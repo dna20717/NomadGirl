@@ -92,7 +92,7 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 - **Leyla** (`leyla.js`): Zustände normal, dash, slide, climb, swing, dead. Werte aus „Leyla“. Kollisionsbox bei 192 px Größe 54 × 168 px (Slide 78 hoch, an Leitern 33 breit), skaliert mit der Höhe von `look.idle`. Aussehen pro Zustand aus `look.<zustand>`, sonst `look.idle` mit Code-Effekten; neue Animationen wirken ohne Code-Änderung.
 - **Gegner** (`enemies.js`): Verhalten charger (Schläger) und shooter (Schütze), andere laufen Patrouille. Jeder Angriff wird angekündigt (Ausholen: Blinken + „!“, Schütze zeigt die Ziellinie). Werte aus „Gegner“ inkl. Abschnitt Angriff. Ohne Aussehen: Platzhalter aus Code (Farbe wählbar).
 - **Kacheln:** Asset-Art „Kacheln“ (Streifen: einzeln, links, Mitte, rechts), im Bereich „Spiel“ › Kacheln zugeordnet. Bisher: Plattform. Wände sind noch aus Code gezeichnet.
-- **Kamera** (Bereich „Spiel“ › Kamera): Zoom (Standard 0,75 = 2560×1440 Spielpixel sichtbar, Daniel 07.11.2026), Vorlauf in Laufrichtung, Nachziehen. Zwei Kameras: Hintergrund ungezoomt (`bgCam`, scrollt mit), Welt gezoomt (`cam`). Ist der Raum niedriger als die Sicht, sitzt der Boden unten und darüber ist Himmel.
+- **Kamera** (Bereich „Spiel“ › Kamera): Zoom (1 = 1920×1080 Spielpixel sichtbar; Daniel hat am 07.11.2026 abends in der Web-Werkstatt von 0,75 zurück auf 1 gestellt), Vorlauf in Laufrichtung, Nachziehen. Zwei Kameras: Hintergrund ungezoomt (`bgCam`, scrollt mit), Welt gezoomt (`cam`). Ist der Raum niedriger als die Sicht, sitzt der Boden unten und darüber ist Himmel.
 - Tod: Mama-Bot-Meldung, Raum startet neu. Raum geräumt: Zeit, Kills, Δ.
 
 ## Startseite
@@ -117,6 +117,7 @@ Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei j
 
 ## Stand
 
+- 07.11.2026 abends: Web-Werkstatt eingerichtet (Access + `GITHUB_TOKEN`), erster Commit aus der Werkstatt von Daniel (Kamera-Zoom 1).
 - 07.11.2026: **Startseite mit Szene**: Daniels Wastelands-Hintergrund (4 Ebenen, Pixel-Art) und Leyla rennt endlos auf uns zu; neuer Bereich „Startseite“ (23 Bereiche).
 - 07.11.2026: Knopf „Spielen“ in der Werkstatt (speichert vorher, eigener Tab).
 - 07.11.2026: **Web-Werkstatt „Speichern = Commit“** (Worker, Access-Login für alles, Autospeichern, Konflikte, Spiel lädt live). Einrichtung im Dashboard durch Daniel.
