@@ -776,5 +776,120 @@
   "derivedFrom": "camp_ground_source",
   "date": "07.11.2026",
   "description": "32 × 40 je Kachel (oben 8 px Platz für Grasbüschel), im Spiel ×2. Reihenfolge: 0 Oberfläche, 1 Füllung, 2 Kante mit Wand links (Boden rechts vom Schacht), 3 Säule (Wände links und rechts), 4 Wand links, 5 Wand rechts, 6 und 7 Oberfläche mit Gras."
+ },
+ "leyla_idle_turn_side_source": {
+  "name": "Leyla · Umdrehen (Idle) · Original",
+  "kind": "source",
+  "file": "assets/leyla/idle_turn_side_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 17 Frames à 200 ms."
+ },
+ "leyla_idle_turn_side": {
+  "name": "Leyla · Umdrehen (Idle)",
+  "kind": "animation",
+  "file": "assets/leyla/idle_turn_side.png",
+  "frameSize": [79, 242],
+  "frames": 17,
+  "fps": 5,
+  "loop": false,
+  "origin": [44, 241],
+  "height": 192,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_idle_turn_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art, dreht sich einmal um und schaut sich um. Zufällige Idle."
+ },
+ "leyla_gum_side_source": {
+  "name": "Leyla · Kaugummiblase (Idle) · Original",
+  "kind": "source",
+  "file": "assets/leyla/gum_side_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 14 Frames à 200 ms."
+ },
+ "leyla_gum_side": {
+  "name": "Leyla · Kaugummiblase (Idle)",
+  "kind": "animation",
+  "file": "assets/leyla/gum_side.png",
+  "frameSize": [86, 242],
+  "frames": 14,
+  "fps": 5,
+  "loop": false,
+  "origin": [38, 241],
+  "height": 192,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_gum_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art, Kaugummiblase bis zum Platzen. Die drei Frames mit der langen Zunge sind raus (Daniel). Zufällige Idle."
+ },
+ "leyla_flex_side_source": {
+  "name": "Leyla · Cyberarm (Idle) · Original",
+  "kind": "source",
+  "file": "assets/leyla/flex_side_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 17 Frames à 200 ms."
+ },
+ "leyla_flex_side": {
+  "name": "Leyla · Cyberarm (Idle)",
+  "kind": "animation",
+  "file": "assets/leyla/flex_side.png",
+  "frameSize": [84, 242],
+  "frames": 17,
+  "fps": 5,
+  "loop": false,
+  "origin": [34, 241],
+  "height": 192,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_flex_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art, ballt die Faust, der Cyberarm leuchtet auf. Zufällige Idle."
+ },
+ "leyla_hair_side_source": {
+  "name": "Leyla · Haare richten (Idle) · Original",
+  "kind": "source",
+  "file": "assets/leyla/hair_side_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 17 Frames à 200 ms."
+ },
+ "leyla_hair_side": {
+  "name": "Leyla · Haare richten (Idle)",
+  "kind": "animation",
+  "file": "assets/leyla/hair_side.png",
+  "frameSize": [74, 242],
+  "frames": 17,
+  "fps": 5,
+  "loop": false,
+  "origin": [34, 241],
+  "height": 192,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_hair_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art, fährt sich durch die Haare. Zufällige Idle."
+ },
+ "leyla_sit_game_side_source": {
+  "name": "Leyla · Sitzen und zocken · Original",
+  "kind": "source",
+  "file": "assets/leyla/sit_game_side_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 17 Frames à 200 ms."
+ },
+ "leyla_sit_game_side": {
+  "name": "Leyla · Sitzen und zocken",
+  "kind": "animation",
+  "file": "assets/leyla/sit_game_side.png",
+  "frameSize": [143, 242],
+  "frames": 17,
+  "fps": 5,
+  "loop": false,
+  "origin": [72, 241],
+  "height": 192,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_sit_game_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art: setzt sich (Frames 1–6), zockt auf dem Handheld (7–13, Schleife), steht auf (14–17). Im Camp am Lagerfeuer."
  }
 }

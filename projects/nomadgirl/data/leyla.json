@@ -58,5 +58,7 @@
   "land": "leyla_land_side"
  },
  "idleAltChance": 50,
- "inventory": {"pickupRange": 150, "autoStack": true, "cell": 44, "dropSpread": 90}
+ "inventory": {"pickupRange": 150, "autoStack": true, "cell": 44, "dropSpread": 90},
+ "idles": [{"look": "leyla_idle_turn_side", "weight": 3},{"look": "leyla_gum_side", "weight": 2},{"look": "leyla_flex_side", "weight": 2},{"look": "leyla_hair_side", "weight": 3}],
+ "idleAfter": [6, 12]
 }

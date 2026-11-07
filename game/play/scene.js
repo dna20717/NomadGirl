@@ -39,11 +39,13 @@ export class PlayScene extends Phaser.Scene {
     for (const e of Object.values(this.data_.enemies || {})) if (e.look) ids.add(e.look);
     for (const id of Object.values(this.data_.game?.tiles || {})) ids.add(id);
     if (this.data_.drone?.look) ids.add(this.data_.drone.look);
+    for (const r of this.data_.leyla?.idles || []) if (r.look) ids.add(r.look);
     const SP = this.data_.game?.spawn;
     for (const id of [SP?.look, SP?.dish?.look, SP?.roof?.front, this.data_.rooms?.[this.roomId]?.backdrop?.image]) if (id) ids.add(id);
     if (this.mode === 'camp') {
       for (const c of this.box?.save.companions || []) if (this.data_.companions?.[c]?.look) ids.add(this.data_.companions[c].look);
       if (this.data_.camp?.fire?.look) ids.add(this.data_.camp.fire.look);
+      if (this.data_.camp?.fire?.sit?.look) ids.add(this.data_.camp.fire.sit.look);
       if (this.data_.camp?.chest?.look) ids.add(this.data_.camp.chest.look);
       if (this.data_.camp?.ground?.tiles) ids.add(this.data_.camp.ground.tiles);
       const S = this.data_.camp?.sound || {};
@@ -75,10 +77,11 @@ export class PlayScene extends Phaser.Scene {
   // a state without its own animation borrows a related one (walk → run, double jump → jump), else idle with code effects;
   // walk without its own animation borrows run (Leyla slows its pace down); facing < 0 = left
   playLook(sprite, who, state, facing = 1) {
-    const look = this.data_.leyla?.look || {}, A = this.data_.assets || {}, has = s => look[s] && this.textures.exists(look[s]);
+    const look = this.data_.leyla?.look || {}, A = this.data_.assets || {}, direct = state.startsWith('@') && this.textures.exists(state.slice(1));
+    const has = s => s.startsWith('@') ? direct : look[s] && this.textures.exists(look[s]);
     this.looks ??= {};
     const used = has(state) ? state : (BORROW[state] || []).find(has) || 'idle';
-    let id = look[used] || look.idle;
+    let id = direct ? state.slice(1) : look[used] || look.idle;   // '@<asset>' plays an asset directly (random idles, sitting)
     const a = A[id], m = a?.mirror;
     if (m && this.textures.exists(m) && (facing < 0) !== !!a.flip) id = m;
     const info = this.looks[id] ??= this.assetInfo(id) || { key: 'px', scale: 60, ox: 0.5, oy: 1, flip: false };

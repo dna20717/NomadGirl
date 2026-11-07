@@ -52,6 +52,11 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/sound/wind.m4a`, `wind2`, `wind3` (+ `.ogg`) | Wind als leise Schleife und zwei Böen (`sound_wind`, `sound_wind2`, `sound_wind3`) | von Daniel | 07.11.2026 |
 | `assets/tiles/camp_ground_source.png` | Camp-Boden: Tileset-Original, 256 × 256, Kacheln 32 px (`camp_ground_source`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/tiles/camp_ground.png` | Camp-Boden: 8 Kacheln à 32 × 40 (Oberfläche, Füllung, Kanten, Säule, Wände, Gras), im Spiel ×2 (`camp_ground`) | aus dem Tileset ausgeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/idle_turn_side.png` (+ `_source.gif`) | Leyla dreht sich um, zufällige Idle, 17 Frames (`leyla_idle_turn_side`) | KI-generiert (Daniel), zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/gum_side.png` (+ `_source.gif`) | Leyla Kaugummiblase, 14 von 17 Frames (ohne lange Zunge), zufällige Idle (`leyla_gum_side`) | KI-generiert (Daniel), zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/flex_side.png` (+ `_source.gif`) | Leyla Cyberarm, zufällige Idle, 17 Frames (`leyla_flex_side`) | KI-generiert (Daniel), zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/hair_side.png` (+ `_source.gif`) | Leyla richtet die Haare, zufällige Idle, 17 Frames (`leyla_hair_side`) | KI-generiert (Daniel), zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/sit_game_side.png` (+ `_source.gif`) | Leyla setzt sich und zockt, steht wieder auf, 17 Frames, am Lagerfeuer (`leyla_sit_game_side`) | KI-generiert (Daniel), zugeschnitten (Code) | 07.11.2026 |
 | `assets/vehicles/van.png` | erste Version des Vans, offene Schiebetür, 837 × 417 px (`van_v1`) | aus `van_source.png` zugeschnitten, halbe Größe (Code) | 07.11.2026 |
 | `assets/vehicles/van_source.png` | erste Version des Vans: Original, 1774 × 887 px (`van_v1_source`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_sky.png` | Wastelands, Himmel: Verlauf mit Dither, 576 × 324 px (`wasteland_sky`) | KI-generiert (Daniel) | 07.11.2026 |

@@ -54,9 +54,12 @@ check('Schlafen bis 7 Uhr mit Buff', s.camp.clock === 'Tag 3 · 07:00' && s.camp
 await shot('morning');
 
 let p = await ev(() => c.to('Lagerfeuer'));
-check('Hinweis am Lagerfeuer', p === 'Am Feuer sitzen · Lagerfeuer', p);
-s = await ev(() => { game.scene.getScene('play').leyla.health = 40; c.use(); return c.pick('Hinsetzen'); });
-check('Am Feuer: 1 h, heilt 25 %, Leyla bleibt dort', s.camp.clock === 'Tag 3 · 08:00' && s.health === 65 && Math.abs(s.leyla.x - s.camp.hotspots.find(h => h.name === 'Lagerfeuer').x) < 40, { clock: s.camp.clock, health: s.health, x: s.leyla.x });
+check('Hinweis am Lagerfeuer', p === 'Hinsetzen · Lagerfeuer', p);
+s = await ev(() => { game.scene.getScene('play').leyla.health = 40; nomad.step(1, [], ['grab']); nomad.step(240); const st = nomad.state(), sp = game.scene.getScene('play').leyla.sprite; return { st, flip: sp.flipX, frame: sp.frame.name, prompt: st.prompt }; });
+check('E am Feuer: Leyla setzt sich und zockt, schaut zum Feuer', s.st.leyla.state === 'sit' && s.prompt === 'Aufstehen · Lagerfeuer' && Number(s.frame) >= 6, s);
+await shot('sit');
+s = await ev(() => { nomad.step(60, ['right']); nomad.step(10); return nomad.state(); });
+check('Aufstehen nach dem Sitzen: 1 h, heilt 25 %, Leyla bleibt dort', s.camp.clock === 'Tag 3 · 08:00' && s.health === 65 && Math.abs(s.leyla.x - s.camp.hotspots.find(h => h.name === 'Lagerfeuer').x) < 200, { clock: s.camp.clock, health: s.health, x: s.leyla.x });
 
 p = await ev(() => c.to('Onkel Sung'));
 s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(3); return game.scene.getScene('play').camp.companions.find(x => x.id === 'onkel_sung').bubble.text; });
@@ -100,3 +103,4 @@ for (const o of ok) console.log('✔', o);
 for (const e of errors) console.log('✖', e);
 console.log(`\n${ok.length} ok, ${errors.length} Fehler`);
 process.exit(errors.length ? 1 : 0);
+

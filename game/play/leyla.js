@@ -95,6 +95,7 @@ export class Leyla {
       case 'hang': this.hang(time, input, dir); break;
       case 'mantle': this.mantle(time); break;
       case 'crouch': this.crouch(time, dt, input, dir, grounded); break;
+      case 'sit': this.sitting(time, input, dir); break;
       case 'land': this.landing(time, s, input, dir); break;
       case 'dead': b.setVelocityX(b.velocity.x * 0.9); break;
     }
@@ -150,7 +151,7 @@ export class Leyla {
       if (L && this.hangFits(L)) return this.startHang(L);
     }
     // crouch: ↓ while standing (fast = slide, see above)
-    if (grounded && input.down.down && !input.jump.down && Math.abs(b.velocity.x) <= (m.walkSpeed ?? 240) * 0.8) return this.startCrouch();
+    if (grounded && input.down.down && !dir && !input.jump.down && Math.abs(b.velocity.x) <= (m.walkSpeed ?? 240) * 0.8) return this.startCrouch();   // not while a direction is held (after a slide with ↓ + → she simply runs on)
   }
 
   jump(f) {
@@ -394,13 +395,24 @@ export class Leyla {
     let name = st === 'dead' ? 'hurt' : st === 'normal' ? (!grounded ? (time < (this.flipUntil || 0) ? 'airJump' : v.y < 0 ? 'jump' : 'fall') : Math.abs(v.x) > 300 ? 'run' : Math.abs(v.x) > 20 ? 'walk' : 'idle') : st === 'swing' ? 'jump' : st;
     this.idleNow = name === 'idle';
     if (name === 'idle' && this.idleVariant === 'idleAlt' && this.d.look?.idleAlt) name = 'idleAlt';
+    // random idles after standing still for a while (Leyla › Zufällige Idles); sitting does not count
+    if (this.idleNow && st === 'normal') {
+      this.stillSince ??= time; this.idleWait ??= this.rollIdleWait();
+      if (!this.special && time - this.stillSince > this.idleWait) this.special = this.pickIdle();
+      if (this.special) name = '@' + this.special;
+    } else { this.stillSince = time; this.special = null; this.idleWait = this.rollIdleWait(); }
+    if (st === 'sit') name = '@' + this.sit.look;
     // mantle and crouch pick their frame from the progress (crouch backwards = standing up)
     const flipFrames = name === 'airJump' && (this.m.airJumpFromFrame ?? 1) > 1;
     const climbFrames = st === 'climb' && (this.m.climbFromFrame ?? 1) > 0;
-    const manual = st === 'mantle' || st === 'crouch' || st === 'dash' || st === 'land' || flipFrames || climbFrames, an0 = this.sprite.anims;
+    const manual = st === 'mantle' || st === 'crouch' || st === 'dash' || st === 'land' || st === 'sit' || flipFrames || climbFrames, an0 = this.sprite.anims;
     if (!manual && st !== 'slide' && an0.isPaused) an0.resume();
     const info = this.scene.playLook(this.sprite, 'leyla', name, this.facing);
-    if (manual && (info.used === st || (flipFrames && info.used === 'airJump')) && an0.currentAnim) {
+    if (st === 'sit' && info.used === name && an0.currentAnim) {
+      const fr = an0.currentAnim.frames;
+      if (!an0.isPaused) an0.pause();
+      this.sprite.setFrame(fr[Math.max(0, Math.min(fr.length - 1, this.sitFrame(time)))].frame.name);
+    } else if (manual && (info.used === st || (flipFrames && info.used === 'airJump')) && an0.currentAnim) {
       const fr = an0.currentAnim.frames, n = fr.length;
       const from = st === 'mantle' ? Math.min(n - 1, Math.max(0, (this.m.mantleFromFrame ?? 5) - 1)) : 0;
       const dashFrom = Math.min(n - 1, Math.max(0, (this.m.dashFromFrame ?? 1) - 1)), dashP = Math.min(1, 1 - (this.dashEnd - time) / DASH_TIME);
@@ -443,6 +455,38 @@ export class Leyla {
     this.sprite.setScale(info.scale * sx, info.scale * sy);
     this.sprite.setFlipX(info.flip ? this.facing > 0 : this.facing < 0);
     if (st !== 'dead') this.sprite.setAlpha(time < this.invulnerableUntil && Math.floor(time / 70) % 2 ? 0.35 : 1);
+  }
+
+  // ---------- random idles ----------
+  rollIdleWait() { const [a, b] = this.d.idleAfter || [6, 12]; return (a + Math.random() * (b - a)) * 1000; }
+  pickIdle() {
+    const rows = (this.d.idles || []).filter(r => r.look && this.scene.textures.exists(r.look) && (r.weight ?? 1) > 0);
+    if (!rows.length) return null;
+    let k = Math.random() * rows.reduce((n, r) => n + (r.weight ?? 1), 0);
+    const r = rows.find(x => (k -= x.weight ?? 1) < 0) || rows[0];
+    // after one run of the animation: back to standing, wait again
+    this.sprite.once('animationcomplete', () => { this.special = null; this.stillSince = this.scene.time.now; this.idleWait = this.rollIdleWait(); });
+    return r.look;
+  }
+
+  // ---------- sitting (camp fire): sit down, a looping part, stand up; frames from Camp › Am Feuer sitzen ----------
+  startSit(S, x, facing, onStand) {
+    this.state = 'sit'; this.sit = { ...S, at: this.scene.time.now, up: 0, onStand };
+    this.facing = facing; this.special = null;
+    this.body.reset(x, this.feet - this.size.h / 2); this.body.setVelocity(0, 0);
+  }
+  sitFrame(time) {
+    const S = this.sit, ms = 1000 / (S.fps || 5), t = time - S.at, down = Math.max(1, S.downTo ?? 6), [l0, l1] = S.loop || [down + 1, down + 1], up = S.upFrom ?? l1 + 1;
+    if (S.up) { const f = up - 1 + Math.floor((time - S.up) / ms); return f; }
+    if (t < down * ms) return Math.floor(t / ms);
+    return l0 - 1 + Math.floor((t - down * ms) / ms) % Math.max(1, l1 - l0 + 1);
+  }
+  sitting(time, input, dir) {
+    const S = this.sit, b = this.body;
+    b.setVelocityX(0);
+    if (!S.up && (dir || input.jump.pressed || input.grab.pressed || input.up.pressed)) S.up = time;
+    const n = this.scene.data_.assets?.[S.look]?.frames || 1;
+    if (S.up && this.sitFrame(time) >= n) { const sat = (S.up - S.at) / 1000; this.state = 'normal'; this.sit = null; S.onStand?.(sat); }
   }
 
   hand() { return { x: this.x, y: this.feet - this.size.h + this.size.hand }; }

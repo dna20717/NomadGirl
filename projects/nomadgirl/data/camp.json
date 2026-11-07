@@ -7,7 +7,18 @@
  "horizon": 66,
  "ground": {"color": "#4a3628", "top": "#8a6440", "far": "#6b4a36", "tiles": "camp_ground"},
  "rig": {"placeWidth": 4, "height": 248, "gap": 1, "wall": "#4a4f5a", "inside": "#2b2233", "light": "#ffcf7a", "labels": true},
- "fire": {"enabled": true, "look": "campfire", "at": 9, "radius": 460, "color": "#ff8a2a", "strength": 100, "pool": 300, "flicker": 25, "lift": 80},
+ "fire": {
+  "enabled": true,
+  "look": "campfire",
+  "at": 9,
+  "radius": 460,
+  "color": "#ff8a2a",
+  "strength": 100,
+  "pool": 300,
+  "flicker": 25,
+  "lift": 80,
+  "sit": {"look": "leyla_sit_game_side", "distance": 150, "downTo": 6, "loop": [7, 13], "upFrom": 14, "fps": 5, "minSeconds": 3}
+ },
  "companions": {"at": [6, 13], "barkEvery": [7, 15], "barkTime": 4},
  "clock": {"startDay": 1, "startHour": 18.5, "wakeHour": 7, "runHours": 3, "fireHours": 1, "arriveHour": 18.5},
  "daytime": [

@@ -250,7 +250,7 @@ export class Camp {
       this.light(x, y - lift, (F.radius ?? 420) * 0.35, '#ffd27a', 0.45 * k),
       ...(F.pool ? [this.light(x, y + 6, F.pool, color, 0.5 * k, F.pool * 0.14)] : []),
     ];
-    this.hotspots.push({ x, w: 90, name: 'Lagerfeuer', hint: 'Am Feuer sitzen', act: () => this.sitByFire() });
+    this.hotspots.push({ x, w: 90, name: 'Lagerfeuer', hint: 'Hinsetzen', act: () => this.sitDown() });
   }
 
   // ---------- van: at night warm light pours out of the open sliding door ----------
@@ -361,14 +361,18 @@ export class Camp {
         s.goCamp({ banner: ['Guten Morgen, Leyla', `${clockText(save)}${def.buff ? ' · ' + (this.D.buffs?.[def.buff]?.name || def.buff) : ''}`], fade: 900 });
       } }, { label: 'Noch nicht', act: () => {} }] });
   }
-  sitByFire() {
-    const s = this.scene, save = this.box.save, C = this.C, max = s.leyla.maxHealth, hrs = C.clock?.fireHours ?? 1;
-    s.hud.menu({ title: 'Lagerfeuer', sub: `Eine Weile am Feuer sitzen (${hrs} h). Heilt ${C.heal?.fire ?? 25} %.`,
-      items: [{ label: 'Hinsetzen', primary: true, act: () => {
-        advance(save, hrs);
-        save.health = Math.min(max, s.leyla.health + max * (C.heal?.fire ?? 25) / 100);
-        s.goCamp({ banner: ['Knistern und Funken', clockText(save)], fade: 600, keepPlace: true });
-      } }, { label: 'Lieber nicht', act: () => {} }] });
+  // Leyla sits down next to the fire on the side she came from, facing the flames, and games (Camp › Am Feuer sitzen).
+  // Standing up after a while: the time moves on and the fire heals; without a sit animation straight to that.
+  sitDown() {
+    const s = this.scene, l = s.leyla, S = this.C.fire?.sit || {}, side = l.x >= this.geo.fireX ? 1 : -1;
+    const rest = () => {
+      const save = this.box.save, C = this.C, max = l.maxHealth;
+      advance(save, C.clock?.fireHours ?? 1);
+      save.health = Math.min(max, l.health + max * (C.heal?.fire ?? 25) / 100);
+      s.goCamp({ banner: ['Knistern und Funken', clockText(save)], fade: 600, keepPlace: true });
+    };
+    if (!S.look || !s.textures.exists(S.look)) return rest();
+    l.startSit(S, this.geo.fireX + side * (S.distance ?? 150), -side, sat => { if (sat >= (S.minSeconds ?? 3)) rest(); });
   }
   // Warroom: plunder the POI here, or drive somewhere else
   warroom() {
@@ -450,6 +454,11 @@ export class Camp {
       c.sprite.setFlipX(l.x < c.x);
     }
     // nearest hotspot within reach (on the ground)
+    if (l.state === 'sit') {   // sitting: only standing up (E or a direction, handled by Leyla)
+      const text = l.sit?.up ? null : 'Aufstehen · Lagerfeuer';
+      if (text !== this.promptText) { this.prompt = null; this.promptText = text; s.hud.prompt(text); }
+      return;
+    }
     let best = null, bd = Infinity;
     if (l.alive && l.body.blocked.down && l.feet > this.ground - 10)
       for (const h of this.hotspots) { const d = Math.abs(l.x - h.x); if (d <= Math.max(h.w || 0, range) && d < bd) { best = h; bd = d; } }
