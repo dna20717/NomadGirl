@@ -60,6 +60,17 @@ const room = await page.evaluate(() => { const r = game.scene.getScene('play').d
 const F = room.h - 6, feet = h => (F - h) * 64;   // floor row (as in tools: 6 rows of ground below)
 
 let v;
+// Leyla's van: door open at the start, closes when she walks away, ladder up, roof walkable with the rail in front
+v = await page.evaluate(() => nomad.state().van); check('Van: Tür offen am Start', v?.open && v.frame === 4, v);
+v = await page.evaluate(() => { nomad.step(90, ['right']); return nomad.state().van; }); check('Van: Tür geht zu', v && !v.open && v.frame === 0, v);
+v = await page.evaluate(() => { nomad.step(90, ['left']); return nomad.state().van; }); check('Van: Tür geht wieder auf', v?.open && v.frame === 4, v);
+v = await page.evaluate(() => {
+  const n = nomad, s = n.state().van, T = 64; P.tp(5.2, 18); n.step(10);
+  n.step(1, ['up'], ['up']); n.until(x => x.leyla.state !== 'climb', 200, ['up']); n.step(25, ['right']);
+  return { ...P.L(), roof: s.roof.y, front: n.state().van.front };
+});
+check('Van: Leiter hoch, Dach begehbar', Math.abs(v.feet - v.roof) < 3 && v.front, v);
+await shot('van');
 v = await P(P => P.tp(13, 18));
 v = await P(P => P.leap(14.6, 17.5)); check('Hürde 1', v.x > 17 * 64 && v.feet === feet(0), v);
 v = await P(P => P.leap(18.5, 22.5)); check('Hürde 2 (breit)', v.x > 22 * 64 && v.feet === feet(0), v);

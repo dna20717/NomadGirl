@@ -6,6 +6,7 @@ import { Enemy } from './enemies.js';
 import { Combat } from './combat.js';
 import { Fx } from './fx.js';
 import { Drone } from './drone.js';
+import { Van } from './van.js';
 
 const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
 
@@ -30,7 +31,8 @@ export class PlayScene extends Phaser.Scene {
     for (const e of Object.values(this.data_.enemies || {})) if (e.look) ids.add(e.look);
     for (const id of Object.values(this.data_.game?.tiles || {})) ids.add(id);
     if (this.data_.drone?.look) ids.add(this.data_.drone.look);
-    if (this.data_.game?.spawn?.look) ids.add(this.data_.game.spawn.look);
+    const SP = this.data_.game?.spawn;
+    for (const id of [SP?.look, SP?.dish?.look, SP?.roof?.front]) if (id) ids.add(id);
     for (const id of [...ids]) if (A[id]?.mirror) ids.add(A[id].mirror);   // drawn opposite direction
     for (const id of ids) {
       const a = A[id];
@@ -121,16 +123,13 @@ export class PlayScene extends Phaser.Scene {
     this.rope = this.add.graphics().setDepth(9);
 
     const start = R.start || [2, R.h - 2];
-    // spawn point (Leyla's van): decoration, its anchor sits on Leyla's start
-    const S = this.data_.game?.spawn, sp = S?.enabled !== false && S?.look && this.assetInfo(S.look);
-    if (sp) {
-      const [ox, oy] = S.offset || [0, 0];
-      this.spawnArt = (sp.anim ? this.add.sprite(0, 0, sp.key).play(sp.anim) : this.add.image(0, 0, sp.key))
-        .setPosition((start[0] + 0.5) * T + ox, (start[1] + 1) * T + oy).setOrigin(sp.ox, sp.oy).setScale(sp.scale)
-        .setFlipX(!!S.flip).setDepth(S.layer === 'front' ? 5 : -20);
-    }
+    // spawn point (Leyla's van): decoration, its anchor sits on Leyla's start; door, roof and dish in van.js
+    const S = this.data_.game?.spawn;
+    this.van = S?.enabled !== false && S?.look && this.assetInfo(S.look) ? new Van(this, S, [(start[0] + 0.5) * T, (start[1] + 1) * T]) : null;
+    this.spawnArt = this.van?.sprite;
     this.leyla = new Leyla(this, this.data_, [(start[0] + 0.5) * T, (start[1] + 1) * T]);
     this.drone = new Drone(this, this.data_);
+    this.van?.reset();
     this.physics.add.collider(this.leyla.box, this.solids);
     this.physics.add.collider(this.leyla.box, this.platforms, null, (box, plat) => {
       const l = this.leyla, b = l.body;
@@ -175,6 +174,7 @@ export class PlayScene extends Phaser.Scene {
     this.spawnEnemies();
     this.leyla.reset();
     this.drone.reset();
+    this.van?.reset();
     this.kills = 0; this.deltas = 0; this.cleared = false; this.startTime = 0;
     this.hud.room(this.data_.rooms?.[this.roomId]?.name || this.roomId, this.enemies.length);
     this.hud.banner(null);
@@ -251,6 +251,7 @@ export class PlayScene extends Phaser.Scene {
 
     this.leyla.update(time, dt, input);
     this.drone.update(time, dt);
+    this.van?.update(dt);
     for (const e of this.enemies) e.update(time, dt, this.leyla);
     this.combat.update(time, dt);
 

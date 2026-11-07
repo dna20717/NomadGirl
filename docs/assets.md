@@ -26,8 +26,12 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/leyla/walk_side*_source.gif`, `jump_side*_source.gif`, `slide_side*_source.gif`, `flip_side_source.gif`, `walk_front_source.gif` | Originale, 256 × 256 px, 200 ms pro Frame | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/drone/moods.png` | Drohne (Mama-Bot): 12 Stimmungen à 380 × 254 px als Streifen, an der Antenne ausgerichtet (`drone_moods`) | aus `concept.png` zugeschnitten (Code) | 07.11.2026 |
 | `assets/drone/concept.png` | Drohne: Konzept mit 12 Stimmungen im Raster 4 × 3, 1536 × 1024 px (`drone_concept`) | KI-generiert (Daniel) | 07.11.2026 |
-| `assets/vehicles/van.png` | Leylas Van von der Seite, offene Schiebetür, 837 × 417 px (`van`), Spawn-Punkt im Spiel | aus `van_source.png` zugeschnitten, halbe Größe (Code) | 07.11.2026 |
-| `assets/vehicles/van_source.png` | Leylas Van: Original, 1774 × 887 px (`van_source`) | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/vehicles/van_door.png` | Leylas Van, Schiebetür geht auf (5 Frames 248 × 172, `van`), Spawn-Punkt; Schüssel herausgenommen | aus `van_door_source.gif` zugeschnitten (Code, `tools/van_strips.py`) | 07.11.2026 |
+| `assets/vehicles/van_dish.png` | Radarschüssel dreht sich (16 Frames 35 × 20, `van_dish`) | aus der Schüssel im Original gedreht (Code, `tools/van_strips.py`) | 07.11.2026 |
+| `assets/vehicles/van_roof_front.png` | vorderes Dachgeländer als Vordergrund (5 Frames, `van_roof_front`) | aus dem Original ausgeschnitten (Code, `tools/van_strips.py`) | 07.11.2026 |
+| `assets/vehicles/van_door_source.gif` | Leylas Van mit Schiebetür: Original, 5 Frames à 150 ms, 256 × 256 (`van_source`) | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/vehicles/van.png` | erste Version des Vans, offene Schiebetür, 837 × 417 px (`van_v1`) | aus `van_source.png` zugeschnitten, halbe Größe (Code) | 07.11.2026 |
+| `assets/vehicles/van_source.png` | erste Version des Vans: Original, 1774 × 887 px (`van_v1_source`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_sky.png` | Wastelands, Himmel: Verlauf mit Dither, 576 × 324 px (`wasteland_sky`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_far.png` | Wastelands, ferne Skyline, transparent, 576 × 324 px (`wasteland_far`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_ledge.png` | Wastelands, Steg, transparent, 576 × 324 px (`wasteland_ledge`) | KI-generiert (Daniel) | 07.11.2026 |

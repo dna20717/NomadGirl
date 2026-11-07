@@ -16,5 +16,15 @@
  "testRoom": "testraum",
  "tiles": {"platform": "platform_metal"},
  "camera": {"zoom": 1, "lookAhead": 160, "follow": 0.12},
- "spawn": {"enabled": true, "look": "van", "offset": [0, 0], "layer": "behindWalls"}
+ "spawn": {
+  "enabled": true,
+  "look": "van",
+  "offset": [0, 0],
+  "layer": "behindWalls",
+  "door": {"enabled": true, "openRange": 260, "closeRange": 380},
+  "roof": {"enabled": true, "x": [23, 185], "y": 47, "front": "van_roof_front"},
+  "dish": {"look": "van_dish", "at": [97.5, 30], "speed": 1},
+  "bob": [{"dx": 0, "dy": 0},{"dx": 0, "dy": 0},{"dx": 2, "dy": 2},{"dx": 2, "dy": 1},{"dx": 0, "dy": 0}],
+  "ladder": {"enabled": true, "x": 39, "y": [47, 171]}
+ }
 }

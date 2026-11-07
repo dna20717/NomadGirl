@@ -10,6 +10,7 @@
 //   nomad.calm() / nomad.restart()    enemies off / room fresh
 //   nomad.freeze() / nomad.thaw()     show the current frame (for screenshots), then continue stepping
 //   nomad.drone('kill')               show a drone mood
+//   nomad.state().van                 van door frame, open, roof platform
 //   nomad.release()                   keyboard again, game runs normally
 // Input names: left right up down jump walk dash melee ranged grab restart help debug
 
@@ -56,6 +57,7 @@ export function installControl(game) {
         leyla: { state: l.state, x: r(l.x), feet: r(l.feet), tile: [Math.floor(l.x / s.T), Math.round(l.feet / s.T)], vx: r(l.body.velocity.x), vy: r(l.body.velocity.y), facing: l.facing, health: l.health, ammo: l.ammo },
         enemies: s.enemies.map(e => ({ id: e.id, state: e.state, x: r(e.x), feet: r(e.feet), hp: e.hp })),
         drone: s.drone && { mood: s.drone.mood, x: r(s.drone.x), y: r(s.drone.y) },
+        van: s.van?.state(),
       };
     },
   };
