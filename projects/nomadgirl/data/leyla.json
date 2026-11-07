@@ -21,5 +21,14 @@
   "swingBoost": 20
  },
  "loadout": {"melee": "rohrzange", "ranged": "nagelpistole", "backpack": "schulranzen"},
- "look": {"idle": "leyla_idle_side", "reference": "leyla_sheet", "run": "leyla_run_side"}
+ "look": {
+  "idle": "leyla_idle_side",
+  "reference": "leyla_sheet",
+  "run": "leyla_run_side",
+  "walk": "leyla_walk_side",
+  "jump": "leyla_jump_side",
+  "fall": "leyla_jump_side",
+  "slide": "leyla_slide_side",
+  "airJump": "leyla_flip_side"
+ }
 }

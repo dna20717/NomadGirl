@@ -18,6 +18,12 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/leyla/run_side_left.png` | Leyla, Rennen seitlich nach links: 8 Frames à 148 × 242 px, Pixel-Art (`leyla_run_side_left`) | aus `run_side_left_source.gif` zugeschnitten (Code) | 07.11.2026 |
 | `assets/leyla/idle_side_source.gif`, `idle_side_left_source.gif` | Leyla, Stehen seitlich rechts/links: Originale, 4 Frames à 200 ms, 256 × 256 px | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/leyla/run_side_source.gif`, `run_side_left_source.gif` | Leyla, Rennen seitlich rechts/links: Originale, 8 Frames à 200 ms, 256 × 256 px | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/leyla/walk_side.png, walk_side_left.png` | Leyla, Gehen seitlich rechts/links: je 8 Frames, Pixel-Art (`leyla_walk_side`, `leyla_walk_side_left`) | aus den `*_source.gif` zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/jump_side.png, jump_side_left.png` | Leyla, Springen seitlich rechts/links: je 8 Frames, Pixel-Art (`leyla_jump_side`, `leyla_jump_side_left`) | aus den `*_source.gif` zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/slide_side.png, slide_side_left.png` | Leyla, Slide seitlich rechts/links: je 6 Frames, Pixel-Art (`leyla_slide_side`, `leyla_slide_side_left`) | aus den `*_source.gif` zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/flip_side.png` | Leyla, Salto (Doppelsprung) nach rechts: 9 Frames, Pixel-Art (`leyla_flip_side`) | aus den `*_source.gif` zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/walk_front.png` | Leyla, Gehen nach vorn: 8 Frames à 96 × 256 px, Pixel-Art, Startseite (`leyla_walk_front`) | aus den `*_source.gif` zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/walk_side*_source.gif`, `jump_side*_source.gif`, `slide_side*_source.gif`, `flip_side_source.gif`, `walk_front_source.gif` | Originale, 256 × 256 px, 200 ms pro Frame | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/drone/moods.png` | Drohne (Mama-Bot): 12 Stimmungen à 380 × 254 px als Streifen, an der Antenne ausgerichtet (`drone_moods`) | aus `concept.png` zugeschnitten (Code) | 07.11.2026 |
 | `assets/drone/concept.png` | Drohne: Konzept mit 12 Stimmungen im Raster 4 × 3, 1536 × 1024 px (`drone_concept`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/vehicles/van.png` | Leylas Van von der Seite, offene Schiebetür, 837 × 417 px (`van`), Spawn-Punkt im Spiel | aus `van_source.png` zugeschnitten, halbe Größe (Code) | 07.11.2026 |

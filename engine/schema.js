@@ -117,7 +117,9 @@ export const AREAS = {
       { title: 'Hintergrund', fields: [refs('background', 'Ebenen', 'assets', { hint: 'Von hinten nach vorn. Alle gleich groß; die erste deckt alles, die anderen sind transparent' }),
         num('horizon', 'Horizont', { unit: '% der Höhe', min: 30, max: 100, hint: 'Hier endet der Hintergrund unten; darunter zeichnet die Startseite den Boden, auf dem Leyla rennt' }),
         num('parallax', 'Tiefe', { unit: '%', min: 0, max: 10, step: 0.5, hint: 'So weit verschieben sich die Ebenen mit Maus bzw. Neigen gegeneinander (vorderste am meisten). 0 = starr' })] },
-      { title: 'Leyla', fields: [ref('runner', 'Animation', 'assets', { hint: 'Asset der Art „Animation“; Tempo und Ankerpunkt kommen von dort' }),
+      { title: 'Leyla', fields: [table('runners', 'Animationen', [ref('look', 'Animation', 'assets'), num('weight', 'Gewicht', { min: 0 }), num('speed', 'Bodentempo ×', { min: 0 })],
+          { hint: 'Zufällig gewählt nach Gewicht (2 = doppelt so oft wie 1). Bodentempo × multipliziert das Tempo vom Boden, z. B. 0,5 fürs Gehen. Tempo und Ankerpunkt kommen vom Asset' }),
+        range('switchEvery', 'Wechseln alle', { unit: 's', hint: 'Nach so vielen Sekunden wechselt sie zufällig die Gangart. Leer = nur beim Laden der Seite' }),
         num('runnerHeight', 'Größe', { unit: '% der Höhe', min: 10, max: 100, hint: 'Höhe eines Frames im Verhältnis zur Bildschirmhöhe' }),
         num('runnerX', 'Position', { unit: '% der Breite', min: 0, max: 100, hint: 'Wo Leyla steht (auf breiten Bildschirmen); auf schmalen immer in der Mitte' }),
         num('runnerFeet', 'Füße', { unit: '% der Höhe', min: 50, max: 100, hint: 'Auf welcher Höhe ihre Füße stehen (100 = unterer Rand)' })] },
@@ -127,7 +129,8 @@ export const AREAS = {
     ],
     check: (x, report, p) => {
       const A = p.data.assets || {};
-      if (x.runner && A[x.runner] && A[x.runner].kind !== 'animation') report('error', 'Leyla braucht ein Asset der Art „Animation“');
+      for (const r of x.runners || []) if (A[r.look] && A[r.look].kind !== 'animation') report('error', `${r.look}: Leyla braucht ein Asset der Art „Animation“`);
+      if (!(x.runners || []).some(r => r.look && (r.weight ?? 1) > 0)) report('hint', 'Keine Animation für Leyla');
       for (const id of x.background || []) if (A[id] && A[id].kind !== 'image') report('warning', `Ebene ${id} ist kein Bild`);
       if (!(x.background || []).length) report('hint', 'Kein Hintergrund: die Startseite zeigt nur die Farbe der Oberfläche');
     },
@@ -194,7 +197,7 @@ export const AREAS = {
         bool('movement.dashInvulnerable', 'Unverwundbar beim Dash'), num('movement.slideSpeed', 'Slide-Tempo', { unit: 'px/s', min: 0 }), num('movement.slideDuration', 'Slide-Dauer', { unit: 'ms', min: 0 })] },
       { title: 'Klettern & Schwingen', fields: [num('movement.climbSpeed', 'Klettern', { unit: 'px/s', min: 0 }), num('movement.swingRope', 'Seillänge', { unit: 'px', min: 0 }), num('movement.swingBoost', 'Schwung-Boost', { unit: '%', min: 0 })] },
       { title: 'Aussehen', fields: [ref('look.idle', 'Stehen', 'assets'), ref('look.walk', 'Gehen', 'assets'), ref('look.run', 'Rennen', 'assets'),
-        ref('look.jump', 'Springen', 'assets'), ref('look.fall', 'Fallen', 'assets'), ref('look.dash', 'Dash', 'assets'), ref('look.slide', 'Slide', 'assets'),
+        ref('look.jump', 'Springen', 'assets'), ref('look.airJump', 'Doppelsprung', 'assets', { hint: 'Läuft einmal beim Sprung in der Luft' }), ref('look.fall', 'Fallen', 'assets', { hint: 'Gleiches Asset wie Springen: läuft dann einfach weiter, beim Fallen ohne Sprung ab der Mitte' }), ref('look.dash', 'Dash', 'assets'), ref('look.slide', 'Slide', 'assets'),
         ref('look.climb', 'Klettern', 'assets'), ref('look.hurt', 'Treffer', 'assets'), ref('look.reference', 'Referenz', 'assets', { hint: 'Character Sheet, Konzept' })] },
       { title: 'Start-Ausrüstung', fields: [ref('loadout.melee', 'Nahkampf', 'weapons'), ref('loadout.ranged', 'Fernkampf', 'weapons'), ref('loadout.cyberdeck', 'Cyberdeck', 'weapons'), ref('loadout.backpack', 'Rucksack', 'backpacks')] },
     ],

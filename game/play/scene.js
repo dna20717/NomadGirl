@@ -7,6 +7,8 @@ import { Combat } from './combat.js';
 import { Fx } from './fx.js';
 import { Drone } from './drone.js';
 
+const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
+
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
   jump: ['SPACE'], walk: ['SHIFT'], dash: ['L', 'C'], melee: ['J', 'Y'], ranged: ['K', 'X'], grab: ['E'],
@@ -50,20 +52,24 @@ export class PlayScene extends Phaser.Scene {
   }
   lookKey(who) { return this.data_.leyla?.look?.idle && this.textures.exists(this.data_.leyla.look.idle) ? this.data_.leyla.look.idle : 'px'; }
   // Leyla: asset for a state, otherwise idle (marked as fallback so code effects step in)
+  lookDuration(state) { const a = this.data_.assets?.[this.data_.leyla?.look?.[state]]; return a?.frames && a.fps ? a.frames / a.fps * 1000 : 0; }
+  // a state without its own animation borrows a related one (walk → run, double jump → jump), else idle with code effects;
   // walk without its own animation borrows run (Leyla slows its pace down); facing < 0 = left
   playLook(sprite, who, state, facing = 1) {
     const look = this.data_.leyla?.look || {}, A = this.data_.assets || {}, has = s => look[s] && this.textures.exists(look[s]);
     this.looks ??= {};
-    const used = has(state) ? state : state === 'walk' && has('run') ? 'run' : 'idle';
+    const used = has(state) ? state : (BORROW[state] || []).find(has) || 'idle';
     let id = look[used] || look.idle;
     const a = A[id], m = a?.mirror;
     if (m && this.textures.exists(m) && (facing < 0) !== !!a.flip) id = m;
     const info = this.looks[id] ??= this.assetInfo(id) || { key: 'px', scale: 60, ox: 0.5, oy: 1, flip: false };
     if (sprite.texture.key !== info.key || (info.anim && sprite.anims.currentAnim?.key !== info.anim)) {
       sprite.setOrigin(info.ox, info.oy);
-      if (info.anim) sprite.play(info.anim, true); else sprite.setTexture(info.key);
+      // falling without a jump: a shared jump animation starts in its second half
+      const mid = used === 'fall' && look.fall === look.jump ? Math.floor((A[id]?.frames || 1) / 2) : 0;
+      if (info.anim) sprite.play({ key: info.anim, startFrame: mid }, true); else sprite.setTexture(info.key);
     }
-    return { ...info, used, fallback: used !== state && used !== 'run' || !has(used) };
+    return { ...info, used, fallback: used === 'idle' && state !== 'idle' || !has(used) };
   }
   enemyLook(def) {
     const info = def.look && this.assetInfo(def.look);

@@ -15,7 +15,14 @@ export async function startSplash(canvas) {
   const [S, A] = await Promise.all([json('data/splash.json'), json('data/assets.json')]);
   const image = id => A[id]?.file ? load(new URL(A[id].file, BASE).href) : Promise.resolve(null);
   const layers = (await Promise.all((S.background || []).map(image))).filter(Boolean);
-  const run = A[S.runner], runImg = await image(S.runner);
+  // Leyla's gaits (run, walk …): picked at random by weight, switched now and then at the end of a cycle
+  const gaits = (await Promise.all((S.runners || (S.runner ? [{ look: S.runner }] : [])).filter(r => A[r.look] && (r.weight ?? 1) > 0)
+    .map(async r => ({ a: A[r.look], img: await image(r.look), weight: r.weight ?? 1, speed: r.speed ?? 1 })))).filter(g => g.img);
+  const pick = not => { const list = gaits.length > 1 && not ? gaits.filter(g => g !== not) : gaits, sum = list.reduce((n, g) => n + g.weight, 0);
+    let r = Math.random() * sum; return list.find(g => (r -= g.weight) < 0) || list[0]; };
+  let gait = pick(), gaitStart = 0, nextSwitch = Infinity, pace = gait?.speed ?? 1, run = gait?.a, runImg = gait?.img;
+  const [sw0, sw1] = S.switchEvery || [];
+  const planSwitch = now => { nextSwitch = sw0 ? now + (sw0 + Math.random() * Math.max(0, (sw1 ?? sw0) - sw0)) * 1000 : Infinity; };
   const G = { speed: 6, specks: 140, color: '#4a4256', base: '#292330', dust: true, shadow: true, ...(S.ground || {}) };
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const ctx = canvas.getContext('2d');
@@ -64,8 +71,13 @@ export async function startSplash(canvas) {
     const project = (x, z) => [W / 2 + x * W * (Z_NEAR / z), top + K / z];
 
     // Leyla
+    if (gaitStart === 0) { gaitStart = now; planSwitch(now); }
+    if (!still && now > nextSwitch && gaits.length > 1 && Math.floor((now - gaitStart) / 1000 * (run?.fps || 5)) % (run?.frames || 1) === 0) {
+      gait = pick(gait); run = gait.a; runImg = gait.img; gaitStart = now; planSwitch(now);   // switch at the start of a cycle
+    }
+    pace += ((gait?.speed ?? 1) - pace) * Math.min(1, dt * 2);   // ground speed eases to the new gait
     const fps = run?.fps || 5, n = run?.frames || 1, [fw, fh] = run?.frameSize || [96, 256], [ax, ay] = run?.origin || [fw / 2, fh];
-    const f = still ? 0 : Math.floor(t * fps) % n;
+    const f = still ? 0 : Math.floor((now - gaitStart) / 1000 * fps) % n;
     let k = H * (S.runnerHeight ?? 46) / 100 / fh;
     k = k * dpr >= 1 ? Math.round(k * dpr * 2) / 2 / dpr : k;   // whole or half device pixels per pixel: stays sharp
     const wide = W / H > 1.15;
@@ -74,11 +86,11 @@ export async function startSplash(canvas) {
 
     // move the world
     if (!still) {
-      for (const s of specks) { s.z += G.speed * dt * (s.z / 6 + 0.35); if (s.z > Z_FAR) Object.assign(s, speck(Z_NEAR)); }
+      for (const s of specks) { s.z += G.speed * pace * dt * (s.z / 6 + 0.35); if (s.z > Z_FAR) Object.assign(s, speck(Z_NEAR)); }
       if (f !== lastFrame && G.dust && (f % Math.max(1, Math.round(n / 2)) === 0)) for (let i = 0; i < 3; i++)
         dust.push({ x: (cx - W / 2) / W / (Z_NEAR / zFeet) + rnd(-0.03, 0.03), z: zFeet + rnd(0, 0.15), up: 0, vy: rnd(0.4, 0.9), r: rnd(1.5, 3), life: 1 });
       lastFrame = f;
-      for (const d of dust) { d.z += G.speed * dt * (d.z / 6 + 0.35); d.up += d.vy * dt; d.life -= dt * 0.9; }
+      for (const d of dust) { d.z += G.speed * pace * dt * (d.z / 6 + 0.35); d.up += d.vy * dt; d.life -= dt * 0.9; }
       while (dust.length && dust[0].life <= 0) dust.shift();
     }
     const drawSpecks = front => {
@@ -108,7 +120,7 @@ export async function startSplash(canvas) {
     if (!still) requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  return { still, layers: layers.length, runner: !!runImg, commit: cloud?.commit || null };
+  return { still, layers: layers.length, runner: !!runImg, gaits: gaits.length, gait: () => run?.name, commit: cloud?.commit || null };
 }
 
 function load(src) {

@@ -62,7 +62,7 @@ export class Leyla {
     const grounded = b.blocked.down || b.touching.down;
     if (grounded) {
       if (!this.wasGrounded && this.lastVy > 500 && this.state === 'normal') this.land(this.lastVy);
-      this.lastGround = time; this.airJumps = m.airJumps ?? 0; this.airDash = true;
+      this.lastGround = time; this.airJumps = m.airJumps ?? 0; this.airDash = true; this.flipUntil = 0;
     }
     if (input.jump.pressed) this.jumpAt = time;
     const dir = (input.right.down ? 1 : 0) - (input.left.down ? 1 : 0);
@@ -102,7 +102,7 @@ export class Leyla {
     if (time - this.jumpAt <= (m.jumpBuffer ?? 120) && (grounded || time - this.lastGround <= (m.coyoteTime ?? 100))) {
       this.jump(1); this.lastGround = -1e9;
     } else if (input.jump.pressed && !grounded && this.airJumps > 0) {
-      this.airJumps--; this.jump(0.92); this.scene.fx.puff(this.x, this.feet, 0x3fe0d0);
+      this.airJumps--; this.jump(0.92); this.flipUntil = time + this.scene.lookDuration('airJump'); this.scene.fx.puff(this.x, this.feet, 0x3fe0d0);
     }
     if (this.cut && !input.jump.down && b.velocity.y < 0) { b.setVelocityY(b.velocity.y * 0.45); this.cut = false; }
     if (b.velocity.y >= 0) this.cut = false;
@@ -252,10 +252,17 @@ export class Leyla {
   // ---------- look ----------
   look(time, dt, grounded) {
     const b = this.body, v = b.velocity, st = this.state;
-    const name = st === 'dead' ? 'hurt' : st === 'normal' ? (!grounded ? (v.y < 0 ? 'jump' : 'fall') : Math.abs(v.x) > 300 ? 'run' : Math.abs(v.x) > 20 ? 'walk' : 'idle') : st === 'swing' ? 'jump' : st;
+    const name = st === 'dead' ? 'hurt' : st === 'normal' ? (!grounded ? (time < (this.flipUntil || 0) ? 'airJump' : v.y < 0 ? 'jump' : 'fall') : Math.abs(v.x) > 300 ? 'run' : Math.abs(v.x) > 20 ? 'walk' : 'idle') : st === 'swing' ? 'jump' : st;
     const info = this.scene.playLook(this.sprite, 'leyla', name, this.facing);
     // run cycle follows the speed, so the feet do not slide (walking = slower steps)
-    this.sprite.anims.timeScale = info.used === 'run' ? Math.max(0.45, Math.min(1.4, Math.abs(v.x) / (this.m.runSpeed || 440))) : 1;
+    // sliding through a tunnel: hold the lowest frame (middle of the slide) until she can stand
+    const an = this.sprite.anims;
+    if (st === 'slide' && info.used === 'slide' && an.currentAnim) {
+      const mid = an.currentAnim.frames[Math.floor(an.currentAnim.frames.length / 2)];
+      if (!this.canStand() && an.currentFrame?.index >= mid.index) { if (!an.isPaused) an.pause(mid); } else if (an.isPaused) an.resume();
+    }
+    const pace = { run: this.m.runSpeed || 440, walk: this.m.walkSpeed || 240 }[info.used];
+    this.sprite.anims.timeScale = pace ? Math.max(0.45, Math.min(1.4, Math.abs(v.x) / pace)) : 1;
     // squash & stretch relaxes back to 1
     const k = Math.min(1, dt / 90);
     this.squash.x += (1 - this.squash.x) * k; this.squash.y += (1 - this.squash.y) * k;
@@ -263,9 +270,9 @@ export class Leyla {
     const lean = v.x / (this.m.runSpeed || 440);
     if (st === 'normal' && grounded && info.fallback && Math.abs(v.x) > 20) { sy *= 1 + Math.sin(time / 55) * 0.025; rot = lean * 0.09; }
     if (st === 'normal' && !grounded && info.fallback) rot = this.facing * Math.max(-0.12, Math.min(0.12, v.y / 9000)) + lean * 0.05;
-    if (st === 'slide') rot = -this.facing * 1.15;
-    if (st === 'dash') rot = this.facing * 0.12;
-    if (st === 'climb') rot = Math.sin(this.climbPhase * 6) * 0.05;
+    if (info.fallback && st === 'slide') rot = -this.facing * 1.15;
+    if (info.fallback && st === 'dash') rot = this.facing * 0.12;
+    if (info.fallback && st === 'climb') rot = Math.sin(this.climbPhase * 6) * 0.05;
     if (st === 'swing') rot = -this.theta * 0.85;
     if (time < this.attackPose && st === 'normal') rot += this.facing * 0.1;
     if (st === 'dead') { this.deadRot = (this.deadRot || 0) + (this.facing * -1.45 - (this.deadRot || 0)) * k; rot = this.deadRot; } else this.deadRot = 0;
