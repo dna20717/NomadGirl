@@ -57,5 +57,6 @@
   "climb": "leyla_climb_back",
   "land": "leyla_land_side"
  },
- "idleAltChance": 50
+ "idleAltChance": 50,
+ "inventory": {"pickupRange": 150, "autoStack": true, "cell": 44, "dropSpread": 90}
 }

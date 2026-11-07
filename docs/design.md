@@ -39,7 +39,7 @@ Im POI spielt sich NomadGirl wie Dead Cells: schnelle Bewegung, harter Kampf, un
 - **Aufbau:** hybrid. Handgebaute Räume werden prozedural zu einem Level zusammengesetzt (Werkstatt: „Raum-Bausteine“ und „POIs“).
 - **Bewegung:** Gehen, Rennen, Springen, Schwingen, Klettern, Dashen, Sliden.
 - **Kampf:** Nahkampf, Fernkampf, später optional Hacking über das Cyberdeck.
-- **Inventar:** Slots für Nahkampf, Fernkampf und Cyberdeck. Dazu ein Rucksack als Raster im Diablo-Stil; Gegenstände haben Form und Größe, die Kapazität wächst mit der Qualität des Rucksacks.
+- **Inventar:** Slots für Nahkampf, Fernkampf, Cyberdeck und Rucksack. Der Rucksack ist ein Raster im Diablo-Stil; Gegenstände haben Tetris-Formen und lassen sich drehen, die Kapazität wächst mit der Qualität des Rucksacks. Bedienung nur mit der Maus, das Spiel läuft dabei weiter. Beute liegt als Bündel am Boden (Boden-Inventar wie bei XCOM); Stapelbares, das Leyla schon trägt, sammelt sie im Vorbeilaufen ein. Kisten und Lagerplätze im Rig sind ebenfalls Inventare.
 - **Geld:** Deltas durch Kills, Kisten und Co.
 
 ### Tod und Mama-Bot
@@ -145,7 +145,7 @@ Ein POI mit Ranking, Rucksack-Raster, Tod mit Mama-Bot, Rig mit zwei bis drei We
 - [x] Camp begehbar: Rig als Puppenhaus, Van mit Schlafkoje + Warroom, Lagerfeuer, Companions, Tag/Nacht (07.11.2026)
 - [x] Loop Camp → Warroom → Run → Van/k.o. → Camp, Ereignis-Zeit, Sprit und Vorräte beim Fahren, Buffs aus dem Schlaf für den nächsten Run
 - [x] Spielstand online pro Login (Cloudflare KV), ohne Worker im Browser
-- [ ] Beute + Rucksack-Raster, Lager im Camp
+- [x] Beute + Rucksack-Raster (Tetris-Formen, nur Maus), Boden-Inventar im Run, Kiste und Lagerregal im Camp (07.11.2026)
 - [ ] Kochen & Craften (Rezeptbuch, Experimentieren)
 - [ ] Bau-Ansicht
 - [ ] POIs aus Raum-Bausteinen zusammensetzen (bis dahin spielt ein Run den Ersatzraum)

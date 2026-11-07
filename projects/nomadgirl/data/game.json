@@ -8,10 +8,24 @@
   "location": "tankstelle_km7",
   "tractor": "van",
   "containers": ["wohnanhaenger"],
-  "workshops": ["schlafkoje", "warroom", "kochnische", "werkbank"],
+  "workshops": ["schlafkoje", "warroom", "kochnische", "werkbank", "lagerregal"],
   "companions": ["schraube", "onkel_sung"],
   "fuel": 40,
-  "food": 6
+  "food": 6,
+  "inventory": [
+   {"where": "backpack", "item": "verband", "count": 2},
+   {"where": "backpack", "item": "kupferkabel", "count": 3},
+   {"where": "chest", "item": "discokugel", "count": 1},
+   {"where": "chest", "weapon": "machete", "count": 1},
+   {"where": "chest", "item": "kabelbaum", "count": 2},
+   {"where": "chest", "item": "dosenbohnen", "count": 4},
+   {"where": "storage", "backpack": "wanderrucksack", "count": 1},
+   {"where": "storage", "weapon": "schrotflinte", "count": 1},
+   {"where": "storage", "item": "rohrbogen", "count": 1},
+   {"where": "storage", "item": "schrottplatte", "count": 2},
+   {"where": "storage", "item": "kronkorken", "count": 37},
+   {"where": "storage", "weapon": "bastlerdeck", "count": 1}
+  ]
  },
  "testRoom": "testraum",
  "tiles": {"platform": "platform_metal"},

@@ -9,9 +9,10 @@
   "knockback": 240,
   "size": [1, 2],
   "value": 8,
-  "description": "Repariert Leitungen und Meinungen."
+  "description": "Repariert Leitungen und Meinungen.",
+  "glyph": "🔧"
  },
- "machete": {"name": "Machete", "kind": "melee", "tier": 2, "damage": 18, "cooldown": 450, "range": 88, "knockback": 160, "critChance": 10, "size": [1, 3], "value": 40},
+ "machete": {"name": "Machete", "kind": "melee", "tier": 2, "damage": 18, "cooldown": 450, "range": 88, "knockback": 160, "critChance": 10, "size": [1, 3], "value": 40, "glyph": "🔪"},
  "schockstab": {
   "name": "Schockstab",
   "kind": "melee",
@@ -23,9 +24,23 @@
   "critChance": 5,
   "size": [1, 2],
   "value": 60,
-  "description": "Ehemals Viehtreiber. Funktioniert auch bei Mutanten."
+  "description": "Ehemals Viehtreiber. Funktioniert auch bei Mutanten.",
+  "glyph": "⚡"
  },
- "nagelpistole": {"name": "Nagelpistole", "kind": "ranged", "tier": 1, "damage": 6, "cooldown": 250, "range": 640, "knockback": 80, "ammo": 40, "size": [2, 1], "value": 15, "projectileSpeed": 1800},
+ "nagelpistole": {
+  "name": "Nagelpistole",
+  "kind": "ranged",
+  "tier": 1,
+  "damage": 6,
+  "cooldown": 250,
+  "range": 640,
+  "knockback": 80,
+  "ammo": 40,
+  "size": [2, 1],
+  "value": 15,
+  "projectileSpeed": 1800,
+  "glyph": "🔫"
+ },
  "schrotflinte": {
   "name": "Schrotflinte",
   "kind": "ranged",
@@ -37,7 +52,8 @@
   "ammo": 12,
   "size": [3, 1],
   "value": 90,
-  "projectileSpeed": 1400
+  "projectileSpeed": 1400,
+  "glyph": "💥"
  },
  "bastlerdeck": {
   "name": "Bastler-Deck",
@@ -49,6 +65,7 @@
   "size": [2, 2],
   "value": 120,
   "description": "Hacking kommt später. Bis dahin ein sehr teurer Briefbeschwerer.",
-  "knockback": null
+  "knockback": null,
+  "glyph": "💾"
  }
 }

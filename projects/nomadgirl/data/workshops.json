@@ -3,8 +3,8 @@
  "kochnische": {"name": "Kochnische", "function": "kitchen", "stage": "mvp", "places": 1, "power": -1, "value": 80, "description": "Zwei Platten, eine davon geht."},
  "werkbank": {"name": "Werkbank", "function": "craft", "stage": "mvp", "places": 1, "power": -1, "value": 80},
  "generator": {"name": "Generator", "function": "power", "stage": "1", "places": 1, "power": 3, "value": 200},
- "waffenkammer": {"name": "Waffenkammer", "function": "storage", "stage": "1", "places": 1, "power": 0, "capacity": 12, "value": 150},
- "kuehlraum": {"name": "Kühlraum", "function": "cooling", "stage": "1", "places": 1, "power": -2, "capacity": 20, "value": 250},
+ "waffenkammer": {"name": "Waffenkammer", "function": "storage", "stage": "1", "places": 1, "power": 0, "capacity": 12, "value": 150, "grid": [6, 6]},
+ "kuehlraum": {"name": "Kühlraum", "function": "cooling", "stage": "1", "places": 1, "power": -2, "capacity": 20, "value": 250, "grid": [6, 4]},
  "chill_area": {"name": "Chill Area", "function": "chill", "stage": "1", "places": 1, "power": 0, "buff": "gemuetlich", "value": 120, "description": "Sofa, Lichterkette, Plattenspieler."},
  "drohnenwerkstatt": {
   "name": "Drohnenwerkstatt",
@@ -20,5 +20,15 @@
  "foodtruck": {"name": "Foodtruck", "function": "foodtruck", "stage": "1", "places": 2, "power": -1, "value": 700, "description": "Jaaa, wirklich."},
  "motorraum": {"name": "Motorraum", "function": "engine", "stage": "1", "places": 1, "power": 0, "value": 300},
  "zelle": {"name": "Zelle", "function": "cell", "stage": "2", "places": 1, "power": 0, "capacity": 1, "value": 200},
- "reaktor": {"name": "Reaktor", "function": "power", "stage": "2", "places": 2, "power": 8, "value": 3000}
+ "reaktor": {"name": "Reaktor", "function": "power", "stage": "2", "places": 2, "power": 8, "value": 3000},
+ "lagerregal": {
+  "name": "Lagerregal",
+  "function": "storage",
+  "places": 1,
+  "power": 0,
+  "stage": "mvp",
+  "value": 60,
+  "grid": [8, 5],
+  "description": "Schwerlastregal, hält alles, was Leyla nicht wegwerfen kann. Also alles."
+ }
 }

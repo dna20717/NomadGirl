@@ -57,3 +57,41 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .hud-item.focus kbd { background: #3fe0d0; color: #0d0a12; }
 .hud-item:disabled { opacity: .45; cursor: default; }
 .hud-keys { display: block; margin-top: 12px; color: #8a7d99; font-size: 12px; }
+
+/* inventory: grids with Tetris shapes, slots, ghost under the pointer, tooltip */
+.inv { position: fixed; left: 50%; top: 92px; transform: translateX(-50%); pointer-events: auto; user-select: none; }
+.inv[hidden], .inv-tip[hidden], .inv-ghost[hidden] { display: none; }
+.inv-row { display: flex; gap: 16px; align-items: flex-start; justify-content: center; }
+.inv-panel { padding: 12px; border-radius: 10px; background: rgba(23, 17, 31, .92); border: 1px solid #3a2f45; box-shadow: 0 14px 40px rgba(0, 0, 0, .45); }
+.inv-panel.floor { border-color: #5a4a2a; }
+.inv-panel header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: #ff7ac0; }
+.inv-panel header b { font: 30px/1 VT323, monospace; font-weight: normal; }
+.inv-panel header small { margin-left: auto; color: #ffd27a; font: 20px/1 VT323, monospace; }
+.inv-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+.inv-slot { display: grid; justify-items: center; align-content: center; gap: 2px; min-height: 62px; padding: 4px; border-radius: 6px; border: 1px dashed #4a3f55; color: #8a7d99; cursor: pointer; text-align: center; }
+.inv-slot small { font-size: 10px; letter-spacing: .5px; text-transform: uppercase; }
+.inv-slot.full { border-style: solid; border-color: color-mix(in srgb, var(--col) 70%, #fff 0%); background: color-mix(in srgb, var(--col) 45%, #17111f); color: #f2eef7; }
+.inv-slot b { font: 24px/1 VT323, monospace; font-weight: normal; }
+.inv-slot span { font-size: 10.5px; line-height: 1.1; }
+.inv-grid { position: relative; background-color: #120d18; background-image: linear-gradient(#2a2233 1px, transparent 1px), linear-gradient(90deg, #2a2233 1px, transparent 1px); background-size: var(--c) var(--c); border: 1px solid #2a2233; cursor: pointer; }
+.inv-item { position: absolute; pointer-events: auto; }
+.inv-item i { position: absolute; box-sizing: border-box; background: var(--col); }
+.inv-item i.l { border-left: 2px solid color-mix(in srgb, var(--col) 50%, #fff); }
+.inv-item i.t { border-top: 2px solid color-mix(in srgb, var(--col) 50%, #fff); }
+.inv-item i.r { border-right: 2px solid color-mix(in srgb, var(--col) 50%, #000); }
+.inv-item i.b { border-bottom: 2px solid color-mix(in srgb, var(--col) 50%, #000); }
+.inv-item:hover i { filter: brightness(1.2); }
+.inv-glyph { position: absolute; display: grid; place-items: center; font: 22px/1 VT323, monospace; color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, .5); pointer-events: none; }
+.inv-name { position: absolute; left: 4px; right: 4px; bottom: 2px; font-size: 9.5px; line-height: 1.1; color: #f2eef7; text-shadow: 0 1px 0 #000; pointer-events: none; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.inv-count { position: absolute; right: 3px; top: 1px; font: 18px/1 VT323, monospace; color: #ffd27a; text-shadow: 0 1px 0 #000; pointer-events: none; }
+.inv-actions { display: flex; gap: 6px; margin-top: 10px; }
+.inv-btn { padding: 6px 12px; border-radius: 6px; border: 0; background: #ffd27a; color: #0d0a12; font: 600 12.5px var(--ui-font); cursor: pointer; }
+.inv-btn.ghost { background: #2a2233; color: #f2eef7; }
+.inv-help { margin: 8px 0 0; text-align: center; font-size: 11.5px; color: #b9a2c8; text-shadow: 0 1px 0 #000; }
+.inv-ghost { position: fixed; z-index: 30; pointer-events: none; opacity: .9; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .6)); }
+.inv-ghost .inv-item { left: 0 !important; top: 0 !important; }
+.inv-ghost, .inv-ghost * { pointer-events: none !important; }
+.inv-tip { position: fixed; z-index: 31; max-width: 260px; padding: 8px 10px; border-radius: 8px; background: #0d0a12; border: 1px solid #3a2f45; pointer-events: none; }
+.inv-tip b { display: block; font-size: 13px; color: #ffd27a; }
+.inv-tip small { display: block; margin-top: 2px; font-size: 11.5px; color: #b9a2c8; }
+.inv-tip p { margin: 6px 0 0; font-size: 12px; color: #d8cfe2; line-height: 1.4; }

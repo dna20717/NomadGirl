@@ -9,14 +9,16 @@ import { Drone } from './drone.js';
 import { Van } from './van.js';
 import { Backdrop } from './backdrop.js';
 import { Camp, campLayout, daytimeAt, drawCampBackground, drawCampGround } from './camp.js';
-import { advance, arrive, clockText } from '../save.js';
+import { advance, arrive, clockText, containers } from '../save.js';
+import { Loot } from './loot.js';
+import { InventoryUI } from './inventory_ui.js';
 
 const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
 
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
   jump: ['SPACE'], walk: ['SHIFT'], dash: ['L', 'C'], melee: ['J', 'Y'], ranged: ['K', 'X'], grab: ['E'],
-  restart: ['R'], help: ['H', 'ESC'], debug: ['G'], mute: ['M'],
+  restart: ['R'], help: ['H', 'ESC'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'],
 };
 
 export class PlayScene extends Phaser.Scene {
@@ -94,11 +96,11 @@ export class PlayScene extends Phaser.Scene {
     const color = PLACEHOLDER_COLORS[def.placeholderColor] ? def.placeholderColor : 'rust';
     return { key: `raider_${def.behavior === 'shooter' ? 'gun' : 'melee'}_${color}`, scale: (def.height ?? 220) / 240, ox: 66 / 150, oy: 1, flip: false };
   }
-  weapon(slot) { return this.data_.weapons?.[this.data_.leyla?.loadout?.[slot]] || null; }
+  weapon(slot) { const id = this.box ? this.box.save.inv?.slots?.[slot] : this.data_.leyla?.loadout?.[slot]; return this.data_.weapons?.[id] || null; }
 
   // ---------- world ----------
   create() {
-    this.camp = null; this.vanPrompt = false;   // the scene object is reused on restart (camp ↔ run)
+    this.camp = null; this.vanPrompt = null;   // the scene object is reused on restart (camp ↔ run)
     this.sound.stopAll(); this.sound.removeAll();   // camp sounds belong to one visit
     try { this.sound.mute = localStorage.getItem('nomadgirl-mute') === '1'; } catch { /* private mode */ }
     makeTextures(this);
@@ -166,6 +168,8 @@ export class PlayScene extends Phaser.Scene {
     if (this.box) this.leyla.health = Math.max(1, Math.min(this.leyla.maxHealth, this.box.save.health + (this.mode === 'run' ? this.mods.health || 0 : 0)));
     this.drone = new Drone(this, this.data_);
     this.van?.reset();
+    this.loot = this.mode === 'run' ? new Loot(this) : null;
+    this.setupInventory();
     if (this.mode === 'camp') this.camp = new Camp(this, this.box, this.campGeo);
     this.backdrop?.front();
     this.physics.add.collider(this.leyla.box, this.solids);
@@ -198,6 +202,56 @@ export class PlayScene extends Phaser.Scene {
     this.leaving = false;
   }
 
+  // ---------- inventory (game/play/inventory_ui.js, game/inventory.js) ----------
+  setupInventory() {
+    this.hud.scene = this;
+    if (!this.box) return;
+    const hud = this.hud;
+    hud.inv ??= new InventoryUI(hud.root, {
+      get D() { return hud.scene.data_; },
+      save: () => hud.scene.box.save,
+      changed: key => hud.scene.invChanged(key),
+      equipChanged: slot => { const sc = hud.scene; if (slot === 'ranged') sc.leyla.ammo = sc.weapon('ranged')?.ammo ?? Infinity; },
+      notify: text => hud.scene.fx.text(hud.scene.leyla.x, hud.scene.leyla.feet - hud.scene.leyla.height - 30, text, { color: '#ffd27a', size: 34, rise: 40, life: 1100 }),
+    });
+    hud.inv.close();
+  }
+  // something moved in an inventory: ground bundles appear or vanish, the savegame is written soon after
+  invChanged(key) {
+    const o = this.hud.inv?.other;
+    if (this.loot && o?.kind === 'floor') this.loot.sync(o.pile);
+    clearTimeout(this.saveTimer);
+    this.saveTimer = setTimeout(() => this.box?.persist(), 1200);
+    if (key) this.hud.inv?.draw();
+  }
+  openFloor() {
+    const pile = this.loot.floor();
+    this.hud.inv.open({ key: 'floor', title: this.loot.piles.includes(pile) ? 'Boden · Beute' : 'Boden', grid: pile.grid, kind: 'floor', pile });
+  }
+  // camp: the chest or a storage place
+  openContainer(key) {
+    const c = containers(this.data_, this.box.save).find(x => x.key === key);
+    if (!c) return;
+    this.hud.inv.open({ key, title: c.name, grid: this.box.save.inv.grids[key], kind: 'container', x: this.leyla.x });
+  }
+  inventoryUpdate(input) {
+    const inv = this.hud.inv;
+    if (!inv) return;
+    if (input.inventory.pressed) {
+      if (inv.isOpen) inv.close(); else if (this.mode === 'run') this.openFloor(); else inv.open();
+    }
+    if (!inv.isOpen) return;
+    const o = inv.other;
+    // the ground follows Leyla: another bundle comes into reach
+    if (this.mode === 'run' && o?.kind === 'floor' && !inv.held) {
+      const near = this.loot.nearest();
+      if (near && near !== o.pile && !(o.pile.grid.items.length && this.loot.piles.includes(o.pile) && this.loot.nearest() === o.pile)) this.openFloor();
+      else if (!near && this.loot.piles.includes(o.pile)) this.openFloor();
+    }
+    // walked away from a chest or a shelf
+    if (o?.kind === 'container' && Math.abs(this.leyla.x - o.x) > (this.data_.camp?.interactRange ?? 130) * 2) inv.open(null);
+  }
+
   // ---------- camp ↔ run (savegame) ----------
   restartAs(args, fade = 500) {
     if (this.leaving) return;
@@ -228,11 +282,12 @@ export class PlayScene extends Phaser.Scene {
   endRun(ko) {
     const save = this.box.save, C = this.data_.camp || {}, base = this.data_.leyla?.health ?? 100;
     advance(save, C.clock?.runHours ?? 3);
-    if (ko) save.health = Math.round(base * (C.heal?.afterKo ?? 30) / 100);
+    if (ko) { save.health = Math.round(base * (C.heal?.afterKo ?? 30) / 100); save.inv.grids.backpack.items = []; }   // Mama-Bot only brings Leyla: the backpack stays behind
     else { save.health = Math.round(this.leyla.health); save.deltas += this.deltas; }
     save.buffs = [];
     save.run = null;
-    const banner = ko ? ['Mama-Bot hat dich heimgebracht', `${clockText(save)} · Die Run-Beute ist weg.`] : ['Zurück im Camp', `${clockText(save)} · +${this.deltas} Δ · ${this.kills} Kills`];
+    this.hud.inv?.close();
+    const banner = ko ? ['Mama-Bot hat dich heimgebracht', `${clockText(save)} · Der Rucksack ist weg.`] : ['Zurück im Camp', `${clockText(save)} · +${this.deltas} Δ · ${this.kills} Kills`];
     this.goCamp({ banner, fade: ko ? 900 : 600, arriving: true });
   }
 
@@ -316,6 +371,7 @@ export class PlayScene extends Phaser.Scene {
   }
   onKill(e) {
     this.kills++;
+    this.loot?.fromEnemy(e);
     this.drone.react('kill');
     const [a, b] = e.d.deltas || [0, 0], d = a + Math.floor(Math.random() * (b - a + 1));
     this.deltas += d;
@@ -332,7 +388,8 @@ export class PlayScene extends Phaser.Scene {
   runUpdate(input) {
     const l = this.leyla, v = this.van;
     const near = v && l.alive && l.body.blocked.down && Math.abs(l.x - v.x) < (this.data_.camp?.interactRange ?? 130) && Math.abs(l.feet - v.y) < 40;
-    if (!!near !== !!this.vanPrompt) { this.vanPrompt = !!near; this.hud.prompt(near ? 'Zurück ins Camp · Van' : null); }
+    const pile = !near && this.loot?.nearest(), text = near ? 'Zurück ins Camp · Van' : pile && !this.hud.inv?.isOpen ? `Beute am Boden · I öffnet (${pile.grid.items.length})` : null;
+    if (text !== this.vanPrompt) { this.vanPrompt = text; this.hud.prompt(text, near ? 'E' : 'I'); }
     if (near && input.grab.pressed) this.endRun(false);
   }
 
@@ -350,6 +407,7 @@ export class PlayScene extends Phaser.Scene {
 
   update(time, delta) {
     const input = this.readInput();
+    if (input.help.pressed && this.hud.inv?.isOpen && !this.hud.paused) { this.hud.inv.close(); input.help.pressed = false; }
     if (input.help.pressed) this.hud.toggleHelp();
     if (input.mute.pressed) { this.sound.mute = !this.sound.mute; try { localStorage.setItem('nomadgirl-mute', this.sound.mute ? '1' : '0'); } catch { /* */ } this.hud.banner(this.sound.mute ? 'Ton aus' : 'Ton an', 'M schaltet um'); this.time.delayedCall(1200, () => this.hud.banner(null)); }
     if (input.debug.pressed) { const w = this.physics.world; w.drawDebug = !w.drawDebug; if (!w.debugGraphic) w.createDebugGraphic(); w.debugGraphic.clear().setVisible(w.drawDebug); }
@@ -366,6 +424,8 @@ export class PlayScene extends Phaser.Scene {
     this.van?.update(dt);
     if (this.camp) this.camp.update(time, dt, input);
     else if (this.mode === 'run') this.runUpdate(input);
+    this.loot?.update(time);
+    this.inventoryUpdate(input);
     for (const e of this.enemies) e.update(time, dt, this.leyla);
     this.combat.update(time, dt);
 

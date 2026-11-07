@@ -14,12 +14,18 @@
  "mutanten_beute": {"name": "Mutanten-Beute", "rolls": [0, 1], "entries": [{"item": "mutantenfleisch", "weight": 6, "min": 1, "max": 1},{"item": "stoffreste", "weight": 2, "min": 1, "max": 2}]},
  "pluenderer_beute": {
   "name": "Plünderer-Beute",
-  "rolls": [1, 2],
+  "rolls": [2, 3],
   "entries": [
    {"item": "schrott", "weight": 4, "min": 1, "max": 3},
    {"item": "verband", "weight": 2, "min": 1, "max": 1},
    {"item": "reis", "weight": 2, "min": 1, "max": 2},
-   {"item": "gewuerzmischung", "weight": 1, "min": 1, "max": 1}
+   {"item": "gewuerzmischung", "weight": 1, "min": 1, "max": 1},
+   {"item": "kupferkabel", "weight": 3, "min": 1, "max": 3},
+   {"item": "rohrbogen", "weight": 1, "min": 1, "max": 1},
+   {"item": "t_stueck", "weight": 1, "min": 1, "max": 1},
+   {"item": "auspuffkruemmer", "weight": 1, "min": 1, "max": 1},
+   {"item": "antenne", "weight": 1, "min": 1, "max": 1},
+   {"item": "autobatterie", "weight": 1, "min": 1, "max": 1}
   ]
  },
  "drohnen_beute": {

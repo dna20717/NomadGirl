@@ -19,7 +19,7 @@
  "heal": {"sleep": 100, "fire": 25, "afterKo": 30},
  "interactRange": 130,
  "fallbackRoom": "kampfraum",
- "chest": {"enabled": true, "look": "chest", "at": 16, "flip": false},
+ "chest": {"enabled": true, "look": "chest", "at": 16, "flip": false, "grid": [6, 4]},
  "sound": {
   "wind": "sound_wind",
   "windVolume": 22,

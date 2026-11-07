@@ -40,7 +40,7 @@ export async function start(parent, hudRoot) {
     hud.saveBox = box;
     // a run that was interrupted (page closed) counts as knocked out: the camp starts, the run loot is gone
     const run = box.save.run;
-    if (run) { box.save.run = null; box.save.buffs = []; }
+    if (run) { box.save.run = null; box.save.buffs = []; box.save.inv.grids.backpack.items = []; }   // like knocked out
     arrive(box.save, D);   // every arrival in the camp is at dusk (Camp › Zeit › Ankunft um)
     await box.persist();
     args = { ...args, mode: 'camp', box, banner: run ? ['Mama-Bot hat dich heimgebracht', 'Der letzte Run wurde abgebrochen.'] : box.fresh ? ['Willkommen im Camp', 'E benutzt Dinge · H zeigt die Steuerung'] : null };

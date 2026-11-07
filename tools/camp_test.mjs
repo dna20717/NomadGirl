@@ -28,7 +28,7 @@ await ev(() => {
 
 let s = await ev(() => nomad.state());
 check('Camp startet', s.mode === 'camp' && s.camp.clock === 'Tag 1 · 18:30' && s.camp.daytime === 'Abend', s.camp);
-check('Rig: Van mit Schlafkoje + Warroom, Wohnanhänger mit Kochnische + Werkbank', JSON.stringify(s.camp.van) === '["schlafkoje","warroom"]' && s.camp.rig[0]?.workshops.join() === 'kochnische,werkbank', s.camp);
+check('Rig: Van mit Schlafkoje + Warroom, Wohnanhänger mit Kochnische, Werkbank, Lagerregal', JSON.stringify(s.camp.van) === '["schlafkoje","warroom"]' && s.camp.rig[0]?.workshops.join() === 'kochnische,werkbank,lagerregal', s.camp);
 check('Leyla steht am Van, E-Hinweis', s.prompt === 'Einsteigen · Van', s.prompt);
 await shot('start');
 

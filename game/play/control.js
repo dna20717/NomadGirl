@@ -70,6 +70,8 @@ export function installControl(game) {
       return api.state();
     },
     save() { return scene().box?.save || null; },
+    inv() { return scene().hud.inv?.state() || null; },   // open inventory: grids, slots, held thing
+    loot() { return scene().loot?.state() || null; },     // bundles on the ground (run)
     drone(mood) { scene().drone.react(mood); return scene().drone.mood; },   // show a drone mood (tests, pictures)
     state() {
       const s = scene(), l = s.leyla, r = n => Math.round(n);

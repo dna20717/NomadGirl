@@ -2,8 +2,11 @@
 // Online (Cloudflare worker) one savegame per login in KV (/api/save), the same on every device;
 // without the worker (local, tests) in this browser (localStorage). Shape:
 //   { version, day, hour, location, fuel, food, deltas, health, buffs: [id], rig: { tractor, units: [{ kind, id, workshops: [{ id, at }] }] },
-//     companions: [id], run: null | { poi, room, location }, log: [text] }
+//     companions: [id], run: null | { poi, room, location }, log: [text],
+//     inv: { backpack: id, slots: { melee, ranged, cyberdeck }, grids: { backpack, chest, 'store:<unit>:<place>': grid } } }   (grids: game/inventory.js)
 // Times are hours (18.5 = 18:30). "Ereignis-Zeit": the clock only moves on actions (sleeping, runs, sitting at the fire).
+
+import { newGrid, add, fits } from './inventory.js';
 
 const LOCAL_KEY = 'nomadgirl-save';
 export const SAVE_VERSION = 1;
@@ -28,10 +31,48 @@ export function placeWorkshops(D, tractor, containers, workshops) {
   return { units, left };
 }
 
+// every inventory the camp has: the chest and each storage place in the rig (workshops with a "Lager-Raster")
+export function containers(D, save) {
+  const out = [];
+  const K = D.camp?.chest;
+  if (K?.enabled !== false && K?.grid) out.push({ key: 'chest', name: 'Kiste', size: K.grid });
+  save.rig.units.forEach((u, ui) => u.workshops.forEach(w => {
+    const g = D.workshops?.[w.id]?.grid;
+    if (g) out.push({ key: `store:${ui}:${w.at}`, name: D.workshops[w.id].name || w.id, size: g, workshop: w.id });
+  }));
+  return out;
+}
+// a grid with the right size: created when missing, things that no longer fit after a resize look for a new spot (or are lost)
+export function ensureGrid(D, inv, key, [w, h]) {
+  let g = inv.grids[key];
+  if (!g) return (inv.grids[key] = newGrid(w, h));
+  if (g.w !== w || g.h !== h) {
+    const old = g.items; g.w = w; g.h = h; g.items = [];
+    for (const e of old) if (fits(D, g, e, e.x, e.y)) g.items.push(e); else add(D, g, e.a, e.id, e.n);
+  }
+  return g;
+}
+export function backpackSize(D, inv) { return D.backpacks?.[inv.backpack]?.size || [4, 3]; }
+
+function newInventory(D, save) {
+  const L = D.leyla?.loadout || {}, S = D.game?.start || {};
+  const inv = { backpack: L.backpack || Object.keys(D.backpacks || {})[0] || null, slots: { melee: L.melee || null, ranged: L.ranged || null, cyberdeck: L.cyberdeck || null }, grids: {} };
+  ensureGrid(D, inv, 'backpack', backpackSize(D, inv));
+  const conts = containers(D, save);
+  for (const c of conts) ensureGrid(D, inv, c.key, c.size);
+  const firstStore = conts.find(c => c.key.startsWith('store:'))?.key;
+  for (const row of S.inventory || []) {
+    const key = row.where === 'chest' ? 'chest' : row.where === 'storage' ? firstStore : 'backpack', g = key && inv.grids[key];
+    const [a, id] = row.item ? ['items', row.item] : row.weapon ? ['weapons', row.weapon] : row.backpack ? ['backpacks', row.backpack] : [];
+    if (g && a && D[a]?.[id]) add(D, g, a, id, row.count || 1);
+  }
+  return inv;
+}
+
 export function newSave(D) {
   const S = D.game?.start || {}, C = D.camp?.clock || {};
   const { units } = placeWorkshops(D, S.tractor, S.containers || [], S.workshops || []);
-  return {
+  return withInventory(D, {
     version: SAVE_VERSION,
     day: C.startDay ?? 1, hour: C.startHour ?? 18,
     location: S.location || Object.keys(D.locations || {})[0] || null,
@@ -42,7 +83,18 @@ export function newSave(D) {
     companions: [...(S.companions || [])],
     run: null,
     log: [],
-  };
+  });
+}
+function withInventory(D, save) {
+  save.inv ??= newInventory(D, save);
+  const inv = save.inv;
+  inv.grids ??= {}; inv.slots ??= {};
+  if (!D.backpacks?.[inv.backpack]) inv.backpack = D.leyla?.loadout?.backpack || null;
+  for (const k of ['melee', 'ranged', 'cyberdeck']) if (inv.slots[k] && !D.weapons?.[inv.slots[k]]) inv.slots[k] = null;
+  for (const g of Object.values(inv.grids)) g.items = (g.items || []).filter(e => D[e.a]?.[e.id] && e.n > 0);
+  ensureGrid(D, inv, 'backpack', backpackSize(D, inv));
+  for (const c of containers(D, save)) ensureGrid(D, inv, c.key, c.size);
+  return save;
 }
 
 // fills gaps of an older savegame (new fields, removed workshops) so the game never trips over it
@@ -56,7 +108,8 @@ export function repairSave(save, D) {
   s.buffs = (s.buffs || []).filter(b => D.buffs?.[b]);
   s.companions = (s.companions || []).filter(c => D.companions?.[c]);
   if (s.run && !D.pois?.[s.run.poi]) s.run = null;
-  return s;
+  if (save.inv === undefined) delete s.inv;   // older savegame: inventory from the start values
+  return withInventory(D, s);
 }
 
 // the clock: day + hour → "Tag 2 · 07:30"

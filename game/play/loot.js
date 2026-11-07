@@ -1,0 +1,86 @@
+// Loot on the ground in a run: beaten enemies drop bundles (their loot table), each bundle is a small grid.
+// The ground inventory (like XCOM) shows the nearest bundle within reach (Leyla › Inventar › Boden-Reichweite);
+// stackable things Leyla already carries are picked up by walking past, as far as the stacks have room.
+import { newGrid, add, rollLoot, thing, stackMax } from '../inventory.js';
+
+const PILE = [6, 4];
+
+function bagTexture(scene) {
+  if (scene.textures.exists('loot_bag')) return 'loot_bag';
+  const g = scene.make.graphics({}, false), p = 3;
+  const px = (x, y, w, h, c) => g.fillStyle(c).fillRect(x * p, y * p, w * p, h * p);
+  px(3, 4, 8, 7, 0x8a6a44); px(2, 6, 10, 5, 0x8a6a44); px(4, 3, 6, 1, 0x6b5030); px(5, 1, 4, 2, 0x8a6a44);   // sack
+  px(5, 3, 4, 1, 0xd4a72c);                                                                                  // tie
+  px(3, 6, 2, 3, 0xa8865a); px(4, 10, 7, 1, 0x5a4428);                                                       // light + shade
+  g.generateTexture('loot_bag', 14 * p, 12 * p); g.destroy();
+  return 'loot_bag';
+}
+
+export class Loot {
+  constructor(scene) {
+    this.scene = scene; this.piles = []; this.tick = 0;
+    this.I = scene.data_.leyla?.inventory || {};
+  }
+  get range() { return this.I.pickupRange ?? 150; }
+
+  // a new bundle somewhere (things that do not fit start another one next to it)
+  drop(x, feet, things, spread = this.I.dropSpread ?? 90) {
+    let rest = things.map(t => ({ ...t }));
+    for (let i = 0; rest.length && i < 6; i++) {
+      const pile = this.make(x + (Math.random() - 0.5) * spread + i * 30, feet);
+      rest = rest.map(t => ({ ...t, n: add(this.scene.data_, pile.grid, t.a, t.id, t.n) })).filter(t => t.n > 0);
+      this.show(pile, x);
+    }
+  }
+  make(x, feet) { return { x, feet, grid: newGrid(...PILE), sprite: null }; }
+  show(pile, fromX = pile.x) {
+    if (pile.sprite || !pile.grid.items.length) return;
+    const s = this.scene, sp = s.add.image(fromX, pile.feet, bagTexture(s)).setOrigin(0.5, 1).setDepth(4);
+    pile.sprite = sp;
+    this.piles.push(pile);
+    s.tweens.add({ targets: sp, x: pile.x, duration: 380, ease: 'Sine.easeOut' });
+    s.tweens.add({ targets: sp, y: pile.feet - 70, duration: 190, yoyo: true, ease: 'Quad.easeOut' });
+  }
+  // after changes in the ground inventory: empty bundles disappear, a new bundle with things appears
+  sync(pile) {
+    if (pile && pile.grid.items.length && !pile.sprite) this.show(pile);
+    for (const p of [...this.piles]) if (!p.grid.items.length) { p.sprite?.destroy(); this.piles.splice(this.piles.indexOf(p), 1); }
+  }
+  nearest() {
+    const l = this.scene.leyla;
+    let best = null, bd = this.range;
+    for (const p of this.piles) { const d = Math.hypot(p.x - l.x, (p.feet - l.feet) * 1.5); if (d <= bd) { best = p; bd = d; } }
+    return best;
+  }
+  // the ground inventory: the nearest bundle in reach, otherwise an empty one at Leyla's feet (appears once something lies in it)
+  floor() { const l = this.scene.leyla; return this.nearest() || this.make(l.x, l.feet); }
+
+  fromEnemy(e) {
+    const t = e.d.loot && rollLoot(this.scene.data_, e.d.loot);
+    if (t?.length) this.drop(e.x, e.feet, t);
+  }
+
+  clear() { for (const p of this.piles) p.sprite?.destroy(); this.piles = []; }
+
+  update(time) {
+    const s = this.scene, D = s.data_;
+    for (const p of this.piles) if (p.sprite) p.sprite.setAlpha(0.85 + 0.15 * Math.sin(time / 200 + p.x));
+    // walking past: top up stacks Leyla already carries
+    if (this.I.autoStack === false || ++this.tick % 6 || !s.box) return;
+    const bag = s.box.save.inv.grids.backpack, l = s.leyla;
+    for (const p of this.piles) {
+      if (Math.hypot(p.x - l.x, (p.feet - l.feet) * 1.5) > this.range) continue;
+      let moved = false;
+      for (const e of [...p.grid.items]) {
+        if (stackMax(D, e.a, e.id) <= 1 || !bag.items.some(b => b.a === e.a && b.id === e.id)) continue;
+        const left = add(D, bag, e.a, e.id, e.n, { stackOnly: true });
+        if (left === e.n) continue;
+        s.fx.text(l.x, l.feet - l.height - 20, `+${e.n - left} ${thing(D, e.a, e.id)?.name || e.id}`, { color: '#9be8d8', size: 34, rise: 60, life: 900 });
+        e.n = left; moved = true;
+        if (!left) p.grid.items.splice(p.grid.items.indexOf(e), 1);
+      }
+      if (moved) { s.invChanged('floor'); this.sync(); }
+    }
+  }
+  state() { return this.piles.map(p => ({ x: Math.round(p.x), items: p.grid.items.map(e => `${e.id}×${e.n}`) })); }
+}

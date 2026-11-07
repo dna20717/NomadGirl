@@ -7,7 +7,7 @@ const CONTROLS = [
   ['L oder C', 'Dash (auch in der Luft)'], ['S / ↓ beim Rennen', 'Slide (unter Hindernissen durch)'], ['S + Leertaste', 'Von Plattform fallen'], ['S / ↓ im Stand', 'Ducken; an der Kante + Richtung: runter hängen'],
   ['Richtung zur Wand im Sprung', 'Kante greifen; W/Leertaste: hochziehen, S: loslassen, Leertaste weg von der Wand: abspringen'],
   ['W / ↑ an der Leiter', 'Klettern'], ['W / ↑ oder E in der Luft', 'Am Seil festhalten, Leertaste: loslassen mit Schwung'],
-  ['E', 'Benutzen: Werkstätten, Lagerfeuer, Companions, Van (im Run: zurück ins Camp)'], ['J oder Y', 'Nahkampf'], ['K oder X', 'Fernkampf'], ['R', 'Raum neu starten'], ['M', 'Ton an/aus'], ['H / Esc', 'Diese Hilfe'], ['G', 'Hitboxen zeigen'],
+  ['E', 'Benutzen: Werkstätten, Lagerfeuer, Companions, Van (im Run: zurück ins Camp)'], ['J oder Y', 'Nahkampf'], ['K oder X', 'Fernkampf'], ['R', 'Raum neu starten'], ['M', 'Ton an/aus'], ['I oder Tab', 'Inventar (Maus: klicken nehmen/ablegen, Rechtsklick drehen, Doppelklick rüber)'], ['H / Esc', 'Diese Hilfe'], ['G', 'Hitboxen zeigen'],
 ];
 
 export class Hud {
@@ -55,10 +55,10 @@ export class Hud {
     this.closeMenu();
   }
   // "E · Schlafen · Schlafkoje" at the bottom
-  prompt(text) {
+  prompt(text, key = 'E') {
     this.promptText = text || null;
     this.promptEl.hidden = !text;
-    if (text) this.promptEl.replaceChildren(el('kbd', {}, 'E'), el('span', {}, text));
+    if (text) this.promptEl.replaceChildren(el('kbd', {}, key), el('span', {}, text));
   }
   // menu: { title, sub, items: [{ label, sub?, primary?, disabled?: reason, act }] }; keys W/S or ↑/↓, E/Enter/Leertaste, Esc, 1–9
   menu({ title, sub = '', items = [] }) {

@@ -2,7 +2,7 @@
 // (dollhouse: every container shows its workshops), a campfire, companions with speech bubbles and day/night.
 // Leyla walks around and uses things with E. Time only moves on actions (sleeping, sitting at the fire, driving, runs).
 // Graphics are code placeholders for now; a "look" on containers, workshops or companions takes over later.
-import { clockText, advance, hoursUntil } from '../save.js';
+import { clockText, advance, hoursUntil, containers } from '../save.js';
 
 const de = n => Number(n).toLocaleString('de-DE', { maximumFractionDigits: 1 });
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
@@ -202,7 +202,8 @@ export class Camp {
         // window with warm light at night
         g.fillStyle(0x0d0a12).fillRect(cx + cw / 2 - 26, top + 22, 52, 34).fillStyle(col(R.light || '#ffcf7a')).fillRect(cx + cw / 2 - 22, top + 26, 44, 26);
         this.light(cx + cw / 2, top + 40, 220, R.light || '#ffcf7a', 0.5);
-        this.hotspots.push({ x: cx + cw / 2, w: cw / 2, name: def.name || w.id, hint: VERB[def.function] || 'Ansehen', ws: w.id, act: () => this.use(w.id) });
+        const store = def.grid && `store:${this.box.save.rig.units.indexOf(this.box.save.rig.units.find(x => x.id === u.id && x.workshops.includes(w)))}:${w.at}`;
+        this.hotspots.push({ x: cx + cw / 2, w: cw / 2, name: def.name || w.id, hint: store ? 'Öffnen' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id) });
         if (R.labels !== false) s.add.text(cx + cw / 2, top - 34, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '26px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 1).setDepth(-14);
       }
       // empty places
@@ -272,10 +273,10 @@ export class Camp {
     const x = (this.geo.vanCol + (K.at ?? 16) + 0.5) * s.T, A = this.D.assets?.[K.look] || {};
     const sprite = s.add.sprite(x, this.ground, info.key, 0).setOrigin(info.ox, info.oy).setScale(info.scale).setFlipX(!!K.flip).setDepth(-3);
     this.chest = { x, sprite, frames: A.frames || 1, fps: A.fps || 8, frame: 0, open: false };
-    this.hotspots.push({ x, w: 70, name: 'Kiste', hint: () => this.chest.open ? 'Schließen' : 'Öffnen', act: () => {
-      const c = this.chest;
-      c.open = !c.open;
-      if (c.open) this.scene.fx.text(x, this.ground - 110, 'leer', { color: '#b9a2c8', size: 34, rise: 50, life: 1100 });
+    // E opens the lid and the chest's inventory, E again closes both
+    const inv = () => this.scene.hud.inv, isOpen = () => inv()?.isOpen && inv().other?.key === 'chest';
+    this.hotspots.push({ x, w: 70, name: 'Kiste', hint: () => isOpen() ? 'Schließen' : 'Öffnen', act: () => {
+      if (isOpen()) inv().close(); else this.scene.openContainer('chest');
     } });
   }
 
@@ -429,9 +430,10 @@ export class Camp {
       const v = s.van, open = v && v.frames > 1 ? v.frame / (v.frames - 1) : 0;
       for (const d of this.doorLights) d.setAlpha(d.base * this.lightK * open).setVisible(this.lightK > 0 && open > 0.02);
     }
-    // chest lid
+    // chest lid: open while its inventory is open
     const c = this.chest;
     if (c) {
+      c.open = !!(s.hud.inv?.isOpen && s.hud.inv.other?.key === 'chest');
       const target = c.open ? c.frames - 1 : 0;
       if (c.frame !== target) c.frame = c.frame < target ? Math.min(target, c.frame + c.fps * dt / 1000) : Math.max(target, c.frame - c.fps * dt / 1000);
       c.sprite.setFrame(Math.round(c.frame));

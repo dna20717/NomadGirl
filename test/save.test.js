@@ -11,7 +11,7 @@ const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
 test('Start-Rig: erst die Plätze im Van, dann der Wohnanhänger', () => {
   const s = newSave(D);
   assert.equal(s.rig.tractor, 'van');
-  assert.deepEqual(s.rig.units.map(u => [u.id, u.workshops.map(w => `${w.id}@${w.at}`)]), [['van', ['schlafkoje@0', 'warroom@1']], ['wohnanhaenger', ['kochnische@0', 'werkbank@1']]]);
+  assert.deepEqual(s.rig.units.map(u => [u.id, u.workshops.map(w => `${w.id}@${w.at}`)]), [['van', ['schlafkoje@0', 'warroom@1']], ['wohnanhaenger', ['kochnische@0', 'werkbank@1', 'lagerregal@2']]]);
   const { left } = placeWorkshops(D, 'van', [], ['kueche', 'schlafkoje', 'warroom']);   // Küche needs 2 places → fills the van, the rest has no room
   assert.deepEqual(left, ['schlafkoje', 'warroom']);
 });
@@ -26,10 +26,10 @@ test('Uhr: Ereignis-Zeit über Mitternacht', () => {
 
 test('Alter Spielstand wird repariert', () => {
   assert.equal(repairSave(null, D).version, 1);
-  const s = newSave(D); s.buffs = ['gibtsnicht', 'satt']; s.rig.units[1].workshops.push({ id: 'weg', at: 2 }); s.location = 'nirgendwo';
+  const s = newSave(D); s.buffs = ['gibtsnicht', 'satt']; s.rig.units[1].workshops.push({ id: 'weg', at: 3 }); s.location = 'nirgendwo';
   const r = repairSave(s, D);
   assert.deepEqual(r.buffs, ['satt']);
-  assert.equal(r.rig.units[1].workshops.length, 2);
+  assert.equal(r.rig.units[1].workshops.length, 3);
   assert.equal(r.location, 'tankstelle_km7');
 });
 
