@@ -5,6 +5,7 @@ import { Leyla } from './leyla.js';
 import { Enemy } from './enemies.js';
 import { Combat } from './combat.js';
 import { Fx } from './fx.js';
+import { Drone } from './drone.js';
 
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
@@ -26,6 +27,7 @@ export class PlayScene extends Phaser.Scene {
     const A = this.data_.assets || {}, ids = new Set(Object.values(this.data_.leyla?.look || {}));
     for (const e of Object.values(this.data_.enemies || {})) if (e.look) ids.add(e.look);
     for (const id of Object.values(this.data_.game?.tiles || {})) ids.add(id);
+    if (this.data_.drone?.look) ids.add(this.data_.drone.look);
     for (const id of [...ids]) if (A[id]?.mirror) ids.add(A[id].mirror);   // drawn opposite direction
     for (const id of ids) {
       const a = A[id];
@@ -113,6 +115,7 @@ export class PlayScene extends Phaser.Scene {
 
     const start = R.start || [2, R.h - 2];
     this.leyla = new Leyla(this, this.data_, [(start[0] + 0.5) * T, (start[1] + 1) * T]);
+    this.drone = new Drone(this, this.data_);
     this.physics.add.collider(this.leyla.box, this.solids);
     this.physics.add.collider(this.leyla.box, this.platforms, null, (box, plat) => {
       const l = this.leyla, b = l.body;
@@ -156,6 +159,7 @@ export class PlayScene extends Phaser.Scene {
     this.combat.clear();
     this.spawnEnemies();
     this.leyla.reset();
+    this.drone.reset();
     this.kills = 0; this.deltas = 0; this.cleared = false; this.startTime = 0;
     this.hud.room(this.data_.rooms?.[this.roomId]?.name || this.roomId, this.enemies.length);
     this.hud.banner(null);
@@ -186,7 +190,7 @@ export class PlayScene extends Phaser.Scene {
   hitstop(time, ms) { this.hitstopUntil = time + ms; this.physics.world.pause(); }
 
   // ---------- events ----------
-  onLeylaHit(dmg) { this.cam.shake(120, 0.006); this.fx.blood(this.leyla.x, this.leyla.chest, 10); this.hud.hurt(); }
+  onLeylaHit(dmg) { this.drone.react('hit'); this.cam.shake(120, 0.006); this.fx.blood(this.leyla.x, this.leyla.chest, 10); this.hud.hurt(); }
   onLeylaDown() {
     this.hud.banner('Mama-Bot schleppt dich raus …', 'Die Run-Beute bleibt liegen.');
     this.cam.shake(300, 0.01);
@@ -194,11 +198,13 @@ export class PlayScene extends Phaser.Scene {
   }
   onKill(e) {
     this.kills++;
+    this.drone.react('kill');
     const [a, b] = e.d.deltas || [0, 0], d = a + Math.floor(Math.random() * (b - a + 1));
     this.deltas += d;
     if (d) this.fx.text(e.x, e.feet - e.h - 20, `+${d} Δ`, { color: '#ffd27a', size: 48, rise: 90, life: 1100 });
     if (this.enemies.every(x => !x.alive) && !this.cleared) {
       this.cleared = true;
+      this.drone.react('cleared');
       this.time.delayedCall(700, () => this.hud.banner('Raum geräumt', `${this.clock()} · ${this.kills} Kills · ${this.deltas} Δ · R für nochmal`));
     }
   }
@@ -229,6 +235,7 @@ export class PlayScene extends Phaser.Scene {
     if (!this.cleared) this.elapsed = time - this.startTime;
 
     this.leyla.update(time, dt, input);
+    this.drone.update(time, dt);
     for (const e of this.enemies) e.update(time, dt, this.leyla);
     this.combat.update(time, dt);
 

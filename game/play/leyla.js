@@ -133,6 +133,7 @@ export class Leyla {
   // ---------- dash ----------
   startDash(time, dir) {
     if (dir) this.facing = dir;
+    this.scene.drone?.react('dash');
     this.state = 'dash'; this.dashEnd = time + DASH_TIME; this.dashReady = time + DASH_TIME + (this.m.dashCooldown ?? 600);
     if (!this.body.blocked.down) this.airDash = false;
     this.body.allowGravity = false;

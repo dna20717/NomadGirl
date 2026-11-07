@@ -94,6 +94,7 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 - **Gegner** (`enemies.js`): Verhalten charger (Schläger) und shooter (Schütze), andere laufen Patrouille. Jeder Angriff wird angekündigt (Ausholen: Blinken + „!“, Schütze zeigt die Ziellinie). Werte aus „Gegner“ inkl. Abschnitt Angriff. Ohne Aussehen: Platzhalter aus Code (Farbe wählbar).
 - **Kacheln:** Asset-Art „Kacheln“ (Streifen: einzeln, links, Mitte, rechts), im Bereich „Spiel“ › Kacheln zugeordnet. Bisher: Plattform. Wände sind noch aus Code gezeichnet.
 - **Kamera** (Bereich „Spiel“ › Kamera): Zoom (1 = 1920×1080 Spielpixel sichtbar; Daniel hat am 07.11.2026 abends in der Web-Werkstatt von 0,75 zurück auf 1 gestellt), Vorlauf in Laufrichtung, Nachziehen. Zwei Kameras: Hintergrund ungezoomt (`bgCam`, scrollt mit), Welt gezoomt (`cam`). Ist der Raum niedriger als die Sicht, sitzt der Boden unten und darüber ist Himmel.
+- **Drohne** (Mama-Bot, Daniel, 07.11.2026: „permanenter Begleiter, nur Deko“): `drone.js`, Bereich **Drohne** (`data/drone.json`, Gruppe Leyla). Keine Physik: zieht weich hinter Leyla her (Position ab den Füßen, x in Blickrichtung gespiegelt), schwebt, neigt sich, dreht nach kurzer Verzögerung um. **Stimmungen** (Tabelle: Anlass → Frame aus `drone_moods` + Kaomoji-Bläschen + Dauer): Ereignisse kill, hit, cleared, dash (`drone.react`), Zustände down, lowHealth, alert (Gegner in Reichweite), bored/sleep (Leyla steht still), zufällig curious/scan. `nomad.drone('kill')` zeigt eine Stimmung, `nomad.state().drone`.
 - Tod: Mama-Bot-Meldung, Raum startet neu. Raum geräumt: Zeit, Kills, Δ.
 
 ## Startseite
@@ -118,6 +119,7 @@ Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei j
 
 ## Stand
 
+- 07.11.2026 abends: **Drohne Mama-Bot** fliegt als Deko hinter Leyla, 12 Stimmungen mit Kaomoji; neuer Bereich „Drohne“ (24 Bereiche).
 - 07.11.2026 abends: **Leyla seitlich in Pixel-Art** (Stehen + Rennen, rechts/links von Daniel), Feld „Gegenrichtung“ bei Assets, Gehen nutzt Rennen mit langsamerem Tempo.
 - 07.11.2026 abends: Web-Werkstatt eingerichtet (Access + `GITHUB_TOKEN`), erster Commit aus der Werkstatt von Daniel (Kamera-Zoom 1).
 - 07.11.2026: **Startseite mit Szene**: Daniels Wastelands-Hintergrund (4 Ebenen, Pixel-Art) und Leyla rennt endlos auf uns zu; neuer Bereich „Startseite“ (23 Bereiche).

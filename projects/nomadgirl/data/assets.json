@@ -212,5 +212,28 @@
   "derivedFrom": "leyla_run_side_left_source",
   "date": "07.11.2026",
   "description": "Pixel-Art, rennt nach links."
+ },
+ "drone_concept": {
+  "name": "Drohne · Konzept",
+  "kind": "source",
+  "file": "assets/drone/concept.png",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "12 Stimmungen im Raster 4 × 3, schaut nach rechts."
+ },
+ "drone_moods": {
+  "name": "Drohne · Stimmungen",
+  "kind": "animation",
+  "file": "assets/drone/moods.png",
+  "frameSize": [380, 254],
+  "frames": 12,
+  "fps": 0,
+  "loop": false,
+  "origin": [188, 140],
+  "height": 96,
+  "source": "Code (aus dem Konzept zugeschnitten, an der Antenne ausgerichtet)",
+  "derivedFrom": "drone_concept",
+  "date": "07.11.2026",
+  "description": "Ein Frame pro Stimmung: 0 normal, 1 fröhlich, 2 überrascht, 3 gelangweilt, 4 alarmiert, 5 fragend, 6 wütend, 7 schläft, 8 k.o., 9 scannt, 10 schwitzt, 11 Boost. Ankerpunkt = Mitte der Drohne."
  }
 }

@@ -77,6 +77,11 @@ v = await t(t => t.tp(300, 960));
 v = await t(t => t.run(12, [], ['dash']));
 check('Dash', v.x > 300 + 200, v);
 
+// drone: follows behind Leyla (decoration), shows moods
+const dr = await page.evaluate(() => { nomad.calm(); nomad.step(90); const s = nomad.state(); return { lx: s.leyla.x, f: s.leyla.facing, ...s.drone, after: nomad.drone('kill') }; });
+check('Drohne fliegt hinter Leyla', dr.mood && Math.sign(dr.lx - dr.x) === dr.f && Math.abs(dr.lx - dr.x) < 260, dr);
+check('Drohne zeigt Stimmungen', dr.after === 'kill', dr);
+
 if (shots) await page.screenshot({ path: 'output/game_end.png' });
 await browser.close();
 console.log(ok.map(n => '✓ ' + n).join('\n'));

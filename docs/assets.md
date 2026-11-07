@@ -18,6 +18,8 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/leyla/run_side_left.png` | Leyla, Rennen seitlich nach links: 8 Frames à 148 × 242 px, Pixel-Art (`leyla_run_side_left`) | aus `run_side_left_source.gif` zugeschnitten (Code) | 07.11.2026 |
 | `assets/leyla/idle_side_source.gif`, `idle_side_left_source.gif` | Leyla, Stehen seitlich rechts/links: Originale, 4 Frames à 200 ms, 256 × 256 px | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/leyla/run_side_source.gif`, `run_side_left_source.gif` | Leyla, Rennen seitlich rechts/links: Originale, 8 Frames à 200 ms, 256 × 256 px | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/drone/moods.png` | Drohne (Mama-Bot): 12 Stimmungen à 380 × 254 px als Streifen, an der Antenne ausgerichtet (`drone_moods`) | aus `concept.png` zugeschnitten (Code) | 07.11.2026 |
+| `assets/drone/concept.png` | Drohne: Konzept mit 12 Stimmungen im Raster 4 × 3, 1536 × 1024 px (`drone_concept`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_sky.png` | Wastelands, Himmel: Verlauf mit Dither, 576 × 324 px (`wasteland_sky`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_far.png` | Wastelands, ferne Skyline, transparent, 576 × 324 px (`wasteland_far`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_ledge.png` | Wastelands, Steg, transparent, 576 × 324 px (`wasteland_ledge`) | KI-generiert (Daniel) | 07.11.2026 |

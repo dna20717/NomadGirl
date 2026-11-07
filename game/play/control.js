@@ -9,6 +9,7 @@
 //   nomad.state()                     Leyla, enemies, kills, Δ, time
 //   nomad.calm() / nomad.restart()    enemies off / room fresh
 //   nomad.freeze() / nomad.thaw()     show the current frame (for screenshots), then continue stepping
+//   nomad.drone('kill')               show a drone mood
 //   nomad.release()                   keyboard again, game runs normally
 // Input names: left right up down jump walk dash melee ranged grab restart help debug
 
@@ -47,12 +48,14 @@ export function installControl(game) {
     restart() { scene().restartRoom(); return api.step(5); },
     freeze() { const s = scene(); s.hud.paused = true; s.tweens.pauseAll(); s.time.paused = true; game.loop.wake(); },
     thaw() { const s = scene(); if (active) game.loop.sleep(); s.hud.paused = false; s.tweens.resumeAll(); s.time.paused = false; },
+    drone(mood) { scene().drone.react(mood); return scene().drone.mood; },   // show a drone mood (tests, pictures)
     state() {
       const s = scene(), l = s.leyla, r = n => Math.round(n);
       return {
         room: s.roomId, time: s.clock(), kills: s.kills, deltas: s.deltas, cleared: s.cleared,
         leyla: { state: l.state, x: r(l.x), feet: r(l.feet), tile: [Math.floor(l.x / s.T), Math.round(l.feet / s.T)], vx: r(l.body.velocity.x), vy: r(l.body.velocity.y), facing: l.facing, health: l.health, ammo: l.ammo },
         enemies: s.enemies.map(e => ({ id: e.id, state: e.state, x: r(e.x), feet: r(e.feet), hp: e.hp })),
+        drone: s.drone && { mood: s.drone.mood, x: r(s.drone.x), y: r(s.drone.y) },
       };
     },
   };

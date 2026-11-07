@@ -46,6 +46,8 @@ export const POI_SIZES = [['S', 'S'], ['M', 'M'], ['L', 'L'], ['XL', 'XL']];
 export const ROOM_TAGS = [['start', 'Eingang'], ['exit', 'Ausgang'], ['combat', 'Kampf'], ['loot', 'Beute'], ['secret', 'Geheimnis'], ['npc', 'NPCs'], ['boss', 'Boss'], ['corridor', 'Gang']];
 export const ASSET_KINDS = [['animation', 'Animation'], ['tiles', 'Kacheln'], ['image', 'Bild'], ['reference', 'Referenz'], ['source', 'Original']];
 export const DAYTIME = [['any', 'Immer'], ['day', 'Tag'], ['night', 'Nacht']];
+export const DRONE_MOODS = [['idle', 'Normal'], ['kill', 'Gegner erledigt'], ['cleared', 'Raum geräumt'], ['bored', 'Langeweile'], ['alert', 'Gegner in der Nähe'],
+  ['curious', 'Neugierig (zufällig)'], ['hit', 'Leyla getroffen'], ['sleep', 'Schlafen'], ['down', 'Leyla k.o.'], ['scan', 'Scannen (zufällig)'], ['lowHealth', 'Wenig Leben'], ['dash', 'Dash']];
 export const RANKING_CATEGORIES = [['time', 'Durchlaufzeit'], ['kills', 'Kills in %'], ['secrets', 'Secrets']];
 
 const label = (list, v) => list.find(([k]) => k === v)?.[1] ?? v ?? '';
@@ -153,6 +155,29 @@ export const AREAS = {
     },
   },
 
+  drone: {
+    name: 'Drohne', icon: 'air', file: 'data/drone.json', kind: 'single',
+    hint: 'Leylas Drohne: fliegt immer hinter ihr her, reine Deko ohne Physik. Stimmungen zeigen ein Gesicht (Frame aus dem Aussehen) und optional ein Kaomoji-Bläschen. Zeiten in Millisekunden bzw. Sekunden.',
+    sections: [
+      { title: 'Drohne', fields: [NAME, ref('look', 'Aussehen', 'assets', { hint: 'Animation mit einem Frame pro Stimmung (Tempo 0)' }), num('height', 'Höhe im Spiel', { unit: 'px', min: 8, hint: 'Leer = Höhe aus dem Asset' }),
+        bool('enabled', 'Fliegt mit'), select('layer', 'Ebene', [['behind', 'Hinter Leyla'], ['front', 'Vor Leyla']]), DESCRIPTION] },
+      { title: 'Flug', fields: [point('follow.offset', 'Position', { unit: 'px', hint: 'Von Leylas Füßen aus: x hinter ihr (in Blickrichtung gespiegelt), y nach oben negativ' }),
+        num('follow.smooth', 'Nachziehen', { min: 0.01, max: 1, step: 0.01, hint: '1 = klebt an der Position, kleiner = träger' }), num('follow.bob', 'Schweben', { unit: 'px', min: 0, hint: 'Auf und ab' }),
+        num('follow.bobSpeed', 'Schwebe-Tempo', { unit: 'Hz', min: 0, step: 0.05 }), num('follow.tilt', 'Neigung', { unit: '°', min: 0, hint: 'Neigt sich beim Fliegen in Flugrichtung' }),
+        num('follow.turnDelay', 'Umdrehen nach', { unit: 'ms', min: 0, hint: 'So lange wartet sie, bevor sie Leylas neuer Richtung folgt' })] },
+      { title: 'Stimmungen', fields: [table('moods', 'Stimmungen', [select('mood', 'Anlass', DRONE_MOODS), num('frame', 'Frame', { min: 0 }), text('kaomoji', 'Kaomoji'), num('duration', 'Dauer ms', { min: 0 })],
+        { hint: 'Frame zählt ab 0. Ohne Kaomoji nur das Gesicht. Dauer 0 = solange der Anlass gilt' })] },
+      { title: 'Verhalten', fields: [num('idle.boredAfter', 'Langeweile nach', { unit: 's', min: 0, hint: 'Leyla steht still' }), num('idle.sleepAfter', 'Einschlafen nach', { unit: 's', min: 0 }),
+        range('idle.randomEvery', 'Zufällige Stimmung alle', { unit: 's', hint: 'Neugierig oder Scannen, während Leyla unterwegs ist' }), num('alertRange', 'Gegner bemerken ab', { unit: 'px', min: 0 }),
+        num('lowHealth', 'Wenig Leben unter', { unit: '%', min: 0, max: 100 })] },
+      { title: 'Bläschen', fields: [bool('bubble.show', 'Kaomoji zeigen'), num('bubble.size', 'Schriftgröße', { unit: 'px', min: 8 }), color('bubble.color', 'Schrift'), color('bubble.background', 'Hintergrund')] },
+    ],
+    check: (x, report, p) => {
+      const a = p.data?.assets?.[x.look], n = a?.frames || 1;
+      for (const m of x.moods || []) if (a && (m.frame ?? 0) >= n) report('error', `Stimmung ${label(DRONE_MOODS, m.mood)}: Frame ${m.frame} gibt es nicht (Aussehen hat ${n})`);
+      if (!(x.moods || []).some(m => m.mood === 'idle')) report('hint', 'Stimmung „Normal“ fehlt, dann zeigt sie Frame 0');
+    },
+  },
   leyla: {
     name: 'Leyla', icon: 'person', file: 'data/leyla.json', kind: 'single',
     hint: 'Alle Werte der Spielfigur. Tempo in Pixel pro Sekunde, Zeiten in Millisekunden.',
@@ -370,7 +395,7 @@ export const AREAS = {
 export const GROUPS = [
   ['ASSETS', ['assets']],
   ['GRUNDLAGEN', ['game', 'splash', 'economy', 'ranking']],
-  ['LEYLA', ['leyla', 'backpacks']],
+  ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes']],
   ['RIG', ['tractors', 'containers', 'workshops', 'rigParts', 'companions']],
