@@ -9,13 +9,20 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/leyla/character_sheet.png` | Character Sheet: Turnarounds, Gesichter, Palette, Details (`leyla_sheet`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/tiles/metal_source.png` | Tileset Metall: Vorschau 256 × 256 px, Blöcke mit glühenden Kanten, Teile um 32 px versetzt (`tileset_metal_source`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/tiles/platform.png` | Plattform Metall: 4 Kacheln à 64 × 64 (einzeln, links, Mitte, rechts), Inhalt 33 px oben bündig (`platform_metal`) | aus `metal_source.png` geschnitten (Code) | 07.11.2026 |
+| `assets/leyla/run_front.png` | Leyla, Rennen nach vorn: 7 Frames à 96 × 256 px als Streifen, Pixel-Art (`leyla_run_front`) | aus `run_front_source.gif` zugeschnitten, Frames 2–8 (Code) | 07.11.2026 |
+| `assets/leyla/stand_front.png` | Leyla, Stehen von vorn: 96 × 256 px, Pixel-Art (`leyla_stand_front`) | Frame 1 aus `run_front_source.gif` (Code) | 07.11.2026 |
+| `assets/leyla/run_front_source.gif` | Leyla, Rennen nach vorn: Original, 8 Frames à 200 ms, 256 × 256 px (`leyla_run_front_source`) | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/backgrounds/wasteland_sky.png` | Wastelands, Himmel: Verlauf mit Dither, 576 × 324 px (`wasteland_sky`) | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/backgrounds/wasteland_far.png` | Wastelands, ferne Skyline, transparent, 576 × 324 px (`wasteland_far`) | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/backgrounds/wasteland_ledge.png` | Wastelands, Steg, transparent, 576 × 324 px (`wasteland_ledge`) | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/backgrounds/wasteland_near.png` | Wastelands, nahe Skyline, transparent, 576 × 324 px (`wasteland_near`) | KI-generiert (Daniel) | 07.11.2026 |
 | (im Spiel gezeichnet) | Himmel, Skyline von BigCityDelta, Wände, Leitern, Seil-Anker, Platzhalter-Plünderer, Nägel, Partikel (`game/play/art.js`) | Code | 07.11.2026 |
 
 Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich „Assets“.
 
 ## Ordner
 
-Alle Grafiken liegen unter `projects/nomadgirl/assets/`, nach Figur oder Thema in Unterordnern (`leyla/`, später z. B. `enemies/`, `rig/`). Dort werden sie auch online ausgeliefert, damit die Werkstatt sie zeigen kann.
+Alle Grafiken liegen unter `projects/nomadgirl/assets/`, nach Figur oder Thema in Unterordnern (`leyla/`, `backgrounds/`, `tiles/`, später z. B. `enemies/`, `rig/`). Dort werden sie auch online ausgeliefert, damit die Werkstatt sie zeigen kann.
 
 ## In der Werkstatt
 
@@ -31,3 +38,7 @@ Spielauflösung 1920×1080, Kacheln 64 px, Leyla 192 px hoch (Höhe im Spiel ihr
 - Ärmellose taktische Weste, gepolsterte Lagen, cyan Nähte, fingerlose Handschuhe, Gürtel mit Taschen, hohe Kampfstiefel mit cyan Sohlen.
 - Neon-Implantat am Oberarm.
 - Palette: Neon-Cyan, Dunkelgrau, Mittelgrau, Haut, Hautschatten, Magenta (Haare), Pink (Akzent), Tiefviolett.
+
+## Pixel-Art
+
+Die Startseiten-Grafiken (Leyla von vorn, Wastelands-Hintergrund) sind Pixel-Art in kleiner Auflösung (Hintergrund 576 × 324) und werden scharf skaliert (`imageSmoothingEnabled = false`). Leyla im Spiel bleibt hochaufgelöst und geglättet.

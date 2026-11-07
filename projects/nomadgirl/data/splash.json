@@ -1,0 +1,10 @@
+{
+ "background": ["wasteland_sky", "wasteland_far", "wasteland_ledge", "wasteland_near"],
+ "parallax": 2,
+ "runner": "leyla_run_front",
+ "runnerHeight": 46,
+ "runnerX": 68,
+ "runnerFeet": 94,
+ "ground": {"speed": 6, "specks": 140, "color": "#4a4256", "dust": true, "shadow": true, "base": "#292330"},
+ "horizon": 80
+}

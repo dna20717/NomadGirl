@@ -48,5 +48,71 @@
   "derivedFrom": "tileset_metal_source",
   "date": "07.11.2026",
   "description": "Metallplattform mit glühender Kante. Frames: einzeln, links, Mitte, rechts (Inhalt 33 px hoch, oben bündig)."
+ },
+ "leyla_run_front_source": {
+  "name": "Leyla · Rennen nach vorn (Original)",
+  "kind": "source",
+  "file": "assets/leyla/run_front_source.gif",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "8 Frames à 200 ms, 256 × 256 px, Pixel-Art, transparent. Frame 1 steht, Frames 2–8 rennen auf die Kamera zu."
+ },
+ "leyla_run_front": {
+  "name": "Leyla · Rennen nach vorn",
+  "kind": "animation",
+  "file": "assets/leyla/run_front.png",
+  "frameSize": [96, 256],
+  "frames": 7,
+  "fps": 5,
+  "loop": true,
+  "origin": [48, 256],
+  "height": 256,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_run_front_source",
+  "date": "07.11.2026",
+  "description": "Rennt auf die Kamera zu, Endlosschleife (Frames 2–8 des Originals). Pixel-Art: scharf skalieren. Für die Startseite."
+ },
+ "leyla_stand_front": {
+  "name": "Leyla · Stehen von vorn",
+  "kind": "image",
+  "file": "assets/leyla/stand_front.png",
+  "origin": [48, 244],
+  "height": 256,
+  "source": "Code (Frame 1 des Originals)",
+  "derivedFrom": "leyla_run_front_source",
+  "date": "07.11.2026",
+  "description": "Steht frontal, Pixel-Art."
+ },
+ "wasteland_sky": {
+  "name": "Wastelands · Himmel",
+  "kind": "image",
+  "file": "assets/backgrounds/wasteland_sky.png",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "Hintergrund-Ebene 576 × 324 px, Pixel-Art: Verlauf mit Dither, deckend."
+ },
+ "wasteland_far": {
+  "name": "Wastelands · Ferne Skyline",
+  "kind": "image",
+  "file": "assets/backgrounds/wasteland_far.png",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "Hintergrund-Ebene 576 × 324 px, Pixel-Art: Hochhäuser, Wohnblock, helleres Grau."
+ },
+ "wasteland_ledge": {
+  "name": "Wastelands · Steg",
+  "kind": "image",
+  "file": "assets/backgrounds/wasteland_ledge.png",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "Hintergrund-Ebene 576 × 324 px, Pixel-Art: kleines Stück Steg rechts, zwischen Ferne und Nähe."
+ },
+ "wasteland_near": {
+  "name": "Wastelands · Nahe Skyline",
+  "kind": "image",
+  "file": "assets/backgrounds/wasteland_near.png",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "Hintergrund-Ebene 576 × 324 px, Pixel-Art: Strommast, Solarpanels, Schuppen, Wasserturm, dunkel."
  }
 }

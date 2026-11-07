@@ -13,6 +13,7 @@ const text = (key, label, o = {}) => ({ key, label, type: 'text', ...o });
 const area_ = (key, label, o = {}) => ({ key, label, type: 'textarea', ...o });
 const num = (key, label, o = {}) => ({ key, label, type: 'number', ...o });
 const bool = (key, label, o = {}) => ({ key, label, type: 'checkbox', ...o });
+const color = (key, label, o = {}) => ({ key, label, type: 'color', ...o });
 const select = (key, label, options, o = {}) => ({ key, label, type: 'select', options, ...o });
 const multi = (key, label, options, o = {}) => ({ key, label, type: 'multi', options, ...o });
 const ref = (key, label, area, o = {}) => ({ key, label, type: 'ref', area, ...o });
@@ -98,6 +99,28 @@ export const AREAS = {
       if (power < 0) report('warning', `Start-Rig hat zu wenig Energie (${power} ⚡)`);
       const weight = (s.containers || []).reduce((n, c) => n + (D.containers?.[c]?.weight || 0), 0), pull = D.tractors?.[s.tractor]?.pull;
       if (pull != null && weight > pull) report('error', `Start-Container wiegen ${weight} kg, die Zugmaschine zieht ${pull} kg`);
+    },
+  },
+  splash: {
+    name: 'Startseite', icon: 'image', file: 'data/splash.json', kind: 'single',
+    hint: 'Die Startseite (online unter /): Hintergrund aus Ebenen, Leyla rennt endlos auf uns zu, der Boden fliegt unter ihr durch. Pixel-Art wird scharf skaliert.',
+    sections: [
+      { title: 'Hintergrund', fields: [refs('background', 'Ebenen', 'assets', { hint: 'Von hinten nach vorn. Alle gleich groß; die erste deckt alles, die anderen sind transparent' }),
+        num('horizon', 'Horizont', { unit: '% der Höhe', min: 30, max: 100, hint: 'Hier endet der Hintergrund unten; darunter zeichnet die Startseite den Boden, auf dem Leyla rennt' }),
+        num('parallax', 'Tiefe', { unit: '%', min: 0, max: 10, step: 0.5, hint: 'So weit verschieben sich die Ebenen mit Maus bzw. Neigen gegeneinander (vorderste am meisten). 0 = starr' })] },
+      { title: 'Leyla', fields: [ref('runner', 'Animation', 'assets', { hint: 'Asset der Art „Animation“; Tempo und Ankerpunkt kommen von dort' }),
+        num('runnerHeight', 'Größe', { unit: '% der Höhe', min: 10, max: 100, hint: 'Höhe eines Frames im Verhältnis zur Bildschirmhöhe' }),
+        num('runnerX', 'Position', { unit: '% der Breite', min: 0, max: 100, hint: 'Wo Leyla steht (auf breiten Bildschirmen); auf schmalen immer in der Mitte' }),
+        num('runnerFeet', 'Füße', { unit: '% der Höhe', min: 50, max: 100, hint: 'Auf welcher Höhe ihre Füße stehen (100 = unterer Rand)' })] },
+      { title: 'Boden', fields: [num('ground.speed', 'Tempo', { unit: 'm/s', min: 0, max: 30, step: 0.5, hint: 'Wie schnell der Boden unter ihr auf uns zukommt. 0 = steht' }),
+        num('ground.specks', 'Steinchen', { min: 0, max: 400, hint: 'Wie viele Steinchen und Risse gleichzeitig im Bild sind' }),
+        color('ground.base', 'Farbe Boden', { hint: 'Am besten die Bodenfarbe der vordersten Ebene' }), color('ground.color', 'Farbe Steinchen'), bool('ground.dust', 'Staubwölkchen', { hint: 'Kleine Wolken bei jedem Schritt' }), bool('ground.shadow', 'Schatten unter Leyla')] },
+    ],
+    check: (x, report, p) => {
+      const A = p.data.assets || {};
+      if (x.runner && A[x.runner] && A[x.runner].kind !== 'animation') report('error', 'Leyla braucht ein Asset der Art „Animation“');
+      for (const id of x.background || []) if (A[id] && A[id].kind !== 'image') report('warning', `Ebene ${id} ist kein Bild`);
+      if (!(x.background || []).length) report('hint', 'Kein Hintergrund: die Startseite zeigt nur die Farbe der Oberfläche');
     },
   },
   economy: {
@@ -342,7 +365,7 @@ export const AREAS = {
 // Navigation: groups of areas in the order of the design document
 export const GROUPS = [
   ['ASSETS', ['assets']],
-  ['GRUNDLAGEN', ['game', 'economy', 'ranking']],
+  ['GRUNDLAGEN', ['game', 'splash', 'economy', 'ranking']],
   ['LEYLA', ['leyla', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes']],

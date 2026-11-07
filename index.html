@@ -9,40 +9,47 @@
 <script>try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme') || 'gray'; } catch (e) { document.documentElement.dataset.theme = 'gray'; }</script>
 <link rel="stylesheet" href="game/ui.css">
 <style>
-  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--ui-bg); color: var(--ui-text); font-family: var(--ui-font); }
-  main { width: min(560px, 92vw); padding: 32px 0; }
-  .hero { display: flex; align-items: flex-end; gap: 18px; }
-  .leyla { flex: none; width: 88px; height: 216px; background: url(projects/nomadgirl/assets/leyla/idle.png) 0 0 / 704px 216px no-repeat; animation: idle 1.2s steps(8) infinite; }
-  @keyframes idle { to { background-position: -704px 0; } }
-  @media (prefers-reduced-motion: reduce) { .leyla { animation: none; } }
-  h1 { font-family: var(--ui-pixel); font-weight: normal; font-size: 64px; margin: 0; letter-spacing: 1px; }
-  .sub { color: var(--ui-text2); margin: 4px 0 28px; line-height: 1.5; }
+  html, body { height: 100%; }
+  body { margin: 0; overflow: hidden; background: #292330; color: var(--ui-text); font-family: var(--ui-font); }
+  #scene { position: fixed; inset: 0; width: 100vw; height: 100vh; image-rendering: pixelated; image-rendering: crisp-edges; }
+  main { position: relative; z-index: 1; box-sizing: border-box; width: min(460px, 92vw); margin: 0 0 0 max(4vw, 24px); min-height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 32px 0; }
+  .card { padding: 24px; border-radius: var(--ui-r-pane); background: color-mix(in srgb, var(--ui-bg) 72%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid color-mix(in srgb, var(--ui-border) 70%, transparent); box-shadow: var(--ui-shadow); }
+  h1 { font-family: var(--ui-pixel); font-weight: normal; font-size: 64px; line-height: .9; margin: 0; letter-spacing: 1px; }
+  .sub { color: var(--ui-text2); margin: 8px 0 22px; line-height: 1.5; }
   nav { display: grid; gap: 10px; }
-  a, .soon { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: var(--ui-r-pane); border: 1px solid var(--ui-border); background: var(--ui-panel); color: var(--ui-text); text-decoration: none; }
+  a, .soon { display: flex; align-items: center; gap: 14px; padding: 13px 16px; border-radius: var(--ui-r-pane); border: 1px solid var(--ui-border); background: var(--ui-panel); color: var(--ui-text); text-decoration: none; }
   a:hover { border-color: var(--ui-acc-line); }
   a.main { background: var(--ui-acc-soft); border-color: var(--ui-acc-line); }
   b { display: block; font-weight: 600; }
   small { color: var(--ui-text3); }
   .soon { opacity: .5; }
-  .ic { flex: none; }
-  footer { margin-top: 28px; font-size: 12px; color: var(--ui-text3); }
+  footer { margin-top: 18px; font-size: 12px; color: var(--ui-text3); }
   footer a { display: inline; padding: 0; border: 0; background: none; color: var(--ui-text2); text-decoration: underline; }
+  .preview main { display: none; }
+  @media (max-width: 760px), (max-aspect-ratio: 23/20) {
+    main { margin: 0 auto; justify-content: flex-start; min-height: 0; }
+    .card { padding: 18px; }
+    h1 { font-size: 48px; }
+    .sub { display: none; }
+    a small { display: none; }
+  }
 </style>
 </head>
 <body>
+<canvas id="scene" aria-label="Leyla rennt durch die Wastelands auf uns zu"></canvas>
 <main>
-  <div class="hero">
-    <div class="leyla" role="img" aria-label="Leyla"></div>
-    <div>
-      <h1>NomadGirl</h1>
-      <p class="sub">Leyla lebt in den Wastelands rund um BigCityDelta in ihrem Rig. Sie plündert, was andere liegen lassen, und kocht erstaunlich gut.</p>
-    </div>
+  <div class="card">
+    <h1>NomadGirl</h1>
+    <p class="sub">Leyla lebt in den Wastelands rund um BigCityDelta in ihrem Rig. Sie plündert, was andere liegen lassen, und kocht erstaunlich gut.</p>
+    <nav id="nav"></nav>
+    <footer>GPL v3 oder später · <a href="https://github.com/dna20717/NomadGirl">Quelltext auf GitHub</a></footer>
   </div>
-  <nav id="nav"></nav>
-  <footer>GPL v3 oder später · <a href="https://github.com/dna20717/NomadGirl">Quelltext auf GitHub</a></footer>
 </main>
 <script type="module">
   import { icon } from './game/icons.js';
+  if (new URLSearchParams(location.search).has('preview')) document.documentElement.classList.add('preview');   // workshop preview: scene only
+  import { startSplash } from './game/splash/splash.js';
+  startSplash(document.getElementById('scene')).then(x => { window.splash = x; }).catch(e => console.warn('Startseite ohne Szene:', e));
   const nav = document.getElementById('nav');
   const entry = (href, ic, title, text, cls = '') => {
     const e = document.createElement(href ? 'a' : 'div');

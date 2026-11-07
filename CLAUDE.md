@@ -27,6 +27,7 @@ npm run web:test                           # Web-Werkstatt + Spiel mit Worker, f
 node tools/ng.js check                     # Spieldaten prüfen
 npm run serve                              # dann http://localhost:8766/workshop.html
 node tools/workshop_test.mjs [--shots]     # Werkstatt kopflos bedienen (Server muss laufen), Bilder nach output/
+node tools/splash_test.mjs [--shots]       # Startseite in drei Größen (Server muss laufen)
 node tools/game_test.mjs [--shots]         # Spiel kopflos durchspielen: Slide, Plattformen, Leiter, Seil, Dash, Kampf
 node tools/play.mjs 'tp 27 15' 'step 30 right' 'tap jump 30 right+jump' 'shot name'   # Spiel per Kommandozeile spielen
 ```
@@ -41,7 +42,7 @@ node tools/play.mjs 'tp 27 15' 'step 30 right' 'tap jump 30 right+jump' 'shot na
 ## Ordner
 
 ```
-index.html             Startseite (online unter /)
+index.html             Startseite (online unter /), Szene aus game/splash/splash.js
 game.html              Spiel (online unter /game), lädt game/vendor/phaser.min.js und game/play/main.js
 wrangler.jsonc         Cloudflare Worker (statische Seiten aus dist/, /api/* über worker/index.js)
 worker/index.js        Login-Prüfung (Cloudflare Access) und Speichern als Commit
@@ -94,6 +95,12 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 - **Kamera** (Bereich „Spiel“ › Kamera): Zoom (Standard 0,75 = 2560×1440 Spielpixel sichtbar, Daniel 07.11.2026), Vorlauf in Laufrichtung, Nachziehen. Zwei Kameras: Hintergrund ungezoomt (`bgCam`, scrollt mit), Welt gezoomt (`cam`). Ist der Raum niedriger als die Sicht, sitzt der Boden unten und darüber ist Himmel.
 - Tod: Mama-Bot-Meldung, Raum startet neu. Raum geräumt: Zeit, Kills, Δ.
 
+## Startseite
+
+- **Szene** (Daniel, 07.11.2026: „Hintergrund auf den Splashscreen, Leyla endlos auf uns zu laufen lassen“): `game/splash/splash.js` (`startSplash(canvas)`) zeichnet in ein Canvas über die ganze Seite, Pixel-Art scharf. Werte aus dem Bereich **Startseite** (`data/splash.json`, Gruppe Grundlagen): Ebenen (Assets, hinten nach vorn, Cover-Skalierung, unten am **Horizont** bündig), **Tiefe** (Parallaxe mit der Maus, ohne Maus langsames Schwanken), Leyla (`runner` = Animation, Größe/Position/Füße in %), Boden (Tempo, Steinchen, Farben, Staub, Schatten). Unter dem Horizont zeichnet der Code den Boden in `ground.base`.
+- **Bild:** Leyla und Kamera bewegen sich gemeinsam auf uns zu, also gleitet der Boden weg: Steinchen und Risse tauchen unten auf und wandern perspektivisch zum Horizont (`y = top + K/z`), Staub bei jedem halben Zyklus bleibt zurück. Was näher ist als ihre Füße, liegt vor ihr. `prefers-reduced-motion` zeigt ein Standbild.
+- Online kommen die Daten live über `/api/files` (wie das Spiel). `index.html?preview` zeigt nur die Szene (Vorschau in der Werkstatt unter „Startseite“ mit „Speichern und neu laden“). `window.splash` für Tests, `node tools/splash_test.mjs [--shots]` (Desktop, iPad hochkant, Handy).
+
 ## Kommandozeile `ng`
 
 `node tools/ng.js` ohne Befehl zeigt die Hilfe: `check` · `areas` · `fields <area>` · `show <area> [id]` · `usages <area> <id>` · `new <area> <id> ['<json>']` · `set <area> [id] <field> '<json>'` · `unset` · `rename <area> <old> <new>` · `remove <area> <id>` · `--dry` schreibt nichts. Nach jedem Schreiben läuft die Prüfung (Exit 1 bei Fehlern). Geschrieben wird mit `pretty()` aus `tools/json.js`.
@@ -110,6 +117,7 @@ Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei j
 
 ## Stand
 
+- 07.11.2026: **Startseite mit Szene**: Daniels Wastelands-Hintergrund (4 Ebenen, Pixel-Art) und Leyla rennt endlos auf uns zu; neuer Bereich „Startseite“ (23 Bereiche).
 - 07.11.2026: Knopf „Spielen“ in der Werkstatt (speichert vorher, eigener Tab).
 - 07.11.2026: **Web-Werkstatt „Speichern = Commit“** (Worker, Access-Login für alles, Autospeichern, Konflikte, Spiel lädt live). Einrichtung im Dashboard durch Daniel.
 - 07.11.2026: Kamera-Zoom in der Werkstatt einstellbar, Standard 0,75 (mehr Überblick).
