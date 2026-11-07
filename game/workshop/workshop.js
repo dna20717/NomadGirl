@@ -276,8 +276,16 @@ export class Workshop {
         id => this.p.data[f.area]?.[id]?.name || id, id => this.go({ area: f.area, choice: id })), f.hint);
       case 'size': case 'point': case 'range': return this.labeled(label, this.pair(v, PAIR[f.type], val => put(val)), f.hint);
       case 'table': return this.labeled(label, this.tableEditor(a, f, x), f.hint, 'ng-wide');
+      case 'lines': return this.labeled(label, this.linesEditor(v, put), f.hint, 'ng-wide');
       default: return el('p', { class: 'ed-error' }, `Unbekannter Feldtyp ${f.type}`);
     }
+  }
+  // List of text rows as monospaced text (room layouts): one row per line, no wrapping
+  linesEditor(v, onChange) {
+    const rows = Array.isArray(v) ? v : [], last = rows.join('\n');
+    const t = el('textarea', { class: 'ed-field ng-lines', rows: Math.min(24, Math.max(4, rows.length + 1)), wrap: 'off', spellcheck: 'false' }, last);
+    t.addEventListener('change', () => { if (t.value === last) return; const n = t.value.replace(/\s+$/, '').split('\n').map(r => r.replace(/\r$/, '')); onChange(n.join('') ? n : undefined); });
+    return t;
   }
   refOptions(area) { return Object.entries(this.p.data[area] || {}).map(([k, y]) => [k, y.name || k]); }
   refEditor(area, v, onChange) {

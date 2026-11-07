@@ -106,7 +106,7 @@ Weird Cyberpunk mit Augenzwinkern: humorvoll, aber niemals albern. In und um das
 
 - **Ziel:** eine Engine, in der alle Aspekte des Spiels über die Werkstatt (GUI) gesteuert werden. Vorbild: die Werkstatt von NomadTactics.
 - **Sprache:** JavaScript als ES-Module ohne Build-Schritt, wie NomadTactics. Gemeinsamer Kern (`ui.js`, `ui.css`, `basis.css`, `icons.js`, `store.js`) als Kopie.
-- **Spiel:** Phaser 3 im Browser (kommt mit dem MVP, als Vendor-Datei).
+- **Spiel:** Phaser 3.90 im Browser als Vendor-Datei (`game/vendor/phaser.min.js`), Arcade-Physik. Seite `game.html`, Code in `game/play/`. (Phaser 4 ist inzwischen erschienen; ein Umstieg wäre später möglich.)
 - **Daten:** JSON unter `projects/nomadgirl/`, Schema in `engine/schema.js`.
 - **Lizenz:** GPL v3 oder später. Alle Assets erzeugen wir selbst mit KI, nichts Externes.
 - **Online:** Cloudflare Worker, https://nomadgirl.dna20717.workers.dev
@@ -115,12 +115,18 @@ Weird Cyberpunk mit Augenzwinkern: humorvoll, aber niemals albern. In und um das
 
 ### MVP: Movement & Kampf
 
-- [ ] Gehen, Rennen, Springen
-- [ ] Dash und Slide
-- [ ] Klettern und Schwingen
-- [ ] Ein Nahkampfangriff, ein Fernkampfangriff
-- [ ] Ein Testraum mit ein bis zwei Gegnertypen
-- [ ] Alle Werte kommen live aus der Werkstatt (Leyla, Waffen, Gegner)
+- [x] Gehen, Rennen, Springen (Coyote Time, Sprungpuffer, Doppelsprung, kurzer Hüpfer beim Loslassen)
+- [x] Dash (auch in der Luft, unverwundbar) und Slide (unter Hindernissen durch)
+- [x] Klettern (Leitern) und Schwingen (Seil-Anker, Pendel mit Schwung-Boost)
+- [x] Ein Nahkampfangriff (Rohrzange), ein Fernkampfangriff (Nagelpistole)
+- [x] Ein Testraum mit zwei Gegnertypen: Plünderer-Schläger (stürmt, holt aus) und Plünderer-Schütze (hält Abstand, zielt sichtbar)
+- [x] Alle Werte kommen aus der Werkstatt (Leyla, Waffen, Gegner, Raum-Bausteine, Kacheln); gespeicherte Werkstatt-Stände gelten beim nächsten Laden des Spiels
+- [ ] Feinschliff nach dem ersten Anspielen (Daniel)
+- [ ] Weitere Leyla-Animationen (Gehen, Rennen, Springen, Dash …) einklinken
+
+**Steuerung (Tastatur):** A/D bzw. ←/→ laufen (Shift: gehen), Leertaste springen, L/C Dash, S/↓ beim Rennen Slide, S + Leertaste durch Plattform fallen, W/↑ klettern bzw. Seil greifen (auch E), J/Y Nahkampf, K/X Fernkampf, R Neustart, H Hilfe, G Hitboxen.
+
+**Platzhalter:** Leyla hat bisher nur die Idle-Animation; Laufen, Springen, Dash, Slide, Klettern und Schwingen zeigt das Spiel mit Code-Effekten (Squash & Stretch, Neigung, Nachbilder, Blinken). Die Plünderer sind aus Code gezeichnet, bis sie ein Aussehen bekommen.
 
 ### Ausbaustufe 1: Der Loop
 

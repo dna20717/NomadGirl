@@ -9,7 +9,7 @@ import { AREAS, GROUPS, fields, loadProject, validateProject, usages, renameEntr
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../projects/nomadgirl');
 const load = () => loadProject(nodeLoader(root));
-const TYPES = new Set(['text', 'textarea', 'number', 'checkbox', 'color', 'select', 'multi', 'ref', 'refs', 'size', 'point', 'range', 'table']);
+const TYPES = new Set(['text', 'textarea', 'number', 'checkbox', 'color', 'select', 'multi', 'ref', 'refs', 'size', 'point', 'range', 'table', 'lines']);
 
 test('schema: every area is in exactly one group, every field is well-formed', () => {
   const grouped = GROUPS.flatMap(([, l]) => l);

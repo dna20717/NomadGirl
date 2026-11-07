@@ -8,13 +8,13 @@ Das Projekt ist als **Engine mit Werkstatt** gebaut: Jeder Aspekt des Spiels (Le
 - Spieldesign: [docs/design.md](docs/design.md)
 - Anleitung für die Zusammenarbeit mit Ava: [CLAUDE.md](CLAUDE.md)
 
-## Werkstatt starten
+## Spiel und Werkstatt starten
 
 ```
 npm run serve
 ```
 
-Dann im Browser http://localhost:8766/workshop.html öffnen.
+Dann im Browser http://localhost:8766/game.html (Spiel) bzw. http://localhost:8766/workshop.html (Werkstatt) öffnen. Online: https://nomadgirl.dna20717.workers.dev/game
 
 ## Prüfen auf der Kommandozeile
 
@@ -29,10 +29,11 @@ node tools/ng.js areas
 | Ordner | Inhalt |
 | --- | --- |
 | `engine/` | Datenschema und Projekt-Logik (läuft im Browser und in Node) |
+| `game/play/` | Spiel (Phaser 3): Szene, Leyla, Gegner, Kampf, HUD, Fernsteuerung |
 | `game/workshop/` | Werkstatt |
 | `game/` | gemeinsamer Oberflächen-Kern (aus NomadTactics) |
 | `projects/nomadgirl/` | Spieldaten als JSON |
-| `tools/` | Kommandozeile `ng`, Werkstatt-Test, Gerüste |
+| `tools/` | Kommandozeile `ng`, Spiel per Kommandozeile `play`, Tests für Werkstatt und Spiel |
 | `docs/` | Design-Doc, Glossar |
 
 ## Lizenz

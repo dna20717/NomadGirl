@@ -25,8 +25,20 @@
   "value": 60,
   "description": "Ehemals Viehtreiber. Funktioniert auch bei Mutanten."
  },
- "nagelpistole": {"name": "Nagelpistole", "kind": "ranged", "tier": 1, "damage": 6, "cooldown": 250, "range": 640, "knockback": 80, "ammo": 40, "size": [2, 1], "value": 15},
- "schrotflinte": {"name": "Schrotflinte", "kind": "ranged", "tier": 2, "damage": 22, "cooldown": 900, "range": 360, "knockback": 520, "ammo": 12, "size": [3, 1], "value": 90},
+ "nagelpistole": {"name": "Nagelpistole", "kind": "ranged", "tier": 1, "damage": 6, "cooldown": 250, "range": 640, "knockback": 80, "ammo": 40, "size": [2, 1], "value": 15, "projectileSpeed": 1800},
+ "schrotflinte": {
+  "name": "Schrotflinte",
+  "kind": "ranged",
+  "tier": 2,
+  "damage": 22,
+  "cooldown": 900,
+  "range": 360,
+  "knockback": 520,
+  "ammo": 12,
+  "size": [3, 1],
+  "value": 90,
+  "projectileSpeed": 1400
+ },
  "bastlerdeck": {
   "name": "Bastler-Deck",
   "kind": "cyberdeck",

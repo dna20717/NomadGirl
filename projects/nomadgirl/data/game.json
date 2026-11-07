@@ -12,5 +12,7 @@
   "companions": [],
   "fuel": 40,
   "food": 6
- }
+ },
+ "testRoom": "testraum",
+ "tiles": {"platform": "platform_metal"}
 }

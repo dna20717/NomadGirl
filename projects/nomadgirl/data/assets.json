@@ -12,7 +12,8 @@
   "source": "Code (Streifen zugeschnitten)",
   "derivedFrom": "leyla_idle_source",
   "date": "07.11.2026",
-  "description": "Idle-Animation, atmet ruhig."
+  "description": "Idle-Animation, atmet ruhig.",
+  "flip": true
  },
  "leyla_idle_source": {
   "name": "Leyla · Stehen (Original)",
@@ -29,5 +30,24 @@
   "source": "KI-generiert (Daniel)",
   "date": "07.11.2026",
   "description": "Turnarounds, Gesichtsausdrücke, Palette, Details zu Haaren, Visor, Weste, Handschuhen, Gürtel, Stiefeln und Implantaten."
+ },
+ "tileset_metal_source": {
+  "name": "Tileset · Metall (Original)",
+  "kind": "source",
+  "file": "assets/tiles/metal_source.png",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "Vorschau-Tileset 256 × 256 px: Metallblöcke mit glühenden Kanten, Teile um 32 px versetzt."
+ },
+ "platform_metal": {
+  "name": "Plattform · Metall",
+  "kind": "tiles",
+  "file": "assets/tiles/platform.png",
+  "frameSize": [64, 64],
+  "frames": 4,
+  "source": "Code (aus dem Tileset geschnitten)",
+  "derivedFrom": "tileset_metal_source",
+  "date": "07.11.2026",
+  "description": "Metallplattform mit glühender Kante. Frames: einzeln, links, Mitte, rechts (Inhalt 33 px hoch, oben bündig)."
  }
 }

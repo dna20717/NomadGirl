@@ -128,3 +128,9 @@ body.ng { background: var(--ui-bg); color: var(--ui-text); font-family: var(--ui
 .ng-ref .ng-thumb { width: 24px; height: 24px; }
 .ng-thumb img { max-height: var(--s); }
 .ng-gallery .da-entry .ng-thumb img { max-height: 120px; }
+
+/* room layouts: one character per tile */
+.da-field textarea.ed-field.ng-lines, textarea.ed-field.ng-lines { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 12px; line-height: 1.15; white-space: pre; overflow-x: auto; tab-size: 1; }
+.ng-roomMap { display: block; max-width: 100%; image-rendering: pixelated; border-radius: 6px; background: var(--ui-bg); }
+.ng-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; font-size: 12px; color: var(--ui-text2); }
+.ng-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }

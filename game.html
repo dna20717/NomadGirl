@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NomadGirl">
+<title>NomadGirl – Spiel</title>
+<script>try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme') || 'gray'; } catch (e) { document.documentElement.dataset.theme = 'gray'; }</script>
+<link rel="stylesheet" href="game/ui.css">
+<link rel="stylesheet" href="game/play/play.css">
+<script src="game/vendor/phaser.min.js"></script>
+</head>
+<body>
+<div id="game"></div>
+<div id="hud"></div>
+<div id="load">Leyla schnürt die Stiefel …</div>
+<script type="module">
+  import { start } from './game/play/main.js';
+  start(document.getElementById('game'), document.getElementById('hud'))
+    .then(g => { window.game = g; document.getElementById('load').remove(); })
+    .catch(e => { document.getElementById('load').textContent = 'Fehler beim Laden: ' + e.message; console.error(e); });
+</script>
+</body>
+</html>

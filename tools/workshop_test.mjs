@@ -36,6 +36,18 @@ await page.keyboard.press('Control+z');
 const undone = await page.evaluate(() => window.workshop.p.data.leyla.movement.runSpeed);
 if (after !== 333 || undone === 333) errors.push(`Bearbeiten/Rückgängig: ${after} → ${undone}`);
 
+// room layout: monospaced text, one row per line; preview draws
+await go({ area: 'rooms', choice: 'testraum' }); await shot('rooms_layout');
+await page.locator('canvas.ng-roomMap').scrollIntoViewIfNeeded(); await shot('rooms_preview');
+const lay = page.locator('textarea.ng-lines');
+const rows = (await lay.inputValue()).split('\n');
+rows[13] = rows[13].slice(0, 5) + '#' + rows[13].slice(6);
+await lay.fill(rows.join('\n')); await lay.dispatchEvent('change');
+const changed = await page.evaluate(() => window.workshop.p.data.rooms.testraum.layout[13][5]);
+if (changed !== '#') errors.push(`Layout bearbeiten: Zeichen ist „${changed}“`);
+if (!await page.locator('canvas.ng-roomMap').count()) errors.push('Layout-Vorschau fehlt');
+await page.keyboard.press('Control+z');
+
 await browser.close();
 if (errors.length) { console.error('Fehler:\n' + errors.join('\n')); process.exit(1); }
 console.log(`Werkstatt ok: ${Object.keys(AREAS).length} Bereiche gezeichnet, Bearbeiten + Rückgängig gehen.`);

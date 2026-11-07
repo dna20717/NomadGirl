@@ -37,7 +37,10 @@
   "weapon": "machete",
   "loot": "pluenderer_beute",
   "deltas": [3, 8],
-  "countsForRanking": true
+  "countsForRanking": true,
+  "attack": {"windup": 450, "cooldown": 900, "range": 150},
+  "height": 240,
+  "placeholderColor": "rust"
  },
  "schuetze": {
   "name": "Plünderer-Schütze",
@@ -50,7 +53,10 @@
   "weapon": "nagelpistole",
   "loot": "pluenderer_beute",
   "deltas": [3, 8],
-  "countsForRanking": true
+  "countsForRanking": true,
+  "attack": {"windup": 650, "cooldown": 1400, "range": 560, "projectileSpeed": 950},
+  "height": 232,
+  "placeholderColor": "olive"
  },
  "wachdrohne": {
   "name": "Wachdrohne",

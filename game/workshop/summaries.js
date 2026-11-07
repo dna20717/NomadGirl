@@ -2,6 +2,9 @@
 // SUMMARY[area](w, x, id) → { title, body } | null. Only reads, never changes data.
 import { el } from '../ui.js';
 import { ROOM_TAGS } from '../../engine/project.js';
+import { parseRoom } from '../../engine/room.js';
+
+const ROOM_COLORS = { '#': '#8b919c', '=': '#d4a72c', H: '#5fb4d9', o: '#e45aa8', L: '#3fe0d0' };
 
 const f1 = n => (Math.round(n * 10) / 10).toLocaleString('de-DE');
 const facts = rows => el('div', { class: 'ng-facts' }, ...rows.filter(Boolean).map(([k, v]) => el('div', {}, el('span', {}, k), el('b', {}, v))));
@@ -91,6 +94,29 @@ export const SUMMARY = {
   pois(w, x) {
     const R = w.p.data.rooms || {}, tags = new Set((x.rooms || []).flatMap(r => R[r]?.tags || []));
     return { title: 'Raum-Merkmale', body: el('div', { class: 'da-tags' }, ...ROOM_TAGS.map(([k, n]) => el('span', { class: 'da-tag' + (tags.has(k) ? ' ng-yes' : ' ng-no') }, (tags.has(k) ? '✓ ' : '– ') + n))) };
+  },
+
+  rooms(w, x, id) {
+    if (!x.layout?.length) return { title: 'Layout', body: el('p', { class: 'ed-small' }, 'Noch kein Layout. Ein Zeichen pro Kachel, siehe Hinweis beim Feld „Kacheln“.') };
+    const r = parseRoom(x), px = Math.max(3, Math.min(8, Math.floor(300 / Math.max(1, r.w))));
+    const c = el('canvas', { class: 'ng-roomMap', width: r.w * px, height: r.h * px }), g = c.getContext('2d');
+    for (let y = 0; y < r.h; y++) for (let x2 = 0; x2 < r.w; x2++) {
+      const t = r.tiles[y][x2];
+      if (t === '.') continue;
+      g.fillStyle = ROOM_COLORS[t] || '#e5484d';
+      if (t === '=') g.fillRect(x2 * px, y * px, px, Math.max(1, px / 3));
+      else if (t === 'H') g.fillRect(x2 * px + px / 4, y * px, px / 2, px);
+      else g.fillRect(x2 * px, y * px, px, px);
+    }
+    const enemies = r.spawns.map(s => w.p.data.enemies?.[s.enemy]?.name || s.enemy);
+    const count = enemies.reduce((m, n) => (m[n] = (m[n] || 0) + 1, m), {});
+    const legend = el('div', { class: 'ng-legend' }, ...[['#', 'Wand'], ['=', 'Plattform'], ['H', 'Leiter'], ['o', 'Seil'], ['L', 'Start'], ['x', 'Gegner']]
+      .map(([k, n]) => el('span', {}, el('i', { style: `background:${ROOM_COLORS[k] || '#e5484d'}` }), n)));
+    const play = el('a', { class: 'ed-button wide', href: new URL(`../../game.html?room=${encodeURIComponent(id)}`, import.meta.url).href, target: '_blank' }, 'Im Spiel testen');
+    return { title: `Layout · ${r.w}×${r.h} Kacheln`, body: el('div', {}, c, legend, facts([
+      ['Gegner', Object.entries(count).map(([n, k]) => `${k}× ${n}`).join(', ') || 'keine'],
+      ['Leitern · Seile · Plattformen', `${r.ladders.length} · ${r.anchors.length} · ${r.platforms.length} Kacheln`],
+      ['In Pixeln', `${r.w * (w.p.data.game?.tileSize || 64)} × ${r.h * (w.p.data.game?.tileSize || 64)}`]]), play) };
   },
 
   locations(w, x, id) {

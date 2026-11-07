@@ -1,12 +1,13 @@
 # Teile von Dritten
 
-NomadGirl steht unter GPL v3 oder später. Alle Assets (Grafik, Ton, Musik) entstehen im Projekt selbst mit KI oder Code. Von Dritten stammen nur diese Bausteine der Oberfläche, alle mit GPL-verträglichen Lizenzen:
+NomadGirl steht unter GPL v3 oder später. Alle Assets (Grafik, Ton, Musik) entstehen im Projekt selbst mit KI oder Code. Von Dritten stammen nur diese Bausteine (Oberfläche und Spiel-Engine), alle mit GPL-verträglichen Lizenzen:
 
 | Was | Wo | Lizenz |
 |---|---|---|
 | Lucide Icons 0.452.0 | eingebettet in `game/icons.js` | ISC, siehe `game/LUCIDE-LICENSE` |
 | Inter | `game/font/` | SIL Open Font License 1.1, siehe `game/font/INTER-OFL.txt` |
 | VT323 | `game/font/` | SIL Open Font License 1.1, siehe `game/font/VT323-OFL.txt` |
+| Phaser 3.90.0 (Spiel-Engine) | `game/vendor/phaser.min.js` | MIT, siehe `game/vendor/PHASER-LICENSE.md` |
 
 KI-generierte Assets stehen mit Herkunft in [docs/assets.md](docs/assets.md).
 
