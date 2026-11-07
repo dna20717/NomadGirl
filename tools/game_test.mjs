@@ -10,7 +10,7 @@ const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
 const errors = [], ok = [];
 page.on('pageerror', e => errors.push(e.message));
-page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+page.on('console', m => { if (m.type() === 'error' && !m.location()?.url?.includes('/api/')) errors.push(m.text()); });   // no worker locally: /api/ answers 404
 await page.goto(url);
 await page.waitForSelector('#load', { state: 'detached', timeout: 15000 });
 await page.waitForFunction(() => window.nomad && window.game?.scene.getScene('play')?.leyla, null, { timeout: 15000 });

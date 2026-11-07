@@ -22,7 +22,8 @@ Spieldesign: `docs/design.md` (dazu das claude.ai-Projekt „NomadGirl“).
 
 ```
 ln -s "$(npm root -g)/playwright" node_modules/playwright     # nur für den Werkstatt-Test
-npm test                                   # Schema, Daten, Umbenennen, Löschen, Start-Rig
+npm test                                   # Schema, Daten, Umbenennen, Löschen, Start-Rig, Worker
+npm run web:test                           # Web-Werkstatt + Spiel mit Worker, falschem GitHub und Login
 node tools/ng.js check                     # Spieldaten prüfen
 npm run serve                              # dann http://localhost:8766/workshop.html
 node tools/workshop_test.mjs [--shots]     # Werkstatt kopflos bedienen (Server muss laufen), Bilder nach output/
@@ -42,7 +43,8 @@ node tools/play.mjs 'tp 27 15' 'step 30 right' 'tap jump 30 right+jump' 'shot na
 ```
 index.html             Startseite (online unter /)
 game.html              Spiel (online unter /game), lädt game/vendor/phaser.min.js und game/play/main.js
-wrangler.jsonc         Cloudflare Worker (statische Seiten aus dist/)
+wrangler.jsonc         Cloudflare Worker (statische Seiten aus dist/, /api/* über worker/index.js)
+worker/index.js        Login-Prüfung (Cloudflare Access) und Speichern als Commit
 tools/build_web.mjs    baut dist/ für Cloudflare
 workshop.html          Werkstatt (Daten-Editor)
 engine/schema.js       Datenschema: alle Bereiche und Felder (das Herz)
@@ -70,7 +72,7 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 - **Neuer Aspekt des Spiels** = neuer Bereich oder neues Feld im Schema, in `GROUPS` einsortieren, Beispieldaten anlegen (`ng new …`). Werkstatt, Prüfung, Umbenennen, Löschen und `ng` können ihn dann sofort. Eigene Ansichten (abgeleitete Werte, Vorschauen) in `game/workshop/summaries.js`.
 - **Prüfung** (`validateProject`): Verweise, Pflichtfelder, Zahlenbereiche, Auswahlwerte, die `check`-Regeln der Bereiche und Querprüfungen (Gegenstände ohne Verwendung, POIs ohne Ort).
 - **Umbenennen/Löschen** ziehen Verweise in allen Bereichen mit bzw. räumen sie auf.
-- **Speichern:** wie die alte NomadTactics-Werkstatt über `game/store.js` (Artifact-Datenbank, sonst localStorage `nomadgirl-drafts:`). Eine Web-Werkstatt mit „Speichern = Commit“ (Cloudflare Worker wie bei NomadTactics) ist der nächste Schritt, wenn Daniel das will.
+- **Speichern:** online **„Speichern = Commit“** (siehe Online) über `game/cloud_store.js`; lokal bzw. ohne Worker wie die alte NomadTactics-Werkstatt über `game/store.js` (Artifact-Datenbank, sonst localStorage `nomadgirl-drafts:`).
 - Oberflächen-Regeln wie in NomadTactics (`CLAUDE.md` dort): nur `--ui-*`-Tokens, Inter + VT323, Dialoge über `openDialogue`, Löschen rot mit Rückgängig, Hauptaktion gold.
 
 ## Assets und Fidelity
@@ -97,10 +99,17 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 
 ## Online
 
-Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei jedem Push auf `main` mit `npm run build:web` → `dist/` und liefert unter https://nomadgirl.dna20717.workers.dev aus (`wrangler.jsonc`): `/` = Startseite (`index.html`), `/workshop` = Werkstatt, `/game` = Spiel. Prüfen: `npx wrangler deploy --dry-run --outdir /tmp/wout`. **Wichtig:** Die GitHub-App „Cloudflare Workers and Pages“ (GitHub › Profil › Settings › Applications › Installed GitHub Apps › Configure) muss Zugriff auf NomadGirl haben, sonst löst ein Push keinen Build aus (07.11.2026 behoben). An jedem Commit hängt dann eine Rückmeldung von Workers Builds. Deploy geht nicht aus der Arbeitsumgebung (Cloudflare-API gesperrt), nur über den Push. Die Werkstatt speichert online vorerst im Browser (localStorage); „Speichern = Commit“ kommt wie bei NomadTactics über `worker/index.js`, Cloudflare Access und das Geheimnis `GITHUB_TOKEN` im Dashboard.
+Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei jedem Push auf `main` mit `npm run build:web` → `dist/` und liefert unter https://nomadgirl.dna20717.workers.dev aus (`wrangler.jsonc`): `/` = Startseite (`index.html`), `/workshop` = Werkstatt, `/game` = Spiel. Prüfen: `npx wrangler deploy --dry-run --outdir /tmp/wout`. **Wichtig:** Die GitHub-App „Cloudflare Workers and Pages“ (GitHub › Profil › Settings › Applications › Installed GitHub Apps › Configure) muss Zugriff auf NomadGirl haben, sonst löst ein Push keinen Build aus (07.11.2026 behoben). An jedem Commit hängt dann eine Rückmeldung von Workers Builds. Deploy geht nicht aus der Arbeitsumgebung (Cloudflare-API gesperrt), nur über den Push. 
+- **Login (Daniel, 07.11.2026): alles hinter Cloudflare Access** (Startseite, Spiel, Werkstatt; E-Mail-Code). Der Worker prüft das JWT für `/api/*` selbst (RS256 gegen `TEAM_DOMAIN/cdn-cgi/access/certs`, `aud` = `POLICY_AUD`, `iss`, `exp`). Ohne `TEAM_DOMAIN`/`POLICY_AUD` antwortet `/api` mit 503, ohne Anmeldung mit 401. `/api/access-info` zeigt nach dem Login Team-Domain und `POLICY_AUD` (Einrichtungshilfe). `GITHUB_TOKEN` (fein eingestellter Schlüssel nur für NomadGirl, Contents lesen/schreiben) ist ein **Geheimnis im Cloudflare-Dashboard**, nie im Repo.
+- **Speichern = Commit** (Daniel, 07.11.2026, Port aus NomadTactics ohne Party und Profil): `worker/index.js` beantwortet `/api/*` (`run_worker_first`): `GET /api/session`, `GET /api/files` (alle JSON unter `DATA_DIR` vom aktuellen `main`, mit Blob-sha), `POST /api/commit` `{ base: {datei: sha|null}, changes: [{file, content|null}], force?, name? }` → **ein** Commit über die Git-Data-API, Dateien mit `pretty()`, Nachricht „Werkstatt: … (Name)“. Abweichende Basis → 409 mit `conflicts`; Wettlauf am Ref → bis zu 3× neu; gleicher Inhalt → kein leerer Commit. **Autor:** Name aus der Werkstatt (Klick auf den Namen oben rechts, gemerkt in localStorage `nomadgirl-name`, sonst aus der Login-E-Mail), E-Mail anonym `<name>@werkstatt.nomadgirl.invalid`. Die Login-E-Mail kommt nie ins Repo. Profile (KV) erst später (Daniels Wahl).
+- **Werkstatt:** `openCloudStore()` findet den Worker über `/api/session` (sonst `null` → alter Speicher, bei Fehler Hinweis „Nur in diesem Browser“). Speichert **automatisch nach 60 s Ruhe** (`?autosave=N` für Tests) oder sofort mit ⌘S, Status „Ungespeichert · seit …“ / „Gespeichert · …“ (Tooltip mit Commit), Konflikt-Dialog „Jemand war schneller“ (Neu laden | Überschreiben). Kein „Übernimm“ nötig: Ava holt sich vor der Arbeit `git pull`.
+- **Spiel live:** `game/play/main.js` lädt online über `cloudFiles()` (`/api/files`) den aktuellen `main`, also sofort nach dem Speichern, ohne auf den Build zu warten (Hilfe-Fenster zeigt den Stand). Ohne Worker: ausgelieferte Dateien plus Browser-Stände.
+- **Tests:** `test/cloud.test.js` (Worker gegen falsches GitHub + falsches Access aus `test/fake_cloud.js`), `npm run web:test` (`tools/workshop_cloud_test.mjs`: echte Werkstatt und echtes Spiel im Browser, Autospeichern, ⌘S, Konflikt, Neuladen, Spiel live). Die anderen Browser-Tests ignorieren den 404 von `/api/` am lokalen Server.
+- **Lokal wie auf Cloudflare:** `npm run build:web`, dann `npx wrangler dev --local --port 8787 --ip 127.0.0.1 --var LOCAL_TEST:1` (Login nur auf localhost ausgelassen).
 
 ## Stand
 
+- 07.11.2026: **Web-Werkstatt „Speichern = Commit“** (Worker, Access-Login für alles, Autospeichern, Konflikte, Spiel lädt live). Einrichtung im Dashboard durch Daniel.
 - 07.11.2026: Kamera-Zoom in der Werkstatt einstellbar, Standard 0,75 (mehr Überblick).
 - 07.11.2026: Leyla auf 192 px verkleinert (Größe kommt aus dem Idle-Asset), Plünderer im gleichen Verhältnis.
 - 07.11.2026: **MVP Movement & Kampf** spielbar (`/game`): Testraum, Leyla mit allen Bewegungen, Rohrzange + Nagelpistole, Plünderer-Schläger und -Schütze, HUD, Fernsteuerung `nomad` + `tools/play.mjs`, Spiel-Test. Raum-Layouts in den Daten, Plattform-Kacheln aus Daniels Tileset.

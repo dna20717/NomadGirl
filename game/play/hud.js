@@ -9,7 +9,7 @@ const CONTROLS = [
 ];
 
 export class Hud {
-  constructor(root, { workshopDrafts = 0 } = {}) {
+  constructor(root, { workshopDrafts = 0, commit = null } = {}) {
     this.healthBar = el('i'); this.healthText = el('b');
     this.ammo = el('b'); this.dash = el('span', { class: 'hud-dash' }, 'DASH');
     this.time = el('b'); this.kills = el('b'); this.deltas = el('b'); this.roomName = el('span', { class: 'hud-room' });
@@ -18,6 +18,7 @@ export class Hud {
       el('h2', {}, 'Steuerung'),
       el('dl', {}, ...CONTROLS.flatMap(([k, t]) => [el('dt', {}, k), el('dd', {}, t)])),
       el('p', {}, 'Alle Werte kommen aus der Werkstatt (Leyla, Waffen, Gegner, Raum-Bausteine).',
+        commit ? el('b', {}, ` Spieldaten live aus dem Repository (Stand ${commit.slice(0, 7)}).`) : null,
         workshopDrafts ? el('b', {}, ` Dein gespeicherter Werkstatt-Stand ist aktiv (${workshopDrafts} ${workshopDrafts === 1 ? 'Datei' : 'Dateien'}).`) : null),
       el('button', { class: 'hud-go', onclick: () => this.toggleHelp(false) }, 'Los geht’s')));
     root.append(

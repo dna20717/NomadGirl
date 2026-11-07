@@ -8,7 +8,8 @@ body.ng { background: var(--ui-bg); color: var(--ui-text); font-family: var(--ui
 .ng-checkButton.green { color: var(--ui-green); }
 .ng-checkButton.yellow { color: var(--ui-acc-line); }
 .ng-checkButton.red { color: var(--ui-red); border-color: var(--ui-red) !important; }
-.ng-state { display: inline-flex; align-items: center; gap: 4px; margin-right: 8px; }
+.ng-state, .ng-user { display: inline-flex; align-items: center; gap: 4px; margin-right: 8px; }
+.ng-user { color: var(--ui-text2); gap: 6px; }
 .ng-data { grid-template-columns: 220px minmax(360px, 1fr) minmax(340px, 440px); }
 .ng-spacing { margin-top: 14px; }
 .da-nav-number.ng-problem { background: var(--ui-red-soft); color: var(--ui-red); }

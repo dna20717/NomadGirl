@@ -10,7 +10,7 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 const errors = [];
 page.on('pageerror', e => errors.push(e.message));
-page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+page.on('console', m => { if (m.type() === 'error' && !m.location()?.url?.includes('/api/')) errors.push(m.text()); });   // no worker locally: /api/ answers 404
 await page.goto(url);
 await page.waitForSelector('#ng-load', { state: 'detached', timeout: 10000 });
 if (shots) fs.mkdirSync('output', { recursive: true });
