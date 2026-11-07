@@ -96,13 +96,18 @@ await page.reload(); await page.waitForSelector('.ng-user', { timeout: 20000 });
 check((await page.textContent('.ng-user')).includes('Daniel K.'), 'Name bleibt nach Neuladen erhalten');
 check(await page.evaluate(() => window.workshop.p.data.leyla.movement.runSpeed) === 779, 'nach Neuladen kommt der Stand aus dem Repository');
 
-// The game takes the data live from the repository
-const game = await browser.newPage({ viewport: { width: 1280, height: 720 } });
-const infos = []; game.on('console', m => infos.push(m.text())); game.on('pageerror', e => errors.push('Spiel: ' + e.message));
-await game.goto(base + '/game');
+// "Spielen" saves first and opens the game in its own tab, which takes the data live from the repository
+const before3 = g.refs.main;
+await setSpeed(780);
+const infos = [];
+const [game] = await Promise.all([page.context().waitForEvent('page'), page.click('.ng-play')]);
+game.on('console', m => infos.push(m.text())); game.on('pageerror', e => errors.push('Spiel: ' + e.message));
+check(g.refs.main !== before3 || (await page.evaluate(() => window.workshop.dirty.size)) === 0, '„Spielen“ speichert vorher');
+await game.waitForURL(/\/game/, { timeout: 15000 });
+check(/"runSpeed": 780/.test(g.fileAt(leylaFile)), 'gespeicherter Stand steht vor dem Spielstart im Repository');
 await game.waitForFunction(() => window.game?.scene.getScene('play')?.leyla, null, { timeout: 30000 });
 check(infos.some(t => t.includes('live aus dem Repository')), 'Spiel lädt die Daten live über /api/files');
-check(await game.evaluate(() => window.game.scene.getScene('play').p.data.leyla.movement.runSpeed) === 779, 'Spiel nutzt den gespeicherten Werkstatt-Stand');
+check(await game.evaluate(() => window.game.scene.getScene('play').p.data.leyla.movement.runSpeed) === 780, 'Spiel nutzt den gespeicherten Werkstatt-Stand');
 check(!errors.length, 'keine Fehler in der Browser-Konsole' + (errors.length ? ': ' + errors.join(' | ') : ''));
 
 await browser.close(); server.close();

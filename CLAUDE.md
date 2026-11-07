@@ -73,6 +73,7 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 - **Prüfung** (`validateProject`): Verweise, Pflichtfelder, Zahlenbereiche, Auswahlwerte, die `check`-Regeln der Bereiche und Querprüfungen (Gegenstände ohne Verwendung, POIs ohne Ort).
 - **Umbenennen/Löschen** ziehen Verweise in allen Bereichen mit bzw. räumen sie auf.
 - **Speichern:** online **„Speichern = Commit“** (siehe Online) über `game/cloud_store.js`; lokal bzw. ohne Worker wie die alte NomadTactics-Werkstatt über `game/store.js` (Artifact-Datenbank, sonst localStorage `nomadgirl-drafts:`).
+- **Spielen** (Daniel, 07.11.2026): goldener Knopf oben links in der Menüleiste (⌘P), dazu „Im Spiel testen“ beim Raum-Layout. Beide speichern vorher (online = Commit) und öffnen das Spiel in einem eigenen Tab `nomadgirl-game`, der bei jedem Klick wiederverwendet wird (Tab wird sofort geöffnet, sonst blockt Safari ihn nach dem Speichern). Ist ein Raum-Baustein mit Layout gewählt, spielt der Knopf diesen Raum, sonst den Testraum. `workshop.play(room?)`.
 - Oberflächen-Regeln wie in NomadTactics (`CLAUDE.md` dort): nur `--ui-*`-Tokens, Inter + VT323, Dialoge über `openDialogue`, Löschen rot mit Rückgängig, Hauptaktion gold.
 
 ## Assets und Fidelity
@@ -109,6 +110,7 @@ Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei j
 
 ## Stand
 
+- 07.11.2026: Knopf „Spielen“ in der Werkstatt (speichert vorher, eigener Tab).
 - 07.11.2026: **Web-Werkstatt „Speichern = Commit“** (Worker, Access-Login für alles, Autospeichern, Konflikte, Spiel lädt live). Einrichtung im Dashboard durch Daniel.
 - 07.11.2026: Kamera-Zoom in der Werkstatt einstellbar, Standard 0,75 (mehr Überblick).
 - 07.11.2026: Leyla auf 192 px verkleinert (Größe kommt aus dem Idle-Asset), Plünderer im gleichen Verhältnis.

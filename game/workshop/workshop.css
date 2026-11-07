@@ -3,6 +3,7 @@ body.ng { background: var(--ui-bg); color: var(--ui-text); font-family: var(--ui
 #ng-load { position: fixed; inset: 0; display: grid; place-items: center; font: 15px var(--ui-font); color: var(--ui-text3); }
 .ng .ed-menu { --menu: 52px; }
 .ng-title { display: inline-flex; align-items: center; gap: 8px; padding: 0 6px; color: var(--ui-text2); }
+.ng-play { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; }
 .ng-title b { color: var(--ui-text); font-weight: 600; }
 .ng-title span { font-family: var(--ui-pixel); font-size: 19px; color: var(--ui-text3); }
 .ng-checkButton.green { color: var(--ui-green); }

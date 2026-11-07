@@ -105,6 +105,19 @@ export class Workshop {
       main: { text: 'Neu laden', icon: 'restart', action: () => { this.dirty.clear(); location.reload(); } },
     });
   }
+  // Jump into the game: save first (the game reads the saved state), then open it in its own tab (reused on every click).
+  // The tab is opened right away, otherwise browsers (Safari on the iPad) block it after the save.
+  async play(room = this.playRoom()) {
+    const url = new URL(`../../game.html${room ? `?room=${encodeURIComponent(room)}` : ''}`, import.meta.url).href;
+    const tab = window.open('', 'nomadgirl-game');
+    if (this.dirty.size) {
+      this.hint('Speichere, dann geht’s ins Spiel …');
+      await this.persist();
+      if (this.dirty.size || this.storeError) { tab?.close(); return; }   // save failed or conflict: stay here
+    }
+    if (tab) { tab.location.href = url; tab.focus(); } else location.href = url;
+  }
+  playRoom() { return this.page.area === 'rooms' && this.page.choice && this.p.data.rooms?.[this.page.choice]?.layout?.length ? this.page.choice : null; }
   // Web workshop: the name in the commits (kept in this browser until profiles come)
   showName() {
     const st = this.store;
@@ -123,6 +136,7 @@ export class Workshop {
   key(e) {
     const t = e.target, writes = t.matches?.('input, textarea, select') && !(e.metaKey || e.ctrlKey);
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') { e.preventDefault(); this.persist(); return; }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'p') { e.preventDefault(); this.play(); return; }
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z' && !t.matches?.('input, textarea')) { e.preventDefault(); e.shiftKey ? this.redoStep() : this.undoStep(); return; }
     if (writes) return;
     if (e.key === '?') this.showHelp();
@@ -160,6 +174,7 @@ export class Workshop {
     ui.status = el('span', { class: 'ed-status' });
     ui.menu.replaceChildren(...[
       el('span', { class: 'ng-title' }, icon('vehicle', 18), el('b', {}, 'NomadGirl'), el('span', {}, 'Werkstatt')),
+      el('button', { class: 'ed-button main ng-play', title: (this.playRoom() ? `Raum „${this.p.data.rooms[this.playRoom()].name || this.playRoom()}“ spielen` : 'Testraum spielen') + ' · speichert vorher (⌘P)', onclick: () => this.play() }, icon('play', 16), ' Spielen'),
       el('span', { class: 'ed-separator' }),
       el('button', { class: 'ed-button', title: 'Speichern (⌘S)', onclick: () => this.persist() }, icon('save', 18)),
       ui.status,
@@ -456,7 +471,7 @@ export class Workshop {
       ...t('Beute & Crafting', 'Gegenstände mit Größe im Rucksack, Beutetabellen mit Gewichten und Rezepte (Zutaten → Ergebnis, Werkstatt, wie man es lernt).'),
       ...t('Rig', 'Zugmaschinen ziehen Container, Container fassen Werkstätten, Werkstätten brauchen oder liefern Energie. Rig-Teile kommen in die Slots der Zugmaschine, Companions betreiben Werkstätten.'),
       ...t('Welt', 'POIs werden aus Raum-Bausteinen zusammengesetzt, Oberwelt-Orte zeigen auf POIs, Encounter passieren unterwegs, Reisen regelt Sprit, Vorräte und Tag/Nacht.'),
-      ...t('Tasten', '⌘S speichern · ⌘Z / ⇧⌘Z rückgängig/wiederholen · Zahlen am Namen ziehen (Shift = fein) · ? Hilfe'),
+      ...t('Tasten', '⌘S speichern · ⌘P spielen · ⌘Z / ⇧⌘Z rückgängig/wiederholen · Zahlen am Namen ziehen (Shift = fein) · ? Hilfe'),
     ] });
   }
 }

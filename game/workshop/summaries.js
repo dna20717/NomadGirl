@@ -114,7 +114,7 @@ export const SUMMARY = {
     const count = enemies.reduce((m, n) => (m[n] = (m[n] || 0) + 1, m), {});
     const legend = el('div', { class: 'ng-legend' }, ...[['#', 'Wand'], ['=', 'Plattform'], ['H', 'Leiter'], ['o', 'Seil'], ['L', 'Start'], ['x', 'Gegner']]
       .map(([k, n]) => el('span', {}, el('i', { style: `background:${ROOM_COLORS[k] || '#e5484d'}` }), n)));
-    const play = el('a', { class: 'ed-button wide', href: new URL(`../../game.html?room=${encodeURIComponent(id)}`, import.meta.url).href, target: '_blank' }, 'Im Spiel testen');
+    const play = el('button', { class: 'ed-button wide', title: 'Speichert vorher, damit das Spiel deinen Stand hat', onclick: () => w.play(id) }, 'Im Spiel testen');
     return { title: `Layout · ${r.w}×${r.h} Kacheln`, body: el('div', {}, c, legend, facts([
       ['Gegner', Object.entries(count).map(([n, k]) => `${k}× ${n}`).join(', ') || 'keine'],
       ['Leitern · Seile · Plattformen', `${r.ladders.length} · ${r.anchors.length} · ${r.platforms.length} Kacheln`],
