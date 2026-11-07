@@ -18,7 +18,13 @@
   "slideDuration": 350,
   "climbSpeed": 180,
   "swingRope": 320,
-  "swingBoost": 20
+  "swingBoost": 20,
+  "ledgeGrab": true,
+  "ledgeReach": 56,
+  "mantleTime": 450,
+  "mantleFromFrame": 5,
+  "standUpTime": 350,
+  "crouchTime": 300
  },
  "loadout": {"melee": "rohrzange", "ranged": "nagelpistole", "backpack": "schulranzen"},
  "look": {
@@ -29,6 +35,11 @@
   "jump": "leyla_jump_side",
   "fall": "leyla_jump_side",
   "slide": "leyla_slide_side",
-  "airJump": "leyla_flip_side"
- }
+  "airJump": "leyla_flip_side",
+  "idleAlt": "leyla_idle2_side",
+  "crouch": "leyla_crouch_side_left",
+  "mantle": "leyla_mantle_side",
+  "hang": "leyla_hang_side"
+ },
+ "idleAltChance": 50
 }

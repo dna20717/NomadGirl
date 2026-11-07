@@ -3,7 +3,8 @@ import { el } from '../ui.js';
 
 const CONTROLS = [
   ['A D / ← →', 'Laufen'], ['Shift halten', 'Gehen statt Rennen'], ['Leertaste', 'Springen (nochmal in der Luft: Doppelsprung)'],
-  ['L oder C', 'Dash (auch in der Luft)'], ['S / ↓ beim Rennen', 'Slide (unter Hindernissen durch)'], ['S + Leertaste', 'Von Plattform fallen'],
+  ['L oder C', 'Dash (auch in der Luft)'], ['S / ↓ beim Rennen', 'Slide (unter Hindernissen durch)'], ['S + Leertaste', 'Von Plattform fallen'], ['S / ↓ im Stand', 'Ducken; an der Kante + Richtung: runter hängen'],
+  ['Richtung zur Wand im Sprung', 'Kante greifen; W/Leertaste: hochziehen, S: loslassen, Leertaste weg von der Wand: abspringen'],
   ['W / ↑ an der Leiter', 'Klettern'], ['W / ↑ oder E in der Luft', 'Am Seil festhalten, Leertaste: loslassen mit Schwung'],
   ['J oder Y', 'Nahkampf'], ['K oder X', 'Fernkampf'], ['R', 'Raum neu starten'], ['H / Esc', 'Diese Hilfe'], ['G', 'Hitboxen zeigen'],
 ];

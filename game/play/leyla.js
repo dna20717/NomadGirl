@@ -1,12 +1,13 @@
 // Leyla: controller (states, physics feel) and look (sprite + code effects).
 // All numbers come from the game data (area "Leyla"); only feel constants that are not game design live here.
 //
-// States: normal (ground/air) · dash · slide · climb · swing · dead
+// States: normal (ground/air) · dash · slide · climb · swing · hang (ledge) · mantle (pull up) · crouch (also standing up) · dead
 // Look: per state the asset from leyla.look.<state>, otherwise look.idle. Missing animations are covered by
 // code effects (squash & stretch, lean, afterimages, blinking), new animations plug in without code changes.
 
 // collider at 256 px look height; everything scales with the height of look.idle (Assets › „Höhe im Spiel“)
-const BASE = { height: 256, w: 72, h: 224, slideH: 104, climbW: 44, hand: 84, chest: 150 };
+// hangReach: hands above the feet while hanging; mantleLift: how far the last pull-up frame lifts the feet inside the picture
+const BASE = { height: 256, w: 72, h: 224, slideH: 104, crouchH: 196, climbW: 44, hand: 84, chest: 150, hangReach: 253, mantleLift: 120 };
 const DASH_TIME = 170, TERMINAL_FALL = 1700;
 const approach = (v, target, step) => v < target ? Math.min(target, v + step) : Math.max(target, v - step);
 
@@ -24,6 +25,11 @@ export class Leyla {
     this.body.setMaxVelocityY(TERMINAL_FALL);
     this.sprite = scene.add.sprite(feet[0], feet[1], scene.lookKey('leyla', 'idle')).setDepth(10);
     this.start = feet;
+    // two idles: after every loop pick one at random (Leyla › „Stehen 2 Anteil“)
+    this.idleVariant = 'idle';
+    this.sprite.on('animationrepeat', () => {
+      if (this.idleNow) this.idleVariant = Math.random() * 100 < (this.d.idleAltChance ?? 50) ? 'idleAlt' : 'idle';
+    });
     this.reset();
   }
 
@@ -38,7 +44,8 @@ export class Leyla {
     this.ammo = this.scene.weapon('ranged')?.ammo ?? Infinity;
     this.airJumps = this.m.airJumps ?? 0;
     this.airDash = true;
-    this.lastGround = -1e9; this.jumpAt = -1e9; this.dashReady = 0; this.dropUntil = 0;
+    this.lastGround = -1e9; this.jumpAt = -1e9; this.dashReady = 0; this.dropUntil = 0; this.noGrabUntil = 0;
+    this.ledge = null; this.body.checkCollision.none = false;
     this.meleeReady = 0; this.rangedReady = 0; this.invulnerableUntil = 0; this.attackPose = 0;
     this.squash = { x: 1, y: 1 };
     this.sprite.setAlpha(1).setRotation(0).clearTint();
@@ -53,6 +60,7 @@ export class Leyla {
 
   setStanding() { const z = this.size; this.body.setSize(z.w, z.h, false); this.body.setOffset(0, 0); }
   setNarrow() { const z = this.size; this.body.setSize(z.climbW, z.h, false); this.body.setOffset((z.w - z.climbW) / 2, 0); }   // on ladders next to ledges
+  setCrouch() { const z = this.size; this.body.setSize(z.w, z.crouchH, false); this.body.setOffset(0, z.h - z.crouchH); }
   setLow() { const z = this.size; this.body.setSize(z.w, z.slideH, false); this.body.setOffset(0, z.h - z.slideH); }
   canStand() { const z = this.size; return this.scene.rectFree(this.x - z.w / 2 + 2, this.feet - z.h, z.w - 4, z.h - 2); }
 
@@ -73,9 +81,12 @@ export class Leyla {
       case 'slide': this.slide(time, input, grounded); break;
       case 'climb': this.climb(time, input, dir, grounded); break;
       case 'swing': this.swing(time, s, input, dir); break;
+      case 'hang': this.hang(time, input, dir); break;
+      case 'mantle': this.mantle(time); break;
+      case 'crouch': this.crouch(time, dt, input, dir, grounded); break;
       case 'dead': b.setVelocityX(b.velocity.x * 0.9); break;
     }
-    if (this.alive && this.state !== 'climb') {
+    if (this.alive && !['climb', 'hang', 'mantle'].includes(this.state)) {
       if (input.melee.pressed && time >= this.meleeReady) this.scene.combat.melee(this, time);
       if (input.ranged.pressed && time >= this.rangedReady) this.scene.combat.shoot(this, time);
     }
@@ -117,6 +128,13 @@ export class Leyla {
       const a = this.scene.anchorNear(this.x, this.hand().y, this.m.swingRope ?? 320);
       if (a) return this.startSwing(a);
     }
+    // ledge: while jumping or falling and pushing towards a wall or platform end, the hands catch its edge
+    if (!grounded && dir && m.ledgeGrab !== false && time >= this.noGrabUntil && b.velocity.y > -350) {
+      const L = this.scene.ledgeAt(this.x, this.hand().y, dir, m.ledgeReach ?? 56, this.size.w / 2);
+      if (L && this.hangFits(L)) return this.startHang(L);
+    }
+    // crouch: ↓ while standing (fast = slide, see above)
+    if (grounded && input.down.down && !input.jump.down && Math.abs(b.velocity.x) <= (m.walkSpeed ?? 240) * 0.8) return this.startCrouch();
   }
 
   jump(f) {
@@ -225,6 +243,79 @@ export class Leyla {
     this.squash = { x: 0.88, y: 1.12 };
   }
 
+  // ---------- ledge: hang, pull up, crouch ----------
+  hangBox(L) { const z = this.size; return { x: L.x - L.dir * z.w / 2, feet: L.y + z.hangReach }; }
+  hangFits(L) {
+    const z = this.size, { x, feet } = this.hangBox(L);
+    return this.scene.rectFree(x - z.w / 2 + 2, feet - z.h, z.w - 4, z.h - 2);
+  }
+  startHang(L) {
+    const { x, feet } = this.hangBox(L), b = this.body;
+    this.state = 'hang'; this.ledge = L; this.facing = L.dir;
+    this.setStanding(); b.allowGravity = false;
+    b.reset(x, feet - this.size.h / 2); b.setVelocity(0, 0);
+    this.airJumps = this.m.airJumps ?? 0; this.airDash = true; this.cut = false; this.flipUntil = 0;
+    this.squash = { x: 0.94, y: 1.06 };
+  }
+  hang(time, input, dir) {
+    const b = this.body, L = this.ledge, m = this.m;
+    b.setVelocity(0, 0);
+    if (input.jump.pressed && dir === -L.dir) {   // jump away from the wall
+      this.leaveHang(time); this.facing = dir;
+      b.setVelocity(dir * (m.runSpeed ?? 440) * 0.8, -(m.jumpVelocity ?? 1100) * 0.85); this.cut = true; this.jumpAt = -1e9;
+      return;
+    }
+    if (input.up.pressed || input.jump.pressed) {
+      this.jumpAt = -1e9;
+      const z = this.size, top = { x: L.x + L.dir * (z.w / 2 + 4), feet: L.y };
+      if (this.scene.rectFree(top.x - z.w / 2 + 2, top.feet - z.crouchH, z.w - 4, z.crouchH - 2)) return this.startMantle(time, top);
+    }
+    if (input.down.pressed) this.leaveHang(time);
+  }
+  leaveHang(time) { this.state = 'normal'; this.body.allowGravity = true; this.ledge = null; this.noGrabUntil = time + 300; }
+  startMantle(time, top) {
+    this.state = 'mantle'; this.mantleAt = time;
+    this.mantleFrom = { x: this.x, feet: this.feet }; this.mantleTo = top;
+    this.body.checkCollision.none = true; this.body.setVelocity(0, 0);
+  }
+  mantleP(time) { return Math.min(1, (time - this.mantleAt) / (this.m.mantleTime ?? 450)); }
+  mantle(time) {
+    this.body.setVelocity(0, 0);
+    if (this.mantleP(time) < 1) return;
+    const t = this.mantleTo, b = this.body;
+    b.checkCollision.none = false; b.allowGravity = true; this.ledge = null;
+    this.setCrouch(); b.reset(t.x, t.feet - this.size.h / 2);   // offset keeps the feet at the bottom
+    this.state = 'crouch'; this.crouchF = this.crouchFrames() - 1; this.rising = true;
+  }
+  crouchFrames() { return this.scene.data_.assets?.[this.d.look?.crouch]?.frames || 1; }
+  startCrouch() {
+    this.state = 'crouch'; this.crouchF = 0; this.rising = false;
+    this.setCrouch(); this.body.setVelocityX(0);
+  }
+  crouch(time, dt, input, dir, grounded) {
+    const b = this.body, m = this.m, last = this.crouchFrames() - 1;
+    b.setVelocityX(0);
+    if (!grounded) { this.endCrouch(); return; }
+    // drop through a platform (↓ + jump) or jump out of the crouch
+    if (input.jump.pressed && this.canStand()) {
+      this.endCrouch();
+      if (input.down.down && this.scene.onPlatform(this.x, this.feet)) { this.dropUntil = time + 250; this.jumpAt = -1e9; } else this.jump(1);
+      return;
+    }
+    // at an edge: ↓ + direction towards it = climb down and hang on the edge
+    if (dir && input.down.down && !this.rising) {
+      const L = this.scene.edgeBelow(this.x, this.feet, dir, this.size.w / 2);
+      if (L && this.hangFits(L)) { this.endCrouch(); return this.startHang(L); }
+    }
+    if (dir && this.canStand()) { this.facing = dir; this.endCrouch(); return; }
+    this.rising = !input.down.down;
+    const target = this.rising ? 0 : last, ms = this.rising ? (m.standUpTime ?? 350) : (m.crouchTime ?? 300);
+    const step = ms > 0 ? last * dt / ms : last;
+    this.crouchF = target > this.crouchF ? Math.min(target, this.crouchF + step) : Math.max(target, this.crouchF - step);
+    if (this.rising && this.crouchF <= 0 && this.canStand()) this.endCrouch();
+  }
+  endCrouch() { const x = this.x, f = this.feet, vx = this.body.velocity.x; this.state = 'normal'; this.rising = false; this.setStanding(); this.body.reset(x, f - this.size.h / 2); this.body.setVelocityX(vx); }
+
   // ---------- damage ----------
   hurt(time, damage, fromX) {
     if (!this.alive || this.invulnerable(time)) return false;
@@ -235,6 +326,8 @@ export class Leyla {
     if (this.state === 'climb') this.leaveClimb();
     if (this.state === 'swing') this.releaseSwing(false);
     if (this.state === 'dash') this.endDash();
+    if (this.state === 'hang' || this.state === 'mantle') { this.body.checkCollision.none = false; this.setStanding(); this.leaveHang(time); }
+    if (this.state === 'crouch') this.endCrouch();
     const away = Math.sign(this.x - fromX) || -this.facing;
     this.body.setVelocity(away * 520, low ? 0 : -420);
     if (low) this.facing = away;
@@ -244,7 +337,8 @@ export class Leyla {
     return true;
   }
   die() {
-    if (this.state === 'slide') this.setStanding();
+    if (this.state === 'slide' || this.state === 'crouch') this.setStanding();
+    this.body.checkCollision.none = false;
     this.state = 'dead'; this.body.allowGravity = true;
     this.scene.onLeylaDown();
   }
@@ -252,8 +346,20 @@ export class Leyla {
   // ---------- look ----------
   look(time, dt, grounded) {
     const b = this.body, v = b.velocity, st = this.state;
-    const name = st === 'dead' ? 'hurt' : st === 'normal' ? (!grounded ? (time < (this.flipUntil || 0) ? 'airJump' : v.y < 0 ? 'jump' : 'fall') : Math.abs(v.x) > 300 ? 'run' : Math.abs(v.x) > 20 ? 'walk' : 'idle') : st === 'swing' ? 'jump' : st;
+    let name = st === 'dead' ? 'hurt' : st === 'normal' ? (!grounded ? (time < (this.flipUntil || 0) ? 'airJump' : v.y < 0 ? 'jump' : 'fall') : Math.abs(v.x) > 300 ? 'run' : Math.abs(v.x) > 20 ? 'walk' : 'idle') : st === 'swing' ? 'jump' : st;
+    this.idleNow = name === 'idle';
+    if (name === 'idle' && this.idleVariant === 'idleAlt' && this.d.look?.idleAlt) name = 'idleAlt';
+    // mantle and crouch pick their frame from the progress (crouch backwards = standing up)
+    const manual = st === 'mantle' || st === 'crouch', an0 = this.sprite.anims;
+    if (!manual && st !== 'slide' && an0.isPaused) an0.resume();
     const info = this.scene.playLook(this.sprite, 'leyla', name, this.facing);
+    if (manual && info.used === st && an0.currentAnim) {
+      const fr = an0.currentAnim.frames, n = fr.length;
+      const from = st === 'mantle' ? Math.min(n - 1, Math.max(0, (this.m.mantleFromFrame ?? 5) - 1)) : 0;
+      const f = st === 'mantle' ? Math.round(from + (n - 1 - from) * this.mantleP(time)) : Math.round(Math.min(n - 1, this.crouchF || 0));
+      if (!an0.isPaused) an0.pause();
+      this.sprite.setFrame(fr[f].frame.name);
+    }
     // run cycle follows the speed, so the feet do not slide (walking = slower steps)
     // sliding through a tunnel: hold the lowest frame (middle of the slide) until she can stand
     const an = this.sprite.anims;
@@ -277,6 +383,11 @@ export class Leyla {
     if (time < this.attackPose && st === 'normal') rot += this.facing * 0.1;
     if (st === 'dead') { this.deadRot = (this.deadRot || 0) + (this.facing * -1.45 - (this.deadRot || 0)) * k; rot = this.deadRot; } else this.deadRot = 0;
     this.sprite.setPosition(b.center.x, b.bottom).setRotation(rot);
+    if (st === 'mantle') {   // the picture lifts the feet itself, so the anchor only rises the rest of the way
+      const p = this.mantleP(time), F = this.mantleFrom, T = this.mantleTo, e = p * p * (3 - 2 * p);
+      const lift = info.used === 'mantle' ? this.size.mantleLift : 0, ex = Math.max(0, Math.min(1, (p - 0.4) / 0.6));
+      this.sprite.setPosition(F.x + (T.x - F.x) * ex * ex * (3 - 2 * ex), F.feet + (T.feet + lift - F.feet) * e);
+    }
     this.sprite.setScale(info.scale * sx, info.scale * sy);
     this.sprite.setFlipX(info.flip ? this.facing > 0 : this.facing < 0);
     if (st !== 'dead') this.sprite.setAlpha(time < this.invulnerableUntil && Math.floor(time / 70) % 2 ? 0.35 : 1);

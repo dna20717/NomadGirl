@@ -196,6 +196,28 @@ export class PlayScene extends Phaser.Scene {
     for (const dx of [-30, 0, 30]) if (this.platformTiles.has(Math.floor((x + dx) / this.T) + ',' + ty)) return true;
     return false;
   }
+  // ledge for the hands: in front of Leyla (dir) a ground tile (wall or platform) with free space above it,
+  // its top edge between handY - 8 and handY + reach; returns the wall face x, the edge y and the direction to the wall
+  ledgeAt(x, handY, dir, reach, halfW) {
+    const T = this.T, cx = Math.floor((x + dir * (halfW + 6)) / T), ground = (c, r) => this.room.solid(c, r) || this.platformTiles.has(c + ',' + r);
+    for (let r = Math.floor((handY - 8) / T); r * T <= handY + reach; r++) {
+      if (r * T < handY - 8) continue;
+      if (ground(cx, r) && !ground(cx, r - 1) && !ground(cx - dir, r) && !this.room.solid(cx - dir, r - 1))
+        return { x: dir > 0 ? cx * T : (cx + 1) * T, y: r * T, dir };
+    }
+    return null;
+  }
+  // edge of the ground Leyla stands on, in direction dir (for climbing down): hanging there she faces back to it
+  edgeBelow(x, feet, dir, halfW) {
+    const T = this.T, r = Math.floor((feet + 2) / T), ground = (c, rr) => this.room.solid(c, rr) || this.platformTiles.has(c + ',' + rr);
+    const cq = Math.floor((x + dir * halfW) / T);
+    for (const c of [cq, cq - dir]) {
+      if (!ground(c, r) || ground(c + dir, r) || this.room.solid(c + dir, r - 1)) continue;
+      const ex = dir > 0 ? (c + 1) * T : c * T;
+      if (Math.abs(ex - x) <= halfW + 48) return { x: ex, y: r * T, dir: -dir };
+    }
+    return null;
+  }
   ladderAt(x, feet) { return this.ladders.find(l => x > l.x0 - 8 && x < l.x1 + 8 && feet >= l.top - 6 && feet <= l.bottom + 6) || null; }
   anchorNear(x, y, max) {
     let best = null, bd = max;

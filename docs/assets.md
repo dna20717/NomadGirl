@@ -24,6 +24,14 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/leyla/flip_side.png` | Leyla, Salto (Doppelsprung) nach rechts: 9 Frames, Pixel-Art (`leyla_flip_side`) | aus den `*_source.gif` zugeschnitten (Code) | 07.11.2026 |
 | `assets/leyla/walk_front.png` | Leyla, Gehen nach vorn: 8 Frames à 96 × 256 px, Pixel-Art, Startseite (`leyla_walk_front`) | aus den `*_source.gif` zugeschnitten (Code) | 07.11.2026 |
 | `assets/leyla/walk_side*_source.gif`, `jump_side*_source.gif`, `slide_side*_source.gif`, `flip_side_source.gif`, `walk_front_source.gif` | Originale, 256 × 256 px, 200 ms pro Frame | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/leyla/idle2_side.png` | Leyla Stehen 2 seitlich, 9 Frames 84 × 242 (`leyla_idle2_side`), zufällig im Wechsel mit Stehen | aus `idle2_side_source.gif` zugeschnitten (Code, `tools/leyla_strips.py`) | 07.11.2026 |
+| `assets/leyla/idle2_side_source.gif` | Original, 9 Frames à 200 ms, nach rechts | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/leyla/hang_side.png` | Leyla hängt an einer Kante, 6 Frames 88 × 250 (`leyla_hang_side`) | aus `hang_side_source.gif` zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/hang_side_source.gif` | Original, 6 Frames à 200 ms, nach rechts | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/leyla/mantle_side.png` | Leyla zieht sich hoch, 9 Frames 144 × 250 (`leyla_mantle_side`) | aus `mantle_side_source.gif` zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/mantle_side_source.gif` | Original, 9 Frames à 200 ms, nach rechts | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/leyla/crouch_side_left.png` | Leyla geht in die Hocke (Ducken, rückwärts = Aufstehen), 9 Frames 152 × 242, schaut nach links (`leyla_crouch_side_left`) | aus `crouch_side_left_source.gif` zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/crouch_side_left_source.gif` | Original, 9 Frames à 200 ms, nach links | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/drone/moods.png` | Drohne (Mama-Bot): 12 Stimmungen à 380 × 254 px als Streifen, an der Antenne ausgerichtet (`drone_moods`) | aus `concept.png` zugeschnitten (Code) | 07.11.2026 |
 | `assets/drone/concept.png` | Drohne: Konzept mit 12 Stimmungen im Raster 4 × 3, 1536 × 1024 px (`drone_concept`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/vehicles/van_door.png` | Leylas Van, Schiebetür geht auf (5 Frames 248 × 172, `van`), Spawn-Punkt; Schüssel herausgenommen | aus `van_door_source.gif` zugeschnitten (Code, `tools/van_strips.py`) | 07.11.2026 |

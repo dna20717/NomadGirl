@@ -71,6 +71,30 @@ v = await page.evaluate(() => {
 });
 check('Van: Leiter hoch, Dach begehbar', Math.abs(v.feet - v.roof) < 3 && v.front, v);
 await shot('van');
+// ledges: crouch at the pit edge, ↓ + towards the pit = hang, W = pull up; jump at the pit wall = grab it; two idles at random
+v = await page.evaluate(() => {
+  const n = nomad, T = 64; P.tp(29.3, 18); n.step(10);
+  n.step(25, ['down']); const crouch = n.state().leyla.state;
+  n.step(3, ['down', 'right']); n.step(5); const hang = n.state().leyla.state;
+  n.step(1, [], ['up']); n.until(x => x.leyla.state !== 'mantle', 60); const after = n.state().leyla.state;
+  n.until(x => x.leyla.state === 'normal', 60); n.step(10);
+  return { ...P.L(), crouch, hang, after };
+});
+check('Kante: Ducken, runter hängen, hochziehen', v.crouch === 'crouch' && v.hang === 'hang' && v.after === 'crouch' && v.st === 'normal' && v.feet === feet(0) && v.x < 30 * 64, v);
+v = await page.evaluate(() => {
+  const n = nomad; P.tp(31.5, 21); n.step(15);
+  n.step(14, ['left', 'jump'], ['jump']); n.until(x => x.leyla.state === 'hang' || x.leyla.ground, 60, ['left']);
+  const hang = n.state().leyla.state;
+  n.step(1, [], ['jump']); n.until(x => x.leyla.state === 'normal', 90); n.step(10);
+  return { ...P.L(), hang };
+});
+check('Kante: aus dem Sprung greifen + hoch', v.hang === 'hang' && v.feet === feet(0), v);
+v = await page.evaluate(() => {
+  const n = nomad, l = game.scene.getScene('play').leyla, seen = new Set(); P.tp(20, 18);
+  for (let i = 0; i < 60 && seen.size < 2; i++) { n.step(30); seen.add(l.sprite.anims.currentAnim?.key); }
+  return [...seen];
+});
+check('Zwei Idles im Wechsel', v.some(k => k?.startsWith('leyla_idle_side')) && v.includes('leyla_idle2_side'), v);
 v = await P(P => P.tp(13, 18));
 v = await P(P => P.leap(14.6, 17.5)); check('Hürde 1', v.x > 17 * 64 && v.feet === feet(0), v);
 v = await P(P => P.leap(18.5, 22.5)); check('Hürde 2 (breit)', v.x > 22 * 64 && v.feet === feet(0), v);

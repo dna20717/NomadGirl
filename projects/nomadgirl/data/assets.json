@@ -500,5 +500,98 @@
   "derivedFrom": "van_source",
   "date": "07.11.2026",
   "description": "Vorderes Dachgeländer, liegt vor Leyla, wenn sie auf dem Dach steht. Frames wie beim Van."
+ },
+ "leyla_idle2_side_source": {
+  "name": "Leyla · Stehen 2 seitlich (Original)",
+  "kind": "source",
+  "file": "assets/leyla/idle2_side_source.gif",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "9 Frames à 200 ms, 256 × 256 px, Pixel-Art, nach rechts."
+ },
+ "leyla_crouch_side_left_source": {
+  "name": "Leyla · Hocke seitlich links (Original)",
+  "kind": "source",
+  "file": "assets/leyla/crouch_side_left_source.gif",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "9 Frames à 200 ms, 256 × 256 px, Pixel-Art, nach links: vom Stehen in die Hocke."
+ },
+ "leyla_mantle_side_source": {
+  "name": "Leyla · Hochziehen seitlich (Original)",
+  "kind": "source",
+  "file": "assets/leyla/mantle_side_source.gif",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "9 Frames à 200 ms, 256 × 256 px, Pixel-Art, nach rechts: Arme hoch, Absprung, Knie angezogen."
+ },
+ "leyla_hang_side_source": {
+  "name": "Leyla · Hängen seitlich (Original)",
+  "kind": "source",
+  "file": "assets/leyla/hang_side_source.gif",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "6 Frames à 200 ms, 256 × 256 px, Pixel-Art, nach rechts, hängt an den Händen."
+ },
+ "leyla_idle2_side": {
+  "name": "Leyla · Stehen 2 seitlich",
+  "kind": "animation",
+  "file": "assets/leyla/idle2_side.png",
+  "frameSize": [84, 242],
+  "frames": 9,
+  "fps": 5,
+  "loop": true,
+  "origin": [42, 241],
+  "height": 192,
+  "source": "Code (Streifen zugeschnitten, tools/leyla_strips.py)",
+  "date": "07.11.2026",
+  "derivedFrom": "leyla_idle2_side_source",
+  "description": "Pixel-Art, schaut nach rechts, zweite Idle (wechselt zufällig mit Stehen)."
+ },
+ "leyla_crouch_side_left": {
+  "name": "Leyla · Hocke seitlich links",
+  "kind": "animation",
+  "file": "assets/leyla/crouch_side_left.png",
+  "frameSize": [152, 242],
+  "frames": 9,
+  "fps": 15,
+  "loop": false,
+  "flip": true,
+  "origin": [72, 241],
+  "height": 192,
+  "source": "Code (Streifen zugeschnitten, tools/leyla_strips.py)",
+  "date": "07.11.2026",
+  "derivedFrom": "leyla_crouch_side_left_source",
+  "description": "Pixel-Art, schaut nach links: in die Hocke (Ducken); rückwärts = Aufstehen nach dem Hochziehen."
+ },
+ "leyla_mantle_side": {
+  "name": "Leyla · Hochziehen seitlich",
+  "kind": "animation",
+  "file": "assets/leyla/mantle_side.png",
+  "frameSize": [144, 250],
+  "frames": 9,
+  "fps": 10,
+  "loop": false,
+  "origin": [72, 248],
+  "height": 198,
+  "source": "Code (Streifen zugeschnitten, tools/leyla_strips.py)",
+  "date": "07.11.2026",
+  "derivedFrom": "leyla_mantle_side_source",
+  "description": "Pixel-Art, schaut nach rechts: zieht sich an der Kante hoch (im Spiel ab Frame 5)."
+ },
+ "leyla_hang_side": {
+  "name": "Leyla · Hängen seitlich",
+  "kind": "animation",
+  "file": "assets/leyla/hang_side.png",
+  "frameSize": [88, 250],
+  "frames": 6,
+  "fps": 5,
+  "loop": true,
+  "origin": [47, 248],
+  "height": 198,
+  "source": "Code (Streifen zugeschnitten, tools/leyla_strips.py)",
+  "date": "07.11.2026",
+  "derivedFrom": "leyla_hang_side_source",
+  "description": "Pixel-Art, schaut nach rechts, hängt an einer Kante. Ankerpunkt so, dass die Hände an der Wand liegen."
  }
 }
