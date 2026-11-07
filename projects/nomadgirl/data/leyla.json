@@ -32,7 +32,12 @@
   "airJumpGhosts": true,
   "climbFromFrame": 2,
   "climbStep": 24,
-  "ladderMantle": true
+  "ladderMantle": true,
+  "landMinDrop": 384,
+  "landMinDistance": 640,
+  "landTime": 450,
+  "landFromFrame": 4,
+  "landCancel": 55
  },
  "loadout": {"melee": "rohrzange", "ranged": "nagelpistole", "backpack": "schulranzen"},
  "look": {
@@ -49,7 +54,8 @@
   "mantle": "leyla_mantle_side",
   "hang": "leyla_hang_side",
   "dash": "leyla_dash_side",
-  "climb": "leyla_climb_back"
+  "climb": "leyla_climb_back",
+  "land": "leyla_land_side"
  },
  "idleAltChance": 50
 }

@@ -1,7 +1,7 @@
 // Leyla: controller (states, physics feel) and look (sprite + code effects).
 // All numbers come from the game data (area "Leyla"); only feel constants that are not game design live here.
 //
-// States: normal (ground/air) · dash · slide · climb · swing · hang (ledge) · mantle (pull up) · crouch (also standing up) · dead
+// States: normal (ground/air) · dash · slide · climb · swing · hang (ledge) · mantle (pull up) · crouch (also standing up) · land (hard landing) · dead
 // Look: per state the asset from leyla.look.<state>, otherwise look.idle. Missing animations are covered by
 // code effects (squash & stretch, lean, afterimages, blinking), new animations plug in without code changes.
 
@@ -68,8 +68,18 @@ export class Leyla {
   update(time, dt, input) {
     const s = dt / 1000, b = this.body, m = this.m;
     const grounded = b.blocked.down || b.touching.down;
+    // airtime of a normal jump/fall: highest point and start, for the hard landing
+    if (this.state === 'normal' && !grounded) {
+      if (!this.air) this.air = { x: this.x, peak: this.feet };
+      this.air.peak = Math.min(this.air.peak, this.feet);
+    } else if (this.state !== 'normal') this.air = null;
     if (grounded) {
-      if (!this.wasGrounded && this.lastVy > 500 && this.state === 'normal') this.land(this.lastVy);
+      if (!this.wasGrounded && this.state === 'normal' && this.air) {
+        const drop = this.feet - this.air.peak, dist = Math.abs(this.x - this.air.x);
+        if (this.d.look?.land && (drop >= (m.landMinDrop ?? 384) || dist >= (m.landMinDistance ?? 640))) this.startLand(time);
+        else if (this.lastVy > 500) this.land(this.lastVy);
+      }
+      this.air = null;
       this.lastGround = time; this.airJumps = m.airJumps ?? 0; this.airDash = true; this.flipUntil = 0;
     }
     if (input.jump.pressed) this.jumpAt = time;
@@ -84,6 +94,7 @@ export class Leyla {
       case 'hang': this.hang(time, input, dir); break;
       case 'mantle': this.mantle(time); break;
       case 'crouch': this.crouch(time, dt, input, dir, grounded); break;
+      case 'land': this.landing(time, s, input, dir); break;
       case 'dead': b.setVelocityX(b.velocity.x * 0.9); break;
     }
     if (this.alive && !['climb', 'hang', 'mantle'].includes(this.state)) {
@@ -330,6 +341,24 @@ export class Leyla {
   }
   endCrouch() { const x = this.x, f = this.feet, vx = this.body.velocity.x; this.state = 'normal'; this.rising = false; this.setStanding(); this.body.reset(x, f - this.size.h / 2); this.body.setVelocityX(vx); }
 
+  // ---------- hard landing (after a long jump or deep fall) ----------
+  startLand(time) {
+    this.state = 'land'; this.landAt = time; this.flipUntil = 0;
+    this.scene.fx.dust(this.x, this.feet, 16);
+    this.scene.cam?.shake?.(120, 0.004);
+  }
+  landP(time) { return Math.min(1, (time - this.landAt) / (this.m.landTime ?? 450)); }
+  landing(time, s, input, dir) {
+    const b = this.body, p = this.landP(time);
+    b.setVelocityX(b.velocity.x * Math.pow(0.0005, s));   // skids to a stop
+    if (p >= (this.m.landCancel ?? 55) / 100 && (dir || input.jump.pressed || input.dash.pressed)) {
+      this.state = 'normal';
+      if (input.jump.pressed) this.jump(1); else if (input.dash.pressed && time >= this.dashReady) this.startDash(time, dir);
+      return;
+    }
+    if (p >= 1) this.state = 'normal';
+  }
+
   // ---------- damage ----------
   hurt(time, damage, fromX) {
     if (!this.alive || this.invulnerable(time)) return false;
@@ -342,6 +371,7 @@ export class Leyla {
     if (this.state === 'dash') this.endDash();
     if (this.state === 'hang' || this.state === 'mantle') { this.body.checkCollision.none = false; this.setStanding(); this.leaveHang(time); }
     if (this.state === 'crouch') this.endCrouch();
+    if (this.state === 'land') this.state = 'normal';
     const away = Math.sign(this.x - fromX) || -this.facing;
     this.body.setVelocity(away * 520, low ? 0 : -420);
     if (low) this.facing = away;
@@ -366,7 +396,7 @@ export class Leyla {
     // mantle and crouch pick their frame from the progress (crouch backwards = standing up)
     const flipFrames = name === 'airJump' && (this.m.airJumpFromFrame ?? 1) > 1;
     const climbFrames = st === 'climb' && (this.m.climbFromFrame ?? 1) > 0;
-    const manual = st === 'mantle' || st === 'crouch' || st === 'dash' || flipFrames || climbFrames, an0 = this.sprite.anims;
+    const manual = st === 'mantle' || st === 'crouch' || st === 'dash' || st === 'land' || flipFrames || climbFrames, an0 = this.sprite.anims;
     if (!manual && st !== 'slide' && an0.isPaused) an0.resume();
     const info = this.scene.playLook(this.sprite, 'leyla', name, this.facing);
     if (manual && (info.used === st || (flipFrames && info.used === 'airJump')) && an0.currentAnim) {
@@ -375,7 +405,8 @@ export class Leyla {
       const dashFrom = Math.min(n - 1, Math.max(0, (this.m.dashFromFrame ?? 1) - 1)), dashP = Math.min(1, 1 - (this.dashEnd - time) / DASH_TIME);
       const flipFrom = Math.min(n - 1, Math.max(0, (this.m.airJumpFromFrame ?? 1) - 1)), flipP = Math.min(1, (time - this.flipAt) / Math.max(1, this.flipLen));
       const climbFrom = Math.min(n - 1, Math.max(0, (this.m.climbFromFrame ?? 1) - 1)), climbN = Math.max(1, n - climbFrom);
-      const f = climbFrames ? climbFrom + Math.floor((this.climbDist || 0) / Math.max(1, this.m.climbStep ?? 24)) % climbN : flipFrames ? Math.round(flipFrom + (n - 1 - flipFrom) * flipP) : st === 'mantle' ? Math.round(from + (n - 1 - from) * this.mantleP(time)) : st === 'dash' ? Math.round(dashFrom + (n - 1 - dashFrom) * dashP) : Math.round(Math.min(n - 1, this.crouchF || 0));
+      const landFrom = Math.min(n - 1, Math.max(0, (this.m.landFromFrame ?? 4) - 1));
+      const f = st === 'land' ? Math.round(landFrom + (n - 1 - landFrom) * this.landP(time)) : climbFrames ? climbFrom + Math.floor((this.climbDist || 0) / Math.max(1, this.m.climbStep ?? 24)) % climbN : flipFrames ? Math.round(flipFrom + (n - 1 - flipFrom) * flipP) : st === 'mantle' ? Math.round(from + (n - 1 - from) * this.mantleP(time)) : st === 'dash' ? Math.round(dashFrom + (n - 1 - dashFrom) * dashP) : Math.round(Math.min(n - 1, this.crouchF || 0));
       if (!an0.isPaused) an0.pause();
       this.sprite.setFrame(fr[f].frame.name);
     }

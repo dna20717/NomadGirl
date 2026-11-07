@@ -95,6 +95,15 @@ v = await page.evaluate(() => {
   return [...seen];
 });
 check('Zwei Idles im Wechsel', v.some(k => k?.startsWith('leyla_idle_side')) && v.includes('leyla_idle2_side'), v);
+// hard landing only after a deep fall (or a long jump), a small hop lands normally
+v = await page.evaluate(() => {
+  const n = nomad, seen = new Set(); P.tp(13, 9);
+  for (let i = 0; i < 120; i++) { n.step(1); seen.add(n.state().leyla.state); }
+  P.tp(13, 18); n.step(10); const small = new Set();
+  n.step(1, ['jump'], ['jump']); for (let i = 0; i < 60; i++) { n.step(1, ['jump']); small.add(n.state().leyla.state); }
+  return { deep: [...seen], small: [...small], end: n.state().leyla.state };
+});
+check('Harte Landung nur nach tiefem Fall', v.deep.includes('land') && !v.small.includes('land') && v.end === 'normal', v);
 v = await P(P => P.tp(13, 18));
 v = await P(P => P.leap(14.6, 17.5)); check('Hürde 1', v.x > 17 * 64 && v.feet === feet(0), v);
 v = await P(P => P.leap(18.5, 22.5)); check('Hürde 2 (breit)', v.x > 22 * 64 && v.feet === feet(0), v);

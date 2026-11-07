@@ -647,5 +647,28 @@
   "derivedFrom": "leyla_climb_back_source",
   "description": "Pixel-Art von hinten an der Leiter. Im Spiel laufen die Frames ab „Klettern ab Frame“ mit dem Kletterweg, stillhalten = Frame bleibt.",
   "date": "07.11.2026"
+ },
+ "leyla_land_side_source": {
+  "name": "Leyla · Landung seitlich (Original)",
+  "kind": "source",
+  "file": "assets/leyla/land_side_source.gif",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "9 Frames à 200 ms, 256 × 256 px, Pixel-Art, nach rechts: Fallen, Aufprall in der Hocke mit Druckwelle, Aufstehen."
+ },
+ "leyla_land_side": {
+  "name": "Leyla · Landung seitlich",
+  "kind": "animation",
+  "file": "assets/leyla/land_side.png",
+  "frameSize": [192, 246],
+  "frames": 9,
+  "fps": 10,
+  "loop": false,
+  "origin": [96, 241],
+  "height": 195,
+  "source": "Code (Streifen zugeschnitten, tools/leyla_strips.py)",
+  "derivedFrom": "leyla_land_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art, nach rechts. Im Spiel ab „Landung ab Frame“ (Aufprall mit Druckwelle), nur nach weiten Sprüngen oder tiefen Stürzen."
  }
 }
