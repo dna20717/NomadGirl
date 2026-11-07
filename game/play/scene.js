@@ -8,7 +8,7 @@ import { Fx } from './fx.js';
 import { Drone } from './drone.js';
 import { Van } from './van.js';
 import { Backdrop } from './backdrop.js';
-import { Camp, campLayout, daytimeAt, drawCampBackground } from './camp.js';
+import { Camp, campLayout, daytimeAt, drawCampBackground, drawCampGround } from './camp.js';
 import { advance, arrive, clockText } from '../save.js';
 
 const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
@@ -43,6 +43,7 @@ export class PlayScene extends Phaser.Scene {
       for (const c of this.box?.save.companions || []) if (this.data_.companions?.[c]?.look) ids.add(this.data_.companions[c].look);
       if (this.data_.camp?.fire?.look) ids.add(this.data_.camp.fire.look);
       if (this.data_.camp?.chest?.look) ids.add(this.data_.camp.chest.look);
+      if (this.data_.camp?.ground?.tiles) ids.add(this.data_.camp.ground.tiles);
       const S = this.data_.camp?.sound || {};
       for (const id of [S.wind, S.fire, ...(S.gusts || [])]) if (id) ids.add(id);
     }
@@ -128,7 +129,8 @@ export class PlayScene extends Phaser.Scene {
     if (!this.onAdded) { this.onAdded = o => this.bgCam.ignore(o); this.events.on(Phaser.Scenes.Events.ADDED_TO_SCENE, this.onAdded); }   // once: the scene object is reused on restart
     const tiles = Object.fromEntries(Object.entries(this.data_.game?.tiles || {}).map(([k, id]) => [k, this.textures.exists(id) ? id : null]));
     const CG = this.data_.camp?.ground;
-    drawRoom(this, R, T, tiles, this.mode === 'camp' ? { ground: CG?.color || '#4a3628', top: CG?.top || '#8a6440', hideEdges: true } : null);
+    if (!(this.mode === 'camp' && drawCampGround(this, this.data_, this.campGeo, T)))
+      drawRoom(this, R, T, tiles, this.mode === 'camp' ? { ground: CG?.color || '#4a3628', top: CG?.top || '#8a6440', hide: this.campGeo.hidden } : null);
 
     this.solids = this.physics.add.staticGroup();
     for (const r of solidRects(R)) this.solids.add(this.add.zone((r.x + r.w / 2) * T, (r.y + r.h / 2) * T, r.w * T, r.h * T));

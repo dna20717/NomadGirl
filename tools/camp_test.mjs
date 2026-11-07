@@ -63,6 +63,8 @@ s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(3); return game.sce
 check('Companion redet per E', p === 'Reden · Onkel Sung' && s.length > 5, { p, s });
 await shot('talk');
 
+s = await ev(() => { nomad.step(600, ['left']); nomad.step(20); return nomad.state(); });
+check('Schacht links: Leyla bleibt am Rand stehen', s.leyla.feet === 768 && s.leyla.x > 4 * 64 && s.leyla.x < 5 * 64 + 10, s.leyla);
 p = await ev(() => c.to('Kiste'));
 s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(60); return nomad.state(); });
 check('Kiste geht mit E auf', p === 'Öffnen · Kiste' && s.camp.chest.open && s.camp.chest.frame === 4 && s.prompt === 'Schließen · Kiste', { p, chest: s.camp.chest, prompt: s.prompt });

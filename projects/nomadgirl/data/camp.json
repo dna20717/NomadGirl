@@ -2,10 +2,10 @@
  "name": "Camp",
  "description": "Leylas Lagerplatz neben dem Rig. Lagerfeuer, Companions, Sterne.",
  "campWidth": 22,
- "margin": 6,
+ "margin": 7,
  "height": 14,
  "horizon": 66,
- "ground": {"color": "#4a3628", "top": "#8a6440", "far": "#6b4a36"},
+ "ground": {"color": "#4a3628", "top": "#8a6440", "far": "#6b4a36", "tiles": "camp_ground"},
  "rig": {"placeWidth": 4, "height": 248, "gap": 1, "wall": "#4a4f5a", "inside": "#2b2233", "light": "#ffcf7a", "labels": true},
  "fire": {"enabled": true, "look": "campfire", "at": 9, "radius": 460, "color": "#ff8a2a", "strength": 100, "pool": 300, "flicker": 25, "lift": 80},
  "companions": {"at": [6, 13], "barkEvery": [7, 15], "barkTime": 4},
@@ -32,5 +32,6 @@
   "fireRange": 1100,
   "fireNear": 120
  },
- "vanLight": {"enabled": true, "color": "#ffc870", "strength": 150, "width": 110, "height": 150, "lift": 150, "pool": 260, "spill": 40}
+ "vanLight": {"enabled": true, "color": "#ffc870", "strength": 150, "width": 110, "height": 150, "lift": 150, "pool": 260, "spill": 40},
+ "shaft": {"enabled": true, "at": 1, "width": 3, "color": "#140d12", "glow": "#c0302a", "frameHeight": 200}
 }

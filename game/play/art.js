@@ -106,14 +106,14 @@ export function drawBackground(scene, roomW, roomH) {
 
 // Tiles of a parsed room: concrete blocks with lit edges, platforms, ladders, rope anchors
 // tiles = { platform: textureKey | null } (asset strips: single, left, middle, right)
-// style (camp): { ground, top, hideEdges } = earth instead of concrete, side walls invisible
+// style (camp): { ground, top, hide(x, y) } = earth instead of concrete, side walls invisible
 export function drawRoom(scene, room, T, tiles = {}, style = null) {
   const g = scene.make.graphics({}, false), solid = (x, y) => room.solid(x, y), stamps = [];
   const r = rng(99);
   for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
     const t = room.tiles[y][x], px = x * T, py = y * T;
     if (t === '#' && style) {
-      if (style.hideEdges && (x === 0 || x === room.w - 1) && y < room.h - 2) continue;
+      if (style.hide?.(x, y)) continue;
       const base = parseInt(style.ground.slice(1), 16), topC = parseInt(style.top.slice(1), 16);
       g.fillStyle(base).fillRect(px, py, T, T);
       if (r() < 0.3) g.fillStyle(topC, 0.35).fillRect(px + 6 + r() * 40, py + 14 + r() * 40, 8 + r() * 10, 4);   // pebbles

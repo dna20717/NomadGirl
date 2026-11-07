@@ -33,13 +33,15 @@ export function campLayout(D, save, T = 64) {
   const vanCol = Math.ceil((x + vanLeft) / T - 0.5), doorX = (vanCol + 0.5) * T;
   const tractor = save.rig.units.find(u => u.kind === 'tractor');
   const W = vanCol + Math.max(8, C.campWidth ?? 20) + 1, floor = H - 2;
+  // shaft on the left: a hole in the ground, closed off by an invisible wall above it (it cannot be entered)
+  const S = C.shaft || {}, shaft = S.enabled === false ? null : { from: Math.max(1, S.at ?? 1), to: Math.max(1, S.at ?? 1) + Math.max(1, S.width ?? 3) - 1 };
+  const blocked = x => x === 0 || x === W - 1 || (shaft && x <= shaft.to);
   const layout = Array.from({ length: H }, (_, y) => {
-    if (y >= floor) return '#'.repeat(W);
-    let row = '#' + '.'.repeat(W - 2) + '#';
-    if (y === floor - 1) row = row.slice(0, vanCol) + 'L' + row.slice(vanCol + 1);
+    let row = '';
+    for (let x = 0; x < W; x++) row += y >= floor ? (shaft && x >= shaft.from && x <= shaft.to ? '.' : '#') : blocked(x) ? '#' : x === vanCol && y === floor - 1 ? 'L' : '.';
     return row;
   });
-  return { layout, W, H, floor, vanCol, doorX, vanLeft: doorX - vanLeft, vanRight: doorX + vanRight, units, tractor, fireX: (vanCol + (C.fire?.at ?? 9) + 0.5) * T,
+  return { layout, W, H, floor, vanCol, shaft, hidden: (x, y) => y < floor && blocked(x), doorX, vanLeft: doorX - vanLeft, vanRight: doorX + vanRight, units, tractor, fireX: (vanCol + (C.fire?.at ?? 9) + 0.5) * T,
     companionX: [(vanCol + (C.companions?.at?.[0] ?? 6) + 0.5) * T, (vanCol + (C.companions?.at?.[1] ?? 13) + 0.5) * T] };
 }
 
@@ -64,6 +66,48 @@ export function drawCampBackground(scene, C) {
   if (scene.textures.exists(key)) scene.textures.remove(key);
   g.generateTexture(key, Math.ceil(W * 1.3), H); g.destroy();
   return scene.add.image(0, 0, key).setOrigin(0).setScrollFactor(0.05, 0).setDepth(-97);
+}
+
+// ground of the camp from the tileset (Camp › Platz › Boden-Kacheln, frames: 0 top, 1 fill, 2 top with wall left, 3 pillar,
+// 4 wall left, 5 wall right, 6/7 grassy tops), with the shaft on the left. Returns false without tiles (then art.js draws earth).
+export function drawCampGround(scene, D, geo, T) {
+  const C = D.camp || {}, id = C.ground?.tiles, A = D.assets?.[id];
+  if (!id || !scene.textures.exists(id) || !A?.frameSize) return false;
+  scene.textures.get(id).setFilter(NEAREST());
+  const [fw, fh] = A.frameSize, k = T / fw, over = (fh - fw) * k, sh = geo.shaft;
+  const r = (seed => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296))(7);
+  const hole = x => sh && x >= sh.from && x <= sh.to;
+  for (let y = geo.floor; y < geo.H; y++) for (let x = 0; x < geo.W; x++) {
+    if (hole(x)) continue;
+    const top = y === geo.floor, leftRim = sh && x === sh.from - 1, rightRim = sh && x === sh.to + 1;
+    let f = top ? (leftRim ? 3 : rightRim ? 2 : r() < 0.35 ? (r() < 0.5 ? 6 : 7) : 0) : (leftRim ? 5 : rightRim ? 4 : 1);
+    if (f >= (A.frames || 1)) f = top ? 0 : 1;
+    scene.add.image(x * T, y * T - over, id, f).setOrigin(0).setScale(k).setDepth(-10);
+  }
+  if (sh) drawShaft(scene, C.shaft || {}, sh, geo, T);
+  return true;
+}
+
+// the shaft: darkness getting deeper, timber posts on the walls, a small headframe with a pulley and a rope into the dark
+function drawShaft(scene, S, sh, geo, T) {
+  const g = scene.add.graphics().setDepth(-11), x0 = sh.from * T, x1 = (sh.to + 1) * T, top = geo.floor * T, bottom = geo.H * T, p = 4;
+  const dark = col(S.color || '#140d12');
+  for (let i = 0; i < 8; i++) g.fillStyle(shadeOf(S.color || '#140d12', 1.6 - i * 0.2), 1).fillRect(x0, top + (bottom - top) * i / 8, x1 - x0, (bottom - top) / 8 + 1);
+  g.fillStyle(dark).fillRect(x0, bottom - 24, x1 - x0, 24);
+  if (S.glow) scene.add.image((x0 + x1) / 2, bottom, glowTexture(scene)).setDisplaySize(x1 - x0, 120).setTint(col(S.glow)).setAlpha(0.35).setBlendMode(Phaser.BlendModes.ADD).setDepth(-10.5);   // something glows down there
+  // timber posts along the walls and a cross brace
+  g.fillStyle(0x4a3424).fillRect(x0 + 2 * p, top, 3 * p, bottom - top).fillRect(x1 - 5 * p, top, 3 * p, bottom - top);
+  g.fillStyle(0x3a281c).fillRect(x0 + 2 * p, top + 40, x1 - x0 - 4 * p, 2 * p);
+  // headframe above the shaft: two legs, a beam, a pulley, the rope
+  const f = scene.add.graphics().setDepth(-12), cx = (x0 + x1) / 2, h = S.frameHeight ?? 200;
+  if (h > 0) {
+    f.fillStyle(0x5a3e28);
+    for (let i = 0; i < h; i += p) { const k = i / h; f.fillRect(Math.round((x0 + 6 * p + (cx - x0 - 8 * p) * k) / p) * p, top - i, 3 * p, p); f.fillRect(Math.round((x1 - 9 * p - (x1 - cx - 8 * p) * k) / p) * p, top - i, 3 * p, p); }
+    f.fillStyle(0x6b4a30).fillRect(cx - 14 * p, top - h - 2 * p, 28 * p, 3 * p);
+    f.fillStyle(0x8b949e).fillCircle(cx, top - h + 4 * p, 4 * p).fillStyle(0x30363d).fillCircle(cx, top - h + 4 * p, 1.5 * p);
+    f.fillStyle(0xb9a27a).fillRect(cx - p / 2 + 4 * p, top - h + 4 * p, p / 2 + 1, h + (bottom - top));
+    f.fillStyle(0x7a6235).fillRect(cx + 2 * p, top + 70, 5 * p, 3 * p);   // the bucket somewhere down there
+  }
 }
 
 // ---------- code art ----------

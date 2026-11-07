@@ -756,5 +756,25 @@
   "source": "von Daniel",
   "date": "07.11.2026",
   "description": "Kurzer Windstoß, 1,7 s."
+ },
+ "camp_ground_source": {
+  "name": "Camp-Boden · Tileset Original",
+  "kind": "source",
+  "file": "assets/tiles/camp_ground_source.png",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "Tileset 256 × 256, Kacheln 32 px: Erde mit Steinen, Grasbüschel oben."
+ },
+ "camp_ground": {
+  "name": "Camp-Boden",
+  "kind": "tiles",
+  "file": "assets/tiles/camp_ground.png",
+  "frameSize": [32, 40],
+  "frames": 8,
+  "height": 80,
+  "source": "Code (aus dem Tileset ausgeschnitten)",
+  "derivedFrom": "camp_ground_source",
+  "date": "07.11.2026",
+  "description": "32 × 40 je Kachel (oben 8 px Platz für Grasbüschel), im Spiel ×2. Reihenfolge: 0 Oberfläche, 1 Füllung, 2 Kante mit Wand links (Boden rechts vom Schacht), 3 Säule (Wände links und rechts), 4 Wand links, 5 Wand rechts, 6 und 7 Oberfläche mit Gras."
  }
 }
