@@ -114,5 +114,103 @@
   "source": "KI-generiert (Daniel)",
   "date": "07.11.2026",
   "description": "Hintergrund-Ebene 576 × 324 px, Pixel-Art: Strommast, Solarpanels, Schuppen, Wasserturm, dunkel."
+ },
+ "leyla_idle_side_source": {
+  "name": "Leyla · Stehen seitlich (Original)",
+  "kind": "source",
+  "file": "assets/leyla/idle_side_source.gif",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "4 Frames à 200 ms, 256 × 256 px, Pixel-Art, schaut nach rechts."
+ },
+ "leyla_idle_side_left_source": {
+  "name": "Leyla · Stehen seitlich links (Original)",
+  "kind": "source",
+  "file": "assets/leyla/idle_side_left_source.gif",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "4 Frames à 200 ms, 256 × 256 px, Pixel-Art, schaut nach links."
+ },
+ "leyla_run_side_source": {
+  "name": "Leyla · Rennen seitlich (Original)",
+  "kind": "source",
+  "file": "assets/leyla/run_side_source.gif",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "8 Frames à 200 ms, 256 × 256 px, Pixel-Art, rennt nach rechts."
+ },
+ "leyla_run_side_left_source": {
+  "name": "Leyla · Rennen seitlich links (Original)",
+  "kind": "source",
+  "file": "assets/leyla/run_side_left_source.gif",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "8 Frames à 200 ms, 256 × 256 px, Pixel-Art, rennt nach links."
+ },
+ "leyla_idle_side": {
+  "name": "Leyla · Stehen seitlich",
+  "kind": "animation",
+  "file": "assets/leyla/idle_side.png",
+  "frameSize": [84, 242],
+  "frames": 4,
+  "fps": 5,
+  "loop": true,
+  "origin": [42, 241],
+  "height": 192,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_idle_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art, schaut nach rechts, atmet ruhig.",
+  "mirror": "leyla_idle_side_left"
+ },
+ "leyla_idle_side_left": {
+  "name": "Leyla · Stehen seitlich links",
+  "kind": "animation",
+  "file": "assets/leyla/idle_side_left.png",
+  "frameSize": [82, 242],
+  "frames": 4,
+  "fps": 5,
+  "loop": true,
+  "origin": [41, 241],
+  "height": 192,
+  "flip": true,
+  "mirror": "leyla_idle_side",
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_idle_side_left_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art, schaut nach links."
+ },
+ "leyla_run_side": {
+  "name": "Leyla · Rennen seitlich",
+  "kind": "animation",
+  "file": "assets/leyla/run_side.png",
+  "frameSize": [152, 242],
+  "frames": 8,
+  "fps": 12,
+  "loop": true,
+  "origin": [76, 241],
+  "height": 192,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_run_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art, rennt nach rechts. Im Spiel läuft das Tempo mit der Geschwindigkeit mit (Gehen = langsamer).",
+  "mirror": "leyla_run_side_left"
+ },
+ "leyla_run_side_left": {
+  "name": "Leyla · Rennen seitlich links",
+  "kind": "animation",
+  "file": "assets/leyla/run_side_left.png",
+  "frameSize": [148, 242],
+  "frames": 8,
+  "fps": 12,
+  "loop": true,
+  "origin": [74, 241],
+  "height": 192,
+  "flip": true,
+  "mirror": "leyla_run_side",
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_run_side_left_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art, rennt nach links."
  }
 }

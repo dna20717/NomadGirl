@@ -12,6 +12,12 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/leyla/run_front.png` | Leyla, Rennen nach vorn: 7 Frames à 96 × 256 px als Streifen, Pixel-Art (`leyla_run_front`) | aus `run_front_source.gif` zugeschnitten, Frames 2–8 (Code) | 07.11.2026 |
 | `assets/leyla/stand_front.png` | Leyla, Stehen von vorn: 96 × 256 px, Pixel-Art (`leyla_stand_front`) | Frame 1 aus `run_front_source.gif` (Code) | 07.11.2026 |
 | `assets/leyla/run_front_source.gif` | Leyla, Rennen nach vorn: Original, 8 Frames à 200 ms, 256 × 256 px (`leyla_run_front_source`) | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/leyla/idle_side.png` | Leyla, Stehen seitlich nach rechts: 4 Frames à 84 × 242 px als Streifen, Pixel-Art (`leyla_idle_side`) | aus `idle_side_source.gif` zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/idle_side_left.png` | Leyla, Stehen seitlich nach links: 4 Frames à 82 × 242 px, Pixel-Art (`leyla_idle_side_left`) | aus `idle_side_left_source.gif` zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/run_side.png` | Leyla, Rennen seitlich nach rechts: 8 Frames à 152 × 242 px, Pixel-Art (`leyla_run_side`) | aus `run_side_source.gif` zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/run_side_left.png` | Leyla, Rennen seitlich nach links: 8 Frames à 148 × 242 px, Pixel-Art (`leyla_run_side_left`) | aus `run_side_left_source.gif` zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/idle_side_source.gif`, `idle_side_left_source.gif` | Leyla, Stehen seitlich rechts/links: Originale, 4 Frames à 200 ms, 256 × 256 px | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/leyla/run_side_source.gif`, `run_side_left_source.gif` | Leyla, Rennen seitlich rechts/links: Originale, 8 Frames à 200 ms, 256 × 256 px | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_sky.png` | Wastelands, Himmel: Verlauf mit Dither, 576 × 324 px (`wasteland_sky`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_far.png` | Wastelands, ferne Skyline, transparent, 576 × 324 px (`wasteland_far`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_ledge.png` | Wastelands, Steg, transparent, 576 × 324 px (`wasteland_ledge`) | KI-generiert (Daniel) | 07.11.2026 |

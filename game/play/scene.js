@@ -26,6 +26,7 @@ export class PlayScene extends Phaser.Scene {
     const A = this.data_.assets || {}, ids = new Set(Object.values(this.data_.leyla?.look || {}));
     for (const e of Object.values(this.data_.enemies || {})) if (e.look) ids.add(e.look);
     for (const id of Object.values(this.data_.game?.tiles || {})) ids.add(id);
+    for (const id of [...ids]) if (A[id]?.mirror) ids.add(A[id].mirror);   // drawn opposite direction
     for (const id of ids) {
       const a = A[id];
       if (!a?.file) continue;
@@ -46,16 +47,20 @@ export class PlayScene extends Phaser.Scene {
   }
   lookKey(who) { return this.data_.leyla?.look?.idle && this.textures.exists(this.data_.leyla.look.idle) ? this.data_.leyla.look.idle : 'px'; }
   // Leyla: asset for a state, otherwise idle (marked as fallback so code effects step in)
-  playLook(sprite, who, state) {
-    const look = this.data_.leyla?.look || {};
+  // walk without its own animation borrows run (Leyla slows its pace down); facing < 0 = left
+  playLook(sprite, who, state, facing = 1) {
+    const look = this.data_.leyla?.look || {}, A = this.data_.assets || {}, has = s => look[s] && this.textures.exists(look[s]);
     this.looks ??= {};
-    const id = look[state] && this.textures.exists(look[state]) ? look[state] : look.idle;
+    const used = has(state) ? state : state === 'walk' && has('run') ? 'run' : 'idle';
+    let id = look[used] || look.idle;
+    const a = A[id], m = a?.mirror;
+    if (m && this.textures.exists(m) && (facing < 0) !== !!a.flip) id = m;
     const info = this.looks[id] ??= this.assetInfo(id) || { key: 'px', scale: 60, ox: 0.5, oy: 1, flip: false };
     if (sprite.texture.key !== info.key || (info.anim && sprite.anims.currentAnim?.key !== info.anim)) {
       sprite.setOrigin(info.ox, info.oy);
       if (info.anim) sprite.play(info.anim, true); else sprite.setTexture(info.key);
     }
-    return { ...info, fallback: id !== look[state] || !look[state] };
+    return { ...info, used, fallback: used !== state && used !== 'run' || !has(used) };
   }
   enemyLook(def) {
     const info = def.look && this.assetInfo(def.look);

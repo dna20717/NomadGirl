@@ -252,7 +252,9 @@ export class Leyla {
   look(time, dt, grounded) {
     const b = this.body, v = b.velocity, st = this.state;
     const name = st === 'dead' ? 'hurt' : st === 'normal' ? (!grounded ? (v.y < 0 ? 'jump' : 'fall') : Math.abs(v.x) > 300 ? 'run' : Math.abs(v.x) > 20 ? 'walk' : 'idle') : st === 'swing' ? 'jump' : st;
-    const info = this.scene.playLook(this.sprite, 'leyla', name);
+    const info = this.scene.playLook(this.sprite, 'leyla', name, this.facing);
+    // run cycle follows the speed, so the feet do not slide (walking = slower steps)
+    this.sprite.anims.timeScale = info.used === 'run' ? Math.max(0.45, Math.min(1.4, Math.abs(v.x) / (this.m.runSpeed || 440))) : 1;
     // squash & stretch relaxes back to 1
     const k = Math.min(1, dt / 90);
     this.squash.x += (1 - this.squash.x) * k; this.squash.y += (1 - this.squash.y) * k;

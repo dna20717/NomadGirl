@@ -88,8 +88,9 @@ test('assets: a missing file is an error when files can be checked', async () =>
 
 test('assets: entities point to assets via look, renaming an asset follows', async () => {
   const p = await load();
-  assert.equal(p.data.leyla.look.idle, 'leyla_idle');
-  renameEntry(p, 'assets', 'leyla_idle', 'leyla_stehen');
+  assert.equal(p.data.leyla.look.idle, 'leyla_idle_side');
+  renameEntry(p, 'assets', 'leyla_idle_side', 'leyla_stehen');
   assert.equal(p.data.leyla.look.idle, 'leyla_stehen');
+  assert.equal(p.data.assets.leyla_idle_side_left.mirror, 'leyla_stehen');   // the opposite direction follows too
   for (const a of ['enemies', 'weapons', 'items', 'tractors', 'containers', 'workshops', 'companions', 'pois']) assert.ok(fields(a).some(f => f.key === 'look' && f.area === 'assets'), a);
 });
