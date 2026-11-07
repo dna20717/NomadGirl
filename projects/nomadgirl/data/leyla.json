@@ -24,7 +24,8 @@
   "mantleTime": 450,
   "mantleFromFrame": 5,
   "standUpTime": 350,
-  "crouchTime": 300
+  "crouchTime": 300,
+  "dashFromFrame": 5
  },
  "loadout": {"melee": "rohrzange", "ranged": "nagelpistole", "backpack": "schulranzen"},
  "look": {
@@ -39,7 +40,8 @@
   "idleAlt": "leyla_idle2_side",
   "crouch": "leyla_crouch_side_left",
   "mantle": "leyla_mantle_side",
-  "hang": "leyla_hang_side"
+  "hang": "leyla_hang_side",
+  "dash": "leyla_dash_side"
  },
  "idleAltChance": 50
 }

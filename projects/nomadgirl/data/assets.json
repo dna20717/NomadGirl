@@ -593,5 +593,36 @@
   "date": "07.11.2026",
   "derivedFrom": "leyla_hang_side_source",
   "description": "Pixel-Art, schaut nach rechts, hängt an einer Kante. Ankerpunkt so, dass die Hände an der Wand liegen."
+ },
+ "leyla_dash_side_source": {
+  "name": "Leyla · Dash seitlich (Original)",
+  "kind": "source",
+  "file": "assets/leyla/dash_side_source.gif",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "9 Frames à 200 ms, 256 × 256 px, Pixel-Art, nach rechts: Ausholen, Schub mit Windspuren, Laufpose."
+ },
+ "leyla_dash_side": {
+  "name": "Leyla · Dash seitlich",
+  "kind": "animation",
+  "file": "assets/leyla/dash_side.png",
+  "frameSize": [256, 242],
+  "frames": 9,
+  "fps": 20,
+  "loop": false,
+  "origin": [128, 241],
+  "height": 192,
+  "source": "Code (Streifen zugeschnitten, tools/leyla_strips.py)",
+  "derivedFrom": "leyla_dash_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art, nach rechts. Im Spiel läuft sie über die Dash-Dauer ab „Dash ab Frame“ (Schub mit Windspuren)."
+ },
+ "ruins_relay": {
+  "name": "Wastelands · Funkruinen",
+  "kind": "image",
+  "file": "assets/backgrounds/ruins_relay.png",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "688 × 384 px, Pixel-Art: Ruinen mit Funkmast, Schüsseln und Zaun, Himmel transparent (Wetter füllt ihn). Startseite und Testraum."
  }
 }

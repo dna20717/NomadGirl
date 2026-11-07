@@ -32,6 +32,8 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/leyla/mantle_side_source.gif` | Original, 9 Frames à 200 ms, nach rechts | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/leyla/crouch_side_left.png` | Leyla geht in die Hocke (Ducken, rückwärts = Aufstehen), 9 Frames 152 × 242, schaut nach links (`leyla_crouch_side_left`) | aus `crouch_side_left_source.gif` zugeschnitten (Code) | 07.11.2026 |
 | `assets/leyla/crouch_side_left_source.gif` | Original, 9 Frames à 200 ms, nach links | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/leyla/dash_side.png` | Leyla Dash seitlich, 9 Frames 256 × 242 (`leyla_dash_side`), im Spiel ab Frame 5 | aus `dash_side_source.gif` zugeschnitten (Code, `tools/leyla_strips.py`) | 07.11.2026 |
+| `assets/leyla/dash_side_source.gif` | Original, 9 Frames à 200 ms, nach rechts | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/drone/moods.png` | Drohne (Mama-Bot): 12 Stimmungen à 380 × 254 px als Streifen, an der Antenne ausgerichtet (`drone_moods`) | aus `concept.png` zugeschnitten (Code) | 07.11.2026 |
 | `assets/drone/concept.png` | Drohne: Konzept mit 12 Stimmungen im Raster 4 × 3, 1536 × 1024 px (`drone_concept`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/vehicles/van_door.png` | Leylas Van, Schiebetür geht auf (5 Frames 248 × 172, `van`), Spawn-Punkt; Schüssel herausgenommen | aus `van_door_source.gif` zugeschnitten (Code, `tools/van_strips.py`) | 07.11.2026 |
@@ -44,6 +46,7 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/backgrounds/wasteland_far.png` | Wastelands, ferne Skyline, transparent, 576 × 324 px (`wasteland_far`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_ledge.png` | Wastelands, Steg, transparent, 576 × 324 px (`wasteland_ledge`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_near.png` | Wastelands, nahe Skyline, transparent, 576 × 324 px (`wasteland_near`) | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/backgrounds/ruins_relay.png` | Wastelands · Funkruinen, 688 × 384, Himmel transparent (`ruins_relay`), Startseite + Testraum; Himmel/Wetter aus Code (`game/weather.js`) | KI-generiert (Daniel) | 07.11.2026 |
 | (im Spiel gezeichnet) | Himmel, Skyline von BigCityDelta, Wände, Leitern, Seil-Anker, Platzhalter-Plünderer, Nägel, Partikel (`game/play/art.js`) | Code | 07.11.2026 |
 
 Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich „Assets“.

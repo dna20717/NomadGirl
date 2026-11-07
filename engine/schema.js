@@ -129,7 +129,7 @@ export const AREAS = {
     name: 'Startseite', icon: 'image', file: 'data/splash.json', kind: 'single',
     hint: 'Die Startseite (online unter /): Hintergrund aus Ebenen, Leyla rennt endlos auf uns zu, der Boden fliegt unter ihr durch. Pixel-Art wird scharf skaliert.',
     sections: [
-      { title: 'Hintergrund', fields: [refs('background', 'Ebenen', 'assets', { hint: 'Von hinten nach vorn. Alle gleich groß; die erste deckt alles, die anderen sind transparent' }),
+      { title: 'Hintergrund', fields: [refs('background', 'Ebenen', 'assets', { hint: 'Von hinten nach vorn. Alle gleich groß; mit Wetter darf auch die erste transparent sein' }), ref('weather', 'Wetter', 'weather', { hint: 'Himmel hinter den Ebenen, Regen davor' }),
         num('horizon', 'Horizont', { unit: '% der Höhe', min: 30, max: 100, hint: 'Hier endet der Hintergrund unten; darunter zeichnet die Startseite den Boden, auf dem Leyla rennt' }),
         num('parallax', 'Tiefe', { unit: '%', min: 0, max: 10, step: 0.5, hint: 'So weit verschieben sich die Ebenen mit Maus bzw. Neigen gegeneinander (vorderste am meisten). 0 = starr' })] },
       { title: 'Leyla', fields: [table('runners', 'Animationen', [ref('look', 'Animation', 'assets'), num('weight', 'Gewicht', { min: 0 }), num('speed', 'Bodentempo ×', { min: 0 })],
@@ -176,6 +176,27 @@ export const AREAS = {
     },
   },
 
+  weather: {
+    name: 'Wetter', singular: 'Wetter', icon: 'rain', file: 'data/weather.json', kind: 'catalog',
+    hint: 'Himmel aus Code hinter transparenten Hintergrundbildern (Startseite, Räume): Farbverlauf mit Pixel-Raster, Sonne, Wolken, bedrohliches Glühen, Regen davor. Positionen in % des Hintergrundbilds, Größen in Bildpixeln.',
+    template: { name: 'Neues Wetter', sky: { top: '#140c26', middle: '#4a1d4a', low: '#b2413c', horizon: '#f5a052', bands: 9 }, sun: { enabled: true }, glow: { enabled: true }, rain: { enabled: false } },
+    row: x => [x.sun?.enabled !== false && 'Sonne', x.glow?.enabled !== false && 'Glühen', x.rain?.enabled && 'Regen'].filter(Boolean).join(' · ') || 'nur Himmel',
+    sections: [
+      { title: 'Himmel', fields: [NAME, color('sky.top', 'Oben'), color('sky.middle', 'Mitte'), color('sky.low', 'Unten'), color('sky.horizon', 'Horizont'),
+        num('sky.bands', 'Farbstufen', { min: 2, hint: 'Stufen des Verlaufs, dazwischen Pixel-Raster' }), DESCRIPTION] },
+      { title: 'Sonne', fields: [bool('sun.enabled', 'Zeigen'), num('sun.x', 'Position x', { unit: '%' }), num('sun.y', 'Mitte y', { unit: '%', hint: 'Vom oberen Bildrand; auch der Horizont des Verlaufs. Die Ruinen davor verdecken den Rest' }),
+        num('sun.size', 'Radius', { unit: 'Bildpixel', min: 2 }), color('sun.color', 'Farbe oben'), color('sun.color2', 'Farbe unten'), num('sun.stripes', 'Streifen', { min: 0 }), num('sun.halo', 'Schein', { unit: '%', min: 0 })] },
+      { title: 'Wolken', fields: [num('clouds.count', 'Anzahl', { min: 0 }), color('clouds.color', 'Farbe'), color('clouds.light', 'Licht von unten'), num('clouds.speed', 'Tempo', { unit: 'Bildpixel/s' }),
+        range('clouds.band', 'Höhe von – bis', { unit: '%' })] },
+      { title: 'Glühen', fields: [bool('glow.enabled', 'Zeigen', { hint: 'Bedrohliches Glühen hinter dem Horizont, pulsiert und flackert, Funken steigen auf' }), color('glow.color', 'Farbe'),
+        point('glow.at', 'Mitte', { unit: '%' }), size('glow.size', 'Größe', { unit: '%' }), num('glow.strength', 'Stärke', { unit: '%', min: 0 }), num('glow.pulse', 'Pulsieren', { unit: 's', min: 0 }),
+        num('glow.flicker', 'Flackern', { unit: '%', min: 0 }), num('glow.embers', 'Funken', { min: 0 })] },
+      { title: 'Regen', fields: [bool('rain.enabled', 'Regen'), num('rain.amount', 'Tropfen', { min: 0 }), num('rain.speed', 'Tempo', { unit: 'Bildpixel/s', min: 0 }), num('rain.angle', 'Schräge', { unit: '°' }),
+        num('rain.length', 'Länge', { unit: 'Bildpixel', min: 1 }), color('rain.color', 'Farbe'), num('rain.opacity', 'Deckkraft', { unit: '%', min: 0, max: 100 }),
+        num('rain.darken', 'Himmel abdunkeln', { unit: '%', min: 0, max: 100 }), num('rain.flash', 'Wetterleuchten', { unit: 'pro Minute', min: 0 })] },
+    ],
+  },
+
   drone: {
     name: 'Drohne', icon: 'air', file: 'data/drone.json', kind: 'single',
     hint: 'Leylas Drohne: fliegt immer hinter ihr her, reine Deko ohne Physik. Stimmungen zeigen ein Gesicht (Frame aus dem Aussehen) und optional ein Kaomoji-Bläschen. Zeiten in Millisekunden bzw. Sekunden.',
@@ -208,7 +229,7 @@ export const AREAS = {
         num('movement.acceleration', 'Beschleunigung', { unit: 'px/s²', min: 0 }), num('movement.jumpVelocity', 'Sprungkraft', { unit: 'px/s', min: 0 }),
         num('movement.airJumps', 'Luftsprünge', { min: 0, hint: '1 = Doppelsprung' }), num('movement.coyoteTime', 'Coyote Time', { unit: 'ms', min: 0, hint: 'Springen kurz nach der Kante erlaubt' }),
         num('movement.jumpBuffer', 'Sprungpuffer', { unit: 'ms', min: 0 })] },
-      { title: 'Dash & Slide', fields: [num('movement.dashDistance', 'Dash-Weite', { unit: 'px', min: 0 }), num('movement.dashCooldown', 'Dash-Abklingzeit', { unit: 'ms', min: 0 }),
+      { title: 'Dash & Slide', fields: [num('movement.dashDistance', 'Dash-Weite', { unit: 'px', min: 0 }), num('movement.dashCooldown', 'Dash-Abklingzeit', { unit: 'ms', min: 0 }), num('movement.dashFromFrame', 'Dash ab Frame', { min: 1, hint: 'Ausholen davor wird übersprungen; ab hier läuft die Animation über die Dash-Dauer' }),
         bool('movement.dashInvulnerable', 'Unverwundbar beim Dash'), num('movement.slideSpeed', 'Slide-Tempo', { unit: 'px/s', min: 0 }), num('movement.slideDuration', 'Slide-Dauer', { unit: 'ms', min: 0 })] },
       { title: 'Klettern & Schwingen', fields: [num('movement.climbSpeed', 'Klettern', { unit: 'px/s', min: 0 }), num('movement.swingRope', 'Seillänge', { unit: 'px', min: 0 }), num('movement.swingBoost', 'Schwung-Boost', { unit: '%', min: 0 })] },
       { title: 'Kanten & Ducken', fields: [bool('movement.ledgeGrab', 'Kanten greifen', { hint: 'Im Sprung oder Fall an Wand- und Plattformkanten hängen bleiben (Richtung zur Wand halten)' }),
@@ -388,6 +409,10 @@ export const AREAS = {
     row: x => `${(x.size || []).join('×')} · ${(x.tags || []).map(t => label(ROOM_TAGS, t)).join(', ')}${x.layout ? ' · Layout' : ''}`,
     sections: [
       { title: 'Raum', fields: [NAME, LOOK, size('size', 'Größe', { unit: 'Kacheln' }), multi('tags', 'Merkmale', ROOM_TAGS), num('weight', 'Häufigkeit', { min: 0 }), DESCRIPTION] },
+      { title: 'Hintergrund', fields: [ref('backdrop.image', 'Bild', 'assets', { hint: 'Pixel-Art mit transparentem Himmel, scharf auf ganze Pixel skaliert; leer = Stadt-Silhouette aus Code' }),
+        ref('backdrop.weather', 'Wetter', 'weather', { hint: 'Himmel dahinter, Regen davor' }), num('backdrop.pixel', 'Pixelgröße', { unit: 'px', min: 1, hint: 'Leer = passend zur Bildhöhe' }),
+        num('backdrop.bottom', 'Unterkante', { unit: '%', hint: 'Wo die Unterkante des Bilds sitzt, wenn die Kamera ganz unten ist (100 = Bildschirmrand)' }), num('backdrop.scroll', 'Mitbewegen', { unit: '%', min: 0, hint: 'Parallaxe mit der Kamera' }),
+        color('backdrop.ground', 'Boden darunter', { hint: 'Füllt unter dem Bild; leer = Farbe der untersten Bildzeile' }), num('backdrop.shade', 'Abdunkeln im Raum', { unit: '%', min: 0, max: 100 })] },
       { title: 'Layout', fields: [lines('layout', 'Kacheln', { hint: 'Ein Zeichen pro Kachel: ' + TILE_LEGEND.map(([c, n]) => `${c} ${n}`).join(' · ') + ' · andere Buchstaben = Spawns aus der Tabelle' }),
         table('spawns', 'Spawns', [text('symbol', 'Zeichen'), ref('enemy', 'Gegner', 'enemies')], { hint: 'Welcher Gegner zu welchem Buchstaben im Layout gehört' })] },
     ],
@@ -422,7 +447,7 @@ export const AREAS = {
 // Navigation: groups of areas in the order of the design document
 export const GROUPS = [
   ['ASSETS', ['assets']],
-  ['GRUNDLAGEN', ['game', 'splash', 'economy', 'ranking']],
+  ['GRUNDLAGEN', ['game', 'splash', 'weather', 'economy', 'ranking']],
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes']],

@@ -1,0 +1,20 @@
+{
+ "abendglut": {
+  "name": "Abendglut",
+  "sky": {"top": "#140c26", "middle": "#4a1d4a", "low": "#b2413c", "horizon": "#f5a052", "bands": 9},
+  "sun": {"enabled": true, "x": 46, "y": 62, "size": 34, "color": "#ffe08a", "color2": "#ff7a3a", "stripes": 4, "halo": 35},
+  "glow": {"enabled": true, "color": "#d4102a", "at": [78, 50], "size": [70, 45], "strength": 75, "pulse": 5, "flicker": 15, "embers": 20},
+  "rain": {"enabled": false, "amount": 160, "speed": 260, "angle": 12, "length": 7, "color": "#a9b8e0", "opacity": 45, "darken": 25, "flash": 2},
+  "description": "Sonnenuntergang über den Ruinen, rotes Glühen hinter dem Horizont.",
+  "clouds": {"count": 14, "color": "#2a1534", "light": "#e0603e", "speed": 2, "band": [14, 50]}
+ },
+ "abendglut_regen": {
+  "name": "Abendglut mit Regen",
+  "sky": {"top": "#120b22", "middle": "#3d1a42", "low": "#9a3a3a", "horizon": "#e08a4a", "bands": 9},
+  "sun": {"enabled": true, "x": 46, "y": 62, "size": 34, "color": "#ffd27a", "color2": "#ff6a34", "stripes": 4, "halo": 28},
+  "glow": {"enabled": true, "color": "#d4102a", "at": [78, 50], "size": [70, 45], "strength": 80, "pulse": 4, "flicker": 25, "embers": 14},
+  "rain": {"enabled": true, "amount": 180, "speed": 280, "angle": 12, "length": 7, "color": "#a9b8e0", "opacity": 45, "darken": 22, "flash": 2},
+  "description": "Wie Abendglut, dazu Regen und fernes Wetterleuchten.",
+  "clouds": {"count": 24, "color": "#24122e", "light": "#c8503a", "speed": 4, "band": [8, 55]}
+ }
+}

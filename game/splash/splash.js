@@ -5,6 +5,7 @@
 // Picture: Leyla and the camera move towards the viewer at the same speed, so the ground recedes:
 // pebbles and cracks appear at the bottom edge and slide up to the horizon, getting smaller. Dust from her steps stays behind.
 import { cloudFiles } from '../cloud_store.js';
+import { makeWeather } from '../weather.js';
 
 const BASE = new URL('../../projects/nomadgirl/', import.meta.url);
 const Z_NEAR = 0.6, Z_FAR = 40;   // depth range of the ground (m)
@@ -12,7 +13,10 @@ const Z_NEAR = 0.6, Z_FAR = 40;   // depth range of the ground (m)
 export async function startSplash(canvas) {
   const cloud = await cloudFiles();
   const json = async f => cloud?.files.has(f) ? cloud.files.get(f) : (await fetch(new URL(f, BASE), { cache: 'no-store' })).json();
-  const [S, A] = await Promise.all([json('data/splash.json'), json('data/assets.json')]);
+  const [S, A, WX] = await Promise.all([json('data/splash.json'), json('data/assets.json'), json('data/weather.json').catch(() => ({}))]);
+  // weather: sky behind the layers, rain in front (both in background pixels, scaled up sharp)
+  const weather = S.weather && WX[S.weather] ? makeWeather(WX[S.weather]) : null;
+  const skyCv = document.createElement('canvas'), rainCv = document.createElement('canvas');
   const image = id => A[id]?.file ? load(new URL(A[id].file, BASE).href) : Promise.resolve(null);
   const layers = (await Promise.all((S.background || []).map(image))).filter(Boolean);
   // Leyla's gaits (run, walk …): picked at random by weight, switched now and then at the end of a cycle
@@ -59,6 +63,13 @@ export async function startSplash(canvas) {
 
     // background, front layers move most
     ctx.fillStyle = G.base; ctx.fillRect(0, 0, W, H);
+    const lx = Math.round((W - bw * sc) / 2), ly = Math.round(horizon - bh * sc);   // where layer 0 sits
+    if (weather) {   // sky in background pixels from the top of the screen down to the horizon, the picture box inside it
+      const cw = Math.ceil(W / sc) + 2, ch = Math.ceil(horizon / sc) + 1, bx = -lx / sc, by = ch - bh;
+      if (skyCv.width !== cw || skyCv.height !== ch) Object.assign(skyCv, { width: cw, height: ch });
+      weather.sky(skyCv.getContext('2d'), cw, ch, t, { x: bx, y: by, w: bw, h: bh });
+      ctx.drawImage(skyCv, 0, Math.round(horizon - ch * sc), Math.round(cw * sc), Math.round(ch * sc));
+    }
     layers.forEach((img, i) => {
       const depth = layers.length > 1 ? i / (layers.length - 1) : 0;
       const ox = -look.x * par * W * depth, oy = -look.y * par * 0.4 * H * depth;
@@ -117,10 +128,17 @@ export async function startSplash(canvas) {
     }
     if (runImg) ctx.drawImage(runImg, f * fw, 0, fw, fh, Math.round(cx - ax * k), Math.round(feet - ay * k), Math.round(fw * k), Math.round(fh * k));
     drawSpecks(true);
+    if (weather?.rain) {   // rain in front of everything
+      const rw = Math.ceil(W / sc), rh = Math.ceil(H / sc);
+      if (rainCv.width !== rw || rainCv.height !== rh) Object.assign(rainCv, { width: rw, height: rh });
+      const rc = rainCv.getContext('2d'); rc.clearRect(0, 0, rw, rh);
+      weather.front(rc, rw, rh, t, still ? 0 : dt);
+      ctx.drawImage(rainCv, 0, 0, Math.round(rw * sc), Math.round(rh * sc));
+    }
     if (!still) requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  return { still, layers: layers.length, runner: !!runImg, gaits: gaits.length, gait: () => run?.name, commit: cloud?.commit || null };
+  return { still, weather: S.weather || null, layers: layers.length, runner: !!runImg, gaits: gaits.length, gait: () => run?.name, commit: cloud?.commit || null };
 }
 
 function load(src) {

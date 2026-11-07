@@ -17,8 +17,8 @@ for (const [name, width, height] of [['desktop', 1440, 900], ['ipad', 820, 1180]
   await page.waitForFunction(() => window.splash, null, { timeout: 15000 });
   const s = await page.evaluate(() => window.splash);
   await page.waitForTimeout(1500);
-  const ok = s.layers === 4 && s.runner && !errors.length;
-  console.log(`  ${ok ? 'ok  ' : 'FEHLER'} ${name}: ${s.layers} Ebenen, Leyla ${s.runner ? 'da' : 'fehlt'}${errors.length ? ' · ' + errors.join(' | ') : ''}`);
+  const ok = s.layers >= 1 && (s.layers === 4 || s.weather) && s.runner && !errors.length;
+  console.log(`  ${ok ? 'ok  ' : 'FEHLER'} ${name}: ${s.layers} Ebenen${s.weather ? " + Wetter " + s.weather : ""}, Leyla ${s.runner ? 'da' : 'fehlt'}${errors.length ? ' · ' + errors.join(' | ') : ''}`);
   if (!ok) failed++;
   if (shots) await page.screenshot({ path: path.join(repo, `output/splash_${name}.png`) });
   await page.close();

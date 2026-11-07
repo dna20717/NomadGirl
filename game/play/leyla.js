@@ -350,13 +350,14 @@ export class Leyla {
     this.idleNow = name === 'idle';
     if (name === 'idle' && this.idleVariant === 'idleAlt' && this.d.look?.idleAlt) name = 'idleAlt';
     // mantle and crouch pick their frame from the progress (crouch backwards = standing up)
-    const manual = st === 'mantle' || st === 'crouch', an0 = this.sprite.anims;
+    const manual = st === 'mantle' || st === 'crouch' || st === 'dash', an0 = this.sprite.anims;
     if (!manual && st !== 'slide' && an0.isPaused) an0.resume();
     const info = this.scene.playLook(this.sprite, 'leyla', name, this.facing);
     if (manual && info.used === st && an0.currentAnim) {
       const fr = an0.currentAnim.frames, n = fr.length;
       const from = st === 'mantle' ? Math.min(n - 1, Math.max(0, (this.m.mantleFromFrame ?? 5) - 1)) : 0;
-      const f = st === 'mantle' ? Math.round(from + (n - 1 - from) * this.mantleP(time)) : Math.round(Math.min(n - 1, this.crouchF || 0));
+      const dashFrom = Math.min(n - 1, Math.max(0, (this.m.dashFromFrame ?? 1) - 1)), dashP = Math.min(1, 1 - (this.dashEnd - time) / DASH_TIME);
+      const f = st === 'mantle' ? Math.round(from + (n - 1 - from) * this.mantleP(time)) : st === 'dash' ? Math.round(dashFrom + (n - 1 - dashFrom) * dashP) : Math.round(Math.min(n - 1, this.crouchF || 0));
       if (!an0.isPaused) an0.pause();
       this.sprite.setFrame(fr[f].frame.name);
     }

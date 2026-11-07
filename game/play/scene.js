@@ -7,6 +7,7 @@ import { Combat } from './combat.js';
 import { Fx } from './fx.js';
 import { Drone } from './drone.js';
 import { Van } from './van.js';
+import { Backdrop } from './backdrop.js';
 
 const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
 
@@ -32,7 +33,7 @@ export class PlayScene extends Phaser.Scene {
     for (const id of Object.values(this.data_.game?.tiles || {})) ids.add(id);
     if (this.data_.drone?.look) ids.add(this.data_.drone.look);
     const SP = this.data_.game?.spawn;
-    for (const id of [SP?.look, SP?.dish?.look, SP?.roof?.front]) if (id) ids.add(id);
+    for (const id of [SP?.look, SP?.dish?.look, SP?.roof?.front, this.data_.rooms?.[this.roomId]?.backdrop?.image]) if (id) ids.add(id);
     for (const id of [...ids]) if (A[id]?.mirror) ids.add(A[id].mirror);   // drawn opposite direction
     for (const id of ids) {
       const a = A[id];
@@ -92,7 +93,8 @@ export class PlayScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, W, H);
     // background (sky, skyline) on its own unzoomed camera, the world on a zoomable camera above it
     const before = new Set(this.children.list);
-    drawBackground(this, W, H);
+    const bd = def?.backdrop;
+    if (bd?.image || bd?.weather) this.backdrop = new Backdrop(this, bd, H); else drawBackground(this, W, H);
     const background = this.children.list.filter(o => !before.has(o));
     this.bgCam = this.cameras.main;
     this.cam = this.cameras.add(0, 0, this.scale.width, this.scale.height);
@@ -130,6 +132,7 @@ export class PlayScene extends Phaser.Scene {
     this.leyla = new Leyla(this, this.data_, [(start[0] + 0.5) * T, (start[1] + 1) * T]);
     this.drone = new Drone(this, this.data_);
     this.van?.reset();
+    this.backdrop?.front();
     this.physics.add.collider(this.leyla.box, this.solids);
     this.physics.add.collider(this.leyla.box, this.platforms, null, (box, plat) => {
       const l = this.leyla, b = l.body;
@@ -287,6 +290,7 @@ export class PlayScene extends Phaser.Scene {
     const cam = this.cam;
     cam.followOffset.x += (-this.leyla.facing * (this.data_.game?.camera?.lookAhead ?? 160) - cam.followOffset.x) * Math.min(1, dt / 400);
     this.bgCam.setScroll(cam.worldView.x, cam.worldView.y);   // parallax follows the world camera
+    this.backdrop?.update(time, dt);
     this.hud.update(this, time);
   }
 }
