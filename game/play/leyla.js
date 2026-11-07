@@ -96,6 +96,7 @@ export class Leyla {
       case 'mantle': this.mantle(time); break;
       case 'crouch': this.crouch(time, dt, input, dir, grounded); break;
       case 'sit': this.sitting(time, input, dir); break;
+      case 'pose': this.posing(time, input, dir); break;
       case 'land': this.landing(time, s, input, dir); break;
       case 'dead': b.setVelocityX(b.velocity.x * 0.9); break;
     }
@@ -116,6 +117,7 @@ export class Leyla {
 
   normal(time, s, input, dir, grounded) {
     const b = this.body, m = this.m;
+    if (input.pose?.pressed && grounded && !dir && Math.abs(b.velocity.x) <= 20 && this.d.look?.yoga && !this.attack && !this.charging) { this.startPose(time); return; }
     if (dir && time > this.attackPose) this.facing = dir;
     const speed = input.walk.down ? (m.walkSpeed ?? 240) : (m.runSpeed ?? 440);
     let acc = (m.acceleration ?? 2800) * (grounded ? (dir ? 1 : 1.6) : 0.75);
@@ -408,6 +410,7 @@ export class Leyla {
       if (this.special) name = '@' + this.special;
     } else { this.stillSince = time; this.special = null; this.idleWait = this.rollIdleWait(); }
     if (st === 'sit') name = '@' + this.sit.look;
+    if (st === 'pose') name = '@' + this.d.look.yoga;
     // standing at a workshop in the rig: seen from behind, busy with her hands
     if (this.idleNow && this.scene.camp?.atWorkshop && this.d.look?.work) { name = '@' + this.d.look.work; this.special = null; }
     // gun drawn (Leyla › Waffe ziehen): drawing, then aiming, walking with the gun, shooting
@@ -443,9 +446,9 @@ export class Leyla {
     // mantle and crouch pick their frame from the progress (crouch backwards = standing up)
     const flipFrames = name === 'airJump' && (this.m.airJumpFromFrame ?? 1) > 1;
     const climbFrames = st === 'climb' && (this.m.climbFromFrame ?? 1) > 0;
-    const manual = st === 'mantle' || st === 'crouch' || st === 'dash' || st === 'land' || st === 'sit' || flipFrames || climbFrames, an0 = this.sprite.anims;
+    const manual = st === 'mantle' || st === 'crouch' || st === 'dash' || st === 'land' || st === 'sit' || st === 'pose' || flipFrames || climbFrames, an0 = this.sprite.anims;
     if (!manual && armedFrame == null && pin == null && st !== 'slide' && an0.isPaused) an0.resume();
-    const info = this.scene.playLook(this.sprite, 'leyla', name, this.facing);
+    const info = this.scene.playLook(this.sprite, 'leyla', name, st === 'pose' ? 1 : this.facing);   // the yoga pose is seen from the front: never mirrored
     if (this.restartLook && an0.currentAnim) { this.restartLook = false; an0.restart(); }
     if (pin != null && info.used === name && an0.currentAnim) {
       const fr = an0.currentAnim.frames;
@@ -456,6 +459,10 @@ export class Leyla {
       const fr = an0.currentAnim.frames, from = Math.min(fr.length - 1, Math.max(0, armedFrom - 1));
       if (!an0.isPaused) an0.pause();
       this.sprite.setFrame(fr[Math.round(from + (fr.length - 1 - from) * Math.min(1, armedFrame))].frame.name);
+    } else if (st === 'pose' && info.used === name && an0.currentAnim) {
+      const fr = an0.currentAnim.frames;
+      if (!an0.isPaused) an0.pause();
+      this.sprite.setFrame(fr[Math.max(0, Math.min(fr.length - 1, this.poseFrame(time)))].frame.name);
     } else if (st === 'sit' && info.used === name && an0.currentAnim) {
       const fr = an0.currentAnim.frames;
       if (!an0.isPaused) an0.pause();
@@ -610,6 +617,25 @@ export class Leyla {
     if (!S.up && (dir || input.jump.pressed || input.grab.pressed || input.up.pressed)) S.up = time;
     const n = this.scene.data_.assets?.[S.look]?.frames || 1;
     if (S.up && this.sitFrame(time) >= n) { const sat = (S.up - S.at) / 1000; this.state = 'normal'; this.sit = null; S.onStand?.(sat); }
+  }
+
+  // ---------- yoga pose (Daniel: P triggers it, dissolving plays it backwards); the anchor offset is baked into the strip ----------
+  startPose(time) {
+    const Y = this.d.yoga || {}, n = this.scene.data_.assets?.[this.d.look.yoga]?.frames || 1;
+    this.state = 'pose'; this.special = null; this.body.setVelocityX(0);
+    this.pose = { at: time, out: 0, n, ms: 1000 / (Y.fps || 6), back: 1000 / (Y.backFps || 10), hold: Math.min(n, Math.max(1, Y.holdFrom ?? n)) - 1 };
+  }
+  poseFrame(time) {
+    const P = this.pose;
+    if (P.out) return P.outFrom - Math.floor((time - P.out) / P.back);
+    const f = Math.floor((time - P.at) / P.ms);
+    return f < P.n ? f : P.hold + (f - P.n) % Math.max(1, P.n - P.hold);   // in, then breathe (or hold the last frame)
+  }
+  posing(time, input, dir) {
+    const P = this.pose;
+    this.body.setVelocityX(0);
+    if (!P.out && (dir || input.pose.pressed || input.jump.pressed || input.grab.pressed || input.melee.pressed || input.ranged.pressed || input.down.pressed)) { P.outFrom = Math.min(P.n - 1, this.poseFrame(time)); P.out = time; }
+    if (P.out && this.poseFrame(time) < 0) { this.state = 'normal'; this.pose = null; this.stillSince = time; }
   }
 
   hand() { return { x: this.x, y: this.feet - this.size.h + this.size.hand }; }

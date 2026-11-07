@@ -18,7 +18,7 @@ const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
   jump: ['SPACE'], walk: ['SHIFT'], dash: ['L', 'C'], melee: ['J', 'Y'], ranged: ['K', 'X'], grab: ['E'],
-  restart: ['BACKSPACE'], reload: ['R'], help: ['H', 'ESC'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'],
+  restart: ['BACKSPACE'], reload: ['R'], help: ['H', 'ESC'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'],
 };
 
 export class PlayScene extends Phaser.Scene {

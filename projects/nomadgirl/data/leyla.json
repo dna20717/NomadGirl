@@ -67,7 +67,8 @@
   "meleeLight": "leyla_melee_light_side",
   "meleeLightWalk": "leyla_melee_light_walk_side",
   "meleeHeavy": "leyla_melee_heavy_side",
-  "meleeHeavyWalk": "leyla_melee_heavy_walk_side"
+  "meleeHeavyWalk": "leyla_melee_heavy_walk_side",
+  "yoga": "leyla_yoga_front"
  },
  "idleAltChance": 50,
  "inventory": {"pickupRange": 150, "autoStack": true, "cell": 44, "dropSpread": 90},
@@ -106,5 +107,6 @@
   "heavyKnockback": 220,
   "lightWalkFrom": 1,
   "heavyWalkFrom": 4
- }
+ },
+ "yoga": {"fps": 6, "backFps": 10, "holdFrom": 12}
 }

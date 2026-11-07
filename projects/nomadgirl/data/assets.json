@@ -1392,5 +1392,28 @@
   "derivedFrom": "leyla_melee_heavy_walk_side_source",
   "date": "07.11.2026",
   "description": "Pixel-Art: holt im Laufen weit aus und schlägt zu (Treffer Frame 11). Schwerer Nahkampf im Gehen."
+ },
+ "leyla_yoga_front_source": {
+  "name": "Leyla · Yoga · Original",
+  "kind": "source",
+  "file": "assets/leyla/yoga_front_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 12 Frames à 200 ms, von vorn. Die Figur sinkt ab Frame 5 um 12 px ab."
+ },
+ "leyla_yoga_front": {
+  "name": "Leyla · Yoga (Baum)",
+  "kind": "animation",
+  "file": "assets/leyla/yoga_front.png",
+  "frameSize": [140, 256],
+  "frames": 12,
+  "fps": 6,
+  "loop": false,
+  "origin": [94, 255],
+  "height": 203.1,
+  "source": "Code (Streifen zugeschnitten, Absinken ausgeglichen)",
+  "derivedFrom": "leyla_yoga_front_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art von vorn: Baum-Pose. Das Standbein bleibt auf dem Anker (Versatz pro Frame ausgeglichen: 0,0,0,0,3,6,9,11,12,12,12,12 px)."
  }
 }

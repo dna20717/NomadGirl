@@ -16,7 +16,7 @@
 //   nomad.walkTo(x)                   walks Leyla to an x position (camp), then E with step(1, [], ['grab'])
 //   nomad.save()                      the savegame
 //   nomad.release()                   keyboard again, game runs normally
-// Input names: left right up down jump walk dash melee ranged grab restart help debug
+// Input names: left right up down jump walk dash melee ranged grab restart help debug pose
 
 const FRAME = 1000 / 60;
 

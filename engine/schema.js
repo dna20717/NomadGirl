@@ -283,6 +283,7 @@ export const AREAS = {
         num('melee.heavyTime', 'Schwer dauert', { unit: 'ms' }), num('melee.heavyFrom', 'Schwer ab Frame', { min: 1, hint: 'Nach dem Aufladen' }), num('melee.heavyHit', 'Schwer trifft bei', { min: 0, max: 1, step: 0.05 }),
         num('melee.heavyWalkTime', 'Schwer im Gehen dauert', { unit: 'ms' }), num('melee.heavyWalkFrom', 'Schwer im Gehen ab Frame', { min: 1 }), num('melee.heavyWalkHit', 'Schwer im Gehen trifft bei', { min: 0, max: 1, step: 0.05 }),
         num('melee.heavyDamage', 'Schwer: Schaden', { unit: '%', min: 100 }), num('melee.heavyRange', 'Schwer: Reichweite +', { unit: 'px', min: 0 }), num('melee.heavyKnockback', 'Schwer: Rückstoß +', { min: 0 })] },
+      { title: 'Yoga', fields: [ref('look.yoga', 'Yoga-Pose', 'assets', { hint: 'Daniel: mit P auslösen, beim Auflösen rückwärts' }), num('yoga.fps', 'Hinein (fps)', { min: 1 }), num('yoga.backFps', 'Zurück (fps)', { min: 1, hint: 'Rückwärts, wenn sie die Pose auflöst' }), num('yoga.holdFrom', 'Halten ab Frame', { min: 1, hint: 'Ab hier atmet sie in einer Schleife bis zum letzten Frame' })] },
       { title: 'Zufällige Idles', fields: [table('idles', 'Idles', [ref('look', 'Animation', 'assets'), num('weight', 'Gewicht', { min: 0 })],
           { hint: 'Daniel: „Idle-Animationen zufällig abspielen, wenn sie länger nicht bewegt wurde“. Läuft einmal, danach wieder Stehen. Sitzen am Feuer zählt nicht' }),
         range('idleAfter', 'Nach Stillstand', { unit: 's', hint: 'Zufällig zwischen den Werten, danach jedes Mal neu gewürfelt' })] },
