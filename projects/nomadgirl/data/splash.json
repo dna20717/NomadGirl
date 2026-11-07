@@ -8,5 +8,7 @@
  "horizon": 80,
  "runners": [{"look": "leyla_run_front", "weight": 2, "speed": 1},{"look": "leyla_walk_front", "weight": 1, "speed": 0.4}],
  "switchEvery": [12, 24],
- "weather": "abendglut"
+ "weather": "abendglut",
+ "haze": {"enabled": true, "fade": 14, "band": 34, "shimmer": 1.5, "speed": 2.2, "glow": 16},
+ "drone": {"show": true, "at": [57, 44], "height": 15, "every": [3, 7], "bob": 1.2, "moods": "kill, cleared, curious, scan, alert, bored, sleep, dash"}
 }

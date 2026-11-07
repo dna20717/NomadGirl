@@ -13,12 +13,22 @@ const Z_NEAR = 0.6, Z_FAR = 40;   // depth range of the ground (m)
 export async function startSplash(canvas) {
   const cloud = await cloudFiles();
   const json = async f => cloud?.files.has(f) ? cloud.files.get(f) : (await fetch(new URL(f, BASE), { cache: 'no-store' })).json();
-  const [S, A, WX] = await Promise.all([json('data/splash.json'), json('data/assets.json'), json('data/weather.json').catch(() => ({}))]);
+  const [S, A, WX, DR] = await Promise.all([json('data/splash.json'), json('data/assets.json'), json('data/weather.json').catch(() => ({})), json('data/drone.json').catch(() => ({}))]);
+  // Mama-Bot hovers next to Leyla and shows random moods (face frame + kaomoji bubble)
+  const SD = { show: true, at: [57, 44], height: 15, every: [3, 7], bob: 1.2, moods: 'kill, cleared, curious, scan, alert, bored, sleep, dash', ...(S.drone || {}) };
+  const droneMoods = (DR.moods || []).filter(m => String(SD.moods).split(',').map(x => x.trim()).includes(m.mood));
+  const drone = { frame: 0, until: 0, next: 0, bubble: '', bubbleUntil: 0 };
   // weather: sky behind the layers, rain in front (both in background pixels, scaled up sharp)
   const weather = S.weather && WX[S.weather] ? makeWeather(WX[S.weather]) : null;
   const skyCv = document.createElement('canvas'), rainCv = document.createElement('canvas');
+  // horizon haze: dithered fade of the ground colour into the picture, shimmering rows (heat), a warm glow line
+  const HZ = { enabled: true, fade: 14, band: 34, shimmer: 1.5, speed: 2.2, glow: 16, color: '#f5a052', ...(S.haze || {}) };
+  if (S.weather && WX[S.weather]?.sky?.horizon && !S.haze?.color) HZ.color = WX[S.weather].sky.horizon;
+  const bandCv = document.createElement('canvas'), fadeCv = document.createElement('canvas');
+  let fadeKey = '';
   const image = id => A[id]?.file ? load(new URL(A[id].file, BASE).href) : Promise.resolve(null);
   const layers = (await Promise.all((S.background || []).map(image))).filter(Boolean);
+  const droneImg = SD.show && DR.look ? await image(DR.look) : null, droneA = A[DR.look] || {};
   // Leyla's gaits (run, walk …): picked at random by weight, switched now and then at the end of a cycle
   const gaits = (await Promise.all((S.runners || (S.runner ? [{ look: S.runner }] : [])).filter(r => A[r.look] && (r.weight ?? 1) > 0)
     .map(async r => ({ a: A[r.look], img: await image(r.look), weight: r.weight ?? 1, speed: r.speed ?? 1 })))).filter(g => g.img);
@@ -49,6 +59,70 @@ export async function startSplash(canvas) {
   const dust = [];
   let lastFrame = -1, last = performance.now();
 
+  function haze(t, horizon, sc) {
+    const hy = Math.round(horizon), p = Math.max(1, Math.round(sc));
+    // heat shimmer: rows of background pixels around the horizon slide sideways a little, strongest at the horizon
+    const bandH = Math.round(HZ.band * sc), y0 = Math.max(0, hy - bandH), y1 = Math.min(H, hy + Math.round(p * 3));
+    if (HZ.shimmer > 0 && !still && y1 > y0) {
+      if (bandCv.width !== W || bandCv.height !== y1 - y0) Object.assign(bandCv, { width: W, height: y1 - y0 });
+      const bc = bandCv.getContext('2d'); bc.clearRect(0, 0, W, y1 - y0); bc.drawImage(canvas, 0, y0, W, y1 - y0, 0, 0, W, y1 - y0);
+      for (let y = y0; y < y1; y += p) {
+        const k = 1 - Math.min(1, Math.abs(hy - y) / Math.max(1, bandH));   // 1 at the horizon
+        const dx = Math.round(Math.sin(t * HZ.speed * 2.3 + y * 0.09) * Math.sin(t * HZ.speed * 0.7 + y * 0.023) * HZ.shimmer * k * k) * p;
+        if (dx) ctx.drawImage(bandCv, 0, y - y0, W, p, dx, y, W, p);
+      }
+    }
+    // dithered fade: the ground colour reaches up into the picture (cached per size)
+    const rows = Math.max(1, Math.round(HZ.fade)), cols = Math.ceil(W / p), key = [W, p, rows, G.base].join(',');
+    if (key !== fadeKey) {
+      fadeKey = key; Object.assign(fadeCv, { width: cols, height: rows });
+      const fc = fadeCv.getContext('2d'), img = fc.createImageData(cols, rows), n = parseInt(G.base.slice(1), 16);
+      const B = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+      for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+        const a = (y + 1) / (rows + 1), o = (y * cols + x) * 4;   // more ground towards the bottom
+        if (a * 16 > B[(y & 3) * 4 + (x & 3)] + 0.5) { img.data[o] = n >> 16 & 255; img.data[o + 1] = n >> 8 & 255; img.data[o + 2] = n & 255; img.data[o + 3] = 255; }
+      }
+      fc.putImageData(img, 0, 0);
+    }
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(fadeCv, 0, hy - rows * p, cols * p, rows * p);
+    // warm haze line, breathing slowly
+    if (HZ.glow > 0) {
+      const n = parseInt(HZ.color.slice(1), 16), c = `${n >> 16 & 255},${n >> 8 & 255},${n & 255}`, a = HZ.glow / 100 * (0.8 + 0.2 * Math.sin(t * 0.8));
+      const g = ctx.createLinearGradient(0, hy - bandH, 0, hy + p * 6);
+      g.addColorStop(0, `rgba(${c},0)`); g.addColorStop(0.75, `rgba(${c},${a})`); g.addColorStop(1, `rgba(${c},0)`);
+      ctx.fillStyle = g; ctx.fillRect(0, hy - bandH, W, bandH + p * 6);
+    }
+  }
+
+  function drawDrone(t, now) {
+    if (!still && now > drone.next) {   // next random mood
+      const m = droneMoods[Math.floor(Math.random() * droneMoods.length)];
+      if (m) {
+        const len = m.duration > 0 ? Math.max(m.duration, 1400) : 2600;
+        Object.assign(drone, { frame: m.frame ?? 0, until: now + len, bubble: DR.bubble?.show !== false ? m.kaomoji || '' : '', bubbleUntil: now + Math.max(len, 1800) });
+      }
+      const [a, b] = SD.every; drone.next = now + (a + Math.random() * Math.max(0, (b ?? a) - a)) * 1000 + 1500;
+    }
+    if (now > drone.until) drone.frame = 0;
+    const [fw, fh] = droneA.frameSize || [droneImg.width, droneImg.height], [ox, oy] = droneA.origin || [fw / 2, fh / 2];
+    const wide = W / H > 1.15, k = H * SD.height / 100 / fh * (wide ? 1 : 0.75);
+    const drift = Math.sin(t * 0.37) * 0.018 * W, bob = Math.sin(t * 2.1) * SD.bob / 100 * H;
+    const x = W * (wide ? SD.at[0] : Math.max(20, 50 - (68 - SD.at[0]) * 2.6)) / 100 + drift - look.x * W * 0.008, y = H * (SD.at[1] + (wide ? 0 : 7)) / 100 + bob - look.y * H * 0.006;
+    ctx.save(); ctx.imageSmoothingEnabled = true; ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(Math.cos(t * 0.37) * 0.06 + Math.cos(t * 2.1) * 0.03);
+    ctx.drawImage(droneImg, drone.frame * fw, 0, fw, fh, -ox * k, -oy * k, fw * k, fh * k);
+    ctx.restore(); ctx.imageSmoothingEnabled = false;
+    if (drone.bubble && now < drone.bubbleUntil) {
+      const B = DR.bubble || {}, size = Math.round(Math.max(14, H * 0.028)), fade = Math.min(1, (drone.bubbleUntil - now) / 300);
+      ctx.font = `${size}px VT323, monospace`; const tw = ctx.measureText(drone.bubble).width, pad = size * 0.4;
+      const bx = Math.round(x + fw * k * 0.15), by = Math.round(y - oy * k - size * 1.3);
+      ctx.globalAlpha = fade; ctx.fillStyle = B.background || '#140c1c';
+      ctx.beginPath(); ctx.roundRect(bx - pad, by - size * 0.95, tw + pad * 2, size * 1.35, size * 0.3); ctx.fill();
+      ctx.fillStyle = B.color || '#7ff6ff'; ctx.textBaseline = 'alphabetic'; ctx.fillText(drone.bubble, bx, by + size * 0.1);
+      ctx.globalAlpha = 1;
+    }
+  }
+
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     const t = still ? 0 : now / 1000;
@@ -76,6 +150,7 @@ export async function startSplash(canvas) {
       ctx.drawImage(img, Math.round((W - bw * sc) / 2 + ox), Math.round(horizon - bh * sc + oy + par * 0.4 * H * depth), Math.round(bw * sc), Math.round(bh * sc));
     });
     ctx.fillStyle = G.base; ctx.fillRect(0, Math.round(horizon), W, H);
+    if (HZ.enabled) haze(t, horizon, sc);
 
     // ground projection: y = top + K / z, so z = Z_FAR sits on the horizon and Z_NEAR just below the bottom edge
     const K = (H + 4 * px - horizon) / (1 / Z_NEAR - 1 / Z_FAR), top = horizon - K / Z_FAR;
@@ -126,6 +201,7 @@ export async function startSplash(canvas) {
       ctx.fillStyle = 'rgba(0,0,0,.35)';
       for (let i = 0; i < 3; i++) { const w = sw * (1 - i * 0.22); ctx.fillRect(Math.round(cx - w / 2), Math.round(feet - m * (1 - i)), Math.round(w), Math.round(m * 2)); }
     }
+    if (droneImg) drawDrone(t, now);   // behind Leyla
     if (runImg) ctx.drawImage(runImg, f * fw, 0, fw, fh, Math.round(cx - ax * k), Math.round(feet - ay * k), Math.round(fw * k), Math.round(fh * k));
     drawSpecks(true);
     if (weather?.rain) {   // rain in front of everything
@@ -138,7 +214,7 @@ export async function startSplash(canvas) {
     if (!still) requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  return { still, weather: S.weather || null, layers: layers.length, runner: !!runImg, gaits: gaits.length, gait: () => run?.name, commit: cloud?.commit || null };
+  return { still, weather: S.weather || null, drone: !!droneImg, droneFrame: () => drone.frame, layers: layers.length, runner: !!runImg, gaits: gaits.length, gait: () => run?.name, commit: cloud?.commit || null };
 }
 
 function load(src) {

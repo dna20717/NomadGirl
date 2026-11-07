@@ -111,6 +111,8 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 
 - **Szene** (Daniel, 07.11.2026: „Hintergrund auf den Splashscreen, Leyla endlos auf uns zu laufen lassen“): `game/splash/splash.js` (`startSplash(canvas)`) zeichnet in ein Canvas über die ganze Seite, Pixel-Art scharf. Werte aus dem Bereich **Startseite** (`data/splash.json`, Gruppe Grundlagen): Ebenen (Assets, hinten nach vorn, Cover-Skalierung, unten am **Horizont** bündig), **Tiefe** (Parallaxe mit der Maus, ohne Maus langsames Schwanken), Leyla (**`runners`**: Tabelle Animation + Gewicht + Bodentempo ×, zufällig nach Gewicht; `switchEvery` = Wechsel alle x–y Sekunden am Anfang eines Zyklus, Boden passt sein Tempo weich an; dazu Größe/Position/Füße in %; Füße seit 07.11.2026 abends bei 86 % statt 94 %, Daniel: „etwas höher, damit man die Füße sieht“). Daniel, 07.11.2026: Gehen von vorn zufällig im Wechsel mit Rennen, Boden (Tempo, Steinchen, Farben, Staub, Schatten). Unter dem Horizont zeichnet der Code den Boden in `ground.base`.
 - **Bild:** Leyla und Kamera bewegen sich gemeinsam auf uns zu, also gleitet der Boden weg: Steinchen und Risse tauchen unten auf und wandern perspektivisch zum Horizont (`y = top + K/z`), Staub bei jedem halben Zyklus bleibt zurück. Was näher ist als ihre Füße, liegt vor ihr. `prefers-reduced-motion` zeigt ein Standbild.
+- **Horizont-Dunst** (Daniel, 07.11.2026 abends: „Übergang zwischen Kulissen und Boden durch Hitzeflimmern sanfter“): Startseite › Horizont-Dunst (`haze`): Zeilen um den Horizont zittern seitlich (Flimmern, stärker zum Horizont hin), der Boden greift mit Bayer-Raster ins Bild (Übergang in Bildpixeln), warmer Dunststreifen in der Horizont-Farbe des Wetters (atmet langsam). `haze()` in `splash.js`.
+- **Drohne auf der Startseite** (Daniel, 07.11.2026 abends: „Drohne auch im Splash Screen, random Animationen“): Startseite › Drohne (`drone`): schwebt hinter/neben Leyla (Position in %, schmal links neben ihr und kleiner), driftet und wackelt, zeigt alle x–y s eine zufällige Stimmung aus der Liste (Frame + Kaomoji-Bläschen aus dem Bereich Drohne), danach wieder Normal-Gesicht.
 - Online kommen die Daten live über `/api/files` (wie das Spiel). `index.html?preview` zeigt nur die Szene (Vorschau in der Werkstatt unter „Startseite“ mit „Speichern und neu laden“). `window.splash` für Tests, `node tools/splash_test.mjs [--shots]` (Desktop, iPad hochkant, Handy).
 
 ## Kommandozeile `ng`
@@ -129,6 +131,7 @@ Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei j
 
 ## Stand
 
+- 07.11.2026 abends: Startseite mit **Hitzeflimmern am Horizont** und **Drohne mit zufälligen Stimmungen**.
 - 07.11.2026 abends: **Leiter-Animation von hinten**, oben seitlich hochziehen; Doppelsprung-Neigung entschärft (25 %).
 - 07.11.2026 abends: **Doppelsprung** nutzt die letzten Dash-Frames, geneigt in Sprungrichtung, mit Nachbildern.
 - 07.11.2026 abends: **Neuer Hintergrund mit Wetter** (Abendglut, Regen, rotes Glühen) auf Startseite und im Testraum, neuer Bereich „Wetter“ (25 Bereiche); **Dash-Animation**.

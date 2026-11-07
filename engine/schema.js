@@ -141,6 +141,14 @@ export const AREAS = {
       { title: 'Boden', fields: [num('ground.speed', 'Tempo', { unit: 'm/s', min: 0, max: 30, step: 0.5, hint: 'Wie schnell der Boden unter ihr auf uns zukommt. 0 = steht' }),
         num('ground.specks', 'Steinchen', { min: 0, max: 400, hint: 'Wie viele Steinchen und Risse gleichzeitig im Bild sind' }),
         color('ground.base', 'Farbe Boden', { hint: 'Am besten die Bodenfarbe der vordersten Ebene' }), color('ground.color', 'Farbe Steinchen'), bool('ground.dust', 'Staubwölkchen', { hint: 'Kleine Wolken bei jedem Schritt' }), bool('ground.shadow', 'Schatten unter Leyla')] },
+      { title: 'Drohne', fields: [bool('drone.show', 'Zeigen', { hint: 'Mama-Bot schwebt neben Leyla und zeigt zufällige Stimmungen (Gesicht + Kaomoji aus dem Bereich Drohne)' }),
+        point('drone.at', 'Position', { unit: '%', hint: 'Mitte der Drohne in % des Bildschirms (breit); schmal rückt sie mit Leyla zur Mitte' }), num('drone.height', 'Größe', { unit: '% der Höhe', min: 2, max: 50 }),
+        range('drone.every', 'Neue Stimmung alle', { unit: 's' }), num('drone.bob', 'Schweben', { unit: '% der Höhe', min: 0, step: 0.1 }),
+        text('drone.moods', 'Stimmungen', { hint: 'Anlässe aus der Tabelle der Drohne, mit Komma getrennt' })] },
+      { title: 'Horizont-Dunst', fields: [bool('haze.enabled', 'Zeigen', { hint: 'Weicher Übergang zwischen Kulisse und Boden: Hitzeflimmern, Pixel-Raster, warmer Dunst' }),
+        num('haze.fade', 'Übergang', { unit: 'Bildpixel', min: 0, hint: 'So hoch reicht der Boden mit Raster ins Bild' }), num('haze.band', 'Flimmer-Höhe', { unit: 'Bildpixel', min: 0 }),
+        num('haze.shimmer', 'Flimmern', { unit: 'Bildpixel', min: 0, step: 0.5, hint: 'Wie weit die Zeilen seitlich zittern' }), num('haze.speed', 'Flimmer-Tempo', { min: 0, step: 0.1 }),
+        num('haze.glow', 'Dunst', { unit: '%', min: 0, max: 100 }), color('haze.color', 'Dunst-Farbe', { hint: 'Leer = Horizont-Farbe des Wetters' })] },
     ],
     check: (x, report, p) => {
       const A = p.data.assets || {};
