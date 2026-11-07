@@ -3,7 +3,7 @@
  "parallax": 2,
  "runnerHeight": 46,
  "runnerX": 68,
- "runnerFeet": 94,
+ "runnerFeet": 86,
  "ground": {"speed": 6, "specks": 140, "color": "#4a4256", "dust": true, "shadow": true, "base": "#292330"},
  "horizon": 80,
  "runners": [{"look": "leyla_run_front", "weight": 2, "speed": 1},{"look": "leyla_walk_front", "weight": 1, "speed": 0.4}],
