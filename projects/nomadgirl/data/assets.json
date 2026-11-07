@@ -624,5 +624,28 @@
   "source": "KI-generiert (Daniel)",
   "date": "07.11.2026",
   "description": "688 × 384 px, Pixel-Art: Ruinen mit Funkmast, Schüsseln und Zaun, Himmel transparent (Wetter füllt ihn). Startseite und Testraum."
+ },
+ "leyla_climb_back_source": {
+  "name": "Leyla · Klettern von hinten (Original)",
+  "kind": "source",
+  "file": "assets/leyla/climb_back_source.gif",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "9 Frames à 200 ms, 256 × 256 px, Pixel-Art, von hinten: Frame 1 steht, 2–9 klettern."
+ },
+ "leyla_climb_back": {
+  "name": "Leyla · Klettern von hinten",
+  "kind": "animation",
+  "file": "assets/leyla/climb_back.png",
+  "frameSize": [118, 252],
+  "frames": 9,
+  "fps": 8,
+  "loop": true,
+  "origin": [58, 251],
+  "height": 200,
+  "source": "Code (Streifen zugeschnitten, tools/leyla_strips.py)",
+  "derivedFrom": "leyla_climb_back_source",
+  "description": "Pixel-Art von hinten an der Leiter. Im Spiel laufen die Frames ab „Klettern ab Frame“ mit dem Kletterweg, stillhalten = Frame bleibt.",
+  "date": "07.11.2026"
  }
 }

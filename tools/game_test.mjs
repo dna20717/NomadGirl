@@ -59,8 +59,9 @@ check('Durch Plattform fallen', v.feet === 960, v);
 v = await t(t => t.tp(48.5 * 64, 960));
 v = await t(t => t.run(4, ['up'], ['up']));
 check('Leiter greifen', v.st === 'climb', v);
-v = await t(t => t.until(v => v.st !== 'climb', 300, ['up']));
-check('Leiter hoch bis auf die Kante', v.feet === 7 * 64 && v.st === 'normal', v);
+v = await t(t => t.until(v => v.st !== 'climb', 300, ['up'])); const pulled = v.st;
+v = await t(t => t.until(v => v.st === 'normal', 120)); v = await t(t => t.run(5));
+check('Leiter hoch bis auf die Kante (oben seitlich hochziehen)', pulled === 'mantle' && v.feet === 7 * 64 && v.st === 'normal', { ...v, pulled });
 v = await t(t => t.run(4, ['down'], ['down']));
 check('Leiter runter', v.st === 'climb', v);
 

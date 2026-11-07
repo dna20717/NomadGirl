@@ -66,10 +66,10 @@ v = await page.evaluate(() => { nomad.step(90, ['right']); return nomad.state().
 v = await page.evaluate(() => { nomad.step(90, ['left']); return nomad.state().van; }); check('Van: Tür geht wieder auf', v?.open && v.frame === 4, v);
 v = await page.evaluate(() => {
   const n = nomad, s = n.state().van, T = 64; P.tp(5.2, 18); n.step(10);
-  n.step(1, ['up'], ['up']); n.until(x => x.leyla.state !== 'climb', 200, ['up']); n.step(25, ['right']);
-  return { ...P.L(), roof: s.roof.y, front: n.state().van.front };
+  n.step(1, ['up'], ['up']); n.until(x => x.leyla.state !== 'climb', 200, ['up']); const pulled = n.state().leyla.state; n.until(x => x.leyla.state === 'normal', 90); n.step(25, ['right']);
+  return { ...P.L(), roof: s.roof.y, front: n.state().van.front, pulled };
 });
-check('Van: Leiter hoch, Dach begehbar', Math.abs(v.feet - v.roof) < 3 && v.front, v);
+check('Van: Leiter hoch (oben seitlich hochziehen), Dach begehbar', v.pulled === 'mantle' && Math.abs(v.feet - v.roof) < 3 && v.front, v);
 await shot('van');
 // ledges: crouch at the pit edge, ↓ + towards the pit = hang, W = pull up; jump at the pit wall = grab it; two idles at random
 v = await page.evaluate(() => {

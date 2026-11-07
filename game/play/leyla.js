@@ -208,6 +208,16 @@ export class Leyla {
     const v = ((input.down.down ? 1 : 0) - (input.up.down ? 1 : 0)) * (m.climbSpeed ?? 180);
     b.setVelocity(0, v);
     this.climbPhase = (this.climbPhase || 0) + Math.abs(v) / 1000;
+    this.climbDist = (this.climbDist || 0) + Math.abs(v) / 60;   // px climbed (per frame at 60 fps), drives the climb frames
+    // near the top: pull up sideways like at a ledge (hands at the top rung), then stand up from the crouch
+    if (v < 0 && m.ladderMantle !== false && this.feet <= L.top + this.size.hangReach && this.feet > L.top + 8) {
+      const z = this.size, top = { x: L.cx, feet: L.top };
+      if (this.scene.rectFree(top.x - z.w / 2 + 2, top.feet - z.crouchH, z.w - 4, z.crouchH - 2)) {
+        this.ladder = null; this.body.allowGravity = false; this.setStanding();
+        if (dir) this.facing = dir;
+        return this.startMantle(time, top);
+      }
+    }
     if (input.jump.pressed) { this.leaveClimb(); b.setVelocity(dir * (m.walkSpeed ?? 240), -(m.jumpVelocity ?? 1100) * 0.6); this.cut = true; return; }
     if (v < 0 && this.feet <= L.top) { this.body.reset(L.cx, L.top - this.size.h / 2); this.leaveClimb(); return; }
     if (this.feet >= L.bottom && grounded && v >= 0) { this.leaveClimb(); return; }
@@ -355,7 +365,8 @@ export class Leyla {
     if (name === 'idle' && this.idleVariant === 'idleAlt' && this.d.look?.idleAlt) name = 'idleAlt';
     // mantle and crouch pick their frame from the progress (crouch backwards = standing up)
     const flipFrames = name === 'airJump' && (this.m.airJumpFromFrame ?? 1) > 1;
-    const manual = st === 'mantle' || st === 'crouch' || st === 'dash' || flipFrames, an0 = this.sprite.anims;
+    const climbFrames = st === 'climb' && (this.m.climbFromFrame ?? 1) > 0;
+    const manual = st === 'mantle' || st === 'crouch' || st === 'dash' || flipFrames || climbFrames, an0 = this.sprite.anims;
     if (!manual && st !== 'slide' && an0.isPaused) an0.resume();
     const info = this.scene.playLook(this.sprite, 'leyla', name, this.facing);
     if (manual && (info.used === st || (flipFrames && info.used === 'airJump')) && an0.currentAnim) {
@@ -363,7 +374,8 @@ export class Leyla {
       const from = st === 'mantle' ? Math.min(n - 1, Math.max(0, (this.m.mantleFromFrame ?? 5) - 1)) : 0;
       const dashFrom = Math.min(n - 1, Math.max(0, (this.m.dashFromFrame ?? 1) - 1)), dashP = Math.min(1, 1 - (this.dashEnd - time) / DASH_TIME);
       const flipFrom = Math.min(n - 1, Math.max(0, (this.m.airJumpFromFrame ?? 1) - 1)), flipP = Math.min(1, (time - this.flipAt) / Math.max(1, this.flipLen));
-      const f = flipFrames ? Math.round(flipFrom + (n - 1 - flipFrom) * flipP) : st === 'mantle' ? Math.round(from + (n - 1 - from) * this.mantleP(time)) : st === 'dash' ? Math.round(dashFrom + (n - 1 - dashFrom) * dashP) : Math.round(Math.min(n - 1, this.crouchF || 0));
+      const climbFrom = Math.min(n - 1, Math.max(0, (this.m.climbFromFrame ?? 1) - 1)), climbN = Math.max(1, n - climbFrom);
+      const f = climbFrames ? climbFrom + Math.floor((this.climbDist || 0) / Math.max(1, this.m.climbStep ?? 24)) % climbN : flipFrames ? Math.round(flipFrom + (n - 1 - flipFrom) * flipP) : st === 'mantle' ? Math.round(from + (n - 1 - from) * this.mantleP(time)) : st === 'dash' ? Math.round(dashFrom + (n - 1 - dashFrom) * dashP) : Math.round(Math.min(n - 1, this.crouchF || 0));
       if (!an0.isPaused) an0.pause();
       this.sprite.setFrame(fr[f].frame.name);
     }
@@ -387,7 +399,7 @@ export class Leyla {
     if (info.fallback && st === 'dash') rot = this.facing * 0.12;
     if (info.fallback && st === 'climb') rot = Math.sin(this.climbPhase * 6) * 0.05;
     if (st === 'swing') rot = -this.theta * 0.85;
-    if (name === 'airJump' && this.m.airJumpTilt) rot = this.facing * Math.atan2(v.y, Math.max(Math.abs(v.x), 250)) * this.m.airJumpTilt / 100;   // pose leans into the jump
+    if (name === 'airJump' && this.m.airJumpTilt) rot = this.facing * Math.max(-0.6, Math.min(0.6, Math.atan2(v.y, Math.max(Math.abs(v.x), 400)))) * this.m.airJumpTilt / 100;   // pose leans into the jump
     if (time < this.attackPose && st === 'normal') rot += this.facing * 0.1;
     if (st === 'dead') { this.deadRot = (this.deadRot || 0) + (this.facing * -1.45 - (this.deadRot || 0)) * k; rot = this.deadRot; } else this.deadRot = 0;
     this.sprite.setPosition(b.center.x, b.bottom).setRotation(rot);
