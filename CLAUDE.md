@@ -73,7 +73,7 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 
 ## Online
 
-Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei jedem Push auf `main` mit `npm run build:web` → `dist/` und liefert unter https://nomadgirl.dna20717.workers.dev aus (`wrangler.jsonc`): `/` = Startseite (`index.html`), `/workshop` = Werkstatt. Prüfen: `npx wrangler deploy --dry-run --outdir /tmp/wout`. Deploy geht nicht aus der Arbeitsumgebung (Cloudflare-API gesperrt), nur über den Push. Die Werkstatt speichert online vorerst im Browser (localStorage); „Speichern = Commit“ kommt wie bei NomadTactics über `worker/index.js`, Cloudflare Access und das Geheimnis `GITHUB_TOKEN` im Dashboard.
+Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei jedem Push auf `main` mit `npm run build:web` → `dist/` und liefert unter https://nomadgirl.dna20717.workers.dev aus (`wrangler.jsonc`): `/` = Startseite (`index.html`), `/workshop` = Werkstatt. Prüfen: `npx wrangler deploy --dry-run --outdir /tmp/wout`. **Wichtig:** Die GitHub-App „Cloudflare Workers and Pages“ (GitHub › Profil › Settings › Applications › Installed GitHub Apps › Configure) muss Zugriff auf NomadGirl haben, sonst löst ein Push keinen Build aus (07.11.2026 behoben). An jedem Commit hängt dann eine Rückmeldung von Workers Builds. Deploy geht nicht aus der Arbeitsumgebung (Cloudflare-API gesperrt), nur über den Push. Die Werkstatt speichert online vorerst im Browser (localStorage); „Speichern = Commit“ kommt wie bei NomadTactics über `worker/index.js`, Cloudflare Access und das Geheimnis `GITHUB_TOKEN` im Dashboard.
 
 ## Stand
 
