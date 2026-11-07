@@ -47,6 +47,7 @@ export class PlayScene extends Phaser.Scene {
       if (this.data_.camp?.fire?.look) ids.add(this.data_.camp.fire.look);
       if (this.data_.camp?.fire?.sit?.look) ids.add(this.data_.camp.fire.sit.look);
       if (this.data_.camp?.chest?.look) ids.add(this.data_.camp.chest.look);
+      for (const u of this.box?.save.rig.units || []) if (u.kind === 'container' && this.data_.containers?.[u.id]?.look) ids.add(this.data_.containers[u.id].look);
       if (this.data_.camp?.ground?.tiles) ids.add(this.data_.camp.ground.tiles);
       const S = this.data_.camp?.sound || {};
       for (const id of [S.wind, S.fire, ...(S.gusts || [])]) if (id) ids.add(id);

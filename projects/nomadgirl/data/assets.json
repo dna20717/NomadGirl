@@ -891,5 +891,20 @@
   "derivedFrom": "leyla_sit_game_side_source",
   "date": "07.11.2026",
   "description": "Pixel-Art: setzt sich (Frames 1–6), zockt auf dem Handheld (7–13, Schleife), steht auf (14–17). Im Camp am Lagerfeuer."
+ },
+ "trailer_modular": {
+  "name": "Modularer Wohnanhänger",
+  "kind": "animation",
+  "file": "assets/rig/trailer_modular.png",
+  "frameSize": [256, 256],
+  "frames": 1,
+  "fps": 0,
+  "loop": false,
+  "origin": [128, 204],
+  "height": 768,
+  "flip": true,
+  "source": "KI (Pixel-Art von Daniel, 07.11.2026)",
+  "date": "07.11.2026",
+  "description": "Anhänger mit aufgeklappter Längsseite, innen leer (Platz für Werkstätten), Rampe unten. Deichsel im Bild links; „Schaut nach links“ an, damit sie im Camp zum Van zeigt. Ankerpunkt = Reifen am Boden, im Spiel ×3."
  }
 }

@@ -391,7 +391,9 @@ export const AREAS = {
     template: { name: 'Neuer Container', kind: 'crate', places: 1, weight: 300, value: 100 },
     row: x => `${label(CONTAINER_KINDS, x.kind)} · ${x.places ?? 0} ${x.places === 1 ? 'Platz' : 'Plätze'} · ${x.weight ?? 0} kg`,
     sections: [{ title: 'Container', fields: [NAME, LOOK, select('kind', 'Art', CONTAINER_KINDS), num('places', 'Werkstatt-Plätze', { min: 1, max: 3 }),
-      num('weight', 'Gewicht', { unit: 'kg', min: 0 }), bool('stackable', 'Stapelbar'), VALUE, DESCRIPTION] }],
+      num('weight', 'Gewicht', { unit: 'kg', min: 0 }), bool('stackable', 'Stapelbar'), VALUE, DESCRIPTION] },
+      { title: 'Innenraum im Camp', fields: [range('inside.x', 'Innenraum von – bis', { unit: 'Bildpixel', hint: 'Waagrecht im Bild des Aussehens (ungespiegelt). Die Werkstätten teilen sich diese Breite' }),
+        range('inside.y', 'Innenraum oben – Boden', { unit: 'Bildpixel', hint: 'Der Boden ist eine Plattform: Leyla kann hineinspringen' }), bool('flip', 'Gespiegelt', { hint: 'Zusätzlich zu „Schaut nach links“ des Assets' })] }],
   },
   workshops: {
     name: 'Werkstätten', singular: 'Werkstatt', icon: 'factory', file: 'data/workshops.json', kind: 'catalog', groupBy: { key: 'function', options: WORKSHOP_FUNCTIONS },

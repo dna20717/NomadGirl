@@ -26,9 +26,20 @@ export function campLayout(D, save, T = 64) {
   const units = [];
   for (const u of [...save.rig.units].reverse()) {
     if (u.kind === 'tractor') continue;
-    const def = D.containers?.[u.id] || {}, places = def.places || 1, w = places * pw * T;
-    units.push({ ...u, def, x0: x, x1: x + w, places, cell: pw * T });
-    x += w + gap * T;
+    const def = D.containers?.[u.id] || {}, places = def.places || 1, A = D.assets?.[def.look];
+    if (A?.frameSize && def.inside?.x && def.inside?.y) {
+      // a picture with an open side (Container › Aussehen + Innenraum): the workshops sit in its interior
+      const [fw, fh] = A.frameSize, k = (A.height || fh) / fh, [ox, oy] = A.origin || [fw / 2, fh], flip = !!A.flip !== !!def.flip, w = fw * k;
+      const ix = v => flip ? fw - v : v, a = ix(def.inside.x[0]), b = ix(def.inside.x[1]), in0 = x + Math.min(a, b) * k, in1 = x + Math.max(a, b) * k;
+      const ground = (H - 2) * T;
+      units.push({ ...u, def, x0: x, x1: x + w, places, cell: (in1 - in0) / places, in0, inTop: ground - (oy - def.inside.y[0]) * k, floorY: ground - (oy - def.inside.y[1]) * k,
+        sprite: { key: def.look, k, flip, ox: (flip ? fw - ox : ox) / fw, oy: oy / fh, cx: x + (flip ? fw - ox : ox) * k } });
+      x += w;
+    } else {
+      const w = places * pw * T;
+      units.push({ ...u, def, x0: x, x1: x + w, places, cell: pw * T, in0: x });
+      x += w + gap * T;
+    }
   }
   const vanCol = Math.ceil((x + vanLeft) / T - 0.5), doorX = (vanCol + 0.5) * T;
   const tractor = save.rig.units.find(u => u.kind === 'tractor');
@@ -184,6 +195,7 @@ export class Camp {
     const g = s.make.graphics({}, false), wall = col(R.wall || '#4a4f5a'), inside = col(R.inside || '#2b2233');
     const x1 = this.geo.vanLeft;
     for (const u of this.geo.units) {
+      if (u.sprite) { this.drawPictureUnit(g, u, R); continue; }
       const top = y - h, kind = u.def.kind;
       // shell: back wall (inside), roof, end walls, floor, wheels
       g.fillStyle(inside).fillRect(u.x0, top, u.x1 - u.x0, h);
@@ -202,16 +214,14 @@ export class Camp {
         // window with warm light at night
         g.fillStyle(0x0d0a12).fillRect(cx + cw / 2 - 26, top + 22, 52, 34).fillStyle(col(R.light || '#ffcf7a')).fillRect(cx + cw / 2 - 22, top + 26, 44, 26);
         this.light(cx + cw / 2, top + 40, 220, R.light || '#ffcf7a', 0.5);
-        const store = def.grid && `store:${this.box.save.rig.units.indexOf(this.box.save.rig.units.find(x => x.id === u.id && x.workshops.includes(w)))}:${w.at}`;
-        this.hotspots.push({ x: cx + cw / 2, w: cw / 2, name: def.name || w.id, hint: store ? 'Öffnen' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id) });
-        if (R.labels !== false) s.add.text(cx + cw / 2, top - 34, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '26px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 1).setDepth(-14);
+        this.workshopHotspot(u, w, def, cx, cw, top - 60);
       }
       // empty places
       for (let i = 0; i < u.places; i++) if (!u.workshops.some(w => i >= w.at && i < w.at + (D.workshops?.[w.id]?.places || 1)))
         g.fillStyle(0x5b5266, 0.5).fillRect(u.x0 + i * u.cell + u.cell / 2 - 30, y - 40, 60, 4);
     }
-    // tow bar to the van
-    if (this.geo.units.length) { const last = this.geo.units[this.geo.units.length - 1]; g.fillStyle(0x30363d).fillRect(last.x1 + 12, y - 34, x1 - last.x1 + 20, 8); }
+    // tow bar to the van (pictures bring their own)
+    if (this.geo.units.length && !this.geo.units[this.geo.units.length - 1].sprite) { const last = this.geo.units[this.geo.units.length - 1]; g.fillStyle(0x30363d).fillRect(last.x1 + 12, y - 34, x1 - last.x1 + 20, 8); }
     if (this.geo.units.length) {
       const key = 'camp_rig';
       if (s.textures.exists(key)) s.textures.remove(key);
@@ -219,6 +229,31 @@ export class Camp {
       s.add.image(0, 0, key).setOrigin(0).setDepth(-21);
     }
     g.destroy();
+  }
+
+  // a container with a picture (e.g. Daniel's trailer with the side folded open): picture behind, furniture in its interior,
+  // the interior floor is a platform (jump in), workshops are used with E from the ground or from inside
+  drawPictureUnit(g, u, R) {
+    const s = this.scene, D = this.D, S = u.sprite;
+    if (!s.textures.exists(S.key)) return;
+    s.textures.get(S.key).setFilter(NEAREST());
+    s.add.image(S.cx, this.ground, S.key, 0).setOrigin(S.ox, S.oy).setScale(S.k).setFlipX(S.flip).setDepth(-22);
+    const top = u.inTop, floor = u.floorY, h = floor - top;
+    for (const w of u.workshops) {
+      const def = D.workshops?.[w.id] || {}, cx = u.in0 + w.at * u.cell, cw = (def.places || 1) * u.cell;
+      furniture(g, def.function, cx, floor, cw, h, R.light || '#ffcf7a');
+      this.light(cx + cw / 2, top + h * 0.35, 200, R.light || '#ffcf7a', 0.45);
+      this.workshopHotspot(u, w, def, cx, cw, top + 8);
+    }
+    const z = s.add.zone((u.in0 + u.in0 + u.cell * u.places) / 2, floor + 8, u.cell * u.places, 16);
+    s.platforms.add(z);
+    Object.assign(z.body.checkCollision, { down: false, left: false, right: false });
+  }
+  workshopHotspot(u, w, def, cx, cw, labelY) {
+    const R = this.C.rig || {}, units = this.box.save.rig.units;
+    const store = def.grid && `store:${units.indexOf(units.find(x => x.id === u.id && x.workshops.includes(w)))}:${w.at}`;
+    this.hotspots.push({ x: cx + cw / 2, w: cw / 2, name: def.name || w.id, hint: store ? 'Öffnen' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id) });
+    if (R.labels !== false) this.scene.add.text(cx + cw / 2, labelY, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '24px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 0).setDepth(-14);
   }
 
   light(x, y, r, color, base, h = r) {
@@ -460,7 +495,7 @@ export class Camp {
       return;
     }
     let best = null, bd = Infinity;
-    if (l.alive && l.body.blocked.down && l.feet > this.ground - 10)
+    if (l.alive && l.body.blocked.down)
       for (const h of this.hotspots) { const d = Math.abs(l.x - h.x); if (d <= Math.max(h.w || 0, range) && d < bd) { best = h; bd = d; } }
     const hint = h => typeof h.hint === 'function' ? h.hint() : h.hint;
     const text = best && `${hint(best)} · ${best.name}`;
