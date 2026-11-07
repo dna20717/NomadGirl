@@ -415,15 +415,21 @@ export class Leyla {
     let armedFrame = null, armedFrom = 1;
     // drawing: the draw animation (from "Ziehen ab Frame"), then stretching the arms out (aim), then that pose is held
     if (this.armed === 'drawing') {
-      const split = L.draw && L.aim ? 0.68 : L.draw ? 1 : 0;
-      if (this.drawP < split) { name = '@' + L.draw; armedFrame = this.drawP / split; armedFrom = this.d.armed?.drawFromFrame ?? 1; }
-      else if (L.aim) { name = '@' + L.aim; armedFrame = split < 1 ? (this.drawP - split) / (1 - split) : 1; }
+      // drawing ends with the gun at the chest (Daniel: arms only stretch out to shoot)
+      if (L.draw) { name = '@' + L.draw; armedFrame = this.drawP; armedFrom = this.d.armed?.drawFromFrame ?? 1; }
     } else if (this.armed === 'on') {
-      const shot = L.shoot && time - (this.shotAt ?? -1e9) < this.lookDur(walking && L.shootWalk ? L.shootWalk : L.shoot);
-      if (this.reloading && (L.reload || L.reloadWalk)) { name = '@' + (walking && L.reloadWalk ? L.reloadWalk : L.reload || L.reloadWalk); armedFrame = Math.min(1, (time - this.reloading.at) / this.reloading.dur); }
-      else if (shot) name = '@' + (walking && L.shootWalk ? L.shootWalk : L.shoot);
+      const AR = this.d.armed || {}, ext = AR.extendTime ?? 100, hold = AR.aimHold ?? 900, lower = AR.lowerTime ?? 220;
+      const since = time - (this.shotAt ?? -1e9), extending = this.extendAt != null && time - this.extendAt < ext;
+      const shot = L.shoot && !extending && since < (this.extendAt != null && this.extendAt === this.shotAt ? ext : 0) + this.lookDur(walking && L.shootWalk ? L.shootWalk : L.shoot);
+      const out = time - (this.aimUntil ?? -1e9);   // < 0: arms still stretched out after shooting / reloading, then they come down
+      if (this.reloading && (L.reload || L.reloadWalk)) { name = '@' + (walking && L.reloadWalk ? L.reloadWalk : L.reload || L.reloadWalk); armedFrame = Math.min(1, (time - this.reloading.at) / this.reloading.dur); this.aimUntil = this.reloading.at + this.reloading.dur + hold; }
+      else if (extending && L.aim) { name = '@' + L.aim; armedFrame = (time - this.extendAt) / ext; }   // gun from the chest up into the aim, then the shot
+      else if (shot) { name = '@' + (walking && L.shootWalk ? L.shootWalk : L.shoot); this.aimUntil = time + hold; }
       else if (walking && L.aimWalk) name = '@' + L.aimWalk;
-      else { name = '@' + (L.aim || L.idle); armedFrame = 1; }   // gun held out: the last frame of "stretch out"
+      else if (out < 0 && L.aim) { name = '@' + L.aim; armedFrame = 1; }
+      else if (out < lower && L.aim) { name = '@' + L.aim; armedFrame = 1 - out / lower; }
+      else if (L.draw) { name = '@' + L.draw; armedFrame = 1; armedFrom = AR.drawFromFrame ?? 1; }   // ready: gun at the chest
+      else { name = '@' + (L.aim || L.idle); armedFrame = 1; }
       if (shot && this.shotSeen !== this.shotAt) { this.shotSeen = this.shotAt; this.restartLook = true; }
     }
     // melee: the attack runs over its time (frames from "ab Frame"), charging holds the crouch loop of the heavy attack
@@ -515,10 +521,12 @@ export class Leyla {
     }
     const c = this.charging;
     if (!c) return;
-    if (this.state !== 'normal' || !grounded) { this.charging = null; this.sprite.clearTint(); return; }
+    if (this.state !== 'normal' || !grounded) { this.charging = null; this.sprite.clearTint(); this.chargeEffects(time, -1); return; }
     const held = time - c.at;
     if (!c.ready && held >= (M.chargeTime ?? 3000)) { c.ready = true; this.scene.fx.sparks(this.x, this.chest, 0xffd27a, 14); this.scene.drone?.react('alert'); }
+    this.chargeEffects(time, held);
     if (input.melee.down) return;
+    this.chargeEffects(time, -1);
     // released: heavy when charged, otherwise light; walking picks the walking version
     this.charging = null; this.sprite.clearTint();
     const walking = Math.abs(b.velocity.x) > 20, heavy = c.ready;
@@ -529,6 +537,17 @@ export class Leyla {
       power: heavy ? { damage: (M.heavyDamage ?? 250) / 100, range: M.heavyRange ?? 160, knockback: M.heavyKnockback ?? 220, heavy: true } : null };
     this.meleeReady = time + this.attack.dur;
     this.attackPose = time + this.attack.dur;   // keeps facing the way she strikes
+  }
+
+  // charging: a glow grows round her, sparks are pulled in; when it is ready the glow turns hot and pulses (Leyla › Nahkampf › Aufladen-Licht)
+  chargeEffects(time, held) {
+    const s = this.scene, M = this.d.melee || {}, fx = s.fx;
+    if (held < (M.chargeAfter ?? 250)) { this.chargeGlow?.destroy(); this.chargeGlow = null; return; }
+    const p = Math.min(1, held / (M.chargeTime ?? 3000)), ready = this.charging?.ready, x = this.x, y = this.feet - this.height * 0.45;
+    this.chargeGlow ??= s.add.image(x, y, fx.glowKey()).setBlendMode(Phaser.BlendModes.ADD).setDepth(9.5);
+    const pulse = ready ? 0.85 + 0.15 * Math.sin(time / 60) : 1, r = (M.chargeGlow ?? 170) * (0.45 + 0.55 * p) * pulse;
+    this.chargeGlow.setPosition(x, y).setDisplaySize(r * 2, r * 2.2).setTint(ready ? 0xffe9a0 : 0x3fe0d0).setAlpha((ready ? 0.75 : 0.25 + 0.4 * p) * pulse);
+    if (time >= (this.nextGather || 0)) { this.nextGather = time + (ready ? 40 : 90 - 50 * p); fx.gather(x, y, ready ? 0xffd27a : 0x7ff6ff, 90 + 70 * p); }
   }
 
   // ---------- magazine and reloading (Waffen › Magazin, Nachladen dauert; R lädt nach, leer = automatisch) ----------

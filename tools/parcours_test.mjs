@@ -97,8 +97,8 @@ v = await page.evaluate(() => {
   return [...seen];
 });
 check('Zwei Idles im Wechsel', v.some(k => k?.startsWith('leyla_idle_side')) && v.includes('leyla_idle2_side'), v);
-v = await page.evaluate(() => { const n = nomad, sp = game.scene.getScene('play').leyla.sprite, out = []; P.tp(20, 18); n.step(60); out.push(sp.texture.key); n.step(2, [], ['ranged']); out.push(sp.texture.key); n.step(40, ['right']); out.push(sp.texture.key); return out; });
-check('Waffe: zieht im Stand, schießt, steckt beim Rennen weg', v[0] === 'leyla_aim_side' && v[1] === 'leyla_shoot_side' && !v[2].includes('aim') && !v[2].includes('shoot'), v);
+v = await page.evaluate(() => { const n = nomad, sp = game.scene.getScene('play').leyla.sprite, out = []; P.tp(20, 18); n.step(60); out.push(sp.texture.key); n.step(2, [], ['ranged']); n.step(8); out.push(sp.texture.key); n.step(40, ['right']); out.push(sp.texture.key); return out; });
+check('Waffe: zieht im Stand, schießt, steckt beim Rennen weg', v[0] === 'leyla_draw_side' && v[1] === 'leyla_shoot_side' && !v[2].includes('aim') && !v[2].includes('shoot'), v);
 // hard landing only after a deep fall (or a long jump), a small hop lands normally
 v = await page.evaluate(() => {
   const n = nomad, seen = new Set(); P.tp(13, 9);

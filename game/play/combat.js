@@ -38,7 +38,9 @@ export class Combat {
     if (leyla.mag <= 0) { s.fx.text(leyla.x, leyla.feet - leyla.height - 20, 'leer', { color: '#8b949e', size: 36, rise: 30 }); return; }
     leyla.mag--;
     leyla.attackPose = time + 120;
-    leyla.shotAt = time;
+    // from the chest-high ready pose the arms first stretch out (Leyla › Waffe ziehen › Ausstrecken), the shot itself leaves right away
+    const lowered = leyla.armed === 'on' && time > (leyla.aimUntil ?? -1e9) && Math.abs(leyla.body.velocity.x) <= 20;
+    leyla.shotAt = time; leyla.extendAt = lowered ? time : null;
     // with the gun drawn the shot leaves the muzzle (Leyla › Waffe ziehen › Mündung), the picture brings its own muzzle flash
     const A = leyla.armed === 'on', AR = leyla.d.armed || {}, M = AR.muzzle || [100, 146], k = leyla.size.h / 168;
     const f = leyla.facing, x = leyla.x + f * (A ? M[0] * k : leyla.size.w * 0.8), y = leyla.feet - (A ? M[1] * k : leyla.height * 0.62), speed = w.projectileSpeed ?? 1600;
