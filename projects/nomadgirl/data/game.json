@@ -15,5 +15,6 @@
  },
  "testRoom": "testraum",
  "tiles": {"platform": "platform_metal"},
- "camera": {"zoom": 1, "lookAhead": 160, "follow": 0.12}
+ "camera": {"zoom": 1, "lookAhead": 160, "follow": 0.12},
+ "spawn": {"enabled": true, "look": "van", "offset": [0, 0], "layer": "behindWalls"}
 }

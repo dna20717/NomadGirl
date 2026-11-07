@@ -235,5 +235,24 @@
   "derivedFrom": "drone_concept",
   "date": "07.11.2026",
   "description": "Ein Frame pro Stimmung: 0 normal, 1 fröhlich, 2 überrascht, 3 gelangweilt, 4 alarmiert, 5 fragend, 6 wütend, 7 schläft, 8 k.o., 9 scannt, 10 schwitzt, 11 Boost. Ankerpunkt = Mitte der Drohne."
+ },
+ "van_source": {
+  "name": "Leylas Van (Original)",
+  "kind": "source",
+  "file": "assets/vehicles/van_source.png",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "Van von der Seite mit offener Schiebetür, 1774 × 887 px, Pixel-Art."
+ },
+ "van": {
+  "name": "Leylas Van",
+  "kind": "image",
+  "file": "assets/vehicles/van.png",
+  "origin": [435, 413],
+  "height": 350,
+  "source": "Code (zugeschnitten, halbe Größe)",
+  "derivedFrom": "van_source",
+  "date": "07.11.2026",
+  "description": "Spawn-Punkt: Ankerpunkt = Mitte der Schiebetür auf dem Boden, dort steht Leyla beim Start."
  }
 }

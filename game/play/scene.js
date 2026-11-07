@@ -28,6 +28,7 @@ export class PlayScene extends Phaser.Scene {
     for (const e of Object.values(this.data_.enemies || {})) if (e.look) ids.add(e.look);
     for (const id of Object.values(this.data_.game?.tiles || {})) ids.add(id);
     if (this.data_.drone?.look) ids.add(this.data_.drone.look);
+    if (this.data_.game?.spawn?.look) ids.add(this.data_.game.spawn.look);
     for (const id of [...ids]) if (A[id]?.mirror) ids.add(A[id].mirror);   // drawn opposite direction
     for (const id of ids) {
       const a = A[id];
@@ -114,6 +115,14 @@ export class PlayScene extends Phaser.Scene {
     this.rope = this.add.graphics().setDepth(9);
 
     const start = R.start || [2, R.h - 2];
+    // spawn point (Leyla's van): decoration, its anchor sits on Leyla's start
+    const S = this.data_.game?.spawn, sp = S?.enabled !== false && S?.look && this.assetInfo(S.look);
+    if (sp) {
+      const [ox, oy] = S.offset || [0, 0];
+      this.spawnArt = (sp.anim ? this.add.sprite(0, 0, sp.key).play(sp.anim) : this.add.image(0, 0, sp.key))
+        .setPosition((start[0] + 0.5) * T + ox, (start[1] + 1) * T + oy).setOrigin(sp.ox, sp.oy).setScale(sp.scale)
+        .setFlipX(!!S.flip).setDepth(S.layer === 'front' ? 5 : -20);
+    }
     this.leyla = new Leyla(this, this.data_, [(start[0] + 0.5) * T, (start[1] + 1) * T]);
     this.drone = new Drone(this, this.data_);
     this.physics.add.collider(this.leyla.box, this.solids);
