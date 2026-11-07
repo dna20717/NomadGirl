@@ -1,18 +1,69 @@
-// Sprite preview for the workshop: plays a sprite strip (frames side by side) on a canvas.
+// Asset previews for the workshop: animations (sprite strips, frames side by side) play on a canvas,
+// images, references and originals (also animated GIFs) show as pictures with a full-size view. Thumbnails for lists and the gallery.
 // Views: "Nah" (frame fitted), "1:1" (original pixels), "Im Spiel" (game viewport with tile grid at the game resolution,
 // drawn like the game will: with pixelArt the sprite is scaled without smoothing). Settings live in w.spriteView and survive redraws.
-import { el } from '../ui.js';
+import { el, openDialogue } from '../ui.js';
 import { icon } from '../icons.js';
 
 const VIEWS = [['near', 'Nah'], ['native', '1:1'], ['game', 'Im Spiel']];
 const BACKS = [['check', 'Karo'], ['dark', 'Dunkel'], ['light', 'Hell']];
 
-// Images are loaded once per URL (fetch + blob also works in the artifact sandbox)
-function image(w, file) {
+// Files are loaded once per URL as blob (fetch + blob also works in the artifact sandbox)
+function blob(w, file) {
   const url = new URL(file, w.basis).href;
-  w.images = w.images || new Map();
-  if (!w.images.has(url)) w.images.set(url, fetch(url, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.blob(); }).then(b => createImageBitmap(b)));
-  return w.images.get(url);
+  w.blobs = w.blobs || new Map();
+  if (!w.blobs.has(url)) w.blobs.set(url, fetch(url).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.blob(); }));
+  return w.blobs.get(url);
+}
+function image(w, file) {
+  w.bitmaps = w.bitmaps || new Map();
+  if (!w.bitmaps.has(file)) w.bitmaps.set(file, blob(w, file).then(b => createImageBitmap(b)));
+  return w.bitmaps.get(file);
+}
+function objectUrl(w, file) {
+  w.urls = w.urls || new Map();
+  if (!w.urls.has(file)) w.urls.set(file, blob(w, file).then(b => URL.createObjectURL(b)));
+  return w.urls.get(file);
+}
+const failed = (file, e) => el('p', { class: 'ng-inline error' }, icon('error', 14), ` ${file} lässt sich nicht laden (${e.message})`);
+
+// Preview of any asset: animation → player, everything else → picture
+export function assetPreview(w, a) {
+  return a?.kind === 'animation' ? spritePreview(w, a) : picturePreview(w, a);
+}
+
+// Picture (image, reference, original): fitted, background switch, tap opens the full size
+export function picturePreview(w, a) {
+  const v = w.spriteView = w.spriteView || { view: 'near', back: 'check', anchor: true, playing: true, frame: 0 };
+  const box = el('div', { class: 'ng-sprite-stage picture back-' + v.back });
+  const seg = el('span', { class: 'ed-segment' }, ...BACKS.map(([k, n]) => el('button', { class: v.back === k ? 'on' : '', onclick: () => { v.back = k; w.draw(); } }, n)));
+  const info = el('span', { class: 'ng-sprite-info' });
+  const wrap = el('div', { class: 'ng-sprite' }, el('div', { class: 'ng-sprite-bar' }, info, el('span', { class: 'ed-grow' }), seg), box);
+  if (!a?.file) { box.append(el('p', { class: 'ed-small' }, 'Datei eintragen, dann erscheint hier die Vorschau.')); return wrap; }
+  objectUrl(w, a.file).then(src => {
+    const img = el('img', { src, alt: a.name || a.file, class: 'ng-picture', title: 'Antippen: Originalgröße' });
+    img.addEventListener('load', () => { info.textContent = `${img.naturalWidth} × ${img.naturalHeight} px · antippen für Originalgröße`; });
+    img.addEventListener('click', () => openDialogue({ title: a.name || a.file, icon: 'image', wide: true, class: 'ng-lightbox', content: [el('div', { class: 'ng-lightbox-box back-' + v.back }, el('img', { src, alt: a.name || a.file }))] }));
+    box.append(img);
+  }).catch(e => box.append(failed(a.file, e)));
+  return wrap;
+}
+
+// Small picture for lists and the gallery: first frame of an animation, otherwise the image itself
+export function assetThumb(w, a, size = 28) {
+  const box = el('span', { class: 'ng-thumb', style: `--s:${size}px` });
+  if (!a?.file) return box;
+  if (a.kind === 'animation') {
+    const [fw, fh] = a.frameSize || [0, 0];
+    if (!fw || !fh) return box;
+    image(w, a.file).then(img => {
+      const c = el('canvas'), k = Math.min(size * 2 / fh, size * 2 / fw);
+      c.width = Math.max(1, Math.round(fw * k)); c.height = Math.max(1, Math.round(fh * k));
+      c.getContext('2d').drawImage(img, 0, 0, fw, fh, 0, 0, c.width, c.height);
+      box.append(el('img', { src: c.toDataURL(), alt: '' }));   // as <img> so it scales like the other thumbnails
+    }).catch(() => box.classList.add('broken'));
+  } else objectUrl(w, a.file).then(src => box.append(el('img', { src, alt: '' }))).catch(() => box.classList.add('broken'));
+  return box;
 }
 
 export function spritePreview(w, s) {
@@ -71,7 +122,7 @@ export function spritePreview(w, s) {
       raf = requestAnimationFrame(draw);
     };
     raf = requestAnimationFrame(draw);
-  }).catch(e => box.replaceChildren(el('p', { class: 'ng-inline error' }, icon('error', 14), ` ${s.file} lässt sich nicht laden (${e.message})`)));
+  }).catch(e => box.replaceChildren(failed(s.file, e)));
   return wrap;
 }
 

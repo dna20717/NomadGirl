@@ -4,22 +4,22 @@
  "invulnerableAfterHit": 600,
  "description": "Schrottsammlerin aus den Wastelands rund um BigCityDelta. Wohnt im Rig, plündert, was andere liegen lassen, und kocht erstaunlich gut.",
  "movement": {
-  "walkSpeed": 120,
-  "runSpeed": 220,
-  "acceleration": 1400,
-  "jumpVelocity": 560,
+  "walkSpeed": 240,
+  "runSpeed": 440,
+  "acceleration": 2800,
+  "jumpVelocity": 1120,
   "airJumps": 1,
   "coyoteTime": 100,
   "jumpBuffer": 120,
-  "dashDistance": 140,
+  "dashDistance": 280,
   "dashCooldown": 600,
   "dashInvulnerable": true,
-  "slideSpeed": 300,
+  "slideSpeed": 600,
   "slideDuration": 350,
-  "climbSpeed": 90,
-  "swingRope": 160,
+  "climbSpeed": 180,
+  "swingRope": 320,
   "swingBoost": 20
  },
  "loadout": {"melee": "rohrzange", "ranged": "nagelpistole", "backpack": "schulranzen"},
- "sprites": {"idle": "leyla_idle"}
+ "look": {"idle": "leyla_idle", "reference": "leyla_sheet"}
 }

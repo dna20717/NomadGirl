@@ -38,16 +38,14 @@ workshop.html          Werkstatt (Daten-Editor)
 engine/schema.js       Datenschema: alle Bereiche und Felder (das Herz)
 engine/project.js      Laden, Prüfen, Verwendungen, Umbenennen, Löschen (Browser und Node)
 engine/image.js, font.js   Bild und Pixelschrift (aus NomadTactics, für browser_loader)
-game/workshop/         Werkstatt: workshop.js (Gerüst + Seiten aus dem Schema), summaries.js (abgeleitete Werte, Vorschauen), sprite_preview.js (Sprite-Animation: Nah, 1:1, Im Spiel), workshop.css
+game/workshop/         Werkstatt: workshop.js (Gerüst + Seiten aus dem Schema), summaries.js (abgeleitete Werte, Vorschauen), asset_preview.js (Animation, Bild, Großansicht, Vorschaubilder), workshop.css
 game/ui.js, ui.css, basis.css, icons.js, store.js, browser_loader.js, font/   gemeinsamer Kern (Kopie aus NomadTactics)
 tools/ng.js            Kommandozeile
-tools/scaffolds/       Gerüst der Beispieldaten
 projects/nomadgirl/    Spieldaten (project.json + data/*.json)
 docs/design.md         Game Design Document
 docs/glossary.md       Deutsch → Englisch
 docs/assets.md         alle Assets mit Herkunft (KI/Code)
-art/                   Originale und Referenzen (z. B. Character Sheet), werden nicht ausgeliefert
-projects/nomadgirl/assets/   Spiel-Grafiken (Sprite-Streifen)
+projects/nomadgirl/assets/   alle Grafiken: Animationen, Bilder, Referenzen, Originale (nach Figur/Thema in Unterordnern, z. B. leyla/)
 output/                Bilder vom Werkstatt-Test (nicht im Git)
 ```
 
@@ -55,17 +53,19 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 
 - **Alles kommt aus `engine/schema.js`.** Ein Bereich (`AREAS.<id>`) ist entweder ein **Katalog** (Einträge nach ID: Waffen, Gegenstände …) oder **einzeln** (ein Objekt: Leyla, Reisen …). Er nennt seine Datei, Abschnitte mit Feldern, eine Vorlage für neue Einträge, eine Kurzzeile für Listen (`row`), optional eine Gruppierung (`groupBy`) und eigene Prüfungen (`check`).
 - **Feldtypen:** text, textarea, number, checkbox, color, select, multi, ref (Verweis), refs (Liste von Verweisen), size ([b, h]), point ([x, y]), range ([min, max]), table (Zeilen mit Spalten). Schlüssel sind Punkt-Pfade (`movement.runSpeed`).
-- **Neuer Aspekt des Spiels** = neuer Bereich oder neues Feld im Schema, in `GROUPS` einsortieren, Beispieldaten anlegen (`ng new …` oder Gerüst). Werkstatt, Prüfung, Umbenennen, Löschen und `ng` können ihn dann sofort. Eigene Ansichten (abgeleitete Werte, Vorschauen) in `game/workshop/summaries.js`.
+- **Neuer Aspekt des Spiels** = neuer Bereich oder neues Feld im Schema, in `GROUPS` einsortieren, Beispieldaten anlegen (`ng new …`). Werkstatt, Prüfung, Umbenennen, Löschen und `ng` können ihn dann sofort. Eigene Ansichten (abgeleitete Werte, Vorschauen) in `game/workshop/summaries.js`.
 - **Prüfung** (`validateProject`): Verweise, Pflichtfelder, Zahlenbereiche, Auswahlwerte, die `check`-Regeln der Bereiche und Querprüfungen (Gegenstände ohne Verwendung, POIs ohne Ort).
 - **Umbenennen/Löschen** ziehen Verweise in allen Bereichen mit bzw. räumen sie auf.
 - **Speichern:** wie die alte NomadTactics-Werkstatt über `game/store.js` (Artifact-Datenbank, sonst localStorage `nomadgirl-drafts:`). Eine Web-Werkstatt mit „Speichern = Commit“ (Cloudflare Worker wie bei NomadTactics) ist der nächste Schritt, wenn Daniel das will.
 - Oberflächen-Regeln wie in NomadTactics (`CLAUDE.md` dort): nur `--ui-*`-Tokens, Inter + VT323, Dialoge über `openDialogue`, Löschen rot mit Rückgängig, Hauptaktion gold.
 
-## Grafik
+## Assets und Fidelity
 
-- **Sprites** (Bereich „Grafik › Sprites“, `data/sprites.json`): PNG-Streifen unter `projects/nomadgirl/assets/`, Frames gleich groß nebeneinander. Felder: Datei, Frame-Größe, Frames, fps, Wiederholen, Ankerpunkt (Füße, px im Frame), Höhe im Spiel, Herkunft. Leyla verweist in „Grafik“ auf ihre Animationen (`sprites.idle` … `sprites.hurt`).
-- **Vorschau** in der Werkstatt (Sprite- und Leyla-Inspektor): Nah, 1:1 und „Im Spiel“ (Spielauflösung mit Kachelraster und Boden, mit `pixelArt` ohne Glättung wie im Spiel); Abspielen/Anhalten, Frame für Frame, Ankerpunkt.
-- **Neues Sprite:** GIF/Frames von Daniel → Original nach `art/<figur>/`, mit Code zu einem Streifen zuschneiden (gleiche Box für alle Frames, Füße auf derselben Zeile), Eintrag in `sprites` + Zeile in `docs/assets.md`. `ng check` prüft, ob die Datei existiert.
+- **Fidelity (Daniel, 07.11.2026): so viel wie geht.** Spielauflösung 1920×1080, Kacheln 64 px, `pixelArt` aus (die KI-Grafiken sind hochaufgelöst und werden geglättet skaliert), Leyla 256 px hoch. Alle Pixelwerte (Tempo, Sprungkraft, Reichweiten …) sind auf diesen Maßstab ausgelegt.
+- **Bereich „Assets“** (ganz oben in der Werkstatt, `data/assets.json`): jede Grafik einmal, mit Art (`animation` = PNG-Streifen mit gleich großen Frames nebeneinander, `image`, `reference` = Konzept/Character Sheet, `source` = Original wie ein GIF), Datei, bei Animationen Frame-Größe, Frames, fps, Wiederholen, dazu Ankerpunkt (Füße), Höhe im Spiel, Herkunft (`source`, `derivedFrom`, `date`). Abschnitte mit `when` erscheinen nur bei passender Art. Die Werkstatt zeigt Assets als Galerie mit Vorschaubildern.
+- **Entitäten verweisen auf Assets:** Feld `look` (Aussehen) bei Rucksäcken, Waffen, Gegnern, Gegenständen, Zugmaschinen, Containern, Werkstätten, Rig-Teilen, Companions, POIs, Räumen, Orten und Encountern; Leyla hat `look.idle` … `look.hurt` und `look.reference`. Jeder Inspektor zeigt oben „Aussehen“ mit Vorschau (bei mehreren Verweisen umschaltbar), Listen zeigen kleine Vorschaubilder.
+- **Vorschau:** Animationen mit Nah, 1:1 und „Im Spiel“ (Spielauflösung mit Kachelraster und Boden), Abspielen/Anhalten, Frame für Frame, Ankerpunkt; Bilder angepasst, antippen öffnet die Originalgröße. Hintergrund Karo, Dunkel, Hell.
+- **Neues Asset:** Datei nach `projects/nomadgirl/assets/<figur>/`; Animationen aus GIF/Frames mit Code zu einem Streifen zuschneiden (gleiche Box für alle Frames, Füße auf derselben Zeile), Original als `source` daneben behalten. Eintrag in `assets` (mit `derivedFrom`) + Zeile in `docs/assets.md`. `ng check` prüft, ob jede Datei existiert.
 
 ## Kommandozeile `ng`
 
@@ -77,5 +77,6 @@ Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei j
 
 ## Stand
 
-- 07.11.2026: Leyla idle (8 Frames, KI) als erstes Sprite, Bereich „Sprites“ mit Vorschau, Character Sheet als Referenz.
-- 07.11.2026: Repo-Gerüst, Werkstatt mit 21 Bereichen in 6 Gruppen, Beispieldaten (Platzhalter nach Gefühl), `ng`, Tests. Das Spiel selbst (Phaser 3) kommt mit dem MVP „Movement & Kampf“.
+- 07.11.2026: Bereich „Assets“ (Galerie, Vorschauen, `look` an allen Entitäten), Fidelity 1920×1080 / Kachel 64 / Leyla 256 px.
+- 07.11.2026: Leyla idle (8 Frames, KI) als erstes Sprite, Character Sheet als Referenz.
+- 07.11.2026: Repo-Gerüst, Werkstatt mit 21 Bereichen in 6 Gruppen (jetzt 22 in 7), Beispieldaten (Platzhalter nach Gefühl), `ng`, Tests. Das Spiel selbst (Phaser 3) kommt mit dem MVP „Movement & Kampf“.

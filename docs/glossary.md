@@ -38,3 +38,9 @@ Neuer Code nimmt die Wörter aus dieser Liste. Die Grundbegriffe (Werkstatt, Pr�
 | Zugkraft | pull |
 | Plätze | places |
 | Ausbaustufe | stage |
+| Asset (Grafik) | asset |
+| Aussehen | look |
+| Animation (Streifen) | animation |
+| Referenz | reference |
+| Original | source |
+| Ankerpunkt | origin |

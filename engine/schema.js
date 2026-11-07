@@ -23,6 +23,7 @@ const table = (key, label, columns, o = {}) => ({ key, label, type: 'table', col
 const NAME = text('name', 'Name', { required: true });
 const DESCRIPTION = area_('description', 'Beschreibung');
 const VALUE = num('value', 'Wert', { unit: 'Δ', min: 0, hint: 'Verkaufswert in Deltas' });
+const LOOK = ref('look', 'Aussehen', 'assets', { hint: 'Grafik aus dem Bereich Assets' });
 const STAGE = select('stage', 'Ausbaustufe', [['mvp', 'MVP'], ['1', 'Stufe 1'], ['2', 'Stufe 2']], { hint: 'Wann das ins Spiel kommt' });
 
 // ---------- fixed option lists ----------
@@ -39,6 +40,7 @@ export const RIG_SLOTS = [['engine', 'Motor'], ['armor', 'Panzerung'], ['weapon'
 export const POI_KINDS = [['gasStation', 'Tankstelle'], ['settlement', 'Siedlung'], ['factory', 'Fabrik'], ['bunker', 'Bunker'], ['government', 'Regierungskomplex'], ['mall', 'Einkaufszentrum'], ['ruin', 'Ruine']];
 export const POI_SIZES = [['S', 'S'], ['M', 'M'], ['L', 'L'], ['XL', 'XL']];
 export const ROOM_TAGS = [['start', 'Eingang'], ['exit', 'Ausgang'], ['combat', 'Kampf'], ['loot', 'Beute'], ['secret', 'Geheimnis'], ['npc', 'NPCs'], ['boss', 'Boss'], ['corridor', 'Gang']];
+export const ASSET_KINDS = [['animation', 'Animation'], ['image', 'Bild'], ['reference', 'Referenz'], ['source', 'Original']];
 export const DAYTIME = [['any', 'Immer'], ['day', 'Tag'], ['night', 'Nacht']];
 export const RANKING_CATEGORIES = [['time', 'Durchlaufzeit'], ['kills', 'Kills in %'], ['secrets', 'Secrets']];
 
@@ -46,26 +48,29 @@ const label = (list, v) => list.find(([k]) => k === v)?.[1] ?? v ?? '';
 
 // ---------- areas ----------
 export const AREAS = {
-  sprites: {
-    name: 'Sprites', singular: 'Sprite', icon: 'image', file: 'data/sprites.json', kind: 'catalog',
-    hint: 'Animationen als Streifen: alle Frames gleich groß nebeneinander in einer PNG-Datei unter projects/nomadgirl/assets/. Alle Grafiken entstehen mit KI oder Code.',
-    template: { name: 'Neues Sprite', file: 'assets/', frameSize: [64, 64], frames: 1, fps: 8, loop: true, origin: [32, 63], height: 64 },
-    row: x => `${x.frames ?? 1} ${x.frames === 1 ? 'Frame' : 'Frames'} · ${x.fps ?? 0} fps · ${(x.frameSize || []).join('×')} px`,
+  assets: {
+    name: 'Assets', singular: 'Asset', icon: 'image', file: 'data/assets.json', kind: 'catalog', gallery: true, groupBy: { key: 'kind', options: ASSET_KINDS },
+    hint: 'Alle Grafiken des Spiels: Animationen (Streifen), Bilder, Referenzen (Konzepte, Character Sheets) und Originale. Dateien liegen unter projects/nomadgirl/assets/. Entitäten wie Leyla, Gegner oder Items verweisen über „Aussehen“ hierher. Alles entsteht mit KI oder Code.',
+    template: { name: 'Neues Asset', kind: 'image', file: 'assets/' },
+    row: x => x.kind === 'animation' ? `${x.frames ?? 1} Frames · ${x.fps ?? 0} fps · ${(x.frameSize || []).join('×')} px` : label(ASSET_KINDS, x.kind),
     sections: [
-      { title: 'Sprite', fields: [NAME, text('file', 'Datei', { required: true, hint: 'Pfad im Projekt, z. B. assets/leyla/idle.png' }), DESCRIPTION] },
-      { title: 'Animation', fields: [size('frameSize', 'Frame-Größe', { unit: 'px' }), num('frames', 'Frames', { min: 1 }), num('fps', 'Tempo', { unit: 'fps', min: 0, step: 0.5 }), bool('loop', 'Wiederholen')] },
-      { title: 'Im Spiel', fields: [point('origin', 'Ankerpunkt', { unit: 'px im Frame', hint: 'Wo die Füße stehen: Dieser Punkt sitzt im Spiel auf dem Boden' }),
-        num('height', 'Höhe im Spiel', { unit: 'px', min: 1, hint: 'Auf diese Höhe wird ein Frame im Spiel skaliert' }), bool('flip', 'Schaut nach links', { hint: 'Wenn die Grafik nach links schaut; das Spiel spiegelt dann umgekehrt' })] },
-      { title: 'Herkunft', fields: [text('source', 'Erzeugt mit', { hint: 'KI-Werkzeug oder Code, für docs/assets.md' })] },
+      { title: 'Asset', fields: [NAME, select('kind', 'Art', ASSET_KINDS, { required: true }), text('file', 'Datei', { required: true, hint: 'Pfad im Projekt, z. B. assets/leyla/idle.png' }), DESCRIPTION] },
+      { title: 'Animation', when: x => x.kind === 'animation', fields: [size('frameSize', 'Frame-Größe', { unit: 'px' }), num('frames', 'Frames', { min: 1 }), num('fps', 'Tempo', { unit: 'fps', min: 0, step: 0.5 }), bool('loop', 'Wiederholen')] },
+      { title: 'Im Spiel', when: x => x.kind === 'animation' || x.kind === 'image', fields: [point('origin', 'Ankerpunkt', { unit: 'px', hint: 'Wo die Füße stehen (bei Animationen im Frame): Dieser Punkt sitzt im Spiel auf dem Boden' }),
+        num('height', 'Höhe im Spiel', { unit: 'px', min: 1, hint: 'Auf diese Höhe wird das Bild bzw. ein Frame im Spiel skaliert' }), bool('flip', 'Schaut nach links', { hint: 'Wenn die Grafik nach links schaut; das Spiel spiegelt dann umgekehrt' })] },
+      { title: 'Herkunft', fields: [text('source', 'Erzeugt mit', { hint: 'KI-Werkzeug oder Code' }), ref('derivedFrom', 'Abgeleitet von', 'assets', { hint: 'z. B. Streifen aus einem Original-GIF' }), text('date', 'Datum')] },
     ],
     check: (x, report, p) => {
-      if (x.file && !/\.(png|webp)$/i.test(x.file)) report('warning', 'Datei sollte ein PNG-Streifen sein');
       if (x.file && p.exists && !p.exists(x.file)) report('error', `Datei ${x.file} fehlt`);
-      const [w, h] = x.frameSize || [], [ox, oy] = x.origin || [];
-      if (x.origin && w && (ox < 0 || ox > w || oy < 0 || oy > h)) report('warning', 'Ankerpunkt liegt außerhalb des Frames');
+      if (x.kind === 'animation') {
+        if (x.file && !/\.(png|webp)$/i.test(x.file)) report('warning', 'Animationen sind PNG-Streifen');
+        if (!x.frameSize || !x.frames) report('error', 'Animation ohne Frame-Größe oder Frames');
+        const [w, h] = x.frameSize || [], [ox, oy] = x.origin || [];
+        if (x.origin && w && (ox < 0 || ox > w || oy < 0 || oy > h)) report('warning', 'Ankerpunkt liegt außerhalb des Frames');
+      }
+      if (x.derivedFrom === undefined && x.kind === 'animation' && !x.source) report('hint', 'Herkunft fehlt');
     },
   },
-
   game: {
     name: 'Spiel', icon: 'settings', file: 'data/game.json', kind: 'single',
     hint: 'Grundwerte für das ganze Spiel: Maßstab, Physik, Auflösung und womit Leyla startet.',
@@ -124,9 +129,9 @@ export const AREAS = {
       { title: 'Dash & Slide', fields: [num('movement.dashDistance', 'Dash-Weite', { unit: 'px', min: 0 }), num('movement.dashCooldown', 'Dash-Abklingzeit', { unit: 'ms', min: 0 }),
         bool('movement.dashInvulnerable', 'Unverwundbar beim Dash'), num('movement.slideSpeed', 'Slide-Tempo', { unit: 'px/s', min: 0 }), num('movement.slideDuration', 'Slide-Dauer', { unit: 'ms', min: 0 })] },
       { title: 'Klettern & Schwingen', fields: [num('movement.climbSpeed', 'Klettern', { unit: 'px/s', min: 0 }), num('movement.swingRope', 'Seillänge', { unit: 'px', min: 0 }), num('movement.swingBoost', 'Schwung-Boost', { unit: '%', min: 0 })] },
-      { title: 'Grafik', fields: [ref('sprites.idle', 'Stehen', 'sprites'), ref('sprites.walk', 'Gehen', 'sprites'), ref('sprites.run', 'Rennen', 'sprites'),
-        ref('sprites.jump', 'Springen', 'sprites'), ref('sprites.fall', 'Fallen', 'sprites'), ref('sprites.dash', 'Dash', 'sprites'), ref('sprites.slide', 'Slide', 'sprites'),
-        ref('sprites.climb', 'Klettern', 'sprites'), ref('sprites.hurt', 'Treffer', 'sprites')] },
+      { title: 'Aussehen', fields: [ref('look.idle', 'Stehen', 'assets'), ref('look.walk', 'Gehen', 'assets'), ref('look.run', 'Rennen', 'assets'),
+        ref('look.jump', 'Springen', 'assets'), ref('look.fall', 'Fallen', 'assets'), ref('look.dash', 'Dash', 'assets'), ref('look.slide', 'Slide', 'assets'),
+        ref('look.climb', 'Klettern', 'assets'), ref('look.hurt', 'Treffer', 'assets'), ref('look.reference', 'Referenz', 'assets', { hint: 'Character Sheet, Konzept' })] },
       { title: 'Start-Ausrüstung', fields: [ref('loadout.melee', 'Nahkampf', 'weapons'), ref('loadout.ranged', 'Fernkampf', 'weapons'), ref('loadout.cyberdeck', 'Cyberdeck', 'weapons'), ref('loadout.backpack', 'Rucksack', 'backpacks')] },
     ],
     check: (x, report, p) => {
@@ -140,7 +145,7 @@ export const AREAS = {
     hint: 'Rucksäcke sind Raster im Diablo-Stil. Gegenstände belegen Felder nach ihrer Größe. Bessere Ausrüstung = mehr Platz.',
     template: { name: 'Neuer Rucksack', size: [6, 4], tier: 1, value: 50 },
     row: x => `${(x.size || []).join('×')} · Stufe ${x.tier ?? '–'}`,
-    sections: [{ title: 'Rucksack', fields: [NAME, size('size', 'Raster', { unit: 'Felder' }), num('tier', 'Stufe', { min: 1, max: 5 }), VALUE, DESCRIPTION] }],
+    sections: [{ title: 'Rucksack', fields: [NAME, LOOK, size('size', 'Raster', { unit: 'Felder' }), num('tier', 'Stufe', { min: 1, max: 5 }), VALUE, DESCRIPTION] }],
   },
 
   weapons: {
@@ -149,7 +154,7 @@ export const AREAS = {
     template: { name: 'Neue Waffe', kind: 'melee', damage: 10, cooldown: 400, range: 40, knockback: 100, size: [1, 2], tier: 1, value: 20 },
     row: x => `${label(WEAPON_KINDS, x.kind)} · ${x.damage ?? 0} Schaden · ${x.cooldown ?? 0} ms`,
     sections: [
-      { title: 'Waffe', fields: [NAME, select('kind', 'Art', WEAPON_KINDS, { required: true }), num('tier', 'Stufe', { min: 1, max: 5 }), DESCRIPTION] },
+      { title: 'Waffe', fields: [NAME, LOOK, select('kind', 'Art', WEAPON_KINDS, { required: true }), num('tier', 'Stufe', { min: 1, max: 5 }), DESCRIPTION] },
       { title: 'Werte', fields: [num('damage', 'Schaden', { min: 0 }), num('cooldown', 'Abklingzeit', { unit: 'ms', min: 0 }), num('range', 'Reichweite', { unit: 'px', min: 0 }),
         num('knockback', 'Rückstoß', { unit: 'px/s', min: 0 }), num('critChance', 'Krit-Chance', { unit: '%', min: 0, max: 100 }), num('ammo', 'Munition', { min: 0, hint: 'Leer = unendlich' })] },
       { title: 'Rucksack & Handel', fields: [size('size', 'Größe', { unit: 'Felder' }), VALUE] },
@@ -161,7 +166,7 @@ export const AREAS = {
     template: { name: 'Neuer Gegner', family: 'mutant', behavior: 'patrol', health: 30, damage: 8, speed: 80, aggroRange: 200, deltas: [1, 4], countsForRanking: true },
     row: x => `${label(ENEMY_BEHAVIORS, x.behavior)} · ${x.health ?? 0} Leben · ${x.damage ?? 0} Schaden`,
     sections: [
-      { title: 'Gegner', fields: [NAME, select('family', 'Familie', ENEMY_FAMILIES), select('behavior', 'Verhalten', ENEMY_BEHAVIORS), DESCRIPTION] },
+      { title: 'Gegner', fields: [NAME, LOOK, select('family', 'Familie', ENEMY_FAMILIES), select('behavior', 'Verhalten', ENEMY_BEHAVIORS), DESCRIPTION] },
       { title: 'Werte', fields: [num('health', 'Leben', { min: 1 }), num('damage', 'Schaden', { min: 0 }), num('speed', 'Tempo', { unit: 'px/s', min: 0 }),
         num('aggroRange', 'Bemerkt Leyla ab', { unit: 'px', min: 0 }), ref('weapon', 'Waffe', 'weapons', { hint: 'Optional, sonst Körperangriff' })] },
       { title: 'Beute', fields: [ref('loot', 'Beutetabelle', 'lootTables'), range('deltas', 'Deltas', { unit: 'Δ' }), bool('countsForRanking', 'Zählt für Kills %')] },
@@ -182,7 +187,7 @@ export const AREAS = {
     template: { name: 'Neuer Gegenstand', category: 'junk', size: [1, 1], stack: 1, value: 1 },
     row: x => `${label(ITEM_CATEGORIES, x.category)} · ${(x.size || [1, 1]).join('×')} · ${x.value ?? 0} Δ`,
     sections: [
-      { title: 'Gegenstand', fields: [NAME, select('category', 'Kategorie', ITEM_CATEGORIES), DESCRIPTION] },
+      { title: 'Gegenstand', fields: [NAME, LOOK, select('category', 'Kategorie', ITEM_CATEGORIES), DESCRIPTION] },
       { title: 'Rucksack & Handel', fields: [size('size', 'Größe', { unit: 'Felder' }), num('stack', 'Stapel', { min: 1 }), VALUE] },
       { title: 'Wirkung', fields: [ref('buff', 'Buff beim Essen/Benutzen', 'buffs'), ref('teaches', 'Bringt Rezept bei', 'recipes', { hint: 'Für Baupläne und Kochbücher' })] },
     ],
@@ -220,7 +225,7 @@ export const AREAS = {
     template: { name: 'Neue Zugmaschine', pull: 2000, fuelUse: 10, tank: 60, length: 2, stack: 1, slots: { engine: 1, armor: 1, weapon: 0 }, value: 500 },
     row: x => `${x.pull ?? 0} kg Zugkraft · ${x.length ?? 0}×${x.stack ?? 0} Plätze`,
     sections: [
-      { title: 'Zugmaschine', fields: [NAME, DESCRIPTION, VALUE] },
+      { title: 'Zugmaschine', fields: [NAME, LOOK, DESCRIPTION, VALUE] },
       { title: 'Leistung', fields: [num('pull', 'Zugkraft', { unit: 'kg', min: 0 }), num('fuelUse', 'Verbrauch', { unit: 'l/100 km', min: 0 }), num('tank', 'Tank', { unit: 'l', min: 0 }),
         num('power', 'Lichtmaschine', { unit: '⚡', min: 0, hint: 'Energie für Werkstätten ohne Generator' })] },
       { title: 'Payload', fields: [num('length', 'Plätze hintereinander', { min: 0 }), num('stack', 'Stapelhöhe', { min: 1 })] },
@@ -232,7 +237,7 @@ export const AREAS = {
     hint: 'Payload des Rigs. Je nach Größe fasst ein Container eine, zwei oder drei Werkstätten.',
     template: { name: 'Neuer Container', kind: 'crate', places: 1, weight: 300, value: 100 },
     row: x => `${label(CONTAINER_KINDS, x.kind)} · ${x.places ?? 0} ${x.places === 1 ? 'Platz' : 'Plätze'} · ${x.weight ?? 0} kg`,
-    sections: [{ title: 'Container', fields: [NAME, select('kind', 'Art', CONTAINER_KINDS), num('places', 'Werkstatt-Plätze', { min: 1, max: 3 }),
+    sections: [{ title: 'Container', fields: [NAME, LOOK, select('kind', 'Art', CONTAINER_KINDS), num('places', 'Werkstatt-Plätze', { min: 1, max: 3 }),
       num('weight', 'Gewicht', { unit: 'kg', min: 0 }), bool('stackable', 'Stapelbar'), VALUE, DESCRIPTION] }],
   },
   workshops: {
@@ -241,7 +246,7 @@ export const AREAS = {
     template: { name: 'Neue Werkstatt', function: 'storage', places: 1, power: 0, stage: 'mvp', value: 100 },
     row: x => `${label(WORKSHOP_FUNCTIONS, x.function)} · ${x.places ?? 1} Pl. · ${x.power > 0 ? '+' : ''}${x.power ?? 0} ⚡`,
     sections: [
-      { title: 'Werkstatt', fields: [NAME, select('function', 'Funktion', WORKSHOP_FUNCTIONS), STAGE, DESCRIPTION] },
+      { title: 'Werkstatt', fields: [NAME, LOOK, select('function', 'Funktion', WORKSHOP_FUNCTIONS), STAGE, DESCRIPTION] },
       { title: 'Werte', fields: [num('places', 'Plätze', { min: 1, max: 3 }), num('power', 'Energie', { unit: '⚡', hint: '+ liefert, − braucht' }), num('capacity', 'Kapazität', { min: 0, hint: 'Lagerplätze, Betten …' }),
         ref('buff', 'Buff', 'buffs', { hint: 'z. B. Schlafzimmer oder Chill Area' }), VALUE] },
     ],
@@ -251,7 +256,7 @@ export const AREAS = {
     hint: 'Motoren, Panzerung und Waffen für die Slots der Zugmaschine.',
     template: { name: 'Neues Rig-Teil', slot: 'engine', pull: 0, armor: 0, damage: 0, fuelUse: 0, value: 200 },
     row: x => label(RIG_SLOTS, x.slot),
-    sections: [{ title: 'Rig-Teil', fields: [NAME, select('slot', 'Slot', RIG_SLOTS), num('pull', 'Zugkraft +', { unit: 'kg' }), num('armor', 'Panzerung +'), num('damage', 'Schaden'),
+    sections: [{ title: 'Rig-Teil', fields: [NAME, LOOK, select('slot', 'Slot', RIG_SLOTS), num('pull', 'Zugkraft +', { unit: 'kg' }), num('armor', 'Panzerung +'), num('damage', 'Schaden'),
       num('fuelUse', 'Verbrauch ±', { unit: 'l/100 km' }), VALUE, DESCRIPTION] }],
   },
   companions: {
@@ -260,7 +265,7 @@ export const AREAS = {
     template: { name: 'Neuer Companion', role: '', workshops: [], buffs: [], tips: [], stage: '1' },
     row: x => x.role || '',
     sections: [
-      { title: 'Companion', fields: [NAME, text('role', 'Rolle'), STAGE, DESCRIPTION] },
+      { title: 'Companion', fields: [NAME, LOOK, text('role', 'Rolle'), STAGE, DESCRIPTION] },
       { title: 'Im Rig', fields: [refs('workshops', 'Betreibt', 'workshops'), refs('buffs', 'Gibt Buffs', 'buffs'), refs('tips', 'Kennt Rezepte', 'recipes')] },
     ],
   },
@@ -271,7 +276,7 @@ export const AREAS = {
     template: { name: 'Neuer POI', kind: 'gasStation', size: 'S', danger: 1, rooms: [], enemies: [], parTime: 120, secrets: 1 },
     row: x => `${label(POI_KINDS, x.kind)} · ${x.size} · Gefahr ${'●'.repeat(x.danger || 0)}`,
     sections: [
-      { title: 'POI', fields: [NAME, select('kind', 'Art', POI_KINDS), select('size', 'Größe', POI_SIZES), num('danger', 'Gefahr', { min: 1, max: 5 }), DESCRIPTION] },
+      { title: 'POI', fields: [NAME, LOOK, select('kind', 'Art', POI_KINDS), select('size', 'Größe', POI_SIZES), num('danger', 'Gefahr', { min: 1, max: 5 }), DESCRIPTION] },
       { title: 'Aufbau', fields: [range('roomCount', 'Räume', { hint: 'Wie viele Räume zusammengesetzt werden' }), refs('rooms', 'Raum-Bausteine', 'rooms'), refs('enemies', 'Gegner', 'enemies'), ref('loot', 'Kisten-Beute', 'lootTables')] },
       { title: 'Ranking', fields: [num('parTime', 'Bestzeit', { unit: 's', min: 0 }), num('secrets', 'Secrets', { min: 0 })] },
       { title: 'Leben', fields: [bool('npcs', 'NPCs vor Ort'), bool('foodtruck', 'Foodtruck-Verkauf möglich'), bool('shop', 'Händler')] },
@@ -287,21 +292,21 @@ export const AREAS = {
     hint: 'Handgebaute Räume, aus denen POIs zusammengesetzt werden. Das Layout (Kacheln) kommt mit dem Level-Editor.',
     template: { name: 'Neuer Raum', size: [30, 17], tags: ['combat'], weight: 1 },
     row: x => `${(x.size || []).join('×')} · ${(x.tags || []).map(t => label(ROOM_TAGS, t)).join(', ')}`,
-    sections: [{ title: 'Raum', fields: [NAME, size('size', 'Größe', { unit: 'Kacheln' }), multi('tags', 'Merkmale', ROOM_TAGS), num('weight', 'Häufigkeit', { min: 0 }), DESCRIPTION] }],
+    sections: [{ title: 'Raum', fields: [NAME, LOOK, size('size', 'Größe', { unit: 'Kacheln' }), multi('tags', 'Merkmale', ROOM_TAGS), num('weight', 'Häufigkeit', { min: 0 }), DESCRIPTION] }],
   },
   locations: {
     name: 'Oberwelt-Orte', singular: 'Ort', icon: 'map', file: 'data/locations.json', kind: 'catalog',
     hint: 'Punkte auf der Oberweltkarte rund um BigCityDelta. Jeder Ort zeigt auf einen POI.',
     template: { name: 'Neuer Ort', poi: '', position: [0, 0], region: '' },
     row: (x, p) => `${p?.data.pois?.[x.poi]?.name || x.poi || '–'} · ${x.region || ''}`,
-    sections: [{ title: 'Ort', fields: [NAME, ref('poi', 'POI', 'pois', { required: true }), point('position', 'Position', { unit: 'km' }), text('region', 'Region'), DESCRIPTION] }],
+    sections: [{ title: 'Ort', fields: [NAME, LOOK, ref('poi', 'POI', 'pois', { required: true }), point('position', 'Position', { unit: 'km' }), text('region', 'Region'), DESCRIPTION] }],
   },
   encounters: {
     name: 'Encounter', singular: 'Encounter', icon: 'flash', file: 'data/encounters.json', kind: 'catalog',
     hint: 'Zufallsbegegnungen auf der Reise. Spielen sich wie kleine Level.',
     template: { name: 'Neuer Encounter', weight: 1, time: 'any', enemies: [] },
     row: x => `${label(DAYTIME, x.time)} · Gewicht ${x.weight ?? 0}`,
-    sections: [{ title: 'Encounter', fields: [NAME, num('weight', 'Gewicht', { min: 0 }), select('time', 'Tageszeit', DAYTIME), refs('enemies', 'Gegner', 'enemies'), ref('loot', 'Beute', 'lootTables'), DESCRIPTION] }],
+    sections: [{ title: 'Encounter', fields: [NAME, LOOK, num('weight', 'Gewicht', { min: 0 }), select('time', 'Tageszeit', DAYTIME), refs('enemies', 'Gegner', 'enemies'), ref('loot', 'Beute', 'lootTables'), DESCRIPTION] }],
   },
   travel: {
     name: 'Reisen', icon: 'world_icon', file: 'data/travel.json', kind: 'single',
@@ -317,13 +322,13 @@ export const AREAS = {
 
 // Navigation: groups of areas in the order of the design document
 export const GROUPS = [
+  ['ASSETS', ['assets']],
   ['GRUNDLAGEN', ['game', 'economy', 'ranking']],
   ['LEYLA', ['leyla', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes']],
   ['RIG', ['tractors', 'containers', 'workshops', 'rigParts', 'companions']],
   ['WELT', ['pois', 'rooms', 'locations', 'encounters', 'travel']],
-  ['GRAFIK', ['sprites']],
 ];
 
 export const optionLabel = label;

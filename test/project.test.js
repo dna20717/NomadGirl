@@ -81,7 +81,15 @@ test('start rig: places, power and weight are checked', async () => {
   assert.ok(validateProject(p).some(m => m.place.area === 'game' && /Plätze/.test(m.text)));
 });
 
-test('sprites: a missing file is an error when files can be checked', async () => {
+test('assets: a missing file is an error when files can be checked', async () => {
   const p = await load(); p.exists = () => false;
-  assert.ok(validateProject(p).some(m => m.kind === 'error' && m.place.area === 'sprites'));
+  assert.ok(validateProject(p).some(m => m.kind === 'error' && m.place.area === 'assets'));
+});
+
+test('assets: entities point to assets via look, renaming an asset follows', async () => {
+  const p = await load();
+  assert.equal(p.data.leyla.look.idle, 'leyla_idle');
+  renameEntry(p, 'assets', 'leyla_idle', 'leyla_stehen');
+  assert.equal(p.data.leyla.look.idle, 'leyla_stehen');
+  for (const a of ['enemies', 'weapons', 'items', 'tractors', 'containers', 'workshops', 'companions', 'pois']) assert.ok(fields(a).some(f => f.key === 'look' && f.area === 'assets'), a);
 });

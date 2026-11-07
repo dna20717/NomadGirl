@@ -1,0 +1,33 @@
+{
+ "leyla_idle": {
+  "name": "Leyla · Stehen",
+  "kind": "animation",
+  "file": "assets/leyla/idle.png",
+  "frameSize": [176, 432],
+  "frames": 8,
+  "fps": 6.67,
+  "loop": true,
+  "origin": [88, 428],
+  "height": 256,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_idle_source",
+  "date": "07.11.2026",
+  "description": "Idle-Animation, atmet ruhig."
+ },
+ "leyla_idle_source": {
+  "name": "Leyla · Stehen (Original)",
+  "kind": "source",
+  "file": "assets/leyla/idle_source.gif",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "8 Frames à 150 ms, 443 × 443 px, transparent."
+ },
+ "leyla_sheet": {
+  "name": "Leyla · Character Sheet",
+  "kind": "reference",
+  "file": "assets/leyla/character_sheet.png",
+  "source": "KI-generiert (Daniel)",
+  "date": "07.11.2026",
+  "description": "Turnarounds, Gesichtsausdrücke, Palette, Details zu Haaren, Visor, Weste, Handschuhen, Gürtel, Stiefeln und Implantaten."
+ }
+}

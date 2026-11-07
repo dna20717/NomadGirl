@@ -1,9 +1,9 @@
 {
  "title": "NomadGirl",
- "tileSize": 32,
- "gravity": 1800,
- "resolution": [640, 360],
- "pixelArt": true,
+ "tileSize": 64,
+ "gravity": 3600,
+ "resolution": [1920, 1080],
+ "pixelArt": false,
  "start": {
   "location": "tankstelle_km7",
   "tractor": "pickup",

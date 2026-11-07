@@ -4,18 +4,23 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 
 | Datei | Was | Herkunft | Datum |
 | --- | --- | --- | --- |
-| `projects/nomadgirl/assets/leyla/idle.png` | Leyla, Stehen: 8 Frames à 176 × 432 px als Streifen | aus `art/leyla/idle_source.gif` zugeschnitten (Code) | 07.11.2026 |
-| `art/leyla/idle_source.gif` | Leyla, Stehen: Original-Animation, 8 Frames à 150 ms, 443 × 443 px | KI-generiert (Daniel) | 07.11.2026 |
-| `art/leyla/character_sheet.png` | Character Sheet: Turnarounds, Gesichter, Palette, Details | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/leyla/idle.png` | Leyla, Stehen: 8 Frames à 176 × 432 px als Streifen (`leyla_idle`) | aus `idle_source.gif` zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/idle_source.gif` | Leyla, Stehen: Original-Animation, 8 Frames à 150 ms, 443 × 443 px (`leyla_idle_source`) | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/leyla/character_sheet.png` | Character Sheet: Turnarounds, Gesichter, Palette, Details (`leyla_sheet`) | KI-generiert (Daniel) | 07.11.2026 |
+
+Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich „Assets“.
 
 ## Ordner
 
-- `art/` – Originale und Referenzen (werden nicht ausgeliefert).
-- `projects/nomadgirl/assets/` – fertige Spiel-Grafiken, die die Spieldaten verwenden (Bereich „Sprites“ in der Werkstatt).
+Alle Grafiken liegen unter `projects/nomadgirl/assets/`, nach Figur oder Thema in Unterordnern (`leyla/`, später z. B. `enemies/`, `rig/`). Dort werden sie auch online ausgeliefert, damit die Werkstatt sie zeigen kann.
 
-## Sprites
+## In der Werkstatt
 
-Animationen liegen als Streifen vor: alle Frames gleich groß nebeneinander in einer PNG-Datei. In der Werkstatt unter „Grafik › Sprites“ stehen Frame-Größe, Anzahl, Tempo, Ankerpunkt (wo die Füße stehen) und die Höhe im Spiel.
+Bereich „Assets“ ganz oben: Galerie aller Grafiken, gruppiert nach Art (Animation, Bild, Referenz, Original). Animationen sind Streifen: alle Frames gleich groß nebeneinander in einer PNG-Datei. Entitäten (Leyla, Gegner, Waffen, Items, Rig …) verweisen über „Aussehen“ auf ein Asset und zeigen es im Inspektor.
+
+## Maßstab
+
+Spielauflösung 1920×1080, Kacheln 64 px, Leyla 256 px hoch. Grafiken dürfen größer sein (Leylas Frames sind 432 px hoch) und werden geglättet herunterskaliert.
 
 ## Leyla – Stil aus dem Character Sheet
 

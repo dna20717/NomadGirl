@@ -5,37 +5,38 @@
   "tier": 1,
   "damage": 12,
   "cooldown": 380,
-  "range": 36,
-  "knockback": 120,
+  "range": 72,
+  "knockback": 240,
   "size": [1, 2],
   "value": 8,
   "description": "Repariert Leitungen und Meinungen."
  },
- "machete": {"name": "Machete", "kind": "melee", "tier": 2, "damage": 18, "cooldown": 450, "range": 44, "knockback": 80, "critChance": 10, "size": [1, 3], "value": 40},
+ "machete": {"name": "Machete", "kind": "melee", "tier": 2, "damage": 18, "cooldown": 450, "range": 88, "knockback": 160, "critChance": 10, "size": [1, 3], "value": 40},
  "schockstab": {
   "name": "Schockstab",
   "kind": "melee",
   "tier": 2,
   "damage": 10,
   "cooldown": 500,
-  "range": 40,
-  "knockback": 200,
+  "range": 80,
+  "knockback": 400,
   "critChance": 5,
   "size": [1, 2],
   "value": 60,
   "description": "Ehemals Viehtreiber. Funktioniert auch bei Mutanten."
  },
- "nagelpistole": {"name": "Nagelpistole", "kind": "ranged", "tier": 1, "damage": 6, "cooldown": 250, "range": 320, "knockback": 40, "ammo": 40, "size": [2, 1], "value": 15},
- "schrotflinte": {"name": "Schrotflinte", "kind": "ranged", "tier": 2, "damage": 22, "cooldown": 900, "range": 180, "knockback": 260, "ammo": 12, "size": [3, 1], "value": 90},
+ "nagelpistole": {"name": "Nagelpistole", "kind": "ranged", "tier": 1, "damage": 6, "cooldown": 250, "range": 640, "knockback": 80, "ammo": 40, "size": [2, 1], "value": 15},
+ "schrotflinte": {"name": "Schrotflinte", "kind": "ranged", "tier": 2, "damage": 22, "cooldown": 900, "range": 360, "knockback": 520, "ammo": 12, "size": [3, 1], "value": 90},
  "bastlerdeck": {
   "name": "Bastler-Deck",
   "kind": "cyberdeck",
   "tier": 1,
   "damage": 0,
   "cooldown": 3000,
-  "range": 200,
+  "range": 400,
   "size": [2, 2],
   "value": 120,
-  "description": "Hacking kommt später. Bis dahin ein sehr teurer Briefbeschwerer."
+  "description": "Hacking kommt später. Bis dahin ein sehr teurer Briefbeschwerer.",
+  "knockback": null
  }
 }

@@ -7,8 +7,9 @@ import { icon } from '../icons.js';
 import { el, openDialogue, suchChoice, draggable, inspectorHead, cleanId } from '../ui.js';
 import { openStore } from '../store.js';
 import { browserLoader } from '../browser_loader.js';
-import { AREAS, GROUPS, fields, loadProject, validateProject, usages, renameEntry, removeEntry, rowText, optionLabel, get, set, freeId } from '../../engine/project.js';
+import { AREAS, GROUPS, fields, loadProject, validateProject, usages, references, renameEntry, removeEntry, rowText, optionLabel, get, set, freeId } from '../../engine/project.js';
 import { SUMMARY } from './summaries.js';
+import { assetPreview, assetThumb } from './asset_preview.js';
 
 const THEMES = { gray: 'Grau', violet: 'Violett', brightness: 'Hell' };
 const clockTime = () => new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
@@ -203,7 +204,9 @@ export class Workshop {
     const m = this.messages || [];
     const row = (id, x) => {
       const bad = m.filter(y => y.place.area === a && y.place.id === id && y.kind !== 'hint');
+      const look = a === 'assets' ? x : this.p.data.assets?.[x.look];
       return [bad.length ? el('span', { class: 'ng-dot ' + (bad.some(y => y.kind === 'error') ? 'error' : 'warning'), title: bad.map(y => y.text).join('\n') }) : null,
+        A.gallery ? assetThumb(this, look, 96) : look ? assetThumb(this, look, 28) : null,
         el('span', { class: 'da-name' }, x.name || id), el('small', {}, rowText(this.p, a, x))];
     };
     const all = Object.entries(o);
@@ -222,7 +225,8 @@ export class Workshop {
       this.go({ area: a, choice: newId });
     }));
     for (const msg of m.filter(y => y.place.area === a && y.place.id === choice)) insp.append(el('p', { class: 'ng-inline ' + msg.kind }, icon(msg.kind === 'hint' ? 'info' : msg.kind, 14), ' ' + msg.text.replace(/^[^:]*: /, '')));
-    for (const s of A.sections) insp.append(el('h4', {}, s.title), ...s.fields.map(f => this.fieldEditor(a, f, x)));
+    insp.append(this.lookBlock(a, x));
+    for (const s of A.sections) if (!s.when || s.when(x)) insp.append(el('h4', {}, s.title), ...s.fields.map(f => this.fieldEditor(a, f, x)));
     for (const extra of [SUMMARY[a]?.(this, x, choice)].flat()) if (extra) insp.append(el('h4', {}, extra.title), extra.body);
     const u = usages(this.p, a, choice);
     insp.append(el('h4', {}, `Verwendet (${u.length})`), u.length ? el('div', { class: 'da-tags' }, ...u.map(v => el('button', { class: 'da-tag ng-leap', title: v.path, onclick: () => this.go({ area: v.area, choice: v.id }) }, icon(AREAS[v.area].icon, 12), ' ' + v.name)))
@@ -237,9 +241,23 @@ export class Workshop {
     main.append(this.head(A.name, this.button('export', 'JSON', () => this.jsonDialogue(`${A.name} als JSON`, x, j => this.change(a, () => { for (const k of Object.keys(x)) delete x[k]; Object.assign(x, j); })))),
       el('p', { class: 'ed-small' }, A.hint));
     for (const msg of (this.messages || []).filter(y => y.place.area === a)) main.append(el('p', { class: 'ng-inline ' + msg.kind }, icon(msg.kind === 'hint' ? 'info' : msg.kind, 14), ' ' + msg.text.replace(/^[^:]*: /, '')));
-    main.append(el('div', { class: 'ng-sections' }, ...A.sections.map(s => el('section', { class: 'ng-section' }, el('h3', {}, s.title), ...s.fields.map(f => this.fieldEditor(a, f, x))))));
-    insp.append(el('h3', {}, A.name), el('p', { class: 'ed-small' }, `Datei: ${this.p.paths[a]}`));
+    main.append(el('div', { class: 'ng-sections' }, ...A.sections.filter(s => !s.when || s.when(x)).map(s => el('section', { class: 'ng-section' }, el('h3', {}, s.title), ...s.fields.map(f => this.fieldEditor(a, f, x))))));
+    insp.append(el('h3', {}, A.name), el('p', { class: 'ed-small' }, `Datei: ${this.p.paths[a]}`), this.lookBlock(a, x));
     for (const extra of [SUMMARY[a]?.(this, x)].flat()) if (extra) insp.append(el('h4', {}, extra.title), extra.body);
+  }
+
+  // ---------- Look: preview of the assets an entry points to (or of the asset itself) ----------
+  lookBlock(a, x) {
+    if (a === 'assets') return [el('h4', {}, 'Vorschau'), assetPreview(this, x)];
+    const A = this.p.data.assets || {}, refs = references(a, x).filter(r => r.area === 'assets' && A[r.value]);
+    const hasLook = fields(a).some(f => f.area === 'assets');
+    if (!refs.length) return hasLook ? el('p', { class: 'ed-small ng-noLook' }, icon('image', 14), ' Noch kein Aussehen. Unter „Aussehen“ ein Asset wählen.') : null;
+    this.lookPick = this.lookPick || {};
+    const r = refs.find(r => r.path === this.lookPick[a]) || refs[0];
+    return [el('h4', {}, 'Aussehen', el('span', { class: 'da-grow' }),
+      el('button', { class: 'ed-button small', title: 'Zum Asset', onclick: () => this.go({ area: 'assets', choice: r.value }) }, icon('arrow_right', 13))),
+      refs.length > 1 ? el('span', { class: 'ed-segment ng-lookPick' }, ...refs.map(q => el('button', { class: q === r ? 'on' : '', onclick: () => { this.lookPick[a] = q.path; this.draw(); } }, q.field.label))) : null,
+      assetPreview(this, A[r.value])];
   }
 
   // ---------- Field editors from the schema ----------
@@ -264,7 +282,7 @@ export class Workshop {
   refOptions(area) { return Object.entries(this.p.data[area] || {}).map(([k, y]) => [k, y.name || k]); }
   refEditor(area, v, onChange) {
     const wrong = v && !this.p.data[area]?.[v];
-    return el('span', { class: 'ng-ref' + (wrong ? ' wrong' : '') }, this.selection(this.refOptions(area), v, onChange, '– keine –'),
+    return el('span', { class: 'ng-ref' + (wrong ? ' wrong' : '') }, area === 'assets' && v && !wrong ? assetThumb(this, this.p.data.assets[v], 24) : null, this.selection(this.refOptions(area), v, onChange, '– keine –'),
       v && !wrong ? el('button', { class: 'ed-button small', title: 'Hinspringen', onclick: () => this.go({ area, choice: v }) }, icon('arrow_right', 14)) : null,
       wrong ? el('span', { class: 'ng-wrongText', title: 'Unbekannte ID' }, v) : null);
   }
@@ -332,7 +350,7 @@ export class Workshop {
   }
   list(entries, choice, onChoice, rendering) {
     const f = this.filter.toLowerCase();
-    return el('div', { class: 'da-list' }, ...entries.filter(([id, x]) => !f || id.includes(f) || String(x?.name || '').toLowerCase().includes(f)).map(([id, x]) =>
+    return el('div', { class: 'da-list' + (AREAS[this.page.area]?.gallery ? ' ng-gallery' : '') }, ...entries.filter(([id, x]) => !f || id.includes(f) || String(x?.name || '').toLowerCase().includes(f)).map(([id, x]) =>
       el('button', { class: 'da-entry' + (choice === id ? ' on' : ''), onclick: () => onChoice(id) }, ...rendering(id, x))));
   }
   search() {
