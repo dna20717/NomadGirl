@@ -118,7 +118,10 @@ export class Camp {
     this.lights = [];
     this.drawRig();
     this.drawFire();
+    this.placeChest();
+    this.vanGlow();
     this.placeCompanions();
+    this.startSound();
     // the van: E at its door shows the van's own workshops
     const vanWs = geo.tractor?.workshops || [];
     this.hotspots.push({ x: geo.doorX, w: 110, name: D.tractors?.[geo.tractor?.id]?.name || 'Van', hint: vanWs.length ? 'Einsteigen' : 'Van',
@@ -203,6 +206,62 @@ export class Camp {
       ...(F.pool ? [this.light(x, y + 6, F.pool, color, 0.5 * k, F.pool * 0.14)] : []),
     ];
     this.hotspots.push({ x, w: 90, name: 'Lagerfeuer', hint: 'Am Feuer sitzen', act: () => this.sitByFire() });
+  }
+
+  // ---------- van: at night warm light pours out of the open sliding door ----------
+  vanGlow() {
+    const V = this.C.vanLight || {};
+    if (V.enabled === false) return;
+    const x = this.geo.doorX, y = this.ground, k = (V.strength ?? 100) / 100, color = V.color || '#ffcf7a';
+    this.doorLights = [
+      this.light(x, y - (V.lift ?? 150), (V.width ?? 110), color, 0.55 * k, (V.height ?? 150)),   // the open doorway glows
+      this.light(x + (V.spill ?? 40), y + 4, (V.pool ?? 260), color, 0.45 * k, (V.pool ?? 260) * 0.16),   // light spills onto the ground
+    ];
+  }
+
+  // ---------- chest: closed, E opens and closes it (the frames run forward or back) ----------
+  placeChest() {
+    const K = this.C.chest || {}, s = this.scene;
+    const info = K.enabled !== false && K.look && s.assetInfo(K.look);
+    if (!info) return;
+    s.textures.get(info.key).setFilter(NEAREST());
+    const x = (this.geo.vanCol + (K.at ?? 16) + 0.5) * s.T, A = this.D.assets?.[K.look] || {};
+    const sprite = s.add.sprite(x, this.ground, info.key, 0).setOrigin(info.ox, info.oy).setScale(info.scale).setFlipX(!!K.flip).setDepth(-3);
+    this.chest = { x, sprite, frames: A.frames || 1, fps: A.fps || 8, frame: 0, open: false };
+    this.hotspots.push({ x, w: 70, name: 'Kiste', hint: () => this.chest.open ? 'Schließen' : 'Öffnen', act: () => {
+      const c = this.chest;
+      c.open = !c.open;
+      if (c.open) this.scene.fx.text(x, this.ground - 110, 'leer', { color: '#b9a2c8', size: 34, rise: 50, life: 1100 });
+    } });
+  }
+
+  // ---------- sound: soft wind with gusts, the fire gets louder (and moves left/right) the closer Leyla comes ----------
+  startSound() {
+    const s = this.scene, S = this.C.sound || {}, vol = id => (this.D.assets?.[id]?.volume ?? 100) / 100;
+    const play = (id, v, loop) => s.cache.audio.exists(id) ? s.sound.add(id, { loop, volume: v }) : null;
+    this.wind = S.wind && play(S.wind, (S.windVolume ?? 20) / 100 * vol(S.wind), true);
+    this.fireSound = S.fire && play(S.fire, 0, true);
+    this.fireBase = vol(S.fire);
+    this.wind?.play(); this.fireSound?.play();
+    if (this.fireSound) this.fireSound.setSeek?.(Math.random() * 20);   // not always the same crackle
+    this.gustAt = s.time.now + this.gustDelay();
+  }
+  gustDelay() { const [a, b] = this.C.sound?.gustEvery || [9, 22]; return (a + Math.random() * (b - a)) * 1000; }
+  updateSound(time) {
+    const s = this.scene, S = this.C.sound || {}, l = s.leyla;
+    if (this.fireSound) {
+      const d = Math.abs(l.x - this.geo.fireX), near = S.fireNear ?? 120, range = S.fireRange ?? 1100;
+      const k = Math.max(0, Math.min(1, 1 - (d - near) / Math.max(1, range - near)));
+      const v = ((S.fireMin ?? 4) + ((S.fireVolume ?? 90) - (S.fireMin ?? 4)) * k * k) / 100 * this.fireBase;
+      this.fireSound.setVolume(v);
+      this.fireVolume = v;
+      if (this.fireSound.setPan) this.fireSound.setPan(Math.max(-0.7, Math.min(0.7, (this.geo.fireX - l.x) / 900)));
+    }
+    if (time > this.gustAt && (S.gusts || []).length) {
+      const id = S.gusts[Math.floor(Math.random() * S.gusts.length)];
+      if (s.cache.audio.exists(id)) s.sound.play(id, { volume: (S.gustVolume ?? 14) / 100 * ((this.D.assets?.[id]?.volume ?? 100) / 100) * (0.6 + Math.random() * 0.4) });
+      this.gustAt = time + this.gustDelay();
+    }
   }
 
   // ---------- companions ----------
@@ -290,7 +349,7 @@ export class Camp {
     save.fuel = Math.max(0, Math.round((save.fuel - t.fuel) * 10) / 10);
     save.food = Math.max(0, Math.round((save.food - t.food) * 10) / 10);
     save.location = id;
-    this.scene.goCamp({ banner: [`Angekommen: ${D.locations?.[id]?.name || id}`, `${clockText(save)} · ${t.km} km · −${de(t.fuel)} l Sprit`], fade: 900 });
+    this.scene.goCamp({ banner: [`Angekommen: ${D.locations?.[id]?.name || id}`, `${clockText(save)} · ${t.km} km · −${de(t.fuel)} l Sprit`], fade: 900, arriving: true });
   }
 
   // ---------- loop ----------
@@ -321,6 +380,19 @@ export class Camp {
         f.fillStyle(0xffd27a, 1 - life).fillRect(Math.round(x + Math.sin(i * 9 + t * 2) * 24 + life * 10), Math.round(y - 60 - life * 140), 4, 4);
       }
     }
+    // light out of the van door: as far as the door is open
+    if (this.doorLights) {
+      const v = s.van, open = v && v.frames > 1 ? v.frame / (v.frames - 1) : 0;
+      for (const d of this.doorLights) d.setAlpha(d.base * this.lightK * open).setVisible(this.lightK > 0 && open > 0.02);
+    }
+    // chest lid
+    const c = this.chest;
+    if (c) {
+      const target = c.open ? c.frames - 1 : 0;
+      if (c.frame !== target) c.frame = c.frame < target ? Math.min(target, c.frame + c.fps * dt / 1000) : Math.max(target, c.frame - c.fps * dt / 1000);
+      c.sprite.setFrame(Math.round(c.frame));
+    }
+    this.updateSound(time);
     // companions: random speech bubbles
     const B = this.C.companions?.barkEvery || [7, 15];
     if (time > this.barkAt && this.companions.length) {
@@ -335,14 +407,18 @@ export class Camp {
     let best = null, bd = Infinity;
     if (l.alive && l.body.blocked.down && l.feet > this.ground - 10)
       for (const h of this.hotspots) { const d = Math.abs(l.x - h.x); if (d <= Math.max(h.w || 0, range) && d < bd) { best = h; bd = d; } }
-    if (best !== this.prompt) { this.prompt = best; s.hud.prompt(best && `${best.hint} · ${best.name}`); }
+    const hint = h => typeof h.hint === 'function' ? h.hint() : h.hint;
+    const text = best && `${hint(best)} · ${best.name}`;
+    if (best !== this.prompt || text !== this.promptText) { this.prompt = best; this.promptText = text; s.hud.prompt(text); }
     if (best && input.grab.pressed) best.act();
   }
 
   state() {
     const sv = this.box.save;
     return { clock: clockText(sv), day: sv.day, hour: sv.hour, daytime: this.day.name, location: sv.location, deltas: sv.deltas, fuel: sv.fuel, food: sv.food, health: sv.health, buffs: [...sv.buffs],
-      prompt: this.prompt && { name: this.prompt.name, hint: this.prompt.hint, x: Math.round(this.prompt.x) }, hotspots: this.hotspots.map(h => ({ name: h.name, hint: h.hint, x: Math.round(h.x) })),
+      prompt: this.promptText || null, hotspots: this.hotspots.map(h => ({ name: h.name, hint: typeof h.hint === 'function' ? h.hint() : h.hint, x: Math.round(h.x) })),
+      chest: this.chest && { open: this.chest.open, frame: Math.round(this.chest.frame) },
+      sound: { wind: !!this.wind, fire: this.fireVolume != null ? Math.round(this.fireVolume * 100) : null, muted: this.scene.sound.mute },
       rig: this.geo.units.map(u => ({ id: u.id, x0: u.x0, x1: u.x1, workshops: u.workshops.map(w => w.id) })), van: this.geo.tractor?.workshops.map(w => w.id) };
   }
 }

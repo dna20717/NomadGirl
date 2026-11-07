@@ -46,6 +46,10 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/vehicles/van_door_source.gif` | Leylas Van mit Schiebetür: Original, 5 Frames à 150 ms, 256 × 256 (`van_source`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/camp/campfire_source.gif` | Lagerfeuer: Original, 9 Frames à 150 ms, 128 × 128 (`campfire_source`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/camp/campfire.png` | Lagerfeuer im Camp: 9 Frames à 72 × 100 als Streifen, im Spiel 200 px hoch (`campfire`) | aus dem Original zugeschnitten (Code) | 07.11.2026 |
+| `assets/camp/chest_source.gif` | Kiste: Original, 5 Frames à 150 ms, 64 × 64 (`chest_source`) | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/camp/chest.png` | Kiste im Camp: 5 Frames à 46 × 45 (zu → offen), im Spiel 90 px (`chest`) | aus dem Original zugeschnitten (Code) | 07.11.2026 |
+| `assets/sound/campfire.m4a`, `.ogg` | Lagerfeuer knistert, 29 s Schleife (`sound_campfire`) | von Daniel (WAV), mit ffmpeg umgewandelt | 07.11.2026 |
+| `assets/sound/wind.m4a`, `wind2`, `wind3` (+ `.ogg`) | Wind als leise Schleife und zwei Böen (`sound_wind`, `sound_wind2`, `sound_wind3`) | von Daniel | 07.11.2026 |
 | `assets/vehicles/van.png` | erste Version des Vans, offene Schiebetür, 837 × 417 px (`van_v1`) | aus `van_source.png` zugeschnitten, halbe Größe (Code) | 07.11.2026 |
 | `assets/vehicles/van_source.png` | erste Version des Vans: Original, 1774 × 887 px (`van_v1_source`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_sky.png` | Wastelands, Himmel: Verlauf mit Dither, 576 × 324 px (`wasteland_sky`) | KI-generiert (Daniel) | 07.11.2026 |

@@ -70,6 +70,12 @@ export function advance(save, hours) {
   return save;
 }
 // hours until the next time the clock shows `hour` (sleeping until the morning)
+// arriving in the camp (loading, after a run, after driving): the clock moves on to the next dusk (Camp › Zeit › Ankunft um)
+export function arrive(save, D) {
+  const h = D.camp?.clock?.arriveHour;
+  if (h == null || h === '' || save.hour === h) return save;
+  return advance(save, hoursUntil(save, h));
+}
 export function hoursUntil(save, hour) { const d = (hour - save.hour + 24) % 24; return d === 0 ? 24 : d; }
 
 export async function openSave(D, base = '') {

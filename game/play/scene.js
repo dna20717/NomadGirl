@@ -9,14 +9,14 @@ import { Drone } from './drone.js';
 import { Van } from './van.js';
 import { Backdrop } from './backdrop.js';
 import { Camp, campLayout, daytimeAt, drawCampBackground } from './camp.js';
-import { advance, clockText } from '../save.js';
+import { advance, arrive, clockText } from '../save.js';
 
 const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
 
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
   jump: ['SPACE'], walk: ['SHIFT'], dash: ['L', 'C'], melee: ['J', 'Y'], ranged: ['K', 'X'], grab: ['E'],
-  restart: ['R'], help: ['H', 'ESC'], debug: ['G'],
+  restart: ['R'], help: ['H', 'ESC'], debug: ['G'], mute: ['M'],
 };
 
 export class PlayScene extends Phaser.Scene {
@@ -42,6 +42,9 @@ export class PlayScene extends Phaser.Scene {
     if (this.mode === 'camp') {
       for (const c of this.box?.save.companions || []) if (this.data_.companions?.[c]?.look) ids.add(this.data_.companions[c].look);
       if (this.data_.camp?.fire?.look) ids.add(this.data_.camp.fire.look);
+      if (this.data_.camp?.chest?.look) ids.add(this.data_.camp.chest.look);
+      const S = this.data_.camp?.sound || {};
+      for (const id of [S.wind, S.fire, ...(S.gusts || [])]) if (id) ids.add(id);
     }
     for (const id of [...ids]) if (A[id]?.mirror) ids.add(A[id].mirror);   // drawn opposite direction
     for (const id of ids) {
@@ -50,6 +53,7 @@ export class PlayScene extends Phaser.Scene {
       const url = new URL(a.file, this.base).href;
       if ((a.kind === 'animation' || a.kind === 'tiles') && a.frameSize) this.load.spritesheet(id, url, { frameWidth: a.frameSize[0], frameHeight: a.frameSize[1] });
       else if (a.kind === 'image') this.load.image(id, url);
+      else if (a.kind === 'sound' && !this.cache.audio.exists(id)) this.load.audio(id, [url, ...(a.alt ? [new URL(a.alt, this.base).href] : [])]);
     }
   }
   assetInfo(id) {
@@ -94,6 +98,8 @@ export class PlayScene extends Phaser.Scene {
   // ---------- world ----------
   create() {
     this.camp = null; this.vanPrompt = false;   // the scene object is reused on restart (camp ↔ run)
+    this.sound.stopAll(); this.sound.removeAll();   // camp sounds belong to one visit
+    try { this.sound.mute = localStorage.getItem('nomadgirl-mute') === '1'; } catch { /* private mode */ }
     makeTextures(this);
     this.fx = new Fx(this);
     this.combat = new Combat(this);
@@ -200,7 +206,8 @@ export class PlayScene extends Phaser.Scene {
     this.cam.fadeOut(fade, 13, 10, 18);
     this.cam.once('camerafadeoutcomplete', go);
   }
-  goCamp({ banner = null, fade = 600, keepPlace = false } = {}) {
+  goCamp({ banner = null, fade = 600, keepPlace = false, arriving = false } = {}) {
+    if (arriving) { arrive(this.box.save, this.data_); if (banner) banner = [banner[0], banner[1].replace(/^Tag \d+ · \d\d:\d\d/, clockText(this.box.save))]; }
     this.box.save.health = Math.max(1, Math.min(this.leyla.maxHealth, this.box.save.health));
     this.box.persist();
     this.restartAs({ mode: 'camp', banner, startX: keepPlace ? this.leyla.x : null }, fade);
@@ -224,7 +231,7 @@ export class PlayScene extends Phaser.Scene {
     save.buffs = [];
     save.run = null;
     const banner = ko ? ['Mama-Bot hat dich heimgebracht', `${clockText(save)} · Die Run-Beute ist weg.`] : ['Zurück im Camp', `${clockText(save)} · +${this.deltas} Δ · ${this.kills} Kills`];
-    this.goCamp({ banner, fade: ko ? 900 : 600 });
+    this.goCamp({ banner, fade: ko ? 900 : 600, arriving: true });
   }
 
   spawnEnemies() {
@@ -342,6 +349,7 @@ export class PlayScene extends Phaser.Scene {
   update(time, delta) {
     const input = this.readInput();
     if (input.help.pressed) this.hud.toggleHelp();
+    if (input.mute.pressed) { this.sound.mute = !this.sound.mute; try { localStorage.setItem('nomadgirl-mute', this.sound.mute ? '1' : '0'); } catch { /* */ } this.hud.banner(this.sound.mute ? 'Ton aus' : 'Ton an', 'M schaltet um'); this.time.delayedCall(1200, () => this.hud.banner(null)); }
     if (input.debug.pressed) { const w = this.physics.world; w.drawDebug = !w.drawDebug; if (!w.debugGraphic) w.createDebugGraphic(); w.debugGraphic.clear().setVisible(w.drawDebug); }
     if (input.restart.pressed && this.mode !== 'camp') this.restartRoom();
     if (this.hud.paused || this.hud.modal || this.leaving) { this.physics.world.pause(); this.hud.update(this, time); return; }

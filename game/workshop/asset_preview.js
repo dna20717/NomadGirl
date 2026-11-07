@@ -29,7 +29,21 @@ const failed = (file, e) => el('p', { class: 'ng-inline error' }, icon('error', 
 
 // Preview of any asset: animation → player, everything else → picture
 export function assetPreview(w, a) {
-  return a?.kind === 'animation' ? spritePreview(w, a) : picturePreview(w, a);
+  return a?.kind === 'animation' ? spritePreview(w, a) : a?.kind === 'sound' ? soundPreview(w, a) : picturePreview(w, a);
+}
+
+// Sound: a player (the browser's own controls), length shown once it is loaded
+export function soundPreview(w, a) {
+  const info = el('span', { class: 'ng-sprite-info' });
+  const box = el('div', { class: 'ng-sprite-stage picture back-dark' });
+  const wrap = el('div', { class: 'ng-sprite' }, el('div', { class: 'ng-sprite-bar' }, icon('music', 14), info), box);
+  if (!a?.file) { box.append(el('p', { class: 'ed-small' }, 'Datei eintragen, dann lässt sich der Ton hier abspielen.')); return wrap; }
+  objectUrl(w, a.file).then(src => {
+    const audio = el('audio', { src, controls: true, loop: true, style: 'width: min(420px, 90%); margin: 24px auto; display: block' });
+    audio.addEventListener('loadedmetadata', () => { info.textContent = ` ${audio.duration.toFixed(1).replace('.', ',')} s · ${a.file}`; });
+    box.append(audio);
+  }).catch(e => box.append(failed(a.file, e)));
+  return wrap;
 }
 
 // Picture (image, reference, original): fitted, background switch, tap opens the full size
@@ -53,6 +67,7 @@ export function picturePreview(w, a) {
 export function assetThumb(w, a, size = 28) {
   const box = el('span', { class: 'ng-thumb', style: `--s:${size}px` });
   if (!a?.file) return box;
+  if (a.kind === 'sound') { box.append(icon('music', Math.round(size * 0.7))); return box; }
   if (a.kind === 'animation') {
     const [fw, fh] = a.frameSize || [0, 0];
     if (!fw || !fh) return box;

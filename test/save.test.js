@@ -1,7 +1,7 @@
 // Savegame (game/save.js): start rig, clock, repair of old savegames, travel costs.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { newSave, placeWorkshops, advance, hoursUntil, clockText, repairSave } from '../game/save.js';
+import { newSave, placeWorkshops, advance, hoursUntil, clockText, repairSave, arrive } from '../game/save.js';
 import { travelCost } from '../game/play/camp.js';
 import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
@@ -36,4 +36,10 @@ test('Alter Spielstand wird repariert', () => {
 test('Fahrtkosten', () => {
   const t = travelCost(D, newSave(D), 'bunker_13');
   assert.deepEqual(t, { km: 42, hours: 1, fuel: 5.4, food: 0.1 });
+});
+
+test('Ankunft im Camp: immer Dämmerung', () => {
+  const s = { day: 1, hour: 21.5 };
+  arrive(s, D); assert.equal(clockText(s), 'Tag 2 · 18:30');
+  arrive(s, D); assert.equal(clockText(s), 'Tag 2 · 18:30');   // already dusk: stays
 });

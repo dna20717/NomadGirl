@@ -693,5 +693,68 @@
   "derivedFrom": "campfire_source",
   "date": "07.11.2026",
   "description": "Pixel-Art von Daniel, Holzscheite im Steinkreis mit Flammen und Funken. Ankerpunkt = Mitte der Steine am Boden. Im Camp mit Lichtschein am Abend und in der Nacht."
+ },
+ "chest_source": {
+  "name": "Kiste · Original",
+  "kind": "source",
+  "file": "assets/camp/chest_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF 64 × 64, 5 Frames à 150 ms, Deckel geht auf."
+ },
+ "chest": {
+  "name": "Kiste",
+  "kind": "animation",
+  "file": "assets/camp/chest.png",
+  "frameSize": [46, 45],
+  "frames": 5,
+  "fps": 6.67,
+  "loop": false,
+  "origin": [23, 44],
+  "height": 90,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "chest_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art von Daniel: Metallkiste, Frame 1 zu, Frame 5 offen. Im Camp mit E öffnen und schließen."
+ },
+ "sound_campfire": {
+  "name": "Lagerfeuer knistert",
+  "kind": "sound",
+  "file": "assets/sound/campfire.m4a",
+  "alt": "assets/sound/campfire.ogg",
+  "volume": 100,
+  "source": "von Daniel (WAV, 29 s), mit ffmpeg nach AAC/Vorbis umgewandelt",
+  "date": "07.11.2026",
+  "description": "Schleife, im Camp lauter, je näher Leyla dem Feuer kommt."
+ },
+ "sound_wind": {
+  "name": "Wind",
+  "kind": "sound",
+  "file": "assets/sound/wind.m4a",
+  "alt": "assets/sound/wind.ogg",
+  "volume": 100,
+  "source": "von Daniel",
+  "date": "07.11.2026",
+  "description": "Wind, 6,7 s, leise Schleife im Camp."
+ },
+ "sound_wind2": {
+  "name": "Wind 2 (Böe)",
+  "kind": "sound",
+  "file": "assets/sound/wind2.m4a",
+  "alt": "assets/sound/wind2.ogg",
+  "volume": 100,
+  "source": "von Daniel",
+  "date": "07.11.2026",
+  "description": "Wind, 6,7 s, kommt als Böe ab und zu dazu."
+ },
+ "sound_wind3": {
+  "name": "Wind 3 (kurze Böe)",
+  "kind": "sound",
+  "file": "assets/sound/wind3.m4a",
+  "alt": "assets/sound/wind3.ogg",
+  "volume": 100,
+  "source": "von Daniel",
+  "date": "07.11.2026",
+  "description": "Kurzer Windstoß, 1,7 s."
  }
 }

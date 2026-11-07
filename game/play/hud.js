@@ -7,7 +7,7 @@ const CONTROLS = [
   ['L oder C', 'Dash (auch in der Luft)'], ['S / ↓ beim Rennen', 'Slide (unter Hindernissen durch)'], ['S + Leertaste', 'Von Plattform fallen'], ['S / ↓ im Stand', 'Ducken; an der Kante + Richtung: runter hängen'],
   ['Richtung zur Wand im Sprung', 'Kante greifen; W/Leertaste: hochziehen, S: loslassen, Leertaste weg von der Wand: abspringen'],
   ['W / ↑ an der Leiter', 'Klettern'], ['W / ↑ oder E in der Luft', 'Am Seil festhalten, Leertaste: loslassen mit Schwung'],
-  ['E', 'Benutzen: Werkstätten, Lagerfeuer, Companions, Van (im Run: zurück ins Camp)'], ['J oder Y', 'Nahkampf'], ['K oder X', 'Fernkampf'], ['R', 'Raum neu starten'], ['H / Esc', 'Diese Hilfe'], ['G', 'Hitboxen zeigen'],
+  ['E', 'Benutzen: Werkstätten, Lagerfeuer, Companions, Van (im Run: zurück ins Camp)'], ['J oder Y', 'Nahkampf'], ['K oder X', 'Fernkampf'], ['R', 'Raum neu starten'], ['M', 'Ton an/aus'], ['H / Esc', 'Diese Hilfe'], ['G', 'Hitboxen zeigen'],
 ];
 
 export class Hud {

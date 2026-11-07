@@ -9,7 +9,7 @@
  "rig": {"placeWidth": 4, "height": 248, "gap": 1, "wall": "#4a4f5a", "inside": "#2b2233", "light": "#ffcf7a", "labels": true},
  "fire": {"enabled": true, "look": "campfire", "at": 9, "radius": 460, "color": "#ff8a2a", "strength": 100, "pool": 300, "flicker": 25, "lift": 80},
  "companions": {"at": [6, 13], "barkEvery": [7, 15], "barkTime": 4},
- "clock": {"startDay": 1, "startHour": 18.5, "wakeHour": 7, "runHours": 3, "fireHours": 1},
+ "clock": {"startDay": 1, "startHour": 18.5, "wakeHour": 7, "runHours": 3, "fireHours": 1, "arriveHour": 18.5},
  "daytime": [
   {"from": 5, "weather": "morgen", "shade": 12, "light": 15, "name": "Morgen"},
   {"from": 9, "weather": "tag", "shade": 0, "light": 0, "name": "Tag"},
@@ -18,5 +18,19 @@
  ],
  "heal": {"sleep": 100, "fire": 25, "afterKo": 30},
  "interactRange": 130,
- "fallbackRoom": "kampfraum"
+ "fallbackRoom": "kampfraum",
+ "chest": {"enabled": true, "look": "chest", "at": 16, "flip": false},
+ "sound": {
+  "wind": "sound_wind",
+  "windVolume": 22,
+  "gusts": ["sound_wind2", "sound_wind3"],
+  "gustEvery": [9, 22],
+  "gustVolume": 14,
+  "fire": "sound_campfire",
+  "fireVolume": 90,
+  "fireMin": 4,
+  "fireRange": 1100,
+  "fireNear": 120
+ },
+ "vanLight": {"enabled": true, "color": "#ffc870", "strength": 150, "width": 110, "height": 150, "lift": 150, "pool": 260, "spill": 40}
 }

@@ -44,7 +44,7 @@ export const RIG_SLOTS = [['engine', 'Motor'], ['armor', 'Panzerung'], ['weapon'
 export const POI_KINDS = [['gasStation', 'Tankstelle'], ['settlement', 'Siedlung'], ['factory', 'Fabrik'], ['bunker', 'Bunker'], ['government', 'Regierungskomplex'], ['mall', 'Einkaufszentrum'], ['ruin', 'Ruine']];
 export const POI_SIZES = [['S', 'S'], ['M', 'M'], ['L', 'L'], ['XL', 'XL']];
 export const ROOM_TAGS = [['start', 'Eingang'], ['exit', 'Ausgang'], ['combat', 'Kampf'], ['loot', 'Beute'], ['secret', 'Geheimnis'], ['npc', 'NPCs'], ['boss', 'Boss'], ['corridor', 'Gang']];
-export const ASSET_KINDS = [['animation', 'Animation'], ['tiles', 'Kacheln'], ['image', 'Bild'], ['reference', 'Referenz'], ['source', 'Original']];
+export const ASSET_KINDS = [['animation', 'Animation'], ['tiles', 'Kacheln'], ['image', 'Bild'], ['sound', 'Ton'], ['reference', 'Referenz'], ['source', 'Original']];
 export const DAYTIME = [['any', 'Immer'], ['day', 'Tag'], ['night', 'Nacht']];
 export const DRONE_MOODS = [['idle', 'Normal'], ['kill', 'Gegner erledigt'], ['cleared', 'Raum geräumt'], ['bored', 'Langeweile'], ['alert', 'Gegner in der Nähe'],
   ['curious', 'Neugierig (zufällig)'], ['hit', 'Leyla getroffen'], ['sleep', 'Schlafen'], ['down', 'Leyla k.o.'], ['scan', 'Scannen (zufällig)'], ['lowHealth', 'Wenig Leben'], ['dash', 'Dash']];
@@ -66,10 +66,14 @@ export const AREAS = {
       { title: 'Im Spiel', when: x => x.kind === 'animation' || x.kind === 'image', fields: [point('origin', 'Ankerpunkt', { unit: 'px', hint: 'Wo die Füße stehen (bei Animationen im Frame): Dieser Punkt sitzt im Spiel auf dem Boden' }),
         num('height', 'Höhe im Spiel', { unit: 'px', min: 1, hint: 'Auf diese Höhe wird das Bild bzw. ein Frame im Spiel skaliert' }), bool('flip', 'Schaut nach links', { hint: 'Wenn die Grafik nach links schaut; das Spiel spiegelt dann umgekehrt' }),
         ref('mirror', 'Gegenrichtung', 'assets', { hint: 'Dieselbe Grafik in die andere Blickrichtung (eigene Zeichnung statt gespiegelt). Leer = das Spiel spiegelt' })] },
+      { title: 'Ton', when: x => x.kind === 'sound', fields: [text('alt', 'Ersatzdatei', { hint: 'Gleicher Ton in einem zweiten Format (z. B. .ogg zur .m4a); das Spiel nimmt, was der Browser kann' }),
+        num('volume', 'Grundlautstärke', { unit: '%', min: 0, max: 200, hint: 'Gleicht laute und leise Aufnahmen aus' })] },
       { title: 'Herkunft', fields: [text('source', 'Erzeugt mit', { hint: 'KI-Werkzeug oder Code' }), ref('derivedFrom', 'Abgeleitet von', 'assets', { hint: 'z. B. Streifen aus einem Original-GIF' }), text('date', 'Datum')] },
     ],
     check: (x, report, p) => {
       if (x.file && p.exists && !p.exists(x.file)) report('error', `Datei ${x.file} fehlt`);
+      if (x.alt && p.exists && !p.exists(x.alt)) report('error', `Ersatzdatei ${x.alt} fehlt`);
+      if (x.kind === 'sound' && x.file && !/\.(m4a|mp3|ogg|wav)$/i.test(x.file)) report('warning', 'Töne sind .m4a, .mp3, .ogg oder .wav');
       if (x.kind === 'tiles' && (!x.frameSize || !x.frames)) report('error', 'Kacheln ohne Frame-Größe oder Frames');
       if (x.kind === 'animation') {
         if (x.file && !/\.(png|webp)$/i.test(x.file)) report('warning', 'Animationen sind PNG-Streifen');
@@ -417,8 +421,18 @@ export const AREAS = {
       { title: 'Lagerfeuer', fields: [bool('fire.enabled', 'Zeigen'), ref('fire.look', 'Aussehen', 'assets', { hint: 'Animation, Ankerpunkt = Mitte am Boden. Leer = Flammen aus Code' }), num('fire.at', 'Abstand vom Van', { unit: 'Kacheln', min: 1 }),
         num('fire.radius', 'Lichtradius', { unit: 'px', min: 0 }), color('fire.color', 'Lichtfarbe'), num('fire.strength', 'Lichtstärke', { unit: '%', min: 0, max: 200, hint: 'Bei Licht 100 % der Tageszeit' }),
         num('fire.pool', 'Lichtkegel am Boden', { unit: 'px', min: 0, hint: 'Breite des warmen Scheins auf dem Boden, 0 = aus' }), num('fire.flicker', 'Flackern', { unit: '%', min: 0, max: 100 }), num('fire.lift', 'Lichtmitte über dem Boden', { unit: 'px', min: 0 })] },
+      { title: 'Licht aus dem Van', fields: [bool('vanLight.enabled', 'Zeigen', { hint: 'Abends und nachts (Licht % der Tageszeit) quillt Licht aus der offenen Schiebetür' }), color('vanLight.color', 'Farbe'),
+        num('vanLight.strength', 'Stärke', { unit: '%', min: 0, max: 200 }), num('vanLight.width', 'Breite in der Tür', { unit: 'px', min: 10 }), num('vanLight.height', 'Höhe in der Tür', { unit: 'px', min: 10 }),
+        num('vanLight.lift', 'Mitte über dem Boden', { unit: 'px', min: 0 }), num('vanLight.pool', 'Lichtkegel am Boden', { unit: 'px', min: 0 }), num('vanLight.spill', 'Kegel versetzt', { unit: 'px' })] },
+      { title: 'Kiste', fields: [bool('chest.enabled', 'Zeigen'), ref('chest.look', 'Aussehen', 'assets', { hint: 'Animation: erster Frame zu, letzter offen. E öffnet und schließt' }),
+        num('chest.at', 'Abstand vom Van', { unit: 'Kacheln' }), bool('chest.flip', 'Gespiegelt')] },
+      { title: 'Ton', fields: [ref('sound.wind', 'Wind', 'assets', { hint: 'Läuft leise in Schleife' }), num('sound.windVolume', 'Wind-Lautstärke', { unit: '%', min: 0, max: 100 }),
+        refs('sound.gusts', 'Böen', 'assets', { hint: 'Kommen ab und zu dazu, zufällig' }), range('sound.gustEvery', 'Böen alle', { unit: 's' }), num('sound.gustVolume', 'Böen-Lautstärke', { unit: '%', min: 0, max: 100 }),
+        ref('sound.fire', 'Lagerfeuer', 'assets', { hint: 'Wird lauter, je näher Leyla den Flammen kommt, und klingt von links oder rechts' }), num('sound.fireVolume', 'Feuer ganz nah', { unit: '%', min: 0, max: 100 }),
+        num('sound.fireMin', 'Feuer von weitem', { unit: '%', min: 0, max: 100 }), num('sound.fireRange', 'Hörweite', { unit: 'px', min: 50 }), num('sound.fireNear', 'Voll ab', { unit: 'px', min: 0, hint: 'Näher als das: volle Lautstärke' })] },
       { title: 'Companions', fields: [range('companions.at', 'Stehen von – bis', { unit: 'Kacheln vom Van' }), range('companions.barkEvery', 'Sprüche alle', { unit: 's' }), num('companions.barkTime', 'Bläschen zeigen', { unit: 's', min: 1 })] },
       { title: 'Zeit', fields: [num('clock.startDay', 'Start-Tag', { min: 1 }), num('clock.startHour', 'Start-Uhrzeit', { unit: 'h', min: 0, max: 23.99, step: 0.25 }),
+        num('clock.arriveHour', 'Ankunft im Camp um', { unit: 'h', min: 0, max: 23.99, step: 0.25, hint: 'Daniel: „Camp startet immer in der Dämmerung“. Beim Laden, nach einem Run und nach dem Fahren springt die Uhr vor bis zu dieser Uhrzeit. Leer = Uhr läuft nur mit den Aktionen' }),
         num('clock.wakeHour', 'Aufwachen um', { unit: 'h', min: 0, max: 23 }), num('clock.runHours', 'Ein Run dauert', { unit: 'h', min: 0, step: 0.25 }),
         num('clock.fireHours', 'Am Feuer sitzen', { unit: 'h', min: 0, step: 0.25 })] },
       { title: 'Tag & Nacht', fields: [table('daytime', 'Tageszeiten', [num('from', 'Ab Uhr'), ref('weather', 'Wetter', 'weather'), num('shade', 'Abdunkeln %', { min: 0, max: 90 }), num('light', 'Licht %', { min: 0, max: 100 }), text('name', 'Name')],
