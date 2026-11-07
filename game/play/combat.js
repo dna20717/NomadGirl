@@ -8,26 +8,27 @@ export class Combat {
   }
 
   boost() { return 1 + (this.scene.mods?.damage || 0) / 100; }   // damage buffs from the camp
-  melee(leyla, time) {
+  // power (heavy hit): { damage ×, range +px, knockback +, heavy }
+  melee(leyla, time, power = null) {
     const s = this.scene, w = s.weapon('melee');
     if (!w) return;
-    leyla.meleeReady = time + (w.cooldown ?? 400);
+    leyla.meleeReady = Math.max(leyla.meleeReady || 0, time + (w.cooldown ?? 400));
     leyla.attackPose = time + 160;
-    const reach = (w.range ?? 70) + 40, f = leyla.facing, b = leyla.body;
+    const reach = (w.range ?? 70) + 40 + (power?.range || 0), f = leyla.facing, b = leyla.body;
     const x0 = f > 0 ? b.center.x : b.left - reach, x1 = f > 0 ? b.right + reach : b.center.x;
     const H = leyla.height, y0 = b.bottom - H, y1 = b.bottom - H * 0.1;
-    s.fx.slash(leyla.x + f * 24, b.bottom - H * 0.58, f, w.range ?? 70);
+    if (!leyla.attack) s.fx.slash(leyla.x + f * 24, b.bottom - H * 0.58, f, w.range ?? 70);   // the attack animations bring their own slash
     let hits = 0;
     for (const e of s.enemies) {
       if (!e.alive) continue;
       const eb = e.body;
       if (eb.right > x0 && eb.left < x1 && eb.bottom > y0 && eb.top < y1) {
         const crit = Math.random() * 100 < (w.critChance ?? 0);
-        e.hit(time, Math.round((w.damage ?? 10) * this.boost() * (crit ? 2 : 1)), w.knockback ?? 200, f, crit);
+        e.hit(time, Math.round((w.damage ?? 10) * (power?.damage || 1) * this.boost() * (crit ? 2 : 1)), (w.knockback ?? 200) + (power?.knockback || 0), f, crit);
         hits++;
       }
     }
-    if (hits) { s.hitstop(time, 55); s.cam.shake(70, 0.003); }
+    if (hits) { s.hitstop(time, power?.heavy ? 110 : 55); s.cam.shake(power?.heavy ? 160 : 70, power?.heavy ? 0.008 : 0.003); }
   }
 
   shoot(leyla, time) {

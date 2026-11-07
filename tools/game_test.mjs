@@ -39,7 +39,11 @@ for (let i = 0; i < 40 && foes.find(e => e.id === 'schlaeger')?.state !== 'dead'
 }
 v = await t(t => t.run(1));
 check('Nahkampf: Schläger besiegt', v.kills >= 1, { v, foes });
-v = await t(t => t.run(70));
+// heavy melee: hold J for 3 s, release
+v = await t(t => t.run(60));
+const heavy = await page.evaluate(() => { const l = game.scene.getScene('play').leyla; nomad.step(1, ['melee'], ['melee']); nomad.step(185, ['melee']); const ready = !!l.charging?.ready; nomad.step(1); const atk = l.attack?.power?.heavy; return { ready, atk }; });
+check('Nahkampf schwer: 3 s halten, loslassen', heavy.ready && heavy.atk, heavy);
+v = await t(t => t.run(130));
 v = await t(t => t.run(10, [], ['ranged']));
 check('Fernkampf: Waffe gezogen, Schuss aus dem Magazin', v.armed === 'on' && v.mag === 6 && v.ammo === 33, v);
 for (let i = 0; i < 12 && v.mag > 0; i++) v = await t(t => t.run(30, [], ['ranged']));

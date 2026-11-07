@@ -73,5 +73,19 @@
   "description": "Hacking kommt später. Bis dahin ein sehr teurer Briefbeschwerer.",
   "knockback": null,
   "glyph": "💾"
+ },
+ "karambit": {
+  "name": "Karambit",
+  "kind": "melee",
+  "damage": 11,
+  "cooldown": 300,
+  "range": 64,
+  "knockback": 170,
+  "size": [1, 2],
+  "tier": 1,
+  "value": 15,
+  "critChance": 15,
+  "glyph": "🗡",
+  "description": "Gebogene Klinge mit Fingerring. Leylas Lieblingsmesser, schnell und gemein."
  }
 }

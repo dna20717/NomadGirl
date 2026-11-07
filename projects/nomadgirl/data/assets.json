@@ -1300,5 +1300,74 @@
   "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
   "date": "07.11.2026",
   "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "leyla_melee_light_side_source": {
+  "name": "Leyla · Nahkampf leicht · Original",
+  "kind": "source",
+  "file": "assets/leyla/melee_light_side_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 9 Frames à 200 ms."
+ },
+ "leyla_melee_light_side": {
+  "name": "Leyla · Nahkampf leicht",
+  "kind": "animation",
+  "file": "assets/leyla/melee_light_side.png",
+  "frameSize": [247, 244],
+  "frames": 9,
+  "fps": 20,
+  "loop": false,
+  "origin": [123.5, 242],
+  "height": 193.6,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_melee_light_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art: schneller Messerhieb aus dem Stand (Treffer Frame 2–3), danach Kampfhaltung."
+ },
+ "leyla_melee_heavy_side_source": {
+  "name": "Leyla · Nahkampf schwer · Original",
+  "kind": "source",
+  "file": "assets/leyla/melee_heavy_side_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 17 Frames à 200 ms."
+ },
+ "leyla_melee_heavy_side": {
+  "name": "Leyla · Nahkampf schwer",
+  "kind": "animation",
+  "file": "assets/leyla/melee_heavy_side.png",
+  "frameSize": [126, 244],
+  "frames": 17,
+  "fps": 20,
+  "loop": false,
+  "origin": [63.5, 242],
+  "height": 193.6,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_melee_heavy_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art: geht in die Hocke (Frames 3–10 = Aufladen, Schleife), Drehhieb (11–13), richtet sich auf. Aufgeladen durch 3 s Halten."
+ },
+ "leyla_melee_walk_side_source": {
+  "name": "Leyla · Nahkampf im Gehen · Original",
+  "kind": "source",
+  "file": "assets/leyla/melee_walk_side_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 17 Frames à 200 ms."
+ },
+ "leyla_melee_walk_side": {
+  "name": "Leyla · Nahkampf im Gehen",
+  "kind": "animation",
+  "file": "assets/leyla/melee_walk_side.png",
+  "frameSize": [229, 253],
+  "frames": 17,
+  "fps": 20,
+  "loop": false,
+  "origin": [81, 251],
+  "height": 200.7,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_melee_walk_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art: Hieb aus der Bewegung (Treffer Frame 11). Für leicht und schwer im Gehen, bis es eine eigene schwere Version gibt."
  }
 }

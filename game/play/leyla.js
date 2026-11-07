@@ -100,7 +100,7 @@ export class Leyla {
       case 'dead': b.setVelocityX(b.velocity.x * 0.9); break;
     }
     if (this.alive && !['climb', 'hang', 'mantle'].includes(this.state)) {
-      if (input.melee.pressed && time >= this.meleeReady) this.scene.combat.melee(this, time);
+      this.meleeInput(time, input, grounded);
       // shooting only on the ground with the gun drawn (Daniel: no shooting in a jump); empty magazine = reload
       const gun = !!this.d.look?.aim && this.d.armed?.enabled !== false;
       const canShoot = this.state === 'normal' && grounded && !this.reloading && (!gun || this.armed === 'on');
@@ -426,14 +426,27 @@ export class Leyla {
       else { name = '@' + (L.aim || L.idle); armedFrame = 1; }   // gun held out: the last frame of "stretch out"
       if (shot && this.shotSeen !== this.shotAt) { this.shotSeen = this.shotAt; this.restartLook = true; }
     }
+    // melee: the attack runs over its time (frames from "ab Frame"), charging holds the crouch loop of the heavy attack
+    let pin = null;
+    if (this.attack && st === 'normal') { const a = this.attack; name = '@' + a.look; armedFrame = Math.min(1, (time - a.at) / a.dur); armedFrom = a.from; }
+    else if (this.charging && st === 'normal' && grounded && !walking && L.meleeHeavy) {
+      const [c0, c1] = this.d.melee?.chargeLoop || [3, 10], t = time - this.charging.at - (this.d.melee?.chargeAfter ?? 250), n0 = Math.max(1, c0 - 1);
+      name = '@' + L.meleeHeavy;
+      pin = t < n0 * 60 ? Math.floor(t / 60) : c0 - 1 + Math.floor((t - n0 * 60) / 110) % Math.max(1, c1 - c0 + 1);   // into the crouch, then the charging loop
+    }
     // mantle and crouch pick their frame from the progress (crouch backwards = standing up)
     const flipFrames = name === 'airJump' && (this.m.airJumpFromFrame ?? 1) > 1;
     const climbFrames = st === 'climb' && (this.m.climbFromFrame ?? 1) > 0;
     const manual = st === 'mantle' || st === 'crouch' || st === 'dash' || st === 'land' || st === 'sit' || flipFrames || climbFrames, an0 = this.sprite.anims;
-    if (!manual && armedFrame == null && st !== 'slide' && an0.isPaused) an0.resume();
+    if (!manual && armedFrame == null && pin == null && st !== 'slide' && an0.isPaused) an0.resume();
     const info = this.scene.playLook(this.sprite, 'leyla', name, this.facing);
     if (this.restartLook && an0.currentAnim) { this.restartLook = false; an0.restart(); }
-    if (armedFrame != null && info.used === name && an0.currentAnim) {
+    if (pin != null && info.used === name && an0.currentAnim) {
+      const fr = an0.currentAnim.frames;
+      if (!an0.isPaused) an0.pause();
+      this.sprite.setFrame(fr[Math.max(0, Math.min(fr.length - 1, pin))].frame.name);
+      if (this.charging?.ready) this.sprite.setTint(Math.floor(time / 90) % 2 ? 0xffffff : 0xffe0a0); else this.sprite.clearTint();
+    } else if (armedFrame != null && info.used === name && an0.currentAnim) {
       const fr = an0.currentAnim.frames, from = Math.min(fr.length - 1, Math.max(0, armedFrom - 1));
       if (!an0.isPaused) an0.pause();
       this.sprite.setFrame(fr[Math.round(from + (fr.length - 1 - from) * Math.min(1, armedFrame))].frame.name);
@@ -487,6 +500,37 @@ export class Leyla {
     if (st !== 'dead') this.sprite.setAlpha(time < this.invulnerableUntil && Math.floor(time / 70) % 2 ? 0.35 : 1);
   }
 
+  // ---------- melee (Daniel, 07.11.2026 spät): tap = light hit, standing or walking; holding ≥ 3 s = heavy hit when released ----------
+  meleeInput(time, input, grounded) {
+    const M = this.d.melee || {}, L = this.d.look || {}, b = this.body;
+    if (this.attack) {
+      const a = this.attack, p = (time - a.at) / a.dur;
+      if (!a.hit && p >= a.hitAt) { a.hit = true; this.scene.combat.melee(this, time, a.power); }
+      if (p >= 1 || this.state !== 'normal') this.attack = null;
+      return;
+    }
+    if (input.melee.pressed && time >= this.meleeReady) {
+      if (!grounded || this.state !== 'normal' || !(L.meleeLight || L.meleeHeavy)) { this.scene.combat.melee(this, time); return; }   // in the air: the quick code hit
+      this.charging = { at: time, ready: false };
+    }
+    const c = this.charging;
+    if (!c) return;
+    if (this.state !== 'normal' || !grounded) { this.charging = null; this.sprite.clearTint(); return; }
+    const held = time - c.at;
+    if (!c.ready && held >= (M.chargeTime ?? 3000)) { c.ready = true; this.scene.fx.sparks(this.x, this.chest, 0xffd27a, 14); this.scene.drone?.react('alert'); }
+    if (input.melee.down) return;
+    // released: heavy when charged, otherwise light; walking picks the walking version
+    this.charging = null; this.sprite.clearTint();
+    const walking = Math.abs(b.velocity.x) > 20, heavy = c.ready;
+    const look = heavy ? (walking ? L.meleeHeavyWalk || L.meleeHeavy : L.meleeHeavy) : (walking ? L.meleeLightWalk || L.meleeLight : L.meleeLight);
+    if (!look) { this.scene.combat.melee(this, time); return; }
+    const key = (heavy ? 'heavy' : 'light') + (walking ? 'Walk' : '');
+    this.attack = { look, at: time, dur: M[key + 'Time'] ?? 450, hitAt: M[key + 'Hit'] ?? 0.4, from: M[key + 'From'] ?? (heavy && !walking ? 11 : 1), hit: false,
+      power: heavy ? { damage: (M.heavyDamage ?? 250) / 100, range: M.heavyRange ?? 160, knockback: M.heavyKnockback ?? 220, heavy: true } : null };
+    this.meleeReady = time + this.attack.dur;
+    this.attackPose = time + this.attack.dur;   // keeps facing the way she strikes
+  }
+
   // ---------- magazine and reloading (Waffen › Magazin, Nachladen dauert; R lädt nach, leer = automatisch) ----------
   loadWeapon() {
     const w = this.scene.weapon('ranged'), total = w?.ammo ?? Infinity;
@@ -508,7 +552,7 @@ export class Leyla {
   // kann schießen oder gehen und schießen; sobald sie rennt oder springt, steckt sie die Waffe wieder weg") ----------
   updateArmed(time, dt, grounded) {
     const A = this.d.armed || {}, s = this.scene, v = this.body.velocity;
-    const can = A.enabled !== false && this.d.look?.aim && s.weapon('ranged') && (s.mode !== 'camp' || A.inCamp) && this.state === 'normal' && grounded
+    const can = A.enabled !== false && this.d.look?.aim && s.weapon('ranged') && (s.mode !== 'camp' || A.inCamp) && this.state === 'normal' && grounded && !this.attack && !this.charging
       && Math.abs(v.x) <= (this.m.walkSpeed ?? 240) * 1.15;
     this.armed ??= 'off';
     if (!can) { this.armed = 'off'; this.drawP = 0; return; }

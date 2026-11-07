@@ -42,10 +42,10 @@ check('Rechtsklick dreht (liegt quer)', s.backpack.items.some(i => i === 'machet
 // equip: machete onto the melee slot, the pipe wrench comes back in hand and goes into the free cell
 await click(0, 0, 2); await slot('Nahkampf');
 s = await inv();
-check('Machete in den Nahkampf-Slot, Rohrzange in der Hand', s.slots.melee === 'machete' && s.held === 'rohrzange×1', s);
+check('Machete in den Nahkampf-Slot, Karambit in der Hand', s.slots.melee === 'machete' && s.held === 'karambit×1', s);
 await click(1, 2, 0);
 s = await inv();
-check('Rohrzange in die Kiste', !s.held && has(s.other.grid, 'rohrzange'), s);
+check('Karambit in die Kiste', !s.held && has(s.other.grid, 'karambit'), s);
 check('Kampf nutzt die neue Waffe', await ev(() => game.scene.getScene('play').weapon('melee')?.name === 'Machete'), null);
 // wrong slot
 await click(1, 0, 0); await slot('Fernkampf');

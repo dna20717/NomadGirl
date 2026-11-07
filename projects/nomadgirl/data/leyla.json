@@ -39,7 +39,7 @@
   "landFromFrame": 4,
   "landCancel": 55
  },
- "loadout": {"melee": "rohrzange", "ranged": "nagelpistole", "backpack": "schulranzen"},
+ "loadout": {"melee": "karambit", "ranged": "nagelpistole", "backpack": "schulranzen"},
  "look": {
   "idle": "leyla_idle_side",
   "reference": "leyla_sheet",
@@ -63,7 +63,11 @@
   "shootWalk": "leyla_shoot_walk_side",
   "work": "leyla_work_back",
   "reload": "leyla_reload_side",
-  "reloadWalk": "leyla_reload_walk_side"
+  "reloadWalk": "leyla_reload_walk_side",
+  "meleeLight": "leyla_melee_light_side",
+  "meleeLightWalk": "leyla_melee_walk_side",
+  "meleeHeavy": "leyla_melee_heavy_side",
+  "meleeHeavyWalk": "leyla_melee_walk_side"
  },
  "idleAltChance": 50,
  "inventory": {"pickupRange": 150, "autoStack": true, "cell": 44, "dropSpread": 90},
@@ -80,5 +84,24 @@
   "flashColor": "#ffc870",
   "flashRadius": 260,
   "flashTime": 90
+ },
+ "melee": {
+  "lightTime": 420,
+  "lightHit": 0.2,
+  "lightWalkTime": 420,
+  "lightWalkHit": 0.45,
+  "chargeTime": 3000,
+  "chargeAfter": 250,
+  "chargeLoop": [3, 10],
+  "heavyTime": 700,
+  "heavyFrom": 11,
+  "heavyHit": 0.3,
+  "heavyWalkTime": 620,
+  "heavyWalkHit": 0.55,
+  "heavyDamage": 250,
+  "heavyRange": 160,
+  "heavyKnockback": 220,
+  "lightWalkFrom": 6,
+  "heavyWalkFrom": 4
  }
 }
