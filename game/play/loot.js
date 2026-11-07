@@ -17,9 +17,12 @@ function bagTexture(scene) {
 }
 
 export class Loot {
-  constructor(scene) {
+  // camp: the bundles lying around stay in the savegame (save.ground[location]); in a run they are gone afterwards
+  constructor(scene, stored = null) {
     this.scene = scene; this.piles = []; this.tick = 0;
     this.I = scene.data_.leyla?.inventory || {};
+    this.stored = stored;
+    for (const p of stored || []) if (p.grid?.items?.length) this.show({ x: p.x, feet: p.feet, grid: p.grid, sprite: null }, p.x, true);
   }
   get range() { return this.I.pickupRange ?? 150; }
 
@@ -33,11 +36,13 @@ export class Loot {
     }
   }
   make(x, feet) { return { x, feet, grid: newGrid(...PILE), sprite: null }; }
-  show(pile, fromX = pile.x) {
+  show(pile, fromX = pile.x, still = false) {
     if (pile.sprite || !pile.grid.items.length) return;
-    const s = this.scene, sp = s.add.image(fromX, pile.feet, bagTexture(s)).setOrigin(0.5, 1).setDepth(4);
+    const s = this.scene, sp = s.add.image(still ? pile.x : fromX, pile.feet, bagTexture(s)).setOrigin(0.5, 1).setDepth(4);
     pile.sprite = sp;
     this.piles.push(pile);
+    this.store();
+    if (still) return;
     s.tweens.add({ targets: sp, x: pile.x, duration: 380, ease: 'Sine.easeOut' });
     s.tweens.add({ targets: sp, y: pile.feet - 70, duration: 190, yoyo: true, ease: 'Quad.easeOut' });
   }
@@ -45,6 +50,20 @@ export class Loot {
   sync(pile) {
     if (pile && pile.grid.items.length && !pile.sprite) this.show(pile);
     for (const p of [...this.piles]) if (!p.grid.items.length) { p.sprite?.destroy(); this.piles.splice(this.piles.indexOf(p), 1); }
+    this.store();
+  }
+  store() { if (this.stored) this.stored.splice(0, this.stored.length, ...this.piles.map(p => ({ x: Math.round(p.x), feet: Math.round(p.feet), grid: p.grid }))); }
+  // throw something on the ground: into the bundle in reach, otherwise a new one at Leyla's feet → how many did not fit
+  throwDown(e) {
+    const D = this.scene.data_, l = this.scene.leyla;
+    let pile = this.nearest(), left = e.n;
+    for (let i = 0; i < 2 && left > 0; i++) {
+      if (!pile || i) pile = this.make(l.x + l.facing * 40, l.feet);
+      left = add(D, pile.grid, e.a, e.id, left);
+      this.show(pile, l.x);
+    }
+    this.sync();
+    return left;
   }
   nearest() {
     const l = this.scene.leyla;

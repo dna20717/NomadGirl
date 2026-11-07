@@ -32,7 +32,10 @@ export class InventoryUI {
     this.held = null;   // { e, from: key | slot name }
     this.other = null;  // { key, title, grid, kind: 'container' | 'floor' }
     document.addEventListener('mousemove', ev => this.move(ev));
-    document.addEventListener('mousedown', ev => { if (this.isOpen && this.held && !this.el.contains(ev.target) && ev.button === 0) this.putBack(); }, true);
+    // a click next to the panels throws the held thing on the ground (a new bundle at Leyla's feet, Daniel: "überall auf den Boden werfen")
+    document.addEventListener('mousedown', ev => { if (this.isOpen && this.held && !this.el.contains(ev.target) && ev.button === 0) this.throwDown(); }, true);
+    // turning while holding: right click, ctrl+click (Mac) or the mouse wheel
+    document.addEventListener('wheel', ev => { if (this.isOpen && this.held) { ev.preventDefault(); this.turnHeld(ev.deltaY < 0 ? -1 : 1); } }, { passive: false });
   }
   get D() { return this.host.D; }
   get inv() { return this.host.save().inv; }
@@ -64,7 +67,7 @@ export class InventoryUI {
           el('div', { class: 'inv-actions' }, el('button', { class: 'inv-btn', onclick: () => this.takeAll() }, 'Alles aufheben'))));
     }
     this.el.replaceChildren(el('div', { class: 'inv-row' }, ...parts),
-      el('p', { class: 'inv-help' }, 'Klicken: nehmen und ablegen · Rechtsklick: drehen · Doppelklick: auf die andere Seite · I oder Tab: schließen'));
+      el('p', { class: 'inv-help' }, 'Klicken: nehmen und ablegen · Rechtsklick, Strg+Klick oder Mausrad: drehen · Doppelklick: auf die andere Seite · daneben klicken: auf den Boden werfen · I oder Tab: schließen'));
     this.drawGhost();
   }
 
@@ -74,7 +77,7 @@ export class InventoryUI {
     box.addEventListener('mousedown', ev => {
       if (ev.target !== box) return;
       const r = box.getBoundingClientRect(), x = Math.floor((ev.clientX - r.left) / c), y = Math.floor((ev.clientY - r.top) / c);
-      if (ev.button === 2) { if (this.held) this.turnHeld(); return; }
+      if (ev.button === 2 || ev.ctrlKey) { if (this.held) this.turnHeld(); return; }
       if (this.held) this.place(key, x, y, ev);
     });
     for (const e of g.items) box.append(this.itemEl(key, g, e));
@@ -94,7 +97,7 @@ export class InventoryUI {
     if (e.n > 1) wrap.append(el('span', { class: 'inv-count' }, String(e.n)));
     wrap.addEventListener('mousedown', ev => {
       ev.stopPropagation();
-      if (ev.button === 2) { if (this.held) this.turnHeld(); else this.turnInPlace(g, e); return; }
+      if (ev.button === 2 || ev.ctrlKey) { if (this.held) this.turnHeld(); else this.turnInPlace(g, e); return; }
       if (ev.button !== 0) return;
       if (this.held) { const r = wrap.parentElement.getBoundingClientRect(); this.place(key, Math.floor((ev.clientX - r.left) / c), Math.floor((ev.clientY - r.top) / c), ev); return; }
       if (ev.detail >= 2) return;
@@ -145,10 +148,10 @@ export class InventoryUI {
     Object.assign(this.ghost.style, { width: `${b.w * c}px`, height: `${b.h * c}px`, marginLeft: `${-c / 2}px`, marginTop: `${-c / 2}px` });
     if (this.mouse) Object.assign(this.ghost.style, { left: `${this.mouse[0]}px`, top: `${this.mouse[1]}px` });
   }
-  turnHeld() {
+  turnHeld(d = 1) {
     const h = this.held;
     if (!h || !canTurn(this.D, h.e.a, h.e.id)) return;
-    h.e.r = ((h.e.r || 0) + 1) % 4;
+    h.e.r = (((h.e.r || 0) + d) % 4 + 4) % 4;
     this.drawGhost();
   }
   turnInPlace(g, e) {
@@ -179,6 +182,15 @@ export class InventoryUI {
       if (g && add(this.D, g, h.e.a, h.e.id, h.e.n) === 0) return this.changed(key);
     }
     this.held = h; this.host.notify?.('Nirgends Platz');
+  }
+  throwDown() {
+    const h = this.held;
+    if (!h) return;
+    const left = this.host.throwDown?.(h.e);
+    if (left == null) return this.putBack();
+    if (left > 0) { h.e.n = left; this.host.notify?.('Nicht alles passt hin'); return this.putBack(); }
+    this.held = null;
+    this.changed('floor');
   }
   quickMove(key, e) {
     const to = key === 'backpack' ? this.other?.key : 'backpack', g = this.grid(key), dst = to && this.grid(to);

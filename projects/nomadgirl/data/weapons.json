@@ -40,7 +40,9 @@
   "value": 15,
   "projectileSpeed": 1800,
   "glyph": "🔫",
-  "sound": "sound_shot"
+  "sound": "sound_shot",
+  "magazine": 7,
+  "reloadTime": 1400
  },
  "schrotflinte": {
   "name": "Schrotflinte",
@@ -55,7 +57,9 @@
   "value": 90,
   "projectileSpeed": 1400,
   "glyph": "💥",
-  "sound": "sound_shot"
+  "sound": "sound_shot",
+  "magazine": 2,
+  "reloadTime": 1600
  },
  "bastlerdeck": {
   "name": "Bastler-Deck",

@@ -92,6 +92,7 @@ function withInventory(D, save) {
   if (!D.backpacks?.[inv.backpack]) inv.backpack = D.leyla?.loadout?.backpack || null;
   for (const k of ['melee', 'ranged', 'cyberdeck']) if (inv.slots[k] && !D.weapons?.[inv.slots[k]]) inv.slots[k] = null;
   for (const g of Object.values(inv.grids)) g.items = (g.items || []).filter(e => D[e.a]?.[e.id] && e.n > 0);
+  for (const piles of Object.values(save.ground || {})) for (const p of piles) p.grid.items = (p.grid?.items || []).filter(e => D[e.a]?.[e.id] && e.n > 0);
   ensureGrid(D, inv, 'backpack', backpackSize(D, inv));
   for (const c of containers(D, save)) ensureGrid(D, inv, c.key, c.size);
   return save;

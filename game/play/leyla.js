@@ -41,7 +41,7 @@ export class Leyla {
     this.state = 'normal';
     this.facing = 1;
     this.health = this.maxHealth;
-    this.ammo = this.scene.weapon('ranged')?.ammo ?? Infinity;
+    this.loadWeapon();
     this.airJumps = this.m.airJumps ?? 0;
     this.airDash = true;
     this.lastGround = -1e9; this.jumpAt = -1e9; this.dashReady = 0; this.dropUntil = 0; this.noGrabUntil = 0;
@@ -101,8 +101,13 @@ export class Leyla {
     }
     if (this.alive && !['climb', 'hang', 'mantle'].includes(this.state)) {
       if (input.melee.pressed && time >= this.meleeReady) this.scene.combat.melee(this, time);
-      if (input.ranged.pressed && time >= this.rangedReady) this.scene.combat.shoot(this, time);
+      // shooting only on the ground with the gun drawn (Daniel: no shooting in a jump); empty magazine = reload
+      const gun = !!this.d.look?.aim && this.d.armed?.enabled !== false;
+      const canShoot = this.state === 'normal' && grounded && !this.reloading && (!gun || this.armed === 'on');
+      if (input.ranged.pressed && time >= this.rangedReady && canShoot) { if (this.mag <= 0 && this.ammo > 0) this.startReload(time); else this.scene.combat.shoot(this, time); }
+      if (input.reload?.pressed && canShoot) this.startReload(time);
     }
+    this.updateReload(time);
     if (time < (this.flipUntil || 0) && m.airJumpGhosts && time >= (this.nextGhost || 0)) { this.scene.fx.ghost(this.sprite); this.nextGhost = time + 28; }
     this.wasGrounded = grounded;
     this.lastVy = b.velocity.y;
@@ -407,11 +412,18 @@ export class Leyla {
     if (this.idleNow && this.scene.camp?.atWorkshop && this.d.look?.work) { name = '@' + this.d.look.work; this.special = null; }
     // gun drawn (Leyla › Waffe ziehen): drawing, then aiming, walking with the gun, shooting
     const L = this.d.look || {}, walking = Math.abs(v.x) > 20;
-    let armedFrame = null;
-    if (this.armed === 'drawing' && L.draw) { name = '@' + L.draw; armedFrame = this.drawP; }
-    else if (this.armed === 'on') {
+    let armedFrame = null, armedFrom = 1;
+    // drawing: the draw animation (from "Ziehen ab Frame"), then stretching the arms out (aim), then that pose is held
+    if (this.armed === 'drawing') {
+      const split = L.draw && L.aim ? 0.68 : L.draw ? 1 : 0;
+      if (this.drawP < split) { name = '@' + L.draw; armedFrame = this.drawP / split; armedFrom = this.d.armed?.drawFromFrame ?? 1; }
+      else if (L.aim) { name = '@' + L.aim; armedFrame = split < 1 ? (this.drawP - split) / (1 - split) : 1; }
+    } else if (this.armed === 'on') {
       const shot = L.shoot && time - (this.shotAt ?? -1e9) < this.lookDur(walking && L.shootWalk ? L.shootWalk : L.shoot);
-      name = '@' + (shot ? (walking && L.shootWalk ? L.shootWalk : L.shoot) : walking && L.aimWalk ? L.aimWalk : L.aim || L.idle);
+      if (this.reloading && (L.reload || L.reloadWalk)) { name = '@' + (walking && L.reloadWalk ? L.reloadWalk : L.reload || L.reloadWalk); armedFrame = Math.min(1, (time - this.reloading.at) / this.reloading.dur); }
+      else if (shot) name = '@' + (walking && L.shootWalk ? L.shootWalk : L.shoot);
+      else if (walking && L.aimWalk) name = '@' + L.aimWalk;
+      else { name = '@' + (L.aim || L.idle); armedFrame = 1; }   // gun held out: the last frame of "stretch out"
       if (shot && this.shotSeen !== this.shotAt) { this.shotSeen = this.shotAt; this.restartLook = true; }
     }
     // mantle and crouch pick their frame from the progress (crouch backwards = standing up)
@@ -422,7 +434,7 @@ export class Leyla {
     const info = this.scene.playLook(this.sprite, 'leyla', name, this.facing);
     if (this.restartLook && an0.currentAnim) { this.restartLook = false; an0.restart(); }
     if (armedFrame != null && info.used === name && an0.currentAnim) {
-      const fr = an0.currentAnim.frames, from = Math.min(fr.length - 1, Math.max(0, (this.d.armed?.drawFromFrame ?? 1) - 1));
+      const fr = an0.currentAnim.frames, from = Math.min(fr.length - 1, Math.max(0, armedFrom - 1));
       if (!an0.isPaused) an0.pause();
       this.sprite.setFrame(fr[Math.round(from + (fr.length - 1 - from) * Math.min(1, armedFrame))].frame.name);
     } else if (st === 'sit' && info.used === name && an0.currentAnim) {
@@ -470,8 +482,26 @@ export class Leyla {
       this.sprite.setPosition(F.x + (T.x - F.x) * ex * ex * (3 - 2 * ex), F.feet + (T.feet + lift - F.feet) * e);
     }
     this.sprite.setScale(info.scale * sx, info.scale * sy);
-    this.sprite.setFlipX(info.flip ? this.facing > 0 : this.facing < 0);
+    const flipped = info.flip ? this.facing > 0 : this.facing < 0;
+    this.sprite.setFlipX(flipped).setOrigin(flipped ? 1 - info.ox : info.ox, info.oy);   // Phaser mirrors inside the frame: the anchor has to mirror too
     if (st !== 'dead') this.sprite.setAlpha(time < this.invulnerableUntil && Math.floor(time / 70) % 2 ? 0.35 : 1);
+  }
+
+  // ---------- magazine and reloading (Waffen › Magazin, Nachladen dauert; R lädt nach, leer = automatisch) ----------
+  loadWeapon() {
+    const w = this.scene.weapon('ranged'), total = w?.ammo ?? Infinity;
+    this.magSize = w?.magazine || total;
+    this.mag = Math.min(this.magSize, total); this.ammo = total - this.mag; this.reloading = null;
+  }
+  startReload(time) {
+    if (this.reloading || this.mag >= this.magSize || this.ammo <= 0) return;
+    this.reloading = { at: time, dur: this.scene.weapon('ranged')?.reloadTime ?? 1400 };
+  }
+  updateReload(time) {
+    const R = this.reloading;
+    if (!R) return;
+    if (this.armed !== 'on' && this.d.look?.aim) { this.reloading = null; return; }   // ran or jumped: reload broken off
+    if (time - R.at >= R.dur) { const n = Math.min(this.magSize - this.mag, this.ammo); this.mag += n; this.ammo -= n; this.reloading = null; }
   }
 
   // ---------- gun drawn: automatically while she is not running (Daniel: "zieht die Waffe automatisch, wenn sie nicht rennt,

@@ -61,7 +61,9 @@
   "aimWalk": "leyla_aim_walk_side",
   "shoot": "leyla_shoot_side",
   "shootWalk": "leyla_shoot_walk_side",
-  "work": "leyla_work_back"
+  "work": "leyla_work_back",
+  "reload": "leyla_reload_side",
+  "reloadWalk": "leyla_reload_walk_side"
  },
  "idleAltChance": 50,
  "inventory": {"pickupRange": 150, "autoStack": true, "cell": 44, "dropSpread": 90},

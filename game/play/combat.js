@@ -34,8 +34,8 @@ export class Combat {
     const s = this.scene, w = s.weapon('ranged');
     if (!w) return;
     leyla.rangedReady = time + (w.cooldown ?? 300);
-    if (leyla.ammo <= 0) { s.fx.text(leyla.x, leyla.feet - leyla.height - 20, 'leer', { color: '#8b949e', size: 36, rise: 30 }); return; }
-    leyla.ammo--;
+    if (leyla.mag <= 0) { s.fx.text(leyla.x, leyla.feet - leyla.height - 20, 'leer', { color: '#8b949e', size: 36, rise: 30 }); return; }
+    leyla.mag--;
     leyla.attackPose = time + 120;
     leyla.shotAt = time;
     // with the gun drawn the shot leaves the muzzle (Leyla › Waffe ziehen › Mündung), the picture brings its own muzzle flash

@@ -79,6 +79,18 @@ await shot('shelf');
 const saved = await ev(() => new Promise(r => setTimeout(() => r(JSON.parse(localStorage.getItem('nomadgirl-save'))), 1500)));
 check('Spielstand merkt sich das Inventar', saved.inv.backpack === 'wanderrucksack' && saved.inv.slots.melee === 'machete', saved.inv.slots);
 
+// throw something on the ground in the camp: a new bundle, it stays after reloading
+s = await ev(() => { nomad.step(1, [], ['inventory']); nomad.step(1, [], ['inventory']); return nomad.inv(); });
+await click(0, 0, 0);
+const thrown = (await inv()).held;
+await page.mouse.click(30, 780); await page.waitForTimeout(40);
+s = await ev(() => ({ inv: nomad.inv(), loot: nomad.loot(), ground: nomad.save().ground }));
+check('Daneben klicken wirft es auf den Boden (neues Bündel)', thrown && !s.inv.held && s.loot.length === 1 && Object.values(s.ground)[0].length === 1, { thrown, s });
+await ev(() => nomad.step(1, [], ['inventory']));
+s = await ev(() => { nomad.step(1, [], ['inventory']); nomad.step(2); return nomad.inv(); });
+check('I am Bündel zeigt den Boden im Camp', s.other?.key === 'floor' && s.other.grid.items.length === 1, s);
+await ev(() => nomad.step(1, [], ['inventory']));
+
 // a run: enemies drop bundles, the ground inventory, auto-stacking, knocked out
 s = await ev(() => {
   nomad.step(1, [], ['inventory']);   // close

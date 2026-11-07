@@ -18,7 +18,7 @@ const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
   jump: ['SPACE'], walk: ['SHIFT'], dash: ['L', 'C'], melee: ['J', 'Y'], ranged: ['K', 'X'], grab: ['E'],
-  restart: ['R'], help: ['H', 'ESC'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'],
+  restart: ['BACKSPACE'], reload: ['R'], help: ['H', 'ESC'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'],
 };
 
 export class PlayScene extends Phaser.Scene {
@@ -173,7 +173,8 @@ export class PlayScene extends Phaser.Scene {
     if (this.box) this.leyla.health = Math.max(1, Math.min(this.leyla.maxHealth, this.box.save.health + (this.mode === 'run' ? this.mods.health || 0 : 0)));
     this.drone = new Drone(this, this.data_);
     this.van?.reset();
-    this.loot = this.mode === 'run' ? new Loot(this) : null;
+    if (this.mode === 'camp') { const G = this.box.save.ground ??= {}; this.loot = new Loot(this, G[this.box.save.location] ??= []); }
+    else this.loot = this.mode === 'run' ? new Loot(this) : null;
     this.setupInventory();
     if (this.mode === 'camp') this.camp = new Camp(this, this.box, this.campGeo);
     this.drone.roamArea = this.mode === 'camp' ? { x0: 6 * this.T, x1: (this.campGeo.W - 2) * this.T, ground: this.campGeo.floor * this.T } : null;
@@ -218,7 +219,8 @@ export class PlayScene extends Phaser.Scene {
       get D() { return hud.scene.data_; },
       save: () => hud.scene.box.save,
       changed: key => hud.scene.invChanged(key),
-      equipChanged: slot => { const sc = hud.scene; if (slot === 'ranged') sc.leyla.ammo = sc.weapon('ranged')?.ammo ?? Infinity; },
+      equipChanged: slot => { const sc = hud.scene; if (slot === 'ranged') sc.leyla.loadWeapon(); },
+      throwDown: e => hud.scene.loot ? hud.scene.loot.throwDown(e) : null,
       notify: text => hud.scene.fx.text(hud.scene.leyla.x, hud.scene.leyla.feet - hud.scene.leyla.height - 30, text, { color: '#ffd27a', size: 34, rise: 40, life: 1100 }),
     });
     hud.inv.close();
@@ -245,12 +247,12 @@ export class PlayScene extends Phaser.Scene {
     const inv = this.hud.inv;
     if (!inv) return;
     if (input.inventory.pressed) {
-      if (inv.isOpen) inv.close(); else if (this.mode === 'run') this.openFloor(); else inv.open();
+      if (inv.isOpen) inv.close(); else if (this.mode === 'run' || this.loot?.nearest()) this.openFloor(); else inv.open();
     }
     if (!inv.isOpen) return;
     const o = inv.other;
     // the ground follows Leyla: another bundle comes into reach
-    if (this.mode === 'run' && o?.kind === 'floor' && !inv.held) {
+    if (this.loot && o?.kind === 'floor' && !inv.held) {
       const near = this.loot.nearest();
       if (near && near !== o.pile && !(o.pile.grid.items.length && this.loot.piles.includes(o.pile) && this.loot.nearest() === o.pile)) this.openFloor();
       else if (!near && this.loot.piles.includes(o.pile)) this.openFloor();

@@ -77,7 +77,7 @@ export function installControl(game) {
       const s = scene(), l = s.leyla, r = n => Math.round(n);
       return {
         room: s.roomId, time: s.clock(), kills: s.kills, deltas: s.deltas, cleared: s.cleared,
-        leyla: { state: l.state, x: r(l.x), feet: r(l.feet), tile: [Math.floor(l.x / s.T), Math.round(l.feet / s.T)], vx: r(l.body.velocity.x), vy: r(l.body.velocity.y), facing: l.facing, health: l.health, ammo: l.ammo },
+        leyla: { state: l.state, x: r(l.x), feet: r(l.feet), tile: [Math.floor(l.x / s.T), Math.round(l.feet / s.T)], vx: r(l.body.velocity.x), vy: r(l.body.velocity.y), facing: l.facing, health: l.health, ammo: l.ammo, mag: l.mag, reloading: !!l.reloading, armed: l.armed },
         enemies: s.enemies.map(e => ({ id: e.id, state: e.state, x: r(e.x), feet: r(e.feet), hp: e.hp })),
         drone: s.drone && { mood: s.drone.mood, x: r(s.drone.x), y: r(s.drone.y) },
         van: s.van?.state(),

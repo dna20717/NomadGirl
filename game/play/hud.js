@@ -7,7 +7,7 @@ const CONTROLS = [
   ['L oder C', 'Dash (auch in der Luft)'], ['S / ↓ beim Rennen', 'Slide (unter Hindernissen durch)'], ['S + Leertaste', 'Von Plattform fallen'], ['S / ↓ im Stand', 'Ducken; an der Kante + Richtung: runter hängen'],
   ['Richtung zur Wand im Sprung', 'Kante greifen; W/Leertaste: hochziehen, S: loslassen, Leertaste weg von der Wand: abspringen'],
   ['W / ↑ an der Leiter', 'Klettern'], ['W / ↑ oder E in der Luft', 'Am Seil festhalten, Leertaste: loslassen mit Schwung'],
-  ['E', 'Benutzen: Werkstätten, Lagerfeuer, Companions, Van (im Run: zurück ins Camp)'], ['J oder Y', 'Nahkampf'], ['K oder X', 'Fernkampf'], ['R', 'Raum neu starten'], ['M', 'Ton an/aus'], ['I oder Tab', 'Inventar (Maus: klicken nehmen/ablegen, Rechtsklick drehen, Doppelklick rüber)'], ['H / Esc', 'Diese Hilfe'], ['G', 'Hitboxen zeigen'],
+  ['E', 'Benutzen: Werkstätten, Lagerfeuer, Companions, Van (im Run: zurück ins Camp)'], ['J oder Y', 'Nahkampf'], ['K oder X', 'Schießen (nur am Boden, Waffe gezogen)'], ['R', 'Nachladen (im Stehen und Gehen)'], ['Rücktaste', 'Raum neu starten'], ['M', 'Ton an/aus'], ['I oder Tab', 'Inventar (Maus: klicken nehmen/ablegen, Rechtsklick drehen, Doppelklick rüber)'], ['H / Esc', 'Diese Hilfe'], ['G', 'Hitboxen zeigen'],
 ];
 
 export class Hud {
@@ -37,7 +37,7 @@ export class Hud {
           el('div', { class: 'hud-row' }, this.roomName),
           el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'ZEIT'), this.time, el('span', { class: 'hud-label' }, 'KILLS'), this.kills, el('span', { class: 'hud-label' }, 'Δ'), this.deltas))),
       this.campEl, this.bannerEl, this.promptEl, this.menuEl, this.help,
-      el('div', { class: 'hud-foot' }, 'H: Steuerung · R: Neustart · ', el('a', { href: 'workshop.html' }, 'Werkstatt'), ' · ', el('a', { href: './' }, 'Start'),
+      el('div', { class: 'hud-foot' }, 'H: Steuerung · Rücktaste: Neustart · ', el('a', { href: 'workshop.html' }, 'Werkstatt'), ' · ', el('a', { href: './' }, 'Start'),
         this.newGame = el('span', { hidden: true }, ' · ', el('a', { href: 'game.html?camp&new', onclick: e => { if (!confirm('Spielstand löschen und neu anfangen?')) e.preventDefault(); } }, 'Neues Spiel'))));
     this.root = root;
     this.paused = true;   // help is open at the start
@@ -106,7 +106,7 @@ export class Hud {
     const l = scene.leyla, max = l.maxHealth;
     this.healthBar.style.width = `${Math.max(0, l.health / max * 100)}%`;
     this.healthText.textContent = `${Math.ceil(l.health)}/${max}`;
-    this.ammo.textContent = l.ammo === Infinity ? '∞' : String(l.ammo);
+    this.ammo.textContent = l.reloading ? 'lädt …' : l.mag === Infinity ? '∞' : l.magSize === Infinity || l.magSize >= 999 ? String(l.mag) : `${l.mag}/${l.ammo === Infinity ? '∞' : l.ammo}`;
     this.dash.classList.toggle('ready', time >= l.dashReady);
     this.time.textContent = scene.clock();
     this.kills.textContent = `${scene.kills}/${this.total ?? 0}`;

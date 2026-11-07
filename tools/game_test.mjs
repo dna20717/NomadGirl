@@ -17,7 +17,7 @@ await page.waitForFunction(() => window.nomad && window.game?.scene.getScene('pl
 if (shots) { fs.mkdirSync('output', { recursive: true }); await page.screenshot({ path: 'output/game_help.png' }); }
 
 await page.evaluate(() => {
-  const n = nomad, flat = v => ({ st: v.leyla.state, x: v.leyla.x, feet: v.leyla.feet, hp: v.leyla.health, ammo: v.leyla.ammo, kills: v.kills });
+  const n = nomad, flat = v => ({ st: v.leyla.state, x: v.leyla.x, feet: v.leyla.feet, hp: v.leyla.health, ammo: v.leyla.ammo, mag: v.leyla.mag, armed: v.leyla.armed, reloading: v.leyla.reloading, kills: v.kills });
   n.take();
   window.t = {
     run: (frames, hold, tap) => flat(n.step(frames, hold, tap)),
@@ -39,8 +39,19 @@ for (let i = 0; i < 40 && foes.find(e => e.id === 'schlaeger')?.state !== 'dead'
 }
 v = await t(t => t.run(1));
 check('Nahkampf: Schläger besiegt', v.kills >= 1, { v, foes });
+v = await t(t => t.run(70));
 v = await t(t => t.run(10, [], ['ranged']));
-check('Fernkampf: Nagel verbraucht', v.ammo < 40, v);
+check('Fernkampf: Waffe gezogen, Schuss aus dem Magazin', v.armed === 'on' && v.mag === 6 && v.ammo === 33, v);
+for (let i = 0; i < 12 && v.mag > 0; i++) v = await t(t => t.run(30, [], ['ranged']));
+check('Magazin leer', v.mag === 0, v);
+v = await t(t => t.run(2, [], ['ranged']));
+check('Leer schießen lädt automatisch nach', v.reloading, v);
+v = await t(t => t.run(100));
+check('Nachgeladen: 7 Schuss, Vorrat 26', v.mag === 7 && v.ammo === 26 && !v.reloading, v);
+v = await t(t => t.run(4, [], ['jump'])); const before = v.mag;
+v = await t(t => t.run(3, [], ['ranged']));
+check('Im Sprung kein Schuss', v.mag === before, v);
+v = await t(t => t.run(80));
 
 // movement without enemies
 await t(t => { t.restart(); t.calm(); });
