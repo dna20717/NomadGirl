@@ -860,7 +860,7 @@
   "file": "assets/leyla/hair_side.png",
   "frameSize": [74, 242],
   "frames": 17,
-  "fps": 5,
+  "fps": 10,
   "loop": false,
   "origin": [34.5, 241],
   "height": 192,
