@@ -46,6 +46,26 @@ const label = (list, v) => list.find(([k]) => k === v)?.[1] ?? v ?? '';
 
 // ---------- areas ----------
 export const AREAS = {
+  sprites: {
+    name: 'Sprites', singular: 'Sprite', icon: 'image', file: 'data/sprites.json', kind: 'catalog',
+    hint: 'Animationen als Streifen: alle Frames gleich groß nebeneinander in einer PNG-Datei unter projects/nomadgirl/assets/. Alle Grafiken entstehen mit KI oder Code.',
+    template: { name: 'Neues Sprite', file: 'assets/', frameSize: [64, 64], frames: 1, fps: 8, loop: true, origin: [32, 63], height: 64 },
+    row: x => `${x.frames ?? 1} ${x.frames === 1 ? 'Frame' : 'Frames'} · ${x.fps ?? 0} fps · ${(x.frameSize || []).join('×')} px`,
+    sections: [
+      { title: 'Sprite', fields: [NAME, text('file', 'Datei', { required: true, hint: 'Pfad im Projekt, z. B. assets/leyla/idle.png' }), DESCRIPTION] },
+      { title: 'Animation', fields: [size('frameSize', 'Frame-Größe', { unit: 'px' }), num('frames', 'Frames', { min: 1 }), num('fps', 'Tempo', { unit: 'fps', min: 0, step: 0.5 }), bool('loop', 'Wiederholen')] },
+      { title: 'Im Spiel', fields: [point('origin', 'Ankerpunkt', { unit: 'px im Frame', hint: 'Wo die Füße stehen: Dieser Punkt sitzt im Spiel auf dem Boden' }),
+        num('height', 'Höhe im Spiel', { unit: 'px', min: 1, hint: 'Auf diese Höhe wird ein Frame im Spiel skaliert' }), bool('flip', 'Schaut nach links', { hint: 'Wenn die Grafik nach links schaut; das Spiel spiegelt dann umgekehrt' })] },
+      { title: 'Herkunft', fields: [text('source', 'Erzeugt mit', { hint: 'KI-Werkzeug oder Code, für docs/assets.md' })] },
+    ],
+    check: (x, report, p) => {
+      if (x.file && !/\.(png|webp)$/i.test(x.file)) report('warning', 'Datei sollte ein PNG-Streifen sein');
+      if (x.file && p.exists && !p.exists(x.file)) report('error', `Datei ${x.file} fehlt`);
+      const [w, h] = x.frameSize || [], [ox, oy] = x.origin || [];
+      if (x.origin && w && (ox < 0 || ox > w || oy < 0 || oy > h)) report('warning', 'Ankerpunkt liegt außerhalb des Frames');
+    },
+  },
+
   game: {
     name: 'Spiel', icon: 'settings', file: 'data/game.json', kind: 'single',
     hint: 'Grundwerte für das ganze Spiel: Maßstab, Physik, Auflösung und womit Leyla startet.',
@@ -104,6 +124,9 @@ export const AREAS = {
       { title: 'Dash & Slide', fields: [num('movement.dashDistance', 'Dash-Weite', { unit: 'px', min: 0 }), num('movement.dashCooldown', 'Dash-Abklingzeit', { unit: 'ms', min: 0 }),
         bool('movement.dashInvulnerable', 'Unverwundbar beim Dash'), num('movement.slideSpeed', 'Slide-Tempo', { unit: 'px/s', min: 0 }), num('movement.slideDuration', 'Slide-Dauer', { unit: 'ms', min: 0 })] },
       { title: 'Klettern & Schwingen', fields: [num('movement.climbSpeed', 'Klettern', { unit: 'px/s', min: 0 }), num('movement.swingRope', 'Seillänge', { unit: 'px', min: 0 }), num('movement.swingBoost', 'Schwung-Boost', { unit: '%', min: 0 })] },
+      { title: 'Grafik', fields: [ref('sprites.idle', 'Stehen', 'sprites'), ref('sprites.walk', 'Gehen', 'sprites'), ref('sprites.run', 'Rennen', 'sprites'),
+        ref('sprites.jump', 'Springen', 'sprites'), ref('sprites.fall', 'Fallen', 'sprites'), ref('sprites.dash', 'Dash', 'sprites'), ref('sprites.slide', 'Slide', 'sprites'),
+        ref('sprites.climb', 'Klettern', 'sprites'), ref('sprites.hurt', 'Treffer', 'sprites')] },
       { title: 'Start-Ausrüstung', fields: [ref('loadout.melee', 'Nahkampf', 'weapons'), ref('loadout.ranged', 'Fernkampf', 'weapons'), ref('loadout.cyberdeck', 'Cyberdeck', 'weapons'), ref('loadout.backpack', 'Rucksack', 'backpacks')] },
     ],
     check: (x, report, p) => {
@@ -300,6 +323,7 @@ export const GROUPS = [
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes']],
   ['RIG', ['tractors', 'containers', 'workshops', 'rigParts', 'companions']],
   ['WELT', ['pois', 'rooms', 'locations', 'encounters', 'travel']],
+  ['GRAFIK', ['sprites']],
 ];
 
 export const optionLabel = label;

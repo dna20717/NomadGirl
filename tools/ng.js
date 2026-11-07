@@ -32,6 +32,7 @@ const HELP = `ng – Kommandozeile für NomadGirl (Projekt: ${path.relative(proc
 Nach jedem Schreiben läuft die Prüfung (Exit 1 bei Fehlern).`;
 
 const p = await loadProject(nodeLoader(projectDir));
+p.exists = f => fs.existsSync(path.join(projectDir, f));   // lets the validation check asset files
 const json = s => { try { return JSON.parse(s); } catch { return s; } };   // plain words count as text
 const needArea = a => { if (!AREAS[a]) { console.error(`Unbekannter Bereich „${a}“. Bereiche: ${Object.keys(AREAS).join(', ')}`); process.exit(2); } return AREAS[a]; };
 const needEntry = (a, id) => { const x = p.data[a]?.[id]; if (!x) { console.error(`${AREAS[a].name}: „${id}“ gibt es nicht.`); process.exit(2); } return x; };

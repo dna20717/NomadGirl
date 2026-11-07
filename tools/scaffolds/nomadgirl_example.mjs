@@ -35,6 +35,7 @@ const FILES = {
     description: 'Schrottsammlerin aus den Wastelands rund um BigCityDelta. Wohnt im Rig, plündert, was andere liegen lassen, und kocht erstaunlich gut.',
     movement: { walkSpeed: 120, runSpeed: 220, acceleration: 1400, jumpVelocity: 560, airJumps: 1, coyoteTime: 100, jumpBuffer: 120, dashDistance: 140, dashCooldown: 600, dashInvulnerable: true, slideSpeed: 300, slideDuration: 350, climbSpeed: 90, swingRope: 160, swingBoost: 20 },
     loadout: { melee: 'rohrzange', ranged: 'nagelpistole', backpack: 'schulranzen' },
+    sprites: { idle: 'leyla_idle' },
   },
   'data/backpacks.json': {
     schulranzen: { name: 'Schulranzen', size: [4, 3], tier: 1, value: 10, description: 'Pink, mit Glitzer. Aus einer Grundschule in Sektor 4.' },
@@ -170,6 +171,10 @@ const FILES = {
     strassensperre: { name: 'Straßensperre', weight: 3, time: 'any', enemies: ['schlaeger', 'schuetze'], loot: 'pluenderer_beute', description: 'Wegzoll. Oder auch nicht.' },
     ghulrudel: { name: 'Ghul-Rudel', weight: 2, time: 'night', enemies: ['kriecher', 'schleimbeisser'], loot: 'mutanten_beute' },
     liegengebliebener_lkw: { name: 'Liegengebliebener LKW', weight: 1, time: 'day', enemies: [], loot: 'kiste_tankstelle', description: 'Niemand da. Verdächtig.' },
+  },
+  'data/sprites.json': {
+    leyla_idle: { name: 'Leyla · Stehen', file: 'assets/leyla/idle.png', frameSize: [176, 432], frames: 8, fps: 6.5, loop: true, origin: [88, 428], height: 64,
+      source: 'KI-generiert (Daniel, 07.11.2026)', description: 'Idle-Animation, atmet ruhig. Original: art/leyla/idle_source.gif (8 Frames à 150 ms).' },
   },
   'data/travel.json': { speed: 40, foodPerDay: 1, weightFuelFactor: 8, dayLength: 24, nightShare: 40, nightDanger: 50, encounterChance: 15 },
 };

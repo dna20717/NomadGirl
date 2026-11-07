@@ -20,5 +20,6 @@
   "swingRope": 160,
   "swingBoost": 20
  },
- "loadout": {"melee": "rohrzange", "ranged": "nagelpistole", "backpack": "schulranzen"}
+ "loadout": {"melee": "rohrzange", "ranged": "nagelpistole", "backpack": "schulranzen"},
+ "sprites": {"idle": "leyla_idle"}
 }

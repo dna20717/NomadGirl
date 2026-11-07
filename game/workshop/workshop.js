@@ -223,7 +223,7 @@ export class Workshop {
     }));
     for (const msg of m.filter(y => y.place.area === a && y.place.id === choice)) insp.append(el('p', { class: 'ng-inline ' + msg.kind }, icon(msg.kind === 'hint' ? 'info' : msg.kind, 14), ' ' + msg.text.replace(/^[^:]*: /, '')));
     for (const s of A.sections) insp.append(el('h4', {}, s.title), ...s.fields.map(f => this.fieldEditor(a, f, x)));
-    const extra = SUMMARY[a]?.(this, x, choice); if (extra) insp.append(el('h4', {}, extra.title), extra.body);
+    for (const extra of [SUMMARY[a]?.(this, x, choice)].flat()) if (extra) insp.append(el('h4', {}, extra.title), extra.body);
     const u = usages(this.p, a, choice);
     insp.append(el('h4', {}, `Verwendet (${u.length})`), u.length ? el('div', { class: 'da-tags' }, ...u.map(v => el('button', { class: 'da-tag ng-leap', title: v.path, onclick: () => this.go({ area: v.area, choice: v.id }) }, icon(AREAS[v.area].icon, 12), ' ' + v.name)))
       : el('p', { class: 'ed-small' }, 'Noch nirgends.'));
@@ -238,9 +238,8 @@ export class Workshop {
       el('p', { class: 'ed-small' }, A.hint));
     for (const msg of (this.messages || []).filter(y => y.place.area === a)) main.append(el('p', { class: 'ng-inline ' + msg.kind }, icon(msg.kind === 'hint' ? 'info' : msg.kind, 14), ' ' + msg.text.replace(/^[^:]*: /, '')));
     main.append(el('div', { class: 'ng-sections' }, ...A.sections.map(s => el('section', { class: 'ng-section' }, el('h3', {}, s.title), ...s.fields.map(f => this.fieldEditor(a, f, x))))));
-    const extra = SUMMARY[a]?.(this, x);
     insp.append(el('h3', {}, A.name), el('p', { class: 'ed-small' }, `Datei: ${this.p.paths[a]}`));
-    if (extra) insp.append(el('h4', {}, extra.title), extra.body);
+    for (const extra of [SUMMARY[a]?.(this, x)].flat()) if (extra) insp.append(el('h4', {}, extra.title), extra.body);
   }
 
   // ---------- Field editors from the schema ----------

@@ -38,13 +38,16 @@ workshop.html          Werkstatt (Daten-Editor)
 engine/schema.js       Datenschema: alle Bereiche und Felder (das Herz)
 engine/project.js      Laden, Prüfen, Verwendungen, Umbenennen, Löschen (Browser und Node)
 engine/image.js, font.js   Bild und Pixelschrift (aus NomadTactics, für browser_loader)
-game/workshop/         Werkstatt: workshop.js (Gerüst + Seiten aus dem Schema), summaries.js (abgeleitete Werte, Vorschauen), workshop.css
+game/workshop/         Werkstatt: workshop.js (Gerüst + Seiten aus dem Schema), summaries.js (abgeleitete Werte, Vorschauen), sprite_preview.js (Sprite-Animation: Nah, 1:1, Im Spiel), workshop.css
 game/ui.js, ui.css, basis.css, icons.js, store.js, browser_loader.js, font/   gemeinsamer Kern (Kopie aus NomadTactics)
 tools/ng.js            Kommandozeile
 tools/scaffolds/       Gerüst der Beispieldaten
 projects/nomadgirl/    Spieldaten (project.json + data/*.json)
 docs/design.md         Game Design Document
 docs/glossary.md       Deutsch → Englisch
+docs/assets.md         alle Assets mit Herkunft (KI/Code)
+art/                   Originale und Referenzen (z. B. Character Sheet), werden nicht ausgeliefert
+projects/nomadgirl/assets/   Spiel-Grafiken (Sprite-Streifen)
 output/                Bilder vom Werkstatt-Test (nicht im Git)
 ```
 
@@ -58,6 +61,12 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 - **Speichern:** wie die alte NomadTactics-Werkstatt über `game/store.js` (Artifact-Datenbank, sonst localStorage `nomadgirl-drafts:`). Eine Web-Werkstatt mit „Speichern = Commit“ (Cloudflare Worker wie bei NomadTactics) ist der nächste Schritt, wenn Daniel das will.
 - Oberflächen-Regeln wie in NomadTactics (`CLAUDE.md` dort): nur `--ui-*`-Tokens, Inter + VT323, Dialoge über `openDialogue`, Löschen rot mit Rückgängig, Hauptaktion gold.
 
+## Grafik
+
+- **Sprites** (Bereich „Grafik › Sprites“, `data/sprites.json`): PNG-Streifen unter `projects/nomadgirl/assets/`, Frames gleich groß nebeneinander. Felder: Datei, Frame-Größe, Frames, fps, Wiederholen, Ankerpunkt (Füße, px im Frame), Höhe im Spiel, Herkunft. Leyla verweist in „Grafik“ auf ihre Animationen (`sprites.idle` … `sprites.hurt`).
+- **Vorschau** in der Werkstatt (Sprite- und Leyla-Inspektor): Nah, 1:1 und „Im Spiel“ (Spielauflösung mit Kachelraster und Boden, mit `pixelArt` ohne Glättung wie im Spiel); Abspielen/Anhalten, Frame für Frame, Ankerpunkt.
+- **Neues Sprite:** GIF/Frames von Daniel → Original nach `art/<figur>/`, mit Code zu einem Streifen zuschneiden (gleiche Box für alle Frames, Füße auf derselben Zeile), Eintrag in `sprites` + Zeile in `docs/assets.md`. `ng check` prüft, ob die Datei existiert.
+
 ## Kommandozeile `ng`
 
 `node tools/ng.js` ohne Befehl zeigt die Hilfe: `check` · `areas` · `fields <area>` · `show <area> [id]` · `usages <area> <id>` · `new <area> <id> ['<json>']` · `set <area> [id] <field> '<json>'` · `unset` · `rename <area> <old> <new>` · `remove <area> <id>` · `--dry` schreibt nichts. Nach jedem Schreiben läuft die Prüfung (Exit 1 bei Fehlern). Geschrieben wird mit `pretty()` aus `tools/json.js`.
@@ -68,4 +77,5 @@ Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei j
 
 ## Stand
 
+- 07.11.2026: Leyla idle (8 Frames, KI) als erstes Sprite, Bereich „Sprites“ mit Vorschau, Character Sheet als Referenz.
 - 07.11.2026: Repo-Gerüst, Werkstatt mit 21 Bereichen in 6 Gruppen, Beispieldaten (Platzhalter nach Gefühl), `ng`, Tests. Das Spiel selbst (Phaser 3) kommt mit dem MVP „Movement & Kampf“.

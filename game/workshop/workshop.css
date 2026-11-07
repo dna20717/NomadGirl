@@ -91,3 +91,16 @@ body.ng { background: var(--ui-bg); color: var(--ui-text); font-family: var(--ui
 .ng-map text { fill: var(--ui-text2); font: 10px var(--ui-font); }
 .ng-map text.on { fill: var(--ui-text); font-weight: 600; }
 .da-field.ng-wide, .da-insp .da-field.ng-wide { display: flex; flex-direction: column; align-items: stretch; }
+
+/* sprite preview */
+.ng-sprite { display: flex; flex-direction: column; gap: 6px; }
+.ng-sprite-bar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ng-sprite-bar .ed-segment button { font-size: var(--ui-gr-xs); padding: 3px 8px; }
+.ng-sprite-info { font-size: var(--ui-gr-xs); color: var(--ui-text3); font-variant-numeric: tabular-nums; }
+.ng-sprite-stage { display: grid; place-items: center; min-height: 120px; max-height: 520px; overflow: auto; border: 1px solid var(--ui-border); border-radius: var(--ui-r-field); padding: 8px; }
+.ng-sprite-stage.back-dark { background: #111116; }
+.ng-sprite-stage.back-light { background: #e9e6ef; }
+.ng-sprite-stage.back-check { background: conic-gradient(var(--ui-field) 25%, var(--ui-panel) 0 50%, var(--ui-field) 0 75%, var(--ui-panel) 0) 0 0 / 16px 16px; }
+.ng-sprite-canvas { max-width: 100%; height: auto; }
+.ng-sprite-canvas.pixelated { width: 100%; image-rendering: pixelated; }
+.ed-button.small.on { color: var(--ui-acc-line); }

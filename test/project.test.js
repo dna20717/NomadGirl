@@ -1,6 +1,7 @@
 // Tests for engine/schema.js and engine/project.js
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { nodeLoader } from '../tools/loader.js';
@@ -28,8 +29,9 @@ test('schema: every area is in exactly one group, every field is well-formed', (
   }
 });
 
-test('data: the example project has no errors', async () => {
-  const errors = validateProject(await load()).filter(m => m.kind === 'error');
+test('data: the example project has no errors (asset files included)', async () => {
+  const p = await load(); p.exists = f => fs.existsSync(path.join(root, f));
+  const errors = validateProject(p).filter(m => m.kind === 'error');
   assert.deepEqual(errors, []);
 });
 
@@ -77,4 +79,9 @@ test('start rig: places, power and weight are checked', async () => {
   const p = await load();
   p.data.game.start.workshops.push('kueche');
   assert.ok(validateProject(p).some(m => m.place.area === 'game' && /Plätze/.test(m.text)));
+});
+
+test('sprites: a missing file is an error when files can be checked', async () => {
+  const p = await load(); p.exists = () => false;
+  assert.ok(validateProject(p).some(m => m.kind === 'error' && m.place.area === 'sprites'));
 });

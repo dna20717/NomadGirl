@@ -8,4 +8,6 @@ NomadGirl steht unter GPL v3 oder später. Alle Assets (Grafik, Ton, Musik) ents
 | Inter | `game/font/` | SIL Open Font License 1.1, siehe `game/font/INTER-OFL.txt` |
 | VT323 | `game/font/` | SIL Open Font License 1.1, siehe `game/font/VT323-OFL.txt` |
 
+KI-generierte Assets stehen mit Herkunft in [docs/assets.md](docs/assets.md).
+
 Der gemeinsame Oberflächen-Kern (`game/ui.js`, `ui.css`, `basis.css`, `icons.js`, `store.js`, `browser_loader.js`, `engine/image.js`, `engine/font.js`, `tools/json.js`) ist eine Kopie aus NomadTactics bzw. NomadHouse (Daniels eigene Projekte).

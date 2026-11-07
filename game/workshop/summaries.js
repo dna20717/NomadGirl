@@ -2,6 +2,7 @@
 // SUMMARY[area](w, x, id) → { title, body } | null. Only reads, never changes data.
 import { el } from '../ui.js';
 import { ROOM_TAGS } from '../../engine/project.js';
+import { spritePreview } from './sprite_preview.js';
 
 const f1 = n => (Math.round(n * 10) / 10).toLocaleString('de-DE');
 const facts = rows => el('div', { class: 'ng-facts' }, ...rows.filter(Boolean).map(([k, v]) => el('div', {}, el('span', {}, k), el('b', {}, v))));
@@ -19,17 +20,19 @@ const sizeView = (x, base = [4, 3]) => {
 };
 
 export const SUMMARY = {
+  sprites: (w, x) => ({ title: 'Vorschau', body: spritePreview(w, x) }),
+
   leyla(w, x) {
     const g = w.p.data.game?.gravity || 1800, t = w.p.data.game?.tileSize || 32, m = x.movement || {};
-    const jump = (m.jumpVelocity || 0) ** 2 / (2 * g);
-    return { title: 'Abgeleitet', body: el('div', {}, facts([
+    const jump = (m.jumpVelocity || 0) ** 2 / (2 * g), idle = w.p.data.sprites?.[x.sprites?.idle];
+    return [idle ? { title: 'Vorschau · Stehen', body: spritePreview(w, idle) } : null, { title: 'Abgeleitet', body: el('div', {}, facts([
       ['Sprunghöhe', `${Math.round(jump)} px · ${f1(jump / t)} Kacheln`],
       m.airJumps ? ['mit Luftsprüngen', `${Math.round(jump * (1 + m.airJumps))} px · ${f1(jump * (1 + m.airJumps) / t)} Kacheln`] : null,
       ['Zeit in der Luft', `${f1(2 * (m.jumpVelocity || 0) / g)} s`],
       ['Rennen', `${f1((m.runSpeed || 0) / t)} Kacheln/s`],
       ['Dash', `${f1((m.dashDistance || 0) / t)} Kacheln`],
       ['Slide', `${f1((m.slideSpeed || 0) * (m.slideDuration || 0) / 1000 / t)} Kacheln`],
-    ]), el('p', { class: 'ed-small' }, `Mit Schwerkraft ${g} px/s² und Kacheln zu ${t} px (Bereich „Spiel“).`)) };
+    ]), el('p', { class: 'ed-small' }, `Mit Schwerkraft ${g} px/s² und Kacheln zu ${t} px (Bereich „Spiel“).`)) }];
   },
 
   game(w, x) {

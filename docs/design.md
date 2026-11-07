@@ -91,12 +91,15 @@ Gekochte Gerichte geben Buffs für den nächsten Run, versorgen Companions auf R
 
 ## Look & Feel
 
+![Leyla – Character Sheet](../art/leyla/character_sheet.png)
+
 Weird Cyberpunk mit Augenzwinkern: humorvoll, aber niemals albern. In und um das Rig herrscht Cosy-Stimmung.
 
 - **Perspektive:** reine Side-Scroll-Ansicht ohne Neigung.
 - **Proportionen:** realistisch.
 - **Rig:** Querschnitt wie ein Puppenhaus.
 - **Kontrast:** draußen rau und gefährlich, drinnen warm und gemütlich.
+- **Leyla:** pinker Irokese, ärmellose Tech-Weste, Neon-Cyan-Akzente (Details und Palette in `docs/assets.md`).
 
 ## Technik
 
@@ -132,4 +135,4 @@ Companion-Quests und Storylines, Hacking, Automatisierung, mehr Container und Zu
 - [ ] Was macht die Zelle im Rig?
 - [ ] Was ist das „vielleicht noch Gefährlichere“ in den Wastelands?
 - [ ] Gibt es eine übergeordnete Story oder ein Endziel?
-- [ ] Wie wird Leyla dargestellt (Pixel Art oder gezeichnet)?
+- [ ] Spielauflösung und Sprite-Größe: Das Character Sheet nennt 16 × 32 px, die Idle-Animation ist hochaufgelöst (ca. 166 × 426 px). Wie groß wird Leyla im Spiel? (Platzhalter: 64 px hoch bei 640 × 360)
