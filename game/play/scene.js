@@ -39,7 +39,10 @@ export class PlayScene extends Phaser.Scene {
     if (this.data_.drone?.look) ids.add(this.data_.drone.look);
     const SP = this.data_.game?.spawn;
     for (const id of [SP?.look, SP?.dish?.look, SP?.roof?.front, this.data_.rooms?.[this.roomId]?.backdrop?.image]) if (id) ids.add(id);
-    if (this.mode === 'camp') for (const c of this.box?.save.companions || []) if (this.data_.companions?.[c]?.look) ids.add(this.data_.companions[c].look);
+    if (this.mode === 'camp') {
+      for (const c of this.box?.save.companions || []) if (this.data_.companions?.[c]?.look) ids.add(this.data_.companions[c].look);
+      if (this.data_.camp?.fire?.look) ids.add(this.data_.camp.fire.look);
+    }
     for (const id of [...ids]) if (A[id]?.mirror) ids.add(A[id].mirror);   // drawn opposite direction
     for (const id of ids) {
       const a = A[id];

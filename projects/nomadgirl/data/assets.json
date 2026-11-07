@@ -670,5 +670,28 @@
   "derivedFrom": "leyla_land_side_source",
   "date": "07.11.2026",
   "description": "Pixel-Art, nach rechts. Im Spiel ab „Landung ab Frame“ (Aufprall mit Druckwelle), nur nach weiten Sprüngen oder tiefen Stürzen."
+ },
+ "campfire_source": {
+  "name": "Lagerfeuer · Original",
+  "kind": "source",
+  "file": "assets/camp/campfire_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF 128 × 128, 9 Frames à 150 ms."
+ },
+ "campfire": {
+  "name": "Lagerfeuer",
+  "kind": "animation",
+  "file": "assets/camp/campfire.png",
+  "frameSize": [72, 100],
+  "frames": 9,
+  "fps": 6.67,
+  "loop": true,
+  "origin": [36, 97],
+  "height": 200,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "campfire_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art von Daniel, Holzscheite im Steinkreis mit Flammen und Funken. Ankerpunkt = Mitte der Steine am Boden. Im Camp mit Lichtschein am Abend und in der Nacht."
  }
 }

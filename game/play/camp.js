@@ -126,7 +126,8 @@ export class Camp {
     // night over the world, lights shine through it
     const shade = (this.day.shade ?? 0) / 100;
     this.night = scene.add.rectangle(0, 0, geo.W * T, geo.H * T, 0x0a0820, shade).setOrigin(0).setDepth(30);
-    for (const l of this.lights) l.setAlpha(l.base * (0.25 + shade * 1.6));
+    this.lightK = (this.day.light ?? Math.min(100, shade * 200)) / 100;   // how strongly fire and windows shine (Tag & Nacht › Licht)
+    for (const l of this.lights) l.setAlpha(l.base * this.lightK).setVisible(this.lightK > 0);
     this.prompt = null; this.barkAt = scene.time.now + 2500;
   }
 
@@ -172,8 +173,8 @@ export class Camp {
     g.destroy();
   }
 
-  light(x, y, r, color, base) {
-    const l = this.scene.add.image(x, y, glowTexture(this.scene)).setDisplaySize(r * 2, r * 2).setTint(col(color)).setBlendMode(Phaser.BlendModes.ADD).setDepth(31);
+  light(x, y, r, color, base, h = r) {
+    const l = this.scene.add.image(x, y, glowTexture(this.scene)).setDisplaySize(r * 2, h * 2).setTint(col(color)).setBlendMode(Phaser.BlendModes.ADD).setDepth(31);
     l.base = base; this.lights.push(l);
     return l;
   }
@@ -183,11 +184,24 @@ export class Camp {
     const F = this.C.fire || {};
     if (F.enabled === false) return;
     const s = this.scene, x = this.geo.fireX, y = this.ground;
-    const g = s.add.graphics().setDepth(-5);
-    g.fillStyle(0x3a2a1e).fillRect(x - 46, y - 14, 92, 14).fillStyle(0x5a4030).fillRect(x - 40, y - 22, 34, 10).fillRect(x + 6, y - 22, 34, 10);
-    for (let i = -3; i <= 3; i++) g.fillStyle(0x6b6258).fillRect(x + i * 18 - 7, y - 10, 14, 10);
-    this.flame = s.add.graphics().setDepth(-4);
-    this.fireLight = this.light(x, y - 50, F.radius ?? 420, F.color || '#ff9a3a', 0.55);
+    const info = F.look && s.assetInfo(F.look);
+    if (info) {   // Daniel's pixel-art fire, sharp at whole pixels
+      s.textures.get(info.key).setFilter(NEAREST());
+      this.fireSprite = s.add.sprite(x, y, info.key).setOrigin(info.ox, info.oy).setScale(info.scale).setDepth(-4);
+      if (info.anim) this.fireSprite.play(info.anim);
+    } else {
+      const g = s.add.graphics().setDepth(-5);
+      g.fillStyle(0x3a2a1e).fillRect(x - 46, y - 14, 92, 14).fillStyle(0x5a4030).fillRect(x - 40, y - 22, 34, 10).fillRect(x + 6, y - 22, 34, 10);
+      for (let i = -3; i <= 3; i++) g.fillStyle(0x6b6258).fillRect(x + i * 18 - 7, y - 10, 14, 10);
+      this.flame = s.add.graphics().setDepth(-4);
+    }
+    // light: a big soft glow round the flames, a hot core and a warm pool on the ground (evening and night)
+    const k = (F.strength ?? 100) / 100, lift = F.lift ?? 80, color = F.color || '#ff9a3a';
+    this.fireLights = [
+      this.light(x, y - lift, F.radius ?? 420, color, 0.6 * k),
+      this.light(x, y - lift, (F.radius ?? 420) * 0.35, '#ffd27a', 0.45 * k),
+      ...(F.pool ? [this.light(x, y + 6, F.pool, color, 0.5 * k, F.pool * 0.14)] : []),
+    ];
     this.hotspots.push({ x, w: 90, name: 'Lagerfeuer', hint: 'Am Feuer sitzen', act: () => this.sitByFire() });
   }
 
@@ -282,7 +296,13 @@ export class Camp {
   // ---------- loop ----------
   update(time, dt, input) {
     const s = this.scene, l = s.leyla, range = this.C.interactRange ?? 130;
-    // flames
+    // the fire's light breathes and flickers
+    if (this.fireLights && this.lightK > 0) {
+      const t = time / 1000, fl = (this.C.fire?.flicker ?? 25) / 100;
+      const wob = 1 - fl * (0.5 + 0.5 * Math.sin(t * 9.1) * Math.sin(t * 5.3 + 1)) - fl * 0.3 * Math.random();
+      for (const l of this.fireLights) l.setAlpha(l.base * this.lightK * wob);
+    }
+    // flames from code (without a look)
     if (this.flame) {
       const x = this.geo.fireX, y = this.ground - 18, f = this.flame.clear(), t = time / 1000;
       // three tongues of pixel flame: rows of 6 px getting narrower, swaying; red outside, yellow core
@@ -300,7 +320,6 @@ export class Camp {
         const life = (t * 0.7 + i * 0.27) % 1;
         f.fillStyle(0xffd27a, 1 - life).fillRect(Math.round(x + Math.sin(i * 9 + t * 2) * 24 + life * 10), Math.round(y - 60 - life * 140), 4, 4);
       }
-      this.fireLight.setAlpha(this.fireLight.base * (0.25 + (this.day.shade ?? 0) / 100 * 1.6) * (0.85 + 0.15 * Math.sin(t * 9) * Math.sin(t * 5.3)));
     }
     // companions: random speech bubbles
     const B = this.C.companions?.barkEvery || [7, 15];
