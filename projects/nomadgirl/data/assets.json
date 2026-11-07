@@ -1368,6 +1368,29 @@
   "source": "Code (Streifen zugeschnitten)",
   "derivedFrom": "leyla_melee_walk_side_source",
   "date": "07.11.2026",
-  "description": "Pixel-Art: Hieb aus der Bewegung (Treffer Frame 11). Für leicht und schwer im Gehen, bis es eine eigene schwere Version gibt."
+  "description": "Pixel-Art: Hieb aus der Bewegung (Treffer Frame 11), leichter Nahkampf im Gehen."
+ },
+ "leyla_melee_heavy_walk_side_source": {
+  "name": "Leyla · Nahkampf schwer im Gehen · Original",
+  "kind": "source",
+  "file": "assets/leyla/melee_heavy_walk_side_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 9 Frames à 200 ms."
+ },
+ "leyla_melee_heavy_walk_side": {
+  "name": "Leyla · Nahkampf schwer im Gehen",
+  "kind": "animation",
+  "file": "assets/leyla/melee_heavy_walk_side.png",
+  "frameSize": [227, 244],
+  "frames": 9,
+  "fps": 18,
+  "loop": false,
+  "origin": [94, 242],
+  "height": 193.6,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_melee_heavy_walk_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art: großer Hieb aus dem Laufen (Treffer Frame 3), läuft weiter."
  }
 }
