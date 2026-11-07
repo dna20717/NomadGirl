@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import { chromium } from 'playwright';
 
-const url = process.env.GAME_URL || 'http://localhost:8766/game.html';
+const url = (process.env.GAME_URL || 'http://localhost:8766/game.html') + '?room=kampfraum';   // the fight playground (the test room is a parcours without enemies)
 const shots = process.argv.includes('--shots');
 const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });

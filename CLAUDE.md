@@ -28,7 +28,8 @@ node tools/ng.js check                     # Spieldaten prüfen
 npm run serve                              # dann http://localhost:8766/workshop.html
 node tools/workshop_test.mjs [--shots]     # Werkstatt kopflos bedienen (Server muss laufen), Bilder nach output/
 node tools/splash_test.mjs [--shots]       # Startseite in drei Größen (Server muss laufen)
-node tools/game_test.mjs [--shots]         # Spiel kopflos durchspielen: Slide, Plattformen, Leiter, Seil, Dash, Kampf
+node tools/game_test.mjs [--shots]         # Spiel kopflos im Kampfraum (?room=kampfraum): Kampf, Slide, Plattformen, Leiter, Seil, Dash, Drohne
+node tools/parcours_test.mjs [--shots]     # Parkour im Testraum Station für Station (24 Prüfungen), Bilder nach output/parcours_*.png
 node tools/play.mjs 'tp 27 15' 'step 30 right' 'tap jump 30 right+jump' 'shot name'   # Spiel per Kommandozeile spielen
 ```
 
@@ -96,6 +97,7 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 - **Kamera** (Bereich „Spiel“ › Kamera): Zoom (1 = 1920×1080 Spielpixel sichtbar; Daniel hat am 07.11.2026 abends in der Web-Werkstatt von 0,75 zurück auf 1 gestellt), Vorlauf in Laufrichtung, Nachziehen. Zwei Kameras: Hintergrund ungezoomt (`bgCam`, scrollt mit), Welt gezoomt (`cam`). Ist der Raum niedriger als die Sicht, sitzt der Boden unten und darüber ist Himmel.
 - **Spawn-Punkt** (Daniel, 07.11.2026: „Leylas Van als Spawn-Punkt“): Bereich „Spiel“ › Spawn-Punkt (`game.spawn`: Aussehen, Versatz, Gespiegelt, Ebene). Der Ankerpunkt des Assets (beim Van: Mitte der Schiebetür am Boden) sitzt auf Leylas Start `L`; Standard hinter den Wänden (Tiefe -20). Im Testraum steht `L` deshalb in Spalte 7, damit der Van zwischen linke Wand und Block passt.
 - **Drohne** (Mama-Bot, Daniel, 07.11.2026: „permanenter Begleiter, nur Deko“): `drone.js`, Bereich **Drohne** (`data/drone.json`, Gruppe Leyla). Keine Physik: zieht weich hinter Leyla her (Position ab den Füßen, x in Blickrichtung gespiegelt), schwebt, neigt sich, dreht nach kurzer Verzögerung um. **Stimmungen** (Tabelle: Anlass → Frame aus `drone_moods` + Kaomoji-Bläschen + Dauer): Ereignisse kill, hit, cleared, dash (`drone.react`), Zustände down, lowHealth, alert (Gegner in Reichweite), bored/sleep (Leyla steht still), zufällig curious/scan. `nomad.drone('kill')` zeigt eine Stimmung, `nomad.state().drone`.
+- **Testraum = Parkour** (Daniel, 07.11.2026: „größer, ohne Gegner, Sprünge und Hindernisse“): 170 × 24 Kacheln, Boden in Zeile 18. Stationen: Hürden (1, 1 breit, 2 hoch), Grube mit Leiter, langer Slide-Tunnel, Treppe, Doppelsprung-Lücke, Seil über 9er-Lücke, Plattform-Zickzack bis Höhe 12, breite Grube (Doppelsprung + Dash), Hürden unter niedriger Decke, Aufstieg zum Ziel. Erzeugt mit `tools/parcours_layout.py` (Sprungweiten im Kopf der Datei), geprüft mit `tools/parcours_test.mjs`. Die alte Spielwiese mit Gegnern heißt jetzt **Kampfraum** (`kampfraum`), dort läuft `game_test.mjs`.
 - Tod: Mama-Bot-Meldung, Raum startet neu. Raum geräumt: Zeit, Kills, Δ.
 
 ## Startseite
@@ -120,6 +122,7 @@ Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei j
 
 ## Stand
 
+- 07.11.2026 abends: **Testraum als großer Parkour** ohne Gegner (170 × 24), alte Spielwiese als Kampfraum, neuer Parkour-Test.
 - 07.11.2026 abends: **Neue Leyla-Animationen**: Gehen, Springen, Slide (rechts/links), Salto als Doppelsprung, Gehen von vorn zufällig auf der Startseite.
 - 07.11.2026 abends: **Leylas Van als Spawn-Punkt** (Bereich „Spiel“ › Spawn-Punkt), Start im Testraum nach rechts gerückt.
 - 07.11.2026 abends: **Drohne Mama-Bot** fliegt als Deko hinter Leyla, 12 Stimmungen mit Kaomoji; neuer Bereich „Drohne“ (24 Bereiche).
