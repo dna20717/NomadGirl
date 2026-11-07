@@ -17,6 +17,7 @@ Spieldesign: `docs/design.md` (dazu das claude.ai-Projekt „NomadGirl“).
 - Das Repo ist **öffentlich** und läuft auf Cloudflare: nichts hineinlegen, was nicht öffentlich sein darf (Schlüssel, Passwörter, private Adressen).
 - **Immer den Link mit ausgeben:** Am Ende jeder Antwort, die etwas baut oder ändert, stehen die Adressen zum Anklicken: Start https://nomadgirl.dna20717.workers.dev, Spiel https://nomadgirl.dna20717.workers.dev/game, Werkstatt https://nomadgirl.dna20717.workers.dev/workshop, Repo https://github.com/dna20717/NomadGirl.
 - Daniel ist bei Git/Kommandozeile Anfänger → Anleitungen Schritt für Schritt.
+- **„HNC“** (Daniel, 07.11.2026: „Handover, new chat“): Übergabe `claude/nomadgirl-handover.md` im claude.ai-Projekt „NomadGirl“ auf den aktuellen Stand bringen (Commit, Entscheidungen, was steht, offene Fragen), Repo sauber und gepusht, kurz bestätigen. Der nächste Chat startet mit dieser Übergabe.
 
 ## Einrichten und prüfen
 
