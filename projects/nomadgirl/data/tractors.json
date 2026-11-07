@@ -1,15 +1,17 @@
 {
- "pickup": {
-  "name": "Pickup",
+ "van": {
+  "name": "Van",
   "pull": 1500,
   "fuelUse": 12,
   "tank": 60,
-  "power": 2,
+  "power": 3,
   "length": 1,
   "stack": 1,
   "slots": {"engine": 1, "armor": 1, "weapon": 0},
   "value": 400,
-  "description": "Rostig, laut, treu."
+  "description": "Leylas Van: rostig, laut, treu. Schlafkoje und Warroom an Bord, Radarschüssel auf dem Dach.",
+  "look": "van",
+  "places": 2
  },
  "lkw": {
   "name": "LKW",

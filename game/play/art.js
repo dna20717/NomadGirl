@@ -74,6 +74,7 @@ function drawRaider(g, c, kind) {
 // Sky, distant skyline (BigCityDelta), nearer ruins: three layers with parallax
 export function drawBackground(scene, roomW, roomH) {
   const [W, H] = [scene.scale.width, scene.scale.height];
+  if (scene.textures.exists('sky')) scene.textures.remove('sky');   // the scene restarts (camp ↔ run)
   const sky = scene.textures.createCanvas('sky', 4, H), ctx = sky.getContext();
   const grad = ctx.createLinearGradient(0, 0, 0, H);
   grad.addColorStop(0, '#1a1030'); grad.addColorStop(0.55, '#5a2a4a'); grad.addColorStop(0.8, '#c4553e'); grad.addColorStop(1, '#f0a35a');
@@ -105,12 +106,19 @@ export function drawBackground(scene, roomW, roomH) {
 
 // Tiles of a parsed room: concrete blocks with lit edges, platforms, ladders, rope anchors
 // tiles = { platform: textureKey | null } (asset strips: single, left, middle, right)
-export function drawRoom(scene, room, T, tiles = {}) {
+// style (camp): { ground, top, hideEdges } = earth instead of concrete, side walls invisible
+export function drawRoom(scene, room, T, tiles = {}, style = null) {
   const g = scene.make.graphics({}, false), solid = (x, y) => room.solid(x, y), stamps = [];
   const r = rng(99);
   for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
     const t = room.tiles[y][x], px = x * T, py = y * T;
-    if (t === '#') {
+    if (t === '#' && style) {
+      if (style.hideEdges && (x === 0 || x === room.w - 1) && y < room.h - 2) continue;
+      const base = parseInt(style.ground.slice(1), 16), topC = parseInt(style.top.slice(1), 16);
+      g.fillStyle(base).fillRect(px, py, T, T);
+      if (r() < 0.3) g.fillStyle(topC, 0.35).fillRect(px + 6 + r() * 40, py + 14 + r() * 40, 8 + r() * 10, 4);   // pebbles
+      if (!solid(x, y - 1)) { g.fillStyle(topC).fillRect(px, py, T, 8); for (let i = 0; i < 4; i++) g.fillRect(px + r() * (T - 6), py - 4 - r() * 6, 3, 6 + r() * 4); }
+    } else if (t === '#') {
       const shade = 0x24272e + (r() < 0.15 ? 0x050505 : 0);
       g.fillStyle(shade).fillRect(px, py, T, T);
       g.fillStyle(0x1a1c21).fillRect(px, py + T - 3, T, 3).fillRect(px + T - 3, py, 3, T);

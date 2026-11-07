@@ -113,3 +113,20 @@ test('Gleicher Inhalt erzeugt keinen leeren Commit, ungültige Pfade werden abge
   assert.equal(info.data.POLICY_AUD, 'aud-test-123'); assert.equal(info.data.login, true);
   assert.equal((await call('/api/access-info', { email: null })).data.login, false);
 });
+
+test('Spielstand pro Login im KV', async () => {
+  const { call, env } = await setup();
+  const kv = new Map();
+  env.SAVES = { get: async (k, t) => kv.has(k) ? (t === 'json' ? JSON.parse(kv.get(k)) : kv.get(k)) : null, put: async (k, v) => { kv.set(k, v); }, delete: async k => { kv.delete(k); } };
+  assert.deepEqual((await call('/api/save')).data, { save: null, time: null });
+  assert.equal((await call('/api/save', { method: 'PUT', body: { save: { day: 2, deltas: 30 } } })).status, 200);
+  assert.equal((await call('/api/save')).data.save.deltas, 30);
+  assert.equal((await call('/api/save', { email: 'anna@example.com' })).data.save, null);   // everyone has their own
+  assert.ok(![...kv.keys()].some(k => k.includes('daniel')));   // the e-mail is not stored in clear
+  assert.equal((await call('/api/save', { method: 'PUT', body: { save: [1] } })).status, 400);
+  assert.equal((await call('/api/save', { method: 'DELETE' })).status, 200);
+  assert.equal((await call('/api/save')).data.save, null);
+  assert.equal((await call('/api/save', { email: null })).status, 401);
+  delete env.SAVES;
+  assert.equal((await call('/api/save')).status, 503);
+});

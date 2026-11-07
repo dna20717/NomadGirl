@@ -2,6 +2,7 @@
 // Online (Cloudflare worker): the game data come live from the repository (/api/files), so a save in the workshop
 // counts after reloading, without waiting for the build. Elsewhere: the delivered files plus the workshop's drafts from this browser.
 //   game.html?room=<id>   plays a room-building block; without: the test room from the area "Spiel"
+//   game.html?camp        the game: camp ↔ runs with a savegame (online per login, otherwise in this browser); ?camp&new starts over
 import { openStore, withDrafts } from '../store.js';
 import { cloudFiles } from '../cloud_store.js';
 import { browserLoader } from '../browser_loader.js';
@@ -9,6 +10,7 @@ import { loadProject } from '../../engine/project.js';
 import { PlayScene } from './scene.js';
 import { Hud } from './hud.js';
 import { installControl } from './control.js';
+import { openSave } from '../save.js';
 
 export async function start(parent, hudRoot) {
   const base = new URL('projects/nomadgirl/', location.href);
@@ -17,7 +19,7 @@ export async function start(parent, hudRoot) {
   const project = await loadProject(withDrafts(browserLoader(base), cloud ? cloud.files : drafts));
   if (cloud) console.info(`Spieldaten live aus dem Repository (Commit ${cloud.commit.slice(0, 7)})`);
   const D = project.data, rooms = D.rooms || {};
-  const asked = new URLSearchParams(location.search).get('room');
+  const q = new URLSearchParams(location.search), asked = q.get('room');
   const roomId = [asked, D.game?.testRoom, ...Object.keys(rooms)].find(id => id && rooms[id]?.layout?.length);
   if (!roomId) throw new Error('Kein Raum mit Layout gefunden (Werkstatt › Raum-Bausteine › Layout).');
   if (asked && asked !== roomId) console.warn(`Raum „${asked}“ hat kein Layout, spiele „${roomId}“`);
@@ -30,7 +32,18 @@ export async function start(parent, hudRoot) {
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
     banner: false,
   });
-  game.scene.add('play', PlayScene, true, { project, roomId, base, hud });
+  let args = { project, roomId, base, hud };
+  if (q.has('camp') && D.camp) {
+    const box = await openSave(D);
+    if (q.has('new')) await box.reset();
+    console.info(`Spielstand ${box.where === 'cloud' ? 'online (pro Login)' : 'in diesem Browser'}${box.fresh ? ', neu' : ''}`);
+    hud.saveBox = box;
+    // a run that was interrupted (page closed) counts as knocked out: the camp starts, the run loot is gone
+    const run = box.save.run;
+    if (run) { box.save.run = null; box.save.buffs = []; await box.persist(); }
+    args = { ...args, mode: 'camp', box, banner: run ? ['Mama-Bot hat dich heimgebracht', 'Der letzte Run wurde abgebrochen.'] : box.fresh ? ['Willkommen im Camp', 'E benutzt Dinge · H zeigt die Steuerung'] : null };
+  }
+  game.scene.add('play', PlayScene, true, args);
   window.nomad = installControl(game);   // remote control for Ava and tests
   return game;
 }

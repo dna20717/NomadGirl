@@ -62,12 +62,22 @@ Das Basisgeld aus dem Run ist immer sicher. Der Rang gibt einen Deltas-Bonus obe
 
 Das Rig ist Leylas Zuhause, Werkstatt und Fahrzeug zugleich. Es wird im Querschnitt gezeigt wie ein Puppenhaus.
 
-- **Zugmaschine:** Pickup zum Start, später LKW. Bestimmt Zugkraft, Spritverbrauch und wie viele Container hintereinander und übereinander passen.
+- **Zugmaschine:** Leylas Van zum Start (mit zwei eigenen Werkstatt-Plätzen: Schlafkoje und Warroom), später LKW. Bestimmt Zugkraft, Spritverbrauch und wie viele Container hintereinander und übereinander passen.
 - **Slots:** Motor, Panzerung, Waffen (Rig-Teile).
 - **Payload:** Container (Hochseecontainer, Holzkisten, Wohnwagenteile). Anfangs knapp, mit stärkerer Zugmaschine horizontal und vertikal stapelbar. Je nach Größe fasst ein Container eine, zwei oder drei Werkstätten.
 - **Budgets:** Zugkraft begrenzt das Gewicht, Energie (Lichtmaschine, Generator, Reaktor) begrenzt die Werkstätten, das Gewicht erhöht den Spritverbrauch, die Stapelhöhe kann Routen sperren.
 
 Werkstätten: Waffenkammer, Kühlraum, Zelle, Schlafzimmer, Chill Area, Drohnenwerkstatt, Warroom, Küche, Foodtruck (jaaa, wirklich), Motorraum, Reaktor. Perspektivisch: Automatisierung der Herstellung.
+
+### Camp (Daniel, 07.11.2026 abends)
+
+- **Ansicht:** begehbar im Side-Scroll (Leyla läuft durchs Camp und ins aufgeschnittene Rig, E benutzt Dinge) plus später eine Bau-Ansicht zum Umbauen.
+- **Wann:** vor und nach jedem POI-Run, immer dort, wo das Rig gerade steht.
+- **Zeit:** Ereignis-Zeit. Die Uhr springt nur bei Aktionen: Schlafen bis zum Morgen, am Feuer sitzen, Fahren, ein Run kostet Stunden; Kochen und Craften kosten Minuten.
+- **Loop:** Im Warroom das Ziel wählen (hier plündern oder hinfahren, kostet Sprit, Vorräte, Zeit). Zurück per Van (E am Van im POI) oder Ausgang; k.o. = Mama-Bot bringt Leyla ins Camp, die Run-Beute ist weg.
+- **Look:** Lagerfeuer, Tag/Nacht mit dem Wetter-System, Companions mit Sprüchen in Bläschen (zum Testen von Anfang an dabei: Schraube und Onkel Sung). Grafik erst aus Code, KI-Bilder rasten später per „Aussehen“ ein.
+- **Spielstand:** online pro Login, auf allen Geräten gleich.
+- **Lieferung:** 1) Camp begehbar + Werkstätten + Schlafen + Loop + Spielstand online ✔, 2) Beute + Rucksack-Raster (Tetris-Formen), 3) Kochen/Craften (Rezeptbuch + Experimentieren), 4) Bau-Ansicht (Werkstätten umstellen, kaufen, Container an-/abhängen, Budgets).
 
 ## Crafting & Kochen
 
@@ -131,6 +141,14 @@ Weird Cyberpunk mit Augenzwinkern: humorvoll, aber niemals albern. In und um das
 ### Ausbaustufe 1: Der Loop
 
 Ein POI mit Ranking, Rucksack-Raster, Tod mit Mama-Bot, Rig mit zwei bis drei Werkstätten, einfache Oberweltkarte mit Sprit.
+
+- [x] Camp begehbar: Rig als Puppenhaus, Van mit Schlafkoje + Warroom, Lagerfeuer, Companions, Tag/Nacht (07.11.2026)
+- [x] Loop Camp → Warroom → Run → Van/k.o. → Camp, Ereignis-Zeit, Sprit und Vorräte beim Fahren, Buffs aus dem Schlaf für den nächsten Run
+- [x] Spielstand online pro Login (Cloudflare KV), ohne Worker im Browser
+- [ ] Beute + Rucksack-Raster, Lager im Camp
+- [ ] Kochen & Craften (Rezeptbuch, Experimentieren)
+- [ ] Bau-Ansicht
+- [ ] POIs aus Raum-Bausteinen zusammensetzen (bis dahin spielt ein Run den Ersatzraum)
 
 ### Ausbaustufe 2
 

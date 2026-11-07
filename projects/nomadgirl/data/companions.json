@@ -6,7 +6,15 @@
   "workshops": ["werkbank", "motorraum", "drohnenwerkstatt"],
   "buffs": [],
   "tips": ["kabelbaum", "schrottplatte"],
-  "description": "Redet mit Motoren. Die Motoren hören zu."
+  "description": "Redet mit Motoren. Die Motoren hören zu.",
+  "lines": [
+   "Hörst du das? Der Motor summt in Moll.",
+   "Wenn was klappert, ist es ein Feature.",
+   "Mama-Bot hat schon wieder an meinen Schrauben genascht.",
+   "Gib mir Kabel und ich geb dir Wunder.",
+   "Kein Rost, kein Ruhm."
+  ],
+  "color": "#3fe0d0"
  },
  "onkel_sung": {
   "name": "Onkel Sung",
@@ -15,6 +23,14 @@
   "workshops": ["kochnische", "kueche", "foodtruck"],
   "buffs": ["feurig"],
   "tips": ["mutanten_curry"],
-  "description": "Hat früher in BigCityDelta gekocht. Für wen, sagt er nicht."
+  "description": "Hat früher in BigCityDelta gekocht. Für wen, sagt er nicht.",
+  "lines": [
+   "Hunger? Natürlich hast du Hunger.",
+   "Mutantenfleisch ist nur Fleisch mit Meinung.",
+   "Früher hatte ich drei Sterne. Jetzt hab ich ein Lagerfeuer.",
+   "Bring mir Pilze. Keine leuchtenden.",
+   "Der Kaffee von der Tankstelle ist ein Verbrechen."
+  ],
+  "color": "#ff9a3a"
  }
 }

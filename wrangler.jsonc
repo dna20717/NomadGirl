@@ -13,6 +13,8 @@
     "html_handling": "drop-trailing-slash",
     "run_worker_first": ["/api/*"]
   },
+  // savegames, one per login (game/save.js ↔ /api/save); the namespace id is no secret
+  "kv_namespaces": [{ "binding": "SAVES", "id": "8f13281e20eb4f92a5f21df4a6dcb43d" }],
   "vars": {
     "GITHUB_REPO": "dna20717/NomadGirl",
     "BRANCH": "main",

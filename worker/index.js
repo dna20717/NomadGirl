@@ -29,6 +29,7 @@ export async function handle(request, env, fetchFn) {
     const user = await accessUser(request, env, fetchFn);
     if (!user) return failure(401, 'Nicht angemeldet.');
     if (url.pathname === '/api/session') return json({ user, repo: env.GITHUB_REPO, branch: branch(env) });
+    if (url.pathname === '/api/save') return await savegame(request, env, user);
     if (!env.GITHUB_TOKEN) return failure(503, 'GitHub-Schlüssel fehlt (GITHUB_TOKEN).');
     const gh = github(env, fetchFn);
     if (url.pathname === '/api/files' && request.method === 'GET') return json(await readFiles(gh, env));
@@ -52,6 +53,35 @@ export const commitEmail = name => `${slug(name)}@werkstatt.nomadgirl.invalid`;
 export function authorName(n) {
   const t = String(n ?? '').replace(/[\u0000-\u001f<>]/g, '').trim();
   return t && t.length <= 40 ? t : null;
+}
+
+// ---------- savegame (Cloudflare KV, one per login) ----------
+// GET /api/save → { save | null, time }   PUT /api/save { save } → { time }   DELETE /api/save → new game
+// The key is a hash of the login e-mail, so the e-mail is not stored in clear.
+const SAVE_MAX = 256 * 1024;
+export async function saveKey(email) {
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(email).trim().toLowerCase()));
+  return 'save:' + [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function savegame(request, env, user) {
+  if (!env.SAVES) return failure(503, 'Spielstand-Speicher fehlt (KV-Binding SAVES).');
+  const key = await saveKey(user.email);
+  if (request.method === 'GET') {
+    const v = await env.SAVES.get(key, 'json');
+    return json({ save: v?.save ?? null, time: v?.time ?? null });
+  }
+  if (request.method === 'PUT') {
+    const body = await request.text();
+    if (body.length > SAVE_MAX) return failure(413, 'Spielstand zu groß.');
+    let save;
+    try { save = JSON.parse(body)?.save; } catch { return failure(400, 'Spielstand nicht lesbar.'); }
+    if (!save || typeof save !== 'object' || Array.isArray(save)) return failure(400, 'Spielstand fehlt.');
+    const time = new Date().toISOString();
+    await env.SAVES.put(key, JSON.stringify({ save, time }));
+    return json({ time });
+  }
+  if (request.method === 'DELETE') { await env.SAVES.delete(key); return json({ time: null }); }
+  return failure(405, 'Nur GET, PUT oder DELETE.');
 }
 
 // ---------- Cloudflare Access ----------

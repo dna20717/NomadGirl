@@ -28,6 +28,11 @@ Neuer Code nimmt die Wörter aus dieser Liste. Die Grundbegriffe (Werkstatt, Pr�
 | Ort (POI) | poi |
 | Raum-Baustein | room |
 | Oberwelt-Ort | location |
+| Camp | camp |
+| Spielstand | savegame (`save`) |
+| Tageszeit | daytime |
+| Lagerfeuer | fire |
+| Spruch (Bläschen) | line / bark |
 | Encounter | encounter |
 | Reisen | travel |
 | Rang | grade |

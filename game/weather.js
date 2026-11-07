@@ -12,6 +12,7 @@ const DEFAULTS = {
   clouds: { count: 14, color: '#2a1534', light: '#e0603e', speed: 2, band: [18, 60] },
   glow: { enabled: true, color: '#ff2a1a', at: [30, 70], size: [45, 30], strength: 55, pulse: 5, flicker: 15, embers: 18 },
   rain: { enabled: false, amount: 160, speed: 260, angle: 12, length: 7, color: '#a9b8e0', opacity: 45, darken: 25, flash: 2 },
+  stars: { count: 0, color: '#fff4d8', twinkle: 40, band: [0, 55] },
 };
 
 const hex = c => { const n = parseInt((c || '#000').slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
@@ -25,6 +26,7 @@ export function makeWeather(def = {}) {
   const D = Object.fromEntries(Object.entries(DEFAULTS).map(([k, v]) => [k, { ...v, ...(def[k] || {}) }]));
   const r = rng(4711);
   const clouds = Array.from({ length: Math.max(0, D.clouds.count | 0) }, () => ({ x: r(), y: r(), w: 14 + r() * 50, h: 1 + Math.floor(r() * 3), v: 0.5 + r() }));
+  const stars = Array.from({ length: Math.max(0, D.stars.count | 0) }, () => ({ x: r(), y: r(), p: r() * 10, big: r() < 0.12 }));
   const embers = Array.from({ length: Math.max(0, D.glow.embers | 0) }, () => ({ x: r(), y: r(), v: 4 + r() * 10, p: r() * 10 }));
   let drops = [], base = null, baseKey = '', flashUntil = 0, nextFlash = 0;
 
@@ -36,7 +38,7 @@ export function makeWeather(def = {}) {
     const c = base.getContext('2d'), img = c.createImageData(w, h), S = D.sky;
     const stops = [[0, hex(S.top)], [0.4, hex(S.middle)], [0.72, hex(S.low)], [1, hex(S.horizon)]];
     const at = k => { for (let i = 1; i < stops.length; i++) if (k <= stops[i][0]) return mix(stops[i - 1][1], stops[i][1], (k - stops[i - 1][0]) / (stops[i][0] - stops[i - 1][0])); return stops[stops.length - 1][1]; };
-    const bands = Math.max(2, S.bands | 0), horizon = box.y + box.h * (D.sun.y / 100);
+    const bands = Math.max(2, S.bands | 0), horizon = box.y + box.h * ((S.at ?? D.sun.y) / 100);
     for (let y = 0; y < h; y++) {
       const k = Math.max(0, Math.min(1, y / Math.max(1, horizon))) * (bands - 1), lo = Math.floor(k), f = k - lo;
       const ca = at(lo / (bands - 1)), cb = at(Math.min(bands - 1, lo + 1) / (bands - 1));
@@ -70,6 +72,17 @@ export function makeWeather(def = {}) {
     sky(ctx, w, h, t, box = { x: 0, y: 0, w, h }) {
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(sky(w, h, box), 0, 0);
+      const ST = D.stars;
+      if (stars.length) {   // stars (night): single pixels, a few crosses, twinkling
+        ctx.fillStyle = css(hex(ST.color));
+        for (const s of stars) {
+          const x = Math.round(s.x * w), y = Math.round(box.y + box.h * (ST.band[0] + (ST.band[1] - ST.band[0]) * s.y) / 100);
+          ctx.globalAlpha = 1 - (ST.twinkle / 100) * (0.5 + 0.5 * Math.sin(t * (1.3 + s.p) + s.p * 7));
+          ctx.fillRect(x, y, 1, 1);
+          if (s.big) { ctx.globalAlpha *= 0.5; ctx.fillRect(x - 1, y, 3, 1); ctx.fillRect(x, y - 1, 1, 3); }
+        }
+        ctx.globalAlpha = 1;
+      }
       const C = D.clouds, dark = hex(C.color), light = hex(C.light);
       for (const c of clouds) {
         const x = Math.round(((c.x * (w + 80) + t * C.speed * c.v) % (w + 80)) - 60), y = Math.round(box.y + box.h * (C.band[0] + (C.band[1] - C.band[0]) * c.y) / 100);

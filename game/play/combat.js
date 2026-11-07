@@ -7,6 +7,7 @@ export class Combat {
     this.shots = [];
   }
 
+  boost() { return 1 + (this.scene.mods?.damage || 0) / 100; }   // damage buffs from the camp
   melee(leyla, time) {
     const s = this.scene, w = s.weapon('melee');
     if (!w) return;
@@ -22,7 +23,7 @@ export class Combat {
       const eb = e.body;
       if (eb.right > x0 && eb.left < x1 && eb.bottom > y0 && eb.top < y1) {
         const crit = Math.random() * 100 < (w.critChance ?? 0);
-        e.hit(time, Math.round((w.damage ?? 10) * (crit ? 2 : 1)), w.knockback ?? 200, f, crit);
+        e.hit(time, Math.round((w.damage ?? 10) * this.boost() * (crit ? 2 : 1)), w.knockback ?? 200, f, crit);
         hits++;
       }
     }
@@ -38,7 +39,7 @@ export class Combat {
     leyla.attackPose = time + 120;
     const f = leyla.facing, x = leyla.x + f * leyla.size.w * 0.8, y = leyla.feet - leyla.height * 0.62, speed = w.projectileSpeed ?? 1600;
     s.fx.flash(x + f * 10, y, 0xfff2b0, 18);
-    this.spawn({ key: 'nail', x, y, vx: f * speed, vy: 0, life: (w.range ?? 600) / speed * 1000, friendly: true, damage: w.damage ?? 5, knockback: w.knockback ?? 80, crit: w.critChance ?? 0, time });
+    this.spawn({ key: 'nail', x, y, vx: f * speed, vy: 0, life: (w.range ?? 600) / speed * 1000, friendly: true, damage: (w.damage ?? 5) * this.boost(), knockback: w.knockback ?? 80, crit: w.critChance ?? 0, time });
     if (!leyla.body.blocked.down) leyla.body.setVelocityX(leyla.body.velocity.x - f * 40);
   }
 

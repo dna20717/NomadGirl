@@ -112,13 +112,13 @@ export const AREAS = {
         table('spawn.bob', 'Wippen pro Frame', [num('dx', 'x'), num('dy', 'y')], { hint: 'Bildpixel je Frame der Tür-Animation (Zeile 1 = Frame 1): die Karosserie federt, die Schüssel federt mit' })] },
       { title: 'Testen', fields: [ref('testRoom', 'Testraum', 'rooms', { hint: 'Diesen Raum startet „Spiel“ auf der Startseite (MVP Movement & Kampf)' })] },
       { title: 'Start', fields: [ref('start.location', 'Startort', 'locations'), ref('start.tractor', 'Zugmaschine', 'tractors'), refs('start.containers', 'Container', 'containers'),
-        refs('start.workshops', 'Werkstätten', 'workshops'), refs('start.companions', 'Companions', 'companions'), num('start.fuel', 'Sprit', { unit: 'l', min: 0 }), num('start.food', 'Vorräte', { unit: 'Rationen', min: 0 })] },
+        refs('start.workshops', 'Werkstätten', 'workshops', { hint: 'Werden der Reihe nach verteilt: erst in die Plätze der Zugmaschine, dann in die Container' }), refs('start.companions', 'Companions', 'companions'), num('start.fuel', 'Sprit', { unit: 'l', min: 0 }), num('start.food', 'Vorräte', { unit: 'Rationen', min: 0 })] },
     ],
     check: (x, report, p) => {
       const D = p.data, s = x.start || {};
-      const places = (s.containers || []).reduce((n, c) => n + (D.containers?.[c]?.places || 0), 0);
+      const places = (D.tractors?.[s.tractor]?.places || 0) + (s.containers || []).reduce((n, c) => n + (D.containers?.[c]?.places || 0), 0);
       const used = (s.workshops || []).reduce((n, w) => n + (D.workshops?.[w]?.places || 0), 0);
-      if (used > places) report('error', `Start-Werkstätten brauchen ${used} Plätze, die Start-Container haben ${places}`);
+      if (used > places) report('error', `Start-Werkstätten brauchen ${used} Plätze, Zugmaschine und Start-Container haben ${places}`);
       const power = (D.tractors?.[s.tractor]?.power || 0) + (s.workshops || []).reduce((n, w) => n + (D.workshops?.[w]?.power || 0), 0);
       if (power < 0) report('warning', `Start-Rig hat zu wenig Energie (${power} ⚡)`);
       const weight = (s.containers || []).reduce((n, c) => n + (D.containers?.[c]?.weight || 0), 0), pull = D.tractors?.[s.tractor]?.pull;
@@ -191,7 +191,8 @@ export const AREAS = {
     row: x => [x.sun?.enabled !== false && 'Sonne', x.glow?.enabled !== false && 'Glühen', x.rain?.enabled && 'Regen'].filter(Boolean).join(' · ') || 'nur Himmel',
     sections: [
       { title: 'Himmel', fields: [NAME, color('sky.top', 'Oben'), color('sky.middle', 'Mitte'), color('sky.low', 'Unten'), color('sky.horizon', 'Horizont'),
-        num('sky.bands', 'Farbstufen', { min: 2, hint: 'Stufen des Verlaufs, dazwischen Pixel-Raster' }), DESCRIPTION] },
+        num('sky.bands', 'Farbstufen', { min: 2, hint: 'Stufen des Verlaufs, dazwischen Pixel-Raster' }),
+        num('sky.at', 'Horizont-Höhe', { unit: '%', hint: 'Wo der Verlauf die Horizont-Farbe erreicht, vom oberen Bildrand. Leer = Mitte der Sonne' }), DESCRIPTION] },
       { title: 'Sonne', fields: [bool('sun.enabled', 'Zeigen'), num('sun.x', 'Position x', { unit: '%' }), num('sun.y', 'Mitte y', { unit: '%', hint: 'Vom oberen Bildrand; auch der Horizont des Verlaufs. Die Ruinen davor verdecken den Rest' }),
         num('sun.size', 'Radius', { unit: 'Bildpixel', min: 2 }), color('sun.color', 'Farbe oben'), color('sun.color2', 'Farbe unten'), num('sun.stripes', 'Streifen', { min: 0 }), num('sun.halo', 'Schein', { unit: '%', min: 0 })] },
       { title: 'Wolken', fields: [num('clouds.count', 'Anzahl', { min: 0 }), color('clouds.color', 'Farbe'), color('clouds.light', 'Licht von unten'), num('clouds.speed', 'Tempo', { unit: 'Bildpixel/s' }),
@@ -202,6 +203,8 @@ export const AREAS = {
       { title: 'Regen', fields: [bool('rain.enabled', 'Regen'), num('rain.amount', 'Tropfen', { min: 0 }), num('rain.speed', 'Tempo', { unit: 'Bildpixel/s', min: 0 }), num('rain.angle', 'Schräge', { unit: '°' }),
         num('rain.length', 'Länge', { unit: 'Bildpixel', min: 1 }), color('rain.color', 'Farbe'), num('rain.opacity', 'Deckkraft', { unit: '%', min: 0, max: 100 }),
         num('rain.darken', 'Himmel abdunkeln', { unit: '%', min: 0, max: 100 }), num('rain.flash', 'Wetterleuchten', { unit: 'pro Minute', min: 0 })] },
+      { title: 'Sterne', fields: [num('stars.count', 'Anzahl', { min: 0, hint: '0 = keine (tagsüber)' }), color('stars.color', 'Farbe'), num('stars.twinkle', 'Funkeln', { unit: '%', min: 0, max: 100 }),
+        range('stars.band', 'Höhe von – bis', { unit: '%' })] },
     ],
   },
 
@@ -358,7 +361,8 @@ export const AREAS = {
       { title: 'Zugmaschine', fields: [NAME, LOOK, DESCRIPTION, VALUE] },
       { title: 'Leistung', fields: [num('pull', 'Zugkraft', { unit: 'kg', min: 0 }), num('fuelUse', 'Verbrauch', { unit: 'l/100 km', min: 0 }), num('tank', 'Tank', { unit: 'l', min: 0 }),
         num('power', 'Lichtmaschine', { unit: '⚡', min: 0, hint: 'Energie für Werkstätten ohne Generator' })] },
-      { title: 'Payload', fields: [num('length', 'Plätze hintereinander', { min: 0 }), num('stack', 'Stapelhöhe', { min: 1 })] },
+      { title: 'Payload', fields: [num('places', 'Werkstatt-Plätze im Fahrzeug', { min: 0, max: 3, hint: 'Eigene Plätze wie ein kleiner Container (Van: Schlafkoje + Warroom). Im Camp per E an der Tür' }),
+        num('length', 'Plätze hintereinander', { min: 0 }), num('stack', 'Stapelhöhe', { min: 1 })] },
       { title: 'Slots', fields: [num('slots.engine', 'Motor', { min: 0 }), num('slots.armor', 'Panzerung', { min: 0 }), num('slots.weapon', 'Waffen', { min: 0 })] },
     ],
   },
@@ -397,7 +401,35 @@ export const AREAS = {
     sections: [
       { title: 'Companion', fields: [NAME, LOOK, text('role', 'Rolle'), STAGE, DESCRIPTION] },
       { title: 'Im Rig', fields: [refs('workshops', 'Betreibt', 'workshops'), refs('buffs', 'Gibt Buffs', 'buffs'), refs('tips', 'Kennt Rezepte', 'recipes')] },
+      { title: 'Im Camp', fields: [lines('lines', 'Sprüche', { hint: 'Eine Zeile pro Spruch, erscheint als Bläschen (zufällig und per E)' }),
+        color('color', 'Platzhalter-Farbe', { hint: 'Solange es kein Aussehen gibt, steht hier eine Figur aus Code' }), num('height', 'Größe', { unit: 'px', min: 40 })] },
     ],
+  },
+
+  camp: {
+    name: 'Camp', icon: 'tracks', file: 'data/camp.json', kind: 'single',
+    hint: 'Das Camp vor und nach jedem Run: Leyla läuft im Side-Scroll durchs Camp und ins aufgeschnittene Rig (wie ein Puppenhaus) und benutzt die Werkstätten mit E. Zeit springt nur bei Aktionen (Ereignis-Zeit). Grafik vorerst aus Code, Aussehen der Container und Werkstätten rastet später ein.',
+    sections: [
+      { title: 'Platz', fields: [NAME, num('campWidth', 'Camp rechts vom Van', { unit: 'Kacheln', min: 8, hint: 'Freifläche mit Lagerfeuer und Companions' }), num('margin', 'Rand links vom Rig', { unit: 'Kacheln', min: 2 }),
+        num('height', 'Höhe', { unit: 'Kacheln', min: 8 }), color('ground.color', 'Boden'), color('ground.top', 'Bodenkante'), color('ground.far', 'Ebene in der Ferne'), num('horizon', 'Horizont', { unit: '%', min: 20, max: 95, hint: 'Vom oberen Bildschirmrand' }), DESCRIPTION] },
+      { title: 'Rig-Ansicht', fields: [num('rig.placeWidth', 'Breite pro Platz', { unit: 'Kacheln', min: 2 }), num('rig.height', 'Raumhöhe', { unit: 'px', min: 200 }), num('rig.gap', 'Abstand zwischen Containern', { unit: 'Kacheln', min: 0 }),
+        color('rig.wall', 'Wand'), color('rig.inside', 'Innen'), color('rig.light', 'Licht'), bool('rig.labels', 'Namen anzeigen')] },
+      { title: 'Lagerfeuer', fields: [bool('fire.enabled', 'Zeigen'), num('fire.at', 'Abstand vom Van', { unit: 'Kacheln', min: 1 }), num('fire.radius', 'Lichtradius', { unit: 'px', min: 0 }), color('fire.color', 'Lichtfarbe')] },
+      { title: 'Companions', fields: [range('companions.at', 'Stehen von – bis', { unit: 'Kacheln vom Van' }), range('companions.barkEvery', 'Sprüche alle', { unit: 's' }), num('companions.barkTime', 'Bläschen zeigen', { unit: 's', min: 1 })] },
+      { title: 'Zeit', fields: [num('clock.startDay', 'Start-Tag', { min: 1 }), num('clock.startHour', 'Start-Uhrzeit', { unit: 'h', min: 0, max: 23.99, step: 0.25 }),
+        num('clock.wakeHour', 'Aufwachen um', { unit: 'h', min: 0, max: 23 }), num('clock.runHours', 'Ein Run dauert', { unit: 'h', min: 0, step: 0.25 }),
+        num('clock.fireHours', 'Am Feuer sitzen', { unit: 'h', min: 0, step: 0.25 })] },
+      { title: 'Tag & Nacht', fields: [table('daytime', 'Tageszeiten', [num('from', 'Ab Uhr'), ref('weather', 'Wetter', 'weather'), num('shade', 'Abdunkeln %', { min: 0, max: 90 }), text('name', 'Name')],
+        { hint: 'Ab dieser Uhrzeit gilt die Zeile (bis zur nächsten). Abdunkeln legt die Nacht über die Welt, Lagerfeuer und Fenster leuchten dann' })] },
+      { title: 'Heilen', fields: [num('heal.sleep', 'Schlafen', { unit: '%', min: 0, max: 100 }), num('heal.fire', 'Am Feuer', { unit: '%', min: 0, max: 100 }), num('heal.afterKo', 'Nach k.o.', { unit: '%', min: 1, max: 100, hint: 'Mit so viel Leben bringt Mama-Bot Leyla zurück' })] },
+      { title: 'Bedienen', fields: [num('interactRange', 'E-Reichweite', { unit: 'px', min: 20 }), ref('fallbackRoom', 'Ersatzraum', 'rooms', { hint: 'Für POIs, deren Raum-Bausteine noch kein Layout haben' })] },
+    ],
+    check: (x, report, p) => {
+      const rows = [...(x.daytime || [])].sort((a, b) => (a.from ?? 0) - (b.from ?? 0));
+      if (!rows.length) report('warning', 'Keine Tageszeiten: das Camp nimmt das erste Wetter');
+      for (const r of rows) if (r.weather && !p.data.weather?.[r.weather]) report('error', `Wetter ${r.weather} fehlt`);
+      if (x.fallbackRoom && !p.data.rooms?.[x.fallbackRoom]?.layout?.length) report('warning', 'Ersatzraum hat kein Layout');
+    },
   },
 
   pois: {
@@ -466,7 +498,7 @@ export const GROUPS = [
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes']],
-  ['RIG', ['tractors', 'containers', 'workshops', 'rigParts', 'companions']],
+  ['RIG', ['camp', 'tractors', 'containers', 'workshops', 'rigParts', 'companions']],
   ['WELT', ['pois', 'rooms', 'locations', 'encounters', 'travel']],
 ];
 

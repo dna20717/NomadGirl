@@ -6,10 +6,10 @@
  "pixelArt": false,
  "start": {
   "location": "tankstelle_km7",
-  "tractor": "pickup",
+  "tractor": "van",
   "containers": ["wohnanhaenger"],
-  "workshops": ["schlafkoje", "kochnische", "werkbank"],
-  "companions": [],
+  "workshops": ["schlafkoje", "warroom", "kochnische", "werkbank"],
+  "companions": ["schraube", "onkel_sung"],
   "fuel": 40,
   "food": 6
  },

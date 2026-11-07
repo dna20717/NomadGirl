@@ -11,6 +11,10 @@
 //   nomad.freeze() / nomad.thaw()     show the current frame (for screenshots), then continue stepping
 //   nomad.drone('kill')               show a drone mood
 //   nomad.state().van                 van door frame, open, roof platform
+//   nomad.state().camp                camp (game.html?camp): clock, place, Δ, prompt, hotspots, rig; .menu = open menu
+//   nomad.menu() / nomad.choose(i | 'text')   the open menu / pick an item (index or part of its label)
+//   nomad.walkTo(x)                   walks Leyla to an x position (camp), then E with step(1, [], ['grab'])
+//   nomad.save()                      the savegame
 //   nomad.release()                   keyboard again, game runs normally
 // Input names: left right up down jump walk dash melee ranged grab restart help debug
 
@@ -49,6 +53,23 @@ export function installControl(game) {
     restart() { scene().restartRoom(); return api.step(5); },
     freeze() { const s = scene(); s.hud.paused = true; s.tweens.pauseAll(); s.time.paused = true; game.loop.wake(); },
     thaw() { const s = scene(); if (active) game.loop.sleep(); s.hud.paused = false; s.tweens.resumeAll(); s.time.paused = false; },
+    menu() { return scene().hud.menuState(); },
+    choose(which) {
+      const h = scene().hud, items = h.menuItems || [];
+      const i = typeof which === 'number' ? which : items.findIndex(it => it.label.toLowerCase().includes(String(which).toLowerCase()));
+      const ok = h.choose(i);
+      api.step(2);
+      return ok;
+    },
+    walkTo(x, max = 900) {
+      for (let i = 0; i < max; i++) {
+        const l = scene().leyla, d = x - l.x;
+        if (Math.abs(d) < 12) { api.step(20); break; }
+        api.step(1, [d > 0 ? 'right' : 'left', ...(Math.abs(d) < 160 ? ['walk'] : [])]);
+      }
+      return api.state();
+    },
+    save() { return scene().box?.save || null; },
     drone(mood) { scene().drone.react(mood); return scene().drone.mood; },   // show a drone mood (tests, pictures)
     state() {
       const s = scene(), l = s.leyla, r = n => Math.round(n);
@@ -58,6 +79,8 @@ export function installControl(game) {
         enemies: s.enemies.map(e => ({ id: e.id, state: e.state, x: r(e.x), feet: r(e.feet), hp: e.hp })),
         drone: s.drone && { mood: s.drone.mood, x: r(s.drone.x), y: r(s.drone.y) },
         van: s.van?.state(),
+        mode: s.mode, prompt: s.hud.promptText, menu: s.hud.menuState(), banner: s.hud.bannerEl.hidden ? null : s.hud.bannerEl.textContent,
+        camp: s.camp?.state(), health: Math.round(s.leyla.health), maxHealth: s.leyla.maxHealth,
       };
     },
   };

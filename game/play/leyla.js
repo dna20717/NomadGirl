@@ -40,7 +40,7 @@ export class Leyla {
     this.body.allowGravity = true;
     this.state = 'normal';
     this.facing = 1;
-    this.health = this.d.health ?? 100;
+    this.health = this.maxHealth;
     this.ammo = this.scene.weapon('ranged')?.ammo ?? Infinity;
     this.airJumps = this.m.airJumps ?? 0;
     this.airDash = true;
@@ -51,6 +51,7 @@ export class Leyla {
     this.sprite.setAlpha(1).setRotation(0).clearTint();
   }
 
+  get maxHealth() { return (this.d.health ?? 100) + (this.scene.mods?.health || 0); }
   get feet() { return this.body.bottom; }
   get x() { return this.body.center.x; }
   get chest() { return this.body.bottom - this.size.chest; }
@@ -362,7 +363,7 @@ export class Leyla {
   // ---------- damage ----------
   hurt(time, damage, fromX) {
     if (!this.alive || this.invulnerable(time)) return false;
-    this.health = Math.max(0, this.health - damage);
+    this.health = Math.max(0, this.health - damage * (1 - Math.min(90, this.scene.mods?.defense || 0) / 100));
     this.invulnerableUntil = time + (this.d.invulnerableAfterHit ?? 600);
     const low = this.state === 'slide' && !this.canStand();   // hit in a tunnel: stay low
     if (this.state === 'slide' && !low) this.endSlide();

@@ -8,6 +8,8 @@ import { Fx } from './fx.js';
 import { Drone } from './drone.js';
 import { Van } from './van.js';
 import { Backdrop } from './backdrop.js';
+import { Camp, campLayout, daytimeAt, drawCampBackground } from './camp.js';
+import { advance, clockText } from '../save.js';
 
 const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
 
@@ -20,8 +22,11 @@ const KEYS = {
 export class PlayScene extends Phaser.Scene {
   constructor() { super('play'); }
 
-  init({ project, roomId, base, hud }) {
-    this.p = project; this.data_ = project.data; this.roomId = roomId; this.base = base; this.hud = hud;
+  // mode: 'test' (a room from the workshop), 'camp' (camp between runs) or 'run' (a POI run from the camp); box = savegame (game/save.js)
+  init(args) {
+    const { project, roomId, base, hud, mode = 'test', box = null } = args;
+    this.args = args;
+    this.p = project; this.data_ = project.data; this.roomId = roomId; this.base = base; this.hud = hud; this.mode = mode; this.box = box;
     this.T = this.data_.game?.tileSize || 64;
     this.gravity = this.data_.game?.gravity || 3600;
   }
@@ -34,6 +39,7 @@ export class PlayScene extends Phaser.Scene {
     if (this.data_.drone?.look) ids.add(this.data_.drone.look);
     const SP = this.data_.game?.spawn;
     for (const id of [SP?.look, SP?.dish?.look, SP?.roof?.front, this.data_.rooms?.[this.roomId]?.backdrop?.image]) if (id) ids.add(id);
+    if (this.mode === 'camp') for (const c of this.box?.save.companions || []) if (this.data_.companions?.[c]?.look) ids.add(this.data_.companions[c].look);
     for (const id of [...ids]) if (A[id]?.mirror) ids.add(A[id].mirror);   // drawn opposite direction
     for (const id of ids) {
       const a = A[id];
@@ -84,25 +90,36 @@ export class PlayScene extends Phaser.Scene {
 
   // ---------- world ----------
   create() {
+    this.camp = null; this.vanPrompt = false;   // the scene object is reused on restart (camp ↔ run)
     makeTextures(this);
     this.fx = new Fx(this);
     this.combat = new Combat(this);
-    const def = this.data_.rooms?.[this.roomId];
+    let def = this.data_.rooms?.[this.roomId];
+    if (this.mode === 'camp') {
+      this.campGeo = campLayout(this.data_, this.box.save, this.T);
+      const day = daytimeAt(this.data_.camp, this.box.save.hour);
+      def = { name: this.data_.locations?.[this.box.save.location]?.name || 'Camp', layout: this.campGeo.layout, backdrop: { weather: day.weather || Object.keys(this.data_.weather || {})[0], shade: 0 } };
+    }
+    this.roomDef = def;
     this.room = parseRoom(def || {});
     const T = this.T, R = this.room, W = R.w * T, H = R.h * T;
     this.physics.world.setBounds(0, 0, W, H);
     // background (sky, skyline) on its own unzoomed camera, the world on a zoomable camera above it
+    if (this.onAdded) this.events.off(Phaser.Scenes.Events.ADDED_TO_SCENE, this.onAdded);
+    this.onAdded = null;
     const before = new Set(this.children.list);
     const bd = def?.backdrop;
     if (bd?.image || bd?.weather) this.backdrop = new Backdrop(this, bd, H); else drawBackground(this, W, H);
+    if (this.mode === 'camp') drawCampBackground(this, this.data_.camp || {});
     const background = this.children.list.filter(o => !before.has(o));
     this.bgCam = this.cameras.main;
     this.cam = this.cameras.add(0, 0, this.scale.width, this.scale.height);
     this.cam.ignore(background);
     this.bgCam.ignore([...before]);
-    this.events.on(Phaser.Scenes.Events.ADDED_TO_SCENE, o => this.bgCam.ignore(o));
+    if (!this.onAdded) { this.onAdded = o => this.bgCam.ignore(o); this.events.on(Phaser.Scenes.Events.ADDED_TO_SCENE, this.onAdded); }   // once: the scene object is reused on restart
     const tiles = Object.fromEntries(Object.entries(this.data_.game?.tiles || {}).map(([k, id]) => [k, this.textures.exists(id) ? id : null]));
-    drawRoom(this, R, T, tiles);
+    const CG = this.data_.camp?.ground;
+    drawRoom(this, R, T, tiles, this.mode === 'camp' ? { ground: CG?.color || '#4a3628', top: CG?.top || '#8a6440', hideEdges: true } : null);
 
     this.solids = this.physics.add.staticGroup();
     for (const r of solidRects(R)) this.solids.add(this.add.zone((r.x + r.w / 2) * T, (r.y + r.h / 2) * T, r.w * T, r.h * T));
@@ -129,9 +146,16 @@ export class PlayScene extends Phaser.Scene {
     const S = this.data_.game?.spawn;
     this.van = S?.enabled !== false && S?.look && this.assetInfo(S.look) ? new Van(this, S, [(start[0] + 0.5) * T, (start[1] + 1) * T]) : null;
     this.spawnArt = this.van?.sprite;
-    this.leyla = new Leyla(this, this.data_, [(start[0] + 0.5) * T, (start[1] + 1) * T]);
+    // buffs from the savegame count in a run (health, defense, damage)
+    this.mods = {};
+    if (this.mode === 'run') for (const b of this.box.save.buffs) { const d = this.data_.buffs?.[b]; if (d?.stat) this.mods[d.stat] = (this.mods[d.stat] || 0) + (d.value || 0); }
+    const feet = [(start[0] + 0.5) * T, (start[1] + 1) * T];
+    if (this.args.startX) feet[0] = this.args.startX;
+    this.leyla = new Leyla(this, this.data_, feet);
+    if (this.box) this.leyla.health = Math.max(1, Math.min(this.leyla.maxHealth, this.box.save.health + (this.mode === 'run' ? this.mods.health || 0 : 0)));
     this.drone = new Drone(this, this.data_);
     this.van?.reset();
+    if (this.mode === 'camp') this.camp = new Camp(this, this.box, this.campGeo);
     this.backdrop?.front();
     this.physics.add.collider(this.leyla.box, this.solids);
     this.physics.add.collider(this.leyla.box, this.platforms, null, (box, plat) => {
@@ -156,6 +180,48 @@ export class PlayScene extends Phaser.Scene {
     this.physics.world.debugGraphic?.setVisible(false);
     this.startTime = 0; this.kills = 0; this.deltas = 0; this.cleared = false; this.hitstopUntil = 0;
     this.hud.room(def?.name || this.roomId, this.enemies.length);
+    this.hud.mode(this.mode, this.box?.save, this.data_);
+    if (this.mode === 'run') this.hud.room(`${this.data_.pois?.[this.box.save.run?.poi]?.name || ''} · ${def?.name || this.roomId}`, this.enemies.length);
+    if (this.args.banner) { this.hud.banner(...this.args.banner); this.time.delayedCall(2800, () => this.hud.banner(null)); }
+    else this.hud.banner(null);
+    this.leaving = false;
+  }
+
+  // ---------- camp ↔ run (savegame) ----------
+  restartAs(args, fade = 500) {
+    if (this.leaving) return;
+    this.leaving = true;
+    this.hud.prompt(null);
+    const go = () => this.scene.restart({ ...this.args, startX: null, banner: null, ...args });
+    if (this.script) return go();   // remote control: no waiting for the fade
+    this.cam.fadeOut(fade, 13, 10, 18);
+    this.cam.once('camerafadeoutcomplete', go);
+  }
+  goCamp({ banner = null, fade = 600, keepPlace = false } = {}) {
+    this.box.save.health = Math.max(1, Math.min(this.leyla.maxHealth, this.box.save.health));
+    this.box.persist();
+    this.restartAs({ mode: 'camp', banner, startX: keepPlace ? this.leyla.x : null }, fade);
+  }
+  startRun(poi) {
+    const D = this.data_, P = D.pois?.[poi] || {}, R = D.rooms || {}, has = id => R[id]?.layout?.length;
+    const ready = (P.rooms || []).filter(has);
+    const room = ready.find(id => R[id].tags?.includes('start')) || ready[0] || [D.camp?.fallbackRoom, D.game?.testRoom].find(has);
+    if (!room) return this.hud.menu({ title: 'Noch kein Raum', sub: 'Dieser POI hat noch keinen Raum mit Layout (Werkstatt › Raum-Bausteine).', items: [{ label: 'Zurück', act: () => {} }] });
+    this.box.save.health = this.leyla.health;
+    this.box.save.run = { poi, room, location: this.box.save.location };
+    this.box.persist();
+    this.restartAs({ mode: 'run', roomId: room, banner: [P.name || poi, `${D.rooms?.[room]?.name || room}${ready.length ? '' : ' (Ersatzraum)'} · E am Van: zurück ins Camp`] }, 700);
+  }
+  // back from a run: by van (loot counts) or knocked out (Mama-Bot, run loot is lost); buffs are used up
+  endRun(ko) {
+    const save = this.box.save, C = this.data_.camp || {}, base = this.data_.leyla?.health ?? 100;
+    advance(save, C.clock?.runHours ?? 3);
+    if (ko) save.health = Math.round(base * (C.heal?.afterKo ?? 30) / 100);
+    else { save.health = Math.round(this.leyla.health); save.deltas += this.deltas; }
+    save.buffs = [];
+    save.run = null;
+    const banner = ko ? ['Mama-Bot hat dich heimgebracht', `${clockText(save)} · Die Run-Beute ist weg.`] : ['Zurück im Camp', `${clockText(save)} · +${this.deltas} Δ · ${this.kills} Kills`];
+    this.goCamp({ banner, fade: ko ? 900 : 600 });
   }
 
   spawnEnemies() {
@@ -234,7 +300,7 @@ export class PlayScene extends Phaser.Scene {
   onLeylaDown() {
     this.hud.banner('Mama-Bot schleppt dich raus …', 'Die Run-Beute bleibt liegen.');
     this.cam.shake(300, 0.01);
-    this.time.delayedCall(1900, () => this.restartRoom());
+    this.time.delayedCall(1900, () => this.mode === 'run' ? this.endRun(true) : this.mode === 'camp' ? this.goCamp() : this.restartRoom());
   }
   onKill(e) {
     this.kills++;
@@ -249,6 +315,14 @@ export class PlayScene extends Phaser.Scene {
     }
   }
   clock() { const s = Math.floor(this.elapsed / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
+
+  // in a run: E at the van's door goes back to the camp
+  runUpdate(input) {
+    const l = this.leyla, v = this.van;
+    const near = v && l.alive && l.body.blocked.down && Math.abs(l.x - v.x) < (this.data_.camp?.interactRange ?? 130) && Math.abs(l.feet - v.y) < 40;
+    if (!!near !== !!this.vanPrompt) { this.vanPrompt = !!near; this.hud.prompt(near ? 'Zurück ins Camp · Van' : null); }
+    if (near && input.grab.pressed) this.endRun(false);
+  }
 
   // ---------- loop ----------
   readInput() {
@@ -266,8 +340,8 @@ export class PlayScene extends Phaser.Scene {
     const input = this.readInput();
     if (input.help.pressed) this.hud.toggleHelp();
     if (input.debug.pressed) { const w = this.physics.world; w.drawDebug = !w.drawDebug; if (!w.debugGraphic) w.createDebugGraphic(); w.debugGraphic.clear().setVisible(w.drawDebug); }
-    if (input.restart.pressed) this.restartRoom();
-    if (this.hud.paused) { this.physics.world.pause(); return; }
+    if (input.restart.pressed && this.mode !== 'camp') this.restartRoom();
+    if (this.hud.paused || this.hud.modal || this.leaving) { this.physics.world.pause(); this.hud.update(this, time); return; }
     if (time < this.hitstopUntil) return;
     if (this.physics.world.isPaused) this.physics.world.resume();
     const dt = Math.min(delta, 50);
@@ -277,6 +351,8 @@ export class PlayScene extends Phaser.Scene {
     this.leyla.update(time, dt, input);
     this.drone.update(time, dt);
     this.van?.update(dt);
+    if (this.camp) this.camp.update(time, dt, input);
+    else if (this.mode === 'run') this.runUpdate(input);
     for (const e of this.enemies) e.update(time, dt, this.leyla);
     this.combat.update(time, dt);
 
