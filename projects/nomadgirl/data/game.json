@@ -1,0 +1,16 @@
+{
+ "title": "NomadGirl",
+ "tileSize": 32,
+ "gravity": 1800,
+ "resolution": [640, 360],
+ "pixelArt": true,
+ "start": {
+  "location": "tankstelle_km7",
+  "tractor": "pickup",
+  "containers": ["wohnanhaenger"],
+  "workshops": ["schlafkoje", "kochnische", "werkbank"],
+  "companions": [],
+  "fuel": 40,
+  "food": 6
+ }
+}

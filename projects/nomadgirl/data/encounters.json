@@ -1,0 +1,5 @@
+{
+ "strassensperre": {"name": "Straßensperre", "weight": 3, "time": "any", "enemies": ["schlaeger", "schuetze"], "loot": "pluenderer_beute", "description": "Wegzoll. Oder auch nicht."},
+ "ghulrudel": {"name": "Ghul-Rudel", "weight": 2, "time": "night", "enemies": ["kriecher", "schleimbeisser"], "loot": "mutanten_beute"},
+ "liegengebliebener_lkw": {"name": "Liegengebliebener LKW", "weight": 1, "time": "day", "enemies": [], "loot": "kiste_tankstelle", "description": "Niemand da. Verdächtig."}
+}

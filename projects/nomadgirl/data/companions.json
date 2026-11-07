@@ -1,0 +1,20 @@
+{
+ "schraube": {
+  "name": "Schraube",
+  "role": "Mechanikerin",
+  "stage": "1",
+  "workshops": ["werkbank", "motorraum", "drohnenwerkstatt"],
+  "buffs": [],
+  "tips": ["kabelbaum", "schrottplatte"],
+  "description": "Redet mit Motoren. Die Motoren hören zu."
+ },
+ "onkel_sung": {
+  "name": "Onkel Sung",
+  "role": "Koch",
+  "stage": "1",
+  "workshops": ["kochnische", "kueche", "foodtruck"],
+  "buffs": ["feurig"],
+  "tips": ["mutanten_curry"],
+  "description": "Hat früher in BigCityDelta gekocht. Für wen, sagt er nicht."
+ }
+}

@@ -1,0 +1,81 @@
+{
+ "kriecher": {
+  "name": "Kriecher",
+  "family": "mutant",
+  "behavior": "patrol",
+  "health": 25,
+  "damage": 8,
+  "speed": 70,
+  "aggroRange": 180,
+  "loot": "mutanten_beute",
+  "deltas": [0, 2],
+  "countsForRanking": true,
+  "description": "Schlurft, stöhnt, beißt."
+ },
+ "schleimbeisser": {
+  "name": "Schleimbeißer",
+  "family": "mutant",
+  "behavior": "ambusher",
+  "health": 35,
+  "damage": 14,
+  "speed": 160,
+  "aggroRange": 90,
+  "loot": "mutanten_beute",
+  "deltas": [1, 3],
+  "countsForRanking": true,
+  "description": "Hängt an der Decke und wartet."
+ },
+ "rattenschwarm": {"name": "Rattenschwarm", "family": "wildlife", "behavior": "charger", "health": 15, "damage": 4, "speed": 200, "aggroRange": 220, "deltas": [0, 1], "countsForRanking": true},
+ "schlaeger": {
+  "name": "Plünderer-Schläger",
+  "family": "raider",
+  "behavior": "charger",
+  "health": 45,
+  "damage": 12,
+  "speed": 140,
+  "aggroRange": 260,
+  "weapon": "machete",
+  "loot": "pluenderer_beute",
+  "deltas": [3, 8],
+  "countsForRanking": true
+ },
+ "schuetze": {
+  "name": "Plünderer-Schütze",
+  "family": "raider",
+  "behavior": "shooter",
+  "health": 30,
+  "damage": 8,
+  "speed": 100,
+  "aggroRange": 340,
+  "weapon": "nagelpistole",
+  "loot": "pluenderer_beute",
+  "deltas": [3, 8],
+  "countsForRanking": true
+ },
+ "wachdrohne": {
+  "name": "Wachdrohne",
+  "family": "machine",
+  "behavior": "flyer",
+  "health": 20,
+  "damage": 6,
+  "speed": 150,
+  "aggroRange": 300,
+  "loot": "drohnen_beute",
+  "deltas": [2, 5],
+  "countsForRanking": true,
+  "description": "Fragt höflich nach dem Ausweis. Schießt dann."
+ },
+ "hausmeister": {
+  "name": "Der Hausmeister",
+  "family": "anomaly",
+  "behavior": "boss",
+  "health": 600,
+  "damage": 25,
+  "speed": 90,
+  "aggroRange": 500,
+  "loot": "boss_beute",
+  "deltas": [80, 120],
+  "countsForRanking": true,
+  "description": "Hat das Ministerium nie verlassen. Hat auch nicht vor, es zu tun."
+ }
+}

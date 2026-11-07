@@ -1,0 +1,12 @@
+{
+ "points": {"time": 40, "kills": 30, "secrets": 30},
+ "timeFalloff": 5,
+ "grades": [
+  {"grade": "F", "minPoints": 0, "bonus": 0},
+  {"grade": "D", "minPoints": 30, "bonus": 10},
+  {"grade": "C", "minPoints": 50, "bonus": 25},
+  {"grade": "B", "minPoints": 70, "bonus": 50},
+  {"grade": "A", "minPoints": 85, "bonus": 75},
+  {"grade": "S", "minPoints": 98, "bonus": 100}
+ ]
+}

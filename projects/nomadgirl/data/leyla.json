@@ -1,0 +1,24 @@
+{
+ "name": "Leyla",
+ "health": 100,
+ "invulnerableAfterHit": 600,
+ "description": "Schrottsammlerin aus den Wastelands rund um BigCityDelta. Wohnt im Rig, plündert, was andere liegen lassen, und kocht erstaunlich gut.",
+ "movement": {
+  "walkSpeed": 120,
+  "runSpeed": 220,
+  "acceleration": 1400,
+  "jumpVelocity": 560,
+  "airJumps": 1,
+  "coyoteTime": 100,
+  "jumpBuffer": 120,
+  "dashDistance": 140,
+  "dashCooldown": 600,
+  "dashInvulnerable": true,
+  "slideSpeed": 300,
+  "slideDuration": 350,
+  "climbSpeed": 90,
+  "swingRope": 160,
+  "swingBoost": 20
+ },
+ "loadout": {"melee": "rohrzange", "ranged": "nagelpistole", "backpack": "schulranzen"}
+}

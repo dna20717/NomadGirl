@@ -1,0 +1,93 @@
+/* NomadGirl – workshop: additions to basis.css + ui.css. Only --ui-* tokens (rules from NomadTactics/NomadHouse). */
+body.ng { background: var(--ui-bg); color: var(--ui-text); font-family: var(--ui-font); touch-action: manipulation; user-select: text; -webkit-user-select: text; }
+#ng-load { position: fixed; inset: 0; display: grid; place-items: center; font: 15px var(--ui-font); color: var(--ui-text3); }
+.ng .ed-menu { --menu: 52px; }
+.ng-title { display: inline-flex; align-items: center; gap: 8px; padding: 0 6px; color: var(--ui-text2); }
+.ng-title b { color: var(--ui-text); font-weight: 600; }
+.ng-title span { font-family: var(--ui-pixel); font-size: 19px; color: var(--ui-text3); }
+.ng-checkButton.green { color: var(--ui-green); }
+.ng-checkButton.yellow { color: var(--ui-acc-line); }
+.ng-checkButton.red { color: var(--ui-red); border-color: var(--ui-red) !important; }
+.ng-state { display: inline-flex; align-items: center; gap: 4px; margin-right: 8px; }
+.ng-data { grid-template-columns: 220px minmax(360px, 1fr) minmax(340px, 440px); }
+.ng-spacing { margin-top: 14px; }
+.da-nav-number.ng-problem { background: var(--ui-red-soft); color: var(--ui-red); }
+
+/* lists */
+.ng-group { display: flex; align-items: center; gap: 6px; margin: 16px 0 4px !important; }
+.ng-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.ng-dot.error { background: var(--ui-red); }
+.ng-dot.warning { background: var(--ui-acc-line); }
+.ng-message.error .ic { color: var(--ui-red); }
+.ng-message.warning .ic { color: var(--ui-acc-line); }
+.ng-message.hint .ic { color: var(--ui-info); }
+.ng-message .da-name { white-space: normal; }
+.ng-allGood { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 40px; color: var(--ui-green); }
+.ng-inline { display: flex; align-items: center; gap: 4px; margin: 4px 0; font-size: var(--ui-gr-s); }
+.ng-inline.error { color: var(--ui-red); }
+.ng-inline.warning { color: var(--ui-acc-line); }
+.ng-inline.hint { color: var(--ui-text3); }
+.ng-leap { cursor: pointer; font: inherit; font-size: var(--ui-gr-s); color: var(--ui-text); }
+.ng-leap:hover { border-color: var(--ui-acc-line); }
+.ng-hintMark { font-style: normal; color: var(--ui-text3); cursor: help; }
+
+/* overview cards */
+.ng-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.ng-card { display: flex; flex-direction: column; gap: 6px; text-align: left; font: inherit; color: var(--ui-text); background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: var(--ui-r-button); padding: 10px 12px; cursor: pointer; }
+.ng-card:hover { border-color: var(--ui-acc-line); }
+.ng-card-head { display: flex; align-items: center; gap: 8px; }
+.ng-card-head b { font-weight: 600; }
+.ng-card-n { margin-left: auto; color: var(--ui-text3); font-variant-numeric: tabular-nums; }
+.ng-card-bad { color: var(--ui-acc-line); font-size: var(--ui-gr-xs); display: inline-flex; align-items: center; gap: 2px; }
+
+/* single areas: sections as cards */
+.ng-sections { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; align-items: start; }
+.ng-section { background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: var(--ui-r-button); padding: 4px 12px 8px; }
+.ng-section h3 { margin: 8px 0 4px !important; }
+
+/* field editors */
+.ng-ref { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.ng-ref > :first-child { flex: 1; min-width: 0; }
+.ng-ref.wrong .ed-choice { border-color: var(--ui-red); }
+.ng-wrongText { color: var(--ui-red); font-size: var(--ui-gr-xs); }
+.ng-pair { display: flex; gap: 8px; }
+.ng-pairField { display: flex; align-items: center; gap: 4px; font-size: var(--ui-gr-xs); color: var(--ui-text3); }
+.ng-chipLeap { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.ng-chipLeap:hover { color: var(--ui-acc-line); text-decoration: underline; }
+.ng-table { display: flex; flex-direction: column; gap: 4px; }
+.ng-trow { display: grid; grid-template-columns: minmax(120px, 2fr) repeat(calc(var(--cols) - 1), minmax(52px, 1fr)) 28px; gap: 4px; align-items: center; }
+.ng-trow.head span { font-size: var(--ui-gr-xs); color: var(--ui-text3); }
+.ng-trow .ed-field.small { width: 100%; }
+.ng-addRow { align-self: flex-start; }
+
+/* summaries */
+.ng-facts { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: var(--ui-gr-s); }
+.ng-facts > div { display: contents; }
+.ng-facts span { color: var(--ui-text3); }
+.ng-facts b { font-weight: 500; font-variant-numeric: tabular-nums; }
+.ng-grid { display: grid; gap: 2px; margin: 6px 0; }
+.ng-grid i { aspect-ratio: 1; border-radius: 3px; background: var(--ui-field); border: 1px solid var(--ui-border); }
+.ng-grid i.on { background: var(--ui-acc-soft); border-color: var(--ui-acc-line); }
+.ng-bars { display: flex; flex-direction: column; gap: 4px; font-size: var(--ui-gr-s); }
+.ng-bars > div { display: grid; grid-template-columns: 120px 1fr 40px; gap: 8px; align-items: center; }
+.ng-bars i { height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--ui-acc) var(--p), var(--ui-field) var(--p)); }
+.ng-bars b { font-weight: 500; text-align: right; font-variant-numeric: tabular-nums; }
+.ng-formula { font-size: var(--ui-gr-s); line-height: 1.5; }
+.ng-ladder { position: relative; height: 44px; margin: 8px 0; background: var(--ui-field); border-radius: var(--ui-r-field); }
+.ng-ladder-step { position: absolute; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; padding-left: 6px; border-left: 2px solid var(--ui-acc-line); overflow: hidden; }
+.ng-ladder-step small { color: var(--ui-text3); font-size: 10px; white-space: nowrap; }
+.da-tag.ng-yes { border-color: var(--ui-green); color: var(--ui-green); }
+.da-tag.ng-no { opacity: .55; }
+.ng-rig { display: flex; align-items: flex-end; gap: 4px; flex-wrap: wrap; margin: 6px 0 10px; }
+.ng-rig-tractor { padding: 14px 10px; border-radius: 10px 18px 6px 6px; background: var(--ui-acc-soft); border: 1px solid var(--ui-acc-line); font-size: var(--ui-gr-s); }
+.ng-rig-container { border: 1px solid var(--ui-border-strong); border-radius: 6px; padding: 4px; background: var(--ui-panel); }
+.ng-rig-container small { display: block; font-size: 10px; color: var(--ui-text3); margin-bottom: 3px; }
+.ng-rig-places { display: flex; gap: 3px; }
+.ng-rig-places span { min-width: 64px; padding: 6px 4px; text-align: center; font-size: 11px; border-radius: 4px; border: 1px dashed var(--ui-border-strong); color: var(--ui-text3); }
+.ng-rig-places span.on { border-style: solid; background: var(--ui-field); color: var(--ui-text); }
+.ng-map { width: 100%; height: auto; background: var(--ui-field); border-radius: var(--ui-r-field); }
+.ng-map circle { fill: var(--ui-text3); }
+.ng-map circle.on { fill: var(--ui-acc); }
+.ng-map text { fill: var(--ui-text2); font: 10px var(--ui-font); }
+.ng-map text.on { fill: var(--ui-text); font-weight: 600; }
+.da-field.ng-wide, .da-insp .da-field.ng-wide { display: flex; flex-direction: column; align-items: stretch; }

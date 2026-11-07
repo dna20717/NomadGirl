@@ -1,0 +1,16 @@
+{
+  "name": "nomadgirl",
+  "version": "0.1.0",
+  "description": "2D-Action-Roguelite mit Cosy-Basisbau: Leyla plündert die Wastelands rund um BigCityDelta und lebt in ihrem Rig. Mit Werkstatt (Daten-Editor) für alle Aspekte des Spiels.",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "ng": "tools/ng.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "ng": "node tools/ng.js",
+    "serve": "python3 -m http.server 8766",
+    "workshop:test": "node tools/workshop_test.mjs"
+  }
+}

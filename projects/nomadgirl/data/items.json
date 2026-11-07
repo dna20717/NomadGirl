@@ -1,0 +1,28 @@
+{
+ "kupferkabel": {"name": "Kupferkabel", "category": "junk", "size": [1, 1], "stack": 10, "value": 2},
+ "alte_platine": {"name": "Alte Platine", "category": "junk", "size": [1, 1], "stack": 5, "value": 3},
+ "gluehbirne": {"name": "Glühbirne", "category": "junk", "size": [1, 1], "stack": 5, "value": 1, "description": "Heil. Ein kleines Wunder."},
+ "kronkorken": {"name": "Kronkorken", "category": "junk", "size": [1, 1], "stack": 99, "value": 0, "description": "Hier nichts wert. Leyla sammelt sie trotzdem."},
+ "schrott": {"name": "Schrott", "category": "resource", "size": [1, 1], "stack": 20, "value": 1},
+ "stoffreste": {"name": "Stoffreste", "category": "resource", "size": [1, 1], "stack": 10, "value": 1},
+ "batteriezelle": {"name": "Batteriezelle", "category": "resource", "size": [1, 1], "stack": 10, "value": 6},
+ "mutantenfleisch": {"name": "Mutantenfleisch", "category": "ingredient", "size": [1, 1], "stack": 5, "value": 2, "description": "Besser nicht fragen."},
+ "reis": {"name": "Reis", "category": "ingredient", "size": [1, 1], "stack": 10, "value": 2},
+ "gewuerzmischung": {"name": "Gewürzmischung", "category": "ingredient", "size": [1, 1], "stack": 10, "value": 4},
+ "dosenbohnen": {"name": "Dosenbohnen", "category": "ingredient", "size": [1, 1], "stack": 6, "value": 2},
+ "mutanten_curry": {"name": "Mutanten-Curry", "category": "food", "size": [1, 1], "stack": 3, "value": 12, "buff": "feurig", "description": "Scharf genug, um Erinnerungen zu löschen."},
+ "bohneneintopf": {"name": "Bohneneintopf", "category": "food", "size": [1, 1], "stack": 3, "value": 6, "buff": "satt"},
+ "schrottplatte": {"name": "Schrottplatte", "category": "component", "size": [2, 2], "stack": 4, "value": 8},
+ "kabelbaum": {"name": "Kabelbaum", "category": "component", "size": [1, 2], "stack": 4, "value": 10},
+ "verband": {"name": "Verband", "category": "consumable", "size": [1, 1], "stack": 5, "value": 5, "buff": "erste_hilfe"},
+ "discokugel": {"name": "Discokugel", "category": "valuable", "size": [2, 2], "stack": 1, "value": 45, "description": "Niemand weiß, warum das funktioniert. Sammler zahlen gut."},
+ "zettel_curry": {
+  "name": "Fettiger Notizzettel",
+  "category": "blueprint",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 1,
+  "teaches": "mutanten_curry",
+  "description": "„Mehr Gewürz. Immer mehr Gewürz.“"
+ }
+}

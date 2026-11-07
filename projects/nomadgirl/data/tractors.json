@@ -1,0 +1,26 @@
+{
+ "pickup": {
+  "name": "Pickup",
+  "pull": 1500,
+  "fuelUse": 12,
+  "tank": 60,
+  "power": 2,
+  "length": 1,
+  "stack": 1,
+  "slots": {"engine": 1, "armor": 1, "weapon": 0},
+  "value": 400,
+  "description": "Rostig, laut, treu."
+ },
+ "lkw": {
+  "name": "LKW",
+  "pull": 12000,
+  "fuelUse": 30,
+  "tank": 300,
+  "power": 4,
+  "length": 3,
+  "stack": 2,
+  "slots": {"engine": 1, "armor": 2, "weapon": 2},
+  "value": 6000,
+  "description": "Ein echtes Rig. Endlich."
+ }
+}

@@ -1,0 +1,6 @@
+{
+ "wohnanhaenger": {"name": "Wohnanhänger", "kind": "trailer", "places": 3, "weight": 900, "value": 300, "description": "Leylas erstes Zuhause. Klein, aber mit Gardinen."},
+ "holzkiste": {"name": "Holzkiste", "kind": "crate", "places": 1, "weight": 250, "stackable": true, "value": 60},
+ "container_20": {"name": "20-Fuß-Container", "kind": "shipping", "places": 2, "weight": 2300, "stackable": true, "value": 900},
+ "container_40": {"name": "40-Fuß-Container", "kind": "shipping", "places": 3, "weight": 3800, "stackable": true, "value": 1500}
+}

@@ -1,0 +1,24 @@
+{
+ "schlafkoje": {"name": "Schlafkoje", "function": "sleep", "stage": "mvp", "places": 1, "power": 0, "capacity": 1, "buff": "ausgeschlafen", "value": 50},
+ "kochnische": {"name": "Kochnische", "function": "kitchen", "stage": "mvp", "places": 1, "power": -1, "value": 80, "description": "Zwei Platten, eine davon geht."},
+ "werkbank": {"name": "Werkbank", "function": "craft", "stage": "mvp", "places": 1, "power": -1, "value": 80},
+ "generator": {"name": "Generator", "function": "power", "stage": "1", "places": 1, "power": 3, "value": 200},
+ "waffenkammer": {"name": "Waffenkammer", "function": "storage", "stage": "1", "places": 1, "power": 0, "capacity": 12, "value": 150},
+ "kuehlraum": {"name": "Kühlraum", "function": "cooling", "stage": "1", "places": 1, "power": -2, "capacity": 20, "value": 250},
+ "chill_area": {"name": "Chill Area", "function": "chill", "stage": "1", "places": 1, "power": 0, "buff": "gemuetlich", "value": 120, "description": "Sofa, Lichterkette, Plattenspieler."},
+ "drohnenwerkstatt": {
+  "name": "Drohnenwerkstatt",
+  "function": "drone",
+  "stage": "1",
+  "places": 1,
+  "power": -2,
+  "value": 400,
+  "description": "Hier wird Mama-Bot verbessert. Sie hat Meinungen dazu."
+ },
+ "warroom": {"name": "Warroom", "function": "warroom", "stage": "1", "places": 1, "power": -1, "value": 300},
+ "kueche": {"name": "Küche", "function": "kitchen", "stage": "1", "places": 2, "power": -2, "value": 500},
+ "foodtruck": {"name": "Foodtruck", "function": "foodtruck", "stage": "1", "places": 2, "power": -1, "value": 700, "description": "Jaaa, wirklich."},
+ "motorraum": {"name": "Motorraum", "function": "engine", "stage": "1", "places": 1, "power": 0, "value": 300},
+ "zelle": {"name": "Zelle", "function": "cell", "stage": "2", "places": 1, "power": 0, "capacity": 1, "value": 200},
+ "reaktor": {"name": "Reaktor", "function": "power", "stage": "2", "places": 2, "power": 8, "value": 3000}
+}

@@ -1,0 +1,11 @@
+{
+ "vorplatz": {"name": "Vorplatz", "size": [40, 17], "tags": ["start"], "weight": 1},
+ "eingangshalle": {"name": "Eingangshalle", "size": [30, 17], "tags": ["start", "npc"], "weight": 1},
+ "verkaufsraum": {"name": "Verkaufsraum", "size": [30, 17], "tags": ["combat", "loot"], "weight": 3},
+ "lager": {"name": "Lager", "size": [20, 17], "tags": ["loot", "secret"], "weight": 2},
+ "werkstatthalle": {"name": "Werkstatthalle", "size": [36, 20], "tags": ["combat", "exit"], "weight": 1},
+ "gang": {"name": "Gang", "size": [24, 10], "tags": ["corridor", "combat"], "weight": 4},
+ "treppenhaus": {"name": "Treppenhaus", "size": [14, 34], "tags": ["corridor"], "weight": 2},
+ "tresorraum": {"name": "Tresorraum", "size": [18, 12], "tags": ["loot", "secret"], "weight": 1},
+ "kontrollraum": {"name": "Kontrollraum", "size": [40, 22], "tags": ["boss", "exit"], "weight": 1}
+}

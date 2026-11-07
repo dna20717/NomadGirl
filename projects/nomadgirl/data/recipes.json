@@ -1,0 +1,42 @@
+{
+ "mutanten_curry": {
+  "name": "Mutanten-Curry",
+  "station": "kochnische",
+  "time": 30,
+  "ingredients": [{"item": "mutantenfleisch", "count": 1},{"item": "reis", "count": 1},{"item": "gewuerzmischung", "count": 1}],
+  "result": "mutanten_curry",
+  "count": 2,
+  "discovery": ["found", "companion", "experiment"],
+  "hint": "Fleisch, Reis und etwas, das brennt."
+ },
+ "bohneneintopf": {
+  "name": "Bohneneintopf",
+  "station": "kochnische",
+  "time": 15,
+  "ingredients": [{"item": "dosenbohnen", "count": 2}],
+  "result": "bohneneintopf",
+  "count": 1,
+  "discovery": ["start"]
+ },
+ "schrottplatte": {"name": "Schrottplatte", "station": "werkbank", "time": 20, "ingredients": [{"item": "schrott", "count": 3}], "result": "schrottplatte", "count": 1, "discovery": ["start"]},
+ "kabelbaum": {
+  "name": "Kabelbaum",
+  "station": "werkbank",
+  "time": 25,
+  "ingredients": [{"item": "kupferkabel", "count": 3},{"item": "alte_platine", "count": 1}],
+  "result": "kabelbaum",
+  "count": 1,
+  "discovery": ["experiment", "companion"]
+ },
+ "verband": {"name": "Verband", "station": "werkbank", "time": 10, "ingredients": [{"item": "stoffreste", "count": 2}], "result": "verband", "count": 1, "discovery": ["start"]},
+ "discokugel": {
+  "name": "Discokugel",
+  "station": "werkbank",
+  "time": 60,
+  "ingredients": [{"item": "gluehbirne", "count": 1},{"item": "kronkorken", "count": 30},{"item": "batteriezelle", "count": 1}],
+  "result": "discokugel",
+  "count": 1,
+  "discovery": ["experiment"],
+  "hint": "Viel zu viele Kronkorken und eine sehr optimistische Glühbirne."
+ }
+}

@@ -1,0 +1,6 @@
+{
+ "tankstelle_km7": {"name": "Tankstelle Kilometer 7", "poi": "tankstelle_km7", "position": [12, 8], "region": "Ödland Süd"},
+ "grossmarkt": {"name": "Großmarkt Delta-Süd", "poi": "grossmarkt", "position": [30, 14], "region": "Vorstadt"},
+ "bunker_13": {"name": "Bunker 13", "poi": "bunker_13", "position": [-20, 35], "region": "Salzebene"},
+ "ministerium": {"name": "Ministerium für Ordnung", "poi": "ministerium", "position": [50, 2], "region": "Delta-Ring"}
+}

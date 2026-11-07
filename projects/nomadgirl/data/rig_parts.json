@@ -1,0 +1,6 @@
+{
+ "v8": {"name": "V8-Motor", "slot": "engine", "pull": 1500, "fuelUse": 4, "value": 900},
+ "bleche": {"name": "Angeschweißte Bleche", "slot": "armor", "armor": 20, "value": 150},
+ "stachelgitter": {"name": "Stachelgitter", "slot": "armor", "armor": 10, "damage": 5, "value": 200},
+ "dachgeschuetz": {"name": "Dachgeschütz", "slot": "weapon", "damage": 30, "value": 1200}
+}

@@ -1,0 +1,55 @@
+{
+ "tankstelle_km7": {
+  "name": "Tankstelle Kilometer 7",
+  "kind": "gasStation",
+  "size": "S",
+  "danger": 1,
+  "roomCount": [3, 4],
+  "rooms": ["vorplatz", "verkaufsraum", "lager", "werkstatthalle"],
+  "enemies": ["kriecher", "rattenschwarm"],
+  "loot": "kiste_tankstelle",
+  "parTime": 90,
+  "secrets": 1,
+  "npcs": true,
+  "foodtruck": true,
+  "shop": true,
+  "description": "Die letzte Tankstelle vor der Salzebene. Der Kaffee ist furchtbar."
+ },
+ "grossmarkt": {
+  "name": "Großmarkt Delta-Süd",
+  "kind": "mall",
+  "size": "M",
+  "danger": 2,
+  "roomCount": [5, 7],
+  "rooms": ["eingangshalle", "gang", "verkaufsraum", "lager", "treppenhaus", "werkstatthalle"],
+  "enemies": ["kriecher", "schleimbeisser", "schlaeger"],
+  "loot": "kiste_tankstelle",
+  "parTime": 180,
+  "secrets": 2
+ },
+ "bunker_13": {
+  "name": "Bunker 13",
+  "kind": "bunker",
+  "size": "L",
+  "danger": 4,
+  "roomCount": [8, 11],
+  "rooms": ["eingangshalle", "gang", "treppenhaus", "tresorraum", "kontrollraum"],
+  "enemies": ["wachdrohne", "schuetze", "schlaeger"],
+  "loot": "pluenderer_beute",
+  "parTime": 300,
+  "secrets": 3
+ },
+ "ministerium": {
+  "name": "Ministerium für Ordnung",
+  "kind": "government",
+  "size": "XL",
+  "danger": 5,
+  "roomCount": [12, 16],
+  "rooms": ["eingangshalle", "gang", "treppenhaus", "tresorraum", "kontrollraum"],
+  "enemies": ["wachdrohne", "schuetze", "schleimbeisser", "hausmeister"],
+  "loot": "boss_beute",
+  "parTime": 600,
+  "secrets": 5,
+  "description": "Riesig, verlassen, tadellos sauber."
+ }
+}

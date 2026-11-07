@@ -1,0 +1,8 @@
+{
+ "satt": {"name": "Satt", "stat": "health", "value": 20, "duration": "run", "description": "Mehr Leben für den nächsten Run."},
+ "feurig": {"name": "Feurig", "stat": "damage", "value": 15, "percent": true, "duration": "run"},
+ "flink": {"name": "Flink", "stat": "speed", "value": 10, "percent": true, "duration": "run"},
+ "ausgeschlafen": {"name": "Ausgeschlafen", "stat": "defense", "value": 10, "percent": true, "duration": "run"},
+ "gemuetlich": {"name": "Gemütlich", "stat": "luck", "value": 5, "percent": true, "duration": "run", "description": "Wer entspannt ist, findet mehr."},
+ "erste_hilfe": {"name": "Erste Hilfe", "stat": "health", "value": 30, "duration": "instant"}
+}

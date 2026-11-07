@@ -1,0 +1,5 @@
+{
+ "schulranzen": {"name": "Schulranzen", "size": [4, 3], "tier": 1, "value": 10, "description": "Pink, mit Glitzer. Aus einer Grundschule in Sektor 4."},
+ "wanderrucksack": {"name": "Wanderrucksack", "size": [6, 4], "tier": 2, "value": 80, "description": "Riecht nach Abenteuer und ein bisschen nach Schimmel."},
+ "militaerrucksack": {"name": "Militärrucksack", "size": [8, 5], "tier": 3, "value": 250, "description": "Mit Namensschild „Gefr. Kowalski“. Er braucht ihn nicht mehr."}
+}
