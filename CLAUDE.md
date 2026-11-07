@@ -12,7 +12,10 @@ Spieldesign: `docs/design.md` (dazu das claude.ai-Projekt „NomadGirl“).
 - Ava ist frisch, vorausdenkend, manchmal frech, nutzt Emojis im Chat (in Oberflächen Lucide-Icons). Niemals das Schema „Das ist nicht X. Das ist Y.“
 - Commits direkt auf `main`, kurze deutsche Commit-Nachrichten mit Attribution. Vor dem Push `git pull --rebase`.
 - **Code auf Englisch:** Code, Kommentare, Datei- und Ordnernamen und die Feldnamen der Spieldaten (JSON) sind englisch. Deutsch bleiben: Texte in Oberflächen, Namen und Beschreibungen in den Spieldaten, Commit-Nachrichten, diese Anleitung und die Docs. Wörter aus `docs/glossary.md`. Inhalts-IDs dürfen deutsch bleiben (`rohrzange`, `tankstelle_km7`).
-- Das Repo ist **öffentlich**: nichts hineinlegen, was nicht öffentlich sein darf (Schlüssel, Passwörter, private Adressen). Neue Grafiken nur selbst gebaut oder mit passender Lizenz; Drittanbieter-Teile in `THIRD_PARTY.md`.
+- **Lizenz:** GPL v3 oder später (`LICENSE`, Daniel, 07.11.2026).
+- **Assets:** Alle Assets (Grafik, Ton, Musik) erzeugen wir selbst mit KI oder Code. Nichts Externes: keine fremden Asset-Packs, keine Downloads. Ausnahme bleiben die Bausteine aus dem gemeinsamen Kern (Lucide-Icons, Schriften Inter und VT323), stehen in `THIRD_PARTY.md`. Bei KI-Assets in `THIRD_PARTY.md` bzw. `docs/assets.md` vermerken, womit sie entstanden sind.
+- Das Repo ist **öffentlich** und läuft auf Cloudflare: nichts hineinlegen, was nicht öffentlich sein darf (Schlüssel, Passwörter, private Adressen).
+- **Immer den Link mit ausgeben:** Am Ende jeder Antwort, die etwas baut oder ändert, stehen die Adressen zum Anklicken: Start https://nomadgirl.dna20717.workers.dev, Werkstatt https://nomadgirl.dna20717.workers.dev/workshop, Repo https://github.com/dna20717/NomadGirl.
 - Daniel ist bei Git/Kommandozeile Anfänger → Anleitungen Schritt für Schritt.
 
 ## Einrichten und prüfen
@@ -28,6 +31,9 @@ node tools/workshop_test.mjs [--shots]     # Werkstatt kopflos bedienen (Server 
 ## Ordner
 
 ```
+index.html             Startseite (online unter /)
+wrangler.jsonc         Cloudflare Worker (statische Seiten aus dist/)
+tools/build_web.mjs    baut dist/ für Cloudflare
 workshop.html          Werkstatt (Daten-Editor)
 engine/schema.js       Datenschema: alle Bereiche und Felder (das Herz)
 engine/project.js      Laden, Prüfen, Verwendungen, Umbenennen, Löschen (Browser und Node)
@@ -55,6 +61,10 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 ## Kommandozeile `ng`
 
 `node tools/ng.js` ohne Befehl zeigt die Hilfe: `check` · `areas` · `fields <area>` · `show <area> [id]` · `usages <area> <id>` · `new <area> <id> ['<json>']` · `set <area> [id] <field> '<json>'` · `unset` · `rename <area> <old> <new>` · `remove <area> <id>` · `--dry` schreibt nichts. Nach jedem Schreiben läuft die Prüfung (Exit 1 bei Fehlern). Geschrieben wird mit `pretty()` aus `tools/json.js`.
+
+## Online
+
+Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei jedem Push auf `main` mit `npm run build:web` → `dist/` und liefert unter https://nomadgirl.dna20717.workers.dev aus (`wrangler.jsonc`): `/` = Startseite (`index.html`), `/workshop` = Werkstatt. Prüfen: `npx wrangler deploy --dry-run --outdir /tmp/wout`. Deploy geht nicht aus der Arbeitsumgebung (Cloudflare-API gesperrt), nur über den Push. Die Werkstatt speichert online vorerst im Browser (localStorage); „Speichern = Commit“ kommt wie bei NomadTactics über `worker/index.js`, Cloudflare Access und das Geheimnis `GITHUB_TOKEN` im Dashboard.
 
 ## Stand
 

@@ -11,6 +11,8 @@
     "test": "node --test test/*.test.js",
     "ng": "node tools/ng.js",
     "serve": "python3 -m http.server 8766",
-    "workshop:test": "node tools/workshop_test.mjs"
-  }
+    "workshop:test": "node tools/workshop_test.mjs",
+    "build:web": "node tools/build_web.mjs"
+  },
+  "license": "GPL-3.0-or-later"
 }

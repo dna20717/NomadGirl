@@ -104,6 +104,8 @@ Weird Cyberpunk mit Augenzwinkern: humorvoll, aber niemals albern. In und um das
 - **Sprache:** JavaScript als ES-Module ohne Build-Schritt, wie NomadTactics. Gemeinsamer Kern (`ui.js`, `ui.css`, `basis.css`, `icons.js`, `store.js`) als Kopie.
 - **Spiel:** Phaser 3 im Browser (kommt mit dem MVP, als Vendor-Datei).
 - **Daten:** JSON unter `projects/nomadgirl/`, Schema in `engine/schema.js`.
+- **Lizenz:** GPL v3 oder später. Alle Assets erzeugen wir selbst mit KI, nichts Externes.
+- **Online:** Cloudflare Worker, https://nomadgirl.dna20717.workers.dev
 
 ## Fahrplan
 
@@ -131,4 +133,3 @@ Companion-Quests und Storylines, Hacking, Automatisierung, mehr Container und Zu
 - [ ] Was ist das „vielleicht noch Gefährlichere“ in den Wastelands?
 - [ ] Gibt es eine übergeordnete Story oder ein Endziel?
 - [ ] Wie wird Leyla dargestellt (Pixel Art oder gezeichnet)?
-- [ ] Lizenz des Repos (es ist öffentlich, hat aber noch keine Lizenz)

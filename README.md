@@ -4,6 +4,7 @@
 
 Das Projekt ist als **Engine mit Werkstatt** gebaut: Jeder Aspekt des Spiels (Leyla, Waffen, Gegner, Gegenstände, Rezepte, Rig, POIs, Oberwelt, Ranking …) lässt sich in einer GUI einstellen.
 
+- Online: https://nomadgirl.dna20717.workers.dev (Werkstatt: https://nomadgirl.dna20717.workers.dev/workshop)
 - Spieldesign: [docs/design.md](docs/design.md)
 - Anleitung für die Zusammenarbeit mit Ava: [CLAUDE.md](CLAUDE.md)
 
@@ -33,3 +34,7 @@ node tools/ng.js areas
 | `projects/nomadgirl/` | Spieldaten als JSON |
 | `tools/` | Kommandozeile `ng`, Werkstatt-Test, Gerüste |
 | `docs/` | Design-Doc, Glossar |
+
+## Lizenz
+
+GPL v3 oder später, siehe [LICENSE](LICENSE). Alle Assets entstehen im Projekt selbst (KI oder Code); Bausteine von Dritten stehen in [THIRD_PARTY.md](THIRD_PARTY.md).

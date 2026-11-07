@@ -1,0 +1,11 @@
+// Cloudflare: Worker "nomadgirl" serves the start page and the workshop.
+// Workers Builds (connected to GitHub) runs `npm run build:web` on every push to main and serves dist/ as static assets.
+// Later: worker/index.js for /api/* (login via Cloudflare Access, saving as commits) like NomadTactics. Secrets only in the dashboard, never here.
+{
+  "name": "nomadgirl",
+  "compatibility_date": "2026-11-07",
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "drop-trailing-slash"
+  }
+}
