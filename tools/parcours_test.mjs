@@ -90,11 +90,15 @@ v = await page.evaluate(() => {
 });
 check('Kante: aus dem Sprung greifen + hoch', v.hang === 'hang' && v.feet === feet(0), v);
 v = await page.evaluate(() => {
-  const n = nomad, l = game.scene.getScene('play').leyla, seen = new Set(); P.tp(20, 18);
+  const n = nomad, l = game.scene.getScene('play').leyla, seen = new Set(), A = l.d.armed, I = l.d.idles; P.tp(20, 18);
+  l.d.armed = { ...A, enabled: false }; l.d.idles = [];   // only the two plain idles here (gun and random idles have their own checks)
   for (let i = 0; i < 60 && seen.size < 2; i++) { n.step(30); seen.add(l.sprite.anims.currentAnim?.key); }
+  l.d.armed = A; l.d.idles = I;
   return [...seen];
 });
 check('Zwei Idles im Wechsel', v.some(k => k?.startsWith('leyla_idle_side')) && v.includes('leyla_idle2_side'), v);
+v = await page.evaluate(() => { const n = nomad, sp = game.scene.getScene('play').leyla.sprite, out = []; P.tp(20, 18); n.step(60); out.push(sp.texture.key); n.step(2, [], ['ranged']); out.push(sp.texture.key); n.step(40, ['right']); out.push(sp.texture.key); return out; });
+check('Waffe: zieht im Stand, schießt, steckt beim Rennen weg', v[0] === 'leyla_aim_side' && v[1] === 'leyla_shoot_side' && !v[2].includes('aim') && !v[2].includes('shoot'), v);
 // hard landing only after a deep fall (or a long jump), a small hop lands normally
 v = await page.evaluate(() => {
   const n = nomad, seen = new Set(); P.tp(13, 9);

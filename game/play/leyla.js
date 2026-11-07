@@ -393,7 +393,8 @@ export class Leyla {
   look(time, dt, grounded) {
     const b = this.body, v = b.velocity, st = this.state;
     let name = st === 'dead' ? 'hurt' : st === 'normal' ? (!grounded ? (time < (this.flipUntil || 0) ? 'airJump' : v.y < 0 ? 'jump' : 'fall') : Math.abs(v.x) > 300 ? 'run' : Math.abs(v.x) > 20 ? 'walk' : 'idle') : st === 'swing' ? 'jump' : st;
-    this.idleNow = name === 'idle';
+    this.updateArmed(time, dt, grounded);
+    this.idleNow = name === 'idle' && this.armed === 'off';
     if (name === 'idle' && this.idleVariant === 'idleAlt' && this.d.look?.idleAlt) name = 'idleAlt';
     // random idles after standing still for a while (Leyla › Zufällige Idles); sitting does not count
     if (this.idleNow && st === 'normal') {
@@ -402,13 +403,29 @@ export class Leyla {
       if (this.special) name = '@' + this.special;
     } else { this.stillSince = time; this.special = null; this.idleWait = this.rollIdleWait(); }
     if (st === 'sit') name = '@' + this.sit.look;
+    // standing at a workshop in the rig: seen from behind, busy with her hands
+    if (this.idleNow && this.scene.camp?.atWorkshop && this.d.look?.work) { name = '@' + this.d.look.work; this.special = null; }
+    // gun drawn (Leyla › Waffe ziehen): drawing, then aiming, walking with the gun, shooting
+    const L = this.d.look || {}, walking = Math.abs(v.x) > 20;
+    let armedFrame = null;
+    if (this.armed === 'drawing' && L.draw) { name = '@' + L.draw; armedFrame = this.drawP; }
+    else if (this.armed === 'on') {
+      const shot = L.shoot && time - (this.shotAt ?? -1e9) < this.lookDur(walking && L.shootWalk ? L.shootWalk : L.shoot);
+      name = '@' + (shot ? (walking && L.shootWalk ? L.shootWalk : L.shoot) : walking && L.aimWalk ? L.aimWalk : L.aim || L.idle);
+      if (shot && this.shotSeen !== this.shotAt) { this.shotSeen = this.shotAt; this.restartLook = true; }
+    }
     // mantle and crouch pick their frame from the progress (crouch backwards = standing up)
     const flipFrames = name === 'airJump' && (this.m.airJumpFromFrame ?? 1) > 1;
     const climbFrames = st === 'climb' && (this.m.climbFromFrame ?? 1) > 0;
     const manual = st === 'mantle' || st === 'crouch' || st === 'dash' || st === 'land' || st === 'sit' || flipFrames || climbFrames, an0 = this.sprite.anims;
-    if (!manual && st !== 'slide' && an0.isPaused) an0.resume();
+    if (!manual && armedFrame == null && st !== 'slide' && an0.isPaused) an0.resume();
     const info = this.scene.playLook(this.sprite, 'leyla', name, this.facing);
-    if (st === 'sit' && info.used === name && an0.currentAnim) {
+    if (this.restartLook && an0.currentAnim) { this.restartLook = false; an0.restart(); }
+    if (armedFrame != null && info.used === name && an0.currentAnim) {
+      const fr = an0.currentAnim.frames, from = Math.min(fr.length - 1, Math.max(0, (this.d.armed?.drawFromFrame ?? 1) - 1));
+      if (!an0.isPaused) an0.pause();
+      this.sprite.setFrame(fr[Math.round(from + (fr.length - 1 - from) * Math.min(1, armedFrame))].frame.name);
+    } else if (st === 'sit' && info.used === name && an0.currentAnim) {
       const fr = an0.currentAnim.frames;
       if (!an0.isPaused) an0.pause();
       this.sprite.setFrame(fr[Math.max(0, Math.min(fr.length - 1, this.sitFrame(time)))].frame.name);
@@ -456,6 +473,19 @@ export class Leyla {
     this.sprite.setFlipX(info.flip ? this.facing > 0 : this.facing < 0);
     if (st !== 'dead') this.sprite.setAlpha(time < this.invulnerableUntil && Math.floor(time / 70) % 2 ? 0.35 : 1);
   }
+
+  // ---------- gun drawn: automatically while she is not running (Daniel: "zieht die Waffe automatisch, wenn sie nicht rennt,
+  // kann schießen oder gehen und schießen; sobald sie rennt oder springt, steckt sie die Waffe wieder weg") ----------
+  updateArmed(time, dt, grounded) {
+    const A = this.d.armed || {}, s = this.scene, v = this.body.velocity;
+    const can = A.enabled !== false && this.d.look?.aim && s.weapon('ranged') && (s.mode !== 'camp' || A.inCamp) && this.state === 'normal' && grounded
+      && Math.abs(v.x) <= (this.m.walkSpeed ?? 240) * 1.15;
+    this.armed ??= 'off';
+    if (!can) { this.armed = 'off'; this.drawP = 0; return; }
+    if (this.armed === 'off') { this.armed = this.d.look?.draw ? 'drawing' : 'on'; this.drawP = 0; this.special = null; }
+    if (this.armed === 'drawing') { this.drawP += dt / Math.max(1, A.drawTime ?? 650); if (this.drawP >= 1) this.armed = 'on'; }
+  }
+  lookDur(id) { const a = this.scene.data_.assets?.[id]; return a?.frames && a.fps ? a.frames / a.fps * 1000 : 0; }
 
   // ---------- random idles ----------
   rollIdleWait() { const [a, b] = this.d.idleAfter || [6, 12]; return (a + Math.random() * (b - a)) * 1000; }

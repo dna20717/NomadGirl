@@ -55,10 +55,28 @@
   "hang": "leyla_hang_side",
   "dash": "leyla_dash_side",
   "climb": "leyla_climb_back",
-  "land": "leyla_land_side"
+  "land": "leyla_land_side",
+  "draw": "leyla_draw_side",
+  "aim": "leyla_aim_side",
+  "aimWalk": "leyla_aim_walk_side",
+  "shoot": "leyla_shoot_side",
+  "shootWalk": "leyla_shoot_walk_side",
+  "work": "leyla_work_back"
  },
  "idleAltChance": 50,
  "inventory": {"pickupRange": 150, "autoStack": true, "cell": 44, "dropSpread": 90},
  "idles": [{"look": "leyla_idle_turn_side", "weight": 3},{"look": "leyla_gum_side", "weight": 2},{"look": "leyla_flex_side", "weight": 2},{"look": "leyla_hair_side", "weight": 3}],
- "idleAfter": [6, 12]
+ "idleAfter": [6, 12],
+ "armed": {
+  "enabled": true,
+  "drawTime": 650,
+  "holsterTime": 0,
+  "inCamp": false,
+  "drawFromFrame": 4,
+  "muzzle": [100, 146],
+  "flashLight": true,
+  "flashColor": "#ffc870",
+  "flashRadius": 260,
+  "flashTime": 90
+ }
 }

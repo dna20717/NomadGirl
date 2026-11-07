@@ -40,6 +40,7 @@ export class PlayScene extends Phaser.Scene {
     for (const id of Object.values(this.data_.game?.tiles || {})) ids.add(id);
     if (this.data_.drone?.look) ids.add(this.data_.drone.look);
     for (const r of this.data_.leyla?.idles || []) if (r.look) ids.add(r.look);
+    for (const w of Object.values(this.data_.weapons || {})) if (w.sound) ids.add(w.sound);
     const SP = this.data_.game?.spawn;
     for (const id of [SP?.look, SP?.dish?.look, SP?.roof?.front, this.data_.rooms?.[this.roomId]?.backdrop?.image]) if (id) ids.add(id);
     if (this.mode === 'camp') {
@@ -175,6 +176,8 @@ export class PlayScene extends Phaser.Scene {
     this.loot = this.mode === 'run' ? new Loot(this) : null;
     this.setupInventory();
     if (this.mode === 'camp') this.camp = new Camp(this, this.box, this.campGeo);
+    this.drone.roamArea = this.mode === 'camp' ? { x0: 6 * this.T, x1: (this.campGeo.W - 2) * this.T, ground: this.campGeo.floor * this.T } : null;
+    this.drone.roamTo = null;
     this.backdrop?.front();
     this.physics.add.collider(this.leyla.box, this.solids);
     this.physics.add.collider(this.leyla.box, this.platforms, null, (box, plat) => {

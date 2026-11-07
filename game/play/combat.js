@@ -37,8 +37,19 @@ export class Combat {
     if (leyla.ammo <= 0) { s.fx.text(leyla.x, leyla.feet - leyla.height - 20, 'leer', { color: '#8b949e', size: 36, rise: 30 }); return; }
     leyla.ammo--;
     leyla.attackPose = time + 120;
-    const f = leyla.facing, x = leyla.x + f * leyla.size.w * 0.8, y = leyla.feet - leyla.height * 0.62, speed = w.projectileSpeed ?? 1600;
-    s.fx.flash(x + f * 10, y, 0xfff2b0, 18);
+    leyla.shotAt = time;
+    // with the gun drawn the shot leaves the muzzle (Leyla › Waffe ziehen › Mündung), the picture brings its own muzzle flash
+    const A = leyla.armed === 'on', AR = leyla.d.armed || {}, M = AR.muzzle || [100, 146], k = leyla.size.h / 168;
+    const f = leyla.facing, x = leyla.x + f * (A ? M[0] * k : leyla.size.w * 0.8), y = leyla.feet - (A ? M[1] * k : leyla.height * 0.62), speed = w.projectileSpeed ?? 1600;
+    if (!A) s.fx.flash(x + f * 10, y, 0xfff2b0, 18);
+    // muzzle flash light (Leyla › Waffe ziehen › Mündungslicht): bright core + a wider warm glow over the surroundings
+    if (AR.flashLight !== false) {
+      const col = parseInt(String(AR.flashColor || '#ffc870').slice(1), 16), r = AR.flashRadius ?? 260, life = AR.flashTime ?? 90;
+      s.fx.light(x + f * 12, y, { radius: r * 0.35, color: 0xfff6d8, alpha: 1, life: life * 0.8 });
+      s.fx.light(x + f * 12, y, { radius: r, color: col, alpha: 0.75, life });
+    }
+    const snd = w.sound && s.cache.audio.exists(w.sound) && s.data_.assets?.[w.sound];
+    if (snd) s.sound.play(w.sound, { volume: (snd.volume ?? 100) / 100 * (0.92 + Math.random() * 0.16), detune: (Math.random() - 0.5) * 120 });
     this.spawn({ key: 'nail', x, y, vx: f * speed, vy: 0, life: (w.range ?? 600) / speed * 1000, friendly: true, damage: (w.damage ?? 5) * this.boost(), knockback: w.knockback ?? 80, crit: w.critChance ?? 0, time });
     if (!leyla.body.blocked.down) leyla.body.setVelocityX(leyla.body.velocity.x - f * 40);
   }

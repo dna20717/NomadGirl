@@ -906,5 +906,153 @@
   "source": "KI (Pixel-Art von Daniel, 07.11.2026)",
   "date": "07.11.2026",
   "description": "Anhänger mit aufgeklappter Längsseite, innen leer (Platz für Werkstätten), Rampe unten. Deichsel im Bild links; „Schaut nach links“ an, damit sie im Camp zum Van zeigt. Ankerpunkt = Reifen am Boden, im Spiel ×3."
+ },
+ "leyla_draw_side_source": {
+  "name": "Leyla · Waffe ziehen · Original",
+  "kind": "source",
+  "file": "assets/leyla/draw_side_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 13 Frames à 200 ms."
+ },
+ "leyla_draw_side": {
+  "name": "Leyla · Waffe ziehen",
+  "kind": "animation",
+  "file": "assets/leyla/draw_side.png",
+  "frameSize": [82, 244],
+  "frames": 13,
+  "fps": 5,
+  "loop": false,
+  "origin": [38, 242],
+  "height": 193.6,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_draw_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art: greift zum Holster und zieht die Pistole in den Anschlag. Rückwärts = wegstecken."
+ },
+ "leyla_aim_side_source": {
+  "name": "Leyla · Zielen (Stehen) · Original",
+  "kind": "source",
+  "file": "assets/leyla/aim_side_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 4 Frames à 200 ms."
+ },
+ "leyla_aim_side": {
+  "name": "Leyla · Zielen (Stehen)",
+  "kind": "animation",
+  "file": "assets/leyla/aim_side.png",
+  "frameSize": [123, 244],
+  "frames": 4,
+  "fps": 5,
+  "loop": true,
+  "origin": [59, 242],
+  "height": 193.6,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_aim_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art: steht mit gezogener Pistole, atmet."
+ },
+ "leyla_aim_walk_side_source": {
+  "name": "Leyla · Gehen mit Waffe · Original",
+  "kind": "source",
+  "file": "assets/leyla/aim_walk_side_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 13 Frames à 200 ms."
+ },
+ "leyla_aim_walk_side": {
+  "name": "Leyla · Gehen mit Waffe",
+  "kind": "animation",
+  "file": "assets/leyla/aim_walk_side.png",
+  "frameSize": [140, 244],
+  "frames": 13,
+  "fps": 8,
+  "loop": true,
+  "origin": [69, 242],
+  "height": 193.6,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_aim_walk_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art: geht und zielt."
+ },
+ "leyla_shoot_side_source": {
+  "name": "Leyla · Schießen (Stehen) · Original",
+  "kind": "source",
+  "file": "assets/leyla/shoot_side_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 9 Frames à 200 ms."
+ },
+ "leyla_shoot_side": {
+  "name": "Leyla · Schießen (Stehen)",
+  "kind": "animation",
+  "file": "assets/leyla/shoot_side.png",
+  "frameSize": [176, 244],
+  "frames": 9,
+  "fps": 18,
+  "loop": false,
+  "origin": [85, 242],
+  "height": 193.6,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_shoot_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art: Schuss mit Mündungsfeuer und Hülse."
+ },
+ "leyla_shoot_walk_side_source": {
+  "name": "Leyla · Schießen im Gehen · Original",
+  "kind": "source",
+  "file": "assets/leyla/shoot_walk_side_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 9 Frames à 200 ms."
+ },
+ "leyla_shoot_walk_side": {
+  "name": "Leyla · Schießen im Gehen",
+  "kind": "animation",
+  "file": "assets/leyla/shoot_walk_side.png",
+  "frameSize": [196, 244],
+  "frames": 9,
+  "fps": 18,
+  "loop": false,
+  "origin": [97, 242],
+  "height": 193.6,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_shoot_walk_side_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art: Schuss im Gehen mit Mündungsfeuer und Hülse."
+ },
+ "sound_shot": {
+  "name": "Schuss (Futuristic Shotgun)",
+  "kind": "sound",
+  "file": "assets/sound/shot.m4a",
+  "alt": "assets/sound/shot.ogg",
+  "volume": 70,
+  "source": "von Daniel (WAV, 0,75 s), mit ffmpeg umgewandelt",
+  "date": "07.11.2026",
+  "description": "Einzelschuss, für Nagelpistole und Schrotflinte."
+ },
+ "leyla_work_back_source": {
+  "name": "Leyla · Arbeiten von hinten · Original",
+  "kind": "source",
+  "file": "assets/leyla/work_back_source.gif",
+  "source": "KI (Pixel-Art von Daniel)",
+  "date": "07.11.2026",
+  "description": "GIF, 13 Frames à 200 ms."
+ },
+ "leyla_work_back": {
+  "name": "Leyla · Arbeiten (von hinten)",
+  "kind": "animation",
+  "file": "assets/leyla/work_back.png",
+  "frameSize": [91, 244],
+  "frames": 13,
+  "fps": 5,
+  "loop": true,
+  "origin": [46, 242],
+  "height": 193.6,
+  "source": "Code (Streifen zugeschnitten)",
+  "derivedFrom": "leyla_work_back_source",
+  "date": "07.11.2026",
+  "description": "Pixel-Art: Leyla von hinten, werkelt mit den Händen. Solange sie an einer Werkstatt im Rig steht."
  }
 }

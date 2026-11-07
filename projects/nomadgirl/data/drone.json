@@ -23,5 +23,6 @@
  "idle": {"boredAfter": 6, "sleepAfter": 14, "randomEvery": [8, 16]},
  "alertRange": 700,
  "lowHealth": 30,
- "bubble": {"show": true, "size": 30, "color": "#7ff6ff", "background": "#140c1c"}
+ "bubble": {"show": true, "size": 30, "color": "#7ff6ff", "background": "#140c1c"},
+ "roam": {"enabled": true, "every": [3, 7], "height": [180, 460], "visitLeyla": 30, "smooth": 0.02}
 }

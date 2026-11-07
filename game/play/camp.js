@@ -489,6 +489,7 @@ export class Camp {
       c.sprite.setFlipX(l.x < c.x);
     }
     // nearest hotspot within reach (on the ground)
+    this.atWorkshop = false;
     if (l.state === 'sit') {   // sitting: only standing up (E or a direction, handled by Leyla)
       const text = l.sit?.up ? null : 'Aufstehen · Lagerfeuer';
       if (text !== this.promptText) { this.prompt = null; this.promptText = text; s.hud.prompt(text); }
@@ -497,6 +498,7 @@ export class Camp {
     let best = null, bd = Infinity;
     if (l.alive && l.body.blocked.down)
       for (const h of this.hotspots) { const d = Math.abs(l.x - h.x); if (d <= Math.max(h.w || 0, range) && d < bd) { best = h; bd = d; } }
+    this.atWorkshop = !!(best?.ws && Math.abs(l.body.velocity.x) < 5);
     const hint = h => typeof h.hint === 'function' ? h.hint() : h.hint;
     const text = best && `${hint(best)} · ${best.name}`;
     if (best !== this.prompt || text !== this.promptText) { this.prompt = best; this.promptText = text; s.hud.prompt(text); }

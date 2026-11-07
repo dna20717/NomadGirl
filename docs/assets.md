@@ -58,6 +58,9 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/leyla/hair_side.png` (+ `_source.gif`) | Leyla richtet die Haare, zufällige Idle, 17 Frames (`leyla_hair_side`) | KI-generiert (Daniel), zugeschnitten (Code) | 07.11.2026 |
 | `assets/leyla/sit_game_side.png` (+ `_source.gif`) | Leyla setzt sich und zockt, steht wieder auf, 17 Frames, am Lagerfeuer (`leyla_sit_game_side`) | KI-generiert (Daniel), zugeschnitten (Code) | 07.11.2026 |
 | `assets/rig/trailer_modular.png` | Modularer Wohnanhänger mit aufgeklappter Seite, 256 × 256, im Camp gespiegelt ×3 (`trailer_modular`) | KI-generiert (Daniel, „low top-down“) | 07.11.2026 |
+| `assets/leyla/draw_side.png`, `aim_side`, `aim_walk_side`, `shoot_side`, `shoot_walk_side` (+ `_source.gif`) | Leyla mit Pistole: ziehen (13), zielen (4), gehen mit Waffe (13), schießen im Stand und im Gehen (je 9) | KI-generiert (Daniel), zugeschnitten (Code) | 07.11.2026 |
+| `assets/leyla/work_back.png` (+ `_source.gif`) | Leyla von hinten, werkelt an einer Werkstatt, 13 Frames (`leyla_work_back`) | KI-generiert (Daniel), zugeschnitten (Code) | 07.11.2026 |
+| `assets/sound/shot.m4a`, `.ogg` | Schuss „Futuristic Shotgun Single Shot“, 0,75 s (`sound_shot`) | von Daniel (WAV), mit ffmpeg umgewandelt | 07.11.2026 |
 | `assets/vehicles/van.png` | erste Version des Vans, offene Schiebetür, 837 × 417 px (`van_v1`) | aus `van_source.png` zugeschnitten, halbe Größe (Code) | 07.11.2026 |
 | `assets/vehicles/van_source.png` | erste Version des Vans: Original, 1774 × 887 px (`van_v1_source`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_sky.png` | Wastelands, Himmel: Verlauf mit Dither, 576 × 324 px (`wasteland_sky`) | KI-generiert (Daniel) | 07.11.2026 |

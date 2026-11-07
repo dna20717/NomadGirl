@@ -14,6 +14,18 @@ export class Fx {
       }, onComplete: () => p.destroy() });
     }
   }
+  // a short burst of light (muzzle flash): soft additive glow that lights up the surroundings, then fades
+  light(x, y, { radius = 220, color = 0xffc870, alpha = 0.9, life = 90 } = {}) {
+    const s = this.scene;
+    if (!s.textures.exists('fx_glow')) {
+      const t = s.textures.createCanvas('fx_glow', 128, 128), c = t.getContext(), g = c.createRadialGradient(64, 64, 0, 64, 64, 64);
+      g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.3, 'rgba(255,255,255,0.5)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+      c.fillStyle = g; c.fillRect(0, 0, 128, 128); t.refresh();
+    }
+    const l = s.add.image(x, y, 'fx_glow').setDisplaySize(radius * 2, radius * 2).setTint(color).setBlendMode(Phaser.BlendModes.ADD).setDepth(32).setAlpha(alpha);
+    s.tweens.add({ targets: l, alpha: 0, scale: l.scale * 1.15, duration: life, ease: 'Quad.easeOut', onComplete: () => l.destroy() });
+    return l;
+  }
   dust(x, y, n = 6) { this.particles(x, y - 4, Math.round(n), 0xb8a48a, { speed: 160, up: 0.25, life: 420, size: 2.2, gravity: -60 }); }
   puff(x, y, color) { this.particles(x, y - 4, 10, color, { speed: 180, up: 0.2, life: 300, size: 1.6, gravity: 0 }); }
   sparks(x, y, color = 0xffd27a, n = 8) { this.particles(x, y, n, color, { speed: 340, up: 1, life: 260, size: 1.3, gravity: 1400 }); }

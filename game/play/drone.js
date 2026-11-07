@@ -78,8 +78,20 @@ export class Drone {
     const l = this.scene.leyla, F = this.f, [dx, dy] = F.offset || [-110, -210];
     // turn around a moment after Leyla does
     if (l.facing !== this.side) { this.turnAt ||= time + (F.turnDelay ?? 250); if (time >= this.turnAt) { this.side = l.facing; this.turnAt = 0; } } else this.turnAt = 0;
-    const k = 1 - Math.pow(1 - Math.min(1, F.smooth ?? 0.08), dt / 16.67);
-    const tx = l.x + dx * this.side, ty = l.feet + dy;
+    // camp: roams freely (Drohne › Im Camp frei fliegen), picks a new spot every few seconds, sometimes visits Leyla
+    const R = this.d.roam || {}, area = this.roamArea;
+    let tx = l.x + dx * this.side, ty = l.feet + dy, smooth = F.smooth ?? 0.08;
+    if (area && R.enabled !== false) {
+      if (!this.roamTo || time > this.roamAt) {
+        const [a, b] = R.every || [3, 7], [h0, h1] = R.height || [180, 460], visit = Math.random() * 100 < (R.visitLeyla ?? 30);
+        const rx = visit ? l.x + (Math.random() < 0.5 ? -1 : 1) * 120 : area.x0 + Math.random() * (area.x1 - area.x0);
+        this.roamTo = { x: rx, y: area.ground - (h0 + Math.random() * (h1 - h0)), leyla: visit };
+        this.roamAt = time + (a + Math.random() * (b - a)) * 1000;
+      }
+      if (this.roamTo.leyla) this.roamTo.x += (l.x + this.side * -110 - this.roamTo.x) * 0.02;
+      tx = this.roamTo.x; ty = this.roamTo.y; smooth = R.smooth ?? 0.02;
+    }
+    const k = 1 - Math.pow(1 - Math.min(1, smooth), dt / 16.67);
     const px = this.x; this.x += (tx - this.x) * k; this.y += (ty - this.y) * k;
     const vx = (this.x - px) / Math.max(1, dt) * 1000;
     const bob = Math.sin(time / 1000 * Math.PI * 2 * (F.bobSpeed ?? 0.6)) * (F.bob ?? 10);
