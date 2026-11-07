@@ -74,7 +74,15 @@ export class PlayScene extends Phaser.Scene {
     this.room = parseRoom(def || {});
     const T = this.T, R = this.room, W = R.w * T, H = R.h * T;
     this.physics.world.setBounds(0, 0, W, H);
+    // background (sky, skyline) on its own unzoomed camera, the world on a zoomable camera above it
+    const before = new Set(this.children.list);
     drawBackground(this, W, H);
+    const background = this.children.list.filter(o => !before.has(o));
+    this.bgCam = this.cameras.main;
+    this.cam = this.cameras.add(0, 0, this.scale.width, this.scale.height);
+    this.cam.ignore(background);
+    this.bgCam.ignore([...before]);
+    this.events.on(Phaser.Scenes.Events.ADDED_TO_SCENE, o => this.bgCam.ignore(o));
     const tiles = Object.fromEntries(Object.entries(this.data_.game?.tiles || {}).map(([k, id]) => [k, this.textures.exists(id) ? id : null]));
     drawRoom(this, R, T, tiles);
 
@@ -108,9 +116,12 @@ export class PlayScene extends Phaser.Scene {
     this.enemies = [];
     this.spawnEnemies();
 
-    const cam = this.cameras.main;
-    cam.setBounds(0, 0, W, H);
-    cam.startFollow(this.leyla.box, false, 0.12, 0.12);
+    const cam = this.cam, C = this.data_.game?.camera || {};
+    cam.setZoom(C.zoom || 1);
+    // room lower than the view (zoomed out): floor stays at the bottom edge, sky above
+    const viewH = this.scale.height / (C.zoom || 1);
+    cam.setBounds(0, Math.min(0, H - viewH), W, Math.max(H, viewH));
+    cam.startFollow(this.leyla.box, false, C.follow ?? 0.12, C.follow ?? 0.12);
     cam.fadeIn(400, 13, 10, 18);
 
     this.keys = {};
@@ -143,7 +154,7 @@ export class PlayScene extends Phaser.Scene {
     this.kills = 0; this.deltas = 0; this.cleared = false; this.startTime = 0;
     this.hud.room(this.data_.rooms?.[this.roomId]?.name || this.roomId, this.enemies.length);
     this.hud.banner(null);
-    this.cameras.main.flash(250, 13, 10, 18);
+    this.cam.flash(250, 13, 10, 18);
   }
 
   // ---------- queries for Leyla, enemies and projectiles ----------
@@ -170,10 +181,10 @@ export class PlayScene extends Phaser.Scene {
   hitstop(time, ms) { this.hitstopUntil = time + ms; this.physics.world.pause(); }
 
   // ---------- events ----------
-  onLeylaHit(dmg) { this.cameras.main.shake(120, 0.006); this.fx.blood(this.leyla.x, this.leyla.chest, 10); this.hud.hurt(); }
+  onLeylaHit(dmg) { this.cam.shake(120, 0.006); this.fx.blood(this.leyla.x, this.leyla.chest, 10); this.hud.hurt(); }
   onLeylaDown() {
     this.hud.banner('Mama-Bot schleppt dich raus …', 'Die Run-Beute bleibt liegen.');
-    this.cameras.main.shake(300, 0.01);
+    this.cam.shake(300, 0.01);
     this.time.delayedCall(1900, () => this.restartRoom());
   }
   onKill(e) {
@@ -223,8 +234,9 @@ export class PlayScene extends Phaser.Scene {
       const near = this.leyla.alive && Math.hypot(a.x - this.leyla.x, a.y - this.leyla.hand().y) <= (this.data_.leyla?.movement?.swingRope ?? 320);
       if (near && !this.leyla.body.blocked.down) this.rope.lineStyle(3, 0x3fe0d0, 0.6 + 0.3 * Math.sin(time / 80)).strokeCircle(a.x, a.y, 30);
     }
-    const cam = this.cameras.main;
-    cam.followOffset.x += (-this.leyla.facing * 160 - cam.followOffset.x) * Math.min(1, dt / 400);
+    const cam = this.cam;
+    cam.followOffset.x += (-this.leyla.facing * (this.data_.game?.camera?.lookAhead ?? 160) - cam.followOffset.x) * Math.min(1, dt / 400);
+    this.bgCam.setScroll(cam.worldView.x, cam.worldView.y);   // parallax follows the world camera
     this.hud.update(this, time);
   }
 }

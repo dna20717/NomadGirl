@@ -47,8 +47,10 @@ export const SUMMARY = {
         const k = queue.shift();
         return el('span', { class: k ? 'on' : '' }, k || 'frei');
       })))));
-    return { title: 'Start-Rig', body: el('div', {}, house, facts([
-      ['Werkstatt-Plätze', `${used} von ${places}`], ['Energie', `${power >= 0 ? '+' : ''}${power} ⚡`], ['Gewicht', `${weight} kg von ${tr?.pull ?? '?'} kg Zugkraft`]])) };
+    const z = x.camera?.zoom || 1, [rw, rh] = x.resolution || [1920, 1080], t = x.tileSize || 64;
+    const view = { title: 'Kamera', body: facts([['Sichtbar', `${Math.round(rw / z)} × ${Math.round(rh / z)} px · ${f1(rw / z / t)} × ${f1(rh / z / t)} Kacheln`]]) };
+    return [view, { title: 'Start-Rig', body: el('div', {}, house, facts([
+      ['Werkstatt-Plätze', `${used} von ${places}`], ['Energie', `${power >= 0 ? '+' : ''}${power} ⚡`], ['Gewicht', `${weight} kg von ${tr?.pull ?? '?'} kg Zugkraft`]])) }];
   },
 
   ranking(w, x) {

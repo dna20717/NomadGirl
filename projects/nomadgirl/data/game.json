@@ -14,5 +14,6 @@
   "food": 6
  },
  "testRoom": "testraum",
- "tiles": {"platform": "platform_metal"}
+ "tiles": {"platform": "platform_metal"},
+ "camera": {"zoom": 0.75, "lookAhead": 160, "follow": 0.12}
 }

@@ -26,7 +26,7 @@ export class Combat {
         hits++;
       }
     }
-    if (hits) { s.hitstop(time, 55); s.cameras.main.shake(70, 0.003); }
+    if (hits) { s.hitstop(time, 55); s.cam.shake(70, 0.003); }
   }
 
   shoot(leyla, time) {

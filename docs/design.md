@@ -99,7 +99,7 @@ Weird Cyberpunk mit Augenzwinkern: humorvoll, aber niemals albern. In und um das
 - **Proportionen:** realistisch.
 - **Rig:** Querschnitt wie ein Puppenhaus.
 - **Kontrast:** draußen rau und gefährlich, drinnen warm und gemütlich.
-- **Fidelity:** so hoch wie möglich. 1920×1080, Kacheln 64 px, Leyla 192 px hoch (drei Kacheln), hochaufgelöste KI-Grafiken statt Low-Res-Pixel-Art.
+- **Fidelity:** so hoch wie möglich. 1920×1080, Kacheln 64 px, Leyla 192 px hoch (drei Kacheln), Kamera-Zoom 0,75 (in der Werkstatt einstellbar), hochaufgelöste KI-Grafiken statt Low-Res-Pixel-Art.
 - **Leyla:** pinker Irokese, ärmellose Tech-Weste, Neon-Cyan-Akzente (Details und Palette in `docs/assets.md`).
 
 ## Technik
