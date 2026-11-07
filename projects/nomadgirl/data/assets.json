@@ -1100,5 +1100,205 @@
   "derivedFrom": "leyla_reload_walk_side_source",
   "date": "07.11.2026",
   "description": "Pixel-Art: lädt im Gehen nach, das Magazin fällt zu Boden."
+ },
+ "sfx_handheld_collect1": {
+  "name": "Handheld · collect1",
+  "kind": "sound",
+  "file": "assets/sound/handheld/collect1.m4a",
+  "alt": "assets/sound/handheld/collect1.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_collect2": {
+  "name": "Handheld · collect2",
+  "kind": "sound",
+  "file": "assets/sound/handheld/collect2.m4a",
+  "alt": "assets/sound/handheld/collect2.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_collect3": {
+  "name": "Handheld · collect3",
+  "kind": "sound",
+  "file": "assets/sound/handheld/collect3.m4a",
+  "alt": "assets/sound/handheld/collect3.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_collect4": {
+  "name": "Handheld · collect4",
+  "kind": "sound",
+  "file": "assets/sound/handheld/collect4.m4a",
+  "alt": "assets/sound/handheld/collect4.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_collect5": {
+  "name": "Handheld · collect5",
+  "kind": "sound",
+  "file": "assets/sound/handheld/collect5.m4a",
+  "alt": "assets/sound/handheld/collect5.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_jump": {
+  "name": "Handheld · jump",
+  "kind": "sound",
+  "file": "assets/sound/handheld/jump.m4a",
+  "alt": "assets/sound/handheld/jump.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_hop": {
+  "name": "Handheld · hop",
+  "kind": "sound",
+  "file": "assets/sound/handheld/hop.m4a",
+  "alt": "assets/sound/handheld/hop.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_laser": {
+  "name": "Handheld · laser",
+  "kind": "sound",
+  "file": "assets/sound/handheld/laser.m4a",
+  "alt": "assets/sound/handheld/laser.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_laser2": {
+  "name": "Handheld · laser2",
+  "kind": "sound",
+  "file": "assets/sound/handheld/laser2.m4a",
+  "alt": "assets/sound/handheld/laser2.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_powerup": {
+  "name": "Handheld · powerup",
+  "kind": "sound",
+  "file": "assets/sound/handheld/powerup.m4a",
+  "alt": "assets/sound/handheld/powerup.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_powerup2": {
+  "name": "Handheld · powerup2",
+  "kind": "sound",
+  "file": "assets/sound/handheld/powerup2.m4a",
+  "alt": "assets/sound/handheld/powerup2.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_bounce": {
+  "name": "Handheld · bounce",
+  "kind": "sound",
+  "file": "assets/sound/handheld/bounce.m4a",
+  "alt": "assets/sound/handheld/bounce.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_spring1": {
+  "name": "Handheld · spring1",
+  "kind": "sound",
+  "file": "assets/sound/handheld/spring1.m4a",
+  "alt": "assets/sound/handheld/spring1.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_tinyexplode": {
+  "name": "Handheld · tinyexplode",
+  "kind": "sound",
+  "file": "assets/sound/handheld/tinyexplode.m4a",
+  "alt": "assets/sound/handheld/tinyexplode.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_tinywarble": {
+  "name": "Handheld · tinywarble",
+  "kind": "sound",
+  "file": "assets/sound/handheld/tinywarble.m4a",
+  "alt": "assets/sound/handheld/tinywarble.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_blunk": {
+  "name": "Handheld · blunk",
+  "kind": "sound",
+  "file": "assets/sound/handheld/blunk.m4a",
+  "alt": "assets/sound/handheld/blunk.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_move": {
+  "name": "Handheld · move",
+  "kind": "sound",
+  "file": "assets/sound/handheld/move.m4a",
+  "alt": "assets/sound/handheld/move.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_reflect": {
+  "name": "Handheld · reflect",
+  "kind": "sound",
+  "file": "assets/sound/handheld/reflect.m4a",
+  "alt": "assets/sound/handheld/reflect.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_wobbleup": {
+  "name": "Handheld · wobbleup",
+  "kind": "sound",
+  "file": "assets/sound/handheld/wobbleup.m4a",
+  "alt": "assets/sound/handheld/wobbleup.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
+ },
+ "sfx_handheld_fail": {
+  "name": "Handheld · fail",
+  "kind": "sound",
+  "file": "assets/sound/handheld/fail.m4a",
+  "alt": "assets/sound/handheld/fail.ogg",
+  "volume": 100,
+  "source": "Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg klein und fern gemacht (Hoch-/Tiefpass, kurzes Echo, mono)",
+  "date": "07.11.2026",
+  "description": "Retro-Spielgeräusch aus Leylas Handheld, wenn sie am Lagerfeuer zockt."
  }
 }

@@ -326,6 +326,7 @@ export class Camp {
     if (this.fireSound) this.fireSound.setSeek?.(Math.random() * 20);   // not always the same crackle
     this.gustAt = s.time.now + this.gustDelay();
   }
+  cam() { return this.scene.cam || this.scene.cameras.main; }
   gustDelay() { const [a, b] = this.C.sound?.gustEvery || [9, 22]; return (a + Math.random() * (b - a)) * 1000; }
   updateSound(time) {
     const s = this.scene, S = this.C.sound || {}, l = s.leyla;
@@ -336,6 +337,20 @@ export class Camp {
       this.fireSound.setVolume(v);
       this.fireVolume = v;
       if (this.fireSound.setPan) this.fireSound.setPan(Math.max(-0.7, Math.min(0.7, (this.geo.fireX - l.x) / 900)));
+    }
+    // gaming at the fire: little retro blips from the handheld, chained at random, quiet and far away (Camp › Am Feuer sitzen › Töne)
+    const sit = l.state === 'sit' && l.sit, F = this.C.fire?.sit || {}, list = (F.sounds || []).filter(id => s.cache.audio.exists(id));
+    const gaming = sit && !sit.up && time - sit.at > (F.downTo ?? 6) * 1000 / (F.fps || 5) && list.length;
+    if (!gaming) this.blipAt = 0;
+    else if (!this.blipAt) this.blipAt = time + 300;
+    else if (time > this.blipAt) {
+      const id = list[Math.floor(Math.random() * list.length)], [g0, g1] = F.soundGap || [120, 650];
+      const snd = s.sound.add(id, { volume: (F.soundVolume ?? 12) / 100 * (0.7 + Math.random() * 0.3) * ((this.D.assets?.[id]?.volume ?? 100) / 100), detune: (Math.random() - 0.5) * 200 });
+      if (snd.setPan) snd.setPan(Math.max(-0.5, Math.min(0.5, (l.x - this.cam().midPoint.x) / 1500)));
+      snd.once('complete', () => snd.destroy());
+      snd.play();
+      const len = (snd.duration || 0.3) * 1000;
+      this.blipAt = time + len + g0 + Math.random() * (g1 - g0) + (Math.random() * 100 < (F.soundPause ?? 18) ? 1200 + Math.random() * 1800 : 0);   // now and then a longer pause
     }
     if (time > this.gustAt && (S.gusts || []).length) {
       const id = S.gusts[Math.floor(Math.random() * S.gusts.length)];
