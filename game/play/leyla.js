@@ -90,6 +90,7 @@ export class Leyla {
       if (input.melee.pressed && time >= this.meleeReady) this.scene.combat.melee(this, time);
       if (input.ranged.pressed && time >= this.rangedReady) this.scene.combat.shoot(this, time);
     }
+    if (time < (this.flipUntil || 0) && m.airJumpGhosts && time >= (this.nextGhost || 0)) { this.scene.fx.ghost(this.sprite); this.nextGhost = time + 28; }
     this.wasGrounded = grounded;
     this.lastVy = b.velocity.y;
     this.look(time, dt, grounded);
@@ -113,7 +114,10 @@ export class Leyla {
     if (time - this.jumpAt <= (m.jumpBuffer ?? 120) && (grounded || time - this.lastGround <= (m.coyoteTime ?? 100))) {
       this.jump(1); this.lastGround = -1e9;
     } else if (input.jump.pressed && !grounded && this.airJumps > 0) {
-      this.airJumps--; this.jump(0.92); this.flipUntil = time + this.scene.lookDuration('airJump'); this.scene.fx.puff(this.x, this.feet, 0x3fe0d0);
+      this.airJumps--; this.jump(0.92); this.scene.fx.puff(this.x, this.feet, 0x3fe0d0);
+      // double jump: whole animation once, or from „Doppelsprung ab Frame“ over „Doppelsprung-Dauer“ (e.g. the last dash frames)
+      this.flipAt = time; this.flipLen = (m.airJumpFromFrame ?? 1) > 1 ? (m.airJumpTime ?? 300) : this.scene.lookDuration('airJump');
+      this.flipUntil = time + this.flipLen; this.nextGhost = 0;
     }
     if (this.cut && !input.jump.down && b.velocity.y < 0) { b.setVelocityY(b.velocity.y * 0.45); this.cut = false; }
     if (b.velocity.y >= 0) this.cut = false;
@@ -350,14 +354,16 @@ export class Leyla {
     this.idleNow = name === 'idle';
     if (name === 'idle' && this.idleVariant === 'idleAlt' && this.d.look?.idleAlt) name = 'idleAlt';
     // mantle and crouch pick their frame from the progress (crouch backwards = standing up)
-    const manual = st === 'mantle' || st === 'crouch' || st === 'dash', an0 = this.sprite.anims;
+    const flipFrames = name === 'airJump' && (this.m.airJumpFromFrame ?? 1) > 1;
+    const manual = st === 'mantle' || st === 'crouch' || st === 'dash' || flipFrames, an0 = this.sprite.anims;
     if (!manual && st !== 'slide' && an0.isPaused) an0.resume();
     const info = this.scene.playLook(this.sprite, 'leyla', name, this.facing);
-    if (manual && info.used === st && an0.currentAnim) {
+    if (manual && (info.used === st || (flipFrames && info.used === 'airJump')) && an0.currentAnim) {
       const fr = an0.currentAnim.frames, n = fr.length;
       const from = st === 'mantle' ? Math.min(n - 1, Math.max(0, (this.m.mantleFromFrame ?? 5) - 1)) : 0;
       const dashFrom = Math.min(n - 1, Math.max(0, (this.m.dashFromFrame ?? 1) - 1)), dashP = Math.min(1, 1 - (this.dashEnd - time) / DASH_TIME);
-      const f = st === 'mantle' ? Math.round(from + (n - 1 - from) * this.mantleP(time)) : st === 'dash' ? Math.round(dashFrom + (n - 1 - dashFrom) * dashP) : Math.round(Math.min(n - 1, this.crouchF || 0));
+      const flipFrom = Math.min(n - 1, Math.max(0, (this.m.airJumpFromFrame ?? 1) - 1)), flipP = Math.min(1, (time - this.flipAt) / Math.max(1, this.flipLen));
+      const f = flipFrames ? Math.round(flipFrom + (n - 1 - flipFrom) * flipP) : st === 'mantle' ? Math.round(from + (n - 1 - from) * this.mantleP(time)) : st === 'dash' ? Math.round(dashFrom + (n - 1 - dashFrom) * dashP) : Math.round(Math.min(n - 1, this.crouchF || 0));
       if (!an0.isPaused) an0.pause();
       this.sprite.setFrame(fr[f].frame.name);
     }
@@ -381,6 +387,7 @@ export class Leyla {
     if (info.fallback && st === 'dash') rot = this.facing * 0.12;
     if (info.fallback && st === 'climb') rot = Math.sin(this.climbPhase * 6) * 0.05;
     if (st === 'swing') rot = -this.theta * 0.85;
+    if (name === 'airJump' && this.m.airJumpTilt) rot = this.facing * Math.atan2(v.y, Math.max(Math.abs(v.x), 250)) * this.m.airJumpTilt / 100;   // pose leans into the jump
     if (time < this.attackPose && st === 'normal') rot += this.facing * 0.1;
     if (st === 'dead') { this.deadRot = (this.deadRot || 0) + (this.facing * -1.45 - (this.deadRot || 0)) * k; rot = this.deadRot; } else this.deadRot = 0;
     this.sprite.setPosition(b.center.x, b.bottom).setRotation(rot);

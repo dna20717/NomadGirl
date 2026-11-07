@@ -25,7 +25,11 @@
   "mantleFromFrame": 5,
   "standUpTime": 350,
   "crouchTime": 300,
-  "dashFromFrame": 5
+  "dashFromFrame": 5,
+  "airJumpFromFrame": 6,
+  "airJumpTime": 320,
+  "airJumpTilt": 55,
+  "airJumpGhosts": true
  },
  "loadout": {"melee": "rohrzange", "ranged": "nagelpistole", "backpack": "schulranzen"},
  "look": {
@@ -36,7 +40,7 @@
   "jump": "leyla_jump_side",
   "fall": "leyla_jump_side",
   "slide": "leyla_slide_side",
-  "airJump": "leyla_flip_side",
+  "airJump": "leyla_dash_side",
   "idleAlt": "leyla_idle2_side",
   "crouch": "leyla_crouch_side_left",
   "mantle": "leyla_mantle_side",
