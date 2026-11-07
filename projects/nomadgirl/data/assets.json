@@ -12,8 +12,7 @@
   "source": "Code (Streifen zugeschnitten)",
   "derivedFrom": "leyla_idle_source",
   "date": "07.11.2026",
-  "description": "Idle-Animation, atmet ruhig.",
-  "flip": true
+  "description": "Idle-Animation, atmet ruhig."
  },
  "leyla_idle_source": {
   "name": "Leyla · Stehen (Original)",
