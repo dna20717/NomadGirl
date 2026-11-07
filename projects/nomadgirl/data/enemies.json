@@ -39,7 +39,7 @@
   "deltas": [3, 8],
   "countsForRanking": true,
   "attack": {"windup": 450, "cooldown": 900, "range": 150},
-  "height": 240,
+  "height": 180,
   "placeholderColor": "rust"
  },
  "schuetze": {
@@ -55,7 +55,7 @@
   "deltas": [3, 8],
   "countsForRanking": true,
   "attack": {"windup": 650, "cooldown": 1400, "range": 560, "projectileSpeed": 950},
-  "height": 232,
+  "height": 174,
   "placeholderColor": "olive"
  },
  "wachdrohne": {

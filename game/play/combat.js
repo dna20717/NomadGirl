@@ -14,8 +14,8 @@ export class Combat {
     leyla.attackPose = time + 160;
     const reach = (w.range ?? 70) + 40, f = leyla.facing, b = leyla.body;
     const x0 = f > 0 ? b.center.x : b.left - reach, x1 = f > 0 ? b.right + reach : b.center.x;
-    const y0 = b.bottom - 220, y1 = b.bottom - 20;
-    s.fx.slash(leyla.x + f * 24, b.bottom - 130, f, w.range ?? 70);
+    const H = leyla.height, y0 = b.bottom - H, y1 = b.bottom - H * 0.1;
+    s.fx.slash(leyla.x + f * 24, b.bottom - H * 0.58, f, w.range ?? 70);
     let hits = 0;
     for (const e of s.enemies) {
       if (!e.alive) continue;
@@ -33,10 +33,10 @@ export class Combat {
     const s = this.scene, w = s.weapon('ranged');
     if (!w) return;
     leyla.rangedReady = time + (w.cooldown ?? 300);
-    if (leyla.ammo <= 0) { s.fx.text(leyla.x, leyla.feet - 250, 'leer', { color: '#8b949e', size: 36, rise: 30 }); return; }
+    if (leyla.ammo <= 0) { s.fx.text(leyla.x, leyla.feet - leyla.height - 20, 'leer', { color: '#8b949e', size: 36, rise: 30 }); return; }
     leyla.ammo--;
     leyla.attackPose = time + 120;
-    const f = leyla.facing, x = leyla.x + f * 60, y = leyla.feet - 140, speed = w.projectileSpeed ?? 1600;
+    const f = leyla.facing, x = leyla.x + f * leyla.size.w * 0.8, y = leyla.feet - leyla.height * 0.62, speed = w.projectileSpeed ?? 1600;
     s.fx.flash(x + f * 10, y, 0xfff2b0, 18);
     this.spawn({ key: 'nail', x, y, vx: f * speed, vy: 0, life: (w.range ?? 600) / speed * 1000, friendly: true, damage: w.damage ?? 5, knockback: w.knockback ?? 80, crit: w.critChance ?? 0, time });
     if (!leyla.body.blocked.down) leyla.body.setVelocityX(leyla.body.velocity.x - f * 40);

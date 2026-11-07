@@ -5,7 +5,8 @@
 // Look: per state the asset from leyla.look.<state>, otherwise look.idle. Missing animations are covered by
 // code effects (squash & stretch, lean, afterimages, blinking), new animations plug in without code changes.
 
-const BODY_W = 72, BODY_H = 224, SLIDE_H = 104, CLIMB_W = 44, HAND = 84;   // collider in px (Leyla is 256 px tall)
+// collider at 256 px look height; everything scales with the height of look.idle (Assets › „Höhe im Spiel“)
+const BASE = { height: 256, w: 72, h: 224, slideH: 104, climbW: 44, hand: 84, chest: 150 };
 const DASH_TIME = 170, TERMINAL_FALL = 1700;
 const approach = (v, target, step) => v < target ? Math.min(target, v + step) : Math.max(target, v - step);
 
@@ -14,6 +15,9 @@ export class Leyla {
     this.scene = scene;
     this.d = data.leyla;
     this.m = data.leyla.movement || {};
+    const k = (data.assets?.[data.leyla.look?.idle]?.height || BASE.height) / BASE.height;
+    this.size = Object.fromEntries(Object.entries(BASE).map(([n, v]) => [n, Math.round(v * k)]));
+    const { w: BODY_W, h: BODY_H } = this.size;
     this.box = scene.add.rectangle(feet[0], feet[1] - BODY_H / 2, BODY_W, BODY_H, 0x000000, 0);
     scene.physics.add.existing(this.box);
     this.body = this.box.body;
@@ -26,7 +30,7 @@ export class Leyla {
   reset() {
     const [x, y] = this.start;
     this.setStanding();
-    this.body.reset(x, y - BODY_H / 2);
+    this.body.reset(x, y - this.size.h / 2);
     this.body.allowGravity = true;
     this.state = 'normal';
     this.facing = 1;
@@ -42,14 +46,15 @@ export class Leyla {
 
   get feet() { return this.body.bottom; }
   get x() { return this.body.center.x; }
-  get chest() { return this.body.bottom - 150; }
+  get chest() { return this.body.bottom - this.size.chest; }
+  get height() { return this.size.h; }
   get alive() { return this.state !== 'dead'; }
   invulnerable(time) { return time < this.invulnerableUntil || (this.state === 'dash' && this.m.dashInvulnerable); }
 
-  setStanding() { this.body.setSize(BODY_W, BODY_H, false); this.body.setOffset(0, 0); }
-  setNarrow() { this.body.setSize(CLIMB_W, BODY_H, false); this.body.setOffset((BODY_W - CLIMB_W) / 2, 0); }   // on ladders next to ledges
-  setLow() { this.body.setSize(BODY_W, SLIDE_H, false); this.body.setOffset(0, BODY_H - SLIDE_H); }
-  canStand() { return this.scene.rectFree(this.x - BODY_W / 2 + 2, this.feet - BODY_H, BODY_W - 4, BODY_H - 2); }
+  setStanding() { const z = this.size; this.body.setSize(z.w, z.h, false); this.body.setOffset(0, 0); }
+  setNarrow() { const z = this.size; this.body.setSize(z.climbW, z.h, false); this.body.setOffset((z.w - z.climbW) / 2, 0); }   // on ladders next to ledges
+  setLow() { const z = this.size; this.body.setSize(z.w, z.slideH, false); this.body.setOffset(0, z.h - z.slideH); }
+  canStand() { const z = this.size; return this.scene.rectFree(this.x - z.w / 2 + 2, this.feet - z.h, z.w - 4, z.h - 2); }
 
   // ---------- update ----------
   update(time, dt, input) {
@@ -109,7 +114,7 @@ export class Leyla {
       if ((input.up.down && !atTop && (input.up.pressed || !grounded)) || (input.down.down && atTop && grounded) || (input.down.down && !grounded && !atBottom)) return this.startClimb(ladder);
     }
     if (!grounded && (input.grab.pressed || input.up.pressed)) {
-      const a = this.scene.anchorNear(this.x, this.feet - BODY_H + HAND, this.m.swingRope ?? 320);
+      const a = this.scene.anchorNear(this.x, this.hand().y, this.m.swingRope ?? 320);
       if (a) return this.startSwing(a);
     }
   }
@@ -158,7 +163,7 @@ export class Leyla {
     const b = this.body, blocked = !this.canStand();
     const speed = time < this.slideEnd ? (this.m.slideSpeed ?? 600) : blocked ? 260 : 0;
     b.setVelocityX(this.facing * speed);
-    if (Math.random() < 0.4) this.scene.fx.dust(this.x - this.facing * 30, this.feet, 1);
+    if (Math.random() < 0.4) this.scene.fx.dust(this.x - this.facing * this.size.w / 2, this.feet, 1);
     if (input.jump.pressed && !blocked) { this.endSlide(); this.jump(1); return; }
     if ((time >= this.slideEnd && !blocked) || (!grounded && !blocked) || b.blocked.left || b.blocked.right) {
       if (blocked) { this.facing *= -1; return; }   // stuck in a tunnel: crawl back out
@@ -181,7 +186,7 @@ export class Leyla {
     b.setVelocity(0, v);
     this.climbPhase = (this.climbPhase || 0) + Math.abs(v) / 1000;
     if (input.jump.pressed) { this.leaveClimb(); b.setVelocity(dir * (m.walkSpeed ?? 240), -(m.jumpVelocity ?? 1100) * 0.6); this.cut = true; return; }
-    if (v < 0 && this.feet <= L.top) { this.body.reset(L.cx, L.top - BODY_H / 2); this.leaveClimb(); return; }
+    if (v < 0 && this.feet <= L.top) { this.body.reset(L.cx, L.top - this.size.h / 2); this.leaveClimb(); return; }
     if (this.feet >= L.bottom && grounded && v >= 0) { this.leaveClimb(); return; }
     if (dir && grounded) this.leaveClimb();
   }
@@ -189,7 +194,7 @@ export class Leyla {
 
   // ---------- rope swing (pendulum) ----------
   startSwing(a) {
-    const hx = this.x, hy = this.feet - BODY_H + HAND;
+    const { x: hx, y: hy } = this.hand();
     const dx = hx - a.x, dy = hy - a.y;
     this.anchor = a;
     this.rope = Math.max(128, Math.min(this.m.swingRope ?? 320, Math.hypot(dx, dy)));
@@ -205,7 +210,7 @@ export class Leyla {
     this.omega *= 1 - 0.12 * s;
     this.theta += this.omega * s;
     if (dir) this.facing = dir;
-    const tx = this.anchor.x + L * Math.sin(this.theta), ty = this.anchor.y + L * Math.cos(this.theta) + BODY_H / 2 - HAND;
+    const tx = this.anchor.x + L * Math.sin(this.theta), ty = this.anchor.y + L * Math.cos(this.theta) + this.size.h / 2 - this.size.hand;
     this.body.setVelocity((tx - this.body.center.x) / s, (ty - this.body.center.y) / s);
     if (input.jump.pressed || input.grab.pressed) return this.releaseSwing(true);
     const b = this.body.blocked;
@@ -267,5 +272,5 @@ export class Leyla {
     if (st !== 'dead') this.sprite.setAlpha(time < this.invulnerableUntil && Math.floor(time / 70) % 2 ? 0.35 : 1);
   }
 
-  hand() { return { x: this.x, y: this.feet - BODY_H + HAND }; }
+  hand() { return { x: this.x, y: this.feet - this.size.h + this.size.hand }; }
 }

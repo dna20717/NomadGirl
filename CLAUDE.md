@@ -75,7 +75,7 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 
 ## Assets und Fidelity
 
-- **Fidelity (Daniel, 07.11.2026): so viel wie geht.** Spielauflösung 1920×1080, Kacheln 64 px, `pixelArt` aus (die KI-Grafiken sind hochaufgelöst und werden geglättet skaliert), Leyla 256 px hoch. Alle Pixelwerte (Tempo, Sprungkraft, Reichweiten …) sind auf diesen Maßstab ausgelegt.
+- **Fidelity (Daniel, 07.11.2026): so viel wie geht.** Spielauflösung 1920×1080, Kacheln 64 px, `pixelArt` aus (die KI-Grafiken sind hochaufgelöst und werden geglättet skaliert), Leyla 192 px hoch (Daniel, 07.11.2026: vorher 256, auf drei Viertel verkleinert). Leylas Größe ist die „Höhe im Spiel“ ihres Idle-Assets; Kollisionsbox, Hand, Brust und Angriffs-Hitboxen skalieren im Spiel automatisch mit. Gegner haben ihre Größe im Feld „Größe“ (Schläger 180, Schütze 174).
 - **Bereich „Assets“** (ganz oben in der Werkstatt, `data/assets.json`): jede Grafik einmal, mit Art (`animation` = PNG-Streifen mit gleich großen Frames nebeneinander, `image`, `reference` = Konzept/Character Sheet, `source` = Original wie ein GIF), Datei, bei Animationen Frame-Größe, Frames, fps, Wiederholen, dazu Ankerpunkt (Füße), Höhe im Spiel, Herkunft (`source`, `derivedFrom`, `date`). Abschnitte mit `when` erscheinen nur bei passender Art. Die Werkstatt zeigt Assets als Galerie mit Vorschaubildern.
 - **Entitäten verweisen auf Assets:** Feld `look` (Aussehen) bei Rucksäcken, Waffen, Gegnern, Gegenständen, Zugmaschinen, Containern, Werkstätten, Rig-Teilen, Companions, POIs, Räumen, Orten und Encountern; Leyla hat `look.idle` … `look.hurt` und `look.reference`. Jeder Inspektor zeigt oben „Aussehen“ mit Vorschau (bei mehreren Verweisen umschaltbar), Listen zeigen kleine Vorschaubilder.
 - **Vorschau:** Animationen mit Nah, 1:1 und „Im Spiel“ (Spielauflösung mit Kachelraster und Boden), Abspielen/Anhalten, Frame für Frame, Ankerpunkt; Bilder angepasst, antippen öffnet die Originalgröße. Hintergrund Karo, Dunkel, Hell.
@@ -85,7 +85,7 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 
 - **Phaser 3.90** (Arcade-Physik), Seite `game.html`, Code in `game/play/`. `game.html?room=<id>` spielt einen Raum-Baustein, sonst den Testraum aus „Spiel“ › Testen. Das Spiel lädt die Spieldaten plus die im selben Browser gespeicherten Werkstatt-Stände (localStorage `nomadgirl-drafts:`): in der Werkstatt speichern, Spiel neu laden.
 - **Raum-Layout** (Bereich Raum-Bausteine, Feld „Kacheln“): ein Zeichen pro Kachel. `.` leer, `#` Wand/Boden, `=` Plattform (von unten durchspringbar), `H` Leiter (oberste Sprosse trägt wie eine Plattform), `o` Seil-Anker, `L` Leylas Start, andere Buchstaben = Spawns aus der Tabelle „Spawns“. Die Werkstatt zeigt eine Vorschau mit Knopf „Im Spiel testen“. Prüfung: Zeilenbreite, unbekannte Zeichen, Start.
-- **Leyla** (`leyla.js`): Zustände normal, dash, slide, climb, swing, dead. Werte aus „Leyla“. Kollisionsbox 72 × 224 px (Slide 104 hoch, an Leitern 44 breit). Aussehen pro Zustand aus `look.<zustand>`, sonst `look.idle` mit Code-Effekten; neue Animationen wirken ohne Code-Änderung.
+- **Leyla** (`leyla.js`): Zustände normal, dash, slide, climb, swing, dead. Werte aus „Leyla“. Kollisionsbox bei 192 px Größe 54 × 168 px (Slide 78 hoch, an Leitern 33 breit), skaliert mit der Höhe von `look.idle`. Aussehen pro Zustand aus `look.<zustand>`, sonst `look.idle` mit Code-Effekten; neue Animationen wirken ohne Code-Änderung.
 - **Gegner** (`enemies.js`): Verhalten charger (Schläger) und shooter (Schütze), andere laufen Patrouille. Jeder Angriff wird angekündigt (Ausholen: Blinken + „!“, Schütze zeigt die Ziellinie). Werte aus „Gegner“ inkl. Abschnitt Angriff. Ohne Aussehen: Platzhalter aus Code (Farbe wählbar).
 - **Kacheln:** Asset-Art „Kacheln“ (Streifen: einzeln, links, Mitte, rechts), im Bereich „Spiel“ › Kacheln zugeordnet. Bisher: Plattform. Wände sind noch aus Code gezeichnet.
 - Tod: Mama-Bot-Meldung, Raum startet neu. Raum geräumt: Zeit, Kills, Δ.
@@ -100,6 +100,7 @@ Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei j
 
 ## Stand
 
+- 07.11.2026: Leyla auf 192 px verkleinert (Größe kommt aus dem Idle-Asset), Plünderer im gleichen Verhältnis.
 - 07.11.2026: **MVP Movement & Kampf** spielbar (`/game`): Testraum, Leyla mit allen Bewegungen, Rohrzange + Nagelpistole, Plünderer-Schläger und -Schütze, HUD, Fernsteuerung `nomad` + `tools/play.mjs`, Spiel-Test. Raum-Layouts in den Daten, Plattform-Kacheln aus Daniels Tileset.
 
 - 07.11.2026: Bereich „Assets“ (Galerie, Vorschauen, `look` an allen Entitäten), Fidelity 1920×1080 / Kachel 64 / Leyla 256 px.

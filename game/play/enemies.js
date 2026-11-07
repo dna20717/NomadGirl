@@ -2,7 +2,6 @@
 // Values from the game data (area "Gegner"): health, damage, speed, aggroRange, weapon, attack.windup/cooldown/range/projectileSpeed, height.
 // Every attack is telegraphed (windup): blinking + warning sign, the shooter shows his aim line.
 
-const BODY_W = 76;
 
 export class Enemy {
   constructor(scene, id, def, feet) {
@@ -11,7 +10,8 @@ export class Enemy {
     this.a = def.attack || {};
     this.h = def.height ?? 220;
     const bodyH = Math.round(this.h * 0.9);
-    this.box = scene.add.rectangle(feet[0], feet[1] - bodyH / 2, BODY_W, bodyH, 0x000000, 0);
+    this.w = Math.round(this.h * 0.32);
+    this.box = scene.add.rectangle(feet[0], feet[1] - bodyH / 2, this.w, bodyH, 0x000000, 0);
     scene.physics.add.existing(this.box);
     this.body = this.box.body;
     this.body.setMaxVelocityY(1700);
@@ -35,7 +35,7 @@ export class Enemy {
 
   // ground ahead in walking direction (so nobody walks off ledges)
   safeStep(dir) {
-    const fx = this.x + dir * (BODY_W / 2 + 10);
+    const fx = this.x + dir * (this.w / 2 + 10);
     return this.scene.groundAt(fx, this.feet + 8) && !(dir < 0 ? this.body.blocked.left : this.body.blocked.right);
   }
 
@@ -107,7 +107,7 @@ export class Enemy {
       this.facing = Math.sign(this.aimDir.x) || this.facing;
     }
   }
-  muzzle() { return { x: this.x + this.facing * 70, y: this.feet - this.h * 0.47 }; }
+  muzzle() { return { x: this.x + this.facing * this.h * 0.3, y: this.feet - this.h * 0.47 }; }
   drawAim(time) {
     const m = this.muzzle(), left = Math.max(0, this.windupEnd - time) / (this.a.windup || 1);
     this.aim.lineStyle(3, 0xff4060, 0.25 + 0.6 * (1 - left)).lineBetween(m.x, m.y, m.x + this.aimDir.x * 1400, m.y + this.aimDir.y * 1400);
@@ -124,7 +124,7 @@ export class Enemy {
   }
   strike(time, leyla) {
     const reach = (this.weapon?.range ?? 80) + 40;
-    const x0 = this.facing > 0 ? this.x : this.x - BODY_W / 2 - reach, x1 = this.facing > 0 ? this.x + BODY_W / 2 + reach : this.x;
+    const x0 = this.facing > 0 ? this.x : this.x - this.w / 2 - reach, x1 = this.facing > 0 ? this.x + this.w / 2 + reach : this.x;
     const y0 = this.feet - this.h * 0.9, y1 = this.feet - 20;
     const lb = leyla.body;
     if (lb.right > x0 && lb.left < x1 && lb.bottom > y0 && lb.top < y1) {
@@ -164,7 +164,7 @@ export class Enemy {
     this.warn.setPosition(this.x, this.feet - this.h - 6);
     this.bar.clear();
     if (time < this.barUntil) {
-      const w = 110, x = this.x - w / 2, y = this.feet - this.h - 24, f = Math.max(0, this.hp / (this.d.health || 1));
+      const w = Math.round(this.h * 0.46), x = this.x - w / 2, y = this.feet - this.h - 24, f = Math.max(0, this.hp / (this.d.health || 1));
       this.bar.fillStyle(0x0d0a12, 0.8).fillRect(x - 3, y - 3, w + 6, 14).fillStyle(0xe5484d).fillRect(x, y, w * f, 8);
     }
   }

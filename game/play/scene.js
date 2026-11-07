@@ -220,7 +220,7 @@ export class PlayScene extends Phaser.Scene {
     this.rope.clear();
     if (this.leyla.state === 'swing') { const h = this.leyla.hand(); this.rope.lineStyle(5, 0xb9a27a).lineBetween(this.leyla.anchor.x, this.leyla.anchor.y, h.x, h.y); }
     else for (const a of this.anchors) {
-      const near = this.leyla.alive && Math.hypot(a.x - this.leyla.x, a.y - (this.leyla.feet - 140)) <= (this.data_.leyla?.movement?.swingRope ?? 320);
+      const near = this.leyla.alive && Math.hypot(a.x - this.leyla.x, a.y - this.leyla.hand().y) <= (this.data_.leyla?.movement?.swingRope ?? 320);
       if (near && !this.leyla.body.blocked.down) this.rope.lineStyle(3, 0x3fe0d0, 0.6 + 0.3 * Math.sin(time / 80)).strokeCircle(a.x, a.y, 30);
     }
     const cam = this.cameras.main;

@@ -23,7 +23,7 @@ Bereich „Assets“ ganz oben: Galerie aller Grafiken, gruppiert nach Art (Anim
 
 ## Maßstab
 
-Spielauflösung 1920×1080, Kacheln 64 px, Leyla 256 px hoch. Grafiken dürfen größer sein (Leylas Frames sind 432 px hoch) und werden geglättet herunterskaliert.
+Spielauflösung 1920×1080, Kacheln 64 px, Leyla 192 px hoch (Höhe im Spiel ihres Idle-Assets). Grafiken dürfen größer sein (Leylas Frames sind 432 px hoch) und werden geglättet herunterskaliert.
 
 ## Leyla – Stil aus dem Character Sheet
 
