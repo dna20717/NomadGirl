@@ -3,7 +3,7 @@
 // Moods come from events (kill, hit, cleared, dash, down) and from states (alert, lowHealth, bored, sleep);
 // while Leyla is moving, a random mood (curious, scan) pops up now and then.
 
-const STATES = ['down', 'lowHealth', 'alert', 'sleep', 'bored'];   // lasting moods, most important first
+const STATES = ['down', 'lowHealth', 'alert', 'zen', 'sleep', 'bored'];   // lasting moods, most important first
 
 export class Drone {
   constructor(scene, data) {
@@ -65,6 +65,9 @@ export class Drone {
     const near = s.enemies.some(e => e.alive && Math.abs(e.x - l.x) < (this.d.alertRange ?? 700) && Math.abs(e.feet - l.feet) < 400);
     if (near && !this.alerted) { this.alerted = true; this.react('alert'); }
     if (!near) this.alerted = false;
+    // Leyla in the yoga pose for a while: the drone joins in (Daniel: "Zen-Modus")
+    this.zen = l.state === 'pose' && !l.pose?.out ? (this.zen || 0) + dt : 0;
+    if (this.zen > (I.zenAfter ?? 2) * 1000) return 'zen';
     const moving = Math.abs(l.body.velocity.x) > 20 || Math.abs(l.body.velocity.y) > 20 || l.state !== 'normal';
     this.still = moving ? 0 : this.still + dt;
     if (this.still > (I.sleepAfter ?? 14) * 1000) return 'sleep';
@@ -94,7 +97,10 @@ export class Drone {
     const k = 1 - Math.pow(1 - Math.min(1, smooth), dt / 16.67);
     const px = this.x; this.x += (tx - this.x) * k; this.y += (ty - this.y) * k;
     const vx = (this.x - px) / Math.max(1, dt) * 1000;
-    const bob = Math.sin(time / 1000 * Math.PI * 2 * (F.bobSpeed ?? 0.6)) * (F.bob ?? 10);
+    // zen: slow, deep breathing instead of the usual bobbing (phase kept smooth when it switches)
+    const zen = this.mood === 'zen', bs = (F.bobSpeed ?? 0.6) * (zen ? 0.35 : 1);
+    this.bobPh = (this.bobPh || 0) + dt / 1000 * Math.PI * 2 * bs;
+    const bob = Math.sin(this.bobPh) * (F.bob ?? 10) * (zen ? 1.8 : 1);
     // flying towards a side: look that way, otherwise look where Leyla looks
     const look = Math.abs(vx) > 120 ? Math.sign(vx) : this.side;
     this.sprite.setPosition(this.x, this.y + bob).setFlipX(look < 0)

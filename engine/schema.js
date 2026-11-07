@@ -47,7 +47,7 @@ export const ROOM_TAGS = [['start', 'Eingang'], ['exit', 'Ausgang'], ['combat', 
 export const ASSET_KINDS = [['animation', 'Animation'], ['tiles', 'Kacheln'], ['image', 'Bild'], ['sound', 'Ton'], ['reference', 'Referenz'], ['source', 'Original']];
 export const DAYTIME = [['any', 'Immer'], ['day', 'Tag'], ['night', 'Nacht']];
 export const DRONE_MOODS = [['idle', 'Normal'], ['kill', 'Gegner erledigt'], ['cleared', 'Raum geräumt'], ['bored', 'Langeweile'], ['alert', 'Gegner in der Nähe'],
-  ['curious', 'Neugierig (zufällig)'], ['hit', 'Leyla getroffen'], ['sleep', 'Schlafen'], ['down', 'Leyla k.o.'], ['scan', 'Scannen (zufällig)'], ['lowHealth', 'Wenig Leben'], ['dash', 'Dash']];
+  ['curious', 'Neugierig (zufällig)'], ['hit', 'Leyla getroffen'], ['sleep', 'Schlafen'], ['down', 'Leyla k.o.'], ['scan', 'Scannen (zufällig)'], ['lowHealth', 'Wenig Leben'], ['dash', 'Dash'], ['zen', 'Zen (Leyla macht Yoga)']];
 export const RANKING_CATEGORIES = [['time', 'Durchlaufzeit'], ['kills', 'Kills in %'], ['secrets', 'Secrets']];
 
 const label = (list, v) => list.find(([k]) => k === v)?.[1] ?? v ?? '';
@@ -226,7 +226,7 @@ export const AREAS = {
         num('follow.turnDelay', 'Umdrehen nach', { unit: 'ms', min: 0, hint: 'So lange wartet sie, bevor sie Leylas neuer Richtung folgt' })] },
       { title: 'Stimmungen', fields: [table('moods', 'Stimmungen', [select('mood', 'Anlass', DRONE_MOODS), num('frame', 'Frame', { min: 0 }), text('kaomoji', 'Kaomoji'), num('duration', 'Dauer ms', { min: 0 })],
         { hint: 'Frame zählt ab 0. Ohne Kaomoji nur das Gesicht. Dauer 0 = solange der Anlass gilt' })] },
-      { title: 'Verhalten', fields: [num('idle.boredAfter', 'Langeweile nach', { unit: 's', min: 0, hint: 'Leyla steht still' }), num('idle.sleepAfter', 'Einschlafen nach', { unit: 's', min: 0 }),
+      { title: 'Verhalten', fields: [num('idle.boredAfter', 'Langeweile nach', { unit: 's', min: 0, hint: 'Leyla steht still' }), num('idle.sleepAfter', 'Einschlafen nach', { unit: 's', min: 0 }), num('idle.zenAfter', 'Zen nach', { unit: 's', min: 0, hint: 'So lange hält Leyla die Yoga-Pose, dann macht die Drohne mit' }),
         range('idle.randomEvery', 'Zufällige Stimmung alle', { unit: 's', hint: 'Neugierig oder Scannen, während Leyla unterwegs ist' }), num('alertRange', 'Gegner bemerken ab', { unit: 'px', min: 0 }),
         num('lowHealth', 'Wenig Leben unter', { unit: '%', min: 0, max: 100 })] },
       { title: 'Im Camp frei fliegen', fields: [bool('roam.enabled', 'Frei fliegen', { hint: 'Daniel: im Camp fliegt die Drohne frei herum statt Leyla zu folgen' }), range('roam.every', 'Neues Ziel alle', { unit: 's' }),

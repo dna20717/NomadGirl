@@ -18,9 +18,10 @@
   {"mood": "down", "frame": 8, "kaomoji": "(×_×)", "duration": 0},
   {"mood": "scan", "frame": 9, "duration": 1600},
   {"mood": "lowHealth", "frame": 10, "kaomoji": "(;´Д`)", "duration": 0},
-  {"mood": "dash", "frame": 11, "duration": 350}
+  {"mood": "dash", "frame": 11, "duration": 350},
+  {"mood": "zen", "frame": 7, "kaomoji": "(￣人￣)", "duration": 0}
  ],
- "idle": {"boredAfter": 6, "sleepAfter": 14, "randomEvery": [8, 16]},
+ "idle": {"boredAfter": 6, "sleepAfter": 14, "randomEvery": [8, 16], "zenAfter": 2},
  "alertRange": 700,
  "lowHealth": 30,
  "bubble": {"show": true, "size": 30, "color": "#7ff6ff", "background": "#140c1c"},
