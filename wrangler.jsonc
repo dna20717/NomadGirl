@@ -18,6 +18,6 @@
     "BRANCH": "main",
     "DATA_DIR": "projects/nomadgirl",
     "TEAM_DOMAIN": "https://lively-voice-a1ce.cloudflareaccess.com",
-    "POLICY_AUD": ""
+    "POLICY_AUD": "c2ef04d27d264d7eb23b44c4acac38665526833e8d487e69c4a06dd8702d7e3c"
   }
 }
