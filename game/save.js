@@ -3,7 +3,9 @@
 // without the worker (local, tests) in this browser (localStorage). Shape:
 //   { version, day, hour, location, fuel, food, deltas, health, buffs: [id], rig: { tractor, units: [{ kind, id, workshops: [{ id, at }] }], spare: { workshops: [id], containers: [id] } } (game/rig.js),
 //     companions: [id], recipes: [id] (recipe book), run: null | { poi, room, location }, log: [text],
-//     inv: { backpack: id, slots: { melee, ranged, cyberdeck }, grids: { backpack, chest, 'store:<unit>:<place>': grid } } }   (grids: game/inventory.js)
+//     inv: { backpack: id, slots: { melee, ranged, cyberdeck }, grids: { backpack, chest, 'store:<unit>:<place>': grid, 'rig:<unit>': grid } } }   (grids: game/inventory.js)
+//   rig.parts = { engine: [id|null], armor: [...], weapon: [...], roof: [...] }: rig parts in the tractor's slots (Inventar › Van)
+//   'rig:<unit>' = the own storage of the tractor (Kofferraum, plus rows from a Dachbox) or of a trailer (Deichselkasten)
 // Times are hours (18.5 = 18:30). "Ereignis-Zeit": the clock only moves on actions (sleeping, runs, sitting at the fire).
 
 import { newGrid, add, fits } from './inventory.js';
@@ -36,6 +38,13 @@ export function containers(D, save) {
   const out = [];
   const K = D.camp?.chest;
   if (K?.enabled !== false && K?.grid) out.push({ key: 'chest', name: 'Kiste', size: K.grid });
+  save.rig.units.forEach((u, ui) => {
+    const def = u.kind === 'tractor' ? D.tractors?.[u.id] : D.containers?.[u.id], S = def?.storage;
+    if (!S?.[0] || !S?.[1]) return;
+    const rows = u.kind === 'tractor' ? Object.values(save.rig.parts || {}).flat().reduce((n, id) => n + (D.rigParts?.[id]?.storageRows || 0), 0) : 0;
+    const own = def.storageName || (u.kind === 'tractor' ? 'Kofferraum' : 'Deichselkasten');
+    out.push({ key: `rig:${ui}`, name: u.kind === 'tractor' ? own : `${own} · ${def.name || u.id}`, size: [S[0], S[1] + rows], unit: ui });
+  });
   save.rig.units.forEach((u, ui) => u.workshops.forEach(w => {
     const g = D.workshops?.[w.id]?.grid;
     if (g) out.push({ key: `store:${ui}:${w.at}`, name: D.workshops[w.id].name || w.id, size: g, workshop: w.id });
@@ -79,7 +88,7 @@ export function newSave(D) {
     fuel: S.fuel ?? 40, food: S.food ?? 6, deltas: S.deltas ?? D.economy?.startDeltas ?? 0,
     health: D.leyla?.health ?? 100,
     buffs: [],
-    rig: { tractor: S.tractor, units, spare: { workshops: [], containers: [] } },
+    rig: { tractor: S.tractor, units, spare: { workshops: [], containers: [] }, parts: {} },
     companions: [...(S.companions || [])],
     recipes: startRecipes(D),
     run: null,
@@ -113,6 +122,7 @@ export function repairSave(save, D) {
   for (const u of s.rig.units) u.workshops = (u.workshops || []).filter(w => D.workshops?.[w.id]);
   const sp = s.rig.spare || {};
   s.rig.spare = { workshops: (sp.workshops || []).filter(w => D.workshops?.[w]), containers: (sp.containers || []).filter(c => D.containers?.[c]) };
+  s.rig.parts = Object.fromEntries(Object.entries(s.rig.parts || {}).map(([k, l]) => [k, (l || []).map(id => D.rigParts?.[id]?.slot === k ? id : null)]));
   s.buffs = (s.buffs || []).filter(b => D.buffs?.[b]);
   s.companions = (s.companions || []).filter(c => D.companions?.[c]);
   if (s.run && !D.pois?.[s.run.poi]) s.run = null;

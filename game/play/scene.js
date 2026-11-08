@@ -225,6 +225,8 @@ export class PlayScene extends Phaser.Scene {
       equipChanged: slot => { const sc = hud.scene; if (slot === 'ranged') sc.leyla.loadWeapon(); },
       throwDown: e => hud.scene.loot ? hud.scene.loot.throwDown(e) : null,
       use: id => hud.scene.useThing(id),
+      inCamp: () => hud.scene.mode === 'camp',
+      rigChanged: () => hud.scene.camp?.drawRig(),
       notify: text => hud.scene.fx.text(hud.scene.leyla.x, hud.scene.leyla.feet - hud.scene.leyla.height - 30, text, { color: '#ffd27a', size: 34, rise: 40, life: 1100 }),
     });
     hud.inv.close();

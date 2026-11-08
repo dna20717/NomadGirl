@@ -263,6 +263,9 @@ export class Camp {
     const vanWs = geo.tractor?.workshops || [];
     this.hotspots.push({ x: geo.doorX, w: 110, name: D.tractors?.[geo.tractor?.id]?.name || 'Van', hint: vanWs.length ? 'Einsteigen' : 'Van',
       act: () => this.vanMenu(vanWs) });
+    // the van's own storage (Kofferraum): E at the rear door
+    const T0 = D.tractors?.[geo.tractor?.id] || {};
+    if (T0.storage?.[0]) this.storeHotspot('rig:0', geo.vanLeft + (geo.vanRight - geo.vanLeft) * (C.rig?.trunkAt ?? 12) / 100, T0.storageName || 'Kofferraum', false);
     // earth below the bottom of the world: visible when the camera zooms out to build
     scene.add.rectangle(-4000, geo.H * T, geo.W * T + 8000, 4000, col(C.ground?.color || '#4a3628')).setOrigin(0).setDepth(-9);
     scene.add.rectangle(-4000, geo.floor * T, 4000, geo.H * T, col(C.ground?.color || '#4a3628')).setOrigin(0).setDepth(-9);
@@ -319,12 +322,28 @@ export class Camp {
     if (s.textures.exists(key)) s.textures.remove(key);
     g.generateTexture(key, Math.ceil(u.x1 - u.x0), Math.ceil(h + 44)); g.destroy();
     add(s.add.image(u.x0 - mid, u.inTop - 40 - this.ground, key).setOrigin(0));
+    // Deichselkasten: a little steel box on the drawbar (code), E opens the trailer's own storage
+    if (u.def.storage?.[0]) {
+      const k = (this.C.rig?.boxAt ?? 55) / 100, b0 = u.in0 + (u.body || 0) + 12, bx = u.sprite ? u.x1 - 40 : b0 + (u.x1 - 10 - b0) * k;
+      const by = u.sprite ? this.ground - 40 : u.floorY + (this.ground - 40 - u.floorY) * k, bw = 44, bh = 26;
+      const bg = s.add.graphics();
+      bg.fillStyle(0x1b1d22).fillRect(bx - bw / 2 - 2, by - bh - 4, bw + 4, bh + 4).fillStyle(0x5a616b).fillRect(bx - bw / 2, by - bh - 2, bw, bh)
+        .fillStyle(0x8b949e).fillRect(bx - bw / 2, by - bh - 2, bw, 4).fillStyle(0x2b2f36).fillRect(bx - 5, by - bh + 8, 10, 5)
+        .fillStyle(0xd9a441).fillRect(bx - bw / 2 + 4, by - 8, bw - 8, 2);
+      bg.x = -mid; bg.y = -this.ground; add(bg);
+      this.storeHotspot(`rig:${u.ui}`, bx, u.def.storageName || 'Deichselkasten');
+    }
     // the interior floor carries Leyla (jump in), workshops are used with E from the ground or from inside
     const z = s.add.zone(u.in0 + u.cell * u.places / 2, u.floorY + 8, u.cell * u.places, 16);
     s.platforms.add(z);
     Object.assign(z.body.checkCollision, { down: false, left: false, right: false });
     this.rigObjs.push(z);
     return view;
+  }
+  // a small storage of its own (Kofferraum, Deichselkasten): E opens and closes it
+  storeHotspot(key, x, name, rig = true) {
+    const inv = () => this.scene.hud.inv, isOpen = () => inv()?.isOpen && inv().other?.key === key;
+    this.hotspots.push({ rig, x, w: 50, name, hint: () => isOpen() ? 'Schließen' : 'Öffnen', store: key, act: () => { if (isOpen()) inv().close(); else this.scene.openContainer(key); } });
   }
   workshopHotspot(u, w, def, cx, cw, labelY) {
     const R = this.C.rig || {};

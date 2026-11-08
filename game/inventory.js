@@ -3,11 +3,11 @@
 // are all the same kind of grid. The interface is game/play/inventory_ui.js.
 //
 // grid  = { w, h, items: [entry] }
-// entry = { a, id, n, x, y, r }   a = area of the thing ('items' | 'weapons' | 'backpacks'), n = count, x/y = top left cell, r = quarter turns (0–3)
+// entry = { a, id, n, x, y, r }   a = area of the thing ('items' | 'weapons' | 'backpacks' | 'rigParts'), n = count, x/y = top left cell, r = quarter turns (0–3)
 // Shapes: items may have a "shape" (rows of text, # = taken, . = free), otherwise a full rectangle of "size" [w, h].
-// Weapons use their "size", backpacks their "bag" footprint (default 2 × 3).
+// Weapons and rig parts (V8, Bleche, Dachbox: big things for the tractor's slots) use their "size", backpacks their "bag" footprint (default 2 × 3).
 
-export const AREAS_WITH_THINGS = ['items', 'weapons', 'backpacks'];
+export const AREAS_WITH_THINGS = ['items', 'weapons', 'backpacks', 'rigParts'];
 
 export function thing(D, a, id) { return D[a]?.[id] || null; }
 
@@ -136,4 +136,12 @@ export function rollLoot(D, tableId, rnd = Math.random) {
 }
 
 // value of a grid in Δ (shown in the interface)
+// would the grid's contents survive a new size w × h (nothing lost)? (the Dachbox comes off, the Kofferraum shrinks)
+export function canResize(D, grid, w, h) {
+  const g = newGrid(w, h), total = grid.items.reduce((n, e) => n + e.n, 0);
+  let kept = 0;
+  for (const e of grid.items) if (fits(D, g, e, e.x, e.y)) { g.items.push({ ...e }); kept += e.n; }
+  for (const e of grid.items) if (!g.items.some(x => x.x === e.x && x.y === e.y && x.id === e.id)) kept += e.n - add(D, g, e.a, e.id, e.n);
+  return kept === total;
+}
 export function worth(D, grid) { return grid.items.reduce((s, e) => s + (thing(D, e.a, e.id)?.value || 0) * e.n, 0); }

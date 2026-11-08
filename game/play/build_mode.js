@@ -9,7 +9,7 @@
 // Logic in game/rig.js (act, snapshot/restore), drawing in game/play/camp.js (drawRig, drawYard), values in "Rig-Bau".
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
-import { budgets, act, snapshot, restore, lift, place, fits, at as wsAt, toSpare, fromSpare, stow, buyWorkshop, sellWorkshop, buyContainer, sellContainer, attachAt, detach, moveContainer, shop, priceOf, sellPrice, wsDef, placesOf } from '../rig.js';
+import { budgets, act, snapshot, restore, lift, place, fits, at as wsAt, toSpare, fromSpare, stow, buyWorkshop, sellWorkshop, buyContainer, sellContainer, buyPart, SLOT_NAMES as PART_SLOTS, attachAt, detach, moveContainer, shop, priceOf, sellPrice, wsDef, placesOf } from '../rig.js';
 import { clockText } from '../save.js';
 import { workshopTexture } from './camp.js';
 import { makeSfx } from './sfx.js';
@@ -122,14 +122,17 @@ export class BuildMode {
     const D = this.D, S = shop(D), save = this.save;
     const row = (area, id) => {
       const x = D[area][id], price = priceOf(D, area, id), poor = price > save.deltas;
-      const sub = area === 'workshops' ? `${FN_NAMES[x.function] || ''} · ${x.places || 1} ${x.places > 1 ? 'Plätze' : 'Platz'} · ${x.power > 0 ? '+' : ''}${x.power || 0} ⚡` : `${x.places || 1} Plätze · ${de(x.weight || 0)} kg`;
-      return el('div', { class: 'build-row', title: x.description || '' }, area === 'workshops' ? el('span', { class: 'build-dot', style: `--col:${FN_COLORS[x.function] || '#555'}` }) : icon('box', 16),
+      const sub = area === 'workshops' ? `${FN_NAMES[x.function] || ''} · ${x.places || 1} ${x.places > 1 ? 'Plätze' : 'Platz'} · ${x.power > 0 ? '+' : ''}${x.power || 0} ⚡`
+        : area === 'rigParts' ? [PART_SLOTS[x.slot] || x.slot, x.pull ? `+${de(x.pull)} kg` : null, x.armor ? `+${x.armor} Panzerung` : null, x.damage ? `${x.damage} Schaden` : null, x.storageRows ? `+${x.storageRows} Reihen Stauraum` : null].filter(Boolean).join(' · ')
+        : `${x.places || 1} Plätze · ${de(x.weight || 0)} kg`;
+      return el('div', { class: 'build-row', title: x.description || '' }, area === 'workshops' ? el('span', { class: 'build-dot', style: `--col:${FN_COLORS[x.function] || '#555'}` }) : icon(area === 'rigParts' ? 'settings' : 'box', 16),
         el('span', {}, el('b', {}, x.name || id), el('small', {}, sub)),
-        el('button', { class: 'inv-btn', disabled: poor, title: poor ? 'Zu wenig Δ' : 'Wird auf den Händler-Platz geliefert', onclick: () => this.buy(area, id) }, `${de(price)} Δ`));
+        el('button', { class: 'inv-btn', disabled: poor, title: poor ? 'Zu wenig Δ' : area === 'rigParts' ? 'Landet im Kofferraum (sonst Kiste, Lager, Rucksack); einbauen im Inventar unter „Van“' : 'Wird auf den Händler-Platz geliefert', onclick: () => this.buy(area, id) }, `${de(price)} Δ`));
     };
     return el('section', { class: 'inv-panel bm-shop' },
       el('header', {}, icon('shop', 16), el('b', {}, D.camp?.yard?.dealerName || 'Händler'), el('small', {}, 'liefert auf den Händler-Platz'), el('button', { class: 'craft-x', onclick: () => { this.shopOpen = false; this.draw(); } }, '×')),
-      el('div', { class: 'build-list' }, el('h3', {}, 'Werkstätten'), ...S.workshops.map(id => row('workshops', id)), el('h3', {}, 'Anhänger'), ...S.containers.map(id => row('containers', id))));
+      el('div', { class: 'build-list' }, el('h3', {}, 'Werkstätten'), ...S.workshops.map(id => row('workshops', id)), el('h3', {}, 'Anhänger'), ...S.containers.map(id => row('containers', id)),
+        S.rigParts.length ? el('h3', {}, 'Rig-Teile') : null, ...S.rigParts.map(id => row('rigParts', id))));
   }
 
   // ---------- where things are (world coordinates) ----------
@@ -337,8 +340,9 @@ export class BuildMode {
   }
   buy(area, id) {
     const D = this.D, save = this.save, before = snapshot(save), name = D[area]?.[id]?.name || id;
-    const r = act(D, save, dd => area === 'workshops' ? buyWorkshop(D, dd, id) : buyContainer(D, dd, id));
+    const r = act(D, save, dd => area === 'workshops' ? buyWorkshop(D, dd, id) : area === 'rigParts' ? buyPart(D, dd, id, save) : buyContainer(D, dd, id));
     if (!r.ok) return this.say(r.reason);
+    if (area === 'rigParts') return this.done(r, before, `${name} gekauft → ${r.where || 'Kofferraum'}`, { x: this.camp.geo.vanLeft + 40, y: this.camp.ground - 60 }, 'part', { weight: 0.6 });
     this.done(r, before, `${name} gekauft`, { x: this.camp.dealer?.x ?? this.scene.leyla.x, y: this.camp.ground }, 'delivered', { kind: area === 'workshops' ? 'ws' : 'container' });
   }
   // after an action: redraw, klonk, dust, springs, Leyla gets a job, undo remembers it

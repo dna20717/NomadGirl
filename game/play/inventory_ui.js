@@ -6,23 +6,27 @@
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot } from '../inventory.js';
+import { partSlots, installPart, removePart, budgets, SLOT_NAMES as PART_SLOT_NAMES } from '../rig.js';
+import { containers as storeList } from '../save.js';
 
 export const CATEGORY_COLORS = {
   junk: '#6b6258', resource: '#5c6b7a', ingredient: '#6b7a3a', food: '#a8642a', component: '#4a6b8a', consumable: '#8a3a5a',
-  valuable: '#a8862a', blueprint: '#7a6a9a', melee: '#8a4a3a', ranged: '#3a6a7a', cyberdeck: '#3a8a6a', backpack: '#7a5a8a',
+  valuable: '#a8862a', blueprint: '#7a6a9a', melee: '#8a4a3a', ranged: '#3a6a7a', cyberdeck: '#3a8a6a', backpack: '#7a5a8a', rigpart: '#8a6a3a',
 };
-const CATEGORY_NAMES = { junk: 'Schrott', resource: 'Ressource', ingredient: 'Zutat', food: 'Gericht', component: 'Bauteil', consumable: 'Verbrauchsgut', valuable: 'Wertsache', blueprint: 'Bauplan', melee: 'Nahkampf', ranged: 'Fernkampf', cyberdeck: 'Cyberdeck', backpack: 'Rucksack' };
+const PART_ICONS = { engine: 'settings', armor: 'armor', weapon: 'target', roof: 'box' };
+const CATEGORY_NAMES = { junk: 'Schrott', resource: 'Ressource', ingredient: 'Zutat', food: 'Gericht', component: 'Bauteil', consumable: 'Verbrauchsgut', valuable: 'Wertsache', blueprint: 'Bauplan', melee: 'Nahkampf', ranged: 'Fernkampf', cyberdeck: 'Cyberdeck', backpack: 'Rucksack', rigpart: 'Rig-Teil' };
 const SLOT_NAMES = { melee: 'Nahkampf', ranged: 'Fernkampf', cyberdeck: 'Cyberdeck', backpack: 'Rucksack' };
 const SLOT_ICONS = { melee: 'weapon', ranged: 'target', cyberdeck: 'brain', backpack: 'bags' };
 
 export function kindOf(D, a, id) {
   const t = thing(D, a, id) || {};
-  return a === 'weapons' ? t.kind || 'melee' : a === 'backpacks' ? 'backpack' : t.category || 'junk';
+  return a === 'weapons' ? t.kind || 'melee' : a === 'backpacks' ? 'backpack' : a === 'rigParts' ? 'rigpart' : t.category || 'junk';
 }
 export const glyphOf = (D, a, id) => { const t = thing(D, a, id) || {}; return t.glyph || (t.name || id).replace(/[^A-Za-zÄÖÜäöü]/g, '').slice(0, 2).toUpperCase(); };
 
 export class InventoryUI {
-  // host: { D, save(), changed(), equipChanged(slot), floor()?, notify(text) }
+  // host: { D, save(), changed(), equipChanged(slot), floor()?, notify(text), inCamp()?, rigChanged()? }
+  // Tabs over the left panel (camp only): "Leyla" (slots + backpack) and the tractor ("Van": rig part slots + Kofferraum).
   constructor(root, host) {
     this.root = root; this.host = host;
     this.el = el('div', { class: 'inv', hidden: true, oncontextmenu: e => e.preventDefault() });
@@ -42,7 +46,10 @@ export class InventoryUI {
   get isOpen() { return !this.el.hidden; }
   get cell() { return this.D.leyla?.inventory?.cell ?? 44; }
 
-  open(other = null) { this.other = other; this.el.hidden = false; this.draw(); }
+  open(other = null, { tab } = {}) { this.other = other; if (tab) this.tab = tab; this.el.hidden = false; this.draw(); }
+  get vanTab() { return this.tab === 'van' && !!this.host.inCamp?.() && !!this.vanStore(); }
+  vanStore() { return storeList(this.D, this.host.save()).find(c => c.unit === 0) || null; }
+  setTab(t) { this.tab = t; this.draw(); }
   close() { if (this.held) this.putBack(); this.el.hidden = true; this.tip.hidden = true; this.other = null; }
   toggle(other = null) { if (this.isOpen && (!other || other.key === this.other?.key)) this.close(); else this.open(other); }
   grid(key) { return key === this.other?.key ? this.other.grid : this.inv.grids[key]; }
@@ -50,14 +57,23 @@ export class InventoryUI {
   // ---------- drawing ----------
   draw() {
     if (!this.isOpen) return;
-    const D = this.D, inv = this.inv, bp = D.backpacks?.[inv.backpack];
-    const left = el('section', { class: 'inv-panel' },
+    const D = this.D, inv = this.inv, bp = D.backpacks?.[inv.backpack], van = this.vanTab, vs = this.vanStore();
+    const tabs = this.host.inCamp?.() && vs ? el('div', { class: 'inv-tabs' },
+      el('button', { class: 'inv-tab' + (van ? '' : ' on'), onclick: () => this.setTab('leyla') }, icon('person', 14), 'Leyla'),
+      el('button', { class: 'inv-tab' + (van ? ' on' : ''), onclick: () => this.setTab('van') }, icon('vehicle', 14), D.tractors?.[this.host.save().rig.tractor]?.name || 'Van')) : null;
+    const leyla = () => el('section', { class: 'inv-panel' },
       el('header', {}, icon('bags', 16), el('b', {}, bp?.name || 'Rucksack'), el('small', {}, `${worth(D, inv.grids.backpack)} Δ`)),
       el('div', { class: 'inv-slots' }, ...['melee', 'ranged', 'cyberdeck', 'backpack'].map(s => this.slotEl(s)), this.useEl()),
       this.gridEl('backpack', inv.grids.backpack));
+    const left = van ? this.vanEl(vs) : leyla();
+    if (tabs) left.prepend(tabs);
     const parts = [left];
-    if (this.other) {
+    // the two grids on screen (double click moves between them)
+    this.pair = [van ? vs.key : 'backpack'];
+    if (van && (!this.other || this.other.key === vs.key)) { parts.push(leyla()); this.pair.push('backpack'); }
+    else if (this.other) {
       const o = this.other;
+      this.pair.push(o.key);
       parts.push(el('section', { class: 'inv-panel' + (o.kind === 'floor' ? ' floor' : '') },
         el('header', {}, icon(o.kind === 'floor' ? 'down' : 'box', 16), el('b', {}, o.title), el('small', {}, `${worth(D, o.grid)} Δ`)),
         this.gridEl(o.key, o.grid),
@@ -67,7 +83,7 @@ export class InventoryUI {
           el('div', { class: 'inv-actions' }, el('button', { class: 'inv-btn', onclick: () => this.takeAll() }, 'Alles aufheben'))));
     }
     this.el.replaceChildren(el('div', { class: 'inv-row' }, ...parts),
-      el('p', { class: 'inv-help' }, 'Klicken: nehmen und ablegen · Rechtsklick, Strg+Klick oder Mausrad: drehen · Doppelklick: auf die andere Seite · daneben klicken: auf den Boden werfen · I oder Tab: schließen'));
+      el('p', { class: 'inv-help' }, this.vanTab ? 'Rig-Teil auf einen Slot legen: einbauen · Slot anklicken: ausbauen · Rig-Teile kauft man beim Händler (B), sie landen im Kofferraum · I oder Tab: schließen' : 'Klicken: nehmen und ablegen · Rechtsklick, Strg+Klick oder Mausrad: drehen · Doppelklick: auf die andere Seite · daneben klicken: auf den Boden werfen · I oder Tab: schließen'));
     this.drawGhost();
   }
 
@@ -135,9 +151,52 @@ export class InventoryUI {
     return s;
   }
 
+  // the tractor like a paper doll: its slots for rig parts (V8, Bleche, Dachbox …), what they add up to, the Kofferraum
+  vanEl(vs) {
+    const D = this.D, save = this.host.save(), T = D.tractors?.[save.rig.tractor] || {}, b = budgets(D, save.rig), g = this.inv.grids[vs.key];
+    const facts = [`${b.pull.toLocaleString('de-DE')} kg Zugkraft`, `${b.fuel} l/100 km`, b.armor ? `${b.armor} Panzerung` : null, b.damage ? `${b.damage} Schaden` : null].filter(Boolean);
+    return el('section', { class: 'inv-panel van' },
+      el('header', {}, icon('vehicle', 16), el('b', {}, T.name || 'Van'), el('small', {}, `${worth(D, g)} Δ`)),
+      el('div', { class: 'inv-slots parts' }, ...partSlots(D, save.rig).map(p => this.partEl(p))),
+      el('p', { class: 'inv-facts' }, facts.join(' · ')),
+      el('div', { class: 'inv-sub' }, icon('box', 14), vs.name),
+      this.gridEl(vs.key, g));
+  }
+  partEl(p) {
+    const D = this.D, t = p.id && D.rigParts?.[p.id], name = PART_SLOT_NAMES[p.slot] || p.slot;
+    const s = el('div', { class: 'inv-slot part' + (t ? ' full' : ''), title: name, 'data-part': `${p.slot}:${p.i}`, style: t ? `--col:${CATEGORY_COLORS.rigpart}` : '' },
+      el('small', {}, name), t ? el('b', {}, glyphOf(D, 'rigParts', p.id)) : icon(PART_ICONS[p.slot] || 'box', 18), t ? el('span', {}, t.name) : null);
+    s.addEventListener('mousedown', ev => { ev.stopPropagation(); if (ev.button === 0) this.partClick(p); });
+    if (t) { s.addEventListener('mouseenter', () => this.showTip({ a: 'rigParts', id: p.id, n: 1 })); s.addEventListener('mouseleave', () => { this.tip.hidden = true; }); }
+    return s;
+  }
+  // held rig part onto a slot = build it in (the old one comes into the hand); click on a full slot = take it out
+  partClick(p, quiet = false) {
+    const D = this.D, save = this.host.save(), h = this.held, say = t => { if (!quiet) this.host.notify?.(t); return false; };
+    if (h) {
+      if (h.e.a !== 'rigParts') return say(`Hier gehört ein Rig-Teil (${PART_SLOT_NAMES[p.slot]}) hin`);
+      const r = installPart(D, save, p.slot, p.i, h.e.id);
+      if (!r.ok) return say(r.reason);
+      this.held = r.prev ? { e: { a: 'rigParts', id: r.prev, n: 1, r: 0 }, from: `part:${p.slot}:${p.i}` } : null;
+      if (!quiet) this.host.notify?.(`${D.rigParts[h.e.id]?.name || h.e.id} eingebaut`);
+      this.host.rigChanged?.();
+      this.changed();
+      return true;
+    }
+    if (!p.id) return say(`Zieh ein Rig-Teil (${PART_SLOT_NAMES[p.slot]}) hierher`);
+    const r = removePart(D, save, p.slot, p.i);
+    if (!r.ok) return say(r.reason);
+    this.held = { e: { a: 'rigParts', id: r.prev, n: 1, r: 0 }, from: `part:${p.slot}:${p.i}` };
+    this.host.rigChanged?.();
+    this.changed();
+    return true;
+  }
+
   showTip(e) {
     const D = this.D, t = thing(D, e.a, e.id) || {}, k = kindOf(D, e.a, e.id);
-    const facts = [CATEGORY_NAMES[k], e.a === 'weapons' && t.damage != null ? `${t.damage} Schaden` : null, e.a === 'backpacks' && t.size ? `Raster ${t.size.join(' × ')}` : null,
+    const facts = [CATEGORY_NAMES[k], e.a === 'rigParts' ? `Slot: ${PART_SLOT_NAMES[t.slot] || t.slot}` : null, e.a === 'rigParts' && t.pull ? `+${t.pull} kg Zugkraft` : null,
+      e.a === 'rigParts' && t.armor ? `+${t.armor} Panzerung` : null, e.a === 'rigParts' && t.storageRows ? `+${t.storageRows} Reihen Stauraum` : null,
+      (e.a === 'weapons' || e.a === 'rigParts') && t.damage ? `${t.damage} Schaden` : null, e.a === 'backpacks' && t.size ? `Raster ${t.size.join(' × ')}` : null,
       stackMax(D, e.a, e.id) > 1 ? `Stapel ${e.n}/${stackMax(D, e.a, e.id)}` : null, `${(t.value || 0) * e.n} Δ`, t.buff ? `Buff: ${D.buffs?.[t.buff]?.name || t.buff}` : null].filter(Boolean);
     this.tip.replaceChildren(el('b', {}, t.name || e.id), el('small', {}, facts.join(' · ')), t.description ? el('p', {}, t.description) : null);
     this.tip.hidden = false;
@@ -195,7 +254,13 @@ export class InventoryUI {
     if (!h) return;
     this.held = null;
     if (['melee', 'ranged', 'cyberdeck', 'backpack'].includes(h.from) && this.equip(h.from, h.e, true)) return this.changed();
-    for (const key of [h.from, 'backpack', this.other?.key]) {
+    if (h.from?.startsWith('part:')) {
+      const [, slot, i] = h.from.split(':');
+      this.held = h;
+      if (this.partClick({ slot, i: +i, id: this.host.save().rig.parts?.[slot]?.[+i] || null }, true) && !this.held) return;
+      this.held = null;
+    }
+    for (const key of [h.from, 'backpack', ...(this.pair || []), this.other?.key]) {
       const g = key && this.grid(key);
       if (g && add(this.D, g, h.e.a, h.e.id, h.e.n) === 0) return this.changed(key);
     }
@@ -210,8 +275,9 @@ export class InventoryUI {
     this.held = null;
     this.changed('floor');
   }
+  otherSide(key) { return (this.pair || []).find(k => k !== key) || (key === 'backpack' ? this.other?.key : 'backpack'); }
   quickMove(key, e) {
-    const to = key === 'backpack' ? this.other?.key : 'backpack', g = this.grid(key), dst = to && this.grid(to);
+    const to = this.otherSide(key), g = this.grid(key), dst = to && this.grid(to);
     if (!dst) return;
     const left = add(this.D, dst, e.a, e.id, e.n);
     if (left === e.n) return this.host.notify?.('Kein Platz');
@@ -219,7 +285,7 @@ export class InventoryUI {
     this.changed(to);
   }
   quickMoveHeld(key) {
-    const h = this.held, to = key === 'backpack' ? this.other?.key : 'backpack', dst = to && this.grid(to);
+    const h = this.held, to = this.otherSide(key), dst = to && this.grid(to);
     if (!dst) return;
     const left = add(this.D, dst, h.e.a, h.e.id, h.e.n);
     if (left === h.e.n) return this.host.notify?.('Kein Platz');
@@ -272,6 +338,6 @@ export class InventoryUI {
   // for tests and Ava: the open state
   state() {
     const g = x => x && { w: x.w, h: x.h, items: x.items.map(e => `${e.id}×${e.n}@${e.x},${e.y}${e.r ? ' r' + e.r : ''}`) };
-    return { open: this.isOpen, other: this.other && { key: this.other.key, title: this.other.title, grid: g(this.other.grid) }, backpack: g(this.inv.grids.backpack), slots: { ...this.inv.slots, backpack: this.inv.backpack }, held: this.held && `${this.held.e.id}×${this.held.e.n}` };
+    return { open: this.isOpen, tab: this.vanTab ? 'van' : 'leyla', pair: this.pair, parts: this.host.save().rig.parts, other: this.other && { key: this.other.key, title: this.other.title, grid: g(this.other.grid) }, backpack: g(this.inv.grids.backpack), slots: { ...this.inv.slots, backpack: this.inv.backpack }, held: this.held && `${this.held.e.id}×${this.held.e.n}` };
   }
 }

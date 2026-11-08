@@ -40,7 +40,7 @@ export const BUFF_DURATIONS = [['instant', 'Sofort'], ['run', 'Nächster Run'], 
 export const DISCOVERY = [['experiment', 'Experimentieren'], ['found', 'Fund im POI'], ['companion', 'Tipp von Companion'], ['shop', 'Bei NPCs kaufen'], ['start', 'Von Anfang an']];
 export const CONTAINER_KINDS = [['shipping', 'Hochseecontainer'], ['crate', 'Holzkiste'], ['trailer', 'Wohnwagenteil'], ['tank', 'Tank']];
 export const WORKSHOP_FUNCTIONS = [['storage', 'Lager'], ['cooling', 'Kühlung'], ['cell', 'Zelle'], ['sleep', 'Schlafen'], ['chill', 'Chillen'], ['drone', 'Drohnen'], ['warroom', 'Planung'], ['kitchen', 'Kochen'], ['foodtruck', 'Verkauf'], ['craft', 'Herstellen'], ['engine', 'Motor'], ['power', 'Energie']];
-export const RIG_SLOTS = [['engine', 'Motor'], ['armor', 'Panzerung'], ['weapon', 'Waffe']];
+export const RIG_SLOTS = [['engine', 'Motor'], ['armor', 'Panzerung'], ['weapon', 'Waffe'], ['roof', 'Dach']];
 export const POI_KINDS = [['gasStation', 'Tankstelle'], ['settlement', 'Siedlung'], ['factory', 'Fabrik'], ['bunker', 'Bunker'], ['government', 'Regierungskomplex'], ['mall', 'Einkaufszentrum'], ['ruin', 'Ruine']];
 export const POI_SIZES = [['S', 'S'], ['M', 'M'], ['L', 'L'], ['XL', 'XL']];
 export const ROOM_TAGS = [['start', 'Eingang'], ['exit', 'Ausgang'], ['combat', 'Kampf'], ['loot', 'Beute'], ['secret', 'Geheimnis'], ['npc', 'NPCs'], ['boss', 'Boss'], ['corridor', 'Gang']];
@@ -418,7 +418,10 @@ export const AREAS = {
         num('power', 'Lichtmaschine', { unit: '⚡', min: 0, hint: 'Energie für Werkstätten ohne Generator' })] },
       { title: 'Payload', fields: [num('places', 'Werkstatt-Plätze im Fahrzeug', { min: 0, max: 3, hint: 'Eigene Plätze wie ein kleiner Container (Van: Schlafkoje + Warroom). Im Camp per E an der Tür' }),
         num('length', 'Plätze hintereinander', { min: 0 }), num('stack', 'Stapelhöhe', { min: 1 })] },
-      { title: 'Slots', fields: [num('slots.engine', 'Motor', { min: 0 }), num('slots.armor', 'Panzerung', { min: 0 }), num('slots.weapon', 'Waffen', { min: 0 })] },
+      { title: 'Stauraum', fields: [size('storage', 'Eigener Stauraum', { unit: 'Felder', hint: 'Kleines Inventar im Fahrzeug selbst (Van: Kofferraum), auch ohne Anhänger. Im Camp per E an der Hecktür. Leer = keiner' }),
+        text('storageName', 'Name', { hint: 'z. B. Kofferraum' })] },
+      { title: 'Slots', fields: [num('slots.engine', 'Motor', { min: 0 }), num('slots.armor', 'Panzerung', { min: 0 }), num('slots.weapon', 'Waffen', { min: 0 }),
+        num('slots.roof', 'Dach', { min: 0, hint: 'Für Dachbox und Ähnliches' })] },
     ],
   },
   containers: {
@@ -428,6 +431,8 @@ export const AREAS = {
     row: x => `${label(CONTAINER_KINDS, x.kind)} · ${x.places ?? 0} ${x.places === 1 ? 'Platz' : 'Plätze'} · ${x.weight ?? 0} kg`,
     sections: [{ title: 'Container', fields: [NAME, LOOK, select('kind', 'Art', CONTAINER_KINDS), num('places', 'Werkstatt-Plätze', { min: 1, max: 3 }),
       num('weight', 'Gewicht', { unit: 'kg', min: 0 }), bool('stackable', 'Stapelbar'), VALUE, DESCRIPTION] },
+      { title: 'Stauraum', fields: [size('storage', 'Eigener Stauraum', { unit: 'Felder', hint: 'Kleines Inventar am Anhänger selbst (Deichselkasten), unabhängig von den Werkstätten. Im Camp per E an der Deichsel. Abhängen und Verkaufen nur, wenn er leer ist. Leer = keiner' }),
+        text('storageName', 'Name', { hint: 'z. B. Deichselkasten' })] },
       { title: 'Innenraum im Camp', fields: [range('inside.x', 'Innenraum von – bis', { unit: 'Bildpixel', hint: 'Waagrecht im Bild des Aussehens (ungespiegelt). Die Werkstätten teilen sich diese Breite' }),
         range('inside.y', 'Innenraum oben – Boden', { unit: 'Bildpixel', hint: 'Der Boden ist eine Plattform: Leyla kann hineinspringen' }), bool('flip', 'Gespiegelt', { hint: 'Zusätzlich zu „Schaut nach links“ des Assets' })] }],
   },
@@ -444,11 +449,12 @@ export const AREAS = {
   },
   rigParts: {
     name: 'Rig-Teile', singular: 'Rig-Teil', icon: 'anvil', file: 'data/rig_parts.json', kind: 'catalog', groupBy: { key: 'slot', options: RIG_SLOTS },
-    hint: 'Motoren, Panzerung und Waffen für die Slots der Zugmaschine.',
-    template: { name: 'Neues Rig-Teil', slot: 'engine', pull: 0, armor: 0, damage: 0, fuelUse: 0, value: 200 },
-    row: x => label(RIG_SLOTS, x.slot),
+    hint: 'Motoren, Panzerung, Waffen und Dachaufbauten für die Slots der Zugmaschine. Rig-Teile sind große Gegenstände: beim Händler kaufen (Rig bauen), sie landen im Kofferraum (sonst Kiste, Lager, Rucksack) und werden im Inventar unter „Van“ in einen Slot gezogen.',
+    template: { name: 'Neues Rig-Teil', slot: 'engine', pull: 0, armor: 0, damage: 0, fuelUse: 0, size: [2, 2], value: 200 },
+    row: x => `${label(RIG_SLOTS, x.slot)} · ${(x.size || [1, 1]).join('×')} · ${x.value ?? 0} Δ`,
     sections: [{ title: 'Rig-Teil', fields: [NAME, LOOK, select('slot', 'Slot', RIG_SLOTS), num('pull', 'Zugkraft +', { unit: 'kg' }), num('armor', 'Panzerung +'), num('damage', 'Schaden'),
-      num('fuelUse', 'Verbrauch ±', { unit: 'l/100 km' }), VALUE, DESCRIPTION] }],
+      num('fuelUse', 'Verbrauch ±', { unit: 'l/100 km' }), num('storageRows', 'Stauraum +', { unit: 'Reihen', min: 0, hint: 'Macht den Stauraum der Zugmaschine um so viele Reihen höher (Dachbox)' }), VALUE, DESCRIPTION] },
+      { title: 'Im Inventar', fields: [size('size', 'Größe', { unit: 'Felder', hint: 'Rechteck im Raster (Kofferraum, Kiste, Lager, Rucksack)' }), text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar: 1–3 Zeichen oder ein Emoji' })] }],
   },
   companions: {
     name: 'Companions', singular: 'Companion', icon: 'humans', file: 'data/companions.json', kind: 'catalog',
@@ -480,6 +486,8 @@ export const AREAS = {
         num('shaft.width', 'Breite', { unit: 'Kacheln', min: 1 }), color('shaft.color', 'Dunkelheit'), color('shaft.glow', 'Glühen von unten', { hint: 'Leer = nichts' }), num('shaft.frameHeight', 'Förderturm', { unit: 'px', min: 0, hint: 'Holzgerüst mit Rolle und Seil über dem Schacht, 0 = keins' })] },
       { title: 'Rig-Ansicht', fields: [num('rig.placeWidth', 'Breite pro Platz', { unit: 'Kacheln', min: 2 }), num('rig.height', 'Raumhöhe', { unit: 'px', min: 200 }), num('rig.gap', 'Abstand zwischen Containern', { unit: 'Kacheln', min: 0, hint: 'Nur für den Platz, den das Rig im Camp freihält; Anhänger aus Code hängen mit der Deichsel aneinander' }),
         num('rig.lift', 'Boden über der Straße', { unit: 'px', min: 20, hint: 'Anhänger aus Code: so hoch steht der Boden auf dem Fahrgestell' }), num('rig.drawbar', 'Deichsel', { unit: 'px', min: 40, hint: 'Anhänger aus Code: Länge der Deichsel bis zur Kupplung' }),
+        num('rig.boxAt', 'Deichselkasten bei', { unit: '%', min: 0, max: 100, hint: 'Wo der Kasten auf der Deichsel sitzt (0 = am Aufbau, 100 = an der Kupplung); E dort öffnet den Stauraum des Anhängers' }),
+        num('rig.trunkAt', 'Kofferraum bei', { unit: '%', min: 0, max: 100, hint: 'E-Punkt für den Stauraum der Zugmaschine, von links über die Breite des Vans' }),
         color('rig.wall', 'Wand'), color('rig.inside', 'Innen'), color('rig.light', 'Licht'), bool('rig.labels', 'Namen anzeigen')] },
       { title: 'Lagerfeuer', fields: [bool('fire.enabled', 'Zeigen'), ref('fire.look', 'Aussehen', 'assets', { hint: 'Animation, Ankerpunkt = Mitte am Boden. Leer = Flammen aus Code' }), num('fire.at', 'Abstand vom Van', { unit: 'Kacheln', min: 1 }),
         num('fire.radius', 'Lichtradius', { unit: 'px', min: 0 }), color('fire.color', 'Lichtfarbe'), num('fire.strength', 'Lichtstärke', { unit: '%', min: 0, max: 200, hint: 'Bei Licht 100 % der Tageszeit' }),
@@ -522,7 +530,8 @@ export const AREAS = {
       { title: 'Kaufen & Verkaufen', fields: [multi('stages', 'Kaufbar', [['mvp', 'MVP'], ['1', 'Stufe 1'], ['2', 'Stufe 2']], { hint: 'Werkstätten dieser Ausbaustufen stehen im Laden' }),
         num('sellFactor', 'Verkaufen bringt', { unit: '% vom Wert', min: 0, max: 100 })] },
       { title: 'Zeit', fields: [num('minutes.move', 'Werkstatt umstellen', { unit: 'min', min: 0 }), num('minutes.buy', 'Kaufen und anliefern', { unit: 'min', min: 0 }),
-        num('minutes.container', 'Container an-/abhängen', { unit: 'min', min: 0, hint: 'Auch beim Umsortieren' })] },
+        num('minutes.container', 'Container an-/abhängen', { unit: 'min', min: 0, hint: 'Auch beim Umsortieren' }),
+        num('minutes.part', 'Rig-Teil ein-/ausbauen', { unit: 'min', min: 0, hint: 'Im Inventar unter „Van“' })] },
       { title: 'Bau-Modus', fields: [num('view.minZoom', 'Kleinster Zoom', { unit: '%', min: 10, max: 100, hint: 'B zoomt so weit raus, dass Schrottplatz, Rig und Van ins Bild passen, aber nicht weiter' }),
         num('view.groundAt', 'Boden auf Höhe', { unit: '% vom Bild', min: 40, max: 95 }), num('view.zoomTime', 'Zoom dauert', { unit: 'ms', min: 0 }),
         num('view.swing', 'Pendeln', { unit: '%', min: 0, max: 300, hint: 'Wie stark ein Teil an der Maus schwingt (schwere Teile schwingen träger)' }),

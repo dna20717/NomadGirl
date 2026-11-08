@@ -7,11 +7,13 @@
   "power": 3,
   "length": 1,
   "stack": 1,
-  "slots": {"engine": 1, "armor": 1, "weapon": 0},
+  "slots": {"engine": 1, "armor": 1, "weapon": 0, "roof": 1},
   "value": 400,
   "description": "Leylas Van: rostig, laut, treu. Schlafkoje und Warroom an Bord, Radarschüssel auf dem Dach.",
   "look": "van",
-  "places": 2
+  "places": 2,
+  "storage": [4, 3],
+  "storageName": "Kofferraum"
  },
  "lkw": {
   "name": "LKW",
@@ -21,8 +23,10 @@
   "power": 4,
   "length": 3,
   "stack": 2,
-  "slots": {"engine": 1, "armor": 2, "weapon": 2},
+  "slots": {"engine": 1, "armor": 2, "weapon": 2, "roof": 1},
   "value": 6000,
-  "description": "Ein echtes Rig. Endlich."
+  "description": "Ein echtes Rig. Endlich.",
+  "storage": [6, 3],
+  "storageName": "Staukasten"
  }
 }

@@ -1,7 +1,7 @@
 {
  "stages": ["mvp", "1"],
  "sellFactor": 50,
- "minutes": {"move": 30, "buy": 60, "container": 90},
+ "minutes": {"move": 30, "buy": 60, "container": 90, "part": 30},
  "rules": {"power": true, "weight": true},
  "view": {"minZoom": 30, "groundAt": 80, "zoomTime": 650, "swing": 100, "snap": 260, "shake": 40, "volume": 50},
  "work": {"seconds": 1.2, "perHour": 0.6}
