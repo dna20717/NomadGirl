@@ -58,5 +58,26 @@
   "time": 30,
   "discovery": ["experiment", "companion"],
   "hint": "Zwei Zellen, etwas Kupfer dazwischen. Nicht ablecken."
+ },
+ "bleche_schweissen": {
+  "name": "Bleche anschweißen",
+  "station": "werkbank",
+  "ingredients": [{"item": "schrottplatte", "count": 3}],
+  "result": "",
+  "count": 1,
+  "time": 90,
+  "discovery": ["start"],
+  "part": "bleche"
+ },
+ "dachbox_bauen": {
+  "name": "Dachbox",
+  "station": "werkbank",
+  "ingredients": [{"item": "schrottplatte", "count": 2},{"item": "stoffreste", "count": 3}],
+  "result": "",
+  "count": 1,
+  "time": 120,
+  "discovery": ["experiment", "companion"],
+  "part": "dachbox",
+  "hint": "Ein Koffer aus Blech und Lumpen. Fürs Dach."
  }
 }

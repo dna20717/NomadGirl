@@ -55,7 +55,7 @@ export class CraftUI {
     const cards = mine.map(r => {
       const miss = missing(D, save, r), st = stock(D, save);
       return el('div', { class: 'craft-recipe' + (miss.length ? ' missing' : '') },
-        el('div', { class: 'craft-rtop' }, this.chip(r.result, r.count || 1, { big: true }), el('b', {}, r.name || D.items?.[r.result]?.name || r.id), el('small', {}, `${r.time ?? 10} min`)),
+        el('div', { class: 'craft-rtop' }, (r.part ? this.partChip(r.part, r.count || 1) : this.chip(r.result, r.count || 1, { big: true })), el('b', {}, r.name || (r.part ? D.rigParts?.[r.part]?.name : D.items?.[r.result]?.name) || r.id), el('small', {}, `${r.time ?? 10} min`)),
         el('div', { class: 'craft-ings' }, ...(r.ingredients || []).map(i => {
           const n = st[i.item] || 0, need = i.count || 1;
           return el('span', { class: 'craft-ing ' + (n >= need ? 'ok' : 'no') }, `${glyphOf(D, 'items', i.item)} ${D.items?.[i.item]?.name || i.item} ${Math.min(n, 99)}/${need}`);
@@ -124,15 +124,16 @@ export class CraftUI {
   make(id) {
     const D = this.D, r = craft(D, this.save, id, this.ws);
     if (!r.ok) return this.say('error', r.reason);
-    this.after(r, 'hit', fill(D.crafting?.texts?.hit || '{name} ist fertig!', `${r.made.n > 1 ? r.made.n + '× ' : ''}${D.items[r.made.id]?.name || r.made.id}`));
+    this.after(r, 'hit', fill(D.crafting?.texts?.hit || '{name} ist fertig!', `${r.made.n > 1 ? r.made.n + '× ' : ''}${this.madeName(r.made)}`) + (r.made.part ? ' · liegt auf dem Schrottplatz, einbauen mit B' : ''));
   }
+  madeName(m) { return (m.part ? this.D.rigParts?.[m.id]?.name : this.D.items?.[m.id]?.name) || m.id; }
   tryPot() {
     const D = this.D, T = D.crafting?.texts || {}, pot = { ...this.pot }, r = experiment(D, this.save, this.ws, pot);
     if (!r.ok) return this.say('error', r.reason);
     this.pot = {};   // tried: the pot is empty again (a hit only used what the recipe needs, the rest is back in the supplies)
     if (r.hit) {
       const name = D.recipes[r.recipe]?.name || r.recipe;
-      this.after(r, r.learnt ? 'learnt' : 'hit', r.learnt ? fill(T.learnt || 'Neues Rezept: {name}', name) : fill(T.hit || '{name} ist fertig!', D.items[r.made.id]?.name || r.made.id));
+      this.after(r, r.learnt ? 'learnt' : 'hit', r.learnt ? fill(T.learnt || 'Neues Rezept: {name}', name) : fill(T.hit || '{name} ist fertig!', this.madeName(r.made)) + (r.made.part ? ' · liegt auf dem Schrottplatz, einbauen mit B' : ''));
     } else {
       const junk = r.made ? D.items[r.made.id]?.name || r.made.id : 'nichts';
       this.after(r, r.near ? 'near' : 'miss', `${r.near ? (T.near || 'Knapp daneben!') + ' ' : ''}${fill(T.miss || 'Daneben. Heraus kommt: {name}', junk)}`);
@@ -172,6 +173,13 @@ export class CraftUI {
   chip(id, n = 1, { big = false } = {}) {
     const D = this.D, c = el('span', { class: 'craft-chip' + (big ? ' big' : ''), style: `--col:${CATEGORY_COLORS[D.items?.[id]?.category] || '#555'}` }, glyphOf(D, 'items', id), n > 1 ? el('i', {}, String(n)) : null);
     this.hover(c, id);
+    return c;
+  }
+  // a rig part as a result: it goes onto the scrapyard, not into a bag
+  partChip(id, n = 1) {
+    const D = this.D, t = D.rigParts?.[id] || {}, c = el('span', { class: 'craft-chip big', style: `--col:${t.color || CATEGORY_COLORS.rigpart}` }, t.glyph || '⚙', n > 1 ? el('i', {}, String(n)) : null);
+    c.addEventListener('mouseenter', () => { this.tip.replaceChildren(el('b', {}, t.name || id), el('small', {}, `Rig-Teil · ${t.value || 0} Δ · landet auf dem Schrottplatz`), t.description ? el('p', {}, t.description) : null); this.tip.hidden = false; });
+    c.addEventListener('mouseleave', () => { this.tip.hidden = true; });
     return c;
   }
   hover(node, id) {

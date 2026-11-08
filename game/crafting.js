@@ -52,6 +52,12 @@ export function take(D, save, id, n) {
   return n - left;
 }
 // puts n of a thing into the backpack, the chest, the storage places; → how many did not fit
+// a recipe's result: a thing into the inventories, or a rig part onto the scrapyard (Rezepte › Oder Rig-Teil). → what did not fit
+function produce(D, save, r, n) {
+  if (r.part && D.rigParts?.[r.part]) { save.rig.spare ??= { workshops: [], containers: [] }; (save.rig.spare.parts ??= []).push(...Array(n).fill(r.part)); return 0; }
+  return give(D, save, r.result, n);
+}
+export const resultOf = r => r.part ? { id: r.part, part: true } : { id: r.result };
 export function give(D, save, id, n, a = 'items') {
   const g = save.inv.grids, order = ['backpack', 'chest', ...sources(D, save).map(s => s.key).filter(k => k !== 'backpack' && k !== 'chest')];
   for (const key of order) { if (!n) break; if (g[key]) n = add(D, g[key], a, id, n); }
@@ -70,12 +76,12 @@ export function craft(D, save, id, ws) {
   if (!r) return { ok: false, reason: 'Unbekanntes Rezept' };
   if (!known(save, id)) return { ok: false, reason: 'Steht nicht im Rezeptbuch' };
   if (ws && !recipesFor(D, ws).some(x => x.id === id)) return { ok: false, reason: 'Geht an dieser Werkstatt nicht' };
-  if (!D.items?.[r.result]) return { ok: false, reason: 'Rezept ohne Ergebnis' };
+  if (!D.items?.[r.result] && !D.rigParts?.[r.part]) return { ok: false, reason: 'Rezept ohne Ergebnis' };
   if (missing(D, save, r).length) return { ok: false, reason: 'Es fehlen Zutaten' };
   for (const i of r.ingredients || []) take(D, save, i.item, i.count || 1);
   const n = r.count || 1, minutes = r.time ?? 10;
   advance(save, minutes / 60);
-  return { ok: true, recipe: id, made: { id: r.result, n }, left: give(D, save, r.result, n), minutes };
+  return { ok: true, recipe: id, made: { ...resultOf(r), n }, left: produce(D, save, r, n), minutes };
 }
 
 // the pot: { item id: count } → the recipe it makes at this workshop (or null)
@@ -114,7 +120,7 @@ export function experiment(D, save, ws, pot, rnd = Math.random) {
     for (const i of r.ingredients || []) take(D, save, i.item, i.count || 1);
     const n = r.count || 1, minutes = r.time ?? 10;
     advance(save, minutes / 60);
-    return { ok: true, hit: true, recipe: r.id, learnt, made: { id: r.result, n }, left: give(D, save, r.result, n), minutes };
+    return { ok: true, hit: true, recipe: r.id, learnt, made: { ...resultOf(r), n }, left: produce(D, save, r, n), minutes };
   }
   const near = C.nearMiss !== false ? nearMiss(D, ws, pot) : null;
   const share = (C.failConsume ?? 100) / 100;

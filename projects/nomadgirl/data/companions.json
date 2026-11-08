@@ -5,7 +5,7 @@
   "stage": "1",
   "workshops": ["werkbank", "motorraum", "drohnenwerkstatt"],
   "buffs": [],
-  "tips": ["kabelbaum", "schrottplatte", "notstrom"],
+  "tips": ["kabelbaum", "schrottplatte", "notstrom", "dachbox_bauen"],
   "description": "Redet mit Motoren. Die Motoren hören zu.",
   "lines": [
    "Hörst du das? Der Motor summt in Moll.",

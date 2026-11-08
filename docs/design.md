@@ -63,7 +63,7 @@ Das Basisgeld aus dem Run ist immer sicher. Der Rang gibt einen Deltas-Bonus obe
 Das Rig ist Leylas Zuhause, Werkstatt und Fahrzeug zugleich. Es wird im Querschnitt gezeigt wie ein Puppenhaus.
 
 - **Zugmaschine:** Leylas Van zum Start (mit zwei eigenen Werkstatt-Plätzen: Schlafkoje und Warroom), später LKW. Bestimmt Zugkraft, Spritverbrauch und wie viele Container hintereinander und übereinander passen.
-- **Slots:** Motor, Panzerung, Waffen, Dach (Rig-Teile). Rig-Teile sind große Gegenstände: beim Händler kaufen, im Inventar-Tab der Zugmaschine (nur im Camp) in die Slots ziehen. Die Dachbox auf dem Dach vergrößert den Kofferraum.
+- **Slots:** Motor, Panzerung, Waffen, Dach (Rig-Teile). Rig-Teile sind Bauteile wie Werkstätten: beim Händler kaufen oder an der Werkbank aus Gegenständen herstellen, sie liegen auf dem Schrottplatz und werden beim Rig bauen an die Sockel am Van geschraubt. Die Dachbox auf dem Dach vergrößert den Kofferraum. Im Inventar zeigt der Tab der Zugmaschine, was eingebaut ist.
 - **Eigener Stauraum:** Die Zugmaschine hat einen kleinen Kofferraum, jeder Anhänger einen Deichselkasten, damit Leyla auch ohne Lager-Werkstatt ein paar Sachen verstauen kann. Das Lagerregal bleibt das große, allgemeine Lagermodul.
 - **Payload:** Container (Hochseecontainer, Holzkisten, Wohnwagenteile). Anfangs knapp, mit stärkerer Zugmaschine horizontal und vertikal stapelbar. Je nach Größe fasst ein Container eine, zwei oder drei Werkstätten.
 - **Budgets:** Zugkraft begrenzt das Gewicht, Energie (Lichtmaschine, Generator, Reaktor) begrenzt die Werkstätten, das Gewicht erhöht den Spritverbrauch, die Stapelhöhe kann Routen sperren.
@@ -160,7 +160,7 @@ Ein POI mit Ranking, Rucksack-Raster, Tod mit Mama-Bot, Rig mit zwei bis drei We
 - [x] Beute + Rucksack-Raster (Tetris-Formen, nur Maus), Boden-Inventar im Run, Kiste und Lagerregal im Camp (07.11.2026)
 - [x] Kochen & Craften (Rezeptbuch, Experimentieren, Zettel, Companion-Tipps, Essen)
 - [x] Bau-Ansicht (Umstellen, Kaufen/Verkaufen, Container, Budgets Gewicht/Energie/Länge; Zugmaschine tauschen folgt)
-- [x] Rig-Teile in Slots (Van-Tab im Inventar), Kofferraum und Deichselkästen
+- [x] Rig-Teile an Sockeln im Bau-Modus (kaufen, herstellen, verkaufen), Kofferraum und Deichselkästen
 - [x] Rig bauen 2.0: im Camp mit Ziehen, Pendeln, Einrasten, Schrottplatz + Händler, sofort echt, Leyla schraubt, Rückgängig
 - [ ] POIs aus Raum-Bausteinen zusammensetzen (bis dahin spielt ein Run den Ersatzraum)
 

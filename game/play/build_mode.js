@@ -5,13 +5,14 @@
 // "Rückgängig" takes back the last action as long as she has not finished it.
 //   workshop → a place in a trailer or the van (taken = swap), the scrapyard (stow), the dealer's pad (sell)
 //   trailer  → a coupling (hang in / change the order), the scrapyard (unhitch, only empty), the dealer's pad (sell, only empty)
+//   rig part → a socket on the van (taken = swap, the old one goes onto the scrapyard), the scrapyard (take off), the dealer's pad (sell)
 //   dealer catalogue (button or click on the pad): bought things are delivered onto the pad.
 // Logic in game/rig.js (act, snapshot/restore), drawing in game/play/camp.js (drawRig, drawYard), values in "Rig-Bau".
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
-import { budgets, act, snapshot, restore, lift, place, fits, at as wsAt, toSpare, fromSpare, stow, buyWorkshop, sellWorkshop, buyContainer, sellContainer, buyPart, SLOT_NAMES as PART_SLOTS, attachAt, detach, moveContainer, shop, priceOf, sellPrice, wsDef, placesOf } from '../rig.js';
+import { budgets, act, snapshot, restore, lift, place, fits, at as wsAt, toSpare, fromSpare, stow, buyWorkshop, sellWorkshop, buyContainer, sellContainer, buyPart, sellPart, mountPart, unmountPart, SLOT_NAMES as PART_SLOTS, attachAt, detach, moveContainer, shop, priceOf, sellPrice, wsDef, placesOf } from '../rig.js';
 import { clockText } from '../save.js';
-import { workshopTexture } from './camp.js';
+import { workshopTexture, partView, socketRects } from './camp.js';
 import { makeSfx } from './sfx.js';
 
 const FN_COLORS = { storage: '#5c6b7a', cooling: '#4a7a9a', cell: '#5a4a4a', sleep: '#6a5a9a', chill: '#9a4a7a', drone: '#3a8a6a', warroom: '#7a6a3a', kitchen: '#a8642a', foodtruck: '#c0703a', craft: '#7a6235', engine: '#5a5a5a', power: '#a8862a' };
@@ -65,6 +66,7 @@ export class BuildMode {
     cam.pan(this.view.x, this.view.y, ms, 'Sine.easeInOut', true);
     cam.zoomTo(z, ms, 'Sine.easeInOut', true);
     // pointer: drag and drop on the world camera
+    this.camp.drawRig();   // parts on the van are shown by the sockets now
     this.onDown = p => this.pointerDown(p); this.onMove = p => this.pointerMove(p); this.onUp = p => this.pointerUp(p);
     s.input.on('pointerdown', this.onDown); s.input.on('pointermove', this.onMove); s.input.on('pointerup', this.onUp); s.input.on('pointerupoutside', this.onUp);
     this.draw();
@@ -80,6 +82,7 @@ export class BuildMode {
     delete this.el.parentElement.dataset.building;
     s.input.off('pointerdown', this.onDown); s.input.off('pointermove', this.onMove); s.input.off('pointerup', this.onUp); s.input.off('pointerupoutside', this.onUp);
     this.gfx?.destroy(); for (const t of this.labels || []) t.destroy(); this.labels = [];
+    this.camp.drawRig();
     s.game.canvas.style.cursor = '';
     const ms = s.script ? 1 : this.B.view?.zoomTime ?? 650, C = s.data_.game?.camera || {};
     cam.zoomTo(back.zoom, ms, 'Sine.easeInOut', true);
@@ -140,7 +143,7 @@ export class BuildMode {
         : `${x.places || 1} Plätze · ${de(x.weight || 0)} kg`;
       return el('div', { class: 'build-row', title: x.description || '' }, area === 'workshops' ? el('span', { class: 'build-dot', style: `--col:${FN_COLORS[x.function] || '#555'}` }) : icon(area === 'rigParts' ? 'settings' : 'box', 16),
         el('span', {}, el('b', {}, x.name || id), el('small', {}, sub)),
-        el('button', { class: 'inv-btn', disabled: poor, title: poor ? 'Zu wenig Δ' : area === 'rigParts' ? 'Landet im Kofferraum (sonst Kiste, Lager, Rucksack); einbauen im Inventar unter „Van“' : 'Wird auf den Händler-Platz geliefert', onclick: () => this.buy(area, id) }, `${de(price)} Δ`));
+        el('button', { class: 'inv-btn', disabled: poor, title: poor ? 'Zu wenig Δ' : 'Wird auf den Händler-Platz geliefert', onclick: () => this.buy(area, id) }, `${de(price)} Δ`));
     };
     return el('section', { class: 'inv-panel bm-shop' },
       el('header', {}, icon('shop', 16), el('b', {}, D.camp?.yard?.dealerName || 'Händler'), el('small', {}, 'liefert auf den Händler-Platz'), el('button', { class: 'craft-x', onclick: () => { this.shopOpen = false; this.draw(); } }, '×')),
@@ -164,6 +167,8 @@ export class BuildMode {
     });
     return out;
   }
+  // sockets for rig parts on the van (camp.js socketRects)
+  sockets() { return socketRects(this.D, this.save.rig, this.camp.geo, this.camp.ground); }
   // couplings: gap g = in front of unit g (1 = right behind the van, units.length = at the end)
   gaps() {
     const geo = this.camp.geo, U = this.save.rig.units, out = [], y = this.camp.ground - 40;
@@ -176,7 +181,8 @@ export class BuildMode {
   // the thing under the pointer: a workshop (rig or yard), a trailer (rig or yard), the dealer's pad
   pick(x, y) {
     const D = this.D, U = this.save.rig.units, camp = this.camp, inside = r => x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1;
-    for (const it of camp.yardItems || []) if (inside(it)) return it.kind === 'ws' ? { kind: 'ws', from: 'yard', i: it.i, id: it.id, item: it } : { kind: 'container', from: 'yard', i: it.i, id: it.id, item: it };
+    for (const it of camp.yardItems || []) if (inside(it)) return { kind: it.kind === 'ws' ? 'ws' : it.kind === 'part' ? 'part' : 'container', from: 'yard', i: it.i, id: it.id, item: it };
+    for (const so of this.sockets()) if (so.id && inside(so)) return { kind: 'part', from: 'socket', slot: so.slot, si: so.i, id: so.id, sock: so };
     for (const sl of this.slots()) {
       const w = inside(sl) && wsAt(D, this.save.rig, sl.ui, sl.p);
       if (w) return { kind: 'ws', from: 'rig', ui: sl.ui, at: w.at, id: w.id, slot: sl };
@@ -213,9 +219,12 @@ export class BuildMode {
   describe(h) {
     const D = this.D;
     if (h.kind === 'ws') { const d = wsDef(D, h.id), p = d.power || 0; return `${d.name || h.id} · ${FN_NAMES[d.function] || ''} · ${d.places || 1} ${d.places > 1 ? 'Plätze' : 'Platz'}${p ? ` · ${p > 0 ? '+' : ''}${p} ⚡` : ''} · ziehen zum Umstellen`; }
+    if (h.kind === 'part') { const t = D.rigParts?.[h.id] || {}; return `${t.name || h.id} · ${PART_SLOTS[t.slot] || t.slot}${this.partFacts(t)} · ziehen ${h.from === 'yard' ? 'an den Van' : 'zum Ausbauen'}`; }
     if (h.kind === 'container') { const d = D.containers?.[h.id] || {}; return `${d.name || h.id} · ${d.places || 1} Plätze · ${de(d.weight || 0)} kg · ziehen zum Umhängen`; }
     return 'Händler: hier abstellen = verkaufen, anklicken = Katalog';
   }
+
+  partFacts(t) { return [t.pull ? `+${de(t.pull)} kg Zugkraft` : '', t.armor ? `+${t.armor} Panzerung` : '', t.damage ? `${t.damage} Schaden` : '', t.storageRows ? `+${t.storageRows} Reihen Kofferraum` : ''].filter(Boolean).map(x => ' · ' + x).join(''); }
 
   // ---------- dragging ----------
   startDrag(hit, w) {
@@ -229,6 +238,13 @@ export class BuildMode {
       if (hit.from === 'rig') camp.drawRig({ hide: { ui: hit.ui, at: hit.at } });
       else hit.item.view.setAlpha(0.25);
       hang = img.height;
+    } else if (hit.kind === 'part') {
+      const v = partView(s, D, hit.id);
+      holder.add([s.add.rectangle(0, 0, 4, 16, 0x8b949e).setOrigin(0.5, 0), v]);
+      v.y = 14 + v.h;
+      weight = 0.6 + ((D.rigParts?.[hit.id]?.size || [2, 2]).reduce((a, b) => a * b, 1)) / 8;
+      if (hit.from === 'yard') hit.item.view.setAlpha(0.25);
+      hang = v.h;
     } else if (hit.kind === 'container') {
       // the trailer itself hangs from the pointer at its roof
       const view = hit.from === 'rig' ? hit.unit.view : hit.item.view, k = view.scaleX, b = view.getBounds();
@@ -250,7 +266,16 @@ export class BuildMode {
     if (!d) return null;
     const x = d.x, cy = d.y + Math.min(d.hang, 300) / 2;
     if (camp.dealer && x >= camp.dealer.x0 && x <= camp.dealer.x1 && d.y < camp.ground + 40) return { type: 'dealer', x: camp.dealer.x };
-    if (d.kind === 'ws') {
+    if (d.kind === 'part') {
+      const slot = this.D.rigParts?.[d.id]?.slot;
+      let best = null, bd = 160;
+      for (const so of this.sockets()) {
+        if (so.slot !== slot) continue;
+        const dist = Math.hypot(x - so.cx, cy - so.cy);
+        if (dist < bd) { bd = dist; best = so; }
+      }
+      if (best) return d.from === 'socket' && best.slot === d.slot && best.i === d.si ? { type: 'home', sock: best, x: best.cx } : { type: 'socket', sock: best, x: best.cx, y: best.cy };
+    } else if (d.kind === 'ws') {
       for (const sl of this.slots()) if (x >= sl.x0 && x <= sl.x1 && cy >= sl.y0 - 120 && cy <= sl.y1 + 120) {
         if (d.from === 'rig' && sl.ui === d.ui && wsAt(D, this.save.rig, sl.ui, sl.p) === wsAt(D, this.save.rig, d.ui, d.at)) return { type: 'home', slot: sl, x: (sl.x0 + sl.x1) / 2 };
         return { type: 'slot', slot: sl, x: (sl.x0 + sl.x1) / 2 };
@@ -265,19 +290,22 @@ export class BuildMode {
       if (best) return best;
     }
     const Y = camp.geo.yard;
-    if (Y && x >= Y.x0 && x <= Y.x1 && d.from === 'rig') return { type: 'yard', x: clamp(x, Y.x0 + 60, Y.x1 - 60) };
+    if (Y && x >= Y.x0 && x <= Y.x1 && (d.from === 'rig' || d.from === 'socket')) return { type: 'yard', x: clamp(x, Y.x0 + 60, Y.x1 - 60) };
     return null;
   }
   dragHint() {
     const t = this.target(), d = this.drag, D = this.D;
+    if (d.kind === 'part' && !t) return d.from === 'socket' ? 'Loslassen hier setzt es zurück. Ziel: Schrottplatz oder Händler.' : `Ziel: ${PART_SLOTS[D.rigParts?.[d.id]?.slot] || 'Sockel'} am Van oder Händler.`;
     if (!t) return d.from === 'rig' ? 'Loslassen hier legt es zurück. Ziel: freier Platz, Schrottplatz oder Händler.' : 'Ziel: freier Platz im Rig oder Händler.';
-    if (t.type === 'dealer') return `Verkaufen: +${d.kind === 'ws' ? sellPrice(D, 'workshops', d.id) : sellPrice(D, 'containers', d.id)} Δ`;
-    if (t.type === 'yard') return d.kind === 'ws' ? 'Ausbauen: auf den Schrottplatz' : 'Abhängen: auf den Schrottplatz';
+    if (t.type === 'dealer') return `Verkaufen: +${this.sellOf(d)} Δ`;
+    if (t.type === 'yard') return d.kind === 'ws' ? 'Ausbauen: auf den Schrottplatz' : d.kind === 'part' ? 'Abschrauben: auf den Schrottplatz' : 'Abhängen: auf den Schrottplatz';
+    if (t.type === 'socket') return t.sock.id ? `Tauschen mit ${D.rigParts?.[t.sock.id]?.name || t.sock.id}` : 'Anschrauben';
     if (t.type === 'gap') return d.from === 'yard' ? 'Ankuppeln' : 'Hier einreihen';
     if (t.type === 'home') return 'Zurück an seinen Platz';
     const there = wsAt(D, this.save.rig, t.slot.ui, t.slot.p);
     return there ? `Tauschen mit ${wsDef(D, there.id).name || there.id}` : 'Einbauen';
   }
+  sellOf(d) { return sellPrice(this.D, d.kind === 'ws' ? 'workshops' : d.kind === 'part' ? 'rigParts' : 'containers', d.id); }
   cancelDrag(silent = false) {
     const d = this.drag;
     if (!d) return;
@@ -292,7 +320,7 @@ export class BuildMode {
     const d = this.drag, s = this.scene;
     this.drag = null;
     this.sfx.nope();
-    const home = d.from === 'yard' ? d.item : d.kind === 'ws' ? d.slot : d.unit;
+    const home = d.from === 'yard' ? d.item : d.from === 'socket' ? d.sock : d.kind === 'ws' ? d.slot : d.unit;
     const hx = (home.x0 + home.x1) / 2, hy = (home.y0 ?? home.inTop ?? this.camp.ground - 300);
     s.tweens.add({ targets: d.holder, x: hx, y: hy, angle: 0, duration: 260, ease: 'Quad.easeOut', onComplete: () => { d.holder.destroy(); this.camp.drawRig(); } });
     s.game.canvas.style.cursor = '';
@@ -305,9 +333,21 @@ export class BuildMode {
     if (!t || t.type === 'home') return this.flyBack(null);
     const before = snapshot(save);
     let r, label = '', fxAt = { x: t.x, y: this.camp.ground }, after = null;
-    const name = d.kind === 'ws' ? wsDef(D, d.id).name || d.id : D.containers?.[d.id]?.name || d.id;
+    const name = d.kind === 'ws' ? wsDef(D, d.id).name || d.id : d.kind === 'part' ? D.rigParts?.[d.id]?.name || d.id : D.containers?.[d.id]?.name || d.id;
     const take = dd => d.from === 'rig' ? lift(D, dd, d.ui, d.at) : fromSpare(dd, dd.rig.spare.workshops[d.i]?.uid);
-    if (d.kind === 'ws' && t.type === 'slot') {
+    if (d.kind === 'part') {
+      if (t.type === 'socket') {
+        r = act(D, save, dd => mountPart(D, dd, t.sock.slot, t.sock.i, d.from === 'yard' ? { yard: d.i } : { slot: d.slot, i: d.si }));
+        label = r?.swapped ? `${name} angeschraubt, ${D.rigParts?.[r.swapped]?.name || r.swapped} auf dem Schrottplatz` : `${name} angeschraubt`;
+        fxAt = { x: t.sock.cx, y: t.sock.y1 };
+      } else if (t.type === 'yard') {
+        r = act(D, save, dd => unmountPart(D, dd, d.slot, d.si));
+        label = `${name} abgeschraubt`; fxAt.yard = 'part';
+      } else if (t.type === 'dealer') {
+        r = act(D, save, dd => { if (d.from === 'socket') { const x = unmountPart(D, dd, d.slot, d.si); if (!x.ok) return x; return sellPart(D, dd, dd.rig.spare.parts.length - 1); } return sellPart(D, dd, d.i); });
+        label = `${name} verkauft`; after = 'sold';
+      }
+    } else if (d.kind === 'ws' && t.type === 'slot') {
       const sl = t.slot;
       r = act(D, save, dd => {
         const w = take(dd); if (!w) return { ok: false, reason: 'Weg' };
@@ -353,9 +393,9 @@ export class BuildMode {
   }
   buy(area, id) {
     const D = this.D, save = this.save, before = snapshot(save), name = D[area]?.[id]?.name || id;
-    const r = act(D, save, dd => area === 'workshops' ? buyWorkshop(D, dd, id) : area === 'rigParts' ? buyPart(D, dd, id, save) : buyContainer(D, dd, id));
+    const r = act(D, save, dd => area === 'workshops' ? buyWorkshop(D, dd, id) : area === 'rigParts' ? buyPart(D, dd, id) : buyContainer(D, dd, id));
     if (!r.ok) return this.say(r.reason);
-    if (area === 'rigParts') return this.done(r, before, `${name} gekauft → ${r.where || 'Kofferraum'}`, { x: this.camp.geo.vanLeft + 40, y: this.camp.ground - 60 }, 'part', { weight: 0.6 });
+    if (area === 'rigParts') return this.done(r, before, `${name} gekauft`, { x: this.camp.dealer?.x ?? this.scene.leyla.x, y: this.camp.ground }, 'delivered', { kind: 'part' });
     this.done(r, before, `${name} gekauft`, { x: this.camp.dealer?.x ?? this.scene.leyla.x, y: this.camp.ground }, 'delivered', { kind: area === 'workshops' ? 'ws' : 'container' });
   }
   // after an action: redraw, klonk, dust, springs, Leyla gets a job, undo remembers it
@@ -458,6 +498,15 @@ export class BuildMode {
         label((sl.x0 + sl.x1) / 2, sl.y0 - 4, wsDef(D, w.id).name || w.id, '#ffd27a', true);
       }
     }
+    // the sockets for rig parts on the van: empty = dashed frame with the slot's name, built in = the part
+    const pslot = d?.kind === 'part' ? D.rigParts?.[d.id]?.slot : null, tt = d ? this.target() : null;
+    for (const so of this.sockets()) {
+      const hot = tt?.type === 'socket' && tt.sock.slot === so.slot && tt.sock.i === so.i, fits = pslot === so.slot, held = d?.from === 'socket' && d.slot === so.slot && d.si === so.i;
+      g.lineStyle(lw, hot ? 0xffd27a : fits ? 0x3fae6a : 0xc9a86a, hot ? 1 : fits ? pulse : 0.45).strokeRoundedRect(so.x0, so.y0, so.x1 - so.x0, so.y1 - so.y0, 10);
+      if (hot) g.fillStyle(0xffd27a, 0.14).fillRoundedRect(so.x0, so.y0, so.x1 - so.x0, so.y1 - so.y0, 10);
+      if (so.id && !held) { const v = partView(s, D, so.id).setDepth(34); const k = Math.min(1, (so.x1 - so.x0 - 8) / v.w, (so.y1 - so.y0 - 8) / v.h); v.setScale(k).setPosition(so.cx, so.cy + v.h * k / 2); this.labels.push(v); }
+      else label(so.cx, so.cy + 12, PART_SLOTS[so.slot] || so.slot, fits || hot ? '#ffd27a' : '#c9a86a', true);
+    }
     if (d) {
       // the part swings: it hangs from the pointer, lags behind sideways movement and settles on a damped spring
       const k = dt / 1000, vx = (d.x - d.px) / Math.max(k, 0.001);
@@ -467,7 +516,7 @@ export class BuildMode {
       d.holder.setPosition(d.x, d.y).setRotation(d.angle);
       // targets: places, couplings, scrapyard, dealer
       const t = this.target(), Y = this.camp.geo.yard, dl = this.camp.dealer;
-      if (d.kind === 'ws') for (const sl of this.slots()) {
+      if (d.kind === 'part') { /* sockets drawn above */ } else if (d.kind === 'ws') for (const sl of this.slots()) {
         const there = wsAt(D, this.save.rig, sl.ui, sl.p), mine = d.from === 'rig' && there && sl.ui === d.ui && there.at === d.at, hot = t?.slot === sl || (t?.slot && t.slot.ui === sl.ui && t.slot.p === sl.p);
         g.lineStyle(lw, hot ? 0xffd27a : there && !mine ? 0xc77dff : 0x3fae6a, hot ? 1 : 0.45 * pulse).strokeRoundedRect(sl.x0 + 6, sl.y0 + 6, sl.x1 - sl.x0 - 12, sl.y1 - sl.y0 - 12, 10);
         if (hot) g.fillStyle(0xffd27a, 0.12).fillRoundedRect(sl.x0 + 6, sl.y0 + 6, sl.x1 - sl.x0 - 12, sl.y1 - sl.y0 - 12, 10);
@@ -477,13 +526,13 @@ export class BuildMode {
         g.lineStyle(lw * 1.4, hot ? 0xffd27a : 0x3fe0d0, hot ? 1 : pulse).strokeCircle(gp.x, gp.y, hot ? 26 : 18);
         if (hot) label(gp.x, gp.y - 34, 'Ankuppeln', '#ffd27a');
       }
-      if (Y && d.from === 'rig') { const hot = t?.type === 'yard'; g.lineStyle(lw, hot ? 0xffd27a : 0xb9a2c8, hot ? 1 : 0.35).strokeRoundedRect(Y.x0, this.camp.ground - 300, Y.x1 - Y.x0, 300, 14); label((Y.x0 + Y.x1) / 2, this.camp.ground - 306, 'Schrottplatz', hot ? '#ffd27a' : '#b9a2c8'); }
-      if (dl) { const hot = t?.type === 'dealer'; g.lineStyle(lw, hot ? 0xffd27a : 0xe0b030, hot ? 1 : 0.4).strokeRoundedRect(dl.x0, dl.y0, dl.x1 - dl.x0, dl.y1 - dl.y0, 14); if (hot) label(dl.x, dl.y0 - 6, `+${d.kind === 'ws' ? sellPrice(D, 'workshops', d.id) : sellPrice(D, 'containers', d.id)} Δ`, '#ffd27a'); }
+      if (Y && (d.from === 'rig' || d.from === 'socket')) { const hot = t?.type === 'yard'; g.lineStyle(lw, hot ? 0xffd27a : 0xb9a2c8, hot ? 1 : 0.35).strokeRoundedRect(Y.x0, this.camp.ground - 300, Y.x1 - Y.x0, 300, 14); label((Y.x0 + Y.x1) / 2, this.camp.ground - 306, 'Schrottplatz', hot ? '#ffd27a' : '#b9a2c8'); }
+      if (dl) { const hot = t?.type === 'dealer'; g.lineStyle(lw, hot ? 0xffd27a : 0xe0b030, hot ? 1 : 0.4).strokeRoundedRect(dl.x0, dl.y0, dl.x1 - dl.x0, dl.y1 - dl.y0, 14); if (hot) label(dl.x, dl.y0 - 6, `+${this.sellOf(d)} Δ`, '#ffd27a'); }
       const hint = this.dragHint();
       if (hint !== this.lastHint) { this.lastHint = hint; this.draw(); }
     } else if (this.pointer) {
       // hover: outline what can be grabbed
-      const h = this.pick(this.pointer.x, this.pointer.y), r = h && (h.item || h.slot || (h.unit && { x0: h.unit.x0, x1: h.unit.x1, y0: h.unit.inTop - 40, y1: this.camp.ground }) || (h.kind === 'dealer' && this.camp.dealer));
+      const h = this.pick(this.pointer.x, this.pointer.y), r = h && (h.item || h.slot || h.sock || (h.unit && { x0: h.unit.x0, x1: h.unit.x1, y0: h.unit.inTop - 40, y1: this.camp.ground }) || (h.kind === 'dealer' && this.camp.dealer));
       if (r) g.lineStyle(lw, 0xffd27a, 0.8).strokeRoundedRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0, 12);
       s.game.canvas.style.cursor = h ? (h.kind === 'dealer' ? 'pointer' : 'grab') : '';
       const text = h ? this.describe(h) : null;
@@ -503,7 +552,7 @@ export class BuildMode {
     if (!this.active) return { open: false };
     const D = this.D, save = this.save;
     return { open: true, deltas: save.deltas, clock: clockText(save), budgets: budgets(D, save.rig), msg: this.msg?.text || null, held: this.drag?.id || null,
-      rig: save.rig.units.map(u => `${u.id}[${u.workshops.map(w => `${w.id}@${w.at}`).join(' ')}]`).join(' '), spare: { workshops: [...save.rig.spare.workshops], containers: [...save.rig.spare.containers] },
+      rig: save.rig.units.map(u => `${u.id}[${u.workshops.map(w => `${w.id}@${w.at}`).join(' ')}]`).join(' '), spare: { workshops: [...save.rig.spare.workshops], containers: [...save.rig.spare.containers], parts: [...(save.rig.spare.parts || [])] }, parts: JSON.parse(JSON.stringify(save.rig.parts || {})),
       jobs: this.jobs.length + (this.job ? 1 : 0), working: this.working, canUndo: !!this.undo.length && !this.undo[this.undo.length - 1].done, shop: !!this.shopOpen, zoom: this.scene.cam.zoom };
   }
   // screen positions (CSS pixels in the page) of everything that can be dragged or dropped on, for tests with a real mouse
@@ -517,6 +566,7 @@ export class BuildMode {
       gaps: this.gaps().map(gp => ({ g: gp.g, ...scr(gp.x, gp.y) })),
       units: this.camp.geo.units.map(u => ({ ui: u.ui, id: u.id, ...scr((u.x0 + u.x1) / 2, u.inTop - 20) })),
       yard: (this.camp.yardItems || []).map(it => ({ kind: it.kind, i: it.i, id: it.id, ...mid(it) })),
+      sockets: this.sockets().map(so => ({ slot: so.slot, i: so.i, id: so.id, ...scr(so.cx, so.cy) })),
       yardFree: this.camp.geo.yard ? scr(this.camp.geo.yard.x1 - 120, this.camp.ground - 100) : null,
       dealer: this.camp.dealer ? mid(this.camp.dealer) : null,
     };

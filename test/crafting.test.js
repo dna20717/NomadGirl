@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { newSave, repairSave, clockText } from '../game/save.js';
 import { recipesFor, stock, craft, experiment, match, readable, read, tips, use, give, take, have } from '../game/crafting.js';
-import { add } from '../game/inventory.js';
+import { add, count } from '../game/inventory.js';
 import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
 
@@ -12,10 +12,10 @@ const fresh = () => { const s = newSave(D); s.hour = 18.5; return s; };
 
 test('Rezeptbuch: am Anfang alle Rezepte „Von Anfang an“, alte Spielstände bekommen sie dazu', () => {
   const s = fresh();
-  assert.deepEqual(s.recipes.sort(), ['bohneneintopf', 'schrottplatte', 'verband']);
+  assert.deepEqual(s.recipes.sort(), ['bleche_schweissen', 'bohneneintopf', 'schrottplatte', 'verband']);
   const old = { ...s, recipes: undefined }; delete old.recipes;
-  assert.deepEqual(repairSave(old, D).recipes.sort(), ['bohneneintopf', 'schrottplatte', 'verband']);
-  assert.deepEqual(repairSave({ ...s, recipes: ['discokugel', 'gibtsnicht'] }, D).recipes.sort(), ['bohneneintopf', 'discokugel', 'schrottplatte', 'verband']);
+  assert.deepEqual(repairSave(old, D).recipes.sort(), ['bleche_schweissen', 'bohneneintopf', 'schrottplatte', 'verband']);
+  assert.deepEqual(repairSave({ ...s, recipes: ['discokugel', 'gibtsnicht'] }, D).recipes.sort(), ['bleche_schweissen', 'bohneneintopf', 'discokugel', 'schrottplatte', 'verband']);
 });
 
 test('Werkstatt-Art: Küche kann Rezepte der Kochnische, die Werkbank keine Gerichte', () => {
@@ -93,4 +93,15 @@ test('Kein Platz: Rest kommt zurück (liegt dann am Boden)', () => {
   for (const g of Object.values(s.inv.grids)) g.items = [];
   for (const g of Object.values(s.inv.grids)) add(D, g, 'items', 'gluehbirne', g.w * g.h * 5);
   assert.equal(give(D, s, 'bohneneintopf', 2), 2);
+});
+
+test('Rezept mit Rig-Teil: Ergebnis landet auf dem Schrottplatz', () => {
+  const s = fresh();
+  for (const g of Object.values(s.inv.grids)) g.items = g.items.filter(e => e.id !== 'schrottplatte');
+  add(D, s.inv.grids.backpack, 'items', 'schrottplatte', 3);
+  const r = craft(D, s, 'bleche_schweissen', 'werkbank');
+  assert.equal(r.ok, true);
+  assert.deepEqual(r.made, { id: 'bleche', part: true, n: 1 });
+  assert.deepEqual(s.rig.spare.parts, ['bleche']);
+  assert.equal(count(s.inv.grids.backpack, 'items', 'schrottplatte'), 0);
 });

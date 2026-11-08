@@ -1,8 +1,8 @@
 {
- "v8": {"name": "V8-Motor", "slot": "engine", "pull": 1500, "fuelUse": 4, "value": 900, "size": [3, 2], "glyph": "V8"},
- "bleche": {"name": "Angeschweißte Bleche", "slot": "armor", "armor": 20, "value": 150, "size": [2, 3], "glyph": "▦"},
- "stachelgitter": {"name": "Stachelgitter", "slot": "armor", "armor": 10, "damage": 5, "value": 200, "size": [3, 2], "glyph": "✶"},
- "dachgeschuetz": {"name": "Dachgeschütz", "slot": "weapon", "damage": 30, "value": 1200, "size": [2, 2], "glyph": "⌖"},
+ "v8": {"name": "V8-Motor", "slot": "engine", "pull": 1500, "fuelUse": 4, "value": 900, "size": [3, 2], "glyph": "V8", "color": "#5a5f68"},
+ "bleche": {"name": "Angeschweißte Bleche", "slot": "armor", "armor": 20, "value": 150, "size": [2, 3], "glyph": "▦", "color": "#7a6a5a"},
+ "stachelgitter": {"name": "Stachelgitter", "slot": "armor", "armor": 10, "damage": 5, "value": 200, "size": [3, 2], "glyph": "✶", "color": "#6b4a3a"},
+ "dachgeschuetz": {"name": "Dachgeschütz", "slot": "weapon", "damage": 30, "value": 1200, "size": [2, 2], "glyph": "⌖", "color": "#4a5a3a"},
  "dachbox": {
   "name": "Dachbox",
   "slot": "roof",
@@ -14,6 +14,7 @@
   "value": 250,
   "storageRows": 2,
   "glyph": "▭",
-  "description": "Plastikkoffer aufs Dach geschnallt. Zwei Reihen mehr Kofferraum, ein bisschen mehr Luftwiderstand."
+  "description": "Plastikkoffer aufs Dach geschnallt. Zwei Reihen mehr Kofferraum, ein bisschen mehr Luftwiderstand.",
+  "color": "#2f3a4a"
  }
 }

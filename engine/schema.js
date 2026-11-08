@@ -376,15 +376,17 @@ export const AREAS = {
     name: 'Rezepte', singular: 'Rezept', icon: 'workbench', file: 'data/recipes.json', kind: 'catalog',
     hint: 'Crafting und Kochen: aus x A, y B (und z C) wird D. Manche Rezepte sind logisch, manche sonderbar.',
     template: { name: 'Neues Rezept', station: '', ingredients: [], result: '', count: 1, time: 10, discovery: ['experiment'] },
-    row: (x, p) => `${(x.ingredients || []).map(i => `${i.count}× ${p?.data.items?.[i.item]?.name || i.item}`).join(' + ') || '–'} → ${p?.data.items?.[x.result]?.name || x.result || '?'}`,
+    row: (x, p) => `${(x.ingredients || []).map(i => `${i.count}× ${p?.data.items?.[i.item]?.name || i.item}`).join(' + ') || '–'} → ${x.part ? p?.data.rigParts?.[x.part]?.name || x.part : p?.data.items?.[x.result]?.name || x.result || '?'}`,
     sections: [
       { title: 'Rezept', fields: [NAME, ref('station', 'Werkstatt', 'workshops', { required: true }), num('time', 'Dauer', { unit: 'min', min: 0, hint: 'Spielzeit: die Uhr springt beim Kochen/Herstellen um so viele Minuten weiter (Ereignis-Zeit)' })] },
       { title: 'Zutaten → Ergebnis', fields: [table('ingredients', 'Zutaten', [ref('item', 'Gegenstand', 'items'), num('count', 'Anzahl', { min: 1 })]),
-        ref('result', 'Ergebnis', 'items', { required: true }), num('count', 'Anzahl', { min: 1 })] },
+        ref('result', 'Ergebnis', 'items'), ref('part', 'Oder Rig-Teil', 'rigParts', { hint: 'Statt eines Gegenstands entsteht ein Rig-Teil: es landet auf dem Schrottplatz und wird im Bau-Modus (B) an den Van gezogen' }), num('count', 'Anzahl', { min: 1 })] },
       { title: 'Entdecken', fields: [multi('discovery', 'Wie man es lernt', DISCOVERY), area_('hint', 'Hinweis', { hint: 'Was Companions oder Notizzettel andeuten' })] },
     ],
     check: (x, report) => {
       if (!(x.ingredients || []).length) report('error', 'Rezept ohne Zutaten');
+      if (!x.result && !x.part) report('warning', 'Rezept ohne Ergebnis (Gegenstand oder Rig-Teil)');
+      if (x.result && x.part) report('warning', 'Gegenstand und Rig-Teil: das Rig-Teil gewinnt');
       if ((x.ingredients || []).some(i => i.item === x.result)) report('warning', 'Ergebnis ist auch Zutat');
       const kinds = (x.ingredients || []).map(i => i.item); if (new Set(kinds).size !== kinds.length) report('warning', 'Eine Zutat steht doppelt in der Liste (Anzahl erhöhen)');
     },
@@ -449,12 +451,12 @@ export const AREAS = {
   },
   rigParts: {
     name: 'Rig-Teile', singular: 'Rig-Teil', icon: 'anvil', file: 'data/rig_parts.json', kind: 'catalog', groupBy: { key: 'slot', options: RIG_SLOTS },
-    hint: 'Motoren, Panzerung, Waffen und Dachaufbauten für die Slots der Zugmaschine. Rig-Teile sind große Gegenstände: beim Händler kaufen (Rig bauen), sie landen im Kofferraum (sonst Kiste, Lager, Rucksack) und werden im Inventar unter „Van“ in einen Slot gezogen.',
+    hint: 'Motoren, Panzerung, Waffen und Dachaufbauten für die Slots der Zugmaschine. Rig-Teile sind Bauteile wie Werkstätten: kaufen beim Händler oder an der Werkbank herstellen (Rezept mit „Oder Rig-Teil“), sie liegen auf dem Schrottplatz und werden im Bau-Modus (B) an die Sockel am Van gezogen.',
     template: { name: 'Neues Rig-Teil', slot: 'engine', pull: 0, armor: 0, damage: 0, fuelUse: 0, size: [2, 2], value: 200 },
     row: x => `${label(RIG_SLOTS, x.slot)} · ${(x.size || [1, 1]).join('×')} · ${x.value ?? 0} Δ`,
     sections: [{ title: 'Rig-Teil', fields: [NAME, LOOK, select('slot', 'Slot', RIG_SLOTS), num('pull', 'Zugkraft +', { unit: 'kg' }), num('armor', 'Panzerung +'), num('damage', 'Schaden'),
       num('fuelUse', 'Verbrauch ±', { unit: 'l/100 km' }), num('storageRows', 'Stauraum +', { unit: 'Reihen', min: 0, hint: 'Macht den Stauraum der Zugmaschine um so viele Reihen höher (Dachbox)' }), VALUE, DESCRIPTION] },
-      { title: 'Im Inventar', fields: [size('size', 'Größe', { unit: 'Felder', hint: 'Rechteck im Raster (Kofferraum, Kiste, Lager, Rucksack)' }), text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar: 1–3 Zeichen oder ein Emoji' })] }],
+      { title: 'Aussehen aus Code', fields: [size('size', 'Größe', { unit: 'Felder', hint: 'Solange es kein Aussehen gibt: Kasten aus Code, ein Feld = 34 × 30 px' }), text('glyph', 'Kürzel', { hint: '1–3 Zeichen oder ein Emoji auf dem Kasten' }), color('color', 'Farbe')] }],
   },
   companions: {
     name: 'Companions', singular: 'Companion', icon: 'humans', file: 'data/companions.json', kind: 'catalog',
@@ -480,7 +482,7 @@ export const AREAS = {
         color('ground.color', 'Boden'), color('ground.top', 'Bodenkante'), color('ground.far', 'Ebene in der Ferne'), num('horizon', 'Horizont', { unit: '%', min: 20, max: 95, hint: 'Vom oberen Bildschirmrand' }), DESCRIPTION] },
       { title: 'Schrottplatz', fields: [bool('yard.enabled', 'Zeigen', { hint: 'Daniel: Lager beim Bauen = Schrottplatz links beim Schacht. Ausgebaute Werkstätten stehen auf Paletten, abgehängte Anhänger parken dahinter' }),
         num('yard.width', 'Breite', { unit: 'Kacheln', min: 4 }), bool('yard.dealer', 'Händler-Platz', { hint: 'Hier abstellen = verkaufen; Gekauftes wird hier geliefert' }), text('yard.dealerName', 'Name am Schild'),
-        num('yard.dealerWidth', 'Breite Händler-Platz', { unit: 'px', min: 80 }), num('yard.palletScale', 'Werkstätten auf Paletten', { unit: '% Größe', min: 20, max: 100 }),
+        num('yard.dealerWidth', 'Breite Händler-Platz', { unit: 'px', min: 80 }), num('yard.palletScale', 'Werkstätten auf Paletten', { unit: '% Größe', min: 20, max: 100 }), num('yard.partScale', 'Rig-Teile im Regal', { unit: '% Größe', min: 20, max: 200 }),
         num('yard.parkScale', 'Geparkte Anhänger', { unit: '% Größe', min: 20, max: 100 })] },
       { title: 'Schacht', fields: [bool('shaft.enabled', 'Zeigen', { hint: 'Daniel: Andeutung eines Schachts nach unten, links im Camp, nicht betretbar' }), num('shaft.at', 'Ab Spalte', { unit: 'Kacheln', min: 1 }),
         num('shaft.width', 'Breite', { unit: 'Kacheln', min: 1 }), color('shaft.color', 'Dunkelheit'), color('shaft.glow', 'Glühen von unten', { hint: 'Leer = nichts' }), num('shaft.frameHeight', 'Förderturm', { unit: 'px', min: 0, hint: 'Holzgerüst mit Rolle und Seil über dem Schacht, 0 = keins' })] },
@@ -539,6 +541,11 @@ export const AREAS = {
         num('view.shake', 'Wackeln beim Einrasten', { unit: '%', min: 0, max: 200 }), num('view.volume', 'Lautstärke der Bau-Töne', { unit: '%', min: 0, max: 100 })] },
       { title: 'Werkeln', fields: [num('work.seconds', 'Leyla schraubt', { unit: 's', min: 0, hint: 'Nach jedem Einrasten läuft sie hin und schraubt so lange; solange sie nicht fertig ist, geht „Rückgängig“' }),
         num('work.perHour', 'Dazu pro Stunde Bauzeit', { unit: 's', min: 0 })] },
+      { title: 'Rig-Teile am Van', fields: [
+        point('sockets.engine', 'Motor', { unit: '%', hint: 'Mitte des Sockels: x = % der Van-Breite von links, y = % der Van-Höhe über dem Boden. Mehrere Slots derselben Art stehen nebeneinander' }),
+        point('sockets.armor', 'Panzerung', { unit: '%' }), point('sockets.weapon', 'Waffe', { unit: '%' }), point('sockets.roof', 'Dach', { unit: '%' }),
+        size('sockets.size', 'Sockel-Größe', { unit: 'px' }),
+        multi('sockets.visible', 'Im Camp sichtbar', [['engine', 'Motor'], ['armor', 'Panzerung'], ['weapon', 'Waffe'], ['roof', 'Dach']], { hint: 'Eingebaute Teile dieser Slots sieht man auch außerhalb des Bau-Modus am Van' })] },
       { title: 'Regeln', fields: [bool('rules.power', 'Ohne Strom keine Arbeit', { hint: 'Ist die Energie unter 0, gehen Werkstätten, die Energie brauchen, im Camp nicht (Kochen, Werkbank …)' }),
         bool('rules.weight', 'Zu schwer: nicht fahren', { hint: 'Wiegen die Container mehr, als die Zugmaschine zieht, bleibt das Rig stehen' })] },
     ],

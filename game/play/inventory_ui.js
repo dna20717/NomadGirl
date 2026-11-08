@@ -6,7 +6,7 @@
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot } from '../inventory.js';
-import { partSlots, installPart, removePart, budgets, SLOT_NAMES as PART_SLOT_NAMES } from '../rig.js';
+import { partSlots, budgets, SLOT_NAMES as PART_SLOT_NAMES } from '../rig.js';
 import { containers as storeList } from '../save.js';
 
 export const CATEGORY_COLORS = {
@@ -83,7 +83,7 @@ export class InventoryUI {
           el('div', { class: 'inv-actions' }, el('button', { class: 'inv-btn', onclick: () => this.takeAll() }, 'Alles aufheben'))));
     }
     this.el.replaceChildren(el('div', { class: 'inv-row' }, ...parts),
-      el('p', { class: 'inv-help' }, this.vanTab ? 'Rig-Teil auf einen Slot legen: einbauen · Slot anklicken: ausbauen · Rig-Teile kauft man beim Händler (B), sie landen im Kofferraum · I oder Tab: schließen' : 'Klicken: nehmen und ablegen · Rechtsklick, Strg+Klick oder Mausrad: drehen · Doppelklick: auf die andere Seite · daneben klicken: auf den Boden werfen · I oder Tab: schließen'));
+      el('p', { class: 'inv-help' }, this.vanTab ? 'Rig-Teile ein- und ausbauen, kaufen und verkaufen: Rig bauen (B) · Herstellen: Werkbank · Kofferraum wie jedes Lager · I oder Tab: schließen' : 'Klicken: nehmen und ablegen · Rechtsklick, Strg+Klick oder Mausrad: drehen · Doppelklick: auf die andere Seite · daneben klicken: auf den Boden werfen · I oder Tab: schließen'));
     this.drawGhost();
   }
 
@@ -170,27 +170,8 @@ export class InventoryUI {
     if (t) { s.addEventListener('mouseenter', () => this.showTip({ a: 'rigParts', id: p.id, n: 1 })); s.addEventListener('mouseleave', () => { this.tip.hidden = true; }); }
     return s;
   }
-  // held rig part onto a slot = build it in (the old one comes into the hand); click on a full slot = take it out
-  partClick(p, quiet = false) {
-    const D = this.D, save = this.host.save(), h = this.held, say = t => { if (!quiet) this.host.notify?.(t); return false; };
-    if (h) {
-      if (h.e.a !== 'rigParts') return say(`Hier gehört ein Rig-Teil (${PART_SLOT_NAMES[p.slot]}) hin`);
-      const r = installPart(D, save, p.slot, p.i, h.e.id);
-      if (!r.ok) return say(r.reason);
-      this.held = r.prev ? { e: { a: 'rigParts', id: r.prev, n: 1, r: 0 }, from: `part:${p.slot}:${p.i}` } : null;
-      if (!quiet) this.host.notify?.(`${D.rigParts[h.e.id]?.name || h.e.id} eingebaut`);
-      this.host.rigChanged?.();
-      this.changed();
-      return true;
-    }
-    if (!p.id) return say(`Zieh ein Rig-Teil (${PART_SLOT_NAMES[p.slot]}) hierher`);
-    const r = removePart(D, save, p.slot, p.i);
-    if (!r.ok) return say(r.reason);
-    this.held = { e: { a: 'rigParts', id: r.prev, n: 1, r: 0 }, from: `part:${p.slot}:${p.i}` };
-    this.host.rigChanged?.();
-    this.changed();
-    return true;
-  }
+  // the slots only show what is built in: rig parts are dragged onto the van in the build mode (B)
+  partClick(p) { this.host.notify?.(p.id ? 'Ein- und ausbauen: Rig bauen (B)' : `${PART_SLOT_NAMES[p.slot]}: ein Rig-Teil im Bau-Modus (B) an den Van ziehen`); }
 
   showTip(e) {
     const D = this.D, t = thing(D, e.a, e.id) || {}, k = kindOf(D, e.a, e.id);
@@ -254,12 +235,6 @@ export class InventoryUI {
     if (!h) return;
     this.held = null;
     if (['melee', 'ranged', 'cyberdeck', 'backpack'].includes(h.from) && this.equip(h.from, h.e, true)) return this.changed();
-    if (h.from?.startsWith('part:')) {
-      const [, slot, i] = h.from.split(':');
-      this.held = h;
-      if (this.partClick({ slot, i: +i, id: this.host.save().rig.parts?.[slot]?.[+i] || null }, true) && !this.held) return;
-      this.held = null;
-    }
     for (const key of [h.from, 'backpack', ...(this.pair || []), this.other?.key]) {
       const g = key && this.grid(key);
       if (g && add(this.D, g, h.e.a, h.e.id, h.e.n) === 0) return this.changed(key);

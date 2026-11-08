@@ -4,5 +4,6 @@
  "minutes": {"move": 30, "buy": 60, "container": 90, "part": 30},
  "rules": {"power": true, "weight": true},
  "view": {"minZoom": 30, "groundAt": 80, "zoomTime": 650, "swing": 100, "snap": 260, "shake": 40, "volume": 50},
- "work": {"seconds": 1.2, "perHour": 0.6}
+ "work": {"seconds": 1.2, "perHour": 0.6},
+ "sockets": {"engine": [86, 32], "armor": [66, 20], "weapon": [62, 80], "roof": [34, 80], "size": [120, 80], "visible": ["armor", "weapon", "roof"]}
 }

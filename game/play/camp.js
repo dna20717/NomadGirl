@@ -3,7 +3,7 @@
 // Leyla walks around and uses things with E. Time only moves on actions (sleeping, sitting at the fire, driving, runs).
 // Graphics are code placeholders for now; a "look" on containers, workshops or companions takes over later.
 import { clockText, advance, hoursUntil, containers } from '../save.js';
-import { budgets } from '../rig.js';
+import { budgets, partSlots } from '../rig.js';
 
 const de = n => Number(n).toLocaleString('de-DE', { maximumFractionDigits: 1 });
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
@@ -231,6 +231,51 @@ export function shellTexture(scene, D, def, T = 64) {
   return key;
 }
 // a workshop on its own (scrapyard pallet, in the hand while building): a slice of interior with its furniture
+// ---------- rig parts from code (until they have a look): a box per slot kind, 34 × 30 px per "Feld" ----------
+export function partTexture(scene, D, id) {
+  const key = `part_${id}`;
+  if (scene.textures.exists(key)) return key;
+  const t = D.rigParts?.[id] || {}, [fw, fh] = t.size || [2, 2], w = Math.max(1, fw) * 34, h = Math.max(1, fh) * 30, c = col(t.color || '#8a6a3a');
+  const lite = shadeOf(t.color || '#8a6a3a', 1.35), dark = shadeOf(t.color || '#8a6a3a', 0.6);
+  const g = scene.make.graphics({}, false), f = (x, y, ww, hh, cc) => g.fillStyle(cc).fillRect(Math.round(x), Math.round(y), Math.round(ww), Math.round(hh));
+  f(0, 0, w, h, 0x0d0a12);
+  if (t.slot === 'engine') {
+    f(2, 8, w - 4, h - 10, c); f(2, h - 8, w - 4, 6, dark);
+    for (let x = 8; x < w - 8; x += 10) f(x, 2, 5, 10, lite);   // cooling fins
+    g.fillStyle(0x30363d).fillCircle(w - 10, h / 2 + 4, 6).fillStyle(0x8b949e).fillCircle(w - 10, h / 2 + 4, 2);
+  } else if (t.slot === 'armor') {
+    f(2, 2, w - 4, h - 4, c); f(2, 2, w - 4, 4, lite);
+    g.lineStyle(3, dark).lineBetween(6, h - 8, w - 6, 8);   // weld seam
+    for (const [x, y] of [[7, 9], [w - 7, 9], [7, h - 7], [w - 7, h - 7]]) g.fillStyle(lite).fillCircle(x, y, 2.5);
+  } else if (t.slot === 'weapon') {
+    f(4, h * 0.45, w * 0.6, h * 0.55 - 2, c); f(4, h * 0.45, w * 0.6, 4, lite);
+    f(w * 0.3, h * 0.25, w * 0.68, 7, dark); f(w * 0.92, h * 0.2, 6, 12, 0x30363d);   // barrel
+  } else {
+    g.fillStyle(c).fillRoundedRect(2, 4, w - 4, h - 6, 8); f(6, h / 2, w - 12, 3, dark);
+    for (const x of [w * 0.25, w * 0.72]) f(x, 4, 5, h - 6, 0x1b1d22);   // straps
+    f(8, 6, w - 16, 3, lite);
+  }
+  g.generateTexture(key, w, h); g.destroy();
+  return key;
+}
+// a rig part as a little view: box + glyph (origin bottom centre)
+export function partView(scene, D, id, k = 1) {
+  const t = D.rigParts?.[id] || {}, key = partTexture(scene, D, id), img = scene.add.image(0, 0, key).setOrigin(0.5, 1);
+  const v = scene.add.container(0, 0, [img, scene.add.text(0, -img.height / 2, t.glyph || '', { fontFamily: 'VT323, monospace', fontSize: '24px', color: '#f2eef7', stroke: '#0d0a12', strokeThickness: 4 }).setOrigin(0.5)]).setScale(k);
+  v.h = img.height * k; v.w = img.width * k;
+  return v;
+}
+// the sockets on the tractor (Rig-Bau › Rig-Teile am Van): x = % of the van's width from the left, y = % of its height above the ground
+export function socketRects(D, rig, geo, ground) {
+  const S = D.build?.sockets || {}, [sw, sh] = S.size || [120, 80], vw = geo.vanRight - geo.vanLeft, vh = D.assets?.[D.tractors?.[rig.tractor]?.look]?.height || 400;
+  const all = partSlots(D, rig), out = [];
+  for (const p of all) {
+    const n = all.filter(q => q.slot === p.slot).length, [px, py] = S[p.slot] || [50, 50];
+    const cx = geo.vanLeft + vw * px / 100 + (p.i - (n - 1) / 2) * (sw + 12), cy = ground - vh * py / 100;
+    out.push({ ...p, cx, cy, x0: cx - sw / 2, x1: cx + sw / 2, y0: cy - sh / 2, y1: cy + sh / 2 });
+  }
+  return out;
+}
 export function workshopTexture(scene, D, id, C = D.camp || {}) {
   const key = `ws_art_${id}`;
   if (scene.textures.exists(key)) return key;
@@ -294,6 +339,7 @@ export class Camp {
     this.noPower = this.D.build?.rules?.power !== false && this.budget.power.net < 0;
     this.tooHeavy = this.D.build?.rules?.weight !== false && this.budget.heavy;
     for (const u of this.geo.units) u.view = this.drawUnit(u);
+    this.drawVanParts();
     this.drawYard();
     if (this.night) for (const l of this.lights) if (l.rig) l.setAlpha(l.base * this.lightK).setVisible(this.lightK > 0);
   }
@@ -353,6 +399,17 @@ export class Camp {
   }
 
   // ---------- scrapyard by the shaft: spare workshops on pallets, spare trailers parked behind, the dealer's pad ----------
+  // built-in rig parts you can see from outside (Rig-Bau › Rig-Teile am Van › Im Camp sichtbar): Dachbox on the roof, plates on the side
+  drawVanParts() {
+    const s = this.scene, D = this.D, vis = D.build?.sockets?.visible || ['armor', 'weapon', 'roof'];
+    if (s.hud.build?.active) return;   // building: the sockets show them
+    for (const p of socketRects(D, this.box.save.rig, this.geo, this.ground)) {
+      if (!p.id || !vis.includes(p.slot)) continue;
+      const v = partView(s, D, p.id).setDepth(-19.5);
+      v.setPosition(p.cx, p.cy + v.h / 2);
+      this.rigObjs.push(v);
+    }
+  }
   drawYard() {
     const s = this.scene, D = this.D, Y = this.geo.yard, sp = this.box.save.rig.spare || { workshops: [], containers: [] }, y = this.ground;
     this.yardItems = [];
@@ -396,6 +453,15 @@ export class Camp {
       view.add(s.add.text(0, -s.textures.get(key).getSourceImage().height * ws - 6, def.name || id, { fontFamily: 'VT323, monospace', fontSize: '22px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 4 }).setOrigin(0.5, 1));
       this.yardItems.push({ kind: 'ws', i, id, x0: wx, x1: wx + w, y0: y - 14 - s.textures.get(key).getSourceImage().height * ws, y1: y, view, x: wx + w / 2 });
       wx += w + 14;
+    });
+    // spare rig parts: on a low rack after the workshops
+    let qx = wx + (sp.workshops.length ? 10 : 0);
+    (sp.parts || []).forEach((id, i) => {
+      const v = keep(partView(s, D, id, (C.partScale ?? 80) / 100).setDepth(-17));
+      g.fillStyle(0x4a3424).fillRect(qx, y - 10, v.w + 8, 10).fillStyle(0x7a5a3a).fillRect(qx, y - 12, v.w + 8, 3);
+      v.setPosition(qx + 4 + v.w / 2, y - 12);
+      this.yardItems.push({ kind: 'part', i, id, x0: qx, x1: qx + v.w + 8, y0: y - 12 - v.h, y1: y, view: v, x: qx + 4 + v.w / 2 });
+      qx += v.w + 18;
     });
     // some scrap so the place reads as a yard even when it is empty: a tyre stack and a barrel
     const ex = Y.x1 - 70;

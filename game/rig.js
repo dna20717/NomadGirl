@@ -9,7 +9,7 @@
 // Budgets: weight of the containers ≤ pull of the tractor (else no driving), number of containers ≤ "Plätze hintereinander",
 // energy: tractor "Lichtmaschine" + workshops with + minus workshops with − (below 0: workshops that need power do not work).
 import { containers as storeList, advance, ensureGrid } from './save.js';
-import { add, findSpot, canResize } from './inventory.js';
+import { canResize } from './inventory.js';
 
 const clone = x => JSON.parse(JSON.stringify(x));
 export const B = D => D.build || {};
@@ -37,32 +37,50 @@ export function partStats(D, rig) {
   for (const id of partsIn(D, rig)) { const p = D.rigParts?.[id] || {}; for (const k of Object.keys(s)) s[k] += p[k] || 0; }
   return s;
 }
-// the tractor's own storage with the size it would have with other parts (the Dachbox adds rows)
-const tractorStore = (D, save) => storeList(D, save).find(c => c.unit === 0);
-// put the rig part `id` (held in the hand) into a slot; → { ok, reason, prev } (prev = the part that was there, now in the hand)
-export function installPart(D, save, slot, i, id) {
+// how many rows the parts add to the tractor's own storage (Dachbox)
+export const extraRows = (D, parts) => Object.values(parts || {}).flat().reduce((n, id) => n + (D.rigParts?.[id]?.storageRows || 0), 0);
+
+// rig parts are building parts like workshops (Daniel, 08.11.2026): bought ones and taken out ones lie on the scrapyard (rig.spare.parts),
+// in the build mode they are dragged onto the sockets on the van. Every action is a draft op (act).
+// from = { yard: index in spare.parts } or { slot, i } (another socket). A taken socket: its part goes onto the scrapyard (or swaps sockets).
+export function mountPart(D, d, slot, i, from) {
+  const P = (d.rig.parts ??= {}), list = (P[slot] ??= []), yard = d.rig.spare.parts;
+  const id = from.yard != null ? yard[from.yard] : P[from.slot]?.[from.i];
   const def = D.rigParts?.[id];
-  if (!def) return { ok: false, reason: 'Das ist kein Rig-Teil' };
-  if (def.slot !== slot) return { ok: false, reason: `Gehört in den Slot „${SLOT_NAMES[def.slot] || def.slot}“` };
-  if (i >= slotCount(D, save.rig, slot)) return { ok: false, reason: 'Diesen Slot hat die Zugmaschine nicht' };
-  return swapPart(D, save, slot, i, id);
-}
-export function removePart(D, save, slot, i) {
-  if (!save.rig.parts?.[slot]?.[i]) return { ok: false, reason: 'Leer' };
-  return swapPart(D, save, slot, i, null);
-}
-function swapPart(D, save, slot, i, id) {
-  save.rig.parts ??= {};
-  const list = (save.rig.parts[slot] ??= []), prev = list[i] || null, before = tractorStore(D, save);
+  if (!def) return { ok: false, reason: 'Weg' };
+  if (def.slot !== slot) return { ok: false, reason: `${def.name || id} gehört an ${SLOT_NAMES[def.slot] || def.slot}` };
+  if (i >= slotCount(D, d.rig, slot)) return { ok: false, reason: 'Diesen Platz hat die Zugmaschine nicht' };
+  if (from.slot === slot && from.i === i) return { ok: false, same: true, reason: 'Sitzt schon da' };
+  const there = list[i] || null;
+  if (from.yard != null) { yard.splice(from.yard, 1); if (there) yard.push(there); }
+  else P[from.slot][from.i] = there;
   list[i] = id;
-  const after = tractorStore(D, save), g = before && save.inv.grids[before.key];
-  if (g && after && (after.size[0] < g.w || after.size[1] < g.h) && !canResize(D, g, ...after.size)) {
-    list[i] = prev;
-    return { ok: false, reason: `Erst den ${before.name} ausräumen, sonst fällt etwas raus` };
-  }
-  for (const c of storeList(D, save)) ensureGrid(D, save.inv, c.key, c.size);
-  advance(save, M(D, 'part', 30) / 60);
-  return { ok: true, prev };
+  spend(D, d, 0, M(D, 'part', 30));
+  return { ok: true, swapped: there };
+}
+// a socket's part onto the scrapyard
+export function unmountPart(D, d, slot, i) {
+  const id = d.rig.parts?.[slot]?.[i];
+  if (!id) return { ok: false, reason: 'Leer' };
+  d.rig.parts[slot][i] = null;
+  d.rig.spare.parts.push(id);
+  spend(D, d, 0, M(D, 'part', 30));
+  return { ok: true };
+}
+export function buyPart(D, d, id) {
+  const price = priceOf(D, 'rigParts', id);
+  if (!D.rigParts?.[id]) return { ok: false, reason: 'Unbekannt' };
+  if (price > d.deltas) return { ok: false, reason: 'Zu wenig Δ' };
+  d.rig.spare.parts.push(id);
+  spend(D, d, price, M(D, 'buy', 60));
+  return { ok: true };
+}
+export function sellPart(D, d, i) {
+  const id = d.rig.spare.parts[i];
+  if (!id) return { ok: false, reason: 'Liegt nicht auf dem Schrottplatz' };
+  d.rig.spare.parts.splice(i, 1);
+  spend(D, d, -sellPrice(D, 'rigParts', id), 0);
+  return { ok: true };
 }
 export const SLOT_NAMES = { engine: 'Motor', armor: 'Panzerung', weapon: 'Waffe', roof: 'Dach' };
 
@@ -92,11 +110,13 @@ export function budgets(D, rig) {
 export function startDraft(D, save) {
   const rig = clone(save.rig);
   rig.spare ??= { workshops: [], containers: [] };
+  rig.spare.parts ??= [];
+  rig.parts ??= {};
   let uid = 0;
   rig.units.forEach((u, ui) => { u.key = `rig:${ui}`; });
   rig.units.forEach((u, ui) => u.workshops.forEach(w => { w.uid = ++uid; w.home = `${ui}:${w.at}`; if (wsDef(D, w.id).grid) w.key = `store:${ui}:${w.at}`; }));
   rig.spare.workshops = rig.spare.workshops.map(w => typeof w === 'string' ? { id: w, uid: ++uid } : { ...w, uid: ++uid });
-  return { rig, deltas: save.deltas, minutes: 0, uid, changes: 0, grids: save.inv?.grids || {}, deliver: [] };
+  return { rig, deltas: save.deltas, minutes: 0, uid, changes: 0, grids: save.inv?.grids || {} };
 }
 const spend = (D, d, n, minutes) => { d.deltas -= n; d.minutes += minutes ?? 0; d.changes++; };
 const M = (D, k, def) => B(D).minutes?.[k] ?? def;
@@ -145,18 +165,6 @@ export function buyWorkshop(D, d, id) {
   d.rig.spare.workshops.push(inst);
   spend(D, d, price, M(D, 'buy', 60));
   return { ok: true, inst };
-}
-// a rig part is a big thing: it is delivered into the Kofferraum (else the chest, a storage place, the backpack)
-export function deliveryKeys(D, save) { return ['rig:0', 'chest', ...storeList(D, save).filter(c => c.key.startsWith('store:') || (c.key.startsWith('rig:') && c.key !== 'rig:0')).map(c => c.key), 'backpack']; }
-export function buyPart(D, d, id, save) {
-  const price = priceOf(D, 'rigParts', id);
-  if (!D.rigParts?.[id]) return { ok: false, reason: 'Unbekannt' };
-  if (price > d.deltas) return { ok: false, reason: 'Zu wenig Δ' };
-  const key = save && deliveryKeys(D, save).find(k => d.grids[k] && findSpot(D, d.grids[k], 'rigParts', id));
-  if (save && !key) return { ok: false, reason: 'Nirgends Platz dafür' };
-  d.deliver.push(id);
-  spend(D, d, price, M(D, 'buy', 60));
-  return { ok: true, key, where: key && (key === 'backpack' ? 'Rucksack' : storeList(D, save).find(c => c.key === key)?.name) };
 }
 export function sellWorkshop(D, d, uid) {
   const inst = d.rig.spare.workshops.find(w => w.uid === uid);
@@ -257,6 +265,9 @@ export function problems(D, d) {
   const out = [];
   for (const w of d.rig.spare.workshops) if (storeFull(d, w)) out.push(`${wsDef(D, w.id).name || w.id} ist nicht leer und muss eingebaut bleiben`);
   if (d.deltas < 0) out.push('Zu wenig Δ');
+  // the Dachbox comes off: the Kofferraum shrinks, nothing may fall out
+  const S = D.tractors?.[d.rig.tractor]?.storage, g = d.grids['rig:0'];
+  if (S?.[0] && g && !canResize(D, g, S[0], S[1] + extraRows(D, d.rig.parts))) out.push(`Erst den ${D.tractors[d.rig.tractor].storageName || 'Kofferraum'} ausräumen, sonst fällt etwas raus`);
   return out;
 }
 
@@ -267,14 +278,13 @@ export function applyDraft(D, save, d) {
   const old = save.inv.grids, grids = {};
   for (const [k, g] of Object.entries(old)) if (!rigGrid(k)) grids[k] = g;
   const rig = { tractor: d.rig.tractor, units: d.rig.units.map(u => ({ kind: u.kind, id: u.id, workshops: u.workshops.map(w => ({ id: w.id, at: w.at })) })),
-    spare: { workshops: d.rig.spare.workshops.map(w => w.id), containers: [...d.rig.spare.containers] }, parts: clone(d.rig.parts || {}) };
+    spare: { workshops: d.rig.spare.workshops.map(w => w.id), containers: [...d.rig.spare.containers], parts: [...d.rig.spare.parts] }, parts: clone(d.rig.parts || {}) };
   d.rig.units.forEach((u, ui) => u.workshops.forEach(w => { if (w.key && old[w.key]) grids[`store:${ui}:${w.at}`] = old[w.key]; }));
   d.rig.units.forEach((u, ui) => { if (u.key && old[u.key]) grids[`rig:${ui}`] = old[u.key]; });
   save.rig = rig;
   save.inv.grids = grids;
   save.deltas = d.deltas;
   for (const c of storeList(D, save)) ensureGrid(D, save.inv, c.key, c.size);
-  for (const id of d.deliver || []) for (const k of deliveryKeys(D, save)) if (grids[k] && add(D, grids[k], 'rigParts', id, 1) === 0) break;
   if (d.minutes) advance(save, d.minutes / 60);
   return { ok: true, minutes: d.minutes };
 }
