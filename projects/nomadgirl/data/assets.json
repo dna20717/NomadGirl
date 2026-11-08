@@ -1415,5 +1415,35 @@
   "derivedFrom": "leyla_yoga_front_source",
   "date": "07.11.2026",
   "description": "Pixel-Art von vorn: Baum-Pose. Das Standbein bleibt auf dem Anker (Versatz pro Frame ausgeglichen: 0,0,0,0,3,6,9,11,12,12,12,12 px)."
+ },
+ "trailer_flat": {
+  "name": "Modul-Anhänger (ohne Dachaufbau)",
+  "kind": "animation",
+  "file": "assets/rig/trailer_flat.png",
+  "frameSize": [256, 256],
+  "frames": 1,
+  "fps": 0,
+  "loop": false,
+  "origin": [128, 204],
+  "height": 768,
+  "flip": true,
+  "source": "KI (Pixel-Art von Daniel, 08.11.2026)",
+  "date": "08.11.2026",
+  "description": "Lila Anhänger mit aufgeklappter Längsseite und flachem Dach zum Stapeln, Rampe unten. Deichsel im Bild links; „Schaut nach links“ an. Dachkante y 77, Ankerpunkt = Reifen am Boden, im Spiel ×3."
+ },
+ "container_stack": {
+  "name": "Container zum Stapeln",
+  "kind": "animation",
+  "file": "assets/rig/container_stack.png",
+  "frameSize": [256, 256],
+  "frames": 1,
+  "fps": 0,
+  "loop": false,
+  "origin": [128, 186],
+  "height": 768,
+  "flip": false,
+  "source": "KI (Pixel-Art von Daniel, 08.11.2026)",
+  "date": "08.11.2026",
+  "description": "Leerer 20-Fuß-Container, Längsseite offen, ohne Räder: steht auf einem Anhänger oder einem anderen Container. Oberkante y 73, Ankerpunkt = Unterkante Mitte, im Spiel ×3."
  }
 }

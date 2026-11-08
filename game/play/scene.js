@@ -51,7 +51,9 @@ export class PlayScene extends Phaser.Scene {
       if (this.data_.camp?.fire?.look) ids.add(this.data_.camp.fire.look);
       if (this.data_.camp?.fire?.sit?.look) ids.add(this.data_.camp.fire.sit.look);
       if (this.data_.camp?.chest?.look) ids.add(this.data_.camp.chest.look);
-      for (const u of this.box?.save.rig.units || []) if (u.kind === 'container' && this.data_.containers?.[u.id]?.look) ids.add(this.data_.containers[u.id].look);
+      // every container's look: bought or stacked ones appear while building, without reloading the scene
+      for (const c of Object.values(this.data_.containers || {})) if (c.look) ids.add(c.look);
+      for (const c of Object.values(this.data_.rigParts || {})) if (c.look) ids.add(c.look);
       if (this.data_.camp?.ground?.tiles) ids.add(this.data_.camp.ground.tiles);
       const S = this.data_.camp?.sound || {};
       for (const id of [S.wind, S.fire, ...(S.gusts || []), ...(this.data_.camp?.fire?.sit?.sounds || [])]) if (id) ids.add(id);

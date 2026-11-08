@@ -25,23 +25,32 @@ export function unitShape(D, def, ground, T = 64) {
   if (A?.frameSize && def.inside?.x && def.inside?.y) {
     const [fw, fh] = A.frameSize, k = (A.height || fh) / fh, [ox, oy] = A.origin || [fw / 2, fh], flip = !!A.flip !== !!def.flip, w = fw * k;
     const ix = v => flip ? fw - v : v, a = ix(def.inside.x[0]), b = ix(def.inside.x[1]), in0 = Math.min(a, b) * k, in1 = Math.max(a, b) * k;
-    return { w, places, cell: (in1 - in0) / places, in0, inTop: ground - (oy - def.inside.y[0]) * k, floorY: ground - (oy - def.inside.y[1]) * k,
+    return { w, places, cell: (in1 - in0) / places, in0, inTop: ground - (oy - def.inside.y[0]) * k, floorY: ground - (oy - def.inside.y[1]) * k, deckY: ground - (oy - (def.deck ?? 0)) * k,
       sprite: { key: def.look, k, flip, ox: (flip ? fw - ox : ox) / fw, oy: oy / fh, cx: (flip ? fw - ox : ox) * k }, hitch: [0, ground - 40 * k / 3], coupling: [w, ground - 40 * k / 3] };
   }
   const cell = (R.placeWidth ?? 4) * T, lift = R.lift ?? 48, h = R.height ?? 248, rear = 44, bar = R.drawbar ?? 120;
   const in0 = rear, body = places * cell, floorY = ground - lift;
-  return { w: rear + body + 12 + bar, places, cell, in0, inTop: floorY - h, floorY, body, lift, bar, hitch: [0, ground - 40], coupling: [rear + body + 12 + bar, ground - 40] };
+  return { w: rear + body + 12 + bar, places, cell, in0, inTop: floorY - h, floorY, deckY: floorY - h - 22, body, lift, bar, hitch: [0, ground - 40], coupling: [rear + body + 12 + bar, ground - 40] };
 }
 export const unitWidth = (D, def, T = 64) => unitShape(D, def, 0, T).w;
 
-// the rig from the van to the left: the first container hangs right behind the van, each next one on the one in front
+// the rig from the van to the left: the first container hangs right behind the van, each next one on the one in front.
+// A stacked container (level > 0) stands on the deck of the unit below it, its interior centred over the one below.
 export function rigUnits(D, rig, vanLeft, ground, T = 64) {
   const out = [];
-  let right = vanLeft;
+  let right = vanLeft, below = null;
   rig.units.forEach((u, ui) => {
     if (u.kind === 'tractor') return;
-    const def = D.containers?.[u.id] || {}, sh = unitShape(D, def, ground, T), x0 = right - sh.w;
-    out.push({ ...u, ui, def, ...sh, x0, x1: right, in0: x0 + sh.in0, sprite: sh.sprite && { ...sh.sprite, cx: x0 + sh.sprite.cx } });
+    const def = D.containers?.[u.id] || {};
+    if (u.level && below) {
+      const base = below.deckY, sh = unitShape(D, def, base, T), mid = below.in0 + below.cell * below.places / 2, x0 = mid - (sh.in0 + sh.cell * sh.places / 2);
+      below = { ...u, ui, def, ...sh, base, x0, x1: x0 + sh.w, in0: x0 + sh.in0, sprite: sh.sprite && { ...sh.sprite, cx: x0 + sh.sprite.cx }, foot: below.foot ?? below };
+      out.push(below);
+      return;
+    }
+    const sh = unitShape(D, def, ground, T), x0 = right - sh.w;
+    below = { ...u, ui, def, ...sh, base: ground, x0, x1: right, in0: x0 + sh.in0, sprite: sh.sprite && { ...sh.sprite, cx: x0 + sh.sprite.cx } };
+    out.push(below);
     right = x0 + (sh.sprite ? 0 : 6);   // a code trailer's drawbar reaches into the towing eye of the one in front
   });
   return out;
@@ -334,6 +343,7 @@ export class Camp {
     for (const l of this.lights) if (l.rig) l.destroy();
     this.lights = this.lights.filter(l => !l.rig);
     this.hotspots = this.hotspots.filter(h => !h.rig);
+    s.ladders = (s.ladders || []).filter(l => !l.rig);
     this.geo.units = rigUnits(this.D, this.box.save.rig, this.geo.vanLeft, this.ground, s.T);
     this.budget = budgets(this.D, this.box.save.rig);
     this.noPower = this.D.build?.rules?.power !== false && this.budget.power.net < 0;
@@ -345,13 +355,17 @@ export class Camp {
   }
   // one container in the rig: shell (picture or code), furniture, lights, the interior floor as a platform, E spots
   drawUnit(u) {
-    const s = this.scene, D = this.D, R = this.C.rig || {}, mid = (u.x0 + u.x1) / 2, view = s.add.container(mid, this.ground).setDepth(-21);
+    const s = this.scene, D = this.D, R = this.C.rig || {}, mid = (u.x0 + u.x1) / 2, G = u.base ?? this.ground, view = s.add.container(mid, G).setDepth(-21);
+    this.curTop = u.level ? u.floorY : null;   // E spots of a stacked container only work up there
     this.rigObjs.push(view);
     const add = o => { view.add(o); return o; };
     if (u.sprite) {
       if (s.textures.exists(u.sprite.key)) {
         s.textures.get(u.sprite.key).setFilter(NEAREST());
-        add(s.add.image(u.sprite.cx - mid, 0, u.sprite.key, 0).setOrigin(u.sprite.ox, u.sprite.oy).setScale(u.sprite.k).setFlipX(u.sprite.flip));
+        const img = add(s.add.image(u.sprite.cx - mid, 0, u.sprite.key, 0).setOrigin(u.sprite.ox, u.sprite.oy).setScale(u.sprite.k).setFlipX(u.sprite.flip));
+        // something stacked on top: the roof clutter above the deck is cut off, the container sits right on the roof (Container › Dachaufbau abschneiden)
+        const U = this.box.save.rig.units, onTop = (U[u.ui + 1]?.level || 0) > (u.level || 0);
+        if (onTop && u.def.deck != null && u.def.cropAbove !== false) { const f = img.frame; img.setCrop(0, u.def.deck, f.width, f.height - u.def.deck); }
       }
     } else add(s.add.image(u.x0 - mid, 0, shellTexture(s, D, u.def, s.T)).setOrigin(0, 1).setScale(1));
     // furniture: one texture per container, drawn in the interior
@@ -367,16 +381,17 @@ export class Camp {
     if (!u.sprite) for (let i = 1; i < u.places; i++) g.fillStyle(col(R.wall || '#4a4f5a')).fillRect(u.in0 - u.x0 + i * u.cell - 3, 40, 6, h - 120);   // thin walls between the places
     if (s.textures.exists(key)) s.textures.remove(key);
     g.generateTexture(key, Math.ceil(u.x1 - u.x0), Math.ceil(h + 44)); g.destroy();
-    add(s.add.image(u.x0 - mid, u.inTop - 40 - this.ground, key).setOrigin(0));
+    add(s.add.image(u.x0 - mid, u.inTop - 40 - G, key).setOrigin(0));
     // Deichselkasten: a little steel box on the drawbar (code), E opens the trailer's own storage
     if (u.def.storage?.[0]) {
-      const k = (this.C.rig?.boxAt ?? 55) / 100, b0 = u.in0 + (u.body || 0) + 12, bx = u.sprite ? u.x1 - 40 : b0 + (u.x1 - 10 - b0) * k;
-      const by = u.sprite ? this.ground - 40 : u.floorY + (this.ground - 40 - u.floorY) * k, bw = 44, bh = 26;
+      // stacked: no drawbar, the box stands on the floor at the front end
+      const k = (this.C.rig?.boxAt ?? 55) / 100, b0 = u.in0 + (u.body || 0) + 12, bx = u.level ? u.in0 + u.cell * u.places - 34 : u.sprite ? u.x1 - 40 : b0 + (u.x1 - 10 - b0) * k;
+      const by = u.level ? u.floorY : u.sprite ? G - 40 : u.floorY + (G - 40 - u.floorY) * k, bw = 44, bh = 26;
       const bg = s.add.graphics();
       bg.fillStyle(0x1b1d22).fillRect(bx - bw / 2 - 2, by - bh - 4, bw + 4, bh + 4).fillStyle(0x5a616b).fillRect(bx - bw / 2, by - bh - 2, bw, bh)
         .fillStyle(0x8b949e).fillRect(bx - bw / 2, by - bh - 2, bw, 4).fillStyle(0x2b2f36).fillRect(bx - 5, by - bh + 8, 10, 5)
         .fillStyle(0xd9a441).fillRect(bx - bw / 2 + 4, by - 8, bw - 8, 2);
-      bg.x = -mid; bg.y = -this.ground; add(bg);
+      bg.x = -mid; bg.y = -G; add(bg);
       this.storeHotspot(`rig:${u.ui}`, bx, u.def.storageName || 'Deichselkasten');
     }
     // the interior floor carries Leyla (jump in), workshops are used with E from the ground or from inside
@@ -384,17 +399,30 @@ export class Camp {
     s.platforms.add(z);
     Object.assign(z.body.checkCollision, { down: false, left: false, right: false });
     this.rigObjs.push(z);
+    if (u.level) this.stackLadder(u);
+    this.curTop = null;
     return view;
+  }
+  // a ladder from below up into a stacked container (Camp › Rig-Ansicht › Leiter bei): climbs like an H ladder, at the top she pulls herself in
+  stackLadder(u) {
+    const s = this.scene, R = this.C.rig || {}, foot = u.foot || u, below = this.geo.units.find(x => x.ui === u.ui - 1) || foot;
+    const x = foot.x0 + (foot.x1 - foot.x0) * (R.ladderAt ?? 8) / 100, top = u.floorY, bottom = u.level > 1 ? below.floorY : this.ground;
+    const g = s.add.graphics().setDepth(-18);
+    g.fillStyle(0x30363d).fillRect(x - 22, top - 30, 6, bottom - top + 30).fillRect(x + 16, top - 30, 6, bottom - top + 30);
+    g.fillStyle(0x8b949e).fillRect(x - 22, top - 30, 2, bottom - top + 30).fillRect(x + 16, top - 30, 2, bottom - top + 30);
+    for (let y = bottom - 20; y > top - 20; y -= 28) g.fillStyle(0x6b7280).fillRect(x - 16, y, 32, 5);
+    this.rigObjs.push(g);
+    s.ladders.push({ cx: x, x0: x - s.T / 2, x1: x + s.T / 2, top, bottom, rig: true });
   }
   // a small storage of its own (Kofferraum, Deichselkasten): E opens and closes it
   storeHotspot(key, x, name, rig = true) {
     const inv = () => this.scene.hud.inv, isOpen = () => inv()?.isOpen && inv().other?.key === key;
-    this.hotspots.push({ rig, x, w: 50, name, hint: () => isOpen() ? 'Schließen' : 'Öffnen', store: key, act: () => { if (isOpen()) inv().close(); else this.scene.openContainer(key); } });
+    this.hotspots.push({ rig, x, w: 50, top: this.curTop, name, hint: () => isOpen() ? 'Schließen' : 'Öffnen', store: key, act: () => { if (isOpen()) inv().close(); else this.scene.openContainer(key); } });
   }
   workshopHotspot(u, w, def, cx, cw, labelY) {
     const R = this.C.rig || {};
     const store = def.grid && `store:${u.ui}:${w.at}`;
-    this.hotspots.push({ rig: true, x: cx + cw / 2, w: cw / 2, name: def.name || w.id, hint: store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id) });
+    this.hotspots.push({ rig: true, x: cx + cw / 2, w: cw / 2, top: this.curTop, name: def.name || w.id, hint: store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id) });
     if (R.labels !== false) this.rigObjs.push(this.scene.add.text(cx + cw / 2, labelY, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '24px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 0).setDepth(-14));
   }
 
@@ -731,7 +759,11 @@ export class Camp {
     }
     let best = null, bd = Infinity;
     if (l.alive && l.body.blocked.down)
-      for (const h of this.hotspots) { const d = Math.abs(l.x - h.x); if (d <= Math.max(h.w || 0, range) && d < bd) { best = h; bd = d; } }
+      for (const h of this.hotspots) {
+        // up in a stacked container only its spots, on the ground (or in a trailer) only the ones down there
+        if (h.top != null ? Math.abs(l.feet - h.top) > 50 : l.feet < this.ground - (this.C.rig?.reachUp ?? 240)) continue;
+        const d = Math.abs(l.x - h.x); if (d <= Math.max(h.w || 0, range) && d < bd) { best = h; bd = d; }
+      }
     this.atWorkshop = !!(best?.ws && Math.abs(l.body.velocity.x) < 5);
     const hint = h => typeof h.hint === 'function' ? h.hint() : h.hint;
     const text = best && `${hint(best)} · ${best.name}`;

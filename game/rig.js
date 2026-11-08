@@ -6,7 +6,10 @@
 //   spare = bought or removed things that are not built in ("Lager" in the build view).
 // Every action is a small draft (startDraft → op → applyDraft, all in act()): Δ, the clock, and the storage grids follow their workshop.
 // "Rückgängig" puts a snapshot back (snapshot/restore).
-// Budgets: weight of the containers ≤ pull of the tractor (else no driving), number of containers ≤ "Plätze hintereinander",
+// Stacks (Daniel, 08.11.2026): units are still one flat list; a stacked container has "level" (1 = on the roof of the one below)
+// and follows right after its base. A ground unit with everything stacked on it is a "block"; blocks move together.
+// Budgets: weight of the containers ≤ pull of the tractor (else no driving), number of ground containers ≤ "Plätze hintereinander",
+// levels < "Stapelhöhe",
 // energy: tractor "Lichtmaschine" + workshops with + minus workshops with − (below 0: workshops that need power do not work).
 import { containers as storeList, advance, ensureGrid } from './save.js';
 import { canResize } from './inventory.js';
@@ -94,15 +97,45 @@ export function shop(D) {
   };
 }
 
+// ---------- stacks ----------
+export const levelOf = u => u?.level || 0;
+// the block of unit ui: [start, end) (start = its ground unit)
+export function blockAt(U, ui) {
+  let a = ui; while (a > 0 && levelOf(U[a]) > 0) a--;
+  let b = a + 1; while (b < U.length && levelOf(U[b]) > 0) b++;
+  return [a, b];
+}
+// is something standing on unit ui?
+export const hasAbove = (U, ui) => levelOf(U[ui + 1]) > levelOf(U[ui]) && ui + 1 < U.length && levelOf(U[ui + 1]) > 0;
+export const maxStack = (D, rig) => Math.max(1, D.tractors?.[rig.tractor]?.stack ?? 1);
+// can something be stacked on the block of unit ui? → the top unit or a reason
+export function stackTop(D, rig, ui) {
+  const U = rig.units, [, b] = blockAt(U, ui), top = U[b - 1];
+  if (!top || top.kind === 'tractor') return { reason: 'Auf die Zugmaschine kommt nichts' };
+  if (!D.containers?.[top.id]?.carries) return { reason: `Auf ${D.containers?.[top.id]?.name || top.id} kann nichts stehen` };
+  if (levelOf(top) + 1 >= maxStack(D, rig)) return { reason: `${D.tractors?.[rig.tractor]?.name || 'Die Zugmaschine'} stapelt höchstens ${maxStack(D, rig)} hoch` };
+  return { top, end: b };
+}
+// takes a unit out of the rig: a ground unit with its whole block, a stacked one only if nothing stands on it. → { units } or { reason }
+function takeOut(U, ui) {
+  if (levelOf(U[ui]) > 0) {
+    if (hasAbove(U, ui)) return { reason: 'Erst den Container darüber abnehmen' };
+    const [u] = U.splice(ui, 1);
+    return { units: [u] };
+  }
+  const [a, b] = blockAt(U, ui);
+  return { units: U.splice(a, b - a) };
+}
+
 export function budgets(D, rig) {
   const T = D.tractors?.[rig.tractor] || {}, Tr = D.travel || {}, P = partStats(D, rig), pull = (T.pull || 0) + P.pull;
-  const conts = rig.units.filter(u => u.kind === 'container');
+  const conts = rig.units.filter(u => u.kind === 'container'), ground = conts.filter(u => !levelOf(u));
   const weight = conts.reduce((n, u) => n + (D.containers?.[u.id]?.weight || 0), 0);
   let made = T.power || 0, used = 0;
   for (const u of rig.units) for (const w of u.workshops) { const p = wsDef(D, w.id).power || 0; if (p > 0) made += p; else used -= p; }
   const fuel = Math.round(((T.fuelUse ?? 12) + P.fuelUse) * (1 + (Tr.weightFuelFactor ?? 0) / 100 * weight / 1000) * 10) / 10;
   const places = rig.units.reduce((n, u) => n + placesOf(D, u), 0), filled = rig.units.reduce((n, u) => n + u.workshops.reduce((k, w) => k + (wsDef(D, w.id).places || 1), 0), 0);
-  return { weight, pull, heavy: weight > pull, armor: P.armor, damage: P.damage, length: conts.length, maxLength: T.length ?? 0, power: { made, used, net: made - used }, fuel, places, filled };
+  return { weight, pull, heavy: weight > pull, armor: P.armor, damage: P.damage, length: ground.length, maxLength: T.length ?? 0, stack: Math.max(1, T.stack ?? 1), height: Math.max(1, ...conts.map(u => levelOf(u) + 1)), power: { made, used, net: made - used }, fuel, places, filled };
 }
 
 // ---------- the draft ----------
@@ -203,6 +236,7 @@ export function attach(D, d, i) {
 export function detach(D, d, ui) {
   const u = d.rig.units[ui];
   if (!u || u.kind !== 'container') return { ok: false, reason: 'Das ist kein Container' };
+  if (hasAbove(d.rig.units, ui)) return { ok: false, reason: 'Erst den Container oben abnehmen' };
   if (u.workshops.length) return { ok: false, reason: 'Erst die Werkstätten ausbauen' };
   if (d.grids[u.key]?.items?.length) return { ok: false, reason: `Erst den ${D.containers?.[u.id]?.storageName || 'Deichselkasten'} ausräumen` };
   d.rig.units.splice(ui, 1);
@@ -218,25 +252,55 @@ export function shift(D, d, ui, dir) {
   spend(D, d, 0, M(D, 'container', 90));
   return { ok: true };
 }
-// hang a spare container in at unit index `at` (1 = right behind the tractor, units.length = at the end)
+// hang a spare container in at gap `at` (a unit index where a block starts, 1 = right behind the tractor, units.length = at the end)
 export function attachAt(D, d, i, at) {
   const id = d.rig.spare.containers[i], b = budgets(D, d.rig), U = d.rig.units;
   if (!id) return { ok: false, reason: 'Liegt nicht im Lager' };
   if (b.length >= b.maxLength) return { ok: false, reason: `${D.tractors?.[d.rig.tractor]?.name || 'Die Zugmaschine'} zieht höchstens ${b.maxLength} Anhänger` };
   d.rig.spare.containers.splice(i, 1);
-  U.splice(Math.max(1, Math.min(U.length, at)), 0, { kind: 'container', id, workshops: [] });
+  U.splice(blockStart(U, at), 0, { kind: 'container', id, workshops: [] });
   spend(D, d, 0, M(D, 'container', 90));
   return { ok: true };
 }
-// move a built-in container into the gap `gap` (gap g = in front of unit g, units.length = at the end); same place = nothing happens
+// a gap index snapped to the start of a block (never inside a stack, never before the tractor)
+const blockStart = (U, at) => { let g = Math.max(1, Math.min(U.length, at)); while (g < U.length && levelOf(U[g]) > 0) g++; return g; };
+// move a built-in container into the gap `gap` (gap g = in front of the block starting at g, units.length = at the end):
+// a ground unit takes its stack along, a stacked one comes down onto the ground; same place = nothing happens
 export function moveContainer(D, d, ui, gap) {
   const U = d.rig.units, u = U[ui];
   if (!u || u.kind !== 'container') return { ok: false, reason: 'Das ist kein Anhänger' };
-  U.splice(ui, 1);
-  const at = Math.max(1, Math.min(U.length, gap > ui ? gap - 1 : gap));
-  U.splice(at, 0, u);
-  if (at === ui) return { ok: false, reason: 'Steht schon da', same: true };
+  const wasStacked = levelOf(u) > 0, b = budgets(D, d.rig);
+  if (wasStacked && b.length >= b.maxLength) return { ok: false, reason: `${D.tractors?.[d.rig.tractor]?.name || 'Die Zugmaschine'} zieht höchstens ${b.maxLength} Anhänger` };
+  const g = blockStart(U, gap), target = U[g] || null, [a, e] = blockAt(U, ui);
+  if (!wasStacked && (g === a || g === e)) return { ok: false, reason: 'Steht schon da', same: true };
+  const t = takeOut(U, ui);
+  if (t.reason) return { ok: false, reason: t.reason };
+  const shift = t.units[0].level || 0;
+  for (const x of t.units) x.level = (x.level || 0) - shift || undefined;
+  const at = target ? U.indexOf(target) : U.length;
+  U.splice(at, 0, ...t.units);
   spend(D, d, 0, M(D, 'container', 90));
+  return { ok: true };
+}
+// stack a container onto the block of unit `onto`: from = { spare: i } (scrapyard) or { ui } (a container in the rig without anything on it)
+export function stackOn(D, d, from, onto) {
+  const U = d.rig.units, st = stackTop(D, d.rig, onto);
+  if (st.reason) return { ok: false, reason: st.reason };
+  const id = from.spare != null ? d.rig.spare.containers[from.spare] : U[from.ui]?.id, def = D.containers?.[id];
+  if (!def) return { ok: false, reason: 'Weg' };
+  if (!def.stackable) return { ok: false, reason: `${def.name || id} lässt sich nicht stapeln` };
+  let unit;
+  if (from.spare != null) { d.rig.spare.containers.splice(from.spare, 1); unit = { kind: 'container', id, workshops: [] }; }
+  else {
+    const [a, b] = blockAt(U, from.ui);
+    if (onto >= a && onto < b) return { ok: false, reason: 'Steht schon da', same: true };
+    if (hasAbove(U, from.ui)) return { ok: false, reason: 'Erst den Container darüber abnehmen' };
+    unit = takeOut(U, from.ui).units[0];
+  }
+  const top = st.top, at = U.indexOf(top) + 1;
+  unit.level = levelOf(top) + 1;
+  U.splice(at, 0, unit);
+  spend(D, d, 0, M(D, 'stack', M(D, 'container', 90)));
   return { ok: true };
 }
 
@@ -277,7 +341,7 @@ export function applyDraft(D, save, d) {
   if (bad.length) return { ok: false, reason: bad[0] };
   const old = save.inv.grids, grids = {};
   for (const [k, g] of Object.entries(old)) if (!rigGrid(k)) grids[k] = g;
-  const rig = { tractor: d.rig.tractor, units: d.rig.units.map(u => ({ kind: u.kind, id: u.id, workshops: u.workshops.map(w => ({ id: w.id, at: w.at })) })),
+  const rig = { tractor: d.rig.tractor, units: d.rig.units.map(u => ({ kind: u.kind, id: u.id, ...(u.level ? { level: u.level } : {}), workshops: u.workshops.map(w => ({ id: w.id, at: w.at })) })),
     spare: { workshops: d.rig.spare.workshops.map(w => w.id), containers: [...d.rig.spare.containers], parts: [...d.rig.spare.parts] }, parts: clone(d.rig.parts || {}) };
   d.rig.units.forEach((u, ui) => u.workshops.forEach(w => { if (w.key && old[w.key]) grids[`store:${ui}:${w.at}`] = old[w.key]; }));
   d.rig.units.forEach((u, ui) => { if (u.key && old[u.key]) grids[`rig:${ui}`] = old[u.key]; });

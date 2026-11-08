@@ -120,6 +120,8 @@ export function repairSave(save, D) {
   if (!D.tractors?.[s.rig?.tractor]) s.rig = fresh.rig;
   s.rig.units = s.rig.units.filter(u => u.kind === 'tractor' || D.containers?.[u.id]);
   for (const u of s.rig.units) u.workshops = (u.workshops || []).filter(w => D.workshops?.[w.id]);
+  // stacks stay whole: a level is at most one above the unit before it, nothing stands on the tractor
+  s.rig.units.forEach((u, i) => { const prev = s.rig.units[i - 1]; if (!u.level) return; const max = !prev || prev.kind === 'tractor' ? 0 : (prev.level || 0) + 1; if (u.level > max) u.level = max; if (!u.level) delete u.level; });
   const sp = s.rig.spare || {};
   s.rig.spare = { workshops: (sp.workshops || []).filter(w => D.workshops?.[w]), containers: (sp.containers || []).filter(c => D.containers?.[c]), parts: (sp.parts || []).filter(c => D.rigParts?.[c]) };
   // rig parts were things in the inventory for a morning (08.11.2026): they move onto the scrapyard

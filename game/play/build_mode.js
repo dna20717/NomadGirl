@@ -4,13 +4,14 @@
 // dust and springs bouncing. Every drop counts right away (Δ and time); Leyla walks over and screws for a moment,
 // "Rückgängig" takes back the last action as long as she has not finished it.
 //   workshop → a place in a trailer or the van (taken = swap), the scrapyard (stow), the dealer's pad (sell)
-//   trailer  → a coupling (hang in / change the order), the scrapyard (unhitch, only empty), the dealer's pad (sell, only empty)
+//   trailer  → a coupling (hang in / change the order, a stack moves along), on top of a trailer or container that carries (stack),
+//              the scrapyard (unhitch, only empty and nothing on top), the dealer's pad (sell, only empty)
 //   rig part → a socket on the van (taken = swap, the old one goes onto the scrapyard), the scrapyard (take off), the dealer's pad (sell)
 //   dealer catalogue (button or click on the pad): bought things are delivered onto the pad.
 // Logic in game/rig.js (act, snapshot/restore), drawing in game/play/camp.js (drawRig, drawYard), values in "Rig-Bau".
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
-import { budgets, act, snapshot, restore, lift, place, fits, at as wsAt, toSpare, fromSpare, stow, buyWorkshop, sellWorkshop, buyContainer, sellContainer, buyPart, sellPart, mountPart, unmountPart, SLOT_NAMES as PART_SLOTS, attachAt, detach, moveContainer, shop, priceOf, sellPrice, wsDef, placesOf } from '../rig.js';
+import { budgets, act, snapshot, restore, lift, place, fits, at as wsAt, toSpare, fromSpare, stow, buyWorkshop, sellWorkshop, buyContainer, sellContainer, buyPart, sellPart, mountPart, unmountPart, SLOT_NAMES as PART_SLOTS, stackOn, stackTop, blockAt, levelOf, attachAt, detach, moveContainer, shop, priceOf, sellPrice, wsDef, placesOf } from '../rig.js';
 import { clockText } from '../save.js';
 import { workshopTexture, partView, socketRects } from './camp.js';
 import { makeSfx } from './sfx.js';
@@ -112,7 +113,7 @@ export class BuildMode {
         el('div', { class: 'bm-title' }, icon('build', 18), el('b', {}, 'Rig bauen')),
         el('div', { class: 'bm-budgets' },
           bar('Gewicht', b.weight, b.pull, `${de(b.weight)} / ${de(b.pull)} kg`, b.heavy, 'scale'),
-          bar('Anhänger', b.length, b.maxLength, `${b.length} / ${b.maxLength}`, b.length > b.maxLength, 'box'),
+          bar('Anhänger', b.length, b.maxLength, `${b.length} / ${b.maxLength}${b.stack > 1 ? ` · ${b.height} / ${b.stack} hoch` : ''}`, b.length > b.maxLength, 'box'),
           bar('Energie', b.power.used, b.power.made, `${b.power.net >= 0 ? '+' : ''}${b.power.net} ⚡ (${b.power.made} da, ${b.power.used} gebraucht)`, b.power.net < 0, 'flash'),
           bar('Verbrauch', 0, null, `${String(b.fuel).replace('.', ',')} l / 100 km`, false, 'drop'),
           bar('Plätze', b.filled, b.places, `${b.filled} / ${b.places} belegt`, false, 'grid')),
@@ -169,13 +170,26 @@ export class BuildMode {
   }
   // sockets for rig parts on the van (camp.js socketRects)
   sockets() { return socketRects(this.D, this.save.rig, this.camp.geo, this.camp.ground); }
-  // couplings: gap g = in front of unit g (1 = right behind the van, units.length = at the end)
+  // couplings: gap g = in front of the block starting at unit g (1 = right behind the van, units.length = at the end)
   gaps() {
     const geo = this.camp.geo, U = this.save.rig.units, out = [], y = this.camp.ground - 40;
     for (let g = 1; g <= U.length; g++) {
-      const behind = geo.units.find(x => x.ui === g - 1);   // the unit in front of the gap (g - 1 = 0 is the van)
-      out.push({ g, x: g === 1 ? geo.vanLeft : behind ? behind.x0 : geo.vanLeft, y });
+      if (g < U.length && levelOf(U[g]) > 0) continue;   // inside a stack
+      const ground = g === 1 ? null : geo.units.find(x => x.ui === blockAt(U, g - 1)[0]);
+      out.push({ g, x: ground ? ground.x0 : geo.vanLeft, y });
     }
+    return out;
+  }
+  // stacking spots: on top of every block whose top unit carries (and the tractor allows one more level)
+  stacks() {
+    const D = this.D, U = this.save.rig.units, geo = this.camp.geo, out = [];
+    U.forEach((u, ui) => {
+      if (u.kind !== 'container' || levelOf(u) > 0) return;
+      const st = stackTop(D, this.save.rig, ui);
+      if (st.reason) return;
+      const top = geo.units.find(x => x.ui === st.end - 1);
+      if (top) out.push({ onto: ui, block: [ui, st.end], x: top.in0 + top.cell * top.places / 2, y: top.deckY, w: top.cell * top.places });
+    });
     return out;
   }
   // the thing under the pointer: a workshop (rig or yard), a trailer (rig or yard), the dealer's pad
@@ -187,7 +201,7 @@ export class BuildMode {
       const w = inside(sl) && wsAt(D, this.save.rig, sl.ui, sl.p);
       if (w) return { kind: 'ws', from: 'rig', ui: sl.ui, at: w.at, id: w.id, slot: sl };
     }
-    for (const u of camp.geo.units) if (x >= u.x0 && x <= u.x1 && y >= u.inTop - 40 && y <= camp.ground + 10) return { kind: 'container', from: 'rig', ui: u.ui, id: u.id, unit: u };
+    for (const u of [...camp.geo.units].sort((a, b) => levelOf(b) - levelOf(a))) if (x >= u.x0 && x <= u.x1 && y >= u.inTop - 40 && y <= (u.base ?? camp.ground) + 10) return { kind: 'container', from: 'rig', ui: u.ui, id: u.id, unit: u };
     if (camp.dealer && inside(camp.dealer)) return { kind: 'dealer' };
     return null;
   }
@@ -247,9 +261,12 @@ export class BuildMode {
       hang = v.h;
     } else if (hit.kind === 'container') {
       // the trailer itself hangs from the pointer at its roof
-      const view = hit.from === 'rig' ? hit.unit.view : hit.item.view, k = view.scaleX, b = view.getBounds();
-      const topY = b.y, h = (view.y - topY) / k;
-      holder.add(view); view.setPosition(0, h * 1 + 14).setScale(1).setAlpha(0.95);
+      const view = hit.from === 'rig' ? hit.unit.view : hit.item.view, k = view.scaleX;
+      // a ground unit takes its stack along: all views of the block hang together
+      const U = this.save.rig.units, [a, e] = hit.from === 'rig' && !levelOf(U[hit.ui]) ? blockAt(U, hit.ui) : [hit.ui, hit.ui + 1];
+      const views = hit.from === 'rig' ? camp.geo.units.filter(x => x.ui >= a && x.ui < e).map(x => x.view) : [view];
+      const topY = Math.min(...views.map(v => v.getBounds().y)), h = (view.y - topY) / k;
+      for (const v of views) { const rx = v.x - view.x, ry = v.y - view.y; holder.add(v); v.setPosition(rx, h + 14 + ry).setScale(1).setAlpha(0.95); }
       if (hit.from === 'yard') { holder.setScale(k); this.scene.tweens.add({ targets: holder, scale: 1, duration: 260, ease: 'Back.easeOut' }); }
       weight = 1 + (D.containers?.[hit.id]?.weight || 1000) / 1500;
       hang = h;
@@ -276,14 +293,29 @@ export class BuildMode {
       }
       if (best) return d.from === 'socket' && best.slot === d.slot && best.i === d.si ? { type: 'home', sock: best, x: best.cx } : { type: 'socket', sock: best, x: best.cx, y: best.cy };
     } else if (d.kind === 'ws') {
-      for (const sl of this.slots()) if (x >= sl.x0 && x <= sl.x1 && cy >= sl.y0 - 120 && cy <= sl.y1 + 120) {
+      // the nearest place in height (stacked containers have places right above the ones below)
+      let sl = null, sd = Infinity;
+      for (const q of this.slots()) if (x >= q.x0 && x <= q.x1 && cy >= q.y0 - 120 && cy <= q.y1 + 120) { const dist = Math.abs(cy - (q.y0 + q.y1) / 2); if (dist < sd) { sd = dist; sl = q; } }
+      if (sl) {
         if (d.from === 'rig' && sl.ui === d.ui && wsAt(D, this.save.rig, sl.ui, sl.p) === wsAt(D, this.save.rig, d.ui, d.at)) return { type: 'home', slot: sl, x: (sl.x0 + sl.x1) / 2 };
         return { type: 'slot', slot: sl, x: (sl.x0 + sl.x1) / 2 };
       }
     } else {
+      // on top of a block: the hanging container's bottom near the deck
+      if (this.D.containers?.[d.id]?.stackable) {
+        let sb = null, sd = (this.B.view?.snap ?? 260) * 1.2;
+        const U = this.save.rig.units, mine = d.from === 'rig' ? blockAt(U, d.ui) : null;
+        for (const st of this.stacks()) {
+          if (mine && st.onto === mine[0]) continue;   // on its own stack
+          const dist = Math.hypot(x - st.x, d.y + d.hang + 14 - st.y);
+          if (dist < sd) { sd = dist; sb = { type: 'stack', onto: st.onto, x: st.x, y: st.y, w: st.w }; }
+        }
+        if (sb) return sb;
+      }
       let best = null, bd = this.B.view?.snap ?? 260;
+      const U = this.save.rig.units, [ba, be] = d.from === 'rig' ? blockAt(U, d.ui) : [-1, -1], stacked = d.from === 'rig' && levelOf(U[d.ui]) > 0;
       for (const g of this.gaps()) {
-        if (d.from === 'rig' && (g.g === d.ui || g.g === d.ui + 1)) continue;   // right next to itself = where it is
+        if (d.from === 'rig' && !stacked && (g.g === ba || g.g === be)) continue;   // right next to itself = where it is
         const dist = Math.abs(x - g.x);
         if (dist < bd && d.y < camp.ground + 60) { bd = dist; best = { type: 'gap', g: g.g, x: g.x, y: g.y }; }
       }
@@ -301,6 +333,7 @@ export class BuildMode {
     if (t.type === 'yard') return d.kind === 'ws' ? 'Ausbauen: auf den Schrottplatz' : d.kind === 'part' ? 'Abschrauben: auf den Schrottplatz' : 'Abhängen: auf den Schrottplatz';
     if (t.type === 'socket') return t.sock.id ? `Tauschen mit ${D.rigParts?.[t.sock.id]?.name || t.sock.id}` : 'Anschrauben';
     if (t.type === 'gap') return d.from === 'yard' ? 'Ankuppeln' : 'Hier einreihen';
+    if (t.type === 'stack') return 'Obendrauf stapeln';
     if (t.type === 'home') return 'Zurück an seinen Platz';
     const there = wsAt(D, this.save.rig, t.slot.ui, t.slot.p);
     return there ? `Tauschen mit ${wsDef(D, there.id).name || there.id}` : 'Einbauen';
@@ -375,6 +408,10 @@ export class BuildMode {
       r = act(D, save, dd => d.from === 'rig' ? moveContainer(D, dd, d.ui, t.g) : attachAt(D, dd, d.i, t.g));
       label = d.from === 'rig' ? `${name} umgehängt` : `${name} angekuppelt`; after = 'coupled';
       fxAt = { x: t.x, y: this.camp.ground - 40, coupling: true };
+    } else if (d.kind === 'container' && t.type === 'stack') {
+      r = act(D, save, dd => stackOn(D, dd, d.from === 'yard' ? { spare: d.i } : { ui: d.ui }, t.onto));
+      label = `${name} gestapelt`; after = 'stacked';
+      fxAt = { x: t.x, y: t.y, unit: t.onto };
     } else if (d.kind === 'container' && t.type === 'yard') {
       r = act(D, save, dd => detach(D, dd, d.ui));
       label = `${name} abgehängt`; fxAt.yard = 'container';
@@ -415,6 +452,10 @@ export class BuildMode {
       this.sfx.coins();
       s.fx.text(fxAt.x, camp.ground - 220, `+${r.deltas} Δ`, { color: '#ffd27a', size: 46, rise: 110, life: 1300 });
       s.fx.dust(fxAt.x, camp.ground, 10);
+    } else if (after === 'stacked') {
+      this.sfx.klonk(2.2); this.sfx.klack();
+      s.fx.dust(fxAt.x - 120, fxAt.y, 10); s.fx.dust(fxAt.x + 120, fxAt.y, 10);
+      for (const u of camp.geo.units) this.bounce(u.view, 0.4);
     } else if (after === 'coupled') {
       this.sfx.klack(); this.sfx.klonk(2);
       s.fx.sparks(fxAt.x, fxAt.y, 0xffd27a, 10); s.fx.dust(fxAt.x, camp.ground, 16);
@@ -520,11 +561,20 @@ export class BuildMode {
         const there = wsAt(D, this.save.rig, sl.ui, sl.p), mine = d.from === 'rig' && there && sl.ui === d.ui && there.at === d.at, hot = t?.slot === sl || (t?.slot && t.slot.ui === sl.ui && t.slot.p === sl.p);
         g.lineStyle(lw, hot ? 0xffd27a : there && !mine ? 0xc77dff : 0x3fae6a, hot ? 1 : 0.45 * pulse).strokeRoundedRect(sl.x0 + 6, sl.y0 + 6, sl.x1 - sl.x0 - 12, sl.y1 - sl.y0 - 12, 10);
         if (hot) g.fillStyle(0xffd27a, 0.12).fillRoundedRect(sl.x0 + 6, sl.y0 + 6, sl.x1 - sl.x0 - 12, sl.y1 - sl.y0 - 12, 10);
-      } else for (const gp of this.gaps()) {
-        if (d.from === 'rig' && (gp.g === d.ui || gp.g === d.ui + 1)) continue;
+      } else {
+        if (D.containers?.[d.id]?.stackable) for (const st of this.stacks()) {
+          const mine = d.from === 'rig' && blockAt(this.save.rig.units, d.ui)[0] === st.onto, hot = t?.type === 'stack' && t.onto === st.onto;
+          if (mine) continue;
+          g.lineStyle(lw * 1.4, hot ? 0xffd27a : 0x3fe0d0, hot ? 1 : pulse).lineBetween(st.x - st.w / 2, st.y, st.x + st.w / 2, st.y);
+          g.lineStyle(lw, hot ? 0xffd27a : 0x3fe0d0, hot ? 1 : pulse * 0.6).strokeTriangle(st.x - 14, st.y - 30, st.x + 14, st.y - 30, st.x, st.y - 10);
+          if (hot) label(st.x, st.y - 36, 'Stapeln', '#ffd27a');
+        }
+        for (const gp of this.gaps()) {
+        if (d.from === 'rig' && !levelOf(this.save.rig.units[d.ui]) && blockAt(this.save.rig.units, d.ui).includes(gp.g)) continue;
         const hot = t?.type === 'gap' && t.g === gp.g;
         g.lineStyle(lw * 1.4, hot ? 0xffd27a : 0x3fe0d0, hot ? 1 : pulse).strokeCircle(gp.x, gp.y, hot ? 26 : 18);
         if (hot) label(gp.x, gp.y - 34, 'Ankuppeln', '#ffd27a');
+        }
       }
       if (Y && (d.from === 'rig' || d.from === 'socket')) { const hot = t?.type === 'yard'; g.lineStyle(lw, hot ? 0xffd27a : 0xb9a2c8, hot ? 1 : 0.35).strokeRoundedRect(Y.x0, this.camp.ground - 300, Y.x1 - Y.x0, 300, 14); label((Y.x0 + Y.x1) / 2, this.camp.ground - 306, 'Schrottplatz', hot ? '#ffd27a' : '#b9a2c8'); }
       if (dl) { const hot = t?.type === 'dealer'; g.lineStyle(lw, hot ? 0xffd27a : 0xe0b030, hot ? 1 : 0.4).strokeRoundedRect(dl.x0, dl.y0, dl.x1 - dl.x0, dl.y1 - dl.y0, 14); if (hot) label(dl.x, dl.y0 - 6, `+${this.sellOf(d)} Δ`, '#ffd27a'); }
@@ -532,7 +582,7 @@ export class BuildMode {
       if (hint !== this.lastHint) { this.lastHint = hint; this.draw(); }
     } else if (this.pointer) {
       // hover: outline what can be grabbed
-      const h = this.pick(this.pointer.x, this.pointer.y), r = h && (h.item || h.slot || h.sock || (h.unit && { x0: h.unit.x0, x1: h.unit.x1, y0: h.unit.inTop - 40, y1: this.camp.ground }) || (h.kind === 'dealer' && this.camp.dealer));
+      const h = this.pick(this.pointer.x, this.pointer.y), r = h && (h.item || h.slot || h.sock || (h.unit && { x0: h.unit.x0, x1: h.unit.x1, y0: h.unit.inTop - 40, y1: h.unit.base ?? this.camp.ground }) || (h.kind === 'dealer' && this.camp.dealer));
       if (r) g.lineStyle(lw, 0xffd27a, 0.8).strokeRoundedRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0, 12);
       s.game.canvas.style.cursor = h ? (h.kind === 'dealer' ? 'pointer' : 'grab') : '';
       const text = h ? this.describe(h) : null;
@@ -552,7 +602,7 @@ export class BuildMode {
     if (!this.active) return { open: false };
     const D = this.D, save = this.save;
     return { open: true, deltas: save.deltas, clock: clockText(save), budgets: budgets(D, save.rig), msg: this.msg?.text || null, held: this.drag?.id || null,
-      rig: save.rig.units.map(u => `${u.id}[${u.workshops.map(w => `${w.id}@${w.at}`).join(' ')}]`).join(' '), spare: { workshops: [...save.rig.spare.workshops], containers: [...save.rig.spare.containers], parts: [...(save.rig.spare.parts || [])] }, parts: JSON.parse(JSON.stringify(save.rig.parts || {})),
+      rig: save.rig.units.map(u => `${u.level ? '^' : ''}${u.id}[${u.workshops.map(w => `${w.id}@${w.at}`).join(' ')}]`).join(' '), spare: { workshops: [...save.rig.spare.workshops], containers: [...save.rig.spare.containers], parts: [...(save.rig.spare.parts || [])] }, parts: JSON.parse(JSON.stringify(save.rig.parts || {})),
       jobs: this.jobs.length + (this.job ? 1 : 0), working: this.working, canUndo: !!this.undo.length && !this.undo[this.undo.length - 1].done, shop: !!this.shopOpen, zoom: this.scene.cam.zoom };
   }
   // screen positions (CSS pixels in the page) of everything that can be dragged or dropped on, for tests with a real mouse
@@ -564,7 +614,8 @@ export class BuildMode {
     return {
       slots: this.slots().map(sl => ({ ui: sl.ui, p: sl.p, ws: wsAt(D, this.save.rig, sl.ui, sl.p)?.id || null, ...mid(sl) })),
       gaps: this.gaps().map(gp => ({ g: gp.g, ...scr(gp.x, gp.y) })),
-      units: this.camp.geo.units.map(u => ({ ui: u.ui, id: u.id, ...scr((u.x0 + u.x1) / 2, u.inTop - 20) })),
+      stacks: this.stacks().map(st => ({ onto: st.onto, ...scr(st.x, st.y) })),
+      units: this.camp.geo.units.map(u => ({ ui: u.ui, id: u.id, level: u.level || 0, ...scr((u.in0 + u.in0 + u.cell * u.places) / 2, u.inTop - 20) })),
       yard: (this.camp.yardItems || []).map(it => ({ kind: it.kind, i: it.i, id: it.id, ...mid(it) })),
       sockets: this.sockets().map(so => ({ slot: so.slot, i: so.i, id: so.id, ...scr(so.cx, so.cy) })),
       yardFree: this.camp.geo.yard ? scr(this.camp.geo.yard.x1 - 120, this.camp.ground - 100) : null,

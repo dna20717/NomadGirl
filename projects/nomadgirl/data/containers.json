@@ -9,9 +9,38 @@
   "look": "trailer_modular",
   "inside": {"x": [72, 225], "y": [95, 160]},
   "storage": [3, 2],
-  "storageName": "Deichselkasten"
+  "storageName": "Deichselkasten",
+  "carries": true,
+  "deck": 81
  },
  "holzkiste": {"name": "Holzkiste", "kind": "crate", "places": 1, "weight": 250, "stackable": true, "value": 60, "storage": [2, 2], "storageName": "Deichselkasten"},
- "container_20": {"name": "20-Fuß-Container", "kind": "shipping", "places": 2, "weight": 2300, "stackable": true, "value": 900, "storage": [4, 2], "storageName": "Deichselkasten"},
- "container_40": {"name": "40-Fuß-Container", "kind": "shipping", "places": 3, "weight": 3800, "stackable": true, "value": 1500, "storage": [5, 2], "storageName": "Deichselkasten"}
+ "container_20": {
+  "name": "20-Fuß-Container",
+  "kind": "shipping",
+  "places": 2,
+  "weight": 2300,
+  "stackable": true,
+  "value": 900,
+  "storage": [4, 2],
+  "storageName": "Staufach",
+  "look": "container_stack",
+  "inside": {"x": [33, 224], "y": [90, 175]},
+  "deck": 73,
+  "carries": true
+ },
+ "container_40": {"name": "40-Fuß-Container", "kind": "shipping", "places": 3, "weight": 3800, "stackable": true, "value": 1500, "storage": [5, 2], "storageName": "Staufach", "carries": true},
+ "modulanhaenger": {
+  "name": "Modul-Anhänger",
+  "kind": "trailer",
+  "places": 3,
+  "weight": 800,
+  "value": 450,
+  "look": "trailer_flat",
+  "inside": {"x": [72, 221], "y": [96, 158]},
+  "deck": 79,
+  "carries": true,
+  "storage": [3, 2],
+  "storageName": "Deichselkasten",
+  "description": "Lila Kasten auf zwei Achsen. Flaches Dach, da passt noch ein Container drauf."
+ }
 }
