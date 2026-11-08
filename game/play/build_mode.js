@@ -41,7 +41,7 @@ export class BuildMode {
   get isOpen() { return this.active; }
 
   // the scene restarts (camp ↔ run): forget everything
-  reset() { delete this.el.parentElement?.dataset.building; this.active = false; this.el.hidden = true; this.drag = null; this.jobs = []; this.job = null; this.undo = []; this.working = false; this.shopOpen = false; }
+  reset() { delete this.el.parentElement?.dataset.building; this.active = false; this.el.hidden = true; this.shell = null; this.el.replaceChildren(); this.drag = null; this.jobs = []; this.job = null; this.undo = []; this.working = false; this.shopOpen = false; }
 
   // ---------- open / close ----------
   open() {
@@ -76,7 +76,7 @@ export class BuildMode {
     // Leyla finishes the rest in no time (the time has been counted already)
     for (const u of this.undo) u.done = true;
     this.jobs = []; this.job = null; this.working = false;
-    this.active = false; this.el.hidden = true;
+    this.active = false; this.el.hidden = true; this.shell = null;
     delete this.el.parentElement.dataset.building;
     s.input.off('pointerdown', this.onDown); s.input.off('pointermove', this.onMove); s.input.off('pointerup', this.onUp); s.input.off('pointerupoutside', this.onUp);
     this.gfx?.destroy(); for (const t of this.labels || []) t.destroy(); this.labels = [];
@@ -98,8 +98,14 @@ export class BuildMode {
     const bar = (label, val, max, text, over, ic) => el('div', { class: 'build-budget' + (over ? ' over' : '') }, icon(ic, 16),
       el('span', {}, el('small', {}, label), el('b', {}, text)), max != null ? el('i', { style: `--k:${Math.min(1, max ? val / max : 1)}` }) : null);
     const msg = this.msg?.text || (this.drag ? this.dragHint() : this.hoverText || 'Teile mit der Maus packen und ziehen: in einen Anhänger, auf den Schrottplatz oder zum Händler.');
-    this.el.replaceChildren(...[
-      el('div', { class: 'bm-bar' },
+    // the bar, the dealer and the message stay the same elements while building (Daniel: the bar stays on, no slide in on every redraw);
+    // only their contents change. The slide-in plays once when building starts or the dealer opens.
+    if (!this.shell || !this.el.contains(this.shell.bar)) {
+      this.shell = { bar: el('div', { class: 'bm-bar' }), shop: el('div', { class: 'bm-shopslot' }), msg: el('div', { class: 'bm-msg idle' }) };
+      this.el.replaceChildren(this.shell.bar, this.shell.shop, this.shell.msg);
+    }
+    const sh = this.shell;
+    sh.bar.replaceChildren(
         el('div', { class: 'bm-title' }, icon('build', 18), el('b', {}, 'Rig bauen')),
         el('div', { class: 'bm-budgets' },
           bar('Gewicht', b.weight, b.pull, `${de(b.weight)} / ${de(b.pull)} kg`, b.heavy, 'scale'),
@@ -112,9 +118,16 @@ export class BuildMode {
           el('b', { class: 'build-deltas' }, `${de(save.deltas)} Δ`),
           el('button', { class: 'inv-btn bm-shopbtn' + (this.shopOpen ? ' on' : ''), onclick: () => { this.shopOpen = !this.shopOpen; this.draw(); } }, icon('shop', 15), ' Händler'),
           el('button', { class: 'inv-btn ghost bm-undo', disabled: !top || top.done, title: top && !top.done ? `Rückgängig: ${top.label} (Strg+Z)` : 'Nichts zum Rückgängigmachen (Leyla hat schon festgeschraubt)', onclick: () => this.undoLast() }, '↶ Rückgängig'),
-          el('button', { class: 'inv-btn build-go', onclick: () => this.close() }, 'Fertig (B)'))),
-      this.shopOpen ? this.shopEl() : null,
-      el('div', { class: 'bm-msg ' + (this.msg?.kind || 'idle') }, msg)].filter(Boolean));
+          el('button', { class: 'inv-btn build-go', onclick: () => this.close() }, 'Fertig (B)')));
+    if (this.shopOpen) {
+      const list = sh.shop.querySelector('.build-list'), top0 = list?.scrollTop || 0, was = sh.shop.firstChild;
+      const panel = this.shopEl();
+      if (was) panel.classList.add('stay');   // already open: no slide in
+      sh.shop.replaceChildren(panel);
+      const nl = panel.querySelector('.build-list'); if (nl) nl.scrollTop = top0;
+    } else sh.shop.replaceChildren();
+    sh.msg.className = 'bm-msg ' + (this.msg?.kind || 'idle');
+    sh.msg.textContent = msg;
   }
   say(text, kind = 'error') { this.msg = { text, kind, until: this.scene.time.now + 3200 }; this.draw(); }
 

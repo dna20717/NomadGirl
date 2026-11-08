@@ -184,6 +184,7 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .bm-msg.idle { color: #d8cfe2; }
 .bm-shop { pointer-events: auto; position: absolute; right: 12px; top: 84px; width: min(380px, 44vw); max-height: calc(100vh - 160px); display: flex; flex-direction: column; animation: bm-shop .25s ease-out; }
 @keyframes bm-shop { from { transform: translateX(110%); } to { transform: none; } }
+.bm-shop.stay { animation: none; }
 .bm-shop header { display: flex; align-items: center; gap: 6px; }
 .bm-shop header small { color: #8a7d99; }
 .bm-shop header .craft-x { margin-left: auto; }
