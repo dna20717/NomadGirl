@@ -48,6 +48,30 @@ if (changed !== '#') errors.push(`Layout bearbeiten: Zeichen ist „${changed}�
 if (!await page.locator('canvas.ng-roomMap').count()) errors.push('Layout-Vorschau fehlt');
 await page.keyboard.press('Control+z');
 
+// scroll positions stay where you are (Daniel, 08.11.2026): small window, area list scrolled down, click an area there;
+// entry list scrolled down, click an entry there; another area starts its list at the top
+await page.setViewportSize({ width: 1280, height: 560 });
+await go({ area: 'overview' });
+const top = sel => page.$eval(sel, e => e.scrollTop);
+await page.$eval('.da-navbar', e => { e.scrollTop = e.scrollHeight; });
+const deep = page.locator('.da-nav', { hasText: 'Rig-Bau' });
+await deep.scrollIntoViewIfNeeded();
+const navBefore = await top('.da-navbar');
+await deep.click();
+const navAfter = await top('.da-navbar');
+if (!navBefore || Math.abs(navAfter - navBefore) > 2) errors.push(`Bereichsleiste springt: ${navBefore} → ${navAfter}`);
+await go({ area: 'items' });
+await page.$eval('.da-main', e => { e.scrollTop = e.scrollHeight; });
+const lastEntry = page.locator('.da-entry').last();
+await lastEntry.scrollIntoViewIfNeeded();
+const listBefore = await top('.da-main');
+await lastEntry.click();
+const listAfter = await top('.da-main');
+if (!listBefore || Math.abs(listAfter - listBefore) > 2) errors.push(`Eintragsliste springt: ${listBefore} → ${listAfter}`);
+if (!(await page.evaluate(() => window.workshop.page.choice))) errors.push('Eintrag nicht gewählt');
+await page.locator('.da-nav', { hasText: 'Waffen' }).click();
+if (await top('.da-main') !== 0) errors.push('Neuer Bereich beginnt nicht oben');
+
 await browser.close();
 if (errors.length) { console.error('Fehler:\n' + errors.join('\n')); process.exit(1); }
 console.log(`Werkstatt ok: ${Object.keys(AREAS).length} Bereiche gezeichnet, Bearbeiten + Rückgängig gehen.`);

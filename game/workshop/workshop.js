@@ -206,8 +206,13 @@ export class Workshop {
     clearTimeout(this.hintTime); this.hintTime = setTimeout(() => h.classList.remove('on'), opt.undo ? 6000 : 2600);
   }
   go(target) {
+    // scroll positions (Daniel, 08.11.2026: "der Scrollzustand soll immer dort gehalten werden, wo ich in der Navigation unterwegs bin"):
+    // the area list on the left always keeps its place; the entry list keeps it while staying in the same area;
+    // the inspector starts at the top when another entry is opened
+    const same = target.area === this.page?.area;
+    this.keepScroll = { main: same, insp: same && (target.choice ?? null) === (this.page?.choice ?? null) };
+    if (!same) this.filter = '';
     this.page = { choice: null, ...target };
-    this.filter = ''; this.keepScroll = false;
     try { history.replaceState(null, '', '#' + encodeURIComponent(JSON.stringify(this.page))); } catch { /* artifact sandbox */ }
     this.draw();
   }
@@ -227,10 +232,18 @@ export class Workshop {
       else if (AREAS[a]) this.singlePage(a, main, insp);
       else main.append(el('p', {}, 'Unbekannte Seite'));
     } catch (e) { console.error(e); main.append(el('p', { class: 'ed-error' }, 'Fehler beim Zeichnen: ' + e.message)); }
-    const scroll = [this.ui.data.querySelector('.da-main')?.scrollTop, this.ui.data.querySelector('.da-insp')?.scrollTop];
+    const q = c => this.ui.data.querySelector(c)?.scrollTop || 0, scroll = { nav: q('.da-navbar'), main: q('.da-main'), insp: q('.da-insp') };
     this.ui.data.replaceChildren(navbar, main, insp);
-    if (this.keepScroll) { main.scrollTop = scroll[0] || 0; insp.scrollTop = scroll[1] || 0; }
-    this.keepScroll = true;
+    const keep = this.keepScroll ?? { main: true, insp: true };
+    navbar.scrollTop = scroll.nav;
+    if (keep.main) main.scrollTop = scroll.main;
+    if (keep.insp) insp.scrollTop = scroll.insp;
+    // the active area and entry stay in sight (e.g. after a jump from a reference or the overview)
+    for (const [box, sel] of [[navbar, '.da-nav.on'], [main, '.on, [aria-selected="true"]']]) {
+      const on = box.querySelector(sel);
+      if (on) { const b = box.getBoundingClientRect(), r = on.getBoundingClientRect(); if (r.top < b.top || r.bottom > b.bottom) on.scrollIntoView({ block: 'nearest' }); }
+    }
+    this.keepScroll = { main: true, insp: true };
   }
 
   navbar(nav) {

@@ -86,6 +86,7 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 - **Umbenennen/Löschen** ziehen Verweise in allen Bereichen mit bzw. räumen sie auf.
 - **Speichern:** online **„Speichern = Commit“** (siehe Online) über `game/cloud_store.js`; lokal bzw. ohne Worker wie die alte NomadTactics-Werkstatt über `game/store.js` (Artifact-Datenbank, sonst localStorage `nomadgirl-drafts:`).
 - **Spielen** (Daniel, 07.11.2026): goldener Knopf oben links in der Menüleiste (⌘P), dazu „Im Spiel testen“ beim Raum-Layout. Beide speichern vorher (online = Commit) und öffnen das Spiel in einem eigenen Tab `nomadgirl-game`, der bei jedem Klick wiederverwendet wird (Tab wird sofort geöffnet, sonst blockt Safari ihn nach dem Speichern). Ist ein Raum-Baustein mit Layout gewählt, spielt der Knopf diesen Raum, sonst den Testraum. `workshop.play(room?)`.
+- **Scrollen bleibt stehen** (Daniel, 08.11.2026: „der Scrollzustand soll immer dort gehalten werden, wo ich gerade in der Navigation unterwegs bin“): `draw()` baut alles neu und setzt danach die Scroll-Positionen zurück: die Bereichsleiste links immer, die Eintragsliste solange man im selben Bereich bleibt (Eintrag anklicken springt nicht mehr nach oben), der Inspektor bei Bearbeiten im selben Eintrag; ein neuer Bereich beginnt oben, ein neuer Eintrag zeigt den Inspektor von oben. Aktiver Bereich und Eintrag werden bei Bedarf ins Bild gerückt. Geprüft in `workshop_test.mjs`.
 - Oberflächen-Regeln wie in NomadTactics (`CLAUDE.md` dort): nur `--ui-*`-Tokens, Inter + VT323, Dialoge über `openDialogue`, Löschen rot mit Rückgängig, Hauptaktion gold.
 
 ## Assets und Fidelity
@@ -149,6 +150,7 @@ Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei j
 
 ## Stand
 
+- 08.11.2026 morgens: Werkstatt hält die **Scroll-Position** von Bereichsleiste und Eintragsliste beim Navigieren.
 - 08.11.2026 nachts: **Bau-Ansicht** (Camp Schritt 4, Camp-Plan komplett): Werkstätten umstellen/tauschen, kaufen/verkaufen, Container an-/abhängen, Budgets, kein Strom/zu schwer im Camp, neuer Bereich „Rig-Bau“ (28 Bereiche), Startgeld 400 Δ, `build_test` (19 Prüfungen), `npm test` 42.
 - 08.11.2026 nachts: **Kochen & Craften** (Camp Schritt 3): Rezeptbuch, Experimentieren mit kuriosem Müll, Zettel lesen, Companion-Tipps und -Sprüche, Essen im Inventar, neuer Bereich „Kochen & Craften“ (27 Bereiche), Uhr auf die Minute, `craft_test` (19 Prüfungen), `npm test` 36.
 - 07.11.2026 spät: **Yoga-Pose** auf P (Daniels Animation, Versatz ausgeglichen, Auflösen rückwärts), Drohne im Zen-Modus.
