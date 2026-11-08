@@ -412,7 +412,7 @@ export class Leyla {
     if (st === 'sit') name = '@' + this.sit.look;
     if (st === 'pose') name = '@' + this.d.look.yoga;
     // standing at a workshop in the rig: seen from behind, busy with her hands
-    if (this.idleNow && this.scene.camp?.atWorkshop && this.d.look?.work) { name = '@' + this.d.look.work; this.special = null; }
+    if (this.idleNow && (this.scene.camp?.atWorkshop || this.scene.hud?.build?.working) && this.d.look?.work) { name = '@' + this.d.look.work; this.special = null; }
     // gun drawn (Leyla › Waffe ziehen): drawing, then aiming, walking with the gun, shooting
     const L = this.d.look || {}, walking = Math.abs(v.x) > 20;
     let armedFrame = null, armedFrom = 1;

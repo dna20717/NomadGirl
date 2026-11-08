@@ -17,34 +17,51 @@ export function daytimeAt(C, hour) {
   return [...rows].reverse().find(r => (r.from ?? 0) <= hour) || rows[rows.length - 1];
 }
 
-// geometry of the camp in tiles and pixels: margin | containers (farthest first) | van | campsite
+// one container as it stands in the camp, from its left end x (rear) to the right (front, towards the van):
+// a picture with an open side (Container › Aussehen + Innenraum) or a trailer from code: rear hitch, body on a chassis
+// with axles, wheels and fenders, drawbar with coupling and jockey wheel at the front. Same art in the rig and on the scrapyard.
+export function unitShape(D, def, ground, T = 64) {
+  const C = D.camp || {}, R = C.rig || {}, places = def.places || 1, A = D.assets?.[def.look];
+  if (A?.frameSize && def.inside?.x && def.inside?.y) {
+    const [fw, fh] = A.frameSize, k = (A.height || fh) / fh, [ox, oy] = A.origin || [fw / 2, fh], flip = !!A.flip !== !!def.flip, w = fw * k;
+    const ix = v => flip ? fw - v : v, a = ix(def.inside.x[0]), b = ix(def.inside.x[1]), in0 = Math.min(a, b) * k, in1 = Math.max(a, b) * k;
+    return { w, places, cell: (in1 - in0) / places, in0, inTop: ground - (oy - def.inside.y[0]) * k, floorY: ground - (oy - def.inside.y[1]) * k,
+      sprite: { key: def.look, k, flip, ox: (flip ? fw - ox : ox) / fw, oy: oy / fh, cx: (flip ? fw - ox : ox) * k }, hitch: [0, ground - 40 * k / 3], coupling: [w, ground - 40 * k / 3] };
+  }
+  const cell = (R.placeWidth ?? 4) * T, lift = R.lift ?? 48, h = R.height ?? 248, rear = 44, bar = R.drawbar ?? 120;
+  const in0 = rear, body = places * cell, floorY = ground - lift;
+  return { w: rear + body + 12 + bar, places, cell, in0, inTop: floorY - h, floorY, body, lift, bar, hitch: [0, ground - 40], coupling: [rear + body + 12 + bar, ground - 40] };
+}
+export const unitWidth = (D, def, T = 64) => unitShape(D, def, 0, T).w;
+
+// the rig from the van to the left: the first container hangs right behind the van, each next one on the one in front
+export function rigUnits(D, rig, vanLeft, ground, T = 64) {
+  const out = [];
+  let right = vanLeft;
+  rig.units.forEach((u, ui) => {
+    if (u.kind === 'tractor') return;
+    const def = D.containers?.[u.id] || {}, sh = unitShape(D, def, ground, T), x0 = right - sh.w;
+    out.push({ ...u, ui, def, ...sh, x0, x1: right, in0: x0 + sh.in0, sprite: sh.sprite && { ...sh.sprite, cx: x0 + sh.sprite.cx } });
+    right = x0 + (sh.sprite ? 0 : 6);   // a code trailer's drawbar reaches into the towing eye of the one in front
+  });
+  return out;
+}
+
+// geometry of the camp in tiles and pixels: margin | scrapyard | room for the rig (as long as the tractor may pull) | van | campsite.
+// The van stands still while building: the rig grows to the left from it.
 export function campLayout(D, save, T = 64) {
-  const C = D.camp || {}, pw = C.rig?.placeWidth ?? 4, gap = C.rig?.gap ?? 1, margin = C.margin ?? 6, H = Math.max(8, C.height ?? 14);
+  const C = D.camp || {}, gap = (C.rig?.gap ?? 1) * T, margin = C.margin ?? 6, H = Math.max(8, C.height ?? 14);
   const vanA = D.assets?.[D.tractors?.[save.rig.tractor]?.look] || D.assets?.[D.game?.spawn?.look];
   const k = vanA?.frameSize ? (vanA.height || vanA.frameSize[1]) / vanA.frameSize[1] : 1;
   const vanLeft = vanA?.frameSize ? (vanA.origin?.[0] ?? vanA.frameSize[0] / 2) * k : 5 * T, vanRight = vanA?.frameSize ? vanA.frameSize[0] * k - vanLeft : 5 * T;
-  let x = margin * T;
-  const units = [];
-  for (const u of [...save.rig.units].reverse()) {
-    if (u.kind === 'tractor') continue;
-    const def = D.containers?.[u.id] || {}, places = def.places || 1, A = D.assets?.[def.look];
-    if (A?.frameSize && def.inside?.x && def.inside?.y) {
-      // a picture with an open side (Container › Aussehen + Innenraum): the workshops sit in its interior
-      const [fw, fh] = A.frameSize, k = (A.height || fh) / fh, [ox, oy] = A.origin || [fw / 2, fh], flip = !!A.flip !== !!def.flip, w = fw * k;
-      const ix = v => flip ? fw - v : v, a = ix(def.inside.x[0]), b = ix(def.inside.x[1]), in0 = x + Math.min(a, b) * k, in1 = x + Math.max(a, b) * k;
-      const ground = (H - 2) * T;
-      units.push({ ...u, def, x0: x, x1: x + w, places, cell: (in1 - in0) / places, in0, inTop: ground - (oy - def.inside.y[0]) * k, floorY: ground - (oy - def.inside.y[1]) * k,
-        sprite: { key: def.look, k, flip, ox: (flip ? fw - ox : ox) / fw, oy: oy / fh, cx: x + (flip ? fw - ox : ox) * k } });
-      x += w;
-    } else {
-      const w = places * pw * T;
-      units.push({ ...u, def, x0: x, x1: x + w, places, cell: pw * T, in0: x });
-      x += w + gap * T;
-    }
-  }
-  const vanCol = Math.ceil((x + vanLeft) / T - 0.5), doorX = (vanCol + 0.5) * T;
-  const tractor = save.rig.units.find(u => u.kind === 'tractor');
+  const Y = C.yard || {}, yardW = Y.enabled === false ? 0 : Math.max(4, Y.width ?? 9) * T;
+  const longest = Math.max(T * 4, ...Object.values(D.containers || {}).map(c => unitWidth(D, c, T)));
+  const pull = Math.max(1, D.tractors?.[save.rig.tractor]?.length ?? 1);
+  const rigRoom = pull * longest + (pull - 1) * gap;
+  const vanCol = Math.ceil((margin * T + yardW + rigRoom + vanLeft) / T - 0.5), doorX = (vanCol + 0.5) * T;
   const W = vanCol + Math.max(8, C.campWidth ?? 20) + 1, floor = H - 2;
+  const units = rigUnits(D, save.rig, doorX - vanLeft, floor * T, T);
+  const tractor = save.rig.units.find(u => u.kind === 'tractor');
   // shaft on the left: a hole in the ground, closed off by an invisible wall above it (it cannot be entered)
   const S = C.shaft || {}, shaft = S.enabled === false ? null : { from: Math.max(1, S.at ?? 1), to: Math.max(1, S.at ?? 1) + Math.max(1, S.width ?? 3) - 1 };
   const blocked = x => x === 0 || x === W - 1 || (shaft && x <= shaft.to);
@@ -53,7 +70,9 @@ export function campLayout(D, save, T = 64) {
     for (let x = 0; x < W; x++) row += y >= floor ? (shaft && x >= shaft.from && x <= shaft.to ? '.' : '#') : blocked(x) ? '#' : x === vanCol && y === floor - 1 ? 'L' : '.';
     return row;
   });
-  return { layout, W, H, floor, vanCol, shaft, hidden: (x, y) => y < floor && blocked(x), doorX, vanLeft: doorX - vanLeft, vanRight: doorX + vanRight, units, tractor, fireX: (vanCol + (C.fire?.at ?? 9) + 0.5) * T,
+  const yard = yardW ? { x0: ((shaft ? shaft.to + 1 : 1) + 0.5) * T, x1: margin * T + yardW } : null;
+  return { layout, W, H, floor, vanCol, shaft, hidden: (x, y) => y < floor && blocked(x), doorX, vanLeft: doorX - vanLeft, vanRight: doorX + vanRight, units, tractor, yard,
+    rigRoom: [doorX - vanLeft - rigRoom, doorX - vanLeft], fireX: (vanCol + (C.fire?.at ?? 9) + 0.5) * T,
     companionX: [(vanCol + (C.companions?.at?.[0] ?? 6) + 0.5) * T, (vanCol + (C.companions?.at?.[1] ?? 13) + 0.5) * T] };
 }
 
@@ -163,6 +182,67 @@ function furniture(g, fn, x, y, w, h, light) {
   }
 }
 
+// a trailer from code (side view, cutaway): rear hitch, body on a chassis, axles with wheels and fenders, drawbar with coupling
+// and jockey wheel towards the van. Bottom of the texture = ground. Cached per container type.
+const KIND_COLORS = { trailer: ['#4a4f5a', '#2b2233'], shipping: ['#7a4a32', '#2a1d1a'], crate: ['#7a5a3a', '#2e2218'] };
+export function shellTexture(scene, D, def, T = 64) {
+  const R = D.camp?.rig || {}, sh = unitShape(D, def, 0, T), key = `shell_${def.kind || 'x'}_${sh.places}_${Math.round(sh.w)}`;
+  if (scene.textures.exists(key)) return key;
+  const [wallC, insideC] = KIND_COLORS[def.kind] || [R.wall || '#4a4f5a', R.inside || '#2b2233'];
+  const wall = col(def.kind === 'trailer' || !KIND_COLORS[def.kind] ? R.wall || wallC : wallC), inside = col(def.kind === 'trailer' || !KIND_COLORS[def.kind] ? R.inside || insideC : insideC);
+  const h = R.height ?? 248, Ht = sh.lift + h + 40, ground = Ht, floor = ground - sh.lift, top = floor - h, bx0 = sh.in0, bx1 = bx0 + sh.body;
+  const g = scene.make.graphics({}, false), f = (x, y, w, hh, c, a = 1) => g.fillStyle(c, a).fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(hh));
+  // drawbar (behind the body): two beams meeting in the coupling head, jockey wheel with crank, a safety chain
+  const head = [sh.w - 10, ground - 40];
+  g.lineStyle(12, 0x26292f).lineBetween(bx1 + 6, floor + 2, head[0], head[1]);
+  g.lineStyle(6, 0x4a4f5a).lineBetween(bx1 + 6, floor - 6, head[0], head[1] - 4);
+  f(head[0] - 14, head[1] - 9, 22, 16, 0x1b1d22); f(head[0] - 4, head[1] - 14, 12, 8, 0x8b949e);
+  const jx = bx1 + 12 + sh.bar * 0.42, jy = floor + 2 + (head[1] - floor - 2) * 0.42 / 1;
+  f(jx - 4, jy - 22, 8, ground - 14 - jy + 22, 0x6b7280); f(jx - 10, jy - 26, 20, 6, 0x30363d);
+  g.fillStyle(0x15161a).fillCircle(jx, ground - 10, 10); g.fillStyle(0x6b7280).fillCircle(jx, ground - 10, 4);
+  for (let i = 0; i < 6; i++) f(head[0] - 30 - i * 8, head[1] + 10 + Math.sin(i / 5 * Math.PI) * 14, 5, 5, 0x8b949e);
+  // rear: towing eye for the next trailer
+  f(8, ground - 46, bx0 - 20, 9, 0x26292f); g.lineStyle(5, 0x8b949e).strokeCircle(12, ground - 42, 8);
+  // chassis under the floor
+  f(bx0 - 6, floor, sh.body + 12, 12, 0x22252b);
+  for (let x = bx0 + 20; x < bx1 - 10; x += 60) f(x, floor + 2, 8, 8, 0x30363d);
+  // body: back wall (inside), planks, roof, end walls, floor beam
+  f(bx0, top, sh.body, h, inside);
+  for (let y = top + 30; y < floor - 10; y += 34) f(bx0 + 12, y, sh.body - 24, 2, shadeOf('#' + inside.toString(16).padStart(6, '0'), 1.25));
+  f(bx0 - 12, top - 22, sh.body + 24, 22, wall); f(bx0 - 12, top, 12, h, wall); f(bx1, top, 12, h, wall);
+  f(bx0 - 12, floor - 8, sh.body + 24, 8, 0x1b1d22);
+  const hi = shadeOf('#' + wall.toString(16).padStart(6, '0'), 1.3), lo = shadeOf('#' + wall.toString(16).padStart(6, '0'), 0.75);
+  if (def.kind === 'trailer') { f(bx0 - 4, top - 30, sh.body + 8, 8, hi); f(bx0 - 12, top - 22, 6, 22, hi); f(bx1 + 6, top - 22, 6, 22, hi); }   // rounded roof
+  if (def.kind === 'shipping') { for (let x = bx0 - 8; x < bx1 + 8; x += 16) f(x, top - 20, 6, 18, lo); f(bx0 - 12, top + 10, 12, h - 30, lo); f(bx1, top + 10, 12, h - 30, lo); for (let y = top + 30; y < floor - 20; y += 40) { f(bx0 - 10, y, 8, 4, 0x8b949e); f(bx1 + 2, y, 8, 4, 0x8b949e); } }
+  if (def.kind === 'crate') { for (let y = top - 22; y < top; y += 8) f(bx0 - 12, y, sh.body + 24, 3, lo); for (let y = top; y < floor - 8; y += 26) { f(bx0 - 12, y, 12, 3, lo); f(bx1, y, 12, 3, lo); } f(bx0 - 12, top, 12, 12, 0x30363d); f(bx1, top, 12, 12, 0x30363d); }
+  // lights: red at the back, amber at the front corner
+  f(bx0 - 18, floor - 34, 6, 16, 0xd0302a); f(bx0 - 18, floor - 18, 6, 8, 0xe0a030); f(bx1 + 12, floor - 26, 5, 10, 0xe0a030);
+  // axles: one for a short body, two (tandem) for a long one, a little behind the middle; wheels with fenders
+  const r = Math.min(sh.lift - 18, 30), n = sh.places >= 2 ? 2 : 1, c0 = bx0 + sh.body * 0.46;
+  for (let i = 0; i < n; i++) {
+    const cx = c0 + (i - (n - 1) / 2) * (2 * r + 14), cy = ground - r;
+    f(cx - r - 8, floor - 6, 2 * r + 16, 10, lo); f(cx - r - 8, floor - 8, 2 * r + 16, 3, hi);   // fender
+    g.fillStyle(0x15161a).fillCircle(cx, cy, r); g.fillStyle(0x2a2c32).fillCircle(cx, cy, r * 0.62);
+    g.fillStyle(0x8b949e).fillCircle(cx, cy, r * 0.42); g.fillStyle(0x30363d).fillCircle(cx, cy, r * 0.16);
+    for (let k = 0; k < 5; k++) { const a = k / 5 * Math.PI * 2; f(cx + Math.cos(a) * r * 0.3 - 2, cy + Math.sin(a) * r * 0.3 - 2, 4, 4, 0x4a4f5a); }
+  }
+  g.generateTexture(key, Math.ceil(sh.w), Ht); g.destroy();
+  scene.textures.get(key).setFilter(NEAREST());
+  return key;
+}
+// a workshop on its own (scrapyard pallet, in the hand while building): a slice of interior with its furniture
+export function workshopTexture(scene, D, id, C = D.camp || {}) {
+  const key = `ws_art_${id}`;
+  if (scene.textures.exists(key)) return key;
+  const R = C.rig || {}, def = D.workshops?.[id] || {}, cw = (R.placeWidth ?? 4) * scene.T * (def.places || 1), h = R.height ?? 248;
+  const g = scene.make.graphics({}, false);
+  g.fillStyle(col(R.inside || '#2b2233'), 0.92).fillRoundedRect(4, 30, cw - 8, h - 30, 10);
+  g.fillStyle(col(R.wall || '#4a4f5a')).fillRect(4, 24, cw - 8, 10).fillRect(4, h - 6, cw - 8, 6);
+  furniture(g, def.function, 0, h - 6, cw, h - 30, R.light || '#ffcf7a');
+  g.generateTexture(key, Math.ceil(cw), h); g.destroy();
+  return key;
+}
+
 export class Camp {
   constructor(scene, box, geo) {
     this.scene = scene; this.box = box; this.geo = geo;
@@ -172,10 +252,7 @@ export class Camp {
     this.day = daytimeAt(C, s.hour);
     this.hotspots = [];
     this.lights = [];
-    // budgets of the rig (Rig-Bau › Regeln): without power, workshops that need it do not work; too heavy, the rig cannot drive
-    this.budget = budgets(D, s.rig);
-    this.noPower = D.build?.rules?.power !== false && this.budget.power.net < 0;
-    this.tooHeavy = D.build?.rules?.weight !== false && this.budget.heavy;
+    // the rig and the scrapyard; also the budgets (Rig-Bau › Regeln): without power, workshops that need it do not work; too heavy, no driving
     this.drawRig();
     this.drawFire();
     this.placeChest();
@@ -186,79 +263,125 @@ export class Camp {
     const vanWs = geo.tractor?.workshops || [];
     this.hotspots.push({ x: geo.doorX, w: 110, name: D.tractors?.[geo.tractor?.id]?.name || 'Van', hint: vanWs.length ? 'Einsteigen' : 'Van',
       act: () => this.vanMenu(vanWs) });
+    // earth below the bottom of the world: visible when the camera zooms out to build
+    scene.add.rectangle(-4000, geo.H * T, geo.W * T + 8000, 4000, col(C.ground?.color || '#4a3628')).setOrigin(0).setDepth(-9);
+    scene.add.rectangle(-4000, geo.floor * T, 4000, geo.H * T, col(C.ground?.color || '#4a3628')).setOrigin(0).setDepth(-9);
+    scene.add.rectangle(geo.W * T, geo.floor * T, 4000, geo.H * T, col(C.ground?.color || '#4a3628')).setOrigin(0).setDepth(-9);
     // night over the world, lights shine through it
     const shade = (this.day.shade ?? 0) / 100;
-    this.night = scene.add.rectangle(0, 0, geo.W * T, geo.H * T, 0x0a0820, shade).setOrigin(0).setDepth(30);
+    this.night = scene.add.rectangle(-4000, -4000, geo.W * T + 8000, geo.H * T + 8000, 0x0a0820, shade).setOrigin(0).setDepth(30);
     this.lightK = (this.day.light ?? Math.min(100, shade * 200)) / 100;   // how strongly fire and windows shine (Tag & Nacht › Licht)
     for (const l of this.lights) l.setAlpha(l.base * this.lightK).setVisible(this.lightK > 0);
     this.prompt = null; this.barkAt = scene.time.now + 2500;
   }
 
   // ---------- the rig as a dollhouse ----------
-  drawRig() {
-    const s = this.scene, D = this.D, R = this.C.rig || {}, T = s.T, y = this.ground, h = R.height ?? 248;
-    const g = s.make.graphics({}, false), wall = col(R.wall || '#4a4f5a'), inside = col(R.inside || '#2b2233');
-    const x1 = this.geo.vanLeft;
-    for (const u of this.geo.units) {
-      if (u.sprite) { this.drawPictureUnit(g, u, R); continue; }
-      const top = y - h, kind = u.def.kind;
-      // shell: back wall (inside), roof, end walls, floor, wheels
-      g.fillStyle(inside).fillRect(u.x0, top, u.x1 - u.x0, h);
-      g.fillStyle(shadeOf(R.inside || '#2b2233', 1.25)); for (let yy = top + 30; yy < y - 10; yy += 34) g.fillRect(u.x0 + 12, yy, u.x1 - u.x0 - 24, 2);   // planks
-      g.fillStyle(wall).fillRect(u.x0 - 12, top - 22, u.x1 - u.x0 + 24, 22).fillRect(u.x0 - 12, top, 12, h).fillRect(u.x1, top, 12, h);
-      if (kind === 'trailer') g.fillStyle(shadeOf(R.wall || '#4a4f5a', 1.3)).fillRect(u.x0 - 4, top - 30, u.x1 - u.x0 + 8, 8);   // rounded roof
-      if (kind === 'shipping') { g.fillStyle(shadeOf(R.wall || '#4a4f5a', 0.8)); for (let xx = u.x0 - 8; xx < u.x1 + 8; xx += 16) g.fillRect(xx, top - 20, 6, 18); }
-      if (kind === 'crate') { g.fillStyle(0x7a5a3a).fillRect(u.x0 - 12, top - 22, u.x1 - u.x0 + 24, 22).fillRect(u.x0 - 12, top, 12, h).fillRect(u.x1, top, 12, h); }
-      g.fillStyle(0x1b1d22).fillRect(u.x0 - 12, y - 8, u.x1 - u.x0 + 24, 8);
-      for (const wx of [u.x0 + 40, u.x1 - 40]) { g.fillStyle(0x15161a).fillCircle(wx, y + 6, 30); g.fillStyle(0x4a4f5a).fillCircle(wx, y + 6, 12); }
-      // cells: thin walls between the places, workshops inside
-      for (let i = 1; i < u.places; i++) g.fillStyle(wall).fillRect(u.x0 + i * u.cell - 3, top, 6, h - 120);
-      for (const w of u.workshops) {
-        const def = D.workshops?.[w.id] || {}, cx = u.x0 + w.at * u.cell, cw = (def.places || 1) * u.cell;
-        furniture(g, def.function, cx, y - 8, cw, h - 8, R.light || '#ffcf7a');
-        // window with warm light at night
-        g.fillStyle(0x0d0a12).fillRect(cx + cw / 2 - 26, top + 22, 52, 34).fillStyle(col(R.light || '#ffcf7a')).fillRect(cx + cw / 2 - 22, top + 26, 44, 26);
-        this.light(cx + cw / 2, top + 40, 220, R.light || '#ffcf7a', 0.5);
-        this.workshopHotspot(u, w, def, cx, cw, top - 60);
-      }
-      // empty places
-      for (let i = 0; i < u.places; i++) if (!u.workshops.some(w => i >= w.at && i < w.at + (D.workshops?.[w.id]?.places || 1)))
-        g.fillStyle(0x5b5266, 0.5).fillRect(u.x0 + i * u.cell + u.cell / 2 - 30, y - 40, 60, 4);
-    }
-    // tow bar to the van (pictures bring their own)
-    if (this.geo.units.length && !this.geo.units[this.geo.units.length - 1].sprite) { const last = this.geo.units[this.geo.units.length - 1]; g.fillStyle(0x30363d).fillRect(last.x1 + 12, y - 34, x1 - last.x1 + 20, 8); }
-    if (this.geo.units.length) {
-      const key = 'camp_rig';
-      if (s.textures.exists(key)) s.textures.remove(key);
-      g.generateTexture(key, Math.ceil(x1 + 40), Math.ceil(y + 40));
-      s.add.image(0, 0, key).setOrigin(0).setDepth(-21);
-    }
-    g.destroy();
+  // Every container is its own view (a Phaser container standing on the ground), so building can redraw the rig on the spot
+  // and let a single trailer wobble on its springs. Lights, interior platforms, labels and the workshops' E spots belong to it.
+  drawRig({ hide = null } = {}) {
+    const s = this.scene;
+    this.hide = hide;   // building: a workshop that is in the hand right now is not drawn
+    for (const o of this.rigObjs || []) o.destroy();
+    this.rigObjs = [];
+    for (const l of this.lights) if (l.rig) l.destroy();
+    this.lights = this.lights.filter(l => !l.rig);
+    this.hotspots = this.hotspots.filter(h => !h.rig);
+    this.geo.units = rigUnits(this.D, this.box.save.rig, this.geo.vanLeft, this.ground, s.T);
+    this.budget = budgets(this.D, this.box.save.rig);
+    this.noPower = this.D.build?.rules?.power !== false && this.budget.power.net < 0;
+    this.tooHeavy = this.D.build?.rules?.weight !== false && this.budget.heavy;
+    for (const u of this.geo.units) u.view = this.drawUnit(u);
+    this.drawYard();
+    if (this.night) for (const l of this.lights) if (l.rig) l.setAlpha(l.base * this.lightK).setVisible(this.lightK > 0);
   }
-
-  // a container with a picture (e.g. Daniel's trailer with the side folded open): picture behind, furniture in its interior,
-  // the interior floor is a platform (jump in), workshops are used with E from the ground or from inside
-  drawPictureUnit(g, u, R) {
-    const s = this.scene, D = this.D, S = u.sprite;
-    if (!s.textures.exists(S.key)) return;
-    s.textures.get(S.key).setFilter(NEAREST());
-    s.add.image(S.cx, this.ground, S.key, 0).setOrigin(S.ox, S.oy).setScale(S.k).setFlipX(S.flip).setDepth(-22);
-    const top = u.inTop, floor = u.floorY, h = floor - top;
+  // one container in the rig: shell (picture or code), furniture, lights, the interior floor as a platform, E spots
+  drawUnit(u) {
+    const s = this.scene, D = this.D, R = this.C.rig || {}, mid = (u.x0 + u.x1) / 2, view = s.add.container(mid, this.ground).setDepth(-21);
+    this.rigObjs.push(view);
+    const add = o => { view.add(o); return o; };
+    if (u.sprite) {
+      if (s.textures.exists(u.sprite.key)) {
+        s.textures.get(u.sprite.key).setFilter(NEAREST());
+        add(s.add.image(u.sprite.cx - mid, 0, u.sprite.key, 0).setOrigin(u.sprite.ox, u.sprite.oy).setScale(u.sprite.k).setFlipX(u.sprite.flip));
+      }
+    } else add(s.add.image(u.x0 - mid, 0, shellTexture(s, D, u.def, s.T)).setOrigin(0, 1).setScale(1));
+    // furniture: one texture per container, drawn in the interior
+    const g = s.make.graphics({}, false), h = u.floorY - u.inTop, key = `camp_unit_${u.ui}`;
     for (const w of u.workshops) {
-      const def = D.workshops?.[w.id] || {}, cx = u.in0 + w.at * u.cell, cw = (def.places || 1) * u.cell;
-      furniture(g, def.function, cx, floor, cw, h, R.light || '#ffcf7a');
-      this.light(cx + cw / 2, top + h * 0.35, 200, R.light || '#ffcf7a', 0.45);
-      this.workshopHotspot(u, w, def, cx, cw, top + 8);
+      if (this.hide && this.hide.ui === u.ui && this.hide.at === w.at) continue;
+      const def = D.workshops?.[w.id] || {}, cx = u.in0 + w.at * u.cell - u.x0, cw = (def.places || 1) * u.cell;
+      furniture(g, def.function, cx, h + 40, cw, h, R.light || '#ffcf7a');
+      if (!u.sprite) g.fillStyle(0x0d0a12).fillRect(cx + cw / 2 - 26, 40 + 22, 52, 34).fillStyle(col(R.light || '#ffcf7a')).fillRect(cx + cw / 2 - 22, 40 + 26, 44, 26);   // window
+      const l = this.light(u.in0 + w.at * u.cell + cw / 2, u.inTop + h * 0.35, 200, R.light || '#ffcf7a', 0.45); l.rig = true;
+      this.workshopHotspot(u, w, def, u.in0 + w.at * u.cell, cw, u.inTop + 8);
     }
-    const z = s.add.zone((u.in0 + u.in0 + u.cell * u.places) / 2, floor + 8, u.cell * u.places, 16);
+    if (!u.sprite) for (let i = 1; i < u.places; i++) g.fillStyle(col(R.wall || '#4a4f5a')).fillRect(u.in0 - u.x0 + i * u.cell - 3, 40, 6, h - 120);   // thin walls between the places
+    if (s.textures.exists(key)) s.textures.remove(key);
+    g.generateTexture(key, Math.ceil(u.x1 - u.x0), Math.ceil(h + 44)); g.destroy();
+    add(s.add.image(u.x0 - mid, u.inTop - 40 - this.ground, key).setOrigin(0));
+    // the interior floor carries Leyla (jump in), workshops are used with E from the ground or from inside
+    const z = s.add.zone(u.in0 + u.cell * u.places / 2, u.floorY + 8, u.cell * u.places, 16);
     s.platforms.add(z);
     Object.assign(z.body.checkCollision, { down: false, left: false, right: false });
+    this.rigObjs.push(z);
+    return view;
   }
   workshopHotspot(u, w, def, cx, cw, labelY) {
-    const R = this.C.rig || {}, units = this.box.save.rig.units;
-    const store = def.grid && `store:${units.indexOf(units.find(x => x.id === u.id && x.workshops.includes(w)))}:${w.at}`;
-    this.hotspots.push({ x: cx + cw / 2, w: cw / 2, name: def.name || w.id, hint: store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id) });
-    if (R.labels !== false) this.scene.add.text(cx + cw / 2, labelY, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '24px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 0).setDepth(-14);
+    const R = this.C.rig || {};
+    const store = def.grid && `store:${u.ui}:${w.at}`;
+    this.hotspots.push({ rig: true, x: cx + cw / 2, w: cw / 2, name: def.name || w.id, hint: store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id) });
+    if (R.labels !== false) this.rigObjs.push(this.scene.add.text(cx + cw / 2, labelY, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '24px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 0).setDepth(-14));
+  }
+
+  // ---------- scrapyard by the shaft: spare workshops on pallets, spare trailers parked behind, the dealer's pad ----------
+  drawYard() {
+    const s = this.scene, D = this.D, Y = this.geo.yard, sp = this.box.save.rig.spare || { workshops: [], containers: [] }, y = this.ground;
+    this.yardItems = [];
+    this.dealer = null;
+    if (!Y) return;
+    const C = this.C.yard || {}, keep = o => { this.rigObjs.push(o); return o; };
+    const g = keep(s.add.graphics().setDepth(-19));
+    let x = Y.x0;
+    // dealer's pad: a steel plate with hazard stripes and a sign; drop things here to sell them, bought things are delivered here
+    if (C.dealer !== false) {
+      const w = C.dealerWidth ?? 170;
+      g.fillStyle(0x30363d).fillRect(x, y - 10, w, 10).fillStyle(0x8b949e).fillRect(x, y - 12, w, 3);
+      for (let i = 0; i < w; i += 24) g.fillStyle(0xe0b030).fillRect(x + i, y - 9, 12, 7);
+      g.fillStyle(0x4a3424).fillRect(x + w - 26, y - 190, 8, 180);
+      g.fillStyle(0x1b1d22).fillRect(x + w - 120, y - 230, 130, 56).fillStyle(0xe0b030).fillRect(x + w - 116, y - 226, 122, 48);
+      keep(s.add.text(x + w - 55, y - 202, `${C.dealerName || 'Händler'} Δ`, { fontFamily: 'VT323, monospace', fontSize: '30px', color: '#1b1d22' }).setOrigin(0.5).setDepth(-18));
+      this.dealer = { x0: x - 10, x1: x + w + 10, y0: y - 260, y1: y + 20, x: x + w / 2 };
+      x += w + 30;
+    }
+    // spare trailers: parked further back, smaller and a little darker
+    const far = (C.parkScale ?? 45) / 100;
+    let px = x;
+    sp.containers.forEach((id, i) => {
+      const def = D.containers?.[id] || {}, sh = unitShape(D, def, 0, s.T), w = sh.w * far;
+      const view = keep(s.add.container(px + w / 2, y - 24).setDepth(-23).setScale(far));
+      if (sh.sprite && s.textures.exists(sh.sprite.key)) view.add(s.add.image(sh.sprite.cx - sh.w / 2, 0, sh.sprite.key, 0).setOrigin(sh.sprite.ox, sh.sprite.oy).setScale(sh.sprite.k).setFlipX(sh.sprite.flip).setTint(0xb8a8b0));
+      else view.add(s.add.image(-sh.w / 2, 0, shellTexture(s, D, def, s.T)).setOrigin(0, 1).setTint(0xb8a8b0));
+      const top = y - 24 - (sh.sprite ? (sh.sprite.k * (D.assets?.[def.look]?.frameSize?.[1] || 256) * sh.sprite.oy) : (sh.lift + (this.C.rig?.height ?? 248) + 30)) * far;
+      this.yardItems.push({ kind: 'container', i, id, x0: px, x1: px + w, y0: top, y1: y, view, x: px + w / 2 });
+      px += w + 20;
+    });
+    // spare workshops: on pallets in front
+    const ws = (C.palletScale ?? 50) / 100, cw = (this.C.rig?.placeWidth ?? 4) * s.T * ws;
+    let wx = px;
+    sp.workshops.forEach((id, i) => {
+      const def = D.workshops?.[id] || {}, n = def.places || 1, w = cw * n;
+      g.fillStyle(0x7a5a3a).fillRect(wx, y - 14, w, 14).fillStyle(0x4a3424);
+      for (let k = 0; k < w; k += 28) g.fillRect(wx + k + 4, y - 10, 12, 10);
+      const key = workshopTexture(s, D, id, this.C), view = keep(s.add.container(wx + w / 2, y - 14).setDepth(-17));
+      view.add(s.add.image(0, 0, key).setOrigin(0.5, 1).setScale(ws));
+      view.add(s.add.text(0, -s.textures.get(key).getSourceImage().height * ws - 6, def.name || id, { fontFamily: 'VT323, monospace', fontSize: '22px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 4 }).setOrigin(0.5, 1));
+      this.yardItems.push({ kind: 'ws', i, id, x0: wx, x1: wx + w, y0: y - 14 - s.textures.get(key).getSourceImage().height * ws, y1: y, view, x: wx + w / 2 });
+      wx += w + 14;
+    });
+    // some scrap so the place reads as a yard even when it is empty: a tyre stack and a barrel
+    const ex = Y.x1 - 70;
+    for (let i = 0; i < 3; i++) g.fillStyle(0x15161a).fillRoundedRect(ex - 36, y - 22 - i * 20, 72, 20, 8).fillStyle(0x2a2c32).fillRect(ex - 14, y - 16 - i * 20, 28, 8);
+    g.fillStyle(0x6a3a2a).fillRect(ex - 120, y - 70, 44, 70).fillStyle(0x8a4a32).fillRect(ex - 120, y - 56, 44, 6).fillRect(ex - 120, y - 24, 44, 6);
   }
 
   light(x, y, r, color, base, h = r) {
@@ -513,8 +636,9 @@ export class Camp {
       if (c.until && time > c.until) { c.bubble.setAlpha(Math.max(0, c.bubble.alpha - dt / 300)); if (c.bubble.alpha <= 0) c.until = 0; }
       c.sprite.setFlipX(l.x < c.x);
     }
-    // nearest hotspot within reach (on the ground)
+    // nearest hotspot within reach (on the ground); not while building (Leyla works by herself then)
     this.atWorkshop = false;
+    if (s.hud.build?.active) { if (this.promptText) { this.prompt = null; this.promptText = null; s.hud.prompt(null); } return; }
     if (l.state === 'sit') {   // sitting: only standing up (E or a direction, handled by Leyla)
       const text = l.sit?.up ? null : 'Aufstehen · Lagerfeuer';
       if (text !== this.promptText) { this.prompt = null; this.promptText = text; s.hud.prompt(text); }

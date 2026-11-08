@@ -13,7 +13,7 @@ import { advance, arrive, clockText, containers } from '../save.js';
 import { Loot } from './loot.js';
 import { InventoryUI } from './inventory_ui.js';
 import { CraftUI } from './craft_ui.js';
-import { BuildUI } from './build_ui.js';
+import { BuildMode } from './build_mode.js';
 import { use as useThing } from '../crafting.js';
 
 const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
@@ -237,19 +237,21 @@ export class PlayScene extends Phaser.Scene {
       closed: () => hud.scene.craftClosed(),
     });
     hud.craft.el.hidden = true;
-    // build view of the rig (game/play/build_ui.js): B in the camp or Warroom › Rig umbauen
-    hud.build ??= new BuildUI(hud.root, {
-      get D() { return hud.scene.data_; },
-      save: () => hud.scene.box.save,
-      apply: r => hud.scene.goCamp({ banner: ['Umgebaut', `${clockText(hud.scene.box.save)}${r.minutes ? ` · ${r.minutes} min gewerkelt` : ''}`], fade: 700 }),
-      closed: () => {},
-    });
-    hud.build.el.hidden = true;
+    // building the rig right in the camp (game/play/build_mode.js): B in the camp or Warroom › Rig umbauen
+    hud.build ??= new BuildMode(hud.root, { scene: () => hud.scene });
+    hud.build.reset();
   }
   openBuild() {
-    if (this.mode !== 'camp' || !this.box) return;
+    if (this.mode !== 'camp' || !this.box || this.hud.build.active) return;
     this.hud.inv?.close();
+    this.hud.closeMenu?.();
     this.hud.build.open();
+  }
+  // building finished: save; the clock may have moved into another time of day (light, sky) → camp fresh at the same spot
+  buildClosed() {
+    const C = this.data_.camp || {}, save = this.box.save;
+    this.box.persist();
+    if (this.camp && daytimeAt(C, save.hour)?.name !== this.camp.day?.name) this.time.delayedCall(this.script ? 0 : 700, () => this.goCamp({ banner: [daytimeAt(C, save.hour)?.name || 'Die Zeit vergeht', clockText(save)], fade: 500, keepPlace: true }));
   }
   // the cooking/crafting panel closed: the clock may have moved into another time of day (light, sky) → camp fresh at the same spot
   craftClosed() {
@@ -457,20 +459,23 @@ export class PlayScene extends Phaser.Scene {
   }
 
   update(time, delta) {
-    const input = this.readInput();
+    let input = this.readInput();
     if (input.help.pressed && this.hud.inv?.isOpen && !this.hud.paused) { this.hud.inv.close(); input.help.pressed = false; }
     if (input.help.pressed) this.hud.toggleHelp();
     if (input.mute.pressed) { this.sound.mute = !this.sound.mute; try { localStorage.setItem('nomadgirl-mute', this.sound.mute ? '1' : '0'); } catch { /* */ } this.hud.banner(this.sound.mute ? 'Ton aus' : 'Ton an', 'M schaltet um'); this.time.delayedCall(1200, () => this.hud.banner(null)); }
     if (input.debug.pressed) { const w = this.physics.world; w.drawDebug = !w.drawDebug; if (!w.debugGraphic) w.createDebugGraphic(); w.debugGraphic.clear().setVisible(w.drawDebug); }
     if (input.restart.pressed && this.mode !== 'camp') this.restartRoom();
-    if (input.build?.pressed && this.mode === 'camp' && !this.hud.modal && !this.hud.paused && !this.leaving && !this.hud.craft?.isOpen && !this.hud.build?.isOpen) this.openBuild();
-    if (this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || this.hud.build?.isOpen || this.leaving) { this.physics.world.pause(); this.hud.update(this, time); return; }
+    const building = this.hud.build?.active;
+    if (input.build?.pressed && building) this.hud.build.close();
+    else if (input.build?.pressed && this.mode === 'camp' && !this.hud.modal && !this.hud.paused && !this.leaving && !this.hud.craft?.isOpen) this.openBuild();
+    if (this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || this.leaving) { this.physics.world.pause(); this.hud.update(this, time); return; }
     if (time < this.hitstopUntil) return;
     if (this.physics.world.isPaused) this.physics.world.resume();
     const dt = Math.min(delta, 50);
     if (!this.startTime) this.startTime = time;
     if (!this.cleared) this.elapsed = time - this.startTime;
 
+    if (this.hud.build?.active) input = this.hud.build.drive(input, dt);   // building: Leyla walks to her jobs by herself
     this.leyla.update(time, dt, input);
     this.drone.update(time, dt);
     this.van?.update(dt);
@@ -492,6 +497,7 @@ export class PlayScene extends Phaser.Scene {
     cam.followOffset.x += (-this.leyla.facing * (this.data_.game?.camera?.lookAhead ?? 160) - cam.followOffset.x) * Math.min(1, dt / 400);
     this.bgCam.setScroll(cam.worldView.x, cam.worldView.y);   // parallax follows the world camera
     this.backdrop?.update(time, dt);
+    this.hud.build?.update(time, dt);
     this.hud.update(this, time);
   }
 }

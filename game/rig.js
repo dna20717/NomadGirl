@@ -1,10 +1,11 @@
-// Building the rig (Camp step 4, "Bau-Ansicht"): pure logic, browser and Node, no DOM. Interface: game/play/build_ui.js.
+// Building the rig (Rig bauen 2.0): pure logic, browser and Node, no DOM. Interface: game/play/build_mode.js (right in the camp).
 // Values from the area "Rig-Bau" (data/build.json), prices = "Wert" of workshops and containers.
 //
 // The rig in the savegame: save.rig = { tractor, units: [{ kind: 'tractor' | 'container', id, workshops: [{ id, at }] }], spare: { workshops: [id], containers: [id] } }
 //   units[0] is the tractor (its own places, the van: sleeping bunk + war room), then the containers in order (camp: from the van to the left).
 //   spare = bought or removed things that are not built in ("Lager" in the build view).
-// Building happens on a draft (startDraft); applyDraft writes it back: Δ, the clock, and the storage grids follow their workshop.
+// Every action is a small draft (startDraft → op → applyDraft, all in act()): Δ, the clock, and the storage grids follow their workshop.
+// "Rückgängig" puts a snapshot back (snapshot/restore).
 // Budgets: weight of the containers ≤ pull of the tractor (else no driving), number of containers ≤ "Plätze hintereinander",
 // energy: tractor "Lichtmaschine" + workshops with + minus workshops with − (below 0: workshops that need power do not work).
 import { containers as storeList, advance, ensureGrid } from './save.js';
@@ -78,6 +79,8 @@ export function place(D, d, inst, ui, p, { free = false } = {}) {
   return true;
 }
 export function toSpare(d, inst) { d.rig.spare.workshops.push(inst); }
+// take a workshop out onto the scrapyard: costs the time for moving it
+export function stow(D, d, inst) { toSpare(d, inst); spend(D, d, 0, M(D, 'move', 30)); return { ok: true }; }
 export function fromSpare(d, uid) { const i = d.rig.spare.workshops.findIndex(w => w.uid === uid); return i < 0 ? null : d.rig.spare.workshops.splice(i, 1)[0]; }
 
 // a storage workshop with things inside cannot be sold or left out of the rig
@@ -142,6 +145,48 @@ export function shift(D, d, ui, dir) {
   [U[ui], U[j]] = [U[j], U[ui]];
   spend(D, d, 0, M(D, 'container', 90));
   return { ok: true };
+}
+// hang a spare container in at unit index `at` (1 = right behind the tractor, units.length = at the end)
+export function attachAt(D, d, i, at) {
+  const id = d.rig.spare.containers[i], b = budgets(D, d.rig), U = d.rig.units;
+  if (!id) return { ok: false, reason: 'Liegt nicht im Lager' };
+  if (b.length >= b.maxLength) return { ok: false, reason: `${D.tractors?.[d.rig.tractor]?.name || 'Die Zugmaschine'} zieht höchstens ${b.maxLength} Anhänger` };
+  d.rig.spare.containers.splice(i, 1);
+  U.splice(Math.max(1, Math.min(U.length, at)), 0, { kind: 'container', id, workshops: [] });
+  spend(D, d, 0, M(D, 'container', 90));
+  return { ok: true };
+}
+// move a built-in container into the gap `gap` (gap g = in front of unit g, units.length = at the end); same place = nothing happens
+export function moveContainer(D, d, ui, gap) {
+  const U = d.rig.units, u = U[ui];
+  if (!u || u.kind !== 'container') return { ok: false, reason: 'Das ist kein Anhänger' };
+  U.splice(ui, 1);
+  const at = Math.max(1, Math.min(U.length, gap > ui ? gap - 1 : gap));
+  U.splice(at, 0, u);
+  if (at === ui) return { ok: false, reason: 'Steht schon da', same: true };
+  spend(D, d, 0, M(D, 'container', 90));
+  return { ok: true };
+}
+
+// ---------- building right away (Rig bauen 2.0): every action is a small draft that is applied at once ----------
+// act(D, save, d => op(...)) → { ok, reason, minutes, deltas }; nothing changes when the action fails or leaves problems
+export function act(D, save, fn) {
+  const d = startDraft(D, save), r = fn(d) || { ok: true };
+  if (r.ok === false) return r;
+  if (!d.changes) return { ok: false, reason: r.reason || 'Nichts geändert', same: true };
+  const before = save.deltas, a = applyDraft(D, save, d);
+  return a.ok ? { ...r, ok: true, minutes: a.minutes, deltas: save.deltas - before } : a;
+}
+// snapshot for "Rückgängig": rig, Δ, clock and the storage grids
+export function snapshot(save) {
+  return JSON.parse(JSON.stringify({ rig: save.rig, deltas: save.deltas, day: save.day, hour: save.hour, grids: Object.fromEntries(Object.entries(save.inv.grids).filter(([k]) => k.startsWith('store:'))) }));
+}
+export function restore(save, snap) {
+  const s = JSON.parse(JSON.stringify(snap));
+  save.rig = s.rig; save.deltas = s.deltas; save.day = s.day; save.hour = s.hour;
+  for (const k of Object.keys(save.inv.grids)) if (k.startsWith('store:')) delete save.inv.grids[k];
+  Object.assign(save.inv.grids, s.grids);
+  return save;
 }
 
 // can the draft be built? → list of reasons (empty = yes)

@@ -6,7 +6,7 @@
  "height": 14,
  "horizon": 66,
  "ground": {"color": "#4a3628", "top": "#8a6440", "far": "#6b4a36", "tiles": "camp_ground"},
- "rig": {"placeWidth": 4, "height": 248, "gap": 1, "wall": "#4a4f5a", "inside": "#2b2233", "light": "#ffcf7a", "labels": true},
+ "rig": {"placeWidth": 4, "height": 248, "gap": 1, "wall": "#4a4f5a", "inside": "#2b2233", "light": "#ffcf7a", "labels": true, "lift": 48, "drawbar": 120},
  "fire": {
   "enabled": true,
   "look": "campfire",
@@ -77,5 +77,6 @@
   "fireNear": 120
  },
  "vanLight": {"enabled": true, "color": "#ffc870", "strength": 150, "width": 110, "height": 150, "lift": 150, "pool": 260, "spill": 40},
- "shaft": {"enabled": true, "at": 1, "width": 3, "color": "#140d12", "glow": "#c0302a", "frameHeight": 200}
+ "shaft": {"enabled": true, "at": 1, "width": 3, "color": "#140d12", "glow": "#c0302a", "frameHeight": 200},
+ "yard": {"enabled": true, "width": 9, "dealer": true, "dealerName": "Händler", "dealerWidth": 170, "palletScale": 50, "parkScale": 45}
 }
