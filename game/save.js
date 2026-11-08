@@ -2,7 +2,7 @@
 // Online (Cloudflare worker) one savegame per login in KV (/api/save), the same on every device;
 // without the worker (local, tests) in this browser (localStorage). Shape:
 //   { version, day, hour, location, fuel, food, deltas, health, buffs: [id], rig: { tractor, units: [{ kind, id, workshops: [{ id, at }] }] },
-//     companions: [id], run: null | { poi, room, location }, log: [text],
+//     companions: [id], recipes: [id] (recipe book), run: null | { poi, room, location }, log: [text],
 //     inv: { backpack: id, slots: { melee, ranged, cyberdeck }, grids: { backpack, chest, 'store:<unit>:<place>': grid } } }   (grids: game/inventory.js)
 // Times are hours (18.5 = 18:30). "Ereignis-Zeit": the clock only moves on actions (sleeping, runs, sitting at the fire).
 
@@ -81,6 +81,7 @@ export function newSave(D) {
     buffs: [],
     rig: { tractor: S.tractor, units },
     companions: [...(S.companions || [])],
+    recipes: startRecipes(D),
     run: null,
     log: [],
   });
@@ -98,6 +99,9 @@ function withInventory(D, save) {
   return save;
 }
 
+// the recipe book at the start: every recipe with discovery "Von Anfang an"
+const startRecipes = D => Object.entries(D.recipes || {}).filter(([, r]) => (r.discovery || []).includes('start')).map(([id]) => id);
+
 // fills gaps of an older savegame (new fields, removed workshops) so the game never trips over it
 export function repairSave(save, D) {
   const fresh = newSave(D);
@@ -109,6 +113,7 @@ export function repairSave(save, D) {
   s.buffs = (s.buffs || []).filter(b => D.buffs?.[b]);
   s.companions = (s.companions || []).filter(c => D.companions?.[c]);
   if (s.run && !D.pois?.[s.run.poi]) s.run = null;
+  s.recipes = Array.isArray(save.recipes) ? [...new Set([...save.recipes.filter(r => D.recipes?.[r]), ...startRecipes(D)])] : fresh.recipes;
   if (save.inv === undefined) delete s.inv;   // older savegame: inventory from the start values
   return withInventory(D, s);
 }
@@ -119,8 +124,8 @@ export function clockText(save) {
   return `Tag ${save.day} · ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
 export function advance(save, hours) {
-  const t = save.hour + hours;
-  save.day += Math.floor(t / 24); save.hour = Math.round((t % 24) * 4) / 4;
+  const m = Math.round((save.hour + hours) * 60);   // whole minutes (cooking and crafting take minutes)
+  save.day += Math.floor(m / 1440); save.hour = (m % 1440) / 60;
   return save;
 }
 // hours until the next time the clock shows `hour` (sleeping until the morning)

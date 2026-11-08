@@ -38,5 +38,25 @@
   "count": 1,
   "discovery": ["experiment"],
   "hint": "Viel zu viele Kronkorken und eine sehr optimistische Glühbirne."
+ },
+ "gewuerzreis": {
+  "name": "Gewürzreis",
+  "station": "kochnische",
+  "ingredients": [{"item": "reis", "count": 2},{"item": "gewuerzmischung", "count": 1}],
+  "result": "gewuerzreis",
+  "count": 1,
+  "time": 20,
+  "discovery": ["experiment", "companion"],
+  "hint": "Reis allein ist traurig. Gib ihm was zum Erzählen."
+ },
+ "notstrom": {
+  "name": "Notstrom-Pack",
+  "station": "werkbank",
+  "ingredients": [{"item": "batteriezelle", "count": 2},{"item": "kupferkabel", "count": 2}],
+  "result": "notstrom",
+  "count": 1,
+  "time": 30,
+  "discovery": ["experiment", "companion"],
+  "hint": "Zwei Zellen, etwas Kupfer dazwischen. Nicht ablecken."
  }
 }

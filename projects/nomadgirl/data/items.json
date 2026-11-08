@@ -65,5 +65,19 @@
  },
  "antenne": {"name": "Teleskopantenne", "category": "component", "size": [1, 3], "stack": 2, "value": 7, "glyph": "📡", "description": "Empfängt drei Sender. Alle spielen Werbung."},
  "t_stueck": {"name": "T-Stück", "category": "junk", "size": [3, 2], "stack": 1, "value": 4, "shape": ["###", ".#."], "glyph": "T", "description": "Klempner-Tetris."},
- "autobatterie": {"name": "Autobatterie", "category": "resource", "size": [2, 2], "stack": 1, "value": 20, "glyph": "⚡", "description": "Schwer. Brummt leise, wenn man sie schüttelt."}
+ "autobatterie": {"name": "Autobatterie", "category": "resource", "size": [2, 2], "stack": 1, "value": 20, "glyph": "⚡", "description": "Schwer. Brummt leise, wenn man sie schüttelt."},
+ "verkohlter_klumpen": {"name": "Verkohlter Klumpen", "category": "junk", "size": [1, 1], "stack": 5, "value": 0, "glyph": "🪨", "description": "War mal Essen. Jetzt ist es ein Briefbeschwerer."},
+ "graue_pampe": {"name": "Graue Pampe", "category": "junk", "size": [1, 1], "stack": 5, "value": 1, "glyph": "🫠", "description": "Riecht nach nichts. Das ist das Beunruhigende."},
+ "kabelsalat": {"name": "Kabelsalat", "category": "junk", "size": [2, 1], "stack": 3, "value": 1, "glyph": "🍝", "description": "Irgendwo da drin ist ein Ende. Vielleicht."},
+ "schrottskulptur": {
+  "name": "Schrottskulptur",
+  "category": "valuable",
+  "size": [2, 2],
+  "stack": 1,
+  "value": 6,
+  "glyph": "🗿",
+  "description": "Sollte ein Werkzeug werden. Ist jetzt Kunst. Sammler sind verwirrt, zahlen aber."
+ },
+ "gewuerzreis": {"name": "Gewürzreis", "category": "food", "size": [1, 1], "stack": 3, "value": 7, "buff": "flink", "glyph": "🍘", "description": "Leicht, scharf, macht Beine."},
+ "notstrom": {"name": "Notstrom-Pack", "category": "component", "size": [1, 2], "stack": 2, "value": 18, "glyph": "🔌", "description": "Zwei Zellen, viel Klebeband, ein Funke Hoffnung."}
 }

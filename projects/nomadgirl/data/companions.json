@@ -5,7 +5,7 @@
   "stage": "1",
   "workshops": ["werkbank", "motorraum", "drohnenwerkstatt"],
   "buffs": [],
-  "tips": ["kabelbaum", "schrottplatte"],
+  "tips": ["kabelbaum", "schrottplatte", "notstrom"],
   "description": "Redet mit Motoren. Die Motoren hören zu.",
   "lines": [
    "Hörst du das? Der Motor summt in Moll.",
@@ -14,7 +14,19 @@
    "Gib mir Kabel und ich geb dir Wunder.",
    "Kein Rost, kein Ruhm."
   ],
-  "color": "#3fe0d0"
+  "color": "#3fe0d0",
+  "craftLines": {
+   "hit": [
+    "Hält! Ich hätte gewettet, dass es explodiert.",
+    "Saubere Arbeit. Fast so gut wie meine.",
+    "Mama-Bot ist neidisch, ich seh es an den Lämpchen."
+   ],
+   "miss": [
+    "Das ist kein Fehler, das ist ein Prototyp.",
+    "Schön ist es ja. Nutzlos, aber schön.",
+    "Mehr Kabel. Es braucht immer mehr Kabel."
+   ]
+  }
  },
  "onkel_sung": {
   "name": "Onkel Sung",
@@ -22,7 +34,7 @@
   "stage": "1",
   "workshops": ["kochnische", "kueche", "foodtruck"],
   "buffs": ["feurig"],
-  "tips": ["mutanten_curry"],
+  "tips": ["mutanten_curry", "gewuerzreis"],
   "description": "Hat früher in BigCityDelta gekocht. Für wen, sagt er nicht.",
   "lines": [
    "Hunger? Natürlich hast du Hunger.",
@@ -31,6 +43,18 @@
    "Bring mir Pilze. Keine leuchtenden.",
    "Der Kaffee von der Tankstelle ist ein Verbrechen."
   ],
-  "color": "#ff9a3a"
+  "color": "#ff9a3a",
+  "craftLines": {
+   "hit": [
+    "Siehst du? Kochen ist nur Chemie mit Liebe.",
+    "Das riecht nach drei Sternen. Mindestens zwei.",
+    "Iss, bevor es kalt wird. Oder bevor es wegläuft."
+   ],
+   "miss": [
+    "Das … war mutig.",
+    "Ich hab schon Schlimmeres gegessen. Einmal. In BigCityDelta.",
+    "Nicht wegwerfen, das düngt bestimmt."
+   ]
+  }
  }
 }

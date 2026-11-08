@@ -390,6 +390,7 @@ export class Camp {
     const def = this.D.workshops?.[id] || {}, s = this.scene;
     if (def.function === 'sleep') return this.sleep(def);
     if (def.function === 'warroom') return this.warroom();
+    if (['kitchen', 'craft'].includes(def.function)) { s.hud.inv?.close(); return s.hud.craft?.open(id); }
     const who = (this.box.save.companions || []).map(c => this.D.companions?.[c]).filter(c => c?.workshops?.includes(id)).map(c => c.name);
     s.hud.menu({ title: def.name || id, sub: [def.description, who.length ? `Betreut von ${who.join(' und ')}.` : null, SOON[def.function] || 'Funktion kommt später.'].filter(Boolean).join(' '),
       items: [{ label: 'Zurück', act: () => {} }] });
@@ -531,7 +532,7 @@ export class Camp {
 }
 
 const VERB = { sleep: 'Schlafen', warroom: 'Planen', kitchen: 'Kochen', foodtruck: 'Verkaufen', craft: 'Herstellen', storage: 'Lager', cooling: 'Kühlraum', chill: 'Chillen', drone: 'Drohne', engine: 'Motor', power: 'Energie', cell: 'Zelle' };
-const SOON = { kitchen: 'Kochen kommt mit Schritt 3 (Kochen & Craften).', foodtruck: 'Verkaufen kommt später.', craft: 'Herstellen kommt mit Schritt 3 (Kochen & Craften).',
+const SOON = { foodtruck: 'Verkaufen kommt später.',
   storage: 'Das Lager füllt sich mit Schritt 2 (Beute & Rucksack).', cooling: 'Das Lager füllt sich mit Schritt 2 (Beute & Rucksack).', chill: 'Chillen gibt bald einen Buff.' };
 
 // distance, hours, fuel and food for driving from the current place to a location

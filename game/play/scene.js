@@ -12,6 +12,8 @@ import { Camp, campLayout, daytimeAt, drawCampBackground, drawCampGround } from 
 import { advance, arrive, clockText, containers } from '../save.js';
 import { Loot } from './loot.js';
 import { InventoryUI } from './inventory_ui.js';
+import { CraftUI } from './craft_ui.js';
+import { use as useThing } from '../crafting.js';
 
 const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
 
@@ -221,9 +223,35 @@ export class PlayScene extends Phaser.Scene {
       changed: key => hud.scene.invChanged(key),
       equipChanged: slot => { const sc = hud.scene; if (slot === 'ranged') sc.leyla.loadWeapon(); },
       throwDown: e => hud.scene.loot ? hud.scene.loot.throwDown(e) : null,
+      use: id => hud.scene.useThing(id),
       notify: text => hud.scene.fx.text(hud.scene.leyla.x, hud.scene.leyla.feet - hud.scene.leyla.height - 30, text, { color: '#ffd27a', size: 34, rise: 40, life: 1100 }),
     });
     hud.inv.close();
+    // cooking and crafting at the workshops in the camp (game/play/craft_ui.js)
+    hud.craft ??= new CraftUI(hud.root, {
+      get D() { return hud.scene.data_; },
+      save: () => hud.scene.box.save,
+      changed: () => { clearTimeout(hud.scene.saveTimer); hud.scene.saveTimer = setTimeout(() => hud.scene.box?.persist(), 600); },
+      leftover: (id, n) => hud.scene.loot?.throwDown({ a: 'items', id, n, r: 0 }),
+      closed: () => hud.scene.craftClosed(),
+    });
+    hud.craft.el.hidden = true;
+  }
+  // the cooking/crafting panel closed: the clock may have moved into another time of day (light, sky) → camp fresh at the same spot
+  craftClosed() {
+    const C = this.data_.camp || {}, save = this.box.save;
+    this.box.persist();
+    if (this.camp && daytimeAt(C, save.hour)?.name !== this.camp.day?.name) this.goCamp({ banner: [daytimeAt(C, save.hour)?.name || 'Die Zeit vergeht', clockText(save)], fade: 500, keepPlace: true });
+  }
+  // eating or using a thing from the inventory (Gegenstände › Buff beim Essen/Benutzen): heals now or waits as a buff for the next run
+  useThing(id) {
+    const D = this.data_, save = this.box.save, l = this.leyla, r = useThing(D, save, id, { health: l.health, maxHealth: l.maxHealth });
+    if (!r.ok) return r;
+    if (r.heal) { l.health = Math.min(l.maxHealth, l.health + r.heal); save.health = Math.round(l.health); }
+    const b = D.buffs?.[r.buff] || {};
+    if (this.mode === 'run' && !r.heal && b.stat) { this.mods[b.stat] = (this.mods[b.stat] || 0) + (b.value || 0); if (b.stat === 'health') l.health = Math.min(l.maxHealth, l.health + (b.value || 0)); }
+    this.fx.text(l.x, l.feet - l.height - 30, r.heal ? `+${Math.round(r.heal)} Leben` : `${b.name || r.buff}${this.mode === 'camp' ? ' · nächster Run' : ''}`, { color: '#7aff9a', size: 34, rise: 50, life: 1300 });
+    return r;
   }
   // something moved in an inventory: ground bundles appear or vanish, the savegame is written soon after
   invChanged(key) {
@@ -421,7 +449,7 @@ export class PlayScene extends Phaser.Scene {
     if (input.mute.pressed) { this.sound.mute = !this.sound.mute; try { localStorage.setItem('nomadgirl-mute', this.sound.mute ? '1' : '0'); } catch { /* */ } this.hud.banner(this.sound.mute ? 'Ton aus' : 'Ton an', 'M schaltet um'); this.time.delayedCall(1200, () => this.hud.banner(null)); }
     if (input.debug.pressed) { const w = this.physics.world; w.drawDebug = !w.drawDebug; if (!w.debugGraphic) w.createDebugGraphic(); w.debugGraphic.clear().setVisible(w.drawDebug); }
     if (input.restart.pressed && this.mode !== 'camp') this.restartRoom();
-    if (this.hud.paused || this.hud.modal || this.leaving) { this.physics.world.pause(); this.hud.update(this, time); return; }
+    if (this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || this.leaving) { this.physics.world.pause(); this.hud.update(this, time); return; }
     if (time < this.hitstopUntil) return;
     if (this.physics.world.isPaused) this.physics.world.resume();
     const dt = Math.min(delta, 50);

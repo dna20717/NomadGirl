@@ -378,7 +378,7 @@ export const AREAS = {
     template: { name: 'Neues Rezept', station: '', ingredients: [], result: '', count: 1, time: 10, discovery: ['experiment'] },
     row: (x, p) => `${(x.ingredients || []).map(i => `${i.count}× ${p?.data.items?.[i.item]?.name || i.item}`).join(' + ') || '–'} → ${p?.data.items?.[x.result]?.name || x.result || '?'}`,
     sections: [
-      { title: 'Rezept', fields: [NAME, ref('station', 'Werkstatt', 'workshops', { required: true }), num('time', 'Dauer', { unit: 's', min: 0 })] },
+      { title: 'Rezept', fields: [NAME, ref('station', 'Werkstatt', 'workshops', { required: true }), num('time', 'Dauer', { unit: 'min', min: 0, hint: 'Spielzeit: die Uhr springt beim Kochen/Herstellen um so viele Minuten weiter (Ereignis-Zeit)' })] },
       { title: 'Zutaten → Ergebnis', fields: [table('ingredients', 'Zutaten', [ref('item', 'Gegenstand', 'items'), num('count', 'Anzahl', { min: 1 })]),
         ref('result', 'Ergebnis', 'items', { required: true }), num('count', 'Anzahl', { min: 1 })] },
       { title: 'Entdecken', fields: [multi('discovery', 'Wie man es lernt', DISCOVERY), area_('hint', 'Hinweis', { hint: 'Was Companions oder Notizzettel andeuten' })] },
@@ -386,7 +386,25 @@ export const AREAS = {
     check: (x, report) => {
       if (!(x.ingredients || []).length) report('error', 'Rezept ohne Zutaten');
       if ((x.ingredients || []).some(i => i.item === x.result)) report('warning', 'Ergebnis ist auch Zutat');
+      const kinds = (x.ingredients || []).map(i => i.item); if (new Set(kinds).size !== kinds.length) report('warning', 'Eine Zutat steht doppelt in der Liste (Anzahl erhöhen)');
     },
+  },
+  crafting: {
+    name: 'Kochen & Craften', icon: 'workbench', file: 'data/crafting.json', kind: 'single',
+    hint: 'An Kochnische, Küche und Werkbank im Camp (E): Rezeptbuch links, Experimentieren in der Mitte. Ein Treffer landet im Rezeptbuch, ein Fehlschlag ergibt kuriosen Müll. Zutaten kommen aus Lager, Kiste und Rucksack, Ergebnisse gehen in den Rucksack (sonst Kiste, Lager, Boden). Rezepte selbst stehen im Bereich Rezepte.',
+    sections: [
+      { title: 'Experimentieren', fields: [num('slots', 'Zutaten im Topf', { min: 1, max: 8, hint: 'Wie viele verschiedene Zutaten man zusammenwerfen kann' }),
+        num('experimentMinutes', 'Ein Versuch dauert', { unit: 'min', min: 0, hint: 'Bei einem Fehlschlag; ein Treffer dauert so lang wie das Rezept' }),
+        bool('exactCounts', 'Genaue Mengen', { hint: 'An: nur die genaue Menge jeder Zutat trifft. Aus: die richtigen Zutaten in mindestens der richtigen Menge treffen, verbraucht wird nur, was das Rezept braucht' }),
+        num('failConsume', 'Fehlschlag verbraucht', { unit: '%', min: 0, max: 100, hint: 'Anteil der Zutaten im Topf, der bei einem Fehlschlag weg ist (mindestens 1 je Zutat)' }),
+        bool('nearMiss', 'Knapp daneben melden', { hint: 'Fehlt nur eine Zutat (oder eine ist zu viel), sagt das Spiel „Knapp daneben“' }),
+        bool('consumeNotes', 'Zettel verbrauchen', { hint: 'Notizzettel, Baupläne und Kochbücher verschwinden beim Lesen' })] },
+      { title: 'Fehlschläge', fields: [table('failures', 'Kurioser Müll', [select('function', 'Werkstatt-Art', WORKSHOP_FUNCTIONS), ref('item', 'Gegenstand', 'items'), num('weight', 'Gewicht', { min: 0 }), num('min', 'min', { min: 1 }), num('max', 'max', { min: 1 })],
+        { hint: 'Was bei einem Fehlschlag herauskommt, gezogen nach Gewicht. Zeilen ohne Werkstatt-Art gelten überall' })] },
+      { title: 'Texte', fields: [text('texts.hit', 'Treffer', { hint: '{name} = Ergebnis' }), text('texts.learnt', 'Neues Rezept', { hint: '{name} = Rezept' }), text('texts.miss', 'Fehlschlag', { hint: '{name} = Müll' }),
+        text('texts.near', 'Knapp daneben'), text('texts.read', 'Zettel gelesen', { hint: '{name} = Rezept' })] },
+    ],
+    check: (x, report) => { if (!(x.failures || []).length) report('warning', 'Keine Fehlschläge: ein misslungener Versuch ergibt nichts'); },
   },
 
   tractors: {
@@ -441,6 +459,8 @@ export const AREAS = {
       { title: 'Companion', fields: [NAME, LOOK, text('role', 'Rolle'), STAGE, DESCRIPTION] },
       { title: 'Im Rig', fields: [refs('workshops', 'Betreibt', 'workshops'), refs('buffs', 'Gibt Buffs', 'buffs'), refs('tips', 'Kennt Rezepte', 'recipes')] },
       { title: 'Im Camp', fields: [lines('lines', 'Sprüche', { hint: 'Eine Zeile pro Spruch, erscheint als Bläschen (zufällig und per E)' }),
+        lines('craftLines.hit', 'Beim Kochen/Craften: Treffer', { hint: 'Sagt der Companion, wenn an seiner Werkstatt etwas gelingt (eine Zeile pro Spruch)' }),
+        lines('craftLines.miss', 'Beim Kochen/Craften: Fehlschlag'),
         color('color', 'Platzhalter-Farbe', { hint: 'Solange es kein Aussehen gibt, steht hier eine Figur aus Code' }), num('height', 'Größe', { unit: 'px', min: 40 })] },
     ],
   },
@@ -555,7 +575,7 @@ export const GROUPS = [
   ['GRUNDLAGEN', ['game', 'splash', 'weather', 'economy', 'ranking']],
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'buffs']],
-  ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes']],
+  ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
   ['RIG', ['camp', 'tractors', 'containers', 'workshops', 'rigParts', 'companions']],
   ['WELT', ['pois', 'rooms', 'locations', 'encounters', 'travel']],
 ];

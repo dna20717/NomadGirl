@@ -19,6 +19,11 @@ Neuer Code nimmt die W√∂rter aus dieser Liste. Die Grundbegriffe (Werkstatt, Pr√
 | Gegenstand | item |
 | Beutetabelle | loot table |
 | Rezept | recipe |
+| Rezeptbuch | recipe book (`save.recipes`) |
+| Kochen & Craften | crafting |
+| Experimentieren, Topf | experiment, pot |
+| Fehlschlag | failure |
+| Benutzen (essen) | use |
 | Zutat | ingredient |
 | Rucksack | backpack |
 | Waffe | weapon |

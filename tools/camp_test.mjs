@@ -78,9 +78,9 @@ s = await ev(() => { const near = (c.to('Lagerfeuer'), nomad.state().camp.sound.
 check('Feuer lauter, je näher Leyla ist; Wind läuft', s.near >= 80 && s.far < 15 && s.wind, s);
 
 p = await ev(() => c.to('Kochnische'));
-m = await ev(() => c.use());
-check('Kochnische: Hinweis auf Schritt 3', p === 'Kochen · Kochnische' && m?.title === 'Kochnische', { p, m });
-await ev(() => nomad.choose('Zurück'));
+m = await ev(() => { c.use(); return nomad.craft(); });
+check('Kochnische: E öffnet Kochen (Rezeptbuch + Experimentieren)', p === 'Kochen · Kochnische' && m?.open && m.workshop === 'kochnische', { p, m });
+await page.keyboard.press('Escape');
 
 s = await ev(() => { c.to('Van'); c.use(); nomad.choose('Planen'); return c.pick('Bunker'); });
 check('Fahren: Ort, Sprit, Ankunft in der Dämmerung', s.camp.location === 'bunker_13' && s.camp.clock === 'Tag 3 · 18:30' && s.camp.fuel === 34.6, s.camp);

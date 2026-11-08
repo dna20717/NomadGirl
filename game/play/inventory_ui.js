@@ -19,7 +19,7 @@ export function kindOf(D, a, id) {
   const t = thing(D, a, id) || {};
   return a === 'weapons' ? t.kind || 'melee' : a === 'backpacks' ? 'backpack' : t.category || 'junk';
 }
-const glyphOf = (D, a, id) => { const t = thing(D, a, id) || {}; return t.glyph || (t.name || id).replace(/[^A-Za-zÄÖÜäöü]/g, '').slice(0, 2).toUpperCase(); };
+export const glyphOf = (D, a, id) => { const t = thing(D, a, id) || {}; return t.glyph || (t.name || id).replace(/[^A-Za-zÄÖÜäöü]/g, '').slice(0, 2).toUpperCase(); };
 
 export class InventoryUI {
   // host: { D, save(), changed(), equipChanged(slot), floor()?, notify(text) }
@@ -53,7 +53,7 @@ export class InventoryUI {
     const D = this.D, inv = this.inv, bp = D.backpacks?.[inv.backpack];
     const left = el('section', { class: 'inv-panel' },
       el('header', {}, icon('bags', 16), el('b', {}, bp?.name || 'Rucksack'), el('small', {}, `${worth(D, inv.grids.backpack)} Δ`)),
-      el('div', { class: 'inv-slots' }, ...['melee', 'ranged', 'cyberdeck', 'backpack'].map(s => this.slotEl(s))),
+      el('div', { class: 'inv-slots' }, ...['melee', 'ranged', 'cyberdeck', 'backpack'].map(s => this.slotEl(s)), this.useEl()),
       this.gridEl('backpack', inv.grids.backpack));
     const parts = [left];
     if (this.other) {
@@ -114,6 +114,24 @@ export class InventoryUI {
       el('small', {}, SLOT_NAMES[slot]), t ? el('b', {}, glyphOf(D, a, id)) : icon(SLOT_ICONS[slot], 18), t ? el('span', {}, t.name) : null);
     s.addEventListener('mousedown', ev => { ev.stopPropagation(); if (ev.button === 0) this.slotClick(slot); });
     if (t) { s.addEventListener('mouseenter', () => this.showTip({ a, id, n: 1 })); s.addEventListener('mouseleave', () => { this.tip.hidden = true; }); }
+    return s;
+  }
+
+  // eating / using: drop a thing with a buff here (food, bandages); Gegenstände › Buff beim Essen/Benutzen
+  useEl() {
+    const s = el('div', { class: 'inv-slot use', title: 'Essen oder benutzen: Gericht oder Verband hier ablegen' }, el('small', {}, 'Benutzen'), icon('heart', 18), el('span', {}, 'Essen'));
+    s.addEventListener('mousedown', ev => {
+      ev.stopPropagation();
+      if (ev.button !== 0) return;
+      const h = this.held;
+      if (!h) return this.host.notify?.('Zieh etwas Essbares hierher');
+      if (h.e.a !== 'items') return this.host.notify?.('Das kann man nicht essen');
+      const r = this.host.use?.(h.e.id);
+      if (!r?.ok) return this.host.notify?.(r?.reason || 'Geht nicht');
+      h.e.n -= 1;
+      if (h.e.n <= 0) this.held = null;
+      this.changed(h.from);
+    });
     return s;
   }
 
