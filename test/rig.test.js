@@ -7,7 +7,8 @@ import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
 
 const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
-const fresh = () => { const s = newSave(D); s.hour = 18.5; return s; };
+// the tests play with 400 Δ, whatever Wirtschaft › Startgeld says (Daniel tries other values in the workshop)
+const fresh = () => { const s = newSave(D); s.hour = 18.5; s.deltas = 400; return s; };
 const layout = s => s.rig.units.map(u => `${u.id}[${u.workshops.map(w => `${w.id}@${w.at}`).join(' ')}]`).join(' ');
 
 test('Budgets: Gewicht gegen Zugkraft, Energie, Container-Zahl', () => {
@@ -15,7 +16,7 @@ test('Budgets: Gewicht gegen Zugkraft, Energie, Container-Zahl', () => {
   assert.deepEqual([b.weight, b.pull, b.heavy, b.length, b.maxLength], [900, 1500, false, 1, 1]);
   assert.deepEqual(b.power, { made: 3, used: 3, net: 0 });   // van 3 ⚡, warroom + kochnische + werkbank −1 each
   assert.equal(b.places, 5); assert.equal(b.filled, 5);
-  assert.equal(fresh().deltas, 400);
+  assert.equal(newSave(D).deltas, D.economy.startDeltas);
 });
 
 test('Laden: nur erlaubte Ausbaustufen', () => {

@@ -34,6 +34,8 @@ export class BuildMode {
       else if ((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey)) { this.undoLast(); e.preventDefault(); e.stopPropagation(); }
       else if (['e', 'E', 'Tab', 'i', 'I'].includes(e.key)) { e.preventDefault(); e.stopPropagation(); }
     }, true);
+    // the window loses focus mid-drag (alt-tab, released outside): the part flies back
+    window.addEventListener('blur', () => { if (this.active && this.drag) this.flyBack(null); });
   }
   get scene() { return this.host.scene(); }
   get D() { return this.scene.data_; }
@@ -43,7 +45,7 @@ export class BuildMode {
   get isOpen() { return this.active; }
 
   // the scene restarts (camp ↔ run): forget everything
-  reset() { delete this.el.parentElement?.dataset.building; this.active = false; this.el.hidden = true; this.shell = null; this.el.replaceChildren(); this.drag = null; this.jobs = []; this.job = null; this.undo = []; this.working = false; this.shopOpen = false; }
+  reset() { delete this.el.parentElement?.dataset.building; this.el.classList.remove("dragging"); this.active = false; this.el.hidden = true; this.shell = null; this.el.replaceChildren(); this.drag = null; this.jobs = []; this.job = null; this.undo = []; this.working = false; this.shopOpen = false; }
 
   // ---------- open / close ----------
   open() {
@@ -219,6 +221,9 @@ export class BuildMode {
     if (!this.active) return;
     const w = this.world(p);
     this.pointer = { x: w.x, y: w.y, t: this.scene.time.now };
+    // the button came up where the game could not see it (outside the window): nothing happens, the part flies back
+    // (Daniel, 08.11.2026: "bleibt man im drop-to-Händler-Modus hängen")
+    if (this.drag && p.event && 'buttons' in p.event && !(p.event.buttons & 1)) { this.press = null; return this.flyBack('Losgelassen außerhalb: zurück an seinen Platz'); }
     if (this.press && !this.drag && Math.hypot(p.x - this.press.sx, p.y - this.press.sy) > 6) this.startDrag(this.press.hit, w);
     if (this.drag) { this.drag.x = w.x; this.drag.y = w.y; }
   }
@@ -272,6 +277,7 @@ export class BuildMode {
       hang = h;
     } else return;
     this.drag = { ...hit, holder, x: w.x, y: w.y, px: w.x, angle: 0, av: 0, vx: 0, weight, hang };
+    this.el.classList.add('dragging');   // the dealer's catalogue fades and lets the pointer through
     this.sfx.lift();
     s.game.canvas.style.cursor = 'grabbing';
     this.msg = null;
@@ -342,7 +348,7 @@ export class BuildMode {
   cancelDrag(silent = false) {
     const d = this.drag;
     if (!d) return;
-    this.drag = null;
+    this.drag = null; this.el.classList.remove('dragging');
     d.holder.destroy();
     this.camp.drawRig();
     if (!silent) this.draw();
@@ -351,7 +357,8 @@ export class BuildMode {
   // the part flies back where it came from
   flyBack(reason) {
     const d = this.drag, s = this.scene;
-    this.drag = null;
+    if (!d) return;
+    this.drag = null; this.el.classList.remove('dragging');
     this.sfx.nope();
     const home = d.from === 'yard' ? d.item : d.from === 'socket' ? d.sock : d.kind === 'ws' ? d.slot : d.unit;
     const hx = (home.x0 + home.x1) / 2, hy = (home.y0 ?? home.inTop ?? this.camp.ground - 300);
@@ -424,7 +431,7 @@ export class BuildMode {
     }
     if (!r?.ok) return this.flyBack(r?.reason === 'Erst die Werkstätten ausbauen' ? 'Erst die Werkstätten ausbauen, dann abhängen' : r?.reason);
     d.holder.destroy();
-    this.drag = null;
+    this.drag = null; this.el.classList.remove('dragging');
     this.scene.game.canvas.style.cursor = '';
     this.done(r, before, label, fxAt, after, d);
   }

@@ -2,7 +2,7 @@
 // B zooms out, swapping workshops by dragging one onto the other, Leyla walks over and screws, undo, onto the scrapyard,
 // buying (delivered onto the dealer's pad), building it in, a full shelf stays in, its contents move along, the van pulls
 // only one trailer, selling at the dealer, a trailer with workshops cannot be unhitched, B closes and the camp keeps it all,
-// no power → workshops say so, too heavy → no driving, Warroom › Rig umbauen, Esc.
+// no power → workshops say so, too heavy → no driving, Warroom › Rig umbauen, a mouseup lost outside the window, Esc.
 //   node tools/build_test.mjs [--shots]   (server must run: npm run serve), pictures to output/build_*.png
 import fs from 'node:fs';
 import { chromium } from 'playwright';
@@ -34,7 +34,8 @@ const freeSlot = async () => (await spots()).slots.find(s => !s.ws);
 const yardItem = async id => (await spots()).yard.find(y => y.id === id);
 const finishJobs = () => ev(() => nomad.until(() => { const b = nomad.build(); return !b.jobs && !b.working; }, 1500));
 
-await ev(() => { nomad.take(); nomad.step(5); nomad.step(1, [], ['build']); nomad.step(5); });
+// the test plays with 400 Δ, whatever Wirtschaft › Startgeld says (Daniel tries other values in the workshop)
+await ev(() => { nomad.save().deltas = 400; nomad.take(); nomad.step(5); nomad.step(1, [], ['build']); nomad.step(5); });
 let b = await build();
 check('B zoomt raus in den Bau-Modus', b.open && b.zoom < 1 && b.rig === 'van[schlafkoje@0 warroom@1] wohnanhaenger[kochnische@0 werkbank@1 lagerregal@2]', b);
 check('Budgets: 900/1500 kg, Energie ±0, 400 Δ', b.budgets.weight === 900 && b.budgets.pull === 1500 && b.budgets.power.net === 0 && b.deltas === 400, b);
@@ -130,6 +131,20 @@ const w = await ev(() => nomad.menu());
 check('Rig zu schwer: Hinfahren gesperrt, Umbauen im Warroom', w?.items.filter(i => i.label.startsWith('Hinfahren')).every(i => /zu schwer/.test(i.disabled || '')) && w.items.some(i => i.label === 'Rig umbauen'), w);
 await ev(() => nomad.choose('Rig umbauen'));
 check('Warroom › Rig umbauen öffnet den Bau-Modus', (await build()).open);
+// the button comes up outside the window (no mouseup reaches the game): the part must not stay stuck to the pointer
+{
+  const cdp = await page.context().newCDPSession(page), m = (type, x, y, buttons, button = 'none') => cdp.send('Input.dispatchMouseEvent', { type, x, y, buttons, button, clickCount: 1 });
+  const sp = await spots(), a = sp.slots.find(s => s.ws), dl = sp.dealer, rig0 = (await build()).rig;
+  await m('mouseMoved', a.x, a.y, 0); await m('mousePressed', a.x, a.y, 1, 'left'); await ev(() => nomad.step(2));
+  for (let k = 1; k <= 8; k++) { await m('mouseMoved', a.x + (dl.x - a.x) * k / 8, a.y + (dl.y - a.y) * k / 8, 1); await ev(() => nomad.step(1)); }
+  await m('mouseMoved', dl.x + 200, dl.y - 40, 0); await ev(() => nomad.step(20));
+  const bb = await build();
+  check('Losgelassen außerhalb des Fensters: nichts hängt am Zeiger, nichts verkauft', !bb.held && bb.rig === rig0, bb);
+  await m('mouseReleased', dl.x + 200, dl.y - 40, 0, 'left');
+  const free = (await spots()).slots.find(s => s.ws);
+  const r2 = await drag(free, (await spots()).yardFree);
+  check('… danach lässt sich wieder normal ziehen', !r2.held && r2.spare.workshops.length >= 1, r2);
+}
 await page.keyboard.press('Escape'); await ev(() => nomad.step(5));
 check('Esc beendet ihn', !(await build()).open);
 
