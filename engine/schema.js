@@ -510,6 +510,19 @@ export const AREAS = {
     },
   },
 
+  build: {
+    name: 'Rig-Bau', icon: 'build', file: 'data/build.json', kind: 'single',
+    hint: 'Die Bau-Ansicht im Camp (B oder Warroom › Rig umbauen): Werkstätten umstellen, kaufen und verkaufen, Container an- und abhängen. Preise = Wert der Werkstätten und Container. Budgets: Gewicht gegen Zugkraft, Anzahl Container gegen „Plätze hintereinander“ der Zugmaschine, Energie.',
+    sections: [
+      { title: 'Kaufen & Verkaufen', fields: [multi('stages', 'Kaufbar', [['mvp', 'MVP'], ['1', 'Stufe 1'], ['2', 'Stufe 2']], { hint: 'Werkstätten dieser Ausbaustufen stehen im Laden' }),
+        num('sellFactor', 'Verkaufen bringt', { unit: '% vom Wert', min: 0, max: 100 })] },
+      { title: 'Zeit', fields: [num('minutes.move', 'Werkstatt umstellen', { unit: 'min', min: 0 }), num('minutes.buy', 'Kaufen und anliefern', { unit: 'min', min: 0 }),
+        num('minutes.container', 'Container an-/abhängen', { unit: 'min', min: 0, hint: 'Auch beim Umsortieren' })] },
+      { title: 'Regeln', fields: [bool('rules.power', 'Ohne Strom keine Arbeit', { hint: 'Ist die Energie unter 0, gehen Werkstätten, die Energie brauchen, im Camp nicht (Kochen, Werkbank …)' }),
+        bool('rules.weight', 'Zu schwer: nicht fahren', { hint: 'Wiegen die Container mehr, als die Zugmaschine zieht, bleibt das Rig stehen' })] },
+    ],
+  },
+
   pois: {
     name: 'POIs', singular: 'POI', icon: 'building', file: 'data/pois.json', kind: 'catalog', groupBy: { key: 'kind', options: POI_KINDS },
     hint: 'Orte zum Plündern. Hybrid gebaut: handgebaute Räume werden prozedural zusammengesetzt.',
@@ -576,7 +589,7 @@ export const GROUPS = [
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
-  ['RIG', ['camp', 'tractors', 'containers', 'workshops', 'rigParts', 'companions']],
+  ['RIG', ['camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'companions']],
   ['WELT', ['pois', 'rooms', 'locations', 'encounters', 'travel']],
 ];
 

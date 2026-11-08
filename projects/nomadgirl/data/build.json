@@ -1,0 +1,6 @@
+{
+ "stages": ["mvp", "1"],
+ "sellFactor": 50,
+ "minutes": {"move": 30, "buy": 60, "container": 90},
+ "rules": {"power": true, "weight": true}
+}

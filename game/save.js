@@ -1,7 +1,7 @@
 // Savegame: everything that lasts between runs (clock, place, rig, Δ, health, buffs, run in progress).
 // Online (Cloudflare worker) one savegame per login in KV (/api/save), the same on every device;
 // without the worker (local, tests) in this browser (localStorage). Shape:
-//   { version, day, hour, location, fuel, food, deltas, health, buffs: [id], rig: { tractor, units: [{ kind, id, workshops: [{ id, at }] }] },
+//   { version, day, hour, location, fuel, food, deltas, health, buffs: [id], rig: { tractor, units: [{ kind, id, workshops: [{ id, at }] }], spare: { workshops: [id], containers: [id] } } (game/rig.js),
 //     companions: [id], recipes: [id] (recipe book), run: null | { poi, room, location }, log: [text],
 //     inv: { backpack: id, slots: { melee, ranged, cyberdeck }, grids: { backpack, chest, 'store:<unit>:<place>': grid } } }   (grids: game/inventory.js)
 // Times are hours (18.5 = 18:30). "Ereignis-Zeit": the clock only moves on actions (sleeping, runs, sitting at the fire).
@@ -76,10 +76,10 @@ export function newSave(D) {
     version: SAVE_VERSION,
     day: C.startDay ?? 1, hour: C.startHour ?? 18,
     location: S.location || Object.keys(D.locations || {})[0] || null,
-    fuel: S.fuel ?? 40, food: S.food ?? 6, deltas: S.deltas ?? 0,
+    fuel: S.fuel ?? 40, food: S.food ?? 6, deltas: S.deltas ?? D.economy?.startDeltas ?? 0,
     health: D.leyla?.health ?? 100,
     buffs: [],
-    rig: { tractor: S.tractor, units },
+    rig: { tractor: S.tractor, units, spare: { workshops: [], containers: [] } },
     companions: [...(S.companions || [])],
     recipes: startRecipes(D),
     run: null,
@@ -109,7 +109,10 @@ export function repairSave(save, D) {
   const s = { ...fresh, ...save };
   if (!D.locations?.[s.location]) s.location = fresh.location;
   if (!D.tractors?.[s.rig?.tractor]) s.rig = fresh.rig;
+  s.rig.units = s.rig.units.filter(u => u.kind === 'tractor' || D.containers?.[u.id]);
   for (const u of s.rig.units) u.workshops = (u.workshops || []).filter(w => D.workshops?.[w.id]);
+  const sp = s.rig.spare || {};
+  s.rig.spare = { workshops: (sp.workshops || []).filter(w => D.workshops?.[w]), containers: (sp.containers || []).filter(c => D.containers?.[c]) };
   s.buffs = (s.buffs || []).filter(b => D.buffs?.[b]);
   s.companions = (s.companions || []).filter(c => D.companions?.[c]);
   if (s.run && !D.pois?.[s.run.poi]) s.run = null;

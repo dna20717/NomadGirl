@@ -4,7 +4,7 @@
   "symbol": "Δ",
   "description": "Offizielle Stadtwährung von BigCityDelta. Außerhalb der Mauern halb wertlos, aber immer noch besser als Kronkorken."
  },
- "startDeltas": 50,
+ "startDeltas": 400,
  "rescue": {
   "drone": "Mama-Bot",
   "losesRunLoot": true,

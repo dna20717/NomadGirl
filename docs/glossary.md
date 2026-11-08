@@ -24,6 +24,9 @@ Neuer Code nimmt die W√∂rter aus dieser Liste. Die Grundbegriffe (Werkstatt, Pr√
 | Experimentieren, Topf | experiment, pot |
 | Fehlschlag | failure |
 | Benutzen (essen) | use |
+| Bau-Ansicht, Rig umbauen | build view (`build`) |
+| Lager (Bau-Ansicht, nicht eingebaut) | spare |
+| Entwurf | draft |
 | Zutat | ingredient |
 | Rucksack | backpack |
 | Waffe | weapon |

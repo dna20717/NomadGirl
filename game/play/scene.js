@@ -13,6 +13,7 @@ import { advance, arrive, clockText, containers } from '../save.js';
 import { Loot } from './loot.js';
 import { InventoryUI } from './inventory_ui.js';
 import { CraftUI } from './craft_ui.js';
+import { BuildUI } from './build_ui.js';
 import { use as useThing } from '../crafting.js';
 
 const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
@@ -20,7 +21,7 @@ const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
   jump: ['SPACE'], walk: ['SHIFT'], dash: ['L', 'C'], melee: ['J', 'Y'], ranged: ['K', 'X'], grab: ['E'],
-  restart: ['BACKSPACE'], reload: ['R'], help: ['H', 'ESC'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'],
+  restart: ['BACKSPACE'], reload: ['R'], help: ['H', 'ESC'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'], build: ['B'],
 };
 
 export class PlayScene extends Phaser.Scene {
@@ -236,6 +237,19 @@ export class PlayScene extends Phaser.Scene {
       closed: () => hud.scene.craftClosed(),
     });
     hud.craft.el.hidden = true;
+    // build view of the rig (game/play/build_ui.js): B in the camp or Warroom › Rig umbauen
+    hud.build ??= new BuildUI(hud.root, {
+      get D() { return hud.scene.data_; },
+      save: () => hud.scene.box.save,
+      apply: r => hud.scene.goCamp({ banner: ['Umgebaut', `${clockText(hud.scene.box.save)}${r.minutes ? ` · ${r.minutes} min gewerkelt` : ''}`], fade: 700 }),
+      closed: () => {},
+    });
+    hud.build.el.hidden = true;
+  }
+  openBuild() {
+    if (this.mode !== 'camp' || !this.box) return;
+    this.hud.inv?.close();
+    this.hud.build.open();
   }
   // the cooking/crafting panel closed: the clock may have moved into another time of day (light, sky) → camp fresh at the same spot
   craftClosed() {
@@ -449,7 +463,8 @@ export class PlayScene extends Phaser.Scene {
     if (input.mute.pressed) { this.sound.mute = !this.sound.mute; try { localStorage.setItem('nomadgirl-mute', this.sound.mute ? '1' : '0'); } catch { /* */ } this.hud.banner(this.sound.mute ? 'Ton aus' : 'Ton an', 'M schaltet um'); this.time.delayedCall(1200, () => this.hud.banner(null)); }
     if (input.debug.pressed) { const w = this.physics.world; w.drawDebug = !w.drawDebug; if (!w.debugGraphic) w.createDebugGraphic(); w.debugGraphic.clear().setVisible(w.drawDebug); }
     if (input.restart.pressed && this.mode !== 'camp') this.restartRoom();
-    if (this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || this.leaving) { this.physics.world.pause(); this.hud.update(this, time); return; }
+    if (input.build?.pressed && this.mode === 'camp' && !this.hud.modal && !this.hud.paused && !this.leaving && !this.hud.craft?.isOpen && !this.hud.build?.isOpen) this.openBuild();
+    if (this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || this.hud.build?.isOpen || this.leaving) { this.physics.world.pause(); this.hud.update(this, time); return; }
     if (time < this.hitstopUntil) return;
     if (this.physics.world.isPaused) this.physics.world.resume();
     const dt = Math.min(delta, 50);

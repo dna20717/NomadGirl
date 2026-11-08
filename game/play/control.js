@@ -14,10 +14,11 @@
 //   nomad.state().camp                camp (game.html?camp): clock, place, Δ, prompt, hotspots, rig; .menu = open menu
 //   nomad.menu() / nomad.choose(i | 'text')   the open menu / pick an item (index or part of its label)
 //   nomad.walkTo(x)                   walks Leyla to an x position (camp), then E with step(1, [], ['grab'])
+//   nomad.build()                     build view of the rig (B in the camp): draft, budgets, store
 //   nomad.craft()                     cooking/crafting panel at a workshop (E in the camp): book, pot, log, stock
 //   nomad.save()                      the savegame
 //   nomad.release()                   keyboard again, game runs normally
-// Input names: left right up down jump walk dash melee ranged grab restart help debug pose
+// Input names: left right up down jump walk dash melee ranged grab restart help debug pose build inventory
 
 const FRAME = 1000 / 60;
 
@@ -71,6 +72,7 @@ export function installControl(game) {
       return api.state();
     },
     save() { return scene().box?.save || null; },
+    build() { return scene().hud.build?.state() || null; },   // open build view (B in the camp): draft rig, budgets, Δ, store
     craft() { return scene().hud.craft?.state() || null; },   // open cooking/crafting panel: recipe book, pot, last result
     inv() { return scene().hud.inv?.state() || null; },   // open inventory: grids, slots, held thing
     loot() { return scene().loot?.state() || null; },     // bundles on the ground (run)

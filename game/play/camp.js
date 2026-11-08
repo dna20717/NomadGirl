@@ -3,6 +3,7 @@
 // Leyla walks around and uses things with E. Time only moves on actions (sleeping, sitting at the fire, driving, runs).
 // Graphics are code placeholders for now; a "look" on containers, workshops or companions takes over later.
 import { clockText, advance, hoursUntil, containers } from '../save.js';
+import { budgets } from '../rig.js';
 
 const de = n => Number(n).toLocaleString('de-DE', { maximumFractionDigits: 1 });
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
@@ -171,6 +172,10 @@ export class Camp {
     this.day = daytimeAt(C, s.hour);
     this.hotspots = [];
     this.lights = [];
+    // budgets of the rig (Rig-Bau › Regeln): without power, workshops that need it do not work; too heavy, the rig cannot drive
+    this.budget = budgets(D, s.rig);
+    this.noPower = D.build?.rules?.power !== false && this.budget.power.net < 0;
+    this.tooHeavy = D.build?.rules?.weight !== false && this.budget.heavy;
     this.drawRig();
     this.drawFire();
     this.placeChest();
@@ -252,7 +257,7 @@ export class Camp {
   workshopHotspot(u, w, def, cx, cw, labelY) {
     const R = this.C.rig || {}, units = this.box.save.rig.units;
     const store = def.grid && `store:${units.indexOf(units.find(x => x.id === u.id && x.workshops.includes(w)))}:${w.at}`;
-    this.hotspots.push({ x: cx + cw / 2, w: cw / 2, name: def.name || w.id, hint: store ? 'Öffnen' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id) });
+    this.hotspots.push({ x: cx + cw / 2, w: cw / 2, name: def.name || w.id, hint: store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id) });
     if (R.labels !== false) this.scene.add.text(cx + cw / 2, labelY, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '24px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 0).setDepth(-14);
   }
 
@@ -388,6 +393,9 @@ export class Camp {
   // ---------- actions ----------
   use(id) {
     const def = this.D.workshops?.[id] || {}, s = this.scene;
+    if (this.noPower && def.power < 0 && def.function !== 'warroom')
+      return s.hud.menu({ title: def.name || id, sub: `Kein Strom: das Rig erzeugt ${this.budget.power.made} ⚡ und braucht ${this.budget.power.used} ⚡. Generator einbauen oder Verbraucher ausbauen (B: Rig umbauen).`,
+        items: [{ label: 'Rig umbauen', primary: true, act: () => s.openBuild() }, { label: 'Zurück', act: () => {} }] });
     if (def.function === 'sleep') return this.sleep(def);
     if (def.function === 'warroom') return this.warroom();
     if (['kitchen', 'craft'].includes(def.function)) { s.hud.inv?.close(); return s.hud.craft?.open(id); }
@@ -438,8 +446,9 @@ export class Camp {
       if (id === save.location) continue;
       const t = travelCost(D, save, id), p = D.pois?.[loc.poi];
       items.push({ label: `Hinfahren: ${loc.name}`, sub: `${t.km} km · ${de(t.hours)} h · ${de(t.fuel)} l Sprit · ${loc.region || ''}${p ? ' · Gefahr ' + '●'.repeat(p.danger || 1) : ''}`,
-        disabled: t.fuel > save.fuel ? 'Zu wenig Sprit' : null, act: () => this.drive(id, t) });
+        disabled: this.tooHeavy ? `Rig zu schwer (${this.budget.weight} von ${this.budget.pull} kg)` : t.fuel > save.fuel ? 'Zu wenig Sprit' : null, act: () => this.drive(id, t) });
     }
+    items.push({ label: 'Rig umbauen', sub: `Werkstätten umstellen und kaufen, Container an- und abhängen · auch mit B`, act: () => s.openBuild() });
     items.push({ label: 'Zurück', act: () => {} });
     s.hud.menu({ title: 'Warroom', sub: `Du bist bei ${here?.name || '–'}. Sprit ${de(save.fuel)} l · Vorräte ${de(save.food)}`, items });
   }
@@ -532,7 +541,7 @@ export class Camp {
 }
 
 const VERB = { sleep: 'Schlafen', warroom: 'Planen', kitchen: 'Kochen', foodtruck: 'Verkaufen', craft: 'Herstellen', storage: 'Lager', cooling: 'Kühlraum', chill: 'Chillen', drone: 'Drohne', engine: 'Motor', power: 'Energie', cell: 'Zelle' };
-const SOON = { foodtruck: 'Verkaufen kommt später.',
+const SOON = { foodtruck: 'Verkaufen kommt später.', power: 'Liefert Energie für die Werkstätten im Rig.',
   storage: 'Das Lager füllt sich mit Schritt 2 (Beute & Rucksack).', cooling: 'Das Lager füllt sich mit Schritt 2 (Beute & Rucksack).', chill: 'Chillen gibt bald einen Buff.' };
 
 // distance, hours, fuel and food for driving from the current place to a location
