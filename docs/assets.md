@@ -83,6 +83,8 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/workshops/drone_bench.png` | Werkstatt Drohnenwerkstatt: halb gebaute Drohne, 3D-Drucker, Kaffeetasse (`ws_drone_bench`) | KI-generiert (Daniel) | 08.11.2026 |
 | `assets/workshops/sleep_bunk.png` | Werkstatt Schlafkoje: Etagenbett mit Lichterkette und Teddy (`ws_sleep_bunk`) | KI-generiert (Daniel) | 08.11.2026 |
 | `assets/workshops/generator_bench.png` | Werkstatt Generator: Generator-Bank mit Kanistern und Wartungswerkzeug (`ws_generator_bench`) | KI-generiert (Daniel) | 08.11.2026 |
+| `assets/leyla/brake_side.png` | Leyla, Bremsen seitlich nach rechts: 9 Frames à 140 × 242 px, Pixel-Art, vorderer Fuß festgehalten (`leyla_brake_side`) | aus `brake_side_source.gif` zugeschnitten (Code) | 08.11.2026 |
+| `assets/leyla/brake_side_source.gif` | Leyla, Bremsen: Original, 9 Frames à 200 ms, 256 × 256 px (`leyla_brake_side_source`) | KI-generiert (Daniel) | 08.11.2026 |
 | (im Spiel gezeichnet) | Himmel, Skyline von BigCityDelta, Wände, Leitern, Seil-Anker, Platzhalter-Plünderer, Nägel, Partikel (`game/play/art.js`) | Code | 07.11.2026 |
 
 Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich „Assets“.

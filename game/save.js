@@ -112,6 +112,44 @@ function withInventory(D, save) {
 const startRecipes = D => Object.entries(D.recipes || {}).filter(([, r]) => (r.discovery || []).includes('start')).map(([id]) => id);
 
 // fills gaps of an older savegame (new fields, removed workshops) so the game never trips over it
+// A container may have fewer places now (Daniel, 08.11.2026: Wohnanhänger 3 → 2): a workshop standing on a place that is gone
+// moves to a free place in the rig, otherwise onto the scrapyard; a storage takes its contents along (to its new place, else
+// into the chest, the Kofferraum, and what is left lies as a bundle next to the van).
+function refit(D, s) {
+  const U = s.rig.units, cap = u => (u.kind === 'tractor' ? D.tractors?.[u.id]?.places : D.containers?.[u.id]?.places) || 0, size = id => D.workshops?.[id]?.places || 1;
+  const taken = U.map(() => new Set()), out = [];
+  U.forEach((u, ui) => {
+    u.workshops = u.workshops.filter(w => {
+      const n = size(w.id), ok = w.at >= 0 && w.at + n <= cap(u) && [...Array(n)].every((_, k) => !taken[ui].has(w.at + k));
+      if (ok) for (let k = 0; k < n; k++) taken[ui].add(w.at + k); else out.push({ ui, w });
+      return ok;
+    });
+  });
+  const grids = s.inv?.grids || {};
+  for (const { ui, w } of out) {
+    const n = size(w.id), old = `store:${ui}:${w.at}`;
+    let spot = null;
+    U.forEach((u, vi) => { for (let at = 0; !spot && at + n <= cap(u); at++) if ([...Array(n)].every((_, k) => !taken[vi].has(at + k))) spot = { vi, at }; });
+    if (spot) {
+      U[spot.vi].workshops.push({ id: w.id, at: spot.at });
+      for (let k = 0; k < n; k++) taken[spot.vi].add(spot.at + k);
+      if (grids[old]) { grids[`store:${spot.vi}:${spot.at}`] = grids[old]; delete grids[old]; }
+      continue;
+    }
+    s.rig.spare.workshops.push(w.id);
+    const g = grids[old];
+    delete grids[old];
+    if (!g?.items?.length) continue;
+    let rest = g.items.map(e => ({ ...e }));
+    for (const key of ['chest', 'rig:0']) if (grids[key]) rest = rest.map(e => ({ ...e, n: add(D, grids[key], e.a, e.id, e.n) })).filter(e => e.n > 0);
+    if (rest.length) {
+      const pile = { x: null, feet: null, grid: newGrid(Math.max(4, g.w), Math.max(3, g.h)) };
+      for (const e of rest) add(D, pile.grid, e.a, e.id, e.n);
+      ((s.ground ??= {})[s.location] ??= []).push(pile);
+    }
+  }
+}
+
 export function repairSave(save, D) {
   const fresh = newSave(D);
   if (!save || typeof save !== 'object' || save.version !== SAVE_VERSION) return fresh;
@@ -120,6 +158,7 @@ export function repairSave(save, D) {
   if (!D.tractors?.[s.rig?.tractor]) s.rig = fresh.rig;
   s.rig.units = s.rig.units.filter(u => u.kind === 'tractor' || D.containers?.[u.id]);
   for (const u of s.rig.units) u.workshops = (u.workshops || []).filter(w => D.workshops?.[w.id]);
+  refit(D, s);
   // stacks stay whole: a level is at most one above the unit before it, nothing stands on the tractor
   s.rig.units.forEach((u, i) => { const prev = s.rig.units[i - 1]; if (!u.level) return; const max = !prev || prev.kind === 'tractor' ? 0 : (prev.level || 0) + 1; if (u.level > max) u.level = max; if (!u.level) delete u.level; });
   const sp = s.rig.spare || {};

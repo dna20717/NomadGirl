@@ -22,6 +22,8 @@ export class Loot {
     this.scene = scene; this.piles = []; this.tick = 0;
     this.I = scene.data_.leyla?.inventory || {};
     this.stored = stored;
+    // a bundle without a place (savegame repair: a storage that lost its place) lies next to the van's door
+    for (const p of stored || []) if (p.x == null && scene.campGeo) { p.x = scene.campGeo.doorX - 140; p.feet = scene.campGeo.floor * scene.T; }
     for (const p of stored || []) if (p.grid?.items?.length) this.show({ x: p.x, feet: p.feet, grid: p.grid, sprite: null }, p.x, true);
   }
   get range() { return this.I.pickupRange ?? 150; }

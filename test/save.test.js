@@ -43,3 +43,19 @@ test('Ankunft im Camp: immer Dämmerung', () => {
   arrive(s, D); assert.equal(clockText(s), 'Tag 2 · 18:30');
   arrive(s, D); assert.equal(clockText(s), 'Tag 2 · 18:30');   // already dusk: stays
 });
+
+test('Alter Spielstand: Werkstatt auf einem Platz, den es nicht mehr gibt, kommt auf den Schrottplatz, ihr Inhalt bleibt', async () => {
+  const { classicRig } = await import('./fixture.js');
+  const old = newSave(classicRig(D)), count = s => Object.values(s.inv.grids).concat(Object.values(s.ground || {}).flat().map(p => p.grid)).reduce((n, g) => n + g.items.reduce((m, e) => m + e.n, 0), 0);
+  const before = count(old);
+  const r = repairSave(structuredClone(old), D);
+  assert.deepEqual(r.rig.units[1].workshops.map(w => `${w.id}@${w.at}`), ['kochnische@0', 'werkbank@1']);
+  assert.deepEqual(r.rig.spare.workshops, ['lagerregal']);
+  assert.ok(!r.inv.grids['store:1:2']);
+  assert.equal(count(r), before);   // nothing lost: chest, Kofferraum, a bundle by the van
+  // with a free place it moves there, with its contents
+  const old2 = newSave(classicRig(D)); old2.rig.units.push({ kind: 'container', id: 'holzkiste', workshops: [] });
+  const n = old2.inv.grids['store:1:2'].items.length, r2 = repairSave(structuredClone(old2), D);
+  assert.deepEqual(r2.rig.units[2].workshops, [{ id: 'lagerregal', at: 0 }]);
+  assert.equal(r2.inv.grids['store:2:0'].items.length, n);
+});

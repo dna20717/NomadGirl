@@ -147,6 +147,18 @@ v = await P(P => P.tp(151, 18)); v = await P(P => P.run(152.5));
 for (const [col, h] of [[154, 2], [157, 4], [160, 6], [163.5, 8]]) { v = await P((P, c) => P.hop(c), col); check(`Aufstieg auf ${h}`, v.feet === feet(h), v); }
 await shot('ziel');
 
+// braking (Leyla › Bremsen, Daniel 08.11.2026): let go after a sprint → skid with the brake animation, stand still, run on
+v = await P(P => P.tp(81.5, 18));   // flat between the two ladders
+let br = await page.evaluate(() => { const L = game.scene.getScene('play').leyla; nomad.step(36, ['right']); nomad.step(3); return { st: L.state, vx: Math.round(L.body.velocity.x) }; });
+check('Bremsen: Richtung loslassen nach dem Sprint', br.st === 'brake' && br.vx > 0, br);
+await shot('bremsen');
+br = await page.evaluate(() => { const L = game.scene.getScene('play').leyla, x0 = L.x; nomad.until(() => L.state !== 'brake', 120); return { st: L.state, vx: Math.round(L.body.velocity.x), slid: Math.round(L.x - x0), frame: L.sprite.frame.name }; });
+check('… rutscht aus und steht', br.st === 'normal' && br.vx === 0 && br.slid > 10 && br.slid < 120, br);
+br = await page.evaluate(() => { const L = game.scene.getScene('play').leyla; nomad.step(8, ['right']); nomad.step(2); return { st: L.state }; });
+check('Kurz antippen bremst nicht', br.st === 'normal', br);
+br = await page.evaluate(() => { const L = game.scene.getScene('play').leyla; nomad.step(36, ['left']); nomad.step(3); const a = L.state; nomad.step(4, ['right']); return { a, b: L.state }; });
+check('Gegenrichtung bricht das Bremsen sofort ab', br.a === 'brake' && br.b === 'normal', br);
+
 await browser.close();
 console.log(ok.map(n => '✓ ' + n).join('\n'));
 if (errors.length) { console.error('Fehler:\n' + errors.join('\n')); process.exit(1); }

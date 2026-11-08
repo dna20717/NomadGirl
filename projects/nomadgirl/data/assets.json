@@ -1535,5 +1535,28 @@
   "source": "KI (Pixel-Art von Daniel, 08.11.2026)",
   "date": "08.11.2026",
   "description": "Generator auf der Werkbank, Kanister, Batterien, Zahnräder und Wartungswerkzeug. 256 × 256, Boden bei y 236."
+ },
+ "leyla_brake_side": {
+  "name": "Leyla · Bremsen seitlich",
+  "kind": "animation",
+  "file": "assets/leyla/brake_side.png",
+  "frameSize": [140, 242],
+  "frames": 9,
+  "fps": 12,
+  "loop": false,
+  "origin": [105.5, 240],
+  "height": 192,
+  "source": "Code (Streifen zugeschnitten, vorderer Fuß festgehalten)",
+  "derivedFrom": "leyla_brake_side_source",
+  "date": "08.11.2026",
+  "description": "Pixel-Art, schaut nach rechts: Frame 1 Rennen, 2–6 Rutschen mit Staub, 7–9 Ankommen im Stand. Im GIF wandert die Figur um bis zu 52 px zurück; im Streifen bleibt die Spitze des vorderen Fußes stehen (Versatz 29,0,28,35,39,48,50,52,52 px), Anker = Fußmitte im Endstand."
+ },
+ "leyla_brake_side_source": {
+  "name": "Leyla · Bremsen (Original)",
+  "kind": "source",
+  "file": "assets/leyla/brake_side_source.gif",
+  "source": "KI (Pixel-Art von Daniel, 08.11.2026)",
+  "date": "08.11.2026",
+  "description": "GIF, 9 Frames à 200 ms, 256 × 256, seitlich nach rechts."
  }
 }
