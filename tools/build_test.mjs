@@ -6,6 +6,7 @@
 //   node tools/build_test.mjs [--shots]   (server must run: npm run serve), pictures to output/build_*.png
 import fs from 'node:fs';
 import { chromium } from 'playwright';
+import { classicRig } from './test_fixture.mjs';
 
 const url = (process.env.GAME_URL || 'http://localhost:8766/game.html') + '?camp&new';
 const shots = process.argv.includes('--shots');
@@ -14,6 +15,7 @@ const page = await browser.newPage({ viewport: { width: 1400, height: 820 } });
 const errors = [], ok = [];
 page.on('pageerror', e => errors.push(e.message));
 page.on('console', m => { if (m.type() === 'error' && !m.location()?.url?.includes('/api/') && !/404/.test(m.text())) errors.push(m.text()); });
+await classicRig(page);   // fixed setup: van pulls one trailer, Wohnanhänger with 3 places (test_fixture.mjs)
 await page.goto(url);
 await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.camp, null, { timeout: 20000 });
 const ev = (f, a) => page.evaluate(f, a);
@@ -128,9 +130,13 @@ await ev(() => { const s = window.game.scene.getScene('play'); s.data_.workshops
 await ev(() => nomad.step(20));
 await ev(() => { const h = nomad.state().camp.hotspots.find(h => h.name === 'Van'); nomad.walkTo(h.x); nomad.step(1, [], ['grab']); nomad.step(2); nomad.choose('Planen'); });
 const w = await ev(() => nomad.menu());
-check('Rig zu schwer: Hinfahren gesperrt, Umbauen im Warroom', w?.items.filter(i => i.label.startsWith('Hinfahren')).every(i => /zu schwer/.test(i.disabled || '')) && w.items.some(i => i.label === 'Rig umbauen'), w);
-await ev(() => nomad.choose('Rig umbauen'));
-check('Warroom › Rig umbauen öffnet den Bau-Modus', (await build()).open);
+check('Rig zu schwer: Hinfahren gesperrt', w?.items.filter(i => i.label.startsWith('Hinfahren')).every(i => /zu schwer/.test(i.disabled || '')), w);
+check('Warroom ohne Umweg: kein „Rig umbauen“ mehr im Menü', !w.items.some(i => i.label === 'Rig umbauen'), w);
+await ev(() => nomad.choose('Zurück'));
+check('Knopf „Rig bauen“ ist im Camp immer da', await page.locator('.hud-buildbtn').isVisible());
+await page.locator('.hud-buildbtn').click(); await ev(() => nomad.step(5));
+check('Knopf „Rig bauen“ öffnet den Bau-Modus', (await build()).open);
+check('… und versteckt sich beim Bauen', !(await page.locator('.hud-buildbtn').isVisible()));
 // the button comes up outside the window (no mouseup reaches the game): the part must not stay stuck to the pointer
 {
   const cdp = await page.context().newCDPSession(page), m = (type, x, y, buttons, button = 'none') => cdp.send('Input.dispatchMouseEvent', { type, x, y, buttons, button, clickCount: 1 });

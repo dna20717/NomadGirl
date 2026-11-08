@@ -19,6 +19,8 @@ export class Hud {
     this.promptEl = el('div', { class: 'hud-prompt', hidden: true });
     this.menuEl = el('div', { class: 'hud-menu', hidden: true });
     this.campEl = el('div', { class: 'hud-camp', hidden: true });
+    // the rig can be rebuilt any time in the camp: B or this button (Daniel, 08.11.2026: "kein Umweg über einen Warroom mehr")
+    this.buildBtn = el('button', { class: 'hud-buildbtn', hidden: true, title: 'Rig bauen: Werkstätten und Anhänger mit der Maus ziehen', onclick: e => { e.currentTarget.blur(); this.scene?.openBuild(); } }, el('kbd', {}, 'B'), el('span', {}, 'Rig bauen'));
     this.modal = false;
     document.addEventListener('keydown', e => this.menuKey(e), true);
     this.help = el('div', { class: 'hud-help' }, el('div', { class: 'hud-helpBox' },
@@ -36,7 +38,7 @@ export class Hud {
         el('div', { class: 'hud-right' },
           el('div', { class: 'hud-row' }, this.roomName),
           el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'ZEIT'), this.time, el('span', { class: 'hud-label' }, 'KILLS'), this.kills, el('span', { class: 'hud-label' }, 'Δ'), this.deltas))),
-      this.campEl, this.bannerEl, this.promptEl, this.menuEl, this.help,
+      this.campEl, this.buildBtn, this.bannerEl, this.promptEl, this.menuEl, this.help,
       el('div', { class: 'hud-foot' }, 'H: Steuerung · Rücktaste: Neustart · ', el('a', { href: 'workshop.html' }, 'Werkstatt'), ' · ', el('a', { href: './' }, 'Start'),
         this.newGame = el('span', { hidden: true }, ' · ', el('a', { href: 'game.html?camp&new', onclick: e => { if (!confirm('Spielstand löschen und neu anfangen?')) e.preventDefault(); } }, 'Neues Spiel'))));
     this.root = root;
@@ -51,6 +53,7 @@ export class Hud {
     this.root.dataset.mode = mode;
     this.campEl.hidden = !save;
     this.newGame.hidden = mode !== 'camp';
+    this.buildBtn.hidden = mode !== 'camp';
     this.prompt(null);
     this.closeMenu();
   }

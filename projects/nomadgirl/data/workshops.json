@@ -230,6 +230,7 @@
   "description": "Schwerlastregal, hält alles, was Leyla nicht wegwerfen kann. Also alles.",
   "look": "ws_shelf_full",
   "lookEmpty": "ws_shelf_empty",
-  "fill": [{"y": 0},{"y": 48},{"y": 106},{"y": 162}]
+  "fill": [{"y": 0},{"y": 48},{"y": 106},{"y": 162}],
+  "scale": 72
  }
 }

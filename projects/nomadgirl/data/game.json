@@ -7,7 +7,7 @@
  "start": {
   "location": "tankstelle_km7",
   "tractor": "van",
-  "containers": ["wohnanhaenger"],
+  "containers": ["wohnanhaenger", "holzkiste"],
   "workshops": ["schlafkoje", "warroom", "kochnische", "werkbank", "lagerregal"],
   "companions": ["schraube", "onkel_sung"],
   "fuel": 40,

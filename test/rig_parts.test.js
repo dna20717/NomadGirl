@@ -5,8 +5,9 @@ import { newSave, repairSave, containers } from '../game/save.js';
 import { act, buyPart, sellPart, mountPart, unmountPart, budgets, snapshot, restore } from '../game/rig.js';
 import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
+import { classicRig } from './fixture.js';
 
-const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
+const D = classicRig((await loadProject(nodeLoader('projects/nomadgirl'))).data);   // fixed setup (fixture.js)
 const fresh = () => { const s = newSave(D); s.deltas = 5000; return s; };
 const trunk = s => containers(D, s).find(c => c.key === 'rig:0');
 

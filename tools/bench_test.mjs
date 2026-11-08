@@ -27,22 +27,40 @@ const reload = (js = '') => ev(js0 => { const s = game.scene.getScene('play'), s
 
 await ev(() => { nomad.save().deltas = 20000; nomad.take(); nomad.step(5); });
 let b = await benches();
-check('Start-Rig: Kochnische, Werkbank und Lagerregal stehen als Bilder im Wohnanhänger', ['kochnische', 'werkbank', 'lagerregal'].every(id => b.some(x => x.id === id)) && b.every(x => x.scale > 0.3 && x.scale < 1.5), b);
+check('Start-Rig: Kochnische und Werkbank im Wohnanhänger, Lagerregal in der Holzkiste, alle als Bilder', ['kochnische', 'werkbank', 'lagerregal'].every(id => b.some(x => x.id === id)) && b.find(x => x.id === 'lagerregal').place === '2:0', b);
+check('Ein Maßstab für alle (Camp › Rig-Ansicht, ×1,2; Regal mit Korrektur 72 %)', b.find(x => x.id === 'werkbank').scale === 1.2 && b.find(x => x.id === 'kochnische').scale === 1.2 && Math.abs(b.find(x => x.id === 'lagerregal').scale - 0.864) < 0.01, b);
 check('Effekte angelegt (Kochnische und Werkbank)', b.find(x => x.id === 'kochnische').fx >= 5 && b.find(x => x.id === 'werkbank').fx >= 4, b);
 const shelf0 = b.find(x => x.id === 'lagerregal');
 check('Lagerregal zeigt seinen Füllstand (Start-Inventar)', shelf0.fill > 0 && shelf0.shelves >= 1, shelf0);
 
+// the van pulls two trailers now (Daniel, 08.11.2026); the start rig uses that: Wohnanhänger + Holzkiste
+check('Van zieht zwei Anhänger: Start-Rig Wohnanhänger + Holzkiste', (await ev(() => nomad.save().rig.units.map(u => u.id).join())) === 'van,wohnanhaenger,holzkiste', await ev(() => nomad.save().rig.units.map(u => u.id)));
+// pixel magic: every picture stays inside its place
+const inside = await ev(() => game.scene.getScene('play').camp.benches.list.every(b => b.x0 >= b.clip.x0 - 0.5 && b.x1 <= b.clip.x1 + 0.5 && b.top >= b.clip.y0 - 0.5));
+check('Pixel-Magie: kein Bild ragt über seinen Platz im Container hinaus', inside, null);
+// Leyla stands in front of the pictures and their little lights
+const depths = await ev(() => { const s = game.scene.getScene('play'), B = s.camp.benches; return { leyla: s.leyla.sprite.depth, fx: B.add_.depth, flat: B.flat.depth }; });
+check('Leyla steht vor den Werkbänken und ihren Effekten', depths.leyla > depths.fx && depths.leyla > depths.flat, depths);
+// the van's door: the workshop behind it shows only while the door is open
+const door = async () => ev(() => { const c = game.scene.getScene('play').camp; return c.vanDoor && { id: c.vanDoor.bench.id, a: c.vanDoor.view.alpha }; });
+await ev(() => { const h = nomad.state().camp.hotspots.find(h => h.name === 'Van'); nomad.walkTo(h.x + 900); nomad.step(60); });
+let dr = await door();
+check('Van-Tür zu: dahinter nichts zu sehen', dr && dr.a === 0, dr);
+await ev(() => { const h = nomad.state().camp.hotspots.find(h => h.name === 'Van'); nomad.walkTo(h.x + 150); nomad.step(60); });
+dr = await door();
+check('Van-Tür offen: der Warroom zeigt sich durch die Tür', dr?.id === 'warroom' && dr.a === 1, dr);
+
 // the shelf: empty → no shelf filled, full → all four
-await ev(() => { const g = nomad.save().inv.grids['store:1:2']; g.keep = g.items; g.items = []; nomad.step(30); });
+await ev(() => { const g = nomad.save().inv.grids['store:2:0']; g.keep = g.items; g.items = []; nomad.step(30); });
 let sh = await bench('lagerregal');
 check('Leeres Regal: kein Fach gefüllt', sh.fill === 0 && sh.shelves === 0, sh);
-await ev(() => { const g = nomad.save().inv.grids['store:1:2']; g.items = g.keep.slice(0, 2); nomad.step(30); });
+await ev(() => { const g = nomad.save().inv.grids['store:2:0']; g.items = g.keep.slice(0, 2); nomad.step(30); });
 sh = await bench('lagerregal');
 check('Ein bisschen drin: unterstes Fach', sh.shelves === 1, sh);
-await ev(() => { const g = nomad.save().inv.grids['store:1:2']; g.items = []; for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) g.items.push({ a: 'items', id: 'schrott', n: 1, x, y, r: 0 }); nomad.step(30); });
+await ev(() => { const g = nomad.save().inv.grids['store:2:0']; g.items = []; for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) g.items.push({ a: 'items', id: 'schrott', n: 1, x, y, r: 0 }); nomad.step(30); });
 sh = await bench('lagerregal');
 check('Randvoll: alle vier Fächer', sh.fill === 100 && sh.shelves === 4, sh);
-await ev(() => { const g = nomad.save().inv.grids['store:1:2']; g.items = g.keep; delete g.keep; nomad.step(30); });
+await ev(() => { const g = nomad.save().inv.grids['store:2:0']; g.items = g.keep; delete g.keep; nomad.step(30); });
 
 // evening; Leyla at the workbench, the craft window open: the bench is "in use", sparks fly behind the window
 await reload('sv.hour = 21.5;');
@@ -55,8 +73,8 @@ check('… und Rauch steigt auf', puffs > 0, puffs);
 await ev(s => eval(s).hud.craft.close(), scene);
 await shot('evening');
 
-// a second trailer with Chill Area, Drohnenwerkstatt and Waffenkammer (LKW pulls two), the Generator for power
-await reload(`sv.rig.tractor = 'lkw'; sv.rig.units[0].id = 'lkw'; sv.rig.units.push({ kind: 'container', id: 'modulanhaenger', workshops: [{ id: 'chill_area', at: 0 }, { id: 'drohnenwerkstatt', at: 1 }, { id: 'generator', at: 2 }] }); sv.hour = 21.5;`);
+// a third trailer with Chill Area and Drohnenwerkstatt (the LKW pulls three), the Generator in the cab for power
+await reload(`sv.rig.tractor = 'lkw'; sv.rig.units[0].id = 'lkw'; sv.rig.units[0].workshops[0] = { id: 'generator', at: 0 }; sv.rig.units.push({ kind: 'container', id: 'modulanhaenger', workshops: [{ id: 'chill_area', at: 0 }, { id: 'drohnenwerkstatt', at: 1 }] }); sv.hour = 21.5;`);
 b = await benches();
 check('Chill Area und Drohnenwerkstatt stehen im Modul-Anhänger', b.some(x => x.id === 'chill_area') && b.some(x => x.id === 'drohnenwerkstatt'), b.map(x => x.id));
 const chill = b.find(x => x.id === 'chill_area');
@@ -83,8 +101,8 @@ check('Mama-Bot warten: die Drohne fliegt zur Werkbank und dockt an', dock.docke
 await ev(() => nomad.step(200));
 await page.waitForFunction(() => game.scene.getScene('play')?.camp?.benches?.list?.length, null, { timeout: 15000 });
 
-// no power: consumers go dark (the generator leaves, the drone bench needs 2 ⚡)
-await reload(`sv.rig.units[2].workshops = sv.rig.units[2].workshops.filter(w => w.id !== 'generator'); sv.rig.units[2].workshops.push({ id: 'werkbank', at: 2 }); sv.rig.units[1].workshops.push({ id: 'werkbank', at: 2 });`);
+// no power: consumers go dark (the generator leaves the cab, the drone bench needs 2 ⚡)
+await reload(`sv.rig.units[0].workshops = sv.rig.units[0].workshops.filter(w => w.id !== 'generator');`);
 await ev(() => nomad.step(120));
 const dark = await ev(s => { const B = eval(s).camp.benches.list.find(b => b.id === 'drohnenwerkstatt'); return { dark: B.dark, max: Math.max(...B.fx.map(e => e.s)) }; }, scene);
 check('Kein Strom: die Drohnenwerkstatt bleibt dunkel', dark.dark && dark.max < 0.05, dark);

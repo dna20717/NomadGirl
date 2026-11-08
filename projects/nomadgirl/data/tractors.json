@@ -5,7 +5,7 @@
   "fuelUse": 12,
   "tank": 60,
   "power": 3,
-  "length": 1,
+  "length": 2,
   "stack": 2,
   "slots": {"engine": 1, "armor": 1, "weapon": 0, "roof": 1},
   "value": 400,
@@ -13,7 +13,8 @@
   "look": "van",
   "places": 2,
   "storage": [4, 3],
-  "storageName": "Kofferraum"
+  "storageName": "Kofferraum",
+  "door": {"x": [99, 147], "y": [69, 138], "place": 1, "backdrop": "#2a1f2e"}
  },
  "lkw": {
   "name": "LKW",

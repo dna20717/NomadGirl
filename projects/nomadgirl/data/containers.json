@@ -2,7 +2,7 @@
  "wohnanhaenger": {
   "name": "Wohnanhänger",
   "kind": "trailer",
-  "places": 3,
+  "places": 2,
   "weight": 900,
   "value": 300,
   "description": "Leylas erstes Zuhause. Klein, aber mit Gardinen.",
@@ -32,7 +32,7 @@
  "modulanhaenger": {
   "name": "Modul-Anhänger",
   "kind": "trailer",
-  "places": 3,
+  "places": 2,
   "weight": 800,
   "value": 450,
   "look": "trailer_flat",

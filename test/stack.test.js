@@ -5,8 +5,9 @@ import { newSave, repairSave, containers } from '../game/save.js';
 import { act, buyContainer, stackOn, moveContainer, detach, attachAt, budgets, blockAt, toSpare } from '../game/rig.js';
 import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
+import { classicRig } from './fixture.js';
 
-const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
+const D = classicRig((await loadProject(nodeLoader('projects/nomadgirl'))).data);   // fixed setup (fixture.js)
 const fresh = () => { const s = newSave(D); s.deltas = 9000; return s; };
 const ids = s => s.rig.units.map(u => u.id + (u.level ? '^' + u.level : '')).join(' ');
 

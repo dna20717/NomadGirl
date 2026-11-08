@@ -356,6 +356,7 @@ export class Camp {
     this.tooHeavy = this.D.build?.rules?.weight !== false && this.budget.heavy;
     for (const u of this.geo.units) u.view = this.drawUnit(u);
     this.drawVanParts();
+    this.drawVanDoor();
     this.drawYard();
     if (this.night) for (const l of this.lights) if (l.rig) l.setAlpha(l.base * this.lightK).setVisible(this.lightK > 0);
   }
@@ -375,21 +376,31 @@ export class Camp {
       }
     } else add(s.add.image(u.x0 - mid, 0, shellTexture(s, D, u.def, s.T)).setOrigin(0, 1).setScale(1));
     // furniture: one texture per container, drawn in the interior
-    const g = s.make.graphics({}, false), h = u.floorY - u.inTop, key = `camp_unit_${u.ui}`;
+    const g = s.make.graphics({}, false), h = u.floorY - u.inTop, key = `camp_unit_${u.ui}`, shades = [];
     for (const w of u.workshops) {
       if (this.hide && this.hide.ui === u.ui && this.hide.at === w.at) continue;
       const def = D.workshops?.[w.id] || {}, cx = u.in0 + w.at * u.cell - u.x0, cw = (def.places || 1) * u.cell, place = `${u.ui}:${w.at}`;
       // Daniel's picture with its lights and effects (benches.js), otherwise furniture from code
-      const art = this.benches.add({ id: w.id, place, x0: u.in0 + w.at * u.cell, w: cw, floor: u.floorY, h, view, mid, G, grid: def.grid && `store:${place}` });
+      const px0 = u.in0 + w.at * u.cell, clip = { x0: px0, x1: px0 + cw, y0: u.inTop, y1: u.floorY + 4 };   // the place inside the container
+      const art = this.benches.add({ id: w.id, place, x0: px0, w: cw, floor: u.floorY, h, view, mid, G, grid: def.grid && `store:${place}`, clip });
+      if (art) shades.push(clip);
       if (!art) furniture(g, def.function, cx, h + 40, cw, h, R.light || '#ffcf7a');
       if (!u.sprite && !art) g.fillStyle(0x0d0a12).fillRect(cx + cw / 2 - 26, 40 + 22, 52, 34).fillStyle(col(R.light || '#ffcf7a')).fillRect(cx + cw / 2 - 22, 40 + 26, 44, 26);   // window
       const l = this.light(u.in0 + w.at * u.cell + cw / 2, u.inTop + h * 0.35, 200, R.light || '#ffcf7a', 0.45); l.rig = true;
       this.workshopHotspot(u, w, def, u.in0 + w.at * u.cell, cw, u.inTop + 8);
     }
+    // a little shade under the ceiling and along the walls, so the pictures sit inside the room (3 steps, pixel style)
+    if (shades.length) {
+      const sg = s.add.graphics(), x0 = u.in0, x1 = u.in0 + u.cell * u.places;
+      [[0.32, 4], [0.18, 8], [0.08, 14]].forEach(([a, d]) => { sg.fillStyle(0x0d0a12, a).fillRect(x0, u.inTop, x1 - x0, d).fillRect(x0, u.inTop, d, h).fillRect(x1 - d, u.inTop, d, h); });
+      for (const c of shades) if (c.x0 > x0 + 1) [[0.22, 3], [0.1, 7]].forEach(([a, d]) => sg.fillStyle(0x0d0a12, a).fillRect(c.x0 - d / 2, u.inTop, d, h));   // between two places
+      sg.x = -mid; sg.y = -G; this.benchShade = sg;
+    }
     if (!u.sprite) for (let i = 1; i < u.places; i++) g.fillStyle(col(R.wall || '#4a4f5a')).fillRect(u.in0 - u.x0 + i * u.cell - 3, 40, 6, h - 120);   // thin walls between the places
     if (s.textures.exists(key)) s.textures.remove(key);
     g.generateTexture(key, Math.ceil(u.x1 - u.x0), Math.ceil(h + 44)); g.destroy();
     add(s.add.image(u.x0 - mid, u.inTop - 40 - G, key).setOrigin(0));
+    if (this.benchShade) { add(this.benchShade); this.benchShade = null; }
     // Deichselkasten: a little steel box on the drawbar (code), E opens the trailer's own storage
     if (u.def.storage?.[0]) {
       // stacked: no drawbar, the box stands on the floor at the front end
@@ -445,6 +456,27 @@ export class Camp {
       v.setPosition(p.cx, p.cy + v.h / 2);
       this.rigObjs.push(v);
     }
+  }
+  // pixel magic at the van's sliding door (Zugmaschine › Blick durch die Tür): the workshop behind the door shows through the
+  // open door, cut at the door frame, with its lights and effects; it fades in when the door is fully open
+  drawVanDoor() {
+    const s = this.scene, D = this.D, rig = this.box.save.rig, T0 = D.tractors?.[rig.tractor] || {}, Dr = T0.door, van = s.van;
+    this.vanDoor = null;
+    if (!Dr?.x || !Dr?.y || !van?.sprite) return;
+    const w = (rig.units[0]?.workshops || []).find(x => x.at === (Dr.place ?? 0));
+    if (!w || (this.hide && this.hide.ui === 0 && this.hide.at === w.at)) return;
+    const a = van.toWorld(Dr.x[0], Dr.y[0]), b = van.toWorld(Dr.x[1], Dr.y[1]);
+    const clip = { x0: Math.min(a.x, b.x), x1: Math.max(a.x, b.x), y0: a.y, y1: b.y };
+    const view = s.add.container(0, 0).setDepth(van.depth + 0.05);
+    this.rigObjs.push(view);
+    view.add(s.add.rectangle(clip.x0, clip.y0, clip.x1 - clip.x0, clip.y1 - clip.y0, col(Dr.backdrop || '#241a2c')).setOrigin(0));
+    // the bench stands on the van's floor, centred in the door, in the shared scale
+    const def = D.workshops?.[w.id] || {}, cw = Math.max(clip.x1 - clip.x0, 200);
+    const bench = this.benches.add({ id: w.id, place: `0:${w.at}`, x0: (clip.x0 + clip.x1) / 2 - cw / 2, w: cw, floor: clip.y1, h: clip.y1 - clip.y0, view, mid: 0, G: 0, grid: def.grid && `store:0:${w.at}`, clip });
+    if (!bench) { view.destroy(); return; }
+    bench.door = true;
+    view.setAlpha(0);
+    this.vanDoor = { view, bench };
   }
   drawYard() {
     const s = this.scene, D = this.D, Y = this.geo.yard, sp = this.box.save.rig.spare || { workshops: [], containers: [] }, y = this.ground;
@@ -711,7 +743,6 @@ export class Camp {
       items.push({ label: `Hinfahren: ${loc.name}`, sub: `${t.km} km · ${de(t.hours)} h · ${de(t.fuel)} l Sprit · ${loc.region || ''}${p ? ' · Gefahr ' + '●'.repeat(p.danger || 1) : ''}`,
         disabled: this.tooHeavy ? `Rig zu schwer (${this.budget.weight} von ${this.budget.pull} kg)` : t.fuel > save.fuel ? 'Zu wenig Sprit' : null, act: () => this.drive(id, t) });
     }
-    items.push({ label: 'Rig umbauen', sub: `Werkstätten umstellen und kaufen, Container an- und abhängen · auch mit B`, act: () => s.openBuild() });
     items.push({ label: 'Zurück', act: () => {} });
     s.hud.menu({ title: 'Warroom', sub: `Du bist bei ${here?.name || '–'}. Sprit ${de(save.fuel)} l · Vorräte ${de(save.food)}`, items });
   }
@@ -766,6 +797,13 @@ export class Camp {
       c.sprite.setFrame(Math.round(c.frame));
     }
     this.updateSound(time);
+    // the van's door: the workshop behind it shows only while the door is fully open
+    if (this.vanDoor) {
+      const v = this.scene.van, open = v && Math.round(v.frame) === v.frames - 1 && !this.scene.hud.build?.active;
+      const a = Math.max(0, Math.min(1, this.vanDoor.view.alpha + (open ? 1 : -1) * dt / 180));
+      this.vanDoor.view.setAlpha(a).setVisible(a > 0);
+      this.vanDoor.bench.shut = a < 0.99;
+    }
     this.benches?.update(time, dt);
     // companions: random speech bubbles
     const B = this.C.companions?.barkEvery || [7, 15];

@@ -5,8 +5,9 @@ import { newSave, clockText, containers } from '../game/save.js';
 import { budgets, startDraft, lift, place, fits, toSpare, fromSpare, buyWorkshop, sellWorkshop, buyContainer, attach, detach, shift, problems, applyDraft, shop, sellContainer, act, snapshot, restore, stow, attachAt, moveContainer } from '../game/rig.js';
 import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
+import { classicRig } from './fixture.js';
 
-const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
+const D = classicRig((await loadProject(nodeLoader('projects/nomadgirl'))).data);   // fixed setup (fixture.js)
 // the tests play with 400 Δ, whatever Wirtschaft › Startgeld says (Daniel tries other values in the workshop)
 const fresh = () => { const s = newSave(D); s.hour = 18.5; s.deltas = 400; return s; };
 const layout = s => s.rig.units.map(u => `${u.id}[${u.workshops.map(w => `${w.id}@${w.at}`).join(' ')}]`).join(' ');

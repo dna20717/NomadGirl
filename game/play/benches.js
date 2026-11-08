@@ -104,8 +104,10 @@ export class Benches {
     this.camp = camp; this.scene = camp.scene; this.D = camp.D;
     this.list = []; this.objs = [];
     const s = this.scene;
-    this.add_ = s.add.graphics().setDepth(31).setBlendMode(Phaser.BlendModes.ADD);   // screens, LEDs, sparks, bubbles …
-    this.flat = s.add.graphics().setDepth(-20.4);                                      // fish (under the night like the picture)
+    // screens, LEDs, sparks, bubbles … sit right in front of the pictures and behind Leyla (depth 10); the night shade lies over
+    // them, so they are boosted by the same amount (glow()). Only the big room lights (kind "light") shine over everything.
+    this.add_ = s.add.graphics().setDepth(-19.9).setBlendMode(Phaser.BlendModes.ADD);
+    this.flat = s.add.graphics().setDepth(-19.93);                                      // fish (under the night like the picture)
     this.puffs = [];
     this.sparks = [];
   }
@@ -115,25 +117,34 @@ export class Benches {
     this.add_.destroy(); this.flat.destroy();
     this.list = []; this.objs = []; this.puffs = [];
   }
-  glow(x, y, color, blend = Phaser.BlendModes.ADD, depth = 31) {
+  glow(x, y, color, blend = Phaser.BlendModes.ADD, depth = -19.92) {
     const g = this.scene.add.image(x, y, glowKey(this.scene)).setTint(col(color)).setBlendMode(blend).setDepth(depth).setAlpha(0);
     this.objs.push(g);
     return g;
   }
   // a workshop picture in a place: x0 = left end in the world, w = width of its places, floor = interior floor, h = interior height.
   // Returns false without a look (then the camp draws its code furniture).
-  add({ id, place, x0, w, floor, h, view, mid, G, grid }) {
+  add({ id, place, x0, w, floor, h, view, mid, G, grid, clip }) {
     const s = this.scene, D = this.D, def = D.workshops?.[id] || {}, key = lookOf(s, D, def);
     if (!key) return false;
     const b = pictureBox(s, key), [fx, fy] = footOf(D, key, b);
-    const k = Math.min(w * (def.fit ?? 100) / 100 / (b.x1 - b.x0), h * 1.02 / Math.max(1, fy - b.y0)), cx = x0 + w / 2;
+    // one scale for all pictures (Camp › Rig-Ansicht › Maßstab der Werkstatt-Bilder), corrected per workshop (Maßstab %);
+    // without it every picture is fitted into its place
+    const one = this.camp.C.rig?.benchScale, k = one ? one * (def.scale ?? 100) / 100 : Math.min(w * (def.fit ?? 100) / 100 / (b.x1 - b.x0), h * 1.02 / Math.max(1, fy - b.y0)), cx = x0 + w / 2;
     const at = (ix, iy) => [cx + (ix - (b.x0 + b.x1) / 2) * k, floor + (iy - fy) * k];
-    const img = (tk, crop) => {
-      const src = s.textures.get(tk).getSourceImage(), i = s.add.image(cx - mid, floor - G, tk).setOrigin((b.x0 + b.x1) / 2 / src.width, fy / src.height).setScale(k);
+    // pixel magic: nothing reaches past the place it stands in (clip = interior of the container, this place's span); a picture
+    // is cut at whole picture pixels
+    const C0 = clip || { x0: -Infinity, x1: Infinity, y0: -Infinity, y1: Infinity };
+    const img = tk => {
+      const src = s.textures.get(tk).getSourceImage(), ox = (b.x0 + b.x1) / 2, i = s.add.image(cx - mid, floor - G, tk).setOrigin(ox / src.width, fy / src.height).setScale(k);
+      const left = cx - ox * k, top = floor - fy * k;
+      i.clipBox = { x: Math.max(0, Math.ceil((C0.x0 - left) / k)), y: Math.max(0, Math.ceil((C0.y0 - top) / k)), x1: Math.min(src.width, Math.floor((C0.x1 - left) / k)), y1: Math.min(src.height, Math.floor((C0.y1 - top) / k)) };
+      i.cropTo = (y = 0) => { const c = i.clipBox, yy = Math.max(y, c.y); i.setCrop(c.x, yy, Math.max(0, c.x1 - c.x), Math.max(0, c.y1 - yy)); };
+      i.cropTo(0);
       view.add(i);
       return i;
     };
-    const bench = { id, place, def, cx, x0: cx - (b.x1 - b.x0) * k / 2, x1: cx + (b.x1 - b.x0) * k / 2, floor, top: floor - (fy - b.y0) * k, k, at, grid, fx: [], s: {} };
+    const bench = { id, place, def, cx, x0: Math.max(C0.x0, cx - (b.x1 - b.x0) * k / 2), x1: Math.min(C0.x1, cx + (b.x1 - b.x0) * k / 2), floor, top: Math.max(C0.y0, floor - (fy - b.y0) * k), k, at, grid, fx: [], s: {}, clip: C0 };
     // a storage that fills up: the empty picture below, the full one cut to the filled shelves
     const empty = def.lookEmpty && s.textures.exists(def.lookEmpty) ? def.lookEmpty : null;
     if (empty && grid) {
@@ -144,7 +155,8 @@ export class Benches {
       bench.fill = -1;
       this.refill(bench);
     } else img(key);
-    (def.fx || []).forEach((r, i) => bench.fx.push(this.effect(bench, r, i)));
+    // effects whose spot was cut away stay out
+    (def.fx || []).forEach((r, i) => { const [ex, ey] = at((r.x || 0) + (r.w || 1) / 2, (r.y || 0) + (r.h || 1) / 2); if (ex >= C0.x0 && ex <= C0.x1 && ey >= C0.y0 && ey <= C0.y1) bench.fx.push(this.effect(bench, r, i)); });
     this.list.push(bench);
     return bench;
   }
@@ -153,9 +165,9 @@ export class Benches {
     const save = this.camp.box.save, f = fillOf(this.D, save.inv?.grids?.[bench.grid]);
     if (Math.abs(f - bench.fill) < 1e-6) return;
     bench.fill = f;
-    const E = bench.edges, n = f <= 0 ? 0 : Math.max(1, Math.ceil(f * E.length - 1e-9)), fr = bench.full.frame;
+    const E = bench.edges, n = f <= 0 ? 0 : Math.max(1, Math.ceil(f * E.length - 1e-9));
     bench.full.setVisible(n > 0);
-    if (n > 0) { const y = E[E.length - n]; bench.full.setCrop(0, y, fr.width, fr.height - y); }
+    if (n > 0) bench.full.cropTo(E[E.length - n]);
     bench.shelves = n;
   }
   // one row of "Licht & Effekte" → a little live object
@@ -164,7 +176,7 @@ export class Benches {
     const kind = r.kind;
     if (kind === 'light' || kind === 'lava' || kind === 'flame') {
       const rad = (r.size || 40) * k;
-      e.glow = this.glow(e.cx, e.cy, r.color || '#ffcf7a').setDisplaySize(w + rad * 2, h + rad * 2);
+      e.glow = this.glow(e.cx, e.cy, r.color || '#ffcf7a', Phaser.BlendModes.ADD, kind === 'light' ? 31 : -19.92).setDisplaySize(w + rad * 2, h + rad * 2);
     }
     if (kind === 'sparks') e.glow = this.glow(e.cx, e.cy, r.color || '#ffb347').setDisplaySize(110 * k, 110 * k);
     if (kind === 'screen') e.glow = this.glow(e.cx, e.cy, r.color || '#3fe0d0').setDisplaySize(w * 2.6 + 30 * k, h * 2.6 + 30 * k);
@@ -195,6 +207,7 @@ export class Benches {
     A.setVisible(!hidden); F.setVisible(!hidden);
     for (const o of this.objs) if (hidden) o.setVisible(false);
     const night = (camp.lightK ?? 0) > 0.3, lk = camp.lightK ?? 0, craft = s.hud.craft;
+    this.boost = 1 / Math.max(0.35, 1 - (camp.night?.fillAlpha ?? 0));   // what the night shade takes away, the small lights get back
     if (time > (this.fillAt || 0)) { this.fillAt = time + 400; for (const b of this.list) if (b.full) this.refill(b); }
     for (const b of this.list) {
       const near = l && Math.abs(l.x - b.cx) < (b.x1 - b.x0) / 2 + 90 && Math.abs(l.feet - b.floor) < 80;
@@ -204,7 +217,7 @@ export class Benches {
       for (const e of b.fx) {
         const r = e.r, on = !r.when || r.when === 'always' || (r.when === 'night' && night) || (r.when === 'near' && near) || (r.when === 'use' && use);
         // no power (Rig-Bau › Regeln): consumers go dark, only the fish keep swimming
-        const goal = b.dark && r.kind !== 'fish' ? 0 : on ? 1 : (r.idle ?? 0) / 100;
+        const goal = b.shut || (b.dark && r.kind !== 'fish') ? 0 : on ? 1 : (r.idle ?? 0) / 100;
         e.s += (goal - e.s) * Math.min(1, sec * 4);
         if (!hidden) this.draw(b, e, t, sec, lk, A, F);
       }
@@ -233,7 +246,7 @@ export class Benches {
   }
   puff(e, b, kind) {
     const r = e.r, k = b.k, smoke = kind === 'smoke', size = (r.size || 5) * k;
-    const img = this.scene.add.image(0, 0, glowKey(this.scene)).setTint(col(r.color || (smoke ? '#9a94a6' : '#ece6f2'))).setDepth(smoke ? -20.3 : 29);
+    const img = this.scene.add.image(0, 0, glowKey(this.scene)).setTint(col(r.color || (smoke ? '#9a94a6' : '#ece6f2'))).setDepth(-19.91);
     this.puffs.push({ img, x: e.x + Math.random() * e.w, y: e.y + Math.random() * e.h, vx: rnd(-4, 4) * k, vy: -rnd(16, 28) * k * (smoke ? 0.8 : 1), wob: rnd(4, 9) * k, ph: Math.random() * 6,
       r: size * 2, a: (smoke ? 0.4 : 0.32) * Math.min(1, 0.4 + e.s), age: 0, life: rnd(1.6, 2.6) * (smoke ? 1.4 : 1) });
     if (this.puffs.length > 140) { this.puffs[0].img.destroy(); this.puffs.shift(); }
@@ -246,7 +259,7 @@ export class Benches {
     e.flash = 1;
   }
   draw(b, e, t, sec, lk, A, F) {
-    const r = e.r, k = b.k, s = e.s, c = col(r.color || '#ffcf7a'), fl = (r.rate ?? 0) / 100;
+    const r = e.r, k = b.k, s = r.kind === 'light' ? e.s : Math.min(1, e.s) * (this.boost || 1), c = col(r.color || '#ffcf7a'), fl = (r.rate ?? 0) / 100;
     const flick = () => 1 - fl * (0.5 + 0.5 * Math.sin(t * 9.1 + e.ph) * Math.sin(t * 5.3 + 1 + e.ph)) - fl * 0.3 * Math.random();
     const dusk = 0.35 + 0.65 * lk;   // lights count for more in the evening
     switch (r.kind) {
@@ -262,7 +275,7 @@ export class Benches {
         break;
       }
       case 'steam': case 'smoke': case 'bubbles': {
-        e.acc += sec * (r.rate || 1) * s;
+        e.acc += sec * (r.rate || 1) * e.s;
         while (e.acc >= 1) {
           e.acc -= 1;
           if (r.kind === 'bubbles') e.list.push({ x: Math.random() * e.w, y: e.h, v: rnd(10, 20) * k, ph: Math.random() * 6, rr: rnd(0.6, 1.2) * (r.size || 2) * k });
@@ -278,7 +291,7 @@ export class Benches {
       }
       case 'sparks':
         // showers per minute, scaled with the strength (a random gap each time)
-        e.acc = (e.acc || 0) + sec * (r.rate || 6) / 60 * s;
+        e.acc = (e.acc || 0) + sec * (r.rate || 6) / 60 * e.s;
         if (e.acc >= (e.gap ??= rnd(0.3, 1.5))) { e.acc = 0; e.gap = rnd(0.3, 1.5); this.shower(e, b, Math.round(rnd(6, 14))); }
         e.glow.setVisible(e.flash > 0).setAlpha(e.flash * 0.8 * (0.5 + 0.5 * Math.random()));
         if (e.flash > 0) {

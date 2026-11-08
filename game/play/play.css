@@ -39,6 +39,10 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .hud-camp { position: fixed; top: 16px; right: 20px; display: grid; gap: 8px; justify-items: end; }
 #hud[data-mode="run"] .hud-camp { top: auto; bottom: 34px; }
 .hud-camp[hidden] { display: none; }
+.hud-buildbtn { position: fixed; left: 20px; top: 62px; display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 7px; border-radius: 9px; border: 1px solid #3a2f45; background: rgba(23, 17, 31, .82); color: #ffd27a; font: 22px/1 VT323, monospace; cursor: pointer; pointer-events: auto; }
+.hud-buildbtn:hover { border-color: #ffd27a; background: rgba(43, 32, 52, .92); }
+.hud-buildbtn kbd { display: inline-grid; place-items: center; min-width: 22px; height: 22px; border-radius: 5px; background: #ffd27a; color: #17111f; font: 18px/1 VT323, monospace; }
+.hud-buildbtn[hidden], #hud[data-building] .hud-buildbtn { display: none; }
 .hud-buffs b { color: #ffd27a; }
 .hud-prompt { position: fixed; left: 50%; bottom: 3%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 8px 16px; border-radius: 8px; background: rgba(13, 10, 18, .8); border: 1px solid #3a2f45; font: 26px/1 VT323, monospace; color: #f2eef7; }
 .hud-prompt[hidden], .hud-menu[hidden] { display: none; }

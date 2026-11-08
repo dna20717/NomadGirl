@@ -6,7 +6,7 @@
  "height": 14,
  "horizon": 66,
  "ground": {"color": "#4a3628", "top": "#8a6440", "far": "#6b4a36", "tiles": "camp_ground"},
- "rig": {"placeWidth": 4, "height": 248, "gap": 1, "wall": "#4a4f5a", "inside": "#2b2233", "light": "#ffcf7a", "labels": true, "lift": 48, "drawbar": 120},
+ "rig": {"placeWidth": 4, "height": 248, "gap": 1, "wall": "#4a4f5a", "inside": "#2b2233", "light": "#ffcf7a", "labels": true, "lift": 48, "drawbar": 120, "benchScale": 1.2},
  "fire": {
   "enabled": true,
   "look": "campfire",

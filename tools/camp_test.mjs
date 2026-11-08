@@ -28,7 +28,7 @@ await ev(() => {
 
 let s = await ev(() => nomad.state());
 check('Camp startet', s.mode === 'camp' && s.camp.clock === 'Tag 1 · 18:30' && s.camp.daytime === 'Abend', s.camp);
-check('Rig: Van mit Schlafkoje + Warroom, Wohnanhänger mit Kochnische, Werkbank, Lagerregal', JSON.stringify(s.camp.van) === '["schlafkoje","warroom"]' && s.camp.rig[0]?.workshops.join() === 'kochnische,werkbank,lagerregal', s.camp);
+check('Rig: Van mit Schlafkoje + Warroom, Wohnanhänger mit Kochnische + Werkbank, Holzkiste mit Lagerregal', JSON.stringify(s.camp.van) === '["schlafkoje","warroom"]' && s.camp.rig[0]?.workshops.join() === 'kochnische,werkbank' && s.camp.rig[1]?.id === 'holzkiste' && s.camp.rig[1]?.workshops.join() === 'lagerregal', s.camp);
 check('Leyla steht am Van, E-Hinweis', s.prompt === 'Einsteigen · Van', s.prompt);
 await shot('start');
 
@@ -36,7 +36,7 @@ let m = await ev(() => c.use());
 check('Van-Menü', m?.items.map(i => i.label).join('|') === 'Schlafen · Schlafkoje|Planen · Warroom|Zurück', m);
 m = await ev(() => { nomad.choose('Planen'); return nomad.menu(); });
 check('Warroom: Plündern + 3 Ziele', m?.title === 'Warroom' && m.items[0].label.startsWith('Plündern') && m.items.filter(i => i.label.startsWith('Hinfahren')).length === 3, m);
-check('Warroom: deutsche Zahlen', /2,4 l Sprit/.test(m?.items[1]?.sub), m?.items[1]);
+check('Warroom: deutsche Zahlen', /2,5 l Sprit/.test(m?.items[1]?.sub), m?.items[1]);
 await shot('warroom');
 
 s = await ev(() => c.pick('Plündern'));
@@ -83,7 +83,7 @@ check('Kochnische: E öffnet Kochen (Rezeptbuch + Experimentieren)', p === 'Koch
 await page.keyboard.press('Escape');
 
 s = await ev(() => { c.to('Van'); c.use(); nomad.choose('Planen'); return c.pick('Bunker'); });
-check('Fahren: Ort, Sprit, Ankunft in der Dämmerung', s.camp.location === 'bunker_13' && s.camp.clock === 'Tag 3 · 18:30' && s.camp.fuel === 34.6, s.camp);
+check('Fahren: Ort, Sprit, Ankunft in der Dämmerung', s.camp.location === 'bunker_13' && s.camp.clock === 'Tag 3 · 18:30' && s.camp.fuel === 34.5, s.camp);
 await shot('day');
 
 s = await ev(() => { c.to('Van'); c.use(); nomad.choose('Planen'); c.pick('Plündern'); const sc = game.scene.getScene('play'); const hp = sc.leyla.maxHealth; sc.deltas = 50; sc.leyla.hurt(sc.time.now, 9999, 0); nomad.step(200); return { ...nomad.state(), hp }; });
