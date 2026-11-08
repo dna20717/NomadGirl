@@ -78,6 +78,7 @@ export class BuildMode {
     if (!this.active) return;
     const s = this.scene, cam = s.cam, back = this.camBack;
     if (this.drag) this.cancelDrag(true);
+    this.peek(null);
     // Leyla finishes the rest in no time (the time has been counted already)
     for (const u of this.undo) u.done = true;
     this.jobs = []; this.job = null; this.working = false;
@@ -100,6 +101,7 @@ export class BuildMode {
   // ---------- the bar on top: budgets, clock, Δ, dealer, undo, done ----------
   draw() {
     if (!this.active) return;
+    if (!this.shopOpen) this.peek(null);
     const D = this.D, save = this.save, b = budgets(D, save.rig), top = this.undo[this.undo.length - 1];
     const bar = (label, val, max, text, over, ic) => el('div', { class: 'build-budget' + (over ? ' over' : '') }, icon(ic, 16),
       el('span', {}, el('small', {}, label), el('b', {}, text)), max != null ? el('i', { style: `--k:${Math.min(1, max ? val / max : 1)}` }) : null);
@@ -144,7 +146,10 @@ export class BuildMode {
       const sub = area === 'workshops' ? `${FN_NAMES[x.function] || ''} · ${x.places || 1} ${x.places > 1 ? 'Plätze' : 'Platz'} · ${x.power > 0 ? '+' : ''}${x.power || 0} ⚡`
         : area === 'rigParts' ? [PART_SLOTS[x.slot] || x.slot, x.pull ? `+${de(x.pull)} kg` : null, x.armor ? `+${x.armor} Panzerung` : null, x.damage ? `${x.damage} Schaden` : null, x.storageRows ? `+${x.storageRows} Reihen Stauraum` : null].filter(Boolean).join(' · ')
         : `${x.places || 1} Plätze · ${de(x.weight || 0)} kg`;
-      return el('div', { class: 'build-row', title: x.description || '' }, area === 'workshops' ? el('span', { class: 'build-dot', style: `--col:${FN_COLORS[x.function] || '#555'}` }) : icon(area === 'rigParts' ? 'settings' : 'box', 16),
+      const pic = area === 'workshops' && this.picture(x.look);
+      const lead = pic ? el('span', { class: 'bm-thumb', style: `--col:${FN_COLORS[x.function] || '#555'}` }, el('img', { src: pic, alt: '', draggable: 'false' }))
+        : area === 'workshops' ? el('span', { class: 'build-dot', style: `--col:${FN_COLORS[x.function] || '#555'}` }) : icon(area === 'rigParts' ? 'settings' : 'box', 16);
+      return el('div', { class: 'build-row' + (pic ? ' has-pic' : ''), title: pic ? '' : x.description || '', onmouseenter: ev => area === 'workshops' && this.peek(id, ev.currentTarget), onmouseleave: () => this.peek(null) }, lead,
         el('span', {}, el('b', {}, x.name || id), el('small', {}, sub)),
         el('button', { class: 'inv-btn', disabled: poor, title: poor ? 'Zu wenig Δ' : 'Wird auf den Händler-Platz geliefert', onclick: () => this.buy(area, id) }, `${de(price)} Δ`));
     };
@@ -152,6 +157,29 @@ export class BuildMode {
       el('header', {}, icon('shop', 16), el('b', {}, D.camp?.yard?.dealerName || 'Händler'), el('small', {}, 'liefert auf den Händler-Platz'), el('button', { class: 'craft-x', onclick: () => { this.shopOpen = false; this.draw(); } }, '×')),
       el('div', { class: 'build-list' }, el('h3', {}, 'Werkstätten'), ...S.workshops.map(id => row('workshops', id)), el('h3', {}, 'Anhänger'), ...S.containers.map(id => row('containers', id)),
         S.rigParts.length ? el('h3', {}, 'Rig-Teile') : null, ...S.rigParts.map(id => row('rigParts', id))));
+  }
+
+  // the file of a picture asset, for the catalogue
+  picture(id) { const a = id && this.D.assets?.[id]; return a?.file ? new URL(a.file, this.scene.base).href : null; }
+  // hovering a workshop in the catalogue: a big preview next to it (picture, empty → full for shelves, facts)
+  peek(id, row) {
+    this.peekEl?.remove();
+    this.peekEl = null;
+    if (!id || this.drag) return;
+    const D = this.D, x = D.workshops?.[id] || {}, pic = this.picture(x.look), empty = this.picture(x.lookEmpty);
+    const buff = x.buff && D.buffs?.[x.buff]?.name, fxN = (x.fx || []).length;
+    const facts = [FN_NAMES[x.function], `${x.places || 1} ${x.places > 1 ? 'Plätze' : 'Platz'}`, `${x.power > 0 ? '+' : ''}${x.power || 0} ⚡`, x.grid ? `Lager ${x.grid[0]} × ${x.grid[1]}` : null,
+      buff ? `Buff: ${buff}` : null, x.rest?.verb ? `E: ${x.rest.verb}` : null].filter(Boolean);
+    const stage = el('div', { class: 'bm-peek-stage' + (empty ? ' fills' : '') + (fxN ? ' cosy' : ''), style: `--col:${FN_COLORS[x.function] || '#555'}` },
+      pic ? (empty ? [el('img', { src: empty, alt: '' }), el('img', { class: 'full', src: pic, alt: '' })] : el('img', { src: pic, alt: '' })) : el('span', { class: 'bm-peek-none' }, 'Noch ohne Bild'));
+    const box = el('aside', { class: 'bm-peek' }, stage,
+      el('div', { class: 'bm-peek-text' }, el('b', {}, x.name || id), el('small', {}, facts.join(' · ')), x.description ? el('p', {}, x.description) : null,
+        empty ? el('p', { class: 'hint' }, 'Füllt sich Fach für Fach, je voller das Lager ist.') : null));
+    const shop = this.el.querySelector('.bm-shop')?.getBoundingClientRect(), r = row.getBoundingClientRect();
+    box.style.right = `${Math.round(window.innerWidth - (shop?.left ?? r.left) + 12)}px`;
+    this.el.append(box);
+    box.style.top = `${Math.round(Math.max(84, Math.min(window.innerHeight - box.offsetHeight - 12, r.top - 60)))}px`;
+    this.peekEl = box;
   }
 
   // ---------- where things are (world coordinates) ----------
@@ -278,6 +306,7 @@ export class BuildMode {
     } else return;
     this.drag = { ...hit, holder, x: w.x, y: w.y, px: w.x, angle: 0, av: 0, vx: 0, weight, hang };
     this.el.classList.add('dragging');   // the dealer's catalogue fades and lets the pointer through
+    this.peek(null);
     this.sfx.lift();
     s.game.canvas.style.cursor = 'grabbing';
     this.msg = null;

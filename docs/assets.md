@@ -74,6 +74,15 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/backgrounds/wasteland_ledge.png` | Wastelands, Steg, transparent, 576 × 324 px (`wasteland_ledge`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_near.png` | Wastelands, nahe Skyline, transparent, 576 × 324 px (`wasteland_near`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/ruins_relay.png` | Wastelands · Funkruinen, 688 × 384, Himmel transparent (`ruins_relay`), Startseite + Testraum; Himmel/Wetter aus Code (`game/weather.js`) | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/workshops/warroom_table.png` | Werkstatt Warroom: Planungstisch mit Karten, Bildschirmen, Laptop, Kaffeetasse, 256 × 256, Pixel-Art (`ws_warroom_table`) | KI-generiert (Daniel) | 08.11.2026 |
+| `assets/workshops/weapon_bench.png` | Werkstatt Waffenkammer: Waffenbank mit Pistole und Sturmgewehr an der Lochwand (`ws_weapon_bench`) | KI-generiert (Daniel) | 08.11.2026 |
+| `assets/workshops/metal_bench.png` | Werkstatt Werkbank: Metall-Werkbank mit Schweißgerät, Gasflasche, Sägen (`ws_metal_bench`) | KI-generiert (Daniel) | 08.11.2026 |
+| `assets/workshops/chill_area.png` | Werkstatt Chill Area: Sofa, Röhrenfernseher, Lichterkette, Lavalampe, Aquarium (`ws_chill_area`) | KI-generiert (Daniel) | 08.11.2026 |
+| `assets/workshops/food_kitchen.png` | Werkstatt Kochnische/Küche/Foodtruck: Küchenzeile im Foodtruck-Stil (`ws_food_kitchen`) | KI-generiert (Daniel) | 08.11.2026 |
+| `assets/workshops/shelf_full.png`, `shelf_empty.png` | Werkstatt Lagerregal voll und leer, deckungsgleich (Füllstand im Spiel) (`ws_shelf_full`, `ws_shelf_empty`) | KI-generiert (Daniel) | 08.11.2026 |
+| `assets/workshops/drone_bench.png` | Werkstatt Drohnenwerkstatt: halb gebaute Drohne, 3D-Drucker, Kaffeetasse (`ws_drone_bench`) | KI-generiert (Daniel) | 08.11.2026 |
+| `assets/workshops/sleep_bunk.png` | Werkstatt Schlafkoje: Etagenbett mit Lichterkette und Teddy (`ws_sleep_bunk`) | KI-generiert (Daniel) | 08.11.2026 |
+| `assets/workshops/generator_bench.png` | Werkstatt Generator: Generator-Bank mit Kanistern und Wartungswerkzeug (`ws_generator_bench`) | KI-generiert (Daniel) | 08.11.2026 |
 | (im Spiel gezeichnet) | Himmel, Skyline von BigCityDelta, Wände, Leitern, Seil-Anker, Platzhalter-Plünderer, Nägel, Partikel (`game/play/art.js`) | Code | 07.11.2026 |
 
 Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich „Assets“.

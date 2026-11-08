@@ -1445,5 +1445,95 @@
   "source": "KI (Pixel-Art von Daniel, 08.11.2026)",
   "date": "08.11.2026",
   "description": "Leerer 20-Fuß-Container, Längsseite offen, ohne Räder: steht auf einem Anhänger oder einem anderen Container. Oberkante y 73, Ankerpunkt = Unterkante Mitte, im Spiel ×3."
+ },
+ "ws_warroom_table": {
+  "name": "Werkstatt · Planungstisch (Warroom)",
+  "kind": "image",
+  "file": "assets/workshops/warroom_table.png",
+  "origin": [128, 205],
+  "source": "KI (Pixel-Art von Daniel, 08.11.2026)",
+  "date": "08.11.2026",
+  "description": "Planungstisch mit Karten, Bildschirmen, Laptop und Kaffeetasse, von vorn. 256 × 256, Füße bei y 205."
+ },
+ "ws_weapon_bench": {
+  "name": "Werkstatt · Waffenbank",
+  "kind": "image",
+  "file": "assets/workshops/weapon_bench.png",
+  "origin": [128, 205],
+  "source": "KI (Pixel-Art von Daniel, 08.11.2026)",
+  "date": "08.11.2026",
+  "description": "Werkbank des Waffenschmieds: Pistole und Sturmgewehr an der Lochwand, Werkzeug davor. 256 × 256, Füße bei y 205."
+ },
+ "ws_metal_bench": {
+  "name": "Werkstatt · Metall-Werkbank",
+  "kind": "image",
+  "file": "assets/workshops/metal_bench.png",
+  "origin": [124, 190],
+  "source": "KI (Pixel-Art von Daniel, 08.11.2026)",
+  "date": "08.11.2026",
+  "description": "Werkbank für Metall mit Schweißgerät, Gasflasche, Sägen und Hämmern, Lampe. 256 × 256, Füße bei y 190."
+ },
+ "ws_chill_area": {
+  "name": "Werkstatt · Chill Area",
+  "kind": "image",
+  "file": "assets/workshops/chill_area.png",
+  "origin": [128, 218],
+  "source": "KI (Pixel-Art von Daniel, 08.11.2026)",
+  "date": "08.11.2026",
+  "description": "Sofa, Röhrenfernseher, Lichterkette, Lavalampe und Aquarium vor einer Regalwand. 256 × 256, Boden bei y 218."
+ },
+ "ws_food_kitchen": {
+  "name": "Werkstatt · Foodtruck-Küche",
+  "kind": "image",
+  "file": "assets/workshops/food_kitchen.png",
+  "origin": [139, 205],
+  "source": "KI (Pixel-Art von Daniel, 08.11.2026)",
+  "date": "08.11.2026",
+  "description": "Küchenzeile im Foodtruck-Stil: Töpfe, Pfanne, Mikrowelle, Abzug, Gasflasche. 256 × 256, Füße bei y 205."
+ },
+ "ws_shelf_full": {
+  "name": "Werkstatt · Lagerregal (voll)",
+  "kind": "image",
+  "file": "assets/workshops/shelf_full.png",
+  "origin": [128, 246],
+  "source": "KI (Pixel-Art von Daniel, 08.11.2026)",
+  "date": "08.11.2026",
+  "description": "Schwerlastregal voller Kartons, Dosen, Pelican-Koffer und Krempel. Böden bei y 48, 106, 162, 232. 256 × 256."
+ },
+ "ws_shelf_empty": {
+  "name": "Werkstatt · Lagerregal (leer)",
+  "kind": "image",
+  "file": "assets/workshops/shelf_empty.png",
+  "origin": [128, 246],
+  "source": "KI (Pixel-Art von Daniel, 08.11.2026)",
+  "date": "08.11.2026",
+  "description": "Dasselbe Regal leer, deckungsgleich mit der vollen Version (Füllstand im Spiel)."
+ },
+ "ws_drone_bench": {
+  "name": "Werkstatt · Drohnen-Werkbank",
+  "kind": "image",
+  "file": "assets/workshops/drone_bench.png",
+  "origin": [128, 203],
+  "source": "KI (Pixel-Art von Daniel, 08.11.2026)",
+  "date": "08.11.2026",
+  "description": "Halb gebaute Drohne, Teile, Werkzeug, 3D-Drucker und Kaffeetasse. 256 × 256, Füße bei y 203."
+ },
+ "ws_sleep_bunk": {
+  "name": "Werkstatt · Schlafecke (Etagenbett)",
+  "kind": "image",
+  "file": "assets/workshops/sleep_bunk.png",
+  "origin": [128, 240],
+  "source": "KI (Pixel-Art von Daniel, 08.11.2026)",
+  "date": "08.11.2026",
+  "description": "Etagenbett mit Lichterkette, zerzaustem Teddy, Leselampe, Röhrenmonitoren und Krempel, von vorn. 256 × 256, Boden bei y 240."
+ },
+ "ws_generator_bench": {
+  "name": "Werkstatt · Generator-Bank",
+  "kind": "image",
+  "file": "assets/workshops/generator_bench.png",
+  "origin": [128, 236],
+  "source": "KI (Pixel-Art von Daniel, 08.11.2026)",
+  "date": "08.11.2026",
+  "description": "Generator auf der Werkbank, Kanister, Batterien, Zahnräder und Wartungswerkzeug. 256 × 256, Boden bei y 236."
  }
 }

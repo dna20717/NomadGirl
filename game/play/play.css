@@ -205,6 +205,27 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .build-row b { font-size: 13px; color: #f2eef7; font-weight: 600; }
 .build-row small { font-size: 11px; }
 .build-dot { width: 14px; height: 14px; border-radius: 4px; background: var(--col); flex: none; }
+/* workshop pictures in the dealer's catalogue: a thumbnail per row, a big preview beside the catalogue on hover */
+.build-row > span.bm-thumb { display: grid; flex: none; }
+.bm-thumb { position: relative; flex: none; width: 58px; height: 46px; border-radius: 7px; overflow: hidden; background: radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--col) 45%, #2b2233), #120d18 75%); border: 1px solid #3a2f45; display: grid; place-items: center; }
+.bm-thumb img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; transform: scale(1.18) translateY(4%); transition: transform .25s; }
+.build-row.has-pic:hover { border-color: #ffd27a; background: #271d33; }
+.build-row.has-pic:hover .bm-thumb img { transform: scale(1.32) translateY(2%); }
+.bm-peek { position: fixed; z-index: 21; width: 300px; pointer-events: none; border-radius: 14px; overflow: hidden; background: rgba(23, 17, 31, .96); border: 1px solid #3a2f45; box-shadow: 0 14px 40px rgba(0, 0, 0, .55); animation: bm-peek .18s ease-out; }
+@keyframes bm-peek { from { opacity: 0; transform: translateX(14px) scale(.97); } to { opacity: 1; transform: none; } }
+.bm-peek-stage { position: relative; height: 250px; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 35%, color-mix(in srgb, var(--col) 38%, #2b2233) 0%, #17111f 62%, #0d0a12 100%); }
+.bm-peek-stage::after { content: ''; position: absolute; left: 10%; right: 10%; bottom: 14px; height: 10px; border-radius: 50%; background: rgba(0, 0, 0, .45); filter: blur(4px); }
+.bm-peek-stage.cosy::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 28%, rgba(255, 214, 140, .22), transparent 55%); animation: bm-cosy 3.2s ease-in-out infinite; }
+@keyframes bm-cosy { 50% { opacity: .55; } }
+.bm-peek-stage img { position: absolute; width: 256px; height: 256px; left: 22px; top: -6px; image-rendering: pixelated; z-index: 1; }
+.bm-peek-stage.fills img.full { animation: bm-fill 3.6s steps(1) infinite; }
+@keyframes bm-fill { 0% { clip-path: inset(100% 0 0 0); } 20% { clip-path: inset(63% 0 0 0); } 40% { clip-path: inset(41% 0 0 0); } 60% { clip-path: inset(19% 0 0 0); } 80% { clip-path: inset(0 0 0 0); } }
+.bm-peek-none { color: #8a7d99; font: 22px/1 VT323, monospace; }
+.bm-peek-text { display: grid; gap: 4px; padding: 10px 14px 12px; }
+.bm-peek-text b { font: 28px/1 VT323, monospace; font-weight: normal; color: #ffd27a; }
+.bm-peek-text small { color: #b9a2c8; font-size: 12px; }
+.bm-peek-text p { margin: 2px 0 0; color: #d8cfe2; font-size: 12px; line-height: 1.4; }
+.bm-peek-text p.hint { color: #9fe8a8; }
 .build-go { font-size: 14px; padding: 9px 16px; }
 @media (max-width: 1100px) { .bm-bar { flex-wrap: wrap; } .bm-budgets { order: 3; flex-basis: 100%; } }
 #hud[data-building] .hud-camp, #hud[data-building] .hud-top { visibility: hidden; }

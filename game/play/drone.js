@@ -94,6 +94,8 @@ export class Drone {
       if (this.roamTo.leyla) this.roamTo.x += (l.x + this.side * -110 - this.roamTo.x) * 0.02;
       tx = this.roamTo.x; ty = this.roamTo.y; smooth = R.smooth ?? 0.02;
     }
+    // docked on a workbench (Werkstätten › Benutzen › Mama-Bot dockt an): flies there and sits still
+    if (this.dock) { if (time > this.dock.until) this.dock = null; else { tx = this.dock.x; ty = this.dock.y; smooth = 0.07; } }
     const k = 1 - Math.pow(1 - Math.min(1, smooth), dt / 16.67);
     const px = this.x; this.x += (tx - this.x) * k; this.y += (ty - this.y) * k;
     const vx = (this.x - px) / Math.max(1, dt) * 1000;

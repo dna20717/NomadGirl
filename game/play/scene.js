@@ -54,6 +54,9 @@ export class PlayScene extends Phaser.Scene {
       // every container's look: bought or stacked ones appear while building, without reloading the scene
       for (const c of Object.values(this.data_.containers || {})) if (c.look) ids.add(c.look);
       for (const c of Object.values(this.data_.rigParts || {})) if (c.look) ids.add(c.look);
+      // workshop pictures (and the empty shelf), the crate for packed workshops
+      for (const w of Object.values(this.data_.workshops || {})) for (const id of [w.look, w.lookEmpty]) if (id) ids.add(id);
+      if (this.data_.camp?.yard?.crate?.look) ids.add(this.data_.camp.yard.crate.look);
       if (this.data_.camp?.ground?.tiles) ids.add(this.data_.camp.ground.tiles);
       const S = this.data_.camp?.sound || {};
       for (const id of [S.wind, S.fire, ...(S.gusts || []), ...(this.data_.camp?.fire?.sit?.sounds || [])]) if (id) ids.add(id);
@@ -472,7 +475,11 @@ export class PlayScene extends Phaser.Scene {
     const building = this.hud.build?.active;
     if (input.build?.pressed && building) this.hud.build.close();
     else if (input.build?.pressed && this.mode === 'camp' && !this.hud.modal && !this.hud.paused && !this.leaving && !this.hud.craft?.isOpen) this.openBuild();
-    if (this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || this.leaving) { this.physics.world.pause(); this.hud.update(this, time); return; }
+    if (this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || this.leaving) {
+      // cooking, crafting, a menu: the workshops keep glowing, steaming and sparking behind the window
+      if (this.camp && !this.hud.paused && !this.leaving) this.camp.benches?.update(time, Math.min(delta, 50));
+      this.physics.world.pause(); this.hud.update(this, time); return;
+    }
     if (time < this.hitstopUntil) return;
     if (this.physics.world.isPaused) this.physics.world.resume();
     const dt = Math.min(delta, 50);

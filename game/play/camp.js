@@ -4,6 +4,7 @@
 // Graphics are code placeholders for now; a "look" on containers, workshops or companions takes over later.
 import { clockText, advance, hoursUntil, containers } from '../save.js';
 import { budgets, partSlots } from '../rig.js';
+import { Benches, benchTexture, crateTexture } from './benches.js';
 
 const de = n => Number(n).toLocaleString('de-DE', { maximumFractionDigits: 1 });
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
@@ -289,6 +290,9 @@ export function workshopTexture(scene, D, id, C = D.camp || {}) {
   const key = `ws_art_${id}`;
   if (scene.textures.exists(key)) return key;
   const R = C.rig || {}, def = D.workshops?.[id] || {}, cw = (R.placeWidth ?? 4) * scene.T * (def.places || 1), h = R.height ?? 248;
+  // with a look: the picture itself (trimmed), as wide as its places
+  const pic = benchTexture(scene, D, id, cw * 0.92, h);
+  if (pic) return pic;
   const g = scene.make.graphics({}, false);
   g.fillStyle(col(R.inside || '#2b2233'), 0.92).fillRoundedRect(4, 30, cw - 8, h - 30, 10);
   g.fillStyle(col(R.wall || '#4a4f5a')).fillRect(4, 24, cw - 8, 10).fillRect(4, h - 6, cw - 8, 6);
@@ -344,6 +348,8 @@ export class Camp {
     this.lights = this.lights.filter(l => !l.rig);
     this.hotspots = this.hotspots.filter(h => !h.rig);
     s.ladders = (s.ladders || []).filter(l => !l.rig);
+    this.benches?.destroy();
+    this.benches = new Benches(this);
     this.geo.units = rigUnits(this.D, this.box.save.rig, this.geo.vanLeft, this.ground, s.T);
     this.budget = budgets(this.D, this.box.save.rig);
     this.noPower = this.D.build?.rules?.power !== false && this.budget.power.net < 0;
@@ -372,9 +378,11 @@ export class Camp {
     const g = s.make.graphics({}, false), h = u.floorY - u.inTop, key = `camp_unit_${u.ui}`;
     for (const w of u.workshops) {
       if (this.hide && this.hide.ui === u.ui && this.hide.at === w.at) continue;
-      const def = D.workshops?.[w.id] || {}, cx = u.in0 + w.at * u.cell - u.x0, cw = (def.places || 1) * u.cell;
-      furniture(g, def.function, cx, h + 40, cw, h, R.light || '#ffcf7a');
-      if (!u.sprite) g.fillStyle(0x0d0a12).fillRect(cx + cw / 2 - 26, 40 + 22, 52, 34).fillStyle(col(R.light || '#ffcf7a')).fillRect(cx + cw / 2 - 22, 40 + 26, 44, 26);   // window
+      const def = D.workshops?.[w.id] || {}, cx = u.in0 + w.at * u.cell - u.x0, cw = (def.places || 1) * u.cell, place = `${u.ui}:${w.at}`;
+      // Daniel's picture with its lights and effects (benches.js), otherwise furniture from code
+      const art = this.benches.add({ id: w.id, place, x0: u.in0 + w.at * u.cell, w: cw, floor: u.floorY, h, view, mid, G, grid: def.grid && `store:${place}` });
+      if (!art) furniture(g, def.function, cx, h + 40, cw, h, R.light || '#ffcf7a');
+      if (!u.sprite && !art) g.fillStyle(0x0d0a12).fillRect(cx + cw / 2 - 26, 40 + 22, 52, 34).fillStyle(col(R.light || '#ffcf7a')).fillRect(cx + cw / 2 - 22, 40 + 26, 44, 26);   // window
       const l = this.light(u.in0 + w.at * u.cell + cw / 2, u.inTop + h * 0.35, 200, R.light || '#ffcf7a', 0.45); l.rig = true;
       this.workshopHotspot(u, w, def, u.in0 + w.at * u.cell, cw, u.inTop + 8);
     }
@@ -422,7 +430,7 @@ export class Camp {
   workshopHotspot(u, w, def, cx, cw, labelY) {
     const R = this.C.rig || {};
     const store = def.grid && `store:${u.ui}:${w.at}`;
-    this.hotspots.push({ rig: true, x: cx + cw / 2, w: cw / 2, top: this.curTop, name: def.name || w.id, hint: store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id) });
+    this.hotspots.push({ rig: true, place: `${u.ui}:${w.at}`, x: cx + cw / 2, w: cw / 2, top: this.curTop, name: def.name || w.id, hint: store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id, `${u.ui}:${w.at}`) });
     if (R.labels !== false) this.rigObjs.push(this.scene.add.text(cx + cw / 2, labelY, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '24px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 0).setDepth(-14));
   }
 
@@ -469,18 +477,16 @@ export class Camp {
       this.yardItems.push({ kind: 'container', i, id, x0: px, x1: px + w, y0: top, y1: y, view, x: px + w / 2 });
       px += w + 20;
     });
-    // spare workshops: on pallets in front
-    const ws = (C.palletScale ?? 50) / 100, cw = (this.C.rig?.placeWidth ?? 4) * s.T * ws;
+    // spare workshops: packed in crates with a label (Camp › Verpackte Werkstätten), on pallets in front
     let wx = px;
     sp.workshops.forEach((id, i) => {
-      const def = D.workshops?.[id] || {}, n = def.places || 1, w = cw * n;
-      g.fillStyle(0x7a5a3a).fillRect(wx, y - 14, w, 14).fillStyle(0x4a3424);
-      for (let k = 0; k < w; k += 28) g.fillRect(wx + k + 4, y - 10, 12, 10);
-      const key = workshopTexture(s, D, id, this.C), view = keep(s.add.container(wx + w / 2, y - 14).setDepth(-17));
-      view.add(s.add.image(0, 0, key).setOrigin(0.5, 1).setScale(ws));
-      view.add(s.add.text(0, -s.textures.get(key).getSourceImage().height * ws - 6, def.name || id, { fontFamily: 'VT323, monospace', fontSize: '22px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 4 }).setOrigin(0.5, 1));
-      this.yardItems.push({ kind: 'ws', i, id, x0: wx, x1: wx + w, y0: y - 14 - s.textures.get(key).getSourceImage().height * ws, y1: y, view, x: wx + w / 2 });
-      wx += w + 14;
+      const key = crateTexture(s, D, id), src = s.textures.get(key).getSourceImage(), w = src.width, hh = src.height;
+      g.fillStyle(0x7a5a3a).fillRect(wx - 6, y - 12, w + 12, 12).fillStyle(0x4a3424);
+      for (let k = 0; k < w + 12; k += 28) g.fillRect(wx - 6 + k + 4, y - 8, 12, 8);
+      const view = keep(s.add.container(wx + w / 2, y - 12).setDepth(-17));
+      view.add(s.add.image(0, 0, key).setOrigin(0.5, 1));
+      this.yardItems.push({ kind: 'ws', i, id, x0: wx, x1: wx + w, y0: y - 12 - hh, y1: y, view, x: wx + w / 2 });
+      wx += w + 24;
     });
     // spare rig parts: on a low rack after the workshops
     let qx = wx + (sp.workshops.length ? 10 : 0);
@@ -627,7 +633,7 @@ export class Camp {
   }
 
   // ---------- actions ----------
-  use(id) {
+  use(id, place = null) {
     const def = this.D.workshops?.[id] || {}, s = this.scene;
     if (this.noPower && def.power < 0 && def.function !== 'warroom')
       return s.hud.menu({ title: def.name || id, sub: `Kein Strom: das Rig erzeugt ${this.budget.power.made} ⚡ und braucht ${this.budget.power.used} ⚡. Generator einbauen oder Verbraucher ausbauen (B: Rig umbauen).`,
@@ -636,8 +642,29 @@ export class Camp {
     if (def.function === 'warroom') return this.warroom();
     if (['kitchen', 'craft'].includes(def.function)) { s.hud.inv?.close(); return s.hud.craft?.open(id); }
     const who = (this.box.save.companions || []).map(c => this.D.companions?.[c]).filter(c => c?.workshops?.includes(id)).map(c => c.name);
+    if (def.rest?.verb) return this.restMenu(id, def, place, who);
     s.hud.menu({ title: def.name || id, sub: [def.description, who.length ? `Betreut von ${who.join(' und ')}.` : null, SOON[def.function] || 'Funktion kommt später.'].filter(Boolean).join(' '),
       items: [{ label: 'Zurück', act: () => {} }] });
+  }
+  // a workshop to spend time at (Werkstätten › Benutzen): Chill Area, Drohnenwerkstatt … time passes, heals, gives its buff;
+  // Mama-Bot can fly over and dock on the bench while it happens
+  restMenu(id, def, place, who) {
+    const s = this.scene, save = this.box.save, R = def.rest, buff = def.buff && this.D.buffs?.[def.buff]?.name;
+    const facts = [R.hours ? `${de(R.hours)} h` : null, R.heal ? `heilt ${R.heal} %` : null, buff ? `danach ${buff}` : null].filter(Boolean).join(' · ');
+    s.hud.menu({ title: def.name || id, sub: [def.description, who.length ? `Betreut von ${who.join(' und ')}.` : null, facts].filter(Boolean).join(' '),
+      items: [{ label: R.verb, primary: true, act: () => {
+        const done = () => {
+          this.resting = null;
+          advance(save, R.hours || 0);
+          if (R.heal) save.health = Math.min(s.leyla.maxHealth, s.leyla.health + s.leyla.maxHealth * R.heal / 100);
+          if (def.buff && !save.buffs.includes(def.buff)) save.buffs.push(def.buff);
+          s.goCamp({ banner: [R.banner || def.name || id, clockText(save) + (buff ? ' · ' + buff : '')], fade: 700, keepPlace: true });
+        };
+        this.resting = place;   // the bench's "Bei Benutzung" effects run meanwhile
+        const dock = R.drone && place && this.benches?.dockOf(place);
+        if (dock && s.drone) { s.drone.dock = { ...dock, until: s.time.now + 3200 }; s.drone.react('cleared'); s.time.delayedCall(3000, done); }
+        else s.time.delayedCall(1400, done);
+      } }, { label: 'Zurück', act: () => {} }] });
   }
   vanMenu(ids) {
     if (!ids.length) return this.scene.hud.menu({ title: 'Van', sub: 'Keine Werkstätten im Van.', items: [{ label: 'Zurück', act: () => {} }] });
@@ -739,6 +766,7 @@ export class Camp {
       c.sprite.setFrame(Math.round(c.frame));
     }
     this.updateSound(time);
+    this.benches?.update(time, dt);
     // companions: random speech bubbles
     const B = this.C.companions?.barkEvery || [7, 15];
     if (time > this.barkAt && this.companions.length) {
@@ -777,6 +805,8 @@ export class Camp {
       prompt: this.promptText || null, hotspots: this.hotspots.map(h => ({ name: h.name, hint: typeof h.hint === 'function' ? h.hint() : h.hint, x: Math.round(h.x) })),
       chest: this.chest && { open: this.chest.open, frame: Math.round(this.chest.frame) },
       sound: { wind: !!this.wind, fire: this.fireVolume != null ? Math.round(this.fireVolume * 100) : null, muted: this.scene.sound.mute },
+      benches: this.benches?.state() || [], resting: this.resting || null,
+      yard: (this.yardItems || []).map(y => ({ kind: y.kind, id: y.id, x: Math.round(y.x), y0: Math.round(y.y0) })),
       rig: this.geo.units.map(u => ({ id: u.id, x0: u.x0, x1: u.x1, workshops: u.workshops.map(w => w.id) })), van: this.geo.tractor?.workshops.map(w => w.id) };
   }
 }

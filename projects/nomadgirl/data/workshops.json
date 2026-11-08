@@ -1,11 +1,131 @@
 {
- "schlafkoje": {"name": "Schlafkoje", "function": "sleep", "stage": "mvp", "places": 1, "power": 0, "capacity": 1, "buff": "ausgeschlafen", "value": 50},
- "kochnische": {"name": "Kochnische", "function": "kitchen", "stage": "mvp", "places": 1, "power": -1, "value": 80, "description": "Zwei Platten, eine davon geht."},
- "werkbank": {"name": "Werkbank", "function": "craft", "stage": "mvp", "places": 1, "power": -1, "value": 80},
- "generator": {"name": "Generator", "function": "power", "stage": "1", "places": 1, "power": 3, "value": 200},
- "waffenkammer": {"name": "Waffenkammer", "function": "storage", "stage": "1", "places": 1, "power": 0, "capacity": 12, "value": 150, "grid": [6, 6]},
+ "schlafkoje": {
+  "name": "Schlafkoje",
+  "function": "sleep",
+  "stage": "mvp",
+  "places": 1,
+  "power": 0,
+  "capacity": 1,
+  "buff": "ausgeschlafen",
+  "value": 50,
+  "look": "ws_sleep_bunk",
+  "fit": 110,
+  "fx": [
+   {"kind": "twinkle", "x": 45, "y": 55, "w": 200, "h": 90, "size": 4, "rate": 0.7, "when": "always"},
+   {"kind": "light", "x": 66, "y": 124, "w": 16, "h": 8, "color": "#ffd27a", "size": 40, "rate": 4, "when": "always"},
+   {"kind": "screen", "x": 172, "y": 36, "w": 30, "h": 20, "color": "#9fc8ff", "size": 0, "rate": 0, "when": "night", "idle": 30},
+   {"kind": "screen", "x": 214, "y": 140, "w": 24, "h": 32, "color": "#56e07a", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "screen", "x": 210, "y": 160, "w": 26, "h": 22, "color": "#3fe0d0", "size": 0, "rate": 1, "when": "near", "idle": 40},
+   {"kind": "screen", "x": 180, "y": 96, "w": 24, "h": 24, "color": "#8fd8ff", "size": 0, "rate": 5, "when": "near", "idle": 0},
+   {"kind": "twinkle", "x": 195, "y": 160, "w": 20, "h": 30, "size": 3, "rate": 1, "when": "always"}
+  ]
+ },
+ "kochnische": {
+  "name": "Kochnische",
+  "function": "kitchen",
+  "stage": "mvp",
+  "places": 1,
+  "power": -1,
+  "value": 80,
+  "description": "Zwei Platten, eine davon geht.",
+  "look": "ws_food_kitchen",
+  "fx": [
+   {"kind": "light", "x": 97, "y": 63, "w": 66, "h": 6, "color": "#fff1c8", "size": 75, "rate": 5, "when": "always"},
+   {"kind": "steam", "x": 110, "y": 121, "w": 10, "h": 4, "color": "#ece6f2", "size": 6, "rate": 1.6, "when": "use", "idle": 35},
+   {"kind": "flame", "x": 142, "y": 127, "w": 16, "h": 5, "color": "#ff7a2a", "size": 26, "rate": 40, "when": "use", "idle": 0},
+   {"kind": "smoke", "x": 144, "y": 118, "w": 12, "h": 4, "color": "#cfc8d8", "size": 7, "rate": 1.4, "when": "use", "idle": 0},
+   {"kind": "screen", "x": 184, "y": 112, "w": 23, "h": 20, "color": "#ffcf7a", "size": 0, "rate": 0, "when": "use", "idle": 15},
+   {"kind": "screen", "x": 178, "y": 75, "w": 14, "h": 10, "color": "#56e07a", "size": 0, "rate": 3, "when": "always"},
+   {"kind": "screen", "x": 84, "y": 105, "w": 17, "h": 7, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "screen", "x": 63, "y": 145, "w": 18, "h": 8, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "smoke", "x": 122, "y": 28, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
+  ]
+ },
+ "werkbank": {
+  "name": "Werkbank",
+  "function": "craft",
+  "stage": "mvp",
+  "places": 1,
+  "power": -1,
+  "value": 80,
+  "look": "ws_metal_bench",
+  "fx": [
+   {"kind": "light", "x": 97, "y": 93, "w": 62, "h": 6, "color": "#fff1c8", "size": 70, "rate": 6, "when": "always"},
+   {"kind": "light", "x": 166, "y": 72, "w": 12, "h": 8, "color": "#ffd27a", "size": 32, "rate": 0, "when": "always"},
+   {"kind": "screen", "x": 63, "y": 145, "w": 18, "h": 8, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "sparks", "x": 112, "y": 128, "w": 20, "h": 6, "color": "#ffb347", "size": 3, "rate": 40, "when": "use", "idle": 0},
+   {"kind": "smoke", "x": 116, "y": 122, "w": 10, "h": 4, "color": "#b9b2c2", "size": 7, "rate": 2, "when": "use", "idle": 0},
+   {"kind": "sparks", "x": 112, "y": 128, "w": 20, "h": 6, "color": "#ffb347", "size": 2, "rate": 2, "when": "always"}
+  ]
+ },
+ "generator": {
+  "name": "Generator",
+  "function": "power",
+  "stage": "1",
+  "places": 1,
+  "power": 3,
+  "value": 200,
+  "look": "ws_generator_bench",
+  "fx": [
+   {"kind": "light", "x": 97, "y": 63, "w": 66, "h": 6, "color": "#fff1c8", "size": 75, "rate": 5, "when": "always"},
+   {"kind": "smoke", "x": 36, "y": 78, "w": 8, "h": 4, "color": "#7a7486", "size": 9, "rate": 0.8, "when": "always"},
+   {"kind": "twinkle", "x": 42, "y": 118, "w": 40, "h": 22, "size": 3, "rate": 2.5, "when": "always"},
+   {"kind": "screen", "x": 149, "y": 98, "w": 17, "h": 10, "color": "#3fe0a0", "size": 0, "rate": 6, "when": "always"},
+   {"kind": "screen", "x": 143, "y": 121, "w": 20, "h": 9, "color": "#3fe0a0", "size": 0, "rate": 4, "when": "always"},
+   {"kind": "screen", "x": 222, "y": 88, "w": 14, "h": 12, "color": "#3fe0d0", "size": 0, "rate": 3, "when": "always"},
+   {"kind": "steam", "x": 167, "y": 126, "w": 6, "h": 3, "color": "#ece6f2", "size": 4, "rate": 0.7, "when": "always"},
+   {"kind": "twinkle", "x": 20, "y": 160, "w": 72, "h": 45, "size": 3, "rate": 1, "when": "always"},
+   {"kind": "twinkle", "x": 180, "y": 158, "w": 40, "h": 20, "size": 3, "rate": 1.5, "when": "always"},
+   {"kind": "light", "x": 42, "y": 104, "w": 52, "h": 36, "color": "#8be04a", "size": 30, "rate": 15, "when": "always"}
+  ]
+ },
+ "waffenkammer": {
+  "name": "Waffenkammer",
+  "function": "storage",
+  "stage": "1",
+  "places": 1,
+  "power": 0,
+  "capacity": 12,
+  "value": 150,
+  "grid": [6, 6],
+  "look": "ws_weapon_bench",
+  "fx": [
+   {"kind": "light", "x": 97, "y": 63, "w": 66, "h": 6, "color": "#fff1c8", "size": 75, "rate": 5, "when": "always"},
+   {"kind": "shine", "x": 117, "y": 96, "w": 74, "h": 14, "color": "#ffffff", "size": 0, "rate": 6, "when": "always"},
+   {"kind": "shine", "x": 82, "y": 103, "w": 25, "h": 14, "color": "#ffffff", "size": 0, "rate": 9, "when": "always"},
+   {"kind": "sparks", "x": 125, "y": 136, "w": 14, "h": 6, "color": "#ffb347", "size": 2, "rate": 12, "when": "use", "idle": 0},
+   {"kind": "screen", "x": 47, "y": 92, "w": 10, "h": 8, "color": "#56e07a", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "twinkle", "x": 20, "y": 160, "w": 72, "h": 45, "size": 3, "rate": 1, "when": "always"},
+   {"kind": "twinkle", "x": 180, "y": 158, "w": 40, "h": 20, "size": 3, "rate": 1.5, "when": "always"},
+   {"kind": "twinkle", "x": 212, "y": 80, "w": 30, "h": 45, "size": 3, "rate": 1, "when": "always"},
+   {"kind": "twinkle", "x": 215, "y": 160, "w": 30, "h": 45, "size": 3, "rate": 1, "when": "always"}
+  ]
+ },
  "kuehlraum": {"name": "Kühlraum", "function": "cooling", "stage": "1", "places": 1, "power": -2, "capacity": 20, "value": 250, "grid": [6, 4]},
- "chill_area": {"name": "Chill Area", "function": "chill", "stage": "1", "places": 1, "power": 0, "buff": "gemuetlich", "value": 120, "description": "Sofa, Lichterkette, Plattenspieler."},
+ "chill_area": {
+  "name": "Chill Area",
+  "function": "chill",
+  "stage": "1",
+  "places": 1,
+  "power": 0,
+  "buff": "gemuetlich",
+  "value": 120,
+  "description": "Sofa, Röhrenfernseher, Lichterkette, Lavalampe und ein Aquarium. Hier wird nichts repariert.",
+  "look": "ws_chill_area",
+  "fit": 110,
+  "fx": [
+   {"kind": "twinkle", "x": 40, "y": 52, "w": 206, "h": 90, "size": 4, "rate": 0.8, "when": "always"},
+   {"kind": "fish", "x": 24, "y": 94, "w": 52, "h": 22, "size": 0, "rate": 3, "when": "always"},
+   {"kind": "bubbles", "x": 24, "y": 93, "w": 52, "h": 24, "color": "#bff6ff", "size": 2, "rate": 2.5, "when": "always"},
+   {"kind": "light", "x": 20, "y": 88, "w": 60, "h": 30, "color": "#5fe0d0", "size": 50, "rate": 4, "when": "always"},
+   {"kind": "lava", "x": 137, "y": 146, "w": 10, "h": 22, "color": "#ff7a2a", "size": 40, "rate": 1, "when": "always"},
+   {"kind": "screen", "x": 183, "y": 118, "w": 30, "h": 27, "color": "#a8f0ff", "size": 0, "rate": 6, "when": "use", "idle": 45},
+   {"kind": "light", "x": 183, "y": 118, "w": 30, "h": 27, "color": "#8fd8ff", "size": 70, "rate": 25, "when": "use", "idle": 30},
+   {"kind": "steam", "x": 128, "y": 165, "w": 6, "h": 3, "color": "#ece6f2", "size": 4, "rate": 0.6, "when": "always"},
+   {"kind": "twinkle", "x": 175, "y": 160, "w": 40, "h": 30, "size": 3, "rate": 1, "when": "always"}
+  ],
+  "rest": {"verb": "Fernsehen und abhängen", "hours": 1, "heal": 20, "banner": "Flimmern, Sofa, Lavalampe"}
+ },
  "drohnenwerkstatt": {
   "name": "Drohnenwerkstatt",
   "function": "drone",
@@ -13,11 +133,89 @@
   "places": 1,
   "power": -2,
   "value": 400,
-  "description": "Hier wird Mama-Bot verbessert. Sie hat Meinungen dazu."
+  "description": "Hier wird Mama-Bot verbessert. Sie hat Meinungen dazu.",
+  "look": "ws_drone_bench",
+  "fx": [
+   {"kind": "light", "x": 97, "y": 63, "w": 66, "h": 6, "color": "#e8f4ff", "size": 75, "rate": 5, "when": "always"},
+   {"kind": "scan", "x": 52, "y": 117, "w": 28, "h": 6, "color": "#ff9a4a", "size": 4, "rate": 0.5, "when": "always"},
+   {"kind": "screen", "x": 52, "y": 131, "w": 28, "h": 8, "color": "#3fe0d0", "size": 0, "rate": 1, "when": "always"},
+   {"kind": "screen", "x": 49, "y": 143, "w": 10, "h": 4, "color": "#8be04a", "size": 0, "rate": 0, "when": "always"},
+   {"kind": "steam", "x": 168, "y": 123, "w": 6, "h": 3, "color": "#ece6f2", "size": 4, "rate": 0.8, "when": "always"},
+   {"kind": "screen", "x": 224, "y": 90, "w": 13, "h": 13, "color": "#3fe0d0", "size": 0, "rate": 3, "when": "always"},
+   {"kind": "sparks", "x": 128, "y": 138, "w": 12, "h": 6, "color": "#9fe8ff", "size": 2, "rate": 30, "when": "use", "idle": 0},
+   {"kind": "blink", "x": 155, "y": 49, "w": 3, "h": 3, "color": "#56e07a", "size": 3, "rate": 1.2, "when": "always"},
+   {"kind": "twinkle", "x": 20, "y": 160, "w": 72, "h": 45, "size": 3, "rate": 1, "when": "always"},
+   {"kind": "twinkle", "x": 180, "y": 158, "w": 40, "h": 20, "size": 3, "rate": 1.5, "when": "always"},
+   {"kind": "twinkle", "x": 212, "y": 80, "w": 30, "h": 45, "size": 3, "rate": 1, "when": "always"},
+   {"kind": "twinkle", "x": 215, "y": 160, "w": 30, "h": 45, "size": 3, "rate": 1, "when": "always"}
+  ],
+  "rest": {"verb": "Mama-Bot warten", "hours": 0.5, "heal": 0, "banner": "Mama-Bot glänzt wieder", "drone": true}
  },
- "warroom": {"name": "Warroom", "function": "warroom", "stage": "1", "places": 1, "power": -1, "value": 300},
- "kueche": {"name": "Küche", "function": "kitchen", "stage": "1", "places": 2, "power": -2, "value": 500},
- "foodtruck": {"name": "Foodtruck", "function": "foodtruck", "stage": "1", "places": 2, "power": -1, "value": 700, "description": "Jaaa, wirklich."},
+ "warroom": {
+  "name": "Warroom",
+  "function": "warroom",
+  "stage": "1",
+  "places": 1,
+  "power": -1,
+  "value": 300,
+  "look": "ws_warroom_table",
+  "fx": [
+   {"kind": "light", "x": 97, "y": 63, "w": 66, "h": 6, "color": "#e8f4ff", "size": 75, "rate": 5, "when": "always"},
+   {"kind": "screen", "x": 110, "y": 74, "w": 42, "h": 30, "color": "#3fe0a0", "size": 0, "rate": 3, "when": "always"},
+   {"kind": "screen", "x": 165, "y": 72, "w": 31, "h": 24, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "screen", "x": 148, "y": 99, "w": 32, "h": 22, "color": "#56e07a", "size": 0, "rate": 4, "when": "always"},
+   {"kind": "screen", "x": 185, "y": 106, "w": 27, "h": 27, "color": "#8be04a", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "screen", "x": 68, "y": 118, "w": 26, "h": 22, "color": "#3fe0d0", "size": 0, "rate": 1, "when": "near", "idle": 50},
+   {"kind": "light", "x": 128, "y": 120, "w": 14, "h": 16, "color": "#3fe0e0", "size": 24, "rate": 30, "when": "always"},
+   {"kind": "light", "x": 165, "y": 120, "w": 13, "h": 14, "color": "#a0f050", "size": 22, "rate": 30, "when": "always"},
+   {"kind": "steam", "x": 112, "y": 126, "w": 6, "h": 3, "color": "#ece6f2", "size": 4, "rate": 0.8, "when": "always"},
+   {"kind": "twinkle", "x": 20, "y": 160, "w": 72, "h": 45, "size": 3, "rate": 1, "when": "always"},
+   {"kind": "twinkle", "x": 180, "y": 158, "w": 40, "h": 20, "size": 3, "rate": 1.5, "when": "always"},
+   {"kind": "twinkle", "x": 212, "y": 80, "w": 30, "h": 45, "size": 3, "rate": 1, "when": "always"},
+   {"kind": "twinkle", "x": 215, "y": 160, "w": 30, "h": 45, "size": 3, "rate": 1, "when": "always"}
+  ]
+ },
+ "kueche": {
+  "name": "Küche",
+  "function": "kitchen",
+  "stage": "1",
+  "places": 2,
+  "power": -2,
+  "value": 500,
+  "look": "ws_food_kitchen",
+  "fx": [
+   {"kind": "light", "x": 97, "y": 63, "w": 66, "h": 6, "color": "#fff1c8", "size": 75, "rate": 5, "when": "always"},
+   {"kind": "steam", "x": 110, "y": 121, "w": 10, "h": 4, "color": "#ece6f2", "size": 6, "rate": 1.6, "when": "use", "idle": 35},
+   {"kind": "flame", "x": 142, "y": 127, "w": 16, "h": 5, "color": "#ff7a2a", "size": 26, "rate": 40, "when": "use", "idle": 0},
+   {"kind": "smoke", "x": 144, "y": 118, "w": 12, "h": 4, "color": "#cfc8d8", "size": 7, "rate": 1.4, "when": "use", "idle": 0},
+   {"kind": "screen", "x": 184, "y": 112, "w": 23, "h": 20, "color": "#ffcf7a", "size": 0, "rate": 0, "when": "use", "idle": 15},
+   {"kind": "screen", "x": 178, "y": 75, "w": 14, "h": 10, "color": "#56e07a", "size": 0, "rate": 3, "when": "always"},
+   {"kind": "screen", "x": 84, "y": 105, "w": 17, "h": 7, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "screen", "x": 63, "y": 145, "w": 18, "h": 8, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "smoke", "x": 122, "y": 28, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
+  ]
+ },
+ "foodtruck": {
+  "name": "Foodtruck",
+  "function": "foodtruck",
+  "stage": "1",
+  "places": 2,
+  "power": -1,
+  "value": 700,
+  "description": "Jaaa, wirklich.",
+  "look": "ws_food_kitchen",
+  "fx": [
+   {"kind": "light", "x": 97, "y": 63, "w": 66, "h": 6, "color": "#fff1c8", "size": 75, "rate": 5, "when": "always"},
+   {"kind": "steam", "x": 110, "y": 121, "w": 10, "h": 4, "color": "#ece6f2", "size": 6, "rate": 1.6, "when": "use", "idle": 35},
+   {"kind": "flame", "x": 142, "y": 127, "w": 16, "h": 5, "color": "#ff7a2a", "size": 26, "rate": 40, "when": "use", "idle": 0},
+   {"kind": "smoke", "x": 144, "y": 118, "w": 12, "h": 4, "color": "#cfc8d8", "size": 7, "rate": 1.4, "when": "use", "idle": 0},
+   {"kind": "screen", "x": 184, "y": 112, "w": 23, "h": 20, "color": "#ffcf7a", "size": 0, "rate": 0, "when": "use", "idle": 15},
+   {"kind": "screen", "x": 178, "y": 75, "w": 14, "h": 10, "color": "#56e07a", "size": 0, "rate": 3, "when": "always"},
+   {"kind": "screen", "x": 84, "y": 105, "w": 17, "h": 7, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "screen", "x": 63, "y": 145, "w": 18, "h": 8, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "smoke", "x": 122, "y": 28, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
+  ]
+ },
  "motorraum": {"name": "Motorraum", "function": "engine", "stage": "1", "places": 1, "power": 0, "value": 300},
  "zelle": {"name": "Zelle", "function": "cell", "stage": "2", "places": 1, "power": 0, "capacity": 1, "value": 200},
  "reaktor": {"name": "Reaktor", "function": "power", "stage": "2", "places": 2, "power": 8, "value": 3000},
@@ -29,6 +227,9 @@
   "stage": "mvp",
   "value": 60,
   "grid": [8, 5],
-  "description": "Schwerlastregal, hält alles, was Leyla nicht wegwerfen kann. Also alles."
+  "description": "Schwerlastregal, hält alles, was Leyla nicht wegwerfen kann. Also alles.",
+  "look": "ws_shelf_full",
+  "lookEmpty": "ws_shelf_empty",
+  "fill": [{"y": 0},{"y": 48},{"y": 106},{"y": 162}]
  }
 }

@@ -40,6 +40,8 @@ export const BUFF_DURATIONS = [['instant', 'Sofort'], ['run', 'Nächster Run'], 
 export const DISCOVERY = [['experiment', 'Experimentieren'], ['found', 'Fund im POI'], ['companion', 'Tipp von Companion'], ['shop', 'Bei NPCs kaufen'], ['start', 'Von Anfang an']];
 export const CONTAINER_KINDS = [['shipping', 'Hochseecontainer'], ['crate', 'Holzkiste'], ['trailer', 'Wohnwagenteil'], ['tank', 'Tank']];
 export const WORKSHOP_FUNCTIONS = [['storage', 'Lager'], ['cooling', 'Kühlung'], ['cell', 'Zelle'], ['sleep', 'Schlafen'], ['chill', 'Chillen'], ['drone', 'Drohnen'], ['warroom', 'Planung'], ['kitchen', 'Kochen'], ['foodtruck', 'Verkauf'], ['craft', 'Herstellen'], ['engine', 'Motor'], ['power', 'Energie']];
+export const BENCH_FX = [['light', 'Licht'], ['screen', 'Bildschirm'], ['steam', 'Dampf'], ['smoke', 'Rauch'], ['sparks', 'Funken'], ['flame', 'Flamme'], ['blink', 'LED blinkt'], ['twinkle', 'Lichter funkeln'], ['bubbles', 'Blasen'], ['fish', 'Fische'], ['lava', 'Lavalampe'], ['scan', 'Druckkopf'], ['shine', 'Glanz']];
+export const BENCH_FX_WHEN = [['always', 'Immer'], ['night', 'Abends'], ['near', 'In der Nähe'], ['use', 'Bei Benutzung']];
 export const RIG_SLOTS = [['engine', 'Motor'], ['armor', 'Panzerung'], ['weapon', 'Waffe'], ['roof', 'Dach']];
 export const POI_KINDS = [['gasStation', 'Tankstelle'], ['settlement', 'Siedlung'], ['factory', 'Fabrik'], ['bunker', 'Bunker'], ['government', 'Regierungskomplex'], ['mall', 'Einkaufszentrum'], ['ruin', 'Ruine']];
 export const POI_SIZES = [['S', 'S'], ['M', 'M'], ['L', 'L'], ['XL', 'XL']];
@@ -450,6 +452,13 @@ export const AREAS = {
       { title: 'Werkstatt', fields: [NAME, LOOK, select('function', 'Funktion', WORKSHOP_FUNCTIONS), STAGE, DESCRIPTION] },
       { title: 'Werte', fields: [num('places', 'Plätze', { min: 1, max: 3 }), num('power', 'Energie', { unit: '⚡', hint: '+ liefert, − braucht' }), num('capacity', 'Kapazität', { min: 0, hint: 'Lagerplätze, Betten …' }),
         ref('buff', 'Buff', 'buffs', { hint: 'z. B. Schlafzimmer oder Chill Area' }), size('grid', 'Lager-Raster', { unit: 'Felder', hint: 'Ist dieser Platz ein Inventar (Lager, Kühlraum, Waffenkammer): Größe des Rasters. Leer = kein Lager' }), VALUE] },
+      { title: 'Aussehen im Rig', fields: [num('fit', 'Breite im Platz', { unit: '%', min: 30, max: 200, hint: 'Wie breit das Bild im Platz steht (100 = genau so breit wie der Platz). Die Höhe passt sich an, höchstens so hoch wie der Innenraum' }),
+        ref('lookEmpty', 'Aussehen leer', 'assets', { hint: 'Für Lager: dieselbe Grafik leer, deckungsgleich. Je voller das Lager, desto mehr Fächer zeigt das Spiel aus dem Aussehen (voll), von unten nach oben' }),
+        table('fill', 'Fächer', [num('y', 'Oberkante', { unit: 'Bildpixel', min: 0 })], { hint: 'Wo die Fächer anfangen (Bildpixel von oben, von oben nach unten sortiert). Das unterste Fach füllt sich zuerst' })] },
+      { title: 'Licht & Effekte', fields: [table('fx', 'Effekte', [select('kind', 'Art', BENCH_FX), num('x', 'x'), num('y', 'y'), num('w', 'Breite'), num('h', 'Höhe'), color('color', 'Farbe'), num('size', 'Größe'), num('rate', 'Tempo'), select('when', 'Wann', BENCH_FX_WHEN), num('idle', 'Sonst %', { min: 0, max: 100 })],
+        { hint: 'Alles in Bildpixeln des Aussehens (x/y = linke obere Ecke, Breite/Höhe = Bereich). Licht: Größe = Radius, Tempo = Flackern %. Bildschirm: Tempo = Zeilen pro Sekunde. Dampf/Rauch/Blasen: Tempo = pro Sekunde. Funken: Tempo = Schauer pro Minute. LED: Tempo = Blinken pro Sekunde. Lichter funkeln: findet die hellen Punkte im Bereich selbst. Fische: Tempo = Anzahl. Druckkopf: fährt im Bereich hin und her. Glanz: läuft alle „Tempo“ Sekunden über den Bereich. Wann: Immer, abends, wenn Leyla nah ist oder bei Benutzung; „Sonst %“ = Stärke, solange es nicht zutrifft' })] },
+      { title: 'Benutzen', fields: [text('rest.verb', 'Knopf', { hint: 'Für Chill Area, Drohnenwerkstatt & Co.: Was Leyla hier macht (z. B. „Fernsehen und abhängen“). Leer = nur Infos' }), num('rest.hours', 'Dauer', { unit: 'h', min: 0 }),
+        num('rest.heal', 'Heilt', { unit: '%', min: 0, max: 100 }), text('rest.banner', 'Meldung danach'), bool('rest.drone', 'Mama-Bot dockt an', { hint: 'Die Drohne fliegt zur Werkstatt und setzt sich drauf, solange Leyla hier ist' })] },
     ],
   },
   rigParts: {
@@ -487,6 +496,9 @@ export const AREAS = {
         num('yard.width', 'Breite', { unit: 'Kacheln', min: 4 }), bool('yard.dealer', 'Händler-Platz', { hint: 'Hier abstellen = verkaufen; Gekauftes wird hier geliefert' }), text('yard.dealerName', 'Name am Schild'),
         num('yard.dealerWidth', 'Breite Händler-Platz', { unit: 'px', min: 80 }), num('yard.palletScale', 'Werkstätten auf Paletten', { unit: '% Größe', min: 20, max: 100 }), num('yard.partScale', 'Rig-Teile im Regal', { unit: '% Größe', min: 20, max: 200 }),
         num('yard.parkScale', 'Geparkte Anhänger', { unit: '% Größe', min: 20, max: 100 })] },
+      { title: 'Verpackte Werkstätten', fields: [ref('yard.crate.look', 'Kiste', 'assets', { hint: 'Ausgebaute Werkstätten liegen auf dem Schrottplatz verpackt in Kisten. Grafik der Kiste mit Label; leer = Platzhalter aus Code' }),
+        num('yard.crate.height', 'Höhe', { unit: 'px', min: 40 }), point('yard.crate.labelAt', 'Label Mitte', { unit: 'Bildpixel', hint: 'Wo auf der Kiste das Label sitzt; dort steht der Name der Werkstatt' }), size('yard.crate.labelSize', 'Label Größe', { unit: 'Bildpixel' }),
+        num('yard.crate.fontSize', 'Schriftgröße', { unit: 'px', min: 8 }), color('yard.crate.ink', 'Schriftfarbe')] },
       { title: 'Schacht', fields: [bool('shaft.enabled', 'Zeigen', { hint: 'Daniel: Andeutung eines Schachts nach unten, links im Camp, nicht betretbar' }), num('shaft.at', 'Ab Spalte', { unit: 'Kacheln', min: 1 }),
         num('shaft.width', 'Breite', { unit: 'Kacheln', min: 1 }), color('shaft.color', 'Dunkelheit'), color('shaft.glow', 'Glühen von unten', { hint: 'Leer = nichts' }), num('shaft.frameHeight', 'Förderturm', { unit: 'px', min: 0, hint: 'Holzgerüst mit Rolle und Seil über dem Schacht, 0 = keins' })] },
       { title: 'Rig-Ansicht', fields: [num('rig.placeWidth', 'Breite pro Platz', { unit: 'Kacheln', min: 2 }), num('rig.height', 'Raumhöhe', { unit: 'px', min: 200 }), num('rig.gap', 'Abstand zwischen Containern', { unit: 'Kacheln', min: 0, hint: 'Nur für den Platz, den das Rig im Camp freihält; Anhänger aus Code hängen mit der Deichsel aneinander' }),
