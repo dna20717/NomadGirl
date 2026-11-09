@@ -350,6 +350,9 @@ export class Camp {
     s.ladders = (s.ladders || []).filter(l => !l.rig);
     this.benches?.destroy();
     this.benches = new Benches(this);
+    this.shut = Object.fromEntries((this.shells || []).map(c => [c.key, c.a]));
+    this.shells = [];
+    this.labels = [];
     this.geo.units = rigUnits(this.D, this.box.save.rig, this.geo.vanLeft, this.ground, s.T);
     this.budget = budgets(this.D, this.box.save.rig);
     this.noPower = this.D.build?.rules?.power !== false && this.budget.power.net < 0;
@@ -373,6 +376,17 @@ export class Camp {
         // something stacked on top: the roof clutter above the deck is cut off, the container sits right on the roof (Container › Dachaufbau abschneiden)
         const U = this.box.save.rig.units, onTop = (U[u.ui + 1]?.level || 0) > (u.level || 0);
         if (onTop && u.def.deck != null && u.def.cropAbove !== false) { const f = img.frame; img.setCrop(0, u.def.deck, f.width, f.height - u.def.deck); }
+        // closed shell (Container › Aussehen geschlossen): lies over the workshops and their effects, under Leyla; update() fades it
+        const ck = u.def.lookClosed;
+        if (ck && s.textures.exists(ck)) {
+          s.textures.get(ck).setFilter(NEAREST());
+          const shut = s.add.image(u.sprite.cx, G, ck, 0).setOrigin(u.sprite.ox, u.sprite.oy).setScale(u.sprite.k).setFlipX(u.sprite.flip).setDepth(-19.5);
+          if (onTop && u.def.deck != null && u.def.cropAbove !== false) { const f = shut.frame; shut.setCrop(0, u.def.deck, f.width, f.height - u.def.deck); }
+          const was = this.shut?.[`${u.ui}:${u.id}`] ?? 1;   // redrawn rig (building): keep the current state, no flash
+          shut.setAlpha(was);
+          this.rigObjs.push(shut);
+          this.shells.push({ u, img: shut, key: `${u.ui}:${u.id}`, a: was });
+        }
       }
     } else add(s.add.image(u.x0 - mid, 0, shellTexture(s, D, u.def, s.T)).setOrigin(0, 1).setScale(1));
     // furniture: one texture per container, drawn in the interior
@@ -386,7 +400,7 @@ export class Camp {
       if (art) shades.push(clip);
       if (!art) furniture(g, def.function, cx, h + 40, cw, h, R.light || '#ffcf7a');
       if (!u.sprite && !art) g.fillStyle(0x0d0a12).fillRect(cx + cw / 2 - 26, 40 + 22, 52, 34).fillStyle(col(R.light || '#ffcf7a')).fillRect(cx + cw / 2 - 22, 40 + 26, 44, 26);   // window
-      const l = this.light(u.in0 + w.at * u.cell + cw / 2, u.inTop + h * 0.35, 200, R.light || '#ffcf7a', 0.45); l.rig = true;
+      const l = this.light(u.in0 + w.at * u.cell + cw / 2, u.inTop + h * 0.35, 200, R.light || '#ffcf7a', 0.45); l.rig = true; l.unit = u.ui;
       this.workshopHotspot(u, w, def, u.in0 + w.at * u.cell, cw, u.inTop + 8);
     }
     // a little shade under the ceiling and along the walls, so the pictures sit inside the room (3 steps, pixel style)
@@ -442,7 +456,10 @@ export class Camp {
     const R = this.C.rig || {};
     const store = def.grid && `store:${u.ui}:${w.at}`;
     this.hotspots.push({ rig: true, place: `${u.ui}:${w.at}`, x: cx + cw / 2, w: cw / 2, top: this.curTop, name: def.name || w.id, hint: store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id, `${u.ui}:${w.at}`) });
-    if (R.labels !== false) this.rigObjs.push(this.scene.add.text(cx + cw / 2, labelY, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '24px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 0).setDepth(-14));
+    if (R.labels !== false) {
+      const t = this.scene.add.text(cx + cw / 2, labelY, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '24px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 0).setDepth(-14);
+      t.unit = u.ui; this.rigObjs.push(t); (this.labels ||= []).push(t);   // fades with a closed shell
+    }
   }
 
   // ---------- scrapyard by the shaft: spare workshops on pallets, spare trailers parked behind, the dealer's pad ----------
@@ -539,6 +556,23 @@ export class Camp {
     const l = this.scene.add.image(x, y, glowTexture(this.scene)).setDisplaySize(r * 2, h * 2).setTint(col(color)).setBlendMode(Phaser.BlendModes.ADD).setDepth(31);
     l.base = base; this.lights.push(l);
     return l;
+  }
+
+  // ---------- closed containers: open near Leyla, while building or with the button „Rig offen“ ----------
+  // (Daniel, 09.11.2026: „Wenn Leyla nicht in der Nähe oder im Baumodus ist oder die offene Ansicht getoggelt wird, sind sie zu“)
+  updateShells(dt) {
+    if (!this.shells?.length) return;
+    const s = this.scene, l = s.leyla, O = this.C.rig?.open || {}, near = O.near ?? 160, fade = Math.max(1, O.fade ?? 350), leak = (O.lights ?? 15) / 100;
+    const all = !!s.hud.build?.active || !!s.hud.rigOpen;
+    for (const c of this.shells) {
+      const u = c.u, top = u.inTop - 40, bottom = (u.base ?? this.ground) + 30;   // its own storey: from under its ceiling to its bottom rail
+      const here = l && l.x > u.x0 - near && l.x < u.x1 + near && l.feet > top && l.feet < bottom;
+      const target = all || here ? 0 : 1;
+      if (c.a !== target) c.a = target > c.a ? Math.min(1, c.a + dt / fade) : Math.max(0, c.a - dt / fade);
+      c.img.setAlpha(c.a).setVisible(c.a > 0.001);
+      for (const lt of this.lights) if (lt.rig && lt.unit === u.ui) lt.setAlpha(lt.base * this.lightK * (1 - c.a * (1 - leak))).setVisible(this.lightK > 0);
+      for (const t of this.labels) if (t.unit === u.ui) t.setAlpha(1 - c.a);
+    }
   }
 
   // ---------- campfire ----------
@@ -805,6 +839,7 @@ export class Camp {
       this.vanDoor.bench.shut = a < 0.99;
     }
     this.benches?.update(time, dt);
+    this.updateShells(dt);
     // companions: random speech bubbles
     const B = this.C.companions?.barkEvery || [7, 15];
     if (time > this.barkAt && this.companions.length) {
@@ -844,6 +879,7 @@ export class Camp {
       chest: this.chest && { open: this.chest.open, frame: Math.round(this.chest.frame) },
       sound: { wind: !!this.wind, fire: this.fireVolume != null ? Math.round(this.fireVolume * 100) : null, muted: this.scene.sound.mute },
       benches: this.benches?.state() || [], resting: this.resting || null,
+      shells: (this.shells || []).map(c => ({ unit: c.u.ui, id: c.u.id, closed: Math.round(c.a * 100) / 100, x0: Math.round(c.u.x0), x1: Math.round(c.u.x1) })), rigOpen: !!this.scene.hud.rigOpen,
       yard: (this.yardItems || []).map(y => ({ kind: y.kind, id: y.id, x: Math.round(y.x), y0: Math.round(y.y0) })),
       rig: this.geo.units.map(u => ({ id: u.id, x0: u.x0, x1: u.x1, workshops: u.workshops.map(w => w.id) })), van: this.geo.tractor?.workshops.map(w => w.id) };
   }

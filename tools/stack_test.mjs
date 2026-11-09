@@ -81,7 +81,7 @@ s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(5); return nomad.in
 check('E öffnet das Lager oben', s.open && s.other?.key === 'store:2:0', s);
 await shot('upstairs');
 await ev(() => game.scene.getScene('play').hud.inv.close());
-// down again and a double jump from the lower trailer's floor up
+// down again and a double jump from the lower trailer's floor: since the rig is drawn ×4 the upper floor is out of reach (ladder only)
 s = await ev(() => {
   const sc = game.scene.getScene('play'), low = sc.camp.geo.units.find(u => !u.level), up = sc.camp.geo.units.find(u => u.level);
   sc.leyla.box.body.reset(low.in0 + 220, low.floorY - sc.leyla.size.h / 2); nomad.step(30);
@@ -90,7 +90,7 @@ s = await ev(() => {
   for (let i = 0; i < 70; i++) nomad.step(1, (i < 14 || (i >= dbl && i < dbl + 14)) ? ['jump'] : [], i === dbl ? ['jump'] : []);
   return { onLow, lowFloor: Math.round(low.floorY), feet: Math.round(sc.leyla.feet), upFloor: Math.round(up.floorY) };
 });
-check('Doppelsprung aus dem unteren Anhänger landet oben', s.onLow === s.lowFloor && s.feet === s.upFloor, s);
+check('Doppelsprung aus dem unteren Anhänger reicht seit Faktor 4 nicht mehr nach oben (nur Leiter; Daniel, 09.11.2026)', s.onLow === s.lowFloor && s.feet === s.lowFloor, s);
 
 // LKW: two trailers, the stack moves along as a block, the Modul-Anhänger carries too
 await ev(() => { const sc = game.scene.getScene('play'), sv = sc.box.save; sv.rig.tractor = sv.rig.units[0].id = 'lkw'; sc.camp.drawRig(); nomad.step(1, [], ['build']); nomad.step(40); });

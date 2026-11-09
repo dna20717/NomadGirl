@@ -28,7 +28,8 @@ const reload = (js = '') => ev(js0 => { const s = game.scene.getScene('play'), s
 await ev(() => { nomad.save().deltas = 20000; nomad.take(); nomad.step(5); });
 let b = await benches();
 check('Start-Rig: Kochnische und Werkbank im Wohnanhänger, Lagerregal in der Holzkiste, alle als Bilder', ['kochnische', 'werkbank', 'lagerregal'].every(id => b.some(x => x.id === id)) && b.find(x => x.id === 'lagerregal').place === '2:0', b);
-check('Ein Maßstab für alle (Camp › Rig-Ansicht, ×1,2; Regal mit Korrektur 72 %)', b.find(x => x.id === 'werkbank').scale === 1.2 && b.find(x => x.id === 'kochnische').scale === 1.2 && Math.abs(b.find(x => x.id === 'lagerregal').scale - 0.864) < 0.01, b);
+const one = await ev(() => game.scene.getScene('play').data_.camp.rig.benchScale), shelfK = await ev(() => (game.scene.getScene('play').data_.workshops.lagerregal.scale ?? 100) / 100);
+check(`Ein Maßstab für alle (Camp › Rig-Ansicht, ×${one}; Regal mit Korrektur ${Math.round(shelfK * 100)} %)`, b.find(x => x.id === 'werkbank').scale === one && b.find(x => x.id === 'kochnische').scale === one && Math.abs(b.find(x => x.id === 'lagerregal').scale - one * shelfK) < 0.01, b);
 check('Effekte angelegt (Kochnische und Werkbank)', b.find(x => x.id === 'kochnische').fx >= 5 && b.find(x => x.id === 'werkbank').fx >= 4, b);
 const shelf0 = b.find(x => x.id === 'lagerregal');
 check('Lagerregal zeigt seinen Füllstand (Start-Inventar)', shelf0.fill > 0 && shelf0.shelves >= 1, shelf0);

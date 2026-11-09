@@ -40,6 +40,11 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 #hud[data-mode="run"] .hud-camp { top: auto; bottom: 34px; }
 .hud-camp[hidden] { display: none; }
 .hud-buildbtn { position: fixed; left: 20px; top: 62px; display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 7px; border-radius: 9px; border: 1px solid #3a2f45; background: rgba(23, 17, 31, .82); color: #ffd27a; font: 22px/1 VT323, monospace; cursor: pointer; pointer-events: auto; }
+.hud-openbtn { position: fixed; left: 20px; top: 106px; display: flex; align-items: center; gap: 7px; padding: 6px 12px 6px 10px; border-radius: 9px; border: 1px solid #3a2f45; background: rgba(23, 17, 31, .82); color: #c9c2d6; font: 22px/1 VT323, monospace; cursor: pointer; pointer-events: auto; }
+.hud-openbtn:hover { border-color: #ffd27a; background: rgba(43, 32, 52, .92); }
+.hud-openbtn[hidden] { display: none; }
+.hud-openbtn.on { color: #ffd27a; border-color: #6b5530; }
+.hud-openbtn svg { width: 16px; height: 16px; }
 .hud-buildbtn:hover { border-color: #ffd27a; background: rgba(43, 32, 52, .92); }
 .hud-buildbtn kbd { display: inline-grid; place-items: center; min-width: 22px; height: 22px; border-radius: 5px; background: #ffd27a; color: #17111f; font: 18px/1 VT323, monospace; }
 .hud-buildbtn[hidden], #hud[data-building] .hud-buildbtn { display: none; }

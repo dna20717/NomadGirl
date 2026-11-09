@@ -23,12 +23,27 @@
   "value": 900,
   "storage": [4, 2],
   "storageName": "Staufach",
-  "look": "container_stack",
-  "inside": {"x": [33, 224], "y": [90, 175]},
+  "inside": {"x": [26, 229], "y": [90, 175]},
   "deck": 73,
-  "carries": true
+  "carries": true,
+  "look": "container_open_2",
+  "lookClosed": "container_closed_2"
  },
- "container_40": {"name": "40-Fuß-Container", "kind": "shipping", "places": 3, "weight": 3800, "stackable": true, "value": 1500, "storage": [5, 2], "storageName": "Staufach", "carries": true},
+ "container_40": {
+  "name": "40-Fuß-Container",
+  "kind": "shipping",
+  "places": 3,
+  "weight": 3800,
+  "stackable": true,
+  "value": 1500,
+  "storage": [5, 2],
+  "storageName": "Staufach",
+  "carries": true,
+  "inside": {"x": [26, 330], "y": [90, 175]},
+  "deck": 73,
+  "look": "container_open_3",
+  "lookClosed": "container_closed_3"
+ },
  "modulanhaenger": {
   "name": "Modul-Anhänger",
   "kind": "trailer",
@@ -42,5 +57,21 @@
   "storage": [3, 2],
   "storageName": "Deichselkasten",
   "description": "Lila Kasten auf zwei Achsen. Flaches Dach, da passt noch ein Container drauf."
+ },
+ "container_10": {
+  "name": "10-Fuß-Container",
+  "kind": "shipping",
+  "places": 1,
+  "weight": 1400,
+  "value": 500,
+  "stackable": true,
+  "carries": true,
+  "storage": [3, 2],
+  "storageName": "Staufach",
+  "inside": {"x": [26, 128], "y": [90, 175]},
+  "deck": 73,
+  "description": "Der Kleine: fasst genau eine Werkstatt.",
+  "look": "container_open_1",
+  "lookClosed": "container_closed_1"
  }
 }

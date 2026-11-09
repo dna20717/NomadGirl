@@ -1,5 +1,6 @@
 // HUD as HTML over the canvas: health, ammo, dash, time, kills, Δ, banners and the controls overlay.
 import { el } from '../ui.js';
+import { icon } from '../icons.js';
 import { clockText } from '../save.js';
 
 const CONTROLS = [
@@ -20,6 +21,10 @@ export class Hud {
     this.menuEl = el('div', { class: 'hud-menu', hidden: true });
     this.campEl = el('div', { class: 'hud-camp', hidden: true });
     // the rig can be rebuilt any time in the camp: B or this button (Daniel, 08.11.2026: "kein Umweg über einen Warroom mehr")
+    // „Rig offen“ (Daniel, 09.11.2026: only a button, no key): all closed containers stay open; remembered in this browser
+    try { this.rigOpen = localStorage.getItem('nomadgirl-rig-open') === '1'; } catch { this.rigOpen = false; }
+    this.openBtn = el('button', { class: 'hud-openbtn', hidden: true, onclick: e => { e.currentTarget.blur(); this.setRigOpen(!this.rigOpen); } });
+    this.setRigOpen(this.rigOpen);
     this.buildBtn = el('button', { class: 'hud-buildbtn', hidden: true, title: 'Rig bauen: Werkstätten und Anhänger mit der Maus ziehen', onclick: e => { e.currentTarget.blur(); this.scene?.openBuild(); } }, el('kbd', {}, 'B'), el('span', {}, 'Rig bauen'));
     this.modal = false;
     document.addEventListener('keydown', e => this.menuKey(e), true);
@@ -38,7 +43,7 @@ export class Hud {
         el('div', { class: 'hud-right' },
           el('div', { class: 'hud-row' }, this.roomName),
           el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'ZEIT'), this.time, el('span', { class: 'hud-label' }, 'KILLS'), this.kills, el('span', { class: 'hud-label' }, 'Δ'), this.deltas))),
-      this.campEl, this.buildBtn, this.bannerEl, this.promptEl, this.menuEl, this.help,
+      this.campEl, this.buildBtn, this.openBtn, this.bannerEl, this.promptEl, this.menuEl, this.help,
       el('div', { class: 'hud-foot' }, 'H: Steuerung · Rücktaste: Neustart · ', el('a', { href: 'workshop.html' }, 'Werkstatt'), ' · ', el('a', { href: './' }, 'Start'),
         this.newGame = el('span', { hidden: true }, ' · ', el('a', { href: 'game.html?camp&new', onclick: e => { if (!confirm('Spielstand löschen und neu anfangen?')) e.preventDefault(); } }, 'Neues Spiel'))));
     this.root = root;
@@ -47,6 +52,14 @@ export class Hud {
 
   firstKey() {}
 
+  setRigOpen(on) {
+    this.rigOpen = !!on;
+    try { localStorage.setItem('nomadgirl-rig-open', on ? '1' : '0'); } catch { /* private mode */ }
+    this.openBtn.classList.toggle('on', this.rigOpen);
+    this.openBtn.title = this.rigOpen ? 'Rig offen: alle Container bleiben offen. Klicken: zu, außer Leyla ist in der Nähe' : 'Container sind zu und öffnen sich, wenn Leyla in der Nähe ist. Klicken: alle offen lassen';
+    this.openBtn.replaceChildren(icon(this.rigOpen ? 'door' : 'box', 16), el('span', {}, this.rigOpen ? 'Rig offen' : 'Rig zu'));
+  }
+
   // camp / run / test: which parts of the HUD show
   mode(mode, save, D) {
     this.modeName = mode; this.save = save; this.D = D;
@@ -54,6 +67,7 @@ export class Hud {
     this.campEl.hidden = !save;
     this.newGame.hidden = mode !== 'camp';
     this.buildBtn.hidden = mode !== 'camp';
+    this.openBtn.hidden = mode !== 'camp';
     this.prompt(null);
     this.closeMenu();
   }

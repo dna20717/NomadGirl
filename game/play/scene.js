@@ -52,7 +52,7 @@ export class PlayScene extends Phaser.Scene {
       if (this.data_.camp?.fire?.sit?.look) ids.add(this.data_.camp.fire.sit.look);
       if (this.data_.camp?.chest?.look) ids.add(this.data_.camp.chest.look);
       // every container's look: bought or stacked ones appear while building, without reloading the scene
-      for (const c of Object.values(this.data_.containers || {})) if (c.look) ids.add(c.look);
+      for (const c of Object.values(this.data_.containers || {})) for (const k of [c.look, c.lookClosed]) if (k) ids.add(k);
       for (const c of Object.values(this.data_.rigParts || {})) if (c.look) ids.add(c.look);
       // workshop pictures (and the empty shelf), the crate for packed workshops
       for (const w of Object.values(this.data_.workshops || {})) for (const id of [w.look, w.lookEmpty]) if (id) ids.add(id);
