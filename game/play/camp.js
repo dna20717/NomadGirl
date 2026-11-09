@@ -480,17 +480,35 @@ export class Camp {
     g.generateTexture(key, Math.ceil(u.x1 - u.x0), Math.ceil(h + 44)); g.destroy();
     add(s.add.image(u.x0 - mid, u.inTop - 40 - G, key).setOrigin(0));
     if (this.benchShade) { add(this.benchShade); this.benchShade = null; }
-    // a divider between two workshop places, cut from the container's own picture (Container › Trennwand aus dem Bild, Daniel 09.11.2026)
+    // a divider between two workshop places, cut from the container's own picture (Container › Trennwand aus dem Bild, Daniel 09.11.2026):
+    // only some columns (narrow post), its foot somewhere on the floor between back wall and front edge so Leyla walks past it in front,
+    // a stepped shadow on the floor at its foot and on the back wall beside it
     const dv = u.def.divider;
     if (u.sprite && dv?.x?.length === 2 && dv?.y?.length === 2 && u.places > 1 && s.textures.exists(u.sprite.key)) {
-      const [dx0, dx1] = dv.x, [dy0, dy1] = dv.y, w = dx1 - dx0 + 1, hh = dy1 - dy0 + 1, tk = `divider_${u.sprite.key}_${dx0}_${dx1}_${dy0}_${dy1}`;
+      const k = u.sprite.k, [dx0, dx1] = dv.x, [dy0, dy1] = dv.y, [top, front] = u.def.inside?.y || [dy0, dy1];
+      const cols = String(dv.keep || '').split(',').map(Number).filter(c => Number.isFinite(c) && c >= dx0 && c <= dx1);
+      const keep = cols.length ? cols : Array.from({ length: dx1 - dx0 + 1 }, (_, i) => dx0 + i);
+      const foot = Math.min(front, dv.foot ?? front), r0 = Math.max(dy0, dy1 - (foot - top)), hh = dy1 - r0 + 1, w = keep.length;
+      const tk = `divider_${u.sprite.key}_${keep.join('-')}_${r0}_${dy1}`;
       if (!s.textures.exists(tk)) {
-        const c = s.textures.createCanvas(tk, w, hh);
-        c.getContext().drawImage(s.textures.get(u.sprite.key).getSourceImage(), dx0, dy0, w, hh, 0, 0, w, hh); c.refresh();
+        const c = s.textures.createCanvas(tk, w, hh), src = s.textures.get(u.sprite.key).getSourceImage();
+        keep.forEach((x, i) => c.getContext().drawImage(src, x, r0, 1, hh, i, 0, 1, hh)); c.refresh();
       }
       s.textures.get(tk).setFilter(NEAREST());
-      const inner = (u.def.inside?.y?.[1] ?? dy1) - dy1;   // rows between the divider's foot and the floor's front edge
-      for (let i = 1; i < u.places; i++) add(s.add.image(u.in0 + i * u.cell - mid, u.floorY - inner * u.sprite.k - G, tk).setOrigin(0.5, 1).setScale(u.sprite.k).setFlipX(u.sprite.flip));
+      const a = (dv.shadow ?? 0) / 100, back = dv.back ?? foot, footY = u.floorY - (front - foot) * k, backY = u.floorY - (front - back) * k;
+      for (let i = 1; i < u.places; i++) {
+        const x = u.in0 + i * u.cell, half = w * k / 2;
+        if (a > 0) {
+          const sh = s.add.graphics();
+          // back wall beside the post (two steps), then the floor: a dark patch at the foot that thins out towards the front
+          [[0.45, 1], [0.2, 2]].forEach(([o, d]) => sh.fillStyle(0x07060a, a * o).fillRect(x - half - d * k, u.inTop, d * k, backY - u.inTop).fillRect(x + half, u.inTop, d * k, backY - u.inTop));
+          sh.fillStyle(0x07060a, a * 0.55).fillRect(x - half - k, backY, w * k + 2 * k, footY - backY + k);
+          sh.fillStyle(0x07060a, a * 0.3).fillRect(x - half - 2 * k, footY + k, w * k + 4 * k, k);
+          sh.fillStyle(0x07060a, a * 0.14).fillRect(x - half - 3 * k, footY + 2 * k, w * k + 6 * k, k);
+          sh.x = -mid; sh.y = -G; add(sh);
+        }
+        add(s.add.image(x - mid, footY - G, tk).setOrigin(0.5, 1).setScale(k).setFlipX(u.sprite.flip));
+      }
     }
     // Deichselkasten: a little steel box on the drawbar (code), E opens the trailer's own storage
     if (u.def.storage?.[0]) {
