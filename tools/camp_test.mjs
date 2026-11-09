@@ -3,6 +3,7 @@
 //   node tools/camp_test.mjs [--shots]   pictures to output/camp_*.png
 import fs from 'node:fs';
 import { chromium } from 'playwright';
+import { furnishedStart } from './test_fixture.mjs';
 
 const url = (process.env.GAME_URL || 'http://localhost:8766/game.html') + '?camp&new';
 const shots = process.argv.includes('--shots');
@@ -11,6 +12,7 @@ const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
 const errors = [], ok = [];
 page.on('pageerror', e => errors.push(e.message));
 page.on('console', m => { if (m.type() === 'error' && !/\/api\/|version\.json/.test(m.location()?.url || '')) errors.push(m.text()); });
+await furnishedStart(page);   // workshops in the rig at the start (tools/test_fixture.mjs)
 await page.goto(url);
 await page.waitForFunction(() => window.nomad && window.game?.scene.getScene('play')?.camp, null, { timeout: 20000 });
 const ev = f => page.evaluate(f);

@@ -63,7 +63,7 @@ test('rename: references in all areas follow (ref, refs, table)', async () => {
   assert.deepEqual(usages(p, 'items', 'kupferkabel'), []);
   renameEntry(p, 'workshops', 'werkbank', 'bastelbank');
   assert.equal(p.data.recipes.verband.station, 'bastelbank');
-  assert.ok(p.data.game.start.workshops.includes('bastelbank'));
+  assert.ok([...p.data.game.start.workshops, ...(p.data.game.start.spare || [])].includes('bastelbank'));
   assert.ok(p.data.companions.schraube.workshops.includes('bastelbank'));
   assert.deepEqual(validateProject(p).filter(m => m.kind === 'error'), []);
 });
@@ -77,7 +77,7 @@ test('remove: references are cleared', async () => {
 
 test('start rig: places, power and weight are checked', async () => {
   const p = await load();
-  p.data.game.start.workshops.push('kueche');
+  p.data.game.start.workshops.push('kueche', 'kueche');   // the second one finds no room
   assert.ok(validateProject(p).some(m => m.place.area === 'game' && /Plätze/.test(m.text)));
 });
 

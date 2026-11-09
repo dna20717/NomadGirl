@@ -75,7 +75,7 @@
  "heal": {"sleep": 100, "fire": 25, "afterKo": 30},
  "interactRange": 130,
  "fallbackRoom": "kampfraum",
- "chest": {"enabled": true, "look": "chest", "at": 16, "flip": false, "grid": [6, 4]},
+ "chest": {"enabled": true, "look": "chest", "at": 16, "flip": false, "grid": [8, 5]},
  "sound": {
   "wind": "sound_wind",
   "windVolume": 22,
@@ -101,6 +101,7 @@
   "rows": [163, 204],
   "couple": 172,
   "frontMin": 12,
-  "axles": {"1": 1, "2": 2, "3": 2}
+  "axles": {"1": 1, "2": 2, "3": 2},
+  "beamRows": 15
  }
 }

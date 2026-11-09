@@ -71,7 +71,7 @@ function newInventory(D, save) {
   for (const c of conts) ensureGrid(D, inv, c.key, c.size);
   const firstStore = conts.find(c => c.key.startsWith('store:'))?.key;
   for (const row of S.inventory || []) {
-    const key = row.where === 'chest' ? 'chest' : row.where === 'storage' ? firstStore : 'backpack', g = key && inv.grids[key];
+    const key = row.where === 'chest' ? 'chest' : row.where === 'storage' ? firstStore || 'chest' : 'backpack', g = key && inv.grids[key];   // no storage at the start: into the chest
     const [a, id] = row.item ? ['items', row.item] : row.weapon ? ['weapons', row.weapon] : row.backpack ? ['backpacks', row.backpack] : [];
     if (g && a && D[a]?.[id]) add(D, g, a, id, row.count || 1);
   }
@@ -80,7 +80,8 @@ function newInventory(D, save) {
 
 export function newSave(D) {
   const S = D.game?.start || {}, C = D.camp?.clock || {};
-  const { units } = placeWorkshops(D, S.tractor, S.containers || [], S.workshops || []);
+  const { units, left } = placeWorkshops(D, S.tractor, S.containers || [], S.workshops || []);
+  const spare = [...(S.spare || []), ...left].filter(id => D.workshops?.[id]);   // packed on the scrapyard: Spiel › Start › Verpackt auf dem Schrottplatz, plus what did not fit
   return withInventory(D, {
     version: SAVE_VERSION,
     day: C.startDay ?? 1, hour: C.startHour ?? 18,
@@ -88,7 +89,7 @@ export function newSave(D) {
     fuel: S.fuel ?? 40, food: S.food ?? 6, deltas: S.deltas ?? D.economy?.startDeltas ?? 0,
     health: D.leyla?.health ?? 100,
     buffs: [],
-    rig: { tractor: S.tractor, units, spare: { workshops: [], containers: [], parts: [] }, parts: {} },
+    rig: { tractor: S.tractor, units, spare: { workshops: spare, containers: [], parts: [] }, parts: {} },
     companions: [...(S.companions || [])],
     recipes: startRecipes(D),
     run: null,
@@ -160,7 +161,7 @@ export function repairSave(save, D) {
   for (const u of s.rig.units) u.workshops = (u.workshops || []).filter(w => D.workshops?.[w.id]);
   refit(D, s);
   // stacks stay whole: a level is at most one above the unit before it, nothing stands on the tractor
-  s.rig.units.forEach((u, i) => { const prev = s.rig.units[i - 1]; if (!u.level) return; const max = !prev || prev.kind === 'tractor' ? 0 : (prev.level || 0) + 1; if (u.level > max) u.level = max; if (!u.level) delete u.level; });
+  s.rig.units.forEach((u, i) => { const prev = s.rig.units[i - 1]; if (!u.level) { delete u.slot; return; } const max = !prev || prev.kind === 'tractor' ? 0 : (prev.level || 0) + 1; if (u.level > max) u.level = max; if (!u.level) { delete u.level; delete u.slot; } });   // a slot only counts on a stack
   const sp = s.rig.spare || {};
   s.rig.spare = { workshops: (sp.workshops || []).filter(w => D.workshops?.[w]), containers: (sp.containers || []).filter(c => D.containers?.[c]), parts: (sp.parts || []).filter(c => D.rigParts?.[c]) };
   // rig parts were things in the inventory for a morning (08.11.2026): they move onto the scrapyard

@@ -35,7 +35,7 @@ export function chassisPlan(D, def) {
   else { const gap = rest / (axles - 1); for (let i = 0; i < axles; i++) { segs.push(C.axle); if (i < axles - 1) segs.push(...mids(Math.round(gap * (i + 1)) - Math.round(gap * i))); } }
   segs.push(C.rear);
   const width = segs.reduce((n, r) => n + w(r), 0), drawbar = w(C.drawbar);
-  return { segs, width, drawbar, bed: width - drawbar, pad, rows: C.rows || [163, 204], couple: C.couple ?? 172, look: C.look, key: `chassis_${segs.map(r => r.join('-')).join('_')}` };
+  return { segs, width, drawbar, bed: width - drawbar, pad, rows: C.rows || [163, 204], couple: C.couple ?? 172, look: C.look, middle: C.middle, beam: C.beamRows ?? 15, key: `chassis_${segs.map(r => r.join('-')).join('_')}_b${C.beamRows ?? 15}` };
 }
 // the chassis as a texture: the pieces side by side, mirrored so the drawbar points to the van (right)
 export function chassisTexture(scene, plan) {
@@ -45,6 +45,10 @@ export function chassisTexture(scene, plan) {
   const tex = scene.textures.createCanvas(plan.key, plan.width, h), ctx = tex.getContext();
   ctx.imageSmoothingEnabled = false;
   ctx.translate(plan.width, 0); ctx.scale(-1, 1);
+  // behind everything: the long beam of the middle piece, all the way from the drawbar to the rear, so no gap shows where the
+  // pieces meet (fender corners, rear) – Daniel, 09.11.2026: „Lücken zwischen den Tiles … Tiles hinter die Lücken legen“
+  const [m0, m1] = plan.middle, bh = Math.min(h, plan.beam || 15);
+  for (let bx = plan.drawbar; bx < plan.width; bx += m1 - m0) { const w = Math.min(m1 - m0, plan.width - bx); ctx.drawImage(src, m0, y0, w, bh, bx, 0, w, bh); }
   let x = 0;
   for (const [a, b] of plan.segs) { ctx.drawImage(src, a, y0, b - a, h, x, 0, b - a, h); x += b - a; }
   tex.refresh(); tex.setFilter(NEAREST());
@@ -85,7 +89,9 @@ export function rigUnits(D, rig, vanLeft, ground, T = 64) {
     if (u.kind === 'tractor') return;
     const def = D.containers?.[u.id] || {};
     if (u.level && below) {
-      const base = below.deckY, sh = unitShape(D, def, base, T, { stacked: true }), mid = below.in0 + below.cell * below.places / 2, x0 = mid - (sh.in0 + sh.cell * sh.places / 2);
+      // container slots: offset 0 … P − p from the left edge of the interior below (u.slot), otherwise centred
+      const base = below.deckY, sh = unitShape(D, def, base, T, { stacked: true }), wB = below.cell * below.places, wT = sh.cell * sh.places, n = below.places - sh.places;
+      const x0 = u.slot != null && n > 0 ? below.in0 + (wB - wT) * Math.min(u.slot, n) / n - sh.in0 : below.in0 + wB / 2 - (sh.in0 + wT / 2);
       below = { ...u, ui, def, ...sh, base, x0, x1: x0 + sh.w, in0: x0 + sh.in0, sprite: sh.sprite && { ...sh.sprite, cx: x0 + sh.sprite.cx }, foot: below.foot ?? below };
       out.push(below);
       return;
@@ -442,7 +448,7 @@ export class Camp {
       const def = D.workshops?.[w.id] || {}, cx = u.in0 + w.at * u.cell - u.x0, cw = (def.places || 1) * u.cell, place = `${u.ui}:${w.at}`;
       // Daniel's picture with its lights and effects (benches.js), otherwise furniture from code
       const px0 = u.in0 + w.at * u.cell, clip = { x0: px0, x1: px0 + cw, y0: u.inTop, y1: u.floorY + 4 };   // the place inside the container
-      const art = this.benches.add({ id: w.id, place, x0: px0, w: cw, floor: u.floorY, h, view, mid, G, grid: def.grid && `store:${place}`, clip });
+      const art = this.benches.add({ id: w.id, place, x0: px0, w: cw, floor: u.floorY, h, view, mid, G, grid: def.grid && `store:${place}`, clip, unitScale: (u.def.benchScale ?? 100) / 100 });
       if (art) shades.push(clip);
       if (!art) furniture(g, def.function, cx, h + 40, cw, h, R.light || '#ffcf7a');
       if (!u.sprite && !art) g.fillStyle(0x0d0a12).fillRect(cx + cw / 2 - 26, 40 + 22, 52, 34).fillStyle(col(R.light || '#ffcf7a')).fillRect(cx + cw / 2 - 22, 40 + 26, 44, 26);   // window

@@ -7,7 +7,7 @@ Stand 07.11.2026 · Entwurf von Daniel, mit Ava überarbeitet. Die Zahlen im Spi
 NomadGirl ist ein 2D-Action-Roguelite mit Cosy-Basisbau: Leyla plündert gefährliche Orte und lebt dazwischen in ihrem rollenden Zuhause, dem Rig.
 
 - **Heldin:** Leyla, Schrottsammlerin in den Wastelands rund um BigCityDelta.
-- **Rig:** Zu Beginn ein Pickup mit Wohnanhänger, später ein LKW mit gestapelten Containern.
+- **Rig:** Zu Beginn der Van mit einem leeren Modul-Anhänger (die ersten Werkstätten liegen verpackt bereit), später ein LKW mit gestapelten Containern.
 - **Ziel:** Schrott, Ressourcen, Lebensmittel und Ausrüstung sammeln.
 - **Gefahr:** Mutanten, Gegner und Dinge, über die man in BigCityDelta lieber nicht spricht.
 - **Prinzip:** High Risk, High Reward. Je tiefer Leyla in einen Ort vordringt, desto besser die Beute und desto größer der mögliche Verlust.

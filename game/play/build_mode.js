@@ -13,7 +13,7 @@ import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { budgets, act, snapshot, restore, lift, place, fits, at as wsAt, toSpare, fromSpare, stow, buyWorkshop, sellWorkshop, buyContainer, sellContainer, buyPart, sellPart, mountPart, unmountPart, SLOT_NAMES as PART_SLOTS, stackOn, stackTop, blockAt, levelOf, attachAt, detach, moveContainer, shop, priceOf, sellPrice, wsDef, placesOf } from '../rig.js';
 import { clockText } from '../save.js';
-import { workshopTexture, partView, socketRects } from './camp.js';
+import { workshopTexture, partView, socketRects, unitShape } from './camp.js';
 import { makeSfx } from './sfx.js';
 
 const FN_COLORS = { storage: '#5c6b7a', cooling: '#4a7a9a', cell: '#5a4a4a', sleep: '#6a5a9a', chill: '#9a4a7a', drone: '#3a8a6a', warroom: '#7a6a3a', kitchen: '#a8642a', foodtruck: '#c0703a', craft: '#7a6235', engine: '#5a5a5a', power: '#a8862a' };
@@ -210,16 +210,28 @@ export class BuildMode {
     }
     return out;
   }
-  // stacking spots: on top of every block whose top unit carries (and the tractor allows one more level)
-  stacks() {
+  // stacking spots: on top of every block whose top unit carries (and the tractor allows one more level). Container slots
+  // (Daniel, 09.11.2026): a shorter container gets one spot per offset (left … right), shown only while a container hangs at the pointer.
+  // The top container of a stack may also move to another slot of its own stack (own: true).
+  stacks(d = this.drag) {
     const D = this.D, U = this.save.rig.units, geo = this.camp.geo, out = [];
+    const def = D.containers?.[d?.id], p = def?.places || 1, sh = def ? unitShape(D, def, 0, this.scene.T, { stacked: true }) : null;
+    const spots = (onto, below, extra = {}) => {
+      const wB = below.cell * below.places, wT = sh ? sh.cell * sh.places : wB, n = below.places - p;
+      if (n <= 0 || !def) return [{ onto, x: below.in0 + wB / 2, y: below.deckY, w: Math.min(wB, wT), ...extra }];   // nothing in the hand: one spot per stack
+      return Array.from({ length: n + 1 }, (_, k) => ({ onto, slot: k, x: below.in0 + (wB - wT) * k / n + wT / 2, y: below.deckY, w: wT, ...extra }));
+    };
     U.forEach((u, ui) => {
       if (u.kind !== 'container' || levelOf(u) > 0) return;
       const st = stackTop(D, this.save.rig, ui);
       if (st.reason) return;
       const top = geo.units.find(x => x.ui === st.end - 1);
-      if (top) out.push({ onto: ui, block: [ui, st.end], x: top.in0 + top.cell * top.places / 2, y: top.deckY, w: top.cell * top.places });
+      if (top) out.push(...spots(ui, top));
     });
+    if (d?.from === 'rig' && levelOf(U[d.ui]) > 0) {
+      const [a, b] = blockAt(U, d.ui), below = geo.units.find(x => x.ui === d.ui - 1);
+      if (d.ui === b - 1 && below) out.push(...spots(a, below, { own: true }).filter(sp => sp.slot !== U[d.ui].slot && sp.slot != null));
+    }
     return out;
   }
   // the thing under the pointer: a workshop (rig or yard), a trailer (rig or yard), the dealer's pad
@@ -341,9 +353,9 @@ export class BuildMode {
         let sb = null, sd = (this.B.view?.snap ?? 260) * 1.2;
         const U = this.save.rig.units, mine = d.from === 'rig' ? blockAt(U, d.ui) : null;
         for (const st of this.stacks()) {
-          if (mine && st.onto === mine[0]) continue;   // on its own stack
+          if (mine && st.onto === mine[0] && !st.own) continue;   // on its own stack (only another slot of it)
           const dist = Math.hypot(x - st.x, d.y + d.hang + 14 - st.y);
-          if (dist < sd) { sd = dist; sb = { type: 'stack', onto: st.onto, x: st.x, y: st.y, w: st.w }; }
+          if (dist < sd) { sd = dist; sb = { type: 'stack', onto: st.onto, slot: st.slot, x: st.x, y: st.y, w: st.w }; }
         }
         if (sb) return sb;
       }
@@ -445,7 +457,7 @@ export class BuildMode {
       label = d.from === 'rig' ? `${name} umgehängt` : `${name} angekuppelt`; after = 'coupled';
       fxAt = { x: t.x, y: this.camp.ground - 40, coupling: true };
     } else if (d.kind === 'container' && t.type === 'stack') {
-      r = act(D, save, dd => stackOn(D, dd, d.from === 'yard' ? { spare: d.i } : { ui: d.ui }, t.onto));
+      r = act(D, save, dd => stackOn(D, dd, d.from === 'yard' ? { spare: d.i } : { ui: d.ui }, t.onto, t.slot));
       label = `${name} gestapelt`; after = 'stacked';
       fxAt = { x: t.x, y: t.y, unit: t.onto };
     } else if (d.kind === 'container' && t.type === 'yard') {
@@ -502,11 +514,12 @@ export class BuildMode {
       if (unit) this.bounce(unit.view, 1); else for (const it of camp.yardItems) if (Math.abs(it.x - fxAt.x) < 140) this.bounce(it.view, 0.6);
     }
     if ((V.shake ?? 40) > 0 && after !== 'sold') s.cam.shake(110, 0.0012 * (V.shake ?? 40) / 40 * (d.weight || 1));
-    // Leyla walks over and screws (Rig-Bau › Werkeln)
+    // Leyla walks over and screws (Rig-Bau › Werkeln). Off (Daniel, 09.11.2026: „hält nur alles auf“): it is done at once,
+    // „Rückgängig“ works for every action until building ends
     const W = this.B.work || {}, secs = clamp((W.seconds ?? 1.2) + (r.minutes || 0) / 60 * (W.perHour ?? 0.6), 0.4, 6);
-    const job = { x: this.reach(fxAt.x), fx: fxAt.x, fy: fxAt.y - 30, secs, label, minutes: r.minutes || 0, state: 'wait' };
-    this.jobs.push(job);
-    this.undo.push({ snap: before, label, job, done: false });
+    const job = W.enabled === false ? null : { x: this.reach(fxAt.x), fx: fxAt.x, fy: fxAt.y - 30, secs, label, minutes: r.minutes || 0, state: 'wait' };
+    if (job) this.jobs.push(job);
+    this.undo.push({ snap: before, label, job, at: { x: fxAt.x, y: fxAt.y }, done: false });
     const add = [r.minutes ? `+${r.minutes} min` : null, r.deltas ? `${r.deltas > 0 ? '+' : ''}${r.deltas} Δ` : null].filter(Boolean).join(' · ');
     this.say(`${label}${add ? ' · ' + add : ''}`, 'ok');
   }
@@ -524,10 +537,9 @@ export class BuildMode {
     if (!this.active || !top || top.done || this.drag) return;
     this.undo.pop();
     restore(this.save, top.snap);
-    this.jobs = this.jobs.filter(j => j !== top.job);
-    if (this.job === top.job) { this.job = null; this.working = false; }
+    if (top.job) { this.jobs = this.jobs.filter(j => j !== top.job); if (this.job === top.job) { this.job = null; this.working = false; } }
     this.camp.drawRig();
-    this.scene.fx.puff(top.job.fx, this.camp.ground - 10, 0xb9a2c8);
+    this.scene.fx.puff(top.at?.x ?? top.job?.fx ?? 0, this.camp.ground - 10, 0xb9a2c8);
     this.say(`Rückgängig: ${top.label}`, 'ok');
   }
 
@@ -599,11 +611,11 @@ export class BuildMode {
         if (hot) g.fillStyle(0xffd27a, 0.12).fillRoundedRect(sl.x0 + 6, sl.y0 + 6, sl.x1 - sl.x0 - 12, sl.y1 - sl.y0 - 12, 10);
       } else {
         if (D.containers?.[d.id]?.stackable) for (const st of this.stacks()) {
-          const mine = d.from === 'rig' && blockAt(this.save.rig.units, d.ui)[0] === st.onto, hot = t?.type === 'stack' && t.onto === st.onto;
+          const mine = d.from === 'rig' && blockAt(this.save.rig.units, d.ui)[0] === st.onto && !st.own, hot = t?.type === 'stack' && t.onto === st.onto && t.slot === st.slot;
           if (mine) continue;
-          g.lineStyle(lw * 1.4, hot ? 0xffd27a : 0x3fe0d0, hot ? 1 : pulse).lineBetween(st.x - st.w / 2, st.y, st.x + st.w / 2, st.y);
+          if (hot || st.slot == null) g.lineStyle(lw * 1.4, hot ? 0xffd27a : 0x3fe0d0, hot ? 1 : pulse).lineBetween(st.x - st.w / 2, st.y, st.x + st.w / 2, st.y);   // slots: only the one under the container shows its full width
           g.lineStyle(lw, hot ? 0xffd27a : 0x3fe0d0, hot ? 1 : pulse * 0.6).strokeTriangle(st.x - 14, st.y - 30, st.x + 14, st.y - 30, st.x, st.y - 10);
-          if (hot) label(st.x, st.y - 36, 'Stapeln', '#ffd27a');
+          if (hot) label(st.x, st.y - 36, st.own ? 'Umsetzen' : 'Stapeln', '#ffd27a');
         }
         for (const gp of this.gaps()) {
         if (d.from === 'rig' && !levelOf(this.save.rig.units[d.ui]) && blockAt(this.save.rig.units, d.ui).includes(gp.g)) continue;
@@ -650,7 +662,7 @@ export class BuildMode {
     return {
       slots: this.slots().map(sl => ({ ui: sl.ui, p: sl.p, ws: wsAt(D, this.save.rig, sl.ui, sl.p)?.id || null, ...mid(sl) })),
       gaps: this.gaps().map(gp => ({ g: gp.g, ...scr(gp.x, gp.y) })),
-      stacks: this.stacks().map(st => ({ onto: st.onto, ...scr(st.x, st.y) })),
+      stacks: this.stacks().map(st => ({ onto: st.onto, slot: st.slot ?? null, own: !!st.own, ...scr(st.x, st.y) })),
       units: this.camp.geo.units.map(u => ({ ui: u.ui, id: u.id, level: u.level || 0, ...scr((u.in0 + u.in0 + u.cell * u.places) / 2, u.inTop - 20) })),
       yard: (this.camp.yardItems || []).map(it => ({ kind: it.kind, i: it.i, id: it.id, ...mid(it) })),
       sockets: this.sockets().map(so => ({ slot: so.slot, i: so.i, id: so.id, ...scr(so.cx, so.cy) })),

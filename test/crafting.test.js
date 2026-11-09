@@ -5,9 +5,10 @@ import { newSave, repairSave, clockText } from '../game/save.js';
 import { recipesFor, stock, craft, experiment, match, readable, read, tips, use, give, take, have } from '../game/crafting.js';
 import { add, count } from '../game/inventory.js';
 import { loadProject } from '../engine/project.js';
+import { classicRig } from './fixture.js';
 import { nodeLoader } from '../tools/loader.js';
 
-const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
+const D = classicRig((await loadProject(nodeLoader('projects/nomadgirl'))).data);   // furnished start rig, whatever the data say
 const fresh = () => { const s = newSave(D); s.hour = 18.5; return s; };
 
 test('Rezeptbuch: am Anfang alle Rezepte „Von Anfang an“, alte Spielstände bekommen sie dazu', () => {

@@ -276,15 +276,31 @@ export function moveContainer(D, d, ui, gap) {
   const t = takeOut(U, ui);
   if (t.reason) return { ok: false, reason: t.reason };
   const shift = t.units[0].level || 0;
-  for (const x of t.units) x.level = (x.level || 0) - shift || undefined;
+  for (const x of t.units) { x.level = (x.level || 0) - shift || undefined; if (!x.level) delete x.slot; }
   const at = target ? U.indexOf(target) : U.length;
   U.splice(at, 0, ...t.units);
   spend(D, d, 0, M(D, 'container', 90));
   return { ok: true };
 }
-// stack a container onto the block of unit `onto`: from = { spare: i } (scrapyard) or { ui } (a container in the rig without anything on it)
-export function stackOn(D, d, from, onto) {
-  const U = d.rig.units, st = stackTop(D, d.rig, onto);
+// container slots (Daniel, 09.11.2026: „einen kurzen Container auf einen langen links oder rechts ausrichten“): a container with
+// p places on a top unit with P places can stand at offset 0 … P − p (0 = left, P − p = right); same length or longer = centred
+export const stackSlots = (D, topId, id) => Math.max(0, (D.containers?.[topId]?.places || 1) - (D.containers?.[id]?.places || 1));
+// stack a container onto the block of unit `onto`: from = { spare: i } (scrapyard) or { ui } (a container in the rig without anything on it);
+// slot = offset in places on the unit below (see stackSlots), leave out = centred
+export function stackOn(D, d, from, onto, slot) {
+  const U = d.rig.units;
+  if (from.ui != null && levelOf(U[from.ui]) > 0) {   // the top of this very block: only moves to another slot
+    const [a, b] = blockAt(U, from.ui);
+    if (onto >= a && onto < b && from.ui === b - 1) {
+      const u = U[from.ui], max = stackSlots(D, U[from.ui - 1]?.id, u.id);
+      const to = slot == null || !max ? undefined : Math.max(0, Math.min(max, slot));
+      if (to === u.slot) return { ok: false, reason: 'Steht schon da', same: true };
+      u.slot = to;
+      spend(D, d, 0, M(D, 'move', 30));
+      return { ok: true };
+    }
+  }
+  const st = stackTop(D, d.rig, onto);
   if (st.reason) return { ok: false, reason: st.reason };
   const id = from.spare != null ? d.rig.spare.containers[from.spare] : U[from.ui]?.id, def = D.containers?.[id];
   if (!def) return { ok: false, reason: 'Weg' };
@@ -297,8 +313,9 @@ export function stackOn(D, d, from, onto) {
     if (hasAbove(U, from.ui)) return { ok: false, reason: 'Erst den Container darüber abnehmen' };
     unit = takeOut(U, from.ui).units[0];
   }
-  const top = st.top, at = U.indexOf(top) + 1;
+  const top = st.top, at = U.indexOf(top) + 1, max = stackSlots(D, top.id, unit.id);
   unit.level = levelOf(top) + 1;
+  unit.slot = slot == null || !max ? undefined : Math.max(0, Math.min(max, slot));
   U.splice(at, 0, unit);
   spend(D, d, 0, M(D, 'stack', M(D, 'container', 90)));
   return { ok: true };
@@ -341,7 +358,7 @@ export function applyDraft(D, save, d) {
   if (bad.length) return { ok: false, reason: bad[0] };
   const old = save.inv.grids, grids = {};
   for (const [k, g] of Object.entries(old)) if (!rigGrid(k)) grids[k] = g;
-  const rig = { tractor: d.rig.tractor, units: d.rig.units.map(u => ({ kind: u.kind, id: u.id, ...(u.level ? { level: u.level } : {}), workshops: u.workshops.map(w => ({ id: w.id, at: w.at })) })),
+  const rig = { tractor: d.rig.tractor, units: d.rig.units.map(u => ({ kind: u.kind, id: u.id, ...(u.level ? { level: u.level } : {}), ...(u.level && u.slot != null ? { slot: u.slot } : {}), workshops: u.workshops.map(w => ({ id: w.id, at: w.at })) })),
     spare: { workshops: d.rig.spare.workshops.map(w => w.id), containers: [...d.rig.spare.containers], parts: [...d.rig.spare.parts] }, parts: clone(d.rig.parts || {}) };
   d.rig.units.forEach((u, ui) => u.workshops.forEach(w => { if (w.key && old[w.key]) grids[`store:${ui}:${w.at}`] = old[w.key]; }));
   d.rig.units.forEach((u, ui) => { if (u.key && old[u.key]) grids[`rig:${ui}`] = old[u.key]; });

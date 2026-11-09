@@ -3,10 +3,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { cellsOf, newGrid, add, fits, drop, remove, moveAll, rollLoot, findSpot, count, at } from '../game/inventory.js';
 import { loadProject } from '../engine/project.js';
+import { classicRig } from './fixture.js';
 import { nodeLoader } from '../tools/loader.js';
 import { newSave } from '../game/save.js';
 
-const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
+const D = classicRig((await loadProject(nodeLoader('projects/nomadgirl'))).data);   // furnished start rig, whatever the data say
 const sorted = c => c.map(p => p.join(',')).sort().join(' ');
 
 test('Formen: Rechteck, Tetris-Form, gedreht', () => {

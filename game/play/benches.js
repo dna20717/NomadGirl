@@ -124,13 +124,14 @@ export class Benches {
   }
   // a workshop picture in a place: x0 = left end in the world, w = width of its places, floor = interior floor, h = interior height.
   // Returns false without a look (then the camp draws its code furniture).
-  add({ id, place, x0, w, floor, h, view, mid, G, grid, clip }) {
+  add({ id, place, x0, w, floor, h, view, mid, G, grid, clip, unitScale = 1 }) {
     const s = this.scene, D = this.D, def = D.workshops?.[id] || {}, key = lookOf(s, D, def);
     if (!key) return false;
     const b = pictureBox(s, key), [fx, fy] = footOf(D, key, b);
     // one scale for all pictures (Camp › Rig-Ansicht › Maßstab der Werkstatt-Bilder), corrected per workshop (Maßstab %);
     // without it every picture is fitted into its place
-    const one = this.camp.C.rig?.benchScale, k = one ? one * (def.scale ?? 100) / 100 : Math.min(w * (def.fit ?? 100) / 100 / (b.x1 - b.x0), h * 1.02 / Math.max(1, fy - b.y0)), cx = x0 + w / 2;
+    // and per container (Container › Maßstab der Werkstätten, Daniel 09.11.2026: in den hohen Hochseecontainern wirkten sie zu klein)
+    const one = this.camp.C.rig?.benchScale, k = one ? one * (def.scale ?? 100) / 100 * unitScale : Math.min(w * (def.fit ?? 100) / 100 / (b.x1 - b.x0), h * 1.02 / Math.max(1, fy - b.y0)), cx = x0 + w / 2;
     const at = (ix, iy) => [cx + (ix - (b.x0 + b.x1) / 2) * k, floor + (iy - fy) * k];
     // pixel magic: nothing reaches past the place it stands in (clip = interior of the container, this place's span); a picture
     // is cut at whole picture pixels

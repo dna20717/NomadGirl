@@ -8,10 +8,12 @@ import { nodeLoader } from '../tools/loader.js';
 
 const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
 
-test('Start-Rig: erst die Plätze im Van, dann Wohnanhänger und Holzkiste', () => {
+test('Start-Rig (Daniel, 09.11.2026): Van mit Schlafkoje + Warroom, leerer Modul-Anhänger, der Rest verpackt auf dem Schrottplatz', () => {
   const s = newSave(D);
   assert.equal(s.rig.tractor, 'van');
-  assert.deepEqual(s.rig.units.map(u => [u.id, u.workshops.map(w => `${w.id}@${w.at}`)]), [['van', ['schlafkoje@0', 'warroom@1']], ['wohnanhaenger', ['kochnische@0', 'werkbank@1']], ['holzkiste', ['lagerregal@0']]]);
+  assert.deepEqual(s.rig.units.map(u => [u.id, u.workshops.map(w => `${w.id}@${w.at}`)]), [['van', ['schlafkoje@0', 'warroom@1']], ['modulanhaenger', []]]);
+  assert.deepEqual(s.rig.spare.workshops, ['kochnische', 'werkbank', 'lagerregal']);
+  assert.ok(s.inv.grids.chest.items.some(e => e.id === 'reis'), 'Vorräte ohne Lager liegen in der Kiste');
   const { left } = placeWorkshops(D, 'van', [], ['kueche', 'schlafkoje', 'warroom']);   // Küche needs 2 places → fills the van, the rest has no room
   assert.deepEqual(left, ['schlafkoje', 'warroom']);
 });
@@ -26,16 +28,16 @@ test('Uhr: Ereignis-Zeit über Mitternacht', () => {
 
 test('Alter Spielstand wird repariert', () => {
   assert.equal(repairSave(null, D).version, 1);
-  const s = newSave(D); s.buffs = ['gibtsnicht', 'satt']; s.rig.units[1].workshops.push({ id: 'weg', at: 3 }); s.location = 'nirgendwo';
+  const s = newSave(D), n = s.rig.units[1].workshops.length; s.buffs = ['gibtsnicht', 'satt']; s.rig.units[1].workshops.push({ id: 'weg', at: 3 }); s.location = 'nirgendwo';
   const r = repairSave(s, D);
   assert.deepEqual(r.buffs, ['satt']);
-  assert.equal(r.rig.units[1].workshops.length, 2);
+  assert.equal(r.rig.units[1].workshops.length, n);
   assert.equal(r.location, 'tankstelle_km7');
 });
 
 test('Fahrtkosten', () => {
   const t = travelCost(D, newSave(D), 'bunker_13');
-  assert.deepEqual(t, { km: 42, hours: 1, fuel: 5.5, food: 0.1 });   // Wohnanhänger + Holzkiste: 1.150 kg
+  assert.deepEqual(t, { km: 42, hours: 1, fuel: 5.4, food: 0.1 });   // leerer Modul-Anhänger: 800 kg
 });
 
 test('Ankunft im Camp: immer Dämmerung', () => {

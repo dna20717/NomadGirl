@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { newSave, repairSave, containers } from '../game/save.js';
-import { act, buyContainer, stackOn, moveContainer, detach, attachAt, budgets, blockAt, toSpare } from '../game/rig.js';
+import { act, buyContainer, stackOn, stackSlots, moveContainer, detach, attachAt, budgets, blockAt, toSpare } from '../game/rig.js';
 import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
 import { classicRig } from './fixture.js';
@@ -64,4 +64,24 @@ test('Alter/kaputter Stand: Stapel bleiben heil', () => {
   s.rig.units.splice(1, 0, { kind: 'container', id: 'holzkiste', level: 1, workshops: [] });
   const t = repairSave(JSON.parse(JSON.stringify(s)), D);
   assert.equal(t.rig.units.map(u => u.level || 0).join(), '0,0,0,1');
+});
+
+test('Container-Slots: kurzer Container links, Mitte oder rechts auf einem langen, umsetzen auf dem eigenen Stapel', () => {
+  const s = fresh();
+  s.rig.units.splice(1); s.rig.tractor = s.rig.units[0].id = 'lkw';   // only the truck (pulls 40 feet)
+  act(D, s, d => buyContainer(D, d, 'container_40'));
+  act(D, s, d => buyContainer(D, d, 'container_10'));
+  const ground = s.rig.spare.containers.indexOf('container_40');
+  assert.equal(act(D, s, d => attachAt(D, d, ground, 1)).ok, true);
+  assert.equal(stackSlots(D, 'container_40', 'container_10'), 2);
+  assert.equal(stackSlots(D, 'container_20', 'container_40'), 0);   // longer: centred
+  const r = act(D, s, d => stackOn(D, d, { spare: 0 }, 1, 2));
+  assert.equal(r.ok, true, r.reason);
+  assert.equal(ids(s), 'lkw container_40 container_10^1');
+  assert.equal(s.rig.units[2].slot, 2);   // right
+  assert.equal(act(D, s, d => stackOn(D, d, { ui: 2 }, 1, 0)).ok, true);   // move to the left on its own stack
+  assert.equal(s.rig.units[2].slot, 0);
+  assert.equal(act(D, s, d => stackOn(D, d, { ui: 2 }, 1, 0)).same, true);   // already there
+  assert.equal(act(D, s, d => stackOn(D, d, { ui: 2 }, 1, 9)).ok, true);   // clamped to the right
+  assert.equal(s.rig.units[2].slot, 2);
 });

@@ -24,11 +24,12 @@
   "storage": [4, 2],
   "storageName": "Staufach",
   "inside": {"x": [26, 229], "y": [90, 175]},
-  "deck": 73,
+  "deck": 83,
   "carries": true,
   "look": "container_open_2",
   "lookClosed": "container_closed_2",
-  "chassis": true
+  "chassis": true,
+  "benchScale": 130
  },
  "container_40": {
   "name": "40-Fuß-Container",
@@ -41,10 +42,11 @@
   "storageName": "Staufach",
   "carries": true,
   "inside": {"x": [26, 330], "y": [90, 175]},
-  "deck": 73,
+  "deck": 83,
   "look": "container_open_3",
   "lookClosed": "container_closed_3",
-  "chassis": true
+  "chassis": true,
+  "benchScale": 130
  },
  "modulanhaenger": {
   "name": "Modul-Anhänger",
@@ -71,10 +73,11 @@
   "storage": [3, 2],
   "storageName": "Staufach",
   "inside": {"x": [26, 128], "y": [90, 175]},
-  "deck": 73,
+  "deck": 83,
   "description": "Der Kleine: fasst genau eine Werkstatt.",
   "look": "container_open_1",
   "lookClosed": "container_closed_1",
-  "chassis": true
+  "chassis": true,
+  "benchScale": 130
  }
 }
