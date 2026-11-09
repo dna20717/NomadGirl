@@ -497,7 +497,11 @@ export class Camp {
       }
       s.textures.get(tk).setFilter(NEAREST());
       const a = (dv.shadow ?? 0) / 100, back = dv.back ?? foot, footY = u.floorY - (front - foot) * k, backY = u.floorY - (front - back) * k;
+      // only where a workshop stands on at least one side, never through the middle of a workshop that takes several places (Daniel 09.11.2026)
+      const occ = Array(u.places).fill(null);
+      u.workshops.forEach((ws, n) => { for (let p = 0; p < (D.workshops?.[ws.id]?.places || 1); p++) if (ws.at + p < u.places) occ[ws.at + p] = n; });
       for (let i = 1; i < u.places; i++) {
+        if (occ[i - 1] === occ[i] || (occ[i - 1] == null && occ[i] == null)) continue;
         const x = u.in0 + i * u.cell, half = w * k / 2;
         if (a > 0) {
           const sh = s.add.graphics();
