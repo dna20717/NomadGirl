@@ -1,6 +1,7 @@
 // HUD as HTML over the canvas: health, ammo, dash, time, kills, Δ, banners and the controls overlay.
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
+import { loadVersion } from '../version.js';
 import { clockText } from '../save.js';
 
 const CONTROLS = [
@@ -45,7 +46,9 @@ export class Hud {
           el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'ZEIT'), this.time, el('span', { class: 'hud-label' }, 'KILLS'), this.kills, el('span', { class: 'hud-label' }, 'Δ'), this.deltas))),
       this.campEl, this.buildBtn, this.openBtn, this.bannerEl, this.promptEl, this.menuEl, this.help,
       el('div', { class: 'hud-foot' }, 'H: Steuerung · Rücktaste: Neustart · ', el('a', { href: 'workshop.html' }, 'Werkstatt'), ' · ', el('a', { href: './' }, 'Start'),
-        this.newGame = el('span', { hidden: true }, ' · ', el('a', { href: 'game.html?camp&new', onclick: e => { if (!confirm('Spielstand löschen und neu anfangen?')) e.preventDefault(); } }, 'Neues Spiel'))));
+        this.newGame = el('span', { hidden: true }, ' · ', el('a', { href: 'game.html?camp&new', onclick: e => { if (!confirm('Spielstand löschen und neu anfangen?')) e.preventDefault(); } }, 'Neues Spiel')),
+        this.versionEl = el('span', { class: 'hud-version' })));
+    loadVersion().then(v => { this.versionEl.textContent = ' · ' + v.text; this.versionEl.title = 'Version dieses Spiels' + (v.commit ? ': ' + v.commit : ''); this.version = v; });
     this.root = root;
     this.paused = true;   // help is open at the start
   }

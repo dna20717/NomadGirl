@@ -42,13 +42,15 @@
     <h1>NomadGirl</h1>
     <p class="sub">Leyla lebt in den Wastelands rund um BigCityDelta in ihrem Rig. Sie plündert, was andere liegen lassen, und kocht erstaunlich gut.</p>
     <nav id="nav"></nav>
-    <footer>GPL v3 oder später · <a href="https://github.com/dna20717/NomadGirl">Quelltext auf GitHub</a></footer>
+    <footer>GPL v3 oder später · <a href="https://github.com/dna20717/NomadGirl">Quelltext auf GitHub</a> · <span id="version" title="Version dieser Seite (Commit und Zeit des Builds)">…</span></footer>
   </div>
 </main>
 <script type="module">
   import { icon } from './game/icons.js';
   if (new URLSearchParams(location.search).has('preview')) document.documentElement.classList.add('preview');   // workshop preview: scene only
   import { startSplash } from './game/splash/splash.js';
+  import { loadVersion } from './game/version.js';
+  loadVersion().then(v => { const e = document.getElementById('version'); e.textContent = v.text; if (v.commit) e.title += ': ' + v.commit; window.version = v; });
   startSplash(document.getElementById('scene')).then(x => { window.splash = x; }).catch(e => console.warn('Startseite ohne Szene:', e));
   const nav = document.getElementById('nav');
   const entry = (href, ic, title, text, cls = '') => {
