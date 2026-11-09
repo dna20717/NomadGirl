@@ -488,7 +488,8 @@ export class Camp {
       const k = u.sprite.k, [dx0, dx1] = dv.x, [dy0, dy1] = dv.y, [top, front] = u.def.inside?.y || [dy0, dy1];
       const cols = String(dv.keep || '').split(',').map(Number).filter(c => Number.isFinite(c) && c >= dx0 && c <= dx1);
       const keep = cols.length ? cols : Array.from({ length: dx1 - dx0 + 1 }, (_, i) => dx0 + i);
-      const foot = Math.min(front, dv.foot ?? front), r0 = Math.max(dy0, dy1 - (foot - top)), hh = dy1 - r0 + 1, w = keep.length;
+      // rows top … foot - 1: the post ends right under the ceiling beam
+      const foot = Math.min(front, dv.foot ?? front), r0 = Math.max(dy0, dy1 - (foot - top) + 1), hh = dy1 - r0 + 1, w = keep.length;
       const tk = `divider_${u.sprite.key}_${keep.join('-')}_${r0}_${dy1}`;
       if (!s.textures.exists(tk)) {
         const c = s.textures.createCanvas(tk, w, hh), src = s.textures.get(u.sprite.key).getSourceImage();
