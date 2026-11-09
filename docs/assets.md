@@ -96,6 +96,12 @@ Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich 
 | `assets/items/icons_kitchen.png` | Symbol-Raster Küche & Essen: 8 × 8 Icons à 32 × 32 px, Pixel-Art (Geräte, Zutaten, Gerichte, Gewürze, Rezepte) (`icons_kitchen`) | KI-generiert (Daniel, Sheet-Export mit Prompt) | 09.11.2026 |
 | `assets/workshops/workbench.png` | Werkbank mit Lochwand (Allzweck): 256 × 256, Füße bei y 205, ersetzt `metal_bench.png` an der Werkbank (`ws_workbench`) | KI-generiert (Daniel) | 09.11.2026 |
 | `assets/rig/container_source.png` (neu) | Hochseecontainer offen + zu, offene Hülle jetzt mit gemaltem Boden (13 px Tiefe) und Rückwand mit Rillen; alte Fassung `container_source_v1.png` | Pixel-Art von Daniel (KI + Handarbeit) | 09.11.2026 |
+| `assets/workshops/drone_bench_v2.png` | Drohnenwerkbank mit halbfertiger Drohne, 3D-Drucker, Kaffee (Anker y 210), 256 × 256 | KI-generiert (Daniel, low top-down) | 09.11.2026 |
+| `assets/workshops/generator_bench_v2.png` | Generator-Werkbank mit Kanistern und Werkzeug (Anker y 205), 256 × 256 | KI-generiert (Daniel, low top-down) | 09.11.2026 |
+| `assets/workshops/warroom_table_v2.png` | Planungstisch mit Karten, Laptop, Hologrammen (Anker y 205), 256 × 256 | KI-generiert (Daniel, low top-down) | 09.11.2026 |
+| `assets/workshops/chill_area_v2.png` | Chill Area mit Sofa, TV, Aquarium, Lavalampe, Lichterkette, eigener Boden (Anker y 225), 256 × 256 | KI-generiert (Daniel, low top-down) | 09.11.2026 |
+| `assets/workshops/sleep_bunk_v2.png` | Schlafkoje mit Etagenbett, Plüschteddy, Lichterkette, eigener Boden (Anker y 246), 256 × 256 | KI-generiert (Daniel, low top-down) | 09.11.2026 |
+| `assets/workshops/foodtruck_kitchen.png` | Foodtruck-Küche mit Töpfen, Pfannen, Mikrowelle (Anker 139, 188), 256 × 256 | KI-generiert (Daniel, low top-down) | 09.11.2026 |
 
 ## Ordner
 

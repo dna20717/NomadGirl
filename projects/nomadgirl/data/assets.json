@@ -1825,5 +1825,59 @@
   "source": "KI (Pixel-Art von Daniel, 09.11.2026; Prompt: general purpose cyberpunk workbench with pegboard, front facing)",
   "date": "09.11.2026",
   "description": "Allzweck-Werkbank mit Lochwand voller Werkzeug, Neonröhre, zwei Hologramm-Schirmen, Servern und Kisten darunter. 256 × 256, Füße bei y 205."
+ },
+ "ws_drone_bench_v2": {
+  "name": "Werkstatt · Drohnenwerkbank (v2)",
+  "kind": "image",
+  "file": "assets/workshops/drone_bench_v2.png",
+  "origin": [128, 210],
+  "source": "KI (Pixel-Art-Generator, low top-down, von Daniel)",
+  "date": "09.11.2026",
+  "description": "Neue Fassung von Daniel, 256 × 256, Anker = vordere Füße bzw. Vorderkante des eigenen Bodens."
+ },
+ "ws_generator_bench_v2": {
+  "name": "Werkstatt · Generator-Werkbank (v2)",
+  "kind": "image",
+  "file": "assets/workshops/generator_bench_v2.png",
+  "origin": [128, 205],
+  "source": "KI (Pixel-Art-Generator, low top-down, von Daniel)",
+  "date": "09.11.2026",
+  "description": "Neue Fassung von Daniel, 256 × 256, Anker = vordere Füße bzw. Vorderkante des eigenen Bodens."
+ },
+ "ws_warroom_table_v2": {
+  "name": "Werkstatt · Planungstisch Warroom (v2)",
+  "kind": "image",
+  "file": "assets/workshops/warroom_table_v2.png",
+  "origin": [128, 205],
+  "source": "KI (Pixel-Art-Generator, low top-down, von Daniel)",
+  "date": "09.11.2026",
+  "description": "Neue Fassung von Daniel, 256 × 256, Anker = vordere Füße bzw. Vorderkante des eigenen Bodens."
+ },
+ "ws_chill_area_v2": {
+  "name": "Werkstatt · Chill Area (v2)",
+  "kind": "image",
+  "file": "assets/workshops/chill_area_v2.png",
+  "origin": [128, 225],
+  "source": "KI (Pixel-Art-Generator, low top-down, von Daniel)",
+  "date": "09.11.2026",
+  "description": "Neue Fassung von Daniel, 256 × 256, Anker = vordere Füße bzw. Vorderkante des eigenen Bodens."
+ },
+ "ws_sleep_bunk_v2": {
+  "name": "Werkstatt · Schlafkoje mit Etagenbett (v2)",
+  "kind": "image",
+  "file": "assets/workshops/sleep_bunk_v2.png",
+  "origin": [128, 246],
+  "source": "KI (Pixel-Art-Generator, low top-down, von Daniel)",
+  "date": "09.11.2026",
+  "description": "Neue Fassung von Daniel, 256 × 256, Anker = vordere Füße bzw. Vorderkante des eigenen Bodens."
+ },
+ "ws_foodtruck_kitchen": {
+  "name": "Werkstatt · Foodtruck-Küche",
+  "kind": "image",
+  "file": "assets/workshops/foodtruck_kitchen.png",
+  "origin": [139, 188],
+  "source": "KI (Pixel-Art-Generator, low top-down, von Daniel)",
+  "date": "09.11.2026",
+  "description": "Neue Fassung von Daniel, 256 × 256, Anker = vordere Füße bzw. Vorderkante des eigenen Bodens."
  }
 }
