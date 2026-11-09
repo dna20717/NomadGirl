@@ -443,12 +443,25 @@ export class Camp {
     } else add(s.add.image(u.x0 - mid, 0, shellTexture(s, D, u.def, s.T)).setOrigin(0, 1).setScale(1));
     // furniture: one texture per container, drawn in the interior
     const g = s.make.graphics({}, false), h = u.floorY - u.inTop, key = `camp_unit_${u.ui}`, shades = [];
+    // a floor with depth for low top-down workshop pictures (Camp › Boden im Innenraum, Daniel 09.11.2026): the back feet stand on it,
+    // Leyla walks along its front edge; pixel style in three tones, seams in the sheet
+    const F = R.floor || {}, depth = u.def.floorStrip ? F.depth || 0 : 0, inset = depth ? Math.min(F.inset || 0, depth) : 0;
+    if (depth > 0) {
+      const fg = s.add.graphics(), x0 = u.in0, x1 = u.in0 + u.cell * u.places, y1 = u.floorY, y0 = y1 - depth, base = col(F.color || '#3a3f48');
+      const tone = k => Phaser.Display.Color.IntegerToColor(base).darken(k).color, lift = k => Phaser.Display.Color.IntegerToColor(base).lighten(k).color;
+      fg.fillStyle(base).fillRect(x0, y0, x1 - x0, depth);
+      fg.fillStyle(tone(30)).fillRect(x0, y0, x1 - x0, Math.max(2, Math.round(depth * 0.18)));          // the far end under the back wall
+      fg.fillStyle(tone(15)).fillRect(x0, y0 + Math.round(depth * 0.18), x1 - x0, Math.max(2, Math.round(depth * 0.2)));
+      fg.fillStyle(lift(18)).fillRect(x0, y1 - 4, x1 - x0, 4);                                           // the front edge Leyla walks on
+      if (F.seam > 0) for (let x = x0 + F.seam; x < x1 - 4; x += F.seam) fg.fillStyle(tone(22)).fillRect(Math.round(x), y0, 2, depth - 4);
+      fg.x = -mid; fg.y = -G; add(fg);
+    }
     for (const w of u.workshops) {
       if (this.hide && this.hide.ui === u.ui && this.hide.at === w.at) continue;
       const def = D.workshops?.[w.id] || {}, cx = u.in0 + w.at * u.cell - u.x0, cw = (def.places || 1) * u.cell, place = `${u.ui}:${w.at}`;
       // Daniel's picture with its lights and effects (benches.js), otherwise furniture from code
       const px0 = u.in0 + w.at * u.cell, clip = { x0: px0, x1: px0 + cw, y0: u.inTop, y1: u.floorY + 4 };   // the place inside the container
-      const art = this.benches.add({ id: w.id, place, x0: px0, w: cw, floor: u.floorY, h, view, mid, G, grid: def.grid && `store:${place}`, clip, unitScale: (u.def.benchScale ?? 100) / 100 });
+      const art = this.benches.add({ id: w.id, place, x0: px0, w: cw, floor: u.floorY - inset, h, view, mid, G, grid: def.grid && `store:${place}`, clip, unitScale: (u.def.benchScale ?? 100) / 100 });
       if (art) shades.push(clip);
       if (!art) furniture(g, def.function, cx, h + 40, cw, h, R.light || '#ffcf7a');
       if (!u.sprite && !art) g.fillStyle(0x0d0a12).fillRect(cx + cw / 2 - 26, 40 + 22, 52, 34).fillStyle(col(R.light || '#ffcf7a')).fillRect(cx + cw / 2 - 22, 40 + 26, 44, 26);   // window

@@ -17,7 +17,8 @@
   "lift": 48,
   "drawbar": 120,
   "benchScale": 1.6,
-  "open": {"near": 160, "fade": 350, "lights": 15}
+  "open": {"near": 160, "fade": 350, "lights": 15},
+  "floor": {"depth": 48, "inset": 10, "color": "#3a3f48", "seam": 96}
  },
  "fire": {
   "enabled": true,
