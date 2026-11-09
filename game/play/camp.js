@@ -480,6 +480,18 @@ export class Camp {
     g.generateTexture(key, Math.ceil(u.x1 - u.x0), Math.ceil(h + 44)); g.destroy();
     add(s.add.image(u.x0 - mid, u.inTop - 40 - G, key).setOrigin(0));
     if (this.benchShade) { add(this.benchShade); this.benchShade = null; }
+    // a divider between two workshop places, cut from the container's own picture (Container › Trennwand aus dem Bild, Daniel 09.11.2026)
+    const dv = u.def.divider;
+    if (u.sprite && dv?.x?.length === 2 && dv?.y?.length === 2 && u.places > 1 && s.textures.exists(u.sprite.key)) {
+      const [dx0, dx1] = dv.x, [dy0, dy1] = dv.y, w = dx1 - dx0 + 1, hh = dy1 - dy0 + 1, tk = `divider_${u.sprite.key}_${dx0}_${dx1}_${dy0}_${dy1}`;
+      if (!s.textures.exists(tk)) {
+        const c = s.textures.createCanvas(tk, w, hh);
+        c.getContext().drawImage(s.textures.get(u.sprite.key).getSourceImage(), dx0, dy0, w, hh, 0, 0, w, hh); c.refresh();
+      }
+      s.textures.get(tk).setFilter(NEAREST());
+      const inner = (u.def.inside?.y?.[1] ?? dy1) - dy1;   // rows between the divider's foot and the floor's front edge
+      for (let i = 1; i < u.places; i++) add(s.add.image(u.in0 + i * u.cell - mid, u.floorY - inner * u.sprite.k - G, tk).setOrigin(0.5, 1).setScale(u.sprite.k).setFlipX(u.sprite.flip));
+    }
     // Deichselkasten: a little steel box on the drawbar (code), E opens the trailer's own storage
     if (u.def.storage?.[0]) {
       // stacked: no drawbar, the box stands on the floor at the front end

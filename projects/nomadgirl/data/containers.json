@@ -30,7 +30,8 @@
   "lookClosed": "container_closed_2",
   "chassis": true,
   "benchScale": 130,
-  "benchInset": 16
+  "benchInset": 16,
+  "divider": {"x": [18, 26], "y": [91, 175]}
  },
  "container_40": {
   "name": "40-Fuß-Container",
@@ -48,7 +49,8 @@
   "lookClosed": "container_closed_3",
   "chassis": true,
   "benchScale": 130,
-  "benchInset": 16
+  "benchInset": 16,
+  "divider": {"x": [18, 26], "y": [91, 175]}
  },
  "modulanhaenger": {
   "name": "Modul-Anhänger",
@@ -81,6 +83,7 @@
   "lookClosed": "container_closed_1",
   "chassis": true,
   "benchScale": 130,
-  "benchInset": 16
+  "benchInset": 16,
+  "divider": {"x": [18, 26], "y": [91, 175]}
  }
 }
