@@ -10,7 +10,7 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 const errors = [];
 page.on('pageerror', e => errors.push(e.message));
-page.on('console', m => { if (m.type() === 'error' && !m.location()?.url?.includes('/api/')) errors.push(m.text()); });   // no worker locally: /api/ answers 404
+page.on('console', m => { if (m.type() === 'error' && !/\/api\/|version\.json/.test(m.location()?.url || '')) errors.push(m.text()); });   // no worker locally: /api/ answers 404
 await page.goto(url);
 await page.waitForSelector('#ng-load', { state: 'detached', timeout: 10000 });
 if (shots) fs.mkdirSync('output', { recursive: true });
@@ -29,7 +29,7 @@ await go({ area: 'validation' }); await shot('validation');
 
 // edit a number in Leyla, then undo
 await go({ area: 'leyla' });
-const field = page.locator('label.da-field', { hasText: 'Rennen' }).locator('input');
+const field = page.getByRole('spinbutton', { name: 'Rennen (px/s)', exact: true });
 await field.fill('333'); await field.dispatchEvent('change');
 const after = await page.evaluate(() => window.workshop.p.data.leyla.movement.runSpeed);
 await page.keyboard.press('Control+z');

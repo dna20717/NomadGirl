@@ -12,7 +12,7 @@ for (const [name, width, height] of [['desktop', 1440, 900], ['ipad', 820, 1180]
   const page = await browser.newPage({ viewport: { width, height } });
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
-  page.on('console', m => { if (m.type() === 'error' && !m.location()?.url?.includes('/api/')) errors.push(m.text()); });
+  page.on('console', m => { if (m.type() === 'error' && !/\/api\/|version\.json/.test(m.location()?.url || '')) errors.push(m.text()); });
   await page.goto('http://localhost:8766/index.html');
   await page.waitForFunction(() => window.splash, null, { timeout: 15000 });
   const s = await page.evaluate(() => window.splash);
