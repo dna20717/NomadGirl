@@ -260,6 +260,8 @@ export class PlayScene extends Phaser.Scene {
     const C = this.data_.camp || {}, save = this.box.save;
     this.box.persist();
     if (this.camp && daytimeAt(C, save.hour)?.name !== this.camp.day?.name) this.time.delayedCall(this.script ? 0 : 700, () => this.goCamp({ banner: [daytimeAt(C, save.hour)?.name || 'Die Zeit vergeht', clockText(save)], fade: 500, keepPlace: true }));
+    // the rig got taller than the camp (container stacked on a container on its chassis): camp fresh at the same spot, now high enough
+    else if (this.camp && this.campGeo && campLayout(this.data_, save, this.T).H !== this.campGeo.H) this.time.delayedCall(this.script ? 0 : 300, () => this.goCamp({ fade: 300, keepPlace: true }));
   }
   // the cooking/crafting panel closed: the clock may have moved into another time of day (light, sky) → camp fresh at the same spot
   craftClosed() {

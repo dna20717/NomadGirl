@@ -22,7 +22,7 @@ const shot = async n => { if (!shots) return; fs.mkdirSync('output', { recursive
 await ev(() => {
   nomad.take(); nomad.step(30);
   window.c = {
-    to(name) { const h = nomad.state().camp.hotspots.find(h => h.name === name); nomad.walkTo(h.x); return nomad.state().prompt; },
+    to(name) { nomad.goTo(name); return nomad.state().prompt; },
     use() { nomad.step(1, [], ['grab']); return nomad.menu(); },
     pick(...labels) { for (const l of labels) nomad.choose(l); nomad.step(5); return nomad.state(); },
   };

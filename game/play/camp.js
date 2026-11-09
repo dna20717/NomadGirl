@@ -107,7 +107,8 @@ export function rigUnits(D, rig, vanLeft, ground, T = 64) {
 // geometry of the camp in tiles and pixels: margin | scrapyard | room for the rig (as long as the tractor may pull) | van | campsite.
 // The van stands still while building: the rig grows to the left from it.
 export function campLayout(D, save, T = 64) {
-  const C = D.camp || {}, gap = (C.rig?.gap ?? 1) * T, margin = C.margin ?? 6, H = Math.max(8, C.height ?? 14);
+  const C = D.camp || {}, gap = (C.rig?.gap ?? 1) * T, margin = C.margin ?? 6;
+  let H = Math.max(8, C.height ?? 14);
   const vanA = D.assets?.[D.tractors?.[save.rig.tractor]?.look] || D.assets?.[D.game?.spawn?.look];
   const k = vanA?.frameSize ? (vanA.height || vanA.frameSize[1]) / vanA.frameSize[1] : 1;
   const vanLeft = vanA?.frameSize ? (vanA.origin?.[0] ?? vanA.frameSize[0] / 2) * k : 5 * T, vanRight = vanA?.frameSize ? vanA.frameSize[0] * k - vanLeft : 5 * T;
@@ -116,8 +117,17 @@ export function campLayout(D, save, T = 64) {
   const pull = Math.max(1, D.tractors?.[save.rig.tractor]?.length ?? 1);
   const rigRoom = pull * longest + (pull - 1) * gap;
   const vanCol = Math.ceil((margin * T + yardW + rigRoom + vanLeft) / T - 0.5), doorX = (vanCol + 0.5) * T;
-  const W = vanCol + Math.max(8, C.campWidth ?? 20) + 1, floor = H - 2;
-  const units = rigUnits(D, save.rig, doorX - vanLeft, floor * T, T);
+  const W = vanCol + Math.max(8, C.campWidth ?? 20) + 1;
+  let floor = H - 2;
+  let units = rigUnits(D, save.rig, doorX - vanLeft, floor * T, T);
+  // a high stack (container on a container on its chassis, ×4) must fit under the top of the world: Leyla has to stand up in the
+  // upper container (Daniel 09.11.2026: "oben auf der Leiter kann man sich nicht mehr bewegen"); the camp grows by whole rows
+  const highest = Math.min(Infinity, ...units.map(u => Math.min(u.inTop ?? u.floorY, u.floorY - 4 * T)));
+  if (highest < T) {
+    const more = Math.ceil((T - highest) / T);
+    H += more; floor += more;
+    units = rigUnits(D, save.rig, doorX - vanLeft, floor * T, T);
+  }
   const tractor = save.rig.units.find(u => u.kind === 'tractor');
   // shaft on the left: a hole in the ground, closed off by an invisible wall above it (it cannot be entered)
   const S = C.shaft || {}, shaft = S.enabled === false ? null : { from: Math.max(1, S.at ?? 1), to: Math.max(1, S.at ?? 1) + Math.max(1, S.width ?? 3) - 1 };
@@ -563,7 +573,7 @@ export class Camp {
   workshopHotspot(u, w, def, cx, cw, labelY) {
     const R = this.C.rig || {};
     const store = def.grid && `store:${u.ui}:${w.at}`;
-    this.hotspots.push({ rig: true, place: `${u.ui}:${w.at}`, x: cx + cw / 2, w: cw / 2, top: this.curTop, name: def.name || w.id, hint: store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id, `${u.ui}:${w.at}`) });
+    this.hotspots.push({ rig: true, place: `${u.ui}:${w.at}`, x: cx + cw / 2, w: cw / 2, top: this.curTop, floor: u.floorY, name: def.name || w.id, hint: store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id, `${u.ui}:${w.at}`) });
     if (R.labels !== false) {
       const t = this.scene.add.text(cx + cw / 2, labelY, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '24px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 0).setDepth(-14);
       t.unit = u.ui; this.rigObjs.push(t); (this.labels ||= []).push(t);   // fades with a closed shell
@@ -970,7 +980,10 @@ export class Camp {
     if (l.alive && l.body.blocked.down)
       for (const h of this.hotspots) {
         // up in a stacked container only its spots, on the ground (or in a trailer) only the ones down there
-        if (h.top != null ? Math.abs(l.feet - h.top) > 50 : l.feet < this.ground - (this.C.rig?.reachUp ?? 240)) continue;
+        // a workshop counts only on its own floor (Daniel 09.11.2026: work mode and "E · …" only on the same level as the bench,
+        // a container on its chassis stands 164 px above the street), everything else by level as before
+        if (h.floor != null) { if (Math.abs(l.feet - h.floor) > (this.C.rig?.sameFloor ?? 40)) continue; }
+        else if (h.top != null ? Math.abs(l.feet - h.top) > 50 : l.feet < this.ground - (this.C.rig?.reachUp ?? 240)) continue;
         const d = Math.abs(l.x - h.x); if (d <= Math.max(h.w || 0, range) && d < bd) { best = h; bd = d; }
       }
     this.atWorkshop = !!(best?.ws && Math.abs(l.body.velocity.x) < 5);
@@ -983,7 +996,7 @@ export class Camp {
   state() {
     const sv = this.box.save;
     return { clock: clockText(sv), day: sv.day, hour: sv.hour, daytime: this.day.name, location: sv.location, deltas: sv.deltas, fuel: sv.fuel, food: sv.food, health: sv.health, buffs: [...sv.buffs],
-      prompt: this.promptText || null, hotspots: this.hotspots.map(h => ({ name: h.name, hint: typeof h.hint === 'function' ? h.hint() : h.hint, x: Math.round(h.x) })),
+      prompt: this.promptText || null, hotspots: this.hotspots.map(h => ({ name: h.name, hint: typeof h.hint === 'function' ? h.hint() : h.hint, x: Math.round(h.x), floor: h.floor ?? null })),
       chest: this.chest && { open: this.chest.open, frame: Math.round(this.chest.frame) },
       sound: { wind: !!this.wind, fire: this.fireVolume != null ? Math.round(this.fireVolume * 100) : null, muted: this.scene.sound.mute },
       benches: this.benches?.state() || [], resting: this.resting || null,

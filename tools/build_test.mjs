@@ -120,7 +120,7 @@ await ev(() => { const s = window.game.scene.getScene('play'); s.data_.workshops
 await ev(() => nomad.step(20));
 let h = await ev(() => nomad.state().camp.hotspots.find(h => h.name === 'Kochnische'));
 check('Zu wenig Energie: Kochnische hat keinen Strom', h?.hint === 'Kein Strom', h);
-await ev(x => { nomad.walkTo(x); nomad.step(1, [], ['grab']); nomad.step(2); }, h.x);
+await ev(() => { nomad.goTo('Kochnische'); nomad.step(1, [], ['grab']); nomad.step(2); });
 const m = await ev(() => nomad.menu());
 check('… und sagt, was zu tun ist', /Kein Strom/.test(m?.title + JSON.stringify(m?.items) + m?.sub + '') || m?.items?.some(i => i.label === 'Rig umbauen'), m);
 await ev(() => nomad.choose('Zurück'));

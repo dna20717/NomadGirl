@@ -75,7 +75,7 @@ check('Alles nehmen packt ein, was passt', s.backpack.items.length > 0, s);
 await shot('moved');
 
 // storage shelf in the trailer: swap the backpack for the hiking backpack
-s = await ev(() => { nomad.step(1, [], ['grab']); const h = nomad.state().camp.hotspots.find(h => h.name === 'Lagerregal'); nomad.walkTo(h.x); nomad.step(1, [], ['grab']); nomad.step(5); return nomad.inv(); });
+s = await ev(() => { nomad.step(1, [], ['grab']); nomad.goTo('Lagerregal'); nomad.step(1, [], ['grab']); nomad.step(5); return nomad.inv(); });
 check('Lagerregal ist ein Inventar', s.open && s.other?.title === 'Lagerregal' && has(s.other.grid, 'wanderrucksack') && has(s.other.grid, 'kronkorken'), s);
 const ruck = await ev(() => { const g = nomad.save().inv.grids; const k = Object.keys(g).find(k => k.startsWith('store:')); return g[k].items.find(e => e.id === 'wanderrucksack'); });
 await click(1, ruck.x, ruck.y); await slot('Rucksack');

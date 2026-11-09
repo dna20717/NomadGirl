@@ -14,6 +14,7 @@
 //   nomad.state().camp                camp (game.html?camp): clock, place, Δ, prompt, hotspots, rig; .menu = open menu
 //   nomad.menu() / nomad.choose(i | 'text')   the open menu / pick an item (index or part of its label)
 //   nomad.walkTo(x)                   walks Leyla to an x position (camp), then E with step(1, [], ['grab'])
+//   nomad.goTo(name)                  walks to a camp hotspot by name; a workshop: up onto the floor of its container (E counts only there)
 //   nomad.build()                     building the rig in the camp (B): rig, budgets, scrapyard, jobs, undo
 //   nomad.buildSpots()                page positions of places, couplings, trailers, scrapyard, dealer (drag with page.mouse)
 //   nomad.craft()                     cooking/crafting panel at a workshop (E in the camp): book, pot, log, stock
@@ -63,6 +64,14 @@ export function installControl(game) {
       const ok = h.choose(i);
       api.step(2);
       return ok;
+    },
+    goTo(name) {
+      const sc = scene(), h = sc.camp?.hotspots.find(h => h.name === name || h.name?.startsWith?.(name));
+      if (!h) return null;
+      api.walkTo(h.x);
+      const l = sc.leyla;
+      if (h.floor != null && Math.abs(l.feet - h.floor) > 4) { l.body.reset(h.x, h.floor - l.size.h / 2); api.step(20); }   // as if she had jumped in
+      return api.state();
     },
     walkTo(x, max = 900) {
       for (let i = 0; i < max; i++) {

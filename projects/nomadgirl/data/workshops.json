@@ -29,17 +29,17 @@
   "power": -1,
   "value": 80,
   "description": "Zwei Platten, eine davon geht.",
-  "look": "ws_food_kitchen",
+  "look": "ws_foodtruck_kitchen",
   "fx": [
-   {"kind": "light", "x": 97, "y": 63, "w": 66, "h": 6, "color": "#fff1c8", "size": 75, "rate": 5, "when": "always"},
-   {"kind": "steam", "x": 110, "y": 121, "w": 10, "h": 4, "color": "#ece6f2", "size": 6, "rate": 1.6, "when": "use", "idle": 35},
-   {"kind": "flame", "x": 142, "y": 127, "w": 16, "h": 5, "color": "#ff7a2a", "size": 26, "rate": 40, "when": "use", "idle": 0},
-   {"kind": "smoke", "x": 144, "y": 118, "w": 12, "h": 4, "color": "#cfc8d8", "size": 7, "rate": 1.4, "when": "use", "idle": 0},
-   {"kind": "screen", "x": 184, "y": 112, "w": 23, "h": 20, "color": "#ffcf7a", "size": 0, "rate": 0, "when": "use", "idle": 15},
-   {"kind": "screen", "x": 178, "y": 75, "w": 14, "h": 10, "color": "#56e07a", "size": 0, "rate": 3, "when": "always"},
-   {"kind": "screen", "x": 84, "y": 105, "w": 17, "h": 7, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
-   {"kind": "screen", "x": 63, "y": 145, "w": 18, "h": 8, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
-   {"kind": "smoke", "x": 122, "y": 28, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
+   {"kind": "light", "x": 98, "y": 61, "w": 66, "h": 5, "color": "#fff1c8", "size": 75, "rate": 5, "when": "always"},
+   {"kind": "steam", "x": 108, "y": 121, "w": 10, "h": 4, "color": "#ece6f2", "size": 6, "rate": 1.6, "when": "use", "idle": 35},
+   {"kind": "flame", "x": 132, "y": 128, "w": 16, "h": 5, "color": "#ff7a2a", "size": 26, "rate": 40, "when": "use", "idle": 0},
+   {"kind": "smoke", "x": 134, "y": 118, "w": 12, "h": 4, "color": "#cfc8d8", "size": 7, "rate": 1.4, "when": "use", "idle": 0},
+   {"kind": "screen", "x": 187, "y": 115, "w": 23, "h": 18, "color": "#ffcf7a", "size": 0, "rate": 0, "when": "use", "idle": 15},
+   {"kind": "screen", "x": 178, "y": 76, "w": 12, "h": 7, "color": "#56e07a", "size": 0, "rate": 3, "when": "always"},
+   {"kind": "screen", "x": 85, "y": 107, "w": 17, "h": 6, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "screen", "x": 62, "y": 148, "w": 17, "h": 7, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "smoke", "x": 124, "y": 26, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
   ]
  },
  "werkbank": {
@@ -188,17 +188,17 @@
   "places": 2,
   "power": -2,
   "value": 500,
-  "look": "ws_food_kitchen",
+  "look": "ws_foodtruck_kitchen",
   "fx": [
-   {"kind": "light", "x": 97, "y": 63, "w": 66, "h": 6, "color": "#fff1c8", "size": 75, "rate": 5, "when": "always"},
-   {"kind": "steam", "x": 110, "y": 121, "w": 10, "h": 4, "color": "#ece6f2", "size": 6, "rate": 1.6, "when": "use", "idle": 35},
-   {"kind": "flame", "x": 142, "y": 127, "w": 16, "h": 5, "color": "#ff7a2a", "size": 26, "rate": 40, "when": "use", "idle": 0},
-   {"kind": "smoke", "x": 144, "y": 118, "w": 12, "h": 4, "color": "#cfc8d8", "size": 7, "rate": 1.4, "when": "use", "idle": 0},
-   {"kind": "screen", "x": 184, "y": 112, "w": 23, "h": 20, "color": "#ffcf7a", "size": 0, "rate": 0, "when": "use", "idle": 15},
-   {"kind": "screen", "x": 178, "y": 75, "w": 14, "h": 10, "color": "#56e07a", "size": 0, "rate": 3, "when": "always"},
-   {"kind": "screen", "x": 84, "y": 105, "w": 17, "h": 7, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
-   {"kind": "screen", "x": 63, "y": 145, "w": 18, "h": 8, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
-   {"kind": "smoke", "x": 122, "y": 28, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
+   {"kind": "light", "x": 98, "y": 61, "w": 66, "h": 5, "color": "#fff1c8", "size": 75, "rate": 5, "when": "always"},
+   {"kind": "steam", "x": 108, "y": 121, "w": 10, "h": 4, "color": "#ece6f2", "size": 6, "rate": 1.6, "when": "use", "idle": 35},
+   {"kind": "flame", "x": 132, "y": 128, "w": 16, "h": 5, "color": "#ff7a2a", "size": 26, "rate": 40, "when": "use", "idle": 0},
+   {"kind": "smoke", "x": 134, "y": 118, "w": 12, "h": 4, "color": "#cfc8d8", "size": 7, "rate": 1.4, "when": "use", "idle": 0},
+   {"kind": "screen", "x": 187, "y": 115, "w": 23, "h": 18, "color": "#ffcf7a", "size": 0, "rate": 0, "when": "use", "idle": 15},
+   {"kind": "screen", "x": 178, "y": 76, "w": 12, "h": 7, "color": "#56e07a", "size": 0, "rate": 3, "when": "always"},
+   {"kind": "screen", "x": 85, "y": 107, "w": 17, "h": 6, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "screen", "x": 62, "y": 148, "w": 17, "h": 7, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "smoke", "x": 124, "y": 26, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
   ]
  },
  "foodtruck": {

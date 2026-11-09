@@ -65,6 +65,21 @@ await ev(() => game.scene.getScene('play').hud.build.close());
 await ev(() => nomad.step(60));
 check('Bau-Modus zu: wieder zu', (await shells())[0].closed === 1, await shells());
 
+// E-Punkt and work mode only on the bench's own level (Daniel, 09.11.2026): on the street below a container on its chassis nothing,
+// up on its floor the bench's "E · …" and work mode
+const lv = await ev(() => {
+  const s = game.scene.getScene('play'), u = s.camp.geo.units.find(u => u.workshops.length && !u.level), w = u.workshops[0], name = s.data_.workshops[w.id]?.name;
+  const x = u.in0 + (w.at + 0.5) * u.cell, L = s.leyla;
+  nomad.walkTo(x); nomad.step(60);
+  const street = { feet: Math.round(L.feet), prompt: s.camp.promptText, work: s.camp.atWorkshop };
+  L.body.reset(x, u.floorY - L.size.h / 2); nomad.step(60);
+  const inside = { feet: Math.round(L.feet), floor: Math.round(u.floorY), prompt: s.camp.promptText, work: s.camp.atWorkshop };
+  nomad.walkTo(x + 2000); nomad.step(30);
+  return { name, street, inside };
+});
+check('Unten auf der Straße: kein „E · Werkstatt“, kein Arbeitsmodus', !(lv.street.prompt || '').includes(lv.name) && !lv.street.work, lv);
+check('Oben auf dem Containerboden: „E · Werkstatt“ und Arbeitsmodus', (lv.inside.prompt || '').includes(lv.name) && lv.inside.work, lv);
+
 // modular trailer (Daniel, 09.11.2026): on the ground automatically on a chassis as long as the container, stacked without
 const ch = await ev(() => {
   const s = game.scene.getScene('play'), sv = s.box.save;

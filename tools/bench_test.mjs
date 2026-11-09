@@ -68,7 +68,7 @@ await ev(() => { const g = nomad.save().inv.grids['store:2:0']; g.items = g.keep
 
 // evening; Leyla at the workbench, the craft window open: the bench is "in use", sparks fly behind the window
 await reload('sv.hour = 21.5;');
-await ev(() => { nomad.walkTo(1700); nomad.step(10); nomad.walkTo(nomad.state().camp.benches.find(b => b.id === 'werkbank').x); nomad.step(20); nomad.step(1, [], ['grab']); nomad.step(3); });
+await ev(() => { nomad.walkTo(1700); nomad.step(10); nomad.goTo('Werkbank'); nomad.step(20); nomad.step(1, [], ['grab']); nomad.step(3); });
 check('E an der Werkbank öffnet Herstellen', await ev(s => eval(s).hud.craft.isOpen, scene), null);
 const sparks = await ev(s => { const B = eval(s).camp.benches; let mx = 0; for (let i = 0; i < 900 && mx < 6; i++) { nomad.step(1); mx = Math.max(mx, B.sparks.length); } return mx; }, scene);
 check('Werkbank in Benutzung: Funken fliegen hinter dem Fenster', (await bench('werkbank')).use && sparks >= 6, { sparks, b: await bench('werkbank') });
@@ -84,7 +84,7 @@ check('Chill Area und Drohnenwerkstatt stehen im Modul-Anhänger', b.some(x => x
 const chill = b.find(x => x.id === 'chill_area');
 const tv = async () => ev(s => eval(s).camp.benches.list.find(b => b.id === 'chill_area').fx.find(e => e.r.kind === 'screen').s, scene);
 const tv0 = await tv();
-await ev(x => { nomad.walkTo(x); nomad.step(30); }, chill.x);
+await ev(() => { nomad.goTo('Chill Area'); nomad.step(30); });
 const before = await ev(() => nomad.state().camp.hour);
 await ev(() => { nomad.step(1, [], ['grab']); nomad.step(3); });
 check('E an der Chill Area bietet „Fernsehen und abhängen“', (await ev(() => nomad.menu()))?.items?.[0]?.label === 'Fernsehen und abhängen', await ev(() => nomad.menu()));
@@ -99,7 +99,7 @@ await shot('chill');
 // Mama-Bot docks at the drone bench
 await ev(() => nomad.take());
 const db = await bench('drohnenwerkstatt');
-await ev(x => { nomad.walkTo(x); nomad.step(30); nomad.step(1, [], ['grab']); nomad.step(3); nomad.choose('Mama-Bot'); }, db.x);
+void db; await ev(() => { nomad.goTo('Drohnenwerkstatt'); nomad.step(30); nomad.step(1, [], ['grab']); nomad.step(3); nomad.choose('Mama-Bot'); });
 const dock = await ev(s => { const S = eval(s); for (let i = 0; i < 150; i++) nomad.step(1); return { d: Math.abs(S.drone.x - S.camp.benches.list.find(b => b.id === 'drohnenwerkstatt').cx), docked: !!S.drone.dock }; }, scene);
 check('Mama-Bot warten: die Drohne fliegt zur Werkbank und dockt an', dock.docked && dock.d < 40, dock);
 await ev(() => nomad.step(200));

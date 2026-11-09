@@ -25,7 +25,7 @@ const supply = (name, opt) => clickText('.craft-supply', name, opt);
 const go = async ws => ev(ws => {
   nomad.take(); nomad.step(5);
   const s = window.game.scene.getScene('play'), h = s.camp.hotspots.find(h => h.ws === ws);
-  nomad.walkTo(h.x); nomad.step(1, [], ['grab']); nomad.step(3);
+  nomad.goTo(h.name); nomad.step(1, [], ['grab']); nomad.step(3);
 }, ws);
 
 await go('kochnische');
