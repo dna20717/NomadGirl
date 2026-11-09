@@ -65,6 +65,18 @@ await ev(() => game.scene.getScene('play').hud.build.close());
 await ev(() => nomad.step(60));
 check('Bau-Modus zu: wieder zu', (await shells())[0].closed === 1, await shells());
 
+// modular trailer (Daniel, 09.11.2026): on the ground automatically on a chassis as long as the container, stacked without
+const ch = await ev(() => {
+  const s = game.scene.getScene('play'), sv = s.box.save;
+  sv.rig.units.push({ id: 'container_10', level: 1, workshops: [] });
+  s.camp.drawRig();
+  return s.camp.geo.units.map(u => ({ id: u.id, level: u.level || 0, chassis: !!u.chassis, segs: u.chassis?.plan.segs.length, axles: u.chassis?.plan.segs.filter(r => r[0] === s.data_.camp.chassis.axle[0]).length, lift: u.chassis?.lift, floor: Math.round(u.floorY), ground: s.camp.ground }));
+});
+const low = ch.find(u => u.id === 'container_20'), top = ch.find(u => u.id === 'container_10');
+check('20-Fuß am Boden steht auf einem Fahrgestell mit 2 Achsen, Boden um die Fahrgestell-Höhe angehoben', low.chassis && low.axles === 2 && low.floor < low.ground - low.lift, ch);
+check('Gestapelter 10-Fuß-Container steht ohne Fahrgestell auf dem Dach', top.level === 1 && !top.chassis, ch);
+await shot('chassis');
+
 check('keine Fehler in der Konsole', !errors.length, errors);
 await browser.close();
 console.log(`${ok} ok, ${bad} Fehler`);

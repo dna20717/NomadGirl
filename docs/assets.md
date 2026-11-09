@@ -89,6 +89,7 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/rig/container_source.png` | Hochseecontainer offen + zu, Original 1792 × 1792 (Bildpixel 7 × 7) (`container_source`) | KI (Pixel-Art von Daniel) | 09.11.2026 |
 | `assets/rig/container_open_1.png` … `_3.png` | Hochseecontainer offen, 1/2/3 Werkstatt-Plätze (155/256/357 × 256) (`container_open_1` … `_3`) | aus `container_source.png` geschnitten, Mittelstück entfernt/wiederholt (`tools/container_strips.py`) | 09.11.2026 |
 | `assets/rig/container_closed_1.png` … `_3.png` | Hochseecontainer zu, deckungsgleich (`container_closed_1` … `_3`) | wie oben | 09.11.2026 |
+| `assets/rig/chassis_parts.png` | Modularer Anhänger: Deichsel + Rahmen, Mittelstück, Achse, Heck nebeneinander, 256 × 256, Pixel-Art 1:1 (`trailer_chassis`); das Camp setzt Fahrgestelle in jeder Länge daraus zusammen | KI (Pixel-Art von Daniel) | 09.11.2026 |
 
 Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich „Assets“.
 

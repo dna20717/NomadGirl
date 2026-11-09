@@ -18,11 +18,52 @@ export function daytimeAt(C, hour) {
   return [...rows].reverse().find(r => (r.from ?? 0) <= hour) || rows[rows.length - 1];
 }
 
+// Daniel's modular trailer (Camp › Fahrgestell, 09.11.2026): a container with „Auf Fahrgestell“ that does not stand on another one
+// gets a chassis as long as itself, put together from drawbar, front frame, middle pieces, axles and rear (art pixels, drawbar left).
+// One axle: drawbar | frame | middles | axle | rear. Two or more: drawbar | a little frame | axle | middles | axle | rear.
+export function chassisPlan(D, def) {
+  const C = D.camp?.chassis, A = D.assets?.[def.look];
+  if (!def.chassis || !C?.look || !D.assets?.[C.look] || !A?.frameSize || !def.inside?.x) return null;
+  const w = r => Math.max(0, (r?.[1] ?? 0) - (r?.[0] ?? 0)), pad = C.pad ?? 9;
+  const bed = Math.abs(def.inside.x[1] - def.inside.x[0]) + 2 * pad, axles = Math.max(1, C.axles?.[def.places || 1] ?? 1);
+  const segs = [C.drawbar], mids = n => { const out = []; for (let left = n; left > 0; left -= w(C.middle)) out.push([C.middle[0], C.middle[0] + Math.min(w(C.middle), left)]); return out; };
+  let rest = Math.max(0, bed - w(C.rear) - axles * w(C.axle));
+  const front = Math.min(w(C.beam), axles > 1 ? Math.min(rest, C.frontMin ?? 12) : rest);
+  if (front > 0) segs.push([C.beam[0], C.beam[0] + front]);
+  rest -= front;
+  if (axles === 1) segs.push(...mids(rest), C.axle);
+  else { const gap = rest / (axles - 1); for (let i = 0; i < axles; i++) { segs.push(C.axle); if (i < axles - 1) segs.push(...mids(Math.round(gap * (i + 1)) - Math.round(gap * i))); } }
+  segs.push(C.rear);
+  const width = segs.reduce((n, r) => n + w(r), 0), drawbar = w(C.drawbar);
+  return { segs, width, drawbar, bed: width - drawbar, pad, rows: C.rows || [163, 204], couple: C.couple ?? 172, look: C.look, key: `chassis_${segs.map(r => r.join('-')).join('_')}` };
+}
+// the chassis as a texture: the pieces side by side, mirrored so the drawbar points to the van (right)
+export function chassisTexture(scene, plan) {
+  if (scene.textures.exists(plan.key)) return plan.key;
+  if (!scene.textures.exists(plan.look)) return null;
+  const src = scene.textures.get(plan.look).getSourceImage(), [y0, y1] = plan.rows, h = y1 - y0;
+  const tex = scene.textures.createCanvas(plan.key, plan.width, h), ctx = tex.getContext();
+  ctx.imageSmoothingEnabled = false;
+  ctx.translate(plan.width, 0); ctx.scale(-1, 1);
+  let x = 0;
+  for (const [a, b] of plan.segs) { ctx.drawImage(src, a, y0, b - a, h, x, 0, b - a, h); x += b - a; }
+  tex.refresh(); tex.setFilter(NEAREST());
+  return plan.key;
+}
+
 // one container as it stands in the camp, from its left end x (rear) to the right (front, towards the van):
 // a picture with an open side (Container › Aussehen + Innenraum) or a trailer from code: rear hitch, body on a chassis
 // with axles, wheels and fenders, drawbar with coupling and jockey wheel at the front. Same art in the rig and on the scrapyard.
-export function unitShape(D, def, ground, T = 64) {
+export function unitShape(D, def, ground, T = 64, { stacked = false } = {}) {
   const C = D.camp || {}, R = C.rig || {}, places = def.places || 1, A = D.assets?.[def.look];
+  const plan = !stacked && chassisPlan(D, def);
+  if (plan) {   // on its chassis: the container stands on the loading bed, the bed spans its posts, the drawbar reaches to the van
+    const [fw] = A.frameSize, k = (A.height || A.frameSize[1]) / A.frameSize[1], [y0, y1] = plan.rows, lift = (y1 - y0) * k;
+    const box = unitShape(D, def, ground - lift, T, { stacked: true }), left = Math.min(def.inside.x[0], def.inside.x[1]);
+    const off = -((!!A.flip !== !!def.flip ? fw - Math.max(def.inside.x[0], def.inside.x[1]) : left) - plan.pad) * k, couple = ground - (y1 - plan.couple) * k;
+    return { ...box, w: plan.width * k, in0: box.in0 + off, sprite: { ...box.sprite, cx: box.sprite.cx + off, dy: -lift },
+      chassis: { plan, k, w: plan.width * k, lift }, hitch: [0, couple], coupling: [plan.width * k, couple] };
+  }
   if (A?.frameSize && def.inside?.x && def.inside?.y) {
     const [fw, fh] = A.frameSize, k = (A.height || fh) / fh, [ox, oy] = A.origin || [fw / 2, fh], flip = !!A.flip !== !!def.flip, w = fw * k;
     const ix = v => flip ? fw - v : v, a = ix(def.inside.x[0]), b = ix(def.inside.x[1]), in0 = Math.min(a, b) * k, in1 = Math.max(a, b) * k;
@@ -44,7 +85,7 @@ export function rigUnits(D, rig, vanLeft, ground, T = 64) {
     if (u.kind === 'tractor') return;
     const def = D.containers?.[u.id] || {};
     if (u.level && below) {
-      const base = below.deckY, sh = unitShape(D, def, base, T), mid = below.in0 + below.cell * below.places / 2, x0 = mid - (sh.in0 + sh.cell * sh.places / 2);
+      const base = below.deckY, sh = unitShape(D, def, base, T, { stacked: true }), mid = below.in0 + below.cell * below.places / 2, x0 = mid - (sh.in0 + sh.cell * sh.places / 2);
       below = { ...u, ui, def, ...sh, base, x0, x1: x0 + sh.w, in0: x0 + sh.in0, sprite: sh.sprite && { ...sh.sprite, cx: x0 + sh.sprite.cx }, foot: below.foot ?? below };
       out.push(below);
       return;
@@ -362,6 +403,7 @@ export class Camp {
     this.drawVanDoor();
     this.drawYard();
     if (this.night) for (const l of this.lights) if (l.rig) l.setAlpha(l.base * this.lightK).setVisible(this.lightK > 0);
+    this.updateShells(0);   // labels and lights of closed containers right away, not one frame later
   }
   // one container in the rig: shell (picture or code), furniture, lights, the interior floor as a platform, E spots
   drawUnit(u) {
@@ -369,10 +411,14 @@ export class Camp {
     this.curTop = u.level ? u.floorY : null;   // E spots of a stacked container only work up there
     this.rigObjs.push(view);
     const add = o => { view.add(o); return o; };
+    if (u.chassis) {
+      const key = chassisTexture(s, u.chassis.plan);
+      if (key) add(s.add.image(u.x0 - mid, 0, key).setOrigin(0, 1).setScale(u.chassis.k));
+    }
     if (u.sprite) {
       if (s.textures.exists(u.sprite.key)) {
         s.textures.get(u.sprite.key).setFilter(NEAREST());
-        const img = add(s.add.image(u.sprite.cx - mid, 0, u.sprite.key, 0).setOrigin(u.sprite.ox, u.sprite.oy).setScale(u.sprite.k).setFlipX(u.sprite.flip));
+        const img = add(s.add.image(u.sprite.cx - mid, u.sprite.dy || 0, u.sprite.key, 0).setOrigin(u.sprite.ox, u.sprite.oy).setScale(u.sprite.k).setFlipX(u.sprite.flip));
         // something stacked on top: the roof clutter above the deck is cut off, the container sits right on the roof (Container › Dachaufbau abschneiden)
         const U = this.box.save.rig.units, onTop = (U[u.ui + 1]?.level || 0) > (u.level || 0);
         if (onTop && u.def.deck != null && u.def.cropAbove !== false) { const f = img.frame; img.setCrop(0, u.def.deck, f.width, f.height - u.def.deck); }
@@ -380,7 +426,7 @@ export class Camp {
         const ck = u.def.lookClosed;
         if (ck && s.textures.exists(ck)) {
           s.textures.get(ck).setFilter(NEAREST());
-          const shut = s.add.image(u.sprite.cx, G, ck, 0).setOrigin(u.sprite.ox, u.sprite.oy).setScale(u.sprite.k).setFlipX(u.sprite.flip).setDepth(-19.5);
+          const shut = s.add.image(u.sprite.cx, G + (u.sprite.dy || 0), ck, 0).setOrigin(u.sprite.ox, u.sprite.oy).setScale(u.sprite.k).setFlipX(u.sprite.flip).setDepth(-19.5);
           if (onTop && u.def.deck != null && u.def.cropAbove !== false) { const f = shut.frame; shut.setCrop(0, u.def.deck, f.width, f.height - u.def.deck); }
           const was = this.shut?.[`${u.ui}:${u.id}`] ?? 1;   // redrawn rig (building): keep the current state, no flash
           shut.setAlpha(was);
@@ -518,7 +564,7 @@ export class Camp {
     const far = (C.parkScale ?? 45) / 100;
     let px = x;
     sp.containers.forEach((id, i) => {
-      const def = D.containers?.[id] || {}, sh = unitShape(D, def, 0, s.T), w = sh.w * far;
+      const def = D.containers?.[id] || {}, sh = unitShape(D, def, 0, s.T, { stacked: true }), w = sh.w * far;
       const view = keep(s.add.container(px + w / 2, y - 24).setDepth(-23).setScale(far));
       if (sh.sprite && s.textures.exists(sh.sprite.key)) view.add(s.add.image(sh.sprite.cx - sh.w / 2, 0, sh.sprite.key, 0).setOrigin(sh.sprite.ox, sh.sprite.oy).setScale(sh.sprite.k).setFlipX(sh.sprite.flip).setTint(0xb8a8b0));
       else view.add(s.add.image(-sh.w / 2, 0, shellTexture(s, D, def, s.T)).setOrigin(0, 1).setTint(0xb8a8b0));

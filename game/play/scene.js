@@ -57,6 +57,7 @@ export class PlayScene extends Phaser.Scene {
       // workshop pictures (and the empty shelf), the crate for packed workshops
       for (const w of Object.values(this.data_.workshops || {})) for (const id of [w.look, w.lookEmpty]) if (id) ids.add(id);
       if (this.data_.camp?.yard?.crate?.look) ids.add(this.data_.camp.yard.crate.look);
+      if (this.data_.camp?.chassis?.look) ids.add(this.data_.camp.chassis.look);   // modular trailer pieces
       if (this.data_.camp?.ground?.tiles) ids.add(this.data_.camp.ground.tiles);
       const S = this.data_.camp?.sound || {};
       for (const id of [S.wind, S.fire, ...(S.gusts || []), ...(this.data_.camp?.fire?.sit?.sounds || [])]) if (id) ids.add(id);

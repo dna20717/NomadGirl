@@ -1656,5 +1656,13 @@
   "derivedFrom": "container_source",
   "date": "09.11.2026",
   "description": "3 Werkstatt-Plätze, geschlossen, deckungsgleich mit der offenen Hülle. Oberkante y 73, Ankerpunkt Unterkante Mitte, im Spiel ×4."
+ },
+ "trailer_chassis": {
+  "name": "Modularer Anhänger (Teile)",
+  "kind": "image",
+  "file": "assets/rig/chassis_parts.png",
+  "source": "KI (Pixel-Art von Daniel, 09.11.2026)",
+  "date": "09.11.2026",
+  "description": "Fahrgestell in vier Teilen nebeneinander: Deichsel + Rahmen (x 6–103), Mittelstück (110–142), Achse mit Zwillingsrädern (146–226), Heck (228–247); Ladefläche y 163, Räder bis y 203. Das Camp setzt daraus Fahrgestelle in jeder Länge zusammen (Camp › Fahrgestell)."
  }
 }

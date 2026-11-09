@@ -90,5 +90,17 @@
  },
  "vanLight": {"enabled": true, "color": "#ffc870", "strength": 150, "width": 110, "height": 150, "lift": 150, "pool": 260, "spill": 40},
  "shaft": {"enabled": true, "at": 1, "width": 3, "color": "#140d12", "glow": "#c0302a", "frameHeight": 200},
- "yard": {"enabled": true, "width": 9, "dealer": true, "dealerName": "Händler", "dealerWidth": 170, "palletScale": 50, "parkScale": 45}
+ "yard": {"enabled": true, "width": 9, "dealer": true, "dealerName": "Händler", "dealerWidth": 170, "palletScale": 50, "parkScale": 45},
+ "chassis": {
+  "look": "trailer_chassis",
+  "drawbar": [6, 38],
+  "beam": [38, 104],
+  "middle": [110, 143],
+  "axle": [146, 227],
+  "rear": [228, 248],
+  "rows": [163, 204],
+  "couple": 172,
+  "frontMin": 12,
+  "axles": {"1": 1, "2": 2, "3": 2}
+ }
 }

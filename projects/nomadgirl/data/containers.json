@@ -27,7 +27,8 @@
   "deck": 73,
   "carries": true,
   "look": "container_open_2",
-  "lookClosed": "container_closed_2"
+  "lookClosed": "container_closed_2",
+  "chassis": true
  },
  "container_40": {
   "name": "40-Fuß-Container",
@@ -42,7 +43,8 @@
   "inside": {"x": [26, 330], "y": [90, 175]},
   "deck": 73,
   "look": "container_open_3",
-  "lookClosed": "container_closed_3"
+  "lookClosed": "container_closed_3",
+  "chassis": true
  },
  "modulanhaenger": {
   "name": "Modul-Anhänger",
@@ -72,6 +74,7 @@
   "deck": 73,
   "description": "Der Kleine: fasst genau eine Werkstatt.",
   "look": "container_open_1",
-  "lookClosed": "container_closed_1"
+  "lookClosed": "container_closed_1",
+  "chassis": true
  }
 }
