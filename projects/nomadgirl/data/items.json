@@ -1,15 +1,25 @@
 {
- "kupferkabel": {"name": "Kupferkabel", "category": "junk", "size": [1, 1], "stack": 10, "value": 2, "glyph": "Cu"},
- "alte_platine": {"name": "Alte Platine", "category": "junk", "size": [1, 1], "stack": 5, "value": 3, "glyph": "PCB"},
+ "kupferkabel": {"name": "Kupferkabel", "category": "junk", "size": [1, 1], "stack": 10, "value": 2, "glyph": "Cu", "look": "icons_gear", "icon": 24},
+ "alte_platine": {"name": "Alte Platine", "category": "junk", "size": [1, 1], "stack": 5, "value": 3, "glyph": "PCB", "look": "icons_gear", "icon": 34},
  "gluehbirne": {"name": "Glühbirne", "category": "junk", "size": [1, 1], "stack": 5, "value": 1, "description": "Heil. Ein kleines Wunder.", "glyph": "💡"},
  "kronkorken": {"name": "Kronkorken", "category": "junk", "size": [1, 1], "stack": 99, "value": 0, "description": "Hier nichts wert. Leyla sammelt sie trotzdem.", "glyph": "KK"},
- "schrott": {"name": "Schrott", "category": "resource", "size": [1, 1], "stack": 20, "value": 1, "glyph": "⚙"},
+ "schrott": {"name": "Schrott", "category": "resource", "size": [1, 1], "stack": 20, "value": 1, "glyph": "⚙", "look": "icons_gear", "icon": 30},
  "stoffreste": {"name": "Stoffreste", "category": "resource", "size": [1, 1], "stack": 10, "value": 1, "glyph": "🧵"},
- "batteriezelle": {"name": "Batteriezelle", "category": "resource", "size": [1, 1], "stack": 10, "value": 6, "glyph": "🔋"},
- "mutantenfleisch": {"name": "Mutantenfleisch", "category": "ingredient", "size": [1, 1], "stack": 5, "value": 2, "description": "Besser nicht fragen.", "glyph": "🍖"},
- "reis": {"name": "Reis", "category": "ingredient", "size": [1, 1], "stack": 10, "value": 2, "glyph": "🍚"},
- "gewuerzmischung": {"name": "Gewürzmischung", "category": "ingredient", "size": [1, 1], "stack": 10, "value": 4, "glyph": "🌶"},
- "dosenbohnen": {"name": "Dosenbohnen", "category": "ingredient", "size": [1, 1], "stack": 6, "value": 2, "glyph": "🥫"},
+ "batteriezelle": {"name": "Batteriezelle", "category": "resource", "size": [1, 1], "stack": 10, "value": 6, "glyph": "🔋", "look": "icons_gear", "icon": 38},
+ "mutantenfleisch": {
+  "name": "Mutantenfleisch",
+  "category": "ingredient",
+  "size": [1, 1],
+  "stack": 5,
+  "value": 2,
+  "description": "Besser nicht fragen.",
+  "glyph": "🍖",
+  "look": "icons_kitchen",
+  "icon": 16
+ },
+ "reis": {"name": "Reis", "category": "ingredient", "size": [1, 1], "stack": 10, "value": 2, "glyph": "🍚", "look": "icons_kitchen", "icon": 19},
+ "gewuerzmischung": {"name": "Gewürzmischung", "category": "ingredient", "size": [1, 1], "stack": 10, "value": 4, "glyph": "🌶", "look": "icons_kitchen", "icon": 44},
+ "dosenbohnen": {"name": "Dosenbohnen", "category": "ingredient", "size": [1, 1], "stack": 6, "value": 2, "glyph": "🥫", "look": "icons_kitchen", "icon": 38},
  "mutanten_curry": {
   "name": "Mutanten-Curry",
   "category": "food",
@@ -18,12 +28,14 @@
   "value": 12,
   "buff": "feurig",
   "description": "Scharf genug, um Erinnerungen zu löschen.",
-  "glyph": "🍛"
+  "glyph": "🍛",
+  "look": "icons_kitchen",
+  "icon": 29
  },
- "bohneneintopf": {"name": "Bohneneintopf", "category": "food", "size": [1, 1], "stack": 3, "value": 6, "buff": "satt", "glyph": "🍲"},
+ "bohneneintopf": {"name": "Bohneneintopf", "category": "food", "size": [1, 1], "stack": 3, "value": 6, "buff": "satt", "glyph": "🍲", "look": "icons_kitchen", "icon": 28},
  "schrottplatte": {"name": "Schrottplatte", "category": "component", "size": [2, 2], "stack": 4, "value": 8, "glyph": "▦"},
- "kabelbaum": {"name": "Kabelbaum", "category": "component", "size": [1, 2], "stack": 4, "value": 10, "shape": ["#.", "##"], "glyph": "KB"},
- "verband": {"name": "Verband", "category": "consumable", "size": [1, 1], "stack": 5, "value": 5, "buff": "erste_hilfe", "glyph": "✚"},
+ "kabelbaum": {"name": "Kabelbaum", "category": "component", "size": [1, 2], "stack": 4, "value": 10, "shape": ["#.", "##"], "glyph": "KB", "look": "icons_gear", "icon": 26},
+ "verband": {"name": "Verband", "category": "consumable", "size": [1, 1], "stack": 5, "value": 5, "buff": "erste_hilfe", "glyph": "✚", "look": "icons_gear", "icon": 49},
  "discokugel": {
   "name": "Discokugel",
   "category": "valuable",
@@ -41,7 +53,9 @@
   "value": 1,
   "teaches": "mutanten_curry",
   "description": "„Mehr Gewürz. Immer mehr Gewürz.“",
-  "glyph": "📜"
+  "glyph": "📜",
+  "look": "icons_kitchen",
+  "icon": 61
  },
  "rohrbogen": {
   "name": "Rohrbogen",
@@ -65,10 +79,40 @@
  },
  "antenne": {"name": "Teleskopantenne", "category": "component", "size": [1, 3], "stack": 2, "value": 7, "glyph": "📡", "description": "Empfängt drei Sender. Alle spielen Werbung."},
  "t_stueck": {"name": "T-Stück", "category": "junk", "size": [3, 2], "stack": 1, "value": 4, "shape": ["###", ".#."], "glyph": "T", "description": "Klempner-Tetris."},
- "autobatterie": {"name": "Autobatterie", "category": "resource", "size": [2, 2], "stack": 1, "value": 20, "glyph": "⚡", "description": "Schwer. Brummt leise, wenn man sie schüttelt."},
+ "autobatterie": {
+  "name": "Autobatterie",
+  "category": "resource",
+  "size": [2, 2],
+  "stack": 1,
+  "value": 20,
+  "glyph": "⚡",
+  "description": "Schwer. Brummt leise, wenn man sie schüttelt.",
+  "look": "icons_gear",
+  "icon": 37
+ },
  "verkohlter_klumpen": {"name": "Verkohlter Klumpen", "category": "junk", "size": [1, 1], "stack": 5, "value": 0, "glyph": "🪨", "description": "War mal Essen. Jetzt ist es ein Briefbeschwerer."},
- "graue_pampe": {"name": "Graue Pampe", "category": "junk", "size": [1, 1], "stack": 5, "value": 1, "glyph": "🫠", "description": "Riecht nach nichts. Das ist das Beunruhigende."},
- "kabelsalat": {"name": "Kabelsalat", "category": "junk", "size": [2, 1], "stack": 3, "value": 1, "glyph": "🍝", "description": "Irgendwo da drin ist ein Ende. Vielleicht."},
+ "graue_pampe": {
+  "name": "Graue Pampe",
+  "category": "junk",
+  "size": [1, 1],
+  "stack": 5,
+  "value": 1,
+  "glyph": "🫠",
+  "description": "Riecht nach nichts. Das ist das Beunruhigende.",
+  "look": "icons_kitchen",
+  "icon": 58
+ },
+ "kabelsalat": {
+  "name": "Kabelsalat",
+  "category": "junk",
+  "size": [2, 1],
+  "stack": 3,
+  "value": 1,
+  "glyph": "🍝",
+  "description": "Irgendwo da drin ist ein Ende. Vielleicht.",
+  "look": "icons_gear",
+  "icon": 39
+ },
  "schrottskulptur": {
   "name": "Schrottskulptur",
   "category": "valuable",
@@ -78,6 +122,27 @@
   "glyph": "🗿",
   "description": "Sollte ein Werkzeug werden. Ist jetzt Kunst. Sammler sind verwirrt, zahlen aber."
  },
- "gewuerzreis": {"name": "Gewürzreis", "category": "food", "size": [1, 1], "stack": 3, "value": 7, "buff": "flink", "glyph": "🍘", "description": "Leicht, scharf, macht Beine."},
- "notstrom": {"name": "Notstrom-Pack", "category": "component", "size": [1, 2], "stack": 2, "value": 18, "glyph": "🔌", "description": "Zwei Zellen, viel Klebeband, ein Funke Hoffnung."}
+ "gewuerzreis": {
+  "name": "Gewürzreis",
+  "category": "food",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 7,
+  "buff": "flink",
+  "glyph": "🍘",
+  "description": "Leicht, scharf, macht Beine.",
+  "look": "icons_kitchen",
+  "icon": 23
+ },
+ "notstrom": {
+  "name": "Notstrom-Pack",
+  "category": "component",
+  "size": [1, 2],
+  "stack": 2,
+  "value": 18,
+  "glyph": "🔌",
+  "description": "Zwei Zellen, viel Klebeband, ein Funke Hoffnung.",
+  "look": "icons_kitchen",
+  "icon": 60
+ }
 }

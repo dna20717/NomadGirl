@@ -72,6 +72,19 @@ if (!(await page.evaluate(() => window.workshop.page.choice))) errors.push('Eint
 await page.locator('.da-nav', { hasText: 'Waffen' }).click();
 if (await top('.da-main') !== 0) errors.push('Neuer Bereich beginnt nicht oben');
 
+// icon sheet (asset kind "Symbole"): the inspector of an item shows the grid, a click picks the cell, undo takes it back, the list shows the cell
+await go({ area: 'items', choice: 'verband' });
+await page.waitForSelector('.ng-icons.pick .ng-icon.picked', { timeout: 5000 }).catch(() => errors.push('Symbol-Raster im Inspektor fehlt'));
+const iconBefore = await page.evaluate(() => window.workshop.p.data.items.verband.icon);
+await page.locator('.ng-icons.pick .ng-icon').nth(48).click();
+if (await page.evaluate(() => window.workshop.p.data.items.verband.icon) !== 48) errors.push('Klick ins Symbol-Raster setzt das Symbol nicht');
+await shot('icons');
+await page.keyboard.press('Control+z');
+if (await page.evaluate(() => window.workshop.p.data.items.verband.icon) !== iconBefore) errors.push('Rückgängig stellt das Symbol nicht zurück');
+if (!(await page.locator('.da-entry .ng-thumb canvas, .da-entry .ng-thumb img').count())) errors.push('Liste zeigt keine Vorschaubilder');
+await go({ area: 'assets', choice: 'icons_gear' });
+await page.waitForSelector('.ng-icons .ng-icon', { timeout: 5000 }).catch(() => errors.push('Symbol-Raster in der Asset-Vorschau fehlt'));
+
 await browser.close();
 if (errors.length) { console.error('Fehler:\n' + errors.join('\n')); process.exit(1); }
 console.log(`Werkstatt ok: ${Object.keys(AREAS).length} Bereiche gezeichnet, Bearbeiten + Rückgängig gehen.`);

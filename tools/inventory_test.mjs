@@ -31,6 +31,11 @@ await ev(() => { nomad.take(); nomad.step(5); const h = nomad.state().camp.hotsp
 let s = await inv();
 check('E an der Kiste öffnet Rucksack + Kiste', s.open && s.other?.key === 'chest' && has(s.other.grid, 'discokugel') && has(s.backpack, 'verband'), s);
 await shot('chest');
+// pictures from the icon sheets (Assets › Symbole) instead of glyphs: the Verband in the backpack, the Karambit in its slot
+const pics = await ev(() => [...document.querySelectorAll('.inv-item.pic .inv-art, .inv-slot .inv-art')].map(e => getComputedStyle(e).backgroundImage).filter(b => b.includes('icons_')));
+check('Symbole statt Kürzel (Rucksack + Slot)', pics.length >= 2, pics);
+const sheetOk = await ev(() => fetch('projects/nomadgirl/assets/items/icons_gear.png').then(r => r.ok));
+check('Symbol-Raster lädt', sheetOk, sheetOk);
 
 // machete (1×3) from the chest into the backpack
 await click(1, 2, 0);

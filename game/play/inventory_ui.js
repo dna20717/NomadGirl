@@ -24,6 +24,26 @@ export function kindOf(D, a, id) {
 }
 export const glyphOf = (D, a, id) => { const t = thing(D, a, id) || {}; return t.glyph || (t.name || id).replace(/[^A-Za-zÄÖÜäöü]/g, '').slice(0, 2).toUpperCase(); };
 
+// The picture of a thing whose look is a cell in an icon sheet (asset kind "icons"), as a CSS sprite; null without one.
+// px = edge length on screen, turn = quarter turns (follows the thing in the grid).
+const ASSET_BASE = new URL('projects/nomadgirl/', location.href);
+export function iconCell(D, t) {
+  const A = D.assets?.[t?.look];
+  if (A?.kind !== 'icons' || !A.file || t.icon === undefined) return null;
+  const [c, r] = A.grid || [1, 1];
+  if (t.icon < 0 || t.icon >= c * r) return null;
+  return { url: new URL(A.file, ASSET_BASE).href, c, r, col: t.icon % c, row: Math.floor(t.icon / c) };
+}
+export function artOf(D, a, id, px, turn = 0) {
+  const k = iconCell(D, thing(D, a, id));
+  if (!k) return null;
+  const pos = (i, n) => n > 1 ? (i / (n - 1)) * 100 : 0;
+  return el('span', { class: 'inv-art', style: `width:${px}px;height:${px}px;background-image:url("${k.url}");background-size:${k.c * 100}% ${k.r * 100}%;` +
+    `background-position:${pos(k.col, k.c)}% ${pos(k.row, k.r)}%;${turn ? `transform:rotate(${turn * 90}deg);` : ''}` });
+}
+// picture if there is one, otherwise the glyph as text
+export const markOf = (D, a, id, px) => artOf(D, a, id, px) || glyphOf(D, a, id);
+
 export class InventoryUI {
   // host: { D, save(), changed(), equipChanged(slot), floor()?, notify(text), inCamp()?, rigChanged()? }
   // Tabs over the left panel (camp only): "Leyla" (slots + backpack) and the tractor ("Van": rig part slots + Kofferraum).
@@ -107,9 +127,10 @@ export class InventoryUI {
     const set = new Set(cells.map(p => p.join(',')));
     for (const [x, y] of cells) wrap.append(el('i', { style: `left:${x * c}px;top:${y * c}px;width:${c}px;height:${c}px`,
       class: [!set.has(`${x - 1},${y}`) && 'l', !set.has(`${x + 1},${y}`) && 'r', !set.has(`${x},${y - 1}`) && 't', !set.has(`${x},${y + 1}`) && 'b'].filter(Boolean).join(' ') }));
-    const [lx, ly] = cells[0];
-    wrap.append(el('span', { class: 'inv-glyph', style: `left:${lx * c}px;top:${ly * c}px;width:${c}px;height:${c}px` }, glyphOf(D, e.a, e.id)));
-    if (b.w * c >= 80 || b.h > 1) wrap.append(el('span', { class: 'inv-name' }, t.name || e.id));
+    const [lx, ly] = cells[0], side = Math.min(b.w, b.h) * c, art = artOf(D, e.a, e.id, Math.round(side * 0.92), e.r || 0);
+    if (art) { wrap.classList.add('pic'); wrap.append(el('span', { class: 'inv-pic', style: `left:${(b.w * c - side) / 2}px;top:${(b.h * c - side) / 2}px;width:${side}px;height:${side}px` }, art)); }
+    else wrap.append(el('span', { class: 'inv-glyph', style: `left:${lx * c}px;top:${ly * c}px;width:${c}px;height:${c}px` }, glyphOf(D, e.a, e.id)));
+    if (!art && (b.w * c >= 80 || b.h > 1)) wrap.append(el('span', { class: 'inv-name' }, t.name || e.id));
     if (e.n > 1) wrap.append(el('span', { class: 'inv-count' }, String(e.n)));
     wrap.addEventListener('mousedown', ev => {
       ev.stopPropagation();
@@ -127,7 +148,7 @@ export class InventoryUI {
   slotEl(slot) {
     const D = this.D, inv = this.inv, id = slot === 'backpack' ? inv.backpack : inv.slots[slot], a = slot === 'backpack' ? 'backpacks' : 'weapons', t = id && thing(D, a, id);
     const s = el('div', { class: 'inv-slot' + (t ? ' full' : ''), title: SLOT_NAMES[slot], style: t ? `--col:${CATEGORY_COLORS[kindOf(D, a, id)]}` : '' },
-      el('small', {}, SLOT_NAMES[slot]), t ? el('b', {}, glyphOf(D, a, id)) : icon(SLOT_ICONS[slot], 18), t ? el('span', {}, t.name) : null);
+      el('small', {}, SLOT_NAMES[slot]), t ? el('b', {}, markOf(D, a, id, 34)) : icon(SLOT_ICONS[slot], 18), t ? el('span', {}, t.name) : null);
     s.addEventListener('mousedown', ev => { ev.stopPropagation(); if (ev.button === 0) this.slotClick(slot); });
     if (t) { s.addEventListener('mouseenter', () => this.showTip({ a, id, n: 1 })); s.addEventListener('mouseleave', () => { this.tip.hidden = true; }); }
     return s;

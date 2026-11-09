@@ -10,7 +10,9 @@
   "size": [1, 2],
   "value": 8,
   "description": "Repariert Leitungen und Meinungen.",
-  "glyph": "🔧"
+  "glyph": "🔧",
+  "look": "icons_gear",
+  "icon": 17
  },
  "machete": {"name": "Machete", "kind": "melee", "tier": 2, "damage": 18, "cooldown": 450, "range": 88, "knockback": 160, "critChance": 10, "size": [1, 3], "value": 40, "glyph": "🔪"},
  "schockstab": {
@@ -42,7 +44,9 @@
   "glyph": "🔫",
   "sound": "sound_shot",
   "magazine": 7,
-  "reloadTime": 1400
+  "reloadTime": 1400,
+  "look": "icons_gear",
+  "icon": 2
  },
  "schrotflinte": {
   "name": "Schrotflinte",
@@ -72,7 +76,9 @@
   "value": 120,
   "description": "Hacking kommt später. Bis dahin ein sehr teurer Briefbeschwerer.",
   "knockback": null,
-  "glyph": "💾"
+  "glyph": "💾",
+  "look": "icons_gear",
+  "icon": 42
  },
  "karambit": {
   "name": "Karambit",
@@ -86,6 +92,8 @@
   "value": 15,
   "critChance": 15,
   "glyph": "🗡",
-  "description": "Gebogene Klinge mit Fingerring. Leylas Lieblingsmesser, schnell und gemein."
+  "description": "Gebogene Klinge mit Fingerring. Leylas Lieblingsmesser, schnell und gemein.",
+  "look": "icons_gear",
+  "icon": 52
  }
 }

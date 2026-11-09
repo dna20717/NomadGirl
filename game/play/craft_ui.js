@@ -5,7 +5,7 @@
 //   Experimentieren: click supplies to put one into the pot (right click or click in the pot takes one out), "Ausprobieren" tries it.
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
-import { CATEGORY_COLORS, glyphOf } from './inventory_ui.js';
+import { CATEGORY_COLORS, markOf } from './inventory_ui.js';
 import { recipesFor, known, missing, stock, craft, experiment, readable, read, tips, functionOf } from '../crafting.js';
 import { clockText } from '../save.js';
 
@@ -58,7 +58,7 @@ export class CraftUI {
         el('div', { class: 'craft-rtop' }, (r.part ? this.partChip(r.part, r.count || 1) : this.chip(r.result, r.count || 1, { big: true })), el('b', {}, r.name || (r.part ? D.rigParts?.[r.part]?.name : D.items?.[r.result]?.name) || r.id), el('small', {}, `${r.time ?? 10} min`)),
         el('div', { class: 'craft-ings' }, ...(r.ingredients || []).map(i => {
           const n = st[i.item] || 0, need = i.count || 1;
-          return el('span', { class: 'craft-ing ' + (n >= need ? 'ok' : 'no') }, `${glyphOf(D, 'items', i.item)} ${D.items?.[i.item]?.name || i.item} ${Math.min(n, 99)}/${need}`);
+          return el('span', { class: 'craft-ing ' + (n >= need ? 'ok' : 'no') }, markOf(D, 'items', i.item, 18), ` ${D.items?.[i.item]?.name || i.item} ${Math.min(n, 99)}/${need}`);
         })),
         el('button', { class: 'inv-btn', disabled: !!miss.length, title: miss.length ? 'Es fehlen: ' + miss.map(m => `${m.need - m.have}× ${D.items?.[m.item]?.name || m.item}`).join(', ') : '', onclick: () => this.make(r.id) }, verb));
     });
@@ -81,7 +81,7 @@ export class CraftUI {
       const id = ids[i];
       if (!id) return el('div', { class: 'craft-slot' }, el('small', {}, `Zutat ${i + 1}`));
       const s = el('div', { class: 'craft-slot full', style: `--col:${CATEGORY_COLORS[D.items?.[id]?.category] || '#555'}`, onmousedown: ev => { ev.preventDefault(); this.takeOut(id, ev.shiftKey ? this.pot[id] : 1); } },
-        el('b', {}, glyphOf(D, 'items', id)), el('span', {}, D.items?.[id]?.name || id), el('i', {}, `×${this.pot[id]}`));
+        el('b', {}, markOf(D, 'items', id, 24)), el('span', {}, D.items?.[id]?.name || id), el('i', {}, `×${this.pot[id]}`));
       this.hover(s, id);
       return s;
     });
@@ -100,7 +100,7 @@ export class CraftUI {
         const left = st[id] - (this.pot[id] || 0);
         const c = el('button', { class: 'craft-supply' + (left <= 0 ? ' used' : ''), style: `--col:${CATEGORY_COLORS[D.items[id].category] || '#555'}`,
           onmousedown: ev => { ev.preventDefault(); if (ev.button === 2 || ev.ctrlKey) this.takeOut(id, 1); else if (ev.button === 0) this.putIn(id, ev.shiftKey ? left : 1); } },
-          el('b', {}, glyphOf(D, 'items', id)), el('span', {}, D.items[id].name || id), el('i', {}, String(left)));
+          el('b', {}, markOf(D, 'items', id, 24)), el('span', {}, D.items[id].name || id), el('i', {}, String(left)));
         this.hover(c, id);
         return c;
       }) : [el('p', { class: 'craft-empty' }, 'Nichts da. Erst plündern, dann kochen.')])));
@@ -171,7 +171,7 @@ export class CraftUI {
 
   // small coloured placeholder of a thing (until things have a look)
   chip(id, n = 1, { big = false } = {}) {
-    const D = this.D, c = el('span', { class: 'craft-chip' + (big ? ' big' : ''), style: `--col:${CATEGORY_COLORS[D.items?.[id]?.category] || '#555'}` }, glyphOf(D, 'items', id), n > 1 ? el('i', {}, String(n)) : null);
+    const D = this.D, c = el('span', { class: 'craft-chip' + (big ? ' big' : ''), style: `--col:${CATEGORY_COLORS[D.items?.[id]?.category] || '#555'}` }, markOf(D, 'items', id, big ? 40 : 26), n > 1 ? el('i', {}, String(n)) : null);
     this.hover(c, id);
     return c;
   }

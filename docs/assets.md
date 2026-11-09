@@ -92,6 +92,8 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/rig/chassis_parts.png` | Modularer Anhänger: Deichsel + Rahmen, Mittelstück, Achse, Heck nebeneinander, 256 × 256, Pixel-Art 1:1 (`trailer_chassis`); das Camp setzt Fahrgestelle in jeder Länge daraus zusammen | KI (Pixel-Art von Daniel) | 09.11.2026 |
 
 Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich „Assets“.
+| `assets/items/icons_gear.png` | Symbol-Raster Ausrüstung & Material: 8 × 8 Icons à 32 × 32 px, Pixel-Art (Waffen, Werkzeug, Material, Elektronik, Medizin) (`icons_gear`) | KI-generiert (Daniel, Sheet-Export mit Prompt) | 09.11.2026 |
+| `assets/items/icons_kitchen.png` | Symbol-Raster Küche & Essen: 8 × 8 Icons à 32 × 32 px, Pixel-Art (Geräte, Zutaten, Gerichte, Gewürze, Rezepte) (`icons_kitchen`) | KI-generiert (Daniel, Sheet-Export mit Prompt) | 09.11.2026 |
 
 ## Ordner
 

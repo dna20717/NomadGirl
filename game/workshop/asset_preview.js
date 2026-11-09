@@ -29,7 +29,31 @@ const failed = (file, e) => el('p', { class: 'ng-inline error' }, icon('error', 
 
 // Preview of any asset: animation → player, everything else → picture
 export function assetPreview(w, a) {
-  return a?.kind === 'animation' ? spritePreview(w, a) : a?.kind === 'sound' ? soundPreview(w, a) : picturePreview(w, a);
+  return a?.kind === 'animation' ? spritePreview(w, a) : a?.kind === 'sound' ? soundPreview(w, a) : a?.kind === 'icons' ? iconSheet(w, a) : picturePreview(w, a);
+}
+
+// Icon sheet (asset kind "icons"): the whole grid, pixel-sharp, every cell with its number and name as tooltip.
+// With pick = { value, set(i) } a cell can be chosen (inspector of an item, weapon or backpack).
+export function iconSheet(w, a, pick) {
+  const v = w.spriteView = w.spriteView || { view: 'near', back: 'check', anchor: true, playing: true, frame: 0 };
+  const [fw, fh] = a.cell || [0, 0], [c, r] = a.grid || [0, 0];
+  const info = el('span', { class: 'ng-sprite-info' });
+  const box = el('div', { class: 'ng-sprite-stage picture back-' + v.back });
+  const seg = el('span', { class: 'ed-segment' }, ...BACKS.map(([k, n]) => el('button', { class: v.back === k ? 'on' : '', onclick: () => { v.back = k; w.draw(); } }, n)));
+  const wrap = el('div', { class: 'ng-sprite' }, el('div', { class: 'ng-sprite-bar' }, info, el('span', { class: 'ed-grow' }), seg), box);
+  if (!a.file || !fw || !c || !r) { box.append(el('p', { class: 'ed-small' }, 'Datei, Feldgröße und Raster eintragen, dann erscheint hier das Raster.')); return wrap; }
+  const name = i => a.names?.[i] || `Feld ${i}`;
+  info.textContent = pick ? (pick.value !== undefined ? `Symbol ${pick.value}: ${name(pick.value)}` : 'Symbol anklicken') : `${c} × ${r} Symbole à ${fw} × ${fh} px`;
+  objectUrl(w, a.file).then(src => {
+    const grid = el('div', { class: 'ng-icons' + (pick ? ' pick' : ''), style: `--c:${c};--r:${r};aspect-ratio:${c * fw} / ${r * fh}` }, el('img', { src, alt: a.name || a.file }));
+    for (let i = 0; i < c * r; i++) {
+      const cell = el(pick ? 'button' : 'span', { class: 'ng-icon' + (pick?.value === i ? ' picked' : ''), title: `${i} · ${name(i)}`, style: `left:${(i % c) / c * 100}%;top:${Math.floor(i / c) / r * 100}%` });
+      if (pick) cell.addEventListener('click', () => pick.set(i));
+      grid.append(cell);
+    }
+    box.append(grid);
+  }).catch(e => box.append(failed(a.file, e)));
+  return wrap;
 }
 
 // Sound: a player (the browser's own controls), length shown once it is loaded
@@ -64,17 +88,20 @@ export function picturePreview(w, a) {
 }
 
 // Small picture for lists and the gallery: first frame of an animation, otherwise the image itself
-export function assetThumb(w, a, size = 28) {
+export function assetThumb(w, a, size = 28, cell) {
   const box = el('span', { class: 'ng-thumb', style: `--s:${size}px` });
   if (!a?.file) return box;
   if (a.kind === 'sound') { box.append(icon('music', Math.round(size * 0.7))); return box; }
-  if (a.kind === 'animation') {
-    const [fw, fh] = a.frameSize || [0, 0];
+  const sheet = a.kind === 'icons' && cell !== undefined && a.grid?.[0];   // one cell of an icon sheet
+  if (a.kind === 'animation' || sheet) {
+    const [fw, fh] = (sheet ? a.cell : a.frameSize) || [0, 0];
     if (!fw || !fh) return box;
+    const sx = sheet ? (cell % a.grid[0]) * fw : 0, sy = sheet ? Math.floor(cell / a.grid[0]) * fh : 0;
     image(w, a.file).then(img => {
-      const c = el('canvas'), k = Math.min(size * 2 / fh, size * 2 / fw);
+      const c = el('canvas'), k = sheet ? Math.max(1, Math.ceil(size * 2 / fw)) : Math.min(size * 2 / fh, size * 2 / fw);
       c.width = Math.max(1, Math.round(fw * k)); c.height = Math.max(1, Math.round(fh * k));
-      c.getContext('2d').drawImage(img, 0, 0, fw, fh, 0, 0, c.width, c.height);
+      const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = !sheet;
+      ctx.drawImage(img, sx, sy, fw, fh, 0, 0, c.width, c.height);
       box.append(el('img', { src: c.toDataURL(), alt: '' }));   // as <img> so it scales like the other thumbnails
     }).catch(() => box.classList.add('broken'));
   } else objectUrl(w, a.file).then(src => box.append(el('img', { src, alt: '' }))).catch(() => box.classList.add('broken'));

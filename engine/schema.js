@@ -28,6 +28,15 @@ const NAME = text('name', 'Name', { required: true });
 const DESCRIPTION = area_('description', 'Beschreibung');
 const VALUE = num('value', 'Wert', { unit: 'Δ', min: 0, hint: 'Verkaufswert in Deltas' });
 const LOOK = ref('look', 'Aussehen', 'assets', { hint: 'Grafik aus dem Bereich Assets' });
+const ICON = num('icon', 'Symbol', { min: 0, hint: 'Nur bei Aussehen der Art „Symbole“: welches Feld im Raster (0 = oben links, zeilenweise). Am einfachsten rechts in der Vorschau anklicken' });
+// an entry whose look is an icon sheet must name a cell that exists
+const iconCheck = (x, report, p) => {
+  const a = p.data?.assets?.[x.look];
+  if (a?.kind !== 'icons') { if (x.icon !== undefined && a) report('hint', 'Symbol gilt nur bei Aussehen der Art „Symbole“'); return; }
+  const [c, r] = a.grid || [];
+  if (x.icon === undefined) report('warning', 'Aussehen ist ein Symbol-Raster, aber kein Symbol gewählt');
+  else if (c && r && x.icon >= c * r) report('error', `Symbol ${x.icon} gibt es nicht (Raster hat ${c * r})`);
+};
 const STAGE = select('stage', 'Ausbaustufe', [['mvp', 'MVP'], ['1', 'Stufe 1'], ['2', 'Stufe 2']], { hint: 'Wann das ins Spiel kommt' });
 
 // ---------- fixed option lists ----------
@@ -46,7 +55,7 @@ export const RIG_SLOTS = [['engine', 'Motor'], ['armor', 'Panzerung'], ['weapon'
 export const POI_KINDS = [['gasStation', 'Tankstelle'], ['settlement', 'Siedlung'], ['factory', 'Fabrik'], ['bunker', 'Bunker'], ['government', 'Regierungskomplex'], ['mall', 'Einkaufszentrum'], ['ruin', 'Ruine']];
 export const POI_SIZES = [['S', 'S'], ['M', 'M'], ['L', 'L'], ['XL', 'XL']];
 export const ROOM_TAGS = [['start', 'Eingang'], ['exit', 'Ausgang'], ['combat', 'Kampf'], ['loot', 'Beute'], ['secret', 'Geheimnis'], ['npc', 'NPCs'], ['boss', 'Boss'], ['corridor', 'Gang']];
-export const ASSET_KINDS = [['animation', 'Animation'], ['tiles', 'Kacheln'], ['image', 'Bild'], ['sound', 'Ton'], ['reference', 'Referenz'], ['source', 'Original']];
+export const ASSET_KINDS = [['animation', 'Animation'], ['tiles', 'Kacheln'], ['image', 'Bild'], ['sound', 'Ton'], ['icons', 'Symbole'], ['reference', 'Referenz'], ['source', 'Original']];
 export const DAYTIME = [['any', 'Immer'], ['day', 'Tag'], ['night', 'Nacht']];
 export const DRONE_MOODS = [['idle', 'Normal'], ['kill', 'Gegner erledigt'], ['cleared', 'Raum geräumt'], ['bored', 'Langeweile'], ['alert', 'Gegner in der Nähe'],
   ['curious', 'Neugierig (zufällig)'], ['hit', 'Leyla getroffen'], ['sleep', 'Schlafen'], ['down', 'Leyla k.o.'], ['scan', 'Scannen (zufällig)'], ['lowHealth', 'Wenig Leben'], ['dash', 'Dash'], ['zen', 'Zen (Leyla macht Yoga)']];
@@ -64,6 +73,8 @@ export const AREAS = {
     sections: [
       { title: 'Asset', fields: [NAME, select('kind', 'Art', ASSET_KINDS, { required: true }), text('file', 'Datei', { required: true, hint: 'Pfad im Projekt, z. B. assets/leyla/idle.png' }), DESCRIPTION] },
       { title: 'Frames', when: x => x.kind === 'animation' || x.kind === 'tiles', fields: [size('frameSize', 'Frame-Größe', { unit: 'px' }), num('frames', 'Frames', { min: 1, hint: 'Kacheln: Streifen in der Reihenfolge einzeln, links, Mitte, rechts' })] },
+      { title: 'Symbol-Raster', when: x => x.kind === 'icons', fields: [size('cell', 'Feldgröße', { unit: 'px' }), size('grid', 'Raster', { unit: 'Felder', hint: 'Spalten × Zeilen' }),
+        lines('names', 'Namen', { hint: 'Ein Name pro Feld, zeilenweise von oben links; erscheinen beim Auswählen' })] },
       { title: 'Animation', when: x => x.kind === 'animation', fields: [num('fps', 'Tempo', { unit: 'fps', min: 0, step: 0.5 }), bool('loop', 'Wiederholen')] },
       { title: 'Im Spiel', when: x => x.kind === 'animation' || x.kind === 'image', fields: [point('origin', 'Ankerpunkt', { unit: 'px', hint: 'Wo die Füße stehen (bei Animationen im Frame): Dieser Punkt sitzt im Spiel auf dem Boden' }),
         num('height', 'Höhe im Spiel', { unit: 'px', min: 1, hint: 'Auf diese Höhe wird das Bild bzw. ein Frame im Spiel skaliert' }), bool('flip', 'Schaut nach links', { hint: 'Wenn die Grafik nach links schaut; das Spiel spiegelt dann umgekehrt' }),
@@ -77,6 +88,8 @@ export const AREAS = {
       if (x.alt && p.exists && !p.exists(x.alt)) report('error', `Ersatzdatei ${x.alt} fehlt`);
       if (x.kind === 'sound' && x.file && !/\.(m4a|mp3|ogg|wav)$/i.test(x.file)) report('warning', 'Töne sind .m4a, .mp3, .ogg oder .wav');
       if (x.kind === 'tiles' && (!x.frameSize || !x.frames)) report('error', 'Kacheln ohne Frame-Größe oder Frames');
+      if (x.kind === 'icons' && (!x.cell || !x.grid)) report('error', 'Symbol-Raster ohne Feldgröße oder Raster');
+      if (x.kind === 'icons' && x.names?.length && x.grid && x.names.length > x.grid[0] * x.grid[1]) report('warning', 'Mehr Namen als Felder im Raster');
       if (x.kind === 'animation') {
         if (x.file && !/\.(png|webp)$/i.test(x.file)) report('warning', 'Animationen sind PNG-Streifen');
         if (!x.frameSize || !x.frames) report('error', 'Animation ohne Frame-Größe oder Frames');
@@ -309,8 +322,9 @@ export const AREAS = {
     hint: 'Rucksäcke sind Raster im Diablo-Stil. Gegenstände belegen Felder nach ihrer Größe. Bessere Ausrüstung = mehr Platz.',
     template: { name: 'Neuer Rucksack', size: [6, 4], tier: 1, value: 50 },
     row: x => `${(x.size || []).join('×')} · Stufe ${x.tier ?? '–'}`,
-    sections: [{ title: 'Rucksack', fields: [NAME, LOOK, size('size', 'Raster', { unit: 'Felder' }), size('bag', 'Platz als Gegenstand', { unit: 'Felder', hint: 'So viel Platz braucht der Rucksack selbst in einem Lager (Standard 2 × 3)' }),
+    sections: [{ title: 'Rucksack', fields: [NAME, LOOK, ICON, size('size', 'Raster', { unit: 'Felder' }), size('bag', 'Platz als Gegenstand', { unit: 'Felder', hint: 'So viel Platz braucht der Rucksack selbst in einem Lager (Standard 2 × 3)' }),
       num('tier', 'Stufe', { min: 1, max: 5 }), text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar' }), VALUE, DESCRIPTION] }],
+    check: iconCheck,
   },
 
   weapons: {
@@ -319,7 +333,7 @@ export const AREAS = {
     template: { name: 'Neue Waffe', kind: 'melee', damage: 10, cooldown: 400, range: 40, knockback: 100, size: [1, 2], tier: 1, value: 20 },
     row: x => `${label(WEAPON_KINDS, x.kind)} · ${x.damage ?? 0} Schaden · ${x.cooldown ?? 0} ms`,
     sections: [
-      { title: 'Waffe', fields: [NAME, LOOK, select('kind', 'Art', WEAPON_KINDS, { required: true }), num('tier', 'Stufe', { min: 1, max: 5 }),
+      { title: 'Waffe', fields: [NAME, LOOK, ICON, select('kind', 'Art', WEAPON_KINDS, { required: true }), num('tier', 'Stufe', { min: 1, max: 5 }),
         text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar: 1–3 Zeichen oder ein Emoji' }), DESCRIPTION] },
       { title: 'Werte', fields: [num('damage', 'Schaden', { min: 0 }), num('cooldown', 'Abklingzeit', { unit: 'ms', min: 0 }), num('range', 'Reichweite', { unit: 'px', min: 0 }),
         num('knockback', 'Rückstoß', { unit: 'px/s', min: 0 }), num('critChance', 'Krit-Chance', { unit: '%', min: 0, max: 100 }), num('ammo', 'Munition', { min: 0, hint: 'Leer = unendlich' }),
@@ -327,6 +341,7 @@ export const AREAS = {
         num('magazine', 'Magazin', { unit: 'Schuss', min: 1, hint: 'Nur Fernkampf: so viele Schuss, dann nachladen (R, leer = automatisch). Munition = Vorrat insgesamt' }), num('reloadTime', 'Nachladen dauert', { unit: 'ms', min: 0 })] },
       { title: 'Rucksack & Handel', fields: [size('size', 'Größe', { unit: 'Felder' }), VALUE] },
     ],
+    check: iconCheck,
   },
   enemies: {
     name: 'Gegner', singular: 'Gegner', icon: 'skull', file: 'data/enemies.json', kind: 'catalog', groupBy: { key: 'family', options: ENEMY_FAMILIES },
@@ -359,13 +374,14 @@ export const AREAS = {
     template: { name: 'Neuer Gegenstand', category: 'junk', size: [1, 1], stack: 1, value: 1 },
     row: x => `${label(ITEM_CATEGORIES, x.category)} · ${(x.size || [1, 1]).join('×')} · ${x.value ?? 0} Δ`,
     sections: [
-      { title: 'Gegenstand', fields: [NAME, LOOK, select('category', 'Kategorie', ITEM_CATEGORIES), DESCRIPTION] },
+      { title: 'Gegenstand', fields: [NAME, LOOK, ICON, select('category', 'Kategorie', ITEM_CATEGORIES), DESCRIPTION] },
       { title: 'Rucksack & Handel', fields: [size('size', 'Größe', { unit: 'Felder', hint: 'Rechteck im Raster; eine Form (unten) hat Vorrang' }),
         lines('shape', 'Form', { hint: 'Tetris-Form: eine Zeile pro Reihe, # = belegt, . = frei (z. B. „#.“ / „##“ für ein L). Leer = Rechteck aus „Größe“. Im Spiel mit Rechtsklick drehbar' }),
         num('stack', 'Stapel', { min: 1 }), text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar, solange es kein Aussehen gibt: 1–3 Zeichen oder ein Emoji' }), VALUE] },
       { title: 'Wirkung', fields: [ref('buff', 'Buff beim Essen/Benutzen', 'buffs'), ref('teaches', 'Bringt Rezept bei', 'recipes', { hint: 'Für Baupläne und Kochbücher' })] },
     ],
-    check: (x, report) => {
+    check: (x, report, p) => {
+      iconCheck(x, report, p);
       if (x.shape?.length) { const w = Math.max(...x.shape.map(r => r.length)); if (!x.shape.join('').includes('#')) report('error', 'Form ohne belegtes Feld (#)'); if (x.shape.some(r => /[^#. ]/.test(r))) report('error', 'Form: nur # und . erlaubt'); if (w > 6 || x.shape.length > 6) report('warning', 'Form größer als 6 × 6'); }
       if (x.category === 'blueprint' && !x.teaches) report('warning', 'Bauplan ohne Rezept'); if (x.category === 'food' && !x.buff) report('hint', 'Gericht ohne Buff'); },
   },

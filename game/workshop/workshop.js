@@ -10,7 +10,7 @@ import { openCloudStore } from '../cloud_store.js';
 import { browserLoader } from '../browser_loader.js';
 import { AREAS, GROUPS, fields, loadProject, validateProject, usages, references, renameEntry, removeEntry, rowText, optionLabel, get, set, freeId } from '../../engine/project.js';
 import { SUMMARY } from './summaries.js';
-import { assetPreview, assetThumb } from './asset_preview.js';
+import { assetPreview, assetThumb, iconSheet } from './asset_preview.js';
 
 const THEMES = { gray: 'Grau', violet: 'Violett', brightness: 'Hell' };
 // Web workshop: save automatically after this many seconds without a new change (?autosave=5 for tests)
@@ -309,7 +309,7 @@ export class Workshop {
       const bad = m.filter(y => y.place.area === a && y.place.id === id && y.kind !== 'hint');
       const look = a === 'assets' ? x : this.p.data.assets?.[x.look];
       return [bad.length ? el('span', { class: 'ng-dot ' + (bad.some(y => y.kind === 'error') ? 'error' : 'warning'), title: bad.map(y => y.text).join('\n') }) : null,
-        A.gallery ? assetThumb(this, look, 96) : look ? assetThumb(this, look, 28) : null,
+        A.gallery ? assetThumb(this, look, 96) : look ? assetThumb(this, look, 28, x.icon) : null,
         el('span', { class: 'da-name' }, x.name || id), el('small', {}, rowText(this.p, a, x))];
     };
     const all = Object.entries(o);
@@ -360,7 +360,9 @@ export class Workshop {
     return [el('h4', {}, 'Aussehen', el('span', { class: 'da-grow' }),
       el('button', { class: 'ed-button small', title: 'Zum Asset', onclick: () => this.go({ area: 'assets', choice: r.value }) }, icon('arrow_right', 13))),
       refs.length > 1 ? el('span', { class: 'ed-segment ng-lookPick' }, ...refs.map(q => el('button', { class: q === r ? 'on' : '', onclick: () => { this.lookPick[a] = q.path; this.draw(); } }, q.field.label))) : null,
-      assetPreview(this, A[r.value])];
+      A[r.value].kind === 'icons' && r.holder === x && r.key === 'look' && fields(a).some(f => f.key === 'icon')
+        ? iconSheet(this, A[r.value], { value: x.icon, set: i => this.change(a, () => { x.icon = i; }) })
+        : assetPreview(this, A[r.value])];
   }
 
   // ---------- Field editors from the schema ----------

@@ -8,6 +8,8 @@
   "value": 250,
   "description": "Mit Namensschild „Gefr. Kowalski“. Er braucht ihn nicht mehr.",
   "bag": [3, 3],
-  "glyph": "🎒"
+  "glyph": "🎒",
+  "look": "icons_gear",
+  "icon": 57
  }
 }
