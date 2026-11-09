@@ -48,16 +48,20 @@
   "places": 1,
   "power": -1,
   "value": 80,
-  "look": "ws_metal_bench",
+  "look": "ws_workbench",
   "fx": [
-   {"kind": "light", "x": 97, "y": 93, "w": 62, "h": 6, "color": "#fff1c8", "size": 70, "rate": 6, "when": "always"},
-   {"kind": "light", "x": 166, "y": 72, "w": 12, "h": 8, "color": "#ffd27a", "size": 32, "rate": 0, "when": "always"},
-   {"kind": "screen", "x": 63, "y": 145, "w": 18, "h": 8, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
-   {"kind": "sparks", "x": 112, "y": 128, "w": 20, "h": 6, "color": "#ffb347", "size": 3, "rate": 40, "when": "use", "idle": 0},
-   {"kind": "smoke", "x": 116, "y": 122, "w": 10, "h": 4, "color": "#b9b2c2", "size": 7, "rate": 2, "when": "use", "idle": 0},
-   {"kind": "sparks", "x": 112, "y": 128, "w": 20, "h": 6, "color": "#ffb347", "size": 2, "rate": 2, "when": "always"}
-  ],
-  "scale": 140
+   {"kind": "light", "x": 97, "y": 63, "w": 68, "h": 6, "color": "#fff1c8", "size": 75, "rate": 5, "when": "always"},
+   {"kind": "screen", "x": 82, "y": 102, "w": 25, "h": 13, "color": "#5cf28a", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "screen", "x": 150, "y": 92, "w": 20, "h": 16, "color": "#3fe0d0", "size": 0, "rate": 3, "when": "always"},
+   {"kind": "screen", "x": 49, "y": 96, "w": 8, "h": 8, "color": "#8be04a", "size": 0, "rate": 0, "when": "always"},
+   {"kind": "screen", "x": 179, "y": 103, "w": 8, "h": 9, "color": "#3fe0a0", "size": 0, "rate": 4, "when": "always"},
+   {"kind": "sparks", "x": 120, "y": 148, "w": 30, "h": 6, "color": "#ffb347", "size": 3, "rate": 40, "when": "use", "idle": 0},
+   {"kind": "smoke", "x": 130, "y": 143, "w": 10, "h": 4, "color": "#b9b2c2", "size": 7, "rate": 2, "when": "use", "idle": 0},
+   {"kind": "sparks", "x": 120, "y": 148, "w": 30, "h": 6, "color": "#ffb347", "size": 2, "rate": 2, "when": "always"},
+   {"kind": "twinkle", "x": 40, "y": 160, "w": 60, "h": 42, "size": 3, "rate": 1, "when": "always"},
+   {"kind": "twinkle", "x": 150, "y": 160, "w": 45, "h": 42, "size": 3, "rate": 1.5, "when": "always"},
+   {"kind": "twinkle", "x": 205, "y": 80, "w": 30, "h": 120, "size": 3, "rate": 1, "when": "always"}
+  ]
  },
  "generator": {
   "name": "Generator",

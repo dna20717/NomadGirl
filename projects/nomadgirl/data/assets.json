@@ -1816,5 +1816,14 @@
    "Schneebesen"
   ],
   "cell": [32, 32]
+ },
+ "ws_workbench": {
+  "name": "Werkstatt · Werkbank mit Lochwand",
+  "kind": "image",
+  "file": "assets/workshops/workbench.png",
+  "origin": [128, 205],
+  "source": "KI (Pixel-Art von Daniel, 09.11.2026; Prompt: general purpose cyberpunk workbench with pegboard, front facing)",
+  "date": "09.11.2026",
+  "description": "Allzweck-Werkbank mit Lochwand voller Werkzeug, Neonröhre, zwei Hologramm-Schirmen, Servern und Kisten darunter. 256 × 256, Füße bei y 205."
  }
 }
