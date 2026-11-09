@@ -30,7 +30,7 @@
   "lookClosed": "container_closed_2",
   "chassis": true,
   "benchScale": 130,
-  "floorStrip": true
+  "benchInset": 16
  },
  "container_40": {
   "name": "40-Fuß-Container",
@@ -48,7 +48,7 @@
   "lookClosed": "container_closed_3",
   "chassis": true,
   "benchScale": 130,
-  "floorStrip": true
+  "benchInset": 16
  },
  "modulanhaenger": {
   "name": "Modul-Anhänger",
@@ -81,6 +81,6 @@
   "lookClosed": "container_closed_1",
   "chassis": true,
   "benchScale": 130,
-  "floorStrip": true
+  "benchInset": 16
  }
 }

@@ -95,6 +95,7 @@ Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich 
 | `assets/items/icons_gear.png` | Symbol-Raster Ausrüstung & Material: 8 × 8 Icons à 32 × 32 px, Pixel-Art (Waffen, Werkzeug, Material, Elektronik, Medizin) (`icons_gear`) | KI-generiert (Daniel, Sheet-Export mit Prompt) | 09.11.2026 |
 | `assets/items/icons_kitchen.png` | Symbol-Raster Küche & Essen: 8 × 8 Icons à 32 × 32 px, Pixel-Art (Geräte, Zutaten, Gerichte, Gewürze, Rezepte) (`icons_kitchen`) | KI-generiert (Daniel, Sheet-Export mit Prompt) | 09.11.2026 |
 | `assets/workshops/workbench.png` | Werkbank mit Lochwand (Allzweck): 256 × 256, Füße bei y 205, ersetzt `metal_bench.png` an der Werkbank (`ws_workbench`) | KI-generiert (Daniel) | 09.11.2026 |
+| `assets/rig/container_source.png` (neu) | Hochseecontainer offen + zu, offene Hülle jetzt mit gemaltem Boden (13 px Tiefe) und Rückwand mit Rillen; alte Fassung `container_source_v1.png` | Pixel-Art von Daniel (KI + Handarbeit) | 09.11.2026 |
 
 ## Ordner
 

@@ -445,7 +445,7 @@ export class Camp {
     const g = s.make.graphics({}, false), h = u.floorY - u.inTop, key = `camp_unit_${u.ui}`, shades = [];
     // a floor with depth for low top-down workshop pictures (Camp › Boden im Innenraum, Daniel 09.11.2026): the back feet stand on it,
     // Leyla walks along its front edge; pixel style in three tones, seams in the sheet
-    const F = R.floor || {}, depth = u.def.floorStrip ? F.depth || 0 : 0, inset = depth ? Math.min(F.inset || 0, depth) : 0;
+    const F = R.floor || {}, depth = u.def.floorStrip ? F.depth || 0 : 0, inset = u.def.benchInset ?? (depth ? Math.min(F.inset || 0, depth) : 0);
     if (depth > 0) {
       const fg = s.add.graphics(), x0 = u.in0, x1 = u.in0 + u.cell * u.places, y1 = u.floorY, y0 = y1 - depth, base = col(F.color || '#3a3f48');
       const tone = k => Phaser.Display.Color.IntegerToColor(base).darken(k).color, lift = k => Phaser.Display.Color.IntegerToColor(base).lighten(k).color;
