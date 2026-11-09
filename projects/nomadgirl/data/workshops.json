@@ -56,7 +56,8 @@
    {"kind": "sparks", "x": 112, "y": 128, "w": 20, "h": 6, "color": "#ffb347", "size": 3, "rate": 40, "when": "use", "idle": 0},
    {"kind": "smoke", "x": 116, "y": 122, "w": 10, "h": 4, "color": "#b9b2c2", "size": 7, "rate": 2, "when": "use", "idle": 0},
    {"kind": "sparks", "x": 112, "y": 128, "w": 20, "h": 6, "color": "#ffb347", "size": 2, "rate": 2, "when": "always"}
-  ]
+  ],
+  "scale": 140
  },
  "generator": {
   "name": "Generator",

@@ -77,6 +77,10 @@ s = await ev(() => {
 });
 check('W an der Leiter: Leyla klettert', s.st === 'climb', s);
 check('… und steht oben im Container', Math.abs(s.feet - s.floor) < 4, s);
+// up there she walks with real keys from end wall to end wall and stays upstairs (Daniel, 09.11.2026: "am Kopf von Leitern kann man nicht mehr laufen")
+s = await ev(() => { const sc = game.scene.getScene('play'), up = sc.camp.geo.units.find(u => u.level), x0 = sc.leyla.box.x; nomad.step(200, ['right']); const xr = sc.leyla.box.x, fr = sc.leyla.feet; nomad.step(400, ['left']);
+  return { right: Math.round(xr - x0), left: Math.round(sc.leyla.box.x - xr), feet: [Math.round(fr), Math.round(sc.leyla.feet)], floor: Math.round(up.floorY), in0: Math.round(up.in0), in1: Math.round(up.in0 + up.cell * up.places), x: Math.round(sc.leyla.box.x) }; });
+check('Oben laufen: hin und her bis an die Stirnwände, ohne runterzufallen', s.right > 100 && s.left < -100 && s.feet.every(f => Math.abs(f - s.floor) < 4) && s.x > s.in0 && s.x < s.in1, s);
 s = await ev(() => { const sc = game.scene.getScene('play'), up = sc.camp.geo.units.find(u => u.level); nomad.walkTo(up.in0 + up.cell / 2); nomad.step(20); return { prompt: nomad.state().camp.prompt, feet: Math.round(sc.leyla.feet) }; });
 check('Oben: E-Punkt des oberen Lagerregals (nicht der Kochnische darunter)', /Lagerregal/.test(s.prompt || '') && !/Kochnische|Werkbank/.test(s.prompt || ''), s);
 s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(5); return nomad.inv(); });

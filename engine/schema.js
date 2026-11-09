@@ -539,7 +539,7 @@ export const AREAS = {
         num('rig.lift', 'Boden über der Straße', { unit: 'px', min: 20, hint: 'Anhänger aus Code: so hoch steht der Boden auf dem Fahrgestell' }), num('rig.drawbar', 'Deichsel', { unit: 'px', min: 40, hint: 'Anhänger aus Code: Länge der Deichsel bis zur Kupplung' }),
         num('rig.boxAt', 'Deichselkasten bei', { unit: '%', min: 0, max: 100, hint: 'Wo der Kasten auf der Deichsel sitzt (0 = am Aufbau, 100 = an der Kupplung); E dort öffnet den Stauraum des Anhängers' }),
         num('rig.trunkAt', 'Kofferraum bei', { unit: '%', min: 0, max: 100, hint: 'E-Punkt für den Stauraum der Zugmaschine, von links über die Breite des Vans' }),
-        num('rig.ladderAt', 'Leiter zum Stapel bei', { unit: '%', min: 0, max: 100, hint: 'Wo die Leiter in einen gestapelten Container hochführt: von links über die Breite des Anhängers darunter' }),
+        num('rig.ladderAt', 'Leiter zum Stapel bei', { unit: '%', min: 0, max: 100, hint: 'Wo die Leiter in einen gestapelten Container hochführt: von links über die Breite des Anhängers darunter; liegt sie neben dem Container oben, rückt sie unter seinen Boden' }),
         num('rig.reachUp', 'E-Punkte unten bis', { unit: 'px', min: 50, hint: 'Steht Leyla höher über dem Boden (z. B. im oberen Container oder auf dem Van-Dach), gelten die E-Punkte unten nicht' }),
         color('rig.wall', 'Wand'), color('rig.inside', 'Innen'), color('rig.light', 'Licht'), bool('rig.labels', 'Namen anzeigen')] },
       { title: 'Lagerfeuer', fields: [bool('fire.enabled', 'Zeigen'), ref('fire.look', 'Aussehen', 'assets', { hint: 'Animation, Ankerpunkt = Mitte am Boden. Leer = Flammen aus Code' }), num('fire.at', 'Abstand vom Van', { unit: 'Kacheln', min: 1 }),

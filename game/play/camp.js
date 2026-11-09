@@ -484,6 +484,11 @@ export class Camp {
     s.platforms.add(z);
     Object.assign(z.body.checkCollision, { down: false, left: false, right: false });
     this.rigObjs.push(z);
+    // a stacked container has end walls: up there Leyla can walk from end to end without stepping off into the air (down = ladder)
+    if (u.level) for (const wx of [u.in0 - 8, u.in0 + u.cell * u.places + 8]) {
+      const wall = s.add.zone(wx, (u.inTop + u.floorY) / 2, 16, u.floorY - u.inTop);
+      s.solids.add(wall); this.rigObjs.push(wall);
+    }
     if (u.level) this.stackLadder(u);
     this.curTop = null;
     return view;
@@ -491,7 +496,10 @@ export class Camp {
   // a ladder from below up into a stacked container (Camp › Rig-Ansicht › Leiter bei): climbs like an H ladder, at the top she pulls herself in
   stackLadder(u) {
     const s = this.scene, R = this.C.rig || {}, foot = u.foot || u, below = this.geo.units.find(x => x.ui === u.ui - 1) || foot;
-    const x = foot.x0 + (foot.x1 - foot.x0) * (R.ladderAt ?? 8) / 100, top = u.floorY, bottom = u.level > 1 ? below.floorY : this.ground;
+    // Camp › Rig-Ansicht › Leiter bei (% of the unit below), but always under the floor of the container on top:
+    // a short container sits in the middle of a long trailer, a ladder beside it ended in the air (Daniel, 09.11.2026)
+    const in1 = u.in0 + u.cell * u.places, edge = Math.min(s.T * 0.75, (in1 - u.in0) / 2);
+    const x = Math.min(Math.max(foot.x0 + (foot.x1 - foot.x0) * (R.ladderAt ?? 8) / 100, u.in0 + edge), in1 - edge), top = u.floorY, bottom = u.level > 1 ? below.floorY : this.ground;
     const g = s.add.graphics().setDepth(-18);
     g.fillStyle(0x30363d).fillRect(x - 22, top - 30, 6, bottom - top + 30).fillRect(x + 16, top - 30, 6, bottom - top + 30);
     g.fillStyle(0x8b949e).fillRect(x - 22, top - 30, 2, bottom - top + 30).fillRect(x + 16, top - 30, 2, bottom - top + 30);
