@@ -84,7 +84,7 @@ check('Werkbank: Verband + Schrottplatte im Buch, Schraube kennt Kabelbaum', c.o
 await page.locator('.craft-recipe', { hasText: 'Verband' }).locator('button').click();
 c = await craft();
 check('Herstellen: Verband', c.log?.kind === 'hit' && c.stock.verband === 3, c.stock);
-await supply('Schrott'); await supply('Kronkorken');
+await supply('Rohrbogen'); await supply('Kronkorken');   // Schrott + Kronkorken is near the Zahnräder (Schrott + Schrauben)
 await clickText('button', 'Ausprobieren');
 c = await craft();
 check('Werkbank-Fehlschlag ergibt Werkbank-Müll', c.log?.kind === 'miss' && (c.stock.kabelsalat || c.stock.schrottskulptur), c);

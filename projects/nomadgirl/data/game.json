@@ -31,7 +31,12 @@
    {"where": "storage", "item": "gewuerzmischung", "count": 2},
    {"where": "storage", "item": "mutantenfleisch", "count": 1},
    {"where": "storage", "item": "batteriezelle", "count": 2},
-   {"where": "storage", "item": "alte_platine", "count": 1}
+   {"where": "storage", "item": "alte_platine", "count": 1},
+   {"where": "storage", "item": "leuchteier", "count": 2},
+   {"where": "storage", "item": "mutantengemuese", "count": 2},
+   {"where": "storage", "item": "sojasauce", "count": 1},
+   {"where": "storage", "item": "speiseoel", "count": 1},
+   {"where": "storage", "item": "schrauben", "count": 6}
   ],
   "spare": ["kochnische", "werkbank", "lagerregal"]
  },

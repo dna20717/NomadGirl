@@ -4,5 +4,9 @@
  "flink": {"name": "Flink", "stat": "speed", "value": 10, "percent": true, "duration": "run"},
  "ausgeschlafen": {"name": "Ausgeschlafen", "stat": "defense", "value": 10, "percent": true, "duration": "run"},
  "gemuetlich": {"name": "Gemütlich", "stat": "luck", "value": 5, "percent": true, "duration": "run", "description": "Wer entspannt ist, findet mehr."},
- "erste_hilfe": {"name": "Erste Hilfe", "stat": "health", "value": 30, "duration": "instant"}
+ "erste_hilfe": {"name": "Erste Hilfe", "stat": "health", "value": 30, "duration": "instant"},
+ "gestaerkt": {"name": "Gestärkt", "stat": "health", "value": 40, "percent": false, "duration": "run", "description": "Ordentlich was auf den Rippen."},
+ "zaeh": {"name": "Zäh", "stat": "defense", "value": 15, "percent": true, "duration": "run", "description": "Ein gutes Bento macht dickes Fell."},
+ "verarztet": {"name": "Verarztet", "stat": "health", "value": 70, "percent": false, "duration": "instant"},
+ "aufgeputscht": {"name": "Aufgeputscht", "stat": "speed", "value": 20, "percent": true, "duration": "run", "description": "Das Herz klopft bis in die Ohren."}
 }

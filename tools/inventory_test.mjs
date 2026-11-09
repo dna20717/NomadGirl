@@ -26,7 +26,7 @@ const slot = async name => { const b = await page.locator('.inv-slot', { hasText
 const has = (g, id) => g.items.some(i => i.startsWith(id + '×'));
 
 // the start ingredients for cooking and crafting (Spiel › Start-Inventar) are not part of this test: the shelf as it was before
-await ev(() => { const g = nomad.save().inv.grids; for (const k of Object.keys(g)) if (k.startsWith('store:')) g[k].items = g[k].items.filter(e => !['stoffreste', 'schrott', 'reis', 'gewuerzmischung', 'mutantenfleisch', 'batteriezelle', 'alte_platine'].includes(e.id)); });
+await ev(() => { const g = nomad.save().inv.grids; for (const k of Object.keys(g)) if (k.startsWith('store:')) g[k].items = g[k].items.filter(e => !['stoffreste', 'schrott', 'reis', 'gewuerzmischung', 'mutantenfleisch', 'batteriezelle', 'alte_platine', 'leuchteier', 'mutantengemuese', 'sojasauce', 'speiseoel', 'schrauben'].includes(e.id)); });
 await ev(() => { nomad.take(); nomad.step(5); const h = nomad.state().camp.hotspots.find(h => h.name === 'Kiste'); nomad.walkTo(h.x); nomad.step(1, [], ['grab']); nomad.step(5); });
 let s = await inv();
 check('E an der Kiste öffnet Rucksack + Kiste', s.open && s.other?.key === 'chest' && has(s.other.grid, 'discokugel') && has(s.backpack, 'verband'), s);

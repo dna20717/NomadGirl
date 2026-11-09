@@ -13,10 +13,10 @@ const fresh = () => { const s = newSave(D); s.hour = 18.5; return s; };
 
 test('Rezeptbuch: am Anfang alle Rezepte „Von Anfang an“, alte Spielstände bekommen sie dazu', () => {
   const s = fresh();
-  assert.deepEqual(s.recipes.sort(), ['bleche_schweissen', 'bohneneintopf', 'schrottplatte', 'verband']);
+  assert.deepEqual(s.recipes.sort(), ['bleche_schweissen', 'bohneneintopf', 'chip', 'grillsteak', 'schrottplatte', 'verband']);
   const old = { ...s, recipes: undefined }; delete old.recipes;
-  assert.deepEqual(repairSave(old, D).recipes.sort(), ['bleche_schweissen', 'bohneneintopf', 'schrottplatte', 'verband']);
-  assert.deepEqual(repairSave({ ...s, recipes: ['discokugel', 'gibtsnicht'] }, D).recipes.sort(), ['bleche_schweissen', 'bohneneintopf', 'discokugel', 'schrottplatte', 'verband']);
+  assert.deepEqual(repairSave(old, D).recipes.sort(), ['bleche_schweissen', 'bohneneintopf', 'chip', 'grillsteak', 'schrottplatte', 'verband']);
+  assert.deepEqual(repairSave({ ...s, recipes: ['discokugel', 'gibtsnicht'] }, D).recipes.sort(), ['bleche_schweissen', 'bohneneintopf', 'chip', 'discokugel', 'grillsteak', 'schrottplatte', 'verband']);
 });
 
 test('Werkstatt-Art: Küche kann Rezepte der Kochnische, die Werkbank keine Gerichte', () => {
@@ -70,7 +70,7 @@ test('Experimentieren: Fehlschlag ergibt kuriosen Müll der Werkstatt-Art, knapp
 
 test('Zettel lesen und Tipps von Companions', () => {
   const s = fresh();
-  assert.deepEqual(tips(D, s, 'kochnische').map(t => t.recipe).sort(), ['gewuerzreis', 'mutanten_curry']);
+  assert.deepEqual(tips(D, s, 'kochnische').map(t => t.recipe).sort(), ['gewuerzreis', 'mutanten_curry', 'neon_ramen', 'wasteland_sushi']);
   assert.equal(tips(D, s, 'kochnische')[0].who, 'Onkel Sung');
   give(D, s, 'zettel_curry', 1);
   assert.deepEqual(readable(D, s).map(x => x.item), ['zettel_curry']);

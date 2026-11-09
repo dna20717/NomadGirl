@@ -79,5 +79,81 @@
   "discovery": ["experiment", "companion"],
   "part": "dachbox",
   "hint": "Ein Koffer aus Blech und Lumpen. Fürs Dach."
+ },
+ "neon_ramen": {
+  "name": "Neon-Ramen",
+  "station": "kochnische",
+  "ingredients": [{"item": "leuchteier", "count": 1},{"item": "mutantengemuese", "count": 1},{"item": "sojasauce", "count": 1}],
+  "result": "neon_ramen",
+  "count": 2,
+  "time": 30,
+  "discovery": ["found", "companion", "experiment"],
+  "hint": "Ein Ei, das leuchtet, Grünzeug und was Salziges, Dunkles."
+ },
+ "dumplings": {
+  "name": "Dumplings",
+  "station": "kochnische",
+  "ingredients": [{"item": "mutantenfleisch", "count": 1},{"item": "mutantengemuese", "count": 2},{"item": "sojasauce", "count": 1}],
+  "result": "dumplings",
+  "count": 3,
+  "time": 40,
+  "discovery": ["experiment"]
+ },
+ "wasteland_sushi": {
+  "name": "Wasteland-Sushi",
+  "station": "kochnische",
+  "ingredients": [{"item": "reis", "count": 2},{"item": "neon_garnelen", "count": 1},{"item": "sojasauce", "count": 1}],
+  "result": "wasteland_sushi",
+  "count": 2,
+  "time": 25,
+  "discovery": ["experiment", "companion"],
+  "hint": "Reis, etwas aus dem Wasser und dunkle Soße. Roh ist Mut."
+ },
+ "grillsteak": {
+  "name": "Grillsteak",
+  "station": "kochnische",
+  "ingredients": [{"item": "mutantenfleisch", "count": 2},{"item": "speiseoel", "count": 1}],
+  "result": "grillsteak",
+  "count": 1,
+  "time": 15,
+  "discovery": ["start"]
+ },
+ "bento_deluxe": {
+  "name": "Bento deluxe",
+  "station": "kochnische",
+  "ingredients": [{"item": "reis", "count": 1},{"item": "leuchteier", "count": 1},{"item": "neon_garnelen", "count": 1},{"item": "mutantengemuese", "count": 1}],
+  "result": "bento_deluxe",
+  "count": 1,
+  "time": 50,
+  "discovery": ["experiment"],
+  "hint": "Vier Fächer: Reis, Ei, Meer, Beet."
+ },
+ "chip": {
+  "name": "Chip",
+  "station": "werkbank",
+  "ingredients": [{"item": "alte_platine", "count": 2},{"item": "kupferkabel", "count": 1}],
+  "result": "chip",
+  "count": 1,
+  "time": 30,
+  "discovery": ["start"]
+ },
+ "zahnraeder": {
+  "name": "Zahnräder",
+  "station": "werkbank",
+  "ingredients": [{"item": "schrott", "count": 2},{"item": "schrauben", "count": 4}],
+  "result": "zahnraeder",
+  "count": 2,
+  "time": 40,
+  "discovery": ["experiment", "companion"],
+  "hint": "Schrott plus eine Handvoll Kleinkram. Dann feilen, feilen, feilen."
+ },
+ "medikit": {
+  "name": "Medikit",
+  "station": "werkbank",
+  "ingredients": [{"item": "verband", "count": 2},{"item": "panzertape", "count": 1}],
+  "result": "medikit",
+  "count": 1,
+  "time": 20,
+  "discovery": ["found", "experiment"]
  }
 }

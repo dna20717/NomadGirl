@@ -5,7 +5,7 @@
   "stage": "1",
   "workshops": ["werkbank", "motorraum", "drohnenwerkstatt"],
   "buffs": [],
-  "tips": ["kabelbaum", "schrottplatte", "notstrom", "dachbox_bauen"],
+  "tips": ["kabelbaum", "schrottplatte", "notstrom", "dachbox_bauen", "zahnraeder"],
   "description": "Redet mit Motoren. Die Motoren hören zu.",
   "lines": [
    "Hörst du das? Der Motor summt in Moll.",
@@ -34,7 +34,7 @@
   "stage": "1",
   "workshops": ["kochnische", "kueche", "foodtruck"],
   "buffs": ["feurig"],
-  "tips": ["mutanten_curry", "gewuerzreis"],
+  "tips": ["mutanten_curry", "gewuerzreis", "neon_ramen", "wasteland_sushi"],
   "description": "Hat früher in BigCityDelta gekocht. Für wen, sagt er nicht.",
   "lines": [
    "Hunger? Natürlich hast du Hunger.",

@@ -8,10 +8,26 @@
    {"item": "dosenbohnen", "weight": 4, "min": 1, "max": 2},
    {"item": "kronkorken", "weight": 6, "min": 2, "max": 8},
    {"item": "batteriezelle", "weight": 1, "min": 1, "max": 1},
-   {"item": "zettel_curry", "weight": 1, "min": 1, "max": 1}
+   {"item": "zettel_curry", "weight": 1, "min": 1, "max": 1},
+   {"item": "sojasauce", "weight": 2, "min": 1, "max": 1},
+   {"item": "speiseoel", "weight": 2, "min": 1, "max": 2},
+   {"item": "panzertape", "weight": 3, "min": 1, "max": 1},
+   {"item": "feuerzeug", "weight": 3, "min": 1, "max": 1},
+   {"item": "mre_ration", "weight": 1, "min": 1, "max": 1},
+   {"item": "rezept_ramen", "weight": 1, "min": 1, "max": 1}
   ]
  },
- "mutanten_beute": {"name": "Mutanten-Beute", "rolls": [0, 1], "entries": [{"item": "mutantenfleisch", "weight": 6, "min": 1, "max": 1},{"item": "stoffreste", "weight": 2, "min": 1, "max": 2}]},
+ "mutanten_beute": {
+  "name": "Mutanten-Beute",
+  "rolls": [0, 1],
+  "entries": [
+   {"item": "mutantenfleisch", "weight": 6, "min": 1, "max": 1},
+   {"item": "stoffreste", "weight": 2, "min": 1, "max": 2},
+   {"item": "leuchteier", "weight": 2, "min": 1, "max": 2},
+   {"item": "mutantengemuese", "weight": 3, "min": 1, "max": 2},
+   {"item": "neon_garnelen", "weight": 2, "min": 1, "max": 2}
+  ]
+ },
  "pluenderer_beute": {
   "name": "Plünderer-Beute",
   "rolls": [2, 3],
@@ -25,17 +41,34 @@
    {"item": "t_stueck", "weight": 1, "min": 1, "max": 1},
    {"item": "auspuffkruemmer", "weight": 1, "min": 1, "max": 1},
    {"item": "antenne", "weight": 1, "min": 1, "max": 1},
-   {"item": "autobatterie", "weight": 1, "min": 1, "max": 1}
+   {"item": "autobatterie", "weight": 1, "min": 1, "max": 1},
+   {"item": "schrauben", "weight": 3, "min": 2, "max": 6},
+   {"item": "panzertape", "weight": 2, "min": 1, "max": 1},
+   {"item": "aufputschspritze", "weight": 1, "min": 1, "max": 1},
+   {"item": "mre_ration", "weight": 1, "min": 1, "max": 1}
   ]
  },
  "drohnen_beute": {
   "name": "Drohnen-Beute",
   "rolls": [1, 1],
-  "entries": [{"item": "alte_platine", "weight": 3, "min": 1, "max": 1},{"item": "batteriezelle", "weight": 2, "min": 1, "max": 1},{"item": "kupferkabel", "weight": 3, "min": 1, "max": 2}]
+  "entries": [
+   {"item": "alte_platine", "weight": 3, "min": 1, "max": 1},
+   {"item": "batteriezelle", "weight": 2, "min": 1, "max": 1},
+   {"item": "kupferkabel", "weight": 3, "min": 1, "max": 2},
+   {"item": "chip", "weight": 1, "min": 1, "max": 1},
+   {"item": "zahnraeder", "weight": 2, "min": 1, "max": 1},
+   {"item": "schrauben", "weight": 2, "min": 2, "max": 4}
+  ]
  },
  "boss_beute": {
   "name": "Boss-Beute",
   "rolls": [3, 4],
-  "entries": [{"item": "discokugel", "weight": 1, "min": 1, "max": 1},{"item": "batteriezelle", "weight": 3, "min": 2, "max": 4},{"item": "kabelbaum", "weight": 2, "min": 1, "max": 2}]
+  "entries": [
+   {"item": "discokugel", "weight": 1, "min": 1, "max": 1},
+   {"item": "batteriezelle", "weight": 3, "min": 2, "max": 4},
+   {"item": "kabelbaum", "weight": 2, "min": 1, "max": 2},
+   {"item": "bauplan_medikit", "weight": 1, "min": 1, "max": 1},
+   {"item": "medikit", "weight": 1, "min": 1, "max": 1}
+  ]
  }
 }
