@@ -22,7 +22,7 @@ Spieldesign: `docs/design.md` (dazu das claude.ai-Projekt „NomadGirl“).
 ## Einrichten und prüfen
 
 ```
-ln -s "$(npm root -g)/playwright" node_modules/playwright     # nur für den Werkstatt-Test
+ln -s "$(npm root -g)/playwright" node_modules/playwright     # für die Browser-Tests (in der Cloud-Umgebung „NomadGirl“ macht das das Setup-Skript)
 npm test                                   # Schema, Daten, Umbenennen, Löschen, Start-Rig, Worker
 npm run web:test                           # Web-Werkstatt + Spiel mit Worker, falschem GitHub und Login
 node tools/ng.js check                     # Spieldaten prüfen
@@ -98,7 +98,7 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 
 ## PixelLab (Grafik-KI)
 
-Daniel nutzt PixelLab für Grafiken (10.11.2026: „direkte Verbindung“). `.mcp.json` bindet den gehosteten PixelLab-MCP-Server ein (`https://api.pixellab.ai/mcp`, Bearer-Token). Der Schlüssel steht **nie im Repo**, nur als Umgebungsvariable `PIXELLAB_API_KEY`. Claude Code auf dem iPad (Cloud-Sitzung) braucht in der Cloud-Umgebung: Umgebungsvariable `PIXELLAB_API_KEY=…`, Netzwerkzugriff „Custom“ mit `api.pixellab.ai` (Standard-Domains behalten), dann neue Sitzung, `/mcp` zeigt `pixellab`. In der Claude-App (Chat) geht es nicht: eigene Connectors können keinen Bearer-Header. PixelLab-Grafiken in `THIRD_PARTY.md`/`docs/assets.md` als „KI (PixelLab)“ vermerken.
+Daniel nutzt PixelLab für Grafiken (10.11.2026: „direkte Verbindung“). `.mcp.json` bindet den gehosteten PixelLab-MCP-Server ein (`https://api.pixellab.ai/mcp`, Bearer-Token). Der Schlüssel steht **nie im Repo** und auch nicht in einer Umgebungsvariable. **Cloud-Umgebung „NomadGirl“** (persönlich, mit dem Repo verknüpft, eingerichtet 10.11.2026): Netzwerk eingeschränkt mit Paketquellen + MCP-Servern + `api.pixellab.ai`; der Schlüssel ist ein **Netzwerk-Geheimnis** für `api.pixellab.ai` (`Authorization: Bearer`), der Proxy setzt ihn selbst ein; `PIXELLAB_API_KEY=vom-proxy-ersetzt` ist nur ein Platzhalter, damit `.mcp.json` einen Header schickt (der Proxy überschreibt ihn). Setup-Skript: Playwright-Verknüpfung in `node_modules/`. Neue Sitzung in der Umgebung „NomadGirl“ starten, `/mcp` zeigt `pixellab`. Schlüssel tauschen: Umgebung › Bearbeiten › Netzwerk-Geheimnisse (oder Ava fragt per sicherem Formular). In der Claude-App (Chat) geht es nicht: eigene Connectors können keinen Bearer-Header. PixelLab-Grafiken in `THIRD_PARTY.md`/`docs/assets.md` als „KI (PixelLab)“ vermerken.
 
 ## Assets und Fidelity
 
