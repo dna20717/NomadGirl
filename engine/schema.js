@@ -245,16 +245,29 @@ export const AREAS = {
 
   drone: {
     name: 'Drohne', icon: 'air', file: 'data/drone.json', kind: 'single',
-    hint: 'Leylas Drohne: fliegt immer hinter ihr her, reine Deko ohne Physik. Stimmungen zeigen ein Gesicht (Frame aus dem Aussehen) und optional ein Kaomoji-Bläschen. Zeiten in Millisekunden bzw. Sekunden.',
+    hint: 'Leylas Drohne: fliegt immer hinter ihr her, reine Deko ohne Physik. Gebaut aus Ebenen (Daniel, 10.11.2026: „modulare Drohne“): Kabel hinten, Hülle, Gesicht auf dem Bildschirm, Glanz darüber, Anbauteile davor oder dahinter. Alle Punkte in Bildpixeln der Hülle. Zeiten in Millisekunden bzw. Sekunden.',
     sections: [
-      { title: 'Drohne', fields: [NAME, ref('look', 'Aussehen', 'assets', { hint: 'Animation mit einem Frame pro Stimmung (Tempo 0)' }), num('height', 'Höhe im Spiel', { unit: 'px', min: 8, hint: 'Leer = Höhe aus dem Asset' }),
+      { title: 'Drohne', fields: [NAME, ref('look', 'Hülle', 'assets', { hint: 'Bild der Drohne ohne Gesicht, Ankerpunkt = Mitte des Körpers. Ältere Drohnen: Animation mit einem Frame pro Stimmung' }), num('height', 'Höhe im Spiel', { unit: 'px', min: 8, hint: 'Leer = Höhe aus dem Asset' }),
         bool('enabled', 'Fliegt mit'), select('layer', 'Ebene', [['behind', 'Hinter Leyla'], ['front', 'Vor Leyla']]), DESCRIPTION] },
+      { title: 'Gesicht', fields: [ref('face.look', 'Gesichter', 'assets', { hint: 'Animation mit einem Gesicht pro Frame, Ankerpunkt = Mitte des Glases. Leer = die Hülle selbst wechselt den Frame (alte Drohne)' }),
+        ref('face.glass', 'Glanz', 'assets', { hint: 'Spiegelung auf dem Glas, liegt über dem Gesicht (gleiche Fläche und Ankerpunkt wie die Hülle)' }), point('face.screen', 'Bildschirm-Mitte', { unit: 'px', hint: 'In Bildpixeln der Hülle' }),
+        num('face.lookShift', 'Augen wandern', { unit: 'px', min: 0, step: 0.5, hint: 'So weit rutscht das Gesicht zu Leyla bzw. zum nächsten Gegner' }), num('face.flicker', 'Flimmern', { unit: '%', min: 0, max: 100, hint: 'Alter Bildschirm: Helligkeit zuckt leicht' }),
+        num('face.blink.frame', 'Blinzeln: Frame', { min: 0 }), range('face.blink.every', 'Blinzeln alle', { unit: 's' }), num('face.blink.duration', 'Blinzeln dauert', { unit: 'ms', min: 0, hint: 'Nur beim Gesicht „Normal“' })] },
       { title: 'Flug', fields: [point('follow.offset', 'Position', { unit: 'px', hint: 'Von Leylas Füßen aus: x hinter ihr (in Blickrichtung gespiegelt), y nach oben negativ' }),
         num('follow.smooth', 'Nachziehen', { min: 0.01, max: 1, step: 0.01, hint: '1 = klebt an der Position, kleiner = träger' }), num('follow.bob', 'Schweben', { unit: 'px', min: 0, hint: 'Auf und ab' }),
         num('follow.bobSpeed', 'Schwebe-Tempo', { unit: 'Hz', min: 0, step: 0.05 }), num('follow.tilt', 'Neigung', { unit: '°', min: 0, hint: 'Neigt sich beim Fliegen in Flugrichtung' }),
         num('follow.turnDelay', 'Umdrehen nach', { unit: 'ms', min: 0, hint: 'So lange wartet sie, bevor sie Leylas neuer Richtung folgt' })] },
-      { title: 'Stimmungen', fields: [table('moods', 'Stimmungen', [select('mood', 'Anlass', DRONE_MOODS), num('frame', 'Frame', { min: 0 }), text('kaomoji', 'Kaomoji'), num('duration', 'Dauer ms', { min: 0 })],
-        { hint: 'Frame zählt ab 0. Ohne Kaomoji nur das Gesicht. Dauer 0 = solange der Anlass gilt' })] },
+      { title: 'Antigrav-Ring', fields: [point('ring.at', 'Mitte', { unit: 'px' }), size('ring.size', 'Größe', { unit: 'px' }), color('ring.color', 'Farbe'),
+        num('ring.glow', 'Leuchten', { unit: '%', min: 0, max: 200 }), num('ring.pulse', 'Pulsieren', { unit: 'Hz', min: 0, step: 0.1 }), num('ring.dash', 'Beim Dash', { unit: '%', min: 0, hint: 'Leuchten beim Dash und schnellen Flug' })] },
+      { title: 'Kabel', fields: [table('cables', 'Kabel', [point('at', 'Hängt an', { unit: 'px' }), point('to', 'Schlaufe bis', { unit: 'px', hint: 'Leer = loses Ende' }), num('length', 'Länge', { unit: 'px', min: 1 }), color('color', 'Farbe'), num('width', 'Dicke', { unit: 'px', min: 1 })],
+        { hint: 'Hängen unter der Drohne und schwingen mit (aus Code). Punkte in Bildpixeln der Hülle' }),
+        num('cable.segments', 'Glieder', { min: 2, max: 24 }), num('cable.gravity', 'Schwerkraft', { unit: 'px/s²', min: 0 }), num('cable.damping', 'Dämpfung', { min: 0.5, max: 1, step: 0.01, hint: 'Kleiner = beruhigt sich schneller' }),
+        num('cable.swing', 'Mitschwingen', { unit: '%', min: 0, hint: 'Wie stark der Flug die Kabel mitreißt' }), color('cable.outline', 'Umriss')] },
+      { title: 'Anbauteile', fields: [table('parts', 'Anbauteile', [text('name', 'Name'), ref('look', 'Aussehen', 'assets'), point('at', 'Sitzt bei', { unit: 'px', hint: 'Ankerpunkt des Teils sitzt hier (Bildpixel der Hülle)' }),
+        select('layer', 'Ebene', [['front', 'Vor der Hülle'], ['behind', 'Hinter der Hülle']]), bool('on', 'Angebaut')],
+        { hint: 'Daniel, 10.11.2026: Upgrades für Mama-Bot (Antenne, Greifarm, Lampe …). Wie man sie bekommt, kommt später' })] },
+      { title: 'Stimmungen', fields: [table('moods', 'Stimmungen', [select('mood', 'Anlass', DRONE_MOODS), num('frame', 'Gesicht', { min: 0 }), text('kaomoji', 'Kaomoji'), num('duration', 'Dauer ms', { min: 0 })],
+        { hint: 'Gesicht = Frame der Gesichter (ab 0). Ohne Kaomoji nur das Gesicht. Dauer 0 = solange der Anlass gilt' })] },
       { title: 'Verhalten', fields: [num('idle.boredAfter', 'Langeweile nach', { unit: 's', min: 0, hint: 'Leyla steht still' }), num('idle.sleepAfter', 'Einschlafen nach', { unit: 's', min: 0 }), num('idle.zenAfter', 'Zen nach', { unit: 's', min: 0, hint: 'So lange hält Leyla die Yoga-Pose, dann macht die Drohne mit' }),
         range('idle.randomEvery', 'Zufällige Stimmung alle', { unit: 's', hint: 'Neugierig oder Scannen, während Leyla unterwegs ist' }), num('alertRange', 'Gegner bemerken ab', { unit: 'px', min: 0 }),
         num('lowHealth', 'Wenig Leben unter', { unit: '%', min: 0, max: 100 })] },
@@ -263,9 +276,11 @@ export const AREAS = {
       { title: 'Bläschen', fields: [bool('bubble.show', 'Kaomoji zeigen'), num('bubble.size', 'Schriftgröße', { unit: 'px', min: 8 }), color('bubble.color', 'Schrift'), color('bubble.background', 'Hintergrund')] },
     ],
     check: (x, report, p) => {
-      const a = p.data?.assets?.[x.look], n = a?.frames || 1;
-      for (const m of x.moods || []) if (a && (m.frame ?? 0) >= n) report('error', `Stimmung ${label(DRONE_MOODS, m.mood)}: Frame ${m.frame} gibt es nicht (Aussehen hat ${n})`);
+      const a = p.data?.assets?.[x.face?.look || x.look], n = a?.frames || 1;
+      for (const m of x.moods || []) if (a && (m.frame ?? 0) >= n) report('error', `Stimmung ${label(DRONE_MOODS, m.mood)}: Gesicht ${m.frame} gibt es nicht (hat ${n})`);
+      if (a && x.face?.blink?.frame != null && x.face.blink.frame >= n) report('error', `Blinzeln: Gesicht ${x.face.blink.frame} gibt es nicht (hat ${n})`);
       if (!(x.moods || []).some(m => m.mood === 'idle')) report('hint', 'Stimmung „Normal“ fehlt, dann zeigt sie Frame 0');
+      (x.parts || []).forEach((r, i) => { if (r.on && !r.look) report('warning', `Anbauteil ${r.name || i + 1}: angebaut, aber ohne Aussehen`); });
     },
   },
   leyla: {

@@ -1,29 +1,48 @@
 {
  "name": "Mama-Bot",
- "look": "drone_moods",
- "height": 96,
+ "look": "drone_hull",
+ "height": 128,
  "enabled": true,
  "layer": "behind",
  "description": "Leylas Drohne. Fliegt immer hinter ihr her, kommentiert alles und holt sie raus, wenn es schiefgeht.",
+ "face": {
+  "look": "drone_faces",
+  "glass": "drone_glass",
+  "screen": [99.5, 60],
+  "lookShift": 1.5,
+  "flicker": 6,
+  "blink": {"frame": 1, "every": [2.5, 6], "duration": 130}
+ },
  "follow": {"offset": [-110, -210], "smooth": 0.08, "bob": 10, "bobSpeed": 0.6, "tilt": 8, "turnDelay": 250},
  "moods": [
   {"mood": "idle", "frame": 0},
-  {"mood": "kill", "frame": 1, "kaomoji": "(^▽^)", "duration": 1200},
-  {"mood": "cleared", "frame": 2, "kaomoji": "ヽ(°〇°)ﾉ", "duration": 2400},
-  {"mood": "bored", "frame": 3, "kaomoji": "(￣～￣;)", "duration": 0},
-  {"mood": "alert", "frame": 4, "kaomoji": "(ﾟДﾟ)!", "duration": 1000},
-  {"mood": "curious", "frame": 5, "kaomoji": "(・・?)", "duration": 1400},
-  {"mood": "hit", "frame": 6, "kaomoji": "(╬ಠ益ಠ)", "duration": 1100},
-  {"mood": "sleep", "frame": 7, "kaomoji": "(－.－)zzZ", "duration": 0},
-  {"mood": "down", "frame": 8, "kaomoji": "(×_×)", "duration": 0},
-  {"mood": "scan", "frame": 9, "duration": 1600},
-  {"mood": "lowHealth", "frame": 10, "kaomoji": "(;´Д`)", "duration": 0},
-  {"mood": "dash", "frame": 11, "duration": 350},
-  {"mood": "zen", "frame": 7, "kaomoji": "(￣人￣)", "duration": 0}
+  {"mood": "kill", "frame": 2, "kaomoji": "(^▽^)", "duration": 1200},
+  {"mood": "cleared", "frame": 3, "kaomoji": "ヽ(°〇°)ﾉ", "duration": 2400},
+  {"mood": "bored", "frame": 4, "kaomoji": "(￣～￣;)", "duration": 0},
+  {"mood": "alert", "frame": 5, "kaomoji": "(ﾟДﾟ)!", "duration": 1000},
+  {"mood": "curious", "frame": 6, "kaomoji": "(・・?)", "duration": 1400},
+  {"mood": "hit", "frame": 7, "kaomoji": "(╬ಠ益ಠ)", "duration": 1100},
+  {"mood": "sleep", "frame": 8, "kaomoji": "(－.－)zzZ", "duration": 0},
+  {"mood": "down", "frame": 9, "kaomoji": "(×_×)", "duration": 0},
+  {"mood": "scan", "frame": 10, "duration": 1600},
+  {"mood": "lowHealth", "frame": 11, "kaomoji": "(;´Д`)", "duration": 0},
+  {"mood": "dash", "frame": 12, "duration": 350},
+  {"mood": "zen", "frame": 13, "kaomoji": "(￣人￣)", "duration": 0}
  ],
  "idle": {"boredAfter": 6, "sleepAfter": 14, "randomEvery": [8, 16], "zenAfter": 2},
  "alertRange": 700,
  "lowHealth": 30,
  "bubble": {"show": true, "size": 30, "color": "#7ff6ff", "background": "#140c1c"},
- "roam": {"enabled": true, "every": [3, 7], "height": [180, 460], "visitLeyla": 30, "smooth": 0.02}
+ "roam": {"enabled": true, "every": [3, 7], "height": [180, 460], "visitLeyla": 30, "smooth": 0.02},
+ "ring": {"at": [66, 79], "size": [46, 10], "color": "#20d6c7", "glow": 45, "pulse": 1.2, "dash": 220},
+ "cables": [
+  {"at": [50, 83], "to": [61, 83], "length": 44, "color": "#20d6c7", "width": 2},
+  {"at": [57, 83], "to": [77, 83], "length": 58, "color": "#bc4a9b", "width": 2},
+  {"at": [81, 83], "length": 30, "color": "#bb7547", "width": 2}
+ ],
+ "cable": {"segments": 8, "gravity": 900, "damping": 0.9, "swing": 75, "outline": "#060608"},
+ "parts": [
+  {"name": "Suchscheinwerfer", "look": "drone_lamp", "at": [98, 78], "layer": "behind", "on": true},
+  {"name": "Greifarm", "look": "drone_claw", "at": [40, 76], "layer": "behind", "on": true}
+ ]
 }

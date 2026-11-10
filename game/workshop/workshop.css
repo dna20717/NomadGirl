@@ -46,6 +46,8 @@ body.ng { background: var(--ui-bg); color: var(--ui-text); font-family: var(--ui
 .ng-sections { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; align-items: start; }
 .ng-section { background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: var(--ui-r-button); padding: 4px 12px 8px; }
 .ng-section h3 { margin: 8px 0 4px !important; }
+.ng-section.wide { grid-column: 1 / -1; }
+.ng-trow .ng-pair .ed-field.small { min-width: 0; }
 
 /* field editors */
 .ng-ref { display: flex; align-items: center; gap: 4px; min-width: 0; }

@@ -10,6 +10,7 @@
 //   nomad.calm() / nomad.restart()    enemies off / room fresh
 //   nomad.freeze() / nomad.thaw()     show the current frame (for screenshots), then continue stepping
 //   nomad.drone('kill')               show a drone mood
+//   nomad.screenOf(x, y)              world position → page position
 //   nomad.state().van                 van door frame, open, roof platform
 //   nomad.state().level               POI level: chests, switches, doors, brittle walls, goal, secrets, ranking (done)
 //   nomad.state().camp                camp (game.html?camp): clock, place, Δ, prompt, hotspots, rig; .menu = open menu
@@ -89,13 +90,17 @@ export function installControl(game) {
     inv() { return scene().hud.inv?.state() || null; },   // open inventory: grids, slots, held thing
     loot() { return scene().loot?.state() || null; },     // bundles on the ground (run)
     drone(mood) { scene().drone.react(mood); return scene().drone.mood; },   // show a drone mood (tests, pictures)
+    screenOf(x, y) {   // world position → page position (close-up pictures, mouse)
+      const c = scene().cam, r = game.canvas.getBoundingClientRect(), kx = r.width / game.scale.width, ky = r.height / game.scale.height;
+      return { x: r.left + (x - c.worldView.x) * c.zoom * kx, y: r.top + (y - c.worldView.y) * c.zoom * ky };
+    },
     state() {
       const s = scene(), l = s.leyla, r = n => Math.round(n);
       return {
         room: s.roomId, time: s.clock(), kills: s.kills, deltas: s.deltas, cleared: s.cleared,
         leyla: { state: l.state, x: r(l.x), feet: r(l.feet), tile: [Math.floor(l.x / s.T), Math.round(l.feet / s.T)], vx: r(l.body.velocity.x), vy: r(l.body.velocity.y), facing: l.facing, health: l.health, ammo: l.ammo, mag: l.mag, reloading: !!l.reloading, armed: l.armed },
         enemies: s.enemies.map(e => ({ id: e.id, state: e.state, x: r(e.x), feet: r(e.feet), hp: e.hp })),
-        drone: s.drone && { mood: s.drone.mood, x: r(s.drone.x), y: r(s.drone.y) },
+        drone: s.drone && { mood: s.drone.mood, x: r(s.drone.x), y: r(s.drone.y), face: s.drone.faceFrame, cables: s.drone.cables.lines().map(c => c.pts.at(-1).map(r)), flip: s.drone.sprite.scaleX < 0 },
         van: s.van?.state(),
         level: s.level?.state() || null,
         mode: s.mode, prompt: s.hud.promptText, menu: s.hud.menuState(), banner: s.hud.bannerEl.hidden ? null : s.hud.bannerEl.textContent,

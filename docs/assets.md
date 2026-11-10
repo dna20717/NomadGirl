@@ -2,6 +2,8 @@
 
 Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jedes Asset steht hier mit Herkunft.
 
+**Palette:** Daniel malt mit **AAP-64** (Adigun A. Polack, 64 Farben), Datei `assets/palette/aap-64.hex` (eine Farbe pro Zeile) und `aap-64.png` (8 × 8 Pixel, für Werkzeuge, die eine Palette als Bild wollen). Neue Pixel-Art (auch von PixelLab) entsteht in dieser Palette.
+
 | Datei | Was | Herkunft | Datum |
 | --- | --- | --- | --- |
 | `assets/leyla/idle.png` | Leyla, Stehen: 8 Frames à 176 × 432 px als Streifen (`leyla_idle`) | aus `idle_source.gif` zugeschnitten (Code) | 07.11.2026 |
@@ -40,6 +42,11 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/leyla/land_side_source.gif` | Original, 9 Frames à 200 ms, nach rechts | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/drone/moods.png` | Drohne (Mama-Bot): 12 Stimmungen à 380 × 254 px als Streifen, an der Antenne ausgerichtet (`drone_moods`) | aus `concept.png` zugeschnitten (Code) | 07.11.2026 |
 | `assets/drone/concept.png` | Drohne: Konzept mit 12 Stimmungen im Raster 4 × 3, 1536 × 1024 px (`drone_concept`) | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/drone/hull_source.png` | Drohne neu (Mama-Bot, 10.11.2026): rostiger Torpedo mit Magenta-Flicken, Stacheln, Antigrav-Ring, leerer Bildschirm, 128 × 128 (`drone_hull_source`) | KI (PixelLab, Create Image Pro, Palette AAP-64) | 10.11.2026 |
+| `assets/drone/hull.png`, `glass.png` | Hülle ohne Kabel mit geleertem Bildschirm (`drone_hull`) und nur die Spiegelung des Glases (`drone_glass`) | aus `hull_source.png` (Code, `tools/drone_parts.py`) | 10.11.2026 |
+| `assets/drone/faces.png` | 14 Gesichter für den Bildschirm à 28 × 32 px, AAP-64-Cyan mit Scanlines (`drone_faces`) | Code (`tools/drone_parts.py`) | 10.11.2026 |
+| `assets/drone/parts/lamp_source.png`, `claw_source.png` | Anbauteile für Mama-Bot: Suchscheinwerfer (Variante 3 von 16) und Greifarm (Variante 1 von 16), je 64 × 64 (`drone_lamp_source`, `drone_claw_source`) | KI (PixelLab, Create Image Pro, Palette AAP-64, Hülle als Vorlage) | 10.11.2026 |
+| `assets/drone/parts/lamp.png`, `claw.png` | Anbauteile zugeschnitten, ×0,75, auf AAP-64 gerastet (`drone_lamp`, `drone_claw`) | Code (`tools/drone_parts.py`) | 10.11.2026 |
 | `assets/vehicles/van_door.png` | Leylas Van, Schiebetür geht auf (5 Frames 248 × 172, `van`), Spawn-Punkt; Schüssel herausgenommen | aus `van_door_source.gif` zugeschnitten (Code, `tools/van_strips.py`) | 07.11.2026 |
 | `assets/vehicles/van_dish.png` | Radarschüssel dreht sich (16 Frames 35 × 20, `van_dish`) | aus der Schüssel im Original gedreht (Code, `tools/van_strips.py`) | 07.11.2026 |
 | `assets/vehicles/van_roof_front.png` | vorderes Dachgeländer als Vordergrund (5 Frames, `van_roof_front`) | aus dem Original ausgeschnitten (Code, `tools/van_strips.py`) | 07.11.2026 |
