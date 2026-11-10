@@ -52,5 +52,11 @@
   "dish": {"look": "van_dish", "at": [97.5, 30], "speed": 1},
   "bob": [{"dx": 0, "dy": 0},{"dx": 0, "dy": 0},{"dx": 2, "dy": 2},{"dx": 2, "dy": 1},{"dx": 0, "dy": 0}],
   "ladder": {"enabled": true, "x": 39, "y": [47, 171]}
+ },
+ "gamepad": {
+  "enabled": true,
+  "deadzone": 30,
+  "walkTilt": 65,
+  "map": {"jump": ["0"], "dash": ["1", "6"], "melee": ["2"], "ranged": ["7"], "reload": ["5"], "grab": ["3"], "walk": ["4"], "inventory": ["8"], "help": ["9"], "pose": ["11"], "down": []}
  }
 }

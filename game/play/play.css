@@ -243,3 +243,5 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .build-go { font-size: 14px; padding: 9px 16px; }
 @media (max-width: 1100px) { .bm-bar { flex-wrap: wrap; } .bm-budgets { order: 3; flex-basis: 100%; } }
 #hud[data-building] .hud-camp, #hud[data-building] .hud-top { visibility: hidden; }
+.hud-padhelp h3 { margin: 4px 0 10px; font: 30px/1 VT323, monospace; font-weight: normal; color: #3fe0d0; }
+.hud-padhelp[hidden] { display: none; }

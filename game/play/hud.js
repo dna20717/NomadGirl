@@ -28,10 +28,11 @@ export class Hud {
     this.setRigOpen(this.rigOpen);
     this.buildBtn = el('button', { class: 'hud-buildbtn', hidden: true, title: 'Rig bauen: Werkstätten und Anhänger mit der Maus ziehen', onclick: e => { e.currentTarget.blur(); this.scene?.openBuild(); } }, el('kbd', {}, 'B'), el('span', {}, 'Rig bauen'));
     this.modal = false;
-    document.addEventListener('keydown', e => this.menuKey(e), true);
+    document.addEventListener('keydown', e => { if (this.pad) this.pad.active = false; this.menuKey(e); }, true);
     this.help = el('div', { class: 'hud-help' }, el('div', { class: 'hud-helpBox' },
       el('h2', {}, 'Steuerung'),
       el('dl', {}, ...CONTROLS.flatMap(([k, t]) => [el('dt', {}, k), el('dd', {}, t)])),
+      this.padHelpEl = el('div', { class: 'hud-padhelp', hidden: true }),
       el('p', {}, 'Alle Werte kommen aus der Werkstatt (Leyla, Waffen, Gegner, Raum-Bausteine).',
         commit ? el('b', {}, ` Spieldaten live aus dem Repository (Stand ${commit.slice(0, 7)}).`) : null,
         workshopDrafts ? el('b', {}, ` Dein gespeicherter Werkstatt-Stand ist aktiv (${workshopDrafts} ${workshopDrafts === 1 ? 'Datei' : 'Dateien'}).`) : null),
@@ -76,9 +77,12 @@ export class Hud {
   }
   // "E · Schlafen · Schlafkoje" at the bottom
   prompt(text, key = 'E') {
-    this.promptText = text || null;
+    this.promptText = text || null; this.promptKey = key;
     this.promptEl.hidden = !text;
-    if (text) this.promptEl.replaceChildren(el('kbd', {}, key), el('span', {}, text));
+    // with a controller in use the prompt shows its button (Spiel › Controller)
+    const p = this.pad?.active && this.pad.kind ? this.pad : null;
+    const k = p && key === 'E' ? p.label('grab') : p && key === 'I' ? p.label('inventory') : key;
+    if (text) this.promptEl.replaceChildren(el('kbd', {}, k || key), el('span', {}, text));
   }
   // menu: { title, sub, items: [{ label, sub?, primary?, disabled?: reason, act }] }; keys W/S or ↑/↓, E/Enter/Leertaste, Esc, 1–9
   menu({ title, sub = '', items = [] }) {
@@ -104,7 +108,7 @@ export class Hud {
   menuKey(e) {
     if (!this.modal) return;
     const k = e.key, n = this.menuItems.length;
-    const move = d => { let i = this.menuIndex; for (let s = 0; s < n; s++) { i = (i + d + n) % n; if (!this.menuItems[i].disabled) break; } this.focus(i); };
+    const move = d => this.menuMove(d);
     if (k === 'Escape') this.closeMenu();
     else if (k === 'ArrowDown' || k === 's' || k === 'S') move(1);
     else if (k === 'ArrowUp' || k === 'w' || k === 'W') move(-1);
@@ -112,6 +116,22 @@ export class Hud {
     else if (/^[1-9]$/.test(k)) this.choose(Number(k) - 1);
     else return;
     e.preventDefault(); e.stopPropagation();
+  }
+  menuMove(d) { const n = this.menuItems?.length || 0; let i = this.menuIndex; for (let s = 0; s < n; s++) { i = (i + d + n) % n; if (!this.menuItems[i].disabled) break; } this.focus(i); }
+  // the help shows the controller's buttons once one is connected (labels for Xbox/Stadia, PlayStation or Switch)
+  padHelp(pad, actions) {
+    // prompt follows the device in use (keyboard ↔ controller)
+    const sig = pad?.active && pad.kind ? pad.kind : null;
+    if (sig !== this.promptSig) { this.promptSig = sig; if (this.promptText) this.prompt(this.promptText, this.promptKey); }
+    const kind = pad?.kind || null;
+    if (kind === this.padHelpKind) return;
+    this.padHelpKind = kind;
+    this.padHelpEl.hidden = !kind;
+    if (!kind) return;
+    const rows = [['Linker Stick / Steuerkreuz', 'Laufen (halb neigen = gehen), runter = Ducken/Slide, hoch = Leiter'],
+      ...actions.map(([a, name]) => [(pad.c.map[a] || []).map(b => pad.labelOf(b)).join(' / '), name]).filter(([k]) => k),
+      ['Menüs', `Steuerkreuz wählen · ${pad.labelOf(0)} nehmen · ${pad.labelOf(1)} zurück`]];
+    this.padHelpEl.replaceChildren(el('h3', {}, 'Controller'), el('dl', {}, ...rows.flatMap(([k, t]) => [el('dt', {}, k), el('dd', {}, t)])));
   }
   menuState() { return this.modal ? { title: this.menuTitle, items: this.menuItems.map(i => ({ label: i.label, sub: i.sub || '', disabled: i.disabled || null })) } : null; }
   toggleHelp(on = !this.paused) { this.paused = on; this.help.hidden = !on; }

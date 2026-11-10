@@ -2,6 +2,7 @@
 import { parseRoom, solidRects } from '../../engine/room.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
 import { PoiLevel } from './poi_level.js';
+import { Pad, PAD_ACTIONS } from './pad.js';
 import { makeTextures, drawBackground, drawRoom, PLACEHOLDER_COLORS } from './art.js';
 import { Leyla } from './leyla.js';
 import { Enemy } from './enemies.js';
@@ -122,6 +123,8 @@ export class PlayScene extends Phaser.Scene {
     this.sound.stopAll(); this.sound.removeAll();   // camp sounds belong to one visit
     try { this.sound.mute = localStorage.getItem('nomadgirl-mute') === '1'; } catch { /* private mode */ }
     makeTextures(this);
+    this.pad ??= new Pad(this.data_.game?.gamepad);   // kept over restarts (camp ↔ run)
+    this.hud.pad = this.pad;
     this.fx = new Fx(this);
     this.combat = new Combat(this);
     let def = this.data_.rooms?.[this.roomId];
@@ -489,18 +492,38 @@ export class PlayScene extends Phaser.Scene {
 
   // ---------- loop ----------
   readInput() {
-    if (this.script) return this.script();   // remote control (game/play/control.js)
-    const J = Phaser.Input.Keyboard.JustDown, i = {};
-    for (const [name, keys] of Object.entries(this.keys)) {
+    const J = Phaser.Input.Keyboard.JustDown, i = this.script ? this.script() : {};   // remote control (game/play/control.js)
+    if (!this.script) for (const [name, keys] of Object.entries(this.keys)) {
       let pressed = false;
       for (const k of keys) if (J(k)) pressed = true;   // every key once per frame
       i[name] = { down: keys.some(k => k.isDown), pressed };
     }
+    // controller (game/play/pad.js): adds to the keyboard, same action names
+    const pad = this.pad?.poll();
+    if (pad?.kind) for (const name of Object.keys(i)) { i[name].down ||= pad.down(name); i[name].pressed ||= pad.pressed(name); }
+    this.hud.padHelp(pad, PAD_ACTIONS);
     return i;
+  }
+  // controller in menus and windows: d-pad/stick choose, bottom button takes, right button goes back
+  padMenus(input) {
+    const p = this.pad, hud = this.hud;
+    if (!p?.kind) return;
+    if (hud.paused && !hud.modal) { if (p.pressed('jump') || p.pressed('grab')) { hud.toggleHelp(false); input.jump.pressed = input.grab.pressed = false; } return; }
+    if (hud.modal) {
+      if (p.pressed('down')) hud.menuMove(1);
+      else if (p.pressed('up')) hud.menuMove(-1);
+      else if (p.pressed('jump')) hud.choose(hud.menuIndex);
+      else if (p.pressed('dash')) hud.closeMenu();
+      for (const k of ['jump', 'grab', 'dash', 'up', 'down']) input[k].pressed = false;
+      return;
+    }
+    if (p.pressed('dash') && hud.craft?.isOpen) { hud.craft.close(); input.dash.pressed = false; }
+    else if (p.pressed('dash') && hud.inv?.isOpen) { hud.inv.close(); input.dash.pressed = false; }
   }
 
   update(time, delta) {
     let input = this.readInput();
+    this.padMenus(input);
     if (input.help.pressed && this.hud.inv?.isOpen && !this.hud.paused) { this.hud.inv.close(); input.help.pressed = false; }
     if (input.help.pressed) this.hud.toggleHelp();
     if (input.mute.pressed) { this.sound.mute = !this.sound.mute; try { localStorage.setItem('nomadgirl-mute', this.sound.mute ? '1' : '0'); } catch { /* */ } this.hud.banner(this.sound.mute ? 'Ton aus' : 'Ton an', 'M schaltet um'); this.time.delayedCall(1200, () => this.hud.banner(null)); }
