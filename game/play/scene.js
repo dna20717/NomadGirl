@@ -1,5 +1,7 @@
 // The play scene: builds a room from its layout, places Leyla and the enemies, runs input, physics, combat and HUD.
 import { parseRoom, solidRects } from '../../engine/room.js';
+import { buildPoi, poiReady } from '../../engine/poi.js';
+import { PoiLevel } from './poi_level.js';
 import { makeTextures, drawBackground, drawRoom, PLACEHOLDER_COLORS } from './art.js';
 import { Leyla } from './leyla.js';
 import { Enemy } from './enemies.js';
@@ -46,6 +48,8 @@ export class PlayScene extends Phaser.Scene {
     for (const w of Object.values(this.data_.weapons || {})) if (w.sound) ids.add(w.sound);
     const SP = this.data_.game?.spawn;
     for (const id of [SP?.look, SP?.dish?.look, SP?.roof?.front, this.data_.rooms?.[this.roomId]?.backdrop?.image]) if (id) ids.add(id);
+    if (this.data_.camp?.chest?.look) ids.add(this.data_.camp.chest.look);   // chests in POIs too
+    if (this.mode === 'run') for (const r of Object.values(this.data_.rooms || {})) if (r.backdrop?.image) ids.add(r.backdrop.image);   // a level wears its entrance's backdrop
     if (this.mode === 'camp') {
       for (const c of this.box?.save.companions || []) if (this.data_.companions?.[c]?.look) ids.add(this.data_.companions[c].look);
       if (this.data_.camp?.fire?.look) ids.add(this.data_.camp.fire.look);
@@ -126,6 +130,10 @@ export class PlayScene extends Phaser.Scene {
       const day = daytimeAt(this.data_.camp, this.box.save.hour);
       def = { name: this.data_.locations?.[this.box.save.location]?.name || 'Camp', layout: this.campGeo.layout, backdrop: { weather: day.weather || Object.keys(this.data_.weather || {})[0], shade: 0 } };
     }
+    // a run in a POI: the rooms welded to one level (engine/poi.js), same seed = same level
+    const run = this.mode === 'run' ? this.box.save.run : this.mode === 'test' && this.args.poi ? { poi: this.args.poi, seed: this.args.seed } : null;
+    this.levelInfo = run?.seed ? buildPoi(this.data_, run.poi, run.seed) : null;
+    if (this.levelInfo?.def) def = this.levelInfo.def;
     this.roomDef = def;
     this.room = parseRoom(def || {});
     const T = this.T, R = this.room, W = R.w * T, H = R.h * T;
@@ -196,6 +204,9 @@ export class PlayScene extends Phaser.Scene {
     });
     this.enemies = [];
     this.spawnEnemies();
+    // chests, switches + doors, brittle walls, goal (game/play/poi_level.js): in POI levels and in single rooms that have them
+    const M = R.marks || {};
+    this.level = this.mode !== 'camp' && (this.levelInfo?.def || ['C', 'S', 'D', 'B', 'Z'].some(k => M[k]?.length)) ? new PoiLevel(this, run?.poi || null) : null;
 
     const cam = this.cam, C = this.data_.game?.camera || {};
     cam.setZoom(C.zoom || 1);
@@ -216,7 +227,7 @@ export class PlayScene extends Phaser.Scene {
     if (this.mode === 'run') this.hud.room(`${this.data_.pois?.[this.box.save.run?.poi]?.name || ''} · ${def?.name || this.roomId}`, this.enemies.length);
     if (this.args.banner) { this.hud.banner(...this.args.banner); this.time.delayedCall(2800, () => this.hud.banner(null)); }
     else this.hud.banner(null);
-    this.leaving = false;
+    this.leaving = false; this.roomName = null;
   }
 
   // ---------- inventory (game/play/inventory_ui.js, game/inventory.js) ----------
@@ -333,6 +344,13 @@ export class PlayScene extends Phaser.Scene {
   }
   startRun(poi) {
     const D = this.data_, P = D.pois?.[poi] || {}, R = D.rooms || {}, has = id => R[id]?.layout?.length;
+    // rooms with entrance and exit: a generated level (engine/poi.js); otherwise the first room as before
+    if (poiReady(D, poi).ok) {
+      this.box.save.health = this.leyla.health;
+      this.box.save.run = { poi, room: null, seed: P.seed || 1 + Math.floor(Math.random() * 2 ** 31), location: this.box.save.location };
+      this.box.persist();
+      return this.restartAs({ mode: 'run', roomId: null, banner: [P.name || poi, 'Finde den Tresor · E am Van: zurück ins Camp'] }, 700);
+    }
     const ready = (P.rooms || []).filter(has);
     const room = ready.find(id => R[id].tags?.includes('start')) || ready[0] || [D.camp?.fallbackRoom, D.game?.testRoom].find(has);
     if (!room) return this.hud.menu({ title: 'Noch kein Raum', sub: 'Dieser POI hat noch keinen Raum mit Layout (Werkstatt › Raum-Bausteine).', items: [{ label: 'Zurück', act: () => {} }] });
@@ -346,11 +364,14 @@ export class PlayScene extends Phaser.Scene {
     const save = this.box.save, C = this.data_.camp || {}, base = this.data_.leyla?.health ?? 100;
     advance(save, C.clock?.runHours ?? 3);
     if (ko) { save.health = Math.round(base * (C.heal?.afterKo ?? 30) / 100); save.inv.grids.backpack.items = []; }   // Mama-Bot only brings Leyla: the backpack stays behind
-    else { save.health = Math.round(this.leyla.health); save.deltas += this.deltas; }
+    const paid = this.level?.payout(this.deltas) ?? this.deltas, rank = !ko && this.level?.done;
+    if (!ko) { save.health = Math.round(this.leyla.health); save.deltas += paid; }
     save.buffs = [];
     save.run = null;
     this.hud.inv?.close();
-    const banner = ko ? ['Mama-Bot hat dich heimgebracht', `${clockText(save)} · Der Rucksack ist weg.`] : ['Zurück im Camp', `${clockText(save)} · +${this.deltas} Δ · ${this.kills} Kills`];
+    const banner = ko ? ['Mama-Bot hat dich heimgebracht', `${clockText(save)} · Der Rucksack ist weg.`]
+      : rank ? [`Zurück im Camp · Rang ${rank.grade}`, `${clockText(save)} · +${paid} Δ (${this.deltas} + ${rank.bonus} %) · ${this.kills} Kills`]
+      : ['Zurück im Camp', `${clockText(save)} · +${paid} Δ · ${this.kills} Kills`];
     this.goCamp({ banner, fade: ko ? 900 : 600, arriving: true });
   }
 
@@ -430,7 +451,7 @@ export class PlayScene extends Phaser.Scene {
   onLeylaDown() {
     this.hud.banner('Mama-Bot schleppt dich raus …', 'Die Run-Beute bleibt liegen.');
     this.cam.shake(300, 0.01);
-    this.time.delayedCall(1900, () => this.mode === 'run' ? this.endRun(true) : this.mode === 'camp' ? this.goCamp() : this.restartRoom());
+    this.time.delayedCall(1900, () => this.mode === 'run' ? this.endRun(true) : this.mode === 'camp' ? this.goCamp() : this.level ? this.restartAs({}) : this.restartRoom());
   }
   onKill(e) {
     this.kills++;
@@ -439,7 +460,7 @@ export class PlayScene extends Phaser.Scene {
     const [a, b] = e.d.deltas || [0, 0], d = a + Math.floor(Math.random() * (b - a + 1));
     this.deltas += d;
     if (d) this.fx.text(e.x, e.feet - e.h - 20, `+${d} Δ`, { color: '#ffd27a', size: 48, rise: 90, life: 1100 });
-    if (this.enemies.every(x => !x.alive) && !this.cleared) {
+    if (!this.level && this.enemies.every(x => !x.alive) && !this.cleared) {
       this.cleared = true;
       this.drone.react('cleared');
       this.time.delayedCall(700, () => this.hud.banner('Raum geräumt', `${this.clock()} · ${this.kills} Kills · ${this.deltas} Δ · R für nochmal`));
@@ -451,9 +472,19 @@ export class PlayScene extends Phaser.Scene {
   runUpdate(input) {
     const l = this.leyla, v = this.van;
     const near = v && l.alive && l.body.blocked.down && Math.abs(l.x - v.x) < (this.data_.camp?.interactRange ?? 130) && Math.abs(l.feet - v.y) < 40;
-    const pile = !near && this.loot?.nearest(), text = near ? 'Zurück ins Camp · Van' : pile && !this.hud.inv?.isOpen ? `Beute am Boden · I öffnet (${pile.grid.items.length})` : null;
-    if (text !== this.vanPrompt) { this.vanPrompt = text; this.hud.prompt(text, near ? 'E' : 'I'); }
-    if (near && input.grab.pressed) this.endRun(false);
+    // POI level: the HUD names the room Leyla is in
+    const LI = this.levelInfo;
+    if (LI?.def) {
+      const tx = l.x / this.T, ty = l.feet / this.T - 0.5, here = LI.rooms.find(r => tx >= r.x && tx < r.x + r.w && ty >= r.y && ty < r.y + r.h);
+      const name = here ? this.data_.rooms?.[here.id]?.name || here.id : 'Abkürzung';
+      if (name !== this.roomName) { this.roomName = name; this.hud.room(`${LI.def.name} · ${name}`, this.enemies.length); }
+    }
+    const thing = !near && l.alive ? this.level?.nearest() : null;
+    const pile = !near && !thing && this.loot?.nearest();
+    const text = near ? (this.level?.done ? `Zurück ins Camp · Rang ${this.level.done.grade}` : 'Zurück ins Camp · Van') : thing ? thing.text : pile && !this.hud.inv?.isOpen ? `Beute am Boden · I öffnet (${pile.grid.items.length})` : null;
+    if (text !== this.vanPrompt) { this.vanPrompt = text; this.hud.prompt(text, pile && !near && !thing ? 'I' : 'E'); }
+    if (input.grab.pressed && near && this.mode === 'run') this.endRun(false);
+    else if (input.grab.pressed && thing?.act) thing.act();
   }
 
   // ---------- loop ----------
@@ -474,7 +505,8 @@ export class PlayScene extends Phaser.Scene {
     if (input.help.pressed) this.hud.toggleHelp();
     if (input.mute.pressed) { this.sound.mute = !this.sound.mute; try { localStorage.setItem('nomadgirl-mute', this.sound.mute ? '1' : '0'); } catch { /* */ } this.hud.banner(this.sound.mute ? 'Ton aus' : 'Ton an', 'M schaltet um'); this.time.delayedCall(1200, () => this.hud.banner(null)); }
     if (input.debug.pressed) { const w = this.physics.world; w.drawDebug = !w.drawDebug; if (!w.debugGraphic) w.createDebugGraphic(); w.debugGraphic.clear().setVisible(w.drawDebug); }
-    if (input.restart.pressed && this.mode !== 'camp') this.restartRoom();
+    if (input.restart.pressed && this.mode === 'test' && this.level) this.restartAs({});   // doors, chests, walls: fresh room
+    else if (input.restart.pressed && this.mode !== 'camp' && !this.level) this.restartRoom();
     const building = this.hud.build?.active;
     if (input.build?.pressed && building) this.hud.build.close();
     else if (input.build?.pressed && this.mode === 'camp' && !this.hud.modal && !this.hud.paused && !this.leaving && !this.hud.craft?.isOpen) this.openBuild();
@@ -494,7 +526,7 @@ export class PlayScene extends Phaser.Scene {
     this.drone.update(time, dt);
     this.van?.update(dt);
     if (this.camp) this.camp.update(time, dt, input);
-    else if (this.mode === 'run') this.runUpdate(input);
+    else if (this.mode === 'run' || this.level) this.runUpdate(input);
     this.loot?.update(time);
     this.inventoryUpdate(input);
     for (const e of this.enemies) e.update(time, dt, this.leyla);

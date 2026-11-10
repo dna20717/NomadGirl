@@ -107,8 +107,9 @@ export class Workshop {
   }
   // Jump into the game: save first (the game reads the saved state), then open it in its own tab (reused on every click).
   // The tab is opened right away, otherwise browsers (Safari on the iPad) block it after the save.
-  async play(room = this.playRoom()) {
-    const url = new URL(`../../game.html${room ? `?room=${encodeURIComponent(room)}` : ''}`, import.meta.url).href;
+  // play(room) plays a room block; play(null, '?poi=<id>&seed=<n>') a POI level
+  async play(room = this.playRoom(), query = null) {
+    const url = new URL(`../../game.html${query || (room ? `?room=${encodeURIComponent(room)}` : '')}`, import.meta.url).href;
     const tab = window.open('', 'nomadgirl-game');
     if (this.dirty.size) {
       this.hint('Speichere, dann geht’s ins Spiel …');

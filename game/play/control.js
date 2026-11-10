@@ -11,6 +11,7 @@
 //   nomad.freeze() / nomad.thaw()     show the current frame (for screenshots), then continue stepping
 //   nomad.drone('kill')               show a drone mood
 //   nomad.state().van                 van door frame, open, roof platform
+//   nomad.state().level               POI level: chests, switches, doors, brittle walls, goal, secrets, ranking (done)
 //   nomad.state().camp                camp (game.html?camp): clock, place, Δ, prompt, hotspots, rig; .menu = open menu
 //   nomad.menu() / nomad.choose(i | 'text')   the open menu / pick an item (index or part of its label)
 //   nomad.walkTo(x)                   walks Leyla to an x position (camp), then E with step(1, [], ['grab'])
@@ -96,6 +97,7 @@ export function installControl(game) {
         enemies: s.enemies.map(e => ({ id: e.id, state: e.state, x: r(e.x), feet: r(e.feet), hp: e.hp })),
         drone: s.drone && { mood: s.drone.mood, x: r(s.drone.x), y: r(s.drone.y) },
         van: s.van?.state(),
+        level: s.level?.state() || null,
         mode: s.mode, prompt: s.hud.promptText, menu: s.hud.menuState(), banner: s.hud.bannerEl.hidden ? null : s.hud.bannerEl.textContent,
         camp: s.camp?.state(), health: Math.round(s.leyla.health), maxHealth: s.leyla.maxHealth,
       };

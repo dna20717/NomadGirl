@@ -1,3 +1,4 @@
+const WALLS = new Set(['#', 'A', '^', 'v']);   // drawn as wall (doors and brittle walls: game/play/poi_level.js)
 // Code-drawn art for the MVP: sky and skyline of BigCityDelta, tiles, placeholder raiders, projectiles, particles.
 // Everything is generated at start (no external files). Real AI assets replace the placeholders via "look".
 
@@ -108,10 +109,10 @@ export function drawBackground(scene, roomW, roomH) {
 // tiles = { platform: textureKey | null } (asset strips: single, left, middle, right)
 // style (camp): { ground, top, hide(x, y) } = earth instead of concrete, side walls invisible
 export function drawRoom(scene, room, T, tiles = {}, style = null) {
-  const g = scene.make.graphics({}, false), solid = (x, y) => room.solid(x, y), stamps = [];
+  const g = scene.make.graphics({}, false), solid = (x, y) => x < 0 || y < 0 || x >= room.w || y >= room.h || WALLS.has(room.tiles[y][x]), stamps = [];
   const r = rng(99);
   for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
-    const t = room.tiles[y][x], px = x * T, py = y * T;
+    const t0 = room.tiles[y][x], t = WALLS.has(t0) ? '#' : t0, px = x * T, py = y * T;
     if (t === '#' && style) {
       if (style.hide?.(x, y)) continue;
       const base = parseInt(style.ground.slice(1), 16), topC = parseInt(style.top.slice(1), 16);

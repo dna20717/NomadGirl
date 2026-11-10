@@ -2,9 +2,26 @@
 // SUMMARY[area](w, x, id) → { title, body } | null. Only reads, never changes data.
 import { el } from '../ui.js';
 import { ROOM_TAGS } from '../../engine/project.js';
+import { buildPoi, poiReady } from '../../engine/poi.js';
 import { parseRoom } from '../../engine/room.js';
 
-const ROOM_COLORS = { '#': '#8b919c', '=': '#d4a72c', H: '#5fb4d9', o: '#e45aa8', L: '#3fe0d0' };
+const ROOM_COLORS = { '#': '#8b919c', '=': '#d4a72c', H: '#5fb4d9', o: '#e45aa8', L: '#3fe0d0', C: '#c08a4a', S: '#7ee0a0', D: '#5b8a6a', B: '#6e5a7a', Z: '#ffd27a', 1: '#ff8a5c', A: '#b0b8c4', '^': '#3fe0d0', v: '#3fe0d0' };
+const ROOM_LEGEND = [['#', 'Wand'], ['=', 'Plattform'], ['H', 'Leiter'], ['o', 'Seil'], ['L', 'Start'], ['x', 'Gegner'], ['C', 'Kiste'], ['S', 'Schalter'], ['D', 'Tür'], ['B', 'Brüchig'], ['Z', 'Ziel'], ['^', 'Abkürzung']];
+// a layout as a small map (rooms and POI levels)
+function roomMap(r, maxW = 300) {
+  const px = Math.max(2, Math.min(8, Math.floor(maxW / Math.max(1, r.w))));
+  const c = el('canvas', { class: 'ng-roomMap', width: r.w * px, height: r.h * px }), g = c.getContext('2d');
+  for (let y = 0; y < r.h; y++) for (let x2 = 0; x2 < r.w; x2++) {
+    const t = r.tiles[y][x2];
+    if (t === '.') continue;
+    g.fillStyle = ROOM_COLORS[t] || '#e5484d';
+    if (t === '=') g.fillRect(x2 * px, y * px, px, Math.max(1, px / 3));
+    else if (t === 'H') g.fillRect(x2 * px + px / 4, y * px, px / 2, px);
+    else g.fillRect(x2 * px, y * px, px, px);
+  }
+  return c;
+}
+const roomLegend = () => el('div', { class: 'ng-legend' }, ...ROOM_LEGEND.map(([k, n]) => el('span', {}, el('i', { style: `background:${ROOM_COLORS[k] || '#e5484d'}` }), n)));
 
 const f1 = n => (Math.round(n * 10) / 10).toLocaleString('de-DE');
 const facts = rows => el('div', { class: 'ng-facts' }, ...rows.filter(Boolean).map(([k, v]) => el('div', {}, el('span', {}, k), el('b', {}, v))));
@@ -100,27 +117,37 @@ export const SUMMARY = {
       el('p', { class: 'ed-small' }, 'Zieht allein: ' + (C.filter(c => (c.weight || 0) <= (x.pull || 0)).map(c => c.name).join(', ') || 'nichts'))) };
   },
 
-  pois(w, x) {
+  pois(w, x, id) {
     const R = w.p.data.rooms || {}, tags = new Set((x.rooms || []).flatMap(r => R[r]?.tags || []));
-    return { title: 'Raum-Merkmale', body: el('div', { class: 'da-tags' }, ...ROOM_TAGS.map(([k, n]) => el('span', { class: 'da-tag' + (tags.has(k) ? ' ng-yes' : ' ng-no') }, (tags.has(k) ? '✓ ' : '– ') + n))) };
+    const tagBox = el('div', { class: 'da-tags' }, ...ROOM_TAGS.map(([k, n]) => el('span', { class: 'da-tag' + (tags.has(k) ? ' ng-yes' : ' ng-no') }, (tags.has(k) ? '✓ ' : '– ') + n)));
+    const ready = poiReady(w.p.data, id);
+    if (!ready.ok) return { title: 'Level', body: el('div', {}, tagBox, el('p', { class: 'ed-small' }, `Noch kein Level: ${ready.why}.`)) };
+    // the generated level as a map; „Neu würfeln“ shows another one, „Im Spiel testen“ plays exactly this one
+    const box = el('div', {});
+    let seed = x.seed || 1;
+    const draw = () => {
+      const L = buildPoi(w.p.data, id, seed), r = parseRoom(L.def), main = L.rooms.filter(o => o.band === 'main').map(o => R[o.id]?.name || o.id);
+      box.replaceChildren(roomMap(r, 320), roomLegend(), facts([
+        ['Hauptweg', main.join(' → ')],
+        ['Abzweige', L.rooms.filter(o => o.band === 'branch').map(o => R[o.id]?.name || o.id).join(', ') || 'keine'],
+        ['Abkürzung', L.shortcut ? 'Tunnel vom Ausgang zum Eingang' : 'keine'],
+        ['Kisten · Secrets · Gegner', `${r.marks.C.length} · ${new Set(r.marks.B.map(([bx]) => bx)).size} · ${r.spawns.length}`],
+        ['Größe', `${r.w} × ${r.h} Kacheln · Seed ${seed}`],
+        ...L.problems.map(t => ['Hinweis', t])]),
+      el('div', { style: 'display:flex;gap:8px;margin-top:8px' },
+        el('button', { class: 'ed-button', onclick: () => { seed = 1 + Math.floor(Math.random() * 1e6); draw(); } }, 'Neu würfeln'),
+        el('button', { class: 'ed-button wide', title: 'Speichert vorher, damit das Spiel deinen Stand hat', onclick: () => w.play(null, `?poi=${encodeURIComponent(id)}&seed=${seed}`) }, 'Im Spiel testen')));
+    };
+    draw();
+    return { title: 'Level', body: el('div', {}, tagBox, box) };
   },
 
   rooms(w, x, id) {
     if (!x.layout?.length) return { title: 'Layout', body: el('p', { class: 'ed-small' }, 'Noch kein Layout. Ein Zeichen pro Kachel, siehe Hinweis beim Feld „Kacheln“.') };
-    const r = parseRoom(x), px = Math.max(3, Math.min(8, Math.floor(300 / Math.max(1, r.w))));
-    const c = el('canvas', { class: 'ng-roomMap', width: r.w * px, height: r.h * px }), g = c.getContext('2d');
-    for (let y = 0; y < r.h; y++) for (let x2 = 0; x2 < r.w; x2++) {
-      const t = r.tiles[y][x2];
-      if (t === '.') continue;
-      g.fillStyle = ROOM_COLORS[t] || '#e5484d';
-      if (t === '=') g.fillRect(x2 * px, y * px, px, Math.max(1, px / 3));
-      else if (t === 'H') g.fillRect(x2 * px + px / 4, y * px, px / 2, px);
-      else g.fillRect(x2 * px, y * px, px, px);
-    }
+    const r = parseRoom(x), c = roomMap(r);
     const enemies = r.spawns.map(s => w.p.data.enemies?.[s.enemy]?.name || s.enemy);
     const count = enemies.reduce((m, n) => (m[n] = (m[n] || 0) + 1, m), {});
-    const legend = el('div', { class: 'ng-legend' }, ...[['#', 'Wand'], ['=', 'Plattform'], ['H', 'Leiter'], ['o', 'Seil'], ['L', 'Start'], ['x', 'Gegner']]
-      .map(([k, n]) => el('span', {}, el('i', { style: `background:${ROOM_COLORS[k] || '#e5484d'}` }), n)));
+    const legend = roomLegend();
     const play = el('button', { class: 'ed-button wide', title: 'Speichert vorher, damit das Spiel deinen Stand hat', onclick: () => w.play(id) }, 'Im Spiel testen');
     return { title: `Layout · ${r.w}×${r.h} Kacheln`, body: el('div', {}, c, legend, facts([
       ['Gegner', Object.entries(count).map(([n, k]) => `${k}× ${n}`).join(', ') || 'keine'],

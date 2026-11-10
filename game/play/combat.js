@@ -28,6 +28,7 @@ export class Combat {
         hits++;
       }
     }
+    s.level?.meleeHit(x0, x1, y0, y1);   // brittle walls in POI levels
     if (hits) { s.hitstop(time, power?.heavy ? 110 : 55); s.cam.shake(power?.heavy ? 160 : 70, power?.heavy ? 0.008 : 0.003); }
   }
 

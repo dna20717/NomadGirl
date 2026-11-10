@@ -42,7 +42,7 @@ check('Warroom: deutsche Zahlen', /2,5 l Sprit/.test(m?.items[1]?.sub), m?.items
 await shot('warroom');
 
 s = await ev(() => c.pick('Plündern'));
-check('Run startet im Ersatzraum mit Van', s.mode === 'run' && s.room === 'kampfraum' && s.prompt === 'Zurück ins Camp · Van' && !s.camp, { mode: s.mode, room: s.room, prompt: s.prompt });
+check('Run startet im POI-Level mit Van (Tankstelle, tools/poi_test.mjs prüft das Level)', s.mode === 'run' && s.level?.poi === 'tankstelle_km7' && s.prompt === 'Zurück ins Camp · Van' && !s.camp, { mode: s.mode, level: !!s.level, prompt: s.prompt });
 await shot('run');
 s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(5); return nomad.state(); });
 check('Mit dem Van zurück ins Camp, Ankunft in der Dämmerung', s.mode === 'camp' && s.camp.clock === 'Tag 2 · 18:30' && /Zurück im Camp/.test(s.banner) && /Tag 2 · 18:30/.test(s.banner), { mode: s.mode, banner: s.banner, clock: s.camp?.clock });

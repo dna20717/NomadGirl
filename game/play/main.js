@@ -2,6 +2,7 @@
 // Online (Cloudflare worker): the game data come live from the repository (/api/files), so a save in the workshop
 // counts after reloading, without waiting for the build. Elsewhere: the delivered files plus the workshop's drafts from this browser.
 //   game.html?room=<id>   plays a room-building block; without: the test room from the area "Spiel"
+//   game.html?poi=<id>[&seed=<n>]   plays a POI as a generated level (test mode, no savegame); without seed a new one every load
 //   game.html?camp        the game: camp ↔ runs with a savegame (online per login, otherwise in this browser); ?camp&new starts over
 import { openStore, withDrafts } from '../store.js';
 import { cloudFiles } from '../cloud_store.js';
@@ -33,6 +34,7 @@ export async function start(parent, hudRoot) {
     banner: false,
   });
   let args = { project, roomId, base, hud };
+  if (q.get('poi') && D.pois?.[q.get('poi')]) args = { ...args, poi: q.get('poi'), seed: Number(q.get('seed')) || 1 + Math.floor(Math.random() * 2 ** 31) };
   if (q.has('camp') && D.camp) {
     const box = await openSave(D);
     if (q.has('new')) await box.reset();
