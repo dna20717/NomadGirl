@@ -5,7 +5,7 @@
  "runnerX": 68,
  "runnerFeet": 86,
  "ground": {
-  "speed": 6,
+  "speed": 4,
   "specks": 0,
   "color": "#4a4256",
   "dust": true,
