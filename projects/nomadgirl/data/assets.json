@@ -1947,5 +1947,39 @@
    "stadia_dpad",
    "stadia_stick"
   ]
+ },
+ "highway_source": {
+  "name": "Wastelands · Highway zur Megacity (Original)",
+  "kind": "source",
+  "file": "assets/backgrounds/highway_source.png",
+  "source": "KI (PixelLab, create_image_pro, Stil: Leyla rennt nach vorn)",
+  "date": "10.11.2026",
+  "description": "688 × 384 px, Pixel-Art, Fluchtpunkt in der Mitte: links Ruinen und Hochstraße, rechts die leuchtende Megacity mit Suchscheinwerfern, Straße zum Horizont."
+ },
+ "highway": {
+  "name": "Wastelands · Highway zur Megacity",
+  "kind": "image",
+  "file": "assets/backgrounds/highway.png",
+  "source": "Code (am Horizont abgeschnitten)",
+  "derivedFrom": "highway_source",
+  "date": "10.11.2026",
+  "description": "688 × 226 px, oberer Teil des Originals bis zum Horizont (Zeile 226). Startseite: darunter rollt der Boden aus highway_ground."
+ },
+ "highway_ground_source": {
+  "name": "Boden · Straße von oben (Original)",
+  "kind": "source",
+  "file": "assets/backgrounds/highway_ground_source.png",
+  "source": "KI (PixelLab, create_image_pro)",
+  "date": "10.11.2026",
+  "description": "127 × 127 px, Draufsicht, kachelbar nach oben/unten: Asphalt mit Mittelstreifen, Sand mit Steinen am Rand (schwarze Randzeile entfernt)."
+ },
+ "highway_ground": {
+  "name": "Boden · Straße von oben",
+  "kind": "image",
+  "file": "assets/backgrounds/highway_ground.png",
+  "source": "Code (auf die Farben des Highway-Bilds umgefärbt)",
+  "derivedFrom": "highway_ground_source",
+  "date": "10.11.2026",
+  "description": "127 × 127 px, Endlos-Textur für den Boden der Startseite, perspektivisch abgerollt (Startseite › Boden › Textur)."
  }
 }

@@ -185,6 +185,7 @@ Daniel nutzt PixelLab für Grafiken (10.11.2026: „direkte Verbindung“). `.mc
 - **Bild:** Leyla und Kamera bewegen sich gemeinsam auf uns zu, also gleitet der Boden weg: Steinchen und Risse tauchen unten auf und wandern perspektivisch zum Horizont (`y = top + K/z`), Staub bei jedem halben Zyklus bleibt zurück. Was näher ist als ihre Füße, liegt vor ihr. `prefers-reduced-motion` zeigt ein Standbild.
 - **Horizont-Dunst** (Daniel, 07.11.2026 abends: „Übergang zwischen Kulissen und Boden durch Hitzeflimmern sanfter“): Startseite › Horizont-Dunst (`haze`): Zeilen um den Horizont zittern seitlich (Flimmern, stärker zum Horizont hin), der Boden greift mit Bayer-Raster ins Bild (Übergang in Bildpixeln), warmer Dunststreifen in der Horizont-Farbe des Wetters (atmet langsam). `haze()` in `splash.js`.
 - **Drohne auf der Startseite** (Daniel, 07.11.2026 abends: „Drohne auch im Splash Screen, random Animationen“): Startseite › Drohne (`drone`): schwebt hinter/neben Leyla (Position in %, schmal links neben ihr und kleiner), driftet und wackelt, zeigt alle x–y s eine zufällige Stimmung aus der Liste (Frame + Kaomoji-Bläschen aus dem Bereich Drohne), danach wieder Normal-Gesicht.
+- **Highway zur Megacity** (Daniel, 10.11.2026: „Hintergrund, der perspektivisch besser zu Leylas Laufen passt, Ruinen und auf der Gegenseite eine beleuchtete Cyberpunk-Megacity, spannende Endlos-Textur für den Boden, passend zum Pixelstil von Leyla und Drohne“): Bild `highway` (PixelLab mit Leyla als Stilvorlage, Fluchtpunkt in der Mitte, am Horizont abgeschnitten), Horizont 60 %. **Textur-Boden** (Startseite › Boden › Textur, `drawGround` in `splash.js`, „Mode 7“): jede Bildpixel-Zeile unter dem Horizont ist eine Tiefe, die Draufsicht `highway_ground` liegt „Breite der Textur“ (1,7 m) breit flach auf dem Boden und rollt mit dem Tempo weg, links/rechts wiederholt sich der Rand (16 Spalten Sand), zum Horizont Dunst ab 8 m; Steinchen 0. Ohne Textur wie vorher. Der alte Hintergrund `ruins_relay` bleibt als Asset.
 - Online kommen die Daten live über `/api/files` (wie das Spiel). `index.html?preview` zeigt nur die Szene (Vorschau in der Werkstatt unter „Startseite“ mit „Speichern und neu laden“). `window.splash` für Tests, `node tools/splash_test.mjs [--shots]` (Desktop, iPad hochkant, Handy).
 
 ## Kommandozeile `ng`
@@ -206,6 +207,7 @@ Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei j
 
 ## Stand
 
+- 10.11.2026 abends: **Startseite: Highway zur Megacity** (PixelLab) mit perspektivisch abrollendem Textur-Boden.
 - 09.11.2026 spät: **Werkstatt nur auf ihrer Ebene** (E + Arbeitsmodus), **Camp wächst mit hohen Stapeln** (Leyla hing oben in der Hocke fest), Kochnische und Küche mit dem Foodtruck-Bild ohne Hocker; `container_test` 16.
 - 09.11.2026 abends: **Sechs neue Werkstatt-Bilder** von Daniel (Drohne, Generator, Warroom, Chill Area, Schlafkoje, Foodtruck) mit neu gesetzten Effekten.
 - 10.11.2026 mittags: **Controller-Symbole** aus Daniels Blättern je Typ (Xbox, PlayStation, Switch, Stadia) in Hilfe, Hinweis und Menüs, wechseln mit dem Gerät; `pad_test` 17.

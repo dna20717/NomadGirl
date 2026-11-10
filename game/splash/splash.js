@@ -37,7 +37,17 @@ export async function startSplash(canvas) {
   let gait = pick(), gaitStart = 0, nextSwitch = Infinity, pace = gait?.speed ?? 1, run = gait?.a, runImg = gait?.img;
   const [sw0, sw1] = S.switchEvery || [];
   const planSwitch = now => { nextSwitch = sw0 ? now + (sw0 + Math.random() * Math.max(0, (sw1 ?? sw0) - sw0)) * 1000 : Infinity; };
-  const G = { speed: 6, specks: 140, color: '#4a4256', base: '#292330', dust: true, shadow: true, ...(S.ground || {}) };
+  const G = { speed: 6, specks: 140, color: '#4a4256', base: '#292330', dust: true, shadow: true, width: 4, edge: 16, shift: 0, fogFrom: 12, ...(S.ground || {}) };
+  // ground texture (top view, tiles along the road): read once into a pixel array, projected row by row in background pixels
+  const texImg = G.texture ? await image(G.texture) : null;
+  const tex = texImg && (() => {
+    const c = Object.assign(document.createElement('canvas'), { width: texImg.width, height: texImg.height }), g = c.getContext('2d');
+    g.drawImage(texImg, 0, 0);
+    return { w: c.width, h: c.height, px: new Uint32Array(g.getImageData(0, 0, c.width, c.height).data.buffer) };
+  })();
+  const groundCv = document.createElement('canvas'), groundCtx = groundCv.getContext('2d');
+  let groundData = null, roll = 0;
+  const rgb = s => { const n = parseInt(String(s || '#000').replace('#', ''), 16) || 0; return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const ctx = canvas.getContext('2d');
   let W = 0, H = 0, dpr = 1;
@@ -123,6 +133,34 @@ export async function startSplash(canvas) {
     }
   }
 
+  // textured ground ("mode 7"): every row of background pixels below the horizon is one depth z,
+  // every column one sideways position; the texture lies flat, G.width metres wide, and rolls away by `roll` metres
+  function drawGround(horizon, top, K, px) {
+    const y0 = Math.round(horizon), cols = Math.ceil(W / px), rows = Math.ceil((H - y0) / px);
+    if (rows <= 0) return;
+    if (!groundData || groundData.width !== cols || groundData.height !== rows) {
+      Object.assign(groundCv, { width: cols, height: rows }); groundData = groundCtx.createImageData(cols, rows);
+    }
+    const out = new Uint32Array(groundData.data.buffer), { w: tw, h: th, px: tp } = tex;
+    const gw = Math.max(0.1, G.width), edge = Math.max(1, Math.min(G.edge | 0, tw >> 1)), focal = W * Z_NEAR;
+    const [fr, fg, fb] = rgb(G.fog || G.base), fog0 = Math.min(G.fogFrom, Z_FAR - 1);
+    for (let r = 0; r < rows; r++) {
+      const z = Math.min(Z_FAR, K / Math.max(1e-3, y0 + (r + 0.5) * px - top));
+      const fog = Math.pow(Math.max(0, Math.min(1, (z - fog0) / (Z_FAR - fog0))), 0.6), keep = 1 - fog;
+      const ty = ((Math.floor((z - roll) / gw * tw) % th) + th) % th, row = ty * tw;
+      const scale = z / focal * tw / gw, base = (0.5 - W / 2 / focal * z / gw - G.shift / gw) * tw;
+      for (let c = 0; c < cols; c++) {
+        let tx = Math.floor(base + (c + 0.5) * px * scale);
+        if (tx < 0) tx = ((tx % edge) + edge) % edge;                          // left edge repeats outwards
+        else if (tx >= tw) tx = tw - edge + (tx - tw) % edge;                  // right edge repeats outwards
+        const p = tp[row + tx];
+        out[r * cols + c] = fog ? (0xff000000 | Math.round((p >> 16 & 255) * keep + fb * fog) << 16 | Math.round((p >> 8 & 255) * keep + fg * fog) << 8 | Math.round((p & 255) * keep + fr * fog)) >>> 0 : p | 0xff000000;
+      }
+    }
+    groundCtx.putImageData(groundData, 0, 0);
+    ctx.drawImage(groundCv, 0, y0, cols * px, rows * px);
+  }
+
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     const t = still ? 0 : now / 1000;
@@ -150,10 +188,11 @@ export async function startSplash(canvas) {
       ctx.drawImage(img, Math.round((W - bw * sc) / 2 + ox), Math.round(horizon - bh * sc + oy + par * 0.4 * H * depth), Math.round(bw * sc), Math.round(bh * sc));
     });
     ctx.fillStyle = G.base; ctx.fillRect(0, Math.round(horizon), W, H);
-    if (HZ.enabled) haze(t, horizon, sc);
 
     // ground projection: y = top + K / z, so z = Z_FAR sits on the horizon and Z_NEAR just below the bottom edge
     const K = (H + 4 * px - horizon) / (1 / Z_NEAR - 1 / Z_FAR), top = horizon - K / Z_FAR;
+    if (tex) { if (!still) roll += G.speed * pace * dt; drawGround(horizon, top, K, px); }
+    if (HZ.enabled) haze(t, horizon, sc);
     const project = (x, z) => [W / 2 + x * W * (Z_NEAR / z), top + K / z];
 
     // Leyla

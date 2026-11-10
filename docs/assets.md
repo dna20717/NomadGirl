@@ -74,6 +74,10 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/backgrounds/wasteland_ledge.png` | Wastelands, Steg, transparent, 576 × 324 px (`wasteland_ledge`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/wasteland_near.png` | Wastelands, nahe Skyline, transparent, 576 × 324 px (`wasteland_near`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/backgrounds/ruins_relay.png` | Wastelands · Funkruinen, 688 × 384, Himmel transparent (`ruins_relay`), Startseite + Testraum; Himmel/Wetter aus Code (`game/weather.js`) | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/backgrounds/highway_source.png` | Wastelands · Highway zur Megacity: Original, 688 × 384, Fluchtpunkt in der Mitte, links Ruinen + Hochstraße, rechts Megacity (`highway_source`) | KI (PixelLab, Stil: Leyla) | 10.11.2026 |
+| `assets/backgrounds/highway.png` | dasselbe bis zum Horizont, 688 × 226 (`highway`), Startseite | aus `highway_source.png` abgeschnitten (Code) | 10.11.2026 |
+| `assets/backgrounds/highway_ground_source.png` | Boden · Straße von oben, 127 × 127, kachelbar nach oben/unten (`highway_ground_source`) | KI (PixelLab, Stil: Leyla) | 10.11.2026 |
+| `assets/backgrounds/highway_ground.png` | dieselbe Textur in den Farben des Highway-Bilds (`highway_ground`), Boden der Startseite | umgefärbt (Code) | 10.11.2026 |
 | `assets/workshops/warroom_table.png` | Werkstatt Warroom: Planungstisch mit Karten, Bildschirmen, Laptop, Kaffeetasse, 256 × 256, Pixel-Art (`ws_warroom_table`) | KI-generiert (Daniel) | 08.11.2026 |
 | `assets/workshops/weapon_bench.png` | Werkstatt Waffenkammer: Waffenbank mit Pistole und Sturmgewehr an der Lochwand (`ws_weapon_bench`) | KI-generiert (Daniel) | 08.11.2026 |
 | `assets/workshops/metal_bench.png` | Werkstatt Werkbank: Metall-Werkbank mit Schweißgerät, Gasflasche, Sägen (`ws_metal_bench`) | KI-generiert (Daniel) | 08.11.2026 |
