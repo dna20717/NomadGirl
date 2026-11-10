@@ -120,7 +120,7 @@ export class Leyla {
     const b = this.body, m = this.m;
     if (input.pose?.pressed && grounded && !dir && Math.abs(b.velocity.x) <= 20 && this.d.look?.yoga && !this.attack && !this.charging) { this.startPose(time); return; }
     if (dir && time > this.attackPose) this.facing = dir;
-    const speed = input.walk.down ? (m.walkSpeed ?? 240) : (m.runSpeed ?? 440);
+    const speed = (input.walk.down ? (m.walkSpeed ?? 240) : (m.runSpeed ?? 440)) * (1 + (this.scene.mods?.speed || 0) / 100);   // gear, implants, buffs
     let acc = (m.acceleration ?? 2800) * (grounded ? (dir ? 1 : 1.6) : 0.75);
     // keep momentum in the air (rope, knockback) while pushing the same way
     if (!grounded && Math.abs(b.velocity.x) > speed && Math.sign(b.velocity.x) === dir) acc *= 0.15;

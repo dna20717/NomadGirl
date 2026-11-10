@@ -3,12 +3,12 @@
 // without the worker (local, tests) in this browser (localStorage). Shape:
 //   { version, day, hour, location, fuel, food, deltas, health, buffs: [id], rig: { tractor, units: [{ kind, id, workshops: [{ id, at }] }], spare: { workshops: [id], containers: [id] } } (game/rig.js),
 //     companions: [id], recipes: [id] (recipe book), run: null | { poi, room, location }, log: [text],
-//     inv: { backpack: id, slots: { melee, ranged, cyberdeck }, grids: { backpack, chest, 'store:<unit>:<place>': grid, 'rig:<unit>': grid } } }   (grids: game/inventory.js)
+//     inv: { backpack: id, slots: { melee, ranged, cyberdeck }, wear: { head, armor, eyes … module }, grids: { backpack, drone (rescue pocket), chest, 'store:<unit>:<place>': grid, 'rig:<unit>': grid } } }   (grids: game/inventory.js)
 //   rig.parts = { engine: [id|null], armor: [...], weapon: [...], roof: [...] }: rig parts on the tractor's sockets (Rig bauen), rig.spare.parts = on the scrapyard
 //   'rig:<unit>' = the own storage of the tractor (Kofferraum, plus rows from a Dachbox) or of a trailer (Deichselkasten)
 // Times are hours (18.5 = 18:30). "Ereignis-Zeit": the clock only moves on actions (sleeping, runs, sitting at the fire).
 
-import { newGrid, add, fits } from './inventory.js';
+import { newGrid, add, fits, startWear, wearOf, WEAR_KEYS } from './inventory.js';
 
 const LOCAL_KEY = 'nomadgirl-save';
 export const SAVE_VERSION = 1;
@@ -102,10 +102,14 @@ function withInventory(D, save) {
   inv.grids ??= {}; inv.slots ??= {};
   if (!D.backpacks?.[inv.backpack]) inv.backpack = D.leyla?.loadout?.backpack || null;
   for (const k of ['melee', 'ranged', 'cyberdeck']) if (inv.slots[k] && !D.weapons?.[inv.slots[k]]) inv.slots[k] = null;
+  // worn things: head, armor, implants, Mama-Bot's parts; older savegames start with Leyla › Start-Ausrüstung › Angelegt
+  inv.wear ??= startWear(D);
+  for (const k of WEAR_KEYS) if (inv.wear[k] && wearOf(D, inv.wear[k]) !== k) inv.wear[k] = null; else inv.wear[k] ??= null;
   for (const g of Object.values(inv.grids)) g.items = (g.items || []).filter(e => D[e.a]?.[e.id] && e.n > 0);
   for (const piles of Object.values(save.ground || {})) for (const p of piles) p.grid.items = (p.grid?.items || []).filter(e => D[e.a]?.[e.id] && e.n > 0);
   ensureGrid(D, inv, 'backpack', backpackSize(D, inv));
   for (const c of containers(D, save)) ensureGrid(D, inv, c.key, c.size);
+  ensureGrid(D, inv, 'drone', D.drone?.rescue?.size || [3, 2]);   // Mama-Bot's rescue pocket: survives a knock-out
   return save;
 }
 

@@ -27,7 +27,16 @@
   {"mood": "scan", "frame": 10, "duration": 1600},
   {"mood": "lowHealth", "frame": 11, "kaomoji": "(;´Д`)", "duration": 0},
   {"mood": "dash", "frame": 12, "duration": 350},
-  {"mood": "zen", "frame": 13, "kaomoji": "(￣人￣)", "duration": 0}
+  {"mood": "zen", "frame": 13, "kaomoji": "(￣人￣)", "duration": 0},
+  {"mood": "gearBetter", "frame": 3, "kaomoji": "ヽ(°〇°)ﾉ", "duration": 1600},
+  {"mood": "gearWorse", "frame": 11, "kaomoji": "(;´Д`)", "duration": 1600},
+  {"mood": "gearOff", "frame": 11, "kaomoji": "(._.)", "duration": 1200},
+  {"mood": "dronePart", "frame": 10, "kaomoji": "(⌐■_■)", "duration": 1800},
+  {"mood": "rescue", "frame": 12, "kaomoji": "(•̀ᴗ•́)و", "duration": 1400},
+  {"mood": "rescueFood", "frame": 7, "kaomoji": "(╬ಠ益ಠ)", "duration": 1600},
+  {"mood": "valuable", "frame": 6, "kaomoji": "(・・?)", "duration": 1400},
+  {"mood": "bagFull", "frame": 4, "kaomoji": "(￣～￣;)", "duration": 1600},
+  {"mood": "invIdle", "frame": 8, "kaomoji": "(－.－)zzZ", "duration": 0}
  ],
  "idle": {"boredAfter": 6, "sleepAfter": 14, "randomEvery": [8, 16], "zenAfter": 2},
  "alertRange": 700,
@@ -42,7 +51,8 @@
  ],
  "cable": {"segments": 8, "gravity": 900, "damping": 0.9, "swing": 75, "outline": "#060608"},
  "parts": [
-  {"name": "Suchscheinwerfer", "look": "drone_lamp", "at": [98, 78], "layer": "behind", "on": true},
-  {"name": "Greifarm", "look": "drone_claw", "at": [40, 76], "layer": "behind", "on": true}
- ]
+  {"name": "Suchscheinwerfer", "look": "drone_lamp", "at": [98, 78], "layer": "behind", "on": true, "item": "suchscheinwerfer"},
+  {"name": "Greifarm", "look": "drone_claw", "at": [40, 76], "layer": "behind", "on": true, "item": "greifarm"}
+ ],
+ "rescue": {"name": "Rettungsfach", "size": [3, 2]}
 }

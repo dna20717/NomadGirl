@@ -56,7 +56,7 @@ s = await inv();
 check('Slot anklicken baut nichts aus (nur Ansicht)', !s.held && !s.parts?.roof?.[0], s);
 await shot('vantab');
 // Leyla tab again: backpack + Kofferraum side by side
-await page.locator('.inv-tab', { hasText: 'Leyla' }).click(); await page.waitForTimeout(40);
+await page.locator('.inv-tab', { hasText: 'Ausrüstung' }).click(); await page.waitForTimeout(40);
 s = await inv();
 check('Tab „Leyla“ zeigt wieder Rucksack + Kofferraum', s.tab === 'leyla' && s.other?.key === 'rig:0', s);
 await ev(() => game.scene.getScene('play').hud.inv.close());

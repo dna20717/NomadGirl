@@ -1,15 +1,15 @@
 {
- "kupferkabel": {"name": "Kupferkabel", "category": "junk", "size": [1, 1], "stack": 10, "value": 2, "glyph": "Cu", "look": "icons_gear", "icon": 24},
- "alte_platine": {"name": "Alte Platine", "category": "junk", "size": [1, 1], "stack": 5, "value": 3, "glyph": "PCB", "look": "icons_gear", "icon": 34},
+ "kupferkabel": {"name": "Kupferkabel", "category": "junk", "size": [1, 2], "stack": 10, "value": 2, "glyph": "Cu", "look": "icons_gear", "icon": 24},
+ "alte_platine": {"name": "Alte Platine", "category": "junk", "size": [2, 1], "stack": 5, "value": 3, "glyph": "PCB", "look": "icons_gear", "icon": 34},
  "gluehbirne": {"name": "Glühbirne", "category": "junk", "size": [1, 1], "stack": 5, "value": 1, "description": "Heil. Ein kleines Wunder.", "glyph": "💡"},
  "kronkorken": {"name": "Kronkorken", "category": "junk", "size": [1, 1], "stack": 99, "value": 0, "description": "Hier nichts wert. Leyla sammelt sie trotzdem.", "glyph": "KK"},
- "schrott": {"name": "Schrott", "category": "resource", "size": [1, 1], "stack": 20, "value": 1, "glyph": "⚙", "look": "icons_gear", "icon": 30},
+ "schrott": {"name": "Schrott", "category": "resource", "size": [2, 1], "stack": 20, "value": 1, "glyph": "⚙", "look": "icons_gear", "icon": 30},
  "stoffreste": {"name": "Stoffreste", "category": "resource", "size": [1, 1], "stack": 10, "value": 1, "glyph": "🧵"},
  "batteriezelle": {"name": "Batteriezelle", "category": "resource", "size": [1, 1], "stack": 10, "value": 6, "glyph": "🔋", "look": "icons_gear", "icon": 38},
  "mutantenfleisch": {
   "name": "Mutantenfleisch",
   "category": "ingredient",
-  "size": [1, 1],
+  "size": [2, 1],
   "stack": 5,
   "value": 2,
   "description": "Besser nicht fragen.",
@@ -17,7 +17,7 @@
   "look": "icons_kitchen",
   "icon": 16
  },
- "reis": {"name": "Reis", "category": "ingredient", "size": [1, 1], "stack": 10, "value": 2, "glyph": "🍚", "look": "icons_kitchen", "icon": 19},
+ "reis": {"name": "Reis", "category": "ingredient", "size": [1, 2], "stack": 10, "value": 2, "glyph": "🍚", "look": "icons_kitchen", "icon": 19},
  "gewuerzmischung": {"name": "Gewürzmischung", "category": "ingredient", "size": [1, 1], "stack": 10, "value": 4, "glyph": "🌶", "look": "icons_kitchen", "icon": 44},
  "dosenbohnen": {"name": "Dosenbohnen", "category": "ingredient", "size": [1, 1], "stack": 6, "value": 2, "glyph": "🥫", "look": "icons_kitchen", "icon": 38},
  "mutanten_curry": {
@@ -159,7 +159,7 @@
  "mutantengemuese": {
   "name": "Mutantengemüse",
   "category": "ingredient",
-  "size": [1, 1],
+  "size": [1, 2],
   "stack": 8,
   "value": 2,
   "glyph": "🥕",
@@ -178,8 +178,8 @@
   "icon": 37,
   "description": "Leuchten noch, wenn sie schon gar sind."
  },
- "sojasauce": {"name": "Sojasauce", "category": "ingredient", "size": [1, 1], "stack": 5, "value": 3, "glyph": "🍶", "look": "icons_kitchen", "icon": 43},
- "speiseoel": {"name": "Speiseöl", "category": "ingredient", "size": [1, 1], "stack": 5, "value": 2, "glyph": "🫗", "look": "icons_kitchen", "icon": 41},
+ "sojasauce": {"name": "Sojasauce", "category": "ingredient", "size": [1, 2], "stack": 5, "value": 3, "glyph": "🍶", "look": "icons_kitchen", "icon": 43},
+ "speiseoel": {"name": "Speiseöl", "category": "ingredient", "size": [1, 2], "stack": 5, "value": 2, "glyph": "🫗", "look": "icons_kitchen", "icon": 41},
  "neon_ramen": {
   "name": "Neon-Ramen",
   "category": "food",
@@ -196,7 +196,7 @@
  "wasteland_sushi": {
   "name": "Wasteland-Sushi",
   "category": "food",
-  "size": [1, 1],
+  "size": [2, 1],
   "stack": 4,
   "value": 12,
   "buff": "flink",
@@ -205,11 +205,11 @@
   "icon": 20,
   "description": "Frisch ist relativ."
  },
- "grillsteak": {"name": "Grillsteak", "category": "food", "size": [1, 1], "stack": 2, "value": 9, "buff": "gestaerkt", "glyph": "🥩", "look": "icons_kitchen", "icon": 33},
+ "grillsteak": {"name": "Grillsteak", "category": "food", "size": [2, 1], "stack": 2, "value": 9, "buff": "gestaerkt", "glyph": "🥩", "look": "icons_kitchen", "icon": 33},
  "bento_deluxe": {
   "name": "Bento deluxe",
   "category": "food",
-  "size": [1, 1],
+  "size": [2, 1],
   "stack": 2,
   "value": 20,
   "buff": "zaeh",
@@ -221,7 +221,7 @@
  "mre_ration": {
   "name": "MRE-Ration",
   "category": "food",
-  "size": [1, 1],
+  "size": [1, 2],
   "stack": 3,
   "value": 6,
   "buff": "satt",
@@ -255,7 +255,7 @@
   "description": "Aus zwei toten Platinen ein lebendiger Chip."
  },
  "feuerzeug": {"name": "Feuerzeug", "category": "junk", "size": [1, 1], "stack": 3, "value": 2, "glyph": "🔥", "look": "icons_gear", "icon": 60},
- "medikit": {"name": "Medikit", "category": "consumable", "size": [1, 1], "stack": 2, "value": 18, "buff": "verarztet", "glyph": "⛑", "look": "icons_gear", "icon": 48},
+ "medikit": {"name": "Medikit", "category": "consumable", "size": [2, 1], "stack": 2, "value": 18, "buff": "verarztet", "glyph": "⛑", "look": "icons_gear", "icon": 48},
  "aufputschspritze": {
   "name": "Aufputschspritze",
   "category": "consumable",
@@ -291,5 +291,116 @@
   "look": "icons_gear",
   "icon": 61,
   "description": "Aus dem Erste-Hilfe-Raum eines Ministeriums."
+ },
+ "gasmaske": {
+  "name": "Gasmaske",
+  "look": "icons_gear",
+  "icon": 51,
+  "category": "armor",
+  "wear": "head",
+  "stats": {"defense": 4},
+  "size": [2, 2],
+  "stack": 1,
+  "value": 60,
+  "description": "Riecht nach Gummi und altem Atem. Hält Staub, Gift und ein paar Kratzer ab."
+ },
+ "plattentraeger": {
+  "name": "Plattenträger",
+  "look": "icons_gear",
+  "icon": 10,
+  "category": "armor",
+  "wear": "armor",
+  "stats": {"defense": 12, "health": 10, "speed": -3},
+  "size": [2, 3],
+  "stack": 1,
+  "value": 180,
+  "description": "Schwere Weste mit Stahlplatten. Schützt gut, macht aber etwas langsamer."
+ },
+ "nachtsicht_optik": {
+  "name": "Nachtsicht-Optik",
+  "look": "icons_gear",
+  "icon": 8,
+  "category": "implant",
+  "wear": "eyes",
+  "stats": {"damage": 5},
+  "strain": 2,
+  "size": [1, 1],
+  "stack": 1,
+  "value": 260,
+  "description": "Cyber-Augen mit Restlichtverstärker. Leyla trifft besser, auch im Dunkeln."
+ },
+ "reflex_booster": {
+  "name": "Reflex-Booster",
+  "look": "icons_gear",
+  "icon": 35,
+  "category": "implant",
+  "wear": "nerves",
+  "stats": {"speed": 5},
+  "strain": 3,
+  "size": [1, 1],
+  "stack": 1,
+  "value": 300,
+  "description": "Chip am Rückenmark. Alles fühlt sich ein bisschen langsamer an, nur Leyla nicht."
+ },
+ "cyberarm_mk1": {
+  "name": "Cyberarm Mk I",
+  "look": "icons_gear",
+  "icon": 58,
+  "category": "implant",
+  "wear": "arm",
+  "stats": {"damage": 10},
+  "strain": 1,
+  "size": [1, 3],
+  "stack": 1,
+  "value": 400,
+  "description": "Leylas eigener Arm, selbst geflickt. Schlägt härter zu als Fleisch."
+ },
+ "subdermale_platten": {
+  "name": "Subdermale Platten",
+  "glyph": "SP",
+  "category": "implant",
+  "wear": "skin",
+  "stats": {"defense": 6},
+  "strain": 3,
+  "size": [2, 2],
+  "stack": 1,
+  "value": 320,
+  "description": "Dünne Panzerplatten unter der Haut. Zieht beim Wetterumschwung."
+ },
+ "herzpumpe": {
+  "name": "Herzpumpe",
+  "glyph": "HP",
+  "category": "implant",
+  "wear": "heart",
+  "stats": {"health": 25},
+  "strain": 4,
+  "size": [1, 2],
+  "stack": 1,
+  "value": 380,
+  "description": "Zweites Herz aus Titan. Mehr Ausdauer, tickt leise beim Schlafen."
+ },
+ "suchscheinwerfer": {
+  "name": "Suchscheinwerfer",
+  "look": "icons_gear",
+  "icon": 53,
+  "category": "dronepart",
+  "wear": "bow",
+  "partLook": "drone_lamp",
+  "size": [1, 2],
+  "stack": 1,
+  "value": 90,
+  "description": "Lampe für Mama-Bots Nase. Sie leuchtet damit gern Leyla ins Gesicht."
+ },
+ "greifarm": {
+  "name": "Greifarm",
+  "look": "icons_gear",
+  "icon": 16,
+  "category": "dronepart",
+  "wear": "tail",
+  "partLook": "drone_claw",
+  "size": [1, 2],
+  "stack": 1,
+  "value": 120,
+  "description": "Zange am Heck. Mama-Bot hebt damit Kleinkram auf und manchmal Leylas Snacks."
  }
 }

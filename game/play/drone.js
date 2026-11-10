@@ -25,12 +25,14 @@ export class Drone {
     this.scale = has ? (this.d.height || a.height || fh) / fh : 60;
     const kids = [];
     const part = (r) => {
-      const pa = A[r.look]; if (!r.on || !tex(r.look)) return null;
+      const pa = A[r.look]; if (!tex(r.look)) return null;
       const img = pa.kind === 'animation' ? scene.add.sprite(0, 0, r.look, 0) : scene.add.image(0, 0, r.look);
       if (pa.kind === 'animation' && scene.anims.exists(r.look)) img.play(r.look);
       const [pw, ph] = pa.frameSize || [img.width, img.height], [px, py] = pa.origin || [pw / 2, ph / 2];
+      this.partImgs.push({ r, img });
       return img.setOrigin(px / pw, py / ph).setPosition((r.at?.[0] ?? ox) - ox, (r.at?.[1] ?? oy) - oy);
     };
+    this.partImgs = [];
     for (const r of this.d.parts || []) if (r.layer === 'behind') { const p = part(r); if (p) kids.push(p); }
     kids.push(this.hull);
     // antigravity ring: soft additive glow over the painted ring
@@ -52,6 +54,7 @@ export class Drone {
     for (const r of this.d.parts || []) if (r.layer !== 'behind') { const p = part(r); if (p) kids.push(p); }
     const depth = this.d.layer === 'front' ? 11 : 9.5;
     this.sprite = scene.add.container(0, 0, kids).setScale(this.scale).setDepth(depth);
+    this.refreshParts();
     this.cables = new Cables(this.d.cables, this.d.cable);
     this.rope = scene.add.graphics().setDepth(depth - 0.01);
     this.half = (has ? oy : 0.5) * this.scale;   // from the anchor up to the top edge
@@ -61,6 +64,12 @@ export class Drone {
       color: B.color || '#7ff6ff', backgroundColor: B.background || '#140c1c', padding: { x: 12, y: 6 },
     }).setOrigin(0.5, 1).setDepth(12).setAlpha(0);
     this.reset();
+  }
+
+  // parts with a "Gegenstand" show while that item sits on Mama-Bot in the inventory (inv.wear), others follow "Angebaut"
+  refreshParts() {
+    const worn = new Set(Object.values(this.scene.box?.save?.inv?.wear || {}).filter(Boolean)), hasInv = !!this.scene.box?.save?.inv?.wear;
+    for (const { r, img } of this.partImgs || []) img.setVisible(r.item && hasInv ? worn.has(r.item) : !!r.on);
   }
 
   reset() {

@@ -39,7 +39,7 @@
   "landFromFrame": 4,
   "landCancel": 55
  },
- "loadout": {"melee": "karambit", "ranged": "nagelpistole", "backpack": "schulranzen"},
+ "loadout": {"melee": "karambit", "ranged": "nagelpistole", "backpack": "schulranzen", "wear": ["cyberarm_mk1", "suchscheinwerfer", "greifarm"]},
  "look": {
   "idle": "leyla_idle_side",
   "reference": "leyla_sheet",
@@ -72,7 +72,23 @@
   "brake": "leyla_brake_side"
  },
  "idleAltChance": 50,
- "inventory": {"pickupRange": 150, "autoStack": true, "cell": 44, "dropSpread": 90},
+ "inventory": {
+  "pickupRange": 150,
+  "autoStack": true,
+  "cell": 44,
+  "dropSpread": 90,
+  "portrait": "leyla_stand_front",
+  "portraitScale": 1.5,
+  "strainMax": 10,
+  "implants": [
+   {"slot": "eyes", "name": "Augen", "at": [50, 45], "side": "left"},
+   {"slot": "arm", "name": "Cyberarm", "at": [23, 74], "side": "left"},
+   {"slot": "legs", "name": "Beine", "at": [27, 172], "side": "left"},
+   {"slot": "nerves", "name": "Nerven", "at": [50, 64], "side": "right"},
+   {"slot": "heart", "name": "Herz", "at": [58, 84], "side": "right"},
+   {"slot": "skin", "name": "Haut", "at": [70, 150], "side": "right"}
+  ]
+ },
  "idles": [{"look": "leyla_idle_turn_side", "weight": 3},{"look": "leyla_gum_side", "weight": 2},{"look": "leyla_flex_side", "weight": 2},{"look": "leyla_hair_side", "weight": 3}],
  "idleAfter": [6, 12],
  "armed": {

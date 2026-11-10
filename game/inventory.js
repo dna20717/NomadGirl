@@ -145,3 +145,31 @@ export function canResize(D, grid, w, h) {
   return kept === total;
 }
 export function worth(D, grid) { return grid.items.reduce((s, e) => s + (thing(D, e.a, e.id)?.value || 0) * e.n, 0); }
+
+// ---------- worn things (Daniel, 10.11.2026: Inventar im Diablo-Stil) ----------
+// inv.wear = { head, armor, eyes, nerves, arm, heart, legs, skin, bow, tail, core, module } → item id or null.
+// Items say where they go with "wear" (Gegenstände › Ausrüstung) and add their "stats" ({ defense, health, damage, speed }) while worn.
+export const LEYLA_WEAR = ['head', 'armor'];
+export const IMPLANTS = ['eyes', 'nerves', 'arm', 'heart', 'legs', 'skin'];
+export const DRONE_WEAR = ['bow', 'tail', 'core', 'module'];
+export const WEAR_KEYS = [...LEYLA_WEAR, ...IMPLANTS, ...DRONE_WEAR];
+export const wearOf = (D, id) => D.items?.[id]?.wear || null;
+// the worn things at the start (Leyla › Start-Ausrüstung › Angelegt), one per place
+export function startWear(D) {
+  const w = Object.fromEntries(WEAR_KEYS.map(k => [k, null]));
+  for (const id of D.leyla?.loadout?.wear || []) { const k = wearOf(D, id); if (k && WEAR_KEYS.includes(k) && !w[k]) w[k] = id; }
+  return w;
+}
+// what everything worn adds up to; strain = load of the implants
+export function gearStats(D, wear = {}) {
+  const s = { defense: 0, health: 0, damage: 0, speed: 0, strain: 0 };
+  for (const [k, id] of Object.entries(wear)) {
+    const t = id && D.items?.[id];
+    if (!t || t.wear !== k) continue;
+    for (const st of ['defense', 'health', 'damage', 'speed']) s[st] += t.stats?.[st] || 0;
+    if (IMPLANTS.includes(k)) s.strain += t.strain || 0;
+  }
+  return s;
+}
+// one number to compare two things for the same place (Mama-Bot cheers or worries)
+export const gearScore = st => (st?.defense || 0) + (st?.health || 0) * 0.4 + (st?.damage || 0) + (st?.speed || 0);

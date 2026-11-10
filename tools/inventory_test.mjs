@@ -122,7 +122,10 @@ await click(1, rb.x, rb.y);
 for (const [x, y] of [[4, 1], [3, 1], [4, 0], [2, 1], [5, 0]]) { if (!(await inv()).held) break; await click(0, x, y); }
 s = await inv();
 check('Rohrbogen vom Boden in den Rucksack', !s.held && has(s.backpack, 'rohrbogen'), s);
-s = await ev(() => { const sc = game.scene.getScene('play'); sc.hud.inv.close(); sc.loot.drop(sc.leyla.x + 20, sc.leyla.feet, [{ a: 'items', id: 'kupferkabel', n: 2 }], 0); nomad.step(40); return { loot: nomad.loot(), inv: nomad.inv(), bag: nomad.save().inv.grids.backpack.items.filter(e => e.id === 'kupferkabel').reduce((n, e) => n + e.n, 0) }; });
+s = await ev(() => { const sc = game.scene.getScene('play'); sc.hud.inv.close();
+  // a cable stack in the backpack to fill up (the start chest changes with Daniel's data): clear the bag, one cable in the corner
+  const g = nomad.save().inv.grids.backpack; g.items = [{ a: 'items', id: 'kupferkabel', n: 3, x: 0, y: 0, r: 0 }];
+  sc.loot.drop(sc.leyla.x + 20, sc.leyla.feet, [{ a: 'items', id: 'kupferkabel', n: 2 }], 0); nomad.step(40); return { loot: nomad.loot(), inv: nomad.inv(), bag: nomad.save().inv.grids.backpack.items.filter(e => e.id === 'kupferkabel').reduce((n, e) => n + e.n, 0) }; });
 check('Kupferkabel (schon im Rucksack) wird beim Drüberlaufen eingesammelt', s.bag >= 5 && !s.loot.some(p => p.items.some(i => i.startsWith('kupferkabel'))), s);
 s = await ev(() => { const sc = game.scene.getScene('play'); sc.leyla.hurt(sc.time.now, 9999, 0); nomad.step(200); return { mode: nomad.state().mode, bag: nomad.save().inv.grids.backpack.items.length, slots: nomad.save().inv.slots }; });
 check('k.o.: Rucksack leer, Waffen bleiben', s.mode === 'camp' && s.bag === 0 && s.slots.melee === 'machete', s);

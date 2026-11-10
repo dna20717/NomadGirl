@@ -15,6 +15,7 @@ import { Camp, campLayout, daytimeAt, drawCampBackground, drawCampGround } from 
 import { advance, arrive, clockText, containers } from '../save.js';
 import { Loot } from './loot.js';
 import { InventoryUI } from './inventory_ui.js';
+import { gearStats } from '../inventory.js';
 import { CraftUI } from './craft_ui.js';
 import { BuildMode } from './build_mode.js';
 import { use as useThing } from '../crafting.js';
@@ -189,6 +190,7 @@ export class PlayScene extends Phaser.Scene {
     this.spawnArt = this.van?.sprite;
     // buffs from the savegame count in a run (health, defense, damage)
     this.mods = {};
+    this.gearMods = null; this.applyGear();   // worn gear and implants count everywhere
     if (this.mode === 'run') for (const b of this.box.save.buffs) { const d = this.data_.buffs?.[b]; if (d?.stat) this.mods[d.stat] = (this.mods[d.stat] || 0) + (d.value || 0); }
     const feet = [(start[0] + 0.5) * T, (start[1] + 1) * T];
     if (this.args.startX) feet[0] = this.args.startX;
@@ -236,6 +238,15 @@ export class PlayScene extends Phaser.Scene {
     this.leaving = false; this.roomName = null;
   }
 
+  // worn gear and implants (inv.wear) on top of the buffs: swap the old sums for the new ones, Mama-Bot shows her parts
+  applyGear() {
+    const g = this.box ? gearStats(this.data_, this.box.save.inv?.wear) : {};
+    for (const k of ['defense', 'health', 'damage', 'speed']) { const v = (this.mods[k] || 0) - (this.gearMods?.[k] || 0) + (g[k] || 0); if (v) this.mods[k] = v; else delete this.mods[k]; }
+    this.gearMods = g;
+    if (this.leyla) this.leyla.health = Math.min(this.leyla.health, this.leyla.maxHealth);
+    this.drone?.refreshParts();
+  }
+
   // ---------- inventory (game/play/inventory_ui.js, game/inventory.js) ----------
   setupInventory() {
     this.hud.scene = this;
@@ -249,6 +260,8 @@ export class PlayScene extends Phaser.Scene {
       throwDown: e => hud.scene.loot ? hud.scene.loot.throwDown(e) : null,
       use: id => hud.scene.useThing(id),
       inCamp: () => hud.scene.mode === 'camp',
+      gearChanged: () => hud.scene.applyGear(),
+      react: mood => hud.scene.drone?.react(mood),
       rigChanged: () => hud.scene.camp?.drawRig(),
       notify: text => hud.scene.fx.text(hud.scene.leyla.x, hud.scene.leyla.feet - hud.scene.leyla.height - 30, text, { color: '#ffd27a', size: 34, rise: 40, life: 1100 }),
     });
