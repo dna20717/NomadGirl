@@ -96,6 +96,10 @@ output/                Bilder vom Werkstatt-Test (nicht im Git)
 - **Scrollen bleibt stehen** (Daniel, 08.11.2026: „der Scrollzustand soll immer dort gehalten werden, wo ich gerade in der Navigation unterwegs bin“): `draw()` baut alles neu und setzt danach die Scroll-Positionen zurück: die Bereichsleiste links immer, die Eintragsliste solange man im selben Bereich bleibt (Eintrag anklicken springt nicht mehr nach oben), der Inspektor bei Bearbeiten im selben Eintrag; ein neuer Bereich beginnt oben, ein neuer Eintrag zeigt den Inspektor von oben. Aktiver Bereich und Eintrag werden bei Bedarf ins Bild gerückt. Geprüft in `workshop_test.mjs`.
 - Oberflächen-Regeln wie in NomadTactics (`CLAUDE.md` dort): nur `--ui-*`-Tokens, Inter + VT323, Dialoge über `openDialogue`, Löschen rot mit Rückgängig, Hauptaktion gold.
 
+## PixelLab (Grafik-KI)
+
+Daniel nutzt PixelLab für Grafiken (10.11.2026: „direkte Verbindung“). `.mcp.json` bindet den gehosteten PixelLab-MCP-Server ein (`https://api.pixellab.ai/mcp`, Bearer-Token). Der Schlüssel steht **nie im Repo**, nur als Umgebungsvariable `PIXELLAB_API_KEY`. Claude Code auf dem iPad (Cloud-Sitzung) braucht in der Cloud-Umgebung: Umgebungsvariable `PIXELLAB_API_KEY=…`, Netzwerkzugriff „Custom“ mit `api.pixellab.ai` (Standard-Domains behalten), dann neue Sitzung, `/mcp` zeigt `pixellab`. In der Claude-App (Chat) geht es nicht: eigene Connectors können keinen Bearer-Header. PixelLab-Grafiken in `THIRD_PARTY.md`/`docs/assets.md` als „KI (PixelLab)“ vermerken.
+
 ## Assets und Fidelity
 
 - **Fidelity (Daniel, 07.11.2026): so viel wie geht.** Spielauflösung 1920×1080, Kacheln 64 px, `pixelArt` aus (die KI-Grafiken sind hochaufgelöst und werden geglättet skaliert), Leyla 192 px hoch (Daniel, 07.11.2026: vorher 256, auf drei Viertel verkleinert). Leylas Größe ist die „Höhe im Spiel“ ihres Idle-Assets; Kollisionsbox, Hand, Brust und Angriffs-Hitboxen skalieren im Spiel automatisch mit. Gegner haben ihre Größe im Feld „Größe“ (Schläger 180, Schütze 174).
