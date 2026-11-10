@@ -93,6 +93,8 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 
 Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich „Assets“.
 | `assets/items/icons_gear.png` | Symbol-Raster Ausrüstung & Material: 8 × 8 Icons à 32 × 32 px, Pixel-Art (Waffen, Werkzeug, Material, Elektronik, Medizin) (`icons_gear`) | KI-generiert (Daniel, Sheet-Export mit Prompt) | 09.11.2026 |
+| `assets/ui/pad_icons.png` | Symbol-Raster Controller-Knöpfe: 14 × 4 Felder à 24 × 24 px, je Zeile Xbox, PlayStation, Switch, Stadia (0–11 nach Gamepad-API, Steuerkreuz, Stick), ausgeschnitten aus den Originalen (`pad_icons`) | KI-generiert (Daniel, 16 Sprites à 48 × 48), zugeschnitten von Ava | 10.11.2026 |
+| `assets/ui/pad_sources/pad_map_01–16.png` | Originale der Controller-Knöpfe (Xbox, PS, Switch, Stadia, weiße Xbox-Variante, Joy-Cons, Gesten-Symbole) | KI-generiert (Daniel, Pixel-Art-Generator, Prompt „A controller input button map for Xbox, Playstation, Switch and Stadia …“) | 10.11.2026 |
 | `assets/items/icons_kitchen.png` | Symbol-Raster Küche & Essen: 8 × 8 Icons à 32 × 32 px, Pixel-Art (Geräte, Zutaten, Gerichte, Gewürze, Rezepte) (`icons_kitchen`) | KI-generiert (Daniel, Sheet-Export mit Prompt) | 09.11.2026 |
 | `assets/workshops/workbench.png` | Werkbank mit Lochwand (Allzweck): 256 × 256, Füße bei y 205, ersetzt `metal_bench.png` an der Werkbank (`ws_workbench`) | KI-generiert (Daniel) | 09.11.2026 |
 | `assets/rig/container_source.png` (neu) | Hochseecontainer offen + zu, offene Hülle jetzt mit gemaltem Boden (13 px Tiefe) und Rückwand mit Rillen; alte Fassung `container_source_v1.png` | Pixel-Art von Daniel (KI + Handarbeit) | 09.11.2026 |

@@ -31,12 +31,12 @@ export class Hud {
     document.addEventListener('keydown', e => { if (this.pad) this.pad.active = false; this.menuKey(e); }, true);
     this.help = el('div', { class: 'hud-help' }, el('div', { class: 'hud-helpBox' },
       el('h2', {}, 'Steuerung'),
-      el('dl', {}, ...CONTROLS.flatMap(([k, t]) => [el('dt', {}, k), el('dd', {}, t)])),
       this.padHelpEl = el('div', { class: 'hud-padhelp', hidden: true }),
+      this.keyHelpEl = el('dl', {}, ...CONTROLS.flatMap(([k, t]) => [el('dt', {}, k), el('dd', {}, t)])),
       el('p', {}, 'Alle Werte kommen aus der Werkstatt (Leyla, Waffen, Gegner, Raum-Bausteine).',
         commit ? el('b', {}, ` Spieldaten live aus dem Repository (Stand ${commit.slice(0, 7)}).`) : null,
         workshopDrafts ? el('b', {}, ` Dein gespeicherter Werkstatt-Stand ist aktiv (${workshopDrafts} ${workshopDrafts === 1 ? 'Datei' : 'Dateien'}).`) : null),
-      el('button', { class: 'hud-go', onclick: () => this.toggleHelp(false) }, 'Los geht’s')));
+      this.goBtn = el('button', { class: 'hud-go', onclick: () => this.toggleHelp(false) }, 'Los geht’s')));
     root.append(
       el('div', { class: 'hud-top' },
         el('div', { class: 'hud-left' },
@@ -81,8 +81,9 @@ export class Hud {
     this.promptEl.hidden = !text;
     // with a controller in use the prompt shows its button (Spiel › Controller)
     const p = this.pad?.active && this.pad.kind ? this.pad : null;
-    const k = p && key === 'E' ? p.label('grab') : p && key === 'I' ? p.label('inventory') : key;
-    if (text) this.promptEl.replaceChildren(el('kbd', {}, k || key), el('span', {}, text));
+    const action = key === 'E' ? 'grab' : key === 'I' ? 'inventory' : null, b = p && action ? p.c.map[action]?.[0] : null;
+    const icon = b != null ? this.padIcon(p.iconName(b), p.labelOf(b)) : null;
+    if (text) this.promptEl.replaceChildren(icon ? el('kbd', { class: 'pad' }, icon) : el('kbd', {}, (b != null ? p.labelOf(b) : null) || key), el('span', {}, text));
   }
   // menu: { title, sub, items: [{ label, sub?, primary?, disabled?: reason, act }] }; keys W/S or ↑/↓, E/Enter/Leertaste, Esc, 1–9
   menu({ title, sub = '', items = [] }) {
@@ -91,7 +92,8 @@ export class Hud {
     this.menuButtons = items.map((it, i) => el('button', { class: 'hud-item' + (it.primary ? ' primary' : ''), disabled: !!it.disabled, onclick: () => this.choose(i), onmouseenter: () => this.focus(i) },
       el('kbd', {}, String(i + 1)), el('span', {}, el('b', {}, it.label), it.sub || it.disabled ? el('small', {}, [it.sub, it.disabled].filter(Boolean).join(' · ')) : null)));
     this.menuEl.replaceChildren(el('div', { class: 'hud-menuBox' }, el('h2', {}, title), sub ? el('p', {}, sub) : null, el('div', { class: 'hud-items' }, ...this.menuButtons),
-      el('small', { class: 'hud-keys' }, 'W/S wählen · E oder Enter nehmen · Esc zurück')));
+      this.menuKeysEl = el('small', { class: 'hud-keys' })));
+    this.menuKeys();
     this.menuEl.hidden = false;
     this.promptEl.hidden = true;
     this.focus(this.menuIndex);
@@ -117,21 +119,43 @@ export class Hud {
     else return;
     e.preventDefault(); e.stopPropagation();
   }
+  // footer of a menu: keyboard keys or the controller's symbols (d-pad, bottom, right)
+  menuKeys() {
+    if (!this.menuKeysEl) return;
+    const p = this.pad?.active && this.pad.kind ? this.pad : null;
+    if (!p) return this.menuKeysEl.replaceChildren('W/S wählen · E oder Enter nehmen · Esc zurück');
+    const ico = (b, alt) => this.padIcon(p.iconName(b), alt) || el('b', {}, alt);
+    this.menuKeysEl.replaceChildren(ico(12, '✚'), ' wählen · ', ico(0, p.labelOf(0)), ' nehmen · ', ico(1, p.labelOf(1)), ' zurück');
+  }
+  // one cell of the controller symbols (Spiel › Controller › Symbole) as a pixel-sharp CSS sprite, ×2; null without symbols
+  padIcon(name, title = '') {
+    const I = this.padIcons, i = I?.names.indexOf(name) ?? -1;
+    if (!I || i < 0) return null;
+    const k = 2, [cw, ch] = I.cell, x = i % I.grid[0], y = Math.floor(i / I.grid[0]);
+    return el('i', { class: 'pad-ico', title, 'data-icon': name, style: `width:${cw * k}px;height:${ch * k}px;background-image:url("${I.url}");background-size:${I.grid[0] * cw * k}px ${I.grid[1] * ch * k}px;background-position:-${x * cw * k}px -${y * ch * k}px` });
+  }
   menuMove(d) { const n = this.menuItems?.length || 0; let i = this.menuIndex; for (let s = 0; s < n; s++) { i = (i + d + n) % n; if (!this.menuItems[i].disabled) break; } this.focus(i); }
   // the help shows the controller's buttons once one is connected (labels for Xbox/Stadia, PlayStation or Switch)
   padHelp(pad, actions) {
-    // prompt follows the device in use (keyboard ↔ controller)
-    const sig = pad?.active && pad.kind ? pad.kind : null;
-    if (sig !== this.promptSig) { this.promptSig = sig; if (this.promptText) this.prompt(this.promptText, this.promptKey); }
+    // everything follows the device in use (keyboard ↔ controller) and the controller's type
+    const active = !!(pad?.active && pad.kind), sig = `${pad?.kind || ''}|${active}`;
+    if (sig === this.padSig) return;
+    this.padSig = sig;
+    this.root?.classList.toggle('hud-pad', active);
+    if (this.promptText) this.prompt(this.promptText, this.promptKey);
+    if (this.modal) this.menuKeys();
     const kind = pad?.kind || null;
-    if (kind === this.padHelpKind) return;
-    this.padHelpKind = kind;
     this.padHelpEl.hidden = !kind;
+    this.keyHelpEl.hidden = active;   // with the controller in hand: only its buttons
+    this.goBtn.replaceChildren(...(active ? [this.padIcon(pad.iconName(0), pad.labelOf(0)) || '', ' '] : []), 'Los geht’s');
     if (!kind) return;
-    const rows = [['Linker Stick / Steuerkreuz', 'Laufen (halb neigen = gehen), runter = Ducken/Slide, hoch = Leiter'],
-      ...actions.map(([a, name]) => [(pad.c.map[a] || []).map(b => pad.labelOf(b)).join(' / '), name]).filter(([k]) => k),
-      ['Menüs', `Steuerkreuz wählen · ${pad.labelOf(0)} nehmen · ${pad.labelOf(1)} zurück`]];
-    this.padHelpEl.replaceChildren(el('h3', {}, 'Controller'), el('dl', {}, ...rows.flatMap(([k, t]) => [el('dt', {}, k), el('dd', {}, t)])));
+    const ico = b => this.padIcon(pad.iconName(b), pad.labelOf(b)) || el('b', {}, pad.labelOf(b));
+    const names = { xbox: 'Xbox', ps: 'PlayStation', switch: 'Switch', stadia: 'Stadia' };
+    const rows = [[[this.padIcon(`${kind}_stick`, 'Stick') || el('b', {}, 'Stick'), ico(12)], 'Laufen (halb neigen = gehen), runter = Ducken/Slide, hoch = Leiter'],
+      ...actions.map(([a, name]) => [(pad.c.map[a] || []).map(ico), name]).filter(([k]) => k.length),
+      [[ico(12), ico(0), ico(1)], 'Menüs: wählen, nehmen, zurück']];
+    this.padHelpEl.replaceChildren(el('h3', {}, `Controller · ${names[kind] || kind}`), el('dl', {}, ...rows.flatMap(([k, t]) => [el('dt', {}, ...k.flatMap((x, i) => i ? [' ', x] : [x])), el('dd', {}, t)])),
+      ...(active ? [el('p', { class: 'hud-small' }, 'Eine Taste auf der Tastatur zeigt wieder die Tastenbelegung.')] : [el('h3', {}, 'Tastatur')]));
   }
   menuState() { return this.modal ? { title: this.menuTitle, items: this.menuItems.map(i => ({ label: i.label, sub: i.sub || '', disabled: i.disabled || null })) } : null; }
   toggleHelp(on = !this.paused) { this.paused = on; this.help.hidden = !on; }

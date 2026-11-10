@@ -125,6 +125,8 @@ export class PlayScene extends Phaser.Scene {
     makeTextures(this);
     this.pad ??= new Pad(this.data_.game?.gamepad);   // kept over restarts (camp ↔ run)
     this.hud.pad = this.pad;
+    const PI = this.data_.assets?.[this.data_.game?.gamepad?.icons];
+    this.hud.padIcons = PI?.kind === 'icons' && PI.file ? { url: new URL(PI.file, this.base).href, grid: PI.grid, cell: Array.isArray(PI.cell) ? PI.cell : [PI.cell, PI.cell], names: PI.names || [] } : null;
     this.fx = new Fx(this);
     this.combat = new Combat(this);
     let def = this.data_.rooms?.[this.roomId];

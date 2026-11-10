@@ -21,11 +21,14 @@ const LABELS = {
   xbox: ['A', 'B', 'X', 'Y', 'LB', 'RB', 'LT', 'RT', 'View', 'Menu', 'L', 'R', '↑', '↓', '←', '→'],
   ps: ['✕', '○', '□', '△', 'L1', 'R1', 'L2', 'R2', 'Share', 'Options', 'L3', 'R3', '↑', '↓', '←', '→'],
   switch: ['B', 'A', 'Y', 'X', 'L', 'R', 'ZL', 'ZR', '−', '+', 'L', 'R', '↑', '↓', '←', '→'],
+  stadia: ['A', 'B', 'X', 'Y', 'L1', 'R1', 'L2', 'R2', '…', 'Menü', 'L3', 'R3', '↑', '↓', '←', '→'],
 };
+export const PAD_KINDS = [['auto', 'Automatisch (Name des Controllers)'], ['xbox', 'Xbox'], ['ps', 'PlayStation'], ['switch', 'Switch'], ['stadia', 'Stadia']];
 export function padKind(id = '') {
   if (/xbox|xinput|045e/i.test(id)) return 'xbox';
   if (/054c|playstation|dualsense|dualshock|wireless controller/i.test(id)) return 'ps';
   if (/057e|pro controller|joy-con/i.test(id)) return 'switch';
+  if (/stadia|18d1/i.test(id)) return 'stadia';
   return 'xbox';   // Xbox, Stadia and most others carry A B X Y in the same places
 }
 export const padLabel = (kind, button) => LABELS[kind]?.[Number(button)] ?? `#${button}`;
@@ -43,7 +46,7 @@ export class Pad {
   poll() {
     const g = this.pad;
     this.prev = this.now; this.now = new Set();
-    this.kind = g ? padKind(g.id) : null;
+    this.kind = g ? (this.c.symbols && this.c.symbols !== 'auto' ? this.c.symbols : padKind(g.id)) : null;
     if (!g) return this;
     const btn = i => { const b = g.buttons[i]; return !!b && (b.pressed || b.value > 0.5); };
     const dz = (this.c.deadzone ?? 30) / 100, ax = g.axes[0] || 0, ay = g.axes[1] || 0;
@@ -60,5 +63,7 @@ export class Pad {
   down(a) { return this.now.has(a); }
   pressed(a) { return this.now.has(a) && !this.prev.has(a); }
   labelOf(button) { return padLabel(this.kind || 'xbox', button); }
+  // name of the icon cell (asset of kind „Symbole“, Spiel › Controller › Symbole): xbox_0 … xbox_11, xbox_dpad, xbox_stick
+  iconName(button) { const k = this.kind || 'xbox', b = Number(button); return b >= 12 && b <= 15 ? `${k}_dpad` : `${k}_${b}`; }
   label(action) { const b = this.c.map[action]?.[0]; return b == null ? null : padLabel(this.kind || 'xbox', b); }
 }

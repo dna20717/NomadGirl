@@ -32,12 +32,14 @@ const check = (name, cond, info) => (cond ? ok : errors).push(cond ? name : `${n
 const step = n => ev(k => nomad.step(k), n);
 const tap = async button => { await ev(b => { setPad({ press: [b] }); nomad.step(2); setPad(); nomad.step(2); }, button); };
 const shot = async n => { if (!shots) return; fs.mkdirSync('output', { recursive: true }); await page.screenshot({ path: `output/pad_${n}.png` }); };
-const sc = () => ev(() => { const s = game.scene.getScene('play'); return { paused: s.hud.paused, x: s.leyla.x, vx: s.leyla.body.velocity.x, vy: s.leyla.body.velocity.y, feet: s.leyla.feet, prompt: s.hud.promptText, key: document.querySelector('.hud-prompt kbd')?.textContent, menu: s.hud.menuState(), focus: s.hud.menuIndex, help: document.querySelector('.hud-padhelp')?.textContent || '', helpHidden: document.querySelector('.hud-padhelp')?.hidden }; });
+const sc = () => ev(() => { const s = game.scene.getScene('play'); return { paused: s.hud.paused, x: s.leyla.x, vx: s.leyla.body.velocity.x, vy: s.leyla.body.velocity.y, feet: s.leyla.feet, prompt: s.hud.promptText, key: document.querySelector('.hud-prompt kbd')?.textContent, icon: document.querySelector('.hud-prompt .pad-ico')?.dataset.icon || null, menuIcons: [...document.querySelectorAll('.hud-keys .pad-ico')].map(e => e.dataset.icon), helpIcons: [...document.querySelectorAll('.hud-padhelp .pad-ico')].map(e => e.dataset.icon), keysHidden: getComputedStyle(document.querySelector('.hud-padhelp + dl')).display === 'none', menu: s.hud.menuState(), focus: s.hud.menuIndex, help: document.querySelector('.hud-padhelp')?.textContent || '', helpHidden: document.querySelector('.hud-padhelp')?.hidden }; });
 
 await page.waitForTimeout(800);   // the help is open at the start; real frames until nomad.take (which closes the help itself)
 let s = await sc();
-check('Hilfe zeigt die Controller-Belegung (Xbox-Symbole)', s.paused && !s.helpHidden && /Controller/.test(s.help) && s.help.includes('ASpringen') && s.help.includes('RTSchießen'), s.help);
+check('Hilfe zeigt die Controller-Belegung mit Xbox-Symbolen', s.paused && !s.helpHidden && /Controller · Xbox/.test(s.help) && s.helpIcons.includes('xbox_0') && s.helpIcons.includes('xbox_7') && s.helpIcons.includes('xbox_stick'), s);
 await shot('help');
+check('Controller noch nicht benutzt: Hilfe zeigt Controller und Tasten', s.keysHidden === false, s.keysHidden);
+await shot('help_xbox');
 await ev(() => setPad({ press: [0] })); await page.waitForTimeout(700); await ev(() => setPad()); await page.waitForTimeout(400);
 s = await sc();
 check('A schließt die Hilfe', !s.paused, s);
@@ -65,10 +67,12 @@ check('A springt', s.feet < f0 - 20 || s.vy < -200, { f0, feet: s.feet, vy: s.vy
 await ev(() => nomad.goTo('Van'));
 await tap(5);   // controller in use again (RB = reload, does nothing in the camp)
 s = await sc();
-check('Hinweis zeigt die Controller-Taste (Y statt E)', s.prompt === 'Einsteigen · Van' && s.key === 'Y', s);
+check('Hinweis zeigt das Symbol der Controller-Taste (Y statt E)', s.prompt === 'Einsteigen · Van' && s.icon === 'xbox_3', s);
+await shot('prompt_xbox');
 await tap(3);
 s = await sc();
 check('Y öffnet das Van-Menü', s.menu?.items.some(i => i.label.startsWith('Planen')), s.menu);
+check('Menü-Fußzeile mit Symbolen: Steuerkreuz, A, B', s.menuIcons.join() === 'xbox_dpad,xbox_0,xbox_1', s.menuIcons);
 await shot('menu');
 await tap(13);
 s = await sc();
@@ -85,12 +89,26 @@ await tap(1);
 await ev(() => setPad({ id: 'DualSense Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)' }));
 await tap(5);
 s = await sc();
-check('PlayStation: Hinweis zeigt △', s.key === '△', s.key);
+check('PlayStation: Hinweis zeigt △', s.icon === 'ps_3', s.icon);
+await ev(() => { nomad.step(1, [], ['help']); nomad.step(2); });
+s = await sc();
+check('PlayStation: Hilfe mit ✕ ○ □ △, L2/R2, Tastenliste ausgeblendet', /Controller · PlayStation/.test(s.help) && ['ps_0', 'ps_7'].every(i => s.helpIcons.includes(i)) && s.keysHidden === true, s);
+await shot('help_ps');
+await ev(() => { nomad.step(1, [], ['help']); nomad.step(2); });
+await ev(() => setPad({ id: 'Google LLC Stadia Controller rev. A (STANDARD GAMEPAD Vendor: 18d1 Product: 9400)' }));
+await tap(5);
+s = await sc();
+check('Stadia: Hinweis und Hilfe mit Stadia-Symbolen', s.icon === 'stadia_3' && /Controller · Stadia/.test(s.help), { icon: s.icon, help: s.help.slice(0, 40) });
+await shot('prompt_stadia');
+await ev(() => setPad({ id: 'Pro Controller (STANDARD GAMEPAD Vendor: 057e Product: 2009)' }));
+await tap(5);
+s = await sc();
+check('Switch: Benutzen liegt auf X (oben)', s.icon === 'switch_3', s.icon);
 
 // the keyboard still works
 await ev(() => nomad.release());
 await page.keyboard.down('d'); await page.waitForTimeout(1500); s = await sc(); await page.keyboard.up('d');
-check('Tastatur geht weiter', Math.abs(s.vx) > 50 && !s.menu, s);
+check('Tastatur geht weiter, Hinweis zeigt wieder E', Math.abs(s.vx) > 50 && !s.menu && s.key === 'E' && !s.icon, s);
 
 console.log(ok.map(o => '✔ ' + o).join('\n'));
 if (errors.length) { console.log(errors.map(e => '✘ ' + e).join('\n')); process.exitCode = 1; }

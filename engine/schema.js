@@ -9,7 +9,7 @@
 //          lines (list of text rows, edited as monospaced text: room layouts)
 import { parseRoom, TILE_LEGEND } from './room.js';
 import { buildPoi, poiReady } from './poi.js';
-import { PAD_BUTTONS, PAD_ACTIONS } from '../game/play/pad.js';
+import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
 
 const text = (key, label, o = {}) => ({ key, label, type: 'text', ...o });
 const area_ = (key, label, o = {}) => ({ key, label, type: 'textarea', ...o });
@@ -111,6 +111,8 @@ export const AREAS = {
       { title: 'Technik', fields: [text('title', 'Titel'), num('tileSize', 'Kachelgröße', { unit: 'px', min: 8 }), num('gravity', 'Schwerkraft', { unit: 'px/s²', min: 0 }),
         size('resolution', 'Auflösung', { unit: 'px', hint: 'Interne Auflösung, wird skaliert' }), bool('pixelArt', 'Pixel-Art (scharf skalieren)')] },
       { title: 'Controller', fields: [bool('gamepad.enabled', 'Controller an', { hint: 'Gamepad-API des Browsers: Xbox, PlayStation, Stadia (Bluetooth-Modus), Switch Pro … mit Standard-Belegung. Die Knöpfe heißen hier nach ihrer Lage, die Hilfe im Spiel zeigt die Symbole des angeschlossenen Controllers' }),
+        ref('gamepad.icons', 'Symbole', 'assets', { hint: 'Asset der Art „Symbole“ mit Namen je Knopf: <typ>_0 … <typ>_11 (Reihenfolge der Gamepad-API), <typ>_dpad, <typ>_stick; Typen xbox, ps, switch, stadia. Ohne Symbol: Text' }),
+        select('gamepad.symbols', 'Symbole von', PAD_KINDS, { hint: 'Automatisch nach dem Namen, den der Controller meldet; zum Testen fest einstellbar (Stadia meldet sich manchmal ohne Namen)' }),
         num('gamepad.deadzone', 'Totzone', { unit: '%', min: 0, max: 90, hint: 'So weit muss der Stick geneigt sein, bevor Leyla läuft' }),
         num('gamepad.walkTilt', 'Gehen bis', { unit: '%', min: 0, max: 100, hint: 'Stick nur bis hier geneigt = gehen statt rennen (0 = aus)' }),
         ...PAD_ACTIONS.map(([a, n]) => multi(`gamepad.map.${a}`, n, PAD_BUTTONS))] },
