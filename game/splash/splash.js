@@ -6,6 +6,7 @@
 // pebbles and cracks appear at the bottom edge and slide up to the horizon, getting smaller. Dust from her steps stays behind.
 import { cloudFiles } from '../cloud_store.js';
 import { makeWeather } from '../weather.js';
+import { Cables, hullPoint } from '../drone_cables.js';
 
 const BASE = new URL('../../projects/nomadgirl/', import.meta.url);
 const Z_NEAR = 0.6, Z_FAR = 40;   // depth range of the ground (m)
@@ -29,6 +30,11 @@ export async function startSplash(canvas) {
   const image = id => A[id]?.file ? load(new URL(A[id].file, BASE).href) : Promise.resolve(null);
   const layers = (await Promise.all((S.background || []).map(image))).filter(Boolean);
   const droneImg = SD.show && DR.look ? await image(DR.look) : null, droneA = A[DR.look] || {};
+  // modular drone (Daniel, 10.11.2026): face on the screen, glass above it, swinging cables below
+  const faceImg = droneImg && DR.face?.look ? await image(DR.face.look) : null, faceA = A[DR.face?.look] || {};
+  const glassImg = faceImg && DR.face?.glass ? await image(DR.face.glass) : null;
+  const cables = new Cables(DR.cables, DR.cable);
+  let blinkAt = 0, blinkUntil = 0, lastDrone = 0;
   // Leyla's gaits (run, walk …): picked at random by weight, switched now and then at the end of a cycle
   const gaits = (await Promise.all((S.runners || (S.runner ? [{ look: S.runner }] : [])).filter(r => A[r.look] && (r.weight ?? 1) > 0)
     .map(async r => ({ a: A[r.look], img: await image(r.look), weight: r.weight ?? 1, speed: r.speed ?? 1 })))).filter(g => g.img);
@@ -109,8 +115,28 @@ export async function startSplash(canvas) {
     const wide = W / H > 1.15, k = H * SD.height / 100 / fh * (wide ? 1 : 0.75);
     const drift = Math.sin(t * 0.37) * 0.018 * W, bob = Math.sin(t * 2.1) * SD.bob / 100 * H;
     const x = W * (wide ? SD.at[0] : Math.max(20, 50 - (68 - SD.at[0]) * 2.6)) / 100 + drift - look.x * W * 0.008, y = H * (SD.at[1] + (wide ? 0 : 7)) / 100 + bob - look.y * H * 0.006;
-    ctx.save(); ctx.imageSmoothingEnabled = true; ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(Math.cos(t * 0.37) * 0.06 + Math.cos(t * 2.1) * 0.03);
-    ctx.drawImage(droneImg, drone.frame * fw, 0, fw, fh, -ox * k, -oy * k, fw * k, fh * k);
+    const rot = Math.cos(t * 0.37) * 0.06 + Math.cos(t * 2.1) * 0.03, px = Math.round(x), py = Math.round(y);
+    if (cables.list.length) {   // behind the hull, in screen pixels
+      const dtc = lastDrone ? Math.min(50, now - lastDrone) : 16; lastDrone = now;
+      cables.step(dtc, hullPoint(px, py, rot, 1, k, ox, oy), k);
+      const out = DR.cable?.outline || '#060608';
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      for (const pass of [0, 1]) for (const c of cables.lines()) {
+        ctx.strokeStyle = pass ? c.color : out; ctx.lineWidth = c.width * k + (pass ? 0 : 2 * k);
+        ctx.beginPath(); ctx.moveTo(c.pts[0][0], c.pts[0][1]); for (const [qx, qy] of c.pts.slice(1)) ctx.lineTo(qx, qy); ctx.stroke();
+      }
+    }
+    ctx.save(); ctx.imageSmoothingEnabled = !faceImg; ctx.translate(px, py); ctx.rotate(rot);
+    ctx.drawImage(droneImg, (faceImg ? 0 : drone.frame) * fw, 0, fw, fh, -ox * k, -oy * k, fw * k, fh * k);
+    if (faceImg) {
+      const B = DR.face.blink || {}, [cw, ch] = faceA.frameSize || [faceImg.width, faceImg.height], [cx, cy] = faceA.origin || [cw / 2, ch / 2], [sx, sy] = DR.face.screen || [ox, oy];
+      if (now > blinkAt) { const [a, b] = B.every || [2.5, 6]; blinkAt = now + (a + Math.random() * (b - a)) * 1000; blinkUntil = now + (B.duration ?? 130); }
+      const fr = !drone.frame && now < blinkUntil && B.frame != null ? B.frame : drone.frame || (DR.moods || []).find(m => m.mood === 'idle')?.frame || 0;
+      ctx.globalAlpha = DR.face.flicker && Math.random() < 0.06 ? 1 - DR.face.flicker / 100 * Math.random() : 1;
+      ctx.drawImage(faceImg, fr * cw, 0, cw, ch, (sx - ox - cx) * k, (sy - oy - cy) * k, cw * k, ch * k);
+      ctx.globalAlpha = 1;
+      if (glassImg) ctx.drawImage(glassImg, 0, 0, glassImg.width, glassImg.height, -ox * k, -oy * k, glassImg.width * k, glassImg.height * k);
+    }
     ctx.restore(); ctx.imageSmoothingEnabled = false;
     if (drone.bubble && now < drone.bubbleUntil) {
       const B = DR.bubble || {}, size = Math.round(Math.max(14, H * 0.028)), fade = Math.min(1, (drone.bubbleUntil - now) / 300);

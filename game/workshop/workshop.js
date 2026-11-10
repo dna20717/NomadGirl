@@ -416,6 +416,9 @@ export class Workshop {
       const val = row[c.key], upd = nv => { const n = structuredClone(rows); if (nv === '' || nv == null) delete n[i][c.key]; else n[i][c.key] = nv; put(n); };
       if (c.type === 'ref') return this.refEditor(c.area, val, upd);
       if (c.type === 'select') return this.selection(c.options, val, upd, '–');
+      if (PAIR[c.type]) return this.pair(val, PAIR[c.type], upd);
+      if (c.type === 'checkbox') { const b = el('input', { type: 'checkbox', checked: !!val }); b.addEventListener('change', () => upd(b.checked || null)); return b; }
+      if (c.type === 'color') { const b = el('input', { type: 'color', class: 'ed-field', value: val || '#cccccc' }); b.addEventListener('change', () => upd(b.value)); return b; }
       const inp = el('input', { type: c.type === 'number' ? 'number' : 'text', class: 'ed-field' + (c.type === 'number' ? ' small' : ''), step: 'any', value: val ?? '' });
       inp.addEventListener('change', () => upd(c.type === 'number' ? (inp.value === '' ? null : +inp.value) : inp.value));
       return inp;

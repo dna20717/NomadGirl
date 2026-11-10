@@ -42,6 +42,9 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/leyla/land_side_source.gif` | Original, 9 Frames à 200 ms, nach rechts | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/drone/moods.png` | Drohne (Mama-Bot): 12 Stimmungen à 380 × 254 px als Streifen, an der Antenne ausgerichtet (`drone_moods`) | aus `concept.png` zugeschnitten (Code) | 07.11.2026 |
 | `assets/drone/concept.png` | Drohne: Konzept mit 12 Stimmungen im Raster 4 × 3, 1536 × 1024 px (`drone_concept`) | KI-generiert (Daniel) | 07.11.2026 |
+| `assets/drone/hull_source.png` | Drohne neu (Mama-Bot, 10.11.2026): rostiger Torpedo mit Magenta-Flicken, Stacheln, Antigrav-Ring, leerer Bildschirm, 128 × 128 (`drone_hull_source`) | KI (PixelLab, Create Image Pro, Palette AAP-64) | 10.11.2026 |
+| `assets/drone/hull.png`, `glass.png` | Hülle ohne Kabel mit geleertem Bildschirm (`drone_hull`) und nur die Spiegelung des Glases (`drone_glass`) | aus `hull_source.png` (Code, `tools/drone_parts.py`) | 10.11.2026 |
+| `assets/drone/faces.png` | 14 Gesichter für den Bildschirm à 28 × 32 px, AAP-64-Cyan mit Scanlines (`drone_faces`) | Code (`tools/drone_parts.py`) | 10.11.2026 |
 | `assets/vehicles/van_door.png` | Leylas Van, Schiebetür geht auf (5 Frames 248 × 172, `van`), Spawn-Punkt; Schüssel herausgenommen | aus `van_door_source.gif` zugeschnitten (Code, `tools/van_strips.py`) | 07.11.2026 |
 | `assets/vehicles/van_dish.png` | Radarschüssel dreht sich (16 Frames 35 × 20, `van_dish`) | aus der Schüssel im Original gedreht (Code, `tools/van_strips.py`) | 07.11.2026 |
 | `assets/vehicles/van_roof_front.png` | vorderes Dachgeländer als Vordergrund (5 Frames, `van_roof_front`) | aus dem Original ausgeschnitten (Code, `tools/van_strips.py`) | 07.11.2026 |

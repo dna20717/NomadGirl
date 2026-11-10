@@ -1947,5 +1947,49 @@
    "stadia_dpad",
    "stadia_stick"
   ]
+ },
+ "drone_hull_source": {
+  "name": "Drohne · Hülle (Original)",
+  "kind": "source",
+  "file": "assets/drone/hull_source.png",
+  "source": "KI (PixelLab, Create Image Pro, Palette AAP-64)",
+  "date": "10.11.2026",
+  "description": "Mama-Bot neu: rostiger Torpedo mit Magenta-Flicken, Stacheln und Antigrav-Ring, leerer Bildschirm, 128 × 128, schaut nach rechts. Daniels Wahl aus Runde 3."
+ },
+ "drone_hull": {
+  "name": "Drohne · Hülle",
+  "kind": "image",
+  "file": "assets/drone/hull.png",
+  "origin": [66, 58],
+  "height": 128,
+  "source": "Code (tools/drone_parts.py: Kabel entfernt, Bildschirm geleert)",
+  "derivedFrom": "drone_hull_source",
+  "date": "10.11.2026",
+  "description": "Hülle ohne Gesicht und ohne Kabel (die schwingen jetzt aus Code). Ankerpunkt = Mitte des Körpers."
+ },
+ "drone_glass": {
+  "name": "Drohne · Glanz",
+  "kind": "image",
+  "file": "assets/drone/glass.png",
+  "origin": [66, 58],
+  "height": 128,
+  "source": "Code (tools/drone_parts.py)",
+  "derivedFrom": "drone_hull_source",
+  "date": "10.11.2026",
+  "description": "Nur die Spiegelung auf dem Bildschirm, liegt über dem Gesicht. Gleiche Fläche wie die Hülle."
+ },
+ "drone_faces": {
+  "name": "Drohne · Gesichter",
+  "kind": "animation",
+  "file": "assets/drone/faces.png",
+  "frameSize": [28, 32],
+  "frames": 14,
+  "fps": 0,
+  "loop": false,
+  "origin": [14, 16],
+  "height": 32,
+  "source": "Code (tools/drone_parts.py, AAP-64 mit Scanlines)",
+  "date": "10.11.2026",
+  "description": "Ein Gesicht pro Frame für den Bildschirm: 0 normal, 1 blinzeln, 2 fröhlich, 3 begeistert, 4 gelangweilt, 5 alarmiert, 6 neugierig, 7 wütend, 8 schläft, 9 k.o., 10 Radar, 11 besorgt (Schweiß), 12 entschlossen (Dash), 13 Zen. Ankerpunkt = Mitte des Glases."
  }
 }

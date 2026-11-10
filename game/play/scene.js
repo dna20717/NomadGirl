@@ -44,7 +44,8 @@ export class PlayScene extends Phaser.Scene {
     const A = this.data_.assets || {}, ids = new Set(Object.values(this.data_.leyla?.look || {}));
     for (const e of Object.values(this.data_.enemies || {})) if (e.look) ids.add(e.look);
     for (const id of Object.values(this.data_.game?.tiles || {})) ids.add(id);
-    if (this.data_.drone?.look) ids.add(this.data_.drone.look);
+    const DR = this.data_.drone || {};
+    for (const id of [DR.look, DR.face?.look, DR.face?.glass, ...(DR.parts || []).filter(r => r.on).map(r => r.look)]) if (id) ids.add(id);
     for (const r of this.data_.leyla?.idles || []) if (r.look) ids.add(r.look);
     for (const w of Object.values(this.data_.weapons || {})) if (w.sound) ids.add(w.sound);
     const SP = this.data_.game?.spawn;

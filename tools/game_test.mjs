@@ -97,6 +97,17 @@ check('Dash', v.x > 300 + 200, v);
 const dr = await page.evaluate(() => { nomad.calm(); nomad.step(90); const s = nomad.state(); return { lx: s.leyla.x, f: s.leyla.facing, ...s.drone, after: nomad.drone('kill') }; });
 check('Drohne fliegt hinter Leyla', dr.mood && Math.sign(dr.lx - dr.x) === dr.f && Math.abs(dr.lx - dr.x) < 260, dr);
 check('Drohne zeigt Stimmungen', dr.after === 'kill', dr);
+// modular drone: the face layer changes with the mood, cables hang below and trail behind in flight
+const df = await page.evaluate(() => {
+  nomad.step(6); const kill = nomad.state().drone.face;
+  nomad.drone('hit'); nomad.step(6); const hit = nomad.state().drone.face;
+  nomad.calm(); nomad.step(200); const rest = nomad.state().drone;
+  nomad.step(20, ['right']); const fly = nomad.state().drone;
+  return { kill, hit, rest, fly };
+});
+check('Drohne: Gesicht wechselt mit der Stimmung', df.kill !== df.hit && df.kill > 0, df);
+check('Drohne: Kabel hängen unten und schwingen nach', df.rest.cables.length >= 2 && df.rest.cables.every(([, y]) => y > df.rest.y)
+  && df.fly.x > df.rest.x + 20 && df.fly.cables.some(([x], i) => x - df.fly.x < df.rest.cables[i][0] - df.rest.x - 4), df);
 
 if (shots) await page.screenshot({ path: 'output/game_end.png' });
 await browser.close();
