@@ -34,6 +34,7 @@ export async function startSplash(canvas) {
   const faceImg = droneImg && DR.face?.look ? await image(DR.face.look) : null, faceA = A[DR.face?.look] || {};
   const glassImg = faceImg && DR.face?.glass ? await image(DR.face.glass) : null;
   const cables = new Cables(DR.cables, DR.cable);
+  const parts = droneImg ? (await Promise.all((DR.parts || []).filter(r => r.on && A[r.look]).map(async r => ({ r, a: A[r.look], img: await image(r.look) })))).filter(p => p.img) : [];
   let blinkAt = 0, blinkUntil = 0, lastDrone = 0;
   // Leyla's gaits (run, walk …): picked at random by weight, switched now and then at the end of a cycle
   const gaits = (await Promise.all((S.runners || (S.runner ? [{ look: S.runner }] : [])).filter(r => A[r.look] && (r.weight ?? 1) > 0)
@@ -127,6 +128,11 @@ export async function startSplash(canvas) {
       }
     }
     ctx.save(); ctx.imageSmoothingEnabled = !faceImg; ctx.translate(px, py); ctx.rotate(rot);
+    const part = front => { for (const { r, a, img } of parts) if ((r.layer !== 'behind') === front) {
+      const [qx, qy] = a.origin || [img.width / 2, img.height / 2], [ax, ay] = r.at || [ox, oy];
+      ctx.drawImage(img, (ax - ox - qx) * k, (ay - oy - qy) * k, img.width * k, img.height * k);
+    } };
+    part(false);
     ctx.drawImage(droneImg, (faceImg ? 0 : drone.frame) * fw, 0, fw, fh, -ox * k, -oy * k, fw * k, fh * k);
     if (faceImg) {
       const B = DR.face.blink || {}, [cw, ch] = faceA.frameSize || [faceImg.width, faceImg.height], [cx, cy] = faceA.origin || [cw / 2, ch / 2], [sx, sy] = DR.face.screen || [ox, oy];
@@ -137,6 +143,7 @@ export async function startSplash(canvas) {
       ctx.globalAlpha = 1;
       if (glassImg) ctx.drawImage(glassImg, 0, 0, glassImg.width, glassImg.height, -ox * k, -oy * k, glassImg.width * k, glassImg.height * k);
     }
+    part(true);
     ctx.restore(); ctx.imageSmoothingEnabled = false;
     if (drone.bubble && now < drone.bubbleUntil) {
       const B = DR.bubble || {}, size = Math.round(Math.max(14, H * 0.028)), fade = Math.min(1, (drone.bubbleUntil - now) / 300);

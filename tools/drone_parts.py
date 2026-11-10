@@ -4,6 +4,7 @@ From the PixelLab hull (assets/drone/hull_source.png, 128 x 128, AAP-64) this ma
   hull.png   the hull without the hanging cables (they are code now and swing), screen emptied
   glass.png  only the glare of the screen glass, drawn above the face
   faces.png  one face per frame (FACES order), drawn on the screen, AAP-64 cyan with scanlines
+  parts/<name>.png  add-on parts (PixelLab, 64 x 64) cut out, scaled to the hull's pixel size and snapped back onto AAP-64
 Run: python3 tools/drone_parts.py
 """
 from PIL import Image
@@ -230,5 +231,28 @@ def faces():
     strip.save(os.path.join(ROOT, 'faces.png'))
     print('faces:', ', '.join(f'{i} {n}' for i, n in enumerate(FACES)), '| frame', CELL, 'origin', (round(SCREEN[0] - cx - cw / 2 + cw / 2, 1), round(ch / 2, 1)))
 
+# add-on parts: source (64 x 64 from PixelLab) → cut, scaled (LANCZOS) and snapped onto AAP-64, origin = middle of the top edge
+PARTS = {'lamp': 0.75, 'claw': 0.75}
+
+def palette():
+    path = os.path.join(ROOT, '..', 'palette', 'aap-64.hex')
+    return [tuple(int(l[i:i + 2], 16) for i in (0, 2, 4)) for l in open(path).read().split()]
+
+def parts():
+    pal = palette()
+    for name, scale in PARTS.items():
+        src = Image.open(os.path.join(ROOT, 'parts', name + '_source.png')).convert('RGBA')
+        src = src.crop(src.getbbox())
+        r = src.resize((round(src.width * scale), round(src.height * scale)), Image.LANCZOS)
+        out = Image.new('RGBA', r.size)
+        for y in range(r.height):
+            for x in range(r.width):
+                p = r.getpixel((x, y))
+                if p[3] < 110: continue
+                out.putpixel((x, y), min(pal, key=lambda q: sum((q[i] - p[i]) ** 2 for i in range(3))) + (255,))
+        out.save(os.path.join(ROOT, 'parts', name + '.png'))
+        top = [x for x in range(out.width) if out.getpixel((x, 0))[3]]
+        print(f'{name}: {out.size}, origin [{(top[0] + top[-1] + 1) / 2}, 0]')
+
 if __name__ == '__main__':
-    hull(); faces()
+    hull(); faces(); parts()

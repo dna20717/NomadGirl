@@ -345,7 +345,9 @@ export class Workshop {
     main.append(this.head(A.name, this.button('export', 'JSON', () => this.jsonDialogue(`${A.name} als JSON`, x, j => this.change(a, () => { for (const k of Object.keys(x)) delete x[k]; Object.assign(x, j); })))),
       el('p', { class: 'ed-small' }, A.hint));
     for (const msg of (this.messages || []).filter(y => y.place.area === a)) main.append(el('p', { class: 'ng-inline ' + msg.kind }, icon(msg.kind === 'hint' ? 'info' : msg.kind, 14), ' ' + msg.text.replace(/^[^:]*: /, '')));
-    main.append(el('div', { class: 'ng-sections' }, ...A.sections.filter(s => !s.when || s.when(x)).map(s => el('section', { class: 'ng-section' }, el('h3', {}, s.title), ...s.fields.map(f => this.fieldEditor(a, f, x))))));
+    // a section with a table of points/sizes needs the full width (Drohne › Kabel, Anbauteile)
+    const wide = s => s.wide || s.fields.some(f => f.type === 'table' && f.columns.some(c => PAIR[c.type]));
+    main.append(el('div', { class: 'ng-sections' }, ...A.sections.filter(s => !s.when || s.when(x)).map(s => el('section', { class: 'ng-section' + (wide(s) ? ' wide' : '') }, el('h3', {}, s.title), ...s.fields.map(f => this.fieldEditor(a, f, x))))));
     insp.append(el('h3', {}, A.name), el('p', { class: 'ed-small' }, `Datei: ${this.p.paths[a]}`), this.lookBlock(a, x));
     for (const extra of [SUMMARY[a]?.(this, x)].flat()) if (extra) insp.append(el('h4', {}, extra.title), extra.body);
   }
@@ -424,9 +426,11 @@ export class Workshop {
       return inp;
     };
     const blank = () => Object.fromEntries(f.columns.map(c => [c.key, c.type === 'number' ? (c.min ?? 1) : c.type === 'ref' ? (this.refOptions(c.area)[0]?.[0] ?? '') : '']));
+    // pairs (points, sizes) need room for two numbers
+    const style = f.columns.some(c => PAIR[c.type]) ? `grid-template-columns:${f.columns.map((c, i) => PAIR[c.type] ? 'minmax(150px, 2fr)' : i === 0 ? 'minmax(120px, 2fr)' : 'minmax(52px, 1fr)').join(' ')} 28px` : `--cols:${f.columns.length}`;
     return el('div', { class: 'ng-table' },
-      el('div', { class: 'ng-trow head', style: `--cols:${f.columns.length}` }, ...f.columns.map(c => el('span', {}, c.label)), el('span')),
-      ...rows.map((row, i) => el('div', { class: 'ng-trow', style: `--cols:${f.columns.length}` }, ...f.columns.map(c => cell(c, row, i)),
+      el('div', { class: 'ng-trow head', style }, ...f.columns.map(c => el('span', {}, c.label)), el('span')),
+      ...rows.map((row, i) => el('div', { class: 'ng-trow', style }, ...f.columns.map(c => cell(c, row, i)),
         el('button', { class: 'ed-button small', title: 'Zeile entfernen', onclick: () => put(rows.filter((_, j) => j !== i)) }, icon('x', 12)))),
       el('button', { class: 'ed-button small ng-addRow', onclick: () => put([...rows, blank()]) }, icon('plus', 12), ' Zeile'));
   }

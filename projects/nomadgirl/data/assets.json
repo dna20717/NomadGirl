@@ -1991,5 +1991,43 @@
   "source": "Code (tools/drone_parts.py, AAP-64 mit Scanlines)",
   "date": "10.11.2026",
   "description": "Ein Gesicht pro Frame für den Bildschirm: 0 normal, 1 blinzeln, 2 fröhlich, 3 begeistert, 4 gelangweilt, 5 alarmiert, 6 neugierig, 7 wütend, 8 schläft, 9 k.o., 10 Radar, 11 besorgt (Schweiß), 12 entschlossen (Dash), 13 Zen. Ankerpunkt = Mitte des Glases."
+ },
+ "drone_lamp_source": {
+  "name": "Drohne · Lampe (Original)",
+  "kind": "source",
+  "file": "assets/drone/parts/lamp_source.png",
+  "source": "KI (PixelLab, Create Image Pro, Palette AAP-64, Hülle als Vorlage)",
+  "date": "10.11.2026",
+  "description": "Anbauteil Suchscheinwerfer am Gelenkarm, 64 × 64, Variante 3 von 16."
+ },
+ "drone_lamp": {
+  "name": "Drohne · Lampe",
+  "kind": "image",
+  "file": "assets/drone/parts/lamp.png",
+  "origin": [16.5, 0],
+  "height": 36,
+  "source": "Code (tools/drone_parts.py: zugeschnitten, ×0,75, auf AAP-64 gerastet)",
+  "derivedFrom": "drone_lamp_source",
+  "date": "10.11.2026",
+  "description": "Anbauteil für Mama-Bot: Suchscheinwerfer. Ankerpunkt = Mitte der Halteplatte oben."
+ },
+ "drone_claw_source": {
+  "name": "Drohne · Greifarm (Original)",
+  "kind": "source",
+  "file": "assets/drone/parts/claw_source.png",
+  "source": "KI (PixelLab, Create Image Pro, Palette AAP-64, Hülle als Vorlage)",
+  "date": "10.11.2026",
+  "description": "Anbauteil Greifarm mit Hydraulikschlauch, 64 × 64, Variante 1 von 16."
+ },
+ "drone_claw": {
+  "name": "Drohne · Greifarm",
+  "kind": "image",
+  "file": "assets/drone/parts/claw.png",
+  "origin": [15, 0],
+  "height": 44,
+  "source": "Code (tools/drone_parts.py: zugeschnitten, ×0,75, auf AAP-64 gerastet)",
+  "derivedFrom": "drone_claw_source",
+  "date": "10.11.2026",
+  "description": "Anbauteil für Mama-Bot: Greifarm. Ankerpunkt = Mitte der Halteplatte oben."
  }
 }

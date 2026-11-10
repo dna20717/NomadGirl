@@ -45,6 +45,8 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/drone/hull_source.png` | Drohne neu (Mama-Bot, 10.11.2026): rostiger Torpedo mit Magenta-Flicken, Stacheln, Antigrav-Ring, leerer Bildschirm, 128 × 128 (`drone_hull_source`) | KI (PixelLab, Create Image Pro, Palette AAP-64) | 10.11.2026 |
 | `assets/drone/hull.png`, `glass.png` | Hülle ohne Kabel mit geleertem Bildschirm (`drone_hull`) und nur die Spiegelung des Glases (`drone_glass`) | aus `hull_source.png` (Code, `tools/drone_parts.py`) | 10.11.2026 |
 | `assets/drone/faces.png` | 14 Gesichter für den Bildschirm à 28 × 32 px, AAP-64-Cyan mit Scanlines (`drone_faces`) | Code (`tools/drone_parts.py`) | 10.11.2026 |
+| `assets/drone/parts/lamp_source.png`, `claw_source.png` | Anbauteile für Mama-Bot: Suchscheinwerfer (Variante 3 von 16) und Greifarm (Variante 1 von 16), je 64 × 64 (`drone_lamp_source`, `drone_claw_source`) | KI (PixelLab, Create Image Pro, Palette AAP-64, Hülle als Vorlage) | 10.11.2026 |
+| `assets/drone/parts/lamp.png`, `claw.png` | Anbauteile zugeschnitten, ×0,75, auf AAP-64 gerastet (`drone_lamp`, `drone_claw`) | Code (`tools/drone_parts.py`) | 10.11.2026 |
 | `assets/vehicles/van_door.png` | Leylas Van, Schiebetür geht auf (5 Frames 248 × 172, `van`), Spawn-Punkt; Schüssel herausgenommen | aus `van_door_source.gif` zugeschnitten (Code, `tools/van_strips.py`) | 07.11.2026 |
 | `assets/vehicles/van_dish.png` | Radarschüssel dreht sich (16 Frames 35 × 20, `van_dish`) | aus der Schüssel im Original gedreht (Code, `tools/van_strips.py`) | 07.11.2026 |
 | `assets/vehicles/van_roof_front.png` | vorderes Dachgeländer als Vordergrund (5 Frames, `van_roof_front`) | aus dem Original ausgeschnitten (Code, `tools/van_strips.py`) | 07.11.2026 |

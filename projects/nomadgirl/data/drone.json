@@ -41,5 +41,8 @@
   {"at": [81, 83], "length": 30, "color": "#bb7547", "width": 2}
  ],
  "cable": {"segments": 8, "gravity": 900, "damping": 0.9, "swing": 75, "outline": "#060608"},
- "parts": []
+ "parts": [
+  {"name": "Suchscheinwerfer", "look": "drone_lamp", "at": [98, 78], "layer": "behind", "on": true},
+  {"name": "Greifarm", "look": "drone_claw", "at": [40, 76], "layer": "behind", "on": true}
+ ]
 }
