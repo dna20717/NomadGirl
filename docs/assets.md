@@ -2,6 +2,8 @@
 
 Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jedes Asset steht hier mit Herkunft.
 
+**Palette:** Daniel malt mit **AAP-64** (Adigun A. Polack, 64 Farben), Datei `assets/palette/aap-64.hex` (eine Farbe pro Zeile) und `aap-64.png` (8 × 8 Pixel, für Werkzeuge, die eine Palette als Bild wollen). Neue Pixel-Art (auch von PixelLab) entsteht in dieser Palette.
+
 | Datei | Was | Herkunft | Datum |
 | --- | --- | --- | --- |
 | `assets/leyla/idle.png` | Leyla, Stehen: 8 Frames à 176 × 432 px als Streifen (`leyla_idle`) | aus `idle_source.gif` zugeschnitten (Code) | 07.11.2026 |
