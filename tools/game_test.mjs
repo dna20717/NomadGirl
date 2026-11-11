@@ -116,6 +116,22 @@ check('Rennen: nach dem Schuss wieder an die Brust', rv.back === 'leyla_run_read
 check('Rennen + Nachladen in zwei Hälften', rv.reload1 === 'leyla_run_reload_side' && rv.reload2 === 'leyla_run_reload2_side', rv);
 check('Rennen: Wegstecken über die Hand am Holster', rv.h1 === 'leyla_run_ready_side' && rv.h2 === 'leyla_run_draw_side' && rv.h3 === 'leyla_run_side', rv);
 
+// reload (Daniel, 11.11.2026, 1C): a jump does not stop it, a hit pauses it, the progress is kept and it carries on by itself
+const rl = await page.evaluate(() => {
+  const s = game.scene.getScene('play'), l = s.leyla, out = {};
+  nomad.calm(); nomad.tp(22 * 64, 960); nomad.step(2, [], ['holster']); nomad.step(60);
+  l.mag = 2; nomad.step(1, [], ['reload']); nomad.step(20);
+  nomad.step(1, [], ['jump']); nomad.step(15); out.air = { reloading: !!l.reloading, armed: l.armed, ground: l.body.blocked.down };
+  nomad.step(70); out.afterJump = l.mag;
+  l.mag = 2; nomad.step(1, [], ['reload']); nomad.step(30);
+  l.invulnerableUntil = 0; l.hurt(s.now, 5, l.x + 50); nomad.step(4); out.paused = !l.reloading && l.reloadSaved > 300; out.saved = Math.round(l.reloadSaved);
+  out.hud = document.querySelector('.hud-reloading')?.textContent || null;
+  nomad.step(110); out.afterHit = l.mag; out.left = l.reloadSaved;
+  return out;
+});
+check('Nachladen läuft im Sprung weiter', rl.air.reloading && !rl.air.ground && rl.afterJump === 7, rl);
+check('Treffer pausiert das Nachladen, Fortschritt bleibt, danach geht es weiter', rl.paused && rl.afterHit === 7 && !rl.left, rl);
+
 // hit reaction (Leyla › Treffer): light and heavy animation, back to standing, running breaks it off after half the time
 const hit = await page.evaluate(() => {
   const s = game.scene.getScene('play'), l = s.leyla, key = () => l.sprite.texture.key, out = {};

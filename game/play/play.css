@@ -16,6 +16,9 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .hud-bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #ff2f8a, #ff7ac0); transition: width .15s; }
 .hud-dash { margin-left: 6px; padding: 1px 6px; border-radius: 3px; font-size: 18px; color: #5b5266; border: 1px solid #3a2f45; }
 .hud-dash.ready { color: #0d0a12; background: #3fe0d0; border-color: #3fe0d0; }
+.hud-reloading { position: relative; padding-left: 26px; color: #ffd27a; }
+.hud-reloading::before { content: ""; position: absolute; left: 2px; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; background: conic-gradient(#ffd27a var(--p, 0%), #3a2f45 0); -webkit-mask: radial-gradient(circle, transparent 4px, #000 5px); mask: radial-gradient(circle, transparent 4px, #000 5px); }
+.hud-reloading.hud-paused { opacity: 0.55; }
 .hud-banner { position: fixed; left: 50%; top: 30%; transform: translateX(-50%); text-align: center; padding: 18px 34px; border-radius: 10px; background: rgba(13, 10, 18, .78); border: 1px solid #5a2a4a; }
 .hud-banner b { display: block; font: 54px/1 VT323, monospace; font-weight: normal; color: #ffd27a; }
 .hud-banner small { display: block; margin-top: 8px; color: #d8cfe2; font-size: 15px; }

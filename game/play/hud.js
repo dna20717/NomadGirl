@@ -211,7 +211,11 @@ export class Hud {
     const l = scene.leyla, max = l.maxHealth;
     this.healthBar.style.width = `${Math.max(0, l.health / max * 100)}%`;
     this.healthText.textContent = `${Math.ceil(l.health)}/${max}`;
-    this.ammo.textContent = l.reloading ? 'lädt …' : l.mag === Infinity ? '∞' : l.magSize === Infinity || l.magSize >= 999 ? String(l.mag) : `${l.mag}/${l.ammo === Infinity ? '∞' : l.ammo}`;
+    // reload ring next to the magazine (also while she jumps or dashes, the reload keeps going; paused = dimmed)
+    const rp = l.reloading ? Math.min(1, (scene.now - l.reloading.at) / l.reloading.dur) : l.reloadSaved > 0 ? l.reloadSaved / (scene.weapon('ranged')?.reloadTime ?? 1400) : -1;
+    this.ammo.classList.toggle('hud-reloading', rp >= 0); this.ammo.classList.toggle('hud-paused', rp >= 0 && !l.reloading);
+    if (rp >= 0) this.ammo.style.setProperty('--p', (rp * 100).toFixed(1) + '%');
+    this.ammo.textContent = rp >= 0 ? `lädt ${Math.round(rp * 100)} %` : l.mag === Infinity ? '∞' : l.magSize === Infinity || l.magSize >= 999 ? String(l.mag) : `${l.mag}/${l.ammo === Infinity ? '∞' : l.ammo}`;
     this.dash.classList.toggle('ready', time >= l.dashReady);
     this.time.textContent = scene.clock();
     this.kills.textContent = `${scene.kills}/${this.total ?? 0}`;

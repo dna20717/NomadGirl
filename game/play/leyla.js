@@ -482,6 +482,11 @@ export class Leyla {
     let name = st === 'dead' ? 'hurt' : st === 'normal' ? (!onGround ? (time < (this.flipUntil || 0) ? 'airJump' : v.y < 0 ? 'jump' : 'fall')
       : speed > 300 || (held && !this.walkHeld) ? 'run' : speed > 20 || held ? 'walk' : 'idle') : st === 'swing' ? 'jump' : st;
     this.updateArmed(time, dt, grounded);
+    // (3) no standing frame without real stillness: right after walking or running she keeps the step a moment (Leyla › Übergänge › Stehen erst nach)
+    // (after a jump the last air frame stays for a moment too, so a quick hop again does not flash a standing frame)
+    const air = name === 'jump' || name === 'fall' || name === 'airJump';
+    if (st === 'normal' && (name === 'walk' || name === 'run' || air)) { this.movedAt = time; this.movedLook = name; this.movedAir = air; }
+    else if (name === 'idle' && st === 'normal' && time - (this.movedAt ?? -1e9) < (this.movedAir ? (this.d.transition?.idleAfterAir ?? 60) : (this.d.transition?.idleAfter ?? 90))) name = this.movedLook;
     this.idleNow = name === 'idle' && this.armed === 'off';
     if (name === 'idle' && this.idleVariant === 'idleAlt' && this.d.look?.idleAlt) name = 'idleAlt';
     // random idles after standing still for a while (Leyla › Zufällige Idles); sitting does not count
@@ -548,9 +553,18 @@ export class Leyla {
     const manual = st === 'mantle' || st === 'crouch' || st === 'dash' || st === 'land' || st === 'brake' || st === 'sit' || st === 'pose' || flipFrames || climbFrames, an0 = this.sprite.anims;
     if (!manual && armedFrame == null && pin == null && st !== 'slide' && an0.isPaused) an0.resume();
     // the run and its variants (gun out, at the chest, drawing, reloading) share the step: switching keeps the frame, so the legs never jump
-    const fam = this.runFamily(), prevKey = this.sprite.anims.currentAnim?.key, prevIdx = this.sprite.anims.currentFrame ? this.sprite.anims.currentFrame.index - 1 : 0;
-    const want = name.startsWith('@') ? name.slice(1) : name === 'run' ? L.run : null;
-    const keep = fam.has(prevKey) && want && fam.has(want) && !this.sprite.anims.isPaused ? prevIdx : null;
+    // transitions (Daniel, 11.11.2026, 2A): (1) families with the same step keep their place in the cycle (run and its variants,
+    // walk with and without the gun), (2) Leyla › Übergänge names exceptions: from → to starts at a given frame
+    const A = this.scene.data_.assets || {}, aa = this.sprite.anims, prevKey = aa.currentAnim?.key, prevIdx = aa.currentFrame ? aa.currentFrame.index - 1 : 0;
+    const want = name.startsWith('@') ? name.slice(1) : L[name] || null, base = id => [id, A[id]?.mirror].filter(Boolean);
+    let keep = null;
+    const row = want && prevKey && prevKey !== want && (this.d.transitions || []).find(r => r.from && r.to && base(r.from).includes(prevKey) && base(r.to).includes(want));
+    if (row) keep = Math.max(0, (row.frame || 1) - 1);
+    else if (want && !aa.isPaused) for (const fam of this.families()) if (fam.has(prevKey) && fam.has(want)) {
+      const n0 = A[prevKey]?.frames || 1, n1 = A[want]?.frames || 1;
+      keep = n0 === n1 ? prevIdx : Math.round(prevIdx / n0 * n1) % n1;   // same share of the cycle
+      break;
+    }
     const info = this.scene.playLook(this.sprite, 'leyla', name, st === 'pose' ? 1 : this.facing, keep);   // the yoga pose is seen from the front: never mirrored
     if (this.restartLook && an0.currentAnim) { this.restartLook = false; an0.restart(); }
     if (pin != null && info.used === name && an0.currentAnim) {
@@ -589,7 +603,7 @@ export class Leyla {
       const mid = an.currentAnim.frames[Math.floor(an.currentAnim.frames.length / 2)];
       if (!this.canStand() && an.currentFrame?.index >= mid.index) { if (!an.isPaused) an.pause(mid); } else if (an.isPaused) an.resume();
     }
-    const pace = { run: this.m.runSpeed || 440, walk: this.m.walkSpeed || 240 }[info.used] ?? (info.used?.startsWith('@') && fam.has(info.used.slice(1)) ? (this.m.runSpeed || 440) * (this.scene.shootRules().runSpeed ?? 85) / 100 : null);
+    const pace = { run: this.m.runSpeed || 440, walk: this.m.walkSpeed || 240 }[info.used] ?? (info.used?.startsWith('@') && this.runFamily().has(info.used.slice(1)) ? (this.m.runSpeed || 440) * (this.scene.shootRules().runSpeed ?? 85) / 100 : null);
     this.sprite.anims.timeScale = pace ? Math.max(0.45, Math.min(1.4, Math.abs(v.x) / pace)) : 1;
     // squash & stretch relaxes back to 1
     const k = Math.min(1, dt / 90);
@@ -667,17 +681,21 @@ export class Leyla {
   loadWeapon() {
     const w = this.scene.weapon('ranged'), total = w?.ammo ?? Infinity;
     this.magSize = w?.magazine || total;
-    this.mag = Math.min(this.magSize, total); this.ammo = total - this.mag; this.reloading = null;
+    this.mag = Math.min(this.magSize, total); this.ammo = total - this.mag; this.reloading = null; this.reloadSaved = 0;
   }
+  // Daniel, 11.11.2026 (1C): jumps, dashes and slides do not stop the reload, only the animation; a hit or a melee attack pauses it,
+  // the progress is kept and it carries on by itself as soon as she can
   startReload(time) {
     if (this.reloading || this.mag >= this.magSize || this.ammo <= 0) return;
-    this.reloading = { at: time, dur: this.scene.weapon('ranged')?.reloadTime ?? 1400 };
+    const dur = this.scene.weapon('ranged')?.reloadTime ?? 1400, done = Math.min(dur - 1, this.reloadSaved || 0);
+    this.reloading = { at: time - done, dur }; this.reloadSaved = 0;
   }
   updateReload(time) {
+    if (!this.reloading && this.reloadSaved > 0 && this.alive && !this.attack && !this.charging && !this.hitAnim && this.state === 'normal') this.startReload(time);   // carry on
     const R = this.reloading;
     if (!R) return;
-    if (this.armed !== 'on' && this.d.look?.aim) { this.reloading = null; return; }   // ran or jumped: reload broken off
-    if (time - R.at >= R.dur) { const n = Math.min(this.magSize - this.mag, this.ammo); this.mag += n; this.ammo -= n; this.reloading = null; }
+    if (this.attack || this.charging || this.hitAnim || !this.alive) { this.reloadSaved = Math.min(R.dur - 1, time - R.at); this.reloading = null; return; }   // paused, progress kept
+    if (time - R.at >= R.dur) { const n = Math.min(this.magSize - this.mag, this.ammo); this.mag += n; this.ammo -= n; this.reloading = null; this.reloadSaved = 0; }
   }
 
   // ---------- gun drawn: automatically while she is not running (Daniel: "zieht die Waffe automatisch, wenn sie nicht rennt,
@@ -703,9 +721,11 @@ export class Leyla {
     if (this.armed === 'drawing' && this.gunRunning(v) && !this.runLook('runDraw')) this.armed = 'on';   // no drawing on the run without its animation
     if (this.armed === 'drawing') { this.drawP += dt / Math.max(1, A.drawTime ?? 650); if (this.drawP >= 1) this.armed = 'on'; }
   }
-  runFamily() {
-    const L = this.d.look || {}, A = this.scene.data_.assets || {}, ids = [L.run, L.runGun, L.runReady, L.runDraw, L.runReload, L.runReload2].filter(Boolean);
-    return new Set([...ids, ...ids.map(id => A[id]?.mirror).filter(Boolean)]);
+  runFamily() { return this.families()[0]; }
+  families() {
+    const L = this.d.look || {}, A = this.scene.data_.assets || {};
+    const set = ids => { ids = ids.filter(Boolean); return new Set([...ids, ...ids.map(id => A[id]?.mirror).filter(Boolean)]); };
+    return [set([L.run, L.runGun, L.runReady, L.runDraw, L.runReload, L.runReload2]), set([L.walk, L.aimWalk])];
   }
   runLook(key) { const id = this.d.look?.[key]; return id && this.scene.textures.exists(id) ? id : null; }
   // Cells-like (Spiel › Kampf › Schießstil): with the gun out she keeps running, look Leyla › Waffe ziehen › Rennen mit Waffe

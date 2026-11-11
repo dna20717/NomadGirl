@@ -46,6 +46,14 @@ const report = await page.evaluate(() => {
     const a = log[i - 1], b = log[i], n = s.data_.assets?.[b.k]?.frames || 1;
     if (a.k === b.k && !a.p && !b.p && b.f < a.f && !(a.f >= n - 1 && b.f <= 2) && a.tag === b.tag) out.restart.push(`${b.tag}: ${b.k} ${a.f}→${b.f} (${b.st}/${b.arm})`);
   }
+  // a standing frame between two movements (Daniel, 11.11.2026: no idle flash between two animations that are not idle)
+  out.idleFlash = [];
+  const idle = k => /idle/.test(k);
+  for (let i = 1; i < log.length; i++) {
+    if (!idle(log[i].k) || idle(log[i - 1].k) || log[i].tag !== log[i - 1].tag) continue;
+    let j = i; while (j < log.length && idle(log[j].k) && log[j].tag === log[i].tag) j++;
+    if (j < log.length && j - i <= 4 && log[j].tag === log[i].tag && !idle(log[j].k)) out.idleFlash.push(`${log[i].tag}: ${log[i - 1].k} → ${j - i}× Stehen → ${log[j].k} (${log[i].st}, vx ${log[i].vx})`);
+  }
   let run = 1;
   for (let i = 1; i < log.length; i++) {
     const a = log[i - 1], b = log[i];
@@ -61,5 +69,6 @@ console.log('Frames:', report.frames);
 console.log('\nFlackern:', uniq(report.flicker).slice(0, 40).join('\n  ') || '–');
 console.log('\nNeustart mitten drin:', uniq(report.restart).slice(0, 40).join('\n  ') || '–');
 console.log('\nHängt:', uniq(report.stall).slice(0, 40).join('\n  ') || '–');
+console.log('\nStehen blitzt auf:', uniq(report.idleFlash).slice(0, 40).join('\n  ') || '–');
 if (process.argv.includes('--seq')) for (const [t, q] of Object.entries(report.seq)) console.log(t.padEnd(10), q.map(([k, f, n]) => `${k}@${f}×${n}`).join(' '));
 await browser.close();
