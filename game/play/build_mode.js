@@ -548,7 +548,7 @@ export class BuildMode {
   drive(input, dt) {
     const s = this.scene, l = s.leyla, now = s.time.now, out = {};
     for (const k of Object.keys(input)) out[k] = { down: false, pressed: false };
-    out.build = input.build; out.help = input.help; out.mute = input.mute; out.debug = input.debug;
+    out.build = input.build; out.help = input.help; out.controls = input.controls; out.mute = input.mute; out.debug = input.debug;
     this.working = false;
     if (!this.job && this.jobs.length) { this.job = this.jobs.shift(); this.job.state = 'walk'; }
     const j = this.job;

@@ -4,13 +4,21 @@ import { icon } from '../icons.js';
 import { loadVersion } from '../version.js';
 import { clockText } from '../save.js';
 
+// the controls panel (H or Menü › Steuerung), two columns: keys as keycaps, " / " splits alternatives
 const CONTROLS = [
-  ['A D / ← →', 'Laufen'], ['Shift halten', 'Gehen statt Rennen'], ['Leertaste', 'Springen (nochmal in der Luft: Doppelsprung)'],
-  ['L oder C', 'Dash (auch in der Luft)'], ['S / ↓ beim Rennen', 'Slide (unter Hindernissen durch)'], ['S + Leertaste', 'Von Plattform fallen'], ['S / ↓ im Stand', 'Ducken; an der Kante + Richtung: runter hängen'],
-  ['Richtung zur Wand im Sprung', 'Kante greifen; W/Leertaste: hochziehen, S: loslassen, Leertaste weg von der Wand: abspringen'],
-  ['W / ↑ an der Leiter', 'Klettern'], ['W / ↑ oder E in der Luft', 'Am Seil festhalten, Leertaste: loslassen mit Schwung'],
-  ['E', 'Benutzen: Werkstätten (Kochnische/Werkbank: Kochen & Craften), Lagerfeuer, Companions, Van (im Run: zurück ins Camp)'], ['J oder Y', 'Nahkampf (antippen = leicht, 3 s halten und loslassen = schwer)'], ['K oder X', 'Schießen (nur am Boden, Waffe gezogen)'], ['R', 'Nachladen (im Stehen und Gehen)'], ['P', 'Yoga-Pose (nochmal P oder bewegen = auflösen)'], ['Rücktaste', 'Raum neu starten'], ['M', 'Ton an/aus'], ['I oder Tab', 'Inventar (Maus: klicken nehmen/ablegen, Rechtsklick drehen, Doppelklick rüber, auf „Benutzen“ legen = essen)'], ['B (im Camp)', 'Rig bauen: Werkstätten und Anhänger mit der Maus ziehen (Schrottplatz, Händler, Kupplungen), Strg+Z rückgängig, B fertig'], ['H / Esc', 'Diese Hilfe'], ['G', 'Hitboxen zeigen'],
+  { title: 'Bewegen', icon: 'right', rows: [
+    ['A D / ← →', 'Laufen'], ['Shift', 'Gehen statt Rennen (halten)'], ['Leertaste', 'Springen, in der Luft nochmal: Doppelsprung'],
+    ['L / C', 'Dash, auch in der Luft'], ['S / ↓', 'Beim Rennen: Slide · im Stand: Ducken'], ['S + Leertaste', 'Von der Plattform fallen'],
+    ['→', 'Im Sprung zur Wand: Kante greifen · W hochziehen · S loslassen'], ['W / ↑', 'Leiter klettern, Seil greifen'], ['Leertaste', 'Am Seil: loslassen mit Schwung']] },
+  { title: 'Kampf', icon: 'weapon', rows: [
+    ['J / Y', 'Nahkampf · 3 s halten: schwerer Hieb'], ['K / X', 'Schießen (am Boden, Waffe gezogen)'], ['R', 'Nachladen']] },
+  { title: 'Machen', icon: 'hand', rows: [
+    ['E', 'Benutzen: Kisten, Schalter, Werkstätten, Feuer, Van'], ['I / Tab', 'Inventar'], ['B', 'Rig bauen (im Camp)'], ['P', 'Yoga-Pose']] },
+  { title: 'System', icon: 'settings', rows: [
+    ['Esc', 'Menü'], ['H', 'Diese Steuerung'], ['M', 'Ton an/aus'], ['Rücktaste', 'Raum neu starten'], ['G', 'Hitboxen']] },
 ];
+const caps = keys => keys.split(' / ').flatMap((k, i) => [...(i ? [el('i', {}, '/')] : []), ...k.split(' + ').flatMap((p, j) => [...(j ? [el('i', {}, '+')] : []), el('kbd', {}, p)])]);
+const section = g => el('section', {}, el('h3', {}, icon(g.icon, 16), g.title), el('dl', {}, ...g.rows.flatMap(([k, t]) => [el('dt', {}, ...caps(k)), el('dd', {}, t)])));
 
 export class Hud {
   constructor(root, { workshopDrafts = 0, commit = null } = {}) {
@@ -29,14 +37,15 @@ export class Hud {
     this.buildBtn = el('button', { class: 'hud-buildbtn', hidden: true, title: 'Rig bauen: Werkstätten und Anhänger mit der Maus ziehen', onclick: e => { e.currentTarget.blur(); this.scene?.openBuild(); } }, el('kbd', {}, 'B'), el('span', {}, 'Rig bauen'));
     this.modal = false;
     document.addEventListener('keydown', e => { if (this.pad) this.pad.active = false; this.menuKey(e); }, true);
-    this.help = el('div', { class: 'hud-help' }, el('div', { class: 'hud-helpBox' },
-      el('h2', {}, 'Steuerung'),
+    // controls: hidden until asked for (Daniel, 11.11.2026: "nicht mehr per default, in einem Menü verstecken"), two columns
+    this.help = el('div', { class: 'hud-help', hidden: true, onclick: e => { if (e.target === this.help) this.toggleHelp(false); } }, el('div', { class: 'hud-helpBox' },
+      el('header', {}, el('h2', {}, 'Steuerung'), el('small', {}, 'NomadGirl · Feldhandbuch')),
       this.padHelpEl = el('div', { class: 'hud-padhelp', hidden: true }),
-      this.keyHelpEl = el('dl', {}, ...CONTROLS.flatMap(([k, t]) => [el('dt', {}, k), el('dd', {}, t)])),
-      el('p', {}, 'Alle Werte kommen aus der Werkstatt (Leyla, Waffen, Gegner, Raum-Bausteine).',
+      this.keyHelpEl = el('div', { class: 'hud-keyhelp' }, el('div', {}, section(CONTROLS[0])), el('div', {}, ...CONTROLS.slice(1).map(section))),
+      el('p', {}, 'Inventar mit der Maus: klicken nehmen und ablegen, Rechtsklick drehen, Doppelklick rüber, auf „Benutzen“ legen = essen. Alle Werte kommen aus der Werkstatt.',
         commit ? el('b', {}, ` Spieldaten live aus dem Repository (Stand ${commit.slice(0, 7)}).`) : null,
         workshopDrafts ? el('b', {}, ` Dein gespeicherter Werkstatt-Stand ist aktiv (${workshopDrafts} ${workshopDrafts === 1 ? 'Datei' : 'Dateien'}).`) : null),
-      this.goBtn = el('button', { class: 'hud-go', onclick: () => this.toggleHelp(false) }, 'Los geht’s')));
+      this.goBtn = el('button', { class: 'hud-go', onclick: () => this.toggleHelp(false) }, 'Weiter')));
     root.append(
       el('div', { class: 'hud-top' },
         el('div', { class: 'hud-left' },
@@ -46,12 +55,29 @@ export class Hud {
           el('div', { class: 'hud-row' }, this.roomName),
           el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'ZEIT'), this.time, el('span', { class: 'hud-label' }, 'KILLS'), this.kills, el('span', { class: 'hud-label' }, 'Δ'), this.deltas))),
       this.campEl, this.buildBtn, this.openBtn, this.bannerEl, this.promptEl, this.menuEl, this.help,
-      el('div', { class: 'hud-foot' }, 'H: Steuerung · Rücktaste: Neustart · ', el('a', { href: 'workshop.html' }, 'Werkstatt'), ' · ', el('a', { href: './' }, 'Start'),
+      el('div', { class: 'hud-foot' }, el('button', { class: 'hud-menubtn', title: 'Menü (Esc)', onclick: e => { e.currentTarget.blur(); this.pauseMenu(); } }, icon('menu', 14), 'Menü'), ' · ', el('a', { href: 'workshop.html' }, 'Werkstatt'), ' · ', el('a', { href: './' }, 'Start'),
         this.newGame = el('span', { hidden: true }, ' · ', el('a', { href: 'game.html?camp&new', onclick: e => { if (!confirm('Spielstand löschen und neu anfangen?')) e.preventDefault(); } }, 'Neues Spiel')),
         this.versionEl = el('span', { class: 'hud-version' })));
     loadVersion().then(v => { this.versionEl.textContent = ' · ' + v.text; this.versionEl.title = 'Version dieses Spiels' + (v.commit ? ': ' + v.commit : ''); this.version = v; });
     this.root = root;
-    this.paused = true;   // help is open at the start
+    this.paused = false;   // the controls wait in the menu (Esc › Steuerung, or H)
+  }
+
+  // pause menu (Esc, Start on the controller, button at the bottom): the controls live here now
+  pauseMenu() {
+    const sc = this.scene;
+    if (this.modal || !sc) return;
+    if (this.paused) this.toggleHelp(false);
+    const camp = this.modeName === 'camp';
+    this.menu({ title: 'Pause', sub: sc.roomDef?.name || '', items: [
+      { label: 'Weiter', primary: true, act: () => {} },
+      { label: 'Steuerung', sub: 'Tasten und Controller', act: () => this.toggleHelp(true) },
+      { label: sc.sound.mute ? 'Ton an' : 'Ton aus', sub: 'M', act: () => sc.toggleMute() },
+      ...(this.modeName === 'test' ? [{ label: 'Raum neu starten', sub: 'Rücktaste', act: () => sc.level ? sc.restartAs({}) : sc.restartRoom() }] : []),
+      { label: 'Werkstatt', act: () => { location.href = 'workshop.html'; } },
+      { label: 'Startseite', act: () => { location.href = './'; } },
+      ...(camp ? [{ label: 'Neues Spiel', sub: 'Spielstand löschen', act: () => { if (confirm('Spielstand löschen und neu anfangen?')) location.href = 'game.html?camp&new'; } }] : []),
+    ] });
   }
 
   firstKey() {}
@@ -147,15 +173,16 @@ export class Hud {
     const kind = pad?.kind || null;
     this.padHelpEl.hidden = !kind;
     this.keyHelpEl.hidden = active;   // with the controller in hand: only its buttons
-    this.goBtn.replaceChildren(...(active ? [this.padIcon(pad.iconName(0), pad.labelOf(0)) || '', ' '] : []), 'Los geht’s');
+    this.goBtn.replaceChildren(...(active ? [this.padIcon(pad.iconName(0), pad.labelOf(0)) || '', ' '] : []), 'Weiter');
     if (!kind) return;
     const ico = b => this.padIcon(pad.iconName(b), pad.labelOf(b)) || el('b', {}, pad.labelOf(b));
     const names = { xbox: 'Xbox', ps: 'PlayStation', switch: 'Switch', stadia: 'Stadia' };
     const rows = [[[this.padIcon(`${kind}_stick`, 'Stick') || el('b', {}, 'Stick'), ico(12)], 'Laufen (halb neigen = gehen), runter = Ducken/Slide, hoch = Leiter'],
       ...actions.map(([a, name]) => [(pad.c.map[a] || []).map(ico), name]).filter(([k]) => k.length),
       [[ico(12), ico(0), ico(1)], 'Menüs: wählen, nehmen, zurück']];
-    this.padHelpEl.replaceChildren(el('h3', {}, `Controller · ${names[kind] || kind}`), el('dl', {}, ...rows.flatMap(([k, t]) => [el('dt', {}, ...k.flatMap((x, i) => i ? [' ', x] : [x])), el('dd', {}, t)])),
-      ...(active ? [el('p', { class: 'hud-small' }, 'Eine Taste auf der Tastatur zeigt wieder die Tastenbelegung.')] : [el('h3', {}, 'Tastatur')]));
+    const half = Math.ceil(rows.length / 2), list = part => el('dl', {}, ...part.flatMap(([k, t]) => [el('dt', {}, ...k.flatMap((x, i) => i ? [' ', x] : [x])), el('dd', {}, t)]));
+    this.padHelpEl.replaceChildren(el('h3', {}, icon('play', 16), `Controller · ${names[kind] || kind}`), el('div', { class: 'hud-cols' }, list(rows.slice(0, half)), list(rows.slice(half))),
+      ...(active ? [el('p', { class: 'hud-small' }, 'Eine Taste auf der Tastatur zeigt wieder die Tastenbelegung.')] : [el('h3', { class: 'hud-keytitle' }, icon('grid', 16), 'Tastatur')]));
   }
   menuState() { return this.modal ? { title: this.menuTitle, items: this.menuItems.map(i => ({ label: i.label, sub: i.sub || '', disabled: i.disabled || null })) } : null; }
   toggleHelp(on = !this.paused) { this.paused = on; this.help.hidden = !on; }

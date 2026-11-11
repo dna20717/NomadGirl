@@ -21,6 +21,7 @@ await ev(() => { nomad.take(); nomad.calm(); });
 const go = (x, y, face = 1) => ev(([x, y, f]) => {
   nomad.tpTile(x, y); nomad.step(4, [f > 0 ? 'right' : 'left']); nomad.step(40);
   const s = game.scene.getScene('play'); s.cam.stopFollow(); s.cam.centerOn(s.leyla.x, s.leyla.feet - 260); s.cam.startFollow(s.leyla.box, false, 0.12, 0.12);
+  nomad.step(1);   // one more frame: the lightmap is drawn for the camera's new place
   return nomad.light();
 }, [x, y, face]);
 const shot = async n => {
@@ -49,23 +50,24 @@ await shot('verkaufsraum');
 
 s = await go(47, 16);
 check('Lager: duster', s.mood === 'beton_lager' && s.atLeyla < 0.75, s);
-const pix = await ev(() => { const a = game.scene.getScene('play').atmo, d = a.ctx.getImageData(Math.floor(a.lw * 0.15), Math.floor(a.lh * 0.12), 1, 1).data; return [d[0], d[1], d[2]]; });
-check('Lichtkarte: in der Ecke dunkel', pix.every(v => v < 200), pix);
+// the lightmap around Leyla (store room, she stands in its middle): the darkest spot is really dark, the brightest is a lamp
+const pix = await ev(() => { const a = game.scene.getScene('play').atmo, d = a.ctx.getImageData(Math.floor(a.lw * 0.35), Math.floor(a.lh * 0.25), Math.floor(a.lw * 0.3), Math.floor(a.lh * 0.5)).data; let lo = 999, hi = 0; for (let i = 0; i < d.length; i += 4) { const v = (d[i] + d[i + 1] + d[i + 2]) / 3; lo = Math.min(lo, v); hi = Math.max(hi, v); } return [Math.round(lo), Math.round(hi)]; });
+check('Lichtkarte: im Lager dunkle Ecken und helle Lampen', pix[0] < 110 && pix[1] > 150, pix);
 await shot('lager');
 
 // tunnel: Mama-Bot's searchlight makes the way ahead brighter, only while the part sits on her
 s = await go(80, 37, 1);
 check('Tunnel: blau und dunkel, Nebel am Boden', s.mood === 'tunnel_blau' && s.fog > 0, s);
 const spot = await ev(() => {
-  const sc = game.scene.getScene('play'), part = sc.drone.partImgs.find(p => p.r.name === 'Suchscheinwerfer');
+  const sc = game.scene.getScene('play'), a = sc.atmo, part = sc.drone.partImgs.find(p => p.r.name === 'Suchscheinwerfer');
   nomad.step(30, []);
-  const on = nomad.light();
+  const on = nomad.light(), sp = a.lastSpot, x = sp.x + Math.cos(sp.dir) * 320, y = sp.y + Math.sin(sp.dir) * 320, beamOn = a.lightAt(x, y);   // a point in the beam
   part.img.setVisible(false); nomad.step(2);
-  const off = nomad.light();
+  const off = nomad.light(), beamOff = a.lightAt(x, y);
   part.img.setVisible(true); nomad.step(2);
-  return { on, off };
+  return { on, off, beamOn, beamOff };
 });
-check('Scheinwerfer: leuchtet in Blickrichtung', !!spot.on.spot && spot.on.ahead > spot.off.ahead + 0.15, { on: spot.on.ahead, off: spot.off.ahead });
+check('Scheinwerfer: leuchtet in Blickrichtung', !!spot.on.spot && spot.beamOn > spot.beamOff + 0.25, { on: spot.beamOn, off: spot.beamOff });
 check('Scheinwerfer: ohne das Teil kein Kegel', spot.off.spot === null, spot.off.spot);
 await shot('tunnel');
 

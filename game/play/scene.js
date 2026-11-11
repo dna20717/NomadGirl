@@ -26,7 +26,7 @@ const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
   jump: ['SPACE'], walk: ['SHIFT'], dash: ['L', 'C'], melee: ['J', 'Y'], ranged: ['K', 'X'], grab: ['E'],
-  restart: ['BACKSPACE'], reload: ['R'], help: ['H', 'ESC'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'], build: ['B'],
+  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'], build: ['B'],
 };
 
 export class PlayScene extends Phaser.Scene {
@@ -567,20 +567,31 @@ export class PlayScene extends Phaser.Scene {
       if (p.pressed('down')) hud.menuMove(1);
       else if (p.pressed('up')) hud.menuMove(-1);
       else if (p.pressed('jump')) hud.choose(hud.menuIndex);
-      else if (p.pressed('dash')) hud.closeMenu();
-      for (const k of ['jump', 'grab', 'dash', 'up', 'down']) input[k].pressed = false;
+      else if (p.pressed('dash') || p.pressed('help')) hud.closeMenu();
+      for (const k of ['jump', 'grab', 'dash', 'up', 'down', 'help']) input[k].pressed = false;
       return;
     }
     if (p.pressed('dash') && hud.craft?.isOpen) { hud.craft.close(); input.dash.pressed = false; }
     else if (p.pressed('dash') && hud.inv?.isOpen) { hud.inv.close(); input.dash.pressed = false; }
   }
 
+  toggleMute() {
+    this.sound.mute = !this.sound.mute;
+    try { localStorage.setItem('nomadgirl-mute', this.sound.mute ? '1' : '0'); } catch { /* private mode */ }
+    this.hud.banner(this.sound.mute ? 'Ton aus' : 'Ton an', 'M schaltet um'); this.time.delayedCall(1200, () => this.hud.banner(null));
+  }
+
   update(time, delta) {
     let input = this.readInput();
     this.padMenus(input);
-    if (input.help.pressed && this.hud.inv?.isOpen && !this.hud.paused) { this.hud.inv.close(); input.help.pressed = false; }
-    if (input.help.pressed) this.hud.toggleHelp();
-    if (input.mute.pressed) { this.sound.mute = !this.sound.mute; try { localStorage.setItem('nomadgirl-mute', this.sound.mute ? '1' : '0'); } catch { /* */ } this.hud.banner(this.sound.mute ? 'Ton aus' : 'Ton an', 'M schaltet um'); this.time.delayedCall(1200, () => this.hud.banner(null)); }
+    // Esc / Start: closes what is open (inventory, controls), otherwise the pause menu (Daniel, 11.11.2026: controls hidden in a menu)
+    if (input.help.pressed) {
+      if (this.hud.inv?.isOpen && !this.hud.paused) this.hud.inv.close();
+      else if (this.hud.paused) this.hud.toggleHelp(false);
+      else if (!this.hud.modal && !this.hud.craft?.isOpen && !this.hud.build?.active && !this.leaving) this.hud.pauseMenu();
+    }
+    if (input.controls?.pressed && !this.hud.modal) this.hud.toggleHelp();
+    if (input.mute.pressed) this.toggleMute();
     if (input.debug.pressed) { const w = this.physics.world; w.drawDebug = !w.drawDebug; if (!w.debugGraphic) w.createDebugGraphic(); w.debugGraphic.clear().setVisible(w.drawDebug); }
     if (input.restart.pressed && this.mode === 'test' && this.level) this.restartAs({});   // doors, chests, walls: fresh room
     else if (input.restart.pressed && this.mode !== 'camp' && !this.level) this.restartRoom();

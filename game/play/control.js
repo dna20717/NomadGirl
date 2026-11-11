@@ -23,7 +23,7 @@
 //   nomad.craft()                     cooking/crafting panel at a workshop (E in the camp): book, pot, log, stock
 //   nomad.save()                      the savegame
 //   nomad.release()                   keyboard again, game runs normally
-// Input names: left right up down jump walk dash melee ranged grab restart help debug pose build inventory
+// Input names: left right up down jump walk dash melee ranged grab restart help (= Esc, Menü) controls (= H, Steuerung) debug pose build inventory
 
 const FRAME = 1000 / 60;
 
