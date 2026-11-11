@@ -37,7 +37,10 @@
   "landMinDistance": 640,
   "landTime": 450,
   "landFromFrame": 4,
-  "landCancel": 55
+  "landCancel": 55,
+  "vault": true,
+  "vaultFrom": 110,
+  "vaultTime": 300
  },
  "loadout": {"melee": "karambit", "ranged": "nagelpistole", "backpack": "schulranzen", "wear": ["cyberarm_mk1", "suchscheinwerfer", "greifarm"]},
  "look": {

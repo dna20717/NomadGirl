@@ -83,12 +83,21 @@ v = await page.evaluate(() => {
 check('Kante: Ducken, runter hängen, hochziehen', v.crouch === 'crouch' && v.hang === 'hang' && v.after === 'crouch' && v.st === 'normal' && v.feet === feet(0) && v.x < 30 * 64, v);
 v = await page.evaluate(() => {
   const n = nomad; P.tp(31.5, 21); n.step(15);
-  n.step(14, ['left', 'jump'], ['jump']); n.until(x => x.leyla.state === 'hang' || x.leyla.ground, 60, ['left']);
+  n.step(1, ['left', 'jump'], ['jump']); n.step(6, ['left', 'jump']); n.until(x => x.leyla.state === 'hang' || x.leyla.ground, 60, ['left']);   // short hop: the hands just reach the edge
   const hang = n.state().leyla.state;
   n.step(1, [], ['jump']); n.until(x => x.leyla.state === 'normal', 90); n.step(10);
   return { ...P.L(), hang };
 });
 check('Kante: aus dem Sprung greifen + hoch', v.hang === 'hang' && v.feet === feet(0), v);
+// too high for hanging (Daniel, 11.11.2026): she takes the edge in one go, skips the first pull-up frames and runs on
+v = await page.evaluate(() => {
+  const n = nomad, l = game.scene.getScene('play').leyla, seen = new Set(); P.tp(31.5, 21); n.step(15);
+  n.step(1, ['left', 'jump'], ['jump']);
+  let frame0 = null, vx = null, was = null;
+  for (let i = 0; i < 70; i++) { n.step(1, i < 13 ? ['left', 'jump'] : ['left']); seen.add(l.state); if (l.state === 'mantle' && frame0 == null) frame0 = Number(l.sprite.frame.name); if (was === 'mantle' && l.state === 'normal') vx = Math.round(l.body.velocity.x); was = l.state; }
+  return { ...P.L(), seen: [...seen], frame0, vx };
+});
+check('Kante im Schwung: kein Hängen, spätere Hochzieh-Frames, rennt oben weiter', v.seen.includes('mantle') && !v.seen.includes('hang') && !v.seen.includes('crouch') && v.frame0 >= 6 && v.feet === feet(0) && v.vx < -200, v);
 v = await page.evaluate(() => {
   const n = nomad, l = game.scene.getScene('play').leyla, seen = new Set(), A = l.d.armed, I = l.d.idles; P.tp(20, 18);
   l.d.armed = { ...A, enabled: false }; l.d.idles = [];   // only the two plain idles here (gun and random idles have their own checks)

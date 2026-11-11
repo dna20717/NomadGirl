@@ -101,7 +101,7 @@ export class Leyla {
       case 'climb': this.climb(time, input, dir, grounded); break;
       case 'swing': this.swing(time, s, input, dir); break;
       case 'hang': this.hang(time, input, dir); break;
-      case 'mantle': this.mantle(time); break;
+      case 'mantle': this.mantle(time, dir); break;
       case 'crouch': this.crouch(time, dt, input, dir, grounded); break;
       case 'sit': this.sitting(time, input, dir); break;
       case 'pose': this.posing(time, input, dir); break;
@@ -171,9 +171,17 @@ export class Leyla {
       if (a) return this.startSwing(a);
     }
     // ledge: while jumping or falling and pushing towards a wall or platform end, the hands catch its edge
+    // too high for hanging (Daniel, 11.11.2026: „ab einem Schwellwert nimmt Leyla die Kante parkourmäßig“): she vaults straight up and over,
+    // the first pull-up frames are skipped and she keeps her run (Leyla › Kanten & Ducken › Schwung ab)
     if (!grounded && dir && m.ledgeGrab !== false && time >= this.noGrabUntil && b.velocity.y > -350) {
-      const L = this.scene.ledgeAt(this.x, this.hand().y, dir, m.ledgeReach ?? 56, this.size.w / 2);
-      if (L && this.hangFits(L)) return this.startHang(L);
+      const z = this.size, hy = this.hand().y, reach = m.ledgeReach ?? 56, k = z.h / 168;
+      const vaultOn = m.vault !== false, low = vaultOn ? Math.max(reach, this.feet - hy - 10) : reach;
+      const L = this.scene.ledgeAt(this.x, hy, dir, low, z.w / 2);
+      if (L) {
+        const rise = L.y + z.hangReach - this.feet, top = { x: L.x + L.dir * (z.w / 2 + 4), feet: L.y };
+        if (vaultOn && rise >= (m.vaultFrom ?? 110) * k && this.scene.rectFree(top.x - z.w / 2 + 2, top.feet - z.crouchH, z.w - 4, z.crouchH - 2)) return this.startVault(time, L, rise, top);
+        if (L.y - hy <= reach && this.hangFits(L)) return this.startHang(L);
+      }
     }
     // crouch: ↓ while standing (fast = slide, see above)
     if (grounded && input.down.down && !dir && !input.jump.down && Math.abs(b.velocity.x) <= (m.walkSpeed ?? 240) * 0.8) return this.startCrouch();   // not while a direction is held (after a slide with ↓ + → she simply runs on)
@@ -325,17 +333,33 @@ export class Leyla {
     if (input.down.pressed) this.leaveHang(time);
   }
   leaveHang(time) { this.state = 'normal'; this.body.allowGravity = true; this.ledge = null; this.noGrabUntil = time + 300; }
-  startMantle(time, top) {
-    this.state = 'mantle'; this.mantleAt = time;
+  startMantle(time, top, q0 = 0, dur = null) {
+    this.state = 'mantle'; this.mantleAt = time; this.mantleQ0 = q0; this.mantleDur = dur ?? (this.m.mantleTime ?? 450);
     this.mantleFrom = { x: this.x, feet: this.feet }; this.mantleTo = top;
     this.body.checkCollision.none = true; this.body.setVelocity(0, 0);
+    if (!dur) this.vault = null;
   }
-  mantleP(time) { return Math.min(1, (time - this.mantleAt) / (this.m.mantleTime ?? 450)); }
-  mantle(time) {
+  // vault: how high she already is decides where the pull-up starts (q0) and how long the rest takes; the run speed is kept for afterwards
+  startVault(time, L, rise, top) {
+    const z = this.size, m = this.m, q0 = Math.max(0, Math.min(0.9, rise / z.hangReach));
+    this.facing = L.dir; this.ledge = null; this.body.allowGravity = false; this.setStanding();
+    this.vault = { dir: L.dir, speed: Math.max(Math.abs(this.body.velocity.x), m.walkSpeed ?? 240) };
+    this.airJumps = m.airJumps ?? 0; this.airDash = true; this.cut = false; this.flipUntil = 0;
+    this.startMantle(time, top, q0, Math.max(80, (m.vaultTime ?? 300) * (1 - q0) / 0.42));
+  }
+  mantleP(time) { return Math.min(1, (time - this.mantleAt) / (this.mantleDur ?? this.m.mantleTime ?? 450)); }
+  mantle(time, dir = 0) {
     this.body.setVelocity(0, 0);
     if (this.mantleP(time) < 1) return;
     const t = this.mantleTo, b = this.body;
     b.checkCollision.none = false; b.allowGravity = true; this.ledge = null;
+    // after a vault with the direction still held: straight on running (round movement), no crouch in between
+    const V = this.vault; this.vault = null;
+    if (V && dir === V.dir && this.scene.rectFree(t.x - this.size.w / 2 + 2, t.feet - this.size.h, this.size.w - 4, this.size.h - 2)) {
+      this.setStanding(); b.reset(t.x, t.feet - this.size.h / 2); b.setVelocityX(dir * V.speed);
+      this.state = 'normal'; this.squash = { x: 1.06, y: 0.94 }; this.lastGround = time;
+      return;
+    }
     this.setCrouch(); b.reset(t.x, t.feet - this.size.h / 2);   // offset keeps the feet at the bottom
     this.state = 'crouch'; this.crouchF = this.crouchFrames() - 1; this.rising = true;
   }
@@ -546,7 +570,7 @@ export class Leyla {
       const climbFrom = Math.min(n - 1, Math.max(0, (this.m.climbFromFrame ?? 1) - 1)), climbN = Math.max(1, n - climbFrom);
       const landFrom = Math.min(n - 1, Math.max(0, (this.m.landFromFrame ?? 4) - 1));
       const brakeFrom = Math.min(n - 1, Math.max(0, (this.d.brake?.fromFrame ?? 2) - 1));
-      const f = st === 'land' ? Math.round(landFrom + (n - 1 - landFrom) * this.landP(time)) : st === 'brake' ? Math.min(n - 1, brakeFrom + Math.floor((n - brakeFrom) * this.brakeP(time))) : climbFrames ? climbFrom + Math.floor((this.climbDist || 0) / Math.max(1, this.m.climbStep ?? 24)) % climbN : flipFrames ? Math.round(flipFrom + (n - 1 - flipFrom) * flipP) : st === 'mantle' ? Math.round(from + (n - 1 - from) * this.mantleP(time)) : st === 'dash' ? Math.round(dashFrom + (n - 1 - dashFrom) * dashP) : Math.round(Math.min(n - 1, this.crouchF || 0));
+      const f = st === 'land' ? Math.round(landFrom + (n - 1 - landFrom) * this.landP(time)) : st === 'brake' ? Math.min(n - 1, brakeFrom + Math.floor((n - brakeFrom) * this.brakeP(time))) : climbFrames ? climbFrom + Math.floor((this.climbDist || 0) / Math.max(1, this.m.climbStep ?? 24)) % climbN : flipFrames ? Math.round(flipFrom + (n - 1 - flipFrom) * flipP) : st === 'mantle' ? Math.round(from + (n - 1 - from) * ((this.mantleQ0 || 0) + (1 - (this.mantleQ0 || 0)) * this.mantleP(time))) : st === 'dash' ? Math.round(dashFrom + (n - 1 - dashFrom) * dashP) : Math.round(Math.min(n - 1, this.crouchF || 0));
       if (!an0.isPaused) an0.pause();
       this.sprite.setFrame(fr[f].frame.name);
     }
@@ -576,8 +600,9 @@ export class Leyla {
     this.sprite.setPosition(b.center.x, b.bottom).setRotation(rot);
     if (st === 'mantle') {   // the picture lifts the feet itself, so the anchor only rises the rest of the way
       const p = this.mantleP(time), F = this.mantleFrom, T = this.mantleTo, e = p * p * (3 - 2 * p);
-      const lift = info.used === 'mantle' ? this.size.mantleLift : 0, ex = Math.max(0, Math.min(1, (p - 0.4) / 0.6));
-      this.sprite.setPosition(F.x + (T.x - F.x) * ex * ex * (3 - 2 * ex), F.feet + (T.feet + lift - F.feet) * e);
+      const lift = info.used === 'mantle' ? this.size.mantleLift : 0, q0 = this.mantleQ0 || 0, l0 = lift * q0;   // a vault starts mid-pull-up: the picture already lifts the feet a bit
+      const ex = Math.max(0, Math.min(1, (p - 0.4 * (1 - q0)) / (1 - 0.4 * (1 - q0))));
+      this.sprite.setPosition(F.x + (T.x - F.x) * ex * ex * (3 - 2 * ex), F.feet + l0 + (T.feet + lift - F.feet - l0) * e);
     }
     this.sprite.setScale(info.scale * sx, info.scale * sy);
     const flipped = info.flip ? this.facing > 0 : this.facing < 0;
