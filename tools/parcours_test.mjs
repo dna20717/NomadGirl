@@ -71,6 +71,18 @@ v = await page.evaluate(() => {
 });
 check('Van: Leiter hoch (oben seitlich hochziehen), Dach begehbar', v.pulled === 'mantle' && Math.abs(v.feet - v.roof) < 3 && v.front, v);
 await shot('van');
+// ladder: frames follow the way climbed (8 frames = 64 px), ↓ slides down fast without animation
+v = await page.evaluate(() => {
+  const n = nomad, l = game.scene.getScene('play').leyla; P.tp(5.2, 18); n.step(10);
+  n.step(1, ['up'], ['up']); n.step(12, ['up']); const y0 = l.feet, f0 = l.sprite.anims.currentFrame?.index; const frames = new Set();
+  for (let i = 0; i < 20; i++) { n.step(1, ['up']); frames.add(l.sprite.frame.name); }
+  const climbed = y0 - l.feet, fr = l.sprite.anims.currentFrame?.index, slideFrames = new Set(); let vy = 0;
+  for (let i = 0; i < 12; i++) { n.step(1, ['down']); slideFrames.add(l.sprite.frame.name); vy = Math.max(vy, l.body.velocity.y); }
+  const st = l.state; n.step(60, ['down']); n.step(40);
+  return { climbed, frames: frames.size, slideFrames: slideFrames.size, vy: Math.round(vy), st, speed: l.m.climbSpeed, step: l.m.climbStep };
+});
+check('Leiter: Frames laufen im Takt des Kletterwegs', Math.abs(v.frames - Math.min(8, v.climbed / v.step)) <= 1.5, v);
+check('Leiter: ↓ rutscht schnell runter, ohne Animation', v.st === 'climb' && v.slideFrames === 1 && v.vy > v.speed * 2, v);
 // ledges: crouch at the pit edge, ↓ + towards the pit = hang, W = pull up; jump at the pit wall = grab it; two idles at random
 v = await page.evaluate(() => {
   const n = nomad, T = 64; P.tp(29.3, 18); n.step(10);

@@ -238,6 +238,9 @@ export class Leyla {
     if ((time >= this.slideEnd && !blocked) || (!grounded && !blocked) || b.blocked.left || b.blocked.right) {
       if (blocked) { this.facing *= -1; return; }   // stuck in a tunnel: crawl back out
       this.endSlide();
+      // direction still held: run on at full pace (Daniel, 11.11.2026: one frame standing still after the slide looked like a stutter)
+      const dir = (input.right.down ? 1 : 0) - (input.left.down ? 1 : 0);
+      if (dir === this.facing && grounded) b.setVelocityX(this.facing * (this.m.runSpeed ?? 440));
     }
   }
   endSlide() { this.state = 'normal'; this.setStanding(); this.squash = { x: 0.92, y: 1.08 }; }
@@ -252,10 +255,16 @@ export class Leyla {
   }
   climb(time, input, dir, grounded) {
     const b = this.body, L = this.ladder, m = this.m;
-    const v = ((input.down.down ? 1 : 0) - (input.up.down ? 1 : 0)) * (m.climbSpeed ?? 180);
+    // ↓ = slide down (Daniel, 11.11.2026: „rutschen, keine Animation, schneller runter“; Leyla › Klettern & Schwingen › Rutschen, 0 = klettern)
+    const slideDown = input.down.down && !input.up.down && (m.ladderSlide ?? 560) > 0;
+    const v = slideDown ? Math.min(m.ladderSlide ?? 560, Math.max(m.climbSpeed ?? 150, b.velocity.y + (m.ladderSlide ?? 560) / 10)) : ((input.down.down ? 1 : 0) - (input.up.down ? 1 : 0)) * (m.climbSpeed ?? 150);
     b.setVelocity(0, v);
-    this.climbPhase = (this.climbPhase || 0) + Math.abs(v) / 1000;
-    this.climbDist = (this.climbDist || 0) + Math.abs(v) / 60;   // px climbed (per frame at 60 fps), drives the climb frames
+    this.climbSliding = slideDown;
+    if (slideDown && Math.random() < 0.25) this.scene.fx.dust(this.x, this.y - this.size.h * 0.3, 1);
+    if (!slideDown) {
+      this.climbPhase = (this.climbPhase || 0) + Math.abs(v) / 1000;
+      this.climbDist = (this.climbDist || 0) + Math.abs(v) / 60;   // px climbed (per frame at 60 fps), drives the climb frames
+    }
     // near the top: pull up sideways like at a ledge (hands at the top rung), then stand up from the crouch
     if (v < 0 && m.ladderMantle !== false && this.feet <= L.top + this.size.hangReach && this.feet > L.top + 8) {
       const z = this.size, top = { x: L.cx, feet: L.top };
