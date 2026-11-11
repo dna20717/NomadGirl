@@ -126,7 +126,8 @@ export const AREAS = {
       { title: 'Kamera', fields: [num('camera.zoom', 'Zoom', { min: 0.3, max: 2, step: 0.05, hint: '1 = 1920×1080 Spielpixel sichtbar, 0,75 = weiter raus (mehr sichtbar), über 1 = näher ran' }),
         num('camera.lookAhead', 'Vorlauf', { unit: 'px', min: 0, hint: 'So weit schaut die Kamera in Laufrichtung voraus' }), num('camera.follow', 'Nachziehen', { min: 0.01, max: 1, step: 0.01, hint: '1 = klebt an Leyla, kleiner = weicher' })] },
       { title: 'Kacheln', fields: [ref('tiles.platform', 'Plattform', 'assets', { hint: 'Asset der Art „Kacheln“ mit 4 Frames: einzeln, links, Mitte, rechts. Leer = aus Code gezeichnet' }),
-        ref('tiles.terrain', 'Kachel-Set', 'terrain', { hint: 'Wände und Böden in allen Räumen ohne eigenes Kachel-Set. Leer = aus Code gezeichnet' })] },
+        ref('tiles.terrain', 'Kachel-Set', 'terrain', { hint: 'Wände und Böden in allen Räumen ohne eigenes Kachel-Set. Leer = aus Code gezeichnet' }),
+        num('tiles.leylaCm', 'Leyla ist groß', { unit: 'cm', min: 50, hint: 'Maßstab für Clutter-Größen: Leylas Höhe im Spiel (Asset Stehen) entspricht so vielen Zentimetern. Leer = 170' })] },
       { title: 'Spawn-Punkt', fields: [bool('spawn.enabled', 'Zeigen'), ref('spawn.look', 'Aussehen', 'assets', { hint: 'Bild oder Animation; der Ankerpunkt des Assets sitzt auf Leylas Start (L im Raum-Layout)' }),
         point('spawn.offset', 'Versatz', { unit: 'px', hint: 'Verschiebt das Bild gegenüber dem Start (x nach rechts, y nach unten)' }), bool('spawn.flip', 'Gespiegelt'),
         select('spawn.layer', 'Ebene', [['behindWalls', 'Hinter Wänden'], ['front', 'Vor Wänden, hinter Leyla']], { hint: 'Hinter Wänden: Wände verdecken das Bild, wenn es hineinragt' })] },
@@ -702,6 +703,8 @@ export const AREAS = {
         ref('propsBig', 'Großer Clutter · Raster', 'assets', { hint: 'Asset der Art „Symbole“ mit Feldern für Dinge über zwei Kacheln (z. B. 128 × 128)' }),
         num('bigChance', 'Großer Clutter', { unit: '%', min: 0, max: 100, hint: 'Chance je Platz: zwei Oberflächen-Kacheln nebeneinander, darüber zwei Kacheln Luft' }),
         lines('bigClutter', 'Großer Clutter', { hint: 'Namen aus dem Großer-Clutter-Raster, eine pro Zeile' }),
+        table('sizes', 'Größen', [text('name', 'Name'), num('cm', 'Höhe', { unit: 'cm', min: 1 })], { hint: 'Echte Höhe je Clutter (Name aus einem der Raster); das Spiel skaliert pixelscharf, Leyla = Spiel › Kacheln › Leyla ist groß. Ohne Zeile: so groß wie im Raster gemalt' }),
+        num('sizeMax', 'Höchstens vergrößern', { unit: '%', min: 100, max: 400, hint: 'Deckel für das Vergrößern, damit Pixel nicht zu klobig werden. Leer = 200' }),
         num('seed', 'Zufall', { min: 0, hint: 'Andere Zahl = andere Verteilung (gleich bleibt gleich)' })] },
     ],
     check: (x, report, p) => {
@@ -715,6 +718,7 @@ export const AREAS = {
       const B = names(x.propsBig);
       if (x.propsBig && !B) report('error', 'Großer-Clutter-Raster ist kein Asset der Art „Symbole“');
       for (const n of x.bigClutter || []) if (B && !B.has(n)) report('error', `„${n}“ gibt es im Großer-Clutter-Raster nicht`);
+      for (const r of x.sizes || []) if (!(P?.has(r.name) || B?.has(r.name))) report('warning', `Größe für „${r.name}“: gibt es in keinem Raster`);
     },
   },
   rooms: {

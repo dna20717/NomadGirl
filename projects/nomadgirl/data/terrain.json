@@ -26,24 +26,30 @@
    "desert3_14",
    "desert3_15"
   ],
-  "decalChance": 6,
-  "decals": ["decal_0", "decal_6", "decal_7", "decal_9", "decal_10", "decal_14", "decal_15"],
+  "decalChance": 3,
+  "decals": ["decal_9", "decal_10", "decal_14", "decal_15", "decal_0"],
   "description": "Festgetretene Erde mit Kieseln, Sandkruste oben. Für draußen (Vorplatz, Testräume).",
-  "details": [
-   "detail_desert_0",
-   "detail_desert_1",
-   "detail_desert_2",
-   "detail_desert_3",
-   "detail_desert_4",
-   "detail_desert_6",
-   "detail_desert_7",
-   "detail_desert_10",
-   "detail_desert_11",
-   "detail_desert_12",
-   "detail_desert_13",
-   "detail_desert_15"
+  "details": ["detail_desert_1", "detail_desert_4", "detail_desert_10", "detail_desert_13", "detail_desert_0", "detail_desert_2"],
+  "detailChance": 5,
+  "sizes": [
+   {"name": "desert3_0", "cm": 25},
+   {"name": "desert3_1", "cm": 200},
+   {"name": "desert3_2", "cm": 60},
+   {"name": "desert3_3", "cm": 90},
+   {"name": "desert3_4", "cm": 90},
+   {"name": "desert3_5", "cm": 20},
+   {"name": "desert3_6", "cm": 90},
+   {"name": "desert3_7", "cm": 30},
+   {"name": "desert3_8", "cm": 45},
+   {"name": "desert3_9", "cm": 25},
+   {"name": "desert3_10", "cm": 160},
+   {"name": "desert3_11", "cm": 70},
+   {"name": "desert3_12", "cm": 45},
+   {"name": "desert3_13", "cm": 35},
+   {"name": "desert3_14", "cm": 25},
+   {"name": "desert3_15", "cm": 50}
   ],
-  "detailChance": 14
+  "sizeMax": 200
  },
  "concrete": {
   "name": "Beton · Linoleum",
@@ -110,7 +116,30 @@
   "detailChance": 14,
   "propsBig": "tileset00_props_big",
   "bigClutter": ["big_station_0", "big_station_1", "big_station_2", "big_station_3"],
-  "bigChance": 35
+  "bigChance": 35,
+  "sizes": [
+   {"name": "station3_0", "cm": 45},
+   {"name": "station3_1", "cm": 85},
+   {"name": "station3_2", "cm": 30},
+   {"name": "station3_3", "cm": 25},
+   {"name": "station3_4", "cm": 30},
+   {"name": "station3_5", "cm": 30},
+   {"name": "station3_6", "cm": 25},
+   {"name": "station3_7", "cm": 90},
+   {"name": "station3_8", "cm": 75},
+   {"name": "station3_9", "cm": 50},
+   {"name": "station3_10", "cm": 80},
+   {"name": "station3_11", "cm": 45},
+   {"name": "station3_12", "cm": 55},
+   {"name": "station3_13", "cm": 60},
+   {"name": "station3_14", "cm": 15},
+   {"name": "station3_15", "cm": 50},
+   {"name": "big_station_0", "cm": 185},
+   {"name": "big_station_1", "cm": 180},
+   {"name": "big_station_2", "cm": 85},
+   {"name": "big_station_3", "cm": 190}
+  ],
+  "sizeMax": 200
  },
  "concrete_wall": {
   "name": "Beton · glatte Wand",
@@ -184,7 +213,30 @@
   "detailChance": 14,
   "propsBig": "tileset00_props_big",
   "bigClutter": ["big_industry_0", "big_industry_1", "big_industry_2", "big_industry_3"],
-  "bigChance": 35
+  "bigChance": 35,
+  "sizes": [
+   {"name": "industry3_0", "cm": 80},
+   {"name": "industry3_1", "cm": 30},
+   {"name": "industry3_2", "cm": 110},
+   {"name": "industry3_3", "cm": 60},
+   {"name": "industry3_4", "cm": 50},
+   {"name": "industry3_5", "cm": 70},
+   {"name": "industry3_6", "cm": 60},
+   {"name": "industry3_7", "cm": 25},
+   {"name": "industry3_8", "cm": 80},
+   {"name": "industry3_9", "cm": 90},
+   {"name": "industry3_10", "cm": 60},
+   {"name": "industry3_11", "cm": 100},
+   {"name": "industry3_12", "cm": 25},
+   {"name": "industry3_13", "cm": 45},
+   {"name": "industry3_14", "cm": 90},
+   {"name": "industry3_15", "cm": 35},
+   {"name": "big_industry_0", "cm": 110},
+   {"name": "big_industry_1", "cm": 150},
+   {"name": "big_industry_2", "cm": 130},
+   {"name": "big_industry_3", "cm": 185}
+  ],
+  "sizeMax": 200
  },
  "ruins": {
   "name": "Ruine · Ziegel",
@@ -234,6 +286,25 @@
   ],
   "description": "Zerfallene Ziegel mit Schutt und Moos oben. Für Stadt-Ruinen.",
   "details": ["detail_ruins_3", "detail_ruins_4", "detail_ruins_8", "detail_ruins_9", "detail_ruins_11", "detail_ruins_13", "detail_ruins_15"],
-  "detailChance": 14
+  "detailChance": 14,
+  "sizes": [
+   {"name": "ruins3_0", "cm": 35},
+   {"name": "ruins3_1", "cm": 50},
+   {"name": "ruins3_2", "cm": 40},
+   {"name": "ruins3_3", "cm": 60},
+   {"name": "ruins3_4", "cm": 45},
+   {"name": "ruins3_5", "cm": 70},
+   {"name": "ruins3_6", "cm": 50},
+   {"name": "ruins3_7", "cm": 20},
+   {"name": "ruins3_8", "cm": 110},
+   {"name": "ruins3_9", "cm": 70},
+   {"name": "ruins3_10", "cm": 65},
+   {"name": "ruins3_11", "cm": 100},
+   {"name": "ruins3_12", "cm": 60},
+   {"name": "ruins3_13", "cm": 50},
+   {"name": "ruins3_14", "cm": 40},
+   {"name": "ruins3_15", "cm": 110}
+  ],
+  "sizeMax": 200
  }
 }

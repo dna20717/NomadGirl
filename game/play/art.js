@@ -13,6 +13,7 @@ export const PLACEHOLDER_COLORS = {
 // stamps: [{ key, frame, x, y }] texture frames drawn on top (tiles from assets), over: graphics drawn after the stamps (edges)
 function bake(scene, g, x0, y0, w, h, { depth = 0, scroll = null, stamps = [], over = null } = {}) {
   const C = 2048;
+  let stamp = null;
   for (let cy = 0; cy < h; cy += C) for (let cx = 0; cx < w; cx += C) {
     const cw = Math.min(C, w - cx), ch = Math.min(C, h - cy);
     const rt = scene.add.renderTexture(x0 + cx, y0 + cy, cw, ch).setOrigin(0).setDepth(depth);
@@ -20,14 +21,45 @@ function bake(scene, g, x0, y0, w, h, { depth = 0, scroll = null, stamps = [], o
     // only the stamps that reach into this chunk, drawn as one batch (big rooms have thousands of tiles)
     const mine = stamps.filter(st => st.x < x0 + cx + cw && st.x + 256 > x0 + cx && st.y < y0 + cy + ch && st.y + 256 > y0 + cy);
     if (mine.length) {
-      rt.beginDraw();
-      for (const st of mine) rt.batchDrawFrame(st.key, st.frame, st.x - x0 - cx, st.y - y0 - cy);
-      rt.endDraw();
+      // in order: plain frames go in one batch, a scaled one (clutter at real size) ends the batch and is drawn on its own
+      let open = false;
+      for (const st of mine) {
+        if (!st.scale) { if (!open) { rt.beginDraw(); open = true; } rt.batchDrawFrame(st.key, st.frame, st.x - x0 - cx, st.y - y0 - cy); continue; }
+        if (open) { rt.endDraw(); open = false; }
+        stamp ||= scene.make.image({ key: st.key }, false);
+        stamp.setTexture(st.key, st.frame).setOrigin(st.ox, st.oy).setScale(st.scale);
+        rt.draw(stamp, st.ax - x0 - cx, st.ay - y0 - cy);
+      }
+      if (open) rt.endDraw();
     }
     if (over) rt.draw(over, -(x0 + cx), -(y0 + cy));
     if (scroll) rt.setScrollFactor(...scroll);
   }
-  g.destroy(); over?.destroy();
+  g.destroy(); over?.destroy(); stamp?.destroy();
+}
+
+// painted part of a frame (transparent rows/columns around it), measured once per frame
+const boxes = new Map();
+function contentBox(scene, key, frame) {
+  const id = key + '#' + frame;
+  if (boxes.has(id)) return boxes.get(id);
+  const f = scene.textures.getFrame(key, frame), w = f.cutWidth, h = f.cutHeight;
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const ctx = c.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(f.source.image, f.cutX, f.cutY, w, h, 0, 0, w, h);
+  const a = ctx.getImageData(0, 0, w, h).data;
+  let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (a[(y * w + x) * 4 + 3] > 40) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+  const b = x1 < 0 ? null : { x0, y0, x1: x1 + 1, y1: y1 + 1, w, h };
+  boxes.set(id, b);
+  return b;
+}
+// a clutter stamp standing on the ground at (cx, ground): real height from the set's table Größen, else 1:1 in its cell
+function propStamp(scene, kit, key, frame, cx, ground) {
+  const cm = kit.sizes.get(key + '#' + frame), b = cm && contentBox(scene, key, frame);
+  if (!b) { const f = scene.textures.getFrame(key, frame); return { key, frame, x: cx - f.cutWidth / 2, y: ground - f.cutHeight }; }
+  const scale = Math.min(kit.maxScale, cm * kit.pxPerCm / (b.y1 - b.y0)), w = (b.x1 - b.x0) * scale, hh = (b.y1 - b.y0) * scale;
+  return { key, frame, scale, ox: (b.x0 + b.x1) / 2 / b.w, oy: b.y1 / b.h, ax: cx, ay: ground, x: cx - w / 2, y: ground - hh };
 }
 
 // small deterministic random so the skyline looks the same every time
@@ -129,6 +161,15 @@ export function terrainKits(scene, D) {
         props: props ? t.props : null, pcell: props ? p.cell : null, clutter: props ? list('clutter', p) : [], decals: props ? list('decals', p) : [], details: props ? list('details', p) : [] };
       const big = b?.kind === 'icons' && b.cell && scene.textures.exists(t.propsBig) ? list('bigClutter', b) : [];
       kit.big = big.length ? { key: t.propsBig, cell: b.cell, list: big } : null;
+      for (const k of [t.props, kit.big?.key]) if (k) scene.textures.get(k).setFilter(1);   // NEAREST: scaled pixel art stays sharp
+      // Größen: real height in cm per clutter name (props and big props), Leyla's height sets the pixels per cm
+      kit.sizes = new Map();
+      for (const r of t.sizes || []) {
+        for (const [k, asset] of [[t.props, p], [t.propsBig, b]]) { const i = (asset?.names || []).indexOf(r.name); if (i >= 0 && r.cm > 0) kit.sizes.set(k + '#' + i, r.cm); }
+      }
+      const L = A[D.leyla?.look?.idle];
+      kit.pxPerCm = (L?.height || 192) / (D.game?.tiles?.leylaCm || 170);
+      kit.maxScale = (t.sizeMax || 200) / 100;
       if (!kit.top.length || !kit.fill.length) kit = null;
     }
     cache.set(id, kit);
@@ -172,11 +213,11 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       const free = (xx) => solid(xx, y) && !solid(xx, y - 1) && room.tiles[y - 1]?.[xx] === '.' && room.tiles[y - 2]?.[xx] === '.';
       if (top && kit.big && !taken.has(x) && free(x) && free(x + 1) && solid(x - 1, y) && solid(x + 2, y) && terrain?.at(x + 1, y) === kit && hash(x, y, seed + 7) * 100 < (D.bigChance ?? 0)) {
         const B = kit.big;
-        clutter.push({ key: B.key, frame: B.list[Math.floor(hash(x, y, seed + 8) * B.list.length)], x: px + T - B.cell[0] / 2, y: py - B.cell[1] + 4 });
+        clutter.push(propStamp(scene, kit, B.key, B.list[Math.floor(hash(x, y, seed + 8) * B.list.length)], px + T, py + 4));
         taken.add(x); taken.add(x + 1);
       }
       if (top && air && !taken.has(x) && kit.clutter.length && solid(x - 1, y) && solid(x + 1, y) && hash(x, y, seed + 3) * 100 < (D.clutterChance ?? 0))
-        clutter.push({ key: kit.props, frame: kit.clutter[Math.floor(hash(x, y, seed + 4) * kit.clutter.length)], x: px + (T - kit.pcell[0]) / 2, y: py - kit.pcell[1] + 4 });
+        clutter.push(propStamp(scene, kit, kit.props, kit.clutter[Math.floor(hash(x, y, seed + 4) * kit.clutter.length)], px + T / 2, py + 4));
       // edges from code: shade inside, then the outline (left, right, bottom; the top tile brings its own)
       const E = D.edge || {}, ow = E.width ?? 2, sw = E.shadeWidth ?? 3, sa = (E.shade ?? 40) / 100, oc = hexInt(E.color, 0x060608);
       const side = (open, rx, ry, rw, rh, ix, iy, iw, ih) => { if (!open) return; edges.fillStyle(0x060608, sa).fillRect(ix, iy, iw, ih); edges.fillStyle(oc).fillRect(rx, ry, rw, rh); };
