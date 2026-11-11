@@ -90,6 +90,10 @@ export class Leyla {
     if (input.jump.pressed) this.jumpAt = time;
     const dir = (input.right.down ? 1 : 0) - (input.left.down ? 1 : 0);
 
+    if (this.hitAnim) {   // the hit reaction runs out, or running / jumping / dash breaks it off after "Abbrechen ab"
+      const h = this.hitAnim, p = (time - h.at) / h.dur;
+      if (p >= 1 || this.state !== 'normal' || (p >= (this.d.hit?.cancelAfter ?? 50) / 100 && (dir || input.jump.pressed || input.dash.pressed || input.melee.pressed || input.ranged.pressed))) this.hitAnim = null;
+    }
     switch (this.state) {
       case 'normal': this.normal(time, s, input, dir, grounded); break;
       case 'dash': this.dash(time, input); break;
@@ -419,9 +423,17 @@ export class Leyla {
     const away = Math.sign(this.x - fromX) || -this.facing;
     this.body.setVelocity(away * 520, low ? 0 : -420);
     if (low) this.facing = away;
-    this.sprite.setTintFill(0xff4060);
-    this.scene.time.delayedCall(90, () => this.sprite.clearTint());
-    if (this.health <= 0) this.die();
+    // hit reaction (Leyla › Treffer, Daniel 11.11.2026): light or heavy animation, effects from code (white flash, then red)
+    const H = this.d.hit || {}, heavy = damage >= (H.heavyFrom ?? 20) && this.d.look?.hitHeavy, look = heavy ? this.d.look.hitHeavy : this.d.look?.hit;
+    if (look && this.scene.textures.exists(look) && H.enabled !== false) {
+      this.hitAnim = { at: time, look, heavy: !!heavy, dur: heavy ? H.heavyTime ?? 520 : H.time ?? 360 };
+      this.attack = null; this.charging = null; this.special = null;
+    }
+    this.sprite.setTintFill(0xffffff);
+    this.scene.time.delayedCall(H.flash ?? 50, () => { if (this.alive) { this.sprite.setTintFill(0xff4060); this.scene.time.delayedCall(70, () => this.sprite.clearTint()); } });
+    this.scene.fx.impact?.(this.x - away * this.size.w * 0.4, this.chest, away, heavy);
+    if (H.hitstop !== 0) this.scene.hitstop(time, heavy ? (H.hitstop ?? 60) * 1.6 : H.hitstop ?? 60);
+    if (this.health <= 0) { this.hitAnim = null; this.die(); }
     return true;
   }
   die() {
@@ -479,6 +491,13 @@ export class Leyla {
       const [c0, c1] = this.d.melee?.chargeLoop || [3, 10], t = time - this.charging.at - (this.d.melee?.chargeAfter ?? 250), n0 = Math.max(1, c0 - 1);
       name = '@' + L.meleeHeavy;
       pin = t < n0 * 60 ? Math.floor(t / 60) : c0 - 1 + Math.floor((t - n0 * 60) / 110) % Math.max(1, c1 - c0 + 1);   // into the crouch, then the charging loop
+    }
+    // hit reaction: snap into the pose within "Treffer sitzt nach" frames, then recover to standing over the rest of the time
+    if (this.hitAnim && st === 'normal') {
+      const h = this.hitAnim, a = this.scene.data_.assets?.[h.look], n = a?.frames || 1, H = this.d.hit || {};
+      const inN = Math.min(n - 1, H.inFrames ?? 3), inT = H.inTime ?? 70, t = time - h.at;
+      const f = t < inT ? Math.floor(t / inT * inN) : inN + Math.floor((t - inT) / Math.max(1, h.dur - inT) * (n - inN));
+      name = '@' + h.look; armedFrom = 1; armedFrame = Math.min(1, Math.min(n - 1, f) / Math.max(1, n - 1)); pin = null;
     }
     // mantle and crouch pick their frame from the progress (crouch backwards = standing up)
     const flipFrames = name === 'airJump' && (this.m.airJumpFromFrame ?? 1) > 1;
@@ -619,7 +638,7 @@ export class Leyla {
     const A = this.d.armed || {}, s = this.scene, v = this.body.velocity;
     const slow = Math.abs(v.x) <= (this.m.walkSpeed ?? 240) * 1.15 || this.gunRunning(v, true);
     const can = A.enabled !== false && this.d.look?.aim && s.weapon('ranged') && (s.mode !== 'camp' || A.inCamp) && this.state === 'normal' && grounded && !this.attack && !this.charging
-      && this.fight.on && slow;
+      && this.fight.on && slow && !this.hitAnim;
     this.armed ??= 'off';
     if (!can) { if (this.armed === 'on') this.armedLost = time; this.armed = 'off'; this.drawP = 0; return; }
     // back on the ground after a jump or dash in a fight: the gun comes straight back (Leyla › Kampfmodus › Wieder im Anschlag)

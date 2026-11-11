@@ -70,7 +70,9 @@
   "meleeHeavyWalk": "leyla_melee_heavy_walk_side",
   "yoga": "leyla_yoga_front",
   "brake": "leyla_brake_side",
-  "runGun": "leyla_run_gun_side"
+  "runGun": "leyla_run_gun_side",
+  "hit": "leyla_hit_side",
+  "hitHeavy": "leyla_hit_heavy_side"
  },
  "idleAltChance": 50,
  "inventory": {
@@ -131,5 +133,6 @@
  },
  "yoga": {"fps": 6, "backFps": 10, "holdFrom": 12},
  "brake": {"enabled": true, "minSpeed": 85, "minRun": 350, "time": 650, "slide": 55, "fromFrame": 2, "cancel": 40},
- "fight": {"enabled": true, "auto": true, "sight": 10, "calm": 4, "onHit": true, "redraw": 700}
+ "fight": {"enabled": true, "auto": true, "sight": 10, "calm": 4, "onHit": true, "redraw": 700},
+ "hit": {"enabled": true, "heavyFrom": 20, "time": 360, "heavyTime": 520, "inFrames": 3, "inTime": 70, "cancelAfter": 50, "flash": 50, "hitstop": 60}
 }

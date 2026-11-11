@@ -596,6 +596,7 @@ export class PlayScene extends Phaser.Scene {
   }
 
   update(time, delta) {
+    this.now = time;   // the loop's clock (hits, shots and Leyla run on it; scene.time.now is another clock)
     let input = this.readInput();
     this.padMenus(input);
     // Esc / Start: closes what is open (inventory, controls), otherwise the pause menu (Daniel, 11.11.2026: controls hidden in a menu)

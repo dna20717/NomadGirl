@@ -73,11 +73,14 @@ const cm = await page.evaluate(() => {
   nomad.step(2, ['right'], ['ranged']); nomad.step(1, ['right']); out.shot = { ...L(), shown, mag0: mag, recoilNow: L().recoil };
   nomad.step(30);
   // aim help: on the little platform, the shooter stands on the ledge further right and a bit higher
-  nomad.tp(36 * 64, 576); s.leyla.facing = 1; nomad.step(2, [], ['ranged']); nomad.step(45);
+  s.leyla.invulnerableUntil = 1e12;   // the shooter fires back: no knockback off the platform here
+  nomad.tp(36 * 64, 576); s.leyla.facing = 1; nomad.step(2, [], ["ranged"]); nomad.step(75);
+  const sh = s.enemies.find(e => e.id === 'schuetze' && e.alive); sh.body.reset(2846, sh.body.center.y); sh.body.setVelocity(0, 0);   // he patrols: put him back in range
   out.target = s.combat.findTarget(s.leyla)?.id || null;
   const n0 = s.combat.shots.length; s.leyla.rangedReady = 0;
   nomad.step(1, [], ['ranged']); const p = s.combat.shots.filter(q => q.friendly).at(-1);
   out.aim = p ? { vx: Math.round(p.vx), vy: Math.round(p.vy), n: s.combat.shots.length - n0 } : null;
+  s.leyla.invulnerableUntil = 0;
   // classic: running holsters the gun
   localStorage.setItem('nomadgirl-shoot-style', 'classic');
   nomad.calm(); nomad.tp(22 * 64, 960); nomad.step(2, [], ['holster']); nomad.step(2, [], ['holster']); nomad.step(40); nomad.step(40, ['right']); out.classic = L();
@@ -92,6 +95,21 @@ check('Cells-like: Schuss im Rennen, Schlitten zuckt', cm.shot.mag === cm.shot.m
 check('Zielhilfe: Schütze erfasst, Schuss fliegt schräg zu ihm', cm.target === 'schuetze' && cm.aim && cm.aim.vy < -20 && cm.aim.vx > 1000, cm);
 check('Klassisch: im Rennen steckt sie die Waffe weg', cm.classic.style === 'classic' && cm.classic.armed === 'off' && cm.classic.vx > 400, cm.classic);
 check('Kampfmodus: weggesteckt bleibt sie friedlich', !cm.calm.fight.on && cm.calm.armed === 'off', cm.calm);
+
+// hit reaction (Leyla › Treffer): light and heavy animation, back to standing, running breaks it off after half the time
+const hit = await page.evaluate(() => {
+  const s = game.scene.getScene('play'), l = s.leyla, key = () => l.sprite.texture.key, out = {};
+  nomad.calm(); nomad.tp(22 * 64, 960); nomad.step(60);
+  l.invulnerableUntil = 0; l.hurt(s.now, 8, l.x + 50); nomad.step(7); out.light = key(); out.lightFrame = Number(l.sprite.frame.name); out.hp = l.health;
+  nomad.step(30); out.after = key();
+  l.invulnerableUntil = 0; l.hurt(s.now, 25, l.x + 50); nomad.step(9); out.heavy = key();
+  nomad.step(18, ['right']); out.cancel = { key: key(), anim: !!l.hitAnim, vx: Math.round(l.body.velocity.x) };
+  return out;
+});
+check('Treffer leicht: Animation, sitzt schnell', hit.light === 'leyla_hit_side' && hit.lightFrame >= 1, hit);
+check('Treffer: danach wieder Stehen', !/hit/.test(hit.after), hit);
+check('Treffer schwer ab 20 Schaden', hit.heavy === 'leyla_hit_heavy_side', hit);
+check('Treffer: Laufen bricht ab der Hälfte ab', !hit.cancel.anim && !/hit/.test(hit.cancel.key), hit);
 
 // movement without enemies
 await t(t => { t.restart(); t.calm(); });

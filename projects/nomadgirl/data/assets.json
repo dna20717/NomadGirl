@@ -2475,5 +2475,51 @@
    {"frame": 8, "from": [141, 52], "to": [176, 61]}
   ],
   "slideShift": 3
+ },
+ "leyla_hit_side_source": {
+  "name": "Leyla · Treffer leicht (Original)",
+  "kind": "source",
+  "file": "assets/leyla/hit_side_source.png",
+  "source": "KI (PixelLab)",
+  "date": "11.11.2026",
+  "description": "PixelLab: Stehen-Frame, Pose „zurückgeschleudert“ (Edit Pro Flash, Farben des Originals), Übergänge rein (4) und zurück ins Stehen (6) mit Animate Image; je 256 × 256."
+ },
+ "leyla_hit_heavy_side_source": {
+  "name": "Leyla · Treffer schwer (Original)",
+  "kind": "source",
+  "file": "assets/leyla/hit_heavy_side_source.png",
+  "source": "KI (PixelLab)",
+  "date": "11.11.2026",
+  "description": "PixelLab: Stehen-Frame, Pose „zusammengekrümmt“ (Edit Pro Flash, Farben des Originals), Übergänge rein (4) und zurück ins Stehen (6) mit Animate Image; je 256 × 256."
+ },
+ "leyla_hit_side": {
+  "name": "Leyla · Treffer leicht",
+  "kind": "animation",
+  "file": "assets/leyla/hit_side.png",
+  "frameSize": [140, 242],
+  "frames": 8,
+  "fps": 20,
+  "loop": false,
+  "origin": [100.5, 241],
+  "height": 192,
+  "source": "KI (PixelLab) + Code (Streifen, Farben eingerastet)",
+  "derivedFrom": "leyla_hit_side_source",
+  "date": "11.11.2026",
+  "description": "Pixel-Art ohne Effekte: wird von vorn getroffen, Oberkörper und Kopf fliegen zurück (Frame 3), dann zurück ins Stehen. Effekte macht der Code."
+ },
+ "leyla_hit_heavy_side": {
+  "name": "Leyla · Treffer schwer",
+  "kind": "animation",
+  "file": "assets/leyla/hit_heavy_side.png",
+  "frameSize": [122, 241],
+  "frames": 8,
+  "fps": 16,
+  "loop": false,
+  "origin": [70.5, 240],
+  "height": 191.2,
+  "source": "KI (PixelLab) + Code (Streifen, Farben eingerastet)",
+  "derivedFrom": "leyla_hit_heavy_side_source",
+  "date": "11.11.2026",
+  "description": "Pixel-Art ohne Effekte: krümmt sich nach einem schweren Treffer zusammen (Frame 3), richtet sich wieder auf ins Stehen."
  }
 }
