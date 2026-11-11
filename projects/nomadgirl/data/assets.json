@@ -2625,5 +2625,68 @@
   "derivedFrom": "leyla_melee_rise_side_source",
   "date": "11.11.2026",
   "description": "Kombo-Hieb: Schritt vor, Karambit in einem Bogen nach oben (Frame 4), zurück ins Stehen. Ohne Hieb-Spur, die kommt aus Code."
+ },
+ "icons_treasure": {
+  "name": "Symbole: Schätze & Wertsachen",
+  "kind": "icons",
+  "file": "assets/items/icons_treasure.png",
+  "grid": [4, 4],
+  "cell": [64, 64],
+  "names": [
+   "goldzahn",
+   "schallplatte",
+   "winkekatze",
+   "handheld",
+   "ring",
+   "kristallschaedel",
+   "neonschild",
+   "luxusuhr",
+   "geldbuendel",
+   "taschenuhr",
+   "juwelenchip",
+   "revolver",
+   "schneekugel",
+   "baseball",
+   "goetzenfigur",
+   "datenkristall"
+  ],
+  "description": "16 Wertsachen in einem 4 × 4-Raster à 64 px (Daniel, 11.11.2026: „Beute-Items gesondert erstellen lassen“). Stilvorlage icons_gear.",
+  "source": "KI (PixelLab, Create Image Pro, Stilbild icons_gear)",
+  "date": "11.11.2026"
+ },
+ "ws_guest_bunk": {
+  "name": "Werkstatt · Gästekoje",
+  "kind": "image",
+  "file": "assets/workshops/guest_bunk.png",
+  "origin": [128, 247],
+  "source": "KI (PixelLab, Create Image Pro, Stilbild Schlafkoje v2, Referenz Chill Area v2)",
+  "date": "11.11.2026",
+  "description": "Zwei Etagenbetten für Fahrgäste mit Vorhang, Leselampen, Klapptisch, Lichterkette. 256 × 256, Anker = Vorderkante des Bodens."
+ },
+ "ws_treasury_empty": {
+  "name": "Werkstatt · Schatzkammer leer",
+  "kind": "image",
+  "file": "assets/workshops/treasury_empty.png",
+  "origin": [128, 226],
+  "source": "KI (PixelLab, Create Image Pro, Stilbild Schlafkoje v2, Referenz Chill Area v2)",
+  "date": "11.11.2026",
+  "description": "Tresorraum mit leeren Wandregalen, Lochwand, Sockel und Absperrkordel; die Trophäen-Ständer liegen auf diesen Flächen."
+ },
+ "ws_treasury": {
+  "name": "Werkstatt · Schatzkammer voll",
+  "kind": "image",
+  "file": "assets/workshops/treasury.png",
+  "origin": [128, 226],
+  "derivedFrom": "ws_treasury_source",
+  "source": "KI (PixelLab, Edit Pro Flash auf der leeren Fassung), nur der Haufen übernommen (Code)",
+  "date": "11.11.2026",
+  "description": "Deckungsgleich mit der leeren Fassung, nur mit Schatzhaufen vorn. Je voller das Lager, desto mehr vom Haufen ist zu sehen."
+ },
+ "ws_treasury_source": {
+  "name": "Schatzkammer voll (Original)",
+  "kind": "source",
+  "file": "assets/workshops/treasury_source.png",
+  "source": "KI (PixelLab, Edit Pro Flash)",
+  "date": "11.11.2026"
  }
 }

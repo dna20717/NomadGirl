@@ -24,7 +24,7 @@ export function recipesFor(D, ws) {
 // the grids Leyla can use in the camp, in the order things are taken from them
 export function sources(D, save) {
   const g = save.inv.grids, out = [];
-  for (const c of containers(D, save)) if (c.key !== 'chest' && g[c.key]) out.push({ key: c.key, name: c.name, grid: g[c.key] });
+  for (const c of containers(D, save)) if (c.key !== 'chest' && c.stand == null && g[c.key]) out.push({ key: c.key, name: c.name, grid: g[c.key] });
   if (g.chest) out.push({ key: 'chest', name: 'Kiste', grid: g.chest });
   if (g.backpack) out.push({ key: 'backpack', name: 'Rucksack', grid: g.backpack });
   return out;

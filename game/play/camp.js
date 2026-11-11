@@ -3,7 +3,7 @@
 // Leyla walks around and uses things with E. Time only moves on actions (sleeping, sitting at the fire, driving, runs).
 // Graphics are code placeholders for now; a "look" on containers, workshops or companions takes over later.
 import { clockText, advance, hoursUntil, containers } from '../save.js';
-import { budgets, partSlots } from '../rig.js';
+import { budgets, partSlots, passengers } from '../rig.js';
 import { Benches, benchTexture, crateTexture } from './benches.js';
 
 const de = n => Number(n).toLocaleString('de-DE', { maximumFractionDigits: 1 });
@@ -825,6 +825,12 @@ export class Camp {
     if (def.function === 'sleep') return this.sleep(def);
     if (def.function === 'warroom') return this.warroom();
     if (['kitchen', 'craft'].includes(def.function)) { s.hud.inv?.close(); return s.hud.craft?.open(id); }
+    if (def.function === 'guests') {   // who sleeps here: the guests in order, as many as there are beds in all guest bunks
+      const P = passengers(this.D, this.box.save), nm = c => this.D.companions?.[c]?.name || c, waiting = Object.entries(this.box.save.waiting || {});
+      return s.hud.menu({ title: def.name || id, sub: [def.description, P.guests.length ? `Gäste an Bord: ${P.riding.map(nm).join(', ') || '–'} · ${P.beds} ${P.beds === 1 ? 'Bett' : 'Betten'} im Rig.` : `${P.beds} ${P.beds === 1 ? 'Bett' : 'Betten'} frei für Fahrgäste.`,
+        P.staying.length ? `Kein Bett für ${P.staying.map(nm).join(', ')}: ${P.staying.length > 1 ? 'sie bleiben' : 'bleibt'} beim nächsten Fahren hier.` : null,
+        waiting.length ? 'Wartet: ' + waiting.map(([loc, ids]) => `${ids.map(nm).join(', ')} bei ${this.D.locations?.[loc]?.name || loc}`).join(' · ') : null].filter(Boolean).join(' '), items: [{ label: 'Zurück', act: () => {} }] });
+    }
     const who = (this.box.save.companions || []).map(c => this.D.companions?.[c]).filter(c => c?.workshops?.includes(id)).map(c => c.name);
     if (def.rest?.verb) return this.restMenu(id, def, place, who);
     s.hud.menu({ title: def.name || id, sub: [def.description, who.length ? `Betreut von ${who.join(' und ')}.` : null, SOON[def.function] || 'Funktion kommt später.'].filter(Boolean).join(' '),
@@ -896,15 +902,24 @@ export class Camp {
         disabled: this.tooHeavy ? `Rig zu schwer (${this.budget.weight} von ${this.budget.pull} kg)` : t.fuel > save.fuel ? 'Zu wenig Sprit' : null, act: () => this.drive(id, t) });
     }
     items.push({ label: 'Zurück', act: () => {} });
-    s.hud.menu({ title: 'Warroom', sub: `Du bist bei ${here?.name || '–'}. Sprit ${de(save.fuel)} l · Vorräte ${de(save.food)}`, items });
+    const P = passengers(D, save), names = ids => ids.map(c => D.companions?.[c]?.name || c).join(' und ');
+    const guests = P.guests.length ? ` · Gäste ${P.guests.length}/${P.beds} Betten${P.staying.length ? `: ${names(P.staying)} ${P.staying.length > 1 ? 'bleiben' : 'bleibt'} beim Fahren hier (keine freie Gästekoje)` : ''}` : '';
+    s.hud.menu({ title: 'Warroom', sub: `Du bist bei ${here?.name || '–'}. Sprit ${de(save.fuel)} l · Vorräte ${de(save.food)}${guests}`, items });
   }
   drive(id, t) {
     const save = this.box.save, D = this.D;
     advance(save, t.hours);
     save.fuel = Math.max(0, Math.round((save.fuel - t.fuel) * 10) / 10);
     save.food = Math.max(0, Math.round((save.food - t.food) * 10) / 10);
+    // guests without a bed wait where they are; whoever waits at the new place comes back aboard
+    const P = passengers(D, save), from = save.location;
+    save.waiting ||= {};
+    if (P.staying.length) { save.waiting[from] = [...new Set([...(save.waiting[from] || []), ...P.staying])]; save.companions = save.companions.filter(c => !P.staying.includes(c)); }
+    const back = save.waiting[id] || [];
+    if (back.length) { save.companions = [...new Set([...save.companions, ...back])]; delete save.waiting[id]; }
     save.location = id;
-    this.scene.goCamp({ banner: [`Angekommen: ${D.locations?.[id]?.name || id}`, `${clockText(save)} · ${t.km} km · −${de(t.fuel)} l Sprit`], fade: 900, arriving: true });
+    const left = P.staying.map(c => D.companions?.[c]?.name || c), met = back.map(c => D.companions?.[c]?.name || c);
+    this.scene.goCamp({ banner: [`Angekommen: ${D.locations?.[id]?.name || id}`, [`${clockText(save)} · ${t.km} km · −${de(t.fuel)} l Sprit`, left.length ? `${left.join(', ')} wartet bei ${D.locations?.[from]?.name || from}` : '', met.length ? `${met.join(', ')} steigt wieder ein` : ''].filter(Boolean).join(' · ')], fade: 900, arriving: true });
   }
 
   // ---------- loop ----------
@@ -1006,7 +1021,7 @@ export class Camp {
   }
 }
 
-const VERB = { sleep: 'Schlafen', warroom: 'Planen', kitchen: 'Kochen', foodtruck: 'Verkaufen', craft: 'Herstellen', storage: 'Lager', cooling: 'Kühlraum', chill: 'Chillen', drone: 'Drohne', engine: 'Motor', power: 'Energie', cell: 'Zelle' };
+const VERB = { sleep: 'Schlafen', warroom: 'Planen', kitchen: 'Kochen', foodtruck: 'Verkaufen', craft: 'Herstellen', storage: 'Lager', cooling: 'Kühlraum', chill: 'Chillen', drone: 'Drohne', engine: 'Motor', power: 'Energie', cell: 'Zelle', guests: 'Gäste', treasury: 'Schatzkammer' };
 const SOON = { foodtruck: 'Verkaufen kommt später.', power: 'Liefert Energie für die Werkstätten im Rig.',
   storage: 'Das Lager füllt sich mit Schritt 2 (Beute & Rucksack).', cooling: 'Das Lager füllt sich mit Schritt 2 (Beute & Rucksack).', chill: 'Chillen gibt bald einen Buff.' };
 

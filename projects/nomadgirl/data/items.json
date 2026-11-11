@@ -43,7 +43,8 @@
   "stack": 1,
   "value": 45,
   "description": "Niemand weiß, warum das funktioniert. Sammler zahlen gut.",
-  "glyph": "🪩"
+  "glyph": "🪩",
+  "tags": ["trophy"]
  },
  "zettel_curry": {
   "name": "Fettiger Notizzettel",
@@ -77,7 +78,16 @@
   "glyph": "S",
   "description": "Riecht nach verbranntem Öl und Abenteuer."
  },
- "antenne": {"name": "Teleskopantenne", "category": "component", "size": [1, 3], "stack": 2, "value": 7, "glyph": "📡", "description": "Empfängt drei Sender. Alle spielen Werbung."},
+ "antenne": {
+  "name": "Teleskopantenne",
+  "category": "component",
+  "size": [1, 3],
+  "stack": 2,
+  "value": 7,
+  "glyph": "📡",
+  "description": "Empfängt drei Sender. Alle spielen Werbung.",
+  "tags": ["trophy"]
+ },
  "t_stueck": {"name": "T-Stück", "category": "junk", "size": [3, 2], "stack": 1, "value": 4, "shape": ["###", ".#."], "glyph": "T", "description": "Klempner-Tetris."},
  "autobatterie": {
   "name": "Autobatterie",
@@ -120,7 +130,8 @@
   "stack": 1,
   "value": 6,
   "glyph": "🗿",
-  "description": "Sollte ein Werkzeug werden. Ist jetzt Kunst. Sammler sind verwirrt, zahlen aber."
+  "description": "Sollte ein Werkzeug werden. Ist jetzt Kunst. Sammler sind verwirrt, zahlen aber.",
+  "tags": ["trophy"]
  },
  "gewuerzreis": {
   "name": "Gewürzreis",
@@ -302,7 +313,8 @@
   "size": [2, 2],
   "stack": 1,
   "value": 60,
-  "description": "Riecht nach Gummi und altem Atem. Hält Staub, Gift und ein paar Kratzer ab."
+  "description": "Riecht nach Gummi und altem Atem. Hält Staub, Gift und ein paar Kratzer ab.",
+  "tags": ["trophy"]
  },
  "plattentraeger": {
   "name": "Plattenträger",
@@ -327,7 +339,8 @@
   "size": [1, 1],
   "stack": 1,
   "value": 260,
-  "description": "Cyber-Augen mit Restlichtverstärker. Leyla trifft besser, auch im Dunkeln."
+  "description": "Cyber-Augen mit Restlichtverstärker. Leyla trifft besser, auch im Dunkeln.",
+  "tags": ["trophy"]
  },
  "reflex_booster": {
   "name": "Reflex-Booster",
@@ -402,5 +415,178 @@
   "stack": 1,
   "value": 120,
   "description": "Zange am Heck. Mama-Bot hebt damit Kleinkram auf und manchmal Leylas Snacks."
+ },
+ "goldzahn": {
+  "name": "Goldzahn",
+  "look": "icons_treasure",
+  "icon": 0,
+  "category": "valuable",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 35,
+  "description": "Aus einem Plünderer-Gebiss. Reden wir nicht drüber."
+ },
+ "schallplatte": {
+  "name": "Schallplatte",
+  "look": "icons_treasure",
+  "icon": 1,
+  "category": "valuable",
+  "size": [2, 2],
+  "stack": 1,
+  "value": 60,
+  "description": "Vinyl aus der Zeit vor dem Kollaps, die Hülle ist noch fast heil.",
+  "tags": ["trophy"]
+ },
+ "winkekatze": {
+  "name": "Winkekatze mit Cyberauge",
+  "look": "icons_treasure",
+  "icon": 2,
+  "category": "valuable",
+  "size": [2, 2],
+  "stack": 1,
+  "value": 80,
+  "description": "Winkt seit Jahrzehnten. Das rote Auge blinkt manchmal.",
+  "tags": ["trophy"]
+ },
+ "handheld": {
+  "name": "Alte Spielkonsole",
+  "look": "icons_treasure",
+  "icon": 3,
+  "category": "valuable",
+  "size": [1, 2],
+  "stack": 1,
+  "value": 70,
+  "description": "Läuft noch mit Batterien. Leyla hat so eine im Rucksack.",
+  "tags": ["trophy"]
+ },
+ "ring": {
+  "name": "Ehering mit Stein",
+  "look": "icons_treasure",
+  "icon": 4,
+  "category": "valuable",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 90,
+  "description": "Jemand hat ihn sehr lange getragen.",
+  "tags": ["trophy"]
+ },
+ "kristallschaedel": {
+  "name": "Kristallschädel",
+  "look": "icons_treasure",
+  "icon": 5,
+  "category": "valuable",
+  "size": [2, 2],
+  "stack": 1,
+  "value": 160,
+  "description": "Sieht aus wie aus einem alten Abenteuerfilm. Ist es vielleicht.",
+  "tags": ["trophy"]
+ },
+ "neonschild": {
+  "name": "Neonschild „OPEN“",
+  "look": "icons_treasure",
+  "icon": 6,
+  "category": "valuable",
+  "size": [2, 1],
+  "stack": 1,
+  "value": 75,
+  "description": "Leuchtet, sobald es Strom bekommt.",
+  "tags": ["trophy"]
+ },
+ "luxusuhr": {
+  "name": "Luxusuhr (Imitat)",
+  "look": "icons_treasure",
+  "icon": 7,
+  "category": "valuable",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 45,
+  "description": "Fühlt sich teuer an. Ist es nicht.",
+  "tags": ["trophy"]
+ },
+ "geldbuendel": {
+  "name": "Bündel alter Scheine",
+  "look": "icons_treasure",
+  "icon": 8,
+  "category": "valuable",
+  "size": [2, 1],
+  "stack": 1,
+  "value": 30,
+  "description": "Wertlos als Geld, aber Sammler zahlen dafür."
+ },
+ "taschenuhr": {
+  "name": "Goldene Taschenuhr",
+  "look": "icons_treasure",
+  "icon": 9,
+  "category": "valuable",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 110,
+  "description": "Tickt noch. Innen eine Gravur, kaum lesbar.",
+  "tags": ["trophy"]
+ },
+ "juwelenchip": {
+  "name": "Juwelenbesetzter Chip",
+  "look": "icons_treasure",
+  "icon": 10,
+  "category": "valuable",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 130,
+  "description": "Ein Implantat-Chip, mit Steinen verziert. Protz aus der Megacity."
+ },
+ "revolver": {
+  "name": "Gravierter Revolver",
+  "look": "icons_treasure",
+  "icon": 11,
+  "category": "valuable",
+  "size": [2, 1],
+  "stack": 1,
+  "value": 140,
+  "description": "Nicht mehr schussfähig, aber was für ein Stück.",
+  "tags": ["trophy"]
+ },
+ "schneekugel": {
+  "name": "Schneekugel mit Stadt",
+  "look": "icons_treasure",
+  "icon": 12,
+  "category": "valuable",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 50,
+  "description": "BigCityDelta im Schnee. Hat es da je geschneit?",
+  "tags": ["trophy"]
+ },
+ "baseball": {
+  "name": "Signierter Baseball",
+  "look": "icons_treasure",
+  "icon": 13,
+  "category": "valuable",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 85,
+  "description": "Die Unterschrift kennt keiner mehr. Trotzdem.",
+  "tags": ["trophy"]
+ },
+ "goetzenfigur": {
+  "name": "Tönerne Götzenfigur",
+  "look": "icons_treasure",
+  "icon": 14,
+  "category": "valuable",
+  "size": [1, 2],
+  "stack": 1,
+  "value": 120,
+  "description": "Aus einer Ruine. Starrt einen an, wenn man nicht hinsieht.",
+  "tags": ["trophy"]
+ },
+ "datenkristall": {
+  "name": "Leuchtender Datenkristall",
+  "look": "icons_treasure",
+  "icon": 15,
+  "category": "valuable",
+  "size": [1, 2],
+  "stack": 1,
+  "value": 150,
+  "description": "Voller Daten, die niemand mehr lesen kann. Schön leuchten tut er trotzdem.",
+  "tags": ["trophy"]
  }
 }

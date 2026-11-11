@@ -147,7 +147,7 @@ export function startDraft(D, save) {
   rig.parts ??= {};
   let uid = 0;
   rig.units.forEach((u, ui) => { u.key = `rig:${ui}`; });
-  rig.units.forEach((u, ui) => u.workshops.forEach(w => { w.uid = ++uid; w.home = `${ui}:${w.at}`; if (wsDef(D, w.id).grid) w.key = `store:${ui}:${w.at}`; }));
+  rig.units.forEach((u, ui) => u.workshops.forEach(w => { w.uid = ++uid; w.home = `${ui}:${w.at}`; if (wsDef(D, w.id).grid || wsDef(D, w.id).stands?.length) w.key = `store:${ui}:${w.at}`; }));
   rig.spare.workshops = rig.spare.workshops.map(w => typeof w === 'string' ? { id: w, uid: ++uid } : { ...w, uid: ++uid });
   return { rig, deltas: save.deltas, minutes: 0, uid, changes: 0, grids: save.inv?.grids || {} };
 }
@@ -188,7 +188,8 @@ export function stow(D, d, inst) { toSpare(d, inst); spend(D, d, 0, M(D, 'move',
 export function fromSpare(d, uid) { const i = d.rig.spare.workshops.findIndex(w => w.uid === uid); return i < 0 ? null : d.rig.spare.workshops.splice(i, 1)[0]; }
 
 // a storage workshop with things inside cannot be sold or left out of the rig
-export const storeFull = (d, inst) => !!(inst.key && d.grids[inst.key]?.items?.length);
+// a storage with things in it (trophy stands count too: <key>:s<i>) stays where it is
+export const storeFull = (d, inst) => !!inst.key && Object.entries(d.grids).some(([k, g]) => (k === inst.key || k.startsWith(inst.key + ':s')) && g?.items?.length);
 
 export function buyWorkshop(D, d, id) {
   const price = priceOf(D, 'workshops', id);
@@ -360,7 +361,11 @@ export function applyDraft(D, save, d) {
   for (const [k, g] of Object.entries(old)) if (!rigGrid(k)) grids[k] = g;
   const rig = { tractor: d.rig.tractor, units: d.rig.units.map(u => ({ kind: u.kind, id: u.id, ...(u.level ? { level: u.level } : {}), ...(u.level && u.slot != null ? { slot: u.slot } : {}), workshops: u.workshops.map(w => ({ id: w.id, at: w.at })) })),
     spare: { workshops: d.rig.spare.workshops.map(w => w.id), containers: [...d.rig.spare.containers], parts: [...d.rig.spare.parts] }, parts: clone(d.rig.parts || {}) };
-  d.rig.units.forEach((u, ui) => u.workshops.forEach(w => { if (w.key && old[w.key]) grids[`store:${ui}:${w.at}`] = old[w.key]; }));
+  d.rig.units.forEach((u, ui) => u.workshops.forEach(w => {
+    if (!w.key) return;
+    if (old[w.key]) grids[`store:${ui}:${w.at}`] = old[w.key];
+    for (const [k, g] of Object.entries(old)) if (k.startsWith(w.key + ':s')) grids[`store:${ui}:${w.at}` + k.slice(w.key.length)] = g;   // trophy stands move along
+  }));
   d.rig.units.forEach((u, ui) => { if (u.key && old[u.key]) grids[`rig:${ui}`] = old[u.key]; });
   save.rig = rig;
   save.inv.grids = grids;
@@ -368,4 +373,17 @@ export function applyDraft(D, save, d) {
   for (const c of storeList(D, save)) ensureGrid(D, save.inv, c.key, c.size);
   if (d.minutes) advance(save, d.minutes / 60);
   return { ok: true, minutes: d.minutes };
+}
+
+// ---------- guests (Daniel, 11.11.2026: „Koje für Gäste/NPCs, um sie zu transportieren“, 1b) ----------
+// beds in guest bunks (workshops with function "guests", Kapazität = beds) all over the rig
+export function berths(D, rig) {
+  let n = 0;
+  for (const u of rig?.units || []) for (const w of u.workshops || []) { const d = D.workshops?.[w.id]; if (d?.function === 'guests') n += d.capacity ?? 1; }
+  return n;
+}
+// who rides along on the next drive: companions marked "Fährt als Gast mit" need a bed, the others are crew and always come
+export function passengers(D, save) {
+  const all = save.companions || [], guests = all.filter(id => D.companions?.[id]?.passenger), beds = berths(D, save.rig);
+  return { guests, beds, riding: guests.slice(0, beds), staying: guests.slice(beds) };
 }

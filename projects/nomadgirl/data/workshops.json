@@ -238,5 +238,38 @@
   "lookEmpty": "ws_shelf_empty",
   "fill": [{"y": 0},{"y": 48},{"y": 106},{"y": 162}],
   "scale": 72
+ },
+ "gaestekoje": {
+  "name": "Gästekoje",
+  "look": "ws_guest_bunk",
+  "function": "guests",
+  "places": 1,
+  "power": -1,
+  "capacity": 2,
+  "value": 320,
+  "stage": "mvp",
+  "description": "Zwei Etagenbetten für Fahrgäste. Companions, die als Gast mitfahren, brauchen hier ein Bett, sonst bleiben sie beim Fahren zurück.",
+  "fx": []
+ },
+ "schatzkammer": {
+  "name": "Schatzkammer",
+  "look": "ws_treasury",
+  "function": "treasury",
+  "places": 1,
+  "power": -1,
+  "grid": [6, 3],
+  "accept": ["valuable"],
+  "value": 650,
+  "stage": "mvp",
+  "description": "Tresorraum für die Beute: Wertsachen kommen auf den Haufen, der mit jedem Fund wächst. An der Wand Trophäen-Ständer für besondere Stücke.",
+  "stands": [
+   {"name": "Regal links", "grid": [3, 1], "x": 40, "y": 73, "w": 56, "h": 22, "align": "bottom"},
+   {"name": "Lochwand", "grid": [3, 2], "x": 105, "y": 64, "w": 54, "h": 34, "align": "top"},
+   {"name": "Regal rechts", "grid": [3, 1], "x": 167, "y": 73, "w": 55, "h": 22, "align": "bottom"},
+   {"name": "Sockel", "grid": [2, 2], "x": 186, "y": 115, "w": 36, "h": 30, "align": "bottom"}
+  ],
+  "fx": [],
+  "lookEmpty": "ws_treasury_empty",
+  "fill": [{"y": 150},{"y": 168},{"y": 186},{"y": 204}]
  }
 }

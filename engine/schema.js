@@ -46,6 +46,8 @@ const STAGE = select('stage', 'Ausbaustufe', [['mvp', 'MVP'], ['1', 'Stufe 1'], 
 export const WEAPON_KINDS = [['melee', 'Nahkampf'], ['ranged', 'Fernkampf'], ['cyberdeck', 'Cyberdeck']];
 export const ENEMY_FAMILIES = [['mutant', 'Mutant'], ['raider', 'Plünderer'], ['machine', 'Maschine'], ['wildlife', 'Getier'], ['anomaly', 'Anomalie']];
 export const ENEMY_BEHAVIORS = [['patrol', 'Patrouille'], ['charger', 'Stürmer'], ['shooter', 'Schütze'], ['ambusher', 'Lauerer'], ['flyer', 'Flieger'], ['boss', 'Boss']];
+// tags on things (Daniel, 11.11.2026: „mach ein Tag trophy“): trophy = may hang on a trophy stand in the treasury
+export const ITEM_TAGS = [['trophy', 'Trophäe']];
 export const ITEM_CATEGORIES = [['junk', 'Schrott'], ['resource', 'Ressource'], ['ingredient', 'Zutat'], ['food', 'Gericht'], ['component', 'Bauteil'], ['consumable', 'Verbrauchsgut'], ['valuable', 'Wertsache'], ['blueprint', 'Bauplan/Rezept'], ['armor', 'Rüstung'], ['implant', 'Implantat'], ['dronepart', 'Drohnenteil']];
 // where a thing is worn (Daniel, 10.11.2026: Inventar im Diablo-Stil): Leyla's head + armor, implants in her body, parts on Mama-Bot
 export const WEAR_SLOTS = [['head', 'Kopf'], ['armor', 'Rüstung'], ['eyes', 'Implantat: Augen'], ['nerves', 'Implantat: Nerven'], ['arm', 'Implantat: Cyberarm'], ['heart', 'Implantat: Herz'], ['legs', 'Implantat: Beine'], ['skin', 'Implantat: Haut'],
@@ -56,7 +58,7 @@ export const BUFF_STATS = [['health', 'Leben'], ['damage', 'Schaden'], ['speed',
 export const BUFF_DURATIONS = [['instant', 'Sofort'], ['run', 'Nächster Run'], ['travel', 'Nächste Reise'], ['seconds', 'Sekunden'], ['permanent', 'Dauerhaft']];
 export const DISCOVERY = [['experiment', 'Experimentieren'], ['found', 'Fund im POI'], ['companion', 'Tipp von Companion'], ['shop', 'Bei NPCs kaufen'], ['start', 'Von Anfang an']];
 export const CONTAINER_KINDS = [['shipping', 'Hochseecontainer'], ['crate', 'Holzkiste'], ['trailer', 'Wohnwagenteil'], ['tank', 'Tank']];
-export const WORKSHOP_FUNCTIONS = [['storage', 'Lager'], ['cooling', 'Kühlung'], ['cell', 'Zelle'], ['sleep', 'Schlafen'], ['chill', 'Chillen'], ['drone', 'Drohnen'], ['warroom', 'Planung'], ['kitchen', 'Kochen'], ['foodtruck', 'Verkauf'], ['craft', 'Herstellen'], ['engine', 'Motor'], ['power', 'Energie']];
+export const WORKSHOP_FUNCTIONS = [['storage', 'Lager'], ['guests', 'Gäste'], ['treasury', 'Schatzkammer'], ['cooling', 'Kühlung'], ['cell', 'Zelle'], ['sleep', 'Schlafen'], ['chill', 'Chillen'], ['drone', 'Drohnen'], ['warroom', 'Planung'], ['kitchen', 'Kochen'], ['foodtruck', 'Verkauf'], ['craft', 'Herstellen'], ['engine', 'Motor'], ['power', 'Energie']];
 export const BENCH_FX = [['light', 'Licht'], ['screen', 'Bildschirm'], ['steam', 'Dampf'], ['smoke', 'Rauch'], ['sparks', 'Funken'], ['flame', 'Flamme'], ['blink', 'LED blinkt'], ['twinkle', 'Lichter funkeln'], ['bubbles', 'Blasen'], ['fish', 'Fische'], ['lava', 'Lavalampe'], ['scan', 'Druckkopf'], ['shine', 'Glanz']];
 export const BENCH_FX_WHEN = [['always', 'Immer'], ['night', 'Abends'], ['near', 'In der Nähe'], ['use', 'Bei Benutzung']];
 export const RIG_SLOTS = [['engine', 'Motor'], ['armor', 'Panzerung'], ['weapon', 'Waffe'], ['roof', 'Dach']];
@@ -433,7 +435,7 @@ export const AREAS = {
     template: { name: 'Neue Waffe', kind: 'melee', damage: 10, cooldown: 400, range: 40, knockback: 100, size: [1, 2], tier: 1, value: 20 },
     row: x => `${label(WEAPON_KINDS, x.kind)} · ${x.damage ?? 0} Schaden · ${x.cooldown ?? 0} ms`,
     sections: [
-      { title: 'Waffe', fields: [NAME, LOOK, ICON, select('kind', 'Art', WEAPON_KINDS, { required: true }), num('tier', 'Stufe', { min: 1, max: 5 }),
+      { title: 'Waffe', fields: [NAME, LOOK, ICON, multi('tags', 'Tags', ITEM_TAGS), select('kind', 'Art', WEAPON_KINDS, { required: true }), num('tier', 'Stufe', { min: 1, max: 5 }),
         text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar: 1–3 Zeichen oder ein Emoji' }), DESCRIPTION] },
       { title: 'Werte', fields: [num('damage', 'Schaden', { min: 0 }), num('cooldown', 'Abklingzeit', { unit: 'ms', min: 0 }), num('range', 'Reichweite', { unit: 'px', min: 0 }),
         num('knockback', 'Rückstoß', { unit: 'px/s', min: 0 }), num('critChance', 'Krit-Chance', { unit: '%', min: 0, max: 100 }), num('ammo', 'Munition', { min: 0, hint: 'Leer = unendlich' }),
@@ -474,7 +476,7 @@ export const AREAS = {
     template: { name: 'Neuer Gegenstand', category: 'junk', size: [1, 1], stack: 1, value: 1 },
     row: x => `${label(ITEM_CATEGORIES, x.category)} · ${(x.size || [1, 1]).join('×')} · ${x.value ?? 0} Δ`,
     sections: [
-      { title: 'Gegenstand', fields: [NAME, LOOK, ICON, select('category', 'Kategorie', ITEM_CATEGORIES), DESCRIPTION] },
+      { title: 'Gegenstand', fields: [NAME, LOOK, ICON, select('category', 'Kategorie', ITEM_CATEGORIES), multi('tags', 'Tags', ITEM_TAGS, { hint: 'Trophäe = darf an einen Trophäen-Ständer in der Schatzkammer' }), DESCRIPTION] },
       { title: 'Rucksack & Handel', fields: [size('size', 'Größe', { unit: 'Felder', hint: 'Rechteck im Raster; eine Form (unten) hat Vorrang' }),
         lines('shape', 'Form', { hint: 'Tetris-Form: eine Zeile pro Reihe, # = belegt, . = frei (z. B. „#.“ / „##“ für ein L). Leer = Rechteck aus „Größe“. Im Spiel mit Rechtsklick drehbar' }),
         num('stack', 'Stapel', { min: 1 }), text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar, solange es kein Aussehen gibt: 1–3 Zeichen oder ein Emoji' }), VALUE] },
@@ -587,6 +589,9 @@ export const AREAS = {
         num('fit', 'Breite im Platz', { unit: '%', min: 30, max: 200, hint: 'Nur ohne gemeinsamen Maßstab: wie breit das Bild im Platz steht (100 = so breit wie der Platz), höchstens so hoch wie der Innenraum' }),
         ref('lookEmpty', 'Aussehen leer', 'assets', { hint: 'Für Lager: dieselbe Grafik leer, deckungsgleich. Je voller das Lager, desto mehr Fächer zeigt das Spiel aus dem Aussehen (voll), von unten nach oben' }),
         table('fill', 'Fächer', [num('y', 'Oberkante', { unit: 'Bildpixel', min: 0 })], { hint: 'Wo die Fächer anfangen (Bildpixel von oben, von oben nach unten sortiert). Das unterste Fach füllt sich zuerst' })] },
+      { title: 'Schatzkammer & Trophäen', fields: [multi('accept', 'Lager nimmt nur', ITEM_CATEGORIES, { hint: 'Kategorien, die ins Lager-Raster dürfen (leer = alles). Schatzkammer: Wertsachen' }),
+        table('stands', 'Trophäen-Ständer', [text('name', 'Name'), size('grid', 'Raster', { unit: 'Felder' }), num('x', 'x'), num('y', 'y'), num('w', 'Breite'), num('h', 'Höhe'), select('align', 'Steht', [['bottom', 'unten (Regal, Sockel)'], ['top', 'oben (Haken)']])],
+          { hint: 'Daniel, 11.11.2026: Platz an der Wand für Trophäen, jeder Ständer ist ein eigenes Inventar und zeigt jedes Ding in seiner echten Größe. x/y/Breite/Höhe = Fläche im Aussehen (Bildpixel); nur Dinge mit Tag „Trophäe“' })] },
       { title: 'Licht & Effekte', fields: [table('fx', 'Effekte', [select('kind', 'Art', BENCH_FX), num('x', 'x'), num('y', 'y'), num('w', 'Breite'), num('h', 'Höhe'), color('color', 'Farbe'), num('size', 'Größe'), num('rate', 'Tempo'), select('when', 'Wann', BENCH_FX_WHEN), num('idle', 'Sonst %', { min: 0, max: 100 })],
         { hint: 'Alles in Bildpixeln des Aussehens (x/y = linke obere Ecke, Breite/Höhe = Bereich). Licht: Größe = Radius, Tempo = Flackern %. Bildschirm: Tempo = Zeilen pro Sekunde. Dampf/Rauch/Blasen: Tempo = pro Sekunde. Funken: Tempo = Schauer pro Minute. LED: Tempo = Blinken pro Sekunde. Lichter funkeln: findet die hellen Punkte im Bereich selbst. Fische: Tempo = Anzahl. Druckkopf: fährt im Bereich hin und her. Glanz: läuft alle „Tempo“ Sekunden über den Bereich. Wann: Immer, abends, wenn Leyla nah ist oder bei Benutzung; „Sonst %“ = Stärke, solange es nicht zutrifft' })] },
       { title: 'Benutzen', fields: [text('rest.verb', 'Knopf', { hint: 'Für Chill Area, Drohnenwerkstatt & Co.: Was Leyla hier macht (z. B. „Fernsehen und abhängen“). Leer = nur Infos' }), num('rest.hours', 'Dauer', { unit: 'h', min: 0 }),
@@ -609,7 +614,7 @@ export const AREAS = {
     row: x => x.role || '',
     sections: [
       { title: 'Companion', fields: [NAME, LOOK, text('role', 'Rolle'), STAGE, DESCRIPTION] },
-      { title: 'Im Rig', fields: [refs('workshops', 'Betreibt', 'workshops'), refs('buffs', 'Gibt Buffs', 'buffs'), refs('tips', 'Kennt Rezepte', 'recipes')] },
+      { title: 'Im Rig', fields: [bool('passenger', 'Fährt als Gast mit', { hint: 'Braucht beim Fahren einen freien Platz in einer Gästekoje (Werkstatt-Funktion Gäste, Kapazität = Betten), sonst bleibt der Companion am Ort und wartet dort' }), refs('workshops', 'Betreibt', 'workshops'), refs('buffs', 'Gibt Buffs', 'buffs'), refs('tips', 'Kennt Rezepte', 'recipes')] },
       { title: 'Im Camp', fields: [lines('lines', 'Sprüche', { hint: 'Eine Zeile pro Spruch, erscheint als Bläschen (zufällig und per E)' }),
         lines('craftLines.hit', 'Beim Kochen/Craften: Treffer', { hint: 'Sagt der Companion, wenn an seiner Werkstatt etwas gelingt (eine Zeile pro Spruch)' }),
         lines('craftLines.miss', 'Beim Kochen/Craften: Fehlschlag'),

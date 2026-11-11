@@ -147,3 +147,6 @@ Spielauflösung 1920×1080, Kacheln 64 px, Leyla 192 px hoch (Höhe im Spiel ihr
 ## Pixel-Art
 
 Die Startseiten-Grafiken (Leyla von vorn, Wastelands-Hintergrund) sind Pixel-Art in kleiner Auflösung (Hintergrund 576 × 324) und werden scharf skaliert (`imageSmoothingEnabled = false`). Leyla im Spiel bleibt hochaufgelöst und geglättet.
+| `assets/workshops/guest_bunk.png` | Werkstatt Gästekoje (zwei Etagenbetten, Vorhang, Lichterkette) | KI (PixelLab, Create Image Pro, Stilbild Schlafkoje v2) | 11.11.2026 |
+| `assets/workshops/treasury_empty.png`, `treasury.png` (+ `treasury_source.png`) | Werkstatt Schatzkammer leer und mit Schatzhaufen (deckungsgleich, Haufen aus dem Edit übernommen) | KI (PixelLab, Create Image Pro + Edit Pro Flash), Zuschnitt Code | 11.11.2026 |
+| `assets/items/icons_treasure.png` | 16 Wertsachen als Symbole, 4 × 4 à 64 px | KI (PixelLab, Create Image Pro, Stilbild icons_gear) | 11.11.2026 |

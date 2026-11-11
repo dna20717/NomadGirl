@@ -12,9 +12,23 @@
   "description": "Repariert Leitungen und Meinungen.",
   "glyph": "🔧",
   "look": "icons_gear",
-  "icon": 17
+  "icon": 17,
+  "tags": ["trophy"]
  },
- "machete": {"name": "Machete", "kind": "melee", "tier": 2, "damage": 18, "cooldown": 450, "range": 88, "knockback": 160, "critChance": 10, "size": [1, 3], "value": 40, "glyph": "🔪"},
+ "machete": {
+  "name": "Machete",
+  "kind": "melee",
+  "tier": 2,
+  "damage": 18,
+  "cooldown": 450,
+  "range": 88,
+  "knockback": 160,
+  "critChance": 10,
+  "size": [1, 3],
+  "value": 40,
+  "glyph": "🔪",
+  "tags": ["trophy"]
+ },
  "schockstab": {
   "name": "Schockstab",
   "kind": "melee",
@@ -27,7 +41,8 @@
   "size": [1, 2],
   "value": 60,
   "description": "Ehemals Viehtreiber. Funktioniert auch bei Mutanten.",
-  "glyph": "⚡"
+  "glyph": "⚡",
+  "tags": ["trophy"]
  },
  "nagelpistole": {
   "name": "Nagelpistole",
@@ -46,7 +61,8 @@
   "magazine": 7,
   "reloadTime": 950,
   "look": "icons_gear",
-  "icon": 2
+  "icon": 2,
+  "tags": ["trophy"]
  },
  "schrotflinte": {
   "name": "Schrotflinte",
@@ -63,7 +79,8 @@
   "glyph": "💥",
   "sound": "sound_shot",
   "magazine": 2,
-  "reloadTime": 1600
+  "reloadTime": 1600,
+  "tags": ["trophy"]
  },
  "bastlerdeck": {
   "name": "Bastler-Deck",
@@ -94,6 +111,7 @@
   "glyph": "🗡",
   "description": "Gebogene Klinge mit Fingerring. Leylas Lieblingsmesser, schnell und gemein.",
   "look": "icons_gear",
-  "icon": 52
+  "icon": 52,
+  "tags": ["trophy"]
  }
 }

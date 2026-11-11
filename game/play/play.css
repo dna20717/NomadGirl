@@ -349,3 +349,7 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .inv-panel.leyla { width: 440px; box-sizing: border-box; }
 .inv-center > :last-child { height: 40px; box-sizing: border-box; }
 .inv-doll.implants .inv-center .inv-note { display: grid; place-items: center; padding: 0; }
+
+/* trophy stands in the treasury (Werkstätten › Schatzkammer & Trophäen) */
+.inv-stands { display: flex; flex-wrap: wrap; gap: 10px 12px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #3a2f45; max-width: 520px; }
+.inv-stand small { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; color: #ffd27a; font-size: 11px; }

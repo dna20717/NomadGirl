@@ -67,6 +67,8 @@ export class PlayScene extends Phaser.Scene {
       for (const c of Object.values(this.data_.rigParts || {})) if (c.look) ids.add(c.look);
       // workshop pictures (and the empty shelf), the crate for packed workshops
       for (const w of Object.values(this.data_.workshops || {})) for (const id of [w.look, w.lookEmpty]) if (id) ids.add(id);
+      // icon sheets of trophies: they stand on the stands of the treasury
+      for (const a of ['items', 'weapons']) for (const t of Object.values(this.data_[a] || {})) if (t.tags?.includes('trophy') && t.look && A[t.look]?.kind === 'icons') ids.add(t.look);
       if (this.data_.camp?.yard?.crate?.look) ids.add(this.data_.camp.yard.crate.look);
       if (this.data_.camp?.chassis?.look) ids.add(this.data_.camp.chassis.look);   // modular trailer pieces
       if (this.data_.camp?.ground?.tiles) ids.add(this.data_.camp.ground.tiles);
@@ -368,7 +370,10 @@ export class PlayScene extends Phaser.Scene {
   openContainer(key) {
     const c = containers(this.data_, this.box.save).find(x => x.key === key);
     if (!c) return;
-    this.hud.inv.open({ key, title: c.name, grid: this.box.save.inv.grids[key], kind: 'container', x: this.leyla.x });
+    // the treasury: its trophy stands open with it, each one an inventory of its own
+    const all = containers(this.data_, this.box.save), g = k => this.box.save.inv.grids[k];
+    const extra = all.filter(x => x.parent === key && g(x.key)).map(x => ({ key: x.key, title: x.name.split(' · ').pop(), grid: g(x.key), accept: x.accept }));
+    this.hud.inv.open({ key, title: c.name, grid: g(key), kind: 'container', x: this.leyla.x, accept: c.accept, extra });
   }
   inventoryUpdate(input) {
     const inv = this.hud.inv;

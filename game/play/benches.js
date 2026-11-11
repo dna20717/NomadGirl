@@ -4,7 +4,7 @@
 // sparks, flames, LEDs, fairy lights, bubbles, fish, a lava lamp, a 3D-printer head and a glint over the guns.
 // Every effect is placed in pixels of the picture and can wait for the evening, for Leyla coming close or for being used.
 // Also: the packed crates on the scrapyard and the workshop picture on its own (in the hand while building, in the van).
-import { occupancy } from '../inventory.js';
+import { occupancy, thing, boxOf } from '../inventory.js';
 
 const col = c => parseInt(String(c || '#ffffff').slice(1), 16);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -145,7 +145,7 @@ export class Benches {
       view.add(i);
       return i;
     };
-    const bench = { id, place, def, cx, x0: Math.max(C0.x0, cx - (b.x1 - b.x0) * k / 2), x1: Math.min(C0.x1, cx + (b.x1 - b.x0) * k / 2), floor, top: Math.max(C0.y0, floor - (fy - b.y0) * k), k, at, grid, fx: [], s: {}, clip: C0 };
+    const bench = { id, place, def, view, off: [mid, G], cx, x0: Math.max(C0.x0, cx - (b.x1 - b.x0) * k / 2), x1: Math.min(C0.x1, cx + (b.x1 - b.x0) * k / 2), floor, top: Math.max(C0.y0, floor - (fy - b.y0) * k), k, at, grid, fx: [], s: {}, clip: C0 };
     // a storage that fills up: the empty picture below, the full one cut to the filled shelves
     const empty = def.lookEmpty && s.textures.exists(def.lookEmpty) ? def.lookEmpty : null;
     if (empty && grid) {
@@ -158,8 +158,37 @@ export class Benches {
     } else img(key);
     // effects whose spot was cut away stay out
     (def.fx || []).forEach((r, i) => { const [ex, ey] = at((r.x || 0) + (r.w || 1) / 2, (r.y || 0) + (r.h || 1) / 2); if (ex >= C0.x0 && ex <= C0.x1 && ey >= C0.y0 && ey <= C0.y1) bench.fx.push(this.effect(bench, r, i)); });
+    if (def.stands?.length) { bench.trophies = []; this.showTrophies(bench); }
     this.list.push(bench);
     return bench;
+  }
+  // trophy stands (Daniel, 11.11.2026: „jedes Item in der richtigen Größe ausstellen“): each stand's grid laid over its area of the
+  // picture, a cell as big as fits, every thing at its size in cells, the picture of its icon sheet (pixel sharp), standing on the shelf
+  showTrophies(bench) {
+    const s = this.scene, D = this.D, grids = this.camp.box.save.inv?.grids || {}, [mx, my] = bench.off;
+    const sig = bench.def.stands.map((st, i) => JSON.stringify(grids[`store:${bench.place}:s${i}`]?.items || [])).join('|');
+    if (sig === bench.trophySig) return;
+    bench.trophySig = sig;
+    for (const o of bench.trophies) o.destroy();
+    bench.trophies = [];
+    bench.def.stands.forEach((st, i) => {
+      const g = grids[`store:${bench.place}:s${i}`], [gw, gh] = st.grid || [1, 1];
+      if (!g?.items?.length) return;
+      const [x0, y0] = bench.at(st.x || 0, st.y || 0), [x1, y1] = bench.at((st.x || 0) + (st.w || 1), (st.y || 0) + (st.h || 1));
+      const c = Math.min((x1 - x0) / gw, (y1 - y0) / gh), ox = x0 + (x1 - x0 - gw * c) / 2, oy = st.align === 'top' ? y0 : y1 - gh * c, C = bench.clip;
+      if (y1 < C.y0 || y0 > C.y1 || x1 < C.x0 || x0 > C.x1) return;   // the stand lies outside the place (picture cut at the interior)
+      for (const e of g.items) {
+        const t = thing(D, e.a, e.id) || {}, b = boxOf(D, e), side = Math.min(b.w, b.h) * c, cx = ox + (e.x + b.w / 2) * c, cy = oy + (e.y + b.h / 2) * c;
+        const A = D.assets?.[t.look];
+        let o;
+        if (A?.kind === 'icons' && t.icon != null && s.textures.exists(t.look)) {
+          s.textures.get(t.look).setFilter(Phaser.Textures.FilterMode.NEAREST);
+          o = s.add.image(cx - mx, cy - my, t.look, t.icon).setDisplaySize(side * 0.96, side * 0.96).setAngle((e.r || 0) * 90);
+        } else o = s.add.text(cx - mx, cy - my, t.glyph || (t.name || e.id).slice(0, 2), { fontFamily: 'VT323, monospace', fontSize: `${Math.max(10, side * 0.7)}px`, color: '#ffd27a' }).setOrigin(0.5);
+        bench.view.add(o);
+        bench.trophies.push(o);
+      }
+    });
   }
   // shelves: the full picture from the topmost filled shelf down
   refill(bench) {
@@ -209,7 +238,7 @@ export class Benches {
     for (const o of this.objs) if (hidden) o.setVisible(false);
     const night = (camp.lightK ?? 0) > 0.3, lk = camp.lightK ?? 0, craft = s.hud.craft;
     this.boost = 1 / Math.max(0.35, 1 - (camp.night?.fillAlpha ?? 0));   // what the night shade takes away, the small lights get back
-    if (time > (this.fillAt || 0)) { this.fillAt = time + 400; for (const b of this.list) if (b.full) this.refill(b); }
+    if (time > (this.fillAt || 0)) { this.fillAt = time + 400; for (const b of this.list) { if (b.full) this.refill(b); if (b.trophies) this.showTrophies(b); } }
     for (const b of this.list) {
       const near = l && Math.abs(l.x - b.cx) < (b.x1 - b.x0) / 2 + 90 && Math.abs(l.feet - b.floor) < 80;
       const use = l && ((camp.atWorkshop && camp.prompt?.place === b.place) || (craft?.isOpen && craft.ws === b.id && Math.abs(l.x - b.cx) < (b.x1 - b.x0) / 2 + 40) || camp.resting === b.place);

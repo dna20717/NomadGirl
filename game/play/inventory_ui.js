@@ -81,7 +81,16 @@ export class InventoryUI {
   setTab(t) { this.tab = t; this.draw(); }
   close() { if (this.held) this.putBack(); this.el.hidden = true; this.tip.hidden = true; this.cursor.hidden = true; this.other = null; }
   toggle(other = null) { if (this.isOpen && (!other || other.key === this.other?.key)) this.close(); else this.open(other); }
-  grid(key) { return key === this.other?.key ? this.other.grid : this.inv.grids[key]; }
+  grid(key) { return key === this.other?.key ? this.other.grid : this.other?.extra?.find(x => x.key === key)?.grid || this.inv.grids[key]; }
+  // what a grid takes (treasury: only valuables on the pile, only things tagged "trophy" on the stands)
+  acceptOf(key) { return key === this.other?.key ? this.other.accept : this.other?.extra?.find(x => x.key === key)?.accept; }
+  allows(key, e, say = true) {
+    const A = this.acceptOf(key);
+    if (!A) return true;
+    const t = thing(this.D, e.a, e.id) || {}, ok = (!A.categories?.length || A.categories.includes(kindOf(this.D, e.a, e.id))) && (!A.tag || (t.tags || []).includes(A.tag));
+    if (!ok && say) this.host.notify?.(A.tag === 'trophy' ? 'Nur Trophäen (Tag „Trophäe“)' : 'Hier nur Wertsachen');
+    return ok;
+  }
 
   // ---------- drawing ----------
   draw() {
@@ -131,6 +140,8 @@ export class InventoryUI {
     return el('section', { class: 'inv-panel' + (o.kind === 'floor' ? ' floor' : '') },
       el('header', {}, icon(o.kind === 'floor' ? 'down' : 'box', 16), el('b', {}, o.title), el('small', {}, `${worth(D, o.grid)} Δ`)),
       this.gridEl(o.key, o.grid),
+      // trophy stands of the treasury: one small grid each, side by side
+      o.extra?.length ? el('div', { class: 'inv-stands' }, ...o.extra.map(x => el('div', { class: 'inv-stand' }, el('small', {}, icon('star', 12), x.title), this.gridEl(x.key, x.grid)))) : null,
       o.kind === 'container' ? el('div', { class: 'inv-actions' },
         el('button', { class: 'inv-btn', onclick: () => this.storeAll() }, 'Alles einlagern'),
         el('button', { class: 'inv-btn ghost', onclick: () => this.takeAll() }, 'Alles nehmen')) :
@@ -489,6 +500,7 @@ export class InventoryUI {
     if (!g || !h) return;
     // second click of a double click on a thing just picked up: send it to the other side
     if (ev?.detail >= 2 && performance.now() - (this.pickedAt || 0) < 450 && h.from === key) return this.quickMoveHeld(key);
+    if (!this.allows(key, h.e)) return;
     const res = drop(this.D, g, h.e, x, y);
     if (!res.ok) { this.host.notify?.('Passt da nicht hin'); return; }
     this.held = res.held ? { e: res.held, from: key } : null;
@@ -519,7 +531,7 @@ export class InventoryUI {
   otherSide(key) { return (this.pair || []).find(k => k !== key) || (key === 'backpack' ? this.other?.key : 'backpack'); }
   quickMove(key, e) {
     const to = this.otherSide(key), g = this.grid(key), dst = to && this.grid(to);
-    if (!dst) return;
+    if (!dst || !this.allows(to, e)) return;
     const left = add(this.D, dst, e.a, e.id, e.n);
     if (left === e.n) return this.host.notify?.('Kein Platz');
     if (left === 0) remove(g, e); else e.n = left;
@@ -528,7 +540,7 @@ export class InventoryUI {
   }
   quickMoveHeld(key) {
     const h = this.held, to = this.otherSide(key), dst = to && this.grid(to);
-    if (!dst) return;
+    if (!dst || !this.allows(to, h.e)) return;
     const left = add(this.D, dst, h.e.a, h.e.id, h.e.n);
     if (left === h.e.n) return this.host.notify?.('Kein Platz');
     h.e.n = left;
@@ -536,7 +548,13 @@ export class InventoryUI {
     if (left) this.putBack();
     this.changed(to);
   }
-  storeAll() { const n = moveAll(this.D, this.inv.grids.backpack, this.other.grid); this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingelagert` : 'Nichts passt mehr rein'); this.changed(this.other.key); }
+  storeAll() {
+    if (this.other.accept) {   // only what this storage takes
+      let n = 0;
+      for (const e of [...this.inv.grids.backpack.items]) if (this.allows(this.other.key, e, false) && add(this.D, this.other.grid, e.a, e.id, e.n) === 0) { remove(this.inv.grids.backpack, e); n++; }
+      this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingelagert` : 'Nichts Passendes im Rucksack'); return this.changed(this.other.key);
+    }
+    const n = moveAll(this.D, this.inv.grids.backpack, this.other.grid); this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingelagert` : 'Nichts passt mehr rein'); this.changed(this.other.key); }
   takeAll() { const n = moveAll(this.D, this.other.grid, this.inv.grids.backpack); this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingepackt` : 'Rucksack ist voll'); this.changed(this.other.key); }
 
   // ---------- slots ----------

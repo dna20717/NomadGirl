@@ -47,7 +47,10 @@ export function containers(D, save) {
   });
   save.rig.units.forEach((u, ui) => u.workshops.forEach(w => {
     const g = D.workshops?.[w.id]?.grid;
-    if (g) out.push({ key: `store:${ui}:${w.at}`, name: D.workshops[w.id].name || w.id, size: g, workshop: w.id });
+    const def = D.workshops[w.id];
+    if (g) out.push({ key: `store:${ui}:${w.at}`, name: def.name || w.id, size: g, workshop: w.id, ...(def.accept?.length ? { accept: { categories: def.accept } } : {}) });
+    // trophy stands (Werkstätten › Schatzkammer & Trophäen): every stand is an inventory of its own, only things tagged "trophy"
+    (def.stands || []).forEach((st, i) => { if (st.grid?.[0] && st.grid?.[1]) out.push({ key: `store:${ui}:${w.at}:s${i}`, name: `${def.name || w.id} · ${st.name || 'Ständer ' + (i + 1)}`, size: st.grid, workshop: w.id, stand: i, parent: `store:${ui}:${w.at}`, accept: { tag: 'trophy' } }); });
   }));
   return out;
 }
@@ -69,7 +72,7 @@ function newInventory(D, save) {
   ensureGrid(D, inv, 'backpack', backpackSize(D, inv));
   const conts = containers(D, save);
   for (const c of conts) ensureGrid(D, inv, c.key, c.size);
-  const firstStore = conts.find(c => c.key.startsWith('store:'))?.key;
+  const firstStore = conts.find(c => c.key.startsWith('store:') && !c.accept)?.key;
   for (const row of S.inventory || []) {
     const key = row.where === 'chest' ? 'chest' : row.where === 'storage' ? firstStore || 'chest' : 'backpack', g = key && inv.grids[key];   // no storage at the start: into the chest
     const [a, id] = row.item ? ['items', row.item] : row.weapon ? ['weapons', row.weapon] : row.backpack ? ['backpacks', row.backpack] : [];
