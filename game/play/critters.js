@@ -30,7 +30,7 @@ export class Critters {
     return null;
   }
   update(mood, dt, vw) {
-    const C = mood.critters || {}, s = this.scene, l = s.leyla, sec = Math.min(0.05, dt / 1000), g = this.g.clear();
+    const C = mood.critters || {}, s = this.scene, l = s.leyla, sec = Math.min(0.05, dt / 1000), g = this.g.clear(), z = (C.size ?? 200) / 100;   // Kleinvieh › Größe
     this.t += sec;
     if (this.hidden) return;
     const inView = (x, y, m = 120) => x > vw.x - m && x < vw.right + m && y > vw.y - m && y < vw.bottom + m;
@@ -50,7 +50,7 @@ export class Critters {
         if (near && fast) { f.vx += rnd(-900, 900) * sec; f.vy += rnd(-900, 200) * sec; }   // scatter
         f.vx *= 0.9; f.vy *= 0.9; f.dx = (f.dx + f.vx * sec) * 0.985; f.dy = (f.dy + f.vy * sec) * 0.985;
         const x = k.x + Math.cos(f.a) * f.r + Math.sin(f.a * 2.7) * 4 + f.dx, y = k.y + Math.sin(f.a * 1.3) * f.r * 0.6 + f.dy;
-        g.fillStyle(fc, 0.95).fillRect(Math.round(x), Math.round(y), 2, 2);
+        g.fillStyle(fc, 0.95).fillRect(Math.round(x), Math.round(y), 2 * z, 2 * z);
       }
     }
 
@@ -64,8 +64,8 @@ export class Critters {
       if (!lamps.includes(m.L)) { if (lamps.length) m.L = lamps[Math.floor(Math.random() * lamps.length)]; else continue; }
       m.a += m.sp * sec; m.ph += sec * 13;
       const bump = Math.max(0, Math.sin(m.a * 3.1)) ** 8 * 0.7;   // now and then it bumps into the lamp
-      const x = m.L.x + Math.cos(m.a) * m.r * (1 - bump), y = m.L.y + 18 + Math.sin(m.a * 1.7) * m.r * 0.5 * (1 - bump), w = Math.sin(m.ph) > 0 ? 3 : 1;
-      g.fillStyle(mc, 0.9).fillRect(Math.round(x - w / 2), Math.round(y), w, 2);
+      const x = m.L.x + Math.cos(m.a) * m.r * z * (1 - bump), y = m.L.y + 18 + Math.sin(m.a * 1.7) * m.r * z * 0.5 * (1 - bump), w = (Math.sin(m.ph) > 0 ? 3 : 1) * z;
+      g.fillStyle(mc, 0.9).fillRect(Math.round(x - w / 2), Math.round(y), w, 2 * z);
     }
 
     // ---- roaches: sit still, twitch, flee from Leyla into the wall ----
@@ -82,8 +82,8 @@ export class Critters {
       if (!R.solid(Math.floor(nx / T), Math.floor(r.y / T)) || R.solid(Math.floor(nx / T), Math.floor((r.y - 4) / T))) { if (r.run > 0) r.gone = true; r.v = 0; r.d *= -1; }   // edge or wall: into a crack
       else r.x = nx;
       const leg = Math.floor(this.t * 30) % 2;
-      g.fillStyle(rc, 1).fillRect(Math.round(r.x - 3), Math.round(r.y - 3), 6, 3).fillStyle(0x141013, 1).fillRect(Math.round(r.x - 3 + (r.d > 0 ? 5 : -1)), Math.round(r.y - 3), 2, 2);
-      if (Math.abs(r.v) > 5) g.fillStyle(0x141013, 0.8).fillRect(Math.round(r.x - 3 + leg * 2), Math.round(r.y - 1), 2, 1).fillRect(Math.round(r.x + 1 - leg * 2), Math.round(r.y - 1), 2, 1);
+      g.fillStyle(rc, 1).fillRect(Math.round(r.x - 3 * z), Math.round(r.y - 3 * z), 6 * z, 3 * z).fillStyle(0x141013, 1).fillRect(Math.round(r.x + (r.d > 0 ? 2 : -4) * z), Math.round(r.y - 3 * z), 2 * z, 2 * z);
+      if (Math.abs(r.v) > 5) g.fillStyle(0x141013, 0.8).fillRect(Math.round(r.x + (-3 + leg * 2) * z), Math.round(r.y - z), 2 * z, z).fillRect(Math.round(r.x + (1 - leg * 2) * z), Math.round(r.y - z), 2 * z, z);
     }
 
     // ---- rats: now and then one runs along a floor across the whole view ----
@@ -94,10 +94,10 @@ export class Critters {
       const nx = r.x + r.d * r.v * sec, T = this.T, R = s.room;
       if (!R.solid(Math.floor(nx / T), Math.floor(r.y / T)) || R.solid(Math.floor(nx / T), Math.floor((r.y - 8) / T))) { r.life = 0; continue; }
       r.x = nx;
-      const hop = Math.abs(Math.sin(r.ph)) * 2, x = Math.round(r.x), y = Math.round(r.y - 6 - hop), d = r.d;
-      g.fillStyle(ratc, 1).fillRect(x - 6, y, 12, 5).fillRect(x + d * 6, y + 1, 3 * d, 3)                              // body, head
-        .fillStyle(0xe86a73, 0.9).fillRect(x - d * 6 - (d > 0 ? 8 : 0), y + 3, 8, 1)                                     // tail
-        .fillStyle(0x141013, 1).fillRect(x + d * 7, y + 1, 1, 1);                                                         // eye
+      const hop = Math.abs(Math.sin(r.ph)) * 2 * z, x = Math.round(r.x), y = Math.round(r.y - 6 * z - hop), d = r.d, Z = n => n * z;
+      g.fillStyle(ratc, 1).fillRect(x - Z(6), y, Z(12), Z(5)).fillRect(d > 0 ? x + Z(6) : x - Z(9), y + Z(1), Z(3), Z(3))              // body, head
+        .fillStyle(0xe86a73, 0.9).fillRect(d > 0 ? x - Z(14) : x + Z(6), y + Z(3), Z(8), Math.max(1, z * 0.7))                   // tail
+        .fillStyle(0x141013, 1).fillRect(d > 0 ? x + Z(7) : x - Z(8), y + Z(1), Z(1), Z(1));                                        // eye
     }
     this.rats = this.rats.filter(r => r.life > 0 && inView(r.x, r.y, 300));
 
@@ -115,7 +115,7 @@ export class Critters {
       const nx = p.x + (wind * gust + (p.h ? 40 : 0)) * p.s * sec, T = this.T, R = s.room;
       if (R.solid(Math.floor(nx / T), Math.floor(p.y / T)) && !R.solid(Math.floor(nx / T), Math.floor((p.y - 4) / T))) p.x = nx; else p.s *= -1;
       const flip = Math.sin(p.ph * 6) > 0;
-      g.fillStyle(pc, 0.9).fillRect(Math.round(p.x - 4), Math.round(p.y - 2 - p.h), flip || !p.h ? 8 : 4, p.h ? 3 : 2);
+      g.fillStyle(pc, 0.9).fillRect(Math.round(p.x - 4 * z), Math.round(p.y - 2 * z - p.h), (flip || !p.h ? 8 : 4) * z, (p.h ? 3 : 2) * z);
     }
   }
   show(v) { this.hidden = !v; this.g.setVisible(v); }

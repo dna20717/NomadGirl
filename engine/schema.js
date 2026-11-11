@@ -810,7 +810,7 @@ export const AREAS = {
         num('critters.moths', 'Motten je Lampe', { min: 0, max: 8, step: 0.5, hint: 'Kreisen um brennende Lampen und stoßen dagegen' }), color('critters.mothColor', 'Motten-Farbe'),
         num('critters.roaches', 'Kakerlaken', { min: 0, max: 40, hint: 'Auf den Böden im Bild, flüchten vor Leyla in die Ritzen' }), color('critters.roachColor', 'Kakerlaken-Farbe'),
         num('critters.rats', 'Ratten', { unit: 'pro Minute', min: 0, hint: 'Ab und zu rennt eine über den Boden' }), color('critters.ratColor', 'Ratten-Farbe'),
-        num('critters.papers', 'Papierfetzen', { min: 0, max: 30, hint: 'Liegen am Boden, der Luftzug schiebt sie, Leyla wirbelt sie auf' }), color('critters.paperColor', 'Papier-Farbe'), num('critters.draft', 'Luftzug', { unit: 'px/s', min: 0 })] },
+        num('critters.papers', 'Papierfetzen', { min: 0, max: 30, hint: 'Liegen am Boden, der Luftzug schiebt sie, Leyla wirbelt sie auf' }), color('critters.paperColor', 'Papier-Farbe'), num('critters.draft', 'Luftzug', { unit: 'px/s', min: 0 }), num('critters.size', 'Größe', { unit: '%', min: 50, max: 400, hint: 'Pixelgröße der Tierchen und Fetzen (100 = 1 Spielpixel je Punkt, Standard 200)' })] },
     ],
   },
   rooms: {

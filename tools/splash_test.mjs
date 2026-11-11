@@ -39,6 +39,12 @@ for (const [name, width, height] of [['desktop', 1440, 900], ['ipad', 820, 1180]
   await ev(() => setPad({ axes: [0, 1] })); await page.waitForTimeout(120); await ev(() => setPad()); await page.waitForTimeout(100);
   await ev(() => setPad({ axes: [0, 1] })); await page.waitForTimeout(120); await ev(() => setPad()); await page.waitForTimeout(100);
   const sel = await ev(() => menu.selected());
+  // the little surprise: a tumbleweed rolls over the highway, a shooting star crosses the sky
+  await ev(() => splash.surprise());
+  let sur = { star: false, tumble: false };
+  for (let i = 0; i < 20 && !(sur.star && sur.tumble); i++) { await page.waitForTimeout(80); const x = await ev(() => ({ star: splash.star(), tumble: splash.tumble() })); sur = { star: sur.star || x.star, tumble: sur.tumble || x.tumble }; }
+  console.log(`  ${sur.star && sur.tumble ? 'ok  ' : 'FEHLER'} Überraschung: Sternschnuppe ${sur.star ? 'ja' : 'nein'}, Steppenläufer ${sur.tumble ? 'ja' : 'nein'}`);
+  if (!(sur.star && sur.tumble)) failed++;
   await ev(() => setPad({ axes: [1, 0] })); await page.waitForTimeout(1500);
   const bent = await ev(() => splash.curve());
   if (shots) await page.screenshot({ path: path.join(repo, 'output/splash_curve.png') });

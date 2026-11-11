@@ -80,6 +80,7 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/workshops/guest_bunk.png` | Werkstatt Gästekoje (zwei Etagenbetten, Vorhang, Lichterkette) | KI (PixelLab, Create Image Pro, Stilbild Schlafkoje v2) | 11.11.2026 |
 | `assets/workshops/treasury_empty.png`, `treasury.png` (+ `treasury_source.png`) | Werkstatt Schatzkammer leer und mit Schatzhaufen (deckungsgleich, Haufen aus dem Edit übernommen) | KI (PixelLab, Create Image Pro + Edit Pro Flash), Zuschnitt Code | 11.11.2026 |
 | `assets/items/icons_treasure.png` | 16 Wertsachen als Symbole, 4 × 4 à 64 px | KI (PixelLab, Create Image Pro, Stilbild icons_gear) | 11.11.2026 |
+| `assets/tiles/tileset00/source/mall.png`, `bunker.png`, `marble.png`, `clutter_mall3.png`, `clutter_bunker3.png`, `clutter_ministry3.png` (→ `terrain.png`, `props.png`) | Kachel-Sets Großmarkt, Bunker 13, Ministerium + je 16 Clutter (streng orthogonal) | KI (PixelLab, Create Image Pro, AAP-64, Stilbild floor/metal/clutter_station3), Zuschnitt `tools/tileset00.py` | 11.11.2026 |
 | `assets/leyla/yoga_front.png` (+ `yoga_front_source.gif`) | Leyla Yoga (Baum-Pose) von vorn, 12 Frames, Absinken pro Frame ausgeglichen | KI-generiert (Daniel), zugeschnitten (Code) | 07.11.2026 |
 | `assets/vehicles/van.png` | erste Version des Vans, offene Schiebetür, 837 × 417 px (`van_v1`) | aus `van_source.png` zugeschnitten, halbe Größe (Code) | 07.11.2026 |
 | `assets/vehicles/van_source.png` | erste Version des Vans: Original, 1774 × 887 px (`van_v1_source`) | KI-generiert (Daniel) | 07.11.2026 |

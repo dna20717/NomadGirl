@@ -86,6 +86,20 @@ export async function startSplash(canvas) {
   const dust = [];
   let lastFrame = -1, last = performance.now();
 
+  // a little surprise (Ava, 11.11.2026 – Daniel: „bau eine visuelle Kleinigkeit in den Homescreen ein“): now and then a tumbleweed
+  // bounces across the highway behind Leyla and rolls off into the distance, and a shooting star crosses the evening sky.
+  // Both from code, pixel sharp. splash.surprise() starts both at once (tests, or just for fun: click the sky).
+  const weed = (() => {   // 18 x 18 background pixels of tangled twigs, drawn once
+    const c = document.createElement('canvas'); c.width = c.height = 18;
+    const x = c.getContext('2d'), cols = ['#796755', '#a08662', '#5a4e44', '#c7b08b'];
+    for (let i = 0; i < 190; i++) { const a = Math.random() * 6.28, r = 1.5 + Math.sqrt(Math.random()) * 6.8; x.fillStyle = cols[i % 4]; x.fillRect(Math.round(9 + Math.cos(a) * r), Math.round(9 + Math.sin(a) * r), 1, 1); }
+    for (let i = 0; i < 16; i++) { const a = Math.random() * 6.28; x.fillStyle = cols[i % 3]; for (let t = 0; t < 7; t++) x.fillRect(Math.round(9 + Math.cos(a + t * 0.4) * (3 + t * 0.8)), Math.round(9 + Math.sin(a + t * 0.4) * (3 + t * 0.6)), 1, 1); }
+    return c;
+  })();
+  let tumble = null, star = null, nextTumble = performance.now() + 9000 + Math.random() * 9000, nextStar = performance.now() + 5000 + Math.random() * 12000;
+  const surprise = () => { nextTumble = nextStar = 0; };
+  canvas.addEventListener('click', e => { if (e.clientY < innerHeight * (S.horizon ?? 60) / 100) nextStar = 0; });
+
   function haze(t, horizon, sc) {
     const hy = Math.round(horizon), p = Math.max(1, Math.round(sc));
     // heat shimmer: rows of background pixels around the horizon slide sideways a little, strongest at the horizon
@@ -229,6 +243,19 @@ export async function startSplash(canvas) {
       weather.sky(skyCv.getContext('2d'), cw, ch, t, { x: bx, y: by, w: bw, h: bh });
       ctx.drawImage(skyCv, 0, Math.round(horizon - ch * sc), Math.round(cw * sc), Math.round(ch * sc));
     }
+    if (!still && now >= nextStar && !star) { star = { t: 0, x: 0.15 + Math.random() * 0.6, y: 0.05 + Math.random() * 0.18, d: Math.random() < 0.5 ? -1 : 1 }; nextStar = now + 18000 + Math.random() * 25000; }
+    if (star) {   // a short white streak with a fading tail, crossing the sky in under a second
+      star.t += dt;
+      const p = star.t / 0.9, m = Math.max(1, Math.round(sc)), len = 18;
+      if (p >= 1) star = null;
+      else for (let i = 0; i < len; i++) {
+        const q = p - i * 0.012; if (q < 0) break;
+        const x = (star.x + star.d * q * 0.28) * W, y = (star.y + q * 0.12) * horizon;
+        ctx.globalAlpha = (1 - i / len) * Math.sin(Math.min(1, p) * Math.PI); ctx.fillStyle = i < 2 ? '#ffffff' : '#fef3c0';
+        ctx.fillRect(Math.round(x / m) * m, Math.round(y / m) * m, m, m);
+      }
+      ctx.globalAlpha = 1;
+    }
     layers.forEach((img, i) => {
       const depth = layers.length > 1 ? i / (layers.length - 1) : 0;
       const ox = -look.x * par * W * depth + shiftH, oy = -look.y * par * 0.4 * H * depth;
@@ -279,6 +306,21 @@ export async function startSplash(canvas) {
       ctx.globalAlpha = 1;
     };
     drawSpecks(false);
+    if (!still && now >= nextTumble && !tumble) { const d = Math.random() < 0.5 ? -1 : 1; tumble = { x: -d * 2.6, z: zFeet + 0.6 + Math.random() * 1.6, d, a: 0, h: 0, vh: 0 }; nextTumble = now + 22000 + Math.random() * 30000; }
+    const drawTumble = front => {
+      if (!tumble || (tumble.z < zFeet) !== front) return;
+      const T = tumble, [x, y] = project(T.x, T.z), m = Math.max(1, Math.round(px * (Z_NEAR * 13) / T.z) / 2), size = 18 * m;
+      ctx.save(); ctx.translate(Math.round(x), Math.round(y - size / 2 - T.h * m * 6)); ctx.rotate(T.a); ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(weed, -size / 2, -size / 2, size, size); ctx.restore();
+      ctx.globalAlpha = 0.25; ctx.fillStyle = '#000'; ctx.fillRect(Math.round(x - size * 0.35), Math.round(y - m), Math.round(size * 0.7), Math.round(m * 2)); ctx.globalAlpha = 1;
+    };
+    if (tumble && !still) {   // it rolls sideways, hops, and the ground carries it away like everything else
+      const T = tumble;
+      T.x += T.d * 1.5 * dt; T.z += G.speed * pace * dt * (T.z / 6 + 0.35); T.a += T.d * dt * 7;
+      T.vh -= 9 * dt; T.h = Math.max(0, T.h + T.vh * dt); if (!T.h) T.vh = 1.6 + Math.random() * 1.4;
+      if (Math.abs(T.x) > 3.2 || T.z > Z_FAR * 0.6) tumble = null;
+    }
+    drawTumble(false);
     for (const d of dust) {   // little clouds of ground colour, lighter
       const [x, y] = project(d.x, d.z), m = Math.max(1, Math.round(px * 0.6 * zFeet / d.z)), r = Math.round(d.r * (1 + (1 - d.life)));
       ctx.globalAlpha = Math.max(0, d.life) * 0.55; ctx.fillStyle = G.color;
@@ -293,6 +335,7 @@ export async function startSplash(canvas) {
     if (droneImg) drawDrone(t, now);   // behind Leyla
     if (runImg) ctx.drawImage(runImg, f * fw, 0, fw, fh, Math.round(cx - ax * k), Math.round(feet - ay * k), Math.round(fw * k), Math.round(fh * k));
     drawSpecks(true);
+    drawTumble(true);
     if (weather?.rain) {   // rain in front of everything
       const rw = Math.ceil(W / sc), rh = Math.ceil(H / sc);
       if (rainCv.width !== rw || rainCv.height !== rh) Object.assign(rainCv, { width: rw, height: rh });
@@ -303,7 +346,7 @@ export async function startSplash(canvas) {
     if (!still) requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  return { steer: v => { steer.aim = v; }, curve: () => +steer.v.toFixed(3), still, weather: S.weather || null, drone: !!droneImg, droneFrame: () => drone.frame, layers: layers.length, runner: !!runImg, gaits: gaits.length, gait: () => run?.name, commit: cloud?.commit || null };
+  return { surprise, tumble: () => !!tumble, star: () => !!star, steer: v => { steer.aim = v; }, curve: () => +steer.v.toFixed(3), still, weather: S.weather || null, drone: !!droneImg, droneFrame: () => drone.frame, layers: layers.length, runner: !!runImg, gaits: gaits.length, gait: () => run?.name, commit: cloud?.commit || null };
 }
 
 function load(src) {
