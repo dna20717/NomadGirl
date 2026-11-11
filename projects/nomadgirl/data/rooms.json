@@ -23,9 +23,10 @@
    "#...S.D......L........H...#...#..1..1...",
    "##^#####################################"
   ],
-  "backdrop": {"weather": "abendglut", "shade": 20}
+  "backdrop": {"weather": "abendglut", "shade": 20},
+  "terrain": "desert"
  },
- "eingangshalle": {"name": "Eingangshalle", "size": [30, 17], "tags": ["start", "npc"], "weight": 1},
+ "eingangshalle": {"name": "Eingangshalle", "size": [30, 17], "tags": ["start", "npc"], "weight": 1, "terrain": "concrete"},
  "verkaufsraum": {
   "name": "Verkaufsraum",
   "size": [30, 17],
@@ -49,7 +50,8 @@
    "................###...........",
    "............1...###...1...1...",
    "##############################"
-  ]
+  ],
+  "terrain": "concrete"
  },
  "lager": {
   "name": "Lager",
@@ -74,7 +76,8 @@
    "#..............B...#",
    "#.....1........B.C.#",
    "##########A#########"
-  ]
+  ],
+  "terrain": "concrete"
  },
  "werkstatthalle": {
   "name": "Werkstatthalle",
@@ -99,12 +102,13 @@
    "..................#####............#",
    "........1.....1...#####...1..1...Z.#",
    "###############################v####"
-  ]
+  ],
+  "terrain": "metal"
  },
- "gang": {"name": "Gang", "size": [24, 10], "tags": ["corridor", "combat"], "weight": 4},
- "treppenhaus": {"name": "Treppenhaus", "size": [14, 34], "tags": ["corridor"], "weight": 2},
- "tresorraum": {"name": "Tresorraum", "size": [18, 12], "tags": ["loot", "secret"], "weight": 1},
- "kontrollraum": {"name": "Kontrollraum", "size": [40, 22], "tags": ["boss", "exit"], "weight": 1},
+ "gang": {"name": "Gang", "size": [24, 10], "tags": ["corridor", "combat"], "weight": 4, "terrain": "concrete"},
+ "treppenhaus": {"name": "Treppenhaus", "size": [14, 34], "tags": ["corridor"], "weight": 2, "terrain": "concrete"},
+ "tresorraum": {"name": "Tresorraum", "size": [18, 12], "tags": ["loot", "secret"], "weight": 1, "terrain": "metal"},
+ "kontrollraum": {"name": "Kontrollraum", "size": [40, 22], "tags": ["boss", "exit"], "weight": 1, "terrain": "metal"},
  "testraum": {
   "name": "Testraum",
   "size": [170, 24],
@@ -138,7 +142,8 @@
    "##########################################################################################################################################################################"
   ],
   "spawns": [],
-  "backdrop": {"image": "ruins_relay", "weather": "abendglut_regen", "bottom": 90, "scroll": 4, "shade": 20}
+  "backdrop": {"image": "ruins_relay", "weather": "abendglut_regen", "bottom": 90, "scroll": 4, "shade": 20},
+  "terrain": "desert"
  },
  "kampfraum": {
   "name": "Kampfraum",
@@ -165,6 +170,7 @@
    "################################################################",
    "################################################################"
   ],
-  "spawns": [{"symbol": "a", "enemy": "schlaeger"},{"symbol": "b", "enemy": "schuetze"}]
+  "spawns": [{"symbol": "a", "enemy": "schlaeger"},{"symbol": "b", "enemy": "schuetze"}],
+  "terrain": "desert"
  }
 }

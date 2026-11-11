@@ -10,7 +10,7 @@ The 64 first-round candidates live in assets/tiles/tileset00/candidates/ (kept o
 Output:
   terrain.png  cells 64 x 80 (16 px room above the tile for crust, grass, rubble),
                per theme two rows of 8: top 0-3, fill a 0-3 | fill b 0-3, (free)
-  props.png    cells 64 x 64, 8 per row: clutter sets, then decals
+  props.png    cells 64 x 64, 8 per row (two rows per set): clutter desert, station, industry, ruins, decals, desert2, station2, industry2
 Prints the cell names in sheet order (for the "names" of the icons asset).
 
 Usage: python3 tools/tileset00.py
@@ -30,7 +30,7 @@ THEMES = [
     ('metal', 'metal', [0, 1, 2, 3]),
     ('ruins', 'ruins', [0, 1, 2, 3]),
 ]
-CLUTTER = ['desert', 'station', 'industry', 'ruins']
+CLUTTER = ['desert', 'station', 'industry', 'ruins', 'desert2', 'station2', 'industry2']   # *2 = second round: 16 different things per sheet
 
 
 def surface_row(img):
@@ -87,8 +87,19 @@ def ground_cut(img):
     return img
 
 
+def to_floor(cell):
+    """Clutter stands on the bottom edge of its cell, centred."""
+    bbox = cell.getchannel('A').getbbox()
+    if not bbox:
+        return cell
+    part = cell.crop(bbox)
+    out = Image.new('RGBA', (T, T))
+    out.alpha_composite(part, ((T - part.width) // 2, T - part.height))
+    return out
+
+
 def props():
-    sets = [(f'clutter_{n}', n) for n in CLUTTER] + [('decals', 'decal')]
+    sets = [(f'clutter_{n}', n) for n in CLUTTER[:4]] + [('decals', 'decal')] + [(f'clutter_{n}', n) for n in CLUTTER[4:]]   # decals stay in rows 8-9
     sheet = Image.new('RGBA', (8 * T, len(sets) * 2 * T))
     names = []
     for i, (file, prefix) in enumerate(sets):
@@ -97,6 +108,8 @@ def props():
             cell = img.crop(((k % 4) * T, (k // 4) * T, (k % 4) * T + T, (k // 4) * T + T))
             if file == 'clutter_desert':
                 cell = ground_cut(cell)
+            if file != 'decals':
+                cell = to_floor(cell)
             sheet.alpha_composite(cell, ((k % 8) * T, (i * 2 + k // 8) * T))
             names.append(f'{prefix}_{k}')
     sheet.save(ROOT / 'props.png')

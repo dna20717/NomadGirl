@@ -115,6 +115,10 @@ Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich 
 | `assets/workshops/chill_area_v2.png` | Chill Area mit Sofa, TV, Aquarium, Lavalampe, Lichterkette, eigener Boden (Anker y 225), 256 × 256 | KI-generiert (Daniel, low top-down) | 09.11.2026 |
 | `assets/workshops/sleep_bunk_v2.png` | Schlafkoje mit Etagenbett, Plüschteddy, Lichterkette, eigener Boden (Anker y 246), 256 × 256 | KI-generiert (Daniel, low top-down) | 09.11.2026 |
 | `assets/workshops/foodtruck_kitchen.png` | Foodtruck-Küche mit Töpfen, Pfannen, Mikrowelle (Anker 139, 188), 256 × 256 | KI-generiert (Daniel, low top-down) | 09.11.2026 |
+| `assets/tiles/tileset00/candidates/*.png` | TileSet00 · erste Runde: je Thema (desert, concrete, metal, ruins) 16 Kandidaten à 64 × 64 als 4 × 4-Blatt, alle aufbewahrt (Daniel: „du wirfst die anderen nicht weg“); gewählt: Wüste 12, Beton 4 + 6, Metall 3, Ruine 1 | KI (PixelLab, Create Image Pro, AAP-64, Stilvorlage Leyla) | 11.11.2026 |
+| `assets/tiles/tileset00/source/*.png` | TileSet00 · Quellen: Texturen 256 × 256 je Thema (desert, floor, wall, metal, ruins; Oberfläche oben, links/rechts nahtlos), Clutter-Blätter (desert, station, industry, ruins, *2 = 16 verschiedene Dinge je Blatt), Decals (`tileset00_source`) | KI (PixelLab, Create Image Pro, AAP-64, Favorit als Vorlage) | 11.11.2026 |
+| `assets/tiles/tileset00/terrain.png` | TileSet00 · Gelände: Felder 64 × 80 (16 px Platz für Kruste darüber), je Thema Oberfläche 0–3, Füllung a/b 0–3 (`tileset00`) | aus den Quellen geschnitten (Code, `tools/tileset00.py`) | 11.11.2026 |
+| `assets/tiles/tileset00/props.png` | TileSet00 · Clutter & Decals: Felder 64 × 64, Clutter auf den Boden ausgerichtet (`tileset00_props`) | aus den Quellen geschnitten (Code, `tools/tileset00.py`) | 11.11.2026 |
 
 ## Ordner
 

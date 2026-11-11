@@ -10,17 +10,24 @@ export const PLACEHOLDER_COLORS = {
 };
 
 // Draw once into textures (Phaser redraws Graphics every frame, textures are cheap). Chunks of max. 2048 px.
-// stamps: [{ key, frame, x, y }] texture frames drawn on top (tiles from assets)
-function bake(scene, g, x0, y0, w, h, { depth = 0, scroll = null, stamps = [] } = {}) {
+// stamps: [{ key, frame, x, y }] texture frames drawn on top (tiles from assets), over: graphics drawn after the stamps (edges)
+function bake(scene, g, x0, y0, w, h, { depth = 0, scroll = null, stamps = [], over = null } = {}) {
   const C = 2048;
   for (let cy = 0; cy < h; cy += C) for (let cx = 0; cx < w; cx += C) {
     const cw = Math.min(C, w - cx), ch = Math.min(C, h - cy);
     const rt = scene.add.renderTexture(x0 + cx, y0 + cy, cw, ch).setOrigin(0).setDepth(depth);
     rt.draw(g, -(x0 + cx), -(y0 + cy));
-    for (const st of stamps) rt.drawFrame(st.key, st.frame, st.x - x0 - cx, st.y - y0 - cy);
+    // only the stamps that reach into this chunk, drawn as one batch (big rooms have thousands of tiles)
+    const mine = stamps.filter(st => st.x < x0 + cx + cw && st.x + 256 > x0 + cx && st.y < y0 + cy + ch && st.y + 256 > y0 + cy);
+    if (mine.length) {
+      rt.beginDraw();
+      for (const st of mine) rt.batchDrawFrame(st.key, st.frame, st.x - x0 - cx, st.y - y0 - cy);
+      rt.endDraw();
+    }
+    if (over) rt.draw(over, -(x0 + cx), -(y0 + cy));
     if (scroll) rt.setScrollFactor(...scroll);
   }
-  g.destroy();
+  g.destroy(); over?.destroy();
 }
 
 // small deterministic random so the skyline looks the same every time
@@ -105,14 +112,66 @@ export function drawBackground(scene, roomW, roomH) {
   scene.add.rectangle(0, 0, roomW, roomH, 0x0d0a12, 0.35).setOrigin(0).setDepth(-90);
 }
 
+// Kachel-Sets (data/terrain.json, TileSet00): resolve a set to frames of its icon sheets, once per id.
+// → kit { key, over (px the cells reach above the tile), top/fill/fill2 (frame indices), props, pcell, clutter, decals, def } or null
+export function terrainKits(scene, D) {
+  const A = D.assets || {}, cache = new Map();
+  return id => {
+    if (!id) return null;
+    if (cache.has(id)) return cache.get(id);
+    const t = D.terrain?.[id], a = A[t?.look], p = A[t?.props];
+    let kit = null;
+    if (t && a?.kind === 'icons' && a.cell && scene.textures.exists(t.look)) {
+      const list = (k, asset) => (t[k] || []).map(n => (asset.names || []).indexOf(n)).filter(i => i >= 0);
+      const props = p?.kind === 'icons' && p.cell && scene.textures.exists(t.props);
+      kit = { id, def: t, key: t.look, over: Math.max(0, a.cell[1] - a.cell[0]), top: list('top', a), fill: list('fill', a), fill2: list('fill2', a),
+        props: props ? t.props : null, pcell: props ? p.cell : null, clutter: props ? list('clutter', p) : [], decals: props ? list('decals', p) : [] };
+      if (!kit.top.length || !kit.fill.length) kit = null;
+    }
+    cache.set(id, kit);
+    return kit;
+  };
+}
+// the same random number for the same tile, every time
+const hash = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + s * 2246822519) >>> 0; h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+const hexInt = (c, d) => c ? parseInt(String(c).slice(1), 16) : d;
+
 // Tiles of a parsed room: concrete blocks with lit edges, platforms, ladders, rope anchors
+// terrain = { at(x, y) → kit | null, back(x, y) → kit | null }: tiles from a Kachel-Set instead of code (walls, back wall in indoor rooms)
 // tiles = { platform: textureKey | null } (asset strips: single, left, middle, right)
 // style (camp): { ground, top, hide(x, y) } = earth instead of concrete, side walls invisible
-export function drawRoom(scene, room, T, tiles = {}, style = null) {
+export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = null) {
   const g = scene.make.graphics({}, false), solid = (x, y) => x < 0 || y < 0 || x >= room.w || y >= room.h || WALLS.has(room.tiles[y][x]), stamps = [];
+  const edges = scene.make.graphics({}, false), decals = [], clutter = [], back = [], backShade = scene.make.graphics({}, false);
   const r = rng(99);
   for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
     const t0 = room.tiles[y][x], t = WALLS.has(t0) ? '#' : t0, px = x * T, py = y * T;
+    const kit = t === '#' && !style ? terrain?.at(x, y) : null;
+    if (t !== '#' && !style) {
+      const bk = terrain?.back?.(x, y);
+      if (bk) {
+        const list = y % 2 && bk.fill2.length ? bk.fill2 : bk.fill;
+        back.push({ key: bk.key, frame: list[x % list.length], x: px, y: py - bk.over });
+        backShade.fillStyle(0x060608, (bk.shade ?? 55) / 100).fillRect(px, py, T, T);
+      }
+    }
+    if (kit) {
+      const top = !solid(x, y - 1), D = kit.def, seed = D.seed || 0, list = top ? kit.top : y % 2 && kit.fill2.length ? kit.fill2 : kit.fill;
+      stamps.push({ key: kit.key, frame: list[x % list.length], x: px, y: py - kit.over });
+      const faces = !solid(x - 1, y) || !solid(x + 1, y) || !solid(x, y - 1) || !solid(x, y + 1) || !solid(x - 1, y - 1) || !solid(x + 1, y - 1) || !solid(x - 1, y + 1) || !solid(x + 1, y + 1);
+      if (faces && kit.decals.length && hash(x, y, seed + 1) * 100 < (D.decalChance ?? 0))   // decals only where the wall meets the air
+        decals.push({ key: kit.props, frame: kit.decals[Math.floor(hash(x, y, seed + 2) * kit.decals.length)], x: px + (T - kit.pcell[0]) / 2, y: py + (T - kit.pcell[1]) / 2 });
+      const air = room.tiles[y - 1]?.[x] === '.';
+      if (top && air && kit.clutter.length && solid(x - 1, y) && solid(x + 1, y) && hash(x, y, seed + 3) * 100 < (D.clutterChance ?? 0))
+        clutter.push({ key: kit.props, frame: kit.clutter[Math.floor(hash(x, y, seed + 4) * kit.clutter.length)], x: px + (T - kit.pcell[0]) / 2, y: py - kit.pcell[1] + 4 });
+      // edges from code: shade inside, then the outline (left, right, bottom; the top tile brings its own)
+      const E = D.edge || {}, ow = E.width ?? 2, sw = E.shadeWidth ?? 3, sa = (E.shade ?? 40) / 100, oc = hexInt(E.color, 0x060608);
+      const side = (open, rx, ry, rw, rh, ix, iy, iw, ih) => { if (!open) return; edges.fillStyle(0x060608, sa).fillRect(ix, iy, iw, ih); edges.fillStyle(oc).fillRect(rx, ry, rw, rh); };
+      side(!solid(x - 1, y), px, py, ow, T, px + ow, py, sw, T);
+      side(!solid(x + 1, y), px + T - ow, py, ow, T, px + T - ow - sw, py, sw, T);
+      side(!solid(x, y + 1), px, py + T - ow, T, ow, px, py + T - ow - sw, T, sw);
+      continue;
+    }
     if (t === '#' && style) {
       if (style.hide?.(x, y)) continue;
       const base = parseInt(style.ground.slice(1), 16), topC = parseInt(style.top.slice(1), 16);
@@ -144,5 +203,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null) {
       g.fillStyle(0xe45aa8, 0.6).fillCircle(px + T / 2, py + T / 2, 5);
     }
   }
-  bake(scene, g, 0, 0, room.w * T, room.h * T, { depth: -10, stamps });
+  if (back.length) bake(scene, scene.make.graphics({}, false), 0, 0, room.w * T, room.h * T, { depth: -11, stamps: back, over: backShade });
+  else backShade.destroy();
+  bake(scene, g, 0, 0, room.w * T, room.h * T, { depth: -10, stamps: [...stamps, ...decals, ...clutter], over: edges });
 }

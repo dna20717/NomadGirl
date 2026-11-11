@@ -76,6 +76,7 @@ export class PoiLevel {
     let seed = 7; const rnd = () => (seed = seed * 16807 % 2147483647) / 2147483647;
     for (let y = 0; y < R.h; y++) for (let x = 0; x < R.w; x++) {
       if (R.tiles[y][x] === '#' || outdoor.some(r => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h)) continue;
+      if (s.terrain?.back(x, y)) continue;   // the Kachel-Set brings its own back wall (art.js drawRoom)
       const px = x * T, py = y * T;
       g.fillStyle(0x14121a + (rnd() < 0.2 ? 0x020202 : 0)).fillRect(px, py, T, T);
       if (y % 3 === 0) g.fillStyle(0x0d0c11).fillRect(px, py, T, 3);

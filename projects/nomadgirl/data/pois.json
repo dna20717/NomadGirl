@@ -13,7 +13,8 @@
   "npcs": true,
   "foodtruck": true,
   "shop": true,
-  "description": "Die letzte Tankstelle vor der Salzebene. Der Kaffee ist furchtbar."
+  "description": "Die letzte Tankstelle vor der Salzebene. Der Kaffee ist furchtbar.",
+  "tunnelTerrain": "metal"
  },
  "grossmarkt": {
   "name": "Großmarkt Delta-Süd",

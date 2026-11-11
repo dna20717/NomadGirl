@@ -125,7 +125,8 @@ export const AREAS = {
         ...PAD_ACTIONS.map(([a, n]) => multi(`gamepad.map.${a}`, n, PAD_BUTTONS))] },
       { title: 'Kamera', fields: [num('camera.zoom', 'Zoom', { min: 0.3, max: 2, step: 0.05, hint: '1 = 1920×1080 Spielpixel sichtbar, 0,75 = weiter raus (mehr sichtbar), über 1 = näher ran' }),
         num('camera.lookAhead', 'Vorlauf', { unit: 'px', min: 0, hint: 'So weit schaut die Kamera in Laufrichtung voraus' }), num('camera.follow', 'Nachziehen', { min: 0.01, max: 1, step: 0.01, hint: '1 = klebt an Leyla, kleiner = weicher' })] },
-      { title: 'Kacheln', fields: [ref('tiles.platform', 'Plattform', 'assets', { hint: 'Asset der Art „Kacheln“ mit 4 Frames: einzeln, links, Mitte, rechts. Leer = aus Code gezeichnet' })] },
+      { title: 'Kacheln', fields: [ref('tiles.platform', 'Plattform', 'assets', { hint: 'Asset der Art „Kacheln“ mit 4 Frames: einzeln, links, Mitte, rechts. Leer = aus Code gezeichnet' }),
+        ref('tiles.terrain', 'Kachel-Set', 'terrain', { hint: 'Wände und Böden in allen Räumen ohne eigenes Kachel-Set. Leer = aus Code gezeichnet' })] },
       { title: 'Spawn-Punkt', fields: [bool('spawn.enabled', 'Zeigen'), ref('spawn.look', 'Aussehen', 'assets', { hint: 'Bild oder Animation; der Ankerpunkt des Assets sitzt auf Leylas Start (L im Raum-Layout)' }),
         point('spawn.offset', 'Versatz', { unit: 'px', hint: 'Verschiebt das Bild gegenüber dem Start (x nach rechts, y nach unten)' }), bool('spawn.flip', 'Gespiegelt'),
         select('spawn.layer', 'Ebene', [['behindWalls', 'Hinter Wänden'], ['front', 'Vor Wänden, hinter Leyla']], { hint: 'Hinter Wänden: Wände verdecken das Bild, wenn es hineinragt' })] },
@@ -664,6 +665,7 @@ export const AREAS = {
       { title: 'Aufbau', fields: [range('roomCount', 'Räume', { hint: 'Wie viele Räume zusammengesetzt werden' }), refs('rooms', 'Raum-Bausteine', 'rooms'), refs('enemies', 'Gegner', 'enemies', { hint: 'Für das Zeichen 1 im Layout: ein zufälliger dieser Gegner' }), ref('loot', 'Kisten-Beute', 'lootTables', { hint: 'Für Kisten (C) in den Räumen' })] },
       { title: 'Level', fields: [num('branchChance', 'Abzweige', { unit: '%', min: 0, max: 100, hint: 'Chance je Abzweig-Haken (A in der Decke eines Hauptraums), dass ein Seitenraum (Merkmal Beute/Geheimnis, A im Boden) darüber hängt. Leer = 60' }),
         bool('shortcut', 'Abkürzung zum Van', { hint: 'Tunnel unter allen Räumen: v im Boden des Ausgangs → ^ im Boden des Eingangs. Aus = kein Tunnel. Leer = an' }),
+        ref('tunnelTerrain', 'Kachel-Set im Tunnel', 'terrain', { hint: 'Wände und Rückwand der Abkürzung. Leer = Kachel-Set des Eingangs' }),
         num('seed', 'Fester Seed', { min: 0, hint: 'Zum Testen: immer dasselbe Level. Leer/0 = jeder Run neu gewürfelt' })] },
       { title: 'Ranking', fields: [num('parTime', 'Bestzeit', { unit: 's', min: 0 }), num('secrets', 'Secrets', { min: 0, hint: 'Im Level zählen die brüchigen Wände (B); diese Zahl gilt nur für POIs ohne Level' })] },
       { title: 'Leben', fields: [bool('npcs', 'NPCs vor Ort'), bool('foodtruck', 'Foodtruck-Verkauf möglich'), bool('shop', 'Händler')] },
@@ -677,6 +679,36 @@ export const AREAS = {
       else for (const t of buildPoi(p.data, id, 1).problems) report('hint', `Level: ${t}`);
     },
   },
+  terrain: {
+    name: 'Kachel-Sets', singular: 'Kachel-Set', icon: 'tile', file: 'data/terrain.json', kind: 'catalog',
+    hint: 'Wände und Böden der Räume (# im Layout) aus einem Symbol-Raster mit 64-px-Kacheln (TileSet00): Oberfläche, Füllung, Kanten aus Code, Clutter oben drauf, Decals auf der Wand und eine Rückwand für Innenräume. Raum-Bausteine wählen ihr Set, sonst gilt Spiel › Kacheln › Kachel-Set.',
+    template: { name: 'Neues Kachel-Set', look: 'tileset00', top: [], fill: [], edge: { color: '#060608', width: 2, shade: 40, shadeWidth: 3 }, clutterChance: 20, decalChance: 6 },
+    row: x => `${(x.top || []).length} Oberflächen · ${(x.fill || []).length + (x.fill2 || []).length} Füllungen · ${(x.clutter || []).length} Clutter · ${(x.decals || []).length} Decals`,
+    sections: [
+      { title: 'Kacheln', fields: [NAME, DESCRIPTION, ref('look', 'Raster', 'assets', { hint: 'Asset der Art „Symbole“: Feldbreite = Kachelgröße, was höher ist, ragt nach oben über die Kachel (Kruste, Moos, Schutt)' }),
+        lines('top', 'Oberfläche', { hint: 'Namen aus dem Raster, eine pro Zeile: Kacheln mit Luft darüber. Nebeneinander der Reihe nach (x mod Anzahl), dann schließen nahtlose Streifen sauber an' }),
+        lines('fill', 'Füllung', { hint: 'Kacheln mit Wand darüber, der Reihe nach wie die Oberfläche' }),
+        lines('fill2', 'Füllung darunter', { hint: 'Wechselt sich zeilenweise mit der Füllung ab; leer = immer Füllung' })] },
+      { title: 'Kanten', fields: [color('edge.color', 'Umriss'), num('edge.width', 'Umriss', { unit: 'px', min: 0 }),
+        num('edge.shade', 'Schatten', { unit: '%', min: 0, max: 100, hint: 'Abdunkeln innen neben dem Umriss' }), num('edge.shadeWidth', 'Schatten', { unit: 'px', min: 0 })] },
+      { title: 'Rückwand', fields: [ref('back.terrain', 'Rückwand aus', 'terrain', { hint: 'In Innenräumen (Raum-Bausteine › Innenraum) und im Tunnel liegt die Füllung dieses Sets abgedunkelt hinter allem. Leer = dunkle Wand aus Code' }),
+        num('back.shade', 'Abdunkeln', { unit: '%', min: 0, max: 100 })] },
+      { title: 'Clutter & Decals', fields: [ref('props', 'Raster', 'assets', { hint: 'Asset der Art „Symbole“ mit Clutter (steht auf dem unteren Rand) und Decals' }),
+        num('clutterChance', 'Clutter', { unit: '%', min: 0, max: 100, hint: 'Chance je Oberflächen-Kachel mit Wand links und rechts und freier Luft darüber' }),
+        lines('clutter', 'Clutter', { hint: 'Namen aus dem Raster, eine pro Zeile; doppelt = häufiger' }),
+        num('decalChance', 'Decals', { unit: '%', min: 0, max: 100, hint: 'Chance je Kachel' }), lines('decals', 'Decals', { hint: 'Namen aus dem Raster, eine pro Zeile' }),
+        num('seed', 'Zufall', { min: 0, hint: 'Andere Zahl = andere Verteilung (gleich bleibt gleich)' })] },
+    ],
+    check: (x, report, p) => {
+      const names = id => { const a = p.data.assets?.[id]; return a?.kind === 'icons' ? new Set(a.names || []) : null; };
+      const T = names(x.look), P = names(x.props);
+      if (x.look && !T) report('error', 'Raster ist kein Asset der Art „Symbole“');
+      if (x.props && !P) report('error', 'Clutter-Raster ist kein Asset der Art „Symbole“');
+      if (!(x.top || []).length || !(x.fill || []).length) report('warning', 'Oberfläche oder Füllung fehlt');
+      for (const k of ['top', 'fill', 'fill2']) for (const n of x[k] || []) if (T && !T.has(n)) report('error', `„${n}“ gibt es im Raster nicht`);
+      for (const k of ['clutter', 'decals']) for (const n of x[k] || []) if (P && !P.has(n)) report('error', `„${n}“ gibt es im Clutter-Raster nicht`);
+    },
+  },
   rooms: {
     name: 'Raum-Bausteine', singular: 'Raum', icon: 'tile', file: 'data/rooms.json', kind: 'catalog',
     hint: 'Handgebaute Räume, aus denen POIs zusammengesetzt werden. Das Layout ist Text: ein Zeichen pro Kachel. Später kommt ein Level-Editor dazu.',
@@ -684,6 +716,7 @@ export const AREAS = {
     row: x => `${(x.size || []).join('×')} · ${(x.tags || []).map(t => label(ROOM_TAGS, t)).join(', ')}${x.layout ? ' · Layout' : ''}`,
     sections: [
       { title: 'Raum', fields: [NAME, LOOK, size('size', 'Größe', { unit: 'Kacheln' }), multi('tags', 'Merkmale', ROOM_TAGS), num('weight', 'Häufigkeit', { min: 0 }),
+        ref('terrain', 'Kachel-Set', 'terrain', { hint: 'Wände und Böden dieses Raums. Leer = Spiel › Kacheln › Kachel-Set' }),
         bool('indoor', 'Innenraum', { hint: 'Im POI-Level: Rückwand statt Himmel. Leer = Innenraum, wenn der Raum keinen eigenen Hintergrund hat' }), DESCRIPTION] },
       { title: 'Hintergrund', fields: [ref('backdrop.image', 'Bild', 'assets', { hint: 'Pixel-Art mit transparentem Himmel, scharf auf ganze Pixel skaliert; leer = Stadt-Silhouette aus Code' }),
         ref('backdrop.weather', 'Wetter', 'weather', { hint: 'Himmel dahinter, Regen davor' }), num('backdrop.pixel', 'Pixelgröße', { unit: 'px', min: 1, hint: 'Leer = passend zur Bildhöhe' }),
@@ -728,7 +761,7 @@ export const GROUPS = [
   ['KAMPF', ['weapons', 'enemies', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
   ['RIG', ['camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'companions']],
-  ['WELT', ['pois', 'rooms', 'locations', 'encounters', 'travel']],
+  ['WELT', ['pois', 'rooms', 'terrain', 'locations', 'encounters', 'travel']],
 ];
 
 export const optionLabel = label;

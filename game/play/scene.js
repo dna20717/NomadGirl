@@ -3,7 +3,7 @@ import { parseRoom, solidRects } from '../../engine/room.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
 import { PoiLevel } from './poi_level.js';
 import { Pad, PAD_ACTIONS } from './pad.js';
-import { makeTextures, drawBackground, drawRoom, PLACEHOLDER_COLORS } from './art.js';
+import { makeTextures, drawBackground, drawRoom, terrainKits, PLACEHOLDER_COLORS } from './art.js';
 import { Leyla } from './leyla.js';
 import { Enemy } from './enemies.js';
 import { Combat } from './combat.js';
@@ -44,7 +44,8 @@ export class PlayScene extends Phaser.Scene {
   preload() {
     const A = this.data_.assets || {}, ids = new Set(Object.values(this.data_.leyla?.look || {}));
     for (const e of Object.values(this.data_.enemies || {})) if (e.look) ids.add(e.look);
-    for (const id of Object.values(this.data_.game?.tiles || {})) ids.add(id);
+    for (const [k, id] of Object.entries(this.data_.game?.tiles || {})) if (k !== 'terrain') ids.add(id);
+    for (const t of Object.values(this.data_.terrain || {})) for (const id of [t.look, t.props]) if (id) ids.add(id);   // Kachel-Sets (TileSet00)
     const DR = this.data_.drone || {};
     for (const id of [DR.look, DR.face?.look, DR.face?.glass, ...(DR.parts || []).filter(r => r.on).map(r => r.look)]) if (id) ids.add(id);
     for (const r of this.data_.leyla?.idles || []) if (r.look) ids.add(r.look);
@@ -75,9 +76,39 @@ export class PlayScene extends Phaser.Scene {
       if (!a?.file) continue;
       const url = new URL(a.file, this.base).href;
       if ((a.kind === 'animation' || a.kind === 'tiles') && a.frameSize) this.load.spritesheet(id, url, { frameWidth: a.frameSize[0], frameHeight: a.frameSize[1] });
+      else if (a.kind === 'icons' && a.cell) { const [cw, ch] = Array.isArray(a.cell) ? a.cell : [a.cell, a.cell]; this.load.spritesheet(id, url, { frameWidth: cw, frameHeight: ch }); }
       else if (a.kind === 'image') this.load.image(id, url);
       else if (a.kind === 'sound' && !this.cache.audio.exists(id)) this.load.audio(id, [url, ...(a.alt ? [new URL(a.alt, this.base).href] : [])]);
     }
+  }
+  // Kachel-Sets per tile: a room's own set, else Spiel › Kacheln › Kachel-Set. In a POI level each tile belongs to the room above/at it,
+  // below all rooms lies the tunnel (POIs › Kachel-Set im Tunnel). back(x, y): back wall of indoor rooms and the tunnel.
+  // → { at(x, y), back(x, y), idAt(x, y) }
+  terrainMap() {
+    const D = this.data_, kits = terrainKits(this, D), dflt = D.game?.tiles?.terrain, LI = this.levelInfo;
+    const roomSet = id => D.rooms?.[id]?.terrain || dflt;
+    const indoor = id => { const r = D.rooms?.[id] || {}; return r.indoor ?? !(r.backdrop?.image || r.backdrop?.weather); };
+    const backOf = id => { const t = D.terrain?.[id], k = kits(t?.back?.terrain); return k ? { ...k, shade: t.back.shade } : null; };
+    let idAt, inside;
+    if (LI?.def) {
+      const P = D.pois?.[this.levelPoi] || {}, tunnel = P.tunnelTerrain || roomSet(LI.rooms[0]?.id), cache = new Map();
+      const roomAt = (x, y) => {
+        const k = x + ',' + y;
+        if (cache.has(k)) return cache.get(k);
+        const col = LI.rooms.filter(r => x >= r.x && x < r.x + r.w);
+        let r = col.find(r => y >= r.y && y < r.y + r.h) || null;
+        if (!r && col.length && y < Math.max(...col.map(c => c.y + c.h))) r = col.reduce((a, b) => Math.abs(b.y - y) < Math.abs(a.y - y) ? b : a);
+        cache.set(k, r);
+        return r;
+      };
+      idAt = (x, y) => { const r = roomAt(x, y); return r ? roomSet(r.id) : tunnel; };
+      inside = (x, y) => { const r = roomAt(x, y); return r ? indoor(r.id) : true; };
+    } else {
+      const own = roomSet(this.roomId);
+      idAt = () => own;
+      inside = () => !!D.rooms?.[this.roomId]?.indoor;
+    }
+    return { idAt, at: (x, y) => kits(idAt(x, y)), back: (x, y) => inside(x, y) ? backOf(idAt(x, y)) : null };
   }
   assetInfo(id) {
     const a = this.data_.assets?.[id];
@@ -141,6 +172,7 @@ export class PlayScene extends Phaser.Scene {
     const run = this.mode === 'run' ? this.box.save.run : this.mode === 'test' && this.args.poi ? { poi: this.args.poi, seed: this.args.seed } : null;
     this.levelInfo = run?.seed ? buildPoi(this.data_, run.poi, run.seed) : null;
     if (this.levelInfo?.def) def = this.levelInfo.def;
+    this.levelPoi = run?.poi || null;
     this.roomDef = def;
     this.room = parseRoom(def || {});
     const T = this.T, R = this.room, W = R.w * T, H = R.h * T;
@@ -158,10 +190,11 @@ export class PlayScene extends Phaser.Scene {
     this.cam.ignore(background);
     this.bgCam.ignore([...before]);
     if (!this.onAdded) { this.onAdded = o => this.bgCam.ignore(o); this.events.on(Phaser.Scenes.Events.ADDED_TO_SCENE, this.onAdded); }   // once: the scene object is reused on restart
-    const tiles = Object.fromEntries(Object.entries(this.data_.game?.tiles || {}).map(([k, id]) => [k, this.textures.exists(id) ? id : null]));
+    const tiles = Object.fromEntries(Object.entries(this.data_.game?.tiles || {}).filter(([k]) => k !== 'terrain').map(([k, id]) => [k, this.textures.exists(id) ? id : null]));
+    this.terrain = this.terrainMap();
     const CG = this.data_.camp?.ground;
     if (!(this.mode === 'camp' && drawCampGround(this, this.data_, this.campGeo, T)))
-      drawRoom(this, R, T, tiles, this.mode === 'camp' ? { ground: CG?.color || '#4a3628', top: CG?.top || '#8a6440', hide: this.campGeo.hidden } : null);
+      drawRoom(this, R, T, tiles, this.mode === 'camp' ? { ground: CG?.color || '#4a3628', top: CG?.top || '#8a6440', hide: this.campGeo.hidden } : null, this.terrain);
 
     this.solids = this.physics.add.staticGroup();
     for (const r of solidRects(R)) this.solids.add(this.add.zone((r.x + r.w / 2) * T, (r.y + r.h / 2) * T, r.w * T, r.h * T));
