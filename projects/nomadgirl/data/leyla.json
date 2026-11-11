@@ -134,5 +134,5 @@
  "yoga": {"fps": 6, "backFps": 10, "holdFrom": 12},
  "brake": {"enabled": true, "minSpeed": 85, "minRun": 350, "time": 650, "slide": 55, "fromFrame": 2, "cancel": 40},
  "fight": {"enabled": true, "auto": true, "sight": 10, "calm": 4, "onHit": true, "redraw": 700},
- "hit": {"enabled": true, "heavyFrom": 20, "time": 360, "heavyTime": 520, "inFrames": 3, "inTime": 70, "cancelAfter": 50, "flash": 50, "hitstop": 60}
+ "hit": {"enabled": true, "heavyFrom": 12, "time": 360, "heavyTime": 520, "inFrames": 3, "inTime": 70, "cancelAfter": 50, "flash": 50, "hitstop": 60, "scale": true, "fullAt": 15}
 }

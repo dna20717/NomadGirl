@@ -45,12 +45,12 @@ export class Fx {
   puff(x, y, color) { this.particles(x, y - 4, 10, color, { speed: 180, up: 0.2, life: 300, size: 1.6, gravity: 0 }); }
   sparks(x, y, color = 0xffd27a, n = 8) { this.particles(x, y, n, color, { speed: 340, up: 1, life: 260, size: 1.3, gravity: 1400 }); }
   // Leyla is hit (Leyla › Treffer): ring + streaks flying in the direction of the blow; dir = where she is pushed
-  impact(x, y, dir, heavy = false) {
-    const s = this.scene, n = heavy ? 9 : 6;
-    const ring = s.add.circle(x, y, heavy ? 16 : 12).setStrokeStyle(heavy ? 4 : 3, 0xff4f9a, 1).setDepth(12);
+  impact(x, y, dir, heavy = false, k = 1) {
+    const s = this.scene, n = Math.round((heavy ? 9 : 6) * k);
+    const ring = s.add.circle(x, y, (heavy ? 16 : 12) * k).setStrokeStyle(heavy ? 4 : 3, 0xff4f9a, 1).setDepth(12);
     s.tweens.add({ targets: ring, scale: heavy ? 3.2 : 2.6, alpha: 0, duration: heavy ? 220 : 160, ease: 'Quad.easeOut', onComplete: () => ring.destroy() });
     for (let i = 0; i < n; i++) {
-      const a = (dir > 0 ? 0 : Math.PI) + (Math.random() - 0.5) * 1.3, len = 18 + Math.random() * (heavy ? 34 : 22);
+      const a = (dir > 0 ? 0 : Math.PI) + (Math.random() - 0.5) * 1.3, len = (18 + Math.random() * (heavy ? 34 : 22)) * k;
       const g = s.add.rectangle(x, y, len, heavy ? 4 : 3, i % 3 ? 0xffffff : 0xff4f9a).setRotation(a).setDepth(12).setBlendMode(Phaser.BlendModes.ADD);
       const d = 70 + Math.random() * (heavy ? 120 : 80);
       s.tweens.add({ targets: g, x: x + Math.cos(a) * d, y: y + Math.sin(a) * d, scaleX: 0.2, alpha: 0, duration: 160 + Math.random() * 120, ease: 'Cubic.easeOut', onComplete: () => g.destroy() });

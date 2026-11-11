@@ -421,18 +421,20 @@ export class Leyla {
     if (this.state === 'crouch') this.endCrouch();
     if (this.state === 'land' || this.state === 'brake') this.state = 'normal';
     const away = Math.sign(this.x - fromX) || -this.facing;
-    this.body.setVelocity(away * 520, low ? 0 : -420);
+    // the damage sets how hard it hits (Leyla › Treffer › „Volle Wucht bei“): 0.5 (a scratch) … 1.5 (a big hit)
+    const H = this.d.hit || {}, k = Math.max(0.5, Math.min(1.5, damage / Math.max(1, H.fullAt ?? 15))), kick = H.scale === false ? 1 : 0.75 + 0.25 * k;
+    this.body.setVelocity(away * 520 * kick, low ? 0 : -420 * kick);
     if (low) this.facing = away;
     // hit reaction (Leyla › Treffer, Daniel 11.11.2026): light or heavy animation, effects from code (white flash, then red)
-    const H = this.d.hit || {}, heavy = damage >= (H.heavyFrom ?? 20) && this.d.look?.hitHeavy, look = heavy ? this.d.look.hitHeavy : this.d.look?.hit;
+    const heavy = damage >= (H.heavyFrom ?? 12) && this.d.look?.hitHeavy, look = heavy ? this.d.look.hitHeavy : this.d.look?.hit;
     if (look && this.scene.textures.exists(look) && H.enabled !== false) {
-      this.hitAnim = { at: time, look, heavy: !!heavy, dur: heavy ? H.heavyTime ?? 520 : H.time ?? 360 };
+      this.hitAnim = { at: time, look, heavy: !!heavy, k, dur: (heavy ? H.heavyTime ?? 520 : H.time ?? 360) * (H.scale === false ? 1 : 0.8 + 0.2 * k) };
       this.attack = null; this.charging = null; this.special = null;
     }
     this.sprite.setTintFill(0xffffff);
     this.scene.time.delayedCall(H.flash ?? 50, () => { if (this.alive) { this.sprite.setTintFill(0xff4060); this.scene.time.delayedCall(70, () => this.sprite.clearTint()); } });
-    this.scene.fx.impact?.(this.x - away * this.size.w * 0.4, this.chest, away, heavy);
-    if (H.hitstop !== 0) this.scene.hitstop(time, heavy ? (H.hitstop ?? 60) * 1.6 : H.hitstop ?? 60);
+    this.scene.fx.impact?.(this.x - away * this.size.w * 0.4, this.chest, away, heavy, H.scale === false ? 1 : k);
+    if (H.hitstop !== 0) this.scene.hitstop(time, (H.hitstop ?? 60) * (heavy ? 1.6 : 1) * (H.scale === false ? 1 : k));
     if (this.health <= 0) { this.hitAnim = null; this.die(); }
     return true;
   }
