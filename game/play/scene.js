@@ -3,6 +3,7 @@ import { parseRoom, solidRects } from '../../engine/room.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
 import { PoiLevel } from './poi_level.js';
 import { Pad, PAD_ACTIONS } from './pad.js';
+import { Fog } from './fog.js';
 import { makeTextures, drawBackground, drawRoom, terrainKits, PLACEHOLDER_COLORS } from './art.js';
 import { Leyla } from './leyla.js';
 import { Enemy } from './enemies.js';
@@ -109,7 +110,7 @@ export class PlayScene extends Phaser.Scene {
       idAt = () => own;
       inside = () => !!D.rooms?.[this.roomId]?.indoor;
     }
-    return { idAt, at: (x, y) => kits(idAt(x, y)), back: (x, y) => inside(x, y) ? backOf(idAt(x, y)) : null };
+    return { idAt, inside, at: (x, y) => kits(idAt(x, y)), back: (x, y) => inside(x, y) ? backOf(idAt(x, y)) : null };
   }
   assetInfo(id) {
     const a = this.data_.assets?.[id];
@@ -250,8 +251,10 @@ export class PlayScene extends Phaser.Scene {
     this.spawnEnemies();
     // chests, switches + doors, brittle walls, goal (game/play/poi_level.js): in POI levels and in single rooms that have them
     const M = R.marks || {};
-    this.level = this.mode !== 'camp' && (this.levelInfo?.def || ['C', 'S', 'D', 'B', 'Z'].some(k => M[k]?.length)) ? new PoiLevel(this, run?.poi || null) : null;
+    this.camo = drawn?.camo || [];
+    this.level = this.mode !== 'camp' && (this.levelInfo?.def || ['C', 'S', 'D', 'B', 'Z', '%', '$'].some(k => M[k]?.length)) ? new PoiLevel(this, run?.poi || null) : null;
     this.props = drawn?.props || [];
+    this.fog = new Fog(this);   // soft fog of war indoors (Spiel › Nebel)
 
     const cam = this.cam, C = this.data_.game?.camera || {};
     cam.setZoom(C.zoom || 1);
@@ -627,6 +630,8 @@ export class PlayScene extends Phaser.Scene {
 
     if (this.hud.build?.active) input = this.hud.build.drive(input, dt);   // building: Leyla walks to her jobs by herself
     this.leyla.update(time, dt, input);
+    this.level?.update?.(dt);
+    this.fog?.update(dt);
     this.drone.update(time, dt);
     this.van?.update(dt);
     if (this.camp) this.camp.update(time, dt, input);

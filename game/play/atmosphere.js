@@ -146,7 +146,7 @@ export class Atmosphere {
     const mood = this.moodAt(Math.floor(l.x / T), Math.floor((l.feet - 40) / T));
     this.vig = lerp(this.vig, mood.vignette, Math.min(1, dt / 600));
     for (const L of this.lights) {
-      L.f = behave(L.behavior, this.time, L.seed);
+      L.f = s.fog?.hiddenAt?.(L.x, L.y + 8) ? 0 : behave(L.behavior, this.time, L.seed);   // a lamp inside an undiscovered secret stays dark
       L.halo.setAlpha(L.haloA * L.f);
       if (L.behavior === 'broken' && L.f > 0.6 && (L.was ?? 0) < 0.3 && Math.random() < 0.5) this.burst(L.x, L.y, '#ffd27a', 7);   // catches: sparks
       L.was = L.f;

@@ -5,8 +5,8 @@ import { ROOM_TAGS } from '../../engine/project.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
 import { parseRoom } from '../../engine/room.js';
 
-const ROOM_COLORS = { '#': '#8b919c', '=': '#d4a72c', H: '#5fb4d9', o: '#e45aa8', L: '#3fe0d0', C: '#c08a4a', S: '#7ee0a0', D: '#5b8a6a', B: '#6e5a7a', Z: '#ffd27a', 1: '#ff8a5c', A: '#b0b8c4', '^': '#3fe0d0', v: '#3fe0d0', '*': '#fff2a8' };
-const ROOM_LEGEND = [['#', 'Wand'], ['=', 'Plattform'], ['H', 'Leiter'], ['o', 'Seil'], ['L', 'Start'], ['x', 'Gegner'], ['C', 'Kiste'], ['S', 'Schalter'], ['D', 'Tür'], ['B', 'Brüchig'], ['Z', 'Ziel'], ['^', 'Abkürzung'], ['*', 'Lampe']];
+const ROOM_COLORS = { '#': '#8b919c', '=': '#d4a72c', H: '#5fb4d9', o: '#e45aa8', L: '#3fe0d0', C: '#c08a4a', S: '#7ee0a0', D: '#5b8a6a', B: '#6e5a7a', Z: '#ffd27a', 1: '#ff8a5c', A: '#b0b8c4', '^': '#3fe0d0', v: '#3fe0d0', '*': '#fff2a8', '%': '#9a7ab8', $: '#8a6e9a' };
+const ROOM_LEGEND = [['#', 'Wand'], ['=', 'Plattform'], ['H', 'Leiter'], ['o', 'Seil'], ['L', 'Start'], ['x', 'Gegner'], ['C', 'Kiste'], ['S', 'Schalter'], ['D', 'Tür'], ['B', 'Brüchig'], ['%', 'Scheinwand'], ['$', 'Getarnt brüchig'], ['Z', 'Ziel'], ['^', 'Abkürzung'], ['*', 'Lampe']];
 // a layout as a small map (rooms and POI levels)
 function roomMap(r, maxW = 300) {
   const px = Math.max(2, Math.min(8, Math.floor(maxW / Math.max(1, r.w))));
@@ -131,7 +131,7 @@ export const SUMMARY = {
         ['Hauptweg', main.join(' → ')],
         ['Abzweige', L.rooms.filter(o => o.band === 'branch').map(o => R[o.id]?.name || o.id).join(', ') || 'keine'],
         ['Abkürzung', L.shortcut ? 'Tunnel vom Ausgang zum Eingang' : 'keine'],
-        ['Kisten · Secrets · Gegner', `${r.marks.C.length} · ${new Set(r.marks.B.map(([bx]) => bx)).size} · ${r.spawns.length}`],
+        ['Kisten · Secrets · Gegner', `${r.marks.C.length} · ${new Set([...r.marks.B, ...r.marks['%'], ...r.marks.$].map(([bx]) => bx)).size} · ${r.spawns.length}`],
         ['Größe', `${r.w} × ${r.h} Kacheln · Seed ${seed}`],
         ...L.problems.map(t => ['Hinweis', t])]),
       el('div', { style: 'display:flex;gap:8px;margin-top:8px' },

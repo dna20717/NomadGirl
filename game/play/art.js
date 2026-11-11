@@ -1,4 +1,5 @@
 const WALLS = new Set(['#', 'A', '^', 'v']);   // drawn as wall (doors and brittle walls: game/play/poi_level.js)
+const CAMO = new Set(['%', '$']);   // fake walls and camouflaged brittle walls: drawn like the wall, on their own layer above Leyla
 // Code-drawn art for the MVP: sky and skyline of BigCityDelta, tiles, placeholder raiders, projectiles, particles.
 // Everything is generated at start (no external files). Real AI assets replace the placeholders via "look".
 
@@ -12,11 +13,12 @@ export const PLACEHOLDER_COLORS = {
 // Draw once into textures (Phaser redraws Graphics every frame, textures are cheap). Chunks of max. 2048 px.
 // stamps: [{ key, frame, x, y }] texture frames drawn on top (tiles from assets), over: graphics drawn after the stamps (edges)
 function bake(scene, g, x0, y0, w, h, { depth = 0, scroll = null, stamps = [], over = null } = {}) {
-  const C = 2048;
+  const C = 2048, rts = [];
   let stamp = null;
   for (let cy = 0; cy < h; cy += C) for (let cx = 0; cx < w; cx += C) {
     const cw = Math.min(C, w - cx), ch = Math.min(C, h - cy);
     const rt = scene.add.renderTexture(x0 + cx, y0 + cy, cw, ch).setOrigin(0).setDepth(depth);
+    rts.push(rt);
     rt.draw(g, -(x0 + cx), -(y0 + cy));
     // only the stamps that reach into this chunk, drawn as one batch (big rooms have thousands of tiles)
     const mine = stamps.filter(st => st.x < x0 + cx + cw && st.x + 256 > x0 + cx && st.y < y0 + cy + ch && st.y + 256 > y0 + cy);
@@ -36,6 +38,7 @@ function bake(scene, g, x0, y0, w, h, { depth = 0, scroll = null, stamps = [], o
     if (scroll) rt.setScrollFactor(...scroll);
   }
   g.destroy(); over?.destroy(); stamp?.destroy();
+  return rts;
 }
 
 // painted part of a frame (transparent rows/columns around it), measured once per frame
@@ -185,8 +188,23 @@ const hexInt = (c, d) => c ? parseInt(String(c).slice(1), 16) : d;
 // tiles = { platform: textureKey | null } (asset strips: single, left, middle, right)
 // style (camp): { ground, top, hide(x, y) } = earth instead of concrete, side walls invisible
 export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = null) {
-  const g = scene.make.graphics({}, false), solid = (x, y) => x < 0 || y < 0 || x >= room.w || y >= room.h || WALLS.has(room.tiles[y][x]), stamps = [];
-  const edges = scene.make.graphics({}, false), decals = [], clutter = [], details = [], back = [], backShade = scene.make.graphics({}, false), taken = new Set();
+  const g0 = scene.make.graphics({}, false), solid = (x, y) => x < 0 || y < 0 || x >= room.w || y >= room.h || WALLS.has(room.tiles[y][x]) || CAMO.has(room.tiles[y][x]), stamps0 = [];
+  // camouflaged tiles: one group per connected patch, each with its own graphics and stamps (poi_level fades or breaks them)
+  const camo = [], camoAt = new Map();
+  for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
+    if (!CAMO.has(room.tiles[y][x]) || camoAt.has(x + ',' + y)) continue;
+    const grp = { kind: room.tiles[y][x], tiles: [], g: scene.make.graphics({}, false), edges: scene.make.graphics({}, false), stamps: [] }, todo = [[x, y]];
+    camoAt.set(x + ',' + y, grp);
+    while (todo.length) {
+      const [cx, cy] = todo.pop(); grp.tiles.push([cx, cy]);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = cx + dx, ny = cy + dy, k = nx + ',' + ny;
+        if (room.tiles[ny]?.[nx] === grp.kind && !camoAt.has(k)) { camoAt.set(k, grp); todo.push([nx, ny]); }
+      }
+    }
+    camo.push(grp);
+  }
+  const edges0 = scene.make.graphics({}, false), decals0 = [], clutter = [], details0 = [], back = [], backShade = scene.make.graphics({}, false), taken = new Set();
   const r = rng(99);
   // clutter stamp + where it stands, by name (game/play/atmosphere.js finds glowing things)
   const placed = (kit, key, frame, cx, ground) => {
@@ -194,9 +212,10 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
     return { ...st, name: scene.data_?.assets?.[key]?.names?.[frame], kit, cw: f.cutWidth, ch: f.cutHeight };
   };
   for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
-    const t0 = room.tiles[y][x], t = WALLS.has(t0) ? '#' : t0, px = x * T, py = y * T;
+    const t0 = room.tiles[y][x], t = WALLS.has(t0) || CAMO.has(t0) ? '#' : t0, px = x * T, py = y * T;
+    const cg = camoAt.get(x + ',' + y), g = cg ? cg.g : g0, edges = cg ? cg.edges : edges0, stamps = cg ? cg.stamps : stamps0, details = cg ? cg.stamps : details0, decals = cg ? cg.stamps : decals0;
     const kit = t === '#' && !style ? terrain?.at(x, y) : null;
-    if (t !== '#' && !style) {
+    if ((t !== '#' || cg) && !style) {   // camouflaged tiles get the back wall behind them (seen once a fake wall fades)
       const bk = terrain?.back?.(x, y);
       if (bk) {
         const list = y % 2 && bk.fill2.length ? bk.fill2 : bk.fill;
@@ -204,6 +223,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
         backShade.fillStyle(0x060608, (bk.shade ?? 55) / 100).fillRect(px, py, T, T);
       }
     }
+    if (cg && t === '#') continue;   // camouflaged: drawn in the cover pass below
     if (kit) {
       const top = !solid(x, y - 1), D = kit.def, seed = D.seed || 0, list = top ? kit.top : y % 2 && kit.fill2.length ? kit.fill2 : kit.fill;
       stamps.push({ key: kit.key, frame: list[x % list.length], x: px, y: py - kit.over });
@@ -216,12 +236,12 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       const air = room.tiles[y - 1]?.[x] === '.';
       // large clutter: two surface tiles with air two tiles high above both, walls on the outside
       const free = (xx) => solid(xx, y) && !solid(xx, y - 1) && room.tiles[y - 1]?.[xx] === '.' && room.tiles[y - 2]?.[xx] === '.';
-      if (top && kit.big && !taken.has(x) && free(x) && free(x + 1) && solid(x - 1, y) && solid(x + 2, y) && terrain?.at(x + 1, y) === kit && hash(x, y, seed + 7) * 100 < (D.bigChance ?? 0)) {
+      if (top && !cg && kit.big && !taken.has(x) && free(x) && free(x + 1) && solid(x - 1, y) && solid(x + 2, y) && terrain?.at(x + 1, y) === kit && hash(x, y, seed + 7) * 100 < (D.bigChance ?? 0)) {
         const B = kit.big;
         clutter.push(placed(kit, B.key, B.list[Math.floor(hash(x, y, seed + 8) * B.list.length)], px + T, py + 4));
         taken.add(x); taken.add(x + 1);
       }
-      if (top && air && !taken.has(x) && kit.clutter.length && solid(x - 1, y) && solid(x + 1, y) && hash(x, y, seed + 3) * 100 < (D.clutterChance ?? 0))
+      if (top && air && !cg && !taken.has(x) && kit.clutter.length && solid(x - 1, y) && solid(x + 1, y) && hash(x, y, seed + 3) * 100 < (D.clutterChance ?? 0))
         clutter.push(placed(kit, kit.props, kit.clutter[Math.floor(hash(x, y, seed + 4) * kit.clutter.length)], px + T / 2, py + 4));
       // edges from code: shade inside, then the outline (left, right, bottom; the top tile brings its own)
       const E = D.edge || {}, ow = E.width ?? 2, sw = E.shadeWidth ?? 3, sa = (E.shade ?? 40) / 100, oc = hexInt(E.color, 0x060608);
@@ -264,6 +284,53 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
   }
   if (back.length) bake(scene, scene.make.graphics({}, false), 0, 0, room.w * T, room.h * T, { depth: -11, stamps: back, over: backShade });
   else backShade.destroy();
-  bake(scene, g, 0, 0, room.w * T, room.h * T, { depth: -10, stamps: [...stamps, ...details, ...decals, ...clutter], over: edges });
-  return { props: clutter };
+  bake(scene, g0, 0, 0, room.w * T, room.h * T, { depth: -10, stamps: [...stamps0, ...details0, ...decals0, ...clutter], over: edges0 });
+  // cover: a camouflaged patch also hides the secret behind it (air reachable only through it) plus the ring of wall around,
+  // all drawn as solid wall on the patch's layer until it is found or broken (Daniel: „hinter Tiles versteckt“, 4A)
+  if (camo.length && !style) {
+    const pass = (x, y) => { const t = room.tiles[y]?.[x]; return t != null && !WALLS.has(t) && !CAMO.has(t) && t !== 'B'; };
+    const normal = new Set(), q = room.start ? [room.start] : [];
+    for (const [x, y] of q) normal.add(x + ',' + y);
+    while (q.length) { const [x, y] = q.pop(); for (const [nx, ny] of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]) { const k = nx + ',' + ny; if (!normal.has(k) && pass(nx, ny)) { normal.add(k); q.push([nx, ny]); } } }
+    const claimed = new Set();
+    for (const c of camo) {
+      const cover = new Set(c.tiles.map(([x, y]) => x + ',' + y)), todo = [...c.tiles];
+      if (room.start) while (todo.length) {
+        const [x, y] = todo.pop();
+        for (const [nx, ny] of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]) {
+          const k = nx + ',' + ny;
+          if (cover.has(k) || normal.has(k) || claimed.has(k) || !pass(nx, ny)) continue;
+          cover.add(k); claimed.add(k); todo.push([nx, ny]);
+        }
+      }
+      for (const k of [...cover]) { const [x, y] = k.split(',').map(Number); for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const kk = (x + dx) + ',' + (y + dy); if (!normal.has(kk) && solid(x + dx, y + dy) && x + dx >= 0 && y + dy >= 0 && x + dx < room.w && y + dy < room.h) cover.add(kk); } }
+      c.cover = [...cover].map(k => k.split(',').map(Number));
+      const cs = (x, y) => solid(x, y) || cover.has(x + ',' + y);
+      for (const [x, y] of c.cover) {
+        const px = x * T, py = y * T, kit = terrain?.at(x, y);
+        if (kit) {
+          const top = !cs(x, y - 1), list = top ? kit.top : y % 2 && kit.fill2.length ? kit.fill2 : kit.fill;
+          c.stamps.push({ key: kit.key, frame: list[x % list.length], x: px, y: py - kit.over });
+          const E = kit.def.edge || {}, ow = E.width ?? 2, sw = E.shadeWidth ?? 3, sa = (E.shade ?? 40) / 100, oc = hexInt(E.color, 0x060608);
+          const side = (open, rx, ry, rw, rh, ix, iy, iw, ih) => { if (!open) return; c.edges.fillStyle(0x060608, sa).fillRect(ix, iy, iw, ih); c.edges.fillStyle(oc).fillRect(rx, ry, rw, rh); };
+          side(!cs(x - 1, y), px, py, ow, T, px + ow, py, sw, T);
+          side(!cs(x + 1, y), px + T - ow, py, ow, T, px + T - ow - sw, py, sw, T);
+          side(!cs(x, y + 1), px, py + T - ow, T, ow, px, py + T - ow - sw, T, sw);
+        } else {
+          c.g.fillStyle(0x24272e).fillRect(px, py, T, T);
+          if (!cs(x, y - 1)) { c.g.fillStyle(0x6b7280).fillRect(px, py, T, 6); c.g.fillStyle(0x3fe0d0, 0.25).fillRect(px, py + 6, T, 2); }
+          if (!cs(x - 1, y)) c.g.fillStyle(0x3a3f48).fillRect(px, py, 4, T);
+          if (!cs(x + 1, y)) c.g.fillStyle(0x3a3f48).fillRect(px + T - 4, py, 4, T);
+          if (!cs(x, y + 1)) c.g.fillStyle(0x111216).fillRect(px, py + T - 6, T, 6);
+        }
+      }
+    }
+  }
+  for (const c of camo) {
+    const all = c.cover || c.tiles, xs = all.map(t => t[0]), ys = all.map(t => t[1]), x0 = (Math.min(...xs) - 1) * T, y0 = (Math.min(...ys) - 1) * T;
+    c.rts = bake(scene, c.g, x0, y0, (Math.max(...xs) - Math.min(...xs) + 3) * T, (Math.max(...ys) - Math.min(...ys) + 3) * T, { depth: 10.6, stamps: c.stamps, over: c.edges });
+    c.secret = all.filter(([x, y]) => !solid(x, y)).map(([x, y]) => [x, y]);   // the hidden air (the fog keeps it dense)
+    delete c.g; delete c.edges; delete c.stamps;
+  }
+  return { props: clutter, camo };
 }

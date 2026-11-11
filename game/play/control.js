@@ -100,6 +100,7 @@ export function installControl(game) {
       const s = scene(), l = s.leyla, r = n => Math.round(n);
       return {
         room: s.roomId, time: s.clock(), kills: s.kills, deltas: s.deltas, cleared: s.cleared,
+        fog: s.fog?.state?.() || { on: false }, fogAtLeyla: s.fog?.at?.(l.x, l.feet - 40) ?? 0,
         leyla: { state: l.state, x: r(l.x), feet: r(l.feet), tile: [Math.floor(l.x / s.T), Math.round(l.feet / s.T)], vx: r(l.body.velocity.x), vy: r(l.body.velocity.y), facing: l.facing, health: l.health, ammo: l.ammo, mag: l.mag, reloading: !!l.reloading, armed: l.armed,
           fight: { on: !!l.fight?.on, manual: l.fight?.manual ?? null, seen: !!l.fight?.seen }, style: s.shootStyle(), look: l.sprite.anims.currentAnim?.key || l.sprite.texture.key,
           recoil: !!l.recoilImg?.visible, recoilShown: l.recoilShown || 0, target: s.combat.target ? r(s.combat.target.body.center.x) : null },

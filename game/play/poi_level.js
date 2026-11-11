@@ -1,6 +1,7 @@
 // Things in a POI level (engine/poi.js welds the rooms, engine/room.js reads the marks):
 //   C chests (E: lid opens, the POI's loot lies in front as a bundle)   S switches (E: the nearest door D opens, for good)
 //   B brittle walls (a melee hit breaks the whole wall, counts as a secret)   Z goal (E: POI done, time stops, ranking)
+//   $ camouflaged brittle walls (look like the wall, break the same)   % fake walls (look like the wall, Leyla walks through, they fade; secrets too)
 // After the goal the run is finished; E at the van pays the base money plus the rank bonus (k.o. on the way back = everything gone).
 import { rollLoot } from '../inventory.js';
 import { rankRun } from '../../engine/poi.js';
@@ -44,6 +45,12 @@ export class PoiLevel {
     this.walls = groups(R, 'B').map(g => solidGroup(g, 'B'));
     for (const d of this.doors) this.drawDoor(d);
     for (const w of this.walls) this.drawWall(w);
+    // camouflaged tiles (art.js drawRoom bakes them like the wall around, on a layer above Leyla)
+    for (const c of s.camo || []) {
+      if (c.kind === '$') this.walls.push({ ...solidGroup(c.tiles, '$'), rts: c.rts });
+      else (this.fakes ??= []).push({ tiles: c.tiles, ...box(c.tiles), rts: c.rts, found: false, set: new Set(c.tiles.map(([x, y]) => x + ',' + y)) });
+    }
+    this.fakes ??= [];
     this.switches = (R.marks.S || []).map(([x, y]) => {
       const cx = (x + 0.5) * T, cy = (y + 1) * T;
       const door = this.doors.slice().sort((a, b) => Math.hypot((a.x0 + a.x1) / 2 * T - cx, (a.y0 + a.y1) / 2 * T - cy) - Math.hypot((b.x0 + b.x1) / 2 * T - cx, (b.y0 + b.y1) / 2 * T - cy))[0] || null;
@@ -63,7 +70,7 @@ export class PoiLevel {
     });
     this.goals = (R.marks.Z || []).map(([x, y]) => ({ x: (x + 0.5) * T, feet: (y + 1) * T, art: s.add.graphics().setDepth(-4), glow: null }));
     for (const z of this.goals) this.drawGoal(z);
-    this.secretsMax = this.walls.length;
+    this.secretsMax = this.walls.length + this.fakes.length;
   }
 
   // ---------- pictures from code (until there is pixel art) ----------
@@ -173,7 +180,7 @@ export class PoiLevel {
     for (const w of this.walls) {
       if (w.open || x1 < w.x0 * T || x0 > w.x1 * T || y1 < w.y0 * T || y0 > w.y1 * T) continue;
       this.openSolid(w);
-      w.art.destroy();
+      w.art.destroy(); for (const rt of w.rts || []) rt.destroy();
       for (const [tx, ty] of w.tiles) { s.fx.sparks((tx + 0.5) * T, (ty + 0.5) * T, 0x8a8490, 10); s.fx.puff((tx + 0.5) * T, (ty + 1) * T, 0x6b6670); }
       s.cam.shake(200, 0.006);
       this.secrets++;
@@ -204,6 +211,21 @@ export class PoiLevel {
       ].map(i => ({ ...i, act: i.act || (() => {}) })),
     });
   }
+  // fake walls: as soon as Leyla stands in one, it fades out (Daniel, 11.11.2026: „Leyla läuft einfach hindurch, die Wand blendet weich aus“)
+  update(dt = 16) {
+    const s = this.scene, l = s.leyla, T = s.T, b = l.body, ms = s.data_.game?.fog?.fakeFade ?? 450;
+    for (const f of this.fakes) if (f.found && f.fade < 1) { f.fade = Math.min(1, f.fade + dt / Math.max(1, ms)); for (const rt of f.rts) rt.setAlpha(1 - f.fade * f.fade * (3 - 2 * f.fade)); }
+    for (const f of this.fakes) {
+      if (f.found || b.right < f.x0 * T || b.left > f.x1 * T || b.bottom < f.y0 * T || b.top > f.y1 * T) continue;
+      if (!f.tiles.some(([x, y]) => b.right > x * T && b.left < (x + 1) * T && b.bottom > y * T && b.top < (y + 1) * T)) continue;
+      f.found = true; f.fade = 0; this.secrets++;
+      s.drone.react('curious');
+      s.fx.text(l.x, l.feet - l.height - 20, `Geheimnis! ${this.secrets}/${this.secretsMax}`, { color: '#e45aa8', size: 46, rise: 70, life: 1500 });
+      s.fog?.reveal(true);
+    }
+  }
+  // tiles that still hide what is behind them (fog sight lines): closed doors, brittle walls, fake walls not found yet
+  hides(x, y) { return this.fakes.some(f => !f.found && f.set.has(x + ',' + y)); }
   // money for the van: run Δ plus rank bonus
   payout(deltas) { return this.done ? Math.round(deltas * (1 + this.done.bonus / 100)) : deltas; }
 
@@ -213,7 +235,8 @@ export class PoiLevel {
       chests: this.chests.map(c => ({ x: Math.round(c.x), feet: c.feet, open: c.open })),
       switches: this.switches.map(sw => ({ x: Math.round(sw.x), feet: sw.feet, on: sw.on })),
       doors: this.doors.map(d => ({ x0: d.x0, x1: d.x1, y0: d.y0, y1: d.y1, open: d.open })),
-      walls: this.walls.map(w => ({ x0: w.x0, x1: w.x1, y0: w.y0, y1: w.y1, open: w.open })),
+      walls: this.walls.map(w => ({ x0: w.x0, x1: w.x1, y0: w.y0, y1: w.y1, open: w.open, kind: w.kind })),
+      fakes: this.fakes.map(f => ({ x0: f.x0, x1: f.x1, y0: f.y0, y1: f.y1, found: f.found, alpha: +(f.rts[0]?.alpha ?? 1).toFixed(2) })),
       goals: this.goals.map(z => ({ x: Math.round(z.x), feet: z.feet })),
     };
   }

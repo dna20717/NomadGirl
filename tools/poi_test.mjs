@@ -54,11 +54,31 @@ s = await ev(() => {
   const w = nomad.state().level.walls[0];
   nomad.tp(w.x0 * T - 70, w.y1 * T); nomad.step(4, ['right']); nomad.step(30);
   nomad.step(1, [], ['melee']); nomad.step(40);
-  return { lv: nomad.state().level, open: nomad.state().level.walls[0].open };
+  const sc = game.scene.getScene('play'), cw = sc.camo.find(c => c.kind === '$');
+  return { lv: nomad.state().level, open: nomad.state().level.walls[0].open, camo: cw.rts.every(r => !r.active) };
 });
 check('Brüchige Wand: Nahkampf bricht sie auf', s.open, s.lv.walls);
-check('Brüchige Wand: zählt als Secret', s.lv.secrets === 1 && s.lv.secretsMax === s.lv.walls.length, s.lv);
+check('Brüchige Wand: zählt als Secret', s.lv.secrets === 1 && s.lv.secretsMax === s.lv.walls.length + s.lv.fakes.length, s.lv);
+check('Getarnte brüchige Wand: sieht aus wie Wand, verschwindet beim Brechen', s.lv.walls[0].kind === '$' && s.camo, s);
 await shot('secret');
+
+// fog of war (Daniel, 11.11.2026): indoors only, over air Leyla can reach; dense behind secrets; a fake wall fades when she walks in
+s = await ev(() => {
+  const sc = game.scene.getScene('play'), F = sc.fog, lv = nomad.state().level, f = lv.fakes[0], c = sc.camo.find(c => c.kind === '%');
+  const tun = L.shortcut.up, deep = c.secret.find(([x]) => x > f.x0 + 1) || c.secret[0];
+  const out = { on: F.on, outdoor: F.at(5 * T, (L.rooms[0].y + 5) * T), tunnel: F.at((tun[0] + 20) * T, (tun[1] + 2) * T), secret: F.at((deep[0] + 0.5) * T, (deep[1] + 0.5) * T), coverBefore: c.rts[0].alpha };
+  nomad.tp((f.x0 - 1.5) * T, f.y1 * T); nomad.step(10);
+  out.stillHidden = F.at((deep[0] + 0.5) * T, (deep[1] + 0.5) * T);
+  nomad.step(40, ['right']); nomad.step(40);
+  const lv2 = nomad.state().level;
+  out.found = lv2.fakes[0].found; out.alpha = lv2.fakes[0].alpha; out.secrets = lv2.secrets; out.secretAfter = F.at((deep[0] + 0.5) * T, (deep[1] + 0.5) * T); out.inRoom = nomad.state().leyla.x > (f.x1 - 0.2) * T;
+  return out;
+});
+check('Nebel: draußen klar, im Tunnel Dunst, hinter dem Secret dicht', s.on && s.outdoor === 0 && s.tunnel >= 0.7 && s.tunnel <= 0.9 && s.secret >= 0.95, s);
+check('Scheinwand: sieht aus wie Wand und deckt den Raum dahinter ab', s.coverBefore === 1 && s.stillHidden >= 0.95, s);
+check('Scheinwand: Leyla läuft hindurch, die Wand blendet aus, zählt als Secret', s.found && s.alpha === 0 && s.secrets === 2 && s.inRoom, s);
+check('Nebel: der geheime Raum klart auf, wenn sie drin ist', s.secretAfter === 0, s);
+await shot('fog');
 
 // side room: up the ladder from the shop into the store room
 s = await ev(() => {
@@ -74,7 +94,7 @@ await shot('branch');
 // goal: E cracks the safe, time stops, ranking
 s = await ev(() => { const z = nomad.state().level.goals[0]; nomad.tp(z.x - 90, z.feet); nomad.step(5); const p = nomad.state().prompt; nomad.step(1, [], ['grab']); nomad.step(3); return { p, menu: nomad.menu(), lv: nomad.state().level }; });
 check('Ziel: E-Hinweis', s.p === 'Tresor knacken · POI abschließen', s.p);
-check('Ziel: Ranking mit Rang, Zeit, Kills, Secrets', /^Rang [FDCBAS]$/.test(s.menu?.title) && s.menu.items.length === 4 && /Secrets 1\//.test(s.menu.items[2].label) && s.lv.done?.grade, s.menu);
+check('Ziel: Ranking mit Rang, Zeit, Kills, Secrets', /^Rang [FDCBAS]$/.test(s.menu?.title) && s.menu.items.length === 4 && /Secrets 2\//.test(s.menu.items[2].label) && s.lv.done?.grade, s.menu);
 await shot('rank');
 s = await ev(() => { nomad.choose('Weiter'); const t0 = nomad.state().time; nomad.step(120); return { t0, t1: nomad.state().time, p: nomad.state().prompt }; });
 check('Ziel: Uhr steht', s.t0 === s.t1, s);

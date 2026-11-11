@@ -31,23 +31,23 @@ put(g, '1', 33, 15); put(g, '1', 36, 15)
 door(g, 39)
 out['vorplatz'] = g
 
-# Verkaufsraum: Regale, Theke, Abzweig nach oben (A), Geheimfach hinter brüchiger Wand
+# Verkaufsraum: Regale, Theke, Abzweig nach oben (A), Geheimfach hinter getarnter brüchiger Wand
 g = room(30)
 door(g, 0); door(g, 29)
 put(g, 'A', 6, 0)
 rect(g, '=', 9, 13, 12, 12)
 rect(g, '=', 14, 19, 9, 9)
 rect(g, '#', 20, 28, 5, 5); rect(g, '#', 20, 28, 9, 9); rect(g, '#', 28, 28, 5, 9)
-rect(g, 'B', 20, 20, 6, 8); put(g, 'C', 25, 8)
+rect(g, '$', 20, 20, 6, 8); put(g, 'C', 25, 8); put(g, '*', 24, 6)   # getarnte brüchige Wand (Daniel, 11.11.2026)
 rect(g, '#', 16, 18, 14, 15)          # Theke
 put(g, '1', 12, 15); put(g, '1', 22, 15); put(g, '1', 26, 15)
 out['verkaufsraum'] = g
 
-# Lager (Seitenraum, Abzweig im Boden): Regale mit Kiste, Hinterzimmer hinter brüchiger Wand
+# Lager (Seitenraum, Abzweig im Boden): Regale mit Kiste, Hinterzimmer hinter einer Scheinwand
 g = room(20)
 put(g, 'A', 10, 16)
 rect(g, '=', 2, 7, 12, 12); put(g, 'C', 4, 11)
-rect(g, '#', 15, 18, 12, 12); rect(g, 'B', 15, 15, 13, 15); put(g, 'C', 17, 15)
+rect(g, '#', 15, 18, 12, 12); rect(g, '%', 15, 15, 13, 15); put(g, 'C', 17, 15)   # Scheinwand (Daniel, 11.11.2026)
 rect(g, '=', 12, 14, 9, 9)
 put(g, '1', 6, 15)
 out['lager'] = g
