@@ -466,8 +466,12 @@ export class Leyla {
     const L = this.d.look || {}, walking = Math.abs(v.x) > 20;
     let armedFrame = null, armedFrom = 1;
     // drawing: the draw animation (from "Ziehen ab Frame"), then stretching the arms out (aim), then that pose is held
-    if (this.armed === 'drawing') {
-      // drawing ends with the gun at the chest (Daniel: arms only stretch out to shoot)
+    const onRun = this.gunRunning(v) && this.runLook('runReady');
+    if ((this.armed === 'drawing' || this.armed === 'holstering') && onRun) {
+      // on the run: hand to the holster, then the gun at the chest (holstering the other way round), the legs keep their step
+      name = '@' + (this.drawP < 0.5 && this.runLook('runDraw') ? L.runDraw : L.runReady);
+    } else if (this.armed === 'drawing' || this.armed === 'holstering') {
+      // drawing ends with the gun at the chest (Daniel: arms only stretch out to shoot); holstering plays it backwards
       if (L.draw) { name = '@' + L.draw; armedFrame = this.drawP; armedFrom = this.d.armed?.drawFromFrame ?? 1; }
     } else if (this.armed === 'on') {
       const AR = this.d.armed || {}, ext = AR.extendTime ?? 100, hold = AR.aimHold ?? 900, lower = AR.lowerTime ?? 220;
@@ -475,7 +479,12 @@ export class Leyla {
       const shot = L.shoot && !extending && since < (this.extendAt != null && this.extendAt === this.shotAt ? ext : 0) + this.lookDur(walking && L.shootWalk ? L.shootWalk : L.shoot);
       const out = time - (this.aimUntil ?? -1e9);   // < 0: arms still stretched out after shooting / reloading, then they come down
       const running = this.gunRunning(v);
-      if (running) name = '@' + L.runGun;   // Cells-like: runs on with the arms out, shots only flash and kick the slide
+      // Cells-like on the run (Daniel, 11.11.2026): shooting = arms out, otherwise the gun at the chest, reloading in two halves
+      if (running) {
+        const RL = this.reloading && (time - this.reloading.at) / this.reloading.dur;
+        name = '@' + (this.reloading && this.runLook('runReload') ? (RL < 0.5 || !this.runLook('runReload2') ? L.runReload : L.runReload2)
+          : since < hold || !onRun ? L.runGun : L.runReady);
+      }
       else if (this.reloading && (L.reload || L.reloadWalk)) { name = '@' + (walking && L.reloadWalk ? L.reloadWalk : L.reload || L.reloadWalk); armedFrame = Math.min(1, (time - this.reloading.at) / this.reloading.dur); this.aimUntil = this.reloading.at + this.reloading.dur + hold; }
       else if (extending && L.aim) { name = '@' + L.aim; armedFrame = (time - this.extendAt) / ext; }   // gun from the chest up into the aim, then the shot
       else if (shot) { name = '@' + (walking && L.shootWalk ? L.shootWalk : L.shoot); this.aimUntil = time + hold; }
@@ -506,7 +515,11 @@ export class Leyla {
     const climbFrames = st === 'climb' && (this.m.climbFromFrame ?? 1) > 0;
     const manual = st === 'mantle' || st === 'crouch' || st === 'dash' || st === 'land' || st === 'brake' || st === 'sit' || st === 'pose' || flipFrames || climbFrames, an0 = this.sprite.anims;
     if (!manual && armedFrame == null && pin == null && st !== 'slide' && an0.isPaused) an0.resume();
-    const info = this.scene.playLook(this.sprite, 'leyla', name, st === 'pose' ? 1 : this.facing);   // the yoga pose is seen from the front: never mirrored
+    // the run and its variants (gun out, at the chest, drawing, reloading) share the step: switching keeps the frame, so the legs never jump
+    const fam = this.runFamily(), prevKey = this.sprite.anims.currentAnim?.key, prevIdx = this.sprite.anims.currentFrame ? this.sprite.anims.currentFrame.index - 1 : 0;
+    const want = name.startsWith('@') ? name.slice(1) : name === 'run' ? L.run : null;
+    const keep = fam.has(prevKey) && want && fam.has(want) && !this.sprite.anims.isPaused ? prevIdx : null;
+    const info = this.scene.playLook(this.sprite, 'leyla', name, st === 'pose' ? 1 : this.facing, keep);   // the yoga pose is seen from the front: never mirrored
     if (this.restartLook && an0.currentAnim) { this.restartLook = false; an0.restart(); }
     if (pin != null && info.used === name && an0.currentAnim) {
       const fr = an0.currentAnim.frames;
@@ -544,7 +557,7 @@ export class Leyla {
       const mid = an.currentAnim.frames[Math.floor(an.currentAnim.frames.length / 2)];
       if (!this.canStand() && an.currentFrame?.index >= mid.index) { if (!an.isPaused) an.pause(mid); } else if (an.isPaused) an.resume();
     }
-    const pace = { run: this.m.runSpeed || 440, walk: this.m.walkSpeed || 240 }[info.used] ?? (L.runGun && info.used === '@' + L.runGun ? (this.m.runSpeed || 440) * (this.scene.shootRules().runSpeed ?? 85) / 100 : null);
+    const pace = { run: this.m.runSpeed || 440, walk: this.m.walkSpeed || 240 }[info.used] ?? (info.used?.startsWith('@') && fam.has(info.used.slice(1)) ? (this.m.runSpeed || 440) * (this.scene.shootRules().runSpeed ?? 85) / 100 : null);
     this.sprite.anims.timeScale = pace ? Math.max(0.45, Math.min(1.4, Math.abs(v.x) / pace)) : 1;
     // squash & stretch relaxes back to 1
     const k = Math.min(1, dt / 90);
@@ -640,15 +653,28 @@ export class Leyla {
     const A = this.d.armed || {}, s = this.scene, v = this.body.velocity;
     const slow = Math.abs(v.x) <= (this.m.walkSpeed ?? 240) * 1.15 || this.gunRunning(v, true);
     const can = A.enabled !== false && this.d.look?.aim && s.weapon('ranged') && (s.mode !== 'camp' || A.inCamp) && this.state === 'normal' && grounded && !this.attack && !this.charging
-      && this.fight.on && slow && !this.hitAnim;
+      && slow && !this.hitAnim;
     this.armed ??= 'off';
     if (!can) { if (this.armed === 'on') this.armedLost = time; this.armed = 'off'; this.drawP = 0; return; }
+    // combat over (calm, Q): holstering = drawing backwards (Daniel, 11.11.2026: „Waffe ziehen soll auch wegstecken sein“)
+    if (!this.fight.on) {
+      if (this.armed === 'on' || this.armed === 'drawing') { if (this.armed === 'on') this.drawP = 1; this.armed = (A.holsterTime ?? 420) > 0 && this.d.look?.draw ? 'holstering' : 'off'; }
+      if (this.armed === 'holstering') { this.drawP -= dt / Math.max(1, A.holsterTime ?? 420); if (this.drawP <= 0) { this.armed = 'off'; this.drawP = 0; } }
+      if (this.armed === 'off') this.drawP = 0;
+      return;
+    }
+    if (this.armed === 'holstering') this.armed = 'drawing';   // back into the fight halfway: draw again from where the hand is
     // back on the ground after a jump or dash in a fight: the gun comes straight back (Leyla › Kampfmodus › Wieder im Anschlag)
     const quick = time - this.armedLost < (this.d.fight?.redraw ?? 700);
-    if (this.armed === 'off') { this.armed = this.d.look?.draw && !quick && !this.gunRunning(v) ? 'drawing' : 'on'; this.drawP = 0; this.special = null; }   // drawn on the run: straight into the run with the gun
-    if (this.armed === 'drawing' && this.gunRunning(v)) this.armed = 'on';
+    if (this.armed === 'off') { this.armed = this.d.look?.draw && !quick ? 'drawing' : 'on'; this.drawP = 0; this.special = null; }
+    if (this.armed === 'drawing' && this.gunRunning(v) && !this.runLook('runDraw')) this.armed = 'on';   // no drawing on the run without its animation
     if (this.armed === 'drawing') { this.drawP += dt / Math.max(1, A.drawTime ?? 650); if (this.drawP >= 1) this.armed = 'on'; }
   }
+  runFamily() {
+    const L = this.d.look || {}, A = this.scene.data_.assets || {}, ids = [L.run, L.runGun, L.runReady, L.runDraw, L.runReload, L.runReload2].filter(Boolean);
+    return new Set([...ids, ...ids.map(id => A[id]?.mirror).filter(Boolean)]);
+  }
+  runLook(key) { const id = this.d.look?.[key]; return id && this.scene.textures.exists(id) ? id : null; }
   // Cells-like (Spiel › Kampf › Schießstil): with the gun out she keeps running, look Leyla › Waffe ziehen › Rennen mit Waffe
   gunRunning(v, any = false) {
     if (!this.d.look?.runGun || !this.scene.cellsLike() || !this.scene.textures.exists(this.d.look.runGun)) return false;

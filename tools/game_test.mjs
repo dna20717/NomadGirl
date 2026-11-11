@@ -88,13 +88,33 @@ const cm = await page.evaluate(() => {
   nomad.step(2, [], ['holster']); nomad.step(300); out.calm = L();
   return out;
 });
-check('Kampfmodus: Q steckt weg', cm.holster.armed === 'off' && cm.holster.fight.manual === 'off', cm.holster);
+check('Kampfmodus: Q steckt weg (Ziehen rückwärts)', /holstering|off/.test(cm.holster.armed) && cm.holster.fight.manual === 'off', cm.holster);
 check('Kampfmodus: Q zieht wieder', cm.drawn.armed === 'on' && cm.drawn.fight.on && cm.drawn.fight.manual === 'on', cm.drawn);
-check('Cells-like: rennt mit Waffe (85 %)', cm.run.style === 'cells' && cm.run.armed === 'on' && cm.run.look === 'leyla_run_gun_side' && Math.abs(cm.run.vx - 374) < 8, cm.run);
+check('Cells-like: rennt mit Waffe (85 %)', cm.run.style === 'cells' && cm.run.armed === 'on' && cm.run.look === 'leyla_run_ready_side' && Math.abs(cm.run.vx - 374) < 8, cm.run);
 check('Cells-like: Schuss im Rennen, Schlitten zuckt', cm.shot.mag === cm.shot.mag0 - 1 && cm.shot.recoilShown > cm.shot.shown && cm.shot.armed === 'on', cm.shot);
 check('Zielhilfe: Schütze erfasst, Schuss fliegt schräg zu ihm', cm.target === 'schuetze' && cm.aim && cm.aim.vy < -20 && cm.aim.vx > 1000, cm);
 check('Klassisch: im Rennen steckt sie die Waffe weg', cm.classic.style === 'classic' && cm.classic.armed === 'off' && cm.classic.vx > 400, cm.classic);
 check('Kampfmodus: weggesteckt bleibt sie friedlich', !cm.calm.fight.on && cm.calm.armed === 'off', cm.calm);
+
+// running in combat mode (Cells-like): gun at the chest, arms out when shooting, reloading in two halves, holstering via the holster; the step never jumps
+const rv = await page.evaluate(() => {
+  const s = game.scene.getScene('play'), l = s.leyla, key = () => l.sprite.anims.currentAnim?.key, idx = () => l.sprite.anims.currentFrame?.index, out = {};
+  try { localStorage.removeItem('nomadgirl-shoot-style'); } catch {}
+  nomad.calm(); nomad.tp(22 * 64, 960); nomad.step(80);
+  nomad.step(2, [], ['holster']); nomad.step(40);
+  nomad.step(30, ['right']); out.ready = key();
+  const f0 = idx(); nomad.step(1, ['right'], ['ranged']); nomad.step(1, ['right']); out.shot = key(); out.keep = Math.abs(idx() - f0) <= 1 || Math.abs(idx() - f0) === 7;
+  nomad.step(70, ['right']); out.back = key();
+  nomad.tp(22 * 64, 960); nomad.step(20, ['right']); l.mag = 0; nomad.step(1, ['right'], ['reload']); nomad.step(4, ['right']); out.reload1 = key(); nomad.step(55, ['right']); out.reload2 = key();
+  nomad.tp(22 * 64, 960); nomad.step(25, ['right']);
+  nomad.step(1, ['right'], ['holster']); nomad.step(6, ['right']); out.h1 = key(); nomad.step(10, ['right']); out.h2 = key(); nomad.step(20, ['right']); out.h3 = key();
+  return out;
+});
+check('Rennen im Kampfmodus: Waffe an der Brust', rv.ready === 'leyla_run_ready_side', rv);
+check('Rennen + Schuss: Arme lang, Schritt bleibt', rv.shot === 'leyla_run_gun_side' && rv.keep, rv);
+check('Rennen: nach dem Schuss wieder an die Brust', rv.back === 'leyla_run_ready_side', rv);
+check('Rennen + Nachladen in zwei Hälften', rv.reload1 === 'leyla_run_reload_side' && rv.reload2 === 'leyla_run_reload2_side', rv);
+check('Rennen: Wegstecken über die Hand am Holster', rv.h1 === 'leyla_run_ready_side' && rv.h2 === 'leyla_run_draw_side' && rv.h3 === 'leyla_run_side', rv);
 
 // hit reaction (Leyla › Treffer): light and heavy animation, back to standing, running breaks it off after half the time
 const hit = await page.evaluate(() => {

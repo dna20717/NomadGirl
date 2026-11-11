@@ -126,7 +126,7 @@ export class PlayScene extends Phaser.Scene {
   lookDuration(state) { const a = this.data_.assets?.[this.data_.leyla?.look?.[state]]; return a?.frames && a.fps ? a.frames / a.fps * 1000 : 0; }
   // a state without its own animation borrows a related one (walk → run, double jump → jump), else idle with code effects;
   // walk without its own animation borrows run (Leyla slows its pace down); facing < 0 = left
-  playLook(sprite, who, state, facing = 1) {
+  playLook(sprite, who, state, facing = 1, start = null) {   // start: frame to continue at (run variants share the step)
     const look = this.data_.leyla?.look || {}, A = this.data_.assets || {}, direct = state.startsWith('@') && this.textures.exists(state.slice(1));
     const has = s => s.startsWith('@') ? direct : look[s] && this.textures.exists(look[s]);
     this.looks ??= {};
@@ -139,7 +139,8 @@ export class PlayScene extends Phaser.Scene {
       sprite.setOrigin(info.ox, info.oy);
       // falling without a jump: a shared jump animation starts in its second half
       const mid = used === 'fall' && look.fall === look.jump ? Math.floor((A[id]?.frames || 1) / 2) : 0;
-      if (info.anim) sprite.play({ key: info.anim, startFrame: mid }, true); else sprite.setTexture(info.key);
+      const n = A[id]?.frames || 1;
+      if (info.anim) sprite.play({ key: info.anim, startFrame: start != null ? Math.max(0, Math.min(n - 1, start)) : mid }, true); else sprite.setTexture(info.key);
     }
     return { ...info, used, fallback: used === 'idle' && state !== 'idle' || !has(used) };
   }

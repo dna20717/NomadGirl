@@ -72,7 +72,11 @@
   "brake": "leyla_brake_side",
   "runGun": "leyla_run_gun_side",
   "hit": "leyla_hit_side",
-  "hitHeavy": "leyla_hit_heavy_side"
+  "hitHeavy": "leyla_hit_heavy_side",
+  "runReady": "leyla_run_ready_side",
+  "runDraw": "leyla_run_draw_side",
+  "runReload": "leyla_run_reload_side",
+  "runReload2": "leyla_run_reload2_side"
  },
  "idleAltChance": 50,
  "inventory": {
@@ -97,7 +101,7 @@
  "armed": {
   "enabled": true,
   "drawTime": 520,
-  "holsterTime": 0,
+  "holsterTime": 420,
   "inCamp": false,
   "drawFromFrame": 4,
   "muzzle": [100, 146],
