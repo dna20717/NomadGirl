@@ -77,6 +77,9 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/sound/handheld/*.m4a`, `.ogg` | 20 Retro-Töne aus Leylas Handheld beim Zocken (`sfx_handheld_*`) | Game SFX by OwlishMedia (OpenGameArt, CC0), mit ffmpeg gefiltert (Ausnahme, siehe `THIRD_PARTY.md`) | 07.11.2026 |
 | `assets/leyla/melee_light_side.png`, `melee_heavy_side.png`, `melee_light_walk_side.png`, `melee_heavy_walk_side.png` (+ `_source.gif`) | Leyla Nahkampf: leicht (9), schwer mit Aufladen (17), leicht im Gehen (9), schwer im Gehen (17) | KI-generiert (Daniel), zugeschnitten (Code) | 07.11.2026 |
 | `assets/leyla/melee_back_side.png`, `melee_rise_side.png` (+ `_source.png`) | Leyla Kombo-Hiebe: Rückhand-Schnitt (8), Aufwärtshieb (8) | KI (PixelLab: Edit Pro Flash + Animate Image), Streifen aus Code | 11.11.2026 |
+| `assets/workshops/guest_bunk.png` | Werkstatt Gästekoje (zwei Etagenbetten, Vorhang, Lichterkette) | KI (PixelLab, Create Image Pro, Stilbild Schlafkoje v2) | 11.11.2026 |
+| `assets/workshops/treasury_empty.png`, `treasury.png` (+ `treasury_source.png`) | Werkstatt Schatzkammer leer und mit Schatzhaufen (deckungsgleich, Haufen aus dem Edit übernommen) | KI (PixelLab, Create Image Pro + Edit Pro Flash), Zuschnitt Code | 11.11.2026 |
+| `assets/items/icons_treasure.png` | 16 Wertsachen als Symbole, 4 × 4 à 64 px | KI (PixelLab, Create Image Pro, Stilbild icons_gear) | 11.11.2026 |
 | `assets/leyla/yoga_front.png` (+ `yoga_front_source.gif`) | Leyla Yoga (Baum-Pose) von vorn, 12 Frames, Absinken pro Frame ausgeglichen | KI-generiert (Daniel), zugeschnitten (Code) | 07.11.2026 |
 | `assets/vehicles/van.png` | erste Version des Vans, offene Schiebetür, 837 × 417 px (`van_v1`) | aus `van_source.png` zugeschnitten, halbe Größe (Code) | 07.11.2026 |
 | `assets/vehicles/van_source.png` | erste Version des Vans: Original, 1774 × 887 px (`van_v1_source`) | KI-generiert (Daniel) | 07.11.2026 |
@@ -147,6 +150,3 @@ Spielauflösung 1920×1080, Kacheln 64 px, Leyla 192 px hoch (Höhe im Spiel ihr
 ## Pixel-Art
 
 Die Startseiten-Grafiken (Leyla von vorn, Wastelands-Hintergrund) sind Pixel-Art in kleiner Auflösung (Hintergrund 576 × 324) und werden scharf skaliert (`imageSmoothingEnabled = false`). Leyla im Spiel bleibt hochaufgelöst und geglättet.
-| `assets/workshops/guest_bunk.png` | Werkstatt Gästekoje (zwei Etagenbetten, Vorhang, Lichterkette) | KI (PixelLab, Create Image Pro, Stilbild Schlafkoje v2) | 11.11.2026 |
-| `assets/workshops/treasury_empty.png`, `treasury.png` (+ `treasury_source.png`) | Werkstatt Schatzkammer leer und mit Schatzhaufen (deckungsgleich, Haufen aus dem Edit übernommen) | KI (PixelLab, Create Image Pro + Edit Pro Flash), Zuschnitt Code | 11.11.2026 |
-| `assets/items/icons_treasure.png` | 16 Wertsachen als Symbole, 4 × 4 à 64 px | KI (PixelLab, Create Image Pro, Stilbild icons_gear) | 11.11.2026 |
