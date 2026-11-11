@@ -2445,5 +2445,20 @@
   "derivedFrom": "tileset00_source",
   "source": "KI (PixelLab, Create Image Pro, AAP-64, Stilvorlage Leyla)",
   "date": "11.11.2026"
+ },
+ "leyla_run_gun_side": {
+  "name": "Leyla · Rennen mit Waffe",
+  "kind": "animation",
+  "file": "assets/leyla/run_gun_side.png",
+  "frameSize": [177, 242],
+  "frames": 8,
+  "fps": 12,
+  "loop": true,
+  "origin": [74, 241],
+  "height": 192,
+  "source": "KI (PixelLab) + Code (Montage)",
+  "derivedFrom": "leyla_run_side",
+  "date": "11.11.2026",
+  "description": "Pixel-Art, rennt nach rechts mit gestreckten Armen und Pistole (Combat Mode). Gleiche Schritte, Anker und Frames wie Rennen seitlich, nur der Oberkörper ist neu. Links spiegelt das Spiel."
  }
 }
