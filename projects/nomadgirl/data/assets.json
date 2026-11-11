@@ -2581,5 +2581,49 @@
   "derivedFrom": "leyla_run_side",
   "date": "11.11.2026",
   "description": "Pixel-Art: rennt, beide Hände vor der Brust, Magazin rein (zweite Hälfte). Gleiche Schritte, Anker und Frames wie Rennen seitlich (Kopf und Beine pixelgleich), nur der Oberkörper ist neu. Links spiegelt das Spiel."
+ },
+ "leyla_melee_back_side_source": {
+  "name": "Leyla · Rückhand-Hieb (Rohframes)",
+  "kind": "source",
+  "file": "assets/leyla/melee_back_side_source.png",
+  "source": "KI (PixelLab: Edit Pro Flash + Animate Image)",
+  "date": "11.11.2026"
+ },
+ "leyla_melee_back_side": {
+  "name": "Leyla · Rückhand-Hieb",
+  "kind": "animation",
+  "file": "assets/leyla/melee_back_side.png",
+  "frameSize": [225, 244],
+  "frames": 8,
+  "fps": 18,
+  "loop": false,
+  "origin": [90.5, 242],
+  "height": 193.6,
+  "source": "KI (PixelLab), Streifen aus Code (Farben auf den leichten Hieb eingerastet)",
+  "derivedFrom": "leyla_melee_back_side_source",
+  "date": "11.11.2026",
+  "description": "Kombo-Hieb: holt über die Brust aus, Ausfallschritt, Rückhand-Schnitt mit dem Karambit (Frame 5), zurück ins Stehen. Ohne Hieb-Spur, die kommt aus Code."
+ },
+ "leyla_melee_rise_side_source": {
+  "name": "Leyla · Aufwärtshieb (Rohframes)",
+  "kind": "source",
+  "file": "assets/leyla/melee_rise_side_source.png",
+  "source": "KI (PixelLab: Edit Pro Flash + Animate Image)",
+  "date": "11.11.2026"
+ },
+ "leyla_melee_rise_side": {
+  "name": "Leyla · Aufwärtshieb",
+  "kind": "animation",
+  "file": "assets/leyla/melee_rise_side.png",
+  "frameSize": [199, 244],
+  "frames": 8,
+  "fps": 18,
+  "loop": false,
+  "origin": [66.5, 242],
+  "height": 193.6,
+  "source": "KI (PixelLab), Streifen aus Code (Farben auf den leichten Hieb eingerastet)",
+  "derivedFrom": "leyla_melee_rise_side_source",
+  "date": "11.11.2026",
+  "description": "Kombo-Hieb: Schritt vor, Karambit in einem Bogen nach oben (Frame 4), zurück ins Stehen. Ohne Hieb-Spur, die kommt aus Code."
  }
 }

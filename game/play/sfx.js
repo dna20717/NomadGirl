@@ -20,6 +20,12 @@ export function makeSfx(scene, volume = 0.5) {
     n.connect(f).connect(g).connect(dest); n.start(t);
   };
   return {
+    // a kept beat in the melee combo: a short soft blip, a little higher with every hit
+    tick(n = 1) {
+      const c = ctx(); if (!c) return;
+      const t = c.currentTime, o = out(c), f = 880 * Math.pow(1.122, Math.min(5, n - 1));
+      tone(c, o, 'sine', f, f * 0.99, t, 0.07, 0.18); tone(c, o, 'triangle', f * 2, f * 1.98, t, 0.04, 0.05);
+    },
     // heavy metal thing sits down
     klonk(weight = 1) {
       const c = ctx(); if (!c) return;

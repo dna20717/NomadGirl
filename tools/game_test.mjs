@@ -39,10 +39,36 @@ for (let i = 0; i < 40 && foes.find(e => e.id === 'schlaeger')?.state !== 'dead'
 }
 v = await t(t => t.run(1));
 check('Nahkampf: Schläger besiegt', v.kills >= 1, { v, foes });
-// heavy melee: hold J for 3 s, release
+// heavy melee: hold J (1 s since the combo), release
 v = await t(t => t.run(60));
 const heavy = await page.evaluate(() => { const l = game.scene.getScene('play').leyla; nomad.step(1, ['melee'], ['melee']); nomad.step(185, ['melee']); const ready = !!l.charging?.ready; nomad.step(1); const atk = l.attack?.power?.heavy; return { ready, atk }; });
-check('Nahkampf schwer: 3 s halten, loslassen', heavy.ready && heavy.atk, heavy);
+check('Nahkampf schwer: 1 s halten, loslassen', heavy.ready && heavy.atk, heavy);
+// combo (Daniel, 11.11.2026): taps chain three random hits (none twice), the finisher; four taps on the beat = point-blank shot as the fifth
+const combo = await page.evaluate(() => {
+  const s = game.scene.getScene('play'), l = s.leyla; nomad.step(60);
+  const run = perfect => {
+    const seq = [], mag0 = l.mag; let ring = false;
+    nomad.step(1, [], ['melee']);
+    for (let i = 0; i < 300; i++) {
+      const a = l.attack;
+      if (a?.combo && seq[seq.length - 1] !== a) seq.push(a);
+      ring ||= !!l.comboG?.visible;
+      let tap = [];
+      if (a?.combo && a.hit && a.next == null && (perfect ? s.now >= a.at + a.dur * a.beat - 20 : s.now >= a.at + 70)) tap = ['melee'];
+      if (seq.length >= 5) tap = [];
+      nomad.step(1, [], tap);
+      if (seq.length >= 5 && !l.attack) break;
+    }
+    nomad.step(40);
+    return { seq: seq.map(a => a.shot ? 'shot' : a.finisher ? 'fin' : a.row), used: mag0 - l.mag, ring };
+  };
+  const p = run(true), m = run(false); l.mag = l.magSize;
+  return { p, m };
+});
+const first3 = combo.p.seq.slice(0, 3);
+check('Kombo: drei zufällige Hiebe ohne Doppel, dann Abschluss', new Set(first3).size === 3 && first3.every(x => typeof x === 'number') && combo.p.seq[3] === 'fin', combo);
+check('Kombo: perfekter Takt = aufgesetzter Schuss als fünfter (1 Patrone), Takt-Ring sichtbar', combo.p.seq[4] === 'shot' && combo.p.used === 1 && combo.p.ring, combo);
+check('Kombo: ohne Takt kein Schuss, nach dem Abschluss beginnt sie neu', combo.m.seq[3] === 'fin' && typeof combo.m.seq[4] === 'number' && combo.m.used === 0, combo);
 v = await t(t => t.run(130));
 check('Kampfmodus: ohne Gegner in Sicht steckt sie die Waffe weg', v.armed === 'off', v);
 v = await t(t => t.run(2, [], ['ranged']));

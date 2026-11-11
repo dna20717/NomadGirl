@@ -8,6 +8,7 @@
 // collider at 256 px look height; everything scales with the height of look.idle (Assets › „Höhe im Spiel“)
 // hangReach: hands above the feet while hanging; mantleLift: how far the last pull-up frame lifts the feet inside the picture
 import { recoilTexture } from './recoil.js';
+import { makeSfx } from './sfx.js';
 
 const BASE = { height: 256, w: 72, h: 224, slideH: 104, crouchH: 196, climbW: 44, hand: 84, chest: 150, hangReach: 253, mantleLift: 120 };
 const DASH_TIME = 170, TERMINAL_FALL = 1700;
@@ -110,6 +111,7 @@ export class Leyla {
       case 'brake': this.braking(time, s, input, dir, grounded); break;
       case 'dead': b.setVelocityX(b.velocity.x * 0.9); break;
     }
+    this.comboFx(time);
     if (this.alive && !['climb', 'hang', 'mantle'].includes(this.state)) {
       this.meleeInput(time, input, grounded);
       // shooting only on the ground with the gun drawn (Daniel: no shooting in a jump); empty magazine = reload
@@ -642,15 +644,29 @@ export class Leyla {
     this.recoil(time);
   }
 
-  // ---------- melee (Daniel, 07.11.2026 spät): tap = light hit, standing or walking; holding ≥ 3 s = heavy hit when released ----------
+  // ---------- melee (Daniel, 07.11.2026 spät): tap = light hit, standing or walking; holding = heavy hit when released ----------
+  // Kombo (Daniel, 11.11.2026: „1c; b … der fünfte ein direkt aufgesetzter Schuss … die ersten drei Hiebe immer random, aber nie doppelt“):
+  // tapping J chains three hits drawn at random from Leyla › Kombo › Zufällige Hiebe (none twice), then the finisher; a tap during a hit is
+  // kept and the next hit starts on its beat ("Takt bei"); taps within "Takt-Fenster" of the beat are perfect, four perfect taps = point-blank shot
+  comboOn() { const C = this.d.combo || {}; return C.enabled !== false && (C.hits || []).some(h => h.look); }
   meleeInput(time, input, grounded) {
-    const M = this.d.melee || {}, L = this.d.look || {}, b = this.body;
+    const M = this.d.melee || {}, L = this.d.look || {}, C = this.d.combo || {}, b = this.body;
     if (this.attack) {
       const a = this.attack, p = (time - a.at) / a.dur;
-      if (!a.hit && p >= a.hitAt) { a.hit = true; this.scene.combat.melee(this, time, a.power); }
-      if (p >= 1 || this.state !== 'normal') this.attack = null;
+      if (!a.hit && p >= a.hitAt) { a.hit = true; if (a.shot) this.scene.combat.pointBlank(this, time, a.shot); else this.scene.combat.melee(this, time, a.power); }
+      if (a.step && grounded && p < Math.min(1, a.hitAt + 0.1)) b.setVelocityX(this.facing * a.step * (1 - p / Math.max(0.01, a.hitAt + 0.1)));
+      if (a.combo && input.melee.pressed && a.next == null && time >= a.at + 60) a.next = time;   // the tap waits for the beat
+      const beatAt = a.at + a.dur * a.beat;
+      if (a.combo && a.next != null && a.hit && time >= beatAt && this.state === 'normal' && grounded) { this.attack = null; this.comboNext(time, a.next, beatAt, grounded); return; }
+      if (p >= 1 || this.state !== 'normal') {
+        this.attack = null;
+        if (a.combo && this.combo) { this.combo.beat = beatAt; this.combo.until = a.at + a.dur + (C.window ?? 350); }
+      }
       return;
     }
+    if (this.combo && (time > this.combo.until || this.state !== 'normal')) this.combo = null;
+    // a late tap after the hit, still within the window
+    if (this.combo && input.melee.pressed && grounded && this.state === 'normal') { this.comboNext(time, time, this.combo.beat, grounded); return; }
     if (input.melee.pressed && time >= this.meleeReady) {
       if (!grounded || this.state !== 'normal' || !(L.meleeLight || L.meleeHeavy)) { this.scene.combat.melee(this, time); return; }   // in the air: the quick code hit
       this.charging = { at: time, ready: false };
@@ -659,13 +675,15 @@ export class Leyla {
     if (!c) return;
     if (this.state !== 'normal' || !grounded) { this.charging = null; this.sprite.clearTint(); this.chargeEffects(time, -1); return; }
     const held = time - c.at;
-    if (!c.ready && held >= (M.chargeTime ?? 3000)) { c.ready = true; this.scene.fx.sparks(this.x, this.chest, 0xffd27a, 14); this.scene.drone?.react('alert'); }
+    if (!c.ready && held >= (M.chargeTime ?? 1000)) { c.ready = true; this.scene.fx.sparks(this.x, this.chest, 0xffd27a, 14); this.scene.drone?.react('alert'); }
     this.chargeEffects(time, held);
     if (input.melee.down) return;
     this.chargeEffects(time, -1);
-    // released: heavy when charged, otherwise light; walking picks the walking version
+    // released: heavy when charged, otherwise the first hit of the combo (or the light hit without combo); walking picks the walking version
     this.charging = null; this.sprite.clearTint();
     const walking = Math.abs(b.velocity.x) > 20, heavy = c.ready;
+    if (!heavy && this.comboOn()) { this.combo = { n: 0, used: [], perfect: true, taps: [], beat: 0, until: 0 }; this.comboHit(time, walking); return; }
+    this.combo = null;
     const look = heavy ? (walking ? L.meleeHeavyWalk || L.meleeHeavy : L.meleeHeavy) : (walking ? L.meleeLightWalk || L.meleeLight : L.meleeLight);
     if (!look) { this.scene.combat.melee(this, time); return; }
     const key = (heavy ? 'heavy' : 'light') + (walking ? 'Walk' : '');
@@ -673,6 +691,75 @@ export class Leyla {
       power: heavy ? { damage: (M.heavyDamage ?? 250) / 100, range: M.heavyRange ?? 160, knockback: M.heavyKnockback ?? 220, heavy: true } : null };
     this.meleeReady = time + this.attack.dur;
     this.attackPose = time + this.attack.dur;   // keeps facing the way she strikes
+  }
+  // the next tap of the combo: judge the beat, then hit 2–3 (random, none twice), the finisher, or with four perfect taps the shot
+  comboNext(time, tapAt, beatAt, grounded) {
+    const C = this.d.combo || {}, k = this.combo, walking = Math.abs(this.body.velocity.x) > 20;
+    if (!k) return;
+    const perfect = Math.abs(tapAt - beatAt) <= (C.perfect ?? 90);
+    k.perfect = k.perfect && perfect; k.taps.push(perfect); k.flash = { at: time, perfect };
+    if (perfect) { this.sfx ??= makeSfx(this.scene, 0.22); this.sfx.tick?.(k.taps.length); }
+    if (k.n < 3) return this.comboHit(time, walking);
+    if (k.n === 3) return this.comboFinisher(time);
+    const w = this.scene.weapon('ranged');
+    if (k.n === 4 && k.perfect && C.shot !== false && w && this.mag > 0 && this.d.look?.shoot) return this.comboShot(time, w);
+    this.combo = { n: 0, used: [], perfect: true, taps: [], beat: 0, until: 0 };   // after the finisher (or shot) a new tap starts over
+    this.comboHit(time, walking);
+  }
+  startCombo(time, a) {
+    this.attack = { hit: false, combo: true, at: time, next: null, ...a };
+    this.meleeReady = time + a.dur; this.attackPose = time + a.dur;
+    this.combo.n++; this.combo.beat = time + a.dur * a.beat; this.combo.until = time + a.dur + ((this.d.combo || {}).window ?? 350);
+  }
+  comboHit(time, walking) {
+    const C = this.d.combo || {}, rows = (C.hits || []).map((h, i) => ({ ...h, i })).filter(h => h.look), k = this.combo;
+    let free = rows.filter(h => !k.used.includes(h.i));
+    if (!free.length) free = rows.filter(h => h.i !== k.used[k.used.length - 1]);
+    if (!free.length) free = rows;
+    const h = free[Math.floor(Math.random() * free.length)];
+    k.used.push(h.i);
+    this.startCombo(time, { look: (walking && h.walk) || h.look, from: h.from ?? 1, dur: h.time ?? 420, hitAt: h.hit ?? 0.3, beat: h.beat ?? 0.7, step: h.step ?? 0, row: h.i, trail: !!h.trail, trailUp: !!h.trailUp,
+      power: (h.damage ?? 100) !== 100 ? { damage: (h.damage ?? 100) / 100 } : null });
+  }
+  comboFinisher(time) {
+    const C = this.d.combo || {}, M = this.d.melee || {}, L = this.d.look || {};
+    const look = C.finisher || L.meleeHeavy;
+    if (!look) { this.combo = null; return; }
+    this.startCombo(time, { look, from: C.finisherFrom ?? M.heavyFrom ?? 11, dur: C.finisherTime ?? 650, hitAt: C.finisherHit ?? 0.3, beat: C.finisherBeat ?? 0.65, step: 160, finisher: true,
+      power: { damage: (C.finisherDamage ?? 200) / 100, range: C.finisherRange ?? 120, knockback: C.finisherKnockback ?? 200, heavy: true } });
+  }
+  comboShot(time, w) {
+    const C = this.d.combo || {};
+    this.startCombo(time, { look: this.d.look.shoot, from: 1, dur: C.shotTime ?? 420, hitAt: 0.05, beat: 1, step: 0,
+      shot: { damage: (w.damage ?? 10) * (C.shotDamage ?? 400) / 100, range: C.shotRange ?? 170, knockback: C.shotKnockback ?? 520 } });
+    this.combo.until = time;   // the shot ends the combo
+  }
+  // the beat, quietly (Leyla › Kombo › Takt anzeigen): a small ring beside her head closes onto the beat, dots for the hits; a perfect tap flashes
+  comboFx(time) {
+    const C = this.d.combo || {}, a = this.attack?.combo ? this.attack : null, k = this.combo;
+    const show = C.show !== false && this.alive && (a || (k && time <= k.until + 250) || (k?.flash && time - k.flash.at < 300));
+    if (!show) { this.comboG?.clear().setVisible(false); return; }
+    const s = this.scene, g = (this.comboG ??= s.add.graphics().setDepth(19)).clear().setVisible(true);
+    const col = parseInt(String(C.color || '#7ff6ff').slice(1), 16), hot = parseInt(String(C.perfectColor || '#ffe27a').slice(1), 16);
+    const x = this.x + this.facing * this.height * 0.1, y = this.feet - this.height * 1.14, r = 9;
+    const beatAt = a ? a.at + a.dur * a.beat : k?.beat ?? 0, near = Math.abs(time - beatAt) <= (C.perfect ?? 90);
+    const fade = a ? 1 : Math.max(0, 1 - (time - (k?.until ?? time) + 250) / 250 * 0.5);
+    g.lineStyle(2, col, 0.32 * fade).strokeCircle(x, y, r);
+    if (a && a.hit && !a.shot && !(k && k.n >= 4 && !(k.perfect && C.shot !== false))) {   // the approach circle closes onto the beat
+      const span = Math.max(1, beatAt - (a.at + a.dur * a.hitAt)), q = Math.max(0, Math.min(1, (beatAt - time) / span));
+      if (time <= beatAt + (C.perfect ?? 90)) g.lineStyle(2, near ? hot : col, (near ? 0.85 : 0.45) * fade).strokeCircle(x, y, r + 22 * q);
+      if (near) g.fillStyle(hot, 0.7 * fade).fillCircle(x, y, 3.5);
+    }
+    // dots: one per hit, warm while the beat is kept, the fifth only shows while the shot is still possible
+    const n = k?.n || 0, dots = k?.perfect && C.shot !== false ? 5 : 4;
+    for (let i = 0; i < dots; i++) {
+      const dx = x + (i - (dots - 1) / 2) * 9, dy = y + r + 10, on = i < n;
+      g.fillStyle(on ? (k?.perfect ? hot : col) : 0xffffff, on ? 0.75 * fade : 0.16 * fade).fillCircle(dx, dy, i === 4 ? 2.6 : 2.1);
+    }
+    if (k?.flash && time - k.flash.at < 300) {
+      const t = (time - k.flash.at) / 300;
+      g.lineStyle(2, k.flash.perfect ? hot : 0x8b949e, (1 - t) * (k.flash.perfect ? 0.9 : 0.4)).strokeCircle(x, y, r + 4 + 18 * t);
+    }
   }
 
   // charging: a glow grows round her, sparks are pulled in; when it is ready the glow turns hot and pulses (Leyla › Nahkampf › Aufladen-Licht)

@@ -125,7 +125,7 @@
   "lightHit": 0.2,
   "lightWalkTime": 450,
   "lightWalkHit": 0.25,
-  "chargeTime": 3000,
+  "chargeTime": 1000,
   "chargeAfter": 250,
   "chargeLoop": [3, 9],
   "heavyTime": 700,
@@ -144,5 +144,31 @@
  "fight": {"enabled": true, "auto": true, "sight": 10, "calm": 4, "onHit": true, "redraw": 700},
  "hit": {"enabled": true, "heavyFrom": 12, "time": 360, "heavyTime": 520, "inFrames": 3, "inTime": 70, "cancelAfter": 50, "flash": 50, "hitstop": 60, "scale": true, "fullAt": 15},
  "transition": {"idleAfter": 90, "idleAfterAir": 60},
- "transitions": [{"from": "leyla_land_side", "to": "leyla_run_side", "frame": 3}]
+ "transitions": [{"from": "leyla_land_side", "to": "leyla_run_side", "frame": 3}],
+ "combo": {
+  "enabled": true,
+  "hits": [
+   {"look": "leyla_melee_light_side", "walk": "leyla_melee_light_walk_side", "from": 1, "time": 400, "hit": 0.22, "beat": 0.5, "damage": 100, "step": 140},
+   {"look": "leyla_melee_back_side", "from": 1, "time": 440, "hit": 0.45, "beat": 0.66, "damage": 110, "step": 180, "trail": true},
+   {"look": "leyla_melee_rise_side", "from": 1, "time": 440, "hit": 0.36, "beat": 0.58, "damage": 110, "step": 120, "trail": true, "trailUp": true}
+  ],
+  "finisher": "leyla_melee_heavy_side",
+  "finisherFrom": 11,
+  "finisherTime": 650,
+  "finisherHit": 0.3,
+  "finisherBeat": 0.65,
+  "finisherDamage": 200,
+  "finisherRange": 120,
+  "finisherKnockback": 200,
+  "perfect": 90,
+  "window": 350,
+  "shot": true,
+  "shotTime": 420,
+  "shotDamage": 400,
+  "shotRange": 170,
+  "shotKnockback": 520,
+  "show": true,
+  "color": "#7ff6ff",
+  "perfectColor": "#ffe27a"
+ }
 }

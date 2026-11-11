@@ -67,11 +67,13 @@ export class Fx {
   }
 
   // crescent slash in front of the attacker
-  slash(x, y, facing, reach, color = 0xf2f5f8) {
+  slash(x, y, facing, reach, color = 0xf2f5f8, up = false) {
     const g = this.scene.add.graphics().setDepth(11);
     const draw = t => {
       g.clear();
-      const r = 60 + reach, a0 = facing > 0 ? -1.2 : Math.PI + 1.2, a1 = facing > 0 ? 1.0 : Math.PI - 1.0, cut = a0 + (a1 - a0) * Math.min(1, t * 1.6);
+      let r = 60 + reach, a0 = facing > 0 ? -1.2 : Math.PI + 1.2, a1 = facing > 0 ? 1.0 : Math.PI - 1.0;
+      if (up) [a0, a1] = [a1, a0];   // rising cut: from below to above
+      const cut = a0 + (a1 - a0) * Math.min(1, t * 1.6);
       g.lineStyle(14 * (1 - t), color, 0.9 * (1 - t)).beginPath().arc(x, y, r, Math.min(a0, cut), Math.max(a0, cut), false).strokePath();
       g.lineStyle(4 * (1 - t), 0x3fe0d0, 0.8 * (1 - t)).beginPath().arc(x, y, r - 12, Math.min(a0, cut), Math.max(a0, cut), false).strokePath();
     };

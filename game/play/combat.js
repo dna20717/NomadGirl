@@ -17,7 +17,7 @@ export class Combat {
     const reach = (w.range ?? 70) + 40 + (power?.range || 0), f = leyla.facing, b = leyla.body;
     const x0 = f > 0 ? b.center.x : b.left - reach, x1 = f > 0 ? b.right + reach : b.center.x;
     const H = leyla.height, y0 = b.bottom - H, y1 = b.bottom - H * 0.1;
-    if (!leyla.attack) s.fx.slash(leyla.x + f * 24, b.bottom - H * 0.58, f, w.range ?? 70);   // the attack animations bring their own slash
+    if (!leyla.attack || leyla.attack.trail) s.fx.slash(leyla.x + f * 24, b.bottom - H * 0.58, f, w.range ?? 70, leyla.attack?.trail ? 0xbff8ff : undefined, !!leyla.attack?.trailUp);   // the attack animations bring their own slash
     let hits = 0;
     for (const e of s.enemies) {
       if (!e.alive) continue;
@@ -30,6 +30,29 @@ export class Combat {
     }
     s.level?.meleeHit(x0, x1, y0, y1);   // brittle walls in POI levels
     if (hits) { s.hitstop(time, power?.heavy ? 110 : 55); s.cam.shake(power?.heavy ? 160 : 70, power?.heavy ? 0.008 : 0.003); }
+  }
+
+  // the fifth hit of a perfect combo: a shot pressed right on the enemy (Leyla › Kombo › Schuss); costs one round from the magazine
+  pointBlank(leyla, time, o) {
+    const s = this.scene, w = s.weapon('ranged');
+    if (!w || leyla.mag <= 0) return;
+    leyla.mag--;
+    const f = leyla.facing, b = leyla.body, H = leyla.height, x = leyla.x + f * H * 0.4, y = b.bottom - H * 0.79;   // muzzle of the stretched shooting pose
+    s.fx.flash(x, y, 0xfff2b0, 22);
+    s.fx.light?.(x, y, { radius: 90, color: 0xfff6d8, alpha: 0.8, life: 80 });
+    s.fx.light?.(x, y, { radius: 240, color: 0xffc870, alpha: 0.45, life: 120 });
+    s.fx.impact?.(x + f * 30, y, f, true, 1.3);
+    const snd = w.sound && s.cache.audio.exists(w.sound) && s.data_.assets?.[w.sound];
+    if (snd) s.sound.play(w.sound, { volume: Math.min(1, (snd.volume ?? 100) / 100 * 1.25), detune: -260 });
+    const x0 = f > 0 ? b.center.x : b.left - o.range, x1 = f > 0 ? b.right + o.range : b.center.x, y0 = b.bottom - H, y1 = b.bottom - H * 0.1;
+    let hits = 0;
+    for (const e of s.enemies) {
+      if (!e.alive) continue;
+      const eb = e.body;
+      if (eb.right > x0 && eb.left < x1 && eb.bottom > y0 && eb.top < y1) { e.hit(time, Math.round(o.damage * this.boost()), o.knockback, f, true); hits++; }
+    }
+    s.hitstop(time, hits ? 140 : 60); s.cam.shake(180, hits ? 0.01 : 0.004);
+    leyla.fightTrigger?.(time);
   }
 
   shoot(leyla, time) {
