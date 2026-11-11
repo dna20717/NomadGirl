@@ -89,6 +89,7 @@ export class Leyla {
     }
     if (input.jump.pressed) this.jumpAt = time;
     const dir = (input.right.down ? 1 : 0) - (input.left.down ? 1 : 0);
+    this.dirHeld = dir; this.walkHeld = !!input.walk.down;   // for the look: running intent, pushing against a wall
 
     if (this.hitAnim) {   // the hit reaction runs out, or running / jumping / dash breaks it off after "Abbrechen ab"
       const h = this.hitAnim, p = (time - h.at) / h.dur;
@@ -472,7 +473,14 @@ export class Leyla {
   // ---------- look ----------
   look(time, dt, grounded) {
     const b = this.body, v = b.velocity, st = this.state;
-    let name = st === 'dead' ? 'hurt' : st === 'normal' ? (!grounded ? (time < (this.flipUntil || 0) ? 'airJump' : v.y < 0 ? 'jump' : 'fall') : Math.abs(v.x) > 300 ? 'run' : Math.abs(v.x) > 20 ? 'walk' : 'idle') : st === 'swing' ? 'jump' : st;
+    // smooth look (animation audit 11.11.2026): a frame in the air right after a dash or a step down counts as ground,
+    // pushing against a wall is standing, and holding a direction runs from the first step (no walk cycle that restarts as a run)
+    const b0 = b.blocked, wall = (v.x > 0 && (b0.right || b.touching.right)) || (v.x < 0 && (b0.left || b.touching.left));
+    const speed = wall ? 0 : Math.abs(v.x), held = this.dirHeld && !wall && st === 'normal';
+    const z0 = this.size, near = Math.abs(v.y) < 150 && (!this.scene.rectFree(this.x - z0.w / 2 + 2, this.feet + 1, z0.w - 4, 8) || this.scene.onPlatform(this.x, this.feet + 6));
+    const onGround = grounded || near || (time - (this.lastGround ?? -1e9) < 90 && Math.abs(v.y) < 150);
+    let name = st === 'dead' ? 'hurt' : st === 'normal' ? (!onGround ? (time < (this.flipUntil || 0) ? 'airJump' : v.y < 0 ? 'jump' : 'fall')
+      : speed > 300 || (held && !this.walkHeld) ? 'run' : speed > 20 || held ? 'walk' : 'idle') : st === 'swing' ? 'jump' : st;
     this.updateArmed(time, dt, grounded);
     this.idleNow = name === 'idle' && this.armed === 'off';
     if (name === 'idle' && this.idleVariant === 'idleAlt' && this.d.look?.idleAlt) name = 'idleAlt';
@@ -487,7 +495,7 @@ export class Leyla {
     // standing at a workshop in the rig: seen from behind, busy with her hands
     if (this.idleNow && (this.scene.camp?.atWorkshop || this.scene.hud?.build?.working) && this.d.look?.work) { name = '@' + this.d.look.work; this.special = null; }
     // gun drawn (Leyla › Waffe ziehen): drawing, then aiming, walking with the gun, shooting
-    const L = this.d.look || {}, walking = Math.abs(v.x) > 20;
+    const L = this.d.look || {}, walking = speed > 20;   // against a wall: standing
     let armedFrame = null, armedFrom = 1;
     // drawing: the draw animation (from "Ziehen ab Frame"), then stretching the arms out (aim), then that pose is held
     const onRun = this.gunRunning(v) && this.runLook('runReady');
