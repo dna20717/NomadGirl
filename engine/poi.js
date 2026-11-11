@@ -68,7 +68,7 @@ export function buildPoi(D, poiId, seed = 1) {
       const id = pick(branchPool, rnd, R), b = parsed[id], [bx] = b.marks.A.find(([, y]) => y === b.h - 1);
       const left = m.x + hx - bx;
       if (left < 1 || left + b.w > W - 1 || branches.some(o => left < o.x + o.w + 1 && o.x < left + b.w + 1)) continue;
-      branches.push({ id, band: 'branch', x: left, w: b.w, h: b.h, hookX: m.x + hx });
+      branches.push({ id, band: 'branch', x: left, w: b.w, h: b.h, hookX: m.x + hx, main: m });
     }
   }
   const BH = branches.length ? Math.max(...branches.map(b => b.h)) : 0;
@@ -119,7 +119,8 @@ export function buildPoi(D, poiId, seed = 1) {
   for (const b of branches) {
     const hx = b.hookX;
     for (let y = top - 1; y < H; y++) {
-      if (y > top && (tiles[y][hx] === '#' || tiles[y][hx] === '=' || tiles[y][hx] === 'H')) break;
+      // a main room lower than the band has rock above its ceiling: the ladder goes through it down to the ceiling hook (b.main.y)
+      if (y > Math.max(top, b.main.y) && (tiles[y][hx] === '#' || tiles[y][hx] === '=' || tiles[y][hx] === 'H')) break;
       tiles[y][hx] = 'H';
     }
   }

@@ -15,13 +15,14 @@
   "light": {"ambient": 46, "color": "#a9c6bf", "vignette": 40},
   "lamps": [
    {"kind": "tube", "color": "#d2fff0", "every": 7, "offset": 3, "chance": 70, "radius": 430, "strength": 85, "behavior": "steady"},
-   {"kind": "tube", "color": "#d2fff0", "every": 7, "offset": 3, "chance": 100, "radius": 430, "strength": 80, "behavior": "flicker"},
+   {"kind": "tube", "color": "#d2fff0", "every": 7, "offset": 3, "chance": 100, "radius": 430, "strength": 80, "behavior": "stutter"},
    {"kind": "emergency", "color": "#ff4a3a", "every": 15, "offset": 0, "chance": 60, "radius": 230, "strength": 60, "behavior": "pulse"}
   ],
   "dust": {"count": 70, "color": "#f6ecd0", "size": 3, "drift": [6, -4], "alpha": 60, "inLight": true},
   "sparks": {"perMinute": 2, "color": "#ffd27a"},
   "drips": {"perMinute": 6, "color": "#9ec8d8"},
-  "fog": {"count": 0}
+  "fog": {"count": 0},
+  "critters": {"flies": 2, "moths": 1.5, "roaches": 3, "papers": 5, "draft": 20}
  },
  "beton_lager": {
   "name": "Lager duster",
@@ -34,7 +35,8 @@
   "dust": {"count": 80, "color": "#f0e2c4", "size": 3, "drift": [4, -3], "alpha": 65, "inLight": true},
   "sparks": {"perMinute": 0},
   "drips": {"perMinute": 12, "color": "#9ec8d8"},
-  "fog": {"count": 4, "color": "#7d8ea0", "alpha": 18, "height": 90, "speed": 10}
+  "fog": {"count": 4, "color": "#7d8ea0", "alpha": 18, "height": 90, "speed": 10},
+  "critters": {"roaches": 8, "rats": 2, "flies": 2, "moths": 1}
  },
  "metall_rost": {
   "name": "Halle rostig",
@@ -47,7 +49,8 @@
   "dust": {"count": 60, "color": "#ffd8a8", "size": 3, "drift": [10, -6], "alpha": 55, "inLight": true},
   "sparks": {"perMinute": 10, "color": "#ffb040"},
   "drips": {"perMinute": 0},
-  "fog": {"count": 3, "color": "#806050", "alpha": 14, "height": 80, "speed": 12}
+  "fog": {"count": 3, "color": "#806050", "alpha": 14, "height": 80, "speed": 12},
+  "critters": {"roaches": 4, "rats": 1, "moths": 1}
  },
  "tunnel_blau": {
   "name": "Tunnel blau",
@@ -60,7 +63,8 @@
   "dust": {"count": 30, "color": "#cfe4ff", "size": 3, "drift": [3, -2], "alpha": 50, "inLight": true},
   "sparks": {"perMinute": 1, "color": "#9fd8ff"},
   "drips": {"perMinute": 14, "color": "#9ec8ff"},
-  "fog": {"count": 6, "color": "#4a6aa0", "alpha": 22, "height": 100, "speed": 14}
+  "fog": {"count": 6, "color": "#4a6aa0", "alpha": 22, "height": 100, "speed": 14},
+  "critters": {"rats": 3, "roaches": 4}
  },
  "ruine_staub": {
   "name": "Ruine staubig",
@@ -70,6 +74,93 @@
   "dust": {"count": 60, "color": "#e8dcc4", "size": 3, "drift": [-30, 8], "alpha": 40, "inLight": false},
   "sparks": {"perMinute": 0},
   "drips": {"perMinute": 2, "color": "#9ec8d8"},
-  "fog": {"count": 0}
+  "fog": {"count": 0},
+  "critters": {"flies": 2, "roaches": 2, "papers": 3, "draft": 40}
+ },
+ "markt_neon": {
+  "name": "Markt · Neon",
+  "description": "Großmarkt: kaltes Neonlicht, viele Röhren springen stotternd an oder sind tot, Papier auf dem Boden, Fliegen über den Imbissresten, Motten an den Röhren.",
+  "light": {"ambient": 42, "color": "#b8d8d0", "vignette": 45},
+  "lamps": [
+   {"kind": "tube", "color": "#dffcff", "every": 6, "chance": 70, "radius": 420, "strength": 85, "behavior": "buzz"},
+   {"kind": "tube", "color": "#dffcff", "every": 6, "offset": 3, "chance": 55, "radius": 400, "strength": 80, "behavior": "stutter"},
+   {"kind": "tube", "color": "#ff8ad8", "every": 13, "offset": 5, "chance": 40, "radius": 300, "strength": 60, "behavior": "flicker"}
+  ],
+  "dust": {"count": 60, "color": "#e3e6ff", "size": 2, "drift": [3, -2], "alpha": 45, "inLight": true},
+  "sparks": {"perMinute": 2, "color": "#a6fcdb"},
+  "drips": {"perMinute": 4, "color": "#9ec8d8"},
+  "fog": {"count": 0},
+  "critters": {"flies": 3, "moths": 1.5, "roaches": 5, "rats": 1.5, "papers": 10, "draft": 35}
+ },
+ "kino_dunkel": {
+  "name": "Kino dunkel",
+  "description": "Fast schwarz, nur das Notlicht über dem Ausgang und das Flimmern einer kaputten Lampe. Ratten zwischen den Sitzreihen.",
+  "light": {"ambient": 18, "color": "#8a7aa8", "vignette": 60},
+  "lamps": [
+   {"kind": "emergency", "color": "#7dff9a", "every": 20, "chance": 100, "radius": 260, "strength": 70, "behavior": "steady"},
+   {"kind": "bulb", "color": "#ffd59a", "every": 9, "offset": 6, "chance": 80, "radius": 320, "strength": 70, "behavior": "broken"}
+  ],
+  "dust": {"count": 90, "color": "#f0e2c4", "size": 2, "drift": [1, -1], "alpha": 70, "inLight": true},
+  "sparks": {"perMinute": 0},
+  "drips": {"perMinute": 0},
+  "fog": {"count": 2, "color": "#5a4a70", "alpha": 16, "height": 80, "speed": 6},
+  "critters": {"roaches": 6, "rats": 4, "papers": 4, "draft": 10, "moths": 2}
+ },
+ "bunker_rot": {
+  "name": "Bunker · Rotlicht",
+  "description": "Bunker 13: Notbeleuchtung, rote Rundumleuchten im Alarm, vergitterte Glühbirnen, Kakerlaken überall, Tropfwasser.",
+  "light": {"ambient": 26, "color": "#c89a8a", "vignette": 55},
+  "lamps": [
+   {"kind": "bulb", "color": "#ffcf8a", "every": 7, "chance": 75, "radius": 330, "strength": 80, "behavior": "buzz"},
+   {"kind": "emergency", "color": "#ff3a2a", "every": 12, "offset": 4, "chance": 80, "radius": 320, "strength": 85, "behavior": "alarm"},
+   {"kind": "bulb", "color": "#ffcf8a", "every": 7, "offset": 2, "chance": 35, "radius": 300, "strength": 70, "behavior": "broken"}
+  ],
+  "dust": {"count": 50, "color": "#f0d8c4", "size": 3, "drift": [2, -1], "alpha": 55, "inLight": true},
+  "sparks": {"perMinute": 3, "color": "#ffb040"},
+  "drips": {"perMinute": 10, "color": "#9ec8b8"},
+  "fog": {"count": 3, "color": "#6a4a48", "alpha": 14, "height": 80, "speed": 8},
+  "critters": {"roaches": 10, "rats": 2, "flies": 1, "moths": 0.5}
+ },
+ "bunker_reaktor": {
+  "name": "Bunker · Reaktor",
+  "description": "Grünes Glimmen vom Reaktor, pulsierende Lampen, Dampf am Boden, kein Leben außer Kakerlaken.",
+  "light": {"ambient": 30, "color": "#9ad8a8", "vignette": 50},
+  "lamps": [
+   {"kind": "ceiling", "color": "#a6fcdb", "every": 8, "chance": 80, "radius": 420, "strength": 80, "behavior": "pulse"},
+   {"kind": "emergency", "color": "#ff3a2a", "every": 16, "offset": 8, "chance": 100, "radius": 300, "strength": 80, "behavior": "alarm"}
+  ],
+  "dust": {"count": 70, "color": "#cdf7e2", "size": 2, "drift": [0, -6], "alpha": 60, "inLight": true},
+  "sparks": {"perMinute": 6, "color": "#a6fcdb"},
+  "drips": {"perMinute": 6, "color": "#9ec8b8"},
+  "fog": {"count": 7, "color": "#4a8a6a", "alpha": 22, "height": 110, "speed": 12},
+  "critters": {"roaches": 8}
+ },
+ "ministerium_kalt": {
+  "name": "Ministerium · kalt",
+  "description": "Unheimlich sauber: kaltes, gleichmäßiges Licht, kaum Staub, kein Dreck. Nur eine einzelne Röhre brummt, und irgendwo eine Fliege, die nicht hierher gehört.",
+  "light": {"ambient": 55, "color": "#d8e0f0", "vignette": 35},
+  "lamps": [
+   {"kind": "tube", "color": "#f0f6ff", "every": 6, "chance": 100, "radius": 440, "strength": 80, "behavior": "steady"},
+   {"kind": "tube", "color": "#f0f6ff", "every": 19, "offset": 9, "chance": 100, "radius": 420, "strength": 80, "behavior": "buzz"}
+  ],
+  "dust": {"count": 12, "color": "#ffffff", "size": 2, "drift": [1, -1], "alpha": 35, "inLight": true},
+  "sparks": {"perMinute": 0},
+  "drips": {"perMinute": 0},
+  "fog": {"count": 0},
+  "critters": {"flies": 1, "papers": 2, "draft": 12}
+ },
+ "ministerium_saal": {
+  "name": "Ministerium · Saal",
+  "description": "Festsaal und Amtszimmer: warme Kronleuchter, die ganz leicht pulsieren, dunkle Ecken, Motten um das Licht.",
+  "light": {"ambient": 38, "color": "#e8d8c0", "vignette": 50},
+  "lamps": [
+   {"kind": "ceiling", "color": "#ffd27a", "every": 10, "chance": 100, "radius": 520, "strength": 90, "behavior": "pulse"},
+   {"kind": "bulb", "color": "#ffd27a", "every": 10, "offset": 5, "chance": 60, "radius": 300, "strength": 70, "behavior": "flicker"}
+  ],
+  "dust": {"count": 40, "color": "#fef3c0", "size": 2, "drift": [1, -2], "alpha": 50, "inLight": true},
+  "sparks": {"perMinute": 0},
+  "drips": {"perMinute": 0},
+  "fog": {"count": 0},
+  "critters": {"moths": 2.5, "papers": 3, "draft": 8}
  }
 }

@@ -8,7 +8,7 @@
 import { WALL } from './room.js';
 
 export const LAMP_KINDS = [['ceiling', 'Deckenlampe'], ['tube', 'Neonröhre'], ['emergency', 'Notlicht'], ['bulb', 'Glühbirne']];
-export const LIGHT_BEHAVIORS = [['steady', 'Ruhig'], ['flicker', 'Flackert'], ['pulse', 'Pulsiert'], ['broken', 'Kaputt (Aussetzer, Funken)']];
+export const LIGHT_BEHAVIORS = [['steady', 'Ruhig'], ['flicker', 'Flackert'], ['pulse', 'Pulsiert'], ['broken', 'Kaputt (Aussetzer, Funken)'], ['stutter', 'Springt an (Neonröhre stottert)'], ['alarm', 'Alarm (Rundumlicht)'], ['buzz', 'Brummt (leises Zittern)']];
 
 // the same random number for the same tile, every time
 export const hash = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + s * 2246822519) >>> 0; h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
@@ -90,6 +90,17 @@ export function behave(behavior, t, seed = 0) {
     const on = hash(Math.floor(t / 2300), 9, Math.floor(seed * 1e6)) < 0.3;   // mostly dark, sometimes it catches
     return on ? (n < 0.5 ? 0.9 : 0.2) : n < 0.03 ? 0.7 : 0.04;
   }
+  if (behavior === 'stutter') {   // a tube that keeps trying to start: dark, a stammering burst, then on for a while
+    const cyc = 5200 + seed * 3000, p = (t + seed * 9000) % cyc;
+    if (p < 900) return 0.06;
+    if (p < 1500) return hash(Math.floor(t / 45), 11, Math.floor(seed * 1e6)) < 0.5 ? 1 : 0.1;
+    return 0.95 + 0.05 * hash(Math.floor(t / 120), 13, Math.floor(seed * 1e6));
+  }
+  if (behavior === 'alarm') {   // rotating beacon: a sharp sweep twice a second
+    const p = ((t / 1000) * (1.6 + seed * 0.4) + seed) % 1;
+    return 0.15 + 0.85 * Math.max(0, Math.cos(p * Math.PI * 2)) ** 6;
+  }
+  if (behavior === 'buzz') return 0.9 + 0.1 * hash(Math.floor(t / 50), 17, Math.floor(seed * 1e6));
   return 1;
 }
 
@@ -98,6 +109,6 @@ export function moodOf(D, id) {
   const m = D.atmosphere?.[id] || {};
   return {
     id, ambient: (m.light?.ambient ?? 100) / 100, color: m.light?.color || '#ffffff', vignette: (m.light?.vignette ?? 0) / 100,
-    lamps: m.lamps || [], dust: m.dust || {}, sparks: m.sparks || {}, drips: m.drips || {}, fog: m.fog || {},
+    lamps: m.lamps || [], dust: m.dust || {}, sparks: m.sparks || {}, drips: m.drips || {}, fog: m.fog || {}, critters: m.critters || {},
   };
 }

@@ -12,6 +12,8 @@ const rgb = c => { const n = parseInt(String(c || '#ffffff').slice(1), 16); retu
 const css = ([r, g, b], a = 1) => `rgba(${r},${g},${b},${a})`;
 const lerp = (a, b, k) => a + (b - a) * k;
 
+import { Critters } from './critters.js';
+
 export class Atmosphere {
   // props = clutter stamps from drawRoom (with name and kit), so glowing things can be found
   constructor(scene, props = []) {
@@ -27,7 +29,7 @@ export class Atmosphere {
     this.ceilings = plan.ceilings; this.faces = plan.faces;
     // nothing to do at all (every room bright, no lamps, nothing moving): stay out of the way
     const any = [...new Set([...Array(R.w).keys()].flatMap(x => [0, Math.floor(R.h / 2), R.h - 1].map(y => this.regionAt(x, y).mood)))].map(id => moodOf(D, id))
-      .some(m => m.ambient < 1 || m.color.toLowerCase() !== '#ffffff' || m.vignette || m.dust.count || m.fog.count || m.drips.perMinute || m.sparks.perMinute) || plan.lamps.length;
+      .some(m => m.ambient < 1 || m.color.toLowerCase() !== '#ffffff' || m.vignette || m.dust.count || m.fog.count || m.drips.perMinute || m.sparks.perMinute || Object.values(m.critters || {}).some(v => typeof v === 'number' && v > 0)) || plan.lamps.length;
     if (!any) { this.on = false; return; }
     this.depth = G.depth ?? 14;
 
@@ -63,6 +65,7 @@ export class Atmosphere {
     this.dust = []; this.sparks = []; this.drips = []; this.fog = [];
     this.vig = 0; this.cur = null; this.time = 0;
     this.spotGlow = s.add.image(0, 0, s.fx.glowKey()).setBlendMode(Phaser.BlendModes.ADD).setDepth(this.depth + 0.5).setVisible(false);
+    this.critters = new Critters(this);   // flies, moths, roaches, rats, paper scraps (Atmosphäre › Kleinvieh)
     // drawn right before the world camera renders: its view is final then (it follows Leyla after update, also in headless steps)
     s.cam.on('prerender', () => this.render());
   }
@@ -154,6 +157,7 @@ export class Atmosphere {
     this.flashes = this.flashes.filter(f => (f.t += dt) < f.life);
     this.lastSpot = this.spot();
     this.particles(mood, dt, s.cam.worldView);
+    this.critters.update(mood, dt, s.cam.worldView);
   }
 
   // ---------- lightmap ----------
@@ -280,6 +284,7 @@ export class Atmosphere {
     this.hidden = !v;
     for (const o of [this.image, this.fixtures, this.top, this.low, ...this.lights.map(L => L.halo), ...this.fog.map(f => f.img)]) o.setVisible(v);
     if (!v) this.spotGlow.setVisible(false);
+    this.critters?.show(v);
     return v;
   }
 
@@ -290,7 +295,7 @@ export class Atmosphere {
       on: true, lamps: this.lights.filter(L => L.lamp).map(L => ({ kind: L.kind, x: Math.round(L.x), y: Math.round(L.y), behavior: L.behavior, fixed: !!L.fixed })),
       glows: this.lights.filter(L => L.glow).map(L => ({ name: L.glow, x: Math.round(L.x), y: Math.round(L.y) })),
       mood: this.moodAt(Math.floor(l.x / this.T), Math.floor((l.feet - 40) / this.T)).id, spot: sp ? { x: Math.round(sp.x), y: Math.round(sp.y), dir: +sp.dir.toFixed(2) } : null,
-      dust: this.dust.length, fog: this.fog.length, drips: this.drips.length, sparks: this.sparks.length,
+      dust: this.dust.length, fog: this.fog.length, drips: this.drips.length, sparks: this.sparks.length, critters: this.critters.state(),
       atLeyla: +this.lightAt(l.x, l.chest).toFixed(3), ahead: +this.lightAt(l.x + l.facing * 380, l.chest + 40).toFixed(3),
     };
   }

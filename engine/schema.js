@@ -806,6 +806,11 @@ export const AREAS = {
       { title: 'Tropfen', fields: [num('drips.perMinute', 'Tropfen', { unit: 'pro Minute', min: 0, hint: 'Wasser tropft von Decken im Bild' }), color('drips.color', 'Farbe')] },
       { title: 'Bodennebel', fields: [num('fog.count', 'Schwaden', { min: 0, max: 40, hint: 'Auf dem Bildschirm zugleich, liegen auf den Böden' }), color('fog.color', 'Farbe'), num('fog.alpha', 'Deckkraft', { unit: '%', min: 0, max: 100 }),
         num('fog.height', 'Höhe', { unit: 'px', min: 8 }), num('fog.speed', 'Tempo', { unit: 'px/s' })] },
+      { title: 'Kleinvieh', fields: [num('critters.flies', 'Fliegen-Schwärme', { min: 0, max: 20, hint: 'Daniel, 11.11.2026: Fliegen, Kakerlaken und andere Kleinigkeiten aus Code. Kleine Knäuel über dem Boden im Bild, stieben auseinander, wenn Leyla durchrennt' }), color('critters.flyColor', 'Fliegen-Farbe'),
+        num('critters.moths', 'Motten je Lampe', { min: 0, max: 8, step: 0.5, hint: 'Kreisen um brennende Lampen und stoßen dagegen' }), color('critters.mothColor', 'Motten-Farbe'),
+        num('critters.roaches', 'Kakerlaken', { min: 0, max: 40, hint: 'Auf den Böden im Bild, flüchten vor Leyla in die Ritzen' }), color('critters.roachColor', 'Kakerlaken-Farbe'),
+        num('critters.rats', 'Ratten', { unit: 'pro Minute', min: 0, hint: 'Ab und zu rennt eine über den Boden' }), color('critters.ratColor', 'Ratten-Farbe'),
+        num('critters.papers', 'Papierfetzen', { min: 0, max: 30, hint: 'Liegen am Boden, der Luftzug schiebt sie, Leyla wirbelt sie auf' }), color('critters.paperColor', 'Papier-Farbe'), num('critters.draft', 'Luftzug', { unit: 'px/s', min: 0 })] },
     ],
   },
   rooms: {

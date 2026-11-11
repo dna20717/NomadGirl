@@ -29,8 +29,11 @@ THEMES = [
     ('concrete_wall', 'wall', [1, 2, 1, 2]),   # framed source: only the inner columns
     ('metal', 'metal', [0, 1, 2, 3]),
     ('ruins', 'ruins', [0, 1, 2, 3]),
+    ('mall', 'mall', [0, 1, 2, 3]),       # Großmarkt (11.11.2026)
+    ('bunker', 'bunker', [0, 1, 2, 3]),   # Bunker 13
+    ('marble', 'marble', [0, 1, 2, 3]),   # Ministerium
 ]
-CLUTTER = ['desert', 'station', 'industry', 'ruins', 'desert2', 'station2', 'industry2', 'station3', 'desert3', 'industry3', 'ruins3']
+CLUTTER = ['desert', 'station', 'industry', 'ruins', 'desert2', 'station2', 'industry2', 'station3', 'desert3', 'industry3', 'ruins3', 'mall3', 'bunker3', 'ministry3']
 # *2 = second round: 16 different things per sheet, *3 = third round in strict orthographic side view (Daniel, 11.11.2026)
 DETAILS = ['desert', 'concrete', 'metal', 'ruins']   # embedded details on the fill (stones, pipes, patches)
 KEY = {'ruins': (45, 0.01), 'metal': (70, 0.01)}   # background keying per theme: colour tolerance, share of the border

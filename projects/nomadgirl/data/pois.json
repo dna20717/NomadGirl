@@ -23,11 +23,15 @@
   "size": "M",
   "danger": 2,
   "roomCount": [5, 7],
-  "rooms": ["eingangshalle", "gang", "verkaufsraum", "lager", "treppenhaus", "werkstatthalle"],
+  "rooms": ["markt_eingang", "markt_passage", "markt_foodcourt", "markt_kaufhaus", "markt_lager", "markt_kino", "markt_buero"],
   "enemies": ["kriecher", "schleimbeisser", "schlaeger"],
   "loot": "kiste_tankstelle",
   "parTime": 180,
-  "secrets": 2
+  "secrets": 2,
+  "tunnelTerrain": "concrete",
+  "tunnelAtmosphere": "tunnel_blau",
+  "description": "Ein Konsumtempel am Stadtrand, halb eingestürzt. Die Rolltreppen laufen nicht mehr, die Kakerlaken schon.",
+  "branchChance": 70
  },
  "bunker_13": {
   "name": "Bunker 13",
@@ -35,11 +39,15 @@
   "size": "L",
   "danger": 4,
   "roomCount": [8, 11],
-  "rooms": ["eingangshalle", "gang", "treppenhaus", "tresorraum", "kontrollraum"],
+  "rooms": ["bunker_tor", "bunker_schleuse", "bunker_quartiere", "bunker_reaktor", "bunker_gang", "bunker_lager", "bunker_archiv", "bunker_kommando"],
   "enemies": ["wachdrohne", "schuetze", "schlaeger"],
   "loot": "pluenderer_beute",
   "parTime": 300,
-  "secrets": 3
+  "secrets": 3,
+  "tunnelTerrain": "metal",
+  "tunnelAtmosphere": "bunker_reaktor",
+  "description": "Zone 13. Gebaut für den Krieg, der nie kam. Irgendwer hält die Notbeleuchtung am Laufen.",
+  "branchChance": 70
  },
  "ministerium": {
   "name": "Ministerium für Ordnung",
@@ -47,11 +55,14 @@
   "size": "XL",
   "danger": 5,
   "roomCount": [12, 16],
-  "rooms": ["eingangshalle", "gang", "treppenhaus", "tresorraum", "kontrollraum"],
+  "rooms": ["min_vorplatz", "min_flur", "min_buero", "min_treppe", "min_saal", "min_archiv", "min_asservaten", "min_amtszimmer"],
   "enemies": ["wachdrohne", "schuetze", "schleimbeisser", "hausmeister"],
   "loot": "boss_beute",
   "parTime": 600,
   "secrets": 5,
-  "description": "Riesig, verlassen, tadellos sauber."
+  "description": "Riesig, verlassen, tadellos sauber.",
+  "tunnelTerrain": "marble",
+  "tunnelAtmosphere": "ministerium_kalt",
+  "branchChance": 65
  }
 }

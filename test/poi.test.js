@@ -7,13 +7,40 @@ import { nodeLoader } from '../tools/loader.js';
 import { loadProject } from '../engine/project.js';
 import { parseRoom, solidRects } from '../engine/room.js';
 import { buildPoi, poiReady, rankRun } from '../engine/poi.js';
+import { reach } from '../engine/reach.js';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '../projects/nomadgirl');
 const D = (await loadProject(nodeLoader(root))).data;
 
-test('Tankstelle KM7 ist als Level spielbar, die anderen POIs noch nicht', () => {
-  assert.equal(poiReady(D, 'tankstelle_km7').ok, true);
-  assert.equal(poiReady(D, 'bunker_13').ok, false);
+test('alle vier POIs sind als Level spielbar (seit 11.11.2026 nachts auch Großmarkt, Bunker 13, Ministerium)', () => {
+  for (const p of ['tankstelle_km7', 'grossmarkt', 'bunker_13', 'ministerium']) assert.equal(poiReady(D, p).ok, true, p);
+});
+
+// rough movement model (engine/reach.js): from the van every chest, switch, the goal and the shortcut can be reached, also in side rooms
+test('Erreichbarkeit: Kisten, Schalter, Ziel und Abkürzung in allen POIs, mehrere Seeds', () => {
+  for (const p of ['tankstelle_km7', 'grossmarkt', 'bunker_13', 'ministerium']) for (const seed of [1, 2, 3, 4, 5, 6, 7, 8]) {
+    const L = buildPoi(D, p, seed), lay = L.def.layout, R = reach(lay), miss = [];
+    assert.equal(L.problems.length, 0, `${p} ${seed}: ${L.problems.join('; ')}`);
+    for (let y = 0; y < lay.length; y++) for (let x = 0; x < lay[0].length; x++) if ('CZvS'.includes(lay[y][x]) && !R.can(x, y)) miss.push(`${lay[y][x]} ${x},${y}`);
+    assert.deepEqual(miss, [], `${p} Seed ${seed}`);
+  }
+});
+test('Erreichbarkeit: eine Kiste 7 Kacheln über dem Boden ist nicht erreichbar', () => {
+  const lay = ['##########', '#.....C..#', '#........#', '#........#', '#........#', '#........#', '#........#', '#........#', '#.L......#', '##########'];
+  assert.equal(reach(lay).can(6, 1), false);
+  assert.equal(reach(lay).can(6, 8), true);
+});
+test('Abzweig-Leiter reicht durch den Fels bis in niedrigere Haupträume', () => {
+  for (let seed = 1; seed <= 8; seed++) {
+    const L = buildPoi(D, 'ministerium', seed), lay = L.def.layout;
+    for (const b of L.rooms.filter(r => r.band === 'branch')) {
+      const hx = [...lay[b.y + b.h - 1]].findIndex((c, x) => c === 'H' && x >= b.x && x < b.x + b.w);
+      assert.ok(hx >= 0, `${b.id}: Leiter im Boden`);
+      let y = b.y + b.h - 1; while (lay[y][hx] === 'H') y++;
+      const m = L.rooms.find(r => r.band === 'main' && hx >= r.x && hx < r.x + r.w);
+      assert.ok(y >= m.y + 2, `${b.id} seed ${seed}: Leiter endet im Fels über ${m.id} (Zeile ${y}, Raum ab ${m.y})`);
+    }
+  }
 });
 
 test('gleicher Seed = gleiches Level, anderer Seed darf anders sein', () => {
