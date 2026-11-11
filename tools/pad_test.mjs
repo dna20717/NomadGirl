@@ -110,6 +110,28 @@ await tap(5);
 s = await sc();
 check('Switch: Benutzen liegt auf X (oben)', s.icon === 'switch_3', s.icon);
 
+// inventory with the controller, no pointer (Daniel, 11.11.2026): a cursor on cells, slots and tabs
+await ev(() => setPad({ id: 'Xbox Wireless Controller (STANDARD GAMEPAD Vendor: 045e)' }));
+await ev(() => { const s = game.scene.getScene('play'), inv = s.box.save.inv, g = inv.grids.backpack; g.items = g.items.filter(e => !(e.x < 3 && e.y < 2)); g.items.push({ a: 'items', id: 'schrottplatte', n: 1, x: 0, y: 0, r: 0 }); });
+await tap(8);
+const iv = () => ev(() => { const u = game.scene.getScene('play').hud.inv, c = document.querySelector('.inv-cursor'), g = game.scene.getScene('play').box.save.inv.grids.backpack;
+  const e = g.items.find(x => x.id === 'schrottplatte'); return { open: u.isOpen, cursor: !c.hidden, focus: u.focusId, held: u.held?.e.id || null, at: e ? [e.x, e.y] : null, x: game.scene.getScene('play').leyla.x }; });
+s = await iv();
+check('Inventar: Select öffnet, Cursor auf dem Rucksack', s.open && s.cursor && /^cell:backpack:0:0$/.test(s.focus), s);
+const lx = s.x;
+await tap(0); s = await iv();
+check('Inventar: A nimmt die Sache am Cursor', s.held === 'schrottplatte', s);
+await tap(15); await tap(13); s = await iv();
+check('Inventar: Steuerkreuz bewegt den Cursor, Leyla bleibt stehen', s.focus === 'cell:backpack:1:1' && Math.abs(s.x - lx) < 2, s);
+await tap(0); s = await iv();
+check('Inventar: A legt am Cursor ab', !s.held && s.at?.[0] === 1 && s.at?.[1] === 1, s);
+for (let i = 0; i < 12; i++) await tap(15);
+s = await iv();
+check('Inventar: nach rechts geht es aus dem Raster zu Slots und Mama-Bot', /^el:/.test(s.focus) || !/backpack/.test(s.focus), s);
+await shot('inventory');
+await tap(1); s = await iv();
+check('Inventar: B schließt', !s.open && !s.cursor, s);
+
 // the keyboard still works
 await ev(() => nomad.release());
 await page.keyboard.down('d'); await page.waitForTimeout(1500); s = await sc(); await page.keyboard.up('d');

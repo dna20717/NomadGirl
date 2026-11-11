@@ -573,7 +573,9 @@ export class PlayScene extends Phaser.Scene {
     }
     // controller (game/play/pad.js): adds to the keyboard, same action names
     const pad = this.pad?.poll();
-    if (pad?.kind) for (const name of Object.keys(i)) { i[name].down ||= pad.down(name); i[name].pressed ||= pad.pressed(name); }
+    // inventory open: the controller drives its cursor (padMenus), Leyla only hears the keyboard; Select / Start still close
+    const invPad = this.hud.inv?.isOpen && !this.hud.paused && !this.hud.modal;
+    if (pad?.kind) for (const name of Object.keys(i)) { if (invPad && name !== 'inventory' && name !== 'help') continue; i[name].down ||= pad.down(name); i[name].pressed ||= pad.pressed(name); }
     this.hud.padHelp(pad, PAD_ACTIONS);
     return i;
   }
@@ -591,7 +593,7 @@ export class PlayScene extends Phaser.Scene {
       return;
     }
     if (p.pressed('dash') && hud.craft?.isOpen) { hud.craft.close(); input.dash.pressed = false; }
-    else if (p.pressed('dash') && hud.inv?.isOpen) { hud.inv.close(); input.dash.pressed = false; }
+    else if (hud.inv?.isOpen && !hud.paused) hud.inv.padNav(p);
   }
 
   toggleMute() {

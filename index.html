@@ -19,6 +19,10 @@
   nav { display: grid; gap: 10px; }
   a, .soon { display: flex; align-items: center; gap: 14px; padding: 13px 16px; border-radius: var(--ui-r-pane); border: 1px solid var(--ui-border); background: var(--ui-panel); color: var(--ui-text); text-decoration: none; }
   a:hover { border-color: var(--ui-acc-line); }
+  nav a.pad-focus { border-color: var(--ui-acc-line); box-shadow: 0 0 0 2px var(--ui-acc-line), 0 0 18px color-mix(in srgb, var(--ui-acc-line) 60%, transparent); transform: translateX(4px); }
+  nav a { transition: transform 120ms ease-out, box-shadow 120ms; }
+  .pad-hint { display: none; margin-top: 12px; font-size: 12px; color: var(--ui-text3); }
+  .pad .pad-hint { display: block; }
   a.main { background: var(--ui-acc-soft); border-color: var(--ui-acc-line); }
   b { display: block; font-weight: 600; }
   small { color: var(--ui-text3); }
@@ -42,6 +46,7 @@
     <h1>NomadGirl</h1>
     <p class="sub">Leyla lebt in den Wastelands rund um BigCityDelta in ihrem Rig. Sie plündert, was andere liegen lassen, und kocht erstaunlich gut.</p>
     <nav id="nav"></nav>
+    <p class="pad-hint">Stick hoch/runter: wählen · A: los · Stick links/rechts: Kurve laufen</p>
     <footer>GPL v3 oder später · <a href="https://github.com/dna20717/NomadGirl">Quelltext auf GitHub</a> · <span id="version" title="Version dieser Seite (Commit und Zeit des Builds)">…</span></footer>
   </div>
 </main>
@@ -63,10 +68,35 @@
     e.append(t);
     nav.append(e);
   };
-  entry('game.html?camp', 'play', 'Spiel', 'Camp mit Rig, Lagerfeuer und Companions, Warroom, Runs mit Spielstand (Tastatur)', 'main');
-  entry('game.html', 'target', 'Testraum', 'Parkour mit Slide, Leiter, Seil, Kanten und Van (Tastatur)');
+  entry('game.html?camp', 'play', 'Spiel', 'Camp mit Rig, Lagerfeuer und Companions, Warroom, Runs mit Spielstand (Tastatur oder Controller)', 'main');
+  entry('game.html', 'target', 'Testraum', 'Parkour mit Slide, Leiter, Seil, Kanten und Van (Tastatur oder Controller)');
   entry('workshop.html', 'workbench', 'Werkstatt', 'Alle Aspekte des Spiels einstellen: Leyla, Waffen, Rezepte, Rig, Welt');
   entry('https://github.com/dna20717/NomadGirl/blob/main/docs/design.md', 'data', 'Design-Dokument', 'Pitch, Core Loop, Mechaniken, Fahrplan');
+
+  // controller (Daniel, 11.11.2026): stick up/down chooses an entry, A opens it, stick sideways lets Leyla run a bend (game/splash/splash.js)
+  const links = [...nav.querySelectorAll('a')];
+  let sel = -1, held = 0, next = 0, wasA = true;
+  const focus = i => { sel = (i + links.length) % links.length; links.forEach((a, k) => a.classList.toggle('pad-focus', k === sel)); links[sel].focus({ preventScroll: true }); };
+  addEventListener('mousemove', () => { if (sel >= 0) { links.forEach(a => a.classList.remove('pad-focus')); sel = -1; document.documentElement.classList.remove('pad'); } });
+  const poll = now => {
+    const g = navigator.getGamepads ? [...navigator.getGamepads()].find(p => p && p.connected) : null;
+    if (g) {
+      const b = i => !!g.buttons[i] && (g.buttons[i].pressed || g.buttons[i].value > 0.5), ax = g.axes[0] || 0, ay = g.axes[1] || 0;
+      const dir = ay < -0.5 || b(12) ? -1 : ay > 0.5 || b(13) ? 1 : 0;
+      const any = dir || b(0) || Math.abs(ax) > 0.3;
+      if (any) document.documentElement.classList.add('pad');
+      if (dir && (dir !== held || now >= next)) { focus(sel < 0 ? (dir > 0 ? 0 : links.length - 1) : sel + dir); next = now + (dir !== held ? 380 : 160); }
+      held = dir;
+      const steer = Math.abs(ax) > 0.25 ? Math.sign(ax) * Math.min(1, (Math.abs(ax) - 0.25) / 0.65) : b(14) ? -1 : b(15) ? 1 : 0;
+      window.splash?.steer?.(steer);
+      const a = b(0);
+      if (a && !wasA) { if (sel < 0) focus(0); else links[sel].click(); }
+      wasA = a;
+    }
+    requestAnimationFrame(poll);
+  };
+  requestAnimationFrame(poll);
+  window.menu = { focus, selected: () => sel, links: () => links.map(a => a.textContent) };
 </script>
 </body>
 </html>

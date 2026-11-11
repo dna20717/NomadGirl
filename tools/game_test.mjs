@@ -54,7 +54,7 @@ const combo = await page.evaluate(() => {
       if (a?.combo && seq[seq.length - 1] !== a) seq.push(a);
       ring ||= !!l.comboG?.visible;
       let tap = [];
-      if (a?.combo && a.hit && a.next == null && (perfect ? s.now >= a.at + a.dur * a.beat - 20 : s.now >= a.at + 70)) tap = ['melee'];
+      if (a?.combo && a.next == null && (perfect ? a.hit && s.now >= a.at + a.dur * a.beat - 20 : s.now >= a.at + 60)) tap = ['melee'];   // mashing: right after the hit starts
       if (seq.length >= 5) tap = [];
       nomad.step(1, [], tap);
       if (seq.length >= 5 && !l.attack) break;
@@ -131,7 +131,7 @@ const rv = await page.evaluate(() => {
   nomad.step(30, ['right']); out.ready = key();
   const f0 = idx(); nomad.step(1, ['right'], ['ranged']); nomad.step(1, ['right']); out.shot = key(); out.keep = Math.abs(idx() - f0) <= 1 || Math.abs(idx() - f0) === 7;
   nomad.step(70, ['right']); out.back = key();
-  nomad.tp(22 * 64, 960); nomad.step(20, ['right']); l.mag = 0; nomad.step(1, ['right'], ['reload']); nomad.step(4, ['right']); out.reload1 = key(); nomad.step(55, ['right']); out.reload2 = key();
+  nomad.tp(22 * 64, 960); nomad.step(20, ['right']); l.mag = 0; nomad.step(1, ['right'], ['reload']); nomad.step(4, ['right']); out.reload1 = key(); nomad.step(Math.round((game.scene.getScene('play').weapon('ranged')?.reloadTime ?? 1400) * 0.06) - 4, ['right']); out.reload2 = key();   // at ~70 % of the reload
   nomad.tp(22 * 64, 960); nomad.step(25, ['right']);
   nomad.step(1, ['right'], ['holster']); nomad.step(6, ['right']); out.h1 = key(); nomad.step(10, ['right']); out.h2 = key(); nomad.step(20, ['right']); out.h3 = key();
   return out;

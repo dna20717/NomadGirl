@@ -69,6 +69,16 @@ export async function startSplash(canvas) {
   const aim = { x: 0, y: 0, at: -1e9 }, look = { x: 0, y: 0 };
   addEventListener('pointermove', e => { aim.x = e.clientX / innerWidth * 2 - 1; aim.y = e.clientY / innerHeight * 2 - 1; aim.at = performance.now(); });
 
+  // curve (Daniel, 11.11.2026: stick sideways = Leyla runs a bend, she stays, the road bends softly and straightens without input):
+  // -1 … 1, eased toward the stick / arrow keys; the road is pushed sideways by bend(z) metres, the background pans with the horizon
+  const CV = { enabled: true, pan: 6, in: 1.4, out: 0.9, ...(S.curve || {}) }, steer = { aim: 0, v: 0, keys: 0 };
+  if (CV.enabled !== false) {
+    addEventListener('keydown', e => { if (e.key === 'ArrowLeft') steer.keys = -1; if (e.key === 'ArrowRight') steer.keys = 1; });
+    addEventListener('keyup', e => { if ((e.key === 'ArrowLeft' && steer.keys < 0) || (e.key === 'ArrowRight' && steer.keys > 0)) steer.keys = 0; });
+  }
+  let bendA = 0, bendZ = 1.5;
+  const bend = z => bendA * (z - bendZ) * (z - bendZ);
+
   // ground: pebbles (squares) and cracks (flat strokes), x in "screen widths at depth 1"
   const rnd = (a, b) => a + Math.random() * (b - a);
   const speck = (z = rnd(Z_NEAR, Z_FAR)) => ({ x: rnd(-1.6, 1.6), z, w: Math.random() < 0.25 ? Math.round(rnd(2, 5)) : 1, s: Math.random() < 0.15 ? 2 : 1, a: rnd(0.45, 1) });
@@ -181,7 +191,7 @@ export async function startSplash(canvas) {
       const z = Math.min(Z_FAR, K / Math.max(1e-3, y0 + (r + 0.5) * px - top));
       const fog = Math.pow(Math.max(0, Math.min(1, (z - fog0) / (Z_FAR - fog0))), 0.6), keep = 1 - fog;
       const ty = ((Math.floor((z - roll) / gw * tw) % th) + th) % th, row = ty * tw;
-      const scale = z / focal * tw / gw, base = (0.5 - W / 2 / focal * z / gw - G.shift / gw) * tw;
+      const scale = z / focal * tw / gw, base = (0.5 - W / 2 / focal * z / gw - (G.shift + bend(z)) / gw) * tw;
       for (let c = 0; c < cols; c++) {
         let tx = Math.floor(base + (c + 0.5) * px * scale);
         if (tx < 0) tx = ((tx % edge) + edge) % edge;                          // left edge repeats outwards
@@ -201,10 +211,14 @@ export async function startSplash(canvas) {
     const horizon = H * (S.horizon ?? 80) / 100;
     const bw = layers[0]?.width || 576, bh = layers[0]?.height || 324;
     const par = (S.parallax ?? 2) / 100;
-    const sc = Math.max(W / bw, horizon / bh) * (1 + par * 2);   // cover + room for the parallax
+    const pan = CV.enabled !== false ? (CV.pan ?? 6) / 100 : 0;
+    const sc = Math.max(W / bw, horizon / bh) * (1 + par * 2 + pan * 2);   // cover + room for the parallax and the bend
     const px = Math.max(1, Math.round(sc));                        // size of one background pixel for the ground details
     if (now - aim.at > 4000) { aim.x = Math.sin(t * 0.17) * 0.5; aim.y = Math.sin(t * 0.11) * 0.3; }
     look.x += (aim.x - look.x) * Math.min(1, dt * 3); look.y += (aim.y - look.y) * Math.min(1, dt * 3);
+    const want = Math.max(-1, Math.min(1, steer.aim || steer.keys)), rate = want ? CV.in ?? 1.4 : CV.out ?? 0.9;
+    steer.v += Math.sign(want - steer.v) * Math.min(Math.abs(want - steer.v), rate * dt);
+    const ease = steer.v * (2 - Math.abs(steer.v)), shiftH = ease * pan * W;   // soft in and out; how far the horizon wanders
 
     // background, front layers move most
     ctx.fillStyle = G.base; ctx.fillRect(0, 0, W, H);
@@ -217,16 +231,19 @@ export async function startSplash(canvas) {
     }
     layers.forEach((img, i) => {
       const depth = layers.length > 1 ? i / (layers.length - 1) : 0;
-      const ox = -look.x * par * W * depth, oy = -look.y * par * 0.4 * H * depth;
+      const ox = -look.x * par * W * depth + shiftH, oy = -look.y * par * 0.4 * H * depth;
       ctx.drawImage(img, Math.round((W - bw * sc) / 2 + ox), Math.round(horizon - bh * sc + oy + par * 0.4 * H * depth), Math.round(bw * sc), Math.round(bh * sc));
     });
     ctx.fillStyle = G.base; ctx.fillRect(0, Math.round(horizon), W, H);
 
     // ground projection: y = top + K / z, so z = Z_FAR sits on the horizon and Z_NEAR just below the bottom edge
     const K = (H + 4 * px - horizon) / (1 / Z_NEAR - 1 / Z_FAR), top = horizon - K / Z_FAR;
+    // the bend: zero under Leyla's feet, at the horizon as far as the background panned (screen x = metres × W·Z_NEAR / z)
+    bendZ = K / Math.max(1, H * (S.runnerFeet ?? 94) / 100 - top);
+    bendA = shiftH / (W * Z_NEAR / Z_FAR) / Math.max(1, (Z_FAR - bendZ) ** 2);
     if (tex) { if (!still) roll += G.speed * pace * dt; drawGround(horizon, top, K, px); }
     if (HZ.enabled) haze(t, horizon, sc);
-    const project = (x, z) => [W / 2 + x * W * (Z_NEAR / z), top + K / z];
+    const project = (x, z) => [W / 2 + (x + bend(z)) * W * (Z_NEAR / z), top + K / z];
 
     // Leyla
     if (gaitStart === 0) { gaitStart = now; planSwitch(now); }
@@ -286,7 +303,7 @@ export async function startSplash(canvas) {
     if (!still) requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  return { still, weather: S.weather || null, drone: !!droneImg, droneFrame: () => drone.frame, layers: layers.length, runner: !!runImg, gaits: gaits.length, gait: () => run?.name, commit: cloud?.commit || null };
+  return { steer: v => { steer.aim = v; }, curve: () => +steer.v.toFixed(3), still, weather: S.weather || null, drone: !!droneImg, droneFrame: () => drone.frame, layers: layers.length, runner: !!runImg, gaits: gaits.length, gait: () => run?.name, commit: cloud?.commit || null };
 }
 
 function load(src) {

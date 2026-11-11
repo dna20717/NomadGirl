@@ -96,7 +96,11 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 
 /* inventory: grids with Tetris shapes, slots, ghost under the pointer, tooltip */
 .inv { position: fixed; left: 50%; top: 92px; transform: translateX(-50%); pointer-events: auto; user-select: none; }
-.inv[hidden], .inv-tip[hidden], .inv-ghost[hidden] { display: none; }
+.inv[hidden], .inv-tip[hidden], .inv-ghost[hidden], .inv-cursor[hidden] { display: none; }
+/* controller cursor in the inventory: a neon frame on the cell, slot or button */
+.inv-cursor { position: fixed; z-index: 29; pointer-events: none; box-sizing: border-box; border: 2px solid #7ff6ff; border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 0 14px rgba(127, 246, 255, .55), inset 0 0 10px rgba(127, 246, 255, .25); transition: left 70ms ease-out, top 70ms ease-out, width 70ms, height 70ms; }
+.inv-cursor.holding { border-color: #ffe27a; box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 0 14px rgba(255, 226, 122, .55); }
 .inv-row { display: flex; gap: 16px; align-items: flex-start; justify-content: center; }
 .inv-panel { padding: 12px; border-radius: 10px; background: rgba(23, 17, 31, .92); border: 1px solid #3a2f45; box-shadow: 0 14px 40px rgba(0, 0, 0, .45); }
 .inv-panel.floor { border-color: #5a4a2a; }

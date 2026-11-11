@@ -57,7 +57,8 @@ export class InventoryUI {
     this.el = el('div', { class: 'inv', hidden: true, oncontextmenu: e => e.preventDefault() });
     this.tip = el('div', { class: 'inv-tip', hidden: true });
     this.ghost = el('div', { class: 'inv-ghost', hidden: true });
-    root.append(this.el, this.tip, this.ghost);
+    this.cursor = el('div', { class: 'inv-cursor', hidden: true });
+    root.append(this.el, this.tip, this.ghost, this.cursor);
     this.held = null;   // { e, from: key | slot name }
     this.other = null;  // { key, title, grid, kind: 'container' | 'floor' }
     document.addEventListener('mousemove', ev => this.move(ev));
@@ -78,7 +79,7 @@ export class InventoryUI {
   get vanTab() { return this.tab === 'van' && !!this.host.inCamp?.() && !!this.vanStore(); }
   vanStore() { return storeList(this.D, this.host.save()).find(c => c.unit === 0) || null; }
   setTab(t) { this.tab = t; this.draw(); }
-  close() { if (this.held) this.putBack(); this.el.hidden = true; this.tip.hidden = true; this.other = null; }
+  close() { if (this.held) this.putBack(); this.el.hidden = true; this.tip.hidden = true; this.cursor.hidden = true; this.other = null; }
   toggle(other = null) { if (this.isOpen && (!other || other.key === this.other?.key)) this.close(); else this.open(other); }
   grid(key) { return key === this.other?.key ? this.other.grid : this.inv.grids[key]; }
 
@@ -94,7 +95,7 @@ export class InventoryUI {
       parts[0].prepend(this.tabsEl());
       this.el.replaceChildren(el('div', { class: 'inv-row' }, ...parts),
         el('p', { class: 'inv-help' }, 'Rig-Teile ein- und ausbauen, kaufen und verkaufen: Rig bauen (B) · Herstellen: Werkbank · Kofferraum wie jedes Lager · I oder Tab: schließen'));
-      return this.fit();
+      this.fit(); return this.padShow();
     }
     // Daniel, 10.11.2026 ("Inventar im Diablo-Stil"): backpack left (with the ground or the open storage under it), Leyla in the middle, Mama-Bot right
     this.pair = this.other ? ['backpack', this.other.key] : ['backpack', 'drone'];
@@ -103,6 +104,7 @@ export class InventoryUI {
       el('p', { class: 'inv-help' }, 'Klicken: nehmen und ablegen · Rechtsklick, Strg+Klick oder Mausrad: drehen · Doppelklick: auf die andere Seite · daneben klicken: auf den Boden werfen · I oder Tab: schließen'));
     this.fit();
     this.drawGhost();
+    this.padShow();
   }
   // shrink to the window when the screen is small (clicks into grids divide by the zoom)
   fit() {
@@ -253,7 +255,7 @@ export class InventoryUI {
 
   gridEl(key, g) {
     const D = this.D, c = this.cell;
-    const box = el('div', { class: 'inv-grid', style: `width:${g.w * c}px;height:${g.h * c}px;--c:${c}px` });
+    const box = el('div', { class: 'inv-grid', 'data-key': key, style: `width:${g.w * c}px;height:${g.h * c}px;--c:${c}px` });
     box.addEventListener('mousedown', ev => {
       if (ev.target !== box) return;
       const r = box.getBoundingClientRect(), z = this.zoom || 1, x = Math.floor((ev.clientX - r.left) / z / c), y = Math.floor((ev.clientY - r.top) / z / c);
@@ -355,6 +357,96 @@ export class InventoryUI {
     this.tip.hidden = false;
   }
 
+  // ---------- controller (Daniel, 11.11.2026: „sinnvolle Controller-Steuerung OHNE Zeiger“) ----------
+  // A cursor jumps between the cells of every grid, the slots, tabs and buttons (the nearest one in the stick's direction).
+  // A = take / put down (like a click), X = turn, Y = to the other side (like a double click), B = put back or close, LB / RB = tabs.
+  padTargets() {
+    const out = [];
+    for (const box of this.el.querySelectorAll('.inv-grid[data-key]')) {
+      const key = box.dataset.key, g = this.grid(key), r = box.getBoundingClientRect();
+      if (!g || !r.width) continue;
+      const cw = r.width / g.w, ch = r.height / g.h;
+      for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) out.push({ id: `cell:${key}:${x}:${y}`, key, x, y, l: r.left + x * cw, t: r.top + y * ch, w: cw, h: ch });
+    }
+    for (const n of this.el.querySelectorAll('.inv-slot, .inv-tab, .inv-btn')) {
+      const r = n.getBoundingClientRect();
+      if (!r.width) continue;
+      out.push({ id: 'el:' + (n.dataset.slot || n.dataset.part || n.dataset.tab || n.className + ':' + n.textContent), node: n, l: r.left, t: r.top, w: r.width, h: r.height });
+    }
+    return out;
+  }
+  padFocus() {
+    const all = this.padTargets();
+    let f = all.find(t => t.id === this.focusId);
+    if (!f) { f = all.find(t => t.key === 'backpack') || all[0]; this.focusId = f?.id; }
+    return f;
+  }
+  padHelp() {
+    const p = this.pad, L = a => p?.label(a) || '?';
+    return `Steuerkreuz/Stick: wählen · ${L('jump')}: nehmen und ablegen · ${L('melee')}: drehen · ${L('grab')}: auf die andere Seite · ${L('dash')}: zurücklegen / schließen · ${L('walk')} ${L('reload')}: Tabs`;
+  }
+  padShow() {
+    const help = this.el.querySelector('.inv-help');
+    if (help && this.padOn && !help.dataset.pad) { help.dataset.pad = '1'; help.textContent = this.padHelp(); }
+    if (!this.padOn || !this.isOpen) { this.cursor.hidden = true; return; }
+    const f = this.padFocus();
+    if (!f) return;
+    this.cursor.hidden = false;
+    Object.assign(this.cursor.style, { left: `${f.l - 3}px`, top: `${f.t - 3}px`, width: `${f.w + 6}px`, height: `${f.h + 6}px` });
+    this.cursor.classList.toggle('holding', !!this.held);
+    this.mouse = [f.l + f.w / 2, f.t + f.h / 2];
+    if (this.held) Object.assign(this.ghost.style, { left: `${this.mouse[0]}px`, top: `${this.mouse[1]}px` });
+    const e = f.key && this.itemAt(f.key, f.x, f.y);
+    if (e && !this.held) { this.showTip(e); Object.assign(this.tip.style, { left: `${f.l + f.w + 10}px`, top: `${f.t}px` }); } else this.tip.hidden = true;
+  }
+  itemAt(key, x, y) {
+    const g = this.grid(key);
+    return g?.items.find(e => cellsOf(this.D, e.a, e.id, e.r || 0).some(([cx, cy]) => e.x + cx === x && e.y + cy === y)) || null;
+  }
+  padMove(dx, dy) {
+    const all = this.padTargets(), f = this.padFocus();
+    if (!f) return;
+    const fx = f.l + f.w / 2, fy = f.t + f.h / 2;
+    let best = null, score = Infinity;
+    for (const t of all) {
+      if (t.id === f.id) continue;
+      const ex = t.l + t.w / 2 - fx, ey = t.t + t.h / 2 - fy, along = ex * dx + ey * dy, across = Math.abs(ex * dy - ey * dx);
+      if (along < 4) continue;
+      const sc = along + across * 2.2;
+      if (sc < score) { score = sc; best = t; }
+    }
+    if (best) { this.focusId = best.id; this.padShow(); }
+  }
+  padNav(p, now = performance.now()) {
+    if (!this.isOpen || (!this.padOn && !p.now.size)) return;   // the mouse keeps working until the controller is touched
+    this.pad = p;
+    if (!this.padOn) { this.padOn = true; this.draw(); }
+    // directions: one step, held = repeats
+    const dirs = [['left', -1, 0], ['right', 1, 0], ['up', 0, -1], ['down', 0, 1]];
+    this.rep ??= {};
+    for (const [d, dx, dy] of dirs) {
+      if (!p.down(d)) { this.rep[d] = 0; continue; }
+      if (!this.rep[d]) { this.rep[d] = now + 300; this.padMove(dx, dy); }
+      else if (now >= this.rep[d]) { this.rep[d] = now + 95; this.padMove(dx, dy); }
+    }
+    const f = this.padFocus();
+    if (!f) return;
+    const e = f.key != null ? this.itemAt(f.key, f.x, f.y) : null;
+    if (p.pressed('jump')) {
+      if (f.key != null) { if (this.held) this.place(f.key, f.x, f.y); else if (e) this.pick(f.key, this.grid(f.key), e); }
+      else { f.node.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 })); if (f.node.tagName === 'BUTTON' && f.node.classList.contains('inv-btn')) f.node.click(); }
+    }
+    if (p.pressed('melee')) { if (this.held) this.turnHeld(); else if (e) this.turnInPlace(this.grid(f.key), e); }
+    if (p.pressed('grab') && f.key != null) { if (this.held) this.quickMoveHeld(f.key); else if (e) this.quickMove(f.key, e); }
+    if (p.pressed('dash')) { if (this.held) this.putBack(); else return this.close(); }
+    for (const [a, d] of [['walk', -1], ['reload', 1]]) if (p.pressed(a)) {
+      const tabs = [...this.el.querySelectorAll('.inv-tab')], i = tabs.findIndex(t => t.classList.contains('on'));
+      const t = tabs[(i + d + tabs.length) % tabs.length];
+      if (tabs.length > 1 && t) t.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }));
+    }
+    this.padShow();
+  }
+
   // ---------- holding things ----------
   pick(key, g, e) {
     remove(g, e);
@@ -364,6 +456,7 @@ export class InventoryUI {
     this.changed(key);
   }
   move(ev) {
+    if (this.padOn) { this.padOn = false; this.cursor.hidden = true; this.draw(); }   // the mouse takes over again
     this.mouse = [ev.clientX, ev.clientY];
     if (!this.tip.hidden) Object.assign(this.tip.style, { left: `${ev.clientX + 16}px`, top: `${ev.clientY + 16}px` });
     if (this.held) Object.assign(this.ghost.style, { left: `${ev.clientX}px`, top: `${ev.clientY}px` });

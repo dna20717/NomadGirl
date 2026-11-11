@@ -23,6 +23,34 @@ for (const [name, width, height] of [['desktop', 1440, 900], ['ipad', 820, 1180]
   if (shots) await page.screenshot({ path: path.join(repo, `output/splash_${name}.png`) });
   await page.close();
 }
+// controller in the main menu (Daniel, 11.11.2026): stick up/down chooses, sideways bends the road, A opens
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const errors = [];
+  page.on('pageerror', e => errors.push(e.message));
+  await page.addInitScript(() => {
+    const pad = { id: 'Xbox Wireless Controller (STANDARD GAMEPAD Vendor: 045e)', index: 0, connected: true, mapping: 'standard', buttons: Array.from({ length: 17 }, () => ({ pressed: false, value: 0 })), axes: [0, 0, 0, 0] };
+    window.setPad = ({ press = [], axes = [0, 0] } = {}) => { pad.buttons.forEach((b, i) => { b.pressed = press.includes(i); b.value = b.pressed ? 1 : 0; }); pad.axes = [...axes, 0, 0]; };
+    navigator.getGamepads = () => [pad, null, null, null];
+  });
+  await page.goto('http://localhost:8766/index.html');
+  await page.waitForFunction(() => window.splash && window.menu, null, { timeout: 15000 });
+  const ev = f => page.evaluate(f);
+  await ev(() => setPad({ axes: [0, 1] })); await page.waitForTimeout(120); await ev(() => setPad()); await page.waitForTimeout(100);
+  await ev(() => setPad({ axes: [0, 1] })); await page.waitForTimeout(120); await ev(() => setPad()); await page.waitForTimeout(100);
+  const sel = await ev(() => menu.selected());
+  await ev(() => setPad({ axes: [1, 0] })); await page.waitForTimeout(1500);
+  const bent = await ev(() => splash.curve());
+  if (shots) await page.screenshot({ path: path.join(repo, 'output/splash_curve.png') });
+  await ev(() => setPad()); await page.waitForTimeout(2500);
+  const back = await ev(() => splash.curve());
+  await ev(() => setPad({ press: [0] }));
+  const url = await page.waitForURL(/game\.html/, { timeout: 5000 }).then(() => page.url()).catch(() => page.url());
+  const ok = sel === 1 && bent > 0.8 && Math.abs(back) < 0.05 && /game\.html$/.test(url) && !errors.length;
+  console.log(`  ${ok ? 'ok  ' : 'FEHLER'} Controller: Stick runter wählt (${sel}), seitlich Kurve ${bent}, losgelassen gerade ${back}, A öffnet ${url.split('/').pop()}${errors.length ? ' · ' + errors.join(' | ') : ''}`);
+  if (!ok) failed++;
+  await page.close();
+}
 await browser.close();
 console.log(failed ? `\n${failed} Fehler.` : 'Startseite ok.');
 process.exit(failed ? 1 : 0);

@@ -44,7 +44,7 @@
   "glyph": "🔫",
   "sound": "sound_shot",
   "magazine": 7,
-  "reloadTime": 1400,
+  "reloadTime": 950,
   "look": "icons_gear",
   "icon": 2
  },

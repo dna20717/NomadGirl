@@ -697,7 +697,8 @@ export class Leyla {
     const C = this.d.combo || {}, k = this.combo, walking = Math.abs(this.body.velocity.x) > 20;
     if (!k) return;
     const perfect = Math.abs(tapAt - beatAt) <= (C.perfect ?? 90);
-    k.perfect = k.perfect && perfect; k.taps.push(perfect); k.flash = { at: time, perfect };
+    // forgiving (Daniel, 11.11.2026: „der fünfte ist zu schwer, insgesamt etwas verzeihender“): Kombo › Fehler erlaubt taps may miss the beat
+    k.misses = (k.misses || 0) + (perfect ? 0 : 1); k.perfect = k.misses <= (C.misses ?? 1); k.taps.push(perfect); k.flash = { at: time, perfect };
     if (perfect) { this.sfx ??= makeSfx(this.scene, 0.22); this.sfx.tick?.(k.taps.length); }
     if (k.n < 3) return this.comboHit(time, walking);
     if (k.n === 3) return this.comboFinisher(time);
