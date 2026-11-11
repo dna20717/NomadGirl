@@ -1,0 +1,75 @@
+{
+ "wueste_draussen": {
+  "name": "Wüste draußen",
+  "description": "Warm und staubig, keine Dunkelheit, Sand treibt im Wind.",
+  "light": {"ambient": 100, "color": "#fff1dc", "vignette": 22},
+  "lamps": [],
+  "dust": {"count": 45, "color": "#e8c896", "size": 4, "drift": [-90, 14], "alpha": 32, "inLight": false},
+  "sparks": {"perMinute": 0},
+  "drips": {"perMinute": 0},
+  "fog": {"count": 0}
+ },
+ "beton_neon": {
+  "name": "Laden mit Neon",
+  "description": "Kalt-grünlich, Neonröhren an der Decke (manche flackern), rotes Notlicht, Staub im Licht.",
+  "light": {"ambient": 46, "color": "#a9c6bf", "vignette": 40},
+  "lamps": [
+   {"kind": "tube", "color": "#d2fff0", "every": 7, "offset": 3, "chance": 70, "radius": 430, "strength": 85, "behavior": "steady"},
+   {"kind": "tube", "color": "#d2fff0", "every": 7, "offset": 3, "chance": 100, "radius": 430, "strength": 80, "behavior": "flicker"},
+   {"kind": "emergency", "color": "#ff4a3a", "every": 15, "offset": 0, "chance": 60, "radius": 230, "strength": 60, "behavior": "pulse"}
+  ],
+  "dust": {"count": 70, "color": "#f6ecd0", "size": 3, "drift": [6, -4], "alpha": 60, "inLight": true},
+  "sparks": {"perMinute": 2, "color": "#ffd27a"},
+  "drips": {"perMinute": 6, "color": "#9ec8d8"},
+  "fog": {"count": 0}
+ },
+ "beton_lager": {
+  "name": "Lager duster",
+  "description": "Fast dunkel, einzelne Glühlampen mit Aussetzern, Tropfwasser, Nebel am Boden.",
+  "light": {"ambient": 30, "color": "#9fb0c4", "vignette": 52},
+  "lamps": [
+   {"kind": "ceiling", "color": "#ffd59a", "every": 8, "chance": 55, "radius": 400, "strength": 85, "behavior": "flicker"},
+   {"kind": "ceiling", "color": "#ffd59a", "every": 8, "chance": 100, "radius": 380, "strength": 80, "behavior": "broken"}
+  ],
+  "dust": {"count": 80, "color": "#f0e2c4", "size": 3, "drift": [4, -3], "alpha": 65, "inLight": true},
+  "sparks": {"perMinute": 0},
+  "drips": {"perMinute": 12, "color": "#9ec8d8"},
+  "fog": {"count": 4, "color": "#7d8ea0", "alpha": 18, "height": 90, "speed": 10}
+ },
+ "metall_rost": {
+  "name": "Halle rostig",
+  "description": "Rostig-orange, warme Hallenstrahler, Funken an den Wänden, etwas Nebel.",
+  "light": {"ambient": 46, "color": "#d4a684", "vignette": 42},
+  "lamps": [
+   {"kind": "ceiling", "color": "#ffc272", "every": 8, "chance": 80, "radius": 580, "strength": 90, "behavior": "steady"},
+   {"kind": "ceiling", "color": "#ffc272", "every": 8, "chance": 100, "radius": 540, "strength": 85, "behavior": "broken"}
+  ],
+  "dust": {"count": 60, "color": "#ffd8a8", "size": 3, "drift": [10, -6], "alpha": 55, "inLight": true},
+  "sparks": {"perMinute": 10, "color": "#ffb040"},
+  "drips": {"perMinute": 0},
+  "fog": {"count": 3, "color": "#806050", "alpha": 14, "height": 80, "speed": 12}
+ },
+ "tunnel_blau": {
+  "name": "Tunnel blau",
+  "description": "Kalt und tiefblau, rotes Notlicht pulsiert, Tropfen, Nebel am Boden. Ohne Scheinwerfer sieht man wenig.",
+  "light": {"ambient": 24, "color": "#6f88c8", "vignette": 56},
+  "lamps": [
+   {"kind": "emergency", "color": "#ff4a3a", "every": 11, "chance": 75, "radius": 270, "strength": 70, "behavior": "pulse"},
+   {"kind": "bulb", "color": "#a8dcff", "every": 11, "offset": 0, "chance": 45, "radius": 300, "strength": 60, "behavior": "flicker"}
+  ],
+  "dust": {"count": 30, "color": "#cfe4ff", "size": 3, "drift": [3, -2], "alpha": 50, "inLight": true},
+  "sparks": {"perMinute": 1, "color": "#9fd8ff"},
+  "drips": {"perMinute": 14, "color": "#9ec8ff"},
+  "fog": {"count": 6, "color": "#4a6aa0", "alpha": 22, "height": 100, "speed": 14}
+ },
+ "ruine_staub": {
+  "name": "Ruine staubig",
+  "description": "Halbschatten, Staub treibt durch die Löcher.",
+  "light": {"ambient": 72, "color": "#e8d8c8", "vignette": 32},
+  "lamps": [],
+  "dust": {"count": 60, "color": "#e8dcc4", "size": 3, "drift": [-30, 8], "alpha": 40, "inLight": false},
+  "sparks": {"perMinute": 0},
+  "drips": {"perMinute": 2, "color": "#9ec8d8"},
+  "fog": {"count": 0}
+ }
+}

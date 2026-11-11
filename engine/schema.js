@@ -10,6 +10,7 @@
 import { parseRoom, TILE_LEGEND } from './room.js';
 import { buildPoi, poiReady } from './poi.js';
 import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
+import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
 
 const text = (key, label, o = {}) => ({ key, label, type: 'text', ...o });
 const area_ = (key, label, o = {}) => ({ key, label, type: 'textarea', ...o });
@@ -128,6 +129,11 @@ export const AREAS = {
       { title: 'Kacheln', fields: [ref('tiles.platform', 'Plattform', 'assets', { hint: 'Asset der Art „Kacheln“ mit 4 Frames: einzeln, links, Mitte, rechts. Leer = aus Code gezeichnet' }),
         ref('tiles.terrain', 'Kachel-Set', 'terrain', { hint: 'Wände und Böden in allen Räumen ohne eigenes Kachel-Set. Leer = aus Code gezeichnet' }),
         num('tiles.leylaCm', 'Leyla ist groß', { unit: 'cm', min: 50, hint: 'Maßstab für Clutter-Größen: Leylas Höhe im Spiel (Asset Stehen) entspricht so vielen Zentimetern. Leer = 170' })] },
+      { title: 'Atmosphäre', fields: [bool('atmosphere.enabled', 'Licht & Atmosphäre', { hint: 'Dunkelheit mit Lampen, Glühen, Farbstimmung, Staub, Funken, Tropfen und Bodennebel (Bereich Atmosphäre). Aus = alles gleich hell wie früher. Nicht im Camp' }),
+        ref('atmosphere.default', 'Standard', 'atmosphere', { hint: 'Für Räume, deren Raum-Baustein und Kachel-Set keine Atmosphäre nennen. Leer = keine' }),
+        num('atmosphere.scale', 'Lichtkarte grob', { unit: '×', min: 1, max: 16, hint: 'Die Lichtkarte wird in 1/n der Auflösung gerechnet und weich hochskaliert. Größer = schneller und weicher. Leer = 4' }),
+        num('atmosphere.leyla.radius', 'Licht um Leyla', { unit: 'px', min: 0, hint: 'Kleiner Schein um Leyla, damit sie im Dunkeln nie ganz verschwindet' }), num('atmosphere.leyla.strength', 'Licht um Leyla', { unit: '%', min: 0, max: 100 }),
+        num('atmosphere.depth', 'Ebene', { hint: 'Tiefe der Lichtkarte: alles darunter wird abgedunkelt (Leyla 10, schwebende Zahlen 20). Leer = 14' })] },
       { title: 'Spawn-Punkt', fields: [bool('spawn.enabled', 'Zeigen'), ref('spawn.look', 'Aussehen', 'assets', { hint: 'Bild oder Animation; der Ankerpunkt des Assets sitzt auf Leylas Start (L im Raum-Layout)' }),
         point('spawn.offset', 'Versatz', { unit: 'px', hint: 'Verschiebt das Bild gegenüber dem Start (x nach rechts, y nach unten)' }), bool('spawn.flip', 'Gespiegelt'),
         select('spawn.layer', 'Ebene', [['behindWalls', 'Hinter Wänden'], ['front', 'Vor Wänden, hinter Leyla']], { hint: 'Hinter Wänden: Wände verdecken das Bild, wenn es hineinragt' })] },
@@ -275,6 +281,10 @@ export const AREAS = {
       { title: 'Anbauteile', fields: [table('parts', 'Anbauteile', [text('name', 'Name'), ref('look', 'Aussehen', 'assets'), point('at', 'Sitzt bei', { unit: 'px', hint: 'Ankerpunkt des Teils sitzt hier (Bildpixel der Hülle)' }),
         select('layer', 'Ebene', [['front', 'Vor der Hülle'], ['behind', 'Hinter der Hülle']]), bool('on', 'Angebaut'), ref('item', 'Gegenstand', 'items')],
         { hint: 'Mit Gegenstand: sichtbar, solange dieser Gegenstand im Inventar an Mama-Bot steckt („Angebaut“ zählt dann nicht). Ohne: „Angebaut“ entscheidet' })] },
+      { title: 'Scheinwerfer', fields: [text('spot.part', 'Anbauteil', { hint: 'Name aus der Tabelle Anbauteile: solange dieses Teil an Mama-Bot steckt, leuchtet sie Leyla den Weg (Daniel, 11.11.2026: „mit Spielwert“). Leer = Suchscheinwerfer' }),
+        point('spot.at', 'Linse', { unit: 'px', hint: 'Wo das Licht austritt, in Bildpixeln der Hülle' }), num('spot.range', 'Reichweite', { unit: 'px', min: 0 }), num('spot.angle', 'Öffnung', { unit: '°', min: 2, max: 170 }),
+        num('spot.tilt', 'Nach unten', { unit: '°', hint: 'Neigung des Kegels unter die Waagrechte, in Blickrichtung' }), num('spot.strength', 'Stärke', { unit: '%', min: 0, max: 200 }), color('spot.color', 'Farbe'),
+        num('spot.glow', 'Schein an der Linse', { unit: '%', min: 0, max: 200 })] },
       { title: 'Rettungsfach', fields: [text('rescue.name', 'Name'), size('rescue.size', 'Größe', { unit: 'Felder', hint: 'Daniel, 10.11.2026: was hier liegt, übersteht ein k.o., Mama-Bot bringt es heim' })] },
       { title: 'Stimmungen', fields: [table('moods', 'Stimmungen', [select('mood', 'Anlass', DRONE_MOODS), num('frame', 'Gesicht', { min: 0 }), text('kaomoji', 'Kaomoji'), num('duration', 'Dauer ms', { min: 0 })],
         { hint: 'Gesicht = Frame der Gesichter (ab 0). Ohne Kaomoji nur das Gesicht. Dauer 0 = solange der Anlass gilt' })] },
@@ -667,6 +677,7 @@ export const AREAS = {
       { title: 'Level', fields: [num('branchChance', 'Abzweige', { unit: '%', min: 0, max: 100, hint: 'Chance je Abzweig-Haken (A in der Decke eines Hauptraums), dass ein Seitenraum (Merkmal Beute/Geheimnis, A im Boden) darüber hängt. Leer = 60' }),
         bool('shortcut', 'Abkürzung zum Van', { hint: 'Tunnel unter allen Räumen: v im Boden des Ausgangs → ^ im Boden des Eingangs. Aus = kein Tunnel. Leer = an' }),
         ref('tunnelTerrain', 'Kachel-Set im Tunnel', 'terrain', { hint: 'Wände und Rückwand der Abkürzung. Leer = Kachel-Set des Eingangs' }),
+        ref('tunnelAtmosphere', 'Atmosphäre im Tunnel', 'atmosphere', { hint: 'Licht und Stimmung der Abkürzung. Leer = Atmosphäre des Kachel-Sets im Tunnel' }),
         num('seed', 'Fester Seed', { min: 0, hint: 'Zum Testen: immer dasselbe Level. Leer/0 = jeder Run neu gewürfelt' })] },
       { title: 'Ranking', fields: [num('parTime', 'Bestzeit', { unit: 's', min: 0 }), num('secrets', 'Secrets', { min: 0, hint: 'Im Level zählen die brüchigen Wände (B); diese Zahl gilt nur für POIs ohne Level' })] },
       { title: 'Leben', fields: [bool('npcs', 'NPCs vor Ort'), bool('foodtruck', 'Foodtruck-Verkauf möglich'), bool('shop', 'Händler')] },
@@ -706,6 +717,10 @@ export const AREAS = {
         table('sizes', 'Größen', [text('name', 'Name'), num('cm', 'Höhe', { unit: 'cm', min: 1 })], { hint: 'Echte Höhe je Clutter (Name aus einem der Raster); das Spiel skaliert pixelscharf, Leyla = Spiel › Kacheln › Leyla ist groß. Ohne Zeile: so groß wie im Raster gemalt' }),
         num('sizeMax', 'Höchstens vergrößern', { unit: '%', min: 100, max: 400, hint: 'Deckel für das Vergrößern, damit Pixel nicht zu klobig werden. Leer = 200' }),
         num('seed', 'Zufall', { min: 0, hint: 'Andere Zahl = andere Verteilung (gleich bleibt gleich)' })] },
+      { title: 'Licht', fields: [ref('atmosphere', 'Atmosphäre', 'atmosphere', { hint: 'Licht und Stimmung in Räumen mit diesem Set (Raum-Bausteine können sie überschreiben). Leer = Spiel › Atmosphäre › Standard' }),
+        table('glows', 'Leuchtet', [text('name', 'Name'), color('color', 'Farbe'), point('at', 'Mitte', { unit: 'px', hint: 'Im Feld des Rasters, von oben links' }), size('size', 'Größe', { unit: 'px' }),
+          num('strength', 'Stärke', { unit: '%', min: 0, max: 200 }), num('light', 'Licht', { unit: 'px', min: 0, hint: 'Radius des Lichts in die Umgebung, 0 = nur Schein' }), select('behavior', 'Verhalten', LIGHT_BEHAVIORS)],
+          { hint: 'Clutter, der selbst leuchtet (Automaten, Kühlschränke, Bildschirme): Schein über der Stelle und Licht in die Umgebung. Name aus einem der Raster' })] },
     ],
     check: (x, report, p) => {
       const names = id => { const a = p.data.assets?.[id]; return a?.kind === 'icons' ? new Set(a.names || []) : null; };
@@ -719,7 +734,28 @@ export const AREAS = {
       if (x.propsBig && !B) report('error', 'Großer-Clutter-Raster ist kein Asset der Art „Symbole“');
       for (const n of x.bigClutter || []) if (B && !B.has(n)) report('error', `„${n}“ gibt es im Großer-Clutter-Raster nicht`);
       for (const r of x.sizes || []) if (!(P?.has(r.name) || B?.has(r.name))) report('warning', `Größe für „${r.name}“: gibt es in keinem Raster`);
+      for (const r of x.glows || []) if (!(P?.has(r.name) || B?.has(r.name))) report('warning', `Leuchtet: „${r.name}“ gibt es in keinem Raster`);
     },
+  },
+  atmosphere: {
+    name: 'Atmosphäre', singular: 'Atmosphäre', icon: 'light', file: 'data/atmosphere.json', kind: 'catalog',
+    hint: 'Licht und Stimmung in Räumen und POI-Levels (Daniel, 11.11.2026: „Atmosphäre und Beleuchtung, damit alles nicht so blank wirkt“): Dunkelheit, Lampen an der Decke, Farbstimmung, Vignette, Staub, Funken, Tropfen, Bodennebel. Kachel-Sets und Raum-Bausteine wählen ihre Atmosphäre. Alles aus Code.',
+    template: { name: 'Neue Atmosphäre', light: { ambient: 60, color: '#c8c8d8', vignette: 30 }, lamps: [], dust: { count: 0 }, sparks: { perMinute: 0 }, drips: { perMinute: 0 }, fog: { count: 0 } },
+    row: x => `Helligkeit ${x.light?.ambient ?? 100} % · ${(x.lamps || []).length ? (x.lamps || []).map(l => label(LAMP_KINDS, l.kind)).join(', ') : 'ohne Lampen'}${x.dust?.count ? ' · Staub' : ''}${x.sparks?.perMinute ? ' · Funken' : ''}${x.drips?.perMinute ? ' · Tropfen' : ''}${x.fog?.count ? ' · Nebel' : ''}`,
+    sections: [
+      { title: 'Licht', fields: [NAME, num('light.ambient', 'Helligkeit', { unit: '%', min: 0, max: 100, hint: 'Grundhelligkeit ohne Lampen. 100 = keine Dunkelheit (draußen am Tag), 40 = stimmungsvoll dunkel' }),
+        color('light.color', 'Farbstimmung', { hint: 'Farbe des Raums: die Welt wird damit eingefärbt (Weiß = neutral). Wüste warm, Beton kalt-grünlich, Metall rostig, Tunnel blau' }),
+        num('light.vignette', 'Vignette', { unit: '%', min: 0, max: 100, hint: 'Ränder des Bilds dunkler' }), DESCRIPTION] },
+      { title: 'Lampen', fields: [table('lamps', 'Lampen', [select('kind', 'Art', LAMP_KINDS), color('color', 'Farbe'), num('every', 'Abstand', { unit: 'Kacheln', min: 1 }), num('offset', 'Versatz', { unit: 'Kacheln', min: 0, hint: 'Leer = halber Abstand' }),
+          num('chance', 'Chance', { unit: '%', min: 0, max: 100 }), num('radius', 'Reichweite', { unit: 'px', min: 0 }), num('strength', 'Stärke', { unit: '%', min: 0, max: 200 }), select('behavior', 'Verhalten', LIGHT_BEHAVIORS)],
+        { hint: 'Hängen automatisch an Decken (Wand mit zwei Kacheln Luft darunter), je Raum alle „Abstand“ Kacheln, Chance je Platz. * im Layout hängt die erste Zeile fest an die Decke darüber' })] },
+      { title: 'Staub', fields: [num('dust.count', 'Teilchen', { min: 0, max: 400, hint: 'Auf dem Bildschirm zugleich. 0 = kein Staub' }), color('dust.color', 'Farbe'), num('dust.size', 'Größe', { unit: 'px', min: 1 }),
+        point('dust.drift', 'Treiben', { unit: 'px/s', hint: 'x, y; draußen z. B. Sand im Wind' }), num('dust.alpha', 'Deckkraft', { unit: '%', min: 0, max: 100 }), bool('dust.inLight', 'Nur im Licht', { hint: 'Staub sieht man nur im Lichtkegel der Lampen' })] },
+      { title: 'Funken', fields: [num('sparks.perMinute', 'Funken', { unit: 'pro Minute', min: 0, hint: 'An Wänden im Bild sprühen zufällig Funken (kaputte Kabel). Kaputte Lampen sprühen sowieso' }), color('sparks.color', 'Farbe')] },
+      { title: 'Tropfen', fields: [num('drips.perMinute', 'Tropfen', { unit: 'pro Minute', min: 0, hint: 'Wasser tropft von Decken im Bild' }), color('drips.color', 'Farbe')] },
+      { title: 'Bodennebel', fields: [num('fog.count', 'Schwaden', { min: 0, max: 40, hint: 'Auf dem Bildschirm zugleich, liegen auf den Böden' }), color('fog.color', 'Farbe'), num('fog.alpha', 'Deckkraft', { unit: '%', min: 0, max: 100 }),
+        num('fog.height', 'Höhe', { unit: 'px', min: 8 }), num('fog.speed', 'Tempo', { unit: 'px/s' })] },
+    ],
   },
   rooms: {
     name: 'Raum-Bausteine', singular: 'Raum', icon: 'tile', file: 'data/rooms.json', kind: 'catalog',
@@ -729,7 +765,8 @@ export const AREAS = {
     sections: [
       { title: 'Raum', fields: [NAME, LOOK, size('size', 'Größe', { unit: 'Kacheln' }), multi('tags', 'Merkmale', ROOM_TAGS), num('weight', 'Häufigkeit', { min: 0 }),
         ref('terrain', 'Kachel-Set', 'terrain', { hint: 'Wände und Böden dieses Raums. Leer = Spiel › Kacheln › Kachel-Set' }),
-        bool('indoor', 'Innenraum', { hint: 'Im POI-Level: Rückwand statt Himmel. Leer = Innenraum, wenn der Raum keinen eigenen Hintergrund hat' }), DESCRIPTION] },
+        bool('indoor', 'Innenraum', { hint: 'Im POI-Level: Rückwand statt Himmel. Leer = Innenraum, wenn der Raum keinen eigenen Hintergrund hat' }),
+        ref('atmosphere', 'Atmosphäre', 'atmosphere', { hint: 'Licht und Stimmung dieses Raums (z. B. Lager dunkler). Leer = Atmosphäre des Kachel-Sets' }), DESCRIPTION] },
       { title: 'Hintergrund', fields: [ref('backdrop.image', 'Bild', 'assets', { hint: 'Pixel-Art mit transparentem Himmel, scharf auf ganze Pixel skaliert; leer = Stadt-Silhouette aus Code' }),
         ref('backdrop.weather', 'Wetter', 'weather', { hint: 'Himmel dahinter, Regen davor' }), num('backdrop.pixel', 'Pixelgröße', { unit: 'px', min: 1, hint: 'Leer = passend zur Bildhöhe' }),
         num('backdrop.bottom', 'Unterkante', { unit: '%', hint: 'Wo die Unterkante des Bilds sitzt, wenn die Kamera ganz unten ist (100 = Bildschirmrand)' }), num('backdrop.scroll', 'Mitbewegen', { unit: '%', min: 0, hint: 'Parallaxe mit der Kamera' }),
@@ -773,7 +810,7 @@ export const GROUPS = [
   ['KAMPF', ['weapons', 'enemies', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
   ['RIG', ['camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'companions']],
-  ['WELT', ['pois', 'rooms', 'terrain', 'locations', 'encounters', 'travel']],
+  ['WELT', ['pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'travel']],
 ];
 
 export const optionLabel = label;

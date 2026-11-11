@@ -49,7 +49,8 @@
    {"name": "desert3_14", "cm": 25},
    {"name": "desert3_15", "cm": 50}
   ],
-  "sizeMax": 200
+  "sizeMax": 200,
+  "atmosphere": "wueste_draussen"
  },
  "concrete": {
   "name": "Beton · Linoleum",
@@ -139,7 +140,12 @@
    {"name": "big_station_2", "cm": 85},
    {"name": "big_station_3", "cm": 190}
   ],
-  "sizeMax": 200
+  "sizeMax": 200,
+  "atmosphere": "beton_neon",
+  "glows": [
+   {"name": "big_station_0", "color": "#a8f0ff", "at": [53, 52], "size": [62, 84], "strength": 70, "light": 260, "behavior": "flicker"},
+   {"name": "big_station_3", "color": "#dff6ff", "at": [63, 62], "size": [60, 74], "strength": 80, "light": 320, "behavior": "steady"}
+  ]
  },
  "concrete_wall": {
   "name": "Beton · glatte Wand",
@@ -236,7 +242,9 @@
    {"name": "big_industry_2", "cm": 130},
    {"name": "big_industry_3", "cm": 185}
   ],
-  "sizeMax": 200
+  "sizeMax": 200,
+  "atmosphere": "metall_rost",
+  "glows": [{"name": "big_industry_0", "color": "#ffb050", "at": [96, 66], "size": [26, 16], "strength": 90, "light": 140, "behavior": "pulse"}]
  },
  "ruins": {
   "name": "Ruine · Ziegel",
@@ -305,6 +313,7 @@
    {"name": "ruins3_14", "cm": 40},
    {"name": "ruins3_15", "cm": 110}
   ],
-  "sizeMax": 200
+  "sizeMax": 200,
+  "atmosphere": "ruine_staub"
  }
 }

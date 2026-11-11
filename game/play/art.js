@@ -188,6 +188,11 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
   const g = scene.make.graphics({}, false), solid = (x, y) => x < 0 || y < 0 || x >= room.w || y >= room.h || WALLS.has(room.tiles[y][x]), stamps = [];
   const edges = scene.make.graphics({}, false), decals = [], clutter = [], details = [], back = [], backShade = scene.make.graphics({}, false), taken = new Set();
   const r = rng(99);
+  // clutter stamp + where it stands, by name (game/play/atmosphere.js finds glowing things)
+  const placed = (kit, key, frame, cx, ground) => {
+    const st = propStamp(scene, kit, key, frame, cx, ground), f = scene.textures.getFrame(key, frame);
+    return { ...st, name: scene.data_?.assets?.[key]?.names?.[frame], kit, cw: f.cutWidth, ch: f.cutHeight };
+  };
   for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
     const t0 = room.tiles[y][x], t = WALLS.has(t0) ? '#' : t0, px = x * T, py = y * T;
     const kit = t === '#' && !style ? terrain?.at(x, y) : null;
@@ -213,11 +218,11 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       const free = (xx) => solid(xx, y) && !solid(xx, y - 1) && room.tiles[y - 1]?.[xx] === '.' && room.tiles[y - 2]?.[xx] === '.';
       if (top && kit.big && !taken.has(x) && free(x) && free(x + 1) && solid(x - 1, y) && solid(x + 2, y) && terrain?.at(x + 1, y) === kit && hash(x, y, seed + 7) * 100 < (D.bigChance ?? 0)) {
         const B = kit.big;
-        clutter.push(propStamp(scene, kit, B.key, B.list[Math.floor(hash(x, y, seed + 8) * B.list.length)], px + T, py + 4));
+        clutter.push(placed(kit, B.key, B.list[Math.floor(hash(x, y, seed + 8) * B.list.length)], px + T, py + 4));
         taken.add(x); taken.add(x + 1);
       }
       if (top && air && !taken.has(x) && kit.clutter.length && solid(x - 1, y) && solid(x + 1, y) && hash(x, y, seed + 3) * 100 < (D.clutterChance ?? 0))
-        clutter.push(propStamp(scene, kit, kit.props, kit.clutter[Math.floor(hash(x, y, seed + 4) * kit.clutter.length)], px + T / 2, py + 4));
+        clutter.push(placed(kit, kit.props, kit.clutter[Math.floor(hash(x, y, seed + 4) * kit.clutter.length)], px + T / 2, py + 4));
       // edges from code: shade inside, then the outline (left, right, bottom; the top tile brings its own)
       const E = D.edge || {}, ow = E.width ?? 2, sw = E.shadeWidth ?? 3, sa = (E.shade ?? 40) / 100, oc = hexInt(E.color, 0x060608);
       const side = (open, rx, ry, rw, rh, ix, iy, iw, ih) => { if (!open) return; edges.fillStyle(0x060608, sa).fillRect(ix, iy, iw, ih); edges.fillStyle(oc).fillRect(rx, ry, rw, rh); };
@@ -260,4 +265,5 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
   if (back.length) bake(scene, scene.make.graphics({}, false), 0, 0, room.w * T, room.h * T, { depth: -11, stamps: back, over: backShade });
   else backShade.destroy();
   bake(scene, g, 0, 0, room.w * T, room.h * T, { depth: -10, stamps: [...stamps, ...details, ...decals, ...clutter], over: edges });
+  return { props: clutter };
 }

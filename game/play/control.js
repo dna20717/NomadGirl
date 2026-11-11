@@ -12,6 +12,7 @@
 //   nomad.drone('kill')               show a drone mood
 //   nomad.screenOf(x, y)              world position → page position
 //   nomad.state().van                 van door frame, open, roof platform
+//   nomad.state().light               light & atmosphere: lamps, glowing clutter, mood at Leyla, searchlight, brightness at Leyla / ahead
 //   nomad.state().level               POI level: chests, switches, doors, brittle walls, goal, secrets, ranking (done)
 //   nomad.state().camp                camp (game.html?camp): clock, place, Δ, prompt, hotspots, rig; .menu = open menu
 //   nomad.menu() / nomad.choose(i | 'text')   the open menu / pick an item (index or part of its label)
@@ -89,7 +90,8 @@ export function installControl(game) {
     craft() { return scene().hud.craft?.state() || null; },   // open cooking/crafting panel: recipe book, pot, last result
     inv() { return scene().hud.inv?.state() || null; },   // open inventory: grids, slots, held thing
     loot() { return scene().loot?.state() || null; },     // bundles on the ground (run)
-    drone(mood) { scene().drone.react(mood); return scene().drone.mood; },   // show a drone mood (tests, pictures)
+    drone(mood) { scene().drone.react(mood); return scene().drone.mood; },
+    light(on) { const a = scene().atmo; if (on !== undefined) a?.show(on); return a?.state() || null; },   // light & atmosphere: state, light(false) = all off (comparison), light(true) = on   // show a drone mood (tests, pictures)
     screenOf(x, y) {   // world position → page position (close-up pictures, mouse)
       const c = scene().cam, r = game.canvas.getBoundingClientRect(), kx = r.width / game.scale.width, ky = r.height / game.scale.height;
       return { x: r.left + (x - c.worldView.x) * c.zoom * kx, y: r.top + (y - c.worldView.y) * c.zoom * ky };
@@ -103,6 +105,7 @@ export function installControl(game) {
         drone: s.drone && { mood: s.drone.mood, x: r(s.drone.x), y: r(s.drone.y), face: s.drone.faceFrame, cables: s.drone.cables.lines().map(c => c.pts.at(-1).map(r)), flip: s.drone.sprite.scaleX < 0 },
         van: s.van?.state(),
         level: s.level?.state() || null,
+        light: s.atmo?.state() || null,
         mode: s.mode, prompt: s.hud.promptText, menu: s.hud.menuState(), banner: s.hud.bannerEl.hidden ? null : s.hud.bannerEl.textContent,
         camp: s.camp?.state(), health: Math.round(s.leyla.health), maxHealth: s.leyla.maxHealth,
       };

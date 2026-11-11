@@ -8,6 +8,7 @@ import { Leyla } from './leyla.js';
 import { Enemy } from './enemies.js';
 import { Combat } from './combat.js';
 import { Fx } from './fx.js';
+import { Atmosphere } from './atmosphere.js';
 import { Drone } from './drone.js';
 import { Van } from './van.js';
 import { Backdrop } from './backdrop.js';
@@ -193,8 +194,9 @@ export class PlayScene extends Phaser.Scene {
     const tiles = Object.fromEntries(Object.entries(this.data_.game?.tiles || {}).filter(([k]) => k !== 'terrain').map(([k, id]) => [k, this.textures.exists(id) ? id : null]));
     this.terrain = this.terrainMap();
     const CG = this.data_.camp?.ground;
+    let drawn = null;
     if (!(this.mode === 'camp' && drawCampGround(this, this.data_, this.campGeo, T)))
-      drawRoom(this, R, T, tiles, this.mode === 'camp' ? { ground: CG?.color || '#4a3628', top: CG?.top || '#8a6440', hide: this.campGeo.hidden } : null, this.terrain);
+      drawn = drawRoom(this, R, T, tiles, this.mode === 'camp' ? { ground: CG?.color || '#4a3628', top: CG?.top || '#8a6440', hide: this.campGeo.hidden } : null, this.terrain);
 
     this.solids = this.physics.add.staticGroup();
     for (const r of solidRects(R)) this.solids.add(this.add.zone((r.x + r.w / 2) * T, (r.y + r.h / 2) * T, r.w * T, r.h * T));
@@ -248,6 +250,7 @@ export class PlayScene extends Phaser.Scene {
     // chests, switches + doors, brittle walls, goal (game/play/poi_level.js): in POI levels and in single rooms that have them
     const M = R.marks || {};
     this.level = this.mode !== 'camp' && (this.levelInfo?.def || ['C', 'S', 'D', 'B', 'Z'].some(k => M[k]?.length)) ? new PoiLevel(this, run?.poi || null) : null;
+    this.props = drawn?.props || [];
 
     const cam = this.cam, C = this.data_.game?.camera || {};
     cam.setZoom(C.zoom || 1);
@@ -256,6 +259,8 @@ export class PlayScene extends Phaser.Scene {
     cam.setBounds(0, Math.min(0, H - viewH), W, Math.max(H, viewH));
     cam.startFollow(this.leyla.box, false, C.follow ?? 0.12, C.follow ?? 0.12);
     cam.fadeIn(400, 13, 10, 18);
+    // light & atmosphere (game/play/atmosphere.js): darkness with lamps, glow, colour mood, dust, sparks, drips, fog
+    this.atmo = new Atmosphere(this, this.props);
 
     this.keys = {};
     for (const [name, list] of Object.entries(KEYS)) this.keys[name] = list.map(k => this.input.keyboard.addKey(k));
@@ -615,6 +620,7 @@ export class PlayScene extends Phaser.Scene {
     cam.followOffset.x += (-this.leyla.facing * (this.data_.game?.camera?.lookAhead ?? 160) - cam.followOffset.x) * Math.min(1, dt / 400);
     this.bgCam.setScroll(cam.worldView.x, cam.worldView.y);   // parallax follows the world camera
     this.backdrop?.update(time, dt);
+    this.atmo?.update(time, dt);
     this.hud.build?.update(time, dt);
     this.hud.update(this, time);
   }
