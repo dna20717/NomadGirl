@@ -997,7 +997,9 @@
   "source": "Code (Streifen zugeschnitten)",
   "derivedFrom": "leyla_shoot_side_source",
   "date": "07.11.2026",
-  "description": "Pixel-Art: Schuss mit Mündungsfeuer und Hülse."
+  "description": "Pixel-Art: Schuss mit Mündungsfeuer und Hülse.",
+  "slide": [{"frame": 1, "from": [112, 36], "to": [148, 44]},{"frame": 2, "from": [112, 36], "to": [148, 44]}],
+  "slideShift": 3
  },
  "leyla_shoot_walk_side_source": {
   "name": "Leyla · Schießen im Gehen · Original",
@@ -1020,7 +1022,9 @@
   "source": "Code (Streifen zugeschnitten)",
   "derivedFrom": "leyla_shoot_walk_side_source",
   "date": "07.11.2026",
-  "description": "Pixel-Art: Schuss im Gehen mit Mündungsfeuer und Hülse."
+  "description": "Pixel-Art: Schuss im Gehen mit Mündungsfeuer und Hülse.",
+  "slide": [{"frame": 1, "from": [122, 37], "to": [160, 45]},{"frame": 2, "from": [127, 41], "to": [161, 48]}],
+  "slideShift": 3
  },
  "sound_shot": {
   "name": "Schuss (Futuristic Shotgun)",
@@ -2459,6 +2463,17 @@
   "source": "KI (PixelLab) + Code (Montage)",
   "derivedFrom": "leyla_run_side",
   "date": "11.11.2026",
-  "description": "Pixel-Art, rennt nach rechts mit gestreckten Armen und Pistole (Combat Mode). Gleiche Schritte, Anker und Frames wie Rennen seitlich, nur der Oberkörper ist neu. Links spiegelt das Spiel."
+  "description": "Pixel-Art, rennt nach rechts mit gestreckten Armen und Pistole (Combat Mode). Gleiche Schritte, Anker und Frames wie Rennen seitlich, nur der Oberkörper ist neu. Links spiegelt das Spiel.",
+  "slide": [
+   {"frame": 1, "from": [141, 51], "to": [176, 60]},
+   {"frame": 2, "from": [141, 51], "to": [176, 60]},
+   {"frame": 3, "from": [140, 51], "to": [176, 60]},
+   {"frame": 4, "from": [141, 52], "to": [176, 61]},
+   {"frame": 5, "from": [140, 51], "to": [176, 60]},
+   {"frame": 6, "from": [139, 50], "to": [176, 59]},
+   {"frame": 7, "from": [139, 50], "to": [176, 59]},
+   {"frame": 8, "from": [141, 52], "to": [176, 61]}
+  ],
+  "slideShift": 3
  }
 }

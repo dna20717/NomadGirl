@@ -7,6 +7,8 @@
 
 // collider at 256 px look height; everything scales with the height of look.idle (Assets › „Höhe im Spiel“)
 // hangReach: hands above the feet while hanging; mantleLift: how far the last pull-up frame lifts the feet inside the picture
+import { recoilTexture } from './recoil.js';
+
 const BASE = { height: 256, w: 72, h: 224, slideH: 104, crouchH: 196, climbW: 44, hand: 84, chest: 150, hangReach: 253, mantleLift: 120 };
 const DASH_TIME = 170, TERMINAL_FALL = 1700;
 const approach = (v, target, step) => v < target ? Math.min(target, v + step) : Math.max(target, v - step);
@@ -48,6 +50,8 @@ export class Leyla {
     this.ledge = null; this.body.checkCollision.none = false;
     this.meleeReady = 0; this.rangedReady = 0; this.invulnerableUntil = 0; this.attackPose = 0;
     this.squash = { x: 1, y: 1 };
+    this.fight = { on: false, manual: null, last: -1e9, seen: false, check: 0 };   // combat mode (Leyla › Kampfmodus)
+    this.armedLost = -1e9; this.armed = 'off';
     this.sprite.setAlpha(1).setRotation(0).clearTint();
   }
 
@@ -105,11 +109,13 @@ export class Leyla {
       this.meleeInput(time, input, grounded);
       // shooting only on the ground with the gun drawn (Daniel: no shooting in a jump); empty magazine = reload
       const gun = !!this.d.look?.aim && this.d.armed?.enabled !== false;
+      if (input.ranged.pressed && gun) this.fightTrigger(time);   // pulling the trigger draws the gun (combat mode)
       const canShoot = this.state === 'normal' && grounded && !this.reloading && (!gun || this.armed === 'on');
       if (input.ranged.pressed && time >= this.rangedReady && canShoot) { if (this.mag <= 0 && this.ammo > 0) this.startReload(time); else this.scene.combat.shoot(this, time); }
       if (input.reload?.pressed && canShoot) this.startReload(time);
     }
     this.updateReload(time);
+    this.updateFight(time, input);
     if (time < (this.flipUntil || 0) && m.airJumpGhosts && time >= (this.nextGhost || 0)) { this.scene.fx.ghost(this.sprite); this.nextGhost = time + 28; }
     this.wasGrounded = grounded;
     this.lastVy = b.velocity.y;
@@ -120,7 +126,8 @@ export class Leyla {
     const b = this.body, m = this.m;
     if (input.pose?.pressed && grounded && !dir && Math.abs(b.velocity.x) <= 20 && this.d.look?.yoga && !this.attack && !this.charging) { this.startPose(time); return; }
     if (dir && time > this.attackPose) this.facing = dir;
-    const speed = (input.walk.down ? (m.walkSpeed ?? 240) : (m.runSpeed ?? 440)) * (1 + (this.scene.mods?.speed || 0) / 100);   // gear, implants, buffs
+    const gunRun = !input.walk.down && this.armed === 'on' && this.gunRunning(b.velocity, true) ? (this.scene.shootRules().runSpeed ?? 85) / 100 : 1;   // Cells-like: a bit slower with the gun out
+    const speed = (input.walk.down ? (m.walkSpeed ?? 240) : (m.runSpeed ?? 440) * gunRun) * (1 + (this.scene.mods?.speed || 0) / 100);   // gear, implants, buffs
     let acc = (m.acceleration ?? 2800) * (grounded ? (dir ? 1 : 1.6) : 0.75);
     // keep momentum in the air (rope, knockback) while pushing the same way
     if (!grounded && Math.abs(b.velocity.x) > speed && Math.sign(b.velocity.x) === dir) acc *= 0.15;
@@ -400,6 +407,7 @@ export class Leyla {
     if (!this.alive || this.invulnerable(time)) return false;
     this.health = Math.max(0, this.health - damage * (1 - Math.min(90, this.scene.mods?.defense || 0) / 100));
     this.invulnerableUntil = time + (this.d.invulnerableAfterHit ?? 600);
+    this.fightTrigger(time, true);
     const low = this.state === 'slide' && !this.canStand();   // hit in a tunnel: stay low
     if (this.state === 'slide' && !low) this.endSlide();
     if (this.state === 'climb') this.leaveClimb();
@@ -452,7 +460,9 @@ export class Leyla {
       const since = time - (this.shotAt ?? -1e9), extending = this.extendAt != null && time - this.extendAt < ext;
       const shot = L.shoot && !extending && since < (this.extendAt != null && this.extendAt === this.shotAt ? ext : 0) + this.lookDur(walking && L.shootWalk ? L.shootWalk : L.shoot);
       const out = time - (this.aimUntil ?? -1e9);   // < 0: arms still stretched out after shooting / reloading, then they come down
-      if (this.reloading && (L.reload || L.reloadWalk)) { name = '@' + (walking && L.reloadWalk ? L.reloadWalk : L.reload || L.reloadWalk); armedFrame = Math.min(1, (time - this.reloading.at) / this.reloading.dur); this.aimUntil = this.reloading.at + this.reloading.dur + hold; }
+      const running = this.gunRunning(v);
+      if (running) name = '@' + L.runGun;   // Cells-like: runs on with the arms out, shots only flash and kick the slide
+      else if (this.reloading && (L.reload || L.reloadWalk)) { name = '@' + (walking && L.reloadWalk ? L.reloadWalk : L.reload || L.reloadWalk); armedFrame = Math.min(1, (time - this.reloading.at) / this.reloading.dur); this.aimUntil = this.reloading.at + this.reloading.dur + hold; }
       else if (extending && L.aim) { name = '@' + L.aim; armedFrame = (time - this.extendAt) / ext; }   // gun from the chest up into the aim, then the shot
       else if (shot) { name = '@' + (walking && L.shootWalk ? L.shootWalk : L.shoot); this.aimUntil = time + hold; }
       else if (walking && L.aimWalk) name = '@' + L.aimWalk;
@@ -460,7 +470,7 @@ export class Leyla {
       else if (out < lower && L.aim) { name = '@' + L.aim; armedFrame = 1 - out / lower; }
       else if (L.draw) { name = '@' + L.draw; armedFrame = 1; armedFrom = AR.drawFromFrame ?? 1; }   // ready: gun at the chest
       else { name = '@' + (L.aim || L.idle); armedFrame = 1; }
-      if (shot && this.shotSeen !== this.shotAt) { this.shotSeen = this.shotAt; this.restartLook = true; }
+      if (shot && !running && this.shotSeen !== this.shotAt) { this.shotSeen = this.shotAt; this.restartLook = true; }
     }
     // melee: the attack runs over its time (frames from "ab Frame"), charging holds the crouch loop of the heavy attack
     let pin = null;
@@ -513,7 +523,7 @@ export class Leyla {
       const mid = an.currentAnim.frames[Math.floor(an.currentAnim.frames.length / 2)];
       if (!this.canStand() && an.currentFrame?.index >= mid.index) { if (!an.isPaused) an.pause(mid); } else if (an.isPaused) an.resume();
     }
-    const pace = { run: this.m.runSpeed || 440, walk: this.m.walkSpeed || 240 }[info.used];
+    const pace = { run: this.m.runSpeed || 440, walk: this.m.walkSpeed || 240 }[info.used] ?? (L.runGun && info.used === '@' + L.runGun ? (this.m.runSpeed || 440) * (this.scene.shootRules().runSpeed ?? 85) / 100 : null);
     this.sprite.anims.timeScale = pace ? Math.max(0.45, Math.min(1.4, Math.abs(v.x) / pace)) : 1;
     // squash & stretch relaxes back to 1
     const k = Math.min(1, dt / 90);
@@ -539,6 +549,7 @@ export class Leyla {
     const flipped = info.flip ? this.facing > 0 : this.facing < 0;
     this.sprite.setFlipX(flipped).setOrigin(flipped ? 1 - info.ox : info.ox, info.oy);   // Phaser mirrors inside the frame: the anchor has to mirror too
     if (st !== 'dead') this.sprite.setAlpha(time < this.invulnerableUntil && Math.floor(time / 70) % 2 ? 0.35 : 1);
+    this.recoil(time);
   }
 
   // ---------- melee (Daniel, 07.11.2026 spät): tap = light hit, standing or walking; holding ≥ 3 s = heavy hit when released ----------
@@ -606,12 +617,73 @@ export class Leyla {
   // kann schießen oder gehen und schießen; sobald sie rennt oder springt, steckt sie die Waffe wieder weg") ----------
   updateArmed(time, dt, grounded) {
     const A = this.d.armed || {}, s = this.scene, v = this.body.velocity;
+    const slow = Math.abs(v.x) <= (this.m.walkSpeed ?? 240) * 1.15 || this.gunRunning(v, true);
     const can = A.enabled !== false && this.d.look?.aim && s.weapon('ranged') && (s.mode !== 'camp' || A.inCamp) && this.state === 'normal' && grounded && !this.attack && !this.charging
-      && Math.abs(v.x) <= (this.m.walkSpeed ?? 240) * 1.15;
+      && this.fight.on && slow;
     this.armed ??= 'off';
-    if (!can) { this.armed = 'off'; this.drawP = 0; return; }
-    if (this.armed === 'off') { this.armed = this.d.look?.draw ? 'drawing' : 'on'; this.drawP = 0; this.special = null; }
+    if (!can) { if (this.armed === 'on') this.armedLost = time; this.armed = 'off'; this.drawP = 0; return; }
+    // back on the ground after a jump or dash in a fight: the gun comes straight back (Leyla › Kampfmodus › Wieder im Anschlag)
+    const quick = time - this.armedLost < (this.d.fight?.redraw ?? 700);
+    if (this.armed === 'off') { this.armed = this.d.look?.draw && !quick && !this.gunRunning(v) ? 'drawing' : 'on'; this.drawP = 0; this.special = null; }   // drawn on the run: straight into the run with the gun
+    if (this.armed === 'drawing' && this.gunRunning(v)) this.armed = 'on';
     if (this.armed === 'drawing') { this.drawP += dt / Math.max(1, A.drawTime ?? 650); if (this.drawP >= 1) this.armed = 'on'; }
+  }
+  // Cells-like (Spiel › Kampf › Schießstil): with the gun out she keeps running, look Leyla › Waffe ziehen › Rennen mit Waffe
+  gunRunning(v, any = false) {
+    if (!this.d.look?.runGun || !this.scene.cellsLike() || !this.scene.textures.exists(this.d.look.runGun)) return false;
+    return any || Math.abs(v.x) > (this.m.walkSpeed ?? 240) * 1.15;
+  }
+
+  // ---------- combat mode (Daniel, 11.11.2026: "Leyla existiert im friedlichen Zustand oder im Combat Mode, d. h. mit gezogener Waffe";
+  // C: automatically in when an enemy shows up, she is hit or pulls the trigger, out again after a quiet while, plus a key to draw and holster) ----------
+  fightTrigger(time, hit = false) {
+    const F = this.fight;
+    if (!F || (hit && this.d.fight?.onHit === false)) return;
+    F.manual = F.manual === 'on' ? 'on' : null;   // a shot or a hit overrides a gun holstered by hand
+    F.last = time; F.on = true;
+  }
+  updateFight(time, input) {
+    const F = this.fight, C = this.d.fight || {}, s = this.scene;
+    if (!F) return;
+    if (C.enabled === false) { F.on = true; return; }   // no combat mode: the gun is ready like before
+    if (s.mode === 'camp' && !this.d.armed?.inCamp) { F.on = false; F.manual = null; return; }
+    // key (Q / left stick): draw or holster by hand; drawn by hand stays drawn until the key again
+    if (input.holster?.pressed && this.alive) {
+      if (F.on) { F.on = false; F.manual = 'off'; } else { F.on = true; F.manual = 'on'; F.last = time; }
+    }
+    // enemies in sight (Leyla › Kampfmodus › Sicht, free line of sight), a few times a second
+    if (C.auto !== false && time >= F.check) {
+      F.check = time + 150;
+      const seen = this.enemyInSight((C.sight ?? 10) * (s.T || 64));
+      if (seen && F.manual === 'off' && !F.seen) F.manual = null;   // holstered by hand: only a new sighting draws again
+      if (seen && F.manual !== 'off') { F.on = true; F.last = time; }
+      F.seen = seen;
+    }
+    if (F.on && F.manual !== 'on' && time - F.last > (C.calm ?? 4) * 1000 && !this.reloading) F.on = false;
+  }
+  enemyInSight(range) {
+    const s = this.scene, x = this.x, y = this.feet - this.height * 0.7;
+    for (const e of s.enemies || []) {
+      if (!e.alive) continue;
+      const b = e.body, ex = b.center.x, ey = b.center.y;
+      if (Math.hypot(ex - x, ey - y) <= range && s.lineFree(x, y, ex, ey)) return true;
+    }
+    return false;
+  }
+
+  // slide recoil (Assets › Schlitten): for a moment the frame with the slide back lies over Leyla
+  recoil(time) {
+    const AR = this.d.armed || {}, dur = AR.recoilTime ?? 70, sp = this.sprite;
+    const start = (this.shotAt ?? -1e9) + (this.extendAt != null && this.extendAt === this.shotAt ? AR.extendTime ?? 100 : 0);
+    const on = AR.recoil !== false && time >= start && time - start < dur && this.armed === 'on' && sp.visible;
+    const key = on ? recoilTexture(this.scene, sp.texture.key, Number(sp.frame.name)) : null;
+    if (!key) { if (this.recoilImg?.visible) this.recoilImg.setVisible(false); return; }
+    this.recoilImg ??= this.scene.add.image(0, 0, key);
+    this.recoilImg.setTexture(key).setVisible(true).setDepth(sp.depth + 0.001).setPosition(sp.x, sp.y).setOrigin(sp.originX, sp.originY)
+      .setScale(sp.scaleX, sp.scaleY).setFlipX(sp.flipX).setRotation(sp.rotation).setAlpha(sp.alpha);
+    if (sp.isTinted) this.recoilImg.setTint(sp.tintTopLeft); else this.recoilImg.clearTint();
+    sp.setAlpha(0);
+    this.recoilShown = (this.recoilShown || 0) + 1;
   }
   lookDur(id) { const a = this.scene.data_.assets?.[id]; return a?.frames && a.fps ? a.frames / a.fps * 1000 : 0; }
 

@@ -11,7 +11,7 @@ const CONTROLS = [
     ['L / C', 'Dash, auch in der Luft'], ['S / ↓', 'Beim Rennen: Slide · im Stand: Ducken'], ['S + Leertaste', 'Von der Plattform fallen'],
     ['→', 'Im Sprung zur Wand: Kante greifen · W hochziehen · S loslassen'], ['W / ↑', 'Leiter klettern, Seil greifen'], ['Leertaste', 'Am Seil: loslassen mit Schwung']] },
   { title: 'Kampf', icon: 'weapon', rows: [
-    ['J / Y', 'Nahkampf · 3 s halten: schwerer Hieb'], ['K / X', 'Schießen (am Boden, Waffe gezogen)'], ['R', 'Nachladen']] },
+    ['J / Y', 'Nahkampf · 3 s halten: schwerer Hieb'], ['K / X', 'Schießen (am Boden; zieht die Waffe)'], ['R', 'Nachladen'], ['Q', 'Waffe ziehen / wegstecken (Kampfmodus)']] },
   { title: 'Machen', icon: 'hand', rows: [
     ['E', 'Benutzen: Kisten, Schalter, Werkstätten, Feuer, Van'], ['I / Tab', 'Inventar'], ['B', 'Rig bauen (im Camp)'], ['P', 'Yoga-Pose']] },
   { title: 'System', icon: 'settings', rows: [
@@ -72,11 +72,25 @@ export class Hud {
     this.menu({ title: 'Pause', sub: sc.roomDef?.name || '', items: [
       { label: 'Weiter', primary: true, act: () => {} },
       { label: 'Steuerung', sub: 'Tasten und Controller', act: () => this.toggleHelp(true) },
-      { label: sc.sound.mute ? 'Ton an' : 'Ton aus', sub: 'M', act: () => sc.toggleMute() },
+      { label: 'Optionen', sub: 'Ton, Schießstil', act: () => setTimeout(() => this.optionsMenu(), 0) },
       ...(this.modeName === 'test' ? [{ label: 'Raum neu starten', sub: 'Rücktaste', act: () => sc.level ? sc.restartAs({}) : sc.restartRoom() }] : []),
       { label: 'Werkstatt', act: () => { location.href = 'workshop.html'; } },
       { label: 'Startseite', act: () => { location.href = './'; } },
       ...(camp ? [{ label: 'Neues Spiel', sub: 'Spielstand löschen', act: () => { if (confirm('Spielstand löschen und neu anfangen?')) location.href = 'game.html?camp&new'; } }] : []),
+    ] });
+  }
+
+  // Menü › Optionen: sound and the shooting style (design.md: Klassisch | Cells-like); the style is kept in this browser
+  optionsMenu() {
+    const sc = this.scene;
+    if (this.modal || !sc) return;
+    const cells = sc.cellsLike();
+    this.menu({ title: 'Optionen', items: [
+      { label: sc.sound.mute ? 'Ton an' : 'Ton aus', sub: 'M', act: () => sc.toggleMute() },
+      { label: `Schießstil: ${cells ? 'Cells-like' : 'Klassisch'}`, sub: cells ? 'Schießen im Rennen mit Zielhilfe · umschalten auf Klassisch' : 'Zum Schießen stehen oder gehen · umschalten auf Cells-like',
+        act: () => { try { localStorage.setItem('nomadgirl-shoot-style', cells ? 'classic' : 'cells'); } catch { /* private mode */ }
+          this.banner(`Schießstil: ${cells ? 'Klassisch' : 'Cells-like'}`, 'Gilt in diesem Browser'); sc.time.delayedCall(1400, () => this.banner(null)); } },
+      { label: 'Zurück', act: () => setTimeout(() => this.pauseMenu(), 0) },
     ] });
   }
 

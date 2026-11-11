@@ -44,6 +44,10 @@ v = await t(t => t.run(60));
 const heavy = await page.evaluate(() => { const l = game.scene.getScene('play').leyla; nomad.step(1, ['melee'], ['melee']); nomad.step(185, ['melee']); const ready = !!l.charging?.ready; nomad.step(1); const atk = l.attack?.power?.heavy; return { ready, atk }; });
 check('Nahkampf schwer: 3 s halten, loslassen', heavy.ready && heavy.atk, heavy);
 v = await t(t => t.run(130));
+check('Kampfmodus: ohne Gegner in Sicht steckt sie die Waffe weg', v.armed === 'off', v);
+v = await t(t => t.run(2, [], ['ranged']));
+check('Kampfmodus: Abzug zieht erst die Waffe', v.armed === 'drawing' && v.mag === 7, v);
+v = await t(t => t.run(40));
 v = await t(t => t.run(10, [], ['ranged']));
 check('Fernkampf: Waffe gezogen, Schuss aus dem Magazin', v.armed === 'on' && v.mag === 6 && v.ammo === 33, v);
 for (let i = 0; i < 12 && v.mag > 0; i++) v = await t(t => t.run(30, [], ['ranged']));
@@ -56,6 +60,38 @@ v = await t(t => t.run(4, [], ['jump'])); const before = v.mag;
 v = await t(t => t.run(3, [], ['ranged']));
 check('Im Sprung kein Schuss', v.mag === before, v);
 v = await t(t => t.run(80));
+
+// combat mode (Q) and Cells-like: running with the gun, slide recoil, aim help at the shooter up on the ledge
+const cm = await page.evaluate(() => {
+  const s = game.scene.getScene('play'), L = () => nomad.state().leyla, out = {};
+  try { localStorage.removeItem('nomadgirl-shoot-style'); } catch {}
+  nomad.step(60);
+  nomad.step(2, [], ['holster']); out.holster = L();
+  nomad.step(2, [], ['holster']); nomad.step(40); out.drawn = L();
+  nomad.step(50, ['right']); out.run = L();
+  const shown = L().recoilShown, mag = L().mag;
+  nomad.step(2, ['right'], ['ranged']); nomad.step(1, ['right']); out.shot = { ...L(), shown, mag0: mag, recoilNow: L().recoil };
+  nomad.step(30);
+  // aim help: on the little platform, the shooter stands on the ledge further right and a bit higher
+  nomad.tp(36 * 64, 576); s.leyla.facing = 1; nomad.step(2, [], ['ranged']); nomad.step(45);
+  out.target = s.combat.findTarget(s.leyla)?.id || null;
+  const n0 = s.combat.shots.length; s.leyla.rangedReady = 0;
+  nomad.step(1, [], ['ranged']); const p = s.combat.shots.filter(q => q.friendly).at(-1);
+  out.aim = p ? { vx: Math.round(p.vx), vy: Math.round(p.vy), n: s.combat.shots.length - n0 } : null;
+  // classic: running holsters the gun
+  localStorage.setItem('nomadgirl-shoot-style', 'classic');
+  nomad.calm(); nomad.tp(22 * 64, 960); nomad.step(2, [], ['holster']); nomad.step(2, [], ['holster']); nomad.step(40); nomad.step(40, ['right']); out.classic = L();
+  localStorage.removeItem('nomadgirl-shoot-style');
+  nomad.step(2, [], ['holster']); nomad.step(300); out.calm = L();
+  return out;
+});
+check('Kampfmodus: Q steckt weg', cm.holster.armed === 'off' && cm.holster.fight.manual === 'off', cm.holster);
+check('Kampfmodus: Q zieht wieder', cm.drawn.armed === 'on' && cm.drawn.fight.on && cm.drawn.fight.manual === 'on', cm.drawn);
+check('Cells-like: rennt mit Waffe (85 %)', cm.run.style === 'cells' && cm.run.armed === 'on' && cm.run.look === 'leyla_run_gun_side' && Math.abs(cm.run.vx - 374) < 8, cm.run);
+check('Cells-like: Schuss im Rennen, Schlitten zuckt', cm.shot.mag === cm.shot.mag0 - 1 && cm.shot.recoilShown > cm.shot.shown && cm.shot.armed === 'on', cm.shot);
+check('Zielhilfe: Schütze erfasst, Schuss fliegt schräg zu ihm', cm.target === 'schuetze' && cm.aim && cm.aim.vy < -20 && cm.aim.vx > 1000, cm);
+check('Klassisch: im Rennen steckt sie die Waffe weg', cm.classic.style === 'classic' && cm.classic.armed === 'off' && cm.classic.vx > 400, cm.classic);
+check('Kampfmodus: weggesteckt bleibt sie friedlich', !cm.calm.fight.on && cm.calm.armed === 'off', cm.calm);
 
 // movement without enemies
 await t(t => { t.restart(); t.calm(); });

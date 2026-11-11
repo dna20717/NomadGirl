@@ -60,9 +60,23 @@
   "enabled": true,
   "deadzone": 30,
   "walkTilt": 65,
-  "map": {"jump": ["0"], "dash": ["1", "6"], "melee": ["2"], "ranged": ["7"], "reload": ["5"], "grab": ["3"], "walk": ["4"], "inventory": ["8"], "help": ["9"], "pose": ["11"], "down": []},
+  "map": {
+   "jump": ["0"],
+   "dash": ["1", "6"],
+   "melee": ["2"],
+   "ranged": ["7"],
+   "reload": ["5"],
+   "grab": ["3"],
+   "walk": ["4"],
+   "inventory": ["8"],
+   "help": ["9"],
+   "pose": ["11"],
+   "down": [],
+   "holster": ["10"]
+  },
   "icons": "pad_icons",
   "symbols": "auto"
  },
- "atmosphere": {"enabled": true, "scale": 4, "leyla": {"radius": 260, "strength": 22}, "depth": 14}
+ "atmosphere": {"enabled": true, "scale": 4, "leyla": {"radius": 260, "strength": 22}, "depth": 14},
+ "combat": {"shootStyle": "cells", "runSpeed": 85, "cone": 35, "range": 9, "bulletSpeed": 2200, "marker": true, "markerColor": "#ff3fa4"}
 }

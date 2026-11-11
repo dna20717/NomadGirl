@@ -43,8 +43,12 @@ export class Combat {
     const lowered = leyla.armed === 'on' && time > (leyla.aimUntil ?? -1e9) && Math.abs(leyla.body.velocity.x) <= 20;
     leyla.shotAt = time; leyla.extendAt = lowered ? time : null;
     // with the gun drawn the shot leaves the muzzle (Leyla › Waffe ziehen › Mündung), the picture brings its own muzzle flash
-    const A = leyla.armed === 'on', AR = leyla.d.armed || {}, M = AR.muzzle || [100, 146], k = leyla.size.h / 168;
-    const f = leyla.facing, x = leyla.x + f * (A ? M[0] * k : leyla.size.w * 0.8), y = leyla.feet - (A ? M[1] * k : leyla.height * 0.62), speed = w.projectileSpeed ?? 1600;
+    const A = leyla.armed === 'on', AR = leyla.d.armed || {}, R = s.shootRules(), cells = s.cellsLike(), f = leyla.facing, { x, y } = this.muzzleOf(leyla);
+    const speed = (cells && R.bulletSpeed) || w.projectileSpeed || 1600;
+    // Cells-like: the nearest enemy in front (cone, range, free line) gets the shot, slanted; otherwise straight ahead
+    const tgt = cells ? this.findTarget(leyla, { x, y }) : null;
+    let dx = f, dy = 0;
+    if (tgt) { const tx = tgt.body.center.x - x, ty = tgt.body.center.y - y, n = Math.hypot(tx, ty) || 1; dx = tx / n; dy = ty / n; }
     if (!A) s.fx.flash(x + f * 10, y, 0xfff2b0, 18);
     // muzzle flash light (Leyla › Waffe ziehen › Mündungslicht): bright core + a wider warm glow over the surroundings
     if (AR.flashLight !== false) {
@@ -54,8 +58,42 @@ export class Combat {
     }
     const snd = w.sound && s.cache.audio.exists(w.sound) && s.data_.assets?.[w.sound];
     if (snd) s.sound.play(w.sound, { volume: (snd.volume ?? 100) / 100 * (0.92 + Math.random() * 0.16), detune: (Math.random() - 0.5) * 120 });
-    this.spawn({ key: 'nail', x, y, vx: f * speed, vy: 0, life: (w.range ?? 600) / speed * 1000, friendly: true, damage: (w.damage ?? 5) * this.boost(), knockback: w.knockback ?? 80, crit: w.critChance ?? 0, time });
+    this.spawn({ key: 'nail', x, y, vx: dx * speed, vy: dy * speed, life: Math.max(w.range ?? 600, tgt ? (R.range ?? 9) * s.T : 0) / speed * 1000, friendly: true, damage: (w.damage ?? 5) * this.boost(), knockback: w.knockback ?? 80, crit: w.critChance ?? 0, time });
     if (!leyla.body.blocked.down) leyla.body.setVelocityX(leyla.body.velocity.x - f * 40);
+  }
+
+  // where the shot leaves: the muzzle with the gun drawn (Leyla › Waffe ziehen › Mündung / im Rennen), otherwise in front of the chest
+  muzzleOf(leyla) {
+    const A = leyla.armed === 'on', AR = leyla.d.armed || {}, run = A && leyla.gunRunning(leyla.body.velocity), k = leyla.size.h / 168;
+    const M = (run && AR.muzzleRun) || AR.muzzle || [100, 146], f = leyla.facing;
+    return { x: leyla.x + f * (A ? M[0] * k : leyla.size.w * 0.8), y: leyla.feet - (A ? M[1] * k : leyla.height * 0.62) };
+  }
+  // Spiel › Kampf: Kegel (± degrees around the facing), Reichweite in tiles, only with a free line of sight
+  findTarget(leyla, at = this.muzzleOf(leyla)) {
+    const { x, y } = at, s = this.scene, R = s.shootRules(), f = leyla.facing, cone = (R.cone ?? 35) * Math.PI / 180, range = (R.range ?? 9) * s.T;
+    let best = null, bd = Infinity;
+    for (const e of s.enemies) {
+      if (!e.alive) continue;
+      const tx = e.body.center.x - x, ty = e.body.center.y - y, d = Math.hypot(tx, ty);
+      if (tx * f <= 0 || d > range || Math.atan2(Math.abs(ty), Math.abs(tx)) > cone || d >= bd) continue;
+      if (!s.lineFree(x, y, e.body.center.x, e.body.center.y)) continue;
+      best = e; bd = d;
+    }
+    return best;
+  }
+  // target marker (Spiel › Kampf › Ziel-Marker): small corner brackets around the enemy the next shot would hit
+  marker(time) {
+    const s = this.scene, l = s.leyla, R = s.shootRules();
+    const on = s.cellsLike() && R.marker !== false && l?.alive && l.armed === 'on';
+    this.target = on ? this.findTarget(l) : null;
+    this.mark ??= s.add.graphics().setDepth(15);
+    this.mark.clear();
+    if (!this.target) return;
+    const b = this.target.body, pad = 10 + 3 * Math.sin(time / 90), x0 = b.left - pad, x1 = b.right + pad, y0 = b.top - pad, y1 = b.bottom + pad, L = 18;
+    this.mark.lineStyle(4, parseInt(String(R.markerColor || '#ff3fa4').slice(1), 16), 0.9);
+    for (const [cx, cy, sx, sy] of [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]]) {
+      this.mark.beginPath(); this.mark.moveTo(cx, cy + sy * L); this.mark.lineTo(cx, cy); this.mark.lineTo(cx + sx * L, cy); this.mark.strokePath();
+    }
   }
 
   enemyShot(enemy, from, dir) {
@@ -71,6 +109,7 @@ export class Combat {
 
   update(time, dt) {
     const s = this.scene, k = dt / 1000;
+    this.marker(time);
     for (const p of this.shots) {
       if (p.dead) continue;
       p.x += p.vx * k; p.y += p.vy * k;
@@ -84,6 +123,7 @@ export class Combat {
           if (p.x > b.left - 6 && p.x < b.right + 6 && p.y > b.top && p.y < b.bottom) {
             const crit = Math.random() * 100 < p.crit;
             e.hit(time, Math.round(p.damage * (crit ? 2 : 1)), p.knockback, Math.sign(p.vx) || 1, crit);
+            s.leyla?.fightTrigger(time);
             p.dead = true; s.fx.sparks(p.x, p.y, 0xffffff, 5);
             break;
           }
@@ -99,5 +139,5 @@ export class Combat {
     this.shots = this.shots.filter(p => !p.dead);
   }
 
-  clear() { for (const p of this.shots) p.img?.destroy(); this.shots = []; }
+  clear() { for (const p of this.shots) p.img?.destroy(); this.shots = []; this.mark?.clear(); this.target = null; }
 }

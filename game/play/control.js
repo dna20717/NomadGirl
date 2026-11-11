@@ -23,7 +23,7 @@
 //   nomad.craft()                     cooking/crafting panel at a workshop (E in the camp): book, pot, log, stock
 //   nomad.save()                      the savegame
 //   nomad.release()                   keyboard again, game runs normally
-// Input names: left right up down jump walk dash melee ranged grab restart help (= Esc, Menü) controls (= H, Steuerung) debug pose build inventory
+// Input names: left right up down jump walk dash melee ranged grab restart help (= Esc, Menü) controls (= H, Steuerung) debug pose build inventory holster (= Q, Waffe ziehen/wegstecken)
 
 const FRAME = 1000 / 60;
 
@@ -100,7 +100,9 @@ export function installControl(game) {
       const s = scene(), l = s.leyla, r = n => Math.round(n);
       return {
         room: s.roomId, time: s.clock(), kills: s.kills, deltas: s.deltas, cleared: s.cleared,
-        leyla: { state: l.state, x: r(l.x), feet: r(l.feet), tile: [Math.floor(l.x / s.T), Math.round(l.feet / s.T)], vx: r(l.body.velocity.x), vy: r(l.body.velocity.y), facing: l.facing, health: l.health, ammo: l.ammo, mag: l.mag, reloading: !!l.reloading, armed: l.armed },
+        leyla: { state: l.state, x: r(l.x), feet: r(l.feet), tile: [Math.floor(l.x / s.T), Math.round(l.feet / s.T)], vx: r(l.body.velocity.x), vy: r(l.body.velocity.y), facing: l.facing, health: l.health, ammo: l.ammo, mag: l.mag, reloading: !!l.reloading, armed: l.armed,
+          fight: { on: !!l.fight?.on, manual: l.fight?.manual ?? null, seen: !!l.fight?.seen }, style: s.shootStyle(), look: l.sprite.anims.currentAnim?.key || l.sprite.texture.key,
+          recoil: !!l.recoilImg?.visible, recoilShown: l.recoilShown || 0, target: s.combat.target ? r(s.combat.target.body.center.x) : null },
         enemies: s.enemies.map(e => ({ id: e.id, state: e.state, x: r(e.x), feet: r(e.feet), hp: e.hp })),
         drone: s.drone && { mood: s.drone.mood, x: r(s.drone.x), y: r(s.drone.y), face: s.drone.faceFrame, cables: s.drone.cables.lines().map(c => c.pts.at(-1).map(r)), flip: s.drone.sprite.scaleX < 0 },
         van: s.van?.state(),

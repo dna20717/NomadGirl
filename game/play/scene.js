@@ -26,7 +26,7 @@ const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
   jump: ['SPACE'], walk: ['SHIFT'], dash: ['L', 'C'], melee: ['J', 'Y'], ranged: ['K', 'X'], grab: ['E'],
-  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'], build: ['B'],
+  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'], build: ['B'], holster: ['Q'],
 };
 
 export class PlayScene extends Phaser.Scene {
@@ -460,6 +460,20 @@ export class PlayScene extends Phaser.Scene {
 
   // ---------- queries for Leyla, enemies and projectiles ----------
   tileAt(px, py) { return this.room.tiles[Math.floor(py / this.T)]?.[Math.floor(px / this.T)] ?? '#'; }
+  // free line of sight between two points (walls only, steps of a quarter tile)
+  lineFree(x0, y0, x1, y1) {
+    const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0) / (this.T / 4));
+    for (let i = 1; i < n; i++) if (this.pointSolid(x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n)) return false;
+    return true;
+  }
+  // shooting style (Spiel › Kampf; Pause-Menü › Optionen overrides it in this browser): 'classic' | 'cells'
+  shootRules() { return this.data_.game?.combat || {}; }
+  shootStyle() {
+    let o = null;
+    try { o = localStorage.getItem('nomadgirl-shoot-style'); } catch { /* private mode */ }
+    return o === 'classic' || o === 'cells' ? o : this.shootRules().shootStyle || 'classic';
+  }
+  cellsLike() { return this.shootStyle() === 'cells'; }
   pointSolid(px, py) { return this.room.solid(Math.floor(px / this.T), Math.floor(py / this.T)); }
   rectFree(x, y, w, h) {
     const T = this.T;

@@ -97,8 +97,9 @@ v = await page.evaluate(() => {
   return [...seen];
 });
 check('Zwei Idles im Wechsel', v.some(k => k?.startsWith('leyla_idle_side')) && v.includes('leyla_idle2_side'), v);
-v = await page.evaluate(() => { const n = nomad, sp = game.scene.getScene('play').leyla.sprite, out = []; P.tp(20, 18); n.step(60); out.push(sp.texture.key); n.step(2, [], ['ranged']); n.step(8); out.push(sp.texture.key); n.step(40, ['right']); out.push(sp.texture.key); return out; });
-check('Waffe: zieht im Stand, schießt, steckt beim Rennen weg', v[0] === 'leyla_draw_side' && v[1] === 'leyla_shoot_side' && !v[2].includes('aim') && !v[2].includes('shoot'), v);
+v = await page.evaluate(() => { const n = nomad, sp = game.scene.getScene('play').leyla.sprite, out = []; P.tp(20, 18); n.step(60); out.push(sp.texture.key);
+  n.step(2, [], ['ranged']); n.step(8); out.push(sp.texture.key); n.step(40); n.step(2, [], ['ranged']); n.step(6); out.push(sp.texture.key); n.step(2, [], ['holster']); n.step(10); out.push(sp.texture.key); return out; });
+check('Waffe: friedlich ohne Waffe, Abzug zieht, schießt, Q steckt weg', !/draw|aim|shoot/.test(v[0]) && v[1] === 'leyla_draw_side' && v[2] === 'leyla_shoot_side' && !/draw|aim|shoot/.test(v[3]), v);
 v = await page.evaluate(() => { const n = nomad, l = game.scene.getScene('play').leyla, sp = l.sprite, f = () => +sp.frame.name; P.tp(20, 18); n.step(60);
   const x0 = Math.round(sp.x), y0 = Math.round(sp.y); n.step(1, [], ['pose']); n.step(150); const held = [l.state, f(), Math.round(sp.x) === x0 && Math.round(sp.y) === y0, n.state().drone?.mood ?? game.scene.getScene('play').drone?.mood];
   n.step(1, [], ['pose']); n.step(30); const back = f(); n.step(120); return { held, back, after: l.state }; });
