@@ -65,9 +65,14 @@ check('Discokugel passt nicht auf den Kopf', s.wear.head === 'gasmaske' && s.hel
 await ev(() => { const ui = game.scene.getScene('play').hud.inv; if (ui.held) ui.putBack(); });
 
 // implants: tab, scan, camp only
+const box = () => ev(() => { const r = q => { const b = document.querySelector(q).getBoundingClientRect(); return [Math.round(b.left), Math.round(b.top), Math.round(b.width), Math.round(b.height)].join(','); }; return { panel: r('.inv-panel.leyla'), fig: r('.inv-figure img') }; });
+const before = await box();
 await clickAt(await center('.inv-tab[data-tab="implants"]'));
+await page.waitForTimeout(450);
+const after = await box();
+check('Umschalten im selben Fenster: Panel und Leyla bleiben stehen', before.panel === after.panel && before.fig === after.fig, { before, after });
 s = await inv();
-const scan = await ev(() => ({ fig: !!document.querySelector('.inv-figure.scan'), slots: document.querySelectorAll('.inv-scan .inv-slot').length, wires: document.querySelectorAll('.inv-wire.on').length }));
+const scan = await ev(() => ({ fig: !!document.querySelector('.inv-figure.scan'), slots: document.querySelectorAll('.inv-doll.implants .inv-slot').length, wires: document.querySelectorAll('.inv-wire.on').length }));
 check('Tab Implantate: Leyla als Scan, 6 Plätze, Linie zum Cyberarm', s.view === 'implants' && scan.fig && scan.slots === 6 && scan.wires >= 2, scan);
 await clickAt(await thingAt('chest', 'nachtsicht_optik'));
 await clickAt(await slot('wear:eyes'));

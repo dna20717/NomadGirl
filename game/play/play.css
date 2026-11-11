@@ -128,7 +128,18 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .inv-figure::after { content: ''; position: absolute; left: 10%; right: 10%; bottom: -6px; height: 22px; border-radius: 50%; background: radial-gradient(closest-side, rgba(127, 246, 255, .25), transparent); }
 .inv-figure img { position: relative; z-index: 1; image-rendering: pixelated; }
 .inv-figure.none { width: 144px; height: 300px; place-items: center; color: #4a3f55; }
-.inv-figure.scan { position: absolute; }
+.inv-doll { position: relative; }
+.inv-doll .inv-wearcol, .inv-figure { z-index: 2; }
+.inv-wire, .inv-dot { animation: inv-fade .35s ease-out; }
+.inv-doll.swap .inv-wearcol .inv-slot { animation: inv-pop .3s ease-out both; }
+.inv-doll.swap .inv-wearcol .inv-slot:nth-child(2) { animation-delay: .04s; } .inv-doll.swap .inv-wearcol .inv-slot:nth-child(3) { animation-delay: .08s; }
+.inv-doll.swap .inv-figure img { animation: inv-unscan .4s ease-out; }
+.inv-doll.swap.implants .inv-figure img { animation: inv-toscan .4s ease-out; }
+@keyframes inv-pop { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: none; } }
+@keyframes inv-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes inv-toscan { from { filter: none; opacity: 1; } to { filter: grayscale(1) brightness(.75) sepia(1) hue-rotate(140deg) saturate(2.6); opacity: .9; } }
+@keyframes inv-unscan { from { filter: grayscale(1) brightness(.75) sepia(1) hue-rotate(140deg) saturate(2.6); opacity: .9; } to { filter: none; opacity: 1; } }
+.inv-doll.implants .inv-center .inv-note { width: 150px; margin: 0; padding: 9px 0; }
 .inv-figure.scan img { filter: grayscale(1) brightness(.75) sepia(1) hue-rotate(140deg) saturate(2.6); opacity: .9; }
 .inv-figure.scan::before { display: none; }
 .inv-figure.scan::after { inset: 0; height: auto; border-radius: 0; z-index: 2; -webkit-mask: var(--fig) center / 100% 100% no-repeat; mask: var(--fig) center / 100% 100% no-repeat; background: repeating-linear-gradient(0deg, rgba(127, 246, 255, .1) 0 1px, transparent 1px 4px); animation: inv-scan 3s linear infinite; }
@@ -302,3 +313,7 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .hud-padhelp dd { margin: 0; }
 .hud-padhelp dt .pad-ico { margin: -4px 0; }
 .hud-helpBox dl[hidden] { display: none; }
+/* both tabs keep the exact same size (Daniel, 11.11.2026) */
+.inv-panel.leyla { width: 440px; box-sizing: border-box; }
+.inv-center > :last-child { height: 40px; box-sizing: border-box; }
+.inv-doll.implants .inv-center .inv-note { display: grid; place-items: center; padding: 0; }

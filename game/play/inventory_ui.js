@@ -149,30 +149,40 @@ export class InventoryUI {
     const max = I.strainMax ?? 10;
     const stats = el('div', { class: 'inv-stats' }, stat('Leben', String(base + st.health), st.health ? 'up' : ''), stat('Abwehr', `${st.defense} %`), stat('Schaden', `${st.damage >= 0 ? '+' : ''}${st.damage} %`),
       stat('Tempo', `${100 + st.speed} %`, st.speed < 0 ? 'down' : st.speed > 0 ? 'up' : ''), stat('Belastung', `${st.strain} / ${max}`, st.strain > max * 0.8 ? 'warn' : 'cyan'));
-    let body;
-    if (!implants) {
-      const col = keys => el('div', { class: 'inv-wearcol' }, ...keys.map(x => this.slotEl(x)));
-      body = el('div', { class: 'inv-doll' }, col(['wear:head', 'wear:armor', 'melee']), el('div', { class: 'inv-center' }, fig(), this.useEl()), col(['cyberdeck', 'ranged', 'backpack']));
-    } else {
-      const rows = (I.implants?.length ? I.implants : IMPLANTS.map((slot, i) => ({ slot, name: WEAR_NAMES[slot], at: [48, 40 + i * 30], side: i < 3 ? 'left' : 'right' })));
-      const f = fig('scan'), S = 96, W = 520, fw = parseFloat(f.style.width) || 144, fh = parseFloat(f.style.height) || 384, H = Math.max(fh + 20, 3 * (S + 34));
-      const fx = (W - fw) / 2, fy = (H - fh) / 2;
-      f.style.left = `${fx}px`; f.style.top = `${fy}px`;
-      const box = el('div', { class: 'inv-scan', style: `width:${W}px;height:${H}px` }, f);
-      const side = { left: 0, right: 0 }, per = { left: rows.filter(r => r.side !== 'right').length, right: rows.filter(r => r.side === 'right').length };
-      for (const r of rows) {
-        const sd = r.side === 'right' ? 'right' : 'left', i = side[sd]++, gap = (H - per[sd] * (S + 24)) / Math.max(1, per[sd]);
-        const x = sd === 'left' ? 0 : W - S, y = gap / 2 + i * (S + 24 + gap), px = fx + (r.at?.[0] ?? 48) * k, py = fy + (r.at?.[1] ?? 60) * k, ly = y + 20 + S / 2;
-        const on = !!inv.wear?.[r.slot], cls = 'inv-wire' + (on ? ' on' : '');
-        const ex = sd === 'left' ? S : W - S;
-        box.append(el('i', { class: cls, style: `left:${Math.min(ex, px)}px;top:${ly}px;width:${Math.abs(px - ex)}px;height:0` }),
-          el('i', { class: cls, style: `left:${px}px;top:${Math.min(ly, py)}px;width:0;height:${Math.abs(py - ly)}px` }),
-          el('i', { class: 'inv-dot' + (on ? ' on' : ''), style: `left:${px - 5}px;top:${py - 5}px` }),
-          el('div', { class: 'inv-at', style: `left:${x}px;top:${y}px` }, this.slotEl('wear:' + r.slot, r.name)));
-      }
-      body = el('div', {}, box, el('p', { class: 'inv-note' }, this.host.inCamp?.() ? 'Im Camp ein- und ausbauen: Implantat auf einen Platz ziehen, anklicken nimmt es heraus.' : 'Implantate tauschst du nur im Camp.'));
+    // one layout for both tabs (Daniel, 11.11.2026: "der Switch soll im selben Fenster stattfinden"): Leyla stays put,
+    // only the six places left and right change, and she fades into the scan; the wires are drawn once the layout stands
+    const col = keys => el('div', { class: 'inv-wearcol' }, ...keys.map(([x, n]) => this.slotEl(x, n)));
+    let left, right;
+    if (!implants) { left = [['wear:head'], ['wear:armor'], ['melee']]; right = [['cyberdeck'], ['ranged'], ['backpack']]; }
+    else {
+      const rows = I.implants?.length ? I.implants : IMPLANTS.map((slot, i) => ({ slot, name: WEAR_NAMES[slot], at: [48, 40 + i * 30], side: i < 3 ? 'left' : 'right' }));
+      left = rows.filter(r => r.side !== 'right').map(r => ['wear:' + r.slot, r.name]);
+      right = rows.filter(r => r.side === 'right').map(r => ['wear:' + r.slot, r.name]);
+      requestAnimationFrame(() => this.wires(rows, k));
     }
+    const swap = this.lastView !== undefined && this.lastView !== (implants ? 'implants' : 'gear');
+    this.lastView = implants ? 'implants' : 'gear';
+    const figure = fig(implants ? 'scan' : '');
+    const body = el('div', { class: 'inv-doll' + (swap ? ' swap' : '') + (implants ? ' implants' : '') }, col(left),
+      el('div', { class: 'inv-center' }, figure, implants ? el('p', { class: 'inv-note' }, this.host.inCamp?.() ? 'Im Camp ein- und ausbauen' : 'Nur im Camp tauschbar') : this.useEl()), col(right));
+    this.dollEl = body; this.figEl = figure;
     return el('section', { class: 'inv-panel leyla' }, el('header', {}, icon('person', 16), el('b', {}, 'Leyla'), el('small', {}, `${this.host.save().deltas ?? 0} Δ`)), this.tabsEl(), body, stats);
+  }
+  // dashed lines from each implant place to its point on Leyla's body (measured after layout, the zoom taken out)
+  wires(rows, k) {
+    const doll = this.dollEl, f = this.figEl?.querySelector('img');
+    if (!doll?.isConnected || !f) return;
+    const z = this.zoom || 1, R = doll.getBoundingClientRect(), F = f.getBoundingClientRect(), add = [];
+    for (const r of rows) {
+      const s = doll.querySelector(`.inv-slot[data-slot="wear:${r.slot}"]`); if (!s) continue;
+      const S = s.getBoundingClientRect(), on = !!this.inv.wear?.[r.slot], c = 'inv-wire' + (on ? ' on' : '');
+      const px = (F.left - R.left) / z + (r.at?.[0] ?? 48) * k, py = (F.top - R.top) / z + (r.at?.[1] ?? 60) * k;
+      const ex = ((r.side === 'right' ? S.left : S.right) - R.left) / z, ly = (S.top + S.height / 2 - R.top) / z;
+      add.push(el('i', { class: c, style: `left:${Math.min(ex, px)}px;top:${ly}px;width:${Math.abs(px - ex)}px;height:0` }),
+        el('i', { class: c, style: `left:${px}px;top:${Math.min(ly, py)}px;width:0;height:${Math.abs(py - ly)}px` }),
+        el('i', { class: 'inv-dot' + (on ? ' on' : ''), style: `left:${px - 5}px;top:${py - 5}px` }));
+    }
+    doll.append(...add);
   }
   // Mama-Bot: her picture (hull, face of the moment, worn parts), four places for parts, the rescue pocket
   droneEl() {
