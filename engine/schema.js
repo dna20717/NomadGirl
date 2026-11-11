@@ -697,6 +697,11 @@ export const AREAS = {
         num('clutterChance', 'Clutter', { unit: '%', min: 0, max: 100, hint: 'Chance je Oberflächen-Kachel mit Wand links und rechts und freier Luft darüber' }),
         lines('clutter', 'Clutter', { hint: 'Namen aus dem Raster, eine pro Zeile; doppelt = häufiger' }),
         num('decalChance', 'Decals', { unit: '%', min: 0, max: 100, hint: 'Chance je Kachel' }), lines('decals', 'Decals', { hint: 'Namen aus dem Raster, eine pro Zeile' }),
+        num('detailChance', 'Einschlüsse', { unit: '%', min: 0, max: 100, hint: 'Chance je Füllungs-Kachel: Steine, Rohre, Flicken liegen flach auf der Wand und brechen die Wiederholung' }),
+        lines('details', 'Einschlüsse', { hint: 'Namen aus dem Raster, eine pro Zeile' }),
+        ref('propsBig', 'Großer Clutter · Raster', 'assets', { hint: 'Asset der Art „Symbole“ mit Feldern für Dinge über zwei Kacheln (z. B. 128 × 128)' }),
+        num('bigChance', 'Großer Clutter', { unit: '%', min: 0, max: 100, hint: 'Chance je Platz: zwei Oberflächen-Kacheln nebeneinander, darüber zwei Kacheln Luft' }),
+        lines('bigClutter', 'Großer Clutter', { hint: 'Namen aus dem Großer-Clutter-Raster, eine pro Zeile' }),
         num('seed', 'Zufall', { min: 0, hint: 'Andere Zahl = andere Verteilung (gleich bleibt gleich)' })] },
     ],
     check: (x, report, p) => {
@@ -706,7 +711,10 @@ export const AREAS = {
       if (x.props && !P) report('error', 'Clutter-Raster ist kein Asset der Art „Symbole“');
       if (!(x.top || []).length || !(x.fill || []).length) report('warning', 'Oberfläche oder Füllung fehlt');
       for (const k of ['top', 'fill', 'fill2']) for (const n of x[k] || []) if (T && !T.has(n)) report('error', `„${n}“ gibt es im Raster nicht`);
-      for (const k of ['clutter', 'decals']) for (const n of x[k] || []) if (P && !P.has(n)) report('error', `„${n}“ gibt es im Clutter-Raster nicht`);
+      for (const k of ['clutter', 'decals', 'details']) for (const n of x[k] || []) if (P && !P.has(n)) report('error', `„${n}“ gibt es im Clutter-Raster nicht`);
+      const B = names(x.propsBig);
+      if (x.propsBig && !B) report('error', 'Großer-Clutter-Raster ist kein Asset der Art „Symbole“');
+      for (const n of x.bigClutter || []) if (B && !B.has(n)) report('error', `„${n}“ gibt es im Großer-Clutter-Raster nicht`);
     },
   },
   rooms: {

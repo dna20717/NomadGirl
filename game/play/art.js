@@ -113,19 +113,22 @@ export function drawBackground(scene, roomW, roomH) {
 }
 
 // Kachel-Sets (data/terrain.json, TileSet00): resolve a set to frames of its icon sheets, once per id.
-// → kit { key, over (px the cells reach above the tile), top/fill/fill2 (frame indices), props, pcell, clutter, decals, def } or null
+// → kit { key, over (px the cells reach above the tile), top/fill/fill2 (frame indices), props, pcell, clutter, decals, details, big, def } or null
+//   big = { key, cell, list } large clutter (two tiles wide) from its own sheet
 export function terrainKits(scene, D) {
   const A = D.assets || {}, cache = new Map();
   return id => {
     if (!id) return null;
     if (cache.has(id)) return cache.get(id);
-    const t = D.terrain?.[id], a = A[t?.look], p = A[t?.props];
+    const t = D.terrain?.[id], a = A[t?.look], p = A[t?.props], b = A[t?.propsBig];
     let kit = null;
     if (t && a?.kind === 'icons' && a.cell && scene.textures.exists(t.look)) {
       const list = (k, asset) => (t[k] || []).map(n => (asset.names || []).indexOf(n)).filter(i => i >= 0);
       const props = p?.kind === 'icons' && p.cell && scene.textures.exists(t.props);
       kit = { id, def: t, key: t.look, over: Math.max(0, a.cell[1] - a.cell[0]), top: list('top', a), fill: list('fill', a), fill2: list('fill2', a),
-        props: props ? t.props : null, pcell: props ? p.cell : null, clutter: props ? list('clutter', p) : [], decals: props ? list('decals', p) : [] };
+        props: props ? t.props : null, pcell: props ? p.cell : null, clutter: props ? list('clutter', p) : [], decals: props ? list('decals', p) : [], details: props ? list('details', p) : [] };
+      const big = b?.kind === 'icons' && b.cell && scene.textures.exists(t.propsBig) ? list('bigClutter', b) : [];
+      kit.big = big.length ? { key: t.propsBig, cell: b.cell, list: big } : null;
       if (!kit.top.length || !kit.fill.length) kit = null;
     }
     cache.set(id, kit);
@@ -142,7 +145,7 @@ const hexInt = (c, d) => c ? parseInt(String(c).slice(1), 16) : d;
 // style (camp): { ground, top, hide(x, y) } = earth instead of concrete, side walls invisible
 export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = null) {
   const g = scene.make.graphics({}, false), solid = (x, y) => x < 0 || y < 0 || x >= room.w || y >= room.h || WALLS.has(room.tiles[y][x]), stamps = [];
-  const edges = scene.make.graphics({}, false), decals = [], clutter = [], back = [], backShade = scene.make.graphics({}, false);
+  const edges = scene.make.graphics({}, false), decals = [], clutter = [], details = [], back = [], backShade = scene.make.graphics({}, false), taken = new Set();
   const r = rng(99);
   for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
     const t0 = room.tiles[y][x], t = WALLS.has(t0) ? '#' : t0, px = x * T, py = y * T;
@@ -158,11 +161,21 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
     if (kit) {
       const top = !solid(x, y - 1), D = kit.def, seed = D.seed || 0, list = top ? kit.top : y % 2 && kit.fill2.length ? kit.fill2 : kit.fill;
       stamps.push({ key: kit.key, frame: list[x % list.length], x: px, y: py - kit.over });
+      // embedded details (stones, pipes, patches) break up the repeating fill
+      if (!top && kit.details.length && hash(x, y, seed + 5) * 100 < (D.detailChance ?? 0))
+        details.push({ key: kit.props, frame: kit.details[Math.floor(hash(x, y, seed + 6) * kit.details.length)], x: px + (T - kit.pcell[0]) / 2, y: py + (T - kit.pcell[1]) / 2 });
       const faces = !solid(x - 1, y) || !solid(x + 1, y) || !solid(x, y - 1) || !solid(x, y + 1) || !solid(x - 1, y - 1) || !solid(x + 1, y - 1) || !solid(x - 1, y + 1) || !solid(x + 1, y + 1);
       if (faces && kit.decals.length && hash(x, y, seed + 1) * 100 < (D.decalChance ?? 0))   // decals only where the wall meets the air
         decals.push({ key: kit.props, frame: kit.decals[Math.floor(hash(x, y, seed + 2) * kit.decals.length)], x: px + (T - kit.pcell[0]) / 2, y: py + (T - kit.pcell[1]) / 2 });
       const air = room.tiles[y - 1]?.[x] === '.';
-      if (top && air && kit.clutter.length && solid(x - 1, y) && solid(x + 1, y) && hash(x, y, seed + 3) * 100 < (D.clutterChance ?? 0))
+      // large clutter: two surface tiles with air two tiles high above both, walls on the outside
+      const free = (xx) => solid(xx, y) && !solid(xx, y - 1) && room.tiles[y - 1]?.[xx] === '.' && room.tiles[y - 2]?.[xx] === '.';
+      if (top && kit.big && !taken.has(x) && free(x) && free(x + 1) && solid(x - 1, y) && solid(x + 2, y) && terrain?.at(x + 1, y) === kit && hash(x, y, seed + 7) * 100 < (D.bigChance ?? 0)) {
+        const B = kit.big;
+        clutter.push({ key: B.key, frame: B.list[Math.floor(hash(x, y, seed + 8) * B.list.length)], x: px + T - B.cell[0] / 2, y: py - B.cell[1] + 4 });
+        taken.add(x); taken.add(x + 1);
+      }
+      if (top && air && !taken.has(x) && kit.clutter.length && solid(x - 1, y) && solid(x + 1, y) && hash(x, y, seed + 3) * 100 < (D.clutterChance ?? 0))
         clutter.push({ key: kit.props, frame: kit.clutter[Math.floor(hash(x, y, seed + 4) * kit.clutter.length)], x: px + (T - kit.pcell[0]) / 2, y: py - kit.pcell[1] + 4 });
       // edges from code: shade inside, then the outline (left, right, bottom; the top tile brings its own)
       const E = D.edge || {}, ow = E.width ?? 2, sw = E.shadeWidth ?? 3, sa = (E.shade ?? 40) / 100, oc = hexInt(E.color, 0x060608);
@@ -205,5 +218,5 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
   }
   if (back.length) bake(scene, scene.make.graphics({}, false), 0, 0, room.w * T, room.h * T, { depth: -11, stamps: back, over: backShade });
   else backShade.destroy();
-  bake(scene, g, 0, 0, room.w * T, room.h * T, { depth: -10, stamps: [...stamps, ...decals, ...clutter], over: edges });
+  bake(scene, g, 0, 0, room.w * T, room.h * T, { depth: -10, stamps: [...stamps, ...details, ...decals, ...clutter], over: edges });
 }

@@ -119,6 +119,7 @@ Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich 
 | `assets/tiles/tileset00/source/*.png` | TileSet00 · Quellen: Texturen 256 × 256 je Thema (desert, floor, wall, metal, ruins; Oberfläche oben, links/rechts nahtlos), Clutter-Blätter (desert, station, industry, ruins, *2 = 16 verschiedene Dinge je Blatt), Decals (`tileset00_source`) | KI (PixelLab, Create Image Pro, AAP-64, Favorit als Vorlage) | 11.11.2026 |
 | `assets/tiles/tileset00/terrain.png` | TileSet00 · Gelände: Felder 64 × 80 (16 px Platz für Kruste darüber), je Thema Oberfläche 0–3, Füllung a/b 0–3 (`tileset00`) | aus den Quellen geschnitten (Code, `tools/tileset00.py`) | 11.11.2026 |
 | `assets/tiles/tileset00/props.png` | TileSet00 · Clutter & Decals: Felder 64 × 64, Clutter auf den Boden ausgerichtet (`tileset00_props`) | aus den Quellen geschnitten (Code, `tools/tileset00.py`) | 11.11.2026 |
+| `assets/tiles/tileset00/props_big.png` | TileSet00 · Großer Clutter: Felder 128 × 128, streng orthogonal (`tileset00_props_big`) | aus `source/big_*.png` (KI, PixelLab, AAP-64) geschnitten (Code) | 11.11.2026 |
 
 ## Ordner
 
