@@ -28,7 +28,7 @@ export class Backdrop {
       this.pic = scene.add.image(0, 0, bd.image).setOrigin(0.5, 1).setScale(this.k).setScrollFactor(0).setDepth(-98);
       // below the picture: ground colour (the bottom row of the picture, or „Boden“)
       const src = img.getSourceImage(), c = document.createElement('canvas'); c.width = 1; c.height = 1;
-      const cx = c.getContext('2d'); cx.drawImage(src, Math.floor(iw / 2), ih - 1, 1, 1, 0, 0, 1, 1);
+      const cx = c.getContext('2d', { willReadFrequently: true }); cx.drawImage(src, Math.floor(iw / 2), ih - 1, 1, 1, 0, 0, 1, 1);
       const [r, g, b] = cx.getImageData(0, 0, 1, 1).data;
       const ground = bd.ground ? parseInt(bd.ground.slice(1), 16) : (r << 16 | g << 8 | b);
       this.under = scene.add.rectangle(0, 0, W, H, ground).setOrigin(0).setScrollFactor(0).setDepth(-98.5);

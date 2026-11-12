@@ -622,7 +622,7 @@ export class PlayScene extends Phaser.Scene {
       this.hud.banner('Niemand holt dich mehr …', 'Alles wird schwarz.'); this.cam.shake(300, 0.01); this.cam.fadeOut(1800, 0, 0, 0);
       this.time.delayedCall(1900, () => this.endRun(true)); return;
     }
-    const r = rescue(D, save, this.tankMods?.());
+    const r = rescue(D, save);   // the tech tree's bonuses come in by themselves (tank.js › tankMods)
     let lostBefore = false;
     if (this.lostPack) { this.loot.forget(this.lostPack); this.lostPack = null; lostBefore = true; }
     const bag = save.inv.grids.backpack;

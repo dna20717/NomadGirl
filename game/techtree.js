@@ -54,5 +54,3 @@ export function tankMods(D, save) {
   return { decay: f(b.tankDecay), rescue: f(b.tankRescue), accel: f(b.tankAccel) };
 }
 
-// recipes a node unlocks are learnt again after a new Durchgang (the recipe book starts small)
-export function relearn(D, save) { for (const id of save.nodes || []) for (const r of D.techtree?.[id]?.recipes || []) learn(save, r); }

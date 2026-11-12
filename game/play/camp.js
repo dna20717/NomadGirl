@@ -1034,7 +1034,7 @@ export class Camp {
 
 const VERB = { sleep: 'Schlafen', warroom: 'Planen', kitchen: 'Kochen', foodtruck: 'Verkaufen', craft: 'Herstellen', storage: 'Lager', cooling: 'Kühlraum', chill: 'Chillen', drone: 'Drohne', engine: 'Motor', power: 'Energie', cell: 'Zelle', guests: 'Gäste', treasury: 'Schatzkammer', tank: 'Nach AvA sehen' };
 const SOON = { foodtruck: 'Verkaufen kommt später.', power: 'Liefert Energie für die Werkstätten im Rig.',
-  storage: 'Das Lager füllt sich mit Schritt 2 (Beute & Rucksack).', cooling: 'Das Lager füllt sich mit Schritt 2 (Beute & Rucksack).', chill: 'Chillen gibt bald einen Buff.' };
+  storage: 'Ein Lager fürs Camp: Kochen, Herstellen und Zerlegen nehmen sich, was hier liegt.', cooling: 'Hält Essen frisch. Kochen nimmt sich, was hier liegt.' };
 
 // distance, hours, fuel and food for driving from the current place to a location
 export function travelCost(D, save, to) {

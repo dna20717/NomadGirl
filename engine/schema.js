@@ -811,7 +811,7 @@ export const AREAS = {
         num('clock.fireHours', 'Am Feuer sitzen', { unit: 'h', min: 0, step: 0.25 })] },
       { title: 'Tag & Nacht', fields: [table('daytime', 'Tageszeiten', [num('from', 'Ab Uhr'), ref('weather', 'Wetter', 'weather'), num('shade', 'Abdunkeln %', { min: 0, max: 90 }), num('light', 'Licht %', { min: 0, max: 100 }), text('name', 'Name')],
         { hint: 'Ab dieser Uhrzeit gilt die Zeile (bis zur nächsten). Abdunkeln legt die Nacht über die Welt; Licht = wie stark Lagerfeuer und Fenster scheinen (tagsüber 0)' })] },
-      { title: 'Heilen', fields: [num('heal.sleep', 'Schlafen', { unit: '%', min: 0, max: 100 }), num('heal.fire', 'Am Feuer', { unit: '%', min: 0, max: 100 }), num('heal.afterKo', 'Nach k.o.', { unit: '%', min: 1, max: 100, hint: 'Mit so viel Leben bringt AvA Leyla zurück' })] },
+      { title: 'Heilen', fields: [num('heal.sleep', 'Schlafen', { unit: '%', min: 0, max: 100 }), num('heal.fire', 'Am Feuer', { unit: '%', min: 0, max: 100 }), num('heal.afterKo', 'Nach k.o.', { unit: '%', min: 1, max: 100, hint: 'Mit so viel Leben bringt AvA Leyla zurück' }), select('koReturn', 'k.o. im Run', [['', 'AvA bringt Leyla an den Run-Start (Tank zahlt)'], ['camp', 'Zurück ins Camp (wie früher)']], { hint: 'Ohne Cryo-Tank immer zurück ins Camp' })] },
       { title: 'Bedienen', fields: [num('interactRange', 'E-Reichweite', { unit: 'px', min: 20 }), ref('fallbackRoom', 'Ersatzraum', 'rooms', { hint: 'Für POIs, deren Raum-Bausteine noch kein Layout haben' })] },
     ],
     check: (x, report, p) => {
@@ -839,6 +839,8 @@ export const AREAS = {
       { title: 'Anzeige', fields: [point('screen.text', 'Text-Anzeige Mitte', { unit: 'Bildpixel' }), size('screen.textSize', 'Text-Anzeige Größe', { unit: 'Bildpixel' }), color('screen.color', 'Textfarbe'),
         point('screen.face', 'Gesicht Mitte', { unit: 'Bildpixel' }), num('screen.faceScale', 'Gesicht Maßstab', { unit: '%', min: 10 }),
         area_('screen.lines', 'Zeilen im Wechsel', { hint: 'Eine Zeile je Absatz; {zustand}, {phase}, {tage}, {stunden} werden ersetzt' })] },
+      { title: 'Traum (neuer Durchgang)', fields: [lines('dream.lines', 'Zeilen', { hint: 'Ist AvA tot, beginnt ein neuer Durchgang: diese Zeilen erscheinen nacheinander auf Schwarz, die letzte groß. Leer = Standard' }),
+        num('dream.seconds', 'Dauer', { unit: 's', min: 2 })] },
       { title: 'Leben im Tank', fields: [point('glass.at', 'Glas oben links', { unit: 'Bildpixel' }), size('glass.size', 'Glas Größe', { unit: 'Bildpixel' }), num('bubbles', 'Bläschen', { unit: 'je Sekunde', min: 0 }), color('glow', 'Leuchten'),
         num('heartEvery', 'Herz ans Glas malen alle', { unit: 's', min: 0, hint: 'Ab Phase 2 (beschlagen) malt ein Finger von innen ein Herz in die beschlagene Scheibe' }), num('handEvery', 'Hand am Glas alle', { unit: 's', min: 0, hint: 'Bild je Phase unter Phasen › Hand' }),
         num('love', 'AvA verliebt bis', { unit: 'px', min: 0, hint: 'So nah am Tank zeigt die Drohne ihr liebevolles Gesicht' })] },

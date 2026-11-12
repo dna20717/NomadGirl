@@ -90,7 +90,7 @@ Nach einem abgeschlossenen POI gibt jede Kategorie eigene Punkte, die Summe ergi
 
 Das Basisgeld aus dem Run ist immer sicher. Der Rang gibt einen Deltas-Bonus obendrauf (F = kein Bonus, S = größter Bonus). Wer stirbt, schließt den POI nicht ab und bekommt kein Ranking.
 
-## Progression, Techtree & die Suche (Design-Session Daniel, 12.11.2026, noch nicht gebaut)
+## Progression, Techtree & die Suche (Design-Session Daniel, 12.11.2026, gebaut 12.11.2026 abends)
 
 Grundsatz: Die Ziele kommen aus der Mechanik, eine Herleitung aus der Story braucht es nicht. **Das Camp ist der Spielstand, die Runs sind die Mechanik.**
 
@@ -277,7 +277,7 @@ Weird Cyberpunk mit Augenzwinkern: humorvoll, aber niemals albern. In und um das
 - [x] Ein Testraum mit zwei Gegnertypen: Plünderer-Schläger (stürmt, holt aus) und Plünderer-Schütze (hält Abstand, zielt sichtbar)
 - [x] Alle Werte kommen aus der Werkstatt (Leyla, Waffen, Gegner, Raum-Bausteine, Kacheln); gespeicherte Werkstatt-Stände gelten beim nächsten Laden des Spiels
 - [ ] Feinschliff nach dem ersten Anspielen (Daniel)
-- [ ] Weitere Leyla-Animationen (Gehen, Rennen, Springen, Dash …) einklinken
+- [x] Weitere Leyla-Animationen (Gehen, Rennen, Springen, Dash …) einklinken
 
 **Steuerung (Tastatur):** A/D bzw. ←/→ laufen (Shift: gehen), Leertaste springen, L/C Dash, S/↓ beim Rennen Slide, S + Leertaste durch Plattform fallen, W/↑ klettern bzw. Seil greifen (auch E), J/Y Nahkampf, K/X Fernkampf, R Neustart, H Hilfe, G Hitboxen.
 
@@ -318,4 +318,4 @@ Companion-Quests und Storylines, Hacking, Automatisierung, mehr Container und Zu
 - [ ] Was macht die Zelle im Rig?
 - [ ] Was ist das „vielleicht noch Gefährlichere“ in den Wastelands?
 - [x] Gibt es eine übergeordnete Story oder ein Endziel? Ja: die Suche nach dem Heilmittel für AvA (12.11.2026, siehe „Progression, Techtree & die Suche“).
-- [ ] Techtree: erster Ast, Knoten-Kosten, Heilmittel als letzter Knoten? Wie verfällt der Tank genau, welche Ersatzteile? Was ist „Dunkelheit“ im Spiel (Licht-System?)
+- [ ] Techtree: erster Ast und Knoten-Kosten stehen (Tank-Ast, Platzhalter-Werte, 12.11.2026), offen: Heilmittel als letzter Knoten? Wie verfällt der Tank genau, welche Ersatzteile? Was ist „Dunkelheit“ im Spiel (Licht-System?)
