@@ -93,6 +93,16 @@ v = await page.evaluate(() => {
   return { ...P.L(), crouch, hang, after };
 });
 check('Kante: Ducken, runter hängen, hochziehen', v.crouch === 'crouch' && v.hang === 'hang' && v.after === 'crouch' && v.st === 'normal' && v.feet === feet(0) && v.x < 30 * 64, v);
+// Daniel, 12.11.2026: hanging, ↓ once = dangle from one arm, ↓ again = let go
+v = await page.evaluate(() => {
+  const n = nomad, l = game.scene.getScene('play').leyla; P.tp(29.3, 18); n.step(10);
+  n.step(25, ['down']); n.step(3, ['down', 'right']); n.step(5); const two = { st: l.state, one: l.oneArm, look: l.sprite.texture.key };
+  n.step(1, [], ['down']); n.step(3); const one = { st: l.state, one: l.oneArm, look: l.sprite.texture.key };
+  n.step(1, [], ['down']); n.step(3); const off = l.state;
+  n.until(x => x.leyla.ground, 120); n.step(10);
+  return { two, one, off };
+});
+check('Kante: ↓ = einarmig baumeln, nochmal ↓ = loslassen', v.two.st === 'hang' && !v.two.one && /hang_side/.test(v.two.look) && v.one.st === 'hang' && v.one.one && /hang_one_arm/.test(v.one.look) && v.off === 'normal', v);
 v = await page.evaluate(() => {
   const n = nomad; P.tp(31.5, 21); n.step(15);
   n.step(1, ['left', 'jump'], ['jump']); n.step(6, ['left', 'jump']); n.until(x => x.leyla.state === 'hang' || x.leyla.ground, 60, ['left']);   // short hop: the hands just reach the edge
@@ -130,7 +140,7 @@ v = await page.evaluate(() => {
   out.snap = { riding: d.riding, up: Math.round(g0 - l.feet) };
   d.parkAt = null; d.parkUntil = 0; n.step(30, ['left']); n.step(400); P.tp(12, 18); n.step(10); d.battery = 1; d.emptyUntil = 0;
   park(l.x + 40, g0 - 330); n.step(3);
-  n.step(1, ['jump'], ['jump']); n.until(() => l.state === 'hang', 60, ['jump']); out.hang = { st: l.state, point: !!l.ledge?.point };
+  n.step(1, ['jump'], ['jump']); n.until(() => l.state === 'hang', 60, ['jump']); out.hang = { st: l.state, point: !!l.ledge?.point }; n.step(2); out.hang.one = l.oneArm; out.hang.look = l.sprite.texture.key;
   n.step(1, [], ['up']); n.step(60); out.up = { riding: d.riding, up: Math.round(g0 - l.feet) };
   const base = d.batteryBonus(); s.box && 0; out.bonus = base;
   d.parkAt = null; d.parkUntil = 0; n.step(30, ['left']); n.step(300);
@@ -138,6 +148,7 @@ v = await page.evaluate(() => {
 });
 check('AvA: Füße in ihrer oberen Hälfte = sie steht gleich drauf', v.snap.riding && v.snap.up > 120, v.snap);
 check('AvA: Leyla greift den Greifarm hinten von selbst und zieht sich hoch', v.hang.st === 'hang' && v.hang.point && v.up.riding && v.up.up > 250, v);
+check('AvA: an ihr hängt Leyla einarmig', v.hang.one && /hang_one_arm/.test(v.hang.look), v.hang);
 // forgiving grab (Daniel, 12.11.2026: „zu fummelig“): flying towards the edge without holding a direction still catches it; ↓ held never does
 v = await page.evaluate(() => {
   const n = nomad, l = game.scene.getScene('play').leyla, run = keys => { P.tp(30.75, 21); n.step(15); n.step(1, ['left']); n.step(12);

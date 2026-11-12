@@ -16,7 +16,7 @@ await furnishedStart(page);   // workshops in the rig at the start (tools/test_f
 await page.goto(url);
 await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.camp, null, { timeout: 20000 });
 const ev = (f, a) => page.evaluate(f, a);
-const check = (name, cond, info) => (cond ? ok : errors).push(cond ? name : `${name}: ${JSON.stringify(info)}`);
+const check = (name, cond, info) => { (cond ? ok : errors).push(cond ? name : `${name}: ${JSON.stringify(info)}`); if (!cond && process.env.DBG) console.log("FAIL", name, JSON.stringify(info).slice(0, 800)); };
 const shot = async n => { if (!shots) return; fs.mkdirSync('output', { recursive: true }); await page.screenshot({ path: `output/inv_${n}.png` }); };
 const inv = () => ev(() => nomad.inv());
 // cell centre of a grid (0 = backpack, 1 = the other panel) in page pixels
@@ -28,7 +28,9 @@ const has = (g, id) => g.items.some(i => i.startsWith(id + '×'));
 // the start ingredients for cooking and crafting (Spiel › Start-Inventar) are not part of this test: the shelf as it was before
 await ev(() => { const g = nomad.save().inv.grids; for (const k of Object.keys(g)) if (k.startsWith('store:')) g[k].items = g[k].items.filter(e => !['stoffreste', 'schrott', 'reis', 'gewuerzmischung', 'mutantenfleisch', 'batteriezelle', 'alte_platine', 'leuchteier', 'mutantengemuese', 'sojasauce', 'speiseoel', 'schrauben'].includes(e.id)); });
 // handed out once to every savegame (Spiel › Start › Nachreichen, the revolver test): not part of this test
-await ev(() => { for (const g of Object.values(nomad.save().inv.grids)) g.items = g.items.filter(e => e.id !== 'trommelrevolver'); });
+// (the revolver and the assault rifle; the rifle pushed the copper cables into the chest, they go back)
+await ev(() => { const G = nomad.save().inv.grids; for (const g of Object.values(G)) g.items = g.items.filter(e => !['trommelrevolver', 'sturmgewehr'].includes(e.id));
+  const k = G.chest.items.find(e => e.id === 'kupferkabel'); if (k) { G.chest.items.splice(G.chest.items.indexOf(k), 1); G.backpack.items.push({ ...k, x: 1, y: 0, r: 0 }); } });
 await ev(() => { nomad.take(); nomad.step(5); const h = nomad.state().camp.hotspots.find(h => h.name === 'Kiste'); nomad.walkTo(h.x); nomad.step(1, [], ['grab']); nomad.step(5); });
 let s = await inv();
 check('E an der Kiste öffnet Rucksack + Kiste', s.open && s.other?.key === 'chest' && has(s.other.grid, 'discokugel') && has(s.backpack, 'verband'), s);
@@ -132,7 +134,7 @@ let [hx, hy] = await cell(0, 0, 0); await page.mouse.move(hx, hy); await page.wa
 const tipActs = await ev(() => [...document.querySelectorAll('.inv-tip .inv-acts li')].map(li => li.textContent));
 check('Tooltip zeigt die Aktionen (Heilen, Drohne geben, Wegwerfen)', tipActs.some(t => /Heilen/.test(t)) && tipActs.some(t => /Drohne geben/.test(t)) && tipActs.some(t => /Wegwerfen/.test(t)), tipActs);
 await page.mouse.click(hx, hy, { button: 'right' }); await page.waitForTimeout(40);
-const menu = await ev(() => [...document.querySelectorAll('.inv-tip .inv-menu button')].map(b => b.textContent));
+const menu = await ev(() => [...document.querySelectorAll('.inv-tip .inv-menu button')].map(b => b.textContent)); 
 await page.locator('.inv-tip .inv-menu button', { hasText: 'Heilen' }).click(); await page.waitForTimeout(40);
 s = await ev(() => ({ inv: nomad.inv(), health: game.scene.getScene('play').leyla.health }));
 check('Rechtsklick-Menü: Heilen heilt und verbraucht einen Verband', menu.includes('Heilen') && s.health > 40 && has(s.inv.backpack, 'verband') && s.inv.backpack.items.some(i => i.startsWith('verband×1')), { menu, s });

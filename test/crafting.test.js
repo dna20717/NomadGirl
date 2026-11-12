@@ -99,6 +99,7 @@ test('Kein Platz: Rest kommt zurück (liegt dann am Boden)', () => {
 test('Rezept mit Rig-Teil: Ergebnis landet auf dem Schrottplatz', () => {
   const s = fresh();
   for (const g of Object.values(s.inv.grids)) g.items = g.items.filter(e => e.id !== 'schrottplatte');
+  s.inv.grids.backpack.items = [];   // the handed-out rifle fills the small start backpack
   add(D, s.inv.grids.backpack, 'items', 'schrottplatte', 3);
   const r = craft(D, s, 'bleche_schweissen', 'werkbank');
   assert.equal(r.ok, true);

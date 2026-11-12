@@ -117,9 +117,23 @@ function withInventory(D, save) {
   save.handedOut ??= [];
   for (const row of D.game?.start?.later || []) {
     const [a, id] = row.item ? ['items', row.item] : row.weapon ? ['weapons', row.weapon] : row.backpack ? ['backpacks', row.backpack] : [];
-    if (!a || !D[a]?.[id] || save.handedOut.includes(`${a}:${id}`)) continue;
+    const key = `${a}:${id}${row.force ? '!' : ''}`;
+    if (!a || !D[a]?.[id] || save.handedOut.includes(key)) continue;
     const g = inv.grids[row.where === 'chest' ? 'chest' : 'backpack'] || inv.grids.chest;
-    if (g && add(D, g, a, id, row.count || 1) === 0) save.handedOut.push(`${a}:${id}`);
+    if (!g) continue;
+    // „Platz machen“ (Daniel, 12.11.2026: „lösch einfach andere Items, bis es passt“): whoever already owns it keeps theirs,
+    // otherwise the newest things in that grid move to the camp chest (or are gone when it is full) until it fits
+    if (row.force) {
+      const owned = Object.values(inv.grids).some(x => x?.items?.some(e => e.a === a && e.id === id)) || Object.values(inv.slots || {}).includes(id);
+      if (!owned) while (add(D, g, a, id, row.count || 1) !== 0 && g.items.some(e => !(e.a === a && e.id === id))) {
+        const i = g.items.map((e, k) => [e, k]).filter(([e]) => !(e.a === a && e.id === id)).pop()[1];
+        const [out] = g.items.splice(i, 1), chest = inv.grids.chest;
+        if (chest && chest !== g) add(D, chest, out.a, out.id, out.n);   // into the camp chest while there is room, otherwise gone
+      }
+      save.handedOut.push(key);
+      continue;
+    }
+    if (add(D, g, a, id, row.count || 1) === 0) save.handedOut.push(key);
   }
   return save;
 }

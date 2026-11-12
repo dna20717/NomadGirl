@@ -61,3 +61,19 @@ test('Alter Spielstand: Werkstatt auf einem Platz, den es nicht mehr gibt, kommt
   assert.deepEqual(r2.rig.units[2].workshops, [{ id: 'lagerregal', at: 0 }]);
   assert.equal(r2.inv.grids['store:2:0'].items.length, n);
 });
+
+test('Nachreichen mit „Platz machen“ (Daniel, 12.11.2026): das Sturmgewehr kommt in jeden Rucksack, notfalls fliegen andere Dinge raus', () => {
+  const s = newSave(D), bp = s.inv.grids.backpack;
+  s.handedOut = [];
+  bp.items = []; for (let y = 0; y < bp.h; y++) for (let x = 0; x < bp.w; x++) bp.items.push({ a: 'items', id: 'stoffreste', n: 1, x, y, r: 0 });
+  const full = bp.items.length;
+  repairSave(s, D);
+  assert.ok(bp.items.some(e => e.id === 'sturmgewehr'), 'Gewehr im Rucksack');
+  assert.ok(bp.items.length < full, 'andere Dinge sind raus');
+  const n = bp.items.length;
+  repairSave(s, D);
+  assert.equal(bp.items.length, n, 'nur einmal');
+  const t = newSave(D); t.handedOut = []; t.inv.grids.backpack.items = []; t.inv.slots.ranged = 'sturmgewehr';
+  repairSave(t, D);
+  assert.ok(!t.inv.grids.backpack.items.some(e => e.id === 'sturmgewehr'), 'wer es schon trägt, bekommt kein zweites');
+});

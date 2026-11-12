@@ -2898,7 +2898,7 @@
   "frames": 8,
   "fps": 8,
   "loop": true,
-  "origin": [40, 254],
+  "origin": [39.5, 248],
   "height": 202.8,
   "source": "KI (PixelLab) + Code (tools/rifle_strips.py)",
   "date": "12.11.2026",

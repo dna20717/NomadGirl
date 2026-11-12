@@ -20,7 +20,11 @@
   "swingRope": 320,
   "swingBoost": 20,
   "ledgeGrab": true,
-  "ledgeReach": 56, "ledgeUp": 40, "ledgeSide": 24, "ledgeRising": 450, "ledgeAuto": true,
+  "ledgeReach": 56,
+  "ledgeUp": 40,
+  "ledgeSide": 24,
+  "ledgeRising": 450,
+  "ledgeAuto": true,
   "mantleTime": 450,
   "mantleFromFrame": 5,
   "standUpTime": 350,
@@ -41,7 +45,9 @@
   "landCancel": 55,
   "vault": true,
   "vaultFrom": 110,
-  "vaultTime": 300
+  "vaultTime": 300,
+  "oneArmTap": true,
+  "droneOneArm": true
  },
  "loadout": {"melee": "karambit", "ranged": "nagelpistole", "backpack": "schulranzen", "wear": ["cyberarm_mk1", "suchscheinwerfer", "greifarm"]},
  "look": {
@@ -80,7 +86,8 @@
   "runReady": "leyla_run_ready_side",
   "runDraw": "leyla_run_draw_side",
   "runReload": "leyla_run_reload_side",
-  "runReload2": "leyla_run_reload2_side"
+  "runReload2": "leyla_run_reload2_side",
+  "hangOne": "leyla_hang_one_arm_side"
  },
  "idleAltChance": 50,
  "inventory": {

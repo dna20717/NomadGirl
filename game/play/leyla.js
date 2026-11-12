@@ -363,6 +363,7 @@ export class Leyla {
   startHang(L) {
     const { x, feet } = this.hangBox(L), b = this.body;
     this.state = 'hang'; this.ledge = L; this.facing = L.dir;
+    this.oneArm = !!L.drone && this.m.droneOneArm !== false && !!this.d.look?.hangOne;   // at AvA: dangling from one arm (Daniel, 12.11.2026)
     this.setStanding(); b.allowGravity = false;
     b.reset(x, feet - this.size.h / 2); b.setVelocity(0, 0);
     this.airJumps = this.m.airJumps ?? 0; this.airDash = true; this.cut = false; this.flipUntil = 0;
@@ -382,9 +383,13 @@ export class Leyla {
       const z = this.size, dr = this.scene.drone, top = L.point && dr ? { x: dr.x, feet: dr.platformTop() } : { x: L.x + L.dir * (z.w / 2 + 4), feet: L.y };
       if (this.scene.rectFree(top.x - z.w / 2 + 2, top.feet - z.crouchH, z.w - 4, z.crouchH - 2)) return this.startMantle(time, top);
     }
-    if (input.down.pressed) this.leaveHang(time);
+    // ↓ once = dangle from one arm, ↓ again = let go (Daniel, 12.11.2026)
+    if (input.down.pressed) {
+      if (!this.oneArm && this.m.oneArmTap !== false && this.d.look?.hangOne) this.oneArm = true;
+      else this.leaveHang(time);
+    }
   }
-  leaveHang(time) { this.state = 'normal'; this.body.allowGravity = true; this.ledge = null; this.noGrabUntil = time + 300; }
+  leaveHang(time) { this.oneArm = false; this.state = 'normal'; this.body.allowGravity = true; this.ledge = null; this.noGrabUntil = time + 300; }
   startMantle(time, top, q0 = 0, dur = null) {
     this.state = 'mantle'; this.mantleAt = time; this.mantleQ0 = q0; this.mantleDur = dur ?? (this.m.mantleTime ?? 450);
     this.mantleFrom = { x: this.x, feet: this.feet }; this.mantleTo = top;
@@ -546,6 +551,7 @@ export class Leyla {
       if (!this.special && time - this.stillSince > this.idleWait) this.special = this.pickIdle();
       if (this.special) name = '@' + this.special;
     } else { this.stillSince = time; this.special = null; this.idleWait = this.rollIdleWait(); }
+    if (st === 'hang' && this.oneArm) name = 'hangOne';
     if (st === 'sit') name = '@' + this.sit.look;
     if (st === 'pose') name = '@' + this.d.look.yoga;
     // standing at a workshop in the rig: seen from behind, busy with her hands

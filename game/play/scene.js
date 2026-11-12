@@ -25,7 +25,7 @@ import { CraftUI } from './craft_ui.js';
 import { BuildMode } from './build_mode.js';
 import { use as useThing } from '../crafting.js';
 
-const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
+const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'], hangOne: ['hang'] };
 
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
