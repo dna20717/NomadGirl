@@ -94,7 +94,8 @@ await shot('branch');
 // goal: E cracks the safe, time stops, ranking
 s = await ev(() => { const z = nomad.state().level.goals[0]; nomad.tp(z.x - 90, z.feet); nomad.step(5); const p = nomad.state().prompt; nomad.step(1, [], ['grab']); nomad.step(3); return { p, menu: nomad.menu(), lv: nomad.state().level }; });
 check('Ziel: E-Hinweis', s.p === 'Tresor knacken · POI abschließen', s.p);
-check('Ziel: Ranking mit Rang, Zeit, Kills, Secrets', /^Rang [FDCBAS]$/.test(s.menu?.title) && s.menu.items.length === 4 && /Secrets 2\//.test(s.menu.items[2].label) && s.lv.done?.grade, s.menu);
+check('Tresor ist voll: mindestens 6 Dinge liegen davor', s.lv.done?.haul?.length >= 3 && /^Tresor: (\d+) Dinge/.test(s.menu.items[3].label) && Number(s.menu.items[3].label.match(/\d+/)[0]) >= 6, { haul: s.lv.done?.haul, item: s.menu?.items?.[3] });
+check('Ziel: Ranking mit Rang, Zeit, Kills, Secrets', /^Rang [FDCBAS]$/.test(s.menu?.title) && s.menu.items.length === 5 && /Secrets 2\//.test(s.menu.items[2].label) && s.lv.done?.grade, s.menu);
 await shot('rank');
 s = await ev(() => { nomad.choose('Weiter'); const t0 = nomad.state().time; nomad.step(120); return { t0, t1: nomad.state().time, p: nomad.state().prompt }; });
 check('Ziel: Uhr steht', s.t0 === s.t1, s);

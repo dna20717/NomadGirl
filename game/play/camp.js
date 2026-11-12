@@ -908,6 +908,8 @@ export class Camp {
       const n = Object.keys(D.techtree).length, mine = (save.nodes || []).filter(x => D.techtree[x]).length;
       items.push({ label: 'Techtree', sub: `${mine} von ${n} Knoten · bleibt über alle Durchgänge`, act: () => { s.hud.inv?.close(); s.hud.tech?.open(); } });
     }
+    const wr = this.rigWorkshop?.('warroom') || Object.keys(D.workshops || {}).find(k => D.workshops[k].function === 'warroom');
+    if (wr) items.push({ label: 'Auswerten', sub: 'Datenträger, Zettel und Kurioses zerlegen: Wissen für den Techtree', act: () => { s.hud.inv?.close(); s.hud.craft?.open(wr, 'salvage'); } });
     for (const [id, loc] of Object.entries(D.locations || {})) {
       if (id === save.location) continue;
       const t = travelCost(D, save, id), p = D.pois?.[loc.poi];

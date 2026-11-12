@@ -39,12 +39,12 @@ export function stock(D, save) {
 export const have = (D, save, id) => sources(D, save).reduce((n, s) => n + count(s.grid, 'items', id), 0);
 
 // takes n of an item out of the camp inventories (in source order); → how many were taken
-export function take(D, save, id, n) {
+export function take(D, save, id, n, a = 'items') {
   let left = n;
   for (const s of sources(D, save)) {
     for (const e of [...s.grid.items]) {
       if (!left) break;
-      if (e.a !== 'items' || e.id !== id) continue;
+      if (e.a !== a || e.id !== id) continue;
       const k = Math.min(left, e.n);
       e.n -= k; left -= k;
       if (e.n <= 0) remove(s.grid, e);
@@ -183,4 +183,35 @@ export function use(D, save, id, { health, maxHealth } = {}) {
   if (save.buffs.includes(t.buff)) return { ok: false, reason: `${b.name || t.buff} wirkt schon` };
   save.buffs.push(t.buff);
   return { ok: true, buff: t.buff, heal: 0 };
+}
+
+// ---------- Zerlegen (design.md › Ressourcen verdienen: Gegenstände › Zerlegen „Zerlegen an“ + „Ergibt“) ----------
+// a thing is taken apart at its workshop or any workshop with the same function (Werkbank → Technik, Warroom → Wissen, Kochnische → Bio)
+export const salvageStation = (D, a, id) => { const t = D[a]?.[id]; return t?.salvage?.some(x => x?.item) ? (t.salvageAt || 'werkbank') : null; };
+export function canSalvageAt(D, a, id, ws) {
+  const st = salvageStation(D, a, id);
+  return !!st && (st === ws || (!!functionOf(D, ws) && functionOf(D, st) === functionOf(D, ws)));
+}
+// what lies in the camp inventories and can be taken apart here: [{ a, id, n, salvage }]
+export function salvageable(D, save, ws) {
+  const out = new Map();
+  for (const s of sources(D, save)) for (const e of s.grid.items) {
+    if (!canSalvageAt(D, e.a, e.id, ws)) continue;
+    const k = e.a + ':' + e.id, o = out.get(k) || { a: e.a, id: e.id, n: 0, salvage: D[e.a][e.id].salvage.filter(x => x?.item) };
+    o.n += e.n; out.set(k, o);
+  }
+  return [...out.values()];
+}
+// takes n of a thing apart: its parts go into the backpack, the chest, the storages (left = what did not fit); the clock moves on
+export function salvage(D, save, a, id, ws, n = 1) {
+  if (!canSalvageAt(D, a, id, ws)) return { ok: false, reason: 'Lässt sich hier nicht zerlegen' };
+  const have = sources(D, save).reduce((k, s) => k + count(s.grid, a, id), 0);
+  n = Math.min(n, have);
+  if (n < 1) return { ok: false, reason: 'Nichts davon da' };
+  take(D, save, id, n, a);
+  const got = D[a][id].salvage.filter(x => x?.item && D.items?.[x.item]).map(x => ({ id: x.item, n: (Number(x.count) || 1) * n }));
+  const left = got.map(g => ({ id: g.id, n: give(D, save, g.id, g.n) })).filter(g => g.n > 0);
+  const minutes = (D.crafting?.salvageTime ?? 5) * n;
+  advance(save, minutes / 60);
+  return { ok: true, thing: id, n, got, left, minutes };
 }

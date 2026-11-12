@@ -196,6 +196,13 @@ export class PoiLevel {
     const r = rankRun(D.ranking, { seconds, par: this.P.parTime, kills, killsMax: this.killsMax, secrets: this.secrets, secretsMax: this.secretsMax });
     this.done = { ...r, seconds, kills, secrets: this.secrets };
     s.cleared = true;   // the clock stops
+    // the vault is full (design.md › Ausbaustufe Progression): POIs › Tresor-Beute, plus one extra roll per 10 % rank bonus
+    const table = this.P.vault || (D.lootTables?.tresor ? 'tresor' : this.lootTable), extra = Math.floor((r.bonus || 0) / 10), haul = [];
+    const things = [...rollLoot(D, table), ...Array.from({ length: extra }, () => rollLoot(D, table)[0]).filter(Boolean)];
+    for (const t of things) { const same = haul.find(h => h.id === t.id); if (same) same.n += t.n; else haul.push({ ...t }); }
+    this.done.haul = haul.map(t => `${t.id}×${t.n}`);
+    const z = this.goals[0];
+    if (z && haul.length) { s.loot?.drop(z.x, z.feet, haul, 200); s.fx.sparks(z.x, z.feet - 60, 0xffd27a, 28); }
     for (const z of this.goals) this.drawGoal(z);
     s.drone.react('cleared');
     s.cam.flash(300, 255, 210, 122);
@@ -207,6 +214,7 @@ export class PoiLevel {
         { label: `Zeit ${mm}`, sub: `Bestzeit ${Math.floor(par / 60)}:${String(par % 60).padStart(2, '0')} · ${r.parts.time} Punkte` },
         { label: `Kills ${kills}/${this.killsMax}`, sub: `${r.parts.kills} Punkte` },
         { label: `Secrets ${this.secrets}/${this.secretsMax}`, sub: `${r.parts.secrets} Punkte` },
+        { label: `Tresor: ${haul.reduce((n, t) => n + t.n, 0)} Dinge`, sub: haul.slice(0, 6).map(t => D.items?.[t.id]?.name || t.id).join(', ') + (haul.length > 6 ? ' …' : '') + (extra ? ` · +${extra} für den Rang` : '') },
         { label: 'Weiter', primary: true, sub: 'Zurück zum Van: die Abkürzung führt unten durch den Tunnel', act: () => {} },
       ].map(i => ({ ...i, act: i.act || (() => {}) })),
     });

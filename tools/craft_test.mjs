@@ -88,6 +88,17 @@ await supply('Rohrbogen'); await supply('Kronkorken');   // Schrott + Kronkorken
 await clickText('button', 'Ausprobieren');
 c = await craft();
 check('Werkbank-Fehlschlag ergibt Werkbank-Müll', c.log?.kind === 'miss' && (c.stock.kabelsalat || c.stock.schrottskulptur), c);
+// Zerlegen (Gegenstände › Zerlegen): tab at the Werkbank, real clicks; parts land in the camp inventories
+await ev(() => { const g = nomad.save().inv.grids.chest; g.items = g.items.filter(e => !['alte_platine', 'technik', 'kupferkabel'].includes(e.id)); g.items.push({ a: 'items', id: 'alte_platine', n: 2, x: 7, y: 4, r: 0 }); game.scene.getScene('play').hud.craft.draw(); });
+await clickText('.craft-modes .inv-tab', 'Zerlegen');
+c = await craft();
+const platinen = c.stock.alte_platine;
+check('Tab Zerlegen zeigt, was sich hier zerlegen lässt', c.mode === 'salvage' && c.salvage.includes(`alte_platine×${platinen}`), c.salvage);
+await page.locator('.craft-salv').filter({ has: page.locator(':scope > span:nth-child(2)', { hasText: /^Alte Platine/ }) }).locator('button').click();
+c = await craft();
+check('Zerlegen: Alte Platine → Kupferkabel + Technik, Uhr läuft', c.log?.kind === 'hit' && c.stock.technik >= 1 && c.stock.kupferkabel >= 1 && c.stock.alte_platine === platinen - 1 && c.log.minutes === 5, { log: c.log, st: c.stock });
+await shot('salvage');
+await clickText('.craft-modes .inv-tab', 'Experimentieren');
 await shot('werkbank');
 await page.keyboard.press('Escape');
 

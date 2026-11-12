@@ -21,7 +21,8 @@
    {"item": "schallplatte", "weight": 1, "min": 1, "max": 1},
    {"item": "neonschild", "weight": 1, "min": 1, "max": 1},
    {"item": "schneekugel", "weight": 1, "min": 1, "max": 1},
-   {"item": "luxusuhr", "weight": 1, "min": 1, "max": 1}
+   {"item": "luxusuhr", "weight": 1, "min": 1, "max": 1},
+   {"item": "kuehlmittel", "weight": 1, "min": 1, "max": 1}
   ]
  },
  "mutanten_beute": {
@@ -59,7 +60,8 @@
    {"item": "goldzahn", "weight": 2, "min": 1, "max": 1},
    {"item": "ring", "weight": 1, "min": 1, "max": 1},
    {"item": "luxusuhr", "weight": 1, "min": 1, "max": 1},
-   {"item": "revolver", "weight": 1, "min": 1, "max": 1}
+   {"item": "revolver", "weight": 1, "min": 1, "max": 1},
+   {"item": "kuehlmittel", "weight": 1, "min": 1, "max": 1}
   ]
  },
  "drohnen_beute": {
@@ -77,7 +79,8 @@
    {"item": "reflex_booster", "weight": 1, "min": 1, "max": 1},
    {"item": "juwelenchip", "weight": 1, "min": 1, "max": 1},
    {"item": "datenkristall", "weight": 1, "min": 1, "max": 1},
-   {"item": "handheld", "weight": 1, "min": 1, "max": 1}
+   {"item": "handheld", "weight": 1, "min": 1, "max": 1},
+   {"item": "kompressor", "weight": 1, "min": 1, "max": 1}
   ]
  },
  "boss_beute": {
@@ -94,7 +97,36 @@
    {"item": "kristallschaedel", "weight": 1, "min": 1, "max": 1},
    {"item": "taschenuhr", "weight": 1, "min": 1, "max": 1},
    {"item": "winkekatze", "weight": 1, "min": 1, "max": 1},
-   {"item": "baseball", "weight": 1, "min": 1, "max": 1}
+   {"item": "baseball", "weight": 1, "min": 1, "max": 1},
+   {"item": "kuehlmittel", "weight": 2, "min": 1, "max": 1},
+   {"item": "kompressor", "weight": 1, "min": 1, "max": 1}
+  ]
+ },
+ "tresor": {
+  "name": "Tresor",
+  "rolls": [6, 9],
+  "description": "Der Tresor am Ende jedes POI (POIs › Tresor-Beute): richtig voll. Wertsachen, Technik, seltene Tank-Teile. Ein guter Rang bringt Extra-Würfe (Rang-Bonus % / 10).",
+  "entries": [
+   {"item": "geldbuendel", "weight": 6, "min": 1, "max": 3},
+   {"item": "luxusuhr", "weight": 4, "min": 1, "max": 1},
+   {"item": "taschenuhr", "weight": 3, "min": 1, "max": 1},
+   {"item": "ring", "weight": 4, "min": 1, "max": 1},
+   {"item": "juwelenchip", "weight": 2, "min": 1, "max": 1},
+   {"item": "kristallschaedel", "weight": 1, "min": 1, "max": 1},
+   {"item": "datenkristall", "weight": 3, "min": 1, "max": 1},
+   {"item": "goldzahn", "weight": 4, "min": 1, "max": 3},
+   {"item": "technik", "weight": 6, "min": 1, "max": 3},
+   {"item": "wissen", "weight": 4, "min": 1, "max": 2},
+   {"item": "bio", "weight": 2, "min": 1, "max": 2},
+   {"item": "alte_platine", "weight": 4, "min": 1, "max": 2},
+   {"item": "batteriezelle", "weight": 4, "min": 2, "max": 4},
+   {"item": "chip", "weight": 3, "min": 1, "max": 1},
+   {"item": "hochleistungszelle", "weight": 1, "min": 1, "max": 1},
+   {"item": "medikit", "weight": 3, "min": 1, "max": 1},
+   {"item": "kuehlmittel", "weight": 3, "min": 1, "max": 1},
+   {"item": "kompressor", "weight": 1, "min": 1, "max": 1},
+   {"item": "aufputschspritze", "weight": 2, "min": 1, "max": 1},
+   {"item": "mre_ration", "weight": 3, "min": 1, "max": 2}
   ]
  }
 }

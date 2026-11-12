@@ -17,5 +17,6 @@
   "miss": "Daneben. Heraus kommt: {name}",
   "near": "Knapp daneben! Eine Zutat stimmt noch nicht.",
   "read": "Gelesen und gemerkt: {name}"
- }
+ },
+ "salvageTime": 5
 }

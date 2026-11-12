@@ -7,11 +7,13 @@ import { el } from '../ui.js';
 import { hints, NavCursor } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { CATEGORY_COLORS, markOf } from './inventory_ui.js';
-import { recipesFor, known, missing, stock, craft, experiment, readable, read, tips, functionOf } from '../crafting.js';
+import { recipesFor, known, missing, stock, craft, experiment, readable, read, tips, functionOf, salvageable, salvage } from '../crafting.js';
 import { clockText } from '../save.js';
 import { phase, canMaintain, update as tankUpdate } from '../tank.js';
 
-const VERBS = { kitchen: ['Kochen', 'Kochnische'], foodtruck: ['Kochen', 'Foodtruck'], craft: ['Herstellen', 'Werkbank'], tank: ['Warten', 'Cryo-Tank'] };
+const VERBS = { kitchen: ['Kochen', 'Kochnische'], foodtruck: ['Kochen', 'Foodtruck'], craft: ['Herstellen', 'Werkbank'], tank: ['Warten', 'Cryo-Tank'], warroom: ['Auswerten', 'Warroom'] };
+// where things can be taken apart (Gegenstände › Zerlegen): the functions with a „Zerlegen“ tab
+const SALVAGE = ['craft', 'kitchen', 'warroom'];
 // order of the supplies: what fits the workshop first
 const FIRST = { kitchen: ['ingredient', 'food'], foodtruck: ['ingredient', 'food'], craft: ['resource', 'junk', 'component'], tank: ['component', 'resource'] };
 const fill = (t, name) => (t || '').replace('{name}', name);
@@ -38,9 +40,15 @@ export class CraftUI {
   get save() { return this.host.save(); }
   get isOpen() { return !this.el.hidden; }
 
-  open(ws) { this.ws = ws; this.cursor.i = -1; this.pot = {}; this.log = null; this.el.hidden = false; this.draw(); }
+  // mode: 'pot' (experimenting) or 'salvage' (taking things apart); the warroom only has the salvage side
+  open(ws, mode = null) { this.ws = ws; this.cursor.i = -1; this.pot = {}; this.log = null; this.only = functionOf(this.D, ws) === 'warroom'; this.mode = this.only ? 'salvage' : mode || 'pot'; this.el.hidden = false; this.draw(); }
+  canSalvage() { return SALVAGE.includes(functionOf(this.D, this.ws)); }
+  setMode(m) { if (this.mode === m) return; this.mode = m; this.cursor.i = -1; this.draw(); }
   close() { this.el.hidden = true; this.tip.hidden = true; this.pot = {}; this.cursor.hide(); this.host.closed?.(); }
-  nav(ui) { if (this.cursor.update(ui)) this.cursor.show(); }
+  nav(ui) {
+    if (this.canSalvage() && !this.only && (ui.pressed('prev') || ui.pressed('next'))) return this.setMode(this.mode === 'salvage' ? 'pot' : 'salvage');
+    if (this.cursor.update(ui)) this.cursor.show();
+  }
 
   verb() { return VERBS[functionOf(this.D, this.ws)]?.[0] || 'Herstellen'; }
 
@@ -51,7 +59,7 @@ export class CraftUI {
       el('header', {}, icon('workbench', 20), el('h2', {}, def.name || this.ws),
         el('small', {}, clockText(save)), el('button', { class: 'craft-x', title: 'Schließen (Esc)', onclick: () => this.close() }, '×')),
       this.tankEl(),
-      el('div', { class: 'craft-cols' }, this.bookEl(), this.potEl()),
+      el('div', { class: 'craft-cols' + (this.only ? ' single' : '') }, this.only ? null : this.bookEl(), this.mode === 'salvage' ? this.salvageEl() : this.potEl()),
       this.logEl(),
       hints([['move', 'wählen'], ['ok', 'eins'], ['send', 'alle'], ['context', 'wieder raus'], ['back', 'schließen']], 'Vorräte anklicken: in den Topf · Rechtsklick oder Klick im Topf: raus · Zutaten aus Lager, Kiste und Rucksack')));
     this.cursor.show();
@@ -99,7 +107,7 @@ export class CraftUI {
     const supplies = Object.keys(st).filter(id => D.items?.[id]).sort((a, b) => rank(a) - rank(b) || (D.items[a].name || a).localeCompare(D.items[b].name || b, 'de'));
     const any = ids.length > 0;
     return el('section', { class: 'inv-panel craft-pot' },
-      el('header', {}, icon('research', 16), el('b', {}, 'Experimentieren'), el('small', {}, `${C.experimentMinutes ?? 20} min`)),
+      this.modeTabs() || el('header', {}, icon('research', 16), el('b', {}, 'Experimentieren'), el('small', {}, `${C.experimentMinutes ?? 20} min`)),
       el('div', { class: 'craft-slots', style: `grid-template-columns:repeat(${Math.min(slots, 4)}, 1fr)` }, ...potSlots),
       el('div', { class: 'inv-actions' },
         el('button', { class: 'inv-btn craft-try', disabled: !any, onclick: () => this.tryPot() }, 'Ausprobieren'),
@@ -113,6 +121,37 @@ export class CraftUI {
         this.hover(c, id);
         return c;
       }) : [el('p', { class: 'craft-empty' }, 'Nichts da. Erst plündern, dann kochen.')])));
+  }
+  // tabs over the right panel: Experimentieren | Zerlegen (Q / LB / RB switches, ui_nav.js)
+  modeTabs() {
+    if (!this.canSalvage() || this.only) return null;
+    const t = (m, ic, label) => el('button', { class: 'inv-tab' + (this.mode === m ? ' on' : ''), onclick: () => this.setMode(m) }, icon(ic, 14), label);
+    return el('header', { class: 'craft-modes' }, t('pot', 'research', 'Experimentieren'), t('salvage', 'anvil', 'Zerlegen'));
+  }
+  // ---------- taking things apart (game/crafting.js › salvage) ----------
+  salvageEl() {
+    const D = this.D, list = salvageable(D, this.save, this.ws), per = D.crafting?.salvageTime ?? 5;
+    const name = (a, id) => D[a]?.[id]?.name || id;
+    const rows = list.sort((a, b) => name(a.a, a.id).localeCompare(name(b.a, b.id), 'de')).map(t => {
+      const r = el('div', { class: 'craft-salv' },
+        el('b', { class: 'craft-salv-thing' }, markOf(D, t.a, t.id, 28)), el('span', {}, name(t.a, t.id), el('i', {}, ` ×${t.n}`)),
+        el('span', { class: 'craft-salv-out' }, '→ ', ...t.salvage.map(x => el('span', { class: 'craft-out' + (D.items?.[x.item]?.category === 'progress' ? ' prog' : '') }, markOf(D, 'items', x.item, 18), ` ${x.count || 1} ${D.items?.[x.item]?.name || x.item}`))),
+        el('button', { class: 'inv-btn', title: 'Shift / Y: alle', onmousedown: ev => { if (ev.button !== 0) return; ev.preventDefault(); this.takeApart(t.a, t.id, ev.shiftKey ? t.n : 1); } }, 'Zerlegen'));
+      this.hover(r, t.id, t.a);
+      return r;
+    });
+    return el('section', { class: 'inv-panel craft-pot craft-salvage' },
+      this.modeTabs() || el('header', {}, icon('anvil', 16), el('b', {}, this.only ? 'Auswerten' : 'Zerlegen'), el('small', {}, `${per} min je Stück`)),
+      el('p', { class: 'craft-empty' }, this.only ? 'Datenträger, Zettel und Kurioses auswerten: daraus wird Wissen für den Techtree.' : 'Beute in ihre Teile zerlegen. Manches ergibt Fortschritt für den Techtree.'),
+      el('div', { class: 'craft-list' }, ...(rows.length ? rows : [el('p', { class: 'craft-empty' }, 'Hier lässt sich gerade nichts zerlegen. Erst plündern!')])));
+  }
+  takeApart(a, id, n) {
+    const D = this.D, r = salvage(D, this.save, a, id, this.ws, n);
+    if (!r.ok) return this.say('error', r.reason);
+    for (const l of r.left) this.host.leftover?.(l.id, l.n);
+    this.log = { kind: 'hit', text: `${r.n > 1 ? r.n + '× ' : ''}${D[a]?.[id]?.name || id} zerlegt: ` + r.got.map(g => `${g.n} ${D.items?.[g.id]?.name || g.id}`).join(', ') + (r.left.length ? ' (Rest am Boden, kein Platz)' : ''), minutes: r.minutes };
+    this.host.changed?.(r);
+    this.draw();
   }
   putIn(id, n = 1) {
     const st = stock(this.D, this.save), slots = this.D.crafting?.slots ?? 4, ids = Object.keys(this.pot).filter(k => this.pot[k] > 0);
@@ -195,14 +234,14 @@ export class CraftUI {
   // a rig part as a result: it goes onto the scrapyard, not into a bag
   partChip(id, n = 1) {
     const D = this.D, t = D.rigParts?.[id] || {}, c = el('span', { class: 'craft-chip big', style: `--col:${t.color || CATEGORY_COLORS.rigpart}` }, t.glyph || '⚙', n > 1 ? el('i', {}, String(n)) : null);
-    c.addEventListener('mouseenter', () => { this.tip.replaceChildren(el('b', {}, t.name || id), el('small', {}, `Rig-Teil · ${t.value || 0} Δ · landet auf dem Schrottplatz`), t.description ? el('p', {}, t.description) : null); this.tip.hidden = false; });
+    c.addEventListener('mouseenter', () => { this.tip.replaceChildren(el('b', {}, t.name || id), el('small', {}, `Rig-Teil · ${t.value || 0} Δ · landet auf dem Schrottplatz`), ...(t.description ? [el('p', {}, t.description)] : [])); this.tip.hidden = false; });
     c.addEventListener('mouseleave', () => { this.tip.hidden = true; });
     return c;
   }
-  hover(node, id) {
+  hover(node, id, a = 'items') {
     node.addEventListener('mouseenter', () => {
-      const t = this.D.items?.[id] || {}, b = this.D.buffs?.[t.buff];
-      this.tip.replaceChildren(el('b', {}, t.name || id), el('small', {}, [`${t.value || 0} Δ`, b ? `Buff: ${b.name || t.buff}` : null].filter(Boolean).join(' · ')), t.description ? el('p', {}, t.description) : null);
+      const t = this.D[a]?.[id] || {}, b = this.D.buffs?.[t.buff];
+      this.tip.replaceChildren(el('b', {}, t.name || id), el('small', {}, [`${t.value || 0} Δ`, b ? `Buff: ${b.name || t.buff}` : null].filter(Boolean).join(' · ')), ...(t.description ? [el('p', {}, t.description)] : []));
       this.tip.hidden = false;
     });
     node.addEventListener('mouseleave', () => { this.tip.hidden = true; });
@@ -212,7 +251,7 @@ export class CraftUI {
   state() {
     if (!this.isOpen) return { open: false };
     const D = this.D, save = this.save;
-    return { open: true, workshop: this.ws, pot: { ...this.pot }, log: this.log && { ...this.log },
+    return { open: true, workshop: this.ws, mode: this.mode, salvage: this.mode === 'salvage' ? salvageable(D, save, this.ws).map(t => `${t.id}×${t.n}`) : null, pot: { ...this.pot }, log: this.log && { ...this.log },
       book: recipesFor(D, this.ws).filter(r => known(save, r.id)).map(r => ({ id: r.id, ready: !missing(D, save, r).length })),
       notes: readable(D, save).map(x => x.item), tips: tips(D, save, this.ws).map(t => t.recipe), stock: stock(D, save) };
   }
