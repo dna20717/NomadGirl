@@ -1,4 +1,5 @@
 // The play scene: builds a room from its layout, places Leyla and the enemies, runs input, physics, combat and HUD.
+import { rescue } from '../tank.js';
 import { parseRoom, solidRects } from '../../engine/room.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
 import { PoiLevel } from './poi_level.js';
@@ -270,6 +271,8 @@ export class PlayScene extends Phaser.Scene {
     this.leyla = new Leyla(this, this.data_, feet);
     if (this.box) this.leyla.health = Math.max(1, Math.min(this.leyla.maxHealth, this.box.save.health + (this.mode === 'run' ? this.mods.health || 0 : 0)));
     this.drone = new Drone(this, this.data_);
+    if (this.box?.save.tank?.dead) { this.drone.gone = true; this.drone.sprite.setVisible(false); }   // AvA is gone until the next Durchgang
+    this.lostPack = null;
     this.van?.reset();
     if (this.mode === 'camp') { const G = this.box.save.ground ??= {}; this.loot = new Loot(this, G[this.box.save.location] ??= []); }
     else this.loot = this.mode === 'run' ? new Loot(this) : null;
@@ -589,9 +592,47 @@ export class PlayScene extends Phaser.Scene {
   // ---------- events ----------
   onLeylaHit(dmg) { this.drone.react('hit'); this.cam.shake(120, 0.006); this.fx.blood(this.leyla.x, this.leyla.chest, 10); this.hud.hurt(); }
   onLeylaDown() {
+    if (this.mode === 'run' && this.box && this.data_.tank?.enabled !== false && this.data_.camp?.koReturn !== 'camp') return this.runKnockout();
     this.hud.banner('AvA schleppt dich raus …', 'Die Run-Beute bleibt liegen.');
     this.cam.shake(300, 0.01);
     this.time.delayedCall(1900, () => this.mode === 'run' ? this.endRun(true) : this.mode === 'camp' ? this.goCamp() : this.level ? this.restartAs({}) : this.restartRoom());
+  }
+  // k.o. in a run (Daniel, 12.11.2026, design.md › k.o. neu): AvA drags Leyla back to the start of the run and pays with her tank;
+  // the backpack stays where Leyla fell (one chance: a second knock-out before she picks it up and it is gone), what she wears stays,
+  // the enemies come back, the rest of the level (vault, chests, doors) stays as it is. The last rescue costs AvA her life.
+  runKnockout() {
+    const D = this.data_, save = this.box.save, l = this.leyla, C = D.camp || {};
+    const r = rescue(D, save, this.tankMods?.());
+    let lostBefore = false;
+    if (this.lostPack) { this.loot.forget(this.lostPack); this.lostPack = null; lostBefore = true; }
+    const bag = save.inv.grids.backpack;
+    if (bag.items.length) { this.lostPack = this.loot.dropPack(l.x, l.feet, bag); bag.items = []; this.invChanged?.('backpack'); }
+    this.cam.shake(300, 0.01);
+    this.drone.react('down');
+    this.hud.banner(r.last ? 'AvA bringt dich ein letztes Mal zurück …' : 'AvA schleppt dich zum Van …', lostBefore ? 'Dein alter Rucksack ist für immer weg.' : this.lostPack ? 'Dein Rucksack liegt noch da. Hol ihn dir, du hast eine Chance.' : `Der Tank verliert ${Math.round(r.cost)} %.`);
+    this.box.persist?.();
+    this.time.delayedCall(1900, () => {
+      l.reset();
+      l.health = Math.max(1, Math.round(l.maxHealth * (C.heal?.afterKo ?? 30) / 100));
+      l.invulnerableUntil = this.now + 1500;
+      this.spawnEnemies();
+      if (r.last) { this.drone.die?.(); this.hud.banner('AvA ist fort.', 'Ihr Tank ist still. Leyla ist allein.'); }
+      else this.hud.banner('Wieder auf den Beinen', `Tank ${Math.round(save.tank.cond)} % · ${save.tank.rescues}× gerettet`);
+    });
+  }
+  takePack(pile) {
+    const save = this.box.save, bag = save.inv.grids.backpack, D = this.data_;
+    let left = 0;
+    for (const e of [...pile.grid.items]) {
+      const free = !bag.items.length && pile.grid.w === bag.w && pile.grid.h === bag.h;   // as it was: same places
+      if (free) { bag.items.push({ ...e }); continue; }
+      left += add(D, bag, e.a, e.id, e.n);
+    }
+    pile.grid.items = [];
+    this.loot.sync(); this.lostPack = null;
+    this.invChanged?.('backpack');
+    this.drone.react('rescue');
+    this.fx.text(this.leyla.x, this.leyla.feet - this.leyla.height - 30, left ? 'Rucksack zurück (nicht alles passt)' : 'Rucksack zurück!', { color: '#ffb3ec', size: 34, rise: 50, life: 1200 });
   }
   onKill(e) {
     this.kills++;
@@ -621,6 +662,13 @@ export class PlayScene extends Phaser.Scene {
     }
     const thing = !near && l.alive ? this.level?.nearest() : null;
     const pile = !near && !thing && this.loot?.nearest();
+    // her own backpack from the knock-out: E takes it all back at once (design.md › k.o. neu: genau eine Chance)
+    if (pile?.pack && l.alive) {
+      const text = 'Deinen Rucksack aufheben';
+      if (text !== this.vanPrompt) { this.vanPrompt = text; this.vanKey = 'E'; this.hud.prompt(text, 'E'); }
+      if (input.grab.pressed) this.takePack(pile);
+      return;
+    }
     // the Boden-Leiste: E / stick ↑ picks up the first thing (Daniel, 12.11.2026), I still opens the whole ground
     const floorText = pile && !this.hud.inv?.isOpen ? (this.hud.floor?.prompt() || `Beute am Boden · I öffnet (${pile.grid.items.length})`) : null;
     const text = near ? (this.level?.done ? `Zurück ins Camp · Rang ${this.level.done.grade}` : 'Zurück ins Camp · Van') : thing ? thing.text : floorText;

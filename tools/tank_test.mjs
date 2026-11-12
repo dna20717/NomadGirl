@@ -15,7 +15,8 @@ const shot = async n => { if (!shots) return; fs.mkdirSync('output', { recursive
 
 await page.goto('http://localhost:8766/game.html?camp&new');
 await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.camp?.benches, null, { timeout: 40000 });
-await ev(() => { nomad.take(); nomad.step(10); window.TK = () => game.scene.getScene('play').camp.benches.list.find(b => b.tank); });
+await ev(() => { nomad.take(); nomad.step(10); window.TK = () => game.scene.getScene('play').camp.benches.list.find(b => b.tank);
+  const d = game.scene.getScene('play').drone; window.droneUpdate = d.update; d.update = function () { this.x = -4000; this.y = 0; }; d.x = -4000; });   // AvA parked far away (she visits the tank by chance)
 
 let v = await ev(() => { const s = nomad.save(), b = TK(); return { units: s.rig.units.map(u => u.id), tank: s.tank, hs: nomad.state().camp.hotspots.some(h => h.name === 'Cryo-Tank'), st: b?.tank.state() }; });
 check('Neues Spiel: Cryo-Tank im kleinsten Container, voll, mit E-Punkt', v.units.includes('container_10') && v.tank.cond === 100 && v.hs && v.st?.phase === 'Stabil', v);
@@ -45,13 +46,36 @@ check('Beschlagen: ein Herz wird ins Glas gemalt, ein Handabdruck taucht auf', v
 await ev(() => nomad.step(40)); await shot('heart');
 
 // AvA near her tank: loving face
-v = await ev(() => { const s = game.scene.getScene('play'), d = s.drone, b = TK(); for (let i = 0; i < 90; i++) { d.x = b.cx; d.y = b.floor - 150; nomad.step(1); } return { mood: d.mood, face: d.faceFrame }; });
+v = await ev(() => { const s = game.scene.getScene('play'), d = s.drone, b = TK(); d.update = window.droneUpdate; for (let i = 0; i < 90; i++) { d.x = b.cx; d.y = b.floor - 150; nomad.step(1); } return { mood: d.mood, face: d.faceFrame }; });
 check('AvA beim Tank: verliebtes Gesicht', v.mood === 'love' && v.face === 14, v);
 
 // dead: dark picture, screen says so
 v = await ev(() => { const s = nomad.save(), b = TK(); s.tank.cond = 0; s.tank.dead = true; b.tank.refresh(true); nomad.step(80); return { key: b.picture.texture.key, st: b.tank.state() }; });
 check('Tot: Bild dunkel, Anzeige zeigt es', v.key === 'ws_cryotank_dead' && /TOT/.test(v.st.text), v);
 await shot('dead');
+
+// k.o. in a run (design.md › k.o. neu): back to the start of the run, tank pays, the backpack stays where she fell (one chance)
+await page.goto('http://localhost:8766/game.html?camp&new');
+await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.camp, null, { timeout: 40000 });
+v = await ev(() => { nomad.take(); nomad.step(5); const s0 = nomad.save(); s0.inv.grids.backpack.items = [{ a: 'items', id: 'schrott', n: 3, x: 0, y: 0, r: 0 }];
+  const v = nomad.state().camp.hotspots.find(h => h.name === 'Van'); nomad.walkTo(v.x); nomad.step(1, [], ['grab']); nomad.choose('Planen'); nomad.choose('Plündern'); nomad.step(10); nomad.calm();
+  const sc = game.scene.getScene('play'), l = sc.leyla, start = l.x;
+  nomad.tp(start + 900, l.feet); nomad.step(5); const fell = l.x;
+  l.hurt(sc.now, 9999, 0); nomad.step(200);
+  const s = nomad.save();
+  return { mode: sc.mode, x: Math.round(l.x), start: Math.round(start), fell: Math.round(fell), hp: l.health, max: l.maxHealth, cond: s.tank.cond, rescues: s.tank.rescues, bag: s.inv.grids.backpack.items.length, pack: !!sc.lostPack, packX: Math.round(sc.lostPack?.x || 0) }; });
+check('k.o. im Run: zurück an den Start, Tank −12 %, Rucksack liegt, wo sie fiel', v.mode === 'run' && Math.abs(v.x - v.start) < 40 && v.cond === 88 && v.rescues === 1 && v.bag === 0 && v.pack && Math.abs(v.packX - v.fell) < 40, v);
+v = await ev(() => { const sc = game.scene.getScene('play'), l = sc.leyla; nomad.tp(sc.lostPack.x, l.feet); nomad.step(5); nomad.step(1, [], ['grab']); nomad.step(3); return { bag: nomad.save().inv.grids.backpack.items.map(e => e.id + '×' + e.n), pack: !!sc.lostPack }; });
+check('E am Rucksack: alles wieder drin', !v.pack && v.bag.join() === 'schrott×3', v);
+v = await ev(() => { const sc = game.scene.getScene('play'), l = sc.leyla, s = nomad.save();
+  l.hurt(sc.now + 5000, 9999, 0); nomad.step(200); const first = !!sc.lostPack;
+  l.hurt(sc.now + 5000, 9999, 0); nomad.step(200);
+  return { first, gone: !sc.lostPack, piles: sc.loot.piles.filter(p => p.pack).length, cond: s.tank.cond };
+});
+check('Zweites k.o. vor dem Aufheben: der Rucksack ist weg', v.first && v.gone && v.piles === 0 && v.cond === 64, v);
+v = await ev(() => { const sc = game.scene.getScene('play'), l = sc.leyla, s = nomad.save(); s.tank.cond = 5;
+  l.hurt(sc.now + 5000, 9999, 0); nomad.step(220); return { dead: s.tank.dead, gone: sc.drone.gone, mode: sc.mode }; });
+check('Letzte Rettung: AvA ist fort, der Run geht weiter', v.dead && v.gone && v.mode === 'run', v);
 
 await browser.close();
 console.log(ok.map(n => '✔ ' + n).join('\n'));

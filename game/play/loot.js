@@ -38,6 +38,23 @@ export class Loot {
     }
   }
   make(x, feet) { return { x, feet, grid: newGrid(...PILE), sprite: null }; }
+  // k.o. in a run (design.md › k.o. neu): Leyla's backpack stays where she fell, as it was (same grid), glowing, with a tag.
+  // One chance: a knock-out before she picks it up and it is gone for good (forget()).
+  dropPack(x, feet, grid) {
+    const pile = { x, feet, grid: { w: grid.w, h: grid.h, items: grid.items.map(e => ({ ...e })) }, sprite: null, pack: true };
+    if (!pile.grid.items.length) return null;
+    this.show(pile, x, true);
+    const s = this.scene;
+    pile.sprite?.setTint(0xff6ad5).setScale(1.25);
+    pile.tag = s.add.text(x, feet - 64, 'Dein Rucksack', { fontFamily: 'VT323, monospace', fontSize: '26px', color: '#ffb3ec', stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 1).setDepth(19);
+    return pile;
+  }
+  forget(pile) {
+    if (!pile) return;
+    pile.sprite?.destroy(); pile.tag?.destroy();
+    const i = this.piles.indexOf(pile); if (i >= 0) this.piles.splice(i, 1);
+    this.store();
+  }
   show(pile, fromX = pile.x, still = false) {
     if (pile.sprite || !pile.grid.items.length) return;
     const s = this.scene, sp = s.add.image(still ? pile.x : fromX, pile.feet, bagTexture(s)).setOrigin(0.5, 1).setDepth(4);
@@ -51,7 +68,7 @@ export class Loot {
   // after changes in the ground inventory: empty bundles disappear, a new bundle with things appears
   sync(pile) {
     if (pile && pile.grid.items.length && !pile.sprite) this.show(pile);
-    for (const p of [...this.piles]) if (!p.grid.items.length) { p.sprite?.destroy(); this.piles.splice(this.piles.indexOf(p), 1); }
+    for (const p of [...this.piles]) if (!p.grid.items.length) { p.sprite?.destroy(); p.tag?.destroy(); this.piles.splice(this.piles.indexOf(p), 1); if (p.pack && this.scene.lostPack === p) this.scene.lostPack = null; }
     this.store();
   }
   store() { if (this.stored) this.stored.splice(0, this.stored.length, ...this.piles.map(p => ({ x: Math.round(p.x), feet: Math.round(p.feet), grid: p.grid }))); }
@@ -81,16 +98,16 @@ export class Loot {
     if (t?.length) this.drop(e.x, e.feet, t);
   }
 
-  clear() { for (const p of this.piles) p.sprite?.destroy(); this.piles = []; }
+  clear() { for (const p of this.piles) { p.sprite?.destroy(); p.tag?.destroy(); } this.piles = []; }
 
   update(time) {
     const s = this.scene, D = s.data_;
-    for (const p of this.piles) if (p.sprite) p.sprite.setAlpha(0.85 + 0.15 * Math.sin(time / 200 + p.x));
+    for (const p of this.piles) if (p.sprite) p.sprite.setAlpha(p.pack ? 0.75 + 0.25 * Math.sin(time / 140) : 0.85 + 0.15 * Math.sin(time / 200 + p.x));
     // walking past: top up stacks Leyla already carries
     if (this.I.autoStack === false || ++this.tick % 6 || !s.box) return;
     const bag = s.box.save.inv.grids.backpack, l = s.leyla;
     for (const p of this.piles) {
-      if (Math.hypot(p.x - l.x, (p.feet - l.feet) * 1.5) > this.range) continue;
+      if (p.pack || Math.hypot(p.x - l.x, (p.feet - l.feet) * 1.5) > this.range) continue;
       let moved = false;
       for (const e of [...p.grid.items]) {
         if (stackMax(D, e.a, e.id) <= 1 || !bag.items.some(b => b.a === e.a && b.id === e.id)) continue;

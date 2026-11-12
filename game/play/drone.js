@@ -91,7 +91,7 @@ export class Drone {
   // event moods (kill, hit, cleared, dash, down …) win for their duration
   react(mood) {
     const m = this.moods[mood];
-    if (!m || this.d.enabled === false) return;
+    if (this.gone || !m || this.d.enabled === false) return;
     const time = this.scene.time.now;
     this.event = { mood, until: m.duration ? time + m.duration : Infinity };
     if (mood === 'dash') this.boostUntil = time + 450;
@@ -144,7 +144,16 @@ export class Drone {
     return 'idle';
   }
 
+  // the last rescue (design.md › k.o. neu): AvA flickers out and is gone until the next Durchgang
+  die() {
+    if (this.gone) return;
+    this.gone = true;
+    this.scene.fx?.text?.(this.x, this.y - 60, '(×_×)', { color: '#ff6b8a', size: 40, rise: 40, life: 1600 });
+    this.scene.tweens.add({ targets: this.sprite, alpha: { from: 1, to: 0 }, duration: 1400, ease: 'Stepped', easeParams: [7], onComplete: () => this.sprite.setVisible(false) });
+  }
+
   update(time, dt) {
+    if (this.gone) return;
     if (this.d.enabled === false) return;
     const l = this.scene.leyla, F = this.f, [dx, dy] = F.offset || [-110, -210];
     // turn around a moment after Leyla does
