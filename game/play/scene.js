@@ -148,10 +148,13 @@ export class PlayScene extends Phaser.Scene {
     }
     return { ...info, used, fallback: used === 'idle' && state !== 'idle' || !has(used) };
   }
-  enemyLook(def) {
+  enemyLook(def, shape = 'raider') {
     const info = def.look && this.assetInfo(def.look);
     if (info) return info;
     const color = PLACEHOLDER_COLORS[def.placeholderColor] ? def.placeholderColor : 'rust';
+    // placeholders from code (art.js): raider, blob (ambusher, wildlife), drone (flyer)
+    if (shape === 'blob') return { key: `enemy_blob_${color}`, scale: (def.height ?? 110) / 120, ox: 0.5, oy: 1, flip: false };
+    if (shape === 'drone') return { key: `enemy_drone_${color}`, scale: (def.height ?? 90) / 96, ox: 0.5, oy: 1, flip: false };
     return { key: `raider_${def.behavior === 'shooter' ? 'gun' : 'melee'}_${color}`, scale: (def.height ?? 220) / 240, ox: 66 / 150, oy: 1, flip: false };
   }
   weapon(slot) { const id = this.box ? this.box.save.inv?.slots?.[slot] : this.data_.leyla?.loadout?.[slot]; return this.data_.weapons?.[id] || null; }
@@ -454,6 +457,23 @@ export class PlayScene extends Phaser.Scene {
       this.physics.add.collider(e.box, this.platforms, null, (box, plat) => e.body.velocity.y >= 0 && e.body.prev.y + e.body.height <= plat.body.top + 2);
       this.enemies.push(e);
     }
+  }
+
+  // a sound at (x, y) that carries r px (Spiel › Kampf › Lärm): enemies that hear it come looking (Gegner › Wahrnehmung › Hört)
+  noise(x, y, r) {
+    if (!(r > 0)) return;
+    for (const e of this.enemies) e.hear?.(this.now ?? this.time.now, x, y, r);
+    this.lastNoise = { x: Math.round(x), y: Math.round(y), r };
+  }
+  // one more enemy at a tile (tests, nomad.spawn)
+  addEnemy(id, col, row) {
+    const def = this.data_.enemies?.[id], T = this.T;
+    if (!def) return null;
+    const e = new Enemy(this, id, def, [(col + 0.5) * T, (row + 1) * T]);
+    this.physics.add.collider(e.box, this.solids);
+    this.physics.add.collider(e.box, this.platforms, null, (box, plat) => e.body.velocity.y >= 0 && e.body.prev.y + e.body.height <= plat.body.top + 2);
+    this.enemies.push(e);
+    return e;
   }
 
   restartRoom() {

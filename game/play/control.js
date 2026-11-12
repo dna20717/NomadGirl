@@ -8,6 +8,7 @@
 //   nomad.tp(x, feet) / nomad.tpTile(col, row)   put Leyla somewhere (feet on top of tile row)
 //   nomad.state()                     Leyla, enemies, kills, Δ, time
 //   nomad.calm() / nomad.restart()    enemies off / room fresh
+//   nomad.spawn(id, col, row)          one more enemy (Gegner) at a tile; state().enemies has state, kind, attack, seeing, lastKnown, plates, guardOpen, ceiling; state().noise = last sound
 //   nomad.freeze() / nomad.thaw()     show the current frame (for screenshots), then continue stepping
 //   nomad.drone('kill')               show a drone mood
 //   nomad.screenOf(x, y)              world position → page position
@@ -56,8 +57,11 @@ export function installControl(game) {
     },
     tp(x, feet) { const l = scene().leyla; l.body.reset(x, feet - l.body.height / 2); l.body.setVelocity(0, 0); return api.step(10); },
     tpTile(col, row) { const T_ = scene().T; return api.tp((col + 0.5) * T_, row * T_); },
-    calm() { for (const e of scene().enemies) if (e.alive) { e.state = 'dead'; e.body.enable = false; e.sprite.setVisible(false); e.warn.setVisible(false); e.bar.clear(); e.aim.clear(); } return api.state(); },
+    calm() { for (const e of scene().enemies) if (e.alive) api.calmOne(e); return api.state(); },
     restart() { scene().restartRoom(); return api.step(5); },
+    // nomad.spawn('schildtraeger', col, row) → one more enemy standing on top of tile row+1 (feet at the bottom of row)
+    spawn(id, col, row) { const e = scene().addEnemy(id, col, row); return e ? e.state_() : null; },
+    calmOne(e) { e.state = 'dead'; e.body.enable = false; e.sprite.setVisible(false); e.warn.setVisible(false); e.bar.clear(); e.aim.clear(); e.gear?.clear(); },
     freeze() { const s = scene(); s.hud.paused = true; s.tweens.pauseAll(); s.time.paused = true; game.loop.wake(); },
     thaw() { const s = scene(); if (active) game.loop.sleep(); s.hud.paused = false; s.tweens.resumeAll(); s.time.paused = false; },
     menu() { return scene().hud.menuState(); },
@@ -104,7 +108,8 @@ export function installControl(game) {
         leyla: { state: l.state, x: r(l.x), feet: r(l.feet), tile: [Math.floor(l.x / s.T), Math.round(l.feet / s.T)], vx: r(l.body.velocity.x), vy: r(l.body.velocity.y), facing: l.facing, health: l.health, ammo: l.ammo, mag: l.mag, reloading: !!l.reloading, armed: l.armed,
           fight: { on: !!l.fight?.on, manual: l.fight?.manual ?? null, seen: !!l.fight?.seen }, style: s.shootStyle(), look: l.sprite.anims.currentAnim?.key || l.sprite.texture.key,
           recoil: !!l.recoilImg?.visible, recoilShown: l.recoilShown || 0, target: s.combat.target ? r(s.combat.target.body.center.x) : null },
-        enemies: s.enemies.map(e => ({ id: e.id, state: e.state, x: r(e.x), feet: r(e.feet), hp: e.hp })),
+        enemies: s.enemies.map(e => e.state_ ? e.state_() : ({ id: e.id, state: e.state, x: r(e.x), feet: r(e.feet), hp: e.hp })),
+        noise: s.lastNoise || null,
         drone: s.drone && { mood: s.drone.mood, x: r(s.drone.x), y: r(s.drone.y), face: s.drone.faceFrame, cables: s.drone.cables.lines().map(c => c.pts.at(-1).map(r)), flip: s.drone.sprite.scaleX < 0 },
         van: s.van?.state(),
         level: s.level?.state() || null,

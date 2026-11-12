@@ -10,7 +10,11 @@
   "loot": "mutanten_beute",
   "deltas": [0, 2],
   "countsForRanking": true,
-  "description": "Schlurft, stöhnt, beißt."
+  "description": "Schlurft, stöhnt, beißt.",
+  "height": 170,
+  "attack": {"windup": 520, "cooldown": 1100, "range": 120},
+  "sense": {"cone": 120, "react": 500, "hearing": 80},
+  "placeholderColor": "olive"
  },
  "schleimbeisser": {
   "name": "Schleimbeißer",
@@ -23,9 +27,27 @@
   "loot": "mutanten_beute",
   "deltas": [1, 3],
   "countsForRanking": true,
-  "description": "Hängt an der Decke und wartet."
+  "description": "Hängt an der Decke und wartet.",
+  "height": 100,
+  "attack": {"windup": 350, "cooldown": 1000, "range": 150},
+  "sense": {"hearing": 60},
+  "placeholderColor": "violet"
  },
- "rattenschwarm": {"name": "Rattenschwarm", "family": "wildlife", "behavior": "charger", "health": 15, "damage": 4, "speed": 400, "aggroRange": 440, "deltas": [0, 1], "countsForRanking": true},
+ "rattenschwarm": {
+  "name": "Rattenschwarm",
+  "family": "wildlife",
+  "behavior": "charger",
+  "health": 15,
+  "damage": 4,
+  "speed": 400,
+  "aggroRange": 440,
+  "deltas": [0, 1],
+  "countsForRanking": true,
+  "height": 70,
+  "placeholderShape": "blob",
+  "attack": {"windup": 300, "cooldown": 700, "range": 110},
+  "move": {"patrol": 260}
+ },
  "schlaeger": {
   "name": "Plünderer-Schläger",
   "family": "raider",
@@ -56,7 +78,8 @@
   "countsForRanking": true,
   "attack": {"windup": 650, "cooldown": 1400, "range": 560, "projectileSpeed": 950},
   "height": 174,
-  "placeholderColor": "olive"
+  "placeholderColor": "olive",
+  "counter": {"dodge": 30, "dodgeCooldown": 1600, "dodgeDistance": 200}
  },
  "wachdrohne": {
   "name": "Wachdrohne",
@@ -69,7 +92,12 @@
   "loot": "drohnen_beute",
   "deltas": [2, 5],
   "countsForRanking": true,
-  "description": "Fragt höflich nach dem Ausweis. Schießt dann."
+  "description": "Fragt höflich nach dem Ausweis. Schießt dann.",
+  "height": 80,
+  "attack": {"windup": 600, "cooldown": 1700, "range": 460, "projectileSpeed": 760},
+  "move": {"flyHeight": 230, "patrol": 220},
+  "counter": {"dodge": 20},
+  "placeholderColor": "steel"
  },
  "hausmeister": {
   "name": "Der Hausmeister",
@@ -83,5 +111,41 @@
   "deltas": [80, 120],
   "countsForRanking": true,
   "description": "Hat das Ministerium nie verlassen. Hat auch nicht vor, es zu tun."
+ },
+ "schildtraeger": {
+  "name": "Plünderer mit Schild",
+  "family": "raider",
+  "behavior": "charger",
+  "health": 60,
+  "damage": 14,
+  "speed": 220,
+  "aggroRange": 520,
+  "weapon": "machete",
+  "loot": "pluenderer_beute",
+  "deltas": [4, 10],
+  "countsForRanking": true,
+  "attack": {"windup": 520, "cooldown": 1100, "range": 140},
+  "height": 184,
+  "placeholderColor": "steel",
+  "counter": {"shield": true, "shieldTurn": 650, "shieldStagger": 900},
+  "description": "Hat ein Verkehrsschild zum Schild umgebaut. Von vorn prallt alles ab: schwer zuschlagen oder hinter ihn kommen."
+ },
+ "panzerwache": {
+  "name": "Panzerwache",
+  "family": "machine",
+  "behavior": "patrol",
+  "health": 90,
+  "damage": 18,
+  "speed": 140,
+  "aggroRange": 460,
+  "loot": "drohnen_beute",
+  "deltas": [6, 12],
+  "countsForRanking": true,
+  "attack": {"kind": "melee", "windup": 650, "cooldown": 1300, "range": 130},
+  "height": 204,
+  "placeholderColor": "steel",
+  "counter": {"armor": 2, "armorChip": 15},
+  "sense": {"hearing": 120},
+  "description": "Alter Wachroboter mit Panzerplatten. Leichte Treffer kratzen nur, schwere knacken die Platten."
  }
 }

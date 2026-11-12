@@ -527,6 +527,8 @@ export class Leyla {
       const shot = L.shoot && !extending && since < (this.extendAt != null && this.extendAt === this.shotAt ? ext : 0) + this.lookDur(walking && L.shootWalk ? L.shootWalk : L.shoot);
       const out = time - (this.aimUntil ?? -1e9);   // < 0: arms still stretched out after shooting / reloading, then they come down
       const running = this.gunRunning(v);
+      // at a wall (Daniel, 12.11.2026: „Kombi“): the stretched-out gun would poke into it, so it stays at the chest; shots spark on the wall
+      this.gunWall = !running && !!this.scene.combat?.muzzleBlocked(this);
       // Cells-like on the run (Daniel, 11.11.2026): shooting = arms out, otherwise the gun at the chest, reloading in two halves
       if (running) {
         const RL = this.reloading && (time - this.reloading.at) / this.reloading.dur;
@@ -534,6 +536,7 @@ export class Leyla {
           : since < hold || !onRun ? L.runGun : L.runReady);
       }
       else if (this.reloading && (L.reload || L.reloadWalk)) { name = '@' + (walking && L.reloadWalk ? L.reloadWalk : L.reload || L.reloadWalk); armedFrame = Math.min(1, (time - this.reloading.at) / this.reloading.dur); this.aimUntil = this.reloading.at + this.reloading.dur + hold; }
+      else if (this.gunWall && L.draw) { name = '@' + L.draw; armedFrame = 1; armedFrom = AR.drawFromFrame ?? 1; }
       else if (extending && L.aim) { name = '@' + L.aim; armedFrame = (time - this.extendAt) / ext; }   // gun from the chest up into the aim, then the shot
       else if (shot) { name = '@' + (walking && L.shootWalk ? L.shootWalk : L.shoot); this.aimUntil = time + hold; }
       else if (walking && L.aimWalk) name = '@' + L.aimWalk;
@@ -541,7 +544,7 @@ export class Leyla {
       else if (out < lower && L.aim) { name = '@' + L.aim; armedFrame = 1 - out / lower; }
       else if (L.draw) { name = '@' + L.draw; armedFrame = 1; armedFrom = AR.drawFromFrame ?? 1; }   // ready: gun at the chest
       else { name = '@' + (L.aim || L.idle); armedFrame = 1; }
-      if (shot && !running && this.shotSeen !== this.shotAt) { this.shotSeen = this.shotAt; this.restartLook = true; }
+      if (shot && !running && !this.gunWall && this.shotSeen !== this.shotAt) { this.shotSeen = this.shotAt; this.restartLook = true; }
     }
     // melee: the attack runs over its time (frames from "ab Frame"), charging holds the crouch loop of the heavy attack
     let pin = null;
@@ -654,7 +657,8 @@ export class Leyla {
     if (this.attack) {
       const a = this.attack, p = (time - a.at) / a.dur;
       if (!a.hit && p >= a.hitAt) { a.hit = true; if (a.shot) this.scene.combat.pointBlank(this, time, a.shot); else this.scene.combat.melee(this, time, a.power); }
-      if (a.step && grounded && p < Math.min(1, a.hitAt + 0.1)) b.setVelocityX(this.facing * a.step * (1 - p / Math.max(0.01, a.hitAt + 0.1)));
+      if (a.nudge && grounded && time < a.nudge.until) b.setVelocityX(-this.facing * a.nudge.speed);   // at a wall: slide back so the pose fits
+      else if (a.step && grounded && p < Math.min(1, a.hitAt + 0.1)) b.setVelocityX(this.facing * a.step * (1 - p / Math.max(0.01, a.hitAt + 0.1)));
       if (a.combo && input.melee.pressed && a.next == null && time >= a.at + 60) a.next = time;   // the tap waits for the beat
       const beatAt = a.at + a.dur * a.beat;
       if (a.combo && a.next != null && a.hit && time >= beatAt && this.state === 'normal' && grounded) { this.attack = null; this.comboNext(time, a.next, beatAt, grounded); return; }
@@ -691,6 +695,19 @@ export class Leyla {
       power: heavy ? { damage: (M.heavyDamage ?? 250) / 100, range: M.heavyRange ?? 160, knockback: M.heavyKnockback ?? 220, heavy: true } : null };
     this.meleeReady = time + this.attack.dur;
     this.attackPose = time + this.attack.dur;   // keeps facing the way she strikes
+    this.wallRoom(this.attack);
+  }
+  // strike poses reach further than her body (Daniel, 12.11.2026: „Hieb an der Wand: Leyla rutscht ein Stück zurück, damit die Pose passt“):
+  // Leyla › Nahkampf › „An der Wand: Abstand“ = from her middle to the tip of the strike pose; with less room she slides back
+  wallRoom(a) {
+    const M = this.d.melee || {}, C = this.scene.combat, k = this.size.h / 168, need = (M.wallGap ?? 96) * k, dur = Math.max(30, M.wallSlide ?? 120);
+    if (!C || M.wallGap === 0 || !a) return;
+    let free = need;
+    for (const q of [0.85, 0.6, 0.35]) free = Math.min(free, C.freeRun(this.x, this.feet - this.height * q, this.facing, need));
+    if (free >= need) return;
+    const back = Math.min(need - free, C.freeRun(this.x - this.facing * this.size.w / 2, this.feet - this.height * 0.5, -this.facing, need));
+    a.step = 0;
+    if (back > 2) a.nudge = { until: a.at + dur, speed: back / (dur / 1000), dist: Math.round(back) };
   }
   // the next tap of the combo: judge the beat, then hit 2–3 (random, none twice), the finisher, or with four perfect taps the shot
   comboNext(time, tapAt, beatAt, grounded) {
@@ -709,6 +726,7 @@ export class Leyla {
   }
   startCombo(time, a) {
     this.attack = { hit: false, combo: true, at: time, next: null, ...a };
+    this.wallRoom(this.attack);
     this.meleeReady = time + a.dur; this.attackPose = time + a.dur;
     this.combo.n++; this.combo.beat = time + a.dur * a.beat; this.combo.until = time + a.dur + ((this.d.combo || {}).window ?? 350);
   }

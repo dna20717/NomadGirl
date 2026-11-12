@@ -80,7 +80,35 @@ export function makeTextures(scene) {
   for (const [name, c] of Object.entries(PLACEHOLDER_COLORS)) for (const kind of ['melee', 'gun']) {
     drawRaider(g, c, kind); g.generateTexture(`raider_${kind}_${name}`, 150, 240); g.clear();
   }
+  // placeholder blob (ambusher, small vermin) and drone (flyer), faces right
+  for (const [name, c] of Object.entries(PLACEHOLDER_COLORS)) {
+    drawBlob(g, c); g.generateTexture(`enemy_blob_${name}`, 140, 120); g.clear();
+    drawDrone(g, c); g.generateTexture(`enemy_drone_${name}`, 120, 96); g.clear();
+  }
   g.destroy();
+}
+
+function drawBlob(g, c) {
+  g.fillStyle(c.dark).fillEllipse(70, 92, 132, 56);
+  g.fillStyle(c.cloth).fillEllipse(70, 76, 120, 80);
+  g.fillStyle(c.accent, 0.35).fillEllipse(54, 62, 40, 22);
+  for (const [x, y] of [[30, 112], [52, 116], [88, 116], [110, 112]]) g.fillStyle(c.dark).fillTriangle(x - 8, y - 14, x + 8, y - 14, x, y + 4);
+  g.fillStyle(0x0d0a12).fillEllipse(104, 84, 34, 16);   // mouth
+  g.fillStyle(0xf2efe6).fillTriangle(92, 78, 98, 78, 95, 88).fillTriangle(104, 78, 110, 78, 107, 88).fillTriangle(114, 80, 120, 80, 116, 89);
+  g.fillStyle(c.accent).fillCircle(96, 60, 7).fillCircle(116, 62, 5);
+  g.fillStyle(0x0d0a12).fillCircle(98, 60, 3).fillCircle(117, 62, 2);
+}
+
+function drawDrone(g, c) {
+  g.fillStyle(0x1b1d22).fillRect(14, 22, 30, 6).fillRect(76, 22, 30, 6);   // rotor arms
+  g.fillStyle(c.accent, 0.5).fillEllipse(22, 18, 40, 8).fillEllipse(98, 18, 40, 8);   // spinning rotors
+  g.fillStyle(c.dark).fillRoundedRect(28, 26, 64, 46, 14);
+  g.fillStyle(c.cloth).fillRoundedRect(32, 28, 56, 36, 12);
+  g.fillStyle(0x0d0a12).fillCircle(78, 48, 13);
+  g.fillStyle(c.accent).fillCircle(80, 48, 8);
+  g.fillStyle(0xffffff, 0.8).fillCircle(83, 45, 3);
+  g.fillStyle(0x6b7280).fillRect(56, 72, 8, 12).fillRect(50, 82, 20, 6);   // gun pod
+  g.fillStyle(0xff4060).fillCircle(40, 36, 3);
 }
 
 function drawRaider(g, c, kind) {
