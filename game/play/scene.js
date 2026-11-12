@@ -9,6 +9,7 @@ import { Fog } from './fog.js';
 import { makeTextures, drawBackground, drawRoom, terrainKits, PLACEHOLDER_COLORS } from './art.js';
 import { Leyla } from './leyla.js';
 import { Enemy } from './enemies.js';
+import { kitAssets } from './enemy_kit.js';
 import { uiInput } from './ui_nav.js';
 import { Combat } from './combat.js';
 import { Fx } from './fx.js';
@@ -53,6 +54,9 @@ export class PlayScene extends Phaser.Scene {
     if (this.args?.loading) this.load.on('progress', p => this.args.loading.progress(p));   // Spiel › Ladebalken
     const A = this.data_.assets || {}, ids = new Set(Object.values(this.data_.leyla?.look || {}));
     for (const e of Object.values(this.data_.enemies || {})) if (e.look) ids.add(e.look);
+    const kitted = kitAssets(this.data_, Object.values(this.data_.enemies || {}));   // Gegner-Bausätze (#004): poses, heads, weapons, hands strips
+    for (const id of kitted.ids) ids.add(id);
+    for (const [key, file] of kitted.extra) if (!this.textures.exists(key)) this.load.image(key, new URL(file, this.base).href);
     for (const [k, id] of Object.entries(this.data_.game?.tiles || {})) if (k !== 'terrain') ids.add(id);
     for (const t of Object.values(this.data_.terrain || {})) for (const id of [t.look, t.props, t.propsBig]) if (id) ids.add(id);   // Kachel-Sets (TileSet00)
     const DR = this.data_.drone || {};

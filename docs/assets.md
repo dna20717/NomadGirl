@@ -139,6 +139,11 @@ Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich 
 | `assets/leyla/flip2_side.png`, `slide2_side.png`, `ladder_slide_back.png` (+ `*_source.png`) | Doppelsprung als Salto, Slide mit Schleife, Leiter-Rutschen in U-Boot-Pose | KI (PixelLab: Edit Pro Flash + Animate Image), Zuschnitt `tools/move_strips.py`, 12.11.2026 |
 | `assets/workshops/hydroponics.png` (+ `hydroponics_alt.png`) | Hydrokultur: Regal mit drei Rinnen, Pflanzenlicht, Fass, Steuerkasten | KI (PixelLab, Create Image Pro, Stilbild Drohnenwerkbank v2, AAP-64), 12.11.2026 |
 | `assets/workshops/hydro/plants.png` (Originale `hydro/source/`) | Pflanzen der Hydrokultur: Kohl, Basilikum, Chili, Tomate in 4 Stufen | KI (PixelLab, Create Image Pro), gemischt und umgefärbt mit `tools/garden_sprites.py`, 12.11.2026 |
+| `assets/raider/source/base_east.png`, `pose_*.png`, `head_*.png`, `anims/*` | Raider-Bausatz (#004): Grundpose, Schlüsselposen mit grünem Waffen-Platzhalter, Kopf-Edits, Rohframes aller Animationen (`raider_base`, `raider_pose_*`) | KI (PixelLab: create_character v3, Edit Pro Flash, animate_character v3) | 12.11.2026 |
+| `assets/raider/<klasse>_<zustand>.png`, `*_hands.png` | Raider-Animationen ohne Waffe + Hände davor, 25 Streifen à 256 × 256 (`raider_*`) | aus den Rohframes geschnitten und vermessen (Code, `tools/raider_strips.py`) | 12.11.2026 |
+| `assets/raider/head_<id>.png` | Raider-Köpfe: Irokese, Gasmaske, Haarknoten, Dreadlocks, Kapuze, Stachelhelm (`raider_head_*`) | KI (PixelLab, Edit Pro Flash) + Code (geänderte Pixel über dem Hals) | 12.11.2026 |
+| `assets/raider/icons_raider_weapons.png` | Raider-Waffen als Symbol-Raster 4 × 2 à 128 × 64: Machete, Nagelkeule, Rohrhammer, Nagelpistole, Rohrpistole, Schrotflinte, Sturmgewehr (`icons_raider_weapons`) | KI (PixelLab, Create Image Pro, AAP-64) + Code (`tools/raider_weapons.py`) | 12.11.2026 |
+| `assets/workshops/treasury_cyber.png`, `treasury_cyber_empty.png`, `treasury_candidates/*` | Trophäenraum im Cyberpunk-Stil, voll/leer, 3 Kandidaten (#003) (`ws_treasury_cyber*`) | KI (PixelLab, Create Image Pro + Edit Pro Flash) + Code (Beutehaufen übernommen) | 12.11.2026 |
 
 ## Ordner
 

@@ -94,8 +94,10 @@ export class Loot {
   floor() { const l = this.scene.leyla; return this.nearest() || this.make(l.x, l.feet); }
 
   fromEnemy(e) {
-    const t = e.d.loot && rollLoot(this.scene.data_, e.d.loot);
-    if (t?.length) this.drop(e.x, e.feet, t);
+    const t = (e.d.loot && rollLoot(this.scene.data_, e.d.loot)) || [];
+    // Gegner › Beute › Lässt seine Waffe fallen (#004): what a raider fights with, Leyla can pick up and use
+    if (e.d.weapon && this.scene.data_.weapons?.[e.d.weapon] && Math.random() * 100 < (e.d.dropWeapon ?? 0)) t.push({ a: 'weapons', id: e.d.weapon, n: 1 });
+    if (t.length) this.drop(e.x, e.feet, t);
   }
 
   clear() { for (const p of this.piles) { p.sprite?.destroy(); p.tag?.destroy(); } this.piles = []; }

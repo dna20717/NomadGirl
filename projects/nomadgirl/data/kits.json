@@ -1,0 +1,64 @@
+{
+ "raider": {
+  "name": "Raider",
+  "description": "Menschlicher Plünderer aus den Wastelands rund um BigCityDelta, im Stil der Bosse (Seitenansicht, Neon auf dunklem Leder). Grundlage für alle humanoiden Gegner: Kopf, Waffe, Hautton und Gang-Farbe sind austauschbar.",
+  "cm": 182,
+  "figure": 243,
+  "height": 182,
+  "windupFrame": 3,
+  "poses": [
+   {"class": "heavy", "state": "alert", "look": "raider_heavy_alert"},
+   {"class": "heavy", "state": "attack", "look": "raider_heavy_attack"},
+   {"class": "heavy", "state": "crouch", "look": "raider_heavy_crouch"},
+   {"class": "heavy", "state": "hit", "look": "raider_heavy_hit"},
+   {"class": "heavy", "state": "run", "look": "raider_heavy_run"},
+   {"class": "heavy", "state": "walk", "look": "raider_heavy_walk"},
+   {"class": "light", "state": "alert", "look": "raider_light_alert"},
+   {"class": "light", "state": "attack", "look": "raider_light_attack"},
+   {"class": "light", "state": "crouch", "look": "raider_light_crouch"},
+   {"class": "light", "state": "hit", "look": "raider_light_hit"},
+   {"class": "light", "state": "run", "look": "raider_light_run"},
+   {"class": "light", "state": "walk", "look": "raider_light_walk"},
+   {"class": "long", "state": "alert", "look": "raider_long_alert"},
+   {"class": "long", "state": "attack", "look": "raider_long_attack"},
+   {"class": "long", "state": "crouch", "look": "raider_long_crouch"},
+   {"class": "long", "state": "hit", "look": "raider_long_hit"},
+   {"class": "long", "state": "run", "look": "raider_long_run"},
+   {"class": "long", "state": "walk", "look": "raider_long_walk"},
+   {"class": "any", "state": "death", "look": "raider_none_death"},
+   {"class": "pistol", "state": "alert", "look": "raider_pistol_alert"},
+   {"class": "pistol", "state": "attack", "look": "raider_pistol_attack"},
+   {"class": "pistol", "state": "crouch", "look": "raider_pistol_crouch"},
+   {"class": "pistol", "state": "hit", "look": "raider_pistol_hit"},
+   {"class": "pistol", "state": "run", "look": "raider_pistol_run"},
+   {"class": "pistol", "state": "walk", "look": "raider_pistol_walk"}
+  ],
+  "heads": [
+   {"id": "dreads", "name": "Dreadlocks", "look": "raider_head_dreads", "at": [91, 5]},
+   {"id": "gasmask", "name": "Gasmaske", "look": "raider_head_gasmask", "at": [91, 7]},
+   {"id": "helmet", "name": "Stachelhelm", "look": "raider_head_helmet", "at": [91, 0]},
+   {"id": "hood", "name": "Kapuze mit Visier", "look": "raider_head_hood", "at": [91, 7]},
+   {"id": "mohawk", "name": "Irokese", "look": "raider_head_mohawk", "at": [91, 0]},
+   {"id": "topknot", "name": "Haarknoten + Cyberauge", "look": "raider_head_topknot", "at": [91, 2]}
+  ],
+  "swaps": [
+   {"group": "skin", "hueFrom": 5, "hueTo": 40, "satMin": 28, "lightMin": 30, "lightMax": 86, "sat": 0.45, "mid": 50},
+   {"group": "gang", "hueFrom": 290, "hueTo": 338, "satMin": 40, "lightMin": 14, "lightMax": 85, "sat": 0.62, "mid": 40}
+  ],
+  "skins": [
+   {"name": "wie gemalt"},
+   {"name": "hell", "color": "#d9a07c"},
+   {"name": "oliv", "color": "#b98656"},
+   {"name": "dunkel", "color": "#7a4a32"},
+   {"name": "sehr dunkel", "color": "#55342a"}
+  ],
+  "gangs": [
+   {"name": "Magenta"},
+   {"name": "Cyan", "color": "#20d6c7"},
+   {"name": "Orange", "color": "#fa6a0a"},
+   {"name": "Gelb", "color": "#ffd541"},
+   {"name": "Blutrot", "color": "#b4202a"}
+  ],
+  "offsets": [{"class": "pistol", "offset": [-4, 8]}]
+ }
+}

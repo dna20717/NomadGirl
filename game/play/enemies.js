@@ -10,6 +10,8 @@
 //   states    patrol · alert · engage · search · windup · strike · recover · dodge · stagger · lurk · drop · dead
 // Every attack is telegraphed (windup: blinking + "!", the shooter shows his aim line, cut at the first wall).
 
+import { kitLook, kitShow, kitMuzzle } from './enemy_kit.js';
+
 const KINDS = { patrol: 'melee', charger: 'lunge', shooter: 'shot', ambusher: 'drop', flyer: 'dive', boss: 'lunge' };
 const SHAPES = { flyer: 'drone', ambusher: 'blob' };
 
@@ -28,7 +30,8 @@ export class Enemy {
       react: S.react ?? 300, lost: S.lost ?? 900, search: S.search ?? 5000 };
     this.M = { patrol: M.patrol ?? 200, jump: M.jump ?? 1, drop: M.drop ?? 3, fly: M.flyHeight ?? 230 };
     this.C = { shield: !!C.shield, turn: C.shieldTurn ?? 650, stagger: C.shieldStagger ?? 900, dodge: C.dodge ?? 0, dodgeEvery: C.dodgeCooldown ?? 1400,
-      dodgeDist: C.dodgeDistance ?? 200, plates: C.armor ?? 0, chip: C.armorChip ?? 15 };
+      dodgeDist: C.dodgeDistance ?? 200, plates: C.armor ?? 0, chip: C.armorChip ?? 15,
+      duck: C.duck ?? 0, duckTime: C.duckTime ?? 700, duckEvery: C.duckEvery ?? 1200 };
     this.plates = this.C.plates;
     const sizes = { raider: [0.32, 0.9], blob: [1.0, 0.8], drone: [0.95, 0.75] }[this.shape] || [0.32, 0.9];
     const bodyH = Math.round(this.h * sizes[1]);
@@ -37,8 +40,10 @@ export class Enemy {
     scene.physics.add.existing(this.box);
     this.body = this.box.body;
     this.body.setMaxVelocityY(1700);
-    const look = scene.enemyLook(def, this.shape);
+    // Gegner › Aussehen aus dem Bausatz (#004): body, head, weapon and colours put together from the kit, else the old look
+    const look = (def.kit && kitLook(scene, def)) || scene.enemyLook(def, this.shape);
     this.look = look;
+    this.bodyH = bodyH;
     this.sprite = scene.add.sprite(feet[0], feet[1], look.key).setOrigin(look.ox, look.oy).setScale(look.scale).setDepth(8);
     if (look.anim) this.sprite.play(look.anim);
     this.gear = scene.add.graphics().setDepth(8.5);
@@ -59,7 +64,7 @@ export class Enemy {
   get eyeY() { return this.body.top + this.body.height * 0.2; }
   get alive() { return this.state !== 'dead'; }
   get behavior() { return this.kind; }
-  get busy() { return ['windup', 'strike', 'recover', 'dodge', 'stagger', 'drop'].includes(this.state); }
+  get busy() { return ['windup', 'strike', 'recover', 'dodge', 'stagger', 'drop', 'duck'].includes(this.state); }
 
   // ---------- senses ----------
   // sight: in range, inside the cone in facing direction (or very close behind), free line from the eyes to her chest or head
@@ -89,7 +94,7 @@ export class Enemy {
 
   // ---------- update ----------
   update(time, dt, leyla) {
-    if (!this.alive) return;
+    if (!this.alive) { if (this.look.anims?.death) kitShow(this, time); return; }
     const b = this.body, l = leyla;
     if (time >= this.senseAt) {   // a few looks a second are enough
       this.senseAt = time + 90;
@@ -100,6 +105,7 @@ export class Enemy {
     this.aim.clear();
     if (time < this.stunUntil && this.state !== 'stagger') { b.setVelocityX(b.velocity.x * 0.9); if (this.kind === 'flyer') b.setVelocityY(b.velocity.y * 0.9); return this.draw(time); }
     this.watchDodge(time, l);
+    this.watchDuck(time);
     const dx = l.x - this.x, dist = Math.abs(dx);
 
     switch (this.state) {
@@ -163,6 +169,11 @@ export class Enemy {
       }
       case 'dodge': {
         if (time >= this.until) this.state = 'engage';
+        break;
+      }
+      case 'duck': {   // low behind nothing: nails at chest height fly over (the box is lower now)
+        this.stop();
+        if (time >= this.until) this.standUp(time);
         break;
       }
       case 'stagger': {   // shield knocked aside: open for a moment
@@ -274,6 +285,8 @@ export class Enemy {
     if (this.attackKind === 'dive') this.diveAt = { x: l.x, y: l.chest };
   }
   muzzle() {
+    const km = this.look.anims && kitMuzzle(this);
+    if (km) return km;
     if (this.shape === 'drone') return { x: this.x + this.facing * this.w * 0.35, y: this.body.center.y + this.body.height * 0.15 };
     return { x: this.x + this.facing * this.h * 0.3, y: this.feet - this.h * 0.47 };
   }
@@ -288,11 +301,12 @@ export class Enemy {
     if (k === 'shot') {
       const m = this.muzzle();
       if (this.scene.combat.blockedAt(this.x, m.y, m.x, m.y)) { this.state = 'recover'; this.until = time + 200; return; }   // muzzle in the wall: no shot
+      this.shotAt = time;
       for (let i = 0; i < (this.a.burst ?? 1); i++) this.scene.time.delayedCall(i * 110, () => this.alive && this.scene.combat.enemyShot(this, this.muzzle(), this.aimDir));
       this.state = 'recover'; this.until = time + 200 + 110 * ((this.a.burst ?? 1) - 1);
       return;
     }
-    this.state = 'strike'; this.struck = false;
+    this.state = 'strike'; this.struck = false; this.strikeAt = time;
     if (k === 'dive') {
       const t = this.diveAt || { x: l.x, y: l.chest }, dx = t.x - this.x, dy = t.y - this.body.center.y, d = Math.hypot(dx, dy) || 1, v = (this.d.speed ?? 300) * 2.6;
       b.setVelocity(dx / d * v, dy / d * v); this.until = time + Math.min(700, d / v * 1000 + 120);
@@ -336,6 +350,29 @@ export class Enemy {
       this.dodged.add(a);
       if (Math.random() * 100 < this.C.dodge) this.dodge(time, Math.sign(this.x - l.x) || 1, false);
     }
+  }
+  // ducking (Gegner › Konter › Duckt sich, #004: „alle Gegner, die Humanoide sind, sollen sich ducken können“):
+  // a nail flying at chest height gets one roll; down, the box is low enough that it flies over
+  watchDuck(time) {
+    if (!this.C.duck || this.kind === 'flyer' || this.shape !== 'raider' || this.busy || this.state === 'patrol' || this.state === 'lurk' || time < (this.duckReady || 0) || !this.body.blocked.down) return;
+    for (const p of this.scene.combat.shots) {
+      if (!p.friendly || p.dead || this.dodged.has(p)) continue;
+      const ahead = (this.x - p.x) * Math.sign(p.vx || 1);
+      if (ahead < 0 || ahead > 420 || p.y > this.feet - this.bodyH * 0.45 || p.y < this.body.top - 10) continue;
+      this.dodged.add(p);
+      if (Math.random() * 100 < this.C.duck) return this.duck(time);
+    }
+  }
+  duck(time) {
+    const b = this.body, h = Math.round(this.bodyH * 0.55);
+    this.state = 'duck'; this.duckAt = time; this.until = time + this.C.duckTime; this.duckReady = this.until + this.C.duckEvery;
+    b.setSize(this.w, h, false); b.setOffset(0, this.bodyH - h);
+    this.stop();
+  }
+  standUp(time) {
+    const b = this.body;
+    b.setSize(this.w, this.bodyH, false); b.setOffset(0, 0);
+    this.state = this.seeing ? 'engage' : 'search'; this.searchStart = time;
   }
   dodge(time, away, jump) {
     const b = this.body, dist = this.C.dodgeDist;
@@ -393,7 +430,8 @@ export class Enemy {
     s.fx.text(this.x + (Math.random() - 0.5) * 40, this.body.top - 10, String(damage) + (crit ? '!' : ''), { color: crit ? '#ffd27a' : '#ffffff', size: crit ? 56 : 42 });
     s.fx.blood(this.x, this.chest, crit ? 18 : 10);
     this.body.setVelocity(dir * (knockback ?? 0), this.kind === 'flyer' ? -(knockback ?? 0) * 0.2 : -(knockback ?? 0) * 0.35);
-    this.stunUntil = time + 220;
+    this.stunUntil = time + 220; this.hitAt = time;
+    if (this.state === 'duck') this.standUp(time);
     // hit from somewhere: it knows where she is now, turns round and fights
     this.lastSeen = time; this.lastKnown = { x: s.leyla.x, y: s.leyla.chest, at: time };
     if (['windup', 'patrol', 'alert', 'search'].includes(this.state)) { this.state = 'engage'; this.readyAt = Math.max(this.readyAt, time + 350); }
@@ -421,7 +459,13 @@ export class Enemy {
     this.body.enable = false;
     this.warn.setVisible(false); this.aim.clear(); this.bar.clear(); this.gear.clear();
     this.scene.fx.blood(this.x, this.chest, 26);
-    this.scene.tweens.add({ targets: this.sprite, rotation: dir * 1.4, alpha: 0, y: this.sprite.y + 10, duration: 650, ease: 'Cubic.easeIn' });
+    this.diedAt = time;
+    if (this.look.anims?.death) {   // the kit falls on its back, lies a moment, then fades
+      this.facing = dir < 0 ? 1 : -1;
+      this.sprite.setFlipX(this.facing < 0);
+      kitShow(this, time);
+      this.scene.tweens.add({ targets: this.sprite, alpha: 0, delay: 1800, duration: 700 });
+    } else this.scene.tweens.add({ targets: this.sprite, rotation: dir * 1.4, alpha: 0, y: this.sprite.y + 10, duration: 650, ease: 'Cubic.easeIn' });
     this.scene.onKill(this);
   }
 
@@ -431,7 +475,9 @@ export class Enemy {
     if (this.onCeiling) this.sprite.setFlipY(true).setOrigin(this.look.ox, 1 - this.look.oy).setPosition(b.center.x, b.top);
     else this.sprite.setFlipY(false).setOrigin(this.look.ox, this.look.oy).setPosition(b.center.x, this.shape === 'drone' ? b.bottom + this.h * 0.08 : b.bottom);
     this.sprite.setFlipX(flip);
-    if (this.state === 'windup' && !this.stunned) this.sprite.setTintFill(Math.floor(time / 60) % 2 ? 0xff4060 : 0xffffff);
+    if (this.look.anims) kitShow(this, time);
+    if (this.state === 'windup' && !this.stunned && this.look.anims) Math.floor(time / 70) % 2 ? this.sprite.setTint(0xff8090) : this.sprite.clearTint();   // painted kit: a softer warning
+    else if (this.state === 'windup' && !this.stunned) this.sprite.setTintFill(Math.floor(time / 60) % 2 ? 0xff4060 : 0xffffff);
     else if (time > this.stunUntil - 150) this.sprite.clearTint();
     this.sprite.setAlpha(this.state === 'dodge' ? 0.7 : 1);
     this.warn.setPosition(this.x, this.onCeiling ? b.bottom + 70 : b.top - 6);
@@ -457,6 +503,7 @@ export class Enemy {
 
   state_() {
     return { id: this.id, state: this.state, kind: this.kind, attack: this.attackKind, x: Math.round(this.x), feet: Math.round(this.feet), hp: this.hp, facing: this.facing,
+      look: this.look.anims ? this.kitState : undefined, frame: this.look.anims ? Number(this.sprite.frame?.name) || 0 : undefined, h: Math.round(this.body.height),
       seeing: this.seeing, lastKnown: this.lastKnown && { x: Math.round(this.lastKnown.x), y: Math.round(this.lastKnown.y) }, plates: this.plates, guardOpen: !!this.guardOpen, ceiling: !!this.onCeiling };
   }
 

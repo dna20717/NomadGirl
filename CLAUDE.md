@@ -108,7 +108,7 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 
 - `docs/features/world.md`: Spiel-Grundlagen: Phaser, Raum-Layout (Zeichen-Legende), Hintergrund & Wetter, Kamera, Spawn-Punkt, Van, Testraum (Parkour), Tod.
 - `docs/features/leyla.md`: Leylas Bewegung und Animationen: Zustände, Kanten & Ducken, Kante im Schwung, Übergänge, Dash, Salto, Leiter, Landung, Bremsen, Slide, einarmig baumeln.
-- `docs/features/combat.md`: Kampf: Kombo, Kampfmodus, Schießstil, Schlitten, Treffer, Revolver, Sturmgewehr, Langwaffen, Gegner-KI, Wände halten alles auf.
+- `docs/features/combat.md`: Kampf: Kombo, Kampfmodus, Schießstil, Schlitten, Treffer, Revolver, Sturmgewehr, Langwaffen, Gegner-KI, Wände halten alles auf, Gegner-Bausatz Raider (modulare Köpfe, Waffen, Farben; Ducken).
 - `docs/features/drone.md`: AvA (Drohne): Aufbau, Stimmungen, Kabel, Anbauteile, AvA als Plattform, Bau-Modus mit AvA.
 - `docs/features/ui.md`: Steuerung neu (Quick Draw, Benutzen auf ↑, UI-Grammatik), Pause-Menü und Steuerungs-Übersicht.
 - `docs/features/controller.md`: Controller: Gamepad-API, Belegung, überall ohne Zeiger, Hauptmenü mit Kurve, Symbole je Typ.

@@ -46,6 +46,8 @@ const STAGE = select('stage', 'Ausbaustufe', [['mvp', 'MVP'], ['1', 'Stufe 1'], 
 
 // ---------- fixed option lists ----------
 export const WEAPON_KINDS = [['melee', 'Nahkampf'], ['ranged', 'Fernkampf'], ['cyberdeck', 'Cyberdeck']];
+export const HELD_CLASSES = [['light', 'Nahkampf leicht'], ['heavy', 'Nahkampf beidhändig'], ['pistol', 'Pistole'], ['long', 'Langwaffe']];
+export const KIT_STATES = [['alert', 'Alarm'], ['walk', 'Gehen'], ['run', 'Rennen'], ['crouch', 'Ducken'], ['attack', 'Angriff'], ['hit', 'Treffer'], ['death', 'Tod']];
 export const ENEMY_FAMILIES = [['mutant', 'Mutant'], ['raider', 'Plünderer'], ['machine', 'Maschine'], ['wildlife', 'Getier'], ['anomaly', 'Anomalie']];
 export const ENEMY_BEHAVIORS = [['patrol', 'Patrouille'], ['charger', 'Stürmer'], ['shooter', 'Schütze'], ['ambusher', 'Lauerer'], ['flyer', 'Flieger'], ['boss', 'Boss']];
 // tags on things (Daniel, 11.11.2026: „mach ein Tag trophy“): trophy = may hang on a trophy stand in the treasury
@@ -123,6 +125,9 @@ export const AREAS = {
       { title: 'Schlitten', when: x => x.kind === 'animation', fields: [table('slide', 'Schlitten', [num('frame', 'Frame', { min: 0, hint: '1 = erster Frame, 0 = alle' }), point('from', 'Von', { unit: 'px' }), point('to', 'Bis', { unit: 'px' })],
           { hint: 'Daniel, 11.11.2026: Bei jedem Schuss fährt der Schlitten der Waffe kurz zurück, ohne neue Grafik. Kasten um den Schlitten in Bildpixeln des Frames (oben links bis unten rechts); was darin gemalt ist, rutscht zurück, vorn schaut der Lauf raus' }),
         num('slideShift', 'Schlitten zurück', { unit: 'px', min: 0, hint: 'Bildpixel; 3 = dezent' })] },
+      { title: 'Ebenen (Gegner-Bausatz)', when: x => x.kind === 'animation' && (x.layers || x.hands), fields: [text('hands', 'Hände davor', { hint: 'Streifen mit dem, was vor der Waffe liegt (Finger am Griff), gleiche Frames. tools/raider_strips.py' }),
+        table('layers', 'Je Frame', [num('frame', 'Frame', { min: 1 }), point('grip', 'Griff', { unit: 'px' }), num('angle', 'Winkel', { unit: '°' }), bool('back', 'Waffe hinten'), point('head', 'Kopf', { unit: 'px' })],
+          { hint: 'Gemessen am grünen Platzhalter: Griff und Richtung (Griff → Spitze); Kopf = Versatz gegenüber der Grundpose' })] },
       { title: 'Ton', when: x => x.kind === 'sound', fields: [text('alt', 'Ersatzdatei', { hint: 'Gleicher Ton in einem zweiten Format (z. B. .ogg zur .m4a); das Spiel nimmt, was der Browser kann' }),
         num('volume', 'Grundlautstärke', { unit: '%', min: 0, max: 200, hint: 'Gleicht laute und leise Aufnahmen aus' })] },
       { title: 'Herkunft', fields: [text('source', 'Erzeugt mit', { hint: 'KI-Werkzeug oder Code' }), ref('derivedFrom', 'Abgeleitet von', 'assets', { hint: 'z. B. Streifen aus einem Original-GIF' }), text('date', 'Datum')] },
@@ -130,6 +135,7 @@ export const AREAS = {
     check: (x, report, p) => {
       if (x.file && p.exists && !p.exists(x.file)) report('error', `Datei ${x.file} fehlt`);
       if (x.alt && p.exists && !p.exists(x.alt)) report('error', `Ersatzdatei ${x.alt} fehlt`);
+      if (x.hands && p.exists && !p.exists(x.hands)) report('error', `Datei ${x.hands} fehlt`);
       if (x.kind === 'sound' && x.file && !/\.(m4a|mp3|ogg|wav)$/i.test(x.file)) report('warning', 'Töne sind .m4a, .mp3, .ogg oder .wav');
       if (x.kind === 'tiles' && (!x.frameSize || !x.frames)) report('error', 'Kacheln ohne Frame-Größe oder Frames');
       if (x.kind === 'icons' && (!x.cell || !x.grid)) report('error', 'Symbol-Raster ohne Feldgröße oder Raster');
@@ -525,10 +531,20 @@ export const AREAS = {
         ref('poses.runReload', 'Rennen + Nachladen 1', 'assets'), ref('poses.runReload2', 'Rennen + Nachladen 2', 'assets'),
         point('poses.muzzle', 'Mündung', { unit: 'px', hint: 'Wie Leyla › Waffe ziehen › Mündung, für diese Waffe' }), point('poses.muzzleRun', 'Mündung im Rennen', { unit: 'px' }),
         bool('muzzleFlash', 'Mündungsfeuer aus Code', { hint: 'Daniel, 12.11.2026: für Posen ohne gemalten Blitz; sitzt genau an der Mündung' }), num('kick', 'Rückstoß', { unit: 'px', min: 0, hint: 'So weit ruckt Leyla beim Schuss kurz zurück' })] },
+      { title: 'In der Hand', fields: [select('held.class', 'Klasse', HELD_CLASSES, { hint: 'Daniel, 12.11.2026 (#004): welche Posen ein Gegner aus dem Bausatz damit spielt. Leer = Nahkampf leicht bzw. Pistole' }),
+        num('hands', 'Hände', { min: 1, max: 2, hint: '2 = beidhändig (Nahkampf schwer, Langwaffe). Leer = 1' }),
+        ref('held.look', 'Bild', 'assets', { hint: 'Symbol-Raster mit der Waffe von der Seite, Spitze bzw. Mündung nach rechts (meist dasselbe wie Aussehen)' }), num('held.icon', 'Feld', { min: 0, hint: '0 = oben links, zeilenweise' }),
+        point('held.grip', 'Griff', { unit: 'px', hint: 'Wo die Hand greift, in Pixeln des Felds (beidhändig: Mitte zwischen den Händen)' }),
+        point('held.tip', 'Spitze', { unit: 'px', hint: 'Klinge bzw. Lauf zeigt vom Griff hierhin; wird auf die Richtung des Platzhalters in jedem Frame gedreht' }),
+        point('held.muzzle', 'Mündung', { unit: 'px', hint: 'Nur Fernkampf: hier startet der Schuss. Leer = Spitze' }),
+        num('held.cm', 'Länge', { unit: 'cm', min: 1, hint: 'Gemalte Länge der Waffe; der Bausatz rechnet sie mit der Körpergröße in Pixel um' })] },
       { title: 'Rucksack & Handel', fields: [size('size', 'Größe', { unit: 'Felder' }), VALUE] },
       { title: 'Zerlegen', fields: SALVAGE_FIELDS },
     ],
-    check: (x, report, p, id) => { iconCheck(x, report, p); for (const m of salvageProblems(p, id, 'weapons')) report(m.kind, m.text); },
+    check: (x, report, p, id) => {
+      iconCheck(x, report, p); for (const m of salvageProblems(p, id, 'weapons')) report(m.kind, m.text);
+      if (x.held?.look && p.data?.assets?.[x.held.look]?.kind !== 'icons') report('warning', 'In der Hand › Bild ist kein Symbol-Raster');
+    },
   },
   enemies: {
     name: 'Gegner', singular: 'Gegner', icon: 'skull', file: 'data/enemies.json', kind: 'catalog', groupBy: { key: 'family', options: ENEMY_FAMILIES },
@@ -537,6 +553,9 @@ export const AREAS = {
     row: x => `${label(ENEMY_BEHAVIORS, x.behavior)} · ${x.health ?? 0} Leben · ${x.damage ?? 0} Schaden`,
     sections: [
       { title: 'Gegner', fields: [NAME, LOOK, select('family', 'Familie', ENEMY_FAMILIES), select('behavior', 'Verhalten', ENEMY_BEHAVIORS), DESCRIPTION] },
+      { title: 'Aussehen aus dem Bausatz', fields: [ref('kit', 'Bausatz', 'kits', { hint: 'Daniel, 12.11.2026 (#004): Körper aus dem Bausatz, die Waffe kommt aus „Waffe“ (Waffen › In der Hand). Geht vor „Aussehen“' }),
+        text('kitHead', 'Kopf', { hint: 'ID aus Gegner-Bausätze › Köpfe; leer = gemalter Kopf' }), text('kitSkin', 'Hautton', { hint: 'Name aus Bausatz › Hauttöne; leer = wie gemalt' }),
+        text('kitGang', 'Gang-Farbe', { hint: 'Name aus Bausatz › Gang-Farben; leer = wie gemalt' })] },
       { title: 'Werte', fields: [num('health', 'Leben', { min: 1 }), num('damage', 'Schaden', { min: 0 }), num('speed', 'Tempo', { unit: 'px/s', min: 0 }),
         ref('weapon', 'Waffe', 'weapons', { hint: 'Optional, sonst Körperangriff' })] },
       { title: 'Wahrnehmung', fields: [num('aggroRange', 'Sieht Leyla bis', { unit: 'px', min: 0, hint: 'Nur mit freier Sichtlinie (Wände, geschlossene Türen und brüchige Wände halten den Blick auf)' }),
@@ -564,9 +583,48 @@ export const AREAS = {
         num('counter.dodge', 'Weicht aus', { unit: '%', min: 0, max: 100, hint: 'Chance je anfliegendem Nagel und je Hieb von Leyla, dass er weghüpft' }),
         num('counter.dodgeCooldown', 'Ausweichen alle', { unit: 'ms', min: 0, hint: 'Leer = 1400' }), num('counter.dodgeDistance', 'Ausweichen weit', { unit: 'px', min: 0, hint: 'Leer = 200' }),
         num('counter.armor', 'Panzerung', { unit: 'Platten', min: 0, hint: 'Jeder schwere Treffer bricht eine Platte; solange eine hält, machen leichte Treffer nur „Leichte Treffer“ Schaden' }),
-        num('counter.armorChip', 'Leichte Treffer', { unit: '%', min: 0, max: 100, hint: 'Anteil Schaden durch die Panzerung. Leer = 15' })] },
-      { title: 'Beute', fields: [ref('loot', 'Beutetabelle', 'lootTables'), range('deltas', 'Deltas', { unit: 'Δ' }), bool('countsForRanking', 'Zählt für Kills %')] },
+        num('counter.armorChip', 'Leichte Treffer', { unit: '%', min: 0, max: 100, hint: 'Anteil Schaden durch die Panzerung. Leer = 15' }),
+        num('counter.duck', 'Duckt sich', { unit: '%', min: 0, max: 100, hint: 'Daniel, 12.11.2026 (#004): „alle Gegner, die Humanoide sind, sollen sich ducken können“. Chance je anfliegendem Nagel auf Brusthöhe; geduckt fliegt er drüber. Leer = 0' }),
+        num('counter.duckTime', 'Geduckt', { unit: 'ms', min: 0, hint: 'So lange bleibt er unten. Leer = 700' }),
+        num('counter.duckEvery', 'Ducken alle', { unit: 'ms', min: 0, hint: 'Leer = 1200' })] },
+      { title: 'Beute', fields: [ref('loot', 'Beutetabelle', 'lootTables'), range('deltas', 'Deltas', { unit: 'Δ' }), bool('countsForRanking', 'Zählt für Kills %'),
+        num('dropWeapon', 'Lässt seine Waffe fallen', { unit: '%', min: 0, max: 100, hint: '#004: Chance, dass seine Waffe (Werte › Waffe) mit der Beute liegt, damit Leyla sie benutzen kann. Leer = 0' })] },
     ],
+    check: (x, report, p) => {
+      const K = x.kit && p.data?.kits?.[x.kit];
+      if (!K) return;
+      if (x.kitHead && !(K.heads || []).some(h => h.id === x.kitHead)) report('error', `Kopf ${x.kitHead} gibt es im Bausatz nicht`);
+      if (x.kitSkin && !(K.skins || []).some(h => h.name === x.kitSkin)) report('error', `Hautton ${x.kitSkin} gibt es im Bausatz nicht`);
+      if (x.kitGang && !(K.gangs || []).some(h => h.name === x.kitGang)) report('error', `Gang-Farbe ${x.kitGang} gibt es im Bausatz nicht`);
+    },
+  },
+  kits: {
+    name: 'Gegner-Bausätze', singular: 'Bausatz', icon: 'person', file: 'data/kits.json', kind: 'catalog',
+    hint: 'Daniel, 12.11.2026 (#004): ein gemalter Körper mit Animationen je Waffenklasse; Köpfe, Waffen und Farben sind austauschbar, ohne neue Animationen. Die Animationen tragen einen grünen Platzhalter statt der Waffe (tools/raider_strips.py), das Spiel setzt die echte Waffe je Frame an Griff und Winkel.',
+    template: { name: 'Neuer Bausatz', cm: 180, height: 180, poses: [], heads: [], swaps: [], skins: [], gangs: [] },
+    row: x => `${(x.poses || []).length} Animationen · ${(x.heads || []).length} Köpfe · ${(x.skins || []).length} Hauttöne`,
+    sections: [
+      { title: 'Bausatz', fields: [NAME, DESCRIPTION, num('cm', 'Körpergröße', { unit: 'cm', min: 50, hint: 'Maßstab für die Waffen (Waffen › In der Hand › Länge)' }),
+        num('figure', 'Figur im Frame', { unit: 'px', min: 1, hint: 'So hoch ist die Figur in den Animationen gemalt (Scheitel bis Sohle)' }),
+        num('height', 'Höhe im Spiel', { unit: 'px', min: 1, hint: 'Standard, wenn der Gegner keine Größe hat (Leyla: 192)' }),
+        num('windupFrame', 'Ausholen bis Frame', { min: 0, hint: 'Nahkampf: während der Warnung laufen die Frames bis hier (0 = erster), beim Hieb der Rest. Leer = 3' })] },
+      { title: 'Animationen', fields: [table('poses', 'Animationen', [select('class', 'Klasse', [...HELD_CLASSES, ['any', 'alle Klassen']]), select('state', 'Zustand', KIT_STATES), ref('look', 'Animation', 'assets')],
+        { hint: 'Je Waffenklasse: Alarm (Stehen im Kampf), Gehen, Rennen, Ducken (letzter Frame hält), Angriff (Hieb bzw. Schuss)' })] },
+      { title: 'Köpfe', fields: [table('heads', 'Köpfe', [text('id', 'ID'), text('name', 'Name'), ref('look', 'Bild', 'assets'), point('at', 'Sitzt bei', { unit: 'px' })],
+        { hint: 'Ein Kopf ist ein Bild, das in der Grundpose genau auf dem Kopf liegt (oben links bei „Sitzt bei“, Pixel im Frame); in jedem Frame wandert es mit dem gemessenen Kopf. Ohne Bild = der gemalte Kopf' })] },
+      { title: 'Farbtausch', fields: [table('swaps', 'Farbgruppen', [select('group', 'Gruppe', [['skin', 'Haut'], ['gang', 'Gang-Farbe']]), num('hueFrom', 'Farbton von', { unit: '°' }), num('hueTo', 'bis', { unit: '°' }),
+          num('satMin', 'Sättigung ab', { unit: '%' }), num('lightMin', 'Helligkeit ab', { unit: '%' }), num('lightMax', 'bis', { unit: '%' }), num('sat', 'Sättigung Mitte', { unit: '0–1' }), num('mid', 'Helligkeit Mitte', { unit: '%' })],
+          { hint: 'Welche gemalten Pixel zu Haut bzw. Gang-Farbe gehören. Sie bekommen Farbton und Sättigung der Wunschfarbe; die Helligkeit behält ihren Abstand zur Mitte (Schatten bleiben)' }),
+        table('skins', 'Hauttöne', [text('name', 'Name'), color('color', 'Farbe')], { hint: 'Leer = wie gemalt' }),
+        table('gangs', 'Gang-Farben', [text('name', 'Name'), color('color', 'Farbe')], { hint: 'Neon-Besatz der Kleidung; leer = wie gemalt (Magenta)' })] },
+      { title: 'Waffe in der Hand', fields: [table('offsets', 'Griff-Versatz', [select('class', 'Klasse', HELD_CLASSES), point('offset', 'Versatz', { unit: 'px' })],
+        { hint: 'Verschiebt die Waffe je Klasse in allen Frames (Pixel im Frame, nach rechts schauend). Für Animationen, in denen der Platzhalter von der Hand weggerutscht ist' })] },
+    ],
+    check: (x, report, p) => {
+      const A = p.data?.assets || {};
+      for (const r of x.poses || []) if (r.look && A[r.look]?.kind !== 'animation') report('error', `${r.class}/${r.state}: keine Animation`);
+      for (const c of ['light', 'heavy', 'pistol', 'long']) if ((x.poses || []).some(r => r.class === c) && !(x.poses || []).some(r => r.class === c && r.state === 'alert')) report('warning', `Klasse ${c} ohne Alarm-Pose`);
+    },
   },
   buffs: {
     name: 'Buffs', singular: 'Buff', icon: 'flash', file: 'data/buffs.json', kind: 'catalog',
@@ -640,7 +698,7 @@ export const AREAS = {
     template: { name: 'Neue Beutetabelle', rolls: [1, 2], entries: [] },
     row: x => `${(x.entries || []).length} Einträge · ${(x.rolls || []).join('–')} Würfe`,
     sections: [{ title: 'Beutetabelle', fields: [NAME, range('rolls', 'Würfe'),
-      table('entries', 'Einträge', [ref('item', 'Gegenstand', 'items'), num('weight', 'Gewicht', { min: 0 }), num('min', 'min', { min: 1 }), num('max', 'max', { min: 1 })]), DESCRIPTION] }],
+      table('entries', 'Einträge', [ref('item', 'Gegenstand', 'items'), ref('weapon', 'oder Waffe', 'weapons'), num('weight', 'Gewicht', { min: 0 }), num('min', 'min', { min: 1 }), num('max', 'max', { min: 1 })]), DESCRIPTION] }],
     check: (x, report) => { if (!(x.entries || []).length) report('warning', 'Beutetabelle ist leer'); },
   },
   recipes: {
@@ -1047,7 +1105,7 @@ export const GROUPS = [
   ['ASSETS', ['assets']],
   ['GRUNDLAGEN', ['game', 'splash', 'weather', 'economy', 'ranking']],
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
-  ['KAMPF', ['weapons', 'enemies', 'buffs']],
+  ['KAMPF', ['weapons', 'enemies', 'kits', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
   ['PROGRESSION', ['techtree', 'resources']],
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'companions']],

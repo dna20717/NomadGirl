@@ -127,10 +127,12 @@ export function rollLoot(D, tableId, rnd = Math.random) {
   for (let i = 0; i < rolls && total > 0; i++) {
     let k = rnd() * total;
     const e = T.entries.find(x => (k -= x.weight || 0) < 0) || T.entries[0];
-    if (!D.items?.[e.item]) continue;
-    const n = (e.min ?? 1) + Math.floor(rnd() * ((e.max ?? e.min ?? 1) - (e.min ?? 1) + 1));
-    const same = out.find(o => o.id === e.item);
-    if (same) same.n += n; else out.push({ a: 'items', id: e.item, n });
+    // an entry is a thing (Gegenstand) or a weapon (Waffe, #004: raider weapons can lie in the loot)
+    const a = e.weapon && D.weapons?.[e.weapon] ? 'weapons' : 'items', id = a === 'weapons' ? e.weapon : e.item;
+    if (!D[a]?.[id]) continue;
+    const n = a === 'weapons' ? 1 : (e.min ?? 1) + Math.floor(rnd() * ((e.max ?? e.min ?? 1) - (e.min ?? 1) + 1));
+    const same = a === 'items' && out.find(o => o.a === 'items' && o.id === id);
+    if (same) same.n += n; else out.push({ a, id, n });
   }
   return out;
 }
