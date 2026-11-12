@@ -574,7 +574,7 @@ export class Camp {
     const R = this.C.rig || {};
     const store = def.grid && `store:${u.ui}:${w.at}`;
     this.hotspots.push({ rig: true, place: `${u.ui}:${w.at}`, x: cx + cw / 2, w: cw / 2, top: this.curTop, floor: u.floorY, name: def.name || w.id, hint: store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id, `${u.ui}:${w.at}`) });
-    if (R.labels !== false) {
+    if (R.labels !== false && def.function !== 'tank') {   // the cryo tank has its own screen
       const t = this.scene.add.text(cx + cw / 2, labelY, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '24px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 0).setDepth(-14);
       t.unit = u.ui; this.rigObjs.push(t); (this.labels ||= []).push(t);   // fades with a closed shell
     }
@@ -828,12 +828,12 @@ export class Camp {
   // ---------- actions ----------
   use(id, place = null) {
     const def = this.D.workshops?.[id] || {}, s = this.scene;
-    if (this.noPower && def.power < 0 && def.function !== 'warroom')
+    if (this.noPower && def.power < 0 && def.function !== 'warroom' && def.function !== 'tank')
       return s.hud.menu({ title: def.name || id, sub: `Kein Strom: das Rig erzeugt ${this.budget.power.made} ⚡ und braucht ${this.budget.power.used} ⚡. Generator einbauen oder Verbraucher ausbauen (B: Rig umbauen).`,
         items: [{ label: 'Rig umbauen', primary: true, act: () => s.openBuild() }, { label: 'Zurück', act: () => {} }] });
     if (def.function === 'sleep') return this.sleep(def);
     if (def.function === 'warroom') return this.warroom();
-    if (['kitchen', 'craft'].includes(def.function)) { s.hud.inv?.close(); return s.hud.craft?.open(id); }
+    if (['kitchen', 'craft', 'tank'].includes(def.function)) { s.hud.inv?.close(); return s.hud.craft?.open(id); }
     if (def.function === 'guests') {   // who sleeps here: the guests in order, as many as there are beds in all guest bunks
       const P = passengers(this.D, this.box.save), nm = c => this.D.companions?.[c]?.name || c, waiting = Object.entries(this.box.save.waiting || {});
       return s.hud.menu({ title: def.name || id, sub: [def.description, P.guests.length ? `Gäste an Bord: ${P.riding.map(nm).join(', ') || '–'} · ${P.beds} ${P.beds === 1 ? 'Bett' : 'Betten'} im Rig.` : `${P.beds} ${P.beds === 1 ? 'Bett' : 'Betten'} frei für Fahrgäste.`,
@@ -1026,7 +1026,7 @@ export class Camp {
   }
 }
 
-const VERB = { sleep: 'Schlafen', warroom: 'Planen', kitchen: 'Kochen', foodtruck: 'Verkaufen', craft: 'Herstellen', storage: 'Lager', cooling: 'Kühlraum', chill: 'Chillen', drone: 'Drohne', engine: 'Motor', power: 'Energie', cell: 'Zelle', guests: 'Gäste', treasury: 'Schatzkammer' };
+const VERB = { sleep: 'Schlafen', warroom: 'Planen', kitchen: 'Kochen', foodtruck: 'Verkaufen', craft: 'Herstellen', storage: 'Lager', cooling: 'Kühlraum', chill: 'Chillen', drone: 'Drohne', engine: 'Motor', power: 'Energie', cell: 'Zelle', guests: 'Gäste', treasury: 'Schatzkammer', tank: 'Nach AvA sehen' };
 const SOON = { foodtruck: 'Verkaufen kommt später.', power: 'Liefert Energie für die Werkstätten im Rig.',
   storage: 'Das Lager füllt sich mit Schritt 2 (Beute & Rucksack).', cooling: 'Das Lager füllt sich mit Schritt 2 (Beute & Rucksack).', chill: 'Chillen gibt bald einen Buff.' };
 

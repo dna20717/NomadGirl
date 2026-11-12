@@ -1,7 +1,7 @@
 {
  "van": {
   "name": "Van",
-  "pull": 1500,
+  "pull": 2400,
   "fuelUse": 12,
   "tank": 60,
   "power": 3,

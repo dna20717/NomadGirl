@@ -9,10 +9,11 @@ import { icon } from '../icons.js';
 import { CATEGORY_COLORS, markOf } from './inventory_ui.js';
 import { recipesFor, known, missing, stock, craft, experiment, readable, read, tips, functionOf } from '../crafting.js';
 import { clockText } from '../save.js';
+import { phase, canMaintain, update as tankUpdate } from '../tank.js';
 
-const VERBS = { kitchen: ['Kochen', 'Kochnische'], foodtruck: ['Kochen', 'Foodtruck'], craft: ['Herstellen', 'Werkbank'] };
+const VERBS = { kitchen: ['Kochen', 'Kochnische'], foodtruck: ['Kochen', 'Foodtruck'], craft: ['Herstellen', 'Werkbank'], tank: ['Warten', 'Cryo-Tank'] };
 // order of the supplies: what fits the workshop first
-const FIRST = { kitchen: ['ingredient', 'food'], foodtruck: ['ingredient', 'food'], craft: ['resource', 'junk', 'component'] };
+const FIRST = { kitchen: ['ingredient', 'food'], foodtruck: ['ingredient', 'food'], craft: ['resource', 'junk', 'component'], tank: ['component', 'resource'] };
 const fill = (t, name) => (t || '').replace('{name}', name);
 
 export class CraftUI {
@@ -49,6 +50,7 @@ export class CraftUI {
     this.el.replaceChildren(el('div', { class: 'craft-box ui-frame' },
       el('header', {}, icon('workbench', 20), el('h2', {}, def.name || this.ws),
         el('small', {}, clockText(save)), el('button', { class: 'craft-x', title: 'Schließen (Esc)', onclick: () => this.close() }, '×')),
+      this.tankEl(),
       el('div', { class: 'craft-cols' }, this.bookEl(), this.potEl()),
       this.logEl(),
       hints([['move', 'wählen'], ['ok', 'eins'], ['send', 'alle'], ['context', 'wieder raus'], ['back', 'schließen']], 'Vorräte anklicken: in den Topf · Rechtsklick oder Klick im Topf: raus · Zutaten aus Lager, Kiste und Rucksack')));
@@ -61,12 +63,13 @@ export class CraftUI {
     const cards = mine.map(r => {
       const miss = missing(D, save, r), st = stock(D, save);
       return el('div', { class: 'craft-recipe' + (miss.length ? ' missing' : '') },
-        el('div', { class: 'craft-rtop' }, (r.part ? this.partChip(r.part, r.count || 1) : this.chip(r.result, r.count || 1, { big: true })), el('b', {}, r.name || (r.part ? D.rigParts?.[r.part]?.name : D.items?.[r.result]?.name) || r.id), el('small', {}, `${r.time ?? 10} min`)),
+        el('div', { class: 'craft-rtop' }, (r.tank ? el('span', { class: 'craft-chip big tank' }, `+${r.tank}%`) : r.part ? this.partChip(r.part, r.count || 1) : this.chip(r.result, r.count || 1, { big: true })), el('b', {}, r.name || (r.part ? D.rigParts?.[r.part]?.name : D.items?.[r.result]?.name) || r.id), el('small', {}, `${r.time ?? 10} min`)),
         el('div', { class: 'craft-ings' }, ...(r.ingredients || []).map(i => {
           const n = st[i.item] || 0, need = i.count || 1;
           return el('span', { class: 'craft-ing ' + (n >= need ? 'ok' : 'no') }, markOf(D, 'items', i.item, 18), ` ${D.items?.[i.item]?.name || i.item} ${Math.min(n, 99)}/${need}`);
         })),
-        el('button', { class: 'inv-btn', disabled: !!miss.length, title: miss.length ? 'Es fehlen: ' + miss.map(m => `${m.need - m.have}× ${D.items?.[m.item]?.name || m.item}`).join(', ') : '', onclick: () => this.make(r.id) }, verb));
+        r.tank && r.tankUpTo ? el('small', { class: 'craft-upto' }, `hilft bis Phase ${r.tankUpTo}`) : null,
+        el('button', { class: 'inv-btn', disabled: !!miss.length || (r.tank && !canMaintain(D, save, r).ok), title: miss.length ? 'Es fehlen: ' + miss.map(m => `${m.need - m.have}× ${D.items?.[m.item]?.name || m.item}`).join(', ') : r.tank ? canMaintain(D, save, r).reason || '' : '', onclick: () => this.make(r.id) }, verb));
     });
     const notes = readable(D, save).filter(x => all.some(r => r.id === x.recipe)).map(x => el('div', { class: 'craft-note' },
       this.chip(x.item, 1), el('span', {}, el('b', {}, D.items[x.item].name || x.item), el('small', {}, D.items[x.item].description || 'Da steht was drauf.')),
@@ -132,7 +135,15 @@ export class CraftUI {
     if (!r.ok) return this.say('error', r.reason);
     this.after(r, 'hit', fill(D.crafting?.texts?.hit || '{name} ist fertig!', `${r.made.n > 1 ? r.made.n + '× ' : ''}${this.madeName(r.made)}`) + (r.made.part ? ' · liegt auf dem Schrottplatz, einbauen mit B' : ''));
   }
-  madeName(m) { return (m.part ? this.D.rigParts?.[m.id]?.name : this.D.items?.[m.id]?.name) || m.id; }
+  madeName(m) { return m.tank ? `Tank +${m.tank} %` : (m.part ? this.D.rigParts?.[m.id]?.name : this.D.items?.[m.id]?.name) || m.id; }
+  // at the cryo tank: a bar with its condition and phase over the recipe book (Cryo-Tank › Phasen)
+  tankEl() {
+    if (functionOf(this.D, this.ws) !== 'tank') return null;
+    const D = this.D, save = this.save; tankUpdate(D, save);
+    const t = save.tank || { cond: 0 }, p = phase(D, save), c = Math.round(t.cond);
+    return el('div', { class: 'craft-tank ph' + p.index + (p.dead ? ' dead' : '') },
+      el('b', {}, p.dead ? 'AvA ist fort.' : `AvA · ${c} %`), el('i', {}, el('span', { style: `width:${c}%` })), el('small', {}, p.name + (t.rescues ? ` · ${t.rescues}× gerettet` : '')));
+  }
   tryPot() {
     const D = this.D, T = D.crafting?.texts || {}, pot = { ...this.pot }, r = experiment(D, this.save, this.ws, pot);
     if (!r.ok) return this.say('error', r.reason);

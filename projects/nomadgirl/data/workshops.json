@@ -271,5 +271,16 @@
   "fx": [],
   "lookEmpty": "ws_treasury_empty",
   "fill": [{"y": 150},{"y": 168},{"y": 186},{"y": 204}]
+ },
+ "cryotank": {
+  "name": "Cryo-Tank",
+  "function": "tank",
+  "places": 1,
+  "power": -1,
+  "stage": "mvp",
+  "value": 0,
+  "fixed": true,
+  "look": "ws_cryotank_1",
+  "description": "AvA schläft hier. Ihr Verstand fliegt mit dir. Kann nicht verkauft oder ausgebaut werden."
  }
 }

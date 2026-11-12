@@ -826,5 +826,23 @@
   "value": 2,
   "glyph": "🧬",
   "description": "Fortschritt aus Proben und allem, was mal gelebt hat. Entsteht in der Kochnische. Führt irgendwann zum Heilmittel."
+ },
+ "kuehlmittel": {
+  "name": "Kühlmittel",
+  "category": "component",
+  "size": [1, 2],
+  "stack": 3,
+  "value": 40,
+  "glyph": "❄",
+  "description": "Ein Kanister, kalt wie eine Winternacht in der Salzebene. Füllt den Cryo-Tank auf."
+ },
+ "kompressor": {
+  "name": "Kompressor",
+  "category": "component",
+  "size": [2, 2],
+  "stack": 1,
+  "value": 160,
+  "glyph": "⚙",
+  "description": "Das Herz einer Kühlanlage. Selten, schwer, unbezahlbar, wenn man es braucht."
  }
 }

@@ -8,6 +8,7 @@
 //   'rig:<unit>' = the own storage of the tractor (Kofferraum, plus rows from a Dachbox) or of a trailer (Deichselkasten)
 // Times are hours (18.5 = 18:30). "Ereignis-Zeit": the clock only moves on actions (sleeping, runs, sitting at the fire).
 
+import { ensureTank } from './tank.js';
 import { newGrid, add, fits, startWear, wearOf, WEAR_KEYS } from './inventory.js';
 
 const LOCAL_KEY = 'nomadgirl-save';
@@ -31,6 +32,18 @@ export function placeWorkshops(D, tractor, containers, workshops) {
     if (!done) left.push(id);
   }
   return { units, left };
+}
+
+// the cryo tank (Cryo-Tank › Werkstatt + Im Container) is always in the rig: from the start and in old savegames, in a container of its own
+// at the end of the rig (storage keys of the other units stay where they are); fixed, so it never leaves again
+export function ensureTankInRig(D, s) {
+  const T = D.tank || {};
+  if (T.enabled === false || !D.workshops?.[T.workshop]) return s;
+  ensureTank(D, s);
+  if (s.rig.units.some(u => u.workshops.some(w => w.id === T.workshop))) return s;
+  s.rig.spare.workshops = (s.rig.spare.workshops || []).filter(w => (w.id ?? w) !== T.workshop);
+  s.rig.units.push({ kind: 'container', id: D.containers?.[T.container] ? T.container : Object.keys(D.containers || {})[0], workshops: [{ id: T.workshop, at: 0 }] });
+  return s;
 }
 
 // every inventory the camp has: the chest and each storage place in the rig (workshops with a "Lager-Raster")
@@ -85,7 +98,7 @@ export function newSave(D) {
   const S = D.game?.start || {}, C = D.camp?.clock || {};
   const { units, left } = placeWorkshops(D, S.tractor, S.containers || [], S.workshops || []);
   const spare = [...(S.spare || []), ...left].filter(id => D.workshops?.[id]);   // packed on the scrapyard: Spiel › Start › Verpackt auf dem Schrottplatz, plus what did not fit
-  return withInventory(D, {
+  return withInventory(D, ensureTankInRig(D, {
     version: SAVE_VERSION,
     day: C.startDay ?? 1, hour: C.startHour ?? 18,
     location: S.location || Object.keys(D.locations || {})[0] || null,
@@ -97,7 +110,7 @@ export function newSave(D) {
     recipes: startRecipes(D),
     run: null,
     log: [],
-  });
+  }));
 }
 function withInventory(D, save) {
   save.inv ??= newInventory(D, save);
@@ -201,6 +214,8 @@ export function repairSave(save, D) {
   if (s.run && !D.pois?.[s.run.poi]) s.run = null;
   s.recipes = Array.isArray(save.recipes) ? [...new Set([...save.recipes.filter(r => D.recipes?.[r]), ...startRecipes(D)])] : fresh.recipes;
   if (save.inv === undefined) delete s.inv;   // older savegame: inventory from the start values
+  if (!save.tank) delete s.tank;   // older savegame: the tank starts full at today's clock
+  ensureTankInRig(D, s);
   return withInventory(D, s);
 }
 

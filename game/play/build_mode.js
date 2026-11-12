@@ -347,9 +347,14 @@ export class BuildMode {
     for (const so of this.sockets()) if (so.id && inside(so)) return { kind: 'part', from: 'socket', slot: so.slot, si: so.i, id: so.id, sock: so };
     for (const sl of this.slots()) {
       const w = inside(sl) && wsAt(D, this.save.rig, sl.ui, sl.p);
+      // Werkstätten › Fest eingebaut (the cryo tank): stays where it is, and so does its container
+      if (w && D.workshops?.[w.id]?.fixed) { this.say(`${D.workshops[w.id].name || w.id} ist fest eingebaut.`); return null; }
       if (w) return { kind: 'ws', from: 'rig', ui: sl.ui, at: w.at, id: w.id, slot: sl };
     }
-    for (const u of [...camp.geo.units].sort((a, b) => levelOf(b) - levelOf(a))) if (x >= u.x0 && x <= u.x1 && y >= u.inTop - 40 && y <= (u.base ?? camp.ground) + 10) return { kind: 'container', from: 'rig', ui: u.ui, id: u.id, unit: u };
+    for (const u of [...camp.geo.units].sort((a, b) => levelOf(b) - levelOf(a))) if (x >= u.x0 && x <= u.x1 && y >= u.inTop - 40 && y <= (u.base ?? camp.ground) + 10) {
+      if (U[u.ui]?.workshops?.some(w => D.workshops?.[w.id]?.fixed)) { this.say('Dieser Container trägt etwas, das bleiben muss.'); return null; }
+      return { kind: 'container', from: 'rig', ui: u.ui, id: u.id, unit: u };
+    }
     if (camp.dealer && inside(camp.dealer)) return { kind: 'dealer' };
     return null;
   }

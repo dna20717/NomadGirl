@@ -11,7 +11,7 @@ const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
 test('Start-Rig (Daniel, 09.11.2026): Van mit Schlafkoje + Warroom, leerer Modul-Anhänger, der Rest verpackt auf dem Schrottplatz', () => {
   const s = newSave(D);
   assert.equal(s.rig.tractor, 'van');
-  assert.deepEqual(s.rig.units.map(u => [u.id, u.workshops.map(w => `${w.id}@${w.at}`)]), [['van', ['schlafkoje@0', 'warroom@1']], ['modulanhaenger', []]]);
+  assert.deepEqual(s.rig.units.map(u => [u.id, u.workshops.map(w => `${w.id}@${w.at}`)]), [['van', ['schlafkoje@0', 'warroom@1']], ['modulanhaenger', []], ['container_10', ['cryotank@0']]]);   // + the cryo tank (12.11.2026)
   assert.deepEqual(s.rig.spare.workshops, ['kochnische', 'werkbank', 'lagerregal']);
   assert.ok(s.inv.grids.chest.items.some(e => e.id === 'reis'), 'Vorräte ohne Lager liegen in der Kiste');
   const { left } = placeWorkshops(D, 'van', [], ['kueche', 'schlafkoje', 'warroom']);   // Küche needs 2 places → fills the van, the rest has no room
@@ -37,7 +37,7 @@ test('Alter Spielstand wird repariert', () => {
 
 test('Fahrtkosten', () => {
   const t = travelCost(D, newSave(D), 'bunker_13');
-  assert.deepEqual(t, { km: 42, hours: 1, fuel: 5.4, food: 0.1 });   // leerer Modul-Anhänger: 800 kg
+  assert.deepEqual(t, { km: 42, hours: 1, fuel: 5.9, food: 0.1 });   // leerer Modul-Anhänger 800 kg + Tank im 10-Fuß-Container
 });
 
 test('Ankunft im Camp: immer Dämmerung', () => {

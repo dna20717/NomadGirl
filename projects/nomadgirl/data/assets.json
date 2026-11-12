@@ -2021,14 +2021,14 @@
   "kind": "animation",
   "file": "assets/drone/faces.png",
   "frameSize": [28, 32],
-  "frames": 14,
+  "frames": 16,
   "fps": 0,
   "loop": false,
   "origin": [14, 16],
   "height": 32,
   "source": "Code (tools/drone_parts.py, AAP-64 mit Scanlines)",
   "date": "10.11.2026",
-  "description": "Ein Gesicht pro Frame für den Bildschirm: 0 normal, 1 blinzeln, 2 fröhlich, 3 begeistert, 4 gelangweilt, 5 alarmiert, 6 neugierig, 7 wütend, 8 schläft, 9 k.o., 10 Radar, 11 besorgt (Schweiß), 12 entschlossen (Dash), 13 Zen. Ankerpunkt = Mitte des Glases."
+  "description": "Ein Gesicht pro Frame für den Bildschirm: 0 normal, 1 blinzeln, 2 fröhlich, 3 begeistert, 4 gelangweilt, 5 alarmiert, 6 neugierig, 7 wütend, 8 schläft, 9 k.o., 10 Radar, 11 besorgt (Schweiß), 12 entschlossen (Dash), 13 Zen, 14 verliebt (beim Cryo-Tank), 15 schwach (Tank-Zustand schlecht). Ankerpunkt = Mitte des Glases."
  },
  "drone_lamp_source": {
   "name": "Drohne · Lampe (Original)",
@@ -2916,5 +2916,155 @@
   "source": "KI (PixelLab, Create Image Pro, Referenz: Gewehr aus Gehen mit Sturmgewehr, Stilbild Rennen seitlich)",
   "date": "12.11.2026",
   "derivedFrom": "leyla_rifle_aim_walk_side"
+ },
+ "ws_cryotank_1": {
+  "name": "Cryo-Tank · stabil",
+  "kind": "image",
+  "file": "assets/workshops/cryotank_1.png",
+  "origin": [128, 240],
+  "source": "KI (PixelLab: Create Image Pro mit Stilbild Drohnenwerkbank v2 und der Drohnen-Hülle als Referenz, Phasen mit Edit Pro Flash)",
+  "date": "12.11.2026",
+  "derivedFrom": null,
+  "description": "Cryo-Tank im Zustand „stabil“, 256 × 256, orthogonal von vorn. Grüne Flüssigkeit, darin nur die Kontur eines Mädchens mit Schläuchen und Kabeln. Text-Anzeige x 96–137 / y 201–215, Gesicht x 145–163 / y 200–216, Glas x 88–168 / y 61–183."
+ },
+ "ws_cryotank_2": {
+  "name": "Cryo-Tank · beschlagen",
+  "kind": "image",
+  "file": "assets/workshops/cryotank_2.png",
+  "origin": [128, 240],
+  "source": "KI (PixelLab: Create Image Pro mit Stilbild Drohnenwerkbank v2 und der Drohnen-Hülle als Referenz, Phasen mit Edit Pro Flash)",
+  "date": "12.11.2026",
+  "derivedFrom": "ws_cryotank_1",
+  "description": "Cryo-Tank im Zustand „beschlagen“, 256 × 256, orthogonal von vorn. Grüne Flüssigkeit, darin nur die Kontur eines Mädchens mit Schläuchen und Kabeln. Text-Anzeige x 96–137 / y 201–215, Gesicht x 145–163 / y 200–216, Glas x 88–168 / y 61–183."
+ },
+ "ws_cryotank_3": {
+  "name": "Cryo-Tank · Risse",
+  "kind": "image",
+  "file": "assets/workshops/cryotank_3.png",
+  "origin": [128, 240],
+  "source": "KI (PixelLab: Create Image Pro mit Stilbild Drohnenwerkbank v2 und der Drohnen-Hülle als Referenz, Phasen mit Edit Pro Flash)",
+  "date": "12.11.2026",
+  "derivedFrom": "ws_cryotank_1",
+  "description": "Cryo-Tank im Zustand „Risse“, 256 × 256, orthogonal von vorn. Grüne Flüssigkeit, darin nur die Kontur eines Mädchens mit Schläuchen und Kabeln. Text-Anzeige x 96–137 / y 201–215, Gesicht x 145–163 / y 200–216, Glas x 88–168 / y 61–183."
+ },
+ "ws_cryotank_4": {
+  "name": "Cryo-Tank · Lecks",
+  "kind": "image",
+  "file": "assets/workshops/cryotank_4.png",
+  "origin": [128, 240],
+  "source": "KI (PixelLab: Create Image Pro mit Stilbild Drohnenwerkbank v2 und der Drohnen-Hülle als Referenz, Phasen mit Edit Pro Flash)",
+  "date": "12.11.2026",
+  "derivedFrom": "ws_cryotank_1",
+  "description": "Cryo-Tank im Zustand „Lecks“, 256 × 256, orthogonal von vorn. Grüne Flüssigkeit, darin nur die Kontur eines Mädchens mit Schläuchen und Kabeln. Text-Anzeige x 96–137 / y 201–215, Gesicht x 145–163 / y 200–216, Glas x 88–168 / y 61–183."
+ },
+ "ws_cryotank_5": {
+  "name": "Cryo-Tank · Alarm",
+  "kind": "image",
+  "file": "assets/workshops/cryotank_5.png",
+  "origin": [128, 240],
+  "source": "KI (PixelLab: Create Image Pro mit Stilbild Drohnenwerkbank v2 und der Drohnen-Hülle als Referenz, Phasen mit Edit Pro Flash)",
+  "date": "12.11.2026",
+  "derivedFrom": "ws_cryotank_1",
+  "description": "Cryo-Tank im Zustand „Alarm“, 256 × 256, orthogonal von vorn. Grüne Flüssigkeit, darin nur die Kontur eines Mädchens mit Schläuchen und Kabeln. Text-Anzeige x 96–137 / y 201–215, Gesicht x 145–163 / y 200–216, Glas x 88–168 / y 61–183."
+ },
+ "ws_cryotank_dead": {
+  "name": "Cryo-Tank · tot",
+  "kind": "image",
+  "file": "assets/workshops/cryotank_dead.png",
+  "origin": [128, 240],
+  "source": "KI (PixelLab: Create Image Pro mit Stilbild Drohnenwerkbank v2 und der Drohnen-Hülle als Referenz, Phasen mit Edit Pro Flash)",
+  "date": "12.11.2026",
+  "derivedFrom": "ws_cryotank_1",
+  "description": "Cryo-Tank im Zustand „tot“, 256 × 256, orthogonal von vorn. Grüne Flüssigkeit, darin nur die Kontur eines Mädchens mit Schläuchen und Kabeln. Text-Anzeige x 96–137 / y 201–215, Gesicht x 145–163 / y 200–216, Glas x 88–168 / y 61–183."
+ },
+ "cryotank_loop_1": {
+  "name": "Cryo-Tank · Schleife stabil",
+  "kind": "animation",
+  "file": "assets/workshops/cryotank_loop_1.png",
+  "frameSize": [256, 256],
+  "frames": 7,
+  "fps": 4,
+  "loop": true,
+  "origin": [128, 240],
+  "source": "KI (PixelLab Animate Image, erster = letzter Frame) + Code (tools/tank_strips.py: nur das Glas animiert, der Rahmen bleibt das Standbild)",
+  "date": "12.11.2026",
+  "derivedFrom": "ws_cryotank_1",
+  "description": "Läuft genau über dem Standbild der Phase."
+ },
+ "cryotank_loop_2": {
+  "name": "Cryo-Tank · Schleife beschlagen",
+  "kind": "animation",
+  "file": "assets/workshops/cryotank_loop_2.png",
+  "frameSize": [256, 256],
+  "frames": 8,
+  "fps": 4,
+  "loop": true,
+  "origin": [128, 240],
+  "source": "KI (PixelLab Animate Image, erster = letzter Frame) + Code (tools/tank_strips.py: nur das Glas animiert, der Rahmen bleibt das Standbild)",
+  "date": "12.11.2026",
+  "derivedFrom": "ws_cryotank_2",
+  "description": "Läuft genau über dem Standbild der Phase."
+ },
+ "cryotank_loop_3": {
+  "name": "Cryo-Tank · Schleife Risse",
+  "kind": "animation",
+  "file": "assets/workshops/cryotank_loop_3.png",
+  "frameSize": [256, 256],
+  "frames": 6,
+  "fps": 4,
+  "loop": true,
+  "origin": [128, 240],
+  "source": "KI (PixelLab Animate Image, erster = letzter Frame) + Code (tools/tank_strips.py: nur das Glas animiert, der Rahmen bleibt das Standbild)",
+  "date": "12.11.2026",
+  "derivedFrom": "ws_cryotank_3",
+  "description": "Läuft genau über dem Standbild der Phase."
+ },
+ "cryotank_loop_4": {
+  "name": "Cryo-Tank · Schleife Lecks",
+  "kind": "animation",
+  "file": "assets/workshops/cryotank_loop_4.png",
+  "frameSize": [256, 256],
+  "frames": 8,
+  "fps": 6,
+  "loop": true,
+  "origin": [128, 240],
+  "source": "KI (PixelLab Animate Image, erster = letzter Frame) + Code (tools/tank_strips.py: nur das Glas animiert, der Rahmen bleibt das Standbild)",
+  "date": "12.11.2026",
+  "derivedFrom": "ws_cryotank_4",
+  "description": "Läuft genau über dem Standbild der Phase."
+ },
+ "cryotank_loop_5": {
+  "name": "Cryo-Tank · Schleife Alarm",
+  "kind": "animation",
+  "file": "assets/workshops/cryotank_loop_5.png",
+  "frameSize": [256, 256],
+  "frames": 8,
+  "fps": 6,
+  "loop": true,
+  "origin": [128, 240],
+  "source": "KI (PixelLab Animate Image, erster = letzter Frame) + Code (tools/tank_strips.py: nur das Glas animiert, der Rahmen bleibt das Standbild)",
+  "date": "12.11.2026",
+  "derivedFrom": "ws_cryotank_5",
+  "description": "Läuft genau über dem Standbild der Phase."
+ },
+ "ws_cryotank_hand_1": {
+  "name": "Cryo-Tank · Hand 1",
+  "kind": "image",
+  "file": "assets/workshops/cryotank_hand_1.png",
+  "origin": [128, 240],
+  "source": "KI (PixelLab Edit Pro Flash) + Code (nur die geänderten Pixel, tools/tank_strips.py)",
+  "date": "12.11.2026",
+  "derivedFrom": "ws_cryotank_1",
+  "description": "Überlagerung: ihre Hand streckt sich zum Glas. Das Spiel blendet sie ab und zu ein."
+ },
+ "ws_cryotank_hand_2": {
+  "name": "Cryo-Tank · Hand 2",
+  "kind": "image",
+  "file": "assets/workshops/cryotank_hand_2.png",
+  "origin": [128, 240],
+  "source": "KI (PixelLab Edit Pro Flash) + Code (nur die geänderten Pixel, tools/tank_strips.py)",
+  "date": "12.11.2026",
+  "derivedFrom": "ws_cryotank_2",
+  "description": "Überlagerung: ein Handabdruck im beschlagenen Glas. Das Spiel blendet sie ab und zu ein."
  }
 }

@@ -423,3 +423,14 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .fs-cell span { position: absolute; right: 5px; bottom: 3px; font: 17px/1 VT323, monospace; color: #ffd27a; text-shadow: 0 1px 0 #000; }
 .fs-cell.first::after { content: ''; position: absolute; inset: 2px; border: 2px solid #ffd27a; border-radius: 6px; box-shadow: 0 0 12px rgba(255, 210, 122, .55); }
 .fs-label { font: 18px/1 VT323, monospace; color: #7ff6ff; letter-spacing: .06em; text-shadow: 0 0 8px rgba(127, 246, 255, .6); opacity: .85; }
+
+/* cryo tank (Cryo-Tank): condition bar over the recipe book, colour by phase */
+.craft-tank { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; margin: 2px 0 10px; padding: 8px 12px; border-radius: 10px;
+  background: color-mix(in srgb, var(--tk, #5cff9d) 12%, transparent); border: 1px solid color-mix(in srgb, var(--tk, #5cff9d) 45%, transparent); --tk: #5cff9d; }
+.craft-tank b { font-family: VT323, monospace; font-size: 24px; color: var(--tk); letter-spacing: .04em; }
+.craft-tank i { height: 8px; border-radius: 4px; background: rgba(255,255,255,.08); overflow: hidden; }
+.craft-tank i span { display: block; height: 100%; background: var(--tk); box-shadow: 0 0 10px var(--tk); }
+.craft-tank small { color: var(--ui-text-dim, #aab); }
+.craft-tank.ph2 { --tk: #7ff6ff; } .craft-tank.ph3 { --tk: #ffd27a; } .craft-tank.ph4 { --tk: #ff9a4a; } .craft-tank.ph5, .craft-tank.dead { --tk: #ff4d6d; }
+.craft-chip.tank { font-family: VT323, monospace; font-size: 20px; color: #5cff9d; display: grid; place-items: center; }
+.craft-upto { color: var(--ui-text-dim, #aab); font-size: 11px; }

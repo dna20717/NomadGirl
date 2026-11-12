@@ -4,6 +4,7 @@
 // sparks, flames, LEDs, fairy lights, bubbles, fish, a lava lamp, a 3D-printer head and a glint over the guns.
 // Every effect is placed in pixels of the picture and can wait for the evening, for Leyla coming close or for being used.
 // Also: the packed crates on the scrapyard and the workshop picture on its own (in the hand while building, in the van).
+import { TankView } from './tank_view.js';
 import { occupancy, thing, boxOf } from '../inventory.js';
 
 const col = c => parseInt(String(c || '#ffffff').slice(1), 16);
@@ -155,7 +156,8 @@ export class Benches {
       if (!bench.edges.length) bench.edges = [0];
       bench.fill = -1;
       this.refill(bench);
-    } else img(key);
+    } else bench.picture = img(key);
+    if (def.function === 'tank' && bench.picture) bench.tank = new TankView(this, bench, bench.picture);   // the cryo tank comes alive (tank_view.js)
     // effects whose spot was cut away stay out
     (def.fx || []).forEach((r, i) => { const [ex, ey] = at((r.x || 0) + (r.w || 1) / 2, (r.y || 0) + (r.h || 1) / 2); if (ex >= C0.x0 && ex <= C0.x1 && ey >= C0.y0 && ey <= C0.y1) bench.fx.push(this.effect(bench, r, i)); });
     if (def.stands?.length) { bench.trophies = []; this.showTrophies(bench); }
@@ -240,6 +242,7 @@ export class Benches {
     this.boost = 1 / Math.max(0.35, 1 - (camp.night?.fillAlpha ?? 0));   // what the night shade takes away, the small lights get back
     if (time > (this.fillAt || 0)) { this.fillAt = time + 400; for (const b of this.list) { if (b.full) this.refill(b); if (b.trophies) this.showTrophies(b); } }
     for (const b of this.list) {
+      b.tank?.update(time, dt, hidden || b.shut);
       const near = l && Math.abs(l.x - b.cx) < (b.x1 - b.x0) / 2 + 90 && Math.abs(l.feet - b.floor) < 80;
       const use = l && ((camp.atWorkshop && camp.prompt?.place === b.place) || (craft?.isOpen && craft.ws === b.id && Math.abs(l.x - b.cx) < (b.x1 - b.x0) / 2 + 40) || camp.resting === b.place);
       b.use = !!use;
@@ -405,5 +408,5 @@ export class Benches {
   }
   // where AvA sits down on a bench
   dockOf(place) { const b = this.list.find(x => x.place === place); return b && { x: b.cx, y: b.top + (b.floor - b.top) * 0.42 }; }
-  state() { return this.list.map(b => ({ id: b.id, place: b.place, fill: b.full ? Math.round(b.fill * 100) : null, shelves: b.shelves ?? null, fx: b.fx.length, use: b.use, x: Math.round(b.cx), scale: +b.k.toFixed(3) })); }
+  state() { return this.list.map(b => ({ tank: b.tank?.state(), id: b.id, place: b.place, fill: b.full ? Math.round(b.fill * 100) : null, shelves: b.shelves ?? null, fx: b.fx.length, use: b.use, x: Math.round(b.cx), scale: +b.k.toFixed(3) })); }
 }

@@ -1,0 +1,56 @@
+{
+ "enabled": true,
+ "workshop": "cryotank",
+ "container": "container_10",
+ "start": 100,
+ "deadName": "Tot",
+ "rate": 0.2,
+ "accel": 1.5,
+ "aging": 0.05,
+ "rescue": 12,
+ "phases": [
+  {
+   "name": "Stabil",
+   "from": 80,
+   "look": "ws_cryotank_1",
+   "battery": 0,
+   "glitch": 0,
+   "flicker": 0,
+   "status": "STABIL",
+   "face": 0,
+   "anim": "cryotank_loop_1",
+   "hand": "ws_cryotank_hand_1"
+  },
+  {
+   "name": "Beschlagen",
+   "from": 60,
+   "look": "ws_cryotank_2",
+   "battery": 0,
+   "glitch": 8,
+   "flicker": 0,
+   "status": "KÜHLUNG SCHWACH",
+   "face": 6,
+   "anim": "cryotank_loop_2",
+   "hand": "ws_cryotank_hand_2"
+  },
+  {"name": "Risse", "from": 40, "look": "ws_cryotank_3", "battery": 15, "glitch": 18, "flicker": 15, "status": "GLAS BESCHÄDIGT", "face": 11, "anim": "cryotank_loop_3"},
+  {"name": "Lecks", "from": 20, "look": "ws_cryotank_4", "battery": 30, "glitch": 35, "flicker": 30, "status": "KÜHLMITTEL TRITT AUS", "face": 15, "anim": "cryotank_loop_4"},
+  {"name": "Alarm", "from": 0, "look": "ws_cryotank_5", "battery": 50, "glitch": 60, "flicker": 50, "status": "KRITISCH", "face": 9, "anim": "cryotank_loop_5"}
+ ],
+ "deadLook": "ws_cryotank_dead",
+ "screen": {
+  "text": [116.5, 208],
+  "textSize": [40, 14],
+  "color": "#7ff6ff",
+  "face": [154, 208],
+  "faceScale": 55,
+  "lines": "AVA · {zustand} %\n{phase}\nTAG {tage} IM TANK\nNOCH ~{stunden} STD"
+ },
+ "glass": {"at": [88, 61], "size": [80, 122]},
+ "bubbles": 6,
+ "glow": "#5cff9d",
+ "heartEvery": 45,
+ "handEvery": 70,
+ "love": 360,
+ "description": "AvA schläft hier. Ihr Verstand fliegt mit dir."
+}

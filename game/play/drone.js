@@ -3,6 +3,7 @@
 // Moods come from events (kill, hit, cleared, dash, down) and from states (alert, lowHealth, bored, sleep);
 // while Leyla is moving, a random mood (curious, scan) pops up now and then.
 
+import { suffering } from '../tank.js';
 import { Cables, hullPoint } from '../drone_cables.js';
 
 const STATES = ['down', 'lowHealth', 'alert', 'zen', 'sleep', 'bored'];   // lasting moods, most important first
@@ -10,6 +11,8 @@ const STATES = ['down', 'lowHealth', 'alert', 'zen', 'sleep', 'bored'];   // las
 export class Drone {
   constructor(scene, data) {
     this.scene = scene; this.d = data.drone || {};
+    // AvA suffers with her tank (Cryo-Tank › Phasen: Akku −, Glitches, Scheinwerfer flackert); in the camp she is home
+    this.suffer = scene.mode === 'run' && scene.box?.save?.tank ? suffering(data, scene.box.save) : null;
     const A = data.assets || {}, a = A[this.d.look], tex = id => id && scene.textures.exists(id);
     this.moods = Object.fromEntries((this.d.moods || []).map(m => [m.mood, m]));
     this.f = this.d.follow || {};
@@ -128,6 +131,11 @@ export class Drone {
     // Leyla in the yoga pose for a while: the drone joins in (Daniel: "Zen-Modus")
     this.zen = l.state === 'pose' && !l.pose?.out ? (this.zen || 0) + dt : 0;
     if (this.zen > (I.zenAfter ?? 2) * 1000) return 'zen';
+    // near her own body in the camp (Daniel, 12.11.2026: „ein liebevolles Gesicht, wenn sie in der Nähe des Tanks herumfliegt“)
+    const tank = s.mode === 'camp' && s.camp?.benches?.list?.find(b => b.tank);
+    if (tank && !tank.tank.p?.dead && Math.hypot(this.x - tank.cx, this.y - (tank.floor - 120)) < (s.data_.tank?.love ?? 360)) return 'love';
+    // in a run with a weak tank she sighs now and then
+    if (this.suffer?.index >= 4 && time > (this.sighAt ||= time + 9000)) { this.sighAt = time + 14000 + Math.random() * 12000; this.react('tankWeak'); }
     const moving = Math.abs(l.body.velocity.x) > 20 || Math.abs(l.body.velocity.y) > 20 || l.state !== 'normal';
     this.still = moving ? 0 : this.still + dt;
     if (this.still > (I.sleepAfter ?? 14) * 1000) return 'sleep';
@@ -147,8 +155,10 @@ export class Drone {
     if (area && R.enabled !== false && !(this.scene.pad?.right && Math.hypot(...this.scene.pad.right) > 0.02 && this.d.leash?.enabled !== false)) {
       if (!this.roamTo || time > this.roamAt) {
         const [a, b] = R.every || [3, 7], [h0, h1] = R.height || [180, 460], visit = Math.random() * 100 < (R.visitLeyla ?? 30);
-        const rx = visit ? l.x + (Math.random() < 0.5 ? -1 : 1) * 120 : area.x0 + Math.random() * (area.x1 - area.x0);
-        this.roamTo = { x: rx, y: area.ground - (h0 + Math.random() * (h1 - h0)), leyla: visit };
+        // she often looks in on her own body in the cryo tank (Drohne › Im Camp frei fliegen › Besucht den Tank %)
+        const tank = this.scene.camp?.benches?.list?.find(b => b.tank && !b.tank.p?.dead), toTank = !visit && tank && Math.random() * 100 < (R.visitTank ?? 30);
+        const rx = toTank ? tank.cx + (Math.random() - 0.5) * 80 : visit ? l.x + (Math.random() < 0.5 ? -1 : 1) * 120 : area.x0 + Math.random() * (area.x1 - area.x0);
+        this.roamTo = { x: rx, y: toTank ? tank.floor - 150 - Math.random() * 80 : area.ground - (h0 + Math.random() * (h1 - h0)), leyla: visit };
         this.roamAt = time + (a + Math.random() * (b - a)) * 1000;
       }
       if (this.roamTo.leyla) this.roamTo.x += (l.x + this.side * -110 - this.roamTo.x) * 0.02;
@@ -261,7 +271,7 @@ export class Drone {
     this.carrying = !!(onTop || l.ledge?.drone); this.riding = !!onTop;
     const ready = time >= (this.emptyUntil || 0);
     this.platOn = P.enabled !== false && l.alive && ready && this.battery > 0 && !this.build && !this.dock && (this.leashed || this.parkAt || this.carrying);
-    const cap = (P.battery ?? 4) * 1000 * (1 + (this.batteryBonus?.() || 0) / 100);
+    const cap = (P.battery ?? 4) * 1000 * (1 + (this.batteryBonus?.() || 0) / 100) * (1 - (this.suffer?.battery || 0) / 100);
     if (this.carrying) {
       this.battery = Math.max(0, this.battery - dt / cap * (this.flying ? P.flyDrain ?? 3 : 1));
       const sag = (P.sag ?? 12) * (1 - this.battery) * dt / 1000;   // the motors labour: she sinks a little (Leyla with her)
@@ -314,6 +324,8 @@ export class Drone {
     this.eye = this.eye || [0, 0];
     this.eye[0] += (want[0] - this.eye[0]) * 0.12; this.eye[1] += (want[1] - this.eye[1]) * 0.12;
     this.face.setPosition(this.faceAt[0] + Math.round(this.eye[0]), this.faceAt[1] + Math.round(this.eye[1]));
+    const gl = (this.suffer?.glitch || 0) / 100;   // a weak tank: the face stutters and jumps
+    if (gl && Math.random() < gl * 0.08) { this.face.setPosition(this.face.x + (Math.random() < 0.5 ? -2 : 2), this.face.y); if (Math.random() < 0.4) this.face.setFrame(Math.floor(Math.random() * 12)); }
     const fl = (FC.flicker ?? 0) / 100;
     this.face.setAlpha(fl && Math.random() < 0.06 ? 1 - fl * (0.5 + Math.random() * 0.5) : Math.min(1, this.face.alpha + 0.2));
   }

@@ -131,6 +131,8 @@ Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich 
 | `assets/tiles/tileset00/terrain.png` | TileSet00 · Gelände: Felder 64 × 80 (16 px Platz für Kruste darüber), je Thema Oberfläche 0–3, Füllung a/b 0–3 (`tileset00`) | aus den Quellen geschnitten (Code, `tools/tileset00.py`) | 11.11.2026 |
 | `assets/tiles/tileset00/props.png` | TileSet00 · Clutter & Decals: Felder 64 × 64, Clutter auf den Boden ausgerichtet (`tileset00_props`) | aus den Quellen geschnitten (Code, `tools/tileset00.py`) | 11.11.2026 |
 | `assets/tiles/tileset00/props_big.png` | TileSet00 · Großer Clutter: Felder 128 × 128, streng orthogonal (`tileset00_props_big`) | aus `source/big_*.png` (KI, PixelLab, AAP-64) geschnitten (Code) | 11.11.2026 |
+| `assets/workshops/cryotank_1…5.png`, `cryotank_dead.png`, `cryotank_loop_1…5.png`, `cryotank_hand_1/2.png` (+ `cryotank/source/`) | Cryo-Tank: Phasen stabil, beschlagen, Risse, Lecks, Alarm, tot; je Phase eine Schleife; Hand am Glas und Handabdruck im Frost als Überlagerung | KI (PixelLab: Create Image Pro mit Stilbild `drone_bench_v2` und Drohnen-Hülle als Referenz, Edit Pro Flash, Animate Image) + Code (`tools/tank_strips.py`) | 12.11.2026 |
+| `assets/drone/faces.png` (Frames 14, 15) | AvA verliebt (Herzaugen) und schwach | Code (`tools/drone_parts.py`) | 12.11.2026 |
 
 ## Ordner
 

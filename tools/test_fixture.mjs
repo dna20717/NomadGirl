@@ -6,12 +6,13 @@ import fs from 'node:fs';
 const read = f => JSON.parse(fs.readFileSync(new URL(`../projects/nomadgirl/${f}`, import.meta.url), 'utf8'));
 export async function classicRig(page) {
   const tractors = read('data/tractors.json'), containers = read('data/containers.json'), game = read('data/game.json');
-  tractors.van.length = 1;
+  tractors.van.length = 1; tractors.van.pull = 1500;
   containers.wohnanhaenger.places = 3; containers.modulanhaenger.places = 3;
   game.start.containers = ['wohnanhaenger'];
   game.start.workshops = ['schlafkoje', 'warroom', 'kochnische', 'werkbank', 'lagerregal']; game.start.spare = [];
   const build = read('data/build.json'); build.work = { ...build.work, enabled: true };   // the tests also check Leyla's screwing jobs
-  const drafts = { 'data/tractors.json': tractors, 'data/containers.json': containers, 'data/game.json': game, 'data/build.json': build };
+  const tank = { ...read('data/tank.json'), enabled: false };   // the cryo tank has its own test (tank_test.mjs)
+  const drafts = { 'data/tractors.json': tractors, 'data/containers.json': containers, 'data/game.json': game, 'data/build.json': build, 'data/tank.json': tank };
   await page.addInitScript(d => { for (const [f, x] of Object.entries(d)) localStorage.setItem('nomadgirl-drafts:' + f, JSON.stringify(x)); }, drafts);
 }
 
@@ -21,5 +22,6 @@ export async function furnishedStart(page) {
   const game = read('data/game.json');
   game.start.containers = ['wohnanhaenger', 'holzkiste'];
   game.start.workshops = ['schlafkoje', 'warroom', 'kochnische', 'werkbank', 'lagerregal']; game.start.spare = [];
-  await page.addInitScript(g => localStorage.setItem('nomadgirl-drafts:data/game.json', JSON.stringify(g)), game);
+  const tank = { ...read('data/tank.json'), enabled: false };
+  await page.addInitScript(([g, t]) => { localStorage.setItem('nomadgirl-drafts:data/game.json', JSON.stringify(g)); localStorage.setItem('nomadgirl-drafts:data/tank.json', JSON.stringify(t)); }, [game, tank]);
 }

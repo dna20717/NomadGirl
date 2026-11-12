@@ -155,5 +155,70 @@
   "count": 1,
   "time": 20,
   "discovery": ["found", "experiment"]
+ },
+ "tank_notflicken": {
+  "name": "Notflicken",
+  "station": "cryotank",
+  "ingredients": [{"item": "panzertape", "count": 2},{"item": "schrott", "count": 1}],
+  "result": "",
+  "count": 1,
+  "time": 20,
+  "discovery": ["start"],
+  "tank": 8,
+  "tankUpTo": 3,
+  "description": "Tape drauf, Daumen drücken."
+ },
+ "tank_stromzelle": {
+  "name": "Stromzelle tauschen",
+  "station": "cryotank",
+  "ingredients": [{"item": "batteriezelle", "count": 2}],
+  "result": "",
+  "count": 1,
+  "time": 30,
+  "discovery": ["start"],
+  "tank": 12,
+  "tankUpTo": 4
+ },
+ "tank_dichtung": {
+  "name": "Dichtung tauschen",
+  "station": "cryotank",
+  "ingredients": [{"item": "stoffreste", "count": 2},{"item": "panzertape", "count": 1},{"item": "schrauben", "count": 2}],
+  "result": "",
+  "count": 1,
+  "time": 45,
+  "discovery": ["techtree"],
+  "tank": 15,
+  "tankUpTo": 4
+ },
+ "tank_kuehlmittel": {
+  "name": "Kühlmittel nachfüllen",
+  "station": "cryotank",
+  "ingredients": [{"item": "kuehlmittel", "count": 1}],
+  "result": "",
+  "count": 1,
+  "time": 30,
+  "discovery": ["start"],
+  "tank": 25,
+  "tankUpTo": 5
+ },
+ "tank_kompressor": {
+  "name": "Kompressor einbauen",
+  "station": "cryotank",
+  "ingredients": [{"item": "kompressor", "count": 1}],
+  "result": "",
+  "count": 1,
+  "time": 90,
+  "discovery": ["start"],
+  "tank": 50,
+  "tankUpTo": 5
+ },
+ "kuehlmittel_destillieren": {
+  "name": "Kühlmittel destillieren",
+  "station": "werkbank",
+  "ingredients": [{"item": "mutantengemuese", "count": 2},{"item": "batteriezelle", "count": 1}],
+  "result": "kuehlmittel",
+  "count": 1,
+  "time": 60,
+  "discovery": ["techtree"]
  }
 }

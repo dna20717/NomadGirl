@@ -82,7 +82,7 @@ b = await drag(await part('v8'), await sock('roof'));
 check('V8 aufs Dach: passt nicht, fliegt zurück', !b.parts.roof?.[0] && b.spare.parts.includes('v8'), b);
 const t0 = await minutes();
 b = await drag(await part('v8'), await sock('engine'), { shotName: 'swing' });
-check('V8 an den Motor-Sockel: angeschraubt, +1.500 kg Zugkraft', b.parts.engine?.[0] === 'v8' && b.budgets.pull === 3000 && !b.spare.parts.includes('v8'), b);
+check('V8 an den Motor-Sockel: angeschraubt, +1.500 kg Zugkraft', b.parts.engine?.[0] === 'v8' && b.budgets.pull === JSON.parse(fs.readFileSync(new URL('../projects/nomadgirl/data/tractors.json', import.meta.url), 'utf8')).van.pull + 1500 && !b.spare.parts.includes('v8'), b);
 check('Anschrauben kostet 30 min', (await minutes()) - t0 === 30, (await minutes()) - t0);
 await finishJobs();
 b = await drag(await part('dachbox'), await sock('roof'));

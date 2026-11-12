@@ -56,9 +56,9 @@ export const IMPLANT_SLOTS = ['eyes', 'nerves', 'arm', 'heart', 'legs', 'skin'];
 export const DRONE_SLOTS = ['bow', 'tail', 'core', 'module'];
 export const BUFF_STATS = [['health', 'Leben'], ['damage', 'Schaden'], ['speed', 'Tempo'], ['defense', 'Abwehr'], ['luck', 'Glück (Beute)'], ['backpack', 'Rucksackplätze'], ['fuel', 'Spritverbrauch']];
 export const BUFF_DURATIONS = [['instant', 'Sofort'], ['run', 'Nächster Run'], ['travel', 'Nächste Reise'], ['seconds', 'Sekunden'], ['permanent', 'Dauerhaft']];
-export const DISCOVERY = [['experiment', 'Experimentieren'], ['found', 'Fund im POI'], ['companion', 'Tipp von Companion'], ['shop', 'Bei NPCs kaufen'], ['start', 'Von Anfang an']];
+export const DISCOVERY = [['experiment', 'Experimentieren'], ['found', 'Fund im POI'], ['companion', 'Tipp von Companion'], ['shop', 'Bei NPCs kaufen'], ['start', 'Von Anfang an'], ['techtree', 'Knoten im Techtree']];
 export const CONTAINER_KINDS = [['shipping', 'Hochseecontainer'], ['crate', 'Holzkiste'], ['trailer', 'Wohnwagenteil'], ['tank', 'Tank']];
-export const WORKSHOP_FUNCTIONS = [['storage', 'Lager'], ['guests', 'Gäste'], ['treasury', 'Schatzkammer'], ['cooling', 'Kühlung'], ['cell', 'Zelle'], ['sleep', 'Schlafen'], ['chill', 'Chillen'], ['drone', 'Drohnen'], ['warroom', 'Planung'], ['kitchen', 'Kochen'], ['foodtruck', 'Verkauf'], ['craft', 'Herstellen'], ['engine', 'Motor'], ['power', 'Energie']];
+export const WORKSHOP_FUNCTIONS = [['tank', 'Cryo-Tank'], ['storage', 'Lager'], ['guests', 'Gäste'], ['treasury', 'Schatzkammer'], ['cooling', 'Kühlung'], ['cell', 'Zelle'], ['sleep', 'Schlafen'], ['chill', 'Chillen'], ['drone', 'Drohnen'], ['warroom', 'Planung'], ['kitchen', 'Kochen'], ['foodtruck', 'Verkauf'], ['craft', 'Herstellen'], ['engine', 'Motor'], ['power', 'Energie']];
 export const BENCH_FX = [['light', 'Licht'], ['screen', 'Bildschirm'], ['steam', 'Dampf'], ['smoke', 'Rauch'], ['sparks', 'Funken'], ['flame', 'Flamme'], ['blink', 'LED blinkt'], ['twinkle', 'Lichter funkeln'], ['bubbles', 'Blasen'], ['fish', 'Fische'], ['lava', 'Lavalampe'], ['scan', 'Druckkopf'], ['shine', 'Glanz']];
 export const BENCH_FX_WHEN = [['always', 'Immer'], ['night', 'Abends'], ['near', 'In der Nähe'], ['use', 'Bei Benutzung']];
 export const RIG_SLOTS = [['engine', 'Motor'], ['armor', 'Panzerung'], ['weapon', 'Waffe'], ['roof', 'Dach']];
@@ -70,7 +70,8 @@ export const DAYTIME = [['any', 'Immer'], ['day', 'Tag'], ['night', 'Nacht']];
 export const DRONE_MOODS = [['idle', 'Normal'], ['kill', 'Gegner erledigt'], ['cleared', 'Raum geräumt'], ['bored', 'Langeweile'], ['alert', 'Gegner in der Nähe'],
   ['curious', 'Neugierig (zufällig)'], ['hit', 'Leyla getroffen'], ['sleep', 'Schlafen'], ['down', 'Leyla k.o.'], ['scan', 'Scannen (zufällig)'], ['lowHealth', 'Wenig Leben'], ['dash', 'Dash'], ['zen', 'Zen (Leyla macht Yoga)'],
   ['gearBetter', 'Inventar: bessere Ausrüstung'], ['gearWorse', 'Inventar: schlechtere Ausrüstung'], ['gearOff', 'Inventar: Slot geleert'], ['dronePart', 'Inventar: Teil an AvA'],
-  ['rescue', 'Inventar: ins Rettungsfach'], ['rescueFood', 'Inventar: Essen ins Rettungsfach'], ['valuable', 'Inventar: Wertsache eingepackt'], ['bagFull', 'Inventar: Rucksack fast voll'], ['invIdle', 'Inventar: lange offen']];
+  ['rescue', 'Inventar: ins Rettungsfach'], ['rescueFood', 'Inventar: Essen ins Rettungsfach'], ['valuable', 'Inventar: Wertsache eingepackt'], ['bagFull', 'Inventar: Rucksack fast voll'], ['invIdle', 'Inventar: lange offen'],
+  ['love', 'Nahe beim Cryo-Tank'], ['tankWeak', 'Tank schwach (im Run)']];
 export const RANKING_CATEGORIES = [['time', 'Durchlaufzeit'], ['kills', 'Kills in %'], ['secrets', 'Secrets']];
 
 const label = (list, v) => list.find(([k]) => k === v)?.[1] ?? v ?? '';
@@ -357,7 +358,7 @@ export const AREAS = {
         range('idle.randomEvery', 'Zufällige Stimmung alle', { unit: 's', hint: 'Neugierig oder Scannen, während Leyla unterwegs ist' }), num('alertRange', 'Gegner bemerken ab', { unit: 'px', min: 0 }),
         num('lowHealth', 'Wenig Leben unter', { unit: '%', min: 0, max: 100 })] },
       { title: 'Im Camp frei fliegen', fields: [bool('roam.enabled', 'Frei fliegen', { hint: 'Daniel: im Camp fliegt die Drohne frei herum statt Leyla zu folgen' }), range('roam.every', 'Neues Ziel alle', { unit: 's' }),
-        range('roam.height', 'Flughöhe', { unit: 'px über dem Boden' }), num('roam.visitLeyla', 'Besucht Leyla', { unit: '%', min: 0, max: 100, hint: 'Wie oft das neue Ziel Leyla ist' }), num('roam.smooth', 'Trägheit', { min: 0.005, max: 1, step: 0.005, hint: 'Kleiner = gemütlicher' })] },
+        range('roam.height', 'Flughöhe', { unit: 'px über dem Boden' }), num('roam.visitLeyla', 'Besucht Leyla', { unit: '%', min: 0, max: 100, hint: 'Wie oft das neue Ziel Leyla ist' }), num('roam.visitTank', 'Besucht den Tank', { unit: '%', min: 0, max: 100, hint: 'Wie oft sie zu ihrem Körper im Cryo-Tank fliegt (dort zeigt sie ihr liebevolles Gesicht)' }), num('roam.smooth', 'Trägheit', { min: 0.005, max: 1, step: 0.005, hint: 'Kleiner = gemütlicher' })] },
       { title: 'Bläschen', fields: [bool('bubble.show', 'Kaomoji zeigen'), num('bubble.size', 'Schriftgröße', { unit: 'px', min: 8 }), color('bubble.color', 'Schrift'), color('bubble.background', 'Hintergrund')] },
     ],
     check: (x, report, p) => {
@@ -605,12 +606,13 @@ export const AREAS = {
     sections: [
       { title: 'Rezept', fields: [NAME, ref('station', 'Werkstatt', 'workshops', { required: true }), num('time', 'Dauer', { unit: 'min', min: 0, hint: 'Spielzeit: die Uhr springt beim Kochen/Herstellen um so viele Minuten weiter (Ereignis-Zeit)' })] },
       { title: 'Zutaten → Ergebnis', fields: [table('ingredients', 'Zutaten', [ref('item', 'Gegenstand', 'items'), num('count', 'Anzahl', { min: 1 })]),
-        ref('result', 'Ergebnis', 'items'), ref('part', 'Oder Rig-Teil', 'rigParts', { hint: 'Statt eines Gegenstands entsteht ein Rig-Teil: es landet auf dem Schrottplatz und wird im Bau-Modus (B) an den Van gezogen' }), num('count', 'Anzahl', { min: 1 })] },
+        ref('result', 'Ergebnis', 'items'), ref('part', 'Oder Rig-Teil', 'rigParts', { hint: 'Statt eines Gegenstands entsteht ein Rig-Teil: es landet auf dem Schrottplatz und wird im Bau-Modus (B) an den Van gezogen' }), num('count', 'Anzahl', { min: 1 }),
+        num('tank', 'Oder Tank-Wartung', { unit: '%', min: 0, max: 100, hint: 'Statt eines Ergebnisses: so viel Zustand bekommt der Cryo-Tank zurück (Werkstatt-Art Cryo-Tank)' }), num('tankUpTo', 'Hilft bis Phase', { min: 1, max: 6, hint: 'Ist der Tank schlechter als diese Phase, hilft die Wartung nicht mehr (ein Leck klebt man nicht). Leer = immer' })] },
       { title: 'Entdecken', fields: [multi('discovery', 'Wie man es lernt', DISCOVERY), area_('hint', 'Hinweis', { hint: 'Was Companions oder Notizzettel andeuten' })] },
     ],
     check: (x, report) => {
       if (!(x.ingredients || []).length) report('error', 'Rezept ohne Zutaten');
-      if (!x.result && !x.part) report('warning', 'Rezept ohne Ergebnis (Gegenstand oder Rig-Teil)');
+      if (!x.result && !x.part && !x.tank) report('warning', 'Rezept ohne Ergebnis (Gegenstand, Rig-Teil oder Tank-Wartung)');
       if (x.result && x.part) report('warning', 'Gegenstand und Rig-Teil: das Rig-Teil gewinnt');
       if ((x.ingredients || []).some(i => i.item === x.result)) report('warning', 'Ergebnis ist auch Zutat');
       const kinds = (x.ingredients || []).map(i => i.item); if (new Set(kinds).size !== kinds.length) report('warning', 'Eine Zutat steht doppelt in der Liste (Anzahl erhöhen)');
@@ -677,7 +679,8 @@ export const AREAS = {
     template: { name: 'Neue Werkstatt', function: 'storage', places: 1, power: 0, stage: 'mvp', value: 100 },
     row: x => `${label(WORKSHOP_FUNCTIONS, x.function)} · ${x.places ?? 1} Pl. · ${x.power > 0 ? '+' : ''}${x.power ?? 0} ⚡`,
     sections: [
-      { title: 'Werkstatt', fields: [NAME, LOOK, select('function', 'Funktion', WORKSHOP_FUNCTIONS), STAGE, DESCRIPTION] },
+      { title: 'Werkstatt', fields: [NAME, LOOK, select('function', 'Funktion', WORKSHOP_FUNCTIONS), STAGE, DESCRIPTION,
+        bool('fixed', 'Fest eingebaut', { hint: 'Daniel, 12.11.2026 (Cryo-Tank): kann nicht verkauft, ausgebaut oder umgestellt werden' })] },
       { title: 'Werte', fields: [num('places', 'Plätze', { min: 1, max: 3 }), num('power', 'Energie', { unit: '⚡', hint: '+ liefert, − braucht' }), num('capacity', 'Kapazität', { min: 0, hint: 'Lagerplätze, Betten …' }),
         ref('buff', 'Buff', 'buffs', { hint: 'z. B. Schlafzimmer oder Chill Area' }), size('grid', 'Lager-Raster', { unit: 'Felder', hint: 'Ist dieser Platz ein Inventar (Lager, Kühlraum, Waffenkammer): Größe des Rasters. Leer = kein Lager' }), VALUE] },
       { title: 'Aussehen im Rig', fields: [num('scale', 'Maßstab', { unit: '%', min: 30, max: 200, hint: 'Korrektur zum gemeinsamen Maßstab der Werkstatt-Bilder (Camp › Rig-Ansicht), z. B. wenn ein Bild etwas zu groß gemalt ist' }),
@@ -783,6 +786,29 @@ export const AREAS = {
       for (const r of rows) if (r.weather && !p.data.weather?.[r.weather]) report('error', `Wetter ${r.weather} fehlt`);
       if (x.fallbackRoom && !p.data.rooms?.[x.fallbackRoom]?.layout?.length) report('warning', 'Ersatzraum hat kein Layout');
     },
+  },
+
+  tank: {
+    name: 'Cryo-Tank', icon: 'heart', file: 'data/tank.json', kind: 'single',
+    hint: 'Daniel, 12.11.2026: AvA ist ein kleines Mädchen, ihr Körper liegt im Cryo-Tank, ihr Verstand ist in der Drohne geparkt. Der Tank verfällt in Ereignis-Zeit, immer schneller; Wartung = Rezepte an der Werkstatt mit Funktion Cryo-Tank (Rezepte › Oder Tank-Wartung). Jede Rettung beim k.o. kostet Zustand, ist er zu niedrig, stirbt AvA bei der letzten Rettung. Ohne Pflege etwa 10 Runs.',
+    sections: [
+      { title: 'Tank', fields: [bool('enabled', 'An'), ref('workshop', 'Werkstatt', 'workshops', { hint: 'Steht von Anfang an im kleinsten Container, auch in alten Spielständen' }), ref('container', 'Im Container', 'containers'),
+        num('start', 'Zustand am Anfang', { unit: '%', min: 1, max: 100 }), text('deadName', 'Name, wenn tot')] },
+      { title: 'Verfall', fields: [num('rate', 'Grundrate', { unit: '% je Stunde', min: 0, hint: 'Verfall je Stunde Ereignis-Zeit bei vollem Tank' }),
+        num('accel', 'Beschleunigung', { min: 0, hint: 'Je schlechter der Zustand, desto schneller: × (1 + Beschleunigung × (100 − Zustand) / 100)' }),
+        num('aging', 'Alterung', { unit: 'je Tag', min: 0, hint: 'Je länger der Durchgang dauert, desto schneller: × (1 + Tage × Alterung)' }),
+        num('rescue', 'Rettung kostet', { unit: '%', min: 0, max: 100, hint: 'Beim k.o.; liegt der Zustand darunter, ist es die letzte Rettung' })] },
+      { title: 'Phasen', fields: [table('phases', 'Phasen', [text('name', 'Name'), num('from', 'ab Zustand', { unit: '%', min: 0, max: 100 }), ref('look', 'Aussehen', 'assets'),
+        num('battery', 'AvA: Akku −', { unit: '%', min: 0, max: 100 }), num('glitch', 'AvA: Glitches', { unit: '%', min: 0, max: 100 }), num('flicker', 'AvA: Scheinwerfer flackert', { unit: '%', min: 0, max: 100 }),
+        ref('anim', 'Schleife', 'assets', { hint: 'Animation genau über dem Bild (gleiche Größe)' }), ref('hand', 'Hand', 'assets', { hint: 'Bild der Phase mit ihrer Hand am Glas, wird ab und zu weich eingeblendet' }), text('status', 'Anzeige'), num('face', 'Gesicht', { min: 0, hint: 'Frame aus den Gesichtern der Drohne' })], { hint: 'Von oben nach unten: die erste Zeile, deren „ab“ der Zustand erreicht. Danach „tot“ bei 0 %' }),
+        ref('deadLook', 'Aussehen tot', 'assets')] },
+      { title: 'Anzeige', fields: [point('screen.text', 'Text-Anzeige Mitte', { unit: 'Bildpixel' }), size('screen.textSize', 'Text-Anzeige Größe', { unit: 'Bildpixel' }), color('screen.color', 'Textfarbe'),
+        point('screen.face', 'Gesicht Mitte', { unit: 'Bildpixel' }), num('screen.faceScale', 'Gesicht Maßstab', { unit: '%', min: 10 }),
+        area_('screen.lines', 'Zeilen im Wechsel', { hint: 'Eine Zeile je Absatz; {zustand}, {phase}, {tage}, {stunden} werden ersetzt' })] },
+      { title: 'Leben im Tank', fields: [point('glass.at', 'Glas oben links', { unit: 'Bildpixel' }), size('glass.size', 'Glas Größe', { unit: 'Bildpixel' }), num('bubbles', 'Bläschen', { unit: 'je Sekunde', min: 0 }), color('glow', 'Leuchten'),
+        num('heartEvery', 'Herz ans Glas malen alle', { unit: 's', min: 0, hint: 'Ab Phase 2 (beschlagen) malt ein Finger von innen ein Herz in die beschlagene Scheibe' }), num('handEvery', 'Hand am Glas alle', { unit: 's', min: 0, hint: 'Bild je Phase unter Phasen › Hand' }),
+        num('love', 'AvA verliebt bis', { unit: 'px', min: 0, hint: 'So nah am Tank zeigt die Drohne ihr liebevolles Gesicht' })] },
+    ],
   },
 
   build: {
@@ -964,7 +990,7 @@ export const GROUPS = [
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
-  ['RIG', ['camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'companions']],
+  ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'companions']],
   ['WELT', ['pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'travel']],
 ];
 

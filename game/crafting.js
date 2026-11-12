@@ -9,6 +9,7 @@
 // Time: recipes take minutes (Rezepte › Dauer), the clock jumps on (Ereignis-Zeit).
 import { add, remove, count } from './inventory.js';
 import { containers, advance } from './save.js';
+import { canMaintain, maintain } from './tank.js';
 
 export const startRecipes = D => Object.entries(D.recipes || {}).filter(([, r]) => (r.discovery || []).includes('start')).map(([id]) => id);
 export const known = (save, id) => (save.recipes || []).includes(id);
@@ -54,10 +55,11 @@ export function take(D, save, id, n) {
 // puts n of a thing into the backpack, the chest, the storage places; → how many did not fit
 // a recipe's result: a thing into the inventories, or a rig part onto the scrapyard (Rezepte › Oder Rig-Teil). → what did not fit
 function produce(D, save, r, n) {
+  if (r.tank) { for (let i = 0; i < n; i++) maintain(D, save, r); return 0; }   // Rezepte › Oder Tank-Wartung: the cryo tank gets condition back
   if (r.part && D.rigParts?.[r.part]) { save.rig.spare ??= { workshops: [], containers: [] }; (save.rig.spare.parts ??= []).push(...Array(n).fill(r.part)); return 0; }
   return give(D, save, r.result, n);
 }
-export const resultOf = r => r.part ? { id: r.part, part: true } : { id: r.result };
+export const resultOf = r => r.tank ? { id: 'tank', tank: r.tank } : r.part ? { id: r.part, part: true } : { id: r.result };
 export function give(D, save, id, n, a = 'items') {
   const g = save.inv.grids, order = ['backpack', 'chest', ...sources(D, save).map(s => s.key).filter(k => k !== 'backpack' && k !== 'chest')];
   for (const key of order) { if (!n) break; if (g[key]) n = add(D, g[key], a, id, n); }
@@ -76,7 +78,8 @@ export function craft(D, save, id, ws) {
   if (!r) return { ok: false, reason: 'Unbekanntes Rezept' };
   if (!known(save, id)) return { ok: false, reason: 'Steht nicht im Rezeptbuch' };
   if (ws && !recipesFor(D, ws).some(x => x.id === id)) return { ok: false, reason: 'Geht an dieser Werkstatt nicht' };
-  if (!D.items?.[r.result] && !D.rigParts?.[r.part]) return { ok: false, reason: 'Rezept ohne Ergebnis' };
+  if (!D.items?.[r.result] && !D.rigParts?.[r.part] && !r.tank) return { ok: false, reason: 'Rezept ohne Ergebnis' };
+  if (r.tank) { const c = canMaintain(D, save, r); if (!c.ok) return c; }
   if (missing(D, save, r).length) return { ok: false, reason: 'Es fehlen Zutaten' };
   for (const i of r.ingredients || []) take(D, save, i.item, i.count || 1);
   const n = r.count || 1, minutes = r.time ?? 10;

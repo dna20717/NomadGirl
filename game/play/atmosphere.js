@@ -108,6 +108,7 @@ export class Atmosphere {
     if (!dr || !S || dr.d.enabled === false || !dr.sprite.visible) return null;
     const name = S.part || 'Suchscheinwerfer', part = (dr.partImgs || []).find(p => p.r.name === name);
     if (!part?.img.visible) return null;
+    if (dr.suffer?.flicker && Math.random() < dr.suffer.flicker / 100 * (Math.sin(this.scene.time.now / 90) > 0.3 ? 1 : 0.15)) return null;   // the tank is weak: the lamp flickers (Cryo-Tank › Phasen)
     const look = dr.sprite.scaleX < 0 ? -1 : 1, k = dr.scale, rot = dr.sprite.rotation, [ox, oy] = dr.org, [px, py] = S.at || [ox + 40, oy + 30];
     const lx = (px - ox) * k * look, ly = (py - oy) * k;
     const x = dr.sprite.x + lx * Math.cos(rot) - ly * Math.sin(rot), y = dr.sprite.y + lx * Math.sin(rot) + ly * Math.cos(rot);
