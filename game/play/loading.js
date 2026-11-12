@@ -15,7 +15,7 @@ export function createLoading(root, base) {
   const canvas = el.querySelector('canvas'), ctx = canvas.getContext('2d'), fill = el.querySelector('.loading-bar i');
   const pct = el.querySelector('.loading-pct'), text = el.querySelector('.loading-text'), track = el.querySelector('.loading-track');
   let cfg = { ...DEFAULTS }, leyla = null, drone = null, target = 0.02, shown = 0, finished = false, failed = false, raf = 0, t0 = performance.now();
-  let visible = true, withDrone = true, timed = null, hideTimer = 0;
+  let visible = true, withDrone = true, timed = null, hideTimer = 0, last = 0;
 
   (async () => {
     try {
@@ -31,7 +31,10 @@ export function createLoading(root, base) {
 
   function frame(now) {
     if (timed) target = Math.max(target, 0.95 * Math.min(1, (now - timed.at) / timed.ms));
-    shown += (target - shown) * (finished ? 0.25 : 0.08);
+    // time based, so a stuttering first second of the game does not hold the bar up
+    const dt = Math.min(0.25, Math.max(0, (now - (last || now)) / 1000)); last = now;
+    shown += (target - shown) * (1 - Math.exp(-dt * 5));
+    if (finished) shown = 1;
     const p = Math.min(1, shown);
     fill.style.width = `${(p * 100).toFixed(1)}%`;
     pct.textContent = `${Math.floor(p * 100)} %`;
@@ -52,13 +55,13 @@ export function createLoading(root, base) {
         ctx.drawImage(d, dx, dy);
       }
     }
-    if (finished && shown > 0.995) return close();
+    if (finished) return close();   // full bar for one frame, then the CSS fade (independent of the frame rate)
     raf = requestAnimationFrame(frame);
   }
   raf = requestAnimationFrame(frame);
 
   function close() {
-    visible = false; raf = 0;
+    visible = false; raf = 0; last = 0;
     root.classList.add('loading-gone');
     hideTimer = setTimeout(() => root.classList.remove('loading-on'), cfg.fade);
   }
@@ -79,7 +82,12 @@ export function createLoading(root, base) {
     },
     data() { target = Math.max(target, 0.3); },
     progress(p) { if (visible && !finished) target = Math.max(target, 0.3 + 0.65 * p); },
-    done() { if (failed || !visible) return; finished = true; timed = null; target = 1; },
+    done() {   // close right away: the first frames of a scene are the slowest, waiting for them makes the start feel long
+      if (failed || !visible) return;
+      finished = true; timed = null; target = shown = 1;
+      fill.style.width = '100%'; pct.textContent = '100 %';
+      cancelAnimationFrame(raf); close();
+    },
     fail(msg) { failed = true; cancelAnimationFrame(raf); root.classList.add('loading-on'); root.textContent = msg; root.classList.add('load-error'); },
   };
   return api;
