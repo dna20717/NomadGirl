@@ -56,6 +56,6 @@
  ],
  "rescue": {"name": "Rettungsfach", "size": [3, 2]},
  "spot": {"part": "Suchscheinwerfer", "at": [108, 90], "range": 760, "angle": 46, "tilt": 14, "strength": 85, "color": "#fff2c8", "glow": 90},
- "platform": {"enabled": true, "park": 1800, "battery": 4, "recharge": 6, "cooldown": 1500, "width": 110, "inset": 14, "sag": 12},
+ "platform": {"enabled": true, "park": 1800, "battery": 4, "recharge": 6, "cooldown": 1500, "width": 110, "inset": 14, "sag": 12, "fly": true, "flySpeed": 150, "flyUp": 60, "flyDrain": 3},
  "leash": {"enabled": true, "reach": 380, "stiffness": 2.4, "smooth": 0.06, "aimLight": true, "aimHold": 600}
 }

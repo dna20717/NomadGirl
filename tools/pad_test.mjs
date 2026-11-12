@@ -186,6 +186,13 @@ s = await ev(() => { const sc = game.scene.getScene('play'), d = sc.drone, l = s
   setPad({ axes: [0, 0, 0.5, 0] }); nomad.step(150); const half = off();
   setPad(); nomad.step(60); const leashed = d.leashed; nomad.step(60); return { full, half, aim, leashed, aimAfter: d.aim, reach: d.d.leash?.reach }; });
 check('Rechter Stick zieht Mama-Bot am Gummiband, Licht folgt, Loslassen = zurück', s.full > s.reach * 0.7 && s.half > s.full * 0.55 && s.half < s.full && Math.abs(s.aim) < 0.05 && !s.leashed && s.aimAfter == null, s);
+// standing on Mama-Bot the right stick lets both hover a little, at three times the battery cost (Daniel, 12.11.2026)
+s = await ev(() => { const s = game.scene.getScene('play'), d = s.drone, l = s.leyla; nomad.step(400);
+  const top = l.feet - 120, y = top + d.half - (d.d.platform?.inset ?? 14); d.x = l.x; d.y = y; d.parkAt = [l.x, y]; d.parkUntil = s.time.now + 1e7; nomad.step(3);
+  nomad.step(1, ['jump'], ['jump']); nomad.step(40, ['jump']); nomad.step(20); const on = d.riding, x0 = l.x, b0 = d.battery;
+  setPad({ axes: [0, 0, 1, 0] }); nomad.step(30); setPad(); const moved = Math.round(l.x - x0), used = +(b0 - d.battery).toFixed(2), still = d.riding;
+  d.parkAt = null; d.parkUntil = 0; nomad.step(30, ['left']); nomad.step(200); return { on, moved, used, still }; });
+check('Auf Mama-Bot: rechter Stick lässt beide schweben, kostet viel Akku', s.on && s.moved > 40 && s.still && s.used > 0.3, s);
 await ev(() => nomad.release());
 await page.keyboard.down('d'); await page.waitForTimeout(1500); s = await sc(); await page.keyboard.up('d');
 check('Tastatur geht weiter, Hinweis zeigt wieder E', Math.abs(s.vx) > 50 && !s.menu && s.key === 'E' && !s.icon, s);

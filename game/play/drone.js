@@ -171,7 +171,20 @@ export class Drone {
     if (this.build) { tx = this.build.x; ty = this.build.y; smooth = this.build.smooth ?? 0.3; this.roamTo = null; }
     // docked on a workbench (Werkstätten › Benutzen › Mama-Bot dockt an): flies there and sits still
     if (this.dock) { if (time > this.dock.until) this.dock = null; else { tx = this.dock.x; ty = this.dock.y; smooth = 0.07; } }
-    if (this.carrying) { tx = this.x; ty = this.y; }   // carrying Leyla: she holds still
+    // carrying Leyla she holds still; with Leyla standing on her the right stick lets her hover a little, but that eats the battery
+    // (Daniel, 12.11.2026: „kurz schweben mit Leyla ist ok, aber mit dem Gewicht kann sie das nicht lange machen“, Drohne › Plattform › Schweben)
+    this.flying = false;
+    if (this.carrying) {
+      const P = this.d.platform || {}, st = this.scene.pad?.right || [0, 0], m = Math.hypot(st[0], st[1]);
+      if (this.riding && P.fly !== false && m > 0.2 && this.battery > 0) {
+        const v = (P.flySpeed ?? 150) * Math.min(1, m) * dt / 1000, dx = st[0] / m * v, dy = st[1] / m * v * (st[1] < 0 ? (P.flyUp ?? 60) / 100 : 1);
+        const b = l.body;
+        if (this.scene.rectFree(b.x + dx + 2, b.y + dy, b.width - 4, b.height - 2)) {
+          this.x += dx; this.y += dy; b.x += dx; b.y += dy; b.prev.x += dx; b.prev.y += dy; this.flying = true;
+        }
+      }
+      tx = this.x; ty = this.y;
+    }
     const k = 1 - Math.pow(1 - Math.min(1, smooth), dt / 16.67);
     const px = this.x; this.x += (tx - this.x) * k; this.y += (ty - this.y) * k;
     const vx = (this.x - px) / Math.max(1, dt) * 1000;
@@ -218,12 +231,12 @@ export class Drone {
     const w = P.width ?? 110, top = this.platformTop(), halfW = l.size.w / 2;
     // standing on her, hanging at her edge or pulling up onto her
     const onTop = this.platOn && (l.body.blocked.down || l.body.touching.down) && Math.abs(l.feet - top) < 10 && Math.abs(l.x - this.x) < w / 2 + halfW;
-    this.carrying = !!(onTop || l.ledge?.drone);
+    this.carrying = !!(onTop || l.ledge?.drone); this.riding = !!onTop;
     const ready = time >= (this.emptyUntil || 0);
     this.platOn = P.enabled !== false && l.alive && ready && this.battery > 0 && !this.build && !this.dock && (this.leashed || this.parkAt || this.carrying);
     const cap = (P.battery ?? 4) * 1000 * (1 + (this.batteryBonus?.() || 0) / 100);
     if (this.carrying) {
-      this.battery = Math.max(0, this.battery - dt / cap);
+      this.battery = Math.max(0, this.battery - dt / cap * (this.flying ? P.flyDrain ?? 3 : 1));
       this.y += (P.sag ?? 12) * (1 - this.battery) * dt / 1000;   // the motors labour: she sinks a little
       if (this.battery <= 0) this.empty(time);
     } else this.battery = Math.min(1, this.battery + dt / ((P.recharge ?? 6) * 1000));
