@@ -2,6 +2,7 @@
 // (dollhouse: every container shows its workshops), a campfire, companions with speech bubbles and day/night.
 // Leyla walks around and uses things with E. Time only moves on actions (sleeping, sitting at the fire, driving, runs).
 // Graphics are code placeholders for now; a "look" on containers, workshops or companions takes over later.
+import { potsOf, stage, ripe, harvest, STAGES } from '../garden.js';
 import { clockText, advance, hoursUntil, containers } from '../save.js';
 import { budgets, partSlots, passengers } from '../rig.js';
 import { Benches, benchTexture, crateTexture } from './benches.js';
@@ -834,6 +835,7 @@ export class Camp {
     if (def.function === 'sleep') return this.sleep(def);
     if (def.function === 'warroom') return this.warroom();
     if (['kitchen', 'craft', 'tank'].includes(def.function)) { s.hud.inv?.close(); return s.hud.craft?.open(id); }
+    if (def.function === 'garden') return this.garden(id, def, place);
     if (def.function === 'guests') {   // who sleeps here: the guests in order, as many as there are beds in all guest bunks
       const P = passengers(this.D, this.box.save), nm = c => this.D.companions?.[c]?.name || c, waiting = Object.entries(this.box.save.waiting || {});
       return s.hud.menu({ title: def.name || id, sub: [def.description, P.guests.length ? `Gäste an Bord: ${P.riding.map(nm).join(', ') || '–'} · ${P.beds} ${P.beds === 1 ? 'Bett' : 'Betten'} im Rig.` : `${P.beds} ${P.beds === 1 ? 'Bett' : 'Betten'} frei für Fahrgäste.`,
@@ -844,6 +846,26 @@ export class Camp {
     if (def.rest?.verb) return this.restMenu(id, def, place, who);
     s.hud.menu({ title: def.name || id, sub: [def.description, who.length ? `Betreut von ${who.join(' und ')}.` : null, SOON[def.function] || 'Funktion kommt später.'].filter(Boolean).join(' '),
       items: [{ label: 'Zurück', act: () => {} }] });
+  }
+  // hydroponics (game/garden.js): what grows, how long until ripe, E harvests the ripe pots into the camp inventories
+  garden(id, def, place) {
+    const s = this.scene, D = this.D, save = this.box.save, key = place || id, P = potsOf(D, id);
+    const rows = (def.garden?.crops || []).map((c, ci) => {
+      const mine = P.map((p, i) => ({ p, i })).filter(({ p }) => (Number(p.crop) || 1) - 1 === ci).map(({ i }) => stage(D, save, id, key, i));
+      if (!mine.length) return null;
+      const r = mine.filter(x => x.stage === STAGES - 1).length, left = Math.min(...mine.filter(x => x.stage < STAGES - 1).map(x => (1 - x.p) * (c.hours || 24)));
+      return `${c.name}: ${r ? `${r} reif` : ''}${r && r < mine.length ? ' · ' : ''}${r < mine.length ? `noch ~${Math.max(1, Math.ceil(left))} h` : ''}`;
+    }).filter(Boolean);
+    const n = ripe(D, save, id, key);
+    s.hud.menu({ title: def.name || id, sub: [def.description, ...rows].filter(Boolean).join(' · '),
+      items: [{ label: n ? `Ernten (${n})` : 'Noch nichts reif', primary: !!n, disabled: n ? null : 'Wächst noch', act: () => {
+        const r = harvest(D, save, id, key);
+        for (const l of r.left) s.loot?.throwDown({ a: 'items', id: l.id, n: l.n, r: 0 });
+        this.box.persist?.();
+        s.fx.text(s.leyla.x, s.leyla.feet - s.leyla.height - 30, r.got.map(g => `+${g.n} ${D.items?.[g.id]?.name || g.id}`).join(' · ') || 'Nichts geerntet', { color: '#9cdb43', size: 34, rise: 50, life: 1600 });
+        s.drone?.react('curious');
+        this.benches?.list.forEach(b => { if (b.plants) b.plantSig = null; });
+      } }, { label: 'Zurück', act: () => {} }] });
   }
   // a workshop to spend time at (Werkstätten › Benutzen): Chill Area, Drohnenwerkstatt … time passes, heals, gives its buff;
   // AvA can fly over and dock on the bench while it happens
@@ -1032,7 +1054,7 @@ export class Camp {
   }
 }
 
-const VERB = { sleep: 'Schlafen', warroom: 'Planen', kitchen: 'Kochen', foodtruck: 'Verkaufen', craft: 'Herstellen', storage: 'Lager', cooling: 'Kühlraum', chill: 'Chillen', drone: 'Drohne', engine: 'Motor', power: 'Energie', cell: 'Zelle', guests: 'Gäste', treasury: 'Schatzkammer', tank: 'Nach AvA sehen' };
+const VERB = { sleep: 'Schlafen', warroom: 'Planen', kitchen: 'Kochen', foodtruck: 'Verkaufen', craft: 'Herstellen', storage: 'Lager', cooling: 'Kühlraum', chill: 'Chillen', drone: 'Drohne', engine: 'Motor', power: 'Energie', cell: 'Zelle', guests: 'Gäste', treasury: 'Schatzkammer', tank: 'Nach AvA sehen', garden: 'Gärtnern' };
 const SOON = { foodtruck: 'Verkaufen kommt später.', power: 'Liefert Energie für die Werkstätten im Rig.',
   storage: 'Ein Lager fürs Camp: Kochen, Herstellen und Zerlegen nehmen sich, was hier liegt.', cooling: 'Hält Essen frisch. Kochen nimmt sich, was hier liegt.' };
 

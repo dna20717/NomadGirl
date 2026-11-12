@@ -137,6 +137,8 @@ Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich 
 | `assets/techtree/techtree_nodes.png` (Originale `techtree/source/`) | Bilder der Techtree-Knoten, 4 × 2 à 108 px, ohne die gemalten Schildchen | KI (PixelLab, Create Image Pro, Referenz Cryo-Tank, Stilbild icons_treasure, AAP-64), 12.11.2026 |
 | `assets/ui/pad_icons.png` (alte Fassung `pad_icons_v1.png`) | Controller-Symbole: Xbox, Stadia, PlayStation, Switch, Sticks und Steuerkreuz generisch, 64-px-Felder | Code (`tools/pad_icons.py`, Schrift Inter), 12.11.2026 |
 | `assets/leyla/flip2_side.png`, `slide2_side.png`, `ladder_slide_back.png` (+ `*_source.png`) | Doppelsprung als Salto, Slide mit Schleife, Leiter-Rutschen in U-Boot-Pose | KI (PixelLab: Edit Pro Flash + Animate Image), Zuschnitt `tools/move_strips.py`, 12.11.2026 |
+| `assets/workshops/hydroponics.png` (+ `hydroponics_alt.png`) | Hydrokultur: Regal mit drei Rinnen, Pflanzenlicht, Fass, Steuerkasten | KI (PixelLab, Create Image Pro, Stilbild Drohnenwerkbank v2, AAP-64), 12.11.2026 |
+| `assets/workshops/hydro/plants.png` (Originale `hydro/source/`) | Pflanzen der Hydrokultur: Kohl, Basilikum, Chili, Tomate in 4 Stufen | KI (PixelLab, Create Image Pro), gemischt und umgefärbt mit `tools/garden_sprites.py`, 12.11.2026 |
 
 ## Ordner
 

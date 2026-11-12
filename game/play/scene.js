@@ -72,7 +72,7 @@ export class PlayScene extends Phaser.Scene {
       for (const c of Object.values(this.data_.containers || {})) for (const k of [c.look, c.lookClosed]) if (k) ids.add(k);
       for (const c of Object.values(this.data_.rigParts || {})) if (c.look) ids.add(c.look);
       // workshop pictures (and the empty shelf), the crate for packed workshops
-      for (const w of Object.values(this.data_.workshops || {})) for (const id of [w.look, w.lookEmpty]) if (id) ids.add(id);
+      for (const w of Object.values(this.data_.workshops || {})) for (const id of [w.look, w.lookEmpty, w.garden?.plants]) if (id) ids.add(id);
       { const T = this.data_.tank || {}; for (const p of T.phases || []) for (const id of [p.look, p.anim, p.hand]) if (id) ids.add(id); if (T.deadLook) ids.add(T.deadLook); }   // the cryo tank in all its phases (tank_view.js)
       // icon sheets of trophies: they stand on the stands of the treasury
       for (const a of ['items', 'weapons']) for (const t of Object.values(this.data_[a] || {})) if (t.tags?.includes('trophy') && t.look && A[t.look]?.kind === 'icons') ids.add(t.look);

@@ -4,6 +4,7 @@
 // sparks, flames, LEDs, fairy lights, bubbles, fish, a lava lamp, a 3D-printer head and a glint over the guns.
 // Every effect is placed in pixels of the picture and can wait for the evening, for Leyla coming close or for being used.
 // Also: the packed crates on the scrapyard and the workshop picture on its own (in the hand while building, in the van).
+import { stage } from '../garden.js';
 import { TankView } from './tank_view.js';
 import { occupancy, thing, boxOf } from '../inventory.js';
 
@@ -161,6 +162,7 @@ export class Benches {
     // effects whose spot was cut away stay out
     (def.fx || []).forEach((r, i) => { const [ex, ey] = at((r.x || 0) + (r.w || 1) / 2, (r.y || 0) + (r.h || 1) / 2); if (ex >= C0.x0 && ex <= C0.x1 && ey >= C0.y0 && ey <= C0.y1) bench.fx.push(this.effect(bench, r, i)); });
     if (def.stands?.length) { bench.trophies = []; this.showTrophies(bench); }
+    if (def.garden?.pots?.length) { bench.plants = []; this.showPlants(bench); }
     this.list.push(bench);
     return bench;
   }
@@ -190,6 +192,28 @@ export class Benches {
         bench.view.add(o);
         bench.trophies.push(o);
       }
+    });
+  }
+  // hydroponics (game/garden.js): every pot shows its crop at its stage (Werkstätten › Hydrokultur), pixel sharp, growing out of the pot
+  showPlants(bench) {
+    const s = this.scene, D = this.D, save = this.camp.box.save, G = bench.def.garden, [mx, my] = bench.off, sheet = G.plants, A = D.assets?.[sheet];
+    if (!A || !s.textures.exists(sheet)) return;
+    const cols = A.grid?.[0] || 4, st = G.pots.map((p, i) => stage(D, save, bench.id, bench.place, i));
+    const sig = st.map(x => x.stage).join('');
+    if (sig === bench.plantSig) return;
+    bench.plantSig = sig;
+    for (const o of bench.plants) o.destroy();
+    bench.plants = [];
+    s.textures.get(sheet).setFilter(Phaser.Textures.FilterMode.NEAREST);
+    const size = (G.size || 24) * bench.k, C = bench.clip;
+    G.pots.forEach((p, i) => {
+      const c = st[i].crop;
+      if (!c) return;
+      const [x, y] = bench.at(p.x || 0, p.y || 0);
+      if (x < C.x0 || x > C.x1 || y < C.y0 || y > C.y1) return;
+      const o = s.add.image(x - mx, y - my, sheet, ((c.row || 1) - 1) * cols + st[i].stage).setOrigin(0.5, 0.92).setDisplaySize(size, size);
+      bench.view.add(o);
+      bench.plants.push(o);
     });
   }
   // shelves: the full picture from the topmost filled shelf down
@@ -240,7 +264,7 @@ export class Benches {
     for (const o of this.objs) if (hidden) o.setVisible(false);
     const night = (camp.lightK ?? 0) > 0.3, lk = camp.lightK ?? 0, craft = s.hud.craft;
     this.boost = 1 / Math.max(0.35, 1 - (camp.night?.fillAlpha ?? 0));   // what the night shade takes away, the small lights get back
-    if (time > (this.fillAt || 0)) { this.fillAt = time + 400; for (const b of this.list) { if (b.full) this.refill(b); if (b.trophies) this.showTrophies(b); } }
+    if (time > (this.fillAt || 0)) { this.fillAt = time + 400; for (const b of this.list) { if (b.full) this.refill(b); if (b.trophies) this.showTrophies(b); if (b.plants) this.showPlants(b); } }
     for (const b of this.list) {
       b.tank?.update(time, dt, hidden || b.shut);
       const near = l && Math.abs(l.x - b.cx) < (b.x1 - b.x0) / 2 + 90 && Math.abs(l.feet - b.floor) < 80;

@@ -220,5 +220,25 @@
   "count": 1,
   "time": 60,
   "discovery": ["techtree"]
+ },
+ "chili_bohnen": {
+  "name": "Chili con Bohnen",
+  "station": "kochnische",
+  "ingredients": [{"item": "dosenbohnen", "count": 1},{"item": "chili", "count": 1},{"item": "tomaten", "count": 1}],
+  "result": "bohneneintopf",
+  "count": 2,
+  "time": 30,
+  "discovery": ["experiment", "companion"],
+  "hint": "Bohnen, aber mit Feuer. Und was Rotes dazu."
+ },
+ "tomatensalat": {
+  "name": "Tomaten mit Basilikum",
+  "station": "kochnische",
+  "ingredients": [{"item": "tomaten", "count": 2},{"item": "gewuerzmischung", "count": 1},{"item": "speiseoel", "count": 1}],
+  "result": "bento_deluxe",
+  "count": 1,
+  "time": 15,
+  "discovery": ["experiment"],
+  "hint": "Rot, grün, ein Schuss Öl. Schmeckt nach früher."
  }
 }

@@ -282,5 +282,48 @@
   "fixed": true,
   "look": "ws_cryotank_1",
   "description": "AvA schläft hier. Ihr Verstand fliegt mit dir. Kann nicht verkauft oder ausgebaut werden."
+ },
+ "hydrokultur": {
+  "name": "Hydrokultur",
+  "function": "garden",
+  "stage": "mvp",
+  "places": 1,
+  "power": -1,
+  "value": 450,
+  "look": "ws_hydroponics",
+  "description": "Drei Rinnen unter Pflanzenlicht. Wächst, während du schläfst, fährst oder plünderst.",
+  "garden": {
+   "plants": "hydro_plants",
+   "size": 24,
+   "crops": [
+    {"name": "Mutantenkohl", "item": "mutantengemuese", "hours": 30, "count": 1, "row": 1},
+    {"name": "Basilikum", "item": "gewuerzmischung", "hours": 18, "count": 1, "row": 2},
+    {"name": "Chili", "item": "chili", "hours": 24, "count": 2, "row": 3},
+    {"name": "Strauchtomaten", "item": "tomaten", "hours": 36, "count": 2, "row": 4}
+   ],
+   "pots": [
+    {"x": 93.5, "y": 84, "crop": 4},
+    {"x": 115.5, "y": 84, "crop": 4},
+    {"x": 137.5, "y": 84, "crop": 2},
+    {"x": 159.5, "y": 84, "crop": 4},
+    {"x": 182, "y": 84, "crop": 4},
+    {"x": 93.5, "y": 134, "crop": 3},
+    {"x": 115.5, "y": 134, "crop": 3},
+    {"x": 137.5, "y": 134, "crop": 2},
+    {"x": 159.5, "y": 134, "crop": 3},
+    {"x": 182, "y": 134, "crop": 3},
+    {"x": 93.5, "y": 185, "crop": 1},
+    {"x": 115.5, "y": 185, "crop": 1},
+    {"x": 137.5, "y": 185, "crop": 2},
+    {"x": 159.5, "y": 185, "crop": 1},
+    {"x": 182, "y": 185, "crop": 1}
+   ]
+  },
+  "fx": [
+   {"kind": "light", "x": 100, "y": 57, "w": 76, "h": 3, "color": "#e45aa8", "size": 38, "rate": 3, "when": "always"},
+   {"kind": "light", "x": 100, "y": 107, "w": 76, "h": 3, "color": "#e45aa8", "size": 38, "rate": 3, "when": "always"},
+   {"kind": "light", "x": 100, "y": 157, "w": 76, "h": 3, "color": "#e45aa8", "size": 38, "rate": 3, "when": "always"},
+   {"kind": "screen", "x": 219, "y": 116, "w": 13, "h": 7, "color": "#56e07a", "size": 0, "rate": 2, "when": "always"}
+  ]
  }
 }

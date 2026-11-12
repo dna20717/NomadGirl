@@ -854,5 +854,31 @@
   "description": "Das Herz einer Kühlanlage. Selten, schwer, unbezahlbar, wenn man es braucht.",
   "look": "icons_progress",
   "icon": 4
+ },
+ "chili": {
+  "name": "Chili",
+  "category": "ingredient",
+  "size": [1, 1],
+  "stack": 12,
+  "value": 4,
+  "glyph": "🌶",
+  "look": "hydro_plants",
+  "icon": 11,
+  "description": "Aus der Hydrokultur. Brennt zweimal.",
+  "salvageAt": "kochnische",
+  "salvage": [{"item": "bio", "count": 1}]
+ },
+ "tomaten": {
+  "name": "Strauchtomaten",
+  "category": "ingredient",
+  "size": [1, 1],
+  "stack": 12,
+  "value": 4,
+  "glyph": "🍅",
+  "look": "hydro_plants",
+  "icon": 15,
+  "description": "Rot, rund, echt. In den Wastelands fast ein Wunder.",
+  "salvageAt": "kochnische",
+  "salvage": [{"item": "bio", "count": 1}]
  }
 }

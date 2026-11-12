@@ -3250,5 +3250,49 @@
   "description": "Von hinten: Hände außen an den Holmen, Füße gegen die Holme (Pose einnehmen 1–3, Schleife 4–7).",
   "source": "KI (PixelLab: Schlüsselpose mit Edit Pro Flash, Übergänge und Schleife mit Animate Image), auf Leylas Farben eingerastet (tools/move_strips.py)",
   "date": "12.11.2026"
+ },
+ "ws_hydroponics": {
+  "name": "Werkstatt · Hydrokultur",
+  "kind": "image",
+  "file": "assets/workshops/hydroponics.png",
+  "origin": [128, 232],
+  "source": "KI (PixelLab, Create Image Pro, Stilbild Drohnenwerkbank v2, Referenz Foodtruck-Küche, Palette AAP-64)",
+  "date": "12.11.2026",
+  "description": "Schrottregal mit drei Pflanzrinnen (je fünf leere Netztöpfe), pinkes Pflanzenlicht, Nährstofffass, Steuerkasten, Gießkanne und Erdsack. Die Pflanzen setzt das Spiel aus „hydro_plants“ in die Töpfe (Werkstätten › Hydrokultur)."
+ },
+ "ws_hydroponics_alt": {
+  "name": "Hydrokultur (Alternative)",
+  "kind": "source",
+  "file": "assets/workshops/hydroponics_alt.png",
+  "source": "KI (PixelLab, Create Image Pro, Stilbild Drohnenwerkbank v2, Referenz Foodtruck-Küche, Palette AAP-64)",
+  "date": "12.11.2026"
+ },
+ "hydro_plants": {
+  "name": "Symbole: Pflanzen der Hydrokultur",
+  "kind": "icons",
+  "file": "assets/workshops/hydro/plants.png",
+  "grid": [4, 4],
+  "cell": [32, 32],
+  "names": [
+   "kohl_1",
+   "kohl_2",
+   "kohl_3",
+   "kohl_4",
+   "kraeuter_1",
+   "kraeuter_2",
+   "kraeuter_3",
+   "kraeuter_4",
+   "chili_1",
+   "chili_2",
+   "chili_3",
+   "chili_4",
+   "tomate_1",
+   "tomate_2",
+   "tomate_3",
+   "tomate_4"
+  ],
+  "source": "KI (PixelLab, Create Image Pro, 4 Kandidaten, Stilbild Drohnenwerkbank v2), gemischt und unreife Tomaten umgefärbt mit tools/garden_sprites.py",
+  "date": "12.11.2026",
+  "description": "Zeilen: Mutantenkohl, Basilikum, Chili, Strauchtomate; Spalten: Keimling, jung, groß, reif. Originale in assets/workshops/hydro/source/."
  }
 }
