@@ -18,7 +18,8 @@ Spieldesign: `docs/design.md` (dazu das claude.ai-Projekt „NomadGirl“).
 - Das Repo ist **öffentlich** und läuft auf Cloudflare: nichts hineinlegen, was nicht öffentlich sein darf (Schlüssel, Passwörter, private Adressen).
 - **Immer den Link mit ausgeben:** Am Ende jeder Antwort, die etwas baut oder ändert, stehen die Adressen zum Anklicken: Start https://nomadgirl.dna20717.workers.dev, Spiel https://nomadgirl.dna20717.workers.dev/game, Werkstatt https://nomadgirl.dna20717.workers.dev/workshop, Repo https://github.com/dna20717/NomadGirl.
 - Daniel ist bei Git/Kommandozeile Anfänger → Anleitungen Schritt für Schritt.
-- **„HNC“** (Daniel, 07.11.2026: „Handover, new chat“): Übergabe `claude/nomadgirl-handover.md` im claude.ai-Projekt „NomadGirl“ auf den aktuellen Stand bringen (Commit, Entscheidungen, was steht, offene Fragen), Repo sauber und gepusht, kurz bestätigen. Der nächste Chat startet mit dieser Übergabe.
+- **„HNC“** (Daniel, 07.11.2026: „Handover, new chat“): Übergabe `claude/nomadgirl-handover.md` im claude.ai-Projekt „NomadGirl“ auf den aktuellen Stand bringen (Commit, Entscheidungen, was steht, offene Fragen), Repo sauber und gepusht, kurz bestätigen. Der nächste Chat startet mit dieser Übergabe. In Claude Code (kein Zugriff aufs Projekt) heißt HNC: Funkbuch aktuell, Stand eingetragen, gepusht.
+- **Funkbuch `docs/funk.md`** (Daniel, 12.11.2026): Aufträge und Rückmeldungen zwischen Ava im Projekt-Chat und Claude Code. **Jede Sitzung beginnt dort** (nach `git pull --rebase`): Funksprüche und Tickets mit `offen`/`läuft`/`blockiert` lesen. Ticket beim Start auf `läuft` setzen und sofort pushen; Commits nennen das Ticket (`(#001)`); offene Designfragen notieren, mit ⚠️ vorläufig entscheiden und weiterbauen; am Ende „Ergebnis“ ausfüllen (Commits, Tests, PixelLab-Verbrauch, was Daniel testen soll) und einen Funkspruch schreiben. Ablauf und Vorlage im Funkbuch.
 
 ## Einrichten und prüfen
 
@@ -92,6 +93,7 @@ docs/design.md         Game Design Document
 docs/glossary.md       Deutsch → Englisch
 docs/assets.md         alle Assets mit Herkunft (KI/Code)
 docs/backlog.md        offene Punkte, technische Schulden, Relikte (Durchsicht 12.11.2026)
+docs/funk.md           Funkbuch: Tickets und Rückmeldungen zwischen Projekt-Chat und Claude Code
 projects/nomadgirl/assets/   alle Grafiken: Animationen, Bilder, Referenzen, Originale (nach Figur/Thema in Unterordnern, z. B. leyla/)
 output/                Bilder vom Werkstatt-Test (nicht im Git)
 ```
@@ -263,6 +265,7 @@ Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei j
 
 ## Stand
 
+- 12.11.2026 abends: **Funkbuch** `docs/funk.md` für Aufträge zwischen Projekt-Chat und Claude Code (Tickets mit Status, ⚠️ vorläufige Entscheidungen); Bauauftrag Progression als #001 nachgetragen.
 - 12.11.2026 abends: **Tiefe für die Kachel-Sets** (Licht von oben links: Masse, Lichtkanten, Lippe unter der Kruste, Schlagschatten auf Rückwand und Himmel, Ecken-AO, Kontaktschatten für Clutter; Werte in Kachel-Sets › Tiefe).
 - 12.11.2026 abends: **Hydrokultur** (PixelLab): Pflanzen wachsen sichtbar in 15 Töpfen (Kohl, Basilikum, Chili, Tomaten), E erntet; neue Zutaten Chili und Strauchtomaten; `garden_test` 4.
 - 12.11.2026 abends: **Neue Controller-Symbole** (Neon-Glas aus Code, Xbox/Stadia/PS/Switch, Sticks und Steuerkreuz generisch) und neuer Look für Tasten, Hilfezeile, E-Hinweis, Tooltips; **Salto als Doppelsprung**, **dynamischer Slide**, **Leiter-Rutschen in U-Boot-Pose** (PixelLab).
