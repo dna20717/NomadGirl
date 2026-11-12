@@ -45,7 +45,7 @@
   "spare": ["kochnische", "werkbank", "lagerregal"]
  },
  "testRoom": "testraum",
- "tiles": {"platform": "platform_metal", "terrain": "desert", "leylaCm": 170},
+ "tiles": {"platform": "platform_metal", "terrain": "desert", "leylaCm": 170, "depth": true},
  "camera": {"zoom": 1, "lookAhead": 160, "follow": 0.12},
  "spawn": {
   "look": "van",

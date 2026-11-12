@@ -211,6 +211,43 @@ export function terrainKits(scene, D) {
 const hash = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + s * 2246822519) >>> 0; h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
 const hexInt = (c, d) => c ? parseInt(String(c).slice(1), 16) : d;
 
+// ---------- depth for the tile sets (Daniel, 12.11.2026: „die Kachel-Sets wirken flach, wie an die Wand geklebt“) ----------
+// Light comes from the upper left. Kachel-Sets › Tiefe (per set), Spiel › Kacheln › Tiefe aus Code (switch for all).
+const DEPTH = { mass: 30, step: 9, rim: 26, rimColor: '#fff4dc', shade: 44, lip: 26, castX: 16, castY: 22, cast: 38, ao: 46, aoSize: 30, prop: 42, drop: 26, dropSize: 22 };
+export const depthOf = kit => ({ ...DEPTH, ...(kit?.def?.depth || {}) });
+// the edges of a wall tile: outline, a light rim on the left (and on top, under the crust), soft shade going right and down
+function rimEdges(g, open, px, py, T, def) {
+  const E = def.edge || {}, P = depthOf({ def }), ow = E.width ?? 2, sw = E.shadeWidth ?? 3, sa = (E.shade ?? 40) / 100, oc = hexInt(E.color, 0x060608);
+  const lc = hexInt(P.rimColor, 0xfff4dc), la = P.rim / 100, da = P.shade / 100;
+  if (open.l) { g.fillStyle(lc, la).fillRect(px + ow, py, 3, T); g.fillStyle(lc, la * 0.45).fillRect(px + ow + 3, py, 3, T); g.fillStyle(oc).fillRect(px, py, ow, T); }
+  if (open.r) { g.fillStyle(0x060608, sa).fillRect(px + T - ow - sw, py, sw, T); g.fillStyle(0x060608, da).fillRect(px + T - ow - sw - 6, py, 6, T); g.fillStyle(0x060608, da * 0.5).fillRect(px + T - ow - sw - 12, py, 6, T); g.fillStyle(oc).fillRect(px + T - ow, py, ow, T); }
+  if (open.b) { g.fillStyle(0x060608, sa).fillRect(px, py + T - ow - sw, T, sw); g.fillStyle(0x060608, da).fillRect(px, py + T - ow - sw - 6, T, 6); g.fillStyle(0x060608, da * 0.5).fillRect(px, py + T - ow - sw - 12, T, 6); g.fillStyle(oc).fillRect(px, py + T - ow, T, ow); }
+  if (open.t) {   // the top lip catches the light, the face right under it falls back into shadow: the surface stands out as a ledge
+    g.fillStyle(lc, la * 0.6).fillRect(px, py, T, 2);
+    const lp = (P.lip ?? 0) / 100;
+    if (lp > 0) for (let i = 0; i < 4; i++) g.fillStyle(0x07050c, lp * (1 - i / 4)).fillRect(px, py + 12 + i * 4, T, 4);
+  }
+}
+// how deep every solid tile lies under the surface above it (in tiles): light comes from above, so the rock darkens downwards
+// in soft layers (mass, not wallpaper); a blob in the middle of a block looked like dirt
+function depthMap(w, h, isSolid, cap = 8) {
+  const d = new Uint8Array(w * h);
+  for (let x = 0; x < w; x++) { let c = cap; for (let y = 0; y < h; y++) { c = isSolid(x, y) ? Math.min(cap, c + 1) : 0; d[y * w + x] = c; } }
+  return (x, y) => x < 0 || y < 0 || x >= w || y >= h ? cap : d[Math.min(h - 1, Math.max(0, y)) * w + Math.min(w - 1, Math.max(0, x))];
+}
+// soft darkening of one solid tile, smoothed over its corners (4 × 4 cells, bilinear)
+function massShade(g, x, y, T, val) {
+  const c = (dx, dy) => (val(x + dx - 1, y + dy - 1) + val(x + dx, y + dy - 1) + val(x + dx - 1, y + dy) + val(x + dx, y + dy)) / 4;
+  const a = c(0, 0), b = c(1, 0), d0 = c(0, 1), e = c(1, 1), px = x * T, py = y * T;
+  if (Math.max(a, b, d0, e) < 0.01) return;
+  if (a === b && b === d0 && d0 === e) { g.fillStyle(0x07050c, a).fillRect(px, py, T, T); return; }
+  const n = 4, s = T / n;
+  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+    const u = (i + 0.5) / n, v = (j + 0.5) / n, k = (a * (1 - u) + b * u) * (1 - v) + (d0 * (1 - u) + e * u) * v;
+    if (k > 0.01) g.fillStyle(0x07050c, k).fillRect(px + i * s, py + j * s, s, s);
+  }
+}
+
 // Tiles of a parsed room: concrete blocks with lit edges, platforms, ladders, rope anchors
 // terrain = { at(x, y) → kit | null, back(x, y) → kit | null }: tiles from a Kachel-Set instead of code (walls, back wall in indoor rooms)
 // tiles = { platform: textureKey | null } (asset strips: single, left, middle, right)
@@ -232,7 +269,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
     }
     camo.push(grp);
   }
-  const edges0 = scene.make.graphics({}, false), decals0 = [], clutter = [], details0 = [], back = [], backShade = scene.make.graphics({}, false), taken = new Set();
+  const edges0 = scene.make.graphics({}, false), decals0 = [], clutter = [], details0 = [], back = [], backShade = scene.make.graphics({}, false), taken = new Set(), edgeTiles = [], coverTiles = [];
   const r = rng(99);
   // clutter stamp + where it stands, by name (game/play/atmosphere.js finds glowing things)
   const placed = (kit, key, frame, cx, ground) => {
@@ -247,7 +284,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       const bk = terrain?.back?.(x, y);
       if (bk) {
         const list = y % 2 && bk.fill2.length ? bk.fill2 : bk.fill;
-        back.push({ key: bk.key, frame: list[x % list.length], x: px, y: py - bk.over });
+        back.push({ key: bk.key, frame: list[x % list.length], x: px, y: py - bk.over, tx: x, ty: y, kit: bk });
         backShade.fillStyle(0x060608, (bk.shade ?? 55) / 100).fillRect(px, py, T, T);
       }
     }
@@ -271,12 +308,8 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       }
       if (top && air && !cg && !taken.has(x) && kit.clutter.length && solid(x - 1, y) && solid(x + 1, y) && hash(x, y, seed + 3) * 100 < (D.clutterChance ?? 0))
         clutter.push(placed(kit, kit.props, kit.clutter[Math.floor(hash(x, y, seed + 4) * kit.clutter.length)], px + T / 2, py + 4));
-      // edges from code: shade inside, then the outline (left, right, bottom; the top tile brings its own)
-      const E = D.edge || {}, ow = E.width ?? 2, sw = E.shadeWidth ?? 3, sa = (E.shade ?? 40) / 100, oc = hexInt(E.color, 0x060608);
-      const side = (open, rx, ry, rw, rh, ix, iy, iw, ih) => { if (!open) return; edges.fillStyle(0x060608, sa).fillRect(ix, iy, iw, ih); edges.fillStyle(oc).fillRect(rx, ry, rw, rh); };
-      side(!solid(x - 1, y), px, py, ow, T, px + ow, py, sw, T);
-      side(!solid(x + 1, y), px + T - ow, py, ow, T, px + T - ow - sw, py, sw, T);
-      side(!solid(x, y + 1), px, py + T - ow, T, ow, px, py + T - ow - sw, T, sw);
+      // edges from code: outline, light rim left and on top, soft shade right and below (the top tile brings its own crust)
+      edgeTiles.push({ x, y, kit, g: edges });
       continue;
     }
     if (t === '#' && style) {
@@ -310,9 +343,6 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       g.fillStyle(0xe45aa8, 0.6).fillCircle(px + T / 2, py + T / 2, 5);
     }
   }
-  if (back.length) bake(scene, scene.make.graphics({}, false), 0, 0, room.w * T, room.h * T, { depth: -11, stamps: back, over: backShade });
-  else backShade.destroy();
-  bake(scene, g0, 0, 0, room.w * T, room.h * T, { depth: -10, stamps: [...stamps0, ...details0, ...decals0, ...clutter], over: edges0 });
   // cover: a camouflaged patch also hides the secret behind it (air reachable only through it) plus the ring of wall around,
   // all drawn as solid wall on the patch's layer until it is found or broken (Daniel: „hinter Tiles versteckt“, 4A)
   if (camo.length && !style) {
@@ -339,11 +369,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
         if (kit) {
           const top = !cs(x, y - 1), list = top ? kit.top : y % 2 && kit.fill2.length ? kit.fill2 : kit.fill;
           c.stamps.push({ key: kit.key, frame: list[x % list.length], x: px, y: py - kit.over });
-          const E = kit.def.edge || {}, ow = E.width ?? 2, sw = E.shadeWidth ?? 3, sa = (E.shade ?? 40) / 100, oc = hexInt(E.color, 0x060608);
-          const side = (open, rx, ry, rw, rh, ix, iy, iw, ih) => { if (!open) return; c.edges.fillStyle(0x060608, sa).fillRect(ix, iy, iw, ih); c.edges.fillStyle(oc).fillRect(rx, ry, rw, rh); };
-          side(!cs(x - 1, y), px, py, ow, T, px + ow, py, sw, T);
-          side(!cs(x + 1, y), px + T - ow, py, ow, T, px + T - ow - sw, py, sw, T);
-          side(!cs(x, y + 1), px, py + T - ow, T, ow, px, py + T - ow - sw, T, sw);
+          coverTiles.push({ x, y, kit, g: c.edges, cs });
         } else {
           c.g.fillStyle(0x24272e).fillRect(px, py, T, T);
           if (!cs(x, y - 1)) { c.g.fillStyle(0x6b7280).fillRect(px, py, T, 6); c.g.fillStyle(0x3fe0d0, 0.25).fillRect(px, py + 6, T, 2); }
@@ -354,6 +380,66 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       }
     }
   }
+  // ---------- depth (see DEPTH above): one map for all layers; air hidden behind a camouflage counts as rock, so nothing gives it away
+  const hidden = new Set();
+  for (const c of camo) for (const [x, y] of c.cover || c.tiles) hidden.add(x + ',' + y);
+  const useDepth = scene.data_?.game?.tiles?.depth !== false && !style;
+  if (useDepth) {
+    const vsolid = (x, y) => solid(x, y) || hidden.has(x + ',' + y), dist = depthMap(room.w, room.h, vsolid);
+    const val = kit => (x, y) => { if (!vsolid(x, y)) return 0; const P = depthOf(kit); return Math.min(P.mass, Math.max(0, dist(x, y) - 1) * P.step) / 100; };
+    for (const e of edgeTiles) {
+      rimEdges(e.g, { l: !solid(e.x - 1, e.y), r: !solid(e.x + 1, e.y), b: !solid(e.x, e.y + 1), t: !solid(e.x, e.y - 1) }, e.x * T, e.y * T, T, e.kit.def);
+      massShade(e.g, e.x, e.y, T, val(e.kit));
+    }
+    for (const e of coverTiles) {
+      rimEdges(e.g, { l: !e.cs(e.x - 1, e.y), r: !e.cs(e.x + 1, e.y), b: !e.cs(e.x, e.y + 1), t: !e.cs(e.x, e.y - 1) }, e.x * T, e.y * T, T, e.kit.def);
+      massShade(e.g, e.x, e.y, T, val(e.kit));
+    }
+    // the back wall: ambient occlusion where it meets walls, floor and ceiling, and the walls cast their shadow onto it (right and down)
+    for (const bt of back) {
+      const P = depthOf(bt.kit), x = bt.tx, y = bt.ty, px = x * T, py = y * T, ao = P.ao / 100, n = 4, sz = P.aoSize / n, cast = P.cast / 100;
+      const L = solid(x - 1, y), R = solid(x + 1, y), U = solid(x, y - 1), B = solid(x, y + 1);
+      for (let i = 0; i < n; i++) {
+        const a = ao * (1 - i / n) * 0.55;
+        if (L) backShade.fillStyle(0x07050c, a).fillRect(px + i * sz, py, sz, T);
+        if (R) backShade.fillStyle(0x07050c, a).fillRect(px + T - (i + 1) * sz, py, sz, T);
+        if (U) backShade.fillStyle(0x07050c, a).fillRect(px, py + i * sz, T, sz);
+        if (B) backShade.fillStyle(0x07050c, a).fillRect(px, py + T - (i + 1) * sz, T, sz);
+      }
+      if (L) backShade.fillStyle(0x07050c, cast).fillRect(px, py + (U ? P.castY : 0), P.castX, T - (U ? P.castY : 0));
+      if (U) backShade.fillStyle(0x07050c, cast).fillRect(px, py, T, P.castY);
+      if (!L && !U && solid(x - 1, y - 1)) backShade.fillStyle(0x07050c, cast).fillRect(px, py, P.castX, P.castY);
+      if (room.tiles[y][x] === '=') for (let i = 0; i < 4; i++) backShade.fillStyle(0x07050c, Math.min(0.8, cast * 1.5) * (1 - i / 4)).fillRect(px + 8, py + 20 + i * 8, T, 8);   // platforms shade the wall behind them
+    }
+    // outdoors (no back wall): walls and overhangs drop a soft shadow into the air to the right and below, so they stand in front of the
+    // backdrop instead of being painted on it
+    const anyKit = edgeTiles[0]?.kit;
+    if (anyKit) {
+      const P = depthOf(anyKit), a = P.drop / 100, n = 3, sz = P.dropSize / n;
+      for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
+        if (vsolid(x, y) || terrain?.back?.(x, y)) continue;
+        if (room.tiles[y][x] === '=') for (let i = 0; i < 3; i++) g0.fillStyle(0x07050c, a * 0.8 * (1 - i / 3)).fillRect(x * T + 6, y * T + 18 + i * 6, T, 6);
+        const L = solid(x - 1, y) && terrain?.at(x - 1, y), U = solid(x, y - 1) && terrain?.at(x, y - 1), px = x * T, py = y * T;
+        for (let i = 0; i < n; i++) {
+          const k = a * (1 - i / n);
+          if (L) g0.fillStyle(0x07050c, k).fillRect(px + i * sz, py + (U ? 0 : 6), sz, T - (U ? 0 : 6));
+          if (U) g0.fillStyle(0x07050c, k).fillRect(px, py + i * sz, T, sz);
+        }
+      }
+    }
+    // clutter stands on the floor: a soft contact shadow under it
+    for (const c of clutter) {
+      const P = depthOf(c.kit), w = c.scale ? 2 * (c.ax - c.x) : c.cw, cx = c.scale ? c.ax : c.x + c.cw / 2, gy = c.scale ? c.ay : c.y + c.ch, a = P.prop / 100;
+      edges0.fillStyle(0x07050c, a * 0.55).fillEllipse(cx + 3, gy - 1, w * 0.95, 12);
+      edges0.fillStyle(0x07050c, a).fillEllipse(cx + 2, gy - 1, w * 0.7, 7);
+    }
+  } else {
+    for (const e of edgeTiles) rimEdges(e.g, { l: !solid(e.x - 1, e.y), r: !solid(e.x + 1, e.y), b: !solid(e.x, e.y + 1) }, e.x * T, e.y * T, T, { ...e.kit.def, depth: { rim: 0, shade: 0 } });
+    for (const e of coverTiles) rimEdges(e.g, { l: !e.cs(e.x - 1, e.y), r: !e.cs(e.x + 1, e.y), b: !e.cs(e.x, e.y + 1) }, e.x * T, e.y * T, T, { ...e.kit.def, depth: { rim: 0, shade: 0 } });
+  }
+  if (back.length) bake(scene, scene.make.graphics({}, false), 0, 0, room.w * T, room.h * T, { depth: -11, stamps: back, over: backShade });
+  else backShade.destroy();
+  bake(scene, g0, 0, 0, room.w * T, room.h * T, { depth: -10, stamps: [...stamps0, ...details0, ...decals0, ...clutter], over: edges0 });
   for (const c of camo) {
     const all = c.cover || c.tiles, xs = all.map(t => t[0]), ys = all.map(t => t[1]), x0 = (Math.min(...xs) - 1) * T, y0 = (Math.min(...ys) - 1) * T;
     c.rts = bake(scene, c.g, x0, y0, (Math.max(...xs) - Math.min(...xs) + 3) * T, (Math.max(...ys) - Math.min(...ys) + 3) * T, { depth: 10.6, stamps: c.stamps, over: c.edges });

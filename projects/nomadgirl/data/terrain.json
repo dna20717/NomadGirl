@@ -518,7 +518,7 @@
   "decalChance": 0,
   "decals": [],
   "description": "Blanke helle Marmorblöcke, dunkler Boden mit Messingleiste. Unheimlich sauber (Ava, 11.11.2026, PixelLab).",
-  "back": {"terrain": "marble", "shade": 48},
+  "back": {"terrain": "marble", "shade": 66},
   "sizes": [
    {"name": "ministry3_0", "cm": 40},
    {"name": "ministry3_1", "cm": 80},
