@@ -102,7 +102,7 @@ await ev(() => nomad.step(1, [], ['inventory']));
 
 // a run: enemies drop bundles, the ground inventory, auto-stacking, knocked out
 s = await ev(() => {
-  nomad.step(1, [], ['inventory']);   // close
+  if (game.scene.getScene('play').hud.inv.isOpen) nomad.step(1, [], ['inventory']);   // close (windows pause the game since 12.11.2026)
   const v = nomad.state().camp.hotspots.find(h => h.name === 'Van'); nomad.walkTo(v.x); nomad.step(1, [], ['grab']); nomad.choose('Planen'); nomad.choose('Plündern'); nomad.step(10);
   const sc = game.scene.getScene('play');
   nomad.calm(); const x = sc.leyla.x + 400;

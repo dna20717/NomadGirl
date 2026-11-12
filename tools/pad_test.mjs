@@ -30,9 +30,11 @@ await page.waitForFunction(() => window.nomad && window.game?.scene.getScene('pl
 const ev = (f, a) => page.evaluate(f, a);
 const check = (name, cond, info) => (cond ? ok : errors).push(cond ? name : `${name}: ${JSON.stringify(info)}`);
 const step = n => ev(k => nomad.step(k), n);
+// Benutzen (Daniel, 12.11.2026, 3a): left stick flicked up, counts while an E prompt is on screen
+const flick = async () => { await ev(() => { setPad({ axes: [0, -1] }); nomad.step(2); setPad(); nomad.step(2); }); };
 const tap = async button => { await ev(b => { setPad({ press: [b] }); nomad.step(2); setPad(); nomad.step(2); }, button); };
 const shot = async n => { if (!shots) return; fs.mkdirSync('output', { recursive: true }); await page.screenshot({ path: `output/pad_${n}.png` }); };
-const sc = () => ev(() => { const s = game.scene.getScene('play'); return { paused: s.hud.paused, x: s.leyla.x, vx: s.leyla.body.velocity.x, vy: s.leyla.body.velocity.y, feet: s.leyla.feet, prompt: s.hud.promptText, key: document.querySelector('.hud-prompt kbd')?.textContent, icon: document.querySelector('.hud-prompt .pad-ico')?.dataset.icon || null, menuIcons: [...document.querySelectorAll('.hud-keys .pad-ico')].map(e => e.dataset.icon), helpIcons: [...document.querySelectorAll('.hud-padhelp .pad-ico')].map(e => e.dataset.icon), keysHidden: getComputedStyle(document.querySelector('.hud-keyhelp')).display === 'none', menu: s.hud.menuState(), focus: s.hud.menuIndex, help: document.querySelector('.hud-padhelp')?.textContent || '', helpHidden: document.querySelector('.hud-padhelp')?.hidden, panel: !document.querySelector('.hud-help').hidden }; });
+const sc = () => ev(() => { const s = game.scene.getScene('play'); return { paused: s.hud.paused, x: s.leyla.x, vx: s.leyla.body.velocity.x, vy: s.leyla.body.velocity.y, feet: s.leyla.feet, prompt: s.hud.promptText, key: document.querySelector('.hud-prompt kbd')?.textContent, icon: document.querySelector('.hud-prompt .pad-ico')?.dataset.icon || null, menuIcons: [...document.querySelectorAll('.hud-menu .ui-hints .pad-ico')].map(e => e.dataset.icon), helpIcons: [...document.querySelectorAll('.hud-padhelp .pad-ico')].map(e => e.dataset.icon), keysHidden: getComputedStyle(document.querySelector('.hud-keyhelp')).display === 'none', menu: s.hud.menuState(), focus: s.hud.menuIndex, help: document.querySelector('.hud-padhelp')?.textContent || '', helpHidden: document.querySelector('.hud-padhelp')?.hidden, panel: !document.querySelector('.hud-help').hidden }; });
 
 await page.waitForTimeout(800);
 let s = await sc();
@@ -68,15 +70,15 @@ s = await sc();
 await ev(() => setPad()); await step(80);
 check('A springt', s.feet < f0 - 20 || s.vy < -200, { f0, feet: s.feet, vy: s.vy });
 
-// Y = E at the van, with the controller's label; menus with d-pad, A and B
+// stick up = E at the van, with the controller's symbol; menus with d-pad, A and B (one grammar for all windows)
 await ev(() => nomad.goTo('Van'));
 await tap(5);   // controller in use again (RB = reload, does nothing in the camp)
 s = await sc();
-check('Hinweis zeigt das Symbol der Controller-Taste (Y statt E)', s.prompt === 'Einsteigen · Van' && s.icon === 'xbox_3', s);
+check('Hinweis zeigt das Symbol der Controller-Taste (Stick statt E)', s.prompt === 'Einsteigen · Van' && s.icon === 'xbox_stick', s);
 await shot('prompt_xbox');
-await tap(3);
+await flick();
 s = await sc();
-check('Y öffnet das Van-Menü', s.menu?.items.some(i => i.label.startsWith('Planen')), s.menu);
+check('Stick hoch öffnet das Van-Menü', s.menu?.items.some(i => i.label.startsWith('Planen')), s.menu);
 check('Menü-Fußzeile mit Symbolen: Steuerkreuz, A, B', s.menuIcons.join() === 'xbox_dpad,xbox_0,xbox_1', s.menuIcons);
 await shot('menu');
 await tap(13);
@@ -85,7 +87,7 @@ check('Steuerkreuz runter wählt den nächsten Eintrag', s.focus === 1, s.focus)
 await tap(1);
 s = await sc();
 check('B schließt das Menü', !s.menu, s.menu);
-await tap(3); await tap(13); await tap(0);
+await flick(); await tap(13); await tap(0);
 s = await sc();
 check('A nimmt den Eintrag (Warroom)', s.menu?.title === 'Warroom', s.menu);
 await tap(1);
@@ -94,7 +96,7 @@ await tap(1);
 await ev(() => setPad({ id: 'DualSense Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)' }));
 await tap(5);
 s = await sc();
-check('PlayStation: Hinweis zeigt △', s.icon === 'ps_3', s.icon);
+check('PlayStation: Hinweis zeigt den Stick', s.icon === 'ps_stick', s.icon);
 await ev(() => { nomad.step(1, [], ['controls']); nomad.step(2); });
 s = await sc();
 check('PlayStation: Hilfe mit ✕ ○ □ △, L2/R2, Tastenliste ausgeblendet', /Controller · PlayStation/.test(s.help) && ['ps_0', 'ps_7'].every(i => s.helpIcons.includes(i)) && s.keysHidden === true, s);
@@ -103,12 +105,12 @@ await ev(() => { nomad.step(1, [], ['controls']); nomad.step(2); });
 await ev(() => setPad({ id: 'Google LLC Stadia Controller rev. A (STANDARD GAMEPAD Vendor: 18d1 Product: 9400)' }));
 await tap(5);
 s = await sc();
-check('Stadia: Hinweis und Hilfe mit Stadia-Symbolen', s.icon === 'stadia_3' && /Controller · Stadia/.test(s.help), { icon: s.icon, help: s.help.slice(0, 40) });
+check('Stadia: Hinweis und Hilfe mit Stadia-Symbolen', s.icon === 'stadia_stick' && /Controller · Stadia/.test(s.help), { icon: s.icon, help: s.help.slice(0, 40) });
 await shot('prompt_stadia');
 await ev(() => setPad({ id: 'Pro Controller (STANDARD GAMEPAD Vendor: 057e Product: 2009)' }));
 await tap(5);
 s = await sc();
-check('Switch: Benutzen liegt auf X (oben)', s.icon === 'switch_3', s.icon);
+check('Switch: Benutzen = Stick hoch', s.icon === 'switch_stick', s.icon);
 
 // inventory with the controller, no pointer (Daniel, 11.11.2026): a cursor on cells, slots and tabs
 await ev(() => setPad({ id: 'Xbox Wireless Controller (STANDARD GAMEPAD Vendor: 045e)' }));

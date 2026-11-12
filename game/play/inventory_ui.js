@@ -4,6 +4,7 @@
 // double click moves it to the other side, a click outside the panels puts it back. Placeholders until things have a look:
 // coloured cells by category with a short glyph, the name and the count.
 import { el } from '../ui.js';
+import { hints, padInUse } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot, IMPLANTS, DRONE_WEAR, WEAR_KEYS, wearOf, gearStats, gearScore, occupancy } from '../inventory.js';
 import { partSlots, budgets, SLOT_NAMES as PART_SLOT_NAMES } from '../rig.js';
@@ -54,7 +55,7 @@ export class InventoryUI {
   // Tabs over the left panel (camp only): "Leyla" (slots + backpack) and the tractor ("Van": rig part slots + Kofferraum).
   constructor(root, host) {
     this.root = root; this.host = host;
-    this.el = el('div', { class: 'inv', hidden: true, oncontextmenu: e => e.preventDefault() });
+    this.el = el('div', { class: 'inv ui-frame', hidden: true, oncontextmenu: e => e.preventDefault() });
     this.tip = el('div', { class: 'inv-tip', hidden: true });
     this.ghost = el('div', { class: 'inv-ghost', hidden: true });
     this.cursor = el('div', { class: 'inv-cursor', hidden: true });
@@ -75,7 +76,7 @@ export class InventoryUI {
   get isOpen() { return !this.el.hidden; }
   get cell() { return this.D.leyla?.inventory?.cell ?? 44; }
 
-  open(other = null, { tab } = {}) { this.other = other; if (tab) this.tab = tab; this.el.hidden = false; this.draw(); }
+  open(other = null, { tab } = {}) { this.other = other; if (tab) this.tab = tab; this.el.hidden = false; if (padInUse()) this.padOn = true; this.draw(); }
   get vanTab() { return this.tab === 'van' && !!this.host.inCamp?.() && !!this.vanStore(); }
   vanStore() { return storeList(this.D, this.host.save()).find(c => c.unit === 0) || null; }
   setTab(t) { this.tab = t; this.draw(); }
@@ -103,14 +104,14 @@ export class InventoryUI {
       if (this.other && this.other.key !== vs.key) { parts[1] = this.otherEl(); this.pair = [vs.key, this.other.key]; }
       parts[0].prepend(this.tabsEl());
       this.el.replaceChildren(el('div', { class: 'inv-row' }, ...parts),
-        el('p', { class: 'inv-help' }, 'Rig-Teile ein- und ausbauen, kaufen und verkaufen: Rig bauen (B) · Herstellen: Werkbank · Kofferraum wie jedes Lager · I oder Tab: schließen'));
+        hints([['move', 'wählen'], ['ok', 'nehmen / ablegen'], ['tabs', 'Tab wechseln'], ['back', 'zurück']], 'Rig-Teile ein- und ausbauen: Rig bauen (B) · Kofferraum wie jedes Lager'));
       this.fit(); return this.padShow();
     }
     // Daniel, 10.11.2026 ("Inventar im Diablo-Stil"): backpack left (with the ground or the open storage under it), Leyla in the middle, Mama-Bot right
     this.pair = this.other ? ['backpack', this.other.key] : ['backpack', 'drone'];
     const left = el('div', { class: 'inv-col' }, this.bagEl(), this.other ? this.otherEl() : null);
     this.el.replaceChildren(el('div', { class: 'inv-row' }, left, this.leylaEl(), this.droneEl()),
-      el('p', { class: 'inv-help' }, 'Klicken: nehmen und ablegen · Rechtsklick, Strg+Klick oder Mausrad: drehen · Doppelklick: auf die andere Seite · daneben klicken: auf den Boden werfen · I oder Tab: schließen'));
+      hints([['move', 'wählen'], ['ok', 'nehmen / ablegen'], ['context', 'drehen'], ['send', 'rüber'], ['tabs', 'Tab'], ['back', 'zurück']], 'Maus: klicken, Rechtsklick dreht, Doppelklick rüber, daneben = auf den Boden'));
     this.fit();
     this.drawGhost();
     this.padShow();
@@ -392,13 +393,7 @@ export class InventoryUI {
     if (!f) { f = all.find(t => t.key === 'backpack') || all[0]; this.focusId = f?.id; }
     return f;
   }
-  padHelp() {
-    const p = this.pad, L = a => p?.label(a) || '?';
-    return `Steuerkreuz/Stick: wählen · ${L('jump')}: nehmen und ablegen · ${L('melee')}: drehen · ${L('grab')}: auf die andere Seite · ${L('dash')}: zurücklegen / schließen · ${L('walk')} ${L('reload')}: Tabs`;
-  }
   padShow() {
-    const help = this.el.querySelector('.inv-help');
-    if (help && this.padOn && !help.dataset.pad) { help.dataset.pad = '1'; help.textContent = this.padHelp(); }
     if (!this.padOn || !this.isOpen) { this.cursor.hidden = true; return; }
     const f = this.padFocus();
     if (!f) return;
@@ -429,9 +424,12 @@ export class InventoryUI {
     if (best) { this.focusId = best.id; this.padShow(); }
   }
   padNav(p, now = performance.now()) {
-    if (!this.isOpen || (!this.padOn && !p.now.size)) return;   // the mouse keeps working until the controller is touched
+    // p = window input (ui_nav.js uiInput): the same grammar for keyboard and controller; the mouse keeps working until a key is touched
+    if (!this.isOpen || (!this.padOn && !p.now.size)) return;
     this.pad = p;
-    if (!this.padOn) { this.padOn = true; this.draw(); }
+    // the key that opened a chest (E) closes it again while the cursor is not in use, like the cooking window; other keys only show the cursor first
+    if (!this.padOn && p.keys && p.pressed('ok') && !this.held) return this.close();
+    if (!this.padOn) { this.padOn = true; this.draw(); if (p.keys) { this.padShow(); return; } }
     // directions: one step, held = repeats
     const dirs = [['left', -1, 0], ['right', 1, 0], ['up', 0, -1], ['down', 0, 1]];
     this.rep ??= {};
@@ -443,14 +441,14 @@ export class InventoryUI {
     const f = this.padFocus();
     if (!f) return;
     const e = f.key != null ? this.itemAt(f.key, f.x, f.y) : null;
-    if (p.pressed('jump')) {
+    if (p.pressed('ok')) {
       if (f.key != null) { if (this.held) this.place(f.key, f.x, f.y); else if (e) this.pick(f.key, this.grid(f.key), e); }
       else { f.node.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 })); if (f.node.tagName === 'BUTTON' && f.node.classList.contains('inv-btn')) f.node.click(); }
     }
-    if (p.pressed('melee')) { if (this.held) this.turnHeld(); else if (e) this.turnInPlace(this.grid(f.key), e); }
-    if (p.pressed('grab') && f.key != null) { if (this.held) this.quickMoveHeld(f.key); else if (e) this.quickMove(f.key, e); }
-    if (p.pressed('dash')) { if (this.held) this.putBack(); else return this.close(); }
-    for (const [a, d] of [['walk', -1], ['reload', 1]]) if (p.pressed(a)) {
+    if (p.pressed('context')) { if (this.held) this.turnHeld(); else if (e) this.turnInPlace(this.grid(f.key), e); }
+    if (p.pressed('send') && f.key != null) { if (this.held) this.quickMoveHeld(f.key); else if (e) this.quickMove(f.key, e); }
+    if (p.pressed('back')) { if (this.held) this.putBack(); else return this.close(); }
+    for (const [a, d] of [['prev', -1], ['next', 1]]) if (p.pressed(a)) {
       const tabs = [...this.el.querySelectorAll('.inv-tab')], i = tabs.findIndex(t => t.classList.contains('on'));
       const t = tabs[(i + d + tabs.length) % tabs.length];
       if (tabs.length > 1 && t) t.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }));

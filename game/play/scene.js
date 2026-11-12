@@ -7,6 +7,7 @@ import { Fog } from './fog.js';
 import { makeTextures, drawBackground, drawRoom, terrainKits, PLACEHOLDER_COLORS } from './art.js';
 import { Leyla } from './leyla.js';
 import { Enemy } from './enemies.js';
+import { uiInput } from './ui_nav.js';
 import { Combat } from './combat.js';
 import { Fx } from './fx.js';
 import { Atmosphere } from './atmosphere.js';
@@ -27,7 +28,7 @@ const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
   jump: ['SPACE'], walk: ['SHIFT'], dash: ['L', 'C'], melee: ['J', 'Y'], ranged: ['K', 'X'], grab: ['E'],
-  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'], build: ['B'], holster: ['Q'],
+  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], uiOk: ['ENTER'], uiSend: ['F'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'], build: ['B'], holster: ['Q'],
 };
 
 export class PlayScene extends Phaser.Scene {
@@ -598,27 +599,47 @@ export class PlayScene extends Phaser.Scene {
     }
     // controller (game/play/pad.js): adds to the keyboard, same action names
     const pad = this.pad?.poll();
+    const kb = {}; for (const [k, v] of Object.entries(i)) kb[k] = { ...v };
+    this.ui = uiInput(kb, pad);   // window keys (ui_nav.js): one grammar for menus, inventory, cooking, building
     // inventory open: the controller drives its cursor (padMenus), Leyla only hears the keyboard; Select / Start still close
     const invPad = this.hud.inv?.isOpen && !this.hud.paused && !this.hud.modal;
-    if (pad?.kind) for (const name of Object.keys(i)) { if (invPad && name !== 'inventory' && name !== 'help') continue; i[name].down ||= pad.down(name); i[name].pressed ||= pad.pressed(name); }
+    if (pad?.kind) for (const name of Object.keys(i)) { if (invPad && name !== 'inventory' && name !== 'help') continue; i[name].down ||= pad.down(name); i[name].pressed ||= pad.pressed(name) && !(pad.viaUp?.has(name) && !this.useByUp()); }
+    // use by „up“ (Daniel, 12.11.2026, 3a): W / ↑ / the stick flicked up counts as E while an E prompt is on screen and Leyla stands or walks;
+    // then it does not start a ladder (the prompt wins)
+    if (i.up?.pressed && !i.grab.pressed && this.useByUp()) { i.grab.pressed = true; i.up.pressed = false; }
+    else if (i.grab.pressed && pad?.viaUp?.has('grab')) i.up.pressed = false;
     this.hud.padHelp(pad, PAD_ACTIONS);
     return i;
   }
-  // controller in menus and windows: d-pad/stick choose, bottom button takes, right button goes back
+  useByUp() {
+    const l = this.leyla, h = this.hud, G = this.data_.game?.gamepad || {};
+    if (G.useUp === false || !l?.alive || h.modal || h.paused || h.inv?.isOpen || h.craft?.isOpen || h.build?.active) return false;
+    if (!h.promptText || (h.promptKey || 'E') !== 'E' || h.promptEl?.hidden) return false;
+    return l.state === 'normal' && (l.body.blocked.down || l.body.touching.down) && Math.abs(l.body.velocity.x) <= (l.m.walkSpeed ?? 240) * 1.15;
+  }
+  // windows (ui_nav.js, Daniel 12.11.2026: one grammar): move, ok, back, context, send, tabs; keyboard and controller alike
   padMenus(input) {
-    const p = this.pad, hud = this.hud;
-    if (!p?.kind) return;
-    if (hud.paused && !hud.modal) { if (p.pressed('jump') || p.pressed('grab')) { hud.toggleHelp(false); input.jump.pressed = input.grab.pressed = false; } return; }
+    const u = this.ui, hud = this.hud, p = this.pad;
+    if (!u) return;
+    const eat = () => { for (const k of ['jump', 'grab', 'dash', 'up', 'down', 'left', 'right', 'melee', 'ranged', 'reload', 'holster']) if (input[k]) input[k].pressed = false; };
+    if (hud.paused && !hud.modal) { if (u.pressed('ok') || u.pressed('back')) { hud.toggleHelp(false); eat(); input.help.pressed = false; } return; }
     if (hud.modal) {
-      if (p.pressed('down')) hud.menuMove(1);
-      else if (p.pressed('up')) hud.menuMove(-1);
-      else if (p.pressed('jump')) hud.choose(hud.menuIndex);
-      else if (p.pressed('dash') || p.pressed('help')) hud.closeMenu();
-      for (const k of ['jump', 'grab', 'dash', 'up', 'down', 'help']) input[k].pressed = false;
+      if (p?.kind) {   // the keyboard runs the menu through its own keys (hud.menuKey)
+        if (p.uiNow.has('down') && !p.uiPrev.has('down')) hud.menuMove(1);
+        else if (p.uiNow.has('up') && !p.uiPrev.has('up')) hud.menuMove(-1);
+        else if (p.uiNow.has('ok') && !p.uiPrev.has('ok')) hud.choose(hud.menuIndex);
+        else if ((p.uiNow.has('back') && !p.uiPrev.has('back')) || p.pressed('help')) hud.closeMenu();
+      }
+      eat(); input.help.pressed = false;
       return;
     }
-    if (p.pressed('dash') && hud.craft?.isOpen) { hud.craft.close(); input.dash.pressed = false; }
-    else if (hud.inv?.isOpen && !hud.paused) hud.inv.padNav(p);
+    if (hud.craft?.isOpen) {
+      if (u.pressed('back')) { hud.craft.close(); input.help.pressed = false; }
+      else hud.craft.nav?.(u);
+      eat(); return;
+    }
+    if (hud.inv?.isOpen && !hud.paused) { hud.inv.padNav(u); if (u.pressed('back')) input.help.pressed = false; eat(); return; }
+    if (hud.build?.active && p?.kind && p.uiNow.has('back') && !p.uiPrev.has('back')) hud.build.close();   // B = fertig (keyboard: Esc / B)
   }
 
   toggleMute() {
@@ -645,9 +666,12 @@ export class PlayScene extends Phaser.Scene {
     const building = this.hud.build?.active;
     if (input.build?.pressed && building) this.hud.build.close();
     else if (input.build?.pressed && this.mode === 'camp' && !this.hud.modal && !this.hud.paused && !this.leaving && !this.hud.craft?.isOpen) this.openBuild();
-    if (this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || this.leaving) {
+    // every window pauses the game (Daniel, 12.11.2026: „Fenster pausieren immer, auch im Run“): menus, controls, cooking and the inventory
+    let invDone = false;
+    if (this.hud.inv?.isOpen && !this.hud.paused && !this.hud.modal && !this.leaving) { this.inventoryUpdate(input); invDone = true; }
+    if (this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || this.hud.inv?.isOpen || this.leaving) {
       // cooking, crafting, a menu: the workshops keep glowing, steaming and sparking behind the window
-      if (this.camp && !this.hud.paused && !this.leaving) this.camp.benches?.update(time, Math.min(delta, 50));
+      if (this.camp && !this.hud.paused && !this.leaving) { this.camp.benches?.update(time, Math.min(delta, 50)); this.camp.lid?.(Math.min(delta, 50)); }
       this.physics.world.pause(); this.hud.update(this, time); return;
     }
     if (time < this.hitstopUntil) return;
@@ -665,7 +689,7 @@ export class PlayScene extends Phaser.Scene {
     if (this.camp) this.camp.update(time, dt, input);
     else if (this.mode === 'run' || this.level) this.runUpdate(input);
     this.loot?.update(time);
-    this.inventoryUpdate(input);
+    if (!invDone) this.inventoryUpdate(input);   // (closed this frame already: do not open it again with the same key)
     for (const e of this.enemies) e.update(time, dt, this.leyla);
     this.combat.update(time, dt);
 

@@ -118,7 +118,9 @@
   "lowerTime": 220,
   "muzzleRun": [81, 144],
   "recoil": true,
-  "recoilTime": 70
+  "recoilTime": 70,
+  "quickDraw": true,
+  "quickDrawTime": 120
  },
  "melee": {
   "lightTime": 420,
@@ -141,7 +143,7 @@
  },
  "yoga": {"fps": 6, "backFps": 10, "holdFrom": 12},
  "brake": {"enabled": true, "minSpeed": 85, "minRun": 350, "time": 650, "slide": 55, "fromFrame": 2, "cancel": 40},
- "fight": {"enabled": true, "auto": true, "sight": 10, "calm": 4, "onHit": true, "redraw": 700},
+ "fight": {"enabled": true, "auto": false, "sight": 10, "calm": 4, "onHit": false, "redraw": 700, "holdToHolster": 500},
  "hit": {"enabled": true, "heavyFrom": 12, "time": 360, "heavyTime": 520, "inFrames": 3, "inTime": 70, "cancelAfter": 50, "flash": 50, "hitstop": 60, "scale": true, "fullAt": 15},
  "transition": {"idleAfter": 90, "idleAfterAir": 60},
  "transitions": [{"from": "leyla_land_side", "to": "leyla_run_side", "frame": 3}],

@@ -10,6 +10,7 @@
 //   dealer catalogue (button or click on the pad): bought things are delivered onto the pad.
 // Logic in game/rig.js (act, snapshot/restore), drawing in game/play/camp.js (drawRig, drawYard), values in "Rig-Bau".
 import { el } from '../ui.js';
+import { hints } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { budgets, act, snapshot, restore, lift, place, fits, at as wsAt, toSpare, fromSpare, stow, buyWorkshop, sellWorkshop, buyContainer, sellContainer, buyPart, sellPart, mountPart, unmountPart, SLOT_NAMES as PART_SLOTS, stackOn, stackTop, blockAt, levelOf, attachAt, detach, moveContainer, shop, priceOf, sellPrice, wsDef, placesOf } from '../rig.js';
 import { clockText } from '../save.js';
@@ -109,8 +110,10 @@ export class BuildMode {
     // the bar, the dealer and the message stay the same elements while building (Daniel: the bar stays on, no slide in on every redraw);
     // only their contents change. The slide-in plays once when building starts or the dealer opens.
     if (!this.shell || !this.el.contains(this.shell.bar)) {
-      this.shell = { bar: el('div', { class: 'bm-bar' }), shop: el('div', { class: 'bm-shopslot' }), msg: el('div', { class: 'bm-msg idle' }) };
-      this.el.replaceChildren(this.shell.bar, this.shell.shop, this.shell.msg);
+      this.shell = { bar: el('div', { class: 'bm-bar ui-frame' }), shop: el('div', { class: 'bm-shopslot' }), msg: el('div', { class: 'bm-msg idle' }),
+        hint: hints([['back', 'fertig']], 'Maus: Teile packen und ziehen · Strg+Z rückgängig · B fertig') };
+      this.shell.hint.classList.add('bm-hints');
+      this.el.replaceChildren(this.shell.bar, this.shell.shop, this.shell.msg, this.shell.hint);
     }
     const sh = this.shell;
     sh.bar.replaceChildren(

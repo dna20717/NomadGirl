@@ -71,11 +71,19 @@ check('Kombo: perfekter Takt = aufgesetzter Schuss als fünfter (1 Patrone), Tak
 check('Kombo: ohne Takt kein Schuss, nach dem Abschluss beginnt sie neu', combo.m.seq[3] === 'fin' && typeof combo.m.seq[4] === 'number' && combo.m.used === 0, combo);
 v = await t(t => t.run(130));
 check('Kampfmodus: ohne Gegner in Sicht steckt sie die Waffe weg', v.armed === 'off', v);
+// Quick Draw (Daniel, 12.11.2026, 1b): the trigger draws from the hip and the shot follows in the same move (~120 ms)
 v = await t(t => t.run(2, [], ['ranged']));
-check('Kampfmodus: Abzug zieht erst die Waffe', v.armed === 'drawing' && v.mag === 7, v);
-v = await t(t => t.run(40));
+check('Quick Draw: Abzug zieht aus der Hüfte', v.armed === 'drawing' && v.mag === 7, v);
+v = await t(t => t.run(12));
+check('Quick Draw: der Schuss kommt im selben Zug', v.armed === 'on' && v.mag === 6 && v.ammo === 33, v);
+v = await t(t => t.run(30));
 v = await t(t => t.run(10, [], ['ranged']));
-check('Fernkampf: Waffe gezogen, Schuss aus dem Magazin', v.armed === 'on' && v.mag === 6 && v.ammo === 33, v);
+check('Fernkampf: Waffe gezogen, Schuss aus dem Magazin', v.armed === 'on' && v.mag === 5 && v.ammo === 33, v);
+// holding the trigger with the gun out holsters it (the shot of the press is out already)
+v = await t(t => t.run(40, ['ranged'], ['ranged']));
+check('Y/K halten: Waffe wegstecken', /holstering|off/.test(v.armed), v);
+v = await t(t => t.run(40));
+v = await t(t => t.run(2, [], ['ranged'])); v = await t(t => t.run(14));
 for (let i = 0; i < 12 && v.mag > 0; i++) v = await t(t => t.run(30, [], ['ranged']));
 check('Magazin leer', v.mag === 0, v);
 v = await t(t => t.run(2, [], ['ranged']));

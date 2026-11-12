@@ -4,6 +4,7 @@
 //               notes in the camp inventories can be read (recipe learnt), companions in the camp give hints for unknown ones.
 //   Experimentieren: click supplies to put one into the pot (right click or click in the pot takes one out), "Ausprobieren" tries it.
 import { el } from '../ui.js';
+import { hints, NavCursor } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { CATEGORY_COLORS, markOf } from './inventory_ui.js';
 import { recipesFor, known, missing, stock, craft, experiment, readable, read, tips, functionOf } from '../crafting.js';
@@ -22,10 +23,13 @@ export class CraftUI {
     this.tip = el('div', { class: 'inv-tip', hidden: true });
     root.append(this.el, this.tip);
     this.pot = {};
+    this.cursor = new NavCursor(this.el, '.craft-recipe .inv-btn, .craft-supply');
     this.log = null;   // { kind: 'hit' | 'learnt' | 'miss' | 'near' | 'read' | 'error', text, who?, line? }
     document.addEventListener('keydown', e => {
       if (!this.isOpen) return;
-      if (e.key === 'Escape' || e.key === 'e' || e.key === 'E' || e.key === 'Tab' || e.key === 'i' || e.key === 'I') { this.close(); e.preventDefault(); e.stopPropagation(); }
+      // one grammar (ui_nav.js): Esc = back; E is „ok“ once the cursor is in use, before that it closes like it opened
+      const ek = (e.key === 'e' || e.key === 'E') && !this.cursor.on;
+      if (e.key === 'Escape' || ek || e.key === 'Tab' || e.key === 'i' || e.key === 'I') { this.close(); e.preventDefault(); e.stopPropagation(); }
     }, true);
     document.addEventListener('mousemove', ev => { if (!this.tip.hidden) Object.assign(this.tip.style, { left: `${ev.clientX + 16}px`, top: `${ev.clientY + 16}px` }); });
   }
@@ -33,20 +37,22 @@ export class CraftUI {
   get save() { return this.host.save(); }
   get isOpen() { return !this.el.hidden; }
 
-  open(ws) { this.ws = ws; this.pot = {}; this.log = null; this.el.hidden = false; this.draw(); }
-  close() { this.el.hidden = true; this.tip.hidden = true; this.pot = {}; this.host.closed?.(); }
+  open(ws) { this.ws = ws; this.cursor.i = -1; this.pot = {}; this.log = null; this.el.hidden = false; this.draw(); }
+  close() { this.el.hidden = true; this.tip.hidden = true; this.pot = {}; this.cursor.hide(); this.host.closed?.(); }
+  nav(ui) { if (this.cursor.update(ui)) this.cursor.show(); }
 
   verb() { return VERBS[functionOf(this.D, this.ws)]?.[0] || 'Herstellen'; }
 
   draw() {
     if (!this.isOpen) return;
     const D = this.D, save = this.save, def = D.workshops?.[this.ws] || {};
-    this.el.replaceChildren(el('div', { class: 'craft-box' },
+    this.el.replaceChildren(el('div', { class: 'craft-box ui-frame' },
       el('header', {}, icon('workbench', 20), el('h2', {}, def.name || this.ws),
         el('small', {}, clockText(save)), el('button', { class: 'craft-x', title: 'Schließen (Esc)', onclick: () => this.close() }, '×')),
       el('div', { class: 'craft-cols' }, this.bookEl(), this.potEl()),
       this.logEl(),
-      el('p', { class: 'inv-help' }, 'Vorräte anklicken: in den Topf · Rechtsklick oder Klick im Topf: wieder raus · Zutaten kommen aus Lager, Kiste und Rucksack · Esc oder E: schließen')));
+      hints([['move', 'wählen'], ['ok', 'nehmen'], ['context', 'wieder raus'], ['back', 'schließen']], 'Vorräte anklicken: in den Topf · Rechtsklick oder Klick im Topf: raus · Zutaten aus Lager, Kiste und Rucksack')));
+    this.cursor.show();
   }
 
   // ---------- recipe book ----------
@@ -80,7 +86,7 @@ export class CraftUI {
     const potSlots = [...Array(slots).keys()].map(i => {
       const id = ids[i];
       if (!id) return el('div', { class: 'craft-slot' }, el('small', {}, `Zutat ${i + 1}`));
-      const s = el('div', { class: 'craft-slot full', style: `--col:${CATEGORY_COLORS[D.items?.[id]?.category] || '#555'}`, onmousedown: ev => { ev.preventDefault(); this.takeOut(id, ev.shiftKey ? this.pot[id] : 1); } },
+      const s = el('div', { class: 'craft-slot full', 'data-nav': '', style: `--col:${CATEGORY_COLORS[D.items?.[id]?.category] || '#555'}`, onmousedown: ev => { ev.preventDefault(); this.takeOut(id, ev.shiftKey ? this.pot[id] : 1); } },
         el('b', {}, markOf(D, 'items', id, 24)), el('span', {}, D.items?.[id]?.name || id), el('i', {}, `×${this.pot[id]}`));
       this.hover(s, id);
       return s;
@@ -98,7 +104,7 @@ export class CraftUI {
       el('h3', {}, 'Vorräte'),
       el('div', { class: 'craft-supplies' }, ...(supplies.length ? supplies.map(id => {
         const left = st[id] - (this.pot[id] || 0);
-        const c = el('button', { class: 'craft-supply' + (left <= 0 ? ' used' : ''), style: `--col:${CATEGORY_COLORS[D.items[id].category] || '#555'}`,
+        const c = el('button', { 'data-nav': '', class: 'craft-supply' + (left <= 0 ? ' used' : ''), style: `--col:${CATEGORY_COLORS[D.items[id].category] || '#555'}`,
           onmousedown: ev => { ev.preventDefault(); if (ev.button === 2 || ev.ctrlKey) this.takeOut(id, 1); else if (ev.button === 0) this.putIn(id, ev.shiftKey ? left : 1); } },
           el('b', {}, markOf(D, 'items', id, 24)), el('span', {}, D.items[id].name || id), el('i', {}, String(left)));
         this.hover(c, id);

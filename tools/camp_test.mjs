@@ -72,10 +72,14 @@ s = await ev(() => { nomad.step(900, ['left']); nomad.step(60); return nomad.sta
 check('Schacht links: Leyla bleibt am Rand stehen', s.leyla.feet === 768 && s.leyla.x > 4 * 64 && s.leyla.x < 5 * 64 + 10, s.leyla);
 p = await ev(() => c.to('Kiste'));
 s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(60); return nomad.state(); });
-check('Kiste geht mit E auf', p === 'Öffnen · Kiste' && s.camp.chest.open && s.camp.chest.frame === 4 && s.prompt === 'Schließen · Kiste', { p, chest: s.camp.chest, prompt: s.prompt });
+check('Kiste geht mit E auf (Fenster pausiert, der Deckel geht trotzdem auf)', p === 'Öffnen · Kiste' && s.camp.chest.open && s.camp.chest.frame === 4, { p, chest: s.camp.chest, prompt: s.prompt });
 await shot('chest');
 s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(60); return nomad.state(); });
 check('… und wieder zu', !s.camp.chest.open && s.camp.chest.frame === 0, s.camp.chest);
+// Daniel, 12.11.2026: W / ↑ (controller: stick up) counts as E while an E prompt shows; an open window pauses the game
+s = await ev(() => { nomad.step(1, [], ['up']); nomad.step(20); const x0 = nomad.state().leyla.x, open = nomad.state().camp.chest.open; nomad.step(40, ['dash'], ['dash']);   // a dash would move her (arrows would move the window's cursor)
+  const x1 = nomad.state().leyla.x; nomad.step(1, [], ['grab']); nomad.step(60); return { open, moved: Math.abs(x1 - x0), closed: !nomad.state().camp.chest.open }; });
+check('W mit E-Hinweis öffnet die Kiste, offenes Fenster pausiert (Leyla läuft nicht), E schließt', s.open && s.moved < 1 && s.closed, s);
 s = await ev(() => { const near = (c.to('Lagerfeuer'), nomad.state().camp.sound.fire); c.to('Kochnische'); return { near, far: nomad.state().camp.sound.fire, wind: nomad.state().camp.sound.wind }; });
 check('Feuer lauter, je näher Leyla ist; Wind läuft', s.near >= 80 && s.far < 15 && s.wind, s);
 

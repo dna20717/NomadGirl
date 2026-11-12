@@ -115,10 +115,26 @@ export class Leyla {
     if (this.alive && !['climb', 'hang', 'mantle'].includes(this.state)) {
       this.meleeInput(time, input, grounded);
       // shooting only on the ground with the gun drawn (Daniel: no shooting in a jump); empty magazine = reload
-      const gun = !!this.d.look?.aim && this.d.armed?.enabled !== false;
-      if (input.ranged.pressed && gun) this.fightTrigger(time);   // pulling the trigger draws the gun (combat mode)
+      const gun = !!this.d.look?.aim && this.d.armed?.enabled !== false, AR = this.d.armed || {};
+      // Quick Draw (Daniel, 12.11.2026, 1b): Y / K always shoots right away; with the gun away she draws it from the hip in the same move
+      // (Leyla › Waffe ziehen › Quick Draw dauert) and the shot follows by itself. Holding Y / K with the gun out holsters it (Wegstecken: halten).
+      if (input.ranged.pressed && gun) {
+        this.rangedPress = { at: time, wasOut: this.armed === 'on', done: false };
+        this.fightTrigger(time);
+        if (this.armed !== 'on' && AR.quickDraw !== false && this.state === 'normal' && grounded) {
+          this.quickShot = time;   // updateArmed draws it within "Quick Draw dauert", then the shot goes off by itself
+          this.quickDraw = Math.max(1, AR.quickDrawTime ?? 120);
+        }
+      }
+      if (this.rangedPress && !input.ranged.down) this.rangedPress = null;
+      const hold = this.d.fight?.holdToHolster ?? 500;
+      if (gun && this.rangedPress?.wasOut && !this.rangedPress.done && hold > 0 && time - this.rangedPress.at >= hold && this.fight) {
+        this.rangedPress.done = true; this.fight.on = false; this.fight.manual = 'off'; this.quickShot = null;
+      }
       const canShoot = this.state === 'normal' && grounded && !this.reloading && (!gun || this.armed === 'on');
-      if (input.ranged.pressed && time >= this.rangedReady && canShoot) { if (this.mag <= 0 && this.ammo > 0) this.startReload(time); else this.scene.combat.shoot(this, time); }
+      const quickNow = this.quickShot != null && this.armed === 'on' && time - this.quickShot < 600;   // the drawn-from-the-hip shot
+      if (this.quickShot != null && (time - this.quickShot >= 600 || !grounded)) this.quickShot = null;
+      if ((input.ranged.pressed || quickNow) && time >= this.rangedReady && canShoot) { this.quickShot = null; if (this.mag <= 0 && this.ammo > 0) this.startReload(time); else this.scene.combat.shoot(this, time); }
       if (input.reload?.pressed && canShoot) this.startReload(time);
     }
     this.updateReload(time);
@@ -821,9 +837,13 @@ export class Leyla {
     const can = A.enabled !== false && this.d.look?.aim && s.weapon('ranged') && (s.mode !== 'camp' || A.inCamp) && this.state === 'normal' && grounded && !this.attack && !this.charging
       && slow && !this.hitAnim;
     this.armed ??= 'off';
-    if (!can) { if (this.armed === 'on') this.armedLost = time; this.armed = 'off'; this.drawP = 0; return; }
+    // a strike, charging or a hit with the gun out (Daniel, 12.11.2026: „Hieb mit gezogener Waffe steckt nicht weg“): the gun counts as out
+    // the whole time and is back in the hand right after, without drawing
+    const busy = this.attack || this.charging || this.hitAnim;
+    if (!can) { if (this.armed === 'on' || (busy && this.gunOut && this.fight?.on)) this.armedLost = time; this.armed = 'off'; this.drawP = 0; return; }
     // combat over (calm, Q): holstering = drawing backwards (Daniel, 11.11.2026: „Waffe ziehen soll auch wegstecken sein“)
     if (!this.fight.on) {
+      this.gunOut = false;
       if (this.armed === 'on' || this.armed === 'drawing') { if (this.armed === 'on') this.drawP = 1; this.armed = (A.holsterTime ?? 420) > 0 && this.d.look?.draw ? 'holstering' : 'off'; }
       if (this.armed === 'holstering') { this.drawP -= dt / Math.max(1, A.holsterTime ?? 420); if (this.drawP <= 0) { this.armed = 'off'; this.drawP = 0; } }
       if (this.armed === 'off') this.drawP = 0;
@@ -834,7 +854,8 @@ export class Leyla {
     const quick = time - this.armedLost < (this.d.fight?.redraw ?? 700);
     if (this.armed === 'off') { this.armed = this.d.look?.draw && !quick ? 'drawing' : 'on'; this.drawP = 0; this.special = null; }
     if (this.armed === 'drawing' && this.gunRunning(v) && !this.runLook('runDraw')) this.armed = 'on';   // no drawing on the run without its animation
-    if (this.armed === 'drawing') { this.drawP += dt / Math.max(1, A.drawTime ?? 650); if (this.drawP >= 1) this.armed = 'on'; }
+    if (this.armed === 'drawing') { this.drawP += dt / Math.max(1, this.quickShot != null ? this.quickDraw ?? 120 : A.drawTime ?? 650); if (this.drawP >= 1) { this.armed = 'on'; this.gunOut = true; } }
+    if (this.armed === 'on') this.gunOut = true;
   }
   runFamily() { return this.families()[0]; }
   families() {
@@ -867,11 +888,14 @@ export class Leyla {
       if (F.on) { F.on = false; F.manual = 'off'; } else { F.on = true; F.manual = 'on'; F.last = time; }
     }
     // enemies in sight (Leyla › Kampfmodus › Sicht, free line of sight), a few times a second
-    if (C.auto !== false && time >= F.check) {
+    // without "Automatisch" (Daniel, 12.11.2026, 2b: only by button) an enemy in sight keeps a drawn gun out, but never draws it
+    if (time >= F.check) {
       F.check = time + 150;
       const seen = this.enemyInSight((C.sight ?? 10) * (s.T || 64));
-      if (seen && F.manual === 'off' && !F.seen) F.manual = null;   // holstered by hand: only a new sighting draws again
-      if (seen && F.manual !== 'off') { F.on = true; F.last = time; }
+      if (C.auto !== false) {
+        if (seen && F.manual === 'off' && !F.seen) F.manual = null;   // holstered by hand: only a new sighting draws again
+        if (seen && F.manual !== 'off') { F.on = true; F.last = time; }
+      } else if (seen && F.on) F.last = time;
       F.seen = seen;
     }
     if (F.on && F.manual !== 'on' && time - F.last > (C.calm ?? 4) * 1000 && !this.reloading) F.on = false;

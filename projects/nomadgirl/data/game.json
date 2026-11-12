@@ -64,18 +64,20 @@
    "jump": ["0"],
    "dash": ["1", "6"],
    "melee": ["2"],
-   "ranged": ["7"],
+   "ranged": ["3", "7"],
    "reload": ["5"],
-   "grab": ["3"],
+   "grab": ["up"],
    "walk": ["4"],
    "inventory": ["8"],
    "help": ["9"],
    "pose": ["11"],
    "down": [],
-   "holster": ["10"]
+   "holster": []
   },
   "icons": "pad_icons",
-  "symbols": "auto"
+  "symbols": "auto",
+  "useTilt": 70,
+  "useUp": true
  },
  "atmosphere": {"enabled": true, "scale": 4, "leyla": {"radius": 260, "strength": 22}, "depth": 14},
  "combat": {"shootStyle": "cells", "runSpeed": 85, "cone": 35, "range": 9, "bulletSpeed": 2200, "marker": true, "markerColor": "#ff3fa4"},

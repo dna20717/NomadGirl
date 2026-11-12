@@ -1,5 +1,6 @@
 // HUD as HTML over the canvas: health, ammo, dash, time, kills, Δ, banners and the controls overlay.
 import { el } from '../ui.js';
+import { hints, setUiDevice } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { loadVersion } from '../version.js';
 import { clockText } from '../save.js';
@@ -11,9 +12,9 @@ const CONTROLS = [
     ['L / C', 'Dash, auch in der Luft'], ['S / ↓', 'Beim Rennen: Slide · im Stand: Ducken'], ['S + Leertaste', 'Von der Plattform fallen'],
     ['→', 'Im Sprung zur Wand: Kante greifen · W hochziehen · S loslassen'], ['W / ↑', 'Leiter klettern, Seil greifen'], ['Leertaste', 'Am Seil: loslassen mit Schwung']] },
   { title: 'Kampf', icon: 'weapon', rows: [
-    ['J / Y', 'Nahkampf · 3 s halten: schwerer Hieb'], ['K / X', 'Schießen (am Boden; zieht die Waffe)'], ['R', 'Nachladen'], ['Q', 'Waffe ziehen / wegstecken (Kampfmodus)']] },
+    ['J / Y', 'Nahkampf: tippen = Kombo · 1 s halten: schwerer Hieb'], ['K / X', 'Schießen (am Boden): zieht und schießt im selben Zug'], ['K halten', 'Waffe wegstecken'], ['R', 'Nachladen (leer abdrücken lädt auch)'], ['Q', 'Waffe ziehen / wegstecken']] },
   { title: 'Machen', icon: 'hand', rows: [
-    ['E', 'Benutzen: Kisten, Schalter, Werkstätten, Feuer, Van'], ['I / Tab', 'Inventar'], ['B', 'Rig bauen (im Camp)'], ['P', 'Yoga-Pose']] },
+    ['E / W', 'Benutzen: Kisten, Schalter, Werkstätten, Feuer, Van (W nur mit Hinweis)'], ['I / Tab', 'Inventar'], ['B', 'Rig bauen (im Camp)'], ['P', 'Yoga-Pose']] },
   { title: 'System', icon: 'settings', rows: [
     ['Esc', 'Menü'], ['H', 'Diese Steuerung'], ['M', 'Ton an/aus'], ['Rücktaste', 'Raum neu starten'], ['G', 'Hitboxen']] },
 ];
@@ -45,6 +46,7 @@ export class Hud {
       el('p', {}, 'Inventar mit der Maus: klicken nehmen und ablegen, Rechtsklick drehen, Doppelklick rüber, auf „Benutzen“ legen = essen. Alle Werte kommen aus der Werkstatt.',
         commit ? el('b', {}, ` Spieldaten live aus dem Repository (Stand ${commit.slice(0, 7)}).`) : null,
         workshopDrafts ? el('b', {}, ` Dein gespeicherter Werkstatt-Stand ist aktiv (${workshopDrafts} ${workshopDrafts === 1 ? 'Datei' : 'Dateien'}).`) : null),
+      hints([['ok', 'weiter'], ['back', 'zurück']]),
       this.goBtn = el('button', { class: 'hud-go', onclick: () => this.toggleHelp(false) }, 'Weiter')));
     root.append(
       el('div', { class: 'hud-top' },
@@ -131,9 +133,8 @@ export class Hud {
     this.menuIndex = Math.max(0, items.findIndex(i => !i.disabled));
     this.menuButtons = items.map((it, i) => el('button', { class: 'hud-item' + (it.primary ? ' primary' : ''), disabled: !!it.disabled, onclick: () => this.choose(i), onmouseenter: () => this.focus(i) },
       el('kbd', {}, String(i + 1)), el('span', {}, el('b', {}, it.label), it.sub || it.disabled ? el('small', {}, [it.sub, it.disabled].filter(Boolean).join(' · ')) : null)));
-    this.menuEl.replaceChildren(el('div', { class: 'hud-menuBox' }, el('h2', {}, title), sub ? el('p', {}, sub) : null, el('div', { class: 'hud-items' }, ...this.menuButtons),
-      this.menuKeysEl = el('small', { class: 'hud-keys' })));
-    this.menuKeys();
+    this.menuEl.replaceChildren(el('div', { class: 'hud-menuBox ui-frame' }, el('h2', {}, title), sub ? el('p', {}, sub) : null, el('div', { class: 'hud-items' }, ...this.menuButtons),
+      hints([['move', 'wählen'], ['ok', 'nehmen'], ['back', 'zurück']], '1–9 direkt')));
     this.menuEl.hidden = false;
     this.promptEl.hidden = true;
     this.focus(this.menuIndex);
@@ -159,14 +160,7 @@ export class Hud {
     else return;
     e.preventDefault(); e.stopPropagation();
   }
-  // footer of a menu: keyboard keys or the controller's symbols (d-pad, bottom, right)
-  menuKeys() {
-    if (!this.menuKeysEl) return;
-    const p = this.pad?.active && this.pad.kind ? this.pad : null;
-    if (!p) return this.menuKeysEl.replaceChildren('W/S wählen · E oder Enter nehmen · Esc zurück');
-    const ico = (b, alt) => this.padIcon(p.iconName(b), alt) || el('b', {}, alt);
-    this.menuKeysEl.replaceChildren(ico(12, '✚'), ' wählen · ', ico(0, p.labelOf(0)), ' nehmen · ', ico(1, p.labelOf(1)), ' zurück');
-  }
+  menuKeys() {}
   // one cell of the controller symbols (Spiel › Controller › Symbole) as a pixel-sharp CSS sprite, ×2; null without symbols
   padIcon(name, title = '') {
     const I = this.padIcons, i = I?.names.indexOf(name) ?? -1;
@@ -183,7 +177,7 @@ export class Hud {
     this.padSig = sig;
     this.root?.classList.toggle('hud-pad', active);
     if (this.promptText) this.prompt(this.promptText, this.promptKey);
-    if (this.modal) this.menuKeys();
+    setUiDevice(pad, (n, t) => this.padIcon(n, t));
     const kind = pad?.kind || null;
     this.padHelpEl.hidden = !kind;
     this.keyHelpEl.hidden = active;   // with the controller in hand: only its buttons
@@ -193,7 +187,7 @@ export class Hud {
     const names = { xbox: 'Xbox', ps: 'PlayStation', switch: 'Switch', stadia: 'Stadia' };
     const rows = [[[this.padIcon(`${kind}_stick`, 'Stick') || el('b', {}, 'Stick'), ico(12)], 'Laufen (halb neigen = gehen), runter = Ducken/Slide, hoch = Leiter'],
       ...actions.map(([a, name]) => [(pad.c.map[a] || []).map(ico), name]).filter(([k]) => k.length),
-      [[ico(12), ico(0), ico(1)], 'Menüs: wählen, nehmen, zurück']];
+      [[ico(12), ico(0), ico(1), ico(2), ico(3), ico(4), ico(5)], 'Fenster: wählen, nehmen, zurück, drehen, rüber, Tabs']];
     const half = Math.ceil(rows.length / 2), list = part => el('dl', {}, ...part.flatMap(([k, t]) => [el('dt', {}, ...k.flatMap((x, i) => i ? [' ', x] : [x])), el('dd', {}, t)]));
     this.padHelpEl.replaceChildren(el('h3', {}, icon('play', 16), `Controller · ${names[kind] || kind}`), el('div', { class: 'hud-cols' }, list(rows.slice(0, half)), list(rows.slice(half))),
       ...(active ? [el('p', { class: 'hud-small' }, 'Eine Taste auf der Tastatur zeigt wieder die Tastenbelegung.')] : [el('h3', { class: 'hud-keytitle' }, icon('grid', 16), 'Tastatur')]));
@@ -209,6 +203,9 @@ export class Hud {
 
   update(scene, time) {
     const l = scene.leyla, max = l.maxHealth;
+    // windows on top: the E prompt of the world waits (its key means „ok“ in the window)
+    const hideP = !this.promptText || this.modal || !!this.inv?.isOpen || !!this.craft?.isOpen;
+    if (this.promptEl.hidden !== hideP) this.promptEl.hidden = hideP;
     this.healthBar.style.width = `${Math.max(0, l.health / max * 100)}%`;
     this.healthText.textContent = `${Math.ceil(l.health)}/${max}`;
     // reload ring next to the magazine (also while she jumps or dashes, the reload keeps going; paused = dimmed)

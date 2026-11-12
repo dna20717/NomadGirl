@@ -730,6 +730,15 @@ export class Camp {
     ];
   }
 
+  // chest lid: open while its inventory is open (also while the window pauses the game)
+  lid(dt) {
+    const c = this.chest, s = this.scene;
+    if (!c) return;
+    c.open = !!(s.hud.inv?.isOpen && s.hud.inv.other?.key === 'chest');
+    const target = c.open ? c.frames - 1 : 0;
+    if (c.frame !== target) c.frame = c.frame < target ? Math.min(target, c.frame + c.fps * dt / 1000) : Math.max(target, c.frame - c.fps * dt / 1000);
+    c.sprite.setFrame(Math.round(c.frame));
+  }
   // ---------- chest: closed, E opens and closes it (the frames run forward or back) ----------
   placeChest() {
     const K = this.C.chest || {}, s = this.scene;
@@ -955,14 +964,7 @@ export class Camp {
       const v = s.van, open = v && v.frames > 1 ? v.frame / (v.frames - 1) : 0;
       for (const d of this.doorLights) d.setAlpha(d.base * this.lightK * open).setVisible(this.lightK > 0 && open > 0.02);
     }
-    // chest lid: open while its inventory is open
-    const c = this.chest;
-    if (c) {
-      c.open = !!(s.hud.inv?.isOpen && s.hud.inv.other?.key === 'chest');
-      const target = c.open ? c.frames - 1 : 0;
-      if (c.frame !== target) c.frame = c.frame < target ? Math.min(target, c.frame + c.fps * dt / 1000) : Math.max(target, c.frame - c.fps * dt / 1000);
-      c.sprite.setFrame(Math.round(c.frame));
-    }
+    this.lid(dt);
     this.updateSound(time);
     // the van's door: the workshop behind it shows only while the door is fully open
     if (this.vanDoor) {
