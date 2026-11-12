@@ -14,12 +14,14 @@
 <body>
 <div id="game"></div>
 <div id="hud"></div>
-<div id="load">Leyla schnürt die Stiefel …</div>
+<div id="load"></div>
 <script type="module">
   import { start } from './game/play/main.js';
-  start(document.getElementById('game'), document.getElementById('hud'))
-    .then(g => { window.game = g; document.getElementById('load').remove(); })
-    .catch(e => { document.getElementById('load').textContent = 'Fehler beim Laden: ' + e.message; console.error(e); });
+  import { createLoading } from './game/play/loading.js';
+  const loading = createLoading(document.getElementById('load'), new URL('projects/nomadgirl/', location.href));
+  start(document.getElementById('game'), document.getElementById('hud'), loading)
+    .then(g => { window.game = g; })
+    .catch(e => { loading.fail('Fehler beim Laden: ' + e.message); console.error(e); });
 </script>
 </body>
 </html>

@@ -13,12 +13,13 @@ import { Hud } from './hud.js';
 import { installControl } from './control.js';
 import { openSave, arrive } from '../save.js';
 
-export async function start(parent, hudRoot) {
+export async function start(parent, hudRoot, loading) {
   const base = new URL('projects/nomadgirl/', location.href);
   const cloud = await cloudFiles();
   const drafts = cloud ? new Map() : await (await openStore({ project: 'nomadgirl', withoutAssets: true })).all().catch(() => new Map());
   const project = await loadProject(withDrafts(browserLoader(base), cloud ? cloud.files : drafts));
   if (cloud) console.info(`Spieldaten live aus dem Repository (Commit ${cloud.commit.slice(0, 7)})`);
+  loading?.data();
   const D = project.data, rooms = D.rooms || {};
   const q = new URLSearchParams(location.search), asked = q.get('room');
   const roomId = [asked, D.game?.testRoom, ...Object.keys(rooms)].find(id => id && rooms[id]?.layout?.length);
@@ -33,7 +34,7 @@ export async function start(parent, hudRoot) {
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
     banner: false,
   });
-  let args = { project, roomId, base, hud };
+  let args = { project, roomId, base, hud, loading };
   if (q.get('poi') && D.pois?.[q.get('poi')]) args = { ...args, poi: q.get('poi'), seed: Number(q.get('seed')) || 1 + Math.floor(Math.random() * 2 ** 31) };
   if (q.has('camp') && D.camp) {
     const box = await openSave(D);

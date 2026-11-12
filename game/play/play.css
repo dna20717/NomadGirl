@@ -1,7 +1,16 @@
 /* Game page: canvas fills the window, HUD on top. Colors from Leyla's palette (cyan, magenta, pink). */
 html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 #game { position: fixed; inset: 0; }
-#load { position: fixed; inset: 0; display: grid; place-items: center; color: #b9a2c8; font: 28px VT323, monospace; }
+#load { position: fixed; inset: 0; display: grid; place-items: center; color: #b9a2c8; font: 28px VT323, monospace; z-index: 50; background: #0d0a12; transition: opacity .35s; }
+/* Spiel › Ladebalken (game/play/loading.js) */
+#load.loading-gone { opacity: 0; pointer-events: none; }
+#load.load-error { padding: 2em; text-align: center; }
+.loading-track { --load-color: #3ee8ff; --load-accent: #ff4fd8; width: min(70vw, 1100px); display: flex; flex-direction: column; gap: 10px; }
+.loading-track canvas { display: block; image-rendering: auto; }
+.loading-bar { height: 4px; background: rgba(185, 162, 200, .14); border-radius: 2px; overflow: hidden; }
+.loading-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--load-accent), var(--load-color)); box-shadow: 0 0 10px var(--load-color); }
+.loading-label { display: flex; justify-content: space-between; color: #b9a2c8; font: 22px VT323, monospace; letter-spacing: .04em; }
+.loading-pct { color: var(--load-color); margin-left: auto; }
 #hud { position: fixed; inset: 0; pointer-events: none; font-family: var(--ui-font); color: #f2eef7; }
 #hud a, #hud button { pointer-events: auto; }
 .hud-top { display: flex; justify-content: space-between; padding: 16px 20px; gap: 16px; }

@@ -50,6 +50,7 @@ export class PlayScene extends Phaser.Scene {
 
   // ---------- assets ----------
   preload() {
+    if (this.args?.loading) this.load.on('progress', p => this.args.loading.progress(p));   // Spiel › Ladebalken
     const A = this.data_.assets || {}, ids = new Set(Object.values(this.data_.leyla?.look || {}));
     for (const e of Object.values(this.data_.enemies || {})) if (e.look) ids.add(e.look);
     for (const [k, id] of Object.entries(this.data_.game?.tiles || {})) if (k !== 'terrain') ids.add(id);
@@ -194,6 +195,7 @@ export class PlayScene extends Phaser.Scene {
 
   // ---------- world ----------
   create() {
+    if (this.args?.loading) this.events.once('postupdate', () => this.args.loading.done());
     this.camp = null; this.vanPrompt = null;   // the scene object is reused on restart (camp ↔ run)
     this.sound.stopAll(); this.sound.removeAll();   // camp sounds belong to one visit
     try { this.sound.mute = localStorage.getItem('nomadgirl-mute') === '1'; } catch { /* private mode */ }

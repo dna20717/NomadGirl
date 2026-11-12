@@ -44,6 +44,7 @@
   ],
   "spare": ["kochnische", "werkbank", "lagerregal"]
  },
+ "loading": {"leyla": "leyla_run_side", "drone": "drone_hull", "color": "#3ee8ff", "accent": "#ff4fd8", "height": 96, "width": 70, "text": ""},
  "testRoom": "testraum",
  "tiles": {"platform": "platform_metal", "terrain": "desert", "leylaCm": 170, "depth": true},
  "camera": {"zoom": 1, "lookAhead": 160, "follow": 0.12},

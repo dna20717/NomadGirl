@@ -118,7 +118,7 @@ Grundsatz: Die Ziele kommen aus der Mechanik, eine Herleitung aus der Story brau
   - **Wissen:** Terminals, Zettel, Secrets, guter Rang
   - **Bio:** Mutanten, Kochen, Proben (führt zum Heilmittel)
 - **Erweiterbar unter der Haube:** Ressourcen kommen aus Daten (beliebig viele). Vorgesehen ist z. B. **„Dunkelheit“**: Wer den Schwierigkeitsgrad steigert, schaltet deutlich mehr der anderen Ressourcen frei (Multiplikator je Stufe). Im Spiel vorerst unsichtbar.
-- Das **Heilmittel** ist als letzter Knoten gedacht (Vorschlag Ava, offen).
+- Das **Heilmittel** ist der letzte Knoten: Abspann, danach offenes Spiel mit AvA als spielbarer Figur (Daniel, 12.11.2026).
 - **Look (Daniel, 12.11.2026):** wie Graveyard Keeper 2: **horizontal**, Knoten mit **Bildern** von dem, was man freischaltet, Linien dazwischen; **vertikale Tabs** für die Ressourcen-Arten (Technik, Wissen, Bio; finale Namen offen). Komplett für Controller optimiert (Stick/Steuerkreuz springt von Knoten zu Knoten, LB/RB oder ↑↓ wechselt die Tabs, UI-Grammatik wie überall).
 - **Erster Ast: Cryo-Tank** (Wartung, bessere Kühlung, langsamerer Verfall), damit der Druck sofort spürbar wird.
 
@@ -184,9 +184,10 @@ Neue Gegenstände: **Kühlmittel** (Kanister; Bunker 13, Großmarkt-Kühlung, K�
 
 Zu Beginn kennt man „Notflicken“, „Stromzelle tauschen“ und „Kühlmittel nachfüllen“. Weil Knoten einen neuen Durchgang überstehen, startet der zweite Traum schon mit Thermohülle und Co.: Das ist der Balatro-Effekt.
 
-### Das Heilmittel (Daniel, 12.11.2026, nur Vision)
+### Das Heilmittel (Daniel, 12.11.2026)
 
-- Ist es fertig, wacht AvA auf, und das Spiel geht weiter. Sie wird ein **neuer spielbarer Charakter**. Vorerst nur Design-Vision, nichts bauen.
+- Ist es fertig, wacht AvA auf, und das Spiel geht weiter. Sie wird ein **neuer spielbarer Charakter**.
+- **Entschieden (Daniel, 12.11.2026, Backlog A4):** Der Heilmittel-Knoten ist das Endziel. Danach kommt ein **Abspann**, anschließend läuft das Spiel **offen** weiter, mit **AvA als spielbarer Figur**. Abspann und AvA-Steuerung sind noch zu entwerfen (Design-Session).
 
 
 ## Rig & Werkstätten
@@ -318,4 +319,4 @@ Companion-Quests und Storylines, Hacking, Automatisierung, mehr Container und Zu
 - [ ] Was macht die Zelle im Rig?
 - [ ] Was ist das „vielleicht noch Gefährlichere“ in den Wastelands?
 - [x] Gibt es eine übergeordnete Story oder ein Endziel? Ja: die Suche nach dem Heilmittel für AvA (12.11.2026, siehe „Progression, Techtree & die Suche“).
-- [ ] Techtree: erster Ast und Knoten-Kosten stehen (Tank-Ast, Platzhalter-Werte, 12.11.2026), offen: Heilmittel als letzter Knoten? Wie verfällt der Tank genau, welche Ersatzteile? Was ist „Dunkelheit“ im Spiel (Licht-System?)
+- [ ] Techtree: erster Ast und Knoten-Kosten stehen (Tank-Ast, Platzhalter-Werte, 12.11.2026), Heilmittel = letzter Knoten mit Abspann (12.11.2026); offen: Wie verfällt der Tank genau, welche Ersatzteile? Was ist „Dunkelheit“ im Spiel (Licht-System?)

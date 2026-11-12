@@ -4,6 +4,8 @@ Stand: 12.11.2026 abends (Durchsicht von Ava). Kleinigkeiten sind schon behoben 
 
 ## A. Entscheidungen, die Daniel treffen muss
 
+**Entschieden 12.11.2026 abends (Daniel):** A1 machen (Funkbuch #002) · A2, A3 erstmal so lassen · A4 Abspann, danach offenes Spiel mit AvA als spielbarer Figur (design.md) · A6 ja, 2.400 kg bleiben · A7 keine der beiden Fassungen: ein **Trophäenraum im Cyberpunk-Stil** (Funkbuch #003). Offen: A5, A8.
+
 | # | Thema | Worum es geht | Vorschlag Ava |
 |---|---|---|---|
 | A1 | **CLAUDE.md ist 184 KB groß** | Jede Sitzung lädt die ganze Datei (grob 50.000 Tokens), bevor die Arbeit beginnt. Der Großteil ist Feature-Beschreibung und Verlauf („Stand“). | Aufteilen: CLAUDE.md behält Regeln, Ordner, Tests und Kurzregeln (≈ 15 KB); die Feature-Abschnitte ziehen nach `docs/features/*.md` (Leyla, Kampf, Camp, Rig, POIs, Inventar, Progression …), der Verlauf nach `docs/changelog.md`. |

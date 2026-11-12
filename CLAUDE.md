@@ -265,6 +265,7 @@ Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei j
 
 ## Stand
 
+- 12.11.2026 abends: **Ladebalken** (Daniel: „eine kleine Version von Leyla und AvA als Kontur von links nach rechts laufen“): `game/play/loading.js` zeichnet den Umriss von `leyla_run_side` (cyan, läuft) und `drone_hull` (pink, schwebt voraus) über einem Verlaufsbalken; echter Fortschritt (Daten 30 %, Phaser-Loader bis 95 %, erster Frame 100 %), blendet aus. Liest `data/game.json` + `assets.json` direkt (vor dem Projekt). Spiel › **Ladebalken** (Leyla, AvA, Farben, Größe, Breite, Text). Ersetzt „Leyla schnürt die Stiefel …“.
 - 12.11.2026 abends: **Funkbuch** `docs/funk.md` für Aufträge zwischen Projekt-Chat und Claude Code (Tickets mit Status, ⚠️ vorläufige Entscheidungen); Bauauftrag Progression als #001 nachgetragen.
 - 12.11.2026 abends: **Tiefe für die Kachel-Sets** (Licht von oben links: Masse, Lichtkanten, Lippe unter der Kruste, Schlagschatten auf Rückwand und Himmel, Ecken-AO, Kontaktschatten für Clutter; Werte in Kachel-Sets › Tiefe).
 - 12.11.2026 abends: **Hydrokultur** (PixelLab): Pflanzen wachsen sichtbar in 15 Töpfen (Kohl, Basilikum, Chili, Tomaten), E erntet; neue Zutaten Chili und Strauchtomaten; `garden_test` 4.
