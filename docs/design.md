@@ -67,7 +67,7 @@ Im POI spielt sich NomadGirl wie Dead Cells: schnelle Bewegung, harter Kampf, un
 
 ### Tod und AvA
 
-Stirbt Leyla, ist die Beute aus dem aktuellen Run verloren. AvA, ihre Drohne, rettet sie und bringt sie zurück zum Rig. Alles andere bleibt erhalten: Rig, Upgrades, Rezepte und Deltas auf dem Konto. Später kann AvA über Drohnen-Upgrades einen Teil der Beute mitretten.
+Stirbt Leyla, ist die Beute aus dem aktuellen Run verloren. AvA, ihre Drohne, rettet sie und bringt sie zurück zum Rig. Alles andere bleibt erhalten: Rig, Upgrades, Rezepte und Deltas auf dem Konto. Später kann AvA über Drohnen-Upgrades einen Teil der Beute mitretten. **Neu (12.11.2026):** jede Rettung kostet Zustand am Cryo-Tank, siehe „Die Suche“.
 
 ### Ranking
 
@@ -80,6 +80,36 @@ Nach einem abgeschlossenen POI gibt jede Kategorie eigene Punkte, die Summe ergi
 | Secrets | Anteil gefundener Geheimnisse |
 
 Das Basisgeld aus dem Run ist immer sicher. Der Rang gibt einen Deltas-Bonus obendrauf (F = kein Bonus, S = größter Bonus). Wer stirbt, schließt den POI nicht ab und bekommt kein Ranking.
+
+## Progression, Techtree & die Suche (Design-Session Daniel, 12.11.2026, noch nicht gebaut)
+
+Grundsatz: Die Ziele kommen aus der Mechanik, eine Herleitung aus der Story braucht es nicht. **Das Camp ist der Spielstand, die Runs sind die Mechanik.**
+
+### Die Suche: AvA im Cryo-Tank
+
+- **AvA** ist eigentlich ein kleines Mädchen (Tochter? Schwester? Wir wissen es nicht). Sie ist krank, ihr Körper liegt im **Cryo-Tank**, ihr Verstand ist so lange in der Drohne geparkt.
+- **Ziel:** das **Rezept für das Heilmittel** finden. Damit wird die Reise zur Suche mit Ablaufdatum.
+- **Cryo-Tank** = eine Werkbank im Rig (Modell fehlt noch). Er hat einen **Zustand**, der verfällt, und braucht Wartung mit Materialien (Rezepte wie an jeder Werkbank). Er zerfällt mit der Zeit immer schneller, die nötigen Ersatzteile werden seltener: Wer das Heilmittel nicht schnell findet, muss immer mehr und gefährlichere Runs machen.
+- **Die Uhr tickt pro Tag und pro Ereignis** in Ereignis-Zeit (Fahren, Schlafen, Runs …), nie in Echtzeit.
+- **Rettung kostet AvA Kraft:** holt AvA Leyla beim k.o. heim, sinkt der Zustand des Tanks.
+- **Stirbt AvA** (Tank kaputt), ist die Drohne für immer weg. Das Spiel endet nicht, die Suche ist aber verloren.
+
+### Neuer Durchgang: „War alles nur ein Traum?“
+
+- Nach Avas Tod beginnt ein **neuer Durchgang**: Leyla wacht schweißgebadet am Lagerfeuer auf. War der letzte Durchgang nur ein Traum?
+- **Was bleibt (wie die Joker bei Balatro):** freigeschaltete Techtree-Knoten. **Was neu anfängt:** Rig, Inventar, Deltas, Tank und Uhr fangen klein an.
+- Das Camp ist persistent: es bleibt auch nach einem Neustart, solange man es nicht ausdrücklich zurücksetzt.
+
+### Techtree im Warroom
+
+- Der **Warroom bleibt eine Werkbank**; seine Rezepte stellen keine Gegenstände her, sie schalten Upgrades und Stationen im Techtree frei. Die Rezeptlogik (Rezeptbuch, Zutaten, Werkstatt) wird weiterverwendet.
+- Anzeige als **Techtree-Bildschirm im Warroom**.
+- **Zentrale Upgrade-Ressourcen** wie bei Graveyard Keeper oder Punch Club, verdient durch Tun. Zunächst drei:
+  - **Technik:** bauen, craften, Rig
+  - **Wissen:** Terminals, Zettel, Secrets, guter Rang
+  - **Bio:** Mutanten, Kochen, Proben (führt zum Heilmittel)
+- **Erweiterbar unter der Haube:** Ressourcen kommen aus Daten (beliebig viele). Vorgesehen ist z. B. **„Dunkelheit“**: Wer den Schwierigkeitsgrad steigert, schaltet deutlich mehr der anderen Ressourcen frei (Multiplikator je Stufe). Im Spiel vorerst unsichtbar.
+- Das **Heilmittel** ist als letzter Knoten gedacht (Vorschlag Ava, offen).
 
 ## Rig & Werkstätten
 
@@ -196,4 +226,5 @@ Companion-Quests und Storylines, Hacking, Automatisierung, mehr Container und Zu
 - [ ] Wie hoch ist der Ranking-Bonus pro Rang? (Platzhalter in der Werkstatt)
 - [ ] Was macht die Zelle im Rig?
 - [ ] Was ist das „vielleicht noch Gefährlichere“ in den Wastelands?
-- [ ] Gibt es eine übergeordnete Story oder ein Endziel?
+- [x] Gibt es eine übergeordnete Story oder ein Endziel? Ja: die Suche nach dem Heilmittel für AvA (12.11.2026, siehe „Progression, Techtree & die Suche“).
+- [ ] Techtree: erster Ast, Knoten-Kosten, Heilmittel als letzter Knoten? Wie verfällt der Tank genau, welche Ersatzteile? Was ist „Dunkelheit“ im Spiel (Licht-System?)
