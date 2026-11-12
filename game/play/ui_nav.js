@@ -12,7 +12,7 @@
 import { el } from '../ui.js';
 
 export const UI_KEYS = { move: 'Pfeile', ok: 'E', back: 'Esc', context: 'R', send: 'F', tabs: 'Q' };
-export const UI_BUTTONS = { move: 12, ok: 0, back: 1, context: 2, send: 3, tabs: [4, 5] };
+export const UI_BUTTONS = { move: 'dpad', ok: 0, back: 1, context: 2, send: 3, tabs: [4, 5] };
 
 // device state for the hints: set by the HUD whenever keyboard ↔ controller switches
 const device = { pad: null, padIcon: null };

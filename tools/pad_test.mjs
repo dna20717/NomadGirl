@@ -46,7 +46,7 @@ s = await sc();
 check('Start öffnet das Menü mit „Steuerung“', s.menu?.title === 'Pause' && s.menu.items.some(i => i.label === 'Steuerung'), s.menu);
 await tap(13); await tap(0);
 s = await sc();
-check('Hilfe zeigt die Controller-Belegung mit Xbox-Symbolen', s.paused && !s.helpHidden && /Controller · Xbox/.test(s.help) && s.helpIcons.includes('xbox_0') && s.helpIcons.includes('xbox_7') && s.helpIcons.includes('xbox_stick'), s);
+check('Hilfe zeigt die Controller-Belegung mit Xbox-Symbolen', s.paused && !s.helpHidden && /Controller · Xbox/.test(s.help) && s.helpIcons.includes('xbox_0') && s.helpIcons.includes('xbox_7') && s.helpIcons.includes('stick_l') && s.helpIcons.includes('stick_r') && s.helpIcons.includes('stick_r_press'), s);
 await shot('help_xbox');
 await tap(0);
 s = await sc();
@@ -74,12 +74,12 @@ check('A springt', s.feet < f0 - 20 || s.vy < -200, { f0, feet: s.feet, vy: s.vy
 await ev(() => nomad.goTo('Van'));
 await tap(5);   // controller in use again (RB = reload, does nothing in the camp)
 s = await sc();
-check('Hinweis zeigt das Symbol der Controller-Taste (Stick statt E)', s.prompt === 'Einsteigen · Van' && s.icon === 'xbox_stick', s);
+check('Hinweis zeigt das Symbol der Controller-Taste (Stick statt E)', s.prompt === 'Einsteigen · Van' && s.icon === 'stick_l_up', s);
 await shot('prompt_xbox');
 await flick();
 s = await sc();
 check('Stick hoch öffnet das Van-Menü', s.menu?.items.some(i => i.label.startsWith('Planen')), s.menu);
-check('Menü-Fußzeile mit Symbolen: Steuerkreuz, A, B', s.menuIcons.join() === 'xbox_dpad,xbox_0,xbox_1', s.menuIcons);
+check('Menü-Fußzeile mit Symbolen: Steuerkreuz, A, B', s.menuIcons.join() === 'dpad,xbox_0,xbox_1', s.menuIcons);
 await shot('menu');
 await tap(13);
 s = await sc();
@@ -96,7 +96,7 @@ await tap(1);
 await ev(() => setPad({ id: 'DualSense Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)' }));
 await tap(5);
 s = await sc();
-check('PlayStation: Hinweis zeigt den Stick', s.icon === 'ps_stick', s.icon);
+check('PlayStation: Hinweis zeigt den Stick', s.icon === 'stick_l_up', s.icon);
 await ev(() => { nomad.step(1, [], ['controls']); nomad.step(2); });
 s = await sc();
 check('PlayStation: Hilfe mit ✕ ○ □ △, L2/R2, Tastenliste ausgeblendet', /Controller · PlayStation/.test(s.help) && ['ps_0', 'ps_7'].every(i => s.helpIcons.includes(i)) && s.keysHidden === true, s);
@@ -105,12 +105,12 @@ await ev(() => { nomad.step(1, [], ['controls']); nomad.step(2); });
 await ev(() => setPad({ id: 'Google LLC Stadia Controller rev. A (STANDARD GAMEPAD Vendor: 18d1 Product: 9400)' }));
 await tap(5);
 s = await sc();
-check('Stadia: Hinweis und Hilfe mit Stadia-Symbolen', s.icon === 'stadia_stick' && /Controller · Stadia/.test(s.help), { icon: s.icon, help: s.help.slice(0, 40) });
+check('Stadia: Hinweis und Hilfe mit Stadia-Symbolen', s.icon === 'stick_l_up' && /Controller · Stadia/.test(s.help) && s.helpIcons?.includes('stadia_0'), { icon: s.icon, help: s.help.slice(0, 40) });
 await shot('prompt_stadia');
 await ev(() => setPad({ id: 'Pro Controller (STANDARD GAMEPAD Vendor: 057e Product: 2009)' }));
 await tap(5);
 s = await sc();
-check('Switch: Benutzen = Stick hoch', s.icon === 'switch_stick', s.icon);
+check('Switch: Benutzen = Stick hoch', s.icon === 'stick_l_up', s.icon);
 
 // inventory with the controller, no pointer (Daniel, 11.11.2026): a cursor on cells, slots and tabs
 await ev(() => setPad({ id: 'Xbox Wireless Controller (STANDARD GAMEPAD Vendor: 045e)' }));

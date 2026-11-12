@@ -156,7 +156,7 @@ export class Leyla {
     }
     this.updateReload(time);
     this.updateFight(time, input);
-    if (time < (this.flipUntil || 0) && m.airJumpGhosts && time >= (this.nextGhost || 0)) { this.scene.fx.ghost(this.sprite); this.nextGhost = time + 28; }
+    if (time < (this.flipUntil || 0) && m.airJumpGhosts && time >= (this.nextGhost || 0)) { this.scene.fx.ghost(this.sprite, 0x3fe0d0, m.airJumpSpin > 0 ? 0.25 : 0.45, m.airJumpSpin > 0 ? 160 : 220); this.nextGhost = time + (m.airJumpSpin > 0 ? 45 : 28); }
     this.wasGrounded = grounded;
     this.lastVy = b.velocity.y;
     this.look(time, dt, grounded);
@@ -190,7 +190,7 @@ export class Leyla {
     } else if (input.jump.pressed && !grounded && this.airJumps > 0) {
       this.airJumps--; this.jump(0.92); this.scene.fx.puff(this.x, this.feet, 0x3fe0d0);
       // double jump: whole animation once, or from „Doppelsprung ab Frame“ over „Doppelsprung-Dauer“ (e.g. the last dash frames)
-      this.flipAt = time; this.flipLen = (m.airJumpFromFrame ?? 1) > 1 ? (m.airJumpTime ?? 300) : this.scene.lookDuration('airJump');
+      this.flipAt = time; this.flipLen = (m.airJumpFromFrame ?? 1) > 1 || m.airJumpSpin > 0 ? (m.airJumpTime ?? 300) : this.scene.lookDuration('airJump');
       this.flipUntil = time + this.flipLen; this.nextGhost = 0;
     }
     if (this.cut && !input.jump.down && b.velocity.y < 0) { b.setVelocityY(b.velocity.y * 0.45); this.cut = false; }
@@ -245,7 +245,8 @@ export class Leyla {
   startDash(time, dir) {
     if (dir) this.facing = dir;
     this.scene.drone?.react('dash');
-    this.state = 'dash'; this.dashEnd = time + DASH_TIME; this.dashReady = time + DASH_TIME + (this.m.dashCooldown ?? 600);
+    this.state = 'dash'; this.flipUntil = 0; this.dashEnd = time + DASH_TIME;   // a dash ends the somersault (no flip after the dash)
+    this.dashReady = time + DASH_TIME + (this.m.dashCooldown ?? 600);
     if (!this.body.blocked.down) this.airDash = false;
     this.body.allowGravity = false;
     this.body.setVelocity(this.facing * (this.m.dashDistance ?? 280) / (DASH_TIME / 1000), 0);
@@ -266,16 +267,19 @@ export class Leyla {
 
   // ---------- slide ----------
   startSlide(time) {
-    this.state = 'slide'; this.slideEnd = time + (this.m.slideDuration ?? 350);
+    this.state = 'slide'; this.slideAt = time; this.slideEnd = time + (this.m.slideDuration ?? 350);
     this.setLow();
     this.body.setVelocityX(this.facing * (this.m.slideSpeed ?? 600));
     this.scene.fx.dust(this.x, this.feet, 8);
   }
   slide(time, input, grounded) {
     const b = this.body, blocked = !this.canStand();
-    const speed = time < this.slideEnd ? (this.m.slideSpeed ?? 600) : blocked ? 260 : 0;
+    // a push that rolls out (Daniel, 12.11.2026: „nicht statisch von A nach B gleiten“): 120 % at the start down to 75 % at the end, about the same way
+    const p = Math.min(1, (time - (this.slideAt ?? time)) / Math.max(1, this.slideEnd - (this.slideAt ?? time)));
+    const speed = time < this.slideEnd ? (this.m.slideSpeed ?? 600) * (1.2 - 0.45 * p) : blocked ? 260 : 0;
     b.setVelocityX(this.facing * speed);
     if (Math.random() < 0.4) this.scene.fx.dust(this.x - this.facing * this.size.w / 2, this.feet, 1);
+    if (speed > (this.m.slideSpeed ?? 600) * 0.95 && this.m.slideGhosts !== false && time >= (this.nextGhost || 0)) { this.scene.fx.ghost(this.sprite, 0xe45aa8, 0.22, 160); this.nextGhost = time + 80; }   // only in the first push: a faint pink trail   // speed: a few after-images while she shoots along
     if (input.jump.pressed && !blocked) { this.endSlide(); this.jump(1); return; }
     if ((time >= this.slideEnd && !blocked) || (!grounded && !blocked) || b.blocked.left || b.blocked.right) {
       if (blocked) { this.facing *= -1; return; }   // stuck in a tunnel: crawl back out
@@ -284,6 +288,15 @@ export class Leyla {
       const dir = (input.right.down ? 1 : 0) - (input.left.down ? 1 : 0);
       if (dir === this.facing && grounded) b.setVelocityX(this.facing * (this.m.runSpeed ?? 440));
     }
+  }
+  // the double jump as a somersault: roll in, the tuck frames turn (rotation in look()), open up (Leyla › Laufen & Springen › Salto)
+  spinFrame(n, p) {
+    const M = this.m, [a1, b1] = M.airJumpTuck || [4, 4], a = Math.min(n - 1, a1 - 1), b = Math.min(n - 1, b1 - 1), [p0, p1] = (M.airJumpPhase || [22, 78]).map(x => x / 100);
+    if (p < p0) return Math.floor(a * p / p0);
+    if (p > p1) return Math.min(n - 1, b + 1 + Math.floor((n - 1 - b) * (p - p1) / Math.max(0.01, 1 - p1)));
+    const q = (p - p0) / Math.max(0.01, p1 - p0), e = q < 0.5 ? 2 * q * q : 1 - 2 * (1 - q) * (1 - q);   // ease in and out
+    this.flipSpin = e * (M.airJumpSpin || 1) * Math.PI * 2;
+    return a + Math.min(b - a, Math.floor(q * (b - a + 1)));
   }
   endSlide() { this.state = 'normal'; this.setStanding(); this.squash = { x: 0.92, y: 1.08 }; }
 
@@ -538,6 +551,8 @@ export class Leyla {
     const onGround = grounded || near || (time - (this.lastGround ?? -1e9) < 90 && Math.abs(v.y) < 150);
     let name = st === 'dead' ? 'hurt' : st === 'normal' ? (!onGround ? (time < (this.flipUntil || 0) ? 'airJump' : v.y < 0 ? 'jump' : 'fall')
       : speed > 300 || (held && !this.walkHeld) ? 'run' : speed > 20 || held ? 'walk' : 'idle') : st === 'swing' ? 'jump' : st;
+    // sliding down a ladder in the submarine pose (Daniel, 12.11.2026: „die Pose, die Menschen im U-Boot einnehmen“): Leyla › Aussehen › Leiter runterrutschen
+    if (st === 'climb' && this.climbSliding && this.d.look?.ladderSlide) { name = 'ladderSlide'; this.ladderSlideAt ??= time; } else this.ladderSlideAt = null;
     this.updateArmed(time, dt, grounded);
     // (3) no standing frame without real stillness: right after walking or running she keeps the step a moment (Leyla › Übergänge › Stehen erst nach)
     // (after a jump the last air frame stays for a moment too, so a quick hop again does not flash a standing frame)
@@ -609,9 +624,13 @@ export class Leyla {
       name = '@' + h.look; armedFrom = 1; armedFrame = Math.min(1, Math.min(n - 1, f) / Math.max(1, n - 1)); pin = null;
     }
     // mantle and crouch pick their frame from the progress (crouch backwards = standing up)
-    const flipFrames = name === 'airJump' && (this.m.airJumpFromFrame ?? 1) > 1;
+    const spin = name === 'airJump' && this.m.airJumpSpin > 0;
+    const flipFrames = name === 'airJump' && ((this.m.airJumpFromFrame ?? 1) > 1 || spin);
+    const slideFrames = st === 'slide' && !!this.m.slideLoop?.[1];
+    const ladderFrames = name === 'ladderSlide';
+    this.flipSpin = 0;
     const climbFrames = st === 'climb' && (this.m.climbFromFrame ?? 1) > 0;
-    const manual = st === 'mantle' || st === 'crouch' || st === 'dash' || st === 'land' || st === 'brake' || st === 'sit' || st === 'pose' || flipFrames || climbFrames, an0 = this.sprite.anims;
+    const manual = st === 'mantle' || st === 'crouch' || st === 'dash' || st === 'land' || st === 'brake' || st === 'sit' || st === 'pose' || flipFrames || climbFrames || slideFrames || ladderFrames, an0 = this.sprite.anims;
     if (!manual && armedFrame == null && pin == null && st !== 'slide' && an0.isPaused) an0.resume();
     // the run and its variants (gun out, at the chest, drawing, reloading) share the step: switching keeps the frame, so the legs never jump
     // transitions (Daniel, 11.11.2026, 2A): (1) families with the same step keep their place in the cycle (run and its variants,
@@ -645,6 +664,22 @@ export class Leyla {
       const fr = an0.currentAnim.frames;
       if (!an0.isPaused) an0.pause();
       this.sprite.setFrame(fr[Math.max(0, Math.min(fr.length - 1, this.sitFrame(time)))].frame.name);
+    } else if (ladderFrames && info.used === 'ladderSlide' && an0.currentAnim) {
+      // take the pose (Klettern & Schwingen › Rutschen: Einnehmen), then the fluttering loop
+      const fr = an0.currentAnim.frames, n = fr.length, k = Math.min(n - 1, Math.max(0, this.m.ladderSlideIn ?? 0)), t = time - this.ladderSlideAt, step = 1000 / (this.m.ladderSlideFps ?? 12);
+      const f = t < k * step * 0.6 ? Math.floor(t / (step * 0.6)) : k + Math.floor((t - k * step * 0.6) / step) % Math.max(1, n - k);
+      if (!an0.isPaused) an0.pause();
+      this.sprite.setFrame(fr[Math.min(n - 1, f)].frame.name);
+    } else if (slideFrames && info.used === 'slide' && an0.currentAnim) {
+      // slide in three parts (Daniel, 12.11.2026: „dynamischer, nicht statisch von A nach B gleiten“): drop in, loop while sliding (also in a tunnel), get up
+      const fr = an0.currentAnim.frames, n = fr.length, M = this.m, [l0, l1] = M.slideLoop, a = Math.max(0, l0 - 1), z = Math.min(n - 1, l1 - 1);
+      const t = time - (this.slideAt ?? time), tin = M.slideIn ?? 90, tout = M.slideOut ?? 110, outAt = this.slideEnd - tout;
+      let f;
+      if (t < tin) f = Math.floor(a * t / Math.max(1, tin));
+      else if (time >= outAt && this.canStand()) f = Math.min(n - 1, z + 1 + Math.floor((n - 1 - z) * Math.min(1, (time - outAt) / Math.max(1, tout))));
+      else f = a + Math.floor((t - tin) / (1000 / (M.slideFps ?? 14))) % Math.max(1, z - a + 1);
+      if (!an0.isPaused) an0.pause();
+      this.sprite.setFrame(fr[Math.min(n - 1, f)].frame.name);
     } else if (manual && (info.used === st || (flipFrames && info.used === 'airJump')) && an0.currentAnim) {
       const fr = an0.currentAnim.frames, n = fr.length;
       const from = st === 'mantle' ? Math.min(n - 1, Math.max(0, (this.m.mantleFromFrame ?? 5) - 1)) : 0;
@@ -653,14 +688,14 @@ export class Leyla {
       const climbFrom = Math.min(n - 1, Math.max(0, (this.m.climbFromFrame ?? 1) - 1)), climbN = Math.max(1, n - climbFrom);
       const landFrom = Math.min(n - 1, Math.max(0, (this.m.landFromFrame ?? 4) - 1));
       const brakeFrom = Math.min(n - 1, Math.max(0, (this.d.brake?.fromFrame ?? 2) - 1));
-      const f = st === 'land' ? Math.round(landFrom + (n - 1 - landFrom) * this.landP(time)) : st === 'brake' ? Math.min(n - 1, brakeFrom + Math.floor((n - brakeFrom) * this.brakeP(time))) : climbFrames ? climbFrom + Math.floor((this.climbDist || 0) / Math.max(1, this.m.climbStep ?? 24)) % climbN : flipFrames ? Math.round(flipFrom + (n - 1 - flipFrom) * flipP) : st === 'mantle' ? Math.round(from + (n - 1 - from) * ((this.mantleQ0 || 0) + (1 - (this.mantleQ0 || 0)) * this.mantleP(time))) : st === 'dash' ? Math.round(dashFrom + (n - 1 - dashFrom) * dashP) : Math.round(Math.min(n - 1, this.crouchF || 0));
+      const f = st === 'land' ? Math.round(landFrom + (n - 1 - landFrom) * this.landP(time)) : st === 'brake' ? Math.min(n - 1, brakeFrom + Math.floor((n - brakeFrom) * this.brakeP(time))) : climbFrames ? climbFrom + Math.floor((this.climbDist || 0) / Math.max(1, this.m.climbStep ?? 24)) % climbN : flipFrames ? (spin ? this.spinFrame(n, flipP) : Math.round(flipFrom + (n - 1 - flipFrom) * flipP)) : st === 'mantle' ? Math.round(from + (n - 1 - from) * ((this.mantleQ0 || 0) + (1 - (this.mantleQ0 || 0)) * this.mantleP(time))) : st === 'dash' ? Math.round(dashFrom + (n - 1 - dashFrom) * dashP) : Math.round(Math.min(n - 1, this.crouchF || 0));
       if (!an0.isPaused) an0.pause();
       this.sprite.setFrame(fr[f].frame.name);
     }
     // run cycle follows the speed, so the feet do not slide (walking = slower steps)
     // sliding through a tunnel: hold the lowest frame (middle of the slide) until she can stand
     const an = this.sprite.anims;
-    if (st === 'slide' && info.used === 'slide' && an.currentAnim) {
+    if (st === 'slide' && !slideFrames && info.used === 'slide' && an.currentAnim) {
       const mid = an.currentAnim.frames[Math.floor(an.currentAnim.frames.length / 2)];
       if (!this.canStand() && an.currentFrame?.index >= mid.index) { if (!an.isPaused) an.pause(mid); } else if (an.isPaused) an.resume();
     }
@@ -677,10 +712,13 @@ export class Leyla {
     if (info.fallback && st === 'dash') rot = this.facing * 0.12;
     if (info.fallback && st === 'climb') rot = Math.sin(this.climbPhase * 6) * 0.05;
     if (st === 'swing') rot = -this.theta * 0.85;
-    if (name === 'airJump' && this.m.airJumpTilt) rot = this.facing * Math.max(-0.6, Math.min(0.6, Math.atan2(v.y, Math.max(Math.abs(v.x), 400)))) * this.m.airJumpTilt / 100;   // pose leans into the jump
+    if (name === 'airJump' && this.m.airJumpTilt && !spin) rot = this.facing * Math.max(-0.6, Math.min(0.6, Math.atan2(v.y, Math.max(Math.abs(v.x), 400)))) * this.m.airJumpTilt / 100;   // pose leans into the jump
     if (time < this.attackPose && st === 'normal') rot += this.facing * 0.1;
     if (st === 'dead') { this.deadRot = (this.deadRot || 0) + (this.facing * -1.45 - (this.deadRot || 0)) * k; rot = this.deadRot; } else this.deadRot = 0;
+    if (spin && this.flipSpin) rot = this.facing * this.flipSpin;
     this.sprite.setPosition(b.center.x, b.bottom).setRotation(rot);
+    // the somersault turns around her middle, not around her feet (Salto: Drehpunkt über den Füßen, in Bildpixeln)
+    if (spin && this.flipSpin) { const ph = (this.m.airJumpPivot ?? 70) * info.scale; this.sprite.x -= Math.sin(rot) * ph; this.sprite.y -= ph - Math.cos(rot) * ph; }
     // Waffen › Rückstoß: the gun shoves her back a few pixels for a moment (long guns without a painted slide)
     const kick = this.armed === 'on' && this.scene.weapon?.('ranged')?.kick, since = time - (this.shotAt ?? -1e9);
     if (kick && since >= 0 && since < 90) this.sprite.x -= this.facing * kick * (1 - since / 90) * this.size.h / 168;

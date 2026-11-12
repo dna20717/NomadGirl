@@ -184,10 +184,11 @@ export class Hud {
   }
   menuKeys() {}
   // one cell of the controller symbols (Spiel › Controller › Symbole) as a pixel-sharp CSS sprite, ×2; null without symbols
-  padIcon(name, title = '') {
+  // size: shown height in px (the cells are drawn large, tools/pad_icons.py; Spiel › Controller › Symbol-Größe)
+  padIcon(name, title = '', size = null) {
     const I = this.padIcons, i = I?.names.indexOf(name) ?? -1;
     if (!I || i < 0) return null;
-    const k = 2, [cw, ch] = I.cell, x = i % I.grid[0], y = Math.floor(i / I.grid[0]);
+    const [cw, ch] = I.cell, k = (size ?? I.size ?? 32) / ch, x = i % I.grid[0], y = Math.floor(i / I.grid[0]);
     return el('i', { class: 'pad-ico', title, 'data-icon': name, style: `width:${cw * k}px;height:${ch * k}px;background-image:url("${I.url}");background-size:${I.grid[0] * cw * k}px ${I.grid[1] * ch * k}px;background-position:-${x * cw * k}px -${y * ch * k}px` });
   }
   menuMove(d) { const n = this.menuItems?.length || 0; let i = this.menuIndex; for (let s = 0; s < n; s++) { i = (i + d + n) % n; if (!this.menuItems[i].disabled) break; } this.focus(i); }
@@ -207,9 +208,10 @@ export class Hud {
     if (!kind) return;
     const ico = b => this.padIcon(pad.iconName(b), pad.labelOf(b)) || el('b', {}, pad.labelOf(b));
     const names = { xbox: 'Xbox', ps: 'PlayStation', switch: 'Switch', stadia: 'Stadia' };
-    const rows = [[[this.padIcon(`${kind}_stick`, 'Stick') || el('b', {}, 'Stick'), ico(12)], 'Laufen (halb neigen = gehen), runter = Ducken/Slide, hoch = Leiter'],
+    const rows = [[[ico('stick'), ico('dpad')], 'Laufen (halb neigen = gehen), runter = Ducken/Slide, hoch = Leiter'],
+      [[ico('rstick')], 'AvA am Gummiband (Licht, Plattform)'],
       ...actions.map(([a, name]) => [(pad.c.map[a] || []).map(ico), name]).filter(([k]) => k.length),
-      [[ico(12), ico(0), ico(1), ico(2), ico(3), ico(4), ico(5)], 'Fenster: wählen, nehmen, zurück, drehen, rüber (halten: wegwerfen), Tabs'],
+      [[ico('dpad'), ico(0), ico(1), ico(2), ico(3), ico(4), ico(5)], 'Fenster: wählen, nehmen, zurück, drehen, rüber (halten: wegwerfen), Tabs'],
       ...(pad.c.map.inventory?.length ? [[[...pad.c.map.inventory.map(ico)], 'Im Camp halten: Rig bauen (dort Select = Rig offen/zu)']] : [])];
     const half = Math.ceil(rows.length / 2), list = part => el('dl', {}, ...part.flatMap(([k, t]) => [el('dt', {}, ...k.flatMap((x, i) => i ? [' ', x] : [x])), el('dd', {}, t)]));
     this.padHelpEl.replaceChildren(el('h3', {}, icon('play', 16), `Controller · ${names[kind] || kind}`), el('div', { class: 'hud-cols' }, list(rows.slice(0, half)), list(rows.slice(half))),

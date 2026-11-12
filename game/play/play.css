@@ -514,3 +514,43 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .craft-salv-out { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; color: #8d7f9c; }
 .craft-out { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px 2px 3px; border-radius: 5px; background: #2a2233; color: #d9d0e3; font: 13px/1 var(--ui-font); white-space: nowrap; }
 .craft-out.prog { background: #3a2e14; color: #ffd27a; box-shadow: inset 0 0 0 1px #6b5a3a; }
+
+/* ---------- one look for keys, pad buttons, hints and tooltips (12.11.2026: „Buttons, Tooltips und Hilfeangaben neu, ein bisschen cool“) ----------
+   keyboard keys = small neon-glass keycaps (gold letter, cyan edge light), pad buttons = the pictures from tools/pad_icons.py */
+.pad-ico { image-rendering: auto; filter: drop-shadow(0 0 4px rgba(63, 224, 208, .18)); }
+.hud-helpBox dt kbd, .ui-hints kbd, .hud-prompt kbd:not(.pad), .hud-buildbtn kbd, .hud-item kbd, .inv-acts kbd {
+  display: inline-grid; place-items: center; box-sizing: border-box; min-width: 26px; height: 26px; padding: 0 7px; border-radius: 7px;
+  background: linear-gradient(180deg, #2c2238 0%, #191222 55%, #120d19 100%);
+  border: 1px solid rgba(63, 224, 208, .45); border-bottom: 3px solid rgba(15, 10, 22, .95);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 0 8px rgba(63, 224, 208, .22), 0 2px 4px rgba(0, 0, 0, .5);
+  color: #ffd27a; font: 20px/1 VT323, monospace; text-shadow: 0 0 6px rgba(255, 210, 122, .55); letter-spacing: .02em; }
+.ui-hints kbd { min-width: 24px; height: 24px; font-size: 18px; padding: 0 6px; }
+.inv-acts kbd { min-width: 18px; height: 18px; font-size: 15px; padding: 0 4px; border-bottom-width: 2px; border-radius: 5px; }
+.hud-item.focus kbd { border-color: #ffd27a; color: #0d0a12; background: linear-gradient(180deg, #ffe3a3, #ffc65a); text-shadow: none; box-shadow: 0 0 12px rgba(255, 210, 122, .6); }
+.hud-buildbtn kbd { min-width: 22px; height: 22px; font-size: 17px; }
+.pad-ico + .pad-ico, kbd + .pad-ico, .pad-ico + kbd { margin-left: 2px; }
+.ui-hints .pad-ico, .hud-padhelp dt .pad-ico, .hud-keys .pad-ico, .hud-go .pad-ico { margin: -4px 0; }
+
+/* the hint line under every window: glass strip, separators as dots */
+.ui-hints { gap: 6px 14px; padding: 8px 14px; margin: 12px auto 0; width: fit-content; max-width: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, rgba(228, 90, 168, .10), rgba(19, 14, 27, .75) 18%, rgba(19, 14, 27, .75) 82%, rgba(63, 224, 208, .10));
+  border: 1px solid rgba(255, 255, 255, .06); font-size: 13px; color: #d4c8e2; }
+.ui-hints > span { gap: 7px; }
+.ui-hints > i { width: 4px; height: 4px; border-radius: 50%; background: #5e4f6e; color: transparent; overflow: hidden; }
+.ui-hints small { margin-top: 2px; color: #8d7f9c; }
+
+/* the E prompt in the world: neon-edged glass pill, the key glows */
+.hud-prompt { gap: 12px; padding: 8px 20px 8px 10px; border-radius: 999px; background: linear-gradient(180deg, rgba(30, 22, 40, .88), rgba(13, 10, 18, .9));
+  border: 1px solid transparent; background-clip: padding-box; box-shadow: 0 0 0 1px rgba(63, 224, 208, .35), 0 0 18px rgba(63, 224, 208, .18), 0 8px 24px rgba(0, 0, 0, .45);
+  color: #f2eef7; letter-spacing: .02em; }
+.hud-prompt kbd:not(.pad) { min-width: 34px; height: 34px; font-size: 26px; border-radius: 50%; padding: 0; }
+.hud-prompt kbd.pad .pad-ico { margin: -6px 0; }
+
+/* tooltips: glass card with a neon top edge */
+.inv-tip { padding: 10px 12px; border-radius: 10px; background: linear-gradient(180deg, rgba(31, 23, 42, .97), rgba(14, 10, 20, .97));
+  border: 1px solid #3a2f45; box-shadow: 0 0 0 1px rgba(0, 0, 0, .4), 0 12px 28px rgba(0, 0, 0, .55), inset 0 2px 0 -0px rgba(228, 90, 168, .0);
+  background-image: linear-gradient(90deg, #e45aa8, #3fe0d0), linear-gradient(180deg, rgba(31, 23, 42, .97), rgba(14, 10, 20, .97));
+  background-size: 100% 2px, 100% 100%; background-repeat: no-repeat; background-position: top, center; }
+.inv-tip b { font: 22px/1 VT323, monospace; color: #ffd27a; letter-spacing: .02em; }
+.inv-tip small { color: #b9a2c8; }
+.inv-tip p { color: #e2d9ec; }

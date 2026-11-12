@@ -59,11 +59,11 @@ export class Fx {
   blood(x, y, n = 14) { this.particles(x, y, n, 0xc0304a, { speed: 300, up: 1, life: 520, size: 2, gravity: 1800 }); }
 
   // copy of a sprite that fades out (dash afterimage)
-  ghost(sprite, color = 0x3fe0d0) {
+  ghost(sprite, color = 0x3fe0d0, alpha = 0.45, life = 220) {
     const g = this.scene.add.image(sprite.x, sprite.y, sprite.texture.key, sprite.frame.name)
       .setOrigin(sprite.originX, sprite.originY).setScale(sprite.scaleX, sprite.scaleY).setRotation(sprite.rotation)
-      .setFlipX(sprite.flipX).setTintFill(color).setAlpha(0.45).setDepth(9);
-    this.scene.tweens.add({ targets: g, alpha: 0, duration: 220, onComplete: () => g.destroy() });
+      .setFlipX(sprite.flipX).setTintFill(color).setAlpha(alpha).setDepth(9);
+    this.scene.tweens.add({ targets: g, alpha: 0, duration: life, onComplete: () => g.destroy() });
   }
 
   // crescent slash in front of the attacker

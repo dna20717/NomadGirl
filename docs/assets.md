@@ -135,6 +135,8 @@ Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich 
 | `assets/drone/faces.png` (Frames 14, 15) | AvA verliebt (Herzaugen) und schwach | Code (`tools/drone_parts.py`) | 12.11.2026 |
 | `assets/items/icons_progress.png` | Symbole Fortschritt (Technik, Wissen, Bio), Kühlmittel, Kompressor + Reserve, 4 × 4 à 64 px | KI (PixelLab, Create Image Pro, Stilbild icons_treasure, AAP-64), 12.11.2026 |
 | `assets/techtree/techtree_nodes.png` (Originale `techtree/source/`) | Bilder der Techtree-Knoten, 4 × 2 à 108 px, ohne die gemalten Schildchen | KI (PixelLab, Create Image Pro, Referenz Cryo-Tank, Stilbild icons_treasure, AAP-64), 12.11.2026 |
+| `assets/ui/pad_icons.png` (alte Fassung `pad_icons_v1.png`) | Controller-Symbole: Xbox, Stadia, PlayStation, Switch, Sticks und Steuerkreuz generisch, 64-px-Felder | Code (`tools/pad_icons.py`, Schrift Inter), 12.11.2026 |
+| `assets/leyla/flip2_side.png`, `slide2_side.png`, `ladder_slide_back.png` (+ `*_source.png`) | Doppelsprung als Salto, Slide mit Schleife, Leiter-Rutschen in U-Boot-Pose | KI (PixelLab: Edit Pro Flash + Animate Image), Zuschnitt `tools/move_strips.py`, 12.11.2026 |
 
 ## Ordner
 

@@ -33,7 +33,13 @@ export function padKind(id = '') {
   if (/stadia|18d1/i.test(id)) return 'stadia';
   return 'xbox';   // Xbox, Stadia and most others carry A B X Y in the same places
 }
-export const padLabel = (kind, button) => button === 'up' ? '↑' : LABELS[kind]?.[Number(button)] ?? `#${button}`;
+// pseudo buttons for the pictures (no mapping of their own): the stick to walk with, the right stick (AvA), the d-pad as a whole
+const PSEUDO = { up: 'Stick ↑', stick: 'Linker Stick', rstick: 'Rechter Stick', dpad: 'Steuerkreuz' };
+export const padLabel = (kind, button) => PSEUDO[button] ?? LABELS[kind]?.[Number(button)] ?? `#${button}`;
+// the picture of a button (Spiel › Controller › Symbole, tools/pad_icons.py): face buttons, shoulders, triggers and select/start per
+// controller type (xbox_0 … xbox_9, stadia_…, ps_…, switch_…); sticks and d-pad are the same for all (Daniel, 12.11.2026: „Sticks generisch“)
+const GENERIC = { up: 'stick_l_up', stick: 'stick_l', rstick: 'stick_r', dpad: 'dpad', 10: 'stick_l_press', 11: 'stick_r_press', 12: 'dpad_up', 13: 'dpad_down', 14: 'dpad_left', 15: 'dpad_right' };
+export const padIconName = (kind, button) => GENERIC[button] ?? `${kind || 'xbox'}_${Number(button)}`;
 
 export class Pad {
   constructor(config = {}) {
@@ -83,7 +89,7 @@ export class Pad {
   down(a) { return this.now.has(a); }
   pressed(a) { return this.now.has(a) && !this.prev.has(a); }
   labelOf(button) { return padLabel(this.kind || 'xbox', button); }
-  // name of the icon cell (asset of kind „Symbole“, Spiel › Controller › Symbole): xbox_0 … xbox_11, xbox_dpad, xbox_stick
-  iconName(button) { const k = this.kind || 'xbox', b = Number(button); return button === 'up' ? `${k}_stick` : b >= 12 && b <= 15 ? `${k}_dpad` : `${k}_${b}`; }
+  // name of the icon cell (padIconName above): xbox_0 … xbox_9 per type, stick_l, stick_l_up, stick_r_press, dpad, dpad_up … for all
+  iconName(button) { return padIconName(this.kind, button); }
   label(action) { const b = this.c.map[action]?.[0]; return b == null ? null : padLabel(this.kind || 'xbox', b); }
 }
