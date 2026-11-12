@@ -80,6 +80,22 @@ export class Fx {
     this.scene.tweens.addCounter({ from: 0, to: 1, duration: 170, onUpdate: tw => draw(tw.getValue()), onComplete: () => g.destroy() });
   }
 
+  // muzzle flash from code (Waffen › Mündungsfeuer aus Code): white-hot core, a forward tongue and two side prongs, gone in 70 ms;
+  // f = facing, k = size (1 at 192 px Leyla)
+  muzzle(x, y, f, k = 1) {
+    const g = this.scene.add.graphics().setDepth(12).setBlendMode(Phaser.BlendModes.ADD), j = 0.85 + Math.random() * 0.3;
+    const draw = t => {
+      g.clear(); const a = 1 - t, L = 34 * k * j, W = 9 * k;
+      g.fillStyle(0xffb347, 0.85 * a).fillTriangle(x, y - W, x, y + W, x + f * L, y);
+      g.fillStyle(0xffe08a, 0.9 * a).fillTriangle(x, y - W * 0.5, x, y + W * 0.5, x + f * L * 0.7, y);
+      g.fillStyle(0xffb347, 0.7 * a).fillTriangle(x + f * 4 * k, y, x + f * 14 * k, y - 16 * k * j, x + f * 10 * k, y)
+        .fillTriangle(x + f * 4 * k, y, x + f * 14 * k, y + 16 * k * j, x + f * 10 * k, y);
+      g.fillStyle(0xffffff, a).fillCircle(x + f * 3 * k, y, 6 * k * (1 - t * 0.5));
+    };
+    draw(0);
+    this.scene.tweens.addCounter({ from: 0, to: 1, duration: 70, onUpdate: tw => draw(tw.getValue()), onComplete: () => g.destroy() });
+  }
+
   flash(x, y, color = 0xfff2b0, r = 26) {
     const c = this.scene.add.circle(x, y, r, color, 0.9).setDepth(12);
     this.scene.tweens.add({ targets: c, scale: 0.2, alpha: 0, duration: 90, onComplete: () => c.destroy() });

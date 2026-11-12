@@ -121,6 +121,10 @@ export class Combat {
     let dx = f, dy = 0;
     if (tgt) { const tx = tgt.body.center.x - x, ty = tgt.body.center.y - y, n = Math.hypot(tx, ty) || 1; dx = tx / n; dy = ty / n; }
     if (!A) s.fx.flash(x + f * 10, y, 0xfff2b0, 18);
+    else if (w.muzzleFlash) {   // the arms come up from the chest first (extendTime): the flash waits for the aim
+      const wait = leyla.extendAt === time ? (AR.extendTime ?? 100) : 0, k = leyla.size.h / 168;
+      if (wait) s.time.delayedCall(wait, () => { const m = this.muzzleOf(leyla); s.fx.muzzle?.(m.x, m.y, leyla.facing, k); }); else s.fx.muzzle?.(x, y, f, k);
+    }
     // muzzle flash light (Leyla › Waffe ziehen › Mündungslicht): bright core + a wider warm glow over the surroundings
     if (AR.flashLight !== false) {
       const col = parseInt(String(AR.flashColor || '#ffc870').slice(1), 16), r = AR.flashRadius ?? 260, life = AR.flashTime ?? 90;

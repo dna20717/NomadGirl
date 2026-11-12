@@ -681,6 +681,9 @@ export class Leyla {
     if (time < this.attackPose && st === 'normal') rot += this.facing * 0.1;
     if (st === 'dead') { this.deadRot = (this.deadRot || 0) + (this.facing * -1.45 - (this.deadRot || 0)) * k; rot = this.deadRot; } else this.deadRot = 0;
     this.sprite.setPosition(b.center.x, b.bottom).setRotation(rot);
+    // Waffen › Rückstoß: the gun shoves her back a few pixels for a moment (long guns without a painted slide)
+    const kick = this.armed === 'on' && this.scene.weapon?.('ranged')?.kick, since = time - (this.shotAt ?? -1e9);
+    if (kick && since >= 0 && since < 90) this.sprite.x -= this.facing * kick * (1 - since / 90) * this.size.h / 168;
     if (st === 'mantle') {   // the picture lifts the feet itself, so the anchor only rises the rest of the way
       const p = this.mantleP(time), F = this.mantleFrom, T = this.mantleTo, e = p * p * (3 - 2 * p);
       const lift = info.used === 'mantle' ? this.size.mantleLift : 0, q0 = this.mantleQ0 || 0, l0 = lift * q0;   // a vault starts mid-pull-up: the picture already lifts the feet a bit
@@ -692,30 +695,8 @@ export class Leyla {
     this.sprite.setFlipX(flipped).setOrigin(flipped ? 1 - info.ox : info.ox, info.oy);   // Phaser mirrors inside the frame: the anchor has to mirror too
     if (st !== 'dead') this.sprite.setAlpha(time < this.invulnerableUntil && Math.floor(time / 70) % 2 ? 0.35 : 1);
     this.recoil(time);
-    this.backGun(name);
   }
 
-  // Waffen › Auf dem Rücken (Daniel, 12.11.2026: „ergänze, dass ein Gewehr auf ihrem Rücken hängt, wenn sie klettert oder springt“):
-  // the long gun hangs on her back while it is not in her hands; the picture is the gun's inventory icon, placed per state
-  // (Stelle: x behind her, y above the feet, in px at 192 px height; Winkel: muzzle up behind the shoulder; Vor Leyla: seen from behind)
-  backGun(look) {
-    const w = this.scene.weapon?.('ranged'), B = w?.back || (w?.posesFrom && this.scene.data_.weapons?.[w.posesFrom]?.back), sp = this.sprite, st = this.state, f = this.facing;
-    const air = ['jump', 'fall', 'airJump'].includes(look);
-    const state = air ? 'jump' : ['climb', 'hang', 'mantle', 'swing', 'dash', 'slide', 'crouch', 'land', 'brake'].includes(st) ? st : 'stand';
-    const moves = air || ['climb', 'hang', 'mantle', 'swing'].includes(st);
-    const rows = B?.spots || [], row = rows.find(r => r.state === state) || rows.find(r => r.state === 'stand');
-    const hidden = !B?.show || !w.look || w.icon == null || !row || row.hide || this.armed !== 'off' || !sp.visible || st === 'dead'
-      || ['sit', 'pose'].includes(st) || look === '@' + this.d.look?.work || (B.show === 'moves' && !moves) || !this.scene.textures.exists(w.look);
-    if (hidden) { if (this.backImg?.visible) this.backImg.setVisible(false); this.backShown = null; return; }
-    const A = this.scene.data_.assets?.[w.look], cw = (Array.isArray(A?.cell) ? A.cell[0] : A?.cell) || 64, k = this.size.h / 168;
-    this.backImg ??= this.scene.add.image(0, 0, w.look, w.icon);
-    const [px, py] = row.point || [14, 120], ang = (row.angle ?? 60) * Math.PI / 180;
-    this.backImg.setTexture(w.look, w.icon).setVisible(true).setDepth(sp.depth + (row.front ? 0.002 : -0.002))
-      .setPosition(sp.x - f * px * k, sp.y - py * k).setRotation(f * ang + (sp.rotation || 0)).setFlipX(f > 0)
-      .setScale((B.length ?? 110) * k / cw).setAlpha(sp.alpha);
-    if (sp.isTinted) this.backImg.setTint(sp.tintTopLeft); else this.backImg.clearTint();
-    this.backShown = state;
-  }
 
   // ---------- melee (Daniel, 07.11.2026 spät): tap = light hit, standing or walking; holding = heavy hit when released ----------
   // Kombo (Daniel, 11.11.2026: „1c; b … der fünfte ein direkt aufgesetzter Schuss … die ersten drei Hiebe immer random, aber nie doppelt“):

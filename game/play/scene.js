@@ -55,7 +55,7 @@ export class PlayScene extends Phaser.Scene {
     for (const id of [DR.look, DR.face?.look, DR.face?.glass, ...(DR.parts || []).filter(r => r.on).map(r => r.look)]) if (id) ids.add(id);
     for (const r of this.data_.leyla?.idles || []) if (r.look) ids.add(r.look);
     { const C = this.data_.leyla?.combo || {}; for (const r of C.hits || []) for (const id of [r.look, r.walk]) if (id) ids.add(id); if (C.finisher) ids.add(C.finisher); }   // melee combo (Leyla › Kombo)
-    for (const w of Object.values(this.data_.weapons || {})) for (const id of [w.sound, (w.back?.show || w.posesFrom) && w.look, ...Object.values(w.poses || {}).filter(v => typeof v === 'string')]) if (id) ids.add(id);   // Waffen › Posen, › Auf dem Rücken
+    for (const w of Object.values(this.data_.weapons || {})) for (const id of [w.sound, ...Object.values(w.poses || {}).filter(v => typeof v === 'string')]) if (id) ids.add(id);   // Waffen › Posen
     const SP = this.data_.game?.spawn;
     for (const id of [SP?.look, SP?.dish?.look, SP?.roof?.front, this.data_.rooms?.[this.roomId]?.backdrop?.image]) if (id) ids.add(id);
     if (this.data_.camp?.chest?.look) ids.add(this.data_.camp.chest.look);   // chests in POIs too

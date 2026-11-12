@@ -21,7 +21,7 @@ PALETTE_FROM = ['idle_side.png', 'run_side.png', 'aim_side.png', 'shoot_side.png
 STRIPS = {
     'rifle_draw_side': ('rifle_draw_side_source.png', (208, 244), range(0, 7), 93.5, 242),
     'rifle_aim_side': ('rifle_aim_side_source.png', (208, 244), range(0, 5), 89.5, 242),
-    'rifle_shoot_side': ('rifle_shoot_side_source.png', (208, 244), [1, 2, 3, 4], 89.5, 242),
+    'rifle_shoot_side': ('rifle_shoot_side_source.png', (208, 244), [3, 4], 89.5, 242),   # 1-2 have PixelLab's flash in the wrong place: the flash comes from code
     'rifle_reload_side': ('rifle_reload_side_source.png', (208, 244), range(0, 23), 89.5, 242),
     'rifle_aim_walk_side': ('rifle_aim_walk_side_source.png', (208, 244), range(0, 8), 106, 242),
     'rifle_run_gun_side': ('rifle_run_gun_side_source.png', (208, 244), range(0, 8), 106, 242),

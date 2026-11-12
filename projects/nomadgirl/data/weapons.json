@@ -168,27 +168,12 @@
    "runDraw": "leyla_rifle_run_ready_side",
    "runReload": "leyla_rifle_run_ready_side",
    "runReload2": "leyla_rifle_run_ready_side",
-   "muzzle": [140, 142],
-   "muzzleRun": [80, 142]
+   "muzzle": [76, 157],
+   "muzzleRun": [80, 141]
   },
   "look": "icons_longguns",
   "icon": 0,
-  "back": {
-   "show": "stowed",
-   "length": 110,
-   "spots": [
-    {"state": "stand", "point": [14, 118], "angle": 60},
-    {"state": "jump", "point": [14, 112], "angle": 55},
-    {"state": "climb", "point": [0, 118], "angle": 40, "front": true},
-    {"state": "hang", "point": [14, 100], "angle": 75},
-    {"state": "mantle", "point": [14, 100], "angle": 60},
-    {"state": "swing", "point": [14, 112], "angle": 55},
-    {"state": "dash", "point": [26, 100], "angle": 25},
-    {"state": "slide", "point": [34, 52], "angle": 10},
-    {"state": "crouch", "point": [18, 84], "angle": 45},
-    {"state": "land", "point": [18, 90], "angle": 45},
-    {"state": "brake", "point": [16, 110], "angle": 55}
-   ]
-  }
+  "muzzleFlash": true,
+  "kick": 4
  }
 }

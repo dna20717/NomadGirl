@@ -2819,16 +2819,16 @@
   "name": "Leyla · Sturmgewehr schießen",
   "kind": "animation",
   "file": "assets/leyla/rifle_shoot_side.png",
-  "frameSize": [179, 244],
-  "frames": 4,
+  "frameSize": [160, 244],
+  "frames": 2,
   "fps": 14,
   "loop": false,
-  "origin": [66.5, 242],
+  "origin": [64.5, 242],
   "height": 193.6,
   "source": "KI (PixelLab) + Code (tools/rifle_strips.py)",
   "date": "12.11.2026",
   "derivedFrom": "leyla_rifle_aim_side",
-  "description": "Test: Schuss im Anschlag mit Mündungsfeuer, Rückstoß in die Schulter."
+  "description": "Test: Rückstoß im Anschlag (2 Frames, ohne gemalten Blitz: PixelLab hatte ihn über die Laufmitte gesetzt; Mündungsfeuer kommt aus Code, Waffen › Mündungsfeuer aus Code)."
  },
  "leyla_rifle_reload_side": {
   "name": "Leyla · Sturmgewehr nachladen",
