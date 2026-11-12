@@ -10,15 +10,19 @@
 <link rel="stylesheet" href="game/basis.css">
 <link rel="stylesheet" href="game/ui.css">
 <link rel="stylesheet" href="game/workshop/workshop.css">
+<link rel="stylesheet" href="game/play/loading.css">
 </head>
 <body class="ng">
 <div id="editor" hidden></div>
-<div id="ng-load">Leyla packt den Rucksack …</div>
+<div id="load"></div>
 <script type="module">
   import { Workshop } from './game/workshop/workshop.js';
-  const w = new Workshop(document.getElementById('editor'), new URL('projects/nomadgirl/', location.href));
+  import { createLoading } from './game/play/loading.js';
+  const base = new URL('projects/nomadgirl/', location.href);
+  const loading = createLoading(document.getElementById('load'), base);   // Spiel › Ladebalken
+  const w = new Workshop(document.getElementById('editor'), base);
   window.workshop = w;
-  w.start().then(() => document.getElementById('ng-load').remove()).catch(e => { document.getElementById('ng-load').textContent = 'Fehler beim Laden: ' + e.message; console.error(e); });
+  w.start().then(() => { loading.data(); loading.progress(1); loading.done(); }).catch(e => { loading.fail('Fehler beim Laden: ' + e.message); console.error(e); });
 </script>
 </body>
 </html>

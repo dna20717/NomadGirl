@@ -1,0 +1,13 @@
+/* Spiel › Ladebalken (game/play/loading.js): page load, camp ↔ run, waits without input; also in the workshop */
+#load { position: fixed; inset: 0; display: none; place-items: center; color: #b9a2c8; font: 28px VT323, monospace; z-index: 50; background: #0d0a12; transition: opacity .35s; }
+#load.loading-on { display: grid; }
+#load.loading-gone { opacity: 0; pointer-events: none; }
+#load.load-error { padding: 2em; text-align: center; }
+.loading-track { --load-color: #3ee8ff; --load-accent: #ff4fd8; width: min(70vw, 1100px); display: flex; flex-direction: column; gap: 10px; }
+.loading-track canvas { display: block; image-rendering: auto; }
+.loading-bar { height: 4px; background: rgba(185, 162, 200, .14); border-radius: 2px; overflow: hidden; }
+.loading-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--load-accent), var(--load-color)); box-shadow: 0 0 10px var(--load-color); }
+.loading-label { display: flex; justify-content: space-between; color: #b9a2c8; font: 22px VT323, monospace; letter-spacing: .04em; }
+.loading-pct { color: var(--load-color); margin-left: auto; }
+.loading-label { gap: 1em; align-items: baseline; }
+.loading-sub { color: #7d6a8c; font-size: 18px; }

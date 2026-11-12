@@ -12,7 +12,7 @@ const errors = [];
 page.on('pageerror', e => errors.push(e.message));
 page.on('console', m => { if (m.type() === 'error' && !/\/api\/|version\.json/.test(m.location()?.url || '')) errors.push(m.text()); });   // no worker locally: /api/ answers 404
 await page.goto(url);
-await page.waitForSelector('#ng-load', { state: 'detached', timeout: 10000 });
+await page.waitForFunction(() => window.workshop?.p && !document.querySelector('#load.loading-on'), null, { timeout: 15000 });
 if (shots) fs.mkdirSync('output', { recursive: true });
 const go = t => page.evaluate(t => window.workshop.go(t), t);
 const shot = async n => { if (shots) await page.screenshot({ path: `output/workshop_${n}.png` }); };

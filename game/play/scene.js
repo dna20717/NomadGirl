@@ -451,13 +451,26 @@ export class PlayScene extends Phaser.Scene {
     if (o?.kind === 'container' && Math.abs(this.leyla.x - o.x) > (this.data_.camp?.interactRange ?? 130) * 2) inv.open(null);
   }
 
+  // Spiel › Ladebalken during a wait without input (k.o.): after a short beat the bar runs over the rest of the wait.
+  // Whoever ends the wait calls done() or restarts the scene (restartAs keeps the bar open).
+  waitBar(ms, text, sub, { drone = true, after = 350 } = {}) {
+    const L = this.args.loading;
+    if (!L || this.script) return null;
+    this.time.delayedCall(after, () => L.show({ text, sub, drone, ms: Math.max(100, ms - after) }));
+    return L;
+  }
+
   // ---------- camp ↔ run (savegame) ----------
   restartAs(args, fade = 500) {
     if (this.leaving) return;
     this.leaving = true;
     this.hud.prompt(null);
-    const go = () => this.scene.restart({ ...this.args, startX: null, banner: null, ...args });
-    if (this.script) return go();   // remote control: no waiting for the fade
+    const L = this.args.loading;   // Spiel › Ladebalken: the new scene loads and builds, nobody can play meanwhile
+    const go = () => {
+      if (L && !this.script && !L.visible) L.show({ text: args.banner?.[0] || '', drone: !this.drone?.gone });
+      this.scene.restart({ ...this.args, startX: null, banner: null, ...args });
+    };
+    if (this.script || L?.visible) return go();   // remote control: no waiting for the fade; a wait already shows the bar
     this.cam.fadeOut(fade, 13, 10, 18);
     this.cam.once('camerafadeoutcomplete', go);
   }
@@ -613,6 +626,7 @@ export class PlayScene extends Phaser.Scene {
     if (this.mode === 'run' && this.box && this.data_.tank?.enabled !== false && this.data_.camp?.koReturn !== 'camp') return this.runKnockout();
     this.hud.banner('AvA schleppt dich raus …', 'Die Run-Beute bleibt liegen.');
     this.cam.shake(300, 0.01);
+    this.waitBar(1900, 'AvA schleppt dich raus …', 'Die Run-Beute bleibt liegen.');
     this.time.delayedCall(1900, () => this.mode === 'run' ? this.endRun(true) : this.mode === 'camp' ? this.goCamp() : this.level ? this.restartAs({}) : this.restartRoom());
   }
   // k.o. in a run (Daniel, 12.11.2026, design.md › k.o. neu): AvA drags Leyla back to the start of the run and pays with her tank;
@@ -622,6 +636,7 @@ export class PlayScene extends Phaser.Scene {
     const D = this.data_, save = this.box.save, l = this.leyla, C = D.camp || {};
     if (save.tank?.dead) {   // nobody comes any more: the run ends, the dream ends (wakeUp in the camp)
       this.hud.banner('Niemand holt dich mehr …', 'Alles wird schwarz.'); this.cam.shake(300, 0.01); this.cam.fadeOut(1800, 0, 0, 0);
+      this.waitBar(1900, 'Niemand holt dich mehr …', 'Alles wird schwarz.', { drone: false, after: 1500 });
       this.time.delayedCall(1900, () => this.endRun(true)); return;
     }
     const r = rescue(D, save);   // the tech tree's bonuses come in by themselves (tank.js › tankMods)
@@ -633,7 +648,9 @@ export class PlayScene extends Phaser.Scene {
     this.drone.react('down');
     this.hud.banner(r.last ? 'AvA bringt dich ein letztes Mal zurück …' : 'AvA schleppt dich zum Van …', lostBefore ? 'Dein alter Rucksack ist für immer weg.' : this.lostPack ? 'Dein Rucksack liegt noch da. Hol ihn dir, du hast eine Chance.' : `Der Tank verliert ${Math.round(r.cost)} %.`);
     this.box.persist?.();
+    const bar = this.waitBar(1900, r.last ? 'AvA bringt dich ein letztes Mal zurück …' : 'AvA schleppt dich zum Van …', lostBefore ? 'Dein alter Rucksack ist für immer weg.' : this.lostPack ? 'Dein Rucksack liegt noch da.' : `Der Tank verliert ${Math.round(r.cost)} %.`);
     this.time.delayedCall(1900, () => {
+      bar?.done();
       l.reset();
       l.health = Math.max(1, Math.round(l.maxHealth * (C.heal?.afterKo ?? 30) / 100));
       l.invulnerableUntil = this.now + 1500;

@@ -14,7 +14,7 @@ const errors = [], ok = [];
 page.on('pageerror', e => errors.push(e.message));
 page.on('console', m => { if (m.type() === 'error' && !/\/api\/|version\.json/.test(m.location()?.url || '')) errors.push(m.text()); });
 await page.goto(url);
-await page.waitForSelector('#load', { state: 'detached', timeout: 15000 });
+await page.waitForFunction(() => !document.querySelector('#load.loading-on'), null, { timeout: 15000 });
 await page.waitForFunction(() => window.nomad && window.game?.scene.getScene('play')?.leyla, null, { timeout: 15000 });
 const check = (name, cond, info) => (cond ? ok : errors).push(cond ? name : `${name}: ${JSON.stringify(info)}`);
 
