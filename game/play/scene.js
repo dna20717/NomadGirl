@@ -278,6 +278,7 @@ export class PlayScene extends Phaser.Scene {
     this.drone.roamTo = null;
     this.backdrop?.front();
     this.physics.add.collider(this.leyla.box, this.solids);
+    this.drone.makePlatform?.();   // Mama-Bot as a platform (Drohne › Plattform)
     this.physics.add.collider(this.leyla.box, this.platforms, null, (box, plat) => {
       const l = this.leyla, b = l.body;
       return l.state !== 'climb' && l.state !== 'swing' && this.time.now >= l.dropUntil && b.velocity.y >= 0 && b.prev.y + b.height <= plat.body.top + 2;
@@ -563,7 +564,7 @@ export class PlayScene extends Phaser.Scene {
       }
       if (ground(cx, Math.floor(handY / T))) break;   // a wall in between: no grabbing through it
     }
-    return null;
+    return this.drone?.ledgeFor?.(x, handY, dir, reach, halfW, up, side) || null;   // Mama-Bot's edge
   }
   // edge of the ground Leyla stands on, in direction dir (for climbing down): hanging there she faces back to it
   edgeBelow(x, feet, dir, halfW) {

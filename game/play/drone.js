@@ -162,15 +162,20 @@ export class Drone {
       tx = l.x + dx * this.side * (1 - m) + st[0] / m * pull; ty = l.feet + dy + st[1] / m * pull;
       smooth = (G.smooth ?? 0.06) * (1 - 0.6 * m * m);   // the further out, the heavier it pulls
       this.aim = Math.atan2(st[1], st[0]); this.leashed = true; this.roamTo = null;
-    } else if (this.leashed) { this.leashed = false; this.aimUntil = time + (G.aimHold ?? 600); }
+    } else if (this.leashed) { this.leashed = false; this.aimUntil = time + (G.aimHold ?? 600); this.parkUntil = time + (this.d.platform?.park ?? 1800); this.parkAt = [this.x, this.y]; }
+    // parked after the rubber band (Drohne › Plattform › Parkt nach dem Loslassen): she waits there a moment, so Leyla can climb onto her
+    if (!this.leashed && this.parkAt && (time < (this.parkUntil || 0) || this.carrying)) { tx = this.parkAt[0]; ty = this.parkAt[1]; smooth = 0.25; }
+    else if (!this.leashed) this.parkAt = null;
     if (!this.leashed && this.aim != null && time > (this.aimUntil || 0)) this.aim = null;
     // building the rig (build_mode.js): she is the hand that carries the parts, Leyla sits at the fire
     if (this.build) { tx = this.build.x; ty = this.build.y; smooth = this.build.smooth ?? 0.3; this.roamTo = null; }
     // docked on a workbench (Werkstätten › Benutzen › Mama-Bot dockt an): flies there and sits still
     if (this.dock) { if (time > this.dock.until) this.dock = null; else { tx = this.dock.x; ty = this.dock.y; smooth = 0.07; } }
+    if (this.carrying) { tx = this.x; ty = this.y; }   // carrying Leyla: she holds still
     const k = 1 - Math.pow(1 - Math.min(1, smooth), dt / 16.67);
     const px = this.x; this.x += (tx - this.x) * k; this.y += (ty - this.y) * k;
     const vx = (this.x - px) / Math.max(1, dt) * 1000;
+    this.updatePlatform(time, dt);
     // zen: slow, deep breathing instead of the usual bobbing (phase kept smooth when it switches)
     const zen = this.mood === 'zen', bs = (F.bobSpeed ?? 0.6) * (zen ? 0.35 : 1);
     this.bobPh = (this.bobPh || 0) + dt / 1000 * Math.PI * 2 * bs;
@@ -189,6 +194,66 @@ export class Drone {
     const top = this.y + bob - this.half - 6;
     this.bubble.setPosition(this.x + look * 30, top);
     if (this.bubbleUntil && time > this.bubbleUntil) this.bubble.setAlpha(Math.max(0, this.bubble.alpha - dt / 250));
+  }
+
+  // ---------- Mama-Bot as a platform (Daniel, 12.11.2026: „Leyla kann dran hochklettern und auf ihr stehen, bis der Akku alle ist“) ----------
+  // Drohne › Plattform: while she is pulled out (right stick) or parked after it, her top is a one-way platform and her sides are ledges.
+  // Carrying Leyla (standing, hanging, pulling up) she holds still and the battery drains; empty = she sags away and Leyla drops.
+  makePlatform() {
+    const s = this.scene, P = this.d.platform || {};
+    this.battery = 1; this.carrying = false;
+    if (P.enabled === false) return;
+    this.plat = s.add.zone(this.x, this.y, P.width ?? 110, 16);
+    s.physics.add.existing(this.plat, true);
+    this.platBar = s.add.graphics().setDepth(12);
+    s.physics.add.collider(s.leyla.box, this.plat, null, () => {
+      const l = s.leyla, b = l.body;
+      return this.platOn && l.state !== 'climb' && l.state !== 'swing' && s.time.now >= l.dropUntil && b.velocity.y >= 0 && b.prev.y + b.height <= this.plat.body.top + 4;
+    });
+  }
+  platformTop() { return this.y - this.half + (this.d.platform?.inset ?? 14); }
+  updatePlatform(time, dt) {
+    const P = this.d.platform || {}, s = this.scene, l = s.leyla;
+    if (!this.plat || !l) return;
+    const w = P.width ?? 110, top = this.platformTop(), halfW = l.size.w / 2;
+    // standing on her, hanging at her edge or pulling up onto her
+    const onTop = this.platOn && (l.body.blocked.down || l.body.touching.down) && Math.abs(l.feet - top) < 10 && Math.abs(l.x - this.x) < w / 2 + halfW;
+    this.carrying = !!(onTop || l.ledge?.drone);
+    const ready = time >= (this.emptyUntil || 0);
+    this.platOn = P.enabled !== false && l.alive && ready && this.battery > 0 && !this.build && !this.dock && (this.leashed || this.parkAt || this.carrying);
+    const cap = (P.battery ?? 4) * 1000 * (1 + (this.batteryBonus?.() || 0) / 100);
+    if (this.carrying) {
+      this.battery = Math.max(0, this.battery - dt / cap);
+      this.y += (P.sag ?? 12) * (1 - this.battery) * dt / 1000;   // the motors labour: she sinks a little
+      if (this.battery <= 0) this.empty(time);
+    } else this.battery = Math.min(1, this.battery + dt / ((P.recharge ?? 6) * 1000));
+    this.plat.setPosition(this.x, top + 8); this.plat.body.updateFromGameObject();
+    this.plat.body.enable = this.platOn;
+    // battery bar over her while it is not full
+    const g = this.platBar.clear();
+    if (this.battery < 0.995 || this.carrying) {
+      const bw = 64, x0 = this.x - bw / 2, y0 = top - 26, c = this.battery > 0.5 ? 0x3fe0d0 : this.battery > 0.2 ? 0xffd27a : 0xff4d6d;
+      g.fillStyle(0x0d0a12, 0.75).fillRoundedRect(x0 - 3, y0 - 3, bw + 6, 12, 4);
+      g.fillStyle(c, 1).fillRoundedRect(x0, y0, Math.max(2, bw * this.battery), 6, 3);
+    }
+  }
+  // battery empty: she sags away for a moment (Drohne › Plattform › Erholt sich ab), Leyla drops off
+  empty(time) {
+    const s = this.scene, l = s.leyla, P = this.d.platform || {};
+    this.emptyUntil = time + (P.cooldown ?? 1500); this.parkAt = null; this.parkUntil = 0; this.carrying = false; this.platOn = false;
+    if (this.plat) this.plat.body.enable = false;
+    if ((l.state === 'hang' || l.state === 'mantle') && l.ledge?.drone) { l.body.checkCollision.none = false; l.setStanding(); l.leaveHang(time); }
+    this.react('gearWorse');
+    s.fx?.text?.(this.x, this.y - this.half - 20, 'Akku leer!', { color: '#ff9a9a', size: 30, rise: 40, life: 900 });
+  }
+  // a ledge at her side for Leyla's hands (scene.ledgeAt asks here when no wall edge is in reach)
+  ledgeFor(x, handY, dir, reach, halfW, up, side) {
+    if (!this.platOn || !this.plat) return null;
+    const w = this.d.platform?.width ?? 110, top = this.platformTop(), edge = dir > 0 ? this.x - w / 2 : this.x + w / 2;
+    const gap = (edge - (x + dir * halfW)) * dir;
+    if (gap < -halfW * 1.5 || gap > Math.max(6, side) + 6) return null;   // also a little from under her edge
+    if (top < handY - up || top > handY + reach) return null;
+    return { x: edge, y: top, dir, drone: true };
   }
 
   // face: blinks now and then (only the normal face), eyes drift towards Leyla or the nearest enemy, old screen flickers

@@ -103,6 +103,24 @@ v = await page.evaluate(() => {
   return { ...P.L(), hang };
 });
 check('Kante: aus dem Sprung greifen + hoch (hängen oder im Schwung)', v.feet === feet(0) && v.x < 30 * 64, v);
+// Mama-Bot as a platform (Daniel, 12.11.2026: „Leyla kann dran hochklettern und auf ihr stehen, bis der Akku alle ist“)
+v = await page.evaluate(() => {
+  const n = nomad, s = game.scene.getScene('play'), l = s.leyla, d = s.drone, out = {};
+  const park = (x, top) => { const y = top + d.half - (d.d.platform?.inset ?? 14); d.x = x; d.y = y; d.parkAt = [x, y]; d.parkUntil = s.time.now + 1e7; };
+  P.tp(12, 18); n.step(10); const ground = l.feet;
+  park(l.x, ground - 120); n.step(3);
+  n.step(1, ['jump'], ['jump']); n.step(40, ['jump']); n.step(20);
+  out.on = { feet: Math.round(ground - l.feet), carrying: d.carrying, bat: +d.battery.toFixed(2) };
+  n.until(() => d.battery <= 0 || l.feet >= ground - 1, 600); n.step(40);
+  out.off = { feet: Math.round(ground - l.feet), empty: d.emptyUntil > s.time.now };
+  n.step(400); P.tp(12, 18); n.step(10); park(l.x + 100, l.feet - 150); n.step(3);
+  n.step(1, ['jump', 'right'], ['jump']); const seen = new Set(); for (let i = 0; i < 50 && l.state !== 'mantle'; i++) { n.step(1, ['right']); seen.add(l.state); } seen.add(l.state);
+  n.step(30); out.climb = { seen: [...seen], feet: Math.round(ground - l.feet), carrying: d.carrying };
+  d.parkAt = null; d.parkUntil = 0; n.step(200);
+  return out;
+});
+check('Mama-Bot: Leyla steht auf ihr, der Akku läuft leer, dann fällt sie runter', v.on.feet > 100 && v.on.carrying && v.on.bat < 1 && v.off.feet < 2 && v.off.empty, v);
+check('Mama-Bot: Leyla klettert seitlich an ihr hoch', v.climb.seen.includes('mantle') && v.climb.feet > 100, v.climb);
 // forgiving grab (Daniel, 12.11.2026: „zu fummelig“): flying towards the edge without holding a direction still catches it; ↓ held never does
 v = await page.evaluate(() => {
   const n = nomad, l = game.scene.getScene('play').leyla, run = keys => { P.tp(30.75, 21); n.step(15); n.step(1, ['left']); n.step(12);

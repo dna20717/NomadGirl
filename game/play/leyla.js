@@ -206,6 +206,8 @@ export class Leyla {
         const rise = L.y + z.hangReach - this.feet, top = { x: L.x + L.dir * (z.w / 2 + 4), feet: L.y };
         if (vaultOn && rise >= (m.vaultFrom ?? 110) * k && this.scene.rectFree(top.x - z.w / 2 + 2, top.feet - z.crouchH, z.w - 4, z.crouchH - 2)) return this.startVault(time, L, rise, top);
         if (L.y - hy <= reach && this.hangFits(L)) return this.startHang(L);
+        // Mama-Bot low over the ground (no room to hang below her): Leyla climbs straight up onto her
+        if (L.drone && this.scene.rectFree(top.x - z.w / 2 + 2, top.feet - z.crouchH, z.w - 4, z.crouchH - 2)) return this.startVault(time, L, Math.max(0, rise), top);
       }
     }
     // crouch: ↓ while standing (fast = slide, see above)
