@@ -4,7 +4,7 @@
 // Lightmap: a small canvas (1/scale of the view) is filled each frame with the ambient light of the rooms (colour mood × brightness,
 // one pixel per tile, smoothed), the lights are added on top ('lighter'), then the vignette; it lies over the world with MULTIPLY.
 // Lights: lamps at the ceilings (auto + * in the layout), glowing clutter (Kachel-Sets › Leuchtet), a small glow around Leyla,
-// Mama-Bot's searchlight (Drohne › Scheinwerfer, only while the part sits on her) and short flashes (sparks).
+// AvA's searchlight (Drohne › Scheinwerfer, only while the part sits on her) and short flashes (sparks).
 // Above the lightmap: additive glow of the fixtures and clutter, dust motes, sparks. Below it (lit by it): fog and drips.
 import { atmoRegions, planLights, moodOf, behave, hash } from '../../engine/atmosphere.js';
 
@@ -102,7 +102,7 @@ export class Atmosphere {
     const halo = s.add.image(x, y, s.fx.glowKey()).setBlendMode(Phaser.BlendModes.ADD).setDepth(this.depth + 0.5).setTint(lit).setDisplaySize(w * sc * 1.8, h * sc * 1.8);
     this.lights.push({ kind: 'bulb', x, y, c, radius: r.light ?? 200, strength: (r.strength ?? 80) / 100, behavior: r.behavior || 'steady', seed: hash(Math.round(x), Math.round(y), 5), clip: null, halo, haloA: 0.45 * (r.strength ?? 80) / 100, glow: p.name, f: 1 });
   }
-  // Mama-Bot's searchlight: lens position and direction while the part sits on her
+  // AvA's searchlight: lens position and direction while the part sits on her
   spot() {
     const dr = this.scene.drone, S = this.scene.data_.drone?.spot;
     if (!dr || !S || dr.d.enabled === false || !dr.sprite.visible) return null;
@@ -191,7 +191,7 @@ export class Atmosphere {
     // Leyla never vanishes completely
     const LG = this.G.leyla || {};
     if (l && (LG.strength ?? 22) > 0) blob(ctx, X(l.x), Y(l.chest), (LG.radius ?? 260) / k, [255, 240, 225], (LG.strength ?? 22) / 100);
-    // Mama-Bot's searchlight
+    // AvA's searchlight
     const sp = this.lastSpot;
     if (sp) { cone(ctx, X(sp.x), Y(sp.y), sp.dir, sp.half, sp.range / k, sp.c, sp.strength); blob(ctx, X(sp.x), Y(sp.y), 60 / k, sp.c, sp.strength * 0.8); }
     this.spotGlow.setVisible(!!sp);

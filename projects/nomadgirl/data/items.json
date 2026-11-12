@@ -402,7 +402,7 @@
   "size": [1, 2],
   "stack": 1,
   "value": 90,
-  "description": "Lampe für Mama-Bots Nase. Sie leuchtet damit gern Leyla ins Gesicht."
+  "description": "Lampe für AvAs Nase. Sie leuchtet damit gern Leyla ins Gesicht."
  },
  "greifarm": {
   "name": "Greifarm",
@@ -414,9 +414,9 @@
   "size": [1, 2],
   "stack": 1,
   "value": 120,
-  "description": "Zange am Heck. Mama-Bot hebt damit Kleinkram auf und manchmal Leylas Snacks. Leyla kann sich daran festhalten.", "battery": 10
+  "description": "Zange am Heck. AvA hebt damit Kleinkram auf und manchmal Leylas Snacks. Leyla kann sich daran festhalten.", "battery": 10
  },
- "hochleistungszelle": {"name": "Hochleistungszelle", "glyph": "⚡", "category": "dronepart", "wear": "core", "size": [1, 1], "stack": 1, "value": 160, "battery": 60, "description": "Ein Akku, der eigentlich in ein Militär-Exoskelett gehört. Mama-Bot trägt Leyla damit deutlich länger."},
+ "hochleistungszelle": {"name": "Hochleistungszelle", "glyph": "⚡", "category": "dronepart", "wear": "core", "size": [1, 1], "stack": 1, "value": 160, "battery": 60, "description": "Ein Akku, der eigentlich in ein Militär-Exoskelett gehört. AvA trägt Leyla damit deutlich länger."},
  "turbinenmodul": {"name": "Turbinenmodul", "glyph": "✈", "category": "dronepart", "wear": "module", "size": [2, 1], "stack": 1, "value": 140, "battery": 35, "description": "Zwei kleine Mantelpropeller zum Anstecken. Laut, aber sie stemmen Gewicht."},
  "goldzahn": {
   "name": "Goldzahn",

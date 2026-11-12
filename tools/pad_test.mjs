@@ -129,7 +129,7 @@ await tap(0); s = await iv();
 check('Inventar: A legt am Cursor ab', !s.held && s.at?.[0] === 1 && s.at?.[1] === 1, s);
 for (let i = 0; i < 12; i++) await tap(15);
 s = await iv();
-check('Inventar: nach rechts geht es aus dem Raster zu Slots und Mama-Bot', /^el:/.test(s.focus) || !/backpack/.test(s.focus), s);
+check('Inventar: nach rechts geht es aus dem Raster zu Slots und AvA', /^el:/.test(s.focus) || !/backpack/.test(s.focus), s);
 await shot('inventory');
 await tap(1); s = await iv();
 check('Inventar: B schließt', !s.open && !s.cursor, s);
@@ -179,21 +179,21 @@ s = await ev(() => game.scene.getScene('play').hud.menuState());
 check('Neues Spiel: B bricht ab', !s, s);
 
 // the keyboard still works
-// right stick pulls Mama-Bot like on a rubber band (Daniel, 12.11.2026): full stick goes far, half stick more than half as far (it gets heavier outside), release = back
+// right stick pulls AvA like on a rubber band (Daniel, 12.11.2026): full stick goes far, half stick more than half as far (it gets heavier outside), release = back
 s = await ev(() => { const sc = game.scene.getScene('play'), d = sc.drone, l = sc.leyla, off = () => Math.round(d.x - l.x);
   nomad.step(3, ['right']); nomad.step(30);   // facing right (after building she got up from the fire)
   setPad({ axes: [0, 0, 1, 0] }); nomad.step(150); const full = off(), aim = d.aim;
   setPad({ axes: [0, 0, 0.5, 0] }); nomad.step(150); const half = off();
   setPad(); nomad.step(60); const leashed = d.leashed; nomad.step(60); return { full, half, aim, leashed, aimAfter: d.aim, reach: d.d.leash?.reach }; });
-check('Rechter Stick zieht Mama-Bot am Gummiband, Licht folgt, Loslassen = zurück', s.full > s.reach * 0.7 && s.half > s.full * 0.55 && s.half < s.full && Math.abs(s.aim) < 0.05 && !s.leashed && s.aimAfter == null, s);
-// standing on Mama-Bot the right stick lets both hover a little, at three times the battery cost (Daniel, 12.11.2026)
+check('Rechter Stick zieht AvA am Gummiband, Licht folgt, Loslassen = zurück', s.full > s.reach * 0.7 && s.half > s.full * 0.55 && s.half < s.full && Math.abs(s.aim) < 0.05 && !s.leashed && s.aimAfter == null, s);
+// standing on AvA the right stick lets both hover a little, at three times the battery cost (Daniel, 12.11.2026)
 s = await ev(() => { const s = game.scene.getScene('play'), d = s.drone, l = s.leyla; nomad.step(400);
   const top = l.feet - 120, y = top + d.half - (d.d.platform?.inset ?? 14); d.x = l.x; d.y = y; d.parkAt = [l.x, y]; d.parkUntil = s.time.now + 1e7; nomad.step(3);
   nomad.step(1, ['jump'], ['jump']); nomad.step(40, ['jump']); nomad.step(20); const on = d.riding, x0 = l.x, b0 = d.battery;
   setPad({ axes: [0, 0, 1, 0] }); nomad.step(30); setPad(); const moved = Math.round(l.x - x0), used = +(b0 - d.battery).toFixed(2), still = d.riding;
   d.parkAt = null; d.parkUntil = 0; nomad.step(30, ['left']); nomad.step(200); return { on, moved, used, still }; });
-check('Auf Mama-Bot: rechter Stick lässt beide schweben, kostet viel Akku', s.on && s.moved > 40 && s.still && s.used > 0.3, s);
-// hanging at her grip, the right stick carries Leyla along; parts on Mama-Bot give more battery
+check('Auf AvA: rechter Stick lässt beide schweben, kostet viel Akku', s.on && s.moved > 40 && s.still && s.used > 0.3, s);
+// hanging at her grip, the right stick carries Leyla along; parts on AvA give more battery
 s = await ev(() => { const s = game.scene.getScene('play'), d = s.drone, l = s.leyla; nomad.step(400); d.battery = 1; d.emptyUntil = 0;
   const top = l.feet - 330, y = top + d.half - (d.d.platform?.inset ?? 14); d.x = l.x + 40; d.y = y; d.parkAt = [d.x, y]; d.parkUntil = s.time.now + 1e7; nomad.step(3);
   nomad.step(1, ['jump'], ['jump']); nomad.until(() => l.state === 'hang', 60, ['jump']); const st = l.state, x0 = l.x;

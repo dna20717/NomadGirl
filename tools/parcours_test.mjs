@@ -103,7 +103,7 @@ v = await page.evaluate(() => {
   return { ...P.L(), hang };
 });
 check('Kante: aus dem Sprung greifen + hoch (hängen oder im Schwung)', v.feet === feet(0) && v.x < 30 * 64, v);
-// Mama-Bot as a platform (Daniel, 12.11.2026: „Leyla kann dran hochklettern und auf ihr stehen, bis der Akku alle ist“)
+// AvA as a platform (Daniel, 12.11.2026: „Leyla kann dran hochklettern und auf ihr stehen, bis der Akku alle ist“)
 v = await page.evaluate(() => {
   const n = nomad, s = game.scene.getScene('play'), l = s.leyla, d = s.drone, out = {};
   const park = (x, top) => { const y = top + d.half - (d.d.platform?.inset ?? 14); d.x = x; d.y = y; d.parkAt = [x, y]; d.parkUntil = s.time.now + 1e7; };
@@ -119,8 +119,8 @@ v = await page.evaluate(() => {
   d.parkAt = null; d.parkUntil = 0; n.step(200);
   return out;
 });
-check('Mama-Bot: Leyla steht auf ihr, der Akku läuft leer, dann fällt sie runter', v.on.feet > 100 && v.on.carrying && v.on.bat < 1 && v.off.feet < 2 && v.off.empty, v);
-check('Mama-Bot: Leyla klettert seitlich an ihr hoch', v.climb.seen.includes('mantle') && v.climb.feet > 100, v.climb);
+check('AvA: Leyla steht auf ihr, der Akku läuft leer, dann fällt sie runter', v.on.feet > 100 && v.on.carrying && v.on.bat < 1 && v.off.feet < 2 && v.off.empty, v);
+check('AvA: Leyla klettert seitlich an ihr hoch', v.climb.seen.includes('mantle') && v.climb.feet > 100, v.climb);
 // easier (Daniel, 12.11.2026): feet in her upper half = stands right on top; near the grip at her back she grabs it, up = onto her; parts give more battery
 v = await page.evaluate(() => {
   const n = nomad, s = game.scene.getScene('play'), l = s.leyla, d = s.drone, out = {};
@@ -136,8 +136,8 @@ v = await page.evaluate(() => {
   d.parkAt = null; d.parkUntil = 0; n.step(30, ['left']); n.step(300);
   return out;
 });
-check('Mama-Bot: Füße in ihrer oberen Hälfte = sie steht gleich drauf', v.snap.riding && v.snap.up > 120, v.snap);
-check('Mama-Bot: Leyla greift den Greifarm hinten von selbst und zieht sich hoch', v.hang.st === 'hang' && v.hang.point && v.up.riding && v.up.up > 250, v);
+check('AvA: Füße in ihrer oberen Hälfte = sie steht gleich drauf', v.snap.riding && v.snap.up > 120, v.snap);
+check('AvA: Leyla greift den Greifarm hinten von selbst und zieht sich hoch', v.hang.st === 'hang' && v.hang.point && v.up.riding && v.up.up > 250, v);
 // forgiving grab (Daniel, 12.11.2026: „zu fummelig“): flying towards the edge without holding a direction still catches it; ↓ held never does
 v = await page.evaluate(() => {
   const n = nomad, l = game.scene.getScene('play').leyla, run = keys => { P.tp(30.75, 21); n.step(15); n.step(1, ['left']); n.step(12);

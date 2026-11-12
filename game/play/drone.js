@@ -66,7 +66,7 @@ export class Drone {
     this.reset();
   }
 
-  // parts with a "Gegenstand" show while that item sits on Mama-Bot in the inventory (inv.wear), others follow "Angebaut"
+  // parts with a "Gegenstand" show while that item sits on AvA in the inventory (inv.wear), others follow "Angebaut"
   refreshParts() {
     const worn = new Set(Object.values(this.scene.box?.save?.inv?.wear || {}).filter(Boolean)), hasInv = !!this.scene.box?.save?.inv?.wear;
     for (const { r, img } of this.partImgs || []) img.setVisible(r.item && hasInv ? worn.has(r.item) : !!r.on);
@@ -154,7 +154,7 @@ export class Drone {
       if (this.roamTo.leyla) this.roamTo.x += (l.x + this.side * -110 - this.roamTo.x) * 0.02;
       tx = this.roamTo.x; ty = this.roamTo.y; smooth = R.smooth ?? 0.02;
     }
-    // right stick: Mama-Bot hangs on Leyla like on a rubber band (Daniel, 12.11.2026: „je weiter weg, desto höher der Widerstand,
+    // right stick: AvA hangs on Leyla like on a rubber band (Daniel, 12.11.2026: „je weiter weg, desto höher der Widerstand,
     // lässt man los, geht sie zurück in ihre Position. So hätte man eine Tischlampe dabei“); Drohne › Gummiband
     const G = this.d.leash || {}, st = G.enabled === false ? [0, 0] : this.scene.pad?.right || [0, 0], m = Math.hypot(st[0], st[1]);
     if (m > 0.02) {
@@ -169,7 +169,7 @@ export class Drone {
     if (!this.leashed && this.aim != null && time > (this.aimUntil || 0)) this.aim = null;
     // building the rig (build_mode.js): she is the hand that carries the parts, Leyla sits at the fire
     if (this.build) { tx = this.build.x; ty = this.build.y; smooth = this.build.smooth ?? 0.3; this.roamTo = null; }
-    // docked on a workbench (Werkstätten › Benutzen › Mama-Bot dockt an): flies there and sits still
+    // docked on a workbench (Werkstätten › Benutzen › AvA dockt an): flies there and sits still
     if (this.dock) { if (time > this.dock.until) this.dock = null; else { tx = this.dock.x; ty = this.dock.y; smooth = 0.07; } }
     // carrying Leyla she holds still; with Leyla standing on her the right stick lets her hover a little, but that eats the battery
     // (Daniel, 12.11.2026: „kurz schweben mit Leyla ist ok, aber mit dem Gewicht kann sie das nicht lange machen“, Drohne › Plattform › Schweben)
@@ -207,7 +207,7 @@ export class Drone {
     if (this.bubbleUntil && time > this.bubbleUntil) this.bubble.setAlpha(Math.max(0, this.bubble.alpha - dt / 250));
   }
 
-  // ---------- Mama-Bot as a platform (Daniel, 12.11.2026: „Leyla kann dran hochklettern und auf ihr stehen, bis der Akku alle ist“) ----------
+  // ---------- AvA as a platform (Daniel, 12.11.2026: „Leyla kann dran hochklettern und auf ihr stehen, bis der Akku alle ist“) ----------
   // Drohne › Plattform: while she is pulled out (right stick) or parked after it, her top is a one-way platform and her sides are ledges.
   // Carrying Leyla (standing, hanging, pulling up) she holds still and the battery drains; empty = she sags away and Leyla drops.
   makePlatform() {
@@ -237,7 +237,7 @@ export class Drone {
     const [ax, ay] = part?.img.visible && part.r.at ? part.r.at : P.hangAt || [40, 80], [ox, oy] = this.org || [0, 0], look = this.sprite.scaleX < 0 ? -1 : 1;
     return { x: this.x + (ax - ox) * this.scale * look, y: this.y + (ay - oy) * this.scale };
   }
-  // how much longer her battery lasts with the parts on her (Gegenstände › Mama-Bot: mehr Akku, summed up)
+  // how much longer her battery lasts with the parts on her (Gegenstände › AvA: mehr Akku, summed up)
   batteryBonus() {
     const wear = this.scene.box?.save?.inv?.wear || {}, I = this.scene.data_.items || {};
     return ['bow', 'tail', 'core', 'module'].reduce((n, k) => n + (I[wear[k]]?.battery || 0), 0);
@@ -247,7 +247,7 @@ export class Drone {
     if (!this.plat || !l) return;
     const w = P.width ?? 110, top = this.platformTop(), halfW = l.size.w / 2;
     // easy to get on (Daniel, 12.11.2026: „zu schwer, sich an die Drohne zu hängen … lass Leyla direkt auf bzw. in der oberen Hälfte stehen“):
-    // in the air with her feet in Mama-Bot's upper half she simply stands on top; near the grip at her back she grabs it by herself
+    // in the air with her feet in AvA's upper half she simply stands on top; near the grip at her back she grabs it by herself
     const air = l.state === 'normal' && !(l.body.blocked.down || l.body.touching.down) && s.now - (l.lastGround ?? -1e9) > 100 && time >= (l.dropUntil || 0);
     if (this.platOn && air && l.body.velocity.y > -250 && Math.abs(l.x - this.x) < w / 2 + halfW * 0.5 && l.feet >= top - 12 && l.feet <= top + (P.snap ?? 70)) {
       const b = l.body, dy = top - l.feet; b.y += dy; b.prev.y = b.y; b.setVelocityY(0);

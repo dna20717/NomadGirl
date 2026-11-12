@@ -45,7 +45,7 @@ export async function start(parent, hudRoot) {
     if (run) { box.save.run = null; box.save.buffs = []; box.save.inv.grids.backpack.items = []; }   // like knocked out
     arrive(box.save, D);   // every arrival in the camp is at dusk (Camp › Zeit › Ankunft um)
     await box.persist();
-    args = { ...args, mode: 'camp', box, banner: run ? ['Mama-Bot hat dich heimgebracht', 'Der letzte Run wurde abgebrochen.'] : box.fresh ? ['Willkommen im Camp', 'E benutzt Dinge · H zeigt die Steuerung'] : null };
+    args = { ...args, mode: 'camp', box, banner: run ? ['AvA hat dich heimgebracht', 'Der letzte Run wurde abgebrochen.'] : box.fresh ? ['Willkommen im Camp', 'E benutzt Dinge · H zeigt die Steuerung'] : null };
   }
   game.scene.add('play', PlayScene, true, args);
   window.nomad = installControl(game);   // remote control for Ava and tests

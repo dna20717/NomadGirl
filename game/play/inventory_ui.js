@@ -18,7 +18,7 @@ const PART_ICONS = { engine: 'settings', armor: 'armor', weapon: 'target', roof:
 const CATEGORY_NAMES = { junk: 'Schrott', resource: 'Ressource', ingredient: 'Zutat', food: 'Gericht', component: 'Bauteil', consumable: 'Verbrauchsgut', valuable: 'Wertsache', blueprint: 'Bauplan', armor: 'Rüstung', implant: 'Implantat', dronepart: 'Drohnenteil', melee: 'Nahkampf', ranged: 'Fernkampf', cyberdeck: 'Cyberdeck', backpack: 'Rucksack', rigpart: 'Rig-Teil' };
 const SLOT_NAMES = { melee: 'Nahkampf', ranged: 'Fernkampf', cyberdeck: 'Cyberdeck', backpack: 'Rucksack' };
 const SLOT_ICONS = { melee: 'weapon', ranged: 'target', cyberdeck: 'brain', backpack: 'bags' };
-// worn places (game/inventory.js WEAR_KEYS): Leyla's head + armor, implants in her body, Mama-Bot's parts
+// worn places (game/inventory.js WEAR_KEYS): Leyla's head + armor, implants in her body, AvA's parts
 export const WEAR_NAMES = { head: 'Kopf', armor: 'Rüstung', eyes: 'Augen', nerves: 'Nerven', arm: 'Cyberarm', heart: 'Herz', legs: 'Beine', skin: 'Haut', bow: 'Bug', tail: 'Heck', core: 'Kern', module: 'Modul' };
 const WEAR_ICONS = { head: 'person', armor: 'armor', bow: 'target', tail: 'settings', core: 'flash', module: 'box' };
 const STAT_NAMES = { defense: ['Abwehr', '%'], health: ['Leben', ''], damage: ['Schaden', '%'], speed: ['Tempo', '%'] };
@@ -63,7 +63,7 @@ export class InventoryUI {
     this.held = null;   // { e, from: key | slot name }
     this.other = null;  // { key, title, grid, kind: 'container' | 'floor' }
     document.addEventListener('mousemove', ev => this.move(ev));
-    // left open without a click for a while: Mama-Bot dozes off (wakes up with the next click)
+    // left open without a click for a while: AvA dozes off (wakes up with the next click)
     document.addEventListener('mousedown', () => { this.lastClick = performance.now(); if (this.face?.mood === 'invIdle') { this.face = null; this.showFace(); } }, true);
     setInterval(() => { if (this.isOpen && !this.face && performance.now() - Math.max(this.lastClick || 0, this.drawn || 0) > (this.D.drone?.idle?.invIdleAfter ?? 25) * 1000) this.react('invIdle'); }, 1000);
     // a click next to the panels throws the held thing on the ground (a new bundle at Leyla's feet, Daniel: "überall auf den Boden werfen")
@@ -107,7 +107,7 @@ export class InventoryUI {
         hints([['move', 'wählen'], ['ok', 'nehmen / ablegen'], ['tabs', 'Tab wechseln'], ['back', 'zurück']], 'Rig-Teile ein- und ausbauen: Rig bauen (B) · Kofferraum wie jedes Lager'));
       this.fit(); return this.padShow();
     }
-    // Daniel, 10.11.2026 ("Inventar im Diablo-Stil"): backpack left (with the ground or the open storage under it), Leyla in the middle, Mama-Bot right
+    // Daniel, 10.11.2026 ("Inventar im Diablo-Stil"): backpack left (with the ground or the open storage under it), Leyla in the middle, AvA right
     this.pair = this.other ? ['backpack', this.other.key] : ['backpack', 'drone'];
     const left = el('div', { class: 'inv-col' }, this.bagEl(), this.other ? this.otherEl() : null);
     this.el.replaceChildren(el('div', { class: 'inv-row' }, left, this.leylaEl(), this.droneEl()),
@@ -198,15 +198,15 @@ export class InventoryUI {
     }
     doll.append(...add);
   }
-  // Mama-Bot: her picture (hull, face of the moment, worn parts), four places for parts, the rescue pocket
+  // AvA: her picture (hull, face of the moment, worn parts), four places for parts, the rescue pocket
   droneEl() {
     const D = this.D, R = D.drone?.rescue || {}, g = this.inv.grids.drone;
     this.droneFig = this.droneFigure();
     const col = keys => el('div', { class: 'inv-wearcol' }, ...keys.map(x => this.slotEl('wear:' + x)));
-    return el('section', { class: 'inv-panel drone' }, el('header', {}, icon('air', 16), el('b', {}, D.drone?.name || 'Mama-Bot')),
+    return el('section', { class: 'inv-panel drone' }, el('header', {}, icon('air', 16), el('b', {}, D.drone?.name || 'AvA')),
       el('div', { class: 'inv-doll' }, col(['tail', 'core']), el('div', { class: 'inv-center' }, this.droneFig), col(['bow', 'module'])),
       el('div', { class: 'inv-sub cyan' }, icon('heart', 14), R.name || 'Rettungsfach', el('small', {}, `${g?.w ?? 0} × ${g?.h ?? 0}`)),
-      el('div', { class: 'inv-rescue' }, g ? this.gridEl('drone', g) : null, el('p', {}, 'Übersteht ein k.o.: Mama-Bot bringt es heim. Was im Rucksack liegt, ist dann weg.')));
+      el('div', { class: 'inv-rescue' }, g ? this.gridEl('drone', g) : null, el('p', {}, 'Übersteht ein k.o.: AvA bringt es heim. Was im Rucksack liegt, ist dann weg.')));
   }
   droneFigure() {
     const D = this.D, Dr = D.drone || {}, A = D.assets || {}, H = A[Dr.look], k = 2, url = a => new URL(a.file, ASSET_BASE).href;
@@ -219,7 +219,7 @@ export class InventoryUI {
       img.onload = () => { const [nw, nh] = [img.naturalWidth, img.naturalHeight], [qx, qy] = a.origin || [nw / 2, nh / 2]; Object.assign(img.style, { width: `${nw * k}px`, height: `${nh * k}px`, left: `${((r.at?.[0] ?? ox) - qx) * k}px`, top: `${((r.at?.[1] ?? oy) - qy) * k}px` }); };
       return img; };
     for (const r of Dr.parts || []) if (r.layer === 'behind') { const p = part(r); if (p) box.append(p); }
-    box.append(el('img', { src: url(H), alt: 'Mama-Bot', style: `left:0;top:0;width:${hw * k}px;height:${hh * k}px` }));
+    box.append(el('img', { src: url(H), alt: 'AvA', style: `left:0;top:0;width:${hw * k}px;height:${hh * k}px` }));
     const F = Dr.face, FA = F && A[F.look];
     if (FA?.file) {
       const [cw, ch] = FA.frameSize || [28, 32], [cx, cy] = FA.origin || [cw / 2, ch / 2], [sx, sy] = F.screen || [ox, oy];
@@ -234,7 +234,7 @@ export class InventoryUI {
     this.showFace();
     return box;
   }
-  // Mama-Bot reacts to what happens in the inventory (Daniel: "das Drohnengesicht soll reagieren, sei kreativ"); also out in the world
+  // AvA reacts to what happens in the inventory (Daniel: "das Drohnengesicht soll reagieren, sei kreativ"); also out in the world
   react(mood) {
     const m = (this.D.drone?.moods || []).find(x => x.mood === mood);
     if (!m) return;
@@ -303,7 +303,7 @@ export class InventoryUI {
     return wrap;
   }
 
-  // a slot: weapons (melee, ranged, cyberdeck), the backpack, or a worn place 'wear:<key>' (head, armor, implants, Mama-Bot's parts)
+  // a slot: weapons (melee, ranged, cyberdeck), the backpack, or a worn place 'wear:<key>' (head, armor, implants, AvA's parts)
   slotEl(slot, label) {
     const D = this.D, inv = this.inv, w = slot.startsWith('wear:') && slot.slice(5);
     const [a, id] = w ? ['items', inv.wear?.[w]] : slot === 'backpack' ? ['backpacks', inv.backpack] : ['weapons', inv.slots[slot]];
@@ -364,7 +364,7 @@ export class InventoryUI {
     const facts = [CATEGORY_NAMES[k], e.a === 'rigParts' ? `Slot: ${PART_SLOT_NAMES[t.slot] || t.slot}` : null, e.a === 'rigParts' && t.pull ? `+${t.pull} kg Zugkraft` : null,
       e.a === 'rigParts' && t.armor ? `+${t.armor} Panzerung` : null, e.a === 'rigParts' && t.storageRows ? `+${t.storageRows} Reihen Stauraum` : null,
       (e.a === 'weapons' || e.a === 'rigParts') && t.damage ? `${t.damage} Schaden` : null, e.a === 'backpacks' && t.size ? `Raster ${t.size.join(' × ')}` : null,
-      t.wear ? `${DRONE_WEAR.includes(t.wear) ? 'Mama-Bot: ' : 'Platz: '}${WEAR_NAMES[t.wear] || t.wear}` : null, t.stats ? statLine(t.stats) : null, t.strain ? `Belastung ${t.strain}` : null,
+      t.wear ? `${DRONE_WEAR.includes(t.wear) ? 'AvA: ' : 'Platz: '}${WEAR_NAMES[t.wear] || t.wear}` : null, t.stats ? statLine(t.stats) : null, t.strain ? `Belastung ${t.strain}` : null,
       stackMax(D, e.a, e.id) > 1 ? `Stapel ${e.n}/${stackMax(D, e.a, e.id)}` : null, `${(t.value || 0) * e.n} Δ`, t.buff ? `Buff: ${D.buffs?.[t.buff]?.name || t.buff}` : null].filter(Boolean);
     const acts = key != null && !this.held ? this.actionsFor(key, e) : [];
     const row = x => el('li', {}, ...(this.padOn ? [...keyGlyph(x.k), x.hold ? el('small', {}, 'halten') : null, ' '] : []), x.label);
@@ -414,7 +414,7 @@ export class InventoryUI {
     if (id === 'use') return this.useFrom(key, g, e);
     if (id === 'equip') return this.equipFrom(key, g, e);
     if (id === 'send') return this.quickMove(key, e);
-    if (id === 'drone') { const left = add(this.D, this.inv.grids.drone, e.a, e.id, e.n); if (left === e.n) return this.host.notify?.('Mama-Bot hat keinen Platz'); if (left === 0) remove(g, e); else e.n = left; this.changed('drone'); return this.moodAfter('drone', e); }
+    if (id === 'drone') { const left = add(this.D, this.inv.grids.drone, e.a, e.id, e.n); if (left === e.n) return this.host.notify?.('AvA hat keinen Platz'); if (left === 0) remove(g, e); else e.n = left; this.changed('drone'); return this.moodAfter('drone', e); }
     if (id === 'throw') { this.pick(key, g, e); this.throwDown(); return this.draw(); }
     if (id === 'turn') return this.turnInPlace(g, e);
   }
@@ -737,7 +737,7 @@ export class InventoryUI {
     this.host.equipChanged?.(slot);
     return true;
   }
-  // head, armor, implants (camp only, strain limit), Mama-Bot's parts
+  // head, armor, implants (camp only, strain limit), AvA's parts
   wear(w, e, quiet, say) {
     const D = this.D, inv = this.inv, t = e.a === 'items' && D.items?.[e.id];
     if (!t || wearOf(D, e.id) !== w) return say(`Hier gehört ${IMPLANTS.includes(w) ? 'ein Implantat für ' : DRONE_WEAR.includes(w) ? 'ein Drohnenteil für ' : 'etwas für '}${WEAR_NAMES[w]} hin`);

@@ -15,7 +15,7 @@ export async function startSplash(canvas) {
   const cloud = await cloudFiles();
   const json = async f => cloud?.files.has(f) ? cloud.files.get(f) : (await fetch(new URL(f, BASE), { cache: 'no-store' })).json();
   const [S, A, WX, DR] = await Promise.all([json('data/splash.json'), json('data/assets.json'), json('data/weather.json').catch(() => ({})), json('data/drone.json').catch(() => ({}))]);
-  // Mama-Bot hovers next to Leyla and shows random moods (face frame + kaomoji bubble)
+  // AvA hovers next to Leyla and shows random moods (face frame + kaomoji bubble)
   const SD = { show: true, at: [57, 44], height: 15, every: [3, 7], bob: 1.2, moods: 'kill, cleared, curious, scan, alert, bored, sleep, dash', ...(S.drone || {}) };
   const droneMoods = (DR.moods || []).filter(m => String(SD.moods).split(',').map(x => x.trim()).includes(m.mood));
   const drone = { frame: 0, until: 0, next: 0, bubble: '', bubbleUntil: 0 };

@@ -15,9 +15,24 @@ const DASH_TIME = 170, TERMINAL_FALL = 1700;
 const approach = (v, target, step) => v < target ? Math.min(target, v + step) : Math.max(target, v - step);
 
 export class Leyla {
+  // Leyla's data, with the poses of the ranged weapon in her hand laid over her own looks (Waffen › Posen, Daniel, 12.11.2026:
+  // „Sturmgewehr als Grundlage für weitere Waffenvarianten“); without poses: her own data
+  get d() {
+    const w = this.scene.weapon?.('ranged'), P = w?.poses;
+    if (!P) return this.base;
+    if (this.posesOf !== w) {
+      this.posesOf = w;
+      const look = { ...this.base.look }, armed = { ...this.base.armed };
+      for (const [k, v] of Object.entries(P)) if (typeof v === 'string' && v && this.scene.textures.exists(v)) look[k] = v;
+      if (P.muzzle) armed.muzzle = P.muzzle;
+      if (P.muzzleRun) armed.muzzleRun = P.muzzleRun;
+      this.posed = { ...this.base, look, armed };
+    }
+    return this.posed;
+  }
   constructor(scene, data, feet) {
     this.scene = scene;
-    this.d = data.leyla;
+    this.base = data.leyla;
     this.m = data.leyla.movement || {};
     const k = (data.assets?.[data.leyla.look?.idle]?.height || BASE.height) / BASE.height;
     this.size = Object.fromEntries(Object.entries(BASE).map(([n, v]) => [n, Math.round(v * k)]));
@@ -206,7 +221,7 @@ export class Leyla {
         const rise = L.y + z.hangReach - this.feet, top = { x: L.x + L.dir * (z.w / 2 + 4), feet: L.y };
         if (vaultOn && rise >= (m.vaultFrom ?? 110) * k && this.scene.rectFree(top.x - z.w / 2 + 2, top.feet - z.crouchH, z.w - 4, z.crouchH - 2)) return this.startVault(time, L, rise, top);
         if (L.y - hy <= reach && this.hangFits(L)) return this.startHang(L);
-        // Mama-Bot low over the ground (no room to hang below her): Leyla climbs straight up onto her
+        // AvA low over the ground (no room to hang below her): Leyla climbs straight up onto her
         if (L.drone && this.scene.rectFree(top.x - z.w / 2 + 2, top.feet - z.crouchH, z.w - 4, z.crouchH - 2)) return this.startVault(time, L, Math.max(0, rise), top);
       }
     }
@@ -363,7 +378,7 @@ export class Leyla {
     }
     if (input.up.pressed || input.jump.pressed) {
       this.jumpAt = -1e9;
-      // hanging at Mama-Bot's grip: up onto her top
+      // hanging at AvA's grip: up onto her top
       const z = this.size, dr = this.scene.drone, top = L.point && dr ? { x: dr.x, feet: dr.platformTop() } : { x: L.x + L.dir * (z.w / 2 + 4), feet: L.y };
       if (this.scene.rectFree(top.x - z.w / 2 + 2, top.feet - z.crouchH, z.w - 4, z.crouchH - 2)) return this.startMantle(time, top);
     }

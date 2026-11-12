@@ -139,7 +139,7 @@ check('Rechtsklick-Menü: Heilen heilt und verbraucht einen Verband', menu.inclu
 await page.mouse.click(hx, hy, { button: 'right' }); await page.waitForTimeout(40);
 await page.locator('.inv-tip .inv-menu button', { hasText: 'Drohne geben' }).click(); await page.waitForTimeout(40);
 s = await inv();
-check('Drohne geben: Verband liegt bei Mama-Bot', has(s.drone, 'verband') && !has(s.backpack, 'verband'), s);
+check('Drohne geben: Verband liegt bei AvA', has(s.drone, 'verband') && !has(s.backpack, 'verband'), s);
 [hx, hy] = await cell(0, 2, 0); await page.mouse.click(hx, hy, { button: 'right' }); await page.waitForTimeout(40);
 await page.locator('.inv-tip .inv-menu button', { hasText: 'Ausrüsten' }).click(); await page.waitForTimeout(40);
 s = await inv();

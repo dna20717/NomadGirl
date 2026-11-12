@@ -1,4 +1,4 @@
-"""Mama-Bot as layers (Daniel, 10.11.2026: "modulare Drohne").
+"""AvA as layers (Daniel, 10.11.2026: "modulare Drohne").
 
 From the PixelLab hull (assets/drone/hull_source.png, 128 x 128, AAP-64) this makes:
   hull.png   the hull without the hanging cables (they are code now and swing), screen emptied

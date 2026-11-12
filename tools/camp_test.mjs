@@ -94,7 +94,7 @@ await shot('day');
 
 s = await ev(() => { c.to('Van'); c.use(); nomad.choose('Planen'); c.pick('Plündern'); const sc = game.scene.getScene('play'); const hp = sc.leyla.maxHealth; sc.deltas = 50; sc.leyla.hurt(sc.time.now, 9999, 0); nomad.step(200); return { ...nomad.state(), hp }; });
 check('Abwehr-Buff lässt das Leben gleich', s.hp === 100, s.hp);
-check('k.o.: Mama-Bot bringt sie ins Camp, Beute weg (Δ bleiben beim Startgeld), 30 % Leben, Buffs verbraucht', s.mode === 'camp' && s.health === 30 && s.camp.deltas === (await ev(() => game.scene.getScene('play').data_.economy?.startDeltas ?? 0)) && !s.camp.buffs.length && /Mama-Bot/.test(s.banner), { mode: s.mode, health: s.health, camp: s.camp });
+check('k.o.: AvA bringt sie ins Camp, Beute weg (Δ bleiben beim Startgeld), 30 % Leben, Buffs verbraucht', s.mode === 'camp' && s.health === 30 && s.camp.deltas === (await ev(() => game.scene.getScene('play').data_.economy?.startDeltas ?? 0)) && !s.camp.buffs.length && /AvA/.test(s.banner), { mode: s.mode, health: s.health, camp: s.camp });
 
 const saved = await ev(() => JSON.parse(localStorage.getItem('nomadgirl-save')));
 check('Spielstand gespeichert (dieser Browser)', saved?.location === 'bunker_13' && saved.health === 30 && saved.run === null, saved);

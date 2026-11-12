@@ -1992,7 +1992,7 @@
   "file": "assets/drone/hull_source.png",
   "source": "KI (PixelLab, Create Image Pro, Palette AAP-64)",
   "date": "10.11.2026",
-  "description": "Mama-Bot neu: rostiger Torpedo mit Magenta-Flicken, Stacheln und Antigrav-Ring, leerer Bildschirm, 128 × 128, schaut nach rechts. Daniels Wahl aus Runde 3."
+  "description": "AvA neu: rostiger Torpedo mit Magenta-Flicken, Stacheln und Antigrav-Ring, leerer Bildschirm, 128 × 128, schaut nach rechts. Daniels Wahl aus Runde 3."
  },
  "drone_hull": {
   "name": "Drohne · Hülle",
@@ -2047,7 +2047,7 @@
   "source": "Code (tools/drone_parts.py: zugeschnitten, ×0,75, auf AAP-64 gerastet)",
   "derivedFrom": "drone_lamp_source",
   "date": "10.11.2026",
-  "description": "Anbauteil für Mama-Bot: Suchscheinwerfer. Ankerpunkt = Mitte der Halteplatte oben."
+  "description": "Anbauteil für AvA: Suchscheinwerfer. Ankerpunkt = Mitte der Halteplatte oben."
  },
  "drone_claw_source": {
   "name": "Drohne · Greifarm (Original)",
@@ -2066,7 +2066,7 @@
   "source": "Code (tools/drone_parts.py: zugeschnitten, ×0,75, auf AAP-64 gerastet)",
   "derivedFrom": "drone_claw_source",
   "date": "10.11.2026",
-  "description": "Anbauteil für Mama-Bot: Greifarm. Ankerpunkt = Mitte der Halteplatte oben."
+  "description": "Anbauteil für AvA: Greifarm. Ankerpunkt = Mitte der Halteplatte oben."
  },
  "tileset00_source": {
   "name": "TileSet00 · Quellen",
@@ -2784,5 +2784,125 @@
   "file": "assets/workshops/treasury_source.png",
   "source": "KI (PixelLab, Edit Pro Flash)",
   "date": "11.11.2026"
+ },
+ "leyla_rifle_draw_side": {
+  "name": "Leyla · Sturmgewehr ziehen",
+  "kind": "animation",
+  "file": "assets/leyla/rifle_draw_side.png",
+  "frameSize": [117, 244],
+  "frames": 7,
+  "fps": 10,
+  "loop": false,
+  "origin": [44.5, 242],
+  "height": 193.6,
+  "source": "KI (PixelLab) + Code (tools/rifle_strips.py)",
+  "date": "12.11.2026",
+  "derivedFrom": "leyla_idle_side",
+  "description": "Test: holt das Gewehr vom Rücken nach vorn in die Bereitschaft (Gewehr schräg vor dem Körper). Rückwärts = wegstecken. PixelLab Animate Image von Stehen zur Bereitschafts-Pose."
+ },
+ "leyla_rifle_aim_side": {
+  "name": "Leyla · Sturmgewehr anlegen",
+  "kind": "animation",
+  "file": "assets/leyla/rifle_aim_side.png",
+  "frameSize": [161, 244],
+  "frames": 5,
+  "fps": 14,
+  "loop": false,
+  "origin": [61.5, 242],
+  "height": 193.6,
+  "source": "KI (PixelLab) + Code (tools/rifle_strips.py)",
+  "date": "12.11.2026",
+  "derivedFrom": "leyla_aim_side",
+  "description": "Test: hebt das Gewehr aus der Bereitschaft an die Schulter, letzter Frame = Anschlag. Schlüsselpose mit Edit Pro Flash aus Zielen (Pistole), Übergang mit Animate Image."
+ },
+ "leyla_rifle_shoot_side": {
+  "name": "Leyla · Sturmgewehr schießen",
+  "kind": "animation",
+  "file": "assets/leyla/rifle_shoot_side.png",
+  "frameSize": [181, 244],
+  "frames": 4,
+  "fps": 14,
+  "loop": false,
+  "origin": [70.5, 242],
+  "height": 193.6,
+  "source": "KI (PixelLab) + Code (tools/rifle_strips.py)",
+  "date": "12.11.2026",
+  "derivedFrom": "leyla_rifle_aim_side",
+  "description": "Test: Schuss im Anschlag mit Mündungsfeuer, Rückstoß in die Schulter."
+ },
+ "leyla_rifle_reload_side": {
+  "name": "Leyla · Sturmgewehr nachladen",
+  "kind": "animation",
+  "file": "assets/leyla/rifle_reload_side.png",
+  "frameSize": [154, 244],
+  "frames": 11,
+  "fps": 12,
+  "loop": false,
+  "origin": [62.5, 242],
+  "height": 193.6,
+  "source": "KI (PixelLab) + Code (tools/rifle_strips.py)",
+  "date": "12.11.2026",
+  "derivedFrom": "leyla_rifle_aim_side",
+  "description": "Test: kippt das Gewehr, wechselt das Magazin, legt wieder an."
+ },
+ "leyla_rifle_aim_walk_side": {
+  "name": "Leyla · Gehen mit Sturmgewehr",
+  "kind": "animation",
+  "file": "assets/leyla/rifle_aim_walk_side.png",
+  "frameSize": [208, 244],
+  "frames": 8,
+  "fps": 10,
+  "loop": true,
+  "origin": [106, 242],
+  "height": 193.6,
+  "source": "KI (PixelLab) + Code (tools/rifle_strips.py)",
+  "date": "12.11.2026",
+  "derivedFrom": "leyla_walk_side",
+  "description": "Test: geht im Anschlag. PixelLab edit_animation auf Gehen seitlich (Beine und Kopf bleiben)."
+ },
+ "leyla_rifle_run_gun_side": {
+  "name": "Leyla · Rennen mit Sturmgewehr im Anschlag",
+  "kind": "animation",
+  "file": "assets/leyla/rifle_run_gun_side.png",
+  "frameSize": [208, 244],
+  "frames": 8,
+  "fps": 12,
+  "loop": true,
+  "origin": [106, 242],
+  "height": 193.6,
+  "source": "KI (PixelLab) + Code (tools/rifle_strips.py)",
+  "date": "12.11.2026",
+  "derivedFrom": "leyla_run_side",
+  "description": "Test: rennt im Anschlag (Cells-like). edit_animation auf Rennen seitlich, gleicher Schritt."
+ },
+ "leyla_rifle_run_ready_side": {
+  "name": "Leyla · Rennen mit Sturmgewehr bereit",
+  "kind": "animation",
+  "file": "assets/leyla/rifle_run_ready_side.png",
+  "frameSize": [173, 244],
+  "frames": 8,
+  "fps": 12,
+  "loop": true,
+  "origin": [75, 242],
+  "height": 193.6,
+  "source": "KI (PixelLab) + Code (tools/rifle_strips.py)",
+  "date": "12.11.2026",
+  "derivedFrom": "leyla_run_side",
+  "description": "Test: rennt mit dem Gewehr schräg vor der Brust (Kampfmodus ohne Schuss, vorerst auch Ziehen und Nachladen im Rennen)."
+ },
+ "leyla_hang_one_arm_side": {
+  "name": "Leyla · Einarmig baumeln",
+  "kind": "animation",
+  "file": "assets/leyla/hang_one_arm_side.png",
+  "frameSize": [73, 256],
+  "frames": 8,
+  "fps": 8,
+  "loop": true,
+  "origin": [40, 254],
+  "height": 202.8,
+  "source": "KI (PixelLab) + Code (tools/rifle_strips.py)",
+  "date": "12.11.2026",
+  "derivedFrom": "leyla_hang_side",
+  "description": "Hängt an einem Arm (z. B. an AvA) und pendelt sacht, der freie Arm und die Beine schwingen nach. Pose mit Edit Pro Flash aus Hängen seitlich, Pendeln mit Animate Image (erster = letzter Frame)."
  }
 }

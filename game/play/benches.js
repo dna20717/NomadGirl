@@ -403,7 +403,7 @@ export class Benches {
       }
     }
   }
-  // where Mama-Bot sits down on a bench
+  // where AvA sits down on a bench
   dockOf(place) { const b = this.list.find(x => x.place === place); return b && { x: b.cx, y: b.top + (b.floor - b.top) * 0.42 }; }
   state() { return this.list.map(b => ({ id: b.id, place: b.place, fill: b.full ? Math.round(b.fill * 100) : null, shelves: b.shelves ?? null, fx: b.fx.length, use: b.use, x: Math.round(b.cx), scale: +b.k.toFixed(3) })); }
 }

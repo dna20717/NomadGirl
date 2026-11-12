@@ -1,6 +1,6 @@
 // Headless check of light & atmosphere (game/play/atmosphere.js) in the POI level Tankstelle Kilometer 7 (seed 7):
 // moods per room (outside bright, shop with neon, store room dark, hall rusty, tunnel blue), lamps at the ceilings and * in the layout,
-// glowing clutter, Mama-Bot's searchlight lights the way (only with the part on her), dust and fog, everything off and on, camp without.
+// glowing clutter, AvA's searchlight lights the way (only with the part on her), dust and fog, everything off and on, camp without.
 // Server must run (npm run serve).   node tools/light_test.mjs [--shots]   pictures to output/light_*.png (on and off)
 import fs from 'node:fs';
 import { chromium } from 'playwright';
@@ -55,7 +55,7 @@ const pix = await ev(() => { const a = game.scene.getScene('play').atmo, d = a.c
 check('Lichtkarte: im Lager dunkle Ecken und helle Lampen', pix[0] < 110 && pix[1] > 150, pix);
 await shot('lager');
 
-// tunnel: Mama-Bot's searchlight makes the way ahead brighter, only while the part sits on her
+// tunnel: AvA's searchlight makes the way ahead brighter, only while the part sits on her
 s = await go(80, 37, 1);
 check('Tunnel: blau und dunkel, Nebel am Boden', s.mood === 'tunnel_blau' && s.fog > 0, s);
 const spot = await ev(() => {

@@ -489,7 +489,7 @@ export class Workshop {
   showHelp() {
     const t = (h, ...p) => [el('h4', {}, h), ...p.map(x => el('p', { class: 'ed-small' }, x))];
     openDialogue({ title: 'Werkstatt – Was ist was?', icon: 'help', wide: true, content: [
-      ...t('Grundlagen', 'Spiel (Maßstab, Physik, Start-Rig), Wirtschaft (Deltas, Tod und Mama-Bot, Foodtruck) und Ranking (Punkte und Ränge F bis S).'),
+      ...t('Grundlagen', 'Spiel (Maßstab, Physik, Start-Rig), Wirtschaft (Deltas, Tod und AvA, Foodtruck) und Ranking (Punkte und Ränge F bis S).'),
       ...t('Leyla & Kampf', 'Alle Bewegungswerte von Leyla, Rucksäcke als Raster, Waffen (Nahkampf, Fernkampf, Cyberdeck), Gegner und Buffs.'),
       ...t('Beute & Crafting', 'Gegenstände mit Größe im Rucksack, Beutetabellen mit Gewichten und Rezepte (Zutaten → Ergebnis, Werkstatt, wie man es lernt).'),
       ...t('Rig', 'Zugmaschinen ziehen Container, Container fassen Werkstätten, Werkstätten brauchen oder liefern Energie. Rig-Teile kommen in die Slots der Zugmaschine, Companions betreiben Werkstätten.'),

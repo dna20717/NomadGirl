@@ -241,6 +241,15 @@ v = await page.evaluate(() => { const n = nomad, s = game.scene.getScene('play')
   while (s.weapon('ranged')?.skin && g++ < 12) { n.step(1, [], ['swap']); n.step(2); }
   n.step(30); n.step(1, [], ['ranged']); n.step(8); return { key, mag, w: s.weapon('ranged')?.name, back: l.sprite.texture.key }; });
 check('Waffe wechseln (V): Revolver aus Code über der gemalten Pistole, 6 Schuss; zurück = gemalt', /@revolver$/.test(v.key) && v.mag === 5 && !/@/.test(v.back), v);
+// assault rifle test (Daniel, 12.11.2026): a weapon brings its own poses for Leyla (Waffen › Posen)
+v = await page.evaluate(() => { const n = nomad, s = game.scene.getScene('play'), l = s.leyla; n.calm?.(); let g = 0;
+  while (s.weapon('ranged')?.name !== 'Sturmgewehr' && g++ < 8) { n.step(1, [], ['swap']); n.step(2); }
+  n.tp(l.start[0] + 200, l.start[1]); l.facing = 1; n.step(40);
+  const seen = new Set(), watch = (k, hold = [], tap = []) => { for (let i = 0; i < k; i++) { n.step(1, hold, i ? [] : tap); seen.add(l.sprite.texture.key); } };
+  watch(40, [], ['ranged']); const mag = l.mag;
+  watch(30, ['walk', 'right'], ['ranged']); watch(20, ['right'], ['ranged']);
+  return { seen: [...seen], mag }; });
+check('Sturmgewehr bringt eigene Posen mit (Ziehen, Schießen, Gehen, Rennen im Anschlag)', ['rifle_draw', 'rifle_shoot', 'rifle_aim_walk', 'rifle_run_gun'].every(k => v.seen.some(s => s.includes(k))) && v.seen.every(s => !/^leyla_(aim|shoot|draw)_side/.test(s)) && v.mag < 30, v);
 await browser.close();
 console.log(ok.map(n => '✓ ' + n).join('\n'));
 if (errors.length) { console.error('Fehler:\n' + errors.join('\n')); process.exit(1); }

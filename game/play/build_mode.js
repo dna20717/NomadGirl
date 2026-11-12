@@ -89,7 +89,7 @@ export class BuildMode {
     l.startSit(S, x, -side, null);
     return true;
   }
-  // where Mama-Bot flies while building: above the part in the claw, above the cursor / pointer, or to a job
+  // where AvA flies while building: above the part in the claw, above the cursor / pointer, or to a job
   droneTarget() {
     const d = this.drag, j = this.job, z = Math.max(0.3, this.scene.cam.zoom), V = this.B.view || {}, up = (V.droneAbove ?? 60) / Math.min(1, z * 1.6);
     if (d) return { x: d.x, y: d.y - up, smooth: (V.droneFollow ?? 30) / 100 };
@@ -658,7 +658,7 @@ export class BuildMode {
     this.working = false;
     if (!this.job && this.jobs.length) { this.job = this.jobs.shift(); this.job.state = 'walk'; }
     const j = this.job;
-    if (j && this.atFire) {   // Mama-Bot does the work: flies there, then sparks and ratchet
+    if (j && this.atFire) {   // AvA does the work: flies there, then sparks and ratchet
       const dr = s.drone, near = !dr || Math.hypot(dr.x - j.fx, dr.y - (j.fy - 150)) < 40;
       if (j.state === 'walk' && near) { j.state = 'work'; j.at = now; }
     } else if (j) {

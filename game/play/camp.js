@@ -846,7 +846,7 @@ export class Camp {
       items: [{ label: 'Zurück', act: () => {} }] });
   }
   // a workshop to spend time at (Werkstätten › Benutzen): Chill Area, Drohnenwerkstatt … time passes, heals, gives its buff;
-  // Mama-Bot can fly over and dock on the bench while it happens
+  // AvA can fly over and dock on the bench while it happens
   restMenu(id, def, place, who) {
     const s = this.scene, save = this.box.save, R = def.rest, buff = def.buff && this.D.buffs?.[def.buff]?.name;
     const facts = [R.hours ? `${de(R.hours)} h` : null, R.heal ? `heilt ${R.heal} %` : null, buff ? `danach ${buff}` : null].filter(Boolean).join(' · ');

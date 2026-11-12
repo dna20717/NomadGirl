@@ -12,7 +12,7 @@
   "companions": ["schraube", "onkel_sung"],
   "fuel": 40,
   "food": 6,
-  "later": [{"where": "backpack", "weapon": "trommelrevolver", "count": 1}],
+  "later": [{"where": "backpack", "weapon": "trommelrevolver", "count": 1},{"where": "backpack", "weapon": "sturmgewehr", "count": 1}],
   "inventory": [
    {"where": "backpack", "item": "verband", "count": 2},
    {"where": "backpack", "item": "kupferkabel", "count": 3},

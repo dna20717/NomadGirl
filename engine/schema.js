@@ -49,7 +49,7 @@ export const ENEMY_BEHAVIORS = [['patrol', 'Patrouille'], ['charger', 'Stürmer'
 // tags on things (Daniel, 11.11.2026: „mach ein Tag trophy“): trophy = may hang on a trophy stand in the treasury
 export const ITEM_TAGS = [['trophy', 'Trophäe']];
 export const ITEM_CATEGORIES = [['junk', 'Schrott'], ['resource', 'Ressource'], ['ingredient', 'Zutat'], ['food', 'Gericht'], ['component', 'Bauteil'], ['consumable', 'Verbrauchsgut'], ['valuable', 'Wertsache'], ['blueprint', 'Bauplan/Rezept'], ['armor', 'Rüstung'], ['implant', 'Implantat'], ['dronepart', 'Drohnenteil']];
-// where a thing is worn (Daniel, 10.11.2026: Inventar im Diablo-Stil): Leyla's head + armor, implants in her body, parts on Mama-Bot
+// where a thing is worn (Daniel, 10.11.2026: Inventar im Diablo-Stil): Leyla's head + armor, implants in her body, parts on AvA
 export const WEAR_SLOTS = [['head', 'Kopf'], ['armor', 'Rüstung'], ['eyes', 'Implantat: Augen'], ['nerves', 'Implantat: Nerven'], ['arm', 'Implantat: Cyberarm'], ['heart', 'Implantat: Herz'], ['legs', 'Implantat: Beine'], ['skin', 'Implantat: Haut'],
   ['bow', 'Drohne: Bug'], ['tail', 'Drohne: Heck'], ['core', 'Drohne: Kern'], ['module', 'Drohne: Modul']];
 export const IMPLANT_SLOTS = ['eyes', 'nerves', 'arm', 'heart', 'legs', 'skin'];
@@ -69,7 +69,7 @@ export const ASSET_KINDS = [['animation', 'Animation'], ['tiles', 'Kacheln'], ['
 export const DAYTIME = [['any', 'Immer'], ['day', 'Tag'], ['night', 'Nacht']];
 export const DRONE_MOODS = [['idle', 'Normal'], ['kill', 'Gegner erledigt'], ['cleared', 'Raum geräumt'], ['bored', 'Langeweile'], ['alert', 'Gegner in der Nähe'],
   ['curious', 'Neugierig (zufällig)'], ['hit', 'Leyla getroffen'], ['sleep', 'Schlafen'], ['down', 'Leyla k.o.'], ['scan', 'Scannen (zufällig)'], ['lowHealth', 'Wenig Leben'], ['dash', 'Dash'], ['zen', 'Zen (Leyla macht Yoga)'],
-  ['gearBetter', 'Inventar: bessere Ausrüstung'], ['gearWorse', 'Inventar: schlechtere Ausrüstung'], ['gearOff', 'Inventar: Slot geleert'], ['dronePart', 'Inventar: Teil an Mama-Bot'],
+  ['gearBetter', 'Inventar: bessere Ausrüstung'], ['gearWorse', 'Inventar: schlechtere Ausrüstung'], ['gearOff', 'Inventar: Slot geleert'], ['dronePart', 'Inventar: Teil an AvA'],
   ['rescue', 'Inventar: ins Rettungsfach'], ['rescueFood', 'Inventar: Essen ins Rettungsfach'], ['valuable', 'Inventar: Wertsache eingepackt'], ['bagFull', 'Inventar: Rucksack fast voll'], ['invIdle', 'Inventar: lange offen']];
 export const RANKING_CATEGORIES = [['time', 'Durchlaufzeit'], ['kills', 'Kills in %'], ['secrets', 'Secrets']];
 
@@ -216,7 +216,7 @@ export const AREAS = {
       { title: 'Kurve', fields: [bool('curve.enabled', 'Kurve mit Stick und Pfeiltasten', { hint: 'Daniel, 11.11.2026: Stick waagrecht lässt Leyla eine Kurve laufen. Sie bleibt, die Straße biegt sich sanft, ohne Eingabe wird sie wieder gerade' }),
         num('curve.pan', 'Stärkste Kurve', { unit: '% Breite', min: 0, max: 20, step: 0.5, hint: 'So weit wandert der Horizont zur Seite; das Bild wird dafür etwas größer' }),
         num('curve.in', 'Einlenken', { unit: '/s', min: 0.1, step: 0.1, hint: 'Wie schnell die Kurve kommt' }), num('curve.out', 'Begradigen', { unit: '/s', min: 0.1, step: 0.1, hint: 'Wie schnell sie ohne Eingabe wieder gerade wird' })] },
-      { title: 'Drohne', fields: [bool('drone.show', 'Zeigen', { hint: 'Mama-Bot schwebt neben Leyla und zeigt zufällige Stimmungen (Gesicht + Kaomoji aus dem Bereich Drohne)' }),
+      { title: 'Drohne', fields: [bool('drone.show', 'Zeigen', { hint: 'AvA schwebt neben Leyla und zeigt zufällige Stimmungen (Gesicht + Kaomoji aus dem Bereich Drohne)' }),
         point('drone.at', 'Position', { unit: '%', hint: 'Mitte der Drohne in % des Bildschirms (breit); schmal rückt sie mit Leyla zur Mitte' }), num('drone.height', 'Größe', { unit: '% der Höhe', min: 2, max: 50 }),
         range('drone.every', 'Neue Stimmung alle', { unit: 's' }), num('drone.bob', 'Schweben', { unit: '% der Höhe', min: 0, step: 0.1 }),
         text('drone.moods', 'Stimmungen', { hint: 'Anlässe aus der Tabelle der Drohne, mit Komma getrennt' })] },
@@ -239,7 +239,7 @@ export const AREAS = {
     sections: [
       { title: 'Währung', fields: [text('currency.name', 'Name'), text('currency.symbol', 'Symbol'), num('startDeltas', 'Startgeld', { unit: 'Δ', min: 0 }), area_('currency.description', 'Hintergrund')] },
       { title: 'Tod', fields: [text('rescue.drone', 'Rettungsdrohne'), bool('rescue.losesRunLoot', 'Run-Beute geht verloren'), bool('rescue.losesEquipped', 'Ausgerüstetes geht verloren'),
-        num('rescue.keepPercent', 'Mama-Bot rettet', { unit: '%', min: 0, max: 100, hint: 'Anteil der Run-Beute, den Mama-Bot mitbringt (später über Drohnen-Upgrades)' }), area_('rescue.description', 'Ablauf')] },
+        num('rescue.keepPercent', 'AvA rettet', { unit: '%', min: 0, max: 100, hint: 'Anteil der Run-Beute, den AvA mitbringt (später über Drohnen-Upgrades)' }), area_('rescue.description', 'Ablauf')] },
       { title: 'Foodtruck', fields: [num('foodtruck.priceFactor', 'Preisfaktor', { step: 0.05, min: 0, hint: 'Verkaufspreis = Wert × Faktor' }), num('foodtruck.maxPerStop', 'Max. Verkäufe pro Halt', { min: 0 })] },
     ],
   },
@@ -305,8 +305,8 @@ export const AREAS = {
         num('cable.swing', 'Mitschwingen', { unit: '%', min: 0, hint: 'Wie stark der Flug die Kabel mitreißt' }), color('cable.outline', 'Umriss')] },
       { title: 'Anbauteile', fields: [table('parts', 'Anbauteile', [text('name', 'Name'), ref('look', 'Aussehen', 'assets'), point('at', 'Sitzt bei', { unit: 'px', hint: 'Ankerpunkt des Teils sitzt hier (Bildpixel der Hülle)' }),
         select('layer', 'Ebene', [['front', 'Vor der Hülle'], ['behind', 'Hinter der Hülle']]), bool('on', 'Angebaut'), ref('item', 'Gegenstand', 'items')],
-        { hint: 'Mit Gegenstand: sichtbar, solange dieser Gegenstand im Inventar an Mama-Bot steckt („Angebaut“ zählt dann nicht). Ohne: „Angebaut“ entscheidet' })] },
-      { title: 'Plattform', fields: [bool('platform.enabled', 'Leyla kann auf Mama-Bot stehen', { hint: 'Daniel, 12.11.2026: „Leyla kann dran hochklettern und auf ihr stehen, bis der Akku alle ist“. Nur solange sie mit dem rechten Stick rausgezogen ist oder danach parkt' }),
+        { hint: 'Mit Gegenstand: sichtbar, solange dieser Gegenstand im Inventar an AvA steckt („Angebaut“ zählt dann nicht). Ohne: „Angebaut“ entscheidet' })] },
+      { title: 'Plattform', fields: [bool('platform.enabled', 'Leyla kann auf AvA stehen', { hint: 'Daniel, 12.11.2026: „Leyla kann dran hochklettern und auf ihr stehen, bis der Akku alle ist“. Nur solange sie mit dem rechten Stick rausgezogen ist oder danach parkt' }),
         num('platform.park', 'Parkt nach dem Loslassen', { unit: 'ms', min: 0, hint: 'So lange bleibt sie stehen, bevor sie zurückfliegt; 0 = sofort zurück' }), num('platform.battery', 'Akku', { unit: 's', min: 0.5, step: 0.5, hint: 'So lange trägt sie Leyla' }),
         num('platform.recharge', 'Aufladen', { unit: 's', min: 0.5, step: 0.5, hint: 'Von leer bis voll, solange sie niemanden trägt' }), num('platform.cooldown', 'Erholt sich ab', { unit: 'ms', min: 0, hint: 'Nach leerem Akku so lange keine Plattform' }),
         num('platform.width', 'Breite', { unit: 'px', min: 40 }), num('platform.inset', 'Oberkante unter dem Scheitel', { unit: 'px', hint: 'Wie tief die Standfläche unter ihrer Oberkante liegt' }), num('platform.sag', 'Sinkt beim Tragen', { unit: 'px/s', min: 0, hint: 'Je leerer der Akku, desto mehr' }),
@@ -316,15 +316,15 @@ export const AREAS = {
         num('platform.snap', 'Aufsteigen: Fangbereich', { unit: 'px', min: 0, hint: 'Leyla in der Luft mit den Füßen bis so weit unter der Standfläche (obere Hälfte): sie steht sofort drauf' }),
         text('platform.hangPart', 'Hängen am Anbauteil', { hint: 'Name aus der Tabelle Anbauteile (leer = Greifarm): dort hält Leyla sich fest' }), point('platform.hangAt', 'Griff ohne Teil', { unit: 'px', hint: 'Bildpixel der Hülle, wenn das Teil fehlt' }),
         num('platform.grab', 'Hängen: Fangbereich', { unit: 'px', min: 0, hint: 'So nah müssen Leylas Hände am Griff sein (in der Luft greift sie von selbst)' })] },
-      { title: 'Gummiband', fields: [bool('leash.enabled', 'Rechter Stick zieht Mama-Bot', { hint: 'Daniel, 12.11.2026: „sanft, wie an einem Gummiband; je weiter weg, desto höher der Widerstand; loslassen = zurück“' }),
+      { title: 'Gummiband', fields: [bool('leash.enabled', 'Rechter Stick zieht AvA', { hint: 'Daniel, 12.11.2026: „sanft, wie an einem Gummiband; je weiter weg, desto höher der Widerstand; loslassen = zurück“' }),
         num('leash.reach', 'Reichweite', { unit: 'px', min: 0, hint: 'So weit kommt sie bei voll gedrücktem Stick von ihrer Position weg' }), num('leash.stiffness', 'Widerstand', { min: 0.1, step: 0.1, hint: 'Größer = am Anfang leicht, nach außen immer zäher' }),
         num('leash.smooth', 'Nachziehen', { min: 0.01, max: 1, step: 0.01, hint: 'Wie schnell sie dem Stick folgt (außen langsamer)' }), bool('leash.aimLight', 'Scheinwerfer folgt dem Stick', { hint: 'Der Lichtkegel zeigt in Stick-Richtung, solange gezogen wird' }),
         num('leash.aimHold', 'Licht bleibt nach Loslassen', { unit: 'ms', min: 0 })] },
-      { title: 'Scheinwerfer', fields: [text('spot.part', 'Anbauteil', { hint: 'Name aus der Tabelle Anbauteile: solange dieses Teil an Mama-Bot steckt, leuchtet sie Leyla den Weg (Daniel, 11.11.2026: „mit Spielwert“). Leer = Suchscheinwerfer' }),
+      { title: 'Scheinwerfer', fields: [text('spot.part', 'Anbauteil', { hint: 'Name aus der Tabelle Anbauteile: solange dieses Teil an AvA steckt, leuchtet sie Leyla den Weg (Daniel, 11.11.2026: „mit Spielwert“). Leer = Suchscheinwerfer' }),
         point('spot.at', 'Linse', { unit: 'px', hint: 'Wo das Licht austritt, in Bildpixeln der Hülle' }), num('spot.range', 'Reichweite', { unit: 'px', min: 0 }), num('spot.angle', 'Öffnung', { unit: '°', min: 2, max: 170 }),
         num('spot.tilt', 'Nach unten', { unit: '°', hint: 'Neigung des Kegels unter die Waagrechte, in Blickrichtung' }), num('spot.strength', 'Stärke', { unit: '%', min: 0, max: 200 }), color('spot.color', 'Farbe'),
         num('spot.glow', 'Schein an der Linse', { unit: '%', min: 0, max: 200 })] },
-      { title: 'Rettungsfach', fields: [text('rescue.name', 'Name'), size('rescue.size', 'Größe', { unit: 'Felder', hint: 'Daniel, 10.11.2026: was hier liegt, übersteht ein k.o., Mama-Bot bringt es heim' })] },
+      { title: 'Rettungsfach', fields: [text('rescue.name', 'Name'), size('rescue.size', 'Größe', { unit: 'Felder', hint: 'Daniel, 10.11.2026: was hier liegt, übersteht ein k.o., AvA bringt es heim' })] },
       { title: 'Stimmungen', fields: [table('moods', 'Stimmungen', [select('mood', 'Anlass', DRONE_MOODS), num('frame', 'Gesicht', { min: 0 }), text('kaomoji', 'Kaomoji'), num('duration', 'Dauer ms', { min: 0 })],
         { hint: 'Gesicht = Frame der Gesichter (ab 0). Ohne Kaomoji nur das Gesicht. Dauer 0 = solange der Anlass gilt' })] },
       { title: 'Verhalten', fields: [num('idle.boredAfter', 'Langeweile nach', { unit: 's', min: 0, hint: 'Leyla steht still' }), num('idle.sleepAfter', 'Einschlafen nach', { unit: 's', min: 0 }), num('idle.zenAfter', 'Zen nach', { unit: 's', min: 0, hint: 'So lange hält Leyla die Yoga-Pose, dann macht die Drohne mit' }),
@@ -382,7 +382,7 @@ export const AREAS = {
         ref('look.climb', 'Klettern', 'assets'), ref('look.land', 'Harte Landung', 'assets', { hint: 'Nur nach weiten Sprüngen oder tiefen Stürzen (Leyla › Harte Landung)' }), ref('look.brake', 'Bremsen', 'assets', { hint: 'Nach einem Sprint, wenn die Richtung losgelassen wird (Leyla › Bremsen)' }), ref('look.crouch', 'Ducken', 'assets', { hint: 'Läuft einmal in die Hocke und hält den letzten Frame; rückwärts = Aufstehen nach dem Hochziehen' }),
         ref('look.hang', 'Hängen', 'assets', { hint: 'An einer Kante, Schleife' }), ref('look.mantle', 'Hochziehen', 'assets', { hint: 'An der Kante hoch, ab „Hochziehen ab Frame“' }), ref('look.hurt', 'Treffer', 'assets'), ref('look.reference', 'Referenz', 'assets', { hint: 'Character Sheet, Konzept' })] },
       { title: 'Start-Ausrüstung', fields: [ref('loadout.melee', 'Nahkampf', 'weapons'), ref('loadout.ranged', 'Fernkampf', 'weapons'), ref('loadout.cyberdeck', 'Cyberdeck', 'weapons'), ref('loadout.backpack', 'Rucksack', 'backpacks'),
-        refs('loadout.wear', 'Angelegt', 'items', { hint: 'Kopf, Rüstung, Implantate und Drohnenteile, die Leyla und Mama-Bot am Anfang tragen (je Platz eins)' })] },
+        refs('loadout.wear', 'Angelegt', 'items', { hint: 'Kopf, Rüstung, Implantate und Drohnenteile, die Leyla und AvA am Anfang tragen (je Platz eins)' })] },
       { title: 'Waffe ziehen', fields: [bool('armed.enabled', 'Automatisch ziehen', { hint: 'Daniel: zieht die Pistole im Kampfmodus, sobald sie nicht rennt (Cells-like: auch im Rennen); Springen, Dash steckt sie weg' }),
         ref('look.draw', 'Ziehen', 'assets'), ref('look.aim', 'Zielen', 'assets'), ref('look.aimWalk', 'Gehen mit Waffe', 'assets'), ref('look.shoot', 'Schießen', 'assets'), ref('look.shootWalk', 'Schießen im Gehen', 'assets'),
         ref('look.runGun', 'Rennen mit Waffe', 'assets', { hint: 'Schießstil Cells-like: sie rennt mit gestreckten Armen weiter, Schüsse blitzen nur und der Schlitten zuckt' }),
@@ -476,6 +476,12 @@ export const AREAS = {
         num('knockback', 'Rückstoß', { unit: 'px/s', min: 0 }), num('critChance', 'Krit-Chance', { unit: '%', min: 0, max: 100 }), num('ammo', 'Munition', { min: 0, hint: 'Leer = unendlich' }),
         num('projectileSpeed', 'Geschosstempo', { unit: 'px/s', min: 0, hint: 'Nur Fernkampf: so schnell fliegt das Geschoss' }), ref('sound', 'Schuss-Ton', 'assets', { hint: 'Asset der Art Ton' }),
         num('magazine', 'Magazin', { unit: 'Schuss', min: 1, hint: 'Nur Fernkampf: so viele Schuss, dann nachladen (R, leer = automatisch). Munition = Vorrat insgesamt' }), num('reloadTime', 'Nachladen dauert', { unit: 'ms', min: 0 })] },
+      { title: 'Posen (Leyla)', fields: [ref('poses.draw', 'Ziehen', 'assets', { hint: 'Daniel, 12.11.2026: eine Waffe kann eigene Posen für Leyla mitbringen (Sturmgewehr). Leer = Leylas eigene (Leyla › Waffe ziehen). Rückwärts = wegstecken' }),
+        ref('poses.aim', 'Zielen', 'assets'), ref('poses.shoot', 'Schießen', 'assets'), ref('poses.aimWalk', 'Gehen mit Waffe', 'assets'), ref('poses.shootWalk', 'Schießen im Gehen', 'assets'),
+        ref('poses.reload', 'Nachladen', 'assets'), ref('poses.reloadWalk', 'Nachladen im Gehen', 'assets'),
+        ref('poses.runGun', 'Rennen mit Waffe', 'assets'), ref('poses.runReady', 'Rennen, Waffe bereit', 'assets'), ref('poses.runDraw', 'Rennen, Ziehen', 'assets'),
+        ref('poses.runReload', 'Rennen + Nachladen 1', 'assets'), ref('poses.runReload2', 'Rennen + Nachladen 2', 'assets'),
+        point('poses.muzzle', 'Mündung', { unit: 'px', hint: 'Wie Leyla › Waffe ziehen › Mündung, für diese Waffe' }), point('poses.muzzleRun', 'Mündung im Rennen', { unit: 'px' })] },
       { title: 'Rucksack & Handel', fields: [size('size', 'Größe', { unit: 'Felder' }), VALUE] },
     ],
     check: iconCheck,
@@ -538,11 +544,11 @@ export const AREAS = {
         lines('shape', 'Form', { hint: 'Tetris-Form: eine Zeile pro Reihe, # = belegt, . = frei (z. B. „#.“ / „##“ für ein L). Leer = Rechteck aus „Größe“. Im Spiel mit Rechtsklick drehbar' }),
         num('stack', 'Stapel', { min: 1 }), text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar, solange es kein Aussehen gibt: 1–3 Zeichen oder ein Emoji' }), VALUE] },
       { title: 'Wirkung', fields: [ref('buff', 'Buff beim Essen/Benutzen', 'buffs'), ref('teaches', 'Bringt Rezept bei', 'recipes', { hint: 'Für Baupläne und Kochbücher' })] },
-      { title: 'Ausrüstung', fields: [select('wear', 'Trägt man als', [['', '—'], ...WEAR_SLOTS], { hint: 'Kopf und Rüstung an Leyla, Implantate in ihrem Körper (nur im Camp einbauen), Teile an Mama-Bot' }),
+      { title: 'Ausrüstung', fields: [select('wear', 'Trägt man als', [['', '—'], ...WEAR_SLOTS], { hint: 'Kopf und Rüstung an Leyla, Implantate in ihrem Körper (nur im Camp einbauen), Teile an AvA' }),
         num('stats.defense', 'Abwehr', { unit: '%', hint: 'Weniger Schaden, zählt mit Buffs zusammen (höchstens 90 %)' }), num('stats.health', 'Leben', { unit: 'LP' }), num('stats.damage', 'Schaden', { unit: '%' }), num('stats.speed', 'Tempo', { unit: '%' }),
         num('strain', 'Belastung', { min: 0, hint: 'Nur Implantate: zusammen höchstens Leyla › Inventar › Belastung höchstens' }),
-        ref('partLook', 'An der Drohne', 'assets', { hint: 'Nur Drohnenteile: Bild an Mama-Bot (Drohne › Anbauteile, Spalte Gegenstand)' }),
-        num('battery', 'Mama-Bot: mehr Akku', { unit: '%', hint: 'Nur Drohnenteile (Daniel, 12.11.2026: „bessere Teile machen die Drohne stärker“): so viel länger trägt sie Leyla, zählt über alle Teile zusammen' })] },
+        ref('partLook', 'An der Drohne', 'assets', { hint: 'Nur Drohnenteile: Bild an AvA (Drohne › Anbauteile, Spalte Gegenstand)' }),
+        num('battery', 'AvA: mehr Akku', { unit: '%', hint: 'Nur Drohnenteile (Daniel, 12.11.2026: „bessere Teile machen die Drohne stärker“): so viel länger trägt sie Leyla, zählt über alle Teile zusammen' })] },
     ],
     check: (x, report, p) => {
       iconCheck(x, report, p);
@@ -653,7 +659,7 @@ export const AREAS = {
       { title: 'Licht & Effekte', fields: [table('fx', 'Effekte', [select('kind', 'Art', BENCH_FX), num('x', 'x'), num('y', 'y'), num('w', 'Breite'), num('h', 'Höhe'), color('color', 'Farbe'), num('size', 'Größe'), num('rate', 'Tempo'), select('when', 'Wann', BENCH_FX_WHEN), num('idle', 'Sonst %', { min: 0, max: 100 })],
         { hint: 'Alles in Bildpixeln des Aussehens (x/y = linke obere Ecke, Breite/Höhe = Bereich). Licht: Größe = Radius, Tempo = Flackern %. Bildschirm: Tempo = Zeilen pro Sekunde. Dampf/Rauch/Blasen: Tempo = pro Sekunde. Funken: Tempo = Schauer pro Minute. LED: Tempo = Blinken pro Sekunde. Lichter funkeln: findet die hellen Punkte im Bereich selbst. Fische: Tempo = Anzahl. Druckkopf: fährt im Bereich hin und her. Glanz: läuft alle „Tempo“ Sekunden über den Bereich. Wann: Immer, abends, wenn Leyla nah ist oder bei Benutzung; „Sonst %“ = Stärke, solange es nicht zutrifft' })] },
       { title: 'Benutzen', fields: [text('rest.verb', 'Knopf', { hint: 'Für Chill Area, Drohnenwerkstatt & Co.: Was Leyla hier macht (z. B. „Fernsehen und abhängen“). Leer = nur Infos' }), num('rest.hours', 'Dauer', { unit: 'h', min: 0 }),
-        num('rest.heal', 'Heilt', { unit: '%', min: 0, max: 100 }), text('rest.banner', 'Meldung danach'), bool('rest.drone', 'Mama-Bot dockt an', { hint: 'Die Drohne fliegt zur Werkstatt und setzt sich drauf, solange Leyla hier ist' })] },
+        num('rest.heal', 'Heilt', { unit: '%', min: 0, max: 100 }), text('rest.banner', 'Meldung danach'), bool('rest.drone', 'AvA dockt an', { hint: 'Die Drohne fliegt zur Werkstatt und setzt sich drauf, solange Leyla hier ist' })] },
     ],
   },
   rigParts: {
@@ -737,7 +743,7 @@ export const AREAS = {
         num('clock.fireHours', 'Am Feuer sitzen', { unit: 'h', min: 0, step: 0.25 })] },
       { title: 'Tag & Nacht', fields: [table('daytime', 'Tageszeiten', [num('from', 'Ab Uhr'), ref('weather', 'Wetter', 'weather'), num('shade', 'Abdunkeln %', { min: 0, max: 90 }), num('light', 'Licht %', { min: 0, max: 100 }), text('name', 'Name')],
         { hint: 'Ab dieser Uhrzeit gilt die Zeile (bis zur nächsten). Abdunkeln legt die Nacht über die Welt; Licht = wie stark Lagerfeuer und Fenster scheinen (tagsüber 0)' })] },
-      { title: 'Heilen', fields: [num('heal.sleep', 'Schlafen', { unit: '%', min: 0, max: 100 }), num('heal.fire', 'Am Feuer', { unit: '%', min: 0, max: 100 }), num('heal.afterKo', 'Nach k.o.', { unit: '%', min: 1, max: 100, hint: 'Mit so viel Leben bringt Mama-Bot Leyla zurück' })] },
+      { title: 'Heilen', fields: [num('heal.sleep', 'Schlafen', { unit: '%', min: 0, max: 100 }), num('heal.fire', 'Am Feuer', { unit: '%', min: 0, max: 100 }), num('heal.afterKo', 'Nach k.o.', { unit: '%', min: 1, max: 100, hint: 'Mit so viel Leben bringt AvA Leyla zurück' })] },
       { title: 'Bedienen', fields: [num('interactRange', 'E-Reichweite', { unit: 'px', min: 20 }), ref('fallbackRoom', 'Ersatzraum', 'rooms', { hint: 'Für POIs, deren Raum-Bausteine noch kein Layout haben' })] },
     ],
     check: (x, report, p) => {
@@ -764,9 +770,9 @@ export const AREAS = {
         num('view.snap', 'Ankuppeln ab', { unit: 'px', min: 40, hint: 'So nah muss ein Anhänger an eine Kupplung' }),
         num('view.shake', 'Wackeln beim Einrasten', { unit: '%', min: 0, max: 200 }), num('view.volume', 'Lautstärke der Bau-Töne', { unit: '%', min: 0, max: 100 }),
         num('view.cursorSpeed', 'Bau-Cursor: Tempo (Controller, Tastatur)', { unit: 'px/s', min: 100, max: 4000, hint: 'Gehalten ab 450 ms fast doppelt so schnell' }),
-        bool('view.leylaFire', 'Leyla setzt sich ans Feuer', { hint: 'Daniel, 12.11.2026: „im Bau-Modus nur noch die Drohne steuern, Leyla setzt sich ans Feuer“. Mama-Bot erledigt dann auch das Werkeln' }),
-        bool('view.droneBuilds', 'Mama-Bot trägt die Teile', { hint: 'Sie fliegt dem Zeiger bzw. Bau-Cursor nach, ein gepacktes Teil hängt unter ihr' }),
-        num('view.droneAbove', 'Mama-Bot über dem Zeiger', { unit: 'px', min: 0 }), num('view.droneFollow', 'Mama-Bot folgt', { unit: '%', min: 1, max: 100, hint: 'Wie schnell sie dem Zeiger folgt' })] },
+        bool('view.leylaFire', 'Leyla setzt sich ans Feuer', { hint: 'Daniel, 12.11.2026: „im Bau-Modus nur noch die Drohne steuern, Leyla setzt sich ans Feuer“. AvA erledigt dann auch das Werkeln' }),
+        bool('view.droneBuilds', 'AvA trägt die Teile', { hint: 'Sie fliegt dem Zeiger bzw. Bau-Cursor nach, ein gepacktes Teil hängt unter ihr' }),
+        num('view.droneAbove', 'AvA über dem Zeiger', { unit: 'px', min: 0 }), num('view.droneFollow', 'AvA folgt', { unit: '%', min: 1, max: 100, hint: 'Wie schnell sie dem Zeiger folgt' })] },
       { title: 'Werkeln', fields: [bool('work.enabled', 'Leyla werkelt', { hint: 'An: nach jedem Einrasten läuft Leyla hin und schraubt, „Rückgängig“ nur, solange sie nicht fertig ist. Aus (Daniel, 09.11.2026): alles sofort, „Rückgängig“ für jede Aktion bis „Fertig“' }), num('work.seconds', 'Leyla schraubt', { unit: 's', min: 0, hint: 'Nach jedem Einrasten läuft sie hin und schraubt so lange; solange sie nicht fertig ist, geht „Rückgängig“' }),
         num('work.perHour', 'Dazu pro Stunde Bauzeit', { unit: 's', min: 0 })] },
       { title: 'Rig-Teile am Van', fields: [

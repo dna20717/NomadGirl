@@ -140,7 +140,7 @@
   "places": 1,
   "power": -2,
   "value": 400,
-  "description": "Hier wird Mama-Bot verbessert. Sie hat Meinungen dazu.",
+  "description": "Hier wird AvA verbessert. Sie hat Meinungen dazu.",
   "look": "ws_drone_bench_v2",
   "fx": [
    {"kind": "light", "x": 96, "y": 61, "w": 68, "h": 5, "color": "#e8f4ff", "size": 75, "rate": 5, "when": "always"},
@@ -154,7 +154,7 @@
    {"kind": "twinkle", "x": 178, "y": 168, "w": 30, "h": 30, "size": 3, "rate": 1.5, "when": "always"},
    {"kind": "twinkle", "x": 212, "y": 150, "w": 32, "h": 60, "size": 3, "rate": 1, "when": "always"}
   ],
-  "rest": {"verb": "Mama-Bot warten", "hours": 0.5, "heal": 0, "banner": "Mama-Bot glänzt wieder", "drone": true}
+  "rest": {"verb": "AvA warten", "hours": 0.5, "heal": 0, "banner": "AvA glänzt wieder", "drone": true}
  },
  "warroom": {
   "name": "Warroom",

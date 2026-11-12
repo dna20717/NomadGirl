@@ -1,6 +1,6 @@
 // Headless check of the Diablo inventory (Daniel, 10.11.2026) with real mouse clicks (game.html?camp):
-// backpack | Leyla from the front | Mama-Bot, head + armor with stats, implants (tab, camp only, strain), Mama-Bot's parts,
-// the rescue pocket surviving a knock-out, Mama-Bot's face reacting.
+// backpack | Leyla from the front | AvA, head + armor with stats, implants (tab, camp only, strain), AvA's parts,
+// the rescue pocket surviving a knock-out, AvA's face reacting.
 //   node tools/gear_test.mjs [--shots]   (server must run: npm run serve), pictures to output/gear_*.png
 import fs from 'node:fs';
 import { chromium } from 'playwright';
@@ -36,10 +36,10 @@ await ev(() => { nomad.take(); nomad.step(5); const h = nomad.state().camp.hotsp
 let s = await inv();
 check('Kiste offen, Gasmaske + Plattenträger liegen drin', s.open && s.other?.key === 'chest' && s.other.grid.items.some(i => i.startsWith('gasmaske')) && s.other.grid.items.some(i => i.startsWith('plattentraeger')), s);
 const order = await ev(() => ['.inv-panel.bag', '.inv-panel.leyla', '.inv-panel.drone'].map(q => document.querySelector(q)?.getBoundingClientRect().left ?? -1));
-check('Rucksack links, Leyla in der Mitte, Mama-Bot rechts', order[0] >= 0 && order[0] < order[1] && order[1] < order[2], order);
+check('Rucksack links, Leyla in der Mitte, AvA rechts', order[0] >= 0 && order[0] < order[1] && order[1] < order[2], order);
 const pics = await ev(() => ({ leyla: document.querySelector('.inv-figure img')?.complete && document.querySelector('.inv-figure img').naturalWidth, hull: [...document.querySelectorAll('.inv-dronefig img')].length, face: !!document.querySelector('.inv-face') }));
-check('Leyla von vorn und Mama-Bot mit Gesicht und Teilen', pics.leyla > 0 && pics.hull >= 3 && pics.face, pics);
-check('Start: Cyberarm eingebaut, Scheinwerfer + Greifarm an Mama-Bot, Rettungsfach 3 × 2', s.wear.arm === 'cyberarm_mk1' && s.wear.bow === 'suchscheinwerfer' && s.wear.tail === 'greifarm' && s.drone?.w === 3 && s.drone?.h === 2, s);
+check('Leyla von vorn und AvA mit Gesicht und Teilen', pics.leyla > 0 && pics.hull >= 3 && pics.face, pics);
+check('Start: Cyberarm eingebaut, Scheinwerfer + Greifarm an AvA, Rettungsfach 3 × 2', s.wear.arm === 'cyberarm_mk1' && s.wear.bow === 'suchscheinwerfer' && s.wear.tail === 'greifarm' && s.drone?.w === 3 && s.drone?.h === 2, s);
 await shot('open');
 
 // head: the gas mask from the chest
@@ -49,7 +49,7 @@ await clickAt(await slot('wear:head'));
 s = await inv();
 let m = await mods();
 check('Gasmaske auf den Kopf: +4 Abwehr', s.wear.head === 'gasmaske' && !s.held && (m.defense || 0) === (m0.defense || 0) + 4, { s, m });
-check('Mama-Bot freut sich über bessere Ausrüstung', s.face === 'gearBetter' && await ev(() => !document.querySelector('.inv-bubble').hidden), s.face);
+check('AvA freut sich über bessere Ausrüstung', s.face === 'gearBetter' && await ev(() => !document.querySelector('.inv-bubble').hidden), s.face);
 // armor
 await clickAt(await thingAt('chest', 'plattentraeger'));
 await clickAt(await slot('wear:armor'));
@@ -84,26 +84,26 @@ const refused = await ev(() => { const sc = game.scene.getScene('play'), ui = sc
   const lim = sc.data_.leyla.inventory.strainMax; sc.data_.leyla.inventory.strainMax = 5; ui.slotClick('wear:heart'); const r = { heart: ui.inv.wear.heart, held: !!ui.held }; sc.data_.leyla.inventory.strainMax = lim; ui.held = null; return r; });
 check('Zu viel Belastung: Herzpumpe passt nicht mehr', !refused.heart && refused.held, refused);
 
-// Mama-Bot's parts: take the claw off, it disappears in the world; back on, she shows off
+// AvA's parts: take the claw off, it disappears in the world; back on, she shows off
 await clickAt(await center('.inv-tab[data-tab="gear"]'));
 await clickAt(await slot('wear:tail'));
 s = await inv();
 let vis = await ev(() => game.scene.getScene('play').drone.partImgs.map(p => `${p.r.item}:${p.img.visible}`));
-check('Greifarm ab: Mama-Bot ohne Greifarm (auch draußen), guckt traurig', s.held === 'greifarm×1' && s.wear.tail === null && vis.includes('greifarm:false') && s.face === 'gearOff', { s, vis });
+check('Greifarm ab: AvA ohne Greifarm (auch draußen), guckt traurig', s.held === 'greifarm×1' && s.wear.tail === null && vis.includes('greifarm:false') && s.face === 'gearOff', { s, vis });
 await clickAt(await slot('wear:tail'));
 s = await inv(); vis = await ev(() => game.scene.getScene('play').drone.partImgs.map(p => `${p.r.item}:${p.img.visible}`));
-check('Greifarm wieder dran: Mama-Bot dreht sich stolz', s.wear.tail === 'greifarm' && vis.includes('greifarm:true') && s.face === 'dronePart', { s, vis });
+check('Greifarm wieder dran: AvA dreht sich stolz', s.wear.tail === 'greifarm' && vis.includes('greifarm:true') && s.face === 'dronePart', { s, vis });
 await shot('drone');
 
 // rescue pocket: a valuable goes in, food makes her angry
 await clickAt(await thingAt('chest', 'discokugel'));
 await clickAt(await freeCell('drone'));
 s = await inv();
-check('Discokugel ins Rettungsfach, Mama-Bot: „hab ich!“', s.drone.items.some(i => i.startsWith('discokugel')) && s.face === 'rescue', s);
+check('Discokugel ins Rettungsfach, AvA: „hab ich!“', s.drone.items.some(i => i.startsWith('discokugel')) && s.face === 'rescue', s);
 await ev(() => { const ui = game.scene.getScene('play').hud.inv; ui.held = { e: { a: 'items', id: 'dosenbohnen', n: 1, r: 0 }, from: 'chest' }; });
 await clickAt(await ev(() => { const box = [...document.querySelectorAll('.inv-grid')].pop(), r = box.getBoundingClientRect(), c = 44; return [r.left + 2.5 * c, r.top + 0.5 * c]; }));
 s = await inv();
-check('Bohnen ins Rettungsfach: Mama-Bot ist sauer', s.face === 'rescueFood', s.face);
+check('Bohnen ins Rettungsfach: AvA ist sauer', s.face === 'rescueFood', s.face);
 
 // a run: implants stay put, the pocket survives a knock-out
 await ev(() => { const sc = game.scene.getScene('play'); sc.hud.inv.close(); nomad.save().inv.grids.backpack.items = [{ a: 'items', id: 'verband', n: 2, x: 0, y: 0, r: 0 }];

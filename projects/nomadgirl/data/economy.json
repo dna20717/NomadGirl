@@ -6,11 +6,11 @@
  },
  "startDeltas": 40000,
  "rescue": {
-  "drone": "Mama-Bot",
+  "drone": "AvA",
   "losesRunLoot": true,
   "losesEquipped": false,
   "keepPercent": 0,
-  "description": "Mama-Bot sammelt Leyla ein, fliegt sie zum Rig und kommentiert das ausführlich."
+  "description": "AvA sammelt Leyla ein, fliegt sie zum Rig und kommentiert das ausführlich."
  },
  "foodtruck": {"priceFactor": 1.5, "maxPerStop": 8}
 }

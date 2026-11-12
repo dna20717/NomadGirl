@@ -1,7 +1,7 @@
 // Headless check of the workshop pictures in the camp (Daniel, 08.11.2026: "Werkbank-Grafiken einbauen, cosy Beleuchtung und Effekte,
 // Funktionen und Micro-Animationen; Vorschau beim Händler; ausgebaute Werkbänke liegen in Kisten"; "das Regal hat mehrere Zustände
 // abhängig vom Füllzustand"). Pictures in the trailer, shelf fills up shelf by shelf, effects wake up when used, sparks at the
-// workbench behind the craft window, Chill Area (time, heal, buff), Mama-Bot docks at the drone bench, no power = dark,
+// workbench behind the craft window, Chill Area (time, heal, buff), AvA docks at the drone bench, no power = dark,
 // packed crates on the scrapyard with the name on the label, thumbnails + big preview in the dealer's catalogue.
 //   node tools/bench_test.mjs [--shots]   (server must run: npm run serve), pictures to output/bench_*.png
 import fs from 'node:fs';
@@ -96,12 +96,12 @@ let st = await ev(() => nomad.state().camp);
 check('Chillen: 1 h vergeht, Buff Gemütlich', Math.abs(((st.hour - before + 24) % 24) - 1) < 0.01 && st.buffs.includes('gemuetlich'), { before, hour: st.hour, buffs: st.buffs });
 await shot('chill');
 
-// Mama-Bot docks at the drone bench
+// AvA docks at the drone bench
 await ev(() => nomad.take());
 const db = await bench('drohnenwerkstatt');
-void db; await ev(() => { nomad.goTo('Drohnenwerkstatt'); nomad.step(30); nomad.step(1, [], ['grab']); nomad.step(3); nomad.choose('Mama-Bot'); });
+void db; await ev(() => { nomad.goTo('Drohnenwerkstatt'); nomad.step(30); nomad.step(1, [], ['grab']); nomad.step(3); nomad.choose('AvA'); });
 const dock = await ev(s => { const S = eval(s); for (let i = 0; i < 150; i++) nomad.step(1); return { d: Math.abs(S.drone.x - S.camp.benches.list.find(b => b.id === 'drohnenwerkstatt').cx), docked: !!S.drone.dock }; }, scene);
-check('Mama-Bot warten: die Drohne fliegt zur Werkbank und dockt an', dock.docked && dock.d < 40, dock);
+check('AvA warten: die Drohne fliegt zur Werkbank und dockt an', dock.docked && dock.d < 40, dock);
 await ev(() => nomad.step(200));
 await page.waitForFunction(() => game.scene.getScene('play')?.camp?.benches?.list?.length, null, { timeout: 15000 });
 

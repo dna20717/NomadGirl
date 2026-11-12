@@ -171,5 +171,5 @@ export function gearStats(D, wear = {}) {
   }
   return s;
 }
-// one number to compare two things for the same place (Mama-Bot cheers or worries)
+// one number to compare two things for the same place (AvA cheers or worries)
 export const gearScore = st => (st?.defense || 0) + (st?.health || 0) * 0.4 + (st?.damage || 0) + (st?.speed || 0);

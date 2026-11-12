@@ -1,4 +1,4 @@
-// Mama-Bot's hanging cables (area "Drohne" › Kabel), shared by the game and the start page. No DOM, no Phaser.
+// AvA's hanging cables (area "Drohne" › Kabel), shared by the game and the start page. No DOM, no Phaser.
 // Each cable is a little rope (Verlet points) hanging from a point of the hull, either with a loose end or as a loop
 // back to a second point. The hull points are given in hull pixels; `anchor(p)` turns them into world positions.
 

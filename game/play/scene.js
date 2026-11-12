@@ -55,7 +55,7 @@ export class PlayScene extends Phaser.Scene {
     for (const id of [DR.look, DR.face?.look, DR.face?.glass, ...(DR.parts || []).filter(r => r.on).map(r => r.look)]) if (id) ids.add(id);
     for (const r of this.data_.leyla?.idles || []) if (r.look) ids.add(r.look);
     { const C = this.data_.leyla?.combo || {}; for (const r of C.hits || []) for (const id of [r.look, r.walk]) if (id) ids.add(id); if (C.finisher) ids.add(C.finisher); }   // melee combo (Leyla › Kombo)
-    for (const w of Object.values(this.data_.weapons || {})) if (w.sound) ids.add(w.sound);
+    for (const w of Object.values(this.data_.weapons || {})) for (const id of [w.sound, ...Object.values(w.poses || {}).filter(v => typeof v === 'string')]) if (id) ids.add(id);   // Waffen › Posen
     const SP = this.data_.game?.spawn;
     for (const id of [SP?.look, SP?.dish?.look, SP?.roof?.front, this.data_.rooms?.[this.roomId]?.backdrop?.image]) if (id) ids.add(id);
     if (this.data_.camp?.chest?.look) ids.add(this.data_.camp.chest.look);   // chests in POIs too
@@ -130,11 +130,11 @@ export class PlayScene extends Phaser.Scene {
   }
   lookKey(who) { return this.data_.leyla?.look?.idle && this.textures.exists(this.data_.leyla.look.idle) ? this.data_.leyla.look.idle : 'px'; }
   // Leyla: asset for a state, otherwise idle (marked as fallback so code effects step in)
-  lookDuration(state) { const a = this.data_.assets?.[this.data_.leyla?.look?.[state]]; return a?.frames && a.fps ? a.frames / a.fps * 1000 : 0; }
+  lookDuration(state) { const a = this.data_.assets?.[(this.leyla?.d?.look || this.data_.leyla?.look)?.[state]]; return a?.frames && a.fps ? a.frames / a.fps * 1000 : 0; }
   // a state without its own animation borrows a related one (walk → run, double jump → jump), else idle with code effects;
   // walk without its own animation borrows run (Leyla slows its pace down); facing < 0 = left
   playLook(sprite, who, state, facing = 1, start = null) {   // start: frame to continue at (run variants share the step)
-    const look = this.data_.leyla?.look || {}, A = this.data_.assets || {}, direct = state.startsWith('@') && this.textures.exists(state.slice(1));
+    const look = (who === 'leyla' && this.leyla?.d?.look) || this.data_.leyla?.look || {}, A = this.data_.assets || {}, direct = state.startsWith('@') && this.textures.exists(state.slice(1));
     const has = s => s.startsWith('@') ? direct : look[s] && this.textures.exists(look[s]);
     this.looks ??= {};
     const used = has(state) ? state : (BORROW[state] || []).find(has) || 'idle';
@@ -278,7 +278,7 @@ export class PlayScene extends Phaser.Scene {
     this.drone.roamTo = null;
     this.backdrop?.front();
     this.physics.add.collider(this.leyla.box, this.solids);
-    this.drone.makePlatform?.();   // Mama-Bot as a platform (Drohne › Plattform)
+    this.drone.makePlatform?.();   // AvA as a platform (Drohne › Plattform)
     this.physics.add.collider(this.leyla.box, this.platforms, null, (box, plat) => {
       const l = this.leyla, b = l.body;
       return l.state !== 'climb' && l.state !== 'swing' && this.time.now >= l.dropUntil && b.velocity.y >= 0 && b.prev.y + b.height <= plat.body.top + 2;
@@ -316,7 +316,7 @@ export class PlayScene extends Phaser.Scene {
     this.leaving = false; this.roomName = null;
   }
 
-  // worn gear and implants (inv.wear) on top of the buffs: swap the old sums for the new ones, Mama-Bot shows her parts
+  // worn gear and implants (inv.wear) on top of the buffs: swap the old sums for the new ones, AvA shows her parts
   applyGear() {
     const g = this.box ? gearStats(this.data_, this.box.save.inv?.wear) : {};
     for (const k of ['defense', 'health', 'damage', 'speed']) { const v = (this.mods[k] || 0) - (this.gearMods?.[k] || 0) + (g[k] || 0); if (v) this.mods[k] = v; else delete this.mods[k]; }
@@ -462,17 +462,17 @@ export class PlayScene extends Phaser.Scene {
     this.box.persist();
     this.restartAs({ mode: 'run', roomId: room, banner: [P.name || poi, `${D.rooms?.[room]?.name || room}${ready.length ? '' : ' (Ersatzraum)'} · E am Van: zurück ins Camp`] }, 700);
   }
-  // back from a run: by van (loot counts) or knocked out (Mama-Bot, run loot is lost); buffs are used up
+  // back from a run: by van (loot counts) or knocked out (AvA, run loot is lost); buffs are used up
   endRun(ko) {
     const save = this.box.save, C = this.data_.camp || {}, base = this.data_.leyla?.health ?? 100;
     advance(save, C.clock?.runHours ?? 3);
-    if (ko) { save.health = Math.round(base * (C.heal?.afterKo ?? 30) / 100); save.inv.grids.backpack.items = []; }   // Mama-Bot only brings Leyla: the backpack stays behind
+    if (ko) { save.health = Math.round(base * (C.heal?.afterKo ?? 30) / 100); save.inv.grids.backpack.items = []; }   // AvA only brings Leyla: the backpack stays behind
     const paid = this.level?.payout(this.deltas) ?? this.deltas, rank = !ko && this.level?.done;
     if (!ko) { save.health = Math.round(this.leyla.health); save.deltas += paid; }
     save.buffs = [];
     save.run = null;
     this.hud.inv?.close();
-    const banner = ko ? ['Mama-Bot hat dich heimgebracht', `${clockText(save)} · Der Rucksack ist weg.`]
+    const banner = ko ? ['AvA hat dich heimgebracht', `${clockText(save)} · Der Rucksack ist weg.`]
       : rank ? [`Zurück im Camp · Rang ${rank.grade}`, `${clockText(save)} · +${paid} Δ (${this.deltas} + ${rank.bonus} %) · ${this.kills} Kills`]
       : ['Zurück im Camp', `${clockText(save)} · +${paid} Δ · ${this.kills} Kills`];
     this.goCamp({ banner, fade: ko ? 900 : 600, arriving: true });
@@ -564,7 +564,7 @@ export class PlayScene extends Phaser.Scene {
       }
       if (ground(cx, Math.floor(handY / T))) break;   // a wall in between: no grabbing through it
     }
-    return this.drone?.ledgeFor?.(x, handY, dir, reach, halfW, up, side) || null;   // Mama-Bot's edge
+    return this.drone?.ledgeFor?.(x, handY, dir, reach, halfW, up, side) || null;   // AvA's edge
   }
   // edge of the ground Leyla stands on, in direction dir (for climbing down): hanging there she faces back to it
   edgeBelow(x, feet, dir, halfW) {
@@ -588,7 +588,7 @@ export class PlayScene extends Phaser.Scene {
   // ---------- events ----------
   onLeylaHit(dmg) { this.drone.react('hit'); this.cam.shake(120, 0.006); this.fx.blood(this.leyla.x, this.leyla.chest, 10); this.hud.hurt(); }
   onLeylaDown() {
-    this.hud.banner('Mama-Bot schleppt dich raus …', 'Die Run-Beute bleibt liegen.');
+    this.hud.banner('AvA schleppt dich raus …', 'Die Run-Beute bleibt liegen.');
     this.cam.shake(300, 0.01);
     this.time.delayedCall(1900, () => this.mode === 'run' ? this.endRun(true) : this.mode === 'camp' ? this.goCamp() : this.level ? this.restartAs({}) : this.restartRoom());
   }
