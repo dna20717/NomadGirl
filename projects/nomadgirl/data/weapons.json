@@ -13,7 +13,9 @@
   "glyph": "🔧",
   "look": "icons_gear",
   "icon": 17,
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrott", "count": 2},{"item": "schrauben", "count": 1}]
  },
  "machete": {
   "name": "Machete",
@@ -27,7 +29,9 @@
   "size": [1, 3],
   "value": 40,
   "glyph": "🔪",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrott", "count": 2},{"item": "stoffreste", "count": 1}]
  },
  "schockstab": {
   "name": "Schockstab",
@@ -42,7 +46,9 @@
   "value": 60,
   "description": "Ehemals Viehtreiber. Funktioniert auch bei Mutanten.",
   "glyph": "⚡",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "batteriezelle", "count": 1},{"item": "kupferkabel", "count": 1},{"item": "technik", "count": 1}]
  },
  "trommelrevolver": {
   "name": "Trommelrevolver",
@@ -65,7 +71,9 @@
   "icon": 11,
   "tags": ["trophy"],
   "skin": "revolver",
-  "description": "Sechs Schuss, schwer in der Hand, laut wie ein Gewitter. Test: Aussehen aus Code."
+  "description": "Sechs Schuss, schwer in der Hand, laut wie ein Gewitter. Test: Aussehen aus Code.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "zahnraeder", "count": 1},{"item": "schrott", "count": 2},{"item": "technik", "count": 1}]
  },
  "nagelpistole": {
   "name": "Nagelpistole",
@@ -85,7 +93,9 @@
   "reloadTime": 950,
   "look": "icons_gear",
   "icon": 2,
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrauben", "count": 2},{"item": "batteriezelle", "count": 1}]
  },
  "schrotflinte": {
   "name": "Schrotflinte",
@@ -103,7 +113,9 @@
   "sound": "sound_shot",
   "magazine": 2,
   "reloadTime": 1600,
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "rohrbogen", "count": 1},{"item": "schrott", "count": 2},{"item": "technik", "count": 1}]
  },
  "bastlerdeck": {
   "name": "Bastler-Deck",
@@ -118,7 +130,9 @@
   "knockback": null,
   "glyph": "💾",
   "look": "icons_gear",
-  "icon": 42
+  "icon": 42,
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "chip", "count": 1},{"item": "alte_platine", "count": 1},{"item": "wissen", "count": 1},{"item": "technik", "count": 1}]
  },
  "karambit": {
   "name": "Karambit",
@@ -135,7 +149,9 @@
   "description": "Gebogene Klinge mit Fingerring. Leylas Lieblingsmesser, schnell und gemein.",
   "look": "icons_gear",
   "icon": 52,
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrott", "count": 1}]
  },
  "sturmgewehr": {
   "name": "Sturmgewehr",
@@ -174,6 +190,8 @@
   "look": "icons_longguns",
   "icon": 0,
   "muzzleFlash": true,
-  "kick": 4
+  "kick": 4,
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "zahnraeder", "count": 2},{"item": "schrott", "count": 3},{"item": "schrauben", "count": 2},{"item": "technik", "count": 3}]
  }
 }

@@ -140,6 +140,50 @@ Grundsatz: Die Ziele kommen aus der Mechanik, eine Herleitung aus der Story brau
 - Ein neuer Durchgang würfelt POI-Reihenfolge und Beute neu (Startwert Ava).
 - **Tresor = Jackpot:** Im Tresor am Ende eines Runs muss **richtig viel Zeug** liegen (bislang leer). To-do.
 
+### Der Tank-Ast (Entwurf Ava, 12.11.2026; Daniel: „Tank-Ast überlasse ich dir“)
+
+Alle Zahlen sind Startwerte und gehören in die Werkstatt (neuer Bereich **Cryo-Tank**).
+
+**Zustand und Verfall**
+- Zustand 100 % … 0 %. Verfall je Stunde Ereignis-Zeit: `Grundrate × (1 + Beschleunigung × (100 − Zustand) / 100) × (1 + Tage im Durchgang × Alterung)`. Startwerte so, dass AvA ohne Pflege nach **~10 Runs** stirbt (ein Run samt Fahrt und Schlaf ≈ ein Tag).
+- **Rettung beim k.o.:** −12 % Zustand. Liegt der Zustand bei einer Rettung unter diesem Wert, ist es **die letzte Rettung**: Leyla ist gerettet, AvA stirbt.
+
+**Phasen (Bild am Tank + was AvA im Run spürt)**
+
+| Phase | Zustand | Tank (Grafik, je Phase eine kleine Schleife) | AvA im Run |
+| --- | --- | --- | --- |
+| 1 Stabil | 100–80 % | klares Glas, ruhiges blaues Licht, Bläschen | normal |
+| 2 Beschlagen | 80–60 % | Frost am Glas, Kondenswasser läuft | Gesicht stottert ab und zu |
+| 3 Risse | 60–40 % | Haarrisse, Anzeige flackert gelb | Akku −15 %, Scheinwerfer flackert manchmal |
+| 4 Lecks | 40–20 % | Kühlmittel tropft, Dampf, Pfütze, rotes Blinken | Akku −30 %, Bild-Glitches, verzerrte Laute |
+| 5 Alarm | 20–1 % | Sirene leise, Glas fast blind, **eine kleine Hand innen am Glas** | Akku −50 %, starke Glitches, sie zittert |
+| Tot | 0 % | Tank dunkel, Glas gesprungen, still | Drohne weg → „Traum“ |
+
+**Wartung (Rezepte am Tank, wie an jeder Werkbank)**
+
+| Wartung | Zutaten | Zustand | wirkt bis Phase |
+| --- | --- | --- | --- |
+| Notflicken | 2 Panzertape, 1 Schrott | +8 % | 3 (ein Leck klebt man nicht) |
+| Stromzelle tauschen | 2 Batteriezellen | +12 % | 4 |
+| Dichtung tauschen | 2 Stoffreste, 1 Panzertape, 2 Schrauben | +15 % | 4 |
+| Kühlmittel nachfüllen | 1 **Kühlmittel** (neu) | +25 % | 5 |
+| Kompressor einbauen | 1 **Kompressor** (neu, selten, tief im POI oder im Tresor) | +50 % | 5 |
+
+Neue Gegenstände: **Kühlmittel** (Kanister; Bunker 13, Großmarkt-Kühlung, Kühlraum-Kisten) und **Kompressor** (selten). Je länger der Durchgang dauert, desto seltener werden beide in den Beutetabellen (Alterung).
+
+**Knoten des Tank-Asts (Techtree-Tab je Ressource, Pfeile = Voraussetzung)**
+
+| # | Knoten | Kosten | Schaltet frei | Voraussetzung |
+| --- | --- | --- | --- | --- |
+| 1 | Wartungsklappe | 3 Technik | Rezept „Dichtung tauschen“ | – |
+| 2 | Thermohülle | 5 Technik, 1 Wissen | Bonus: Verfall −15 % | 1 |
+| 3 | Lebenszeichen | 3 Wissen | Fähigkeit: Tank-Zustand als kleines Symbol im Run, Warnung beim Phasenwechsel | – |
+| 4 | Notreserve | 4 Technik, 2 Bio | Bonus: Rettung kostet 25 % weniger | 1 |
+| 5 | Kühlkreislauf | 8 Technik, 3 Wissen | Rezept „Kühlmittel destillieren“ (2 Mutantengemüse + 1 Batteriezelle → 1 Kühlmittel, an der Werkbank) | 2 |
+| 6 | Stasis-Stabilisator | 10 Technik, 5 Wissen, 5 Bio | Bonus: Beschleunigung des Verfalls −50 %; öffnet den Bio-Ast Richtung Heilmittel | 3, 4, 5 |
+
+Zu Beginn kennt man „Notflicken“, „Stromzelle tauschen“ und „Kühlmittel nachfüllen“. Weil Knoten einen neuen Durchgang überstehen, startet der zweite Traum schon mit Thermohülle und Co.: Das ist der Balatro-Effekt.
+
 ### Das Heilmittel (Daniel, 12.11.2026, nur Vision)
 
 - Ist es fertig, wacht AvA auf, und das Spiel geht weiter. Sie wird ein **neuer spielbarer Charakter**. Vorerst nur Design-Vision, nichts bauen.
@@ -252,6 +296,17 @@ Ein POI mit Ranking, Rucksack-Raster, Tod mit AvA, Rig mit zwei bis drei Werkst�
 - [x] Rig-Teile an Sockeln im Bau-Modus (kaufen, herstellen, verkaufen), Kofferraum (Deichselkästen 12.11.2026 entfallen)
 - [x] Rig bauen 2.0: im Camp mit Ziehen, Pendeln, Einrasten, Schrottplatz + Händler, sofort echt, Leyla schraubt, Rückgängig
 - [x] POIs aus Raum-Bausteinen zusammensetzen: Tankstelle KM7 als erstes Level mit Kisten, Secrets, Schalter-Tür, Ziel, Ranking und Abkürzung (10.11.2026); Großmarkt, Bunker, Ministerium brauchen noch Raum-Layouts
+
+### Ausbaustufe Progression (Bauauftrag 12.11.2026)
+
+- [ ] Aufräumen: Deichselkästen raus (Inhalt alter Spielstände ins Lager/die Kiste)
+- [ ] Tresor am Ende jedes Runs richtig voll
+- [ ] Zerlegen-Aktion an Werkbank, Kochnische, Warroom (Gegenstände und Waffen, Daten stehen)
+- [ ] Cryo-Tank: Werkstatt im kleinsten Container (auch in alten Spielständen), Zustand, Verfall in Ereignis-Zeit, Phasen, Wartungs-Rezepte, unverkäuflich und nicht ausbaubar, AvA leidet im Run, Bereich „Cryo-Tank“ in der Werkstatt
+- [ ] k.o. neu: Startpunkt, Rucksack liegt (eine Chance), Raum-Reset außer Tresor, Ausrüstung bleibt, Rettung kostet Tank, letzte Rettung tötet AvA
+- [ ] Techtree: Bereich „Techtree“ (Knoten mit Bild, Tab/Ressource, Kosten, Voraussetzungen, Freischaltung, Position), Ressourcen-Definitionen mit versteckter „Dunkelheit“, Warroom-Bildschirm im Graveyard-Keeper-2-Look mit vertikalen Tabs, Controller zuerst; Tank-Ast als erster Inhalt
+- [ ] Durchgang/Traum: AvA tot → Leyla wacht am Feuer auf; Spielstand trennt bleibende Knoten von allem anderen; „Spiel zurücksetzen“ ausdrücklich
+- [ ] Grafik (PixelLab): Cryo-Tank in 6 Phasen mit kleinen Schleifen, Symbole Technik/Wissen/Bio/Kühlmittel/Kompressor, Bilder der 6 Tank-Knoten
 
 ### Ausbaustufe 2
 

@@ -105,4 +105,5 @@ test('salvage: every item says how it breaks down, crafting then salvaging never
   assert.ok(farm(q => { q.data.items.schrottplatte.salvage = [{ item: 'schrott', count: 4 }]; }, /Farming/), 'nicht mehr zurück als hinein');
   assert.ok(farm(q => { q.data.items.verkohlter_klumpen.salvage = [{ item: 'bio', count: 1 }]; }, /Fehlschlag/), 'Fehlschlag-Müll');
   assert.ok(farm(q => { q.data.items.schrott.salvage = [{ item: 'schrottplatte', count: 1 }]; }, /Kreis/), 'Kreislauf');
+  for (const [id, w] of Object.entries(p.data.weapons)) assert.ok(w.salvage?.length, `Waffe ${id} zerlegbar`);
 });
