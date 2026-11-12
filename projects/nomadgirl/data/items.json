@@ -1,11 +1,43 @@
 {
  "kupferkabel": {"name": "Kupferkabel", "category": "junk", "size": [1, 2], "stack": 10, "value": 2, "glyph": "Cu", "look": "icons_gear", "icon": 24},
- "alte_platine": {"name": "Alte Platine", "category": "junk", "size": [2, 1], "stack": 5, "value": 3, "glyph": "PCB", "look": "icons_gear", "icon": 34},
- "gluehbirne": {"name": "Glühbirne", "category": "junk", "size": [1, 1], "stack": 5, "value": 1, "description": "Heil. Ein kleines Wunder.", "glyph": "💡"},
+ "alte_platine": {
+  "name": "Alte Platine",
+  "category": "junk",
+  "size": [2, 1],
+  "stack": 5,
+  "value": 3,
+  "glyph": "PCB",
+  "look": "icons_gear",
+  "icon": 34,
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "kupferkabel", "count": 1},{"item": "technik", "count": 1}]
+ },
+ "gluehbirne": {
+  "name": "Glühbirne",
+  "category": "junk",
+  "size": [1, 1],
+  "stack": 5,
+  "value": 1,
+  "description": "Heil. Ein kleines Wunder.",
+  "glyph": "💡",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrauben", "count": 1}]
+ },
  "kronkorken": {"name": "Kronkorken", "category": "junk", "size": [1, 1], "stack": 99, "value": 0, "description": "Hier nichts wert. Leyla sammelt sie trotzdem.", "glyph": "KK"},
  "schrott": {"name": "Schrott", "category": "resource", "size": [2, 1], "stack": 20, "value": 1, "glyph": "⚙", "look": "icons_gear", "icon": 30},
  "stoffreste": {"name": "Stoffreste", "category": "resource", "size": [1, 1], "stack": 10, "value": 1, "glyph": "🧵"},
- "batteriezelle": {"name": "Batteriezelle", "category": "resource", "size": [1, 1], "stack": 10, "value": 6, "glyph": "🔋", "look": "icons_gear", "icon": 38},
+ "batteriezelle": {
+  "name": "Batteriezelle",
+  "category": "resource",
+  "size": [1, 1],
+  "stack": 10,
+  "value": 6,
+  "glyph": "🔋",
+  "look": "icons_gear",
+  "icon": 38,
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "technik", "count": 1}]
+ },
  "mutantenfleisch": {
   "name": "Mutantenfleisch",
   "category": "ingredient",
@@ -15,11 +47,24 @@
   "description": "Besser nicht fragen.",
   "glyph": "🍖",
   "look": "icons_kitchen",
-  "icon": 16
+  "icon": 16,
+  "salvageAt": "kochnische",
+  "salvage": [{"item": "bio", "count": 1}]
  },
  "reis": {"name": "Reis", "category": "ingredient", "size": [1, 2], "stack": 10, "value": 2, "glyph": "🍚", "look": "icons_kitchen", "icon": 19},
  "gewuerzmischung": {"name": "Gewürzmischung", "category": "ingredient", "size": [1, 1], "stack": 10, "value": 4, "glyph": "🌶", "look": "icons_kitchen", "icon": 44},
- "dosenbohnen": {"name": "Dosenbohnen", "category": "ingredient", "size": [1, 1], "stack": 6, "value": 2, "glyph": "🥫", "look": "icons_kitchen", "icon": 38},
+ "dosenbohnen": {
+  "name": "Dosenbohnen",
+  "category": "ingredient",
+  "size": [1, 1],
+  "stack": 6,
+  "value": 2,
+  "glyph": "🥫",
+  "look": "icons_kitchen",
+  "icon": 38,
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrott", "count": 1}]
+ },
  "mutanten_curry": {
   "name": "Mutanten-Curry",
   "category": "food",
@@ -33,9 +78,33 @@
   "icon": 29
  },
  "bohneneintopf": {"name": "Bohneneintopf", "category": "food", "size": [1, 1], "stack": 3, "value": 6, "buff": "satt", "glyph": "🍲", "look": "icons_kitchen", "icon": 28},
- "schrottplatte": {"name": "Schrottplatte", "category": "component", "size": [2, 2], "stack": 4, "value": 8, "glyph": "▦"},
- "kabelbaum": {"name": "Kabelbaum", "category": "component", "size": [1, 2], "stack": 4, "value": 10, "shape": ["#.", "##"], "glyph": "KB", "look": "icons_gear", "icon": 26},
- "verband": {"name": "Verband", "category": "consumable", "size": [1, 1], "stack": 5, "value": 5, "buff": "erste_hilfe", "glyph": "✚", "look": "icons_gear", "icon": 49},
+ "schrottplatte": {"name": "Schrottplatte", "category": "component", "size": [2, 2], "stack": 4, "value": 8, "glyph": "▦", "salvageAt": "werkbank", "salvage": [{"item": "schrott", "count": 2}]},
+ "kabelbaum": {
+  "name": "Kabelbaum",
+  "category": "component",
+  "size": [1, 2],
+  "stack": 4,
+  "value": 10,
+  "shape": ["#.", "##"],
+  "glyph": "KB",
+  "look": "icons_gear",
+  "icon": 26,
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "kupferkabel", "count": 2}]
+ },
+ "verband": {
+  "name": "Verband",
+  "category": "consumable",
+  "size": [1, 1],
+  "stack": 5,
+  "value": 5,
+  "buff": "erste_hilfe",
+  "glyph": "✚",
+  "look": "icons_gear",
+  "icon": 49,
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "stoffreste", "count": 1}]
+ },
  "discokugel": {
   "name": "Discokugel",
   "category": "valuable",
@@ -44,7 +113,9 @@
   "value": 45,
   "description": "Niemand weiß, warum das funktioniert. Sammler zahlen gut.",
   "glyph": "🪩",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "gluehbirne", "count": 1},{"item": "kronkorken", "count": 20}]
  },
  "zettel_curry": {
   "name": "Fettiger Notizzettel",
@@ -56,7 +127,9 @@
   "description": "„Mehr Gewürz. Immer mehr Gewürz.“",
   "glyph": "📜",
   "look": "icons_kitchen",
-  "icon": 61
+  "icon": 61,
+  "salvageAt": "warroom",
+  "salvage": [{"item": "wissen", "count": 1}]
  },
  "rohrbogen": {
   "name": "Rohrbogen",
@@ -66,7 +139,9 @@
   "value": 9,
   "shape": ["#.", "#.", "##"],
   "glyph": "L",
-  "description": "Ein L aus Stahl. Passt nie dahin, wo du ihn brauchst."
+  "description": "Ein L aus Stahl. Passt nie dahin, wo du ihn brauchst.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrott", "count": 2}]
  },
  "auspuffkruemmer": {
   "name": "Auspuffkrümmer",
@@ -76,7 +151,9 @@
   "value": 14,
   "shape": [".##", "##."],
   "glyph": "S",
-  "description": "Riecht nach verbranntem Öl und Abenteuer."
+  "description": "Riecht nach verbranntem Öl und Abenteuer.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrott", "count": 3},{"item": "technik", "count": 1}]
  },
  "antenne": {
   "name": "Teleskopantenne",
@@ -86,9 +163,22 @@
   "value": 7,
   "glyph": "📡",
   "description": "Empfängt drei Sender. Alle spielen Werbung.",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "kupferkabel", "count": 1},{"item": "schrott", "count": 1}]
  },
- "t_stueck": {"name": "T-Stück", "category": "junk", "size": [3, 2], "stack": 1, "value": 4, "shape": ["###", ".#."], "glyph": "T", "description": "Klempner-Tetris."},
+ "t_stueck": {
+  "name": "T-Stück",
+  "category": "junk",
+  "size": [3, 2],
+  "stack": 1,
+  "value": 4,
+  "shape": ["###", ".#."],
+  "glyph": "T",
+  "description": "Klempner-Tetris.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrott", "count": 1},{"item": "schrauben", "count": 1}]
+ },
  "autobatterie": {
   "name": "Autobatterie",
   "category": "resource",
@@ -98,7 +188,9 @@
   "glyph": "⚡",
   "description": "Schwer. Brummt leise, wenn man sie schüttelt.",
   "look": "icons_gear",
-  "icon": 37
+  "icon": 37,
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "batteriezelle", "count": 2},{"item": "schrott", "count": 2},{"item": "technik", "count": 1}]
  },
  "verkohlter_klumpen": {"name": "Verkohlter Klumpen", "category": "junk", "size": [1, 1], "stack": 5, "value": 0, "glyph": "🪨", "description": "War mal Essen. Jetzt ist es ein Briefbeschwerer."},
  "graue_pampe": {
@@ -154,7 +246,9 @@
   "glyph": "🔌",
   "description": "Zwei Zellen, viel Klebeband, ein Funke Hoffnung.",
   "look": "icons_kitchen",
-  "icon": 60
+  "icon": 60,
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "batteriezelle", "count": 1},{"item": "kupferkabel", "count": 1}]
  },
  "leuchteier": {
   "name": "Leuchteier",
@@ -165,7 +259,9 @@
   "glyph": "🥚",
   "look": "icons_kitchen",
   "icon": 17,
-  "description": "Von Hühnern, die man besser nicht fragt."
+  "description": "Von Hühnern, die man besser nicht fragt.",
+  "salvageAt": "kochnische",
+  "salvage": [{"item": "bio", "count": 1}]
  },
  "mutantengemuese": {
   "name": "Mutantengemüse",
@@ -176,7 +272,9 @@
   "glyph": "🥕",
   "look": "icons_kitchen",
   "icon": 26,
-  "description": "Wächst überall, wo es nicht sollte."
+  "description": "Wächst überall, wo es nicht sollte.",
+  "salvageAt": "kochnische",
+  "salvage": [{"item": "bio", "count": 1}]
  },
  "neon_garnelen": {
   "name": "Neon-Garnelen",
@@ -187,7 +285,9 @@
   "glyph": "🦐",
   "look": "icons_kitchen",
   "icon": 37,
-  "description": "Leuchten noch, wenn sie schon gar sind."
+  "description": "Leuchten noch, wenn sie schon gar sind.",
+  "salvageAt": "kochnische",
+  "salvage": [{"item": "bio", "count": 1}]
  },
  "sojasauce": {"name": "Sojasauce", "category": "ingredient", "size": [1, 2], "stack": 5, "value": 3, "glyph": "🍶", "look": "icons_kitchen", "icon": 43},
  "speiseoel": {"name": "Speiseöl", "category": "ingredient", "size": [1, 2], "stack": 5, "value": 2, "glyph": "🫗", "look": "icons_kitchen", "icon": 41},
@@ -253,7 +353,18 @@
   "description": "Hält die Welt zusammen. Buchstäblich."
  },
  "schrauben": {"name": "Schrauben & Muttern", "category": "resource", "size": [1, 1], "stack": 20, "value": 1, "glyph": "🔩", "look": "icons_gear", "icon": 29},
- "zahnraeder": {"name": "Zahnräder", "category": "component", "size": [1, 1], "stack": 6, "value": 6, "glyph": "⚙", "look": "icons_gear", "icon": 31},
+ "zahnraeder": {
+  "name": "Zahnräder",
+  "category": "component",
+  "size": [1, 1],
+  "stack": 6,
+  "value": 6,
+  "glyph": "⚙",
+  "look": "icons_gear",
+  "icon": 31,
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrauben", "count": 1}]
+ },
  "chip": {
   "name": "Chip",
   "category": "component",
@@ -263,10 +374,35 @@
   "glyph": "🔲",
   "look": "icons_gear",
   "icon": 35,
-  "description": "Aus zwei toten Platinen ein lebendiger Chip."
+  "description": "Aus zwei toten Platinen ein lebendiger Chip.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "alte_platine", "count": 1}]
  },
- "feuerzeug": {"name": "Feuerzeug", "category": "junk", "size": [1, 1], "stack": 3, "value": 2, "glyph": "🔥", "look": "icons_gear", "icon": 60},
- "medikit": {"name": "Medikit", "category": "consumable", "size": [2, 1], "stack": 2, "value": 18, "buff": "verarztet", "glyph": "⛑", "look": "icons_gear", "icon": 48},
+ "feuerzeug": {
+  "name": "Feuerzeug",
+  "category": "junk",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 2,
+  "glyph": "🔥",
+  "look": "icons_gear",
+  "icon": 60,
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrauben", "count": 1}]
+ },
+ "medikit": {
+  "name": "Medikit",
+  "category": "consumable",
+  "size": [2, 1],
+  "stack": 2,
+  "value": 18,
+  "buff": "verarztet",
+  "glyph": "⛑",
+  "look": "icons_gear",
+  "icon": 48,
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "verband", "count": 1}]
+ },
  "aufputschspritze": {
   "name": "Aufputschspritze",
   "category": "consumable",
@@ -277,7 +413,9 @@
   "glyph": "💉",
   "look": "icons_gear",
   "icon": 50,
-  "description": "Nicht fragen, was drin ist."
+  "description": "Nicht fragen, was drin ist.",
+  "salvageAt": "kochnische",
+  "salvage": [{"item": "bio", "count": 1}]
  },
  "rezept_ramen": {
   "name": "Bekleckerte Rezeptkarte",
@@ -289,7 +427,9 @@
   "glyph": "📜",
   "look": "icons_kitchen",
   "icon": 46,
-  "description": "„Nie ohne Ei. Nie.“"
+  "description": "„Nie ohne Ei. Nie.“",
+  "salvageAt": "warroom",
+  "salvage": [{"item": "wissen", "count": 1}]
  },
  "bauplan_medikit": {
   "name": "Bauplan: Medikit",
@@ -301,7 +441,9 @@
   "glyph": "📘",
   "look": "icons_gear",
   "icon": 61,
-  "description": "Aus dem Erste-Hilfe-Raum eines Ministeriums."
+  "description": "Aus dem Erste-Hilfe-Raum eines Ministeriums.",
+  "salvageAt": "warroom",
+  "salvage": [{"item": "wissen", "count": 2}]
  },
  "gasmaske": {
   "name": "Gasmaske",
@@ -314,7 +456,9 @@
   "stack": 1,
   "value": 60,
   "description": "Riecht nach Gummi und altem Atem. Hält Staub, Gift und ein paar Kratzer ab.",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "stoffreste", "count": 1},{"item": "schrott", "count": 1}]
  },
  "plattentraeger": {
   "name": "Plattenträger",
@@ -326,7 +470,9 @@
   "size": [2, 3],
   "stack": 1,
   "value": 180,
-  "description": "Schwere Weste mit Stahlplatten. Schützt gut, macht aber etwas langsamer."
+  "description": "Schwere Weste mit Stahlplatten. Schützt gut, macht aber etwas langsamer.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrottplatte", "count": 2},{"item": "stoffreste", "count": 2}]
  },
  "nachtsicht_optik": {
   "name": "Nachtsicht-Optik",
@@ -340,7 +486,9 @@
   "stack": 1,
   "value": 260,
   "description": "Cyber-Augen mit Restlichtverstärker. Leyla trifft besser, auch im Dunkeln.",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "chip", "count": 1},{"item": "technik", "count": 2}]
  },
  "reflex_booster": {
   "name": "Reflex-Booster",
@@ -353,7 +501,9 @@
   "size": [1, 1],
   "stack": 1,
   "value": 300,
-  "description": "Chip am Rückenmark. Alles fühlt sich ein bisschen langsamer an, nur Leyla nicht."
+  "description": "Chip am Rückenmark. Alles fühlt sich ein bisschen langsamer an, nur Leyla nicht.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "chip", "count": 1},{"item": "technik", "count": 2}]
  },
  "cyberarm_mk1": {
   "name": "Cyberarm Mk I",
@@ -366,7 +516,9 @@
   "size": [1, 3],
   "stack": 1,
   "value": 400,
-  "description": "Leylas eigener Arm, selbst geflickt. Schlägt härter zu als Fleisch."
+  "description": "Leylas eigener Arm, selbst geflickt. Schlägt härter zu als Fleisch.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "zahnraeder", "count": 2},{"item": "kabelbaum", "count": 1},{"item": "technik", "count": 3}]
  },
  "subdermale_platten": {
   "name": "Subdermale Platten",
@@ -378,7 +530,9 @@
   "size": [2, 2],
   "stack": 1,
   "value": 320,
-  "description": "Dünne Panzerplatten unter der Haut. Zieht beim Wetterumschwung."
+  "description": "Dünne Panzerplatten unter der Haut. Zieht beim Wetterumschwung.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrottplatte", "count": 2},{"item": "technik", "count": 2}]
  },
  "herzpumpe": {
   "name": "Herzpumpe",
@@ -390,7 +544,9 @@
   "size": [1, 2],
   "stack": 1,
   "value": 380,
-  "description": "Zweites Herz aus Titan. Mehr Ausdauer, tickt leise beim Schlafen."
+  "description": "Zweites Herz aus Titan. Mehr Ausdauer, tickt leise beim Schlafen.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "zahnraeder", "count": 1},{"item": "batteriezelle", "count": 1},{"item": "technik", "count": 2}]
  },
  "suchscheinwerfer": {
   "name": "Suchscheinwerfer",
@@ -402,7 +558,9 @@
   "size": [1, 2],
   "stack": 1,
   "value": 90,
-  "description": "Lampe für AvAs Nase. Sie leuchtet damit gern Leyla ins Gesicht."
+  "description": "Lampe für AvAs Nase. Sie leuchtet damit gern Leyla ins Gesicht.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "gluehbirne", "count": 1},{"item": "kupferkabel", "count": 1},{"item": "technik", "count": 1}]
  },
  "greifarm": {
   "name": "Greifarm",
@@ -414,10 +572,37 @@
   "size": [1, 2],
   "stack": 1,
   "value": 120,
-  "description": "Zange am Heck. AvA hebt damit Kleinkram auf und manchmal Leylas Snacks. Leyla kann sich daran festhalten.", "battery": 10
+  "description": "Zange am Heck. AvA hebt damit Kleinkram auf und manchmal Leylas Snacks. Leyla kann sich daran festhalten.",
+  "battery": 10,
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "zahnraeder", "count": 1},{"item": "schrott", "count": 1},{"item": "technik", "count": 1}]
  },
- "hochleistungszelle": {"name": "Hochleistungszelle", "glyph": "⚡", "category": "dronepart", "wear": "core", "size": [1, 1], "stack": 1, "value": 160, "battery": 60, "description": "Ein Akku, der eigentlich in ein Militär-Exoskelett gehört. AvA trägt Leyla damit deutlich länger."},
- "turbinenmodul": {"name": "Turbinenmodul", "glyph": "✈", "category": "dronepart", "wear": "module", "size": [2, 1], "stack": 1, "value": 140, "battery": 35, "description": "Zwei kleine Mantelpropeller zum Anstecken. Laut, aber sie stemmen Gewicht."},
+ "hochleistungszelle": {
+  "name": "Hochleistungszelle",
+  "glyph": "⚡",
+  "category": "dronepart",
+  "wear": "core",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 160,
+  "battery": 60,
+  "description": "Ein Akku, der eigentlich in ein Militär-Exoskelett gehört. AvA trägt Leyla damit deutlich länger.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "batteriezelle", "count": 2},{"item": "technik", "count": 2}]
+ },
+ "turbinenmodul": {
+  "name": "Turbinenmodul",
+  "glyph": "✈",
+  "category": "dronepart",
+  "wear": "module",
+  "size": [2, 1],
+  "stack": 1,
+  "value": 140,
+  "battery": 35,
+  "description": "Zwei kleine Mantelpropeller zum Anstecken. Laut, aber sie stemmen Gewicht.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "zahnraeder", "count": 2},{"item": "technik", "count": 2}]
+ },
  "goldzahn": {
   "name": "Goldzahn",
   "look": "icons_treasure",
@@ -437,7 +622,9 @@
   "stack": 1,
   "value": 60,
   "description": "Vinyl aus der Zeit vor dem Kollaps, die Hülle ist noch fast heil.",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "warroom",
+  "salvage": [{"item": "wissen", "count": 1}]
  },
  "winkekatze": {
   "name": "Winkekatze mit Cyberauge",
@@ -448,7 +635,9 @@
   "stack": 1,
   "value": 80,
   "description": "Winkt seit Jahrzehnten. Das rote Auge blinkt manchmal.",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "batteriezelle", "count": 1},{"item": "technik", "count": 1}]
  },
  "handheld": {
   "name": "Alte Spielkonsole",
@@ -459,7 +648,9 @@
   "stack": 1,
   "value": 70,
   "description": "Läuft noch mit Batterien. Leyla hat so eine im Rucksack.",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "alte_platine", "count": 1},{"item": "batteriezelle", "count": 1},{"item": "technik", "count": 1}]
  },
  "ring": {
   "name": "Ehering mit Stein",
@@ -492,7 +683,9 @@
   "stack": 1,
   "value": 75,
   "description": "Leuchtet, sobald es Strom bekommt.",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "kupferkabel", "count": 2},{"item": "technik", "count": 1}]
  },
  "luxusuhr": {
   "name": "Luxusuhr (Imitat)",
@@ -503,7 +696,9 @@
   "stack": 1,
   "value": 45,
   "description": "Fühlt sich teuer an. Ist es nicht.",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "zahnraeder", "count": 1}]
  },
  "geldbuendel": {
   "name": "Bündel alter Scheine",
@@ -513,7 +708,9 @@
   "size": [2, 1],
   "stack": 1,
   "value": 30,
-  "description": "Wertlos als Geld, aber Sammler zahlen dafür."
+  "description": "Wertlos als Geld, aber Sammler zahlen dafür.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "stoffreste", "count": 1}]
  },
  "taschenuhr": {
   "name": "Goldene Taschenuhr",
@@ -524,7 +721,9 @@
   "stack": 1,
   "value": 110,
   "description": "Tickt noch. Innen eine Gravur, kaum lesbar.",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "zahnraeder", "count": 2}]
  },
  "juwelenchip": {
   "name": "Juwelenbesetzter Chip",
@@ -534,7 +733,9 @@
   "size": [1, 1],
   "stack": 1,
   "value": 130,
-  "description": "Ein Implantat-Chip, mit Steinen verziert. Protz aus der Megacity."
+  "description": "Ein Implantat-Chip, mit Steinen verziert. Protz aus der Megacity.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "chip", "count": 1},{"item": "technik", "count": 2}]
  },
  "revolver": {
   "name": "Gravierter Revolver",
@@ -545,7 +746,9 @@
   "stack": 1,
   "value": 140,
   "description": "Nicht mehr schussfähig, aber was für ein Stück.",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrott", "count": 2},{"item": "zahnraeder", "count": 1}]
  },
  "schneekugel": {
   "name": "Schneekugel mit Stadt",
@@ -567,7 +770,9 @@
   "stack": 1,
   "value": 85,
   "description": "Die Unterschrift kennt keiner mehr. Trotzdem.",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "stoffreste", "count": 1}]
  },
  "goetzenfigur": {
   "name": "Tönerne Götzenfigur",
@@ -578,7 +783,9 @@
   "stack": 1,
   "value": 120,
   "description": "Aus einer Ruine. Starrt einen an, wenn man nicht hinsieht.",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "warroom",
+  "salvage": [{"item": "wissen", "count": 1}]
  },
  "datenkristall": {
   "name": "Leuchtender Datenkristall",
@@ -589,6 +796,35 @@
   "stack": 1,
   "value": 150,
   "description": "Voller Daten, die niemand mehr lesen kann. Schön leuchten tut er trotzdem.",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "salvageAt": "warroom",
+  "salvage": [{"item": "wissen", "count": 3}]
+ },
+ "technik": {
+  "name": "Technik",
+  "category": "progress",
+  "size": [1, 1],
+  "stack": 99,
+  "value": 2,
+  "glyph": "⚙",
+  "description": "Fortschritt fürs Basteln. Entsteht beim Zerlegen an der Werkbank, wird im Warroom in den Techtree gesteckt."
+ },
+ "wissen": {
+  "name": "Wissen",
+  "category": "progress",
+  "size": [1, 1],
+  "stack": 99,
+  "value": 2,
+  "glyph": "💾",
+  "description": "Fortschritt aus Daten, Zetteln und alten Dingen. Entsteht beim Auswerten im Warroom."
+ },
+ "bio": {
+  "name": "Bio",
+  "category": "progress",
+  "size": [1, 1],
+  "stack": 99,
+  "value": 2,
+  "glyph": "🧬",
+  "description": "Fortschritt aus Proben und allem, was mal gelebt hat. Entsteht in der Kochnische. Führt irgendwann zum Heilmittel."
  }
 }

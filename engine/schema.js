@@ -48,7 +48,7 @@ export const ENEMY_FAMILIES = [['mutant', 'Mutant'], ['raider', 'Plünderer'], [
 export const ENEMY_BEHAVIORS = [['patrol', 'Patrouille'], ['charger', 'Stürmer'], ['shooter', 'Schütze'], ['ambusher', 'Lauerer'], ['flyer', 'Flieger'], ['boss', 'Boss']];
 // tags on things (Daniel, 11.11.2026: „mach ein Tag trophy“): trophy = may hang on a trophy stand in the treasury
 export const ITEM_TAGS = [['trophy', 'Trophäe']];
-export const ITEM_CATEGORIES = [['junk', 'Schrott'], ['resource', 'Ressource'], ['ingredient', 'Zutat'], ['food', 'Gericht'], ['component', 'Bauteil'], ['consumable', 'Verbrauchsgut'], ['valuable', 'Wertsache'], ['blueprint', 'Bauplan/Rezept'], ['armor', 'Rüstung'], ['implant', 'Implantat'], ['dronepart', 'Drohnenteil']];
+export const ITEM_CATEGORIES = [['junk', 'Schrott'], ['resource', 'Ressource'], ['ingredient', 'Zutat'], ['food', 'Gericht'], ['component', 'Bauteil'], ['consumable', 'Verbrauchsgut'], ['valuable', 'Wertsache'], ['blueprint', 'Bauplan/Rezept'], ['armor', 'Rüstung'], ['implant', 'Implantat'], ['dronepart', 'Drohnenteil'], ['progress', 'Fortschritt']];
 // where a thing is worn (Daniel, 10.11.2026: Inventar im Diablo-Stil): Leyla's head + armor, implants in her body, parts on AvA
 export const WEAR_SLOTS = [['head', 'Kopf'], ['armor', 'Rüstung'], ['eyes', 'Implantat: Augen'], ['nerves', 'Implantat: Nerven'], ['arm', 'Implantat: Cyberarm'], ['heart', 'Implantat: Herz'], ['legs', 'Implantat: Beine'], ['skin', 'Implantat: Haut'],
   ['bow', 'Drohne: Bug'], ['tail', 'Drohne: Heck'], ['core', 'Drohne: Kern'], ['module', 'Drohne: Modul']];
@@ -76,6 +76,30 @@ export const RANKING_CATEGORIES = [['time', 'Durchlaufzeit'], ['kills', 'Kills i
 const label = (list, v) => list.find(([k]) => k === v)?.[1] ?? v ?? '';
 
 // ---------- areas ----------
+// Zerlegen ohne Farming (Daniel, 12.11.2026: „ich baue das Glas, um es dann zu zerlegen, darf nicht funktionieren“).
+// Rules: a craftable thing never gives back more of any ingredient than its recipe takes (per piece, every recipe),
+// its salvage is worth less than the ingredients, failure junk from experiments has no salvage, salvage never loops.
+export function salvageProblems(p, id) {
+  const items = p?.data?.items || {}, x = items[id]; if (!x) return [];
+  const out = [], sv = (x.salvage || []).filter(s => s?.item), val = k => Number(items[k]?.value) || 0;
+  const add = (kind, text) => out.push({ kind, text });
+  if (sv.some(s => s.item === id)) add('error', 'Zerlegt sich in sich selbst');
+  if (x.category === 'progress' && sv.length) add('warning', 'Fortschritt (Technik, Wissen, Bio) sollte sich nicht zerlegen lassen');
+  for (const [rid, r] of Object.entries(p?.data?.recipes || {})) {
+    if (r?.result !== id || r.part) continue;
+    const n = Math.max(1, Number(r.count) || 1), ing = Object.fromEntries((r.ingredients || []).map(i => [i.item, Number(i.count) || 0]));
+    for (const s of sv) if ((Number(s.count) || 0) * n > (ing[s.item] || 0)) add('error', `Farming: aus Rezept „${r.name || rid}“ kommt beim Zerlegen mehr ${items[s.item]?.name || s.item} heraus, als hineingeht${items[s.item]?.category === 'progress' ? ' (Hergestelltes gibt nie Fortschritt)' : ''}`);
+    const back = sv.reduce((a, s) => a + (Number(s.count) || 0) * n * val(s.item), 0), cost = Object.entries(ing).reduce((a, [k, c]) => a + c * val(k), 0);
+    if (sv.length && back > 0 && back >= cost) add('error', `Farming: Zerlegen bringt mehr Wert zurück (${back} Δ), als Rezept „${r.name || rid}“ kostet (${cost} Δ)`);
+  }
+  if (sv.length && (p?.data?.crafting?.failures || []).some(f => f?.item === id)) add('error', 'Fehlschlag-Müll darf nicht zerlegbar sein (sonst Farming über Experimente)');
+  const seen = new Set(), walk = k => { for (const s of items[k]?.salvage || []) { if (s?.item === id) return true; if (s?.item && !seen.has(s.item)) { seen.add(s.item); if (walk(s.item)) return true; } } return false; };
+  if (sv.length && walk(id)) add('error', 'Zerlegen dreht sich im Kreis (ein Bestandteil zerlegt sich wieder hierzu)');
+  const back = sv.reduce((a, s) => a + (Number(s.count) || 0) * val(s.item), 0);
+  if (sv.length && back > Math.max(1, val(id)) * 1.5) add('hint', `Zerlegen bringt deutlich mehr (${back} Δ) als Verkaufen (${val(id)} Δ)`);
+  return out;
+}
+
 export const AREAS = {
   assets: {
     name: 'Assets', singular: 'Asset', icon: 'image', file: 'data/assets.json', kind: 'catalog', gallery: true, groupBy: { key: 'kind', options: ASSET_KINDS },
@@ -551,9 +575,12 @@ export const AREAS = {
         num('strain', 'Belastung', { min: 0, hint: 'Nur Implantate: zusammen höchstens Leyla › Inventar › Belastung höchstens' }),
         ref('partLook', 'An der Drohne', 'assets', { hint: 'Nur Drohnenteile: Bild an AvA (Drohne › Anbauteile, Spalte Gegenstand)' }),
         num('battery', 'AvA: mehr Akku', { unit: '%', hint: 'Nur Drohnenteile (Daniel, 12.11.2026: „bessere Teile machen die Drohne stärker“): so viel länger trägt sie Leyla, zählt über alle Teile zusammen' })] },
+      { title: 'Zerlegen', fields: [ref('salvageAt', 'Zerlegen an', 'workshops', { hint: 'Werkstatt, an der man das Ding zerlegt (Technik meist Werkbank, Wissen Warroom, Bio Kochnische). Leer = Werkbank' }),
+        table('salvage', 'Ergibt', [ref('item', 'Gegenstand', 'items'), num('count', 'Anzahl', { min: 1 })], { hint: 'Bestandteile beim Zerlegen: Bauteile oder direkt Fortschritt (Technik, Wissen, Bio). Leer = nicht zerlegbar. Gegen Farming (Daniel, 12.11.2026): was man herstellen kann, gibt nie mehr zurück, als im Rezept steckt, und nie Fortschritt; Fehlschlag-Müll ist nicht zerlegbar' })] },
     ],
-    check: (x, report, p) => {
+    check: (x, report, p, id) => {
       iconCheck(x, report, p);
+      for (const m of salvageProblems(p, id)) report(m.kind, m.text);
       if (x.wear && !['armor', 'implant', 'dronepart'].includes(x.category)) report('hint', 'Trägt man, ist aber keine Rüstung, kein Implantat und kein Drohnenteil');
       if (['armor', 'implant', 'dronepart'].includes(x.category) && !x.wear) report('warning', 'Ausrüstung ohne „Trägt man als“');
       if (x.shape?.length) { const w = Math.max(...x.shape.map(r => r.length)); if (!x.shape.join('').includes('#')) report('error', 'Form ohne belegtes Feld (#)'); if (x.shape.some(r => /[^#. ]/.test(r))) report('error', 'Form: nur # und . erlaubt'); if (w > 6 || x.shape.length > 6) report('warning', 'Form größer als 6 × 6'); }

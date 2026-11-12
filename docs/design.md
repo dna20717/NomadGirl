@@ -73,6 +73,10 @@ Stirbt Leyla, ist die Beute aus dem aktuellen Run verloren. AvA, ihre Drohne, re
 - **k.o.** = Leylas Leben fällt im Run auf null. AvA schleppt sie **zum Startpunkt des Runs** (nicht ins Camp), der Wiedereinstieg ist weicher. Jede Rettung kostet Tank-Zustand.
 - **Verloren ist alles, was nicht in Avas Rettungsfach (Schutzbox) liegt.**
 - **Der Rucksack bleibt an der k.o.-Stelle liegen.** Leyla hat **genau eine Chance**, ihn zurückzuholen; geht sie vorher wieder k.o., ist er endgültig weg.
+- **Ausrüstung am Körper bleibt** (Waffen, Rüstung, Implantate); verloren geht nur der Rucksack (2a).
+- **Der Run läuft weiter.** Rang: keine Extra-Strafe, die verlorene Zeit drückt ihn ohnehin (1c).
+- **Räume setzen zurück** (Gegner neu), **aber** der liegende Rucksack bleibt, und große Beute wie Tresore wird nicht zurückgesetzt (3c).
+- **Ist der Tank bei einer Rettung kritisch, kostet die letzte Rettung AvA das Leben** (4c): Leyla ist gerettet, die Suche verloren.
 
 ### Ranking
 
@@ -129,6 +133,8 @@ Grundsatz: Die Ziele kommen aus der Mechanik, eine Herleitung aus der Story brau
 ### Ressourcen verdienen & Knoten (Daniel, 12.11.2026)
 
 - **Ressourcen sind Gegenstände in der Welt (Daniel, 12.11.2026):** Technik, Wissen und Bio existieren als verwertbare Items. Man **erzeugt sie an Werkbänken** aus Beute (Vorschlag Ava: Technik an der Werkbank durch Zerlegen, Wissen im Warroom durch Auswerten von Datenträgern und Zetteln, Bio in Küche/Labor aus Proben). Sie liegen im Lager wie alles andere und werden im Warroom für Knoten ausgegeben. Damit gelten für sie dieselben Regeln wie für Beute: Was beim k.o. nicht im Rettungsfach liegt, ist weg.
+- **Zerlegen (Daniel, 12.11.2026, Daten angelegt):** Jeder Gegenstand sagt, in was er sich zerlegen lässt (Gegenstände › Zerlegen: „Zerlegen an“ + „Ergibt“), andere Bauteile oder direkt Fortschritt. Neue Kategorie **Fortschritt** mit den Gegenständen **Technik ⚙, Wissen 💾, Bio 🧬** (Namen tbd). Technik meist an der Werkbank, Wissen im Warroom (Zettel, Baupläne, Datenkristall, Götzenfigur, Schallplatte), Bio in der Kochnische (Mutantenfleisch, Gemüse, Eier, Garnelen, Aufputschspritze). Grundstoffe (Schrott, Kabel, Schrauben …), Gerichte, Fehlschlag-Müll und manche Wertsachen sind nicht zerlegbar.
+- **Kein Farming** („Glas bauen, um es zu zerlegen“, darf nicht gehen), von der Werkstatt geprüft: Was man herstellen kann, gibt beim Zerlegen von keinem Bestandteil mehr zurück, als im Rezept steckt, insgesamt weniger Wert, und nie Fortschritt. Fehlschlag-Müll aus Experimenten ist nicht zerlegbar. Zerlegen darf sich nicht im Kreis drehen. Die Aktion „Zerlegen“ an den Werkbänken ist noch nicht gebaut.
 - Ressourcen-Rohstoffe gibt es für erledigte Aktionen: Kisten, Kills, Secrets, Kochen, Bauen; ein guter Rang gibt Wissen extra.
 - **Knoten schalten frei (2c):** Rezepte, Werkstätten, Rig-Teile, Fähigkeiten für Leyla und AvA **und passive Boni** (z. B. +10 % Akku).
 - Ein neuer Durchgang würfelt POI-Reihenfolge und Beute neu (Startwert Ava).

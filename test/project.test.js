@@ -94,3 +94,15 @@ test('assets: entities point to assets via look, renaming an asset follows', asy
   assert.equal(p.data.assets.leyla_idle_side_left.mirror, 'leyla_stehen');   // the opposite direction follows too
   for (const a of ['enemies', 'weapons', 'items', 'tractors', 'containers', 'workshops', 'companions', 'pois']) assert.ok(fields(a).some(f => f.key === 'look' && f.area === 'assets'), a);
 });
+
+test('salvage: every item says how it breaks down, crafting then salvaging never pays (no farming)', async () => {
+  const p = await load();
+  const msgs = validateProject(p).filter(m => m.place.area === 'items' && /Farming|Kreis|Fehlschlag|sich selbst/.test(m.text));
+  assert.deepEqual(msgs, []);
+  for (const id of ['technik', 'wissen', 'bio']) assert.equal(p.data.items[id]?.category, 'progress', id);
+  const farm = (mut, re) => { const q = structuredClone(p); mut(q); return validateProject(q).some(m => m.kind === 'error' && re.test(m.text)); };
+  assert.ok(farm(q => { q.data.items.schrottplatte.salvage = [{ item: 'technik', count: 1 }]; }, /Farming/), 'Hergestelltes gibt keinen Fortschritt');
+  assert.ok(farm(q => { q.data.items.schrottplatte.salvage = [{ item: 'schrott', count: 4 }]; }, /Farming/), 'nicht mehr zurück als hinein');
+  assert.ok(farm(q => { q.data.items.verkohlter_klumpen.salvage = [{ item: 'bio', count: 1 }]; }, /Fehlschlag/), 'Fehlschlag-Müll');
+  assert.ok(farm(q => { q.data.items.schrott.salvage = [{ item: 'schrottplatte', count: 1 }]; }, /Kreis/), 'Kreislauf');
+});
