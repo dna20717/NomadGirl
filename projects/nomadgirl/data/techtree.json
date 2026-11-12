@@ -1,0 +1,88 @@
+{
+ "wartungsklappe": {
+  "name": "Wartungsklappe",
+  "tab": "technik",
+  "look": "tt_nodes",
+  "icon": 0,
+  "pos": [0, 1],
+  "cost": [{"resource": "technik", "count": 3}],
+  "requires": [],
+  "recipes": ["tank_dichtung"],
+  "bonus": [],
+  "description": "Eine Klappe im Sockel des Tanks. Endlich kommt Leyla an die Dichtungen ran."
+ },
+ "thermohuelle": {
+  "name": "Thermohülle",
+  "tab": "technik",
+  "look": "tt_nodes",
+  "icon": 1,
+  "pos": [1, 0],
+  "cost": [{"resource": "technik", "count": 5},{"resource": "wissen", "count": 1}],
+  "requires": ["wartungsklappe"],
+  "recipes": [],
+  "bonus": [{"stat": "tankDecay", "value": -15}],
+  "description": "Ein gesteppter Mantel um das Glas. Die Kälte bleibt drin: der Tank verfällt 15 % langsamer."
+ },
+ "notreserve": {
+  "name": "Notreserve",
+  "tab": "technik",
+  "look": "tt_nodes",
+  "icon": 3,
+  "pos": [1, 2],
+  "cost": [{"resource": "technik", "count": 4},{"resource": "bio", "count": 2}],
+  "requires": ["wartungsklappe"],
+  "recipes": [],
+  "bonus": [{"stat": "tankRescue", "value": -25}],
+  "description": "Ein Akku nur für den Notfall. Wenn AvA Leyla heimholt, kostet es den Tank ein Viertel weniger."
+ },
+ "kuehlkreislauf": {
+  "name": "Kühlkreislauf",
+  "tab": "technik",
+  "look": "tt_nodes",
+  "icon": 4,
+  "pos": [2, 1],
+  "cost": [{"resource": "technik", "count": 8},{"resource": "wissen", "count": 3}],
+  "requires": ["thermohuelle"],
+  "recipes": [
+   "kuehlmittel_destillieren"
+  ],
+  "bonus": [],
+  "description": "Rohre, Pumpe, ein bisschen Magie. An der Werkbank lässt sich jetzt Kühlmittel destillieren."
+ },
+ "stasis": {
+  "name": "Stasis-Stabilisator",
+  "tab": "technik",
+  "look": "tt_nodes",
+  "icon": 5,
+  "pos": [3, 1],
+  "cost": [{"resource": "technik", "count": 10},{"resource": "wissen", "count": 5},{"resource": "bio", "count": 5}],
+  "requires": ["kuehlkreislauf", "notreserve", "lebenszeichen"],
+  "recipes": [],
+  "bonus": [{"stat": "tankAccel", "value": -50}],
+  "description": "Ein Kern, der die Zeit im Tank fast anhält. Ein schwacher Tank zerfällt nur noch halb so schnell schneller."
+ },
+ "lebenszeichen": {
+  "name": "Lebenszeichen",
+  "tab": "wissen",
+  "look": "tt_nodes",
+  "icon": 2,
+  "pos": [0, 1],
+  "cost": [{"resource": "wissen", "count": 3}],
+  "requires": [],
+  "recipes": [],
+  "bonus": [{"stat": "tankStatus", "value": 1}],
+  "description": "Ein Display am Handgelenk. Leyla sieht auch im Run, wie es AvA geht."
+ },
+ "heilmittel": {
+  "name": "Das Heilmittel",
+  "tab": "bio",
+  "look": "tt_nodes",
+  "icon": 6,
+  "pos": [3, 1],
+  "cost": [{"resource": "bio", "count": 30},{"resource": "wissen", "count": 20},{"resource": "technik", "count": 20}],
+  "requires": ["stasis"],
+  "recipes": [],
+  "bonus": [],
+  "description": "Irgendwo da draußen gibt es ein Rezept. Noch weiß niemand, wie es aussieht."
+ }
+}

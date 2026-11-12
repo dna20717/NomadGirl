@@ -30,6 +30,8 @@ const lines = (key, label, o = {}) => ({ key, label, type: 'lines', ...o });
 const NAME = text('name', 'Name', { required: true });
 const DESCRIPTION = area_('description', 'Beschreibung');
 const VALUE = num('value', 'Wert', { unit: 'Δ', min: 0, hint: 'Verkaufswert in Deltas' });
+export const TECH_BONUS = [['tankDecay', 'Tank: Verfall %'], ['tankRescue', 'Tank: Rettung kostet %'], ['tankAccel', 'Tank: Beschleunigung %'],
+  ['tankStatus', 'Tank-Anzeige im Run (1 = an)'], ['droneBattery', 'AvA: Akku %'], ['health', 'Leyla: Leben'], ['damage', 'Leyla: Schaden %']];
 const LOOK = ref('look', 'Aussehen', 'assets', { hint: 'Grafik aus dem Bereich Assets' });
 const ICON = num('icon', 'Symbol', { min: 0, hint: 'Nur bei Aussehen der Art „Symbole“: welches Feld im Raster (0 = oben links, zeilenweise). Am einfachsten rechts in der Vorschau anklicken' });
 // an entry whose look is an icon sheet must name a cell that exists
@@ -563,6 +565,37 @@ export const AREAS = {
       select('duration', 'Dauer', BUFF_DURATIONS), num('seconds', 'Sekunden', { min: 0, hint: 'Nur bei Dauer „Sekunden“' }), DESCRIPTION] }],
   },
 
+  resources: {
+    name: 'Ressourcen', singular: 'Ressource', icon: 'points', file: 'data/resources.json', kind: 'catalog',
+    hint: 'Upgrade-Ressourcen für den Techtree (design.md › Progression): Technik, Wissen, Bio … Jede ist ein Gegenstand in der Welt (Kategorie Fortschritt), bezahlt wird aus Lager, Kiste und Rucksack. Versteckte Ressourcen (z. B. „Dunkelheit“) sind unter der Haube vorgesehen und erscheinen nicht als Tab.',
+    template: { name: 'Neue Ressource', color: '#20d6c7', order: 9 },
+    row: x => `${x.item ? '' : 'ohne Gegenstand · '}${x.hidden ? 'versteckt' : 'Tab ' + (x.order ?? 0)}`,
+    sections: [{ title: 'Ressource', fields: [NAME, ref('item', 'Gegenstand', 'items', { hint: 'Das Ding in der Welt, das man im Techtree ausgibt' }), color('color', 'Farbe'),
+      num('order', 'Reihenfolge der Tabs'), bool('hidden', 'Versteckt', { hint: 'Kein Tab, nicht im Spiel sichtbar (vorgesehen: Dunkelheit)' }),
+      num('darkness', 'Mehr je Stufe', { unit: '%', hint: 'Nur „Dunkelheit“: so viel mehr der anderen Ressourcen je Stufe (noch ohne Wirkung)' }), DESCRIPTION] }],
+  },
+
+  techtree: {
+    name: 'Techtree', singular: 'Knoten', icon: 'tree', file: 'data/techtree.json', kind: 'catalog', groupBy: { key: 'tab', area: 'resources' },
+    hint: 'Knoten im Warroom (design.md › Progression): kosten Ressourcen, bleiben über alle Durchgänge, schalten Rezepte und Boni frei. Position = Spalte und Zeile im Baum (horizontal, Spalte 0 links); Linien kommen aus „Braucht“.',
+    template: { name: 'Neuer Knoten', pos: [0, 0], cost: [], requires: [] },
+    row: x => `${(x.cost || []).map(c => `${c.count}× ${c.resource}`).join(' + ') || 'gratis'} · Spalte ${x.pos?.[0] ?? 0}`,
+    sections: [
+      { title: 'Knoten', fields: [NAME, LOOK, ICON, ref('tab', 'Tab', 'resources', { required: true, hint: 'Unter welcher Ressource der Knoten steht' }), point('pos', 'Position', { unit: 'Spalte, Zeile' }), DESCRIPTION] },
+      { title: 'Kosten & Voraussetzungen', fields: [table('cost', 'Kosten', [ref('resource', 'Ressource', 'resources'), num('count', 'Menge', { min: 1 })]),
+        refs('requires', 'Braucht', 'techtree', { hint: 'Erst wenn diese Knoten freigeschaltet sind' })] },
+      { title: 'Schaltet frei', fields: [refs('recipes', 'Rezepte', 'recipes', { hint: 'Am besten mit Entdecken „Knoten im Techtree“' }),
+        table('bonus', 'Boni', [select('stat', 'Wert', TECH_BONUS), num('value', 'Änderung')], { hint: 'Passive Boni, gelten sofort und in jedem Durchgang. Prozent: −15 = 15 % weniger' })] },
+    ],
+    check: (x, report, p) => {
+      const T = p.data.techtree || {};
+      for (const r of x.requires || []) if (r === x.id) report('error', 'Knoten braucht sich selbst');
+      const seen = new Set(), walk = id => { if (seen.has(id)) return id === x.id; seen.add(id); return (T[id]?.requires || []).some(walk); };
+      if ((x.requires || []).some(walk)) report('error', 'Voraussetzungen drehen sich im Kreis');
+      for (const c of x.cost || []) if (p.data.resources?.[c.resource] && !p.data.resources[c.resource].item && !p.data.resources[c.resource].hidden) report('warning', `Ressource „${c.resource}“ hat keinen Gegenstand`);
+    },
+  },
+
   items: {
     name: 'Gegenstände', singular: 'Gegenstand', icon: 'item', file: 'data/items.json', kind: 'catalog', groupBy: { key: 'category', options: ITEM_CATEGORIES },
     hint: 'Alles, was in den Rucksack passt: Schrott, Ressourcen, Zutaten, Gerichte, Bauteile. Viel Junk, viele Kombinationen.',
@@ -990,6 +1023,7 @@ export const GROUPS = [
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
+  ['PROGRESSION', ['techtree', 'resources']],
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'companions']],
   ['WELT', ['pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'travel']],
 ];

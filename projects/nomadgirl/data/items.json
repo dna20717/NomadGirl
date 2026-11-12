@@ -807,7 +807,9 @@
   "stack": 99,
   "value": 2,
   "glyph": "⚙",
-  "description": "Fortschritt fürs Basteln. Entsteht beim Zerlegen an der Werkbank, wird im Warroom in den Techtree gesteckt."
+  "description": "Fortschritt fürs Basteln. Entsteht beim Zerlegen an der Werkbank, wird im Warroom in den Techtree gesteckt.",
+  "look": "icons_progress",
+  "icon": 0
  },
  "wissen": {
   "name": "Wissen",
@@ -816,7 +818,9 @@
   "stack": 99,
   "value": 2,
   "glyph": "💾",
-  "description": "Fortschritt aus Daten, Zetteln und alten Dingen. Entsteht beim Auswerten im Warroom."
+  "description": "Fortschritt aus Daten, Zetteln und alten Dingen. Entsteht beim Auswerten im Warroom.",
+  "look": "icons_progress",
+  "icon": 1
  },
  "bio": {
   "name": "Bio",
@@ -825,7 +829,9 @@
   "stack": 99,
   "value": 2,
   "glyph": "🧬",
-  "description": "Fortschritt aus Proben und allem, was mal gelebt hat. Entsteht in der Kochnische. Führt irgendwann zum Heilmittel."
+  "description": "Fortschritt aus Proben und allem, was mal gelebt hat. Entsteht in der Kochnische. Führt irgendwann zum Heilmittel.",
+  "look": "icons_progress",
+  "icon": 2
  },
  "kuehlmittel": {
   "name": "Kühlmittel",
@@ -834,7 +840,9 @@
   "stack": 3,
   "value": 40,
   "glyph": "❄",
-  "description": "Ein Kanister, kalt wie eine Winternacht in der Salzebene. Füllt den Cryo-Tank auf."
+  "description": "Ein Kanister, kalt wie eine Winternacht in der Salzebene. Füllt den Cryo-Tank auf.",
+  "look": "icons_progress",
+  "icon": 3
  },
  "kompressor": {
   "name": "Kompressor",
@@ -843,6 +851,8 @@
   "stack": 1,
   "value": 160,
   "glyph": "⚙",
-  "description": "Das Herz einer Kühlanlage. Selten, schwer, unbezahlbar, wenn man es braucht."
+  "description": "Das Herz einer Kühlanlage. Selten, schwer, unbezahlbar, wenn man es braucht.",
+  "look": "icons_progress",
+  "icon": 4
  }
 }

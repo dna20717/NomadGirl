@@ -1,5 +1,6 @@
 // The play scene: builds a room from its layout, places Leyla and the enemies, runs input, physics, combat and HUD.
 import { rescue } from '../tank.js';
+import { bonuses } from '../techtree.js';
 import { parseRoom, solidRects } from '../../engine/room.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
 import { PoiLevel } from './poi_level.js';
@@ -23,6 +24,7 @@ import { FloorStrip } from './floor_strip.js';
 import { skinnedLook, SKIN_LOOKS } from './gun_skins.js';
 import { gearStats, add } from '../inventory.js';
 import { CraftUI } from './craft_ui.js';
+import { TechtreeUI } from './techtree_ui.js';
 import { BuildMode } from './build_mode.js';
 import { use as useThing } from '../crafting.js';
 
@@ -322,7 +324,8 @@ export class PlayScene extends Phaser.Scene {
 
   // worn gear and implants (inv.wear) on top of the buffs: swap the old sums for the new ones, AvA shows her parts
   applyGear() {
-    const g = this.box ? gearStats(this.data_, this.box.save.inv?.wear) : {};
+    const g = this.box ? { ...gearStats(this.data_, this.box.save.inv?.wear) } : {};
+    if (this.box) { const b = bonuses(this.data_, this.box.save); for (const k of ['health', 'damage']) if (b[k]) g[k] = (g[k] || 0) + b[k]; }   // Techtree: passive bonuses count like gear
     for (const k of ['defense', 'health', 'damage', 'speed']) { const v = (this.mods[k] || 0) - (this.gearMods?.[k] || 0) + (g[k] || 0); if (v) this.mods[k] = v; else delete this.mods[k]; }
     this.gearMods = g;
     if (this.leyla) this.leyla.health = Math.min(this.leyla.health, this.leyla.maxHealth);
@@ -360,6 +363,15 @@ export class PlayScene extends Phaser.Scene {
       closed: () => hud.scene.craftClosed(),
     });
     hud.craft.el.hidden = true;
+    // the tech tree in the warroom (game/play/techtree_ui.js)
+    hud.tech ??= new TechtreeUI(hud.root, {
+      get D() { return hud.scene.data_; },
+      save: () => hud.scene.box.save,
+      changed: () => { clearTimeout(hud.scene.saveTimer); hud.scene.saveTimer = setTimeout(() => hud.scene.box?.persist(), 400); hud.scene.applyGear?.(); },
+      notify: text => hud.scene.fx.text(hud.scene.leyla.x, hud.scene.leyla.feet - hud.scene.leyla.height - 30, text, { color: '#ffd27a', size: 34, rise: 40, life: 1600 }),
+      closed: () => {},
+    });
+    hud.tech.close(); hud.tech.el.hidden = true;
     // building the rig right in the camp (game/play/build_mode.js): B in the camp or Warroom › Rig umbauen
     hud.build ??= new BuildMode(hud.root, { scene: () => hud.scene });
     hud.build.reset();
@@ -694,7 +706,7 @@ export class PlayScene extends Phaser.Scene {
     // inventory open: the controller drives its cursor (padMenus), Leyla only hears the keyboard; Select / Start still close
     const invPad = this.hud.inv?.isOpen && !this.hud.paused && !this.hud.modal;
     // Select in the camp (Daniel, 12.11.2026: „Rig-Bau-Modus = Select“): tap = inventory (on release), hold = build the rig
-    const selHold = this.mode === 'camp' && pad?.kind && !this.hud.inv?.isOpen && !this.hud.build?.active && !this.hud.modal && !this.hud.craft?.isOpen;
+    const selHold = this.mode === 'camp' && pad?.kind && !this.hud.inv?.isOpen && !this.hud.build?.active && !this.hud.modal && !this.hud.craft?.isOpen && !this.hud.tech?.isOpen;
     if (pad?.kind) for (const name of Object.keys(i)) { if (invPad && name !== 'inventory' && name !== 'help') continue; if (name === 'inventory' && (selHold || this.hud.build?.active)) continue; i[name].down ||= pad.down(name); i[name].pressed ||= pad.pressed(name) && !(pad.viaUp?.has(name) && !this.useByUp()); }
     if (selHold) {
       const hold = this.data_.game?.gamepad?.buildHold ?? 500, now = this.now ?? 0;
@@ -712,7 +724,7 @@ export class PlayScene extends Phaser.Scene {
   }
   useByUp() {
     const l = this.leyla, h = this.hud, G = this.data_.game?.gamepad || {};
-    if (G.useUp === false || !l?.alive || h.modal || h.paused || h.inv?.isOpen || h.craft?.isOpen || h.build?.active) return false;
+    if (G.useUp === false || !l?.alive || h.modal || h.paused || h.inv?.isOpen || h.craft?.isOpen || h.tech?.isOpen || h.build?.active) return false;
     if (!h.promptText || (h.promptKey || 'E') !== 'E' || h.promptEl?.hidden) return false;
     return l.state === 'normal' && (l.body.blocked.down || l.body.touching.down) && Math.abs(l.body.velocity.x) <= (l.m.walkSpeed ?? 240) * 1.15;
   }
@@ -731,6 +743,11 @@ export class PlayScene extends Phaser.Scene {
       }
       eat(); input.help.pressed = false;
       return;
+    }
+    if (hud.tech?.isOpen) {
+      if (u.pressed('back')) { hud.tech.close(); input.help.pressed = false; }
+      else hud.tech.nav(u);
+      eat(); return;
     }
     if (hud.craft?.isOpen) {
       if (u.pressed('back')) { hud.craft.close(); input.help.pressed = false; }
@@ -755,7 +772,7 @@ export class PlayScene extends Phaser.Scene {
     if (input.help.pressed) {
       if (this.hud.inv?.isOpen && !this.hud.paused) this.hud.inv.close();
       else if (this.hud.paused) this.hud.toggleHelp(false);
-      else if (!this.hud.modal && !this.hud.craft?.isOpen && !this.hud.build?.active && !this.leaving) this.hud.pauseMenu();
+      else if (!this.hud.modal && !this.hud.craft?.isOpen && !this.hud.tech?.isOpen && !this.hud.build?.active && !this.leaving) this.hud.pauseMenu();
     }
     if (input.controls?.pressed && !this.hud.modal) this.hud.toggleHelp();
     if (input.mute.pressed) this.toggleMute();
@@ -763,13 +780,13 @@ export class PlayScene extends Phaser.Scene {
     if (input.restart.pressed && this.mode === 'test' && this.level) this.restartAs({});   // doors, chests, walls: fresh room
     else if (input.restart.pressed && this.mode !== 'camp' && !this.level) this.restartRoom();
     const building = this.hud.build?.active;
-    if (input.swap?.pressed && !building && !this.hud.modal && !this.hud.paused && !this.hud.inv?.isOpen && !this.hud.craft?.isOpen && this.leyla.alive) this.swapRanged();
+    if (input.swap?.pressed && !building && !this.hud.modal && !this.hud.paused && !this.hud.inv?.isOpen && !this.hud.craft?.isOpen && !this.hud.tech?.isOpen && this.leyla.alive) this.swapRanged();
     if (input.build?.pressed && building) this.hud.build.close();
-    else if (input.build?.pressed && this.mode === 'camp' && !this.hud.modal && !this.hud.paused && !this.leaving && !this.hud.craft?.isOpen) this.openBuild();
+    else if (input.build?.pressed && this.mode === 'camp' && !this.hud.modal && !this.hud.paused && !this.leaving && !this.hud.craft?.isOpen && !this.hud.tech?.isOpen) this.openBuild();
     // every window pauses the game (Daniel, 12.11.2026: „Fenster pausieren immer, auch im Run“): menus, controls, cooking and the inventory
     let invDone = false;
     if (this.hud.inv?.isOpen && !this.hud.paused && !this.hud.modal && !this.leaving) { this.inventoryUpdate(input); invDone = true; }
-    if (this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || this.hud.inv?.isOpen || this.leaving) {
+    if (this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || this.hud.tech?.isOpen || this.hud.inv?.isOpen || this.leaving) {
       // cooking, crafting, a menu: the workshops keep glowing, steaming and sparking behind the window
       if (this.camp && !this.hud.paused && !this.leaving) { this.camp.benches?.update(time, Math.min(delta, 50)); this.camp.lid?.(Math.min(delta, 50)); }
       this.physics.world.pause(); this.hud.update(this, time); return;

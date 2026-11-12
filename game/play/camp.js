@@ -904,6 +904,10 @@ export class Camp {
       items.push({ label: `Plündern: ${p.name}`, sub: `Gefahr ${'●'.repeat(p.danger || 1)} · ein Run dauert ${this.C.clock?.runHours ?? 3} h${save.buffs.length ? ' · Buffs: ' + save.buffs.map(b => D.buffs?.[b]?.name || b).join(', ') : ''}`,
         primary: true, act: () => s.startRun(here.poi) });
     }
+    if (Object.keys(D.techtree || {}).length) {
+      const n = Object.keys(D.techtree).length, mine = (save.nodes || []).filter(x => D.techtree[x]).length;
+      items.push({ label: 'Techtree', sub: `${mine} von ${n} Knoten · bleibt über alle Durchgänge`, act: () => { s.hud.inv?.close(); s.hud.tech?.open(); } });
+    }
     for (const [id, loc] of Object.entries(D.locations || {})) {
       if (id === save.location) continue;
       const t = travelCost(D, save, id), p = D.pois?.[loc.poi];

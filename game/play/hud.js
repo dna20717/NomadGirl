@@ -1,4 +1,6 @@
 // HUD as HTML over the canvas: health, ammo, dash, time, kills, Δ, banners and the controls overlay.
+import { bonuses } from '../techtree.js';
+import { phase } from '../tank.js';
 import { el } from '../ui.js';
 import { hints, setUiDevice } from './ui_nav.js';
 import { icon } from '../icons.js';
@@ -212,7 +214,7 @@ export class Hud {
   update(scene, time) {
     const l = scene.leyla, max = l.maxHealth;
     // windows on top: the E prompt of the world waits (its key means „ok“ in the window)
-    const hideP = !this.promptText || this.modal || !!this.inv?.isOpen || !!this.craft?.isOpen;
+    const hideP = !this.promptText || this.modal || !!this.inv?.isOpen || !!this.craft?.isOpen || !!this.tech?.isOpen;
     if (this.promptEl.hidden !== hideP) this.promptEl.hidden = hideP;
     this.healthBar.style.width = `${Math.max(0, l.health / max * 100)}%`;
     this.healthText.textContent = `${Math.ceil(l.health)}/${max}`;
@@ -228,7 +230,8 @@ export class Hud {
     const sv = this.save;
     if (sv) {
       const D = this.D, loc = D.locations?.[sv.location]?.name || '';
-      const key = [sv.day, sv.hour, sv.location, sv.deltas, sv.fuel, sv.food, sv.buffs.join(), this.modeName].join('|');
+      const vit = this.modeName === 'run' && sv.tank && bonuses(D, sv).tankStatus > 0 ? phase(D, sv) : null;   // Techtree › Lebenszeichen: the tank in the run
+      const key = [sv.day, sv.hour, sv.location, sv.deltas, sv.fuel, sv.food, sv.buffs.join(), this.modeName, vit ? `${Math.round(sv.tank.cond)}${sv.tank.dead}` : ''].join('|');
       if (key !== this.campKey) {
         this.campKey = key;
         const buffs = sv.buffs.map(b => D.buffs?.[b]?.name || b);
@@ -236,6 +239,7 @@ export class Hud {
           el('div', { class: 'hud-row' }, el('span', { class: 'hud-room' }, `${clockText(sv)} · ${loc}`)),
           el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'Δ'), el('b', {}, String(sv.deltas)), el('span', { class: 'hud-label' }, 'SPRIT'), el('b', {}, `${Math.round(sv.fuel)} l`),
             el('span', { class: 'hud-label' }, 'VORRÄTE'), el('b', {}, (Math.round(sv.food * 10) / 10).toLocaleString('de-DE'))),
+          ...(vit ? [el('div', { class: 'hud-row hud-vital' + (vit.index >= 4 || vit.dead ? ' bad' : '') }, el('span', { class: 'hud-label' }, '♥ AvA'), el('b', {}, vit.dead ? 'kein Signal' : `${Math.round(sv.tank.cond)} % · ${vit.name}`))] : []),
           ...(buffs.length ? [el('div', { class: 'hud-row hud-buffs' }, el('span', { class: 'hud-label' }, 'BUFFS'), el('b', {}, buffs.join(' · ')))] : []));
       }
     }

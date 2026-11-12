@@ -4,6 +4,7 @@
 // while Leyla is moving, a random mood (curious, scan) pops up now and then.
 
 import { suffering } from '../tank.js';
+import { bonuses } from '../techtree.js';
 import { Cables, hullPoint } from '../drone_cables.js';
 
 const STATES = ['down', 'lowHealth', 'alert', 'zen', 'sleep', 'bored'];   // lasting moods, most important first
@@ -259,7 +260,7 @@ export class Drone {
   // how much longer her battery lasts with the parts on her (Gegenstände › AvA: mehr Akku, summed up)
   batteryBonus() {
     const wear = this.scene.box?.save?.inv?.wear || {}, I = this.scene.data_.items || {};
-    return ['bow', 'tail', 'core', 'module'].reduce((n, k) => n + (I[wear[k]]?.battery || 0), 0);
+    return ['bow', 'tail', 'core', 'module'].reduce((n, k) => n + (I[wear[k]]?.battery || 0), 0) + (bonuses(this.scene.data_, this.scene.box?.save).droneBattery || 0);   // + Techtree
   }
   updatePlatform(time, dt) {
     const P = this.d.platform || {}, s = this.scene, l = s.leyla;

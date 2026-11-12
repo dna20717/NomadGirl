@@ -3066,5 +3066,44 @@
   "date": "12.11.2026",
   "derivedFrom": "ws_cryotank_2",
   "description": "Überlagerung: ein Handabdruck im beschlagenen Glas. Das Spiel blendet sie ab und zu ein."
+ },
+ "icons_progress": {
+  "name": "Symbole: Fortschritt & Tank",
+  "kind": "icons",
+  "file": "assets/items/icons_progress.png",
+  "grid": [4, 4],
+  "cell": [64, 64],
+  "names": [
+   "technik",
+   "wissen",
+   "bio",
+   "kuehlmittel",
+   "kompressor",
+   "dichtung",
+   "kuehlspirale",
+   "stasiskern",
+   "heilmittel",
+   "herzchip",
+   "notakku",
+   "thermodecke",
+   "ventil",
+   "glassplitter",
+   "dunkelheit",
+   "medkoffer"
+  ],
+  "description": "Fortschritt (Technik, Wissen, Bio), Tank-Teile und Reserve, 4 × 4 à 64 px. Stilbild icons_treasure, AAP-64.",
+  "source": "KI (PixelLab, Create Image Pro, Stilbild icons_treasure, Palette AAP-64)",
+  "date": "12.11.2026"
+ },
+ "tt_nodes": {
+  "name": "Techtree: Knoten-Bilder",
+  "kind": "icons",
+  "file": "assets/techtree/techtree_nodes.png",
+  "grid": [4, 2],
+  "cell": [108, 108],
+  "names": ["wartungsklappe", "thermohuelle", "lebenszeichen", "notreserve", "kuehlkreislauf", "stasis", "heilmittel", "dichtung"],
+  "description": "Bilder der Techtree-Knoten (Tank-Ast), aus zwei 2 × 2-Blättern ohne die gemalten Schildchen geschnitten (Originale in techtree/source/).",
+  "source": "KI (PixelLab, Create Image Pro, Referenz Cryo-Tank, Stilbild icons_treasure, Palette AAP-64)",
+  "date": "12.11.2026"
  }
 }

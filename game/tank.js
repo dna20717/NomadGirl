@@ -6,6 +6,8 @@
 // Per hour: rate × (1 + accel × (100 − cond) / 100) × (1 + days in this run of the game × aging) × bonus (Techtree, < 1 = slower).
 // A rescue on a knock-out costs `rescue` %; is the tank already below that, it is the last rescue: Leyla is saved, AvA dies.
 
+import { tankMods } from './techtree.js';
+
 export const clockHours = save => (save.day ?? 1) * 24 + (save.hour ?? 0);
 const clamp = v => Math.max(0, Math.min(100, v));
 
@@ -18,13 +20,13 @@ export function ensureTank(D, save) {
 }
 
 // how fast it decays right now (% per hour); bonus = factor from the Techtree (0.85 = −15 %), accelBonus scales the acceleration
-export function rate(D, save, mods = {}) {
+export function rate(D, save, mods = tankMods(D, save)) {
   const T = D.tank || {}, t = save.tank, days = Math.max(0, (save.day ?? 1) - (t.since ?? 1));
   return (T.rate ?? 0.4) * (1 + (T.accel ?? 1) * (mods.accel ?? 1) * (100 - t.cond) / 100) * (1 + days * (T.aging ?? 0.05)) * (mods.decay ?? 1);
 }
 
 // catch up with the clock: hour by hour (the rate changes as the condition falls). → the condition lost
-export function update(D, save, mods = {}) {
+export function update(D, save, mods = tankMods(D, save)) {
   const t = ensureTank(D, save);
   if (t.dead || D.tank?.enabled === false) { t.at = clockHours(save); return 0; }
   const now = clockHours(save), before = t.cond;
@@ -45,7 +47,7 @@ export function phase(D, save) {
 }
 
 // a knock-out in a run: AvA brings Leyla back and pays with the tank. → { cost, last }
-export function rescue(D, save, mods = {}) {
+export function rescue(D, save, mods = tankMods(D, save)) {
   const t = ensureTank(D, save), cost = (D.tank?.rescue ?? 12) * (mods.rescue ?? 1);
   if (t.dead) return { cost: 0, last: false, dead: true };
   t.rescues = (t.rescues || 0) + 1;
@@ -79,7 +81,7 @@ export function suffering(D, save) {
 }
 
 // a rough forecast for the status screen: hours left at today's pace (ignores maintenance)
-export function hoursLeft(D, save, mods = {}) {
+export function hoursLeft(D, save, mods = tankMods(D, save)) {
   const copy = { day: save.day, hour: save.hour, tank: { ...save.tank } };
   let h = 0;
   while (copy.tank.cond > 0 && h < 24 * 60) { copy.tank.cond -= rate(D, copy, mods); h++; if (h % 24 === 0) copy.day++; }

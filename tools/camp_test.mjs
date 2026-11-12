@@ -38,7 +38,7 @@ let m = await ev(() => c.use());
 check('Van-Menü', m?.items.map(i => i.label).join('|') === 'Schlafen · Schlafkoje|Planen · Warroom|Zurück', m);
 m = await ev(() => { nomad.choose('Planen'); return nomad.menu(); });
 check('Warroom: Plündern + 3 Ziele', m?.title === 'Warroom' && m.items[0].label.startsWith('Plündern') && m.items.filter(i => i.label.startsWith('Hinfahren')).length === 3, m);
-check('Warroom: deutsche Zahlen', /2,5 l Sprit/.test(m?.items[1]?.sub), m?.items[1]);
+{ const h = m?.items.find(i => i.label.startsWith('Hinfahren')); check('Warroom: deutsche Zahlen', /2,5 l Sprit/.test(h?.sub), h); }
 await shot('warroom');
 
 s = await ev(() => c.pick('Plündern'));

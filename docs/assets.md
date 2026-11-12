@@ -156,3 +156,5 @@ Spielauflösung 1920×1080, Kacheln 64 px, Leyla 192 px hoch (Höhe im Spiel ihr
 ## Pixel-Art
 
 Die Startseiten-Grafiken (Leyla von vorn, Wastelands-Hintergrund) sind Pixel-Art in kleiner Auflösung (Hintergrund 576 × 324) und werden scharf skaliert (`imageSmoothingEnabled = false`). Leyla im Spiel bleibt hochaufgelöst und geglättet.
+| `icons_progress` | `assets/items/icons_progress.png` | Symbole Fortschritt (Technik, Wissen, Bio), Kühlmittel, Kompressor + Reserve, 4 × 4 à 64 px | KI (PixelLab, Create Image Pro, Stilbild icons_treasure, AAP-64), 12.11.2026 |
+| `tt_nodes` | `assets/techtree/techtree_nodes.png` (Originale `techtree/source/`) | Bilder der Techtree-Knoten (Tank-Ast + Heilmittel + Dichtung), 4 × 2 à 108 px | KI (PixelLab, Create Image Pro, Referenz Cryo-Tank, Stilbild icons_treasure, AAP-64), 12.11.2026 |

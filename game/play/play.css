@@ -434,3 +434,64 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .craft-tank.ph2 { --tk: #7ff6ff; } .craft-tank.ph3 { --tk: #ffd27a; } .craft-tank.ph4 { --tk: #ff9a4a; } .craft-tank.ph5, .craft-tank.dead { --tk: #ff4d6d; }
 .craft-chip.tank { font-family: VT323, monospace; font-size: 20px; color: #5cff9d; display: grid; place-items: center; }
 .craft-upto { color: var(--ui-text-dim, #aab); font-size: 11px; }
+
+/* ---------- tech tree in the warroom (techtree_ui.js): horizontal, pictures, vertical tabs ---------- */
+.tt { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(6, 5, 10, .6); pointer-events: auto; user-select: none; z-index: 20; }
+.tt[hidden] { display: none; }
+.tt-box { width: min(1600px, 97vw); height: min(860px, 92vh); display: flex; flex-direction: column; gap: 12px; padding: 16px 18px; border-radius: 12px; background: #120e19; border: 1px solid #3a2f45; box-shadow: 0 20px 60px rgba(0, 0, 0, .6); }
+.tt-box > header { display: flex; align-items: center; gap: 12px; color: #ffd27a; }
+.tt-box > header h2 { margin: 0; font: 44px/1 VT323, monospace; font-weight: normal; text-shadow: 0 0 12px rgba(255, 210, 122, .45); }
+.tt-box > header small { margin-left: auto; color: #b9a9c9; font: 15px/1.2 var(--ui-font); }
+.tt-main { flex: 1; min-height: 0; display: grid; grid-template-columns: 150px 1fr 330px; gap: 14px; }
+.tt-tabs { display: flex; flex-direction: column; gap: 8px; }
+.tt-tab { position: relative; display: grid; justify-items: center; gap: 2px; padding: 12px 6px 10px; border-radius: 10px; border: 1px solid #3a2f45; background: #1b1424; color: #cbbfda; cursor: pointer; font: 14px/1.1 var(--ui-font); }
+.tt-tab b { font: 26px/1 VT323, monospace; font-weight: normal; }
+.tt-tab small { font: 22px/1 VT323, monospace; color: var(--c); }
+.tt-tab .tt-count { position: absolute; top: 6px; right: 8px; font: 13px/1 var(--ui-font); color: #8d7f9c; font-style: normal; }
+.tt-tab.on { border-color: var(--c); background: linear-gradient(90deg, color-mix(in srgb, var(--c) 22%, #1b1424), #1b1424); color: #fff; box-shadow: inset 4px 0 0 var(--c), 0 0 18px color-mix(in srgb, var(--c) 30%, transparent); }
+.tt-scroll { position: relative; overflow: auto; border-radius: 10px; background: radial-gradient(circle at 30% 40%, #1f1830, #0d0a13 70%); border: 1px solid #2c2338;
+  background-image: radial-gradient(circle at 30% 40%, rgba(32, 214, 199, .06), transparent 60%), repeating-linear-gradient(0deg, rgba(255, 255, 255, .025) 0 1px, transparent 1px 34px), repeating-linear-gradient(90deg, rgba(255, 255, 255, .025) 0 1px, transparent 1px 34px); }
+.tt-tree { position: relative; margin: auto; }
+.tt-lines { position: absolute; inset: 0; pointer-events: none; }
+.tt-line { fill: none; stroke-width: 4; stroke-linecap: round; }
+.tt-line.dead { stroke: #3a3046; stroke-dasharray: 2 10; }
+.tt-line.live { stroke: #20d6c7; stroke-dasharray: 10 8; animation: tt-flow 1.2s linear infinite; filter: drop-shadow(0 0 4px rgba(32, 214, 199, .7)); }
+.tt-line.done { stroke: #ffd27a; filter: drop-shadow(0 0 3px rgba(255, 210, 122, .6)); }
+@keyframes tt-flow { to { stroke-dashoffset: -36; } }
+.tt-node { position: absolute; padding: 0; display: grid; place-items: center; border-radius: 10px; border: 3px solid #3a3046; background: #0c0a10; cursor: pointer; transition: transform .12s, box-shadow .12s; }
+.tt-node .tt-pic { border-radius: 6px; }
+.tt-node.locked .tt-pic { filter: grayscale(1) brightness(.35); }
+.tt-node.open .tt-pic { filter: saturate(.55) brightness(.7); }
+.tt-node.ready { border-color: #20d6c7; animation: tt-ready 1.6s ease-in-out infinite; }
+.tt-node.owned { border-color: #ffd27a; box-shadow: 0 0 16px rgba(255, 210, 122, .35); }
+.tt-node.sel { transform: scale(1.08); outline: 3px solid #ffd27a; outline-offset: 4px; z-index: 2; }
+.tt-node.flash { animation: tt-flash .7s ease-out; }
+.tt-node.shake { animation: tt-shake .35s; }
+@keyframes tt-ready { 50% { box-shadow: 0 0 22px rgba(32, 214, 199, .65); } }
+@keyframes tt-flash { 0% { box-shadow: 0 0 0 0 rgba(255, 230, 160, 1); filter: brightness(2.2); } 100% { box-shadow: 0 0 0 40px rgba(255, 230, 160, 0); filter: none; } }
+@keyframes tt-shake { 25% { translate: -6px 0; } 75% { translate: 6px 0; } }
+.tt-check { position: absolute; top: -10px; right: -10px; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #ffd27a; color: #1b1424; }
+.tt-check.lock { background: #3a3046; color: #b9a9c9; }
+.tt-name { position: absolute; top: calc(100% + 8px); left: 50%; translate: -50% 0; white-space: nowrap; font: 22px/1 VT323, monospace; color: #e9e1f2; text-shadow: 0 2px 0 #000; }
+.tt-node.locked .tt-name { color: #6f6380; }
+.tt-away { position: absolute; top: calc(100% + 30px); left: 50%; translate: -50% 0; white-space: nowrap; font: 12px/1 var(--ui-font); color: #8d7f9c; }
+.tt-pic { display: block; background-repeat: no-repeat; image-rendering: pixelated; }
+.tt-nopic { display: grid; place-items: center; color: #4a3f58; background: #18121f; }
+.tt-detail { display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: 10px; background: #18121f; border: 1px solid #3a2f45; overflow: auto; color: #d9d0e3; font: 15px/1.35 var(--ui-font); }
+.tt-detail .tt-pic { align-self: center; border-radius: 8px; border: 3px solid #3a3046; }
+.tt-detail.owned .tt-pic { border-color: #ffd27a; }
+.tt-detail.ready .tt-pic { border-color: #20d6c7; }
+.tt-detail.locked .tt-pic { filter: grayscale(1) brightness(.45); }
+.tt-detail h3 { margin: 4px 0 0; font: 34px/1 VT323, monospace; font-weight: normal; color: #fff; }
+.tt-detail p { margin: 0; color: #b9a9c9; }
+.tt-state { font: 13px/1 var(--ui-font); text-transform: uppercase; letter-spacing: .08em; color: #8d7f9c; }
+.tt-detail.ready .tt-state { color: #20d6c7; }
+.tt-detail.owned .tt-state { color: #ffd27a; }
+.tt-fx { margin: 0; padding-left: 18px; color: #9be8d8; }
+.tt-req { color: #8d7f9c; }
+.tt-costs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+.tt-cost { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px 3px 4px; border-radius: 6px; background: #221a2c; border: 1px solid color-mix(in srgb, var(--c) 45%, transparent); font: 20px/1 VT323, monospace; }
+.tt-cost.no { color: #ff8a8a; }
+.tt-buy { font-size: 16px; }
+.hud-vital b { color: #9cdb43; }
+.hud-vital.bad b { color: #ff6b8a; animation: tt-ready 1s infinite; }

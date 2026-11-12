@@ -315,7 +315,7 @@ export class Workshop {
     };
     const all = Object.entries(o);
     if (A.groupBy) {
-      const { key, options } = A.groupBy, known = new Set(options.map(([k]) => k));
+      const { key } = A.groupBy, options = A.groupBy.options || Object.entries(this.p.data[A.groupBy.area] || {}).map(([k, v]) => [k, v.name || k]), known = new Set(options.map(([k]) => k));
       for (const [k, name] of [...options, ['__other', 'Sonstige']]) {
         const part = all.filter(([, x]) => k === '__other' ? !known.has(x[key]) : x[key] === k);
         if (part.length) main.append(el('h3', { class: 'ng-group' }, name, el('span', { class: 'da-nav-number' }, String(part.length))), this.list(part, choice, id => this.go({ area: a, choice: id }), row));
