@@ -7,7 +7,7 @@ Stand 07.11.2026 · Entwurf von Daniel, mit Ava überarbeitet. Die Zahlen im Spi
 NomadGirl ist ein 2D-Action-Roguelite mit Cosy-Basisbau: Leyla plündert gefährliche Orte und lebt dazwischen in ihrem rollenden Zuhause, dem Rig.
 
 - **Heldin:** Leyla, Schrottsammlerin in den Wastelands rund um BigCityDelta.
-- **Rig:** Zu Beginn der Van, die ersten Werkstätten liegen verpackt bereit, später ein LKW mit gestapelten Containern. **Neu (Daniel, 12.11.2026): keine Modul-Anhänger mehr, nur noch die variablen Container** (Umbau offen, siehe unten).
+- **Rig:** Zu Beginn der Van, die ersten Werkstätten liegen verpackt bereit, später ein LKW mit gestapelten Containern. **Keine Modul-Anhänger, nur die variablen Container**; ein Container im Erdgeschoss ist zugleich Anhänger (Daniel, 12.11.2026).
 - **Ziel:** Schrott, Ressourcen, Lebensmittel und Ausrüstung sammeln.
 - **Gefahr:** Mutanten, Gegner und Dinge, über die man in BigCityDelta lieber nicht spricht.
 - **Prinzip:** High Risk, High Reward. Je tiefer Leyla in einen Ort vordringt, desto besser die Beute und desto größer der mögliche Verlust.
@@ -118,17 +118,30 @@ Grundsatz: Die Ziele kommen aus der Mechanik, eine Herleitung aus der Story brau
 - **Tempo:** ohne Pflege stirbt AvA nach etwa **10 Runs** (umgerechnet in Ereignis-Zeit; Wert in der Werkstatt).
 - **Dramatischer visueller Verfall am Tank selbst** (nicht an der ganzen Werkbank), über **mehrere Animationsphasen** hinweg (z. B. intakt → Frost-Risse → Lecks/Dampf → flackernde Anzeige/Alarm → kurz vor dem Ende). Braucht eigene Grafik (PixelLab).
 - **Kann nicht verkauft werden** (auch nicht auf den Händler-Platz gezogen).
+- **Steht von Anfang an im kleinsten Container.**
+- **AvA leidet sichtlich** (Daniel, 3b): ist der Tank schwach, glitcht die Drohne im Run, ihr Akku schrumpft, der Scheinwerfer flackert.
+
+### Ressourcen verdienen & Knoten (Daniel, 12.11.2026)
+
+- Ressourcen gibt es für erledigte Aktionen: Kisten, Kills, Secrets, Kochen, Bauen; ein guter Rang gibt Wissen extra.
+- **Knoten schalten frei (2c):** Rezepte, Werkstätten, Rig-Teile, Fähigkeiten für Leyla und AvA **und passive Boni** (z. B. +10 % Akku).
+- Ein neuer Durchgang würfelt POI-Reihenfolge und Beute neu (Startwert Ava).
+- **Tresor = Jackpot:** Im Tresor am Ende eines Runs muss **richtig viel Zeug** liegen (bislang leer). To-do.
+
+### Das Heilmittel (Daniel, 12.11.2026, nur Vision)
+
+- Ist es fertig, wacht AvA auf, und das Spiel geht weiter. Sie wird ein **neuer spielbarer Charakter**. Vorerst nur Design-Vision, nichts bauen.
 
 
 ## Rig & Werkstätten
 
-> **Änderung 12.11.2026 (Daniel, noch nicht gebaut):** Modul-Anhänger fallen weg, Werkstätten stecken nur noch in variablen Containern. Die Absätze unten zu Anhängern, Deichselkästen und Ankoppeln gelten bis zum Umbau. Offen: worauf die Container stehen (Flachbett-Chassis? direkt auf dem LKW?), was aus den Deichselkästen wird, wie alte Spielstände mit Anhängern umziehen (`repairSave`).
+> **Klarstellung 12.11.2026 (Daniel):** Es gibt keine eigenen Modul-Anhänger, nur die variablen Container. Ein Container im Erdgeschoss ist gleichzeitig ein Anhänger (Rahmen, Räder, Kupplung gehören dazu). Das ist bereits so gelöst, kein To-do. **Deichselkästen gibt es nicht mehr**, Stauraum kommt aus den Lagerregalen.
 
 Das Rig ist Leylas Zuhause, Werkstatt und Fahrzeug zugleich. Es wird im Querschnitt gezeigt wie ein Puppenhaus.
 
 - **Zugmaschine:** Leylas Van zum Start (mit zwei eigenen Werkstatt-Plätzen: Schlafkoje und Warroom), später LKW. Bestimmt Zugkraft, Spritverbrauch und wie viele Container hintereinander und übereinander passen.
 - **Slots:** Motor, Panzerung, Waffen, Dach (Rig-Teile). Rig-Teile sind Bauteile wie Werkstätten: beim Händler kaufen oder an der Werkbank aus Gegenständen herstellen, sie liegen auf dem Schrottplatz und werden beim Rig bauen an die Sockel am Van geschraubt. Die Dachbox auf dem Dach vergrößert den Kofferraum. Im Inventar zeigt der Tab der Zugmaschine, was eingebaut ist.
-- **Eigener Stauraum:** Die Zugmaschine hat einen kleinen Kofferraum, jeder Anhänger einen Deichselkasten, damit Leyla auch ohne Lager-Werkstatt ein paar Sachen verstauen kann. Das Lagerregal bleibt das große, allgemeine Lagermodul.
+- **Eigener Stauraum:** Die Zugmaschine hat einen kleinen Kofferraum, damit Leyla auch ohne Lager-Werkstatt ein paar Sachen verstauen kann. Sonst lagert alles in **Lagerregalen** (Deichselkästen entfallen, 12.11.2026).
 - **Payload:** Container (Hochseecontainer, Holzkisten, Wohnwagenteile). Anfangs knapp, mit stärkerer Zugmaschine horizontal und vertikal stapelbar. Je nach Größe fasst ein Container eine, zwei oder drei Werkstätten. Gestapelt wird auf Anhänger ohne Dachaufbau (und auf Container): der obere Container ist begehbar, Leyla kommt per Leiter oder Doppelsprung hoch. Die Stapelhöhe kommt von der Zugmaschine (Van 2).
 - **Budgets:** Zugkraft begrenzt das Gewicht, Energie (Lichtmaschine, Generator, Reaktor) begrenzt die Werkstätten, das Gewicht erhöht den Spritverbrauch, die Stapelhöhe kann Routen sperren.
 
@@ -224,7 +237,7 @@ Ein POI mit Ranking, Rucksack-Raster, Tod mit AvA, Rig mit zwei bis drei Werkst�
 - [x] Beute + Rucksack-Raster (Tetris-Formen, nur Maus), Boden-Inventar im Run, Kiste und Lagerregal im Camp (07.11.2026)
 - [x] Kochen & Craften (Rezeptbuch, Experimentieren, Zettel, Companion-Tipps, Essen)
 - [x] Bau-Ansicht (Umstellen, Kaufen/Verkaufen, Container, Budgets Gewicht/Energie/Länge; Zugmaschine tauschen folgt)
-- [x] Rig-Teile an Sockeln im Bau-Modus (kaufen, herstellen, verkaufen), Kofferraum und Deichselkästen
+- [x] Rig-Teile an Sockeln im Bau-Modus (kaufen, herstellen, verkaufen), Kofferraum (Deichselkästen 12.11.2026 entfallen)
 - [x] Rig bauen 2.0: im Camp mit Ziehen, Pendeln, Einrasten, Schrottplatz + Händler, sofort echt, Leyla schraubt, Rückgängig
 - [x] POIs aus Raum-Bausteinen zusammensetzen: Tankstelle KM7 als erstes Level mit Kisten, Secrets, Schalter-Tür, Ziel, Ranking und Abkürzung (10.11.2026); Großmarkt, Bunker, Ministerium brauchen noch Raum-Layouts
 
