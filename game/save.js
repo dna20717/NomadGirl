@@ -113,6 +113,14 @@ function withInventory(D, save) {
   ensureGrid(D, inv, 'backpack', backpackSize(D, inv));
   for (const c of containers(D, save)) ensureGrid(D, inv, c.key, c.size);
   ensureGrid(D, inv, 'drone', D.drone?.rescue?.size || [3, 2]);   // Mama-Bot's rescue pocket: survives a knock-out
+  // Spiel › Start › Nachreichen: every savegame (new or old) gets these once, e.g. a test weapon (Daniel, 12.11.2026: Revolver-Test)
+  save.handedOut ??= [];
+  for (const row of D.game?.start?.later || []) {
+    const [a, id] = row.item ? ['items', row.item] : row.weapon ? ['weapons', row.weapon] : row.backpack ? ['backpacks', row.backpack] : [];
+    if (!a || !D[a]?.[id] || save.handedOut.includes(`${a}:${id}`)) continue;
+    const g = inv.grids[row.where === 'chest' ? 'chest' : 'backpack'] || inv.grids.chest;
+    if (g && add(D, g, a, id, row.count || 1) === 0) save.handedOut.push(`${a}:${id}`);
+  }
   return save;
 }
 

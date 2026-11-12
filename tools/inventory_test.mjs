@@ -27,6 +27,8 @@ const has = (g, id) => g.items.some(i => i.startsWith(id + '×'));
 
 // the start ingredients for cooking and crafting (Spiel › Start-Inventar) are not part of this test: the shelf as it was before
 await ev(() => { const g = nomad.save().inv.grids; for (const k of Object.keys(g)) if (k.startsWith('store:')) g[k].items = g[k].items.filter(e => !['stoffreste', 'schrott', 'reis', 'gewuerzmischung', 'mutantenfleisch', 'batteriezelle', 'alte_platine', 'leuchteier', 'mutantengemuese', 'sojasauce', 'speiseoel', 'schrauben'].includes(e.id)); });
+// handed out once to every savegame (Spiel › Start › Nachreichen, the revolver test): not part of this test
+await ev(() => { for (const g of Object.values(nomad.save().inv.grids)) g.items = g.items.filter(e => e.id !== 'trommelrevolver'); });
 await ev(() => { nomad.take(); nomad.step(5); const h = nomad.state().camp.hotspots.find(h => h.name === 'Kiste'); nomad.walkTo(h.x); nomad.step(1, [], ['grab']); nomad.step(5); });
 let s = await inv();
 check('E an der Kiste öffnet Rucksack + Kiste', s.open && s.other?.key === 'chest' && has(s.other.grid, 'discokugel') && has(s.backpack, 'verband'), s);

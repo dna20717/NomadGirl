@@ -234,6 +234,13 @@ check('Drohne: Kabel hängen unten und schwingen nach', df.rest.cables.length >=
   && df.fly.x > df.rest.x + 20 && df.fly.cables.some(([x], i) => x - df.fly.x < df.rest.cables[i][0] - df.rest.x - 4), df);
 
 if (shots) await page.screenshot({ path: 'output/game_end.png' });
+// revolver test (Daniel, 12.11.2026): V switches the ranged weapon, the stretched-out poses show the revolver from code over the painted gun
+v = await page.evaluate(() => { const n = nomad, s = game.scene.getScene('play'), l = s.leyla; n.calm?.(); let g = 0;
+  while (s.weapon('ranged')?.skin !== 'revolver' && g++ < 6) { n.step(1, [], ['swap']); n.step(2); }
+  n.step(1, [], ['ranged']); n.step(8); const key = l.sprite.texture.key, mag = l.mag;
+  while (s.weapon('ranged')?.skin && g++ < 12) { n.step(1, [], ['swap']); n.step(2); }
+  n.step(30); n.step(1, [], ['ranged']); n.step(8); return { key, mag, w: s.weapon('ranged')?.name, back: l.sprite.texture.key }; });
+check('Waffe wechseln (V): Revolver aus Code über der gemalten Pistole, 6 Schuss; zurück = gemalt', /@revolver$/.test(v.key) && v.mag === 5 && !/@/.test(v.back), v);
 await browser.close();
 console.log(ok.map(n => '✓ ' + n).join('\n'));
 if (errors.length) { console.error('Fehler:\n' + errors.join('\n')); process.exit(1); }

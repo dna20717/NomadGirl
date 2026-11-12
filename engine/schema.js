@@ -176,6 +176,8 @@ export const AREAS = {
       { title: 'Start', fields: [ref('start.location', 'Startort', 'locations'), ref('start.tractor', 'Zugmaschine', 'tractors'), refs('start.containers', 'Container', 'containers'),
         table('start.inventory', 'Start-Inventar', [select('where', 'Wo', [['backpack', 'Rucksack'], ['chest', 'Kiste im Camp'], ['storage', 'Erstes Lager (sonst Kiste)']]), ref('item', 'Gegenstand', 'items'), ref('weapon', 'Waffe', 'weapons'), ref('backpack', 'Rucksack', 'backpacks'), num('count', 'Anzahl', { min: 1 })],
           { hint: 'Pro Zeile ein Gegenstand, eine Waffe oder ein Rucksack. Platz suchen die Dinge sich selbst' }),
+        table('start.later', 'Nachreichen', [select('where', 'Wo', [['backpack', 'Rucksack'], ['chest', 'Kiste im Camp']]), ref('item', 'Gegenstand', 'items'), ref('weapon', 'Waffe', 'weapons'), ref('backpack', 'Rucksack', 'backpacks'), num('count', 'Anzahl', { min: 1 })],
+          { hint: 'Jeder Spielstand (neu oder alt) bekommt das genau einmal, z. B. eine Test-Waffe. Passt es nicht, kommt es beim nächsten Laden' }),
         refs('start.workshops', 'Werkstätten', 'workshops', { hint: 'Werden der Reihe nach verteilt: erst in die Plätze der Zugmaschine, dann in die Container' }), refs('start.spare', 'Verpackt auf dem Schrottplatz', 'workshops', { hint: 'Liegen am Start in Kisten auf dem Schrottplatz und werden im Bau-Modus eingebaut. Werkstätten, die oben keinen Platz finden, landen auch hier' }), refs('start.companions', 'Companions', 'companions'), num('start.fuel', 'Sprit', { unit: 'l', min: 0 }), num('start.food', 'Vorräte', { unit: 'Rationen', min: 0 })] },
     ],
     check: (x, report, p) => {
@@ -458,7 +460,8 @@ export const AREAS = {
     row: x => `${label(WEAPON_KINDS, x.kind)} · ${x.damage ?? 0} Schaden · ${x.cooldown ?? 0} ms`,
     sections: [
       { title: 'Waffe', fields: [NAME, LOOK, ICON, multi('tags', 'Tags', ITEM_TAGS), select('kind', 'Art', WEAPON_KINDS, { required: true }), num('tier', 'Stufe', { min: 1, max: 5 }),
-        text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar: 1–3 Zeichen oder ein Emoji' }), DESCRIPTION] },
+        text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar: 1–3 Zeichen oder ein Emoji' }), DESCRIPTION,
+        select('skin', 'Aussehen aus Code', [['', 'wie gemalt'], ['revolver', 'Revolver']], { hint: 'Nur Fernkampf, Test (Daniel, 12.11.2026): legt eine Waffe aus Code über die gemalte Pistole in den Posen mit ausgestreckten Armen. An der Brust bleibt vorerst die gemalte' })] },
       { title: 'Werte', fields: [num('damage', 'Schaden', { min: 0 }), num('cooldown', 'Abklingzeit', { unit: 'ms', min: 0 }), num('range', 'Reichweite', { unit: 'px', min: 0 }),
         num('knockback', 'Rückstoß', { unit: 'px/s', min: 0 }), num('critChance', 'Krit-Chance', { unit: '%', min: 0, max: 100 }), num('ammo', 'Munition', { min: 0, hint: 'Leer = unendlich' }),
         num('projectileSpeed', 'Geschosstempo', { unit: 'px/s', min: 0, hint: 'Nur Fernkampf: so schnell fliegt das Geschoss' }), ref('sound', 'Schuss-Ton', 'assets', { hint: 'Asset der Art Ton' }),

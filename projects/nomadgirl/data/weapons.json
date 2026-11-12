@@ -44,6 +44,7 @@
   "glyph": "⚡",
   "tags": ["trophy"]
  },
+ "trommelrevolver": {"name": "Trommelrevolver", "kind": "ranged", "tier": 2, "damage": 15, "cooldown": 420, "range": 760, "knockback": 180, "critChance": 12, "ammo": 30, "size": [2, 1], "value": 90, "projectileSpeed": 2600, "glyph": "R", "sound": "sound_shot", "magazine": 6, "reloadTime": 1500, "look": "icons_treasure", "icon": 11, "tags": ["trophy"], "skin": "revolver", "description": "Sechs Schuss, schwer in der Hand, laut wie ein Gewitter. Test: Aussehen aus Code."},
  "nagelpistole": {
   "name": "Nagelpistole",
   "kind": "ranged",

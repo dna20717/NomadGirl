@@ -19,7 +19,8 @@ import { advance, arrive, clockText, containers } from '../save.js';
 import { Loot } from './loot.js';
 import { InventoryUI } from './inventory_ui.js';
 import { FloorStrip } from './floor_strip.js';
-import { gearStats } from '../inventory.js';
+import { skinnedLook, SKIN_LOOKS } from './gun_skins.js';
+import { gearStats, add } from '../inventory.js';
 import { CraftUI } from './craft_ui.js';
 import { BuildMode } from './build_mode.js';
 import { use as useThing } from '../crafting.js';
@@ -29,7 +30,7 @@ const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'] };
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
   jump: ['SPACE'], walk: ['SHIFT'], dash: ['L', 'C'], melee: ['J', 'Y'], ranged: ['K', 'X'], grab: ['E'],
-  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], uiOk: ['ENTER'], uiSend: ['F'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'], build: ['B'], holster: ['Q'],
+  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], uiOk: ['ENTER'], uiSend: ['F'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'], build: ['B'], holster: ['Q'], swap: ['V'],
 };
 
 export class PlayScene extends Phaser.Scene {
@@ -140,7 +141,11 @@ export class PlayScene extends Phaser.Scene {
     let id = direct ? state.slice(1) : look[used] || look.idle;   // '@<asset>' plays an asset directly (random idles, sitting)
     const a = A[id], m = a?.mirror;
     if (m && this.textures.exists(m) && (facing < 0) !== !!a.flip) id = m;
-    const info = this.looks[id] ??= this.assetInfo(id) || { key: 'px', scale: 60, ox: 0.5, oy: 1, flip: false };
+    let info = this.looks[id] ??= this.assetInfo(id) || { key: 'px', scale: 60, ox: 0.5, oy: 1, flip: false };
+    // the ranged weapon brings its own look from code over the painted gun (Waffen › Aussehen aus Code, gun_skins.js)
+    const base = direct ? state.slice(1) : look[used];
+    const skin = who === 'leyla' && SKIN_LOOKS.some(k => look[k] && look[k] === base) && this.weapon('ranged')?.skin;
+    if (skin && info.anim) { const k = skinnedLook(this, id, skin); if (k) info = this.looks[k] ??= { ...info, key: k, anim: k }; }
     if (sprite.texture.key !== info.key || (info.anim && sprite.anims.currentAnim?.key !== info.anim)) {
       sprite.setOrigin(info.ox, info.oy);
       // falling without a jump: a shared jump animation starts in its second half
@@ -159,7 +164,29 @@ export class PlayScene extends Phaser.Scene {
     if (shape === 'drone') return { key: `enemy_drone_${color}`, scale: (def.height ?? 90) / 96, ox: 0.5, oy: 1, flip: false };
     return { key: `raider_${def.behavior === 'shooter' ? 'gun' : 'melee'}_${color}`, scale: (def.height ?? 220) / 240, ox: 66 / 150, oy: 1, flip: false };
   }
-  weapon(slot) { const id = this.box ? this.box.save.inv?.slots?.[slot] : this.data_.leyla?.loadout?.[slot]; return this.data_.weapons?.[id] || null; }
+  weapon(slot) { const id = this.box ? this.box.save.inv?.slots?.[slot] : this.testSlots?.[slot] || this.data_.leyla?.loadout?.[slot]; return this.data_.weapons?.[id] || null; }
+  // V / L3: the next ranged weapon from the backpack into the hand, the old one into the backpack (Daniel, 12.11.2026: „wir proben den Switch“);
+  // in a test room without a savegame: through all ranged weapons
+  swapRanged() {
+    const D = this.data_, W = D.weapons || {}, l = this.leyla, say = t => this.fx.text(l.x, l.feet - l.height - 30, t, { color: '#ffd27a', size: 34, rise: 40, life: 1100 });
+    let next;
+    if (!this.box) {
+      const all = Object.keys(W).filter(id => W[id].kind === 'ranged'), cur = this.testSlots?.ranged || D.leyla?.loadout?.ranged;
+      next = all[(all.indexOf(cur) + 1) % all.length];
+      (this.testSlots ??= {}).ranged = next;
+    } else {
+      const inv = this.box.save.inv, bag = inv.grids.backpack, e = bag.items.find(x => x.a === 'weapons' && W[x.id]?.kind === 'ranged');
+      if (!e) return say('Keine zweite Fernkampfwaffe im Rucksack');
+      const old = inv.slots.ranged;
+      bag.items.splice(bag.items.indexOf(e), 1);
+      if (old && add(D, bag, 'weapons', old, 1) > 0) this.loot?.throwDown({ a: 'weapons', id: old, n: 1, r: 0 });
+      inv.slots.ranged = next = e.id;
+      this.invChanged?.('backpack');
+    }
+    l.loadWeapon();
+    say(W[next]?.name || next);
+    this.drone?.react('gearBetter');
+  }
 
   // ---------- world ----------
   create() {
@@ -686,6 +713,7 @@ export class PlayScene extends Phaser.Scene {
     if (input.restart.pressed && this.mode === 'test' && this.level) this.restartAs({});   // doors, chests, walls: fresh room
     else if (input.restart.pressed && this.mode !== 'camp' && !this.level) this.restartRoom();
     const building = this.hud.build?.active;
+    if (input.swap?.pressed && !building && !this.hud.modal && !this.hud.paused && !this.hud.inv?.isOpen && !this.hud.craft?.isOpen && this.leyla.alive) this.swapRanged();
     if (input.build?.pressed && building) this.hud.build.close();
     else if (input.build?.pressed && this.mode === 'camp' && !this.hud.modal && !this.hud.paused && !this.leaving && !this.hud.craft?.isOpen) this.openBuild();
     // every window pauses the game (Daniel, 12.11.2026: „Fenster pausieren immer, auch im Run“): menus, controls, cooking and the inventory

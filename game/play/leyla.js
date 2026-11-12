@@ -591,7 +591,7 @@ export class Leyla {
     // the run and its variants (gun out, at the chest, drawing, reloading) share the step: switching keeps the frame, so the legs never jump
     // transitions (Daniel, 11.11.2026, 2A): (1) families with the same step keep their place in the cycle (run and its variants,
     // walk with and without the gun), (2) Leyla › Übergänge names exceptions: from → to starts at a given frame
-    const A = this.scene.data_.assets || {}, aa = this.sprite.anims, prevKey = aa.currentAnim?.key, prevIdx = aa.currentFrame ? aa.currentFrame.index - 1 : 0;
+    const A = this.scene.data_.assets || {}, aa = this.sprite.anims, prevKey = aa.currentAnim?.key?.split('@')[0], prevIdx = aa.currentFrame ? aa.currentFrame.index - 1 : 0;
     const want = name.startsWith('@') ? name.slice(1) : L[name] || null, base = id => [id, A[id]?.mirror].filter(Boolean);
     let keep = null;
     const row = want && prevKey && prevKey !== want && (this.d.transitions || []).find(r => r.from && r.to && base(r.from).includes(prevKey) && base(r.to).includes(want));
