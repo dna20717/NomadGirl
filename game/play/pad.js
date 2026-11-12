@@ -50,7 +50,11 @@ export class Pad {
     this.prev = this.now; this.now = new Set();
     this.uiPrev = this.uiNow || new Set(); this.uiNow = new Set();
     this.kind = g ? (this.c.symbols && this.c.symbols !== 'auto' ? this.c.symbols : padKind(g.id)) : null;
+    this.right = [0, 0];
     if (!g) return this;
+    // right stick (Mama-Bot on the rubber band, Daniel 12.11.2026): raw direction beyond the dead zone, scaled back to 0 … 1
+    const rx = g.axes[2] || 0, ry = g.axes[3] || 0, rm = Math.hypot(rx, ry), rdz = (this.c.deadzone ?? 30) / 100 * 0.6;
+    if (rm > rdz) { const q = Math.min(1, (rm - rdz) / (1 - rdz)) / rm; this.right = [rx * q, ry * q]; }
     const dz = (this.c.deadzone ?? 30) / 100, ax = g.axes[0] || 0, ay = g.axes[1] || 0;
     // 'up' = a clear flick of the left stick upwards (Spiel › Controller › Benutzen ab), or the d-pad up
     const stickUp = ay < -(this.c.useTilt ?? 70) / 100 || (g.buttons[12]?.pressed ?? false);

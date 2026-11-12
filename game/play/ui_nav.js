@@ -29,13 +29,14 @@ export function hints(entries, extra = '') {
   render(h); shown.add(h);
   return h.el;
 }
-function render(h) {
+// the key (keyboard) or button picture (controller) of one window action, e.g. in a tooltip
+export function keyGlyph(a) {
   const p = device.pad;
-  const key = a => {
-    if (!p) return [el('kbd', {}, UI_KEYS[a])];
-    const bs = [].concat(UI_BUTTONS[a]);
-    return bs.map(b => device.padIcon?.(p.iconName(b), p.labelOf(b)) || el('kbd', {}, p.labelOf(b)));
-  };
+  if (!p) return [el('kbd', {}, UI_KEYS[a])];
+  return [].concat(UI_BUTTONS[a]).map(b => device.padIcon?.(p.iconName(b), p.labelOf(b)) || el('kbd', {}, p.labelOf(b)));
+}
+function render(h) {
+  const p = device.pad, key = keyGlyph;
   const parts = h.entries.map(([a, text]) => el('span', {}, ...key(a), ' ', text));
   h.el.replaceChildren(...parts.flatMap((x, i) => i ? [el('i', {}, '·'), x] : [x]), ...(h.extra && !p ? [el('small', {}, h.extra)] : []));
 }

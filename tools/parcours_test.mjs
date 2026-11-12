@@ -97,10 +97,22 @@ v = await page.evaluate(() => {
   const n = nomad; P.tp(31.5, 21); n.step(15);
   n.step(1, ['left', 'jump'], ['jump']); n.step(6, ['left', 'jump']); n.until(x => x.leyla.state === 'hang' || x.leyla.ground, 60, ['left']);   // short hop: the hands just reach the edge
   const hang = n.state().leyla.state;
-  n.step(1, [], ['jump']); n.until(x => x.leyla.state === 'normal', 90); n.step(10);
+  // since 12.11.2026 (grabbing more forgiving) the short hop already catches the edge at its top and takes it in one swing
+  if (hang === 'hang') n.step(1, [], ['jump']);
+  n.until(x => x.leyla.state === 'normal' && x.leyla.ground, 90); n.step(10);
   return { ...P.L(), hang };
 });
-check('Kante: aus dem Sprung greifen + hoch', v.hang === 'hang' && v.feet === feet(0), v);
+check('Kante: aus dem Sprung greifen + hoch (hängen oder im Schwung)', v.feet === feet(0) && v.x < 30 * 64, v);
+// forgiving grab (Daniel, 12.11.2026: „zu fummelig“): flying towards the edge without holding a direction still catches it; ↓ held never does
+v = await page.evaluate(() => {
+  const n = nomad, l = game.scene.getScene('play').leyla, run = keys => { P.tp(30.75, 21); n.step(15); n.step(1, ['left']); n.step(12);
+    n.step(1, ['jump'], ['jump']); n.step(6, ['jump']); const seen = new Set(); for (let i = 0; i < 70; i++) { n.step(1, keys); seen.add(l.state); if (l.body.blocked.down && i > 5) break; }
+    if (l.state === 'hang') n.step(1, [], ['up']);
+    n.until(x => x.leyla.state === 'normal' && x.leyla.ground, 90); n.step(5); return { ...P.L(), seen: [...seen] }; };
+  return { free: run([]), down: run(['down']) };
+});
+check('Kante: greift auch ohne gehaltene Richtung', v.free.feet === feet(0) && (v.free.seen.includes('hang') || v.free.seen.includes('mantle')), v.free);
+check('Kante: ↓ gehalten greift nicht', !v.down.seen.includes('hang') && !v.down.seen.includes('mantle') && v.down.feet > feet(0), v.down);
 // too high for hanging (Daniel, 11.11.2026): she takes the edge in one go, skips the first pull-up frames and runs on
 v = await page.evaluate(() => {
   const n = nomad, l = game.scene.getScene('play').leyla, seen = new Set(); P.tp(31.5, 21); n.step(15);

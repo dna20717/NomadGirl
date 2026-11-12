@@ -4,7 +4,7 @@
 // double click moves it to the other side, a click outside the panels puts it back. Placeholders until things have a look:
 // coloured cells by category with a short glyph, the name and the count.
 import { el } from '../ui.js';
-import { hints, padInUse } from './ui_nav.js';
+import { hints, padInUse, keyGlyph } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot, IMPLANTS, DRONE_WEAR, WEAR_KEYS, wearOf, gearStats, gearScore, occupancy } from '../inventory.js';
 import { partSlots, budgets, SLOT_NAMES as PART_SLOT_NAMES } from '../rig.js';
@@ -80,7 +80,7 @@ export class InventoryUI {
   get vanTab() { return this.tab === 'van' && !!this.host.inCamp?.() && !!this.vanStore(); }
   vanStore() { return storeList(this.D, this.host.save()).find(c => c.unit === 0) || null; }
   setTab(t) { this.tab = t; this.draw(); }
-  close() { if (this.held) this.putBack(); this.el.hidden = true; this.tip.hidden = true; this.cursor.hidden = true; this.other = null; }
+  close() { if (this.held) this.putBack(); if (this.menuOn) this.closeMenu(); this.el.hidden = true; this.tip.hidden = true; this.cursor.hidden = true; this.other = null; }
   toggle(other = null) { if (this.isOpen && (!other || other.key === this.other?.key)) this.close(); else this.open(other); }
   grid(key) { return key === this.other?.key ? this.other.grid : this.other?.extra?.find(x => x.key === key)?.grid || this.inv.grids[key]; }
   // what a grid takes (treasury: only valuables on the pile, only things tagged "trophy" on the stands)
@@ -111,7 +111,7 @@ export class InventoryUI {
     this.pair = this.other ? ['backpack', this.other.key] : ['backpack', 'drone'];
     const left = el('div', { class: 'inv-col' }, this.bagEl(), this.other ? this.otherEl() : null);
     this.el.replaceChildren(el('div', { class: 'inv-row' }, left, this.leylaEl(), this.droneEl()),
-      hints([['move', 'wählen'], ['ok', 'nehmen / ablegen'], ['context', 'drehen'], ['send', 'rüber (halten: wegwerfen)'], ['tabs', 'Tab'], ['back', 'zurück']], 'Maus: klicken, Rechtsklick dreht, Doppelklick rüber, daneben = auf den Boden'));
+      hints([['move', 'wählen'], ['ok', 'nehmen / ablegen'], ['context', 'benutzen (halten: mehr)'], ['send', 'rüber (halten: wegwerfen)'], ['tabs', 'Tab'], ['back', 'zurück']], 'Maus: klicken, Rechtsklick Aktionen, Doppelklick rüber, daneben = Boden'));
     this.fit();
     this.drawGhost();
     this.padShow();
@@ -292,14 +292,14 @@ export class InventoryUI {
     if (e.n > 1) wrap.append(el('span', { class: 'inv-count' }, String(e.n)));
     wrap.addEventListener('mousedown', ev => {
       ev.stopPropagation();
-      if (ev.button === 2 || ev.ctrlKey) { if (this.held) this.turnHeld(); else this.turnInPlace(g, e); return; }
+      if (ev.button === 2 || ev.ctrlKey) { if (this.held) this.turnHeld(); else this.openMenu(key, g, e, wrap); return; }
       if (ev.button !== 0) return;
       if (this.held) { const r = wrap.parentElement.getBoundingClientRect(), z = this.zoom || 1; this.place(key, Math.floor((ev.clientX - r.left) / z / c), Math.floor((ev.clientY - r.top) / z / c), ev); return; }
       if (ev.detail >= 2) return;
       this.pick(key, g, e, ev);
     });
-    wrap.addEventListener('mouseenter', () => this.showTip(e));
-    wrap.addEventListener('mouseleave', () => { this.tip.hidden = true; });
+    wrap.addEventListener('mouseenter', () => { if (!this.menuOn) this.showTip(e, key); });
+    wrap.addEventListener('mouseleave', () => { if (!this.menuOn) this.tip.hidden = true; });
     return wrap;
   }
 
@@ -314,7 +314,7 @@ export class InventoryUI {
     const s = el('div', { class: 'inv-slot wear' + (t ? ' full' : '') + (w && IMPLANTS.includes(w) ? ' implant' : ''), title: name, 'data-slot': slot, style: t ? `--col:${CATEGORY_COLORS[kindOf(D, a, id)]}` : '' },
       el('small', {}, name), pic, el('span', {}, t ? t.name : 'frei'));
     s.addEventListener('mousedown', ev => { ev.stopPropagation(); if (ev.button === 0) this.slotClick(slot); });
-    if (t) { s.addEventListener('mouseenter', () => this.showTip({ a, id, n: 1 })); s.addEventListener('mouseleave', () => { this.tip.hidden = true; }); }
+    if (t) { s.addEventListener('mouseenter', () => this.showTip({ a, id, n: 1 })); s.addEventListener('mouseleave', () => { if (!this.menuOn) this.tip.hidden = true; }); }
     return s;
   }
 
@@ -352,22 +352,108 @@ export class InventoryUI {
     const s = el('div', { class: 'inv-slot part' + (t ? ' full' : ''), title: name, 'data-part': `${p.slot}:${p.i}`, style: t ? `--col:${CATEGORY_COLORS.rigpart}` : '' },
       el('small', {}, name), t ? el('b', {}, glyphOf(D, 'rigParts', p.id)) : icon(PART_ICONS[p.slot] || 'box', 18), t ? el('span', {}, t.name) : null);
     s.addEventListener('mousedown', ev => { ev.stopPropagation(); if (ev.button === 0) this.partClick(p); });
-    if (t) { s.addEventListener('mouseenter', () => this.showTip({ a: 'rigParts', id: p.id, n: 1 })); s.addEventListener('mouseleave', () => { this.tip.hidden = true; }); }
+    if (t) { s.addEventListener('mouseenter', () => this.showTip({ a: 'rigParts', id: p.id, n: 1 })); s.addEventListener('mouseleave', () => { if (!this.menuOn) this.tip.hidden = true; }); }
     return s;
   }
   // the slots only show what is built in: rig parts are dragged onto the van in the build mode (B)
   partClick(p) { this.host.notify?.(p.id ? 'Ein- und ausbauen: Rig bauen (B)' : `${PART_SLOT_NAMES[p.slot]}: ein Rig-Teil im Bau-Modus (B) an den Van ziehen`); }
 
-  showTip(e) {
+  showTip(e, key = null) {
+    if (this.menuOn) return;   // the right-click menu stays until it is used or closed
     const D = this.D, t = thing(D, e.a, e.id) || {}, k = kindOf(D, e.a, e.id);
     const facts = [CATEGORY_NAMES[k], e.a === 'rigParts' ? `Slot: ${PART_SLOT_NAMES[t.slot] || t.slot}` : null, e.a === 'rigParts' && t.pull ? `+${t.pull} kg Zugkraft` : null,
       e.a === 'rigParts' && t.armor ? `+${t.armor} Panzerung` : null, e.a === 'rigParts' && t.storageRows ? `+${t.storageRows} Reihen Stauraum` : null,
       (e.a === 'weapons' || e.a === 'rigParts') && t.damage ? `${t.damage} Schaden` : null, e.a === 'backpacks' && t.size ? `Raster ${t.size.join(' × ')}` : null,
       t.wear ? `${DRONE_WEAR.includes(t.wear) ? 'Mama-Bot: ' : 'Platz: '}${WEAR_NAMES[t.wear] || t.wear}` : null, t.stats ? statLine(t.stats) : null, t.strain ? `Belastung ${t.strain}` : null,
       stackMax(D, e.a, e.id) > 1 ? `Stapel ${e.n}/${stackMax(D, e.a, e.id)}` : null, `${(t.value || 0) * e.n} Δ`, t.buff ? `Buff: ${D.buffs?.[t.buff]?.name || t.buff}` : null].filter(Boolean);
-    this.tip.replaceChildren(el('b', {}, t.name || e.id), el('small', {}, facts.join(' · ')), t.description ? el('p', {}, t.description) : null);
+    const acts = key != null && !this.held ? this.actionsFor(key, e) : [];
+    const row = x => el('li', {}, ...(this.padOn ? [...keyGlyph(x.k), x.hold ? el('small', {}, 'halten') : null, ' '] : []), x.label);
+    this.tip.replaceChildren(el('b', {}, t.name || e.id), el('small', {}, facts.join(' · ')), t.description ? el('p', {}, t.description) : null,
+      acts.length ? el('ul', { class: 'inv-acts' }, ...(this.padOn ? acts.filter(x => x.k) : acts).map(row), this.padOn ? null : el('li', { class: 'hint' }, 'Rechtsklick: Aktionen')) : null);
     this.tip.hidden = false;
   }
+
+  // ---------- actions on a thing (Daniel, 12.11.2026: „als Tooltip über jedem Item: benutzen (je nach Item heilen, essen, ausrüsten), Drohne geben (nur wenn dort Platz ist), wegwerfen“) ----------
+  // k = window key (context = X / R, send = Y / F, hold = Y / F halten); the mouse gets the same list as a menu on right click
+  actionsFor(key, e) {
+    const D = this.D, t = thing(D, e.a, e.id) || {}, out = [], camp = this.host.inCamp?.();
+    const b = e.a === 'items' && t.buff && D.buffs?.[t.buff];
+    if (b) out.push({ id: 'use', k: 'context', label: t.category === 'food' ? 'Essen' : b.duration === 'instant' && b.stat === 'health' ? 'Heilen' : 'Benutzen' });
+    const slot = this.slotFor(e);
+    if (slot && !(slot.startsWith('wear:') && IMPLANTS.includes(slot.slice(5)) && !camp))
+      out.push({ id: 'equip', k: b ? null : 'context', label: slot.startsWith('wear:') && (IMPLANTS.includes(slot.slice(5)) || DRONE_WEAR.includes(slot.slice(5))) ? 'Einbauen' : 'Ausrüsten' });
+    const to = this.otherSide(key);
+    if (to && this.grid(to) && this.allows(to, e, false) && this.hasRoom(to, e))
+      out.push({ id: 'send', k: 'send', label: to === 'drone' ? 'Drohne geben' : key === 'drone' ? 'In den Rucksack' : to === 'backpack' ? 'In den Rucksack' : `Rüber: ${this.other?.title || 'Kiste'}` });
+    if (to !== 'drone' && key !== 'drone' && this.inv.grids.drone && this.hasRoom('drone', e)) out.push({ id: 'drone', k: null, label: 'Drohne geben' });
+    if (this.host.canThrow?.()) out.push({ id: 'throw', k: 'send', hold: true, label: 'Wegwerfen' });
+    if (canTurn(D, e.a, e.id)) out.push({ id: 'turn', k: out.some(x => x.k === 'context') ? null : 'context', label: 'Drehen' });
+    // the first action without a key goes on X / R held (Ausrüsten next to Essen, Drohne geben next to a chest …)
+    const extra = out.find(x => !x.k);
+    if (extra) Object.assign(extra, { k: 'context', hold: true });
+    return out;
+  }
+  // where a thing would be worn or held: weapon slot, backpack, a worn place
+  slotFor(e) {
+    const D = this.D;
+    if (e.a === 'weapons') { const k = D.weapons?.[e.id]?.kind || 'melee'; return k in (this.inv.slots || {}) ? k : null; }
+    if (e.a === 'backpacks') return 'backpack';
+    const w = e.a === 'items' && wearOf(D, e.id);
+    return w ? 'wear:' + w : null;
+  }
+  // would at least one of it fit into that grid?
+  hasRoom(key, e) {
+    const g = this.grid(key);
+    if (!g) return false;
+    const test = { ...g, items: g.items.map(x => ({ ...x })) };
+    return add(this.D, test, e.a, e.id, 1) === 0;
+  }
+  act(id, key, e) {
+    const g = this.grid(key);
+    if (!g) return;
+    if (id === 'use') return this.useFrom(key, g, e);
+    if (id === 'equip') return this.equipFrom(key, g, e);
+    if (id === 'send') return this.quickMove(key, e);
+    if (id === 'drone') { const left = add(this.D, this.inv.grids.drone, e.a, e.id, e.n); if (left === e.n) return this.host.notify?.('Mama-Bot hat keinen Platz'); if (left === 0) remove(g, e); else e.n = left; this.changed('drone'); return this.moodAfter('drone', e); }
+    if (id === 'throw') { this.pick(key, g, e); this.throwDown(); return this.draw(); }
+    if (id === 'turn') return this.turnInPlace(g, e);
+  }
+  useFrom(key, g, e) {
+    const r = this.host.use?.(e.id);
+    if (!r?.ok) return this.host.notify?.(r?.reason || 'Geht nicht');
+    e.n -= 1;
+    if (e.n <= 0) remove(g, e);
+    this.changed(key);
+  }
+  // one of it into its slot; whatever was there goes back into the grid (or anywhere with room)
+  equipFrom(key, g, e) {
+    const slot = this.slotFor(e);
+    if (!slot) return;
+    let one;
+    if (e.n > 1) { e.n -= 1; one = { ...e, n: 1 }; } else { remove(g, e); one = e; }
+    this.held = { e: one, from: key };
+    if (!this.equip(slot, one)) { this.putBack(); return this.changed(key); }
+    if (this.held) { this.held.from = key; this.putBack(); }
+    this.changed(key);
+  }
+  // right click: the tooltip becomes a small menu with buttons
+  openMenu(key, g, e, node) {
+    const acts = this.actionsFor(key, e);
+    if (!acts.length) return;
+    const t = thing(this.D, e.a, e.id) || {}, r = node.getBoundingClientRect();
+    this.menuOn = true;
+    this.tip.classList.add('menu');
+    this.tip.replaceChildren(el('b', {}, t.name || e.id), el('div', { class: 'inv-menu' }, ...acts.map(x => {
+      const btn = el('button', { class: 'inv-btn' }, x.label);
+      btn.addEventListener('mousedown', ev => { ev.stopPropagation(); if (ev.button !== 0) return; this.closeMenu(); this.act(x.id, key, e); });
+      return btn;
+    })));
+    Object.assign(this.tip.style, { left: `${r.right + 6}px`, top: `${r.top}px` });
+    this.tip.hidden = false;
+    this.offMenu ??= ev => { if (this.menuOn && !this.tip.contains(ev.target)) this.closeMenu(); };
+    setTimeout(() => document.addEventListener('mousedown', this.offMenu, { capture: true }), 0);
+  }
+  closeMenu() { this.menuOn = false; this.tip.classList.remove('menu'); this.tip.hidden = true; document.removeEventListener('mousedown', this.offMenu, { capture: true }); }
 
   // ---------- controller (Daniel, 11.11.2026: „sinnvolle Controller-Steuerung OHNE Zeiger“) ----------
   // A cursor jumps between the cells of every grid, the slots, tabs and buttons (the nearest one in the stick's direction).
@@ -403,7 +489,7 @@ export class InventoryUI {
     this.mouse = [f.l + f.w / 2, f.t + f.h / 2];
     if (this.held) Object.assign(this.ghost.style, { left: `${this.mouse[0]}px`, top: `${this.mouse[1]}px` });
     const e = f.key && this.itemAt(f.key, f.x, f.y);
-    if (e && !this.held) { this.showTip(e); Object.assign(this.tip.style, { left: `${box.r + 8}px`, top: `${box.t + 3}px` }); } else this.tip.hidden = true;
+    if (e && !this.held) { this.showTip(e, f.key); Object.assign(this.tip.style, { left: `${box.r + 8}px`, top: `${box.t + 3}px` }); } else this.tip.hidden = true;
   }
   // the cursor frame follows the thing's shape (Daniel, 12.11.2026: „wenn ein Objekt mehr als ein Segment hat, soll der Rahmen das ganze Objekt in seiner Form umfassen“):
   // on a thing = its cells, holding something = where it would land (red if it does not fit), otherwise the one field
@@ -480,7 +566,12 @@ export class InventoryUI {
       if (f.key != null) { if (this.held) this.place(f.key, f.x, f.y); else if (e) this.pick(f.key, this.grid(f.key), e); }
       else { f.node.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 })); if (f.node.tagName === 'BUTTON' && f.node.classList.contains('inv-btn')) f.node.click(); }
     }
-    if (p.pressed('context')) { if (this.held) this.turnHeld(); else if (e) this.turnInPlace(this.grid(f.key), e); }
+    // X / R: tap = the thing's first action (use, equip or turn), hold = the next one; holding something = turn it
+    const ctxHold = this.D.game?.gamepad?.throwHold ?? 450;
+    if (p.pressed('context')) { if (this.held) this.turnHeld(); else this.ctxAt = now; }
+    const ctxAct = hold => { const x = e && this.actionsFor(f.key, e).find(a => a.k === 'context' && !!a.hold === hold); if (x) this.act(x.id, f.key, e); };
+    if (this.ctxAt != null && p.down('context') && now - this.ctxAt >= ctxHold) { this.ctxAt = null; ctxAct(true); }
+    else if (this.ctxAt != null && !p.down('context')) { this.ctxAt = null; ctxAct(false); }
     // Y / F: tap = to the other side, hold = throw it on the ground (Daniel, 12.11.2026, controller has no „click beside the window“)
     const hold = this.D.game?.gamepad?.throwHold ?? 450;
     if (p.pressed('send')) this.sendAt = now;
@@ -512,7 +603,7 @@ export class InventoryUI {
   move(ev) {
     if (this.padOn) { this.padOn = false; this.cursor.hidden = true; this.draw(); }   // the mouse takes over again
     this.mouse = [ev.clientX, ev.clientY];
-    if (!this.tip.hidden) Object.assign(this.tip.style, { left: `${ev.clientX + 16}px`, top: `${ev.clientY + 16}px` });
+    if (!this.tip.hidden && !this.menuOn) Object.assign(this.tip.style, { left: `${ev.clientX + 16}px`, top: `${ev.clientY + 16}px` });
     if (this.held) Object.assign(this.ghost.style, { left: `${ev.clientX}px`, top: `${ev.clientY}px` });
   }
   drawGhost() {

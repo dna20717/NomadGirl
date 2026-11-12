@@ -74,6 +74,7 @@ export class Leyla {
   update(time, dt, input) {
     const s = dt / 1000, b = this.body, m = this.m;
     const grounded = b.blocked.down || b.touching.down;
+    if (grounded && time - (this.leapAt ?? -1e9) > 80) this.leapAt = -1e9;   // landed: the next fall without a jump does not grab on its own
     // airtime of a normal jump/fall: highest point and start, for the hard landing
     if (this.state === 'normal' && !grounded) {
       if (!this.air) this.air = { x: this.x, peak: this.feet };
@@ -192,10 +193,15 @@ export class Leyla {
     // ledge: while jumping or falling and pushing towards a wall or platform end, the hands catch its edge
     // too high for hanging (Daniel, 11.11.2026: „ab einem Schwellwert nimmt Leyla die Kante parkourmäßig“): she vaults straight up and over,
     // the first pull-up frames are skipped and she keeps her run (Leyla › Kanten & Ducken › Schwung ab)
-    if (!grounded && dir && m.ledgeGrab !== false && time >= this.noGrabUntil && b.velocity.y > -350) {
-      const z = this.size, hy = this.hand().y, reach = m.ledgeReach ?? 56, k = z.h / 168;
+    // easier (Daniel, 12.11.2026: „es ist zu fummelig, an eine Kante zu springen“): the hands also catch an edge a bit above them (Greifen nach oben),
+    // the edge may be a little away from her side (Greifen zur Seite, she is pulled over), already while still rising a bit (Greifen im Steigen),
+    // and without a direction held she grabs what she flies or looks towards (Greifen ohne Richtung); ↓ held never grabs
+    const leapt = time - (this.leapAt ?? -1e9) < 1200;   // only after a jump of her own, never when dropping through a platform or falling off
+    const gdir = dir || (m.ledgeAuto !== false && leapt ? (Math.abs(b.velocity.x) > 60 ? Math.sign(b.velocity.x) : this.facing) : 0);
+    if (!grounded && gdir && !input.down.down && m.ledgeGrab !== false && time >= this.noGrabUntil && b.velocity.y > -(m.ledgeRising ?? 450)) {
+      const z = this.size, hy = this.hand().y, reach = m.ledgeReach ?? 56, up = m.ledgeUp ?? 40, k = z.h / 168;
       const vaultOn = m.vault !== false, low = vaultOn ? Math.max(reach, this.feet - hy - 10) : reach;
-      const L = this.scene.ledgeAt(this.x, hy, dir, low, z.w / 2);
+      const L = this.scene.ledgeAt(this.x, hy, gdir, low, z.w / 2, up, m.ledgeSide ?? 24);
       if (L) {
         const rise = L.y + z.hangReach - this.feet, top = { x: L.x + L.dir * (z.w / 2 + 4), feet: L.y };
         if (vaultOn && rise >= (m.vaultFrom ?? 110) * k && this.scene.rectFree(top.x - z.w / 2 + 2, top.feet - z.crouchH, z.w - 4, z.crouchH - 2)) return this.startVault(time, L, rise, top);
@@ -208,7 +214,7 @@ export class Leyla {
 
   jump(f) {
     this.body.setVelocityY(-(this.m.jumpVelocity ?? 1100) * f);
-    this.jumpAt = -1e9; this.cut = true;
+    this.jumpAt = -1e9; this.cut = true; this.leapAt = this.scene.now ?? 0;
     this.squash = { x: 0.86, y: 1.14 };
   }
   land(vy) {

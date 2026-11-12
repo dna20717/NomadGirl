@@ -308,6 +308,7 @@ export class PlayScene extends Phaser.Scene {
       equipChanged: slot => { const sc = hud.scene; if (slot === 'ranged') sc.leyla.loadWeapon(); },
       throwDown: e => hud.scene.loot ? hud.scene.loot.throwDown(e) : null,
       use: id => hud.scene.useThing(id),
+      canThrow: () => !!hud.scene.loot,
       inCamp: () => hud.scene.mode === 'camp',
       gearChanged: () => hud.scene.applyGear(),
       react: mood => hud.scene.drone?.react(mood),
@@ -520,12 +521,17 @@ export class PlayScene extends Phaser.Scene {
   }
   // ledge for the hands: in front of Leyla (dir) a ground tile (wall or platform) with free space above it,
   // its top edge between handY - 8 and handY + reach; returns the wall face x, the edge y and the direction to the wall
-  ledgeAt(x, handY, dir, reach, halfW) {
-    const T = this.T, cx = Math.floor((x + dir * (halfW + 6)) / T), ground = (c, r) => this.room.solid(c, r) || this.platformTiles.has(c + ',' + r);
-    for (let r = Math.floor((handY - 8) / T); r * T <= handY + reach; r++) {
-      if (r * T < handY - 8) continue;
-      if (ground(cx, r) && !ground(cx, r - 1) && !ground(cx - dir, r) && !this.room.solid(cx - dir, r - 1))
-        return { x: dir > 0 ? cx * T : (cx + 1) * T, y: r * T, dir };
+  // up = the edge may be this far above the hands, side = this far beside her (both make grabbing forgiving, Leyla › Kanten & Ducken)
+  ledgeAt(x, handY, dir, reach, halfW, up = 8, side = 6) {
+    const T = this.T, ground = (c, r) => this.room.solid(c, r) || this.platformTiles.has(c + ',' + r);
+    const near = Math.floor((x + dir * (halfW + 6)) / T), far = Math.floor((x + dir * (halfW + Math.max(6, side))) / T);
+    for (let cx = near; dir > 0 ? cx <= far : cx >= far; cx += dir) {
+      for (let r = Math.floor((handY - up) / T); r * T <= handY + reach; r++) {
+        if (r * T < handY - up) continue;
+        if (ground(cx, r) && !ground(cx, r - 1) && !ground(cx - dir, r) && !this.room.solid(cx - dir, r - 1))
+          return { x: dir > 0 ? cx * T : (cx + 1) * T, y: r * T, dir };
+      }
+      if (ground(cx, Math.floor(handY / T))) break;   // a wall in between: no grabbing through it
     }
     return null;
   }

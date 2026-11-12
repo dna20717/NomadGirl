@@ -55,5 +55,6 @@
   {"name": "Greifarm", "look": "drone_claw", "at": [40, 76], "layer": "behind", "on": true, "item": "greifarm"}
  ],
  "rescue": {"name": "Rettungsfach", "size": [3, 2]},
- "spot": {"part": "Suchscheinwerfer", "at": [108, 90], "range": 760, "angle": 46, "tilt": 14, "strength": 85, "color": "#fff2c8", "glow": 90}
+ "spot": {"part": "Suchscheinwerfer", "at": [108, 90], "range": 760, "angle": 46, "tilt": 14, "strength": 85, "color": "#fff2c8", "glow": 90},
+ "leash": {"enabled": true, "reach": 380, "stiffness": 2.4, "smooth": 0.06, "aimLight": true, "aimHold": 600}
 }

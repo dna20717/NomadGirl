@@ -20,7 +20,7 @@
   "swingRope": 320,
   "swingBoost": 20,
   "ledgeGrab": true,
-  "ledgeReach": 56,
+  "ledgeReach": 56, "ledgeUp": 40, "ledgeSide": 24, "ledgeRising": 450, "ledgeAuto": true,
   "mantleTime": 450,
   "mantleFromFrame": 5,
   "standUpTime": 350,

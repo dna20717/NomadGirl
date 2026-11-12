@@ -132,7 +132,7 @@ export class Drone {
     this.still = moving ? 0 : this.still + dt;
     if (this.still > (I.sleepAfter ?? 14) * 1000) return 'sleep';
     if (this.still > (I.boredAfter ?? 6) * 1000) return 'bored';
-    if (time > this.nextRandom) { this.nextRandom = time + this.randomGap(); if (moving && !near) this.react(Math.random() < 0.5 ? 'curious' : 'scan'); }
+    if (time > this.nextRandom) { this.nextRandom = time + this.randomGap(); if (moving && !near && l.state !== 'pose') this.react(Math.random() < 0.5 ? 'curious' : 'scan'); }   // not into the yoga pose (would break the zen)
     return 'idle';
   }
 
@@ -144,7 +144,7 @@ export class Drone {
     // camp: roams freely (Drohne › Im Camp frei fliegen), picks a new spot every few seconds, sometimes visits Leyla
     const R = this.d.roam || {}, area = this.roamArea;
     let tx = l.x + dx * this.side, ty = l.feet + dy, smooth = F.smooth ?? 0.08;
-    if (area && R.enabled !== false) {
+    if (area && R.enabled !== false && !(this.scene.pad?.right && Math.hypot(...this.scene.pad.right) > 0.02 && this.d.leash?.enabled !== false)) {
       if (!this.roamTo || time > this.roamAt) {
         const [a, b] = R.every || [3, 7], [h0, h1] = R.height || [180, 460], visit = Math.random() * 100 < (R.visitLeyla ?? 30);
         const rx = visit ? l.x + (Math.random() < 0.5 ? -1 : 1) * 120 : area.x0 + Math.random() * (area.x1 - area.x0);
@@ -154,6 +154,16 @@ export class Drone {
       if (this.roamTo.leyla) this.roamTo.x += (l.x + this.side * -110 - this.roamTo.x) * 0.02;
       tx = this.roamTo.x; ty = this.roamTo.y; smooth = R.smooth ?? 0.02;
     }
+    // right stick: Mama-Bot hangs on Leyla like on a rubber band (Daniel, 12.11.2026: „je weiter weg, desto höher der Widerstand,
+    // lässt man los, geht sie zurück in ihre Position. So hätte man eine Tischlampe dabei“); Drohne › Gummiband
+    const G = this.d.leash || {}, st = G.enabled === false ? [0, 0] : this.scene.pad?.right || [0, 0], m = Math.hypot(st[0], st[1]);
+    if (m > 0.02) {
+      const reach = G.reach ?? 380, stiff = Math.max(0.01, G.stiffness ?? 2.4), pull = reach * (1 - Math.exp(-stiff * m)) / (1 - Math.exp(-stiff));
+      tx = l.x + dx * this.side * (1 - m) + st[0] / m * pull; ty = l.feet + dy + st[1] / m * pull;
+      smooth = (G.smooth ?? 0.06) * (1 - 0.6 * m * m);   // the further out, the heavier it pulls
+      this.aim = Math.atan2(st[1], st[0]); this.leashed = true; this.roamTo = null;
+    } else if (this.leashed) { this.leashed = false; this.aimUntil = time + (G.aimHold ?? 600); }
+    if (!this.leashed && this.aim != null && time > (this.aimUntil || 0)) this.aim = null;
     // docked on a workbench (Werkstätten › Benutzen › Mama-Bot dockt an): flies there and sits still
     if (this.dock) { if (time > this.dock.until) this.dock = null; else { tx = this.dock.x; ty = this.dock.y; smooth = 0.07; } }
     const k = 1 - Math.pow(1 - Math.min(1, smooth), dt / 16.67);
@@ -164,7 +174,7 @@ export class Drone {
     this.bobPh = (this.bobPh || 0) + dt / 1000 * Math.PI * 2 * bs;
     const bob = Math.sin(this.bobPh) * (F.bob ?? 10) * (zen ? 1.8 : 1);
     // flying towards a side: look that way, otherwise look where Leyla looks
-    const look = Math.abs(vx) > 120 ? Math.sign(vx) : this.side;
+    const look = this.aim != null && Math.abs(Math.cos(this.aim)) > 0.2 ? Math.sign(Math.cos(this.aim)) : Math.abs(vx) > 120 ? Math.sign(vx) : this.side;
     const rot = Math.max(-1, Math.min(1, vx / 900)) * (F.tilt ?? 8) * Math.PI / 180;   // nose dips into the flight direction
     this.sprite.setPosition(Math.round(this.x), Math.round(this.y + bob)).setScale(this.scale * (look < 0 ? -1 : 1), this.scale).setRotation(rot);
     // mood: an event for its duration, otherwise the situation

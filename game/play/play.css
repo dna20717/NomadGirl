@@ -387,3 +387,12 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .inv-cursor.bad { border-color: #ff5a6e; }
 .inv-cursor.shaped.bad path { stroke: #ff5a6e; }
 .inv-cursor.shaped.bad svg { filter: drop-shadow(0 0 1px rgba(0, 0, 0, .8)) drop-shadow(0 0 6px rgba(255, 90, 110, .6)); }
+/* actions in the tooltip / right-click menu (Daniel, 12.11.2026) */
+.inv-acts { list-style: none; margin: 7px 0 0; padding: 6px 0 0; border-top: 1px solid #3a2f45; display: grid; gap: 3px; font-size: 12px; color: #e8def0; }
+.inv-acts li { display: flex; align-items: center; gap: 5px; }
+.inv-acts li small { font-size: 10.5px; color: #b9a2c8; }
+.inv-acts li.hint { color: #8c7a9c; font-size: 11px; }
+.inv-acts kbd, .inv-acts img, .inv-acts svg { min-width: 16px; height: 16px; font-size: 10.5px; }
+.inv-tip.menu { pointer-events: auto; }
+.inv-menu { display: grid; gap: 4px; margin-top: 6px; }
+.inv-menu .inv-btn { text-align: left; }

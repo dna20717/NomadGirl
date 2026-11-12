@@ -122,6 +122,29 @@ await click(1, rb.x, rb.y);
 for (const [x, y] of [[4, 1], [3, 1], [4, 0], [2, 1], [5, 0]]) { if (!(await inv()).held) break; await click(0, x, y); }
 s = await inv();
 check('Rohrbogen vom Boden in den Rucksack', !s.held && has(s.backpack, 'rohrbogen'), s);
+// actions on a thing (Daniel, 12.11.2026): tooltip lists them, right click = menu: Heilen, Ausrüsten, Drohne geben, Wegwerfen
+await ev(() => { const sc = game.scene.getScene('play'), g = nomad.save().inv.grids;
+  g.backpack.items = [{ a: 'items', id: 'verband', n: 2, x: 0, y: 0, r: 0 }, { a: 'weapons', id: 'rohrzange', n: 1, x: 2, y: 0, r: 0 }]; g.drone.items = [];
+  sc.leyla.health = 40; sc.hud.inv.draw(); });
+let [hx, hy] = await cell(0, 0, 0); await page.mouse.move(hx, hy); await page.waitForTimeout(40);
+const tipActs = await ev(() => [...document.querySelectorAll('.inv-tip .inv-acts li')].map(li => li.textContent));
+check('Tooltip zeigt die Aktionen (Heilen, Drohne geben, Wegwerfen)', tipActs.some(t => /Heilen/.test(t)) && tipActs.some(t => /Drohne geben/.test(t)) && tipActs.some(t => /Wegwerfen/.test(t)), tipActs);
+await page.mouse.click(hx, hy, { button: 'right' }); await page.waitForTimeout(40);
+const menu = await ev(() => [...document.querySelectorAll('.inv-tip .inv-menu button')].map(b => b.textContent));
+await page.locator('.inv-tip .inv-menu button', { hasText: 'Heilen' }).click(); await page.waitForTimeout(40);
+s = await ev(() => ({ inv: nomad.inv(), health: game.scene.getScene('play').leyla.health }));
+check('Rechtsklick-Menü: Heilen heilt und verbraucht einen Verband', menu.includes('Heilen') && s.health > 40 && has(s.inv.backpack, 'verband') && s.inv.backpack.items.some(i => i.startsWith('verband×1')), { menu, s });
+await page.mouse.click(hx, hy, { button: 'right' }); await page.waitForTimeout(40);
+await page.locator('.inv-tip .inv-menu button', { hasText: 'Drohne geben' }).click(); await page.waitForTimeout(40);
+s = await inv();
+check('Drohne geben: Verband liegt bei Mama-Bot', has(s.drone, 'verband') && !has(s.backpack, 'verband'), s);
+[hx, hy] = await cell(0, 2, 0); await page.mouse.click(hx, hy, { button: 'right' }); await page.waitForTimeout(40);
+await page.locator('.inv-tip .inv-menu button', { hasText: 'Ausrüsten' }).click(); await page.waitForTimeout(40);
+s = await inv();
+check('Ausrüsten: Rohrzange in den Slot, Machete zurück in den Rucksack', s.slots.melee === 'rohrzange' && has(s.backpack, 'machete') && !s.held, s);
+// controller/keyboard: R on a thing = its first action (here: equip the machete back)
+s = await ev(() => { const ui = game.scene.getScene('play').hud.inv, e = ui.inv.grids.backpack.items.find(x => x.id === 'machete'); ui.act(ui.actionsFor('backpack', e).find(a => a.k === 'context').id, 'backpack', e); return nomad.inv(); });
+check('Erste Aktion per Taste: Machete wieder ausgerüstet', s.slots.melee === 'machete' && has(s.backpack, 'rohrzange'), s);
 s = await ev(() => { const sc = game.scene.getScene('play'); sc.hud.inv.close();
   // a cable stack in the backpack to fill up (the start chest changes with Daniel's data): clear the bag, one cable in the corner
   const g = nomad.save().inv.grids.backpack; g.items = [{ a: 'items', id: 'kupferkabel', n: 3, x: 0, y: 0, r: 0 }];
