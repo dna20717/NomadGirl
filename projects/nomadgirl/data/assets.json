@@ -3294,5 +3294,45 @@
   "source": "KI (PixelLab, Create Image Pro, 4 Kandidaten, Stilbild Drohnenwerkbank v2), gemischt und unreife Tomaten umgefärbt mit tools/garden_sprites.py",
   "date": "12.11.2026",
   "description": "Zeilen: Mutantenkohl, Basilikum, Chili, Strauchtomate; Spalten: Keimling, jung, groß, reif. Originale in assets/workshops/hydro/source/."
+ },
+ "ws_treasury_cyber_empty": {
+  "name": "Werkstatt · Trophäenraum leer (Cyberpunk)",
+  "kind": "image",
+  "file": "assets/workshops/treasury_cyber_empty.png",
+  "origin": [128, 226],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Stilbild Chill Area v2, Seed 301)",
+  "date": "12.11.2026",
+  "description": "Daniel, 12.11.2026: „eine Art Trophy Room im Cyberpunk Style“ (#003, Kandidat 1 von 3). Zwei Neon-Vitrinen, Lochwand mit Holo-Schildern, Sockel im Spotlicht; darauf liegen die Trophäen-Ständer."
+ },
+ "ws_treasury_cyber": {
+  "name": "Werkstatt · Trophäenraum voll (Cyberpunk)",
+  "kind": "image",
+  "file": "assets/workshops/treasury_cyber.png",
+  "origin": [128, 226],
+  "source": "KI (PixelLab, Edit Pro Flash mit Palettenkorrektur, Seed 81) + Code (nur der Beutehaufen in die leere Fassung übernommen)",
+  "derivedFrom": "ws_treasury_cyber_empty",
+  "date": "12.11.2026",
+  "description": "Leere Fassung plus Beutehaufen vor der Lochwand: Koffer mit Neon, Goldbarren, Scheine, Tresor, Pokale. Wächst mit dem Füllstand von unten."
+ },
+ "ws_treasury_cyber_candidate_1": {
+  "name": "Trophäenraum Kandidat 1 (#003)",
+  "kind": "source",
+  "file": "assets/workshops/treasury_candidates/cyber_1.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Seed 301)",
+  "date": "12.11.2026"
+ },
+ "ws_treasury_cyber_candidate_2": {
+  "name": "Trophäenraum Kandidat 2 (#003)",
+  "kind": "source",
+  "file": "assets/workshops/treasury_candidates/cyber_2.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Seed 302)",
+  "date": "12.11.2026"
+ },
+ "ws_treasury_cyber_candidate_3": {
+  "name": "Trophäenraum Kandidat 3 (#003)",
+  "kind": "source",
+  "file": "assets/workshops/treasury_candidates/cyber_3.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Seed 303)",
+  "date": "12.11.2026"
  }
 }
