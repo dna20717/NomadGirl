@@ -18,7 +18,8 @@ export class Leyla {
   // Leyla's data, with the poses of the ranged weapon in her hand laid over her own looks (Waffen › Posen, Daniel, 12.11.2026:
   // „Sturmgewehr als Grundlage für weitere Waffenvarianten“); without poses: her own data
   get d() {
-    const w = this.scene.weapon?.('ranged'), P = w?.poses;
+    const w = this.scene.weapon?.('ranged'), from = w?.posesFrom && this.scene.data_.weapons?.[w.posesFrom];
+    const P = w && (w.poses || from?.poses) ? { ...from?.poses, ...w.poses } : null;   // Waffen › Posen von: a new gun borrows the poses of another one
     if (!P) return this.base;
     if (this.posesOf !== w) {
       this.posesOf = w;
@@ -691,6 +692,29 @@ export class Leyla {
     this.sprite.setFlipX(flipped).setOrigin(flipped ? 1 - info.ox : info.ox, info.oy);   // Phaser mirrors inside the frame: the anchor has to mirror too
     if (st !== 'dead') this.sprite.setAlpha(time < this.invulnerableUntil && Math.floor(time / 70) % 2 ? 0.35 : 1);
     this.recoil(time);
+    this.backGun(name);
+  }
+
+  // Waffen › Auf dem Rücken (Daniel, 12.11.2026: „ergänze, dass ein Gewehr auf ihrem Rücken hängt, wenn sie klettert oder springt“):
+  // the long gun hangs on her back while it is not in her hands; the picture is the gun's inventory icon, placed per state
+  // (Stelle: x behind her, y above the feet, in px at 192 px height; Winkel: muzzle up behind the shoulder; Vor Leyla: seen from behind)
+  backGun(look) {
+    const w = this.scene.weapon?.('ranged'), B = w?.back || (w?.posesFrom && this.scene.data_.weapons?.[w.posesFrom]?.back), sp = this.sprite, st = this.state, f = this.facing;
+    const air = ['jump', 'fall', 'airJump'].includes(look);
+    const state = air ? 'jump' : ['climb', 'hang', 'mantle', 'swing', 'dash', 'slide', 'crouch', 'land', 'brake'].includes(st) ? st : 'stand';
+    const moves = air || ['climb', 'hang', 'mantle', 'swing'].includes(st);
+    const rows = B?.spots || [], row = rows.find(r => r.state === state) || rows.find(r => r.state === 'stand');
+    const hidden = !B?.show || !w.look || w.icon == null || !row || row.hide || this.armed !== 'off' || !sp.visible || st === 'dead'
+      || ['sit', 'pose'].includes(st) || look === '@' + this.d.look?.work || (B.show === 'moves' && !moves) || !this.scene.textures.exists(w.look);
+    if (hidden) { if (this.backImg?.visible) this.backImg.setVisible(false); this.backShown = null; return; }
+    const A = this.scene.data_.assets?.[w.look], cw = (Array.isArray(A?.cell) ? A.cell[0] : A?.cell) || 64, k = this.size.h / 168;
+    this.backImg ??= this.scene.add.image(0, 0, w.look, w.icon);
+    const [px, py] = row.point || [14, 120], ang = (row.angle ?? 60) * Math.PI / 180;
+    this.backImg.setTexture(w.look, w.icon).setVisible(true).setDepth(sp.depth + (row.front ? 0.002 : -0.002))
+      .setPosition(sp.x - f * px * k, sp.y - py * k).setRotation(f * ang + (sp.rotation || 0)).setFlipX(f > 0)
+      .setScale((B.length ?? 110) * k / cw).setAlpha(sp.alpha);
+    if (sp.isTinted) this.backImg.setTint(sp.tintTopLeft); else this.backImg.clearTint();
+    this.backShown = state;
   }
 
   // ---------- melee (Daniel, 07.11.2026 spät): tap = light hit, standing or walking; holding = heavy hit when released ----------

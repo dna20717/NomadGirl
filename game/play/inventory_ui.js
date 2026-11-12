@@ -38,13 +38,18 @@ export function iconCell(D, t) {
   if (A?.kind !== 'icons' || !A.file || t.icon === undefined) return null;
   const [c, r] = A.grid || [1, 1];
   if (t.icon < 0 || t.icon >= c * r) return null;
-  return { url: new URL(A.file, ASSET_BASE).href, c, r, col: t.icon % c, row: Math.floor(t.icon / c) };
+  const [cw, ch] = Array.isArray(A.cell) ? A.cell : [A.cell || 1, A.cell || 1];
+  return { url: new URL(A.file, ASSET_BASE).href, c, r, col: t.icon % c, row: Math.floor(t.icon / c), aspect: cw / ch || 1 };
 }
-export function artOf(D, a, id, px, turn = 0) {
+// the picture of a thing; wide icon sheets (e.g. 128 × 64 for long guns, Daniel 12.11.2026) keep their shape:
+// px × ph is the box before turning, without ph the picture fits into a px square
+export function artOf(D, a, id, px, turn = 0, ph = null) {
   const k = iconCell(D, thing(D, a, id));
   if (!k) return null;
+  let w = px, h = ph ?? px;
+  if (ph == null && k.aspect !== 1) { if (k.aspect > 1) h = px / k.aspect; else w = px * k.aspect; }
   const pos = (i, n) => n > 1 ? (i / (n - 1)) * 100 : 0;
-  return el('span', { class: 'inv-art', style: `width:${px}px;height:${px}px;background-image:url("${k.url}");background-size:${k.c * 100}% ${k.r * 100}%;` +
+  return el('span', { class: 'inv-art', style: `width:${w}px;height:${h}px;background-image:url("${k.url}");background-size:${k.c * 100}% ${k.r * 100}%;` +
     `background-position:${pos(k.col, k.c)}% ${pos(k.row, k.r)}%;${turn ? `transform:rotate(${turn * 90}deg);` : ''}` });
 }
 // picture if there is one, otherwise the glyph as text
@@ -285,8 +290,11 @@ export class InventoryUI {
     const set = new Set(cells.map(p => p.join(',')));
     for (const [x, y] of cells) wrap.append(el('i', { style: `left:${x * c}px;top:${y * c}px;width:${c}px;height:${c}px`,
       class: [!set.has(`${x - 1},${y}`) && 'l', !set.has(`${x + 1},${y}`) && 'r', !set.has(`${x},${y - 1}`) && 't', !set.has(`${x},${y + 1}`) && 'b'].filter(Boolean).join(' ') }));
-    const [lx, ly] = cells[0], side = Math.min(b.w, b.h) * c, art = artOf(D, e.a, e.id, Math.round(side * 0.92), e.r || 0);
-    if (art) { wrap.classList.add('pic'); wrap.append(el('span', { class: 'inv-pic', style: `left:${(b.w * c - side) / 2}px;top:${(b.h * c - side) / 2}px;width:${side}px;height:${side}px` }, art)); }
+    // the picture fills the box in its own shape (square icons a square, wide ones as wide as the thing), turned with it
+    const [lx, ly] = cells[0], k = iconCell(D, t), odd = (e.r || 0) % 2 === 1, W = b.w * c, H = b.h * c;
+    const [uw, uh] = odd ? [H, W] : [W, H], sz = k ? Math.min(uw / k.aspect, uh) : 0, aw = sz * (k?.aspect || 1) * 0.92, ah = sz * 0.92;
+    const art = k && artOf(D, e.a, e.id, aw, e.r || 0, ah);
+    if (art) { wrap.classList.add('pic'); wrap.append(el('span', { class: 'inv-pic', style: `left:${(W - aw) / 2}px;top:${(H - ah) / 2}px;width:${aw}px;height:${ah}px` }, art)); }
     else wrap.append(el('span', { class: 'inv-glyph', style: `left:${lx * c}px;top:${ly * c}px;width:${c}px;height:${c}px` }, glyphOf(D, e.a, e.id)));
     if (!art && (b.w * c >= 80 || b.h > 1)) wrap.append(el('span', { class: 'inv-name' }, t.name || e.id));
     if (e.n > 1) wrap.append(el('span', { class: 'inv-count' }, String(e.n)));

@@ -248,7 +248,10 @@ v = await page.evaluate(() => { const n = nomad, s = game.scene.getScene('play')
   const seen = new Set(), watch = (k, hold = [], tap = []) => { for (let i = 0; i < k; i++) { n.step(1, hold, i ? [] : tap); seen.add(l.sprite.texture.key); } };
   watch(40, [], ['ranged']); const mag = l.mag;
   watch(30, ['walk', 'right'], ['ranged']); watch(20, ['right'], ['ranged']);
-  return { seen: [...seen], mag }; });
+  n.step(1, [], ['holster']); n.step(60); const stowed = l.armed + ':' + l.backShown;
+  n.step(1, ['jump'], ['jump']); n.step(10, ['jump']); const air = l.backShown; n.step(60);
+  return { seen: [...seen], mag, stowed, air }; });
+check('Sturmgewehr: weggesteckt hängt es auf dem Rücken, auch im Sprung', v.stowed === 'off:stand' && v.air === 'jump', v);
 check('Sturmgewehr bringt eigene Posen mit (Ziehen, Schießen, Gehen, Rennen im Anschlag)', ['rifle_draw', 'rifle_shoot', 'rifle_aim_walk', 'rifle_run_gun'].every(k => v.seen.some(s => s.includes(k))) && v.seen.every(s => !/^leyla_(aim|shoot|draw)_side/.test(s)) && v.mag < 30, v);
 await browser.close();
 console.log(ok.map(n => '✓ ' + n).join('\n'));

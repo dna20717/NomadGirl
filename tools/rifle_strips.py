@@ -9,6 +9,7 @@ Prints frame size, frame count and the anchor (feet) for assets.json.
     python3 tools/rifle_strips.py
 """
 import os
+from collections import deque
 from PIL import Image
 
 L = os.path.join(os.path.dirname(__file__), '..', 'projects', 'nomadgirl', 'assets', 'leyla')
@@ -21,7 +22,7 @@ STRIPS = {
     'rifle_draw_side': ('rifle_draw_side_source.png', (208, 244), range(0, 7), 93.5, 242),
     'rifle_aim_side': ('rifle_aim_side_source.png', (208, 244), range(0, 5), 89.5, 242),
     'rifle_shoot_side': ('rifle_shoot_side_source.png', (208, 244), [1, 2, 3, 4], 89.5, 242),
-    'rifle_reload_side': ('rifle_reload_side_source.png', (208, 244), range(0, 11), 89.5, 242),
+    'rifle_reload_side': ('rifle_reload_side_source.png', (208, 244), range(0, 23), 89.5, 242),
     'rifle_aim_walk_side': ('rifle_aim_walk_side_source.png', (208, 244), range(0, 8), 106, 242),
     'rifle_run_gun_side': ('rifle_run_gun_side_source.png', (208, 244), range(0, 8), 106, 242),
     'rifle_run_ready_side': ('rifle_run_ready_side_source.png', (208, 244), range(0, 8), 106, 242),
@@ -52,11 +53,49 @@ def snap(im, pal, cache):
     return im
 
 
+def components(im):
+    px, (w, h), seen, out = im.load(), im.size, set(), []
+    for y in range(h):
+        for x in range(w):
+            if px[x, y][3] and (x, y) not in seen:
+                q, c = deque([(x, y)]), []
+                seen.add((x, y))
+                while q:
+                    a, b = q.popleft()
+                    c.append((a, b))
+                    for dx in (-1, 0, 1):
+                        for dy in (-1, 0, 1):
+                            n = (a + dx, b + dy)
+                            if 0 <= n[0] < w and 0 <= n[1] < h and n not in seen and px[n][3]:
+                                seen.add(n)
+                                q.append(n)
+                out.append(c)
+    return sorted(out, key=len, reverse=True)
+
+
+def mend(f, pad):
+    """PixelLab cuts a muzzle that reaches the right edge and lets it come in again at the left edge (the 'artefacts behind Leyla'):
+    pieces touching the left edge go back to the right, behind the barrel; specks of 1-3 pixels go."""
+    out = Image.new('RGBA', (f.width + pad, f.height))
+    out.paste(f, (0, 0))
+    src, px = f.load(), out.load()
+    for c in components(f)[1:]:
+        for x, y in c:
+            px[x, y] = (0, 0, 0, 0)
+        if len(c) <= 3:
+            continue
+        dx = f.width if min(x for x, _ in c) == 0 and len(c) < 300 else 0
+        for x, y in c:
+            px[x + dx, y] = src[x, y]
+    return out
+
+
 def main():
     pal, cache = palette(), {}
     for out, (src, (fw, fh), take, ax, ay) in STRIPS.items():
         S = Image.open(os.path.join(L, src)).convert('RGBA')
-        frames = [snap(S.crop((i * fw, 0, (i + 1) * fw, fh)), pal, cache) for i in take]
+        frames = [mend(snap(S.crop((i * fw, 0, (i + 1) * fw, fh)), pal, cache), 48) for i in take]
+        fw += 48
         boxes = [f.getbbox() for f in frames if f.getbbox()]
         x0, x1 = min(b[0] for b in boxes), max(b[2] for b in boxes)
         x0, x1 = max(0, x0 - 1), min(fw, x1 + 1)
