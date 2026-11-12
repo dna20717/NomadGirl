@@ -7,7 +7,7 @@
 //   ok        E / Enter / Space     A (bottom)
 //   back      Esc                   B (right)            one layer back: put back what is held, then close
 //   context   R / right click       X (left)             turn, take out of the pot …
-//   send      F / double click      Y (top)              to the other side
+//   send      F / double click      Y (top)              to the other side (inventory: hold = throw on the ground; pot: all)
 //   tabs      Q                     LB / RB
 import { el } from '../ui.js';
 
@@ -84,6 +84,7 @@ export class NavCursor {
     }
     const c = this.current();
     if (c && ui.pressed('ok')) { c.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 })); c.click(); }
+    if (c && ui.pressed('send')) c.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, shiftKey: true }));   // Y / F = all of it (shift + click)
     if (c && ui.pressed('context')) { c.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 2 })); c.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, button: 2 })); }
     this.show();
     return true;

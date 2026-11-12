@@ -373,3 +373,17 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
   box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 0 14px rgba(255, 210, 122, .55), inset 0 0 10px rgba(255, 210, 122, .2); transition: left 70ms ease-out, top 70ms ease-out, width 70ms, height 70ms; }
 .inv-cursor.holding { border-color: #7ff6ff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 0 14px rgba(127, 246, 255, .55); }
 .hud-item.focus { outline: 2px solid #ffd27a; outline-offset: 1px; box-shadow: 0 0 14px rgba(255, 210, 122, .35); }
+/* build mode cursor (controller, keyboard): a golden ring over the world, cyan while something hangs on it */
+.bm-cursor { border-radius: 50%; z-index: 40; transition: none; }
+.bm-cursor::after { content: ''; position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px; border-radius: 50%; background: #ffd27a; }
+.bm-cursor.holding { border-color: #7ff6ff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 0 16px rgba(127, 246, 255, .6); }
+.bm-openbtn.on { color: #3fe0d0; }
+/* inventory cursor around a thing with several fields: the frame follows its shape (svg outline instead of the box border) */
+.inv-cursor.shaped { border: 0; box-shadow: none; border-radius: 0; }
+.inv-cursor.shaped svg { display: block; overflow: visible; filter: drop-shadow(0 0 1px rgba(0, 0, 0, .8)) drop-shadow(0 0 6px rgba(255, 210, 122, .6)); }
+.inv-cursor.shaped path { fill: none; stroke: #ffd27a; stroke-width: 2; stroke-linecap: square; }
+.inv-cursor.shaped.holding svg { filter: drop-shadow(0 0 1px rgba(0, 0, 0, .8)) drop-shadow(0 0 6px rgba(127, 246, 255, .6)); }
+.inv-cursor.shaped.holding path { stroke: #7ff6ff; }
+.inv-cursor.bad { border-color: #ff5a6e; }
+.inv-cursor.shaped.bad path { stroke: #ff5a6e; }
+.inv-cursor.shaped.bad svg { filter: drop-shadow(0 0 1px rgba(0, 0, 0, .8)) drop-shadow(0 0 6px rgba(255, 90, 110, .6)); }

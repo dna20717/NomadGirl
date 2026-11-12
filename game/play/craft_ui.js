@@ -51,7 +51,7 @@ export class CraftUI {
         el('small', {}, clockText(save)), el('button', { class: 'craft-x', title: 'Schließen (Esc)', onclick: () => this.close() }, '×')),
       el('div', { class: 'craft-cols' }, this.bookEl(), this.potEl()),
       this.logEl(),
-      hints([['move', 'wählen'], ['ok', 'nehmen'], ['context', 'wieder raus'], ['back', 'schließen']], 'Vorräte anklicken: in den Topf · Rechtsklick oder Klick im Topf: raus · Zutaten aus Lager, Kiste und Rucksack')));
+      hints([['move', 'wählen'], ['ok', 'eins'], ['send', 'alle'], ['context', 'wieder raus'], ['back', 'schließen']], 'Vorräte anklicken: in den Topf · Rechtsklick oder Klick im Topf: raus · Zutaten aus Lager, Kiste und Rucksack')));
     this.cursor.show();
   }
 

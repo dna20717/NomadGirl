@@ -603,7 +603,16 @@ export class PlayScene extends Phaser.Scene {
     this.ui = uiInput(kb, pad);   // window keys (ui_nav.js): one grammar for menus, inventory, cooking, building
     // inventory open: the controller drives its cursor (padMenus), Leyla only hears the keyboard; Select / Start still close
     const invPad = this.hud.inv?.isOpen && !this.hud.paused && !this.hud.modal;
-    if (pad?.kind) for (const name of Object.keys(i)) { if (invPad && name !== 'inventory' && name !== 'help') continue; i[name].down ||= pad.down(name); i[name].pressed ||= pad.pressed(name) && !(pad.viaUp?.has(name) && !this.useByUp()); }
+    // Select in the camp (Daniel, 12.11.2026: „Rig-Bau-Modus = Select“): tap = inventory (on release), hold = build the rig
+    const selHold = this.mode === 'camp' && pad?.kind && !this.hud.inv?.isOpen && !this.hud.build?.active && !this.hud.modal && !this.hud.craft?.isOpen;
+    if (pad?.kind) for (const name of Object.keys(i)) { if (invPad && name !== 'inventory' && name !== 'help') continue; if (name === 'inventory' && (selHold || this.hud.build?.active)) continue; i[name].down ||= pad.down(name); i[name].pressed ||= pad.pressed(name) && !(pad.viaUp?.has(name) && !this.useByUp()); }
+    if (selHold) {
+      const hold = this.data_.game?.gamepad?.buildHold ?? 500, now = this.now ?? 0;
+      if (pad.down('inventory')) {
+        this.selAt ??= now;
+        if (!this.selFired && now - this.selAt >= hold && hold > 0) { this.selFired = true; i.build = { down: true, pressed: true }; }
+      } else { if (this.selAt != null && !this.selFired) i.inventory.pressed = true; this.selAt = null; this.selFired = false; }
+    } else if (!pad?.down('inventory')) { this.selAt = null; this.selFired = false; }
     // use by „up“ (Daniel, 12.11.2026, 3a): W / ↑ / the stick flicked up counts as E while an E prompt is on screen and Leyla stands or walks;
     // then it does not start a ladder (the prompt wins)
     if (i.up?.pressed && !i.grab.pressed && this.useByUp()) { i.grab.pressed = true; i.up.pressed = false; }
@@ -618,7 +627,7 @@ export class PlayScene extends Phaser.Scene {
     return l.state === 'normal' && (l.body.blocked.down || l.body.touching.down) && Math.abs(l.body.velocity.x) <= (l.m.walkSpeed ?? 240) * 1.15;
   }
   // windows (ui_nav.js, Daniel 12.11.2026: one grammar): move, ok, back, context, send, tabs; keyboard and controller alike
-  padMenus(input) {
+  padMenus(input, dt = 16) {
     const u = this.ui, hud = this.hud, p = this.pad;
     if (!u) return;
     const eat = () => { for (const k of ['jump', 'grab', 'dash', 'up', 'down', 'left', 'right', 'melee', 'ranged', 'reload', 'holster']) if (input[k]) input[k].pressed = false; };
@@ -638,8 +647,8 @@ export class PlayScene extends Phaser.Scene {
       else hud.craft.nav?.(u);
       eat(); return;
     }
-    if (hud.inv?.isOpen && !hud.paused) { hud.inv.padNav(u); if (u.pressed('back')) input.help.pressed = false; eat(); return; }
-    if (hud.build?.active && p?.kind && p.uiNow.has('back') && !p.uiPrev.has('back')) hud.build.close();   // B = fertig (keyboard: Esc / B)
+    if (hud.inv?.isOpen && !hud.paused) { hud.inv.padNav(u, this.now ?? performance.now()); if (u.pressed('back')) input.help.pressed = false; eat(); return; }
+    if (hud.build?.active) hud.build.nav(u, p, dt);   // cursor for controller and keyboard (build_mode.js)
   }
 
   toggleMute() {
@@ -651,7 +660,7 @@ export class PlayScene extends Phaser.Scene {
   update(time, delta) {
     this.now = time;   // the loop's clock (hits, shots and Leyla run on it; scene.time.now is another clock)
     let input = this.readInput();
-    this.padMenus(input);
+    this.padMenus(input, Math.min(delta, 50));
     // Esc / Start: closes what is open (inventory, controls), otherwise the pause menu (Daniel, 11.11.2026: controls hidden in a menu)
     if (input.help.pressed) {
       if (this.hud.inv?.isOpen && !this.hud.paused) this.hud.inv.close();

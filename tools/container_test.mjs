@@ -49,13 +49,14 @@ await shot('near');
 await ev(x => { nomad.walkTo(x); nomad.step(80); }, c.x1 + 340);
 check('Leyla geht weg: wieder zu', (await shells())[0].closed === 1, await shells());
 
-await page.click('.hud-openbtn');
-await ev(() => nomad.step(40));
-check('Knopf „Rig offen“: alle offen, auch aus der Ferne', (await shells())[0].closed === 0 && await ev(() => localStorage.getItem('nomadgirl-rig-open')) === '1' && (await page.textContent('.hud-openbtn')).includes('Rig offen'), await shells());
+// „Rig offen / zu“ lives in the build bar since 12.11.2026 (Daniel: „kann dann im Bau-Menü sein“)
+const toggleOpen = async () => { await ev(() => nomad.step(1, [], ['build'])); await ev(() => nomad.step(30)); await page.click('.bm-openbtn'); const t = await page.textContent('.bm-openbtn'); await ev(() => { nomad.step(1, [], ['build']); nomad.step(60); }); return t; };
+check('Kein Knopf „Rig offen“ mehr im HUD', await ev(() => document.querySelector('.hud-openbtn').hidden), null);
+let label = await toggleOpen();
+check('Bau-Leiste „Rig offen“: alle offen, auch aus der Ferne', (await shells())[0].closed === 0 && await ev(() => localStorage.getItem('nomadgirl-rig-open')) === '1' && label.includes('Rig offen'), { s: await shells(), label });
 await shot('toggle');
-await page.click('.hud-openbtn');
-await ev(() => nomad.step(40));
-check('Knopf nochmal: wieder zu', (await shells())[0].closed === 1 && (await page.textContent('.hud-openbtn')).includes('Rig zu'), await shells());
+label = await toggleOpen();
+check('Knopf nochmal: wieder zu', (await shells())[0].closed === 1 && label.includes('Rig zu'), { s: await shells(), label });
 
 await page.click('.hud-buildbtn');
 await ev(() => nomad.step(40));

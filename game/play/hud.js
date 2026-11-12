@@ -14,7 +14,7 @@ const CONTROLS = [
   { title: 'Kampf', icon: 'weapon', rows: [
     ['J / Y', 'Nahkampf: tippen = Kombo · 1 s halten: schwerer Hieb'], ['K / X', 'Schießen (am Boden): zieht und schießt im selben Zug'], ['K halten', 'Waffe wegstecken'], ['R', 'Nachladen (leer abdrücken lädt auch)'], ['Q', 'Waffe ziehen / wegstecken']] },
   { title: 'Machen', icon: 'hand', rows: [
-    ['E / W', 'Benutzen: Kisten, Schalter, Werkstätten, Feuer, Van (W nur mit Hinweis)'], ['I / Tab', 'Inventar'], ['B', 'Rig bauen (im Camp)'], ['P', 'Yoga-Pose']] },
+    ['E / W', 'Benutzen: Kisten, Schalter, Werkstätten, Feuer, Van (W nur mit Hinweis)'], ['I / Tab', 'Inventar'], ['B', 'Rig bauen (im Camp; Pfeile + Leertaste/Enter ohne Maus)'], ['P', 'Yoga-Pose']] },
   { title: 'System', icon: 'settings', rows: [
     ['Esc', 'Menü'], ['H', 'Diese Steuerung'], ['M', 'Ton an/aus'], ['Rücktaste', 'Raum neu starten'], ['G', 'Hitboxen']] },
 ];
@@ -58,13 +58,20 @@ export class Hud {
           el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'ZEIT'), this.time, el('span', { class: 'hud-label' }, 'KILLS'), this.kills, el('span', { class: 'hud-label' }, 'Δ'), this.deltas))),
       this.campEl, this.buildBtn, this.openBtn, this.bannerEl, this.promptEl, this.menuEl, this.help,
       el('div', { class: 'hud-foot' }, el('button', { class: 'hud-menubtn', title: 'Menü (Esc)', onclick: e => { e.currentTarget.blur(); this.pauseMenu(); } }, icon('menu', 14), 'Menü'), ' · ', el('a', { href: 'workshop.html' }, 'Werkstatt'), ' · ', el('a', { href: './' }, 'Start'),
-        this.newGame = el('span', { hidden: true }, ' · ', el('a', { href: 'game.html?camp&new', onclick: e => { if (!confirm('Spielstand löschen und neu anfangen?')) e.preventDefault(); } }, 'Neues Spiel')),
+        this.newGame = el('span', { hidden: true }, ' · ', el('a', { href: 'game.html?camp&new', onclick: e => { e.preventDefault(); e.currentTarget.blur(); this.confirmNew(); } }, 'Neues Spiel')),
         this.versionEl = el('span', { class: 'hud-version' })));
     loadVersion().then(v => { this.versionEl.textContent = ' · ' + v.text; this.versionEl.title = 'Version dieses Spiels' + (v.commit ? ': ' + v.commit : ''); this.version = v; });
     this.root = root;
     this.paused = false;   // the controls wait in the menu (Esc › Steuerung, or H)
   }
 
+  // a new game asks in the game's own menu (controller too), no browser dialog (Daniel, 12.11.2026)
+  confirmNew() {
+    if (this.paused) this.toggleHelp(false);
+    this.closeMenu();
+    this.menu({ title: 'Neues Spiel?', sub: 'Der Spielstand wird gelöscht: Rig, Inventar, Rezepte, Δ. Das lässt sich nicht rückgängig machen.',
+      items: [{ label: 'Abbrechen', sub: 'Weiterspielen', act: () => {} }, { label: 'Ja, neu anfangen', sub: 'Spielstand löschen', act: () => { location.href = 'game.html?camp&new'; } }] });
+  }
   // pause menu (Esc, Start on the controller, button at the bottom): the controls live here now
   pauseMenu() {
     const sc = this.scene;
@@ -78,7 +85,7 @@ export class Hud {
       ...(this.modeName === 'test' ? [{ label: 'Raum neu starten', sub: 'Rücktaste', act: () => sc.level ? sc.restartAs({}) : sc.restartRoom() }] : []),
       { label: 'Werkstatt', act: () => { location.href = 'workshop.html'; } },
       { label: 'Startseite', act: () => { location.href = './'; } },
-      ...(camp ? [{ label: 'Neues Spiel', sub: 'Spielstand löschen', act: () => { if (confirm('Spielstand löschen und neu anfangen?')) location.href = 'game.html?camp&new'; } }] : []),
+      ...(camp ? [{ label: 'Neues Spiel', sub: 'Spielstand löschen', act: () => this.confirmNew() }] : []),
     ] });
   }
 
@@ -113,7 +120,7 @@ export class Hud {
     this.campEl.hidden = !save;
     this.newGame.hidden = mode !== 'camp';
     this.buildBtn.hidden = mode !== 'camp';
-    this.openBtn.hidden = mode !== 'camp';
+    this.openBtn.hidden = true;   // Daniel, 12.11.2026: „Rig offen oder zu kann dann im Bau-Menü sein“ (build_mode.js bar)
     this.prompt(null);
     this.closeMenu();
   }
@@ -187,7 +194,8 @@ export class Hud {
     const names = { xbox: 'Xbox', ps: 'PlayStation', switch: 'Switch', stadia: 'Stadia' };
     const rows = [[[this.padIcon(`${kind}_stick`, 'Stick') || el('b', {}, 'Stick'), ico(12)], 'Laufen (halb neigen = gehen), runter = Ducken/Slide, hoch = Leiter'],
       ...actions.map(([a, name]) => [(pad.c.map[a] || []).map(ico), name]).filter(([k]) => k.length),
-      [[ico(12), ico(0), ico(1), ico(2), ico(3), ico(4), ico(5)], 'Fenster: wählen, nehmen, zurück, drehen, rüber, Tabs']];
+      [[ico(12), ico(0), ico(1), ico(2), ico(3), ico(4), ico(5)], 'Fenster: wählen, nehmen, zurück, drehen, rüber (halten: wegwerfen), Tabs'],
+      ...(pad.c.map.inventory?.length ? [[[...pad.c.map.inventory.map(ico)], 'Im Camp halten: Rig bauen (dort Select = Rig offen/zu)']] : [])];
     const half = Math.ceil(rows.length / 2), list = part => el('dl', {}, ...part.flatMap(([k, t]) => [el('dt', {}, ...k.flatMap((x, i) => i ? [' ', x] : [x])), el('dd', {}, t)]));
     this.padHelpEl.replaceChildren(el('h3', {}, icon('play', 16), `Controller · ${names[kind] || kind}`), el('div', { class: 'hud-cols' }, list(rows.slice(0, half)), list(rows.slice(half))),
       ...(active ? [el('p', { class: 'hud-small' }, 'Eine Taste auf der Tastatur zeigt wieder die Tastenbelegung.')] : [el('h3', { class: 'hud-keytitle' }, icon('grid', 16), 'Tastatur')]));

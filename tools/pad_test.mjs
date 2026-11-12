@@ -134,6 +134,50 @@ await shot('inventory');
 await tap(1); s = await iv();
 check('Inventar: B schließt', !s.open && !s.cursor, s);
 
+// Daniel, 12.11.2026: no dead ends for the controller
+// inventory: Y held = throw the thing at the cursor on the ground
+await tap(8);
+s = await ev(() => { const sc = game.scene.getScene('play'), cnt = () => sc.loot.piles.reduce((a, q) => a + q.grid.items.reduce((b, e) => b + e.n, 0), 0), n0 = cnt(), g = sc.box.save.inv.grids.backpack; g.items = g.items.filter(e => !(e.x < 2 && e.y < 2)); g.items.push({ a: 'items', id: 'schrottplatte', n: 1, x: 0, y: 0, r: 0 }); const b0 = g.items.length; sc.hud.inv.draw(); sc.hud.inv.focusId = 'cell:backpack:0:0'; setPad({ press: [3] }); nomad.step(40); setPad(); nomad.step(4); return { open: sc.hud.inv.isOpen, piles: cnt() - n0, bag: b0 - sc.box.save.inv.grids.backpack.items.length }; });
+check('Inventar: Y halten wirft die Sache auf den Boden', s.open && s.piles === 1 && s.bag === 1, s);
+// Daniel, 12.11.2026: the cursor frame takes the whole thing in its shape
+s = await ev(() => { const sc = game.scene.getScene('play'), inv = sc.hud.inv, g = sc.box.save.inv.grids.backpack;
+  const keep = g.items; g.items = [{ a: 'items', id: 'rohrbogen', n: 1, x: 0, y: 0, r: 0 }]; inv.draw();
+  inv.focusId = 'cell:backpack:0:0'; inv.padShow(); const c = inv.cursor, d = c.querySelector('path')?.getAttribute('d') || '';
+  const on = { shaped: c.classList.contains('shaped'), edges: (d.match(/M/g) || []).length };
+  inv.focusId = 'cell:backpack:3:1'; inv.padShow(); const empty = !c.classList.contains('shaped'); window.__keep = keep; return { on, empty }; });
+check('Inventar: Rahmen umfasst die ganze Form (Rohrbogen)', s.on.shaped && s.on.edges === 10 && s.empty, s);
+await ev(() => { const sc = game.scene.getScene('play'), inv = sc.hud.inv; inv.focusId = 'cell:backpack:0:1'; inv.padShow(); });
+if (shots) await page.waitForTimeout(400);
+await shot('inv_shape');
+await ev(() => { const sc = game.scene.getScene('play'); sc.box.save.inv.grids.backpack.items = window.__keep; sc.hud.inv.draw(); });
+await tap(1);
+// Select held in the camp = build the rig; cursor with stick/d-pad, RB jumps to the next part, A packs, B puts back, B finishes; Select = Rig offen/zu
+s = await ev(() => { setPad({ press: [8] }); nomad.step(45); setPad(); nomad.step(40); return { build: !!game.scene.getScene('play').hud.build.active, inv: game.scene.getScene('play').hud.inv.isOpen }; });
+check('Select halten im Camp öffnet Rig bauen (kein Inventar)', s.build && !s.inv, s);
+const bc = () => ev(() => game.scene.getScene('play').hud.build.cursorState());
+await tap(15); await tap(5);
+s = await bc();
+check('Bau-Modus: Cursor erscheint, RB springt zum nächsten Teil', s?.on && s.x > 0, s);
+await tap(0); s = await bc();
+check('Bau-Modus: A packt das Teil unter dem Cursor', !!s?.drag, s);
+await tap(1); await ev(() => nomad.step(20)); s = await bc();
+check('Bau-Modus: B legt es zurück', s && !s.drag, s);
+s = await ev(() => { const h = game.scene.getScene('play').hud, a = h.rigOpen; setPad({ press: [8] }); nomad.step(2); setPad(); nomad.step(2); const b = h.rigOpen; setPad({ press: [8] }); nomad.step(2); setPad(); nomad.step(2); return { a, b, c: h.rigOpen, label: document.querySelector('.bm-openbtn')?.textContent }; });
+check('Bau-Modus: Select schaltet Rig offen/zu', s.a !== s.b && s.c === s.a && /Rig (offen|zu)/.test(s.label), s);
+await tap(3); s = await bc();
+check('Bau-Modus: Y öffnet den Händler', s?.shop, s);
+await tap(1); s = await bc();
+check('Bau-Modus: B schließt den Händler', s && !s.shop, s);
+await tap(1); await ev(() => nomad.step(60));
+s = await ev(() => !!game.scene.getScene('play').hud.build.active);
+check('Bau-Modus: B ist fertig', !s, s);
+// a new game asks in the game's own menu
+s = await ev(() => { const h = game.scene.getScene('play').hud; h.confirmNew(); return h.menuState(); });
+check('Neues Spiel fragt im Spiel-Menü (kein Browser-Fenster)', s?.title === 'Neues Spiel?' && s.items.length === 2, s);
+await tap(1);
+s = await ev(() => game.scene.getScene('play').hud.menuState());
+check('Neues Spiel: B bricht ab', !s, s);
+
 // the keyboard still works
 await ev(() => nomad.release());
 await page.keyboard.down('d'); await page.waitForTimeout(1500); s = await sc(); await page.keyboard.up('d');

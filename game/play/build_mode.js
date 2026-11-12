@@ -10,7 +10,7 @@
 //   dealer catalogue (button or click on the pad): bought things are delivered onto the pad.
 // Logic in game/rig.js (act, snapshot/restore), drawing in game/play/camp.js (drawRig, drawYard), values in "Rig-Bau".
 import { el } from '../ui.js';
-import { hints } from './ui_nav.js';
+import { hints, NavCursor } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { budgets, act, snapshot, restore, lift, place, fits, at as wsAt, toSpare, fromSpare, stow, buyWorkshop, sellWorkshop, buyContainer, sellContainer, buyPart, sellPart, mountPart, unmountPart, SLOT_NAMES as PART_SLOTS, stackOn, stackTop, blockAt, levelOf, attachAt, detach, moveContainer, shop, priceOf, sellPrice, wsDef, placesOf } from '../rig.js';
 import { clockText } from '../save.js';
@@ -84,6 +84,7 @@ export class BuildMode {
     for (const u of this.undo) u.done = true;
     this.jobs = []; this.job = null; this.working = false;
     this.active = false; this.el.hidden = true; this.shell = null;
+    this.cur = null; this.curEl && (this.curEl.hidden = true); this.shopCur?.hide();
     delete this.el.parentElement.dataset.building;
     s.input.off('pointerdown', this.onDown); s.input.off('pointermove', this.onMove); s.input.off('pointerup', this.onUp); s.input.off('pointerupoutside', this.onUp);
     this.gfx?.destroy(); for (const t of this.labels || []) t.destroy(); this.labels = [];
@@ -99,6 +100,83 @@ export class BuildMode {
     s.buildClosed();
   }
 
+  toggleOpen() { const h = this.scene.hud; h.setRigOpen(!h.rigOpen); this.draw(); }
+
+  // ---------- controller and keyboard (Daniel, 12.11.2026: „Rig-Bau-Modus = Select“, Cursor wie vorgeschlagen) ----------
+  // u = window input (ui_nav.js), p = controller: a golden cursor over the world; A / Enter / Space packs what is under it, moving
+  // carries it along, A again puts it down (the same drop as the mouse); B puts it back, closes the dealer, then finishes;
+  // X undoes, Y opens the dealer (its catalogue gets the window cursor), LB / RB / Q jump to the next part, Select = Rig offen/zu
+  nav(u, p, dt) {
+    if (!this.active) return;
+    const s = this.scene, edge = a => p?.kind && p.uiNow.has(a) && !p.uiPrev.has(a);
+    if (p?.kind && p.pressed('inventory')) this.toggleOpen();
+    if (!this.cur?.on && !u.now.size) return;
+    if (!this.curEl) {
+      this.curEl = el('div', { class: 'ui-cursor bm-cursor', hidden: true }); document.body.append(this.curEl);
+      document.addEventListener('mousemove', ev => { if (this.cur?.on && (Math.abs(ev.movementX) + Math.abs(ev.movementY)) > 0) { this.cur.on = false; this.curEl.hidden = true; } });
+    }
+    if (!this.cur) this.cur = { x: s.scale.width / 2, y: s.scale.height * 0.62, on: false, held: 0 };
+    if (!this.cur.on) { this.cur.on = true; return this.showCur(); }
+    // the dealer's catalogue: the window cursor, B closes it
+    if (this.shopOpen && !this.drag) {
+      this.shopCur ??= new NavCursor(this.shell.shop, '.bm-shop .inv-btn:not(.craft-x)');
+      this.shopCur.root = this.shell.shop;
+      if (edge('back') || u.pressed('send')) { this.shopOpen = false; this.shopCur.hide(); this.draw(); return this.showCur(); }
+      this.shopCur.update(u);
+      this.curEl.hidden = true;
+      return;
+    }
+    this.shopCur?.hide();
+    // move: the stick moves smoothly (faster when held), arrows and d-pad at a steady pace
+    const g = p?.pad, ax = g ? g.axes[0] || 0 : 0, ay = g ? g.axes[1] || 0 : 0, dz = 0.25;
+    let vx = (u.down('right') ? 1 : 0) - (u.down('left') ? 1 : 0), vy = (u.down('down') ? 1 : 0) - (u.down('up') ? 1 : 0);
+    if (Math.abs(ax) > dz) vx = ax; if (Math.abs(ay) > dz) vy = ay;
+    const moving = vx || vy;
+    this.cur.held = moving ? this.cur.held + dt : 0;
+    const v = (this.B.view?.cursorSpeed ?? 900) * (this.cur.held > 450 ? 1.8 : 1);
+    if (moving) {
+      this.cur.x = clamp(this.cur.x + vx * v * dt / 1000, 0, s.scale.width); this.cur.y = clamp(this.cur.y + vy * v * dt / 1000, 0, s.scale.height);
+      this.pointerMove({ x: this.cur.x, y: this.cur.y });
+    }
+    if (u.pressed('next') || edge('next')) this.jump(1);
+    if (edge('prev')) this.jump(-1);
+    const pt = { x: this.cur.x, y: this.cur.y, button: 0 };
+    if (u.pressed('ok')) {
+      if (this.drag) this.pointerUp(pt);
+      else {
+        this.pointerDown(pt);
+        const hit = this.press?.hit;
+        if (hit && hit.kind !== 'dealer') { this.press = null; this.startDrag(hit, this.world(pt)); this.pointerMove(pt); }
+        else this.pointerUp(pt);
+      }
+    }
+    if (edge('back')) { if (this.drag) this.flyBack(null); else { this.close(); return; } }
+    if (u.pressed('context') || edge('context')) this.undoLast();
+    if (u.pressed('send') || edge('send')) { this.shopOpen = true; this.draw(); }
+    this.showCur();
+  }
+  showCur() {
+    const s = this.scene, r = s.game.canvas.getBoundingClientRect(), k = r.width / s.scale.width, show = !!this.cur?.on && this.active;
+    this.curEl.hidden = !show;
+    if (!show) return;
+    const z = this.drag ? 34 : 26;
+    Object.assign(this.curEl.style, { left: `${r.left + this.cur.x * k - z / 2}px`, top: `${r.top + this.cur.y * (r.height / s.scale.height) - z / 2}px`, width: `${z}px`, height: `${z}px` });
+    this.curEl.classList.toggle('holding', !!this.drag);
+  }
+  // LB / RB / Q: the cursor jumps to the next part, place, trailer or the dealer (left to right)
+  jump(d) {
+    const sp = this.spots(), s = this.scene, r = s.game.canvas.getBoundingClientRect(), kx = s.scale.width / r.width, ky = s.scale.height / r.height;
+    const pts = this.drag ? [...sp.slots, ...sp.gaps, ...sp.stacks, ...sp.sockets, ...(sp.yardFree ? [sp.yardFree] : []), ...(sp.dealer ? [sp.dealer] : [])]
+      : [...sp.yard, ...sp.slots.filter(x => x.ws), ...sp.units, ...sp.sockets.filter(x => x.id), ...(sp.dealer ? [sp.dealer] : [])];
+    const g = pts.map(q => ({ x: (q.x - r.left) * kx, y: (q.y - r.top) * ky })).filter(q => q.x >= 0 && q.x <= s.scale.width).sort((a, b) => a.x - b.x || a.y - b.y);
+    if (!g.length) return;
+    const i = d > 0 ? g.findIndex(q => q.x > this.cur.x + 12) : g.map(q => q.x < this.cur.x - 12).lastIndexOf(true);
+    const q = g[i >= 0 ? i : d > 0 ? 0 : g.length - 1];
+    this.cur.x = q.x; this.cur.y = q.y;
+    this.pointerMove({ x: q.x, y: q.y });
+  }
+  cursorState() { return this.cur ? { on: !!this.cur.on, x: Math.round(this.cur.x), y: Math.round(this.cur.y), drag: this.drag?.kind || null, shop: !!this.shopOpen } : null; }
+
   // ---------- the bar on top: budgets, clock, Δ, dealer, undo, done ----------
   draw() {
     if (!this.active) return;
@@ -111,7 +189,7 @@ export class BuildMode {
     // only their contents change. The slide-in plays once when building starts or the dealer opens.
     if (!this.shell || !this.el.contains(this.shell.bar)) {
       this.shell = { bar: el('div', { class: 'bm-bar ui-frame' }), shop: el('div', { class: 'bm-shopslot' }), msg: el('div', { class: 'bm-msg idle' }),
-        hint: hints([['back', 'fertig']], 'Maus: Teile packen und ziehen · Strg+Z rückgängig · B fertig') };
+        hint: hints([['move', 'Cursor'], ['ok', 'packen / ablegen'], ['context', 'rückgängig'], ['send', 'Händler'], ['tabs', 'nächstes Teil'], ['back', 'zurück / fertig']], 'Maus: Teile packen und ziehen · Strg+Z rückgängig · B fertig') };
       this.shell.hint.classList.add('bm-hints');
       this.el.replaceChildren(this.shell.bar, this.shell.shop, this.shell.msg, this.shell.hint);
     }
@@ -128,6 +206,7 @@ export class BuildMode {
           el('small', { class: 'bm-clock' }, clockText(save)),
           el('b', { class: 'build-deltas' }, `${de(save.deltas)} Δ`),
           el('button', { class: 'inv-btn bm-shopbtn' + (this.shopOpen ? ' on' : ''), onclick: () => { this.shopOpen = !this.shopOpen; this.draw(); } }, icon('shop', 15), ' Händler'),
+          el('button', { class: 'inv-btn ghost bm-openbtn' + (this.scene.hud.rigOpen ? ' on' : ''), title: 'Rig offen: alle Container bleiben offen (auch außerhalb des Bau-Modus). Controller: Select', onclick: () => this.toggleOpen() }, icon(this.scene.hud.rigOpen ? 'door' : 'box', 15), this.scene.hud.rigOpen ? ' Rig offen' : ' Rig zu'),
           el('button', { class: 'inv-btn ghost bm-undo', disabled: !top || top.done, title: top && !top.done ? `Rückgängig: ${top.label} (Strg+Z)` : 'Nichts zum Rückgängigmachen (Leyla hat schon festgeschraubt)', onclick: () => this.undoLast() }, '↶ Rückgängig'),
           el('button', { class: 'inv-btn build-go', onclick: () => this.close() }, 'Fertig (B)')));
     if (this.shopOpen) {

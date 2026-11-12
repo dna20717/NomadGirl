@@ -77,7 +77,9 @@
   "icons": "pad_icons",
   "symbols": "auto",
   "useTilt": 70,
-  "useUp": true
+  "useUp": true,
+  "buildHold": 500,
+  "throwHold": 450
  },
  "atmosphere": {"enabled": true, "scale": 4, "leyla": {"radius": 260, "strength": 22}, "depth": 14},
  "combat": {"shootStyle": "cells", "runSpeed": 85, "cone": 35, "range": 9, "bulletSpeed": 2200, "marker": true, "markerColor": "#ff3fa4"},

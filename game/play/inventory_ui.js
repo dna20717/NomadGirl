@@ -111,7 +111,7 @@ export class InventoryUI {
     this.pair = this.other ? ['backpack', this.other.key] : ['backpack', 'drone'];
     const left = el('div', { class: 'inv-col' }, this.bagEl(), this.other ? this.otherEl() : null);
     this.el.replaceChildren(el('div', { class: 'inv-row' }, left, this.leylaEl(), this.droneEl()),
-      hints([['move', 'wählen'], ['ok', 'nehmen / ablegen'], ['context', 'drehen'], ['send', 'rüber'], ['tabs', 'Tab'], ['back', 'zurück']], 'Maus: klicken, Rechtsklick dreht, Doppelklick rüber, daneben = auf den Boden'));
+      hints([['move', 'wählen'], ['ok', 'nehmen / ablegen'], ['context', 'drehen'], ['send', 'rüber (halten: wegwerfen)'], ['tabs', 'Tab'], ['back', 'zurück']], 'Maus: klicken, Rechtsklick dreht, Doppelklick rüber, daneben = auf den Boden'));
     this.fit();
     this.drawGhost();
     this.padShow();
@@ -398,12 +398,47 @@ export class InventoryUI {
     const f = this.padFocus();
     if (!f) return;
     this.cursor.hidden = false;
-    Object.assign(this.cursor.style, { left: `${f.l - 3}px`, top: `${f.t - 3}px`, width: `${f.w + 6}px`, height: `${f.h + 6}px` });
+    const box = this.cursorShape(f);
     this.cursor.classList.toggle('holding', !!this.held);
     this.mouse = [f.l + f.w / 2, f.t + f.h / 2];
     if (this.held) Object.assign(this.ghost.style, { left: `${this.mouse[0]}px`, top: `${this.mouse[1]}px` });
     const e = f.key && this.itemAt(f.key, f.x, f.y);
-    if (e && !this.held) { this.showTip(e); Object.assign(this.tip.style, { left: `${f.l + f.w + 10}px`, top: `${f.t}px` }); } else this.tip.hidden = true;
+    if (e && !this.held) { this.showTip(e); Object.assign(this.tip.style, { left: `${box.r + 8}px`, top: `${box.t + 3}px` }); } else this.tip.hidden = true;
+  }
+  // the cursor frame follows the thing's shape (Daniel, 12.11.2026: „wenn ein Objekt mehr als ein Segment hat, soll der Rahmen das ganze Objekt in seiner Form umfassen“):
+  // on a thing = its cells, holding something = where it would land (red if it does not fit), otherwise the one field
+  cursorShape(f) {
+    const g = f.key != null && this.grid(f.key), held = this.held?.e, e = g && !held && this.itemAt(f.key, f.x, f.y);
+    let cells = null, ox = 0, oy = 0, bad = false;
+    if (e) { cells = cellsOf(this.D, e.a, e.id, e.r || 0); ox = e.x; oy = e.y; }
+    else if (g && held) {
+      cells = cellsOf(this.D, held.a, held.id, held.r || 0); ox = f.x; oy = f.y;
+      bad = !cells.every(([cx, cy]) => ox + cx < g.w && oy + cy < g.h) || (!fits(this.D, g, held, ox, oy) && !this.itemAt(f.key, f.x, f.y));
+    }
+    const c = this.cursor;
+    c.classList.toggle('bad', bad);
+    if (!cells || cells.length < 2 && !bad) {
+      c.classList.remove('shaped'); c.replaceChildren();
+      Object.assign(c.style, { left: `${f.l - 3}px`, top: `${f.t - 3}px`, width: `${f.w + 6}px`, height: `${f.h + 6}px` });
+      return { r: f.l + f.w + 3, t: f.t - 3 };
+    }
+    const set = new Set(cells.map(([x, y]) => `${x},${y}`)), w = Math.max(...cells.map(q => q[0])) + 1, h = Math.max(...cells.map(q => q[1])) + 1;
+    const P = 3, L = f.l + (ox - f.x) * f.w, T = f.t + (oy - f.y) * f.h, M = P + 2, W = w * f.w + 2 * M, H = h * f.h + 2 * M;
+    // edges of every cell where the neighbour is not part of the thing → one outline around the whole shape
+    let d = '';
+    // outward by P; at each end: open = reach out (convex corner), straight on = 0, inner corner = stop short
+    const has = (a, b) => set.has(`${a},${b}`), end = (nx, ny, ox2, oy2) => !has(nx, ny) ? P : has(nx + ox2, ny + oy2) ? -P : 0;
+    for (const [x, y] of cells) {
+      const x0 = M + x * f.w, y0 = M + y * f.h, x1 = x0 + f.w, y1 = y0 + f.h;
+      if (!has(x, y - 1)) d += `M${x0 - end(x - 1, y, 0, -1)} ${y0 - P}H${x1 + end(x + 1, y, 0, -1)}`;
+      if (!has(x, y + 1)) d += `M${x0 - end(x - 1, y, 0, 1)} ${y1 + P}H${x1 + end(x + 1, y, 0, 1)}`;
+      if (!has(x - 1, y)) d += `M${x0 - P} ${y0 - end(x, y - 1, -1, 0)}V${y1 + end(x, y + 1, -1, 0)}`;
+      if (!has(x + 1, y)) d += `M${x1 + P} ${y0 - end(x, y - 1, 1, 0)}V${y1 + end(x, y + 1, 1, 0)}`;
+    }
+    c.classList.add('shaped');
+    c.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><path d="${d}"/></svg>`;
+    Object.assign(c.style, { left: `${L - M}px`, top: `${T - M}px`, width: `${W}px`, height: `${H}px` });
+    return { r: L - M + W, t: T - M };
   }
   itemAt(key, x, y) {
     const g = this.grid(key);
@@ -446,7 +481,17 @@ export class InventoryUI {
       else { f.node.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 })); if (f.node.tagName === 'BUTTON' && f.node.classList.contains('inv-btn')) f.node.click(); }
     }
     if (p.pressed('context')) { if (this.held) this.turnHeld(); else if (e) this.turnInPlace(this.grid(f.key), e); }
-    if (p.pressed('send') && f.key != null) { if (this.held) this.quickMoveHeld(f.key); else if (e) this.quickMove(f.key, e); }
+    // Y / F: tap = to the other side, hold = throw it on the ground (Daniel, 12.11.2026, controller has no „click beside the window“)
+    const hold = this.D.game?.gamepad?.throwHold ?? 450;
+    if (p.pressed('send')) this.sendAt = now;
+    if (this.sendAt != null && p.down('send') && hold > 0 && now - this.sendAt >= hold) {
+      this.sendAt = null;
+      if (!this.held && e && f.key != null) this.pick(f.key, this.grid(f.key), e);
+      if (this.held) { this.throwDown(); this.draw(); }
+    } else if (this.sendAt != null && !p.down('send')) {
+      this.sendAt = null;
+      if (f.key != null) { if (this.held) this.quickMoveHeld(f.key); else if (e) this.quickMove(f.key, e); }
+    }
     if (p.pressed('back')) { if (this.held) this.putBack(); else return this.close(); }
     for (const [a, d] of [['prev', -1], ['next', 1]]) if (p.pressed(a)) {
       const tabs = [...this.el.querySelectorAll('.inv-tab')], i = tabs.findIndex(t => t.classList.contains('on'));

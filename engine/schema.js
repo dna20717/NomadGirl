@@ -129,6 +129,8 @@ export const AREAS = {
         num('gamepad.deadzone', 'Totzone', { unit: '%', min: 0, max: 90, hint: 'So weit muss der Stick geneigt sein, bevor Leyla läuft' }),
         num('gamepad.walkTilt', 'Gehen bis', { unit: '%', min: 0, max: 100, hint: 'Stick nur bis hier geneigt = gehen statt rennen (0 = aus)' }),
         num('gamepad.useTilt', 'Benutzen ab', { unit: '%', min: 0, max: 100, hint: 'Daniel, 12.11.2026: Benutzen = linken Stick deutlich nach oben antippen (Knopf „Linker Stick ↑“), zählt nur mit E-Hinweis im Bild, im Stand oder Gehen; der Hinweis schlägt die Leiter. Leer = 70' }),
+        num('gamepad.throwHold', 'Wegwerfen: rüber-Knopf halten', { unit: 'ms', min: 0, hint: 'Inventar: Y (Tastatur F) getippt = auf die andere Seite, so lange gehalten = auf den Boden werfen. 0 = aus. Leer = 450' }),
+        num('gamepad.buildHold', 'Rig bauen: Inventar-Knopf halten', { unit: 'ms', min: 0, hint: 'Daniel, 12.11.2026: im Camp öffnet der Inventar-Knopf (Select) gehalten den Bau-Modus, getippt wie immer das Inventar. Im Bau-Modus schaltet er Rig offen/zu. 0 = aus. Leer = 500' }),
         bool('gamepad.useUp', 'Benutzen auch mit ↑ / W', { hint: 'Tastatur: W / ↑ wirkt wie E, solange ein E-Hinweis zu sehen ist (auch der Stick ↑). Aus = nur E bzw. der Knopf aus der Belegung' }),
         ...PAD_ACTIONS.map(([a, n]) => multi(`gamepad.map.${a}`, n, PAD_BUTTONS))] },
       { title: 'Nebel', fields: [bool('fog.enabled', 'Nebel des Unbekannten', { hint: 'Daniel, 11.11.2026: nur in Innenräumen und nur über Luft, die Leyla erreichen kann; was sie einmal gesehen hat, bleibt aufgedeckt. Fels und Unerreichbares bleiben sichtbar' }),
@@ -735,7 +737,8 @@ export const AREAS = {
         num('view.groundAt', 'Boden auf Höhe', { unit: '% vom Bild', min: 40, max: 95 }), num('view.zoomTime', 'Zoom dauert', { unit: 'ms', min: 0 }),
         num('view.swing', 'Pendeln', { unit: '%', min: 0, max: 300, hint: 'Wie stark ein Teil an der Maus schwingt (schwere Teile schwingen träger)' }),
         num('view.snap', 'Ankuppeln ab', { unit: 'px', min: 40, hint: 'So nah muss ein Anhänger an eine Kupplung' }),
-        num('view.shake', 'Wackeln beim Einrasten', { unit: '%', min: 0, max: 200 }), num('view.volume', 'Lautstärke der Bau-Töne', { unit: '%', min: 0, max: 100 })] },
+        num('view.shake', 'Wackeln beim Einrasten', { unit: '%', min: 0, max: 200 }), num('view.volume', 'Lautstärke der Bau-Töne', { unit: '%', min: 0, max: 100 }),
+        num('view.cursorSpeed', 'Bau-Cursor: Tempo (Controller, Tastatur)', { unit: 'px/s', min: 100, max: 4000, hint: 'Gehalten ab 450 ms fast doppelt so schnell' })] },
       { title: 'Werkeln', fields: [bool('work.enabled', 'Leyla werkelt', { hint: 'An: nach jedem Einrasten läuft Leyla hin und schraubt, „Rückgängig“ nur, solange sie nicht fertig ist. Aus (Daniel, 09.11.2026): alles sofort, „Rückgängig“ für jede Aktion bis „Fertig“' }), num('work.seconds', 'Leyla schraubt', { unit: 's', min: 0, hint: 'Nach jedem Einrasten läuft sie hin und schraubt so lange; solange sie nicht fertig ist, geht „Rückgängig“' }),
         num('work.perHour', 'Dazu pro Stunde Bauzeit', { unit: 's', min: 0 })] },
       { title: 'Rig-Teile am Van', fields: [
