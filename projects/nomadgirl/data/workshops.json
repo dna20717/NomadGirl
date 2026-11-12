@@ -270,7 +270,7 @@
   ],
   "fx": [],
   "lookEmpty": "ws_treasury_empty",
-  "fill": [{"y": 150},{"y": 168},{"y": 186},{"y": 204}]
+  "fill": [{"y": 128},{"y": 150},{"y": 172},{"y": 194}]
  },
  "cryotank": {
   "name": "Cryo-Tank",

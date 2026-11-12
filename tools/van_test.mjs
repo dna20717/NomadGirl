@@ -1,8 +1,8 @@
 // Headless check of the rigs' own storages and the rig parts (game.html?camp) with real mouse clicks and drags:
-// Kofferraum at the van's rear door, Deichselkasten on the trailer's drawbar, the inventory tab "Van" (only a view),
+// Kofferraum at the van's rear door, the inventory tab "Van" (only a view),
 // rig parts in the build mode (B): bought onto the scrapyard, dragged onto the sockets on the van (wrong socket = flies back),
 // swapped, the Dachbox makes the Kofferraum taller and only comes off when nothing falls out, undo, selling at the dealer,
-// a part made at the workbench lands on the scrapyard, unhitching only with an empty Deichselkasten.
+// a part made at the workbench lands on the scrapyard.
 //   node tools/van_test.mjs [--shots]   (server must run: npm run serve), pictures to output/van_*.png
 import fs from 'node:fs';
 import { chromium } from 'playwright';
@@ -41,7 +41,7 @@ const finishJobs = () => ev(() => nomad.until(() => { const b = nomad.build(); r
 
 // the camp has E spots for both storages
 const names = await ev(() => nomad.state().camp.hotspots.map(h => h.name));
-check('Kofferraum und Deichselkasten haben einen E-Punkt', names.includes('Kofferraum') && names.includes('Deichselkasten'), names);
+check('Kofferraum hat einen E-Punkt, Deichselkästen gibt es nicht mehr', names.includes('Kofferraum') && !names.includes('Deichselkasten'), names);
 
 let h = await walkE('Kofferraum'), s = await inv();
 check('E an der Hecktür öffnet den Kofferraum (4 × 3)', s.open && s.other?.key === 'rig:0' && s.other.grid.w === 4 && s.other.grid.h === 3, { h, s });
@@ -60,12 +60,6 @@ await page.locator('.inv-tab', { hasText: 'Ausrüstung' }).click(); await page.w
 s = await inv();
 check('Tab „Leyla“ zeigt wieder Rucksack + Kofferraum', s.tab === 'leyla' && s.other?.key === 'rig:0', s);
 await ev(() => game.scene.getScene('play').hud.inv.close());
-
-// Deichselkasten of the trailer
-h = await walkE('Deichselkasten'); s = await inv();
-check('E an der Deichsel öffnet den Deichselkasten (3 × 2)', s.open && s.other?.key === 'rig:1' && s.other.grid.w === 3 && s.other.grid.h === 2, { h, s });
-await shot('drawbar');
-await ev(() => { const sc = game.scene.getScene('play'); sc.hud.inv.close(); });
 
 // build mode: rig parts are bought onto the scrapyard and dragged onto the sockets on the van
 await ev(() => { nomad.save().deltas = 3000; nomad.take(); nomad.step(5); nomad.step(1, [], ['build']); nomad.step(40); });
@@ -113,15 +107,6 @@ check('Außerhalb des Bau-Modus: Dachbox sichtbar auf dem Van', await ev(() => g
 // made at the workbench: onto the scrapyard
 s = await ev(() => import('./game/crafting.js').then(C => { const sv = nomad.save(); sv.inv.grids.backpack.items.push({ a: 'items', id: 'schrottplatte', n: 3, x: 0, y: 2, r: 0 }); for (const k of Object.keys(sv.inv.grids)) if (k !== 'backpack') sv.inv.grids[k].items = sv.inv.grids[k].items.filter(e => e.id !== 'schrottplatte'); return { r: C.craft(game.scene.getScene('play').data_, sv, 'bleche_schweissen', 'werkbank'), parts: sv.rig.spare.parts }; }));
 check('Bleche an der Werkbank geschweißt: liegen auf dem Schrottplatz', s.r.ok && s.r.made.part && s.parts.includes('bleche'), s);
-
-// unhitching: not while the Deichselkasten holds something
-s = await ev(() => {
-  const sc = game.scene.getScene('play'), save = sc.box.save;
-  save.inv.grids['rig:1'].items.push({ a: 'items', id: 'discokugel', n: 1, x: 0, y: 0, r: 0 });
-  return import('./game/rig.js').then(R => R.act(sc.data_, save, d => { for (const w of d.rig.units[1].workshops.splice(0)) R.toSpare(d, w); return R.detach(sc.data_, d, 1); }));
-});
-check('Abhängen geht nur mit leerem Deichselkasten', s.ok === false && /Deichselkasten/.test(s.reason), s);
-
 
 await browser.close();
 for (const o of ok) console.log('✔', o);

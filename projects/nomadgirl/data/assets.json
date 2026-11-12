@@ -2774,9 +2774,9 @@
   "file": "assets/workshops/treasury.png",
   "origin": [128, 226],
   "derivedFrom": "ws_treasury_source",
-  "source": "KI (PixelLab, Edit Pro Flash auf der leeren Fassung), nur der Haufen übernommen (Code)",
-  "date": "11.11.2026",
-  "description": "Deckungsgleich mit der leeren Fassung, nur mit Schatzhaufen vorn. Je voller das Lager, desto mehr vom Haufen ist zu sehen."
+  "source": "KI (PixelLab, Edit Pro Flash auf der leeren Fassung, Seed 71), nur die Palette übernommen (Code)",
+  "date": "12.11.2026",
+  "description": "Plünderer-Lager auf einer Palette zwischen den Absperrpfosten: Stahlkassetten, Munitionskisten, Sporttasche voller alter Scheine, Bodentresor, Schmuckschale (12.11.2026: weniger Drachenhort, mehr Wasteland). Wächst mit dem Füllstand (Fächer 128–194)."
  },
  "ws_treasury_source": {
   "name": "Schatzkammer voll (Original)",
@@ -3105,5 +3105,27 @@
   "description": "Bilder der Techtree-Knoten (Tank-Ast), aus zwei 2 × 2-Blättern ohne die gemalten Schildchen geschnitten (Originale in techtree/source/).",
   "source": "KI (PixelLab, Create Image Pro, Referenz Cryo-Tank, Stilbild icons_treasure, Palette AAP-64)",
   "date": "12.11.2026"
+ },
+ "ws_treasury_v1": {
+  "name": "Werkstatt · Schatzkammer voll (alte Fassung, Goldhaufen)",
+  "kind": "image",
+  "file": "assets/workshops/treasury_v1.png",
+  "origin": [128, 226],
+  "source": "KI (PixelLab, Edit Pro Flash)",
+  "date": "11.11.2026"
+ },
+ "ws_treasury_alt": {
+  "name": "Schatzkammer voll (Alternative: festgezurrte Palette)",
+  "kind": "source",
+  "file": "assets/workshops/treasury_source_alt.png",
+  "source": "KI (PixelLab, Edit Pro Flash, Seed 72)",
+  "date": "12.11.2026"
+ },
+ "ws_treasury_source_v1": {
+  "name": "Schatzkammer voll (Original, alte Fassung)",
+  "kind": "source",
+  "file": "assets/workshops/treasury_source_v1.png",
+  "source": "KI (PixelLab, Edit Pro Flash)",
+  "date": "11.11.2026"
  }
 }

@@ -299,7 +299,7 @@ Ein POI mit Ranking, Rucksack-Raster, Tod mit AvA, Rig mit zwei bis drei Werkst�
 
 ### Ausbaustufe Progression (Bauauftrag 12.11.2026)
 
-- [ ] Aufräumen: Deichselkästen raus (Inhalt alter Spielstände ins Lager/die Kiste)
+- [x] Aufräumen: Deichselkästen raus (12.11.2026 abends) (Inhalt alter Spielstände ins Lager/die Kiste)
 - [ ] Tresor am Ende jedes Runs richtig voll
 - [ ] Zerlegen-Aktion an Werkbank, Kochnische, Warroom (Gegenstände und Waffen, Daten stehen)
 - [x] Cryo-Tank: Werkstatt im kleinsten Container (auch in alten Spielständen), Zustand, Verfall in Ereignis-Zeit, Phasen, Wartungs-Rezepte, unverkäuflich und nicht ausbaubar, AvA leidet im Run, Bereich „Cryo-Tank“ in der Werkstatt (12.11.2026 abends)

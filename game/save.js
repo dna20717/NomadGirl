@@ -193,13 +193,31 @@ function refit(D, s) {
     const g = grids[old];
     delete grids[old];
     if (!g?.items?.length) continue;
-    let rest = g.items.map(e => ({ ...e }));
-    for (const key of ['chest', 'rig:0']) if (grids[key]) rest = rest.map(e => ({ ...e, n: add(D, grids[key], e.a, e.id, e.n) })).filter(e => e.n > 0);
-    if (rest.length) {
-      const pile = { x: null, feet: null, grid: newGrid(Math.max(4, g.w), Math.max(3, g.h)) };
-      for (const e of rest) add(D, pile.grid, e.a, e.id, e.n);
-      ((s.ground ??= {})[s.location] ??= []).push(pile);
-    }
+    rehome(D, s, g);
+  }
+}
+// the contents of a grid that is gone: into the chest, the Kofferraum, and what is left lies as a bundle next to the van
+function rehome(D, s, g) {
+  const grids = s.inv?.grids || {};
+  let rest = g.items.map(e => ({ ...e }));
+  for (const key of ['chest', 'rig:0']) if (grids[key]) rest = rest.map(e => ({ ...e, n: add(D, grids[key], e.a, e.id, e.n) })).filter(e => e.n > 0);
+  if (rest.length) {
+    const pile = { x: null, feet: null, grid: newGrid(Math.max(4, g.w), Math.max(3, g.h)) };
+    for (const e of rest) add(D, pile.grid, e.a, e.id, e.n);
+    ((s.ground ??= {})[s.location] ??= []).push(pile);
+  }
+}
+// Deichselkästen und Staufächer are gone (Daniel, 12.11.2026, design.md › Ausbaustufe Progression): only the tractor keeps its own storage;
+// what an older savegame kept in a trailer's box moves into the chest (then the Kofferraum, then a bundle by the van)
+function dropStorage(D, s) {
+  const grids = s.inv?.grids || {};
+  for (const key of Object.keys(grids)) {
+    const m = /^rig:(\d+)$/.exec(key);
+    if (!m) continue;
+    const u = s.rig.units[Number(m[1])];
+    if (u?.kind === 'tractor' || (u && D.containers?.[u.id]?.storage)) continue;
+    const g = grids[key]; delete grids[key];
+    if (g?.items?.length) rehome(D, s, g);
   }
 }
 
@@ -212,6 +230,7 @@ export function repairSave(save, D) {
   s.rig.units = s.rig.units.filter(u => u.kind === 'tractor' || D.containers?.[u.id]);
   for (const u of s.rig.units) u.workshops = (u.workshops || []).filter(w => D.workshops?.[w.id]);
   refit(D, s);
+  dropStorage(D, s);
   // stacks stay whole: a level is at most one above the unit before it, nothing stands on the tractor
   s.rig.units.forEach((u, i) => { const prev = s.rig.units[i - 1]; if (!u.level) { delete u.slot; return; } const max = !prev || prev.kind === 'tractor' ? 0 : (prev.level || 0) + 1; if (u.level > max) u.level = max; if (!u.level) { delete u.level; delete u.slot; } });   // a slot only counts on a stack
   const sp = s.rig.spare || {};

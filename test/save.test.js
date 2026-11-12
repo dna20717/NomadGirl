@@ -77,3 +77,17 @@ test('Nachreichen mit „Platz machen“ (Daniel, 12.11.2026): das Sturmgewehr k
   repairSave(t, D);
   assert.ok(!t.inv.grids.backpack.items.some(e => e.id === 'sturmgewehr'), 'wer es schon trägt, bekommt kein zweites');
 });
+
+test('Deichselkästen sind weg: alter Inhalt wandert in die Kiste, das Raster verschwindet', async () => {
+  const { loadProject } = await import('../engine/project.js');
+  const { nodeLoader } = await import('../tools/loader.js');
+  const { newSave, repairSave } = await import('../game/save.js');
+  const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
+  const s = newSave(D);
+  s.inv.grids.chest.items = [];
+  s.inv.grids['rig:1'] = { w: 3, h: 2, items: [{ a: 'items', id: 'schrott', n: 2, x: 0, y: 0, r: 0 }] };
+  const r = repairSave(JSON.parse(JSON.stringify(s)), D);
+  assert.equal(r.inv.grids['rig:1'], undefined);
+  assert.ok(r.inv.grids.chest.items.some(e => e.id === 'schrott' && e.n === 2));
+  assert.ok(r.inv.grids['rig:0'], 'Kofferraum bleibt');
+});

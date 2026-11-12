@@ -7,7 +7,9 @@ import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
 import { classicRig } from './fixture.js';
 
-const D = classicRig((await loadProject(nodeLoader('projects/nomadgirl'))).data);   // fixed setup (fixture.js)
+const D0 = classicRig((await loadProject(nodeLoader('projects/nomadgirl'))).data);   // fixed setup (fixture.js)
+// the trailers lost their own storage (12.11.2026); the code still carries one along, so the test gives the 20 Fuß one back
+const D = { ...D0, containers: { ...D0.containers, container_20: { ...D0.containers.container_20, storage: [4, 2] } } };
 const fresh = () => { const s = newSave(D); s.deltas = 9000; return s; };
 const ids = s => s.rig.units.map(u => u.id + (u.level ? '^' + u.level : '')).join(' ');
 
