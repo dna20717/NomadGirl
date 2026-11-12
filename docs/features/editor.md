@@ -1,0 +1,6 @@
+# Werkstatt-Editor
+
+Bedienung der Werkstatt (Daten-Editor): Spielen-Knopf und Scroll-Verhalten. Die Grundregeln zu Schema und Speichern stehen in `CLAUDE.md` › Werkstatt und Schema.
+
+- **Spielen** (Daniel, 07.11.2026): goldener Knopf oben links in der Menüleiste (⌘P), dazu „Im Spiel testen“ beim Raum-Layout. Beide speichern vorher (online = Commit) und öffnen das Spiel in einem eigenen Tab `nomadgirl-game`, der bei jedem Klick wiederverwendet wird (Tab wird sofort geöffnet, sonst blockt Safari ihn nach dem Speichern). Ist ein Raum-Baustein mit Layout gewählt, spielt der Knopf diesen Raum, sonst den Testraum. `workshop.play(room?)`.
+- **Scrollen bleibt stehen** (Daniel, 08.11.2026: „der Scrollzustand soll immer dort gehalten werden, wo ich gerade in der Navigation unterwegs bin“): `draw()` baut alles neu und setzt danach die Scroll-Positionen zurück: die Bereichsleiste links immer, die Eintragsliste solange man im selben Bereich bleibt (Eintrag anklicken springt nicht mehr nach oben), der Inspektor bei Bearbeiten im selben Eintrag; ein neuer Bereich beginnt oben, ein neuer Eintrag zeigt den Inspektor von oben. Aktiver Bereich und Eintrag werden bei Bedarf ins Bild gerückt. Geprüft in `workshop_test.mjs`.
