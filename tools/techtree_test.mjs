@@ -44,6 +44,17 @@ v = await ev(() => { nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.choos
 check('Lebenszeichen: AvAs Zustand im Run', /AvA.*100 % · Stabil/.test(v || ''), v);
 await shot('run');
 
+// AvA dead → k.o. in the run: nobody comes, the dream ends, a new Durchgang: Leyla at the fire, the nodes stay, everything else is new
+v = await ev(() => { const sc = game.scene.getScene('play'), s = nomad.save(); s.tank.dead = true; s.tank.cond = 0; s.deltas = 999; sc.drone.die();
+  sc.leyla.hurt(sc.now + 5000, 9999, 0); nomad.step(240); return { mode: sc.mode }; });
+await page.waitForFunction(() => game.scene.getScene('play').mode === 'camp' && document.querySelector('.hud-dream'), null, { timeout: 15000 });
+v = await ev(() => { nomad.step(30); const sc = game.scene.getScene('play'), s = nomad.save();
+  return { cycle: s.cycle, nodes: s.nodes, tank: s.tank.cond, dead: s.tank.dead, deltas: s.deltas, dicht: s.recipes.includes('tank_dichtung'), sit: sc.leyla.state, gone: !!sc.drone.gone, dream: document.querySelector('.hud-dream')?.textContent, dreams: s.dreams?.length }; });
+check('AvA tot + k.o.: Traum, neuer Durchgang am Feuer, Knoten und ihre Rezepte bleiben, Tank voll, AvA wieder da', v.cycle === 2 && v.nodes.length === 3 && v.tank === 100 && !v.dead && v.deltas !== 999 && v.dicht && v.sit === 'sit' && !v.gone && v.dreams === 1, v);
+await page.waitForTimeout(2600); await shot('dream');
+v = await ev(() => { game.scene.getScene('play').hud.confirmNew(); return nomad.menu().items.map(i => i.label); });
+check('Neues Spiel: Neuer Durchgang oder ausdrücklich alles zurücksetzen', v.join('|') === 'Abbrechen|Neuer Durchgang|Alles zurücksetzen', v);
+
 await browser.close();
 console.log(ok.map(n => '✔ ' + n).join('\n'));
 if (errors.length) { console.log('✖ ' + errors.join('\n✖ ')); }

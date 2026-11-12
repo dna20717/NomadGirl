@@ -112,6 +112,16 @@ export function newSave(D) {
     log: [],
   }));
 }
+// a new Durchgang (design.md › Progression: „War alles nur ein Traum?“): AvA is dead, Leyla wakes up at the fire.
+// What stays: the tech tree nodes (and the recipes they unlock), the count of Durchgänge. Everything else starts small.
+export function newCycle(D, old) {
+  const s = newSave(D);
+  s.nodes = [...(old.nodes || [])].filter(id => D.techtree?.[id]);
+  s.cycle = (old.cycle || 1) + 1;
+  s.dreams = [...(old.dreams || []), { day: old.day, hour: old.hour, rescues: old.tank?.rescues || 0, cause: old.tank?.cause || null }];
+  for (const id of s.nodes) for (const r of D.techtree[id].recipes || []) if (!s.recipes.includes(r)) s.recipes.push(r);
+  return s;
+}
 function withInventory(D, save) {
   save.inv ??= newInventory(D, save);
   const inv = save.inv;
@@ -264,6 +274,7 @@ export async function openSave(D, base = '') {
       return box;
     },
     async reset() { box.save = newSave(D); box.fresh = true; return box.persist(); },
+    async cycle() { box.save = newCycle(D, box.save); box.fresh = true; return box.persist(); },
   };
   return box;
 }

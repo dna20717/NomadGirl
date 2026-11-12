@@ -37,7 +37,8 @@ export async function start(parent, hudRoot) {
   if (q.get('poi') && D.pois?.[q.get('poi')]) args = { ...args, poi: q.get('poi'), seed: Number(q.get('seed')) || 1 + Math.floor(Math.random() * 2 ** 31) };
   if (q.has('camp') && D.camp) {
     const box = await openSave(D);
-    if (q.has('new')) await box.reset();
+    if (q.has('new')) await box.reset();   // Neues Spiel › Alles zurücksetzen
+    else if (q.has('cycle')) await box.cycle();   // Neues Spiel › Neuer Durchgang: the tech tree stays
     console.info(`Spielstand ${box.where === 'cloud' ? 'online (pro Login)' : 'in diesem Browser'}${box.fresh ? ', neu' : ''}`);
     hud.saveBox = box;
     // a run that was interrupted (page closed) counts as knocked out: the camp starts, the run loot is gone

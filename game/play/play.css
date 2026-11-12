@@ -495,3 +495,12 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .tt-buy { font-size: 16px; }
 .hud-vital b { color: #9cdb43; }
 .hud-vital.bad b { color: #ff6b8a; animation: tt-ready 1s infinite; }
+
+/* the end of a Durchgang: „War alles nur ein Traum?“ (hud.dream) */
+.hud-dream { position: fixed; inset: 0; z-index: 40; display: grid; place-content: center; justify-items: center; gap: 28px; background: #000; pointer-events: auto; transition: opacity 1.8s ease; }
+.hud-dream.out { opacity: 0; pointer-events: none; }
+.hud-dream-text p { margin: 10px 0; text-align: center; font: 40px/1.2 VT323, monospace; color: #cbbfda; animation: dream-in 1.6s ease both; }
+.hud-dream-text p.last { margin-top: 34px; font-size: 64px; color: #ffd27a; text-shadow: 0 0 20px rgba(255, 210, 122, .5); }
+.hud-dream small { font: 16px/1 var(--ui-font); color: #8d7f9c; letter-spacing: .1em; text-transform: uppercase; opacity: 0; transition: opacity 1.2s; }
+.hud-dream.foot small { opacity: 1; }
+@keyframes dream-in { from { opacity: 0; filter: blur(6px); translate: 0 8px; } to { opacity: 1; filter: none; translate: 0 0; } }

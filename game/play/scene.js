@@ -17,7 +17,7 @@ import { Drone } from './drone.js';
 import { Van } from './van.js';
 import { Backdrop } from './backdrop.js';
 import { Camp, campLayout, daytimeAt, drawCampBackground, drawCampGround } from './camp.js';
-import { advance, arrive, clockText, containers } from '../save.js';
+import { advance, arrive, clockText, containers, newCycle } from '../save.js';
 import { Loot } from './loot.js';
 import { InventoryUI } from './inventory_ui.js';
 import { FloorStrip } from './floor_strip.js';
@@ -205,6 +205,9 @@ export class PlayScene extends Phaser.Scene {
     this.fx = new Fx(this);
     this.combat = new Combat(this);
     let def = this.data_.rooms?.[this.roomId];
+    // AvA died: a new Durchgang begins, Leyla wakes up at the fire (design.md › „War alles nur ein Traum?“)
+    this.dreaming = false;
+    if (this.mode === 'camp' && this.box?.save.tank?.dead) { this.box.save = newCycle(this.data_, this.box.save); this.dreaming = true; this.box.persist?.(); }
     if (this.mode === 'camp') {
       this.campGeo = campLayout(this.data_, this.box.save, this.T);
       const day = daytimeAt(this.data_.camp, this.box.save.hour);
@@ -320,6 +323,7 @@ export class PlayScene extends Phaser.Scene {
     if (this.args.banner) { this.hud.banner(...this.args.banner); this.time.delayedCall(2800, () => this.hud.banner(null)); }
     else this.hud.banner(null);
     this.leaving = false; this.roomName = null;
+    if (this.dreaming) this.wakeUp();
   }
 
   // worn gear and implants (inv.wear) on top of the buffs: swap the old sums for the new ones, AvA shows her parts
@@ -614,6 +618,10 @@ export class PlayScene extends Phaser.Scene {
   // the enemies come back, the rest of the level (vault, chests, doors) stays as it is. The last rescue costs AvA her life.
   runKnockout() {
     const D = this.data_, save = this.box.save, l = this.leyla, C = D.camp || {};
+    if (save.tank?.dead) {   // nobody comes any more: the run ends, the dream ends (wakeUp in the camp)
+      this.hud.banner('Niemand holt dich mehr …', 'Alles wird schwarz.'); this.cam.shake(300, 0.01); this.cam.fadeOut(1800, 0, 0, 0);
+      this.time.delayedCall(1900, () => this.endRun(true)); return;
+    }
     const r = rescue(D, save, this.tankMods?.());
     let lostBefore = false;
     if (this.lostPack) { this.loot.forget(this.lostPack); this.lostPack = null; lostBefore = true; }
@@ -631,6 +639,22 @@ export class PlayScene extends Phaser.Scene {
       if (r.last) { this.drone.die?.(); this.hud.banner('AvA ist fort.', 'Ihr Tank ist still. Leyla ist allein.'); }
       else this.hud.banner('Wieder auf den Beinen', `Tank ${Math.round(save.tank.cond)} % · ${save.tank.rescues}× gerettet`);
     });
+  }
+  // the dream is over: black screen, typed lines, then Leyla sits at the fire; AvA (new, whole) floats down to her
+  wakeUp() {
+    const save = this.box.save, D = this.data_, T = D.tank?.dream || {};
+    this.time.delayedCall(30, () => this.sitForDream());
+    const lines = T.lines || ['Leyla schreckt hoch.', 'Schweißgebadet. Das Feuer knistert.', 'AvA summt neben ihr, als wäre nichts gewesen.', 'War alles nur ein Traum?'];
+    const kept = (save.nodes || []).length;
+    this.hud.dream(lines, `Durchgang ${save.cycle} · ${kept ? `${kept} Knoten im Techtree sind noch da` : 'Der Techtree ist noch leer'}`, T.seconds ?? 7);
+    this.drone.react('love');
+  }
+  sitForDream() {
+    const l = this.leyla, C = this.data_.camp || {}, S = C.fire?.sit || {}, fx = this.campGeo?.fireX;
+    if (fx == null || !S.look || !this.textures.exists(S.look)) return;
+    const x = fx - (S.distance ?? 150);
+    l.body.reset(x, this.camp.ground - l.size.h / 2); l.body.setVelocity(0, 0);
+    l.startSit(S, x, 1, null);
   }
   takePack(pile) {
     const save = this.box.save, bag = save.inv.grids.backpack, D = this.data_;

@@ -36,3 +36,15 @@ test('Boni wirken auf den Tank: Verfall −15 %, Rettung −25 %', () => {
   assert.equal(tankMods(D, s).rescue, 0.75);
   const before = s.tank.cond; rescue(D, s); assert.equal(before - s.tank.cond, D.tank.rescue * 0.75);
 });
+
+test('Neuer Durchgang: Knoten und ihre Rezepte bleiben, alles andere fängt klein an', async () => {
+  const { newCycle } = await import('../game/save.js');
+  const s = newSave(D);
+  s.nodes = ['wartungsklappe', 'thermohuelle', 'weg_damit']; s.deltas = 12345; s.tank.cond = 0; s.tank.dead = true; s.day = 9;
+  const n = newCycle(D, s);
+  assert.deepEqual(n.nodes, ['wartungsklappe', 'thermohuelle']);
+  assert.equal(n.cycle, 2); assert.equal(n.tank.cond, 100); assert.equal(n.tank.dead, false);
+  assert.equal(n.deltas, newSave(D).deltas); assert.ok(n.day < 9);
+  assert.ok(n.recipes.includes('tank_dichtung'));
+  assert.equal(n.dreams.length, 1);
+});

@@ -68,11 +68,24 @@ export class Hud {
   }
 
   // a new game asks in the game's own menu (controller too), no browser dialog (Daniel, 12.11.2026)
+  // the end of a Durchgang (scene.wakeUp): black, the lines are typed one after another, then it fades into the camp
+  dream(lines, foot, seconds = 7) {
+    this.dreamEl?.remove();
+    const box = el('div', { class: 'hud-dream' }), text = el('div', { class: 'hud-dream-text' }), small = el('small', {}, foot);
+    box.append(text, small); this.root.append(box); this.dreamEl = box;
+    const per = seconds * 1000 / (lines.length + 1);
+    lines.forEach((t, i) => setTimeout(() => text.append(el('p', { class: i === lines.length - 1 ? 'last' : '' }, t)), 400 + i * per));
+    setTimeout(() => box.classList.add('foot'), 400 + lines.length * per);
+    setTimeout(() => box.classList.add('out'), seconds * 1000 + 600);
+    setTimeout(() => { box.remove(); if (this.dreamEl === box) this.dreamEl = null; }, seconds * 1000 + 2400);
+  }
   confirmNew() {
     if (this.paused) this.toggleHelp(false);
     this.closeMenu();
-    this.menu({ title: 'Neues Spiel?', sub: 'Der Spielstand wird gelöscht: Rig, Inventar, Rezepte, Δ. Das lässt sich nicht rückgängig machen.',
-      items: [{ label: 'Abbrechen', sub: 'Weiterspielen', act: () => {} }, { label: 'Ja, neu anfangen', sub: 'Spielstand löschen', act: () => { location.href = 'game.html?camp&new'; } }] });
+    this.menu({ title: 'Neues Spiel?', sub: 'Ein neuer Durchgang beginnt klein: Rig, Inventar, Δ, Tank und Uhr. Der Techtree bleibt, es sei denn, du setzt ausdrücklich alles zurück.',
+      items: [{ label: 'Abbrechen', sub: 'Weiterspielen', act: () => {} },
+        { label: 'Neuer Durchgang', sub: 'Techtree bleibt, alles andere fängt neu an', act: () => { location.href = 'game.html?camp&cycle'; } },
+        { label: 'Alles zurücksetzen', sub: 'Auch der Techtree ist weg. Lässt sich nicht rückgängig machen', act: () => { location.href = 'game.html?camp&new'; } }] });
   }
   // pause menu (Esc, Start on the controller, button at the bottom): the controls live here now
   pauseMenu() {
