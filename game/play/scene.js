@@ -18,6 +18,7 @@ import { Camp, campLayout, daytimeAt, drawCampBackground, drawCampGround } from 
 import { advance, arrive, clockText, containers } from '../save.js';
 import { Loot } from './loot.js';
 import { InventoryUI } from './inventory_ui.js';
+import { FloorStrip } from './floor_strip.js';
 import { gearStats } from '../inventory.js';
 import { CraftUI } from './craft_ui.js';
 import { BuildMode } from './build_mode.js';
@@ -301,6 +302,8 @@ export class PlayScene extends Phaser.Scene {
     this.hud.scene = this;
     if (!this.box) return;
     const hud = this.hud;
+    hud.floor ??= new FloorStrip(hud.root, this.data_);   // Boden-Leiste (floor_strip.js)
+    hud.floor.D = this.data_; hud.floor.sig = null;
     hud.inv ??= new InventoryUI(hud.root, {
       get D() { return hud.scene.data_; },
       save: () => hud.scene.box.save,
@@ -589,10 +592,14 @@ export class PlayScene extends Phaser.Scene {
     }
     const thing = !near && l.alive ? this.level?.nearest() : null;
     const pile = !near && !thing && this.loot?.nearest();
-    const text = near ? (this.level?.done ? `Zurück ins Camp · Rang ${this.level.done.grade}` : 'Zurück ins Camp · Van') : thing ? thing.text : pile && !this.hud.inv?.isOpen ? `Beute am Boden · I öffnet (${pile.grid.items.length})` : null;
-    if (text !== this.vanPrompt) { this.vanPrompt = text; this.hud.prompt(text, pile && !near && !thing ? 'I' : 'E'); }
+    // the Boden-Leiste: E / stick ↑ picks up the first thing (Daniel, 12.11.2026), I still opens the whole ground
+    const floorText = pile && !this.hud.inv?.isOpen ? (this.hud.floor?.prompt() || `Beute am Boden · I öffnet (${pile.grid.items.length})`) : null;
+    const text = near ? (this.level?.done ? `Zurück ins Camp · Rang ${this.level.done.grade}` : 'Zurück ins Camp · Van') : thing ? thing.text : floorText;
+    const key = floorText && !near && !thing && !this.hud.floor?.list?.length ? 'I' : 'E';
+    if (text !== this.vanPrompt || key !== this.vanKey) { this.vanPrompt = text; this.vanKey = key; this.hud.prompt(text, key); }
     if (input.grab.pressed && near && this.mode === 'run') this.endRun(false);
     else if (input.grab.pressed && thing?.act) thing.act();
+    else if (input.grab.pressed && floorText && key === 'E') this.hud.floor.pick(this);
   }
 
   // ---------- loop ----------
@@ -704,6 +711,7 @@ export class PlayScene extends Phaser.Scene {
     if (this.camp) this.camp.update(time, dt, input);
     else if (this.mode === 'run' || this.level) this.runUpdate(input);
     this.loot?.update(time);
+    this.hud.floor?.update(this);
     if (!invDone) this.inventoryUpdate(input);   // (closed this frame already: do not open it again with the same key)
     for (const e of this.enemies) e.update(time, dt, this.leyla);
     this.combat.update(time, dt);

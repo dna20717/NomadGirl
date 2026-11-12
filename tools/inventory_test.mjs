@@ -111,7 +111,7 @@ s = await ev(() => {
   return { st: nomad.state(), loot: nomad.loot(), inv: nomad.inv() };
 });
 check('Beutebündel am Boden', s.st.mode === 'run' && s.loot.length === 1, s.loot);
-check('Hinweis: I öffnet die Beute', /Beute am Boden/.test(s.st.prompt || ''), s.st.prompt);
+check('Hinweis: E hebt auf, I öffnet die Beute', /Aufheben: .* · I: alles am Boden/.test(s.st.prompt || ''), s.st.prompt);
 await ev(() => nomad.step(1, [], ['inventory']));
 s = await inv();
 check('Boden-Inventar zeigt das Bündel', s.open && s.other?.key === 'floor' && has(s.other.grid, 'rohrbogen'), s);
@@ -150,6 +150,17 @@ s = await ev(() => { const sc = game.scene.getScene('play'); sc.hud.inv.close();
   const g = nomad.save().inv.grids.backpack; g.items = [{ a: 'items', id: 'kupferkabel', n: 3, x: 0, y: 0, r: 0 }];
   sc.loot.drop(sc.leyla.x + 20, sc.leyla.feet, [{ a: 'items', id: 'kupferkabel', n: 2 }], 0); nomad.step(40); return { loot: nomad.loot(), inv: nomad.inv(), bag: nomad.save().inv.grids.backpack.items.filter(e => e.id === 'kupferkabel').reduce((n, e) => n + e.n, 0) }; });
 check('Kupferkabel (schon im Rucksack) wird beim Drüberlaufen eingesammelt', s.bag >= 5 && !s.loot.some(p => p.items.some(i => i.startsWith('kupferkabel'))), s);
+// Boden-Leiste (Daniel, 12.11.2026): what lies in reach shows at the bottom, E picks up the first thing, walking away hides it
+s = await ev(() => { const sc = game.scene.getScene('play'); sc.hud.inv.close(); for (const p of [...sc.loot.piles]) { p.grid.items = []; } sc.loot.sync();
+  nomad.save().inv.grids.backpack.items = [];
+  sc.loot.drop(sc.leyla.x + 30, sc.leyla.feet, [{ a: 'items', id: 'verband', n: 2 }, { a: 'items', id: 'gasmaske', n: 1 }], 0); nomad.step(30);
+  const st = document.querySelector('.floor-strip'); return { shown: !st.hidden, cells: st.querySelectorAll('.fs-cell:not(.empty)').length, first: !!st.querySelector('.fs-cell.first'), prompt: nomad.state().prompt ?? document.querySelector('.hud-prompt')?.textContent }; });
+check('Boden-Leiste zeigt die Beute in der Nähe, erstes Ding markiert, Hinweis Aufheben', s.shown && s.cells === 2 && s.first && /Aufheben/.test(s.prompt || ''), s);
+await shot('floor_strip');
+s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(5); return { bag: nomad.save().inv.grids.backpack.items.map(e => e.id), cells: document.querySelectorAll('.floor-strip .fs-cell:not(.empty)').length }; });
+check('E hebt das erste Ding aus der Leiste auf', s.bag.length === 1 && s.cells === 1, s);
+s = await ev(() => { const sc = game.scene.getScene('play'); nomad.tp(sc.leyla.x - 900, sc.leyla.feet); nomad.step(30); return document.querySelector('.floor-strip').hidden; });
+check('Weg vom Bündel: Leiste verschwindet', s === true, s);
 s = await ev(() => { const sc = game.scene.getScene('play'); sc.leyla.hurt(sc.time.now, 9999, 0); nomad.step(200); return { mode: nomad.state().mode, bag: nomad.save().inv.grids.backpack.items.length, slots: nomad.save().inv.slots }; });
 check('k.o.: Rucksack leer, Waffen bleiben', s.mode === 'camp' && s.bag === 0 && s.slots.melee === 'machete', s);
 

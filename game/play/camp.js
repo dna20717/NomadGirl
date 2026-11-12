@@ -1005,9 +1005,12 @@ export class Camp {
       }
     this.atWorkshop = !!(best?.ws && Math.abs(l.body.velocity.x) < 5);
     const hint = h => typeof h.hint === 'function' ? h.hint() : h.hint;
-    const text = best && `${hint(best)} · ${best.name}`;
+    // nothing to use here, but something lies on the ground: E picks it up (Boden-Leiste, floor_strip.js)
+    const floor = !best && l.alive && !s.hud.inv?.isOpen ? s.hud.floor?.prompt() : null;
+    const text = best ? `${hint(best)} · ${best.name}` : floor;
     if (best !== this.prompt || text !== this.promptText) { this.prompt = best; this.promptText = text; s.hud.prompt(text); }
     if (best && input.grab.pressed) best.act();
+    else if (floor && input.grab.pressed) s.hud.floor.pick(s);
   }
 
   state() {

@@ -396,3 +396,30 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .inv-tip.menu { pointer-events: auto; }
 .inv-menu { display: grid; gap: 4px; margin-top: 6px; }
 .inv-menu .inv-btn { text-align: left; }
+
+/* ---------- Boden-Leiste (floor_strip.js, Daniel 12.11.2026: „Grid zu den Rändern hin ausfaden, passend zur Cyberware-Ansicht“) ---------- */
+.floor-strip { position: fixed; left: 50%; bottom: calc(3% + 58px); transform: translateX(-50%); z-index: 6; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; animation: fs-in .25s ease-out; }
+.floor-strip[hidden] { display: none; }
+@keyframes fs-in { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translateX(-50%); } }
+.fs-grid { position: relative; display: flex; padding: 6px 90px; --c: var(--fs-cell, 56px);
+  /* cyan scan grid like the implant view; fades out towards the edges */
+  background:
+    repeating-linear-gradient(0deg, rgba(127, 246, 255, .08) 0 1px, transparent 1px 4px),
+    linear-gradient(90deg, rgba(127, 246, 255, .22) 1px, transparent 1px) 90px 0 / var(--c) 100%,
+    linear-gradient(0deg, rgba(127, 246, 255, .22) 1px, transparent 1px) 0 6px / 100% calc(var(--c)),
+    linear-gradient(180deg, rgba(10, 30, 36, .55), rgba(6, 14, 20, .75));
+  -webkit-mask: linear-gradient(90deg, transparent, #000 var(--fs-fade, 22%), #000 calc(100% - var(--fs-fade, 22%)), transparent),
+                linear-gradient(180deg, transparent, #000 22%, #000 78%, transparent);
+  mask: linear-gradient(90deg, transparent, #000 var(--fs-fade, 22%), #000 calc(100% - var(--fs-fade, 22%)), transparent),
+        linear-gradient(180deg, transparent, #000 22%, #000 78%, transparent);
+  -webkit-mask-composite: source-in; mask-composite: intersect;   /* after the shorthand, it resets this */
+  animation: inv-scan 3s linear infinite; }
+.fs-cell { position: relative; width: var(--c); height: var(--c); display: grid; place-items: center; font-style: normal; }
+.fs-cell:not(.empty)::before { content: ''; position: absolute; inset: 5px; border-radius: 4px;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--col) 45%, transparent), transparent); box-shadow: inset 0 0 0 1px rgba(127, 246, 255, .25); }
+.fs-cell .inv-art { position: relative; filter: drop-shadow(0 0 4px rgba(127, 246, 255, .45)); image-rendering: pixelated; }
+.fs-cell b { position: relative; font: 22px/1 VT323, monospace; color: #c9fbff; text-shadow: 0 0 6px rgba(127, 246, 255, .7); }
+.fs-cell span { position: absolute; right: 5px; bottom: 3px; font: 17px/1 VT323, monospace; color: #ffd27a; text-shadow: 0 1px 0 #000; }
+.fs-cell.first::after { content: ''; position: absolute; inset: 2px; border: 2px solid #ffd27a; border-radius: 6px; box-shadow: 0 0 12px rgba(255, 210, 122, .55); }
+.fs-label { font: 18px/1 VT323, monospace; color: #7ff6ff; letter-spacing: .06em; text-shadow: 0 0 8px rgba(127, 246, 255, .6); opacity: .85; }

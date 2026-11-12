@@ -86,6 +86,7 @@
  "inventory": {
   "pickupRange": 150,
   "autoStack": true,
+  "floorStrip": {"enabled": true, "max": 8, "slots": 7, "cell": 56, "fade": 22},
   "cell": 44,
   "dropSpread": 90,
   "portrait": "leyla_stand_front",
