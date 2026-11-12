@@ -51,8 +51,8 @@ for (const [name, width, height] of [['desktop', 1440, 900], ['ipad', 820, 1180]
   await ev(() => setPad()); await page.waitForTimeout(2500);
   const back = await ev(() => splash.curve());
   await ev(() => setPad({ press: [0] }));
-  const url = await page.waitForURL(/game\.html/, { timeout: 5000 }).then(() => page.url()).catch(() => page.url());
-  const ok = sel === 1 && bent > 0.8 && Math.abs(back) < 0.05 && /game\.html$/.test(url) && !errors.length;
+  const url = await page.waitForURL(/intro\.html/, { timeout: 5000 }).then(() => page.url()).catch(() => page.url());
+  const ok = sel === 1 && bent > 0.8 && Math.abs(back) < 0.05 && /intro\.html$/.test(url) && !errors.length;
   console.log(`  ${ok ? 'ok  ' : 'FEHLER'} Controller: Stick runter wählt (${sel}), seitlich Kurve ${bent}, losgelassen gerade ${back}, A öffnet ${url.split('/').pop()}${errors.length ? ' · ' + errors.join(' | ') : ''}`);
   if (!ok) failed++;
   await page.close();

@@ -1,0 +1,109 @@
+{
+ "panel_1": {
+  "name": "Klinikturm",
+  "page": 1,
+  "order": 1,
+  "look": "intro_panel_1",
+  "at": [3, 3],
+  "size": [46, 46],
+  "camera": "in",
+  "effect": "bubbles",
+  "effectAt": [57, 52],
+  "hold": 0,
+  "captions": [
+   {"speaker": "", "text": "BigCityDelta, Klinikturm, Ebene 40.", "at": "tl"},
+   {"speaker": "", "text": "Der Tank hält sie am Leben. Bezahlt ist er bis Donnerstag.", "at": "bl"}
+  ]
+ },
+ "panel_2": {
+  "name": "Alarm",
+  "page": 1,
+  "order": 2,
+  "look": "intro_panel_2",
+  "at": [51, 3],
+  "size": [46, 46],
+  "camera": "left",
+  "effect": "alarm",
+  "hold": 0,
+  "captions": [{"speaker": "", "text": "Am Mittwoch kam Leyla ohne Termin.", "at": "tl"},{"speaker": "Leyla", "text": "Sie kommt mit. Samt Tank.", "at": "br"}]
+ },
+ "panel_3": {
+  "name": "Flucht",
+  "page": 1,
+  "order": 3,
+  "look": "intro_panel_3",
+  "at": [3, 51],
+  "size": [46, 46],
+  "camera": "right",
+  "effect": "dust",
+  "hold": 0,
+  "captions": [{"speaker": "", "text": "Die alte Hochstraße nach Süden. Hinter der Stadtgrenze fragt keiner mehr nach Rechnungen.", "at": "tl"}]
+ },
+ "panel_4": {
+  "name": "Notstrom",
+  "page": 1,
+  "order": 4,
+  "look": "intro_panel_4",
+  "at": [51, 51],
+  "size": [46, 46],
+  "camera": "in",
+  "effect": "none",
+  "hold": 0,
+  "captions": [{"speaker": "", "text": "Der Tank läuft auf Notstrom.", "at": "tl"},{"speaker": "", "text": "Drei Tage, dann ist der Akku leer.", "at": "bl"}],
+  "display": {"text": "03", "sub": "TAGE", "bar": 30, "at": [85, 42], "size": 22, "style": "alarm"}
+ },
+ "panel_4b": {
+  "name": "Erstes Camp",
+  "page": 2,
+  "order": 1,
+  "look": "intro_panel_4b",
+  "at": [3, 3],
+  "size": [60, 60],
+  "camera": "out",
+  "effect": "embers",
+  "effectAt": [39, 82],
+  "hold": 0,
+  "captions": [{"speaker": "", "text": "Kilometer 6. Die erste Nacht draußen.", "at": "tl"},{"speaker": "", "text": "Leyla schläft nicht. Sie zählt die Blasen im Tank.", "at": "tr"}]
+ },
+ "panel_5": {
+  "name": "Tankstelle Kilometer 7",
+  "page": 2,
+  "order": 2,
+  "look": "intro_panel_5",
+  "at": [37, 37],
+  "size": [60, 60],
+  "camera": "in",
+  "effect": "dust",
+  "hold": 0,
+  "captions": [
+   {"speaker": "", "text": "Tankstelle Kilometer 7. Dort liegt, was der Tank braucht.", "at": "tl"},
+   {"speaker": "Leyla", "text": "Zahnräder, ein Chip, Kühlmittel. Klingt nach einem Einkaufszettel.", "at": "br"}
+  ]
+ },
+ "panel_6": {
+  "name": "Null Tage",
+  "page": 3,
+  "order": 1,
+  "look": "intro_panel_6",
+  "at": [3, 3],
+  "size": [94, 94],
+  "camera": "in",
+  "effect": "dust",
+  "hold": 0,
+  "captions": [{"speaker": "", "text": "Die Besitzer sind wach. Der Akku ist leer.", "at": "bl"},{"speaker": "Leyla", "text": "Dann eben jetzt.", "at": "br"}],
+  "display": {"text": "00", "sub": "TAGE", "bar": 0, "at": [76, 17], "size": 17, "style": "alarm"}
+ },
+ "panel_7": {
+  "name": "AvA erwacht",
+  "page": 4,
+  "order": 1,
+  "look": "intro_panel_7",
+  "at": [3, 3],
+  "size": [94, 94],
+  "camera": "in",
+  "effect": "glitch",
+  "effectAt": [63, 49],
+  "hold": 0,
+  "captions": [{"speaker": "", "text": "Im Anhänger springt ein Licht an.", "at": "tl"},{"speaker": "AvA", "text": "Leyla? Ich bin hier drin.", "at": "br"}]
+ }
+}

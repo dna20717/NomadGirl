@@ -265,6 +265,10 @@ export const AREAS = {
         point('drone.at', 'Position', { unit: '%', hint: 'Mitte der Drohne in % des Bildschirms (breit); schmal rückt sie mit Leyla zur Mitte' }), num('drone.height', 'Größe', { unit: '% der Höhe', min: 2, max: 50 }),
         range('drone.every', 'Neue Stimmung alle', { unit: 's' }), num('drone.bob', 'Schweben', { unit: '% der Höhe', min: 0, step: 0.1 }),
         text('drone.moods', 'Stimmungen', { hint: 'Anlässe aus der Tabelle der Drohne, mit Komma getrennt' })] },
+      { title: 'Intro', fields: [num('intro.typing', 'Schreibtempo', { unit: 'Zeichen/s', min: 5, max: 400, hint: 'So schnell erscheinen die Textboxen im Intro (Bereich Intro)' }),
+        num('intro.appear', 'Panel erscheint in', { unit: 's', min: 0, step: 0.05 }), num('intro.dim', 'Alte Panels abdunkeln', { unit: '%', min: 0, max: 90, hint: 'Damit das aktuelle Panel heraussticht' }),
+        num('intro.cameraZoom', 'Kamerafahrt', { unit: '%', min: 0, max: 30, hint: 'So weit zoomt bzw. schwenkt die Kamera über die ganze Zeit eines Panels' }), num('intro.cameraTime', 'Dauer der Kamerafahrt', { unit: 's', min: 1 }),
+        text('intro.title', 'Titel am Ende', { hint: 'Erscheint nach dem letzten Panel, dann geht es zurück ins Hauptmenü' }), text('intro.subtitle', 'Untertitel am Ende')] },
       { title: 'Horizont-Dunst', fields: [bool('haze.enabled', 'Zeigen', { hint: 'Weicher Übergang zwischen Kulisse und Boden: Hitzeflimmern, Pixel-Raster, warmer Dunst' }),
         num('haze.fade', 'Übergang', { unit: 'Bildpixel', min: 0, hint: 'So hoch reicht der Boden mit Raster ins Bild' }), num('haze.band', 'Flimmer-Höhe', { unit: 'Bildpixel', min: 0 }),
         num('haze.shimmer', 'Flimmern', { unit: 'Bildpixel', min: 0, step: 0.5, hint: 'Wie weit die Zeilen seitlich zittern' }), num('haze.speed', 'Flimmer-Tempo', { min: 0, step: 0.1 }),
@@ -276,6 +280,37 @@ export const AREAS = {
       if (!(x.runners || []).some(r => r.look && (r.weight ?? 1) > 0)) report('hint', 'Keine Animation für Leyla');
       for (const id of x.background || []) if (A[id] && A[id].kind !== 'image') report('warning', `Ebene ${id} ist kein Bild`);
       if (!(x.background || []).length) report('hint', 'Kein Hintergrund: die Startseite zeigt nur die Farbe der Oberfläche');
+    },
+  },
+  intro: {
+    name: 'Intro', singular: 'Panel', icon: 'image', file: 'data/intro.json', kind: 'catalog',
+    hint: 'Das Intro als Comic (Daniel, 12.11.2026, nach seinem Storyboard): Panels erscheinen nacheinander auf Comic-Seiten, mit Textboxen, Kamerafahrt und Effekten aus Code. Startet nur über das Hauptmenü (online unter /intro); „Spielen“ zeigt es ab dem gewählten Panel. Weiter: Enter, Leertaste, Klick, A; zurück: ←, LB; überspringen: Esc, B. Einstellungen für alle Panels unter Startseite › Intro',
+    sections: [
+      { title: 'Panel', fields: [NAME, num('page', 'Seite', { min: 1, required: true, hint: 'Comic-Seite; eine neue Seite blättert um' }), num('order', 'Reihenfolge', { min: 0, hint: 'Innerhalb der Seite, kleinere zuerst' }),
+        { ...LOOK, hint: 'Bild aus dem Bereich Assets (Art „Bild“), füllt den Rahmen' },
+        point('at', 'Position', { unit: '% der Seite', hint: 'Linke obere Ecke des Rahmens auf der Seite (16:9)' }), size('size', 'Größe', { unit: '% der Seite' }),
+        select('camera', 'Kamerafahrt', [['none', 'Keine'], ['in', 'Langsam heran'], ['out', 'Langsam weg'], ['left', 'Schwenk nach links'], ['right', 'Schwenk nach rechts'], ['up', 'Schwenk nach oben']]),
+        select('effect', 'Effekt', [['none', 'Keiner'], ['bubbles', 'Blasen im Tank'], ['alarm', 'Alarm (rotes Licht, Wackeln)'], ['dust', 'Staub im Licht'], ['embers', 'Funken vom Feuer'], ['searchlight', 'Suchscheinwerfer'], ['glitch', 'Erwachen (Flackern, Licht)']]),
+        point('effectAt', 'Effekt-Ort', { unit: '% des Panels', hint: 'Mitte des Effekts (Tank, Feuer, Lampe); leer = Mitte' }),
+        num('hold', 'Automatisch weiter nach', { unit: 's', min: 0, step: 0.5, hint: 'Wenn der Text fertig ist. 0 = nur per Taste' })] },
+      { title: 'Text', fields: [table('captions', 'Textboxen', [select('speaker', 'Wer', [['', 'Erzähler'], ['Leyla', 'Leyla'], ['AvA', 'AvA']]), text('text', 'Text'),
+          select('at', 'Ecke', [['tl', 'oben links'], ['tr', 'oben rechts'], ['bl', 'unten links'], ['br', 'unten rechts']])],
+        { hint: 'Nacheinander, Buchstabe für Buchstabe. Erzähler = gelbe Box, Leyla und AvA = Sprechbox mit Namen' })] },
+      { title: 'Anzeige', fields: [text('display.text', 'Großer Text', { hint: 'z. B. „03“; leer = keine Anzeige' }), text('display.sub', 'Darunter', { hint: 'z. B. „TAGE“' }),
+        num('display.bar', 'Balken', { unit: '%', min: 0, max: 100, hint: 'Tank-Zustand wie im Spiel; leer = kein Balken. Unter 15 % blinkt er' }),
+        point('display.at', 'Mitte', { unit: '% des Panels' }), num('display.size', 'Größe', { unit: '% der Panelhöhe', min: 5, max: 80 }),
+        select('display.style', 'Stil', [['alarm', 'Warnung (rot)'], ['holo', 'Hologramm (cyan)']])] },
+    ],
+    template: { name: 'Neues Panel', page: 1, order: 1, at: [3, 4], size: [45, 44], camera: 'in', effect: 'none', hold: 0, captions: [] },
+    row: x => [`Nr. ${x.order ?? 0}`, x.display?.text ? `Anzeige ${x.display.text}` : '', x.captions?.length ? x.captions.length + (x.captions.length > 1 ? ' Texte' : ' Text') : ''].filter(Boolean).join(' · '),
+    groupBy: { key: 'page', options: [[1, 'Seite 1'], [2, 'Seite 2'], [3, 'Seite 3'], [4, 'Seite 4']] },
+    check: (x, report, p) => {
+      const a = p.data?.assets?.[x.look];
+      if (!x.look) report('warning', 'Kein Bild');
+      else if (a && a.kind !== 'image') report('warning', `${x.look} ist kein Bild`);
+      const [ax, ay] = x.at || [0, 0], [w, h] = x.size || [0, 0];
+      if (!(w > 0 && h > 0)) report('error', 'Größe fehlt');
+      else if (ax + w > 100.5 || ay + h > 100.5) report('warning', 'Panel ragt über die Seite');
     },
   },
   economy: {
@@ -1108,7 +1143,7 @@ export const AREAS = {
 // Navigation: groups of areas in the order of the design document
 export const GROUPS = [
   ['ASSETS', ['assets']],
-  ['GRUNDLAGEN', ['game', 'splash', 'weather', 'economy', 'ranking']],
+  ['GRUNDLAGEN', ['game', 'splash', 'intro', 'weather', 'economy', 'ranking']],
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'kits', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],

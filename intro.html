@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NomadGirl · Intro</title>
+<link rel="stylesheet" href="game/ui.css">
+<style>
+  html, body { height: 100%; margin: 0; background: #060608; overflow: hidden; }
+  #comic { position: fixed; inset: 0; width: 100vw; height: 100vh; cursor: pointer; touch-action: manipulation; }
+  #fail { position: fixed; inset: 0; display: none; place-items: center; color: #e3e6ff; font-family: var(--ui-pixel); font-size: 32px; text-align: center; padding: 24px; }
+</style>
+</head>
+<body>
+<canvas id="comic" aria-label="Intro als Comic: Leyla, der Cryo-Tank und die Suche"></canvas>
+<div id="fail"></div>
+<script type="module">
+  // Intro (Daniel, 12.11.2026): comic after his storyboard, only from the main menu; at the end back to the menu
+  import { startIntro } from './game/intro/intro.js';
+  const home = () => { location.href = './'; };
+  startIntro(document.getElementById('comic'), { onEnd: home, startAt: new URLSearchParams(location.search).get('panel') }).then(x => { window.intro = x; })
+    .catch(e => { const f = document.getElementById('fail'); f.style.display = 'grid'; f.textContent = 'Das Intro lässt sich nicht laden: ' + e.message; console.error(e); });
+</script>
+</body>
+</html>

@@ -109,7 +109,10 @@ export class Workshop {
   // The tab is opened right away, otherwise browsers (Safari on the iPad) block it after the save.
   // play(room) plays a room block; play(null, '?poi=<id>&seed=<n>') a POI level
   async play(room = this.playRoom(), query = null) {
-    const url = new URL(`../../game.html${query || (room ? `?room=${encodeURIComponent(room)}` : '')}`, import.meta.url).href;
+    // in the area Intro the button plays the comic from the chosen panel (#005)
+    const intro = !query && !room && this.page.area === 'intro';
+    const url = intro ? new URL(`../../intro.html${this.page.choice ? `?panel=${encodeURIComponent(this.page.choice)}` : ''}`, import.meta.url).href
+      : new URL(`../../game.html${query || (room ? `?room=${encodeURIComponent(room)}` : '')}`, import.meta.url).href;
     const tab = window.open('', 'nomadgirl-game');
     if (this.dirty.size) {
       this.hint('Speichere, dann geht’s ins Spiel …');

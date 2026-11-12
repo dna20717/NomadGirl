@@ -16,7 +16,7 @@ Spieldesign: `docs/design.md` (dazu das claude.ai-Projekt „NomadGirl“).
 - **Lizenz:** GPL v3 oder später (`LICENSE`, Daniel, 07.11.2026).
 - **Assets:** Alle Assets (Grafik, Ton, Musik) erzeugen wir selbst mit KI oder Code. Nichts Externes: keine fremden Asset-Packs, keine Downloads. Einzige Ausnahme (Daniel, 07.11.2026): die Handheld-Töne aus „Game SFX by OwlishMedia“ (CC0, steht in `THIRD_PARTY.md`); weitere fremde Pakete vorher mit Daniel klären. Ausnahme bleiben die Bausteine aus dem gemeinsamen Kern (Lucide-Icons, Schriften Inter und VT323), stehen in `THIRD_PARTY.md`. Bei KI-Assets in `THIRD_PARTY.md` bzw. `docs/assets.md` vermerken, womit sie entstanden sind.
 - Das Repo ist **öffentlich** und läuft auf Cloudflare: nichts hineinlegen, was nicht öffentlich sein darf (Schlüssel, Passwörter, private Adressen).
-- **Immer den Link mit ausgeben:** Am Ende jeder Antwort, die etwas baut oder ändert, stehen die Adressen zum Anklicken: Start https://nomadgirl.dna20717.workers.dev, Spiel https://nomadgirl.dna20717.workers.dev/game, Werkstatt https://nomadgirl.dna20717.workers.dev/workshop, Repo https://github.com/dna20717/NomadGirl.
+- **Immer den Link mit ausgeben:** Am Ende jeder Antwort, die etwas baut oder ändert, stehen die Adressen zum Anklicken: Start https://nomadgirl.dna20717.workers.dev, Spiel https://nomadgirl.dna20717.workers.dev/game, Intro https://nomadgirl.dna20717.workers.dev/intro, Werkstatt https://nomadgirl.dna20717.workers.dev/workshop, Repo https://github.com/dna20717/NomadGirl.
 - Daniel ist bei Git/Kommandozeile Anfänger → Anleitungen Schritt für Schritt.
 - **„HNC“** (Daniel, 07.11.2026: „Handover, new chat“): Übergabe `claude/nomadgirl-handover.md` im claude.ai-Projekt „NomadGirl“ auf den aktuellen Stand bringen (Commit, Entscheidungen, was steht, offene Fragen), Repo sauber und gepusht, kurz bestätigen. Der nächste Chat startet mit dieser Übergabe. In Claude Code (kein Zugriff aufs Projekt) heißt HNC: Funkbuch aktuell, Stand in `docs/changelog.md` eingetragen, gepusht.
 - **Funkbuch `docs/funk.md`** (Daniel, 12.11.2026): Aufträge und Rückmeldungen zwischen Ava im Projekt-Chat und Claude Code. **Jede Sitzung beginnt dort** (nach `git pull --rebase`): Funksprüche und Tickets mit `offen`/`läuft`/`blockiert` lesen. Ticket beim Start auf `läuft` setzen und sofort pushen; Commits nennen das Ticket (`(#001)`); offene Designfragen notieren, mit ⚠️ vorläufig entscheiden und weiterbauen; am Ende „Ergebnis“ ausfüllen (Commits, Tests, PixelLab-Verbrauch, was Daniel testen soll) und einen Funkspruch schreiben. Ablauf und Vorlage im Funkbuch.
@@ -47,6 +47,7 @@ Alle Browser-Tests mit ihren Prüfungen: `docs/features/tests.md`.
 ```
 index.html             Startseite (online unter /), Szene aus game/splash/splash.js
 game.html              Spiel (online unter /game), lädt game/vendor/phaser.min.js und game/play/main.js
+intro.html             Intro als Comic (online unter /intro, nur übers Hauptmenü), Player game/intro/intro.js
 wrangler.jsonc         Cloudflare Worker (statische Seiten aus dist/, /api/* über worker/index.js)
 worker/index.js        Login-Prüfung (Cloudflare Access) und Speichern als Commit
 tools/build_web.mjs    baut dist/ für Cloudflare
@@ -120,6 +121,7 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 - `docs/features/progression.md`: Progression: Cryo-Tank, k.o. neu, Techtree, Durchgang / Traum, Zerlegen, voller Tresor.
 - `docs/features/pois.md`: POI-Level: Verschweißen, Kisten, Schalter, Secrets, Ranking, die vier POIs, Licht & Atmosphäre, Kleinvieh, Nebel.
 - `docs/features/tiles.md`: Kacheln und Kachel-Sets (TileSet00): Clutter, Decals, Einschlüsse, echte Größen, Tiefe aus Code.
+- `docs/features/intro.md`: Intro als Comic (#005): Panels, Textboxen, Countdown, Effekte, nur übers Hauptmenü.
 - `docs/features/splash.md`: Startseite: Szene, Horizont-Dunst, AvA, Highway mit Textur-Boden, Überraschungen.
 - `docs/features/art.md`: Feld `look` an Entitäten, Asset-Vorschau, Symbol-Raster, Gegenrichtung beim Spiegeln.
 - `docs/features/editor.md`: Werkstatt-Editor: Spielen-Knopf, Scroll-Position.

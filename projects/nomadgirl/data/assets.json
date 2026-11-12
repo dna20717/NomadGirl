@@ -4040,5 +4040,133 @@
   "source": "KI (PixelLab, Edit Pro Flash: nur der Kopf) + Code (tools/raider_strips.py: geänderte Pixel über dem Hals)",
   "derivedFrom": "raider_base",
   "date": "12.11.2026"
+ },
+ "intro_panel_1_source": {
+  "name": "Intro 1 · Klinikturm (Original)",
+  "kind": "source",
+  "file": "assets/intro/raw/panel_1.png",
+  "source": "KI (PixelLab: Create Image Pro, AAP-64)",
+  "date": "12.11.2026"
+ },
+ "intro_panel_1": {
+  "name": "Intro 1 · Klinikturm",
+  "kind": "image",
+  "file": "assets/intro/panel_1.png",
+  "source": "KI (PixelLab: Create Image Pro 688 × 384, AAP-64, Referenzen: Storyboard 1, Leyla-Sheet, Tank; Rand per Code abgeschnitten)",
+  "date": "12.11.2026",
+  "derivedFrom": "intro_panel_1_source",
+  "description": "Leyla von hinten vor dem Cryo-Tank im Klinikturm, Herzmonitor rechts. Comic-Panel fürs Intro (#005)."
+ },
+ "intro_panel_2_source": {
+  "name": "Intro 2 · Alarm (Original)",
+  "kind": "source",
+  "file": "assets/intro/raw/panel_2.png",
+  "source": "KI (PixelLab: Create Image Pro, AAP-64)",
+  "date": "12.11.2026"
+ },
+ "intro_panel_2": {
+  "name": "Intro 2 · Alarm",
+  "kind": "image",
+  "file": "assets/intro/panel_2.png",
+  "source": "KI (PixelLab: Create Image Pro 688 × 384, AAP-64, Referenzen: Storyboard 2, Leyla-Sheet, Tank; Rand per Code abgeschnitten)",
+  "date": "12.11.2026",
+  "derivedFrom": "intro_panel_2_source",
+  "description": "Rotes Alarmlicht, Leyla mit Maske reißt den Tank auf einem Rollwagen weg, zwei Wachen mit roten Visieren in der Tür. Comic-Panel fürs Intro (#005)."
+ },
+ "intro_panel_3_source": {
+  "name": "Intro 3 · Flucht (Original)",
+  "kind": "source",
+  "file": "assets/intro/raw/panel_3.png",
+  "source": "KI (PixelLab: Create Image Pro, AAP-64)",
+  "date": "12.11.2026"
+ },
+ "intro_panel_3": {
+  "name": "Intro 3 · Flucht",
+  "kind": "image",
+  "file": "assets/intro/panel_3.png",
+  "source": "KI (PixelLab: Create Image Pro 688 × 384, AAP-64, Referenzen: Storyboard 3, Van; Rand per Code abgeschnitten)",
+  "date": "12.11.2026",
+  "derivedFrom": "intro_panel_3_source",
+  "description": "Der Van rast bei Sonnenuntergang über die Hochstraße aus BigCityDelta in die Wastelands. Comic-Panel fürs Intro (#005)."
+ },
+ "intro_panel_4_source": {
+  "name": "Intro 4 · Notstrom (Original)",
+  "kind": "source",
+  "file": "assets/intro/raw/panel_4.png",
+  "source": "KI (PixelLab: Create Image Pro, AAP-64)",
+  "date": "12.11.2026"
+ },
+ "intro_panel_4": {
+  "name": "Intro 4 · Notstrom",
+  "kind": "image",
+  "file": "assets/intro/panel_4.png",
+  "source": "KI (PixelLab: Create Image Pro 688 × 384, AAP-64, Referenzen: Storyboard 4, Leyla-Sheet, Tank; Rand per Code abgeschnitten)",
+  "date": "12.11.2026",
+  "derivedFrom": "intro_panel_4_source",
+  "description": "Leyla erschöpft im Van, der Tank festgezurrt, rechts ein leerer Monitor (Anzeige 03 TAGE kommt aus Code, Bildschirm x 75–95 % / y 19–70 %). Comic-Panel fürs Intro (#005)."
+ },
+ "intro_panel_4b_source": {
+  "name": "Intro 4b · Erstes Camp (Original)",
+  "kind": "source",
+  "file": "assets/intro/raw/panel_4b.png",
+  "source": "KI (PixelLab: Create Image Pro, AAP-64)",
+  "date": "12.11.2026"
+ },
+ "intro_panel_4b": {
+  "name": "Intro 4b · Erstes Camp",
+  "kind": "image",
+  "file": "assets/intro/panel_4b.png",
+  "source": "KI (PixelLab: Create Image Pro 688 × 384, AAP-64, Referenzen: Van + Anhänger + Tank (Montage), Leyla-Sheet, Tank; Rand per Code abgeschnitten)",
+  "date": "12.11.2026",
+  "derivedFrom": "intro_panel_4b_source",
+  "description": "Nacht in der Wüste: Van mit Anhänger, darauf der leuchtende Tank, Leyla allein am Lagerfeuer. Comic-Panel fürs Intro (#005)."
+ },
+ "intro_panel_5_source": {
+  "name": "Intro 5 · Tankstelle Kilometer 7 (Original)",
+  "kind": "source",
+  "file": "assets/intro/raw/panel_5.png",
+  "source": "KI (PixelLab: Create Image Pro, AAP-64)",
+  "date": "12.11.2026"
+ },
+ "intro_panel_5": {
+  "name": "Intro 5 · Tankstelle Kilometer 7",
+  "kind": "image",
+  "file": "assets/intro/panel_5.png",
+  "source": "KI (PixelLab: Create Image Pro 688 × 384, AAP-64, Referenzen: Storyboard 5, Leyla-Sheet; Rand per Code abgeschnitten)",
+  "date": "12.11.2026",
+  "derivedFrom": "intro_panel_5_source",
+  "description": "Leyla mit Rohrzange vor der Tankstelle (Vordach, Zapfsäulen, Laden, Werkstatthalle), rotes Holo mit Zahnrad, Chip, Kühlmittel. Comic-Panel fürs Intro (#005)."
+ },
+ "intro_panel_6_source": {
+  "name": "Intro 6 · Null Tage (Original)",
+  "kind": "source",
+  "file": "assets/intro/raw/panel_6.png",
+  "source": "KI (PixelLab: Create Image Pro, AAP-64)",
+  "date": "12.11.2026"
+ },
+ "intro_panel_6": {
+  "name": "Intro 6 · Null Tage",
+  "kind": "image",
+  "file": "assets/intro/panel_6.png",
+  "source": "KI (PixelLab: Create Image Pro 688 × 384, AAP-64, Referenzen: Storyboard 6, Leyla-Sheet; Rand per Code abgeschnitten)",
+  "date": "12.11.2026",
+  "derivedFrom": "intro_panel_6_source",
+  "description": "Nacht, Wachen auf dem Vordach, zwei Suchscheinwerfer, Leyla hinter einem Autowrack (Anzeige 00 TAGE kommt aus Code). Comic-Panel fürs Intro (#005)."
+ },
+ "intro_panel_7_source": {
+  "name": "Intro 7 · AvA erwacht (Original)",
+  "kind": "source",
+  "file": "assets/intro/raw/panel_7.png",
+  "source": "KI (PixelLab: Create Image Pro, AAP-64)",
+  "date": "12.11.2026"
+ },
+ "intro_panel_7": {
+  "name": "Intro 7 · AvA erwacht",
+  "kind": "image",
+  "file": "assets/intro/panel_7.png",
+  "source": "KI (PixelLab: Create Image Pro 688 × 384, AAP-64, Referenzen: Drohnen-Konzept, Tank; Rand per Code abgeschnitten)",
+  "date": "12.11.2026",
+  "derivedFrom": "intro_panel_7_source",
+  "description": "Im dunklen Anhänger erwacht die Drohne, cyanes Auge und Lichtkegel, links der grüne Tank. Comic-Panel fürs Intro (#005)."
  }
 }
