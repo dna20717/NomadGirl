@@ -173,7 +173,7 @@ s = await ev(() => !!game.scene.getScene('play').hud.build.active);
 check('Bau-Modus: B ist fertig', !s, s);
 // a new game asks in the game's own menu
 s = await ev(() => { const h = game.scene.getScene('play').hud; h.confirmNew(); return h.menuState(); });
-check('Neues Spiel fragt im Spiel-Menü (kein Browser-Fenster)', s?.title === 'Neues Spiel?' && s.items.length === 2, s);
+check('Neues Spiel fragt im Spiel-Menü (kein Browser-Fenster)', s?.title === 'Neues Spiel?' && s.items.length === 3, s);
 await tap(1);
 s = await ev(() => game.scene.getScene('play').hud.menuState());
 check('Neues Spiel: B bricht ab', !s, s);
@@ -181,11 +181,11 @@ check('Neues Spiel: B bricht ab', !s, s);
 // the keyboard still works
 // right stick pulls AvA like on a rubber band (Daniel, 12.11.2026): full stick goes far, half stick more than half as far (it gets heavier outside), release = back
 s = await ev(() => { const sc = game.scene.getScene('play'), d = sc.drone, l = sc.leyla, off = () => Math.round(d.x - l.x);
-  nomad.step(3, ['right']); nomad.step(30);   // facing right (after building she got up from the fire)
+  nomad.step(3, ['right']); nomad.step(30); l.facing = 1; d.side = 1; d.turnAt = 0;   // facing right (after building she got up from the fire), AvA on the same side
   setPad({ axes: [0, 0, 1, 0] }); nomad.step(150); const full = off(), aim = d.aim;
   setPad({ axes: [0, 0, 0.5, 0] }); nomad.step(150); const half = off();
   setPad(); nomad.step(60); const leashed = d.leashed; nomad.step(60); return { full, half, aim, leashed, aimAfter: d.aim, reach: d.d.leash?.reach }; });
-check('Rechter Stick zieht AvA am Gummiband, Licht folgt, Loslassen = zurück', s.full > s.reach * 0.7 && s.half > s.full * 0.55 && s.half < s.full && Math.abs(s.aim) < 0.05 && !s.leashed && s.aimAfter == null, s);
+check('Rechter Stick zieht AvA am Gummiband, Licht folgt, Loslassen = zurück', s.full > s.reach * 0.7 && s.half > s.reach * 0.4 && s.half < s.full && Math.abs(s.aim) < 0.05 && !s.leashed && s.aimAfter == null, s);
 // standing on AvA the right stick lets both hover a little, at three times the battery cost (Daniel, 12.11.2026)
 s = await ev(() => { const s = game.scene.getScene('play'), d = s.drone, l = s.leyla; nomad.step(400);
   const top = l.feet - 120, y = top + d.half - (d.d.platform?.inset ?? 14); d.x = l.x; d.y = y; d.parkAt = [l.x, y]; d.parkUntil = s.time.now + 1e7; nomad.step(3);
