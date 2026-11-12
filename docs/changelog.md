@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 12.11.2026 nachts: **Banner gehen von selbst** („Wieder auf den Beinen“ blieb stehen), **✕ an jedem Overlay**, **Hammer flackert nicht mehr** beim Gehen/Rennen, **Kopf fällt beim Tod mit**, Leiche nicht mehr gelb nach Krit, **Blutspritzer** in Schlagrichtung mit Flecken am Boden und an Wänden, Lache beim Tod; `raider_test` 20, `npm test` 91.
 - 12.11.2026 nachts: **Gegner-Bausatz Raider** (#004, PixelLab): menschlicher Raider im Stil der Bosse mit 25 Animationen (je Waffenklasse leicht, beidhändig, Pistole, Langwaffe: Alarm, Gehen, Rennen, Ducken, Angriff, Treffer; Tod), Waffe als grüner Platzhalter gemalt und im Spiel je Frame durch die echte Waffe ersetzt, 6 Köpfe, Hauttöne und Gang-Farben per Farbtausch, Ducken in der KI, neue Waffen Nagelkeule, Rohrhammer, Rohrpistole (auch für Leyla), 5 neue Raider-Gegner; `raider_test` 17, `npm test` 89.
 - 12.11.2026 nachts: **Trophäenraum im Cyberpunk-Stil** (#003, PixelLab): Neon-Vitrinen, Lochwand mit Holo-Schildern, Sockel im Spotlicht, Beutehaufen wächst; 3 Kandidaten zur Wahl.
 - 12.11.2026 nachts: **CLAUDE.md aufgeteilt** (#002): Regeln + Landkarte in `CLAUDE.md` (19 KB), Features in `docs/features/`, Verlauf hier.

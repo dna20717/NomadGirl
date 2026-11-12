@@ -2,7 +2,7 @@
 import { bonuses } from '../techtree.js';
 import { phase } from '../tank.js';
 import { el } from '../ui.js';
-import { hints, setUiDevice } from './ui_nav.js';
+import { hints, setUiDevice, closeX } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { loadVersion } from '../version.js';
 import { clockText } from '../save.js';
@@ -42,7 +42,7 @@ export class Hud {
     document.addEventListener('keydown', e => { if (this.pad) this.pad.active = false; this.menuKey(e); }, true);
     // controls: hidden until asked for (Daniel, 11.11.2026: "nicht mehr per default, in einem Menü verstecken"), two columns
     this.help = el('div', { class: 'hud-help', hidden: true, onclick: e => { if (e.target === this.help) this.toggleHelp(false); } }, el('div', { class: 'hud-helpBox' },
-      el('header', {}, el('h2', {}, 'Steuerung'), el('small', {}, 'NomadGirl · Feldhandbuch')),
+      el('header', {}, el('h2', {}, 'Steuerung'), el('small', {}, 'NomadGirl · Feldhandbuch')), closeX(() => this.toggleHelp(false)),
       this.padHelpEl = el('div', { class: 'hud-padhelp', hidden: true }),
       this.keyHelpEl = el('div', { class: 'hud-keyhelp' }, el('div', {}, section(CONTROLS[0])), el('div', {}, ...CONTROLS.slice(1).map(section))),
       el('p', {}, 'Inventar mit der Maus: klicken nehmen und ablegen, Rechtsklick drehen, Doppelklick rüber, auf „Benutzen“ legen = essen. Alle Werte kommen aus der Werkstatt.',
@@ -72,7 +72,7 @@ export class Hud {
   dream(lines, foot, seconds = 7) {
     this.dreamEl?.remove();
     const box = el('div', { class: 'hud-dream' }), text = el('div', { class: 'hud-dream-text' }), small = el('small', {}, foot);
-    box.append(text, small); this.root.append(box); this.dreamEl = box;
+    box.append(text, small, closeX(() => { box.remove(); if (this.dreamEl === box) this.dreamEl = null; }, 'Überspringen')); this.root.append(box); this.dreamEl = box;
     const per = seconds * 1000 / (lines.length + 1);
     lines.forEach((t, i) => setTimeout(() => text.append(el('p', { class: i === lines.length - 1 ? 'last' : '' }, t)), 400 + i * per));
     setTimeout(() => box.classList.add('foot'), 400 + lines.length * per);
@@ -156,7 +156,7 @@ export class Hud {
     this.menuButtons = items.map((it, i) => el('button', { class: 'hud-item' + (it.primary ? ' primary' : ''), disabled: !!it.disabled, onclick: () => this.choose(i), onmouseenter: () => this.focus(i) },
       el('kbd', {}, String(i + 1)), el('span', {}, el('b', {}, it.label), it.sub || it.disabled ? el('small', {}, [it.sub, it.disabled].filter(Boolean).join(' · ')) : null)));
     this.menuEl.replaceChildren(el('div', { class: 'hud-menuBox ui-frame' }, el('h2', {}, title), sub ? el('p', {}, sub) : null, el('div', { class: 'hud-items' }, ...this.menuButtons),
-      hints([['move', 'wählen'], ['ok', 'nehmen'], ['back', 'zurück']], '1–9 direkt')));
+      hints([['move', 'wählen'], ['ok', 'nehmen'], ['back', 'zurück']], '1–9 direkt'), closeX(() => this.closeMenu())));
     this.menuEl.hidden = false;
     this.promptEl.hidden = true;
     this.focus(this.menuIndex);
@@ -220,9 +220,13 @@ export class Hud {
   menuState() { return this.modal ? { title: this.menuTitle, items: this.menuItems.map(i => ({ label: i.label, sub: i.sub || '', disabled: i.disabled || null })) } : null; }
   toggleHelp(on = !this.paused) { this.paused = on; this.help.hidden = !on; }
   room(name, count) { this.roomName.textContent = name; this.total = count; }
-  banner(title, sub = '') {
+  // banners go by themselves after ms (default 3.5 s; 0 = stays until the next banner or ✕). Before, a banner stayed until
+  // the next one replaced it, so „Wieder auf den Beinen“ never left (Daniel, 12.11.2026)
+  banner(title, sub = '', ms = 3500) {
+    clearTimeout(this.bannerTimer);
     this.bannerEl.hidden = !title;
-    this.bannerEl.replaceChildren(...(title ? [el('b', {}, title), el('small', {}, sub)] : []));
+    this.bannerEl.replaceChildren(...(title ? [el('b', {}, title), el('small', {}, sub), closeX(() => this.banner(null))] : []));
+    if (title && ms > 0) this.bannerTimer = setTimeout(() => { if (this.bannerEl.firstChild?.textContent === title) this.banner(null); }, ms);
   }
   hurt() { this.root.classList.remove('hud-hurt'); void this.root.offsetWidth; this.root.classList.add('hud-hurt'); }
 

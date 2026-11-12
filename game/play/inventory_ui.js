@@ -4,7 +4,7 @@
 // double click moves it to the other side, a click outside the panels puts it back. Placeholders until things have a look:
 // coloured cells by category with a short glyph, the name and the count.
 import { el } from '../ui.js';
-import { hints, padInUse, keyGlyph } from './ui_nav.js';
+import { hints, padInUse, keyGlyph, closeX } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot, IMPLANTS, DRONE_WEAR, WEAR_KEYS, wearOf, gearStats, gearScore, occupancy } from '../inventory.js';
 import { partSlots, budgets, SLOT_NAMES as PART_SLOT_NAMES } from '../rig.js';
@@ -108,14 +108,14 @@ export class InventoryUI {
       this.pair = [vs.key, 'backpack'];
       if (this.other && this.other.key !== vs.key) { parts[1] = this.otherEl(); this.pair = [vs.key, this.other.key]; }
       parts[0].prepend(this.tabsEl());
-      this.el.replaceChildren(el('div', { class: 'inv-row' }, ...parts),
+      this.el.replaceChildren(closeX(() => this.close()), el('div', { class: 'inv-row' }, ...parts),
         hints([['move', 'wählen'], ['ok', 'nehmen / ablegen'], ['tabs', 'Tab wechseln'], ['back', 'zurück']], 'Rig-Teile ein- und ausbauen: Rig bauen (B) · Kofferraum wie jedes Lager'));
       this.fit(); return this.padShow();
     }
     // Daniel, 10.11.2026 ("Inventar im Diablo-Stil"): backpack left (with the ground or the open storage under it), Leyla in the middle, AvA right
     this.pair = this.other ? ['backpack', this.other.key] : ['backpack', 'drone'];
     const left = el('div', { class: 'inv-col' }, this.bagEl(), this.other ? this.otherEl() : null);
-    this.el.replaceChildren(el('div', { class: 'inv-row' }, left, this.leylaEl(), this.droneEl()),
+    this.el.replaceChildren(closeX(() => this.close()), el('div', { class: 'inv-row' }, left, this.leylaEl(), this.droneEl()),
       hints([['move', 'wählen'], ['ok', 'nehmen / ablegen'], ['context', 'benutzen (halten: mehr)'], ['send', 'rüber (halten: wegwerfen)'], ['tabs', 'Tab'], ['back', 'zurück']], 'Maus: klicken, Rechtsklick Aktionen, Doppelklick rüber, daneben = Boden'));
     this.fit();
     this.drawGhost();

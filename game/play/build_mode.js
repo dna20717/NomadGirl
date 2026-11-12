@@ -10,7 +10,7 @@
 //   dealer catalogue (button or click on the pad): bought things are delivered onto the pad.
 // Logic in game/rig.js (act, snapshot/restore), drawing in game/play/camp.js (drawRig, drawYard), values in "Rig-Bau".
 import { el } from '../ui.js';
-import { hints, NavCursor } from './ui_nav.js';
+import { hints, NavCursor, closeX } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { budgets, act, snapshot, restore, lift, place, fits, at as wsAt, toSpare, fromSpare, stow, buyWorkshop, sellWorkshop, buyContainer, sellContainer, buyPart, sellPart, mountPart, unmountPart, SLOT_NAMES as PART_SLOTS, stackOn, stackTop, blockAt, levelOf, attachAt, detach, moveContainer, shop, priceOf, sellPrice, wsDef, placesOf } from '../rig.js';
 import { clockText } from '../save.js';
@@ -215,7 +215,7 @@ export class BuildMode {
       this.shell = { bar: el('div', { class: 'bm-bar ui-frame' }), shop: el('div', { class: 'bm-shopslot' }), msg: el('div', { class: 'bm-msg idle' }),
         hint: hints([['move', 'Cursor'], ['ok', 'packen / ablegen'], ['context', 'rückgängig'], ['send', 'Händler'], ['tabs', 'nächstes Teil'], ['back', 'zurück / fertig']], 'Maus: Teile packen und ziehen · Strg+Z rückgängig · B fertig') };
       this.shell.hint.classList.add('bm-hints');
-      this.el.replaceChildren(this.shell.bar, this.shell.shop, this.shell.msg, this.shell.hint);
+      this.el.replaceChildren(this.shell.bar, this.shell.shop, this.shell.msg, this.shell.hint, this.shell.x = closeX(() => this.close(), 'Fertig (B)'));
     }
     const sh = this.shell;
     sh.bar.replaceChildren(

@@ -133,7 +133,11 @@ export function kitLook(scene, def) {
         ctx.drawImage(src, x, 0, fw, fh, x, 0, fw, fh);
         if (head) {
           const hsrc = scene.textures.get(head.look).getSourceImage(), at = head.at || [0, 0], off = L.head || [0, 0];
-          ctx.drawImage(hsrc, x + at[0] + off[0], at[1] + off[1]);
+          if (L.headAngle) {   // falling over (death): the head turns with the body around its centre (Bausatz › Kopf-Drehpunkt)
+            const pv = kit.headPivot || [at[0] + hsrc.width / 2, at[1] + hsrc.height / 2];
+            ctx.save(); ctx.translate(x + pv[0] + off[0], pv[1] + off[1]); ctx.rotate(-L.headAngle * Math.PI / 180);
+            ctx.drawImage(hsrc, at[0] - pv[0], at[1] - pv[1]); ctx.restore();
+          } else ctx.drawImage(hsrc, x + at[0] + off[0], at[1] + off[1]);
         }
         recolor(ctx, x, 0, fw, fh, swap);   // body and head; the weapon keeps its colours
         if (weapon && L.grip && !L.back) drawHeld(ctx, weapon, x + L.grip[0], L.grip[1], L.angle || 0);

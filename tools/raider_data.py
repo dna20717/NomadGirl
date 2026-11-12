@@ -24,6 +24,7 @@ for h in S['meta']['heads']:
     A.setdefault(f'raider_head_{h}', {'name': f'Raider · Kopf {HN.get(h, h)}', 'kind': 'image', 'file': f'assets/raider/head_{h}.png', 'origin': [0, 0],
         'source': 'KI (PixelLab, Edit Pro Flash: nur der Kopf) + Code (tools/raider_strips.py: geänderte Pixel über dem Hals)', 'derivedFrom': 'raider_base', 'date': '12.11.2026'})
 kit = K.setdefault('raider', {})
+kit['headPivot'] = S['meta']['headPivot']
 kit['poses'] = [{'class': 'any' if k[7:].split('_')[0] == 'none' else k[7:].split('_')[0], 'state': k[7:].split('_', 1)[1], 'look': k} for k in S['assets']]
 old_heads = {h['id']: h for h in kit.get('heads', [])}
 kit['heads'] = [{**old_heads.get(h, {}), 'id': h, 'name': old_heads.get(h, {}).get('name', HN.get(h, h)), 'look': f'raider_head_{h}', 'at': info['at']} for h, info in S['meta']['heads'].items()]

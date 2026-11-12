@@ -11,6 +11,11 @@
 //   tabs      Q                     LB / RB
 import { el } from '../ui.js';
 
+// the same ✕ at the top right of every overlay (Daniel, 12.11.2026: „zur Sicherheit X-Button an jedes Overlay“)
+export function closeX(onClose, title = 'Schließen (Esc)') {
+  return el('button', { class: 'ui-x', title, 'aria-label': 'Schließen', onclick: e => { e.preventDefault(); e.stopPropagation(); e.currentTarget.blur(); onClose(); } }, '×');
+}
+
 export const UI_KEYS = { move: 'Pfeile', ok: 'E', back: 'Esc', context: 'R', send: 'F', tabs: 'Q' };
 export const UI_BUTTONS = { move: 'dpad', ok: 0, back: 1, context: 2, send: 3, tabs: [4, 5] };
 

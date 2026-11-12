@@ -3457,8 +3457,8 @@
    {"frame": 4, "head": [1, 8], "grip": [116.9, 86.7], "angle": -157.5},
    {"frame": 5, "head": [2, 7], "grip": [117.9, 83.1], "angle": -165.5},
    {"frame": 6, "head": [3, 10], "grip": [120.6, 88.1], "angle": -169.7},
-   {"frame": 7, "head": [3, 13], "grip": [157.8, 120.7], "angle": 38.2, "back": true},
-   {"frame": 8, "head": [9, 10], "grip": [144.7, 108.8], "angle": 19.7}
+   {"frame": 7, "head": [3, 13], "grip": [119.8, 86.1], "angle": -157.2},
+   {"frame": 8, "head": [9, 10], "grip": [118.9, 84.2], "angle": -144.6}
   ],
   "source": "KI (PixelLab, animate_character v3 mit grünem Platzhalter) + Code (tools/raider_strips.py)",
   "date": "12.11.2026",
@@ -3483,8 +3483,8 @@
    {"frame": 4, "head": [-5, 2], "grip": [122.8, 75.1], "angle": -138.9},
    {"frame": 5, "head": [-3, 4], "grip": [121.7, 74.7], "angle": -141.5},
    {"frame": 6, "head": [-2, 8], "grip": [123.6, 79], "angle": -141.9},
-   {"frame": 7, "head": [-2, 8], "grip": [131.4, 85], "angle": -140.7},
-   {"frame": 8, "head": [-3, 5], "grip": [108.8, 65.3], "angle": 40}
+   {"frame": 7, "head": [-2, 8], "grip": [121.6, 80.1], "angle": -138.9},
+   {"frame": 8, "head": [-3, 5], "grip": [119.7, 81.2], "angle": -135.9}
   ],
   "source": "KI (PixelLab, animate_character v3 mit grünem Platzhalter) + Code (tools/raider_strips.py)",
   "date": "12.11.2026",
@@ -3532,7 +3532,7 @@
    {"frame": 5, "head": [-9, 30], "grip": [74, 130.3], "angle": -146.8},
    {"frame": 6, "head": [-9, 30], "grip": [51, 138.6], "angle": -119.8},
    {"frame": 7, "head": [-4, 25], "grip": [81, 139.3], "angle": -142.5},
-   {"frame": 8, "head": [0, 14], "grip": [145.2, 132.2], "angle": -176.6}
+   {"frame": 8, "head": [0, 14], "grip": [81, 139.3], "angle": -142.5}
   ],
   "source": "KI (PixelLab, animate_character v3 mit grünem Platzhalter) + Code (tools/raider_strips.py)",
   "date": "12.11.2026",
@@ -3791,13 +3791,13 @@
   "origin": [127.4, 250],
   "layers": [
    {"frame": 1, "head": [4, 1]},
-   {"frame": 2, "head": [11, 5]},
-   {"frame": 3, "head": [25, 13]},
-   {"frame": 4, "head": [36, 27]},
-   {"frame": 5, "head": [22, 13]},
-   {"frame": 6, "head": [8, -1]},
-   {"frame": 7, "head": [-6, -7]},
-   {"frame": 8, "head": [-20, -7]}
+   {"frame": 2, "head": [12, 3], "headAngle": -10},
+   {"frame": 3, "head": [24, 9], "headAngle": -10},
+   {"frame": 4, "head": [36, 31], "headAngle": -20},
+   {"frame": 5, "head": [52, 81], "headAngle": -30},
+   {"frame": 6, "head": [64, 119], "headAngle": -30},
+   {"frame": 7, "head": [80, 169], "headAngle": -40},
+   {"frame": 8, "head": [94, 189], "headAngle": -70}
   ],
   "source": "KI (PixelLab, animate_character v3 mit grünem Platzhalter) + Code (tools/raider_strips.py)",
   "date": "12.11.2026",
@@ -3860,7 +3860,7 @@
   "loop": false,
   "origin": [127.4, 250],
   "layers": [
-   {"frame": 1, "head": [-3, 5], "grip": [204, 41.7], "angle": -8.6, "back": true},
+   {"frame": 1, "head": [-3, 5], "grip": [195.4, 53.6], "angle": -14.8},
    {"frame": 2, "head": [0, 9], "grip": [195.4, 53.6], "angle": -14.8},
    {"frame": 3, "head": [9, 21], "grip": [201.1, 65.5], "angle": -14},
    {"frame": 4, "head": [5, 35], "grip": [191.3, 85.1], "angle": -17.6},
@@ -3935,7 +3935,7 @@
    {"frame": 1, "head": [-6, 3], "grip": [207.7, 42], "angle": -4.7},
    {"frame": 2, "head": [-8, 3], "grip": [205.2, 46.4], "angle": -8.1},
    {"frame": 3, "head": [-10, 0], "grip": [200.2, 45.9], "angle": -1.6},
-   {"frame": 4, "head": [-11, -2], "grip": [206.1, 40.9], "angle": 177.7},
+   {"frame": 4, "head": [-11, -2], "grip": [200.6, 44.6], "angle": -4.4},
    {"frame": 5, "head": [-10, 1], "grip": [200.9, 43.4], "angle": -7.2},
    {"frame": 6, "head": [-8, 4], "grip": [204.6, 44.4], "angle": -6.3},
    {"frame": 7, "head": [-6, 4], "grip": [203.2, 46.8], "angle": -4.3},

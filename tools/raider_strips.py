@@ -109,6 +109,26 @@ def find_head(frame, tpl, tmask, box, prev=None):
         return find_head(frame, tpl, tmask, box, best)
     return best
 
+def find_head_turned(frame, tpl, tmask, prev, prev_ang):
+    """death: the head falls and turns; search rotated templates around the last place (centre + angle)"""
+    best, bd = (prev[0], prev[1], prev_ang), 1e18
+    for ang in range(int(prev_ang) - 40, int(prev_ang) + 41, 10):
+        rt = ndimage.rotate(tpl, ang, reshape=True, order=0, mode='constant', cval=0)
+        rm = ndimage.rotate(tmask.astype(np.uint8), ang, reshape=True, order=0) > 0
+        th, tw = rm.shape
+        n = rm.sum() or 1
+        for step, rng, cx0, cy0 in ((2, 50, prev[0], prev[1]), ):
+            for cy in range(cy0 - rng, cy0 + rng + 1, step):
+                for cx in range(cx0 - rng, cx0 + rng + 1, step):
+                    x, y = cx - tw // 2, cy - th // 2
+                    if x < 0 or y < 0 or x + tw > CANVAS or y + th > CANVAS: continue
+                    win = frame[y:y + th, x:x + tw]
+                    sol = win[:, :, 3] > 0
+                    d = np.abs(win[:, :, :3] - rt[:, :, :3]).sum(2)
+                    score = (d[rm & sol].sum() + (rm & ~sol).sum() * 300) / n
+                    if score < bd: bd, best = score, (cx, cy, ang)
+    return best
+
 def weapon(frame, g, torso_x):
     """grip, angle, length from the green placeholder g (mask); hands = opaque non-green pixels inside its hull"""
     ys, xs = np.where(g)
@@ -208,31 +228,69 @@ def main():
             else:
                 w, hm = weapon(f, solid(g), feet_x)
                 raw.append((w, hm, 'ok' if w else 'gone'))
+        # partly painted (PixelLab fades the weapon out or paints it pale): too little green → also interpolated
+        for i, r in enumerate(raw):
+            if r[2] == 'ok' and areas[i] < med * 0.6: raw[i] = (None, np.zeros(r[1].shape, bool), 'gone')
+        # a jump of the angle against both neighbours (the tip measured at the wrong end) → interpolated
+        loop = LOOP.get(state, True)
+        n = len(raw)
+        def nb(i, d):
+            j = i + d
+            while 0 <= j < n or loop:
+                j %= n
+                if j == i: return None
+                if raw[j][2] == 'ok': return j
+                j += d
+                if not loop and not 0 <= j < n: return None
+            return None
+        for i, r in enumerate(raw):
+            if r[2] != 'ok': continue
+            js = [j for j in (nb(i, -1), nb(i, 1)) if j is not None]
+            diffs = [abs((r[0]['angle'] - raw[j][0]['angle'] + 180) % 360 - 180) for j in js]
+            if diffs and all(d > (110 if state == 'attack' else 70) for d in diffs): raw[i] = (None, r[1], 'gone')
+        # loops (alert, walk, run) hold the weapon roughly the same way: far off the circular mean = measured wrong
+        if state in ('alert', 'walk', 'run'):
+            ok_ = [r[0]['angle'] for r in raw if r[2] == 'ok']
+            if ok_:
+                ref = np.degrees(np.arctan2(np.mean(np.sin(np.radians(ok_))), np.mean(np.cos(np.radians(ok_)))))
+                for i, r in enumerate(raw):
+                    if r[2] == 'ok' and abs((r[0]['angle'] - ref + 180) % 360 - 180) > 75: raw[i] = (None, r[1], 'gone')
         good = [i for i, r in enumerate(raw) if r[2] == 'ok']
         ws = []
         for i, (w, hm, kind) in enumerate(raw):
             if kind == 'ok' or not good: ws.append(w); continue
-            before = [j for j in good if j < i]; after = [j for j in good if j > i]
-            a, b = (raw[before[-1]][0] if before else None), (raw[after[0]][0] if after else None)
+            bi, ai = nb(i, -1), nb(i, 1)
+            a, b = (raw[bi][0] if bi is not None else None), (raw[ai][0] if ai is not None else None)
             if a and b:
-                t = (i - before[-1]) / (after[0] - before[-1])
+                span = (ai - bi) % n if loop else ai - bi
+                t = ((i - bi) % n if loop else i - bi) / (span or 1)
                 w = {'grip': [round(a['grip'][0] + (b['grip'][0] - a['grip'][0]) * t, 1), round(a['grip'][1] + (b['grip'][1] - a['grip'][1]) * t, 1)],
                      'angle': round(lerp_angle(a['angle'], b['angle'], t), 1)}
             else:
                 w = dict(a or b)
-            if kind == 'gone': w['back'] = True   # hidden behind the body in the painting
+            w.pop('back', None)
             ws.append(w)
+        head_ang = 0
+        th0, tw0 = tmask.shape
         for i, f in enumerate(fr):
             g = green(f)
+            if raw[i][2] != 'ok':   # pale or half painted weapon: every greenish pixel goes
+                r_, g_, b_ = f[:, :, 0], f[:, :, 1], f[:, :, 2]
+                g = g | ((f[:, :, 3] > 0) & (g_ > r_ + 15) & (g_ > b_ + 15))
             w, hm = ws[i], raw[i][1]
-            hx, hy = find_head(f, tpl, tmask, hbox, prev_head)
+            if state == 'death' and i > 0:
+                cx, cy, head_ang = find_head_turned(f, tpl, tmask, (prev_head[0] + tw0 // 2, prev_head[1] + th0 // 2), head_ang)
+                hx, hy = cx - tw0 // 2, cy - th0 // 2
+            else:
+                hx, hy = find_head(f, tpl, tmask, hbox, prev_head)
             prev_head = (hx, hy)
             b = fill_holes(f, g)
             hpix = np.zeros_like(f); hpix[hm] = f[hm]
             if hm.any(): any_hands = True
             body.paste(Image.fromarray(b[y0:y1, x0:x1].astype(np.uint8)), (i * W, 0))
             hands.paste(Image.fromarray(hpix[y0:y1, x0:x1].astype(np.uint8)), (i * W, 0))
-            row = {'frame': i + 1, 'head': [hx - head0[0], hy - head0[1]]}
+            row = {'frame': i + 1, 'head': [int(hx - head0[0]), int(hy - head0[1])]}
+            if head_ang: row['headAngle'] = int(head_ang)
             if w:
                 row['grip'] = [round(w['grip'][0] - x0, 1), round(w['grip'][1] - y0, 1)]
                 row['angle'] = w['angle']
@@ -270,7 +328,7 @@ def main():
         out = np.zeros_like(e); out[m] = e[m]
         Image.fromarray(out[by0:by1, bx0:bx1].astype(np.uint8)).save(ROOT + f'head_{hid}.png')
         heads[hid] = {'at': [int(bx0 - x0 + 0), int(by0 - y0)], 'size': [int(bx1 - bx0), int(by1 - by0)]}
-    meta = {'frameSize': [W, H], 'origin': origin, 'heads': heads, 'head': {'box': [int(hbox[0] - x0), int(hbox[1] - y0), int(hbox[2] - hbox[0]), int(hbox[3] - hbox[1])]},
+    meta = {'frameSize': [W, H], 'origin': origin, 'heads': heads, 'headPivot': [int(hbox[0] + (hbox[2] - hbox[0]) // 2 - x0), int(hbox[1] + 23 - y0)], 'head': {'box': [int(hbox[0] - x0), int(hbox[1] - y0), int(hbox[2] - hbox[0]), int(hbox[3] - hbox[1])]},
             'crop': [int(x0), int(y0)]}
     json.dump({'meta': meta, 'assets': rows}, open(SRC + 'strips.json', 'w'), ensure_ascii=False, indent=1, default=lambda o: o.item() if hasattr(o, 'item') else str(o))
     print(json.dumps(meta, default=lambda o: o.item()))

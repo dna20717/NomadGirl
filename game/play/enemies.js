@@ -428,7 +428,7 @@ export class Enemy {
     this.sprite.setTintFill(crit ? 0xffd27a : 0xffffff);
     s.time.delayedCall(70, () => this.alive && this.sprite.clearTint());
     s.fx.text(this.x + (Math.random() - 0.5) * 40, this.body.top - 10, String(damage) + (crit ? '!' : ''), { color: crit ? '#ffd27a' : '#ffffff', size: crit ? 56 : 42 });
-    s.fx.blood(this.x, this.chest, crit ? 18 : 10);
+    s.fx.bloodHit(this.x - dir * this.w * 0.25, this.chest - this.bodyH * 0.1, dir || 1, Math.max(0.5, Math.min(2.2, damage / 15)) * (crit ? 1.5 : 1), { machine: this.d.family === 'machine' });
     this.body.setVelocity(dir * (knockback ?? 0), this.kind === 'flyer' ? -(knockback ?? 0) * 0.2 : -(knockback ?? 0) * 0.35);
     this.stunUntil = time + 220; this.hitAt = time;
     if (this.state === 'duck') this.standUp(time);
@@ -458,8 +458,11 @@ export class Enemy {
     this.state = 'dead';
     this.body.enable = false;
     this.warn.setVisible(false); this.aim.clear(); this.bar.clear(); this.gear.clear();
-    this.scene.fx.blood(this.x, this.chest, 26);
+    const machine = this.d.family === 'machine';
+    this.scene.fx.bloodHit(this.x, this.chest, dir || 1, 2.2, { machine });
+    if (!machine && this.shape !== 'drone' && this.kind !== 'flyer') this.scene.time.delayedCall(450, () => this.scene.fx.pool(this.x - dir * this.h * 0.25, this.feet, this.h / 180));
     this.diedAt = time;
+    this.sprite.clearTint();   // a crit tints yellow for 70 ms; dying in it kept the colour
     if (this.look.anims?.death) {   // the kit falls on its back, lies a moment, then fades
       this.facing = dir < 0 ? 1 : -1;
       this.sprite.setFlipX(this.facing < 0);

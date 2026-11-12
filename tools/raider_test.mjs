@@ -111,6 +111,42 @@ const K = await page.evaluate(() => {
 check('Treffer spielt die Treffer-Animation', K.hit === 'hit', K);
 check('Tod fällt um (Tod-Animation)', K.dead === 'death' && K.frame > 2, K);
 
+// blood (Daniel, 12.11.2026: „mehr Treffer-Feedback in Form von Blutspritzern“): spray, stains on the floor, a pool when dying
+// (Phaser tweens run on real time: steps spread over real time so the droplets can land)
+const real = async ms => { for (let t = 0; t < ms; t += 100) { await page.evaluate(() => nomad.step(6)); await page.waitForTimeout(100); } };
+const b0 = await page.evaluate(() => {
+  const s = game.scene.getScene('play'), e = s.enemies.find(x => x.id === 'pistolero');
+  e.body.enable = true; e.sprite.setVisible(true);
+  const before = (s.fx.stains || []).length;
+  e.hit(s.now, 20, 50, 1, true, { kind: 'shot' });
+  return before;
+});
+await real(1400);
+const b1 = await page.evaluate(() => { const s = game.scene.getScene('play'), e = s.enemies.find(x => x.id === 'pistolero'); const n = (s.fx.stains || []).length; e.hit(s.now, 999, 50, 1, false, { kind: 'melee' }); return n; });
+await real(2400);
+const B = await page.evaluate(([b0, b1]) => ({ hitStains: b1 - b0, all: (game.scene.getScene('play').fx.stains || []).length - b0 }), [b0, b1]);
+check('Blut: Spritzer bleiben als Flecken liegen, beim Tod eine Lache', B.hitStains >= 2 && B.all > B.hitStains + 2, B);
+if (shots) {
+  await page.evaluate(() => { const s = game.scene.getScene('play'), e = s.enemies.find(x => x.id === 'pistolero'); s.cam.setZoom(1.6); s.cam.stopFollow(); s.cam.centerOn(e.x, e.feet - 120); s.atmosphere?.setEnabled?.(false); });
+  await page.evaluate(() => nomad.step(1));
+  await page.screenshot({ path: 'output/raider_blood.png' });
+}
+
+// banners go by themselves (Daniel: „Wieder auf den Beinen-Meldung verschwindet nicht“), every overlay has a ✕
+const ban = await page.evaluate(() => { const h = game.scene.getScene('play').hud; h.banner('Wieder auf den Beinen', 'Test'); return { shown: !h.bannerEl.hidden, x: !!h.bannerEl.querySelector('.ui-x') }; });
+await page.waitForTimeout(3800);
+const gone = await page.evaluate(() => game.scene.getScene('play').hud.bannerEl.hidden);
+check('Banner verschwindet nach 3,5 s von selbst und hat ein ✕', ban.shown && ban.x && gone, { ...ban, gone });
+const X = await page.evaluate(() => {
+  const h = game.scene.getScene('play').hud;
+  h.menu({ title: 'Test', items: [{ label: 'A', act: () => {} }] });
+  const menuX = h.menuEl.querySelector('.ui-x'); menuX?.click();
+  const menuClosed = h.menuEl.hidden;
+  h.toggleHelp(true); const helpX = h.help.querySelector('.ui-x'); helpX?.click();
+  return { menuX: !!menuX, menuClosed, helpX: !!helpX, helpClosed: h.help.hidden, load: !!document.querySelector('#load > .ui-x') };
+});
+check('✕ an Menü, Steuerung und Ladebalken schließt sie', X.menuX && X.menuClosed && X.helpX && X.helpClosed && X.load, X);
+
 check('keine Fehler in der Konsole', !errors.length, errors);
 console.log(`${ok} ok, ${bad} Fehler`);
 await browser.close();

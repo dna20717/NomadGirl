@@ -553,3 +553,13 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .inv-tip b { font: 22px/1 VT323, monospace; color: #ffd27a; letter-spacing: .02em; }
 .inv-tip small { color: #b9a2c8; }
 .inv-tip p { color: #e2d9ec; }
+
+/* one ✕ for every overlay (Daniel, 12.11.2026): top right, above everything in its box */
+.ui-x { position: absolute; top: 8px; right: 8px; z-index: 60; width: 30px; height: 30px; display: grid; place-items: center; padding: 0; border: 1px solid #3a2f45; border-radius: 7px;
+  background: rgba(23, 17, 31, .9); color: #f2eef7; font: 22px/1 var(--ui-font, Inter, sans-serif); cursor: pointer; pointer-events: auto; opacity: .75; transition: opacity .15s, border-color .15s, color .15s; }
+.ui-x:hover, .ui-x:focus-visible { opacity: 1; border-color: #ff2f8a; color: #ff7ac0; box-shadow: 0 0 10px rgba(255, 47, 138, .4); outline: none; }
+.hud-banner { pointer-events: auto; padding-right: 48px; }
+.hud-banner .ui-x { top: 6px; right: 6px; width: 26px; height: 26px; font-size: 18px; }
+.hud-dream .ui-x { position: fixed; top: 16px; right: 16px; }
+.bm > .ui-x { top: 74px; right: 14px; }
+.inv > .ui-x { top: -14px; right: -14px; }

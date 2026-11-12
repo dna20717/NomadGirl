@@ -60,3 +60,20 @@ test('Laden: der Bausatz lädt nur die Animationen der Waffenklasse, dazu Kopf, 
   assert.ok(ids.has('raider_heavy_attack') && ids.has('raider_none_death') && ids.has('raider_head_gasmask') && ids.has('icons_raider_weapons'));
   assert.ok(extra.some(([k]) => k === 'raider_heavy_attack#hands'));
 });
+
+test('Waffe springt in Schleifen nicht (Daniel, 12.11.2026: „Hammer glitcht beim Gehen“): Winkel ändert sich je Frame höchstens 60° (Rennen schwingt mit dem Arm)', () => {
+  for (const p of D.kits.raider.poses.filter(p => ['alert', 'walk', 'run'].includes(p.state) && p.class !== 'any')) {
+    const L = D.assets[p.look].layers;
+    L.forEach((l, i) => {
+      const n = L[(i + 1) % L.length], d = Math.abs(((n.angle - l.angle + 540) % 360) - 180);
+      assert.ok(d <= 60, `${p.look} Frame ${i + 1} → ${(i + 1) % L.length + 1}: ${d}°`);
+    });
+  }
+});
+
+test('Kopf fällt beim Tod mit (Daniel, 12.11.2026: „wenn NPCs sterben, bleibt der Kopf in der Luft hängen“)', () => {
+  const L = D.assets.raider_none_death.layers, last = L[L.length - 1];
+  assert.ok(last.head[1] > 120, `Kopf unten: ${last.head}`);
+  assert.ok(Math.abs(last.headAngle || 0) >= 45, `Kopf gedreht: ${last.headAngle}`);
+  assert.ok(D.kits.raider.headPivot);
+});

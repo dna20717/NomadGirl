@@ -59,6 +59,7 @@
    {"name": "Gelb", "color": "#ffd541"},
    {"name": "Blutrot", "color": "#b4202a"}
   ],
-  "offsets": [{"class": "pistol", "offset": [-4, 8]}]
+  "offsets": [{"class": "pistol", "offset": [-4, 8]}],
+  "headPivot": [119, 30]
  }
 }

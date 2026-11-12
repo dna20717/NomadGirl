@@ -12,6 +12,8 @@ export function createLoading(root, base) {
   el.innerHTML = '<div class="loading-track"><canvas></canvas><div class="loading-bar"><i></i></div><div class="loading-label"><span class="loading-text"></span><span class="loading-sub"></span><span class="loading-pct">0 %</span></div></div>';
   root.replaceChildren(el);
   root.classList.add('loading-on');
+  { const x = document.createElement('button'); x.className = 'ui-x'; x.title = 'Ausblenden'; x.textContent = '×';
+    x.onclick = () => { root.classList.remove('loading-on'); }; root.append(x); }
   const canvas = el.querySelector('canvas'), ctx = canvas.getContext('2d'), fill = el.querySelector('.loading-bar i');
   const pct = el.querySelector('.loading-pct'), text = el.querySelector('.loading-text'), track = el.querySelector('.loading-track');
   let cfg = { ...DEFAULTS }, leyla = null, drone = null, target = 0.02, shown = 0, finished = false, failed = false, raf = 0, t0 = performance.now();

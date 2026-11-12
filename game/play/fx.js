@@ -58,6 +58,72 @@ export class Fx {
   }
   blood(x, y, n = 14) { this.particles(x, y, n, 0xc0304a, { speed: 300, up: 1, life: 520, size: 2, gravity: 1800 }); }
 
+  // ---------- blood (Daniel, 12.11.2026: „ein wenig mehr Treffer-Feedback in Form von Blutspritzern“, Spiel › Kampf › Blut) ----------
+  // a spray in the direction of the hit (dir: +1 = to the right), a puff of red mist, droplets that fly, fall and stay where they
+  // land: a splat on the floor, a run down the wall. k = strength (≈ damage / 15; crits more). machine = sparks and oil instead.
+  bloodHit(x, y, dir, k = 1, { machine = false } = {}) {
+    const s = this.scene, B = s.data_.game?.combat?.blood || {};
+    if (B.enabled === false) return this.blood(x, y, 10);
+    if (machine) { this.sparks(x, y, 0xffd27a, Math.round(8 + 6 * k)); return this.spray(x, y, dir, k * 0.6, [0x1b1a1f, 0x2b2830, 0x3a3640], B); }
+    const base = B.color ? parseInt(String(B.color).replace('#', ''), 16) : 0xa01828;
+    const shade = (c, f) => ((Math.min(255, (c >> 16 & 255) * f) << 16) | (Math.min(255, (c >> 8 & 255) * f) << 8) | Math.min(255, (c & 255) * f)) >>> 0;
+    const cols = [base, shade(base, 0.7), shade(base, 0.5), shade(base, 1.25)];
+    const m = s.add.image(x + dir * 10, y, this.glowKey()).setTint(cols[1]).setDepth(12).setAlpha(0.55).setDisplaySize(40 * k + 30, 40 * k + 30);
+    s.tweens.add({ targets: m, alpha: 0, scale: m.scale * 1.8, x: m.x + dir * 30, duration: 260, ease: 'Quad.easeOut', onComplete: () => m.destroy() });
+    this.spray(x, y, dir, k, cols, B);
+  }
+  spray(x, y, dir, k, cols, B = {}) {
+    const s = this.scene, n = Math.round((8 + 10 * k) * (B.amount ?? 100) / 100);
+    for (let i = 0; i < n; i++) {
+      const size = 2 + Math.random() * 3.5 * Math.min(1.6, k), col = cols[i % cols.length];
+      const p = s.add.rectangle(x, y, size, size, col).setDepth(12);
+      // a cone in the hit direction, a little upward; a few fly back towards the attacker
+      const back = Math.random() < 0.15 ? -1 : 1, a = (dir * back > 0 ? 0 : Math.PI) + (Math.random() - 0.6) * 1.3 * (dir * back > 0 ? 1 : -1);
+      const v = (220 + Math.random() * 520) * Math.sqrt(k), vx = Math.cos(a) * v, vy = Math.sin(a) * v - 120;
+      let lx = x, ly = y;
+      s.tweens.addCounter({ from: 0, to: 1, duration: 900, onUpdate: tw => {
+        if (!p.active) return;
+        const t = tw.getValue() * 0.9, px = x + vx * t, py = y + vy * t + 2200 * t * t / 2;
+        if (B.decals !== false && (s.pointSolid?.(px, py) || (vy + 2200 * t > 0 && s.groundAt?.(px, py)))) {
+          const T = s.T || 64, wall = s.pointSolid(px, py) && !s.pointSolid(lx, py) && Math.abs(vx) > 80;
+          if (wall) this.splat(vx > 0 ? Math.floor(px / T) * T : Math.ceil(px / T) * T, py, col, size, 'wall');
+          else this.splat(px, Math.floor(py / T) * T, col, size, 'floor');
+          p.destroy(); return;
+        }
+        p.setPosition(px, py).setAngle(t * 400); lx = px; ly = py;
+      }, onComplete: () => p.destroy() });
+    }
+  }
+  // a stain that stays (Spiel › Kampf › Blut › Bleibt liegen); the oldest goes first
+  splat(x, y, col, size, where) {
+    const s = this.scene, B = s.data_.game?.combat?.blood || {}, g = s.add.graphics().setDepth(7.5);
+    this.stains ??= [];
+    if (where === 'wall') {
+      g.fillStyle(col, 0.9).fillEllipse(x, y, size * 0.9, size * 1.6);
+      const run = s.add.rectangle(x, y, Math.max(1.5, size * 0.4), 1, col, 0.85).setOrigin(0.5, 0).setDepth(7.5);
+      s.tweens.add({ targets: run, displayHeight: 8 + Math.random() * 22 * (size / 4), duration: 900 + Math.random() * 900, ease: 'Sine.easeOut' });
+      this.stains.push(run);
+    } else {
+      const w = size * (2 + Math.random() * 2.5);
+      g.fillStyle(col, 0.9).fillEllipse(x, y + 1, w, Math.max(3, size * 1.1));
+      if (Math.random() < 0.4) g.fillStyle(col, 0.8).fillCircle(x + (Math.random() - 0.5) * w * 1.6, y + 1, Math.max(1, size * 0.35));
+    }
+    this.stains.push(g);
+    while (this.stains.length > (B.max ?? 160)) this.stains.shift().destroy();
+    s.tweens.add({ targets: g, alpha: 0, delay: (B.stay ?? 20) * 1000, duration: 2500, onComplete: () => { g.destroy(); this.stains = this.stains.filter(o => o !== g); } });
+  }
+  // a pool under a fallen body that grows for a moment
+  pool(x, y, k = 1) {
+    const s = this.scene, B = s.data_.game?.combat?.blood || {};
+    if (B.enabled === false || B.decals === false) return;
+    const col = B.color ? parseInt(String(B.color).replace('#', ''), 16) : 0xa01828, T = s.T || 64;
+    const floor = s.groundAt?.(x, y + 4) ? Math.floor((y + 4) / T) * T : y;
+    const g = s.add.graphics().setDepth(7.4), st = { w: 6 };
+    (this.stains ??= []).push(g);
+    s.tweens.add({ targets: st, w: 70 * k, duration: 1400, delay: 350, ease: 'Sine.easeOut', onUpdate: () => g.clear().fillStyle(col, 0.85).fillEllipse(x, floor + 1, st.w, Math.max(3, st.w * 0.14)).fillStyle(0xffffff, 0.08).fillEllipse(x - st.w * 0.15, floor, st.w * 0.3, 2) });
+    s.tweens.add({ targets: g, alpha: 0, delay: (B.stay ?? 20) * 1000 + 1800, duration: 2500, onComplete: () => g.destroy() });
+  }
+
   // copy of a sprite that fades out (dash afterimage)
   ghost(sprite, color = 0x3fe0d0, alpha = 0.45, life = 220) {
     const g = this.scene.add.image(sprite.x, sprite.y, sprite.texture.key, sprite.frame.name)

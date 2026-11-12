@@ -625,7 +625,7 @@ export class PlayScene extends Phaser.Scene {
   hitstop(time, ms) { this.hitstopUntil = time + ms; this.physics.world.pause(); }
 
   // ---------- events ----------
-  onLeylaHit(dmg) { this.drone.react('hit'); this.cam.shake(120, 0.006); this.fx.blood(this.leyla.x, this.leyla.chest, 10); this.hud.hurt(); }
+  onLeylaHit(dmg) { this.drone.react('hit'); this.cam.shake(120, 0.006); this.fx.bloodHit(this.leyla.x, this.leyla.chest, -this.leyla.facing || 1, Math.max(0.5, Math.min(1.6, dmg / 15))); this.hud.hurt(); }
   onLeylaDown() {
     if (this.mode === 'run' && this.box && this.data_.tank?.enabled !== false && this.data_.camp?.koReturn !== 'camp') return this.runKnockout();
     this.hud.banner('AvA schleppt dich raus …', 'Die Run-Beute bleibt liegen.');
@@ -703,7 +703,7 @@ export class PlayScene extends Phaser.Scene {
     if (!this.level && this.enemies.every(x => !x.alive) && !this.cleared) {
       this.cleared = true;
       this.drone.react('cleared');
-      this.time.delayedCall(700, () => this.hud.banner('Raum geräumt', `${this.clock()} · ${this.kills} Kills · ${this.deltas} Δ · R für nochmal`));
+      this.time.delayedCall(700, () => this.hud.banner('Raum geräumt', `${this.clock()} · ${this.kills} Kills · ${this.deltas} Δ · R für nochmal`, 0));
     }
   }
   clock() { const s = Math.floor(this.elapsed / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
