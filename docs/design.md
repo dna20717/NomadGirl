@@ -7,7 +7,7 @@ Stand 07.11.2026 · Entwurf von Daniel, mit Ava überarbeitet. Die Zahlen im Spi
 NomadGirl ist ein 2D-Action-Roguelite mit Cosy-Basisbau: Leyla plündert gefährliche Orte und lebt dazwischen in ihrem rollenden Zuhause, dem Rig.
 
 - **Heldin:** Leyla, Schrottsammlerin in den Wastelands rund um BigCityDelta.
-- **Rig:** Zu Beginn der Van mit einem leeren Modul-Anhänger (die ersten Werkstätten liegen verpackt bereit), später ein LKW mit gestapelten Containern.
+- **Rig:** Zu Beginn der Van, die ersten Werkstätten liegen verpackt bereit, später ein LKW mit gestapelten Containern. **Neu (Daniel, 12.11.2026): keine Modul-Anhänger mehr, nur noch die variablen Container** (Umbau offen, siehe unten).
 - **Ziel:** Schrott, Ressourcen, Lebensmittel und Ausrüstung sammeln.
 - **Gefahr:** Mutanten, Gegner und Dinge, über die man in BigCityDelta lieber nicht spricht.
 - **Prinzip:** High Risk, High Reward. Je tiefer Leyla in einen Ort vordringt, desto besser die Beute und desto größer der mögliche Verlust.
@@ -110,8 +110,19 @@ Grundsatz: Die Ziele kommen aus der Mechanik, eine Herleitung aus der Story brau
   - **Bio:** Mutanten, Kochen, Proben (führt zum Heilmittel)
 - **Erweiterbar unter der Haube:** Ressourcen kommen aus Daten (beliebig viele). Vorgesehen ist z. B. **„Dunkelheit“**: Wer den Schwierigkeitsgrad steigert, schaltet deutlich mehr der anderen Ressourcen frei (Multiplikator je Stufe). Im Spiel vorerst unsichtbar.
 - Das **Heilmittel** ist als letzter Knoten gedacht (Vorschlag Ava, offen).
+- **Look (Daniel, 12.11.2026):** wie Graveyard Keeper 2: **horizontal**, Knoten mit **Bildern** von dem, was man freischaltet, Linien dazwischen; **vertikale Tabs** für die Ressourcen-Arten (Technik, Wissen, Bio; finale Namen offen). Komplett für Controller optimiert (Stick/Steuerkreuz springt von Knoten zu Knoten, LB/RB oder ↑↓ wechselt die Tabs, UI-Grammatik wie überall).
+- **Erster Ast: Cryo-Tank** (Wartung, bessere Kühlung, langsamerer Verfall), damit der Druck sofort spürbar wird.
+
+### Cryo-Tank (Daniel, 12.11.2026)
+
+- **Tempo:** ohne Pflege stirbt AvA nach etwa **10 Runs** (umgerechnet in Ereignis-Zeit; Wert in der Werkstatt).
+- **Dramatischer visueller Verfall am Tank selbst** (nicht an der ganzen Werkbank), über **mehrere Animationsphasen** hinweg (z. B. intakt → Frost-Risse → Lecks/Dampf → flackernde Anzeige/Alarm → kurz vor dem Ende). Braucht eigene Grafik (PixelLab).
+- **Kann nicht verkauft werden** (auch nicht auf den Händler-Platz gezogen).
+
 
 ## Rig & Werkstätten
+
+> **Änderung 12.11.2026 (Daniel, noch nicht gebaut):** Modul-Anhänger fallen weg, Werkstätten stecken nur noch in variablen Containern. Die Absätze unten zu Anhängern, Deichselkästen und Ankoppeln gelten bis zum Umbau. Offen: worauf die Container stehen (Flachbett-Chassis? direkt auf dem LKW?), was aus den Deichselkästen wird, wie alte Spielstände mit Anhängern umziehen (`repairSave`).
 
 Das Rig ist Leylas Zuhause, Werkstatt und Fahrzeug zugleich. Es wird im Querschnitt gezeigt wie ein Puppenhaus.
 
