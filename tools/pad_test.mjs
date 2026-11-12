@@ -193,6 +193,14 @@ s = await ev(() => { const s = game.scene.getScene('play'), d = s.drone, l = s.l
   setPad({ axes: [0, 0, 1, 0] }); nomad.step(30); setPad(); const moved = Math.round(l.x - x0), used = +(b0 - d.battery).toFixed(2), still = d.riding;
   d.parkAt = null; d.parkUntil = 0; nomad.step(30, ['left']); nomad.step(200); return { on, moved, used, still }; });
 check('Auf Mama-Bot: rechter Stick lässt beide schweben, kostet viel Akku', s.on && s.moved > 40 && s.still && s.used > 0.3, s);
+// hanging at her grip, the right stick carries Leyla along; parts on Mama-Bot give more battery
+s = await ev(() => { const s = game.scene.getScene('play'), d = s.drone, l = s.leyla; nomad.step(400); d.battery = 1; d.emptyUntil = 0;
+  const top = l.feet - 330, y = top + d.half - (d.d.platform?.inset ?? 14); d.x = l.x + 40; d.y = y; d.parkAt = [d.x, y]; d.parkUntil = s.time.now + 1e7; nomad.step(3);
+  nomad.step(1, ['jump'], ['jump']); nomad.until(() => l.state === 'hang', 60, ['jump']); const st = l.state, x0 = l.x;
+  setPad({ axes: [0, 0, -1, 0] }); nomad.step(20); setPad(); const moved = Math.round(l.x - x0), still = l.state;
+  const wear = s.box.save.inv.wear, before = d.batteryBonus(); wear.core = 'hochleistungszelle'; const after = d.batteryBonus(); wear.core = null;
+  nomad.step(1, [], ['down']); d.parkAt = null; d.parkUntil = 0; nomad.step(200); return { st, moved, still, before, after }; });
+check('Am Greifarm hängend: rechter Stick fliegt Leyla mit; Hochleistungszelle = mehr Akku', s.st === 'hang' && s.moved < -25 && s.still === 'hang' && s.after - s.before === 60, s);
 await ev(() => nomad.release());
 await page.keyboard.down('d'); await page.waitForTimeout(1500); s = await sc(); await page.keyboard.up('d');
 check('Tastatur geht weiter, Hinweis zeigt wieder E', Math.abs(s.vx) > 50 && !s.menu && s.key === 'E' && !s.icon, s);

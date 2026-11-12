@@ -363,7 +363,8 @@ export class Leyla {
     }
     if (input.up.pressed || input.jump.pressed) {
       this.jumpAt = -1e9;
-      const z = this.size, top = { x: L.x + L.dir * (z.w / 2 + 4), feet: L.y };
+      // hanging at Mama-Bot's grip: up onto her top
+      const z = this.size, dr = this.scene.drone, top = L.point && dr ? { x: dr.x, feet: dr.platformTop() } : { x: L.x + L.dir * (z.w / 2 + 4), feet: L.y };
       if (this.scene.rectFree(top.x - z.w / 2 + 2, top.feet - z.crouchH, z.w - 4, z.crouchH - 2)) return this.startMantle(time, top);
     }
     if (input.down.pressed) this.leaveHang(time);

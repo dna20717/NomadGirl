@@ -121,6 +121,23 @@ v = await page.evaluate(() => {
 });
 check('Mama-Bot: Leyla steht auf ihr, der Akku läuft leer, dann fällt sie runter', v.on.feet > 100 && v.on.carrying && v.on.bat < 1 && v.off.feet < 2 && v.off.empty, v);
 check('Mama-Bot: Leyla klettert seitlich an ihr hoch', v.climb.seen.includes('mantle') && v.climb.feet > 100, v.climb);
+// easier (Daniel, 12.11.2026): feet in her upper half = stands right on top; near the grip at her back she grabs it, up = onto her; parts give more battery
+v = await page.evaluate(() => {
+  const n = nomad, s = game.scene.getScene('play'), l = s.leyla, d = s.drone, out = {};
+  const park = (x, top) => { const y = top + d.half - (d.d.platform?.inset ?? 14); d.x = x; d.y = y; d.parkAt = [x, y]; d.parkUntil = s.time.now + 1e7; };
+  P.tp(12, 18); n.step(10); const g0 = l.feet; d.battery = 1; d.emptyUntil = 0;
+  park(l.x, g0 - 150); n.step(3); n.step(1, ['jump'], ['jump']); n.step(6, ['jump']); n.until(() => d.riding || (l.body.blocked.down && l.feet >= g0 - 1), 80, ['jump']);
+  out.snap = { riding: d.riding, up: Math.round(g0 - l.feet) };
+  d.parkAt = null; d.parkUntil = 0; n.step(30, ['left']); n.step(400); P.tp(12, 18); n.step(10); d.battery = 1; d.emptyUntil = 0;
+  park(l.x + 40, g0 - 330); n.step(3);
+  n.step(1, ['jump'], ['jump']); n.until(() => l.state === 'hang', 60, ['jump']); out.hang = { st: l.state, point: !!l.ledge?.point };
+  n.step(1, [], ['up']); n.step(60); out.up = { riding: d.riding, up: Math.round(g0 - l.feet) };
+  const base = d.batteryBonus(); s.box && 0; out.bonus = base;
+  d.parkAt = null; d.parkUntil = 0; n.step(30, ['left']); n.step(300);
+  return out;
+});
+check('Mama-Bot: Füße in ihrer oberen Hälfte = sie steht gleich drauf', v.snap.riding && v.snap.up > 120, v.snap);
+check('Mama-Bot: Leyla greift den Greifarm hinten von selbst und zieht sich hoch', v.hang.st === 'hang' && v.hang.point && v.up.riding && v.up.up > 250, v);
 // forgiving grab (Daniel, 12.11.2026: „zu fummelig“): flying towards the edge without holding a direction still catches it; ↓ held never does
 v = await page.evaluate(() => {
   const n = nomad, l = game.scene.getScene('play').leyla, run = keys => { P.tp(30.75, 21); n.step(15); n.step(1, ['left']); n.step(12);

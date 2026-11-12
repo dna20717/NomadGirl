@@ -71,6 +71,8 @@
    {"item": "kupferkabel", "weight": 3, "min": 1, "max": 2},
    {"item": "chip", "weight": 1, "min": 1, "max": 1},
    {"item": "zahnraeder", "weight": 2, "min": 1, "max": 1},
+   {"item": "hochleistungszelle", "weight": 1, "min": 1, "max": 1},
+   {"item": "turbinenmodul", "weight": 1, "min": 1, "max": 1},
    {"item": "schrauben", "weight": 2, "min": 2, "max": 4},
    {"item": "reflex_booster", "weight": 1, "min": 1, "max": 1},
    {"item": "juwelenchip", "weight": 1, "min": 1, "max": 1},

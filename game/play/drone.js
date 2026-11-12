@@ -176,12 +176,10 @@ export class Drone {
     this.flying = false;
     if (this.carrying) {
       const P = this.d.platform || {}, st = this.scene.pad?.right || [0, 0], m = Math.hypot(st[0], st[1]);
-      if (this.riding && P.fly !== false && m > 0.2 && this.battery > 0) {
+      const hanging = l.state === 'hang' && l.ledge?.drone;
+      if ((this.riding || hanging) && P.fly !== false && m > 0.2 && this.battery > 0) {
         const v = (P.flySpeed ?? 150) * Math.min(1, m) * dt / 1000, dx = st[0] / m * v, dy = st[1] / m * v * (st[1] < 0 ? (P.flyUp ?? 60) / 100 : 1);
-        const b = l.body;
-        if (this.scene.rectFree(b.x + dx + 2, b.y + dy, b.width - 4, b.height - 2)) {
-          this.x += dx; this.y += dy; b.x += dx; b.y += dy; b.prev.x += dx; b.prev.y += dy; this.flying = true;
-        }
+        if (this.carryLeyla(dx, dy)) { this.x += dx; this.y += dy; this.flying = true; }
       }
       tx = this.x; ty = this.y;
     }
@@ -225,10 +223,39 @@ export class Drone {
     });
   }
   platformTop() { return this.y - this.half + (this.d.platform?.inset ?? 14); }
+  // move Leyla along with her (standing on her or hanging at her): false if Leyla would end up in a wall
+  carryLeyla(dx, dy) {
+    const l = this.scene.leyla, b = l.body;
+    if (!this.scene.rectFree(b.x + dx + 2, b.y + dy, b.width - 4, b.height - 2)) return false;
+    b.x += dx; b.y += dy; b.prev.x += dx; b.prev.y += dy;
+    if (l.ledge?.drone) { l.ledge.x += dx; l.ledge.y += dy; }
+    return true;
+  }
+  // the grip at her back (Drohne › Plattform › Hängen am Anbauteil, the Greifarm): world point
+  gripPoint() {
+    const P = this.d.platform || {}, name = P.hangPart || 'Greifarm', part = (this.partImgs || []).find(p => p.r.name === name);
+    const [ax, ay] = part?.img.visible && part.r.at ? part.r.at : P.hangAt || [40, 80], [ox, oy] = this.org || [0, 0], look = this.sprite.scaleX < 0 ? -1 : 1;
+    return { x: this.x + (ax - ox) * this.scale * look, y: this.y + (ay - oy) * this.scale };
+  }
+  // how much longer her battery lasts with the parts on her (Gegenstände › Mama-Bot: mehr Akku, summed up)
+  batteryBonus() {
+    const wear = this.scene.box?.save?.inv?.wear || {}, I = this.scene.data_.items || {};
+    return ['bow', 'tail', 'core', 'module'].reduce((n, k) => n + (I[wear[k]]?.battery || 0), 0);
+  }
   updatePlatform(time, dt) {
     const P = this.d.platform || {}, s = this.scene, l = s.leyla;
     if (!this.plat || !l) return;
     const w = P.width ?? 110, top = this.platformTop(), halfW = l.size.w / 2;
+    // easy to get on (Daniel, 12.11.2026: „zu schwer, sich an die Drohne zu hängen … lass Leyla direkt auf bzw. in der oberen Hälfte stehen“):
+    // in the air with her feet in Mama-Bot's upper half she simply stands on top; near the grip at her back she grabs it by herself
+    const air = l.state === 'normal' && !(l.body.blocked.down || l.body.touching.down) && s.now - (l.lastGround ?? -1e9) > 100 && time >= (l.dropUntil || 0);
+    if (this.platOn && air && l.body.velocity.y > -250 && Math.abs(l.x - this.x) < w / 2 + halfW * 0.5 && l.feet >= top - 12 && l.feet <= top + (P.snap ?? 70)) {
+      const b = l.body, dy = top - l.feet; b.y += dy; b.prev.y = b.y; b.setVelocityY(0);
+    } else if (this.platOn && air && time >= (l.noGrabUntil || 0) && P.grab !== 0) {
+      const g = this.gripPoint(), h = l.hand(), dir = l.facing || 1;
+      const L = { x: g.x + dir * halfW, y: g.y, dir, drone: true, point: true };
+      if (Math.hypot(h.x - g.x, h.y - g.y) < (P.grab ?? 70) && l.hangFits(L)) l.startHang(L);   // only where her legs hang free
+    }
     // standing on her, hanging at her edge or pulling up onto her
     const onTop = this.platOn && (l.body.blocked.down || l.body.touching.down) && Math.abs(l.feet - top) < 10 && Math.abs(l.x - this.x) < w / 2 + halfW;
     this.carrying = !!(onTop || l.ledge?.drone); this.riding = !!onTop;
@@ -237,7 +264,8 @@ export class Drone {
     const cap = (P.battery ?? 4) * 1000 * (1 + (this.batteryBonus?.() || 0) / 100);
     if (this.carrying) {
       this.battery = Math.max(0, this.battery - dt / cap * (this.flying ? P.flyDrain ?? 3 : 1));
-      this.y += (P.sag ?? 12) * (1 - this.battery) * dt / 1000;   // the motors labour: she sinks a little
+      const sag = (P.sag ?? 12) * (1 - this.battery) * dt / 1000;   // the motors labour: she sinks a little (Leyla with her)
+      if (l.state === 'hang' && l.ledge?.drone) { if (this.carryLeyla(0, sag)) this.y += sag; } else this.y += sag;
       if (this.battery <= 0) this.empty(time);
     } else this.battery = Math.min(1, this.battery + dt / ((P.recharge ?? 6) * 1000));
     this.plat.setPosition(this.x, top + 8); this.plat.body.updateFromGameObject();

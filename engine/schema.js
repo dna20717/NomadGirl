@@ -312,7 +312,10 @@ export const AREAS = {
         num('platform.width', 'Breite', { unit: 'px', min: 40 }), num('platform.inset', 'Oberkante unter dem Scheitel', { unit: 'px', hint: 'Wie tief die Standfläche unter ihrer Oberkante liegt' }), num('platform.sag', 'Sinkt beim Tragen', { unit: 'px/s', min: 0, hint: 'Je leerer der Akku, desto mehr' }),
         bool('platform.fly', 'Schweben mit Leyla', { hint: 'Steht Leyla auf ihr, bewegt der rechte Stick beide (Daniel, 12.11.2026: „kurz schweben ist ok, aber mit dem Gewicht nicht lange“)' }),
         num('platform.flySpeed', 'Schweben: Tempo', { unit: 'px/s', min: 0 }), num('platform.flyUp', 'Schweben: nach oben', { unit: '%', min: 0, max: 100, hint: 'Steigen ist mit Last langsamer' }),
-        num('platform.flyDrain', 'Schweben: Akku-Verbrauch', { unit: '×', min: 1, step: 0.5, hint: 'So viel schneller leert sich der Akku beim Schweben' })] },
+        num('platform.flyDrain', 'Schweben: Akku-Verbrauch', { unit: '×', min: 1, step: 0.5, hint: 'So viel schneller leert sich der Akku beim Schweben' }),
+        num('platform.snap', 'Aufsteigen: Fangbereich', { unit: 'px', min: 0, hint: 'Leyla in der Luft mit den Füßen bis so weit unter der Standfläche (obere Hälfte): sie steht sofort drauf' }),
+        text('platform.hangPart', 'Hängen am Anbauteil', { hint: 'Name aus der Tabelle Anbauteile (leer = Greifarm): dort hält Leyla sich fest' }), point('platform.hangAt', 'Griff ohne Teil', { unit: 'px', hint: 'Bildpixel der Hülle, wenn das Teil fehlt' }),
+        num('platform.grab', 'Hängen: Fangbereich', { unit: 'px', min: 0, hint: 'So nah müssen Leylas Hände am Griff sein (in der Luft greift sie von selbst)' })] },
       { title: 'Gummiband', fields: [bool('leash.enabled', 'Rechter Stick zieht Mama-Bot', { hint: 'Daniel, 12.11.2026: „sanft, wie an einem Gummiband; je weiter weg, desto höher der Widerstand; loslassen = zurück“' }),
         num('leash.reach', 'Reichweite', { unit: 'px', min: 0, hint: 'So weit kommt sie bei voll gedrücktem Stick von ihrer Position weg' }), num('leash.stiffness', 'Widerstand', { min: 0.1, step: 0.1, hint: 'Größer = am Anfang leicht, nach außen immer zäher' }),
         num('leash.smooth', 'Nachziehen', { min: 0.01, max: 1, step: 0.01, hint: 'Wie schnell sie dem Stick folgt (außen langsamer)' }), bool('leash.aimLight', 'Scheinwerfer folgt dem Stick', { hint: 'Der Lichtkegel zeigt in Stick-Richtung, solange gezogen wird' }),
@@ -538,7 +541,8 @@ export const AREAS = {
       { title: 'Ausrüstung', fields: [select('wear', 'Trägt man als', [['', '—'], ...WEAR_SLOTS], { hint: 'Kopf und Rüstung an Leyla, Implantate in ihrem Körper (nur im Camp einbauen), Teile an Mama-Bot' }),
         num('stats.defense', 'Abwehr', { unit: '%', hint: 'Weniger Schaden, zählt mit Buffs zusammen (höchstens 90 %)' }), num('stats.health', 'Leben', { unit: 'LP' }), num('stats.damage', 'Schaden', { unit: '%' }), num('stats.speed', 'Tempo', { unit: '%' }),
         num('strain', 'Belastung', { min: 0, hint: 'Nur Implantate: zusammen höchstens Leyla › Inventar › Belastung höchstens' }),
-        ref('partLook', 'An der Drohne', 'assets', { hint: 'Nur Drohnenteile: Bild an Mama-Bot (Drohne › Anbauteile, Spalte Gegenstand)' })] },
+        ref('partLook', 'An der Drohne', 'assets', { hint: 'Nur Drohnenteile: Bild an Mama-Bot (Drohne › Anbauteile, Spalte Gegenstand)' }),
+        num('battery', 'Mama-Bot: mehr Akku', { unit: '%', hint: 'Nur Drohnenteile (Daniel, 12.11.2026: „bessere Teile machen die Drohne stärker“): so viel länger trägt sie Leyla, zählt über alle Teile zusammen' })] },
     ],
     check: (x, report, p) => {
       iconCheck(x, report, p);
