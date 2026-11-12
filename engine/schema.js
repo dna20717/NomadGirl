@@ -752,7 +752,10 @@ export const AREAS = {
         num('view.swing', 'Pendeln', { unit: '%', min: 0, max: 300, hint: 'Wie stark ein Teil an der Maus schwingt (schwere Teile schwingen träger)' }),
         num('view.snap', 'Ankuppeln ab', { unit: 'px', min: 40, hint: 'So nah muss ein Anhänger an eine Kupplung' }),
         num('view.shake', 'Wackeln beim Einrasten', { unit: '%', min: 0, max: 200 }), num('view.volume', 'Lautstärke der Bau-Töne', { unit: '%', min: 0, max: 100 }),
-        num('view.cursorSpeed', 'Bau-Cursor: Tempo (Controller, Tastatur)', { unit: 'px/s', min: 100, max: 4000, hint: 'Gehalten ab 450 ms fast doppelt so schnell' })] },
+        num('view.cursorSpeed', 'Bau-Cursor: Tempo (Controller, Tastatur)', { unit: 'px/s', min: 100, max: 4000, hint: 'Gehalten ab 450 ms fast doppelt so schnell' }),
+        bool('view.leylaFire', 'Leyla setzt sich ans Feuer', { hint: 'Daniel, 12.11.2026: „im Bau-Modus nur noch die Drohne steuern, Leyla setzt sich ans Feuer“. Mama-Bot erledigt dann auch das Werkeln' }),
+        bool('view.droneBuilds', 'Mama-Bot trägt die Teile', { hint: 'Sie fliegt dem Zeiger bzw. Bau-Cursor nach, ein gepacktes Teil hängt unter ihr' }),
+        num('view.droneAbove', 'Mama-Bot über dem Zeiger', { unit: 'px', min: 0 }), num('view.droneFollow', 'Mama-Bot folgt', { unit: '%', min: 1, max: 100, hint: 'Wie schnell sie dem Zeiger folgt' })] },
       { title: 'Werkeln', fields: [bool('work.enabled', 'Leyla werkelt', { hint: 'An: nach jedem Einrasten läuft Leyla hin und schraubt, „Rückgängig“ nur, solange sie nicht fertig ist. Aus (Daniel, 09.11.2026): alles sofort, „Rückgängig“ für jede Aktion bis „Fertig“' }), num('work.seconds', 'Leyla schraubt', { unit: 's', min: 0, hint: 'Nach jedem Einrasten läuft sie hin und schraubt so lange; solange sie nicht fertig ist, geht „Rückgängig“' }),
         num('work.perHour', 'Dazu pro Stunde Bauzeit', { unit: 's', min: 0 })] },
       { title: 'Rig-Teile am Van', fields: [

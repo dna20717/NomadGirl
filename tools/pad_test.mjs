@@ -181,6 +181,7 @@ check('Neues Spiel: B bricht ab', !s, s);
 // the keyboard still works
 // right stick pulls Mama-Bot like on a rubber band (Daniel, 12.11.2026): full stick goes far, half stick more than half as far (it gets heavier outside), release = back
 s = await ev(() => { const sc = game.scene.getScene('play'), d = sc.drone, l = sc.leyla, off = () => Math.round(d.x - l.x);
+  nomad.step(3, ['right']); nomad.step(30);   // facing right (after building she got up from the fire)
   setPad({ axes: [0, 0, 1, 0] }); nomad.step(150); const full = off(), aim = d.aim;
   setPad({ axes: [0, 0, 0.5, 0] }); nomad.step(150); const half = off();
   setPad(); nomad.step(60); const leashed = d.leashed; nomad.step(60); return { full, half, aim, leashed, aimAfter: d.aim, reach: d.d.leash?.reach }; });

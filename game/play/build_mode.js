@@ -59,6 +59,8 @@ export class BuildMode {
     this.gfx = s.add.graphics().setDepth(35);
     this.labels = [];
     s.hud.prompt(null); s.hud.inv?.close();
+    // Daniel, 12.11.2026: „im Bau-Modus soll man nur noch die Drohne steuern und Leyla setzt sich ans Feuer“ (Rig-Bau › Bau-Modus › Leyla ans Feuer)
+    this.atFire = V.leylaFire !== false && this.sitAtFire();
     // camera: from the yard to the van's nose, the ground low in the picture
     const x0 = (geo.yard?.x0 ?? geo.rigRoom[0]) - 80, x1 = geo.vanRight + 120, base = s.data_.game?.camera?.zoom || 1;
     const z = clamp(s.scale.width * 0.96 / (x1 - x0), (V.minZoom ?? 30) / 100, base);
@@ -75,9 +77,31 @@ export class BuildMode {
     s.input.on('pointerdown', this.onDown); s.input.on('pointermove', this.onMove); s.input.on('pointerup', this.onUp); s.input.on('pointerupoutside', this.onUp);
     this.draw();
   }
+  // Leyla goes to the campfire and sits down (no time passes, no healing: she just waits there); a dust puff where she was
+  sitAtFire() {
+    const s = this.scene, l = s.leyla, C = this.camp.C, S = C.fire?.sit || {}, fx = this.camp.geo.fireX;
+    if (fx == null || !l?.alive || !S.look || !s.textures.exists(S.look)) return false;
+    if (l.state === 'sit') return true;
+    s.fx.puff?.(l.x, l.feet - 10, 0xb9a2c8);
+    const side = l.x >= fx ? 1 : -1;
+    const x = fx + side * (S.distance ?? 150);
+    l.setStanding?.(); l.body.reset(x, this.camp.ground - l.size.h / 2); l.body.setVelocity(0, 0);   // down on the ground by the fire, also from a container upstairs
+    l.startSit(S, x, -side, null);
+    return true;
+  }
+  // where Mama-Bot flies while building: above the part in the claw, above the cursor / pointer, or to a job
+  droneTarget() {
+    const d = this.drag, j = this.job, z = Math.max(0.3, this.scene.cam.zoom), V = this.B.view || {}, up = (V.droneAbove ?? 60) / Math.min(1, z * 1.6);
+    if (d) return { x: d.x, y: d.y - up, smooth: (V.droneFollow ?? 30) / 100 };
+    if (j && this.atFire) return { x: j.fx, y: j.fy - 150, smooth: 0.12 };
+    const p = this.cur?.on ? this.world({ x: this.cur.x, y: this.cur.y }) : this.pointer;
+    return p ? { x: p.x, y: p.y - up, smooth: (V.droneFollow ?? 30) / 100 } : null;
+  }
   close() {
     if (!this.active) return;
     const s = this.scene, cam = s.cam, back = this.camBack;
+    if (s.drone) s.drone.build = null;
+    if (this.atFire && s.leyla.state === 'sit' && s.leyla.sit && !s.leyla.sit.up) s.leyla.sit.up = s.time.now;   // back to the player: she gets up
     if (this.drag) this.cancelDrag(true);
     this.peek(null);
     // Leyla finishes the rest in no time (the time has been counted already)
@@ -634,10 +658,15 @@ export class BuildMode {
     this.working = false;
     if (!this.job && this.jobs.length) { this.job = this.jobs.shift(); this.job.state = 'walk'; }
     const j = this.job;
-    if (j) {
+    if (j && this.atFire) {   // Mama-Bot does the work: flies there, then sparks and ratchet
+      const dr = s.drone, near = !dr || Math.hypot(dr.x - j.fx, dr.y - (j.fy - 150)) < 40;
+      if (j.state === 'walk' && near) { j.state = 'work'; j.at = now; }
+    } else if (j) {
       const dx = j.x - l.x;
       if (j.state === 'walk' && Math.abs(dx) > 16) { out[dx > 0 ? 'right' : 'left'] = { down: true, pressed: false }; if (Math.abs(dx) < 200) out.walk = { down: true, pressed: false }; }
       else if (j.state === 'walk') { if (Math.abs(l.body.velocity.x) < 8) { j.state = 'work'; j.at = now; l.facing = j.fx >= l.x ? 1 : -1; } }
+    }
+    if (j) {
       if (j.state === 'work') {
         this.working = true;
         if (now - (j.tick || 0) > 260) { j.tick = now; s.fx.sparks(j.fx + (Math.random() - 0.5) * 60, j.fy, 0xffd27a, 4); this.sfx.ratchet(); }
@@ -654,6 +683,7 @@ export class BuildMode {
   update(time, dt) {
     if (!this.active) return;
     const s = this.scene, g = this.gfx.clear(), d = this.drag, z = s.cam.zoom, D = this.D;
+    if (s.drone) s.drone.build = this.B.view?.droneBuilds === false ? null : this.droneTarget();
     if (this.msg?.until && time > this.msg.until) { this.msg = null; this.draw(); }
     for (const t of this.labels) t.destroy();
     this.labels = [];

@@ -164,6 +164,8 @@ export class Drone {
       this.aim = Math.atan2(st[1], st[0]); this.leashed = true; this.roamTo = null;
     } else if (this.leashed) { this.leashed = false; this.aimUntil = time + (G.aimHold ?? 600); }
     if (!this.leashed && this.aim != null && time > (this.aimUntil || 0)) this.aim = null;
+    // building the rig (build_mode.js): she is the hand that carries the parts, Leyla sits at the fire
+    if (this.build) { tx = this.build.x; ty = this.build.y; smooth = this.build.smooth ?? 0.3; this.roamTo = null; }
     // docked on a workbench (Werkstätten › Benutzen › Mama-Bot dockt an): flies there and sits still
     if (this.dock) { if (time > this.dock.until) this.dock = null; else { tx = this.dock.x; ty = this.dock.y; smooth = 0.07; } }
     const k = 1 - Math.pow(1 - Math.min(1, smooth), dt / 16.67);

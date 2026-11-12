@@ -41,6 +41,10 @@ await ev(() => { nomad.save().deltas = 400; nomad.take(); nomad.step(5); nomad.s
 let b = await build();
 check('B zoomt raus in den Bau-Modus', b.open && b.zoom < 1 && b.rig === 'van[schlafkoje@0 warroom@1] wohnanhaenger[kochnische@0 werkbank@1 lagerregal@2]', b);
 check('Budgets: 900/1500 kg, Energie ±0, 400 Δ', b.budgets.weight === 900 && b.budgets.pull === 1500 && b.budgets.power.net === 0 && b.deltas === 400, b);
+// Daniel, 12.11.2026: building = steering Mama-Bot only, Leyla sits at the fire
+await page.mouse.move(700, 400); await page.waitForTimeout(30); await page.mouse.move(720, 420); await ev(() => nomad.step(60));
+const fire = await ev(() => { const s = game.scene.getScene('play'), d = s.drone, p = s.hud.build.pointer; return { st: s.leyla.state, dx: Math.round(Math.abs(s.leyla.x - s.camp.geo.fireX)), build: !!d.build, near: p ? Math.round(Math.hypot(d.x - d.build.x, d.y - d.build.y)) : null }; });
+check('Bau-Modus: Leyla sitzt am Feuer, Mama-Bot folgt dem Zeiger', fire.st === 'sit' && fire.dx < 300 && fire.build && fire.near < 30, fire);
 const x0 = await ev(() => nomad.state().leyla.x);
 await ev(() => nomad.step(20, ['right']));
 check('Tasten steuern Leyla beim Bauen nicht', Math.abs((await ev(() => nomad.state().leyla.x)) - x0) < 2);
