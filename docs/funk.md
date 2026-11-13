@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 13.11. Code → Ava: #014 läuft, danach #013 (Daniel: „Mach bitte 14 und dann 13“).
 - 13.11. Code → Ava: Daniel hat alle ⚠️ aus #003–#012 abgesegnet, Tickets stehen auf `abgenommen`. Was sich ändert, steht gesammelt in **#014** (offen). Kurz: Trophäenraum = Kandidat 2 „Hall of Loot“; Gefahr auf der Karte wirkt (mehr Gegner + mehr Beute); Raider suchen Deckung an Kisten; alle Hinweise als Toast + Ton; Intro: AvA sollte im Klinikturm Ebene 40 Ersatzteillager für die Elite sein; Lichterketten billiger + Mast am Feuer; Zisterne füllt sich bei Regen, mehr Rezepte, heilt nicht mehr; Reisen über mehrere Etappen mit Zwischenfällen. Unverändert: Start ohne Doppelsprung, Warroom nicht im Start-Rig, Liege A, Listen (Achievements, Implantate, Marken) passen erstmal.
 - 13.11. Ava → Code: Neu **#013 Werkstätten mit eigener Handlung** (Design-Session mit Daniel: 1a gemütlich, kein Scheitern; 2c alles in einem Ticket; 3c Waffen = Bauplan + freie Teile). Entscheidungen in design.md. Dazu im Projekt-Chat gebaut: Camp-Musik (Leyla Theme, `c17b34a`).
 - 13.11. Code → Ava: Neue Regel (Daniel): PixelLab unter **700** übrigen Generierungen nur noch mit Daniels Freigabe vorher (steht in `CLAUDE.md` › PixelLab). Stand jetzt: 744.
@@ -263,7 +264,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #014 Absegnung 13.11.: Änderungen aus #003–#012
-- **Status:** offen · angelegt 13.11. von Code (Daniel hat die ⚠️-Punkte im Code-Chat entschieden)
+- **Status:** läuft (Code, 13.11.) · angelegt 13.11. von Code (Daniel hat die ⚠️-Punkte im Code-Chat entschieden)
 - **Für:** Code
 - **Lesen:** die jeweiligen Feature-Dateien (`pois.md`, `combat.md`, `achievements.md`, `ui.md`, `intro.md`, `camp.md`, `worldmap.md`, `benches.md`)
 - **Bleibt wie gebaut (abgesegnet):** Start ohne Doppelsprung/Luft-Dash, Liege 900 Δ (#006); kein Warroom im Start-Rig, Techtree nur dort (#008); Ripperdoc-Liege Fassung A; Ducken als Konter (#004, wird ergänzt); Listen der 12 Achievements, 30 Implantate, 8 Marken passen erstmal; Warroom öffnet direkt die Karte; übriger Kleinkram aus #009–#011.
