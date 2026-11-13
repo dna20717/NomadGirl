@@ -102,8 +102,9 @@
   "size": [94, 94],
   "camera": "in",
   "effect": "glitch",
-  "effectAt": [63, 49],
+  "effectAt": [28, 44],
   "hold": 0,
-  "captions": [{"speaker": "", "text": "Im Anhänger springt ein Licht an.", "at": "tl"},{"speaker": "AvA", "text": "Leyla? Ich bin hier drin.", "at": "br"}]
+  "drone": {"show": true, "at": [28, 44], "size": 30, "wake": 1.2, "face": 2},
+  "captions": [{"speaker": "", "text": "Neben dem Tank springt ein Licht an.", "at": "tl"},{"speaker": "AvA", "text": "Leyla? Ich bin hier drin.", "at": "br"}]
  }
 }

@@ -15,12 +15,18 @@ const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s
 export async function startIntro(canvas, { onEnd = () => {}, startAt = null } = {}) {
   const cloud = await cloudFiles();
   const json = async f => cloud?.files.has(f) ? cloud.files.get(f) : (await fetch(new URL(f, BASE), { cache: 'no-store' })).json();
-  const [I, A, S] = await Promise.all([json('data/intro.json'), json('data/assets.json'), json('data/splash.json').catch(() => ({}))]);
+  const [I, A, S, DR] = await Promise.all([json('data/intro.json'), json('data/assets.json'), json('data/splash.json').catch(() => ({})), json('data/drone.json').catch(() => ({}))]);
   const C = { ...DEFAULTS, ...(S.intro || {}) };
   const panels = Object.entries(I).map(([id, x]) => ({ id, ...x })).filter(p => (p.size?.[0] ?? 0) > 0)
     .sort((a, b) => (a.page ?? 1) - (b.page ?? 1) || (a.order ?? 0) - (b.order ?? 0));
   const load = src => new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
   await Promise.all(panels.map(async p => { p.img = A[p.look]?.file ? await load(new URL(A[p.look].file, BASE).href) : null; }));
+  // AvA as in the game (Daniel, 13.11.2026: „du nutzt den falschen Sprite für die Drohne“): hull, face and glass from the area Drohne, drawn by code
+  const asset = id => A[id]?.file ? load(new URL(A[id].file, BASE).href) : Promise.resolve(null);
+  const ava = panels.some(p => p.drone?.show) && DR.look ? {
+    hull: await asset(DR.look), hullA: A[DR.look] || {}, face: await asset(DR.face?.look), faceA: A[DR.face?.look] || {}, glass: await asset(DR.face?.glass),
+    parts: (await Promise.all((DR.parts || []).filter(x => x.on && A[x.look]).map(async x => ({ x, a: A[x.look], img: await asset(x.look) })))).filter(q => q.img),
+  } : null;
   try { await document.fonts.load('40px VT323'); } catch { /* fallback font */ }
 
   const ctx = canvas.getContext('2d');
@@ -110,6 +116,7 @@ export async function startIntro(canvas, { onEnd = () => {}, startAt = null } = 
     ctx.beginPath(); ctx.rect(0, 0, r.w, r.h); ctx.clip();
     drawPicture(p, r, since);
     drawEffect(p, r, since);
+    if (p.drone?.show && ava?.hull) drawDrone(p.drone, r, since);
     if (p.display?.text || p.display?.sub || p.display?.bar != null) drawDisplay(p.display, r, since);
     if (!focus) { ctx.fillStyle = `rgba(6,6,8,${C.dim / 100})`; ctx.fillRect(0, 0, r.w, r.h); }
     ctx.restore();
@@ -200,6 +207,33 @@ export async function startIntro(canvas, { onEnd = () => {}, startAt = null } = 
       ctx.fillStyle = '#060608';
       for (let y = 0; y < r.h; y += 4 * u) ctx.fillRect(0, y, r.w, 1.5 * u);
     }
+    ctx.restore();
+  }
+
+  // AvA wakes up: dark screen, the face flickers on (Drohne › Gesicht), then she floats and looks around
+  function drawDrone(d, r, t) {
+    const { hull, hullA, face, faceA, glass, parts } = ava, [ox, oy] = hullA.origin || [hull.width / 2, hull.height / 2];
+    const k = (d.size ?? 30) / 100 * r.h / hull.height, wake = (d.wake ?? 1.2), on = t > wake;
+    const x = (d.at?.[0] ?? 50) / 100 * r.w, y = (d.at?.[1] ?? 50) / 100 * r.h + Math.sin(t * 2.1) * r.h * 0.012 * (on ? 1 : 0.3);
+    ctx.save(); ctx.translate(x, y); if (d.flip) ctx.scale(-1, 1); ctx.rotate(Math.sin(t * 1.3) * 0.04);
+    ctx.imageSmoothingEnabled = false;
+    // the screen glows first, then the whole drone
+    const glow = clamp((t - wake * 0.6) / 0.8), [sx, sy] = DR.face?.screen || [ox, oy];
+    if (glow > 0) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; const g = ctx.createRadialGradient((sx - ox) * k, (sy - oy) * k, 0, (sx - ox) * k, (sy - oy) * k, hull.height * k * 0.9);
+      g.addColorStop(0, `rgba(32,214,199,${0.45 * glow})`); g.addColorStop(1, 'rgba(32,214,199,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc((sx - ox) * k, (sy - oy) * k, hull.height * k * 0.9, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }   // round, no hard edge
+    const part = front => { for (const { x: q, a, img } of parts) if ((q.layer !== 'behind') === front) { const [qx, qy] = a.origin || [img.width / 2, img.height / 2], [ax, ay] = q.at || [ox, oy]; ctx.drawImage(img, (ax - ox - qx) * k, (ay - oy - qy) * k, img.width * k, img.height * k); } };
+    part(false);
+    ctx.drawImage(hull, -ox * k, -oy * k, hull.width * k, hull.height * k);
+    if (face) {
+      const [cw, ch] = faceA.frameSize || [face.width, face.height], [cx, cy] = faceA.origin || [cw / 2, ch / 2];
+      const flick = t < wake + 0.6 && hash(Math.floor(t * 16)) > 0.45;   // the face flickers while she boots
+      const fr = !on ? DR.face?.blink?.frame ?? 1 : (Math.sin(t * 0.9) > 0.97 ? DR.face?.blink?.frame ?? 1 : d.face ?? 2);
+      ctx.globalAlpha = t < wake * 0.6 ? 0 : flick ? 0.35 : 1;
+      ctx.drawImage(face, fr * cw, 0, cw, ch, (sx - ox - cx) * k, (sy - oy - cy) * k, cw * k, ch * k);
+      ctx.globalAlpha = 1;
+    }
+    if (glass) ctx.drawImage(glass, -ox * k, -oy * k, glass.width * k, glass.height * k);
+    part(true);
     ctx.restore();
   }
 
@@ -326,6 +360,7 @@ export async function startIntro(canvas, { onEnd = () => {}, startAt = null } = 
   return {
     panels: panels.length,
     images: panels.filter(p => p.img).length,
+    ava: !!ava?.hull && !!ava.face,   // AvA from the area Drohne (hull + face) for panels with Intro › AvA
     next, back, skip,
     state: () => ({ index: idx, panel: P()?.id, page: P()?.page, caption: cap, captions: captions(P()).length, typing: !capDone(now()), ended, left, shown: [...shownAt.keys()] }),
   };

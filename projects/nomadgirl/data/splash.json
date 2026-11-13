@@ -25,5 +25,5 @@
  "haze": {"enabled": true, "fade": 4, "band": 34, "shimmer": 1.5, "speed": 2.2, "glow": 16},
  "drone": {"show": true, "at": [57, 44], "height": 15, "every": [3, 7], "bob": 1.2, "moods": "kill, cleared, curious, scan, alert, bored, sleep, dash"},
  "curve": {"enabled": true, "pan": 9, "in": 1.4, "out": 0.9},
- "intro": {"typing": 45, "appear": 0.45, "dim": 35, "cameraZoom": 8, "cameraTime": 14, "title": "NomadGirl", "subtitle": "Die Suche beginnt."}
+ "intro": {"typing": 45, "appear": 0.45, "dim": 35, "cameraZoom": 8, "cameraTime": 14, "title": "NomadGirl"}
 }

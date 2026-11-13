@@ -4161,13 +4161,13 @@
   "date": "12.11.2026"
  },
  "intro_panel_7": {
-  "name": "Intro 7 · AvA erwacht",
+  "name": "Intro 7 · AvA erwacht (Camp)",
   "kind": "image",
   "file": "assets/intro/panel_7.png",
   "source": "KI (PixelLab: Create Image Pro 688 × 384, AAP-64, Referenzen: Drohnen-Konzept, Tank; Rand per Code abgeschnitten)",
   "date": "12.11.2026",
   "derivedFrom": "intro_panel_7_source",
-  "description": "Im dunklen Anhänger erwacht die Drohne, cyanes Auge und Lichtkegel, links der grüne Tank. Comic-Panel fürs Intro (#005)."
+  "description": "Nacht im Camp, nah am Van: der Tank leuchtet grün auf dem Anhänger, Glut vom Feuer, links freie Luft. AvA setzt das Intro aus Code als echte Spiel-Drohne hinein (Intro › AvA). Comic-Panel fürs Intro (#005)."
  },
  "icons_cyberware_1x1": {
   "name": "Symbole · Cyberware 1 × 1",

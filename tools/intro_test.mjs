@@ -28,6 +28,8 @@ await page.waitForFunction(() => window.intro, null, { timeout: 15000 });
 const ev = f => page.evaluate(f);
 const info = await ev(() => ({ panels: intro.panels, images: intro.images, s: intro.state() }));
 check(info.panels === count && info.images === count, `${info.panels} Panels, ${info.images} mit Bild (Daten: ${count})`);
+const ava = await ev(() => intro.ava), avaPanels = Object.values(data).filter(x => x.drone?.show).length;
+check(!avaPanels || ava, `AvA als Spiel-Drohne geladen (${avaPanels} Panel)`);
 check(info.s.panel === 'panel_1' && info.s.page === 1, `beginnt mit ${info.s.panel} auf Seite ${info.s.page}`);
 
 // captions: one press finishes typing, the next one opens the next box
