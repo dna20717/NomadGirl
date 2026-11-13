@@ -615,6 +615,8 @@ export class PlayScene extends Phaser.Scene {
     }
   }
 
+  // cover (#014): the chests of the POI level, plus test boxes (nomad / tests) → [{ x, w, top, feet }]
+  covers() { return [...(this.level?.covers?.() || []), ...(this.testCovers || [])]; }
   // a sound at (x, y) that carries r px (Spiel › Kampf › Lärm): enemies that hear it come looking (Gegner › Wahrnehmung › Hört)
   noise(x, y, r) {
     if (!(r > 0)) return;

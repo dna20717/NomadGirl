@@ -132,6 +132,25 @@ if (shots) {
   await page.screenshot({ path: 'output/raider_blood.png' });
 }
 
+// #014: shooters take cover behind a chest, duck there, come up to shoot; shots stop at the chest
+const cov = await page.evaluate(() => {
+  const s = game.scene.getScene('play'), T = s.T;
+  for (const e of s.enemies) e.destroy(); s.enemies.length = 0; s.combat.clear();
+  nomad.tpTile(3, 15); nomad.step(5);
+  const g = nomad.spawn('gewehrschuetze', 16, 14), e = s.enemies[s.enemies.length - 1];
+  e.C.cover = 100; e.C.dodge = 0; e.C.duck = 0;
+  const feet = e.feet; s.testCovers = [{ x: 13 * T, w: 70, top: feet - 90, feet }];
+  const states = new Set(); let reached = false, popped = false;
+  for (let i = 0; i < 600; i++) { nomad.step(1); states.add(e.state); if (e.cover && Math.abs(e.x - e.cover.x) < 12) reached = true; if (reached && e.state === 'windup') popped = true; }
+  // a nail through the chest at knee height stops there
+  s.combat.spawn({ key: 'nail', x: 9 * T, y: feet - 40, vx: 1800, vy: 0, life: 1500, friendly: true, damage: 10, knockback: 0, crit: 0, time: s.now });
+  const hp = e.hp; nomad.step(40);
+  const blocked = e.hp === hp;
+  s.testCovers = []; e.cover = null;
+  return { states: [...states], reached, popped, blocked, x: Math.round(e.x), cx: 13 * T };
+});
+check('Deckung: Schütze läuft hinter die Kiste, duckt sich, taucht zum Schießen auf, Kiste hält Nägel auf', cov.reached && cov.states.includes('cover') && cov.popped && cov.blocked, cov);
+
 // banners go by themselves (Daniel: „Wieder auf den Beinen-Meldung verschwindet nicht“); since #014 a banner is a toast,
 // one that stays (ms 0) has an ✕
 const ban = await page.evaluate(() => { const h = game.scene.getScene('play').hud; h.banner('Wieder auf den Beinen', 'Test', 3500, 'good'); return { shown: /Wieder auf den Beinen/.test(h.bannerText() || ''), toast: !!document.querySelector('.hud-toast.good.banner') }; });

@@ -126,6 +126,14 @@ export class PoiLevel {
     g.lineStyle(8, 0xb9c0c9); g.beginPath(); g.moveTo(x, f - 85); g.lineTo(x + (sw.on ? 26 : -26), f - (sw.on ? 128 : 128)); g.strokePath();
     g.fillStyle(sw.on ? 0x3fe0d0 : 0xff4060).fillCircle(x + (sw.on ? 26 : -26), f - 130, 9);
   }
+  // chests are cover (#014): raiders hide behind them, shots stop at them → [{ x, w, top, feet }]
+  covers() {
+    const T = this.scene.T;
+    return this.chests.map(c => {
+      const w = c.sprite ? c.sprite.displayWidth * 0.8 : 80, h = c.sprite ? c.sprite.displayHeight * 0.85 : (c.open ? 80 : 64);
+      return { x: c.x, w: Math.max(T * 0.6, w), top: c.feet - h, feet: c.feet };
+    });
+  }
   drawChest(c) {
     const g = c.art.clear(), x = c.x, f = c.feet;
     g.fillStyle(0x6b5030).fillRect(x - 40, f - 54, 80, 54);

@@ -84,7 +84,7 @@
   "attack": {"windup": 650, "cooldown": 1400, "range": 560, "projectileSpeed": 950},
   "height": 174,
   "placeholderColor": "olive",
-  "counter": {"dodge": 30, "dodgeCooldown": 1600, "dodgeDistance": 200, "duck": 35},
+  "counter": {"dodge": 30, "dodgeCooldown": 1600, "dodgeDistance": 200, "duck": 35, "cover": 60},
   "kit": "raider",
   "kitHead": "hood",
   "kitSkin": "dunkel",
@@ -226,7 +226,7 @@
   "kitHead": "dreads",
   "kitSkin": "dunkel",
   "kitGang": "Cyan",
-  "counter": {"duck": 40, "duckTime": 900},
+  "counter": {"duck": 40, "duckTime": 900, "cover": 70},
   "sense": {"cone": 150},
   "description": "Legt an, zielt lange, feuert eine Salve. Geht in die Hocke, wenn es zurückkommt."
  },
@@ -249,7 +249,7 @@
   "kitHead": "mohawk",
   "kitSkin": "oliv",
   "kitGang": "Orange",
-  "counter": {"duck": 30},
+  "counter": {"duck": 30, "cover": 40},
   "description": "Kommt nah ran, bevor er abdrückt."
  },
  "pistolero": {
@@ -270,7 +270,7 @@
   "height": 180,
   "kitHead": "topknot",
   "kitGang": "Magenta",
-  "counter": {"duck": 30, "dodge": 15},
+  "counter": {"duck": 30, "dodge": 15, "cover": 60},
   "description": "Der pinke Laser verrät ihn, bevor er schießt."
  },
  "streuner": {

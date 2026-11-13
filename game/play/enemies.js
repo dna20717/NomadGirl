@@ -31,7 +31,7 @@ export class Enemy {
     this.M = { patrol: M.patrol ?? 200, jump: M.jump ?? 1, drop: M.drop ?? 3, fly: M.flyHeight ?? 230 };
     this.C = { shield: !!C.shield, turn: C.shieldTurn ?? 650, stagger: C.shieldStagger ?? 900, dodge: C.dodge ?? 0, dodgeEvery: C.dodgeCooldown ?? 1400,
       dodgeDist: C.dodgeDistance ?? 200, plates: C.armor ?? 0, chip: C.armorChip ?? 15,
-      duck: C.duck ?? 0, duckTime: C.duckTime ?? 700, duckEvery: C.duckEvery ?? 1200 };
+      duck: C.duck ?? 0, duckTime: C.duckTime ?? 700, duckEvery: C.duckEvery ?? 1200, cover: C.cover ?? 0, coverRange: C.coverRange ?? 420, coverTime: C.coverTime ?? 1400 };
     this.plates = this.C.plates;
     const sizes = { raider: [0.32, 0.9], blob: [1.0, 0.8], drone: [0.95, 0.75] }[this.shape] || [0.32, 0.9];
     const bodyH = Math.round(this.h * sizes[1]);
@@ -64,7 +64,7 @@ export class Enemy {
   get eyeY() { return this.body.top + this.body.height * 0.2; }
   get alive() { return this.state !== 'dead'; }
   get behavior() { return this.kind; }
-  get busy() { return ['windup', 'strike', 'recover', 'dodge', 'stagger', 'drop', 'duck'].includes(this.state); }
+  get busy() { return ['windup', 'strike', 'recover', 'dodge', 'stagger', 'drop', 'duck', 'cover'].includes(this.state); }
 
   // ---------- senses ----------
   // sight: in range, inside the cone in facing direction (or very close behind), free line from the eyes to her chest or head
@@ -176,6 +176,12 @@ export class Enemy {
         if (time >= this.until) this.standUp(time);
         break;
       }
+      case 'cover': {   // down behind a chest (#014); comes up to shoot, leaves when Leyla is round the chest or right there
+        this.stop();
+        this.face(time, dx, true);
+        if (!this.coverOk(l) || time >= this.until) { this.standUp(time); this.popUntil = time + (this.a.windup ?? 450) + 900; if (!this.coverOk(l)) this.cover = null; }
+        break;
+      }
       case 'stagger': {   // shield knocked aside: open for a moment
         b.setVelocityX(b.velocity.x * 0.85);
         if (time >= this.until) { this.state = 'engage'; this.guardOpen = false; }
@@ -259,6 +265,7 @@ export class Enemy {
       return;
     }
     if (this.attackKind === 'shot') {   // keep the distance band, close in when the line is blocked
+      if (this.C.cover && this.shape === 'raider' && this.takeCover(time, l, speed)) return;
       let v = 0;
       if (!this.seeing && this.lastKnown) return this.moveTo(time, this.lastKnown.x, this.lastKnown.y, speed * 0.8);
       if (dist < range * 0.55 && this.safeStep(-this.facing)) v = -this.facing * speed;
@@ -363,6 +370,37 @@ export class Enemy {
       if (Math.random() * 100 < this.C.duck) return this.duck(time);
     }
   }
+  // cover (Gegner › Konter › Sucht Deckung, #014, Daniel 13.11.2026: „Plus Deckung an Kisten“): a chest on the same floor, close
+  // enough, with Leyla on the far side; he runs behind it, ducks, comes up to shoot (popUntil), ducks again. → true while busy with it
+  coverOk(l) {
+    const c = this.cover?.c;
+    return !!c && (Math.sign(l.x - c.x) || 1) === this.cover.side && Math.abs(l.x - c.x) > c.w / 2 + 120 && l.alive;
+  }
+  takeCover(time, l, speed) {
+    if (this.cover && !this.coverOk(l)) { this.cover = null; this.coverReady = time + 2500; }
+    if (!this.cover) {
+      if (time < (this.coverReady || 0) || !this.seeing) return false;
+      this.coverReady = time + 3000;   // one roll every few seconds
+      if (Math.random() * 100 >= this.C.cover) return false;
+      const all = this.scene.covers?.() || [];
+      let best = null;
+      for (const c of all) {
+        if (Math.abs(c.feet - this.feet) > 24) continue;
+        const side = Math.sign(l.x - c.x) || 1, x = c.x - side * (c.w / 2 + this.w / 2 + 4), far = Math.abs(x - this.x);
+        if (far > this.C.coverRange || Math.abs(l.x - c.x) < c.w / 2 + 160 || (best && far >= best.far)) continue;
+        best = { c, side, x, far };
+      }
+      if (!best) return false;
+      this.cover = best;
+      this.say('Deckung!', '#c7b08b');
+    }
+    const { x } = this.cover;
+    if (Math.abs(x - this.x) > 10) { this.walk(Math.sign(x - this.x), speed * 1.15, 0); this.facing = Math.sign(l.x - this.x) || this.facing; return true; }
+    this.stop();
+    if (time < (this.popUntil || 0)) return false;   // up for a shot
+    this.duck(time); this.state = 'cover'; this.until = time + this.C.coverTime; this.duckReady = 0;
+    return true;
+  }
   duck(time) {
     const b = this.body, h = Math.round(this.bodyH * 0.55);
     this.state = 'duck'; this.duckAt = time; this.until = time + this.C.duckTime; this.duckReady = this.until + this.C.duckEvery;
@@ -432,7 +470,7 @@ export class Enemy {
     s.fx.bloodHit(this.x - dir * this.w * 0.25, this.chest - this.bodyH * 0.1, dir || 1, Math.max(0.5, Math.min(2.2, damage / 15)) * (crit ? 1.5 : 1), { machine: this.d.family === 'machine' });
     this.body.setVelocity(dir * (knockback ?? 0), this.kind === 'flyer' ? -(knockback ?? 0) * 0.2 : -(knockback ?? 0) * 0.35);
     this.stunUntil = time + 220; this.hitAt = time;
-    if (this.state === 'duck') this.standUp(time);
+    if (this.state === 'duck' || this.state === 'cover') this.standUp(time);
     // hit from somewhere: it knows where she is now, turns round and fights
     this.lastSeen = time; this.lastKnown = { x: s.leyla.x, y: s.leyla.chest, at: time };
     if (['windup', 'patrol', 'alert', 'search'].includes(this.state)) { this.state = 'engage'; this.readyAt = Math.max(this.readyAt, time + 350); }

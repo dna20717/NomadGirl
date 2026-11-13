@@ -212,7 +212,7 @@ export function kitShow(e, time) {
   const melee = e.attackKind !== 'shot';
   let st, t0 = 0, from = 0;
   if (e.state === 'dead') { st = 'death'; t0 = e.diedAt; }
-  else if (e.state === 'duck') { st = 'crouch'; t0 = e.duckAt; }
+  else if (e.state === 'duck' || e.state === 'cover') { st = 'crouch'; t0 = e.duckAt; }
   else if (A.hit && time < (e.hitAt ?? -1e9) + A.hit.frames / A.hit.fps * 1000) { st = 'hit'; t0 = e.hitAt; }
   else if (e.state === 'windup' && melee) st = 'windup';
   else if (melee && (e.state === 'strike' || (e.state === 'recover' && e.strikeAt && time - e.strikeAt < 600))) { st = 'attack'; t0 = e.strikeAt; from = K.windupFrame ?? 3; }

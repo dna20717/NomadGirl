@@ -188,6 +188,7 @@ export class Combat {
   update(time, dt) {
     const s = this.scene, k = dt / 1000;
     this.marker(time);
+    const covers = s.covers?.() || [];
     for (const p of this.shots) {
       if (p.dead) continue;
       if (time >= p.end) { p.dead = true; s.fx.sparks(p.x, p.y, 0x8b949e, 3); continue; }
@@ -196,6 +197,7 @@ export class Combat {
       for (let i = 0; i < n && !p.dead; i++) {
         p.x += p.vx * k / n; p.y += p.vy * k / n;
         if (s.pointSolid(p.x, p.y)) { p.dead = true; s.fx.sparks(p.x - Math.sign(p.vx) * 6, p.y, 0xffd27a, 6); break; }
+        if (covers.some(c => p.x > c.x - c.w / 2 && p.x < c.x + c.w / 2 && p.y > c.top && p.y < c.feet)) { p.dead = true; s.fx.sparks(p.x - Math.sign(p.vx) * 6, p.y, 0xc7b08b, 6); break; }   // a chest is cover (#014)
         if (p.friendly) {
           for (const e of s.enemies) {
             if (!e.alive) continue;
