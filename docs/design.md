@@ -202,6 +202,19 @@ Zu Beginn kennt man „Notflicken“, „Stromzelle tauschen“ und „Kühlmitt
 - **Jeder Durchgang würfelt ein Straßennetz** um BigCityDelta: feste Wahrzeichen plus gewürfelte Orte. Leyla fährt immer eine Straße weit; weiter draußen ist es gefährlicher und lohnender, Unbekanntes bleibt „?“.
 - Jedes Ziel zeigt Kosten (Strecke, Fahrzeit, Sprit, Vorräte), Gefahr und Art, und welche Beute dort vermutlich liegt. Details: `docs/features/worldmap.md`.
 
+### Achievements & Trophäen (Design-Session Daniel, 13.11.2026)
+
+Daniel: „Wir benutzen den Trophäenraum, um Achievements zu visualisieren. Ein Achievement erzeugt immer ein Rezept mit Bezug zum Achievement, das man einmalig an einer Werkbank herstellen kann. Wenn man das Belohnungs-Item hergestellt und im Trophäenraum ausgestellt hat, bekommt man einen permanenten Bonus“ (Vorbild: Badass-Ränge in Borderlands 2).
+
+- **Ablauf:** Achievement erreicht → Meldung „🏆 *Name*“ → gleich danach „📜 Rezept gelernt: *Trophäe*“ → an der Werkbank **einmalig** herstellen (Zutaten gern aus dem Zerlegen, damit Material sinnvoll abfließt) → auf einen Trophäen-Ständer in einer Schatzkammer stellen → Holo-Schild leuchtet, **Bonus aktiv**.
+- **Jede ausgestellte Trophäe wirkt** (1a), ohne Obergrenze. Die Grenze ist der Platz: Reichen die Ständer nicht, baut man **weitere Trophäenräume** (Schatzkammern) ins Rig, mit Strom, Gewicht und Containerplatz als natürlichem Preis. Der Bonus zählt, solange die Trophäe auf irgendeinem Ständer im Rig steht.
+- **Boni gemischt** (3c): kleine Prozentwerte (z. B. +5 % Krit Revolver) und Spezialeffekte mit Bezug zum Achievement (z. B. Goldene Gießkanne: Hydrokultur wächst schneller).
+- **Neuer Durchgang** (2a): Achievements, ihre Rezepte und hergestellte Trophäen **bleiben als Erinnerungsstücke** erhalten, wie die Techtree-Knoten. ⚠️ vorläufig (Ava): Nach dem Aufwachen liegen sie in einer Erinnerungskiste am Feuer und wirken erst wieder, wenn sie ausgestellt sind.
+- ⚠️ vorläufig (Ava): Achievement-Trophäen sind unverkäuflich und nicht zerlegbar, sonst wäre der Bonus für immer weg.
+- **Arten:** Kampf, Erkundung (Secrets, POIs), Cosy (Hydrokultur, Kochen, Rig), AvA/Tank, Story; dazu **versteckte** Achievements. Beispiele (Ava): 100 Kopfschüsse mit dem Revolver → Messing-Patrone (+Krit Revolver); alle Secrets im Bunker 13 → Bunker-Schlüsselbund (Secrets leichter sichtbar); 50 Ernten → Goldene Gießkanne; 10 Runs ohne kritischen Tank → AvAs erstes Bild (Tank verfällt langsamer).
+- **Werkstatt:** eigener Bereich „Achievements“: Name, Text, versteckt, Bedingung (Zähler + Zielwert oder Ereignis), Rezept (Zutaten, Werkstatt-Art), Trophäe (Gegenstand mit Tag Trophäe, Symbol, Rastergröße), Bonus (Wert + Prozent oder Spezialeffekt).
+- **Idee für später** (nicht entschieden): Ruhm-Punkte je ausgestellter Trophäe, ab Schwellen Titel für Leyla („Wastelandkind“, „Legende von BigCityDelta“), wie die Badass-Ränge.
+
 ## Rig & Werkstätten
 
 > **Klarstellung 12.11.2026 (Daniel):** Es gibt keine eigenen Modul-Anhänger, nur die variablen Container. Ein Container im Erdgeschoss ist gleichzeitig ein Anhänger (Rahmen, Räder, Kupplung gehören dazu). Das ist bereits so gelöst, kein To-do. **Deichselkästen gibt es nicht mehr**, Stauraum kommt aus den Lagerregalen.
@@ -245,6 +258,9 @@ Rezepte entdecken:
 - **Funde im POI:** Bauanleitungen, Kochbücher, Notizzettel.
 - **Companions:** verraten Rezepte oder geben vage Hinweise.
 - **NPCs:** Händler verkaufen Rezepte.
+- **Achievements:** jedes Achievement lehrt das Rezept seiner Trophäe (siehe „Achievements & Trophäen“).
+
+**Rezepte lernen (Daniel, 13.11.2026):** Rezepte (Zettel, Baupläne, Kochbücher) werden **beim Einsammeln automatisch gelernt**, mit Meldung „📜 Rezept gelernt: *Name*“, und landen nicht im Rucksack. Für Rezepte, die schon im Inventar liegen (alte Spielstände), gibt es im Inventar die **Schnellaktion „Lernen“**. ⚠️ vorläufig (Ava): Ein schon bekanntes Rezept wird beim Einsammeln zu **Wissen** für den Techtree (eine Wissen-Quelle).
 
 **Im Spiel (08.11.2026):** E an Kochnische, Küche oder Werkbank öffnet Rezeptbuch und Topf. Zutaten kommen aus Lager, Kiste und Rucksack. Experimentieren: die richtigen Zutaten in mindestens der richtigen Menge treffen (abschaltbar: genaue Mengen), ein Treffer landet im Rezeptbuch, ein Fehlschlag ergibt kuriosen Müll je Werkstatt-Art (Verkohlter Klumpen, Graue Pampe, Kabelsalat, Schrottskulptur); fehlt nur eine Zutat, heißt es „Knapp daneben“. Zettel aus dem POI liest man im Rezeptbuch, Companions im Camp geben vage Tipps und kommentieren ihre Werkstatt. Gerichte isst man im Inventar (Feld „Benutzen“). Alles einstellbar im Bereich „Kochen & Craften“.
 

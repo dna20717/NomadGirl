@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 13.11. Ava → Code: Neu **#012 Achievements mit Trophäen-Rezepten + Rezepte automatisch lernen** (Design-Session mit Daniel, Entscheidungen in design.md). Bitte nach #011.
 - 13.11. Code → Ava: #011 Tutorial (Feldhandbuch) läuft.
 - 13.11. Code → Ava: #010 Bau-Modus mit Controller erledigt: AvA ist der Zeiger, UI-Grammatik, Bereiche, Vorschau, Vibration.
 - 13.11. Code → Ava: #009 Camp-Feinschliff erledigt: alles Seitenansicht, Horizont mit Milchstraße und BigCityDelta, Onkel Sung größer, Lichterketten als Bilder, Lichter ohne Kasten, kein Solar unter Stapeln.
@@ -212,6 +213,21 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Lesen:** `docs/features/ui.md`, `controller.md`, `tests.md`
 - **Auftrag (Daniel, 13.11.2026):** „Auf Basis von Screenshots ein Tutorial, das ähnlich wie bei Far Cry erklärt, wie man Dinge tut. Keine neuen Grafiken erzeugen, sondern Clips und Screenshots nutzen, um in kurzen Animationen oder Slideshows die verschiedenen Bausteine des Spiels zu erklären. Feingranulare Lektionen.“ Antworten: **beim ersten Mal als Karte + Archiv im Pause-Menü**, **gemischt** (Bewegung/Kampf/AvA als Loop-Clip, Menüs/Camp/Bauen als Slideshow), **alle ~45 Lektionen**, **Tasten je Gerät**.
 - **Fertig, wenn:** Lektionen in der Werkstatt, Clips und Bilder automatisch aus dem Spiel aufgenommen, Karten beim ersten Mal, Feldhandbuch im Pause-Menü, Tests grün.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #012 Achievements mit Trophäen-Rezepten + Rezepte automatisch lernen
+- **Status:** offen · angelegt 13.11. von Ava (Design-Session mit Daniel im Projekt-Chat)
+- **Für:** Code
+- **Lesen:** design.md › „Achievements & Trophäen“ und › Crafting & Kochen › „Rezepte lernen“; `docs/features/benches.md` › Schatzkammer (Ständer, Tag Trophäe); `docs/features/crafting.md` (Zettel); `docs/features/progression.md` (Durchgang, Wissen)
+- **Auftrag:** Reihenfolge:
+  1. **Rezepte automatisch lernen:** Zettel/Baupläne beim Einsammeln sofort ins Rezeptbuch, Meldung „📜 Rezept gelernt: *Name*“, kein Platz im Rucksack. Schnellaktion **„Lernen“** im Inventar (Maus, Tastatur, Controller) für Zettel, die schon irgendwo liegen; alte Spielstände bleiben gültig. ⚠️ vorläufig: bekanntes Rezept → Wissen (Menge in der Werkstatt).
+  2. **Achievement-System:** Zähler und Ereignisse im Spielstand (`save.achievements`), Meldung „🏆 *Name*“, danach lehrt es das Rezept seiner Trophäe. Rezept einmalig herstellbar (danach im Rezeptbuch als „hergestellt“).
+  3. **Bonus:** Trophäe auf irgendeinem Ständer in irgendeiner Schatzkammer im Rig → Bonus aktiv (Prozentwerte und Spezialeffekte). Keine Obergrenze; mehrere Schatzkammern müssen gehen. Holo-Schild/Leuchten am Ständer, wenn ein Bonus wirkt; Tooltip zeigt Achievement + Bonus.
+  4. **Durchgang:** Achievements, deren Rezepte und Trophäen bleiben; ⚠️ vorläufig liegen die Trophäen nach dem Aufwachen in einer Erinnerungskiste am Feuer. Trophäen unverkäuflich und nicht zerlegbar.
+  5. **Werkstatt-Bereich „Achievements“** (Felder siehe design.md) plus Übersicht im Pause-Menü (erreicht / offen / versteckt als „???“).
+  6. **Startinhalt:** ca. 10 Achievements quer durch Kampf, Erkundung, Cosy, AvA/Tank, Story (Beispiele in design.md, Rest erfinden), je eine Trophäe mit Symbol von PixelLab (AAP-64, passend zu den Wertsachen).
+- **Fertig, wenn:** Rezept einsammeln → Meldung, Rezeptbuch, Rucksack leer; Achievement auslösen → Rezept → herstellen → ausstellen → Bonus messbar; zweite Schatzkammer zählt mit; neuer Durchgang behält alles; Werkstatt-Bereich vollständig; alte Spielstände gültig; Tests grün (neuer `achievement_test`), PixelLab gemeldet.
 - **Rückfragen:**
 - **Ergebnis:**
 
