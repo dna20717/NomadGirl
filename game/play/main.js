@@ -45,6 +45,16 @@ export async function start(parent, hudRoot, loading) {
     else if (q.has('cycle')) await box.cycle();   // Neues Spiel › Neuer Durchgang: the tech tree stays
     console.info(`Spielstand ${box.where === 'cloud' ? 'online (pro Login)' : 'in diesem Browser'}${box.fresh ? ', neu' : ''}`);
     hud.saveBox = box;
+    // another tab or device saved something newer (Lichterketten, 13.11.2026): this tab takes it over and opens the camp fresh
+    box.onAdopt = () => {
+      const sc = game.scene.getScene('play');
+      if (!sc?.box) return;
+      try { if (sc.hud?.build?.active) sc.hud.build.close(); } catch { /* the scene starts fresh anyway */ }
+      sc.leaving = false;
+      sc.restartAs({ mode: 'camp', banner: ['Neuerer Spielstand geladen', 'aus einem anderen Fenster'] }, 300);
+    };
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') box.adoptNewer(); });
+    window.addEventListener('focus', () => box.adoptNewer());
     // a run that was interrupted (page closed) counts as knocked out: the camp starts, the run loot is gone
     const run = box.save.run;
     if (run) { box.save.run = null; box.save.buffs = []; box.save.inv.grids.backpack.items = []; }   // like knocked out

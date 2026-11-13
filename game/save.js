@@ -290,8 +290,27 @@ export async function openSave(D, base = '') {
     save: repairSave(stored, D),
     fresh: !stored,
     error: null,
+    seen: stored?.savedAt || 0,   // the newest stamp this tab knows (loaded or written itself)
+    // what is stored right now (another tab or device may have written it) → raw save or null
+    async stored() {
+      if (where === 'cloud') { const r = await fetch(`${base}/api/save`, { headers: { accept: 'application/json' }, cache: 'no-store' }); return r.ok ? (await r.json()).save : null; }
+      return JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null');
+    },
+    // a newer savegame from another tab or device wins over this (stale) tab: it is taken over instead of being overwritten
+    // (Daniel, 13.11.2026: „die Lichterketten verschwinden weiterhin“; a second game tab, e.g. from the workshop's Spielen button,
+    // still held the rig without them and wrote it back). → true when the stored one was taken over
+    async adoptNewer() {
+      let st = null;
+      try { st = await box.stored(); } catch { return false; }
+      if (!st?.savedAt || st.savedAt <= box.seen) return false;
+      box.save = repairSave(st, D); box.seen = st.savedAt;
+      box.onAdopt?.(box.save);
+      return true;
+    },
     // write the savegame (online: KV per login, otherwise this browser); errors are kept, the game goes on
-    async persist() {
+    async persist(force = false) {
+      if (!force && await box.adoptNewer()) return box;
+      box.save.savedAt = box.seen = Math.max(Date.now(), box.seen + 1);
       const body = JSON.stringify({ save: box.save });
       try {
         if (where === 'cloud') {
@@ -303,8 +322,8 @@ export async function openSave(D, base = '') {
       } catch (e) { box.error = e.message; console.warn('Spielstand nicht gespeichert:', e.message); }
       return box;
     },
-    async reset() { box.save = newSave(D); box.fresh = true; return box.persist(); },
-    async cycle() { box.save = newCycle(D, box.save); box.fresh = true; return box.persist(); },
+    async reset() { box.save = newSave(D); box.fresh = true; return box.persist(true); },
+    async cycle() { box.save = newCycle(D, box.save); box.fresh = true; return box.persist(true); },
   };
   return box;
 }

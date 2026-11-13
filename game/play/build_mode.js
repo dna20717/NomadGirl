@@ -889,8 +889,10 @@ export class BuildMode {
     this.wire = null;
     const near = (this.camp.anchors?.() || []).filter(a => a.id !== wr.from.id).sort((a, b) => Math.hypot(a.x - w.x, a.y - w.y) - Math.hypot(b.x - w.x, b.y - w.y))[0];
     if (!near || Math.hypot(near.x - w.x, near.y - w.y) > 60 / z) { this.draw(); return this.say('Lichterkette: an einem Andockpunkt loslassen'); }
-    const r = hang(this.D, this.save, wr.from.id, near.id, { a: wr.from, b: near });
+    const before = snapshot(this.save), r = hang(this.D, this.save, wr.from.id, near.id, { a: wr.from, b: near });
     if (!r.ok) return this.say(r.why);
+    // on the undo stack too: undoing an older action restores its snapshot, which would take later strings down with it
+    this.undo.push({ snap: before, label: 'Lichterkette aufgehängt', job: null, at: { x: (wr.from.x + near.x) / 2, y: near.y }, done: false });
     this.camp.drawRig();
     this.sfx.klack?.();
     this.scene.fx.text((wr.from.x + near.x) / 2, Math.min(wr.from.y, near.y) - 30, `${r.deltas} Δ`, { color: '#ffd27a', size: 36, rise: 60, life: 1100 });
@@ -898,8 +900,9 @@ export class BuildMode {
     this.say('Lichterkette aufgehängt', 'ok');
   }
   takeDown(i) {
-    const w = this.camp.wire(i), r = unhang(this.D, this.save, i);
+    const before = snapshot(this.save), w = this.camp.wire(i), r = unhang(this.D, this.save, i);
     if (!r.ok) return;
+    this.undo.push({ snap: before, label: 'Lichterkette abgenommen', job: null, at: w ? { x: w.mid.x, y: w.mid.y } : null, done: false });
     this.camp.drawRig();
     if (w) this.scene.fx.text(w.mid.x, w.mid.y - 30, `+${r.deltas} Δ`, { color: '#ffd27a', size: 36, rise: 60, life: 1100 });
     this.say('Lichterkette abgenommen', 'ok');

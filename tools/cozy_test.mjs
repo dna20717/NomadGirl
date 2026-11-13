@@ -7,7 +7,7 @@ import fs from 'node:fs';
 
 const shots = process.argv.includes('--shots');
 const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
-const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
+const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 } }), page = await ctx.newPage();
 const errors = [], ok = [];
 page.on('pageerror', e => errors.push('Seite: ' + e.message));
 const check = (name, cond, info) => (cond ? ok : errors).push(cond ? name : `${name}: ${JSON.stringify(info).slice(0, 700)}`);
@@ -82,6 +82,23 @@ await ev(() => { SC().hud.build.close(); nomad.step(60); nomad.save().hour = 23;
 v = await ev(() => { const c = SC().camp; return { lights: nomad.save().rig.lights, bulbs: c.bulbs.map(b => +b.alpha.toFixed(2)), flies: c.flies.length, lightK: c.lightK }; });
 check('Nachts: Lichterkette bleibt im Spielstand und leuchtet, Glühwürmchen ums Feuer', v.lights.length === 1 && v.bulbs.length && v.bulbs.every(x => x > 0.2) && v.flies > 0, v);
 await shot('night');
+
+// Daniel, 13.11.2026: „die Lichterketten verschwinden weiterhin“: (1) Rückgängig nimmt keine später gehängte Kette mehr mit,
+// (2) ein zweiter, veralteter Spiel-Tab überschreibt den neueren Spielstand nicht mehr, er übernimmt ihn
+v = await ev(() => { const B = SC().hud.build; SC().openBuild(); nomad.step(30); nomad.save().deltas = 900; B.buy('workshops', 'werkbank'); nomad.step(4);
+  const a = SC().camp.anchors(), n0 = nomad.save().rig.lights.length; B.wire = { from: a.find(x => x.id === '0:1') }; B.finishWire(a.find(x => x.id === '1:1')); const n1 = nomad.save().rig.lights.length;
+  B.undoLast(); const n2 = nomad.save().rig.lights.length, d2 = nomad.save().deltas; B.undoLast(); const n3 = nomad.save().rig.lights.length; B.close(); nomad.step(30); return { n0, n1, n2, n3, d2 }; });
+check('Rückgängig: erst die zuletzt gehängte Kette, dann der Kauf, die alte Kette bleibt', v.n1 === v.n0 + 1 && v.n2 === v.n0 && v.n3 === v.n0, v);
+await ev(() => SC().box.persist());
+const page2 = await ctx.newPage();
+await page2.goto('http://localhost:8766/game.html?camp'); await page2.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.camp, null, { timeout: 40000 });
+await page2.evaluate(async () => { const sc = game.scene.getScene('play'); sc.box.save.rig.lights.push(['0:1', '1:1']); await sc.box.persist(); });
+const want = await page2.evaluate(() => JSON.stringify(game.scene.getScene('play').box.save.rig.lights));
+await page2.close();
+await ev(async () => { await SC().box.persist(); });
+await page.waitForTimeout(800); await ev(() => nomad.step(60));
+v = await ev(() => ({ lights: JSON.stringify(nomad.save().rig.lights), stored: JSON.stringify(JSON.parse(localStorage.getItem('nomadgirl-save')).rig.lights) }));
+check('Zweiter Tab: der alte Tab übernimmt den neueren Spielstand, die Kette bleibt', v.lights === want && v.stored === want, { ...v, want });
 
 // the Tankstelle: a raider from the kit instead of the code-drawn crawler
 v = await ev(() => game.scene.getScene('play').data_.pois.tankstelle_km7.enemies.map(e => [e, game.scene.getScene('play').data_.enemies[e].kit || null]));
