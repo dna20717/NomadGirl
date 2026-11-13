@@ -265,7 +265,7 @@
  },
  "schatzkammer": {
   "name": "Schatzkammer",
-  "look": "ws_treasury_cyber",
+  "look": "ws_treasury_hall",
   "function": "treasury",
   "places": 1,
   "power": -1,
@@ -273,25 +273,25 @@
   "accept": ["valuable"],
   "value": 650,
   "stage": "mvp",
-  "description": "Trophäenraum im Cyberpunk-Stil: Wertsachen kommen auf den Haufen vor der Lochwand, der mit jedem Fund wächst. Neon-Vitrinen, Lochwand und Sockel im Spotlicht sind Trophäen-Ständer für besondere Stücke.",
+  "description": "Trophäenraum „Hall of Loot“: Wertsachen kommen auf den Haufen links vorne, der mit jedem Fund wächst. Regal, Regale oben, Laser-Vitrine und der Sockel im Lichtkegel sind Trophäen-Ständer für besondere Stücke.",
   "stands": [
-   {"name": "Vitrine links", "grid": [1, 3], "x": 20, "y": 96, "w": 32, "h": 84, "align": "bottom"},
-   {"name": "Lochwand", "grid": [4, 2], "x": 92, "y": 86, "w": 72, "h": 36, "align": "top"},
-   {"name": "Vitrine rechts", "grid": [2, 3], "x": 208, "y": 96, "w": 30, "h": 84, "align": "bottom"},
-   {"name": "Sockel", "grid": [2, 2], "x": 174, "y": 118, "w": 28, "h": 32, "align": "bottom"}
+   {"name": "Lichtkegel", "grid": [1, 3], "x": 186, "y": 104, "w": 26, "h": 60, "align": "bottom"},
+   {"name": "Regal links", "grid": [4, 2], "x": 38, "y": 58, "w": 54, "h": 33, "align": "bottom"},
+   {"name": "Laser-Vitrine", "grid": [2, 3], "x": 102, "y": 104, "w": 52, "h": 68, "align": "bottom"},
+   {"name": "Regale oben", "grid": [2, 2], "x": 104, "y": 22, "w": 48, "h": 26, "align": "bottom"}
   ],
   "fx": [
-   {"kind": "light", "x": 176, "y": 52, "w": 16, "h": 4, "color": "#ffe6b0", "size": 60, "rate": 3, "when": "always"},
-   {"kind": "light", "x": 22, "y": 100, "w": 28, "h": 70, "color": "#20d6c7", "size": 36, "rate": 5, "when": "always"},
-   {"kind": "light", "x": 210, "y": 100, "w": 26, "h": 70, "color": "#20d6c7", "size": 36, "rate": 5, "when": "always"},
-   {"kind": "light", "x": 16, "y": 30, "w": 28, "h": 20, "color": "#e86a73", "size": 30, "rate": 8, "when": "evening", "idle": 40},
-   {"kind": "light", "x": 210, "y": 30, "w": 28, "h": 20, "color": "#e86a73", "size": 30, "rate": 8, "when": "evening", "idle": 40},
-   {"kind": "twinkle", "x": 28, "y": 60, "w": 52, "h": 52, "size": 3, "rate": 0.8, "when": "always"},
-   {"kind": "twinkle", "x": 92, "y": 90, "w": 72, "h": 60, "size": 3, "rate": 0.6, "when": "near"},
-   {"kind": "twinkle", "x": 200, "y": 62, "w": 30, "h": 30, "size": 3, "rate": 0.8, "when": "always"}
+   {"kind": "light", "x": 186, "y": 26, "w": 20, "h": 6, "color": "#c8ffe8", "size": 60, "rate": 3, "when": "always"},
+   {"kind": "light", "x": 98, "y": 72, "w": 60, "h": 24, "color": "#ff5fd2", "size": 34, "rate": 6, "when": "always"},
+   {"kind": "light", "x": 100, "y": 136, "w": 56, "h": 36, "color": "#20d6c7", "size": 30, "rate": 5, "when": "always"},
+   {"kind": "light", "x": 38, "y": 50, "w": 54, "h": 5, "color": "#e86ad8", "size": 24, "rate": 8, "when": "evening", "idle": 40},
+   {"kind": "light", "x": 164, "y": 50, "w": 54, "h": 5, "color": "#e86ad8", "size": 24, "rate": 8, "when": "evening", "idle": 40},
+   {"kind": "twinkle", "x": 110, "y": 104, "w": 36, "h": 30, "size": 3, "rate": 0.8, "when": "always"},
+   {"kind": "twinkle", "x": 182, "y": 110, "w": 34, "h": 50, "size": 3, "rate": 0.6, "when": "always"},
+   {"kind": "twinkle", "x": 20, "y": 160, "w": 80, "h": 50, "size": 3, "rate": 0.6, "when": "near"}
   ],
-  "lookEmpty": "ws_treasury_cyber_empty",
-  "fill": [{"y": 124},{"y": 150},{"y": 172},{"y": 194}],
+  "lookEmpty": "ws_treasury_hall_empty",
+  "fill": [{"y": 158},{"y": 178},{"y": 196},{"y": 212}],
   "scale": 78,
   "outside": "out_treasury"
  },

@@ -5178,5 +5178,25 @@
   "source": "Code (Ava, Python: Karplus-Strong-Gitarre, Skript tools/music/leyla_theme_camp.py)",
   "date": "13.11.2026",
   "description": "Leyla Theme, Camp-Version: akustische Gitarre im Fingerpicking, d-Moll, 3/4, 66 BPM, Feuerknistern. 87 s, nahtlose Schleife (Ausklang liegt über dem Anfang). Noten im claude.ai-Projekt › leyla-theme.md."
+ },
+ "ws_treasury_hall_empty": {
+  "name": "Werkstatt · Hall of Loot leer",
+  "kind": "image",
+  "file": "assets/workshops/treasury_hall_empty.png",
+  "origin": [128, 225],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Seed 302)",
+  "derivedFrom": "ws_treasury_cyber_candidate_2",
+  "date": "13.11.2026",
+  "description": "Daniel, 13.11.2026: Kandidat 2 „Hall of Loot“ (#003/#014). Regale mit Neon, Laser-Vitrine mit Hologramm, Sockel im Lichtkegel."
+ },
+ "ws_treasury_hall": {
+  "name": "Werkstatt · Hall of Loot voll",
+  "kind": "image",
+  "file": "assets/workshops/treasury_hall.png",
+  "origin": [128, 225],
+  "source": "Code (Beutehaufen aus ws_treasury_cyber ausgeschnitten, verkleinert, auf AAP-64 eingerastet, links vor die Server gesetzt)",
+  "derivedFrom": "ws_treasury_hall_empty",
+  "date": "13.11.2026",
+  "description": "Leere Fassung plus Beutehaufen links vorne. Wächst mit dem Füllstand von unten."
  }
 }
