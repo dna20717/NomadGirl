@@ -4,6 +4,8 @@
 // Graphics are code placeholders for now; a "look" on containers, workshops or companions takes over later.
 import { ensureMap, placeOf, roadKm, route, hops, mapConfig } from '../worldmap.js';
 import { rollEncounter, choose, blocked } from '../travel.js';
+import { powerBoost } from '../stations.js';
+import { clockHours } from '../tank.js';
 import { potsOf, stage, ripe, harvest, STAGES, canWater, waterOf, water } from '../garden.js';
 import { level as cisternLevel, tap as cisternTap } from '../cistern.js';
 import { anchors as lightAnchors, catenary, lightsConfig, mastAt } from '../string_lights.js';
@@ -476,6 +478,7 @@ export class Camp {
     // solar: in the sun full power, at night only while the battery holds (#008)
     this.solar = solarState(this.D, this.box.save);
     if (this.solar.live < this.solar.made) { this.budget.power.made -= this.solar.made - this.solar.live; this.budget.power.net = this.budget.power.made - this.budget.power.used; }
+    { const x = powerBoost(this.box.save, clockHours(this.box.save)); if (x) { this.budget.power.made += x; this.budget.power.net = this.budget.power.made - this.budget.power.used; } }   // the regulator in the green band (#013)
     this.noPower = this.D.build?.rules?.power !== false && this.budget.power.net < 0;
     this.tooHeavy = this.D.build?.rules?.weight !== false && this.budget.heavy;
     for (const u of this.geo.units) u.view = this.drawUnit(u);
@@ -1054,7 +1057,13 @@ export class Camp {
         items: [{ label: 'Rig umbauen', primary: true, act: () => s.openBuild() }, { label: 'Zurück', act: () => {} }] });
     if (def.function === 'sleep') return this.sleep(def);
     if (def.function === 'warroom') return this.warroom();
-    if (['kitchen', 'craft', 'cyber', 'tank'].includes(def.function)) { s.hud.inv?.close(); return s.hud.craft?.open(id); }
+    if (['kitchen', 'craft', 'cyber', 'tank', 'foodtruck', 'power'].includes(def.function)) { s.hud.inv?.close(); return s.hud.craft?.open(id); }   // #013: foodtruck counter, regulator
+    if (def.function === 'drone') {   // AvA's board (#013) or her rest (Werkstätten › Benutzen)
+      s.hud.inv?.close();
+      if (!def.rest?.verb) return s.hud.craft?.open(id);
+      return s.hud.menu({ title: def.name || id, sub: def.description || '', items: [{ label: 'Platine bestücken', sub: 'Chips stecken, Kabel löten: AvA wird besser', primary: true, act: () => s.hud.craft?.open(id) },
+        { label: def.rest.verb, act: () => this.restMenu(id, def, place, (this.box.save.companions || []).map(c => this.D.companions?.[c]).filter(c => c?.workshops?.includes(id)).map(c => c.name)) }, { label: 'Zurück', act: () => {} }] });
+    }
     if (def.function === 'garden') return this.garden(id, def, place);
     if (def.function === 'cistern') return this.cistern(id, def, place);
     if (def.function === 'guests') {   // who sleeps here: the guests in order, as many as there are beds in all guest bunks

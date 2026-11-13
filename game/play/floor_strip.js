@@ -3,7 +3,7 @@
 // Inventar passen“). A thin scan grid at the bottom of the screen: what lies on the ground in reach, nearest first. The first thing
 // carries the golden frame; E / stick ↑ picks it up (scene.floorPick), I opens the whole ground inventory.
 import { el } from '../ui.js';
-import { thing, add, stackMax } from '../inventory.js';
+import { thing, add, stackMax, addEntry } from '../inventory.js';
 import { artOf, glyphOf, kindOf, CATEGORY_COLORS } from './inventory_ui.js';
 
 export class FloorStrip {
@@ -57,7 +57,7 @@ export class FloorStrip {
     const t = this.list?.[0];
     if (!t || !scene.box) return false;
     const D = this.D, bag = scene.box.save.inv.grids.backpack, l = scene.leyla, name = thing(D, t.e.a, t.e.id)?.name || t.e.id;
-    const left = add(D, bag, t.e.a, t.e.id, t.e.n);
+    const left = addEntry(D, bag, t.e, t.e.n);
     if (left === t.e.n) { scene.hud.toast('Rucksack voll', '', 'warn', 2600); scene.drone?.react?.('gearWorse'); return true; }
     const got = t.e.n - left;
     t.e.n = left;

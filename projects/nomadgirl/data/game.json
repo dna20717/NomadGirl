@@ -38,6 +38,9 @@
    {"where": "storage", "item": "sojasauce", "count": 1},
    {"where": "storage", "item": "speiseoel", "count": 1},
    {"where": "storage", "item": "schrauben", "count": 6},
+   {"where": "storage", "item": "langer_lauf", "count": 1},
+   {"where": "storage", "item": "tape_griff", "count": 1},
+   {"where": "storage", "item": "kaffeepulver", "count": 1},
    {"item": "gasmaske", "count": 1, "where": "chest"},
    {"item": "plattentraeger", "count": 1, "where": "chest"},
    {"item": "nachtsicht_optik", "count": 1, "where": "chest"}

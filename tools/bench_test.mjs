@@ -99,7 +99,7 @@ await shot('chill');
 // AvA docks at the drone bench
 await ev(() => nomad.take());
 const db = await bench('drohnenwerkstatt');
-void db; await ev(() => { nomad.goTo('Drohnenwerkstatt'); nomad.step(30); nomad.step(1, [], ['grab']); nomad.step(3); nomad.choose('AvA'); });
+void db; await ev(() => { nomad.goTo('Drohnenwerkstatt'); nomad.step(30); nomad.step(1, [], ['grab']); nomad.step(3); nomad.choose('AvA warten'); nomad.step(2); if (nomad.state().menu) nomad.choose('AvA warten'); });   // #013: first the drone bench's menu (Platine / AvA warten)
 const dock = await ev(s => { const S = eval(s); for (let i = 0; i < 150; i++) nomad.step(1); return { d: Math.abs(S.drone.x - S.camp.benches.list.find(b => b.id === 'drohnenwerkstatt').cx), docked: !!S.drone.dock }; }, scene);
 check('AvA warten: die Drohne fliegt zur Werkbank und dockt an', dock.docked && dock.d < 40, dock);
 await ev(() => nomad.step(200));

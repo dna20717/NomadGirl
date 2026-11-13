@@ -22,5 +22,13 @@
  },
  "salvageTime": 5,
  "autoLearn": true,
- "knownKnowledge": 1
+ "knownKnowledge": 1,
+ "stations": {
+  "cook": {"seconds": 4, "good": [55, 90], "perfect": [68, 80], "bonus": [0, 25, 50], "spices": "gewuerzmischung, chili, sojasauce"},
+  "bench": {"seconds": 1.6, "steps": 2, "good": 22, "perfect": 8, "bonus": [0, 5, 10]},
+  "surgery": {"seconds": 2.2, "good": 18, "perfect": 7, "bonus": [0, 10, 20]},
+  "drone": {"power": 6, "slots": 4, "bonus": [0, 15, 30]},
+  "truck": {"customers": 4, "patience": 12, "price": 100, "tip": 30, "favourite": 50},
+  "power": {"seconds": 6, "band": [45, 65], "drift": 18, "need": 60, "extra": 1, "hours": 12}
+ }
 }

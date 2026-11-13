@@ -376,7 +376,8 @@
   "icon": 35,
   "description": "Aus zwei toten Platinen ein lebendiger Chip.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "alte_platine", "count": 1}]
+  "salvage": [{"item": "alte_platine", "count": 1}],
+  "chip": {"stat": "battery", "value": 20, "power": 2}
  },
  "feuerzeug": {
   "name": "Feuerzeug",
@@ -1731,5 +1732,160 @@
   "icon": 22,
   "buff": "satt",
   "description": "Mutantenkohl, lange gekocht. Wärmt von innen."
+ },
+ "langer_lauf": {
+  "name": "Langer Lauf",
+  "category": "weaponpart",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 40,
+  "look": "icons_gear",
+  "icon": 9,
+  "part": {"slot": "lauf", "kind": "ranged", "range": 20, "damage": 8, "cooldown": 6},
+  "description": "Ein Rohr, länger als nötig. Trifft weiter, schießt etwas träger."
+ },
+ "kurzer_lauf": {
+  "name": "Abgesägter Lauf",
+  "category": "weaponpart",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 30,
+  "look": "icons_gear",
+  "icon": 15,
+  "part": {"slot": "lauf", "kind": "ranged", "cooldown": -14, "range": -15, "knockback": 10},
+  "description": "Kurz, laut, schnell. Wer braucht schon Reichweite."
+ },
+ "tape_griff": {
+  "name": "Panzertape-Griff",
+  "category": "weaponpart",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 15,
+  "look": "icons_gear",
+  "icon": 25,
+  "part": {"slot": "griff", "reload": -10, "crit": 2},
+  "description": "Dreimal ums Metall gewickelt. Rutscht nicht, auch nicht mit Blut an den Fingern."
+ },
+ "holzgriff": {
+  "name": "Holzgriff",
+  "category": "weaponpart",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 20,
+  "look": "icons_gear",
+  "icon": 12,
+  "part": {"slot": "griff", "knockback": 20, "damage": 4},
+  "description": "Aus einem alten Stuhlbein geschnitzt. Liegt schwer in der Hand."
+ },
+ "trommelmagazin": {
+  "name": "Trommelmagazin",
+  "category": "weaponpart",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 45,
+  "look": "icons_gear",
+  "icon": 4,
+  "part": {"slot": "magazin", "kind": "ranged", "magazine": 4, "reload": 15},
+  "description": "Mehr Schuss, dafür fummelig beim Wechseln."
+ },
+ "schnellmagazin": {
+  "name": "Schnellwechsel-Magazin",
+  "category": "weaponpart",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 40,
+  "look": "icons_gear",
+  "icon": 5,
+  "part": {"slot": "magazin", "kind": "ranged", "reload": -25, "magazine": -1},
+  "description": "Klick, raus, rein, weiter."
+ },
+ "rotpunkt_visier": {
+  "name": "Rotpunkt-Visier",
+  "category": "weaponpart",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 50,
+  "look": "icons_gear",
+  "icon": 8,
+  "part": {"slot": "visier", "kind": "ranged", "crit": 8},
+  "description": "Ein roter Punkt auf einer Glasscheibe. Mehr braucht es nicht."
+ },
+ "zackenklinge": {
+  "name": "Gezackte Klinge",
+  "category": "weaponpart",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 45,
+  "look": "icons_gear",
+  "icon": 52,
+  "part": {"slot": "klinge", "kind": "melee", "damage": 18, "crit": 4, "cooldown": 8},
+  "description": "Aus einem Sägeblatt geschliffen. Reißt mehr, als sie schneidet."
+ },
+ "leichtklinge": {
+  "name": "Leichte Klinge",
+  "category": "weaponpart",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 35,
+  "look": "icons_gear",
+  "icon": 20,
+  "part": {"slot": "klinge", "kind": "melee", "cooldown": -18, "damage": -4},
+  "description": "Dünn wie ein Brieföffner. Schnell wie ein schlechter Gedanke."
+ },
+ "led_chip": {
+  "name": "Leuchtdioden-Chip",
+  "category": "component",
+  "size": [1, 1],
+  "stack": 5,
+  "value": 25,
+  "look": "icons_gear",
+  "icon": 36,
+  "chip": {"stat": "spot", "value": 25, "power": 1},
+  "description": "Treibt AvAs Scheinwerfer über die Werksangabe. Sie findet das aufregend."
+ },
+ "turbo_regler": {
+  "name": "Turbo-Regler",
+  "category": "component",
+  "size": [1, 1],
+  "stack": 5,
+  "value": 35,
+  "look": "icons_gear",
+  "icon": 40,
+  "chip": {"stat": "speed", "value": 25, "power": 2},
+  "description": "Lässt die Rotoren schneller drehen, als gut für sie ist."
+ },
+ "notfall_relais": {
+  "name": "Notfall-Relais",
+  "category": "component",
+  "size": [1, 1],
+  "stack": 5,
+  "value": 60,
+  "look": "icons_gear",
+  "icon": 43,
+  "chip": {"stat": "rescue", "value": 15, "power": 3},
+  "description": "Leitet beim Rettungsflug Strom am Tank vorbei. Schont AvA."
+ },
+ "spuernase_chip": {
+  "name": "Spürnasen-Chip",
+  "category": "component",
+  "size": [1, 1],
+  "stack": 5,
+  "value": 45,
+  "look": "icons_gear",
+  "icon": 22,
+  "chip": {"stat": "loot", "value": 8, "power": 2},
+  "description": "AvA riecht jetzt Metall. Sagt sie zumindest."
+ },
+ "zettel_rohrpistole": {
+  "name": "Bauplan: Rohrpistole",
+  "category": "blueprint",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 15,
+  "teaches": "bauplan_rohrpistole",
+  "glyph": "📘",
+  "look": "icons_gear",
+  "icon": 61,
+  "description": "Eine Skizze auf Butterbrotpapier, mit Ölflecken. Wer zeichnet so sauber?"
  }
 }

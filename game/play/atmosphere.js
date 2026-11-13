@@ -7,6 +7,7 @@
 // AvA's searchlight (Drohne › Scheinwerfer, only while the part sits on her) and short flashes (sparks).
 // Above the lightmap: additive glow of the fixtures and clutter, dust motes, sparks. Below it (lit by it): fog and drips.
 import { atmoRegions, planLights, moodOf, behave, hash } from '../../engine/atmosphere.js';
+import { droneBonuses } from '../stations.js';
 
 const rgb = c => { const n = parseInt(String(c || '#ffffff').slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
 const css = ([r, g, b], a = 1) => `rgba(${r},${g},${b},${a})`;
@@ -115,7 +116,7 @@ export class Atmosphere {
     const tilt = (S.tilt ?? 14) * Math.PI / 180;
     // on the rubber band (right stick) the cone points where the stick points, like a desk lamp
     const dir = dr.aim != null && dr.d.leash?.aimLight !== false ? dr.aim : look > 0 ? tilt + rot : Math.PI - tilt + rot;
-    return { x, y, dir, half: (S.angle ?? 46) / 2 * Math.PI / 180, range: S.range ?? 760, c: rgb(S.color || '#fff2c8'), strength: (S.strength ?? 85) / 100, glow: (S.glow ?? 90) / 100 };
+    return { x, y, dir, half: (S.angle ?? 46) / 2 * Math.PI / 180, range: (S.range ?? 760) * (1 + (this.scene.box ? droneBonuses(this.scene.data_, this.scene.box.save).spot || 0 : 0) / 100), c: rgb(S.color || '#fff2c8'), strength: (S.strength ?? 85) / 100, glow: (S.glow ?? 90) / 100 };
   }
   flash(x, y, color, radius = 200, life = 140) { this.flashes.push({ x, y, c: rgb(color), radius, strength: 0.9, t: 0, life }); }
 

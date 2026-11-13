@@ -701,5 +701,39 @@
   "time": 20,
   "discovery": ["experiment", "companion"],
   "hint": "Viel Wasser, ein Kohlkopf, viel Geduld."
+ },
+ "bauplan_nagelpistole": {
+  "name": "Bauplan Nagelpistole",
+  "station": "werkbank",
+  "ingredients": [{"item": "schrott", "count": 2},{"item": "schrauben", "count": 1}],
+  "result": "",
+  "count": 1,
+  "time": 40,
+  "discovery": ["start"],
+  "weapon": "nagelpistole",
+  "slots": [{"slot": "lauf"},{"slot": "griff"},{"slot": "magazin"},{"slot": "visier"}]
+ },
+ "bauplan_rohrpistole": {
+  "name": "Bauplan Rohrpistole",
+  "station": "werkbank",
+  "ingredients": [{"item": "schrott", "count": 3},{"item": "kupferkabel", "count": 1}],
+  "result": "",
+  "count": 1,
+  "time": 60,
+  "discovery": ["found", "experiment"],
+  "hint": "Ein Rohr, ein Griff, ein Stück Draht für den Abzug.",
+  "weapon": "rohrpistole",
+  "slots": [{"slot": "lauf", "required": true},{"slot": "griff"},{"slot": "magazin"},{"slot": "visier"}]
+ },
+ "bauplan_machete": {
+  "name": "Bauplan Machete",
+  "station": "werkbank",
+  "ingredients": [{"item": "schrottplatte", "count": 1}],
+  "result": "",
+  "count": 1,
+  "time": 40,
+  "discovery": ["start"],
+  "weapon": "machete",
+  "slots": [{"slot": "klinge"},{"slot": "griff"}]
  }
 }

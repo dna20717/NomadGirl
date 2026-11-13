@@ -21,6 +21,7 @@ import { Van } from './van.js';
 import { Backdrop } from './backdrop.js';
 import { Camp, campLayout, daytimeAt, drawCampBackground, drawCampGround, travelCost } from './camp.js';
 import { raining, rainConfig } from '../rain.js';
+import { applyMods, implantBoosts, droneBonuses } from '../stations.js';
 import { advance, arrive, clockText, containers, newCycle } from '../save.js';
 import { Loot } from './loot.js';
 import { InventoryUI } from './inventory_ui.js';
@@ -182,7 +183,12 @@ export class PlayScene extends Phaser.Scene {
     if (shape === 'drone') return { key: `enemy_drone_${color}`, scale: (def.height ?? 90) / 96, ox: 0.5, oy: 1, flip: false };
     return { key: `raider_${def.behavior === 'shooter' ? 'gun' : 'melee'}_${color}`, scale: (def.height ?? 220) / 240, ox: 66 / 150, oy: 1, flip: false };
   }
-  weapon(slot) { const id = this.box ? this.box.save.inv?.slots?.[slot] : this.testSlots?.[slot] || this.data_.leyla?.loadout?.[slot]; return this.data_.weapons?.[id] || null; }
+  // the weapon in a slot; a copy from the bench brings its own values (#013, inv.slotMods)
+  weapon(slot) { const id = this.box ? this.box.save.inv?.slots?.[slot] : this.testSlots?.[slot] || this.data_.leyla?.loadout?.[slot]; const def = this.data_.weapons?.[id] || null, mods = this.box?.save.inv?.slotMods?.[slot];
+    if (!def || !mods) return def;
+    const key = id + JSON.stringify(mods), C = (this.weaponCache ??= {});   // the same object while nothing changes (leyla.js compares it)
+    if (C[slot]?.key !== key || C[slot].def !== def) C[slot] = { key, def, w: applyMods(def, mods) };
+    return C[slot].w; }
   // V / L3: the next ranged weapon from the backpack into the hand, the old one into the backpack (Daniel, 12.11.2026: „wir proben den Switch“);
   // in a test room without a savegame: through all ranged weapons
   swapRanged() {
@@ -195,10 +201,11 @@ export class PlayScene extends Phaser.Scene {
     } else {
       const inv = this.box.save.inv, bag = inv.grids.backpack, e = bag.items.find(x => x.a === 'weapons' && W[x.id]?.kind === 'ranged');
       if (!e) return say('Keine zweite Fernkampfwaffe im Rucksack');
-      const old = inv.slots.ranged;
+      const old = inv.slots.ranged, oldMods = inv.slotMods?.ranged;
       bag.items.splice(bag.items.indexOf(e), 1);
-      if (old && add(D, bag, 'weapons', old, 1) > 0) this.loot?.throwDown({ a: 'weapons', id: old, n: 1, r: 0 });
+      if (old && add(D, bag, 'weapons', old, 1, { mods: oldMods || null }) > 0) this.loot?.throwDown({ a: 'weapons', id: old, n: 1, r: 0, ...(oldMods ? { mods: oldMods } : {}) });
       inv.slots.ranged = next = e.id;
+      inv.slotMods ??= {}; if (e.mods) inv.slotMods.ranged = e.mods; else delete inv.slotMods.ranged;   // the copy's own values (#013)
       this.invChanged?.('backpack');
     }
     l.loadWeapon();
@@ -288,7 +295,7 @@ export class PlayScene extends Phaser.Scene {
     // buffs from the savegame count in a run (health, defense, damage)
     this.mods = {};
     this.gearMods = null; this.applyGear();   // worn gear and implants count everywhere
-    if (this.mode === 'run') for (const b of this.box.save.buffs) { const d = this.data_.buffs?.[b]; if (d?.stat) this.mods[d.stat] = (this.mods[d.stat] || 0) + (d.value || 0); }
+    if (this.mode === 'run') for (const b of this.box.save.buffs) { const d = this.data_.buffs?.[b]; if (d?.stat) this.mods[d.stat] = (this.mods[d.stat] || 0) + Math.round((d.value || 0) * (1 + (this.box.save.buffQ?.[b] || 0) / 100)); }
     const feet = [(start[0] + 0.5) * T, (start[1] + 1) * T];
     if (this.args.startX) feet[0] = this.args.startX;
     this.leyla = new Leyla(this, this.data_, feet);
@@ -349,7 +356,7 @@ export class PlayScene extends Phaser.Scene {
 
   // worn gear and implants (inv.wear) on top of the buffs: swap the old sums for the new ones, AvA shows her parts
   applyGear() {
-    const g = this.box ? { ...gearStats(this.data_, this.box.save.inv?.wear) } : {};
+    const g = this.box ? { ...gearStats(this.data_, this.box.save.inv?.wear, implantBoosts(this.data_, this.box.save)) } : {};
     if (this.box) { const b = bonuses(this.data_, this.box.save); for (const k of ['health', 'damage']) if (b[k]) g[k] = (g[k] || 0) + b[k]; }   // Techtree: passive bonuses count like gear
     if (this.box) { const b = trophyBonuses(this.data_, this.box.save); for (const k of GEAR_KEYS) if (b[k] && k !== 'tankDecay' && k !== 'droneBattery') g[k] = (g[k] || 0) + b[k]; }   // trophies on the stands (#012)
     for (const k of GEAR_KEYS) { const v = (this.mods[k] || 0) - (this.gearMods?.[k] || 0) + (g[k] || 0); if (v) this.mods[k] = v; else delete this.mods[k]; }
@@ -377,7 +384,7 @@ export class PlayScene extends Phaser.Scene {
       equipChanged: slot => { const sc = hud.scene; if (slot === 'ranged') sc.leyla.loadWeapon(); },
       throwDown: e => hud.scene.loot ? hud.scene.loot.throwDown(e) : null,
       padActive: () => { const p = hud.scene.pad; if (!(p?.active && p.kind)) return false; hud.padHelp?.(p, PAD_ACTIONS); return true; },
-      use: id => hud.scene.useThing(id),
+      use: (id, q) => hud.scene.useThing(id, q),
       learn: (g, e) => hud.scene.learnFrom(g, e),
       canThrow: () => !!hud.scene.loot,
       inCamp: () => hud.scene.mode === 'camp',
@@ -392,7 +399,8 @@ export class PlayScene extends Phaser.Scene {
       get D() { return hud.scene.data_; },
       save: () => hud.scene.box.save,
       changed: r => { hud.scene.craftDone(r, hud.craft.ws); clearTimeout(hud.scene.saveTimer); hud.scene.saveTimer = setTimeout(() => hud.scene.box?.persist(), 600); },
-      leftover: (id, n) => hud.scene.loot?.throwDown({ a: 'items', id, n, r: 0 }),
+      leftover: (id, n, a = 'items', x = {}) => hud.scene.loot?.throwDown({ a, id, n, r: 0, ...x }),
+      react: mood => hud.scene.drone?.react(mood),
       closed: () => hud.scene.craftClosed(),
     });
     hud.craft.el.hidden = true;
@@ -452,13 +460,14 @@ export class PlayScene extends Phaser.Scene {
     if (this.camp && this.skyChanged()) this.goCamp({ banner: this.skyBanner(), fade: 500, keepPlace: true });
   }
   // eating or using a thing from the inventory (Gegenstände › Buff beim Essen/Benutzen): heals now or waits as a buff for the next run
-  useThing(id) {
-    const D = this.data_, save = this.box.save, l = this.leyla, r = useThing(D, save, id, { health: l.health, maxHealth: l.maxHealth });
+  useThing(id, q = 0) {
+    const D = this.data_, save = this.box.save, l = this.leyla, r = useThing(D, save, id, { health: l.health, maxHealth: l.maxHealth, q });
     if (!r.ok) return r;
     if (r.heal) { r.heal *= Math.max(0, 1 + (this.mods.heal || 0) / 100); l.health = Math.min(l.maxHealth, l.health + r.heal); save.health = Math.round(l.health); }   // Heilung % from implants
     const b = D.buffs?.[r.buff] || {};
-    if (this.mode === 'run' && !r.heal && b.stat) { this.mods[b.stat] = (this.mods[b.stat] || 0) + (b.value || 0); if (b.stat === 'health') l.health = Math.min(l.maxHealth, l.health + (b.value || 0)); }
-    this.hud.toast(r.heal ? `+${Math.round(r.heal)} Leben` : b.name || r.buff, r.heal ? '' : this.mode === 'camp' ? 'Wirkt im nächsten Run' : (b.description || ''), 'heal', 2600);
+    const bv = Math.round((b.value || 0) * (1 + (r.bonus || 0) / 100));   // a good / perfect dish (#013)
+    if (this.mode === 'run' && !r.heal && b.stat) { this.mods[b.stat] = (this.mods[b.stat] || 0) + bv; if (b.stat === 'health') l.health = Math.min(l.maxHealth, l.health + bv); }
+    this.hud.toast(r.heal ? `+${Math.round(r.heal)} Leben` : `${b.name || r.buff}${r.bonus ? ` +${r.bonus} %` : ''}`, r.heal ? '' : this.mode === 'camp' ? 'Wirkt im nächsten Run' : (b.description || ''), 'heal', 2600);
     return r;
   }
   // something moved in an inventory: ground bundles appear or vanish, the savegame is written soon after
@@ -584,7 +593,7 @@ export class PlayScene extends Phaser.Scene {
       if (rank) later(bump(this.data_, save, 'pois', 1, [this.level.poi, rank.grade]));
       if (rank && this.level.secretsMax > 0 && this.level.secrets >= this.level.secretsMax) later(bump(this.data_, save, 'secretsAll', 1, [this.level.poi]));
     }
-    save.buffs = [];
+    save.buffs = []; save.buffQ = {};
     save.run = null;
     this.hud.inv?.close();
     const banner = ko ? ['AvA hat dich heimgebracht', `${clockText(save)} · Der Rucksack ist weg.`, 'drama']
@@ -808,7 +817,7 @@ export class PlayScene extends Phaser.Scene {
   achieveLevel(counter, value) { if (this.box) this.announce(achieveLevel(this.data_, this.box.save, counter, value)); }
   // a loot roll; Delta-Petrol-Schild & Co. (#012, Extra-Beute %) give a chance of one more thing
   lootRoll(table) {
-    const D = this.data_, out = rollLoot(D, table) || [], k = (this.box ? trophyBonuses(D, this.box.save).loot || 0 : 0) + (this.threat()?.loot || 0);   // + danger of the place (#014)
+    const D = this.data_, out = rollLoot(D, table) || [], k = (this.box ? trophyBonuses(D, this.box.save).loot || 0 : 0) + (this.threat()?.loot || 0) + (this.box ? droneBonuses(D, this.box.save).loot || 0 : 0);   // + danger of the place (#014), AvA's board (#013)
     for (let left = k; left > 0; left -= 100) if (Math.random() * 100 < Math.min(100, left)) { const x = rollLoot(D, table)?.[0]; if (x) out.push(x); }
     return out;
   }

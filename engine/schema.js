@@ -56,7 +56,7 @@ export const ENEMY_FAMILIES = [['mutant', 'Mutant'], ['raider', 'Plünderer'], [
 export const ENEMY_BEHAVIORS = [['patrol', 'Patrouille'], ['charger', 'Stürmer'], ['shooter', 'Schütze'], ['ambusher', 'Lauerer'], ['flyer', 'Flieger'], ['boss', 'Boss']];
 // tags on things (Daniel, 11.11.2026: „mach ein Tag trophy“): trophy = may hang on a trophy stand in the treasury
 export const ITEM_TAGS = [['trophy', 'Trophäe']];
-export const ITEM_CATEGORIES = [['junk', 'Schrott'], ['resource', 'Ressource'], ['ingredient', 'Zutat'], ['food', 'Gericht'], ['component', 'Bauteil'], ['consumable', 'Verbrauchsgut'], ['valuable', 'Wertsache'], ['blueprint', 'Bauplan/Rezept'], ['armor', 'Rüstung'], ['implant', 'Implantat'], ['dronepart', 'Drohnenteil'], ['progress', 'Fortschritt']];
+export const ITEM_CATEGORIES = [['junk', 'Schrott'], ['resource', 'Ressource'], ['ingredient', 'Zutat'], ['food', 'Gericht'], ['component', 'Bauteil'], ['consumable', 'Verbrauchsgut'], ['valuable', 'Wertsache'], ['blueprint', 'Bauplan/Rezept'], ['armor', 'Rüstung'], ['implant', 'Implantat'], ['dronepart', 'Drohnenteil'], ['progress', 'Fortschritt'], ['weaponpart', 'Waffenteil']];
 // where a thing is worn (Daniel, 10.11.2026: Inventar im Diablo-Stil): Leyla's head + armor, implants in her body, parts on AvA
 export const WEAR_SLOTS = [['head', 'Kopf'], ['armor', 'Rüstung'], ['eyes', 'Implantat: Augen'], ['nerves', 'Implantat: Nerven'], ['arm', 'Implantat: Cyberarm'], ['heart', 'Implantat: Herz'], ['legs', 'Implantat: Beine'], ['skin', 'Implantat: Haut'],
   ['bow', 'Drohne: Bug'], ['tail', 'Drohne: Heck'], ['core', 'Drohne: Kern'], ['module', 'Drohne: Modul']];
@@ -66,6 +66,7 @@ export const BUFF_STATS = [['health', 'Leben'], ['damage', 'Schaden'], ['speed',
 export const BUFF_DURATIONS = [['instant', 'Sofort'], ['run', 'Nächster Run'], ['travel', 'Nächste Reise'], ['seconds', 'Sekunden'], ['permanent', 'Dauerhaft']];
 export const DISCOVERY = [['experiment', 'Experimentieren'], ['found', 'Fund im POI'], ['companion', 'Tipp von Companion'], ['shop', 'Bei NPCs kaufen'], ['start', 'Von Anfang an'], ['techtree', 'Knoten im Techtree'], ['achievement', 'Achievement']];
 export const CONTAINER_KINDS = [['shipping', 'Hochseecontainer'], ['crate', 'Holzkiste'], ['trailer', 'Wohnwagenteil'], ['tank', 'Tank']];
+export const PART_SLOTS_SCHEMA = [['lauf', 'Lauf'], ['griff', 'Griff'], ['schaft', 'Schaft'], ['magazin', 'Magazin'], ['visier', 'Visier'], ['klinge', 'Klinge'], ['kern', 'Kern']];
 export const WORKSHOP_FUNCTIONS = [['tank', 'Cryo-Tank'], ['garden', 'Hydrokultur'], ['cistern', 'Zisterne'], ['storage', 'Lager'], ['guests', 'Gäste'], ['treasury', 'Schatzkammer'], ['cooling', 'Kühlung'], ['cell', 'Zelle'], ['sleep', 'Schlafen'], ['chill', 'Chillen'], ['drone', 'Drohnen'], ['warroom', 'Planung'], ['kitchen', 'Kochen'], ['foodtruck', 'Verkauf'], ['craft', 'Herstellen'], ['cyber', 'Cyberware (Ripperdoc)'], ['engine', 'Motor'], ['power', 'Energie']];
 export const BENCH_FX = [['light', 'Licht'], ['screen', 'Bildschirm'], ['steam', 'Dampf'], ['smoke', 'Rauch'], ['sparks', 'Funken'], ['flame', 'Flamme'], ['blink', 'LED blinkt'], ['twinkle', 'Lichter funkeln'], ['bubbles', 'Blasen'], ['fish', 'Fische'], ['lava', 'Lavalampe'], ['scan', 'Druckkopf'], ['shine', 'Glanz']];
 export const BENCH_FX_WHEN = [['always', 'Immer'], ['night', 'Abends'], ['near', 'In der Nähe'], ['use', 'Bei Benutzung']];
@@ -594,6 +595,12 @@ export const AREAS = {
         point('held.muzzle', 'Mündung', { unit: 'px', hint: 'Nur Fernkampf: hier startet der Schuss. Leer = Spitze' }),
         num('held.cm', 'Länge', { unit: 'cm', min: 1, hint: 'Gemalte Länge der Waffe; der Bausatz rechnet sie mit der Körpergröße in Pixel um' })] },
       { title: 'Rucksack & Handel', fields: [size('size', 'Größe', { unit: 'Felder' }), VALUE] },
+      { title: 'Waffenteil', when: x => x.category === 'weaponpart', fields: [select('part.slot', 'Platz', PART_SLOTS_SCHEMA, { hint: 'Daniel, 13.11.2026 (#013, 3c): ein Bauplan hat Plätze, Leyla setzt die Teile frei ein. Jedes Teil ändert die Werte der Waffe' }),
+        select('part.kind', 'Nur für', [['', 'Nah- und Fernkampf'], ['melee', 'Nahkampf'], ['ranged', 'Fernkampf']]),
+        num('part.damage', 'Schaden', { unit: '%' }), num('part.cooldown', 'Abklingzeit', { unit: '%', hint: 'Negativ = schneller' }), num('part.range', 'Reichweite', { unit: '%' }),
+        num('part.crit', 'Krit-Chance', { unit: '%-Punkte' }), num('part.magazine', 'Magazin', { unit: 'Schuss' }), num('part.reload', 'Nachladen', { unit: '%', hint: 'Negativ = schneller' }), num('part.knockback', 'Rückstoß', { unit: '%' })] },
+      { title: 'Chip für AvA', fields: [select('chip.stat', 'Wirkt auf', [['', '—'], ['battery', 'Akku (Plattform)'], ['spot', 'Scheinwerfer'], ['speed', 'Fliegt schneller'], ['rescue', 'Rettung kostet weniger'], ['loot', 'Extra-Beute']], { hint: '#013: steckt man an der Drohnenwerkstatt auf AvAs Platine' }),
+        num('chip.value', 'Wert', { unit: '%' }), num('chip.power', 'Energie', { min: 0, hint: 'Die Platine hat ein Energie-Budget (Kochen & Craften › Handgriffe › Drohnen-Platine)' })] },
       { title: 'Zerlegen', fields: SALVAGE_FIELDS },
     ],
     check: (x, report, p, id) => {
@@ -777,13 +784,15 @@ export const AREAS = {
       { title: 'Rezept', fields: [NAME, ref('station', 'Werkstatt', 'workshops', { required: true }), num('time', 'Dauer', { unit: 'min', min: 0, hint: 'Spielzeit: die Uhr springt beim Kochen/Herstellen um so viele Minuten weiter (Ereignis-Zeit)' })] },
       { title: 'Zutaten → Ergebnis', fields: [table('ingredients', 'Zutaten', [ref('item', 'Gegenstand', 'items'), num('count', 'Anzahl', { min: 1 })]),
         ref('result', 'Ergebnis', 'items'), ref('part', 'Oder Rig-Teil', 'rigParts', { hint: 'Statt eines Gegenstands entsteht ein Rig-Teil: es landet auf dem Schrottplatz und wird im Bau-Modus (B) an den Van gezogen' }), num('count', 'Anzahl', { min: 1 }),
+        ref('weapon', 'Oder Waffe', 'weapons', { hint: '#013 (Daniel, 3c): ein Bauplan für eine Waffe. Mit Plätzen setzt Leyla an der Werkbank Waffenteile ein; jede gebaute Waffe ist ein Exemplar mit eigenen Werten' }),
+        table('slots', 'Plätze (Bauplan)', [select('slot', 'Platz', PART_SLOTS_SCHEMA), bool('required', 'Muss')], { hint: 'Leer = keine Teile, nur der Handgriff am Ende' }),
         num('tank', 'Oder Tank-Wartung', { unit: '%', min: 0, max: 100, hint: 'Statt eines Ergebnisses: so viel Zustand bekommt der Cryo-Tank zurück (Werkstatt-Art Cryo-Tank)' }), num('tankUpTo', 'Hilft bis Phase', { min: 1, max: 6, hint: 'Ist der Tank schlechter als diese Phase, hilft die Wartung nicht mehr (ein Leck klebt man nicht). Leer = immer' })] },
       { title: 'Entdecken', fields: [multi('discovery', 'Wie man es lernt', DISCOVERY), area_('hint', 'Hinweis', { hint: 'Was Companions oder Notizzettel andeuten' }),
         bool('once', 'Einmalig', { hint: 'Lässt sich nur ein einziges Mal herstellen (Trophäen der Achievements); danach steht es im Rezeptbuch als „hergestellt“' })] },
     ],
     check: (x, report) => {
       if (!(x.ingredients || []).length) report('error', 'Rezept ohne Zutaten');
-      if (!x.result && !x.part && !x.tank) report('warning', 'Rezept ohne Ergebnis (Gegenstand, Rig-Teil oder Tank-Wartung)');
+      if (!x.result && !x.part && !x.tank && !x.weapon) report('warning', 'Rezept ohne Ergebnis (Gegenstand, Waffe, Rig-Teil oder Tank-Wartung)');
       if (x.result && x.part) report('warning', 'Gegenstand und Rig-Teil: das Rig-Teil gewinnt');
       if ((x.ingredients || []).some(i => i.item === x.result)) report('warning', 'Ergebnis ist auch Zutat');
       const kinds = (x.ingredients || []).map(i => i.item); if (new Set(kinds).size !== kinds.length) report('warning', 'Eine Zutat steht doppelt in der Liste (Anzahl erhöhen)');
@@ -816,6 +825,21 @@ export const AREAS = {
     name: 'Kochen & Craften', icon: 'workbench', file: 'data/crafting.json', kind: 'single',
     hint: 'An Kochnische, Küche und Werkbank im Camp (E): Rezeptbuch links, Experimentieren in der Mitte. Ein Treffer landet im Rezeptbuch, ein Fehlschlag ergibt kuriosen Müll. Zutaten kommen aus Lager, Kiste und Rucksack, Ergebnisse gehen in den Rucksack (sonst Kiste, Lager, Boden). Rezepte selbst stehen im Bereich Rezepte.',
     sections: [
+      { title: 'Handgriffe', fields: [
+        num('stations.cook.seconds', 'Herd: Gar-Balken', { unit: 's', min: 0.5, hint: 'Daniel, 13.11.2026 (#013, 1a): jede Werkstatt hat ihre Handlung, Geschick gibt nur Bonus. So lange läuft der Gar-Balken; wer nicht drückt, nimmt am Ende normal raus' }),
+        range('stations.cook.good', 'Herd: guter Bereich', { unit: '%' }), range('stations.cook.perfect', 'Herd: perfekter Bereich', { unit: '%' }),
+        num('stations.cook.bonus.1', 'Bonus gut', { unit: '% Buff', min: 0 }), num('stations.cook.bonus.2', 'Bonus perfekt', { unit: '% Buff', min: 0 }),
+        text('stations.cook.spices', 'Gewürze', { hint: 'Gegenstände, mit Komma; eins davon vor dem Gar-Balken macht das Gericht eine Stufe besser (verbraucht eins)' }),
+        num('stations.bench.seconds', 'Werkbank: Handgriff', { unit: 's', min: 0.3 }), num('stations.bench.steps', 'Werkbank: Handgriffe je Waffe', { min: 1, max: 4 }),
+        num('stations.bench.good', 'Werkbank: gut bis', { unit: '% daneben' }), num('stations.bench.perfect', 'Werkbank: perfekt bis', { unit: '% daneben' }),
+        num('stations.bench.bonus.1', 'Werkbank: Schaden gut', { unit: '%' }), num('stations.bench.bonus.2', 'Werkbank: Schaden perfekt', { unit: '%' }),
+        num('stations.surgery.seconds', 'Ripperdoc: Schnitt', { unit: 's', min: 0.3 }), num('stations.surgery.bonus.1', 'Ripperdoc: Implantat gut', { unit: '% Vorteil' }), num('stations.surgery.bonus.2', 'Ripperdoc: Implantat perfekt', { unit: '% Vorteil' }),
+        num('stations.drone.power', 'Drohnen-Platine: Energie', { min: 1 }), num('stations.drone.slots', 'Drohnen-Platine: Plätze', { min: 1, max: 8 }),
+        num('stations.drone.bonus.1', 'Platine: Lötstelle gut', { unit: '%' }), num('stations.drone.bonus.2', 'Platine: Lötstelle perfekt', { unit: '%' }),
+        num('stations.truck.customers', 'Foodtruck: Kunden', { min: 1 }), num('stations.truck.patience', 'Foodtruck: Geduld', { unit: 's', min: 1 }), num('stations.truck.price', 'Foodtruck: Preis', { unit: '% vom Wert' }),
+        num('stations.truck.tip', 'Foodtruck: Trinkgeld schnell', { unit: '%' }), num('stations.truck.favourite', 'Foodtruck: Lieblingsgericht', { unit: '%' }),
+        num('stations.power.seconds', 'Regler: Dauer', { unit: 's', min: 1 }), range('stations.power.band', 'Regler: grüner Bereich', { unit: '%' }), num('stations.power.drift', 'Regler: Unruhe'),
+        num('stations.power.need', 'Regler: nötig im Grünen', { unit: '%' }), num('stations.power.extra', 'Regler: Extra-Strom', { unit: '⚡' }), num('stations.power.hours', 'Regler: hält', { unit: 'h' })] },
       { title: 'Zerlegen', fields: [num('salvageTime', 'Zerlegen dauert', { unit: 'min', min: 0, hint: 'Je Stück, an Werkbank, Kochnische und Warroom (Gegenstände › Zerlegen)' })] },
       { title: 'Experimentieren', fields: [num('slots', 'Zutaten im Topf', { min: 1, max: 8, hint: 'Wie viele verschiedene Zutaten man zusammenwerfen kann' }),
         num('experimentMinutes', 'Ein Versuch dauert', { unit: 'min', min: 0, hint: 'Bei einem Fehlschlag; ein Treffer dauert so lang wie das Rezept' }),

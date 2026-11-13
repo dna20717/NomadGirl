@@ -10,9 +10,13 @@ import { icon } from '../icons.js';
 import { CATEGORY_COLORS, markOf } from './inventory_ui.js';
 import { recipesFor, known, missing, stock, craft, experiment, readable, read, tips, functionOf, salvageable, salvage } from '../crafting.js';
 import { clockText } from '../save.js';
-import { phase, canMaintain, update as tankUpdate } from '../tank.js';
+import { phase, canMaintain, update as tankUpdate, clockHours } from '../tank.js';
+import { RECIPE_PANELS, OWN_PANELS } from './station_ui.js';
+import { installBoard, noteSurgery, tuneResult, modsText, droneBonuses, CHIP_STATS } from '../stations.js';
+import { take } from '../crafting.js';
 
-const VERBS = { kitchen: ['Kochen', 'Kochnische'], foodtruck: ['Kochen', 'Foodtruck'], craft: ['Herstellen', 'Werkbank'], tank: ['Warten', 'Cryo-Tank'], warroom: ['Auswerten', 'Warroom'] };
+const VERBS = { kitchen: ['Kochen', 'Kochnische'], foodtruck: ['Kochen', 'Foodtruck'], craft: ['Bauen', 'Werkbank'], cyber: ['Operieren', 'Ripperdoc'], tank: ['Warten', 'Cryo-Tank'], warroom: ['Auswerten', 'Warroom'], drone: ['Platine', 'Drohnenwerkstatt'], power: ['Regeln', 'Generator'] };
+const QNAMES = ['', 'gut', 'perfekt'];
 // where things can be taken apart (Gegenstände › Zerlegen): the functions with a „Zerlegen“ tab
 const SALVAGE = ['craft', 'kitchen', 'warroom'];
 // order of the supplies: what fits the workshop first
@@ -31,6 +35,13 @@ export class CraftUI {
     this.log = null;   // { kind: 'hit' | 'learnt' | 'miss' | 'near' | 'read' | 'error', text, who?, line? }
     document.addEventListener('keydown', e => {
       if (!this.isOpen) return;
+      // a workshop's action is running (#013): Leertaste / Enter / E = its main button, arrows turn the regulator, Esc = back to the book
+      if (this.station && !this.station.finished) {
+        const k = e.key;
+        if (k === ' ' || k === 'Enter' || ((k === 'e' || k === 'E') && !this.cursor.on)) { this.mainPress(); e.preventDefault(); e.stopPropagation(); return; }
+        if ((k === 'ArrowLeft' || k === 'ArrowRight') && this.station.turn) { this.station.turn(k === 'ArrowLeft' ? -1 : 1); e.preventDefault(); e.stopPropagation(); return; }
+        if (k === 'Escape' && !this.stationOnly) { this.stopStation(); e.preventDefault(); e.stopPropagation(); return; }
+      }
       // one grammar (ui_nav.js): Esc = back; E is „ok“ once the cursor is in use, before that it closes like it opened
       const ek = (e.key === 'e' || e.key === 'E') && !this.cursor.on;
       if (e.key === 'Escape' || ek || e.key === 'Tab' || e.key === 'i' || e.key === 'I') { this.close(); e.preventDefault(); e.stopPropagation(); }
@@ -42,16 +53,65 @@ export class CraftUI {
   get isOpen() { return !this.el.hidden; }
 
   // mode: 'pot' (experimenting) or 'salvage' (taking things apart); the warroom only has the salvage side
-  open(ws, mode = null) { this.ws = ws; this.cursor.i = -1; this.pot = {}; this.log = null; this.only = functionOf(this.D, ws) === 'warroom'; this.mode = this.only ? 'salvage' : mode || 'pot'; this.el.hidden = false; this.draw(); }
+  open(ws, mode = null) {
+    this.ws = ws; this.cursor.i = -1; this.pot = {}; this.log = null; this.station = null; this.stationOnly = false;
+    const fn = functionOf(this.D, ws);
+    this.only = fn === 'warroom'; this.mode = this.only ? 'salvage' : mode || 'pot'; this.el.hidden = false;
+    // workshops whose action needs no recipe (#013): AvA's board, the regulator; the foodtruck opens at its counter
+    if (OWN_PANELS[fn] && (fn !== 'foodtruck' || mode !== 'pot')) { this.stationOnly = fn !== 'foodtruck'; this.startStation(new OWN_PANELS[fn](this), null); return; }
+    this.draw();
+  }
+  // ---------- the workshop's action (#013, game/play/station_ui.js) ----------
+  startStation(panel, r) {
+    this.station = panel; this.stationRecipe = r; this.cursor.i = -1; this.cursor.start = '.st-btn.main';
+    this.draw(); this.focusMain();
+    cancelAnimationFrame(this.raf); let last = performance.now();
+    const loop = now => { if (!this.isOpen || this.station !== panel) return; const dt = Math.min(100, now - last); last = now; if (!this.manual && panel.tick?.(dt)) this.refreshStation(); this.raf = requestAnimationFrame(loop); };   // manual: tests step by hand
+    this.raf = requestAnimationFrame(loop);
+  }
+  // the time of the panels: steps by hand for tests (nomad, scripts), the same as the frame loop
+  stepStation(ms) { if (this.station?.tick?.(ms)) this.refreshStation(); }
+  focusMain() { const T = this.cursor.targets(), k = T.findIndex(n => n.matches('.st-btn.main')); if (k >= 0) { this.cursor.i = k; if (this.cursor.on) this.cursor.show(); } }
+  refreshStation() { const old = this.el.querySelector('.st-panel'); if (old && this.station) { const n = this.station.el(); old.replaceWith(n); if (this.cursor.on) this.cursor.show(); } }
+  mainPress() { const b = this.el.querySelector('.st-btn.main:not([disabled])'); if (b) b.click(); }
+  stopStation() { cancelAnimationFrame(this.raf); this.station = null; this.stationRecipe = null; this.cursor.start = null; if (this.stationOnly) return this.close(); this.draw(); }
+  drone(mood) { this.host.react?.(mood); }
+  // a panel is through: make the thing with its quality, or put AvA's board in, sell, tune
+  finishStation(res) {
+    const D = this.D, save = this.save, p = this.station, r = this.stationRecipe, fn = functionOf(D, this.ws);
+    p.finished = true; cancelAnimationFrame(this.raf);
+    if (r) {
+      let q = res.q || 0;
+      if (res.spice) { take(D, save, res.spice, 1); q = Math.min(2, q + 1); }   // spice: one step better
+      if (fn === 'cyber' && r.result) noteSurgery(save, r.result, q);
+      const out = craft(D, save, r.id, this.ws, { q, mods: res.mods || null, parts: res.parts || [] });
+      this.station = null; this.stationRecipe = null; this.cursor.start = null;
+      if (!out.ok) return this.say('error', out.reason);
+      const qn = QNAMES[q], extra = out.made.mods ? ` (${modsText(out.made.mods) || 'Grundwerte'})` : fn === 'cyber' && q ? ` · Implantat wirkt +${D.crafting?.stations?.surgery?.bonus?.[q] ?? [0, 10, 20][q]} %` : '';
+      return this.after(out, 'hit', `${this.madeName(out.made)}${qn ? ` · ${qn}` : ''} ist fertig!${extra}` + (out.made.part ? ' · liegt auf dem Schrottplatz, einbauen mit B' : ''));
+    }
+    let text = '', kind = 'hit';
+    if (fn === 'drone') { const x = installBoard(D, save, res.chips); if (!x.ok) { kind = 'error'; text = x.reason; } else text = 'AvAs Platine sitzt: ' + Object.entries(x.bonuses).map(([k, v]) => `${CHIP_STATS.find(s => s[0] === k)?.[1] || k} +${v}`).join(' · '); this.drone(x.ok ? 'happy' : 'gearWorse'); }
+    else if (fn === 'foodtruck') text = res.sold ? `${res.sold} verkauft: +${res.deltas} Δ${res.tips ? ` (davon ${res.tips} Δ Trinkgeld)` : ''}` : 'Niemand bedient.';
+    else if (fn === 'power') { const x = tuneResult(D, save, res.share, clockHours(save)); kind = x.ok ? 'hit' : 'miss'; text = x.ok ? `Im grünen Bereich (${x.share} %): +${x.extra} ⚡ für ${x.hours} h` : `Nur ${x.share} % im grünen Bereich. Das Licht flackert, sonst passiert nichts.`; }
+    this.station = null; this.stationRecipe = null; this.cursor.start = null;
+    this.log = { kind, text }; this.host.changed?.({ minutes: 0 });
+    if (this.stationOnly) { this.stationOnly = false; this.mode = 'done'; }
+    this.draw();
+  }
   canSalvage() { return SALVAGE.includes(functionOf(this.D, this.ws)); }
   setMode(m) { if (this.mode === m) return; this.mode = m; this.cursor.i = -1; this.draw(); }
-  close() { this.el.hidden = true; this.tip.hidden = true; this.pot = {}; this.cursor.hide(); this.host.closed?.(); }
+  close() { cancelAnimationFrame(this.raf); this.station = null; this.el.hidden = true; this.tip.hidden = true; this.pot = {}; this.cursor.hide(); this.cursor.start = null; this.host.closed?.(); }
   nav(ui) {
-    if (this.canSalvage() && !this.only && (ui.pressed('prev') || ui.pressed('next'))) return this.setMode(this.mode === 'salvage' ? 'pot' : 'salvage');
+    if (this.station && this.station.turn && !this.station.finished) { if (ui.down('left')) this.station.turn(-1); else if (ui.down('right')) this.station.turn(1); }
+    if (this.station && !this.station.finished && ui.pressed('back') && !this.stationOnly) return this.stopStation();
+    if (!this.station && this.canSalvage() && !this.only && (ui.pressed('prev') || ui.pressed('next'))) return this.setMode(this.mode === 'salvage' ? 'pot' : 'salvage');
     if (this.cursor.update(ui)) this.cursor.show();
   }
 
   verb() { return VERBS[functionOf(this.D, this.ws)]?.[0] || 'Herstellen'; }
+  // the action panel of a recipe at this workshop (#013); tank care and trophies stay plain
+  panelFor(r) { const P = RECIPE_PANELS[functionOf(this.D, this.ws)]; return P && !r.tank && !r.part ? P : null; }
 
   draw() {
     if (!this.isOpen) return;
@@ -60,9 +120,11 @@ export class CraftUI {
       el('header', {}, icon('workbench', 20), el('h2', {}, def.name || this.ws),
         el('small', {}, clockText(save)), el('button', { class: 'craft-x', title: 'Schließen (Esc)', onclick: () => this.close() }, '×')),
       this.tankEl(),
-      el('div', { class: 'craft-cols' + (this.only ? ' single' : '') }, this.only ? null : this.bookEl(), this.mode === 'salvage' ? this.salvageEl() : this.potEl()),
+      el('div', { class: 'craft-cols' + (this.only || this.stationOnly || this.mode === 'done' ? ' single' : '') }, this.only || this.stationOnly || this.mode === 'done' ? null : this.bookEl(),
+        this.station ? this.station.el() : this.mode === 'done' ? this.doneEl() : this.mode === 'salvage' ? this.salvageEl() : this.potEl()),
       this.logEl(),
-      hints([['move', 'wählen'], ['ok', 'eins'], ['send', 'alle'], ['context', 'wieder raus'], ['back', 'schließen']], 'Vorräte anklicken: in den Topf · Rechtsklick oder Klick im Topf: raus · Zutaten aus Lager, Kiste und Rucksack')));
+      this.station ? hints([['move', 'wählen'], ['ok', 'drücken'], ['back', this.stationOnly ? 'schließen' : 'abbrechen']], 'Leertaste: Hauptknopf · Geschick gibt nur Bonus, daneben ist auch in Ordnung')
+        : hints([['move', 'wählen'], ['ok', 'eins'], ['send', 'alle'], ['context', 'wieder raus'], ['back', 'schließen']], 'Vorräte anklicken: in den Topf · Rechtsklick oder Klick im Topf: raus · Zutaten aus Lager, Kiste und Rucksack')));
     this.cursor.show();
   }
 
@@ -72,14 +134,20 @@ export class CraftUI {
     const cards = mine.map(r => {
       const miss = missing(D, save, r), st = stock(D, save), made = r.once && madeOnce(save, r.id);   // a trophy (#012): once, then „hergestellt“
       return el('div', { class: 'craft-recipe' + (miss.length && !made ? ' missing' : '') + (r.once ? ' trophy' : '') + (made ? ' made' : '') },
-        el('div', { class: 'craft-rtop' }, (r.tank ? el('span', { class: 'craft-chip big tank' }, `+${r.tank}%`) : r.part ? this.partChip(r.part, r.count || 1) : this.chip(r.result, r.count || 1, { big: true })), el('b', {}, r.name || (r.part ? D.rigParts?.[r.part]?.name : D.items?.[r.result]?.name) || r.id), el('small', {}, `${r.time ?? 10} min`)),
+        el('div', { class: 'craft-rtop' }, (r.tank ? el('span', { class: 'craft-chip big tank' }, `+${r.tank}%`) : r.part ? this.partChip(r.part, r.count || 1) : r.weapon ? el('span', { class: 'craft-chip big', style: '--col:#c7b08b' }, markOf(D, 'weapons', r.weapon, 40)) : this.chip(r.result, r.count || 1, { big: true })), el('b', {}, r.name || (r.part ? D.rigParts?.[r.part]?.name : r.weapon ? D.weapons?.[r.weapon]?.name : D.items?.[r.result]?.name) || r.id), el('small', {}, `${r.time ?? 10} min`)),
         el('div', { class: 'craft-ings' }, ...(r.ingredients || []).map(i => {
           const n = st[i.item] || 0, need = i.count || 1;
           return el('span', { class: 'craft-ing ' + (n >= need ? 'ok' : 'no') }, markOf(D, 'items', i.item, 18), ` ${D.items?.[i.item]?.name || i.item} ${Math.min(n, 99)}/${need}`);
         })),
         r.tank && r.tankUpTo ? el('small', { class: 'craft-upto' }, `hilft bis Phase ${r.tankUpTo}`) : null,
         r.once ? el('small', { class: 'craft-upto' }, made ? 'Trophäe · hergestellt' : 'Trophäe · einmalig') : null,
-        made ? null : el('button', { class: 'inv-btn', disabled: !!miss.length || (r.tank && !canMaintain(D, save, r).ok), title: miss.length ? 'Es fehlen: ' + miss.map(m => `${m.need - m.have}× ${D.items?.[m.item]?.name || m.item}`).join(', ') : r.tank ? canMaintain(D, save, r).reason || '' : '', onclick: () => this.make(r.id) }, verb));
+        made ? null : (() => {
+          const off = !!miss.length || (r.tank && !canMaintain(D, save, r).ok), why = miss.length ? 'Es fehlen: ' + miss.map(m => `${m.need - m.have}× ${D.items?.[m.item]?.name || m.item}`).join(', ') : r.tank ? canMaintain(D, save, r).reason || '' : '';
+          const P = this.panelFor(r), needsParts = (r.slots || []).some(x => x.required);
+          return el('div', { class: 'craft-btns' },
+            el('button', { class: 'inv-btn', disabled: off, title: why, onclick: () => P ? this.startStation(new P(this, r), r) : this.make(r.id) }, P ? verb : verb === 'Bauen' ? 'Herstellen' : verb),
+            P && !needsParts ? el('button', { class: 'inv-btn ghost craft-quick', disabled: off, title: 'Ohne Handgriffe, normales Ergebnis', onclick: () => this.make(r.id) }, 'Schnell') : null);
+        })());
     });
     const notes = readable(D, save).filter(x => all.some(r => r.id === x.recipe)).map(x => el('div', { class: 'craft-note' },
       this.chip(x.item, 1), el('span', {}, el('b', {}, D.items[x.item].name || x.item), el('small', {}, D.items[x.item].description || 'Da steht was drauf.')),
@@ -124,11 +192,19 @@ export class CraftUI {
         return c;
       }) : [el('p', { class: 'craft-empty' }, 'Nichts da. Erst plündern, dann kochen.')])));
   }
-  // tabs over the right panel: Experimentieren | Zerlegen (Q / LB / RB switches, ui_nav.js)
+  // tabs over the right panel: Experimentieren | Zerlegen | Theke (Q / LB / RB switches, ui_nav.js)
   modeTabs() {
-    if (!this.canSalvage() || this.only) return null;
-    const t = (m, ic, label) => el('button', { class: 'inv-tab' + (this.mode === m ? ' on' : ''), onclick: () => this.setMode(m) }, icon(ic, 14), label);
-    return el('header', { class: 'craft-modes' }, t('pot', 'research', 'Experimentieren'), t('salvage', 'anvil', 'Zerlegen'));
+    const truck = functionOf(this.D, this.ws) === 'foodtruck';
+    if ((!this.canSalvage() && !truck) || this.only) return null;
+    const t = (m, ic, label) => el('button', { class: 'inv-tab' + (this.mode === m ? ' on' : ''), onclick: () => m === 'counter' ? this.startStation(new OWN_PANELS.foodtruck(this), null) : this.setMode(m) }, icon(ic, 14), label);
+    return el('header', { class: 'craft-modes' }, t('pot', 'research', 'Experimentieren'), this.canSalvage() ? t('salvage', 'anvil', 'Zerlegen') : null, truck ? t('counter', 'shop', 'Theke') : null);
+  }
+  // after a workshop without recipes (AvA's board, the regulator): what came out, and once more
+  doneEl() {
+    const fn = functionOf(this.D, this.ws), again = () => { this.mode = 'pot'; this.stationOnly = fn !== 'foodtruck'; this.startStation(new OWN_PANELS[fn](this), null); };
+    const now = fn === 'drone' ? Object.entries(droneBonuses(this.D, this.save)).map(([k, v]) => `${CHIP_STATS.find(s => s[0] === k)?.[1] || k} +${v}`).join(' · ') : '';
+    return el('section', { class: 'inv-panel st-panel st-done' }, el('header', {}, icon('check', 16), el('b', {}, 'Erledigt')), now ? el('p', {}, `AvA jetzt: ${now}`) : null,
+      el('div', { class: 'st-row' }, el('button', { class: 'inv-btn st-btn main', 'data-nav': '', onclick: again }, 'Nochmal'), el('button', { class: 'inv-btn ghost st-btn', 'data-nav': '', onclick: () => this.close() }, 'Fertig')));
   }
   // ---------- taking things apart (game/crafting.js › salvage) ----------
   salvageEl() {
@@ -176,7 +252,7 @@ export class CraftUI {
     if (!r.ok) return this.say('error', r.reason);
     this.after(r, 'hit', fill(D.crafting?.texts?.hit || '{name} ist fertig!', `${r.made.n > 1 ? r.made.n + '× ' : ''}${this.madeName(r.made)}`) + (r.made.part ? ' · liegt auf dem Schrottplatz, einbauen mit B' : ''));
   }
-  madeName(m) { return m.tank ? `Tank +${m.tank} %` : (m.part ? this.D.rigParts?.[m.id]?.name : this.D.items?.[m.id]?.name) || m.id; }
+  madeName(m) { return m.tank ? `Tank +${m.tank} %` : (m.part ? this.D.rigParts?.[m.id]?.name : m.weapon ? this.D.weapons?.[m.id]?.name : this.D.items?.[m.id]?.name) || m.id; }
   // at the cryo tank: a bar with its condition and phase over the recipe book (Cryo-Tank › Phasen)
   tankEl() {
     if (functionOf(this.D, this.ws) !== 'tank') return null;
@@ -204,7 +280,7 @@ export class CraftUI {
   }
   // after an action: leftovers go on the ground, a companion of this workshop comments, the savegame is written
   after(r, kind, text) {
-    if (r.left > 0) { this.host.leftover?.(r.made.id, r.left); text += ` (${r.left} ${r.left === 1 ? 'liegt' : 'liegen'} am Boden, kein Platz)`; }
+    if (r.left > 0) { this.host.leftover?.(r.made.id, r.left, r.made.weapon ? 'weapons' : 'items', { ...(r.made.q ? { q: r.made.q } : {}), ...(r.made.mods ? { mods: r.made.mods } : {}) }); text += ` (${r.left} ${r.left === 1 ? 'liegt' : 'liegen'} am Boden, kein Platz)`; }
     const line = this.companionLine(kind === 'miss' || kind === 'near' ? 'miss' : kind === 'read' ? null : 'hit');
     this.log = { kind, text, minutes: r.minutes, ...line };
     this.host.changed?.(r);
@@ -253,7 +329,7 @@ export class CraftUI {
   state() {
     if (!this.isOpen) return { open: false };
     const D = this.D, save = this.save;
-    return { open: true, workshop: this.ws, mode: this.mode, salvage: this.mode === 'salvage' ? salvageable(D, save, this.ws).map(t => `${t.id}×${t.n}`) : null, pot: { ...this.pot }, log: this.log && { ...this.log },
+    return { open: true, workshop: this.ws, mode: this.mode, station: this.station ? this.station.constructor.name : null, phase: this.station?.phase ?? null, salvage: this.mode === 'salvage' ? salvageable(D, save, this.ws).map(t => `${t.id}×${t.n}`) : null, pot: { ...this.pot }, log: this.log && { ...this.log },
       book: recipesFor(D, this.ws).filter(r => known(save, r.id)).map(r => ({ id: r.id, ready: !missing(D, save, r).length })),
       notes: readable(D, save).map(x => x.item), tips: tips(D, save, this.ws).map(t => t.recipe), stock: stock(D, save) };
   }

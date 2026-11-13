@@ -8,6 +8,7 @@
 import { bonuses as trophyBonuses } from './achievements.js';
 import { stock, take, learn } from './crafting.js';
 import { gearStats } from './inventory.js';
+import { droneBonuses } from './stations.js';
 
 export const nodes = save => (save.nodes ??= []);
 export const owned = (save, id) => nodes(save).includes(id);
@@ -51,6 +52,8 @@ export function bonuses(D, save) {
   if (save?.inv?.wear) { const g = gearStats(D, save.inv.wear); for (const k of ['tankDecay', 'droneBattery']) if (g[k]) out[k] = (out[k] || 0) + g[k]; }
   // trophies on the stands (#012): AvAs erstes Bild (Tank-Verfall), Notfall-Chip (Rettung), AvA-Akku
   const t = trophyBonuses(D, save); for (const k of ['tankDecay', 'tankRescue', 'droneBattery']) if (t[k]) out[k] = (out[k] || 0) + t[k];
+  // AvA's board from the drone workshop (#013): more battery, a cheaper rescue
+  const d = droneBonuses(D, save); if (d.battery) out.droneBattery = (out.droneBattery || 0) + d.battery; if (d.rescue) out.tankRescue = (out.tankRescue || 0) - d.rescue;
   return out;
 }
 

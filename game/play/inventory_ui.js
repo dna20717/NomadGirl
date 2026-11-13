@@ -4,10 +4,12 @@
 // double click moves it to the other side, a click outside the panels puts it back. Placeholders until things have a look:
 // coloured cells by category with a short glyph, the name and the count.
 import { achievementOf, displayed, bonusText } from '../achievements.js';
+import { modsText, weaponStats, PART_SLOTS, CHIP_STATS } from '../stations.js';
+import { qualityBonus } from '../crafting.js';
 import { el } from '../ui.js';
 import { hints, padInUse, keyGlyph, closeX } from './ui_nav.js';
 import { icon } from '../icons.js';
-import { cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot, IMPLANTS, DRONE_WEAR, WEAR_KEYS, wearOf, gearStats, gearScore, occupancy, statParts, GEAR_STATS } from '../inventory.js';
+import { cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot, IMPLANTS, DRONE_WEAR, WEAR_KEYS, wearOf, gearStats, gearScore, occupancy, statParts, GEAR_STATS, addEntry } from '../inventory.js';
 import { partSlots, budgets, SLOT_NAMES as PART_SLOT_NAMES } from '../rig.js';
 import { containers as storeList } from '../save.js';
 
@@ -308,6 +310,7 @@ export class InventoryUI {
     else wrap.append(el('span', { class: 'inv-glyph', style: `left:${lx * c}px;top:${ly * c}px;width:${c}px;height:${c}px` }, glyphOf(D, e.a, e.id)));
     if (!art && (b.w * c >= 80 || b.h > 1)) wrap.append(el('span', { class: 'inv-name' }, t.name || e.id));
     if (e.n > 1) wrap.append(el('span', { class: 'inv-count' }, String(e.n)));
+    if (e.q || e.mods) wrap.append(el('span', { class: 'inv-badge' + (e.q ? ' q' + e.q : ' mod') }, e.mods ? '⚙' : e.q === 2 ? '★★' : '★'));   // good dish / own weapon (#013)
     wrap.addEventListener('mousedown', ev => {
       ev.stopPropagation();
       if (ev.button === 2 || ev.ctrlKey) { if (this.held) this.turnHeld(); else this.openMenu(key, g, e, wrap); return; }
@@ -332,7 +335,7 @@ export class InventoryUI {
     const s = el('div', { class: 'inv-slot wear' + (t ? ' full' : '') + (w && IMPLANTS.includes(w) ? ' implant' : '') + (t?.tier ? ' tier-' + t.tier : ''), title: name, 'data-slot': slot, style: t ? `--col:${CATEGORY_COLORS[kindOf(D, a, id)]}${t.tier ? `;--tier:${TIER_COLORS[t.tier]}` : ''}` : '' },
       el('small', {}, name), pic, el('span', {}, t ? t.name : 'frei'));
     s.addEventListener('mousedown', ev => { ev.stopPropagation(); if (ev.button === 0) this.slotClick(slot); });
-    if (t) { s.addEventListener('mouseenter', () => this.showTip({ a, id, n: 1 })); s.addEventListener('mouseleave', () => { if (!this.menuOn) this.tip.hidden = true; }); }
+    if (t) { s.addEventListener('mouseenter', () => this.showTip({ a, id, n: 1, ...(a === 'weapons' && inv.slotMods?.[slot] ? { mods: inv.slotMods[slot] } : {}) })); s.addEventListener('mouseleave', () => { if (!this.menuOn) this.tip.hidden = true; }); }
     return s;
   }
 
@@ -345,7 +348,7 @@ export class InventoryUI {
       const h = this.held;
       if (!h) return this.host.notify?.('Zieh etwas Essbares hierher', 'info');
       if (h.e.a !== 'items') return this.host.notify?.('Das kann man nicht essen');
-      const r = this.host.use?.(h.e.id);
+      const r = this.host.use?.(h.e.id, h.e.q || 0);
       if (!r?.ok) return this.host.notify?.(r?.reason || 'Geht nicht');
       h.e.n -= 1;
       if (h.e.n <= 0) this.held = null;
@@ -396,6 +399,11 @@ export class InventoryUI {
       el('small', {}, live ? 'Bonus aktiv: steht in der Schatzkammer' : 'Auf einen Trophäen-Ständer in der Schatzkammer stellen, dann wirkt der Bonus')) : null;
     this.tip.replaceChildren(...[el('b', {}, t.name || e.id), el('small', {}, facts.join(' · ')), trophy,
       parts.length ? el('ul', { class: 'inv-perks' }, ...parts.map(x => el('li', { class: x.good ? 'perk' : 'flaw' }, (x.good ? '▲ ' : '▼ ') + x.text))) : null,
+      e.q ? el('small', { class: 'inv-quality q' + e.q }, `Qualität: ${e.q === 2 ? 'perfekt' : 'gut'}${t.buff ? ` · Buff +${qualityBonus(D, e.q)} %` : ''}`) : null,
+      e.a === 'weapons' && e.mods ? el('div', { class: 'inv-mods' }, el('small', {}, 'Eigenbau: ' + (modsText(e.mods) || 'Grundwerte')),
+        el('ul', { class: 'inv-perks' }, ...weaponStats(t, e.mods).filter(x => x.now !== x.base).map(x => el('li', { class: x.better ? 'perk' : 'flaw' }, `${x.better ? '▲' : '▼'} ${x.label} ${x.base} → ${x.now}`)))) : null,
+      t.part ? el('small', { class: 'inv-mods' }, `Waffenteil (${PART_SLOTS.find(p => p[0] === t.part.slot)?.[1] || t.part.slot}): ${modsText(t.part) || '—'}`) : null,
+      t.chip?.stat ? el('small', { class: 'inv-mods' }, `Chip für AvA: ${CHIP_STATS.find(c => c[0] === t.chip.stat)?.[1] || t.chip.stat} +${t.chip.value} · ${t.chip.power ?? 1} Energie`) : null,
       t.description ? el('p', {}, t.description) : null,
       acts.length ? el('ul', { class: 'inv-acts' }, ...(this.padOn ? acts.filter(x => x.k) : acts).map(row), this.padOn ? null : el('li', { class: 'hint' }, 'Rechtsklick: Aktionen')) : null].filter(Boolean));   // replaceChildren would write "null" as text
     this.tip.hidden = false;
@@ -436,7 +444,7 @@ export class InventoryUI {
     const g = this.grid(key);
     if (!g) return false;
     const test = { ...g, items: g.items.map(x => ({ ...x })) };
-    return add(this.D, test, e.a, e.id, 1) === 0;
+    return addEntry(this.D, test, e, 1) === 0;
   }
   act(id, key, e) {
     const g = this.grid(key);
@@ -445,12 +453,12 @@ export class InventoryUI {
     if (id === 'learn') { if (this.host.learn?.(g, e)) this.changed(key); return; }
     if (id === 'equip') return this.equipFrom(key, g, e);
     if (id === 'send') return this.quickMove(key, e);
-    if (id === 'drone') { const left = add(this.D, this.inv.grids.drone, e.a, e.id, e.n); if (left === e.n) return this.host.notify?.('AvA hat keinen Platz'); if (left === 0) remove(g, e); else e.n = left; this.changed('drone'); return this.moodAfter('drone', e); }
+    if (id === 'drone') { const left = addEntry(this.D, this.inv.grids.drone, e, e.n); if (left === e.n) return this.host.notify?.('AvA hat keinen Platz'); if (left === 0) remove(g, e); else e.n = left; this.changed('drone'); return this.moodAfter('drone', e); }
     if (id === 'throw') { this.pick(key, g, e); this.throwDown(); return this.draw(); }
     if (id === 'turn') return this.turnInPlace(g, e);
   }
   useFrom(key, g, e) {
-    const r = this.host.use?.(e.id);
+    const r = this.host.use?.(e.id, e.q || 0);
     if (!r?.ok) return this.host.notify?.(r?.reason || 'Geht nicht');
     e.n -= 1;
     if (e.n <= 0) remove(g, e);
@@ -682,7 +690,7 @@ export class InventoryUI {
     if ((['melee', 'ranged', 'cyberdeck', 'backpack'].includes(h.from) || String(h.from).startsWith('wear:')) && this.equip(h.from, h.e, true)) return this.changed();
     for (const key of [h.from, 'backpack', ...(this.pair || []), this.other?.key]) {
       const g = key && this.grid(key);
-      if (g && add(this.D, g, h.e.a, h.e.id, h.e.n) === 0) return this.changed(key);
+      if (g && addEntry(this.D, g, h.e, h.e.n) === 0) return this.changed(key);
     }
     this.held = h; this.host.notify?.('Nirgends Platz');
   }
@@ -699,7 +707,7 @@ export class InventoryUI {
   quickMove(key, e) {
     const to = this.otherSide(key), g = this.grid(key), dst = to && this.grid(to);
     if (!dst || !this.allows(to, e)) return;
-    const left = add(this.D, dst, e.a, e.id, e.n);
+    const left = addEntry(this.D, dst, e, e.n);
     if (left === e.n) return this.host.notify?.('Kein Platz');
     if (left === 0) remove(g, e); else e.n = left;
     this.changed(to);
@@ -708,7 +716,7 @@ export class InventoryUI {
   quickMoveHeld(key) {
     const h = this.held, to = this.otherSide(key), dst = to && this.grid(to);
     if (!dst || !this.allows(to, h.e)) return;
-    const left = add(this.D, dst, h.e.a, h.e.id, h.e.n);
+    const left = addEntry(this.D, dst, h.e, h.e.n);
     if (left === h.e.n) return this.host.notify?.('Kein Platz');
     h.e.n = left;
     this.held = left ? h : null;
@@ -718,7 +726,7 @@ export class InventoryUI {
   storeAll() {
     if (this.other.accept) {   // only what this storage takes
       let n = 0;
-      for (const e of [...this.inv.grids.backpack.items]) if (this.allows(this.other.key, e, false) && add(this.D, this.other.grid, e.a, e.id, e.n) === 0) { remove(this.inv.grids.backpack, e); n++; }
+      for (const e of [...this.inv.grids.backpack.items]) if (this.allows(this.other.key, e, false) && addEntry(this.D, this.other.grid, e, e.n) === 0) { remove(this.inv.grids.backpack, e); n++; }
       this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingelagert` : 'Nichts Passendes im Rucksack', n ? 'good' : 'warn'); return this.changed(this.other.key);
     }
     const n = moveAll(this.D, this.inv.grids.backpack, this.other.grid); this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingelagert` : 'Nichts passt mehr rein', n ? 'good' : 'warn'); this.changed(this.other.key); }
@@ -745,7 +753,8 @@ export class InventoryUI {
     const id = inv.slots[slot];
     if (!id) return;
     inv.slots[slot] = null;
-    this.held = { e: { a: 'weapons', id, n: 1, r: 0 }, from: slot };
+    const mods = inv.slotMods?.[slot]; if (inv.slotMods) delete inv.slotMods[slot];   // a weapon copy keeps its own values (#013)
+    this.held = { e: { a: 'weapons', id, n: 1, r: 0, ...(mods ? { mods } : {}) }, from: slot };
     this.host.equipChanged?.(slot);
     this.changed();
   }
@@ -764,9 +773,10 @@ export class InventoryUI {
       return true;
     }
     if (e.a !== 'weapons' || (D.weapons?.[e.id]?.kind || 'melee') !== slot) return say(`Hier gehört eine ${SLOT_NAMES[slot]}-Waffe hin`);
-    const prev = inv.slots[slot];
+    const prev = inv.slots[slot], prevMods = inv.slotMods?.[slot];
     inv.slots[slot] = e.id;
-    this.held = prev ? { e: { a: 'weapons', id: prev, n: 1, r: 0 }, from: slot } : null;
+    inv.slotMods ??= {}; if (e.mods) inv.slotMods[slot] = { ...e.mods }; else delete inv.slotMods[slot];
+    this.held = prev ? { e: { a: 'weapons', id: prev, n: 1, r: 0, ...(prevMods ? { mods: prevMods } : {}) }, from: slot } : null;
     this.host.equipChanged?.(slot);
     return true;
   }
@@ -780,7 +790,7 @@ export class InventoryUI {
     inv.wear[w] = e.id;
     const rest = (e.n || 1) - 1;
     this.held = prev ? { e: { a: 'items', id: prev, n: 1, r: 0 }, from: 'wear:' + w } : rest > 0 ? { e: { ...e, n: rest }, from: this.held?.from } : null;
-    if (prev && rest > 0) add(D, this.inv.grids.backpack, e.a, e.id, rest);
+    if (prev && rest > 0) addEntry(D, this.inv.grids.backpack, e, rest);
     this.host.gearChanged?.();
     if (!quiet) {
       const before = prev ? gearScore(D.items?.[prev]?.stats) : 0, after = gearScore(t.stats);

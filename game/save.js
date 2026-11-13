@@ -11,7 +11,7 @@
 import { keepThrough } from './achievements.js';
 import { ensureMap } from './worldmap.js';
 import { ensureTank } from './tank.js';
-import { newGrid, add, fits, startWear, wearOf, WEAR_KEYS } from './inventory.js';
+import { newGrid, add, fits, startWear, wearOf, WEAR_KEYS, addEntry } from './inventory.js';
 
 const LOCAL_KEY = 'nomadgirl-save';
 export const SAVE_VERSION = 1;
@@ -75,7 +75,7 @@ export function ensureGrid(D, inv, key, [w, h]) {
   if (!g) return (inv.grids[key] = newGrid(w, h));
   if (g.w !== w || g.h !== h) {
     const old = g.items; g.w = w; g.h = h; g.items = [];
-    for (const e of old) if (fits(D, g, e, e.x, e.y)) g.items.push(e); else add(D, g, e.a, e.id, e.n);
+    for (const e of old) if (fits(D, g, e, e.x, e.y)) g.items.push(e); else addEntry(D, g, e, e.n);
   }
   return g;
 }
@@ -132,7 +132,7 @@ export function newCycle(D, old) {
   const trophies = keepThrough(D, old, s);
   if (trophies.length) {
     const grid = newGrid(6, Math.max(3, Math.ceil(trophies.length / 2) + 1));
-    for (const t of trophies) add(D, grid, t.a, t.id, t.n);
+    for (const t of trophies) addEntry(D, grid, t, t.n);
     ((s.ground ??= {})[s.location] ??= []).push({ x: null, feet: null, grid, memory: true });
   }
   return s;
@@ -166,7 +166,7 @@ function withInventory(D, save) {
       if (!owned) while (add(D, g, a, id, row.count || 1) !== 0 && g.items.some(e => !(e.a === a && e.id === id))) {
         const i = g.items.map((e, k) => [e, k]).filter(([e]) => !(e.a === a && e.id === id)).pop()[1];
         const [out] = g.items.splice(i, 1), chest = inv.grids.chest;
-        if (chest && chest !== g) add(D, chest, out.a, out.id, out.n);   // into the camp chest while there is room, otherwise gone
+        if (chest && chest !== g) addEntry(D, chest, out, out.n);   // into the camp chest while there is room, otherwise gone
       }
       save.handedOut.push(key);
       continue;
@@ -215,10 +215,10 @@ function refit(D, s) {
 function rehome(D, s, g) {
   const grids = s.inv?.grids || {};
   let rest = g.items.map(e => ({ ...e }));
-  for (const key of ['chest', 'rig:0']) if (grids[key]) rest = rest.map(e => ({ ...e, n: add(D, grids[key], e.a, e.id, e.n) })).filter(e => e.n > 0);
+  for (const key of ['chest', 'rig:0']) if (grids[key]) rest = rest.map(e => ({ ...e, n: addEntry(D, grids[key], e, e.n) })).filter(e => e.n > 0);
   if (rest.length) {
     const pile = { x: null, feet: null, grid: newGrid(Math.max(4, g.w), Math.max(3, g.h)) };
-    for (const e of rest) add(D, pile.grid, e.a, e.id, e.n);
+    for (const e of rest) addEntry(D, pile.grid, e, e.n);
     ((s.ground ??= {})[s.location] ??= []).push(pile);
   }
 }

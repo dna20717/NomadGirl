@@ -12,6 +12,9 @@ import { containers, advance } from './save.js';
 import { canMaintain, maintain } from './tank.js';
 import { madeOnce, markMade } from './achievements.js';
 
+// % more buff for a good / perfect dish (#013, Kochen & Craften › Herd › Bonus je Qualität)
+export const qualityBonus = (D, q = 0) => (D.crafting?.stations?.cook?.bonus ?? [0, 25, 50])[q || 0] ?? 0;
+
 export const startRecipes = D => Object.entries(D.recipes || {}).filter(([, r]) => (r.discovery || []).includes('start')).map(([id]) => id);
 export const known = (save, id) => (save.recipes || []).includes(id);
 export function learn(save, id) { save.recipes ??= []; if (known(save, id)) return false; save.recipes.push(id); return true; }
@@ -43,7 +46,7 @@ export const have = (D, save, id) => sources(D, save).reduce((n, s) => n + count
 export function take(D, save, id, n, a = 'items') {
   let left = n;
   for (const s of sources(D, save)) {
-    for (const e of [...s.grid.items]) {
+    for (const e of [...s.grid.items].sort((x, y) => (x.q || 0) - (y.q || 0))) {   // plain ones first, the good dishes stay (#013)
       if (!left) break;
       if (e.a !== a || e.id !== id) continue;
       const k = Math.min(left, e.n);
@@ -55,15 +58,16 @@ export function take(D, save, id, n, a = 'items') {
 }
 // puts n of a thing into the backpack, the chest, the storage places; → how many did not fit
 // a recipe's result: a thing into the inventories, or a rig part onto the scrapyard (Rezepte › Oder Rig-Teil). → what did not fit
-function produce(D, save, r, n) {
+function produce(D, save, r, n, x = {}) {
   if (r.tank) { for (let i = 0; i < n; i++) maintain(D, save, r); return 0; }   // Rezepte › Oder Tank-Wartung: the cryo tank gets condition back
   if (r.part && D.rigParts?.[r.part]) { save.rig.spare ??= { workshops: [], containers: [] }; (save.rig.spare.parts ??= []).push(...Array(n).fill(r.part)); return 0; }
-  return give(D, save, r.result, n);
+  if (r.weapon && D.weapons?.[r.weapon]) return give(D, save, r.weapon, n, 'weapons', { mods: x.mods || null });   // a weapon copy with its own values (#013)
+  return give(D, save, r.result, n, 'items', { q: x.q && D.items?.[r.result]?.buff ? x.q : 0 });   // quality only matters for things with a buff
 }
-export const resultOf = r => r.tank ? { id: 'tank', tank: r.tank } : r.part ? { id: r.part, part: true } : { id: r.result };
-export function give(D, save, id, n, a = 'items') {
+export const resultOf = r => r.tank ? { id: 'tank', tank: r.tank } : r.part ? { id: r.part, part: true } : r.weapon ? { id: r.weapon, weapon: true } : { id: r.result };
+export function give(D, save, id, n, a = 'items', opts = {}) {
   const g = save.inv.grids, order = ['backpack', 'chest', ...sources(D, save).map(s => s.key).filter(k => k !== 'backpack' && k !== 'chest')];
-  for (const key of order) { if (!n) break; if (g[key]) n = add(D, g[key], a, id, n); }
+  for (const key of order) { if (!n) break; if (g[key]) n = add(D, g[key], a, id, n, opts); }
   return n;
 }
 
@@ -74,20 +78,23 @@ export function missing(D, save, r) {
 }
 
 // cooks / crafts a known recipe: takes the ingredients, gives the result, moves the clock. → { ok, reason?, made, left, minutes }
-export function craft(D, save, id, ws) {
+// x (#013, the workshop's action): { q } quality of a dish or thing, { mods } values of a weapon from a blueprint
+export function craft(D, save, id, ws, x = {}) {
   const r = D.recipes?.[id];
   if (!r) return { ok: false, reason: 'Unbekanntes Rezept' };
   if (!known(save, id)) return { ok: false, reason: 'Steht nicht im Rezeptbuch' };
   if (ws && !recipesFor(D, ws).some(x => x.id === id)) return { ok: false, reason: 'Geht an dieser Werkstatt nicht' };
-  if (!D.items?.[r.result] && !D.rigParts?.[r.part] && !r.tank) return { ok: false, reason: 'Rezept ohne Ergebnis' };
+  if (!D.items?.[r.result] && !D.rigParts?.[r.part] && !D.weapons?.[r.weapon] && !r.tank) return { ok: false, reason: 'Rezept ohne Ergebnis' };
   if (r.tank) { const c = canMaintain(D, save, r); if (!c.ok) return c; }
   if (r.once && madeOnce(save, id)) return { ok: false, reason: 'Schon hergestellt (einmalig)' };   // trophies of achievements (#012)
   if (missing(D, save, r).length) return { ok: false, reason: 'Es fehlen Zutaten' };
+  { const need = {}, st = stock(D, save); for (const p of x.parts || []) need[p] = (need[p] || 0) + 1; for (const [p, k] of Object.entries(need)) if ((st[p] || 0) < k) return { ok: false, reason: `Teil fehlt: ${D.items?.[p]?.name || p}` }; }
   for (const i of r.ingredients || []) take(D, save, i.item, i.count || 1);
   const n = r.count || 1, minutes = r.time ?? 10;
   advance(save, minutes / 60);
   markMade(D, save, id);
-  return { ok: true, recipe: id, made: { ...resultOf(r), n }, left: produce(D, save, r, n), minutes };
+  for (const p of x.parts || []) take(D, save, p, 1);   // the weapon parts go into the weapon
+  return { ok: true, recipe: id, made: { ...resultOf(r), n, ...(x.q ? { q: x.q } : {}), ...(x.mods ? { mods: x.mods } : {}) }, left: produce(D, save, r, n, x), minutes };
 }
 
 // the pot: { item id: count } → the recipe it makes at this workshop (or null)
@@ -175,20 +182,23 @@ export function tips(D, save, ws) {
 
 // eating / using a thing with a buff (Gegenstände › Buff beim Essen/Benutzen). → { ok, reason?, buff, heal }
 // instant health heals now, buffs with the duration "Nächster Run" wait in save.buffs until the run ends.
-export function use(D, save, id, { health, maxHealth } = {}) {
+// q (#013): a good or perfect dish makes its buff stronger (Kochen & Craften › Herd › Bonus je Qualität), save.buffQ = { buff: % }
+export function use(D, save, id, { health, maxHealth, q = 0 } = {}) {
   const t = D.items?.[id], b = t && D.buffs?.[t.buff];
   if (!b) return { ok: false, reason: 'Kann man nicht benutzen' };
   if (b.duration === 'instant') {
     if (b.stat !== 'health') return { ok: false, reason: 'Wirkt nicht' };
     const max = maxHealth ?? D.leyla?.health ?? 100, now = health ?? save.health ?? max;
     if (now >= max) return { ok: false, reason: 'Leben ist schon voll' };
-    const heal = b.percent ? max * b.value / 100 : b.value;
+    const heal = (b.percent ? max * b.value / 100 : b.value) * (1 + qualityBonus(D, q) / 100);
     return { ok: true, buff: t.buff, heal: Math.min(max - now, heal) };
   }
   save.buffs ??= [];
-  if (save.buffs.includes(t.buff)) return { ok: false, reason: `${b.name || t.buff} wirkt schon` };
-  save.buffs.push(t.buff);
-  return { ok: true, buff: t.buff, heal: 0 };
+  const bonus = qualityBonus(D, q), had = save.buffQ?.[t.buff] || 0;
+  if (save.buffs.includes(t.buff) && bonus <= had) return { ok: false, reason: `${b.name || t.buff} wirkt schon` };
+  if (!save.buffs.includes(t.buff)) save.buffs.push(t.buff);
+  if (bonus) (save.buffQ ??= {})[t.buff] = bonus;   // a better dish on top of a plain one: the buff gets stronger
+  return { ok: true, buff: t.buff, heal: 0, ...(bonus ? { bonus } : {}) };
 }
 
 // ---------- Zerlegen (design.md › Ressourcen verdienen: Gegenstände › Zerlegen „Zerlegen an“ + „Ergibt“) ----------

@@ -3,7 +3,8 @@
 // are all the same kind of grid. The interface is game/play/inventory_ui.js.
 //
 // grid  = { w, h, items: [entry] }
-// entry = { a, id, n, x, y, r }   a = area of the thing ('items' | 'weapons' | 'backpacks'), n = count, x/y = top left cell, r = quarter turns (0–3)
+// entry = { a, id, n, x, y, r, q?, mods? }   a = area of the thing ('items' | 'weapons' | 'backpacks'), n = count, x/y = top left cell, r = quarter turns (0–3)
+//         q = quality of a dish or thing (#013: 1 gut, 2 perfekt; only the same quality stacks), mods = values of one weapon copy (#013)
 // Shapes: items may have a "shape" (rows of text, # = taken, . = free), otherwise a full rectangle of "size" [w, h].
 // Weapons use their "size", backpacks their "bag" footprint (default 2 × 3).
 
@@ -70,21 +71,25 @@ export function findSpot(D, grid, a, id, turns = [0, 1, 2, 3]) {
 }
 
 // add n of a thing: first onto existing stacks, then into free spots. Returns how many did NOT fit.
-export function add(D, grid, a, id, n = 1, { stackOnly = false } = {}) {
+// q / mods (#013): only the same quality stacks; a weapon with its own values keeps them
+export const sameKind = (e, a, id, q = 0) => e.a === a && e.id === id && (e.q || 0) === (q || 0);
+export function add(D, grid, a, id, n = 1, { stackOnly = false, q = 0, mods = null } = {}) {
   const max = stackMax(D, a, id);
   for (const e of grid.items) {
     if (!n) break;
-    if (e.a === a && e.id === id && e.n < max) { const k = Math.min(n, max - e.n); e.n += k; n -= k; }
+    if (sameKind(e, a, id, q) && e.n < max && !mods) { const k = Math.min(n, max - e.n); e.n += k; n -= k; }
   }
   while (n > 0 && !stackOnly) {
     const spot = findSpot(D, grid, a, id);
     if (!spot) break;
     const k = Math.min(n, max);
-    grid.items.push({ a, id, n: k, ...spot });
+    grid.items.push({ a, id, n: k, ...spot, ...(q ? { q } : {}), ...(mods ? { mods: { ...mods } } : {}) });
     n -= k;
   }
   return n;
 }
+// an entry taken out of somewhere back into a grid, with its quality and values; → how many did NOT fit
+export const addEntry = (D, grid, e, n = e.n, opts = {}) => add(D, grid, e.a, e.id, n, { ...opts, q: e.q || 0, mods: e.mods || null });
 export function remove(grid, e) { const i = grid.items.indexOf(e); if (i >= 0) grid.items.splice(i, 1); return e; }
 export function count(grid, a, id) { return grid.items.filter(e => e.a === a && e.id === id).reduce((s, e) => s + e.n, 0); }
 
@@ -97,7 +102,7 @@ export function drop(D, grid, e, x, y) {
   if (!hit.length) { grid.items.push(Object.assign(e, { x, y })); return { ok: true, held: null }; }
   if (hit.length === 1) {
     const o = hit[0], max = stackMax(D, e.a, e.id);
-    if (o.a === e.a && o.id === e.id && max > 1) {
+    if (sameKind(o, e.a, e.id, e.q) && max > 1 && !e.mods && !o.mods) {
       const k = Math.min(e.n, max - o.n);
       if (k <= 0) return { ok: false, held: e };
       o.n += k; e.n -= k;
@@ -112,7 +117,7 @@ export function drop(D, grid, e, x, y) {
 export function moveAll(D, from, to) {
   let moved = 0;
   for (const e of [...from.items].sort((p, q) => cellsOf(D, q.a, q.id).length - cellsOf(D, p.a, p.id).length)) {
-    const left = add(D, to, e.a, e.id, e.n);
+    const left = addEntry(D, to, e);
     if (left < e.n) moved++;
     if (left === 0) remove(from, e); else e.n = left;
   }
@@ -143,7 +148,7 @@ export function canResize(D, grid, w, h) {
   const g = newGrid(w, h), total = grid.items.reduce((n, e) => n + e.n, 0);
   let kept = 0;
   for (const e of grid.items) if (fits(D, g, e, e.x, e.y)) { g.items.push({ ...e }); kept += e.n; }
-  for (const e of grid.items) if (!g.items.some(x => x.x === e.x && x.y === e.y && x.id === e.id)) kept += e.n - add(D, g, e.a, e.id, e.n);
+  for (const e of grid.items) if (!g.items.some(x => x.x === e.x && x.y === e.y && x.id === e.id)) kept += e.n - addEntry(D, g, e);
   return kept === total;
 }
 export function worth(D, grid) { return grid.items.reduce((s, e) => s + (thing(D, e.a, e.id)?.value || 0) * e.n, 0); }
@@ -181,13 +186,15 @@ export function statParts(st = {}) {
   });
 }
 // what everything worn adds up to; strain = load of the implants
-export function gearStats(D, wear = {}) {
-  const s = { strain: 0 };
+// boost (#013, Ripperdoc): { implant id: % } a clean operation makes the good sides of an implant stronger, never its flaws
+export function gearStats(D, wear = {}, boost = null) {
+  const s = { strain: 0 }, dir = Object.fromEntries(GEAR_STATS.map(x => [x[0], x[3] || 1]));
   for (const k of GEAR_KEYS) s[k] = 0;
   for (const [k, id] of Object.entries(wear)) {
     const t = id && D.items?.[id];
     if (!t || t.wear !== k) continue;
-    for (const st of GEAR_KEYS) s[st] += t.stats?.[st] || 0;
+    const f = 1 + (IMPLANTS.includes(k) ? boost?.[id] || 0 : 0) / 100;
+    for (const st of GEAR_KEYS) { const v = t.stats?.[st] || 0; s[st] += v * (dir[st] ?? 1) > 0 && st !== 'airJumps' && st !== 'airDash' ? Math.round(v * f * 10) / 10 : v; }
     if (IMPLANTS.includes(k)) s.strain += t.strain || 0;
   }
   return s;

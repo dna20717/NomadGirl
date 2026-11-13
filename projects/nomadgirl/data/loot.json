@@ -33,7 +33,10 @@
    {"item": "sprungfedern", "weight": 1, "min": 1, "max": 1},
    {"item": "sprintwaden", "weight": 1, "min": 1, "max": 1},
    {"item": "subdermale_platten", "weight": 1, "min": 1, "max": 1},
-   {"item": "dermal_netz", "weight": 1, "min": 1, "max": 1}
+   {"item": "dermal_netz", "weight": 1, "min": 1, "max": 1},
+   {"item": "kurzer_lauf", "weight": 1, "min": 1, "max": 1},
+   {"item": "holzgriff", "weight": 1, "min": 1, "max": 1},
+   {"item": "led_chip", "weight": 1, "min": 1, "max": 1}
   ]
  },
  "mutanten_beute": {
@@ -46,7 +49,8 @@
    {"item": "mutantengemuese", "weight": 3, "min": 1, "max": 2},
    {"item": "neon_garnelen", "weight": 2, "min": 1, "max": 2},
    {"item": "goldzahn", "weight": 1, "min": 1, "max": 1},
-   {"item": "goetzenfigur", "weight": 1, "min": 1, "max": 1}
+   {"item": "goetzenfigur", "weight": 1, "min": 1, "max": 1},
+   {"item": "leichtklinge", "weight": 1, "min": 1, "max": 1}
   ]
  },
  "pluenderer_beute": {
@@ -97,7 +101,12 @@
    {"item": "subdermale_platten", "weight": 1, "min": 1, "max": 1},
    {"item": "dermal_netz", "weight": 1, "min": 1, "max": 1},
    {"item": "bauplan_faserhaut", "weight": 1, "min": 1, "max": 1},
-   {"item": "bauplan_heilgel_haut", "weight": 1, "min": 1, "max": 1}
+   {"item": "bauplan_heilgel_haut", "weight": 1, "min": 1, "max": 1},
+   {"item": "trommelmagazin", "weight": 1, "min": 1, "max": 1},
+   {"item": "schnellmagazin", "weight": 1, "min": 1, "max": 1},
+   {"item": "zackenklinge", "weight": 1, "min": 1, "max": 1},
+   {"item": "tape_griff", "weight": 1, "min": 1, "max": 1},
+   {"item": "zettel_rohrpistole", "weight": 1, "min": 1, "max": 1}
   ]
  },
  "drohnen_beute": {
@@ -128,7 +137,11 @@
    {"item": "federbeine_mk2", "weight": 1, "min": 1, "max": 1},
    {"item": "stossdaempfer_beine", "weight": 1, "min": 1, "max": 1},
    {"item": "faserhaut", "weight": 1, "min": 1, "max": 1},
-   {"item": "heilgel_haut", "weight": 1, "min": 1, "max": 1}
+   {"item": "heilgel_haut", "weight": 1, "min": 1, "max": 1},
+   {"item": "turbo_regler", "weight": 2, "min": 1, "max": 1},
+   {"item": "led_chip", "weight": 2, "min": 1, "max": 1},
+   {"item": "notfall_relais", "weight": 1, "min": 1, "max": 1},
+   {"item": "spuernase_chip", "weight": 1, "min": 1, "max": 1}
   ]
  },
  "boss_beute": {
@@ -161,7 +174,9 @@
    {"item": "bauplan_kaenguru_beine", "weight": 2, "min": 1, "max": 1},
    {"item": "kaenguru_beine", "weight": 1, "min": 1, "max": 1},
    {"item": "bauplan_panzerhaut_titan", "weight": 2, "min": 1, "max": 1},
-   {"item": "panzerhaut_titan", "weight": 1, "min": 1, "max": 1}
+   {"item": "panzerhaut_titan", "weight": 1, "min": 1, "max": 1},
+   {"item": "rotpunkt_visier", "weight": 2, "min": 1, "max": 1},
+   {"item": "notfall_relais", "weight": 1, "min": 1, "max": 1}
   ]
  },
  "tresor": {
@@ -207,7 +222,10 @@
    {"item": "bauplan_kaenguru_beine", "weight": 1, "min": 1, "max": 1},
    {"item": "bauplan_faserhaut", "weight": 1, "min": 1, "max": 1},
    {"item": "bauplan_heilgel_haut", "weight": 1, "min": 1, "max": 1},
-   {"item": "bauplan_panzerhaut_titan", "weight": 1, "min": 1, "max": 1}
+   {"item": "bauplan_panzerhaut_titan", "weight": 1, "min": 1, "max": 1},
+   {"item": "rotpunkt_visier", "weight": 1, "min": 1, "max": 1},
+   {"item": "leichtklinge", "weight": 1, "min": 1, "max": 1},
+   {"item": "spuernase_chip", "weight": 1, "min": 1, "max": 1}
   ]
  }
 }

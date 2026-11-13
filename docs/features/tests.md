@@ -38,3 +38,5 @@ node tools/raider_test.mjs [--shots]       # Raider-Bausatz im Kampfraum: alle R
 ```
 
 - #014: `raider_test` prüft Banner als Toast (ms 0 mit ✕) und **Deckung** (läuft hinter die Kiste, `cover`, taucht zum Schießen auf, Kiste hält Nägel); `cozy_test` Lichterkette 10 Δ, halber Preis zurück, **Mast am Lagerfeuer**; `map_test` **Gefahr wirkt** (Gefahr 4: mehr und zähere Gegner, Extra-Beute) und **Etappen** mit erzwungener Panne; Unit-Tests `test/rain.test.js` (Regen, Zisterne bei Regen, Wasser heilt nicht, Gießen), `test/threat.test.js`, `test/travel.test.js` (Route, Zwischenfälle, Entscheidungen).
+
+- #013: `node tools/bench_ui_test.mjs [--shots]` Werkstätten mit eigener Handlung: Herd (Zutaten, Würzen, Gar-Balken, perfekt/normal, Schnell), Bauplan + Teile → zwei Exemplare mit anderen Werten im Kampf, Ablegen behält die Werte, Ripperdoc, Drohnen-Platine mit Energie-Budget, Foodtruck mit Trinkgeld, Regler + Extra-Strom im Rig, Tastatur und Controller (23 Prüfungen), Bilder nach `output/bench_ui_*.png`. Unit-Test `test/stations.test.js`.

@@ -1,7 +1,7 @@
 // Loot on the ground in a run: beaten enemies drop bundles (their loot table), each bundle is a small grid.
 // The ground inventory (like XCOM) shows the nearest bundle within reach (Leyla › Inventar › Boden-Reichweite);
 // stackable things Leyla already carries are picked up by walking past, as far as the stacks have room.
-import { newGrid, add, rollLoot, thing, stackMax } from '../inventory.js';
+import { newGrid, add, rollLoot, thing, stackMax, addEntry } from '../inventory.js';
 
 const PILE = [6, 4];
 
@@ -86,7 +86,7 @@ export class Loot {
     let pile = this.nearest(), left = e.n;
     for (let i = 0; i < 2 && left > 0; i++) {
       if (!pile || i) pile = this.make(l.x + l.facing * 40, l.feet);
-      left = add(D, pile.grid, e.a, e.id, left);
+      left = addEntry(D, pile.grid, e, left);
       this.show(pile, l.x);
     }
     this.sync();
@@ -126,7 +126,7 @@ export class Loot {
       let moved = false;
       for (const e of [...p.grid.items]) {
         if (stackMax(D, e.a, e.id) <= 1 || !bag.items.some(b => b.a === e.a && b.id === e.id)) continue;
-        const left = add(D, bag, e.a, e.id, e.n, { stackOnly: true });
+        const left = addEntry(D, bag, e, e.n, { stackOnly: true });
         if (left === e.n) continue;
         s.fx.text(l.x, l.feet - l.height - 20, `+${e.n - left} ${thing(D, e.a, e.id)?.name || e.id}`, { color: '#9be8d8', size: 34, rise: 60, life: 900 });
         e.n = left; moved = true;

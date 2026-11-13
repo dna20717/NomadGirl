@@ -4,6 +4,7 @@
 // while Leyla is moving, a random mood (curious, scan) pops up now and then.
 
 import { suffering } from '../tank.js';
+import { droneBonuses } from '../stations.js';
 import { bonuses } from '../techtree.js';
 import { Cables, hullPoint } from '../drone_cables.js';
 
@@ -199,7 +200,7 @@ export class Drone {
       const P = this.d.platform || {}, st = this.scene.pad?.right || [0, 0], m = Math.hypot(st[0], st[1]);
       const hanging = l.state === 'hang' && l.ledge?.drone;
       if ((this.riding || hanging) && P.fly !== false && m > 0.2 && this.battery > 0) {
-        const v = (P.flySpeed ?? 150) * Math.min(1, m) * dt / 1000, dx = st[0] / m * v, dy = st[1] / m * v * (st[1] < 0 ? (P.flyUp ?? 60) / 100 : 1);
+        const v = (P.flySpeed ?? 150) * (1 + (this.scene.box ? droneBonuses(this.scene.data_, this.scene.box.save).speed || 0 : 0) / 100) * Math.min(1, m) * dt / 1000, dx = st[0] / m * v, dy = st[1] / m * v * (st[1] < 0 ? (P.flyUp ?? 60) / 100 : 1);
         if (this.carryLeyla(dx, dy)) { this.x += dx; this.y += dy; this.flying = true; }
       }
       tx = this.x; ty = this.y;
