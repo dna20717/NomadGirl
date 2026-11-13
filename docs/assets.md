@@ -57,6 +57,7 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/camp/chest.png` | Kiste im Camp: 5 Frames à 46 × 45 (zu → offen), im Spiel 90 px (`chest`) | aus dem Original zugeschnitten (Code) | 07.11.2026 |
 | `assets/sound/campfire.m4a`, `.ogg` | Lagerfeuer knistert, 29 s Schleife (`sound_campfire`) | von Daniel (WAV), mit ffmpeg umgewandelt | 07.11.2026 |
 | `assets/sound/wind.m4a`, `wind2`, `wind3` (+ `.ogg`) | Wind als leise Schleife und zwei Böen (`sound_wind`, `sound_wind2`, `sound_wind3`) | von Daniel | 07.11.2026 |
+| `assets/music/leyla_theme_camp.m4a`, `.ogg` | **Leyla Theme**, Camp-Version: akustische Gitarre, d-Moll, 3/4, 66 BPM, Feuerknistern; 87 s nahtlose Schleife (`music_leyla_camp`) | Code (Ava, Python/Karplus-Strong, `tools/music/leyla_theme_camp.py`), Noten selbst komponiert | 13.11.2026 |
 | `assets/tiles/camp_ground_source.png` | Camp-Boden: Tileset-Original, 256 × 256, Kacheln 32 px (`camp_ground_source`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/tiles/camp_ground.png` | Camp-Boden: 8 Kacheln à 32 × 40 (Oberfläche, Füllung, Kanten, Säule, Wände, Gras), im Spiel ×2 (`camp_ground`) | aus dem Tileset ausgeschnitten (Code) | 07.11.2026 |
 | `assets/leyla/idle_turn_side.png` (+ `_source.gif`) | Leyla dreht sich um, zufällige Idle, 17 Frames (`leyla_idle_turn_side`) | KI-generiert (Daniel), zugeschnitten (Code) | 07.11.2026 |

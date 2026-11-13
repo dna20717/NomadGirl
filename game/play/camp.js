@@ -946,11 +946,34 @@ export class Camp {
     this.wind?.play(); this.fireSound?.play();
     if (this.fireSound) this.fireSound.setSeek?.(Math.random() * 20);   // not always the same crackle
     this.gustAt = s.time.now + this.gustDelay();
+    this.startMusic();
+  }
+  // Leyla Theme, quiet in the background (Camp › Ton › Musik); loaded lazily so the camp is not slower to open
+  startMusic() {
+    const s = this.scene, S = this.C.sound || {}, id = S.music, A = id && this.D.assets?.[id];
+    if (!A?.file || !(S.musicVolume ?? 15)) return;
+    const play = () => {
+      if (s.camp !== this || this.music || !s.cache.audio.exists(id)) return;   // the scene may have moved on (run, new camp) while loading
+      this.musicTarget = (S.musicVolume ?? 15) / 100 * ((A.volume ?? 100) / 100);
+      this.musicAt = s.time.now;
+      this.music = s.sound.add(id, { loop: true, volume: 0 });
+      this.music.play({ loop: true, volume: 0 });
+      this.music.setVolume(0);   // fades in through updateSound
+    };
+    if (s.cache.audio.exists(id)) return play();
+    const base = s.base || location.href;
+    s.load.audio(id, [new URL(A.file, base).href, ...(A.alt ? [new URL(A.alt, base).href] : [])]);
+    s.load.once('filecomplete-audio-' + id, play);
+    s.load.start();
   }
   cam() { return this.scene.cam || this.scene.cameras.main; }
   gustDelay() { const [a, b] = this.C.sound?.gustEvery || [9, 22]; return (a + Math.random() * (b - a)) * 1000; }
   updateSound(time) {
     const s = this.scene, S = this.C.sound || {}, l = s.leyla;
+    if (this.music) {
+      const k = Math.min(1, (time - this.musicAt) / Math.max(1, (S.musicFadeIn ?? 4) * 1000));
+      this.music.setVolume(this.musicTarget * k * k);
+    }
     if (this.fireSound) {
       const d = Math.abs(l.x - this.geo.fireX), near = S.fireNear ?? 120, range = S.fireRange ?? 1100;
       const k = Math.max(0, Math.min(1, 1 - (d - near) / Math.max(1, range - near)));
@@ -1234,7 +1257,7 @@ export class Camp {
     return { clock: clockText(sv), day: sv.day, hour: sv.hour, daytime: this.day.name, location: sv.location, deltas: sv.deltas, fuel: sv.fuel, food: sv.food, health: sv.health, buffs: [...sv.buffs],
       prompt: this.promptText || null, hotspots: this.hotspots.map(h => ({ name: h.name, hint: typeof h.hint === 'function' ? h.hint() : h.hint, x: Math.round(h.x), floor: h.floor ?? null })),
       chest: this.chest && { open: this.chest.open, frame: Math.round(this.chest.frame) },
-      sound: { wind: !!this.wind, fire: this.fireVolume != null ? Math.round(this.fireVolume * 100) : null, muted: this.scene.sound.mute },
+      sound: { wind: !!this.wind, music: this.music ? Math.round(this.music.volume * 100) : null, fire: this.fireVolume != null ? Math.round(this.fireVolume * 100) : null, muted: this.scene.sound.mute },
       benches: this.benches?.state() || [], resting: this.resting || null,
       shells: (this.shells || []).map(c => ({ unit: c.u.ui, id: c.u.id, closed: Math.round(c.a * 100) / 100, x0: Math.round(c.u.x0), x1: Math.round(c.u.x1) })), rigOpen: !!this.scene.hud.rigOpen,
       yard: (this.yardItems || []).map(y => ({ kind: y.kind, id: y.id, x: Math.round(y.x), y0: Math.round(y.y0) })),

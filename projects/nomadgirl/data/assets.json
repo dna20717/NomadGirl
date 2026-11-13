@@ -5168,5 +5168,15 @@
   "source": "KI (PixelLab, Create Image Pro je Trophäe, AAP-64, Stilbild icons_treasure) + Code (Raster)",
   "date": "13.11.2026",
   "description": "Die 12 Trophäen der Achievements (#012), je 2 × 2 Felder, in der Reihenfolge der Achievements."
+ },
+ "music_leyla_camp": {
+  "name": "Leyla Theme (Camp)",
+  "kind": "sound",
+  "file": "assets/music/leyla_theme_camp.m4a",
+  "alt": "assets/music/leyla_theme_camp.ogg",
+  "volume": 100,
+  "source": "Code (Ava, Python: Karplus-Strong-Gitarre, Skript tools/music/leyla_theme_camp.py)",
+  "date": "13.11.2026",
+  "description": "Leyla Theme, Camp-Version: akustische Gitarre im Fingerpicking, d-Moll, 3/4, 66 BPM, Feuerknistern. 87 s, nahtlose Schleife (Ausklang liegt über dem Anfang). Noten im claude.ai-Projekt › leyla-theme.md."
  }
 }
