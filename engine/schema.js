@@ -1236,7 +1236,9 @@ export const AREAS = {
     sections: [
       { title: 'Welt', fields: [range('count', 'Gewürfelte Orte', { hint: 'Zusätzlich zu den Wahrzeichen aus dem Bereich Orte' }), num('radius', 'Radius', { unit: 'km', min: 20 }), num('gap', 'Mindestabstand', { unit: 'km', min: 2 }),
         point('city', 'BigCityDelta liegt bei', { unit: 'km' }), text('cityName', 'Name der Stadt'), num('cityRadius', 'Stadtgebiet', { unit: 'km', min: 0, hint: 'Hier wird nichts gewürfelt' }),
-        num('dangerStep', 'Gefahr +1 alle', { unit: 'km', min: 5, hint: 'Je weiter vom Start, desto gefährlicher (und lohnender)' }), num('detour', 'Umwege', { unit: '%', min: 0, hint: 'Straßen sind so viel länger als die Luftlinie' }),
+        num('dangerStep', 'Gefahr +1 alle', { unit: 'km', min: 5, hint: 'Je weiter vom Start, desto gefährlicher (und lohnender)' }),
+        num('threat.enemies', 'Gefahr: mehr Gegner', { unit: '% je Stufe', min: 0, hint: 'Daniel, 13.11.2026: Gefahr wirkt (#014). Jede Stufe über 1 bringt so viel mehr Gegner in den Run' }), num('threat.health', 'Gefahr: Gegner-Leben', { unit: '% je Stufe', min: 0 }),
+        num('threat.damage', 'Gefahr: Gegner-Schaden', { unit: '% je Stufe', min: 0 }), num('threat.loot', 'Gefahr: Extra-Beute', { unit: '% je Stufe', min: 0, hint: 'Chance auf ein Ding mehr je Beute-Wurf (Kisten, Gegner, Tresor)' }), num('detour', 'Umwege', { unit: '%', min: 0, hint: 'Straßen sind so viel länger als die Luftlinie' }),
         num('reveal', 'Namen sichtbar bis', { unit: 'Straßen', min: 0, hint: 'Orte weiter weg erscheinen als „?“, bis Leyla näher kommt' })] },
       { title: 'Orte', fields: [table('kinds', 'POI-Arten', [ref('poi', 'POI', 'pois'), num('weight', 'Gewicht', { min: 0 }), text('names', 'Namen')],
           { hint: 'Namen mit | getrennt, Platzhalter: {km} Entfernung zur Stadt, {nr} Nummer, {word} Ortswort, {office} Amt, {region}, {brand} Kurzname der Marke' }),

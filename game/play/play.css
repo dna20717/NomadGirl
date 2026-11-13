@@ -615,6 +615,7 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .wm-row { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 8px; }
 .wm-row small { color: #8d7f9c; font: 13px/1 var(--ui-font); text-transform: uppercase; letter-spacing: .5px; }
 .wm-danger { color: #df3e23; font-size: 18px; letter-spacing: 2px; }
+.wm-threat { margin: -4px 0 6px; font-size: 12px; color: #a8574a; }
 .wm-hints { display: flex; flex-wrap: wrap; gap: 6px; }
 .wm-hints span { padding: 3px 8px; border-radius: 999px; border: 1px solid var(--c); color: var(--c); font: 13px/1.2 var(--ui-font); background: color-mix(in srgb, var(--c) 12%, transparent); }
 .wm-brand { margin: 0; color: #c7b08b; font: italic 20px/1.1 VT323, monospace; }

@@ -40,5 +40,6 @@
  "paper": "map_paper",
  "logos": "map_logos",
  "title": "Straßenkarte BigCityDelta & Umland",
- "edition": "Ausgabe 1962 · überreicht von Delta Petrol"
+ "edition": "Ausgabe 1962 · überreicht von Delta Petrol",
+ "threat": {"enemies": 25, "health": 15, "damage": 10, "loot": 20}
 }

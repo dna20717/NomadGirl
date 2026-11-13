@@ -5,7 +5,7 @@
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { hints } from './ui_nav.js';
-import { ensureMap, placeOf, neighbours, hops, mapConfig } from '../worldmap.js';
+import { ensureMap, placeOf, neighbours, hops, mapConfig, threatOf } from '../worldmap.js';
 import { drawMap } from '../map_render.js';
 import { ITEM_CATEGORIES, optionLabel as optLabel } from '../../engine/schema.js';
 
@@ -122,6 +122,7 @@ export class MapUI {
       el('div', { class: 'wm-head' }, logo, el('div', {}, el('h3', {}, n.name), el('small', {}, [KIND_NAMES[P.kind] || P.name, n.region, P.size ? `Größe ${P.size}` : null].filter(Boolean).join(' · ')))),
       here ? el('p', { class: 'wm-here' }, icon('tracks', 14), ' Du bist hier.') : null,
       el('div', { class: 'wm-row' }, el('small', {}, 'Gefahr'), this.intel ? el('b', { class: 'wm-danger' }, '●'.repeat(n.danger || 1) + '○'.repeat(Math.max(0, 5 - (n.danger || 1)))) : el('b', { class: 'wm-unknown' }, '? ? ?')),
+      this.intel && (n.danger || 1) > 1 ? (() => { const T = threatOf(this.host.D, n.danger); return el('p', { class: 'wm-threat' }, `Gegner +${Math.round(T.more * 100)} % · zäher +${Math.round((T.health - 1) * 100)} % · Beute +${Math.round(T.loot)} %`); })() : null,
       el('div', { class: 'wm-row' }, el('small', {}, 'Beute'), this.intel ? el('div', { class: 'wm-hints' }, ...(n.hints || []).map(h => el('span', { style: `--c:${HINT_COLORS[h] || '#c7b08b'}` }, optLabel(ITEM_CATEGORIES, h) || h))) : el('b', { class: 'wm-unknown' }, '? ? ?')),
       this.intel ? null : el('p', { class: 'wm-intel' }, icon('research', 14), ' Was dort wartet, zeigt erst ein Warroom. Bau einen ins Rig (B), dann siehst du Gefahr und Beute.'),
       b ? el('p', { class: 'wm-brand' }, `${b.name}: „${b.slogan}“`) : null,

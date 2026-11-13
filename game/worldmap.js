@@ -107,6 +107,12 @@ export function ensureMap(D, save) {
 export function placeOf(D, save, id = save?.location) {
   return save?.map?.nodes?.find(n => n.id === id) || (D.locations?.[id] ? { id, ...D.locations[id], pos: D.locations[id].position || [0, 0] } : null);
 }
+// what the danger of a place does in the run (#014, Daniel 13.11.2026: „Mehr Gegner + mehr Beute“): every step above 1 adds
+// Reisekarte › Gefahr wirkt: more enemies, more health and damage, a chance of one more thing per loot roll (all in %)
+export function threatOf(D, danger = 1) {
+  const T = D.worldmap?.threat || {}, k = Math.max(0, (Number(danger) || 1) - 1);
+  return { danger: k + 1, more: k * (T.enemies ?? 25) / 100, health: 1 + k * (T.health ?? 15) / 100, damage: 1 + k * (T.damage ?? 10) / 100, loot: k * (T.loot ?? 20) };
+}
 export const neighbours = (map, id) => (map?.edges || []).filter(e => e.includes(id)).map(e => e[0] === id ? e[1] : e[0]);
 // hops from Leyla's place (breadth first): what the map shows with its name (Reisekarte › Namen sichtbar bis)
 export function hops(map, from) {

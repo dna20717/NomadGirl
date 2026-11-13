@@ -1,6 +1,6 @@
 // The play scene: builds a room from its layout, places Leyla and the enemies, runs input, physics, combat and HUD.
 import { MapUI } from './map_ui.js';
-import { placeOf } from '../worldmap.js';
+import { placeOf, threatOf } from '../worldmap.js';
 import { rescue, update as tankUpdate, phase as tankPhase } from '../tank.js';
 import { bonuses } from '../techtree.js';
 import { parseRoom, solidRects } from '../../engine/room.js';
@@ -540,7 +540,7 @@ export class PlayScene extends Phaser.Scene {
     // rooms with entrance and exit: a generated level (engine/poi.js); otherwise the first room as before
     if (poiReady(D, poi).ok) {
       this.box.save.health = this.leyla.health;
-      this.box.save.run = { poi, room: null, seed: P.seed || 1 + Math.floor(Math.random() * 2 ** 31), location: this.box.save.location };
+      this.box.save.run = { poi, room: null, seed: P.seed || 1 + Math.floor(Math.random() * 2 ** 31), location: this.box.save.location, danger: this.placeDanger(poi) };
       this.box.persist();
       return this.restartAs({ mode: 'run', roomId: null, banner: [P.name || poi, 'Finde den Tresor · E am Van: zurück ins Camp'] }, 700);
     }
@@ -548,10 +548,14 @@ export class PlayScene extends Phaser.Scene {
     const room = ready.find(id => R[id].tags?.includes('start')) || ready[0] || [D.camp?.fallbackRoom, D.game?.testRoom].find(has);
     if (!room) return this.hud.menu({ title: 'Noch kein Raum', sub: 'Dieser POI hat noch keinen Raum mit Layout (Werkstatt › Raum-Bausteine).', items: [{ label: 'Zurück', act: () => {} }] });
     this.box.save.health = this.leyla.health;
-    this.box.save.run = { poi, room, location: this.box.save.location };
+    this.box.save.run = { poi, room, location: this.box.save.location, danger: this.placeDanger(poi) };
     this.box.persist();
     this.restartAs({ mode: 'run', roomId: room, banner: [P.name || poi, `${D.rooms?.[room]?.name || room}${ready.length ? '' : ' (Ersatzraum)'} · E am Van: zurück ins Camp`] }, 700);
   }
+  // the danger of the place Leyla is at (Reisekarte), else the POI's own
+  placeDanger(poi) { const n = placeOf(this.data_, this.box.save); return n?.danger || this.data_.pois?.[poi]?.danger || 1; }
+  // what the danger does in this run (game/worldmap.js threatOf): more enemies, tougher, more loot (#014)
+  threat() { return this.mode === 'run' && this.box?.save.run ? threatOf(this.data_, this.box.save.run.danger) : null; }
   // back from a run: by van (loot counts) or knocked out (AvA, run loot is lost); buffs are used up
   // at the van in a run: ask first (Daniel, 13.11.2026: „Die Rückkehr ins Camp vom POI braucht eine Bestätigung à la ‚wirklich zurückreisen?‘“)
   confirmLeave() {
@@ -593,9 +597,17 @@ export class PlayScene extends Phaser.Scene {
     const T = this.T;
     for (const e of this.enemies) e.destroy();
     this.enemies = [];
-    for (const s of this.room.spawns) {
-      const def = this.data_.enemies?.[s.enemy];
+    // danger of the place (#014): some spawns get a second enemy next to them, all are tougher; the same seed gives the same extras
+    const Th = this.threat(), list = [...this.room.spawns];
+    if (Th?.more > 0 && list.length) {
+      let r = (this.box.save.run.seed || 1) >>> 0; const rnd = () => ((r = (r * 1664525 + 1013904223) >>> 0) / 4294967296);
+      const n = Math.floor(list.length * Th.more) + (rnd() < (list.length * Th.more) % 1 ? 1 : 0);
+      for (let i = 0; i < n; i++) { const s = list[Math.floor(rnd() * this.room.spawns.length)]; list.push({ ...s, x: s.x + (rnd() < 0.5 ? -0.6 : 0.6), extra: true }); }
+    }
+    for (const s of list) {
+      let def = this.data_.enemies?.[s.enemy];
       if (!def) continue;
+      if (Th && (Th.health !== 1 || Th.damage !== 1)) def = { ...def, health: Math.round((def.health ?? 30) * Th.health), damage: Math.round((def.damage ?? 10) * Th.damage) };
       const e = new Enemy(this, s.enemy, def, [(s.x + 0.5) * T, (s.y + 1) * T]);
       this.physics.add.collider(e.box, this.solids);
       this.physics.add.collider(e.box, this.platforms, null, (box, plat) => e.body.velocity.y >= 0 && e.body.prev.y + e.body.height <= plat.body.top + 2);
@@ -794,8 +806,8 @@ export class PlayScene extends Phaser.Scene {
   achieveLevel(counter, value) { if (this.box) this.announce(achieveLevel(this.data_, this.box.save, counter, value)); }
   // a loot roll; Delta-Petrol-Schild & Co. (#012, Extra-Beute %) give a chance of one more thing
   lootRoll(table) {
-    const D = this.data_, out = rollLoot(D, table) || [], k = this.box ? trophyBonuses(D, this.box.save).loot || 0 : 0;
-    if (k > 0 && Math.random() * 100 < k) { const x = rollLoot(D, table)?.[0]; if (x) out.push(x); }
+    const D = this.data_, out = rollLoot(D, table) || [], k = (this.box ? trophyBonuses(D, this.box.save).loot || 0 : 0) + (this.threat()?.loot || 0);   // + danger of the place (#014)
+    for (let left = k; left > 0; left -= 100) if (Math.random() * 100 < Math.min(100, left)) { const x = rollLoot(D, table)?.[0]; if (x) out.push(x); }
     return out;
   }
   // cooking, crafting, experimenting, taking apart (craft_ui.js) count for the achievements

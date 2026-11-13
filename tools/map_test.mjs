@@ -62,6 +62,12 @@ v = await ev(() => { const W = () => { const u = nomad.save().rig.units[0]; u.wo
 check('Warroom: Reisekarte mit Techtree und Auswerten', v.open && v.extras.includes('Techtree') && v.extras.includes('Auswerten'), v);
 v = await ev(() => { const ok = nomad.choose('Plündern'); nomad.step(60); return { ok, mode: nomad.state().mode, poi: nomad.save().run?.poi }; });
 check('Hier plündern startet den Run am neuen Ort', v.ok && v.mode === 'run' && !!v.poi, v);
+// #014: the danger of the place works in the run: more enemies, tougher, more loot
+v = await ev(() => { const S = game.scene.getScene('play'), run = nomad.save().run, D = S.data_;
+  run.danger = 1; S.spawnEnemies(); const n1 = S.enemies.length, hp1 = S.enemies.map(e => e.hp).reduce((a, b) => a + b, 0) / n1;
+  run.danger = 4; S.spawnEnemies(); const n4 = S.enemies.length, hp4 = S.enemies.map(e => e.hp).reduce((a, b) => a + b, 0) / n4;
+  const T = S.threat(); return { n1, n4, hp1, hp4, loot: T.loot, stored: typeof run.danger }; });
+check('Gefahr wirkt: Gefahr 4 bringt mehr und zähere Gegner und Extra-Beute', v.n4 > v.n1 && v.hp4 > v.hp1 * 1.3 && v.loot > 0, v);
 
 // a new Durchgang rolls a new map
 v = await ev(async () => { const { newCycle } = await import('/game/save.js'); const s = nomad.save(), old = s.map.nodes.map(n => n.name).join(); const n = newCycle(SC().data_, s); return { same: n.map.nodes.map(x => x.name).join() === old, cycle: n.cycle, mapCycle: n.map.cycle, here: n.location }; });
