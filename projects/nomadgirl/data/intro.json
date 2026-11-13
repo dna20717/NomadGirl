@@ -11,8 +11,8 @@
   "effectAt": [57, 52],
   "hold": 0,
   "captions": [
-   {"speaker": "", "text": "BigCityDelta, Klinikturm, Ebene 40.", "at": "tl"},
-   {"speaker": "", "text": "Der Tank hält sie am Leben. Bezahlt ist er bis Donnerstag.", "at": "bl"}
+   {"speaker": "", "text": "BigCityDelta, Klinikturm, Ebene 40: das Ersatzteillager der Elite.", "at": "tl"},
+   {"speaker": "", "text": "Sie schläft hier, bis jemand da oben ein neues Herz braucht. Abgeholt wird es am Donnerstag.", "at": "bl"}
   ]
  },
  "panel_2": {

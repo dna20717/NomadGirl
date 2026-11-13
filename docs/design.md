@@ -97,6 +97,7 @@ Grundsatz: Die Ziele kommen aus der Mechanik, eine Herleitung aus der Story brau
 ### Die Suche: AvA im Cryo-Tank
 
 - **AvA** ist eigentlich ein kleines Mädchen (Tochter? Schwester? Wir wissen es nicht). Sie ist krank, ihr Körper liegt im **Cryo-Tank**, ihr Verstand ist so lange in der Drohne geparkt.
+- **Woher der Tank kommt** (Daniel, 13.11.2026): Sie lag im Klinikturm von BigCityDelta auf **Ebene 40**, dem **Ersatzteillager der Elite**: Kinder im Tank, bis jemand da oben ein Organ braucht. Ihr Herz war für Donnerstag bestellt, am Mittwoch hat Leyla sie samt Tank gestohlen (Intro, Panel 1–2).
 - **Ziel:** das **Rezept für das Heilmittel** finden. Damit wird die Reise zur Suche mit Ablaufdatum.
 - **Cryo-Tank** = eine Werkbank im Rig (Modell fehlt noch). Er hat einen **Zustand**, der verfällt, und braucht Wartung mit Materialien (Rezepte wie an jeder Werkbank). Er zerfällt mit der Zeit immer schneller, die nötigen Ersatzteile werden seltener: Wer das Heilmittel nicht schnell findet, muss immer mehr und gefährlichere Runs machen.
 - **Die Uhr tickt pro Tag und pro Ereignis** in Ereignis-Zeit (Fahren, Schlafen, Runs …), nie in Echtzeit.
