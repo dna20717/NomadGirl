@@ -67,9 +67,18 @@ check('Wohnanhänger mit Container drauf: nicht abhängen', !b.spare.containers.
 await shot('built');
 await ev(() => { game.scene.getScene('play').hud.build.close(); nomad.step(60); });
 
+// ground floor: a few rungs from the ground into every raised container (Daniel, 13.11.2026: „ohne Doppelsprung … auch für das Erdgeschoss“)
+s = await ev(() => { const sc = game.scene.getScene('play'), g = sc.ladders.filter(l => l.ground), u = sc.camp.geo.units.find(x => !x.level && sc.camp.ground - x.floorY > sc.T * 0.6);
+  const lad = g[0]; if (!lad) return { n: 0 };
+  nomad.take(); nomad.walkTo(lad.cx); nomad.step(10); nomad.step(1, ['up'], ['up']); const st = sc.leyla.state;
+  nomad.until(() => sc.leyla.state !== 'climb' && sc.leyla.feet < lad.top + 5, 400, ['up']); nomad.step(40);
+  const r = { n: g.length, st, feet: Math.round(sc.leyla.feet), top: Math.round(lad.top), raised: !!u };
+  nomad.step(1, ['down'], ['down']); nomad.until(() => sc.leyla.feet >= sc.camp.ground - 2 && sc.leyla.state === 'normal', 400, ['down']); nomad.step(30); r.back = Math.round(sc.leyla.feet); return r; });
+check('Erdgeschoss: Leiter vom Boden in den erhöhten Container', s.n >= 1 && s.raised && s.st === 'climb' && Math.abs(s.feet - s.top) < 6, s);
+
 // Leyla climbs the ladder and stands upstairs
 s = await ev(() => {
-  const sc = game.scene.getScene('play'), lad = sc.ladders.find(l => l.rig), up = sc.camp.geo.units.find(u => u.level);
+  const sc = game.scene.getScene('play'), lad = sc.ladders.find(l => l.rig && !l.ground), up = sc.camp.geo.units.find(u => u.level);
   nomad.take(); nomad.walkTo(lad.cx); nomad.step(10);
   nomad.step(1, ['up'], ['up']); const st = sc.leyla.state;
   nomad.until(() => sc.leyla.state !== 'climb' && sc.leyla.feet < up.floorY + 5, 400, ['up']); nomad.step(60);

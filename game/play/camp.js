@@ -549,6 +549,8 @@ export class Camp {
       s.solids.add(wall); this.rigObjs.push(wall);
     }
     if (u.level) this.stackLadder(u);
+    // ground floor: a few rungs up into a raised container (Daniel, 13.11.2026: „ohne Doppelsprung müssen Leitern an den Container sein, auch für das Erdgeschoss“)
+    else if (this.C.rig?.groundLadder !== false && this.ground - u.floorY > s.T * 0.6) this.groundLadder(u);
     this.curTop = null;
     return view;
   }
@@ -565,6 +567,18 @@ export class Camp {
     for (let y = bottom - 20; y > top - 20; y -= 28) g.fillStyle(0x6b7280).fillRect(x - 16, y, 32, 5);
     this.rigObjs.push(g);
     s.ladders.push({ cx: x, x0: x - s.T / 2, x1: x + s.T / 2, top, bottom, rig: true });
+  }
+  // a short ladder from the ground into a container on the ground floor (Camp › Rig-Ansicht › Leiter ins Erdgeschoss bei),
+  // at the other end than the ladder to the stack, so both can stand side by side
+  groundLadder(u) {
+    const s = this.scene, R = this.C.rig || {}, in1 = u.in0 + u.cell * u.places, edge = Math.min(s.T * 0.75, (in1 - u.in0) / 2);
+    const x = Math.min(Math.max(u.in0 + (in1 - u.in0) * (R.groundLadderAt ?? 92) / 100, u.in0 + edge), in1 - edge), top = u.floorY, bottom = this.ground;
+    const g = s.add.graphics().setDepth(-18);
+    g.fillStyle(0x30363d).fillRect(x - 22, top - 30, 6, bottom - top + 30).fillRect(x + 16, top - 30, 6, bottom - top + 30);
+    g.fillStyle(0x8b949e).fillRect(x - 22, top - 30, 2, bottom - top + 30).fillRect(x + 16, top - 30, 2, bottom - top + 30);
+    for (let y = bottom - 20; y > top - 20; y -= 28) g.fillStyle(0x6b7280).fillRect(x - 16, y, 32, 5);
+    this.rigObjs.push(g);
+    s.ladders.push({ cx: x, x0: x - s.T / 2, x1: x + s.T / 2, top, bottom, rig: true, ground: true });
   }
   // a small storage of its own (Kofferraum, Deichselkasten): E opens and closes it
   storeHotspot(key, x, name, rig = true) {

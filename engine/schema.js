@@ -157,6 +157,7 @@ export const AREAS = {
     hint: 'Grundwerte für das ganze Spiel: Maßstab, Physik, Auflösung und womit Leyla startet.',
     sections: [
       { title: 'Technik', fields: [text('title', 'Titel'), num('tileSize', 'Kachelgröße', { unit: 'px', min: 8 }), num('gravity', 'Schwerkraft', { unit: 'px/s²', min: 0 }),
+        bool('confirmLeave', 'Rückfrage beim Abreisen', { hint: 'Daniel, 13.11.2026: am Van im POI fragt das Spiel „Wirklich zurückreisen?“. Aus = sofort zurück ins Camp' }),
         size('resolution', 'Auflösung', { unit: 'px', hint: 'Interne Auflösung, wird skaliert' }), bool('pixelArt', 'Pixel-Art (scharf skalieren)')] },
       { title: 'Controller', fields: [bool('gamepad.enabled', 'Controller an', { hint: 'Gamepad-API des Browsers: Xbox, PlayStation, Stadia (Bluetooth-Modus), Switch Pro … mit Standard-Belegung. Die Knöpfe heißen hier nach ihrer Lage, die Hilfe im Spiel zeigt die Symbole des angeschlossenen Controllers' }),
         ref('gamepad.icons', 'Symbole', 'assets', { hint: 'Asset der Art „Symbole“ (tools/pad_icons.py): <typ>_0 … <typ>_9 je Controller (xbox, stadia, ps, switch), dazu für alle gleich stick_l, stick_r, stick_l_up … stick_l_press, stick_r_press, dpad, dpad_up …' }), num('gamepad.iconSize', 'Symbol-Größe', { unit: 'px', min: 16, max: 64, hint: 'So hoch erscheinen die Knöpfe in Hinweisen und Hilfe (Standard 32)' }),
@@ -909,6 +910,8 @@ export const AREAS = {
         num('rig.lift', 'Boden über der Straße', { unit: 'px', min: 20, hint: 'Anhänger aus Code: so hoch steht der Boden auf dem Fahrgestell' }), num('rig.drawbar', 'Deichsel', { unit: 'px', min: 40, hint: 'Anhänger aus Code: Länge der Deichsel bis zur Kupplung' }),
         num('rig.boxAt', 'Deichselkasten bei', { unit: '%', min: 0, max: 100, hint: 'Wo der Kasten auf der Deichsel sitzt (0 = am Aufbau, 100 = an der Kupplung); E dort öffnet den Stauraum des Anhängers' }),
         num('rig.trunkAt', 'Kofferraum bei', { unit: '%', min: 0, max: 100, hint: 'E-Punkt für den Stauraum der Zugmaschine, von links über die Breite des Vans' }),
+        bool('rig.groundLadder', 'Leiter ins Erdgeschoss', { hint: 'Daniel, 13.11.2026: ohne Doppelsprung braucht jeder erhöhte Container im Erdgeschoss ein paar Sprossen vom Boden. Aus = keine' }),
+        num('rig.groundLadderAt', 'Leiter ins Erdgeschoss bei', { unit: '%', min: 0, max: 100, hint: 'Von links über den Innenraum des Containers; Standard 92 = am hinteren Ende, damit sie nicht neben der Leiter zum Stapel steht' }),
         num('rig.ladderAt', 'Leiter zum Stapel bei', { unit: '%', min: 0, max: 100, hint: 'Wo die Leiter in einen gestapelten Container hochführt: von links über die Breite des Anhängers darunter; liegt sie neben dem Container oben, rückt sie unter seinen Boden' }),
         num('rig.sameFloor', 'Werkstatt: gleiche Ebene bis', { unit: 'px', min: 0, hint: 'E-Punkt und Arbeitsmodus einer Werkstatt gelten nur, wenn Leylas Füße höchstens so weit über oder unter dem Boden ihres Containers sind. Leer = 40' }), num('rig.reachUp', 'E-Punkte unten bis', { unit: 'px', min: 50, hint: 'Steht Leyla höher über dem Boden (z. B. im oberen Container oder auf dem Van-Dach), gelten die E-Punkte unten nicht' }),
         color('rig.wall', 'Wand'), color('rig.inside', 'Innen'), color('rig.light', 'Licht'), bool('rig.labels', 'Namen anzeigen')] },

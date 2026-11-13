@@ -131,7 +131,7 @@ s = await ev(() => {
   sc.deltas = 100;
   nomad.until(st => st.prompt?.startsWith('Zurück ins Camp'), 600, ['right']);
   const p = nomad.state().prompt, before = nomad.save().deltas, grade = nomad.state().level.done;
-  nomad.step(1, [], ['grab']); nomad.step(10);
+  nomad.step(1, [], ['grab']); nomad.step(3); nomad.choose('Zurückreisen'); nomad.step(10);
   return { p, before, after: nomad.save().deltas, grade, st: nomad.state() };
 });
 check('Durch die Tür zum Van, Hinweis mit Rang', /^Zurück ins Camp · Rang [FDCBAS]$/.test(s.p), s.p);

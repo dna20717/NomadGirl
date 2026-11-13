@@ -515,6 +515,14 @@ export class PlayScene extends Phaser.Scene {
     this.restartAs({ mode: 'run', roomId: room, banner: [P.name || poi, `${D.rooms?.[room]?.name || room}${ready.length ? '' : ' (Ersatzraum)'} · E am Van: zurück ins Camp`] }, 700);
   }
   // back from a run: by van (loot counts) or knocked out (AvA, run loot is lost); buffs are used up
+  // at the van in a run: ask first (Daniel, 13.11.2026: „Die Rückkehr ins Camp vom POI braucht eine Bestätigung à la ‚wirklich zurückreisen?‘“)
+  confirmLeave() {
+    if (this.hud.modal || this.leaving) return;
+    if (this.data_.game?.confirmLeave === false) return this.endRun(false);
+    const done = this.level?.done, items = this.box?.save.inv.grids.backpack.items.length || 0;
+    this.hud.menu({ title: 'Wirklich zurückreisen?', sub: done ? `POI geschafft, Rang ${done.grade}. Die Beute im Rucksack kommt mit ins Camp.` : this.level ? `Der POI ist noch nicht geschafft: kein Ranking. Die Beute im Rucksack (${items}) ist sicher.` : 'Zurück ins Camp, die Beute im Rucksack kommt mit.',
+      items: [{ label: 'Hierbleiben', sub: 'Weiter plündern', primary: true, act: () => {} }, { label: 'Zurückreisen', sub: 'Ins Camp', act: () => this.endRun(false) }] });
+  }
   endRun(ko) {
     const save = this.box.save, C = this.data_.camp || {}, base = this.data_.leyla?.health ?? 100;
     advance(save, C.clock?.runHours ?? 3);
@@ -746,7 +754,7 @@ export class PlayScene extends Phaser.Scene {
     const text = near ? (this.level?.done ? `Zurück ins Camp · Rang ${this.level.done.grade}` : 'Zurück ins Camp · Van') : thing ? thing.text : floorText;
     const key = floorText && !near && !thing && !this.hud.floor?.list?.length ? 'I' : 'E';
     if (text !== this.vanPrompt || key !== this.vanKey) { this.vanPrompt = text; this.vanKey = key; this.hud.prompt(text, key); }
-    if (input.grab.pressed && near && this.mode === 'run') this.endRun(false);
+    if (input.grab.pressed && near && this.mode === 'run') this.confirmLeave();
     else if (input.grab.pressed && thing?.act) thing.act();
     else if (input.grab.pressed && floorText && key === 'E') this.hud.floor.pick(this);
   }
