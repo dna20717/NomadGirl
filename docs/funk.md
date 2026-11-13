@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 13.11. Code → Ava: #010 Bau-Modus mit Controller läuft (AvA als Zeiger).
 - 13.11. Code → Ava: #009 Camp-Feinschliff erledigt: alles Seitenansicht, Horizont mit Milchstraße und BigCityDelta, Onkel Sung größer, Lichterketten als Bilder, Lichter ohne Kasten, kein Solar unter Stapeln.
 - 13.11. Code → Ava: #008 Camp-Paket erledigt: Start-Rig neu, Van 2 ⚡, Solar + Akku, Zisterne, Außenwände, Klapptreppe, Deko + Stimmung, Lichterketten selbst ziehen, Companions als Figuren, Streuner an der Tankstelle. ⚠️ Techtree braucht weiter einen Warroom.
 - 13.11. Code → Ava: #008 Camp-Paket läuft (Daniels Auftrag im Code-Chat).
@@ -192,6 +193,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** Details in `docs/features/camp.md` (Feinschliff) und `rig.md` (Solar unter Stapeln). Neu von PixelLab, streng von der Seite mit dem Van als Referenz: Treppe, Solarpaneel, Teppich, zwei Stühle, Ecke, Lagerfeuer (animiert, `campfire_side`), Klimagerät, Kisten, Satellitenschüssel. Horizont aus Code (Camp › Horizont). Onkel Sung 240 px. Lichterketten als Bilder. Lichter ohne Kasten (ADD global rein additiv in `main.js`). Tests: `npm test` 98/98, `cozy_test` 18, alle 27 Browser-Tests grün. PixelLab: diesmal 101 Generierungen, übrig 865. **Bitte testen:** Lichterkette halb aus dem Bild schieben und Fenster wechseln, Nacht am Feuer (kein Lichtkasten mehr), Container auf einen anderen stapeln (Solar-Sockel darunter weg), Solarpaneel beim Händler kaufen und aufs Dach ziehen.
   - ⚠️ Solar kaufen lief schon per Drag & Drop wie bei Containern (Händler liefert aufs Pad, dann aufs Dach ziehen); das Paneel war nur als namenlose Kiste zu sehen. Falls du direkt aus dem Katalog ziehen willst: sag Bescheid.
   - ⚠️ Lichterketten-Fehler war bei mir nicht nachzustellen; die Umstellung auf Bilder plus der Mischmodus-Fix sollten es lösen.
+
+### #010 Bau-Modus mit Controller: AvA als Zeiger, UI-Grammatik, Spaß
+- **Status:** läuft (Code, 13.11.) · angelegt 13.11. von Code (Auftrag Daniel im Code-Chat)
+- **Für:** Code
+- **Lesen:** `docs/features/rig.md`, `controller.md`, `ui.md`, `drone.md`
+- **Auftrag (Daniel, 13.11.2026):** „Das Camp-Bau-Menü muss auch vollständig mit dem Controller bedienbar sein und soll Spaß machen … orientiere dich an den Design-Konventionen von unseren anderen Menüs.“ Antworten: linker Stick springt von Ziel zu Ziel, rechter Stick steuert frei, **„aber die Drohne ist der Zeiger“**; Kaufen liefert **aufs Pad wie bisher**; **volle UI-Grammatik** (Y = rüber: Schrottplatz, halten = verkaufen, ohne Teil = Händler; LB/RB = Bereiche; X = Kontext, X halten = rückgängig); Extras: **Vibration, Vorschau am Ziel, Kamera fährt mit, Klick-Töne**.
+- **Fertig, wenn:** alles im Bau-Modus ohne Maus geht (Werkstätten, Container, Rig-Teile, Solar, Lichterketten, Händler), Hilfezeile je Lage, Tests grün.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ## Archiv
 
