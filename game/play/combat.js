@@ -7,7 +7,8 @@ export class Combat {
     this.shots = [];
   }
 
-  boost() { return 1 + (this.scene.mods?.damage || 0) / 100; }   // damage buffs from the camp
+  boost(kind) { const m = this.scene.mods || {}; return Math.max(0, 1 + ((m.damage || 0) + (kind ? m[kind] || 0 : 0)) / 100); }   // damage buffs + implants (Nahkampf/Fernkampf %)
+  critBonus() { return this.scene.mods?.crit || 0; }   // Krit-Chance from implants
 
   // ---------- walls stop everything (Daniel, 12.11.2026: „nicht durch Objekte schießen oder schlagen, auch wenn der Sprite hineinreicht“) ----------
   // how far from (x, y) in direction dir (±1) until the first solid tile (closed doors and brittle walls count), at most max px
@@ -59,8 +60,8 @@ export class Combat {
     let hits = 0, blocked = 0;
     for (const e of s.enemies) {
       if (!e.alive || !this.inZone(z, e.body)) continue;
-      const crit = Math.random() * 100 < (w.critChance ?? 0);
-      const r = e.hit(time, Math.round((w.damage ?? 10) * (power?.damage || 1) * this.boost() * (crit ? 2 : 1)), (w.knockback ?? 200) + (power?.knockback || 0), f, crit, { kind: 'melee', heavy: !!power?.heavy });
+      const crit = Math.random() * 100 < (w.critChance ?? 0) + this.critBonus();
+      const r = e.hit(time, Math.round((w.damage ?? 10) * (power?.damage || 1) * this.boost('melee') * (crit ? 2 : 1)), (w.knockback ?? 200) + (power?.knockback || 0), f, crit, { kind: 'melee', heavy: !!power?.heavy });
       if (r === 'blocked') blocked++; else hits++;
     }
     // brittle walls in POI levels: only where the strike really reaches the wall
@@ -86,7 +87,7 @@ export class Combat {
     if (snd) s.sound.play(w.sound, { volume: Math.min(1, (snd.volume ?? 100) / 100 * 1.25), detune: -260 });
     const z = this.meleeZone(leyla, o.range);
     let hits = 0;
-    for (const e of s.enemies) if (e.alive && this.inZone(z, e.body) && e.hit(time, Math.round(o.damage * this.boost()), o.knockback, f, true, { kind: 'blank', heavy: true }) !== 'blocked') hits++;
+    for (const e of s.enemies) if (e.alive && this.inZone(z, e.body) && e.hit(time, Math.round(o.damage * this.boost('melee')), o.knockback, f, true, { kind: 'blank', heavy: true }) !== 'blocked') hits++;
     s.noise?.(x, y, s.shootRules().noiseShot ?? 900);
     s.hitstop(time, hits ? 140 : 60); s.cam.shake(180, hits ? 0.01 : 0.004);
     leyla.fightTrigger?.(time);
@@ -133,7 +134,7 @@ export class Combat {
     }
     const snd = w.sound && s.cache.audio.exists(w.sound) && s.data_.assets?.[w.sound];
     if (snd) s.sound.play(w.sound, { volume: (snd.volume ?? 100) / 100 * (0.92 + Math.random() * 0.16), detune: (Math.random() - 0.5) * 120 });
-    this.spawn({ key: 'nail', x, y, vx: dx * speed, vy: dy * speed, life: Math.max(w.range ?? 600, tgt ? (R.range ?? 9) * s.T : 0) / speed * 1000, friendly: true, damage: (w.damage ?? 5) * this.boost(), knockback: w.knockback ?? 80, crit: w.critChance ?? 0, time });
+    this.spawn({ key: 'nail', x, y, vx: dx * speed, vy: dy * speed, life: Math.max(w.range ?? 600, tgt ? (R.range ?? 9) * s.T : 0) / speed * 1000, friendly: true, damage: (w.damage ?? 5) * this.boost('ranged'), knockback: w.knockback ?? 80, crit: (w.critChance ?? 0) + this.critBonus(), time });
     if (!leyla.body.blocked.down) leyla.body.setVelocityX(leyla.body.velocity.x - f * 40);
   }
 

@@ -6,6 +6,7 @@
 //   D.techtree[id]  = { name, description, tab, look, icon, pos: [col, row], cost: [{ resource, count }], requires: [ids],
 //                       recipes: [ids], bonus: [{ stat, value }] }
 import { stock, take, learn } from './crafting.js';
+import { gearStats } from './inventory.js';
 
 export const nodes = save => (save.nodes ??= []);
 export const owned = (save, id) => nodes(save).includes(id);
@@ -45,6 +46,8 @@ export function unlock(D, save, id) {
 export function bonuses(D, save) {
   const out = {};
   for (const id of save?.nodes || []) for (const b of D.techtree?.[id]?.bonus || []) if (b.stat) out[b.stat] = (out[b.stat] || 0) + (Number(b.value) || 0);
+  // Cyberware (#006): implants that pull on the tank or on AvA's battery (Reaktor-Herz: Tank-Verfall +30 %) count like Techtree bonuses
+  if (save?.inv?.wear) { const g = gearStats(D, save.inv.wear); for (const k of ['tankDecay', 'droneBattery']) if (g[k]) out[k] = (out[k] || 0) + g[k]; }
   return out;
 }
 

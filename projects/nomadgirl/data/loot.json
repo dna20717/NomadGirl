@@ -16,13 +16,23 @@
    {"item": "mre_ration", "weight": 1, "min": 1, "max": 1},
    {"item": "rezept_ramen", "weight": 1, "min": 1, "max": 1},
    {"item": "plattentraeger", "weight": 1, "min": 1, "max": 1},
-   {"item": "nachtsicht_optik", "weight": 1, "min": 1, "max": 1},
    {"item": "geldbuendel", "weight": 2, "min": 1, "max": 1},
    {"item": "schallplatte", "weight": 1, "min": 1, "max": 1},
    {"item": "neonschild", "weight": 1, "min": 1, "max": 1},
    {"item": "schneekugel", "weight": 1, "min": 1, "max": 1},
    {"item": "luxusuhr", "weight": 1, "min": 1, "max": 1},
-   {"item": "kuehlmittel", "weight": 1, "min": 1, "max": 1}
+   {"item": "kuehlmittel", "weight": 1, "min": 1, "max": 1},
+   {"item": "billig_kameraauge", "weight": 1, "min": 1, "max": 1},
+   {"item": "nachtsicht_optik", "weight": 1, "min": 1, "max": 1},
+   {"item": "reflex_booster", "weight": 1, "min": 1, "max": 1},
+   {"item": "dash_synapse", "weight": 1, "min": 1, "max": 1},
+   {"item": "cyberarm_mk1", "weight": 1, "min": 1, "max": 1},
+   {"item": "nano_herzklappe", "weight": 1, "min": 1, "max": 1},
+   {"item": "blutfilter", "weight": 1, "min": 1, "max": 1},
+   {"item": "sprungfedern", "weight": 1, "min": 1, "max": 1},
+   {"item": "sprintwaden", "weight": 1, "min": 1, "max": 1},
+   {"item": "subdermale_platten", "weight": 1, "min": 1, "max": 1},
+   {"item": "dermal_netz", "weight": 1, "min": 1, "max": 1}
   ]
  },
  "mutanten_beute": {
@@ -63,7 +73,30 @@
    {"item": "revolver", "weight": 1, "min": 1, "max": 1},
    {"item": "kuehlmittel", "weight": 1, "min": 1, "max": 1},
    {"weapon": "nagelkeule", "weight": 1, "min": 1, "max": 1},
-   {"weapon": "rohrpistole", "weight": 1, "min": 1, "max": 1}
+   {"weapon": "rohrpistole", "weight": 1, "min": 1, "max": 1},
+   {"item": "billig_kameraauge", "weight": 1, "min": 1, "max": 1},
+   {"item": "nachtsicht_optik", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_zielsucher_linse", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_kristallauge", "weight": 1, "min": 1, "max": 1},
+   {"item": "reflex_booster", "weight": 1, "min": 1, "max": 1},
+   {"item": "dash_synapse", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_kinetik_rueckenmark", "weight": 1, "min": 1, "max": 1},
+   {"item": "cyberarm_mk1", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_hydraulik_arm", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_klingenarm", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_schuetzenarm", "weight": 1, "min": 1, "max": 1},
+   {"item": "nano_herzklappe", "weight": 1, "min": 1, "max": 1},
+   {"item": "blutfilter", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_herzpumpe", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_biomonitor", "weight": 1, "min": 1, "max": 1},
+   {"item": "sprungfedern", "weight": 1, "min": 1, "max": 1},
+   {"item": "sprintwaden", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_federbeine_mk2", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_stossdaempfer_beine", "weight": 1, "min": 1, "max": 1},
+   {"item": "subdermale_platten", "weight": 1, "min": 1, "max": 1},
+   {"item": "dermal_netz", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_faserhaut", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_heilgel_haut", "weight": 1, "min": 1, "max": 1}
   ]
  },
  "drohnen_beute": {
@@ -82,7 +115,19 @@
    {"item": "juwelenchip", "weight": 1, "min": 1, "max": 1},
    {"item": "datenkristall", "weight": 1, "min": 1, "max": 1},
    {"item": "handheld", "weight": 1, "min": 1, "max": 1},
-   {"item": "kompressor", "weight": 1, "min": 1, "max": 1}
+   {"item": "kompressor", "weight": 1, "min": 1, "max": 1},
+   {"item": "zielsucher_linse", "weight": 1, "min": 1, "max": 1},
+   {"item": "kristallauge", "weight": 1, "min": 1, "max": 1},
+   {"item": "kinetik_rueckenmark", "weight": 1, "min": 1, "max": 1},
+   {"item": "hydraulik_arm", "weight": 1, "min": 1, "max": 1},
+   {"item": "klingenarm", "weight": 1, "min": 1, "max": 1},
+   {"item": "schuetzenarm", "weight": 1, "min": 1, "max": 1},
+   {"item": "herzpumpe", "weight": 1, "min": 1, "max": 1},
+   {"item": "biomonitor", "weight": 1, "min": 1, "max": 1},
+   {"item": "federbeine_mk2", "weight": 1, "min": 1, "max": 1},
+   {"item": "stossdaempfer_beine", "weight": 1, "min": 1, "max": 1},
+   {"item": "faserhaut", "weight": 1, "min": 1, "max": 1},
+   {"item": "heilgel_haut", "weight": 1, "min": 1, "max": 1}
   ]
  },
  "boss_beute": {
@@ -101,7 +146,21 @@
    {"item": "winkekatze", "weight": 1, "min": 1, "max": 1},
    {"item": "baseball", "weight": 1, "min": 1, "max": 1},
    {"item": "kuehlmittel", "weight": 2, "min": 1, "max": 1},
-   {"item": "kompressor", "weight": 1, "min": 1, "max": 1}
+   {"item": "kompressor", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_tunnelblick_optik", "weight": 2, "min": 1, "max": 1},
+   {"item": "tunnelblick_optik", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_overclock_chip", "weight": 2, "min": 1, "max": 1},
+   {"item": "overclock_chip", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_berserker_chip", "weight": 2, "min": 1, "max": 1},
+   {"item": "berserker_chip", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_presslufthammer_arm", "weight": 2, "min": 1, "max": 1},
+   {"item": "presslufthammer_arm", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_reaktor_herz", "weight": 2, "min": 1, "max": 1},
+   {"item": "reaktor_herz", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_kaenguru_beine", "weight": 2, "min": 1, "max": 1},
+   {"item": "kaenguru_beine", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_panzerhaut_titan", "weight": 2, "min": 1, "max": 1},
+   {"item": "panzerhaut_titan", "weight": 1, "min": 1, "max": 1}
   ]
  },
  "tresor": {
@@ -128,7 +187,26 @@
    {"item": "kuehlmittel", "weight": 3, "min": 1, "max": 1},
    {"item": "kompressor", "weight": 1, "min": 1, "max": 1},
    {"item": "aufputschspritze", "weight": 2, "min": 1, "max": 1},
-   {"item": "mre_ration", "weight": 3, "min": 1, "max": 2}
+   {"item": "mre_ration", "weight": 3, "min": 1, "max": 2},
+   {"item": "bauplan_zielsucher_linse", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_kristallauge", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_tunnelblick_optik", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_kinetik_rueckenmark", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_overclock_chip", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_berserker_chip", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_hydraulik_arm", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_klingenarm", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_schuetzenarm", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_presslufthammer_arm", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_herzpumpe", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_biomonitor", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_reaktor_herz", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_federbeine_mk2", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_stossdaempfer_beine", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_kaenguru_beine", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_faserhaut", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_heilgel_haut", "weight": 1, "min": 1, "max": 1},
+   {"item": "bauplan_panzerhaut_titan", "weight": 1, "min": 1, "max": 1}
   ]
  }
 }

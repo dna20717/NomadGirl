@@ -62,7 +62,7 @@ export const BUFF_STATS = [['health', 'Leben'], ['damage', 'Schaden'], ['speed',
 export const BUFF_DURATIONS = [['instant', 'Sofort'], ['run', 'Nächster Run'], ['travel', 'Nächste Reise'], ['seconds', 'Sekunden'], ['permanent', 'Dauerhaft']];
 export const DISCOVERY = [['experiment', 'Experimentieren'], ['found', 'Fund im POI'], ['companion', 'Tipp von Companion'], ['shop', 'Bei NPCs kaufen'], ['start', 'Von Anfang an'], ['techtree', 'Knoten im Techtree']];
 export const CONTAINER_KINDS = [['shipping', 'Hochseecontainer'], ['crate', 'Holzkiste'], ['trailer', 'Wohnwagenteil'], ['tank', 'Tank']];
-export const WORKSHOP_FUNCTIONS = [['tank', 'Cryo-Tank'], ['garden', 'Hydrokultur'], ['storage', 'Lager'], ['guests', 'Gäste'], ['treasury', 'Schatzkammer'], ['cooling', 'Kühlung'], ['cell', 'Zelle'], ['sleep', 'Schlafen'], ['chill', 'Chillen'], ['drone', 'Drohnen'], ['warroom', 'Planung'], ['kitchen', 'Kochen'], ['foodtruck', 'Verkauf'], ['craft', 'Herstellen'], ['engine', 'Motor'], ['power', 'Energie']];
+export const WORKSHOP_FUNCTIONS = [['tank', 'Cryo-Tank'], ['garden', 'Hydrokultur'], ['storage', 'Lager'], ['guests', 'Gäste'], ['treasury', 'Schatzkammer'], ['cooling', 'Kühlung'], ['cell', 'Zelle'], ['sleep', 'Schlafen'], ['chill', 'Chillen'], ['drone', 'Drohnen'], ['warroom', 'Planung'], ['kitchen', 'Kochen'], ['foodtruck', 'Verkauf'], ['craft', 'Herstellen'], ['cyber', 'Cyberware (Ripperdoc)'], ['engine', 'Motor'], ['power', 'Energie']];
 export const BENCH_FX = [['light', 'Licht'], ['screen', 'Bildschirm'], ['steam', 'Dampf'], ['smoke', 'Rauch'], ['sparks', 'Funken'], ['flame', 'Flamme'], ['blink', 'LED blinkt'], ['twinkle', 'Lichter funkeln'], ['bubbles', 'Blasen'], ['fish', 'Fische'], ['lava', 'Lavalampe'], ['scan', 'Druckkopf'], ['shine', 'Glanz']];
 export const BENCH_FX_WHEN = [['always', 'Immer'], ['night', 'Abends'], ['near', 'In der Nähe'], ['use', 'Bei Benutzung']];
 export const RIG_SLOTS = [['engine', 'Motor'], ['armor', 'Panzerung'], ['weapon', 'Waffe'], ['roof', 'Dach']];
@@ -531,6 +531,7 @@ export const AREAS = {
         num('inventory.dropSpread', 'Beute streut', { unit: 'px', min: 0, hint: 'Wie weit Beutebündel von besiegten Gegnern wegspringen' }),
         ref('inventory.portrait', 'Leyla im Inventar', 'assets', { hint: 'Bild von vorn in der Mitte des Inventars (Daniel, 10.11.2026: Diablo-Stil)' }), num('inventory.portraitScale', 'Maßstab', { min: 0.5, max: 4, step: 0.5, hint: 'Ganze oder halbe Schritte bleiben pixelscharf' }),
         num('inventory.strainMax', 'Belastung höchstens', { min: 0, hint: 'Summe der Belastung aller Implantate' }),
+        bool('abilities.gated', 'Doppelsprung und Luft-Dash nur mit Implantat', { hint: 'Cyberware (#006, Daniel, 13.11.2026): im Spiel mit Spielstand schalten Implantate (Beine, Nerven) Doppelsprung und Luft-Dash frei; im Testraum geht immer alles. Aus = wie früher' }),
         table('inventory.implants', 'Implantat-Plätze', [select('slot', 'Platz', WEAR_SLOTS.filter(w => IMPLANT_SLOTS.includes(w[0]))), text('name', 'Name'), point('at', 'Am Körper', { unit: 'Bildpixel', hint: 'Punkt im Bild „Leyla im Inventar“' }), select('side', 'Seite', [['left', 'Links'], ['right', 'Rechts']])],
           { hint: 'Ansicht „Implantate“: je Platz ein Feld links oder rechts neben Leyla mit Linie zum Punkt am Körper' })] },
     ],
@@ -718,7 +719,15 @@ export const AREAS = {
         num('stack', 'Stapel', { min: 1 }), text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar, solange es kein Aussehen gibt: 1–3 Zeichen oder ein Emoji' }), VALUE] },
       { title: 'Wirkung', fields: [ref('buff', 'Buff beim Essen/Benutzen', 'buffs'), ref('teaches', 'Bringt Rezept bei', 'recipes', { hint: 'Für Baupläne und Kochbücher' })] },
       { title: 'Ausrüstung', fields: [select('wear', 'Trägt man als', [['', '—'], ...WEAR_SLOTS], { hint: 'Kopf und Rüstung an Leyla, Implantate in ihrem Körper (nur im Camp einbauen), Teile an AvA' }),
-        num('stats.defense', 'Abwehr', { unit: '%', hint: 'Weniger Schaden, zählt mit Buffs zusammen (höchstens 90 %)' }), num('stats.health', 'Leben', { unit: 'LP' }), num('stats.damage', 'Schaden', { unit: '%' }), num('stats.speed', 'Tempo', { unit: '%' }),
+        select('tier', 'Stufe', [['', '—'], [1, 'Einfach'], [2, 'Gut'], [3, 'Perk + Flaw']], { hint: 'Cyberware (#006): Stufe 3 = sehr großer Vorteil mit Nachteil (negativer Wert), wie Traits in Fallout. Rahmen im Inventar: grau, cyan, gold' }),
+        num('stats.defense', 'Abwehr', { unit: '%', hint: 'Weniger Schaden, zählt mit Buffs zusammen (höchstens 90 %). Negative Werte sind Nachteile (rot im Tooltip)' }), num('stats.health', 'Leben', { unit: 'LP' }), num('stats.damage', 'Schaden', { unit: '%' }), num('stats.speed', 'Tempo', { unit: '%' }),
+        num('stats.melee', 'Nahkampf', { unit: '%', hint: 'Nur Nahkampf-Schaden, zusätzlich zu Schaden' }), num('stats.ranged', 'Fernkampf', { unit: '%', hint: 'Nur Fernkampf-Schaden, zusätzlich zu Schaden' }),
+        num('stats.crit', 'Krit-Chance', { unit: '%', hint: 'Kommt zur Krit-Chance der Waffe dazu (Krit = doppelter Schaden)' }), num('stats.jump', 'Sprungkraft', { unit: '%' }),
+        num('stats.dashCooldown', 'Dash-Abklingzeit', { unit: '%', hint: 'Negativ = schneller wieder bereit' }),
+        num('stats.airJumps', 'Sprünge in der Luft', { hint: 'Doppelsprung: 1 = einer in der Luft. Mit Leyla › Fähigkeiten › nur mit Implantat kommt er nur von hier' }),
+        num('stats.airDash', 'Luft-Dash', { min: 0, max: 1, hint: '1 = Leyla darf in der Luft dashen (mit Leyla › Fähigkeiten › nur mit Implantat). Am Boden geht der Dash immer' }),
+        num('stats.regen', 'Heilt sich', { unit: 'LP/10 s', step: 0.5, hint: 'Negativ = Leben sickert (nie unter 1 LP)' }), num('stats.heal', 'Heilung', { unit: '%', hint: 'Wirkung von Medikits und Heil-Essen' }),
+        num('stats.droneBattery', 'AvA-Akku', { unit: '%' }), num('stats.tankDecay', 'Tank-Verfall', { unit: '%', hint: 'Positiv = der Cryo-Tank verfällt schneller (ein Nachteil)' }),
         num('strain', 'Belastung', { min: 0, hint: 'Nur Implantate: zusammen höchstens Leyla › Inventar › Belastung höchstens' }),
         ref('partLook', 'An der Drohne', 'assets', { hint: 'Nur Drohnenteile: Bild an AvA (Drohne › Anbauteile, Spalte Gegenstand)' }),
         num('battery', 'AvA: mehr Akku', { unit: '%', hint: 'Nur Drohnenteile (Daniel, 12.11.2026: „bessere Teile machen die Drohne stärker“): so viel länger trägt sie Leyla, zählt über alle Teile zusammen' })] },

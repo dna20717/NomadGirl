@@ -240,5 +240,305 @@
   "time": 15,
   "discovery": ["experiment"],
   "hint": "Rot, grün, ein Schuss Öl. Schmeckt nach früher."
+ },
+ "billig_kameraauge": {
+  "name": "Billig-Kameraauge",
+  "station": "ripperdoc",
+  "time": 60,
+  "ingredients": [{"item": "chip", "count": 1},{"item": "schrott", "count": 2}],
+  "result": "billig_kameraauge",
+  "count": 1,
+  "discovery": ["start", "experiment"],
+  "hint": "einfach · Billig-Kameraauge"
+ },
+ "nachtsicht_optik": {
+  "name": "Nachtsicht-Optik",
+  "station": "ripperdoc",
+  "time": 60,
+  "ingredients": [{"item": "chip", "count": 1},{"item": "gluehbirne", "count": 1},{"item": "kabelbaum", "count": 1}],
+  "result": "nachtsicht_optik",
+  "count": 1,
+  "discovery": ["experiment"],
+  "hint": "einfach · Nachtsicht-Optik"
+ },
+ "zielsucher_linse": {
+  "name": "Zielsucher-Linse",
+  "station": "ripperdoc",
+  "time": 120,
+  "ingredients": [{"item": "chip", "count": 2},{"item": "kabelbaum", "count": 1},{"item": "technik", "count": 2}],
+  "result": "zielsucher_linse",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "gut · Zielsucher-Linse"
+ },
+ "kristallauge": {
+  "name": "Kristallauge",
+  "station": "ripperdoc",
+  "time": 120,
+  "ingredients": [{"item": "juwelenchip", "count": 1},{"item": "chip", "count": 1},{"item": "technik", "count": 2}],
+  "result": "kristallauge",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "gut · Kristallauge"
+ },
+ "tunnelblick_optik": {
+  "name": "Tunnelblick-Optik",
+  "station": "ripperdoc",
+  "time": 240,
+  "ingredients": [{"item": "chip", "count": 3},{"item": "juwelenchip", "count": 1},{"item": "technik", "count": 4}],
+  "result": "tunnelblick_optik",
+  "count": 1,
+  "discovery": ["found"],
+  "hint": "Perk + Flaw · Tunnelblick-Optik"
+ },
+ "reflex_booster": {
+  "name": "Reflex-Booster",
+  "station": "ripperdoc",
+  "time": 60,
+  "ingredients": [{"item": "chip", "count": 1},{"item": "kupferkabel", "count": 2}],
+  "result": "reflex_booster",
+  "count": 1,
+  "discovery": ["experiment"],
+  "hint": "einfach · Reflex-Booster"
+ },
+ "dash_synapse": {
+  "name": "Dash-Synapse",
+  "station": "ripperdoc",
+  "time": 60,
+  "ingredients": [{"item": "chip", "count": 1},{"item": "batteriezelle", "count": 1},{"item": "kupferkabel", "count": 1}],
+  "result": "dash_synapse",
+  "count": 1,
+  "discovery": ["start", "experiment"],
+  "hint": "einfach · Dash-Synapse"
+ },
+ "kinetik_rueckenmark": {
+  "name": "Kinetik-Rückenmark",
+  "station": "ripperdoc",
+  "time": 120,
+  "ingredients": [{"item": "chip", "count": 2},{"item": "zahnraeder", "count": 2},{"item": "kabelbaum", "count": 2},{"item": "technik", "count": 3}],
+  "result": "kinetik_rueckenmark",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "gut · Kinetik-Rückenmark"
+ },
+ "overclock_chip": {
+  "name": "Overclock-Chip",
+  "station": "ripperdoc",
+  "time": 240,
+  "ingredients": [{"item": "chip", "count": 3},{"item": "kuehlmittel", "count": 1},{"item": "technik", "count": 4}],
+  "result": "overclock_chip",
+  "count": 1,
+  "discovery": ["found"],
+  "hint": "Perk + Flaw · Overclock-Chip"
+ },
+ "berserker_chip": {
+  "name": "Berserker-Chip",
+  "station": "ripperdoc",
+  "time": 240,
+  "ingredients": [{"item": "chip", "count": 2},{"item": "bio", "count": 3},{"item": "technik", "count": 3}],
+  "result": "berserker_chip",
+  "count": 1,
+  "discovery": ["found"],
+  "hint": "Perk + Flaw · Berserker-Chip"
+ },
+ "cyberarm_mk1": {
+  "name": "Cyberarm Mk I",
+  "station": "ripperdoc",
+  "time": 60,
+  "ingredients": [{"item": "zahnraeder", "count": 2},{"item": "kabelbaum", "count": 1},{"item": "schrottplatte", "count": 1}],
+  "result": "cyberarm_mk1",
+  "count": 1,
+  "discovery": ["experiment"],
+  "hint": "einfach · Cyberarm Mk I"
+ },
+ "hydraulik_arm": {
+  "name": "Hydraulik-Arm",
+  "station": "ripperdoc",
+  "time": 120,
+  "ingredients": [{"item": "kompressor", "count": 1},{"item": "rohrbogen", "count": 2},{"item": "schrottplatte", "count": 2},{"item": "technik", "count": 2}],
+  "result": "hydraulik_arm",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "gut · Hydraulik-Arm"
+ },
+ "klingenarm": {
+  "name": "Klingenarm",
+  "station": "ripperdoc",
+  "time": 120,
+  "ingredients": [{"item": "schrottplatte", "count": 2},{"item": "chip", "count": 1},{"item": "zahnraeder", "count": 1},{"item": "technik", "count": 3}],
+  "result": "klingenarm",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "gut · Klingenarm"
+ },
+ "schuetzenarm": {
+  "name": "Schützenarm",
+  "station": "ripperdoc",
+  "time": 120,
+  "ingredients": [{"item": "zahnraeder", "count": 2},{"item": "chip", "count": 1},{"item": "kabelbaum", "count": 1},{"item": "technik", "count": 2}],
+  "result": "schuetzenarm",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "gut · Schützenarm"
+ },
+ "presslufthammer_arm": {
+  "name": "Presslufthammer-Arm",
+  "station": "ripperdoc",
+  "time": 240,
+  "ingredients": [{"item": "kompressor", "count": 1},{"item": "schrottplatte", "count": 3},{"item": "autobatterie", "count": 1},{"item": "technik", "count": 4}],
+  "result": "presslufthammer_arm",
+  "count": 1,
+  "discovery": ["found"],
+  "hint": "Perk + Flaw · Presslufthammer-Arm"
+ },
+ "nano_herzklappe": {
+  "name": "Nano-Herzklappe",
+  "station": "ripperdoc",
+  "time": 60,
+  "ingredients": [{"item": "schrott", "count": 2},{"item": "kupferkabel", "count": 1},{"item": "bio", "count": 1}],
+  "result": "nano_herzklappe",
+  "count": 1,
+  "discovery": ["start", "experiment"],
+  "hint": "einfach · Nano-Herzklappe"
+ },
+ "blutfilter": {
+  "name": "Blutfilter",
+  "station": "ripperdoc",
+  "time": 60,
+  "ingredients": [{"item": "rohrbogen", "count": 1},{"item": "bio", "count": 1},{"item": "panzertape", "count": 1}],
+  "result": "blutfilter",
+  "count": 1,
+  "discovery": ["experiment"],
+  "hint": "einfach · Blutfilter"
+ },
+ "herzpumpe": {
+  "name": "Herzpumpe",
+  "station": "ripperdoc",
+  "time": 120,
+  "ingredients": [{"item": "zahnraeder", "count": 1},{"item": "batteriezelle", "count": 1},{"item": "bio", "count": 1},{"item": "technik", "count": 2}],
+  "result": "herzpumpe",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "gut · Herzpumpe"
+ },
+ "biomonitor": {
+  "name": "Biomonitor",
+  "station": "ripperdoc",
+  "time": 120,
+  "ingredients": [{"item": "chip", "count": 1},{"item": "bio", "count": 2},{"item": "technik", "count": 2}],
+  "result": "biomonitor",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "gut · Biomonitor"
+ },
+ "reaktor_herz": {
+  "name": "Reaktor-Herz",
+  "station": "ripperdoc",
+  "time": 240,
+  "ingredients": [{"item": "notstrom", "count": 1},{"item": "kuehlmittel", "count": 1},{"item": "bio", "count": 3},{"item": "technik", "count": 5}],
+  "result": "reaktor_herz",
+  "count": 1,
+  "discovery": ["found"],
+  "hint": "Perk + Flaw · Reaktor-Herz"
+ },
+ "sprungfedern": {
+  "name": "Sprungfedern",
+  "station": "ripperdoc",
+  "time": 60,
+  "ingredients": [{"item": "zahnraeder", "count": 1},{"item": "schrott", "count": 3},{"item": "panzertape", "count": 1}],
+  "result": "sprungfedern",
+  "count": 1,
+  "discovery": ["start", "experiment"],
+  "hint": "einfach · Sprungfedern"
+ },
+ "sprintwaden": {
+  "name": "Sprintwaden",
+  "station": "ripperdoc",
+  "time": 60,
+  "ingredients": [{"item": "rohrbogen", "count": 1},{"item": "kupferkabel", "count": 2},{"item": "schrott", "count": 2}],
+  "result": "sprintwaden",
+  "count": 1,
+  "discovery": ["experiment"],
+  "hint": "einfach · Sprintwaden"
+ },
+ "federbeine_mk2": {
+  "name": "Federbeine Mk II",
+  "station": "ripperdoc",
+  "time": 120,
+  "ingredients": [{"item": "zahnraeder", "count": 2},{"item": "batteriezelle", "count": 1},{"item": "schrottplatte", "count": 1},{"item": "technik", "count": 3}],
+  "result": "federbeine_mk2",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "gut · Federbeine Mk II"
+ },
+ "stossdaempfer_beine": {
+  "name": "Stoßdämpfer-Beine",
+  "station": "ripperdoc",
+  "time": 120,
+  "ingredients": [{"item": "kompressor", "count": 1},{"item": "rohrbogen", "count": 1},{"item": "technik", "count": 2}],
+  "result": "stossdaempfer_beine",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "gut · Stoßdämpfer-Beine"
+ },
+ "kaenguru_beine": {
+  "name": "Känguru-Beine",
+  "station": "ripperdoc",
+  "time": 240,
+  "ingredients": [{"item": "zahnraeder", "count": 3},{"item": "kompressor", "count": 1},{"item": "bio", "count": 2},{"item": "technik", "count": 4}],
+  "result": "kaenguru_beine",
+  "count": 1,
+  "discovery": ["found"],
+  "hint": "Perk + Flaw · Känguru-Beine"
+ },
+ "subdermale_platten": {
+  "name": "Subdermale Platten",
+  "station": "ripperdoc",
+  "time": 60,
+  "ingredients": [{"item": "schrottplatte", "count": 2},{"item": "panzertape", "count": 1}],
+  "result": "subdermale_platten",
+  "count": 1,
+  "discovery": ["experiment"],
+  "hint": "einfach · Subdermale Platten"
+ },
+ "dermal_netz": {
+  "name": "Dermal-Netz",
+  "station": "ripperdoc",
+  "time": 60,
+  "ingredients": [{"item": "kupferkabel", "count": 2},{"item": "stoffreste", "count": 2},{"item": "bio", "count": 1}],
+  "result": "dermal_netz",
+  "count": 1,
+  "discovery": ["experiment"],
+  "hint": "einfach · Dermal-Netz"
+ },
+ "faserhaut": {
+  "name": "Faserhaut",
+  "station": "ripperdoc",
+  "time": 120,
+  "ingredients": [{"item": "stoffreste", "count": 3},{"item": "schrottplatte", "count": 1},{"item": "technik", "count": 3}],
+  "result": "faserhaut",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "gut · Faserhaut"
+ },
+ "heilgel_haut": {
+  "name": "Heilgel-Haut",
+  "station": "ripperdoc",
+  "time": 120,
+  "ingredients": [{"item": "bio", "count": 3},{"item": "chip", "count": 1},{"item": "technik", "count": 2}],
+  "result": "heilgel_haut",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "gut · Heilgel-Haut"
+ },
+ "panzerhaut_titan": {
+  "name": "Panzerhaut Titan",
+  "station": "ripperdoc",
+  "time": 240,
+  "ingredients": [{"item": "schrottplatte", "count": 4},{"item": "kompressor", "count": 1},{"item": "technik", "count": 5}],
+  "result": "panzerhaut_titan",
+  "count": 1,
+  "discovery": ["found"],
+  "hint": "Perk + Flaw · Panzerhaut Titan"
  }
 }

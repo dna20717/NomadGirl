@@ -61,8 +61,8 @@ export class Leyla {
     this.facing = 1;
     this.health = this.maxHealth;
     this.loadWeapon();
-    this.airJumps = this.m.airJumps ?? 0;
-    this.airDash = true;
+    this.airJumps = this.maxAirJumps;
+    this.airDash = this.canAirDash;
     this.lastGround = -1e9; this.jumpAt = -1e9; this.dashReady = 0; this.dropUntil = 0; this.noGrabUntil = 0;
     this.ledge = null; this.body.checkCollision.none = false;
     this.meleeReady = 0; this.rangedReady = 0; this.invulnerableUntil = 0; this.attackPose = 0;
@@ -72,6 +72,9 @@ export class Leyla {
     this.sprite.setAlpha(1).setRotation(0).clearTint();
   }
 
+  // Cyberware (#006): with Leyla › Fähigkeiten › „nur mit Implantat“ the double jump and the air dash come from implants (scene.ability)
+  get maxAirJumps() { return this.scene.ability ? this.scene.ability.airJumps : this.m.airJumps ?? 0; }
+  get canAirDash() { return this.scene.ability ? this.scene.ability.airDash : true; }
   get maxHealth() { return (this.d.health ?? 100) + (this.scene.mods?.health || 0); }
   get feet() { return this.body.bottom; }
   get x() { return this.body.center.x; }
@@ -103,7 +106,7 @@ export class Leyla {
         else if (this.lastVy > 500) this.land(this.lastVy);
       }
       this.air = null;
-      this.lastGround = time; this.airJumps = m.airJumps ?? 0; this.airDash = true; this.flipUntil = 0;
+      this.lastGround = time; this.airJumps = this.maxAirJumps; this.airDash = this.canAirDash; this.flipUntil = 0;
     }
     if (input.jump.pressed) this.jumpAt = time;
     const dir = (input.right.down ? 1 : 0) - (input.left.down ? 1 : 0);
@@ -231,7 +234,7 @@ export class Leyla {
   }
 
   jump(f) {
-    this.body.setVelocityY(-(this.m.jumpVelocity ?? 1100) * f);
+    this.body.setVelocityY(-(this.m.jumpVelocity ?? 1100) * f * (1 + (this.scene.mods?.jump || 0) / 100));   // Sprungkraft from implants
     this.jumpAt = -1e9; this.cut = true; this.leapAt = this.scene.now ?? 0;
     this.squash = { x: 0.86, y: 1.14 };
   }
@@ -246,7 +249,7 @@ export class Leyla {
     if (dir) this.facing = dir;
     this.scene.drone?.react('dash');
     this.state = 'dash'; this.flipUntil = 0; this.dashEnd = time + DASH_TIME;   // a dash ends the somersault (no flip after the dash)
-    this.dashReady = time + DASH_TIME + (this.m.dashCooldown ?? 600);
+    this.dashReady = time + DASH_TIME + (this.m.dashCooldown ?? 600) * Math.max(0.1, 1 + (this.scene.mods?.dashCooldown || 0) / 100);
     if (!this.body.blocked.down) this.airDash = false;
     this.body.allowGravity = false;
     this.body.setVelocity(this.facing * (this.m.dashDistance ?? 280) / (DASH_TIME / 1000), 0);
@@ -364,7 +367,7 @@ export class Leyla {
     const k = boost ? 1 + (this.m.swingBoost ?? 0) / 100 : 0.5, v = this.rope * this.omega;
     this.state = 'normal'; this.body.allowGravity = true; this.anchor = null;
     this.body.setVelocity(v * Math.cos(this.theta) * k, -v * Math.sin(this.theta) * k - (boost ? 260 : 0));
-    this.airJumps = this.m.airJumps ?? 0; this.airDash = true; this.cut = false;
+    this.airJumps = this.maxAirJumps; this.airDash = this.canAirDash; this.cut = false;
     this.squash = { x: 0.88, y: 1.12 };
   }
 
@@ -380,7 +383,7 @@ export class Leyla {
     this.oneArm = !!L.drone && this.m.droneOneArm !== false && !!this.d.look?.hangOne;   // at AvA: dangling from one arm (Daniel, 12.11.2026)
     this.setStanding(); b.allowGravity = false;
     b.reset(x, feet - this.size.h / 2); b.setVelocity(0, 0);
-    this.airJumps = this.m.airJumps ?? 0; this.airDash = true; this.cut = false; this.flipUntil = 0;
+    this.airJumps = this.maxAirJumps; this.airDash = this.canAirDash; this.cut = false; this.flipUntil = 0;
     this.squash = { x: 0.94, y: 1.06 };
   }
   hang(time, input, dir) {
@@ -415,7 +418,7 @@ export class Leyla {
     const z = this.size, m = this.m, q0 = Math.max(0, Math.min(0.9, rise / z.hangReach));
     this.facing = L.dir; this.ledge = null; this.body.allowGravity = false; this.setStanding();
     this.vault = { dir: L.dir, speed: Math.max(Math.abs(this.body.velocity.x), m.walkSpeed ?? 240) };
-    this.airJumps = m.airJumps ?? 0; this.airDash = true; this.cut = false; this.flipUntil = 0;
+    this.airJumps = this.maxAirJumps; this.airDash = this.canAirDash; this.cut = false; this.flipUntil = 0;
     this.startMantle(time, top, q0, Math.max(80, (m.vaultTime ?? 300) * (1 - q0) / 0.42));
   }
   mantleP(time) { return Math.min(1, (time - this.mantleAt) / (this.mantleDur ?? this.m.mantleTime ?? 450)); }

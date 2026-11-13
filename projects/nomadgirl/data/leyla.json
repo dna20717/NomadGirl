@@ -192,5 +192,6 @@
   "show": true,
   "color": "#7ff6ff",
   "perfectColor": "#ffe27a"
- }
+ },
+ "abilities": {"gated": true}
 }

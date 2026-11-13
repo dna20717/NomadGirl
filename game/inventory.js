@@ -162,16 +162,35 @@ export function startWear(D) {
   for (const id of D.leyla?.loadout?.wear || []) { const k = wearOf(D, id); if (k && WEAR_KEYS.includes(k) && !w[k]) w[k] = id; }
   return w;
 }
+// what worn things can change (Gegenstände › Ausrüstung); key, name, unit, good when (+1 higher, -1 lower), weight for comparing
+// Cyberware (#006, Daniel, 13.11.2026): implants unlock the double jump and the air dash and may carry a flaw (negative value)
+export const GEAR_STATS = [
+  ['defense', 'Abwehr', '%', 1, 1], ['health', 'Leben', ' LP', 1, 0.4], ['damage', 'Schaden', '%', 1, 1], ['melee', 'Nahkampf', '%', 1, 0.7], ['ranged', 'Fernkampf', '%', 1, 0.7],
+  ['crit', 'Krit-Chance', '%', 1, 1], ['speed', 'Tempo', '%', 1, 1], ['jump', 'Sprungkraft', '%', 1, 0.6], ['dashCooldown', 'Dash-Abklingzeit', '%', -1, 0.4],
+  ['airJumps', 'Sprünge in der Luft', '', 1, 15], ['airDash', 'Luft-Dash', '', 1, 12], ['regen', 'Heilt sich', ' LP/10 s', 1, 4], ['heal', 'Heilung', '%', 1, 0.3],
+  ['droneBattery', 'AvA-Akku', '%', 1, 0.3], ['tankDecay', 'Tank-Verfall', '%', -1, 0.5],
+];
+export const GEAR_KEYS = GEAR_STATS.map(s => s[0]);
+// one line per value: '+12 % Fernkampf', 'Luft-Dash'; good = helps Leyla (green), bad = flaw (red)
+export function statParts(st = {}) {
+  return GEAR_STATS.filter(([k]) => st[k]).map(([k, name, unit, dir]) => {
+    const v = st[k], good = v * dir > 0;
+    const text = k === 'airDash' ? (v > 0 ? 'Luft-Dash' : 'kein Luft-Dash') : k === 'airJumps' ? (v > 0 ? `+${v} ${v === 1 ? 'Sprung' : 'Sprünge'} in der Luft` : `${v} Sprung in der Luft`)
+      : `${v > 0 ? '+' : ''}${v}${unit === '%' ? ' %' : unit} ${name}`;
+    return { key: k, text, good };
+  });
+}
 // what everything worn adds up to; strain = load of the implants
 export function gearStats(D, wear = {}) {
-  const s = { defense: 0, health: 0, damage: 0, speed: 0, strain: 0 };
+  const s = { strain: 0 };
+  for (const k of GEAR_KEYS) s[k] = 0;
   for (const [k, id] of Object.entries(wear)) {
     const t = id && D.items?.[id];
     if (!t || t.wear !== k) continue;
-    for (const st of ['defense', 'health', 'damage', 'speed']) s[st] += t.stats?.[st] || 0;
+    for (const st of GEAR_KEYS) s[st] += t.stats?.[st] || 0;
     if (IMPLANTS.includes(k)) s.strain += t.strain || 0;
   }
   return s;
 }
 // one number to compare two things for the same place (AvA cheers or worries)
-export const gearScore = st => (st?.defense || 0) + (st?.health || 0) * 0.4 + (st?.damage || 0) + (st?.speed || 0);
+export const gearScore = st => GEAR_STATS.reduce((n, [k, , , dir, w]) => n + (st?.[k] || 0) * dir * w, 0);

@@ -114,6 +114,7 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 - `docs/features/ui.md`: Steuerung neu (Quick Draw, Benutzen auf ↑, UI-Grammatik), Pause-Menü und Steuerungs-Übersicht.
 - `docs/features/controller.md`: Controller: Gamepad-API, Belegung, überall ohne Zeiger, Hauptmenü mit Kurve, Symbole je Typ.
 - `docs/features/inventory.md`: Inventar: Tetris-Raster, Diablo-Ansicht, Implantate, Rettungsfach, Aktionen, Gummiband, Boden-Leiste.
+- `docs/features/cyberware.md`: Cyberware (#006): 30 Implantate, Stufen, Perk + Flaw, Doppelsprung/Luft-Dash freischalten, Ripperdoc-Liege.
 - `docs/features/crafting.md`: Kochen & Craften: Rezeptbuch, Experimentieren, Zettel, Essen, Gegenstände aus den Symbolen.
 - `docs/features/camp.md`: Camp: Puppenhaus-Rig, Lagerfeuer, Tag/Nacht, Kiste, Ton, Schacht, Run-Loop, E-Punkte nach Ebene.
 - `docs/features/rig.md`: Rig bauen: Bau-Modus, Stauraum, Rig-Teile, Stapeln, Hochseecontainer, Fahrgestell, Start-Rig, alte Spielstände.

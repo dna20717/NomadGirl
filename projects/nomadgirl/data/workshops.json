@@ -335,5 +335,25 @@
    {"kind": "light", "x": 100, "y": 157, "w": 76, "h": 3, "color": "#e45aa8", "size": 38, "rate": 3, "when": "always"},
    {"kind": "screen", "x": 219, "y": 116, "w": 13, "h": 7, "color": "#56e07a", "size": 0, "rate": 2, "when": "always"}
   ]
+ },
+ "ripperdoc": {
+  "name": "Ripperdoc-Liege",
+  "function": "cyber",
+  "stage": "1",
+  "places": 1,
+  "power": -2,
+  "value": 900,
+  "description": "Ein Zahnarztstuhl mit OP-Lampe und Roboterarmen. Hier baut Leyla Cyberware, eingebaut wird im Inventar.",
+  "look": "ws_ripperdoc",
+  "fx": [
+   {"kind": "light", "x": 128, "y": 64, "w": 46, "h": 8, "color": "#e8fff6", "size": 80, "rate": 4, "when": "always"},
+   {"kind": "screen", "x": 184, "y": 89, "w": 36, "h": 31, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "screen", "x": 178, "y": 128, "w": 20, "h": 6, "color": "#3fe0d0", "size": 0, "rate": 3, "when": "always"},
+   {"kind": "screen", "x": 170, "y": 95, "w": 6, "h": 18, "color": "#5cf28a", "size": 0, "rate": 1, "when": "always"},
+   {"kind": "bubbles", "x": 34, "y": 128, "w": 30, "h": 16, "color": "#a6fcdb", "size": 2, "rate": 3, "when": "always"},
+   {"kind": "blink", "x": 197, "y": 74, "w": 4, "h": 4, "color": "#ff4a6a", "size": 3, "rate": 1, "when": "always"},
+   {"kind": "sparks", "x": 112, "y": 100, "w": 30, "h": 8, "color": "#9ff7ff", "size": 3, "rate": 30, "when": "use", "idle": 0},
+   {"kind": "smoke", "x": 120, "y": 98, "w": 10, "h": 4, "color": "#c2b9cc", "size": 6, "rate": 2, "when": "use", "idle": 0}
+  ]
  }
 }

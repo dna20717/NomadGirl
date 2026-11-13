@@ -4168,5 +4168,89 @@
   "date": "12.11.2026",
   "derivedFrom": "intro_panel_7_source",
   "description": "Im dunklen Anhänger erwacht die Drohne, cyanes Auge und Lichtkegel, links der grüne Tank. Comic-Panel fürs Intro (#005)."
+ },
+ "icons_cyberware_1x1": {
+  "name": "Symbole · Cyberware 1 × 1",
+  "kind": "icons",
+  "file": "assets/items/icons_cyberware_1x1.png",
+  "cell": [64, 64],
+  "grid": [6, 2],
+  "names": [
+   "Billig-Kameraauge",
+   "Nachtsicht-Optik",
+   "Zielsucher-Linse",
+   "Kristallauge",
+   "Tunnelblick-Optik",
+   "Reflex-Booster",
+   "Dash-Synapse",
+   "Overclock-Chip",
+   "Berserker-Chip"
+  ],
+  "source": "KI (PixelLab, Create Image Pro je Implantat, AAP-64, bester von bis zu 16 Kandidaten) + Code (tools/cyberware_icons.py)",
+  "date": "13.11.2026",
+  "description": "Cyberware (#006) für Gegenstände der Größe 1 × 1, 64 px je Feld. Stufe 1 Schrott-Grau mit Cyan-LED, Stufe 2 Chrom, Stufe 3 (Perk + Flaw) Schwarz-Gold mit rotem Glühen und Warnstreifen. Einzelbilder in assets/items/cyberware/."
+ },
+ "ws_ripperdoc": {
+  "name": "Werkstatt · Ripperdoc-Liege",
+  "kind": "image",
+  "file": "assets/workshops/ripperdoc.png",
+  "origin": [128, 236],
+  "source": "KI (PixelLab, Create Image Pro, Stilbild Drohnenwerkbank v2, Palette AAP-64)",
+  "date": "13.11.2026",
+  "description": "Roter Zahnarztstuhl mit OP-Lampe, Roboterarme mit Bohrer und Skalpell, Monitor mit Körper-Scan, Gläser mit Augen, Kabel am Boden (#006)."
+ },
+ "ws_ripperdoc_alt": {
+  "name": "Werkstatt · Ripperdoc-Ecke (Alternative)",
+  "kind": "image",
+  "file": "assets/workshops/ripperdoc_alt.png",
+  "origin": [128, 236],
+  "source": "KI (PixelLab, Create Image Pro, Stilbild Drohnenwerkbank v2, Palette AAP-64)",
+  "date": "13.11.2026",
+  "description": "Zweite Fassung: OP-Liege, Laserskalpell, Infusionsständer, Gliedmaßen an der Wand, pinkes Neon-Kreuz, Röntgenbild (#006)."
+ },
+ "icons_cyberware_1x3": {
+  "name": "Symbole · Cyberware 1 × 3",
+  "kind": "icons",
+  "file": "assets/items/icons_cyberware_1x3.png",
+  "cell": [64, 192],
+  "grid": [6, 2],
+  "names": [
+   "Kinetik-Rückenmark",
+   "Cyberarm Mk I",
+   "Hydraulik-Arm",
+   "Klingenarm",
+   "Schützenarm",
+   "Presslufthammer-Arm",
+   "Sprungfedern",
+   "Sprintwaden",
+   "Federbeine Mk II",
+   "Stoßdämpfer-Beine",
+   "Känguru-Beine"
+  ],
+  "source": "KI (PixelLab, Create Image Pro je Implantat, AAP-64, bester von bis zu 16 Kandidaten) + Code (tools/cyberware_icons.py)",
+  "date": "13.11.2026",
+  "description": "Cyberware (#006) für Gegenstände der Größe 1 × 3, 64 px je Feld. Stufe 1 Schrott-Grau mit Cyan-LED, Stufe 2 Chrom, Stufe 3 (Perk + Flaw) Schwarz-Gold mit rotem Glühen und Warnstreifen. Einzelbilder in assets/items/cyberware/."
+ },
+ "icons_cyberware_2x2": {
+  "name": "Symbole · Cyberware 2 × 2",
+  "kind": "icons",
+  "file": "assets/items/icons_cyberware_2x2.png",
+  "cell": [128, 128],
+  "grid": [5, 1],
+  "names": ["Subdermale Platten", "Dermal-Netz", "Faserhaut", "Heilgel-Haut", "Panzerhaut Titan"],
+  "source": "KI (PixelLab, Create Image Pro je Implantat, AAP-64, bester von bis zu 16 Kandidaten) + Code (tools/cyberware_icons.py)",
+  "date": "13.11.2026",
+  "description": "Cyberware (#006) für Gegenstände der Größe 2 × 2, 64 px je Feld. Stufe 1 Schrott-Grau mit Cyan-LED, Stufe 2 Chrom, Stufe 3 (Perk + Flaw) Schwarz-Gold mit rotem Glühen und Warnstreifen. Einzelbilder in assets/items/cyberware/."
+ },
+ "icons_cyberware_1x2": {
+  "name": "Symbole · Cyberware 1 × 2",
+  "kind": "icons",
+  "file": "assets/items/icons_cyberware_1x2.png",
+  "cell": [64, 128],
+  "grid": [5, 1],
+  "names": ["Nano-Herzklappe", "Blutfilter", "Herzpumpe", "Biomonitor", "Reaktor-Herz"],
+  "source": "KI (PixelLab, Create Image Pro je Implantat, AAP-64, bester von bis zu 16 Kandidaten) + Code (tools/cyberware_icons.py)",
+  "date": "13.11.2026",
+  "description": "Cyberware (#006) für Gegenstände der Größe 1 × 2, 64 px je Feld. Stufe 1 Schrott-Grau mit Cyan-LED, Stufe 2 Chrom, Stufe 3 (Perk + Flaw) Schwarz-Gold mit rotem Glühen und Warnstreifen. Einzelbilder in assets/items/cyberware/."
  }
 }

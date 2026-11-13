@@ -6,7 +6,7 @@
 import { el } from '../ui.js';
 import { hints, padInUse, keyGlyph, closeX } from './ui_nav.js';
 import { icon } from '../icons.js';
-import { cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot, IMPLANTS, DRONE_WEAR, WEAR_KEYS, wearOf, gearStats, gearScore, occupancy } from '../inventory.js';
+import { cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot, IMPLANTS, DRONE_WEAR, WEAR_KEYS, wearOf, gearStats, gearScore, occupancy, statParts } from '../inventory.js';
 import { partSlots, budgets, SLOT_NAMES as PART_SLOT_NAMES } from '../rig.js';
 import { containers as storeList } from '../save.js';
 
@@ -21,8 +21,9 @@ const SLOT_ICONS = { melee: 'weapon', ranged: 'target', cyberdeck: 'brain', back
 // worn places (game/inventory.js WEAR_KEYS): Leyla's head + armor, implants in her body, AvA's parts
 export const WEAR_NAMES = { head: 'Kopf', armor: 'Rüstung', eyes: 'Augen', nerves: 'Nerven', arm: 'Cyberarm', heart: 'Herz', legs: 'Beine', skin: 'Haut', bow: 'Bug', tail: 'Heck', core: 'Kern', module: 'Modul' };
 const WEAR_ICONS = { head: 'person', armor: 'armor', bow: 'target', tail: 'settings', core: 'flash', module: 'box' };
-const STAT_NAMES = { defense: ['Abwehr', '%'], health: ['Leben', ''], damage: ['Schaden', '%'], speed: ['Tempo', '%'] };
-export const statLine = st => Object.entries(STAT_NAMES).filter(([k]) => st?.[k]).map(([k, [n, u]]) => `${st[k] > 0 ? '+' : ''}${st[k]}${u} ${n}`).join(' · ');
+// Cyberware tiers (#006): simple = scrap grey, good = cyan, perk + flaw = gold that glows red
+const TIER_COLORS = { 1: '#6d758d', 2: '#249fde', 3: '#f9a31b' };
+export const statLine = st => statParts(st).map(x => x.text).join(' · ');
 
 export function kindOf(D, a, id) {
   const t = thing(D, a, id) || {};
@@ -167,7 +168,9 @@ export class InventoryUI {
     const stat = (n, v, c = '') => el('div', { class: 'inv-stat' + (c ? ' ' + c : '') }, el('small', {}, n), el('b', {}, v));
     const max = I.strainMax ?? 10;
     const stats = el('div', { class: 'inv-stats' }, stat('Leben', String(base + st.health), st.health ? 'up' : ''), stat('Abwehr', `${st.defense} %`), stat('Schaden', `${st.damage >= 0 ? '+' : ''}${st.damage} %`),
-      stat('Tempo', `${100 + st.speed} %`, st.speed < 0 ? 'down' : st.speed > 0 ? 'up' : ''), stat('Belastung', `${st.strain} / ${max}`, st.strain > max * 0.8 ? 'warn' : 'cyan'));
+      stat('Tempo', `${100 + st.speed} %`, st.speed < 0 ? 'down' : st.speed > 0 ? 'up' : ''), stat('Belastung', `${st.strain} / ${max}`, st.strain > max * 0.8 ? 'warn' : 'cyan'),
+      // Cyberware (#006): what the implants unlock in the air (Leyla › Inventar › nur mit Implantat)
+      D.leyla?.abilities?.gated !== false ? stat('In der Luft', [st.airJumps > 0 ? `${st.airJumps}× Sprung` : null, st.airDash > 0 ? 'Dash' : null].filter(Boolean).join(' + ') || '—', st.airJumps > 0 || st.airDash > 0 ? 'up' : '') : null);
     // one layout for both tabs (Daniel, 11.11.2026: "der Switch soll im selben Fenster stattfinden"): Leyla stays put,
     // only the six places left and right change, and she fades into the scan; the wires are drawn once the layout stands
     const col = keys => el('div', { class: 'inv-wearcol' }, ...keys.map(([x, n]) => this.slotEl(x, n)));
@@ -285,8 +288,8 @@ export class InventoryUI {
 
   // a thing in a grid: coloured cells of its shape + glyph, name and count
   itemEl(key, g, e) {
-    const D = this.D, c = this.cell, cells = cellsOf(D, e.a, e.id, e.r || 0), b = boxOf(D, e), t = thing(D, e.a, e.id) || {}, color = CATEGORY_COLORS[kindOf(D, e.a, e.id)] || '#555';
-    const wrap = el('div', { class: 'inv-item', style: `left:${e.x * c}px;top:${e.y * c}px;width:${b.w * c}px;height:${b.h * c}px;--col:${color}` });
+    const D = this.D, c = this.cell, cells = cellsOf(D, e.a, e.id, e.r || 0), b = boxOf(D, e), t = thing(D, e.a, e.id) || {}, color = TIER_COLORS[t.tier] || CATEGORY_COLORS[kindOf(D, e.a, e.id)] || '#555';
+    const wrap = el('div', { class: 'inv-item' + (t.tier ? ' tier-' + t.tier : ''), style: `left:${e.x * c}px;top:${e.y * c}px;width:${b.w * c}px;height:${b.h * c}px;--col:${color}` });
     const set = new Set(cells.map(p => p.join(',')));
     for (const [x, y] of cells) wrap.append(el('i', { style: `left:${x * c}px;top:${y * c}px;width:${c}px;height:${c}px`,
       class: [!set.has(`${x - 1},${y}`) && 'l', !set.has(`${x + 1},${y}`) && 'r', !set.has(`${x},${y - 1}`) && 't', !set.has(`${x},${y + 1}`) && 'b'].filter(Boolean).join(' ') }));
@@ -318,8 +321,8 @@ export class InventoryUI {
     const t = id && thing(D, a, id), name = label || (w ? WEAR_NAMES[w] : SLOT_NAMES[slot]);
     const part = w && DRONE_WEAR.includes(w) && t?.partLook && D.assets?.[t.partLook]?.file;
     const pic = !t ? icon(w ? WEAR_ICONS[w] || (IMPLANTS.includes(w) ? 'brain' : 'item') : SLOT_ICONS[slot], 22)
-      : part ? el('img', { class: 'inv-partpic', src: new URL(part, ASSET_BASE).href, alt: '' }) : el('b', {}, markOf(D, a, id, w ? 52 : 40));
-    const s = el('div', { class: 'inv-slot wear' + (t ? ' full' : '') + (w && IMPLANTS.includes(w) ? ' implant' : ''), title: name, 'data-slot': slot, style: t ? `--col:${CATEGORY_COLORS[kindOf(D, a, id)]}` : '' },
+      : part ? el('img', { class: 'inv-partpic', src: new URL(part, ASSET_BASE).href, alt: '' }) : el('b', {}, markOf(D, a, id, w ? (iconCell(D, t)?.aspect < 0.75 ? 58 : 52) : 40));   // tall implants (arm, legs, heart) stand upright and big
+    const s = el('div', { class: 'inv-slot wear' + (t ? ' full' : '') + (w && IMPLANTS.includes(w) ? ' implant' : '') + (t?.tier ? ' tier-' + t.tier : ''), title: name, 'data-slot': slot, style: t ? `--col:${CATEGORY_COLORS[kindOf(D, a, id)]}${t.tier ? `;--tier:${TIER_COLORS[t.tier]}` : ''}` : '' },
       el('small', {}, name), pic, el('span', {}, t ? t.name : 'frei'));
     s.addEventListener('mousedown', ev => { ev.stopPropagation(); if (ev.button === 0) this.slotClick(slot); });
     if (t) { s.addEventListener('mouseenter', () => this.showTip({ a, id, n: 1 })); s.addEventListener('mouseleave', () => { if (!this.menuOn) this.tip.hidden = true; }); }
@@ -372,12 +375,16 @@ export class InventoryUI {
     const facts = [CATEGORY_NAMES[k], e.a === 'rigParts' ? `Slot: ${PART_SLOT_NAMES[t.slot] || t.slot}` : null, e.a === 'rigParts' && t.pull ? `+${t.pull} kg Zugkraft` : null,
       e.a === 'rigParts' && t.armor ? `+${t.armor} Panzerung` : null, e.a === 'rigParts' && t.storageRows ? `+${t.storageRows} Reihen Stauraum` : null,
       (e.a === 'weapons' || e.a === 'rigParts') && t.damage ? `${t.damage} Schaden` : null, e.a === 'backpacks' && t.size ? `Raster ${t.size.join(' × ')}` : null,
-      t.wear ? `${DRONE_WEAR.includes(t.wear) ? 'AvA: ' : 'Platz: '}${WEAR_NAMES[t.wear] || t.wear}` : null, t.stats ? statLine(t.stats) : null, t.strain ? `Belastung ${t.strain}` : null,
+      t.wear ? `${DRONE_WEAR.includes(t.wear) ? 'AvA: ' : 'Platz: '}${WEAR_NAMES[t.wear] || t.wear}` : null, t.strain ? `Belastung ${t.strain}` : null,
       stackMax(D, e.a, e.id) > 1 ? `Stapel ${e.n}/${stackMax(D, e.a, e.id)}` : null, `${(t.value || 0) * e.n} Δ`, t.buff ? `Buff: ${D.buffs?.[t.buff]?.name || t.buff}` : null].filter(Boolean);
     const acts = key != null && !this.held ? this.actionsFor(key, e) : [];
     const row = x => el('li', {}, ...(this.padOn ? [...keyGlyph(x.k), x.hold ? el('small', {}, 'halten') : null, ' '] : []), x.label);
-    this.tip.replaceChildren(el('b', {}, t.name || e.id), el('small', {}, facts.join(' · ')), t.description ? el('p', {}, t.description) : null,
-      acts.length ? el('ul', { class: 'inv-acts' }, ...(this.padOn ? acts.filter(x => x.k) : acts).map(row), this.padOn ? null : el('li', { class: 'hint' }, 'Rechtsklick: Aktionen')) : null);
+    // Cyberware (#006): every value on its own line, perks green, flaws red (like Fallout's traits)
+    const parts = statParts(t.stats);
+    this.tip.replaceChildren(...[el('b', {}, t.name || e.id), el('small', {}, facts.join(' · ')),
+      parts.length ? el('ul', { class: 'inv-perks' }, ...parts.map(x => el('li', { class: x.good ? 'perk' : 'flaw' }, (x.good ? '▲ ' : '▼ ') + x.text))) : null,
+      t.description ? el('p', {}, t.description) : null,
+      acts.length ? el('ul', { class: 'inv-acts' }, ...(this.padOn ? acts.filter(x => x.k) : acts).map(row), this.padOn ? null : el('li', { class: 'hint' }, 'Rechtsklick: Aktionen')) : null].filter(Boolean));   // replaceChildren would write "null" as text
     this.tip.hidden = false;
   }
 

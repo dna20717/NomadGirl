@@ -23,7 +23,7 @@ import { Loot } from './loot.js';
 import { InventoryUI } from './inventory_ui.js';
 import { FloorStrip } from './floor_strip.js';
 import { skinnedLook, SKIN_LOOKS } from './gun_skins.js';
-import { gearStats, add } from '../inventory.js';
+import { gearStats, add, GEAR_KEYS } from '../inventory.js';
 import { CraftUI } from './craft_ui.js';
 import { TechtreeUI } from './techtree_ui.js';
 import { BuildMode } from './build_mode.js';
@@ -336,8 +336,13 @@ export class PlayScene extends Phaser.Scene {
   applyGear() {
     const g = this.box ? { ...gearStats(this.data_, this.box.save.inv?.wear) } : {};
     if (this.box) { const b = bonuses(this.data_, this.box.save); for (const k of ['health', 'damage']) if (b[k]) g[k] = (g[k] || 0) + b[k]; }   // Techtree: passive bonuses count like gear
-    for (const k of ['defense', 'health', 'damage', 'speed']) { const v = (this.mods[k] || 0) - (this.gearMods?.[k] || 0) + (g[k] || 0); if (v) this.mods[k] = v; else delete this.mods[k]; }
+    for (const k of GEAR_KEYS) { const v = (this.mods[k] || 0) - (this.gearMods?.[k] || 0) + (g[k] || 0); if (v) this.mods[k] = v; else delete this.mods[k]; }
     this.gearMods = g;
+    // Cyberware (#006, Daniel, 13.11.2026: Implantate „ermöglichen Doppelsprung und Dash“): with a savegame and Leyla › Fähigkeiten › nur mit Implantat
+    // the double jump and the air dash come only from implants; the test room keeps everything
+    const gated = this.box && this.data_.leyla?.abilities?.gated !== false;
+    this.ability = gated ? { airJumps: Math.max(0, g.airJumps || 0), airDash: (g.airDash || 0) > 0 } : null;
+    if (this.leyla) { this.leyla.airJumps = Math.min(this.leyla.airJumps, this.leyla.maxAirJumps); if (!this.leyla.canAirDash) this.leyla.airDash = false; }
     if (this.leyla) this.leyla.health = Math.min(this.leyla.health, this.leyla.maxHealth);
     this.drone?.refreshParts();
   }
@@ -410,7 +415,7 @@ export class PlayScene extends Phaser.Scene {
   useThing(id) {
     const D = this.data_, save = this.box.save, l = this.leyla, r = useThing(D, save, id, { health: l.health, maxHealth: l.maxHealth });
     if (!r.ok) return r;
-    if (r.heal) { l.health = Math.min(l.maxHealth, l.health + r.heal); save.health = Math.round(l.health); }
+    if (r.heal) { r.heal *= Math.max(0, 1 + (this.mods.heal || 0) / 100); l.health = Math.min(l.maxHealth, l.health + r.heal); save.health = Math.round(l.health); }   // Heilung % from implants
     const b = D.buffs?.[r.buff] || {};
     if (this.mode === 'run' && !r.heal && b.stat) { this.mods[b.stat] = (this.mods[b.stat] || 0) + (b.value || 0); if (b.stat === 'health') l.health = Math.min(l.maxHealth, l.health + (b.value || 0)); }
     this.fx.text(l.x, l.feet - l.height - 30, r.heal ? `+${Math.round(r.heal)} Leben` : `${b.name || r.buff}${this.mode === 'camp' ? ' · nächster Run' : ''}`, { color: '#7aff9a', size: 34, rise: 50, life: 1300 });
@@ -846,6 +851,11 @@ export class PlayScene extends Phaser.Scene {
 
     if (this.hud.build?.active) input = this.hud.build.drive(input, dt);   // building: Leyla walks to her jobs by herself
     this.leyla.update(time, dt, input);
+    // Heilt sich (implants, LP per 10 s; negative = a flaw that drains, never below 1 LP)
+    const regen = this.mods?.regen || 0, l = this.leyla;
+    if (regen && l.alive && !this.hud.paused) {
+      l.health = regen > 0 ? Math.min(l.maxHealth, l.health + regen * dt / 10000) : Math.max(Math.min(l.health, 1), l.health + regen * dt / 10000);
+    }
     this.level?.update?.(dt);
     this.fog?.update(dt);
     this.drone.update(time, dt);

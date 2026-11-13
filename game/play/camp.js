@@ -834,7 +834,7 @@ export class Camp {
         items: [{ label: 'Rig umbauen', primary: true, act: () => s.openBuild() }, { label: 'Zurück', act: () => {} }] });
     if (def.function === 'sleep') return this.sleep(def);
     if (def.function === 'warroom') return this.warroom();
-    if (['kitchen', 'craft', 'tank'].includes(def.function)) { s.hud.inv?.close(); return s.hud.craft?.open(id); }
+    if (['kitchen', 'craft', 'cyber', 'tank'].includes(def.function)) { s.hud.inv?.close(); return s.hud.craft?.open(id); }
     if (def.function === 'garden') return this.garden(id, def, place);
     if (def.function === 'guests') {   // who sleeps here: the guests in order, as many as there are beds in all guest bunks
       const P = passengers(this.D, this.box.save), nm = c => this.D.companions?.[c]?.name || c, waiting = Object.entries(this.box.save.waiting || {});

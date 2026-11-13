@@ -190,6 +190,12 @@ Zu Beginn kennt man „Notflicken“, „Stromzelle tauschen“ und „Kühlmitt
 - **Entschieden (Daniel, 12.11.2026, Backlog A4):** Der Heilmittel-Knoten ist das Endziel. Danach kommt ein **Abspann**, anschließend läuft das Spiel **offen** weiter, mit **AvA als spielbarer Figur**. Abspann und AvA-Steuerung sind noch zu entwerfen (Design-Session).
 
 
+### Cyberware (Daniel, 13.11.2026, gebaut als #006)
+
+- Implantate an sechs Plätzen (Augen, Nerven, Cyberarm, Herz, Beine, Haut), drei Stufen: einfach, gut und **Perk + Flaw** wie die Traits in Fallout (sehr großer Vorteil, dauerhafter Nachteil, solange eingebaut).
+- **Doppelsprung und Luft-Dash schalten Implantate frei** (Beine bzw. Nerven); Leyla beginnt ohne. Der Dash am Boden geht immer.
+- Hergestellt an der **Ripperdoc-Liege** (neue Werkstatt im Rig), die starken Teile nur über Baupläne aus Tresoren und von Bossen. Liste und Werte: `docs/features/cyberware.md`, Zahlen in der Werkstatt.
+
 ## Rig & Werkstätten
 
 > **Klarstellung 12.11.2026 (Daniel):** Es gibt keine eigenen Modul-Anhänger, nur die variablen Container. Ein Container im Erdgeschoss ist gleichzeitig ein Anhänger (Rahmen, Räder, Kupplung gehören dazu). Das ist bereits so gelöst, kein To-do. **Deichselkästen gibt es nicht mehr**, Stauraum kommt aus den Lagerregalen.

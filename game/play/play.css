@@ -134,6 +134,10 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .inv-art { display: inline-block; vertical-align: middle; background-repeat: no-repeat; image-rendering: pixelated; flex: none; }
 .inv-pic { position: absolute; display: grid; place-items: center; pointer-events: none; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .45)); }
 .inv-item.pic i { background: color-mix(in srgb, var(--col) 38%, #17111f); }
+.inv-slot[class*="tier-"] { border: 2px solid var(--tier); }
+.inv-slot.tier-3 { box-shadow: 0 0 10px rgba(223, 62, 35, .45), inset 0 0 8px rgba(249, 163, 27, .25); }
+.inv-item.tier-3 .inv-pic { filter: drop-shadow(0 0 3px rgba(223, 62, 35, .75)); animation: inv-flaw 2.4s ease-in-out infinite; }
+@keyframes inv-flaw { 50% { filter: drop-shadow(0 0 6px rgba(249, 163, 27, .8)); } }
 .craft-ing .inv-art { margin: -3px 0 -2px; }
 .inv-glyph { position: absolute; display: grid; place-items: center; font: 22px/1 VT323, monospace; color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, .5); pointer-events: none; }
 .inv-name { position: absolute; left: 4px; right: 4px; bottom: 2px; font-size: 9.5px; line-height: 1.1; color: #f2eef7; text-shadow: 0 1px 0 #000; pointer-events: none; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
@@ -390,6 +394,10 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .inv-acts { list-style: none; margin: 7px 0 0; padding: 6px 0 0; border-top: 1px solid #3a2f45; display: grid; gap: 3px; font-size: 12px; color: #e8def0; }
 .inv-acts li { display: flex; align-items: center; gap: 5px; }
 .inv-acts li small { font-size: 10.5px; color: #b9a2c8; }
+/* Cyberware (#006): perks green, flaws red */
+.inv-perks { list-style: none; margin: 6px 0 2px; padding: 0; display: grid; gap: 2px; font-size: 12.5px; font-weight: 600; }
+.inv-perks .perk { color: #7aff9a; }
+.inv-perks .flaw { color: #ff6b6b; }
 .inv-acts li.hint { color: #8c7a9c; font-size: 11px; }
 .inv-acts kbd, .inv-acts img, .inv-acts svg { min-width: 16px; height: 16px; font-size: 10.5px; }
 .inv-tip.menu { pointer-events: auto; }

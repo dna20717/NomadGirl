@@ -77,7 +77,7 @@ check('Tab Implantate: Leyla als Scan, 6 Plätze, Linie zum Cyberarm', s.view ==
 await clickAt(await thingAt('chest', 'nachtsicht_optik'));
 await clickAt(await slot('wear:eyes'));
 s = await inv(); m = await mods();
-check('Nachtsicht-Optik in die Augen (im Camp): +5 % Schaden, Belastung 3', s.wear.eyes === 'nachtsicht_optik' && m.damage === (m0.damage || 0) + 5 && /3 \/ 10/.test(await ev(() => document.querySelector('.inv-stats').textContent)), m);
+check('Nachtsicht-Optik in die Augen (im Camp): +8 % Fernkampf, Belastung 3', s.wear.eyes === 'nachtsicht_optik' && m.ranged === (m0.ranged || 0) + 8 && /3 \/ 10/.test(await ev(() => document.querySelector('.inv-stats').textContent)), m);
 await shot('implants');
 // strain limit
 const refused = await ev(() => { const sc = game.scene.getScene('play'), ui = sc.hud.inv; ui.held = { e: { a: 'items', id: 'herzpumpe', n: 1, r: 0 }, from: 'chest' };
