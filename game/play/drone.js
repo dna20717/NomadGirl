@@ -92,6 +92,7 @@ export class Drone {
   // event moods (kill, hit, cleared, dash, down …) win for their duration
   react(mood) {
     const m = this.moods[mood];
+    this.scene.hud?.tut?.event(mood);   // the field guide listens (#011): alert, hit, kill, cleared, down …
     if (this.gone || !m || this.d.enabled === false) return;
     const time = this.scene.time.now;
     this.event = { mood, until: m.duration ? time + m.duration : Infinity };

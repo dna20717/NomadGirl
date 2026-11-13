@@ -123,6 +123,7 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 - `docs/features/progression.md`: Progression: Cryo-Tank, k.o. neu, Techtree, Durchgang / Traum, Zerlegen, voller Tresor.
 - `docs/features/pois.md`: POI-Level: Verschweißen, Kisten, Schalter, Secrets, Ranking, die vier POIs, Licht & Atmosphäre, Kleinvieh, Nebel.
 - `docs/features/tiles.md`: Kacheln und Kachel-Sets (TileSet00): Clutter, Decals, Einschlüsse, echte Größen, Tiefe aus Code.
+- `docs/features/tutorial.md`: Feldhandbuch (#011): Lektionen mit Clips/Bildern aus dem Spiel, Karte beim ersten Mal, Archiv im Menü, Aufnahme-Tool.
 - `docs/features/intro.md`: Intro als Comic (#005): Panels, Textboxen, Countdown, Effekte, nur übers Hauptmenü.
 - `docs/features/worldmap.md`: Reisekarte (#007): Routen-Netz je Durchgang, Marken der Spielwelt, Fenster am Warroom und an der Van-Tür.
 - `docs/features/splash.md`: Startseite: Szene, Horizont-Dunst, AvA, Highway mit Textur-Boden, Überraschungen.

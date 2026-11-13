@@ -95,5 +95,6 @@
   "markerColor": "#ff3fa4",
   "blood": {"enabled": true, "amount": 100, "decals": true, "stay": 20, "max": 160, "color": "#a01828"}
  },
- "fog": {"enabled": true, "density": 82, "secretDensity": 97, "walls": 80, "sight": 11, "fade": 450, "fakeFade": 450, "color": "#07060c"}
+ "fog": {"enabled": true, "density": 82, "secretDensity": 97, "walls": 80, "sight": 11, "fade": 450, "fakeFade": 450, "color": "#07060c"},
+ "tutorial": {"enabled": true, "gap": 40}
 }

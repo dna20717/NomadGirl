@@ -36,8 +36,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 13.11. Code → Ava: #011 Feldhandbuch erledigt: 53 Lektionen mit Clips und Bildern aus dem Spiel, Karte beim ersten Mal, Archiv im Pause-Menü.
 - 13.11. Ava → Code: Neu **#012 Achievements mit Trophäen-Rezepten + Rezepte automatisch lernen** (Design-Session mit Daniel, Entscheidungen in design.md). Bitte nach #011.
-- 13.11. Code → Ava: #011 Tutorial (Feldhandbuch) läuft.
 - 13.11. Code → Ava: #010 Bau-Modus mit Controller erledigt: AvA ist der Zeiger, UI-Grammatik, Bereiche, Vorschau, Vibration.
 - 13.11. Code → Ava: #009 Camp-Feinschliff erledigt: alles Seitenansicht, Horizont mit Milchstraße und BigCityDelta, Onkel Sung größer, Lichterketten als Bilder, Lichter ohne Kasten, kein Solar unter Stapeln.
 - 13.11. Code → Ava: #008 Camp-Paket erledigt: Start-Rig neu, Van 2 ⚡, Solar + Akku, Zisterne, Außenwände, Klapptreppe, Deko + Stimmung, Lichterketten selbst ziehen, Companions als Figuren, Streuner an der Tankstelle. ⚠️ Techtree braucht weiter einen Warroom.
@@ -208,13 +208,17 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - ⚠️ Am Händler kauft A wie gewünscht aufs Pad; danach mit RB zum Schrottplatz und das Teil dort packen.
 
 ### #011 Tutorial als Feldhandbuch: Lektionen mit Clips und Slideshows
-- **Status:** läuft (Code, 13.11.) · angelegt 13.11. von Code (Auftrag Daniel im Code-Chat)
+- **Status:** erledigt (Code, 13.11.) · angelegt 13.11. von Code (Auftrag Daniel im Code-Chat)
 - **Für:** Code
 - **Lesen:** `docs/features/ui.md`, `controller.md`, `tests.md`
 - **Auftrag (Daniel, 13.11.2026):** „Auf Basis von Screenshots ein Tutorial, das ähnlich wie bei Far Cry erklärt, wie man Dinge tut. Keine neuen Grafiken erzeugen, sondern Clips und Screenshots nutzen, um in kurzen Animationen oder Slideshows die verschiedenen Bausteine des Spiels zu erklären. Feingranulare Lektionen.“ Antworten: **beim ersten Mal als Karte + Archiv im Pause-Menü**, **gemischt** (Bewegung/Kampf/AvA als Loop-Clip, Menüs/Camp/Bauen als Slideshow), **alle ~45 Lektionen**, **Tasten je Gerät**.
 - **Fertig, wenn:** Lektionen in der Werkstatt, Clips und Bilder automatisch aus dem Spiel aufgenommen, Karten beim ersten Mal, Feldhandbuch im Pause-Menü, Tests grün.
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** Details in `docs/features/tutorial.md`. 53 Lektionen in 9 Kapiteln (Bereich **Lektionen**), 22 Clips und 61 Bilder, alle mit `tools/tutorial_capture.mjs` aus dem Spiel aufgenommen (Testraum, Kampfraum, Camp, Tankstelle; ffmpeg → WebM/WebP, 4,8 MB). Karte beim ersten Mal (pausiert, Neon-Glas, Clip in Schleife oder Slideshow mit Schritten), Feldhandbuch im Pause-Menü (Kapitel als Tabs), Tasten je Gerät, Optionen an/aus und „Lektionen neu zeigen“. Neue Asset-Art „Clip (Video)“ mit Vorschau in der Werkstatt. Tests: `tutorial_test` 18 (neu), alle 29 Browser-Tests und `npm test` grün. PixelLab: nichts. **Bitte testen:** neues Spiel und ein paar Minuten spielen (Karten erscheinen), Menü › Feldhandbuch durchblättern, Clips anschauen.
+  - ⚠️ Auslöser je Lektion sind Vorschläge (Zeit, Hinweis, Fenster, Leyla-Zustand, AvAs Stimmung) und in der Werkstatt änderbar; zwischen zwei zeitgesteuerten Karten liegen 40 s.
+  - ⚠️ Gesehen wird im Browser gespeichert (über Durchgänge und „Neues Spiel“ hinweg).
+  - ⚠️ Bewegungs-Lektionen mit Implantat (Salto, Dash in der Luft) erklären das Implantat nur im Text.
+  - ⚠️ „Formen und Drehen“ zeigt nur das Nehmen; das Drehen sieht man auf dem Bild kaum.
 
 ### #012 Achievements mit Trophäen-Rezepten + Rezepte automatisch lernen
 - **Status:** offen · angelegt 13.11. von Ava (Design-Session mit Daniel im Projekt-Chat)

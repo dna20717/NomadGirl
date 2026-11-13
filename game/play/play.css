@@ -615,7 +615,7 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 /* #010 build mode with the controller: areas, dealer tabs, AvA's tooltip, the context menu (same look as inventory tabs and tooltips) */
 .bm-areas, .bm-tabs { display: flex; align-items: center; gap: 4px; }
 .bm-tabs { padding: 6px 10px 0; }
-.bm-areas img, .bm-tabs img, .bm-areas kbd, .bm-tabs kbd { height: 20px; }
+.bm-areas .pad-ico, .bm-tabs .pad-ico { display: inline-block; vertical-align: middle; }
 .bm-area, .bm-tab { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 6px; border: 1px solid #3a2f45; background: transparent; color: #8a7d99; font: 18px/1 VT323, monospace; cursor: pointer; }
 .bm-area.on, .bm-tab.on { background: #2a2233; color: #ffd27a; border-color: #6b5a3a; }
 .bm-tip { position: fixed; z-index: 27; max-width: 320px; padding: 8px 10px; border-radius: 8px; background: rgba(13, 10, 18, .94); border: 1px solid #3a2f45; pointer-events: none; font-family: var(--ui-font); }
@@ -624,10 +624,57 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .bm-tip small { display: block; margin-top: 2px; font-size: 11.5px; color: #b9a2c8; }
 .bm-tip-acts { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 6px; font-size: 11.5px; color: #d8cfe2; }
 .bm-tip-acts span { display: inline-flex; align-items: center; gap: 4px; }
-.bm-tip-acts img, .bm-tip-acts kbd { height: 18px; }
+.bm-tip-acts .pad-ico { display: inline-block; vertical-align: middle; }
 .bm-ctx { position: fixed; z-index: 28; display: flex; flex-direction: column; gap: 4px; min-width: 240px; padding: 10px; border-radius: 10px; background: rgba(23, 17, 31, .96); border: 1px solid #3a2f45; font-family: var(--ui-font); pointer-events: auto; }
 .bm-ctx header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
 .bm-ctx header b { color: #ffd27a; font-size: 14px; }
 .bm-ctx header small { color: #8a7d99; font-size: 11.5px; }
 .bm-ctx .inv-btn { text-align: left; display: flex; align-items: center; }
 .bm-ctx .ui-hints { margin-top: 6px; }
+
+/* #011 field guide: the card the first time and Menü › Feldhandbuch (Neon glass like the controls panel) */
+.tut { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; background: rgba(8, 6, 14, .62); pointer-events: auto; font-family: var(--ui-font); animation: tut-in .22s ease-out; }
+.tut[hidden] { display: none; }
+@keyframes tut-in { from { opacity: 0; } to { opacity: 1; } }
+.tut-card, .tut-guide { position: relative; display: flex; flex-direction: column; gap: 12px; padding: 16px 18px 12px; border-radius: 14px; background: rgba(23, 17, 31, .97); border: 1px solid #3a2f45; box-shadow: 0 18px 60px rgba(0, 0, 0, .6); color: #f2eef7; }
+.tut-card { width: min(980px, 94vw); animation: tut-card .3s cubic-bezier(.2, .9, .3, 1.2); }
+@keyframes tut-card { from { transform: translateY(24px) scale(.96); } to { transform: none; } }
+.tut-card header, .tut-guide header { display: flex; align-items: center; gap: 8px; color: #ffd27a; }
+.tut-card header b { font: 22px/1 VT323, monospace; letter-spacing: .5px; }
+.tut-new { margin-left: 6px; padding: 2px 8px; border-radius: 99px; background: #ffd27a; color: #0d0a12; font: 600 11px var(--ui-font); text-transform: uppercase; }
+.tut-body { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.tut-clip, .tut-slides { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: #0d0a12; border: 1px solid #3a2f45; display: block; object-fit: cover; }
+.tut-slide { position: absolute; inset: 0; margin: 0; opacity: 0; transition: opacity .45s; }
+.tut-slide.on { opacity: 1; }
+.tut-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tut-slide figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 14px 12px; background: linear-gradient(transparent, rgba(8, 6, 14, .92)); font-size: 14px; line-height: 1.4; color: #f2eef7; }
+.tut-dots { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; }
+.tut-dots i { width: 9px; height: 9px; border-radius: 50%; background: rgba(242, 238, 247, .35); cursor: pointer; }
+.tut-dots i.on { background: #ffd27a; box-shadow: 0 0 8px rgba(255, 210, 122, .7); }
+.tut-missing { display: grid; place-items: center; height: 100%; color: #8a7d99; font-size: 13px; }
+.tut-text small { color: #8a7d99; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+.tut-text h2 { margin: 4px 0 10px; font: 34px/1 VT323, monospace; color: #ffd27a; }
+.tut-text p { margin: 0; font-size: 15px; line-height: 1.6; color: #d8cfe2; }
+.tut kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; margin: 0 2px; border-radius: 5px; border: 1px solid #6b5a3a; background: #2a2233; color: #ffd27a; font: 600 12px var(--ui-font); text-align: center; vertical-align: 1px; }
+.tut-text .pad-ico, .tut-slide figcaption .pad-ico { display: inline-block; vertical-align: -7px; margin: 0 2px; }
+.tut .ui-hints { align-self: center; }
+.tut-guide { width: min(1240px, 96vw); height: min(760px, 92vh); }
+.tut-guide header h2 { margin: 0; font: 30px/1 VT323, monospace; }
+.tut-guide header small { color: #8a7d99; font-size: 12px; margin-right: auto; }
+.tut-tabs { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.tut-tabs .pad-ico { display: inline-block; vertical-align: middle; }
+.tut-tab { padding: 3px 9px; border-radius: 6px; border: 1px solid #3a2f45; background: transparent; color: #8a7d99; font: 18px/1 VT323, monospace; cursor: pointer; }
+.tut-tab.on { background: #2a2233; color: #ffd27a; border-color: #6b5a3a; }
+.tut-main { flex: 1; min-height: 0; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 16px; }
+.tut-main .tut-body { grid-template-columns: 1fr; align-content: start; overflow: auto; }
+.tut-list { margin: 0; padding: 0; list-style: none; overflow: auto; display: flex; flex-direction: column; gap: 3px; }
+.tut-list li { display: flex; align-items: center; gap: 4px; padding: 7px 10px; border-radius: 7px; color: #b9a2c8; font-size: 13.5px; cursor: pointer; border: 1px solid transparent; }
+.tut-list li:hover { background: #1f1729; }
+.tut-list li.on { background: #2a2233; color: #ffd27a; border-color: #ffd27a; box-shadow: 0 0 10px rgba(255, 210, 122, .25); }
+.tut-list li.fresh::after { content: ''; margin-left: auto; width: 7px; height: 7px; border-radius: 50%; background: #3fe0d0; }
+@media (max-width: 760px) { .tut-body, .tut-main { grid-template-columns: 1fr; } .tut-list { max-height: 140px; } }
+.tut-steps { margin: 4px 0 0; padding: 0; list-style: none; counter-reset: st; display: flex; flex-direction: column; gap: 8px; }
+.tut-steps li { counter-increment: st; position: relative; padding: 8px 10px 8px 36px; border-radius: 8px; border: 1px solid transparent; color: #8a7d99; font-size: 14.5px; line-height: 1.5; cursor: pointer; transition: color .3s, background .3s; }
+.tut-steps li::before { content: counter(st); position: absolute; left: 9px; top: 8px; width: 19px; height: 19px; border-radius: 50%; display: grid; place-items: center; background: #2a2233; color: #8a7d99; font: 600 11px var(--ui-font); }
+.tut-steps li.on { color: #f2eef7; background: #1f1729; border-color: #3a2f45; }
+.tut-steps li.on::before { background: #ffd27a; color: #0d0a12; }

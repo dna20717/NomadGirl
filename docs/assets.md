@@ -156,6 +156,7 @@ Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich 
 | `assets/camp/campfire_side.png` | Lagerfeuer von der Seite (#009, `campfire_side`): 8 Frames à 56 × 64 px, Steine als Reihe, Flammen flackern | KI (PixelLab, Create Image Pro + Animate Image, AAP-64) | 13.11.2026 |
 | `assets/workshops/cistern.png` | Zisterne (#008, `ws_cistern`): IBC-Tank im Käfig, Plane und Trichter, Filterfass, Hahn mit Eimer | KI (PixelLab, Create Image Pro, AAP-64, Stilbild Drohnenwerkbank) | 13.11.2026 |
 | `assets/companions/schraube_idle.png`, `onkel_sung_idle.png` | Companions stehen (#008): Schraube (2 Frames, die anderen setzten eine Kapuze auf) und Onkel Sung (4 Frames), Blick nach rechts | KI (PixelLab, Charakter + breathing-idle), zugeschnitten (Code) | 13.11.2026 |
+| `assets/tutorial/tut_<lektion>.webm`, `tut_<lektion>_<n>.webp` | Feldhandbuch (#011): 22 Clips (WebM/VP9, 640 px, 15 fps) und 61 Bilder (WebP, 960 px) der Lektionen, aus dem Spiel aufgenommen (`tools/tutorial_capture.mjs`), keine neuen Grafiken | Code (Aufnahme aus dem Spiel) | 13.11.2026 |
 
 ## Ordner
 

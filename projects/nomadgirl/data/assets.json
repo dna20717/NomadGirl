@@ -4494,5 +4494,669 @@
   "source": "KI (PixelLab, Create Image Pro + Animate Image, AAP-64, Referenz Van)",
   "date": "13.11.2026",
   "description": "Lagerfeuer streng von der Seite (#009, Daniel: „Perspektiven kaputt … inklusive des Feuers“): Steine als Reihe, gekreuzte Scheite, Flammen flackern in der Schleife."
+ },
+ "tut_laufen": {
+  "name": "Feldhandbuch · Laufen und Gehen",
+  "kind": "video",
+  "file": "assets/tutorial/tut_laufen.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Laufen und Gehen“, 29 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_springen": {
+  "name": "Feldhandbuch · Springen",
+  "kind": "video",
+  "file": "assets/tutorial/tut_springen.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Springen“, 40 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_salto": {
+  "name": "Feldhandbuch · Salto",
+  "kind": "video",
+  "file": "assets/tutorial/tut_salto.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Salto“, 46 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_kanten": {
+  "name": "Feldhandbuch · Kanten greifen",
+  "kind": "video",
+  "file": "assets/tutorial/tut_kanten.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Kanten greifen“, 46 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_leitern": {
+  "name": "Feldhandbuch · Leitern und Treppen",
+  "kind": "video",
+  "file": "assets/tutorial/tut_leitern.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Leitern und Treppen“, 30 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_dash": {
+  "name": "Feldhandbuch · Dash",
+  "kind": "video",
+  "file": "assets/tutorial/tut_dash.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Dash“, 25 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_slide": {
+  "name": "Feldhandbuch · Slide",
+  "kind": "video",
+  "file": "assets/tutorial/tut_slide.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Slide“, 32 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_ducken": {
+  "name": "Feldhandbuch · Ducken und Abspringen",
+  "kind": "video",
+  "file": "assets/tutorial/tut_ducken.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Ducken und Abspringen“, 35 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_seil": {
+  "name": "Feldhandbuch · Seile",
+  "kind": "video",
+  "file": "assets/tutorial/tut_seil.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Seile“, 28 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_nahkampf": {
+  "name": "Feldhandbuch · Nahkampf",
+  "kind": "video",
+  "file": "assets/tutorial/tut_nahkampf.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Nahkampf“, 39 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_schiessen": {
+  "name": "Feldhandbuch · Schießen",
+  "kind": "video",
+  "file": "assets/tutorial/tut_schiessen.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Schießen“, 31 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_nachladen_1": {
+  "name": "Feldhandbuch · Nachladen 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_nachladen_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Nachladen“ (960 px, WebP)."
+ },
+ "tut_nachladen_2": {
+  "name": "Feldhandbuch · Nachladen 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_nachladen_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Nachladen“ (960 px, WebP)."
+ },
+ "tut_gegner_1": {
+  "name": "Feldhandbuch · Gegner sehen und hören 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_gegner_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Gegner sehen und hören“ (960 px, WebP)."
+ },
+ "tut_gegner_2": {
+  "name": "Feldhandbuch · Gegner sehen und hören 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_gegner_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Gegner sehen und hören“ (960 px, WebP)."
+ },
+ "tut_treffer": {
+  "name": "Feldhandbuch · Treffer einstecken",
+  "kind": "video",
+  "file": "assets/tutorial/tut_treffer.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Treffer einstecken“, 18 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_beute": {
+  "name": "Feldhandbuch · Beute",
+  "kind": "video",
+  "file": "assets/tutorial/tut_beute.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Beute“, 45 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_gummiband": {
+  "name": "Feldhandbuch · AvA am Gummiband",
+  "kind": "video",
+  "file": "assets/tutorial/tut_gummiband.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „AvA am Gummiband“, 26 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_plattform": {
+  "name": "Feldhandbuch · AvA als Plattform",
+  "kind": "video",
+  "file": "assets/tutorial/tut_plattform.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „AvA als Plattform“, 48 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_stimmungen_1": {
+  "name": "Feldhandbuch · AvAs Gesicht 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_stimmungen_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „AvAs Gesicht“ (960 px, WebP)."
+ },
+ "tut_stimmungen_2": {
+  "name": "Feldhandbuch · AvAs Gesicht 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_stimmungen_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „AvAs Gesicht“ (960 px, WebP)."
+ },
+ "tut_inventar_1": {
+  "name": "Feldhandbuch · Das Inventar 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_inventar_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Das Inventar“ (960 px, WebP)."
+ },
+ "tut_inventar_2": {
+  "name": "Feldhandbuch · Das Inventar 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_inventar_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Das Inventar“ (960 px, WebP)."
+ },
+ "tut_raster_1": {
+  "name": "Feldhandbuch · Formen und Drehen 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_raster_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Formen und Drehen“ (960 px, WebP)."
+ },
+ "tut_raster_2": {
+  "name": "Feldhandbuch · Formen und Drehen 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_raster_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Formen und Drehen“ (960 px, WebP)."
+ },
+ "tut_rueber_1": {
+  "name": "Feldhandbuch · Rüber und Wegwerfen 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_rueber_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Rüber und Wegwerfen“ (960 px, WebP)."
+ },
+ "tut_rueber_2": {
+  "name": "Feldhandbuch · Rüber und Wegwerfen 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_rueber_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Rüber und Wegwerfen“ (960 px, WebP)."
+ },
+ "tut_boden_1": {
+  "name": "Feldhandbuch · Die Boden-Leiste 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_boden_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Die Boden-Leiste“ (960 px, WebP)."
+ },
+ "tut_boden_2": {
+  "name": "Feldhandbuch · Die Boden-Leiste 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_boden_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Die Boden-Leiste“ (960 px, WebP)."
+ },
+ "tut_implantate_1": {
+  "name": "Feldhandbuch · Implantate 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_implantate_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Implantate“ (960 px, WebP)."
+ },
+ "tut_implantate_2": {
+  "name": "Feldhandbuch · Implantate 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_implantate_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Implantate“ (960 px, WebP)."
+ },
+ "tut_benutzen": {
+  "name": "Feldhandbuch · Dinge benutzen",
+  "kind": "video",
+  "file": "assets/tutorial/tut_benutzen.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Dinge benutzen“, 23 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_feuer": {
+  "name": "Feldhandbuch · Am Lagerfeuer",
+  "kind": "video",
+  "file": "assets/tutorial/tut_feuer.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Am Lagerfeuer“, 45 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_schlafen_1": {
+  "name": "Feldhandbuch · Schlafen 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_schlafen_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Schlafen“ (960 px, WebP)."
+ },
+ "tut_schlafen_2": {
+  "name": "Feldhandbuch · Schlafen 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_schlafen_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Schlafen“ (960 px, WebP)."
+ },
+ "tut_kiste_1": {
+  "name": "Feldhandbuch · Die Kiste 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_kiste_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Die Kiste“ (960 px, WebP)."
+ },
+ "tut_kiste_2": {
+  "name": "Feldhandbuch · Die Kiste 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_kiste_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Die Kiste“ (960 px, WebP)."
+ },
+ "tut_kochen_1": {
+  "name": "Feldhandbuch · Kochen 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_kochen_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Kochen“ (960 px, WebP)."
+ },
+ "tut_kochen_2": {
+  "name": "Feldhandbuch · Kochen 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_kochen_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Kochen“ (960 px, WebP)."
+ },
+ "tut_experimentieren_1": {
+  "name": "Feldhandbuch · Experimentieren 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_experimentieren_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Experimentieren“ (960 px, WebP)."
+ },
+ "tut_experimentieren_2": {
+  "name": "Feldhandbuch · Experimentieren 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_experimentieren_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Experimentieren“ (960 px, WebP)."
+ },
+ "tut_werkbank_1": {
+  "name": "Feldhandbuch · Die Werkbank 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_werkbank_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Die Werkbank“ (960 px, WebP)."
+ },
+ "tut_werkbank_2": {
+  "name": "Feldhandbuch · Die Werkbank 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_werkbank_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Die Werkbank“ (960 px, WebP)."
+ },
+ "tut_hydrokultur_1": {
+  "name": "Feldhandbuch · Hydrokultur 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_hydrokultur_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Hydrokultur“ (960 px, WebP)."
+ },
+ "tut_hydrokultur_2": {
+  "name": "Feldhandbuch · Hydrokultur 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_hydrokultur_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Hydrokultur“ (960 px, WebP)."
+ },
+ "tut_zisterne_1": {
+  "name": "Feldhandbuch · Zisterne 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_zisterne_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Zisterne“ (960 px, WebP)."
+ },
+ "tut_zisterne_2": {
+  "name": "Feldhandbuch · Zisterne 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_zisterne_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Zisterne“ (960 px, WebP)."
+ },
+ "tut_ripperdoc_1": {
+  "name": "Feldhandbuch · Ripperdoc 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_ripperdoc_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Ripperdoc“ (960 px, WebP)."
+ },
+ "tut_ripperdoc_2": {
+  "name": "Feldhandbuch · Ripperdoc 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_ripperdoc_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Ripperdoc“ (960 px, WebP)."
+ },
+ "tut_bauen_1": {
+  "name": "Feldhandbuch · Der Bau-Modus 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_bauen_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Der Bau-Modus“ (960 px, WebP)."
+ },
+ "tut_bauen_2": {
+  "name": "Feldhandbuch · Der Bau-Modus 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_bauen_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Der Bau-Modus“ (960 px, WebP)."
+ },
+ "tut_einbauen_1": {
+  "name": "Feldhandbuch · Werkstätten einbauen 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_einbauen_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Werkstätten einbauen“ (960 px, WebP)."
+ },
+ "tut_einbauen_2": {
+  "name": "Feldhandbuch · Werkstätten einbauen 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_einbauen_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Werkstätten einbauen“ (960 px, WebP)."
+ },
+ "tut_anhaenger_1": {
+  "name": "Feldhandbuch · Anhänger und Container 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_anhaenger_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Anhänger und Container“ (960 px, WebP)."
+ },
+ "tut_anhaenger_2": {
+  "name": "Feldhandbuch · Anhänger und Container 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_anhaenger_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Anhänger und Container“ (960 px, WebP)."
+ },
+ "tut_solar_1": {
+  "name": "Feldhandbuch · Rig-Teile und Solar 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_solar_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Rig-Teile und Solar“ (960 px, WebP)."
+ },
+ "tut_solar_2": {
+  "name": "Feldhandbuch · Rig-Teile und Solar 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_solar_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Rig-Teile und Solar“ (960 px, WebP)."
+ },
+ "tut_lichterketten": {
+  "name": "Feldhandbuch · Lichterketten",
+  "kind": "video",
+  "file": "assets/tutorial/tut_lichterketten.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Lichterketten“, 41 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_haendler_1": {
+  "name": "Feldhandbuch · Der Händler 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_haendler_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Der Händler“ (960 px, WebP)."
+ },
+ "tut_haendler_2": {
+  "name": "Feldhandbuch · Der Händler 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_haendler_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Der Händler“ (960 px, WebP)."
+ },
+ "tut_budget_1": {
+  "name": "Feldhandbuch · Gewicht, Strom, Plätze 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_budget_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Gewicht, Strom, Plätze“ (960 px, WebP)."
+ },
+ "tut_budget_2": {
+  "name": "Feldhandbuch · Gewicht, Strom, Plätze 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_budget_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Gewicht, Strom, Plätze“ (960 px, WebP)."
+ },
+ "tut_karte_1": {
+  "name": "Feldhandbuch · Die Reisekarte 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_karte_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Die Reisekarte“ (960 px, WebP)."
+ },
+ "tut_karte_2": {
+  "name": "Feldhandbuch · Die Reisekarte 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_karte_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Die Reisekarte“ (960 px, WebP)."
+ },
+ "tut_fahren_1": {
+  "name": "Feldhandbuch · Fahren 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_fahren_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Fahren“ (960 px, WebP)."
+ },
+ "tut_fahren_2": {
+  "name": "Feldhandbuch · Fahren 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_fahren_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Fahren“ (960 px, WebP)."
+ },
+ "tut_pluendern_1": {
+  "name": "Feldhandbuch · Plündern 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_pluendern_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Plündern“ (960 px, WebP)."
+ },
+ "tut_warroom_1": {
+  "name": "Feldhandbuch · Der Warroom 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_warroom_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Der Warroom“ (960 px, WebP)."
+ },
+ "tut_warroom_2": {
+  "name": "Feldhandbuch · Der Warroom 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_warroom_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Der Warroom“ (960 px, WebP)."
+ },
+ "tut_kisten": {
+  "name": "Feldhandbuch · Kisten",
+  "kind": "video",
+  "file": "assets/tutorial/tut_kisten.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Kisten“, 21 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_schalter": {
+  "name": "Feldhandbuch · Schalter und Türen",
+  "kind": "video",
+  "file": "assets/tutorial/tut_schalter.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Schalter und Türen“, 26 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_waende": {
+  "name": "Feldhandbuch · Brüchige Wände",
+  "kind": "video",
+  "file": "assets/tutorial/tut_waende.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Brüchige Wände“, 37 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_ziel_1": {
+  "name": "Feldhandbuch · Ziel und Ranking 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_ziel_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Ziel und Ranking“ (960 px, WebP)."
+ },
+ "tut_ziel_2": {
+  "name": "Feldhandbuch · Ziel und Ranking 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_ziel_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Ziel und Ranking“ (960 px, WebP)."
+ },
+ "tut_ko_1": {
+  "name": "Feldhandbuch · k.o. 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_ko_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „k.o.“ (960 px, WebP)."
+ },
+ "tut_ko_2": {
+  "name": "Feldhandbuch · k.o. 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_ko_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „k.o.“ (960 px, WebP)."
+ },
+ "tut_zurueck": {
+  "name": "Feldhandbuch · Zurück ins Camp",
+  "kind": "video",
+  "file": "assets/tutorial/tut_zurueck.webm",
+  "source": "Code (aus dem Spiel aufgenommen, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Clip der Lektion „Zurück ins Camp“, 22 Bilder mit 15 fps, 640 px breit (WebM/VP9)."
+ },
+ "tut_tank_1": {
+  "name": "Feldhandbuch · AvAs Tank 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_tank_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „AvAs Tank“ (960 px, WebP)."
+ },
+ "tut_tank_2": {
+  "name": "Feldhandbuch · AvAs Tank 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_tank_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „AvAs Tank“ (960 px, WebP)."
+ },
+ "tut_techtree_1": {
+  "name": "Feldhandbuch · Der Techtree 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_techtree_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Der Techtree“ (960 px, WebP)."
+ },
+ "tut_techtree_2": {
+  "name": "Feldhandbuch · Der Techtree 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_techtree_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Der Techtree“ (960 px, WebP)."
+ },
+ "tut_durchgang_1": {
+  "name": "Feldhandbuch · Ein neuer Durchgang 1",
+  "kind": "image",
+  "file": "assets/tutorial/tut_durchgang_1.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 1 der Lektion „Ein neuer Durchgang“ (960 px, WebP)."
+ },
+ "tut_durchgang_2": {
+  "name": "Feldhandbuch · Ein neuer Durchgang 2",
+  "kind": "image",
+  "file": "assets/tutorial/tut_durchgang_2.webp",
+  "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
+  "date": "13.11.2026",
+  "description": "Bild 2 der Lektion „Ein neuer Durchgang“ (960 px, WebP)."
  }
 }

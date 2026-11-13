@@ -29,6 +29,7 @@ import { gearStats, add, GEAR_KEYS } from '../inventory.js';
 import { CraftUI } from './craft_ui.js';
 import { TechtreeUI } from './techtree_ui.js';
 import { BuildMode } from './build_mode.js';
+import { Tutorial } from './tutorial.js';
 import { use as useThing } from '../crafting.js';
 
 const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'], hangOne: ['hang'] };
@@ -220,7 +221,7 @@ export class PlayScene extends Phaser.Scene {
     let def = this.data_.rooms?.[this.roomId];
     // AvA died: a new Durchgang begins, Leyla wakes up at the fire (design.md › „War alles nur ein Traum?“)
     this.dreaming = false;
-    if (this.mode === 'camp' && this.box?.save.tank?.dead) { this.box.save = newCycle(this.data_, this.box.save); this.dreaming = true; this.box.persist?.(); }
+    if (this.mode === 'camp' && this.box?.save.tank?.dead) { this.box.save = newCycle(this.data_, this.box.save); this.dreaming = true; this.box.persist?.(); this.hud.tut?.event('cycle'); }
     if (this.mode === 'camp') {
       this.campGeo = campLayout(this.data_, this.box.save, this.T);
       const day = daytimeAt(this.data_.camp, this.box.save.hour);
@@ -395,6 +396,8 @@ export class PlayScene extends Phaser.Scene {
       closed: () => {},
     });
     hud.tech.close(); hud.tech.el.hidden = true;
+    // the field guide (#011, game/play/tutorial.js): a card the first time, Menü › Feldhandbuch
+    hud.tut ??= new Tutorial(hud.root, { scene: () => hud.scene, hud });
     // the travel map (#007, game/play/map_ui.js): warroom and van door
     hud.map ??= new MapUI(hud.root, {
       get D() { return hud.scene.data_; }, get base() { return hud.scene.base; },
@@ -818,6 +821,7 @@ export class PlayScene extends Phaser.Scene {
     const u = this.ui, hud = this.hud, p = this.pad;
     if (!u) return;
     const eat = () => { for (const k of ['jump', 'grab', 'dash', 'up', 'down', 'left', 'right', 'melee', 'ranged', 'reload', 'holster']) if (input[k]) input[k].pressed = false; };
+    if (hud.tut?.isOpen) { hud.tut.nav(u); eat(); input.help.pressed = false; return; }   // the field guide card / archive (#011)
     if (hud.paused && !hud.modal) { if (u.pressed('ok') || u.pressed('back')) { hud.toggleHelp(false); eat(); input.help.pressed = false; } return; }
     if (hud.modal) {
       if (p?.kind) {   // the keyboard runs the menu through its own keys (hud.menuKey)
@@ -857,6 +861,7 @@ export class PlayScene extends Phaser.Scene {
     this.now = time;   // the loop's clock (hits, shots and Leyla run on it; scene.time.now is another clock)
     let input = this.readInput();
     this.padMenus(input, Math.min(delta, 50));
+    this.hud.tut?.tick(performance.now()); this.hud.tut?.poll(this.now);   // field guide (#011)
     // Esc / Start: closes what is open (inventory, controls), otherwise the pause menu (Daniel, 11.11.2026: controls hidden in a menu)
     if (input.help.pressed) {
       if (this.hud.inv?.isOpen && !this.hud.paused) this.hud.inv.close();
@@ -875,7 +880,7 @@ export class PlayScene extends Phaser.Scene {
     // every window pauses the game (Daniel, 12.11.2026: „Fenster pausieren immer, auch im Run“): menus, controls, cooking and the inventory
     let invDone = false;
     if (this.hud.inv?.isOpen && !this.hud.paused && !this.hud.modal && !this.leaving) { this.inventoryUpdate(input); invDone = true; }
-    if (this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
+    if (this.hud.tut?.isOpen || this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
       // cooking, crafting, a menu: the workshops keep glowing, steaming and sparking behind the window
       if (this.camp && !this.hud.paused && !this.leaving) { this.camp.benches?.update(time, Math.min(delta, 50)); this.camp.lid?.(Math.min(delta, 50)); }
       this.physics.world.pause(); this.hud.update(this, time); return;

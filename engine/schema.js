@@ -69,7 +69,11 @@ export const RIG_SLOTS = [['engine', 'Motor'], ['armor', 'Panzerung'], ['weapon'
 export const POI_KINDS = [['gasStation', 'Tankstelle'], ['settlement', 'Siedlung'], ['factory', 'Fabrik'], ['bunker', 'Bunker'], ['government', 'Regierungskomplex'], ['mall', 'Einkaufszentrum'], ['ruin', 'Ruine']];
 export const POI_SIZES = [['S', 'S'], ['M', 'M'], ['L', 'L'], ['XL', 'XL']];
 export const ROOM_TAGS = [['start', 'Eingang'], ['exit', 'Ausgang'], ['combat', 'Kampf'], ['loot', 'Beute'], ['secret', 'Geheimnis'], ['npc', 'NPCs'], ['boss', 'Boss'], ['corridor', 'Gang']];
-export const ASSET_KINDS = [['animation', 'Animation'], ['tiles', 'Kacheln'], ['image', 'Bild'], ['sound', 'Ton'], ['icons', 'Symbole'], ['reference', 'Referenz'], ['source', 'Original']];
+export const ASSET_KINDS = [['animation', 'Animation'], ['tiles', 'Kacheln'], ['image', 'Bild'], ['video', 'Clip (Video)'], ['sound', 'Ton'], ['icons', 'Symbole'], ['reference', 'Referenz'], ['source', 'Original']];
+// tutorial (#011): chapters of the field guide and what makes a lesson show up the first time
+export const TUT_CHAPTERS = [['move', 'Bewegung'], ['fight', 'Kampf'], ['ava', 'AvA'], ['inventory', 'Inventar'], ['camp', 'Camp'], ['build', 'Rig bauen'], ['travel', 'Reisen'], ['poi', 'Im POI'], ['progress', 'Fortschritt']];
+export const TUT_TRIGGERS = [['', 'nie (nur Feldhandbuch)'], ['time', 'nach Zeit'], ['near', 'Hinweis sichtbar'], ['window', 'Fenster offen'], ['leyla', 'Leyla-Zustand'], ['event', 'Ereignis']];
+export const TUT_MODES = [['', 'überall'], ['camp', 'im Camp'], ['run', 'im POI']];
 export const DAYTIME = [['any', 'Immer'], ['day', 'Tag'], ['night', 'Nacht']];
 export const DRONE_MOODS = [['idle', 'Normal'], ['kill', 'Gegner erledigt'], ['cleared', 'Raum geräumt'], ['bored', 'Langeweile'], ['alert', 'Gegner in der Nähe'],
   ['curious', 'Neugierig (zufällig)'], ['hit', 'Leyla getroffen'], ['sleep', 'Schlafen'], ['down', 'Leyla k.o.'], ['scan', 'Scannen (zufällig)'], ['lowHealth', 'Wenig Leben'], ['dash', 'Dash'], ['zen', 'Zen (Leyla macht Yoga)'],
@@ -159,6 +163,7 @@ export const AREAS = {
       { title: 'Technik', fields: [text('title', 'Titel'), num('tileSize', 'Kachelgröße', { unit: 'px', min: 8 }), num('gravity', 'Schwerkraft', { unit: 'px/s²', min: 0 }),
         bool('confirmLeave', 'Rückfrage beim Abreisen', { hint: 'Daniel, 13.11.2026: am Van im POI fragt das Spiel „Wirklich zurückreisen?“. Aus = sofort zurück ins Camp' }),
         size('resolution', 'Auflösung', { unit: 'px', hint: 'Interne Auflösung, wird skaliert' }), bool('pixelArt', 'Pixel-Art (scharf skalieren)')] },
+      { title: 'Tutorial', fields: [bool('tutorial.enabled', 'Lektionen beim ersten Mal', { hint: '#011: Karte mit Clip, wenn man etwas zum ersten Mal sieht oder kann. Spieler können sie unter Menü › Optionen abschalten' }), num('tutorial.gap', 'Abstand zwischen zwei Karten', { unit: 's', min: 0 })] },
       { title: 'Controller', fields: [bool('gamepad.enabled', 'Controller an', { hint: 'Gamepad-API des Browsers: Xbox, PlayStation, Stadia (Bluetooth-Modus), Switch Pro … mit Standard-Belegung. Die Knöpfe heißen hier nach ihrer Lage, die Hilfe im Spiel zeigt die Symbole des angeschlossenen Controllers' }),
         ref('gamepad.icons', 'Symbole', 'assets', { hint: 'Asset der Art „Symbole“ (tools/pad_icons.py): <typ>_0 … <typ>_9 je Controller (xbox, stadia, ps, switch), dazu für alle gleich stick_l, stick_r, stick_l_up … stick_l_press, stick_r_press, dpad, dpad_up …' }), num('gamepad.iconSize', 'Symbol-Größe', { unit: 'px', min: 16, max: 64, hint: 'So hoch erscheinen die Knöpfe in Hinweisen und Hilfe (Standard 32)' }),
         select('gamepad.symbols', 'Symbole von', PAD_KINDS, { hint: 'Automatisch nach dem Namen, den der Controller meldet; zum Testen fest einstellbar (Stadia meldet sich manchmal ohne Namen)' }),
@@ -1166,6 +1171,24 @@ export const AREAS = {
     row: x => `${label(DAYTIME, x.time)} · Gewicht ${x.weight ?? 0}`,
     sections: [{ title: 'Encounter', fields: [NAME, LOOK, num('weight', 'Gewicht', { min: 0 }), select('time', 'Tageszeit', DAYTIME), refs('enemies', 'Gegner', 'enemies'), ref('loot', 'Beute', 'lootTables'), DESCRIPTION] }],
   },
+  tutorial: {
+    name: 'Lektionen', singular: 'Lektion', icon: 'help', file: 'data/tutorial.json', kind: 'catalog', groupBy: { key: 'chapter', options: TUT_CHAPTERS },
+    hint: 'Das Feldhandbuch (#011, Daniel, 13.11.2026: „ein Tutorial ähnlich wie bei Far Cry … Clips und Screenshots … feingranulare Lektionen“). Beim ersten Mal erscheint die Karte (pausiert), danach steht sie im Pause-Menü › Feldhandbuch. Clips und Bilder nimmt tools/tutorial_capture.mjs aus dem Spiel auf.',
+    template: { name: 'Neue Lektion', chapter: 'move', order: 99, text: '', media: 'slides', trigger: '' },
+    row: x => `${label(TUT_CHAPTERS, x.chapter)} · ${x.media === 'clip' ? 'Clip' : 'Bilder'} · ${label(TUT_TRIGGERS, x.trigger || '')}${x.on ? ' ' + x.on : ''}`,
+    sections: [
+      { title: 'Lektion', fields: [NAME, select('chapter', 'Kapitel', TUT_CHAPTERS), num('order', 'Reihenfolge', { min: 0 }),
+        area_('text', 'Text', { hint: 'Tasten als Platzhalter, je Gerät als Taste oder Controller-Symbol: {k:jump} Spiel-Aktion (jump, dash, melee, ranged, reload, holster, grab, up, down, left, right, walk, inventory, build, help), {u:ok} Fenster-Aktion (ok, back, context, send, tabs, move), {stick}, {rstick}' })] },
+      { title: 'Bilder', fields: [select('media', 'Art', [['clip', 'Clip (Schleife)'], ['slides', 'Slideshow']]), ref('clip', 'Clip', 'assets', { hint: 'Asset der Art „Clip (Video)“' }),
+        table('slides', 'Bilder', [ref('look', 'Bild', 'assets'), text('caption', 'Untertitel')], { hint: 'Eine Seite je Zeile, Untertitel mit Platzhaltern wie im Text' })] },
+      { title: 'Beim ersten Mal', fields: [select('trigger', 'Auslöser', TUT_TRIGGERS), select('mode', 'Wo', TUT_MODES),
+        text('on', 'Bei', { hint: 'Hinweis sichtbar: Text im E-Hinweis (Teilwort, z. B. Kiste). Fenster: inventory, other, floor, build, shop, map, kitchen, craft, cyber, tech. Leyla: climb, hang, slide, crouch, swing, dash, flip. Ereignis: AvAs Stimmung (alert, kill, hit, cleared, down) oder cycle' }),
+        num('after', 'Frühestens nach', { unit: 's', min: 0, hint: 'Sekunden im Camp bzw. im POI' })] },
+    ],
+    check: (x, report, P) => {
+      if (x.media === 'clip' && x.clip && P.data?.assets?.[x.clip] && P.data.assets[x.clip].kind !== 'video') report('warning', 'Clip ist kein Video-Asset');
+    },
+  },
   worldmap: {
     name: 'Reisekarte', icon: 'map', file: 'data/worldmap.json', kind: 'single',
     hint: 'Die Reise als verwitterte Touristen-Karte der 60er (#007, Daniel, 13.11.2026). Jeder Durchgang würfelt ein Straßennetz um BigCityDelta: die Orte (Bereich Orte) bleiben als Wahrzeichen, dazu kommen gewürfelte Orte aus den POI-Arten unten, mit Namen, Region, Gefahr (wächst mit der Entfernung), Beute-Hinweisen und Marke. Leyla fährt immer eine Straße weit. Am Warroom und an der Van-Tür',
@@ -1203,7 +1226,7 @@ export const AREAS = {
 // Navigation: groups of areas in the order of the design document
 export const GROUPS = [
   ['ASSETS', ['assets']],
-  ['GRUNDLAGEN', ['game', 'splash', 'intro', 'weather', 'economy', 'ranking']],
+  ['GRUNDLAGEN', ['game', 'splash', 'intro', 'tutorial', 'weather', 'economy', 'ranking']],
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'kits', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],

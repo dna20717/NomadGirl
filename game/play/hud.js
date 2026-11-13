@@ -97,6 +97,7 @@ export class Hud {
     this.menu({ title: 'Pause', sub: sc.roomDef?.name || '', items: [
       { label: 'Weiter', primary: true, act: () => {} },
       { label: 'Steuerung', sub: 'Tasten und Controller', act: () => this.toggleHelp(true) },
+      { label: 'Feldhandbuch', sub: 'Alle Lektionen mit Clips', act: () => setTimeout(() => this.tut?.openGuide(), 0) },
       { label: 'Optionen', sub: 'Ton, Schießstil', act: () => setTimeout(() => this.optionsMenu(), 0) },
       ...(this.modeName === 'test' ? [{ label: 'Raum neu starten', sub: 'Rücktaste', act: () => sc.level ? sc.restartAs({}) : sc.restartRoom() }] : []),
       { label: 'Werkstatt', act: () => { location.href = 'workshop.html'; } },
@@ -115,6 +116,8 @@ export class Hud {
       { label: `Schießstil: ${cells ? 'Cells-like' : 'Klassisch'}`, sub: cells ? 'Schießen im Rennen mit Zielhilfe · umschalten auf Klassisch' : 'Zum Schießen stehen oder gehen · umschalten auf Cells-like',
         act: () => { try { localStorage.setItem('nomadgirl-shoot-style', cells ? 'classic' : 'cells'); } catch { /* private mode */ }
           this.banner(`Schießstil: ${cells ? 'Klassisch' : 'Cells-like'}`, 'Gilt in diesem Browser'); sc.time.delayedCall(1400, () => this.banner(null)); } },
+      ...(this.tut ? [{ label: `Lektionen beim ersten Mal: ${this.tut.off ? 'aus' : 'an'}`, sub: 'Feldhandbuch-Karten, wenn du etwas Neues siehst', act: () => { this.tut.setOff(!this.tut.off); setTimeout(() => this.optionsMenu(), 0); } },
+        { label: 'Lektionen neu zeigen', sub: 'Alle Karten erscheinen wieder beim ersten Mal', act: () => { this.tut.reset(); this.banner('Lektionen zurückgesetzt', '', 1600); } }] : []),
       { label: 'Zurück', act: () => setTimeout(() => this.pauseMenu(), 0) },
     ] });
   }

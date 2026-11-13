@@ -29,7 +29,7 @@ const failed = (file, e) => el('p', { class: 'ng-inline error' }, icon('error', 
 
 // Preview of any asset: animation → player, everything else → picture
 export function assetPreview(w, a) {
-  return a?.kind === 'animation' ? spritePreview(w, a) : a?.kind === 'sound' ? soundPreview(w, a) : a?.kind === 'icons' ? iconSheet(w, a) : picturePreview(w, a);
+  return a?.kind === 'animation' ? spritePreview(w, a) : a?.kind === 'sound' ? soundPreview(w, a) : a?.kind === 'video' ? videoPreview(w, a) : a?.kind === 'icons' ? iconSheet(w, a) : picturePreview(w, a);
 }
 
 // Icon sheet (asset kind "icons"): the whole grid, pixel-sharp, every cell with its number and name as tooltip.
@@ -57,6 +57,20 @@ export function iconSheet(w, a, pick) {
 }
 
 // Sound: a player (the browser's own controls), length shown once it is loaded
+// a clip (asset kind „video“, #011 field guide): plays as a loop
+export function videoPreview(w, a) {
+  const info = el('span', { class: 'ng-sprite-info' });
+  const box = el('div', { class: 'ng-sprite-stage picture back-dark' });
+  const wrap = el('div', { class: 'ng-sprite' }, el('div', { class: 'ng-sprite-bar' }, icon('play', 14), info), box);
+  if (!a?.file) { box.append(el('p', { class: 'ed-small' }, 'Datei eintragen, dann läuft der Clip hier.')); return wrap; }
+  objectUrl(w, a.file).then(src => {
+    const v = el('video', { src, autoplay: true, loop: true, muted: true, playsinline: true, style: 'max-width: 100%; display: block; margin: 0 auto' });
+    v.muted = true;
+    v.addEventListener('loadedmetadata', () => { info.textContent = ` ${v.duration.toFixed(1).replace('.', ',')} s · ${v.videoWidth} × ${v.videoHeight} · ${a.file}`; });
+    box.append(v);
+  }).catch(e => box.append(failed(a.file, e)));
+  return wrap;
+}
 export function soundPreview(w, a) {
   const info = el('span', { class: 'ng-sprite-info' });
   const box = el('div', { class: 'ng-sprite-stage picture back-dark' });
@@ -92,6 +106,7 @@ export function assetThumb(w, a, size = 28, cell) {
   const box = el('span', { class: 'ng-thumb', style: `--s:${size}px` });
   if (!a?.file) return box;
   if (a.kind === 'sound') { box.append(icon('music', Math.round(size * 0.7))); return box; }
+  if (a.kind === 'video') { box.append(icon('play', Math.round(size * 0.7))); return box; }
   const sheet = a.kind === 'icons' && cell !== undefined && a.grid?.[0];   // one cell of an icon sheet
   if (a.kind === 'animation' || sheet) {
     const [fw, fh] = (sheet ? a.cell : a.frameSize) || [0, 0];

@@ -1,0 +1,641 @@
+{
+ "laufen": {
+  "name": "Laufen und Gehen",
+  "chapter": "move",
+  "order": 10,
+  "text": "{k:left} {k:right} laufen. Mit halb geneigtem Stick oder {k:walk} gehalten geht Leyla gemütlich.",
+  "media": "clip",
+  "clip": "tut_laufen",
+  "trigger": "time",
+  "mode": "camp",
+  "after": 2
+ },
+ "springen": {
+  "name": "Springen",
+  "chapter": "move",
+  "order": 20,
+  "text": "{k:jump} springt. Lang gehalten geht es höher, kurz angetippt wird ein Hüpfer daraus.",
+  "media": "clip",
+  "clip": "tut_springen",
+  "trigger": "time",
+  "after": 40
+ },
+ "salto": {
+  "name": "Salto",
+  "chapter": "move",
+  "order": 30,
+  "text": "In der Luft noch einmal {k:jump}: Salto. Dafür braucht Leyla das passende Implantat vom Ripperdoc.",
+  "media": "clip",
+  "clip": "tut_salto",
+  "trigger": "leyla",
+  "on": "flip"
+ },
+ "kanten": {
+  "name": "Kanten greifen",
+  "chapter": "move",
+  "order": 40,
+  "text": "Spring an eine Kante, Leyla greift von selbst zu. {k:up} zieht sie hoch, {k:down} lässt sie einarmig baumeln, noch einmal {k:down} lässt los.",
+  "media": "clip",
+  "clip": "tut_kanten",
+  "trigger": "leyla",
+  "on": "hang"
+ },
+ "leitern": {
+  "name": "Leitern und Treppen",
+  "chapter": "move",
+  "order": 50,
+  "text": "An einer Leiter klettert Leyla mit {k:up} hinauf. {k:down} rutscht schnell nach unten. Oben zieht sie sich von selbst über die Kante.",
+  "media": "clip",
+  "clip": "tut_leitern",
+  "trigger": "leyla",
+  "on": "climb"
+ },
+ "dash": {
+  "name": "Dash",
+  "chapter": "move",
+  "order": 60,
+  "text": "{k:dash} schießt Leyla ein Stück nach vorn. Danach lädt er sich kurz auf, oben steht dann DASH.",
+  "media": "clip",
+  "clip": "tut_dash",
+  "trigger": "time",
+  "mode": "run",
+  "after": 15
+ },
+ "slide": {
+  "name": "Slide",
+  "chapter": "move",
+  "order": 70,
+  "text": "Beim Rennen {k:down}: Leyla rutscht flach weiter und passt unter niedrigen Hindernissen durch.",
+  "media": "clip",
+  "clip": "tut_slide",
+  "trigger": "leyla",
+  "on": "slide"
+ },
+ "ducken": {
+  "name": "Ducken und Abspringen",
+  "chapter": "move",
+  "order": 80,
+  "text": "Im Stand {k:down}: Leyla geht in die Hocke. {k:down} mit {k:jump} auf einer dünnen Plattform: sie lässt sich fallen.",
+  "media": "clip",
+  "clip": "tut_ducken",
+  "trigger": "leyla",
+  "on": "crouch"
+ },
+ "seil": {
+  "name": "Seile",
+  "chapter": "move",
+  "order": 90,
+  "text": "Spring an ein Seil, Leyla hält sich fest und schwingt. {k:jump} lässt mit Schwung los.",
+  "media": "clip",
+  "clip": "tut_seil",
+  "trigger": "leyla",
+  "on": "swing"
+ },
+ "nahkampf": {
+  "name": "Nahkampf",
+  "chapter": "fight",
+  "order": 10,
+  "text": "{k:melee} schlägt zu. Im Takt getippt wird eine Kombo daraus, eine Sekunde gehalten ein schwerer Hieb.",
+  "media": "clip",
+  "clip": "tut_nahkampf",
+  "trigger": "event",
+  "on": "alert"
+ },
+ "schiessen": {
+  "name": "Schießen",
+  "chapter": "fight",
+  "order": 20,
+  "text": "{k:ranged} zieht die Waffe und schießt im selben Zug. Gehalten steckt Leyla sie wieder weg.",
+  "media": "clip",
+  "clip": "tut_schiessen",
+  "trigger": "event",
+  "on": "alert"
+ },
+ "nachladen": {
+  "name": "Nachladen",
+  "chapter": "fight",
+  "order": 30,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_nachladen_1", "caption": "Oben links steht, wie viel Munition noch im Magazin ist."},
+   {"look": "tut_nachladen_2", "caption": "{k:reload} lädt nach. Wer leer abdrückt, lädt auch."}
+  ],
+  "trigger": "time",
+  "mode": "run",
+  "after": 120
+ },
+ "gegner": {
+  "name": "Gegner sehen und hören",
+  "chapter": "fight",
+  "order": 40,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_gegner_1", "caption": "Gegner schauen nach vorn. Ein Ausrufezeichen heißt: entdeckt."},
+   {"look": "tut_gegner_2", "caption": "In der Nähe hören sie Leyla auch hinter sich. Von hinten bist du im Vorteil."}
+  ],
+  "trigger": "time",
+  "mode": "run",
+  "after": 8
+ },
+ "treffer": {
+  "name": "Treffer einstecken",
+  "chapter": "fight",
+  "order": 50,
+  "text": "Ein Treffer schleudert Leyla zurück. Die Leiste oben links zeigt, wie viel sie noch aushält.",
+  "media": "clip",
+  "clip": "tut_treffer",
+  "trigger": "event",
+  "on": "hit"
+ },
+ "beute": {
+  "name": "Beute",
+  "chapter": "fight",
+  "order": 60,
+  "text": "Besiegte Gegner lassen etwas fallen. Lauf hin und nimm es mit {k:grab} auf.",
+  "media": "clip",
+  "clip": "tut_beute",
+  "trigger": "event",
+  "on": "kill"
+ },
+ "gummiband": {
+  "name": "AvA am Gummiband",
+  "chapter": "ava",
+  "order": 10,
+  "text": "{rstick} zieht AvA von Leyla weg: Sie leuchtet dunkle Ecken aus und späht voraus. Loslassen, und sie fliegt zurück.",
+  "media": "clip",
+  "clip": "tut_gummiband",
+  "trigger": "time",
+  "mode": "run",
+  "after": 40
+ },
+ "plattform": {
+  "name": "AvA als Plattform",
+  "chapter": "ava",
+  "order": 20,
+  "text": "Ist AvA draußen, kann Leyla auf ihr stehen oder sich an ihr hochziehen. Ihr Akku hält nur ein paar Sekunden.",
+  "media": "clip",
+  "clip": "tut_plattform",
+  "trigger": "time",
+  "mode": "run",
+  "after": 100
+ },
+ "stimmungen": {
+  "name": "AvAs Gesicht",
+  "chapter": "ava",
+  "order": 30,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_stimmungen_1", "caption": "AvA zeigt, wie es ihr geht: ruhig, neugierig, alarmiert."},
+   {"look": "tut_stimmungen_2", "caption": "Ihr Gesicht warnt dich oft, bevor du die Gefahr selbst siehst."}
+  ],
+  "trigger": "time",
+  "mode": "camp",
+  "after": 240
+ },
+ "inventar": {
+  "name": "Das Inventar",
+  "chapter": "inventory",
+  "order": 10,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_inventar_1", "caption": "{k:inventory} öffnet das Inventar. Links Leyla mit Waffen, Kleidung und Implantaten."},
+   {"look": "tut_inventar_2", "caption": "Rechts Rucksack und AvA, oben die Tabs."}
+  ],
+  "trigger": "time",
+  "mode": "camp",
+  "after": 60
+ },
+ "raster": {
+  "name": "Formen und Drehen",
+  "chapter": "inventory",
+  "order": 20,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_raster_1", "caption": "Alles hat eine Form. {u:ok} nimmt und legt ab."},
+   {"look": "tut_raster_2", "caption": "{u:context} dreht, was du in der Hand hast. Passt es nicht, wird der Rahmen rot."}
+  ],
+  "trigger": "window",
+  "on": "inventory"
+ },
+ "rueber": {
+  "name": "Rüber und Wegwerfen",
+  "chapter": "inventory",
+  "order": 30,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_rueber_1", "caption": "{u:send} schickt ein Ding auf die andere Seite, zum Beispiel in die Kiste."},
+   {"look": "tut_rueber_2", "caption": "{u:send} gehalten wirft es auf den Boden."}
+  ],
+  "trigger": "window",
+  "on": "other"
+ },
+ "boden": {
+  "name": "Die Boden-Leiste",
+  "chapter": "inventory",
+  "order": 40,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_boden_1", "caption": "Was neben Leyla am Boden liegt, steht unten in der Boden-Leiste."},
+   {"look": "tut_boden_2", "caption": "Liegen mehrere Bündel da, blätterst du mit {u:tabs}."}
+  ],
+  "trigger": "window",
+  "on": "floor"
+ },
+ "implantate": {
+  "name": "Implantate",
+  "chapter": "inventory",
+  "order": 50,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_implantate_1", "caption": "Implantate stecken in den Feldern um Leyla herum: Augen, Nerven, Arm, Herz, Beine, Haut."},
+   {"look": "tut_implantate_2", "caption": "Jedes bringt einen Vorteil und einen Haken. Einsetzen kann sie nur der Ripperdoc."}
+  ],
+  "trigger": "window",
+  "on": "inventory"
+ },
+ "benutzen": {
+  "name": "Dinge benutzen",
+  "chapter": "camp",
+  "order": 10,
+  "text": "Unten erscheint ein Hinweis, was hier geht. {k:grab} oder der Stick nach oben benutzt es.",
+  "media": "clip",
+  "clip": "tut_benutzen",
+  "trigger": "time",
+  "mode": "camp",
+  "after": 10
+ },
+ "feuer": {
+  "name": "Am Lagerfeuer",
+  "chapter": "camp",
+  "order": 20,
+  "text": "Am Feuer setzt sich Leyla hin. Die Zeit läuft, sie heilt ein Stück. Aufstehen mit {k:grab} oder einer Richtung.",
+  "media": "clip",
+  "clip": "tut_feuer",
+  "trigger": "near",
+  "on": "Lagerfeuer",
+  "mode": "camp"
+ },
+ "schlafen": {
+  "name": "Schlafen",
+  "chapter": "camp",
+  "order": 30,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_schlafen_1", "caption": "In der Koje schläft Leyla bis zum Morgen."},
+   {"look": "tut_schlafen_2", "caption": "Danach ist sie geheilt. Die Nacht kostet Vorräte."}
+  ],
+  "trigger": "near",
+  "on": "Schlaf",
+  "mode": "camp"
+ },
+ "kiste": {
+  "name": "Die Kiste",
+  "chapter": "camp",
+  "order": 40,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_kiste_1", "caption": "Die Kiste ist das Lager des Camps."},
+   {"look": "tut_kiste_2", "caption": "Was hier liegt, bleibt im Camp, auch wenn ein Run schiefgeht."}
+  ],
+  "trigger": "near",
+  "on": "Kiste",
+  "mode": "camp"
+ },
+ "kochen": {
+  "name": "Kochen",
+  "chapter": "camp",
+  "order": 50,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_kochen_1", "caption": "Zutaten in den Topf, {u:ok} kocht."},
+   {"look": "tut_kochen_2", "caption": "Bekannte Rezepte stehen im Buch. {u:send} legt alle Zutaten auf einmal hinein."}
+  ],
+  "trigger": "window",
+  "on": "kitchen"
+ },
+ "experimentieren": {
+  "name": "Experimentieren",
+  "chapter": "camp",
+  "order": 60,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_experimentieren_1", "caption": "Unbekannte Mischungen sind Experimente."},
+   {"look": "tut_experimentieren_2", "caption": "Treffer werden zu Rezepten, Fehlschläge zu kuriosem Müll."}
+  ],
+  "trigger": "window",
+  "on": "kitchen"
+ },
+ "werkbank": {
+  "name": "Die Werkbank",
+  "chapter": "camp",
+  "order": 70,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_werkbank_1", "caption": "An der Werkbank entstehen Teile, Munition und Ausrüstung aus Schrott."},
+   {"look": "tut_werkbank_2", "caption": "Zettel aus den POIs bringen neue Baupläne."}
+  ],
+  "trigger": "window",
+  "on": "craft"
+ },
+ "hydrokultur": {
+  "name": "Hydrokultur",
+  "chapter": "camp",
+  "order": 80,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_hydrokultur_1", "caption": "Die Pflanzen wachsen, während Leyla unterwegs ist oder schläft."},
+   {"look": "tut_hydrokultur_2", "caption": "Ist etwas reif, erntet {k:grab} und pflanzt gleich neu."}
+  ],
+  "trigger": "near",
+  "on": "Gärtnern",
+  "mode": "camp"
+ },
+ "zisterne": {
+  "name": "Zisterne",
+  "chapter": "camp",
+  "order": 90,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_zisterne_1", "caption": "Die Zisterne fängt Regen und Tau."},
+   {"look": "tut_zisterne_2", "caption": "{k:grab} füllt jede volle Flasche Frischwasser ab."}
+  ],
+  "trigger": "near",
+  "on": "Wasser",
+  "mode": "camp"
+ },
+ "ripperdoc": {
+  "name": "Ripperdoc",
+  "chapter": "camp",
+  "order": 100,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_ripperdoc_1", "caption": "Auf der Liege setzt der Ripperdoc Implantate ein."},
+   {"look": "tut_ripperdoc_2", "caption": "Jedes hat seinen Preis: einen Vorteil und einen Haken."}
+  ],
+  "trigger": "window",
+  "on": "cyber"
+ },
+ "bauen": {
+  "name": "Der Bau-Modus",
+  "chapter": "build",
+  "order": 10,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_bauen_1", "caption": "{k:build} öffnet den Bau-Modus, am Controller hältst du dafür Select."},
+   {"look": "tut_bauen_2", "caption": "Leyla setzt sich ans Feuer, du steuerst AvA: Sie ist dein Zeiger."}
+  ],
+  "trigger": "time",
+  "mode": "camp",
+  "after": 100
+ },
+ "einbauen": {
+  "name": "Werkstätten einbauen",
+  "chapter": "build",
+  "order": 20,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_einbauen_1", "caption": "Pack eine Werkstatt mit {u:ok} und bring sie an einen freien Platz."},
+   {"look": "tut_einbauen_2", "caption": "Grün heißt: passt. Rot sagt dir, warum nicht."}
+  ],
+  "trigger": "window",
+  "on": "build"
+ },
+ "anhaenger": {
+  "name": "Anhänger und Container",
+  "chapter": "build",
+  "order": 30,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_anhaenger_1", "caption": "Anhänger hängst du an eine Kupplung."},
+   {"look": "tut_anhaenger_2", "caption": "Stapelbare Container gehen auch obendrauf."}
+  ],
+  "trigger": "window",
+  "on": "build"
+ },
+ "solar": {
+  "name": "Rig-Teile und Solar",
+  "chapter": "build",
+  "order": 40,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_solar_1", "caption": "Rig-Teile kommen an die Sockel am Van."},
+   {"look": "tut_solar_2", "caption": "Solarpaneele gehören aufs Container-Dach: Strom bei Sonne, nachts aus dem Akku."}
+  ],
+  "trigger": "window",
+  "on": "build"
+ },
+ "lichterketten": {
+  "name": "Lichterketten",
+  "chapter": "build",
+  "order": 50,
+  "text": "Von einem Andockpunkt zum nächsten ziehen: eine Lichterkette. Nachts leuchtet sie über dem Camp.",
+  "media": "clip",
+  "clip": "tut_lichterketten",
+  "trigger": "window",
+  "on": "build"
+ },
+ "haendler": {
+  "name": "Der Händler",
+  "chapter": "build",
+  "order": 60,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_haendler_1", "caption": "{u:send} öffnet den Händler. Gekauftes wird aufs Pad geliefert."},
+   {"look": "tut_haendler_2", "caption": "Was du aufs Pad legst, verkaufst du. {u:send} gehalten verkauft das Teil in der Hand."}
+  ],
+  "trigger": "window",
+  "on": "shop"
+ },
+ "budget": {
+  "name": "Gewicht, Strom, Plätze",
+  "chapter": "build",
+  "order": 70,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_budget_1", "caption": "Oben stehen Gewicht, Anhänger, Energie und Plätze."},
+   {"look": "tut_budget_2", "caption": "Wird ein Wert rot, fährt das Rig so nicht los oder eine Werkstatt hat keinen Strom."}
+  ],
+  "trigger": "window",
+  "on": "build"
+ },
+ "karte": {
+  "name": "Die Reisekarte",
+  "chapter": "travel",
+  "order": 10,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_karte_1", "caption": "Die Karte zeigt die Orte dieses Durchgangs."},
+   {"look": "tut_karte_2", "caption": "Rot eingekreist: Nachbarorte, eine Straße weit."}
+  ],
+  "trigger": "window",
+  "on": "map"
+ },
+ "fahren": {
+  "name": "Fahren",
+  "chapter": "travel",
+  "order": 20,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_fahren_1", "caption": "Fahren kostet Sprit und Vorräte, unterwegs vergeht Zeit."},
+   {"look": "tut_fahren_2", "caption": "Am Ziel steht das Camp neu, mit allem, was am Rig hängt."}
+  ],
+  "trigger": "window",
+  "on": "map"
+ },
+ "pluendern": {
+  "name": "Plündern",
+  "chapter": "travel",
+  "order": 30,
+  "text": "",
+  "media": "slides",
+  "slides": [{"look": "tut_pluendern_1", "caption": "Am Ort, wo du gerade bist: Hier plündern startet den Run in den POI."}],
+  "trigger": "window",
+  "on": "map"
+ },
+ "warroom": {
+  "name": "Der Warroom",
+  "chapter": "travel",
+  "order": 40,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_warroom_1", "caption": "Mit einem Warroom zeigt die Karte Gefahr und Beute."},
+   {"look": "tut_warroom_2", "caption": "Im Kopf der Karte stehen dann auch Techtree und Auswerten."}
+  ],
+  "trigger": "near",
+  "on": "Planen",
+  "mode": "camp"
+ },
+ "kisten": {
+  "name": "Kisten",
+  "chapter": "poi",
+  "order": 10,
+  "text": "Kisten öffnest du mit {k:grab}. Was drin ist, landet in einem Bündel daneben.",
+  "media": "clip",
+  "clip": "tut_kisten",
+  "trigger": "near",
+  "on": "Kiste",
+  "mode": "run"
+ },
+ "schalter": {
+  "name": "Schalter und Türen",
+  "chapter": "poi",
+  "order": 20,
+  "text": "Ein Schalter öffnet eine Tür irgendwo im Level. Achte darauf, was sich bewegt.",
+  "media": "clip",
+  "clip": "tut_schalter",
+  "trigger": "near",
+  "on": "Schalter",
+  "mode": "run"
+ },
+ "waende": {
+  "name": "Brüchige Wände",
+  "chapter": "poi",
+  "order": 30,
+  "text": "Rissige Wände brechen unter schweren Hieben ({k:melee} halten). Dahinter liegt oft ein Secret.",
+  "media": "clip",
+  "clip": "tut_waende",
+  "trigger": "time",
+  "mode": "run",
+  "after": 45
+ },
+ "ziel": {
+  "name": "Ziel und Ranking",
+  "chapter": "poi",
+  "order": 40,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_ziel_1", "caption": "Am Ausgang endet der Run."},
+   {"look": "tut_ziel_2", "caption": "Das Ranking zählt Zeit, Kills und Funde. Ein voller Tresor wartet auf die Besten."}
+  ],
+  "trigger": "event",
+  "on": "cleared",
+  "mode": "run"
+ },
+ "ko": {
+  "name": "k.o.",
+  "chapter": "poi",
+  "order": 50,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_ko_1", "caption": "Fällt Leyla, wacht sie am Anfang des Runs wieder auf."},
+   {"look": "tut_ko_2", "caption": "Ihr Rucksack liegt, wo sie fiel. Holen kostet nichts, aber der Tank zahlt für jeden k.o."}
+  ],
+  "trigger": "event",
+  "on": "down"
+ },
+ "zurueck": {
+  "name": "Zurück ins Camp",
+  "chapter": "poi",
+  "order": 60,
+  "text": "Am Van fragt das Spiel, ob du zurückreisen willst. Was im Rucksack ist, kommt mit.",
+  "media": "clip",
+  "clip": "tut_zurueck",
+  "trigger": "near",
+  "on": "Van",
+  "mode": "run"
+ },
+ "tank": {
+  "name": "AvAs Tank",
+  "chapter": "progress",
+  "order": 10,
+  "text": "",
+  "media": "slides",
+  "slides": [{"look": "tut_tank_1", "caption": "Im Cryo-Tank liegt AvAs Körper."},{"look": "tut_tank_2", "caption": "Wartung hält ihn stabil, jeder k.o. kostet Zustand."}],
+  "trigger": "near",
+  "on": "AvA",
+  "mode": "camp"
+ },
+ "techtree": {
+  "name": "Der Techtree",
+  "chapter": "progress",
+  "order": 20,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_techtree_1", "caption": "Technik, Wissen und Bio: Funde aus den Runs schalten Knoten frei."},
+   {"look": "tut_techtree_2", "caption": "Was du hier lernst, bleibt auch im nächsten Durchgang."}
+  ],
+  "trigger": "window",
+  "on": "tech"
+ },
+ "durchgang": {
+  "name": "Ein neuer Durchgang",
+  "chapter": "progress",
+  "order": 30,
+  "text": "",
+  "media": "slides",
+  "slides": [
+   {"look": "tut_durchgang_1", "caption": "Stirbt AvA, endet der Durchgang. Leyla wacht am Feuer auf."},
+   {"look": "tut_durchgang_2", "caption": "Die Karte ist neu, der Techtree bleibt."}
+  ],
+  "trigger": "event",
+  "on": "cycle"
+ }
+}
