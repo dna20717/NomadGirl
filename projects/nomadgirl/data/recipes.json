@@ -672,5 +672,34 @@
   "discovery": ["achievement"],
   "once": true,
   "hint": "Trophäe für „Neuer Anfang“"
+ },
+ "kaffee": {
+  "name": "Wasteland-Kaffee",
+  "station": "kochnische",
+  "ingredients": [{"item": "wasser", "count": 1},{"item": "kaffeepulver", "count": 1}],
+  "result": "kaffee",
+  "count": 2,
+  "time": 5,
+  "discovery": ["start"]
+ },
+ "kraeutertee": {
+  "name": "Kräutertee",
+  "station": "kochnische",
+  "ingredients": [{"item": "wasser", "count": 1},{"item": "gewuerzmischung", "count": 1}],
+  "result": "kraeutertee",
+  "count": 2,
+  "time": 5,
+  "discovery": ["experiment", "companion"],
+  "hint": "Heißes Wasser und was Grünes aus dem Beet."
+ },
+ "gemuesebruehe": {
+  "name": "Gemüsebrühe",
+  "station": "kochnische",
+  "ingredients": [{"item": "wasser", "count": 2},{"item": "mutantengemuese", "count": 1}],
+  "result": "gemuesebruehe",
+  "count": 2,
+  "time": 20,
+  "discovery": ["experiment", "companion"],
+  "hint": "Viel Wasser, ein Kohlkopf, viel Geduld."
  }
 }

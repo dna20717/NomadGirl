@@ -3,7 +3,7 @@
 // Leyla walks around and uses things with E. Time only moves on actions (sleeping, sitting at the fire, driving, runs).
 // Graphics are code placeholders for now; a "look" on containers, workshops or companions takes over later.
 import { ensureMap, placeOf, roadKm } from '../worldmap.js';
-import { potsOf, stage, ripe, harvest, STAGES } from '../garden.js';
+import { potsOf, stage, ripe, harvest, STAGES, canWater, waterOf, water } from '../garden.js';
 import { level as cisternLevel, tap as cisternTap } from '../cistern.js';
 import { anchors as lightAnchors, catenary, lightsConfig, mastAt } from '../string_lights.js';
 import { clockText, advance, hoursUntil, containers, solarState } from '../save.js';
@@ -1086,7 +1086,14 @@ export class Camp {
         s.hud.toast(r.got.length ? 'Geerntet' : 'Nichts geerntet', r.got.map(g => `+${g.n} ${D.items?.[g.id]?.name || g.id}`).join(' · '), r.got.length ? 'loot' : 'info', 3000);
         s.drone?.react('curious');
         this.benches?.list.forEach(b => { if (b.plants) b.plantSig = null; });
-      } }, { label: 'Zurück', act: () => {} }] });
+      } }, (() => { const c = canWater(D, save, id, key), W = waterOf(D, id), nm = D.items?.[W.item]?.name || W.item;
+        return W.hours && D.items?.[W.item] ? { label: `Gießen (1 ${nm}${c.have ? ` · ${c.have} da` : ''})`, sub: `Alles wächst ${de(W.hours)} h weiter`, disabled: c.ok ? null : c.why, act: () => {
+          const r = water(D, save, id, key);
+          this.box.persist?.();
+          s.hud.toast(r.ok ? 'Gegossen' : 'Geht nicht', r.ok ? `Die Pflanzen wachsen ${de(r.hours)} h weiter` : r.why, r.ok ? 'good' : 'warn', 2800);
+          if (r.ok) s.drone?.react('happy');
+          this.benches?.list.forEach(b => { if (b.plants) b.plantSig = null; });
+        } } : null; })(), { label: 'Zurück', act: () => {} }].filter(Boolean) });
   }
   // the cistern (game/cistern.js): how full it is, E fills bottles into the camp inventories
   cistern(id, def, place) {

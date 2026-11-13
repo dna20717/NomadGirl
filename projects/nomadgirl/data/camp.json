@@ -129,5 +129,6 @@
   "mastHeight": 300
  },
  "mood": {"vignette": 35, "warm": 30, "fireflies": 18, "smoke": true},
- "solar": {"look": "rig_solar", "power": 1, "battery": 6, "day": [7, 19], "price": 220, "weight": 40}
+ "solar": {"look": "rig_solar", "power": 1, "battery": 6, "day": [7, 19], "price": 220, "weight": 40},
+ "rain": {"enabled": true, "chance": 30, "hours": [2, 6], "look": "abendglut_regen"}
 }

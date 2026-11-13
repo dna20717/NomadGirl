@@ -3,8 +3,9 @@
 // Stage 0 sprout … 3 ripe; E at the bench harvests what is ripe into the camp inventories and plants anew. No DOM.
 //
 //   save.garden['<unit>:<place>'] = [hour planted, …]   one entry per pot (clock hours: day * 24 + hour)
+//   save.watered['<unit>:<place>'] = clock hour of the last watering (#014)
 import { clockHours } from './tank.js';
-import { give } from './crafting.js';
+import { give, have, take } from './crafting.js';
 import { bonuses as trophyBonuses } from './achievements.js';
 
 export const STAGES = 4;
@@ -54,4 +55,31 @@ export function nextRipe(D, save, ws, place) {
   let best = Infinity;
   potsOf(D, ws).forEach((pot, i) => { const s = stage(D, save, ws, place, i); if (s.stage === STAGES - 1) best = 0; else if (s.crop) best = Math.min(best, (1 - s.p) * (s.crop.hours || 24)); });
   return best === Infinity ? null : best;
+}
+
+// watering (#014, Daniel 13.11.2026: „Wasser auch für Hydrokultur“): one bottle from the camp inventories lets every pot that is
+// not ripe yet grow „Gießen bringt“ hours further; the next watering only after „Wieder gießen nach“ hours (Werkstätten › Hydrokultur)
+export function waterOf(D, ws) {
+  const W = D.workshops?.[ws]?.garden?.water || {};
+  return { item: W.item ?? 'wasser', hours: Math.max(0, W.hours ?? 6), every: Math.max(0, W.every ?? 8) };
+}
+// → { ok, why, wait (hours until it may be watered again), have (bottles in the camp) }
+export function canWater(D, save, ws, place) {
+  const W = waterOf(D, ws), key = Array.isArray(place) ? place.join(':') : String(place);
+  if (!W.item || !W.hours || !D.items?.[W.item]) return { ok: false, why: 'Braucht kein Wasser', wait: 0, have: 0 };
+  const n = have(D, save, W.item), last = save.watered?.[key], wait = last == null ? 0 : Math.max(0, last + W.every - clockHours(save));
+  const growing = potsOf(D, ws).some((_, i) => stage(D, save, ws, place, i).stage < STAGES - 1);
+  if (!growing) return { ok: false, why: 'Alles reif', wait, have: n };
+  if (wait > 0) return { ok: false, why: `Noch feucht · wieder in ~${Math.ceil(wait)} h`, wait, have: n };
+  if (!n) return { ok: false, why: `Kein ${D.items[W.item].name || W.item}`, wait, have: n };
+  return { ok: true, why: null, wait, have: n };
+}
+export function water(D, save, ws, place) {
+  const c = canWater(D, save, ws, place);
+  if (!c.ok) return { ok: false, why: c.why };
+  const W = waterOf(D, ws), key = Array.isArray(place) ? place.join(':') : String(place), b = bed(D, save, ws, place);
+  take(D, save, W.item, 1);
+  potsOf(D, ws).forEach((_, i) => { if (stage(D, save, ws, place, i).stage < STAGES - 1) b[i] -= W.hours; });
+  (save.watered ??= {})[key] = clockHours(save);
+  return { ok: true, hours: W.hours };
 }

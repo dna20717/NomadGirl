@@ -10,6 +10,7 @@
    {"item": "batteriezelle", "weight": 1, "min": 1, "max": 1},
    {"item": "zettel_curry", "weight": 1, "min": 1, "max": 1},
    {"item": "sojasauce", "weight": 2, "min": 1, "max": 1},
+   {"item": "kaffeepulver", "weight": 2, "min": 1, "max": 1},
    {"item": "speiseoel", "weight": 2, "min": 1, "max": 2},
    {"item": "panzertape", "weight": 3, "min": 1, "max": 1},
    {"item": "feuerzeug", "weight": 3, "min": 1, "max": 1},

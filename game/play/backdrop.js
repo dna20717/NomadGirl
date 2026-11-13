@@ -13,7 +13,9 @@ export class Backdrop {
     this.k = Math.max(1, bd.pixel || Math.ceil(H / ih));          // screen pixels per background pixel
     this.iw = iw; this.ih = ih;
     this.cw = Math.ceil(W / this.k) + 2; this.ch = Math.ceil(H / this.k) + 2;
-    const wx = bd.weather && D.weather?.[bd.weather];
+    let wx = bd.weather && D.weather?.[bd.weather];
+    // rain in the camp (game/rain.js, #014): the sky of the time of day, with the rain of another weather (Camp › Regen › Himmel)
+    if (wx && bd.rain) wx = { ...wx, rain: { ...(D.weather?.[bd.rain]?.rain || wx.rain || {}), enabled: true } };
     this.weather = wx ? makeWeather(wx) : null;
     if (this.weather) {
       if (scene.textures.exists('backdrop_sky')) scene.textures.remove('backdrop_sky');

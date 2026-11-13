@@ -13,10 +13,10 @@ const fresh = () => { const s = newSave(D); s.hour = 18.5; return s; };
 
 test('Rezeptbuch: am Anfang alle Rezepte „Von Anfang an“, alte Spielstände bekommen sie dazu', () => {
   const s = fresh();
-  assert.deepEqual(s.recipes.sort(), ['billig_kameraauge', 'bleche_schweissen', 'bohneneintopf', 'chip', 'dash_synapse', 'grillsteak', 'nano_herzklappe', 'schrottplatte', 'sprungfedern', 'tank_kompressor', 'tank_kuehlmittel', 'tank_notflicken', 'tank_stromzelle', 'verband']);
+  assert.deepEqual(s.recipes.sort(), ['billig_kameraauge', 'bleche_schweissen', 'bohneneintopf', 'chip', 'dash_synapse', 'grillsteak', 'kaffee', 'nano_herzklappe', 'schrottplatte', 'sprungfedern', 'tank_kompressor', 'tank_kuehlmittel', 'tank_notflicken', 'tank_stromzelle', 'verband']);
   const old = { ...s, recipes: undefined }; delete old.recipes;
-  assert.deepEqual(repairSave(old, D).recipes.sort(), ['billig_kameraauge', 'bleche_schweissen', 'bohneneintopf', 'chip', 'dash_synapse', 'grillsteak', 'nano_herzklappe', 'schrottplatte', 'sprungfedern', 'tank_kompressor', 'tank_kuehlmittel', 'tank_notflicken', 'tank_stromzelle', 'verband']);
-  assert.deepEqual(repairSave({ ...s, recipes: ['discokugel', 'gibtsnicht'] }, D).recipes.sort(), ['billig_kameraauge', 'bleche_schweissen', 'bohneneintopf', 'chip', 'dash_synapse', 'discokugel', 'grillsteak', 'nano_herzklappe', 'schrottplatte', 'sprungfedern', 'tank_kompressor', 'tank_kuehlmittel', 'tank_notflicken', 'tank_stromzelle', 'verband']);
+  assert.deepEqual(repairSave(old, D).recipes.sort(), ['billig_kameraauge', 'bleche_schweissen', 'bohneneintopf', 'chip', 'dash_synapse', 'grillsteak', 'kaffee', 'nano_herzklappe', 'schrottplatte', 'sprungfedern', 'tank_kompressor', 'tank_kuehlmittel', 'tank_notflicken', 'tank_stromzelle', 'verband']);
+  assert.deepEqual(repairSave({ ...s, recipes: ['discokugel', 'gibtsnicht'] }, D).recipes.sort(), ['billig_kameraauge', 'bleche_schweissen', 'bohneneintopf', 'chip', 'dash_synapse', 'discokugel', 'grillsteak', 'kaffee', 'nano_herzklappe', 'schrottplatte', 'sprungfedern', 'tank_kompressor', 'tank_kuehlmittel', 'tank_notflicken', 'tank_stromzelle', 'verband']);
 });
 
 test('Werkstatt-Art: Küche kann Rezepte der Kochnische, die Werkbank keine Gerichte', () => {

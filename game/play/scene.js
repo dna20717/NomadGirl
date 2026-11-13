@@ -20,6 +20,7 @@ import { Drone } from './drone.js';
 import { Van } from './van.js';
 import { Backdrop } from './backdrop.js';
 import { Camp, campLayout, daytimeAt, drawCampBackground, drawCampGround, travelCost } from './camp.js';
+import { raining, rainConfig } from '../rain.js';
 import { advance, arrive, clockText, containers, newCycle } from '../save.js';
 import { Loot } from './loot.js';
 import { InventoryUI } from './inventory_ui.js';
@@ -227,7 +228,8 @@ export class PlayScene extends Phaser.Scene {
     if (this.mode === 'camp') {
       this.campGeo = campLayout(this.data_, this.box.save, this.T);
       const day = daytimeAt(this.data_.camp, this.box.save.hour);
-      def = { name: placeOf(this.data_, this.box.save)?.name || 'Camp', layout: this.campGeo.layout, backdrop: { weather: day.weather || Object.keys(this.data_.weather || {})[0], shade: 0 } };
+      this.rain = raining(this.data_, this.box.save);
+      def = { name: placeOf(this.data_, this.box.save)?.name || 'Camp', layout: this.campGeo.layout, backdrop: { weather: day.weather || Object.keys(this.data_.weather || {})[0], shade: 0, rain: this.rain ? rainConfig(this.data_).look : null } };
     }
     // a run in a POI: the rooms welded to one level (engine/poi.js), same seed = same level
     const run = this.mode === 'run' ? this.box.save.run : this.mode === 'test' && this.args.poi ? { poi: this.args.poi, seed: this.args.seed } : null;
@@ -338,6 +340,8 @@ export class PlayScene extends Phaser.Scene {
     this.hud.mode(this.mode, this.box?.save, this.data_);
     if (this.mode === 'run') this.hud.room(`${this.data_.pois?.[this.box.save.run?.poi]?.name || ''} · ${def?.name || this.roomId}`, this.enemies.length);
     if (this.args.banner) { const [t, sub, kind] = this.args.banner; this.hud.banner(t, sub, 4200, kind || (this.mode === 'camp' ? 'camp' : 'travel')); }
+    if (this.mode === 'camp' && this.rain && !this.hud.toldRain && !/regnet/.test(this.args.banner?.[0] || '')) this.hud.toast('Es regnet', 'Die Zisterne füllt sich schneller', 'camp', 3600);
+    if (this.mode === 'camp') this.hud.toldRain = !!this.rain;
     else this.hud.banner(null);
     this.leaving = false; this.roomName = null;
     if (this.dreaming) this.wakeUp();
@@ -426,11 +430,18 @@ export class PlayScene extends Phaser.Scene {
     this.hud.closeMenu?.();
     this.hud.build.open();
   }
+  // the sky changed since the camp was drawn: another time of day, or the rain started or stopped (#014)
+  skyChanged() { const save = this.box.save; return daytimeAt(this.data_.camp || {}, save.hour)?.name !== this.camp?.day?.name || raining(this.data_, save) !== !!this.rain; }
+  skyBanner() {
+    const save = this.box.save, wet = raining(this.data_, save);
+    if (wet !== !!this.rain) return wet ? ['Es regnet', `${clockText(save)} · Die Zisterne füllt sich schneller`, 'camp'] : ['Der Regen hört auf', clockText(save), 'camp'];
+    return [daytimeAt(this.data_.camp || {}, save.hour)?.name || 'Die Zeit vergeht', clockText(save)];
+  }
   // building finished: save; the clock may have moved into another time of day (light, sky) → camp fresh at the same spot
   buildClosed() {
     const C = this.data_.camp || {}, save = this.box.save;
     this.box.persist();
-    if (this.camp && daytimeAt(C, save.hour)?.name !== this.camp.day?.name) this.time.delayedCall(this.script ? 0 : 700, () => this.goCamp({ banner: [daytimeAt(C, save.hour)?.name || 'Die Zeit vergeht', clockText(save)], fade: 500, keepPlace: true }));
+    if (this.camp && this.skyChanged()) this.time.delayedCall(this.script ? 0 : 700, () => this.goCamp({ banner: this.skyBanner(), fade: 500, keepPlace: true }));
     // the rig got taller than the camp (container stacked on a container on its chassis): camp fresh at the same spot, now high enough
     else if (this.camp && this.campGeo && campLayout(this.data_, save, this.T).H !== this.campGeo.H) this.time.delayedCall(this.script ? 0 : 300, () => this.goCamp({ fade: 300, keepPlace: true }));
   }
@@ -438,7 +449,7 @@ export class PlayScene extends Phaser.Scene {
   craftClosed() {
     const C = this.data_.camp || {}, save = this.box.save;
     this.box.persist();
-    if (this.camp && daytimeAt(C, save.hour)?.name !== this.camp.day?.name) this.goCamp({ banner: [daytimeAt(C, save.hour)?.name || 'Die Zeit vergeht', clockText(save)], fade: 500, keepPlace: true });
+    if (this.camp && this.skyChanged()) this.goCamp({ banner: this.skyBanner(), fade: 500, keepPlace: true });
   }
   // eating or using a thing from the inventory (Gegenstände › Buff beim Essen/Benutzen): heals now or waits as a buff for the next run
   useThing(id) {

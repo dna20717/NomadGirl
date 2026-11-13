@@ -1543,8 +1543,7 @@
   "size": [1, 1],
   "stack": 5,
   "value": 4,
-  "buff": "erste_hilfe",
-  "description": "Gefiltertes Regenwasser in der Feldflasche. Schmeckt nach Blech, ist aber sauber."
+  "description": "Gefiltertes Regenwasser in der Feldflasche. Schmeckt nach Blech, ist aber sauber. Zum Kochen, für Kaffee und Tee und zum Gießen der Hydrokultur."
  },
  "raider_maske": {
   "name": "Raider-Maske",
@@ -1689,5 +1688,48 @@
   "tags": ["trophy"],
   "look": "icons_trophies",
   "icon": 11
+ },
+ "kaffeepulver": {
+  "name": "Kaffeepulver",
+  "category": "ingredient",
+  "size": [1, 1],
+  "stack": 5,
+  "value": 8,
+  "look": "icons_kitchen",
+  "icon": 52,
+  "description": "Eine Dose echtes Pulver von vor dem Zusammenbruch. Riecht noch nach Montagmorgen."
+ },
+ "kaffee": {
+  "name": "Wasteland-Kaffee",
+  "category": "food",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 10,
+  "look": "icons_kitchen",
+  "icon": 12,
+  "buff": "flink",
+  "description": "Schwarz, stark, aus der Blechkanne. Macht die Beine schneller als den Kopf."
+ },
+ "kraeutertee": {
+  "name": "Kräutertee",
+  "category": "food",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 8,
+  "look": "icons_kitchen",
+  "icon": 15,
+  "buff": "ausgeschlafen",
+  "description": "Basilikum aus der Hydrokultur, heißes Regenwasser. Beruhigt die Nerven."
+ },
+ "gemuesebruehe": {
+  "name": "Gemüsebrühe",
+  "category": "food",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 12,
+  "look": "icons_kitchen",
+  "icon": 22,
+  "buff": "satt",
+  "description": "Mutantenkohl, lange gekocht. Wärmt von innen."
  }
 }
