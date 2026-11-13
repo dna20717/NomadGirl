@@ -2,17 +2,25 @@
 // Lichterketten selbst ziehen“). Every unit of the rig has two docking points on its upper corners; in build mode a string is
 // pulled from one point to another (Camp › Lichterketten: price, maximum, sag, bulb spacing, colours). No DOM.
 //
-//   save.rig.lights = [['<unit>:<0|1>', '<unit>:<0|1>'], …]   0 = left corner, 1 = right corner
+//   save.rig.lights = [['<unit>:<0|1>', '<unit>:<0|1>'], …]   0 = left corner, 1 = right corner; 'mast:0' = the mast at the
+//   campfire (#014, Daniel 13.11.2026: „Mast am Lagerfeuer“), it belongs to no unit and stays put when the rig is rebuilt
 
 export function lightsConfig(D) {
   const L = D.camp?.lights || {};
-  return { enabled: L.enabled !== false, max: L.max ?? 12, sag: L.sag ?? 18, spacing: Math.max(12, L.spacing ?? 34), price: L.price ?? 25, maxLength: L.maxLength ?? 1600,
+  return { enabled: L.enabled !== false, max: L.max ?? 12, sag: L.sag ?? 18, spacing: Math.max(12, L.spacing ?? 34), price: L.price ?? 10, back: L.back ?? 50, maxLength: L.maxLength ?? 1600,
+    mast: L.mast !== false, mastOffset: L.mastOffset ?? -220, mastHeight: L.mastHeight ?? 300,
     colors: String(L.colors || '#ffd541').split(',').map(c => c.trim()).filter(Boolean) };
 }
 
-// the docking points of the units as drawn (geo.units of the camp: x0, x1, inTop)
-export function anchors(units) {
+// the mast at the campfire: where it stands (x of the fire, ground) → { x, y, top } or null
+export function mastAt(D, fireX, ground) {
+  const L = lightsConfig(D);
+  return L.enabled && L.mast && fireX != null ? { x: fireX + L.mastOffset, y: ground, top: ground - L.mastHeight } : null;
+}
+// the docking points of the units as drawn (geo.units of the camp: x0, x1, inTop), plus the mast
+export function anchors(units, mast = null) {
   const out = [];
+  if (mast) out.push({ id: 'mast:0', ui: 'mast', x: mast.x, y: mast.top + 6 });
   for (const u of units || []) {
     // the corners of the box itself (interior ± its walls), not of the drawbar or chassis
     const y = u.inTop - 34, l = u.in0 != null ? u.in0 - 4 : u.x0 + 12, r = u.in0 != null ? u.in0 + u.cell * u.places + 4 : u.x1 - 12;
@@ -49,12 +57,12 @@ export function hang(D, save, a, b, pos) {
   save.deltas = (save.deltas || 0) - L.price;
   return { ok: true, deltas: -L.price };
 }
-// taking one down gives half the price back
+// taking one down gives part of the price back (Camp › Lichterketten › Zurück beim Abnehmen, default half)
 export function unhang(D, save, i) {
   const list = save.rig.lights || [];
   if (!list[i]) return { ok: false };
   list.splice(i, 1);
-  const back = Math.floor(lightsConfig(D).price / 2);
+  const L = lightsConfig(D), back = Math.floor(L.price * L.back / 100);
   save.deltas = (save.deltas || 0) + back;
   return { ok: true, deltas: back };
 }

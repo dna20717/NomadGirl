@@ -5,7 +5,7 @@
 import { ensureMap, placeOf, roadKm } from '../worldmap.js';
 import { potsOf, stage, ripe, harvest, STAGES } from '../garden.js';
 import { level as cisternLevel, tap as cisternTap } from '../cistern.js';
-import { anchors as lightAnchors, catenary, lightsConfig } from '../string_lights.js';
+import { anchors as lightAnchors, catenary, lightsConfig, mastAt } from '../string_lights.js';
 import { clockText, advance, hoursUntil, containers, solarState } from '../save.js';
 import { budgets, partSlots, passengers, roofFree } from '../rig.js';
 import { Benches, benchTexture, crateTexture } from './benches.js';
@@ -774,7 +774,7 @@ export class Camp {
   anchors() {
     // the van has corners too: front and back of its roof
     const r = this.scene.van?.roof, van = r ? [{ ui: 0, x0: r.x0 - 8, x1: r.x1 + 8, inTop: r.y + 34 - 14 }] : [];   // the roof rails (Spiel › Van › Dach)
-    return lightAnchors([...van, ...this.geo.units.filter(u => u.ui !== 0)]);
+    return lightAnchors([...van, ...this.geo.units.filter(u => u.ui !== 0)], mastAt(this.D, this.geo.fireX, this.ground));
   }
   wire(i) {
     const pair = this.box.save.rig.lights?.[i], A = Object.fromEntries(this.anchors().map(a => [a.id, a])), L = lightsConfig(this.D);
@@ -788,6 +788,7 @@ export class Camp {
     this.wireKeys = [];
     this.bulbs = [];
     if (!L.enabled) return;
+    this.drawMast();
     (this.box.save.rig.lights || []).forEach((_, i) => {
       const w = this.wire(i);
       if (!w) return;
@@ -809,6 +810,21 @@ export class Camp {
       this.rigObjs.push(s.add.image(x0, y0, key).setOrigin(0).setDepth(-16));
       w.bulbs.forEach((b, j) => { const l = this.light(b.x, b.y + 9, 46, L.colors[j % L.colors.length], 0.75); l.rig = true; l.bulb = j * 1.7 + i; this.bulbs.push(l); });
     });
+  }
+
+  // the mast at the campfire (#014): a weathered pole with a little crossbar and a hook on top, drawn from code
+  drawMast() {
+    const s = this.scene, m = mastAt(this.D, this.geo.fireX, this.ground);
+    if (!m) return;
+    const g = s.add.graphics().setDepth(-17), x = Math.round(m.x), top = Math.round(m.top), h = m.y - top;
+    g.fillStyle(0x17111f).fillRect(x - 9, top - 2, 18, h + 2);                                 // outline
+    g.fillStyle(0x5d4037).fillRect(x - 7, top, 14, h);                                         // pole
+    g.fillStyle(0x7a5a44).fillRect(x - 7, top, 4, h);                                          // light side
+    for (let y = top + 40; y < m.y - 20; y += 70) g.fillStyle(0x3f2a22).fillRect(x - 7, y, 14, 3);   // grain
+    g.fillStyle(0x17111f).fillRect(x - 30, top + 16, 60, 10).fillStyle(0x6b4a38).fillRect(x - 28, top + 18, 56, 6);   // crossbar
+    g.fillStyle(0x8b949e).fillRect(x - 3, top - 10, 6, 10).fillStyle(0x17111f).fillRect(x - 1, top - 8, 2, 6);         // hook
+    g.fillStyle(0x3f2a22).fillRect(x - 16, m.y - 8, 32, 8).fillStyle(0x17111f).fillRect(x - 16, m.y - 8, 32, 2);       // stones at the foot
+    this.rigObjs.push(g);
   }
 
   // ---------- mood (Camp › Gemütlichkeit): dark edge, warm shimmer at night, fireflies round the fire ----------

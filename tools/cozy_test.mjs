@@ -57,11 +57,11 @@ check('Solarpaneel auf dem Container-Dach: +1 ⚡ am Tag', v.made === 3 && v.sol
 await ev(() => { nomad.save().deltas = 500; SC().openBuild(); nomad.step(30); });
 await page.waitForTimeout(400);
 let sp = await ev(() => SC().hud.build.spots());
-check('Bau-Modus: Andockpunkte an Van und Container', sp.anchors.length >= 4, sp.anchors);
+check('Bau-Modus: Andockpunkte an Van, Container und am Mast beim Lagerfeuer', sp.anchors.length >= 5 && sp.anchors.some(x => x.id === 'mast:0'), sp.anchors);
 const [a, b] = [sp.anchors.find(x => x.id === '1:1'), sp.anchors.find(x => x.id === '0:0')];
 await page.mouse.move(a.x, a.y); await page.mouse.down(); await page.mouse.move((a.x + b.x) / 2, a.y + 40, { steps: 6 }); await page.mouse.move(b.x, b.y, { steps: 6 }); await page.mouse.up(); await ev(() => nomad.step(4));
 v = await ev(() => { const st = SC().hud.build.state(); return { lights: st.lights, deltas: st.deltas, bulbs: SC().camp.bulbs.length }; });
-check('Lichterkette ziehen: hängt zwischen Container und Van, kostet 25 Δ, Lampen leuchten', v.lights.join() === '1:1-0:0' && v.deltas === 475 && v.bulbs >= 4, v);
+check('Lichterkette ziehen: hängt zwischen Container und Van, kostet 10 Δ, Lampen leuchten', v.lights.join() === '1:1-0:0' && v.deltas === 490 && v.bulbs >= 4, v);
 const c0 = sp.anchors.find(x => x.id === '1:0');
 await page.mouse.click(c0.x, c0.y); await ev(() => nomad.step(2)); await page.mouse.click(a.x, a.y); await ev(() => nomad.step(2));
 v = await ev(() => SC().hud.build.state());
@@ -70,7 +70,13 @@ await shot('build');
 sp = await ev(() => SC().hud.build.spots());
 await page.mouse.click(sp.wires[0].x, sp.wires[0].y); await ev(() => nomad.step(2));
 v = await ev(() => SC().hud.build.state());
-check('Klick auf die Mitte: Kette abgenommen, halber Preis zurück', v.lights.length === 1 && v.deltas === 450 + 12, v);
+check('Klick auf die Mitte: Kette abgenommen, halber Preis zurück', v.lights.length === 1 && v.deltas === 480 + 5, v);
+// #014: the mast at the campfire is a docking point too
+sp = await ev(() => SC().hud.build.spots());
+{ const m = sp.anchors.find(x => x.id === 'mast:0'), v0 = sp.anchors.find(x => x.id === '0:1'); await page.mouse.click(m.x, m.y); await ev(() => nomad.step(2)); await page.mouse.click(v0.x, v0.y); await ev(() => nomad.step(2)); }
+v = await ev(() => SC().hud.build.state());
+check('Mast am Lagerfeuer: Kette vom Mast zur Van-Reling', v.lights.length === 2 && v.lights.some(x => /mast:0/.test(x)), v.lights);
+await ev(() => { const L = nomad.save().rig.lights; L.splice(L.findIndex(p => p.includes('mast:0')), 1); SC().camp.drawRig(); nomad.step(2); });
 // Daniel, 13.11.2026: „Lichterketten verschwinden immer dann, wenn man eine Werkstatt im Rig platziert oder neu baut“ + „alter Tooltip“
 v = await ev(() => { const B = SC().hud.build, it = SC().camp.yardItems.find(x => x.kind === 'ws'); B.ava = { on: true, x: 0, y: 0 }; B.aim({ x: (it.x0 + it.x1) / 2, y: (it.y0 + it.y1) / 2 }); B.padPress(); nomad.step(4);
   const t = B.navTargets().find(t => /Tauschen|Einbauen/.test(t.label) && !/Cryo/.test(t.label)); B.aim(t); nomad.step(2); B.padPress(); nomad.step(30); B.ava.on = false; B.draw();

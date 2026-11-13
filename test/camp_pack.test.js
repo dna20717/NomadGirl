@@ -63,7 +63,7 @@ test('Lichterketten: Andockpunkte an den Ecken, aufhängen kostet Δ, abnehmen g
   s.deltas = 0;
   assert.match(hang(D, s, '0:0', '1:1').why, /kostet/);
   assert.ok(unhang(D, s, 0).ok);
-  assert.equal(s.deltas, Math.floor(L.price / 2));
+  assert.equal(s.deltas, Math.floor(L.price * L.back / 100));
   assert.deepEqual(s.rig.lights, []);
 });
 
