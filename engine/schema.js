@@ -167,6 +167,7 @@ export const AREAS = {
         num('gamepad.useTilt', 'Benutzen ab', { unit: '%', min: 0, max: 100, hint: 'Daniel, 12.11.2026: Benutzen = linken Stick deutlich nach oben antippen (Knopf „Linker Stick ↑“), zählt nur mit E-Hinweis im Bild, im Stand oder Gehen; der Hinweis schlägt die Leiter. Leer = 70' }),
         num('gamepad.throwHold', 'Wegwerfen: rüber-Knopf halten', { unit: 'ms', min: 0, hint: 'Inventar: Y (Tastatur F) getippt = auf die andere Seite, so lange gehalten = auf den Boden werfen. 0 = aus. Leer = 450' }),
         num('gamepad.buildHold', 'Rig bauen: Inventar-Knopf halten', { unit: 'ms', min: 0, hint: 'Daniel, 12.11.2026: im Camp öffnet der Inventar-Knopf (Select) gehalten den Bau-Modus, getippt wie immer das Inventar. Im Bau-Modus schaltet er Rig offen/zu. 0 = aus. Leer = 500' }),
+        bool('gamepad.rumble', 'Vibration', { hint: 'Daniel, 13.11.2026 (#010): kurzes Rumpeln im Bau-Modus beim Springen, Packen, Ablegen und Verkaufen, wo der Browser es kann. Aus = still' }),
         bool('gamepad.useUp', 'Benutzen auch mit ↑ / W', { hint: 'Tastatur: W / ↑ wirkt wie E, solange ein E-Hinweis zu sehen ist (auch der Stick ↑). Aus = nur E bzw. der Knopf aus der Belegung' }),
         ...PAD_ACTIONS.map(([a, n]) => multi(`gamepad.map.${a}`, n, PAD_BUTTONS))] },
       { title: 'Nebel', fields: [bool('fog.enabled', 'Nebel des Unbekannten', { hint: 'Daniel, 11.11.2026: nur in Innenräumen und nur über Luft, die Leyla erreichen kann; was sie einmal gesehen hat, bleibt aufgedeckt. Fels und Unerreichbares bleiben sichtbar' }),

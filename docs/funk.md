@@ -36,7 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
-- 13.11. Code → Ava: #010 Bau-Modus mit Controller läuft (AvA als Zeiger).
+- 13.11. Code → Ava: #010 Bau-Modus mit Controller erledigt: AvA ist der Zeiger, UI-Grammatik, Bereiche, Vorschau, Vibration.
 - 13.11. Code → Ava: #009 Camp-Feinschliff erledigt: alles Seitenansicht, Horizont mit Milchstraße und BigCityDelta, Onkel Sung größer, Lichterketten als Bilder, Lichter ohne Kasten, kein Solar unter Stapeln.
 - 13.11. Code → Ava: #008 Camp-Paket erledigt: Start-Rig neu, Van 2 ⚡, Solar + Akku, Zisterne, Außenwände, Klapptreppe, Deko + Stimmung, Lichterketten selbst ziehen, Companions als Figuren, Streuner an der Tankstelle. ⚠️ Techtree braucht weiter einen Warroom.
 - 13.11. Code → Ava: #008 Camp-Paket läuft (Daniels Auftrag im Code-Chat).
@@ -195,13 +195,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - ⚠️ Lichterketten-Fehler war bei mir nicht nachzustellen; die Umstellung auf Bilder plus der Mischmodus-Fix sollten es lösen.
 
 ### #010 Bau-Modus mit Controller: AvA als Zeiger, UI-Grammatik, Spaß
-- **Status:** läuft (Code, 13.11.) · angelegt 13.11. von Code (Auftrag Daniel im Code-Chat)
+- **Status:** erledigt (Code, 13.11.) · angelegt 13.11. von Code (Auftrag Daniel im Code-Chat)
 - **Für:** Code
 - **Lesen:** `docs/features/rig.md`, `controller.md`, `ui.md`, `drone.md`
 - **Auftrag (Daniel, 13.11.2026):** „Das Camp-Bau-Menü muss auch vollständig mit dem Controller bedienbar sein und soll Spaß machen … orientiere dich an den Design-Konventionen von unseren anderen Menüs.“ Antworten: linker Stick springt von Ziel zu Ziel, rechter Stick steuert frei, **„aber die Drohne ist der Zeiger“**; Kaufen liefert **aufs Pad wie bisher**; **volle UI-Grammatik** (Y = rüber: Schrottplatz, halten = verkaufen, ohne Teil = Händler; LB/RB = Bereiche; X = Kontext, X halten = rückgängig); Extras: **Vibration, Vorschau am Ziel, Kamera fährt mit, Klick-Töne**.
 - **Fertig, wenn:** alles im Bau-Modus ohne Maus geht (Werkstätten, Container, Rig-Teile, Solar, Lichterketten, Händler), Hilfezeile je Lage, Tests grün.
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** Details in `docs/features/controller.md` › „Bau-Modus mit Controller, AvA ist der Zeiger“. AvA fliegt als Zeiger: Der linke Stick springt von Ziel zu Ziel, mit einem Teil in der Hand nur dorthin, wo es passt; der rechte Stick fliegt frei. A packt und legt ab, B zurück/fertig, Y Schrottplatz (halten: verkaufen) bzw. Händler, X Kontextmenü (halten: rückgängig), LB/RB Bereiche mit Kamerafahrt, Händler mit Tabs, Vorschau grün/rot am Ziel, Tooltip an AvA, Hilfezeile je Lage, Vibration und Klick-Töne. Behoben: Werkstätten ließen sich auf den Platz des Cryo-Tanks tauschen. Tests: `build_pad_test` 20 (neu), `pad_test` 41, `build_test` 32 (Händler-Tabs); alle 28 Browser-Tests und `npm test` grün. PixelLab: nichts. **Bitte testen** (Stadia): Select halten, mit dem Steuerkreuz durchs Rig springen, Werkbank packen und einbauen, Y halten zum Verkaufen, X fürs Menü, RB durch die Bereiche, Lichterkette mit A, Steuerkreuz, A.
+  - ⚠️ Ob der Stadia-Controller im Browser vibriert, hängt vom Browser ab (Chrome kann es meist); ohne Vibration läuft alles gleich.
+  - ⚠️ Am Händler kauft A wie gewünscht aufs Pad; danach mit RB zum Schrottplatz und das Teil dort packen.
 
 ## Archiv
 

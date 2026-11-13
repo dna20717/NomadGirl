@@ -92,6 +92,7 @@ check('Lagerregal-Inhalt zieht mit', (await ev(() => { const g = nomad.save().in
 
 // a crate trailer: the van pulls only one; selling it at the dealer
 await page.locator('.bm-shopbtn').click();
+await page.locator('.bm-shop .bm-tab', { hasText: 'Anhänger' }).click(); await ev(() => nomad.step(2));   // the dealer has tabs (#010)
 await page.locator('.bm-shop .build-row', { hasText: 'Holzkiste' }).locator('button').click(); await ev(() => nomad.step(40));
 await page.locator('.bm-shop .craft-x').click();
 const gaps = (await spots()).gaps;

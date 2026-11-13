@@ -60,6 +60,12 @@ export function makeSfx(scene, volume = 0.5) {
       tone(c, o, 'triangle', 240, 420, t, 0.12, 0.08);
     },
     // does not fit
+    // AvA hops onto a target in the build mode (#010): a short soft click, a little random
+    snap() {
+      const c = ctx(); if (!c) return;
+      const t = c.currentTime, o = out(c), f = 1300 + Math.random() * 160;
+      tone(c, o, 'triangle', f, f * 0.7, t, 0.035, 0.09); thud(c, o, t, 0.02, 3000, 0.08);
+    },
     nope() {
       const c = ctx(); if (!c) return;
       const t = c.currentTime, o = out(c);

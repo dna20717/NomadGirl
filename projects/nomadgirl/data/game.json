@@ -81,7 +81,8 @@
   "useTilt": 70,
   "useUp": true,
   "buildHold": 500,
-  "throwHold": 450
+  "throwHold": 450,
+  "rumble": true
  },
  "atmosphere": {"enabled": true, "scale": 4, "leyla": {"radius": 260, "strength": 22}, "depth": 14},
  "combat": {

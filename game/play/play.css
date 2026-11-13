@@ -611,3 +611,23 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .wm-why { color: #b9a9c9; }
 .wm-unknown { color: #6d5f7c; font: 22px/1 VT323, monospace; letter-spacing: 3px; }
 .wm-intel { margin: 0; padding: 8px 10px; border-radius: 8px; border: 1px dashed #5a4a2a; color: #ffd27a; font: 13px/1.4 var(--ui-font); background: rgba(255, 210, 122, .06); }
+
+/* #010 build mode with the controller: areas, dealer tabs, AvA's tooltip, the context menu (same look as inventory tabs and tooltips) */
+.bm-areas, .bm-tabs { display: flex; align-items: center; gap: 4px; }
+.bm-tabs { padding: 6px 10px 0; }
+.bm-areas img, .bm-tabs img, .bm-areas kbd, .bm-tabs kbd { height: 20px; }
+.bm-area, .bm-tab { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 6px; border: 1px solid #3a2f45; background: transparent; color: #8a7d99; font: 18px/1 VT323, monospace; cursor: pointer; }
+.bm-area.on, .bm-tab.on { background: #2a2233; color: #ffd27a; border-color: #6b5a3a; }
+.bm-tip { position: fixed; z-index: 27; max-width: 320px; padding: 8px 10px; border-radius: 8px; background: rgba(13, 10, 18, .94); border: 1px solid #3a2f45; pointer-events: none; font-family: var(--ui-font); }
+.bm-tip[hidden], .bm-ctx[hidden] { display: none; }
+.bm-tip b { display: block; font-size: 13px; color: #ffd27a; }
+.bm-tip small { display: block; margin-top: 2px; font-size: 11.5px; color: #b9a2c8; }
+.bm-tip-acts { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 6px; font-size: 11.5px; color: #d8cfe2; }
+.bm-tip-acts span { display: inline-flex; align-items: center; gap: 4px; }
+.bm-tip-acts img, .bm-tip-acts kbd { height: 18px; }
+.bm-ctx { position: fixed; z-index: 28; display: flex; flex-direction: column; gap: 4px; min-width: 240px; padding: 10px; border-radius: 10px; background: rgba(23, 17, 31, .96); border: 1px solid #3a2f45; font-family: var(--ui-font); pointer-events: auto; }
+.bm-ctx header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.bm-ctx header b { color: #ffd27a; font-size: 14px; }
+.bm-ctx header small { color: #8a7d99; font-size: 11.5px; }
+.bm-ctx .inv-btn { text-align: left; display: flex; align-items: center; }
+.bm-ctx .ui-hints { margin-top: 6px; }

@@ -11,7 +11,7 @@
 // Logic in game/rig.js (act, snapshot/restore), drawing in game/play/camp.js (drawRig, drawYard), values in "Rig-Bau".
 import { hang, unhang, canHang, lightsConfig } from '../string_lights.js';
 import { el } from '../ui.js';
-import { hints, NavCursor, closeX } from './ui_nav.js';
+import { hints, NavCursor, closeX, keyGlyph } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { budgets, act, snapshot, restore, lift, place, fits, at as wsAt, toSpare, fromSpare, stow, buyWorkshop, sellWorkshop, buyContainer, sellContainer, buyPart, sellPart, mountPart, unmountPart, SLOT_NAMES as PART_SLOTS, stackOn, stackTop, blockAt, levelOf, attachAt, detach, moveContainer, shop, priceOf, sellPrice, wsDef, placesOf } from '../rig.js';
 import { clockText } from '../save.js';
@@ -22,6 +22,8 @@ const FN_COLORS = { storage: '#5c6b7a', cooling: '#4a7a9a', cell: '#5a4a4a', sle
 const FN_NAMES = { storage: 'Lager', cooling: 'Kühlung', cell: 'Zelle', sleep: 'Schlafen', chill: 'Chillen', drone: 'Drohnen', warroom: 'Planung', kitchen: 'Kochen', foodtruck: 'Verkauf', craft: 'Herstellen', engine: 'Motor', power: 'Energie' };
 const de = n => Number(n).toLocaleString('de-DE');
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const SHOP_TABS = [['workshops', 'Werkstätten'], ['containers', 'Anhänger'], ['rigParts', 'Rig-Teile']];
+const KIND_NAMES = { ws: 'Werkstatt', part: 'Rig-Teil', container: 'Anhänger', anchor: 'Andockpunkt', lights: 'Lichterkette', dealer: 'Händler' };
 
 export class BuildMode {
   // host: { scene: () => PlayScene }
@@ -95,8 +97,8 @@ export class BuildMode {
     const d = this.drag, j = this.job, z = Math.max(0.3, this.scene.cam.zoom), V = this.B.view || {}, up = (V.droneAbove ?? 60) / Math.min(1, z * 1.6);
     if (d) return { x: d.x, y: d.y - up, smooth: (V.droneFollow ?? 30) / 100 };
     if (j && this.atFire) return { x: j.fx, y: j.fy - 150, smooth: 0.12 };
-    const p = this.cur?.on ? this.world({ x: this.cur.x, y: this.cur.y }) : this.pointer;
-    return p ? { x: p.x, y: p.y - up, smooth: (V.droneFollow ?? 30) / 100 } : null;
+    const p = this.ava?.on ? this.ava : this.pointer;   // #010: with the controller AvA IS the pointer (her claw above the point), quicker
+    return p ? { x: p.x, y: p.y - up, smooth: this.ava?.on ? 0.45 : (V.droneFollow ?? 30) / 100 } : null;
   }
   close() {
     if (!this.active) return;
@@ -109,7 +111,7 @@ export class BuildMode {
     for (const u of this.undo) u.done = true;
     this.jobs = []; this.job = null; this.working = false;
     this.active = false; this.el.hidden = true; this.shell = null;
-    this.cur = null; this.curEl && (this.curEl.hidden = true); this.shopCur?.hide();
+    this.ava = null; this.areaNow = null; this.closeCtx(); if (this.tipEl) this.tipEl.hidden = true; this.shopCur?.hide();
     delete this.el.parentElement.dataset.building;
     s.input.off('pointerdown', this.onDown); s.input.off('pointermove', this.onMove); s.input.off('pointerup', this.onUp); s.input.off('pointerupoutside', this.onUp);
     this.gfx?.destroy(); for (const t of this.labels || []) t.destroy(); this.labels = [];
@@ -127,80 +129,263 @@ export class BuildMode {
 
   toggleOpen() { const h = this.scene.hud; h.setRigOpen(!h.rigOpen); this.draw(); }
 
-  // ---------- controller and keyboard (Daniel, 12.11.2026: „Rig-Bau-Modus = Select“, Cursor wie vorgeschlagen) ----------
-  // u = window input (ui_nav.js), p = controller: a golden cursor over the world; A / Enter / Space packs what is under it, moving
-  // carries it along, A again puts it down (the same drop as the mouse); B puts it back, closes the dealer, then finishes;
-  // X undoes, Y opens the dealer (its catalogue gets the window cursor), LB / RB / Q jump to the next part, Select = Rig offen/zu
+  // ---------- controller and keyboard (#010, Daniel, 13.11.2026: „vollständig mit dem Controller bedienbar und soll Spaß machen“,
+  // „linker Stick springt, rechter frei, aber die Drohne ist der Zeiger“). AvA IS the pointer: her claw point (`this.ava`) is where
+  // packing and dropping happen. Left stick / d-pad / arrows hop her to the next target in that direction (holding something: only where
+  // it fits, with a preview there), the right stick flies her freely, the camera follows. One UI grammar as in every window:
+  //   A / E      pack · put down                     B / Esc   put back · close the dealer · finish
+  //   Y / F      held thing → scrapyard, hold = sell; empty-handed = dealer
+  //   X / R      context menu at the target, hold = undo           LB / RB / Q   areas (Alles, Van, Anhänger, Schrottplatz)
+  //   Select     rig open / closed
   nav(u, p, dt) {
     if (!this.active) return;
-    const s = this.scene, edge = a => p?.kind && p.uiNow.has(a) && !p.uiPrev.has(a);
-    if (p?.kind && p.pressed('inventory')) this.toggleOpen();
-    if (!this.cur?.on && !u.now.size) return;
-    if (!this.curEl) {
-      this.curEl = el('div', { class: 'ui-cursor bm-cursor', hidden: true }); document.body.append(this.curEl);
-      document.addEventListener('mousemove', ev => { if (this.cur?.on && (Math.abs(ev.movementX) + Math.abs(ev.movementY)) > 0) { this.cur.on = false; this.curEl.hidden = true; } });
+    const s = this.scene, pad = p?.kind ? p : null, now = s.time.now;
+    if (pad?.pressed('inventory')) this.toggleOpen();
+    const g = pad?.pad, rs = g ? [g.axes[2] || 0, g.axes[3] || 0] : [0, 0], rsOn = Math.abs(rs[0]) > 0.25 || Math.abs(rs[1]) > 0.25;
+    if (!this.mouseWatch) {   // the mouse takes over again as soon as it moves
+      this.mouseWatch = ev => { if (this.ava?.on && (Math.abs(ev.movementX) + Math.abs(ev.movementY)) > 0) { this.ava.on = false; this.tipEl && (this.tipEl.hidden = true); this.draw(); } };
+      document.addEventListener('mousemove', this.mouseWatch);
     }
-    if (!this.cur) this.cur = { x: s.scale.width / 2, y: s.scale.height * 0.62, on: false, held: 0 };
-    if (!this.cur.on) { this.cur.on = true; return this.showCur(); }
-    // the dealer's catalogue: the window cursor, B closes it
+    if (!this.ava?.on && !u.now.size && !rsOn) return;
+    if (!this.ava?.on) { this.takeAva(); this.holds = {}; return; }   // the first touch only brings AvA over
+    if (this.ctx) return this.ctxNav(u);
+    // the dealer's catalogue: the window cursor, LB/RB tabs, B/Y close it
     if (this.shopOpen && !this.drag) {
-      this.shopCur ??= new NavCursor(this.shell.shop, '.bm-shop .inv-btn:not(.craft-x)');
+      this.shopCur ??= new NavCursor(this.shell.shop, '.bm-shop .build-row .inv-btn');
       this.shopCur.root = this.shell.shop;
-      if (edge('back') || u.pressed('send')) { this.shopOpen = false; this.shopCur.hide(); this.draw(); return this.showCur(); }
+      if (u.pressed('back') || u.pressed('send')) { this.shopOpen = false; this.shopCur.hide(); this.holds = {}; this.draw(); return; }
+      if (u.pressed('next') || u.pressed('prev')) { this.shopTabStep(u.pressed('next') ? 1 : -1); const T = this.shopCur.targets(); this.shopCur.i = Math.max(0, T.findIndex(n => n.matches('.build-row .inv-btn'))); this.shopCur.show(); }
       this.shopCur.update(u);
-      this.curEl.hidden = true;
       return;
     }
     this.shopCur?.hide();
-    // move: the stick moves smoothly (faster when held), arrows and d-pad at a steady pace
-    const g = p?.pad, ax = g ? g.axes[0] || 0 : 0, ay = g ? g.axes[1] || 0 : 0, dz = 0.25;
-    let vx = (u.down('right') ? 1 : 0) - (u.down('left') ? 1 : 0), vy = (u.down('down') ? 1 : 0) - (u.down('up') ? 1 : 0);
-    if (Math.abs(ax) > dz) vx = ax; if (Math.abs(ay) > dz) vy = ay;
-    const moving = vx || vy;
-    this.cur.held = moving ? this.cur.held + dt : 0;
-    const v = (this.B.view?.cursorSpeed ?? 900) * (this.cur.held > 450 ? 1.8 : 1);
-    if (moving) {
-      this.cur.x = clamp(this.cur.x + vx * v * dt / 1000, 0, s.scale.width); this.cur.y = clamp(this.cur.y + vy * v * dt / 1000, 0, s.scale.height);
-      this.pointerMove({ x: this.cur.x, y: this.cur.y });
+    for (const [d, dx, dy] of [['left', -1, 0], ['right', 1, 0], ['up', 0, -1], ['down', 0, 1]]) {
+      if (u.pressed(d)) { this.rep = { d, at: now + 360 }; this.hop(dx, dy); }
+      else if (u.down(d) && this.rep?.d === d && now > this.rep.at) { this.rep.at = now + 150; this.hop(dx, dy); }
     }
-    if (u.pressed('next') || edge('next')) this.jump(1);
-    if (edge('prev')) this.jump(-1);
-    const pt = { x: this.cur.x, y: this.cur.y, button: 0 };
-    if (u.pressed('ok')) {
-      if (this.drag || this.wire) this.pointerUp(pt);
-      else {
-        this.pointerDown(pt);
-        const hit = this.press?.hit;
-        if (hit && hit.kind !== 'dealer') { this.press = null; this.startDrag(hit, this.world(pt)); this.pointerMove(pt); }
-        else this.pointerUp(pt);
+    if (rsOn) { const v = (this.B.view?.cursorSpeed ?? 900) / Math.max(0.3, s.cam.zoom); this.aim({ x: this.ava.x + rs[0] * v * dt / 1000, y: this.ava.y + rs[1] * v * dt / 1000 }); }
+    if (u.pressed('next')) this.area(1);
+    if (u.pressed('prev')) this.area(-1);
+    if (u.pressed('ok')) this.press();
+    if (u.pressed('back')) { if (this.drag) this.flyBack(null); else if (this.wire) { this.wire = null; this.draw(); } else return this.close(); }
+    this.holdBtn(u, 'send', dt, () => this.sendTap(), () => this.sendHold());
+    this.holdBtn(u, 'context', dt, () => this.openCtx(), () => { this.undoLast(); this.buzz('nope'); });
+    this.follow(dt);
+  }
+  // a window key tapped or held (Spiel › Controller › „Wegwerfen: rüber-Knopf halten“ is the hold time, like in the inventory)
+  holdBtn(u, a, dt, tap, hold) {
+    const H = this.holds ??= {}, need = this.D.game?.gamepad?.throwHold ?? 450;
+    if (u.down(a)) {
+      if (!H[a]) H[a] = { t: 0, fired: false };
+      H[a].t += dt;
+      if (!H[a].fired && need > 0 && H[a].t >= need) { H[a].fired = true; hold(); }
+    } else if (H[a]) { const h = H[a]; H[a] = null; if (!h.fired) tap(); }
+  }
+  holdProgress(a) { const h = this.holds?.[a], need = this.D.game?.gamepad?.throwHold ?? 450; return h && !h.fired && h.t > 90 ? Math.min(1, h.t / need) : 0; }
+
+  // AvA comes under the controller: from the mouse pointer, the part in hand or where she is; then onto the nearest target
+  takeAva() {
+    const s = this.scene, d = s.drone, base = this.drag ? { x: this.drag.x, y: this.drag.y } : this.pointer || (d ? { x: d.x, y: d.y + 60 } : this.view);
+    this.ava = { on: true, x: base.x, y: base.y };
+    s.game.canvas.style.cursor = 'none';
+    const T = this.navTargets();
+    if (T.length) { const q = T.reduce((a, b) => Math.hypot(b.x - base.x, b.y - base.y) < Math.hypot(a.x - base.x, a.y - base.y) ? b : a); this.aim(q, true); }
+    else this.aim(base);
+    this.draw();
+  }
+  // AvA's claw goes to a world point: hover, drag and string follow; snapped = a target was chosen (click, buzz)
+  aim(w, snapped = false) {
+    this.ava.x = w.x; this.ava.y = w.y;
+    this.pointer = { x: w.x, y: w.y, t: this.scene.time.now };
+    if (this.drag) { this.drag.x = w.x; this.drag.y = w.y; }
+    if (this.wire) { this.wire.x = w.x; this.wire.y = w.y; }
+    if (snapped) { this.sfx.snap?.(); this.buzz('snap'); }
+  }
+  // left stick: the next target in that direction (the same choice as the inventory and the travel map)
+  hop(dx, dy) {
+    const T = this.navTargets(), c = this.ava;
+    let best = null, bd = Infinity;
+    for (const q of T) {
+      const x = q.x - c.x, y = q.y - c.y, along = x * dx + y * dy, side = Math.abs(x * dy) + Math.abs(y * dx);
+      if (along <= 8) continue;
+      const score = along + side * 2.2;
+      if (score < bd) { bd = score; best = q; }
+    }
+    if (best) { this.aim(best, true); this.hoverText = best.label || null; this.draw(); }
+    else { this.sfx.nope?.(); this.buzz('edge'); }
+  }
+  // every place AvA can hop to right now (world points where pick() resp. target() finds that thing)
+  navTargets() {
+    const camp = this.camp, D = this.D, out = [], add = (x, y, label) => out.push({ x, y, label });
+    const Y = camp.geo.yard, dl = camp.dealer, d = this.drag, g = camp.ground;
+    if (this.wire) { for (const a of camp.anchors?.() || []) if (a.id !== this.wire.from.id) add(a.x, a.y, 'Hier einhängen'); return this.inArea(out); }
+    if (d) {
+      const hang = Math.min(d.hang || 0, 300), sx = d.x, sy = d.y, cand = [];
+      if (d.kind === 'ws') for (const q of this.slots()) cand.push({ x: (q.x0 + q.x1) / 2, y: (q.y0 + q.y1) / 2 - hang / 2 });
+      if (d.kind === 'part') for (const so of this.sockets()) cand.push({ x: so.cx, y: so.cy - hang / 2 });
+      if (d.kind === 'container') {
+        for (const gp of this.gaps()) cand.push({ x: gp.x, y: g - hang - 30 });
+        if (D.containers?.[d.id]?.stackable) for (const st of this.stacks()) cand.push({ x: st.x, y: st.y - hang - 14 });
       }
+      if (Y && d.from !== 'yard') cand.push({ x: (Y.x0 + Y.x1) / 2, y: g - 160 });
+      if (dl) cand.push({ x: dl.x, y: g - 140 });
+      for (const q of cand) { d.x = q.x; d.y = q.y; const t = this.target(); if (t && t.type !== 'home') add(q.x, q.y, this.dragHint()); }
+      d.x = sx; d.y = sy;
+      return this.inArea(out);
     }
-    if (edge('back')) { if (this.drag) this.flyBack(null); else if (this.wire) { this.wire = null; this.draw(); } else { this.close(); return; } }
-    if (u.pressed('context') || edge('context')) this.undoLast();
-    if (u.pressed('send') || edge('send')) { this.shopOpen = true; this.draw(); }
-    this.showCur();
+    const mid = o => [(o.x0 + o.x1) / 2, (o.y0 + o.y1) / 2];
+    for (const it of camp.yardItems || []) add(...mid(it));
+    for (const sl of this.slots()) if (wsAt(D, this.save.rig, sl.ui, sl.p)) add(...mid(sl));
+    for (const u of camp.geo.units) if (u.ui > 0) add((u.in0 + u.in0 + u.cell * u.places) / 2, u.inTop - 20);
+    for (const so of this.sockets()) if (so.id) add(so.cx, so.cy);
+    for (const a of camp.anchors?.() || []) add(a.x, a.y);
+    (this.save.rig.lights || []).forEach((_, i) => { const w = camp.wire?.(i); if (w) add(w.mid.x, w.mid.y); });
+    if (dl) add(...mid(dl));
+    return this.inArea(out.filter(q => this.pick(q.x, q.y, true)));
   }
-  showCur() {
-    const s = this.scene, r = s.game.canvas.getBoundingClientRect(), k = r.width / s.scale.width, show = !!this.cur?.on && this.active;
-    this.curEl.hidden = !show;
-    if (!show) return;
-    const z = this.drag ? 34 : 26;
-    Object.assign(this.curEl.style, { left: `${r.left + this.cur.x * k - z / 2}px`, top: `${r.top + this.cur.y * (r.height / s.scale.height) - z / 2}px`, width: `${z}px`, height: `${z}px` });
-    this.curEl.classList.toggle('holding', !!this.drag);
+  // ---------- areas (LB / RB): the camera frames a part of the camp, AvA hops only there ----------
+  areas() {
+    const camp = this.camp, geo = camp.geo, U = geo.units, Y = geo.yard, dl = camp.dealer, top = Math.min(...U.map(u => u.inTop)) - 120;
+    const rig = U.filter(u => u.ui > 0), all = { x0: (Y?.x0 ?? geo.rigRoom[0]) - 80, x1: geo.vanRight + 120 };
+    return [
+      { key: 'all', name: 'Alles', ...all },
+      { key: 'van', name: 'Van', x0: geo.vanLeft - 60, x1: geo.vanRight + 60 },
+      ...(rig.length ? [{ key: 'rig', name: 'Anhänger', x0: Math.min(...rig.map(u => u.x0)) - 60, x1: Math.max(...rig.map(u => u.x1)) + 60 }] : []),
+      ...(Y ? [{ key: 'yard', name: 'Schrottplatz', x0: Y.x0 - 40, x1: Math.max(Y.x1, dl?.x1 ?? Y.x1) + 40 }] : []),
+    ].map(a => ({ ...a, top }));
   }
-  // LB / RB / Q: the cursor jumps to the next part, place, trailer or the dealer (left to right)
-  jump(d) {
-    const sp = this.spots(), s = this.scene, r = s.game.canvas.getBoundingClientRect(), kx = s.scale.width / r.width, ky = s.scale.height / r.height;
-    const pts = this.drag ? [...sp.slots, ...sp.gaps, ...sp.stacks, ...sp.sockets, ...(sp.yardFree ? [sp.yardFree] : []), ...(sp.dealer ? [sp.dealer] : [])]
-      : this.wire ? sp.anchors : [...sp.yard, ...sp.slots.filter(x => x.ws), ...sp.units, ...sp.sockets.filter(x => x.id), ...(sp.dealer ? [sp.dealer] : [])];
-    const g = pts.map(q => ({ x: (q.x - r.left) * kx, y: (q.y - r.top) * ky })).filter(q => q.x >= 0 && q.x <= s.scale.width).sort((a, b) => a.x - b.x || a.y - b.y);
-    if (!g.length) return;
-    const i = d > 0 ? g.findIndex(q => q.x > this.cur.x + 12) : g.map(q => q.x < this.cur.x - 12).lastIndexOf(true);
-    const q = g[i >= 0 ? i : d > 0 ? 0 : g.length - 1];
-    this.cur.x = q.x; this.cur.y = q.y;
-    this.pointerMove({ x: q.x, y: q.y });
+  inArea(T) { const a = this.areaNow; return a && a.key !== 'all' ? T.filter(q => q.x >= a.x0 && q.x <= a.x1) : T; }
+  area(dir) {
+    const A = this.areas(), i = Math.max(0, A.findIndex(a => a.key === (this.areaNow?.key || 'all')));
+    this.areaNow = A[(i + dir + A.length) % A.length];
+    this.frame(this.areaNow);
+    this.sfx.klack?.(); this.buzz('snap');
+    const T = this.navTargets();
+    if (T.length) { const c = (this.areaNow.x0 + this.areaNow.x1) / 2; this.aim(T.reduce((a, b) => Math.abs(b.x - c) < Math.abs(a.x - c) ? b : a), false); }
+    this.draw();
   }
-  cursorState() { return this.cur ? { on: !!this.cur.on, x: Math.round(this.cur.x), y: Math.round(this.cur.y), drag: this.drag?.kind || null, shop: !!this.shopOpen } : null; }
+  // the camera frames an area: zoom so it fits, the ground low in the picture (Rig-Bau › Bau-Modus)
+  frame(a) {
+    const s = this.scene, cam = s.cam, V = this.B.view || {}, base = s.data_.game?.camera?.zoom || 1;
+    const z = clamp(s.scale.width * 0.92 / (a.x1 - a.x0), (V.minZoom ?? 30) / 100, base * 1.15);
+    const cy = this.camp.ground - (((V.groundAt ?? 80) / 100) - 0.5) * s.scale.height / z, ms = s.script ? 1 : 420;
+    this.view = { x: (a.x0 + a.x1) / 2, y: cy, zoom: z };
+    cam.pan(this.view.x, cy, ms, 'Sine.easeInOut', true);
+    cam.zoomTo(z, ms, 'Sine.easeInOut', true);
+  }
+  // the camera follows AvA when she gets close to the edge of the picture
+  follow(dt) {
+    const cam = this.scene.cam;
+    if (!this.ava?.on || cam.panEffect?.isRunning || cam.zoomEffect?.isRunning) return;
+    const v = this.viewBox(), w = cam.width / v.z, h = cam.height / v.z, m = 0.14, k = Math.min(1, dt / 160);
+    let dx = 0, dy = 0;
+    if (this.ava.x < v.x + w * m) dx = this.ava.x - (v.x + w * m); else if (this.ava.x > v.x + w * (1 - m)) dx = this.ava.x - (v.x + w * (1 - m));
+    if (this.ava.y < v.y + h * m) dy = this.ava.y - (v.y + h * m); else if (this.ava.y > v.y + h * (1 - 0.1)) dy = this.ava.y - (v.y + h * 0.9);
+    if (dx || dy) { cam.scrollX += dx * k; cam.scrollY += dy * k; }
+  }
+
+  // A: pack what is under AvA's claw, or put the held thing down there
+  press() {
+    const w = { x: this.ava.x, y: this.ava.y };
+    if (this.drag) return this.drop();
+    if (this.wire) return this.finishWire(w);
+    const hit = this.pick(w.x, w.y);
+    if (!hit) { this.sfx.nope?.(); this.buzz('edge'); return this.say('Hier ist nichts zum Packen', 'idle'); }
+    if (hit.kind === 'dealer') { this.shopOpen = true; return this.draw(); }
+    this.startDrag(hit, w);
+    this.buzz('lift');
+  }
+  // Y tapped: the held thing onto the scrapyard; empty-handed: the dealer
+  sendTap() {
+    const d = this.drag, Y = this.camp.geo.yard;
+    if (this.wire) return;
+    if (!d) { this.shopOpen = !this.shopOpen; return this.draw(); }
+    if (!Y || d.from === 'yard') return this.say('Liegt schon auf dem Schrottplatz. Halten = verkaufen', 'idle');
+    this.aim({ x: (Y.x0 + Y.x1) / 2, y: this.camp.ground - 160 });
+    this.drop();
+  }
+  // Y held: sell the held thing
+  sendHold() {
+    const d = this.drag, dl = this.camp.dealer;
+    if (!d || !dl) return;
+    this.aim({ x: dl.x, y: this.camp.ground - 140 });
+    this.drop();
+  }
+  // a little rumble where the browser can (Spiel › Controller › Vibration)
+  buzz(kind) {
+    if (this.D.game?.gamepad?.rumble === false) return;
+    const g = this.scene.pad?.pad, a = g?.vibrationActuator;
+    if (!a?.playEffect || !this.ava?.on) return;
+    const [ms, weak, strong] = { snap: [24, 0.18, 0], edge: [40, 0, 0.25], lift: [70, 0.35, 0.15], drop: [130, 0.4, 0.6], sell: [110, 0.5, 0.2], nope: [90, 0.1, 0.5] }[kind] || [30, 0.2, 0];
+    try { a.playEffect('dual-rumble', { duration: ms, weakMagnitude: weak, strongMagnitude: strong }); } catch {}
+  }
+
+  // ---------- context menu (X): what can happen with the thing under AvA ----------
+  openCtx() {
+    if (this.drag || this.wire) return;
+    const D = this.D, w = { x: this.ava.x, y: this.ava.y }, hit = this.pick(w.x, w.y), L = lightsConfig(D), items = [];
+    const name = hit && (hit.kind === 'ws' ? wsDef(D, hit.id).name : hit.kind === 'part' ? D.rigParts?.[hit.id]?.name : hit.kind === 'container' ? D.containers?.[hit.id]?.name : null) || hit?.id;
+    const grab = (then) => () => { this.closeCtx(); this.startDrag(hit, w); this.buzz('lift'); then?.(); };
+    if (hit && ['ws', 'part', 'container'].includes(hit.kind)) {
+      items.push({ label: 'Packen', icon: 'hand', act: grab() });
+      if (hit.from !== 'yard') items.push({ label: 'Auf den Schrottplatz', icon: 'box', act: grab(() => this.sendTap()) });
+      items.push({ label: `Verkaufen · +${de(this.sellOf(hit))} Δ`, icon: 'shop', act: grab(() => this.sendHold()) });
+    }
+    if (hit?.kind === 'anchor') items.push({ label: `Lichterkette ziehen · ${L.price} Δ`, icon: 'light', act: () => { this.closeCtx(); this.startDrag(hit, w); } });
+    if (hit?.kind === 'lights') items.push({ label: `Abnehmen · +${Math.floor(L.price / 2)} Δ`, icon: 'x', act: () => { this.closeCtx(); this.takeDown(hit.i); } });
+    items.push({ label: 'Händler', icon: 'shop', act: () => { this.closeCtx(); this.shopOpen = true; this.draw(); } });
+    const top = this.undo[this.undo.length - 1];
+    if (top && !top.done) items.push({ label: `Rückgängig: ${top.label}`, icon: 'undo', act: () => { this.closeCtx(); this.undoLast(); } });
+    items.push({ label: this.scene.hud.rigOpen ? 'Rig zu' : 'Rig offen', icon: 'box', act: () => { this.closeCtx(); this.toggleOpen(); } });
+    items.push({ label: 'Fertig', icon: 'check', act: () => { this.closeCtx(); this.close(); } });
+    const box = el('div', { class: 'bm-ctx ui-frame' }, el('header', {}, el('b', {}, name || 'Rig bauen'), hit ? el('small', {}, KIND_NAMES[hit.kind] || '') : null),
+      ...items.map(x => el('button', { class: 'inv-btn ghost', onclick: x.act }, icon(x.icon, 15), ' ', x.label)),
+      hints([['move', 'wählen'], ['ok', 'ausführen'], ['back', 'zurück']]));
+    const sp = this.screenOf(w);
+    Object.assign(box.style, { left: `${Math.min(window.innerWidth - 300, sp.x + 40)}px`, top: `${Math.max(70, sp.y - 120)}px` });
+    document.body.append(box);
+    this.ctx = { box, cur: new NavCursor(box, '.inv-btn') };
+    this.ctx.cur.on = false;
+    this.ctx.cur.update({ now: new Set(['ok']), down: () => false, pressed: () => false });
+    this.sfx.snap?.();
+  }
+  ctxNav(u) {
+    if (u.pressed('back') || u.pressed('context')) { this.closeCtx(); this.holds = {}; return; }
+    this.ctx.cur.update(u);
+  }
+  closeCtx() { if (!this.ctx) return; this.ctx.cur.hide(); this.ctx.cur.box.remove(); this.ctx.box.remove(); this.ctx = null; }
+
+  // world point → page pixels (for the tooltip and the context menu)
+  screenOf(w) {
+    const s = this.scene, cam = s.cam, r = s.game.canvas.getBoundingClientRect(), v = this.viewBox(), sx = r.width / s.scale.width, sy = r.height / s.scale.height;
+    return { x: r.left + (cam.x + (w.x - v.x) * v.z) * sx, y: r.top + (cam.y + (w.y - v.y) * v.z) * sy };
+  }
+  // a little card next to AvA: what is under her, what A / Y / X do (only while the controller steers)
+  drawTip() {
+    if (!this.ava?.on || this.ctx || (this.shopOpen && !this.drag)) { if (this.tipEl) this.tipEl.hidden = true; return; }
+    this.tipEl ??= document.body.appendChild(el('div', { class: 'bm-tip ui-frame', hidden: true }));
+    const D = this.D, d = this.drag, hit = d ? null : this.pick(this.ava.x, this.ava.y, true), L = lightsConfig(D);
+    let title = '', sub = '', acts = [];
+    if (this.wire) { title = 'Lichterkette'; sub = this.describe({ kind: 'anchor' }); acts = [['ok', 'einhängen'], ['back', 'loslassen']]; }
+    else if (d) {
+      const t = this.target(), nm = d.kind === 'ws' ? wsDef(D, d.id).name : d.kind === 'part' ? D.rigParts?.[d.id]?.name : D.containers?.[d.id]?.name;
+      title = nm || d.id; sub = this.dragHint();
+      acts = [['ok', t && t.type !== 'home' ? (this.check?.ok === false ? 'geht nicht' : 'ablegen') : 'zurücklegen'], ...(d.from !== 'yard' ? [['send', 'Schrottplatz']] : []), ['send', `halten: verkaufen +${de(this.sellOf(d))} Δ`], ['back', 'zurück']];
+    } else if (hit) {
+      const txt = this.describe(hit).split(' · ');
+      title = txt[0]; sub = txt.slice(1).filter(x => !/ziehen|anklicken/.test(x)).join(' · ');
+      acts = hit.kind === 'dealer' ? [['ok', 'Katalog']] : hit.kind === 'anchor' ? [['ok', `Kette ziehen (${L.price} Δ)`]] : hit.kind === 'lights' ? [['ok', 'abnehmen']] : [['ok', 'packen'], ['context', 'mehr']];
+    } else { if (this.tipEl) this.tipEl.hidden = true; return; }
+    const key = [title, sub, acts.map(a => a.join()).join()].join('|');
+    if (key !== this.tipKey) {
+      this.tipKey = key;
+      this.tipEl.replaceChildren(el('b', {}, title), sub ? el('small', {}, sub) : null, el('div', { class: 'bm-tip-acts' }, ...acts.map(([a, t]) => el('span', {}, ...keyGlyph(a), ' ', t))));
+    }
+    const sp = this.screenOf(this.ava);
+    this.tipEl.hidden = false;
+    Object.assign(this.tipEl.style, { left: `${Math.min(window.innerWidth - 340, sp.x + 46)}px`, top: `${Math.max(64, sp.y + 30)}px` });
+  }
+  cursorState() { return this.ava ? { on: !!this.ava.on, x: Math.round(this.ava.x), y: Math.round(this.ava.y), drag: this.drag?.kind || null, shop: !!this.shopOpen, area: this.areaNow?.key || 'all', ctx: !!this.ctx, wire: this.wire?.from.id || null } : null; }
 
   // ---------- the bar on top: budgets, clock, Δ, dealer, undo, done ----------
   draw() {
@@ -219,8 +404,20 @@ export class BuildMode {
       this.el.replaceChildren(this.shell.bar, this.shell.shop, this.shell.msg, this.shell.hint, this.shell.x = closeX(() => this.close(), 'Fertig (B)'));
     }
     const sh = this.shell;
+    // the hint line follows what is going on (#010): empty-handed, holding, pulling a string, the catalogue
+    const hs = this.shopOpen && !this.drag ? 'shop' : this.wire ? 'wire' : this.drag ? 'hold' : 'free';
+    if (hs !== this.hintState) {
+      this.hintState = hs;
+      const H = { free: [['move', 'AvA zum nächsten Ziel'], ['ok', 'packen'], ['send', 'Händler'], ['context', 'mehr (halten: rückgängig)'], ['tabs', 'Bereich'], ['back', 'fertig']],
+        hold: [['move', 'wohin damit'], ['ok', 'ablegen'], ['send', 'Schrottplatz (halten: verkaufen)'], ['back', 'zurücklegen']],
+        wire: [['move', 'zum nächsten Andockpunkt'], ['ok', 'einhängen'], ['back', 'loslassen']],
+        shop: [['move', 'wählen'], ['ok', 'kaufen (aufs Pad)'], ['tabs', 'Werkstätten · Anhänger · Rig-Teile'], ['back', 'zu']] }[hs];
+      const nh = hints(H, 'Maus: Teile packen und ziehen · Strg+Z rückgängig · B fertig · rechter Stick: AvA frei fliegen');
+      nh.classList.add('bm-hints'); sh.hint.replaceWith(nh); sh.hint = nh;
+    }
     sh.bar.replaceChildren(
         el('div', { class: 'bm-title' }, icon('build', 18), el('b', {}, 'Rig bauen')),
+        el('div', { class: 'bm-areas' }, ...keyGlyph('tabs').slice(0, 1), ...this.areas().map(a => el('button', { class: 'bm-area' + ((this.areaNow?.key || 'all') === a.key ? ' on' : ''), onclick: () => { this.areaNow = a; this.frame(a); this.draw(); } }, a.name)), ...keyGlyph('tabs').slice(1)),
         el('div', { class: 'bm-budgets' },
           bar('Gewicht', b.weight, b.pull, `${de(b.weight)} / ${de(b.pull)} kg`, b.heavy, 'scale'),
           bar('Anhänger', b.length, b.maxLength, `${b.length} / ${b.maxLength}${b.stack > 1 ? ` · ${b.height} / ${b.stack} hoch` : ''}`, b.length > b.maxLength, 'box'),
@@ -248,6 +445,7 @@ export class BuildMode {
 
   shopEl() {
     const D = this.D, S = shop(D), save = this.save;
+    this.shopTab ??= 'workshops';
     const row = (area, id) => {
       const x = D[area][id], price = priceOf(D, area, id), poor = price > save.deltas;
       const sub = area === 'workshops' ? `${FN_NAMES[x.function] || ''} · ${x.places || 1} ${x.places > 1 ? 'Plätze' : 'Platz'} · ${x.power > 0 ? '+' : ''}${x.power || 0} ⚡`
@@ -262,8 +460,15 @@ export class BuildMode {
     };
     return el('section', { class: 'inv-panel bm-shop' },
       el('header', {}, icon('shop', 16), el('b', {}, D.camp?.yard?.dealerName || 'Händler'), el('small', {}, 'liefert auf den Händler-Platz'), el('button', { class: 'craft-x', onclick: () => { this.shopOpen = false; this.draw(); } }, '×')),
-      el('div', { class: 'build-list' }, el('h3', {}, 'Werkstätten'), ...S.workshops.map(id => row('workshops', id)), el('h3', {}, 'Anhänger'), ...S.containers.map(id => row('containers', id)),
-        S.rigParts.length ? el('h3', {}, 'Rig-Teile') : null, ...S.rigParts.map(id => row('rigParts', id))));
+      // tabs like every other window (#010): LB / RB or Q, also clickable
+      el('div', { class: 'bm-tabs' }, ...keyGlyph('tabs').slice(0, 1), ...SHOP_TABS.filter(([k]) => S[k].length).map(([k, n]) => el('button', { class: 'bm-tab' + (this.shopTab === k ? ' on' : ''), onclick: () => { this.shopTab = k; this.draw(); } }, n)), ...keyGlyph('tabs').slice(1)),
+      el('div', { class: 'build-list' }, ...S[this.shopTab].map(id => row(this.shopTab, id))));
+  }
+  shopTabStep(dir) {
+    const S = shop(this.D), T = SHOP_TABS.map(([k]) => k).filter(k => S[k].length), i = Math.max(0, T.indexOf(this.shopTab));
+    this.shopTab = T[(i + dir + T.length) % T.length];
+    this.sfx.snap?.();
+    this.draw();
   }
 
   // the file of a picture asset, for the catalogue
@@ -342,7 +547,7 @@ export class BuildMode {
     return out;
   }
   // the thing under the pointer: a workshop (rig or yard), a trailer (rig or yard), the dealer's pad
-  pick(x, y) {
+  pick(x, y, quiet = false) {
     const D = this.D, U = this.save.rig.units, camp = this.camp, inside = r => x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1;
     // string lights (#008): the docking points on the container corners, the middle of a hanging string
     if (lightsConfig(D).enabled) {
@@ -355,11 +560,11 @@ export class BuildMode {
     for (const sl of this.slots()) {
       const w = inside(sl) && wsAt(D, this.save.rig, sl.ui, sl.p);
       // Werkstätten › Fest eingebaut (the cryo tank): stays where it is, and so does its container
-      if (w && D.workshops?.[w.id]?.fixed) { this.say(`${D.workshops[w.id].name || w.id} ist fest eingebaut.`); return null; }
+      if (w && D.workshops?.[w.id]?.fixed) { if (!quiet) this.say(`${D.workshops[w.id].name || w.id} ist fest eingebaut.`); return null; }
       if (w) return { kind: 'ws', from: 'rig', ui: sl.ui, at: w.at, id: w.id, slot: sl };
     }
     for (const u of [...camp.geo.units].sort((a, b) => levelOf(b) - levelOf(a))) if (x >= u.x0 && x <= u.x1 && y >= u.inTop - 40 && y <= (u.base ?? camp.ground) + 10) {
-      if (U[u.ui]?.workshops?.some(w => D.workshops?.[w.id]?.fixed)) { this.say('Dieser Container trägt etwas, das bleiben muss.'); return null; }
+      if (U[u.ui]?.workshops?.some(w => D.workshops?.[w.id]?.fixed)) { if (!quiet) this.say('Dieser Container trägt etwas, das bleiben muss.'); return null; }
       return { kind: 'container', from: 'rig', ui: u.ui, id: u.id, unit: u };
     }
     if (camp.dealer && inside(camp.dealer)) return { kind: 'dealer' };
@@ -534,31 +739,37 @@ export class BuildMode {
     if (reason) this.say(reason); else this.draw();
   }
 
-  // ---------- dropping: one action, right away ----------
-  drop() {
-    const d = this.drag, D = this.D, save = this.save, t = this.target();
-    if (!t || t.type === 'home') return this.flyBack(null);
-    const before = snapshot(save);
-    let r, label = '', fxAt = { x: t.x, y: this.camp.ground }, after = null;
+  // would this drop work? Runs the op on the savegame and puts everything back (snapshot / restore) → { ok, reason }
+  tryDrop(d, t) {
+    const save = this.save, snap = snapshot(save), solar = save.solar && { ...save.solar };
+    try { const P = this.plan(d, t); return P.fn ? act(this.D, save, P.fn) : { ok: true }; }
+    catch { return { ok: true }; }
+    finally { restore(save, snap); if (solar) save.solar = solar; }
+  }
+  // what dropping here would do: the draft op, its label and where the dust flies (drop() runs it, the preview tries it on a copy)
+  plan(d, t) {
+    const D = this.D, save = this.save;
+    let fn = null, label = '', fxAt = { x: t.x, y: this.camp.ground }, after = null;
     const name = d.kind === 'ws' ? wsDef(D, d.id).name || d.id : d.kind === 'part' ? D.rigParts?.[d.id]?.name || d.id : D.containers?.[d.id]?.name || d.id;
     const take = dd => d.from === 'rig' ? lift(D, dd, d.ui, d.at) : fromSpare(dd, dd.rig.spare.workshops[d.i]?.uid);
     if (d.kind === 'part') {
       if (t.type === 'socket') {
-        r = act(D, save, dd => mountPart(D, dd, t.sock.slot, t.sock.i, d.from === 'yard' ? { yard: d.i } : { slot: d.slot, i: d.si }));
-        label = r?.swapped ? `${name} angeschraubt, ${D.rigParts?.[r.swapped]?.name || r.swapped} auf dem Schrottplatz` : `${name} angeschraubt`;
+        fn = (dd => mountPart(D, dd, t.sock.slot, t.sock.i, d.from === 'yard' ? { yard: d.i } : { slot: d.slot, i: d.si }));
+        label = r => r?.swapped ? `${name} angeschraubt, ${D.rigParts?.[r.swapped]?.name || r.swapped} auf dem Schrottplatz` : `${name} angeschraubt`;
         fxAt = { x: t.sock.cx, y: t.sock.y1 };
       } else if (t.type === 'yard') {
-        r = act(D, save, dd => unmountPart(D, dd, d.slot, d.si));
+        fn = (dd => unmountPart(D, dd, d.slot, d.si));
         label = `${name} abgeschraubt`; fxAt.yard = 'part';
       } else if (t.type === 'dealer') {
-        r = act(D, save, dd => { if (d.from === 'socket') { const x = unmountPart(D, dd, d.slot, d.si); if (!x.ok) return x; return sellPart(D, dd, dd.rig.spare.parts.length - 1); } return sellPart(D, dd, d.i); });
+        fn = (dd => { if (d.from === 'socket') { const x = unmountPart(D, dd, d.slot, d.si); if (!x.ok) return x; return sellPart(D, dd, dd.rig.spare.parts.length - 1); } return sellPart(D, dd, d.i); });
         label = `${name} verkauft`; after = 'sold';
       }
     } else if (d.kind === 'ws' && t.type === 'slot') {
       const sl = t.slot;
-      r = act(D, save, dd => {
+      fn = (dd => {
         const w = take(dd); if (!w) return { ok: false, reason: 'Weg' };
         const there = wsAt(D, dd.rig, sl.ui, sl.p);
+        if (there && wsDef(D, there.id).fixed) return { ok: false, reason: `${wsDef(D, there.id).name || there.id} ist fest eingebaut` };   // #010: the cryo tank never swaps out
         if (there) {
           const thereAt = there.at; lift(D, dd, sl.ui, sl.p);
           if (!place(D, dd, w, sl.ui, thereAt)) return { ok: false, reason: `${name} passt da nicht hin` };
@@ -573,29 +784,37 @@ export class BuildMode {
       label = `${name} eingebaut`;
       fxAt = { x: t.x, y: sl.y1, unit: sl.ui };
     } else if (d.kind === 'ws' && t.type === 'yard') {
-      r = act(D, save, dd => stow(D, dd, take(dd)));
+      fn = (dd => stow(D, dd, take(dd)));
       label = `${name} ausgebaut`; fxAt.yard = 'ws';
     } else if (d.kind === 'ws' && t.type === 'dealer') {
-      r = act(D, save, dd => { const w = take(dd); toSpare(dd, w); return sellWorkshop(D, dd, w.uid); });
+      fn = (dd => { const w = take(dd); toSpare(dd, w); return sellWorkshop(D, dd, w.uid); });
       label = `${name} verkauft`; after = 'sold';
     } else if (d.kind === 'container' && t.type === 'gap') {
-      r = act(D, save, dd => d.from === 'rig' ? moveContainer(D, dd, d.ui, t.g) : attachAt(D, dd, d.i, t.g));
+      fn = (dd => d.from === 'rig' ? moveContainer(D, dd, d.ui, t.g) : attachAt(D, dd, d.i, t.g));
       label = d.from === 'rig' ? `${name} umgehängt` : `${name} angekuppelt`; after = 'coupled';
       fxAt = { x: t.x, y: this.camp.ground - 40, coupling: true };
     } else if (d.kind === 'container' && t.type === 'stack') {
-      r = act(D, save, dd => stackOn(D, dd, d.from === 'yard' ? { spare: d.i } : { ui: d.ui }, t.onto, t.slot));
+      fn = (dd => stackOn(D, dd, d.from === 'yard' ? { spare: d.i } : { ui: d.ui }, t.onto, t.slot));
       label = `${name} gestapelt`; after = 'stacked';
       fxAt = { x: t.x, y: t.y, unit: t.onto };
     } else if (d.kind === 'container' && t.type === 'yard') {
-      r = act(D, save, dd => detach(D, dd, d.ui));
+      fn = (dd => detach(D, dd, d.ui));
       label = `${name} abgehängt`; fxAt.yard = 'container';
     } else if (d.kind === 'container' && t.type === 'dealer') {
-      r = act(D, save, dd => {
+      fn = (dd => {
         if (d.from === 'rig') { const x = detach(D, dd, d.ui); if (!x.ok) return x; return sellContainer(D, dd, dd.rig.spare.containers.length - 1); }
         return sellContainer(D, dd, d.i);
       });
       label = `${name} verkauft`; after = 'sold';
     }
+    return { fn, label, fxAt, after };
+  }
+
+  // ---------- dropping: one action, right away ----------
+  drop() {
+    const d = this.drag, D = this.D, save = this.save, t = this.target();
+    if (!t || t.type === 'home') return this.flyBack(null);
+    const before = snapshot(save), P = this.plan(d, t), r = P.fn ? act(D, save, P.fn) : null, label = typeof P.label === 'function' ? P.label(r) : P.label, fxAt = P.fxAt, after = P.after;
     if (!r?.ok) return this.flyBack(r?.reason === 'Erst die Werkstätten ausbauen' ? 'Erst die Werkstätten ausbauen, dann abhängen' : r?.reason);
     d.holder.destroy();
     this.drag = null; this.el.classList.remove('dragging');
@@ -613,6 +832,8 @@ export class BuildMode {
   done(r, before, label, fxAt, after, d) {
     const s = this.scene, camp = this.camp, V = this.B.view || {};
     camp.drawRig();
+    this.buzz(after === 'sold' ? 'sell' : 'drop');
+    this.checkKey = null;
     const unit = fxAt.unit != null ? camp.geo.units.find(u => u.ui === fxAt.unit) : null;
     if (fxAt.yard) { const its = camp.yardItems.filter(it => it.kind === fxAt.yard), it = its[its.length - 1]; if (it) fxAt.x = it.x; }   // it lands on the scrapyard's next free spot
     if (after === 'delivered') {
@@ -723,7 +944,7 @@ export class BuildMode {
   }
   update(time, dt) {
     if (!this.active) return;
-    const s = this.scene, g = this.gfx.clear(), d = this.drag, z = s.cam.zoom, D = this.D;
+    const s = this.scene, g = this.gfx.clear(), d = this.drag, z = s.cam.zoom, D = this.D, camp0 = this.camp;
     if (s.drone) s.drone.build = this.B.view?.droneBuilds === false ? null : this.droneTarget();
     if (this.msg?.until && time > this.msg.until) { this.msg = null; this.draw(); }
     for (const t of this.labels) t.destroy();
@@ -783,7 +1004,7 @@ export class BuildMode {
       if (hint !== this.lastHint) { this.lastHint = hint; this.draw(); }
     } else if (this.pointer) {
       // hover: outline what can be grabbed
-      const h = this.pick(this.pointer.x, this.pointer.y), r = h && (h.item || h.slot || h.sock || (h.unit && { x0: h.unit.x0, x1: h.unit.x1, y0: h.unit.inTop - 40, y1: h.unit.base ?? this.camp.ground }) || (h.kind === 'dealer' && this.camp.dealer));
+      const h = this.pick(this.pointer.x, this.pointer.y, true), r = h && (h.item || h.slot || h.sock || (h.unit && { x0: h.unit.x0, x1: h.unit.x1, y0: h.unit.inTop - 40, y1: h.unit.base ?? this.camp.ground }) || (h.kind === 'dealer' && this.camp.dealer));
       if (r) g.lineStyle(lw, 0xffd27a, 0.8).strokeRoundedRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0, 12);
       s.game.canvas.style.cursor = h ? (h.kind === 'dealer' ? 'pointer' : 'grab') : '';
       const text = h ? this.describe(h) : null;
@@ -804,6 +1025,39 @@ export class BuildMode {
       }
       (this.save.rig.lights || []).forEach((_, i) => { const w = this.camp.wire(i); if (!w) return; const m = w.mid, r = 7 / z; g.lineStyle(lw, 0xe86a73, 0.4 + 0.3 * pulse).lineBetween(m.x - r, m.y - r, m.x + r, m.y + r).lineBetween(m.x - r, m.y + r, m.x + r, m.y - r); });
     }
+    // #010 preview at the target: where the held thing would land, green = fits, red = why not (tried on a copy of the savegame)
+    if (d) {
+      const t = this.target();
+      if (t && !['home', 'yard', 'dealer'].includes(t.type)) {
+        const key = [t.type, t.slot?.ui, t.slot?.p, t.sock?.slot, t.sock?.i, t.g, t.onto, t.slot?.slot ?? t.slot].join(':');
+        if (key !== this.checkKey) { this.checkKey = key; this.check = this.tryDrop(d, t); }
+        const ok = this.check?.ok !== false, c = ok ? 0x3fae6a : 0xe86a73;
+        const r = t.slot ? { x0: t.slot.x0 + 8, x1: t.slot.x1 - 8, y0: t.slot.y0 + 8, y1: t.slot.y1 } : t.sock ? t.sock : t.type === 'gap' ? { x0: t.x - 120, x1: t.x + 120, y0: camp0.ground - Math.min(d.hang, 300), y1: camp0.ground } : t.type === 'stack' ? { x0: t.x - (t.w || 240) / 2, x1: t.x + (t.w || 240) / 2, y0: t.y - Math.min(d.hang, 300), y1: t.y } : null;
+        if (r) {
+          g.fillStyle(c, 0.16 + 0.08 * pulse).fillRoundedRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0, 10).lineStyle(lw * 1.4, c, 0.9).strokeRoundedRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0, 10);
+          if (d.kind === 'ws' && t.slot && ok) {
+            const key2 = workshopTexture(s, D, d.id, D.camp), src = s.textures.get(key2).getSourceImage(), need = wsDef(D, d.id).places || 1, w = (r.x1 - r.x0) * need, k = Math.min(w / src.width, (r.y1 - r.y0) / src.height);
+            this.labels.push(s.add.image((r.x0 + r.x1) / 2 + (need - 1) * (r.x1 - r.x0) / 2 * 0, r.y1, key2).setOrigin(0.5, 1).setScale(k).setAlpha(0.45).setTint(0xb8ffd0).setDepth(33));
+          }
+          if (!ok && this.check?.reason) label((r.x0 + r.x1) / 2, r.y0 - 8, this.check.reason, '#e86a73');
+        }
+      } else { this.checkKey = null; this.check = null; }
+    }
+    // controller: AvA's claw point (a small reticle) and the ring while Y / X is held (sell / undo)
+    if (this.ava?.on) {
+      const a = this.ava, rr = 9 / Math.max(0.5, z);
+      g.lineStyle(lw, 0xffd27a, 0.9).strokeCircle(a.x, a.y, rr);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) g.lineBetween(a.x + dx * rr * 1.4, a.y + dy * rr * 1.4, a.x + dx * rr * 2.2, a.y + dy * rr * 2.2);
+      for (const [k2, col2] of [['send', 0xffd27a], ['context', 0x3fe0d0]]) {
+        const pr = this.holdProgress(k2);
+        if (!pr || (k2 === 'send' && !d)) continue;
+        const R = 30 / Math.max(0.5, z);
+        g.lineStyle(lw * 2, 0x0d0a12, 0.7).strokeCircle(a.x, a.y, R);
+        g.lineStyle(lw * 2, col2, 1).beginPath().arc(a.x, a.y, R, -Math.PI / 2, -Math.PI / 2 + pr * Math.PI * 2).strokePath();
+        label(a.x, a.y - R - 6 / z, k2 === 'send' ? `Verkaufen +${de(this.sellOf(d))} Δ` : 'Rückgängig', k2 === 'send' ? '#ffd27a' : '#3fe0d0');
+      }
+    }
+    this.drawTip();
     // Leyla's job: a little progress ring over the spot
     const j = this.job;
     if (j?.state === 'work') {

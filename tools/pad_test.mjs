@@ -153,15 +153,15 @@ if (shots) await page.waitForTimeout(400);
 await shot('inv_shape');
 await ev(() => { const sc = game.scene.getScene('play'); sc.box.save.inv.grids.backpack.items = window.__keep; sc.hud.inv.draw(); });
 await tap(1);
-// Select held in the camp = build the rig; cursor with stick/d-pad, RB jumps to the next part, A packs, B puts back, B finishes; Select = Rig offen/zu
+// Select held in the camp = build the rig; AvA is the pointer (#010): d-pad hops, RB = next area, A packs, B puts back, B finishes; Select = Rig offen/zu
 s = await ev(() => { setPad({ press: [8] }); nomad.step(45); setPad(); nomad.step(40); return { build: !!game.scene.getScene('play').hud.build.active, inv: game.scene.getScene('play').hud.inv.isOpen }; });
 check('Select halten im Camp öffnet Rig bauen (kein Inventar)', s.build && !s.inv, s);
 const bc = () => ev(() => game.scene.getScene('play').hud.build.cursorState());
 await tap(15); await tap(5);
 s = await bc();
-check('Bau-Modus: Cursor erscheint, RB springt zum nächsten Teil', s?.on && s.x > 0, s);
+check('Bau-Modus: AvA wird zum Zeiger, RB wechselt den Bereich', s?.on && s.x > 0 && s.area !== 'all', s);
 await tap(0); s = await bc();
-check('Bau-Modus: A packt das Teil unter dem Cursor', !!s?.drag, s);
+check('Bau-Modus: A packt das Teil unter AvA', !!s?.drag, s);
 await tap(1); await ev(() => nomad.step(20)); s = await bc();
 check('Bau-Modus: B legt es zurück', s && !s.drag, s);
 s = await ev(() => { const h = game.scene.getScene('play').hud, a = h.rigOpen; setPad({ press: [8] }); nomad.step(2); setPad(); nomad.step(2); const b = h.rigOpen; setPad({ press: [8] }); nomad.step(2); setPad(); nomad.step(2); return { a, b, c: h.rigOpen, label: document.querySelector('.bm-openbtn')?.textContent }; });
