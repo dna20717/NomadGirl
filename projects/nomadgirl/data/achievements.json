@@ -1,0 +1,129 @@
+{
+ "plage": {
+  "name": "Plünderer-Plage",
+  "description": "Besiege 25 Plünderer.",
+  "category": "combat",
+  "order": 1,
+  "counter": "kills",
+  "filter": "raider",
+  "target": 25,
+  "recipe": "trophaee_raider_maske",
+  "bonus": [{"stat": "damage", "value": 5}]
+ },
+ "revolverheldin": {
+  "name": "Revolverheldin",
+  "description": "Besiege 30 Gegner mit dem Trommelrevolver.",
+  "category": "combat",
+  "order": 2,
+  "counter": "kills",
+  "filter": "trommelrevolver",
+  "target": 30,
+  "recipe": "trophaee_messing_patrone",
+  "bonus": [{"stat": "crit", "value": 5}]
+ },
+ "ins_schwarze": {
+  "name": "Ins Schwarze",
+  "description": "Erledige 25 Gegner mit einem kritischen Treffer.",
+  "category": "combat",
+  "hidden": true,
+  "order": 3,
+  "counter": "kills",
+  "filter": "crit",
+  "target": 25,
+  "recipe": "trophaee_blech_zielscheibe",
+  "bonus": [{"stat": "ranged", "value": 6}]
+ },
+ "schatzsucherin": {
+  "name": "Schatzsucherin",
+  "description": "Finde alle Secrets im Bunker 13 in einem Run.",
+  "category": "explore",
+  "order": 4,
+  "counter": "secretsAll",
+  "filter": "bunker_13",
+  "target": 1,
+  "recipe": "trophaee_bunker_schluesselbund",
+  "bonus": [{"stat": "secrets", "value": 1}]
+ },
+ "streckenkennerin": {
+  "name": "Streckenkennerin",
+  "description": "Schaffe 10 POIs.",
+  "category": "explore",
+  "order": 5,
+  "counter": "pois",
+  "target": 10,
+  "recipe": "trophaee_delta_petrol_schild",
+  "bonus": [{"stat": "loot", "value": 10}]
+ },
+ "bestnote": {
+  "name": "Bestnote",
+  "description": "Schaffe 3 POIs mit Rang S.",
+  "category": "explore",
+  "order": 6,
+  "counter": "pois",
+  "filter": "S",
+  "target": 3,
+  "recipe": "trophaee_rang_s_abzeichen",
+  "bonus": [{"stat": "sell", "value": 10}]
+ },
+ "gruener_daumen": {
+  "name": "Grüner Daumen",
+  "description": "Ernte 25 Mal in der Hydrokultur.",
+  "category": "cosy",
+  "order": 7,
+  "counter": "harvests",
+  "target": 25,
+  "recipe": "trophaee_goldene_giesskanne",
+  "bonus": [{"stat": "growth", "value": 25}]
+ },
+ "sternekoechin": {
+  "name": "Sterneköchin",
+  "description": "Koche 20 Gerichte.",
+  "category": "cosy",
+  "order": 8,
+  "counter": "cooked",
+  "target": 20,
+  "recipe": "trophaee_goldener_wok",
+  "bonus": [{"stat": "heal", "value": 15}]
+ },
+ "lichterfest": {
+  "name": "Lichterfest",
+  "description": "Häng 6 Lichterketten im Camp auf.",
+  "category": "cosy",
+  "hidden": true,
+  "order": 9,
+  "counter": "lights",
+  "target": 6,
+  "recipe": "trophaee_neon_herz",
+  "bonus": [{"stat": "regen", "value": 1}]
+ },
+ "gut_gekuehlt": {
+  "name": "Gut gekühlt",
+  "description": "Schaffe 10 Runs, ohne dass der Tank kritisch wird.",
+  "category": "ava",
+  "order": 10,
+  "counter": "tankSafeRuns",
+  "target": 10,
+  "recipe": "trophaee_avas_erstes_bild",
+  "bonus": [{"stat": "tankDecay", "value": -10}]
+ },
+ "nie_allein": {
+  "name": "Nie allein",
+  "description": "Lass dich 3 Mal von AvA heimbringen.",
+  "category": "ava",
+  "order": 11,
+  "counter": "knockouts",
+  "target": 3,
+  "recipe": "trophaee_notfall_chip",
+  "bonus": [{"stat": "tankRescue", "value": -15}]
+ },
+ "neuer_anfang": {
+  "name": "Neuer Anfang",
+  "description": "Wach in einem neuen Durchgang auf.",
+  "category": "story",
+  "order": 12,
+  "counter": "cycles",
+  "target": 1,
+  "recipe": "trophaee_traumfaenger",
+  "bonus": [{"stat": "health", "value": 10}]
+ }
+}

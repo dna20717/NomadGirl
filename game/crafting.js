@@ -10,6 +10,7 @@
 import { add, remove, count } from './inventory.js';
 import { containers, advance } from './save.js';
 import { canMaintain, maintain } from './tank.js';
+import { madeOnce, markMade } from './achievements.js';
 
 export const startRecipes = D => Object.entries(D.recipes || {}).filter(([, r]) => (r.discovery || []).includes('start')).map(([id]) => id);
 export const known = (save, id) => (save.recipes || []).includes(id);
@@ -80,10 +81,12 @@ export function craft(D, save, id, ws) {
   if (ws && !recipesFor(D, ws).some(x => x.id === id)) return { ok: false, reason: 'Geht an dieser Werkstatt nicht' };
   if (!D.items?.[r.result] && !D.rigParts?.[r.part] && !r.tank) return { ok: false, reason: 'Rezept ohne Ergebnis' };
   if (r.tank) { const c = canMaintain(D, save, r); if (!c.ok) return c; }
+  if (r.once && madeOnce(save, id)) return { ok: false, reason: 'Schon hergestellt (einmalig)' };   // trophies of achievements (#012)
   if (missing(D, save, r).length) return { ok: false, reason: 'Es fehlen Zutaten' };
   for (const i of r.ingredients || []) take(D, save, i.item, i.count || 1);
   const n = r.count || 1, minutes = r.time ?? 10;
   advance(save, minutes / 60);
+  markMade(D, save, id);
   return { ok: true, recipe: id, made: { ...resultOf(r), n }, left: produce(D, save, r, n), minutes };
 }
 
@@ -104,6 +107,7 @@ export function match(D, ws, pot) {
 export function nearMiss(D, ws, pot) {
   const kinds = new Set(Object.keys(pot).filter(k => pot[k] > 0));
   for (const r of recipesFor(D, ws)) {
+    if (r.once) continue;   // trophies are not guessed (#012)
     const rk = new Set((r.ingredients || []).map(i => i.item));
     const extra = [...kinds].filter(k => !rk.has(k)).length, lack = [...rk].filter(k => !kinds.has(k)).length;
     if (extra + lack === 0 || (extra <= 1 && lack <= 1 && extra + lack >= 1 && rk.size > 1)) return r;
@@ -117,12 +121,14 @@ export function experiment(D, save, ws, pot, rnd = Math.random) {
   const C = D.crafting || {}, st = stock(D, save);
   for (const [id, n] of Object.entries(pot)) if (n > (st[id] || 0)) return { ok: false, reason: `Zu wenig ${D.items?.[id]?.name || id}` };
   if (!Object.values(pot).some(n => n > 0)) return { ok: false, reason: 'Der Topf ist leer' };
-  const r = match(D, ws, pot);
+  let r = match(D, ws, pot);
+  if (r?.once && (!known(save, r.id) || madeOnce(save, r.id))) r = null;   // a trophy comes only from its achievement, once
   if (r) {
     const learnt = learn(save, r.id);
     for (const i of r.ingredients || []) take(D, save, i.item, i.count || 1);
     const n = r.count || 1, minutes = r.time ?? 10;
     advance(save, minutes / 60);
+    markMade(D, save, r.id);
     return { ok: true, hit: true, recipe: r.id, learnt, made: { ...resultOf(r), n }, left: produce(D, save, r, n), minutes };
   }
   const near = C.nearMiss !== false ? nearMiss(D, ws, pot) : null;
@@ -214,4 +220,24 @@ export function salvage(D, save, a, id, ws, n = 1) {
   const minutes = (D.crafting?.salvageTime ?? 5) * n;
   advance(save, minutes / 60);
   return { ok: true, thing: id, n, got, left, minutes };
+}
+
+// ---------- Rezepte automatisch lernen (#012, Daniel, 13.11.2026: „beim Einsammeln automatisch gelernt … landen nicht im Rucksack“) ----------
+// a note, blueprint or cookbook teaches its recipe at once; a recipe that is already known becomes knowledge for the tech tree
+// (⚠️ vorläufig: Kochen & Craften › „Bekanntes Rezept gibt Wissen“). → { recipe, item, learnt, knowledge }
+export const teaches = (D, a, id) => a === 'items' && D.recipes?.[D.items?.[id]?.teaches] ? D.items[id].teaches : null;
+export function learnNote(D, save, grid, e) {
+  const rid = teaches(D, e.a, e.id);
+  if (!rid) return null;
+  let learnt = false, knowledge = 0;
+  const per = D.crafting?.knownKnowledge ?? 1, wis = D.resources?.wissen?.item || 'wissen';
+  for (let k = 0; k < (e.n || 1); k++) { if (!known(save, rid)) learnt = learn(save, rid) || learnt; else knowledge += per; }
+  remove(grid, e);
+  if (knowledge && D.items?.[wis]) { const left = add(D, grid, 'items', wis, knowledge); if (left) give(D, save, wis, left); }
+  return { recipe: rid, item: e.id, learnt, knowledge };
+}
+// every note in a grid (the backpack after picking things up) → list of learnNote results
+export function learnAll(D, save, grid) {
+  if (!grid || D.crafting?.autoLearn === false) return [];
+  return grid.items.filter(e => teaches(D, e.a, e.id)).map(e => learnNote(D, save, grid, e)).filter(Boolean);
 }

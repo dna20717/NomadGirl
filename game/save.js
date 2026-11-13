@@ -8,6 +8,7 @@
 //   'rig:<unit>' = the own storage of the tractor (Kofferraum, plus rows from a Dachbox) or of a trailer (Deichselkasten)
 // Times are hours (18.5 = 18:30). "Ereignis-Zeit": the clock only moves on actions (sleeping, runs, sitting at the fire).
 
+import { keepThrough } from './achievements.js';
 import { ensureMap } from './worldmap.js';
 import { ensureTank } from './tank.js';
 import { newGrid, add, fits, startWear, wearOf, WEAR_KEYS } from './inventory.js';
@@ -127,6 +128,13 @@ export function newCycle(D, old) {
   s.map = null; ensureMap(D, s);   // a new Durchgang, a new map
   s.dreams = [...(old.dreams || []), { day: old.day, hour: old.hour, rescues: old.tank?.rescues || 0, cause: old.tank?.cause || null }];
   for (const id of s.nodes) for (const r of D.techtree[id].recipes || []) if (!s.recipes.includes(r)) s.recipes.push(r);
+  // Achievements (#012): they, their recipes and the trophies stay; ⚠️ vorläufig the trophies wait in a memory chest at the fire
+  const trophies = keepThrough(D, old, s);
+  if (trophies.length) {
+    const grid = newGrid(6, Math.max(3, Math.ceil(trophies.length / 2) + 1));
+    for (const t of trophies) add(D, grid, t.a, t.id, t.n);
+    ((s.ground ??= {})[s.location] ??= []).push({ x: null, feet: null, grid, memory: true });
+  }
   return s;
 }
 function withInventory(D, save) {

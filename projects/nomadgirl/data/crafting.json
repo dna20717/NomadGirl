@@ -16,7 +16,11 @@
   "learnt": "Neues Rezept: {name}",
   "miss": "Daneben. Heraus kommt: {name}",
   "near": "Knapp daneben! Eine Zutat stimmt noch nicht.",
-  "read": "Gelesen und gemerkt: {name}"
+  "read": "Gelesen und gemerkt: {name}",
+  "autoLearn": "Rezept gelernt: {name}",
+  "knowledge": "{name} kennst du schon: +{n} Wissen"
  },
- "salvageTime": 5
+ "salvageTime": 5,
+ "autoLearn": true,
+ "knownKnowledge": 1
 }

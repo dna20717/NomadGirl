@@ -1,7 +1,7 @@
 // The play scene: builds a room from its layout, places Leyla and the enemies, runs input, physics, combat and HUD.
 import { MapUI } from './map_ui.js';
 import { placeOf } from '../worldmap.js';
-import { rescue } from '../tank.js';
+import { rescue, update as tankUpdate, phase as tankPhase } from '../tank.js';
 import { bonuses } from '../techtree.js';
 import { parseRoom, solidRects } from '../../engine/room.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
@@ -25,12 +25,14 @@ import { Loot } from './loot.js';
 import { InventoryUI } from './inventory_ui.js';
 import { FloorStrip } from './floor_strip.js';
 import { skinnedLook, SKIN_LOOKS } from './gun_skins.js';
-import { gearStats, add, GEAR_KEYS } from '../inventory.js';
+import { gearStats, add, GEAR_KEYS, rollLoot } from '../inventory.js';
 import { CraftUI } from './craft_ui.js';
 import { TechtreeUI } from './techtree_ui.js';
 import { BuildMode } from './build_mode.js';
 import { Tutorial } from './tutorial.js';
-import { use as useThing } from '../crafting.js';
+import { AchievementsUI } from './achievements_ui.js';
+import { use as useThing, learnAll, learnNote } from '../crafting.js';
+import { bump, level as achieveLevel, check as achieveCheck, bonuses as trophyBonuses } from '../achievements.js';
 
 const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'], hangOne: ['hang'] };
 
@@ -297,6 +299,7 @@ export class PlayScene extends Phaser.Scene {
     else this.loot = this.mode === 'run' ? new Loot(this) : null;
     this.setupInventory();
     if (this.mode === 'camp') this.camp = new Camp(this, this.box, this.campGeo);
+    if (this.mode === 'camp' && this.box) this.time.delayedCall(this.script ? 0 : 1400, () => this.campNews());
     this.drone.roamArea = this.mode === 'camp' ? { x0: 6 * this.T, x1: (this.campGeo.W - 2) * this.T, ground: this.campGeo.floor * this.T } : null;
     this.drone.roamTo = null;
     this.backdrop?.front();
@@ -344,6 +347,7 @@ export class PlayScene extends Phaser.Scene {
   applyGear() {
     const g = this.box ? { ...gearStats(this.data_, this.box.save.inv?.wear) } : {};
     if (this.box) { const b = bonuses(this.data_, this.box.save); for (const k of ['health', 'damage']) if (b[k]) g[k] = (g[k] || 0) + b[k]; }   // Techtree: passive bonuses count like gear
+    if (this.box) { const b = trophyBonuses(this.data_, this.box.save); for (const k of GEAR_KEYS) if (b[k] && k !== 'tankDecay' && k !== 'droneBattery') g[k] = (g[k] || 0) + b[k]; }   // trophies on the stands (#012)
     for (const k of GEAR_KEYS) { const v = (this.mods[k] || 0) - (this.gearMods?.[k] || 0) + (g[k] || 0); if (v) this.mods[k] = v; else delete this.mods[k]; }
     this.gearMods = g;
     // Cyberware (#006, Daniel, 13.11.2026: Implantate „ermöglichen Doppelsprung und Dash“): with a savegame and Leyla › Fähigkeiten › nur mit Implantat
@@ -370,6 +374,7 @@ export class PlayScene extends Phaser.Scene {
       throwDown: e => hud.scene.loot ? hud.scene.loot.throwDown(e) : null,
       padActive: () => { const p = hud.scene.pad; if (!(p?.active && p.kind)) return false; hud.padHelp?.(p, PAD_ACTIONS); return true; },
       use: id => hud.scene.useThing(id),
+      learn: (g, e) => hud.scene.learnFrom(g, e),
       canThrow: () => !!hud.scene.loot,
       inCamp: () => hud.scene.mode === 'camp',
       gearChanged: () => hud.scene.applyGear(),
@@ -382,7 +387,7 @@ export class PlayScene extends Phaser.Scene {
     hud.craft ??= new CraftUI(hud.root, {
       get D() { return hud.scene.data_; },
       save: () => hud.scene.box.save,
-      changed: () => { clearTimeout(hud.scene.saveTimer); hud.scene.saveTimer = setTimeout(() => hud.scene.box?.persist(), 600); },
+      changed: r => { hud.scene.craftDone(r, hud.craft.ws); clearTimeout(hud.scene.saveTimer); hud.scene.saveTimer = setTimeout(() => hud.scene.box?.persist(), 600); },
       leftover: (id, n) => hud.scene.loot?.throwDown({ a: 'items', id, n, r: 0 }),
       closed: () => hud.scene.craftClosed(),
     });
@@ -398,6 +403,7 @@ export class PlayScene extends Phaser.Scene {
     hud.tech.close(); hud.tech.el.hidden = true;
     // the field guide (#011, game/play/tutorial.js): a card the first time, Menü › Feldhandbuch
     hud.tut ??= new Tutorial(hud.root, { scene: () => hud.scene, hud });
+    hud.ach ??= new AchievementsUI(hud.root, { scene: () => hud.scene });   // Menü › Achievements (#012)
     // the travel map (#007, game/play/map_ui.js): warroom and van door
     hud.map ??= new MapUI(hud.root, {
       get D() { return hud.scene.data_; }, get base() { return hud.scene.base; },
@@ -446,6 +452,7 @@ export class PlayScene extends Phaser.Scene {
   }
   // something moved in an inventory: ground bundles appear or vanish, the savegame is written soon after
   invChanged(key) {
+    this.learnNotes();
     const o = this.hud.inv?.other;
     if (this.loot && o?.kind === 'floor') this.loot.sync(o.pile);
     clearTimeout(this.saveTimer);
@@ -547,8 +554,21 @@ export class PlayScene extends Phaser.Scene {
     const save = this.box.save, C = this.data_.camp || {}, base = this.data_.leyla?.health ?? 100;
     advance(save, C.clock?.runHours ?? 3);
     if (ko) { save.health = Math.round(base * (C.heal?.afterKo ?? 30) / 100); save.inv.grids.backpack.items = []; }   // AvA only brings Leyla: the backpack stays behind
-    const paid = this.level?.payout(this.deltas) ?? this.deltas, rank = !ko && this.level?.done;
+    let paid = this.level?.payout(this.deltas) ?? this.deltas;
+    const rank = !ko && this.level?.done;
+    paid = Math.round(paid * (1 + (trophyBonuses(this.data_, save).sell || 0) / 100));   // Rang-S-Abzeichen & Co. (#012)
     if (!ko) { save.health = Math.round(this.leyla.health); save.deltas += paid; }
+    // achievements (#012): knocked out, or home safe (the tank never went critical in this run), Δ earned
+    const later = list => (save.achievements.news ??= []).push(...list.map(a => a.id));   // announced when the camp is there
+    if (ko) later(bump(this.data_, save, 'knockouts'));
+    else {
+      if (save.tank) tankUpdate(this.data_, save);
+      const ph = tankPhase(this.data_, save), critical = ph.dead || ph.index >= (this.data_.tank?.phases?.length || 5);   // the last phase: KRITISCH
+      if (!critical) later(bump(this.data_, save, 'tankSafeRuns'));
+      if (paid > 0) later(bump(this.data_, save, 'deltas', paid));
+      if (rank) later(bump(this.data_, save, 'pois', 1, [this.level.poi, rank.grade]));
+      if (rank && this.level.secretsMax > 0 && this.level.secrets >= this.level.secretsMax) later(bump(this.data_, save, 'secretsAll', 1, [this.level.poi]));
+    }
     save.buffs = [];
     save.run = null;
     this.hud.inv?.close();
@@ -734,8 +754,76 @@ export class PlayScene extends Phaser.Scene {
     this.drone.react('rescue');
     this.fx.text(this.leyla.x, this.leyla.feet - this.leyla.height - 30, left ? 'Rucksack zurück (nicht alles passt)' : 'Rucksack zurück!', { color: '#ffb3ec', size: 34, rise: 50, life: 1200 });
   }
+  // ---------- Rezepte automatisch lernen + Achievements (#012) ----------
+  // notes, blueprints and cookbooks in the backpack (everything picked up lands there) go straight into the recipe book
+  learnNotes() {
+    const save = this.box?.save, bag = save?.inv?.grids?.backpack;
+    if (!bag?.items.some(e => this.data_.items?.[e.id]?.teaches)) return;
+    this.announceNotes(learnAll(this.data_, save, bag));
+  }
+  // Inventar › Lernen: one note from any grid
+  learnFrom(grid, e) {
+    const r = learnNote(this.data_, this.box.save, grid, e);
+    if (r) this.announceNotes([r]);
+    return r;
+  }
+  announceNotes(list) {
+    const D = this.data_, T = D.crafting?.texts || {}, fill = (t, n, k) => t.replace('{name}', n).replace('{n}', k);
+    for (const r of list) {
+      const name = D.recipes?.[r.recipe]?.name || D.items?.[D.recipes?.[r.recipe]?.result]?.name || r.recipe;
+      if (r.learnt) this.hud.toast(fill(T.autoLearn || 'Rezept gelernt: {name}', name, 0), `Aus: ${D.items?.[r.item]?.name || r.item} · steht im Rezeptbuch`, 'recipe');
+      if (r.knowledge) this.hud.toast(fill(T.knowledge || '{name} kennst du schon: +{n} Wissen', name, r.knowledge), 'Für den Techtree', 'recipe');
+    }
+    if (list.length) { this.achieveLevel('recipes', this.box.save.recipes.length); this.hud.inv?.draw(); }
+  }
+  // counts something for the achievements; reached ones are announced right away
+  achieve(counter, n = 1, tags = []) { if (this.box) this.announce(bump(this.data_, this.box.save, counter, n, tags)); }
+  // before the scene starts anew (sleeping, driving): announced in the fresh camp
+  achieveLater(counter, n = 1, tags = []) { if (this.box) (this.box.save.achievements.news ??= []).push(...bump(this.data_, this.box.save, counter, n, tags).map(a => a.id)); }
+  achieveLevel(counter, value) { if (this.box) this.announce(achieveLevel(this.data_, this.box.save, counter, value)); }
+  // a loot roll; Delta-Petrol-Schild & Co. (#012, Extra-Beute %) give a chance of one more thing
+  lootRoll(table) {
+    const D = this.data_, out = rollLoot(D, table) || [], k = this.box ? trophyBonuses(D, this.box.save).loot || 0 : 0;
+    if (k > 0 && Math.random() * 100 < k) { const x = rollLoot(D, table)?.[0]; if (x) out.push(x); }
+    return out;
+  }
+  // cooking, crafting, experimenting, taking apart (craft_ui.js) count for the achievements
+  craftDone(r, ws) {
+    if (!r?.ok) return;
+    const fn = this.data_.workshops?.[ws]?.function;
+    if (r.thing) return this.achieve('salvaged', r.n || 1);
+    if (r.hit === false) return this.achieve('failures');
+    if (r.hit) this.achieve('experiments');
+    if (r.recipe) this.achieve(fn === 'kitchen' || fn === 'foodtruck' ? 'cooked' : 'crafted', 1, [r.recipe]);
+  }
+  // in the camp: what was reached on the way (run end, a new Durchgang) and what is a state (string lights, recipes)
+  campNews() {
+    const D = this.data_, save = this.box?.save;
+    if (!save || !D.achievements) return;
+    this.learnNotes();
+    const news = [...(save.achievements?.news || [])];
+    if (save.achievements) save.achievements.news = [];
+    const now = [...achieveLevel(D, save, 'lights', save.rig?.lights?.length || 0), ...achieveLevel(D, save, 'recipes', save.recipes?.length || 0), ...achieveCheck(D, save)];
+    const info = id => { const a = D.achievements[id] || {}, rid = D.recipes?.[a.recipe] ? a.recipe : null; return { id, name: a.name || id, recipe: rid, recipeName: rid ? D.recipes[rid].name || rid : null }; };
+    this.announce([...news.filter(id => D.achievements[id]).map(info), ...now]);
+  }
+  announce(list) {
+    if (!list?.length) return;
+    const D = this.data_;
+    list.forEach((a, i) => this.time.delayedCall(i * 900, () => {
+      this.hud.toast(a.name, `Achievement erreicht · ${D.achievements?.[a.id]?.description || ''}`, 'trophy', 5200);
+      this.sfxAchieve?.();
+      if (a.recipe) this.time.delayedCall(700, () => this.hud.toast(`Rezept gelernt: ${a.recipeName}`, `Einmal herstellen an: ${D.workshops?.[D.recipes?.[a.recipe]?.station]?.name || 'Werkbank'} · dann in die Schatzkammer stellen`, 'recipe', 5200));
+    }));
+    this.drone?.react('cleared');
+    clearTimeout(this.saveTimer);
+    this.saveTimer = setTimeout(() => this.box?.persist(), 800);
+  }
+
   onKill(e) {
     this.kills++;
+    const slots = this.box?.save.inv?.slots || {}, h = e.lastHit || {};
+    this.achieve('kills', 1, [e.id, e.d.family, h.kind === 'shot' ? slots.ranged : h.kind === 'melee' ? slots.melee : null, h.crit ? 'crit' : null]);
     this.loot?.fromEnemy(e);
     this.drone.react('kill');
     const [a, b] = e.d.deltas || [0, 0], d = a + Math.floor(Math.random() * (b - a + 1));
@@ -821,7 +909,8 @@ export class PlayScene extends Phaser.Scene {
     const u = this.ui, hud = this.hud, p = this.pad;
     if (!u) return;
     const eat = () => { for (const k of ['jump', 'grab', 'dash', 'up', 'down', 'left', 'right', 'melee', 'ranged', 'reload', 'holster']) if (input[k]) input[k].pressed = false; };
-    if (hud.tut?.isOpen) { hud.tut.nav(u); eat(); input.help.pressed = false; return; }   // the field guide card / archive (#011)
+    if (hud.tut?.isOpen) { hud.tut.nav(u); eat(); input.help.pressed = false; return; }   
+    if (hud.ach?.isOpen) { hud.ach.nav(u); eat(); input.help.pressed = false; return; }   // Menü › Achievements (#012)   // the field guide card / archive (#011)
     if (hud.paused && !hud.modal) { if (u.pressed('ok') || u.pressed('back')) { hud.toggleHelp(false); eat(); input.help.pressed = false; } return; }
     if (hud.modal) {
       if (p?.kind) {   // the keyboard runs the menu through its own keys (hud.menuKey)
@@ -880,7 +969,7 @@ export class PlayScene extends Phaser.Scene {
     // every window pauses the game (Daniel, 12.11.2026: „Fenster pausieren immer, auch im Run“): menus, controls, cooking and the inventory
     let invDone = false;
     if (this.hud.inv?.isOpen && !this.hud.paused && !this.hud.modal && !this.leaving) { this.inventoryUpdate(input); invDone = true; }
-    if (this.hud.tut?.isOpen || this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
+    if (this.hud.tut?.isOpen || this.hud.ach?.isOpen || this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
       // cooking, crafting, a menu: the workshops keep glowing, steaming and sparking behind the window
       if (this.camp && !this.hud.paused && !this.leaving) { this.camp.benches?.update(time, Math.min(delta, 50)); this.camp.lid?.(Math.min(delta, 50)); }
       this.physics.world.pause(); this.hud.update(this, time); return;

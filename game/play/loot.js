@@ -23,8 +23,16 @@ export class Loot {
     this.I = scene.data_.leyla?.inventory || {};
     this.stored = stored;
     // a bundle without a place (savegame repair: a storage that lost its place) lies next to the van's door
-    for (const p of stored || []) if (p.x == null && scene.campGeo) { p.x = scene.campGeo.doorX - 140; p.feet = scene.campGeo.floor * scene.T; }
-    for (const p of stored || []) if (p.grid?.items?.length) this.show({ x: p.x, feet: p.feet, grid: p.grid, sprite: null }, p.x, true);
+    // the memory chest of a new Durchgang (#012) waits by the fire
+    for (const p of stored || []) if (p.x == null && scene.campGeo) { p.x = p.memory && scene.campGeo.fireX ? scene.campGeo.fireX + 150 : scene.campGeo.doorX - 140; p.feet = scene.campGeo.floor * scene.T; }
+    for (const p of stored || []) if (p.grid?.items?.length) {
+      const pile = { x: p.x, feet: p.feet, grid: p.grid, sprite: null, ...(p.memory ? { memory: true } : {}) };
+      this.show(pile, p.x, true);
+      if (p.memory && pile.sprite) {
+        pile.sprite.setTint(0xffd27a).setScale(1.3);
+        pile.tag = scene.add.text(p.x, p.feet - 64, 'Erinnerungskiste', { fontFamily: 'VT323, monospace', fontSize: '26px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 1).setDepth(19);
+      }
+    }
   }
   get range() { return this.I.pickupRange ?? 150; }
 
@@ -71,7 +79,7 @@ export class Loot {
     for (const p of [...this.piles]) if (!p.grid.items.length) { p.sprite?.destroy(); p.tag?.destroy(); this.piles.splice(this.piles.indexOf(p), 1); if (p.pack && this.scene.lostPack === p) this.scene.lostPack = null; }
     this.store();
   }
-  store() { if (this.stored) this.stored.splice(0, this.stored.length, ...this.piles.map(p => ({ x: Math.round(p.x), feet: Math.round(p.feet), grid: p.grid }))); }
+  store() { if (this.stored) this.stored.splice(0, this.stored.length, ...this.piles.map(p => ({ x: Math.round(p.x), feet: Math.round(p.feet), grid: p.grid, ...(p.memory ? { memory: true } : {}) }))); }
   // throw something on the ground: into the bundle in reach, otherwise a new one at Leyla's feet → how many did not fit
   throwDown(e) {
     const D = this.scene.data_, l = this.scene.leyla;
@@ -99,7 +107,7 @@ export class Loot {
   floor() { const l = this.scene.leyla; return this.nearest() || this.make(l.x, l.feet); }
 
   fromEnemy(e) {
-    const t = (e.d.loot && rollLoot(this.scene.data_, e.d.loot)) || [];
+    const t = (e.d.loot && (this.scene.lootRoll ? this.scene.lootRoll(e.d.loot) : rollLoot(this.scene.data_, e.d.loot))) || [];
     // Gegner › Beute › Lässt seine Waffe fallen (#004): what a raider fights with, Leyla can pick up and use
     if (e.d.weapon && this.scene.data_.weapons?.[e.d.weapon] && Math.random() * 100 < (e.d.dropWeapon ?? 0)) t.push({ a: 'weapons', id: e.d.weapon, n: 1 });
     if (t.length) this.drop(e.x, e.feet, t);

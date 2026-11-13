@@ -4,6 +4,8 @@
 // sparks, flames, LEDs, fairy lights, bubbles, fish, a lava lamp, a 3D-printer head and a glint over the guns.
 // Every effect is placed in pixels of the picture and can wait for the evening, for Leyla coming close or for being used.
 // Also: the packed crates on the scrapyard and the workshop picture on its own (in the hand while building, in the van).
+import { displayed } from '../achievements.js';
+import { glowTexture } from './camp.js';
 import { stage } from '../garden.js';
 import { TankView } from './tank_view.js';
 import { occupancy, thing, boxOf } from '../inventory.js';
@@ -101,6 +103,14 @@ export function fillOf(D, grid) {
 
 // ---------- benches in the rig ----------
 // One manager per camp: add() places a workshop picture into a unit's view and remembers its effects; update() animates them.
+// the holo sign over a trophy whose bonus works (#012): short, „+5 % Krit“
+const HOLO = { defense: 'Abwehr', health: 'Leben', damage: 'Schaden', melee: 'Nahkampf', ranged: 'Fernkampf', crit: 'Krit', speed: 'Tempo', jump: 'Sprung', dashCooldown: 'Dash',
+  regen: 'Regen', heal: 'Heilung', droneBattery: 'Akku', tankDecay: 'Tank', tankRescue: 'Rettung', growth: 'Wachstum', loot: 'Beute', sell: 'Δ', secrets: 'Secrets' };
+const PCT = new Set(['defense', 'damage', 'melee', 'ranged', 'crit', 'speed', 'jump', 'dashCooldown', 'heal', 'droneBattery', 'tankDecay', 'tankRescue', 'growth', 'loot', 'sell']);
+function holoText(x) {
+  return (x?.bonus || []).filter(b => b?.stat).map(b => b.stat === 'secrets' ? 'Secrets' : `${b.value > 0 ? '+' : ''}${b.value}${PCT.has(b.stat) ? '%' : ''} ${HOLO[b.stat] || b.stat}`).join(' ') || x?.name || '';
+}
+
 export class Benches {
   constructor(camp) {
     this.camp = camp; this.scene = camp.scene; this.D = camp.D;
@@ -175,6 +185,8 @@ export class Benches {
     bench.trophySig = sig;
     for (const o of bench.trophies) o.destroy();
     bench.trophies = [];
+    const signs = [];   // holo signs placed so far: one above the other when they would overlap
+    const live = new Map(displayed(D, this.camp.box.save).map(d => [d.key + '|' + d.item, d.id]));   // the trophies whose bonus counts (#012)
     bench.def.stands.forEach((st, i) => {
       const g = grids[`store:${bench.place}:s${i}`], [gw, gh] = st.grid || [1, 1];
       if (!g?.items?.length) return;
@@ -189,6 +201,23 @@ export class Benches {
           s.textures.get(t.look).setFilter(Phaser.Textures.FilterMode.NEAREST);
           o = s.add.image(cx - mx, cy - my, t.look, t.icon).setDisplaySize(side * 0.96, side * 0.96).setAngle((e.r || 0) * 90);
         } else o = s.add.text(cx - mx, cy - my, t.glyph || (t.name || e.id).slice(0, 2), { fontFamily: 'VT323, monospace', fontSize: `${Math.max(10, side * 0.7)}px`, color: '#ffd27a' }).setOrigin(0.5);
+        // Holo-Schild (#012): a trophy whose bonus works glows gold underneath and shows its bonus on a small hologram above
+        const aid = live.get(`store:${bench.place}:s${i}|${e.id}`);
+        if (aid) {
+          live.delete(`store:${bench.place}:s${i}|${e.id}`);
+          const glow = s.add.image(cx - mx, cy - my, glowTexture(s)).setDisplaySize(side * 2.2, side * 1.6).setTint(0xffd27a).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.55);
+          const txt = holoText(D.achievements[aid]), fs = Math.max(13, Math.round(side * 0.3));
+          const half = txt.length * fs * 0.3 + 6, sx = Math.max(C.x0 + half, Math.min(C.x1 - half, cx));   // stays inside the treasury
+          let sy = Math.max(C.y0 + fs, cy - side * 0.55);
+          while (signs.some(r => Math.abs(r.x - sx) < r.half + half && Math.abs(r.y - sy) < fs)) sy -= fs + 2;
+          signs.push({ x: sx, y: sy, half });
+          const sign = s.add.text(sx - mx, sy - my, txt, { fontFamily: 'VT323, monospace', fontSize: `${fs}px`, color: '#a6fcdb', backgroundColor: 'rgba(20,52,100,0.55)', padding: { x: 3, y: 0 } }).setOrigin(0.5, 1).setAlpha(0.9);
+          s.tweens.add({ targets: [glow, sign], alpha: { from: 0.5, to: 0.95 }, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+          sign.holo = aid;
+          bench.view.add(glow);
+          bench.view.add(sign);
+          bench.trophies.push(glow, sign);
+        }
         bench.view.add(o);
         bench.trophies.push(o);
       }

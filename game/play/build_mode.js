@@ -829,6 +829,7 @@ export class BuildMode {
     const D = this.D, save = this.save, before = snapshot(save), name = D[area]?.[id]?.name || id;
     const r = act(D, save, dd => area === 'workshops' ? buyWorkshop(D, dd, id) : area === 'rigParts' ? buyPart(D, dd, id) : buyContainer(D, dd, id));
     if (!r.ok) return this.say(r.reason);
+    if (area === 'workshops') this.scene.achieve?.('workshops', 1, [id]);
     if (area === 'rigParts') return this.done(r, before, `${name} gekauft`, { x: this.camp.dealer?.x ?? this.scene.leyla.x, y: this.camp.ground }, 'delivered', { kind: 'part' });
     this.done(r, before, `${name} gekauft`, { x: this.camp.dealer?.x ?? this.scene.leyla.x, y: this.camp.ground }, 'delivered', { kind: area === 'workshops' ? 'ws' : 'container' });
   }
@@ -898,6 +899,7 @@ export class BuildMode {
     this.scene.fx.text((wr.from.x + near.x) / 2, Math.min(wr.from.y, near.y) - 30, `${r.deltas} Δ`, { color: '#ffd27a', size: 36, rise: 60, life: 1100 });
     this.scene.hud.changed?.();
     this.say('Lichterkette aufgehängt', 'ok');
+    this.scene.achieveLevel?.('lights', this.save.rig.lights.length);
   }
   takeDown(i) {
     const before = snapshot(this.save), w = this.camp.wire(i), r = unhang(this.D, this.save, i);

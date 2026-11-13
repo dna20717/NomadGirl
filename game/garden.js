@@ -5,6 +5,7 @@
 //   save.garden['<unit>:<place>'] = [hour planted, …]   one entry per pot (clock hours: day * 24 + hour)
 import { clockHours } from './tank.js';
 import { give } from './crafting.js';
+import { bonuses as trophyBonuses } from './achievements.js';
 
 export const STAGES = 4;
 
@@ -27,7 +28,8 @@ export function bed(D, save, ws, place) {
 export function stage(D, save, ws, place, i) {
   const pot = potsOf(D, ws)[i], c = pot && cropOf(D, ws, pot);
   if (!c) return { stage: 0, p: 0 };
-  const p = Math.max(0, Math.min(1, (clockHours(save) - bed(D, save, ws, place)[i]) / Math.max(0.1, c.hours || 24)));
+  const fast = 1 + Math.max(0, trophyBonuses(D, save).growth || 0) / 100;   // Goldene Gießkanne (#012)
+  const p = Math.max(0, Math.min(1, (clockHours(save) - bed(D, save, ws, place)[i]) * fast / Math.max(0.1, c.hours || 24)));
   return { stage: p >= 1 ? STAGES - 1 : Math.min(STAGES - 2, Math.floor(p * (STAGES - 1))), p, crop: c };
 }
 

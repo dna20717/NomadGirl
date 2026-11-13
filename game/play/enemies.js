@@ -394,6 +394,7 @@ export class Enemy {
   // info: { kind: 'melee' | 'shot' | 'blank', heavy } → 'blocked' when the shield took it
   hit(time, damage, knockback, dir, crit, info = {}) {
     if (!this.alive) return;
+    this.lastHit = { kind: info.kind, crit: !!crit };   // what finished it off (achievements: kills with a weapon, crits)
     const s = this.scene, heavy = !!info.heavy;
     if (this.state === 'lurk') this.fall();
     const front = this.facing === -dir;

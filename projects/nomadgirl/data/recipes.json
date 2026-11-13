@@ -540,5 +540,137 @@
   "count": 1,
   "discovery": ["found"],
   "hint": "Perk + Flaw · Panzerhaut Titan"
+ },
+ "trophaee_raider_maske": {
+  "name": "Raider-Maske",
+  "station": "werkbank",
+  "ingredients": [{"item": "schrott", "count": 4},{"item": "stoffreste", "count": 2},{"item": "panzertape", "count": 1}],
+  "result": "raider_maske",
+  "count": 1,
+  "time": 45,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Plünderer-Plage“"
+ },
+ "trophaee_messing_patrone": {
+  "name": "Messing-Patrone",
+  "station": "werkbank",
+  "ingredients": [{"item": "schrott", "count": 2},{"item": "kupferkabel", "count": 2},{"item": "kronkorken", "count": 10}],
+  "result": "messing_patrone",
+  "count": 1,
+  "time": 45,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Revolverheldin“"
+ },
+ "trophaee_blech_zielscheibe": {
+  "name": "Blech-Zielscheibe",
+  "station": "werkbank",
+  "ingredients": [{"item": "schrottplatte", "count": 1},{"item": "schrauben", "count": 4}],
+  "result": "blech_zielscheibe",
+  "count": 1,
+  "time": 45,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Ins Schwarze“"
+ },
+ "trophaee_bunker_schluesselbund": {
+  "name": "Bunker-Schlüsselbund",
+  "station": "werkbank",
+  "ingredients": [{"item": "schrott", "count": 3},{"item": "kronkorken", "count": 6}],
+  "result": "bunker_schluesselbund",
+  "count": 1,
+  "time": 45,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Schatzsucherin“"
+ },
+ "trophaee_delta_petrol_schild": {
+  "name": "Delta-Petrol-Schild",
+  "station": "werkbank",
+  "ingredients": [{"item": "schrottplatte", "count": 2},{"item": "gluehbirne", "count": 1},{"item": "kupferkabel", "count": 1}],
+  "result": "delta_petrol_schild",
+  "count": 1,
+  "time": 45,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Streckenkennerin“"
+ },
+ "trophaee_rang_s_abzeichen": {
+  "name": "Rang-S-Abzeichen",
+  "station": "werkbank",
+  "ingredients": [{"item": "goldzahn", "count": 1},{"item": "schrauben", "count": 2}],
+  "result": "rang_s_abzeichen",
+  "count": 1,
+  "time": 45,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Bestnote“"
+ },
+ "trophaee_goldene_giesskanne": {
+  "name": "Goldene Gießkanne",
+  "station": "werkbank",
+  "ingredients": [{"item": "schrott", "count": 3},{"item": "rohrbogen", "count": 1},{"item": "tomaten", "count": 2}],
+  "result": "goldene_giesskanne",
+  "count": 1,
+  "time": 45,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Grüner Daumen“"
+ },
+ "trophaee_goldener_wok": {
+  "name": "Goldener Wok",
+  "station": "kochnische",
+  "ingredients": [{"item": "schrottplatte", "count": 1},{"item": "speiseoel", "count": 1},{"item": "gewuerzmischung", "count": 1}],
+  "result": "goldener_wok",
+  "count": 1,
+  "time": 45,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Sterneköchin“"
+ },
+ "trophaee_neon_herz": {
+  "name": "Neon-Herz",
+  "station": "werkbank",
+  "ingredients": [{"item": "gluehbirne", "count": 2},{"item": "kupferkabel", "count": 2},{"item": "batteriezelle", "count": 1}],
+  "result": "neon_herz",
+  "count": 1,
+  "time": 45,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Lichterfest“"
+ },
+ "trophaee_avas_erstes_bild": {
+  "name": "AvAs erstes Bild",
+  "station": "werkbank",
+  "ingredients": [{"item": "schrottplatte", "count": 1},{"item": "stoffreste", "count": 1},{"item": "kuehlmittel", "count": 1}],
+  "result": "avas_erstes_bild",
+  "count": 1,
+  "time": 45,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Gut gekühlt“"
+ },
+ "trophaee_notfall_chip": {
+  "name": "AvAs Notfall-Chip",
+  "station": "werkbank",
+  "ingredients": [{"item": "chip", "count": 1},{"item": "alte_platine", "count": 1}],
+  "result": "notfall_chip",
+  "count": 1,
+  "time": 45,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Nie allein“"
+ },
+ "trophaee_traumfaenger": {
+  "name": "Traumfänger",
+  "station": "werkbank",
+  "ingredients": [{"item": "kupferkabel", "count": 2},{"item": "stoffreste", "count": 2}],
+  "result": "traumfaenger",
+  "count": 1,
+  "time": 45,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Neuer Anfang“"
  }
 }

@@ -3,6 +3,7 @@
 //   Rezeptbuch: known recipes of this kind of workshop with what is on hand (green) or missing (red), "Kochen"/"Herstellen" makes one;
 //               notes in the camp inventories can be read (recipe learnt), companions in the camp give hints for unknown ones.
 //   Experimentieren: click supplies to put one into the pot (right click or click in the pot takes one out), "Ausprobieren" tries it.
+import { madeOnce } from '../achievements.js';
 import { el } from '../ui.js';
 import { hints, NavCursor } from './ui_nav.js';
 import { icon } from '../icons.js';
@@ -69,15 +70,16 @@ export class CraftUI {
   bookEl() {
     const D = this.D, save = this.save, all = recipesFor(D, this.ws), mine = all.filter(r => known(save, r.id)), verb = this.verb();
     const cards = mine.map(r => {
-      const miss = missing(D, save, r), st = stock(D, save);
-      return el('div', { class: 'craft-recipe' + (miss.length ? ' missing' : '') },
+      const miss = missing(D, save, r), st = stock(D, save), made = r.once && madeOnce(save, r.id);   // a trophy (#012): once, then „hergestellt“
+      return el('div', { class: 'craft-recipe' + (miss.length && !made ? ' missing' : '') + (r.once ? ' trophy' : '') + (made ? ' made' : '') },
         el('div', { class: 'craft-rtop' }, (r.tank ? el('span', { class: 'craft-chip big tank' }, `+${r.tank}%`) : r.part ? this.partChip(r.part, r.count || 1) : this.chip(r.result, r.count || 1, { big: true })), el('b', {}, r.name || (r.part ? D.rigParts?.[r.part]?.name : D.items?.[r.result]?.name) || r.id), el('small', {}, `${r.time ?? 10} min`)),
         el('div', { class: 'craft-ings' }, ...(r.ingredients || []).map(i => {
           const n = st[i.item] || 0, need = i.count || 1;
           return el('span', { class: 'craft-ing ' + (n >= need ? 'ok' : 'no') }, markOf(D, 'items', i.item, 18), ` ${D.items?.[i.item]?.name || i.item} ${Math.min(n, 99)}/${need}`);
         })),
         r.tank && r.tankUpTo ? el('small', { class: 'craft-upto' }, `hilft bis Phase ${r.tankUpTo}`) : null,
-        el('button', { class: 'inv-btn', disabled: !!miss.length || (r.tank && !canMaintain(D, save, r).ok), title: miss.length ? 'Es fehlen: ' + miss.map(m => `${m.need - m.have}× ${D.items?.[m.item]?.name || m.item}`).join(', ') : r.tank ? canMaintain(D, save, r).reason || '' : '', onclick: () => this.make(r.id) }, verb));
+        r.once ? el('small', { class: 'craft-upto' }, made ? 'Trophäe · hergestellt' : 'Trophäe · einmalig') : null,
+        made ? null : el('button', { class: 'inv-btn', disabled: !!miss.length || (r.tank && !canMaintain(D, save, r).ok), title: miss.length ? 'Es fehlen: ' + miss.map(m => `${m.need - m.have}× ${D.items?.[m.item]?.name || m.item}`).join(', ') : r.tank ? canMaintain(D, save, r).reason || '' : '', onclick: () => this.make(r.id) }, verb));
     });
     const notes = readable(D, save).filter(x => all.some(r => r.id === x.recipe)).map(x => el('div', { class: 'craft-note' },
       this.chip(x.item, 1), el('span', {}, el('b', {}, D.items[x.item].name || x.item), el('small', {}, D.items[x.item].description || 'Da steht was drauf.')),

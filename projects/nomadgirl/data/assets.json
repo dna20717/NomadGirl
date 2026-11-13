@@ -5158,5 +5158,15 @@
   "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
   "date": "13.11.2026",
   "description": "Bild 2 der Lektion „Ein neuer Durchgang“ (960 px, WebP)."
+ },
+ "icons_trophies": {
+  "name": "Symbole · Trophäen",
+  "kind": "icons",
+  "file": "assets/items/icons_trophies.png",
+  "grid": [4, 3],
+  "cell": [128, 128],
+  "source": "KI (PixelLab, Create Image Pro je Trophäe, AAP-64, Stilbild icons_treasure) + Code (Raster)",
+  "date": "13.11.2026",
+  "description": "Die 12 Trophäen der Achievements (#012), je 2 × 2 Felder, in der Reihenfolge der Achievements."
  }
 }

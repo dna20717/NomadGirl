@@ -281,7 +281,7 @@ function figureTexture(scene, key, color, role) {
   return key;
 }
 
-function glowTexture(scene) {
+export function glowTexture(scene) {
   if (scene.textures.exists('camp_glow')) return 'camp_glow';
   const t = scene.textures.createCanvas('camp_glow', 256, 256), c = t.getContext(), g = c.createRadialGradient(128, 128, 0, 128, 128, 128);
   g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.35, 'rgba(255,255,255,0.45)'); g.addColorStop(1, 'rgba(0,0,0,0)');   // fades to black too: added (ADD) almost-transparent white edges showed as a square (#009)
@@ -1041,6 +1041,7 @@ export class Camp {
     s.hud.menu({ title: def.name || id, sub: [def.description, ...rows].filter(Boolean).join(' · '),
       items: [{ label: n ? `Ernten (${n})` : 'Noch nichts reif', primary: !!n, disabled: n ? null : 'Wächst noch', act: () => {
         const r = harvest(D, save, id, key);
+        const got = r.got.reduce((n, g) => n + g.n, 0); if (got) s.achieve?.('harvests', 1);
         for (const l of r.left) s.loot?.throwDown({ a: 'items', id: l.id, n: l.n, r: 0 });
         this.box.persist?.();
         s.fx.text(s.leyla.x, s.leyla.feet - s.leyla.height - 30, r.got.map(g => `+${g.n} ${D.items?.[g.id]?.name || g.id}`).join(' · ') || 'Nichts geerntet', { color: '#9cdb43', size: 34, rise: 50, life: 1600 });
@@ -1095,6 +1096,7 @@ export class Camp {
         save.health = Math.min(max, Math.max(save.health, s.leyla.health) + max * (C.heal?.sleep ?? 100) / 100);
         if (def.buff && !save.buffs.includes(def.buff)) save.buffs.push(def.buff);
         s.drone.react('sleep');
+        s.achieveLater?.('sleeps');
         s.goCamp({ banner: ['Guten Morgen, Leyla', `${clockText(save)}${def.buff ? ' · ' + (this.D.buffs?.[def.buff]?.name || def.buff) : ''}`], fade: 900 });
       } }, { label: 'Noch nicht', act: () => {} }] });
   }
@@ -1138,6 +1140,7 @@ export class Camp {
     const back = save.waiting[id] || [];
     if (back.length) { save.companions = [...new Set([...save.companions, ...back])]; delete save.waiting[id]; }
     save.location = id;
+    this.scene.achieveLater?.('trips');
     if (save.map && !save.map.visited.includes(id)) save.map.visited.push(id);
     const left = P.staying.map(c => D.companions?.[c]?.name || c), met = back.map(c => D.companions?.[c]?.name || c);
     this.scene.goCamp({ banner: [`Angekommen: ${placeOf(D, save, id)?.name || id}`, [`${clockText(save)} · ${t.km} km · −${de(t.fuel)} l Sprit`, left.length ? `${left.join(', ')} wartet bei ${placeOf(D, save, from)?.name || from}` : '', met.length ? `${met.join(', ')} steigt wieder ein` : ''].filter(Boolean).join(' · ')], fade: 900, arriving: true });

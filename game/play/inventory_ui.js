@@ -3,10 +3,11 @@
 // Mouse: click picks a thing up (it follows the pointer), click on a cell puts it down (stacks or swaps), right click turns it,
 // double click moves it to the other side, a click outside the panels puts it back. Placeholders until things have a look:
 // coloured cells by category with a short glyph, the name and the count.
+import { achievementOf, displayed, bonusText } from '../achievements.js';
 import { el } from '../ui.js';
 import { hints, padInUse, keyGlyph, closeX } from './ui_nav.js';
 import { icon } from '../icons.js';
-import { cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot, IMPLANTS, DRONE_WEAR, WEAR_KEYS, wearOf, gearStats, gearScore, occupancy, statParts } from '../inventory.js';
+import { cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot, IMPLANTS, DRONE_WEAR, WEAR_KEYS, wearOf, gearStats, gearScore, occupancy, statParts, GEAR_STATS } from '../inventory.js';
 import { partSlots, budgets, SLOT_NAMES as PART_SLOT_NAMES } from '../rig.js';
 import { containers as storeList } from '../save.js';
 
@@ -387,7 +388,13 @@ export class InventoryUI {
     const row = x => el('li', {}, ...(this.padOn ? [...keyGlyph(x.k), x.hold ? el('small', {}, 'halten') : null, ' '] : []), x.label);
     // Cyberware (#006): every value on its own line, perks green, flaws red (like Fallout's traits)
     const parts = statParts(t.stats);
-    this.tip.replaceChildren(...[el('b', {}, t.name || e.id), el('small', {}, facts.join(' · ')),
+    // a trophy (#012): its achievement and its bonus, and whether it works right now (only on a stand in a treasury)
+    const aid = e.a === 'items' && achievementOf(D, e.id), save = this.host.save?.();
+    const live = aid && save && displayed(D, save).some(d => d.id === aid);
+    const trophy = aid ? el('div', { class: 'inv-trophy' + (live ? ' live' : '') }, el('small', {}, `Achievement: ${D.achievements[aid].name}`),
+      el('ul', { class: 'inv-perks' }, ...bonusText(D, D.achievements[aid], GEAR_STATS).map(x => el('li', { class: 'perk' }, '▲ ' + x))),
+      el('small', {}, live ? 'Bonus aktiv: steht in der Schatzkammer' : 'Auf einen Trophäen-Ständer in der Schatzkammer stellen, dann wirkt der Bonus')) : null;
+    this.tip.replaceChildren(...[el('b', {}, t.name || e.id), el('small', {}, facts.join(' · ')), trophy,
       parts.length ? el('ul', { class: 'inv-perks' }, ...parts.map(x => el('li', { class: x.good ? 'perk' : 'flaw' }, (x.good ? '▲ ' : '▼ ') + x.text))) : null,
       t.description ? el('p', {}, t.description) : null,
       acts.length ? el('ul', { class: 'inv-acts' }, ...(this.padOn ? acts.filter(x => x.k) : acts).map(row), this.padOn ? null : el('li', { class: 'hint' }, 'Rechtsklick: Aktionen')) : null].filter(Boolean));   // replaceChildren would write "null" as text
@@ -399,7 +406,9 @@ export class InventoryUI {
   actionsFor(key, e) {
     const D = this.D, t = thing(D, e.a, e.id) || {}, out = [], camp = this.host.inCamp?.();
     const b = e.a === 'items' && t.buff && D.buffs?.[t.buff];
-    if (b) out.push({ id: 'use', k: 'context', label: t.category === 'food' ? 'Essen' : b.duration === 'instant' && b.stat === 'health' ? 'Heilen' : 'Benutzen' });
+    // Rezepte lernen (#012): notes that are still lying somewhere (older savegames, chests) teach their recipe on the spot
+    if (e.a === 'items' && t.teaches && D.recipes?.[t.teaches]) out.push({ id: 'learn', k: 'context', label: 'Lernen' });
+    if (b) out.push({ id: 'use', k: out.some(x => x.k === 'context') ? null : 'context', label: t.category === 'food' ? 'Essen' : b.duration === 'instant' && b.stat === 'health' ? 'Heilen' : 'Benutzen' });
     const slot = this.slotFor(e);
     if (slot && !(slot.startsWith('wear:') && IMPLANTS.includes(slot.slice(5)) && !camp))
       out.push({ id: 'equip', k: b ? null : 'context', label: slot.startsWith('wear:') && (IMPLANTS.includes(slot.slice(5)) || DRONE_WEAR.includes(slot.slice(5))) ? 'Einbauen' : 'Ausrüsten' });
@@ -433,6 +442,7 @@ export class InventoryUI {
     const g = this.grid(key);
     if (!g) return;
     if (id === 'use') return this.useFrom(key, g, e);
+    if (id === 'learn') { if (this.host.learn?.(g, e)) this.changed(key); return; }
     if (id === 'equip') return this.equipFrom(key, g, e);
     if (id === 'send') return this.quickMove(key, e);
     if (id === 'drone') { const left = add(this.D, this.inv.grids.drone, e.a, e.id, e.n); if (left === e.n) return this.host.notify?.('AvA hat keinen Platz'); if (left === 0) remove(g, e); else e.n = left; this.changed('drone'); return this.moodAfter('drone', e); }

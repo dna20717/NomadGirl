@@ -30,6 +30,7 @@ export class Hud {
     this.ammo = el('b'); this.dash = el('span', { class: 'hud-dash' }, 'DASH');
     this.time = el('b'); this.kills = el('b'); this.deltas = el('b'); this.roomName = el('span', { class: 'hud-room' });
     this.bannerEl = el('div', { class: 'hud-banner', hidden: true });
+    this.toastsEl = el('div', { class: 'hud-toasts' });   // 🏆 Achievement, 📜 Rezept gelernt (#012): stack top right, go by themselves
     this.promptEl = el('div', { class: 'hud-prompt', hidden: true });
     this.menuEl = el('div', { class: 'hud-menu', hidden: true });
     this.campEl = el('div', { class: 'hud-camp', hidden: true });
@@ -59,7 +60,7 @@ export class Hud {
         el('div', { class: 'hud-right' },
           el('div', { class: 'hud-row' }, this.roomName),
           el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'ZEIT'), this.time, el('span', { class: 'hud-label' }, 'KILLS'), this.kills, el('span', { class: 'hud-label' }, 'Δ'), this.deltas))),
-      this.campEl, this.buildBtn, this.openBtn, this.bannerEl, this.promptEl, this.menuEl, this.help,
+      this.campEl, this.buildBtn, this.openBtn, this.bannerEl, this.toastsEl, this.promptEl, this.menuEl, this.help,
       el('div', { class: 'hud-foot' }, // tidy (#008, Daniel: „HUD aufräumen“): only the menu button and the version; Werkstatt, Startseite and Neues Spiel live in the menu
         el('button', { class: 'hud-menubtn', title: 'Menü (Esc)', onclick: e => { e.currentTarget.blur(); this.pauseMenu(); } }, icon('menu', 14), 'Menü'),
         this.versionEl = el('span', { class: 'hud-version' })));
@@ -98,6 +99,7 @@ export class Hud {
       { label: 'Weiter', primary: true, act: () => {} },
       { label: 'Steuerung', sub: 'Tasten und Controller', act: () => this.toggleHelp(true) },
       { label: 'Feldhandbuch', sub: 'Alle Lektionen mit Clips', act: () => setTimeout(() => this.tut?.openGuide(), 0) },
+      ...(sc.box ? [{ label: 'Achievements', sub: 'Erreicht, offen, Trophäen', act: () => setTimeout(() => this.ach?.open(), 0) }] : []),
       { label: 'Optionen', sub: 'Ton, Schießstil', act: () => setTimeout(() => this.optionsMenu(), 0) },
       ...(this.modeName === 'test' ? [{ label: 'Raum neu starten', sub: 'Rücktaste', act: () => sc.level ? sc.restartAs({}) : sc.restartRoom() }] : []),
       { label: 'Werkstatt', act: () => { location.href = 'workshop.html'; } },
@@ -230,6 +232,15 @@ export class Hud {
     this.bannerEl.hidden = !title;
     this.bannerEl.replaceChildren(...(title ? [el('b', {}, title), el('small', {}, sub), closeX(() => this.banner(null))] : []));
     if (title && ms > 0) this.bannerTimer = setTimeout(() => { if (this.bannerEl.firstChild?.textContent === title) this.banner(null); }, ms);
+  }
+  // a small note that stacks and fades (kind: trophy | recipe | info); → the element
+  toast(title, sub = '', kind = 'info', ms = 4200) {
+    const t = el('div', { class: 'hud-toast ' + kind }, icon(kind === 'trophy' ? 'trophy' : kind === 'recipe' ? 'list' : 'general', 22), el('div', {}, el('b', {}, title), sub ? el('small', {}, sub) : null));
+    this.toastsEl.append(t);
+    while (this.toastsEl.children.length > 4) this.toastsEl.firstChild.remove();
+    setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 450); }, ms);
+    (this.toastLog ??= []).push({ title, sub, kind });
+    return t;
   }
   hurt() { this.root.classList.remove('hud-hurt'); void this.root.offsetWidth; this.root.classList.add('hud-hurt'); }
 

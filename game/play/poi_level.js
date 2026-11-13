@@ -4,6 +4,7 @@
 //   $ camouflaged brittle walls (look like the wall, break the same)   % fake walls (look like the wall, Leyla walks through, they fade; secrets too)
 // After the goal the run is finished; E at the van pays the base money plus the rank bonus (k.o. on the way back = everything gone).
 import { rollLoot } from '../inventory.js';
+import { bonuses as trophyBonuses } from '../achievements.js';
 import { rankRun } from '../../engine/poi.js';
 
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
@@ -71,6 +72,15 @@ export class PoiLevel {
     this.goals = (R.marks.Z || []).map(([x, y]) => ({ x: (x + 0.5) * T, feet: (y + 1) * T, art: s.add.graphics().setDepth(-4), glow: null }));
     for (const z of this.goals) this.drawGoal(z);
     this.secretsMax = this.walls.length + this.fakes.length;
+    // Bunker-Schlüsselbund (#012, Bonus „Secrets schimmern“): hidden walls glimmer pink now and then until they are found
+    this.shimmer = [];
+    if (s.box && trophyBonuses(s.data_, s.box.save).secrets > 0) for (const x of [...this.walls, ...this.fakes]) {
+      const [tx, ty] = x.tiles[Math.floor(x.tiles.length / 2)] || [];
+      if (tx == null) continue;
+      const g = s.add.circle((tx + 0.5) * T, (ty + 0.5) * T, T * 0.45, 0xe45aa8, 0).setBlendMode(Phaser.BlendModes.ADD).setDepth(6);
+      s.tweens.add({ targets: g, fillAlpha: 0.35, duration: 900, yoyo: true, repeat: -1, repeatDelay: 1400, delay: Math.random() * 1500, onUpdate: () => { if (x.open || x.found) g.setVisible(false); } });
+      this.shimmer.push(g);
+    }
   }
 
   // ---------- pictures from code (until there is pixel art) ----------
@@ -153,7 +163,7 @@ export class PoiLevel {
     c.open = true; this.chestsOpened++;
     if (c.sprite) { let f = 0; s.time.addEvent({ delay: 70, repeat: c.frames - 1, callback: () => c.sprite.setFrame(Math.min(c.frames - 1, ++f)) }); }
     else this.drawChest(c);
-    const things = rollLoot(s.data_, this.lootTable);
+    const things = s.lootRoll ? s.lootRoll(this.lootTable) : rollLoot(s.data_, this.lootTable);
     s.fx.sparks(c.x, c.feet - 50, 0xffd27a, 14);
     if (things.length) s.loot?.drop(c.x, c.feet, things, 140);
     else s.fx.text(c.x, c.feet - 90, 'leer …', { color: '#8b949e', size: 36 });
@@ -184,6 +194,7 @@ export class PoiLevel {
       for (const [tx, ty] of w.tiles) { s.fx.sparks((tx + 0.5) * T, (ty + 0.5) * T, 0x8a8490, 10); s.fx.puff((tx + 0.5) * T, (ty + 1) * T, 0x6b6670); }
       s.cam.shake(200, 0.006);
       this.secrets++;
+      s.achieve?.('secrets', 1, [this.poi]);
       s.drone.react('curious');
       s.fx.text((w.x0 + w.x1) / 2 * T, w.y0 * T - 10, `Geheimnis! ${this.secrets}/${this.secretsMax}`, { color: '#e45aa8', size: 46, rise: 70, life: 1500 });
     }
@@ -198,7 +209,7 @@ export class PoiLevel {
     s.cleared = true;   // the clock stops
     // the vault is full (design.md › Ausbaustufe Progression): POIs › Tresor-Beute, plus one extra roll per 10 % rank bonus
     const table = this.P.vault || (D.lootTables?.tresor ? 'tresor' : this.lootTable), extra = Math.floor((r.bonus || 0) / 10), haul = [];
-    const things = [...rollLoot(D, table), ...Array.from({ length: extra }, () => rollLoot(D, table)[0]).filter(Boolean)];
+    const things = [...(s.lootRoll ? s.lootRoll(table) : rollLoot(D, table)), ...Array.from({ length: extra }, () => rollLoot(D, table)[0]).filter(Boolean)];
     for (const t of things) { const same = haul.find(h => h.id === t.id); if (same) same.n += t.n; else haul.push({ ...t }); }
     this.done.haul = haul.map(t => `${t.id}×${t.n}`);
     const z = this.goals[0];
@@ -226,7 +237,7 @@ export class PoiLevel {
     for (const f of this.fakes) {
       if (f.found || b.right < f.x0 * T || b.left > f.x1 * T || b.bottom < f.y0 * T || b.top > f.y1 * T) continue;
       if (!f.tiles.some(([x, y]) => b.right > x * T && b.left < (x + 1) * T && b.bottom > y * T && b.top < (y + 1) * T)) continue;
-      f.found = true; f.fade = 0; this.secrets++;
+      f.found = true; f.fade = 0; this.secrets++; s.achieve?.('secrets', 1, [this.poi]);
       s.drone.react('curious');
       s.fx.text(l.x, l.feet - l.height - 20, `Geheimnis! ${this.secrets}/${this.secretsMax}`, { color: '#e45aa8', size: 46, rise: 70, life: 1500 });
       s.fog?.reveal(true);

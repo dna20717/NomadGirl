@@ -11,6 +11,7 @@ import { parseRoom, TILE_LEGEND } from './room.js';
 import { buildPoi, poiReady } from './poi.js';
 import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
 import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
+import { ACHIEVEMENT_COUNTERS, ACHIEVEMENT_SPECIALS, ACHIEVEMENT_CATEGORIES } from '../game/achievements.js';
 
 const text = (key, label, o = {}) => ({ key, label, type: 'text', ...o });
 const area_ = (key, label, o = {}) => ({ key, label, type: 'textarea', ...o });
@@ -30,6 +31,9 @@ const lines = (key, label, o = {}) => ({ key, label, type: 'lines', ...o });
 const NAME = text('name', 'Name', { required: true });
 const DESCRIPTION = area_('description', 'Beschreibung');
 const VALUE = num('value', 'Wert', { unit: 'Δ', min: 0, hint: 'Verkaufswert in Deltas' });
+// what a trophy can give (Achievements › Bonus): Leyla's gear values (game/inventory.js › GEAR_STATS) plus the tank
+const TROPHY_GEAR = [['defense', 'Abwehr %'], ['health', 'Leben'], ['damage', 'Schaden %'], ['melee', 'Nahkampf %'], ['ranged', 'Fernkampf %'], ['crit', 'Krit-Chance %'], ['speed', 'Tempo %'],
+  ['jump', 'Sprungkraft %'], ['dashCooldown', 'Dash-Abklingzeit %'], ['regen', 'Heilt sich (LP/10 s)'], ['heal', 'Heilung %'], ['droneBattery', 'AvA-Akku %'], ['tankDecay', 'Tank: Verfall %']];
 export const TECH_BONUS = [['tankDecay', 'Tank: Verfall %'], ['tankRescue', 'Tank: Rettung kostet %'], ['tankAccel', 'Tank: Beschleunigung %'],
   ['tankStatus', 'Tank-Anzeige im Run (1 = an)'], ['droneBattery', 'AvA: Akku %'], ['health', 'Leyla: Leben'], ['damage', 'Leyla: Schaden %']];
 const LOOK = ref('look', 'Aussehen', 'assets', { hint: 'Grafik aus dem Bereich Assets' });
@@ -60,7 +64,7 @@ export const IMPLANT_SLOTS = ['eyes', 'nerves', 'arm', 'heart', 'legs', 'skin'];
 export const DRONE_SLOTS = ['bow', 'tail', 'core', 'module'];
 export const BUFF_STATS = [['health', 'Leben'], ['damage', 'Schaden'], ['speed', 'Tempo'], ['defense', 'Abwehr'], ['luck', 'Glück (Beute)'], ['backpack', 'Rucksackplätze'], ['fuel', 'Spritverbrauch']];
 export const BUFF_DURATIONS = [['instant', 'Sofort'], ['run', 'Nächster Run'], ['travel', 'Nächste Reise'], ['seconds', 'Sekunden'], ['permanent', 'Dauerhaft']];
-export const DISCOVERY = [['experiment', 'Experimentieren'], ['found', 'Fund im POI'], ['companion', 'Tipp von Companion'], ['shop', 'Bei NPCs kaufen'], ['start', 'Von Anfang an'], ['techtree', 'Knoten im Techtree']];
+export const DISCOVERY = [['experiment', 'Experimentieren'], ['found', 'Fund im POI'], ['companion', 'Tipp von Companion'], ['shop', 'Bei NPCs kaufen'], ['start', 'Von Anfang an'], ['techtree', 'Knoten im Techtree'], ['achievement', 'Achievement']];
 export const CONTAINER_KINDS = [['shipping', 'Hochseecontainer'], ['crate', 'Holzkiste'], ['trailer', 'Wohnwagenteil'], ['tank', 'Tank']];
 export const WORKSHOP_FUNCTIONS = [['tank', 'Cryo-Tank'], ['garden', 'Hydrokultur'], ['cistern', 'Zisterne'], ['storage', 'Lager'], ['guests', 'Gäste'], ['treasury', 'Schatzkammer'], ['cooling', 'Kühlung'], ['cell', 'Zelle'], ['sleep', 'Schlafen'], ['chill', 'Chillen'], ['drone', 'Drohnen'], ['warroom', 'Planung'], ['kitchen', 'Kochen'], ['foodtruck', 'Verkauf'], ['craft', 'Herstellen'], ['cyber', 'Cyberware (Ripperdoc)'], ['engine', 'Motor'], ['power', 'Energie']];
 export const BENCH_FX = [['light', 'Licht'], ['screen', 'Bildschirm'], ['steam', 'Dampf'], ['smoke', 'Rauch'], ['sparks', 'Funken'], ['flame', 'Flamme'], ['blink', 'LED blinkt'], ['twinkle', 'Lichter funkeln'], ['bubbles', 'Blasen'], ['fish', 'Fische'], ['lava', 'Lavalampe'], ['scan', 'Druckkopf'], ['shine', 'Glanz']];
@@ -771,7 +775,8 @@ export const AREAS = {
       { title: 'Zutaten → Ergebnis', fields: [table('ingredients', 'Zutaten', [ref('item', 'Gegenstand', 'items'), num('count', 'Anzahl', { min: 1 })]),
         ref('result', 'Ergebnis', 'items'), ref('part', 'Oder Rig-Teil', 'rigParts', { hint: 'Statt eines Gegenstands entsteht ein Rig-Teil: es landet auf dem Schrottplatz und wird im Bau-Modus (B) an den Van gezogen' }), num('count', 'Anzahl', { min: 1 }),
         num('tank', 'Oder Tank-Wartung', { unit: '%', min: 0, max: 100, hint: 'Statt eines Ergebnisses: so viel Zustand bekommt der Cryo-Tank zurück (Werkstatt-Art Cryo-Tank)' }), num('tankUpTo', 'Hilft bis Phase', { min: 1, max: 6, hint: 'Ist der Tank schlechter als diese Phase, hilft die Wartung nicht mehr (ein Leck klebt man nicht). Leer = immer' })] },
-      { title: 'Entdecken', fields: [multi('discovery', 'Wie man es lernt', DISCOVERY), area_('hint', 'Hinweis', { hint: 'Was Companions oder Notizzettel andeuten' })] },
+      { title: 'Entdecken', fields: [multi('discovery', 'Wie man es lernt', DISCOVERY), area_('hint', 'Hinweis', { hint: 'Was Companions oder Notizzettel andeuten' }),
+        bool('once', 'Einmalig', { hint: 'Lässt sich nur ein einziges Mal herstellen (Trophäen der Achievements); danach steht es im Rezeptbuch als „hergestellt“' })] },
     ],
     check: (x, report) => {
       if (!(x.ingredients || []).length) report('error', 'Rezept ohne Zutaten');
@@ -779,6 +784,29 @@ export const AREAS = {
       if (x.result && x.part) report('warning', 'Gegenstand und Rig-Teil: das Rig-Teil gewinnt');
       if ((x.ingredients || []).some(i => i.item === x.result)) report('warning', 'Ergebnis ist auch Zutat');
       const kinds = (x.ingredients || []).map(i => i.item); if (new Set(kinds).size !== kinds.length) report('warning', 'Eine Zutat steht doppelt in der Liste (Anzahl erhöhen)');
+    },
+  },
+  achievements: {
+    name: 'Achievements', singular: 'Achievement', icon: 'trophy', file: 'data/achievements.json', kind: 'catalog', groupBy: { key: 'category', options: ACHIEVEMENT_CATEGORIES },
+    hint: 'Achievements & Trophäen (#012, design.md): erreicht → Meldung „🏆 Name“ → das Rezept der Trophäe ist gelernt → an der Werkstatt einmal herstellen → auf einen Trophäen-Ständer in einer Schatzkammer stellen → der Bonus wirkt, solange sie irgendwo im Rig ausgestellt ist. Achievements, Rezepte und Trophäen bleiben über alle Durchgänge.',
+    template: { name: 'Neues Achievement', category: 'combat', counter: 'kills', target: 10, bonus: [] },
+    row: (x, p) => `${x.hidden ? '🔒 ' : ''}${x.target || 1}× ${ACHIEVEMENT_COUNTERS.find(c => c[0] === x.counter)?.[1]?.replace(/ \(.*$/, '') || x.counter || '?'}${x.filter ? ' · ' + x.filter : ''} → ${p?.data.items?.[p?.data.recipes?.[x.recipe]?.result]?.name || x.recipe || 'kein Rezept'}`,
+    sections: [
+      { title: 'Achievement', fields: [NAME, area_('description', 'Text', { hint: 'Was man dafür tun muss (bei versteckten erst nach dem Erreichen sichtbar)' }), select('category', 'Art', ACHIEVEMENT_CATEGORIES),
+        bool('hidden', 'Versteckt', { hint: 'Steht in der Übersicht als „???“, bis es erreicht ist' }), num('order', 'Reihenfolge', { hint: 'In der Übersicht, kleiner = weiter oben' })] },
+      { title: 'Bedingung', fields: [select('counter', 'Zähler', ACHIEVEMENT_COUNTERS, { required: true, hint: 'Was das Spiel zählt. Ein Ereignis ist ein Zähler mit Zielwert 1' }),
+        text('filter', 'Filter', { hint: 'Nur ein Teil des Zählers: Gegner-ID, Familie (raider, mutant …), Waffen-ID, crit, POI-ID, Rang (S, A …) oder Rezept-ID. Leer = alles' }),
+        num('target', 'Zielwert', { min: 1 })] },
+      { title: 'Trophäe & Rezept', fields: [ref('recipe', 'Rezept der Trophäe', 'recipes', { hint: 'Wird beim Erreichen gelernt. Im Rezept: Ergebnis = die Trophäe (Gegenstand mit Tag Trophäe), Einmalig an, Entdecken „Achievement“' })] },
+      { title: 'Bonus', fields: [table('bonus', 'Bonus, solange ausgestellt', [select('stat', 'Wert', [...TROPHY_GEAR, ...ACHIEVEMENT_SPECIALS]), num('value', 'Änderung')],
+        { hint: 'Wirkt, solange die Trophäe auf irgendeinem Trophäen-Ständer im Rig steht, ohne Obergrenze. Prozentwerte: +5 = 5 % mehr' })] },
+    ],
+    check: (x, report, p) => {
+      const r = p.data?.recipes?.[x.recipe], t = r && p.data?.items?.[r.result];
+      if (!x.recipe) report('warning', 'Kein Rezept: das Achievement gibt keine Trophäe');
+      else if (r && !r.once) report('warning', 'Rezept der Trophäe ist nicht „Einmalig“');
+      if (t && !(t.tags || []).includes('trophy')) report('error', 'Die Trophäe braucht den Tag Trophäe, sonst passt sie auf keinen Ständer');
+      if (!(x.bonus || []).length) report('hint', 'Ohne Bonus');
     },
   },
   crafting: {
@@ -792,10 +820,12 @@ export const AREAS = {
         num('failConsume', 'Fehlschlag verbraucht', { unit: '%', min: 0, max: 100, hint: 'Anteil der Zutaten im Topf, der bei einem Fehlschlag weg ist (mindestens 1 je Zutat)' }),
         bool('nearMiss', 'Knapp daneben melden', { hint: 'Fehlt nur eine Zutat (oder eine ist zu viel), sagt das Spiel „Knapp daneben“' }),
         bool('consumeNotes', 'Zettel verbrauchen', { hint: 'Notizzettel, Baupläne und Kochbücher verschwinden beim Lesen' })] },
+      { title: 'Rezepte lernen', fields: [bool('autoLearn', 'Beim Einsammeln lernen', { hint: 'Zettel, Baupläne und Kochbücher landen sofort im Rezeptbuch statt im Rucksack (#012). Was schon in Kiste oder Lager liegt: Schnellaktion „Lernen“ im Inventar' }),
+        num('knownKnowledge', 'Bekanntes Rezept gibt Wissen', { min: 0, hint: 'Ein Zettel für ein Rezept, das Leyla schon kennt, wird zu so viel Wissen (Techtree)' })] },
       { title: 'Fehlschläge', fields: [table('failures', 'Kurioser Müll', [select('function', 'Werkstatt-Art', WORKSHOP_FUNCTIONS), ref('item', 'Gegenstand', 'items'), num('weight', 'Gewicht', { min: 0 }), num('min', 'min', { min: 1 }), num('max', 'max', { min: 1 })],
         { hint: 'Was bei einem Fehlschlag herauskommt, gezogen nach Gewicht. Zeilen ohne Werkstatt-Art gelten überall' })] },
       { title: 'Texte', fields: [text('texts.hit', 'Treffer', { hint: '{name} = Ergebnis' }), text('texts.learnt', 'Neues Rezept', { hint: '{name} = Rezept' }), text('texts.miss', 'Fehlschlag', { hint: '{name} = Müll' }),
-        text('texts.near', 'Knapp daneben'), text('texts.read', 'Zettel gelesen', { hint: '{name} = Rezept' })] },
+        text('texts.near', 'Knapp daneben'), text('texts.read', 'Zettel gelesen', { hint: '{name} = Rezept' }), text('texts.autoLearn', 'Rezept gelernt (Einsammeln)', { hint: '{name} = Rezept' }), text('texts.knowledge', 'Schon bekannt', { hint: '{name} = Rezept, {n} = Wissen' })] },
     ],
     check: (x, report) => { if (!(x.failures || []).length) report('warning', 'Keine Fehlschläge: ein misslungener Versuch ergibt nichts'); },
   },
@@ -1230,6 +1260,7 @@ export const GROUPS = [
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'kits', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
+  ['ACHIEVEMENTS', ['achievements']],
   ['PROGRESSION', ['techtree', 'resources']],
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'companions']],
   ['WELT', ['worldmap', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'travel']],

@@ -5,6 +5,7 @@
 //   D.resources[id] = { name, item, color, hidden, tab, order, darkness }   hidden = not shown (e.g. „Dunkelheit“, multiplier per level)
 //   D.techtree[id]  = { name, description, tab, look, icon, pos: [col, row], cost: [{ resource, count }], requires: [ids],
 //                       recipes: [ids], bonus: [{ stat, value }] }
+import { bonuses as trophyBonuses } from './achievements.js';
 import { stock, take, learn } from './crafting.js';
 import { gearStats } from './inventory.js';
 
@@ -48,6 +49,8 @@ export function bonuses(D, save) {
   for (const id of save?.nodes || []) for (const b of D.techtree?.[id]?.bonus || []) if (b.stat) out[b.stat] = (out[b.stat] || 0) + (Number(b.value) || 0);
   // Cyberware (#006): implants that pull on the tank or on AvA's battery (Reaktor-Herz: Tank-Verfall +30 %) count like Techtree bonuses
   if (save?.inv?.wear) { const g = gearStats(D, save.inv.wear); for (const k of ['tankDecay', 'droneBattery']) if (g[k]) out[k] = (out[k] || 0) + g[k]; }
+  // trophies on the stands (#012): AvAs erstes Bild (Tank-Verfall), Notfall-Chip (Rettung), AvA-Akku
+  const t = trophyBonuses(D, save); for (const k of ['tankDecay', 'tankRescue', 'droneBattery']) if (t[k]) out[k] = (out[k] || 0) + t[k];
   return out;
 }
 

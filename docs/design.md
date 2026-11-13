@@ -213,6 +213,7 @@ Daniel: „Wir benutzen den Trophäenraum, um Achievements zu visualisieren. Ein
 - ⚠️ vorläufig (Ava): Achievement-Trophäen sind unverkäuflich und nicht zerlegbar, sonst wäre der Bonus für immer weg.
 - **Arten:** Kampf, Erkundung (Secrets, POIs), Cosy (Hydrokultur, Kochen, Rig), AvA/Tank, Story; dazu **versteckte** Achievements. Beispiele (Ava): 100 Kopfschüsse mit dem Revolver → Messing-Patrone (+Krit Revolver); alle Secrets im Bunker 13 → Bunker-Schlüsselbund (Secrets leichter sichtbar); 50 Ernten → Goldene Gießkanne; 10 Runs ohne kritischen Tank → AvAs erstes Bild (Tank verfällt langsamer).
 - **Werkstatt:** eigener Bereich „Achievements“: Name, Text, versteckt, Bedingung (Zähler + Zielwert oder Ereignis), Rezept (Zutaten, Werkstatt-Art), Trophäe (Gegenstand mit Tag Trophäe, Symbol, Rastergröße), Bonus (Wert + Prozent oder Spezialeffekt).
+- **Gebaut** als #012 (13.11.2026): 12 Achievements, Zähler, Boni, Holo-Schild, Erinnerungskiste, Übersicht im Pause-Menü; Details `docs/features/achievements.md`.
 - **Idee für später** (nicht entschieden): Ruhm-Punkte je ausgestellter Trophäe, ab Schwellen Titel für Leyla („Wastelandkind“, „Legende von BigCityDelta“), wie die Badass-Ränge.
 
 ## Rig & Werkstätten

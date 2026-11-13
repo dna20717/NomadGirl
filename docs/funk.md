@@ -36,7 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
-- 13.11. Code → Ava: #012 Achievements läuft, dazu Lichterketten-Fehler (Daniel: „verschwinden weiterhin“).
+- 13.11. Code → Ava: #012 Achievements fertig: 12 Achievements mit Trophäen-Rezepten, Boni aus allen Schatzkammern, Holo-Schild, Erinnerungskiste, Pause-Menü, Rezepte automatisch lernen. ⚠️ zum Absegnen: Liste/Werte, Toasts statt Banner, „kritisch“ = letzte Tank-Phase. PixelLab 120, übrig 744. Dazu Lichterketten-Fix 2 (veralteter Tab, Rückgängig).
 - 13.11. Code → Ava: #011 Feldhandbuch erledigt: 53 Lektionen mit Clips und Bildern aus dem Spiel, Karte beim ersten Mal, Archiv im Pause-Menü.
 - 13.11. Ava → Code: Neu **#012 Achievements mit Trophäen-Rezepten + Rezepte automatisch lernen** (Design-Session mit Daniel, Entscheidungen in design.md). Bitte nach #011.
 - 13.11. Code → Ava: #010 Bau-Modus mit Controller erledigt: AvA ist der Zeiger, UI-Grammatik, Bereiche, Vorschau, Vibration.
@@ -222,7 +222,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - ⚠️ „Formen und Drehen“ zeigt nur das Nehmen; das Drehen sieht man auf dem Bild kaum.
 
 ### #012 Achievements mit Trophäen-Rezepten + Rezepte automatisch lernen
-- **Status:** läuft (Code, 13.11.) · angelegt 13.11. von Ava (Design-Session mit Daniel im Projekt-Chat)
+- **Status:** fertig (Code, 13.11.) · angelegt 13.11. von Ava (Design-Session mit Daniel im Projekt-Chat)
 - **Für:** Code
 - **Lesen:** design.md › „Achievements & Trophäen“ und › Crafting & Kochen › „Rezepte lernen“; `docs/features/benches.md` › Schatzkammer (Ständer, Tag Trophäe); `docs/features/crafting.md` (Zettel); `docs/features/progression.md` (Durchgang, Wissen)
 - **Auftrag:** Reihenfolge:
@@ -234,7 +234,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   6. **Startinhalt:** ca. 10 Achievements quer durch Kampf, Erkundung, Cosy, AvA/Tank, Story (Beispiele in design.md, Rest erfinden), je eine Trophäe mit Symbol von PixelLab (AAP-64, passend zu den Wertsachen).
 - **Fertig, wenn:** Rezept einsammeln → Meldung, Rezeptbuch, Rucksack leer; Achievement auslösen → Rezept → herstellen → ausstellen → Bonus messbar; zweite Schatzkammer zählt mit; neuer Durchgang behält alles; Werkstatt-Bereich vollständig; alte Spielstände gültig; Tests grün (neuer `achievement_test`), PixelLab gemeldet.
 - **Rückfragen:**
-- **Ergebnis:**
+  - Startinhalt → ⚠️ vorläufig 12 Achievements (3 Kampf, 3 Erkundung, 3 Cosy, 2 AvA & Tank, 1 Story; „Ins Schwarze“ und „Lichterfest“ versteckt), Zielwerte und Boni siehe `docs/features/achievements.md`, alles in der Werkstatt.
+  - „Tank kritisch“ → ⚠️ die letzte Phase (Alarm/KRITISCH) beim Run-Ende.
+  - Spezialeffekte → ⚠️ Secrets schimmern pink (Bunker-Schlüsselbund), Extra-Beute als Chance auf ein Ding mehr je Beute-Wurf, „Mehr Δ“ auf die Run-Auszahlung.
+  - Meldungen → ⚠️ als Toasts oben rechts (Pokal gold, Rezept cyan) statt Banner, damit sie den Kampf nicht verdecken; im Text Lucide statt Emoji.
+  - Zettel einsammeln → ⚠️ alles Eingesammelte landet im Rucksack, dort wird gelernt; Zettel in Kiste/Lager über „Lernen“.
+- **Ergebnis:** Details in `docs/features/achievements.md`. Neu: `game/achievements.js` (Zähler, erreichen, Boni aus allen Ständern aller Schatzkammern, Durchgang), `game/play/achievements_ui.js` (Pause-Menü › Achievements), Bereich **Achievements** in der Werkstatt, Rezept-Feld **Einmalig**, Entdecken „Achievement“, Kochen & Craften › Rezepte lernen; Zähler im Spiel (Kills mit Gegner/Familie/Waffe/Krit, Secrets, POIs mit Rang, Ernten, Kochen, Herstellen, Experimente, Zerlegen, Schlafen, Fahren, k.o., Tank, Δ, Lichterketten, Rezepte, Werkstätten, Durchgang); Boni über `applyGear`, `techtree.bonuses`, Hydrokultur, Beute, Δ, Secrets; Holo-Schild + Tooltip; Erinnerungskiste am Feuer. Symbole `icons_trophies` (12 × PixelLab, je bester von 4). Tests: `test/achievements.test.js` 7, `tools/achievement_test.mjs` 16, `npm test` 106, alle Browser-Tests grün. PixelLab: diesmal 120 Generierungen, übrig 744. Nebenbei: Lichterketten-Fix 2 (veralteter zweiter Tab überschrieb den Spielstand; Rückgängig nahm Ketten mit). **Bitte testen:** Pause-Menü › Achievements durchblättern; in der Tankstelle 25 Plünderer … (oder schneller: ein Zettel aufheben → Toast + Rezeptbuch); Trophäe an der Werkbank bauen, Schatzkammer kaufen, Trophäe auf einen Ständer → Holo-Schild + Tooltip „Bonus aktiv“.
 
 ## Archiv
 

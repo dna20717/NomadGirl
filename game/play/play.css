@@ -20,6 +20,14 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .hud-reloading.hud-paused { opacity: 0.55; }
 .hud-banner { position: fixed; left: 50%; top: 30%; transform: translateX(-50%); text-align: center; padding: 18px 34px; border-radius: 10px; background: rgba(13, 10, 18, .78); border: 1px solid #5a2a4a; }
 .hud-banner b { display: block; font: 54px/1 VT323, monospace; font-weight: normal; color: #ffd27a; }
+.hud-toasts { position: fixed; right: 24px; top: 110px; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; pointer-events: none; z-index: 40; }
+.hud-toast { display: flex; align-items: center; gap: 12px; padding: 10px 16px; min-width: 260px; max-width: 460px; border-radius: 10px; background: rgba(13, 10, 18, .9); border: 1px solid #3a2f45; color: #d8cfe2; animation: hud-toast-in .35s ease-out; transition: opacity .4s, transform .4s; }
+.hud-toast.out { opacity: 0; transform: translateX(30px); }
+.hud-toast b { display: block; font: 28px/1 VT323, monospace; font-weight: normal; color: #f2eef7; }
+.hud-toast small { display: block; margin-top: 3px; font-size: 13px; color: #b9a2c8; }
+.hud-toast.trophy { border-color: #c28d29; box-shadow: 0 0 18px rgba(255, 210, 122, .25); } .hud-toast.trophy svg, .hud-toast.trophy b { color: #ffd27a; }
+.hud-toast.recipe { border-color: #20d6c7; } .hud-toast.recipe svg { color: #20d6c7; }
+@keyframes hud-toast-in { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
 .hud-banner small { display: block; margin-top: 8px; color: #d8cfe2; font-size: 15px; }
 /* controls panel (H or Menü › Steuerung): two columns, neon field manual (Daniel, 11.11.2026: "zweispaltig, hübsch und cool") */
 .hud-help { position: fixed; inset: 0; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 40%, rgba(40, 14, 52, .55), rgba(8, 6, 12, .86)); backdrop-filter: blur(3px); pointer-events: auto; animation: helpFade .18s ease-out; }
@@ -679,3 +687,24 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .tut-steps li::before { content: counter(st); position: absolute; left: 9px; top: 8px; width: 19px; height: 19px; border-radius: 50%; display: grid; place-items: center; background: #2a2233; color: #8a7d99; font: 600 11px var(--ui-font); }
 .tut-steps li.on { color: #f2eef7; background: #1f1729; border-color: #3a2f45; }
 .tut-steps li.on::before { background: #ffd27a; color: #0d0a12; }
+
+.craft-recipe.trophy { border-color: #c28d29; }
+.craft-recipe.made { opacity: .7; }
+.inv-trophy { margin: 6px 0; padding: 6px 8px; border-radius: 6px; border: 1px solid #5a4a2a; background: rgba(255, 210, 122, .06); }
+.inv-trophy.live { border-color: #c28d29; box-shadow: 0 0 12px rgba(255, 210, 122, .2); }
+.inv-trophy > small:first-child { color: #ffd27a; }
+/* Menü › Achievements (#012) */
+.ach-list { list-style: none; margin: 0; padding: 0 4px 0 0; flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 10px; align-content: start; }
+.ach-card { display: flex; gap: 12px; padding: 10px 12px; border-radius: 10px; background: #1f1729; border: 1px solid #3a2f45; cursor: pointer; }
+.ach-card.on { border-color: #ffd27a; box-shadow: 0 0 0 1px #ffd27a inset; }
+.ach-card.done { background: #241b2c; } .ach-card.live { border-color: #c28d29; box-shadow: 0 0 16px rgba(255, 210, 122, .18); }
+.ach-card.hidden { opacity: .6; }
+.ach-pic { flex: 0 0 64px; height: 64px; display: grid; place-items: center; border-radius: 8px; background: #17111f; }
+.ach-card:not(.done) .ach-pic .inv-art { filter: grayscale(1) brightness(.55); }
+.ach-q { font: 40px/1 VT323, monospace; color: #5a4a6a; }
+.ach-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.ach-text b { font: 24px/1 VT323, monospace; font-weight: normal; color: #f2eef7; } .ach-card.done .ach-text b { color: #ffd27a; }
+.ach-text small { color: #b9a2c8; font-size: 12px; } .ach-trophy { color: #8a7d99 !important; } .ach-state { color: #20d6c7 !important; } .ach-card.live .ach-state { color: #ffd27a !important; }
+.ach-bar { position: relative; height: 14px; border-radius: 7px; background: #120d18; overflow: hidden; margin-top: 2px; }
+.ach-bar i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #c28d29, #ffd27a); }
+.ach-bar span { position: relative; display: block; text-align: center; font: 13px/14px VT323, monospace; color: #f2eef7; }
