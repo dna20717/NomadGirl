@@ -201,6 +201,16 @@ s = await ev(() => { const s = game.scene.getScene('play'), d = s.drone, l = s.l
   const wear = s.box.save.inv.wear, before = d.batteryBonus(); wear.core = 'hochleistungszelle'; const after = d.batteryBonus(); wear.core = null;
   nomad.step(1, [], ['down']); d.parkAt = null; d.parkUntil = 0; nomad.step(200); return { st, moved, still, before, after }; });
 check('Am Greifarm hängend: rechter Stick fliegt Leyla mit; Hochleistungszelle = mehr Akku', s.st === 'hang' && s.moved < -25 && s.still === 'hang' && s.after - s.before === 60, s);
+// ground with several bundles (Daniel, 13.11.2026: „Boden-Inventar scrollbar mit Schulterbuttons“): cursor on the ground = L1/R1 page, elsewhere = tabs
+s = await ev(() => { const s = game.scene.getScene('play'), l = s.leyla, inv = s.hud.inv;
+  s.loot.drop(l.x, l.feet, [{ a: 'items', id: 'schrott', n: 3 }], 10); s.loot.drop(l.x + 30, l.feet, [{ a: 'items', id: 'chip', n: 2 }], 10); s.loot.drop(l.x - 30, l.feet, [{ a: 'items', id: 'panzertape', n: 1 }], 10);
+  s.openFloor(); inv.padOn = true; inv.focusId = 'cell:floor:0:0'; nomad.step(2); return { page: inv.other.page, pages: inv.other.pages }; });
+await tap(5); const p1 = await ev(() => game.scene.getScene('play').hud.inv.other.page);
+await tap(4); await tap(4); const p2 = await ev(() => game.scene.getScene('play').hud.inv.other.page);
+const icons = await ev(() => [...document.querySelectorAll('.inv-pages .pad-ico')].map(i => i.dataset.icon));
+const v0 = await ev(() => { const inv = game.scene.getScene('play').hud.inv; inv.focusId = 'cell:backpack:0:0'; return inv.view + inv.tab; });
+await tap(5); const v1 = await ev(() => { const inv = game.scene.getScene('play').hud.inv; const r = { view: inv.view + inv.tab, page: inv.other?.page }; inv.close(); for (const q of [...game.scene.getScene('play').loot.piles]) q.grid.items = []; nomad.step(3); return r; });
+check('Boden mit mehreren Bündeln: L1/R1 blättern (Cursor am Boden), sonst Tabs', s.pages === 3 && p1 === 1 && p2 === 2 && icons.length === 2 && v1.view !== v0 && v1.page === 2, { s, p1, p2, icons, v0, v1 });
 await ev(() => nomad.release());
 await page.keyboard.down('d'); await page.waitForTimeout(1500); s = await sc(); await page.keyboard.up('d');
 check('Tastatur geht weiter, Hinweis zeigt wieder E', Math.abs(s.vx) > 50 && !s.menu && s.key === 'E' && !s.icon, s);

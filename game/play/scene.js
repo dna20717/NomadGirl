@@ -208,6 +208,8 @@ export class PlayScene extends Phaser.Scene {
     this.hud.pad = this.pad;
     const PI = this.data_.assets?.[this.data_.game?.gamepad?.icons];
     this.hud.padIcons = PI?.kind === 'icons' && PI.file ? { url: new URL(PI.file, this.base).href, grid: PI.grid, cell: Array.isArray(PI.cell) ? PI.cell : [PI.cell, PI.cell], names: PI.names || [], size: this.data_.game?.gamepad?.iconSize } : null;
+    // if the picture does not load (Daniel, 13.11.2026, Stadia: „keine Symbole“), the HUD falls back to the button letters instead of empty gaps
+    if (this.hud.padIcons && !this.hud.padIcons.checked) { const I = this.hud.padIcons, img = new Image(); I.checked = true; img.onerror = () => { I.broken = true; this.hud.padSig = null; }; img.src = I.url; }
     this.fx = new Fx(this);
     this.combat = new Combat(this);
     let def = this.data_.rooms?.[this.roomId];
@@ -360,6 +362,7 @@ export class PlayScene extends Phaser.Scene {
       changed: key => hud.scene.invChanged(key),
       equipChanged: slot => { const sc = hud.scene; if (slot === 'ranged') sc.leyla.loadWeapon(); },
       throwDown: e => hud.scene.loot ? hud.scene.loot.throwDown(e) : null,
+      padActive: () => { const p = hud.scene.pad; if (!(p?.active && p.kind)) return false; hud.padHelp?.(p, PAD_ACTIONS); return true; },
       use: id => hud.scene.useThing(id),
       canThrow: () => !!hud.scene.loot,
       inCamp: () => hud.scene.mode === 'camp',
@@ -429,9 +432,13 @@ export class PlayScene extends Phaser.Scene {
     this.saveTimer = setTimeout(() => this.box?.persist(), 1200);
     if (key) this.hud.inv?.draw();
   }
-  openFloor() {
-    const pile = this.loot.floor();
-    this.hud.inv.open({ key: 'floor', title: this.loot.piles.includes(pile) ? 'Boden · Beute' : 'Boden', grid: pile.grid, kind: 'floor', pile });
+  // the ground: one bundle at a time; with several in reach L1/R1 (cursor on the ground) or the arrows in the header page through them
+  // (Daniel, 13.11.2026: „Boden-Inventar scrollbar mit Schulterbuttons, das macht es einfacher, wenn da viel Zeug liegt“)
+  openFloor(page = 0) {
+    const all = this.loot.inReach(), n = all.length, i = n ? ((page % n) + n) % n : 0, pile = n ? all[i] : this.loot.floor();
+    const inv = this.hud.inv, keep = inv.isOpen && inv.other?.kind === 'floor';
+    inv.open({ key: 'floor', title: this.loot.piles.includes(pile) ? 'Boden · Beute' : 'Boden', grid: pile.grid, kind: 'floor', pile, page: i, pages: Math.max(1, n),
+      flip: d => this.openFloor(i + d) }, keep ? {} : undefined);
   }
   // camp: the chest or a storage place
   openContainer(key) {
@@ -452,9 +459,10 @@ export class PlayScene extends Phaser.Scene {
     const o = inv.other;
     // the ground follows Leyla: another bundle comes into reach
     if (this.loot && o?.kind === 'floor' && !inv.held) {
-      const near = this.loot.nearest();
-      if (near && near !== o.pile && !(o.pile.grid.items.length && this.loot.piles.includes(o.pile) && this.loot.nearest() === o.pile)) this.openFloor();
-      else if (!near && this.loot.piles.includes(o.pile)) this.openFloor();
+      // the shown bundle stays while it is in reach (L1/R1 may have paged to another one); out of reach = the nearest one again
+      const all = this.loot.inReach(), at = all.indexOf(o.pile);
+      if (at < 0 && (all.length || this.loot.piles.includes(o.pile))) this.openFloor();
+      else if (at >= 0 && (all.length !== o.pages || at !== o.page)) this.openFloor(at);
     }
     // walked away from a chest or a shelf
     if (o?.kind === 'container' && Math.abs(this.leyla.x - o.x) > (this.data_.camp?.interactRange ?? 130) * 2) inv.open(null);

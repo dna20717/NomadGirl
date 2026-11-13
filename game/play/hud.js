@@ -187,7 +187,7 @@ export class Hud {
   // size: shown height in px (the cells are drawn large, tools/pad_icons.py; Spiel › Controller › Symbol-Größe)
   padIcon(name, title = '', size = null) {
     const I = this.padIcons, i = I?.names.indexOf(name) ?? -1;
-    if (!I || i < 0) return null;
+    if (!I || I.broken || i < 0) return null;
     const [cw, ch] = I.cell, k = (size ?? I.size ?? 32) / ch, x = i % I.grid[0], y = Math.floor(i / I.grid[0]);
     return el('i', { class: 'pad-ico', title, 'data-icon': name, style: `width:${cw * k}px;height:${ch * k}px;background-image:url("${I.url}");background-size:${I.grid[0] * cw * k}px ${I.grid[1] * ch * k}px;background-position:-${x * cw * k}px -${y * ch * k}px` });
   }

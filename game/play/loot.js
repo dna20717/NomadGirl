@@ -90,6 +90,11 @@ export class Loot {
     for (const p of this.piles) { const d = Math.hypot(p.x - l.x, (p.feet - l.feet) * 1.5); if (d <= bd) { best = p; bd = d; } }
     return best;
   }
+  // every bundle in reach, the nearest first (the ground inventory pages through them: L1/R1 with the cursor on the ground)
+  inReach() {
+    const l = this.scene.leyla, d = p => Math.hypot(p.x - l.x, (p.feet - l.feet) * 1.5);
+    return this.piles.filter(p => d(p) <= this.range && p.grid.items.length).sort((a, b) => d(a) - d(b));
+  }
   // the ground inventory: the nearest bundle in reach, otherwise an empty one at Leyla's feet (appears once something lies in it)
   floor() { const l = this.scene.leyla; return this.nearest() || this.make(l.x, l.feet); }
 

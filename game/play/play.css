@@ -106,6 +106,12 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .inv-panel header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: #ff7ac0; }
 .inv-panel header b { font: 30px/1 VT323, monospace; font-weight: normal; white-space: nowrap; }
 .inv-panel header small { margin-left: auto; color: #ffd27a; font: 20px/1 VT323, monospace; }
+/* the ground: several bundles in reach (L1/R1 or the arrows page through them) */
+.inv-pages { display: inline-flex; align-items: center; gap: 4px; margin-left: 6px; }
+.inv-pages > b { font: 22px/1 VT323, monospace; color: #e8def0; }
+.inv-page { display: inline-flex; align-items: center; gap: 3px; padding: 0 6px; height: 26px; border-radius: 6px; border: 1px solid #5a4a2a; background: #1d1626; color: #ffd27a; font: 22px/1 VT323, monospace; cursor: pointer; }
+.inv-page:hover { border-color: #ffd27a; }
+.inv-page .pad-ico { transform: scale(.7); margin: -5px; }
 .inv-slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 10px; }
 .inv-slots.parts { grid-template-columns: repeat(4, minmax(70px, 1fr)); }
 .inv-slot.part:not(.full) { border-color: #6b5a3a; color: #c9a86a; }

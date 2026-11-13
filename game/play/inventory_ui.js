@@ -82,7 +82,7 @@ export class InventoryUI {
   get isOpen() { return !this.el.hidden; }
   get cell() { return this.D.leyla?.inventory?.cell ?? 44; }
 
-  open(other = null, { tab } = {}) { this.other = other; if (tab) this.tab = tab; this.el.hidden = false; if (padInUse()) this.padOn = true; this.draw(); }
+  open(other = null, { tab } = {}) { this.other = other; if (tab) this.tab = tab; this.el.hidden = false; if (padInUse() || this.host.padActive?.()) this.padOn = true; this.draw(); }   // padActive: opened with the very first controller press
   get vanTab() { return this.tab === 'van' && !!this.host.inCamp?.() && !!this.vanStore(); }
   vanStore() { return storeList(this.D, this.host.save()).find(c => c.unit === 0) || null; }
   setTab(t) { this.tab = t; this.draw(); }
@@ -117,7 +117,7 @@ export class InventoryUI {
     this.pair = this.other ? ['backpack', this.other.key] : ['backpack', 'drone'];
     const left = el('div', { class: 'inv-col' }, this.bagEl(), this.other ? this.otherEl() : null);
     this.el.replaceChildren(closeX(() => this.close()), el('div', { class: 'inv-row' }, left, this.leylaEl(), this.droneEl()),
-      hints([['move', 'wählen'], ['ok', 'nehmen / ablegen'], ['context', 'benutzen (halten: mehr)'], ['send', 'rüber (halten: wegwerfen)'], ['tabs', 'Tab'], ['back', 'zurück']], 'Maus: klicken, Rechtsklick Aktionen, Doppelklick rüber, daneben = Boden'));
+      hints([['move', 'wählen'], ['ok', 'nehmen / ablegen'], ['context', 'benutzen (halten: mehr)'], ['send', 'rüber (halten: wegwerfen)'], ['tabs', this.other?.pages > 1 ? 'Tab · am Boden: Bündel' : 'Tab'], ['back', 'zurück']], 'Maus: klicken, Rechtsklick Aktionen, Doppelklick rüber, daneben = Boden'));
     this.fit();
     this.drawGhost();
     this.padShow();
@@ -142,10 +142,16 @@ export class InventoryUI {
       el('header', {}, icon('bags', 16), el('b', {}, bp?.name || 'Rucksack'), el('small', {}, `${worth(D, inv.grids.backpack)} Δ`)),
       this.gridEl('backpack', inv.grids.backpack));
   }
+  // the shoulder button that pages (controller only, keyGlyph shows L1 / R1 or LB / RB)
+  pageKey(i) { return this.padOn && padInUse() ? [keyGlyph('tabs')[i]].filter(Boolean) : []; }
   otherEl() {
     const D = this.D, o = this.other;
     return el('section', { class: 'inv-panel' + (o.kind === 'floor' ? ' floor' : '') },
-      el('header', {}, icon(o.kind === 'floor' ? 'down' : 'box', 16), el('b', {}, o.title), el('small', {}, `${worth(D, o.grid)} Δ`)),
+      el('header', {}, icon(o.kind === 'floor' ? 'down' : 'box', 16), el('b', {}, o.title),
+        // several bundles in reach: page through them (L1/R1 with the cursor on the ground, or the arrows)
+        o.pages > 1 ? el('span', { class: 'inv-pages' }, el('button', { class: 'inv-page', title: 'Vorheriges Bündel', onclick: () => o.flip(-1) }, ...this.pageKey(0), '‹'),
+          el('b', {}, `${o.page + 1} / ${o.pages}`), el('button', { class: 'inv-page', title: 'Nächstes Bündel', onclick: () => o.flip(1) }, '›', ...this.pageKey(1))) : null,
+        el('small', {}, `${worth(D, o.grid)} Δ`)),
       this.gridEl(o.key, o.grid),
       // trophy stands of the treasury: one small grid each, side by side
       o.extra?.length ? el('div', { class: 'inv-stands' }, ...o.extra.map(x => el('div', { class: 'inv-stand' }, el('small', {}, icon('star', 12), x.title), this.gridEl(x.key, x.grid)))) : null,
@@ -600,6 +606,8 @@ export class InventoryUI {
     }
     if (p.pressed('back')) { if (this.held) this.putBack(); else return this.close(); }
     for (const [a, d] of [['prev', -1], ['next', 1]]) if (p.pressed(a)) {
+      // the cursor on the ground with several bundles in reach: L1/R1 page through them instead of the tabs
+      if (f.key != null && f.key === this.other?.key && this.other.pages > 1 && this.other.flip) { this.other.flip(d); continue; }
       const tabs = [...this.el.querySelectorAll('.inv-tab')], i = tabs.findIndex(t => t.classList.contains('on'));
       const t = tabs[(i + d + tabs.length) % tabs.length];
       if (tabs.length > 1 && t) t.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }));
