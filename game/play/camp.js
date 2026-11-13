@@ -2,6 +2,7 @@
 // (dollhouse: every container shows its workshops), a campfire, companions with speech bubbles and day/night.
 // Leyla walks around and uses things with E. Time only moves on actions (sleeping, sitting at the fire, driving, runs).
 // Graphics are code placeholders for now; a "look" on containers, workshops or companions takes over later.
+import { ensureMap, placeOf, roadKm } from '../worldmap.js';
 import { potsOf, stage, ripe, harvest, STAGES } from '../garden.js';
 import { clockText, advance, hoursUntil, containers } from '../save.js';
 import { budgets, partSlots, passengers } from '../rig.js';
@@ -854,7 +855,7 @@ export class Camp {
       const P = passengers(this.D, this.box.save), nm = c => this.D.companions?.[c]?.name || c, waiting = Object.entries(this.box.save.waiting || {});
       return s.hud.menu({ title: def.name || id, sub: [def.description, P.guests.length ? `Gäste an Bord: ${P.riding.map(nm).join(', ') || '–'} · ${P.beds} ${P.beds === 1 ? 'Bett' : 'Betten'} im Rig.` : `${P.beds} ${P.beds === 1 ? 'Bett' : 'Betten'} frei für Fahrgäste.`,
         P.staying.length ? `Kein Bett für ${P.staying.map(nm).join(', ')}: ${P.staying.length > 1 ? 'sie bleiben' : 'bleibt'} beim nächsten Fahren hier.` : null,
-        waiting.length ? 'Wartet: ' + waiting.map(([loc, ids]) => `${ids.map(nm).join(', ')} bei ${this.D.locations?.[loc]?.name || loc}`).join(' · ') : null].filter(Boolean).join(' '), items: [{ label: 'Zurück', act: () => {} }] });
+        waiting.length ? 'Wartet: ' + waiting.map(([loc, ids]) => `${ids.map(nm).join(', ')} bei ${placeOf(this.D, this.box.save, loc)?.name || loc}`).join(' · ') : null].filter(Boolean).join(' '), items: [{ label: 'Zurück', act: () => {} }] });
     }
     const who = (this.box.save.companions || []).map(c => this.D.companions?.[c]).filter(c => c?.workshops?.includes(id)).map(c => c.name);
     if (def.rest?.verb) return this.restMenu(id, def, place, who);
@@ -902,9 +903,10 @@ export class Camp {
       } }, { label: 'Zurück', act: () => {} }] });
   }
   vanMenu(ids) {
-    if (!ids.length) return this.scene.hud.menu({ title: 'Van', sub: 'Keine Werkstätten im Van.', items: [{ label: 'Zurück', act: () => {} }] });
+    if (!ids.length) return this.openMap();   // nothing else in the van: straight to the map
     this.scene.hud.menu({ title: this.D.tractors?.[this.geo.tractor.id]?.name || 'Van', sub: 'Was willst du im Van machen?',
-      items: [...ids.map(w => { const d = this.D.workshops?.[w.id] || {}; return { label: `${VERB[d.function] || 'Ansehen'} · ${d.name || w.id}`, act: () => this.use(w.id) }; }), { label: 'Zurück', act: () => {} }] });
+      items: [{ label: 'Karte · Reisen', sub: 'Die Reisekarte: hier plündern oder weiterfahren', primary: true, act: () => this.openMap() },
+        ...ids.map(w => { const d = this.D.workshops?.[w.id] || {}; return { label: `${VERB[d.function] || 'Ansehen'} · ${d.name || w.id}`, act: () => this.use(w.id) }; }), { label: 'Zurück', act: () => {} }] });
   }
   sleep(def) {
     const s = this.scene, box = this.box, save = box.save, C = this.C, max = s.leyla.maxHealth;
@@ -931,32 +933,19 @@ export class Camp {
     if (!S.look || !s.textures.exists(S.look)) return rest();
     l.startSit(S, this.geo.fireX + side * (S.distance ?? 150), -side, sat => { if (sat >= (S.minSeconds ?? 3)) rest(); });
   }
-  // Warroom: plunder the POI here, or drive somewhere else
+  // Warroom: the travel map (#007) with the POI here, the places to drive to, and the techtree / Auswerten in its header
   warroom() {
-    const s = this.scene, D = this.D, save = this.box.save, here = D.locations?.[save.location];
-    const items = [];
-    if (here?.poi && D.pois?.[here.poi]) {
-      const p = D.pois[here.poi];
-      items.push({ label: `Plündern: ${p.name}`, sub: `Gefahr ${'●'.repeat(p.danger || 1)} · ein Run dauert ${this.C.clock?.runHours ?? 3} h${save.buffs.length ? ' · Buffs: ' + save.buffs.map(b => D.buffs?.[b]?.name || b).join(', ') : ''}`,
-        primary: true, act: () => s.startRun(here.poi) });
-    }
-    if (Object.keys(D.techtree || {}).length) {
-      const n = Object.keys(D.techtree).length, mine = (save.nodes || []).filter(x => D.techtree[x]).length;
-      items.push({ label: 'Techtree', sub: `${mine} von ${n} Knoten · bleibt über alle Durchgänge`, act: () => { s.hud.inv?.close(); s.hud.tech?.open(); } });
-    }
+    const s = this.scene, D = this.D, save = this.box.save, extras = [];
+    if (Object.keys(D.techtree || {}).length) extras.push({ label: 'Techtree', icon: 'tree', act: () => { s.hud.inv?.close(); s.hud.tech?.open(); } });
     const wr = this.rigWorkshop?.('warroom') || Object.keys(D.workshops || {}).find(k => D.workshops[k].function === 'warroom');
-    if (wr) items.push({ label: 'Auswerten', sub: 'Datenträger, Zettel und Kurioses zerlegen: Wissen für den Techtree', act: () => { s.hud.inv?.close(); s.hud.craft?.open(wr, 'salvage'); } });
-    for (const [id, loc] of Object.entries(D.locations || {})) {
-      if (id === save.location) continue;
-      const t = travelCost(D, save, id), p = D.pois?.[loc.poi];
-      items.push({ label: `Hinfahren: ${loc.name}`, sub: `${t.km} km · ${de(t.hours)} h · ${de(t.fuel)} l Sprit · ${loc.region || ''}${p ? ' · Gefahr ' + '●'.repeat(p.danger || 1) : ''}`,
-        disabled: this.tooHeavy ? `Rig zu schwer (${this.budget.weight} von ${this.budget.pull} kg)` : t.fuel > save.fuel ? 'Zu wenig Sprit' : null, act: () => this.drive(id, t) });
-    }
-    items.push({ label: 'Zurück', act: () => {} });
-    const P = passengers(D, save), names = ids => ids.map(c => D.companions?.[c]?.name || c).join(' und ');
-    const guests = P.guests.length ? ` · Gäste ${P.guests.length}/${P.beds} Betten${P.staying.length ? `: ${names(P.staying)} ${P.staying.length > 1 ? 'bleiben' : 'bleibt'} beim Fahren hier (keine freie Gästekoje)` : ''}` : '';
-    s.hud.menu({ title: 'Warroom', sub: `Du bist bei ${here?.name || '–'}. Sprit ${de(save.fuel)} l · Vorräte ${de(save.food)}${guests}`, items });
+    if (wr) extras.push({ label: 'Auswerten', icon: 'research', act: () => { s.hud.inv?.close(); s.hud.craft?.open(wr, 'salvage'); } });
+    this.openMap({ extras });
   }
+  // the travel map at the warroom and at the van door (Daniel: „Beides“)
+  openMap(opts = {}) { const s = this.scene; s.hud.inv?.close(); ensureMap(this.D, this.box.save); s.hud.map?.open(opts); }
+  // why the rig cannot drive (too heavy, too little fuel)
+  driveBlocked(t) { const save = this.box.save; return this.tooHeavy ? `Rig zu schwer (${this.budget.weight} von ${this.budget.pull} kg)` : t.fuel > save.fuel ? 'Zu wenig Sprit' : null; }
+  plunderHere() { const here = placeOf(this.D, this.box.save); if (here?.poi && this.D.pois?.[here.poi]) this.scene.startRun(here.poi); }
   drive(id, t) {
     const save = this.box.save, D = this.D;
     advance(save, t.hours);
@@ -969,8 +958,9 @@ export class Camp {
     const back = save.waiting[id] || [];
     if (back.length) { save.companions = [...new Set([...save.companions, ...back])]; delete save.waiting[id]; }
     save.location = id;
+    if (save.map && !save.map.visited.includes(id)) save.map.visited.push(id);
     const left = P.staying.map(c => D.companions?.[c]?.name || c), met = back.map(c => D.companions?.[c]?.name || c);
-    this.scene.goCamp({ banner: [`Angekommen: ${D.locations?.[id]?.name || id}`, [`${clockText(save)} · ${t.km} km · −${de(t.fuel)} l Sprit`, left.length ? `${left.join(', ')} wartet bei ${D.locations?.[from]?.name || from}` : '', met.length ? `${met.join(', ')} steigt wieder ein` : ''].filter(Boolean).join(' · ')], fade: 900, arriving: true });
+    this.scene.goCamp({ banner: [`Angekommen: ${placeOf(D, save, id)?.name || id}`, [`${clockText(save)} · ${t.km} km · −${de(t.fuel)} l Sprit`, left.length ? `${left.join(', ')} wartet bei ${placeOf(D, save, from)?.name || from}` : '', met.length ? `${met.join(', ')} steigt wieder ein` : ''].filter(Boolean).join(' · ')], fade: 900, arriving: true });
   }
 
   // ---------- loop ----------
@@ -1074,8 +1064,8 @@ const SOON = { foodtruck: 'Verkaufen kommt später.', power: 'Liefert Energie f�
 
 // distance, hours, fuel and food for driving from the current place to a location
 export function travelCost(D, save, to) {
-  const a = D.locations?.[save.location]?.position || [0, 0], b = D.locations?.[to]?.position || [0, 0], Tr = D.travel || {};
-  const km = Math.round(Math.hypot(b[0] - a[0], b[1] - a[1]));
+  const a = placeOf(D, save, save.location), b = placeOf(D, save, to), Tr = D.travel || {};
+  const km = a && b ? roadKm(D, a, b) : 0;   // along the road on the map (#007)
   const tons = save.rig.units.filter(u => u.kind === 'container').reduce((n, u) => n + (D.containers?.[u.id]?.weight || 0), 0) / 1000;
   const fuelUse = D.tractors?.[save.rig.tractor]?.fuelUse ?? 12;
   const hours = Math.max(0.25, Math.round(km / (Tr.speed || 40) * 4) / 4);

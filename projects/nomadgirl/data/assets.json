@@ -4252,5 +4252,49 @@
   "source": "KI (PixelLab, Create Image Pro je Implantat, AAP-64, bester von bis zu 16 Kandidaten) + Code (tools/cyberware_icons.py)",
   "date": "13.11.2026",
   "description": "Cyberware (#006) für Gegenstände der Größe 1 × 2, 64 px je Feld. Stufe 1 Schrott-Grau mit Cyan-LED, Stufe 2 Chrom, Stufe 3 (Perk + Flaw) Schwarz-Gold mit rotem Glühen und Warnstreifen. Einzelbilder in assets/items/cyberware/."
+ },
+ "map_paper": {
+  "name": "Reisekarte · Papier",
+  "kind": "image",
+  "file": "assets/map/paper.png",
+  "source": "KI (PixelLab, Create Image Pro 688 × 384, AAP-64; Rand per Code abgeschnitten)",
+  "date": "13.11.2026",
+  "derivedFrom": "map_paper_source",
+  "description": "Verwitterte, leere Touristen-Karte der 60er: Falze, Höhenlinien, Salzsee, Kaffeering. Straßen, Orte und Marken zeichnet das Spiel darauf (#007)."
+ },
+ "map_paper_source": {
+  "name": "Reisekarte · Papier (Original)",
+  "kind": "source",
+  "file": "assets/map/raw/paper.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64)",
+  "date": "13.11.2026"
+ },
+ "map_paper_alt": {
+  "name": "Reisekarte · Papier (Alternative, Falzraster)",
+  "kind": "image",
+  "file": "assets/map/paper_alt.png",
+  "source": "KI (PixelLab, Create Image Pro 688 × 384, AAP-64)",
+  "date": "13.11.2026",
+  "description": "Zweite Fassung: helles Papier mit Falzraster 4 × 2, Kaffeeringe, türkise Flächen."
+ },
+ "map_logos": {
+  "name": "Symbole · Marken der Spielwelt",
+  "kind": "icons",
+  "file": "assets/map/logos.png",
+  "cell": [64, 64],
+  "grid": [4, 2],
+  "names": [
+   "Delta Petrol",
+   "Neon-Nudel",
+   "Kessler Kybernetik",
+   "AtomCola",
+   "Motel Salzsee",
+   "Ordnungsamt Delta",
+   "Krähe & Söhne Schrott",
+   "Kilometerkönig"
+  ],
+  "source": "KI (PixelLab, Create Image Pro je Marke, AAP-64, bester von 16 Kandidaten) + Code (Raster)",
+  "date": "13.11.2026",
+  "description": "Logos im Stil der 60er-Werbung für die Reisekarte (#007), Einzelbilder in assets/map/logos/."
  }
 }

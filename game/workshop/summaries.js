@@ -4,6 +4,8 @@ import { el } from '../ui.js';
 import { ROOM_TAGS } from '../../engine/project.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
 import { parseRoom } from '../../engine/room.js';
+import { generateMap, neighbours } from '../worldmap.js';
+import { drawMap } from '../map_render.js';
 
 const ROOM_COLORS = { '#': '#8b919c', '=': '#d4a72c', H: '#5fb4d9', o: '#e45aa8', L: '#3fe0d0', C: '#c08a4a', S: '#7ee0a0', D: '#5b8a6a', B: '#6e5a7a', Z: '#ffd27a', 1: '#ff8a5c', A: '#b0b8c4', '^': '#3fe0d0', v: '#3fe0d0', '*': '#fff2a8', '%': '#9a7ab8', $: '#8a6e9a' };
 const ROOM_LEGEND = [['#', 'Wand'], ['=', 'Plattform'], ['H', 'Leiter'], ['o', 'Seil'], ['L', 'Start'], ['x', 'Gegner'], ['C', 'Kiste'], ['S', 'Schalter'], ['D', 'Tür'], ['B', 'Brüchig'], ['%', 'Scheinwand'], ['$', 'Getarnt brüchig'], ['Z', 'Ziel'], ['^', 'Abkürzung'], ['*', 'Lampe']];
@@ -153,6 +155,23 @@ export const SUMMARY = {
       ['Gegner', Object.entries(count).map(([n, k]) => `${k}× ${n}`).join(', ') || 'keine'],
       ['Leitern · Seile · Plattformen', `${r.ladders.length} · ${r.anchors.length} · ${r.platforms.length} Kacheln`],
       ['In Pixeln', `${r.w * (w.p.data.game?.tileSize || 64)} × ${r.h * (w.p.data.game?.tileSize || 64)}`]]), play) };
+  },
+
+  // the travel map (#007): one rolled map with the current values, „Neu würfeln“ rolls another (the game rolls one per Durchgang)
+  worldmap(w, x) {
+    const D = w.p.data, c = el('canvas', { class: 'ng-worldmap', width: 960, height: 540, style: 'width:100%;border-radius:6px' });
+    let seed = w.mapSeed ??= 1 + Math.floor(Math.random() * 1e6);
+    const base = new URL('../../projects/nomadgirl/', import.meta.url), imgs = {};
+    const img = id => { const A = D.assets?.[id]; if (!A?.file) return null; if (!imgs[id]) { const i = new Image(); i.onload = paint; i.src = new URL(A.file, base).href; imgs[id] = i; } return imgs[id].complete ? imgs[id] : null; };
+    const info = el('p', { class: 'ed-small' });
+    function paint() {
+      const map = generateMap(D, seed), here = map.start, ctx = c.getContext('2d');
+      drawMap(ctx, c.width, c.height, D, map, { paper: img(x.paper), logos: img(x.logos), here, sel: neighbours(map, here)[0], reveal: 99 });
+      info.textContent = `Seed ${seed} · ${map.nodes.length} Orte (${map.nodes.filter(n => n.landmark).length} Wahrzeichen) · ${map.edges.length} Straßen · Plakate ${map.signs.length}. Im Spiel sind Orte weiter als „Namen sichtbar bis“ noch „?“.`;
+    }
+    document.fonts?.load('20px VT323').then(paint); paint();
+    const again = el('button', { class: 'ed-button wide', onclick: () => { seed = w.mapSeed = 1 + Math.floor(Math.random() * 1e6); paint(); } }, 'Neu würfeln');
+    return { title: 'Vorschau', body: el('div', {}, c, info, again) };
   },
 
   locations(w, x, id) {

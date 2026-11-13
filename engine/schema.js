@@ -1144,6 +1144,28 @@ export const AREAS = {
     row: x => `${label(DAYTIME, x.time)} · Gewicht ${x.weight ?? 0}`,
     sections: [{ title: 'Encounter', fields: [NAME, LOOK, num('weight', 'Gewicht', { min: 0 }), select('time', 'Tageszeit', DAYTIME), refs('enemies', 'Gegner', 'enemies'), ref('loot', 'Beute', 'lootTables'), DESCRIPTION] }],
   },
+  worldmap: {
+    name: 'Reisekarte', icon: 'map', file: 'data/worldmap.json', kind: 'single',
+    hint: 'Die Reise als verwitterte Touristen-Karte der 60er (#007, Daniel, 13.11.2026). Jeder Durchgang würfelt ein Straßennetz um BigCityDelta: die Orte (Bereich Orte) bleiben als Wahrzeichen, dazu kommen gewürfelte Orte aus den POI-Arten unten, mit Namen, Region, Gefahr (wächst mit der Entfernung), Beute-Hinweisen und Marke. Leyla fährt immer eine Straße weit. Am Warroom und an der Van-Tür',
+    sections: [
+      { title: 'Welt', fields: [range('count', 'Gewürfelte Orte', { hint: 'Zusätzlich zu den Wahrzeichen aus dem Bereich Orte' }), num('radius', 'Radius', { unit: 'km', min: 20 }), num('gap', 'Mindestabstand', { unit: 'km', min: 2 }),
+        point('city', 'BigCityDelta liegt bei', { unit: 'km' }), text('cityName', 'Name der Stadt'), num('cityRadius', 'Stadtgebiet', { unit: 'km', min: 0, hint: 'Hier wird nichts gewürfelt' }),
+        num('dangerStep', 'Gefahr +1 alle', { unit: 'km', min: 5, hint: 'Je weiter vom Start, desto gefährlicher (und lohnender)' }), num('detour', 'Umwege', { unit: '%', min: 0, hint: 'Straßen sind so viel länger als die Luftlinie' }),
+        num('reveal', 'Namen sichtbar bis', { unit: 'Straßen', min: 0, hint: 'Orte weiter weg erscheinen als „?“, bis Leyla näher kommt' })] },
+      { title: 'Orte', fields: [table('kinds', 'POI-Arten', [ref('poi', 'POI', 'pois'), num('weight', 'Gewicht', { min: 0 }), text('names', 'Namen')],
+          { hint: 'Namen mit | getrennt, Platzhalter: {km} Entfernung zur Stadt, {nr} Nummer, {word} Ortswort, {office} Amt, {region}, {brand} Kurzname der Marke' }),
+        text('words', 'Ortswörter', { hint: 'Mit Komma getrennt, für {word}' }), text('offices', 'Ämter', { hint: 'Für {office}' }),
+        text('regions', 'Regionen', { hint: 'Mit Komma getrennt, im Kreis um die Stadt verteilt (beginnend im Westen, gegen den Uhrzeigersinn über Norden)' })] },
+      { title: 'Marken', fields: [table('brands', 'Marken', [text('id', 'ID'), text('name', 'Name'), text('short', 'Kurz'), text('slogan', 'Slogan'), select('kind', 'Bei', [['', 'überall'], ['gasStation', 'Tankstelle'], ['mall', 'Markt'], ['bunker', 'Bunker'], ['government', 'Amt']]), num('icon', 'Logo', { min: 0 }), color('color', 'Farbe'), num('weight', 'Gewicht', { min: 0 })],
+          { hint: 'Logo = Feld im Symbol-Raster „Logos“. Marken stehen an passenden Orten und als Plakate an den Straßen' }), num('signs', 'Plakate', { min: 0, max: 30 })] },
+      { title: 'Aussehen', fields: [ref('paper', 'Papier', 'assets'), ref('logos', 'Logos', 'assets', { hint: 'Symbol-Raster mit den Marken-Logos' }), text('title', 'Titel'), text('edition', 'Ausgabe')] },
+    ],
+    check: (x, report, p) => {
+      for (const b of x.brands || []) if (!b.id) report('error', `Marke „${b.name || '?'}“ ohne ID`);
+      if (!(x.kinds || []).length) report('hint', 'Keine POI-Arten: es gibt nur die Wahrzeichen aus dem Bereich Orte');
+      const L = p.data?.assets?.[x.logos]; for (const b of x.brands || []) if (L?.grid && b.icon >= L.grid[0] * L.grid[1]) report('warning', `${b.name}: Logo ${b.icon} gibt es nicht`);
+    },
+  },
   travel: {
     name: 'Reisen', icon: 'world_icon', file: 'data/travel.json', kind: 'single',
     hint: 'Was das Fahren kostet: Sprit, Vorräte und Zeit. Nachts ist es gefährlicher.',
@@ -1165,7 +1187,7 @@ export const GROUPS = [
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
   ['PROGRESSION', ['techtree', 'resources']],
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'companions']],
-  ['WELT', ['pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'travel']],
+  ['WELT', ['worldmap', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'travel']],
 ];
 
 export const optionLabel = label;

@@ -577,3 +577,34 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .hud-dream .ui-x { position: fixed; top: 16px; right: 16px; }
 .bm > .ui-x { top: 74px; right: 14px; }
 .inv > .ui-x { top: -14px; right: -14px; }
+
+/* ---------- travel map (#007, game/play/map_ui.js): the old tourist map, the chosen place on the right ---------- */
+.wm { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(6, 5, 10, .62); pointer-events: auto; user-select: none; z-index: 20; }
+.wm[hidden] { display: none; }
+.wm-box { width: min(1640px, 97vw); height: min(900px, 93vh); display: flex; flex-direction: column; gap: 12px; padding: 16px 18px; border-radius: 12px; background: #120e19; border: 1px solid #3a2f45; box-shadow: 0 20px 60px rgba(0, 0, 0, .6); }
+.wm-box > header { display: flex; align-items: center; gap: 12px; color: #ffd27a; }
+.wm-box > header h2 { margin: 0; font: 44px/1 VT323, monospace; font-weight: normal; text-shadow: 0 0 12px rgba(255, 210, 122, .45); }
+.wm-box > header small { margin-left: auto; color: #b9a9c9; font: 22px/1 VT323, monospace; }
+.wm-main { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 340px; gap: 14px; }
+.wm-paper { position: relative; min-height: 0; border-radius: 6px; overflow: hidden; background: #3a2c22; box-shadow: inset 0 0 0 1px #5a4a3a, 0 8px 30px rgba(0, 0, 0, .5); }
+.wm-map { position: absolute; inset: 0; display: block; }
+.wm-detail { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 10px; background: #1b1424; border: 1px solid #3a2f45; color: #e8def0; overflow: auto; }
+.wm-head { display: flex; gap: 12px; align-items: center; }
+.wm-head h3 { margin: 0; font: 32px/1 VT323, monospace; font-weight: normal; color: #ffd27a; }
+.wm-head small { color: #b9a9c9; font: 14px/1.3 var(--ui-font); }
+.wm-logo { flex: none; width: 64px; height: 64px; image-rendering: pixelated; background-repeat: no-repeat; }
+.wm-here { margin: 0; color: #20d6c7; font: 22px/1 VT323, monospace; }
+.wm-row { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 8px; }
+.wm-row small { color: #8d7f9c; font: 13px/1 var(--ui-font); text-transform: uppercase; letter-spacing: .5px; }
+.wm-danger { color: #df3e23; font-size: 18px; letter-spacing: 2px; }
+.wm-hints { display: flex; flex-wrap: wrap; gap: 6px; }
+.wm-hints span { padding: 3px 8px; border-radius: 999px; border: 1px solid var(--c); color: var(--c); font: 13px/1.2 var(--ui-font); background: color-mix(in srgb, var(--c) 12%, transparent); }
+.wm-brand { margin: 0; color: #c7b08b; font: italic 20px/1.1 VT323, monospace; }
+.wm-desc { margin: 0; color: #b9a9c9; font: 14px/1.4 var(--ui-font); }
+.wm-cost { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.wm-cost div { padding: 8px 10px; border-radius: 8px; background: #241b30; border: 1px solid #3a2f45; }
+.wm-cost small { display: block; color: #8d7f9c; font: 12px/1 var(--ui-font); text-transform: uppercase; }
+.wm-cost b { font: 26px/1.1 VT323, monospace; font-weight: normal; color: #f2eef7; }
+.wm-cost .bad b { color: #ff6b6b; }
+.wm-go { margin-top: auto; justify-content: center; font-size: 18px; padding: 12px; }
+.wm-why { color: #b9a9c9; }

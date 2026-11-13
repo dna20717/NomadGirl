@@ -87,10 +87,12 @@ check('Steuerkreuz runter wählt den nächsten Eintrag', s.focus === 1, s.focus)
 await tap(1);
 s = await sc();
 check('B schließt das Menü', !s.menu, s.menu);
-await flick(); await tap(13); await tap(0);
+await flick(); await tap(0);   // first entry: Karte · Reisen (#007)
 s = await sc();
-check('A nimmt den Eintrag (Warroom)', s.menu?.title === 'Warroom', s.menu);
+const wm = await ev(() => nomad.map());
+check('A nimmt den Eintrag (Karte · Reisen)', wm?.open, { menu: s.menu, wm });
 await tap(1);
+check('B schließt die Reisekarte', !(await ev(() => nomad.map()))?.open);
 
 // PlayStation symbols
 await ev(() => setPad({ id: 'DualSense Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)' }));

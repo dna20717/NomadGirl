@@ -60,6 +60,7 @@ engine/image.js, font.js   Bild und Pixelschrift (aus NomadTactics, für browser
 game/workshop/         Werkstatt: workshop.js (Gerüst + Seiten aus dem Schema), summaries.js (abgeleitete Werte, Vorschauen), asset_preview.js (Animation, Bild, Großansicht, Vorschaubilder), workshop.css
 game/drone_cables.js   Kabel der Drohne (Verlet-Seile, Spiel + Startseite)
 game/weather.js        Wetter-Himmel, Sterne und Regen aus Code (Startseite + Spiel)
+game/worldmap.js       Reisekarte (ohne DOM): Routen-Netz je Durchgang würfeln, Orte, Straßen, Marken; map_render.js zeichnet sie (Spiel + Werkstatt)
 game/crafting.js       Kochen & Craften (ohne DOM): Rezeptbuch, Vorräte aus Lager/Kiste/Rucksack, Herstellen, Experimentieren, Fehlschläge, Zettel, Tipps, Essen
 game/rig.js            Rig umbauen (ohne DOM): Budgets (Gewicht, Container, Energie, Verbrauch, Rig-Teile), Rig-Teile an Sockeln (anschrauben, tauschen, abschrauben, kaufen, verkaufen), Aktionen sofort (act), Umstellen, Kaufen/Verkaufen, Anhänger an Kupplungen/umsortieren/abhängen, Lager-Umzug, Schnappschuss für Rückgängig
 game/inventory.js      Inventar-Kern (ohne DOM): Raster, Tetris-Formen, Drehen, Stapeln, Tauschen, Alles einlagern, Beute würfeln
@@ -123,6 +124,7 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 - `docs/features/pois.md`: POI-Level: Verschweißen, Kisten, Schalter, Secrets, Ranking, die vier POIs, Licht & Atmosphäre, Kleinvieh, Nebel.
 - `docs/features/tiles.md`: Kacheln und Kachel-Sets (TileSet00): Clutter, Decals, Einschlüsse, echte Größen, Tiefe aus Code.
 - `docs/features/intro.md`: Intro als Comic (#005): Panels, Textboxen, Countdown, Effekte, nur übers Hauptmenü.
+- `docs/features/worldmap.md`: Reisekarte (#007): Routen-Netz je Durchgang, Marken der Spielwelt, Fenster am Warroom und an der Van-Tür.
 - `docs/features/splash.md`: Startseite: Szene, Horizont-Dunst, AvA, Highway mit Textur-Boden, Überraschungen.
 - `docs/features/art.md`: Feld `look` an Entitäten, Asset-Vorschau, Symbol-Raster, Gegenrichtung beim Spiegeln.
 - `docs/features/editor.md`: Werkstatt-Editor: Spielen-Knopf, Scroll-Position.

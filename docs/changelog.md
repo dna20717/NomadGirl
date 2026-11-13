@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 13.11.2026: **Reisekarte** (#007, PixelLab): statt Menü eine verwitterte Touristen-Karte der 60er; jeder Durchgang würfelt ein Straßennetz um BigCityDelta (Wahrzeichen + gewürfelte Orte mit Namen, Region, Gefahr, Beute-Hinweisen, Marken), Plakate der Marken, Rotstift um erreichbare Ziele, „Sie sind hier“, unbekannte Orte als „?“; Fenster am Warroom (mit Techtree/Auswerten) und an der Van-Tür; Werkstatt-Bereich Reisekarte mit Vorschau; `map_test` 12, `npm test` 92.
 - 13.11.2026: **Rückfrage „Wirklich zurückreisen?“** am Van im POI, **Leitern ins Erdgeschoss** an jedem erhöhten Container (für Spiele ohne Doppelsprung); `camp_test` 27, `stack_test` 16.
 - 13.11.2026: **Boden blättern** mit L1/R1, wenn der Cursor am Boden steht (mehrere Bündel in Reichweite, „2 / 3“ im Kopf), **Controller-Symbole im Inventar abgesichert** (sofort Controller beim ersten Druck, Buchstaben statt Lücken, falls das Symbolbild nicht lädt); `pad_test` 40.
 - 13.11.2026: **Intro nachgebessert** (Daniel): AvA im letzten Panel ist jetzt die echte Spiel-Drohne (aus Code, Intro › AvA), die Szene spielt am Van im Camp statt im Labor (neues Bild, PixelLab), Titel ohne Untertitel; `intro_test` 15.

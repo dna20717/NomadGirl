@@ -37,7 +37,20 @@ test('Alter Spielstand wird repariert', () => {
 
 test('Fahrtkosten', () => {
   const t = travelCost(D, newSave(D), 'bunker_13');
-  assert.deepEqual(t, { km: 42, hours: 1, fuel: 5.9, food: 0.1 });   // leerer Modul-Anhänger 800 kg + Tank im 10-Fuß-Container
+  assert.deepEqual(t, { km: 47, hours: 1.25, fuel: 6.6, food: 0.2 });   // Straße auf der Reisekarte (#007: Luftlinie 40,5 km + 15 % Umweg); leerer Modul-Anhänger 800 kg + Tank im 10-Fuß-Container
+});
+
+test('Reisekarte: jeder Durchgang würfelt eine Karte, Wahrzeichen bleiben, jeder Ort hat mindestens zwei Straßen (#007)', async () => {
+  const { generateMap, ensureMap, neighbours, hops } = await import('../game/worldmap.js');
+  const a = generateMap(D, 1), b = generateMap(D, 2), again = generateMap(D, 1);
+  assert.deepEqual(a, again);   // same seed, same map
+  assert.notDeepEqual(a.nodes.map(n => n.name), b.nodes.map(n => n.name));
+  for (const id of Object.keys(D.locations)) assert.ok(a.nodes.some(n => n.id === id && n.landmark));
+  for (const n of a.nodes) { assert.ok(neighbours(a, n.id).length >= 2, n.id); assert.ok(n.danger >= 1 && n.danger <= 5); }
+  assert.equal(Object.keys(hops(a, a.start)).length, a.nodes.length);   // every place can be reached
+  const s = newSave(D); assert.equal(s.location, Object.keys(D.locations)[0]); assert.ok(s.map.nodes.length > Object.keys(D.locations).length);
+  const old = { ...s }; delete old.map; const r = repairSave(old, D); assert.ok(r.map?.nodes.length);   // older savegames get a map
+  const kept = ensureMap(D, s); assert.equal(kept, s.map);   // the same Durchgang keeps its map
 });
 
 test('Ankunft im Camp: immer Dämmerung', () => {

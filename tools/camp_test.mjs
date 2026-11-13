@@ -35,10 +35,11 @@ check('Leyla steht am Van, E-Hinweis', s.prompt === 'Einsteigen · Van', s.promp
 await shot('start');
 
 let m = await ev(() => c.use());
-check('Van-Menü', m?.items.map(i => i.label).join('|') === 'Schlafen · Schlafkoje|Planen · Warroom|Zurück', m);
-m = await ev(() => { nomad.choose('Planen'); return nomad.menu(); });
-check('Warroom: Plündern + 3 Ziele', m?.title === 'Warroom' && m.items[0].label.startsWith('Plündern') && m.items.filter(i => i.label.startsWith('Hinfahren')).length === 3, m);
-{ const h = m?.items.find(i => i.label.startsWith('Hinfahren')); check('Warroom: deutsche Zahlen', /2,5 l Sprit/.test(h?.sub), h); }
+check('Van-Menü mit Karte', m?.items.map(i => i.label).join('|') === 'Karte · Reisen|Schlafen · Schlafkoje|Planen · Warroom|Zurück', m);
+m = await ev(() => { nomad.choose('Planen'); return nomad.map(); });
+check('Warroom öffnet die Reisekarte: Start, Nachbarorte, Hinfahren (#007)', m?.open && m.here === 'tankstelle_km7' && m.near.length >= 2 && m.near.includes(m.sel) && m.action === 'Hinfahren', m);
+{ const t = await ev(() => document.querySelector('.wm-cost')?.textContent || ''); check('Reisekarte: Kosten mit deutschen Zahlen', /\d+ km/.test(t) && /\d,\d+ l|\d+ l/.test(t), t); }
+{ const h = await ev(() => { const mp = game.scene.getScene('play').hud.map; mp.select(mp.save.location); return mp.state(); }); check('Reisekarte: hier = Hier plündern', h.action === 'Hier plündern', h); }
 await shot('warroom');
 
 s = await ev(() => c.pick('Plündern'));
@@ -89,8 +90,9 @@ m = await ev(() => { c.use(); return nomad.craft(); });
 check('Kochnische: E öffnet Kochen (Rezeptbuch + Experimentieren)', p === 'Kochen · Kochnische' && m?.open && m.workshop === 'kochnische', { p, m });
 await page.keyboard.press('Escape');
 
-s = await ev(() => { c.to('Van'); c.use(); nomad.choose('Planen'); return c.pick('Bunker'); });
-check('Fahren: Ort, Sprit, Ankunft in der Dämmerung', s.camp.location === 'bunker_13' && s.camp.clock === 'Tag 3 · 18:30' && s.camp.fuel === 34.5, s.camp);
+s = await ev(() => { c.to('Van'); c.use(); nomad.choose('Planen'); const m = nomad.map(), to = m.near[0], fuel0 = nomad.save().fuel, cost = game.scene.getScene('play').hud.map.host.cost(to); const st = c.pick(to); return { ...st, to, want: Math.round((fuel0 - cost.fuel) * 10) / 10, visited: nomad.save().map.visited.includes(to) }; });
+const drove = s.to;
+check('Fahren: Nachbarort auf der Karte, Sprit, Ankunft in der Dämmerung, als besucht markiert', s.camp.location === s.to && /18:30$/.test(s.camp.clock) && s.camp.fuel === s.want && s.visited, { camp: s.camp, to: s.to, want: s.want });
 await shot('day');
 
 s = await ev(() => { c.to('Van'); c.use(); nomad.choose('Planen'); c.pick('Plündern'); const sc = game.scene.getScene('play'); const hp = sc.leyla.maxHealth; sc.deltas = 50; sc.leyla.hurt(sc.time.now, 9999, 0); nomad.step(200); return { ...nomad.state(), hp }; });
@@ -98,12 +100,12 @@ check('Abwehr-Buff lässt das Leben gleich', s.hp === 100, s.hp);
 check('k.o.: AvA bringt sie ins Camp, Beute weg (Δ bleiben beim Startgeld), 30 % Leben, Buffs verbraucht', s.mode === 'camp' && s.health === 30 && s.camp.deltas === (await ev(() => game.scene.getScene('play').data_.economy?.startDeltas ?? 0)) && !s.camp.buffs.length && /AvA/.test(s.banner), { mode: s.mode, health: s.health, camp: s.camp });
 
 const saved = await ev(() => JSON.parse(localStorage.getItem('nomadgirl-save')));
-check('Spielstand gespeichert (dieser Browser)', saved?.location === 'bunker_13' && saved.health === 30 && saved.run === null, saved);
+check('Spielstand gespeichert (dieser Browser)', saved?.location === drove && saved.health === 30 && saved.run === null, saved);
 // reload: the savegame comes back
 await page.goto(url.replace('&new', ''));
 await page.waitForFunction(() => window.nomad && window.game?.scene.getScene('play')?.camp, null, { timeout: 20000 });
 s = await ev(() => { nomad.take(); nomad.step(5); return nomad.state(); });
-check('Neu laden: Spielstand ist wieder da', s.camp.location === 'bunker_13' && s.camp.clock === 'Tag 4 · 18:30' && s.health === 30, s.camp);
+check('Neu laden: Spielstand ist wieder da', s.camp.location === drove && /18:30$/.test(s.camp.clock) && s.health === 30, s.camp);
 
 await browser.close();
 for (const o of ok) console.log('✔', o);

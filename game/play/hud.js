@@ -1,4 +1,5 @@
 // HUD as HTML over the canvas: health, ammo, dash, time, kills, Δ, banners and the controls overlay.
+import { placeOf } from '../worldmap.js';
 import { bonuses } from '../techtree.js';
 import { phase } from '../tank.js';
 import { el } from '../ui.js';
@@ -233,7 +234,7 @@ export class Hud {
   update(scene, time) {
     const l = scene.leyla, max = l.maxHealth;
     // windows on top: the E prompt of the world waits (its key means „ok“ in the window)
-    const hideP = !this.promptText || this.modal || !!this.inv?.isOpen || !!this.craft?.isOpen || !!this.tech?.isOpen;
+    const hideP = !this.promptText || this.modal || !!this.inv?.isOpen || !!this.craft?.isOpen || !!this.tech?.isOpen || !!this.map?.isOpen;
     if (this.promptEl.hidden !== hideP) this.promptEl.hidden = hideP;
     this.healthBar.style.width = `${Math.max(0, l.health / max * 100)}%`;
     this.healthText.textContent = `${Math.ceil(l.health)}/${max}`;
@@ -248,7 +249,7 @@ export class Hud {
     this.deltas.textContent = String(scene.deltas);
     const sv = this.save;
     if (sv) {
-      const D = this.D, loc = D.locations?.[sv.location]?.name || '';
+      const D = this.D, loc = placeOf(D, sv)?.name || '';
       const vit = this.modeName === 'run' && sv.tank && bonuses(D, sv).tankStatus > 0 ? phase(D, sv) : null;   // Techtree › Lebenszeichen: the tank in the run
       const key = [sv.day, sv.hour, sv.location, sv.deltas, sv.fuel, sv.food, sv.buffs.join(), this.modeName, vit ? `${Math.round(sv.tank.cond)}${sv.tank.dead}` : ''].join('|');
       if (key !== this.campKey) {

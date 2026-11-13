@@ -16,7 +16,8 @@
 //   nomad.state().light               light & atmosphere: lamps, glowing clutter, mood at Leyla, searchlight, brightness at Leyla / ahead
 //   nomad.state().level               POI level: chests, switches, doors, brittle walls, goal, secrets, ranking (done)
 //   nomad.state().camp                camp (game.html?camp): clock, place, Δ, prompt, hotspots, rig; .menu = open menu
-//   nomad.menu() / nomad.choose(i | 'text')   the open menu / pick an item (index or part of its label)
+//   nomad.menu() / nomad.choose(i | 'text')   the open menu / pick an item (index or part of its label); on the travel map 'Plündern' or a place's name
+//   nomad.map()                       the travel map (#007): open, here, sel, near, action
 //   nomad.walkTo(x)                   walks Leyla to an x position (camp), then E with step(1, [], ['grab'])
 //   nomad.goTo(name)                  walks to a camp hotspot by name; a workshop: up onto the floor of its container (E counts only there)
 //   nomad.build()                     building the rig in the camp (B): rig, budgets, scrapyard, jobs, undo
@@ -65,8 +66,18 @@ export function installControl(game) {
     freeze() { const s = scene(); s.hud.paused = true; s.tweens.pauseAll(); s.time.paused = true; game.loop.wake(); },
     thaw() { const s = scene(); if (active) game.loop.sleep(); s.hud.paused = false; s.tweens.resumeAll(); s.time.paused = false; },
     menu() { return scene().hud.menuState(); },
+    map() { return scene().hud.map?.state() || null; },   // travel map (#007): open, here, selected, neighbours, action
     choose(which) {
       const h = scene().hud, items = h.menuItems || [];
+      // the travel map (#007) instead of the old warroom menu: 'Plündern' = plunder here, a place's name (or 'Hinfahren: <name>') = drive there
+      if (h.map?.isOpen && typeof which === 'string') {
+        const m = h.map, w = which.toLowerCase().replace(/^hinfahren:\s*/, ''), ex = (m.opts?.extras || []).find(x => x.label.toLowerCase().includes(w));
+        if (ex) { m.close(); ex.act(); api.step(2); return true; }   // Techtree, Auswerten in the map's header
+        if (/^pl(ü|u)nder/.test(w)) m.select(m.save.location);
+        else { const n = m.map.nodes.find(x => x.name.toLowerCase().includes(w) || x.id === w); if (n) m.select(n.id); else return false; }
+        const a = m.action(); if (!a || a.disabled) return false;
+        a.act(); api.step(2); return true;
+      }
       const i = typeof which === 'number' ? which : items.findIndex(it => it.label.toLowerCase().includes(String(which).toLowerCase()));
       const ok = h.choose(i);
       api.step(2);

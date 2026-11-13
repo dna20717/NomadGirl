@@ -196,6 +196,12 @@ Zu Beginn kennt man „Notflicken“, „Stromzelle tauschen“ und „Kühlmitt
 - **Doppelsprung und Luft-Dash schalten Implantate frei** (Beine bzw. Nerven); Leyla beginnt ohne. Der Dash am Boden geht immer.
 - Hergestellt an der **Ripperdoc-Liege** (neue Werkstatt im Rig), die starken Teile nur über Baupläne aus Tresoren und von Bossen. Liste und Werte: `docs/features/cyberware.md`, Zahlen in der Werkstatt.
 
+### Reisekarte (Daniel, 13.11.2026, gebaut als #007)
+
+- Reisen ist eine **verwitterte Touristen-Karte der 60er** mit Marken der Spielwelt (Delta Petrol, AtomCola, Motel Salzsee …), kein Menü mehr. Am Warroom und an der Van-Tür.
+- **Jeder Durchgang würfelt ein Straßennetz** um BigCityDelta: feste Wahrzeichen plus gewürfelte Orte. Leyla fährt immer eine Straße weit; weiter draußen ist es gefährlicher und lohnender, Unbekanntes bleibt „?“.
+- Jedes Ziel zeigt Kosten (Strecke, Fahrzeit, Sprit, Vorräte), Gefahr und Art, und welche Beute dort vermutlich liegt. Details: `docs/features/worldmap.md`.
+
 ## Rig & Werkstätten
 
 > **Klarstellung 12.11.2026 (Daniel):** Es gibt keine eigenen Modul-Anhänger, nur die variablen Container. Ein Container im Erdgeschoss ist gleichzeitig ein Anhänger (Rahmen, Räder, Kupplung gehören dazu). Das ist bereits so gelöst, kein To-do. **Deichselkästen gibt es nicht mehr**, Stauraum kommt aus den Lagerregalen.

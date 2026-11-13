@@ -8,6 +8,7 @@
 //   'rig:<unit>' = the own storage of the tractor (Kofferraum, plus rows from a Dachbox) or of a trailer (Deichselkasten)
 // Times are hours (18.5 = 18:30). "Ereignis-Zeit": the clock only moves on actions (sleeping, runs, sitting at the fire).
 
+import { ensureMap } from './worldmap.js';
 import { ensureTank } from './tank.js';
 import { newGrid, add, fits, startWear, wearOf, WEAR_KEYS } from './inventory.js';
 
@@ -95,6 +96,11 @@ function newInventory(D, save) {
 }
 
 export function newSave(D) {
+  return withMap(D, newSaveCore(D));
+}
+// the travel map (#007): rolled for every new game and every Durchgang (game/worldmap.js)
+function withMap(D, s) { ensureMap(D, s); return s; }
+function newSaveCore(D) {
   const S = D.game?.start || {}, C = D.camp?.clock || {};
   const { units, left } = placeWorkshops(D, S.tractor, S.containers || [], S.workshops || []);
   const spare = [...(S.spare || []), ...left].filter(id => D.workshops?.[id]);   // packed on the scrapyard: Spiel › Start › Verpackt auf dem Schrottplatz, plus what did not fit
@@ -118,6 +124,7 @@ export function newCycle(D, old) {
   const s = newSave(D);
   s.nodes = [...(old.nodes || [])].filter(id => D.techtree?.[id]);
   s.cycle = (old.cycle || 1) + 1;
+  s.map = null; ensureMap(D, s);   // a new Durchgang, a new map
   s.dreams = [...(old.dreams || []), { day: old.day, hour: old.hour, rescues: old.tank?.rescues || 0, cause: old.tank?.cause || null }];
   for (const id of s.nodes) for (const r of D.techtree[id].recipes || []) if (!s.recipes.includes(r)) s.recipes.push(r);
   return s;
@@ -225,7 +232,8 @@ export function repairSave(save, D) {
   const fresh = newSave(D);
   if (!save || typeof save !== 'object' || save.version !== SAVE_VERSION) return fresh;
   const s = { ...fresh, ...save };
-  if (!D.locations?.[s.location]) s.location = fresh.location;
+  if (!D.locations?.[s.location] && !s.map?.nodes?.some(n => n.id === s.location)) s.location = fresh.location;
+  ensureMap(D, s);   // older savegames get their map here (#007)
   if (!D.tractors?.[s.rig?.tractor]) s.rig = fresh.rig;
   s.rig.units = s.rig.units.filter(u => u.kind === 'tractor' || D.containers?.[u.id]);
   for (const u of s.rig.units) u.workshops = (u.workshops || []).filter(w => D.workshops?.[w.id]);

@@ -29,7 +29,7 @@ export class FloorStrip {
 
   update(scene) {
     const h = scene.hud, S = this.S;
-    const off = S.enabled === false || !scene.leyla?.alive || h.inv?.isOpen || h.craft?.isOpen || h.tech?.isOpen || h.build?.active || h.modal || h.paused;
+    const off = S.enabled === false || !scene.leyla?.alive || h.inv?.isOpen || h.craft?.isOpen || h.tech?.isOpen || h.map?.isOpen || h.build?.active || h.modal || h.paused;
     const list = off ? [] : this.things(scene).slice(0, S.max ?? 8);
     this.list = list;
     const sig = list.map(t => `${t.e.id}×${t.e.n}`).join(',');

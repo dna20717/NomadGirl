@@ -18,9 +18,9 @@ await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('p
 let v = await ev(() => { nomad.take(); nomad.step(5);
   const s = nomad.save(), g = s.inv.grids.chest; g.items = [];
   g.items.push({ a: 'items', id: 'technik', n: 12, x: 0, y: 0, r: 0 }, { a: 'items', id: 'wissen', n: 4, x: 1, y: 0, r: 0 }, { a: 'items', id: 'bio', n: 1, x: 2, y: 0, r: 0 });
-  nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.choose('Planen'); const m = nomad.menu(); nomad.choose('Techtree'); nomad.step(3);
-  return { menu: m.items.map(i => i.label), t: nomad.tech() }; });
-check('Warroom › Techtree öffnet den Bildschirm, erster Tab Technik, Auswahl auf dem ersten bereiten Knoten', v.menu.includes('Techtree') && v.t?.open && v.t.tab === 'technik' && v.t.sel === 'wartungsklappe', v);
+  nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.choose('Planen'); const m = nomad.map(); nomad.choose('Techtree'); nomad.step(3);
+  return { menu: m.extras, t: nomad.tech() }; });   // Techtree sits in the travel map's header (#007)
+check('Warroom › Reisekarte › Techtree öffnet den Bildschirm, erster Tab Technik, Auswahl auf dem ersten bereiten Knoten', v.menu.includes('Techtree') && v.t?.open && v.t.tab === 'technik' && v.t.sel === 'wartungsklappe', v);
 await shot('open');
 
 v = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(2); const s = nomad.save(); return { t: nomad.tech(), nodes: s.nodes, dicht: s.recipes.includes('tank_dichtung'), tech: s.inv.grids.chest.items.find(e => e.id === 'technik')?.n }; });
