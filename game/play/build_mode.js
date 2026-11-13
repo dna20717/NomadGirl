@@ -9,6 +9,7 @@
 //   rig part → a socket on the van (taken = swap, the old one goes onto the scrapyard), the scrapyard (take off), the dealer's pad (sell)
 //   dealer catalogue (button or click on the pad): bought things are delivered onto the pad.
 // Logic in game/rig.js (act, snapshot/restore), drawing in game/play/camp.js (drawRig, drawYard), values in "Rig-Bau".
+import { hang, unhang, canHang, lightsConfig } from '../string_lights.js';
 import { el } from '../ui.js';
 import { hints, NavCursor, closeX } from './ui_nav.js';
 import { icon } from '../icons.js';
@@ -166,7 +167,7 @@ export class BuildMode {
     if (edge('prev')) this.jump(-1);
     const pt = { x: this.cur.x, y: this.cur.y, button: 0 };
     if (u.pressed('ok')) {
-      if (this.drag) this.pointerUp(pt);
+      if (this.drag || this.wire) this.pointerUp(pt);
       else {
         this.pointerDown(pt);
         const hit = this.press?.hit;
@@ -174,7 +175,7 @@ export class BuildMode {
         else this.pointerUp(pt);
       }
     }
-    if (edge('back')) { if (this.drag) this.flyBack(null); else { this.close(); return; } }
+    if (edge('back')) { if (this.drag) this.flyBack(null); else if (this.wire) { this.wire = null; this.draw(); } else { this.close(); return; } }
     if (u.pressed('context') || edge('context')) this.undoLast();
     if (u.pressed('send') || edge('send')) { this.shopOpen = true; this.draw(); }
     this.showCur();
@@ -191,7 +192,7 @@ export class BuildMode {
   jump(d) {
     const sp = this.spots(), s = this.scene, r = s.game.canvas.getBoundingClientRect(), kx = s.scale.width / r.width, ky = s.scale.height / r.height;
     const pts = this.drag ? [...sp.slots, ...sp.gaps, ...sp.stacks, ...sp.sockets, ...(sp.yardFree ? [sp.yardFree] : []), ...(sp.dealer ? [sp.dealer] : [])]
-      : [...sp.yard, ...sp.slots.filter(x => x.ws), ...sp.units, ...sp.sockets.filter(x => x.id), ...(sp.dealer ? [sp.dealer] : [])];
+      : this.wire ? sp.anchors : [...sp.yard, ...sp.slots.filter(x => x.ws), ...sp.units, ...sp.sockets.filter(x => x.id), ...(sp.dealer ? [sp.dealer] : [])];
     const g = pts.map(q => ({ x: (q.x - r.left) * kx, y: (q.y - r.top) * ky })).filter(q => q.x >= 0 && q.x <= s.scale.width).sort((a, b) => a.x - b.x || a.y - b.y);
     if (!g.length) return;
     const i = d > 0 ? g.findIndex(q => q.x > this.cur.x + 12) : g.map(q => q.x < this.cur.x - 12).lastIndexOf(true);
@@ -343,6 +344,12 @@ export class BuildMode {
   // the thing under the pointer: a workshop (rig or yard), a trailer (rig or yard), the dealer's pad
   pick(x, y) {
     const D = this.D, U = this.save.rig.units, camp = this.camp, inside = r => x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1;
+    // string lights (#008): the docking points on the container corners, the middle of a hanging string
+    if (lightsConfig(D).enabled) {
+      const z = Math.max(0.5, this.scene.cam.zoom), R = 24 / z, box = p => ({ x0: p.x - R, x1: p.x + R, y0: p.y - R, y1: p.y + R });
+      for (const a of camp.anchors?.() || []) if (Math.hypot(x - a.x, y - a.y) < R) return { kind: 'anchor', a, item: box(a) };
+      for (let i = 0; i < (this.save.rig.lights || []).length; i++) { const w = camp.wire(i); if (w && Math.hypot(x - w.mid.x, y - w.mid.y) < R) return { kind: 'lights', i, item: box(w.mid) }; }
+    }
     for (const it of camp.yardItems || []) if (inside(it)) return { kind: it.kind === 'ws' ? 'ws' : it.kind === 'part' ? 'part' : 'container', from: 'yard', i: it.i, id: it.id, item: it };
     for (const so of this.sockets()) if (so.id && inside(so)) return { kind: 'part', from: 'socket', slot: so.slot, si: so.i, id: so.id, sock: so };
     for (const sl of this.slots()) {
@@ -377,17 +384,23 @@ export class BuildMode {
     if (this.drag && p.event && 'buttons' in p.event && !(p.event.buttons & 1)) { this.press = null; return this.flyBack('Losgelassen außerhalb: zurück an seinen Platz'); }
     if (this.press && !this.drag && Math.hypot(p.x - this.press.sx, p.y - this.press.sy) > 6) this.startDrag(this.press.hit, w);
     if (this.drag) { this.drag.x = w.x; this.drag.y = w.y; }
+    if (this.wire) { this.wire.x = w.x; this.wire.y = w.y; }
   }
   pointerUp(p) {
     if (!this.active) return;
     const w = this.world(p), press = this.press;
     this.press = null;
     if (this.drag) { this.drag.x = w.x; this.drag.y = w.y; return this.drop(); }
+    if (this.wire) return this.finishWire(w);
+    if (press?.hit?.kind === 'anchor') return this.startDrag(press.hit, w);   // click, click: from here … to there
+    if (press?.hit?.kind === 'lights') return this.takeDown(press.hit.i);
     if (press?.hit?.kind === 'dealer') { this.shopOpen = !this.shopOpen; return this.draw(); }
     if (press?.hit) { this.msg = null; this.hoverText = this.describe(press.hit); this.draw(); }
   }
   describe(h) {
-    const D = this.D;
+    const D = this.D, L = lightsConfig(D);
+    if (h.kind === 'anchor') return this.wire ? 'Hier einhängen' : `Andockpunkt · zu einem anderen ziehen: Lichterkette (${L.price} Δ)`;
+    if (h.kind === 'lights') return `Lichterkette · anklicken zum Abnehmen (+${Math.floor(L.price / 2)} Δ)`;
     if (h.kind === 'ws') { const d = wsDef(D, h.id), p = d.power || 0; return `${d.name || h.id} · ${FN_NAMES[d.function] || ''} · ${d.places || 1} ${d.places > 1 ? 'Plätze' : 'Platz'}${p ? ` · ${p > 0 ? '+' : ''}${p} ⚡` : ''} · ziehen zum Umstellen`; }
     if (h.kind === 'part') { const t = D.rigParts?.[h.id] || {}; return `${t.name || h.id} · ${PART_SLOTS[t.slot] || t.slot}${this.partFacts(t)} · ziehen ${h.from === 'yard' ? 'an den Van' : 'zum Ausbauen'}`; }
     if (h.kind === 'container') { const d = D.containers?.[h.id] || {}; return `${d.name || h.id} · ${d.places || 1} Plätze · ${de(d.weight || 0)} kg · ziehen zum Umhängen`; }
@@ -398,6 +411,8 @@ export class BuildMode {
 
   // ---------- dragging ----------
   startDrag(hit, w) {
+    if (hit.kind === 'anchor') { this.wire = { from: hit.a, x: w.x, y: w.y }; this.hoverText = this.describe(hit); return this.draw(); }
+    if (hit.kind === 'lights') return this.takeDown(hit.i);
     const s = this.scene, D = this.D, camp = this.camp;
     const holder = s.add.container(w.x, w.y).setDepth(34);
     let weight = 1, hang = 0;
@@ -643,6 +658,27 @@ export class BuildMode {
   // a spot Leyla can walk to (not into the shaft, not off the map)
   reach(x) { const g = this.camp.geo, T = this.scene.T; return clamp(x, ((g.shaft?.to ?? 0) + 1) * T + 50, (g.W - 2) * T); }
 
+  // the string lands on the docking point nearest to the pointer (string_lights.js checks price, maximum, length)
+  finishWire(w) {
+    const wr = this.wire, z = this.scene.cam.zoom;
+    this.wire = null;
+    const near = (this.camp.anchors?.() || []).filter(a => a.id !== wr.from.id).sort((a, b) => Math.hypot(a.x - w.x, a.y - w.y) - Math.hypot(b.x - w.x, b.y - w.y))[0];
+    if (!near || Math.hypot(near.x - w.x, near.y - w.y) > 60 / z) { this.draw(); return this.say('Lichterkette: an einem Andockpunkt loslassen'); }
+    const r = hang(this.D, this.save, wr.from.id, near.id, { a: wr.from, b: near });
+    if (!r.ok) return this.say(r.why);
+    this.camp.drawRig();
+    this.sfx.klack?.();
+    this.scene.fx.text((wr.from.x + near.x) / 2, Math.min(wr.from.y, near.y) - 30, `${r.deltas} Δ`, { color: '#ffd27a', size: 36, rise: 60, life: 1100 });
+    this.scene.hud.changed?.();
+    this.say('Lichterkette aufgehängt', 'ok');
+  }
+  takeDown(i) {
+    const w = this.camp.wire(i), r = unhang(this.D, this.save, i);
+    if (!r.ok) return;
+    this.camp.drawRig();
+    if (w) this.scene.fx.text(w.mid.x, w.mid.y - 30, `+${r.deltas} Δ`, { color: '#ffd27a', size: 36, rise: 60, life: 1100 });
+    this.say('Lichterkette abgenommen', 'ok');
+  }
   undoLast() {
     const top = this.undo[this.undo.length - 1];
     if (!this.active || !top || top.done || this.drag) return;
@@ -753,6 +789,21 @@ export class BuildMode {
       const text = h ? this.describe(h) : null;
       if (text !== this.hoverText) { this.hoverText = text; if (!this.msg) this.draw(); }
     }
+    // string lights: docking points on every container corner, the string being pulled, an X in the middle of each hanging one
+    if (lightsConfig(D).enabled) {
+      const wr = this.wire, A = this.camp.anchors?.() || [], near = wr && A.filter(a => a.id !== wr.from.id).sort((a, b) => Math.hypot(a.x - wr.x, a.y - wr.y) - Math.hypot(b.x - wr.x, b.y - wr.y))[0];
+      const snap = near && Math.hypot(near.x - wr.x, near.y - wr.y) < 60 / z ? near : null;
+      for (const a of A) {
+        const hot = a === snap || wr?.from.id === a.id;
+        g.fillStyle(0x0d0a12, 0.7).fillCircle(a.x, a.y, 10 / z).fillStyle(hot ? 0xffd27a : 0xc9a86a, hot ? 1 : 0.5 + 0.3 * pulse).fillCircle(a.x, a.y, 6 / z);
+      }
+      if (wr) {
+        const to = snap || wr, why = snap ? canHang(D, this.save, wr.from.id, snap.id, { a: wr.from, b: snap }) : null;
+        g.lineStyle(lw, why ? 0xe86a73 : 0xffd27a, 0.9).lineBetween(wr.from.x, wr.from.y, to.x, to.y);
+        if (snap) label(snap.x, snap.y - 16 / z, why || `Lichterkette · ${lightsConfig(D).price} Δ`, why ? '#e86a73' : '#ffd27a');
+      }
+      (this.save.rig.lights || []).forEach((_, i) => { const w = this.camp.wire(i); if (!w) return; const m = w.mid, r = 7 / z; g.lineStyle(lw, 0xe86a73, 0.4 + 0.3 * pulse).lineBetween(m.x - r, m.y - r, m.x + r, m.y + r).lineBetween(m.x - r, m.y + r, m.x + r, m.y - r); });
+    }
     // Leyla's job: a little progress ring over the spot
     const j = this.job;
     if (j?.state === 'work') {
@@ -768,7 +819,7 @@ export class BuildMode {
     const D = this.D, save = this.save;
     return { open: true, deltas: save.deltas, clock: clockText(save), budgets: budgets(D, save.rig), msg: this.msg?.text || null, held: this.drag?.id || null,
       rig: save.rig.units.map(u => `${u.level ? '^' : ''}${u.id}[${u.workshops.map(w => `${w.id}@${w.at}`).join(' ')}]`).join(' '), spare: { workshops: [...save.rig.spare.workshops], containers: [...save.rig.spare.containers], parts: [...(save.rig.spare.parts || [])] }, parts: JSON.parse(JSON.stringify(save.rig.parts || {})),
-      jobs: this.jobs.length + (this.job ? 1 : 0), working: this.working, canUndo: !!this.undo.length && !this.undo[this.undo.length - 1].done, shop: !!this.shopOpen, zoom: this.scene.cam.zoom };
+      jobs: this.jobs.length + (this.job ? 1 : 0), working: this.working, canUndo: !!this.undo.length && !this.undo[this.undo.length - 1].done, shop: !!this.shopOpen, zoom: this.scene.cam.zoom, lights: (save.rig.lights || []).map(p => p.join('-')), wiring: this.wire?.from.id || null };
   }
   // screen positions (CSS pixels in the page) of everything that can be dragged or dropped on, for tests with a real mouse
   spots() {
@@ -785,6 +836,8 @@ export class BuildMode {
       sockets: this.sockets().map(so => ({ slot: so.slot, i: so.i, id: so.id, ...scr(so.cx, so.cy) })),
       yardFree: this.camp.geo.yard ? scr(this.camp.geo.yard.x1 - 120, this.camp.ground - 100) : null,
       dealer: this.camp.dealer ? mid(this.camp.dealer) : null,
+      anchors: lightsConfig(D).enabled ? (this.camp.anchors?.() || []).map(a => ({ id: a.id, ...scr(a.x, a.y) })) : [],
+      wires: (this.save.rig.lights || []).map((_, i) => { const w = this.camp.wire(i); return w ? { i, ...scr(w.mid.x, w.mid.y) } : null; }).filter(Boolean),
     };
   }
 }

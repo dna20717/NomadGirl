@@ -252,7 +252,7 @@ Gekochte Gerichte geben Buffs für den nächsten Run, versorgen Companions auf R
 
 ## Companions, Oberwelt & Wirtschaft
 
-- **Companions** leben im Rig: Sie betreiben Werkstätten (Koch im Foodtruck, Mechanikerin in der Drohnenwerkstatt), geben Buffs und Rezepttipps. Eigene Quests und Storylines kommen in Ausbaustufe 2. Vorerst kommen sie nicht mit in die POIs.
+- **Companions** leben im Rig: Sie betreiben Werkstätten (Koch im Foodtruck, Mechaniker in der Drohnenwerkstatt), geben Buffs und Rezepttipps. Eigene Quests und Storylines kommen in Ausbaustufe 2. Vorerst kommen sie nicht mit in die POIs.
 - **Reisen** kostet Sprit (mehr bei schwerem Rig), Vorräte (pro Kopf und Tag) und Zeit (Tag-Nacht-Wechsel, nachts gefährlicher).
 - **Währung:** Deltas, die offizielle und halb wertlose Stadtwährung von BigCityDelta.
 - **Foodtruck:** An POIs mit NPCs verkauft Leyla selbst gekochte Gerichte.

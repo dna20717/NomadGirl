@@ -16,5 +16,18 @@
   "glyph": "▭",
   "description": "Plastikkoffer aufs Dach geschnallt. Zwei Reihen mehr Kofferraum, ein bisschen mehr Luftwiderstand.",
   "color": "#2f3a4a"
+ },
+ "solarpaneel": {
+  "name": "Solarpaneel",
+  "slot": "solar",
+  "look": "rig_solar",
+  "size": [2, 1],
+  "value": 220,
+  "weight": 40,
+  "pull": 0,
+  "armor": 0,
+  "damage": 0,
+  "fuelUse": 0,
+  "description": "Liefert tagsüber Strom und lädt den Akku für die Nacht. Gehört aufs Container-Dach."
  }
 }

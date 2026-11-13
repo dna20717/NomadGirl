@@ -66,27 +66,30 @@ export function drawMap(ctx, W, H, D, map, opt = {}) {
     ctx.fillStyle = '#fef3c0'; circle(ctx, x, y, r + 2.5 * u);
     ctx.fillStyle = k.color; circle(ctx, x, y, r);
     glyph(ctx, k.glyph, x, y, r);
-    if (map.visited?.includes(n.id) && n.id !== here) { ctx.strokeStyle = INK; ctx.lineWidth = 2.5 * u; ctx.beginPath(); ctx.moveTo(x - r, y - r); ctx.lineTo(x + r, y + r); ctx.moveTo(x + r, y - r); ctx.lineTo(x - r, y + r); ctx.stroke(); }
-    ctx.save(); ctx.font = `${n.landmark ? 'bold' : 'normal'} ${Math.round((n.landmark ? 19 : 17) * u)}px VT323, monospace`; const tw = ctx.measureText(n.name).width; ctx.restore();
-    let ly = y + r + 18 * u;
-    for (const dy of [0, -(2 * r + 44 * u), 18 * u, -(2 * r + 62 * u), 36 * u]) if (free(x - tw / 2, y + r + 4 * u + dy, tw, 32 * u)) { ly = y + r + 18 * u + dy; break; }
-    taken.push({ x: x - tw / 2, y: ly - 16 * u, w: tw, h: 32 * u });
-    label(ctx, n.name, x, ly, { size: (n.landmark ? 19 : 17) * u, color: INK, weight: n.landmark ? 'bold' : 'normal', halo: true });
-    label(ctx, '●'.repeat(n.danger || 1), x, ly + 15 * u, { size: 11 * u, color: RED, halo: true });
+    // visited: a bold red cross with a dark rim (Daniel, 13.11.2026: „mehr Kontrast“)
+    if (map.visited?.includes(n.id) && n.id !== here) { const q = r * 1.35; ctx.save(); ctx.lineCap = 'round';
+      for (const [col, lw] of [['#fef3c0', 9 * u], [INK, 6.5 * u], [RED, 3.5 * u]]) { ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.beginPath(); ctx.moveTo(x - q, y - q); ctx.lineTo(x + q, y + q); ctx.moveTo(x + q, y - q); ctx.lineTo(x - q, y + q); ctx.stroke(); }
+      ctx.restore(); }
+    ctx.save(); ctx.font = `${n.landmark ? 'bold' : 'normal'} ${Math.round((n.landmark ? 26 : 23) * u)}px VT323, monospace`; const tw = ctx.measureText(n.name).width; ctx.restore();
+    let ly = y + r + 22 * u;
+    for (const dy of [0, -(2 * r + 54 * u), 22 * u, -(2 * r + 76 * u), 44 * u]) if (free(x - tw / 2, y + r + 4 * u + dy, tw, 40 * u)) { ly = y + r + 22 * u + dy; break; }
+    taken.push({ x: x - tw / 2, y: ly - 20 * u, w: tw, h: 40 * u });
+    label(ctx, n.name, x, ly, { size: (n.landmark ? 26 : 23) * u, color: INK, weight: n.landmark ? 'bold' : 'normal', halo: true });
+    if (!opt.hideDanger) label(ctx, '●'.repeat(n.danger || 1), x, ly + 19 * u, { size: 15 * u, color: RED, halo: true });
     if (n.id === opt.sel) { ctx.strokeStyle = '#ffd541'; ctx.lineWidth = 3 * u; ctx.setLineDash([6 * u, 4 * u]); ctx.lineDashOffset = t * 20; ctx.beginPath(); ctx.arc(x, y, r * 2.7, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); }
   }
   // billboards along the roads: logo on a post, slogan underneath
   for (const s of map.signs || []) {
     const b = brand(s.brand); if (!b) continue;
     const [x, y] = V.at(s.pos), z = 30 * u;
-    ctx.save(); ctx.font = `italic ${Math.round(13 * u)}px VT323, monospace`; const sw = Math.max(z, ctx.measureText(b.slogan || b.name).width); ctx.restore();
+    ctx.save(); ctx.font = `italic ${Math.round(13 * u)}px VT323, monospace`; const sw = Math.max(z, ctx.measureText(b.slogan || b.name).width * 1.3); ctx.restore();
     if (!free(x - sw / 2, y - z, sw, z + 30 * u) || Object.values(out).some(p => Math.hypot(p.x - x, p.y - y) < 34 * u)) continue;   // never over a place or a name
     taken.push({ x: x - sw / 2, y: y - z, w: sw, h: z + 30 * u });
     ctx.save(); ctx.translate(x, y); ctx.rotate(s.rot || 0);
     ctx.fillStyle = INK; ctx.fillRect(-1.5 * u, 0, 3 * u, 14 * u);
     if (opt.logos && b.icon != null) { const c = b.icon % 4, r = Math.floor(b.icon / 4); ctx.imageSmoothingEnabled = false; ctx.drawImage(opt.logos, c * 64, r * 64, 64, 64, -z / 2, -z, z, z); }
     else { ctx.fillStyle = b.color || RED; ctx.fillRect(-z / 2, -z, z, z * 0.8); }
-    label(ctx, b.slogan || b.name, 0, 24 * u, { size: 13 * u, color: INK, italic: true, halo: true });
+    label(ctx, b.slogan || b.name, 0, 26 * u, { size: 17 * u, color: INK, italic: true, halo: true });
     ctx.restore();
   }
   // "Sie sind hier" with the van

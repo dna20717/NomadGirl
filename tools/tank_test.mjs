@@ -58,7 +58,7 @@ await shot('dead');
 await page.goto('http://localhost:8766/game.html?camp&new');
 await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.camp, null, { timeout: 40000 });
 v = await ev(() => { nomad.take(); nomad.step(5); const s0 = nomad.save(); s0.inv.grids.backpack.items = [{ a: 'items', id: 'schrott', n: 3, x: 0, y: 0, r: 0 }];
-  const v = nomad.state().camp.hotspots.find(h => h.name === 'Van'); nomad.walkTo(v.x); nomad.step(1, [], ['grab']); nomad.choose('Planen'); nomad.choose('Plündern'); nomad.step(10); nomad.calm();
+  const v = nomad.state().camp.hotspots.find(h => h.name === 'Van'); nomad.walkTo(v.x); nomad.step(1, [], ['grab']); nomad.choose('Karte'); nomad.choose('Plündern'); nomad.step(10); nomad.calm();
   const sc = game.scene.getScene('play'), l = sc.leyla, start = l.x;
   nomad.tp(start + 900, l.feet); nomad.step(5); const fell = l.x;
   l.hurt(sc.now, 9999, 0); nomad.step(200);

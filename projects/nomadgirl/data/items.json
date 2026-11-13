@@ -1534,5 +1534,16 @@
   "description": "Schwarzmarkt-Schaltplan, mit Blut statt Tinte unterschrieben. Für die Ripperdoc-Liege.",
   "salvageAt": "warroom",
   "salvage": [{"item": "wissen", "count": 3}]
+ },
+ "wasser": {
+  "name": "Frischwasser",
+  "look": "icons_gear",
+  "icon": 54,
+  "category": "ingredient",
+  "size": [1, 1],
+  "stack": 5,
+  "value": 4,
+  "buff": "erste_hilfe",
+  "description": "Gefiltertes Regenwasser in der Feldflasche. Schmeckt nach Blech, ist aber sauber."
  }
 }

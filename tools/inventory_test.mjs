@@ -96,7 +96,8 @@ check('Spielstand merkt sich das Inventar', saved.inv.backpack === 'wanderrucksa
 s = await ev(() => { nomad.step(1, [], ['inventory']); nomad.step(1, [], ['inventory']); return nomad.inv(); });
 await click(0, 0, 0);
 const thrown = (await inv()).held;
-await page.mouse.click(30, 780); await page.waitForTimeout(40);
+const out = await ev(() => { const inv = game.scene.getScene('play').hud.inv.el; for (const [x, y] of [[30, 780], [8, 430], [1390, 430], [700, 6], [8, 8]]) if (!inv.contains(document.elementFromPoint(x, y))) return [x, y]; return [30, 780]; });   // next to the panels (they grew)
+await page.mouse.click(out[0], out[1]); await page.waitForTimeout(40);
 s = await ev(() => ({ inv: nomad.inv(), loot: nomad.loot(), ground: nomad.save().ground }));
 check('Daneben klicken wirft es auf den Boden (neues Bündel)', thrown && !s.inv.held && s.loot.length === 1 && Object.values(s.ground)[0].length === 1, { thrown, s });
 await ev(() => nomad.step(1, [], ['inventory']));

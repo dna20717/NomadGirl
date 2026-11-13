@@ -272,5 +272,27 @@
   "kitGang": "Magenta",
   "counter": {"duck": 30, "dodge": 15},
   "description": "Der pinke Laser verrät ihn, bevor er schießt."
+ },
+ "streuner": {
+  "name": "Streuner",
+  "family": "raider",
+  "behavior": "patrol",
+  "health": 25,
+  "damage": 8,
+  "speed": 170,
+  "aggroRange": 380,
+  "deltas": [1, 4],
+  "countsForRanking": true,
+  "kit": "raider",
+  "weapon": "machete",
+  "dropWeapon": 15,
+  "loot": "pluenderer_beute",
+  "height": 176,
+  "kitHead": "hood",
+  "kitSkin": "oliv",
+  "kitGang": "Gelb",
+  "attack": {"windup": 520, "cooldown": 1100, "range": 130},
+  "sense": {"cone": 120, "react": 500, "hearing": 80},
+  "description": "Hat sich an der Tankstelle eingerichtet und verteidigt sein Revier mit der Machete. Zögert lieber, als dass er stirbt."
  }
 }

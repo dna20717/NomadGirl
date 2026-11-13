@@ -17,7 +17,7 @@ const ready = () => page.waitForFunction(() => window.nomad && window.game?.scen
 await page.goto('http://localhost:8766/game.html?camp&new');
 await ready();
 // the bench goes into the empty module trailer of the start rig
-await ev(() => { nomad.take(); nomad.step(5); const s = nomad.save(), u = s.rig.units.find(u => u.id === 'modulanhaenger'); u.workshops.push({ id: 'hydrokultur', at: 0 }); nomad.save(); game.scene.getScene('play').goCamp({ keepPlace: true, fade: 0 }); for (let i = 0; i < 90; i++) nomad.step(1); });
+await ev(() => { nomad.take(); nomad.step(5); const s = nomad.save(), u = { kind: 'container', id: 'container_20', workshops: [] }; s.rig.units.push(u); u.workshops.push({ id: 'hydrokultur', at: 0 }); /* #008: no more module trailers */ nomad.save(); game.scene.getScene('play').goCamp({ keepPlace: true, fade: 0 }); for (let i = 0; i < 90; i++) nomad.step(1); });
 await ready(); await ev(() => { nomad.take(); nomad.step(10); });
 const H = () => ev(() => { const b = game.scene.getScene('play').camp.benches.list.find(b => b.id === 'hydrokultur'); return b && { n: b.plants?.length, frames: b.plants?.map(p => Number(p.frame.name)), place: b.place }; });
 let v = await H();

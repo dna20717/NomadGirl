@@ -1,7 +1,7 @@
 {
  "schraube": {
   "name": "Schraube",
-  "role": "Mechanikerin",
+  "role": "Mechaniker",
   "stage": "1",
   "workshops": ["werkbank", "motorraum", "drohnenwerkstatt"],
   "buffs": [],
@@ -26,7 +26,8 @@
     "Schön ist es ja. Nutzlos, aber schön.",
     "Mehr Kabel. Es braucht immer mehr Kabel."
    ]
-  }
+  },
+  "look": "companion_schraube_idle"
  },
  "onkel_sung": {
   "name": "Onkel Sung",
@@ -56,6 +57,7 @@
     "Nicht wegwerfen, das düngt bestimmt."
    ]
   },
-  "passenger": true
+  "passenger": true,
+  "look": "companion_onkel_sung_idle"
  }
 }

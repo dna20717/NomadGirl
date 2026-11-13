@@ -19,7 +19,8 @@
    {"kind": "screen", "x": 180, "y": 112, "w": 22, "h": 20, "color": "#8fd8ff", "size": 0, "rate": 5, "when": "near", "idle": 0},
    {"kind": "twinkle", "x": 166, "y": 150, "w": 34, "h": 50, "size": 3, "rate": 1, "when": "always"},
    {"kind": "screen", "x": 210, "y": 167, "w": 18, "h": 10, "color": "#3fe0d0", "size": 0, "rate": 1, "when": "always"}
-  ]
+  ],
+  "outside": "out_sleep"
  },
  "kochnische": {
   "name": "Kochnische",
@@ -40,7 +41,8 @@
    {"kind": "screen", "x": 85, "y": 107, "w": 17, "h": 6, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
    {"kind": "screen", "x": 62, "y": 148, "w": 17, "h": 7, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
    {"kind": "smoke", "x": 124, "y": 26, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
-  ]
+  ],
+  "outside": "out_kitchen"
  },
  "werkbank": {
   "name": "Werkbank",
@@ -62,7 +64,8 @@
    {"kind": "twinkle", "x": 40, "y": 160, "w": 60, "h": 42, "size": 3, "rate": 1, "when": "always"},
    {"kind": "twinkle", "x": 150, "y": 160, "w": 45, "h": 42, "size": 3, "rate": 1.5, "when": "always"},
    {"kind": "twinkle", "x": 205, "y": 80, "w": 30, "h": 120, "size": 3, "rate": 1, "when": "always"}
-  ]
+  ],
+  "outside": "out_craft"
  },
  "generator": {
   "name": "Generator",
@@ -84,7 +87,8 @@
    {"kind": "twinkle", "x": 40, "y": 160, "w": 60, "h": 45, "size": 3, "rate": 1, "when": "always"},
    {"kind": "twinkle", "x": 178, "y": 165, "w": 40, "h": 35, "size": 3, "rate": 1.5, "when": "always"},
    {"kind": "twinkle", "x": 210, "y": 80, "w": 30, "h": 120, "size": 3, "rate": 1, "when": "always"}
-  ]
+  ],
+  "outside": "out_ac"
  },
  "waffenkammer": {
   "name": "Waffenkammer",
@@ -106,9 +110,10 @@
    {"kind": "twinkle", "x": 180, "y": 158, "w": 40, "h": 20, "size": 3, "rate": 1.5, "when": "always"},
    {"kind": "twinkle", "x": 212, "y": 80, "w": 30, "h": 45, "size": 3, "rate": 1, "when": "always"},
    {"kind": "twinkle", "x": 215, "y": 160, "w": 30, "h": 45, "size": 3, "rate": 1, "when": "always"}
-  ]
+  ],
+  "outside": "out_storage"
  },
- "kuehlraum": {"name": "Kühlraum", "function": "cooling", "stage": "1", "places": 1, "power": -2, "capacity": 20, "value": 250, "grid": [6, 4]},
+ "kuehlraum": {"name": "Kühlraum", "function": "cooling", "stage": "1", "places": 1, "power": -2, "capacity": 20, "value": 250, "grid": [6, 4], "outside": "out_tank"},
  "chill_area": {
   "name": "Chill Area",
   "function": "chill",
@@ -131,7 +136,8 @@
    {"kind": "steam", "x": 128, "y": 162, "w": 6, "h": 3, "color": "#ece6f2", "size": 4, "rate": 0.6, "when": "always"},
    {"kind": "twinkle", "x": 175, "y": 160, "w": 40, "h": 35, "size": 3, "rate": 1, "when": "always"}
   ],
-  "rest": {"verb": "Fernsehen und abhängen", "hours": 1, "heal": 20, "banner": "Flimmern, Sofa, Lavalampe"}
+  "rest": {"verb": "Fernsehen und abhängen", "hours": 1, "heal": 20, "banner": "Flimmern, Sofa, Lavalampe"},
+  "outside": "out_graffiti"
  },
  "drohnenwerkstatt": {
   "name": "Drohnenwerkstatt",
@@ -154,7 +160,8 @@
    {"kind": "twinkle", "x": 178, "y": 168, "w": 30, "h": 30, "size": 3, "rate": 1.5, "when": "always"},
    {"kind": "twinkle", "x": 212, "y": 150, "w": 32, "h": 60, "size": 3, "rate": 1, "when": "always"}
   ],
-  "rest": {"verb": "AvA warten", "hours": 0.5, "heal": 0, "banner": "AvA glänzt wieder", "drone": true}
+  "rest": {"verb": "AvA warten", "hours": 0.5, "heal": 0, "banner": "AvA glänzt wieder", "drone": true},
+  "outside": "out_craft"
  },
  "warroom": {
   "name": "Warroom",
@@ -179,7 +186,8 @@
    {"kind": "twinkle", "x": 40, "y": 165, "w": 60, "h": 40, "size": 3, "rate": 1, "when": "always"},
    {"kind": "twinkle", "x": 175, "y": 165, "w": 22, "h": 25, "size": 3, "rate": 1.5, "when": "always"},
    {"kind": "twinkle", "x": 215, "y": 160, "w": 25, "h": 45, "size": 3, "rate": 1, "when": "always"}
-  ]
+  ],
+  "outside": "out_warroom"
  },
  "kueche": {
   "name": "Küche",
@@ -199,7 +207,8 @@
    {"kind": "screen", "x": 85, "y": 107, "w": 17, "h": 6, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
    {"kind": "screen", "x": 62, "y": 148, "w": 17, "h": 7, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
    {"kind": "smoke", "x": 124, "y": 26, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
-  ]
+  ],
+  "outside": "out_kitchen"
  },
  "foodtruck": {
   "name": "Foodtruck",
@@ -220,11 +229,12 @@
    {"kind": "screen", "x": 85, "y": 107, "w": 17, "h": 6, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
    {"kind": "screen", "x": 62, "y": 148, "w": 17, "h": 7, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
    {"kind": "smoke", "x": 124, "y": 26, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
-  ]
+  ],
+  "outside": "out_kitchen"
  },
- "motorraum": {"name": "Motorraum", "function": "engine", "stage": "1", "places": 1, "power": 0, "value": 300},
- "zelle": {"name": "Zelle", "function": "cell", "stage": "2", "places": 1, "power": 0, "capacity": 1, "value": 200},
- "reaktor": {"name": "Reaktor", "function": "power", "stage": "2", "places": 2, "power": 8, "value": 3000},
+ "motorraum": {"name": "Motorraum", "function": "engine", "stage": "1", "places": 1, "power": 0, "value": 300, "outside": "out_ac"},
+ "zelle": {"name": "Zelle", "function": "cell", "stage": "2", "places": 1, "power": 0, "capacity": 1, "value": 200, "outside": "out_graffiti"},
+ "reaktor": {"name": "Reaktor", "function": "power", "stage": "2", "places": 2, "power": 8, "value": 3000, "outside": "out_ac"},
  "lagerregal": {
   "name": "Lagerregal",
   "function": "storage",
@@ -237,7 +247,8 @@
   "look": "ws_shelf_full",
   "lookEmpty": "ws_shelf_empty",
   "fill": [{"y": 0},{"y": 48},{"y": 106},{"y": 162}],
-  "scale": 72
+  "scale": 72,
+  "outside": "out_storage"
  },
  "gaestekoje": {
   "name": "Gästekoje",
@@ -249,7 +260,8 @@
   "value": 320,
   "stage": "mvp",
   "description": "Zwei Etagenbetten für Fahrgäste. Companions, die als Gast mitfahren, brauchen hier ein Bett, sonst bleiben sie beim Fahren zurück.",
-  "fx": []
+  "fx": [],
+  "outside": "out_sleep"
  },
  "schatzkammer": {
   "name": "Schatzkammer",
@@ -280,18 +292,20 @@
   ],
   "lookEmpty": "ws_treasury_cyber_empty",
   "fill": [{"y": 124},{"y": 150},{"y": 172},{"y": 194}],
-  "scale": 78
+  "scale": 78,
+  "outside": "out_treasury"
  },
  "cryotank": {
   "name": "Cryo-Tank",
   "function": "tank",
   "places": 1,
-  "power": -1,
+  "power": 0,
   "stage": "mvp",
   "value": 0,
   "fixed": true,
   "look": "ws_cryotank_1",
-  "description": "AvA schläft hier. Ihr Verstand fliegt mit dir. Kann nicht verkauft oder ausgebaut werden."
+  "description": "AvA schläft hier. Ihr Verstand fliegt mit dir. Kann nicht verkauft oder ausgebaut werden.",
+  "outside": "out_tank"
  },
  "hydrokultur": {
   "name": "Hydrokultur",
@@ -334,7 +348,8 @@
    {"kind": "light", "x": 100, "y": 107, "w": 76, "h": 3, "color": "#e45aa8", "size": 38, "rate": 3, "when": "always"},
    {"kind": "light", "x": 100, "y": 157, "w": 76, "h": 3, "color": "#e45aa8", "size": 38, "rate": 3, "when": "always"},
    {"kind": "screen", "x": 219, "y": 116, "w": 13, "h": 7, "color": "#56e07a", "size": 0, "rate": 2, "when": "always"}
-  ]
+  ],
+  "outside": "out_garden"
  },
  "ripperdoc": {
   "name": "Ripperdoc-Liege",
@@ -354,6 +369,23 @@
    {"kind": "blink", "x": 197, "y": 74, "w": 4, "h": 4, "color": "#ff4a6a", "size": 3, "rate": 1, "when": "always"},
    {"kind": "sparks", "x": 112, "y": 100, "w": 30, "h": 8, "color": "#9ff7ff", "size": 3, "rate": 30, "when": "use", "idle": 0},
    {"kind": "smoke", "x": 120, "y": 98, "w": 10, "h": 4, "color": "#c2b9cc", "size": 6, "rate": 2, "when": "use", "idle": 0}
-  ]
+  ],
+  "outside": "out_ripper"
+ },
+ "zisterne": {
+  "name": "Zisterne",
+  "function": "cistern",
+  "stage": "mvp",
+  "places": 1,
+  "power": 0,
+  "value": 300,
+  "look": "ws_cistern",
+  "description": "Fängt Regen und Tau, filtert durch Kohle und Sand. Füllt sich, während du schläfst, fährst oder plünderst.",
+  "cistern": {"item": "wasser", "perHour": 0.25, "max": 8},
+  "fx": [
+   {"kind": "screen", "x": 184, "y": 80, "w": 8, "h": 26, "color": "#20d6c7", "size": 0, "rate": 1, "when": "always"},
+   {"kind": "bubbles", "x": 150, "y": 70, "w": 60, "h": 40, "color": "#a6fcdb", "size": 2, "rate": 2, "when": "always"}
+  ],
+  "outside": "out_cistern"
  }
 }

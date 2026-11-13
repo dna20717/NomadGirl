@@ -4,7 +4,7 @@
   "pull": 2400,
   "fuelUse": 12,
   "tank": 60,
-  "power": 3,
+  "power": 2,
   "length": 2,
   "stack": 2,
   "slots": {"engine": 1, "armor": 1, "weapon": 0, "roof": 1},

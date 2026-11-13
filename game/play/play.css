@@ -54,7 +54,8 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .hud-menubtn svg { width: 14px; height: 14px; }
 @media (max-width: 760px) { .hud-keyhelp, .hud-cols { grid-template-columns: 1fr; } }
 .hud-go { display: block; margin: 4px 0 0 auto; padding: 10px 26px; box-shadow: 0 0 18px rgba(255, 210, 122, .35); border: 0; border-radius: 8px; background: #ffd27a; color: #0d0a12; font: 600 15px var(--ui-font); cursor: pointer; }
-.hud-foot { position: fixed; left: 20px; bottom: 12px; font-size: 12px; color: #8a7d99; }
+.hud-foot { position: fixed; left: 20px; bottom: 12px; font-size: 12px; color: #8a7d99; opacity: .55; transition: opacity .2s; }
+.hud-foot:hover { opacity: 1; }
 .hud-foot a { color: #b9a2c8; }
 #hud.hud-hurt::after { content: ''; position: fixed; inset: 0; box-shadow: inset 0 0 120px rgba(255, 47, 90, .55); animation: hurt .35s ease-out forwards; }
 @keyframes hurt { to { opacity: 0; } }
@@ -608,3 +609,5 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .wm-cost .bad b { color: #ff6b6b; }
 .wm-go { margin-top: auto; justify-content: center; font-size: 18px; padding: 12px; }
 .wm-why { color: #b9a9c9; }
+.wm-unknown { color: #6d5f7c; font: 22px/1 VT323, monospace; letter-spacing: 3px; }
+.wm-intel { margin: 0; padding: 8px 10px; border-radius: 8px; border: 1px dashed #5a4a2a; color: #ffd27a; font: 13px/1.4 var(--ui-font); background: rgba(255, 210, 122, .06); }

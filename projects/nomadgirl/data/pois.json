@@ -6,7 +6,7 @@
   "danger": 1,
   "roomCount": [3, 4],
   "rooms": ["vorplatz", "verkaufsraum", "lager", "werkstatthalle"],
-  "enemies": ["kriecher", "rattenschwarm", "keulenschwinger", "pistolero"],
+  "enemies": ["streuner", "rattenschwarm", "keulenschwinger", "pistolero"],
   "loot": "kiste_tankstelle",
   "parTime": 90,
   "secrets": 1,

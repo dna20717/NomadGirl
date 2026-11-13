@@ -25,8 +25,12 @@ export const sellPrice = (D, area, id) => Math.round(priceOf(D, area, id) * (B(D
 const rigGrid = k => k.startsWith('store:') || k.startsWith('rig:');
 
 // ---------- rig parts in the tractor's slots (Inventar › Van) ----------
-export const SLOT_ORDER = ['engine', 'armor', 'weapon', 'roof'];
-export const slotCount = (D, rig, slot) => D.tractors?.[rig.tractor]?.slots?.[slot] || 0;
+export const SLOT_ORDER = ['engine', 'armor', 'weapon', 'roof', 'solar'];
+// solar (#008, Daniel 13.11.2026: „Solarpaneele auf Dächer von Containern, so viele wie der Container in Einheiten lang ist“): one socket per place of every container
+export const slotCount = (D, rig, slot) => slot === 'solar' ? rig.units.filter(u => u.kind === 'container' && D.containers?.[u.id]?.kind !== 'crate').reduce((n, u) => n + placesOf(D, u), 0) : D.tractors?.[rig.tractor]?.slots?.[slot] || 0;
+// the panels on the roofs, and how much they make in the sun (Camp › Solar & Akku)
+export const solarPanels = (D, rig) => (rig.parts?.solar || []).filter(id => D.rigParts?.[id]?.slot === 'solar').length;
+export const solarPower = (D, rig) => solarPanels(D, rig) * (D.camp?.solar?.power ?? 1);
 // all slots of the tractor: [{ slot, i, id }]
 export function partSlots(D, rig) {
   const out = [];
@@ -85,14 +89,14 @@ export function sellPart(D, d, i) {
   spend(D, d, -sellPrice(D, 'rigParts', id), 0);
   return { ok: true };
 }
-export const SLOT_NAMES = { engine: 'Motor', armor: 'Panzerung', weapon: 'Waffe', roof: 'Dach' };
+export const SLOT_NAMES = { engine: 'Motor', armor: 'Panzerung', weapon: 'Waffe', roof: 'Dach', solar: 'Solar' };
 
 // what can be bought: workshops of the allowed stages (Rig-Bau › Kaufbar), all containers, all rig parts
 export function shop(D) {
   const stages = B(D).stages || ['mvp', '1'];
   return {
     workshops: Object.entries(D.workshops || {}).filter(([, w]) => stages.includes(w.stage || 'mvp') && (w.value || 0) > 0).map(([id]) => id),
-    containers: Object.entries(D.containers || {}).filter(([, c]) => (c.value || 0) > 0).map(([id]) => id),
+    containers: Object.entries(D.containers || {}).filter(([, c]) => (c.value || 0) > 0 && !c.retired).map(([id]) => id),   // retired (Modul-Anhänger) are gone
     rigParts: Object.entries(D.rigParts || {}).filter(([, c]) => (c.value || 0) > 0).map(([id]) => id),
   };
 }
@@ -131,7 +135,7 @@ export function budgets(D, rig) {
   const T = D.tractors?.[rig.tractor] || {}, Tr = D.travel || {}, P = partStats(D, rig), pull = (T.pull || 0) + P.pull;
   const conts = rig.units.filter(u => u.kind === 'container'), ground = conts.filter(u => !levelOf(u));
   const weight = conts.reduce((n, u) => n + (D.containers?.[u.id]?.weight || 0), 0);
-  let made = T.power || 0, used = 0;
+  let made = (T.power || 0) + solarPower(D, rig), used = 0;   // + solar panels (in the sun; at night from the battery, camp.js)
   for (const u of rig.units) for (const w of u.workshops) { const p = wsDef(D, w.id).power || 0; if (p > 0) made += p; else used -= p; }
   const fuel = Math.round(((T.fuelUse ?? 12) + P.fuelUse) * (1 + (Tr.weightFuelFactor ?? 0) / 100 * weight / 1000) * 10) / 10;
   const places = rig.units.reduce((n, u) => n + placesOf(D, u), 0), filled = rig.units.reduce((n, u) => n + u.workshops.reduce((k, w) => k + (wsDef(D, w.id).places || 1), 0), 0);

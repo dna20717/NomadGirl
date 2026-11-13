@@ -235,6 +235,9 @@ export function repairSave(save, D) {
   if (!D.locations?.[s.location] && !s.map?.nodes?.some(n => n.id === s.location)) s.location = fresh.location;
   ensureMap(D, s);   // older savegames get their map here (#007)
   if (!D.tractors?.[s.rig?.tractor]) s.rig = fresh.rig;
+  // retired containers (Modul-Anhänger, Daniel 13.11.2026) become their replacement, with the same workshops
+  for (const u of s.rig.units) { const c = D.containers?.[u.id]; if (u.kind === 'container' && c?.retired && D.containers?.[c.replacedBy]) u.id = c.replacedBy; }
+  if (s.rig.spare?.containers) s.rig.spare.containers = s.rig.spare.containers.map(id => D.containers?.[id]?.retired && D.containers?.[D.containers[id].replacedBy] ? D.containers[id].replacedBy : id);
   s.rig.units = s.rig.units.filter(u => u.kind === 'tractor' || D.containers?.[u.id]);
   for (const u of s.rig.units) u.workshops = (u.workshops || []).filter(w => D.workshops?.[w.id]);
   refit(D, s);
@@ -305,3 +308,16 @@ export async function openSave(D, base = '') {
   };
   return box;
 }
+
+// the solar battery (#008, Daniel: „tagsüber + Akku“): every hour of sun the panels charge it, every dark hour they draw from it.
+// save.solar = { charge (⚡·h), at (absolute hour) }. At night the panels only count while there is charge left.
+export function solarState(D, save) {
+  const S = D.camp?.solar || {}, n = (save.rig?.parts?.solar || []).filter(id => D.rigParts?.[id]?.slot === 'solar').length, per = S.power ?? 1;
+  const [d0, d1] = S.day || [7, 19], cap = n * (S.battery ?? 6), now = (save.day || 1) * 24 + (save.hour || 0);
+  const st = save.solar ??= { charge: cap / 2, at: now };
+  for (let h = Math.max(st.at, now - 72); h < now; h += 1) { const hr = ((h % 24) + 24) % 24, sun = hr >= d0 && hr < d1, step = Math.min(1, now - h); st.charge = Math.max(0, Math.min(cap, st.charge + (sun ? 1 : -1) * n * per * step)); }
+  st.at = now;
+  const hr = save.hour || 0, sun = hr >= d0 && hr < d1;
+  return { panels: n, sun, charge: Math.round(st.charge * 10) / 10, capacity: cap, live: sun || st.charge > 0 ? n * per : 0, made: n * per };
+}
+

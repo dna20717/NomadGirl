@@ -9,7 +9,9 @@
   "look": "trailer_modular",
   "inside": {"x": [72, 225], "y": [95, 160]},
   "carries": true,
-  "deck": 81
+  "deck": 81,
+  "retired": true,
+  "replacedBy": "container_20"
  },
  "holzkiste": {"name": "Holzkiste", "kind": "crate", "places": 1, "weight": 250, "stackable": true, "value": 60},
  "container_20": {
@@ -56,7 +58,9 @@
   "inside": {"x": [72, 221], "y": [96, 158]},
   "deck": 79,
   "carries": true,
-  "description": "Lila Kasten auf zwei Achsen. Flaches Dach, da passt noch ein Container drauf."
+  "description": "Lila Kasten auf zwei Achsen. Flaches Dach, da passt noch ein Container drauf.",
+  "retired": true,
+  "replacedBy": "container_20"
  },
  "container_10": {
   "name": "10-Fuß-Container",

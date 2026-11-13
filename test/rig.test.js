@@ -15,7 +15,7 @@ const layout = s => s.rig.units.map(u => `${u.id}[${u.workshops.map(w => `${w.id
 test('Budgets: Gewicht gegen Zugkraft, Energie, Container-Zahl', () => {
   const b = budgets(D, fresh().rig);
   assert.deepEqual([b.weight, b.pull, b.heavy, b.length, b.maxLength], [900, 1500, false, 1, 1]);
-  assert.deepEqual(b.power, { made: 3, used: 3, net: 0 });   // van 3 ⚡, warroom + kochnische + werkbank −1 each
+  assert.deepEqual(b.power, { made: 2, used: 3, net: -1 });   // van 2 ⚡ (Daniel, 13.11.2026: „genug für ein oder zwei Module“), warroom + kochnische + werkbank −1 each
   assert.equal(b.places, 5); assert.equal(b.filled, 5);
   assert.equal(newSave(D).deltas, D.economy.startDeltas);
 });

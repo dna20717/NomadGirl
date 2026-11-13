@@ -25,6 +25,7 @@ const supply = (name, opt) => clickText('.craft-supply', name, opt);
 const go = async ws => ev(ws => {
   nomad.take(); nomad.step(5);
   const s = window.game.scene.getScene('play'), h = s.camp.hotspots.find(h => h.ws === ws);
+  if (!h) { s.camp.use(ws); nomad.step(3); return; }   // in the van (#008: the kitchenette lives there): through the van door
   nomad.goTo(h.name); nomad.step(1, [], ['grab']); nomad.step(3);
 }, ws);
 

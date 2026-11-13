@@ -15,7 +15,7 @@ const shot = async n => { if (!shots) return; fs.mkdirSync('output', { recursive
 
 await page.goto('http://localhost:8766/game.html?camp&new');
 await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.camp, null, { timeout: 40000 });
-let v = await ev(() => { nomad.take(); nomad.step(5);
+let v = await ev(() => { nomad.take(); nomad.step(5); const W = () => { const u = nomad.save().rig.units[0]; u.workshops = u.workshops.filter(w => w.at !== 1).concat({ id: 'warroom', at: 1 }); game.scene.getScene('play').goCamp({ keepPlace: true, fade: 0 }); nomad.step(30); }; /* #008: no warroom at the start, build one into the van */ W();
   const s = nomad.save(), g = s.inv.grids.chest; g.items = [];
   g.items.push({ a: 'items', id: 'technik', n: 12, x: 0, y: 0, r: 0 }, { a: 'items', id: 'wissen', n: 4, x: 1, y: 0, r: 0 }, { a: 'items', id: 'bio', n: 1, x: 2, y: 0, r: 0 });
   nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.choose('Planen'); const m = nomad.map(); nomad.choose('Techtree'); nomad.step(3);

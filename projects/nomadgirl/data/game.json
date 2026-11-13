@@ -7,8 +7,8 @@
  "start": {
   "location": "tankstelle_km7",
   "tractor": "van",
-  "containers": ["modulanhaenger"],
-  "workshops": ["schlafkoje", "warroom"],
+  "containers": [],
+  "workshops": ["schlafkoje", "kochnische"],
   "companions": ["schraube", "onkel_sung"],
   "fuel": 40,
   "food": 6,
@@ -42,7 +42,7 @@
    {"item": "plattentraeger", "count": 1, "where": "chest"},
    {"item": "nachtsicht_optik", "count": 1, "where": "chest"}
   ],
-  "spare": ["kochnische", "werkbank", "lagerregal"]
+  "spare": ["werkbank", "lagerregal"]
  },
  "loading": {"leyla": "leyla_run_side", "drone": "drone_hull", "color": "#3ee8ff", "accent": "#ff4fd8", "height": 96, "width": 70, "text": ""},
  "testRoom": "testraum",

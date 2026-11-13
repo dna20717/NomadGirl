@@ -4,12 +4,15 @@
 // Graphics are code placeholders for now; a "look" on containers, workshops or companions takes over later.
 import { ensureMap, placeOf, roadKm } from '../worldmap.js';
 import { potsOf, stage, ripe, harvest, STAGES } from '../garden.js';
-import { clockText, advance, hoursUntil, containers } from '../save.js';
+import { level as cisternLevel, tap as cisternTap } from '../cistern.js';
+import { anchors as lightAnchors, catenary, lightsConfig } from '../string_lights.js';
+import { clockText, advance, hoursUntil, containers, solarState } from '../save.js';
 import { budgets, partSlots, passengers } from '../rig.js';
 import { Benches, benchTexture, crateTexture } from './benches.js';
 
 const de = n => Number(n).toLocaleString('de-DE', { maximumFractionDigits: 1 });
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
+const LABEL_ALPHA = 0.8;
 const col = c => parseInt(String(c || '#000000').slice(1), 16);
 const shadeOf = (c, k) => { const n = col(c), f = v => Math.max(0, Math.min(255, Math.round(v * k))); return f(n >> 16 & 255) << 16 | f(n >> 8 & 255) << 8 | f(n & 255); };
 
@@ -302,7 +305,8 @@ export function shellTexture(scene, D, def, T = 64) {
 // a workshop on its own (scrapyard pallet, in the hand while building): a slice of interior with its furniture
 // ---------- rig parts from code (until they have a look): a box per slot kind, 34 × 30 px per "Feld" ----------
 export function partTexture(scene, D, id) {
-  const key = `part_${id}`;
+  const key = `part_${id}`, look = D.rigParts?.[id]?.look;
+  if (look && scene.textures.exists(look)) { scene.textures.get(look).setFilter(NEAREST()); return look; }   // its picture (e.g. the solar panel, #008)
   if (scene.textures.exists(key)) return key;
   const t = D.rigParts?.[id] || {}, [fw, fh] = t.size || [2, 2], w = Math.max(1, fw) * 34, h = Math.max(1, fh) * 30, c = col(t.color || '#8a6a3a');
   const lite = shadeOf(t.color || '#8a6a3a', 1.35), dark = shadeOf(t.color || '#8a6a3a', 0.6);
@@ -338,7 +342,10 @@ export function partView(scene, D, id, k = 1) {
 export function socketRects(D, rig, geo, ground) {
   const S = D.build?.sockets || {}, [sw, sh] = S.size || [120, 80], vw = geo.vanRight - geo.vanLeft, vh = D.assets?.[D.tractors?.[rig.tractor]?.look]?.height || 400;
   const all = partSlots(D, rig), out = [];
+  // solar sockets sit on the container roofs, one per place (#008)
+  const roofs = []; for (const u of geo.units || []) if (u.kind !== 'tractor' && u.def?.kind !== 'crate') for (let j = 0; j < (u.places || 0); j++) roofs.push({ cx: u.in0 + u.cell * (j + 0.5), y: u.deckY ?? u.inTop });
   for (const p of all) {
+    if (p.slot === 'solar') { const r = roofs[p.i]; if (!r) continue; const w = Math.min(sw, (r.w || sw)), cy = r.y - sh / 2; out.push({ ...p, cx: r.cx, cy, x0: r.cx - w / 2, x1: r.cx + w / 2, y0: cy - sh / 2, y1: cy + sh / 2 }); continue; }
     const n = all.filter(q => q.slot === p.slot).length, [px, py] = S[p.slot] || [50, 50];
     const cx = geo.vanLeft + vw * px / 100 + (p.i - (n - 1) / 2) * (sw + 12), cy = ground - vh * py / 100;
     out.push({ ...p, cx, cy, x0: cx - sw / 2, x1: cx + sw / 2, y0: cy - sh / 2, y1: cy + sh / 2 });
@@ -392,6 +399,7 @@ export class Camp {
     this.night = scene.add.rectangle(-4000, -4000, geo.W * T + 8000, geo.H * T + 8000, 0x0a0820, shade).setOrigin(0).setDepth(30);
     this.lightK = (this.day.light ?? Math.min(100, shade * 200)) / 100;   // how strongly fire and windows shine (Tag & Nacht › Licht)
     for (const l of this.lights) l.setAlpha(l.base * this.lightK).setVisible(this.lightK > 0);
+    this.setMood();
     this.prompt = null; this.barkAt = scene.time.now + 2500;
   }
 
@@ -414,12 +422,16 @@ export class Camp {
     this.labels = [];
     this.geo.units = rigUnits(this.D, this.box.save.rig, this.geo.vanLeft, this.ground, s.T);
     this.budget = budgets(this.D, this.box.save.rig);
+    // solar: in the sun full power, at night only while the battery holds (#008)
+    this.solar = solarState(this.D, this.box.save);
+    if (this.solar.live < this.solar.made) { this.budget.power.made -= this.solar.made - this.solar.live; this.budget.power.net = this.budget.power.made - this.budget.power.used; }
     this.noPower = this.D.build?.rules?.power !== false && this.budget.power.net < 0;
     this.tooHeavy = this.D.build?.rules?.weight !== false && this.budget.heavy;
     for (const u of this.geo.units) u.view = this.drawUnit(u);
     this.drawVanParts();
     this.drawVanDoor();
     this.drawYard();
+    this.drawStringLights();
     if (this.night) for (const l of this.lights) if (l.rig) l.setAlpha(l.base * this.lightK).setVisible(this.lightK > 0);
     this.updateShells(0);   // labels and lights of closed containers right away, not one frame later
   }
@@ -449,7 +461,7 @@ export class Camp {
           const was = this.shut?.[`${u.ui}:${u.id}`] ?? 1;   // redrawn rig (building): keep the current state, no flash
           shut.setAlpha(was);
           this.rigObjs.push(shut);
-          this.shells.push({ u, img: shut, key: `${u.ui}:${u.id}`, a: was });
+          this.shells.push({ u, img: shut, key: `${u.ui}:${u.id}`, a: was, extras: [] });
         }
       }
     } else add(s.add.image(u.x0 - mid, 0, shellTexture(s, D, u.def, s.T)).setOrigin(0, 1).setScale(1));
@@ -479,6 +491,18 @@ export class Camp {
       if (!u.sprite && !art) g.fillStyle(0x0d0a12).fillRect(cx + cw / 2 - 26, 40 + 22, 52, 34).fillStyle(col(R.light || '#ffcf7a')).fillRect(cx + cw / 2 - 22, 40 + 26, 44, 26);   // window
       const l = this.light(u.in0 + w.at * u.cell + cw / 2, u.inTop + h * 0.35, 200, R.light || '#ffcf7a', 0.45); l.rig = true; l.unit = u.ui;
       this.workshopHotspot(u, w, def, u.in0 + w.at * u.cell, cw, u.inTop + 8);
+    }
+    // clutter on the closed container's outer wall, matching the workshop behind it (Werkstätten › Außenwand, #008); fades with the shell
+    const shell = this.shells.find(c => c.u === u);
+    if (shell) for (const w of u.workshops) {
+      const def = D.workshops?.[w.id] || {}, info = def.outside && s.assetInfo(def.outside);
+      if (!info || (this.hide && this.hide.ui === u.ui && this.hide.at === w.at)) continue;
+      s.textures.get(info.key).setFilter(NEAREST());
+      const cw = (def.places || 1) * u.cell, [ox, oy] = def.outsideAt || [0, 0], k = R.outsideScale ?? 2;
+      const x = u.in0 + w.at * u.cell + cw / 2 + ox, y = u.inTop + h * 0.52 + oy;
+      const img = s.add.image(x, y, info.key, 0).setOrigin(0.5).setScale(k).setDepth(-19.4).setAlpha(shell.a);
+      this.rigObjs.push(img); shell.extras.push(img);
+      if (def.function === 'kitchen' || def.function === 'foodtruck') (shell.smoke ||= []).push({ x: x + img.displayWidth * 0.18, y: y - img.displayHeight / 2 });
     }
     // a little shade under the ceiling and along the walls, so the pictures sit inside the room (3 steps, pixel style)
     if (shades.length) {
@@ -574,12 +598,21 @@ export class Camp {
   groundLadder(u) {
     const s = this.scene, R = this.C.rig || {}, in1 = u.in0 + u.cell * u.places, edge = Math.min(s.T * 0.75, (in1 - u.in0) / 2);
     const x = Math.min(Math.max(u.in0 + (in1 - u.in0) * (R.groundLadderAt ?? 92) / 100, u.in0 + edge), in1 - edge), top = u.floorY, bottom = this.ground;
-    const g = s.add.graphics().setDepth(-18);
-    g.fillStyle(0x30363d).fillRect(x - 22, top - 30, 6, bottom - top + 30).fillRect(x + 16, top - 30, 6, bottom - top + 30);
-    g.fillStyle(0x8b949e).fillRect(x - 22, top - 30, 2, bottom - top + 30).fillRect(x + 16, top - 30, 2, bottom - top + 30);
-    for (let y = bottom - 20; y > top - 20; y -= 28) g.fillStyle(0x6b7280).fillRect(x - 16, y, 32, 5);
-    this.rigObjs.push(g);
-    s.ladders.push({ cx: x, x0: x - s.T / 2, x1: x + s.T / 2, top, bottom, rig: true, ground: true });
+    // a folding metal stair (Camp › Gemütlichkeit › Klapptreppe, Daniel 13.11.2026): its landing reaches the container's floor
+    const info = this.C.stairs?.look && s.assetInfo(this.C.stairs.look);
+    if (info) {
+      s.textures.get(info.key).setFilter(NEAREST());
+      const src = s.textures.get(info.key).getSourceImage(), land = (this.C.stairs.landing ?? 26) / src.height, feet = (this.C.stairs.feet ?? 123) / src.height;
+      const k = Math.max(0.6, (bottom - top) / ((feet - land) * src.height)), ox = (this.C.stairs.at ?? 85) / src.width;
+      this.rigObjs.push(s.add.image(x, bottom + (1 - feet) * src.height * k, info.key).setOrigin(ox, 1).setScale(k).setDepth(-18));
+    } else {
+      const g = s.add.graphics().setDepth(-18);
+      g.fillStyle(0x30363d).fillRect(x - 22, top - 30, 6, bottom - top + 30).fillRect(x + 16, top - 30, 6, bottom - top + 30);
+      g.fillStyle(0x8b949e).fillRect(x - 22, top - 30, 2, bottom - top + 30).fillRect(x + 16, top - 30, 2, bottom - top + 30);
+      for (let y = bottom - 20; y > top - 20; y -= 28) g.fillStyle(0x6b7280).fillRect(x - 16, y, 32, 5);
+      this.rigObjs.push(g);
+    }
+    s.ladders.push({ cx: x, x0: x - s.T / 2, x1: x + s.T / 2, top, bottom, rig: true, ground: true, stairs: !!info });
   }
   // a small storage of its own (Kofferraum, Deichselkasten): E opens and closes it
   storeHotspot(key, x, name, rig = true) {
@@ -591,7 +624,8 @@ export class Camp {
     const store = def.grid && `store:${u.ui}:${w.at}`;
     this.hotspots.push({ rig: true, place: `${u.ui}:${w.at}`, x: cx + cw / 2, w: cw / 2, top: this.curTop, floor: u.floorY, name: def.name || w.id, hint: store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id, `${u.ui}:${w.at}`) });
     if (R.labels !== false && def.function !== 'tank') {   // the cryo tank has its own screen
-      const t = this.scene.add.text(cx + cw / 2, labelY, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '24px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 0).setDepth(-14);
+      // subtle (#008): small, soft, a little see-through; they still say what stands where
+      const t = this.scene.add.text(cx + cw / 2, labelY, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '20px', color: '#e9d8b4', stroke: '#0d0a12', strokeThickness: 4 }).setOrigin(0.5, 0).setDepth(-14).setAlpha(LABEL_ALPHA);
       t.unit = u.ui; this.rigObjs.push(t); (this.labels ||= []).push(t);   // fades with a closed shell
     }
   }
@@ -602,9 +636,9 @@ export class Camp {
     const s = this.scene, D = this.D, vis = D.build?.sockets?.visible || ['armor', 'weapon', 'roof'];
     if (s.hud.build?.active) return;   // building: the sockets show them
     for (const p of socketRects(D, this.box.save.rig, this.geo, this.ground)) {
-      if (!p.id || !vis.includes(p.slot)) continue;
+      if (!p.id || !(vis.includes(p.slot) || p.slot === 'solar')) continue;
       const v = partView(s, D, p.id).setDepth(-19.5);
-      v.setPosition(p.cx, p.cy + v.h / 2);
+      v.setPosition(p.cx, p.slot === 'solar' ? p.y1 : p.cy + v.h / 2);   // solar stands on the container roof (#008)
       this.rigObjs.push(v);
     }
   }
@@ -686,6 +720,67 @@ export class Camp {
     g.fillStyle(0x6a3a2a).fillRect(ex - 120, y - 70, 44, 70).fillStyle(0x8a4a32).fillRect(ex - 120, y - 56, 44, 6).fillRect(ex - 120, y - 24, 44, 6);
   }
 
+  // ---------- string lights (game/string_lights.js): pulled between the containers' corners in build mode ----------
+  anchors() {
+    // the van has corners too: front and back of its roof
+    const r = this.scene.van?.roof, van = r ? [{ ui: 0, x0: r.x0 - 8, x1: r.x1 + 8, inTop: r.y + 34 - 14 }] : [];   // the roof rails (Spiel › Van › Dach)
+    return lightAnchors([...van, ...this.geo.units.filter(u => u.ui !== 0)]);
+  }
+  wire(i) {
+    const pair = this.box.save.rig.lights?.[i], A = Object.fromEntries(this.anchors().map(a => [a.id, a])), L = lightsConfig(this.D);
+    return pair && A[pair[0]] && A[pair[1]] ? catenary(A[pair[0]], A[pair[1]], L.sag, L.spacing) : null;
+  }
+  drawStringLights() {
+    const s = this.scene, L = lightsConfig(this.D);
+    this.bulbs = [];
+    if (!L.enabled) return;
+    const g = s.add.graphics().setDepth(-16);
+    this.rigObjs.push(g);
+    (this.box.save.rig.lights || []).forEach((_, i) => {
+      const w = this.wire(i);
+      if (!w) return;
+      g.lineStyle(3, 0x17111f, 1).strokePoints(w.line);
+      w.bulbs.forEach((b, j) => {
+        const c = L.colors[j % L.colors.length];
+        g.fillStyle(0x17111f).fillRect(b.x - 3, b.y - 1, 6, 5);
+        g.fillStyle(col(c)).fillCircle(b.x, b.y + 9, 5).fillStyle(0xffffff, 0.6).fillRect(b.x - 2, b.y + 5, 2, 2);
+        const l = this.light(b.x, b.y + 9, 46, c, 0.75); l.rig = true; l.bulb = j * 1.7 + i; this.bulbs.push(l);
+      });
+    });
+  }
+
+  // ---------- mood (Camp › Gemütlichkeit): dark edge, warm shimmer at night, fireflies round the fire ----------
+  setMood() {
+    const s = this.scene, M = this.C.mood || {}, k = this.lightK;
+    const v = (M.vignette ?? 0) / 100;
+    if (v > 0 && s.renderer?.type === Phaser.WEBGL && s.cam?.postFX) this.vignette = s.cam.postFX.addVignette(0.5, 0.5, 0.95 - 0.3 * v, 0.55 * v);
+    const warm = (M.warm ?? 0) / 100;
+    if (warm > 0 && k > 0) s.add.rectangle(-4000, -4000, this.geo.W * s.T + 8000, this.geo.H * s.T + 8000, 0xff8a3a, warm * 0.09 * k).setOrigin(0).setBlendMode(Phaser.BlendModes.ADD).setDepth(30.5);
+    this.flies = [];
+    const n = Math.round(M.fireflies ?? 0);
+    if (n > 0 && k > 0.2) for (let i = 0; i < n; i++) {
+      const f = s.add.image(0, 0, glowTexture(s)).setDisplaySize(16, 16).setTint(0xd8ff7a).setBlendMode(Phaser.BlendModes.ADD).setDepth(31);
+      this.flies.push({ f, x: this.geo.fireX + (Math.random() - 0.5) * 1300, y: this.ground - 40 - Math.random() * 240, p: Math.random() * 100, sp: 0.4 + Math.random() * 0.6 });
+    }
+    this.puffAt = 0;
+  }
+  updateMood(time, dt) {
+    const s = this.scene, k = this.lightK, t = time / 1000;
+    for (const q of this.flies || []) {
+      const x = q.x + Math.sin(t * 0.37 * q.sp + q.p) * 90 + Math.sin(t * 1.1 * q.sp + q.p * 2) * 24, y = q.y + Math.sin(t * 0.53 * q.sp + q.p * 3) * 40;
+      q.f.setPosition(x, y).setAlpha(k * Math.max(0, Math.sin(t * 1.7 * q.sp + q.p)) * 0.9);
+    }
+    for (const b of this.bulbs || []) b.setAlpha(b.base * k * (0.8 + 0.2 * Math.sin(t * 2.3 + b.bulb)));
+    // chimney smoke from kitchen walls (closed shells only)
+    if (this.C.mood?.smoke !== false && time > this.puffAt) {
+      this.puffAt = time + 520;
+      for (const c of this.shells || []) if (c.a > 0.6) for (const p of c.smoke || []) {
+        const puff = s.add.circle(p.x + (Math.random() - 0.5) * 6, p.y, 7 + Math.random() * 4, 0xb8b0c0, 0.32 * c.a).setDepth(-19.3);
+        s.tweens.add({ targets: puff, y: p.y - 150 - Math.random() * 60, x: puff.x + 30 + Math.random() * 30, scale: 2.6, alpha: 0, duration: 2600, onComplete: () => puff.destroy() });
+      }
+    }
+  }
+
   light(x, y, r, color, base, h = r) {
     const l = this.scene.add.image(x, y, glowTexture(this.scene)).setDisplaySize(r * 2, h * 2).setTint(col(color)).setBlendMode(Phaser.BlendModes.ADD).setDepth(31);
     l.base = base; this.lights.push(l);
@@ -705,7 +800,8 @@ export class Camp {
       if (c.a !== target) c.a = target > c.a ? Math.min(1, c.a + dt / fade) : Math.max(0, c.a - dt / fade);
       c.img.setAlpha(c.a).setVisible(c.a > 0.001);
       for (const lt of this.lights) if (lt.rig && lt.unit === u.ui) lt.setAlpha(lt.base * this.lightK * (1 - c.a * (1 - leak))).setVisible(this.lightK > 0);
-      for (const t of this.labels) if (t.unit === u.ui) t.setAlpha(1 - c.a);
+      for (const t of this.labels) if (t.unit === u.ui) t.setAlpha(LABEL_ALPHA * (1 - c.a));
+      for (const x of c.extras || []) x.setAlpha(c.a).setVisible(c.a > 0.001);
     }
   }
 
@@ -733,6 +829,13 @@ export class Camp {
       ...(F.pool ? [this.light(x, y + 6, F.pool, color, 0.5 * k, F.pool * 0.14)] : []),
     ];
     this.hotspots.push({ x, w: 90, name: 'Lagerfeuer', hint: 'Hinsetzen', act: () => this.sitDown() });
+    // deco round the fire (Camp › Gemütlichkeit › Deko ums Feuer): rug, chairs, a corner with canisters
+    for (const d of this.C.deco || []) {
+      const info = d.look && s.assetInfo(d.look);
+      if (!info) continue;
+      s.textures.get(info.key).setFilter(NEAREST());
+      s.add.image(x + (d.x || 0), y + (d.y || 0), info.key).setOrigin(0.5, 1).setScale(d.scale || 2).setFlipX(!!d.flip).setDepth(d.front ? 5 : d.look.includes('rug') ? -6 : -5);
+    }
   }
 
   // ---------- van: at night warm light pours out of the open sliding door ----------
@@ -851,6 +954,7 @@ export class Camp {
     if (def.function === 'warroom') return this.warroom();
     if (['kitchen', 'craft', 'cyber', 'tank'].includes(def.function)) { s.hud.inv?.close(); return s.hud.craft?.open(id); }
     if (def.function === 'garden') return this.garden(id, def, place);
+    if (def.function === 'cistern') return this.cistern(id, def, place);
     if (def.function === 'guests') {   // who sleeps here: the guests in order, as many as there are beds in all guest bunks
       const P = passengers(this.D, this.box.save), nm = c => this.D.companions?.[c]?.name || c, waiting = Object.entries(this.box.save.waiting || {});
       return s.hud.menu({ title: def.name || id, sub: [def.description, P.guests.length ? `Gäste an Bord: ${P.riding.map(nm).join(', ') || '–'} · ${P.beds} ${P.beds === 1 ? 'Bett' : 'Betten'} im Rig.` : `${P.beds} ${P.beds === 1 ? 'Bett' : 'Betten'} frei für Fahrgäste.`,
@@ -880,6 +984,18 @@ export class Camp {
         s.fx.text(s.leyla.x, s.leyla.feet - s.leyla.height - 30, r.got.map(g => `+${g.n} ${D.items?.[g.id]?.name || g.id}`).join(' · ') || 'Nichts geerntet', { color: '#9cdb43', size: 34, rise: 50, life: 1600 });
         s.drone?.react('curious');
         this.benches?.list.forEach(b => { if (b.plants) b.plantSig = null; });
+      } }, { label: 'Zurück', act: () => {} }] });
+  }
+  // the cistern (game/cistern.js): how full it is, E fills bottles into the camp inventories
+  cistern(id, def, place) {
+    const s = this.scene, D = this.D, save = this.box.save, key = place || id, L = cisternLevel(D, save, id, key), name = D.items?.[L.item]?.name || L.item;
+    const left = L.full >= L.max ? 'voll' : `nächste Flasche in ~${Math.max(1, Math.ceil((1 - (L.water % 1)) / Math.max(0.01, L.perHour)))} h`;
+    s.hud.menu({ title: def.name || id, sub: [def.description, `${L.full} von ${L.max} Flaschen · ${left}`].filter(Boolean).join(' · '),
+      items: [{ label: L.full ? `Abfüllen (${L.full})` : 'Noch zu wenig Wasser', primary: !!L.full, disabled: L.full ? null : 'Sammelt noch', act: () => {
+        const r = cisternTap(D, save, id, key);
+        this.box.persist?.();
+        s.fx.text(s.leyla.x, s.leyla.feet - s.leyla.height - 30, r.got ? `+${r.got} ${name}` : 'Kein Platz im Rucksack', { color: '#20d6c7', size: 34, rise: 50, life: 1600 });
+        s.drone?.react('happy');
       } }, { label: 'Zurück', act: () => {} }] });
   }
   // a workshop to spend time at (Werkstätten › Benutzen): Chill Area, Drohnenwerkstatt … time passes, heals, gives its buff;
@@ -937,10 +1053,12 @@ export class Camp {
   warroom() {
     const s = this.scene, D = this.D, save = this.box.save, extras = [];
     if (Object.keys(D.techtree || {}).length) extras.push({ label: 'Techtree', icon: 'tree', act: () => { s.hud.inv?.close(); s.hud.tech?.open(); } });
-    const wr = this.rigWorkshop?.('warroom') || Object.keys(D.workshops || {}).find(k => D.workshops[k].function === 'warroom');
+    const wr = this.rigWorkshop('warroom') || Object.keys(D.workshops || {}).find(k => D.workshops[k].function === 'warroom');
     if (wr) extras.push({ label: 'Auswerten', icon: 'research', act: () => { s.hud.inv?.close(); s.hud.craft?.open(wr, 'salvage'); } });
     this.openMap({ extras });
   }
+  // the first built-in workshop of a kind (function) anywhere in the rig, or null
+  rigWorkshop(fn) { for (const u of this.box.save.rig.units) for (const w of u.workshops || []) if (this.D.workshops?.[w.id]?.function === fn) return w.id; return null; }
   // the travel map at the warroom and at the van door (Daniel: „Beides“)
   openMap(opts = {}) { const s = this.scene; s.hud.inv?.close(); ensureMap(this.D, this.box.save); s.hud.map?.open(opts); }
   // why the rig cannot drive (too heavy, too little fuel)
@@ -1007,6 +1125,7 @@ export class Camp {
     }
     this.benches?.update(time, dt);
     this.updateShells(dt);
+    this.updateMood(time, dt);
     // companions: random speech bubbles
     const B = this.C.companions?.barkEvery || [7, 15];
     if (time > this.barkAt && this.companions.length) {
@@ -1058,7 +1177,7 @@ export class Camp {
   }
 }
 
-const VERB = { sleep: 'Schlafen', warroom: 'Planen', kitchen: 'Kochen', foodtruck: 'Verkaufen', craft: 'Herstellen', storage: 'Lager', cooling: 'Kühlraum', chill: 'Chillen', drone: 'Drohne', engine: 'Motor', power: 'Energie', cell: 'Zelle', guests: 'Gäste', treasury: 'Schatzkammer', tank: 'Nach AvA sehen', garden: 'Gärtnern' };
+const VERB = { sleep: 'Schlafen', warroom: 'Planen', kitchen: 'Kochen', foodtruck: 'Verkaufen', craft: 'Herstellen', storage: 'Lager', cooling: 'Kühlraum', chill: 'Chillen', drone: 'Drohne', engine: 'Motor', power: 'Energie', cell: 'Zelle', guests: 'Gäste', treasury: 'Schatzkammer', tank: 'Nach AvA sehen', garden: 'Gärtnern', cistern: 'Wasser' };
 const SOON = { foodtruck: 'Verkaufen kommt später.', power: 'Liefert Energie für die Werkstätten im Rig.',
   storage: 'Ein Lager fürs Camp: Kochen, Herstellen und Zerlegen nehmen sich, was hier liegt.', cooling: 'Hält Essen frisch. Kochen nimmt sich, was hier liegt.' };
 

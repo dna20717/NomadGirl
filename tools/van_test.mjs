@@ -50,7 +50,7 @@ await shot('trunk');
 // the tab "Van" shows the van's slots and the Kofferraum; building in happens in the build mode
 await page.locator('.inv-tab', { hasText: 'Van' }).click(); await page.waitForTimeout(40);
 s = await inv();
-check('Tab „Van“: Slots + Kofferraum links, Rucksack rechts', s.tab === 'van' && s.pair?.[0] === 'rig:0' && s.pair?.[1] === 'backpack' && (await page.locator('.inv-slot.part').count()) === 3, s);
+check('Tab „Van“: Slots (Motor, Panzerung, Dach, dazu Solar auf Container-Dächern, #008) + Kofferraum links, Rucksack rechts', s.tab === 'van' && s.pair?.[0] === 'rig:0' && s.pair?.[1] === 'backpack' && (await page.locator('.inv-slot.part').count()) >= 3, s);
 await page.locator('.inv-slot[data-part="roof:0"]').click(); await page.waitForTimeout(30);
 s = await inv();
 check('Slot anklicken baut nichts aus (nur Ansicht)', !s.held && !s.parts?.roof?.[0], s);
@@ -64,7 +64,7 @@ await ev(() => game.scene.getScene('play').hud.inv.close());
 // build mode: rig parts are bought onto the scrapyard and dragged onto the sockets on the van
 await ev(() => { nomad.save().deltas = 3000; nomad.take(); nomad.step(5); nomad.step(1, [], ['build']); nomad.step(40); });
 let b = await build(), sp = await spots();
-check('Bau-Modus zeigt drei Sockel am Van (Motor, Panzerung, Dach)', sp.sockets.map(x => x.slot).join() === 'engine,armor,roof' && sp.sockets.every(x => !x.id), sp.sockets);
+check('Bau-Modus zeigt drei Sockel am Van (Motor, Panzerung, Dach)', sp.sockets.filter(x => x.slot !== 'solar').map(x => x.slot).join() === 'engine,armor,roof' && sp.sockets.every(x => !x.id), sp.sockets);
 await ev(() => { const bm = game.scene.getScene('play').hud.build; bm.buy('rigParts', 'dachbox'); bm.buy('rigParts', 'v8'); });
 await finishJobs();
 b = await build(); sp = await spots();

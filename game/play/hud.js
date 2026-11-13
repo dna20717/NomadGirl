@@ -60,8 +60,8 @@ export class Hud {
           el('div', { class: 'hud-row' }, this.roomName),
           el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'ZEIT'), this.time, el('span', { class: 'hud-label' }, 'KILLS'), this.kills, el('span', { class: 'hud-label' }, 'Δ'), this.deltas))),
       this.campEl, this.buildBtn, this.openBtn, this.bannerEl, this.promptEl, this.menuEl, this.help,
-      el('div', { class: 'hud-foot' }, el('button', { class: 'hud-menubtn', title: 'Menü (Esc)', onclick: e => { e.currentTarget.blur(); this.pauseMenu(); } }, icon('menu', 14), 'Menü'), ' · ', el('a', { href: 'workshop.html' }, 'Werkstatt'), ' · ', el('a', { href: './' }, 'Start'),
-        this.newGame = el('span', { hidden: true }, ' · ', el('a', { href: 'game.html?camp&new', onclick: e => { e.preventDefault(); e.currentTarget.blur(); this.confirmNew(); } }, 'Neues Spiel')),
+      el('div', { class: 'hud-foot' }, // tidy (#008, Daniel: „HUD aufräumen“): only the menu button and the version; Werkstatt, Startseite and Neues Spiel live in the menu
+        el('button', { class: 'hud-menubtn', title: 'Menü (Esc)', onclick: e => { e.currentTarget.blur(); this.pauseMenu(); } }, icon('menu', 14), 'Menü'),
         this.versionEl = el('span', { class: 'hud-version' })));
     loadVersion().then(v => { this.versionEl.textContent = ' · ' + v.text; this.versionEl.title = 'Version dieses Spiels' + (v.commit ? ': ' + v.commit : ''); this.version = v; });
     this.root = root;
@@ -134,7 +134,6 @@ export class Hud {
     this.modeName = mode; this.save = save; this.D = D;
     this.root.dataset.mode = mode;
     this.campEl.hidden = !save;
-    this.newGame.hidden = mode !== 'camp';
     this.buildBtn.hidden = mode !== 'camp';
     this.openBtn.hidden = true;   // Daniel, 12.11.2026: „Rig offen oder zu kann dann im Bau-Menü sein“ (build_mode.js bar)
     this.prompt(null);

@@ -62,9 +62,9 @@ test('Dachbox macht den Kofferraum höher, ab nur wenn nichts rausfällt; Rückg
 
 test('Alter Spielstand: Rig-Teile aus dem Inventar ziehen auf den Schrottplatz', () => {
   const s = newSave(D);
-  s.inv.grids['rig:0'].items.push({ a: 'rigParts', id: 'dachbox', n: 1, x: 0, y: 0, r: 0 });
+  (s.inv.grids['rig:0'] ??= { w: 4, h: 2, items: [] }).items.push({ a: 'rigParts', id: 'dachbox', n: 1, x: 0, y: 0, r: 0 });   // the Modul-Anhänger's box is gone (#008), an old one still counts
   delete s.rig.spare.parts;
   const t = repairSave(JSON.parse(JSON.stringify(s)), D);
   assert.deepEqual(t.rig.spare.parts, ['dachbox']);
-  assert.equal(t.inv.grids['rig:0'].items.length, 0);
+  assert.ok(!t.inv.grids['rig:0'].items.some(e => e.a === 'rigParts'));   // (the van's boot holds start supplies since #008)
 });

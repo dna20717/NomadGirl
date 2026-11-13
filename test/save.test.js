@@ -3,16 +3,21 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { newSave, placeWorkshops, advance, hoursUntil, clockText, repairSave, arrive } from '../game/save.js';
 import { travelCost } from '../game/play/camp.js';
+import { shop } from '../game/rig.js';
 import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
 
 const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
 
-test('Start-Rig (Daniel, 09.11.2026): Van mit Schlafkoje + Warroom, leerer Modul-Anhänger, der Rest verpackt auf dem Schrottplatz', () => {
+test('Start-Rig (Daniel, 13.11.2026): Van mit Koje + Kochnische, der kleine Anhänger mit dem Tank, kein Warroom, Modul-Anhänger gibt es nicht mehr', () => {
   const s = newSave(D);
   assert.equal(s.rig.tractor, 'van');
-  assert.deepEqual(s.rig.units.map(u => [u.id, u.workshops.map(w => `${w.id}@${w.at}`)]), [['van', ['schlafkoje@0', 'warroom@1']], ['modulanhaenger', []], ['container_10', ['cryotank@0']]]);   // + the cryo tank (12.11.2026)
-  assert.deepEqual(s.rig.spare.workshops, ['kochnische', 'werkbank', 'lagerregal']);
+  assert.deepEqual(s.rig.units.map(u => [u.id, u.workshops.map(w => `${w.id}@${w.at}`)]), [['van', ['schlafkoje@0', 'kochnische@1']], ['container_10', ['cryotank@0']]]);
+  assert.deepEqual(s.rig.spare.workshops, ['werkbank', 'lagerregal']);
+  assert.ok(!shop(D).containers.includes('modulanhaenger') && !shop(D).containers.includes('wohnanhaenger'));
+  const old = repairSave({ ...s, rig: { ...s.rig, units: [s.rig.units[0], { kind: 'container', id: 'wohnanhaenger', workshops: [{ id: 'werkbank', at: 0 }] }, s.rig.units[1]] } }, D);
+  assert.deepEqual(old.rig.units.map(u => u.id), ['van', 'container_20', 'container_10']);   // old savegames: the trailer becomes a 20-foot container
+  assert.ok(old.rig.units[1].workshops.some(w => w.id === 'werkbank'));
   assert.ok(s.inv.grids.chest.items.some(e => e.id === 'reis'), 'Vorräte ohne Lager liegen in der Kiste');
   const { left } = placeWorkshops(D, 'van', [], ['kueche', 'schlafkoje', 'warroom']);   // Küche needs 2 places → fills the van, the rest has no room
   assert.deepEqual(left, ['schlafkoje', 'warroom']);
@@ -37,7 +42,7 @@ test('Alter Spielstand wird repariert', () => {
 
 test('Fahrtkosten', () => {
   const t = travelCost(D, newSave(D), 'bunker_13');
-  assert.deepEqual(t, { km: 47, hours: 1.25, fuel: 6.6, food: 0.2 });   // Straße auf der Reisekarte (#007: Luftlinie 40,5 km + 15 % Umweg); leerer Modul-Anhänger 800 kg + Tank im 10-Fuß-Container
+  assert.deepEqual(t, { km: 47, hours: 1.25, fuel: 6.3, food: 0.2 });   // Straße auf der Reisekarte (#007: Luftlinie 40,5 km + 15 % Umweg); nur der Tank im 10-Fuß-Container (#008)
 });
 
 test('Reisekarte: jeder Durchgang würfelt eine Karte, Wahrzeichen bleiben, jeder Ort hat mindestens zwei Straßen (#007)', async () => {

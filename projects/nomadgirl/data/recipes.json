@@ -83,7 +83,7 @@
  "neon_ramen": {
   "name": "Neon-Ramen",
   "station": "kochnische",
-  "ingredients": [{"item": "leuchteier", "count": 1},{"item": "mutantengemuese", "count": 1},{"item": "sojasauce", "count": 1}],
+  "ingredients": [{"item": "leuchteier", "count": 1},{"item": "mutantengemuese", "count": 1},{"item": "sojasauce", "count": 1},{"item": "wasser", "count": 1}],
   "result": "neon_ramen",
   "count": 2,
   "time": 30,

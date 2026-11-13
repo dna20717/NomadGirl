@@ -27,6 +27,7 @@ export class MapUI {
   get save() { return this.host.save(); }
   get map() { return ensureMap(this.D, this.save); }
   get isOpen() { return !this.el.hidden; }
+  get intel() { return this.host.intel?.() ?? true; }
 
   image(id) {
     const A = this.D.assets?.[id];
@@ -101,7 +102,7 @@ export class MapUI {
     const W = Math.max(200, Math.floor(r.width)), H = Math.max(120, Math.floor(r.height));
     if (c.width !== W * dpr || c.height !== H * dpr) { c.width = W * dpr; c.height = H * dpr; c.style.width = W + 'px'; c.style.height = H + 'px'; }
     const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const M = mapConfig(this.D), res = drawMap(ctx, W, H, this.D, this.map, { paper: this.image(M.paper), logos: this.image(M.logos), here: this.save.location, sel: this.sel, t: (performance.now() - this.t0) / 1000 });
+    const M = mapConfig(this.D), res = drawMap(ctx, W, H, this.D, this.map, { paper: this.image(M.paper), logos: this.image(M.logos), here: this.save.location, sel: this.sel, t: (performance.now() - this.t0) / 1000, hideDanger: !this.intel });
     this.places = res.places;
   }
   hover(e) {
@@ -120,8 +121,9 @@ export class MapUI {
     this.aside.replaceChildren(...[
       el('div', { class: 'wm-head' }, logo, el('div', {}, el('h3', {}, n.name), el('small', {}, [KIND_NAMES[P.kind] || P.name, n.region, P.size ? `Größe ${P.size}` : null].filter(Boolean).join(' · ')))),
       here ? el('p', { class: 'wm-here' }, icon('tracks', 14), ' Du bist hier.') : null,
-      el('div', { class: 'wm-row' }, el('small', {}, 'Gefahr'), el('b', { class: 'wm-danger' }, '●'.repeat(n.danger || 1) + '○'.repeat(Math.max(0, 5 - (n.danger || 1))))),
-      el('div', { class: 'wm-row' }, el('small', {}, 'Beute'), el('div', { class: 'wm-hints' }, ...(n.hints || []).map(h => el('span', { style: `--c:${HINT_COLORS[h] || '#c7b08b'}` }, optLabel(ITEM_CATEGORIES, h) || h)))),
+      el('div', { class: 'wm-row' }, el('small', {}, 'Gefahr'), this.intel ? el('b', { class: 'wm-danger' }, '●'.repeat(n.danger || 1) + '○'.repeat(Math.max(0, 5 - (n.danger || 1)))) : el('b', { class: 'wm-unknown' }, '? ? ?')),
+      el('div', { class: 'wm-row' }, el('small', {}, 'Beute'), this.intel ? el('div', { class: 'wm-hints' }, ...(n.hints || []).map(h => el('span', { style: `--c:${HINT_COLORS[h] || '#c7b08b'}` }, optLabel(ITEM_CATEGORIES, h) || h))) : el('b', { class: 'wm-unknown' }, '? ? ?')),
+      this.intel ? null : el('p', { class: 'wm-intel' }, icon('research', 14), ' Was dort wartet, zeigt erst ein Warroom. Bau einen ins Rig (B), dann siehst du Gefahr und Beute.'),
       b ? el('p', { class: 'wm-brand' }, `${b.name}: „${b.slogan}“`) : null,
       // the POI's own text only at the landmark itself; rolled places say what kind of place it is
       el('p', { class: 'wm-desc' }, n.landmark && P.description ? P.description : `Wie ${P.name || 'ein POI'}, nur ${n.danger > (P.danger || 1) ? 'weiter draußen und gefährlicher' : 'ein anderer Ort'}. Was genau dort liegt, weiß man erst drinnen.`),
@@ -132,6 +134,6 @@ export class MapUI {
   }
   state() {
     const m = this.map;
-    return { open: this.isOpen, extras: (this.opts?.extras || []).map(x => x.label), here: this.save.location, sel: this.sel, nodes: m.nodes.length, edges: m.edges.length, near: neighbours(m, this.save.location), action: this.action()?.label || null, disabled: this.action()?.disabled || null };
+    return { open: this.isOpen, intel: this.intel, extras: (this.opts?.extras || []).map(x => x.label), here: this.save.location, sel: this.sel, nodes: m.nodes.length, edges: m.edges.length, near: neighbours(m, this.save.location), action: this.action()?.label || null, disabled: this.action()?.disabled || null };
   }
 }

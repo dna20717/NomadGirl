@@ -58,7 +58,7 @@ v = await ev(() => { const fuel = nomad.save().fuel, day = nomad.save().day; nom
 check('Klick auf „Hinfahren“: Leyla ist am Nachbarort, Sprit weg, als besucht markiert', v.here === v.to && Math.abs(v.fuel - v.cost.fuel - v.after) < 0.11 && v.visited.includes(v.to) && /Angekommen/.test(v.banner || ''), v);
 
 // the warroom: same map, with Techtree / Auswerten in its header; plunder here
-v = await ev(() => { nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(2); nomad.choose('Planen'); nomad.step(3); return nomad.map(); });
+v = await ev(() => { const W = () => { const u = nomad.save().rig.units[0]; u.workshops = u.workshops.filter(w => w.at !== 1).concat({ id: 'warroom', at: 1 }); game.scene.getScene('play').goCamp({ keepPlace: true, fade: 0 }); nomad.step(30); }; /* #008: no warroom at the start, build one into the van */ W(); nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(2); nomad.choose('Planen'); nomad.step(3); return nomad.map(); });
 check('Warroom: Reisekarte mit Techtree und Auswerten', v.open && v.extras.includes('Techtree') && v.extras.includes('Auswerten'), v);
 v = await ev(() => { const ok = nomad.choose('Plündern'); nomad.step(60); return { ok, mode: nomad.state().mode, poi: nomad.save().run?.poi }; });
 check('Hier plündern startet den Run am neuen Ort', v.ok && v.mode === 'run' && !!v.poi, v);
