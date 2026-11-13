@@ -16,7 +16,7 @@ export const ACHIEVEMENT_COUNTERS = [
   ['secretsAll', 'Alle Secrets eines POI in einem Run (Filter: POI)'], ['pois', 'POI geschafft (Filter: POI oder Rang S/A/B …)'],
   ['harvests', 'Ernten in der Hydrokultur'], ['cooked', 'Gerichte gekocht (Filter: Rezept)'], ['crafted', 'Hergestellt an der Werkbank (Filter: Rezept)'],
   ['experiments', 'Experimente geglückt'], ['failures', 'Experimente misslungen'], ['salvaged', 'Dinge zerlegt'], ['recipes', 'Rezepte im Rezeptbuch (Stand)'],
-  ['sleeps', 'Nächte geschlafen'], ['trips', 'Gefahren (Reisekarte)'], ['tankSafeRuns', 'Runs ohne kritischen Tank'], ['knockouts', 'k.o. (AvA bringt Leyla heim)'],
+  ['sleeps', 'Nächte geschlafen'], ['trips', 'Gefahren (Reisekarte)'], ['encounters', 'Zwischenfälle unterwegs'], ['tankSafeRuns', 'Runs ohne kritischen Tank'], ['knockouts', 'k.o. (AvA bringt Leyla heim)'],
   ['cycles', 'Neuer Durchgang'], ['lights', 'Lichterketten im Camp (Stand)'], ['workshops', 'Werkstätten gekauft'], ['deltas', 'Δ aus Runs verdient'],
 ];
 // what a trophy on a stand gives: Leyla's gear values (game/inventory.js › GEAR_STATS) plus special effects

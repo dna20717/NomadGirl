@@ -163,8 +163,9 @@ export class Hud {
     if (text) this.promptEl.replaceChildren(icon ? el('kbd', { class: 'pad' }, icon) : el('kbd', {}, (b != null ? p.labelOf(b) : null) || key), el('span', {}, text));
   }
   // menu: { title, sub, items: [{ label, sub?, primary?, disabled?: reason, act }] }; keys W/S or ↑/↓, E/Enter/Leertaste, Esc, 1–9
-  menu({ title, sub = '', items = [] }) {
-    this.modal = true; this.menuItems = items; this.menuTitle = title;
+  // onClose: called when the menu is closed without a choice (✕, Esc, B), e.g. an encounter on the road takes its default then
+  menu({ title, sub = '', items = [], onClose = null }) {
+    this.modal = true; this.menuItems = items; this.menuTitle = title; this.menuOnClose = onClose;
     this.menuIndex = Math.max(0, items.findIndex(i => !i.disabled));
     this.menuButtons = items.map((it, i) => el('button', { class: 'hud-item' + (it.primary ? ' primary' : ''), disabled: !!it.disabled, onclick: () => this.choose(i), onmouseenter: () => this.focus(i) },
       el('kbd', {}, String(i + 1)), el('span', {}, el('b', {}, it.label), it.sub || it.disabled ? el('small', {}, [it.sub, it.disabled].filter(Boolean).join(' · ')) : null)));
@@ -175,11 +176,15 @@ export class Hud {
     this.focus(this.menuIndex);
   }
   focus(i) { this.menuIndex = i; this.menuButtons?.forEach((b, k) => b.classList.toggle('focus', k === i)); }
-  closeMenu() { this.modal = false; this.menuEl.hidden = true; this.menuItems = null; this.promptEl.hidden = !this.promptText; }
+  closeMenu(chosen = false) {
+    const f = this.menuOnClose; this.menuOnClose = null;
+    this.modal = false; this.menuEl.hidden = true; this.menuItems = null; this.promptEl.hidden = !this.promptText;
+    if (!chosen) f?.();
+  }
   choose(i) {
     const it = this.menuItems?.[i];
     if (!it || it.disabled) return false;
-    this.closeMenu();
+    this.closeMenu(true);
     it.act?.();
     return true;
   }
@@ -281,6 +286,7 @@ export class Hud {
     const l = scene.leyla, max = l.maxHealth;
     // windows on top: the E prompt of the world waits (its key means „ok“ in the window)
     const hideP = !this.promptText || this.modal || !!this.inv?.isOpen || !!this.craft?.isOpen || !!this.tech?.isOpen || !!this.map?.isOpen;
+    this.root.classList.toggle('hud-windowed', !!(this.inv?.isOpen || this.craft?.isOpen || this.tech?.isOpen || this.map?.isOpen));   // toasts step down out of the big windows
     if (this.promptEl.hidden !== hideP) this.promptEl.hidden = hideP;
     this.healthBar.style.width = `${Math.max(0, l.health / max * 100)}%`;
     this.healthText.textContent = `${Math.ceil(l.health)}/${max}`;

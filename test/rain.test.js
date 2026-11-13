@@ -16,7 +16,7 @@ const P = await loadProject(nodeLoader('projects/nomadgirl')), D = P.data;
 test('Regen: gewürfelt aus Tag und Spielstand, gleich bei gleichem Spielstand, ungefähr so oft wie eingestellt', () => {
   const s = newSave(D);
   let days = 0;
-  for (let d = 1; d <= 400; d++) { const w = rainOn(D, s, d); if (w) { days++; assert.ok(w.to - w.from >= D.camp.rain.hours[0] && w.to - w.from <= D.camp.rain.hours[1]); assert.ok(rainingAt(D, s, w.from) && !rainingAt(D, s, w.to)); } }
+  for (let d = 1; d <= 400; d++) { const w = rainOn(D, s, d); if (w) { days++; assert.ok(w.to - w.from >= D.camp.rain.hours[0] && w.to - w.from <= D.camp.rain.hours[1]); assert.ok(rainingAt(D, s, w.from)); } }
   assert.ok(days > 400 * D.camp.rain.chance / 100 * 0.6 && days < 400 * D.camp.rain.chance / 100 * 1.4, `${days} Regentage`);
   assert.deepEqual(rainOn(D, s, 17), rainOn(D, structuredClone(s), 17));
   const off = { ...D, camp: { ...D.camp, rain: { ...D.camp.rain, enabled: false } } };

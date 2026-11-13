@@ -2,7 +2,8 @@
 // (dollhouse: every container shows its workshops), a campfire, companions with speech bubbles and day/night.
 // Leyla walks around and uses things with E. Time only moves on actions (sleeping, sitting at the fire, driving, runs).
 // Graphics are code placeholders for now; a "look" on containers, workshops or companions takes over later.
-import { ensureMap, placeOf, roadKm } from '../worldmap.js';
+import { ensureMap, placeOf, roadKm, route, hops, mapConfig } from '../worldmap.js';
+import { rollEncounter, choose, blocked } from '../travel.js';
 import { potsOf, stage, ripe, harvest, STAGES, canWater, waterOf, water } from '../garden.js';
 import { level as cisternLevel, tap as cisternTap } from '../cistern.js';
 import { anchors as lightAnchors, catenary, lightsConfig, mastAt } from '../string_lights.js';
@@ -1174,13 +1175,41 @@ export class Camp {
   // why the rig cannot drive (too heavy, too little fuel)
   driveBlocked(t) { const save = this.box.save; return this.tooHeavy ? `Rig zu schwer (${this.budget.weight} von ${this.budget.pull} kg)` : t.fuel > save.fuel ? 'Zu wenig Sprit' : null; }
   plunderHere() { const here = placeOf(this.D, this.box.save); if (here?.poi && this.D.pois?.[here.poi]) this.scene.startRun(here.poi); }
+  // driving (#014: several legs, an encounter may happen after each one; Welt › Encounter, Reisen › Chance pro 10 km)
   drive(id, t) {
-    const save = this.box.save, D = this.D;
-    advance(save, t.hours);
-    save.fuel = Math.max(0, Math.round((save.fuel - t.fuel) * 10) / 10);
-    save.food = Math.max(0, Math.round((save.food - t.food) * 10) / 10);
+    const save = this.box.save, legs = t.legs?.length ? t.legs : [{ from: save.location, to: id, km: t.km, hours: t.hours, fuel: t.fuel, food: t.food }];
+    this.driving = { id, t, legs, log: [], from: save.location };
+    this.nextLeg(0);
+  }
+  nextLeg(i) {
+    const save = this.box.save, D = this.D, R = this.driving, s = this.scene;
+    if (!R) return;
+    if (i >= R.legs.length) return this.arrive();
+    const L = R.legs[i];
+    advance(save, L.hours);
+    save.fuel = Math.max(0, Math.round((save.fuel - L.fuel) * 10) / 10);
+    save.food = Math.max(0, Math.round((save.food - L.food) * 10) / 10);
+    if (save.map && L.to !== R.id && !save.map.visited.includes(L.to)) save.map.visited.push(L.to);   // passed through
+    // under remote control (nomad, tests) no random encounters, unless forced (scene.forceEncounter = id) or wanted (scene.randomEncounters)
+    const enc = s.forceEncounter || (s.script && !s.randomEncounters ? null : rollEncounter(D, save, L.km));
+    s.forceEncounter = null;
+    const E = enc && D.encounters?.[enc];
+    if (!E) return this.nextLeg(i + 1);
+    s.achieveLater?.('encounters');
+    const where = placeOf(D, save, L.to)?.name || L.to, opts = E.options || [];
+    const pick = o => { const r = choose(D, save, o); R.log.push(`${E.name}: ${[r.text, r.lines.join(', ')].filter(Boolean).join(' ')}`);
+      s.hud.toast(E.name, [r.text, r.lines.join(' · ')].filter(Boolean).join(' · '), o.health || o.deltas < 0 || o.fuel > 0 ? 'warn' : 'travel', 4200);
+      this.box.persist?.(); s.time.delayedCall(s.script ? 0 : 120, () => this.nextLeg(i + 1)); };
+    const fallback = opts.find(o => !blocked(D, save, o)) || opts[opts.length - 1];
+    s.hud.menu({ title: E.name, sub: [E.description, `Etappe ${i + 1} von ${R.legs.length} · kurz vor ${where} · ${clockText(save)}`].filter(Boolean).join(' · '),
+      items: opts.map(o => ({ label: o.label || 'Weiter', sub: costLine(D, o), disabled: blocked(D, save, o), primary: o === opts[0], act: () => pick(o) })),
+      onClose: () => pick(fallback) });
+  }
+  arrive() {
+    const save = this.box.save, D = this.D, R = this.driving, id = R.id, t = R.t, from = R.from;
+    this.driving = null;
     // guests without a bed wait where they are; whoever waits at the new place comes back aboard
-    const P = passengers(D, save), from = save.location;
+    const P = passengers(D, save);
     save.waiting ||= {};
     if (P.staying.length) { save.waiting[from] = [...new Set([...(save.waiting[from] || []), ...P.staying])]; save.companions = save.companions.filter(c => !P.staying.includes(c)); }
     const back = save.waiting[id] || [];
@@ -1189,7 +1218,7 @@ export class Camp {
     this.scene.achieveLater?.('trips');
     if (save.map && !save.map.visited.includes(id)) save.map.visited.push(id);
     const left = P.staying.map(c => D.companions?.[c]?.name || c), met = back.map(c => D.companions?.[c]?.name || c);
-    this.scene.goCamp({ banner: [`Angekommen: ${placeOf(D, save, id)?.name || id}`, [`${clockText(save)} · ${t.km} km · −${de(t.fuel)} l Sprit`, left.length ? `${left.join(', ')} wartet bei ${placeOf(D, save, from)?.name || from}` : '', met.length ? `${met.join(', ')} steigt wieder ein` : ''].filter(Boolean).join(' · ')], fade: 900, arriving: true });
+    this.scene.goCamp({ banner: [`Angekommen: ${placeOf(D, save, id)?.name || id}`, [`${clockText(save)} · ${t.km} km${R.legs.length > 1 ? ` in ${R.legs.length} Etappen` : ''} · −${de(t.fuel)} l Sprit`, left.length ? `${left.join(', ')} wartet bei ${placeOf(D, save, from)?.name || from}` : '', met.length ? `${met.join(', ')} steigt wieder ein` : ''].filter(Boolean).join(' · '), 'travel'], fade: 900, arriving: true });
   }
 
   // ---------- loop ----------
@@ -1292,14 +1321,36 @@ const VERB = { sleep: 'Schlafen', warroom: 'Planen', kitchen: 'Kochen', foodtruc
 const SOON = { foodtruck: 'Verkaufen kommt später.', power: 'Liefert Energie für die Werkstätten im Rig.',
   storage: 'Ein Lager fürs Camp: Kochen, Herstellen und Zerlegen nehmen sich, was hier liegt.', cooling: 'Hält Essen frisch. Kochen nimmt sich, was hier liegt.' };
 
-// distance, hours, fuel and food for driving from the current place to a location
+// what a choice on the road costs or gives, short (for the menu)
+function costLine(D, o) {
+  const p = [];
+  if (o.use) p.push(`−${o.useCount || 1} ${D.items?.[o.use]?.name || o.use}`);
+  if (o.hours) p.push(`${o.hours > 0 ? '+' : ''}${de(o.hours)} h`);
+  if (o.fuel) p.push(`${o.fuel > 0 ? '−' : '+'}${de(Math.abs(o.fuel))} l`);
+  if (o.food) p.push(`${o.food > 0 ? '−' : '+'}${de(Math.abs(o.food))} Vorräte`);
+  if (o.deltas) p.push(`${o.deltas > 0 ? '+' : '−'}${Math.abs(o.deltas)} Δ`);
+  if (o.health) p.push(`−${o.health} Leben`);
+  if (o.item) p.push(`+${o.count || 1} ${D.items?.[o.item]?.name || o.item}`);
+  if (o.loot) p.push('Beute');
+  return p.join(' · ');
+}
+// distance, hours, fuel and food for driving from the current place to a location; since #014 over several legs: the shortest
+// way by road through known places (worldmap.js route), the legs summed up → { km, hours, fuel, food, route: [ids], legs: [...] }
 export function travelCost(D, save, to) {
-  const a = placeOf(D, save, save.location), b = placeOf(D, save, to), Tr = D.travel || {};
+  const from = save.location, M = save.map, reveal = mapConfig(D).reveal, hop = M ? hops(M, from) : {};
+  const way = (M && route(D, M, from, to, id => M.visited?.includes(id) || (hop[id] ?? 99) <= reveal)) || [from, to];
+  const legs = way.slice(1).map((id, i) => legCost(D, save, way[i], id));
+  const sum = k => Math.round(legs.reduce((n, l) => n + l[k], 0) * 100) / 100;
+  return { km: sum('km'), hours: sum('hours'), fuel: Math.round(sum('fuel') * 10) / 10, food: Math.round(sum('food') * 10) / 10, route: way, legs };
+}
+// one leg of the way (one road)
+export function legCost(D, save, fromId, to) {
+  const a = placeOf(D, save, fromId), b = placeOf(D, save, to), Tr = D.travel || {};
   const km = a && b ? roadKm(D, a, b) : 0;   // along the road on the map (#007)
   const tons = save.rig.units.filter(u => u.kind === 'container').reduce((n, u) => n + (D.containers?.[u.id]?.weight || 0), 0) / 1000;
   const fuelUse = D.tractors?.[save.rig.tractor]?.fuelUse ?? 12;
   const hours = Math.max(0.25, Math.round(km / (Tr.speed || 40) * 4) / 4);
   const fuel = Math.round(km * fuelUse / 100 * (1 + (Tr.weightFuelFactor ?? 0) / 100 * tons) * 10) / 10;
   const food = Math.round(hours / (Tr.dayLength || 24) * (Tr.foodPerDay ?? 1) * (1 + (save.companions?.length || 0)) * 10) / 10;
-  return { km, hours, fuel, food };
+  return { from: fromId, to, km, hours, fuel, food };
 }

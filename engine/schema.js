@@ -1210,10 +1210,14 @@ export const AREAS = {
   },
   encounters: {
     name: 'Encounter', singular: 'Encounter', icon: 'flash', file: 'data/encounters.json', kind: 'catalog',
-    hint: 'Zufallsbegegnungen auf der Reise. Spielen sich wie kleine Level.',
-    template: { name: 'Neuer Encounter', weight: 1, time: 'any', enemies: [] },
-    row: x => `${label(DAYTIME, x.time)} · Gewicht ${x.weight ?? 0}`,
-    sections: [{ title: 'Encounter', fields: [NAME, LOOK, num('weight', 'Gewicht', { min: 0 }), select('time', 'Tageszeit', DAYTIME), refs('enemies', 'Gegner', 'enemies'), ref('loot', 'Beute', 'lootTables'), DESCRIPTION] }],
+    hint: 'Zwischenfälle auf der Reise (#014, Daniel, 13.11.2026: „Mehrere Etappen + Ereignisse (Panne, Händler, Hinterhalt)“). Nach jeder Etappe kann einer passieren (Reisen › Chance pro 10 km, nachts mehr); er erzählt, was los ist, und bietet Entscheidungen an. Jede kostet oder bringt Zeit, Sprit, Vorräte, Δ, Leben oder Dinge.',
+    template: { name: 'Neuer Encounter', weight: 1, time: 'any', enemies: [], options: [{ label: 'Weiterfahren' }] },
+    row: x => `${label(DAYTIME, x.time)} · Gewicht ${x.weight ?? 0} · ${(x.options || []).length} Entscheidungen`,
+    sections: [{ title: 'Encounter', fields: [NAME, LOOK, num('weight', 'Gewicht', { min: 0 }), select('time', 'Tageszeit', DAYTIME), refs('enemies', 'Gegner', 'enemies', { hint: 'Noch ohne Wirkung: ein Kampf auf der Straße als kleines Level kommt später' }), ref('loot', 'Beute', 'lootTables'), DESCRIPTION] },
+      { title: 'Entscheidungen', fields: [table('options', 'Entscheidungen', [text('label', 'Knopf'), num('hours', 'Zeit', { unit: 'h' }), num('fuel', 'Sprit', { unit: 'l', hint: 'positiv = kostet' }),
+        num('food', 'Vorräte', { hint: 'positiv = kostet' }), num('deltas', 'Δ', { hint: 'negativ = zahlen' }), num('health', 'Schaden', { unit: 'Leben', min: 0 }),
+        ref('use', 'Verbraucht', 'items'), num('useCount', 'Wie viele', { min: 1 }), ref('item', 'Gibt', 'items'), num('count', 'Anzahl', { min: 1 }), ref('loot', 'Beute-Wurf', 'lootTables'), text('result', 'Danach')],
+        { hint: 'Die erste ist hervorgehoben; wer das Fenster schließt, nimmt die erste, die geht. Ausgegraut, wenn Δ, Sprit oder der verbrauchte Gegenstand fehlen' })] }],
   },
   tutorial: {
     name: 'Lektionen', singular: 'Lektion', icon: 'help', file: 'data/tutorial.json', kind: 'catalog', groupBy: { key: 'chapter', options: TUT_CHAPTERS },

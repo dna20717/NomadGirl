@@ -35,6 +35,7 @@ test('Solar: ein Paneel je Container-Platz auf dem Dach, tagsüber Strom, nachts
 });
 
 test('Zisterne: Wasser sammelt sich mit der Zeit, E füllt Flaschen ab, nie mehr als sie fasst', () => {
+  const D = { ...P.data, camp: { ...P.data.camp, rain: { enabled: false } } };   // dry weather here; the rain has its own test (rain.test.js)
   const s = newSave(D), ws = Object.keys(D.workshops).find(k => D.workshops[k].function === 'cistern');
   assert.ok(ws && D.items.wasser, 'Zisterne und Frischwasser in den Daten');
   s.day = 1; s.hour = 8;

@@ -1,5 +1,87 @@
 {
- "strassensperre": {"name": "Straßensperre", "weight": 3, "time": "any", "enemies": ["schlaeger", "schuetze"], "loot": "pluenderer_beute", "description": "Wegzoll. Oder auch nicht."},
- "ghulrudel": {"name": "Ghul-Rudel", "weight": 2, "time": "night", "enemies": ["kriecher", "schleimbeisser"], "loot": "mutanten_beute"},
- "liegengebliebener_lkw": {"name": "Liegengebliebener LKW", "weight": 1, "time": "day", "enemies": [], "loot": "kiste_tankstelle", "description": "Niemand da. Verdächtig."}
+ "strassensperre": {
+  "name": "Straßensperre",
+  "weight": 3,
+  "time": "any",
+  "enemies": ["schlaeger", "schuetze"],
+  "loot": "pluenderer_beute",
+  "description": "Zwei Autowracks quer über der Straße, dahinter Gewehrläufe. Wegzoll, sagt einer. Oder auch nicht.",
+  "options": [
+   {"label": "Wegzoll zahlen", "deltas": -60, "result": "Sie winken dich durch."},
+   {"label": "Durchbrechen", "health": 25, "fuel": 3, "loot": "pluenderer_beute", "result": "Blech kreischt, Kugeln prasseln. Hinten fällt etwas vom Wrack."},
+   {"label": "Umweg fahren", "hours": 2, "fuel": 4, "result": "Ein langer Bogen über die Schotterpiste."}
+  ]
+ },
+ "ghulrudel": {
+  "name": "Ghul-Rudel",
+  "weight": 2,
+  "time": "night",
+  "enemies": ["kriecher", "schleimbeisser"],
+  "loot": "mutanten_beute",
+  "description": "Augen im Scheinwerferlicht. Viele Augen.",
+  "options": [
+   {"label": "Vollgas", "fuel": 2, "health": 10, "result": "Etwas schlägt gegen die Tür, dann seid ihr durch."},
+   {"label": "Licht aus und warten", "hours": 3, "result": "Sie ziehen vorbei. Leyla zählt bis tausend."}
+  ]
+ },
+ "liegengebliebener_lkw": {
+  "name": "Liegengebliebener LKW",
+  "weight": 2,
+  "time": "day",
+  "enemies": [],
+  "loot": "kiste_tankstelle",
+  "description": "Ein Sattelzug im Graben, Türen offen. Niemand da. Verdächtig.",
+  "options": [
+   {"label": "Durchsuchen", "hours": 1, "loot": "kiste_tankstelle", "result": "Kisten, Dosen, ein Kalender von 2061."},
+   {"label": "Tank abzapfen", "hours": 0.5, "fuel": -6, "result": "Der Diesel riecht alt, läuft aber."},
+   {"label": "Weiterfahren", "result": "Lieber nicht."}
+  ]
+ },
+ "panne": {
+  "name": "Panne",
+  "weight": 3,
+  "time": "any",
+  "enemies": [],
+  "description": "Ein Knall unter der Haube, dann Dampf. Der Van rollt aus.",
+  "options": [
+   {"label": "Mit Panzertape flicken", "use": "panzertape", "useCount": 1, "hours": 0.5, "result": "Hält. Vorerst."},
+   {"label": "Richtig reparieren", "hours": 3, "result": "Drei Stunden mit dem Kopf im Motorraum."},
+   {"label": "AvA schicken", "hours": 1.5, "deltas": -25, "result": "AvA findet das Leck und ein Ersatzteil, das sie dir in Rechnung stellt."}
+  ]
+ },
+ "haendler": {
+  "name": "Fahrender Händler",
+  "weight": 2,
+  "time": "day",
+  "enemies": [],
+  "description": "Ein Bus mit Sonnensegel und handgemaltem Schild: „Alles für unterwegs“.",
+  "options": [
+   {"label": "Kaffeepulver kaufen", "deltas": -30, "item": "kaffeepulver", "count": 2, "result": "Echter Kaffee. Der Händler schwört drauf."},
+   {"label": "Sprit kaufen", "deltas": -50, "fuel": -8, "result": "Acht Liter, etwas trüb."},
+   {"label": "Vorräte tauschen", "deltas": -40, "food": -2, "result": "Zwei Kisten Rationen."},
+   {"label": "Nur grüßen", "result": "Er hupt zum Abschied."}
+  ]
+ },
+ "sandsturm": {
+  "name": "Sandsturm",
+  "weight": 2,
+  "time": "any",
+  "enemies": [],
+  "description": "Der Horizont wird braun, dann ist er weg.",
+  "options": [
+   {"label": "Abwarten", "hours": 4, "food": 0.5, "result": "Vier Stunden Sand an den Scheiben."},
+   {"label": "Weiterfahren", "fuel": 4, "health": 5, "result": "Blind durch die Wand. Irgendwann wird es wieder hell."}
+  ]
+ },
+ "anhalterin": {
+  "name": "Anhalterin",
+  "weight": 1,
+  "time": "day",
+  "enemies": [],
+  "description": "Eine Frau mit Kanister am Straßenrand. Sie will nur bis zur nächsten Kreuzung.",
+  "options": [
+   {"label": "Mitnehmen", "hours": 0.5, "item": "wasser", "count": 2, "result": "Sie bedankt sich mit zwei Flaschen Wasser und einer Geschichte über BigCityDelta."},
+   {"label": "Vorbeifahren", "result": "Im Rückspiegel winkt sie noch."}
+  ]
+ }
 }

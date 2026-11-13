@@ -77,11 +77,15 @@ export class MapUI {
     const save = this.save, id = this.sel, n = placeOf(this.D, save, id);
     if (!n) return null;
     if (id === save.location) return n.poi && this.D.pois?.[n.poi] ? { label: 'Hier plündern', icon: 'target', act: () => { this.close(); this.host.plunder(); } } : null;
-    if (!neighbours(this.map, save.location).includes(id)) return { label: 'Keine direkte Straße', disabled: 'Erst zu einem Nachbarort fahren' };
-    const cost = this.host.cost(id), why = this.host.blocked(cost);
-    return { label: 'Hinfahren', icon: 'tracks', cost, disabled: why, act: () => { this.close(); this.host.drive(id, cost); } };
+    // #014: also further away, over several legs along known roads (Zwischenfälle unterwegs)
+    const cost = this.host.cost(id);
+    if (!cost || cost.route?.[cost.route.length - 1] !== id || (cost.route.length > 2 && !cost.legs?.length)) return { label: 'Kein Weg bekannt', disabled: 'Keine bekannte Straße dorthin' };
+    const legs = cost.legs?.length || 1, why = this.host.blocked(cost);
+    return { label: legs > 1 ? `Hinfahren · ${legs} Etappen` : 'Hinfahren', icon: 'tracks', cost, disabled: why, act: () => { this.close(); this.host.drive(id, cost); } };
   }
   act() { const a = this.action(); if (a && !a.disabled) a.act(); }
+  // the way to the chosen place (several legs, #014), cached per place for the painting
+  routeTo(id) { if (!id || id === this.save.location) return null; if (this.routeFor !== id + '@' + this.save.location) { this.routeFor = id + '@' + this.save.location; this.routeIds = this.host.cost(id)?.route || null; } return this.routeIds; }
 
   draw() {
     const save = this.save;
@@ -102,7 +106,7 @@ export class MapUI {
     const W = Math.max(200, Math.floor(r.width)), H = Math.max(120, Math.floor(r.height));
     if (c.width !== W * dpr || c.height !== H * dpr) { c.width = W * dpr; c.height = H * dpr; c.style.width = W + 'px'; c.style.height = H + 'px'; }
     const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const M = mapConfig(this.D), res = drawMap(ctx, W, H, this.D, this.map, { paper: this.image(M.paper), logos: this.image(M.logos), here: this.save.location, sel: this.sel, t: (performance.now() - this.t0) / 1000, hideDanger: !this.intel });
+    const M = mapConfig(this.D), res = drawMap(ctx, W, H, this.D, this.map, { paper: this.image(M.paper), logos: this.image(M.logos), here: this.save.location, sel: this.sel, route: this.routeTo(this.sel), t: (performance.now() - this.t0) / 1000, hideDanger: !this.intel });
     this.places = res.places;
   }
   hover(e) {
@@ -128,7 +132,7 @@ export class MapUI {
       b ? el('p', { class: 'wm-brand' }, `${b.name}: „${b.slogan}“`) : null,
       // the POI's own text only at the landmark itself; rolled places say what kind of place it is
       el('p', { class: 'wm-desc' }, n.landmark && P.description ? P.description : `Wie ${P.name || 'ein POI'}, nur ${n.danger > (P.danger || 1) ? 'weiter draußen und gefährlicher' : 'ein anderer Ort'}. Was genau dort liegt, weiß man erst drinnen.`),
-      cost ? el('div', { class: 'wm-cost' }, ...[['Strecke', `${cost.km} km`], ['Fahrt', `${de(cost.hours)} h`], ['Sprit', `${de(cost.fuel)} l`, cost.fuel > save.fuel], ['Vorräte', de(cost.food), cost.food > save.food]]
+      cost ? el('div', { class: 'wm-cost' }, ...[['Strecke', `${cost.km} km${(cost.legs?.length || 1) > 1 ? ` · ${cost.legs.length} Etappen` : ''}`], ['Fahrt', `${de(cost.hours)} h`], ['Sprit', `${de(cost.fuel)} l`, cost.fuel > save.fuel], ['Vorräte', de(cost.food), cost.food > save.food]]
         .map(([k, v, bad]) => el('div', { class: bad ? 'bad' : '' }, el('small', {}, k), el('b', {}, v)))) : null,
       a ? el('button', { class: 'inv-btn wm-go', disabled: !!a.disabled, title: a.disabled || '', onclick: () => this.act() }, a.icon ? icon(a.icon, 18) : null, ' ', a.disabled && a.cost ? a.disabled : a.label) : null,
       a?.disabled && !a.cost ? el('small', { class: 'wm-why' }, a.disabled) : null].filter(Boolean));   // replaceChildren would write "null"

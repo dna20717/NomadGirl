@@ -18,7 +18,7 @@ export function mapView(D, map, W, H) {
   return { k, at: p => [ox + p[0] * k, oy + p[1] * k] };
 }
 
-// opt: { paper, logos (Image), here, sel, t (s), brands: {id: brand}, reveal }
+// opt: { paper, logos (Image), here, sel, route ([ids], #014), t (s), brands: {id: brand}, reveal }
 export function drawMap(ctx, W, H, D, map, opt = {}) {
   const C = mapConfig(D), V = mapView(D, map, W, H), u = Math.min(W / 1200, H / 680), t = opt.t || 0;
   const here = opt.here, near = new Set(neighbours(map, here)), hop = hops(map, here), reveal = opt.reveal ?? C.reveal;
@@ -49,8 +49,12 @@ export function drawMap(ctx, W, H, D, map, opt = {}) {
     else { ctx.strokeStyle = 'rgba(113,65,59,.45)'; ctx.lineWidth = 2 * u; ctx.setLineDash([4 * u, 6 * u]); ctx.stroke(); ctx.setLineDash([]); }
   }
   // the chosen route: red pencil along the road (Leyla's marker)
-  if (opt.sel && near.has(opt.sel)) {
-    const [ax, ay, qx, qy, bx, by] = curve(P(here), P(opt.sel));
+  // since #014 along every leg of the way (opt.route: [here, …, sel])
+  const way = opt.route?.length > 1 ? opt.route : opt.sel && near.has(opt.sel) ? [here, opt.sel] : null;
+  if (way) for (let i = 1; i < way.length; i++) {
+    const e = map.edges.find(([x, y]) => (x === way[i - 1] && y === way[i]) || (x === way[i] && y === way[i - 1])) || [way[i - 1], way[i]];   // the road's own bend
+    const a = P(e[0]), b = P(e[1]); if (!a || !b) continue;
+    const [ax, ay, qx, qy, bx, by] = curve(a, b);
     ctx.save(); ctx.strokeStyle = RED; ctx.lineWidth = 4 * u; ctx.setLineDash([10 * u, 7 * u]); ctx.lineDashOffset = -t * 30 * u;
     ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo(qx, qy, bx, by); ctx.stroke(); ctx.restore();
   }

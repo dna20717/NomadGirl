@@ -56,6 +56,19 @@ v = await ev(() => { const fuel = nomad.save().fuel, day = nomad.save().day; nom
   const mp = SC().hud.map, to = nomad.map().near[0], cost = mp.host.cost(to); mp.select(to); document.querySelector('.wm-go').click(); nomad.step(60);
   return { to, here: nomad.save().location, fuel, after: nomad.save().fuel, cost, visited: nomad.save().map.visited, banner: nomad.state().banner }; });
 check('Klick auf „Hinfahren“: Leyla ist am Nachbarort, Sprit weg, als besucht markiert', v.here === v.to && Math.abs(v.fuel - v.cost.fuel - v.after) < 0.11 && v.visited.includes(v.to) && /Angekommen/.test(v.banner || ''), v);
+// #014: further away over several legs, an incident on the road (forced: Panne), the choice costs time, then arrival
+v = await ev(() => { nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(2); nomad.choose('Karte'); nomad.step(3);
+  const mp = SC().hud.map, save = nomad.save(), far = save.map.nodes.map(n => n.id).filter(id => id !== save.location && !nomad.map().near.includes(id)).map(id => ({ id, c: mp.host.cost(id) })).find(x => x.c.legs?.length >= 2 && x.c.fuel < save.fuel);
+  if (!far) return { none: true };
+  mp.select(far.id); const label = mp.state().action;
+  SC().forceEncounter = 'panne'; const h0 = save.day * 24 + save.hour;
+  document.querySelector('.wm-go').click(); nomad.step(2);
+  const menu = nomad.state().menu;
+  nomad.choose('Richtig reparieren'); nomad.step(80);
+  const s2 = nomad.save();
+  return { to: far.id, legs: far.c.legs.length, label, menu, here: s2.location, hours: s2.day * 24 + s2.hour - h0, cost: far.c.hours, banner: nomad.state().banner, toasts: [...document.querySelectorAll('.hud-toast')].map(t => t.textContent) };
+});
+check('Weiter weg in Etappen: „Hinfahren · N Etappen“, Panne unterwegs, Reparatur kostet 3 h, dann angekommen', !v.none && /Etappen/.test(v.label) && v.menu?.title === 'Panne' && v.here === v.to && v.hours >= v.cost + 3 - 0.01 && /Etappen/.test(v.banner || ''), v);
 
 // the warroom: same map, with Techtree / Auswerten in its header; plunder here
 v = await ev(() => { const W = () => { const u = nomad.save().rig.units[0]; u.workshops = u.workshops.filter(w => w.at !== 1).concat({ id: 'warroom', at: 1 }); game.scene.getScene('play').goCamp({ keepPlace: true, fade: 0 }); nomad.step(30); }; /* #008: no warroom at the start, build one into the van */ W(); nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(2); nomad.choose('Planen'); nomad.step(3); return nomad.map(); });

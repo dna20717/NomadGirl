@@ -122,3 +122,24 @@ export function hops(map, from) {
 }
 // the road between two places: a little longer than the straight line (Reisekarte › Umwege %)
 export function roadKm(D, a, b) { return Math.round(dist(a.pos, b.pos) * (1 + (mapConfig(D).detour) / 100)); }
+// the shortest way by road between two places (#014, Daniel 13.11.2026: „Mehrere Etappen + Ereignisse“): Dijkstra over the
+// roads of the map, only through places that pass „ok“ (known ones); → [from, …, to] or null
+export function route(D, map, from, to, ok = () => true) {
+  if (!map?.nodes || from === to) return from === to ? [from] : null;
+  const N = Object.fromEntries(map.nodes.map(n => [n.id, n])), dist_ = { [from]: 0 }, prev = {}, done = new Set();
+  while (true) {
+    let a = null;
+    for (const id in dist_) if (!done.has(id) && (a == null || dist_[id] < dist_[a])) a = id;
+    if (a == null) return null;
+    if (a === to) break;
+    done.add(a);
+    for (const b of neighbours(map, a)) {
+      if (done.has(b) || !N[b] || (b !== to && !ok(b))) continue;
+      const d = dist_[a] + roadKm(D, N[a], N[b]);
+      if (dist_[b] == null || d < dist_[b]) { dist_[b] = d; prev[b] = a; }
+    }
+  }
+  const out = [to];
+  while (out[0] !== from) out.unshift(prev[out[0]]);
+  return out;
+}

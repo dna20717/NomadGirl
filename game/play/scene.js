@@ -804,7 +804,7 @@ export class PlayScene extends Phaser.Scene {
   // counts something for the achievements; reached ones are announced right away
   achieve(counter, n = 1, tags = []) { if (this.box) this.announce(bump(this.data_, this.box.save, counter, n, tags)); }
   // before the scene starts anew (sleeping, driving): announced in the fresh camp
-  achieveLater(counter, n = 1, tags = []) { if (this.box) (this.box.save.achievements.news ??= []).push(...bump(this.data_, this.box.save, counter, n, tags).map(a => a.id)); }
+  achieveLater(counter, n = 1, tags = []) { if (!this.box) return; const got = bump(this.data_, this.box.save, counter, n, tags).map(a => a.id); (this.box.save.achievements.news ??= []).push(...got); }   // bump first: it creates save.achievements in a fresh save
   achieveLevel(counter, value) { if (this.box) this.announce(achieveLevel(this.data_, this.box.save, counter, value)); }
   // a loot roll; Delta-Petrol-Schild & Co. (#012, Extra-Beute %) give a chance of one more thing
   lootRoll(table) {

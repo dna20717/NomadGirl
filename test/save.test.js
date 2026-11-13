@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { newSave, placeWorkshops, advance, hoursUntil, clockText, repairSave, arrive } from '../game/save.js';
-import { travelCost } from '../game/play/camp.js';
+import { travelCost, legCost } from '../game/play/camp.js';
 import { shop } from '../game/rig.js';
 import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
@@ -41,8 +41,12 @@ test('Alter Spielstand wird repariert', () => {
 });
 
 test('Fahrtkosten', () => {
-  const t = travelCost(D, newSave(D), 'bunker_13');
-  assert.deepEqual(t, { km: 47, hours: 1.25, fuel: 6.3, food: 0.2 });   // Straße auf der Reisekarte (#007: Luftlinie 40,5 km + 15 % Umweg); nur der Tank im 10-Fuß-Container (#008)
+  const s = newSave(D), leg = legCost(D, s, 'tankstelle_km7', 'bunker_13');
+  assert.deepEqual(leg, { from: 'tankstelle_km7', to: 'bunker_13', km: 47, hours: 1.25, fuel: 6.3, food: 0.2 });   // Straße auf der Reisekarte (#007: Luftlinie 40,5 km + 15 % Umweg); nur der Tank im 10-Fuß-Container (#008)
+  // #014: the way over several legs, the costs summed up
+  const t = travelCost(D, s, 'bunker_13');
+  assert.equal(t.route[0], s.location); assert.equal(t.route[t.route.length - 1], 'bunker_13'); assert.equal(t.legs.length, t.route.length - 1);
+  assert.equal(t.km, t.legs.reduce((n, l) => n + l.km, 0));
 });
 
 test('Reisekarte: jeder Durchgang würfelt eine Karte, Wahrzeichen bleiben, jeder Ort hat mindestens zwei Straßen (#007)', async () => {
