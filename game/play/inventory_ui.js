@@ -343,7 +343,7 @@ export class InventoryUI {
       ev.stopPropagation();
       if (ev.button !== 0) return;
       const h = this.held;
-      if (!h) return this.host.notify?.('Zieh etwas Essbares hierher');
+      if (!h) return this.host.notify?.('Zieh etwas Essbares hierher', 'info');
       if (h.e.a !== 'items') return this.host.notify?.('Das kann man nicht essen');
       const r = this.host.use?.(h.e.id);
       if (!r?.ok) return this.host.notify?.(r?.reason || 'Geht nicht');
@@ -374,7 +374,7 @@ export class InventoryUI {
     return s;
   }
   // the slots only show what is built in: rig parts are dragged onto the van in the build mode (B)
-  partClick(p) { this.host.notify?.(p.id ? 'Ein- und ausbauen: Rig bauen (B)' : `${PART_SLOT_NAMES[p.slot]}: ein Rig-Teil im Bau-Modus (B) an den Van ziehen`); }
+  partClick(p) { this.host.notify?.(p.id ? 'Ein- und ausbauen: Rig bauen (B)' : `${PART_SLOT_NAMES[p.slot]}: ein Rig-Teil im Bau-Modus (B) an den Van ziehen`, 'info'); }
 
   showTip(e, key = null) {
     if (this.menuOn) return;   // the right-click menu stays until it is used or closed
@@ -719,10 +719,10 @@ export class InventoryUI {
     if (this.other.accept) {   // only what this storage takes
       let n = 0;
       for (const e of [...this.inv.grids.backpack.items]) if (this.allows(this.other.key, e, false) && add(this.D, this.other.grid, e.a, e.id, e.n) === 0) { remove(this.inv.grids.backpack, e); n++; }
-      this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingelagert` : 'Nichts Passendes im Rucksack'); return this.changed(this.other.key);
+      this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingelagert` : 'Nichts Passendes im Rucksack', n ? 'good' : 'warn'); return this.changed(this.other.key);
     }
-    const n = moveAll(this.D, this.inv.grids.backpack, this.other.grid); this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingelagert` : 'Nichts passt mehr rein'); this.changed(this.other.key); }
-  takeAll() { const n = moveAll(this.D, this.other.grid, this.inv.grids.backpack); this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingepackt` : 'Rucksack ist voll'); this.changed(this.other.key); }
+    const n = moveAll(this.D, this.inv.grids.backpack, this.other.grid); this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingelagert` : 'Nichts passt mehr rein', n ? 'good' : 'warn'); this.changed(this.other.key); }
+  takeAll() { const n = moveAll(this.D, this.other.grid, this.inv.grids.backpack); this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingepackt` : 'Rucksack ist voll', n ? 'good' : 'warn'); this.changed(this.other.key); }
 
   // ---------- slots ----------
   slotClick(slot) {
@@ -731,10 +731,10 @@ export class InventoryUI {
       if (!this.equip(slot, h.e)) return;
       return this.changed();
     }
-    if (slot === 'backpack') return this.host.notify?.('Den Rucksack tauschst du, indem du einen anderen draufziehst');
+    if (slot === 'backpack') return this.host.notify?.('Den Rucksack tauschst du, indem du einen anderen draufziehst', 'info');
     if (slot.startsWith('wear:')) {
       const w = slot.slice(5), id = inv.wear?.[w];
-      if (!id) return this.host.notify?.(IMPLANTS.includes(w) ? `${WEAR_NAMES[w]}: ein Implantat hierher ziehen` : `${WEAR_NAMES[w]}: frei`);
+      if (!id) return this.host.notify?.(IMPLANTS.includes(w) ? `${WEAR_NAMES[w]}: ein Implantat hierher ziehen` : `${WEAR_NAMES[w]}: frei`, 'info');
       if (IMPLANTS.includes(w) && !this.host.inCamp?.()) return this.host.notify?.('Implantate baust du nur im Camp aus');
       inv.wear[w] = null;
       this.held = { e: { a: 'items', id, n: 1, r: 0 }, from: slot };

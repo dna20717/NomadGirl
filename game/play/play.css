@@ -18,8 +18,6 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .hud-reloading { position: relative; padding-left: 26px; color: #ffd27a; }
 .hud-reloading::before { content: ""; position: absolute; left: 2px; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; background: conic-gradient(#ffd27a var(--p, 0%), #3a2f45 0); -webkit-mask: radial-gradient(circle, transparent 4px, #000 5px); mask: radial-gradient(circle, transparent 4px, #000 5px); }
 .hud-reloading.hud-paused { opacity: 0.55; }
-.hud-banner { position: fixed; left: 50%; top: 30%; transform: translateX(-50%); text-align: center; padding: 18px 34px; border-radius: 10px; background: rgba(13, 10, 18, .78); border: 1px solid #5a2a4a; }
-.hud-banner b { display: block; font: 54px/1 VT323, monospace; font-weight: normal; color: #ffd27a; }
 .hud-toasts { position: fixed; right: 24px; top: 110px; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; pointer-events: none; z-index: 40; }
 .hud-toast { display: flex; align-items: center; gap: 12px; padding: 10px 16px; min-width: 260px; max-width: 460px; border-radius: 10px; background: rgba(13, 10, 18, .9); border: 1px solid #3a2f45; color: #d8cfe2; animation: hud-toast-in .35s ease-out; transition: opacity .4s, transform .4s; }
 .hud-toast.out { opacity: 0; transform: translateX(30px); }
@@ -27,8 +25,20 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .hud-toast small { display: block; margin-top: 3px; font-size: 13px; color: #b9a2c8; }
 .hud-toast.trophy { border-color: #c28d29; box-shadow: 0 0 18px rgba(255, 210, 122, .25); } .hud-toast.trophy svg, .hud-toast.trophy b { color: #ffd27a; }
 .hud-toast.recipe { border-color: #20d6c7; } .hud-toast.recipe svg { color: #20d6c7; }
+/* all other kinds (#014): every message is a toast; a banner toast is a little bigger */
+.hud-toast.info svg { color: #9cc6e6; }
+.hud-toast.good { border-color: #3fa86b; } .hud-toast.good svg { color: #9cdb43; }
+.hud-toast.loot svg { color: #9be8d8; }
+.hud-toast.heal { border-color: #3fa86b; } .hud-toast.heal svg { color: #7aff9a; }
+.hud-toast.warn { border-color: #a8384a; } .hud-toast.warn svg { color: #ff8a9a; }
+.hud-toast.secret { border-color: #e45aa8; box-shadow: 0 0 18px rgba(228, 90, 168, .25); } .hud-toast.secret svg, .hud-toast.secret b { color: #ff9ad2; }
+.hud-toast.drama { border-color: #5a2a4a; background: rgba(8, 4, 10, .94); } .hud-toast.drama svg { color: #e86a73; } .hud-toast.drama b { color: #ffb3c0; }
+.hud-toast.travel svg, .hud-toast.camp svg { color: #ffd27a; }
+.hud-toast.banner { min-width: 340px; padding: 14px 18px; } .hud-toast.banner b { font-size: 34px; }
+.hud-toast .ui-x { position: static; flex: none; margin-left: auto; width: 24px; height: 24px; font-size: 16px; pointer-events: auto; }
+.hud-toast.nod { animation: hud-toast-nod .3s ease-out; }
+@keyframes hud-toast-nod { 40% { transform: translateX(-8px) scale(1.03); } }
 @keyframes hud-toast-in { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
-.hud-banner small { display: block; margin-top: 8px; color: #d8cfe2; font-size: 15px; }
 /* controls panel (H or Menü › Steuerung): two columns, neon field manual (Daniel, 11.11.2026: "zweispaltig, hübsch und cool") */
 .hud-help { position: fixed; inset: 0; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 40%, rgba(40, 14, 52, .55), rgba(8, 6, 12, .86)); backdrop-filter: blur(3px); pointer-events: auto; animation: helpFade .18s ease-out; }
 .hud-help[hidden] { display: none; }
@@ -582,8 +592,6 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .ui-x { position: absolute; top: 8px; right: 8px; z-index: 60; width: 30px; height: 30px; display: grid; place-items: center; padding: 0; border: 1px solid #3a2f45; border-radius: 7px;
   background: rgba(23, 17, 31, .9); color: #f2eef7; font: 22px/1 var(--ui-font, Inter, sans-serif); cursor: pointer; pointer-events: auto; opacity: .75; transition: opacity .15s, border-color .15s, color .15s; }
 .ui-x:hover, .ui-x:focus-visible { opacity: 1; border-color: #ff2f8a; color: #ff7ac0; box-shadow: 0 0 10px rgba(255, 47, 138, .4); outline: none; }
-.hud-banner { pointer-events: auto; padding-right: 48px; }
-.hud-banner .ui-x { top: 6px; right: 6px; width: 26px; height: 26px; font-size: 18px; }
 .hud-dream .ui-x { position: fixed; top: 16px; right: 16px; }
 .bm > .ui-x { top: 74px; right: 14px; }
 .inv > .ui-x { top: -14px; right: -14px; }

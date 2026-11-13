@@ -49,7 +49,7 @@ const R = {
   async zoom(z) { await ev(z => { const c = SC().cam; c.setZoom(c.zoom * z); nomad.step(2); }, z); },
   // hide the HUD for clips (the prompt stays), show it for windows
   async hud(on) {
-    await page.addStyleTag({ content: on ? '.hud-top,.hud-foot,.hud-camp,.hud-buildbtn,.hud-openbtn{visibility:visible}' : '.hud-top,.hud-foot,.hud-camp,.hud-buildbtn,.hud-openbtn,.hud-banner{visibility:hidden}' });
+    await page.addStyleTag({ content: on ? '.hud-top,.hud-foot,.hud-camp,.hud-buildbtn,.hud-openbtn{visibility:visible}' : '.hud-top,.hud-foot,.hud-camp,.hud-buildbtn,.hud-openbtn,.hud-toasts{visibility:hidden}' });
   },
   frames: [],
   async grab() {

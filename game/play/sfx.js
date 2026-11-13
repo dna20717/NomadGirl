@@ -71,5 +71,43 @@ export function makeSfx(scene, volume = 0.5) {
       const t = c.currentTime, o = out(c);
       tone(c, o, 'square', 220, 180, t, 0.09, 0.08); tone(c, o, 'square', 180, 140, t + 0.1, 0.12, 0.08);
     },
+    // toasts (#014, Daniel 13.11.2026: „Toast und Sound“): every kind of message has its own little sound
+    // achievement: a short fanfare, four rising notes and a shimmer on top
+    fanfare() {
+      const c = ctx(); if (!c) return;
+      const t = c.currentTime, o = out(c);
+      [523, 659, 784, 1047].forEach((f, i) => { tone(c, o, 'triangle', f, f, t + i * 0.09, i === 3 ? 0.55 : 0.12, 0.2); tone(c, o, 'square', f / 2, f / 2, t + i * 0.09, 0.1, 0.03); });
+      tone(c, o, 'sine', 2093, 2080, t + 0.3, 0.5, 0.05);
+    },
+    // a recipe learnt: two bright bell notes
+    chime() {
+      const c = ctx(); if (!c) return;
+      const t = c.currentTime, o = out(c);
+      tone(c, o, 'sine', 1175, 1170, t, 0.25, 0.16); tone(c, o, 'sine', 1568, 1560, t + 0.1, 0.35, 0.14); tone(c, o, 'sine', 3136, 3130, t + 0.1, 0.2, 0.02);
+    },
+    // a plain note: one soft blip
+    ping() {
+      const c = ctx(); if (!c) return;
+      const t = c.currentTime, o = out(c);
+      tone(c, o, 'sine', 880, 870, t, 0.14, 0.12); tone(c, o, 'triangle', 1760, 1750, t, 0.06, 0.03);
+    },
+    // something good: blip up
+    good() {
+      const c = ctx(); if (!c) return;
+      const t = c.currentTime, o = out(c);
+      tone(c, o, 'sine', 660, 660, t, 0.08, 0.12); tone(c, o, 'sine', 990, 990, t + 0.07, 0.16, 0.12);
+    },
+    // a secret: a run of glittering notes
+    sparkle() {
+      const c = ctx(); if (!c) return;
+      const t = c.currentTime, o = out(c);
+      [1319, 1568, 1976, 2637, 3136].forEach((f, i) => tone(c, o, 'sine', f, f, t + i * 0.05, 0.18, 0.07));
+    },
+    // dark moments (k.o., AvA gone): a low falling hum
+    low() {
+      const c = ctx(); if (!c) return;
+      const t = c.currentTime, o = out(c);
+      tone(c, o, 'sawtooth', 110, 70, t, 0.9, 0.06); tone(c, o, 'sine', 220, 140, t, 0.8, 0.08); thud(c, o, t, 0.4, 300, 0.2);
+    },
   };
 }

@@ -58,7 +58,7 @@ export class FloorStrip {
     if (!t || !scene.box) return false;
     const D = this.D, bag = scene.box.save.inv.grids.backpack, l = scene.leyla, name = thing(D, t.e.a, t.e.id)?.name || t.e.id;
     const left = add(D, bag, t.e.a, t.e.id, t.e.n);
-    if (left === t.e.n) { scene.fx.text(l.x, l.feet - l.height - 30, 'Rucksack voll', { color: '#ff9a9a', size: 34, rise: 40, life: 1000 }); scene.drone?.react?.('gearWorse'); return true; }
+    if (left === t.e.n) { scene.hud.toast('Rucksack voll', '', 'warn', 2600); scene.drone?.react?.('gearWorse'); return true; }
     const got = t.e.n - left;
     t.e.n = left;
     if (!left) t.pile.grid.items.splice(t.pile.grid.items.indexOf(t.e), 1);

@@ -7,6 +7,15 @@ import { hints, setUiDevice, closeX } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { loadVersion } from '../version.js';
 import { clockText } from '../save.js';
+import { makeSfx } from './sfx.js';
+
+// toast kinds: icon (Lucide) and sound (sfx.js); colours in play.css (.hud-toast.<kind>)
+const TOAST_KINDS = {
+  info: { icon: 'info', sound: 'ping' }, good: { icon: 'check', sound: 'good' }, warn: { icon: 'warning', sound: 'nope' },
+  trophy: { icon: 'trophy', sound: 'fanfare' }, recipe: { icon: 'list', sound: 'chime' }, secret: { icon: 'star', sound: 'sparkle' },
+  heal: { icon: 'heart', sound: 'good' }, drama: { icon: 'skull', sound: 'low' }, travel: { icon: 'map', sound: 'ping' },
+  camp: { icon: 'moon', sound: 'ping' }, loot: { icon: 'bags', sound: 'good' },
+};
 
 // the controls panel (H or Menü › Steuerung), two columns: keys as keycaps, " / " splits alternatives
 const CONTROLS = [
@@ -29,7 +38,6 @@ export class Hud {
     this.healthBar = el('i'); this.healthText = el('b');
     this.ammo = el('b'); this.dash = el('span', { class: 'hud-dash' }, 'DASH');
     this.time = el('b'); this.kills = el('b'); this.deltas = el('b'); this.roomName = el('span', { class: 'hud-room' });
-    this.bannerEl = el('div', { class: 'hud-banner', hidden: true });
     this.toastsEl = el('div', { class: 'hud-toasts' });   // 🏆 Achievement, 📜 Rezept gelernt (#012): stack top right, go by themselves
     this.promptEl = el('div', { class: 'hud-prompt', hidden: true });
     this.menuEl = el('div', { class: 'hud-menu', hidden: true });
@@ -60,7 +68,7 @@ export class Hud {
         el('div', { class: 'hud-right' },
           el('div', { class: 'hud-row' }, this.roomName),
           el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'ZEIT'), this.time, el('span', { class: 'hud-label' }, 'KILLS'), this.kills, el('span', { class: 'hud-label' }, 'Δ'), this.deltas))),
-      this.campEl, this.buildBtn, this.openBtn, this.bannerEl, this.toastsEl, this.promptEl, this.menuEl, this.help,
+      this.campEl, this.buildBtn, this.openBtn, this.toastsEl, this.promptEl, this.menuEl, this.help,
       el('div', { class: 'hud-foot' }, // tidy (#008, Daniel: „HUD aufräumen“): only the menu button and the version; Werkstatt, Startseite and Neues Spiel live in the menu
         el('button', { class: 'hud-menubtn', title: 'Menü (Esc)', onclick: e => { e.currentTarget.blur(); this.pauseMenu(); } }, icon('menu', 14), 'Menü'),
         this.versionEl = el('span', { class: 'hud-version' })));
@@ -227,20 +235,45 @@ export class Hud {
   room(name, count) { this.roomName.textContent = name; this.total = count; }
   // banners go by themselves after ms (default 3.5 s; 0 = stays until the next banner or ✕). Before, a banner stayed until
   // the next one replaced it, so „Wieder auf den Beinen“ never left (Daniel, 12.11.2026)
-  banner(title, sub = '', ms = 3500) {
-    clearTimeout(this.bannerTimer);
-    this.bannerEl.hidden = !title;
-    this.bannerEl.replaceChildren(...(title ? [el('b', {}, title), el('small', {}, sub), closeX(() => this.banner(null))] : []));
-    if (title && ms > 0) this.bannerTimer = setTimeout(() => { if (this.bannerEl.firstChild?.textContent === title) this.banner(null); }, ms);
+  // Since #014 (Daniel, 13.11.2026: „Toast und Sound, aber stell sicher, dass alle diese Hinweise auf diese Art dargestellt
+  // werden“) a banner is a toast too: it replaces the previous banner toast, ms 0 = stays until ✕ or the next banner.
+  banner(title, sub = '', ms = 3500, kind = 'info') {
+    const old = this.bannerToast; this.bannerToast = null;
+    if (old?.isConnected) this.dismiss(old);
+    if (!title) return null;
+    return (this.bannerToast = this.toast(title, sub, kind, ms, { banner: true }));
   }
-  // a small note that stacks and fades (kind: trophy | recipe | info); → the element
-  toast(title, sub = '', kind = 'info', ms = 4200) {
-    const t = el('div', { class: 'hud-toast ' + kind }, icon(kind === 'trophy' ? 'trophy' : kind === 'recipe' ? 'list' : 'general', 22), el('div', {}, el('b', {}, title), sub ? el('small', {}, sub) : null));
+  // the text of the banner toast still on screen (for the remote control and the tests)
+  bannerText() { const t = this.bannerToast; return t?.isConnected && !t.classList.contains('out') ? t.textContent : null; }
+  dismiss(t) { if (!t || t.classList.contains('out')) return; clearTimeout(t._timer); t.classList.add('out'); setTimeout(() => t.remove(), 450); }
+  // every message of the game: a note top right that stacks and goes by itself, with its own icon, colour and sound.
+  // The same title twice in a row does not stack: the toast already there starts its time again (and nods). → the element
+  toast(title, sub = '', kind = 'info', ms = 4200, { banner = false, sound = true } = {}) {
+    const K = TOAST_KINDS[kind] || TOAST_KINDS.info;
+    const same = [...this.toastsEl.children].find(x => !x.classList.contains('out') && x._title === title && x._sub === sub);
+    if (same) {
+      clearTimeout(same._timer); same.classList.remove('nod'); void same.offsetWidth; same.classList.add('nod');
+      if (ms > 0) same._timer = setTimeout(() => this.dismiss(same), ms);
+      return same;
+    }
+    const t = el('div', { class: `hud-toast ${kind}${banner ? ' banner' : ''}` }, icon(K.icon, 22), el('div', {}, el('b', {}, title), sub ? el('small', {}, sub) : null));
+    t._title = title; t._sub = sub;
+    if (ms <= 0) t.append(closeX(() => this.dismiss(t)));
     this.toastsEl.append(t);
-    while (this.toastsEl.children.length > 4) this.toastsEl.firstChild.remove();
-    setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 450); }, ms);
+    const live = [...this.toastsEl.children].filter(x => !x.classList.contains('out'));
+    for (const x of live.slice(0, Math.max(0, live.length - 5))) this.dismiss(x);
+    if (ms > 0) t._timer = setTimeout(() => this.dismiss(t), ms);
     (this.toastLog ??= []).push({ title, sub, kind });
+    if (sound) this.toastSound(K.sound);
     return t;
+  }
+  toastSound(name) {
+    const s = this.scene; if (!s?.sound || !name) return;
+    if (this.sfxScene !== s) { this.sfxScene = s; this.sfx = makeSfx(s, (s.data_?.build?.view?.volume ?? 50) / 100 * 0.8); }
+    const now = performance.now();
+    if (now - (this.lastSound || 0) < 120) return;   // a burst of toasts plays one sound
+    this.lastSound = now;
+    try { this.sfx[name]?.(); } catch { /* no audio */ }
   }
   hurt() { this.root.classList.remove('hud-hurt'); void this.root.offsetWidth; this.root.classList.add('hud-hurt'); }
 

@@ -185,7 +185,7 @@ export class PlayScene extends Phaser.Scene {
   // V / L3: the next ranged weapon from the backpack into the hand, the old one into the backpack (Daniel, 12.11.2026: „wir proben den Switch“);
   // in a test room without a savegame: through all ranged weapons
   swapRanged() {
-    const D = this.data_, W = D.weapons || {}, l = this.leyla, say = t => this.fx.text(l.x, l.feet - l.height - 30, t, { color: '#ffd27a', size: 34, rise: 40, life: 1100 });
+    const D = this.data_, W = D.weapons || {}, l = this.leyla, say = t => this.hud.toast(t, '', 'warn', 2600);
     let next;
     if (!this.box) {
       const all = Object.keys(W).filter(id => W[id].kind === 'ranged'), cur = this.testSlots?.ranged || D.leyla?.loadout?.ranged;
@@ -337,7 +337,7 @@ export class PlayScene extends Phaser.Scene {
     this.hud.room(def?.name || this.roomId, this.enemies.length);
     this.hud.mode(this.mode, this.box?.save, this.data_);
     if (this.mode === 'run') this.hud.room(`${this.data_.pois?.[this.box.save.run?.poi]?.name || ''} · ${def?.name || this.roomId}`, this.enemies.length);
-    if (this.args.banner) { this.hud.banner(...this.args.banner); this.time.delayedCall(2800, () => this.hud.banner(null)); }
+    if (this.args.banner) { const [t, sub, kind] = this.args.banner; this.hud.banner(t, sub, 4200, kind || (this.mode === 'camp' ? 'camp' : 'travel')); }
     else this.hud.banner(null);
     this.leaving = false; this.roomName = null;
     if (this.dreaming) this.wakeUp();
@@ -380,7 +380,7 @@ export class PlayScene extends Phaser.Scene {
       gearChanged: () => hud.scene.applyGear(),
       react: mood => hud.scene.drone?.react(mood),
       rigChanged: () => hud.scene.camp?.drawRig(),
-      notify: text => hud.scene.fx.text(hud.scene.leyla.x, hud.scene.leyla.feet - hud.scene.leyla.height - 30, text, { color: '#ffd27a', size: 34, rise: 40, life: 1100 }),
+      notify: (text, kind = 'warn') => hud.toast(text, '', kind, 2600),
     });
     hud.inv.close();
     // cooking and crafting at the workshops in the camp (game/play/craft_ui.js)
@@ -397,7 +397,7 @@ export class PlayScene extends Phaser.Scene {
       get D() { return hud.scene.data_; },
       save: () => hud.scene.box.save,
       changed: () => { clearTimeout(hud.scene.saveTimer); hud.scene.saveTimer = setTimeout(() => hud.scene.box?.persist(), 400); hud.scene.applyGear?.(); },
-      notify: text => hud.scene.fx.text(hud.scene.leyla.x, hud.scene.leyla.feet - hud.scene.leyla.height - 30, text, { color: '#ffd27a', size: 34, rise: 40, life: 1600 }),
+      notify: (text, kind = 'info') => hud.toast(text, '', kind, 3200),
       closed: () => {},
     });
     hud.tech.close(); hud.tech.el.hidden = true;
@@ -447,7 +447,7 @@ export class PlayScene extends Phaser.Scene {
     if (r.heal) { r.heal *= Math.max(0, 1 + (this.mods.heal || 0) / 100); l.health = Math.min(l.maxHealth, l.health + r.heal); save.health = Math.round(l.health); }   // Heilung % from implants
     const b = D.buffs?.[r.buff] || {};
     if (this.mode === 'run' && !r.heal && b.stat) { this.mods[b.stat] = (this.mods[b.stat] || 0) + (b.value || 0); if (b.stat === 'health') l.health = Math.min(l.maxHealth, l.health + (b.value || 0)); }
-    this.fx.text(l.x, l.feet - l.height - 30, r.heal ? `+${Math.round(r.heal)} Leben` : `${b.name || r.buff}${this.mode === 'camp' ? ' · nächster Run' : ''}`, { color: '#7aff9a', size: 34, rise: 50, life: 1300 });
+    this.hud.toast(r.heal ? `+${Math.round(r.heal)} Leben` : b.name || r.buff, r.heal ? '' : this.mode === 'camp' ? 'Wirkt im nächsten Run' : (b.description || ''), 'heal', 2600);
     return r;
   }
   // something moved in an inventory: ground bundles appear or vanish, the savegame is written soon after
@@ -572,9 +572,9 @@ export class PlayScene extends Phaser.Scene {
     save.buffs = [];
     save.run = null;
     this.hud.inv?.close();
-    const banner = ko ? ['AvA hat dich heimgebracht', `${clockText(save)} · Der Rucksack ist weg.`]
-      : rank ? [`Zurück im Camp · Rang ${rank.grade}`, `${clockText(save)} · +${paid} Δ (${this.deltas} + ${rank.bonus} %) · ${this.kills} Kills`]
-      : ['Zurück im Camp', `${clockText(save)} · +${paid} Δ · ${this.kills} Kills`];
+    const banner = ko ? ['AvA hat dich heimgebracht', `${clockText(save)} · Der Rucksack ist weg.`, 'drama']
+      : rank ? [`Zurück im Camp · Rang ${rank.grade}`, `${clockText(save)} · +${paid} Δ (${this.deltas} + ${rank.bonus} %) · ${this.kills} Kills`, 'good']
+      : ['Zurück im Camp', `${clockText(save)} · +${paid} Δ · ${this.kills} Kills`, 'good'];
     this.goCamp({ banner, fade: ko ? 900 : 600, arriving: true });
   }
 
@@ -689,7 +689,7 @@ export class PlayScene extends Phaser.Scene {
   onLeylaHit(dmg) { this.drone.react('hit'); this.cam.shake(120, 0.006); this.fx.bloodHit(this.leyla.x, this.leyla.chest, -this.leyla.facing || 1, Math.max(0.5, Math.min(1.6, dmg / 15))); this.hud.hurt(); }
   onLeylaDown() {
     if (this.mode === 'run' && this.box && this.data_.tank?.enabled !== false && this.data_.camp?.koReturn !== 'camp') return this.runKnockout();
-    this.hud.banner('AvA schleppt dich raus …', 'Die Run-Beute bleibt liegen.');
+    this.hud.banner('AvA schleppt dich raus …', 'Die Run-Beute bleibt liegen.', 3500, 'drama');
     this.cam.shake(300, 0.01);
     this.waitBar(1900, 'AvA schleppt dich raus …', 'Die Run-Beute bleibt liegen.');
     this.time.delayedCall(1900, () => this.mode === 'run' ? this.endRun(true) : this.mode === 'camp' ? this.goCamp() : this.level ? this.restartAs({}) : this.restartRoom());
@@ -700,7 +700,7 @@ export class PlayScene extends Phaser.Scene {
   runKnockout() {
     const D = this.data_, save = this.box.save, l = this.leyla, C = D.camp || {};
     if (save.tank?.dead) {   // nobody comes any more: the run ends, the dream ends (wakeUp in the camp)
-      this.hud.banner('Niemand holt dich mehr …', 'Alles wird schwarz.'); this.cam.shake(300, 0.01); this.cam.fadeOut(1800, 0, 0, 0);
+      this.hud.banner('Niemand holt dich mehr …', 'Alles wird schwarz.', 3500, 'drama'); this.cam.shake(300, 0.01); this.cam.fadeOut(1800, 0, 0, 0);
       this.waitBar(1900, 'Niemand holt dich mehr …', 'Alles wird schwarz.', { drone: false, after: 1500 });
       this.time.delayedCall(1900, () => this.endRun(true)); return;
     }
@@ -711,7 +711,7 @@ export class PlayScene extends Phaser.Scene {
     if (bag.items.length) { this.lostPack = this.loot.dropPack(l.x, l.feet, bag); bag.items = []; this.invChanged?.('backpack'); }
     this.cam.shake(300, 0.01);
     this.drone.react('down');
-    this.hud.banner(r.last ? 'AvA bringt dich ein letztes Mal zurück …' : 'AvA schleppt dich zum Van …', lostBefore ? 'Dein alter Rucksack ist für immer weg.' : this.lostPack ? 'Dein Rucksack liegt noch da. Hol ihn dir, du hast eine Chance.' : `Der Tank verliert ${Math.round(r.cost)} %.`);
+    this.hud.banner(r.last ? 'AvA bringt dich ein letztes Mal zurück …' : 'AvA schleppt dich zum Van …', lostBefore ? 'Dein alter Rucksack ist für immer weg.' : this.lostPack ? 'Dein Rucksack liegt noch da. Hol ihn dir, du hast eine Chance.' : `Der Tank verliert ${Math.round(r.cost)} %.`, 3500, 'drama');
     this.box.persist?.();
     const bar = this.waitBar(1900, r.last ? 'AvA bringt dich ein letztes Mal zurück …' : 'AvA schleppt dich zum Van …', lostBefore ? 'Dein alter Rucksack ist für immer weg.' : this.lostPack ? 'Dein Rucksack liegt noch da.' : `Der Tank verliert ${Math.round(r.cost)} %.`);
     this.time.delayedCall(1900, () => {
@@ -720,8 +720,8 @@ export class PlayScene extends Phaser.Scene {
       l.health = Math.max(1, Math.round(l.maxHealth * (C.heal?.afterKo ?? 30) / 100));
       l.invulnerableUntil = this.now + 1500;
       this.spawnEnemies();
-      if (r.last) { this.drone.die?.(); this.hud.banner('AvA ist fort.', 'Ihr Tank ist still. Leyla ist allein.'); }
-      else this.hud.banner('Wieder auf den Beinen', `Tank ${Math.round(save.tank.cond)} % · ${save.tank.rescues}× gerettet`);
+      if (r.last) { this.drone.die?.(); this.hud.banner('AvA ist fort.', 'Ihr Tank ist still. Leyla ist allein.', 6000, 'drama'); }
+      else this.hud.banner('Wieder auf den Beinen', `Tank ${Math.round(save.tank.cond)} % · ${save.tank.rescues}× gerettet`, 3500, 'good');
     });
   }
   // the dream is over: black screen, typed lines, then Leyla sits at the fire; AvA (new, whole) floats down to her
@@ -752,7 +752,7 @@ export class PlayScene extends Phaser.Scene {
     this.loot.sync(); this.lostPack = null;
     this.invChanged?.('backpack');
     this.drone.react('rescue');
-    this.fx.text(this.leyla.x, this.leyla.feet - this.leyla.height - 30, left ? 'Rucksack zurück (nicht alles passt)' : 'Rucksack zurück!', { color: '#ffb3ec', size: 34, rise: 50, life: 1200 });
+    this.hud.toast('Rucksack zurück!', left ? 'Nicht alles passt, der Rest liegt am Boden' : '', 'good', 3200);
   }
   // ---------- Rezepte automatisch lernen + Achievements (#012) ----------
   // notes, blueprints and cookbooks in the backpack (everything picked up lands there) go straight into the recipe book
@@ -832,7 +832,7 @@ export class PlayScene extends Phaser.Scene {
     if (!this.level && this.enemies.every(x => !x.alive) && !this.cleared) {
       this.cleared = true;
       this.drone.react('cleared');
-      this.time.delayedCall(700, () => this.hud.banner('Raum geräumt', `${this.clock()} · ${this.kills} Kills · ${this.deltas} Δ · R für nochmal`, 0));
+      this.time.delayedCall(700, () => this.hud.banner('Raum geräumt', `${this.clock()} · ${this.kills} Kills · ${this.deltas} Δ · R für nochmal`, 0, 'good'));
     }
   }
   clock() { const s = Math.floor(this.elapsed / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
@@ -943,7 +943,7 @@ export class PlayScene extends Phaser.Scene {
   toggleMute() {
     this.sound.mute = !this.sound.mute;
     try { localStorage.setItem('nomadgirl-mute', this.sound.mute ? '1' : '0'); } catch { /* private mode */ }
-    this.hud.banner(this.sound.mute ? 'Ton aus' : 'Ton an', 'M schaltet um'); this.time.delayedCall(1200, () => this.hud.banner(null));
+    this.hud.banner(this.sound.mute ? 'Ton aus' : 'Ton an', 'M schaltet um', 1600);
   }
 
   update(time, delta) {

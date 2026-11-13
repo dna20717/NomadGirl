@@ -166,7 +166,7 @@ export class PoiLevel {
     const things = s.lootRoll ? s.lootRoll(this.lootTable) : rollLoot(s.data_, this.lootTable);
     s.fx.sparks(c.x, c.feet - 50, 0xffd27a, 14);
     if (things.length) s.loot?.drop(c.x, c.feet, things, 140);
-    else s.fx.text(c.x, c.feet - 90, 'leer …', { color: '#8b949e', size: 36 });
+    else s.hud.toast('Leer …', 'Hier hat schon jemand geplündert', 'info', 2400);
   }
   pull(sw) {
     const s = this.scene;
@@ -177,7 +177,7 @@ export class PoiLevel {
     this.openSolid(d);
     s.cam.shake(260, 0.004);
     s.tweens.add({ targets: d.art, y: -(d.y1 - d.y0) * s.T + 12, duration: 900, ease: 'Sine.easeInOut' });
-    s.fx.text(s.leyla.x, s.leyla.feet - s.leyla.height - 30, 'Abkürzung offen!', { color: '#3fe0d0', size: 44, rise: 60, life: 1400 });
+    s.hud.toast('Abkürzung offen!', 'Ein Schalter hat eine Tür geöffnet', 'good', 3000);
   }
   openSolid(o) {
     o.open = true;
@@ -196,7 +196,7 @@ export class PoiLevel {
       this.secrets++;
       s.achieve?.('secrets', 1, [this.poi]);
       s.drone.react('curious');
-      s.fx.text((w.x0 + w.x1) / 2 * T, w.y0 * T - 10, `Geheimnis! ${this.secrets}/${this.secretsMax}`, { color: '#e45aa8', size: 46, rise: 70, life: 1500 });
+      s.hud.toast('Geheimnis gefunden!', `${this.secrets} von ${this.secretsMax}`, 'secret', 3200);
     }
   }
 
@@ -239,7 +239,7 @@ export class PoiLevel {
       if (!f.tiles.some(([x, y]) => b.right > x * T && b.left < (x + 1) * T && b.bottom > y * T && b.top < (y + 1) * T)) continue;
       f.found = true; f.fade = 0; this.secrets++; s.achieve?.('secrets', 1, [this.poi]);
       s.drone.react('curious');
-      s.fx.text(l.x, l.feet - l.height - 20, `Geheimnis! ${this.secrets}/${this.secretsMax}`, { color: '#e45aa8', size: 46, rise: 70, life: 1500 });
+      s.hud.toast('Geheimnis gefunden!', `${this.secrets} von ${this.secretsMax}`, 'secret', 3200);
       s.fog?.reveal(true);
     }
   }

@@ -126,7 +126,7 @@ export function installControl(game) {
         van: s.van?.state(),
         level: s.level?.state() || null,
         light: s.atmo?.state() || null,
-        mode: s.mode, prompt: s.hud.promptText, menu: s.hud.menuState(), banner: s.hud.bannerEl.hidden ? null : s.hud.bannerEl.textContent,
+        mode: s.mode, prompt: s.hud.promptText, menu: s.hud.menuState(), banner: s.hud.bannerText(),
         camp: s.camp?.state(), health: Math.round(s.leyla.health), maxHealth: s.leyla.maxHealth,
       };
     },

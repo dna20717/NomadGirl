@@ -66,10 +66,10 @@ export class TechtreeUI {
   }
   buy(id) {
     const r = unlock(this.D, this.save, id);
-    if (!r.ok) { this.shake = id; this.draw(); this.host.notify?.(r.reason); return r; }
+    if (!r.ok) { this.shake = id; this.draw(); this.host.notify?.(r.reason, 'warn'); return r; }
     this.flash = id; this.host.changed?.(r); this.draw();
     const n = this.D.techtree[id];
-    this.host.notify?.(`${n.name} freigeschaltet!` + (r.learnt.length ? ` Neues Rezept: ${r.learnt.map(x => this.D.recipes?.[x]?.name || x).join(', ')}` : ''));
+    this.host.notify?.(`${n.name} freigeschaltet!` + (r.learnt.length ? ` Neues Rezept: ${r.learnt.map(x => this.D.recipes?.[x]?.name || x).join(', ')}` : ''), 'good');
     return r;
   }
 

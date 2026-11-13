@@ -132,11 +132,14 @@ if (shots) {
   await page.screenshot({ path: 'output/raider_blood.png' });
 }
 
-// banners go by themselves (Daniel: „Wieder auf den Beinen-Meldung verschwindet nicht“), every overlay has a ✕
-const ban = await page.evaluate(() => { const h = game.scene.getScene('play').hud; h.banner('Wieder auf den Beinen', 'Test'); return { shown: !h.bannerEl.hidden, x: !!h.bannerEl.querySelector('.ui-x') }; });
+// banners go by themselves (Daniel: „Wieder auf den Beinen-Meldung verschwindet nicht“); since #014 a banner is a toast,
+// one that stays (ms 0) has an ✕
+const ban = await page.evaluate(() => { const h = game.scene.getScene('play').hud; h.banner('Wieder auf den Beinen', 'Test', 3500, 'good'); return { shown: /Wieder auf den Beinen/.test(h.bannerText() || ''), toast: !!document.querySelector('.hud-toast.good.banner') }; });
 await page.waitForTimeout(3800);
-const gone = await page.evaluate(() => game.scene.getScene('play').hud.bannerEl.hidden);
-check('Banner verschwindet nach 3,5 s von selbst und hat ein ✕', ban.shown && ban.x && gone, { ...ban, gone });
+const gone = await page.evaluate(() => { const h = game.scene.getScene('play').hud, auto = !h.bannerText(), t = h.banner('Raum geräumt', 'bleibt', 0, 'good'), x = t.querySelector('.ui-x'); const stays = !!h.bannerText(); x?.click(); return { auto, x: !!x, stays }; });
+await page.waitForTimeout(100);
+const closed = await page.evaluate(() => !game.scene.getScene('play').hud.bannerText());
+check('Banner ist ein Toast, verschwindet nach 3,5 s von selbst; ein bleibender hat ein ✕', ban.shown && ban.toast && gone.auto && gone.x && gone.stays && closed, { ...ban, ...gone, closed });
 const X = await page.evaluate(() => {
   const h = game.scene.getScene('play').hud;
   h.menu({ title: 'Test', items: [{ label: 'A', act: () => {} }] });

@@ -1067,7 +1067,7 @@ export class Camp {
         const got = r.got.reduce((n, g) => n + g.n, 0); if (got) s.achieve?.('harvests', 1);
         for (const l of r.left) s.loot?.throwDown({ a: 'items', id: l.id, n: l.n, r: 0 });
         this.box.persist?.();
-        s.fx.text(s.leyla.x, s.leyla.feet - s.leyla.height - 30, r.got.map(g => `+${g.n} ${D.items?.[g.id]?.name || g.id}`).join(' · ') || 'Nichts geerntet', { color: '#9cdb43', size: 34, rise: 50, life: 1600 });
+        s.hud.toast(r.got.length ? 'Geerntet' : 'Nichts geerntet', r.got.map(g => `+${g.n} ${D.items?.[g.id]?.name || g.id}`).join(' · '), r.got.length ? 'loot' : 'info', 3000);
         s.drone?.react('curious');
         this.benches?.list.forEach(b => { if (b.plants) b.plantSig = null; });
       } }, { label: 'Zurück', act: () => {} }] });
@@ -1080,7 +1080,7 @@ export class Camp {
       items: [{ label: L.full ? `Abfüllen (${L.full})` : 'Noch zu wenig Wasser', primary: !!L.full, disabled: L.full ? null : 'Sammelt noch', act: () => {
         const r = cisternTap(D, save, id, key);
         this.box.persist?.();
-        s.fx.text(s.leyla.x, s.leyla.feet - s.leyla.height - 30, r.got ? `+${r.got} ${name}` : 'Kein Platz im Rucksack', { color: '#20d6c7', size: 34, rise: 50, life: 1600 });
+        s.hud.toast(r.got ? `+${r.got} ${name}` : 'Kein Platz im Rucksack', '', r.got ? 'loot' : 'warn', 2600);
         s.drone?.react('happy');
       } }, { label: 'Zurück', act: () => {} }] });
   }
