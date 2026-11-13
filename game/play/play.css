@@ -291,7 +291,8 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .bm-side { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .bm-clock { color: #b9a2c8; font: 20px/1 VT323, monospace; }
 .bm-shopbtn.on { background: #ffd27a; color: #17111f; }
-.bm-msg { position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); max-width: min(900px, 90vw); padding: 9px 16px; border-radius: 10px; background: rgba(13, 10, 18, .88); border: 1px solid #3a2f45; font: 22px/1.1 VT323, monospace; text-align: center; }
+.bm-msg { position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%); max-width: min(900px, 90vw); padding: 9px 16px; border-radius: 10px; background: rgba(13, 10, 18, .88); border: 1px solid #3a2f45; font: 22px/1.1 VT323, monospace; text-align: center; }
+.bm-msg[hidden] { display: none; }
 .bm-msg.error { color: #ff8a7a; border-color: #7a2f2f; }
 .bm-msg.ok { color: #9fe8a8; }
 .bm-msg.idle { color: #d8cfe2; }

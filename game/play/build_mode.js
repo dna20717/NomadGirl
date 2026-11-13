@@ -166,7 +166,7 @@ export class BuildMode {
     if (rsOn) { const v = (this.B.view?.cursorSpeed ?? 900) / Math.max(0.3, s.cam.zoom); this.aim({ x: this.ava.x + rs[0] * v * dt / 1000, y: this.ava.y + rs[1] * v * dt / 1000 }); }
     if (u.pressed('next')) this.area(1);
     if (u.pressed('prev')) this.area(-1);
-    if (u.pressed('ok')) this.press();
+    if (u.pressed('ok')) this.padPress();
     if (u.pressed('back')) { if (this.drag) this.flyBack(null); else if (this.wire) { this.wire = null; this.draw(); } else return this.close(); }
     this.holdBtn(u, 'send', dt, () => this.sendTap(), () => this.sendHold());
     this.holdBtn(u, 'context', dt, () => this.openCtx(), () => { this.undoLast(); this.buzz('nope'); });
@@ -285,7 +285,7 @@ export class BuildMode {
   }
 
   // A: pack what is under AvA's claw, or put the held thing down there
-  press() {
+  padPress() {   // (not press(): this.press is the mouse press of pointerDown)
     const w = { x: this.ava.x, y: this.ava.y };
     if (this.drag) return this.drop();
     if (this.wire) return this.finishWire(w);
@@ -394,12 +394,15 @@ export class BuildMode {
     const D = this.D, save = this.save, b = budgets(D, save.rig), top = this.undo[this.undo.length - 1];
     const bar = (label, val, max, text, over, ic) => el('div', { class: 'build-budget' + (over ? ' over' : '') }, icon(ic, 16),
       el('span', {}, el('small', {}, label), el('b', {}, text)), max != null ? el('i', { style: `--k:${Math.min(1, max ? val / max : 1)}` }) : null);
-    const msg = this.msg?.text || (this.drag ? this.dragHint() : this.hoverText || 'Teile mit der Maus packen und ziehen: in einen Anhänger, auf den Schrottplatz oder zum Händler.');
+    // only real news: a message, what the held thing would do, what is under the mouse; nothing idle (the hint line says how it works),
+    // and while AvA steers her tooltip says it already
+    const msg = this.msg?.text || (this.ava?.on ? '' : this.drag ? this.dragHint() : this.hoverText || '');
     // the bar, the dealer and the message stay the same elements while building (Daniel: the bar stays on, no slide in on every redraw);
     // only their contents change. The slide-in plays once when building starts or the dealer opens.
     if (!this.shell || !this.el.contains(this.shell.bar)) {
       this.shell = { bar: el('div', { class: 'bm-bar ui-frame' }), shop: el('div', { class: 'bm-shopslot' }), msg: el('div', { class: 'bm-msg idle' }),
-        hint: hints([['move', 'Cursor'], ['ok', 'packen / ablegen'], ['context', 'rückgängig'], ['send', 'Händler'], ['tabs', 'nächstes Teil'], ['back', 'zurück / fertig']], 'Maus: Teile packen und ziehen · Strg+Z rückgängig · B fertig') };
+        hint: el('div', { class: 'ui-hints' }) };   // filled right below with the hint line of the situation (#010)
+      this.hintState = null;   // a new shell: the hint line is drawn again (it kept the old one when building opened a second time)
       this.shell.hint.classList.add('bm-hints');
       this.el.replaceChildren(this.shell.bar, this.shell.shop, this.shell.msg, this.shell.hint, this.shell.x = closeX(() => this.close(), 'Fertig (B)'));
     }
@@ -440,6 +443,7 @@ export class BuildMode {
     } else sh.shop.replaceChildren();
     sh.msg.className = 'bm-msg ' + (this.msg?.kind || 'idle');
     sh.msg.textContent = msg;
+    sh.msg.hidden = !msg;
   }
   say(text, kind = 'error') { this.msg = { text, kind, until: this.scene.time.now + 3200 }; this.draw(); }
 

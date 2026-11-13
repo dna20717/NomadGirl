@@ -48,6 +48,8 @@ check('Steuerkreuz: AvA hüpft zum nächsten Ziel (mit Vibration)', (p0.x !== p1
 
 // pack a spare workshop on the scrapyard
 s = await ev(() => { const it = SC().camp.yardItems.find(x => x.kind === 'ws' && x.id === 'werkbank'); BM().aim({ x: (it.x0 + it.x1) / 2, y: (it.y0 + it.y1) / 2 }); return it.id; });
+await page.mouse.click(960, 200); await ev(() => nomad.step(2)); await tap(15);   // a mouse click before: A must still work (press() vs. the mouse's this.press)
+s = await ev(() => { const it = SC().camp.yardItems.find(x => x.kind === 'ws' && x.id === 'werkbank'); BM().aim({ x: (it.x0 + it.x1) / 2, y: (it.y0 + it.y1) / 2 }); return it.id; });
 await tap(0); s = await st();
 check('A packt die Werkbank, Hilfezeile wechselt auf „ablegen“', s.drag === 'ws' && /ablegen/.test(s.hint) && /Werkbank/.test(s.tip), s);
 

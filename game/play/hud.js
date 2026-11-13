@@ -38,7 +38,7 @@ export class Hud {
     try { this.rigOpen = localStorage.getItem('nomadgirl-rig-open') === '1'; } catch { this.rigOpen = false; }
     this.openBtn = el('button', { class: 'hud-openbtn', hidden: true, onclick: e => { e.currentTarget.blur(); this.setRigOpen(!this.rigOpen); } });
     this.setRigOpen(this.rigOpen);
-    this.buildBtn = el('button', { class: 'hud-buildbtn', hidden: true, title: 'Rig bauen: Werkstätten und Anhänger mit der Maus ziehen', onclick: e => { e.currentTarget.blur(); this.scene?.openBuild(); } }, el('kbd', {}, 'B'), el('span', {}, 'Rig bauen'));
+    this.buildBtn = el('button', { class: 'hud-buildbtn', hidden: true, title: 'Rig bauen (B, Controller: Select halten): Werkstätten, Anhänger und Rig-Teile mit der Maus oder AvA umsetzen', onclick: e => { e.currentTarget.blur(); this.scene?.openBuild(); } }, el('kbd', {}, 'B'), el('span', {}, 'Rig bauen'));
     this.modal = false;
     document.addEventListener('keydown', e => { if (this.pad) this.pad.active = false; this.menuKey(e); }, true);
     // controls: hidden until asked for (Daniel, 11.11.2026: "nicht mehr per default, in einem Menü verstecken"), two columns

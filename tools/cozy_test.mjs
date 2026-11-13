@@ -71,6 +71,13 @@ sp = await ev(() => SC().hud.build.spots());
 await page.mouse.click(sp.wires[0].x, sp.wires[0].y); await ev(() => nomad.step(2));
 v = await ev(() => SC().hud.build.state());
 check('Klick auf die Mitte: Kette abgenommen, halber Preis zurück', v.lights.length === 1 && v.deltas === 450 + 12, v);
+// Daniel, 13.11.2026: „Lichterketten verschwinden immer dann, wenn man eine Werkstatt im Rig platziert oder neu baut“ + „alter Tooltip“
+v = await ev(() => { const B = SC().hud.build, it = SC().camp.yardItems.find(x => x.kind === 'ws'); B.ava = { on: true, x: 0, y: 0 }; B.aim({ x: (it.x0 + it.x1) / 2, y: (it.y0 + it.y1) / 2 }); B.padPress(); nomad.step(4);
+  const t = B.navTargets().find(t => /Tauschen|Einbauen/.test(t.label) && !/Cryo/.test(t.label)); B.aim(t); nomad.step(2); B.padPress(); nomad.step(30); B.ava.on = false; B.draw();
+  return { lights: nomad.save().rig.lights.length, bulbs: SC().camp.bulbs.length, rig: B.state().rig }; });
+check('Werkstatt einbauen: die Lichterkette bleibt hängen und leuchtet', v.lights === 1 && v.bulbs > 0 && /werkbank|lagerregal/.test(v.rig), v);
+v = await ev(() => { SC().hud.build.close(); nomad.step(60); SC().openBuild(); nomad.step(30); const h = document.querySelector('.bm-hints')?.textContent || '', m = document.querySelector('.bm-msg'); return { h, msg: m?.hidden ? '' : m?.textContent }; });
+check('Bau-Modus zum zweiten Mal: neue Hilfezeile, kein alter Maus-Text unten', !/nächstes Teil|Cursor/.test(v.h) && /packen/.test(v.h) && !/Teile mit der Maus packen/.test(v.msg || ''), v);
 await ev(() => { SC().hud.build.close(); nomad.step(60); nomad.save().hour = 23; SC().goCamp({}); nomad.step(40); });
 v = await ev(() => { const c = SC().camp; return { lights: nomad.save().rig.lights, bulbs: c.bulbs.map(b => +b.alpha.toFixed(2)), flies: c.flies.length, lightK: c.lightK }; });
 check('Nachts: Lichterkette bleibt im Spielstand und leuchtet, Glühwürmchen ums Feuer', v.lights.length === 1 && v.bulbs.length && v.bulbs.every(x => x > 0.2) && v.flies > 0, v);

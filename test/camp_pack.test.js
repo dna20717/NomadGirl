@@ -87,3 +87,19 @@ test('Solar unter einem Stapel (#009): kein Sockel auf einem überbauten Dach, P
   assert.deepEqual(s.rig.parts.solar, []);
   assert.ok(s.rig.spare.parts.includes('solarpaneel'));
 });
+
+test('Lichterketten überleben den Umbau (Daniel: „verschwinden, wenn man eine Werkstatt platziert oder neu baut“) und wandern mit ihrem Anhänger', async () => {
+  const { act, buyWorkshop } = await import('../game/rig.js');
+  const s = newSave(D);
+  s.deltas = 5000;
+  s.rig.units.push({ kind: 'container', id: 'container_20', workshops: [] });
+  s.rig.lights = [['0:0', '1:1'], ['1:0', '2:1']];
+  assert.ok(act(D, s, d => buyWorkshop(D, d, 'werkbank')).ok);
+  assert.deepEqual(s.rig.lights, [['0:0', '1:1'], ['1:0', '2:1']], 'Kaufen/Einbauen lässt die Ketten hängen');
+  // the 10-foot container leaves (index 1): its strings come down, the 20-foot container moves up to index 1 and keeps its string end
+  assert.ok(act(D, s, d => { d.rig.units.splice(1, 1); d.changes = (d.changes || 0) + 1; return { ok: true }; }).ok);
+  assert.deepEqual(s.rig.lights, [], 'beide Ketten hingen am entfernten Container');
+  s.rig.lights = [['0:1', '1:0']];
+  assert.ok(act(D, s, d => { const u = d.rig.units.splice(1, 1)[0]; d.rig.units.push(u); d.changes = (d.changes || 0) + 1; return { ok: true }; }).ok);
+  assert.deepEqual(s.rig.lights, [['0:1', `${s.rig.units.length - 1}:0`]], 'die Kette wandert mit ihrem Container');
+});
