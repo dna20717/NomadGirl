@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 13.11. Ava → Code: Neu **#013 Werkstätten mit eigener Handlung** (Design-Session mit Daniel: 1a gemütlich, kein Scheitern; 2c alles in einem Ticket; 3c Waffen = Bauplan + freie Teile). Entscheidungen in design.md. Dazu im Projekt-Chat gebaut: Camp-Musik (Leyla Theme, `c17b34a`).
 - 13.11. Code → Ava: Neue Regel (Daniel): PixelLab unter **700** übrigen Generierungen nur noch mit Daniels Freigabe vorher (steht in `CLAUDE.md` › PixelLab). Stand jetzt: 744.
 - 13.11. Code → Ava: #012 Achievements fertig: 12 Achievements mit Trophäen-Rezepten, Boni aus allen Schatzkammern, Holo-Schild, Erinnerungskiste, Pause-Menü, Rezepte automatisch lernen. ⚠️ zum Absegnen: Liste/Werte, Toasts statt Banner, „kritisch“ = letzte Tank-Phase. PixelLab 120, übrig 744. Dazu Lichterketten-Fix 2 (veralteter Tab, Rückgängig).
 - 13.11. Code → Ava: #011 Feldhandbuch erledigt: 53 Lektionen mit Clips und Bildern aus dem Spiel, Karte beim ersten Mal, Archiv im Pause-Menü.
@@ -241,6 +242,24 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - Meldungen → ⚠️ als Toasts oben rechts (Pokal gold, Rezept cyan) statt Banner, damit sie den Kampf nicht verdecken; im Text Lucide statt Emoji.
   - Zettel einsammeln → ⚠️ alles Eingesammelte landet im Rucksack, dort wird gelernt; Zettel in Kiste/Lager über „Lernen“.
 - **Ergebnis:** Details in `docs/features/achievements.md`. Neu: `game/achievements.js` (Zähler, erreichen, Boni aus allen Ständern aller Schatzkammern, Durchgang), `game/play/achievements_ui.js` (Pause-Menü › Achievements), Bereich **Achievements** in der Werkstatt, Rezept-Feld **Einmalig**, Entdecken „Achievement“, Kochen & Craften › Rezepte lernen; Zähler im Spiel (Kills mit Gegner/Familie/Waffe/Krit, Secrets, POIs mit Rang, Ernten, Kochen, Herstellen, Experimente, Zerlegen, Schlafen, Fahren, k.o., Tank, Δ, Lichterketten, Rezepte, Werkstätten, Durchgang); Boni über `applyGear`, `techtree.bonuses`, Hydrokultur, Beute, Δ, Secrets; Holo-Schild + Tooltip; Erinnerungskiste am Feuer. Symbole `icons_trophies` (12 × PixelLab, je bester von 4). Tests: `test/achievements.test.js` 7, `tools/achievement_test.mjs` 16, `npm test` 106, alle Browser-Tests grün. PixelLab: diesmal 120 Generierungen, übrig 744. Nebenbei: Lichterketten-Fix 2 (veralteter zweiter Tab überschrieb den Spielstand; Rückgängig nahm Ketten mit). **Bitte testen:** Pause-Menü › Achievements durchblättern; in der Tankstelle 25 Plünderer … (oder schneller: ein Zettel aufheben → Toast + Rezeptbuch); Trophäe an der Werkbank bauen, Schatzkammer kaufen, Trophäe auf einen Ständer → Holo-Schild + Tooltip „Bonus aktiv“.
+
+### #013 Werkstätten mit eigener Handlung: Kochen, Werkbank (Bauplan + Teile), Drohnen, Ripperdoc, Foodtruck, Energie
+- **Status:** offen · angelegt 13.11. von Ava (Design-Session mit Daniel im Projekt-Chat: 1a, 2c, 3c)
+- **Für:** Code
+- **Lesen:** design.md › Crafting & Kochen › „Jede Werkstatt fühlt sich an wie das, was sie ist“; `docs/features/crafting.md`; `docs/features/benches.md`; `docs/features/cyberware.md`; `docs/features/drone.md`; `docs/features/ui.md` + `docs/features/controller.md` (UI-Grammatik); `docs/features/inventory.md` (Tetris-Formen)
+- **Auftrag:** Jede Werkstatt-Art bekommt ein eigenes Fenster mit eigener Handlung statt des gemeinsamen Rezeptbuch-/Topf-Fensters. Bedienung überall gleich (`ui_nav.js`, Controller, Maus, Tastatur), Rezeptbuch, Zettel, Tipps und Experimentieren bleiben erreichbar (z. B. als Tab). **Kein Scheitern durch Geschick (1a):** Geschick gibt nur Bonus, Nichtstun = normales Ergebnis. Reihenfolge:
+  1. **Gerüst:** Werkstatt-Art → eigene Oberfläche (Register/Plugin), gemeinsame Teile (Rezeptbuch, Vorräte, Ergebnis-Ablage, Uhr, Companion-Kommentare) wiederverwenden; Fernsteuerung `nomad.craft()` erweitern.
+  2. **Kochen:** Herd mit Pfanne/Topf, Zutaten nacheinander, Gar-Balken, Rausnehmen im guten Bereich = Qualität (Stufen z. B. ok / gut / perfekt) → stärkerer/längerer Buff; Gewürze als Extra. Experimentieren als Abschmecken mit Hinweisen.
+  3. **Werkbank, Waffen nach 3c:** Bauplan = Grundgerüst mit Plätzen (Lauf, Griff/Schaft, Magazin, Visier …), Teile frei einsetzen (Tetris-Stücke), Werte live; neue **Waffenteile** als Gegenstände mit Werte-Änderungen und Platz-Art; Ergebnis = **Waffen-Exemplar mit eigenen Werten** (Spielstand, Inventar-Tooltip, Kampf nutzt die Werte). Kurze Handgriffe (Schrauben, Schweißen) am Ende = Qualitätsbonus. Andere Herstellen-Rezepte (Material, Medikit, Rig-Teile) mit einfacherem Bauplan.
+  4. **Drohnenwerkstatt:** Platine/Schaltplan, Chips stecken, Kabel ziehen, Energie-Budget, AvA kommentiert (Stimmungen aus drone.md).
+  5. **Ripperdoc:** OP-Ansicht, Präzisionsmoment je Implantat, gut = kleiner Bonus, Flaws nie schlimmer.
+  6. **Foodtruck:** Kunden an der Theke (Bestellungen aus gekochten Gerichten), Tempo/Lieblingsgericht = Trinkgeld; ohne Eile normaler Verkauf.
+  7. **Generator/Reaktor:** Regler + Lastanzeige, grüner Bereich = etwas Extra-Strom, sonst nur Flackern.
+  8. **Werkstatt:** alle Werte (Gar-Zeiten, Bereiche, Bonus-Stufen, Teile-Werte, Kunden, Trinkgeld, Regler) in der Werkstatt einstellbar, neue Felder/Bereiche im Schema; Baupläne und Waffenteile als Daten.
+- **Grenzen:** Gemütlich bleiben, kurze Handgriffe (Sekunden, nicht Minuten), jede Handlung lässt sich überspringen (z. B. „Schnell herstellen“ für bekannte Rezepte, normales Ergebnis). Spielstände bleiben gültig (`repairSave`; vorhandene Waffen = Exemplare mit Grundwerten). Grafik aus Code, wo es geht; PixelLab nur nach Freigabe-Regel (unter 700 vorher Daniel fragen).
+- **Fertig, wenn:** jede genannte Werkstatt-Art öffnet ihr eigenes Fenster; Kochen mit Qualitätsstufen und messbar stärkerem Buff; Waffe aus Bauplan + zwei verschiedenen Teile-Sätzen ergibt zwei Exemplare mit unterschiedlichen Werten im Kampf; Drohne, Ripperdoc, Foodtruck, Energie spielbar; alles mit Controller bedienbar; Werkstatt-Bereiche vollständig; alte Spielstände gültig; `npm test` + neuer Browser-Test (`bench_ui_test`) grün; Build grün.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ## Archiv
 

@@ -267,6 +267,24 @@ Rezepte entdecken:
 
 Gekochte Gerichte geben Buffs für den nächsten Run, versorgen Companions auf Reisen oder werden im Foodtruck verkauft.
 
+### Jede Werkstatt fühlt sich an wie das, was sie ist (Design-Session Daniel, 13.11.2026)
+
+Daniel: „Ich hätte gerne, dass die Interfaces der Werkbänke sich unterscheiden. Nicht rein von der Grafik, sondern ein wenig in ihrer Funktion … Kochen funktioniert anders als ein Gewehr zu bauen.“ Bisher öffnen Kochen und Herstellen dasselbe Fenster (Rezeptbuch + Topf). Künftig hat jede Werkstatt-Art eine eigene **Handlung**; die **Bedienung** bleibt überall gleich (UI-Grammatik aus `ui_nav.js`: Stick/Pfeile, A/E bestätigen, B/Esc zurück, LB/RB Tabs, Maus überall).
+
+- **1a Gemütlich, kein Scheitern:** Geschick bringt nur einen **Bonus** (Qualität, stärkerer Buff, bessere Werte, mehr Trinkgeld); wer nichts tut oder daneben liegt, bekommt das normale Ergebnis. Keine Fehlschläge durch Geschick. ⚠️ vorläufig (Ava): Fehlschläge beim **Experimentieren** (falsche Zutaten → kurioser Müll) bleiben, denn das ist Wissen, kein Geschick.
+- **2c** alles in einem großen Ticket (**#013**).
+- **3c Waffenbau = Bauplan + freie Teile:** Ein Bauplan (Rezept) legt das Grundgerüst fest (z. B. Sturmgewehr) und hat Plätze (Lauf, Griff/Schaft, Magazin, Visier, …). Welche Teile hineinkommen, wählt Leyla frei aus dem, was sie hat; jedes Teil verändert die Werte, die Waffe zeigt sie live. Daraus entstehen Waffen-Exemplare mit eigenen Werten.
+
+Die Werkstatt-Arten:
+
+- 🍳 **Kochen** (Kochnische, Küche): am Herd. Zutaten nacheinander in Pfanne/Topf, ein **Gar-Balken** läuft, rausnehmen im guten Bereich gibt Qualität; Gewürze geben Extra-Bonus. Qualität = stärkerer/längerer Buff. Experimentieren = **Abschmecken** mit Hinweisen („fehlt was Scharfes …“).
+- 🔧 **Herstellen** (Werkbank): **Blaupause** auf dem Tisch; Teile als Tetris-Stücke wie im Inventar in die Plätze setzen, Werte live; am Ende ein, zwei kurze Handgriffe (Schrauben, Schweißen), gut getroffen = Qualitätsbonus. Gilt auch für Material, Medikits, Rig-Teile (deren Baupläne haben einfachere Plätze).
+- 🤖 **Drohnen** (Drohnenwerkstatt): **Schaltplan/Platine**. Chips stecken, Kabel ziehen, AvAs Energie-Budget im Blick; AvA kommentiert live.
+- 💉 **Ripperdoc** (Ripperdoc-Liege): **OP mit ruhiger Hand**; je Implantat ein Präzisionsmoment. ⚠️ vorläufig (Ava, wegen 1a): gut getroffen = kleiner Bonus, Flaws bleiben wie gehabt, nie schlimmer.
+- 🚚 **Verkauf** (Foodtruck): **Kunden an der Theke** bestellen, Leyla serviert aus den gekochten Gerichten; Tempo und Lieblingsgerichte = Trinkgeld. Ohne Eile verkauft man normal.
+- ⚡ **Energie** (Generator, Reaktor): **Regler und Lastanzeige**; im grünen Bereich gibt es etwas Extra-Strom, daneben nur optisches Flackern.
+- Die anderen Werkstätten (Lager, Schlafen, Warroom mit Karte/Techtree, Hydrokultur, Schatzkammer, Cryo-Tank, Zisterne …) haben ihre Handlung schon oder brauchen keine; sie bleiben, wie sie sind.
+
 ## Companions, Oberwelt & Wirtschaft
 
 - **Companions** leben im Rig: Sie betreiben Werkstätten (Koch im Foodtruck, Mechaniker in der Drohnenwerkstatt), geben Buffs und Rezepttipps. Eigene Quests und Storylines kommen in Ausbaustufe 2. Vorerst kommen sie nicht mit in die POIs.
