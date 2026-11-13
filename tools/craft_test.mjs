@@ -42,7 +42,7 @@ await shot('book');
 
 // cook a known recipe
 await clickText('.craft-recipe', 'Bohneneintopf');
-await page.locator('.craft-recipe', { hasText: 'Bohneneintopf' }).locator('button').click();
+await page.locator('.craft-recipe', { hasText: 'Bohneneintopf' }).locator('.craft-quick').click();   // #013: „Schnell“ = ohne Handgriff, sofort
 c = await craft();
 check('Kochen: Bohneneintopf im Rucksack, Dosen weniger', c.log?.kind === 'hit' && c.stock.bohneneintopf === 1 && c.stock.dosenbohnen === 2, c);
 check('Kochen kostet Minuten', (await ev(() => nomad.state().camp.clock)) !== t0 && /15 min/.test(await page.locator('.craft-log').textContent()), [t0, await ev(() => nomad.state().camp.clock)]);
@@ -82,7 +82,7 @@ check('Esc schließt', !(await craft()).open);
 await go('werkbank');
 c = await craft();
 check('Werkbank: Verband + Schrottplatte im Buch, Schraube kennt Kabelbaum', c.open && c.book.some(r => r.id === 'verband') && c.tips.includes('kabelbaum'), c);
-await page.locator('.craft-recipe', { hasText: 'Verband' }).locator('button').click();
+await page.locator('.craft-recipe', { hasText: 'Verband' }).locator('.craft-quick').click();
 c = await craft();
 check('Herstellen: Verband', c.log?.kind === 'hit' && c.stock.verband === 3, c.stock);
 await supply('Rohrbogen'); await supply('Kronkorken');   // Schrott + Kronkorken is near the Zahnräder (Schrott + Schrauben)
