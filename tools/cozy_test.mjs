@@ -28,6 +28,17 @@ check('Deko ums Feuer, Beschriftungen dezent', v.deco >= 3 && v.labels.every(([f
 check('HUD aufgeräumt: unten nur Menü und Version', !/Werkstatt|Start|Neues Spiel/.test(v.foot), v.foot);
 await shot('day');
 
+// #009: Onkel Sung clearly taller than Leyla, string lights as pictures with real bounds, no solar socket under a stacked container
+v = await ev(() => { const c = SC().camp, sung = c.companions.find(x => x.id === 'onkel_sung'), l = SC().leyla; return { sung: Math.round(sung.sprite.displayHeight), leyla: Math.round(l.height) }; });
+check('Onkel Sung deutlich größer als Leyla', v.sung > v.leyla * 1.15, v);
+v = await ev(() => { const s = nomad.save(), c = SC().camp; s.rig.lights = [['0:0', '1:0']]; c.drawRig(); const imgs = c.rigObjs.filter(o => o.type === 'Image' && o.texture.key.startsWith('string_lights_'));
+  const n0 = c.bulbs.length; c.drawRig(); return { imgs: imgs.map(o => [Math.round(o.width), Math.round(o.height)]), keys: c.wireKeys, n0, n1: c.bulbs.length, old: imgs[0] && SC().textures.exists(imgs[0].texture.key) }; });
+check('Lichterkette ist ein Bild mit echten Maßen, neu zeichnen räumt die alte Textur weg', v.imgs.length === 1 && v.imgs[0][0] > 100 && v.n0 === v.n1 && v.keys.length === 1 && !v.old, v);
+v = await ev(async () => { const R = await import('/game/rig.js'), s = nomad.save(); const u = { kind: 'container', id: 'container_10', workshops: [], level: 1 }; const rig = { ...s.rig, units: [...s.rig.units, u] };
+  return { flat: R.slotCount(SC().data_, s.rig, 'solar'), stacked: R.slotCount(SC().data_, rig, 'solar') }; });
+check('Container auf dem Dach: darunter kein Solar-Sockel mehr (nur oben)', v.flat === 1 && v.stacked === 1, v);
+await ev(() => { nomad.save().rig.lights = []; SC().camp.drawRig(); });
+
 // the map without a warroom: no danger, no loot, a hint
 v = await ev(() => { nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(2); nomad.choose('Karte'); nomad.step(5); const m = nomad.map(); return { m, text: document.querySelector('.wm-detail')?.textContent || '' }; });
 check('Karte ohne Warroom: Gefahr und Beute unbekannt, Hinweis auf den Warroom', v.m.open && v.m.intel === false && /\? \? \?/.test(v.text) && /Warroom/.test(v.text), v);

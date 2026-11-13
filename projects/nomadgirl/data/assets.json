@@ -4301,20 +4301,20 @@
   "name": "Rig · Klapptreppe",
   "kind": "image",
   "file": "assets/rig/stairs.png",
-  "source": "KI (PixelLab, Create Image Pro, AAP-64)",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz Van für die Seitenansicht)",
   "date": "13.11.2026",
-  "description": "Klapptreppe aus Gitterrost mit Geländer und Warnstreifen: Aufstieg vom Boden in Container im Erdgeschoss (#008). Oben rechts hängt sie am Container.",
-  "origin": [64, 128]
+  "description": "Klapptreppe aus Metall, streng von der Seite (#009, Daniel: „frontfacing orthogonal wie alle anderen Sachen“): Stufen als Sägezahn, Podest rechts mit Warnstreifen.",
+  "origin": [96, 121]
  },
  "rig_solar": {
   "name": "Rig · Solarpaneel",
   "kind": "image",
   "file": "assets/rig/solar_panel.png",
-  "source": "KI (PixelLab, Create Image Pro, AAP-64)",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz Van für die Seitenansicht)",
   "date": "13.11.2026",
-  "description": "Ein Solarpaneel auf einem kleinen Gestell, steht auf dem Container-Dach (#008).",
-  "origin": [64, 58],
-  "height": 72
+  "description": "Solarpaneel frontal auf kurzem Gestell (#009), steht auf dem Container-Dach.",
+  "origin": [36, 63],
+  "height": 52
  },
  "ws_cistern": {
   "name": "Werkstatt · Zisterne",
@@ -4329,33 +4329,33 @@
   "name": "Camp · Teppich",
   "kind": "image",
   "file": "assets/camp/deco/rug.png",
-  "source": "KI (PixelLab, Create Image Pro, AAP-64)",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz Van für die Seitenansicht)",
   "date": "13.11.2026",
-  "description": "Verblasster Orientteppich vor dem Feuer (#008, Deko ums Feuer)."
+  "description": "Teppich, flach von der Seite (#009): ein gemusterter Streifen mit Fransen."
  },
  "camp_chair_a": {
   "name": "Camp · Campingstuhl",
   "kind": "image",
   "file": "assets/camp/deco/chair_a.png",
-  "source": "KI (PixelLab, Create Image Pro, AAP-64)",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz Van für die Seitenansicht)",
   "date": "13.11.2026",
-  "description": "Orangener Klappstuhl mit Decke (#008, Deko ums Feuer)."
+  "description": "Campingstuhl im Profil, orange mit Zickzack-Decke, schaut nach rechts (#009)."
  },
  "camp_chair_b": {
   "name": "Camp · Campingstuhl (bunt)",
   "kind": "image",
   "file": "assets/camp/deco/chair_b.png",
-  "source": "KI (PixelLab, Create Image Pro, AAP-64)",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz Van für die Seitenansicht)",
   "date": "13.11.2026",
-  "description": "Klappstuhl mit gestreifter Decke (#008, Deko ums Feuer)."
+  "description": "Campingstuhl im Profil, petrol mit gestreifter Decke, schaut nach links (#009)."
  },
  "camp_camp_corner": {
   "name": "Camp · Camp-Ecke",
   "kind": "image",
   "file": "assets/camp/deco/camp_corner.png",
-  "source": "KI (PixelLab, Create Image Pro, AAP-64)",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz Van für die Seitenansicht)",
   "date": "13.11.2026",
-  "description": "Kanister, Kühlbox mit Becher, Sukkulente in der Dose (#008, Deko ums Feuer)."
+  "description": "Kanister, Kühlbox mit Becher, Sukkulente in der Dose, Munitionskiste, flach von vorn (#009)."
  },
  "out_kitchen": {
   "name": "Außenwand · Abluft mit Ofenrohr",
@@ -4377,7 +4377,7 @@
   "name": "Außenwand · Satellitenschüssel mit Warnlicht",
   "kind": "image",
   "file": "assets/rig/exterior/warroom.png",
-  "source": "KI (PixelLab, Create Image Pro, AAP-64)",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz Van für die Seitenansicht)",
   "date": "13.11.2026",
   "description": "Clutter an der Container-Außenwand (#008), passend zur Werkstatt dahinter."
  },
@@ -4401,7 +4401,7 @@
   "name": "Außenwand · Klimagerät",
   "kind": "image",
   "file": "assets/rig/exterior/ac.png",
-  "source": "KI (PixelLab, Create Image Pro, AAP-64)",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz Van für die Seitenansicht)",
   "date": "13.11.2026",
   "description": "Clutter an der Container-Außenwand (#008), passend zur Werkstatt dahinter."
  },
@@ -4449,7 +4449,7 @@
   "name": "Außenwand · Kisten unterm Frachtnetz",
   "kind": "image",
   "file": "assets/rig/exterior/storage.png",
-  "source": "KI (PixelLab, Create Image Pro, AAP-64)",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz Van für die Seitenansicht)",
   "date": "13.11.2026",
   "description": "Clutter an der Container-Außenwand (#008), passend zur Werkstatt dahinter."
  },
@@ -4476,9 +4476,23 @@
   "fps": 3,
   "loop": true,
   "origin": [42, 256],
-  "height": 190,
+  "height": 240,
   "source": "KI (PixelLab, Charakter + Animation breathing-idle)",
   "date": "13.11.2026",
   "description": "Onkel Sung (Koch, groß, Sonnenbrille), atmet ruhig, schaut nach rechts (#008)."
+ },
+ "campfire_side": {
+  "name": "Lagerfeuer (Seitenansicht)",
+  "kind": "animation",
+  "file": "assets/camp/campfire_side.png",
+  "frameSize": [56, 64],
+  "frames": 8,
+  "fps": 8,
+  "loop": true,
+  "origin": [28, 62],
+  "height": 150,
+  "source": "KI (PixelLab, Create Image Pro + Animate Image, AAP-64, Referenz Van)",
+  "date": "13.11.2026",
+  "description": "Lagerfeuer streng von der Seite (#009, Daniel: „Perspektiven kaputt … inklusive des Feuers“): Steine als Reihe, gekreuzte Scheite, Flammen flackern in der Schleife."
  }
 }

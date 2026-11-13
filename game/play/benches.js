@@ -15,7 +15,7 @@ const GLOW = 'camp_glow';
 function glowKey(scene) {
   if (scene.textures.exists(GLOW)) return GLOW;
   const t = scene.textures.createCanvas(GLOW, 256, 256), c = t.getContext(), g = c.createRadialGradient(128, 128, 0, 128, 128, 128);
-  g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.35, 'rgba(255,255,255,0.45)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.35, 'rgba(255,255,255,0.45)'); g.addColorStop(1, 'rgba(0,0,0,0)');
   c.fillStyle = g; c.fillRect(0, 0, 256, 256); t.refresh();
   return GLOW;
 }

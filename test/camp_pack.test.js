@@ -75,3 +75,15 @@ test('Außenwände, Deko, Treppe, Companions, Tankstelle: alle Grafiken da, kein
   for (const c of ['schraube', 'onkel_sung']) assert.equal(D.assets[D.companions[c].look]?.kind, 'animation');
   for (const e of D.pois.tankstelle_km7.enemies) { const E = D.enemies[e]; assert.ok(E.kit || E.family === 'wildlife', `${e} braucht ein Aussehen`); }
 });
+
+test('Solar unter einem Stapel (#009): kein Sockel auf einem überbauten Dach, Paneele ohne Dach wandern auf den Schrottplatz', async () => {
+  const { dropHomeless } = await import('../game/rig.js');
+  const s = newSave(D);
+  s.rig.parts = { solar: ['solarpaneel'] };
+  assert.equal(slotCount(D, s.rig, 'solar'), 1);
+  s.rig.units.push({ kind: 'crate', id: Object.keys(D.containers).find(k => D.containers[k].kind === 'crate') || 'holzkiste', workshops: [], level: 1 });
+  assert.equal(slotCount(D, s.rig, 'solar'), 0);
+  dropHomeless(D, s.rig);
+  assert.deepEqual(s.rig.parts.solar, []);
+  assert.ok(s.rig.spare.parts.includes('solarpaneel'));
+});

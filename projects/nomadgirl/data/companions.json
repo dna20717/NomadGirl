@@ -58,6 +58,7 @@
    ]
   },
   "passenger": true,
-  "look": "companion_onkel_sung_idle"
+  "look": "companion_onkel_sung_idle",
+  "height": 240
  }
 }

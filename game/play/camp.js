@@ -7,12 +7,13 @@ import { potsOf, stage, ripe, harvest, STAGES } from '../garden.js';
 import { level as cisternLevel, tap as cisternTap } from '../cistern.js';
 import { anchors as lightAnchors, catenary, lightsConfig } from '../string_lights.js';
 import { clockText, advance, hoursUntil, containers, solarState } from '../save.js';
-import { budgets, partSlots, passengers } from '../rig.js';
+import { budgets, partSlots, passengers, roofFree } from '../rig.js';
 import { Benches, benchTexture, crateTexture } from './benches.js';
 
 const de = n => Number(n).toLocaleString('de-DE', { maximumFractionDigits: 1 });
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
 const LABEL_ALPHA = 0.8;
+let wireSeq = 0;
 const col = c => parseInt(String(c || '#000000').slice(1), 16);
 const shadeOf = (c, k) => { const n = col(c), f = v => Math.max(0, Math.min(255, Math.round(v * k))); return f(n >> 16 & 255) << 16 | f(n >> 8 & 255) << 8 | f(n & 255); };
 
@@ -151,19 +152,68 @@ export function campLayout(D, save, T = 64) {
 // background of the camp: weather sky from the Backdrop, a far plain with dunes and a tiny BigCityDelta on the horizon
 export function drawCampBackground(scene, C) {
   const W = scene.scale.width, H = scene.scale.height, hy = Math.round(H * (C.horizon ?? 66) / 100), k = 3;
-  const g = scene.make.graphics({}, false), far = C.ground?.far || '#6b4a36', base = col(far);
-  // city silhouette (far, tiny, cool)
-  let x = W * 0.58;
+  const E = C.epic || {}, day = daytimeAt(C, scene.box?.save?.hour ?? 20), night = Math.min(1, (day.light ?? Math.min(100, (day.shade ?? 0) * 2)) / 100);
   const r = (s => () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296))(31);
-  g.fillStyle(0x2a1d3a);
-  while (x < W * 0.84) { const w = (3 + r() * 7) * k, h = (3 + r() * 12 + (r() < 0.15 ? 8 : 0)) * k; g.fillRect(Math.round(x / k) * k, hy - Math.round(h / k) * k, Math.round(w / k) * k, Math.round(h / k) * k + k); x += w + r() * 2 * k; }
-  // plain: bands getting lighter towards us
-  for (let i = 0; i < 6; i++) g.fillStyle(shadeOf(far, 0.62 + i * 0.09)).fillRect(0, hy + Math.round((H - hy) * Math.pow(i / 6, 1.6) / k) * k, W, H);
-  // dunes
+  const snap = v => Math.round(v / k) * k;
+  const tex = (key, w, h, draw) => { if (scene.textures.exists(key)) scene.textures.remove(key); const t = scene.textures.createCanvas(key, Math.ceil(w), Math.ceil(h)), ctx = t.getContext(); draw(ctx); t.refresh(); t.setFilter(NEAREST()); return key; };
+  const px = (ctx, x, y, c, a = 1) => { ctx.globalAlpha = a; ctx.fillStyle = c; ctx.fillRect(snap(x), snap(y), k, k); };
+  // 1 · the Milky Way at night (#009, Daniel: „ein wenig epischer, mehr wie im Intro“): a diagonal band of stars and violet haze
+  if (E.milkyWay !== false && night > 0.55) {
+    scene.add.image(0, 0, tex('camp_milky', W * 1.1, hy, ctx => {
+      const ax = W * 0.05, ay = hy * 0.95, bx = W * 1.05, by = hy * 0.02, len = Math.hypot(bx - ax, by - ay), nx = -(by - ay) / len, ny = (bx - ax) / len;
+      const gauss = () => (r() + r() + r() - 1.5) / 1.5;
+      for (let n = 0; n < 1100; n++) { const t = r(), o = gauss() * 120; px(ctx, ax + (bx - ax) * t + nx * o, ay + (by - ay) * t + ny * o, ['#3b2f6b', '#793a80', '#285cc4'][n % 3], 0.09); }
+      for (let n = 0; n < 650; n++) { const t = r(), o = gauss() * gauss() * 140; px(ctx, ax + (bx - ax) * t + nx * o, ay + (by - ay) * t + ny * o, ['#ffffff', '#b9bffb', '#fad6b8', '#a6fcdb'][n % 4], 0.2 + r() * 0.5); }
+      ctx.globalAlpha = 1;
+    })).setOrigin(0).setScrollFactor(0.01, 0).setDepth(-99.5).setAlpha(night * (E.milkyWay ?? 85) / 100);
+  }
+  // 2 · far mountain ranges, two layers of jagged mesas with a lit rim
+  // haze: by day the far layers fade into the sky (atmospheric perspective), at night they stand dark
+  const haze = (near) => Math.min(1, near + (1 - near) * night);
+  const ridge = (key, depth, sf, base, amp, col, rim, seed, near) => {
+    const w = W * 1.4, rr = (s => () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296))(seed);
+    const f = [rr() * 9, rr() * 9, rr() * 9];
+    scene.add.image(0, 0, tex(key, w, hy + k, ctx => {
+      let mesa = 0, mh = 0;
+      for (let x = 0; x < w; x += k) {
+        if (mesa <= 0 && rr() < (E.mesas ?? 0)) { mesa = (10 + rr() * 30) * k; mh = amp * (0.7 + rr() * 0.5); }
+        let h = base + amp * (0.5 * Math.sin(x / 210 + f[0]) + 0.3 * Math.sin(x / 77 + f[1]) + 0.2 * Math.sin(x / 31 + f[2]));
+        if (mesa > 0) { h = Math.max(h, base + mh); mesa -= k; }
+        const top = snap(hy - Math.max(k, h));
+        ctx.fillStyle = col; ctx.fillRect(x, top, k, hy + k - top);
+        ctx.fillStyle = rim; ctx.fillRect(x, top, k, k);
+      }
+    })).setOrigin(0).setScrollFactor(sf, 0).setDepth(depth).setAlpha(haze(near));
+  };
+  ridge('camp_ridge_far', -98.8, 0.015, 70, 80, E.farRidge || '#2c2347', E.farRim || '#45386b', 11, 0.35);
+  // 3 · BigCityDelta: bigger, with megatowers, spires and lit windows at night, a neon haze behind it
+  const cw = W * 0.42, ch = Math.round(H * (E.cityHeight ?? 22) / 100), cx0 = W * (E.cityAt ?? 0.66);
+  if (night > 0.2) for (const [c, sx, a] of [['#e86a73', 1, 0.22], ['#20d6c7', 0.6, 0.14]])
+    scene.add.image(cx0 + cw / 2, hy - 30, glowTexture(scene)).setDisplaySize(cw * 1.3 * sx, ch * 0.9).setTint(col(c)).setAlpha(a * night).setBlendMode(Phaser.BlendModes.ADD).setScrollFactor(0.03, 0).setDepth(-98.4);
+  scene.add.image(cx0, hy - ch, tex('camp_city', cw, ch, ctx => {
+    const lit = ['#20d6c7', '#e86a73', '#ffd541', '#bc4a9b', '#fef3c0'];
+    let x = 0;
+    while (x < cw) {
+      const mega = r() < 0.08, w = snap((mega ? 6 + r() * 4 : 2 + r() * 5) * k), edge = Math.min(1, x / (cw * 0.25), (cw - x) / (cw * 0.25));
+      const h = snap(((mega ? 0.7 + r() * 0.25 : 0.12 + r() * 0.35) * ch) * (0.45 + 0.55 * edge));
+      const top = ch - h;
+      ctx.globalAlpha = 1; ctx.fillStyle = E.city || '#2a2147'; ctx.fillRect(x, top, w, h);
+      ctx.fillStyle = E.cityRim || '#3d3266'; ctx.fillRect(x, top, k, h);   // lit edge
+      if (mega) { const sx = x + snap(w / 2); ctx.fillStyle = E.city || '#2a2147'; ctx.fillRect(sx, top - 14 * k, k, 14 * k); ctx.fillRect(sx - k, top - 5 * k, 3 * k, 5 * k); px(ctx, sx, top - 15 * k, '#df3e23', 0.4 + 0.6 * night); }
+      if (night > 0.2) for (let yy = top + 2 * k; yy < ch - k; yy += 2 * k) for (let xx = x + k; xx < x + w - k; xx += 2 * k) if (r() < (mega ? 0.22 : 0.14)) px(ctx, xx, yy, lit[Math.floor(r() * lit.length)], night * (0.5 + r() * 0.5));
+      if (mega && night > 0.2 && r() < 0.7) { ctx.globalAlpha = 0.85 * night; ctx.fillStyle = lit[Math.floor(r() * 2)]; ctx.fillRect(x + k, top + snap(h * 0.2), w - 2 * k, k); }   // neon band
+      x += w + (r() < 0.3 ? k : 0);
+    }
+    ctx.globalAlpha = 1;
+  })).setOrigin(0).setScrollFactor(0.035, 0).setDepth(-98.2).setAlpha(haze(0.5));
+  ridge('camp_ridge_near', -97.6, 0.05, 6, 16, E.nearRidge || '#1d1626', E.nearRim || '#3a2b3d', 23, 0.8);
+  // 4 · the plain: bands getting lighter towards us, dunes
+  const g = scene.make.graphics({}, false), far = C.ground?.far || '#6b4a36';
+  for (let i = 0; i < 6; i++) g.fillStyle(shadeOf(far, 0.62 + i * 0.09)).fillRect(0, hy + Math.round((H - hy) * Math.pow(i / 6, 1.6) / k) * k, W * 1.3, H);
   for (let d = 0; d < 3; d++) {
     g.fillStyle(shadeOf(far, 0.7 + d * 0.12));
     const y0 = hy + (6 + d * 14) * k, amp = (3 + d * 3) * k, len = 120 + d * 70;
-    for (let px = 0; px < W * 1.3; px += k) g.fillRect(px, y0 - Math.round(Math.max(0, Math.sin(px / len + d * 2) * amp) / k) * k, k, H);
+    for (let x = 0; x < W * 1.3; x += k) g.fillRect(x, y0 - Math.round(Math.max(0, Math.sin(x / len + d * 2) * amp) / k) * k, k, H);
   }
   const key = 'camp_far';
   if (scene.textures.exists(key)) scene.textures.remove(key);
@@ -234,7 +284,7 @@ function figureTexture(scene, key, color, role) {
 function glowTexture(scene) {
   if (scene.textures.exists('camp_glow')) return 'camp_glow';
   const t = scene.textures.createCanvas('camp_glow', 256, 256), c = t.getContext(), g = c.createRadialGradient(128, 128, 0, 128, 128, 128);
-  g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.35, 'rgba(255,255,255,0.45)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.35, 'rgba(255,255,255,0.45)'); g.addColorStop(1, 'rgba(0,0,0,0)');   // fades to black too: added (ADD) almost-transparent white edges showed as a square (#009)
   c.fillStyle = g; c.fillRect(0, 0, 256, 256); t.refresh();
   return 'camp_glow';
 }
@@ -343,7 +393,7 @@ export function socketRects(D, rig, geo, ground) {
   const S = D.build?.sockets || {}, [sw, sh] = S.size || [120, 80], vw = geo.vanRight - geo.vanLeft, vh = D.assets?.[D.tractors?.[rig.tractor]?.look]?.height || 400;
   const all = partSlots(D, rig), out = [];
   // solar sockets sit on the container roofs, one per place (#008)
-  const roofs = []; for (const u of geo.units || []) if (u.kind !== 'tractor' && u.def?.kind !== 'crate') for (let j = 0; j < (u.places || 0); j++) roofs.push({ cx: u.in0 + u.cell * (j + 0.5), y: u.deckY ?? u.inTop });
+  const roofs = []; for (const u of geo.units || []) if (u.kind !== 'tractor' && u.def?.kind !== 'crate' && roofFree(rig, u.ui)) for (let j = 0; j < (u.places || 0); j++) roofs.push({ cx: u.in0 + u.cell * (j + 0.5), y: u.deckY ?? u.inTop });
   for (const p of all) {
     if (p.slot === 'solar') { const r = roofs[p.i]; if (!r) continue; const w = Math.min(sw, (r.w || sw)), cy = r.y - sh / 2; out.push({ ...p, cx: r.cx, cy, x0: r.cx - w / 2, x1: r.cx + w / 2, y0: cy - sh / 2, y1: cy + sh / 2 }); continue; }
     const n = all.filter(q => q.slot === p.slot).length, [px, py] = S[p.slot] || [50, 50];
@@ -730,22 +780,34 @@ export class Camp {
     const pair = this.box.save.rig.lights?.[i], A = Object.fromEntries(this.anchors().map(a => [a.id, a])), L = lightsConfig(this.D);
     return pair && A[pair[0]] && A[pair[1]] ? catenary(A[pair[0]], A[pair[1]], L.sag, L.spacing) : null;
   }
+  // every string is its own picture with real bounds (#009, Daniel: „sie verschwinden, wenn sie nicht mehr vollständig auf dem Screen
+  // sind“ und nach dem Zurückkommen ins Fenster): a canvas texture per string, drawn once, plus glow lights for the night
   drawStringLights() {
     const s = this.scene, L = lightsConfig(this.D);
+    for (const k of this.wireKeys || []) if (s.textures.exists(k)) s.textures.remove(k);
+    this.wireKeys = [];
     this.bulbs = [];
     if (!L.enabled) return;
-    const g = s.add.graphics().setDepth(-16);
-    this.rigObjs.push(g);
     (this.box.save.rig.lights || []).forEach((_, i) => {
       const w = this.wire(i);
       if (!w) return;
-      g.lineStyle(3, 0x17111f, 1).strokePoints(w.line);
+      const pts = [...w.line, ...w.bulbs.map(b => ({ x: b.x, y: b.y + 16 }))], pad = 8;
+      const x0 = Math.floor(Math.min(...pts.map(p => p.x)) - pad), y0 = Math.floor(Math.min(...pts.map(p => p.y)) - pad);
+      const x1 = Math.ceil(Math.max(...pts.map(p => p.x)) + pad), y1 = Math.ceil(Math.max(...pts.map(p => p.y)) + pad);
+      const key = `string_lights_${i}_${++wireSeq}`, tex = s.textures.createCanvas(key, x1 - x0, y1 - y0), ctx = tex.getContext();
+      ctx.imageSmoothingEnabled = false;
+      ctx.strokeStyle = '#17111f'; ctx.lineWidth = 3; ctx.lineJoin = 'round';
+      ctx.beginPath(); w.line.forEach((p, k) => k ? ctx.lineTo(p.x - x0, p.y - y0) : ctx.moveTo(p.x - x0, p.y - y0)); ctx.stroke();
       w.bulbs.forEach((b, j) => {
-        const c = L.colors[j % L.colors.length];
-        g.fillStyle(0x17111f).fillRect(b.x - 3, b.y - 1, 6, 5);
-        g.fillStyle(col(c)).fillCircle(b.x, b.y + 9, 5).fillStyle(0xffffff, 0.6).fillRect(b.x - 2, b.y + 5, 2, 2);
-        const l = this.light(b.x, b.y + 9, 46, c, 0.75); l.rig = true; l.bulb = j * 1.7 + i; this.bulbs.push(l);
+        const bx = Math.round(b.x - x0), by = Math.round(b.y - y0);
+        ctx.fillStyle = '#17111f'; ctx.fillRect(bx - 3, by - 1, 6, 5);                                    // socket
+        ctx.fillStyle = L.colors[j % L.colors.length]; ctx.fillRect(bx - 4, by + 4, 8, 8); ctx.fillRect(bx - 3, by + 12, 6, 2);   // bulb (pixel)
+        ctx.fillStyle = 'rgba(255,255,255,0.65)'; ctx.fillRect(bx - 2, by + 5, 2, 2);
       });
+      tex.refresh(); tex.setFilter(NEAREST());
+      this.wireKeys.push(key);
+      this.rigObjs.push(s.add.image(x0, y0, key).setOrigin(0).setDepth(-16));
+      w.bulbs.forEach((b, j) => { const l = this.light(b.x, b.y + 9, 46, L.colors[j % L.colors.length], 0.75); l.rig = true; l.bulb = j * 1.7 + i; this.bulbs.push(l); });
     });
   }
 

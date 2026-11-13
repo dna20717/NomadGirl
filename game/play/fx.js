@@ -19,7 +19,7 @@ export class Fx {
     const s = this.scene;
     if (!s.textures.exists('fx_glow')) {
       const t = s.textures.createCanvas('fx_glow', 128, 128), c = t.getContext(), g = c.createRadialGradient(64, 64, 0, 64, 64, 64);
-      g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.3, 'rgba(255,255,255,0.5)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+      g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.3, 'rgba(255,255,255,0.5)'); g.addColorStop(1, 'rgba(0,0,0,0)');
       c.fillStyle = g; c.fillRect(0, 0, 128, 128); t.refresh();
     }
     const l = s.add.image(x, y, 'fx_glow').setDisplaySize(radius * 2, radius * 2).setTint(color).setBlendMode(Phaser.BlendModes.ADD).setDepth(32).setAlpha(alpha);
@@ -30,7 +30,7 @@ export class Fx {
     const s = this.scene;
     if (!s.textures.exists('fx_glow')) {
       const t = s.textures.createCanvas('fx_glow', 128, 128), c = t.getContext(), g = c.createRadialGradient(64, 64, 0, 64, 64, 64);
-      g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.3, 'rgba(255,255,255,0.5)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+      g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.3, 'rgba(255,255,255,0.5)'); g.addColorStop(1, 'rgba(0,0,0,0)');
       c.fillStyle = g; c.fillRect(0, 0, 128, 128); t.refresh();
     }
     return 'fx_glow';

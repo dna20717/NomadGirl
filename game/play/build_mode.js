@@ -253,7 +253,7 @@ export class BuildMode {
       const sub = area === 'workshops' ? `${FN_NAMES[x.function] || ''} · ${x.places || 1} ${x.places > 1 ? 'Plätze' : 'Platz'} · ${x.power > 0 ? '+' : ''}${x.power || 0} ⚡`
         : area === 'rigParts' ? [PART_SLOTS[x.slot] || x.slot, x.pull ? `+${de(x.pull)} kg` : null, x.armor ? `+${x.armor} Panzerung` : null, x.damage ? `${x.damage} Schaden` : null, x.storageRows ? `+${x.storageRows} Reihen Stauraum` : null].filter(Boolean).join(' · ')
         : `${x.places || 1} Plätze · ${de(x.weight || 0)} kg`;
-      const pic = area === 'workshops' && this.picture(x.look);
+      const pic = (area === 'workshops' || area === 'rigParts') && this.picture(x.look);   // rig parts with a picture (solar panel) like workshops
       const lead = pic ? el('span', { class: 'bm-thumb', style: `--col:${FN_COLORS[x.function] || '#555'}` }, el('img', { src: pic, alt: '', draggable: 'false' }))
         : area === 'workshops' ? el('span', { class: 'build-dot', style: `--col:${FN_COLORS[x.function] || '#555'}` }) : icon(area === 'rigParts' ? 'settings' : 'box', 16);
       return el('div', { class: 'build-row' + (pic ? ' has-pic' : ''), title: pic ? '' : x.description || '', onmouseenter: ev => area === 'workshops' && this.peek(id, ev.currentTarget), onmouseleave: () => this.peek(null) }, lead,

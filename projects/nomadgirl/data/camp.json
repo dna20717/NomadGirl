@@ -23,7 +23,7 @@
  },
  "fire": {
   "enabled": true,
-  "look": "campfire",
+  "look": "campfire_side",
   "at": 9,
   "radius": 460,
   "color": "#ff8a2a",
@@ -108,11 +108,11 @@
  },
  "deco": [
   {"look": "camp_rug", "x": -10, "y": 4, "scale": 2.2},
-  {"look": "camp_chair_a", "x": -170, "y": 0, "scale": 2.4, "flip": true},
-  {"look": "camp_chair_b", "x": 170, "y": 0, "scale": 2.4},
+  {"look": "camp_chair_a", "x": -170, "y": 0, "scale": 2.4, "flip": false},
+  {"look": "camp_chair_b", "x": 170, "y": 0, "scale": 2.4, "flip": false},
   {"look": "camp_camp_corner", "x": 330, "y": 0, "scale": 2.2}
  ],
- "stairs": {"look": "rig_stairs"},
+ "stairs": {"look": "rig_stairs", "landing": 33, "feet": 121, "at": 96},
  "lights": {"enabled": true, "max": 12, "sag": 18, "spacing": 34, "colors": "#ffd541, #e86a73, #20d6c7, #9cdb43", "price": 25},
  "mood": {"vignette": 35, "warm": 30, "fireflies": 18, "smoke": true},
  "solar": {"look": "rig_solar", "power": 1, "battery": 6, "day": [7, 19], "price": 220, "weight": 40}

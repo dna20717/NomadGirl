@@ -27,9 +27,12 @@ const rigGrid = k => k.startsWith('store:') || k.startsWith('rig:');
 // ---------- rig parts in the tractor's slots (Inventar › Van) ----------
 export const SLOT_ORDER = ['engine', 'armor', 'weapon', 'roof', 'solar'];
 // solar (#008, Daniel 13.11.2026: „Solarpaneele auf Dächer von Containern, so viele wie der Container in Einheiten lang ist“): one socket per place of every container
-export const slotCount = (D, rig, slot) => slot === 'solar' ? rig.units.filter(u => u.kind === 'container' && D.containers?.[u.id]?.kind !== 'crate').reduce((n, u) => n + placesOf(D, u), 0) : D.tractors?.[rig.tractor]?.slots?.[slot] || 0;
+// a roof with something stacked on it carries no panel (#009, Daniel: „wenn ein Container auf einem Dach steht, keine Solar-Hotspots mehr“)
+export const roofFree = (rig, i) => !((rig.units[i + 1]?.level || 0) > (rig.units[i]?.level || 0));
+export const solarRoofs = (D, rig) => rig.units.map((u, i) => ({ u, i })).filter(({ u, i }) => u.kind === 'container' && D.containers?.[u.id]?.kind !== 'crate' && roofFree(rig, i));
+export const slotCount = (D, rig, slot) => slot === 'solar' ? solarRoofs(D, rig).reduce((n, { u }) => n + placesOf(D, u), 0) : D.tractors?.[rig.tractor]?.slots?.[slot] || 0;
 // the panels on the roofs, and how much they make in the sun (Camp › Solar & Akku)
-export const solarPanels = (D, rig) => (rig.parts?.solar || []).filter(id => D.rigParts?.[id]?.slot === 'solar').length;
+export const solarPanels = (D, rig) => (rig.parts?.solar || []).slice(0, slotCount(D, rig, 'solar')).filter(id => D.rigParts?.[id]?.slot === 'solar').length;
 export const solarPower = (D, rig) => solarPanels(D, rig) * (D.camp?.solar?.power ?? 1);
 // all slots of the tractor: [{ slot, i, id }]
 export function partSlots(D, rig) {
@@ -346,6 +349,13 @@ export function restore(save, snap) {
   return save;
 }
 
+// panels whose roof is gone (stacked over, container sold) go onto the scrapyard
+export function dropHomeless(D, rig) {
+  const list = rig.parts?.solar;
+  if (!list) return;
+  const n = slotCount(D, rig, 'solar');
+  for (const id of list.splice(n)) if (id) (rig.spare.parts ??= []).push(id);
+}
 // can the draft be built? → list of reasons (empty = yes)
 export function problems(D, d) {
   const out = [];
@@ -359,6 +369,7 @@ export function problems(D, d) {
 
 // writes the draft into the savegame: rig, Δ, clock; storage grids move with their workshop (new keys), new storages get empty grids
 export function applyDraft(D, save, d) {
+  dropHomeless(D, d.rig);
   const bad = problems(D, d);
   if (bad.length) return { ok: false, reason: bad[0] };
   const old = save.inv.grids, grids = {};

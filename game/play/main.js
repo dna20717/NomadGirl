@@ -33,6 +33,9 @@ export async function start(parent, hudRoot, loading) {
     physics: { default: 'arcade', arcade: { gravity: { y: D.game?.gravity ?? 3600 }, debug: true, tileBias: 32 } },
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
     banner: false,
+    // pure additive light (#009): Phaser's ADD blends (ONE, DST_ALPHA) and showed the whole square of a glow where the frame's
+    // alpha was not 1 (a light box round the campfire); (ONE, ONE) adds only the light. Again after the WebGL context comes back.
+    callbacks: { postBoot: g => { const r = g.renderer, fix = () => { const m = r.blendModes?.[Phaser.BlendModes.ADD]; if (r.gl && m) m.func = [r.gl.ONE, r.gl.ONE]; }; fix(); r.on?.('restorewebgl', fix); } },
   });
   let args = { project, roomId, base, hud, loading };
   if (q.get('poi') && D.pois?.[q.get('poi')]) args = { ...args, poi: q.get('poi'), seed: Number(q.get('seed')) || 1 + Math.floor(Math.random() * 2 ** 31) };
