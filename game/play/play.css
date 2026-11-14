@@ -692,6 +692,8 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .tut-list li.on { background: #2a2233; color: #ffd27a; border-color: #ffd27a; box-shadow: 0 0 10px rgba(255, 210, 122, .25); }
 .tut-list li.fresh::after { content: ''; margin-left: auto; width: 7px; height: 7px; border-radius: 50%; background: #3fe0d0; }
 @media (max-width: 760px) { .tut-body, .tut-main { grid-template-columns: 1fr; } .tut-list { max-height: 140px; } }
+.tut-mute { display: flex; align-items: center; gap: 8px; align-self: flex-start; color: #b9a2c8; font-size: 13.5px; cursor: pointer; user-select: none; }
+.tut-mute input { width: 17px; height: 17px; accent-color: #ffd27a; cursor: pointer; margin: 0; }
 .tut-steps { margin: 4px 0 0; padding: 0; list-style: none; counter-reset: st; display: flex; flex-direction: column; gap: 8px; }
 .tut-steps li { counter-increment: st; position: relative; padding: 8px 10px 8px 36px; border-radius: 8px; border: 1px solid transparent; color: #8a7d99; font-size: 14.5px; line-height: 1.5; cursor: pointer; transition: color .3s, background .3s; }
 .tut-steps li::before { content: counter(st); position: absolute; left: 9px; top: 8px; width: 19px; height: 19px; border-radius: 50%; display: grid; place-items: center; background: #2a2233; color: #8a7d99; font: 600 11px var(--ui-font); }

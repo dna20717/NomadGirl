@@ -65,7 +65,13 @@ await ev(() => { SC().hud.inv.close(); nomad.step(10); });
 // an event: AvA alarmed → „Nahkampf“
 v = await ev(() => { nomad.step(200); SC().drone.react('alert'); nomad.step(200); return TU().state(); });
 check('Ereignis (AvA alarmiert) → Lektion „Nahkampf“', v.open && v.lesson === 'nahkampf', v);
+// „für diese Sitzung nicht mehr“ (Daniel, 14.11.2026): X toggles the checkbox on the card, then no card comes until it is off again
+await tap(2);
+v = await ev(() => ({ tut: TU().state(), box: !!document.querySelector('.tut-mute input')?.checked, txt: document.querySelector('.tut-mute')?.textContent || '' }));
+check('Häkchen „Für diese Sitzung keine Lektionen mehr“ auf der Karte, X setzt es', v.tut.open && v.tut.sessionOff && v.box && /Sitzung/.test(v.txt), v);
 await tap(1);
+v = await ev(() => { nomad.step(200); SC().drone.react('kill'); nomad.step(200); const r = { ...TU().state(), keep: sessionStorage.getItem('nomadgirl-tutorial-session-off') }; TU().setSessionOff(false); TU().events.clear(); return r; });
+check('Mit Häkchen kommt in dieser Sitzung keine Karte mehr (sessionStorage)', !v.open && v.sessionOff && v.keep === '1', v);
 
 // Menü › Feldhandbuch: chapters, lessons, slides
 await ev(() => { SC().hud.pauseMenu(); window.__items = SC().hud.menuState().items.map(i => i.label); nomad.choose('Feldhandbuch'); }); await page.waitForTimeout(100);

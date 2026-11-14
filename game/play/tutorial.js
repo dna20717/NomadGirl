@@ -15,6 +15,8 @@ import { TUT_CHAPTERS } from '../../engine/schema.js';
 
 const KEYS = { left: 'A', right: 'D', up: 'W', down: 'S', jump: 'Leertaste', dash: 'L', melee: 'J', ranged: 'K', reload: 'R', holster: 'Q', grab: 'E', walk: 'Shift', inventory: 'I', build: 'B', help: 'Esc', pose: 'P' };
 const PAD_SPECIAL = { left: 'stick', right: 'stick', up: 'stick', down: 'stick' };
+// „für diese Sitzung nicht mehr“ (Daniel, 14.11.2026): a checkbox on every card, kept for this browser tab (sessionStorage)
+const session = { get() { try { return sessionStorage.getItem('nomadgirl-tutorial-session-off') === '1'; } catch { return false; } }, set(v) { try { v ? sessionStorage.setItem('nomadgirl-tutorial-session-off', '1') : sessionStorage.removeItem('nomadgirl-tutorial-session-off'); } catch { /* private mode */ } } };
 const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode */ } } };
 
 export class Tutorial {
@@ -23,13 +25,14 @@ export class Tutorial {
     this.root = root; this.host = host;
     this.seen = new Set(store.get('nomadgirl-tutorial-seen', []));
     this.off = !!store.get('nomadgirl-tutorial-off', false);
+    this.sessionOff = session.get();
     this.events = new Map(); this.lastClose = -1e9; this.queue = []; this.winOpen = null; this.winShown = null;
     this.el = el('div', { class: 'tut', hidden: true, onclick: e => { if (e.target === this.el) this.close(); } });
     root.append(this.el);
     // the keyboard while a card or the guide is open: our own keys first (before the windows and the game below see them)
     window.addEventListener('keydown', e => {
       if (!this.isOpen) return;
-      const k = e.key, map = { Escape: 'back', Enter: 'ok', ' ': 'ok', e: 'ok', E: 'ok', ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down', a: 'left', d: 'right', w: 'up', s: 'down', q: 'next', Q: 'next', Tab: 'next' }[k];
+      const k = e.key, map = { Escape: 'back', Enter: 'ok', ' ': 'ok', e: 'ok', E: 'ok', ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down', a: 'left', d: 'right', w: 'up', s: 'down', q: 'next', Q: 'next', Tab: 'next', r: 'context', R: 'context' }[k];
       if (!map) return;
       e.preventDefault(); e.stopPropagation();
       if (!e.repeat || map !== 'back') this.act(map);
@@ -43,7 +46,8 @@ export class Tutorial {
   }
   get isOpen() { return !this.el.hidden; }
   // automated browsers (the tests) see no cards unless they ask for them (nomadgirl-tutorial-test), so no card pauses another test
-  get enabled() { return !this.off && this.D.game?.tutorial?.enabled !== false && (typeof navigator === 'undefined' || !navigator.webdriver || store.get('nomadgirl-tutorial-test', false)); }
+  get enabled() { return !this.off && !this.sessionOff && this.D.game?.tutorial?.enabled !== false && (typeof navigator === 'undefined' || !navigator.webdriver || store.get('nomadgirl-tutorial-test', false)); }
+  setSessionOff(v) { this.sessionOff = !!v; session.set(this.sessionOff); const c = this.el.querySelector('.tut-mute input'); if (c) c.checked = this.sessionOff; }
   setOff(off) { this.off = off; store.set('nomadgirl-tutorial-off', off); }
   markSeen(id) { if (!this.seen.has(id)) { this.seen.add(id); store.set('nomadgirl-tutorial-seen', [...this.seen]); } }
   reset() { this.seen.clear(); store.set('nomadgirl-tutorial-seen', []); }
@@ -153,7 +157,8 @@ export class Tutorial {
     this.el.replaceChildren(el('div', { class: 'tut-card ui-frame' },
       el('header', {}, icon('help', 18), el('b', {}, 'Feldhandbuch'), el('span', { class: 'tut-new' }, 'Neu')),
       this.body(l),
-      hints([...(l.media === 'slides' && (l.slides || []).length > 1 ? [['move', 'blättern']] : []), ['ok', 'Verstanden'], ['back', 'schließen']], 'Alle Lektionen: Menü › Feldhandbuch'),
+      el('label', { class: 'tut-mute' }, el('input', { type: 'checkbox', checked: this.sessionOff, onchange: e => this.setSessionOff(e.target.checked) }), ' Für diese Sitzung keine Lektionen mehr zeigen'),
+      hints([...(l.media === 'slides' && (l.slides || []).length > 1 ? [['move', 'blättern']] : []), ['context', 'nicht mehr zeigen'], ['ok', 'Verstanden'], ['back', 'schließen']], 'Alle Lektionen: Menü › Feldhandbuch'),
       closeX(() => this.close())));
     this.el.hidden = false; this.el.dataset.view = 'card';
   }
@@ -186,11 +191,12 @@ export class Tutorial {
 
   // ---------- one grammar: controller (scene.padMenus) and keyboard (our listener) ----------
   nav(u) {
-    for (const a of ['back', 'ok', 'left', 'right', 'up', 'down', 'next', 'prev']) if (u.pressed(a)) { this.act(a); return; }
+    for (const a of ['back', 'ok', 'context', 'left', 'right', 'up', 'down', 'next', 'prev']) if (u.pressed(a)) { this.act(a); return; }
   }
   act(a) {
     if (this.view === 'card') {
       if (a === 'back' || a === 'ok') return this.close();
+      if (a === 'context') return this.setSessionOff(!this.sessionOff);
       if (a === 'left' || a === 'up') return this.go((this.slide?.i ?? 0) - 1);
       if (a === 'right' || a === 'down') return this.go((this.slide?.i ?? 0) + 1);
       return;
@@ -203,5 +209,5 @@ export class Tutorial {
     if (a === 'up' || a === 'down') { this.pick = mine[(i + (a === 'down' ? 1 : -1) + mine.length) % mine.length]?.id; this.drawGuide(); }
     if (a === 'ok') this.go((this.slide?.i ?? 0) + 1);
   }
-  state() { return { open: this.isOpen, view: this.view || null, lesson: this.view === 'card' ? this.cur?.id : this.pick || null, chapter: this.chapter || null, seen: [...this.seen], slide: this.slide?.i ?? null, off: this.off }; }
+  state() { return { open: this.isOpen, view: this.view || null, lesson: this.view === 'card' ? this.cur?.id : this.pick || null, chapter: this.chapter || null, seen: [...this.seen], slide: this.slide?.i ?? null, off: this.off, sessionOff: this.sessionOff }; }
 }
