@@ -328,6 +328,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   5. **Run-HUD aufräumen:** im Run nur Run-Werte, keine zweite Δ-Anzeige, keine Camp-Leiste.
   6. **Orte mit eigener Gang + Boss:** feste Gang-Farbe/Köpfe je POI, Hausmeister mit eigenem Boss-Verhalten.
   7. **Tutorial im Run nicht modal:** Lektionen im Run als Ecken-Tipp, modal nur im Camp.
+  8. **Questlog** (Daniel, 14.11.: „Wir brauchen eine Art Questlog! Nimm das mit auf“; Antworten: Hauptquest Heilmittel + AvAs Tank als Dauerauftrag + Nebenaufträge; öffnen am Warroom und am Lagerfeuer; verfolgte Quest selbst wählbar, der schwache Tank geht vor).
 - **Bleibt:** Start mit 40.000 Δ (zum Testen, Daniel 14.11.). Beute-Bilanz am Run-Ende: nicht jetzt.
 - **Fertig, wenn:** alles spielbar, Werte in der Werkstatt, Tests grün, Build grün.
 - **Rückfragen:**
