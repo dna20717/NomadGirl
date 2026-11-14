@@ -823,3 +823,34 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .ql-reward { display: flex; align-items: center; gap: 4px; color: #ffd27a !important; }
 .ql-tracked { color: #ffd27a !important; font-size: 13px !important; }
 .ql-go { align-self: flex-start; padding: 8px 18px; }
+
+/* Beute-Bilanz (#017) */
+.sum-card { width: min(940px, 94vw); gap: 16px; }
+.sum-head { display: grid; grid-template-columns: auto 1fr minmax(220px, 280px); gap: 18px; align-items: center; }
+.sum-grade { width: 92px; height: 92px; border-radius: 16px; display: grid; place-items: center; font: 84px/1 VT323, monospace; color: #0d0a12; background: #ffd27a; box-shadow: 0 0 30px rgba(255, 210, 122, .35); animation: sum-grade .6s cubic-bezier(.2, .9, .3, 1.4); }
+@keyframes sum-grade { from { transform: scale(.3) rotate(-12deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.sum-grade.gS { background: linear-gradient(135deg, #ffd27a, #fa6a0a); color: #fff; text-shadow: 0 2px 0 #73172d; }
+.sum-grade.gA { background: #ffd27a; } .sum-grade.gB { background: #20d6c7; } .sum-grade.gC { background: #9cdb43; }
+.sum-grade.gD, .sum-grade.gE, .sum-grade.gF { background: #6d758d; color: #f2eef7; }
+.sum-grade.none { background: #2a2233; color: #e86a73; box-shadow: none; font-size: 40px; }
+.sum-title small { color: #8a7d99; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+.sum-title h2 { margin: 2px 0 6px; font: 36px/1 VT323, monospace; color: #ffd27a; }
+.sum-title p { margin: 0; color: #d8cfe2; font-size: 14px; }
+.sum-parts { display: flex; flex-direction: column; gap: 6px; }
+.sum-part small { color: #8a7d99; font-size: 11px; text-transform: uppercase; letter-spacing: .8px; }
+.sum-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.sum-col { padding: 10px 12px; border-radius: 10px; background: #1d1626; border: 1px solid #3a2f45; min-height: 120px; }
+.sum-col h3 { margin: 0 0 8px; font: 20px/1 VT323, monospace; color: #b9a2c8; display: flex; align-items: center; gap: 6px; }
+.sum-col p { margin: 0; color: #8a7d99; font-size: 13.5px; }
+.sum-things, .sum-news { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.sum-things li { display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 8px; color: #d8cfe2; font-size: 13.5px; }
+.sum-things li.res { color: #ffd27a; } .sum-things li b { color: #f2eef7; }
+.sum-things.lost li { color: #e86a73; opacity: .85; }
+.sum-things li.more { display: block; color: #8a7d99; }
+.sum-news li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; align-items: center; color: #d8cfe2; font-size: 13.5px; }
+.sum-news li.gold { color: #ffd27a; } .sum-news li.warn { color: #fa6a0a; } .sum-news b { color: inherit; font-weight: 600; }
+.sum-btns { display: flex; justify-content: flex-end; gap: 10px; }
+.sum-btns .inv-btn { padding: 10px 18px; display: flex; align-items: center; gap: 6px; }
+.sum-btns .inv-btn small { margin-left: 6px; font-size: 12px; opacity: .8; }
+.sum-btns .inv-btn.on { outline: 2px solid #ffd27a; outline-offset: 2px; }
+@media (max-width: 760px) { .sum-head, .sum-cols { grid-template-columns: 1fr; } }

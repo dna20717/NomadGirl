@@ -34,6 +34,8 @@ import { BuildMode } from './build_mode.js';
 import { Tutorial } from './tutorial.js';
 import { AchievementsUI } from './achievements_ui.js';
 import { QuestLogUI } from './questlog_ui.js';
+import { SummaryUI } from './summary_ui.js';
+import { snapshot as runSnapshot, compare as runCompare } from '../summary.js';
 import { use as useThing, learnAll, learnNote } from '../crafting.js';
 import { bump, level as achieveLevel, check as achieveCheck, bonuses as trophyBonuses } from '../achievements.js';
 
@@ -347,6 +349,7 @@ export class PlayScene extends Phaser.Scene {
     this.hud.room(def?.name || this.roomId, this.enemies.length);
     this.hud.mode(this.mode, this.box?.save, this.data_);
     if (this.mode === 'run') this.hud.room(`${this.data_.pois?.[this.box.save.run?.poi]?.name || ''} · ${def?.name || this.roomId}`, this.enemies.length);
+    if (this.args.summary && this.mode === 'camp') { const S = this.args.summary; this.args.summary = null; this.time.delayedCall(450, () => this.hud.sum?.open(S)); }
     if (this.args.banner) { const [t, sub, kind] = this.args.banner; this.hud.banner(t, sub, 4200, kind || (this.mode === 'camp' ? 'camp' : 'travel')); }
     if (this.mode === 'camp' && this.rain && !this.hud.toldRain && !/regnet/.test(this.args.banner?.[0] || '')) this.hud.toast('Es regnet', 'Die Zisterne füllt sich schneller', 'camp', 3600);
     if (this.mode === 'camp') this.hud.toldRain = !!this.rain;
@@ -417,6 +420,7 @@ export class PlayScene extends Phaser.Scene {
     // the field guide (#011, game/play/tutorial.js): a card the first time, Menü › Feldhandbuch
     hud.tut ??= new Tutorial(hud.root, { scene: () => hud.scene, hud });
     hud.ach ??= new AchievementsUI(hud.root, { scene: () => hud.scene });   // Menü › Achievements (#012)
+    hud.sum ??= new SummaryUI(hud.root, { scene: () => hud.scene, go: next => hud.scene.goNext?.(next) });   // Beute-Bilanz (#017)
     hud.quests ??= new QuestLogUI(hud.root, { scene: () => hud.scene, toast: (t, sub, kind) => hud.toast(t, sub, kind), changed: () => { hud.campKey = null; hud.goalAt = 0; } });   // Questlog (#016)
     // the travel map (#007, game/play/map_ui.js): warroom and van door
     hud.map ??= new MapUI(hud.root, {
@@ -541,18 +545,18 @@ export class PlayScene extends Phaser.Scene {
     this.cam.fadeOut(fade, 13, 10, 18);
     this.cam.once('camerafadeoutcomplete', go);
   }
-  goCamp({ banner = null, fade = 600, keepPlace = false, arriving = false } = {}) {
+  goCamp({ banner = null, fade = 600, keepPlace = false, arriving = false, summary = null } = {}) {
     if (arriving) { arrive(this.box.save, this.data_); if (banner) banner = [banner[0], banner[1].replace(/^Tag \d+ · \d\d:\d\d/, clockText(this.box.save))]; }
     this.box.save.health = Math.max(1, Math.min(this.leyla.maxHealth, this.box.save.health));
     this.box.persist();
-    this.restartAs({ mode: 'camp', banner, startX: keepPlace ? this.leyla.x : null }, fade);
+    this.restartAs({ mode: 'camp', banner, summary, startX: keepPlace ? this.leyla.x : null }, fade);
   }
   startRun(poi) {
     const D = this.data_, P = D.pois?.[poi] || {}, R = D.rooms || {}, has = id => R[id]?.layout?.length;
     // rooms with entrance and exit: a generated level (engine/poi.js); otherwise the first room as before
     if (poiReady(D, poi).ok) {
       this.box.save.health = this.leyla.health;
-      this.box.save.run = { poi, room: null, seed: P.seed || 1 + Math.floor(Math.random() * 2 ** 31), location: this.box.save.location, danger: this.placeDanger(poi) };
+      this.box.save.run = { poi, room: null, seed: P.seed || 1 + Math.floor(Math.random() * 2 ** 31), location: this.box.save.location, danger: this.placeDanger(poi), before: runSnapshot(D, this.box.save) };   // before: for the Beute-Bilanz (#017)
       this.box.persist();
       return this.restartAs({ mode: 'run', roomId: null, banner: [P.name || poi, `${P.gang?.name ? `Revier: ${P.gang.name} · ` : ''}Finde den Tresor · E am Van: zurück ins Camp`] }, 700);   // #016 whose place this is
     }
@@ -560,7 +564,7 @@ export class PlayScene extends Phaser.Scene {
     const room = ready.find(id => R[id].tags?.includes('start')) || ready[0] || [D.camp?.fallbackRoom, D.game?.testRoom].find(has);
     if (!room) return this.hud.menu({ title: 'Noch kein Raum', sub: 'Dieser POI hat noch keinen Raum mit Layout (Werkstatt › Raum-Bausteine).', items: [{ label: 'Zurück', act: () => {} }] });
     this.box.save.health = this.leyla.health;
-    this.box.save.run = { poi, room, location: this.box.save.location, danger: this.placeDanger(poi) };
+    this.box.save.run = { poi, room, location: this.box.save.location, danger: this.placeDanger(poi), before: runSnapshot(D, this.box.save) };
     this.box.persist();
     this.restartAs({ mode: 'run', roomId: room, banner: [P.name || poi, `${D.rooms?.[room]?.name || room}${ready.length ? '' : ' (Ersatzraum)'} · E am Van: zurück ins Camp`] }, 700);
   }
@@ -597,12 +601,29 @@ export class PlayScene extends Phaser.Scene {
       if (rank && this.level.secretsMax > 0 && this.level.secrets >= this.level.secretsMax) later(bump(this.data_, save, 'secretsAll', 1, [this.level.poi]));
     }
     save.buffs = []; save.buffQ = {};
+    // Beute-Bilanz (#017): what changed since she drove off
+    let summary = null;
+    try {
+      const R = this.level?.done, P = this.data_.pois?.[save.run?.poi] || {}, sec = R?.seconds ?? Math.round((this.elapsed || 0) / 1000);
+      summary = runCompare(this.data_, save, save.run?.before || {}, { ko, poi: P.name || save.run?.poi || '', title: ko ? 'AvA hat dich heimgebracht' : rank ? `Tresor geknackt · Rang ${rank.grade}` : 'Zurück im Camp',
+        grade: rank?.grade || null, parts: rank?.parts || null, paid, base: this.deltas, bonus: rank?.bonus || 0, kills: this.kills, killsMax: this.level?.killsMax ?? null,
+        secrets: this.level?.secrets ?? 0, secretsMax: this.level?.secretsMax ?? 0, time: `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}` });
+    } catch (e) { console.warn('Bilanz', e); }
     save.run = null;
     this.hud.inv?.close();
     const banner = ko ? ['AvA hat dich heimgebracht', `${clockText(save)} · Der Rucksack ist weg.`, 'drama']
       : rank ? [`Zurück im Camp · Rang ${rank.grade}`, `${clockText(save)} · +${paid} Δ (${this.deltas} + ${rank.bonus} %) · ${this.kills} Kills`, 'good']
       : ['Zurück im Camp', `${clockText(save)} · +${paid} Δ · ${this.kills} Kills`, 'good'];
-    this.goCamp({ banner, fade: ko ? 900 : 600, arriving: true });
+    this.goCamp({ banner: summary && this.data_.game?.summary !== false ? null : banner, fade: ko ? 900 : 600, arriving: true, summary: this.data_.game?.summary !== false ? summary : null });
+  }
+  // the gold button of the Beute-Bilanz: straight to where it pays off
+  goNext(next) {
+    const c = this.camp, hud = this.hud;
+    if (!next || !c) return;
+    if (next.kind === 'quests') return hud.quests?.open();
+    if (next.kind === 'tech') return hud.tech?.open();
+    if (next.kind === 'tank') { const ws = c.rigWorkshop?.('tank'); if (ws) return c.use(ws); }
+    if (next.kind === 'workshop') { const f = this.data_.workshops?.[next.ws]?.function, ws = c.rigWorkshop?.(f) || next.ws; return c.use(ws); }
   }
 
   spawnEnemies() {
@@ -958,6 +979,7 @@ export class PlayScene extends Phaser.Scene {
     if (!u) return;
     const eat = () => { for (const k of ['jump', 'grab', 'dash', 'up', 'down', 'left', 'right', 'melee', 'ranged', 'reload', 'holster']) if (input[k]) input[k].pressed = false; };
     if (hud.tut?.isOpen) { hud.tut.nav(u); eat(); input.help.pressed = false; return; }   
+    if (hud.sum?.isOpen) { hud.sum.nav(u); eat(); input.help.pressed = false; return; }   // Beute-Bilanz (#017)
     if (hud.quests?.isOpen) { hud.quests.nav(u); eat(); input.help.pressed = false; return; }   // Questlog (#016)
     if (hud.ach?.isOpen) { hud.ach.nav(u); eat(); input.help.pressed = false; return; }   // Menü › Achievements (#012)   // the field guide card / archive (#011)
     if (hud.paused && !hud.modal) { if (u.pressed('ok') || u.pressed('back')) { hud.toggleHelp(false); eat(); input.help.pressed = false; } return; }
@@ -1018,7 +1040,7 @@ export class PlayScene extends Phaser.Scene {
     // every window pauses the game (Daniel, 12.11.2026: „Fenster pausieren immer, auch im Run“): menus, controls, cooking and the inventory
     let invDone = false;
     if (this.hud.inv?.isOpen && !this.hud.paused && !this.hud.modal && !this.leaving) { this.inventoryUpdate(input); invDone = true; }
-    if (this.hud.tut?.isOpen || this.hud.ach?.isOpen || this.hud.quests?.isOpen || this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
+    if (this.hud.tut?.isOpen || this.hud.ach?.isOpen || this.hud.quests?.isOpen || this.hud.sum?.isOpen || this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
       // cooking, crafting, a menu: the workshops keep glowing, steaming and sparking behind the window
       if (this.camp && !this.hud.paused && !this.leaving) { this.camp.benches?.update(time, Math.min(delta, 50)); this.camp.lid?.(Math.min(delta, 50)); }
       this.physics.world.pause(); this.hud.update(this, time); return;
