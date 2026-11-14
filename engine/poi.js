@@ -34,6 +34,18 @@ export function poiReady(D, poiId) {
 
 // → { def (a room definition the game plays: name, size, layout, spawns, backdrop), rooms: [{ id, band, x, y, w, h }],
 //     shortcut: null | { up: [x, y] (ladder top in the entrance), down: [x, y] (ladder top in the exit), floor: tunnel floor row }, branches, problems }
+// Spannungskurve: „30, 70, 20, 85, 100“ → [0.3, 0.7, …] (null = off, every 1 is an enemy as before)
+export function parseCurve(text) {
+  const v = String(text ?? '').split(/[,;\s]+/).filter(Boolean).map(Number).filter(n => Number.isFinite(n));
+  return v.length ? v.map(n => Math.max(0, Math.min(150, n)) / 100) : null;
+}
+// the curve at t (0 = entrance, 1 = exit), linear between its points
+export function curveAt(c, t) {
+  if (c.length === 1) return c[0];
+  const f = Math.max(0, Math.min(1, t)) * (c.length - 1), i = Math.min(c.length - 2, Math.floor(f));
+  return c[i] + (c[i + 1] - c[i]) * (f - i);
+}
+
 export function buildPoi(D, poiId, seed = 1) {
   const P = D.pois?.[poiId] || {}, R = D.rooms || {}, rnd = rng(seed), problems = [];
   const ready = (P.rooms || []).filter(id => R[id]?.layout?.length);
@@ -86,7 +98,20 @@ export function buildPoi(D, poiId, seed = 1) {
     if (!sym[enemy]) { sym[enemy] = letters.shift() || '.'; if (sym[enemy] !== '.') spawns.push({ symbol: sym[enemy], enemy }); }
     return sym[enemy];
   };
-  const poiEnemies = (P.enemies || []).filter(e => D.enemies?.[e]);
+  // Spannungskurve (#016, Daniel 14.11.2026: Flow): the main path follows a curve of intensity (POIs › Level › Spannungskurve, %
+  // from entrance to exit). A random enemy (1) stays with that chance; quiet rooms draw from the weaker half of the POI's enemies,
+  // loud rooms (from 85 %) from the tougher half. Bosses never come from 1, only from their room's table. Side rooms: half as loud.
+  const byHealth = (P.enemies || []).filter(e => D.enemies?.[e] && D.enemies[e].behavior !== 'boss').sort((a, b) => (D.enemies[a].health ?? 30) - (D.enemies[b].health ?? 30));
+  const curve = parseCurve(P.curve);
+  placedMain.forEach((m, i) => { m.intensity = curve ? curveAt(curve, placedMain.length > 1 ? i / (placedMain.length - 1) : 1) : 1; });
+  for (const b of branches) b.intensity = curve ? (b.main.intensity ?? 1) * 0.5 : 1;
+  const pickEnemy = k => {
+    if (!byHealth.length) return null;
+    const half = Math.max(1, Math.ceil(byHealth.length / 2));
+    const pool = !curve ? byHealth : k < 0.5 ? byHealth.slice(0, half) : k >= 0.85 ? byHealth.slice(byHealth.length - half) : byHealth;
+    return pool[Math.floor(rnd() * pool.length)];
+  };
+  const poiEnemies = byHealth;
   const stamp = (place, y0) => {
     const r = parsed[place.id], table = Object.fromEntries((R[place.id].spawns || []).map(s => [s.symbol, s.enemy]));
     place.y = y0;
@@ -96,7 +121,7 @@ export function buildPoi(D, poiId, seed = 1) {
       else if (c === '^' && !(place.id === start && shortcut)) c = '#';
       else if (c === 'v' && !(place.id === exit && shortcut)) c = '#';
       else if (c === 'Z' && place.id !== exit) c = '.';
-      else if (c === '1') c = poiEnemies.length ? letterOf(poiEnemies[Math.floor(rnd() * poiEnemies.length)]) : '.';
+      else if (c === '1') { const k = place.intensity ?? 1, e = rnd() < k ? pickEnemy(k) : null; c = e ? letterOf(e) : '.'; }
       else if (table[c]) c = D.enemies?.[table[c]] ? letterOf(table[c]) : '.';
       tiles[y0 + y][place.x + x] = c;
     }
@@ -140,7 +165,7 @@ export function buildPoi(D, poiId, seed = 1) {
   const layout = tiles.map(r => r.join(''));
   const S = R[start];
   const def = { name: P.name || poiId, size: [W, H], layout, spawns, tags: ['poi'], backdrop: S.backdrop };
-  const rooms = [...placedMain, ...branches].map(({ id, band, x, y, w, h }) => ({ id, band, x, y, w, h }));
+  const rooms = [...placedMain, ...branches].map(({ id, band, x, y, w, h, intensity }) => ({ id, band, x, y, w, h, intensity: Math.round((intensity ?? 1) * 100) }));
   return { def, rooms, shortcut: ends, branches: branches.length, problems, start, exit };
 }
 

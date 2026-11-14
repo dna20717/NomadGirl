@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { nodeLoader } from '../tools/loader.js';
 import { loadProject } from '../engine/project.js';
 import { parseRoom, solidRects } from '../engine/room.js';
-import { buildPoi, poiReady, rankRun } from '../engine/poi.js';
+import { buildPoi, poiReady, rankRun, parseCurve, curveAt } from '../engine/poi.js';
 import { reach } from '../engine/reach.js';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '../projects/nomadgirl');
@@ -95,4 +95,23 @@ test('Ranking: Bestzeit, Kills, Secrets → Rang und Bonus', () => {
   assert.equal(late.parts.time, Math.round(R.points.time * (1 - R.timeFalloff / 100 * 10)));
   assert.equal(late.grade, 'F');
   assert.equal(late.bonus, 0);
+});
+
+// Spannungskurve (#016): quiet entrance, the loudest room at the exit, no boss from the random 1, curve off = every 1 an enemy
+test('Spannungskurve: ruhiger Eingang, lauter Ausgang, kein Boss aus der 1', () => {
+  assert.deepEqual(parseCurve('30, 70,100'), [0.3, 0.7, 1]);
+  assert.equal(parseCurve(''), null);
+  assert.ok(Math.abs(curveAt([0.2, 1], 0.5) - 0.6) < 1e-9);
+  const count = (r, room) => { const sym = Object.fromEntries(r.def.spawns.map(s => [s.symbol, s.enemy])); let n = 0; for (let y = room.y; y < room.y + room.h; y++) for (let x = room.x; x < room.x + room.w; x++) if (sym[r.def.layout[y][x]]) n++; return n; };
+  let first = 0, last = 0;
+  for (let seed = 1; seed <= 30; seed++) {
+    const r = buildPoi(D, 'ministerium', seed), main = r.rooms.filter(x => x.band === 'main');
+    assert.ok(main[0].intensity < main.at(-1).intensity, 'Eingang leiser als Ausgang');
+    first += count(r, main[0]); last += count(r, main.at(-1));
+    const random = r.def.spawns.filter(s => s.enemy === 'hausmeister');
+    assert.ok(random.length <= 1, 'Hausmeister nur aus seinem Raum');
+  }
+  assert.ok(first < last, `Eingang ${first} < Ausgang ${last}`);
+  const off = buildPoi({ ...D, pois: { ...D.pois, tankstelle_km7: { ...D.pois.tankstelle_km7, curve: '' } } }, 'tankstelle_km7', 3);
+  assert.ok(off.rooms.every(x => x.intensity === 100));
 });
