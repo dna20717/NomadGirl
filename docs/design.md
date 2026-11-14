@@ -231,6 +231,25 @@ Das Rig ist Leylas Zuhause, Werkstatt und Fahrzeug zugleich. Es wird im Querschn
 
 Werkstätten: Waffenkammer, Kühlraum, Zelle, Schlafzimmer, Chill Area, Drohnenwerkstatt, Warroom, Küche, Foodtruck (jaaa, wirklich), Motorraum, Reaktor. Perspektivisch: Automatisierung der Herstellung.
 
+### Ausrüstung wirkt auf die Reise (Design-Session 14.11.2026)
+
+Daniel: „Ausrüstung des Rigs hat Auswirkungen auf Reisen und beeinflusst Chancen, dass Dinge passieren. Geschütz auf max macht Überfälle unmöglich, Scheinwerfer ermöglicht mehr Speed bei Nacht usw.“ Stand heute: Panzerung und Schaden der Rig-Teile werden nur angezeigt und wirken nirgends.
+
+- **Keine eigene Werkstatt fürs Tuning:** Rig-Teile werden wie bisher im Bau-Modus an die Sockel geschraubt.
+- **Chancen statt fester Ereignisse:** Jeder Zwischenfall hat eine Grundchance, die Werte des Rigs schieben sie hoch oder runter. Beispiele: Geschütz/Bewaffnung = Überfälle seltener, ab einer **Schwelle unmöglich** (Daniel: die Summe der Bewaffnung zählt, Qualität hilft, die Schwelle schneller zu erreichen; z. B. zwei Geschütze am LKW); Scheinwerfer = nachts fast volles Tempo, weniger Ghule. ⚠️ vorläufig (Ava): Rammbügel/Bleche = Straßensperre ohne Schaden durchbrechen; Offroad-Reifen = weniger Pannen und Sandsturm, auf der Straße etwas langsamer; V8 = Zugkraft und Tempo, säuft, **laut** (lockt Überfälle an); Radarschüssel = Vorwarnung, dann „Umfahren“; Zusatztank = Reichweite. Neue Werte also Tempo, Reichweite, Gelände, Licht, Lärm, Bewaffnung.
+- ⚠️ vorläufig (Ava): Zwischenfälle bekommen Optionen mit Bedingung (Feld `requires`, z. B. „Rammen“ ab Panzerung 20). Die Karte zeigt vor dem Losfahren das Risiko je Route mit Gründen („Überfall ●○○ · Geschütz −60 %“). Alle Werte in der Werkstatt.
+
+### Bergungsprojekt: der LKW (Design-Session 14.11.2026)
+
+Daniel: „Bergungsprojekt ist eine gute Idee … Eine Werkstatt wird es aber nicht geben. Das Wrack taucht am Ende des Camps an der Location auf, wo es gefunden wurde, und hier kommt der Clou: Man muss mehrmals zurückgehen, bis er fertig ist.“
+
+- **Quest ab Spielstart**, weil der Van zu schwach ist: Er zieht nur das Start-Rig, **jeder weitere Container braucht den LKW** (früh).
+- **Ort gewürfelt je Durchgang** (in Startnähe), auf der Karte markiert. Camp an diesem Ort = das Wrack steht am Ende des Camps; E daran zeigt die Bergungsliste.
+- **Mehrere Besuche, weil die Teile nur woanders liegen:** Die Bauabschnitte brauchen Teile aus anderen Orten. Leyla plündert dort und fährt zurück, um sie einzubauen. ⚠️ vorläufig (Ava): Abschnitte Freilegen → Fahrwerk (Reifen, Achse) → Motor (Motorblock, Kabelbaum, Batterie) → Kabine & Tank (Bleche, Diesel) → Probestart (Drehzahl-Moment, gut = besserer Motor, nie Scheitern); Fortschritt sichtbar am Wrack; Questlog listet fehlende Teile und wahrscheinliche Fundorte; Projekte als Daten (Werkstatt › Bergungsprojekte), damit später weitere Bergungen gehen.
+- **Keine Gefahr fürs Wrack** (gemütlich): Was eingebaut ist, bleibt.
+- **Der Wrack-Ort wird die Basis:** Ist der LKW fertig, **bleibt der Van dort stehen**. Erstmal nur das; mit etwas Ausblick: Hier kann später eine Siedlung entstehen (passt zum Konzept Kundenabend im Projekt-Doc `claude/konzept-kundenabend.md`).
+- **Neuer Durchgang: der LKW bleibt.** ⚠️ offen: Was ersetzt dann den Quest (nächstes Bergungsprojekt?) und steht der Van im neuen Durchgang trotzdem irgendwo als Basis?
+
 ### Camp (Daniel, 07.11.2026 abends)
 
 - **Ansicht:** begehbar im Side-Scroll (Leyla läuft durchs Camp und ins aufgeschnittene Rig, E benutzt Dinge). Umbauen passiert im Camp selbst (B oder Warroom › Rig umbauen), siehe „Rig bauen“.
