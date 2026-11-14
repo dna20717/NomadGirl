@@ -247,6 +247,7 @@ Daniel: „Bergungsprojekt ist eine gute Idee … Eine Werkstatt wird es aber ni
 - **Ort gewürfelt je Durchgang** (in Startnähe), auf der Karte markiert. Camp an diesem Ort = das Wrack steht am Ende des Camps; E daran zeigt die Bergungsliste.
 - **Mehrere Besuche, weil die Teile nur woanders liegen:** Die Bauabschnitte brauchen Teile aus anderen Orten. Leyla plündert dort und fährt zurück, um sie einzubauen. ⚠️ vorläufig (Ava): Abschnitte Freilegen → Fahrwerk (Reifen, Achse) → Motor (Motorblock, Kabelbaum, Batterie) → Kabine & Tank (Bleche, Diesel) → Probestart (Drehzahl-Moment, gut = besserer Motor, nie Scheitern); Fortschritt sichtbar am Wrack; Questlog listet fehlende Teile und wahrscheinliche Fundorte; Projekte als Daten (Werkstatt › Bergungsprojekte), damit später weitere Bergungen gehen.
 - **Keine Gefahr fürs Wrack** (gemütlich): Was eingebaut ist, bleibt.
+- **Gebaut** als #023 (15.11.2026): Bergungsprojekte LKW, Crawler, Fatbird mit Teilen aus POIs, Questlog und Karte; Details `docs/features/megarigs.md` › Bergungsprojekte.
 - **Der Wrack-Ort wird die Basis:** Ist der LKW fertig, **bleibt der Van dort stehen**. Erstmal nur das; mit etwas Ausblick: Hier kann später eine Siedlung entstehen (passt zum Konzept Kundenabend im Projekt-Doc `claude/konzept-kundenabend.md`).
 - **Neuer Durchgang: der LKW bleibt.** ⚠️ offen: Steht der Van im neuen Durchgang trotzdem irgendwo als Basis?
 

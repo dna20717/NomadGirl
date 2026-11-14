@@ -13,11 +13,12 @@ const rng = seed => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 429496
 const BOX = { left: 17, one: 121, more: 101, roof: 83, bottom: 187 };
 
 export class MegarigView {
-  constructor(scene, build, T) {
+  // opts.id: the vehicle (default: the prototype page's); used small as a wreck in the camp too (camp_salvage.js)
+  constructor(scene, build, T, opts = {}) {
     this.s = scene; this.b = build; this.T = T;
     this.containers = [];
     this.glows = [];
-    const D = scene.data_, V = D.megarigs?.[scene.args.megarig.id] || {};
+    const D = scene.data_, V = D.megarigs?.[opts.id ?? scene.args.megarig?.id] || {};
     this.paint = { main: C.yellow, dark: C.violet, trim: C.copper, neon: C.cyan, light: C.red, ...(V.paint || {}) };
     this.g = scene.add.graphics().setDepth(-6);       // hull, back layer
     this.gm = scene.add.graphics().setDepth(-4.5);    // rooms

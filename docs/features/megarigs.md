@@ -1,4 +1,4 @@
-# Mega-Rigs: LKW, Crawler, Fatbird (#022)
+# Mega-Rigs und Bergung: LKW, Crawler, Fatbird (#022, #023)
 
 Prototyp zum Begehen unter **/megarig** (`megarig.html?id=lkw|crawler|fatbird&stage=0..2`), absichtlich nicht im Menü und nicht im Spiel (Daniel, 14.11.2026: „brauchen wir weder im Menü noch im Spiel, sondern als Link“). Design: `docs/design.md` › Endgame-Zugmaschinen, Mega-Rigs aus Kachel-Sets.
 
@@ -34,7 +34,23 @@ Prototyp zum Begehen unter **/megarig** (`megarig.html?id=lkw|crawler|fatbird&st
 - `node --test test/megarig.test.js`: alle Stufen ohne Probleme und erreichbar, Wachstum, Raster, Räume im Rumpf, Warnung bei fehlendem Unterbau, `reach()`, Anbauteile.
 - `node tools/megarig_test.mjs [--shots]`: jede Stufe lädt, Leyla klettert jede Leiter bis oben (27 Leitern), Container öffnen sich, Übersicht zoomt.
 
+## Bergungsprojekte (#023)
+
+Daniel, 15.11.2026 (AFK): „Bau bitte den gesamten Themenbereich inklusive Quests und POI und Felgen mit ein“. Design: `docs/design.md` › Bergungsprojekt: der LKW, Endgame-Zugmaschinen.
+
+- **Daten:** RIG › **Bergungsprojekte** (`data/salvage.json`): LKW (ab Spielstart), Crawler und Fatbird (nach dem LKW). Abschnitte als Tabelle (Abschnitt, Teil, Anzahl, Fundorte = POIs, Einbau-Stunden), Fundort-Abstand vom Start (`hops`), Belohnung Zugmaschine oder Mega-Rig, Kisten-Chance, Wrack-Aussehen.
+- **Teile** (⚠️ „Felgen“ als Bergungsteile gelesen): 14 neue Gegenstände (Felge, Reifen, Achse, Motorblock, Dieselkanister, Auspuff, Kettenglied, Laufrolle, Hydraulikzylinder, Rotorblatt, Ballonstoff, Gasventil, Bordrechner, Bordwerkzeug), Symbole `icons_salvage` aus `tools/salvage_icons.py` (Ausschnitte aus dem LKW-Teileblatt + Code, AAP-64). Dazu vorhandene Teile (Schrauben, Kabelbaum, Autobatterie, Schrottplatte, Rohrbogen, Chip, Turbinenmodul).
+- **Fundort je Durchgang** (`game/salvage.js` › `ensureSites`): aus dem Seed der Karte gewürfelt, so viele Straßen vom Start wie eingestellt, auf der Reisekarte als **WRACK**-Marke (fertig: **BASIS**), auch an noch unbekannten Orten.
+- **POIs:** Fehlt ein Teil, liegt es mit `chestChance` % in einer Kiste seiner Fundort-POIs, im **Tresor** des Fundorts sicher (`chestPart`, `poi_level.js` › `salvagePart`, Meldung „Bergungsteil“).
+- **Camp:** Am Fundort steht das Wrack **am Ende des Camps** (Camp wird breiter). LKW = das PixelLab-Bild verrostet und schräg, Crawler/Fatbird = ihre echte Mega-Rig-Zeichnung verkleinert, eingesunken, rostig. Schild mit Prozent. **E:** Bergungsliste des Abschnitts (Teile, Vorrat, Fundorte), **Einbauen** nimmt alles Passende aus Lager, Kiste und Rucksack und kostet Zeit; Abschnitte nacheinander. Am Ende **Probestart**.
+- **Belohnung:** LKW wird Zugmaschine (`swapTractor`, Werkstätten aus dem Van ziehen ins Rig oder auf den Schrottplatz), der Van bleibt als Basis (`save.base`), im Camp steht vorne der LKW (Bild der Zugmaschine, der Lagerplatz rückt nach rechts). Crawler/Fatbird: `save.megarigs`.
+- **Questlog:** jede offene Bergung als Zeile mit Abschnitten, Fortschritt, Fundorten; „Verfolgen“ macht die Zielzeile zum nächsten Teil („LKW: Fahrwerk · Felge 0/2 · Mile 7 Gas & Go“).
+- **Neuer Durchgang:** Eingebautes und fertige Bergungen bleiben, der LKW zieht weiter, Fundorte werden neu gewürfelt.
+- **Achievements:** „Wieder auf der Straße“ (LKW, Trophäe Chromfelge, +10 Leben) und versteckt „Für die 1 %“ (Crawler und Fatbird, Trophäe Logbuch der Giganten, +10 % Schaden, +5 % Krit). Zähler `salvage` (Filter Projekt, `tractor`, `megarig`).
+- **Prüfen:** `node --test test/salvage.test.js` (7), `node tools/salvage_test.mjs [--shots]` (7, Bilder `output/salvage_*.png`).
+
 ## Offen
 
 - ⚠️ Crawler/Fatbird aus Code, bis die Kachel-Sets kommen (frühestens nach dem PixelLab-Reset am 07.12., nur mit Daniels Freigabe).
-- Bau-Modus für Mega-Rigs, Budgets, Crew, Bergungs-Zustände je Segment: noch nicht.
+- Mega-Rigs im Spiel fahren (Bau-Modus, Budgets, Crew, Ladebucht), Fahrzeug-Skilltrees und Heavy-Duty-Werkbank: noch nicht. Freigeschaltete Mega-Rigs stehen nur in `save.megarigs`.
+- ⚠️ Der Van als Basis ist nur vermerkt (Karte „BASIS“), am Fundort steht er noch nicht sichtbar.

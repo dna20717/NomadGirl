@@ -2072,5 +2072,29 @@
   "look": "icons_salvage",
   "icon": 13,
   "description": "Werkzeugkiste eines Fernfahrers. Alles drin, was man für eine Panne braucht."
+ },
+ "chromfelge": {
+  "name": "Chromfelge",
+  "category": "valuable",
+  "size": [2, 2],
+  "stack": 1,
+  "value": 0,
+  "glyph": "🛞",
+  "description": "Die erste Felge des LKW, auf Hochglanz poliert. Erinnert dich daran, wo alles angefangen hat.",
+  "tags": ["trophy"],
+  "look": "icons_salvage",
+  "icon": 0
+ },
+ "logbuch_giganten": {
+  "name": "Logbuch der Giganten",
+  "category": "valuable",
+  "size": [2, 2],
+  "stack": 1,
+  "value": 0,
+  "glyph": "📓",
+  "description": "Die Bordrechner von Crawler und Fatbird, verkabelt zu einem Logbuch. Nur ein Prozent kommt so weit.",
+  "tags": ["trophy"],
+  "look": "icons_salvage",
+  "icon": 12
  }
 }

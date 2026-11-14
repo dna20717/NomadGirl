@@ -735,5 +735,27 @@
   "discovery": ["start"],
   "weapon": "machete",
   "slots": [{"slot": "klinge"},{"slot": "griff"}]
+ },
+ "trophaee_chromfelge": {
+  "name": "Chromfelge",
+  "station": "werkbank",
+  "ingredients": [{"item": "felge", "count": 1},{"item": "schrauben", "count": 4}],
+  "result": "chromfelge",
+  "count": 1,
+  "time": 45,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Wieder auf der Straße“"
+ },
+ "trophaee_logbuch_giganten": {
+  "name": "Logbuch der Giganten",
+  "station": "werkbank",
+  "ingredients": [{"item": "bordrechner", "count": 1},{"item": "kabelbaum", "count": 2}],
+  "result": "logbuch_giganten",
+  "count": 1,
+  "time": 60,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Für die 1 %“"
  }
 }

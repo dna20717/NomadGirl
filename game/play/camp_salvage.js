@@ -3,6 +3,8 @@
 // test start. Mixed into Camp like CampLife and CampActions.
 import { here, progress, missing, install, finish, sstate } from '../salvage.js';
 import { advance, clockText, swapTractor } from '../save.js';
+import { buildMegarig } from '../../engine/megarig.js';
+import { MegarigView } from './megarig_view.js';
 
 const col = c => parseInt(String(c).slice(1), 16);
 const lerp = (a, b, t) => { const A = col(a), B = col(b), m = (s) => Math.round(((A >> s) & 255) + ((((B >> s) & 255) - ((A >> s) & 255)) * t)); return (m(16) << 16) | (m(8) << 8) | m(0); };
@@ -21,7 +23,8 @@ export class CampSalvage {
     if (x.look && s.textures.exists(x.look)) {
       const im = s.add.image(mid, ground + (gear ? 0 : 0.35 * T), x.look).setOrigin(0.5, 1).setScale(x.scale || 4).setDepth(-3.2).setTint(tint).setAngle(gear ? 0 : -3);
       this.wreckArt.push(im);
-    } else this.wreckArt.push(this.wreckCode(x.art || 'crawler', mid, ground, x1 - x0, tint, t));
+    } else if (x.megarig && D.megarigs?.[x.megarig]) this.wreckArt.push(...this.wreckRig(x.megarig, x0, x1, ground, t));
+    else this.wreckArt.push(this.wreckCode(x.art || 'crawler', mid, ground, x1 - x0, tint, t));
     // sand drift in front, scattered parts while it is not finished
     const sand = s.add.graphics().setDepth(-3);
     sand.fillStyle(0xbb7547, 0.95).fillEllipse(mid - (x1 - x0) * 0.25, ground + 6, (x1 - x0) * 0.55 * (1 - t * 0.7), 46);
@@ -41,6 +44,24 @@ export class CampSalvage {
     // the first time here: what Leyla says
     const S = sstate(save);
     if (!S.seen[id]) { S.seen[id] = true; this.box.persist?.(); s.time.delayedCall(1800, () => s.hud.toast(`Ein Wrack: ${x.name}`, x.text || 'Das könnte man wieder flottmachen.', 'drama', 6000)); }
+  }
+
+  // a mega rig as a wreck: its real drawing (megarig_view.js, first stage) scaled into the wreck's width, sunk, tilted, rusty
+  wreckRig(mid, x0, x1, ground, t) {
+    const s = this.scene, T = s.T, b = buildMegarig(this.D, mid, 0);
+    if (!b) return [];
+    const before = new Set(s.children.list);
+    new MegarigView(s, b, T, { id: mid });
+    const made = s.children.list.filter(o => !before.has(o)).sort((a, c) => (a.depth || 0) - (c.depth || 0));
+    const k = (x1 - x0) / (b.len * T), air = b.kind === 'airship';
+    // a wreck lies on the ground: the airship's hover height goes away, both sink into the sand
+    const sink = (1 - t) * 0.5 * T + (air ? b.pieces[0].under * T * k : 0);
+    // turn around the bottom middle (an inner container shifts the vehicle so its ground line runs through the pivot)
+    const inner = s.add.container(-(b.x0 + b.len / 2) * T, -b.G * T, made);
+    const box = s.add.container((x0 + x1) / 2, ground + sink, [inner]).setScale(k).setDepth(-3.25).setAngle(t >= 1 ? 0 : air ? 2 : -1.5);
+    const rust = s.add.graphics().setDepth(-3.2).setBlendMode(Phaser.BlendModes.MULTIPLY);
+    rust.fillStyle(0x8e5252, 0.55 * (1 - t)).fillRect(x0 - 40, ground - 40 * T * k, x1 - x0 + 80, 40 * T * k);
+    return [box, rust];
   }
 
   // wrecks without a picture: a buried crawler (cab, track, toppled containers) or a collapsed airship (empty envelope, rotor)

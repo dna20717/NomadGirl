@@ -97,6 +97,7 @@ export class PlayScene extends Phaser.Scene {
       for (const c of Object.values(this.data_.rigParts || {})) if (c.look) ids.add(c.look);
       for (const x of Object.values(this.data_.salvage || {})) if (x.look) ids.add(x.look);   // wrecks (#023)
       for (const t of Object.values(this.data_.tractors || {})) if (t.look) ids.add(t.look);   // the tractor in front (the salvaged LKW)
+      for (const a of Object.values(this.data_.rigAddons || {})) if (a.look) ids.add(a.look);   // mega rig wrecks wear add-ons
       // workshop pictures (and the empty shelf), the crate for packed workshops
       for (const w of Object.values(this.data_.workshops || {})) for (const id of [w.look, w.lookEmpty, w.garden?.plants]) if (id) ids.add(id);
       { const T = this.data_.tank || {}; for (const p of T.phases || []) for (const id of [p.look, p.anim, p.hand]) if (id) ids.add(id); if (T.deadLook) ids.add(T.deadLook); }   // the cryo tank in all its phases (tank_view.js)

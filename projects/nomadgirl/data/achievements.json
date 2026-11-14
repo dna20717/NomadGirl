@@ -125,5 +125,28 @@
   "target": 1,
   "recipe": "trophaee_traumfaenger",
   "bonus": [{"stat": "health", "value": 10}]
+ },
+ "wieder_auf_der_strasse": {
+  "name": "Wieder auf der Straße",
+  "category": "story",
+  "counter": "salvage",
+  "target": 1,
+  "bonus": [{"stat": "health", "value": 10}],
+  "description": "Berge den LKW.",
+  "order": 20,
+  "filter": "tractor",
+  "recipe": "trophaee_chromfelge"
+ },
+ "fuer_die_1_prozent": {
+  "name": "Für die 1 %",
+  "category": "story",
+  "counter": "salvage",
+  "target": 2,
+  "bonus": [{"stat": "damage", "value": 10},{"stat": "crit", "value": 5}],
+  "description": "Berge den Crawler und den Fatbird.",
+  "order": 21,
+  "hidden": true,
+  "filter": "megarig",
+  "recipe": "trophaee_logbuch_giganten"
  }
 }

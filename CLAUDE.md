@@ -121,7 +121,7 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 - `docs/features/achievements.md`: Achievements & Trophäen (#012), Rezepte automatisch lernen.
 - `docs/features/crafting.md`: Kochen & Craften: Rezeptbuch, Experimentieren, Zettel, Essen, Gegenstände aus den Symbolen.
 - `docs/features/camp.md`: Camp: Puppenhaus-Rig, Lagerfeuer, Tag/Nacht, Kiste, Ton, Schacht, Run-Loop, E-Punkte nach Ebene.
-- `docs/features/megarigs.md`: Mega-Rigs (#022): LKW, Crawler, Fatbird, Raster, Anbauteile, Prototyp /megarig.
+- `docs/features/megarigs.md`: Mega-Rigs + Bergung (#022/#023): Raster, Wracks, Teile, /megarig.
 - `docs/features/rig.md`: Rig bauen: Bau-Modus, Stauraum, Rig-Teile, Stapeln, Hochseecontainer, Fahrgestell, Start-Rig, alte Spielstände.
 - `docs/features/benches.md`: Werkstätten im Rig: Bilder mit Licht & Effekten, Füllstand, Benutzen, Gästekoje, Schatzkammer, Hydrokultur.
 - `docs/features/progression.md`: Progression: Cryo-Tank, k.o. neu, Techtree, Durchgang / Traum, Zerlegen, voller Tresor.

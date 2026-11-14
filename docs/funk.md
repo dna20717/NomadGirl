@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #023 fertig: Bergungsprojekte LKW, Crawler, Fatbird mit Teilen aus POIs, Wrack im Camp, Questlog, Karte, LKW zieht das Rig. PixelLab 0, übrig 674. ⚠️ „Felgen“ als Bergungsteile gelesen, weitere ⚠️ im Ticket.
 - 15.11. Code → Ava: #023 Bergungsprojekte (LKW, Crawler, Fatbird, Quests, POIs, Felgen) läuft.
 - 15.11. Code → Ava: #022 fertig: Mega-Rigs als begehbarer Prototyp unter /megarig (LKW, Crawler, Fatbird, je 3 Stufen), Bereiche Mega-Rigs + Anbauteile, Erreichbarkeits-Prüfung. PixelLab 9, übrig 674. ⚠️ zum Absegnen im Ticket.
 - 14.11. Code → Ava: #022 Mega-Rigs (Baukasten + begehbarer Prototyp) läuft.
@@ -414,13 +415,19 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** Neue Bereiche **Mega-Rigs** + **Anbauteile** (RIG), `engine/megarig.js` (Raster → Layout, Erreichbarkeit), `game/play/megarig_view.js`, Seite `megarig.html` (Fahrzeug, Stufe −/+, Übersicht). Tests: `npm test` 138 (6 neu in `test/megarig.test.js`), `tools/megarig_test.mjs` 14 Prüfungen (27 Leitern bis oben). PixelLab: diesmal 9 (LKW auf Seitenansicht), übrig 674. **Bitte testen:** /megarig, alle drei Fahrzeuge, ganz nach oben klettern (Ausguck am Mast/Kran), in die Räume im Rumpf, „Übersicht“, Stufen durchschalten; in der Werkstatt RIG › Mega-Rigs ein Modul verschieben und neu laden.
 
 ### #023 Bergungsprojekte: LKW-Wrack, Crawler, Fatbird mit Quests, POIs und Teilen
-- **Status:** läuft (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, AFK: „Bau bitte den gesamten Themenbereich inklusive Quests und POI und Felgen mit ein“)
+- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, AFK: „Bau bitte den gesamten Themenbereich inklusive Quests und POI und Felgen mit ein“)
 - **Für:** Code
-- **Lesen:** design.md › Bergungsprojekt: der LKW, Endgame-Zugmaschinen; docs/features/megarigs.md
+- **Lesen:** design.md › Bergungsprojekt: der LKW, Endgame-Zugmaschinen; docs/features/megarigs.md › Bergungsprojekte
 - **Auftrag:** Bergungsprojekte als Daten (Abschnitte mit Teilen), Wrack am gewürfelten Ort, mehrfach hinfahren, Teile aus anderen POIs, Fortschritt sichtbar, Questlog mit fehlenden Teilen und Fundorten; danach Crawler und Fatbird als große Bergungen.
 - **Fertig, wenn:** LKW lässt sich vom Spielstart an bergen, Crawler/Fatbird freischaltbar, Werkstatt-Bereich, Tests grün, Build grün.
 - **Rückfragen:**
-- **Ergebnis:**
+  - „Felgen“ → ⚠️ als Bergungsteile gelesen (Felge, Reifen, Achse … fürs Fahrwerk). Falls Fahrzeug-Skilltrees o. Ä. gemeint war: neues Ticket.
+  - Abschnitte LKW → ⚠️ Freilegen (Bordwerkzeug, Schrauben) → Fahrwerk (2 Felgen, 2 Reifen, Achse) → Motor (Motorblock, 2 Kabelbäume, Autobatterie) → Kabine & Tank (3 Schrottplatten, 2 Dieselkanister, Auspuff) → Probestart (ohne Drehzahl-Moment, kommt später).
+  - Fundorte → ⚠️ LKW 1–2 Straßen vom Start, Crawler 3–4, Fatbird 3–5; Teile in den Kisten ihrer Fundort-POIs (LKW 35 %, Mega-Rigs 25 %), im Tresor sicher eins.
+  - Zugmaschine tauschen → ⚠️ Werkstätten aus dem Van ziehen in freie Plätze oder auf den Schrottplatz; der LKW steht im Camp vorne (Bild gespiegelt), der Lagerplatz rückt nach rechts; der Van als Basis ist nur auf der Karte („BASIS“), noch nicht sichtbar am Ort.
+  - Crawler/Fatbird freigeschaltet → ⚠️ nur `save.megarigs` + Achievement, fahren/bauen kommt mit dem nächsten Schritt (Bau-Modus, Budgets, Crew, Skilltrees).
+  - Achievements → ⚠️ „Wieder auf der Straße“ (Chromfelge, +10 Leben) und versteckt „Für die 1 %“ (Logbuch der Giganten, +10 % Schaden, +5 % Krit); Trophäen-Symbole aus dem Bergungs-Raster.
+- **Ergebnis:** `game/salvage.js`, `game/play/camp_salvage.js`, Bereich Bergungsprojekte, 14 Teile + 2 Trophäen + 2 Achievements, Karte, Questlog, POI-Kisten. Tests: `npm test` 145 (7 neu in `test/salvage.test.js`), `tools/salvage_test.mjs` 7, `megarig_test` 14, Camp/Bau/Karte/Spiel/Achievements grün. PixelLab: 0, übrig 674. **Bitte testen:** neues Spiel, Questlog › Der LKW verfolgen, Karte (WRACK-Marke), zum Wrack fahren, E am Wrack, Teile in Mile 7 sammeln, einbauen, Probestart → LKW vorne am Rig; danach Crawler-/Fatbird-Wrack anschauen.
 
 ## Archiv
 
