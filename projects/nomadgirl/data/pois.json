@@ -16,7 +16,8 @@
   "description": "Die letzte Tankstelle vor der Salzebene. Der Kaffee ist furchtbar.",
   "tunnelTerrain": "metal",
   "tunnelAtmosphere": "tunnel_blau",
-  "curve": "30, 75, 20, 90, 100"
+  "curve": "30, 75, 20, 90, 100",
+  "gang": {"name": "Gelbe Geier", "color": "Gelb", "motto": "Wer tankt, zahlt. Wer nicht zahlt, tankt Blei."}
  },
  "grossmarkt": {
   "name": "Großmarkt Delta-Süd",
@@ -33,7 +34,8 @@
   "tunnelAtmosphere": "tunnel_blau",
   "description": "Ein Konsumtempel am Stadtrand, halb eingestürzt. Die Rolltreppen laufen nicht mehr, die Kakerlaken schon.",
   "branchChance": 70,
-  "curve": "35, 80, 25, 70, 30, 95, 100"
+  "curve": "35, 80, 25, 70, 30, 95, 100",
+  "gang": {"name": "Neon-Ratten", "color": "Magenta", "motto": "Alles muss raus. Du zuerst."}
  },
  "bunker_13": {
   "name": "Bunker 13",
@@ -50,7 +52,8 @@
   "tunnelAtmosphere": "bunker_reaktor",
   "description": "Zone 13. Gebaut für den Krieg, der nie kam. Irgendwer hält die Notbeleuchtung am Laufen.",
   "branchChance": 70,
-  "curve": "40, 85, 30, 90, 35, 100"
+  "curve": "40, 85, 30, 90, 35, 100",
+  "gang": {"name": "Rostgarde", "color": "Orange", "motto": "Der Bunker hält. Wir halten den Bunker."}
  },
  "ministerium": {
   "name": "Ministerium für Ordnung",
@@ -67,6 +70,7 @@
   "tunnelTerrain": "marble",
   "tunnelAtmosphere": "ministerium_kalt",
   "branchChance": 65,
-  "curve": "30, 70, 25, 85, 40, 100"
+  "curve": "30, 70, 25, 85, 40, 100",
+  "gang": {"name": "Ordnungsamt", "color": "Cyan", "motto": "Bitte ziehen Sie eine Nummer. Sie werden erschossen."}
  }
 }

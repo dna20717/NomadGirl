@@ -654,6 +654,9 @@ export const AREAS = {
         num('counter.cover', 'Sucht Deckung', { unit: '%', min: 0, max: 100, hint: 'Daniel, 13.11.2026 (#014): Raider suchen Deckung hinter Kisten. Chance, im Kampf hinter eine nahe Kiste zu laufen; dort duckt er sich und taucht nur zum Schießen auf. Kisten halten Schüsse auf' }),
         num('counter.coverRange', 'Deckung bis', { unit: 'px', min: 0, hint: 'So weit läuft er höchstens zu einer Kiste. Leer = 420' }),
         num('counter.coverTime', 'Bleibt unten', { unit: 'ms', min: 0, hint: 'So lange zwischen zwei Schüssen geduckt. Leer = 1400' })] },
+      { title: 'Boss', when: x => x.behavior === 'boss', fields: [table('boss.phases', 'Phasen', [num('at', 'ab Leben', { unit: '%', min: 0, max: 100 }), text('say', 'Ruft'), num('speed', 'schneller', { unit: '%' }), num('windup', 'kürzer ausholen', { unit: '%', min: 0, max: 90 }), num('adds', 'Verstärkung', { min: 0 }), bool('wave', 'Bodenwelle')],
+          { hint: '#016: fällt sein Leben unter „ab Leben“, brüllt er, wird schneller, holt kürzer aus, ruft Verstärkung (schwächere Gegner des POIs, in Gang-Farbe) und schlägt ab dann nach jedem Hieb eine Bodenwelle in beide Richtungen, über die Leyla springen muss' }),
+        num('boss.waveSpeed', 'Bodenwelle Tempo', { unit: 'px/s', min: 0, hint: 'Leer = 620' }), num('boss.waveDamage', 'Bodenwelle Schaden', { unit: '%', min: 0, hint: 'Anteil seines Schadens. Leer = 60' })] },
       { title: 'Beute', fields: [ref('loot', 'Beutetabelle', 'lootTables'), range('deltas', 'Deltas', { unit: 'Δ' }), bool('countsForRanking', 'Zählt für Kills %'),
         num('dropWeapon', 'Lässt seine Waffe fallen', { unit: '%', min: 0, max: 100, hint: '#004: Chance, dass seine Waffe (Werte › Waffe) mit der Beute liegt, damit Leyla sie benutzen kann. Leer = 0' })] },
     ],
@@ -1116,6 +1119,7 @@ export const AREAS = {
     sections: [
       { title: 'POI', fields: [NAME, LOOK, select('kind', 'Art', POI_KINDS), select('size', 'Größe', POI_SIZES), num('danger', 'Gefahr', { min: 1, max: 5 }), DESCRIPTION] },
       { title: 'Aufbau', fields: [range('roomCount', 'Räume', { hint: 'Wie viele Räume zusammengesetzt werden' }), refs('rooms', 'Raum-Bausteine', 'rooms'), refs('enemies', 'Gegner', 'enemies', { hint: 'Für das Zeichen 1 im Layout: ein zufälliger dieser Gegner' }), ref('loot', 'Kisten-Beute', 'lootTables', { hint: 'Für Kisten (C) in den Räumen' }), ref('vault', 'Tresor-Beute', 'lootTables', { hint: 'Liegt im Tresor am Ziel (Z), dazu je 10 % Rang-Bonus ein Extra-Wurf. Leer = Tabelle „tresor“' })] },
+      { title: 'Gang', fields: [text('gang.name', 'Name', { hint: '#016: Wem dieser Ort gehört. Steht beim Betreten als Toast („Revier der …“)' }), text('gang.color', 'Gang-Farbe', { hint: 'Name einer Gang-Farbe aus dem Gegner-Bausatz (Magenta, Cyan, Orange, Gelb, Blutrot). Alle Plünderer aus dem Bausatz tragen hier diese Farbe (nicht Mutanten, nicht der Boss)' }), area_('gang.motto', 'Spruch')] },
       { title: 'Level', fields: [text('curve', 'Spannungskurve', { hint: 'Intensität in % vom Eingang bis zum Ausgang, mit Komma, z. B. „30, 70, 20, 85, 100“: so wahrscheinlich wird ein Zufallsgegner (1) in einem Raum auf dem Hauptweg gesetzt; unter 50 % nur die schwächere Hälfte der Gegner, ab 85 % die zähere. Seitenräume halb so laut. Leer = jede 1 ist ein Gegner' }), num('branchChance', 'Abzweige', { unit: '%', min: 0, max: 100, hint: 'Chance je Abzweig-Haken (A in der Decke eines Hauptraums), dass ein Seitenraum (Merkmal Beute/Geheimnis, A im Boden) darüber hängt. Leer = 60' }),
         bool('shortcut', 'Abkürzung zum Van', { hint: 'Tunnel unter allen Räumen: v im Boden des Ausgangs → ^ im Boden des Eingangs. Aus = kein Tunnel. Leer = an' }),
         ref('tunnelTerrain', 'Kachel-Set im Tunnel', 'terrain', { hint: 'Wände und Rückwand der Abkürzung. Leer = Kachel-Set des Eingangs' }),
@@ -1125,6 +1129,7 @@ export const AREAS = {
       { title: 'Leben', fields: [bool('npcs', 'NPCs vor Ort'), bool('foodtruck', 'Foodtruck-Verkauf möglich'), bool('shop', 'Händler')] },
     ],
     check: (x, report, p, id) => {
+      if (x.gang?.color && !Object.values(p.data.kits || {}).some(K => (K.gangs || []).some(g => g.name === x.gang.color))) report('warning', `Gang-Farbe „${x.gang.color}“ gibt es in keinem Gegner-Bausatz`);
       const R = p.data.rooms || {};
       if (!(x.rooms || []).some(r => R[r]?.tags?.includes('start'))) report('warning', 'Kein Raum mit Eingang');
       if (!(x.rooms || []).some(r => R[r]?.tags?.includes('exit'))) report('warning', 'Kein Raum mit Ausgang');

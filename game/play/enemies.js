@@ -50,7 +50,10 @@ export class Enemy {
     this.bar = scene.add.graphics().setDepth(15);
     this.warn = scene.add.text(0, 0, '!', { fontFamily: 'VT323, monospace', fontSize: '72px', color: '#ff4060', stroke: '#0d0a12', strokeThickness: 8 }).setOrigin(0.5, 1).setDepth(16).setVisible(false);
     this.aim = scene.add.graphics().setDepth(7);
-    this.hp = def.health ?? 30;
+    this.hp = def.health ?? 30; this.maxHp = this.hp;
+    // boss phases (#016, Gegner › Boss): below a share of its life it roars, gets faster, winds up shorter, calls help, sends waves
+    this.phases = this.kind === 'boss' ? [...(def.boss?.phases || [])].sort((a, b) => (b.at ?? 0) - (a.at ?? 0)) : [];
+    this.phase = 0; this.waves = false;
     this.state = 'patrol'; this.facing = -1; this.home = { x: feet[0], y: feet[1] - bodyH / 2 };
     this.readyAt = 0; this.stunUntil = 0; this.barUntil = 0; this.lastSeen = -1e9; this.lastKnown = null; this.seeing = false;
     this.senseAt = 0; this.dodgeReady = 0; this.dodged = new WeakSet(); this.turnAt = 0; this.until = 0;
@@ -321,6 +324,7 @@ export class Enemy {
     }
     if (k === 'drop') { b.allowGravity = true; b.setVelocity(0, 200); this.onCeiling = false; this.until = time + 2000; return; }
     this.until = time + (k === 'lunge' ? 180 : 120);
+    if (this.waves) this.scene.time.delayedCall(k === 'lunge' ? 200 : 120, () => this.alive && this.wave());
     this.scene.fx.slash(this.x + this.facing * 20, this.feet - this.h * 0.55, this.facing, (this.weapon?.range ?? 80), 0xff9a7a);
   }
   // the ambusher hits the floor: splash around it, then it fights like a charger
@@ -476,6 +480,42 @@ export class Enemy {
     if (['windup', 'patrol', 'alert', 'search'].includes(this.state)) { this.state = 'engage'; this.readyAt = Math.max(this.readyAt, time + 350); }
     if (!this.C.shield || this.guardOpen) this.facing = -dir || this.facing;
     if (this.hp <= 0) this.die(time, dir);
+    else while (this.phase < this.phases.length && this.hp / this.maxHp * 100 <= (this.phases[this.phase].at ?? 0)) this.enterPhase(time, this.phases[this.phase++]);
+  }
+
+  // ---------- boss ----------
+  enterPhase(time, P) {
+    const s = this.scene;
+    this.state = 'stagger'; this.until = time + 700; this.stunUntil = time + 700; this.readyAt = time + 900;
+    this.d = { ...this.d, speed: Math.round((this.d.speed ?? 180) * (1 + (P.speed ?? 0) / 100)) };
+    this.a = { ...this.a, windup: Math.round((this.a.windup ?? 450) * (1 - Math.min(90, P.windup ?? 0) / 100)), cooldown: Math.round((this.a.cooldown ?? 900) * (1 - Math.min(90, P.windup ?? 0) / 200)) };
+    if (P.wave) this.waves = true;
+    s.cam.shake(420, 0.012); s.fx.flash?.(this.x, this.chest, 0xff4060, 60);
+    s.fx.text(this.x, this.body.top - 60, P.say || 'RAAAH!', { color: '#ff4060', size: 64, rise: 60 });
+    this.sprite.setTintFill(0xff4060); s.time.delayedCall(160, () => this.alive && this.sprite.clearTint());
+    // help: the weaker enemies of this POI, left and right of the boss, in the gang's colour
+    const n = P.adds ?? 0, pool = this.helpers();
+    for (let i = 0; i < n && pool.length; i++) {
+      const side = i % 2 ? 1 : -1, col = Math.round((this.x + side * (260 + 90 * Math.floor(i / 2))) / s.T - 0.5), row = Math.round(this.feet / s.T) - 1;
+      const id = pool[i % pool.length];
+      s.time.delayedCall(250 + i * 180, () => { if (!this.alive) return; const e = s.addEnemy(id, col, row); if (e) { const en = s.enemies.at(-1); en.state = 'engage'; en.lastSeen = s.now; en.lastKnown = { x: s.leyla.x, y: s.leyla.chest, at: s.now }; s.fx.puff?.(en.x, en.feet, 0xc0a080); } });
+    }
+    s.hud?.toast?.(`${this.d.name || 'Boss'} wird wütend`, P.adds ? `Verstärkung: ${P.adds}` : '', 'warn', 2400);
+  }
+  helpers() {
+    const D = this.scene.data_, poi = this.scene.box?.save?.run?.poi || Object.keys(D.pois || {}).find(k => (D.pois[k].enemies || []).includes(this.id)), list = (D.pois?.[poi]?.enemies || []).filter(id => D.enemies?.[id] && D.enemies[id].behavior !== 'boss' && D.enemies[id].kit);
+    return list.sort((a, b) => (D.enemies[a].health ?? 30) - (D.enemies[b].health ?? 30)).slice(0, 2);
+  }
+  // a wave along the floor in both directions: jump over it (combat shots, so walls stop it)
+  wave() {
+    const s = this.scene, B = this.d.boss || {}, v = B.waveSpeed ?? 620, dmg = Math.max(1, Math.round((this.d.damage ?? 20) * (B.waveDamage ?? 60) / 100)), y = this.feet - 22;
+    if (!s.textures.exists('boss_wave')) {
+      const g = s.make.graphics({ x: 0, y: 0, add: false });
+      g.fillStyle(0xff4060, 0.35).fillEllipse(32, 22, 64, 30); g.fillStyle(0xffd27a, 0.9).fillEllipse(34, 24, 40, 14); g.fillStyle(0xffffff, 0.9).fillEllipse(38, 25, 16, 6);
+      g.generateTexture('boss_wave', 64, 36); g.destroy();
+    }
+    s.cam.shake(160, 0.006); s.fx.puff?.(this.x, this.feet, 0xc0a080);
+    for (const d of [-1, 1]) s.combat.spawn({ key: 'boss_wave', x: this.x + d * this.w * 0.6, y, vx: d * v, vy: 0, life: 1600, friendly: false, damage: dmg, knockback: 260, time: s.time.now, from: this, wave: true });
   }
 
   // ---------- ceiling (ambusher) ----------

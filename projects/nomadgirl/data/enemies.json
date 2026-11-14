@@ -135,7 +135,12 @@
   "kitHead": "gasmask",
   "kitSkin": "wie gemalt",
   "kitGang": "Cyan",
-  "height": 230
+  "height": 230,
+  "boss": {
+   "phases": [{"at": 60, "say": "RUHE IM FLUR!", "speed": 20, "windup": 25, "adds": 2, "wave": true},{"at": 30, "say": "FEIERABEND!", "speed": 20, "windup": 20, "adds": 2, "wave": true}],
+   "waveSpeed": 620,
+   "waveDamage": 60
+  }
  },
  "schildtraeger": {
   "name": "Plünderer mit Schild",

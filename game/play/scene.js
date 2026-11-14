@@ -552,7 +552,7 @@ export class PlayScene extends Phaser.Scene {
       this.box.save.health = this.leyla.health;
       this.box.save.run = { poi, room: null, seed: P.seed || 1 + Math.floor(Math.random() * 2 ** 31), location: this.box.save.location, danger: this.placeDanger(poi) };
       this.box.persist();
-      return this.restartAs({ mode: 'run', roomId: null, banner: [P.name || poi, 'Finde den Tresor · E am Van: zurück ins Camp'] }, 700);
+      return this.restartAs({ mode: 'run', roomId: null, banner: [P.name || poi, `${P.gang?.name ? `Revier: ${P.gang.name} · ` : ''}Finde den Tresor · E am Van: zurück ins Camp`] }, 700);   // #016 whose place this is
     }
     const ready = (P.rooms || []).filter(has);
     const room = ready.find(id => R[id].tags?.includes('start')) || ready[0] || [D.camp?.fallbackRoom, D.game?.testRoom].find(has);
@@ -615,9 +615,8 @@ export class PlayScene extends Phaser.Scene {
       for (let i = 0; i < n; i++) { const s = list[Math.floor(rnd() * this.room.spawns.length)]; list.push({ ...s, x: s.x + (rnd() < 0.5 ? -0.6 : 0.6), extra: true }); }
     }
     for (const s of list) {
-      let def = this.data_.enemies?.[s.enemy];
+      const def = this.enemyDef(s.enemy);
       if (!def) continue;
-      if (Th && (Th.health !== 1 || Th.damage !== 1)) def = { ...def, health: Math.round((def.health ?? 30) * Th.health), damage: Math.round((def.damage ?? 10) * Th.damage) };
       const e = new Enemy(this, s.enemy, def, [(s.x + 0.5) * T, (s.y + 1) * T]);
       this.physics.add.collider(e.box, this.solids);
       this.physics.add.collider(e.box, this.platforms, null, (box, plat) => e.body.velocity.y >= 0 && e.body.prev.y + e.body.height <= plat.body.top + 2);
@@ -634,8 +633,20 @@ export class PlayScene extends Phaser.Scene {
     this.lastNoise = { x: Math.round(x), y: Math.round(y), r };
   }
   // one more enemy at a tile (tests, nomad.spawn)
+  // an enemy as it fights here: danger of the place (#014) and the POI's gang colour (#016: plunderers from the kit wear it, not
+  // mutants, not the boss)
+  enemyDef(id) {
+    let def = this.data_.enemies?.[id];
+    if (!def) return null;
+    const Th = this.threat();
+    if (Th && (Th.health !== 1 || Th.damage !== 1)) def = { ...def, health: Math.round((def.health ?? 30) * Th.health), damage: Math.round((def.damage ?? 10) * Th.damage) };
+    const G = this.gang();
+    if (G?.color && def.kit && def.family === 'raider' && def.behavior !== 'boss') def = { ...def, kitGang: G.color };
+    return def;
+  }
+  gang() { const poi = (this.mode === 'run' && this.box?.save?.run?.poi) || this.level?.poi; return poi ? this.data_.pois?.[poi]?.gang || null : null; }
   addEnemy(id, col, row) {
-    const def = this.data_.enemies?.[id], T = this.T;
+    const def = this.enemyDef(id), T = this.T;
     if (!def) return null;
     const e = new Enemy(this, id, def, [(col + 0.5) * T, (row + 1) * T]);
     this.physics.add.collider(e.box, this.solids);

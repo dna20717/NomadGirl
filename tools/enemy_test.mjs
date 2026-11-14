@@ -182,6 +182,18 @@ check('Flieger: kommt über sie und schießt', kinds.fly.fired > 0 && kinds.fly.
 check('Schütze: ohne Sichtlinie kein Schuss', kinds.blind.shots === 0, kinds.blind);
 function A_FLOOR() { return 15 * 64 - 150; }
 
+// boss (#016): below 60 % the Hausmeister roars, gets faster, winds up shorter, calls two helpers and sends floor waves
+{
+  const v = await ev(() => { nomad.restart(); const s = game.scene.getScene('play'); nomad.calm();
+    nomad.spawn('hausmeister', 14, 14); const e = s.enemies.at(-1), sp = e.d.speed, wu = e.a.windup ?? 450; nomad.tpTile(8, 14); nomad.step(20);
+    const n0 = s.enemies.filter(x => x.alive).length;
+    e.hit(s.now, Math.ceil(e.maxHp * 0.45), 0, 1, false, { kind: 'melee', heavy: true }); nomad.step(80);
+    const out = { phase: e.phase, faster: e.d.speed > sp, shorter: e.a.windup < wu, added: s.enemies.filter(x => x.alive).length - n0 };
+    e.release(s.now, s.leyla); nomad.step(20); out.waves = s.combat.shots.filter(x => x.wave).length;
+    return out; });
+  check('Boss: Phase 2 unter 60 % (schneller, kürzer ausholen, 2 Helfer, Bodenwelle in beide Richtungen)', v.phase === 1 && v.faster && v.shorter && v.added === 2 && v.waves === 2, v);
+}
+
 if (shots) {
   fs.mkdirSync('output', { recursive: true });
   await ev(() => { nomad.restart(); A.s.leyla.invulnerableUntil = 1e12; nomad.tp(40 * 64, 960); nomad.step(90); nomad.freeze(); });
