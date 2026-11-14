@@ -94,6 +94,17 @@ v = await ev(() => { SC().hud.closeMenu(); nomad.step(200); SC().drone.react('ki
 check('Optionen: Lektionen abschalten, dann kommt keine Karte mehr', v.m.some(x => /Lektionen beim ersten Mal: an/.test(x)) && v.off && !v.open, v);
 await ev(() => TU().setOff(false));
 
+// #016: in the run a lesson is a tip in the corner, the game keeps running; „Mehr“ opens the card
+await ev(() => { TU().setSessionOff(false); TU().events.clear(); nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(4); nomad.choose('Plündern'); nomad.release(); });
+await page.waitForFunction(() => { const s = game.scene.getScene('play'); return s?.mode === 'run' && s.leyla; }, null, { timeout: 40000 });
+await page.waitForTimeout(800);
+v = await ev(() => { nomad.take(); const r = nomad.until(() => !!TU().state().tip, 4000, []); const st = TU().state(); const x = SC().leyla.x; nomad.step(30, ['right']);
+  return { tip: st.tip, open: st.open, moved: SC().leyla.x !== x, shown: !document.querySelector('.tut-tip')?.hidden, text: document.querySelector('.tut-tip b')?.textContent || '' }; });
+check('Run: Lektion als Tipp in der Ecke, das Spiel läuft weiter', !!v.tip && !v.open && v.moved && v.shown && !!v.text, v);
+v = await ev(() => { document.querySelector('.tut-tip-more')?.click(); nomad.step(2); return TU().state(); });
+check('Tipp › „Mehr“ öffnet die volle Karte', v.open && v.view === 'card' && !v.tip, v);
+await ev(() => { TU().close(); });
+
 // the workshop shows the lessons and plays a clip
 await page.goto('http://localhost:8766/workshop.html');
 await page.waitForFunction(() => window.workshop?.p?.data, null, { timeout: 20000 });

@@ -29,6 +29,9 @@ export class Tutorial {
     this.events = new Map(); this.lastClose = -1e9; this.queue = []; this.winOpen = null; this.winShown = null;
     this.el = el('div', { class: 'tut', hidden: true, onclick: e => { if (e.target === this.el) this.close(); } });
     root.append(this.el);
+    // #016: in the run a lesson comes as a small tip in the corner that does not stop the game; a click opens the full card
+    this.tipEl = el('div', { class: 'tut-tip', hidden: true });
+    root.append(this.tipEl);
     // the keyboard while a card or the guide is open: our own keys first (before the windows and the game below see them)
     window.addEventListener('keydown', e => {
       if (!this.isOpen) return;
@@ -58,8 +61,10 @@ export class Tutorial {
   poll(now) {
     const s = this.scene, hud = this.host.hud;
     for (const [k, at] of this.events) if (now - at > 8000) this.events.delete(k);   // an event counts for a few seconds
-    if (!s || this.isOpen || !this.enabled) return;
-    if (this.mode !== s.mode || this.sceneId !== s.sys.settings.key + (s.roomId || '') + (s.level ? 'L' : '')) { this.mode = s.mode; this.sceneId = s.sys.settings.key + (s.roomId || '') + (s.level ? 'L' : ''); this.modeAt = now; }
+    if (this.tip && now < this.tip.at) { this.tip.until = now + (this.tip.until - this.tip.at); this.tip.at = now; }   // the scene clock started again
+    if (this.tip && (now >= this.tip.until || !this.enabled || s?.mode !== 'run')) this.hideTip(now);   // gone with time, outside the run, or off
+    if (!s || this.isOpen || this.tip || !this.enabled) return;
+    if (this.mode !== s.mode || this.sceneId !== s.sys.settings.key + (s.roomId || '') + (s.level ? 'L' : '')) { this.mode = s.mode; this.sceneId = s.sys.settings.key + (s.roomId || '') + (s.level ? 'L' : ''); this.modeAt = now; if (this.lastClose > now) this.lastClose = now - 2500; }   // a new scene starts its clock again
     if (now < (this.nextPoll || 0)) return;
     this.nextPoll = now + 250;
     if (hud.modal || hud.paused || s.leaving || s.dreaming || !s.leyla?.alive) return;
@@ -81,7 +86,10 @@ export class Tutorial {
     };
     const next = this.lessons.find(fits);
     if (next?.trigger === 'event') this.events.delete(next.on);
-    if (next && now - this.lastClose > 2500) { if (win) this.winShown = next.id; this.show(next.id); }
+    if (next && now - this.lastClose > 2500) {
+      if (win) this.winShown = next.id;
+      if (mode === 'run' && !win && this.D.game?.tutorial?.runTips !== false) this.showTip(next.id, now); else this.show(next.id);
+    }
   }
   // which window is open right now (for window triggers)
   window() {
@@ -162,6 +170,28 @@ export class Tutorial {
       closeX(() => this.close())));
     this.el.hidden = false; this.el.dataset.view = 'card';
   }
+  // ---------- the tip in the run (#016): no pause, goes by itself after Spiel › Tutorial › Tipp im Run (s) ----------
+  showTip(id, now) {
+    const l = this.lessons.find(x => x.id === id);
+    if (!l) return;
+    this.markSeen(id);
+    const A = this.D.assets || {}, url = x => A[x]?.file ? new URL(A[x].file, this.scene.base).href : null;
+    const pic = l.media === 'clip' ? (url(l.clip) ? el('video', { src: url(l.clip), autoplay: true, loop: true, muted: true, playsinline: true, oncanplay: e => { e.target.muted = true; e.target.play?.().catch(() => {}); } }) : null)
+      : (() => { const f = (l.slides || []).find(x => x.look && url(x.look)); return f ? el('img', { src: url(f.look), alt: '' }) : null; })();
+    const ch = TUT_CHAPTERS.find(([k]) => k === l.chapter)?.[1] || '';
+    this.tipEl.replaceChildren(
+      pic ? el('div', { class: 'tut-tip-pic' }, pic) : null,
+      el('div', { class: 'tut-tip-text' }, el('small', {}, icon('help', 12), ' Feldhandbuch · ', ch), el('b', {}, l.name || l.id), l.text ? el('p', {}, ...this.glyphs(l.text)) : null,
+        el('div', { class: 'tut-tip-foot' }, el('button', { class: 'tut-tip-more', onclick: e => { e.stopPropagation(); this.hideTip(this.scene?.now ?? 0); this.show(id); } }, 'Mehr'),
+          el('button', { class: 'tut-tip-off', onclick: e => { e.stopPropagation(); this.setSessionOff(true); this.hideTip(this.scene?.now ?? 0); } }, 'Für diese Sitzung aus'))),
+      el('span', { class: 'tut-tip-bar', style: `animation-duration:${(this.D.game?.tutorial?.tipSeconds ?? 9)}s` }));
+    this.tipEl.hidden = false;
+    this.tip = { id, at: now, until: now + (this.D.game?.tutorial?.tipSeconds ?? 9) * 1000 };
+  }
+  hideTip(now) {
+    if (!this.tip) return;
+    this.tipEl.hidden = true; this.tipEl.replaceChildren(); this.tip = null; this.lastClose = now;
+  }
   close() {
     if (!this.isOpen) return;
     this.el.hidden = true; this.el.replaceChildren(); this.slide = null; this.view = null;
@@ -209,5 +239,5 @@ export class Tutorial {
     if (a === 'up' || a === 'down') { this.pick = mine[(i + (a === 'down' ? 1 : -1) + mine.length) % mine.length]?.id; this.drawGuide(); }
     if (a === 'ok') this.go((this.slide?.i ?? 0) + 1);
   }
-  state() { return { open: this.isOpen, view: this.view || null, lesson: this.view === 'card' ? this.cur?.id : this.pick || null, chapter: this.chapter || null, seen: [...this.seen], slide: this.slide?.i ?? null, off: this.off, sessionOff: this.sessionOff }; }
+  state() { return { tip: this.tip?.id || null, open: this.isOpen, view: this.view || null, lesson: this.view === 'card' ? this.cur?.id : this.pick || null, chapter: this.chapter || null, seen: [...this.seen], slide: this.slide?.i ?? null, off: this.off, sessionOff: this.sessionOff }; }
 }

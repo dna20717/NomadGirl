@@ -708,6 +708,21 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .tut-list li.on { background: #2a2233; color: #ffd27a; border-color: #ffd27a; box-shadow: 0 0 10px rgba(255, 210, 122, .25); }
 .tut-list li.fresh::after { content: ''; margin-left: auto; width: 7px; height: 7px; border-radius: 50%; background: #3fe0d0; }
 @media (max-width: 760px) { .tut-body, .tut-main { grid-template-columns: 1fr; } .tut-list { max-height: 140px; } }
+.tut-tip { position: fixed; left: 20px; bottom: 64px; z-index: 30; display: flex; gap: 10px; width: min(460px, calc(100vw - 40px)); padding: 10px; border-radius: 12px; background: rgba(23, 17, 31, .9); border: 1px solid #3a2f45; box-shadow: 0 10px 30px rgba(0, 0, 0, .5); color: #f2eef7; overflow: hidden; animation: tut-tip-in .35s cubic-bezier(.2, .9, .3, 1.2); pointer-events: auto; }
+.tut-tip[hidden] { display: none; }
+@keyframes tut-tip-in { from { transform: translateX(-30px); opacity: 0; } to { transform: none; opacity: 1; } }
+.tut-tip-pic { flex: 0 0 150px; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #0d0a12; border: 1px solid #3a2f45; }
+.tut-tip-pic video, .tut-tip-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tut-tip-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.tut-tip-text small { color: #8a7d99; font-size: 11px; text-transform: uppercase; letter-spacing: .8px; display: flex; align-items: center; gap: 4px; }
+.tut-tip-text b { font: 22px/1 VT323, monospace; color: #ffd27a; }
+.tut-tip-text p { margin: 0; font-size: 13px; line-height: 1.45; color: #d8cfe2; }
+.tut-tip-text kbd { font-size: 11px; }
+.tut-tip-foot { display: flex; gap: 10px; margin-top: 2px; }
+.tut-tip-foot button { padding: 0; border: 0; background: none; color: #20d6c7; font: 12px var(--ui-font); cursor: pointer; }
+.tut-tip-foot .tut-tip-off { color: #8a7d99; }
+.tut-tip-bar { position: absolute; left: 0; bottom: 0; height: 2px; width: 100%; background: #ffd27a; transform-origin: left; animation: tut-tip-bar linear forwards; }
+@keyframes tut-tip-bar { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 .tut-mute { display: flex; align-items: center; gap: 8px; align-self: flex-start; color: #b9a2c8; font-size: 13.5px; cursor: pointer; user-select: none; }
 .tut-mute input { width: 17px; height: 17px; accent-color: #ffd27a; cursor: pointer; margin: 0; }
 .tut-steps { margin: 4px 0 0; padding: 0; list-style: none; counter-reset: st; display: flex; flex-direction: column; gap: 8px; }
