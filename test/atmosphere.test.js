@@ -53,7 +53,9 @@ test('Verhalten: ruhig = 1, kaputt meist dunkel, Pulsieren schwankt', () => {
 
 test('Tankstelle KM7: Räume haben ihre Atmosphäre, der Tunnel seine eigene, Lampen hängen', async () => {
   const p = await loadProject(nodeLoader(new URL('../projects/nomadgirl', import.meta.url).pathname));
-  const Dk = p.data, level = buildPoi(Dk, 'tankstelle_km7', 7), r = parseRoom(level.def);
+  // a seed whose level has all four classic rooms (#017: more rooms, so not every seed has them)
+  const Dk = p.data, has = l => ['vorplatz', 'verkaufsraum', 'lager', 'werkstatthalle'].every(id => l.rooms.some(x => x.id === id));
+  const level = [...Array(60).keys()].map(i => buildPoi(Dk, 'tankstelle_km7', i + 1)).find(has), r = parseRoom(level.def);
   const at = atmoRegions(Dk, r, { level, poiId: 'tankstelle_km7' });
   const of = id => { const q = level.rooms.find(x => x.id === id); return at(q.x + 3, q.y + q.h - 3).mood; };
   assert.equal(of('vorplatz'), 'wueste_draussen');
