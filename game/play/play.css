@@ -21,7 +21,11 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .hud-toasts { position: fixed; right: 24px; top: 110px; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; pointer-events: none; z-index: 40; }
 .hud-toast { display: flex; align-items: center; gap: 12px; padding: 10px 16px; min-width: 260px; max-width: 460px; border-radius: 10px; background: rgba(13, 10, 18, .9); border: 1px solid #3a2f45; color: #d8cfe2; animation: hud-toast-in .35s ease-out; transition: opacity .4s, transform .4s; }
 .hud-toast.out { opacity: 0; transform: translateX(30px); }
-.hud-windowed .hud-toasts { top: auto; bottom: 96px; flex-direction: column-reverse; }
+.hud-windowed .hud-toasts { top: 10px; right: auto; left: 50%; transform: translateX(-50%); align-items: center; z-index: 60; }
+.hud-windowed .hud-toast { min-width: 0; max-width: 420px; padding: 6px 12px; gap: 8px; box-shadow: 0 6px 20px rgba(0, 0, 0, .6); }
+.hud-windowed .hud-toast b { font-size: 22px; }
+.hud-windowed .hud-toast small { font-size: 12px; }
+.hud-windowed .hud-toast.out { transform: translateY(-16px); }
 .hud-toast b { display: block; font: 28px/1 VT323, monospace; font-weight: normal; color: #f2eef7; }
 .hud-toast small { display: block; margin-top: 3px; font-size: 13px; color: #b9a2c8; }
 .hud-toast.trophy { border-color: #c28d29; box-shadow: 0 0 18px rgba(255, 210, 122, .25); } .hud-toast.trophy svg, .hud-toast.trophy b { color: #ffd27a; }

@@ -287,7 +287,7 @@ export class Hud {
     const l = scene.leyla, max = l.maxHealth;
     // windows on top: the E prompt of the world waits (its key means „ok“ in the window)
     const hideP = !this.promptText || this.modal || !!this.inv?.isOpen || !!this.craft?.isOpen || !!this.tech?.isOpen || !!this.map?.isOpen;
-    this.root.classList.toggle('hud-windowed', !!(this.inv?.isOpen || this.craft?.isOpen || this.tech?.isOpen || this.map?.isOpen));   // toasts step down out of the big windows
+    this.root.classList.toggle('hud-windowed', !!(this.inv?.isOpen || this.craft?.isOpen || this.tech?.isOpen || this.map?.isOpen || this.quests?.isOpen || this.ach?.isOpen || this.tut?.isOpen || this.build?.active));   // #017: toasts move to the top centre, over the free middle of the window header, never over its buttons
     if (this.promptEl.hidden !== hideP) this.promptEl.hidden = hideP;
     this.healthBar.style.width = `${Math.max(0, l.health / max * 100)}%`;
     this.healthText.textContent = `${Math.ceil(l.health)}/${max}`;
