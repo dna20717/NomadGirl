@@ -878,3 +878,9 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .sum-btns .inv-btn small { margin-left: 6px; font-size: 12px; opacity: .8; }
 .sum-btns .inv-btn.on { outline: 2px solid #ffd27a; outline-offset: 2px; }
 @media (max-width: 760px) { .sum-head, .sum-cols { grid-template-columns: 1fr; } }
+
+/* #021: a comic panel on top of a menu (encounters on the way) */
+.hud-menuBox.pic { width: min(620px, 92vw); }
+.hud-menuPic { margin: -6px -6px 4px; border-radius: 10px; overflow: hidden; border: 2px solid #0d0a12; box-shadow: 0 0 0 1px #3a2f45, 0 8px 24px rgba(0, 0, 0, .5); transform: rotate(-0.6deg); animation: hud-pic-in .5s cubic-bezier(.2, .9, .3, 1.2); }
+.hud-menuPic img { display: block; width: 100%; aspect-ratio: 482 / 236; object-fit: cover; image-rendering: pixelated; }
+@keyframes hud-pic-in { from { transform: rotate(-3deg) scale(.92); opacity: 0; } to { transform: rotate(-0.6deg); opacity: 1; } }

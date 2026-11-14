@@ -48,3 +48,19 @@ test('Entscheidung: kostet und bringt, ausgegraut ohne Δ oder Gegenstand', () =
   assert.equal(have(D, s, 'panzertape'), n - 1); assert.ok(s.hour !== h || s.day > 1);
   const fuel = s.fuel; choose(D, s, D.encounters.liegengebliebener_lkw.options[1]); assert.ok(s.fuel > fuel);
 });
+
+// #021 English place names: an older map keeps its roads, visited places and dangers, only names and regions change
+test('Ortsnamen: alte Karte bekommt die neuen englischen Namen, Wege bleiben', async () => {
+  const { generateMap, ensureMap, NAMES_VERSION } = await import('../game/worldmap.js');
+  const map = generateMap(D, 4242, 1), old = JSON.parse(JSON.stringify(map));
+  for (const n of map.nodes) { n.name = 'Alter Name ' + n.id; n.region = 'Ödland'; }
+  delete map.names; map.visited = [map.nodes[0].id, map.nodes[3].id];
+  const save = { map, cycle: 1, location: map.nodes[3].id };
+  ensureMap(D, save);
+  assert.equal(save.map.names, NAMES_VERSION);
+  assert.deepEqual(save.map.edges, old.edges);
+  assert.deepEqual(save.map.visited, [old.nodes[0].id, old.nodes[3].id]);
+  assert.equal(save.location, old.nodes[3].id);
+  for (const n of save.map.nodes) { assert.ok(!/Alter Name|Ödland/.test(n.name + n.region), n.name); assert.equal(n.name, old.nodes.find(o => o.id === n.id).name); }
+  assert.equal(save.map.nodes.find(n => n.id === 'tankstelle_km7')?.name, 'Mile 7 Gas & Go');
+});

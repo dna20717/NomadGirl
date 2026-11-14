@@ -10,14 +10,14 @@
  "reveal": 2,
  "signs": 7,
  "kinds": [
-  {"poi": "tankstelle_km7", "weight": 4, "names": "Tankstelle Kilometer {km}|{brand}-Station {word}|Rasthof {word}|Autohof {word}"},
-  {"poi": "grossmarkt", "weight": 3, "names": "Großmarkt {word}|{brand}-Markt {word}|Einkaufszentrum {word}|Kaufhalle {region}"},
-  {"poi": "bunker_13", "weight": 2, "names": "Bunker {nr}|Schutzraum {word}|Silo {nr}|Depot {word}"},
-  {"poi": "ministerium", "weight": 1, "names": "Amt für {office}|Ministerium für {office}|Behörde {word}"}
+  {"poi": "tankstelle_km7", "weight": 4, "names": "Mile {km} Gas & Go|{brand} Station {word}|{word} Truck Stop|{word} Fuel Depot"},
+  {"poi": "grossmarkt", "weight": 3, "names": "{word} Megamall|{brand} Market {word}|{word} Plaza|{region} Outlet"},
+  {"poi": "bunker_13", "weight": 2, "names": "Bunker {nr}|{word} Shelter|Silo {nr}|{word} Depot"},
+  {"poi": "ministerium", "weight": 1, "names": "Bureau of {office}|Ministry of {office}|{word} Authority"}
  ],
- "words": "Sonnenhang, Salzkreuz, Dornfeld, Ostkehre, Krähenbucht, Blechhausen, Rostdorf, Funkenberg, Glutsenke, Kupferfeld, Sandbank, Neonhof, Staubwinkel, Schlackenau, Kesselgrund, Morgenrot, Drahtheide, Spiegelsee",
- "offices": "Ordnung, Wasser, Zukunft, Strahlenschutz, Heimat, Wiederaufbau, Rationen, Wetter",
- "regions": "Glasdünen, Ödland Süd, Salzebene, Schrottwüste, Krähental, Ostkehre, Delta-Ring, Vorstadt",
+ "words": "Sunhollow, Saltcross, Thornfield, East Bend, Crowbay, Tinhaven, Rustvale, Sparkridge, Emberpit, Copperfield, Ashfall, Neon Flats, Static Creek, Slagmoor, Chrome Hollow, Daybreak, Wireheath, Mirrorlake",
+ "offices": "Order, Water, Tomorrow, Radiation Control, Homeland, Reconstruction, Rations, Weather",
+ "regions": "Glass Dunes, South Badlands, Salt Flats, Scrap Desert, Crow Valley, East Bend, Delta Ring, The Outskirts",
  "brands": [
   {"id": "delta_petrol", "name": "Delta Petrol", "short": "Delta", "slogan": "Tank voll, Kopf frei.", "kind": "gasStation", "icon": 0, "color": "#fa6a0a", "weight": 3},
   {"id": "neon_nudel", "name": "Neon-Nudel", "short": "Neon", "slogan": "Heiß wie der Asphalt.", "kind": "mall", "icon": 1, "color": "#bc4a9b", "weight": 2},

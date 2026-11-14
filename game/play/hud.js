@@ -170,12 +170,13 @@ export class Hud {
   }
   // menu: { title, sub, items: [{ label, sub?, primary?, disabled?: reason, act }] }; keys W/S or ↑/↓, E/Enter/Leertaste, Esc, 1–9
   // onClose: called when the menu is closed without a choice (✕, Esc, B), e.g. an encounter on the road takes its default then
-  menu({ title, sub = '', items = [], onClose = null }) {
+  menu({ title, sub = '', items = [], onClose = null, image = null }) {
     this.modal = true; this.menuItems = items; this.menuTitle = title; this.menuOnClose = onClose;
     this.menuIndex = Math.max(0, items.findIndex(i => !i.disabled));
     this.menuButtons = items.map((it, i) => el('button', { class: 'hud-item' + (it.primary ? ' primary' : ''), disabled: !!it.disabled, onclick: () => this.choose(i), onmouseenter: () => this.focus(i) },
       el('kbd', {}, String(i + 1)), el('span', {}, el('b', {}, it.label), it.sub || it.disabled ? el('small', {}, [it.sub, it.disabled].filter(Boolean).join(' · ')) : null)));
-    this.menuEl.replaceChildren(el('div', { class: 'hud-menuBox ui-frame' }, el('h2', {}, title), sub ? el('p', {}, sub) : null, el('div', { class: 'hud-items' }, ...this.menuButtons),
+    // image (#021): a comic panel on top of the box, e.g. the road for the encounters on the way
+    this.menuEl.replaceChildren(el('div', { class: 'hud-menuBox ui-frame' + (image ? ' pic' : '') }, image ? el('div', { class: 'hud-menuPic' }, el('img', { src: image, alt: '' })) : null, el('h2', {}, title), sub ? el('p', {}, sub) : null, el('div', { class: 'hud-items' }, ...this.menuButtons),
       hints([['move', 'wählen'], ['ok', 'nehmen'], ['back', 'zurück']], '1–9 direkt'), closeX(() => this.closeMenu())));
     this.menuEl.hidden = false;
     this.promptEl.hidden = true;

@@ -196,7 +196,8 @@ export class CampActions {
       s.hud.toast(E.name, [r.text, r.lines.join(' · ')].filter(Boolean).join(' · '), o.health || o.deltas < 0 || o.fuel > 0 ? 'warn' : 'travel', 4200);
       this.box.persist?.(); s.time.delayedCall(s.script ? 0 : 120, () => this.nextLeg(i + 1)); };
     const fallback = opts.find(o => !blocked(D, save, o)) || opts[opts.length - 1];
-    s.hud.menu({ title: E.name, sub: [E.description, `Etappe ${i + 1} von ${R.legs.length} · kurz vor ${where} · ${clockText(save)}`].filter(Boolean).join(' · '),
+    const look = (E.look && D.assets?.[E.look]?.file) ? E.look : D.travel?.encounterLook, file = look && D.assets?.[look]?.file;   // #021 comic panel
+    s.hud.menu({ image: file ? new URL(file, s.base).href : null, title: E.name, sub: [E.description, `Etappe ${i + 1} von ${R.legs.length} · kurz vor ${where} · ${clockText(save)}`].filter(Boolean).join(' · '),
       items: opts.map(o => ({ label: o.label || 'Weiter', sub: costLine(D, o), disabled: blocked(D, save, o), primary: o === opts[0], act: () => pick(o) })),
       onClose: () => pick(fallback) });
   }

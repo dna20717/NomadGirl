@@ -45,8 +45,9 @@ check('Karte ohne Warroom: Gefahr und Beute unbekannt, Hinweis auf den Warroom',
 await ev(() => { SC().hud.map.close(); nomad.step(5); });
 
 // the cistern: water over time, fill bottles
-v = await ev(() => { const s = nomad.save(), c = SC().camp; s.hour = 6; c.use('zisterne', '9:0'); const m1 = nomad.menu(); nomad.choose('Zurück'); s.hour = 18; c.use('zisterne', '9:0'); const m2 = nomad.menu(); nomad.choose('Abfüllen'); nomad.step(3);
-  const n = ['backpack', 'chest'].reduce((a, k) => a + JSON.stringify(s[k] || s.inventories?.[k] || '').split('"wasser"').length - 1, 0); return { m1: m1?.items[0]?.label, m2: m2?.items[0]?.label, has: JSON.stringify(s).includes('"wasser"') }; });
+v = await ev(() => { const s = nomad.save(), c = SC().camp; const rain0 = SC().data_.camp.rain; SC().data_.camp.rain = { ...(rain0 || {}), enabled: false };   // dry weather for this check (rain fills it 6× faster, rolled per game)
+  s.hour = 6; c.use('zisterne', '9:0'); const m1 = nomad.menu(); nomad.choose('Zurück'); s.hour = 18; c.use('zisterne', '9:0'); const m2 = nomad.menu(); nomad.choose('Abfüllen'); nomad.step(3);
+  const n = ['backpack', 'chest'].reduce((a, k) => a + JSON.stringify(s[k] || s.inventories?.[k] || '').split('"wasser"').length - 1, 0); SC().data_.camp.rain = rain0; return { m1: m1?.items[0]?.label, m2: m2?.items[0]?.label, has: JSON.stringify(s).includes('"wasser"') }; });
 check('Zisterne: erst leer, nach 12 Stunden „Abfüllen (3)“, Frischwasser im Inventar', /zu wenig/.test(v.m1) && v.m2 === 'Abfüllen (3)' && v.has, v);
 
 // solar: a panel on the container roof

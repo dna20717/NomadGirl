@@ -66,7 +66,7 @@
   "captions": [{"speaker": "", "text": "Kilometer 6. Die erste Nacht draußen.", "at": "tl"},{"speaker": "", "text": "Leyla schläft nicht. Sie zählt die Blasen im Tank.", "at": "tr"}]
  },
  "panel_5": {
-  "name": "Tankstelle Kilometer 7",
+  "name": "Mile 7 Gas & Go",
   "page": 2,
   "order": 2,
   "look": "intro_panel_5",
@@ -76,7 +76,7 @@
   "effect": "dust",
   "hold": 0,
   "captions": [
-   {"speaker": "", "text": "Tankstelle Kilometer 7. Dort liegt, was der Tank braucht.", "at": "tl"},
+   {"speaker": "", "text": "Mile 7 Gas & Go. Dort liegt, was der Tank braucht.", "at": "tl"},
    {"speaker": "Leyla", "text": "Zahnräder, ein Chip, Kühlmittel. Klingt nach einem Einkaufszettel.", "at": "br"}
   ]
  },

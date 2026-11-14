@@ -10,6 +10,9 @@
 //                edges: [[a, b]], visited: [id], signs: [{ brand, pos, rot }] }
 
 export const MAP_VERSION = 1;
+// names of the places (#021, Daniel 14.11.2026: „Alle Ortsnamen müssen ein wenig cooler werden und auf Englisch sein“): a savegame with
+// older names gets the new ones, the roads, visited places and dangers stay (renameMap)
+export const NAMES_VERSION = 2;
 
 // small seeded random numbers (mulberry32), the same seed gives the same map
 export function rng(seed) {
@@ -89,7 +92,7 @@ export function generateMap(D, seed, cycle = 1) {
     const [a, b] = edges[Math.floor(r() * edges.length)].map(id => nodes.find(x => x.id === id).pos), t = 0.3 + r() * 0.4;
     signs.push({ brand: pickW(r, C.brands).id, pos: [a[0] + (b[0] - a[0]) * t + (r() - 0.5) * 6, a[1] + (b[1] - a[1]) * t + (r() - 0.5) * 6], rot: (r() - 0.5) * 0.35 });
   }
-  return { v: MAP_VERSION, seed, cycle, start: nodes[0]?.id || null, nodes, edges, visited: nodes[0] ? [nodes[0].id] : [], signs };
+  return { v: MAP_VERSION, names: NAMES_VERSION, seed, cycle, start: nodes[0]?.id || null, nodes, edges, visited: nodes[0] ? [nodes[0].id] : [], signs };
 }
 
 // the savegame's map: rolled once per Durchgang (save.cycle), kept from then on; Leyla's place must be on it
@@ -99,9 +102,26 @@ export function ensureMap(D, save) {
     save.map = generateMap(D, (Math.random() * 2 ** 31) >>> 0, cycle);
     if (!save.map.nodes.some(n => n.id === save.location)) save.location = save.map.start;
   }
+  if (save.map.names !== NAMES_VERSION) renameMap(D, save.map);
   if (!save.map.nodes.some(n => n.id === save.location)) save.location = save.map.start;
   if (!save.map.visited.includes(save.location)) save.map.visited.push(save.location);
   return save.map;
+}
+// new names for an older map: the same seed rolls the same places, so names and regions are taken over where id and position match;
+// landmarks take theirs from the area Orte; a place without a twin gets a fresh name of its kind
+export function renameMap(D, map) {
+  const fresh = generateMap(D, map.seed, map.cycle), C = mapConfig(D);
+  for (const n of map.nodes) {
+    const L = n.landmark && D.locations?.[n.id], twin = fresh.nodes.find(x => x.id === n.id && dist(x.pos, n.pos) < 0.05);
+    if (L) { n.name = L.name || n.name; if (L.region) n.region = L.region; continue; }
+    if (twin) { n.name = twin.name; n.region = twin.region; continue; }
+    const r = rng((map.seed ^ [...n.id].reduce((h, c) => h * 31 + c.charCodeAt(0) | 0, 7)) >>> 0), kind = C.kinds.find(k => k.poi === n.poi), tpl = words(kind?.names || '');
+    const near = fresh.nodes.slice().sort((a, b) => dist(a.pos, n.pos) - dist(b.pos, n.pos))[0];
+    n.region = near?.region || n.region;
+    n.name = nameFrom(r, tpl.length ? pick(r, tpl) : D.pois?.[n.poi]?.name || n.poi, { km: dist(n.pos, C.city), region: n.region, brand: C.brands.find(b => b.id === n.brand) || null, fill: C.fill });
+  }
+  map.names = NAMES_VERSION;
+  return map;
 }
 // a place on the map (or, without a map, from the area Orte)
 export function placeOf(D, save, id = save?.location) {

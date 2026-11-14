@@ -36,7 +36,7 @@ check('Abzweig: Lager hängt über einem Verkaufsraum', s.rooms.some(r => r.band
 check('Abkürzung: Tunnel von der Werkstatthalle zum Vorplatz', !!s.shortcut?.up && !!s.shortcut?.down && s.shortcut.down[0] > s.shortcut.up[0], s.shortcut);
 check('Am Van: zurück ins Camp', s.prompt === 'Zurück ins Camp · Van', s.prompt);
 check('Kisten, Schalter, Tür, brüchige Wände, Ziel', s.level.chests.length >= 4 && s.level.switches.length === 1 && s.level.doors.length === 1 && s.level.walls.length >= 2 && s.level.goals.length === 1, s.level);
-check('HUD nennt den Raum', /Tankstelle Kilometer 7 · Vorplatz/.test(await ev(() => document.querySelector('.hud-room, [class*=room]')?.textContent || game.scene.getScene('play').roomName)), null);
+check('HUD nennt den Raum', /Mile 7 Gas & Go · Vorplatz/.test(await ev(() => document.querySelector('.hud-room, [class*=room]')?.textContent || game.scene.getScene('play').roomName)), null);
 await ev(() => nomad.calm());
 await shot('van');
 

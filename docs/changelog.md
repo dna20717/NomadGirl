@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 15.11.2026 nachts: **EKG, Reisebild, englische Orte** (#021): Herzschlag-Linie über der Lebensleiste; Comic-Panel „Van auf der Wüstenstraße“ oben in jedem Zwischenfall (PixelLab); alle Ortsnamen englisch und cooler (Mile 7 Gas & Go, Delta South Megamall, Deadlock Bunker 13, Ministry of Order …), alte Spielstände werden umbenannt.
 - 14.11.2026 spät nachts: **Ausdauer** (#020): Dash, Slide, Doppelsprung und Hiebe kosten Ausdauer, leer geht nichts (Leiste blinkt, Brummen), nach kurzer Pause schnell wieder voll; neue Ausrüstungs-Werte Ausdauer und Erholung; Leben und Ausdauer als Neon-Leisten im Cyberpunk-Look.
 - 14.11.2026 spät nachts: **Inventar nur noch mit Rechtecken** (#019, Daniel): keine Tetris-Formen mehr, Drehen bleibt; alte Spielstände werden beim Laden entwirrt, nichts geht verloren.
 - 14.11.2026 spät nachts: **Letzte Symbole** (#018): Raster `icons_misc` mit 16 Symbolen (Kleinkram, Rohrteile, Discokugel, Schrottskulptur, Drohnenteile, Schockstab, Schulranzen, Wanderrucksack); jetzt hat jedes Ding im Spiel eine Grafik.

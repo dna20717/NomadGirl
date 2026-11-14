@@ -1323,6 +1323,7 @@ export const AREAS = {
     name: 'Reisen', icon: 'world_icon', file: 'data/travel.json', kind: 'single',
     hint: 'Was das Fahren kostet: Sprit, Vorräte und Zeit. Nachts ist es gefährlicher.',
     sections: [
+      { title: 'Bild', fields: [ref('encounterLook', 'Bild für Zwischenfälle', 'assets', { hint: '#021: steht oben im Fenster jedes Zwischenfalls (wie ein Comic-Panel aus dem Intro); ein Encounter mit eigenem Aussehen nimmt seins' })] },
       { title: 'Kosten', fields: [num('speed', 'Reisetempo', { unit: 'km/h', min: 1 }), num('foodPerDay', 'Vorräte pro Tag und Kopf', { unit: 'Rationen', min: 0 }),
         num('weightFuelFactor', 'Mehrverbrauch je Tonne', { unit: '%', min: 0 })] },
       { title: 'Tag & Nacht', fields: [num('dayLength', 'Tageslänge', { unit: 'Spiel-h', min: 1 }), num('nightShare', 'Anteil Nacht', { unit: '%', min: 0, max: 100 }), num('nightDanger', 'Gefahr nachts', { unit: '%', min: 0 })] },

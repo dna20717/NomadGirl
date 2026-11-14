@@ -1,1 +1,1 @@
-{"speed": 40, "foodPerDay": 1, "weightFuelFactor": 8, "dayLength": 24, "nightShare": 40, "nightDanger": 50, "encounterChance": 15}
+{"speed": 40, "foodPerDay": 1, "weightFuelFactor": 8, "dayLength": 24, "nightShare": 40, "nightDanger": 50, "encounterChance": 15, "encounterLook": "travel_road"}

@@ -36,7 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
-- 14.11. Code → Ava: #021 läuft (EKG-Linie, Reisebild, englische Ortsnamen).
+- 14.11. Code → Ava: #021 fertig: EKG-Linie, Reisebild für Zwischenfälle, englische Ortsnamen. PixelLab 25, übrig 683.
 - 14.11. Code → Ava: #020 fertig: Ausdauerleiste (Dash, Slide, Doppelsprung, Hiebe), Leben + Ausdauer als Cyberpunk-Leisten. ⚠️ Werte zum Absegnen im Ticket.
 - 14.11. Code → Ava: #019 fertig: Inventar nur noch mit Rechtecken (Daniels Wunsch), alte Spielstände werden beim Laden entwirrt.
 - 14.11. Code → Ava: #018 fertig: die letzten 16 Dinge ohne Grafik haben Symbole (`icons_misc`, PixelLab 10, übrig 708).
@@ -388,11 +388,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** Ausdauer in Leyla, Kosten an Dash/Slide/Doppelsprung/Hieben/Kombo, Leisten im Cyberpunk-Look (Leben mit Nachzieh-Balken). Tests: `npm test` 131, alle Browser-Tests grün (`game_test` 52). PixelLab: 0. **Bitte testen:** viermal hintereinander dashen (der vierte geht nicht, Leiste blinkt), eine volle Kombo + gleich noch eine.
 
 ### #021 EKG-Linie, Reisebild für Zwischenfälle, englische Ortsnamen
-- **Status:** läuft (Code, 14.11.) · angelegt 14.11. von Code (Daniel im Code-Chat)
+- **Status:** fertig (Code, 14.11.) · angelegt 14.11. von Code (Daniel im Code-Chat)
 - **Für:** Code
 - **Auftrag:** 1) EKG-Linie in der Lebensanzeige. 2) Ein generisches Reisebild für die Zwischenfälle unterwegs, ähnlich den Intro-Panels (PixelLab, Daniel: „nutze bis 30 Credits dafür“, freigegeben unter der 700er-Grenze). 3) Alle Ortsnamen cooler und auf Englisch.
 - **Rückfragen:**
-- **Ergebnis:**
+  - Namen → ⚠️ Mile 7 Gas & Go, Delta South Megamall, Deadlock Bunker 13, Ministry of Order, dazu englische Muster, Wörter und Regionen (Liste in `worldmap.md`). Gang-Namen, Marken und Kartentitel bleiben vorerst deutsch.
+  - Reisebild → ⚠️ ein Bild für alle Zwischenfälle (25 von 30 freigegebenen Generierungen).
+- **Ergebnis:** EKG-Linie über der Lebensleiste; Reisebild `travel_road` oben in jedem Zwischenfall; englische Ortsnamen, alte Spielstände werden umbenannt. Nebenbei: `cozy_test` war wetterabhängig (Regen füllt die Zisterne schneller), jetzt trocken geprüft. Tests: `npm test` 132. PixelLab: diesmal 25, übrig 683 (unter 700: ab jetzt wieder vorher fragen). **Bitte testen:** wenig Leben (EKG rast), weit fahren bis zum Zwischenfall (Bild), Karte ansehen.
 
 ## Archiv
 

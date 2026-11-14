@@ -29,10 +29,10 @@
   "reward": {"deltas": 40, "items": [{"item": "bio", "count": 2}]}
  },
  "tresor_tankstelle": {
-  "name": "Der Tresor an der Tankstelle",
+  "name": "Der Tresor im Mile 7",
   "giver": "onkel_sung",
   "after": "sungs_suppe",
-  "text": "Wer schnell ist, lebt länger. Knack den Tresor an der Tankstelle Kilometer 7 und komm heil zurück.",
+  "text": "Wer schnell ist, lebt länger. Knack den Tresor an der Mile 7 Gas & Go und komm heil zurück.",
   "done": "Schnell und leise. So mag ich das.",
   "counter": "pois",
   "filter": "tankstelle_km7",

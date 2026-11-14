@@ -5236,5 +5236,22 @@
   "source": "KI (PixelLab, Create Image Pro, AAP-64, Stilbild icons_treasure)",
   "derivedFrom": "icons_treasure",
   "date": "14.11.2026"
+ },
+ "travel_road_source": {
+  "name": "Reise · Straße (Original)",
+  "kind": "source",
+  "file": "assets/travel/raw/road.png",
+  "source": "KI (PixelLab, Create Image Pro 688 × 384, AAP-64, Stilbild Intro-Panel 3, Referenz Van)",
+  "date": "14.11.2026",
+  "description": "Rohbild mit lila Rand."
+ },
+ "travel_road": {
+  "name": "Reise · Straße",
+  "kind": "image",
+  "file": "assets/travel/road.png",
+  "derivedFrom": "travel_road_source",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64), Rand per Code abgeschnitten",
+  "date": "14.11.2026",
+  "description": "Generisches Reisebild für die Zwischenfälle unterwegs (#021, Daniel: „ähnlich den Intro-Panels“): der Van allein auf einer rissigen Wüstenstraße in der Dämmerung, Strommasten, Reklametafel, die Stadt am Horizont."
  }
 }

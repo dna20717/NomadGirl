@@ -1,6 +1,6 @@
 {
  "tankstelle_km7": {
-  "name": "Tankstelle Kilometer 7",
+  "name": "Mile 7 Gas & Go",
   "kind": "gasStation",
   "size": "S",
   "danger": 1,
@@ -20,7 +20,7 @@
   "gang": {"name": "Gelbe Geier", "color": "Gelb", "motto": "Wer tankt, zahlt. Wer nicht zahlt, tankt Blei."}
  },
  "grossmarkt": {
-  "name": "Großmarkt Delta-Süd",
+  "name": "Delta South Megamall",
   "kind": "mall",
   "size": "M",
   "danger": 2,
@@ -38,7 +38,7 @@
   "gang": {"name": "Neon-Ratten", "color": "Magenta", "motto": "Alles muss raus. Du zuerst."}
  },
  "bunker_13": {
-  "name": "Bunker 13",
+  "name": "Deadlock Bunker 13",
   "kind": "bunker",
   "size": "L",
   "danger": 4,
@@ -67,7 +67,7 @@
   "gang": {"name": "Rostgarde", "color": "Orange", "motto": "Der Bunker hält. Wir halten den Bunker."}
  },
  "ministerium": {
-  "name": "Ministerium für Ordnung",
+  "name": "Ministry of Order",
   "kind": "government",
   "size": "XL",
   "danger": 5,
