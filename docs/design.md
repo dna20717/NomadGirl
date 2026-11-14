@@ -260,7 +260,19 @@ Daniel: In einem extrem guten ersten oder spätestens im zweiten Durchgang soll 
 - **Freischalten als Ausbaustufe** mit Rückbezug auf das erste Bergungsprojekt (LKW): wieder eine Bergung über mehrere Abschnitte, aber viel größer. Beide sind der **Lategame-Geldfresser**: Sie verschlingen **Ressourcen, Gegenstände und NPCs**, denn **man braucht eine Crew**.
 - **In jedem Durchgang möglich, im ersten sehr schwer.**
 - **Beide zu haben ist das ultimative Ziel** mit eigenem Achievement, „was für die 1 %“.
-- ⚠️ offen: Woher kommt die Crew (Gäste/Stammkunden aus dem Konzept Kundenabend, Anhalter, Gerettete)? Was braucht sie genau (Essen, Trinken, Chill Area, Musik)? Braucht der Fatbird auch eine Crew? Was passiert mit dem LKW, wenn ein Endgame-Fahrzeug fertig ist (zweite Basis?)? Assets grob 100–150 PixelLab-Generierungen, frühestens nach dem Reset am 07.12. und nur mit Daniels Freigabe.
+- **Crew = eigenes Sozialsystem** (Daniel, 14.11.2026 abends: „nicht auf Kunden beziehen, sondern ein Sozialsystem bauen, damit wir nicht in Features denken, sondern in Systemen“). **Geparkt**, eigene Design-Session.
+- ⚠️ offen: Braucht der Fatbird auch eine Crew? Was passiert mit dem LKW, wenn ein Endgame-Fahrzeug fertig ist (zweite Basis?)? Assets grob 100–150 PixelLab-Generierungen, frühestens nach dem Reset am 07.12. und nur mit Daniels Freigabe.
+
+### Fahrzeug-Skilltrees und Heavy-Duty-Werkbank (Design-Session 14.11.2026)
+
+Daniel: „Es sind so mächtige Mechaniken, dass reines Upgraden nicht genug ist. Ich sehe sie wirklich eher jeweils als eigenen Techtree bzw. Skilltree.“
+
+- **Je Fahrzeug ein eigener Skilltree: Rig (Van/LKW), Crawler, Fatbird.** Rig-Teile bleiben Ausrüstung (tauschbar, im Bau-Modus), der Baum ist die Identität (dauerhaft): Er bestimmt, *was* das Fahrzeug kann, die Teile, *wie gut*.
+- **Skillpunkte durch Fahren + Ressourcen:** Punkte gibt es für Kilometer, Etappen und überstandene Zwischenfälle; Knoten kosten zusätzlich Ressourcen (Geldfresser).
+- **Äste schließen sich aus** (echte Spezialisierung). **Umskillen geht, ist aber teuer** (an der Heavy-Duty-Werkbank, viele Ressourcen).
+- **Die Bäume bleiben über den Durchgang** (wie Techtree-Knoten und LKW).
+- **Heavy-Duty-Werkbank** (neue Werkstatt): Hier sieht und skillt man die Fahrzeug-Bäume. Sie kann **nur Fahrzeug-Sachen** (Bäume, Umskillen, Rig-Teile herstellen); im Lategame ersetzt sie per Ausbau die reguläre Werkbank. Das Anschrauben der Teile bleibt im Bau-Modus.
+- ⚠️ vorläufig (Ava), noch absegnen: je Baum drei Äste. Rig: **Festung** (Panzerung, Bewaffnung, Rammen) · **Nomade** (Tempo, Reichweite, Gelände, Nachtfahrt, Radar) · **Heimat** (Werkstatt-Plätze, Strom, Stapelhöhe). Crawler: **Stadt** (Bauhöhe, Bewohner, Crew-Plätze; Andockpunkt fürs Sozialsystem) · **Kriegsmaschine** (Geschütztürme, Abschreckung) · **Fabrik** (Automatisierung: Werkstätten stellen her, während Leyla im Run ist). Fatbird: **Frachter** (Plätze, Traglast) · **Späher** (Karte aufdecken, POIs von oben auskundschaften) · **Luftunterstützung** (Versorgungsabwurf, Bergung im Run; Keystone **Absprung**: Run beginnt von oben). Knoten-Arten: Werte, neue Möglichkeiten (Sockel, Teil-Rezepte, Optionen in Zwischenfällen) und **Keystones**, die eine Regel ändern (z. B. „Rollende Stadt: Das Camp ist überall“).
 
 ### Camp (Daniel, 07.11.2026 abends)
 
