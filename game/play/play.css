@@ -20,6 +20,8 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .hud-gauge.st .hud-meter { width: min(250px, 31vw); height: 10px; clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
 .hud-meter i { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; }
 .hud-meter i.fill { background: linear-gradient(90deg, var(--c1), var(--c2)); box-shadow: 0 0 12px var(--glow); transition: width .12s; }
+.hud-ekg { position: absolute; left: 0; top: -3px; width: 100%; height: calc(100% + 6px); pointer-events: none; mix-blend-mode: screen; opacity: .9; }
+.hud-gauge.hp .hud-meter { height: 20px; }
 .hud-meter i.ghost { background: #ffe1ef; opacity: .75; transition: width .05s; }
 /* segments (10 for health, one notch per dash for stamina) and scanlines over the fill */
 .hud-meter s { position: absolute; inset: 0; pointer-events: none; text-decoration: none;

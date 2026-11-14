@@ -68,7 +68,7 @@ export class Hud {
       el('div', { class: 'hud-top' },
         el('div', { class: 'hud-left' },
           this.vitalsEl = el('div', { class: 'hud-vitals' },
-            this.hpRow = el('div', { class: 'hud-gauge hp' }, el('span', { class: 'hud-tag' }, 'LEBEN'), el('span', { class: 'hud-meter' }, this.healthGhost, this.healthBar, el('s')), this.healthText),
+            this.hpRow = el('div', { class: 'hud-gauge hp' }, el('span', { class: 'hud-tag' }, 'LEBEN'), el('span', { class: 'hud-meter' }, this.healthGhost, this.healthBar, el('s'), this.ekg = el('canvas', { class: 'hud-ekg', width: 320, height: 22 })), this.healthText),
             this.stRow = el('div', { class: 'hud-gauge st' }, el('span', { class: 'hud-tag' }, 'AUSDAUER'), this.stMeter = el('span', { class: 'hud-meter' }, this.stBar, el('s')), this.stText)),
           el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'NÄGEL'), this.ammo, this.dash)),
         el('div', { class: 'hud-right' },
@@ -301,6 +301,7 @@ export class Hud {
     this.healthGhost.style.width = `${this.ghostP * 100}%`;
     this.hpRow.classList.toggle('low', hp <= 0.3);
     this.healthText.textContent = `${Math.ceil(l.health)}/${max}`;
+    this.drawEkg(scene, hp);
     // stamina (#020)
     const on = l.staminaOn, smax = l.maxStamina, st = Math.max(0, Math.min(1, (l.stamina ?? smax) / smax));
     this.stRow.hidden = !on;
@@ -354,6 +355,35 @@ export class Hud {
         requestAnimationFrame(() => { const r = !run && !this.campEl.hidden ? this.campEl.getBoundingClientRect() : null; this.toastsEl.style.setProperty('--toast-top', `${r && r.height ? Math.round(r.bottom + 10) : 110}px`); });
       }
     }
+  }
+
+  // EKG line over the health bar (#021, Daniel 14.11.2026: „eine EKG-Linie in der Anzeige“): a sweep that writes a heartbeat from left to
+  // right and wipes just ahead of itself; the pulse speeds up and stumbles when Leyla is low, a flat line at 0 (game clock: stops in pauses)
+  drawEkg(scene, hp) {
+    const cv = this.ekg, g = cv?.getContext('2d');
+    if (!g) return;
+    const W = cv.width, H = cv.height, now = scene.now ?? performance.now(), last = this.ekgAt ?? now, dt = Math.min(100, Math.max(0, now - last));
+    this.ekgAt = now;
+    const bpm = hp <= 0 ? 0 : 66 + (1 - hp) * 84, speed = W / 2600;   // the sweep crosses the bar in 2.6 s
+    this.ekgPhase = ((this.ekgPhase ?? 0) + dt * bpm / 60000) % 1e6;
+    const wave = p => {   // one beat over p 0..1: P bump, QRS spike, T bump
+      const b = (c, w, a) => a * Math.exp(-((p - c) ** 2) / (2 * w * w));
+      return b(0.18, 0.025, 0.12) - b(0.30, 0.008, 0.18) + b(0.33, 0.012, 1) - b(0.36, 0.01, 0.35) + b(0.56, 0.04, 0.22);
+    };
+    const jitter = hp > 0 && hp < 0.3 ? (Math.sin(now / 37) * 0.08) : 0;
+    const steps = Math.max(1, Math.round(dt * speed));
+    let x = this.ekgX ?? 0, y = this.ekgY ?? H / 2;
+    g.lineWidth = 1.6; g.lineCap = 'round';
+    for (let k = 0; k < steps; k++) {
+      const nx = x + 1, ph = (this.ekgPhase - (steps - k) * (bpm / 60000) / speed) % 1;
+      const v = hp <= 0 ? 0 : wave((ph + 1) % 1) + jitter, ny = H / 2 + 1 - v * (H / 2 - 2);
+      if (nx >= W) { x = 0; y = ny; continue; }
+      g.clearRect(nx, 0, 10, H);   // wipe ahead of the pen
+      g.strokeStyle = hp <= 0 ? 'rgba(255,90,90,.9)' : 'rgba(255,240,248,.95)'; g.shadowColor = '#ff7ac0'; g.shadowBlur = 4;
+      g.beginPath(); g.moveTo(x, y); g.lineTo(nx, ny); g.stroke();
+      x = nx; y = ny;
+    }
+    this.ekgX = x; this.ekgY = y;
   }
 }
 
