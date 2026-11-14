@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 14.11. Code → Ava: #017 läuft (Beute-Bilanz, Companions mit Aufträgen, Toasts, neue Räume, Technik).
 - 14.11. Code → Ava: #016 fertig: Losziehen in einem Schritt + Bereit?, Spannungskurve, Zielzeile (roter Faden), Run-HUD aufgeräumt, Gangs je POI, Hausmeister-Boss, Tipp im Run, **Questlog** (Hauptquest, Tank, Nebenaufträge; Lagerfeuer + Warroom). PixelLab 0.
 - 14.11. Code → Ava: (alt) #016 Flow & Kohärenz läuft (Daniels Auswahl aus Avas Analyse: Losziehen + Loadout-Check, Spannungskurve, roter Faden, Run-HUD, Gangs + Boss, Tutorial im Run nicht modal).
 - 14.11. Code → Ava: #015 fertig: Tutorial-Häkchen „diese Sitzung nicht mehr“, keine Code-Gegner (Prüfung in `ng check`), Hall-of-Loot-Trophäen auf den Brettern, Zisterne frontal. PixelLab 19, übrig 725.
@@ -339,6 +340,20 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - Nebenaufträge → ⚠️ 5 Start-Aufträge von Schraube und Onkel Sung (Texte und Belohnungen frei erfunden, in der Werkstatt › Aufträge).
   - Tipp im Run → ⚠️ 9 s, unten links.
 - **Ergebnis:** Commits `215264d` (Losziehen + Bereit?), `60e8bf4` (Spannungskurve), `694d2c8` (roter Faden + Run-HUD), `df6a188` (Gangs + Boss), `99efa48` (Tipp im Run), `ff88947` (Questlog). Tests: `npm test` 127, alle 32 Browser-Tests grün. PixelLab: 0. **Bitte testen:** Van-Tür → Karte („Bereit?“), Tankstelle plündern (ruhiger Start, harter Schluss, Gelbe Geier), Zielzeile oben rechts, am Lagerfeuer das Questlog (Kabelsalat annehmen, verfolgen), im Ministerium den Hausmeister unter 60 % bringen.
+
+### #017 Beute-Bilanz, Companions mit Aufträgen, Toasts, neue Räume, Technik
+- **Status:** läuft (Code, 14.11.) · angelegt 14.11. von Code (Daniels Auswahl aus Avas Liste)
+- **Für:** Code
+- **Lesen:** `progression.md` (Questlog), `camp.md`, `ui.md`, `pois.md`, `tests.md`, `backlog.md` (C8)
+- **Auftrag:**
+  1. **Beute-Bilanz am Run-Ende:** Rang, Δ, was neu ist (Rezepte, Techtree, Quest-Fortschritt), Knopf zur passenden Werkstatt.
+  2. **Companions reden:** „Reden“ bei Schraube und Onkel Sung bietet ihre Aufträge an, nimmt sie an und ab.
+  3. **Toasts weichen Fenstern aus** (Toast verdeckte „Hier plündern“).
+  4. **Mehr Raum-Bausteine:** 2–3 neue Räume je POI (Code + vorhandene Kacheln, kein PixelLab).
+  5. **Technik:** wackelige Prüfung „Panzerung“ stabil, lokaler Testserver stirbt nicht mehr, große Dateien (`camp.js`, `leyla.js`, `scene.js`) aufteilen.
+- **Fertig, wenn:** alles spielbar, Tests grün, Build grün.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ## Archiv
 
