@@ -38,7 +38,9 @@ export class MapUI {
   open(opts = {}) {
     this.opts = opts; this.el.hidden = false;
     const near = neighbours(this.map, this.save.location);
-    this.sel = opts.sel || (this.sel && (this.sel === this.save.location || near.includes(this.sel)) ? this.sel : near[0] || this.save.location);
+    // #016: a place you can plunder is chosen first, so „Hier plündern“ is one press away
+    const hereN = placeOf(this.D, this.save, this.save.location), canPlunder = !!(hereN?.poi && this.D.pois?.[hereN.poi]);
+    this.sel = opts.sel || (this.sel && (this.sel === this.save.location || near.includes(this.sel)) ? this.sel : canPlunder ? this.save.location : near[0] || this.save.location);
     this.draw();
     cancelAnimationFrame(this.raf); const loop = () => { if (!this.isOpen) return; this.paint(); this.raf = requestAnimationFrame(loop); }; loop();
   }
@@ -134,11 +136,18 @@ export class MapUI {
       el('p', { class: 'wm-desc' }, n.landmark && P.description ? P.description : `Wie ${P.name || 'ein POI'}, nur ${n.danger > (P.danger || 1) ? 'weiter draußen und gefährlicher' : 'ein anderer Ort'}. Was genau dort liegt, weiß man erst drinnen.`),
       cost ? el('div', { class: 'wm-cost' }, ...[['Strecke', `${cost.km} km${(cost.legs?.length || 1) > 1 ? ` · ${cost.legs.length} Etappen` : ''}`], ['Fahrt', `${de(cost.hours)} h`], ['Sprit', `${de(cost.fuel)} l`, cost.fuel > save.fuel], ['Vorräte', de(cost.food), cost.food > save.food]]
         .map(([k, v, bad]) => el('div', { class: bad ? 'bad' : '' }, el('small', {}, k), el('b', {}, v)))) : null,
+      here && a && !a.disabled ? this.readyBox() : null,
       a ? el('button', { class: 'inv-btn wm-go', disabled: !!a.disabled, title: a.disabled || '', onclick: () => this.act() }, a.icon ? icon(a.icon, 18) : null, ' ', a.disabled && a.cost ? a.disabled : a.label) : null,
       a?.disabled && !a.cost ? el('small', { class: 'wm-why' }, a.disabled) : null].filter(Boolean));   // replaceChildren would write "null"
   }
+  // Loadout-Check (#016): what Leyla takes into the run, warnings in amber
+  readyBox() {
+    const rows = this.host.loadout?.() || [];
+    if (!rows.length) return null;
+    return el('div', { class: 'wm-ready' }, el('small', {}, 'Bereit?'), ...rows.map(r => el('div', { class: 'wm-ready-row' + (r.warn ? (r.soft ? ' soft' : ' warn') : '') }, icon(r.icon, 14), el('span', {}, r.label), el('b', {}, r.value))));
+  }
   state() {
     const m = this.map;
-    return { open: this.isOpen, intel: this.intel, extras: (this.opts?.extras || []).map(x => x.label), here: this.save.location, sel: this.sel, nodes: m.nodes.length, edges: m.edges.length, near: neighbours(m, this.save.location), action: this.action()?.label || null, disabled: this.action()?.disabled || null };
+    return { open: this.isOpen, intel: this.intel, extras: (this.opts?.extras || []).map(x => x.label), here: this.save.location, sel: this.sel, nodes: m.nodes.length, edges: m.edges.length, near: neighbours(m, this.save.location), action: this.action()?.label || null, disabled: this.action()?.disabled || null, ready: this.sel === this.save.location ? (this.host.loadout?.() || []).map(r => r.label + (r.warn ? '!' : '')) : [] };
   }
 }

@@ -73,6 +73,7 @@ export function installControl(game) {
       if (h.map?.isOpen && typeof which === 'string') {
         const m = h.map, w = which.toLowerCase().replace(/^hinfahren:\s*/, ''), ex = (m.opts?.extras || []).find(x => x.label.toLowerCase().includes(w));
         if (ex) { m.close(); ex.act(); api.step(2); return true; }   // Techtree, Auswerten in the map's header
+        if (/^karte/.test(w)) return true;   // #016: the van door opens the map directly
         if (/^pl(ü|u)nder/.test(w)) m.select(m.save.location);
         else { const n = m.map.nodes.find(x => x.name.toLowerCase().includes(w) || x.id === w); if (n) m.select(n.id); else return false; }
         const a = m.action(); if (!a || a.disabled) return false;

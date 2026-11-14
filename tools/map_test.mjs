@@ -28,8 +28,8 @@ let v = await ev(() => { const m = nomad.save().map; return { n: m?.nodes.length
 check('Neues Spiel: Karte im Spielstand, Start = Tankstelle Kilometer 7', v.n >= 12 && v.e >= v.n && v.here === 'tankstelle_km7' && v.start === 'tankstelle_km7' && v.visited.includes('tankstelle_km7'), v);
 
 // the van door: Karte · Reisen
-v = await ev(() => { nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(2); const m = nomad.menu(); nomad.choose('Karte'); nomad.step(5); return { first: m?.items[0]?.label, map: nomad.map() }; });
-check('Van-Tür: „Karte · Reisen“ öffnet die Reisekarte', v.first === 'Karte · Reisen' && v.map?.open, v);
+v = await ev(() => { nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(5); return { map: nomad.map(), ready: document.querySelectorAll('.wm-ready-row').length }; });
+check('Van-Tür öffnet direkt die Reisekarte, hier gewählt, mit „Bereit?“-Check (#016)', v.map?.open && v.map.sel === v.map.here && v.map.action === 'Hier plündern' && v.ready >= 4, v);
 await page.waitForTimeout(800);
 v = await ev(() => { const mp = SC().hud.map; return { places: Object.keys(mp.places).length, known: Object.values(mp.places).filter(p => p.known).length, near: Object.values(mp.places).filter(p => p.near).length, canvas: mp.canvas.width, paper: !!mp.image(mp.D.worldmap.paper), logos: !!mp.image(mp.D.worldmap.logos) }; });
 check('Karte gezeichnet: alle Orte, Nachbarn im Rotstift, Papier und Logos geladen', v.places >= 12 && v.near >= 2 && v.known > v.near && v.known < v.places && v.canvas > 400 && v.paper && v.logos, v);

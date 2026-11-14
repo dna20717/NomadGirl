@@ -621,6 +621,12 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .wm-hints span { padding: 3px 8px; border-radius: 999px; border: 1px solid var(--c); color: var(--c); font: 13px/1.2 var(--ui-font); background: color-mix(in srgb, var(--c) 12%, transparent); }
 .wm-brand { margin: 0; color: #c7b08b; font: italic 20px/1.1 VT323, monospace; }
 .wm-desc { margin: 0; color: #b9a9c9; font: 14px/1.4 var(--ui-font); }
+.wm-ready { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 8px; background: #1d1626; border: 1px solid #3a2f45; }
+.wm-ready > small { color: #8d7f9c; font: 12px/1 var(--ui-font); text-transform: uppercase; margin-bottom: 2px; }
+.wm-ready-row { display: grid; grid-template-columns: 16px auto 1fr; align-items: center; gap: 6px; color: #b9a2c8; font-size: 13px; }
+.wm-ready-row b { justify-self: end; color: #f2eef7; font-weight: 600; text-align: right; }
+.wm-ready-row.warn { color: #fa6a0a; } .wm-ready-row.warn b { color: #f9a31b; }
+.wm-ready-row.soft b { color: #8d7f9c; font-weight: 400; }
 .wm-cost { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .wm-cost div { padding: 8px 10px; border-radius: 8px; background: #241b30; border: 1px solid #3a2f45; }
 .wm-cost small { display: block; color: #8d7f9c; font: 12px/1 var(--ui-font); text-transform: uppercase; }

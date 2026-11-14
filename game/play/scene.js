@@ -424,6 +424,7 @@ export class PlayScene extends Phaser.Scene {
       blocked: t => hud.scene.camp?.driveBlocked(t) ?? null,
       drive: (id, t) => hud.scene.camp?.drive(id, t),
       plunder: () => hud.scene.camp?.plunderHere(),
+      loadout: () => hud.scene.camp?.loadout?.() || [],
       intel: () => !!hud.scene.camp?.rigWorkshop('warroom'),   // without a warroom the map does not tell danger and loot (Daniel, 13.11.2026)
       closed: () => {},
     });

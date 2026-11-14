@@ -11,6 +11,7 @@ import { level as cisternLevel, tap as cisternTap } from '../cistern.js';
 import { anchors as lightAnchors, catenary, lightsConfig, mastAt } from '../string_lights.js';
 import { clockText, advance, hoursUntil, containers, solarState } from '../save.js';
 import { budgets, partSlots, passengers, roofFree } from '../rig.js';
+import { occupancy } from '../inventory.js';
 import { Benches, benchTexture, crateTexture } from './benches.js';
 
 const de = n => Number(n).toLocaleString('de-DE', { maximumFractionDigits: 1 });
@@ -1137,13 +1138,30 @@ export class Camp {
         else s.time.delayedCall(1400, done);
       } }, { label: 'Zurück', act: () => {} }] });
   }
+  // the van door (#016, Daniel 14.11.2026: Losziehen in einem Schritt): straight to the map with this place chosen; the van's own
+  // workshops (bunk, kitchen) sit as buttons in its header
   vanMenu(ids) {
-    if (!ids.length) return this.openMap();   // nothing else in the van: straight to the map
-    this.scene.hud.menu({ title: this.D.tractors?.[this.geo.tractor.id]?.name || 'Van', sub: 'Was willst du im Van machen?',
-      items: [{ label: 'Karte · Reisen', sub: 'Die Reisekarte: hier plündern oder weiterfahren', primary: true, act: () => this.openMap() },
-        ...ids.map(w => { const d = this.D.workshops?.[w.id] || {}; return { label: `${VERB[d.function] || 'Ansehen'} · ${d.name || w.id}`, act: () => this.use(w.id) }; }), { label: 'Zurück', act: () => {} }] });
+    const extras = ids.map(w => { const d = this.D.workshops?.[w.id] || {}; return { label: VERB[d.function] || d.name || w.id, icon: d.function === 'sleep' ? 'moon' : d.function === 'kitchen' ? 'light' : 'workbench', act: () => this.use(w.id) }; });
+    this.openMap({ extras, sel: this.box.save.location });
   }
-  sleep(def) {
+  // Loadout-Check next to „Hier plündern“ (#016): what Leyla takes along, each line ok or a warning
+  loadout() {
+    const D = this.D, save = this.box.save, inv = save.inv || {}, G = inv.grids || {}, l = this.scene.leyla, out = [];
+    const max = l?.maxHealth || 100, hp = Math.round(Math.min(max, save.health ?? max));
+    out.push({ icon: 'heart', label: 'Leben', value: `${hp}/${max}`, warn: hp < max * 0.6 });
+    const wn = id => { const w = D.weapons?.[id] || D.weapons?.[String(id).split('#')[0]]; return w?.name || null; };
+    const mel = wn(inv.slots?.melee), rng = wn(inv.slots?.ranged);
+    out.push({ icon: 'weapon', label: 'Waffen', value: [mel, rng].filter(Boolean).join(' · ') || 'keine', warn: !mel && !rng });
+    const heal = Object.values(G.backpack?.items || []).filter(e => { const t = D[e.a]?.[e.id]; const b = t?.buff && D.buffs?.[t.buff]; return b?.stat === 'health' || t?.heal; }).reduce((n, e) => n + (e.n || 1), 0);
+    out.push({ icon: 'plus', label: 'Heilung', value: heal ? `${heal}× im Rucksack` : 'nichts dabei', warn: !heal });
+    const bp = G.backpack;
+    if (bp) { const used = occupancy(D, bp).size, all = bp.w * bp.h, free = Math.round((1 - used / Math.max(1, all)) * 100); out.push({ icon: 'bags', label: 'Rucksack', value: `${free} % frei`, warn: free < 35 }); }
+    const buffs = (save.buffs || []).map(b => D.buffs?.[b]?.name || b);
+    out.push({ icon: 'star', label: 'Buffs', value: buffs.length ? buffs.join(' · ') : 'keine (Kochen, Schlafen)', warn: !buffs.length, soft: true });
+    const pocket = G.drone; if (pocket) out.push({ icon: 'armor', label: 'AvAs Rettungsfach', value: pocket.items.length ? `${pocket.items.length} gesichert` : 'leer', soft: true });
+    return out;
+  }
+    sleep(def) {
     const s = this.scene, box = this.box, save = box.save, C = this.C, max = s.leyla.maxHealth;
     const h = hoursUntil(save, C.clock?.wakeHour ?? 7);
     s.hud.menu({ title: def.name || 'Schlafen', sub: `Schlafen bis ${String(C.clock?.wakeHour ?? 7).padStart(2, '0')}:00 (${h} h). Heilt ${C.heal?.sleep ?? 100} %.${def.buff ? ` Danach: ${this.D.buffs?.[def.buff]?.name || def.buff} für den nächsten Run.` : ''}`,

@@ -34,9 +34,9 @@ check('Rig: Van mit Schlafkoje + Warroom, Wohnanhänger mit Kochnische + Werkban
 check('Leyla steht am Van, E-Hinweis', s.prompt === 'Einsteigen · Van', s.prompt);
 await shot('start');
 
-let m = await ev(() => c.use());
-check('Van-Menü mit Karte', m?.items.map(i => i.label).join('|') === 'Karte · Reisen|Schlafen · Schlafkoje|Planen · Warroom|Zurück', m);
-m = await ev(() => { nomad.choose('Planen'); return nomad.map(); });
+let m = await ev(() => { c.use(); return nomad.map(); });
+check('Van-Tür öffnet direkt die Karte, der Ort hier ist gewählt, Werkstätten im Van als Knöpfe (#016)', m?.open && m.sel === m.here && m.action === 'Hier plündern' && m.extras.join('|') === 'Schlafen|Planen' && m.ready.some(r => /^Leben/.test(r)), m);
+m = await ev(() => { nomad.choose('Planen'); const mp = game.scene.getScene('play').hud.map; mp.select(mp.state().near[0]); return nomad.map(); });
 check('Warroom öffnet die Reisekarte: Start, Nachbarorte, Hinfahren (#007)', m?.open && m.here === 'tankstelle_km7' && m.near.length >= 2 && m.near.includes(m.sel) && m.action === 'Hinfahren', m);
 { const t = await ev(() => document.querySelector('.wm-cost')?.textContent || ''); check('Reisekarte: Kosten mit deutschen Zahlen', /\d+ km/.test(t) && /\d,\d+ l|\d+ l/.test(t), t); }
 { const h = await ev(() => { const mp = game.scene.getScene('play').hud.map; mp.select(mp.save.location); return mp.state(); }); check('Reisekarte: hier = Hier plündern', h.action === 'Hier plündern', h); }
