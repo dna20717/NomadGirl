@@ -28,6 +28,7 @@ Spieldesign: `docs/design.md` (dazu das claude.ai-Projekt „NomadGirl“).
 ln -s "$(npm root -g)/playwright" node_modules/playwright     # für die Browser-Tests (in der Cloud-Umgebung „NomadGirl“ macht das das Setup-Skript)
 npm test                                   # Schema, Daten, Umbenennen, Löschen, Start-Rig, Worker
 npm run web:test                           # Web-Werkstatt + Spiel mit Worker, falschem GitHub und Login
+npm run test:browser                       # alle Browser-Tests, bringt bei Bedarf eigenen Server mit (#017)
 node tools/ng.js check                     # Spieldaten prüfen
 npm run serve                              # dann http://localhost:8766/workshop.html
 node tools/play.mjs 'tp 27 15' 'step 30 right' 'tap jump 30 right+jump' 'shot name'   # Spiel per Kommandozeile spielen

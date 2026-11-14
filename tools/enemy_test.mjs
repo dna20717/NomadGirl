@@ -132,7 +132,9 @@ const counter = await ev(() => {
   A.stand(p.body.left - 20, 1, 0); p.readyAt = 1e12;
   const w = s.weapon('melee'), a0 = p.hp; C.melee(l, s.now); nomad.step(20); out.armorLight = { dmg: a0 - p.hp, weapon: w.damage, plates: p.plates };
   for (let i = 0; i < 2; i++) { p.stunUntil = 0; C.melee(l, s.now, { damage: 2.5, range: 160, knockback: 0, heavy: true }); nomad.step(20); }
-  out.plates = p.plates; const a1 = p.hp; C.melee(l, s.now); nomad.step(5); out.afterArmor = a1 - p.hp;
+  // #017 stable: stand next to it again (the heavy hits may have moved it), same reach as the heavy hits, a plain light hit
+  p.stunUntil = 0; p.body.setVelocity(0, 0); A.stand(p.body.left - 20, 1, 0); nomad.step(2);
+  out.plates = p.plates; const a1 = p.hp; C.melee(l, s.now, { damage: 1, range: 160, knockback: 0 }); nomad.step(5); out.afterArmor = a1 - p.hp;
   // dodging: a shooter that always dodges hops away from a nail
   A.reset();
   const d = A.spawn('schuetze', 40, 14, { readyAt: 1e12 }); d.C.dodge = 100; d.state = 'engage'; d.lastSeen = s.now; d.M.patrol = 0;

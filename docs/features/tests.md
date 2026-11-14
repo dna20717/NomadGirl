@@ -40,3 +40,9 @@ node tools/raider_test.mjs [--shots]       # Raider-Bausatz im Kampfraum: alle R
 - #014: `raider_test` prüft Banner als Toast (ms 0 mit ✕) und **Deckung** (läuft hinter die Kiste, `cover`, taucht zum Schießen auf, Kiste hält Nägel); `cozy_test` Lichterkette 10 Δ, halber Preis zurück, **Mast am Lagerfeuer**; `map_test` **Gefahr wirkt** (Gefahr 4: mehr und zähere Gegner, Extra-Beute) und **Etappen** mit erzwungener Panne; Unit-Tests `test/rain.test.js` (Regen, Zisterne bei Regen, Wasser heilt nicht, Gießen), `test/threat.test.js`, `test/travel.test.js` (Route, Zwischenfälle, Entscheidungen).
 
 - #013: `node tools/bench_ui_test.mjs [--shots]` Werkstätten mit eigener Handlung: Herd (Zutaten, Würzen, Gar-Balken, perfekt/normal, Schnell), Bauplan + Teile → zwei Exemplare mit anderen Werten im Kampf, Ablegen behält die Werte, Ripperdoc, Drohnen-Platine mit Energie-Budget, Foodtruck mit Trinkgeld, Regler + Extra-Strom im Rig, Tastatur und Controller (23 Prüfungen), Bilder nach `output/bench_ui_*.png`. Unit-Test `test/stations.test.js`.
+
+## Alle Browser-Tests auf einmal (#017)
+
+`npm run test:browser` bzw. `node tools/test_all.mjs [name …]` (z. B. `node tools/test_all.mjs camp enemy`): nutzt einen laufenden Server auf :8766, sonst startet es selbst einen statischen Server für die Dauer des Laufs (mit Range-Anfragen für die Clips). Grund: der mit `npm run serve &` gestartete Server starb in der Cloud-Arbeitsumgebung zwischen zwei Werkzeug-Aufrufen. Je Test eine Zeile (✔/✖, Sekunden, letzte Ausgabe), bei Fehlern die Fehlerzeilen, am Ende „X von Y grün“; Exit-Code 1, wenn einer rot ist. Zeitlimit 400 s je Test.
+
+`enemy_test` › Panzerung (#017): vor dem letzten Hieb stellt sich Leyla wieder neben die Panzerwache und schlägt mit derselben Reichweite wie die schweren Hiebe (war einmal wackelig, jetzt 5 von 5 grün).

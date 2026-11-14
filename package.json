@@ -16,6 +16,7 @@
     "game:test": "node tools/game_test.mjs",
     "play": "node tools/play.mjs",
     "web:test": "node tools/workshop_cloud_test.mjs",
+    "test:browser": "node tools/test_all.mjs",
     "parcours:test": "node tools/parcours_test.mjs"
   },
   "license": "GPL-3.0-or-later"
