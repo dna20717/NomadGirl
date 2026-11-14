@@ -111,6 +111,34 @@ function holoText(x) {
   return (x?.bonus || []).filter(b => b?.stat).map(b => b.stat === 'secrets' ? 'Secrets' : `${b.value > 0 ? '+' : ''}${b.value}${PCT.has(b.stat) ? '%' : ''} ${HOLO[b.stat] || b.stat}`).join(' ') || x?.name || '';
 }
 
+// the visible part of an icon frame (alpha > 0) in frame pixels + its centre as origin (0..1); cached per frame
+export function visibleBox(scene, key, frame) {
+  const cache = scene.iconBoxes ??= new Map(), id = key + '#' + frame;
+  if (cache.has(id)) return cache.get(id);
+  const f = scene.textures.getFrame(key, frame), fw = f.cutWidth, fh = f.cutHeight;
+  let r = { w: fw, h: fh, cx: 0.5, cy: 0.5 };
+  try {
+    const cv = document.createElement('canvas'); cv.width = fw; cv.height = fh;
+    const g = cv.getContext('2d', { willReadFrequently: true }); g.drawImage(f.source.image, f.cutX, f.cutY, fw, fh, 0, 0, fw, fh);
+    const d = g.getImageData(0, 0, fw, fh).data;
+    let x0 = fw, y0 = fh, x1 = -1, y1 = -1;
+    for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) if (d[(y * fw + x) * 4 + 3] > 24) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    if (x1 >= 0) r = { w: x1 - x0 + 1, h: y1 - y0 + 1, cx: (x0 + x1 + 1) / 2 / fw, cy: (y0 + y1 + 1) / 2 / fh };
+  } catch { /* tainted or headless: the whole frame */ }
+  cache.set(id, r);
+  return r;
+}
+
+// Trophäen-Ständer › Reihen auf: „49@37+56; 92@37+56“ → one shelf per grid row ({ floor, x, w } in picture pixels), null = no shelves
+export function shelfRows(st, gh) {
+  const parts = String(st.rows || '').split(';').map(x => x.trim()).filter(Boolean);
+  if (!parts.length) return null;
+  const R = parts.map(p => { const m = p.match(/^(-?[\d.]+)\s*(?:@\s*(-?[\d.]+)\s*\+\s*([\d.]+))?$/); return m ? { floor: +m[1], x: m[2] != null ? +m[2] : st.x || 0, w: m[3] != null ? +m[3] : st.w || 1 } : null; });
+  if (R.some(r => !r)) return null;
+  while (R.length < gh) R.push(R[R.length - 1]);
+  return R;
+}
+
 export class Benches {
   constructor(camp) {
     this.camp = camp; this.scene = camp.scene; this.D = camp.D;
@@ -193,14 +221,28 @@ export class Benches {
       const [x0, y0] = bench.at(st.x || 0, st.y || 0), [x1, y1] = bench.at((st.x || 0) + (st.w || 1), (st.y || 0) + (st.h || 1));
       const c = Math.min((x1 - x0) / gw, (y1 - y0) / gh), ox = x0 + (x1 - x0 - gw * c) / 2, oy = st.align === 'top' ? y0 : y1 - gh * c, C = bench.clip;
       if (y1 < C.y0 || y0 > C.y1 || x1 < C.x0 || x0 > C.x1) return;   // the stand lies outside the place (picture cut at the interior)
+      // Daniel, 14.11.2026: „items im Lootraum werden zu klein an den Plaketten dargestellt“: each grid row stands on its own shelf of the
+      // picture (Reihen auf: floor y @ x + width), a cell as big as Feldgröße (may be bigger than the grid area: things stick out)
+      const rows = shelfRows(st, gh), k = (bench.at(1, 0)[0] - bench.at(0, 0)[0]) || 1, cell = (st.cell || 0) * k;
       for (const e of g.items) {
-        const t = thing(D, e.a, e.id) || {}, b = boxOf(D, e), side = Math.min(b.w, b.h) * c, cx = ox + (e.x + b.w / 2) * c, cy = oy + (e.y + b.h / 2) * c;
-        const A = D.assets?.[t.look];
+        const t = thing(D, e.a, e.id) || {}, b = boxOf(D, e);
+        let side = Math.min(b.w, b.h) * c, cx = ox + (e.x + b.w / 2) * c, cy = oy + (e.y + b.h / 2) * c;
+        const A = D.assets?.[t.look], isIcon = A?.kind === 'icons' && t.icon != null && s.textures.exists(t.look);
+        const shelf = rows && st.align !== 'top' ? rows[Math.min(gh - 1, e.y + b.h - 1)] : null;
         let o;
-        if (A?.kind === 'icons' && t.icon != null && s.textures.exists(t.look)) {
-          s.textures.get(t.look).setFilter(Phaser.Textures.FilterMode.NEAREST);
-          o = s.add.image(cx - mx, cy - my, t.look, t.icon).setDisplaySize(side * 0.96, side * 0.96).setAngle((e.r || 0) * 90);
-        } else o = s.add.text(cx - mx, cy - my, t.glyph || (t.name || e.id).slice(0, 2), { fontFamily: 'VT323, monospace', fontSize: `${Math.max(10, side * 0.7)}px`, color: '#ffd27a' }).setOrigin(0.5);
+        if (isIcon) s.textures.get(t.look).setFilter(Phaser.Textures.FilterMode.NEAREST);
+        if (shelf && isIcon) {
+          // on a shelf: the visible part of the icon (without its transparent margin) fills the thing's cells, standing on the board
+          const [rx, ry] = bench.at(shelf.x, shelf.floor), rw = shelf.w * k, u = cell || c, vb = visibleBox(s, t.look, t.icon), turn = (e.r || 0) % 2;
+          const vw = turn ? vb.h : vb.w, vh = turn ? vb.w : vb.h, sc = Math.min(b.w * u / vw, b.h * u / vh) * 0.94;
+          cx = rx + (e.x + b.w / 2) * rw / gw; cy = ry - vh * sc / 2 + k;   // one picture pixel into the board
+          side = Math.max(vw, vh) * sc;
+          o = s.add.image(cx - mx, cy - my, t.look, t.icon).setOrigin(vb.cx, vb.cy).setScale(sc).setAngle((e.r || 0) * 90);
+        } else {
+          if (cell) side = Math.min(b.w, b.h) * cell;
+          if (isIcon) o = s.add.image(cx - mx, cy - my, t.look, t.icon).setDisplaySize(side * 0.96, side * 0.96).setAngle((e.r || 0) * 90);
+        }
+        if (!o) o = s.add.text(cx - mx, cy - my, t.glyph || (t.name || e.id).slice(0, 2), { fontFamily: 'VT323, monospace', fontSize: `${Math.max(10, side * 0.7)}px`, color: '#ffd27a' }).setOrigin(0.5);
         // Holo-Schild (#012): a trophy whose bonus works glows gold underneath and shows its bonus on a small hologram above
         const aid = live.get(`store:${bench.place}:s${i}|${e.id}`);
         if (aid) {

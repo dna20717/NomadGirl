@@ -56,7 +56,7 @@ if (shots) {
   await ev(() => { const s = game.scene.getScene('play'), b = s.camp.benches.list.find(x => x.id === 'schatzkammer'), key = `store:${b.place}`, inv = s.hud.inv;
     s.hud.inv.open(); const add = (k, a, id) => { const g = s.box.save.inv.grids[k]; for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) { inv.held = { e: { a, id, n: 1, x: 0, y: 0, r: 0 }, from: 'backpack' }; inv.other = { key: k, grid: g }; inv.place(k, x, y); if (!inv.held) return; } inv.held = null; };
     for (const id of ['geldbuendel', 'geldbuendel', 'ring', 'luxusuhr', 'juwelenchip', 'taschenuhr', 'discokugel', 'goldzahn', 'ring']) add(key, 'items', id);
-    for (const [i, id] of [[0, 'baseball'], [0, 'taschenuhr'], [0, 'ring'], [1, 'neonschild'], [1, 'luxusuhr'], [2, 'ring'], [2, 'handheld']]) add(`${key}:s${i}`, 'items', id);
+    for (const [i, id] of [[0, 'baseball'], [0, 'taschenuhr'], [0, 'ring'], [1, 'neonschild'], [1, 'luxusuhr'], [1, 'winkekatze'], [1, 'schallplatte'], [2, 'ring'], [2, 'handheld'], [2, 'schneekugel'], [3, 'goetzenfigur'], [3, 'datenkristall']]) add(`${key}:s${i}`, 'items', id);
     inv.close(); nomad.step(40); nomad.goTo('Schatzkammer'); nomad.step(20); s.cam.stopFollow(); const bb = s.camp.benches.list.find(x => x.id === 'schatzkammer'); s.cam.setZoom(2.2); s.cam.centerOn(bb.cx, bb.floor - 170);  nomad.step(2); nomad.freeze(); window.__tro = bb.trophies.map(o => [o.texture.key, o.frame.name, Math.round(o.x + bb.off[0]), Math.round(o.y + bb.off[1])]); window.__clip = bb.clip; });
   await page.waitForTimeout(2500);
   await page.screenshot({ path: 'output/treasury.png' });
