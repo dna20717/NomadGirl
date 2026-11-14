@@ -47,6 +47,7 @@ check('Nahkampf schwer: 1 s halten, loslassen', heavy.ready && heavy.atk, heavy)
 const combo = await page.evaluate(() => {
   const s = game.scene.getScene('play'), l = s.leyla; nomad.step(60);
   const run = perfect => {
+    l.stamina = l.maxStamina;   // #020: each combo starts rested (two combos in a row would run out of stamina, as they should)
     const seq = [], mag0 = l.mag; let ring = false;
     nomad.step(1, [], ['melee']);
     for (let i = 0; i < 300; i++) {
@@ -250,6 +251,25 @@ v = await page.evaluate(() => { const n = nomad, s = game.scene.getScene('play')
   watch(30, ['walk', 'right'], ['ranged']); watch(20, ['right'], ['ranged']);
   return { seen: [...seen], mag }; });
 check('Sturmgewehr bringt eigene Posen mit (Ziehen, Schießen, Gehen, Rennen im Anschlag)', ['rifle_draw', 'rifle_shoot', 'rifle_aim_walk', 'rifle_run_gun'].every(k => v.seen.some(s => s.includes(k))) && v.seen.every(s => !/^leyla_(aim|shoot|draw)_side/.test(s)) && v.mag < 30, v);
+// Ausdauer (#020): dash costs, empty = no dash (and the HUD flashes), refills after the pause, gear raises the maximum
+{
+  const v = await page.evaluate(() => {
+    const s = game.scene.getScene('play'), l = s.leyla; nomad.calm(); nomad.step(5);
+    l.stamina = l.maxStamina; l.dashReady = 0; const s0 = l.stamina;
+    nomad.step(1, [], ['dash']); const afterDash = l.stamina, dashed = l.state === 'dash';
+    nomad.step(60);
+    l.stamina = 5; l.dashReady = 0; l.staminaAt = s.now; l.staminaDenied = null;
+    nomad.step(1, [], ['dash']); const denied = l.state !== 'dash' && l.staminaDenied != null;
+    const flash = document.querySelector('.hud-gauge.st')?.classList.contains('denied');
+    const low = l.stamina; nomad.step(20); const stillLow = l.stamina - low < 1;   // within the pause: nothing
+    nomad.step(120); const refilled = l.stamina;
+    const max0 = l.maxStamina; s.mods.stamina = 40; const max1 = l.maxStamina; delete s.mods.stamina;
+    return { s0, afterDash, dashed, denied, flash, stillLow, refilled, max: l.maxStamina, max0, max1, cost: l.staminaCost('dash') };
+  });
+  check('Ausdauer: Dash kostet, leer geht kein Dash (Leiste blinkt rot)', v.dashed && Math.round(v.s0 - v.afterDash) === v.cost && v.denied && v.flash, v);
+  check('Ausdauer: erst Pause, dann schnell wieder voll; Ausrüstung erhöht das Maximum', v.stillLow && v.refilled >= v.max - 0.5 && v.max1 === v.max0 + 40, v);
+}
+
 await browser.close();
 console.log(ok.map(n => '✓ ' + n).join('\n'));
 if (errors.length) { console.error('Fehler:\n' + errors.join('\n')); process.exit(1); }

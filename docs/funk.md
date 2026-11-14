@@ -36,7 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
-- 14.11. Code → Ava: #020 Ausdauerleiste läuft.
+- 14.11. Code → Ava: #020 fertig: Ausdauerleiste (Dash, Slide, Doppelsprung, Hiebe), Leben + Ausdauer als Cyberpunk-Leisten. ⚠️ Werte zum Absegnen im Ticket.
 - 14.11. Code → Ava: #019 fertig: Inventar nur noch mit Rechtecken (Daniels Wunsch), alte Spielstände werden beim Laden entwirrt.
 - 14.11. Code → Ava: #018 fertig: die letzten 16 Dinge ohne Grafik haben Symbole (`icons_misc`, PixelLab 10, übrig 708).
 - 14.11. Code → Ava: #017 fertig: Beute-Bilanz, Companions mit Aufträgen, Toasts weichen aus, 9 neue Räume, Test-Runner `npm run test:browser`, große Dateien aufgeteilt. Korrektur zu #016: zwei Browser-Tests waren rot (Filterfehler beim Melden), jetzt alle 32 grün.
@@ -376,12 +376,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** Formen raus aus Logik, Schema und Daten; alte Spielstände werden beim Laden entwirrt (nichts geht verloren); nebenbei verschluckte das Bündel am Van keine Dinge mehr. Tests: `npm test` 131, alle 32 Browser-Tests grün. PixelLab: 0. **Bitte testen:** Inventar öffnen, Rohrbogen/T-Stück drehen und ablegen; einen alten Spielstand laden.
 
 ### #020 Ausdauerleiste + Cyberpunk-Leisten
-- **Status:** läuft (Code, 14.11.) · angelegt 14.11. von Code (Daniel: „Wir brauchen eine Ausdauerleiste für Dash, Slide, Doppelsprung und Nahkampf-Attacken“)
+- **Status:** fertig (Code, 14.11.) · angelegt 14.11. von Code (Daniel: „Wir brauchen eine Ausdauerleiste für Dash, Slide, Doppelsprung und Nahkampf-Attacken“)
 - **Für:** Code
 - **Lesen:** `leyla.md`, `combat.md`, `ui.md`, `cyberware.md`
 - **Auftrag (Antworten Daniel):** leer = Aktion geht nicht (Leiste blinkt, Ton); Erholung nach kurzer Pause schnell; Leiste unter der Lebensleiste, **beide Leisten im Cyberpunk-Design**; Kosten in der Werkstatt, Ausrüstung kann Max-Ausdauer und Erholung erhöhen.
 - **Rückfragen:**
-- **Ergebnis:**
+  - Werte → ⚠️ 100 Ausdauer; Dash 25, Slide 20, Doppelsprung 25, Hieb 12, schwerer Hieb/Abschluss 28; Pause 0,6 s, dann 55/s (in der Werkstatt).
+  - Aufgeladener Hieb ohne genug Ausdauer → ⚠️ wird ein leichter Hieb statt gar nichts.
+  - Noch keine Implantate/Essen mit den neuen Werten; die Werte „Ausdauer“ und „Erholung“ stehen bereit (Gegenstände › Ausrüstung).
+- **Ergebnis:** Ausdauer in Leyla, Kosten an Dash/Slide/Doppelsprung/Hieben/Kombo, Leisten im Cyberpunk-Look (Leben mit Nachzieh-Balken). Tests: `npm test` 131, alle Browser-Tests grün (`game_test` 52). PixelLab: 0. **Bitte testen:** viermal hintereinander dashen (der vierte geht nicht, Leiste blinkt), eine volle Kombo + gleich noch eine.
 
 ## Archiv
 

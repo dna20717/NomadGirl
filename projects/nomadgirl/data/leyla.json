@@ -193,5 +193,6 @@
   "color": "#7ff6ff",
   "perfectColor": "#ffe27a"
  },
- "abilities": {"gated": true}
+ "abilities": {"gated": true},
+ "stamina": {"enabled": true, "max": 100, "delay": 600, "regen": 55, "costs": {"dash": 25, "slide": 20, "airJump": 25, "melee": 12, "heavy": 28}}
 }

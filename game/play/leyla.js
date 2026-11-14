@@ -75,6 +75,26 @@ export class Leyla {
   // Cyberware (#006): with Leyla › Fähigkeiten › „nur mit Implantat“ the double jump and the air dash come from implants (scene.ability)
   get maxAirJumps() { return this.scene.ability ? this.scene.ability.airJumps : this.m.airJumps ?? 0; }
   get canAirDash() { return this.scene.ability ? this.scene.ability.airDash : true; }
+  // ---------- stamina (#020, Daniel 14.11.2026: „eine Ausdauerleiste für Dash, Slide, Doppelsprung und Nahkampf-Attacken“) ----------
+  // empty = the action does not happen (the bar flashes, a short buzz); after Leyla › Ausdauer › „Erholt sich nach“ it refills quickly
+  get S() { return this.d.stamina || {}; }
+  get staminaOn() { return this.S.enabled !== false; }
+  get maxStamina() { return Math.max(1, (this.S.max ?? 100) + (this.scene.mods?.stamina || 0)); }
+  staminaCost(kind) { return this.staminaOn ? Math.max(0, this.S.costs?.[kind] ?? { dash: 25, slide: 20, airJump: 25, melee: 12, heavy: 28 }[kind] ?? 0) : 0; }
+  canSpend(kind) { return (this.stamina ?? this.maxStamina) >= this.staminaCost(kind) - 1e-6; }
+  spend(kind, time) {
+    const cost = this.staminaCost(kind);
+    if (!cost) return true;
+    if (!this.canSpend(kind)) { this.staminaDenied = time; this.scene.staminaDenied?.(kind); return false; }
+    this.stamina = (this.stamina ?? this.maxStamina) - cost; this.staminaAt = time;
+    return true;
+  }
+  staminaTick(time, dt) {
+    const max = this.maxStamina;
+    if (this.stamina == null || this.stamina > max) this.stamina = Math.min(this.stamina ?? max, max);
+    if (this.stamina < max && time - (this.staminaAt ?? -1e9) >= (this.S.delay ?? 600))
+      this.stamina = Math.min(max, this.stamina + (this.S.regen ?? 55) * (1 + (this.scene.mods?.staminaRegen || 0) / 100) * dt / 1000);
+  }
   get maxHealth() { return (this.d.health ?? 100) + (this.scene.mods?.health || 0); }
   get feet() { return this.body.bottom; }
   get x() { return this.body.center.x; }
@@ -91,6 +111,7 @@ export class Leyla {
 
   // ---------- update ----------
   update(time, dt, input) {
+    this.staminaTick(time, dt);   // #020
     const s = dt / 1000, b = this.body, m = this.m;
     const grounded = b.blocked.down || b.touching.down;
     if (grounded && time - (this.leapAt ?? -1e9) > 80) this.leapAt = -1e9;   // landed: the next fall without a jump does not grab on its own
@@ -190,7 +211,7 @@ export class Leyla {
     // jump (buffer + coyote time), air jumps, short hop when released early
     if (time - this.jumpAt <= (m.jumpBuffer ?? 120) && (grounded || time - this.lastGround <= (m.coyoteTime ?? 100))) {
       this.jump(1); this.lastGround = -1e9;
-    } else if (input.jump.pressed && !grounded && this.airJumps > 0) {
+    } else if (input.jump.pressed && !grounded && this.airJumps > 0 && this.spend('airJump', time)) {
       this.airJumps--; this.jump(0.92); this.scene.fx.puff(this.x, this.feet, 0x3fe0d0);
       // double jump: whole animation once, or from „Doppelsprung ab Frame“ over „Doppelsprung-Dauer“ (e.g. the last dash frames)
       this.flipAt = time; this.flipLen = (m.airJumpFromFrame ?? 1) > 1 || m.airJumpSpin > 0 ? (m.airJumpTime ?? 300) : this.scene.lookDuration('airJump');
@@ -199,8 +220,8 @@ export class Leyla {
     if (this.cut && !input.jump.down && b.velocity.y < 0) { b.setVelocityY(b.velocity.y * 0.45); this.cut = false; }
     if (b.velocity.y >= 0) this.cut = false;
 
-    if (input.dash.pressed && time >= this.dashReady && (grounded || this.airDash)) return this.startDash(time, dir);
-    if (grounded && input.down.pressed && Math.abs(b.velocity.x) > (m.walkSpeed ?? 240) * 0.8 && !(ladder && this.feet <= ladder.top + 4)) return this.startSlide(time);
+    if (input.dash.pressed && time >= this.dashReady && (grounded || this.airDash) && this.spend('dash', time)) return this.startDash(time, dir);
+    if (grounded && input.down.pressed && Math.abs(b.velocity.x) > (m.walkSpeed ?? 240) * 0.8 && !(ladder && this.feet <= ladder.top + 4) && this.spend('slide', time)) return this.startSlide(time);
     if (ladder) {
       const atTop = this.feet <= ladder.top + 4, atBottom = this.feet >= ladder.bottom - 4;
       if ((input.up.down && !atTop && (input.up.pressed || !grounded)) || (input.down.down && atTop && grounded) || (input.down.down && !grounded && !atBottom)) return this.startClimb(ladder);

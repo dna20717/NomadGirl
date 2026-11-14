@@ -183,6 +183,7 @@ export const GEAR_STATS = [
   ['crit', 'Krit-Chance', '%', 1, 1], ['speed', 'Tempo', '%', 1, 1], ['jump', 'Sprungkraft', '%', 1, 0.6], ['dashCooldown', 'Dash-Abklingzeit', '%', -1, 0.4],
   ['airJumps', 'Sprünge in der Luft', '', 1, 15], ['airDash', 'Luft-Dash', '', 1, 12], ['regen', 'Heilt sich', ' LP/10 s', 1, 4], ['heal', 'Heilung', '%', 1, 0.3],
   ['droneBattery', 'AvA-Akku', '%', 1, 0.3], ['tankDecay', 'Tank-Verfall', '%', -1, 0.5],
+  ['stamina', 'Ausdauer', '', 1, 0.4], ['staminaRegen', 'Erholung', '%', 1, 0.4],   // #020
 ];
 export const GEAR_KEYS = GEAR_STATS.map(s => s[0]);
 // one line per value: '+12 % Fernkampf', 'Luft-Dash'; good = helps Leyla (green), bad = flaw (red)

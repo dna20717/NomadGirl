@@ -10,9 +10,31 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .hud-row b { font-weight: normal; color: #fff; margin-right: 10px; }
 .hud-label { color: #b9a2c8; font-size: 18px; letter-spacing: 1px; }
 .hud-room { color: #3fe0d0; font-size: 22px; letter-spacing: 1px; }
-.hud-health { display: flex; align-items: center; gap: 10px; font: 24px/1 VT323, monospace; }
-.hud-bar { width: min(320px, 40vw); height: 16px; border-radius: 4px; background: #2a1a3a; border: 2px solid #0d0a12; box-shadow: 0 0 0 1px #5a2a4a; overflow: hidden; }
-.hud-bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #ff2f8a, #ff7ac0); transition: width .15s; }
+/* #020 vitals: slanted neon meters with segments, scanlines and a ghost bar (Daniel, 14.11.2026: „passendes Cyberpunk-Design“) */
+.hud-gauges { display: grid; gap: 5px; }
+.hud-gauge { display: grid; grid-template-columns: 74px auto auto; align-items: center; gap: 8px; --c1: #ff2f8a; --c2: #ff7ac0; --glow: rgba(255, 47, 138, .55); }
+.hud-gauge[hidden] { display: none; }
+.hud-gauge.st { --c1: #20d6c7; --c2: #a6fcdb; --glow: rgba(32, 214, 199, .5); }
+.hud-tag { font: 15px/1 VT323, monospace; letter-spacing: 1.5px; color: var(--c2); text-align: right; padding: 2px 6px 1px; background: rgba(13, 10, 18, .7); border-left: 3px solid var(--c1); clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 100%, 0 100%); text-shadow: 0 0 6px var(--glow); }
+.hud-meter { position: relative; display: block; width: min(320px, 40vw); height: 16px; background: linear-gradient(180deg, rgba(42, 26, 58, .95), rgba(13, 10, 18, .95)); clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06); }
+.hud-gauge.st .hud-meter { width: min(250px, 31vw); height: 10px; clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
+.hud-meter i { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; }
+.hud-meter i.fill { background: linear-gradient(90deg, var(--c1), var(--c2)); box-shadow: 0 0 12px var(--glow); transition: width .12s; }
+.hud-meter i.ghost { background: #ffe1ef; opacity: .75; transition: width .05s; }
+/* segments (10 for health, one notch per dash for stamina) and scanlines over the fill */
+.hud-meter s { position: absolute; inset: 0; pointer-events: none; text-decoration: none;
+  background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 2px), rgba(13, 10, 18, .85) calc(10% - 2px) 10%), repeating-linear-gradient(180deg, rgba(255, 255, 255, .12) 0 1px, transparent 1px 3px); }
+.hud-gauge.st .hud-meter s { background: repeating-linear-gradient(90deg, transparent 0 calc(var(--notch, 25%) - 2px), rgba(13, 10, 18, .9) calc(var(--notch, 25%) - 2px) var(--notch, 25%)), repeating-linear-gradient(180deg, rgba(255, 255, 255, .14) 0 1px, transparent 1px 3px); }
+.hud-gauges .hud-gauge b { font: 22px/1 VT323, monospace; color: #ffd6ea; text-shadow: 0 0 6px var(--glow); min-width: 64px; }
+.hud-gauges .hud-gauge.st b { font-size: 17px; color: var(--c2); min-width: 0; }
+.hud-gauge.hp.low .hud-meter i.fill { animation: hud-low 0.9s ease-in-out infinite; }
+@keyframes hud-low { 50% { filter: brightness(1.6); box-shadow: 0 0 20px rgba(255, 47, 138, .9); } }
+.hud-gauge.st.refill .hud-meter i.fill { background: linear-gradient(90deg, var(--c1), var(--c2), #ffffff, var(--c2)); background-size: 300% 100%; animation: hud-shimmer 0.8s linear infinite; }
+@keyframes hud-shimmer { from { background-position: 100% 0; } to { background-position: -200% 0; } }
+.hud-gauge.st.full .hud-meter i.fill { box-shadow: 0 0 6px var(--glow); }
+.hud-gauge.st.denied { --c1: #ff3b3b; --c2: #ff8a8a; --glow: rgba(255, 59, 59, .8); animation: hud-deny 0.45s steps(2) 1; }
+.hud-gauge.st.denied .hud-meter { background: rgba(120, 10, 20, .9); }
+@keyframes hud-deny { 0%, 100% { transform: none; } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
 .hud-dash { margin-left: 6px; padding: 1px 6px; border-radius: 3px; font-size: 18px; color: #5b5266; border: 1px solid #3a2f45; }
 .hud-dash.ready { color: #0d0a12; background: #3fe0d0; border-color: #3fe0d0; }
 .hud-reloading { position: relative; padding-left: 26px; color: #ffd27a; }

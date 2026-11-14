@@ -1,5 +1,6 @@
 // The play scene: builds a room from its layout, places Leyla and the enemies, runs input, physics, combat and HUD.
 import { MapUI } from './map_ui.js';
+import { makeSfx } from './sfx.js';
 import { placeOf, threatOf } from '../worldmap.js';
 import { rescue, update as tankUpdate, phase as tankPhase } from '../tank.js';
 import { bonuses } from '../techtree.js';
@@ -593,6 +594,8 @@ export class PlayScene extends Phaser.Scene {
     for (const a of this.anchors) { const d = Math.hypot(a.x - x, a.y - y); if (d <= bd) { best = a; bd = d; } }
     return best;
   }
+  // #020: an action without the stamina for it: a short low buzz (at most every 300 ms), the HUD flashes the bar
+  staminaDenied() { const t = this.time.now; if (t - (this.deniedAt || 0) < 300) return; this.deniedAt = t; this.sfxUi ??= makeSfx(this, 0.25); this.sfxUi.nope?.(); }
   hitstop(time, ms) { this.hitstopUntil = time + ms; this.physics.world.pause(); }
 
   // ---------- loop ----------

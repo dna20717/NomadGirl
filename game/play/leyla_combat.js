@@ -29,7 +29,8 @@ export class LeylaCombat {
     // a late tap after the hit, still within the window
     if (this.combo && input.melee.pressed && grounded && this.state === 'normal') { this.comboNext(time, time, this.combo.beat, grounded); return; }
     if (input.melee.pressed && time >= this.meleeReady) {
-      if (!grounded || this.state !== 'normal' || !(L.meleeLight || L.meleeHeavy)) { this.scene.combat.melee(this, time); return; }   // in the air: the quick code hit
+      if (!this.canSpend('melee')) { this.spend('melee', time); return; }   // #020: too tired for a hit (flash + buzz)
+      if (!grounded || this.state !== 'normal' || !(L.meleeLight || L.meleeHeavy)) { this.spend('melee', time); this.scene.combat.melee(this, time); return; }   // in the air: the quick code hit
       this.charging = { at: time, ready: false };
     }
     const c = this.charging;
@@ -42,7 +43,8 @@ export class LeylaCombat {
     this.chargeEffects(time, -1);
     // released: heavy when charged, otherwise the first hit of the combo (or the light hit without combo); walking picks the walking version
     this.charging = null; this.sprite.clearTint();
-    const walking = Math.abs(b.velocity.x) > 20, heavy = c.ready;
+    const walking = Math.abs(b.velocity.x) > 20, heavy = c.ready && this.canSpend('heavy');   // #020: a charged hit without the stamina for it is a light one
+    if (!this.spend(heavy ? 'heavy' : 'melee', time)) return;
     if (!heavy && this.comboOn()) { this.combo = { n: 0, used: [], perfect: true, taps: [], beat: 0, until: 0 }; this.comboHit(time, walking); return; }
     this.combo = null;
     const look = heavy ? (walking ? L.meleeHeavyWalk || L.meleeHeavy : L.meleeHeavy) : (walking ? L.meleeLightWalk || L.meleeLight : L.meleeLight);
@@ -74,6 +76,9 @@ export class LeylaCombat {
     // forgiving (Daniel, 11.11.2026: „der fünfte ist zu schwer, insgesamt etwas verzeihender“): Kombo › Fehler erlaubt taps may miss the beat
     k.misses = (k.misses || 0) + (perfect ? 0 : 1); k.perfect = k.misses <= (C.misses ?? 1); k.taps.push(perfect); k.flash = { at: time, perfect };
     if (perfect) { this.sfx ??= makeSfx(this.scene, 0.22); this.sfx.tick?.(k.taps.length); }
+    // #020: every hit of the combo costs; without stamina the combo ends here
+    const cost = k.n === 3 ? 'heavy' : 'melee';
+    if (!this.spend(cost, time)) { this.combo = null; return; }
     if (k.n < 3) return this.comboHit(time, walking);
     if (k.n === 3) return this.comboFinisher(time);
     const w = this.scene.weapon('ranged');

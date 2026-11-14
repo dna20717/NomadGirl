@@ -36,7 +36,10 @@ const section = g => el('section', {}, el('h3', {}, icon(g.icon, 16), g.title), 
 
 export class Hud {
   constructor(root, { workshopDrafts = 0, commit = null } = {}) {
-    this.healthBar = el('i'); this.healthText = el('b');
+    // #020 vitals in cyberpunk style (Daniel, 14.11.2026): slanted neon bars with segments and scanlines; health with a ghost bar that
+    // trails behind damage, stamina below it with notches every dash, a shimmer while it refills and a red flash when it is not enough
+    this.healthBar = el('i', { class: 'fill' }); this.healthGhost = el('i', { class: 'ghost' }); this.healthText = el('b');
+    this.stBar = el('i', { class: 'fill' }); this.stText = el('b');
     this.ammo = el('b'); this.dash = el('span', { class: 'hud-dash' }, 'DASH');
     this.time = el('b'); this.kills = el('b'); this.deltas = el('b'); this.roomName = el('span', { class: 'hud-room' });
     this.toastsEl = el('div', { class: 'hud-toasts' });   // 🏆 Achievement, 📜 Rezept gelernt (#012): stack top right, go by themselves
@@ -64,7 +67,9 @@ export class Hud {
     root.append(
       el('div', { class: 'hud-top' },
         el('div', { class: 'hud-left' },
-          el('div', { class: 'hud-health' }, el('span', { class: 'hud-bar' }, this.healthBar), this.healthText),
+          this.vitalsEl = el('div', { class: 'hud-vitals' },
+            this.hpRow = el('div', { class: 'hud-gauge hp' }, el('span', { class: 'hud-tag' }, 'LEBEN'), el('span', { class: 'hud-meter' }, this.healthGhost, this.healthBar, el('s')), this.healthText),
+            this.stRow = el('div', { class: 'hud-gauge st' }, el('span', { class: 'hud-tag' }, 'AUSDAUER'), this.stMeter = el('span', { class: 'hud-meter' }, this.stBar, el('s')), this.stText)),
           el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'NÄGEL'), this.ammo, this.dash)),
         el('div', { class: 'hud-right' },
           el('div', { class: 'hud-row' }, this.roomName),
@@ -289,8 +294,25 @@ export class Hud {
     const hideP = !this.promptText || this.modal || !!this.inv?.isOpen || !!this.craft?.isOpen || !!this.tech?.isOpen || !!this.map?.isOpen;
     this.root.classList.toggle('hud-windowed', !!(this.inv?.isOpen || this.craft?.isOpen || this.tech?.isOpen || this.map?.isOpen || this.quests?.isOpen || this.ach?.isOpen || this.tut?.isOpen || this.build?.active));   // #017: toasts move to the top centre, over the free middle of the window header, never over its buttons
     if (this.promptEl.hidden !== hideP) this.promptEl.hidden = hideP;
-    this.healthBar.style.width = `${Math.max(0, l.health / max * 100)}%`;
+    const hp = Math.max(0, Math.min(1, l.health / max));
+    this.healthBar.style.width = `${hp * 100}%`;
+    this.ghostP = Math.max(hp, (this.ghostP ?? hp) - 0.006);   // the ghost catches up slowly
+    if (hp > (this.ghostP ?? 0)) this.ghostP = hp;
+    this.healthGhost.style.width = `${this.ghostP * 100}%`;
+    this.hpRow.classList.toggle('low', hp <= 0.3);
     this.healthText.textContent = `${Math.ceil(l.health)}/${max}`;
+    // stamina (#020)
+    const on = l.staminaOn, smax = l.maxStamina, st = Math.max(0, Math.min(1, (l.stamina ?? smax) / smax));
+    this.stRow.hidden = !on;
+    if (on) {
+      this.stBar.style.width = `${st * 100}%`;
+      const dash = l.staminaCost?.('dash') || 0;
+      if (this.stNotch !== `${dash}/${smax}`) { this.stNotch = `${dash}/${smax}`; this.stMeter.style.setProperty('--notch', dash > 0 ? `${dash / smax * 100}%` : '100%'); }
+      this.stRow.classList.toggle('refill', st < 1 && scene.now - (l.staminaAt ?? -1e9) >= (l.S?.delay ?? 600));
+      this.stRow.classList.toggle('denied', scene.now - (l.staminaDenied ?? -1e9) < 450);
+      this.stRow.classList.toggle('full', st >= 1);
+      this.stText.textContent = String(Math.floor(l.stamina ?? smax));
+    }
     // reload ring next to the magazine (also while she jumps or dashes, the reload keeps going; paused = dimmed)
     const rp = l.reloading ? Math.min(1, (scene.now - l.reloading.at) / l.reloading.dur) : l.reloadSaved > 0 ? l.reloadSaved / (scene.weapon('ranged')?.reloadTime ?? 1400) : -1;
     this.ammo.classList.toggle('hud-reloading', rp >= 0); this.ammo.classList.toggle('hud-paused', rp >= 0 && !l.reloading);
