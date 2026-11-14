@@ -10,11 +10,15 @@
   "loot": "mutanten_beute",
   "deltas": [0, 2],
   "countsForRanking": true,
-  "description": "Schlurft, stöhnt, beißt.",
-  "height": 170,
+  "description": "Ausgezehrter Plünderer, bleich wie ein Kellerkind. Schleicht durch die Ruinen und schlägt mit der Nagelkeule zu.",
+  "height": 172,
   "attack": {"windup": 520, "cooldown": 1100, "range": 120},
   "sense": {"cone": 120, "react": 500, "hearing": 80},
-  "placeholderColor": "olive"
+  "placeholderColor": "olive",
+  "kit": "raider",
+  "weapon": "nagelkeule",
+  "kitSkin": "hell",
+  "kitGang": "Blutrot"
  },
  "schleimbeisser": {
   "name": "Schleimbeißer",
@@ -27,11 +31,16 @@
   "loot": "mutanten_beute",
   "deltas": [1, 3],
   "countsForRanking": true,
-  "description": "Hängt an der Decke und wartet.",
-  "height": 100,
+  "description": "Hängt kopfüber an Rohren unter der Decke und lässt sich fallen, wenn jemand drunter durchläuft.",
+  "height": 178,
   "attack": {"windup": 350, "cooldown": 1000, "range": 150},
   "sense": {"hearing": 60},
-  "placeholderColor": "violet"
+  "placeholderColor": "violet",
+  "kit": "raider",
+  "weapon": "machete",
+  "kitHead": "dreads",
+  "kitSkin": "hell",
+  "kitGang": "Gelb"
  },
  "rattenschwarm": {
   "name": "Rattenschwarm",
@@ -120,7 +129,13 @@
   "loot": "boss_beute",
   "deltas": [80, 120],
   "countsForRanking": true,
-  "description": "Hat das Ministerium nie verlassen. Hat auch nicht vor, es zu tun."
+  "description": "Hat das Ministerium nie verlassen. Gasmaske, Rohrhammer und zwei Meter schlechte Laune.",
+  "kit": "raider",
+  "weapon": "rohrhammer",
+  "kitHead": "gasmask",
+  "kitSkin": "wie gemalt",
+  "kitGang": "Cyan",
+  "height": 230
  },
  "schildtraeger": {
   "name": "Plünderer mit Schild",
@@ -147,7 +162,7 @@
  },
  "panzerwache": {
   "name": "Panzerwache",
-  "family": "machine",
+  "family": "raider",
   "behavior": "patrol",
   "health": 90,
   "damage": 18,
@@ -157,11 +172,16 @@
   "deltas": [6, 12],
   "countsForRanking": true,
   "attack": {"kind": "melee", "windup": 650, "cooldown": 1300, "range": 130},
-  "height": 204,
+  "height": 196,
   "placeholderColor": "steel",
   "counter": {"armor": 2, "armorChip": 15},
   "sense": {"hearing": 120},
-  "description": "Alter Wachroboter mit Panzerplatten. Leichte Treffer kratzen nur, schwere knacken die Platten."
+  "description": "Schwer gepanzerter Plünderer mit Stachelhelm und Rohrhammer. Leichte Treffer kratzen nur, schwere knacken die Platten.",
+  "kit": "raider",
+  "weapon": "rohrhammer",
+  "kitHead": "helmet",
+  "kitSkin": "dunkel",
+  "kitGang": "Orange"
  },
  "keulenschwinger": {
   "family": "raider",

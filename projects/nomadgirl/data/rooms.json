@@ -838,7 +838,7 @@
    {"symbol": "s", "enemy": "schildtraeger"},
    {"symbol": "p", "enemy": "panzerwache"},
    {"symbol": "b", "enemy": "schleimbeisser"},
-   {"symbol": "d", "enemy": "wachdrohne"},
+   {"symbol": "d", "enemy": "pistolero"},
    {"symbol": "g", "enemy": "schuetze"}
   ],
   "terrain": "concrete"

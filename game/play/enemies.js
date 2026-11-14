@@ -21,7 +21,7 @@ export class Enemy {
     this.weapon = scene.data_.weapons?.[def.weapon] || null;
     this.a = def.attack || {};
     this.kind = ['patrol', 'charger', 'shooter', 'ambusher', 'flyer', 'boss'].includes(def.behavior) ? def.behavior : 'patrol';
-    this.shape = def.placeholderShape || SHAPES[this.kind] || 'raider';
+    this.shape = def.kit ? 'raider' : def.placeholderShape || SHAPES[this.kind] || 'raider';   // a kit is always a person (also the ambusher on the ceiling)
     this.attackKind = this.a.kind || (this.kind === 'flyer' && (this.a.projectileSpeed || this.weapon) ? 'shot' : KINDS[this.kind]);
     this.h = def.height ?? (this.shape === 'blob' ? 110 : this.shape === 'drone' ? 90 : 220);
     const S = def.sense || {}, M = def.move || {}, C = def.counter || {};
@@ -531,7 +531,15 @@ export class Enemy {
       g.lineStyle(3, open ? 0x2a3138 : 0xb8c7d4, 1).strokeRoundedRect(fx - 9, top + (open ? 30 : 0), 18, hh, 5);
       g.fillStyle(0xffd27a, open ? 0.2 : 0.8).fillRect(fx - 3, top + hh * 0.45 + (open ? 30 : 0), 6, 10);
     }
-    if (this.plates > 0) {
+    if (this.plates > 0 && this.look.anims) {   // painted kit: the plates as small steel badges over the head, the body stays as painted
+      const y = this.onCeiling ? b.bottom + 44 : b.top - 22;
+      for (let i = 0; i < this.plates; i++) {
+        const x = this.x - (this.plates - 1) * 13 + i * 26;
+        g.fillStyle(0x0d0a12, 0.8).fillRoundedRect(x - 11, y - 9, 22, 18, 4);
+        g.fillStyle(0x9aa6b2, 1).fillRoundedRect(x - 8, y - 6, 16, 12, 3);
+        g.fillStyle(0xe8eef4, 1).fillRect(x - 6, y - 4, 12, 3);
+      }
+    } else if (this.plates > 0) {
       g.fillStyle(0x9aa6b2, 0.85).fillRoundedRect(this.x - this.w * 0.55, b.top + b.height * 0.22, this.w * 1.1, b.height * 0.3, 6);
       g.lineStyle(2, 0x2a3138, 1).strokeRoundedRect(this.x - this.w * 0.55, b.top + b.height * 0.22, this.w * 1.1, b.height * 0.3, 6);
       for (let i = 0; i < this.plates; i++) g.fillStyle(0xe8eef4, 1).fillCircle(this.x - (this.plates - 1) * 7 + i * 14, b.top + b.height * 0.37, 4);

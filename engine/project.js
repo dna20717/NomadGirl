@@ -82,6 +82,11 @@ function usageChecks(p, m) {
     const inRecipe = Object.values(p.data.recipes || {}).some(r => r.result === id || (r.ingredients || []).some(i => i.item === id));
     if (!used.has('items:' + id) && !inRecipe) m.push({ kind: 'hint', text: `Gegenstand „${x.name || id}“ kommt nirgends vor (keine Beute, kein Rezept)`, place: { area: 'items', id } });
   }
+  // no enemies drawn from code in the game (Daniel, 14.11.2026: „stell sicher, dass die nicht mehr auftauchen“): whoever spawns must come from a kit
+  for (const a of ['pois', 'rooms', 'encounters']) for (const [eid, x] of entries(p, a)) for (const r of references(a, x)) {
+    const e = r.area === 'enemies' && p.data.enemies?.[r.value];
+    if (e && !e.kit) m.push({ kind: 'error', text: `${AREAS[a].singular || AREAS[a].name} „${x.name || eid}“: Gegner „${e.name || r.value}“ ist aus Code gezeichnet (kein Bausatz) und darf nicht auftauchen`, place: { area: a, id: eid } });
+  }
   for (const [id, x] of Object.entries(p.data.pois || {})) if (!Object.values(p.data.locations || {}).some(l => l.poi === id)) m.push({ kind: 'hint', text: `POI „${x.name || id}“ hat noch keinen Ort auf der Oberwelt`, place: { area: 'pois', id } });
 }
 
