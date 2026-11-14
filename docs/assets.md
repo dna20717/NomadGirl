@@ -50,6 +50,8 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/vehicles/van_door.png` | Leylas Van, Schiebetür geht auf (5 Frames 248 × 172, `van`), Spawn-Punkt; Schüssel herausgenommen | aus `van_door_source.gif` zugeschnitten (Code, `tools/van_strips.py`) | 07.11.2026 |
 | `assets/vehicles/van_dish.png` | Radarschüssel dreht sich (16 Frames 35 × 20, `van_dish`) | aus der Schüssel im Original gedreht (Code, `tools/van_strips.py`) | 07.11.2026 |
 | `assets/vehicles/van_roof_front.png` | vorderes Dachgeländer als Vordergrund (5 Frames, `van_roof_front`) | aus dem Original ausgeschnitten (Code, `tools/van_strips.py`) | 07.11.2026 |
+| `assets/vehicles/concept/fatbird_concept.png` | Konzept Fatbird (Referenz, `concept_fatbird`): Lastdrohne mit vier Mantelrotoren, Container im Rahmen, Seite + Front | KI-generiert (Daniel) | 14.11.2026 |
+| `assets/vehicles/concept/crawler_concept.png` | Konzept Crawler (Referenz, `concept_crawler`): Raupenplattform mit Container-Stadt, Seite + Front | KI-generiert (Daniel) | 14.11.2026 |
 | `assets/vehicles/van_door_source.gif` | Leylas Van mit Schiebetür: Original, 5 Frames à 150 ms, 256 × 256 (`van_source`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/camp/campfire_source.gif` | Lagerfeuer: Original, 9 Frames à 150 ms, 128 × 128 (`campfire_source`) | KI-generiert (Daniel) | 07.11.2026 |
 | `assets/camp/campfire.png` | Lagerfeuer im Camp: 9 Frames à 72 × 100 als Streifen, im Spiel 200 px hoch (`campfire`) | aus dem Original zugeschnitten (Code) | 07.11.2026 |

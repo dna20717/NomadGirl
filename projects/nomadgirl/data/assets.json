@@ -5253,5 +5253,21 @@
   "source": "KI (PixelLab, Create Image Pro, AAP-64), Rand per Code abgeschnitten",
   "date": "14.11.2026",
   "description": "Generisches Reisebild für die Zwischenfälle unterwegs (#021, Daniel: „ähnlich den Intro-Panels“): der Van allein auf einer rissigen Wüstenstraße in der Dämmerung, Strommasten, Reklametafel, die Stadt am Horizont."
+ },
+ "concept_fatbird": {
+  "name": "Konzept · Fatbird",
+  "kind": "reference",
+  "file": "assets/vehicles/concept/fatbird_concept.png",
+  "source": "KI-generiert (Daniel)",
+  "date": "14.11.2026",
+  "description": "Endgame-Zugmaschine Fatbird, Seite und Front: schwere Lastdrohne mit vier Mantelrotoren, Cockpit, Container im Rahmen, Gelb/Rost/Dunkelviolett, Neon-Blau unten. Laut Daniel als Mischung mit einer Gashülle darüber (design.md › Fatbird)."
+ },
+ "concept_crawler": {
+  "name": "Konzept · Crawler",
+  "kind": "reference",
+  "file": "assets/vehicles/concept/crawler_concept.png",
+  "source": "KI-generiert (Daniel)",
+  "date": "14.11.2026",
+  "description": "Endgame-Zugmaschine Crawler, Seite und Front: Raupenplattform mit gelber Kabine, darauf eine gestapelte Container-Stadt mit Neon, Bannern, Kran, Schüssel und Bohrturm; Größenvergleich Mensch, Auto, Panzer."
  }
 }
