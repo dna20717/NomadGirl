@@ -21,7 +21,7 @@ const BY = { kitchen: 'kitchen', foodtruck: 'kitchen', sleep: 'sleep', guests: '
 W.zisterne = { ...(W.zisterne || {}), name: 'Zisterne', function: 'cistern', stage: 'mvp', places: 1, power: 0, value: 300, look: 'ws_cistern',
   description: 'Fängt Regen und Tau, filtert durch Kohle und Sand. Füllt sich, während du schläfst, fährst oder plünderst.',
   cistern: { item: 'wasser', perHour: 0.25, max: 8 },
-  fx: W.zisterne?.fx || [{ kind: 'screen', x: 184, y: 80, w: 8, h: 26, color: '#20d6c7', size: 0, rate: 1, when: 'always' }, { kind: 'bubbles', x: 150, y: 70, w: 60, h: 40, color: '#a6fcdb', size: 2, rate: 2, when: 'always' }] };
+  fx: W.zisterne?.fx || [{ kind: 'screen', x: 70, y: 100, w: 86, h: 6, color: '#20d6c7', size: 0, rate: 1, when: 'always' }, { kind: 'bubbles', x: 72, y: 110, w: 82, h: 80, color: '#a6fcdb', size: 2, rate: 2, when: 'always' }] };
 for (const [id, w] of Object.entries(W)) { const k = BY[w.function]; if (k && A[`out_${k}`] && !w.outside) w.outside = `out_${k}`; }
 // fresh water: the cistern's harvest, a drink and an ingredient
 I.wasser = { ...(I.wasser || {}), name: 'Frischwasser', look: 'icons_gear', icon: 54, category: 'ingredient', size: [1, 1], stack: 5, value: 4, buff: 'erste_hilfe',
