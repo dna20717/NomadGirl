@@ -36,7 +36,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
-- 14.11. Code → Ava: #016 Flow & Kohärenz läuft (Daniels Auswahl aus Avas Analyse: Losziehen + Loadout-Check, Spannungskurve, roter Faden, Run-HUD, Gangs + Boss, Tutorial im Run nicht modal).
+- 14.11. Code → Ava: #016 fertig: Losziehen in einem Schritt + Bereit?, Spannungskurve, Zielzeile (roter Faden), Run-HUD aufgeräumt, Gangs je POI, Hausmeister-Boss, Tipp im Run, **Questlog** (Hauptquest, Tank, Nebenaufträge; Lagerfeuer + Warroom). PixelLab 0.
+- 14.11. Code → Ava: (alt) #016 Flow & Kohärenz läuft (Daniels Auswahl aus Avas Analyse: Losziehen + Loadout-Check, Spannungskurve, roter Faden, Run-HUD, Gangs + Boss, Tutorial im Run nicht modal).
 - 14.11. Code → Ava: #015 fertig: Tutorial-Häkchen „diese Sitzung nicht mehr“, keine Code-Gegner (Prüfung in `ng check`), Hall-of-Loot-Trophäen auf den Brettern, Zisterne frontal. PixelLab 19, übrig 725.
 - 14.11. Code → Ava (Regel, Daniel: „alte Zweige aufräumen, damit es weniger zu Fehlern kommt“): **Nur `main` pushen**, Sitzungszweige nie (sonst ❌ durch Cloudflare-Vorschau-Builds); lokalen Zweig mit `git branch -u origin/main` an `main` hängen. Daniel schaltet bei Cloudflare die Builds für Nebenzweige ab und löscht die 6 alten Zweige auf GitHub (alle geprüft, Inhalt komplett auf `main`). Details `docs/features/online.md` › Nebenzweige und Vorschau-Builds.
 - 13.11. Code → Ava: #013 fertig: Herd mit Gar-Balken + Qualität, Werkbank mit Bauplan + Waffenteilen (Waffen-Exemplare), Ripperdoc-OP, AvAs Platine, Foodtruck-Theke, Regler. Überall „Schnell“. ⚠️ zum Absegnen: Werte, Gewürze, Platinen-Effekte, Foodtruck im Camp. PixelLab 0, übrig 744.
@@ -316,7 +317,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** Commits `393151a` (Tutorial-Häkchen), `15c02cf` (Gegner), `7cb9438` (Hall of Loot), `ce741b3` + Folge (Zisterne, Feldhandbuch-Bilder). Tests: `npm test` 120, alle 32 Browser-Tests grün. PixelLab: diesmal 19 (10 verworfen: Referenz in alter Perspektive wurde kopiert; 9 mit `view: side` sitzt), übrig 725. **Bitte testen:** eine Lektion mit Häkchen wegklicken; Bunker/Ministerium: keine Drohnen/Ratten mehr, Hausmeister als großer Raider; Schatzkammer mit Trophäen füllen; Zisterne im Rig.
 
 ### #016 Flow & Kohärenz: Losziehen, Spannungskurve, roter Faden, Gangs, Tutorial im Run
-- **Status:** läuft (Code, 14.11.) · angelegt 14.11. von Code (Analyse Ava, Daniel hat ausgewählt)
+- **Status:** fertig (Code, 14.11.) · angelegt 14.11. von Code (Analyse Ava, Daniel hat ausgewählt)
 - **Für:** Code
 - **Lesen:** `worldmap.md`, `pois.md`, `progression.md`, `ui.md`, `tutorial.md`, `combat.md`
 - **Befund (Durchspielen 14.11.):** Bis zum Run vier Eingaben (Van → Menü → Karte, Nachbarort vorgewählt, „Hier plündern“ versteckt); Camp-Vorbereitung im Run unsichtbar; Gegner in der Tankstelle gleichmäßig alle 300–600 px (kein Rhythmus); Suche nach AvAs Heilmittel im Spiel kaum sichtbar; im Run zwei Δ-Anzeigen und die Camp-Leiste; POIs ohne eigene Gegner-Identität, Hausmeister ohne Boss-Verhalten; Lektionen pausieren auch im Run.
@@ -332,7 +333,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Bleibt:** Start mit 40.000 Δ (zum Testen, Daniel 14.11.). Beute-Bilanz am Run-Ende: nicht jetzt.
 - **Fertig, wenn:** alles spielbar, Werte in der Werkstatt, Tests grün, Build grün.
 - **Rückfragen:**
-- **Ergebnis:**
+  - Spannungskurve → ⚠️ vorläufig: Zufallsgegner (1) mit der Chance der Kurve, leise Räume schwächere, laute zähere Gegner, Seitenräume halb so laut; Kurven je POI in der Werkstatt.
+  - Gangs → ⚠️ Gelbe Geier (Tankstelle), Neon-Ratten (Großmarkt), Rostgarde (Bunker 13), Ordnungsamt (Ministerium); nur Plünderer aus dem Bausatz tragen die Farbe.
+  - Hausmeister → ⚠️ 60 % / 30 %: wütend, schneller, 2 Helfer, Bodenwellen.
+  - Nebenaufträge → ⚠️ 5 Start-Aufträge von Schraube und Onkel Sung (Texte und Belohnungen frei erfunden, in der Werkstatt › Aufträge).
+  - Tipp im Run → ⚠️ 9 s, unten links.
+- **Ergebnis:** Commits `215264d` (Losziehen + Bereit?), `60e8bf4` (Spannungskurve), `694d2c8` (roter Faden + Run-HUD), `df6a188` (Gangs + Boss), `99efa48` (Tipp im Run), `ff88947` (Questlog). Tests: `npm test` 127, alle 32 Browser-Tests grün. PixelLab: 0. **Bitte testen:** Van-Tür → Karte („Bereit?“), Tankstelle plündern (ruhiger Start, harter Schluss, Gelbe Geier), Zielzeile oben rechts, am Lagerfeuer das Questlog (Kabelsalat annehmen, verfolgen), im Ministerium den Hausmeister unter 60 % bringen.
 
 ## Archiv
 
