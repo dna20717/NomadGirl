@@ -5207,5 +5207,34 @@
   "derivedFrom": "ws_treasury_hall_empty",
   "date": "13.11.2026",
   "description": "Leere Fassung plus Beutehaufen links vorne. Wächst mit dem Füllstand von unten."
+ },
+ "icons_misc": {
+  "name": "Symbole: Kleinkram & Nachzügler",
+  "kind": "icons",
+  "file": "assets/items/icons_misc.png",
+  "grid": [4, 4],
+  "cell": [64, 64],
+  "names": [
+   "gluehbirne",
+   "kronkorken",
+   "stoffreste",
+   "schrottplatte",
+   "discokugel",
+   "rohrbogen",
+   "auspuffkruemmer",
+   "antenne",
+   "t_stueck",
+   "verkohlter_klumpen",
+   "schrottskulptur",
+   "hochleistungszelle",
+   "turbinenmodul",
+   "schockstab",
+   "schulranzen",
+   "wanderrucksack"
+  ],
+  "description": "Die letzten 16 Dinge ohne Grafik (#018, Daniel 14.11.2026): Kleinkram, Rohrteile, Trophäen, Drohnenteile, Schockstab, zwei Rucksäcke. 4 × 4 à 64 px. Das T-Stück kam als Kreuz und wurde per Code zum T beschnitten.",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Stilbild icons_treasure)",
+  "derivedFrom": "icons_treasure",
+  "date": "14.11.2026"
  }
 }

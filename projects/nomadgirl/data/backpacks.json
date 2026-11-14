@@ -1,6 +1,26 @@
 {
- "schulranzen": {"name": "Schulranzen", "size": [4, 3], "tier": 1, "value": 10, "description": "Pink, mit Glitzer. Aus einer Grundschule in Sektor 4.", "bag": [2, 2], "glyph": "🎒"},
- "wanderrucksack": {"name": "Wanderrucksack", "size": [6, 4], "tier": 2, "value": 80, "description": "Riecht nach Abenteuer und ein bisschen nach Schimmel.", "bag": [2, 3], "glyph": "🎒"},
+ "schulranzen": {
+  "name": "Schulranzen",
+  "size": [4, 3],
+  "tier": 1,
+  "value": 10,
+  "description": "Pink, mit Glitzer. Aus einer Grundschule in Sektor 4.",
+  "bag": [2, 2],
+  "glyph": "🎒",
+  "look": "icons_misc",
+  "icon": 14
+ },
+ "wanderrucksack": {
+  "name": "Wanderrucksack",
+  "size": [6, 4],
+  "tier": 2,
+  "value": 80,
+  "description": "Riecht nach Abenteuer und ein bisschen nach Schimmel.",
+  "bag": [2, 3],
+  "glyph": "🎒",
+  "look": "icons_misc",
+  "icon": 15
+ },
  "militaerrucksack": {
   "name": "Militärrucksack",
   "size": [8, 5],

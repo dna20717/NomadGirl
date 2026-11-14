@@ -21,11 +21,23 @@
   "description": "Heil. Ein kleines Wunder.",
   "glyph": "💡",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrauben", "count": 1}]
+  "salvage": [{"item": "schrauben", "count": 1}],
+  "look": "icons_misc",
+  "icon": 0
  },
- "kronkorken": {"name": "Kronkorken", "category": "junk", "size": [1, 1], "stack": 99, "value": 0, "description": "Hier nichts wert. Leyla sammelt sie trotzdem.", "glyph": "KK"},
+ "kronkorken": {
+  "name": "Kronkorken",
+  "category": "junk",
+  "size": [1, 1],
+  "stack": 99,
+  "value": 0,
+  "description": "Hier nichts wert. Leyla sammelt sie trotzdem.",
+  "glyph": "KK",
+  "look": "icons_misc",
+  "icon": 1
+ },
  "schrott": {"name": "Schrott", "category": "resource", "size": [2, 1], "stack": 20, "value": 1, "glyph": "⚙", "look": "icons_gear", "icon": 30},
- "stoffreste": {"name": "Stoffreste", "category": "resource", "size": [1, 1], "stack": 10, "value": 1, "glyph": "🧵"},
+ "stoffreste": {"name": "Stoffreste", "category": "resource", "size": [1, 1], "stack": 10, "value": 1, "glyph": "🧵", "look": "icons_misc", "icon": 2},
  "batteriezelle": {
   "name": "Batteriezelle",
   "category": "resource",
@@ -78,7 +90,18 @@
   "icon": 29
  },
  "bohneneintopf": {"name": "Bohneneintopf", "category": "food", "size": [1, 1], "stack": 3, "value": 6, "buff": "satt", "glyph": "🍲", "look": "icons_kitchen", "icon": 28},
- "schrottplatte": {"name": "Schrottplatte", "category": "component", "size": [2, 2], "stack": 4, "value": 8, "glyph": "▦", "salvageAt": "werkbank", "salvage": [{"item": "schrott", "count": 2}]},
+ "schrottplatte": {
+  "name": "Schrottplatte",
+  "category": "component",
+  "size": [2, 2],
+  "stack": 4,
+  "value": 8,
+  "glyph": "▦",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrott", "count": 2}],
+  "look": "icons_misc",
+  "icon": 3
+ },
  "kabelbaum": {
   "name": "Kabelbaum",
   "category": "component",
@@ -115,7 +138,9 @@
   "glyph": "🪩",
   "tags": ["trophy"],
   "salvageAt": "werkbank",
-  "salvage": [{"item": "gluehbirne", "count": 1},{"item": "kronkorken", "count": 20}]
+  "salvage": [{"item": "gluehbirne", "count": 1},{"item": "kronkorken", "count": 20}],
+  "look": "icons_misc",
+  "icon": 4
  },
  "zettel_curry": {
   "name": "Fettiger Notizzettel",
@@ -141,7 +166,9 @@
   "glyph": "L",
   "description": "Ein L aus Stahl. Passt nie dahin, wo du ihn brauchst.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrott", "count": 2}]
+  "salvage": [{"item": "schrott", "count": 2}],
+  "look": "icons_misc",
+  "icon": 5
  },
  "auspuffkruemmer": {
   "name": "Auspuffkrümmer",
@@ -153,7 +180,9 @@
   "glyph": "S",
   "description": "Riecht nach verbranntem Öl und Abenteuer.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrott", "count": 3},{"item": "technik", "count": 1}]
+  "salvage": [{"item": "schrott", "count": 3},{"item": "technik", "count": 1}],
+  "look": "icons_misc",
+  "icon": 6
  },
  "antenne": {
   "name": "Teleskopantenne",
@@ -165,7 +194,9 @@
   "description": "Empfängt drei Sender. Alle spielen Werbung.",
   "tags": ["trophy"],
   "salvageAt": "werkbank",
-  "salvage": [{"item": "kupferkabel", "count": 1},{"item": "schrott", "count": 1}]
+  "salvage": [{"item": "kupferkabel", "count": 1},{"item": "schrott", "count": 1}],
+  "look": "icons_misc",
+  "icon": 7
  },
  "t_stueck": {
   "name": "T-Stück",
@@ -177,7 +208,9 @@
   "glyph": "T",
   "description": "Klempner-Tetris.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrott", "count": 1},{"item": "schrauben", "count": 1}]
+  "salvage": [{"item": "schrott", "count": 1},{"item": "schrauben", "count": 1}],
+  "look": "icons_misc",
+  "icon": 8
  },
  "autobatterie": {
   "name": "Autobatterie",
@@ -192,7 +225,17 @@
   "salvageAt": "werkbank",
   "salvage": [{"item": "batteriezelle", "count": 2},{"item": "schrott", "count": 2},{"item": "technik", "count": 1}]
  },
- "verkohlter_klumpen": {"name": "Verkohlter Klumpen", "category": "junk", "size": [1, 1], "stack": 5, "value": 0, "glyph": "🪨", "description": "War mal Essen. Jetzt ist es ein Briefbeschwerer."},
+ "verkohlter_klumpen": {
+  "name": "Verkohlter Klumpen",
+  "category": "junk",
+  "size": [1, 1],
+  "stack": 5,
+  "value": 0,
+  "glyph": "🪨",
+  "description": "War mal Essen. Jetzt ist es ein Briefbeschwerer.",
+  "look": "icons_misc",
+  "icon": 9
+ },
  "graue_pampe": {
   "name": "Graue Pampe",
   "category": "junk",
@@ -223,7 +266,9 @@
   "value": 6,
   "glyph": "🗿",
   "description": "Sollte ein Werkzeug werden. Ist jetzt Kunst. Sammler sind verwirrt, zahlen aber.",
-  "tags": ["trophy"]
+  "tags": ["trophy"],
+  "look": "icons_misc",
+  "icon": 10
  },
  "gewuerzreis": {
   "name": "Gewürzreis",
@@ -596,7 +641,9 @@
   "battery": 60,
   "description": "Ein Akku, der eigentlich in ein Militär-Exoskelett gehört. AvA trägt Leyla damit deutlich länger.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "batteriezelle", "count": 2},{"item": "technik", "count": 2}]
+  "salvage": [{"item": "batteriezelle", "count": 2},{"item": "technik", "count": 2}],
+  "look": "icons_misc",
+  "icon": 11
  },
  "turbinenmodul": {
   "name": "Turbinenmodul",
@@ -609,7 +656,9 @@
   "battery": 35,
   "description": "Zwei kleine Mantelpropeller zum Anstecken. Laut, aber sie stemmen Gewicht.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "zahnraeder", "count": 2},{"item": "technik", "count": 2}]
+  "salvage": [{"item": "zahnraeder", "count": 2},{"item": "technik", "count": 2}],
+  "look": "icons_misc",
+  "icon": 12
  },
  "goldzahn": {
   "name": "Goldzahn",

@@ -51,7 +51,9 @@
   "glyph": "⚡",
   "tags": ["trophy"],
   "salvageAt": "werkbank",
-  "salvage": [{"item": "batteriezelle", "count": 1},{"item": "kupferkabel", "count": 1},{"item": "technik", "count": 1}]
+  "salvage": [{"item": "batteriezelle", "count": 1},{"item": "kupferkabel", "count": 1},{"item": "technik", "count": 1}],
+  "look": "icons_misc",
+  "icon": 13
  },
  "trommelrevolver": {
   "name": "Trommelrevolver",

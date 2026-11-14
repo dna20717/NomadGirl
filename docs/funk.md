@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 14.11. Code → Ava: #018 fertig: die letzten 16 Dinge ohne Grafik haben Symbole (`icons_misc`, PixelLab 10, übrig 708).
 - 14.11. Code → Ava: #017 fertig: Beute-Bilanz, Companions mit Aufträgen, Toasts weichen aus, 9 neue Räume, Test-Runner `npm run test:browser`, große Dateien aufgeteilt. Korrektur zu #016: zwei Browser-Tests waren rot (Filterfehler beim Melden), jetzt alle 32 grün.
 - 14.11. Code → Ava: #016 fertig: Losziehen in einem Schritt + Bereit?, Spannungskurve, Zielzeile (roter Faden), Run-HUD aufgeräumt, Gangs je POI, Hausmeister-Boss, Tipp im Run, **Questlog** (Hauptquest, Tank, Nebenaufträge; Lagerfeuer + Warroom). PixelLab 0.
 - 14.11. Code → Ava: (alt) #016 Flow & Kohärenz läuft (Daniels Auswahl aus Avas Analyse: Losziehen + Loadout-Check, Spannungskurve, roter Faden, Run-HUD, Gangs + Boss, Tutorial im Run nicht modal).
@@ -360,11 +361,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** Commits `8d7cf66` (Toasts), `47b102f` (Beute-Bilanz), `ddc2899` (Companions), `02beaab` (Räume), `807315c` (Test-Runner, Panzerung), `70959f1` (Aufteilen + Tests), `9d6b751` (CLAUDE.md). Tests: `npm test` 129, **alle 32 Browser-Tests grün** mit `npm run test:browser`. Korrektur: Nach #016 hatte ich fälschlich „alle grün“ gemeldet (Filterfehler), `pad_test` und `poi_test` waren rot und sind jetzt angepasst. PixelLab: 0. **Bitte testen:** einen Run beenden (Bilanz, goldener Knopf), mit Schraube reden („!“ → Auftrag), Tankstelle mehrmals plündern (neue Räume: Waschstraße, Zapfinseln, Reifenlager mit Secret).
 
 ### #018 Symbole für die letzten 16 Dinge ohne Grafik
-- **Status:** läuft (Code, 14.11.) · angelegt 14.11. von Code (Daniel: „Welche Gegenstände haben noch keine Grafik“ → „Ja, ein Raster“)
+- **Status:** fertig (Code, 14.11.) · angelegt 14.11. von Code (Daniel: „Welche Gegenstände haben noch keine Grafik“ → „Ja, ein Raster“)
 - **Für:** Code
 - **Auftrag:** ein Symbol-Raster `icons_misc` (4 × 4 à 64 px, PixelLab, Stil wie `icons_treasure`, AAP-64) für Glühbirne, Kronkorken, Stoffreste, Schrottplatte, Discokugel, Rohrbogen, Auspuffkrümmer, Teleskopantenne, T-Stück, Verkohlter Klumpen, Schrottskulptur, Hochleistungszelle, Turbinenmodul, Schockstab, Schulranzen, Wanderrucksack.
 - **Rückfragen:**
-- **Ergebnis:**
+  - T-Stück kam als Kreuz → per Code zum T beschnitten.
+- **Ergebnis:** `icons_misc` eingebaut, alle 158 Gegenstände, 12 Waffen und 3 Rucksäcke haben jetzt eine Grafik. Tests: `npm test` 129, inventory/treasury/craft/gear grün. PixelLab: diesmal 10, übrig 708. **Bitte testen:** Kiste und Rucksack (Schulranzen-Symbol), Discokugel in der Hall of Loot.
 
 ## Archiv
 
