@@ -1,25 +1,20 @@
-// Inventories in the Diablo/Tetris style: grids where things take up cells by their shape, can be turned and stack.
+// Inventories in the Diablo style: grids where things take up a rectangle of cells, can be turned and stack.
 // Pure logic (browser and Node, no DOM): the backpack, the chest in the camp, storage places in the rig and the ground in a run
 // are all the same kind of grid. The interface is game/play/inventory_ui.js.
 //
 // grid  = { w, h, items: [entry] }
 // entry = { a, id, n, x, y, r, q?, mods? }   a = area of the thing ('items' | 'weapons' | 'backpacks'), n = count, x/y = top left cell, r = quarter turns (0–3)
 //         q = quality of a dish or thing (#013: 1 gut, 2 perfekt; only the same quality stacks), mods = values of one weapon copy (#013)
-// Shapes: items may have a "shape" (rows of text, # = taken, . = free), otherwise a full rectangle of "size" [w, h].
-// Weapons use their "size", backpacks their "bag" footprint (default 2 × 3).
+// Rectangles only (Daniel, 14.11.2026: „Lass uns mit dem Tetris-Quatsch aufhören und auf Rechtecke beschränken“): items and weapons
+// take their "size" [w, h], backpacks their "bag" footprint (default 2 × 3). Older savegames are tidied by untangle().
 
 export const AREAS_WITH_THINGS = ['items', 'weapons', 'backpacks'];
 
 export function thing(D, a, id) { return D[a]?.[id] || null; }
 
-// the cells of a thing (unturned): list of [x, y]
+// the cells of a thing (unturned): list of [x, y], always its whole rectangle
 export function baseCells(D, a, id) {
   const t = thing(D, a, id) || {};
-  if (a === 'items' && Array.isArray(t.shape) && t.shape.length) {
-    const cells = [];
-    t.shape.forEach((row, y) => [...row].forEach((c, x) => { if (c !== '.' && c !== ' ') cells.push([x, y]); }));
-    if (cells.length) return cells;
-  }
   const [w, h] = (a === 'backpacks' ? t.bag : t.size) || (a === 'backpacks' ? [2, 3] : [1, 1]);
   const cells = [];
   for (let y = 0; y < Math.max(1, h); y++) for (let x = 0; x < Math.max(1, w); x++) cells.push([x, y]);
@@ -68,6 +63,20 @@ export function at(D, grid, x, y) { return occupancy(D, grid).get(`${x},${y}`) |
 export function findSpot(D, grid, a, id, turns = [0, 1, 2, 3]) {
   for (const r of turns) for (let y = 0; y < grid.h; y++) for (let x = 0; x < grid.w; x++) if (fits(D, grid, { a, id, r }, x, y)) return { x, y, r };
   return null;
+}
+
+// a grid whose things overlap or stick out (older savegames: Tetris shapes nested into each other became full rectangles, 14.11.2026):
+// keeps whatever fits where it lies, moves the rest to a free spot in the same grid (any turn); → the entries that found no room
+export function untangle(D, grid) {
+  const all = grid.items, out = [];
+  grid.items = [];
+  const later = [];
+  for (const e of all) if (fits(D, grid, e, e.x, e.y)) grid.items.push(e); else later.push(e);
+  for (const e of later) {
+    const spot = findSpot(D, grid, e.a, e.id, [e.r || 0, ...[0, 1, 2, 3].filter(r => r !== (e.r || 0))]);
+    if (spot) grid.items.push(Object.assign(e, spot)); else out.push(e);
+  }
+  return out;
 }
 
 // add n of a thing: first onto existing stacks, then into free spots. Returns how many did NOT fit.

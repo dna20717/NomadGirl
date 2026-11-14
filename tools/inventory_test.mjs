@@ -85,7 +85,9 @@ const ruck = await ev(() => { const g = nomad.save().inv.grids; const k = Object
 await click(1, ruck.x, ruck.y); await slot('Rucksack');
 s = await inv();
 check('Größerer Rucksack angelegt, Inhalt bleibt', s.slots.backpack === 'wanderrucksack' && s.backpack.w === 6 && s.backpack.h === 4 && s.held === 'schulranzen×1', s);
-await click(1, 0, 3);
+// a free spot for the held school bag in the shelf (#019: rectangles only, the shelf's layout is not fixed)
+const free = await ev(async () => { const { findSpot } = await import('./game/inventory.js'); const sc = game.scene.getScene('play'), u = sc.hud.inv, g = nomad.save().inv.grids[u.other.key]; return findSpot(sc.data_, g, u.held.e.a, u.held.e.id, [u.held.e.r || 0]); });
+await click(1, free.x, free.y);
 s = await inv();
 check('Schulranzen ins Regal', !s.held && has(s.other.grid, 'schulranzen'), s);
 await shot('shelf');

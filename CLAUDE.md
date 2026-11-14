@@ -65,7 +65,7 @@ game/worldmap.js       Reisekarte (ohne DOM): Routen-Netz je Durchgang würfeln,
 game/quest.js, quests.js, summary.js   Zielzeile, Questlog, Beute-Bilanz (ohne DOM)
 game/crafting.js       Kochen & Craften (ohne DOM): Rezeptbuch, Vorräte aus Lager/Kiste/Rucksack, Herstellen, Experimentieren, Fehlschläge, Zettel, Tipps, Essen
 game/rig.js            Rig umbauen (ohne DOM): Budgets (Gewicht, Container, Energie, Verbrauch, Rig-Teile), Rig-Teile an Sockeln (anschrauben, tauschen, abschrauben, kaufen, verkaufen), Aktionen sofort (act), Umstellen, Kaufen/Verkaufen, Anhänger an Kupplungen/umsortieren/abhängen, Lager-Umzug, Schnappschuss für Rückgängig
-game/inventory.js      Inventar-Kern (ohne DOM): Raster, Tetris-Formen, Drehen, Stapeln, Tauschen, Alles einlagern, Beute würfeln
+game/inventory.js      Inventar-Kern (ohne DOM): Raster aus Rechtecken, Drehen, Stapeln, Tauschen, Alles einlagern, Beute würfeln
 game/save.js           Spielstand: neuer Stand, Start-Rig verteilen, Uhr (Ereignis-Zeit), Reparieren, online /api/save bzw. localStorage
 game/play/             Spiel: floor_strip.js (Boden-Leiste unten im Bild), gun_skins.js (Waffen aus Code über der gemalten Pistole), main.js (Laden + Start), scene.js (Raum, Physik, Ablauf) + scene_runs.js (Camp ↔ Run, Beute-Bilanz) + scene_events.js (k.o., Notizen, Kills), camp.js (Camp: Rig-Puppenhaus, Feuer, Tag/Nacht) + camp_life.js (Ton, Companions, Aufträge) + camp_actions.js (Werkstätten, Schlafen, Warroom, Van, Fahren), questlog_ui.js, summary_ui.js (Beute-Bilanz), inventory_ui.js (Inventar-Oberfläche, Maus), craft_ui.js (Kochen & Craften an der Werkstatt), build_mode.js (Rig bauen im Camp), sfx.js (Bau-Töne aus Code), loot.js (Beutebündel, Boden-Inventar), pad.js (Controller), poi_level.js (Kisten, Schalter + Türen, brüchige Wände, Ziel + Ranking im POI-Level), leyla.js (Steuerung + Look) + leyla_moves.js (Dash, Slide, Leiter, Seil, Kanten) + leyla_combat.js (Nahkampf, Magazin, Kampfmodus), van.js, backdrop.js (Hintergrund + Wetter), enemies.js, combat.js, fx.js, art.js (Code-Grafik), hud.js, control.js (Fernsteuerung), play.css
 game/vendor/           Phaser 3.90 (MIT)
@@ -116,7 +116,7 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 - `docs/features/drone.md`: AvA (Drohne): Aufbau, Stimmungen, Kabel, Anbauteile, AvA als Plattform, Bau-Modus mit AvA.
 - `docs/features/ui.md`: Steuerung neu (Quick Draw, Benutzen auf ↑, UI-Grammatik), Pause-Menü und Steuerungs-Übersicht.
 - `docs/features/controller.md`: Controller: Gamepad-API, Belegung, überall ohne Zeiger, Hauptmenü mit Kurve, Symbole je Typ.
-- `docs/features/inventory.md`: Inventar: Tetris-Raster, Diablo-Ansicht, Implantate, Rettungsfach, Aktionen, Gummiband, Boden-Leiste.
+- `docs/features/inventory.md`: Inventar: Raster (nur Rechtecke), Diablo-Ansicht, Implantate, Rettungsfach, Aktionen, Gummiband, Boden-Leiste.
 - `docs/features/cyberware.md`: Cyberware (#006): 30 Implantate, Stufen, Perk + Flaw, Doppelsprung/Luft-Dash freischalten, Ripperdoc-Liege.
 - `docs/features/achievements.md`: Achievements & Trophäen (#012), Rezepte automatisch lernen.
 - `docs/features/crafting.md`: Kochen & Craften: Rezeptbuch, Experimentieren, Zettel, Essen, Gegenstände aus den Symbolen.

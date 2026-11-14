@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 14.11. Code → Ava: #019 fertig: Inventar nur noch mit Rechtecken (Daniels Wunsch), alte Spielstände werden beim Laden entwirrt.
 - 14.11. Code → Ava: #018 fertig: die letzten 16 Dinge ohne Grafik haben Symbole (`icons_misc`, PixelLab 10, übrig 708).
 - 14.11. Code → Ava: #017 fertig: Beute-Bilanz, Companions mit Aufträgen, Toasts weichen aus, 9 neue Räume, Test-Runner `npm run test:browser`, große Dateien aufgeteilt. Korrektur zu #016: zwei Browser-Tests waren rot (Filterfehler beim Melden), jetzt alle 32 grün.
 - 14.11. Code → Ava: #016 fertig: Losziehen in einem Schritt + Bereit?, Spannungskurve, Zielzeile (roter Faden), Run-HUD aufgeräumt, Gangs je POI, Hausmeister-Boss, Tipp im Run, **Questlog** (Hauptquest, Tank, Nebenaufträge; Lagerfeuer + Warroom). PixelLab 0.
@@ -367,6 +368,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:**
   - T-Stück kam als Kreuz → per Code zum T beschnitten.
 - **Ergebnis:** `icons_misc` eingebaut, alle 158 Gegenstände, 12 Waffen und 3 Rucksäcke haben jetzt eine Grafik. Tests: `npm test` 129, inventory/treasury/craft/gear grün. PixelLab: diesmal 10, übrig 708. **Bitte testen:** Kiste und Rucksack (Schulranzen-Symbol), Discokugel in der Hall of Loot.
+
+### #019 Inventar nur noch mit Rechtecken
+- **Status:** fertig (Code, 14.11.) · angelegt 14.11. von Code (Daniel: „Lass uns mit dem Tetris-Quatsch aufhören und auf Rechtecke beschränken im Inventar“)
+- **Für:** Code
+- **Ergebnis:** Formen raus aus Logik, Schema und Daten; alte Spielstände werden beim Laden entwirrt (nichts geht verloren); nebenbei verschluckte das Bündel am Van keine Dinge mehr. Tests: `npm test` 131, alle 32 Browser-Tests grün. PixelLab: 0. **Bitte testen:** Inventar öffnen, Rohrbogen/T-Stück drehen und ablegen; einen alten Spielstand laden.
 
 ## Archiv
 

@@ -11,7 +11,7 @@
 import { keepThrough } from './achievements.js';
 import { ensureMap } from './worldmap.js';
 import { ensureTank } from './tank.js';
-import { newGrid, add, fits, startWear, wearOf, WEAR_KEYS, addEntry } from './inventory.js';
+import { newGrid, add, fits, startWear, wearOf, WEAR_KEYS, addEntry, untangle } from './inventory.js';
 
 const LOCAL_KEY = 'nomadgirl-save';
 export const SAVE_VERSION = 1;
@@ -151,6 +151,11 @@ function withInventory(D, save) {
   ensureGrid(D, inv, 'backpack', backpackSize(D, inv));
   for (const c of containers(D, save)) ensureGrid(D, inv, c.key, c.size);
   ensureGrid(D, inv, 'drone', D.drone?.rescue?.size || [3, 2]);   // AvA's rescue pocket: survives a knock-out
+  // rectangles only (14.11.2026): what overlaps now moves to a free spot, else into the chest / Kofferraum / a bundle by the van
+  const homeless = [];
+  for (const g of Object.values(inv.grids)) if (g?.items?.length) homeless.push(...untangle(D, g));
+  for (const piles of Object.values(save.ground || {})) for (const p of piles) if (p.grid?.items?.length) homeless.push(...untangle(D, p.grid));
+  if (homeless.length) rehome(D, save, { w: 4, h: 3, items: homeless });
   // Spiel › Start › Nachreichen: every savegame (new or old) gets these once, e.g. a test weapon (Daniel, 12.11.2026: Revolver-Test)
   save.handedOut ??= [];
   for (const row of D.game?.start?.later || []) {
@@ -218,7 +223,8 @@ function rehome(D, s, g) {
   for (const key of ['chest', 'rig:0']) if (grids[key]) rest = rest.map(e => ({ ...e, n: addEntry(D, grids[key], e, e.n) })).filter(e => e.n > 0);
   if (rest.length) {
     const pile = { x: null, feet: null, grid: newGrid(Math.max(4, g.w), Math.max(3, g.h)) };
-    for (const e of rest) addEntry(D, pile.grid, e, e.n);
+    // the bundle grows until everything is in (#019: it used to drop what did not fit)
+    for (const e of rest) { let left = e.n, guard = 0; while ((left = addEntry(D, pile.grid, e, left)) > 0 && guard++ < 40) pile.grid.h += 3; }
     ((s.ground ??= {})[s.location] ??= []).push(pile);
   }
 }

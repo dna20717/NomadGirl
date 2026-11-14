@@ -62,7 +62,7 @@ Im POI spielt sich NomadGirl wie Dead Cells: schnelle Bewegung, harter Kampf, un
   - **Konter:** Schild vorn (von vorn prallen Schüsse und leichte Hiebe ab, ein schwerer Treffer öffnet die Deckung, dreht sich langsam um), Ausweichen (hüpft vor Nägeln und Hieben weg), Panzerung (leichte Treffer kratzen, schwere brechen Platten). Neue Gegner: Plünderer mit Schild, Panzerwache.
   - **Offen:** eigenes Boss-Verhalten für den Hausmeister, Gruppen-Alarm (Daniel hat erst einmal Sicht + Gehör gewählt), Gegner-Grafiken.
   - **To-do: Gegnerbaukasten für Sprites** (Daniel, 12.11.2026, noch zu definieren): Gegner-Grafiken aus Bausteinen statt jeden Gegner einzeln malen. Zu klären: was ist ein Baustein (Körper, Kopf, Rüstung, Waffe, Farbe?), Ebenen im Code vs. fertige Varianten von PixelLab, welche Animationen jeder Gegner braucht, wie die Werkstatt es zeigt.
-- **Inventar:** Slots für Nahkampf, Fernkampf, Cyberdeck und Rucksack. Der Rucksack ist ein Raster im Diablo-Stil; Gegenstände haben Tetris-Formen und lassen sich drehen, die Kapazität wächst mit der Qualität des Rucksacks. Bedienung nur mit der Maus, das Spiel läuft dabei weiter. Beute liegt als Bündel am Boden (Boden-Inventar wie bei XCOM); Stapelbares, das Leyla schon trägt, sammelt sie im Vorbeilaufen ein. Kisten und Lagerplätze im Rig sind ebenfalls Inventare.
+- **Inventar:** Slots für Nahkampf, Fernkampf, Cyberdeck und Rucksack. Der Rucksack ist ein Raster im Diablo-Stil; Gegenstände belegen Rechtecke und lassen sich drehen (Daniel, 14.11.2026: „mit dem Tetris-Quatsch aufhören und auf Rechtecke beschränken“), die Kapazität wächst mit der Qualität des Rucksacks. Bedienung nur mit der Maus, das Spiel läuft dabei weiter. Beute liegt als Bündel am Boden (Boden-Inventar wie bei XCOM); Stapelbares, das Leyla schon trägt, sammelt sie im Vorbeilaufen ein. Kisten und Lagerplätze im Rig sind ebenfalls Inventare.
 - **Geld:** Deltas durch Kills, Kisten und Co.
 
 ### Tod und AvA
@@ -279,7 +279,7 @@ Daniel: „Ich hätte gerne, dass die Interfaces der Werkbänke sich unterscheid
 Die Werkstatt-Arten:
 
 - 🍳 **Kochen** (Kochnische, Küche): am Herd. Zutaten nacheinander in Pfanne/Topf, ein **Gar-Balken** läuft, rausnehmen im guten Bereich gibt Qualität; Gewürze geben Extra-Bonus. Qualität = stärkerer/längerer Buff. Experimentieren = **Abschmecken** mit Hinweisen („fehlt was Scharfes …“).
-- 🔧 **Herstellen** (Werkbank): **Blaupause** auf dem Tisch; Teile als Tetris-Stücke wie im Inventar in die Plätze setzen, Werte live; am Ende ein, zwei kurze Handgriffe (Schrauben, Schweißen), gut getroffen = Qualitätsbonus. Gilt auch für Material, Medikits, Rig-Teile (deren Baupläne haben einfachere Plätze).
+- 🔧 **Herstellen** (Werkbank): **Blaupause** auf dem Tisch; Teile als Rechtecke wie im Inventar in die Plätze setzen, Werte live; am Ende ein, zwei kurze Handgriffe (Schrauben, Schweißen), gut getroffen = Qualitätsbonus. Gilt auch für Material, Medikits, Rig-Teile (deren Baupläne haben einfachere Plätze).
 - 🤖 **Drohnen** (Drohnenwerkstatt): **Schaltplan/Platine**. Chips stecken, Kabel ziehen, AvAs Energie-Budget im Blick; AvA kommentiert live.
 - 💉 **Ripperdoc** (Ripperdoc-Liege): **OP mit ruhiger Hand**; je Implantat ein Präzisionsmoment. ⚠️ vorläufig (Ava, wegen 1a): gut getroffen = kleiner Bonus, Flaws bleiben wie gehabt, nie schlimmer.
 - 🚚 **Verkauf** (Foodtruck): **Kunden an der Theke** bestellen, Leyla serviert aus den gekochten Gerichten; Tempo und Lieblingsgerichte = Trinkgeld. Ohne Eile verkauft man normal.
