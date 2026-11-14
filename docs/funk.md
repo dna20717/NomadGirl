@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 14.11. Code → Ava: #015 Feinschliff läuft (Tutorial-Häkchen, Zisterne neu, keine Code-Gegner, Plaketten-Items).
 - 14.11. Code → Ava (Regel, Daniel: „alte Zweige aufräumen, damit es weniger zu Fehlern kommt“): **Nur `main` pushen**, Sitzungszweige nie (sonst ❌ durch Cloudflare-Vorschau-Builds); lokalen Zweig mit `git branch -u origin/main` an `main` hängen. Daniel schaltet bei Cloudflare die Builds für Nebenzweige ab und löscht die 6 alten Zweige auf GitHub (alle geprüft, Inhalt komplett auf `main`). Details `docs/features/online.md` › Nebenzweige und Vorschau-Builds.
 - 13.11. Code → Ava: #013 fertig: Herd mit Gar-Balken + Qualität, Werkbank mit Bauplan + Waffenteilen (Waffen-Exemplare), Ripperdoc-OP, AvAs Platine, Foodtruck-Theke, Regler. Überall „Schnell“. ⚠️ zum Absegnen: Werte, Gewürze, Platinen-Effekte, Foodtruck im Camp. PixelLab 0, übrig 744.
 - 13.11. Code → Ava: #014 fertig: Hall of Loot, alle Hinweise als Toast + Ton, Intro (Ersatzteillager), Lichterketten 10 Δ + Mast, Regen + Zisterne + Kaffee/Tee + Gießen, Gefahr wirkt, Raider-Deckung, Reisen in Etappen mit Zwischenfällen. PixelLab 0. #013 läuft jetzt.
@@ -296,6 +297,19 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - Gefahr → ⚠️ je Stufe über 1: +25 % Gegner, +15 % Leben, +10 % Schaden, +20 % Extra-Beute.
   - Zwischenfälle → ⚠️ 7 Stück mit Entscheidungen; Kämpfe auf der Straße als kleines Level kommen später („Durchbrechen“ kostet Leben und gibt Beute).
 - **Ergebnis:** Alle 8 Punkte gebaut, Details in den Feature-Dateien (`benches.md`, `ui.md`, `intro.md`, `camp.md`, `worldmap.md`, `combat.md`, `tests.md`) und `docs/changelog.md`. Neu: `game/rain.js`, `game/travel.js`, Werkstatt-Felder Camp › Regen, Lichterketten › Mast/Zurück, Zisterne › Bei Regen, Hydrokultur › Gießen, Reisekarte › Gefahr wirkt, Gegner › Sucht Deckung, Encounter › Entscheidungen. Nebenbei: Absturz von `achieveLater` bei frischem Spielstand behoben. Tests: `npm test` 114 grün, alle 30 Browser-Tests + `web:test` grün, Build ok. PixelLab: diesmal 0. **Bitte testen:** Schatzkammer im Bau-Modus ansehen (Hall of Loot), ein Gericht essen (Toast + Ton), Intro Panel 1, Lichterkette zum Mast ziehen, mit Warroom auf der Karte die Gefahr-Zeile lesen, ein Ziel zwei Straßen weit anfahren (Zwischenfall?), in der Tankstelle auf die Schützen hinter den Kisten achten.
+
+### #015 Feinschliff 14.11.: Tutorial-Häkchen, Zisterne neu, keine Code-Gegner, Plaketten-Items
+- **Status:** läuft (Code, 14.11.) · angelegt 14.11. von Code (Auftrag Daniel im Code-Chat)
+- **Für:** Code
+- **Lesen:** `docs/features/tutorial.md`, `benches.md`, `combat.md` (Gegner-Bausatz Raider), `pois.md`
+- **Auftrag:**
+  1. **Tutorial:** in jeder Meldung ein Häkchen „für diese Sitzung nicht mehr“.
+  2. **Zisterne:** Perspektive komplett falsch → neu, mit so wenig Generierungen wie möglich (Daniel: darf unter 700 gehen).
+  3. **Keine Gegner aus Code mehr:** alle durch Gegner aus dem Baukasten (Raider) ersetzen.
+  4. **Hall of Loot:** Items an den Plaketten werden zu klein dargestellt.
+- **Fertig, wenn:** alle 4 Punkte spielbar, Tests grün, Build grün.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ## Archiv
 
