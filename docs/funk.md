@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 14.11. Code → Ava: #022 Mega-Rigs (Baukasten + begehbarer Prototyp) läuft.
 - 14.11. Code → Ava (HNC): Stand bis #021 auf `main`, Build grün, `npm test` 132, alle 32 Browser-Tests grün (`npm run test:browser`). PixelLab übrig 683, also unter der 700er-Grenze: jeder Auftrag nur mit Daniels Freigabe. Zum Absegnen offen: die ⚠️ aus #016–#021. Gesehen: die Design-Session „Ausrüstung wirkt auf die Reise, Bergungsprojekt LKW“ (`d280137`, design.md) hat noch kein Ticket.
 - 14.11. Code → Ava: #021 fertig: EKG-Linie, Reisebild für Zwischenfälle, englische Ortsnamen. PixelLab 25, übrig 683.
 - 14.11. Code → Ava: #020 fertig: Ausdauerleiste (Dash, Slide, Doppelsprung, Hiebe), Leben + Ausdauer als Cyberpunk-Leisten. ⚠️ Werte zum Absegnen im Ticket.
@@ -396,6 +397,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - Namen → ⚠️ Mile 7 Gas & Go, Delta South Megamall, Deadlock Bunker 13, Ministry of Order, dazu englische Muster, Wörter und Regionen (Liste in `worldmap.md`). Gang-Namen, Marken und Kartentitel bleiben vorerst deutsch.
   - Reisebild → ⚠️ ein Bild für alle Zwischenfälle (25 von 30 freigegebenen Generierungen).
 - **Ergebnis:** EKG-Linie über der Lebensleiste; Reisebild `travel_road` oben in jedem Zwischenfall; englische Ortsnamen, alte Spielstände werden umbenannt. Nebenbei: `cozy_test` war wetterabhängig (Regen füllt die Zisterne schneller), jetzt trocken geprüft. Tests: `npm test` 132, alle 32 Browser-Tests grün. PixelLab: diesmal 25, übrig 683 (unter 700: ab jetzt wieder vorher fragen). **Bitte testen:** wenig Leben (EKG rast), weit fahren bis zum Zwischenfall (Bild), Karte ansehen.
+
+### #022 Mega-Rigs: Baukasten + begehbarer Prototyp (LKW, Crawler, Fatbird)
+- **Status:** läuft (Code, 14.11.) · angelegt 14.11. von Code (Daniel im Code-Chat)
+- **Für:** Code
+- **Lesen:** design.md › Endgame-Zugmaschinen, Mega-Rigs aus Kachel-Sets; docs/features/rig.md
+- **Auftrag:** Daniel per Multiple Choice: **Platz-Raster** wie die Container (Module 1/2/3, Stockwerke, Deko an Anschlusspunkten); **LKW** aus PixelLab (vorhandenes Bild, „Erzeuge nichts Neues“), nur gerade rücken auf echte Seitenansicht (Daniel: „der LKW ist nicht orthogonal, das kannst du mit PixelLab beheben“), Teile aus seinem Blatt docken an; **Daten im Werkstatt-Bereich**; **Prototyp begehbar mit Leyla** als eigener Link, nicht im Menü und nicht im Spiel. Perspektive (strenge Seitenansicht) und Palette AAP-64 beachten.
+- **Fertig, wenn:** eigener Link, LKW/Crawler/Fatbird umschaltbar, Leyla klettert darauf, Daten in der Werkstatt, `npm test` grün, Build grün.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ## Archiv
 
