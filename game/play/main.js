@@ -3,6 +3,7 @@
 // counts after reloading, without waiting for the build. Elsewhere: the delivered files plus the workshop's drafts from this browser.
 //   game.html?room=<id>   plays a room-building block; without: the test room from the area "Spiel"
 //   game.html?poi=<id>[&seed=<n>]   plays a POI as a generated level (test mode, no savegame); without seed a new one every load
+//   megarig.html?id=<id>&stage=<n>   mega rig prototype (#022): Leyla walks a vehicle from the area „Mega-Rigs“, no savegame
 //   game.html?camp        the game: camp ↔ runs with a savegame (online per login, otherwise in this browser); ?camp&new starts over
 import { openStore, withDrafts } from '../store.js';
 import { cloudFiles } from '../cloud_store.js';
@@ -13,7 +14,7 @@ import { Hud } from './hud.js';
 import { installControl } from './control.js';
 import { openSave, arrive } from '../save.js';
 
-export async function start(parent, hudRoot, loading) {
+export async function start(parent, hudRoot, loading, opts = {}) {
   const base = new URL('projects/nomadgirl/', location.href);
   const cloud = await cloudFiles();
   const drafts = cloud ? new Map() : await (await openStore({ project: 'nomadgirl', withoutAssets: true })).all().catch(() => new Map());
@@ -38,6 +39,7 @@ export async function start(parent, hudRoot, loading) {
     callbacks: { postBoot: g => { const r = g.renderer, fix = () => { const m = r.blendModes?.[Phaser.BlendModes.ADD]; if (r.gl && m) m.func = [r.gl.ONE, r.gl.ONE]; }; fix(); r.on?.('restorewebgl', fix); } },
   });
   let args = { project, roomId, base, hud, loading };
+  if (opts.megarig && D.megarigs?.[opts.megarig.id]) args = { ...args, megarig: opts.megarig };
   if (q.get('poi') && D.pois?.[q.get('poi')]) args = { ...args, poi: q.get('poi'), seed: Number(q.get('seed')) || 1 + Math.floor(Math.random() * 2 ** 31) };
   if (q.has('camp') && D.camp) {
     const box = await openSave(D);

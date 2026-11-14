@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 15.11.2026: **Mega-Rigs als begehbarer Prototyp** (#022, Daniel per Multiple Choice): eigener Link **/megarig** mit LKW, Crawler und Fatbird in je drei Ausbaustufen, Leyla klettert überall herum. Platz-Raster wie die Container (7 × 6 Kacheln), Räume im Rumpf = Container ohne Außenhaut, gemeinsamer Baukasten aus **Anbauteilen** (Teile aus dem LKW-Blatt + Kran, Mast, Bohrturm, Banner, Neon, Sonnensegel, Balkon, Positionslicht), **Erreichbarkeits-Prüfung**. LKW aus dem vorhandenen PixelLab-Objekt, nur auf strenge Seitenansicht gerückt (9 Generierungen); Crawler und Fatbird aus Code in AAP-64. Neue Bereiche Mega-Rigs und Anbauteile in der Werkstatt.
 - 15.11.2026 nachts: **EKG, Reisebild, englische Orte** (#021): Herzschlag-Linie über der Lebensleiste; Comic-Panel „Van auf der Wüstenstraße“ oben in jedem Zwischenfall (PixelLab); alle Ortsnamen englisch und cooler (Mile 7 Gas & Go, Delta South Megamall, Deadlock Bunker 13, Ministry of Order …), alte Spielstände werden umbenannt.
 - 14.11.2026 spät nachts: **Ausdauer** (#020): Dash, Slide, Doppelsprung und Hiebe kosten Ausdauer, leer geht nichts (Leiste blinkt, Brummen), nach kurzer Pause schnell wieder voll; neue Ausrüstungs-Werte Ausdauer und Erholung; Leben und Ausdauer als Neon-Leisten im Cyberpunk-Look.
 - 14.11.2026 spät nachts: **Inventar nur noch mit Rechtecken** (#019, Daniel): keine Tetris-Formen mehr, Drehen bleibt; alte Spielstände werden beim Laden entwirrt, nichts geht verloren.

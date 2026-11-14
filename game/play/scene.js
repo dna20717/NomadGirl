@@ -6,6 +6,8 @@ import { rescue, update as tankUpdate, phase as tankPhase } from '../tank.js';
 import { bonuses } from '../techtree.js';
 import { parseRoom, solidRects } from '../../engine/room.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
+import { buildMegarig } from '../../engine/megarig.js';
+import { MegarigView } from './megarig_view.js';
 import { PoiLevel } from './poi_level.js';
 import { Pad, PAD_ACTIONS } from './pad.js';
 import { Fog } from './fog.js';
@@ -79,6 +81,12 @@ export class PlayScene extends Phaser.Scene {
     for (const id of [SP?.look, SP?.dish?.look, SP?.roof?.front, this.data_.rooms?.[this.roomId]?.backdrop?.image]) if (id) ids.add(id);
     if (this.data_.camp?.chest?.look) ids.add(this.data_.camp.chest.look);   // chests in POIs too
     if (this.mode === 'run') for (const r of Object.values(this.data_.rooms || {})) if (r.backdrop?.image) ids.add(r.backdrop.image);   // a level wears its entrance's backdrop
+    // mega rig prototype (#022, megarig.html): the raw vehicle, add-ons, all container pictures, the camp ground
+    if (this.args.megarig) {
+      const V = this.data_.megarigs?.[this.args.megarig.id] || {};
+      for (const id of [V.hull?.look, this.data_.camp?.ground?.tiles, ...Object.values(this.data_.rigAddons || {}).map(a => a.look)]) if (id) ids.add(id);
+      for (const c of Object.values(this.data_.containers || {})) for (const k of [c.look, c.lookClosed]) if (k) ids.add(k);
+    }
     if (this.mode === 'camp') {
       for (const c of this.box?.save.companions || []) if (this.data_.companions?.[c]?.look) ids.add(this.data_.companions[c].look);
       if (this.data_.camp?.fire?.look) ids.add(this.data_.camp.fire.look);
@@ -246,6 +254,9 @@ export class PlayScene extends Phaser.Scene {
     const run = this.mode === 'run' ? this.box.save.run : this.mode === 'test' && this.args.poi ? { poi: this.args.poi, seed: this.args.seed } : null;
     this.levelInfo = run?.seed ? buildPoi(this.data_, run.poi, run.seed) : null;
     if (this.levelInfo?.def) def = this.levelInfo.def;
+    // mega rig prototype (#022): the vehicle as a walkable room, evening sky and the camp ground
+    this.megarig = this.args.megarig ? buildMegarig(this.data_, this.args.megarig.id, this.args.megarig.stage) : null;
+    if (this.megarig) def = { name: `${this.data_.megarigs[this.args.megarig.id].name} · ${this.megarig.stageName}`, layout: this.megarig.layout, backdrop: { weather: this.args.megarig.weather || Object.keys(this.data_.weather || {})[0], shade: 0 } };
     this.levelPoi = run?.poi || null;
     this.roomDef = def;
     this.room = parseRoom(def || {});
@@ -257,7 +268,7 @@ export class PlayScene extends Phaser.Scene {
     const before = new Set(this.children.list);
     const bd = def?.backdrop;
     if (bd?.image || bd?.weather) this.backdrop = new Backdrop(this, bd, H); else drawBackground(this, W, H);
-    if (this.mode === 'camp') drawCampBackground(this, this.data_.camp || {});
+    if (this.mode === 'camp' || this.megarig) drawCampBackground(this, this.data_.camp || {});
     const background = this.children.list.filter(o => !before.has(o));
     this.bgCam = this.cameras.main;
     this.cam = this.cameras.add(0, 0, this.scale.width, this.scale.height);
@@ -268,7 +279,8 @@ export class PlayScene extends Phaser.Scene {
     this.terrain = this.terrainMap();
     const CG = this.data_.camp?.ground;
     let drawn = null;
-    if (!(this.mode === 'camp' && drawCampGround(this, this.data_, this.campGeo, T)))
+    if (this.megarig) { if (!drawCampGround(this, this.data_, { floor: this.megarig.G, W: R.w, H: R.h }, T)) drawn = drawRoom(this, { ...R, tiles: R.tiles.map((r, y) => y >= this.megarig.G ? r : r.map(() => '.')) }, T, tiles, null, this.terrain); }
+    else if (!(this.mode === 'camp' && drawCampGround(this, this.data_, this.campGeo, T)))
       drawn = drawRoom(this, R, T, tiles, this.mode === 'camp' ? { ground: CG?.color || '#4a3628', top: CG?.top || '#8a6440', hide: this.campGeo.hidden } : null, this.terrain);
 
     this.solids = this.physics.add.staticGroup();
@@ -294,7 +306,9 @@ export class PlayScene extends Phaser.Scene {
     const start = R.start || [2, R.h - 2];
     // spawn point (Leyla's van): decoration, its anchor sits on Leyla's start; door, roof and dish in van.js
     const S = this.data_.game?.spawn;
-    this.van = S?.enabled !== false && S?.look && this.assetInfo(S.look) ? new Van(this, S, [(start[0] + 0.5) * T, (start[1] + 1) * T]) : null;
+    this.megaView = this.megarig ? new MegarigView(this, this.megarig, T) : null;
+    this.megaView?.ladders(this.ladders, new Set((this.data_.megarigs[this.args.megarig.id].walk || []).filter(w => w.kind === 'ladder').map(w => this.megarig.x0 + Number(w.x || 0))));
+    this.van = !this.megarig && S?.enabled !== false && S?.look && this.assetInfo(S.look) ? new Van(this, S, [(start[0] + 0.5) * T, (start[1] + 1) * T]) : null;
     this.spawnArt = this.van?.sprite;
     // buffs from the savegame count in a run (health, defense, damage)
     this.mods = {};
@@ -715,6 +729,7 @@ export class PlayScene extends Phaser.Scene {
 
     if (this.hud.build?.active) input = this.hud.build.drive(input, dt);   // building: Leyla walks to her jobs by herself
     this.leyla.update(time, dt, input);
+    this.megaView?.update(this.leyla.box);
     // Heilt sich (implants, LP per 10 s; negative = a flaw that drains, never below 1 LP)
     const regen = this.mods?.regen || 0, l = this.leyla;
     if (regen && l.alive && !this.hud.paused) {

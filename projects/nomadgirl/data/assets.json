@@ -5269,5 +5269,32 @@
   "source": "KI-generiert (Daniel)",
   "date": "14.11.2026",
   "description": "Endgame-Zugmaschine Crawler, Seite und Front: Raupenplattform mit gelber Kabine, darauf eine gestapelte Container-Stadt mit Neon, Bannern, Kran, Schüssel und Bohrturm; Größenvergleich Mensch, Auto, Panzer."
+ },
+ "truck_source": {
+  "name": "LKW · Zugmaschine + Teileblatt (Original)",
+  "kind": "source",
+  "file": "assets/vehicles/truck_source.png",
+  "source": "KI (PixelLab, Objekt von Daniel)",
+  "date": "14.11.2026",
+  "description": "Sattelschlepper (leicht schräg) und Teileblatt: Kisten, Räder, Schüssel, Antennen, Auspuffe, Generator, Leiter, Bleche, Warnschild. 256 × 256."
+ },
+ "truck": {
+  "name": "LKW · Zugmaschine (Seitenansicht)",
+  "kind": "image",
+  "file": "assets/vehicles/truck.png",
+  "origin": [0, 121],
+  "source": "KI (PixelLab, Pro Flash Edit: streng von der Seite) + Code (AAP-64)",
+  "derivedFrom": "truck_source",
+  "date": "14.11.2026",
+  "description": "Sattelschlepper streng von der Seite, schaut nach links, 227 × 122. #022: Daniel „der LKW ist nicht orthogonal“."
+ },
+ "truck_parts": {
+  "name": "LKW · Teileblatt",
+  "kind": "image",
+  "file": "assets/vehicles/truck_parts.png",
+  "source": "Code (aus dem Original ausgeschnitten, AAP-64)",
+  "derivedFrom": "truck_source",
+  "date": "14.11.2026",
+  "description": "Die Teile ohne Zugmaschine, 256 × 256. Ausschnitte in Anbauteile › Ausschnitt."
  }
 }

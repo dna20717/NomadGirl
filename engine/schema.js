@@ -11,6 +11,7 @@ import { parseRoom, TILE_LEGEND } from './room.js';
 import { buildPoi, poiReady } from './poi.js';
 import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
 import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
+import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from './megarig.js';
 import { ACHIEVEMENT_COUNTERS, ACHIEVEMENT_SPECIALS, ACHIEVEMENT_CATEGORIES } from '../game/achievements.js';
 
 const text = (key, label, o = {}) => ({ key, label, type: 'text', ...o });
@@ -970,6 +971,47 @@ export const AREAS = {
       num('fuelUse', 'Verbrauch ±', { unit: 'l/100 km' }), num('storageRows', 'Stauraum +', { unit: 'Reihen', min: 0, hint: 'Macht den Stauraum der Zugmaschine um so viele Reihen höher (Dachbox)' }), VALUE, DESCRIPTION] },
       { title: 'Aussehen aus Code', fields: [size('size', 'Größe', { unit: 'Felder', hint: 'Solange es kein Aussehen gibt: Kasten aus Code, ein Feld = 34 × 30 px' }), text('glyph', 'Kürzel', { hint: '1–3 Zeichen oder ein Emoji auf dem Kasten' }), color('color', 'Farbe')] }],
   },
+  megarigs: {
+    name: 'Mega-Rigs', singular: 'Mega-Rig', icon: 'vehicle', file: 'data/megarigs.json', kind: 'catalog', groupBy: { key: 'kind', options: MEGARIG_KINDS },
+    hint: 'Große Fahrzeuge aus dem Baukasten (#022): LKW, Crawler, Fatbird. Nur das rohe Fahrzeug ist eigen, Module (Container, Räume) und Anbauteile sind ein gemeinsamer Baukasten auf einem Raster aus Plätzen. Prototyp zum Begehen: megarig.html?id=<ID>.',
+    template: { name: 'Neues Mega-Rig', kind: 'crawler', grid: { place: 7, story: 6 }, hull: { under: 4, inside: 1, front: 10, back: 4, segPlaces: 2 }, stages: [{ name: 'Rohbau', mids: 1, top: 1 }], modules: [], addons: [] },
+    row: x => `${label(MEGARIG_KINDS, x.kind)} · ${(x.stages || []).length} Ausbaustufen · ${(x.modules || []).length} Module`,
+    check: (x, report, p, id) => { for (const [k, t] of megarigProblems(p.data, id)) report(k, t); },
+    sections: [
+      { title: 'Mega-Rig', fields: [NAME, select('kind', 'Art', MEGARIG_KINDS), ref('tractor', 'Zugmaschine', 'tractors', { hint: 'Werte (Zugkraft, Verbrauch, Slots) kommen von dieser Zugmaschine' }), DESCRIPTION] },
+      { title: 'Raster', fields: [num('grid.place', 'Platz breit', { unit: 'Kacheln', min: 2, hint: 'Ein Werkstatt-Platz. 7 passt zu den Container-Bildern (gleicher Maßstab wie hoch)' }),
+        num('grid.story', 'Stockwerk hoch', { unit: 'Kacheln', min: 4, hint: 'Boden bis Boden. 6 = Innenraum 5 Kacheln, Leyla passt gut hinein' })] },
+      { title: 'Rohes Fahrzeug', fields: [ref('hull.look', 'Aussehen', 'assets', { hint: 'Bild des rohen Fahrzeugs (LKW: Zugmaschine). Leer = aus Code im Stil der Art' }),
+        num('hull.lookScale', 'Maßstab des Bilds', { min: 0.5, step: 0.25, hint: 'Bildpixel → Spielpixel' }), point('hull.lookOffset', 'Versatz des Bilds', { unit: 'px', hint: 'Vom vorderen Ende am Boden aus' }),
+        num('hull.under', 'Unter dem ersten Stockwerk', { unit: 'Kacheln', min: 1, hint: 'LKW: Höhe der Ladefläche, Crawler: Höhe der Ketten, Fatbird: Schwebehöhe' }),
+        num('hull.inside', 'Stockwerke im Rumpf', { min: 0, hint: 'So viele Stockwerke liegen im Rumpf (Räume = Container ohne Außenhaut), alles darüber wird obendrauf gebaut' }),
+        num('hull.frame', 'Davon offener Lastrahmen', { min: 0, hint: 'Fatbird: die unteren Stockwerke im Rumpf sind ein offener Rahmen, in dem Container hängen' }),
+        num('hull.front', 'Bug', { unit: 'Kacheln', min: 2, hint: 'Kabine/Cockpit vor dem ersten Platz' }), num('hull.back', 'Heck', { unit: 'Kacheln', min: 1 }),
+        num('hull.segPlaces', 'Plätze je Mittelstück', { min: 1, hint: 'Das wiederholbare Segment: so viele Plätze kommen je Mittelstück dazu' }),
+        num('hull.envelope', 'Gashülle', { unit: 'Kacheln', min: 0, hint: 'Nur Fatbird: Höhe der Hülle über dem Rumpf, oben ein Laufsteg' })] },
+      { title: 'Lack', fields: [color('paint.main', 'Grundfarbe'), color('paint.dark', 'Dunkel'), color('paint.trim', 'Kanten/Rost'), color('paint.neon', 'Neon'), color('paint.light', 'Positionslichter')] },
+      { title: 'Ausbaustufen', fields: [table('stages', 'Ausbaustufen', [text('name', 'Name'), num('mids', 'Mittelstücke', { min: 0 }), num('top', 'Stockwerke obendrauf', { min: 0 })],
+        { hint: 'Wie das Fahrzeug wächst: Mittelstücke machen es länger (mehr Plätze), Stockwerke obendrauf höher. Im Prototyp per Regler' })] },
+      { title: 'Module', fields: [table('modules', 'Module', [ref('container', 'Container', 'containers'), num('place', 'Platz', { min: 0 }), num('story', 'Stockwerk', { min: 0 }),
+        bool('shell', 'Außenhaut'), num('from', 'Ab Stufe', { min: 0 }), text('name', 'Name'), color('color', 'Farbton')],
+        { hint: 'Container und Räume auf dem Raster. Platz 0 = erster Platz hinter dem Bug, Stockwerk 0 = unterstes. Im Rumpf ohne Außenhaut = Raum. Ab Stufe: 0 = erste Ausbaustufe. Farbton färbt das Container-Bild ein (leer = wie gemalt)' })] },
+      { title: 'Anbauteile', fields: [table('addons', 'Anbauteile', [ref('addon', 'Teil', 'rigAddons'), num('place', 'Platz', { min: -1, hint: '-1 = über dem Bug' }), num('story', 'Stockwerk', { min: 0 }),
+        select('at', 'Wo', ADDON_AT), num('shift', 'Versatz', { unit: 'Kacheln' }), bool('flip', 'Gespiegelt'), num('from', 'Ab Stufe', { min: 0 }), text('text', 'Text'), color('color', 'Farbe')],
+        { hint: 'Teile aus dem gemeinsamen Baukasten an Anschlusspunkten: Dach (Stockwerk = auf dessen Boden), Wand (Mitte des Stockwerks)' })] },
+      { title: 'Wege am rohen Fahrzeug', fields: [table('walk', 'Begehbar', [select('kind', 'Art', [['platform', 'Plattform'], ['solid', 'Fest'], ['ladder', 'Leiter']]),
+        num('x', 'x', { unit: 'Kacheln' }), num('y', 'Höhe', { unit: 'Kacheln' }), num('w', 'Breite', { unit: 'Kacheln' }), num('h', 'Höhe (Dicke)', { unit: 'Kacheln' })],
+        { hint: 'Für Bild-Fahrzeuge (LKW): wo Leyla am Bild stehen und klettern kann. x vom Bug, Höhe über dem Boden' })] },
+    ],
+  },
+  rigAddons: {
+    name: 'Anbauteile', singular: 'Anbauteil', icon: 'build', file: 'data/rig_addons.json', kind: 'catalog', groupBy: { key: 'at', options: ADDON_AT },
+    hint: 'Gemeinsamer Baukasten für alle Mega-Rigs (#022): Schüssel, Antennen, Auspuff, Kran, Banner, Neon … Bild (Ausschnitt aus einem Teileblatt) oder aus Code.',
+    template: { name: 'Neues Anbauteil', at: 'roof', size: [2, 2] },
+    row: x => `${label(ADDON_AT, x.at)} · ${(x.size || [1, 1]).join('×')} Kacheln${x.code ? ' · ' + label(ADDON_CODE, x.code) : ''}`,
+    sections: [{ title: 'Anbauteil', fields: [NAME, select('at', 'Sitzt', ADDON_AT), size('size', 'Größe', { unit: 'Kacheln' }), select('walk', 'Begehbar', ADDON_WALK), DESCRIPTION] },
+      { title: 'Aussehen', fields: [ref('look', 'Bild', 'assets'), point('crop.at', 'Ausschnitt ab', { unit: 'Bildpixel', hint: 'Oben links im Teileblatt' }), size('crop.size', 'Ausschnitt Größe', { unit: 'Bildpixel' }),
+        select('code', 'Aus Code', ADDON_CODE, { hint: 'Ohne Bild: aus Code gezeichnet' }), color('color', 'Farbe'), text('text', 'Text', { hint: 'Neon-Schild, Banner' })] }],
+  },
   companions: {
     name: 'Companions', singular: 'Companion', icon: 'humans', file: 'data/companions.json', kind: 'catalog',
     hint: 'Leben im Rig, betreiben Werkstätten, geben Buffs und Rezept-Tipps. Eigene Quests kommen in Ausbaustufe 2.',
@@ -1341,7 +1383,7 @@ export const GROUPS = [
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
   ['ACHIEVEMENTS & AUFTRÄGE', ['achievements', 'quests']],
   ['PROGRESSION', ['techtree', 'resources']],
-  ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'companions']],
+  ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'megarigs', 'rigAddons', 'companions']],
   ['WELT', ['worldmap', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'travel']],
 ];
 

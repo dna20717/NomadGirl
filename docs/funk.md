@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #022 fertig: Mega-Rigs als begehbarer Prototyp unter /megarig (LKW, Crawler, Fatbird, je 3 Stufen), Bereiche Mega-Rigs + Anbauteile, Erreichbarkeits-Prüfung. PixelLab 9, übrig 674. ⚠️ zum Absegnen im Ticket.
 - 14.11. Code → Ava: #022 Mega-Rigs (Baukasten + begehbarer Prototyp) läuft.
 - 14.11. Code → Ava (HNC): Stand bis #021 auf `main`, Build grün, `npm test` 132, alle 32 Browser-Tests grün (`npm run test:browser`). PixelLab übrig 683, also unter der 700er-Grenze: jeder Auftrag nur mit Daniels Freigabe. Zum Absegnen offen: die ⚠️ aus #016–#021. Gesehen: die Design-Session „Ausrüstung wirkt auf die Reise, Bergungsprojekt LKW“ (`d280137`, design.md) hat noch kein Ticket.
 - 14.11. Code → Ava: #021 fertig: EKG-Linie, Reisebild für Zwischenfälle, englische Ortsnamen. PixelLab 25, übrig 683.
@@ -399,13 +400,17 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** EKG-Linie über der Lebensleiste; Reisebild `travel_road` oben in jedem Zwischenfall; englische Ortsnamen, alte Spielstände werden umbenannt. Nebenbei: `cozy_test` war wetterabhängig (Regen füllt die Zisterne schneller), jetzt trocken geprüft. Tests: `npm test` 132, alle 32 Browser-Tests grün. PixelLab: diesmal 25, übrig 683 (unter 700: ab jetzt wieder vorher fragen). **Bitte testen:** wenig Leben (EKG rast), weit fahren bis zum Zwischenfall (Bild), Karte ansehen.
 
 ### #022 Mega-Rigs: Baukasten + begehbarer Prototyp (LKW, Crawler, Fatbird)
-- **Status:** läuft (Code, 14.11.) · angelegt 14.11. von Code (Daniel im Code-Chat)
+- **Status:** fertig (Code, 15.11.) · angelegt 14.11. von Code (Daniel im Code-Chat)
 - **Für:** Code
-- **Lesen:** design.md › Endgame-Zugmaschinen, Mega-Rigs aus Kachel-Sets; docs/features/rig.md
+- **Lesen:** design.md › Endgame-Zugmaschinen, Mega-Rigs aus Kachel-Sets; docs/features/megarigs.md
 - **Auftrag:** Daniel per Multiple Choice: **Platz-Raster** wie die Container (Module 1/2/3, Stockwerke, Deko an Anschlusspunkten); **LKW** aus PixelLab (vorhandenes Bild, „Erzeuge nichts Neues“), nur gerade rücken auf echte Seitenansicht (Daniel: „der LKW ist nicht orthogonal, das kannst du mit PixelLab beheben“), Teile aus seinem Blatt docken an; **Daten im Werkstatt-Bereich**; **Prototyp begehbar mit Leyla** als eigener Link, nicht im Menü und nicht im Spiel. Perspektive (strenge Seitenansicht) und Palette AAP-64 beachten.
 - **Fertig, wenn:** eigener Link, LKW/Crawler/Fatbird umschaltbar, Leyla klettert darauf, Daten in der Werkstatt, `npm test` grün, Build grün.
 - **Rückfragen:**
-- **Ergebnis:**
+  - Raster-Maß → ⚠️ Platz 7 × Stockwerk 6 Kacheln, damit die Container-Bilder unverzerrt passen.
+  - Wie kommt Leyla nach oben → ⚠️ Leitern automatisch (Stapel abwechselnd links/rechts, Luken in Räume, Bug/Heck vom Boden, Seilwinde beim Fatbird); kletterbare Teile (Kran, Mast, Bohrturm) haben oben einen Aussichtspunkt.
+  - Crawler/Fatbird-Grafik → ⚠️ aus Code im Stil der Konzeptbilder (AAP-64), bis die Kachel-Sets kommen; Container mit leichtem Farbton je Modul wie im Konzept.
+  - Fatbird → ⚠️ 3 Stufen füllen nur (Länge bleibt, „voll ist voll“): unten Lastrahmen mit Containern, darüber Deck mit Räumen, oben Gashülle mit Laufsteg.
+- **Ergebnis:** Neue Bereiche **Mega-Rigs** + **Anbauteile** (RIG), `engine/megarig.js` (Raster → Layout, Erreichbarkeit), `game/play/megarig_view.js`, Seite `megarig.html` (Fahrzeug, Stufe −/+, Übersicht). Tests: `npm test` 138 (6 neu in `test/megarig.test.js`), `tools/megarig_test.mjs` 14 Prüfungen (27 Leitern bis oben). PixelLab: diesmal 9 (LKW auf Seitenansicht), übrig 674. **Bitte testen:** /megarig, alle drei Fahrzeuge, ganz nach oben klettern (Ausguck am Mast/Kran), in die Räume im Rumpf, „Übersicht“, Stufen durchschalten; in der Werkstatt RIG › Mega-Rigs ein Modul verschieben und neu laden.
 
 ## Archiv
 

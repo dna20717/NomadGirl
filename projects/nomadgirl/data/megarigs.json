@@ -1,0 +1,94 @@
+{
+ "lkw": {
+  "name": "LKW (Sattelzug)",
+  "kind": "truck",
+  "tractor": "lkw",
+  "description": "Die Zugmaschine aus der Bergung mit Auflieger. Bild aus PixelLab, Teile aus seinem Blatt docken an (Daniel, 14.11.2026: „Teile andocken“).",
+  "grid": {"place": 7, "story": 6},
+  "hull": {"look": "truck", "lookScale": 5, "lookOffset": [0, 0], "under": 4, "inside": 0, "front": 10, "back": 2, "segPlaces": 3},
+  "paint": {"main": "#4a5462", "dark": "#242234", "trim": "#71413b", "neon": "#bc4a9b", "light": "#df3e23"},
+  "stages": [{"name": "Leer", "mids": 1, "top": 0},{"name": "Beladen", "mids": 1, "top": 1},{"name": "Gestapelt", "mids": 1, "top": 2}],
+  "modules": [
+   {"container": "container_40", "place": 0, "story": 0, "from": 1, "shell": true},
+   {"container": "container_20", "place": 0, "story": 1, "from": 2, "shell": true},
+   {"container": "container_10", "place": 2, "story": 1, "from": 2, "color": "#f5a097", "shell": true}
+  ],
+  "addons": [
+   {"addon": "schuessel", "place": 0, "story": 2, "from": 2, "shift": -1},
+   {"addon": "mast", "place": 2, "story": 2, "from": 2, "shift": 1},
+   {"addon": "generator", "place": 0, "story": 2, "from": 2, "shift": 3},
+   {"addon": "positionslicht", "place": 2, "story": 2, "from": 2, "shift": -2},
+   {"addon": "seesaecke", "place": 1, "story": 2, "from": 2},
+   {"addon": "neon", "place": 0, "story": 1, "from": 1, "text": "NOMAD", "color": "#bc4a9b", "shift": 1}
+  ],
+  "walk": [{"kind": "platform", "x": 2, "y": 6.6, "w": 6, "h": 1},{"kind": "ladder", "x": 7, "y": 0, "w": 1, "h": 7.6}]
+ },
+ "crawler": {
+  "name": "Crawler",
+  "kind": "crawler",
+  "description": "Der Riesenpanzer auf zwei Kettenfahrwerken: Räume im Rumpf, darauf die Container-Stadt, die mit dem Ausbau wächst.",
+  "grid": {"place": 7, "story": 6},
+  "hull": {"under": 4, "inside": 1, "front": 12, "back": 5, "segPlaces": 2},
+  "paint": {"main": "#f9a31b", "dark": "#403353", "trim": "#bb7547", "neon": "#20d6c7", "light": "#df3e23"},
+  "stages": [{"name": "Rohbau", "mids": 2, "top": 1},{"name": "Siedlung", "mids": 3, "top": 2},{"name": "Container-Stadt", "mids": 4, "top": 4}],
+  "modules": [
+   {"container": "container_20", "place": 0, "story": 0, "from": 0, "name": "Maschinenraum"},
+   {"container": "container_10", "place": 3, "story": 0, "from": 0, "name": "Lager"},
+   {"container": "container_20", "place": 4, "story": 0, "from": 1, "name": "Kantine"},
+   {"container": "container_10", "place": 7, "story": 0, "from": 2, "name": "Zelle"},
+   {"container": "container_40", "place": 0, "story": 1, "from": 0, "color": "#e4d2aa"},
+   {"container": "container_10", "place": 3, "story": 1, "from": 0, "color": "#92dcba"},
+   {"container": "container_20", "place": 4, "story": 1, "from": 1, "color": "#b9bffb"},
+   {"container": "container_20", "place": 6, "story": 1, "from": 2, "color": "#fad6b8"},
+   {"container": "container_20", "place": 0, "story": 2, "from": 1, "color": "#e9b5a3"},
+   {"container": "container_10", "place": 2, "story": 2, "from": 1},
+   {"container": "container_20", "place": 4, "story": 2, "from": 2, "color": "#f5a097"},
+   {"container": "container_10", "place": 7, "story": 2, "from": 2, "color": "#e4d2aa"},
+   {"container": "container_10", "place": 1, "story": 3, "from": 2, "color": "#92dcba"},
+   {"container": "container_20", "place": 4, "story": 3, "from": 2, "color": "#b9bffb"},
+   {"container": "container_10", "place": 4, "story": 4, "from": 2, "color": "#fad6b8"}
+  ],
+  "addons": [
+   {"addon": "banner", "place": 0, "story": 1, "from": 0, "at": "wall", "shift": 2},
+   {"addon": "neon", "place": 3, "story": 1, "from": 0, "text": "BAR", "color": "#bc4a9b"},
+   {"addon": "positionslicht", "place": -1, "story": 2, "from": 0, "shift": -2},
+   {"addon": "kran", "place": 3, "story": 2, "from": 1, "shift": 0},
+   {"addon": "schuessel", "place": 2, "story": 3, "from": 1},
+   {"addon": "sonnensegel", "place": 0, "story": 3, "from": 1, "shift": 2},
+   {"addon": "balkon", "place": 4, "story": 2, "from": 1, "at": "wall", "shift": -4},
+   {"addon": "mast", "place": 1, "story": 4, "from": 2},
+   {"addon": "bohrturm", "place": 7, "story": 3, "from": 2},
+   {"addon": "banner", "place": 4, "story": 3, "from": 2, "at": "wall", "color": "#285cc4", "shift": 3},
+   {"addon": "neon", "place": 4, "story": 4, "from": 2, "text": "HOTEL", "color": "#20d6c7"},
+   {"addon": "antenne", "place": 4, "story": 5, "from": 2},
+   {"addon": "positionslicht", "place": 4, "story": 5, "from": 2, "shift": 2},
+   {"addon": "generator", "place": 5, "story": 4, "from": 2},
+   {"addon": "auspuff_lang", "place": 0, "story": 1, "from": 0, "at": "wall", "shift": -3}
+  ]
+ },
+ "fatbird": {
+  "name": "Fatbird",
+  "kind": "airship",
+  "description": "Das schwebende Lastluftschiff: Gashülle oben, Rumpf mit Decks, darunter der offene Lastrahmen mit Containern, vier Mantelrotoren. Voll ist voll.",
+  "grid": {"place": 7, "story": 6},
+  "hull": {"under": 5, "inside": 2, "frame": 1, "front": 10, "back": 7, "segPlaces": 2, "envelope": 9},
+  "paint": {"main": "#f9a31b", "dark": "#333941", "trim": "#8e5252", "neon": "#249fde", "light": "#df3e23"},
+  "stages": [{"name": "Rohbau", "mids": 3, "top": 0},{"name": "Halb voll", "mids": 3, "top": 0},{"name": "Voll", "mids": 3, "top": 0}],
+  "modules": [
+   {"container": "container_20", "place": 0, "story": 0, "from": 0, "shell": true},
+   {"container": "container_20", "place": 2, "story": 0, "from": 1, "shell": true},
+   {"container": "container_10", "place": 4, "story": 0, "from": 2, "shell": true},
+   {"container": "container_10", "place": 5, "story": 0, "from": 2, "shell": true},
+   {"container": "container_20", "place": 0, "story": 1, "from": 0, "color": "#e9b5a3", "name": "Brücke"},
+   {"container": "container_10", "place": 2, "story": 1, "from": 0, "name": "Lounge"},
+   {"container": "container_20", "place": 3, "story": 1, "from": 1, "color": "#f5a097", "name": "Werkstatt"},
+   {"container": "container_10", "place": 5, "story": 1, "from": 2, "color": "#e4d2aa", "name": "Koje"}
+  ],
+  "addons": [
+   {"addon": "antenne", "place": 1, "story": 3, "from": 0, "shift": 0},
+   {"addon": "positionslicht", "place": 5, "story": 3, "from": 0},
+   {"addon": "neon", "place": 2, "story": 2, "from": 1, "at": "wall", "text": "FATBIRD", "color": "#249fde", "shift": 3},
+   {"addon": "schuessel", "place": 4, "story": 3, "from": 2}
+  ]
+ }
+}

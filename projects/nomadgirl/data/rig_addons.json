@@ -1,0 +1,136 @@
+{
+ "elektronikkiste": {
+  "name": "Elektronik-Kiste",
+  "at": "roof",
+  "look": "truck_parts",
+  "crop": {"at": [7, 8], "size": [32, 23]},
+  "size": [2, 1.44],
+  "walk": "platform",
+  "description": "Kiste mit Display, aus dem LKW-Blatt"
+ },
+ "werkzeugkiste": {
+  "name": "Werkzeugkiste",
+  "at": "roof",
+  "look": "truck_parts",
+  "crop": {"at": [42, 8], "size": [36, 23]},
+  "size": [2.25, 1.44],
+  "walk": "platform"
+ },
+ "ladung": {
+  "name": "Verzurrte Ladung",
+  "at": "roof",
+  "look": "truck_parts",
+  "crop": {"at": [82, 7], "size": [28, 24]},
+  "size": [1.75, 1.5],
+  "walk": "platform"
+ },
+ "seesaecke": {
+  "name": "Seesäcke",
+  "at": "roof",
+  "look": "truck_parts",
+  "crop": {"at": [113, 11], "size": [31, 20]},
+  "size": [1.94, 1.25],
+  "walk": "platform"
+ },
+ "schuessel": {
+  "name": "Satellitenschüssel",
+  "at": "roof",
+  "look": "truck_parts",
+  "crop": {"at": [168, 10], "size": [24, 27]},
+  "size": [1.5, 1.69]
+ },
+ "antenne": {
+  "name": "Antenne",
+  "at": "roof",
+  "look": "truck_parts",
+  "crop": {"at": [199, 14], "size": [16, 23]},
+  "size": [1, 1.44]
+ },
+ "scheinwerfer": {
+  "name": "Scheinwerfer",
+  "at": "roof",
+  "look": "truck_parts",
+  "crop": {"at": [217, 19], "size": [11, 18]},
+  "size": [0.69, 1.13]
+ },
+ "kamera": {
+  "name": "Kamera",
+  "at": "wall",
+  "look": "truck_parts",
+  "crop": {"at": [231, 27], "size": [16, 10]},
+  "size": [1, 0.63]
+ },
+ "rad": {
+  "name": "Ersatzrad",
+  "at": "wall",
+  "look": "truck_parts",
+  "crop": {"at": [42, 40], "size": [32, 32]},
+  "size": [2, 2]
+ },
+ "auspuff": {
+  "name": "Auspuff",
+  "at": "wall",
+  "look": "truck_parts",
+  "crop": {"at": [171, 40], "size": [11, 49]},
+  "size": [0.69, 3.06]
+ },
+ "auspuff_lang": {
+  "name": "Auspuff lang",
+  "at": "wall",
+  "look": "truck_parts",
+  "crop": {"at": [219, 42], "size": [12, 48]},
+  "size": [0.75, 3]
+ },
+ "generator": {
+  "name": "Generator",
+  "at": "roof",
+  "look": "truck_parts",
+  "crop": {"at": [186, 45], "size": [32, 36]},
+  "size": [2, 2.25],
+  "walk": "platform"
+ },
+ "leiter": {
+  "name": "Leiter",
+  "at": "wall",
+  "look": "truck_parts",
+  "crop": {"at": [234, 43], "size": [15, 49]},
+  "size": [0.94, 3.06],
+  "walk": "ladder"
+ },
+ "blech": {
+  "name": "Panzerblech",
+  "at": "wall",
+  "look": "truck_parts",
+  "crop": {"at": [173, 94], "size": [16, 21]},
+  "size": [1, 1.31]
+ },
+ "warnschild": {
+  "name": "Warnschild",
+  "at": "wall",
+  "look": "truck_parts",
+  "crop": {"at": [230, 95], "size": [19, 19]},
+  "size": [1.19, 1.19]
+ },
+ "schild": {
+  "name": "Schild",
+  "at": "wall",
+  "look": "truck_parts",
+  "crop": {"at": [8, 78], "size": [15, 19]},
+  "size": [0.94, 1.19]
+ },
+ "kabel": {
+  "name": "Kabel",
+  "at": "wall",
+  "look": "truck_parts",
+  "crop": {"at": [29, 79], "size": [32, 20]},
+  "size": [2, 1.25]
+ },
+ "kran": {"name": "Kran", "at": "roof", "code": "crane", "size": [6, 9], "walk": "ladder", "color": "#f9a31b", "description": "Ausleger mit Haken, Leyla klettert den Mast hoch"},
+ "mast": {"name": "Antennenmast", "at": "roof", "code": "mast", "size": [1, 5], "walk": "ladder", "color": "#8b93af"},
+ "bohrturm": {"name": "Bohrturm", "at": "roof", "code": "tower", "size": [4, 12], "walk": "ladder", "color": "#bb7547"},
+ "banner": {"name": "Banner", "at": "wall", "code": "banner", "size": [3, 4], "color": "#b4202a"},
+ "neon": {"name": "Neon-Schild", "at": "wall", "code": "neon", "size": [4, 1.2], "color": "#f5a097", "text": "OPEN"},
+ "sonnensegel": {"name": "Sonnensegel", "at": "roof", "code": "sail", "size": [8, 3], "walk": "platform", "color": "#73172d"},
+ "balkon": {"name": "Balkon", "at": "wall", "code": "balcony", "size": [5, 1.5], "walk": "platform", "color": "#4a5462"},
+ "positionslicht": {"name": "Positionslicht", "at": "roof", "code": "beacon", "size": [0.5, 1], "color": "#df3e23"}
+}

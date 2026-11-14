@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>NomadGirl – Mega-Rigs</title>
+<script>try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme') || 'gray'; } catch (e) { document.documentElement.dataset.theme = 'gray'; }</script>
+<link rel="stylesheet" href="game/ui.css">
+<link rel="stylesheet" href="game/play/play.css">
+<link rel="stylesheet" href="game/play/loading.css">
+<script src="game/vendor/phaser.min.js"></script>
+<style>
+  /* Prototype panel (#022): vehicle, stage, overview. Only --ui-* tokens. */
+  .mr-panel { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 50; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    padding: 8px 10px; background: var(--ui-glass); border: 1px solid var(--ui-border); border-radius: var(--ui-r-pane); box-shadow: var(--ui-shadow);
+    font: 500 var(--ui-gr-m) var(--ui-font); color: var(--ui-text); backdrop-filter: blur(6px); max-width: calc(100vw - 32px); }
+  .mr-panel .mr-group { display: flex; gap: 4px; align-items: center; }
+  .mr-panel button { min-height: 34px; padding: 0 12px; border-radius: var(--ui-r-button); border: 1px solid var(--ui-border-strong); background: var(--ui-panel); color: var(--ui-text);
+    font: inherit; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; transition: background var(--ui-t1) var(--ui-curve); }
+  .mr-panel button:hover { background: var(--ui-hover); }
+  .mr-panel button.on { background: var(--ui-acc); color: var(--ui-acc-text); border-color: var(--ui-acc-line); }
+  .mr-panel .mr-stage { font-family: var(--ui-pixel); font-size: 20px; min-width: 9ch; text-align: center; color: var(--ui-text-strong); }
+  .mr-panel .mr-sep { width: 1px; align-self: stretch; background: var(--ui-border); }
+  .mr-panel .mr-hint { color: var(--ui-text3); font-size: var(--ui-gr-s); }
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div id="hud"></div>
+<div id="load"></div>
+<div class="mr-panel" id="mr"></div>
+<script type="module">
+  // Mega-Rig prototype (#022): own address, not in the menu and not in the game. ?id=lkw|crawler|fatbird&stage=<0..>
+  import { start } from './game/play/main.js';
+  import { createLoading } from './game/play/loading.js';
+  import { icon } from './game/icons.js';
+  const q = new URLSearchParams(location.search), id = q.get('id') || 'crawler', stage = q.has('stage') ? Number(q.get('stage')) : null;
+  const loading = createLoading(document.getElementById('load'), new URL('projects/nomadgirl/', location.href));
+  const go = (nid, nstage) => { const u = new URL(location.href); u.searchParams.set('id', nid); if (nstage === null || nstage === undefined) u.searchParams.delete('stage'); else u.searchParams.set('stage', nstage); location.href = u.href; };
+  start(document.getElementById('game'), document.getElementById('hud'), loading, { megarig: { id, stage } })
+    .then(g => {
+      window.game = g;
+      const sc = () => g.scene.getScene('play');
+      const wait = setInterval(() => {
+        const s = sc(); if (!s?.megarig) return;
+        clearInterval(wait);
+        const D = s.data_, b = s.megarig, el = document.getElementById('mr');
+        const vehicles = Object.entries(D.megarigs || {});
+        el.innerHTML = `<div class="mr-group">${vehicles.map(([k, v]) => `<button data-v="${k}" class="${k === id ? 'on' : ''}">${icon('vehicle', 16).outerHTML}${v.name}</button>`).join('')}</div>
+          <span class="mr-sep"></span>
+          <div class="mr-group"><button data-s="-1" title="Ausbaustufe zurück">−</button><span class="mr-stage">${b.stageName}</span><button data-s="1" title="Ausbaustufe weiter">+</button></div>
+          <span class="mr-sep"></span>
+          <button data-zoom>${icon('map', 16).outerHTML}Übersicht</button>
+          <span class="mr-hint">${b.stage + 1}/${b.stages.length} · ${b.places} Plätze · ${b.stories} Stockwerke</span>`;
+        el.querySelectorAll('[data-v]').forEach(x => x.onclick = () => go(x.dataset.v, null));
+        el.querySelectorAll('[data-s]').forEach(x => x.onclick = () => { const n = b.stage + Number(x.dataset.s); if (n >= 0 && n < b.stages.length) go(id, n); });
+        let wide = false;
+        const zoom = el.querySelector('[data-zoom]');
+        zoom.onclick = () => {
+          wide = !wide; zoom.classList.toggle('on', wide);
+          const s = sc(), cam = s.cam, T = s.T, W = b.W * T, H = b.H * T;
+          if (wide) { cam.stopFollow(); cam.setZoom(Math.min(s.scale.width / W, s.scale.height / H) * 0.98); cam.setBounds(0, 0, W, H); cam.centerOn(W / 2, H / 2); }
+          else { cam.setZoom(1); cam.setBounds(0, Math.min(0, H - s.scale.height), W, Math.max(H, s.scale.height)); cam.startFollow(s.leyla.box, false, 0.12, 0.12); }
+          zoom.blur();
+        };
+        el.querySelectorAll('button').forEach(x => x.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') e.preventDefault(); }));
+      }, 100);
+    })
+    .catch(e => { loading.fail('Fehler beim Laden: ' + e.message); console.error(e); });
+</script>
+</body>
+</html>
