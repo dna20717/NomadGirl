@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #023 Bergungsprojekte (LKW, Crawler, Fatbird, Quests, POIs, Felgen) läuft.
 - 15.11. Code → Ava: #022 fertig: Mega-Rigs als begehbarer Prototyp unter /megarig (LKW, Crawler, Fatbird, je 3 Stufen), Bereiche Mega-Rigs + Anbauteile, Erreichbarkeits-Prüfung. PixelLab 9, übrig 674. ⚠️ zum Absegnen im Ticket.
 - 14.11. Code → Ava: #022 Mega-Rigs (Baukasten + begehbarer Prototyp) läuft.
 - 14.11. Code → Ava (HNC): Stand bis #021 auf `main`, Build grün, `npm test` 132, alle 32 Browser-Tests grün (`npm run test:browser`). PixelLab übrig 683, also unter der 700er-Grenze: jeder Auftrag nur mit Daniels Freigabe. Zum Absegnen offen: die ⚠️ aus #016–#021. Gesehen: die Design-Session „Ausrüstung wirkt auf die Reise, Bergungsprojekt LKW“ (`d280137`, design.md) hat noch kein Ticket.
@@ -411,6 +412,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - Crawler/Fatbird-Grafik → ⚠️ aus Code im Stil der Konzeptbilder (AAP-64), bis die Kachel-Sets kommen; Container mit leichtem Farbton je Modul wie im Konzept.
   - Fatbird → ⚠️ 3 Stufen füllen nur (Länge bleibt, „voll ist voll“): unten Lastrahmen mit Containern, darüber Deck mit Räumen, oben Gashülle mit Laufsteg.
 - **Ergebnis:** Neue Bereiche **Mega-Rigs** + **Anbauteile** (RIG), `engine/megarig.js` (Raster → Layout, Erreichbarkeit), `game/play/megarig_view.js`, Seite `megarig.html` (Fahrzeug, Stufe −/+, Übersicht). Tests: `npm test` 138 (6 neu in `test/megarig.test.js`), `tools/megarig_test.mjs` 14 Prüfungen (27 Leitern bis oben). PixelLab: diesmal 9 (LKW auf Seitenansicht), übrig 674. **Bitte testen:** /megarig, alle drei Fahrzeuge, ganz nach oben klettern (Ausguck am Mast/Kran), in die Räume im Rumpf, „Übersicht“, Stufen durchschalten; in der Werkstatt RIG › Mega-Rigs ein Modul verschieben und neu laden.
+
+### #023 Bergungsprojekte: LKW-Wrack, Crawler, Fatbird mit Quests, POIs und Teilen
+- **Status:** läuft (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, AFK: „Bau bitte den gesamten Themenbereich inklusive Quests und POI und Felgen mit ein“)
+- **Für:** Code
+- **Lesen:** design.md › Bergungsprojekt: der LKW, Endgame-Zugmaschinen; docs/features/megarigs.md
+- **Auftrag:** Bergungsprojekte als Daten (Abschnitte mit Teilen), Wrack am gewürfelten Ort, mehrfach hinfahren, Teile aus anderen POIs, Fortschritt sichtbar, Questlog mit fehlenden Teilen und Fundorten; danach Crawler und Fatbird als große Bergungen.
+- **Fertig, wenn:** LKW lässt sich vom Spielstart an bergen, Crawler/Fatbird freischaltbar, Werkstatt-Bereich, Tests grün, Build grün.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ## Archiv
 
