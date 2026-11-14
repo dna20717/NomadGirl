@@ -5,6 +5,8 @@
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { hints } from './ui_nav.js';
+import { goalEl } from './hud.js';
+import { goal as questGoal } from '../quest.js';
 import { ensureMap, placeOf, neighbours, hops, mapConfig, threatOf } from '../worldmap.js';
 import { drawMap } from '../map_render.js';
 import { ITEM_CATEGORIES, optionLabel as optLabel } from '../../engine/schema.js';
@@ -124,7 +126,9 @@ export class MapUI {
     const P = D.pois?.[n.poi] || {}, b = C.brands.find(x => x.id === n.brand), here = n.id === save.location, a = this.action();
     const logo = b && this.D.assets?.[C.logos]?.file ? el('span', { class: 'wm-logo', style: `background-image:url("${new URL(D.assets[C.logos].file, this.host.base).href}");background-position:${(b.icon % 4) * -64}px ${Math.floor(b.icon / 4) * -64}px` }) : null;
     const cost = a?.cost;
+    const G = (() => { try { return questGoal(D, save); } catch { return null; } })();   // #016 the red thread on the map
     this.aside.replaceChildren(...[
+      G ? goalEl(G) : null,
       el('div', { class: 'wm-head' }, logo, el('div', {}, el('h3', {}, n.name), el('small', {}, [KIND_NAMES[P.kind] || P.name, n.region, P.size ? `Größe ${P.size}` : null].filter(Boolean).join(' · ')))),
       here ? el('p', { class: 'wm-here' }, icon('tracks', 14), ' Du bist hier.') : null,
       el('div', { class: 'wm-row' }, el('small', {}, 'Gefahr'), this.intel ? el('b', { class: 'wm-danger' }, '●'.repeat(n.danger || 1) + '○'.repeat(Math.max(0, 5 - (n.danger || 1)))) : el('b', { class: 'wm-unknown' }, '? ? ?')),

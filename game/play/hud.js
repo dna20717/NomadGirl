@@ -7,6 +7,7 @@ import { hints, setUiDevice, closeX } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { loadVersion } from '../version.js';
 import { clockText } from '../save.js';
+import { goal as questGoal } from '../quest.js';
 import { makeSfx } from './sfx.js';
 
 // toast kinds: icon (Lucide) and sound (sfx.js); colours in play.css (.hud-toast.<kind>)
@@ -303,17 +304,37 @@ export class Hud {
     if (sv) {
       const D = this.D, loc = placeOf(D, sv)?.name || '';
       const vit = this.modeName === 'run' && sv.tank && bonuses(D, sv).tankStatus > 0 ? phase(D, sv) : null;   // Techtree › Lebenszeichen: the tank in the run
-      const key = [sv.day, sv.hour, sv.location, sv.deltas, sv.fuel, sv.food, sv.buffs.join(), this.modeName, vit ? `${Math.round(sv.tank.cond)}${sv.tank.dead}` : ''].join('|');
+      const now = performance.now();
+      if (!this.goalAt || now - this.goalAt > 1000) {
+        this.goalAt = now;
+        const before = this.goal;
+        try { this.goal = questGoal(D, sv); } catch { this.goal = null; }
+        // progress on the way (#016): a node on the way was unlocked → a gold toast with how far the search is
+        if (before && this.goal && this.goal.progress > before.progress + 1e-6) this.toast('Ein Schritt näher an AvA', `${Math.round(this.goal.progress * 100)} % des Weges · nächster: ${this.goal.text.replace(/^[^:]*:\s*/, '')}`, 'good');
+      }
+      const G = this.goal, run = this.modeName === 'run';
+      const key = [sv.day, sv.hour, sv.location, sv.deltas, sv.fuel, sv.food, sv.buffs.join(), this.modeName, vit ? `${Math.round(sv.tank.cond)}${sv.tank.dead}` : '', G ? G.text + G.sub : ''].join('|');
       if (key !== this.campKey) {
         this.campKey = key;
         const buffs = sv.buffs.map(b => D.buffs?.[b]?.name || b);
+        // #016 Run-HUD aufräumen: in the run only what matters in the run (AvA's vital signs, buffs, the goal); clock, Δ, fuel and
+        // supplies of the camp stay in the camp (the run shows its own Δ top right)
         this.campEl.replaceChildren(
-          el('div', { class: 'hud-row' }, el('span', { class: 'hud-room' }, `${clockText(sv)} · ${loc}`)),
-          el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'Δ'), el('b', {}, String(sv.deltas)), el('span', { class: 'hud-label' }, 'SPRIT'), el('b', {}, `${Math.round(sv.fuel)} l`),
-            el('span', { class: 'hud-label' }, 'VORRÄTE'), el('b', {}, (Math.round(sv.food * 10) / 10).toLocaleString('de-DE'))),
+          ...(run ? [] : [el('div', { class: 'hud-row' }, el('span', { class: 'hud-room' }, `${clockText(sv)} · ${loc}`)),
+            el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'Δ'), el('b', {}, String(sv.deltas)), el('span', { class: 'hud-label' }, 'SPRIT'), el('b', {}, `${Math.round(sv.fuel)} l`),
+              el('span', { class: 'hud-label' }, 'VORRÄTE'), el('b', {}, (Math.round(sv.food * 10) / 10).toLocaleString('de-DE')))]),
           ...(vit ? [el('div', { class: 'hud-row hud-vital' + (vit.index >= 4 || vit.dead ? ' bad' : '') }, el('span', { class: 'hud-label' }, '♥ AvA'), el('b', {}, vit.dead ? 'kein Signal' : `${Math.round(sv.tank.cond)} % · ${vit.name}`))] : []),
-          ...(buffs.length ? [el('div', { class: 'hud-row hud-buffs' }, el('span', { class: 'hud-label' }, 'BUFFS'), el('b', {}, buffs.join(' · ')))] : []));
+          ...(buffs.length ? [el('div', { class: 'hud-row hud-buffs' }, el('span', { class: 'hud-label' }, 'BUFFS'), el('b', {}, buffs.join(' · ')))] : []),
+          ...(G ? [goalEl(G, run)] : []));
       }
     }
   }
+}
+
+// the red thread (#016): ◆ next step to the cure (or the tank when it is weak), a thin bar of the way so far; compact in the run
+export function goalEl(G, compact = false) {
+  return el('div', { class: `hud-goal ${G.kind}` + (compact ? ' compact' : '') },
+    el('div', { class: 'hud-goal-text' }, el('i', {}, G.kind === 'tank' || G.kind === 'lost' ? '♥' : '◆'), el('b', {}, G.text)),
+    compact && G.kind !== 'tank' ? null : el('small', {}, G.sub),
+    el('span', { class: 'hud-goal-bar', style: `--p:${Math.round((G.progress || 0) * 100)}%` }));
 }

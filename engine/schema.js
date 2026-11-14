@@ -168,6 +168,8 @@ export const AREAS = {
       { title: 'Technik', fields: [text('title', 'Titel'), num('tileSize', 'Kachelgröße', { unit: 'px', min: 8 }), num('gravity', 'Schwerkraft', { unit: 'px/s²', min: 0 }),
         bool('confirmLeave', 'Rückfrage beim Abreisen', { hint: 'Daniel, 13.11.2026: am Van im POI fragt das Spiel „Wirklich zurückreisen?“. Aus = sofort zurück ins Camp' }),
         size('resolution', 'Auflösung', { unit: 'px', hint: 'Interne Auflösung, wird skaliert' }), bool('pixelArt', 'Pixel-Art (scharf skalieren)')] },
+      { title: 'Zielzeile', fields: [bool('quest.enabled', 'Zielzeile zeigen', { hint: '#016 roter Faden: im HUD, auf der Karte und nach dem Run steht der nächste Schritt zum Heilmittel bzw. der Tank, wenn er schwach ist' }),
+        ref('quest.goal', 'Endziel', 'techtree', { hint: 'Knoten, auf den alles hinläuft. Leer = heilmittel' }), num('quest.tankWarn', 'Tank zuerst unter', { unit: '%', min: 0, max: 100, hint: 'Unter diesem Zustand zeigt die Zielzeile den Tank statt des Techtrees. Leer = 45' })] },
       { title: 'Tutorial', fields: [bool('tutorial.enabled', 'Lektionen beim ersten Mal', { hint: '#011: Karte mit Clip, wenn man etwas zum ersten Mal sieht oder kann. Spieler können sie unter Menü › Optionen abschalten' }), num('tutorial.gap', 'Abstand zwischen zwei Karten', { unit: 's', min: 0 })] },
       { title: 'Controller', fields: [bool('gamepad.enabled', 'Controller an', { hint: 'Gamepad-API des Browsers: Xbox, PlayStation, Stadia (Bluetooth-Modus), Switch Pro … mit Standard-Belegung. Die Knöpfe heißen hier nach ihrer Lage, die Hilfe im Spiel zeigt die Symbole des angeschlossenen Controllers' }),
         ref('gamepad.icons', 'Symbole', 'assets', { hint: 'Asset der Art „Symbole“ (tools/pad_icons.py): <typ>_0 … <typ>_9 je Controller (xbox, stadia, ps, switch), dazu für alle gleich stick_l, stick_r, stick_l_up … stick_l_press, stick_r_press, dpad, dpad_up …' }), num('gamepad.iconSize', 'Symbol-Größe', { unit: 'px', min: 16, max: 64, hint: 'So hoch erscheinen die Knöpfe in Hinweisen und Hilfe (Standard 32)' }),
@@ -708,7 +710,8 @@ export const AREAS = {
     row: x => `${x.item ? '' : 'ohne Gegenstand · '}${x.hidden ? 'versteckt' : 'Tab ' + (x.order ?? 0)}`,
     sections: [{ title: 'Ressource', fields: [NAME, ref('item', 'Gegenstand', 'items', { hint: 'Das Ding in der Welt, das man im Techtree ausgibt' }), color('color', 'Farbe'),
       num('order', 'Reihenfolge der Tabs'), bool('hidden', 'Versteckt', { hint: 'Kein Tab, nicht im Spiel sichtbar (vorgesehen: Dunkelheit)' }),
-      num('darkness', 'Mehr je Stufe', { unit: '%', hint: 'Nur „Dunkelheit“: so viel mehr der anderen Ressourcen je Stufe (noch ohne Wirkung)' }), DESCRIPTION] }],
+      num('darkness', 'Mehr je Stufe', { unit: '%', hint: 'Nur „Dunkelheit“: so viel mehr der anderen Ressourcen je Stufe (noch ohne Wirkung)' }),
+      text('source', 'Woher', { hint: 'Kurz, wo man sie bekommt; steht in der Zielzeile (#016), z. B. „Zerlegen an der Werkbank“' }), DESCRIPTION] }],
   },
 
   techtree: {

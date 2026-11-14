@@ -1,7 +1,21 @@
 {
- "technik": {"name": "Technik", "item": "technik", "color": "#f9a31b", "order": 1, "description": "Bauen, craften, Rig. Entsteht beim Zerlegen an der Werkbank."},
- "wissen": {"name": "Wissen", "item": "wissen", "color": "#20d6c7", "order": 2, "description": "Terminals, Zettel, Secrets, guter Rang. Entsteht beim Auswerten im Warroom."},
- "bio": {"name": "Bio", "item": "bio", "color": "#9cdb43", "order": 3, "description": "Mutanten, Kochen, Proben. Führt zum Heilmittel."},
+ "technik": {
+  "name": "Technik",
+  "item": "technik",
+  "color": "#f9a31b",
+  "order": 1,
+  "description": "Bauen, craften, Rig. Entsteht beim Zerlegen an der Werkbank.",
+  "source": "Zerlegen an der Werkbank"
+ },
+ "wissen": {
+  "name": "Wissen",
+  "item": "wissen",
+  "color": "#20d6c7",
+  "order": 2,
+  "description": "Terminals, Zettel, Secrets, guter Rang. Entsteht beim Auswerten im Warroom.",
+  "source": "Auswerten im Warroom, Secrets"
+ },
+ "bio": {"name": "Bio", "item": "bio", "color": "#9cdb43", "order": 3, "description": "Mutanten, Kochen, Proben. Führt zum Heilmittel.", "source": "Mutanten, Proben zerlegen"},
  "dunkelheit": {
   "name": "Dunkelheit",
   "color": "#793a80",
