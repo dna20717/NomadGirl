@@ -16,6 +16,8 @@ await furnishedStart(page);
 // a fixed level: same seed every run (POIs › Level › Fester Seed), with the side room
 const pois = JSON.parse(fs.readFileSync(new URL('../projects/nomadgirl/data/pois.json', import.meta.url), 'utf8'));
 pois.tankstelle_km7.seed = 7;
+// #017: the classic four rooms (the checks know their layout; new rooms are checked by the reach test in test/poi.test.js)
+Object.assign(pois.tankstelle_km7, { rooms: ['vorplatz', 'verkaufsraum', 'lager', 'werkstatthalle'], roomCount: [3, 4] });
 await page.addInitScript(p => localStorage.setItem('nomadgirl-drafts:data/pois.json', JSON.stringify(p)), pois);
 await page.goto(url);
 await page.waitForFunction(() => window.nomad && window.game?.scene.getScene('play')?.camp, null, { timeout: 20000 });
@@ -131,11 +133,12 @@ s = await ev(() => {
   sc.deltas = 100;
   nomad.until(st => st.prompt?.startsWith('Zurück ins Camp'), 600, ['right']);
   const p = nomad.state().prompt, before = nomad.save().deltas, grade = nomad.state().level.done;
-  nomad.step(1, [], ['grab']); nomad.step(3); nomad.choose('Zurückreisen'); nomad.step(10);
-  return { p, before, after: nomad.save().deltas, grade, st: nomad.state() };
+  nomad.step(1, [], ['grab']); nomad.step(3); nomad.choose('Zurückreisen'); nomad.step(40);
+  const H = game.scene.getScene('play').hud, sum = { ...H.sum.state(), title: H.sum.S?.title }; H.sum.close(); nomad.step(2);
+  return { p, before, after: nomad.save().deltas, grade, st: nomad.state(), sum };
 });
 check('Durch die Tür zum Van, Hinweis mit Rang', /^Zurück ins Camp · Rang [FDCBAS]$/.test(s.p), s.p);
-check('Am Van: Run-Geld plus Rang-Bonus', s.st.mode === 'camp' && s.after - s.before === Math.round(100 * (1 + s.grade.bonus / 100)) && /Rang/.test(s.st.banner), { d: s.after - s.before, grade: s.grade, banner: s.st.banner });
+check('Am Van: Run-Geld plus Rang-Bonus, Beute-Bilanz mit Rang (#017)', s.st.mode === 'camp' && s.after - s.before === Math.round(100 * (1 + s.grade.bonus / 100)) && s.sum.open && s.sum.grade === s.grade.grade && /Rang/.test(s.sum.title), { d: s.after - s.before, grade: s.grade, sum: s.sum });
 
 console.log(ok.map(o => '✔ ' + o).join('\n'));
 if (errors.length) { console.log(errors.map(e => '✘ ' + e).join('\n')); process.exitCode = 1; }

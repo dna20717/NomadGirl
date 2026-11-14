@@ -42,7 +42,7 @@ Stand: 12.11.2026 abends (Durchsicht von Ava). Kleinigkeiten sind schon behoben 
 | C5 | Container-Stauraum im Code | Deichselkästen sind raus, der Code (E-Punkt, Umzug der Raster `rig:<n>`) bleibt, falls Stauraum an Containern zurückkommt. `test/stack.test.js` gibt dem 20-Fuß-Container dafür im Test Stauraum. | – (bewusst) |
 | C6 | Gemeinsamer Kern | `game/ui.js` (`showMenu`, `askText`, `uiColor`), `icons.js` (`ICON_NAMES`), `browser_loader.js` (`asCanvas`) haben unbenutzte Exporte: Kopie aus NomadTactics, bewusst gleich gehalten. | – |
 | C7 | Unbenutzte Exporte | `weatherDefaults` (weather.js), `AREAS_WITH_THINGS` (inventory.js), `DRONE_SLOTS`, `RANKING_CATEGORIES` (schema.js). Harmlos, beim nächsten Umbau mitnehmen. | klein |
-| C8 | Große Dateien | `camp.js` und `leyla.js` je ≈ 1.000 sehr lange Zeilen, `scene.js` ≈ 850. Lesbar, aber Kandidaten zum Aufteilen (Camp: Zeichnen/Hotspots/Menüs; Leyla: Bewegung/Kampf/Aussehen). | mittel |
+| C8 | ~~Große Dateien~~ erledigt (#017): `camp.js` 1.437 → 1.100 (+ `camp_life.js`, `camp_actions.js`), `scene.js` 1.088 → 752 (+ `scene_runs.js`, `scene_events.js`), `leyla.js` 1.057 → 539 (+ `leyla_moves.js`, `leyla_combat.js`); Methoden-Bündel werden in die Klasse eingehängt (Ende der Hauptdatei), Code unverändert. Altes Problem: | `camp.js` und `leyla.js` je ≈ 1.000 sehr lange Zeilen, `scene.js` ≈ 850. Lesbar, aber Kandidaten zum Aufteilen (Camp: Zeichnen/Hotspots/Menüs; Leyla: Bewegung/Kampf/Aussehen). | mittel |
 | C9 | Test-Fixtures | Rig-Tests spielen mit einer festen alten Aufstellung (`classicRig`, `furnishedStart`, Tank aus). Gut für stabile Tests, prüft aber nicht Daniels aktuellen Start. | – (bewusst) |
 
 ## Erledigt bei der Durchsicht (12.11.2026)

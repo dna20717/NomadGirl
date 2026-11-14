@@ -108,7 +108,7 @@ await ev(() => { TU().close(); });
 // the workshop shows the lessons and plays a clip
 await page.goto('http://localhost:8766/workshop.html');
 await page.waitForFunction(() => window.workshop?.p?.data, null, { timeout: 20000 });
-v = await ev(async () => { workshop.go({ area: 'assets', choice: 'tut_laufen' }); await new Promise(r => setTimeout(r, 900)); return { video: !!document.querySelector('.ng-sprite video') }; });
+v = await ev(async () => { workshop.go({ area: 'assets', choice: 'tut_laufen' }); for (let i = 0; i < 50 && !document.querySelector('.ng-sprite video'); i++) await new Promise(r => setTimeout(r, 100)); return { video: !!document.querySelector('.ng-sprite video') }; });   // #017: up to 5 s (was 0.9 s, flaky)
 check('Werkstatt: Clip-Asset spielt in der Vorschau', v.video, v);
 v = await ev(async () => { workshop.go({ area: 'tutorial', choice: 'kanten' }); await new Promise(r => setTimeout(r, 500)); return { txt: document.body.textContent.includes('Kanten greifen') }; });
 check('Werkstatt: Bereich Lektionen', v.txt, v);

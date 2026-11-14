@@ -14,6 +14,10 @@ page.on('pageerror', e => errors.push(e.message));
 page.on('console', m => { if (m.type() === 'error' && !/\/api\/|version\.json/.test(m.location()?.url || '')) errors.push(m.text()); });
 const ev = (f, a) => page.evaluate(f, a);
 const check = (name, cond, info) => (cond ? ok : errors).push(cond ? name : `${name}: ${JSON.stringify(info)}`);
+// #017: the classic four rooms of the Tankstelle (this check knows their lamps); new rooms are checked in test/poi.test.js
+const pois = JSON.parse(fs.readFileSync(new URL('../projects/nomadgirl/data/pois.json', import.meta.url), 'utf8'));
+Object.assign(pois.tankstelle_km7, { rooms: ['vorplatz', 'verkaufsraum', 'lager', 'werkstatthalle'], roomCount: [3, 4] });
+await page.addInitScript(p => localStorage.setItem('nomadgirl-drafts:data/pois.json', JSON.stringify(p)), pois);
 await page.goto(base + '?poi=tankstelle_km7&seed=7');
 await page.waitForFunction(() => window.nomad && window.game?.scene.getScene('play')?.leyla, null, { timeout: 20000 });
 await ev(() => { nomad.take(); nomad.calm(); });

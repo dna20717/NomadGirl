@@ -77,8 +77,15 @@ s = await sc();
 check('Hinweis zeigt das Symbol der Controller-Taste (Stick statt E)', s.prompt === 'Einsteigen · Van' && s.icon === 'stick_l_up', s);
 await shot('prompt_xbox');
 await flick();
+let wm = await ev(() => nomad.map());
+check('Stick hoch an der Van-Tür öffnet direkt die Reisekarte (#016)', wm?.open && wm.action === 'Hier plündern', wm);
+await tap(1);
+check('B schließt die Reisekarte', !(await ev(() => nomad.map()))?.open);
+// menus with d-pad, A and B: the campfire menu (#016: Hinsetzen · Questlog)
+await ev(() => nomad.goTo('Lagerfeuer'));
+await flick();
 s = await sc();
-check('Stick hoch öffnet das Van-Menü', s.menu?.items.some(i => i.label.startsWith('Planen')), s.menu);
+check('Stick hoch am Lagerfeuer öffnet das Menü', s.menu?.items.some(i => i.label === 'Questlog'), s.menu);
 check('Menü-Fußzeile mit Symbolen: Steuerkreuz, A, B', s.menuIcons.join() === 'dpad,xbox_0,xbox_1', s.menuIcons);
 await shot('menu');
 await tap(13);
@@ -87,12 +94,10 @@ check('Steuerkreuz runter wählt den nächsten Eintrag', s.focus === 1, s.focus)
 await tap(1);
 s = await sc();
 check('B schließt das Menü', !s.menu, s.menu);
-await flick(); await tap(0);   // first entry: Karte · Reisen (#007)
-s = await sc();
-const wm = await ev(() => nomad.map());
-check('A nimmt den Eintrag (Karte · Reisen)', wm?.open, { menu: s.menu, wm });
+await flick(); await tap(13); await tap(0);   // second entry: Questlog
+check('A nimmt den Eintrag (Questlog)', !!(await ev(() => nomad.quests()))?.open);
 await tap(1);
-check('B schließt die Reisekarte', !(await ev(() => nomad.map()))?.open);
+check('B schließt das Questlog', !(await ev(() => nomad.quests()))?.open);
 
 // PlayStation symbols
 await ev(() => setPad({ id: 'DualSense Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)' }));
