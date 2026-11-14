@@ -28,6 +28,7 @@
   "value": 6000,
   "description": "Ein echtes Rig. Endlich.",
   "storage": [6, 3],
-  "storageName": "Staukasten"
+  "storageName": "Staukasten",
+  "look": "truck"
  }
 }

@@ -95,6 +95,8 @@ export class PlayScene extends Phaser.Scene {
       // every container's look: bought or stacked ones appear while building, without reloading the scene
       for (const c of Object.values(this.data_.containers || {})) for (const k of [c.look, c.lookClosed]) if (k) ids.add(k);
       for (const c of Object.values(this.data_.rigParts || {})) if (c.look) ids.add(c.look);
+      for (const x of Object.values(this.data_.salvage || {})) if (x.look) ids.add(x.look);   // wrecks (#023)
+      for (const t of Object.values(this.data_.tractors || {})) if (t.look) ids.add(t.look);   // the tractor in front (the salvaged LKW)
       // workshop pictures (and the empty shelf), the crate for packed workshops
       for (const w of Object.values(this.data_.workshops || {})) for (const id of [w.look, w.lookEmpty, w.garden?.plants]) if (id) ids.add(id);
       { const T = this.data_.tank || {}; for (const p of T.phases || []) for (const id of [p.look, p.anim, p.hand]) if (id) ids.add(id); if (T.deadLook) ids.add(T.deadLook); }   // the cryo tank in all its phases (tank_view.js)
@@ -305,7 +307,10 @@ export class PlayScene extends Phaser.Scene {
 
     const start = R.start || [2, R.h - 2];
     // spawn point (Leyla's van): decoration, its anchor sits on Leyla's start; door, roof and dish in van.js
-    const S = this.data_.game?.spawn;
+    let S = this.data_.game?.spawn;
+    // the camp's tractor has its own picture (the salvaged LKW, #023): it stands where the van stood, without door, dish and roof
+    const TL = this.mode === 'camp' && this.data_.tractors?.[this.box?.save.rig?.tractor]?.look;
+    if (TL && TL !== S?.look && this.assetInfo(TL)) S = { ...S, look: TL, flip: !!this.data_.assets[TL].flip, door: { enabled: false }, dish: null, roof: null };
     this.megaView = this.megarig ? new MegarigView(this, this.megarig, T) : null;
     this.megaView?.ladders(this.ladders, new Set((this.data_.megarigs[this.args.megarig.id].walk || []).filter(w => w.kind === 'ladder').map(w => this.megarig.x0 + Number(w.x || 0))));
     this.van = !this.megarig && S?.enabled !== false && S?.look && this.assetInfo(S.look) ? new Van(this, S, [(start[0] + 0.5) * T, (start[1] + 1) * T]) : null;

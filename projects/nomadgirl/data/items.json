@@ -1932,5 +1932,145 @@
   "look": "icons_gear",
   "icon": 61,
   "description": "Eine Skizze auf Butterbrotpapier, mit Ölflecken. Wer zeichnet so sauber?"
+ },
+ "felge": {
+  "name": "Felge",
+  "category": "component",
+  "size": [2, 2],
+  "stack": 2,
+  "value": 30,
+  "look": "icons_salvage",
+  "icon": 0,
+  "description": "Stahlfelge für schwere Achsen. Ein bisschen verbogen, aber rund genug."
+ },
+ "reifen": {
+  "name": "Reifen",
+  "category": "component",
+  "size": [2, 2],
+  "stack": 2,
+  "value": 35,
+  "look": "icons_salvage",
+  "icon": 1,
+  "description": "Lkw-Reifen mit noch etwas Profil. Riecht nach Sommer 2049."
+ },
+ "achse": {
+  "name": "Achse",
+  "category": "component",
+  "size": [3, 1],
+  "stack": 1,
+  "value": 60,
+  "look": "icons_salvage",
+  "icon": 2,
+  "description": "Eine ganze Hinterachse. Schwer, sperrig, unbezahlbar."
+ },
+ "motorblock": {
+  "name": "Motorblock",
+  "category": "component",
+  "size": [2, 2],
+  "stack": 1,
+  "value": 120,
+  "look": "icons_salvage",
+  "icon": 3,
+  "description": "Sechs Zylinder, ein Haufen Rost und ein Herz aus Gusseisen."
+ },
+ "dieselkanister": {
+  "name": "Dieselkanister",
+  "category": "component",
+  "size": [2, 2],
+  "stack": 2,
+  "value": 25,
+  "look": "icons_salvage",
+  "icon": 4,
+  "description": "Zwanzig Liter. Der Geruch von Freiheit."
+ },
+ "auspuff": {
+  "name": "Auspuff",
+  "category": "component",
+  "size": [1, 3],
+  "stack": 1,
+  "value": 20,
+  "look": "icons_salvage",
+  "icon": 5,
+  "description": "Ein senkrechter Auspuff, wie ihn echte Trucks tragen."
+ },
+ "kettenglied": {
+  "name": "Kettenglied",
+  "category": "component",
+  "size": [2, 1],
+  "stack": 4,
+  "value": 18,
+  "look": "icons_salvage",
+  "icon": 6,
+  "description": "Ein Glied einer Gleiskette, schwer wie ein schlechtes Gewissen."
+ },
+ "laufrolle": {
+  "name": "Laufrolle",
+  "category": "component",
+  "size": [2, 2],
+  "stack": 2,
+  "value": 40,
+  "look": "icons_salvage",
+  "icon": 7,
+  "description": "Laufrolle eines Kettenfahrwerks. Dreht sich noch."
+ },
+ "hydraulikzylinder": {
+  "name": "Hydraulikzylinder",
+  "category": "component",
+  "size": [1, 3],
+  "stack": 2,
+  "value": 55,
+  "look": "icons_salvage",
+  "icon": 8,
+  "description": "Hebt Tonnen. Tropft ein bisschen."
+ },
+ "rotorblatt": {
+  "name": "Rotorblatt",
+  "category": "component",
+  "size": [3, 1],
+  "stack": 2,
+  "value": 70,
+  "look": "icons_salvage",
+  "icon": 9,
+  "description": "Ein Blatt aus einem Mantelrotor. Leicht und scharf."
+ },
+ "ballonstoff": {
+  "name": "Ballonstoff",
+  "category": "component",
+  "size": [2, 2],
+  "stack": 4,
+  "value": 45,
+  "look": "icons_salvage",
+  "icon": 10,
+  "description": "Silbrige Hüllenbahn, gasdicht, wenn man sie nicht anschaut."
+ },
+ "gasventil": {
+  "name": "Gasventil",
+  "category": "component",
+  "size": [1, 1],
+  "stack": 4,
+  "value": 50,
+  "look": "icons_salvage",
+  "icon": 11,
+  "description": "Ventil für eine Traggas-Hülle. Ohne das: Knall."
+ },
+ "bordrechner": {
+  "name": "Bordrechner",
+  "category": "component",
+  "size": [2, 2],
+  "stack": 1,
+  "value": 150,
+  "look": "icons_salvage",
+  "icon": 12,
+  "description": "Ein Bordcomputer aus der Zeit vor dem Zusammenbruch. Brummt beim Einschalten."
+ },
+ "bordwerkzeug": {
+  "name": "Bordwerkzeug",
+  "category": "component",
+  "size": [2, 2],
+  "stack": 1,
+  "value": 40,
+  "look": "icons_salvage",
+  "icon": 13,
+  "description": "Werkzeugkiste eines Fernfahrers. Alles drin, was man für eine Panne braucht."
  }
 }

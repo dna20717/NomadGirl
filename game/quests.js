@@ -11,6 +11,7 @@ import { add as addTo } from './inventory.js';
 import { goal as mainGoal, pathTo, progress as mainProgress, goalId } from './quest.js';
 import { status, owned } from './techtree.js';
 import { phase, hoursLeft } from './tank.js';
+import { active as salvageOpen, progress as salvageProgress, goal as salvageGoal, siteOf, ensureSites } from './salvage.js';
 
 export const qstate = save => { const q = (save.quests ??= {}); q.active ??= {}; q.done ??= {}; return q; };
 const keyOf = x => x.filter ? `${x.counter}:${x.filter}` : x.counter;
@@ -71,6 +72,8 @@ export function tankTask(D, save) {
 // the line in the HUD: a weak tank first, then the tracked side job, else the main quest
 export function trackedGoal(D, save) {
   const G = mainGoal(D, save), Q = qstate(save), id = Q.tracked;
+  // a salvage project (#023) as the tracked line: the next missing part and where it lies
+  if (G && G.kind !== 'tank' && G.kind !== 'lost' && String(id).startsWith('salvage:')) { const sg = salvageGoal(D, save, id.slice(8)); if (sg) return { ...G, ...sg }; }
   if (!G || G.kind === 'tank' || G.kind === 'lost' || !id || id === 'main' || !Q.active[id] || !D.quests?.[id]) return G;
   const x = D.quests[id], p = progressOf(D, save, id), giver = D.companions?.[x.giver]?.name;
   return { kind: p.ready ? 'ready' : 'side', text: `${x.name || id}${p.ready ? ' · erledigt' : ''}`, sub: p.ready ? `Abgeben im Questlog${giver ? ` bei ${giver}` : ''}` : `${p.n} / ${p.target}${giver ? ` · für ${giver}` : ''}`, progress: p.n / p.target, quest: id };
@@ -86,5 +89,15 @@ export function questLog(D, save) {
     offers: offers(D, save).map(id => ({ id, ...D.quests[id], ...progressOf(D, save, id) })),
     done: Object.keys(Q.done).filter(id => D.quests?.[id]).map(id => ({ id, ...D.quests[id], day: Q.done[id].day })),
     tracked: Q.tracked || 'main',
+    salvage: salvageLog(D, save),
   };
+}
+
+// salvage projects (#023) for the quest log: every open wreck with its sections, where it is and what is missing
+export function salvageLog(D, save) {
+  if (save.map) ensureSites(D, save);
+  return salvageOpen(D, save).map(id => {
+    const P = salvageProgress(D, save, id), node = save.map?.nodes?.find(n => n.id === siteOf(save, id));
+    return { ...P, site: node?.name || null, here: node?.id === save.location, text: D.salvage[id].text || '', description: D.salvage[id].description || '', reward: D.salvage[id].tractor ? D.tractors?.[D.salvage[id].tractor]?.name : D.megarigs?.[D.salvage[id].megarig]?.name };
+  });
 }

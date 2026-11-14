@@ -1003,6 +1003,28 @@ export const AREAS = {
         { hint: 'Für Bild-Fahrzeuge (LKW): wo Leyla am Bild stehen und klettern kann. x vom Bug, Höhe über dem Boden' })] },
     ],
   },
+  salvage: {
+    name: 'Bergungsprojekte', singular: 'Bergungsprojekt', icon: 'vehicle', file: 'data/salvage.json', kind: 'catalog',
+    hint: 'Wracks, die Leyla über mehrere Besuche wieder flott macht (#023, design.md › Bergungsprojekt). Der Fundort wird je Durchgang gewürfelt (Abstand vom Start), das Wrack steht dort am Ende des Camps. Die Teile liegen in anderen POIs. Was eingebaut ist, bleibt, auch über den Durchgang.',
+    template: { name: 'Neue Bergung', hops: [1, 2], steps: [], chestChance: 30 },
+    row: x => `${new Set((x.steps || []).map(s => s.step)).size} Abschnitte · ${(x.steps || []).reduce((n, s) => n + (s.count || 1), 0)} Teile${x.tractor ? ' · Zugmaschine ' + x.tractor : x.megarig ? ' · Mega-Rig ' + x.megarig : ''}`,
+    check: (x, report, p) => {
+      if (!x.tractor && !x.megarig) report('warning', 'Weder Zugmaschine noch Mega-Rig als Belohnung');
+      if (!(x.steps || []).length) report('warning', 'Keine Abschnitte');
+      for (const [i, r] of (x.steps || []).entries()) if (r.item && !(r.where || []).length && !x.anywhere) report('hint', `Zeile ${i + 1}: ${p.data.items?.[r.item]?.name || r.item} hat keinen Fundort (POI)`);
+    },
+    sections: [
+      { title: 'Bergung', fields: [NAME, area_('text', 'Erster Satz', { hint: 'Was Leyla sagt, wenn sie das Wrack zum ersten Mal sieht' }), DESCRIPTION, ref('after', 'Nach', 'salvage', { hint: 'Erst wenn diese Bergung fertig ist (Crawler und Fatbird nach dem LKW)' }),
+        range('hops', 'Fundort: Straßen vom Start', { hint: 'Je Durchgang gewürfelt: ein Ort so viele Straßen vom Start entfernt (LKW 1–2, Mega-Rigs weiter draußen)' }), num('minCycle', 'Ab Durchgang', { min: 1, hint: 'Leer = ab dem ersten (design.md: „in jedem Durchgang möglich, im ersten sehr schwer“)' })] },
+      { title: 'Belohnung', fields: [ref('tractor', 'Neue Zugmaschine', 'tractors', { hint: 'Ersetzt den Van vorne am Rig. Der Van bleibt am Fundort als Basis' }), ref('megarig', 'Mega-Rig', 'megarigs', { hint: 'Wird freigeschaltet (Crawler, Fatbird)' }),
+        area_('finale', 'Probestart', { hint: 'Text beim letzten Abschnitt' })] },
+      { title: 'Abschnitte', fields: [table('steps', 'Teile je Abschnitt', [text('step', 'Abschnitt'), ref('item', 'Teil', 'items'), num('count', 'Anzahl', { min: 1 }), refs('where', 'Fundorte', 'pois'), num('hours', 'Einbau', { unit: 'h', min: 0 })],
+        { hint: 'Zeilen mit demselben Abschnitt gehören zusammen, Reihenfolge = Bauabschnitte. Die Teile liegen in den Kisten der Fundorte (solange sie fehlen), im Tresor des Fundorts sicher eines' })] },
+      { title: 'Beute', fields: [num('chestChance', 'Chance je Kiste', { unit: '%', min: 0, max: 100, hint: 'Wie oft eine Kiste im Fundort-POI ein fehlendes Teil enthält' }), bool('anywhere', 'Teile auch überall', { hint: 'Auch in POIs ohne Eintrag als Fundort (mit halber Chance)' })] },
+      { title: 'Wrack im Camp', fields: [ref('look', 'Aussehen', 'assets', { hint: 'Bild des Wracks (LKW: die Zugmaschine). Leer = aus Code' }), num('width', 'Breite', { unit: 'Kacheln', min: 6, hint: 'So viel Platz bekommt das Wrack am Ende des Camps' }), num('scale', 'Maßstab', { min: 0.5, step: 0.25 }),
+        select('art', 'Wrack aus Code', [['', '–'], ['crawler', 'Crawler'], ['airship', 'Fatbird']])] },
+    ],
+  },
   rigAddons: {
     name: 'Anbauteile', singular: 'Anbauteil', icon: 'build', file: 'data/rig_addons.json', kind: 'catalog', groupBy: { key: 'at', options: ADDON_AT },
     hint: 'Gemeinsamer Baukasten für alle Mega-Rigs (#022): Schüssel, Antennen, Auspuff, Kran, Banner, Neon … Bild (Ausschnitt aus einem Teileblatt) oder aus Code.',
@@ -1383,7 +1405,7 @@ export const GROUPS = [
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
   ['ACHIEVEMENTS & AUFTRÄGE', ['achievements', 'quests']],
   ['PROGRESSION', ['techtree', 'resources']],
-  ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'megarigs', 'rigAddons', 'companions']],
+  ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'megarigs', 'rigAddons', 'salvage', 'companions']],
   ['WELT', ['worldmap', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'travel']],
 ];
 

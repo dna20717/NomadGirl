@@ -1,0 +1,74 @@
+{
+ "lkw": {
+  "name": "Der LKW",
+  "hops": [1, 2],
+  "tractor": "lkw",
+  "look": "truck",
+  "width": 18,
+  "scale": 5,
+  "chestChance": 35,
+  "text": "Ein Sattelschlepper, halb im Sand. Der Van zieht nicht mehr als das, was er hat. Der hier könnte.",
+  "description": "Erste Bergung ab Spielstart: Der Van ist zu schwach für weitere Container, jeder weitere braucht den LKW. Ist er fertig, bleibt der Van hier als Basis.",
+  "finale": "Leyla dreht den Schlüssel. Der Diesel hustet, spuckt, brüllt. Der LKW lebt.",
+  "steps": [
+   {"step": "Freilegen", "item": "bordwerkzeug", "count": 1, "where": ["tankstelle_km7"], "hours": 3},
+   {"step": "Freilegen", "item": "schrauben", "count": 4, "where": ["tankstelle_km7", "grossmarkt"], "hours": 1},
+   {"step": "Fahrwerk", "item": "felge", "count": 2, "where": ["tankstelle_km7"], "hours": 2},
+   {"step": "Fahrwerk", "item": "reifen", "count": 2, "where": ["tankstelle_km7"], "hours": 2},
+   {"step": "Fahrwerk", "item": "achse", "count": 1, "where": ["tankstelle_km7", "bunker_13"], "hours": 3},
+   {"step": "Motor", "item": "motorblock", "count": 1, "where": ["grossmarkt", "bunker_13"], "hours": 4},
+   {"step": "Motor", "item": "kabelbaum", "count": 2, "where": ["grossmarkt"], "hours": 1},
+   {"step": "Motor", "item": "autobatterie", "count": 1, "where": ["grossmarkt", "tankstelle_km7"], "hours": 1},
+   {"step": "Kabine & Tank", "item": "schrottplatte", "count": 3, "where": ["tankstelle_km7", "grossmarkt"], "hours": 2},
+   {"step": "Kabine & Tank", "item": "dieselkanister", "count": 2, "where": ["tankstelle_km7"], "hours": 1},
+   {"step": "Kabine & Tank", "item": "auspuff", "count": 1, "where": ["tankstelle_km7"], "hours": 1}
+  ]
+ },
+ "crawler": {
+  "name": "Der Crawler",
+  "after": "lkw",
+  "hops": [3, 4],
+  "megarig": "crawler",
+  "width": 24,
+  "art": "crawler",
+  "chestChance": 25,
+  "text": "Ein Raupentransporter, so groß wie ein Wohnblock. Eingesunken, aber die Ketten sind noch da.",
+  "description": "Lategame-Bergung: der Riesenpanzer. Viele Teile aus den gefährlichen POIs, die Crew kommt später.",
+  "finale": "Die Ketten mahlen. Staub steigt auf wie eine Wolke. Der Crawler rollt, langsam, unaufhaltsam.",
+  "steps": [
+   {"step": "Kettenwerk", "item": "kettenglied", "count": 8, "where": ["bunker_13", "tankstelle_km7"], "hours": 2},
+   {"step": "Kettenwerk", "item": "laufrolle", "count": 4, "where": ["bunker_13"], "hours": 2},
+   {"step": "Hydraulik", "item": "hydraulikzylinder", "count": 3, "where": ["bunker_13", "ministerium"], "hours": 3},
+   {"step": "Hydraulik", "item": "rohrbogen", "count": 2, "where": ["grossmarkt", "tankstelle_km7"], "hours": 1},
+   {"step": "Antrieb", "item": "motorblock", "count": 2, "where": ["grossmarkt", "bunker_13"], "hours": 4},
+   {"step": "Antrieb", "item": "kabelbaum", "count": 3, "where": ["grossmarkt"], "hours": 1},
+   {"step": "Antrieb", "item": "autobatterie", "count": 2, "where": ["grossmarkt", "tankstelle_km7"], "hours": 1},
+   {"step": "Panzerung", "item": "schrottplatte", "count": 8, "where": ["tankstelle_km7", "grossmarkt", "bunker_13"], "hours": 2},
+   {"step": "Kommandobrücke", "item": "bordrechner", "count": 1, "where": ["ministerium"], "hours": 3},
+   {"step": "Kommandobrücke", "item": "chip", "count": 2, "where": ["ministerium", "bunker_13"], "hours": 1}
+  ]
+ },
+ "fatbird": {
+  "name": "Der Fatbird",
+  "after": "lkw",
+  "hops": [3, 5],
+  "megarig": "fatbird",
+  "width": 24,
+  "art": "airship",
+  "chestChance": 25,
+  "text": "Ein Lastluftschiff liegt auf der Seite, die Hülle schlaff wie ein Zelt. Die Rotoren sind noch dran. Fast alle.",
+  "description": "Lategame-Bergung: das schwebende Lastluftschiff. Hülle, Rotoren, Rahmen, Cockpit.",
+  "finale": "Die Hülle bläht sich, die Rotoren heulen auf. Der Fatbird hebt ab und bleibt in der Luft stehen, als hätte er nie etwas anderes getan.",
+  "steps": [
+   {"step": "Hülle", "item": "ballonstoff", "count": 6, "where": ["grossmarkt", "ministerium"], "hours": 2},
+   {"step": "Hülle", "item": "gasventil", "count": 2, "where": ["ministerium"], "hours": 1},
+   {"step": "Rotoren", "item": "rotorblatt", "count": 4, "where": ["ministerium", "bunker_13"], "hours": 2},
+   {"step": "Rotoren", "item": "turbinenmodul", "count": 2, "where": ["bunker_13", "ministerium"], "hours": 2},
+   {"step": "Lastrahmen", "item": "schrottplatte", "count": 6, "where": ["tankstelle_km7", "grossmarkt"], "hours": 2},
+   {"step": "Lastrahmen", "item": "hydraulikzylinder", "count": 2, "where": ["bunker_13"], "hours": 2},
+   {"step": "Cockpit", "item": "bordrechner", "count": 1, "where": ["ministerium"], "hours": 3},
+   {"step": "Cockpit", "item": "chip", "count": 3, "where": ["ministerium", "bunker_13"], "hours": 1},
+   {"step": "Cockpit", "item": "kabelbaum", "count": 2, "where": ["grossmarkt"], "hours": 1}
+  ]
+ }
+}

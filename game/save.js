@@ -126,6 +126,10 @@ export function newCycle(D, old) {
   s.nodes = [...(old.nodes || [])].filter(id => D.techtree?.[id]);
   s.cycle = (old.cycle || 1) + 1;
   s.map = null; ensureMap(D, s);   // a new Durchgang, a new map
+  // salvage (#023): what is built stays, done wrecks stay done, the LKW keeps pulling; sites are rolled anew on the new map
+  if (old.salvage) s.salvage = { built: old.salvage.built || {}, done: old.salvage.done || {}, seen: old.salvage.seen || {}, sites: {} };
+  if (old.megarigs) s.megarigs = [...old.megarigs];
+  for (const [id, x] of Object.entries(D.salvage || {})) if (s.salvage?.done?.[id] && x.tractor && D.tractors?.[x.tractor]) swapTractor(D, s, x.tractor);
   s.dreams = [...(old.dreams || []), { day: old.day, hour: old.hour, rescues: old.tank?.rescues || 0, cause: old.tank?.cause || null }];
   for (const id of s.nodes) for (const r of D.techtree[id].recipes || []) if (!s.recipes.includes(r)) s.recipes.push(r);
   // Achievements (#012): they, their recipes and the trophies stay; ⚠️ vorläufig the trophies wait in a memory chest at the fire
@@ -188,6 +192,15 @@ const startRecipes = D => Object.entries(D.recipes || {}).filter(([, r]) => (r.d
 // A container may have fewer places now (Daniel, 08.11.2026: Wohnanhänger 3 → 2): a workshop standing on a place that is gone
 // moves to a free place in the rig, otherwise onto the scrapyard; a storage takes its contents along (to its new place, else
 // into the chest, the Kofferraum, and what is left lies as a bundle next to the van).
+// a new tractor in front of the rig (#023, the salvaged LKW): workshops that do not fit any more move into the rig or onto the scrapyard
+export function swapTractor(D, s, id) {
+  if (!D.tractors?.[id] || !s.rig?.units?.length) return false;
+  s.rig.tractor = id;
+  const t = s.rig.units.find(u => u.kind === 'tractor');
+  if (t) t.id = id;
+  refit(D, s);
+  return true;
+}
 function refit(D, s) {
   const U = s.rig.units, cap = u => (u.kind === 'tractor' ? D.tractors?.[u.id]?.places : D.containers?.[u.id]?.places) || 0, size = id => D.workshops?.[id]?.places || 1;
   const taken = U.map(() => new Set()), out = [];

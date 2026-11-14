@@ -14,6 +14,7 @@ import { budgets, partSlots, passengers, roofFree } from '../rig.js';
 import { occupancy } from '../inventory.js';
 import { offers, accept, claim, progressOf, qstate } from '../quests.js';
 import { Benches, benchTexture, crateTexture } from './benches.js';
+import { wreckHere } from './camp_salvage.js';
 
 export const de = n => Number(n).toLocaleString('de-DE', { maximumFractionDigits: 1 });
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
@@ -128,7 +129,11 @@ export function campLayout(D, save, T = 64) {
   const pull = Math.max(1, D.tractors?.[save.rig.tractor]?.length ?? 1);
   const rigRoom = pull * longest + (pull - 1) * gap;
   const vanCol = Math.ceil((margin * T + yardW + rigRoom + vanLeft) / T - 0.5), doorX = (vanCol + 0.5) * T;
-  const W = vanCol + Math.max(8, C.campWidth ?? 20) + 1;
+  // salvage (#023): a wreck found here stands at the end of the camp, the camp grows by its width
+  const wr = wreckHere(D, save), campW = Math.max(8, C.campWidth ?? 20);
+  // a tractor wider than the van (the LKW) pushes the campsite to the right by the difference
+  const wide = Math.max(0, Math.round((vanRight - 5 * T) / T)), campCol = vanCol + wide;   // the van: 0
+  const W = campCol + campW + (wr ? wr.width + 2 : 0) + 1;
   let floor = H - 2;
   let units = rigUnits(D, save.rig, doorX - vanLeft, floor * T, T);
   // a high stack (container on a container on its chassis, ×4) must fit under the top of the world: Leyla has to stand up in the
@@ -150,8 +155,9 @@ export function campLayout(D, save, T = 64) {
   });
   const yard = yardW ? { x0: ((shaft ? shaft.to + 1 : 1) + 0.5) * T, x1: margin * T + yardW } : null;
   return { layout, W, H, floor, vanCol, shaft, hidden: (x, y) => y < floor && blocked(x), doorX, vanLeft: doorX - vanLeft, vanRight: doorX + vanRight, units, tractor, yard,
-    rigRoom: [doorX - vanLeft - rigRoom, doorX - vanLeft], fireX: (vanCol + (C.fire?.at ?? 9) + 0.5) * T,
-    companionX: [(vanCol + (C.companions?.at?.[0] ?? 6) + 0.5) * T, (vanCol + (C.companions?.at?.[1] ?? 13) + 0.5) * T] };
+    rigRoom: [doorX - vanLeft - rigRoom, doorX - vanLeft], fireX: (campCol + (C.fire?.at ?? 9) + 0.5) * T, campCol,
+    companionX: [(campCol + (C.companions?.at?.[0] ?? 6) + 0.5) * T, (campCol + (C.companions?.at?.[1] ?? 13) + 0.5) * T],
+    wreck: wr ? { id: wr.id, x0: (campCol + campW + 1) * T, x1: (campCol + campW + 1 + wr.width) * T } : null };
 }
 
 // background of the camp: weather sky from the Backdrop, a far plain with dunes and a tiny BigCityDelta on the horizon
@@ -437,10 +443,11 @@ export class Camp {
     this.placeChest();
     this.vanGlow();
     this.placeCompanions();
+    this.placeWreck();
     this.startSound();
     // the van: E at its door shows the van's own workshops
     const vanWs = geo.tractor?.workshops || [];
-    this.hotspots.push({ x: geo.doorX, w: 110, name: D.tractors?.[geo.tractor?.id]?.name || 'Van', hint: vanWs.length ? 'Einsteigen' : 'Van',
+    this.hotspots.push({ x: geo.doorX, w: 110, name: D.tractors?.[geo.tractor?.id]?.name || 'Van', hint: vanWs.length ? 'Einsteigen' : 'Fahrerhaus',
       act: () => this.vanMenu(vanWs) });
     // the van's own storage (Kofferraum): E at the rear door
     const T0 = D.tractors?.[geo.tractor?.id] || {};
@@ -949,7 +956,7 @@ export class Camp {
     const info = K.enabled !== false && K.look && s.assetInfo(K.look);
     if (!info) return;
     s.textures.get(info.key).setFilter(NEAREST());
-    const x = (this.geo.vanCol + (K.at ?? 16) + 0.5) * s.T, A = this.D.assets?.[K.look] || {};
+    const x = ((this.geo.campCol ?? this.geo.vanCol) + (K.at ?? 16) + 0.5) * s.T, A = this.D.assets?.[K.look] || {};
     const sprite = s.add.sprite(x, this.ground, info.key, 0).setOrigin(info.ox, info.oy).setScale(info.scale).setFlipX(!!K.flip).setDepth(-3);
     this.chest = { x, sprite, frames: A.frames || 1, fps: A.fps || 8, frame: 0, open: false };
     // E opens the lid and the chest's inventory, E again closes both
@@ -1097,4 +1104,5 @@ export function legCost(D, save, fromId, to) {
 // Split (#017, backlog C8): companions + sound and the actions live in their own files
 import { CampLife } from './camp_life.js';
 import { CampActions } from './camp_actions.js';
-for (const M of [CampLife, CampActions]) for (const k of Object.getOwnPropertyNames(M.prototype)) if (k !== 'constructor') Object.defineProperty(Camp.prototype, k, Object.getOwnPropertyDescriptor(M.prototype, k));
+import { CampSalvage } from './camp_salvage.js';
+for (const M of [CampLife, CampActions, CampSalvage]) for (const k of Object.getOwnPropertyNames(M.prototype)) if (k !== 'constructor') Object.defineProperty(Camp.prototype, k, Object.getOwnPropertyDescriptor(M.prototype, k));

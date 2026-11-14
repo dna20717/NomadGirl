@@ -8,6 +8,7 @@ import { hints } from './ui_nav.js';
 import { goalEl } from './hud.js';
 import { trackedGoal as questGoal } from '../quests.js';
 import { ensureMap, placeOf, neighbours, hops, mapConfig, threatOf } from '../worldmap.js';
+import { ensureSites } from '../salvage.js';
 import { drawMap } from '../map_render.js';
 import { ITEM_CATEGORIES, optionLabel as optLabel } from '../../engine/schema.js';
 
@@ -27,7 +28,7 @@ export class MapUI {
   }
   get D() { return this.host.D; }
   get save() { return this.host.save(); }
-  get map() { return ensureMap(this.D, this.save); }
+  get map() { const m = ensureMap(this.D, this.save); ensureSites(this.D, this.save); return m; }   // wrecks on the map (#023)
   get isOpen() { return !this.el.hidden; }
   get intel() { return this.host.intel?.() ?? true; }
 

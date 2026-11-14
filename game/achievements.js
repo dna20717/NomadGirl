@@ -15,7 +15,7 @@ export const ACHIEVEMENT_COUNTERS = [
   ['kills', 'Gegner besiegt (Filter: Gegner, Familie, Waffe oder crit)'], ['secrets', 'Secrets gefunden (Filter: POI)'],
   ['secretsAll', 'Alle Secrets eines POI in einem Run (Filter: POI)'], ['pois', 'POI geschafft (Filter: POI oder Rang S/A/B …)'],
   ['harvests', 'Ernten in der Hydrokultur'], ['cooked', 'Gerichte gekocht (Filter: Rezept)'], ['crafted', 'Hergestellt an der Werkbank (Filter: Rezept)'],
-  ['experiments', 'Experimente geglückt'], ['failures', 'Experimente misslungen'], ['salvaged', 'Dinge zerlegt'], ['recipes', 'Rezepte im Rezeptbuch (Stand)'],
+  ['experiments', 'Experimente geglückt'], ['failures', 'Experimente misslungen'], ['salvaged', 'Dinge zerlegt'], ['salvage', 'Bergungen abgeschlossen (Filter: Projekt, megarig, tractor)'], ['recipes', 'Rezepte im Rezeptbuch (Stand)'],
   ['sleeps', 'Nächte geschlafen'], ['trips', 'Gefahren (Reisekarte)'], ['encounters', 'Zwischenfälle unterwegs'], ['tankSafeRuns', 'Runs ohne kritischen Tank'], ['knockouts', 'k.o. (AvA bringt Leyla heim)'],
   ['cycles', 'Neuer Durchgang'], ['lights', 'Lichterketten im Camp (Stand)'], ['workshops', 'Werkstätten gekauft'], ['deltas', 'Δ aus Runs verdient'],
 ];

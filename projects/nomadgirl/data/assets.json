@@ -5280,13 +5280,19 @@
  },
  "truck": {
   "name": "LKW · Zugmaschine (Seitenansicht)",
-  "kind": "image",
+  "kind": "animation",
   "file": "assets/vehicles/truck.png",
-  "origin": [0, 121],
+  "origin": [113, 121],
   "source": "KI (PixelLab, Pro Flash Edit: streng von der Seite) + Code (AAP-64)",
   "derivedFrom": "truck_source",
   "date": "14.11.2026",
-  "description": "Sattelschlepper streng von der Seite, schaut nach links, 227 × 122. #022: Daniel „der LKW ist nicht orthogonal“."
+  "description": "Sattelschlepper streng von der Seite, schaut nach links, 227 × 122. #022: Daniel „der LKW ist nicht orthogonal“. Im Camp ersetzt er nach der Bergung den Van vorne am Rig (gespiegelt, Anker Mitte).",
+  "frameSize": [227, 122],
+  "frames": 1,
+  "fps": 0,
+  "loop": false,
+  "height": 560,
+  "flip": true
  },
  "truck_parts": {
   "name": "LKW · Teileblatt",
@@ -5296,5 +5302,32 @@
   "derivedFrom": "truck_source",
   "date": "14.11.2026",
   "description": "Die Teile ohne Zugmaschine, 256 × 256. Ausschnitte in Anbauteile › Ausschnitt."
+ },
+ "icons_salvage": {
+  "name": "Symbole: Bergungsteile",
+  "kind": "icons",
+  "file": "assets/items/icons_salvage.png",
+  "grid": [4, 4],
+  "cell": [64, 64],
+  "names": [
+   "felge",
+   "reifen",
+   "achse",
+   "motorblock",
+   "dieselkanister",
+   "auspuff",
+   "kettenglied",
+   "laufrolle",
+   "hydraulikzylinder",
+   "rotorblatt",
+   "ballonstoff",
+   "gasventil",
+   "bordrechner",
+   "bordwerkzeug"
+  ],
+  "description": "Teile für die Bergungsprojekte (#023): Felge, Reifen, Achse, Motorblock, Dieselkanister, Auspuff, Kettenglied, Laufrolle, Hydraulikzylinder, Rotorblatt, Ballonstoff, Gasventil, Bordrechner, Bordwerkzeug. 4 × 4 à 64 px.",
+  "source": "Code (tools/salvage_icons.py: Ausschnitte aus dem LKW-Teileblatt + Pixel-Art aus Code, AAP-64)",
+  "derivedFrom": "truck_parts",
+  "date": "15.11.2026"
  }
 }

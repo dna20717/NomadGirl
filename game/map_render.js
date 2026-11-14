@@ -96,6 +96,18 @@ export function drawMap(ctx, W, H, D, map, opt = {}) {
     label(ctx, b.slogan || b.name, 0, 26 * u, { size: 17 * u, color: INK, italic: true, halo: true });
     ctx.restore();
   }
+  // salvage wrecks (#023): a tag with a little truck at their place, known or not (the quest says where); done = base with the van
+  for (const [id, w] of Object.entries(map.wrecks || {})) {
+    const p = out[id]; if (!p) continue;
+    const x = p.x + 22 * u, y = p.y - 26 * u, wd = 34 * u, ht = 20 * u;
+    ctx.save(); ctx.translate(x, y); ctx.rotate(-0.08);
+    ctx.fillStyle = INK; ctx.fillRect(-wd / 2 - 2 * u, -ht / 2 - 2 * u, wd + 4 * u, ht + 4 * u);
+    ctx.fillStyle = w.done ? '#5daf8d' : '#f9a31b'; ctx.fillRect(-wd / 2, -ht / 2, wd, ht);
+    ctx.fillStyle = INK; ctx.fillRect(-11 * u, -5 * u, 13 * u, 8 * u); ctx.fillRect(2 * u, -2 * u, 9 * u, 5 * u);   // truck: box + cab
+    circle(ctx, -7 * u, 4 * u, 2.6 * u); circle(ctx, 7 * u, 4 * u, 2.6 * u);
+    ctx.restore();
+    label(ctx, w.done ? 'BASIS' : 'WRACK', x, y + ht + 4 * u, { size: 14 * u, color: w.done ? '#23674e' : RED, weight: 'bold', halo: true, spacing: 1.2 * u });
+  }
   // "Sie sind hier" with the van
   if (out[here]) {
     const { x, y } = out[here], bob = Math.sin(t * 3) * 3 * u;

@@ -4,6 +4,7 @@
 //   $ camouflaged brittle walls (look like the wall, break the same)   % fake walls (look like the wall, Leyla walks through, they fade; secrets too)
 // After the goal the run is finished; E at the van pays the base money plus the rank bonus (k.o. on the way back = everything gone).
 import { rollLoot } from '../inventory.js';
+import { chestPart } from '../salvage.js';
 import { bonuses as trophyBonuses } from '../achievements.js';
 import { rankRun } from '../../engine/poi.js';
 
@@ -172,9 +173,20 @@ export class PoiLevel {
     if (c.sprite) { let f = 0; s.time.addEvent({ delay: 70, repeat: c.frames - 1, callback: () => c.sprite.setFrame(Math.min(c.frames - 1, ++f)) }); }
     else this.drawChest(c);
     const things = s.lootRoll ? s.lootRoll(this.lootTable) : rollLoot(s.data_, this.lootTable);
+    this.salvagePart(things);
     s.fx.sparks(c.x, c.feet - 50, 0xffd27a, 14);
     if (things.length) s.loot?.drop(c.x, c.feet, things, 140);
     else s.hud.toast('Leer …', 'Hier hat schon jemand geplündert', 'info', 2400);
+  }
+  // salvage (#023): a part a wreck still needs, if it lies in this POI (Bergungsprojekte › Fundorte)
+  salvagePart(things, sure = false) {
+    const s = this.scene, save = s.box?.save;
+    if (!this.poi || !save) return;
+    const p = chestPart(s.data_, save, this.poi, Math.random, sure);
+    if (!p) return;
+    things.push({ a: p.a, id: p.id, n: p.n });
+    const name = s.data_.items?.[p.id]?.name || p.id;
+    s.time.delayedCall(500, () => s.hud.toast(`Bergungsteil: ${name}`, `Für ${s.data_.salvage?.[p.salvage]?.name || 'das Wrack'}`, 'loot', 3200));
   }
   pull(sw) {
     const s = this.scene;
@@ -218,6 +230,7 @@ export class PoiLevel {
     // the vault is full (design.md › Ausbaustufe Progression): POIs › Tresor-Beute, plus one extra roll per 10 % rank bonus
     const table = this.P.vault || (D.lootTables?.tresor ? 'tresor' : this.lootTable), extra = Math.floor((r.bonus || 0) / 10), haul = [];
     const things = [...(s.lootRoll ? s.lootRoll(table) : rollLoot(D, table)), ...Array.from({ length: extra }, () => rollLoot(D, table)[0]).filter(Boolean)];
+    this.salvagePart(things, true);   // the vault holds one missing salvage part for sure, if this POI is a Fundort
     for (const t of things) { const same = haul.find(h => h.id === t.id); if (same) same.n += t.n; else haul.push({ ...t }); }
     this.done.haul = haul.map(t => `${t.id}×${t.n}`);
     const z = this.goals[0];
