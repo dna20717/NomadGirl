@@ -104,7 +104,8 @@ export function installControl(game) {
     build() { return scene().hud.build?.state() || null; },   // building in the camp (B): rig, budgets, Δ, scrapyard, Leyla's jobs, undo
     buildSpots() { return scene().hud.build?.spots() || null; },   // page positions of places, couplings, units, scrapyard items, dealer (for real mouse drags)
     craft() { return scene().hud.craft?.state() || null; },
-    tech() { return scene().hud.tech?.state() || null; },   // tech tree in the warroom: tab, selected node, node states   // open cooking/crafting panel: recipe book, pot, last result
+    tech() { return scene().hud.tech?.state() || null; },
+    quests() { return scene().hud.quests?.state() || null; },   // Questlog (#016): tab, rows ('main', 'tank', 'side:<id>!' = ready, 'offer:<id>'), tracked   // tech tree in the warroom: tab, selected node, node states   // open cooking/crafting panel: recipe book, pot, last result
     inv() { return scene().hud.inv?.state() || null; },   // open inventory: grids, slots, held thing
     loot() { return scene().loot?.state() || null; },     // bundles on the ground (run)
     drone(mood) { scene().drone.react(mood); return scene().drone.mood; },

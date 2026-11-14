@@ -58,8 +58,21 @@ check('Schlafen bis 7 Uhr mit Buff', s.camp.clock === 'Tag 3 · 07:00' && s.camp
 await shot('morning');
 
 let p = await ev(() => c.to('Lagerfeuer'));
-check('Hinweis am Lagerfeuer', p === 'Hinsetzen · Lagerfeuer', p);
-s = await ev(() => { game.scene.getScene('play').leyla.health = 40; nomad.step(1, [], ['grab']); nomad.step(240); const st = nomad.state(), sp = game.scene.getScene('play').leyla.sprite; return { st, flip: sp.flipX, frame: sp.frame.name, prompt: st.prompt }; });
+check('Hinweis am Lagerfeuer', p === 'Hinsetzen · Questlog · Lagerfeuer', p);
+// Questlog (#016): at the campfire; offers from the companions, take one, follow it, deliver, reward
+s = await ev(() => { const m = c.use(); nomad.choose('Questlog'); const sc = game.scene.getScene('play'), Q = sc.hud.quests, first = nomad.quests().tab; Q.open('active'); const a = { ...nomad.quests(), first };
+  Q.open('offers'); const offers = nomad.quests().rows; Q.pick = offers.indexOf('offer:kabelsalat'); Q.act('ok'); const taken = nomad.quests();
+  const sv = nomad.save(), d0 = sv.deltas; sc.hud.goalAt = 0; nomad.step(3); const goal = document.querySelector('.hud-goal')?.textContent || '';
+  const g = sv.inv.grids.chest, cables = () => Object.values(sv.inv.grids).reduce((n, gr) => n + (gr?.items || []).filter(e => e.id === 'kupferkabel').reduce((k, e) => k + e.n, 0), 0); g.items.push({ a: 'items', id: 'kupferkabel', n: 5, x: g.w - 1, y: g.h - 1 }); const c0 = cables(); Q.draw();
+  const ready = nomad.quests(); Q.pick = ready.rows.indexOf('side:kabelsalat!'); Q.act('ok');
+  const after = { ...nomad.quests(), deltas: sv.deltas - d0, done: !!sv.quests.done.kabelsalat, cable: c0 - cables() };
+  sv.deltas = d0; Q.close(); nomad.step(2);   // the later checks count from the start money
+  return { menu: m?.items.map(i => i.label), a, offers, taken, goal, ready: ready.rows, after }; });
+check('Lagerfeuer: Menü mit Hinsetzen und Questlog; neue Angebote zuerst, Aktiv beginnt mit der Hauptquest', s.menu?.join('|') === 'Hinsetzen|Questlog|Zurück' && s.a.first === 'offers' && s.a.open && s.a.rows[0] === 'main', s);
+check('Questlog: Angebot annehmen, wird verfolgt und steht als Zielzeile im Bild', s.offers.includes('offer:kabelsalat') && s.taken.tab === 'active' && s.taken.tracked === 'kabelsalat' && /Kabelsalat/.test(s.goal), s);
+check('Questlog: Kupferkabel da → abgeben, Belohnung, Kabel weg, wieder Hauptquest verfolgt', s.ready.includes('side:kabelsalat!') && s.after.done && s.after.deltas === 60 && s.after.cable === 5 && s.after.tracked === 'main', s);
+p = await ev(() => c.to('Lagerfeuer'));
+s = await ev(() => { game.scene.getScene('play').leyla.health = 40; c.use(); nomad.choose('Hinsetzen'); nomad.step(240); const st = nomad.state(), sp = game.scene.getScene('play').leyla.sprite; return { st, flip: sp.flipX, frame: sp.frame.name, prompt: st.prompt }; });
 check('E am Feuer: Leyla setzt sich und zockt, schaut zum Feuer', s.st.leyla.state === 'sit' && s.prompt === 'Aufstehen · Lagerfeuer' && Number(s.frame) >= 6, s);
 await shot('sit');
 s = await ev(() => { nomad.step(60, ['right']); nomad.step(10); return nomad.state(); });

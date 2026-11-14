@@ -791,3 +791,31 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .st-now { color: #9cdb43 !important; font-size: 13px !important; }
 .st-queue { display: grid; gap: 6px; } .st-cust { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 8px; background: #1b1424; opacity: .6; }
 .st-cust.now { opacity: 1; border: 1px solid #ffd27a; } .st-cust b { min-width: 150px; } .st-fav { color: #ff9ad2; margin-left: auto; }
+
+/* Questlog (#016) */
+.ql-box { width: min(1180px, 96vw); }
+.ql-box > header { padding-right: 44px; }
+.ql-dot { margin-left: 6px; padding: 0 6px; border-radius: 99px; background: #ffd27a; color: #0d0a12; font: 600 11px/16px var(--ui-font); font-style: normal; }
+.ql-list li { align-items: flex-start; }
+.ql-row { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ql-row b { font-weight: 600; color: inherit; }
+.ql-row small { color: #8a7d99; font-size: 12px; }
+.ql-list li.ready .ql-row small { color: #9cdb43; }
+.ql-list li.warn { color: #fa6a0a; }
+.ql-star { margin-left: auto; color: #ffd27a; font-style: normal; }
+.ql-empty { color: #8a7d99; cursor: default; }
+.ql-detail .tut-text { display: flex; flex-direction: column; gap: 10px; }
+.ql-detail .tut-text h2 { margin: 0; }
+.ql-say { font-style: italic; color: #e9dcf5 !important; }
+.ql-now { padding: 8px 10px; border-radius: 8px; background: #241b30; border: 1px solid #6b5a3a; color: #c8bcd6 !important; font-size: 13.5px !important; }
+.ql-now b { color: #ffd27a; font-weight: 600; }
+.ql-steps { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.ql-steps li { display: grid; grid-template-columns: 18px auto 1fr; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; color: #8a7d99; font-size: 13.5px; }
+.ql-steps li small { justify-self: end; font-size: 12px; text-align: right; }
+.ql-steps li.owned { color: #9cdb43; } .ql-steps li.owned span { text-decoration: line-through; opacity: .8; }
+.ql-steps li.open, .ql-steps li.ready { color: #ffd27a; background: #241b30; border: 1px solid #3a2f45; }
+.ql-steps li.ready small { color: #9cdb43; }
+.ql-steps li.goal span { font-weight: 700; }
+.ql-reward { display: flex; align-items: center; gap: 4px; color: #ffd27a !important; }
+.ql-tracked { color: #ffd27a !important; font-size: 13px !important; }
+.ql-go { align-self: flex-start; padding: 8px 18px; }

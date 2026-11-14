@@ -1,0 +1,52 @@
+{
+ "kabelsalat": {
+  "name": "Kabelsalat",
+  "giver": "schraube",
+  "text": "Der Motor will Kupfer. Bring mir fünf Kupferkabel, dann flicke ich den Kabelbaum, bevor er uns abfackelt.",
+  "done": "Fünf Stück! Hörst du? Er summt schon in Dur.",
+  "item": "kupferkabel",
+  "count": 5,
+  "reward": {"deltas": 60, "items": [{"item": "technik", "count": 2}]}
+ },
+ "geier_rupfen": {
+  "name": "Geier rupfen",
+  "giver": "schraube",
+  "after": "kabelsalat",
+  "text": "Die Gelben Geier an der Tankstelle klauen meine Ersatzteile. Zeig ihnen, dass das Rig zurückbeißt: acht von ihnen.",
+  "done": "Acht? Na, die tanken jetzt woanders.",
+  "counter": "kills",
+  "filter": "raider",
+  "target": 8,
+  "reward": {"deltas": 120, "items": [{"item": "technik", "count": 3}]}
+ },
+ "sungs_suppe": {
+  "name": "Sungs Suppe",
+  "giver": "onkel_sung",
+  "text": "Ein Mann, der nicht kocht, ist ein Mann, der hungert. Koch drei Gerichte, dann erzähl ich dir was über Bio-Proben.",
+  "done": "Gut. Jetzt hör zu: Mutanten tragen das, was AvA braucht, im Blut.",
+  "counter": "cooked",
+  "target": 3,
+  "reward": {"deltas": 40, "items": [{"item": "bio", "count": 2}]}
+ },
+ "tresor_tankstelle": {
+  "name": "Der Tresor an der Tankstelle",
+  "giver": "onkel_sung",
+  "after": "sungs_suppe",
+  "text": "Wer schnell ist, lebt länger. Knack den Tresor an der Tankstelle Kilometer 7 und komm heil zurück.",
+  "done": "Schnell und leise. So mag ich das.",
+  "counter": "pois",
+  "filter": "tankstelle_km7",
+  "target": 1,
+  "reward": {"deltas": 150, "items": [{"item": "wissen", "count": 2}]}
+ },
+ "lichter_fuers_camp": {
+  "name": "Lichter fürs Camp",
+  "giver": "onkel_sung",
+  "minDay": 2,
+  "text": "Ein Camp ohne Licht ist nur ein Parkplatz. Häng zwei Lichterketten auf.",
+  "done": "Siehst du? Jetzt ist es ein Zuhause.",
+  "counter": "lights",
+  "target": 2,
+  "reward": {"deltas": 30, "items": [{"item": "wissen", "count": 1}]}
+ }
+}

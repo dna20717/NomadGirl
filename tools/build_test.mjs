@@ -134,7 +134,7 @@ await ev(() => nomad.choose('Zurück'));
 await ev(() => { const s = window.game.scene.getScene('play'); s.data_.workshops.kochnische.power = -1; s.data_.tractors.van.pull = 500; s.goCamp({ fade: 1 }); });
 await ev(() => nomad.step(20));
 await ev(() => { const h = nomad.state().camp.hotspots.find(h => h.name === 'Van'); nomad.walkTo(h.x); nomad.step(1, [], ['grab']); nomad.step(2); nomad.choose('Planen'); });
-const w = await ev(() => nomad.map());
+const w = await ev(() => { const mp = game.scene.getScene('play').hud.map; mp.select(mp.state().near.find(n => n !== mp.save.location)); return nomad.map(); });
 check('Rig zu schwer: Hinfahren auf der Reisekarte gesperrt', w?.open && w.action === 'Hinfahren' && /zu schwer/.test(w.disabled || ''), w);
 await ev(() => game.scene.getScene('play').hud.map.close());
 check('Knopf „Rig bauen“ ist im Camp immer da', await page.locator('.hud-buildbtn').isVisible());

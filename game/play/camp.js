@@ -911,7 +911,8 @@ export class Camp {
       this.light(x, y - lift, (F.radius ?? 420) * 0.35, '#ffd27a', 0.45 * k),
       ...(F.pool ? [this.light(x, y + 6, F.pool, color, 0.5 * k, F.pool * 0.14)] : []),
     ];
-    this.hotspots.push({ x, w: 90, name: 'Lagerfeuer', hint: 'Hinsetzen', act: () => this.sitDown() });
+    // #016: the campfire also opens the quest log (Daniel: „am Warroom / Lagerfeuer“)
+    this.hotspots.push({ x, w: 90, name: 'Lagerfeuer', hint: 'Hinsetzen · Questlog', act: () => this.fireMenu() });
     // deco round the fire (Camp › Gemütlichkeit › Deko ums Feuer): rug, chairs, a corner with canisters
     for (const d of this.C.deco || []) {
       const info = d.look && s.assetInfo(d.look);
@@ -1187,12 +1188,20 @@ export class Camp {
     if (!S.look || !s.textures.exists(S.look)) return rest();
     l.startSit(S, this.geo.fireX + side * (S.distance ?? 150), -side, sat => { if (sat >= (S.minSeconds ?? 3)) rest(); });
   }
+  fireMenu() {
+    const s = this.scene, n = s.hud.quests?.log()?.offers?.length || 0, ready = (s.hud.quests?.log()?.active || []).filter(q => q.ready).length;
+    s.hud.menu({ title: 'Lagerfeuer', sub: 'Knistern, Funken, Zeit zum Nachdenken.', items: [
+      { label: 'Hinsetzen', sub: 'Die Zeit vergeht, das Feuer heilt', primary: true, act: () => this.sitDown() },
+      { label: 'Questlog', sub: [ready ? `${ready} zum Abgeben` : null, n ? `${n} neue Angebote` : null].filter(Boolean).join(' · ') || 'Die Suche, AvAs Tank, Aufträge', act: () => s.hud.quests?.open(ready ? 'active' : n ? 'offers' : 'active') },
+      { label: 'Zurück', act: () => {} }] });
+  }
   // Warroom: the travel map (#007) with the POI here, the places to drive to, and the techtree / Auswerten in its header
   warroom() {
     const s = this.scene, D = this.D, save = this.box.save, extras = [];
     if (Object.keys(D.techtree || {}).length) extras.push({ label: 'Techtree', icon: 'tree', act: () => { s.hud.inv?.close(); s.hud.tech?.open(); } });
     const wr = this.rigWorkshop('warroom') || Object.keys(D.workshops || {}).find(k => D.workshops[k].function === 'warroom');
     if (wr) extras.push({ label: 'Auswerten', icon: 'research', act: () => { s.hud.inv?.close(); s.hud.craft?.open(wr, 'salvage'); } });
+    extras.push({ label: 'Questlog', icon: 'list', act: () => { s.hud.inv?.close(); s.hud.quests?.open(); } });   // #016
     this.openMap({ extras });
   }
   // the first built-in workshop of a kind (function) anywhere in the rig, or null

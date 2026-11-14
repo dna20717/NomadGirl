@@ -6,7 +6,7 @@ import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { hints } from './ui_nav.js';
 import { goalEl } from './hud.js';
-import { goal as questGoal } from '../quest.js';
+import { trackedGoal as questGoal } from '../quests.js';
 import { ensureMap, placeOf, neighbours, hops, mapConfig, threatOf } from '../worldmap.js';
 import { drawMap } from '../map_render.js';
 import { ITEM_CATEGORIES, optionLabel as optLabel } from '../../engine/schema.js';

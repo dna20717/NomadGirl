@@ -806,6 +806,21 @@ export const AREAS = {
       const kinds = (x.ingredients || []).map(i => i.item); if (new Set(kinds).size !== kinds.length) report('warning', 'Eine Zutat steht doppelt in der Liste (Anzahl erhöhen)');
     },
   },
+  quests: {
+    name: 'Aufträge', singular: 'Auftrag', icon: 'list', file: 'data/quests.json', kind: 'catalog', groupBy: { key: 'giver' },
+    hint: 'Nebenaufträge im Questlog (#016, Daniel 14.11.2026: „Wir brauchen eine Art Questlog!“). Ein Auftrag zählt ab dem Annehmen einen Zähler hoch (wie Achievements) oder will Dinge abgegeben haben. Die Hauptquest (Heilmittel) und AvAs Tank kommen aus Techtree und Cryo-Tank. Geöffnet am Warroom und am Lagerfeuer.',
+    template: { name: 'Neuer Auftrag', counter: 'kills', target: 5, reward: { deltas: 50 } },
+    row: (x, p) => `${p?.data.companions?.[x.giver]?.name || 'ohne Auftraggeber'} · ${x.counter ? `${x.target || 1}× ${ACHIEVEMENT_COUNTERS.find(c => c[0] === x.counter)?.[1]?.replace(/ \(.*$/, '') || x.counter}${x.filter ? ' · ' + x.filter : ''}` : `${x.count || 1}× ${p?.data.items?.[x.item]?.name || x.item || '?'} abgeben`}`,
+    sections: [
+      { title: 'Auftrag', fields: [NAME, ref('giver', 'Auftraggeber', 'companions'), area_('text', 'Text', { hint: 'Was der Auftraggeber sagt' }), area_('done', 'Beim Abgeben', { hint: 'Sein Satz, wenn Leyla den Auftrag abgibt' }),
+        ref('after', 'Nach Auftrag', 'quests', { hint: 'Erst im Angebot, wenn dieser Auftrag erledigt ist' }), num('minDay', 'Ab Tag', { min: 1 })] },
+      { title: 'Ziel', fields: [select('counter', 'Zähler', [['', '– Dinge abgeben –'], ...ACHIEVEMENT_COUNTERS], { hint: 'Was das Spiel zählt (ab dem Annehmen). Leer = Dinge abgeben' }), text('filter', 'Filter', { hint: 'Wie bei Achievements: Gegner, Familie, POI, Rang, Rezept …' }), num('target', 'Ziel', { min: 1 }),
+        ref('item', 'Abgeben: Ding', 'items'), num('count', 'Abgeben: Anzahl', { min: 1 })] },
+      { title: 'Belohnung', fields: [num('reward.deltas', 'Deltas', { unit: 'Δ', min: 0 }), table('reward.items', 'Dinge', [ref('item', 'Ding', 'items'), num('count', 'Anzahl', { min: 1 })], { hint: 'Kommen in die Kiste im Camp, ist sie voll, in den Rucksack' })] },
+    ],
+    check: (x, report) => { if (!x.counter && !x.item) report('warning', 'Weder Zähler noch Ding zum Abgeben'); if (!x.reward?.deltas && !(x.reward?.items || []).length) report('hint', 'Keine Belohnung'); },
+  },
+
   achievements: {
     name: 'Achievements', singular: 'Achievement', icon: 'trophy', file: 'data/achievements.json', kind: 'catalog', groupBy: { key: 'category', options: ACHIEVEMENT_CATEGORIES },
     hint: 'Achievements & Trophäen (#012, design.md): erreicht → Meldung „🏆 Name“ → das Rezept der Trophäe ist gelernt → an der Werkstatt einmal herstellen → auf einen Trophäen-Ständer in einer Schatzkammer stellen → der Bonus wirkt, solange sie irgendwo im Rig ausgestellt ist. Achievements, Rezepte und Trophäen bleiben über alle Durchgänge.',
@@ -1316,7 +1331,7 @@ export const GROUPS = [
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'kits', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
-  ['ACHIEVEMENTS', ['achievements']],
+  ['ACHIEVEMENTS & AUFTRÄGE', ['achievements', 'quests']],
   ['PROGRESSION', ['techtree', 'resources']],
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'companions']],
   ['WELT', ['worldmap', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'travel']],

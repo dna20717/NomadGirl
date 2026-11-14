@@ -7,7 +7,7 @@ import { hints, setUiDevice, closeX } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { loadVersion } from '../version.js';
 import { clockText } from '../save.js';
-import { goal as questGoal } from '../quest.js';
+import { trackedGoal as questGoal } from '../quests.js';
 import { makeSfx } from './sfx.js';
 
 // toast kinds: icon (Lucide) and sound (sfx.js); colours in play.css (.hud-toast.<kind>)
@@ -310,7 +310,8 @@ export class Hud {
         const before = this.goal;
         try { this.goal = questGoal(D, sv); } catch { this.goal = null; }
         // progress on the way (#016): a node on the way was unlocked → a gold toast with how far the search is
-        if (before && this.goal && this.goal.progress > before.progress + 1e-6) this.toast('Ein Schritt näher an AvA', `${Math.round(this.goal.progress * 100)} % des Weges · nächster: ${this.goal.text.replace(/^[^:]*:\s*/, '')}`, 'good');
+        if (before && this.goal && before.quest && before.quest === this.goal.quest && this.goal.kind === 'ready' && before.kind !== 'ready') this.toast(`Auftrag erledigt: ${this.goal.text.replace(/ · erledigt$/, '')}`, 'Abgeben im Questlog (Lagerfeuer, Warroom)', 'good');
+        else if (before && this.goal && !before.quest && !this.goal.quest && this.goal.progress > before.progress + 1e-6) this.toast('Ein Schritt näher an AvA', `${Math.round(this.goal.progress * 100)} % des Weges · nächster: ${this.goal.text.replace(/^[^:]*:\s*/, '')}`, 'good');
       }
       const G = this.goal, run = this.modeName === 'run';
       const key = [sv.day, sv.hour, sv.location, sv.deltas, sv.fuel, sv.food, sv.buffs.join(), this.modeName, vit ? `${Math.round(sv.tank.cond)}${sv.tank.dead}` : '', G ? G.text + G.sub : ''].join('|');
@@ -334,7 +335,7 @@ export class Hud {
 // the red thread (#016): ◆ next step to the cure (or the tank when it is weak), a thin bar of the way so far; compact in the run
 export function goalEl(G, compact = false) {
   return el('div', { class: `hud-goal ${G.kind}` + (compact ? ' compact' : '') },
-    el('div', { class: 'hud-goal-text' }, el('i', {}, G.kind === 'tank' || G.kind === 'lost' ? '♥' : '◆'), el('b', {}, G.text)),
+    el('div', { class: 'hud-goal-text' }, el('i', {}, G.kind === 'tank' || G.kind === 'lost' ? '♥' : G.quest ? '◇' : '◆'), el('b', {}, G.text)),
     compact && G.kind !== 'tank' ? null : el('small', {}, G.sub),
     el('span', { class: 'hud-goal-bar', style: `--p:${Math.round((G.progress || 0) * 100)}%` }));
 }
