@@ -18,7 +18,7 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .hud-reloading { position: relative; padding-left: 26px; color: #ffd27a; }
 .hud-reloading::before { content: ""; position: absolute; left: 2px; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; background: conic-gradient(#ffd27a var(--p, 0%), #3a2f45 0); -webkit-mask: radial-gradient(circle, transparent 4px, #000 5px); mask: radial-gradient(circle, transparent 4px, #000 5px); }
 .hud-reloading.hud-paused { opacity: 0.55; }
-.hud-toasts { position: fixed; right: 24px; top: 110px; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; pointer-events: none; z-index: 40; }
+.hud-toasts { position: fixed; right: 24px; top: var(--toast-top, 110px); display: flex; flex-direction: column; gap: 8px; align-items: flex-end; pointer-events: none; z-index: 40; }
 .hud-toast { display: flex; align-items: center; gap: 12px; padding: 10px 16px; min-width: 260px; max-width: 460px; border-radius: 10px; background: rgba(13, 10, 18, .9); border: 1px solid #3a2f45; color: #d8cfe2; animation: hud-toast-in .35s ease-out; transition: opacity .4s, transform .4s; }
 .hud-toast.out { opacity: 0; transform: translateX(30px); }
 .hud-windowed .hud-toasts { top: 10px; right: auto; left: 50%; transform: translateX(-50%); align-items: center; z-index: 60; }

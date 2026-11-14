@@ -71,6 +71,11 @@ s = await ev(() => { const m = c.use(); nomad.choose('Questlog'); const sc = gam
 check('Lagerfeuer: Menü mit Hinsetzen und Questlog; neue Angebote zuerst, Aktiv beginnt mit der Hauptquest', s.menu?.join('|') === 'Hinsetzen|Questlog|Zurück' && s.a.first === 'offers' && s.a.open && s.a.rows[0] === 'main', s);
 check('Questlog: Angebot annehmen, wird verfolgt und steht als Zielzeile im Bild', s.offers.includes('offer:kabelsalat') && s.taken.tab === 'active' && s.taken.tracked === 'kabelsalat' && /Kabelsalat/.test(s.goal), s);
 check('Questlog: Kupferkabel da → abgeben, Belohnung, Kabel weg, wieder Hauptquest verfolgt', s.ready.includes('side:kabelsalat!') && s.after.done && s.after.deltas === 60 && s.after.cable === 5 && s.after.tracked === 'main', s);
+// #017: companions talk jobs: „!“ over Schraube's head, the next job in the conversation (after Kabelsalat: Geier rupfen)
+s = await ev(() => { const cp = game.scene.getScene('play').camp, sch = cp.companions.find(x => x.id === 'schraube'); cp.questMarks(); const mark = sch.mark.text, hint = sch.spot.hint;
+  nomad.goTo('Schraube'); const m = c.use(); nomad.choose('Auftrag: Geier'); const sub = document.querySelector('.hud-menuBox p')?.textContent; nomad.choose('Annehmen'); nomad.step(3);
+  return { mark, hint, menu: m?.items.map(i => i.label), sub, active: Object.keys(nomad.save().quests.active), mark2: sch.mark.text }; });
+check('Companions: „!“ über Schraube, im Gespräch den Folgeauftrag annehmen (#017)', s.mark === '!' && s.hint === 'Reden · neuer Auftrag' && s.menu?.[0] === 'Auftrag: Geier rupfen' && /Belohnung/.test(s.sub || '') && s.active.includes('geier_rupfen') && s.mark2 === '', s);
 p = await ev(() => c.to('Lagerfeuer'));
 s = await ev(() => { game.scene.getScene('play').leyla.health = 40; c.use(); nomad.choose('Hinsetzen'); nomad.step(240); const st = nomad.state(), sp = game.scene.getScene('play').leyla.sprite; return { st, flip: sp.flipX, frame: sp.frame.name, prompt: st.prompt }; });
 check('E am Feuer: Leyla setzt sich und zockt, schaut zum Feuer', s.st.leyla.state === 'sit' && s.prompt === 'Aufstehen · Lagerfeuer' && Number(s.frame) >= 6, s);
@@ -79,8 +84,8 @@ s = await ev(() => { nomad.step(60, ['right']); nomad.step(10); return nomad.sta
 check('Aufstehen nach dem Sitzen: 1 h, heilt 25 %, Leyla bleibt dort', s.camp.clock === 'Tag 3 · 08:00' && s.health === 65 && Math.abs(s.leyla.x - s.camp.hotspots.find(h => h.name === 'Lagerfeuer').x) < 200, { clock: s.camp.clock, health: s.health, x: s.leyla.x });
 
 p = await ev(() => c.to('Onkel Sung'));
-s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(3); return game.scene.getScene('play').camp.companions.find(x => x.id === 'onkel_sung').bubble.text; });
-check('Companion redet per E', p === 'Reden · Onkel Sung' && s.length > 5, { p, s });
+s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(3); const m = nomad.menu(); nomad.choose('Plaudern'); nomad.step(3); return { m: m?.items.map(i => i.label), text: game.scene.getScene('play').camp.companions.find(x => x.id === 'onkel_sung').bubble.text }; });
+check('Companion redet per E: mit Auftrag im Angebot erst das Gespräch, „Plaudern“ gibt einen Spruch', p === 'Reden · neuer Auftrag · Onkel Sung' && s.m?.includes('Auftrag: Sungs Suppe') && s.text.length > 5, { p, s });
 await shot('talk');
 
 s = await ev(() => { nomad.step(900, ['left']); nomad.step(60); return nomad.state(); });   // the rig is longer since ×4 (09.11.2026)

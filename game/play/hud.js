@@ -309,6 +309,7 @@ export class Hud {
         this.goalAt = now;
         const before = this.goal;
         try { this.goal = questGoal(D, sv); } catch { this.goal = null; }
+        try { scene.camp?.questMarks?.(); } catch { /* camp not ready */ }   // #017: „!“ / „✓“ over the companions stay true (a job done while cooking)
         // progress on the way (#016): a node on the way was unlocked → a gold toast with how far the search is
         if (before && this.goal && before.quest && before.quest === this.goal.quest && this.goal.kind === 'ready' && before.kind !== 'ready') this.toast(`Auftrag erledigt: ${this.goal.text.replace(/ · erledigt$/, '')}`, 'Abgeben im Questlog (Lagerfeuer, Warroom)', 'good');
         else if (before && this.goal && !before.quest && !this.goal.quest && this.goal.progress > before.progress + 1e-6) this.toast('Ein Schritt näher an AvA', `${Math.round(this.goal.progress * 100)} % des Weges · nächster: ${this.goal.text.replace(/^[^:]*:\s*/, '')}`, 'good');
@@ -327,6 +328,8 @@ export class Hud {
           ...(vit ? [el('div', { class: 'hud-row hud-vital' + (vit.index >= 4 || vit.dead ? ' bad' : '') }, el('span', { class: 'hud-label' }, '♥ AvA'), el('b', {}, vit.dead ? 'kein Signal' : `${Math.round(sv.tank.cond)} % · ${vit.name}`))] : []),
           ...(buffs.length ? [el('div', { class: 'hud-row hud-buffs' }, el('span', { class: 'hud-label' }, 'BUFFS'), el('b', {}, buffs.join(' · ')))] : []),
           ...(G ? [goalEl(G, run)] : []));
+        // #017: in the camp the toasts start below this column (they covered the goal line)
+        requestAnimationFrame(() => { const r = !run && !this.campEl.hidden ? this.campEl.getBoundingClientRect() : null; this.toastsEl.style.setProperty('--toast-top', `${r && r.height ? Math.round(r.bottom + 10) : 110}px`); });
       }
     }
   }

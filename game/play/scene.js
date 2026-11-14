@@ -421,7 +421,7 @@ export class PlayScene extends Phaser.Scene {
     hud.tut ??= new Tutorial(hud.root, { scene: () => hud.scene, hud });
     hud.ach ??= new AchievementsUI(hud.root, { scene: () => hud.scene });   // Menü › Achievements (#012)
     hud.sum ??= new SummaryUI(hud.root, { scene: () => hud.scene, go: next => hud.scene.goNext?.(next) });   // Beute-Bilanz (#017)
-    hud.quests ??= new QuestLogUI(hud.root, { scene: () => hud.scene, toast: (t, sub, kind) => hud.toast(t, sub, kind), changed: () => { hud.campKey = null; hud.goalAt = 0; } });   // Questlog (#016)
+    hud.quests ??= new QuestLogUI(hud.root, { scene: () => hud.scene, toast: (t, sub, kind) => hud.toast(t, sub, kind), changed: () => { hud.campKey = null; hud.goalAt = 0; hud.scene.camp?.questMarks?.(); } });   // Questlog (#016)
     // the travel map (#007, game/play/map_ui.js): warroom and van door
     hud.map ??= new MapUI(hud.root, {
       get D() { return hud.scene.data_; }, get base() { return hud.scene.base; },
