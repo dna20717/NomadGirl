@@ -248,7 +248,19 @@ Daniel: „Bergungsprojekt ist eine gute Idee … Eine Werkstatt wird es aber ni
 - **Mehrere Besuche, weil die Teile nur woanders liegen:** Die Bauabschnitte brauchen Teile aus anderen Orten. Leyla plündert dort und fährt zurück, um sie einzubauen. ⚠️ vorläufig (Ava): Abschnitte Freilegen → Fahrwerk (Reifen, Achse) → Motor (Motorblock, Kabelbaum, Batterie) → Kabine & Tank (Bleche, Diesel) → Probestart (Drehzahl-Moment, gut = besserer Motor, nie Scheitern); Fortschritt sichtbar am Wrack; Questlog listet fehlende Teile und wahrscheinliche Fundorte; Projekte als Daten (Werkstatt › Bergungsprojekte), damit später weitere Bergungen gehen.
 - **Keine Gefahr fürs Wrack** (gemütlich): Was eingebaut ist, bleibt.
 - **Der Wrack-Ort wird die Basis:** Ist der LKW fertig, **bleibt der Van dort stehen**. Erstmal nur das; mit etwas Ausblick: Hier kann später eine Siedlung entstehen (passt zum Konzept Kundenabend im Projekt-Doc `claude/konzept-kundenabend.md`).
-- **Neuer Durchgang: der LKW bleibt.** ⚠️ offen: Was ersetzt dann den Quest (nächstes Bergungsprojekt?) und steht der Van im neuen Durchgang trotzdem irgendwo als Basis?
+- **Neuer Durchgang: der LKW bleibt.** ⚠️ offen: Steht der Van im neuen Durchgang trotzdem irgendwo als Basis?
+
+### Endgame-Zugmaschinen: Crawler und Fatbird (Design-Session 14.11.2026)
+
+Daniel: In einem extrem guten ersten oder spätestens im zweiten Durchgang soll man einen Crawler (wie der Raupentransporter der NASA für Raketen) oder einen Cargo-Lifter freischalten können. „Riesenpanzer hat den Vorteil, beinahe unendlich viele Container einbauen und vor allem aufbauen zu können, während der Lifter zwar ein ultra großzügiges Angebot für Werkstätten hat, aber wenn voll, dann voll. Dafür ist er super schnell und kann indirekt reisen.“
+
+- **Zwei Endgame-Fahrzeuge:** **Crawler** = der Riesenpanzer; **Fatbird** = die Schwerlast-Drohne (Name oder später eine Marke der Spielwelt; „CargoLifter“ war eine echte Firma, deshalb ein eigener Name).
+- **Crawler:** fast unbegrenzt Container, in die Breite und vor allem in die Höhe aufbauen. Schwächen: **langsam**, **kommt nicht überall hin** (Routen gesperrt) und **braucht eine Crew**, die essen, trinken und Spaß braucht. Gepanzert: Die Bewaffnungs-Schwelle gegen Überfälle ist leicht erreicht. **Dafür hat er eine Ladebucht für Van oder LKW** (Daniel). ⚠️ vorläufig (Ava): Damit fährt Leyla mit Van/LKW (und dem, was dranhängt) zu Orten, an die der Crawler nicht hinkommt, der Crawler wartet als rollende Basis; der Van, der nach der LKW-Bergung an der Basis stand, kann so wieder mitkommen.
+- **Fatbird:** sehr viele Werkstatt-Plätze in fester Form, kein Aufbauen, voll ist voll. **Super schnell** und **reist indirekt**: Luftlinie über die Karte, ohne Straßen. ⚠️ vorläufig (Ava): Zwischenfälle in der Luft (Wind, Sandsturm, Drohnen) statt Straßensperren; im Camp schwebt er über dem Platz, die Gondel bleibt ein Puppenhaus, Leyla klettert per Leiter hoch.
+- **Freischalten als Ausbaustufe** mit Rückbezug auf das erste Bergungsprojekt (LKW): wieder eine Bergung über mehrere Abschnitte, aber viel größer. Beide sind der **Lategame-Geldfresser**: Sie verschlingen **Ressourcen, Gegenstände und NPCs**, denn **man braucht eine Crew**.
+- **In jedem Durchgang möglich, im ersten sehr schwer.**
+- **Beide zu haben ist das ultimative Ziel** mit eigenem Achievement, „was für die 1 %“.
+- ⚠️ offen: Woher kommt die Crew (Gäste/Stammkunden aus dem Konzept Kundenabend, Anhalter, Gerettete)? Was braucht sie genau (Essen, Trinken, Chill Area, Musik)? Braucht der Fatbird auch eine Crew? Was passiert mit dem LKW, wenn ein Endgame-Fahrzeug fertig ist (zweite Basis?)? Assets grob 100–150 PixelLab-Generierungen, frühestens nach dem Reset am 07.12. und nur mit Daniels Freigabe.
 
 ### Camp (Daniel, 07.11.2026 abends)
 
