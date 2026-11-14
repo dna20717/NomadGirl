@@ -4320,10 +4320,19 @@
   "name": "Werkstatt · Zisterne",
   "kind": "image",
   "file": "assets/workshops/cistern.png",
+  "source": "KI (PixelLab, Create Object Pro Flash, Ansicht side, AAP-64, Stilbild Hydrokultur)",
+  "date": "14.11.2026",
+  "description": "Regenwasser-Zisterne frontal (#015): IBC-Tank im Gitterkäfig mit Wasserstand, Trichter am Regenrohr, Filterfass, Hahn mit Eimer, Flaschenregal, Manometer, Schlauch, Palette.",
+  "origin": [128, 230],
+  "derivedFrom": "ws_cistern_iso"
+ },
+ "ws_cistern_iso": {
+  "name": "Werkstatt · Zisterne (alt, isometrisch)",
+  "kind": "reference",
+  "file": "assets/workshops/cistern_iso.png",
   "source": "KI (PixelLab, Create Image Pro, AAP-64), Stilbild Drohnenwerkbank v2",
   "date": "13.11.2026",
-  "description": "Regenwasser-Zisterne: IBC-Tank im Käfig, Plane und Trichter oben, Filterfass, Hahn mit Eimer, Wasserstand (#008).",
-  "origin": [128, 236]
+  "description": "Erste Fassung (#008), schräg von oben: passte nicht zur Frontansicht der anderen Werkstätten (Daniel, 14.11.2026: „Perspektive ist komplett falsch“)."
  },
  "camp_rug": {
   "name": "Camp · Teppich",
