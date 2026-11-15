@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #032 fertig: Container sauber gestapelt, Laufstege auf Stelzen, Fatbird-Träger über die ganze Länge. PixelLab 0.
 - 15.11. Code → Ava: #031 fertig: Container ohne Dachkante, Fatbird-Heck neu (PixelLab 10, übrig 569), Rotoren an Fachwerk-Auslegern.
 - 15.11. Code → Ava: #030 fertig: Crawler-Heck neu und streng von der Seite (PixelLab 10, übrig 579).
 - 15.11. Code → Ava: #029 fertig: Mega-Rigs fahren (Umzug mit Ladebucht, Camp an Bord, Bauplan aufs Raster, Budgets, Reisen; Crawler + Fatbird, ohne Crew). Offen: gesperrte Straßen + Ausflüge aus der Ladebucht, Fatbird-Cockpit, Camp an Deck/am Seil.
@@ -537,6 +538,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - Dachkante → ⚠️ bei allen Containern an Bord abgeschnitten (nicht nur oberste Reihe), weil die Kante auch unten zwischen den Stapeln Draufsicht zeigt. Im Camp (Puppenhaus-Rig) bleibt sie.
   - Halterung → ⚠️ beide Rotoren: zwei Fachwerk-Träger in den Rumpf + Pfosten aufs Deck, aus Code.
 - **Ergebnis:** `megarig_view.js` (`setCrop`, `pylon`, `post`, Heck-Ausrichtung), Felder Kachel-Set › Heck-Zeile, Heck beginnt vor dem Ende, Triebwerk-Glühen. Tests grün. PixelLab: diesmal 10, übrig 569. **Bitte testen:** /megarig Fatbird und Crawler, Container-Dächer, Rotoren, Fatbird-Heck.
+
+### #032 Container sauber gestapelt, Träger über die ganze Länge
+- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Auftrag:** Daniel: „Sortieren wir noch den Container-Stapel auf dem Crawler so, dass sie nicht mehr ineinander reichen, sondern sauber gestapelt sind. Lass die Halterungsträger doch über die gesamte Länge laufen. Das gibt einen industriellen Look.“
+- **Rückfragen:**
+  - Ursache → Container-Bilder waren 8 statt 6 Kacheln hoch und 9,3 statt 7 breit. ⚠️ Jetzt genau eine Zelle; der Laufsteg auf dem Dach liegt eine Kachel über dem Bild und steht deshalb auf Stelzen.
+- **Ergebnis:** `megarig_view.js` (Maßstab, Stelzen, `airshipTruss`, `clamp`). Tests: `npm test` 154, `megarig_test` 16, `mega_test` 7, `salvage_test` 7. PixelLab 0. **Bitte testen:** /megarig Crawler (Container-Stadt) und Fatbird.
 
 ## Archiv
 

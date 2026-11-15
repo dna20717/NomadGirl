@@ -65,6 +65,7 @@ export class MegarigView {
       else if (p.type === 'rotor') this.rotor(p);
       else if (p.type === 'bridge') this.bridge(p);
     }
+    this.airshipTruss();
     for (const p of build.pieces) if (p.type === 'addon') this.addon(p);
     this.stringLights();
     if (scene.args?.megarig || opts.walk) this.walkways();   // not on a wreck in the camp
@@ -305,7 +306,7 @@ export class MegarigView {
     for (const p of beds) {
       const def = D.containers?.[p.container], plan = def && chassisPlan(D, def), key = plan && chassisTexture(s, plan);
       if (!key) continue;
-      const k = (p.h + 3) * T / (BOX.bottom - BOX.roof), n = p.places || def.places || 1, cxImg = BOX.left + (BOX.one + (n - 1) * BOX.more) / 2;
+      const k = (p.h + 1) * T / (BOX.bottom - BOX.roof), n = p.places || def.places || 1, cxImg = BOX.left + (BOX.one + (n - 1) * BOX.more) / 2;
       const bedLeft = (p.x + p.w / 2) * T - (cxImg - BOX.left) * k, hgt = (plan.rows[1] - plan.rows[0]) * k;
       s.add.image(bedLeft - plan.drawbar * k, ground, key).setOrigin(0, 1).setScale(k).setFlipX(true).setDepth(-5.2);
       if (!ground0.length) this.r(this.g, bedLeft, ground - hgt - PX, plan.bed * k, PX, C.ink, 0);   // nothing on it: the bed alone
@@ -450,11 +451,9 @@ export class MegarigView {
       const im = this.src(R), k = w / im.width, left = x < this.b.x0 * T + this.b.len * T / 2;
       // #031 (Daniel: „die vordere Drohnendüse hängt komplett in der Luft, da muss eine ordentliche Halterung hin“): a truss pylon
       // from the pod into the hull, behind the skin (it disappears into the hull) plus a strut underneath; both orthogonal
-      const midY = y - 0.3 * T + im.height * k * 0.42, inner = left ? x + w - 0.6 * T : x + 0.6 * T, into = left ? this.b.x0 * T + this.b.pieces[0].front * T + 2 * T : (this.b.x0 + this.b.len - this.b.pieces[0].back - 2) * T;
-      this.pylon(inner, into, midY, 1.3 * T);
-      this.pylon(left ? x + w * 0.62 : x + w * 0.38, into, midY + 1.6 * T, 0.7 * T);
-      const deck = (this.b.G - this.b.pieces[0].hullTop) * T;   // and a post from the beam down onto the deck, so nothing hangs in the air
-      this.post(into + (left ? -0.6 : 0) * T, midY - 0.65 * T, deck + T, 1.2 * T);
+      // #032 (Daniel: „lass die Halterungsträger über die gesamte Länge laufen, das gibt einen industriellen Look“): the pods only
+      // note where they hang; airshipTruss() runs both beams from pod to pod and puts posts onto the deck
+      (this.pods ??= []).push({ left, inner: left ? x + w - 0.6 * T : x + 0.6 * T, under: left ? x + w * 0.62 : x + w * 0.38, midY: y - 0.3 * T + im.height * k * 0.42 });
       this.s.add.image(x, y - 0.3 * T, key).setOrigin(0).setScale(k / 2).setFlipX(left).setDepth(-3);
       this.glow(x + w / 2, y + im.height * k + 0.4 * T, w * 1.1, 1.6 * T, P.neon, 0.5);
       this.blink(x + w * (left ? 0.44 : 0.56), y - 0.2 * T, P.light);
@@ -471,6 +470,17 @@ export class MegarigView {
     this.blink(x + w / 2, y - PX, P.light);
   }
 
+  // the rotor beams along the whole fatbird (#032): two truss beams from pod to pod, a post onto the deck at every segment border
+  airshipTruss() {
+    const P = this.pods || [], a = P.find(p => p.left), z = P.find(p => !p.left);
+    if (!a || !z) return;
+    const T = this.T, h = this.b.pieces.find(p => p.type === 'hull'), deck = (this.b.G - h.hullTop) * T, y = Math.min(a.midY, z.midY);
+    this.pylon(a.inner, z.inner, y, 1.3 * T);
+    this.pylon(a.under, z.under, y + 1.6 * T, 0.7 * T);
+    const x0 = (this.b.x0 + h.front) * T, step = h.P * (this.V.hull?.segPlaces || 2) * T;
+    for (let x = x0; x <= (this.b.x0 + h.front + h.places * h.P) * T + 1; x += step) this.post(x - 0.6 * T, y - 0.65 * T, deck + T, 1.2 * T);
+    for (const p of [a, z]) this.clamp(p.inner, y, 1.3 * T, p.left), this.clamp(p.under, y + 1.6 * T, 0.7 * T, p.left);
+  }
   // a horizontal truss beam (two chords, zigzag braces, rivets, a hazard band at the pod end), from x0 to x1 at centre y, behind the skin
   pylon(x0, x1, cy, h) {
     const g = this.s.add.graphics().setDepth(-6.2), a = Math.min(x0, x1), w = Math.abs(x1 - x0), top = cy - h / 2, ch = Math.max(2 * PX, h * 0.22);
@@ -482,7 +492,10 @@ export class MegarigView {
     g.lineStyle(PX, col(C.steel));
     for (let xx = a; xx < a + w - step / 2; xx += step) g.lineBetween(xx, top + ch, xx + step / 2, top + h - ch).lineBetween(xx + step / 2, top + h - ch, xx + step, top + ch);
     for (let xx = a + 8; xx < a + w; xx += 24) { this.r(g, xx, top + ch / 2, PX, PX, C.ink); this.r(g, xx, top + h - ch / 2, PX, PX, C.ink); }
-    const end = x0 < x1 ? x0 : x0 - 0.6 * this.T;   // a clamp at the pod
+  }
+  // a clamp where a beam meets a pod
+  clamp(x, cy, h, left) {
+    const g = this.s.add.graphics().setDepth(-6.1), top = cy - h / 2, end = left ? x : x - 0.6 * this.T;
     this.r(g, end - PX, top - 2 * PX, 0.6 * this.T + 2 * PX, h + 4 * PX, C.ink); this.r(g, end, top - PX, 0.6 * this.T, h + 2 * PX, this.paint.main);
     this.hazard(g, end, top + h * 0.35, 0.6 * this.T, h * 0.3);
   }
@@ -512,7 +525,9 @@ export class MegarigView {
     const s = this.s, T = this.T, D = s.data_, Cn = D.containers?.[p.container] || {};
     const open = Cn.look, closed = Cn.lookClosed;
     if (!open || !s.textures.exists(open)) { this.room(p); return; }
-    const k = (p.h + 3) * T / (BOX.bottom - BOX.roof);   // roof edge on the top of the roof row, bottom on the bottom of the floor row
+    // #032 (Daniel: „sauber gestapelt, nicht mehr ineinander“): exactly one story high (top rail to bottom = the story), so stacked
+    // containers meet edge to edge; one place is then exactly as wide as its cell, longer ones leave a small gap
+    const k = (p.h + 1) * T / (BOX.bottom - BOX.roof);
     const fw = s.textures.get(open).getSourceImage().width, a = s.data_.assets?.[open], frameW = a?.frameSize?.[0] || fw;
     const n = p.places, cxImg = BOX.left + (BOX.one + (n - 1) * BOX.more) / 2;
     const x = (p.x + p.w / 2) * T, y = (p.floorRow + 1) * T, depth = -5 + p.story * 0.01;
@@ -741,6 +756,11 @@ export class MegarigView {
         this.r(g, x, top, w, 2 * PX, C.steel, 0.95);
         for (let gx = x + 6; gx < x + w - 4; gx += 12) this.r(g, gx, top + PX, PX, PX, C.ink, 0.8);   // grating holes
         for (const ex of [x, x + w - 2 * PX]) this.r(g, ex, top - 3 * PX, 2 * PX, 3 * PX, C.gold);   // posts at the ends
+        // #032: over a container roof the walkway is a catwalk on short stilts down to the roof (the picture ends one tile lower)
+        const roofs = this.b.pieces.filter(q => q.type === 'container' && q.y - 1 === y && q.x < run[1] + 1 && q.x + q.w > run[0]);
+        for (const q of roofs) for (let sx = Math.max(run[0], q.x) * T + 12; sx < Math.min(run[1] + 1, q.x + q.w) * T - 8; sx += T) {
+          this.r(g, sx - PX, top + 2 * PX, 3 * PX, T - 2 * PX, C.ink); this.r(g, sx, top + 2 * PX, PX, T - 2 * PX, C.steel);
+        }
         run = null;
       };
       for (let x = 0; x < rows[y].length; x++) {

@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 15.11.2026: **Sauber gestapelt** (#032): Container an Bord Kante auf Kante statt ineinander, Laufstege auf Stelzen; Fatbird mit Trägern über die ganze Länge.
 - 15.11.2026: **Seitenansicht vereinheitlicht** (#031): Container an Bord ohne Dachkante; Fatbird mit neuem Heck streng von der Seite und Rotoren an Fachwerk-Auslegern mit Pfosten aufs Deck.
 - 15.11.2026: **Crawler-Heck streng von der Seite** (#030): neu aus PixelLab, ohne die angeklebte Rückansicht, bündig vom Deck bis zu den Ketten.
 - 15.11.2026: **Mega-Rigs fahren** (#029): nach der Bergung zieht Leyla in Crawler oder Fatbird um, das alte Rig parkt in der Ladebucht. Camp an Bord mit Werkstätten per E und Kommandobrücke als Karte, Bauplan aufs Raster (Container, Räume, Werkstätten, Lichterketten, Ausbaustufen), Budgets wie beim Rig, Crawler langsam und durstig, Fatbird schnell und Luftlinie.
