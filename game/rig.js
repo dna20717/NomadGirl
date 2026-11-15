@@ -14,6 +14,7 @@
 import { containers as storeList, advance, ensureGrid } from './save.js';
 import { canResize } from './inventory.js';
 import { synergyPower } from './synergy.js';
+import { remap as remapDecor } from './decor.js';
 
 const clone = x => JSON.parse(JSON.stringify(x));
 export const B = D => D.build || {};
@@ -377,12 +378,18 @@ export function applyDraft(D, save, d) {
   const old = save.inv.grids, grids = {};
   for (const [k, g] of Object.entries(old)) if (!rigGrid(k)) grids[k] = g;
   const rig = { tractor: d.rig.tractor, units: d.rig.units.map(u => ({ kind: u.kind, id: u.id, ...(u.level ? { level: u.level } : {}), ...(u.level && u.slot != null ? { slot: u.slot } : {}), ...(u.pos ? { pos: { place: u.pos.place, story: u.pos.story } } : {}), workshops: u.workshops.map(w => ({ id: w.id, at: w.at })) })),
-    spare: { workshops: d.rig.spare.workshops.map(w => w.id), containers: [...d.rig.spare.containers], parts: [...d.rig.spare.parts] }, parts: clone(d.rig.parts || {}) };
+    spare: { workshops: d.rig.spare.workshops.map(w => w.id), containers: [...d.rig.spare.containers], parts: [...d.rig.spare.parts], ...(d.rig.spare.decor ? { decor: [...d.rig.spare.decor] } : {}) }, parts: clone(d.rig.parts || {}) };
   // string lights (#009) stay up: they hang on units by index, so they move with their unit (units keep their old key rig:<ui>),
   // the mast at the campfire (#014) stays where it is; a string whose unit left the rig comes down (Daniel, 13.11.2026: „Lichterketten verschwinden, wenn man eine Werkstatt platziert oder neu baut“)
   if (d.rig.lights?.length) {
     const now = Object.fromEntries(d.rig.units.map((u, ui) => [u.key ?? `new:${ui}`, ui])), move = a => { const [ui, side] = String(a).split(':'); if (ui === 'mast') return a; const n = now[`rig:${ui}`]; return n == null ? null : `${n}:${side}`; };
     rig.lights = d.rig.lights.map(([a, b]) => [move(a), move(b)]).filter(([a, b]) => a && b && a !== b);
+  }
+  // decoration (#036): pieces on a unit follow it, those of a unit that left go into the Lager
+  if (d.rig.decor?.length) {
+    const now = Object.fromEntries(d.rig.units.map((u, ui) => [u.key ?? `new:${ui}`, ui]));
+    rig.decor = clone(d.rig.decor);
+    remapDecor(rig, ui => now[`rig:${ui}`] ?? null);
   }
   d.rig.units.forEach((u, ui) => u.workshops.forEach(w => {
     if (!w.key) return;

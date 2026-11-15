@@ -2096,5 +2096,17 @@
   "tags": ["trophy"],
   "look": "icons_salvage",
   "icon": 12
+ },
+ "goldene_discokugel": {
+  "name": "Goldene Discokugel",
+  "category": "valuable",
+  "size": [2, 2],
+  "stack": 1,
+  "value": 0,
+  "glyph": "🪩",
+  "description": "Fürs schönste Camp der Wastelands. Wirft kleine Sonnen an die Container.",
+  "tags": ["trophy"],
+  "look": "icons_misc",
+  "icon": 4
  }
 }

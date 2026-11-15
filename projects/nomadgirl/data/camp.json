@@ -131,5 +131,6 @@
  "mood": {"vignette": 35, "warm": 30, "fireflies": 18, "smoke": true},
  "solar": {"look": "rig_solar", "power": 1, "battery": 6, "day": [7, 19], "price": 220, "weight": 40},
  "rain": {"enabled": true, "chance": 30, "hours": [2, 6], "look": "abendglut_regen"},
- "board": {"enabled": true, "name": "Schwarzes Brett", "offset": -220, "lift": 210, "width": 132, "height": 96}
+ "board": {"enabled": true, "name": "Schwarzes Brett", "offset": -220, "lift": 210, "width": 132, "height": 96},
+ "decor": {"max": 40, "back": 50, "cozyMax": 25, "ground": [-4, 20]}
 }

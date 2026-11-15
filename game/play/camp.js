@@ -505,6 +505,7 @@ export class Camp {
       this.drawStringLights();
     }
     this.drawSynergies();
+    this.drawDecor();   // #036
     if (this.night) for (const l of this.lights) if (l.rig) l.setAlpha(l.base * this.lightK).setVisible(this.lightK > 0);
     this.updateShells(0);   // labels and lights of closed containers right away, not one frame later
   }
@@ -1012,6 +1013,7 @@ export class Camp {
   // ---------- loop ----------
   update(time, dt, input) {
     const s = this.scene, l = s.leyla, range = this.C.interactRange ?? 130;
+    this.updateDecor?.(time, dt);
     // the fire's light breathes and flickers
     if (this.fireLights && this.lightK > 0) {
       const t = time / 1000, fl = (this.C.fire?.flicker ?? 25) / 100;
@@ -1151,4 +1153,5 @@ import { CampActions } from './camp_actions.js';
 import { CampSalvage } from './camp_salvage.js';
 import { CampBoard } from './camp_board.js';
 import { CampMega } from './camp_mega.js';
-for (const M of [CampLife, CampActions, CampSalvage, CampBoard, CampMega]) for (const k of Object.getOwnPropertyNames(M.prototype)) if (k !== 'constructor') Object.defineProperty(Camp.prototype, k, Object.getOwnPropertyDescriptor(M.prototype, k));
+import { CampDecor } from './camp_decor.js';
+for (const M of [CampLife, CampActions, CampSalvage, CampBoard, CampMega, CampDecor]) for (const k of Object.getOwnPropertyNames(M.prototype)) if (k !== 'constructor') Object.defineProperty(Camp.prototype, k, Object.getOwnPropertyDescriptor(M.prototype, k));

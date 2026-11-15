@@ -2,6 +2,7 @@
 // Mixed into Camp (game/play/camp.js): the methods keep their `this`, nothing else changes.
 import { owned, activeMega } from '../mega.js';
 import { synergyAt } from '../synergy.js';
+import { cozyBonus } from '../decor.js';
 import { ensureMap, placeOf } from '../worldmap.js';
 import { rollEncounter, choose, blocked } from '../travel.js';
 import { potsOf, stage, ripe, harvest, STAGES, canWater, waterOf, water } from '../garden.js';
@@ -84,8 +85,9 @@ export class CampActions {
   }
   // #033 synergy „quality“: the buff of this bench gets stronger (save.buffQ, like a good dish)
   synergyBuff(def, place) {
-    const x = place && synergyAt(this.D, this.box.save, place);
-    if (def.buff && x?.effect === 'quality' && x.bonus > 0) { const Q = (this.box.save.buffQ ??= {}); Q[def.buff] = Math.max(Q[def.buff] || 0, Math.round(x.bonus)); }
+    const x = place && synergyAt(this.D, this.box.save, place), cz = cozyBonus(this.D, this.box.save);   // #036: Gemütlichkeit of the decoration on top
+    const add = (x?.effect === 'quality' ? x.bonus : 0) + cz;
+    if (def.buff && add > 0) { const Q = (this.box.save.buffQ ??= {}); Q[def.buff] = Math.max(Q[def.buff] || 0, Math.round(add)); }
   }
   // a workshop to spend time at (Werkstätten › Benutzen): Chill Area, Drohnenwerkstatt … time passes, heals, gives its buff;
   // AvA can fly over and dock on the bench while it happens

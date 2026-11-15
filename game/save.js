@@ -273,7 +273,8 @@ export function repairSave(save, D) {
   // stacks stay whole: a level is at most one above the unit before it, nothing stands on the tractor
   s.rig.units.forEach((u, i) => { const prev = s.rig.units[i - 1]; if (!u.level) { delete u.slot; return; } const max = !prev || prev.kind === 'tractor' ? 0 : (prev.level || 0) + 1; if (u.level > max) u.level = max; if (!u.level) { delete u.level; delete u.slot; } });   // a slot only counts on a stack
   const sp = s.rig.spare || {};
-  s.rig.spare = { workshops: (sp.workshops || []).filter(w => D.workshops?.[w]), containers: (sp.containers || []).filter(c => D.containers?.[c]), parts: (sp.parts || []).filter(c => D.rigParts?.[c]) };
+  s.rig.spare = { workshops: (sp.workshops || []).filter(w => D.workshops?.[w]), containers: (sp.containers || []).filter(c => D.containers?.[c]), parts: (sp.parts || []).filter(c => D.rigParts?.[c]), decor: (sp.decor || []).filter(c => D.decor?.[c]) };
+  if (s.rig.decor) s.rig.decor = s.rig.decor.filter(x => D.decor?.[x.id] && x.at && (x.at.ui == null || s.rig.units[x.at.ui]));   // #036
   // a mega rig (#029): every container on a free cell of its grid, the rest into the Lager; strings only between units that are there
   if (s.mega?.active && D.megarigs?.[s.mega.active] && D.tractors?.[s.rig.tractor]?.megarig) { settleMega(D, s); fixMegaLights(s); }
   else if (s.mega?.active) s.mega.active = null;

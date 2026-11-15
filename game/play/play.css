@@ -986,3 +986,4 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .mb-lagerT { display: inline-flex; align-items: center; gap: 5px; color: #ffd27a; font: 20px VT323, monospace; margin-right: 6px; }
 @media (max-width: 900px) { .mb-body { grid-template-columns: 1fr; } }
 .mb-slot.syn { box-shadow: inset 0 0 0 1px #7ff6ff; color: #e3fffd; }
+.build-sub { display: flex; align-items: center; gap: 6px; margin: 8px 2px 2px; color: #ffd27a; font: 18px VT323, monospace; }

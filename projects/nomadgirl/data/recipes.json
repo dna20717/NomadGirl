@@ -757,5 +757,16 @@
   "discovery": ["achievement"],
   "once": true,
   "hint": "Trophäe für „Für die 1 %“"
+ },
+ "trophaee_discokugel": {
+  "name": "Goldene Discokugel",
+  "station": "werkbank",
+  "ingredients": [{"item": "gluehbirne", "count": 1},{"item": "schrottplatte", "count": 2}],
+  "result": "goldene_discokugel",
+  "count": 1,
+  "time": 45,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Wohnzimmer mit Aussicht“"
  }
 }

@@ -148,5 +148,16 @@
   "hidden": true,
   "filter": "megarig",
   "recipe": "trophaee_logbuch_giganten"
+ },
+ "wohnzimmer": {
+  "name": "Wohnzimmer mit Aussicht",
+  "category": "cosy",
+  "counter": "decor",
+  "target": 10,
+  "bonus": [{"stat": "regen", "value": 1}],
+  "description": "Richte das Camp mit 10 Deko-Stücken ein.",
+  "hidden": false,
+  "order": 10,
+  "recipe": "trophaee_discokugel"
  }
 }

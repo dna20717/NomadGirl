@@ -17,7 +17,7 @@ export const ACHIEVEMENT_COUNTERS = [
   ['harvests', 'Ernten in der Hydrokultur'], ['cooked', 'Gerichte gekocht (Filter: Rezept)'], ['crafted', 'Hergestellt an der Werkbank (Filter: Rezept)'],
   ['experiments', 'Experimente geglückt'], ['failures', 'Experimente misslungen'], ['salvaged', 'Dinge zerlegt'], ['salvage', 'Bergungen abgeschlossen (Filter: Projekt, megarig, tractor)'], ['recipes', 'Rezepte im Rezeptbuch (Stand)'],
   ['sleeps', 'Nächte geschlafen'], ['trips', 'Gefahren (Reisekarte)'], ['encounters', 'Zwischenfälle unterwegs'], ['tankSafeRuns', 'Runs ohne kritischen Tank'], ['knockouts', 'k.o. (AvA bringt Leyla heim)'],
-  ['cycles', 'Neuer Durchgang'], ['lights', 'Lichterketten im Camp (Stand)'], ['workshops', 'Werkstätten gekauft'], ['deltas', 'Δ aus Runs verdient'],
+  ['cycles', 'Neuer Durchgang'], ['lights', 'Lichterketten im Camp (Stand)'], ['decor', 'Deko-Stücke im Camp (Stand, #036)'], ['workshops', 'Werkstätten gekauft'], ['deltas', 'Δ aus Runs verdient'],
 ];
 // what a trophy on a stand gives: Leyla's gear values (game/inventory.js › GEAR_STATS) plus special effects
 export const ACHIEVEMENT_SPECIALS = [

@@ -1,0 +1,281 @@
+{
+ "neon_open": {
+  "name": "Neon „OPEN“",
+  "art": "neon",
+  "place": "wall",
+  "value": 60,
+  "cozy": 2,
+  "size": [
+   2.4,
+   1
+  ],
+  "color": "#ff7ac0",
+  "text": "OPEN",
+  "description": "Pinkes Neon an der Container-Wand, flackert ab und zu."
+ },
+ "neon_bar": {
+  "name": "Neon „BAR“",
+  "art": "neon",
+  "place": "wall",
+  "value": 60,
+  "cozy": 2,
+  "size": [
+   2,
+   1
+  ],
+  "color": "#20d6c7",
+  "text": "BAR|NUDELN|24/7|LEYLA'S",
+  "description": "Cyan-Neon, Text je Stück zufällig aus einer Liste."
+ },
+ "banner_logo": {
+  "name": "Banner mit Dreieck",
+  "art": "banner",
+  "place": "wall",
+  "value": 40,
+  "cozy": 1,
+  "size": [
+   1.6,
+   2.4
+  ],
+  "color": "#b4202a",
+  "description": "Stoffbanner mit dem Dreieck der Spielwelt."
+ },
+ "banner_gang": {
+  "name": "Gang-Banner",
+  "art": "banner",
+  "place": "wall",
+  "value": 40,
+  "cozy": 1,
+  "size": [
+   1.6,
+   2.4
+  ],
+  "color": "#285cc4",
+  "text": "skull",
+  "description": "Blaues Banner mit Totenkopf, Trophäe aus dem Revier."
+ },
+ "sonnensegel": {
+  "name": "Sonnensegel",
+  "art": "sail",
+  "place": "span",
+  "value": 80,
+  "cozy": 3,
+  "size": [
+   0,
+   1.2
+  ],
+  "colors": "#f9a31b,#f2e3c4",
+  "description": "Gestreiftes Segel zwischen zwei Punkten: Container-Ecken, Mast oder Zeltstangen."
+ },
+ "schrott_rad": {
+  "name": "Altreifen-Stapel",
+  "art": "addon",
+  "place": "ground",
+  "value": 15,
+  "cozy": 0,
+  "size": [
+   1.6,
+   1.6
+  ],
+  "addon": "rad",
+  "description": "Ersatzräder aus dem LKW-Teileblatt, gestapelt."
+ },
+ "schrott_kisten": {
+  "name": "Kistenstapel",
+  "art": "addon",
+  "place": "ground",
+  "value": 20,
+  "cozy": 1,
+  "size": [
+   2.2,
+   1.4
+  ],
+  "addon": "werkzeugkiste",
+  "description": "Werkzeugkisten, aufeinandergestellt."
+ },
+ "seesaecke": {
+  "name": "Seesäcke",
+  "art": "addon",
+  "place": "ground",
+  "value": 15,
+  "cozy": 1,
+  "size": [
+   1.9,
+   1.2
+  ],
+  "addon": "seesaecke"
+ },
+ "warnschild": {
+  "name": "Warnschild",
+  "art": "addon",
+  "place": "wall",
+  "value": 10,
+  "cozy": 0,
+  "size": [
+   1.1,
+   1.1
+  ],
+  "addon": "warnschild"
+ },
+ "fundstuecke": {
+  "name": "Kiste mit Fundstücken",
+  "art": "trophies",
+  "place": "ground",
+  "value": 90,
+  "cozy": 3,
+  "size": [
+   2,
+   1.2
+  ],
+  "items": [
+   "winkekatze",
+   "schallplatte",
+   "kristallschaedel",
+   "discokugel"
+  ],
+  "description": "Eine Kiste vor dem Feuer, darauf die schönsten Fundstücke."
+ },
+ "waescheleine": {
+  "name": "Wäscheleine",
+  "art": "line",
+  "place": "span",
+  "value": 25,
+  "cozy": 2,
+  "size": [
+   0,
+   0.6
+  ],
+  "colors": "#e86a73,#249fde,#f2e3c4,#9cdb43,#ffd541",
+  "description": "Leine mit Wäsche, zwischen zwei Punkten. Bläht sich im Wind."
+ },
+ "windrad": {
+  "name": "Windrad",
+  "art": "windmill",
+  "place": "roof",
+  "value": 70,
+  "cozy": 2,
+  "size": [
+   1.6,
+   2.6
+  ],
+  "color": "#dae0ea",
+  "description": "Dreht sich im Wind, schneller bei Böen."
+ },
+ "pflanze": {
+  "name": "Topfpflanze",
+  "art": "plant",
+  "place": "ground",
+  "value": 20,
+  "cozy": 2,
+  "size": [
+   0.8,
+   1.2
+  ],
+  "growDays": 2,
+  "color": "#59c135",
+  "description": "Wächst über die Tage, bis sie blüht."
+ },
+ "kaktus": {
+  "name": "Kaktus in der Dose",
+  "art": "plant",
+  "place": "roof",
+  "value": 15,
+  "cozy": 1,
+  "size": [
+   0.6,
+   1
+  ],
+  "growDays": 3,
+  "color": "#328464",
+  "description": "Steht auf dem Dach und wird langsam größer."
+ },
+ "haengematte": {
+  "name": "Hängematte",
+  "art": "hammock",
+  "place": "span",
+  "value": 45,
+  "cozy": 4,
+  "size": [
+   0,
+   1
+  ],
+  "colors": "#bc4a9b,#f2e3c4",
+  "description": "Zwischen zwei Punkten, nah beieinander am schönsten."
+ },
+ "graffiti": {
+  "name": "Graffiti",
+  "art": "graffiti",
+  "place": "wall",
+  "value": 10,
+  "cozy": 1,
+  "size": [
+   2.4,
+   1
+  ],
+  "colors": "#ff7ac0,#20d6c7,#ffd541,#9cdb43",
+  "text": "LEYLA|AvA <3|NO FUTURE|MILE 7|KEEP ROLLIN|NOMAD",
+  "description": "Gesprühter Tag in Neonfarben, Text und Farbe je Stelle anders."
+ },
+ "dreibein": {
+  "name": "Dreibein mit Kessel",
+  "art": "tripod",
+  "place": "ground",
+  "value": 35,
+  "cozy": 3,
+  "size": [
+   1.4,
+   1.6
+  ],
+  "description": "Über dem Feuer oder daneben, der Kessel dampft."
+ },
+ "vogelhaus": {
+  "name": "Vogelhaus",
+  "art": "birdhouse",
+  "place": "roof",
+  "value": 30,
+  "cozy": 2,
+  "size": [
+   0.8,
+   1.4
+  ],
+  "description": "Lockt Krähen an, die auf den Dächern sitzen und auffliegen, wenn Leyla kommt."
+ },
+ "laterne": {
+  "name": "Laterne",
+  "art": "lantern",
+  "place": "ground",
+  "value": 25,
+  "cozy": 2,
+  "size": [
+   0.6,
+   1.8
+  ],
+  "color": "#ffd27a",
+  "description": "Leuchtet nachts warm."
+ },
+ "zeltstange": {
+  "name": "Zeltstange",
+  "art": "pole",
+  "place": "ground",
+  "value": 10,
+  "cozy": 0,
+  "size": [
+   0.4,
+   4
+  ],
+  "description": "Ein Ankerpunkt für Zelte, Segel und Leinen, frei auf dem Boden."
+ },
+ "zelt": {
+  "name": "Großes Zelt",
+  "art": "tent",
+  "place": "span",
+  "value": 120,
+  "cozy": 5,
+  "size": [
+   0,
+   0
+  ],
+  "colors": "#8e5252,#c7b08b",
+  "description": "Zwischen zwei Containern, zwei Zeltstangen oder Container und Mast: der First hängt zwischen den Punkten, die Bahnen reichen bis zum Boden."
+ }
+}

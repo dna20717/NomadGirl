@@ -13,6 +13,7 @@ import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
 import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
 import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from './megarig.js';
 import { ACHIEVEMENT_COUNTERS, ACHIEVEMENT_SPECIALS, ACHIEVEMENT_CATEGORIES } from '../game/achievements.js';
+import { DECOR_PLACES, DECOR_ARTS } from '../game/decor.js';
 
 const text = (key, label, o = {}) => ({ key, label, type: 'text', ...o });
 const area_ = (key, label, o = {}) => ({ key, label, type: 'textarea', ...o });
@@ -1061,6 +1062,16 @@ export const AREAS = {
       { title: 'Aussehen', fields: [ref('look', 'Bild', 'assets'), point('crop.at', 'Ausschnitt ab', { unit: 'Bildpixel', hint: 'Oben links im Teileblatt' }), size('crop.size', 'Ausschnitt Größe', { unit: 'Bildpixel' }),
         select('code', 'Aus Code', ADDON_CODE, { hint: 'Ohne Bild: aus Code gezeichnet' }), color('color', 'Farbe'), text('text', 'Text', { hint: 'Neon-Schild, Banner' })] }],
   },
+  decor: {
+    name: 'Deko', singular: 'Deko-Stück', icon: 'star', file: 'data/decor.json', kind: 'catalog', groupBy: { key: 'place', options: DECOR_PLACES },
+    hint: '#036 (Daniel: „das Dekosystem“): Kosmetik fürs Camp, beim Händler im Bau-Modus kaufen und in der Welt platzieren. Keine Werte, nur Gemütlichkeit (stärkere Buffs beim Schlafen und Ausruhen, Camp › Deko).',
+    template: { name: 'Neues Deko-Stück', art: 'neon', place: 'wall', value: 20, cozy: 1, size: [2, 1] },
+    row: x => `${label(DECOR_ARTS, x.art)} · ${label(DECOR_PLACES, x.place)} · ${x.value ?? 0} Δ${x.cozy ? ` · +${x.cozy} Gemütlichkeit` : ''}`,
+    sections: [{ title: 'Deko', fields: [NAME, select('art', 'Art', DECOR_ARTS), select('place', 'Sitzt', DECOR_PLACES), VALUE, num('cozy', 'Gemütlichkeit', { min: 0 }), DESCRIPTION] },
+      { title: 'Aussehen', fields: [size('size', 'Größe', { unit: 'Kacheln', hint: 'Breite × Höhe; bei Zelt und Segel: Höhe = wie tief es hängt' }), color('color', 'Farbe'), text('colors', 'Farben', { hint: 'Mehrere mit Komma (Wäsche, Streifen)' }),
+        text('text', 'Text', { hint: 'Neon, Banner, Graffiti; mehrere mit | (zufällig je Ort)' }), ref('addon', 'Ausschnitt von', 'rigAddons', { hint: 'Art „Ausschnitt“: das Bild dieses Anbauteils' }),
+        refs('items', 'Fundstücke', 'items', { hint: 'Art „Kiste mit Fundstücken“: diese Symbole' }), num('growDays', 'Wächst in Tagen', { min: 1, hint: 'Pflanze: Tage je Stufe' })] }],
+  },
   companions: {
     name: 'Companions', singular: 'Companion', icon: 'humans', file: 'data/companions.json', kind: 'catalog',
     hint: 'Leben im Rig, betreiben Werkstätten, geben Buffs und Rezept-Tipps. Eigene Quests kommen in Ausbaustufe 2.',
@@ -1152,6 +1163,9 @@ export const AREAS = {
         num('sound.fireMin', 'Feuer von weitem', { unit: '%', min: 0, max: 100 }), num('sound.fireRange', 'Hörweite', { unit: 'px', min: 50 }), num('sound.fireNear', 'Voll ab', { unit: 'px', min: 0, hint: 'Näher als das: volle Lautstärke' }),
         ref('sound.music', 'Musik', 'assets', { hint: 'Läuft leise im Hintergrund in Schleife (Leyla Theme). Lädt erst, wenn das Camp steht. M schaltet allen Ton aus' }), num('sound.musicVolume', 'Musik-Lautstärke', { unit: '%', min: 0, max: 100, hint: 'Dezent: um 15' }),
         num('sound.musicFadeIn', 'Musik einblenden', { unit: 's', min: 0, hint: 'So lange wird sie beim Betreten des Camps lauter' })] },
+      { title: 'Deko', fields: [num('decor.max', 'Höchstens', { min: 1, hint: '#036: so viele Deko-Stücke im Camp' }), num('decor.back', 'Zurück beim Verkaufen', { unit: '%', min: 0, max: 100 }),
+        num('decor.cozyMax', 'Gemütlichkeit wirkt bis', { unit: '%', min: 0, hint: 'Jeder Punkt Gemütlichkeit macht die Buffs von Schlafen und Ausruhen 1 % stärker, höchstens so viel' }),
+        range('decor.ground', 'Boden von – bis', { unit: 'Kacheln ab dem Lagerplatz', hint: 'Wo Boden-Deko stehen darf (negativ = Richtung Rig)' })] },
       { title: 'Schwarzes Brett', fields: [bool('board.enabled', 'Schwarzes Brett', { hint: 'Daniel, 15.11.2026 (#025): am Van Aufträge annehmen, abgeben und Belohnungen einsammeln, zentral für alle Companions. Bei ihnen direkt geht es weiter. Später eine Werkbank, die fertige Aufträge gegen bessere Belohnungen tauscht' }),
         text('board.name', 'Name'), num('board.offset', 'Abstand zum Feuer', { unit: 'px', hint: 'Negativ = links vom Feuer, Richtung Van. −220 = am Mast' }),
         num('board.lift', 'Oberkante über dem Boden', { unit: 'px', min: 60 }), num('board.width', 'Breite', { unit: 'px', min: 60 }), num('board.height', 'Höhe', { unit: 'px', min: 40 })] },
@@ -1435,7 +1449,7 @@ export const GROUPS = [
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
   ['ACHIEVEMENTS & AUFTRÄGE', ['achievements', 'quests']],
   ['PROGRESSION', ['techtree', 'resources']],
-  ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'megarigs', 'rigAddons', 'salvage', 'companions']],
+  ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'megarigs', 'rigAddons', 'salvage', 'companions']],
   ['WELT', ['worldmap', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'travel']],
 ];
 
