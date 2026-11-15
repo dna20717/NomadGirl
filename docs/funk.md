@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #039 Ressourcen verdienen + Gruppen-Alarm läuft.
 - 15.11. Code → Ava: #038 fertig: acht neue POIs (S bis XL), drei Türme nach oben, drei Tiefen nach unten, Schacht als Abkürzung. PixelLab 0.
 - 15.11. Code → Ava: #037 fertig: Balkone, Hängebrücke, Stahlsteg, Aussichtsturm, alles begehbar. PixelLab 0.
 - 15.11. Code → Ava: #036 fertig: Deko-System mit 27 Stücken (Neon, Graffiti, Zelte, Hängematte, Windrad, Krähen …), Gemütlichkeit, Wetter am Rig. PixelLab 0.
@@ -615,6 +616,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - Draußen um den Turm → ⚠️ vorerst Fels/Wand wie bei allen POIs; offene Etagen (Rohbau, Penthouse, Dachdeck, Funkmast) zeigen Himmel. Echte Luft rund um ein Hochhaus wäre ein eigenes Ticket.
   - Grafik → ⚠️ keine neuen Kachel-Sets, die Räume nutzen die vorhandenen (Ruine, Beton, Metall, Wüste, Marmor) und Stimmungen.
 - **Ergebnis:** `engine/poi.js` (`buildStack`, Spiegeln, Schacht), Feld POIs › Level › Aufbau, POI-Arten Hochhaus/Untergrund mit Karten-Symbolen, 53 Raum-Bausteine (`tools/poi_rooms_038.py`, `tools/merge_rooms.mjs`), 8 POIs: Delta Heights (Turm L), P+R Delta Süd (Turm M), Funkmast KM 31 (Turm S), Metro Line 4 (Tiefe M), Storm Drain 9 (Tiefe S), Pit 6 (Tiefe XL), Delta Crude Refinery (L), Sunny Acres (S). Tests: `npm test` 170 (3 neu), Browser `poi_stack_test` 8. PixelLab 0. **Bitte testen:** Werkstatt › POIs › Delta Heights › „Im Spiel testen“: Etage für Etage hoch, oben den Tresor, dann den Schacht runter und den Schalter; Metro Line 4 und Pit 6 nach unten.
+
+### #039 Ressourcen verdienen, Gruppen-Alarm
+- **Status:** läuft · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Auftrag:** Daniel wählt aus der Liste „ohne neue Assets“: Ressourcen verdienen (Kisten, Kills, Secrets, guter Rang, design.md) und Gruppen-Alarm (wer Leyla sieht, ruft die anderen).
 
 ## Archiv
 
