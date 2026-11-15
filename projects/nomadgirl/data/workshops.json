@@ -20,7 +20,8 @@
    {"kind": "twinkle", "x": 166, "y": 150, "w": 34, "h": 50, "size": 3, "rate": 1, "when": "always"},
    {"kind": "screen", "x": 210, "y": 167, "w": 18, "h": 10, "color": "#3fe0d0", "size": 0, "rate": 1, "when": "always"}
   ],
-  "outside": "out_sleep"
+  "outside": "out_sleep",
+  "synergy": {"partners": ["chill_area", "gaestekoje"], "effect": "quality", "max": 30}
  },
  "kochnische": {
   "name": "Kochnische",
@@ -42,7 +43,8 @@
    {"kind": "screen", "x": 62, "y": 148, "w": 17, "h": 7, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
    {"kind": "smoke", "x": 124, "y": 26, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
   ],
-  "outside": "out_kitchen"
+  "outside": "out_kitchen",
+  "synergy": {"partners": ["kuehlraum", "zisterne", "hydrokultur", "kueche"], "effect": "speed", "max": 30}
  },
  "werkbank": {
   "name": "Werkbank",
@@ -65,7 +67,8 @@
    {"kind": "twinkle", "x": 150, "y": 160, "w": 45, "h": 42, "size": 3, "rate": 1.5, "when": "always"},
    {"kind": "twinkle", "x": 205, "y": 80, "w": 30, "h": 120, "size": 3, "rate": 1, "when": "always"}
   ],
-  "outside": "out_craft"
+  "outside": "out_craft",
+  "synergy": {"partners": ["generator", "reaktor", "motorraum", "waffenkammer", "heavy_duty"], "effect": "speed", "max": 30}
  },
  "generator": {
   "name": "Generator",
@@ -88,7 +91,8 @@
    {"kind": "twinkle", "x": 178, "y": 165, "w": 40, "h": 35, "size": 3, "rate": 1.5, "when": "always"},
    {"kind": "twinkle", "x": 210, "y": 80, "w": 30, "h": 120, "size": 3, "rate": 1, "when": "always"}
   ],
-  "outside": "out_ac"
+  "outside": "out_ac",
+  "synergy": {"partners": ["motorraum", "reaktor"], "effect": "power", "max": 2}
  },
  "waffenkammer": {
   "name": "Waffenwerkbank",
@@ -112,9 +116,10 @@
    {"kind": "twinkle", "x": 215, "y": 160, "w": 30, "h": 45, "size": 3, "rate": 1, "when": "always"}
   ],
   "outside": "out_storage",
-  "description": "Werkbank und Lager für Waffen: Teile, Munition, Ersatzläufe. Ausgestellt wird in der Waffenkammer (#033)."
+  "description": "Werkbank und Lager für Waffen: Teile, Munition, Ersatzläufe. Ausgestellt wird in der Waffenkammer (#033).",
+  "synergy": {"partners": ["waffengalerie", "werkbank", "generator"], "effect": "speed", "max": 30}
  },
- "kuehlraum": {"name": "Kühlraum", "function": "cooling", "stage": "1", "places": 1, "power": -2, "capacity": 20, "value": 250, "grid": [6, 4], "outside": "out_tank"},
+ "kuehlraum": {"name": "Kühlraum", "function": "cooling", "stage": "1", "places": 1, "power": -2, "capacity": 20, "value": 250, "grid": [6, 4], "outside": "out_tank", "look": "ws_cold_room"},
  "chill_area": {
   "name": "Chill Area",
   "function": "chill",
@@ -138,7 +143,8 @@
    {"kind": "twinkle", "x": 175, "y": 160, "w": 40, "h": 35, "size": 3, "rate": 1, "when": "always"}
   ],
   "rest": {"verb": "Fernsehen und abhängen", "hours": 1, "heal": 20, "banner": "Flimmern, Sofa, Lavalampe"},
-  "outside": "out_graffiti"
+  "outside": "out_graffiti",
+  "synergy": {"partners": ["schlafkoje", "kochnische", "kueche", "hydrokultur"], "effect": "quality", "max": 25}
  },
  "drohnenwerkstatt": {
   "name": "Drohnenwerkstatt",
@@ -162,7 +168,8 @@
    {"kind": "twinkle", "x": 212, "y": 150, "w": 32, "h": 60, "size": 3, "rate": 1, "when": "always"}
   ],
   "rest": {"verb": "AvA warten", "hours": 0.5, "heal": 0, "banner": "AvA glänzt wieder", "drone": true},
-  "outside": "out_craft"
+  "outside": "out_craft",
+  "synergy": {"partners": ["generator", "reaktor", "werkbank"], "effect": "speed", "max": 30}
  },
  "warroom": {
   "name": "Warroom",
@@ -209,7 +216,8 @@
    {"kind": "screen", "x": 62, "y": 148, "w": 17, "h": 7, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
    {"kind": "smoke", "x": 124, "y": 26, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
   ],
-  "outside": "out_kitchen"
+  "outside": "out_kitchen",
+  "synergy": {"partners": ["kuehlraum", "zisterne", "hydrokultur", "kochnische"], "effect": "speed", "max": 30}
  },
  "foodtruck": {
   "name": "Foodtruck",
@@ -231,11 +239,22 @@
    {"kind": "screen", "x": 62, "y": 148, "w": 17, "h": 7, "color": "#3fe0d0", "size": 0, "rate": 2, "when": "always"},
    {"kind": "smoke", "x": 124, "y": 26, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
   ],
-  "outside": "out_kitchen"
+  "outside": "out_kitchen",
+  "synergy": {"partners": ["kuehlraum", "kueche", "kochnische"], "effect": "speed", "max": 30}
  },
  "motorraum": {"name": "Motorraum", "function": "engine", "stage": "1", "places": 1, "power": 0, "value": 300, "outside": "out_ac", "look": "ws_engine_room"},
  "zelle": {"name": "Zelle", "function": "cell", "stage": "2", "places": 1, "power": 0, "capacity": 1, "value": 200, "outside": "out_graffiti", "look": "ws_cell"},
- "reaktor": {"name": "Reaktor", "function": "power", "stage": "2", "places": 2, "power": 8, "value": 3000, "outside": "out_ac", "look": "ws_reactor"},
+ "reaktor": {
+  "name": "Reaktor",
+  "function": "power",
+  "stage": "2",
+  "places": 2,
+  "power": 8,
+  "value": 3000,
+  "outside": "out_ac",
+  "look": "ws_reactor",
+  "synergy": {"partners": ["kuehlraum", "generator", "motorraum"], "effect": "power", "max": 4}
+ },
  "lagerregal": {
   "name": "Lagerregal",
   "function": "storage",
@@ -351,7 +370,8 @@
    {"kind": "light", "x": 100, "y": 157, "w": 76, "h": 3, "color": "#e45aa8", "size": 38, "rate": 3, "when": "always"},
    {"kind": "screen", "x": 219, "y": 116, "w": 13, "h": 7, "color": "#56e07a", "size": 0, "rate": 2, "when": "always"}
   ],
-  "outside": "out_garden"
+  "outside": "out_garden",
+  "synergy": {"partners": ["zisterne", "generator", "reaktor", "kuehlraum"], "effect": "speed", "max": 50}
  },
  "ripperdoc": {
   "name": "Ripperdoc-Liege",
@@ -372,7 +392,8 @@
    {"kind": "sparks", "x": 112, "y": 100, "w": 30, "h": 8, "color": "#9ff7ff", "size": 3, "rate": 30, "when": "use", "idle": 0},
    {"kind": "smoke", "x": 120, "y": 98, "w": 10, "h": 4, "color": "#c2b9cc", "size": 6, "rate": 2, "when": "use", "idle": 0}
   ],
-  "outside": "out_ripper"
+  "outside": "out_ripper",
+  "synergy": {"partners": ["cryotank", "kuehlraum", "generator", "reaktor"], "effect": "speed", "max": 30}
  },
  "zisterne": {
   "name": "Zisterne",
@@ -436,7 +457,8 @@
   "fx": [
    {"kind": "sparks", "x": 36, "y": 150, "w": 12, "h": 8, "color": "#7ff6ff", "size": 2, "rate": 10, "when": "use", "idle": 20},
    {"kind": "light", "x": 100, "y": 40, "w": 60, "h": 10, "color": "#fff1c8", "size": 60, "rate": 5, "when": "always"}
-  ]
+  ],
+  "synergy": {"partners": ["motorraum", "reaktor", "generator", "werkbank"], "effect": "speed", "max": 40}
  },
  "auftragsbuero": {
   "name": "Auftragsbüro",

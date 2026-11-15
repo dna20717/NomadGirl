@@ -17,6 +17,7 @@ import { Benches, benchTexture, crateTexture } from './benches.js';
 import { wreckHere } from './camp_salvage.js';
 import { campMegaLayout } from './camp_mega.js';
 import { activeMega, flies, travelSpeed } from '../mega.js';
+import { synergyAt, synergyText, links } from '../synergy.js';
 
 export const de = n => Number(n).toLocaleString('de-DE', { maximumFractionDigits: 1 });
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
@@ -502,6 +503,7 @@ export class Camp {
       this.drawYard();
       this.drawStringLights();
     }
+    this.drawSynergies();
     if (this.night) for (const l of this.lights) if (l.rig) l.setAlpha(l.base * this.lightK).setVisible(this.lightK > 0);
     this.updateShells(0);   // labels and lights of closed containers right away, not one frame later
   }
@@ -692,11 +694,37 @@ export class Camp {
   workshopHotspot(u, w, def, cx, cw, labelY) {
     const R = this.C.rig || {};
     const store = def.grid && `store:${u.ui}:${w.at}`;
-    this.hotspots.push({ rig: true, place: `${u.ui}:${w.at}`, x: cx + cw / 2, w: cw / 2, top: this.curTop, floor: u.floorY, name: def.name || w.id, hint: store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen', ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id, `${u.ui}:${w.at}`) });
+    this.hotspots.push({ rig: true, place: `${u.ui}:${w.at}`, x: cx + cw / 2, w: cw / 2, top: this.curTop, floor: u.floorY, name: def.name || w.id, hint: this.synHint(`${u.ui}:${w.at}`, store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen'), ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id, `${u.ui}:${w.at}`) });
     if (R.labels !== false && def.function !== 'tank') {   // the cryo tank has its own screen
       // subtle (#008): small, soft, a little see-through; they still say what stands where
       const t = this.scene.add.text(cx + cw / 2, labelY, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '20px', color: '#e9d8b4', stroke: '#0d0a12', strokeThickness: 4 }).setOrigin(0.5, 0).setDepth(-14).setAlpha(LABEL_ALPHA);
       t.unit = u.ui; this.rigObjs.push(t); (this.labels ||= []).push(t);   // fades with a closed shell
+    }
+  }
+
+  // ---------- synergies (#033): the bonus in the prompt, a glowing link between neighbours that like each other ----------
+  synHint(place, verb) {
+    const x = synergyAt(this.D, this.box.save, place);
+    return x && x.near ? () => `${verb} · ${synergyText(x)}` : verb;   // only with at least one partner next to it
+  }
+  drawSynergies() {
+    const s = this.scene, T = s.T, save = this.box.save, L = links(this.D, save);
+    if (!L.length) return;
+    const where = p => this.geo.mega ? this.megaBenchAt(p) : this.benches?.dockOf(`${p.ui}:${p.at}`);
+    const g = s.add.graphics().setDepth(-13.5);
+    this.rigObjs.push(g);
+    for (const { a, b } of L) {
+      const A = where(a), B = where(b);
+      if (!A || !B) continue;
+      const vert = Math.abs(A.x - B.x) < Math.abs(A.y - B.y), y = vert ? null : Math.min(A.y, B.y) - 0.6 * T;
+      const pts = vert ? [A, B] : [{ x: A.x, y }, { x: B.x, y }];
+      g.lineStyle(6, 0x0d0a12, 0.55).lineBetween(pts[0].x, pts[0].y, pts[1].x, pts[1].y);
+      g.lineStyle(2, 0x7ff6ff, 0.75).lineBetween(pts[0].x, pts[0].y, pts[1].x, pts[1].y);
+      for (const p of pts) g.fillStyle(0x7ff6ff, 0.9).fillCircle(p.x, p.y, 4);
+      const m = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
+      const glow = s.add.image(m.x, m.y, glowTexture(s)).setDisplaySize(70, 70).setTint(0x7ff6ff).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.35).setDepth(-13.4);
+      s.tweens.add({ targets: glow, alpha: 0.12, duration: 1100, yoyo: true, repeat: -1 });
+      this.rigObjs.push(glow);
     }
   }
 

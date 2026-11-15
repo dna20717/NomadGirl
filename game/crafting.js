@@ -7,6 +7,7 @@
 // Experimenting: ingredients go into the pot; a recipe of this kind of workshop with the same kinds of ingredients
 // (and enough of each, or exactly as many with "Genaue Mengen") is a hit, everything else is curious junk.
 // Time: recipes take minutes (Rezepte › Dauer), the clock jumps on (Ereignis-Zeit).
+import { speedOf } from './synergy.js';
 import { add, remove, count } from './inventory.js';
 import { containers, advance } from './save.js';
 import { canMaintain, maintain } from './tank.js';
@@ -91,7 +92,7 @@ export function craft(D, save, id, ws, x = {}) {
   if (missing(D, save, r).length) return { ok: false, reason: 'Es fehlen Zutaten' };
   { const need = {}, st = stock(D, save); for (const p of x.parts || []) need[p] = (need[p] || 0) + 1; for (const [p, k] of Object.entries(need)) if ((st[p] || 0) < k) return { ok: false, reason: `Teil fehlt: ${D.items?.[p]?.name || p}` }; }
   for (const i of r.ingredients || []) take(D, save, i.item, i.count || 1);
-  const n = r.count || 1, minutes = r.time ?? 10;
+  const n = r.count || 1, minutes = Math.round((r.time ?? 10) * (1 - Math.min(90, speedOf(D, save, ws)) / 100));   // #033 synergy: faster
   advance(save, minutes / 60);
   markMade(D, save, id);
   for (const p of x.parts || []) take(D, save, p, 1);   // the weapon parts go into the weapon
@@ -134,7 +135,7 @@ export function experiment(D, save, ws, pot, rnd = Math.random) {
   if (r) {
     const learnt = learn(save, r.id);
     for (const i of r.ingredients || []) take(D, save, i.item, i.count || 1);
-    const n = r.count || 1, minutes = r.time ?? 10;
+    const n = r.count || 1, minutes = Math.round((r.time ?? 10) * (1 - Math.min(90, speedOf(D, save, ws)) / 100));
     advance(save, minutes / 60);
     markMade(D, save, r.id);
     return { ok: true, hit: true, recipe: r.id, learnt, made: { ...resultOf(r), n }, left: produce(D, save, r, n), minutes };

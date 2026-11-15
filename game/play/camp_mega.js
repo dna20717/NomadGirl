@@ -75,10 +75,18 @@ export class CampMega {
       this.hotspots.push({ rig: true, x: bx, w: 90, name: `Ladebucht · ${D.tractors?.[bay.tractor]?.name || bay.tractor}`, hint: 'Ansehen', act: () => this.bayMenu() });
     }
   }
+  // the middle of a workshop aboard (for the synergy links)
+  megaBenchAt({ ui, at }) {
+    const T = this.scene.T, b = this.geo.mega.b, D = this.D, u = this.box.save.rig.units[ui];
+    const p = b.pieces.find(q => (q.type === 'container' || q.type === 'room') && q.module === ui - 1);
+    if (!p || !u) return null;
+    const n = D.containers?.[u.id]?.places || 1, cell = (p.w - 0.7) / n, w = u.workshops.find(x => x.at === at), k = D.workshops?.[w?.id]?.places || 1;
+    return { x: (p.x + 0.35 + (at + k / 2) * cell) * T, y: (p.floorRow - (p.h || 5) * 0.45) * T };
+  }
   megaSpot(ui, w, def, cx, cw, floor) {
     const store = def.grid && `store:${ui}:${w.at}`;
     this.hotspots.push({ rig: true, place: `${ui}:${w.at}`, x: cx + cw / 2, w: Math.max(40, cw / 2), floor, name: def.name || w.id,
-      hint: store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Benutzen', ws: w.id,
+      hint: this.synHint(`${ui}:${w.at}`, store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Benutzen'), ws: w.id,
       act: () => store ? this.scene.openContainer(store) : this.use(w.id, `${ui}:${w.at}`) });
   }
   bayMenu() {

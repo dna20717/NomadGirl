@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #033 fertig: 7 Werkstatt-Bilder, Heavy-Duty, Auftragsbüro, Waffenkammer mit Display-Boards, Synergien à la Dorfromantik. PixelLab 85, übrig 484.
 - 15.11. Code → Ava: #033 Werkstätten-Paket (7 Grafiken, Heavy-Duty, Auftragsraum, Waffenkammer mit Display-Boards, Synergie-Konzept) läuft.
 - 15.11. Code → Ava: #032 fertig: Container sauber gestapelt, Laufstege auf Stelzen, Fatbird-Träger über die ganze Länge. PixelLab 0.
 - 15.11. Code → Ava: #031 fertig: Container ohne Dachkante, Fatbird-Heck neu (PixelLab 10, übrig 569), Rotoren an Fachwerk-Auslegern.
@@ -548,11 +549,16 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `megarig_view.js` (Maßstab, Stelzen, `airshipTruss`, `clamp`). Tests: `npm test` 154, `megarig_test` 16, `mega_test` 7, `salvage_test` 7. PixelLab 0. **Bitte testen:** /megarig Crawler (Container-Stadt) und Fatbird.
 
 ### #033 Werkstätten mit Grafik, Heavy-Duty, Auftragsraum, echte Waffenkammer, Synergien
-- **Status:** läuft (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Für:** Code
-- **Auftrag:** Daniel: „Die vier, die du genannt hast (Kühlraum, Motorraum, Zelle, Reaktor) + Heavy Duty + Aufträge (schwarzes Brett als Werkbank, ähnlicher Raum). Wichtig ist die orthogonale Betrachtung. Dazu noch eine echte Waffenkammer mit Display-Boards analog zur Loot-Kammer. Dann ist die aktuelle Waffenkammer eher die Werkbank dazu. Parallel kannst du ein System ersinnen, wie man Synergien zwischen nebeneinander platzierten Werkbänken schaffen kann.“ PixelLab freigegeben (~75).
+- **Auftrag:** Daniel: „Die vier, die du genannt hast (Kühlraum, Motorraum, Zelle, Reaktor) + Heavy Duty + Aufträge (schwarzes Brett als Werkbank, ähnlicher Raum). Wichtig ist die orthogonale Betrachtung. Dazu noch eine echte Waffenkammer mit Display-Boards analog zur Loot-Kammer. Dann ist die aktuelle Waffenkammer eher die Werkbank dazu. Parallel kannst du ein System ersinnen, wie man Synergien zwischen nebeneinander platzierten Werkbänken schaffen kann.“ PixelLab freigegeben (~75). Nachtrag Daniel: Kühlraum „Perspektive etwas zu gewagt“ → neu (10). Synergien: „wie bei Civilization oder Dorfromantik: wenn in allen verfügbaren angrenzenden Slots passende Werkstätten sind, maximaler Bonus, sonst weniger“.
 - **Rückfragen:**
-- **Ergebnis:**
+  - Heavy-Duty → ⚠️ Funktion „Fahrzeuge“: stellt alle Rig-Teile her (zusätzlich zur Werkbank); Skilltrees später.
+  - Auftragsbüro (Name offen) → ⚠️ E öffnet das Schwarze Brett; Tausch fertiger Aufträge später.
+  - Alte Waffenkammer → ⚠️ heißt Waffenwerkbank (ID bleibt), bleibt Lager für Waffen und Teile; Waffen-Rezepte später.
+  - Neue Waffenkammer → ⚠️ ID `waffengalerie`, 3 Boards + Vitrine nehmen Waffen, Kiste für Waffenteile, Maßstab 78 %.
+  - Synergien → ⚠️ Nachbarn = links/rechts/darüber/darunter, über Containergrenzen; Rand zählt nicht dagegen; 13 Werkstätten mit Paaren; drei Wirkungen (schneller, Strom, Buff). Gegenpaare noch nicht.
+- **Ergebnis:** 7 Bilder (Kühlraum im zweiten Versuch), Werkstätten `heavy_duty`, `auftragsbuero`, `waffengalerie`, Ständer › Nimmt, `game/synergy.js` + Anbindung in Crafting, Garten, Budget, Schlafen/Ausruhen, Links im Camp. Tests: `npm test` 159 (5 neu), alle 35 Browser-Tests grün. PixelLab: diesmal 85, übrig 484. **Bitte testen:** neue Werkstätten im Bau-Modus kaufen und platzieren, Waffen an die Boards der Waffenkammer hängen, Auftragsbüro benutzen, Werkbank neben Generator stellen (Leuchtlinie, Hinweis „Synergie“), Kühlraum ansehen.
 
 ## Archiv
 

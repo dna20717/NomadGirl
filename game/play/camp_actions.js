@@ -1,6 +1,7 @@
 // What Leyla does in the camp (#017 split from camp.js): use a workshop, sleep, sit by the fire, the warroom, the van door, driving.
 // Mixed into Camp (game/play/camp.js): the methods keep their `this`, nothing else changes.
 import { owned, activeMega } from '../mega.js';
+import { synergyAt } from '../synergy.js';
 import { ensureMap, placeOf } from '../worldmap.js';
 import { rollEncounter, choose, blocked } from '../travel.js';
 import { potsOf, stage, ripe, harvest, STAGES, canWater, waterOf, water } from '../garden.js';
@@ -17,7 +18,7 @@ export class CampActions {
     if (this.noPower && def.power < 0 && def.function !== 'warroom' && def.function !== 'tank')
       return s.hud.menu({ title: def.name || id, sub: `Kein Strom: das Rig erzeugt ${this.budget.power.made} ⚡ und braucht ${this.budget.power.used} ⚡. Generator einbauen oder Verbraucher ausbauen (B: Rig umbauen).`,
         items: [{ label: 'Rig umbauen', primary: true, act: () => s.openBuild() }, { label: 'Zurück', act: () => {} }] });
-    if (def.function === 'sleep') return this.sleep(def);
+    if (def.function === 'sleep') return this.sleep(def, place);
     if (def.function === 'warroom') return this.warroom();
     if (def.function === 'jobs') return this.boardMenu();   // #033 the Auftragsbüro: the notice board as a room in the rig
     if (def.function === 'vehicle') { s.hud.inv?.close(); return s.hud.craft?.open(id); }   // #033 Heavy-Duty: vehicle recipes (skill trees later)
@@ -81,6 +82,11 @@ export class CampActions {
         s.drone?.react('happy');
       } }, { label: 'Zurück', act: () => {} }] });
   }
+  // #033 synergy „quality“: the buff of this bench gets stronger (save.buffQ, like a good dish)
+  synergyBuff(def, place) {
+    const x = place && synergyAt(this.D, this.box.save, place);
+    if (def.buff && x?.effect === 'quality' && x.bonus > 0) { const Q = (this.box.save.buffQ ??= {}); Q[def.buff] = Math.max(Q[def.buff] || 0, Math.round(x.bonus)); }
+  }
   // a workshop to spend time at (Werkstätten › Benutzen): Chill Area, Drohnenwerkstatt … time passes, heals, gives its buff;
   // AvA can fly over and dock on the bench while it happens
   restMenu(id, def, place, who) {
@@ -93,6 +99,7 @@ export class CampActions {
           advance(save, R.hours || 0);
           if (R.heal) save.health = Math.min(s.leyla.maxHealth, s.leyla.health + s.leyla.maxHealth * R.heal / 100);
           if (def.buff && !save.buffs.includes(def.buff)) save.buffs.push(def.buff);
+          this.synergyBuff(def, place);
           s.goCamp({ banner: [R.banner || def.name || id, clockText(save) + (buff ? ' · ' + buff : '')], fade: 700, keepPlace: true });
         };
         this.resting = place;   // the bench's "Bei Benutzung" effects run meanwhile
@@ -126,7 +133,7 @@ export class CampActions {
     const pocket = G.drone; if (pocket) out.push({ icon: 'armor', label: 'AvAs Rettungsfach', value: pocket.items.length ? `${pocket.items.length} gesichert` : 'leer', soft: true });
     return out;
   }
-    sleep(def) {
+    sleep(def, place = null) {
     const s = this.scene, box = this.box, save = box.save, C = this.C, max = s.leyla.maxHealth;
     const h = hoursUntil(save, C.clock?.wakeHour ?? 7);
     s.hud.menu({ title: def.name || 'Schlafen', sub: `Schlafen bis ${String(C.clock?.wakeHour ?? 7).padStart(2, '0')}:00 (${h} h). Heilt ${C.heal?.sleep ?? 100} %.${def.buff ? ` Danach: ${this.D.buffs?.[def.buff]?.name || def.buff} für den nächsten Run.` : ''}`,
@@ -134,6 +141,7 @@ export class CampActions {
         advance(save, h);
         save.health = Math.min(max, Math.max(save.health, s.leyla.health) + max * (C.heal?.sleep ?? 100) / 100);
         if (def.buff && !save.buffs.includes(def.buff)) save.buffs.push(def.buff);
+        this.synergyBuff(def, place);
         s.drone.react('sleep');
         s.achieveLater?.('sleeps');
         s.goCamp({ banner: ['Guten Morgen, Leyla', `${clockText(save)}${def.buff ? ' · ' + (this.D.buffs?.[def.buff]?.name || def.buff) : ''}`], fade: 900 });

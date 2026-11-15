@@ -13,6 +13,7 @@
 // energy: tractor "Lichtmaschine" + workshops with + minus workshops with − (below 0: workshops that need power do not work).
 import { containers as storeList, advance, ensureGrid } from './save.js';
 import { canResize } from './inventory.js';
+import { synergyPower } from './synergy.js';
 
 const clone = x => JSON.parse(JSON.stringify(x));
 export const B = D => D.build || {};
@@ -140,6 +141,7 @@ export function budgets(D, rig) {
   const weight = conts.reduce((n, u) => n + (D.containers?.[u.id]?.weight || 0), 0);
   let made = (T.power || 0) + solarPower(D, rig), used = 0;   // + solar panels (in the sun; at night from the battery, camp.js)
   for (const u of rig.units) for (const w of u.workshops) { const p = wsDef(D, w.id).power || 0; if (p > 0) made += p; else used -= p; }
+  made += synergyPower(D, rig);   // #033: generators and reactors in good company
   const fuel = Math.round(((T.fuelUse ?? 12) + P.fuelUse) * (1 + (Tr.weightFuelFactor ?? 0) / 100 * weight / 1000) * 10) / 10;
   const places = rig.units.reduce((n, u) => n + placesOf(D, u), 0), filled = rig.units.reduce((n, u) => n + u.workshops.reduce((k, w) => k + (wsDef(D, w.id).places || 1), 0), 0);
   return { weight, pull, heavy: weight > pull, armor: P.armor, damage: P.damage, length: ground.length, maxLength: T.length ?? 0, stack: Math.max(1, T.stack ?? 1), height: Math.max(1, ...conts.map(u => levelOf(u) + 1)), power: { made, used, net: made - used }, fuel, places, filled };

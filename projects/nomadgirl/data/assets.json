@@ -5455,5 +5455,14 @@
   "source": "KI (PixelLab, Create Image Pro, Referenz Hydrokultur + Ripperdoc bzw. Halle der Beute, Palette AAP-64, streng frontal)",
   "date": "15.11.2026",
   "description": "#033: Waffenkammer: Raum wie die Halle der Beute, drei leere Display-Boards mit Neonrahmen, Vitrine, Spot, Neon ARMORY. Original in source/."
+ },
+ "ws_cold_room": {
+  "name": "Werkstatt · Kühlraum",
+  "kind": "image",
+  "file": "assets/workshops/cold_room.png",
+  "origin": [128, 230],
+  "source": "KI (PixelLab, Create Image Pro, Referenz Motorraum + Zelle, Palette AAP-64, streng frontal)",
+  "date": "15.11.2026",
+  "description": "#033, zweiter Versuch (Daniel: erster „Perspektive etwas zu gewagt“): Kühlregale, Fleischhaken, Frostrohre, Thermostat-Tafel, Lüfter, alles flach von vorn. Erster Versuch: source/cold_room_rejected.png."
  }
 }
