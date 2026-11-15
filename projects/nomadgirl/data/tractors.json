@@ -30,5 +30,40 @@
   "storage": [6, 3],
   "storageName": "Staukasten",
   "look": "truck"
+ },
+ "crawler": {
+  "name": "Crawler",
+  "pull": 200000,
+  "fuelUse": 120,
+  "tank": 1500,
+  "length": 0,
+  "stack": 1,
+  "slots": {"engine": 1, "armor": 3, "weapon": 3, "roof": 0},
+  "value": 40000,
+  "description": "Armadillo Heavy Industries. Langsam, durstig, unaufhaltsam: eine rollende Stadt mit Ladebucht für das alte Rig.",
+  "power": 10,
+  "speed": 45,
+  "places": 3,
+  "storage": [8, 4],
+  "storageName": "Ladebucht-Spind",
+  "megarig": "crawler"
+ },
+ "fatbird": {
+  "name": "Fatbird",
+  "pull": 60000,
+  "fuelUse": 60,
+  "tank": 800,
+  "length": 0,
+  "stack": 1,
+  "slots": {"engine": 1, "armor": 1, "weapon": 2, "roof": 0},
+  "value": 40000,
+  "description": "Schwebt, wohin er will: schnell und Luftlinie, aber voll ist voll.",
+  "power": 8,
+  "speed": 250,
+  "air": true,
+  "places": 2,
+  "storage": [6, 4],
+  "storageName": "Frachtspind",
+  "megarig": "fatbird"
  }
 }

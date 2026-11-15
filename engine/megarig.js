@@ -16,8 +16,10 @@ export const ADDON_WALK = [['', 'nur Deko'], ['platform', 'Oberseite begehbar'],
 const num = (v, d) => (Number.isFinite(Number(v)) && v !== '' && v !== null && v !== undefined ? Number(v) : d);
 
 // → { W, H, G, rows, layout, start, x0, len, places, stage, pieces, problems }
-export function buildMegarig(data, id, stageIndex = null) {
-  const V = data?.megarigs?.[id];
+// opts (#029, the player's own mega rig): modules / addons / lights instead of the vehicle's examples, margin = empty tiles left and right
+export function buildMegarig(data, id, stageIndex = null, opts = {}) {
+  const V0 = data?.megarigs?.[id];
+  const V = V0 && { ...V0, modules: opts.modules ?? V0.modules, addons: opts.addons ?? V0.addons, lights: opts.lights ?? V0.lights };
   if (!V) return null;
   const problems = [];
   const P = num(V.grid?.place, 7), S = num(V.grid?.story, 6), H0 = V.hull || {};
@@ -28,7 +30,7 @@ export function buildMegarig(data, id, stageIndex = null) {
   const front = num(H0.front, 8), back = num(H0.back, 3), places = mids * segPlaces, len = front + places * P + back;
   const top = Math.max(0, num(stage.top, 1)), stories = inside + top;
   const envelope = kind === 'airship' ? num(H0.envelope, 9) : 0;
-  const margin = 16, sky = 8, groundRows = 3;
+  const margin = num(opts.margin, 16), sky = num(opts.sky, 8), groundRows = 3;
   const W = margin * 2 + len, contentH = under + stories * S + envelope + (kind === 'crawler' ? 6 : 0);
   const H = sky + contentH + groundRows, G = H - groundRows, x0 = margin;
   const tiles = Array.from({ length: H }, (_, y) => Array.from({ length: W }, () => (y >= G ? '#' : '.')));

@@ -30,7 +30,11 @@
   "grid": {"place": 7, "story": 6},
   "hull": {"under": 6, "inside": 2, "front": 24, "back": 6, "segPlaces": 2, "bridge": "Kommandobrücke", "cabInset": 8},
   "paint": {"main": "#f9a31b", "dark": "#403353", "trim": "#bb7547", "neon": "#20d6c7", "light": "#df3e23"},
-  "stages": [{"name": "Rohbau", "mids": 3, "top": 1},{"name": "Siedlung", "mids": 4, "top": 2},{"name": "Container-Stadt", "mids": 5, "top": 3}],
+  "stages": [
+   {"name": "Rohbau", "mids": 3, "top": 1, "price": 0, "hours": 0},
+   {"name": "Siedlung", "mids": 4, "top": 2, "price": 6000, "hours": 12},
+   {"name": "Container-Stadt", "mids": 5, "top": 3, "price": 14000, "hours": 24}
+  ],
   "modules": [
    {"container": "container_20", "place": 0, "story": 0, "from": 0, "name": "Maschinenraum", "workshops": ["generator", "werkbank"]},
    {"container": "container_10", "place": 3, "story": 0, "from": 0, "name": "Lager", "workshops": ["lagerregal"]},
@@ -93,7 +97,8 @@
    {"from": 19, "fromCorner": "1", "to": 20, "toCorner": "0"},
    {"from": 13, "fromCorner": "0", "to": 18, "toCorner": "0"},
    {"from": 17, "fromCorner": "1", "to": 20, "toCorner": "1"}
-  ]
+  ],
+  "tractor": "crawler"
  },
  "fatbird": {
   "name": "Fatbird",
@@ -102,7 +107,11 @@
   "grid": {"place": 7, "story": 6},
   "hull": {"under": 6, "inside": 3, "frame": 1, "front": 16, "back": 9, "segPlaces": 2, "envelope": 13},
   "paint": {"main": "#f9a31b", "dark": "#333941", "trim": "#8e5252", "neon": "#249fde", "light": "#df3e23"},
-  "stages": [{"name": "Rohbau", "mids": 4, "top": 0},{"name": "Halb voll", "mids": 4, "top": 0},{"name": "Voll", "mids": 4, "top": 0}],
+  "stages": [
+   {"name": "Rohbau", "mids": 4, "top": 0, "price": 0, "hours": 0},
+   {"name": "Halb voll", "mids": 4, "top": 0, "price": 0, "hours": 0},
+   {"name": "Voll", "mids": 4, "top": 0, "price": 0, "hours": 0}
+  ],
   "modules": [
    {"container": "container_20", "place": 0, "story": 0, "from": 0, "shell": true},
    {"container": "container_20", "place": 2, "story": 0, "from": 1, "shell": true},
@@ -125,6 +134,7 @@
    {"addon": "neon", "place": 3, "story": 2, "from": 1, "at": "wall", "text": "FATBIRD", "color": "#249fde", "shift": 3},
    {"addon": "schuessel", "place": 6, "story": 3, "from": 2}
   ],
-  "skin": {"bow": "megarig_fatbird_nose", "mid": "megarig_fatbird_mid", "stern": "megarig_fatbird_tail", "rotor": "megarig_fatbird_rotor", "scale": 6}
+  "skin": {"bow": "megarig_fatbird_nose", "mid": "megarig_fatbird_mid", "stern": "megarig_fatbird_tail", "rotor": "megarig_fatbird_rotor", "scale": 6},
+  "tractor": "fatbird"
  }
 }

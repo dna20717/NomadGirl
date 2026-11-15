@@ -10,6 +10,7 @@
 
 import { keepThrough } from './achievements.js';
 import { ensureMap } from './worldmap.js';
+import { settle as settleMega, fixLights as fixMegaLights } from './mega.js';
 import { ensureTank } from './tank.js';
 import { newGrid, add, fits, startWear, wearOf, WEAR_KEYS, addEntry, untangle } from './inventory.js';
 
@@ -273,6 +274,9 @@ export function repairSave(save, D) {
   s.rig.units.forEach((u, i) => { const prev = s.rig.units[i - 1]; if (!u.level) { delete u.slot; return; } const max = !prev || prev.kind === 'tractor' ? 0 : (prev.level || 0) + 1; if (u.level > max) u.level = max; if (!u.level) { delete u.level; delete u.slot; } });   // a slot only counts on a stack
   const sp = s.rig.spare || {};
   s.rig.spare = { workshops: (sp.workshops || []).filter(w => D.workshops?.[w]), containers: (sp.containers || []).filter(c => D.containers?.[c]), parts: (sp.parts || []).filter(c => D.rigParts?.[c]) };
+  // a mega rig (#029): every container on a free cell of its grid, the rest into the Lager; strings only between units that are there
+  if (s.mega?.active && D.megarigs?.[s.mega.active] && D.tractors?.[s.rig.tractor]?.megarig) { settleMega(D, s); fixMegaLights(s); }
+  else if (s.mega?.active) s.mega.active = null;
   // rig parts were things in the inventory for a morning (08.11.2026): they move onto the scrapyard
   for (const g of Object.values(save.inv?.grids || {})) for (const e of [...(g.items || [])]) if (e.a === 'rigParts') { g.items.splice(g.items.indexOf(e), 1); if (D.rigParts?.[e.id]) for (let k = 0; k < (e.n || 1); k++) s.rig.spare.parts.push(e.id); }
   s.rig.parts = Object.fromEntries(Object.entries(s.rig.parts || {}).map(([k, l]) => [k, (l || []).map(id => D.rigParts?.[id]?.slot === k ? id : null)]));
