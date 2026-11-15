@@ -482,6 +482,10 @@ export class MegarigView {
     const o = s.add.image(x, y, open, 0).setOrigin(cxImg / frameW, BOX.bottom / 256).setScale(k).setDepth(depth);
     const c = closed && s.textures.exists(closed) ? s.add.image(x, y, closed, 0).setOrigin(cxImg / frameW, BOX.bottom / 256).setScale(k).setDepth(depth + 0.005) : null;
     if (p.color) { o.setTint(col(p.color)); c?.setTint(col(p.color)); }
+    // #031 (Daniel: „die räumliche Kante der Container in der obersten Reihe ausblenden, damit die Perspektive einheitlich ist“):
+    // the pictures show a strip of the roof from above; aboard everything is strict side view, so the picture starts at the top rail
+    const cut = BOX.roof - (Cn.roofCut ?? 0), fh = s.textures.get(open).frames[0]?.height || 256;
+    for (const im of [o, c]) im?.setCrop(0, cut, frameW, fh - cut);
     this.containers.push({ open: o, closed: c, x0: p.x * T, x1: (p.x + p.w) * T, y0: (p.y - 1) * T, y1: (p.floorRow + 1) * T });
     // #028: workshops inside (seen when it is open), docking points for string lights on the upper corners of the box
     const ins = Cn.inside?.y || [90, 175], roofY = y - (BOX.bottom - BOX.roof) * k;
