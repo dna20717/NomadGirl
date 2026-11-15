@@ -16,7 +16,7 @@ import { offers, accept, claim, progressOf, qstate } from '../quests.js';
 import { Benches, benchTexture, crateTexture } from './benches.js';
 import { wreckHere } from './camp_salvage.js';
 import { campMegaLayout } from './camp_mega.js';
-import { activeMega } from '../mega.js';
+import { activeMega, flies, travelSpeed } from '../mega.js';
 
 export const de = n => Number(n).toLocaleString('de-DE', { maximumFractionDigits: 1 });
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
@@ -1091,7 +1091,8 @@ export function costLine(D, o) {
 // way by road through known places (worldmap.js route), the legs summed up → { km, hours, fuel, food, route: [ids], legs: [...] }
 export function travelCost(D, save, to) {
   const from = save.location, M = save.map, reveal = mapConfig(D).reveal, hop = M ? hops(M, from) : {};
-  const way = (M && route(D, M, from, to, id => M.visited?.includes(id) || (hop[id] ?? 99) <= reveal)) || [from, to];
+  // #029: the fatbird flies straight over the map, without roads (one leg)
+  const way = flies(D, save.rig.tractor) ? [from, to] : (M && route(D, M, from, to, id => M.visited?.includes(id) || (hop[id] ?? 99) <= reveal)) || [from, to];
   const legs = way.slice(1).map((id, i) => legCost(D, save, way[i], id));
   const sum = k => Math.round(legs.reduce((n, l) => n + l[k], 0) * 100) / 100;
   return { km: sum('km'), hours: sum('hours'), fuel: Math.round(sum('fuel') * 10) / 10, food: Math.round(sum('food') * 10) / 10, route: way, legs };
@@ -1099,10 +1100,10 @@ export function travelCost(D, save, to) {
 // one leg of the way (one road)
 export function legCost(D, save, fromId, to) {
   const a = placeOf(D, save, fromId), b = placeOf(D, save, to), Tr = D.travel || {};
-  const km = a && b ? roadKm(D, a, b) : 0;   // along the road on the map (#007)
+  const air = flies(D, save.rig.tractor), km = a && b ? (air ? Math.round(roadKm(D, a, b) / (1 + (mapConfig(D).detour ?? 0) / 100)) : roadKm(D, a, b)) : 0;   // along the road on the map (#007), flying: straight (#029)
   const tons = save.rig.units.filter(u => u.kind === 'container').reduce((n, u) => n + (D.containers?.[u.id]?.weight || 0), 0) / 1000;
   const fuelUse = D.tractors?.[save.rig.tractor]?.fuelUse ?? 12;
-  const hours = Math.max(0.25, Math.round(km / (Tr.speed || 40) * 4) / 4);
+  const hours = Math.max(0.25, Math.round(km / ((Tr.speed || 40) * travelSpeed(D, save.rig.tractor)) * 4) / 4);   // #029: the crawler crawls, the fatbird races
   const fuel = Math.round(km * fuelUse / 100 * (1 + (Tr.weightFuelFactor ?? 0) / 100 * tons) * 10) / 10;
   const food = Math.round(hours / (Tr.dayLength || 24) * (Tr.foodPerDay ?? 1) * (1 + (save.companions?.length || 0)) * 10) / 10;
   return { from: fromId, to, km, hours, fuel, food };

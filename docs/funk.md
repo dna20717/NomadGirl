@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #029 fertig: Mega-Rigs fahren (Umzug mit Ladebucht, Camp an Bord, Bauplan aufs Raster, Budgets, Reisen; Crawler + Fatbird, ohne Crew). Offen: gesperrte Straßen + Ausflüge aus der Ladebucht, Fatbird-Cockpit, Camp an Deck/am Seil.
 - 15.11. Code → Ava: #029 Mega-Rigs fahren (Crawler + Fatbird: Camp an Bord, Bau-Modus aufs Raster, Budgets, Reisen; Rig in der Ladebucht, ohne Crew) läuft.
 - 15.11. Code → Ava: #028 fertig: Test-Crawler mit Werkstätten in Räumen/Containern und 11 Lichterketten (Geschmackstest, Daten in Mega-Rigs). PixelLab 0.
 - 15.11. Code → Ava: #027 fertig: Mega-Rigs aufgeräumt (EPX-Grafik, Spanten/Träger, Laufwege, Leitern, LKW mit Container-Anhängern). PixelLab 0, übrig 589. Nächster Step laut Daniel: Favela-Container-Städte.
@@ -507,13 +508,20 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `benchesIn`, `stringLights`, Wandteile mit der Haut in `megarig_view.js`; Felder in Schema; Crawler mit 15 eingerichteten Modulen und 11 Lichterketten. Tests: `npm test` 145, `megarig_test` 16, `salvage_test` 7, `workshop_test` grün. PixelLab 0. **Bitte testen:** /megarig › Crawler › Container-Stadt, über die Dächer laufen (Lichterketten), in Container und Rumpf-Räume gehen.
 
 ### #029 Mega-Rigs fahren: Camp an Bord, Bau-Modus aufs Raster, Budgets, Reisen (Crawler + Fatbird)
-- **Status:** läuft (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, Multiple Choice)
+- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, Multiple Choice)
 - **Für:** Code
 - **Lesen:** design.md › Endgame-Zugmaschinen; docs/features/megarigs.md, rig.md, camp.md
 - **Auftrag:** Daniel: Mega-Rigs fahren. Entscheidungen: altes Rig fährt in die **Ladebucht** (Werkstätten ziehen in den Crawler um, Van/LKW für Orte, an die der Crawler nicht hinkommt); erster Schritt mit **Camp an Bord, Bau-Modus aufs Raster, Budgets, Reisen**; **Crawler und Fatbird zusammen**; **Crew erstmal ohne**.
 - **Plan:** 1) Logik `game/mega.js` (Umzug, Rasterpositionen, Budgets, Ausbaustufen), 2) Camp an Bord, 3) Bau-Modus aufs Raster, 4) Reisen.
 - **Rückfragen:**
-- **Ergebnis:**
+  - Datenmodell → ⚠️ `save.rig` bleibt die Wahrheit; Container bekommen eine Rasterposition, das Mega-Rig ist die Zugmaschine. So laufen Werkstätten, Lager, Strom, Gewicht ohne Umbau weiter.
+  - Bau-Modus → ⚠️ als **Bauplan** (Fenster mit dem Raster) statt Ziehen in der Welt; die Welt baut sich beim Schließen neu auf. Bauen direkt in der Welt kann später kommen.
+  - Lager des Camps → ⚠️ der Lagerplatz (Feuer, Kiste, Brett, Companions) bleibt am Boden neben dem Fahrzeug; Feuer an Deck bzw. Camp am Seil später.
+  - Fatbird-Cockpit → ⚠️ noch kein begehbarer Raum: die Karte liegt am Boden unter der Nase, seine zwei Bordplätze erreicht man über die Karten-Kopfzeile.
+  - „Kommt nicht überall hin“ → ⚠️ noch nicht: der Crawler ist erst einmal nur langsam und durstig. Gesperrte Straßen + Ausflüge mit dem Rig aus der Ladebucht als nächster Schritt.
+  - Werte → ⚠️ Crawler 200 t Zug, 120 l/100 km, Tempo 45 %, 3 Brückenplätze; Fatbird 60 t, 60 l, 250 %, fliegt; Ausbau Crawler 6.000 Δ/12 h und 14.000 Δ/24 h.
+  - Umzug zwischen Crawler und Fatbird → ⚠️ geht über die Karte, die Container stellen sich neu auf (was nicht passt, ins Lager).
+- **Ergebnis:** `game/mega.js`, `game/play/camp_mega.js`, `game/play/mega_build.js`; Zugmaschinen Crawler + Fatbird, Felder Tempo/Fliegt/Mega-Rig, Ausbaustufen mit Preis und Dauer; `buildMegarig` mit eigenen Modulen. Tests: `npm test` 154 (9 neu in `test/mega.test.js`), alle 35 Browser-Tests grün (neu `mega_test` 7), `web:test` grün, `ng check` stimmig. PixelLab 0. **Bitte testen:** Spielstand mit geborgenem Crawler (oder im Menü schummeln: Konsole `save.megarigs=['crawler','fatbird']`), Karte › „Umziehen: Crawler“, an Bord herumklettern, Werkstätten benutzen, B = Bauplan, Container kaufen und stapeln, Werkstätten einräumen, Lichterketten, Ausbau kaufen; reisen; Ladebucht › zurück ins Rig.
 
 ## Archiv
 
