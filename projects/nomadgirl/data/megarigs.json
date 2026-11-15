@@ -28,7 +28,7 @@
   "kind": "crawler",
   "description": "Der Riesenpanzer von Armadillo Heavy Industries auf zwei Kettenfahrwerken: Kommandobrücke so groß wie ein 40-Fuß-Container, zwei Etagen Räume im Rumpf, darauf die Container-Stadt, die mit dem Ausbau wächst (#024: größer, länger statt höher).",
   "grid": {"place": 7, "story": 6},
-  "hull": {"under": 6, "inside": 2, "front": 24, "back": 6, "segPlaces": 2, "bridge": "Kommandobrücke"},
+  "hull": {"under": 6, "inside": 2, "front": 24, "back": 6, "segPlaces": 2, "bridge": "Kommandobrücke", "cabInset": 8},
   "paint": {"main": "#f9a31b", "dark": "#403353", "trim": "#bb7547", "neon": "#20d6c7", "light": "#df3e23"},
   "stages": [{"name": "Rohbau", "mids": 3, "top": 1},{"name": "Siedlung", "mids": 4, "top": 2},{"name": "Container-Stadt", "mids": 5, "top": 3}],
   "modules": [
@@ -71,7 +71,16 @@
    {"addon": "generator", "place": 5, "story": 5, "from": 2},
    {"addon": "auspuff_lang", "place": 0, "story": 2, "from": 0, "at": "wall", "shift": -3}
   ],
-  "brand": "Armadillo Heavy Industries"
+  "brand": "Armadillo Heavy Industries",
+  "skin": {
+   "bow": "megarig_crawler_bow",
+   "mid": "megarig_crawler_mid",
+   "stern": "megarig_crawler_stern",
+   "track": "megarig_crawler_track",
+   "trackRepeat": [111, 155],
+   "scale": 4,
+   "sternScale": 1.75
+  }
  },
  "fatbird": {
   "name": "Fatbird",
@@ -102,6 +111,7 @@
    {"addon": "positionslicht", "place": 7, "story": 3, "from": 0},
    {"addon": "neon", "place": 3, "story": 2, "from": 1, "at": "wall", "text": "FATBIRD", "color": "#249fde", "shift": 3},
    {"addon": "schuessel", "place": 6, "story": 3, "from": 2}
-  ]
+  ],
+  "skin": {"bow": "megarig_fatbird_nose", "mid": "megarig_fatbird_mid", "stern": "megarig_fatbird_tail", "rotor": "megarig_fatbird_rotor", "scale": 6}
  }
 }

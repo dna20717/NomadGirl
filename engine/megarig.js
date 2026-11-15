@@ -56,7 +56,8 @@ export function buildMegarig(data, id, stageIndex = null) {
     // cab: bridge room one story above the deck, open to walk through
     const cabTop = hullTop + S;
     fill(x0 + 2, rowOf(hullTop) + 1, front - 2, inside * S - 1, '#');   // cab block below the deck
-    fill(x0 + 2, rowOf(cabTop), front - 3, 1, '=');   // cab roof
+    const inset = Math.max(2, num(H0.cabInset, 2));   // #026: the roof starts behind the sloped nose of the picture
+    fill(x0 + inset, rowOf(cabTop), front - inset - 1, 1, '=');   // cab roof
     ladder(x0 + front - 2, rowOf(cabTop), slab(inside) - 1);
     // the bridge (#024, Daniel: „Fahrerkabine alleine sollte Platz für mindestens einen großen Container haben“): a room behind the nose
     pieces.push({ type: 'bridge', x: x0 + 5, w: front - 7, y: rowOf(cabTop) + 1, floorRow: slab(inside), name: H0.bridge || 'Kommandobrücke' });

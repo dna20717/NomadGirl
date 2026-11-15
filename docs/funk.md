@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #026 fertig: Crawler und Fatbird aus PixelLab-Kachel-Sets (85 Generierungen, übrig 589), Räume als Schnittzeichnung, Gashülle als Pixel-Art aus Code.
 - 15.11. Code → Ava: #026 Kachel-Sets für Crawler und Fatbird läuft (PixelLab max. 100, von Daniel freigegeben).
 - 15.11. Code → Ava: #025 fertig: Schwarzes Brett am Van, Dialog-Kasten ohne Porträts, Quest-Zettel über den Köpfen, Armadillo Heavy Industries am Crawler, Gangs englisch. PixelLab 0, übrig 674. Idee für später: Werkbank „Aufträge gegen bessere Belohnungen“ (Name offen).
 - 15.11. Code → Ava: Daniel hat die ⚠️ aus #016–#024 abgesegnet (Tickets `abgenommen`). Änderungen in **#025** (läuft): Schwarzes Brett am Van, schönere Dialoge ohne Porträts, Quest-Marken aus der Spielwelt, Armadillo als Marke, Gangs englisch.
@@ -467,13 +468,17 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `game/play/camp_board.js` (Brett, Zettel, `talkOf`), Dialog- und Brett-Variante von `hud.menu` (`talk`, `board`), neue Felder Camp › Schwarzes Brett, Spiel › Dialog-Tempo, Companions › Porträt, Mega-Rigs › Hersteller. Tests: `npm test` 145, alle 34 Browser-Tests grün (`camp_test` 33 mit neuer Brett-Prüfung), `web:test` grün, `ng check` stimmig. PixelLab: 0, übrig 674. **Bitte testen:** Camp, E am Brett (Zettel durchblättern mit Pfeilen/Steuerkreuz, annehmen, später abgeben), mit Schraube und Onkel Sung reden (neuer Dialog), Zettel über den Köpfen; /megarig Crawler (Schriftzug am Bug); Mile 7 betreten (Banner „Revier: Yellow Vultures“).
 
 ### #026 Kachel-Sets für Crawler und Fatbird (PixelLab, max. 100)
-- **Status:** läuft (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Für:** Code
 - **Lesen:** design.md › Mega-Rigs aus Kachel-Sets, Konzeptbilder; docs/features/megarigs.md
 - **Auftrag:** Daniel: „Bitte nutze max 100 Generierungen auf Tilesets für die Mega-Rigs. Wichtig ist, dass sie wirklich cool aussehen (orthogonal!), das ist die maximale Belohnung für den Spieler. Aber versuche auch, das so ökonomisch wie möglich zu machen. Wichtig ist auch, dass die Dinger trotz des Gameplays nicht aussehen wie Boxen. Orientiere dich an den Konzept-Grafiken für die Kontur.“
 - **Fertig, wenn:** Crawler und Fatbird aus PixelLab-Bausteinen (Bug, wiederholbare Mittelstücke, Heck, Fahrwerk/Rotoren), streng von der Seite, AAP-64, Kontur wie im Konzept, alle Stufen wachsen nahtlos, Leyla kommt überall hin, Tests grün, ≤ 100 Generierungen.
 - **Rückfragen:**
-- **Ergebnis:**
+  - Räume vs. Außenhaut → ⚠️ Schnittzeichnung: Haut geschlossen, über jedem Raum blendet sie aus, wenn Leyla drin ist (Raum öffnet sich nur von innen).
+  - Gashülle → ⚠️ aus Code als Pixel-Art statt PixelLab (Budget, und das Konzept zeigt keine Hülle).
+  - Pixelgröße → ⚠️ Teile leicht unterschiedlich groß skaliert (Bug ≈ 5,9, Mitte 4, Heck 7), damit Kontur und Raster passen; scharf skaliert.
+  - Kabinendach → ⚠️ beginnt hinter der schrägen Nase (`hull.cabInset` 8), Laufsteg über dem schrägen Heck.
+- **Ergebnis:** 8 Teile in `assets/vehicles/megarig/` (+ `source/`), Bereich Mega-Rigs › Kachel-Set, `crawlerSkin`/`airshipSkin`/`envelopePixels`/`cover` in `megarig_view.js`, `tools/megarig_tiles.py`. Tests: `npm test` 145, alle 34 Browser-Tests grün (`megarig_test` 14, `salvage_test` 7), `ng check` stimmig. PixelLab: diesmal 85, übrig 589 (unter 700). **Bitte testen:** /megarig Crawler und Fatbird in allen Stufen, „Übersicht“, in die Kommandobrücke und die Rumpf-Räume klettern (Haut blendet aus), am Heck aufs Deck; im Camp das Crawler-Wrack.
 
 ## Archiv
 

@@ -19,6 +19,7 @@ export class MegarigView {
     this.containers = [];
     this.glows = [];
     const D = scene.data_, V = D.megarigs?.[opts.id ?? scene.args.megarig?.id] || {};
+    this.V = V; this.id = opts.id ?? scene.args.megarig?.id ?? 'rig';
     this.paint = { main: C.yellow, dark: C.violet, trim: C.copper, neon: C.cyan, light: C.red, ...(V.paint || {}) };
     this.g = scene.add.graphics().setDepth(-6);       // hull, back layer
     this.gm = scene.add.graphics().setDepth(-4.5);    // rooms
@@ -35,7 +36,11 @@ export class MegarigView {
       else if (p.type === 'bridge') this.bridge(p);
     }
     for (const p of build.pieces) if (p.type === 'addon') this.addon(p);
-    if (V.brand && this.brandAt) this.stencil(V.brand, ...this.brandAt);
+    if (V.brand && this.brandAt) {
+      const st = this.stencil(V.brand, ...this.brandAt);
+      const c = this.containers.find(c => c.inside && st.x > c.x0 && st.x < c.x1 && st.y > c.y0 && st.y < c.y1);
+      if (c) { st.setDepth(-4.3); c.extra.push(st); }   // painted on the skin over the bridge: fades with it
+    }
   }
 
   // ---------- helpers ----------
@@ -78,6 +83,151 @@ export class MegarigView {
     return name;
   }
 
+  // ---------- tile sets (#026) ----------
+  // The raw vehicle as one continuous skin of PixelLab pieces (bow, repeated middle pieces, stern) painted into a canvas at picture
+  // resolution; rooms inside the hull lie behind it and a piece of the skin over each room fades when Leyla is inside (cover()).
+  skinOk(...keys) { return keys.every(k => k && this.s.textures.exists(k)); }
+  src(k) { return this.s.textures.get(k).getSourceImage(); }
+  skinCanvas(gx, gy, gw, gh, A) {
+    const s = this.s, key = `mr_skin_${this.id}_${this.b.pieces[0].stage}`;
+    if (s.textures.exists(key)) s.textures.remove(key);
+    const t = s.textures.createCanvas(key, Math.ceil(gw / A), Math.ceil(gh / A)), ctx = t.getContext();
+    ctx.imageSmoothingEnabled = false;
+    this.skin = { key, t, ctx, gx, gy, A };
+    return ctx;
+  }
+  // a picture into the skin: game position of its top-left corner, game px per picture px, flipped, only the first `cut` picture px
+  put(k, x, y, sc, flip = false, cut = null) {
+    const S = this.skin, im = this.src(k), w = Math.min(im.width, cut ?? im.width), k2 = sc / S.A, dx = (x - S.gx) / S.A, dy = (y - S.gy) / S.A;
+    const c = S.ctx;
+    c.save();
+    if (flip) { c.translate(dx + w * k2, dy); c.scale(-1, 1); c.drawImage(im, 0, 0, w, im.height, 0, 0, w * k2, im.height * k2); }
+    else c.drawImage(im, 0, 0, w, im.height, dx, dy, w * k2, im.height * k2);
+    c.restore();
+  }
+  finishSkin(depth = -6) {
+    const S = this.skin;
+    S.t.refresh(); S.t.setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.s.add.image(S.gx, S.gy, S.key).setOrigin(0).setScale(S.A).setDepth(depth);
+  }
+  // the skin over a room: closed until Leyla climbs in (update())
+  cover(x, y, w, h) {
+    const S = this.skin;
+    if (!S) return;
+    const im = this.s.add.image(S.gx, S.gy, S.key).setOrigin(0).setScale(S.A).setCrop((x - S.gx) / S.A, (y - S.gy) / S.A, w / S.A, h / S.A).setDepth(-4.4);
+    this.containers.push({ open: null, closed: im, x0: x, x1: x + w, y0: y, y1: y + h, inside: true, extra: [] });
+  }
+  // a long picture stretched by repeating its middle [r0, r1] (the track: one road wheel), as its own texture, picture px
+  stretched(k, artW, r0, r1) {
+    const s = this.s, im = this.src(k), key = `mr_str_${k}_${artW}`;
+    if (!s.textures.exists(key)) {
+      const t = s.textures.createCanvas(key, artW, im.height), c = t.getContext(), tail = im.width - r1;
+      c.imageSmoothingEnabled = false;
+      c.drawImage(im, 0, 0, r0, im.height, 0, 0, r0, im.height);
+      for (let x = r0; x < artW - tail; x += r1 - r0) c.drawImage(im, r0, 0, r1 - r0, im.height, x, 0, r1 - r0, im.height);
+      c.drawImage(im, r1, 0, tail, im.height, artW - tail, 0, tail, im.height);
+      t.refresh(); t.setFilter(Phaser.Textures.FilterMode.NEAREST);
+    }
+    return key;
+  }
+  crawlerSkin(h) {
+    const V = this.V.skin || {}, A = V.scale || 4;
+    if (!this.skinOk(V.bow, V.mid, V.stern, V.track)) return false;
+    const T = this.T, s = this.s, b = this.b, ground = b.G * T, x0 = b.x0 * T, len = h.len * T, P = this.paint;
+    const bottom = (b.G - h.under) * T, top = (b.G - h.hullTop) * T, front = h.front * T, back = h.back * T, cabTop = top - h.S * T;
+    const bow = this.src(V.bow), mid = this.src(V.mid), st = this.src(V.stern), tr = this.src(V.track);
+    // bow: the cab roof of the picture (31 px down) on the cab roof, its foot one tile into the tracks; right edge 2 tiles into the middle
+    const roof = 31, foot = bow.height - 10, bk = (bottom + T - cabTop) / (foot - roof);
+    const bw = bow.width * bk, bx = x0 + front + 2 * T - bw, by = cabTop - roof * bk;
+    // stern: its body (14 px down) level with the deck, a bit bigger than the middle pieces
+    const sk = (V.sternScale || 1.75) * A, sw = st.width * sk, sx = x0 + len + 1.5 * T - sw, sy = top - 14 * sk;
+    const gx = Math.min(bx, x0) - T, gy = Math.min(by, sy) - T;
+    this.skinCanvas(gx, gy, x0 + len + 3 * T - gx, ground - gy, A);
+    const end = x0 + len - back;
+    for (let x = x0 + front - T; x < end; x += mid.width * A) this.put(V.mid, x, top, A, false, Math.ceil((end - x) / A));
+    this.put(V.stern, sx, sy, sk);
+    this.put(V.bow, bx, by, bk);
+    // under the hull between the track units: the bogie, from code
+    this.r(this.g, x0 + 3 * T, bottom, len - 6 * T, h.under * T * 0.55, C.night);
+    for (let i = x0 + 4 * T; i < x0 + len - 4 * T; i += 3 * T) this.r(this.g, i, bottom + 2 * PX, 2 * T, 6 * PX, C.violet);
+    this.finishSkin(-6);
+    // two track units, the middle of the picture repeated to their length
+    const [r0, r1] = V.trackRepeat || [Math.round(tr.width * 0.35), Math.round(tr.width * 0.5)];
+    const tk = h.under * T / tr.height, uw = len * 0.42, key = this.stretched(V.track, Math.round(uw / tk), r0, r1);
+    for (const ux of [x0 + T, x0 + len - uw - T]) s.add.image(ux, ground, key).setOrigin(0, 1).setScale(tk).setDepth(-5.9);
+    // lights, the deck railing, a catwalk over the sloped stern (the deck walks on to the end)
+    this.glow(bx + 26 * bk, by + 147 * bk, 200, 110, C.gold, 0.5);
+    this.glow(sx + sw - 6 * sk, sy + 62 * sk, 90, 60, P.light, 0.55);
+    this.r(this.gf, x0 + front, top - 0.7 * T, end - x0 - front, PX, C.steel);
+    for (let i = x0 + front; i < end; i += T) this.r(this.gf, i, top - 0.7 * T, PX, 0.7 * T, C.steel);
+    const cw0 = sx + 57 * sk;
+    this.r(this.gf, cw0, top - PX, x0 + len - cw0, 3 * PX, C.ink); this.r(this.gf, cw0, top - PX, x0 + len - cw0, PX, C.steel);
+    for (let i = cw0; i < x0 + len; i += 0.5 * T) this.r(this.gf, i, top + 2 * PX, PX, 0.5 * T, C.night);   // struts down to the slope
+    this.brandAt = [bx + 92 * bk, by + 116 * bk, 0.62 * T];   // on the yellow nose plate under the bridge
+    return true;
+  }
+  // the gas envelope as pixel art (#026): a silver cigar shaded in AAP-64 bands with ordered dithering, light from the top left,
+  // curved panel seams, two load straps, patches of old canvas with stitches, rust drips; drawn at the tile set's pixel size
+  envelopePixels(ex, ey, ew, eh, A) {
+    const s = this.s, key = `mr_env_${this.id}_${Math.round(ew)}`, w = Math.round(ew / A), h = Math.round(eh / A);
+    if (s.textures.exists(key)) s.textures.remove(key);
+    const t = s.textures.createCanvas(key, w, h), c = t.getContext(), img = c.createImageData(w, h), d = img.data;
+    const ramp = ['#242234', '#4a5462', '#6d758d', '#8b93af', '#b3b9d1', '#dae0ea'].map(x => [parseInt(x.slice(1, 3), 16), parseInt(x.slice(3, 5), 16), parseInt(x.slice(5, 7), 16)]);
+    const ink = [20, 16, 19], bayer = [[0, 2], [3, 1]], cx = w / 2, cy = h / 2, rx = w / 2 - 0.5, ry = h / 2 - 0.5, r = rng(23);
+    const patches = Array.from({ length: 6 }, () => ({ x: 0.1 + r() * 0.75, y: 0.2 + r() * 0.5, w: 10 + Math.floor(r() * 14), h: 6 + Math.floor(r() * 7), tan: r() < 0.5 }));
+    const inside = (x, y) => { const nx = (x + 0.5 - cx) / rx, ny = (y + 0.5 - cy) / ry; return Math.pow(Math.abs(nx), 2.6) + ny * ny <= 1; };
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      // a cigar: rounder nose and tail than an ellipse (superellipse in x)
+      const nx = (x + 0.5 - cx) / rx, ny = (y + 0.5 - cy) / ry, dd = Math.pow(Math.abs(nx), 2.6) + ny * ny;
+      if (dd > 1) continue;
+      const i = (y * w + x) * 4;
+      let rgb;
+      if (!inside(x - 1, y) || !inside(x + 1, y) || !inside(x, y - 1) || !inside(x, y + 1)) rgb = ink;   // a one pixel outline
+      else {
+        const nz = Math.sqrt(Math.max(0, 1 - Math.min(1, dd)));
+        const v = 0.62 - ny * 0.5 - nx * 0.08 - (1 - nz) * 0.45;   // light from the top left, darker towards the rim and the belly
+        const seam = x % 22 === 0 && (y % 2 === 0) && Math.abs(nx) < 0.92;
+        const strap = (Math.abs(nx + 0.42) < 0.008 || Math.abs(nx - 0.42) < 0.008);
+        let k = Math.max(0, Math.min(5, Math.floor(v * 6 + bayer[y % 2][x % 2] / 4 - 0.25)));
+        if (seam) k = Math.max(0, k - 1);
+        rgb = strap ? ramp[Math.max(0, k - 2)] : ramp[k];
+        for (const p of patches) {
+          const px = p.x * w, py = p.y * h;
+          if (x >= px && x < px + p.w && y >= py && y < py + p.h) {
+            const edge = x === Math.floor(px) || x === Math.floor(px + p.w - 1) || y === Math.floor(py) || y === Math.floor(py + p.h - 1);
+            const base = p.tan ? [[160, 134, 98], [199, 176, 139]] : [[142, 82, 82], [186, 117, 106]];
+            rgb = edge && (x + y) % 2 === 0 ? ink : base[(x + y) % 3 === 0 ? 0 : 1];
+          }
+        }
+        if (k <= 2 && r() < 0.012) rgb = [113, 65, 59];   // rust specks in the shade
+      }
+      d[i] = rgb[0]; d[i + 1] = rgb[1]; d[i + 2] = rgb[2]; d[i + 3] = 255;
+    }
+    c.putImageData(img, 0, 0);
+    t.refresh(); t.setFilter(Phaser.Textures.FilterMode.NEAREST);
+    s.add.image(ex, ey, key).setOrigin(0).setScale(ew / w, eh / h).setDepth(-6.5);
+  }
+  airshipSkin(h) {
+    const V = this.V.skin || {}, A = V.scale || 6;
+    if (!this.skinOk(V.bow, V.mid, V.stern)) return false;
+    const T = this.T, b = this.b, x0 = b.x0 * T, len = h.len * T, P = this.paint;
+    const frameBottom = (b.G - h.under) * T, top = (b.G - h.hullTop) * T, front = h.front * T, back = h.back * T;
+    const nose = this.src(V.bow), mid = this.src(V.mid), tail = this.src(V.stern);
+    const nw = nose.width * A, nh = nose.height * A, nx = x0 + front + 2 * T - nw, ny = frameBottom + 1.5 * T - nh;
+    const tx = x0 + len - back - 5 * T, ty = top - 4.5 * T, tw = tail.width * A, th = tail.height * A;
+    const gx = Math.min(nx, x0) - T, gy = Math.min(ny, ty) - T;
+    this.skinCanvas(gx, gy, Math.max(tx + tw, x0 + len) + T - gx, Math.max(ny + nh, ty + th, frameBottom + 2 * T) - gy, A);
+    const end = tx + 4 * T;
+    for (let x = x0 + front - T; x < end; x += mid.width * A) this.put(V.mid, x, top, A, false, Math.ceil((end - x) / A));
+    this.put(V.stern, tx, ty, A);
+    this.put(V.bow, nx, ny, A);
+    this.finishSkin(-6);
+    this.glow(nx + 50 * A, ny + 80 * A, 260, 200, C.gold, 0.35);   // the cockpit window
+    this.glow(nx + 40 * A, ny + nh - 12 * A, 160, 90, P.neon, 0.5);   // hover nozzle under the nose
+    this.glow(tx + tw - 5 * A, ty + 125 * A, 220, 160, P.neon, 0.5);   // the tail engine
+    return true;
+  }
+
   // ---------- raw vehicles ----------
   truck(h) {
     const T = this.T, s = this.s, g = this.g, b = this.b, ground = b.G * T, x0 = b.x0 * T;
@@ -103,6 +253,7 @@ export class MegarigView {
   }
 
   crawler(h) {
+    if (this.crawlerSkin(h)) return;
     const T = this.T, g = this.g, b = this.b, P = this.paint, ground = b.G * T, x0 = b.x0 * T, len = h.len * T;
     const bottom = (b.G - h.under) * T, top = (b.G - h.hullTop) * T, front = h.front * T, r = rng(7);
     // two track units: dark tread loops with road wheels, a bogie block between them
@@ -169,17 +320,21 @@ export class MegarigView {
     const frameTop = (b.G - h.under - h.frames * h.S) * T, frameBottom = (b.G - h.under) * T, top = (b.G - h.hullTop) * T, front = h.front * T;
     // gas envelope: a fat silver cigar above the fuselage, panel seams, neon band, logo; catwalk rail on top
     const ex = x0 + front - 3 * T, ew = len - front + 4 * T, eh = (h.envelope + 1) * T, ey = top - eh;
-    const env = this.s.add.graphics().setDepth(-6.5);
-    const ell = (c, inset, a = 1) => { env.fillStyle(col(c), a); env.fillEllipse(ex + ew / 2, ey + eh / 2 + inset / 3, ew - inset * 2, eh - inset); };
-    ell(C.steel, 0); ell(C.silver, 2 * PX); ell(C.pale, 6 * PX);
-    env.fillStyle(col(C.white), 0.9).fillEllipse(ex + ew / 2, ey + eh * 0.3, ew * 0.8, eh * 0.25);
-    for (let i = 1; i < 12; i++) { const sx = ex + ew * i / 12, k = Math.sqrt(1 - Math.pow((sx - ex - ew / 2) / (ew / 2), 2)); env.fillStyle(col(C.steel), 0.6).fillRect(snap(sx), snap(ey + eh / 2 - eh / 2 * k + 2 * PX), PX, snap(eh * k - 4 * PX)); }
+    const env = this.s.add.graphics().setDepth(-6.4);
+    if (this.V.skin?.bow && this.s.textures.exists(this.V.skin.bow)) this.envelopePixels(ex, ey, ew, eh, this.V.skin.scale || 6);   // #026: pixel art like the tile set
+    else {
+      const ell = (c, inset, a = 1) => { env.fillStyle(col(c), a); env.fillEllipse(ex + ew / 2, ey + eh / 2 + inset / 3, ew - inset * 2, eh - inset); };
+      ell(C.steel, 0); ell(C.silver, 2 * PX); ell(C.pale, 6 * PX);
+      env.fillStyle(col(C.white), 0.9).fillEllipse(ex + ew / 2, ey + eh * 0.3, ew * 0.8, eh * 0.25);
+      for (let i = 1; i < 12; i++) { const sx = ex + ew * i / 12, k = Math.sqrt(1 - Math.pow((sx - ex - ew / 2) / (ew / 2), 2)); env.fillStyle(col(C.steel), 0.6).fillRect(snap(sx), snap(ey + eh / 2 - eh / 2 * k + 2 * PX), PX, snap(eh * k - 4 * PX)); }
+    }
     env.fillStyle(col(P.neon), 0.9).fillRect(snap(ex + ew * 0.08), snap(ey + eh * 0.55), snap(ew * 0.84), 2 * PX);
     this.glow(ex + ew / 2, ey + eh * 0.55, ew * 0.9, 50, P.neon, 0.35);
     this.logo(env, ex + ew * 0.32, ey + eh * 0.3, 2.6 * T, P.main);
     this.r(this.gf, ex + ew * 0.15, ey - 0.8 * T, ew * 0.7, PX, C.steel);   // catwalk rail
     for (let i = ex + ew * 0.15; i < ex + ew * 0.85; i += T) this.r(this.gf, i, ey - 0.8 * T, PX, 0.8 * T, C.steel);
     for (let i = 0; i < 6; i++) this.r(g, ex + ew * (0.18 + i * 0.13), ey + eh - 2 * PX, PX, top - ey - eh + 4 * PX, C.ink);   // straps down to the hull
+    if (this.airshipSkin(h)) { this.winch = true; return; }
     // fuselage: closed decks, cockpit nose, engine block at the back
     this.plate(g, x0 + 2 * T, top, len - 3 * T, frameTop - top + T, P.main, P.dark, P.trim, 11);
     for (let p = 0; p <= h.places; p++) this.r(g, x0 + front + p * h.P * T - PX, top + T, 2 * PX, frameTop - top - T, P.dark, 0.7);
@@ -220,6 +375,14 @@ export class MegarigView {
     const hullTop = (this.b.G - this.b.pieces[0].hullTop) * T, ax = x + w / 2;   // outrigger: an arm to the hull roof plus a strut
     this.g.lineStyle(0.7 * T, col(C.night)).lineBetween(ax, y + 0.8 * T, hullX, hullTop + T);
     this.g.lineStyle(2 * PX, col(this.paint.dark)).lineBetween(ax, y + 1.4 * T, hullX, hullTop + 2.5 * T);
+    const R = this.V.skin?.rotor;
+    if (R && this.s.textures.exists(R)) {   // #026: the rotor pod from the tile set, its outrigger stub towards the hull
+      const im = this.src(R), k = w / im.width, left = x < this.b.x0 * T + this.b.len * T / 2;
+      this.s.add.image(x, y - 0.3 * T, R).setOrigin(0).setScale(k).setFlipX(left).setDepth(-3).texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+      this.glow(x + w / 2, y + im.height * k + 0.4 * T, w * 1.1, 1.6 * T, P.neon, 0.5);
+      this.blink(x + w * (left ? 0.44 : 0.56), y - 0.2 * T, P.light);
+      return;
+    }
     const rh = Math.max(1.6 * T, w * 0.22);   // #024: housing grows with the rotor
     g.fillStyle(col(C.ink)).fillRoundedRect(x, y, w, rh, 20);
     g.fillStyle(col(C.grey)).fillRoundedRect(x + PX, y + PX, w - 2 * PX, rh - 2 * PX, 18);
@@ -271,6 +434,7 @@ export class MegarigView {
       this.glow(lx, y + 0.6 * T, 2.2 * T, 1.4 * T, C.gold, 0.28);
     }
     if (p.name) this.label(x + w / 2, y + 0.5 * T, p.name);
+    if (this.skin && (p.inside || p.type === 'bridge')) this.cover(x, y - T, w, h + T);   // #026: the hull skin over the room
   }
 
   // the crawler's bridge (#024): a room as big as a 40-foot container, consoles with screens, the captain's chair
@@ -402,9 +566,11 @@ export class MegarigView {
     const lx = leyla.x, ly = leyla.y;
     for (const c of this.containers) {
       if (!c.closed) continue;
-      const near = lx > c.x0 - 200 && lx < c.x1 + 200 && ly > c.y0 - 120 && ly < c.y1 + 200;
+      const near = c.inside ? lx > c.x0 - 40 && lx < c.x1 + 40 && ly > c.y0 + 20 && ly < c.y1 + 40   // a room in the hull: only from inside
+        : lx > c.x0 - 200 && lx < c.x1 + 200 && ly > c.y0 - 120 && ly < c.y1 + 200;
       const want = near ? 0 : 1;
       c.closed.alpha += (want - c.closed.alpha) * 0.15;
+      for (const e of c.extra || []) e.alpha = c.closed.alpha * 0.82;
     }
   }
 }

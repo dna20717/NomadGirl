@@ -5329,5 +5329,77 @@
   "source": "Code (tools/salvage_icons.py: Ausschnitte aus dem LKW-Teileblatt + Pixel-Art aus Code, AAP-64)",
   "derivedFrom": "truck_parts",
   "date": "15.11.2026"
+ },
+ "megarig_crawler_bow": {
+  "name": "Crawler · Bug (Kachel-Set)",
+  "kind": "image",
+  "file": "assets/vehicles/megarig/crawler_bow.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Konzeptbild als Referenz) + Code (zugeschnitten, tools/megarig_tiles.py)",
+  "derivedFrom": "concept_crawler",
+  "date": "15.11.2026",
+  "description": "#026: Kabine mit schräger Panzernase, Dreieck-Logo, Brückenfenster, Maschinenblock darunter; rechts offen fürs Mittelstück."
+ },
+ "megarig_crawler_track": {
+  "name": "Crawler · Kettenfahrwerk (Kachel-Set)",
+  "kind": "image",
+  "file": "assets/vehicles/megarig/crawler_track.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Konzeptbild als Referenz) + Code (zugeschnitten, tools/megarig_tiles.py)",
+  "derivedFrom": "concept_crawler",
+  "date": "15.11.2026",
+  "description": "#026: Ganzes Kettenfahrwerk mit Antriebsrad links, Leitrad rechts; Mittelteil x 111–155 (eine Laufrolle) wiederholt sich, so wächst die Kette mit dem Rumpf."
+ },
+ "megarig_crawler_mid": {
+  "name": "Crawler · Rumpf-Mittelstück (Kachel-Set)",
+  "kind": "image",
+  "file": "assets/vehicles/megarig/crawler_mid.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Konzeptbild als Referenz) + Code (zugeschnitten, tools/megarig_tiles.py)",
+  "derivedFrom": "concept_crawler",
+  "date": "15.11.2026",
+  "description": "#026: Wiederholbar: gelbes Panzerband mit Warnstreifen am Deck, darunter Rohre, Tanks, Lampen; 224 × 192 = 2 Plätze × 2 Rumpf-Etagen."
+ },
+ "megarig_crawler_stern": {
+  "name": "Crawler · Heck (Kachel-Set)",
+  "kind": "image",
+  "file": "assets/vehicles/megarig/crawler_stern.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Konzeptbild als Referenz) + Code (zugeschnitten, tools/megarig_tiles.py)",
+  "derivedFrom": "concept_crawler",
+  "date": "15.11.2026",
+  "description": "#026: Abgeschrägtes Heck mit Motorhaus, Kühlergrill, zwei Auspuffen, Rücklichtern; links offen."
+ },
+ "megarig_fatbird_nose": {
+  "name": "Fatbird · Cockpit-Nase (Kachel-Set)",
+  "kind": "image",
+  "file": "assets/vehicles/megarig/fatbird_nose.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Konzeptbild als Referenz) + Code (zugeschnitten, tools/megarig_tiles.py)",
+  "derivedFrom": "concept_fatbird",
+  "date": "15.11.2026",
+  "description": "#026: Runde Panzernase mit glühendem Fenstergitter, Balkon, Schwebe-Düse, Dreieck-Logo; rechts offen."
+ },
+ "megarig_fatbird_rotor": {
+  "name": "Fatbird · Mantelrotor (Kachel-Set)",
+  "kind": "image",
+  "file": "assets/vehicles/megarig/fatbird_rotor.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Konzeptbild als Referenz) + Code (zugeschnitten, tools/megarig_tiles.py)",
+  "derivedFrom": "concept_fatbird",
+  "date": "15.11.2026",
+  "description": "#026: Rotor-Gondel mit gelber Schelle, roter Leuchte und vier blauen Düsen, Ausleger links; hinten gespiegelt."
+ },
+ "megarig_fatbird_mid": {
+  "name": "Fatbird · Rumpf-Mittelstück (Kachel-Set)",
+  "kind": "image",
+  "file": "assets/vehicles/megarig/fatbird_mid.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Konzeptbild als Referenz) + Code (zugeschnitten, tools/megarig_tiles.py)",
+  "derivedFrom": "concept_fatbird",
+  "date": "15.11.2026",
+  "description": "#026: Wiederholbar: Rumpfwand mit Panzerplatten und blauem Neonband, darunter Kielträger mit Fachwerk und Warnstreifen. Weiße Pixel im Fachwerk per Code entfernt."
+ },
+ "megarig_fatbird_tail": {
+  "name": "Fatbird · Heck (Kachel-Set)",
+  "kind": "image",
+  "file": "assets/vehicles/megarig/fatbird_tail.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Konzeptbild als Referenz) + Code (zugeschnitten, tools/megarig_tiles.py)",
+  "derivedFrom": "concept_fatbird",
+  "date": "15.11.2026",
+  "description": "#026: Verjüngtes Heck mit Leitwerk oben und unten, Triebwerk mit blauem Glühen, Positionslichtern; links offen."
  }
 }

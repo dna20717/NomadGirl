@@ -29,6 +29,19 @@ Daniel: „Eine Kette sollte deutlich höher sein als Leyla. Füge beiden eine E
 
 - Feld **Hersteller** (`brand`) an jedem Mega-Rig: Marke der Spielwelt als Schablonen-Schriftzug am Rumpf (`MegarigView.stencil`, zweizeilig ab drei Wörtern, Farbe „Dunkel“ des Lacks). Der Crawler stammt von **Armadillo Heavy Industries** (Daniel auf „armadillo?!“: Marke der Spielwelt, der Typ heißt weiter Crawler); der Schriftzug sitzt unter dem Dreieck-Logo am Maschinenblock. Auch in der Beschreibung und im Text des Bergungsprojekts.
 
+## Kachel-Sets (#026, Daniel 15.11.2026)
+
+Daniel: „max 100 Generierungen auf Tilesets für die Mega-Rigs. Wichtig ist, dass sie wirklich cool aussehen (orthogonal!) … dass die Dinger trotz des Gameplays nicht aussehen wie Boxen. Orientiere dich an den Konzept-Grafiken für die Kontur.“
+
+- **8 PixelLab-Teile, 85 Generierungen** (Create Image Pro, AAP-64, Konzeptbild bzw. das erste Teil als Referenz, je 1 Bild): Crawler Bug 320² (15), Kettenfahrwerk 320 × 96, Rumpf-Mittelstück 224 × 192, Heck 160 × 240; Fatbird Cockpit-Nase 224 × 256, Mantelrotor 192 × 96, Rumpf-Mittelstück 224 × 192, Heck 192 × 256 (je 10). Originale in `assets/vehicles/megarig/source/`, zugeschnitten mit `tools/megarig_tiles.py`.
+- **Daten:** Mega-Rigs › **Kachel-Set** (`skin`): Bug, Mittelstück, Heck, Kettenfahrwerk + Wiederholbereich (`trackRepeat`, x 111–155 = eine Laufrolle), Rotor, Maßstab (Crawler 4, Fatbird 6), Heck-Maßstab (`sternScale`, 1,75). Ohne Kachel-Set zeichnet der Code wie vorher.
+- **Durchgehende Außenhaut** (`MegarigView.crawlerSkin` / `airshipSkin`): Mittelstücke reihen sich vom Bug bis zum Heck, Bug und Heck darüber, alles in eine Leinwand in Bildauflösung (scharf skaliert, `NEAREST`). Kontur wie im Konzept: schräge Panzernase, Kettenfahrwerke mit Antriebs- und Leitrad, abgeschrägtes Heck mit Auspuffen; Fatbird mit runder Cockpit-Nase, Kielträger und Leitwerk.
+- **Räume als Schnittzeichnung:** Über jedem Raum im Rumpf (und der Kommandobrücke) liegt ein Ausschnitt der Haut, der ausblendet, sobald Leyla drin ist (`cover()`, wie Container; ein Raum öffnet sich nur von innen). So bleibt die Haut geschlossen, die Räume funktionieren wie bisher.
+- **Kette wächst mit:** das Fahrwerk wird pro Fahrzeuglänge als eigene Textur gebaut, der Wiederholbereich so oft wie nötig (`stretched()`).
+- **Kabinendach** (`hull.cabInset` = 8): das begehbare Dach beginnt hinter der schrägen Nase, damit Leyla nicht über der Schräge schwebt. Über dem schrägen Heck läuft ein Gitter-Laufsteg (Code) auf Deckhöhe weiter.
+- **Rotoren** aus dem Teil (vorne gespiegelt, Ausleger zum Rumpf), **Gashülle** als Pixel-Art aus Code (`envelopePixels`: Zigarrenform, AAP-64-Verlauf mit Dithering, Nähte, Gurte, Flicken, Rost), weil Daniel nur die Fahrzeuge aus KI wollte und das Budget so reicht.
+- **Hersteller-Schriftzug** sitzt jetzt auf der gelben Nase unter der Brücke.
+
 ## Wege und Erreichbarkeit
 
 - `engine/megarig.js` › `buildMegarig(data, id, stage)` baut ein Raum-Layout (Legende aus `engine/room.js`): Böden der Module sind Plattformen, Decks fest, Leitern automatisch (Stapel: an einem Ende abwechselnd links/rechts, nur wenn darunter etwas steht; Räume: Luke; vom Boden: Bug und Heck, Fatbird: Seilwinde in der Mitte).
@@ -62,6 +75,6 @@ Daniel, 15.11.2026 (AFK): „Bau bitte den gesamten Themenbereich inklusive Ques
 
 ## Offen
 
-- ⚠️ Crawler/Fatbird aus Code, bis die Kachel-Sets kommen (frühestens nach dem PixelLab-Reset am 07.12., nur mit Daniels Freigabe).
+- Crawler/Fatbird haben seit #026 Kachel-Sets. Offen: Pixelgrößen der Teile weichen etwas voneinander ab (Bug ≈ 5,9, Mitte 4, Heck 7 Spielpixel je Bildpixel); weitere Mittelstück-Varianten gegen Wiederholung.
 - Mega-Rigs im Spiel fahren (Bau-Modus, Budgets, Crew, Ladebucht), Fahrzeug-Skilltrees und Heavy-Duty-Werkbank: noch nicht. Freigeschaltete Mega-Rigs stehen nur in `save.megarigs`.
 - ⚠️ Der Van als Basis ist nur vermerkt (Karte „BASIS“), am Fundort steht er noch nicht sichtbar.
