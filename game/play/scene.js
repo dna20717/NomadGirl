@@ -667,9 +667,12 @@ export class PlayScene extends Phaser.Scene {
     if (hud.paused && !hud.modal) { if (u.pressed('ok') || u.pressed('back')) { hud.toggleHelp(false); eat(); input.help.pressed = false; } return; }
     if (hud.modal) {
       if (p?.kind) {   // the keyboard runs the menu through its own keys (hud.menuKey)
-        if (p.uiNow.has('down') && !p.uiPrev.has('down')) hud.menuMove(1);
-        else if (p.uiNow.has('up') && !p.uiPrev.has('up')) hud.menuMove(-1);
-        else if (p.uiNow.has('ok') && !p.uiPrev.has('ok')) hud.choose(hud.menuIndex);
+        const cols = hud.menuCols || 1;   // the notice board (#025) is a grid: ←/→ along, ↑/↓ a row
+        if (p.uiNow.has('down') && !p.uiPrev.has('down')) hud.menuMove(cols);
+        else if (p.uiNow.has('up') && !p.uiPrev.has('up')) hud.menuMove(-cols);
+        else if (cols > 1 && p.uiNow.has('right') && !p.uiPrev.has('right')) hud.menuMove(1);
+        else if (cols > 1 && p.uiNow.has('left') && !p.uiPrev.has('left')) hud.menuMove(-1);
+        else if (p.uiNow.has('ok') && !p.uiPrev.has('ok')) { if (!hud.stopType()) hud.choose(hud.menuIndex); }
         else if ((p.uiNow.has('back') && !p.uiPrev.has('back')) || p.pressed('help')) hud.closeMenu();
       }
       eat(); input.help.pressed = false;

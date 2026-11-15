@@ -443,6 +443,7 @@ export class Camp {
     this.placeChest();
     this.vanGlow();
     this.placeCompanions();
+    this.placeBoard();
     this.placeWreck();
     this.startSound();
     // the van: E at its door shows the van's own workshops
@@ -1105,4 +1106,5 @@ export function legCost(D, save, fromId, to) {
 import { CampLife } from './camp_life.js';
 import { CampActions } from './camp_actions.js';
 import { CampSalvage } from './camp_salvage.js';
-for (const M of [CampLife, CampActions, CampSalvage]) for (const k of Object.getOwnPropertyNames(M.prototype)) if (k !== 'constructor') Object.defineProperty(Camp.prototype, k, Object.getOwnPropertyDescriptor(M.prototype, k));
+import { CampBoard } from './camp_board.js';
+for (const M of [CampLife, CampActions, CampSalvage, CampBoard]) for (const k of Object.getOwnPropertyNames(M.prototype)) if (k !== 'constructor') Object.defineProperty(Camp.prototype, k, Object.getOwnPropertyDescriptor(M.prototype, k));

@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #025 fertig: Schwarzes Brett am Van, Dialog-Kasten ohne Porträts, Quest-Zettel über den Köpfen, Armadillo Heavy Industries am Crawler, Gangs englisch. PixelLab 0, übrig 674. Idee für später: Werkbank „Aufträge gegen bessere Belohnungen“ (Name offen).
 - 15.11. Code → Ava: Daniel hat die ⚠️ aus #016–#024 abgesegnet (Tickets `abgenommen`). Änderungen in **#025** (läuft): Schwarzes Brett am Van, schönere Dialoge ohne Porträts, Quest-Marken aus der Spielwelt, Armadillo als Marke, Gangs englisch.
 - 15.11. Code → Ava (HNC): Stand bis #024 auf `main`, `npm test` 145, alle 34 Browser-Tests grün (zuletzt vollständig nach #023, nach #024 megarig/salvage erneut grün). PixelLab übrig 674 (unter 700: jeder Auftrag nur mit Daniels Freigabe). Neu: /megarig (nur als Link), Bereiche Mega-Rigs, Anbauteile, Bergungsprojekte. Zum Absegnen: die ⚠️ aus #022–#024, vor allem „Felgen“ = Bergungsteile (#023). Offen: Name „Armadillo“ für den Crawler (A umbenennen / B Marke der Spielwelt / C bleibt Crawler); als Nächstes denkbar: Mega-Rigs im Spiel fahren (Bau-Modus, Budgets, Crew), Fahrzeug-Skilltrees + Heavy-Duty-Werkbank, Van als Basis sichtbar, Kachel-Sets für Crawler/Fatbird ab dem PixelLab-Reset am 07.12.
 - 15.11. Code → Ava: #024 fertig: Crawler und Fatbird größer, je eine Etage mehr, Brücke in Container-Größe. Offen: Name „Armadillo“?
@@ -445,7 +446,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** Crawler Ketten 6 Kacheln, 2 Rumpf-Etagen, Bug 24 Kacheln mit Brücke, 10 Plätze in der letzten Stufe, 3 Stockwerke obendrauf statt 4; Fatbird Lastrahmen + 2 Decks, größere Hülle, Rotoren, Cockpit. Luken führen jetzt als Schacht bis zum Deck. Tests: `npm test` 145, `megarig_test` 14, `salvage_test` 7. PixelLab 0. **Bitte testen:** /megarig Crawler und Fatbird, Übersicht, in die Brücke und die untere Rumpf-Etage klettern.
 
 ### #025 Absegnung 15.11.: Schwarzes Brett, schönere Dialoge, Armadillo, englische Gangs
-- **Status:** läuft (Code, 15.11.) · angelegt 15.11. von Code (Daniel hat die ⚠️ aus #016–#024 im Code-Chat entschieden)
+- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel hat die ⚠️ aus #016–#024 im Code-Chat entschieden)
 - **Für:** Code
 - **Lesen:** docs/features/camp.md (Companions, Aufträge), docs/features/megarigs.md, docs/features/worldmap.md
 - **Auftrag:** Alle ⚠️ aus #016–#024 abgenommen, dazu:
@@ -456,7 +457,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   5. **Schwarzes Brett am Van:** Aufträge annehmen, abgeben und Belohnungen einsammeln, zentral; bei den NPCs geht es weiter direkt. Später wird daraus eine Werkbank, die fertige Aufträge gegen noch bessere Belohnungen tauscht (Name offen, „nicht alles im Warroom abladen“).
 - **Fertig, wenn:** Brett im Camp benutzbar (Tastatur + Controller), Dialog neu, Marken neu, Namen umgestellt, alte Spielstände gültig, Tests grün, Build grün.
 - **Rückfragen:**
-- **Ergebnis:**
+  - Porträts → Daniel: erst ohne. PixelLab „Charakter → Porträt“ kostet 15 je Figur (160 px); Feld Companions › Porträt ist schon da.
+  - Wo steht das Brett → ⚠️ zwischen Van und Feuer am Lichtermast (Camp › Schwarzes Brett › Abstand −220), Schraube rückt eine Kachel nach rechts.
+  - Quest-Marken → ⚠️ Papierzettel aus Code wie am Brett (goldene Nadel = neu, grüner Stempel = abgeben); in Questlog/HUD bleiben Lucide-Symbole.
+  - Gespräch nach Annehmen/Abgeben → ⚠️ schließt, Antwort im Bläschen (weniger Klicks).
+  - Gang-Sprüche → ⚠️ bleiben deutsch, nur die Namen englisch.
+  - Werkbank aus dem Brett (fertige Aufträge gegen bessere Belohnung) → später, Name offen.
+- **Ergebnis:** `game/play/camp_board.js` (Brett, Zettel, `talkOf`), Dialog- und Brett-Variante von `hud.menu` (`talk`, `board`), neue Felder Camp › Schwarzes Brett, Spiel › Dialog-Tempo, Companions › Porträt, Mega-Rigs › Hersteller. Tests: `npm test` 145, alle 34 Browser-Tests grün (`camp_test` 33 mit neuer Brett-Prüfung), `web:test` grün, `ng check` stimmig. PixelLab: 0, übrig 674. **Bitte testen:** Camp, E am Brett (Zettel durchblättern mit Pfeilen/Steuerkreuz, annehmen, später abgeben), mit Schraube und Onkel Sung reden (neuer Dialog), Zettel über den Köpfen; /megarig Crawler (Schriftzug am Bug); Mile 7 betreten (Banner „Revier: Yellow Vultures“).
 
 ## Archiv
 

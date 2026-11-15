@@ -170,20 +170,58 @@ export class Hud {
   }
   // menu: { title, sub, items: [{ label, sub?, primary?, disabled?: reason, act }] }; keys W/S or ↑/↓, E/Enter/Leertaste, Esc, 1–9
   // onClose: called when the menu is closed without a choice (✕, Esc, B), e.g. an encounter on the road takes its default then
-  menu({ title, sub = '', items = [], onClose = null, image = null }) {
+  // talk (#025): { name, role, color, initials, portrait } turns the box into a dialogue at the bottom: a name plate in the speaker's colour,
+  // the line typed out, the answers below; the portrait slot shows the initials until there are portraits (Daniel: „zunächst ohne Portraits“)
+  // board (#025): the notice board, the items as pinned notes in a grid (item.note: { kind, from, stamp }); ←/→ move along, ↑/↓ a row
+  menu({ title, sub = '', items = [], onClose = null, image = null, talk = null, board = false }) {
+    this.stopType();
     this.modal = true; this.menuItems = items; this.menuTitle = title; this.menuOnClose = onClose;
+    this.menuCols = board ? 3 : 1;
     this.menuIndex = Math.max(0, items.findIndex(i => !i.disabled));
-    this.menuButtons = items.map((it, i) => el('button', { class: 'hud-item' + (it.primary ? ' primary' : ''), disabled: !!it.disabled, onclick: () => this.choose(i), onmouseenter: () => this.focus(i) },
-      el('kbd', {}, String(i + 1)), el('span', {}, el('b', {}, it.label), it.sub || it.disabled ? el('small', {}, [it.sub, it.disabled].filter(Boolean).join(' · ')) : null)));
-    // image (#021): a comic panel on top of the box, e.g. the road for the encounters on the way
-    this.menuEl.replaceChildren(el('div', { class: 'hud-menuBox ui-frame' + (image ? ' pic' : '') }, image ? el('div', { class: 'hud-menuPic' }, el('img', { src: image, alt: '' })) : null, el('h2', {}, title), sub ? el('p', {}, sub) : null, el('div', { class: 'hud-items' }, ...this.menuButtons),
-      hints([['move', 'wählen'], ['ok', 'nehmen'], ['back', 'zurück']], '1–9 direkt'), closeX(() => this.closeMenu())));
+    const keyHints = hints([['move', 'wählen'], ['ok', talk ? 'antworten' : 'nehmen'], ['back', 'zurück']], '1–9 direkt');
+    if (board) {
+      this.menuButtons = items.map((it, i) => el('button', { class: `hud-note ${it.note?.kind || ''}` + (it.primary ? ' primary' : ''), disabled: !!it.disabled, style: `--tilt:${((i * 37) % 7) - 3}deg`, onclick: () => this.choose(i), onmouseenter: () => this.focus(i) },
+        el('i', { class: 'hud-pin' }), el('small', { class: 'hud-noteFrom' }, it.note?.from || ''), el('b', {}, it.label), it.sub ? el('span', {}, it.sub) : null,
+        it.note?.stamp ? el('em', { class: 'hud-stamp' }, it.note.stamp) : null, el('kbd', {}, String(i + 1))));
+      this.menuEl.replaceChildren(el('div', { class: 'hud-board' }, el('header', {}, icon('sign', 20), el('h2', {}, title)), sub ? el('p', {}, sub) : null,
+        el('div', { class: 'hud-notes' }, ...this.menuButtons), keyHints, closeX(() => this.closeMenu())));
+    } else {
+      this.menuButtons = items.map((it, i) => el('button', { class: 'hud-item' + (it.primary ? ' primary' : ''), disabled: !!it.disabled, onclick: () => this.choose(i), onmouseenter: () => this.focus(i) },
+        el('kbd', {}, String(i + 1)), it.icon && talk ? icon(it.icon, 16) : null, el('span', {}, el('b', {}, it.label), it.sub || it.disabled ? el('small', {}, [it.sub, it.disabled].filter(Boolean).join(' · ')) : null)));
+      if (talk) {
+        const line = el('p', { class: 'hud-line' });
+        const face = talk.portrait ? el('div', { class: 'hud-face pic' }, el('img', { src: talk.portrait, alt: talk.name })) : el('div', { class: 'hud-face' }, el('span', {}, talk.initials || '?'));
+        this.menuEl.replaceChildren(el('div', { class: 'hud-talk', style: `--who:${talk.color || '#ffd27a'}` },
+          face, el('div', { class: 'hud-talkMain' }, el('header', {}, el('b', {}, talk.name || title), talk.role ? el('small', {}, talk.role) : null, talk.name && title !== talk.name ? el('em', {}, title) : null),
+            line, el('div', { class: 'hud-items' }, ...this.menuButtons), keyHints), closeX(() => this.closeMenu())));
+        this.typeLine(line, sub ? `„${sub}“` : '');
+      } else {
+        // image (#021): a comic panel on top of the box, e.g. the road for the encounters on the way
+        this.menuEl.replaceChildren(el('div', { class: 'hud-menuBox ui-frame' + (image ? ' pic' : '') }, image ? el('div', { class: 'hud-menuPic' }, el('img', { src: image, alt: '' })) : null, el('h2', {}, title), sub ? el('p', {}, sub) : null, el('div', { class: 'hud-items' }, ...this.menuButtons),
+          keyHints, closeX(() => this.closeMenu())));
+      }
+    }
+    this.menuEl.classList.toggle('talk', !!talk);
+    this.menuEl.classList.toggle('board', !!board);
     this.menuEl.hidden = false;
     this.promptEl.hidden = true;
     this.focus(this.menuIndex);
   }
+  // the line of a dialogue types itself out (Spiel › Technik could slow it down later); E while typing shows it whole
+  typeLine(elm, text) {
+    const speed = this.D?.game?.typeSpeed ?? 55;   // characters per second
+    if (!text || speed <= 0 || navigator.webdriver) { elm.textContent = text; return; }
+    let n = 0; const t0 = performance.now();
+    this.typing = { elm, text, timer: setInterval(() => {
+      n = Math.min(text.length, Math.floor((performance.now() - t0) / 1000 * speed));
+      elm.textContent = text.slice(0, n);
+      if (n >= text.length) this.stopType();
+    }, 16) };
+  }
+  stopType() { const T = this.typing; if (!T) return false; clearInterval(T.timer); T.elm.textContent = T.text; this.typing = null; return true; }
   focus(i) { this.menuIndex = i; this.menuButtons?.forEach((b, k) => b.classList.toggle('focus', k === i)); }
   closeMenu(chosen = false) {
+    this.stopType();
     const f = this.menuOnClose; this.menuOnClose = null;
     this.modal = false; this.menuEl.hidden = true; this.menuItems = null; this.promptEl.hidden = !this.promptText;
     if (!chosen) f?.();
@@ -200,9 +238,11 @@ export class Hud {
     const k = e.key, n = this.menuItems.length;
     const move = d => this.menuMove(d);
     if (k === 'Escape') this.closeMenu();
-    else if (k === 'ArrowDown' || k === 's' || k === 'S') move(1);
-    else if (k === 'ArrowUp' || k === 'w' || k === 'W') move(-1);
-    else if (k === 'Enter' || k === ' ' || k === 'e' || k === 'E') this.choose(this.menuIndex);
+    else if (k === 'ArrowDown' || k === 's' || k === 'S') move(this.menuCols || 1);
+    else if (k === 'ArrowUp' || k === 'w' || k === 'W') move(-(this.menuCols || 1));
+    else if ((this.menuCols || 1) > 1 && (k === 'ArrowRight' || k === 'd' || k === 'D')) move(1);
+    else if ((this.menuCols || 1) > 1 && (k === 'ArrowLeft' || k === 'a' || k === 'A')) move(-1);
+    else if (k === 'Enter' || k === ' ' || k === 'e' || k === 'E') { if (!this.stopType()) this.choose(this.menuIndex); }
     else if (/^[1-9]$/.test(k)) this.choose(Number(k) - 1);
     else return;
     e.preventDefault(); e.stopPropagation();
@@ -333,7 +373,7 @@ export class Hud {
         this.goalAt = now;
         const before = this.goal;
         try { this.goal = questGoal(D, sv); } catch { this.goal = null; }
-        try { scene.camp?.questMarks?.(); } catch { /* camp not ready */ }   // #017: „!“ / „✓“ over the companions stay true (a job done while cooking)
+        try { scene.camp?.questMarks?.(); scene.camp?.boardNotes?.(); } catch { /* camp not ready */ }   // #017: „!“ / „✓“ over the companions stay true (a job done while cooking)
         // progress on the way (#016): a node on the way was unlocked → a gold toast with how far the search is
         if (before && this.goal && before.quest && before.quest === this.goal.quest && this.goal.kind === 'ready' && before.kind !== 'ready') this.toast(`Auftrag erledigt: ${this.goal.text.replace(/ · erledigt$/, '')}`, 'Abgeben im Questlog (Lagerfeuer, Warroom)', 'good');
         else if (before && this.goal && !before.quest && !this.goal.quest && this.goal.progress > before.progress + 1e-6) this.toast('Ein Schritt näher an AvA', `${Math.round(this.goal.progress * 100)} % des Weges · nächster: ${this.goal.text.replace(/^[^:]*:\s*/, '')}`, 'good');

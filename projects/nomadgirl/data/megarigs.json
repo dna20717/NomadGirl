@@ -26,7 +26,7 @@
  "crawler": {
   "name": "Crawler",
   "kind": "crawler",
-  "description": "Der Riesenpanzer auf zwei Kettenfahrwerken: Kommandobrücke so groß wie ein 40-Fuß-Container, zwei Etagen Räume im Rumpf, darauf die Container-Stadt, die mit dem Ausbau wächst (#024: größer, länger statt höher).",
+  "description": "Der Riesenpanzer von Armadillo Heavy Industries auf zwei Kettenfahrwerken: Kommandobrücke so groß wie ein 40-Fuß-Container, zwei Etagen Räume im Rumpf, darauf die Container-Stadt, die mit dem Ausbau wächst (#024: größer, länger statt höher).",
   "grid": {"place": 7, "story": 6},
   "hull": {"under": 6, "inside": 2, "front": 24, "back": 6, "segPlaces": 2, "bridge": "Kommandobrücke"},
   "paint": {"main": "#f9a31b", "dark": "#403353", "trim": "#bb7547", "neon": "#20d6c7", "light": "#df3e23"},
@@ -70,7 +70,8 @@
    {"addon": "positionslicht", "place": 4, "story": 5, "from": 2, "shift": 2},
    {"addon": "generator", "place": 5, "story": 5, "from": 2},
    {"addon": "auspuff_lang", "place": 0, "story": 2, "from": 0, "at": "wall", "shift": -3}
-  ]
+  ],
+  "brand": "Armadillo Heavy Industries"
  },
  "fatbird": {
   "name": "Fatbird",

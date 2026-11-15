@@ -25,6 +25,10 @@ Daniel: „Eine Kette sollte deutlich höher sein als Leyla. Füge beiden eine E
 - **Crawler:** Ketten 6 Kacheln hoch (doppelt so hoch wie Leyla) mit großen Laufrollen und Stützrollen; **2 Etagen im Rumpf** (Räume mit Luken-Schacht bis zum Deck); Bug 24 Kacheln mit der **Kommandobrücke** (Raum so breit wie ein 40-Fuß-Container: Konsolen, Kapitänsstuhl, Frontscheibe); 3/4/5 Mittelstücke (6/8/10 Plätze), 1/2/3 Stockwerke obendrauf.
 - **Fatbird:** Schwebehöhe 6, Lastrahmen + **2 Decks**, Gashülle 13 Kacheln, Rotoren 11 Kacheln breit, größeres Cockpit, 8 Plätze.
 
+## Hersteller (#025, Daniel 15.11.2026)
+
+- Feld **Hersteller** (`brand`) an jedem Mega-Rig: Marke der Spielwelt als Schablonen-Schriftzug am Rumpf (`MegarigView.stencil`, zweizeilig ab drei Wörtern, Farbe „Dunkel“ des Lacks). Der Crawler stammt von **Armadillo Heavy Industries** (Daniel auf „armadillo?!“: Marke der Spielwelt, der Typ heißt weiter Crawler); der Schriftzug sitzt unter dem Dreieck-Logo am Maschinenblock. Auch in der Beschreibung und im Text des Bergungsprojekts.
+
 ## Wege und Erreichbarkeit
 
 - `engine/megarig.js` › `buildMegarig(data, id, stage)` baut ein Raum-Layout (Legende aus `engine/room.js`): Böden der Module sind Plattformen, Decks fest, Leitern automatisch (Stapel: an einem Ende abwechselnd links/rechts, nur wenn darunter etwas steht; Räume: Luke; vom Boden: Bug und Heck, Fatbird: Seilwinde in der Mitte).

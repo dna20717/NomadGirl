@@ -167,6 +167,7 @@ export const AREAS = {
     hint: 'Grundwerte für das ganze Spiel: Maßstab, Physik, Auflösung und womit Leyla startet.',
     sections: [
       { title: 'Technik', fields: [text('title', 'Titel'), num('tileSize', 'Kachelgröße', { unit: 'px', min: 8 }), num('gravity', 'Schwerkraft', { unit: 'px/s²', min: 0 }),
+        num('typeSpeed', 'Dialog-Tempo', { unit: 'Zeichen/s', min: 0, hint: 'So schnell tippt sich eine Zeile im Dialog mit den Companions aus (#025). 0 = sofort ganz. E zeigt die Zeile sofort ganz' }),
         bool('confirmLeave', 'Rückfrage beim Abreisen', { hint: 'Daniel, 13.11.2026: am Van im POI fragt das Spiel „Wirklich zurückreisen?“. Aus = sofort zurück ins Camp' }),
         size('resolution', 'Auflösung', { unit: 'px', hint: 'Interne Auflösung, wird skaliert' }), bool('pixelArt', 'Pixel-Art (scharf skalieren)')] },
       { title: 'Beute-Bilanz', fields: [bool('summary', 'Bilanz nach dem Run', { hint: '#017: zurück im Camp eine Karte mit Rang, Δ, Mitgebrachtem, Neuem (Rezepte, Techtree, Aufträge, Tank) und einem Knopf zur passenden Station. Aus = nur der Banner wie früher' })] },
@@ -978,7 +979,8 @@ export const AREAS = {
     row: x => `${label(MEGARIG_KINDS, x.kind)} · ${(x.stages || []).length} Ausbaustufen · ${(x.modules || []).length} Module`,
     check: (x, report, p, id) => { for (const [k, t] of megarigProblems(p.data, id)) report(k, t); },
     sections: [
-      { title: 'Mega-Rig', fields: [NAME, select('kind', 'Art', MEGARIG_KINDS), ref('tractor', 'Zugmaschine', 'tractors', { hint: 'Werte (Zugkraft, Verbrauch, Slots) kommen von dieser Zugmaschine' }), DESCRIPTION] },
+      { title: 'Mega-Rig', fields: [NAME, select('kind', 'Art', MEGARIG_KINDS), ref('tractor', 'Zugmaschine', 'tractors', { hint: 'Werte (Zugkraft, Verbrauch, Slots) kommen von dieser Zugmaschine' }),
+        text('brand', 'Hersteller', { hint: 'Marke der Spielwelt als Schriftzug am Rumpf (#025), z. B. Armadillo Heavy Industries. Leer = kein Schriftzug' }), DESCRIPTION] },
       { title: 'Raster', fields: [num('grid.place', 'Platz breit', { unit: 'Kacheln', min: 2, hint: 'Ein Werkstatt-Platz. 7 passt zu den Container-Bildern (gleicher Maßstab wie hoch)' }),
         num('grid.story', 'Stockwerk hoch', { unit: 'Kacheln', min: 4, hint: 'Boden bis Boden. 6 = Innenraum 5 Kacheln, Leyla passt gut hinein' })] },
       { title: 'Rohes Fahrzeug', fields: [ref('hull.look', 'Aussehen', 'assets', { hint: 'Bild des rohen Fahrzeugs (LKW: Zugmaschine). Leer = aus Code im Stil der Art' }),
@@ -1040,7 +1042,7 @@ export const AREAS = {
     template: { name: 'Neuer Companion', role: '', workshops: [], buffs: [], tips: [], stage: '1' },
     row: x => x.role || '',
     sections: [
-      { title: 'Companion', fields: [NAME, LOOK, text('role', 'Rolle'), STAGE, DESCRIPTION] },
+      { title: 'Companion', fields: [NAME, LOOK, ref('portrait', 'Porträt', 'assets', { hint: 'Kopf in Nahaufnahme für den Dialog (#025). Leer = Initialen in der Farbe des Companions' }), text('role', 'Rolle'), STAGE, DESCRIPTION] },
       { title: 'Im Rig', fields: [bool('passenger', 'Fährt als Gast mit', { hint: 'Braucht beim Fahren einen freien Platz in einer Gästekoje (Werkstatt-Funktion Gäste, Kapazität = Betten), sonst bleibt der Companion am Ort und wartet dort' }), refs('workshops', 'Betreibt', 'workshops'), refs('buffs', 'Gibt Buffs', 'buffs'), refs('tips', 'Kennt Rezepte', 'recipes')] },
       { title: 'Im Camp', fields: [lines('lines', 'Sprüche', { hint: 'Eine Zeile pro Spruch, erscheint als Bläschen (zufällig und per E)' }),
         lines('craftLines.hit', 'Beim Kochen/Craften: Treffer', { hint: 'Sagt der Companion, wenn an seiner Werkstatt etwas gelingt (eine Zeile pro Spruch)' }),
@@ -1125,6 +1127,9 @@ export const AREAS = {
         num('sound.fireMin', 'Feuer von weitem', { unit: '%', min: 0, max: 100 }), num('sound.fireRange', 'Hörweite', { unit: 'px', min: 50 }), num('sound.fireNear', 'Voll ab', { unit: 'px', min: 0, hint: 'Näher als das: volle Lautstärke' }),
         ref('sound.music', 'Musik', 'assets', { hint: 'Läuft leise im Hintergrund in Schleife (Leyla Theme). Lädt erst, wenn das Camp steht. M schaltet allen Ton aus' }), num('sound.musicVolume', 'Musik-Lautstärke', { unit: '%', min: 0, max: 100, hint: 'Dezent: um 15' }),
         num('sound.musicFadeIn', 'Musik einblenden', { unit: 's', min: 0, hint: 'So lange wird sie beim Betreten des Camps lauter' })] },
+      { title: 'Schwarzes Brett', fields: [bool('board.enabled', 'Schwarzes Brett', { hint: 'Daniel, 15.11.2026 (#025): am Van Aufträge annehmen, abgeben und Belohnungen einsammeln, zentral für alle Companions. Bei ihnen direkt geht es weiter. Später eine Werkbank, die fertige Aufträge gegen bessere Belohnungen tauscht' }),
+        text('board.name', 'Name'), num('board.offset', 'Abstand zum Feuer', { unit: 'px', hint: 'Negativ = links vom Feuer, Richtung Van. −220 = am Mast' }),
+        num('board.lift', 'Oberkante über dem Boden', { unit: 'px', min: 60 }), num('board.width', 'Breite', { unit: 'px', min: 60 }), num('board.height', 'Höhe', { unit: 'px', min: 40 })] },
       { title: 'Companions', fields: [range('companions.at', 'Stehen von – bis', { unit: 'Kacheln vom Van' }), range('companions.barkEvery', 'Sprüche alle', { unit: 's' }), num('companions.barkTime', 'Bläschen zeigen', { unit: 's', min: 1 })] },
       { title: 'Zeit', fields: [num('clock.startDay', 'Start-Tag', { min: 1 }), num('clock.startHour', 'Start-Uhrzeit', { unit: 'h', min: 0, max: 23.99, step: 0.25 }),
         num('clock.arriveHour', 'Ankunft im Camp um', { unit: 'h', min: 0, max: 23.99, step: 0.25, hint: 'Daniel: „Camp startet immer in der Dämmerung“. Beim Laden, nach einem Run und nach dem Fahren springt die Uhr vor bis zu dieser Uhrzeit. Leer = Uhr läuft nur mit den Aktionen' }),

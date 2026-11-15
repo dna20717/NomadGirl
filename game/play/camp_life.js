@@ -2,6 +2,7 @@
 // Mixed into Camp (game/play/camp.js): the methods keep their `this`, nothing else changes.
 import { offers, accept, claim, progressOf, qstate } from '../quests.js';
 import { figureTexture } from './camp.js';
+import { noteTexture } from './camp_board.js';
 
 export class CampLife {
   // ---------- sound: soft wind with gusts, the fire gets louder (and moves left/right) the closer Leyla comes ----------
@@ -82,9 +83,9 @@ export class CampLife {
       if (info?.anim) sprite.play(info.anim);
       sprite.setDepth(-3).setFlipX(x > this.geo.fireX);
       const bubble = s.add.text(x, this.ground - h - 16, '', { fontFamily: 'VT323, monospace', fontSize: '30px', color: '#17111f', backgroundColor: '#f2eef7', padding: { x: 10, y: 4 }, wordWrap: { width: 420 }, align: 'center' }).setOrigin(0.5, 1).setDepth(25).setAlpha(0);
-      // #017: a gold „!“ over the head when they have a job for Leyla, a green „✓“ when she can hand one in
-      const mark = s.add.text(x, this.ground - h - 14, '', { fontFamily: 'VT323, monospace', fontSize: '54px', color: '#ffd27a', stroke: '#0d0a12', strokeThickness: 8 }).setOrigin(0.5, 1).setDepth(24);
-      s.tweens.add({ targets: mark, y: mark.y - 10, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      // #017: a mark over the head when they have a job for Leyla; #025: a little pinned note (gold pin = offer, green stamp = hand in)
+      const mark = s.add.image(x, this.ground - h - 14, noteTexture(s, 'offer')).setOrigin(0.5, 1).setDepth(24).setVisible(false);
+      s.tweens.add({ targets: mark, y: mark.y - 10, angle: { from: -6, to: 6 }, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
       const c = { id, def, x, sprite, bubble, mark, h, until: 0, last: -1 };
       const spot = { x, w: 70, name: def.name || id, hint: 'Reden', act: () => this.talk(c) };
       c.spot = spot;
@@ -102,33 +103,34 @@ export class CampLife {
   }
   questMarks() {
     for (const c of this.companions || []) {
-      const J = this.jobsOf(c);
-      c.mark.setText(J.ready.length ? '✓' : J.offer.length ? '!' : '').setColor(J.ready.length ? '#9cdb43' : '#ffd27a');
+      const J = this.jobsOf(c), kind = J.ready.length ? 'ready' : J.offer.length ? 'offer' : null;
+      c.mark.setVisible(!!kind);
+      if (kind) c.mark.setTexture(noteTexture(this.scene, kind));
+      c.markKind = kind;
       c.spot.hint = J.ready.length ? 'Reden · Auftrag abgeben' : J.offer.length ? 'Reden · neuer Auftrag' : 'Reden';
     }
   }
   say(c, text) { c.bubble.setText(text).setAlpha(1); c.until = this.scene.time.now + Math.max(4000, text.length * 70); }
+  // #025: a conversation in the dialogue box (name plate, colour, room for a portrait later), not a plain menu
   talk(c) {
-    const D = this.D, save = this.box.save, s = this.scene, J = this.jobsOf(c), name = c.def.name || c.id;
+    const D = this.D, save = this.box.save, s = this.scene, J = this.jobsOf(c), who = this.talkOf(c.id);
     if (!J.offer.length && !J.ready.length && !J.active.length) return this.bark(c, true);
-    const done = () => { s.box.persist(); this.questMarks(); s.hud.campKey = null; s.hud.goalAt = 0; };
+    const rew = q => { const R = q.reward || {}; return [R.deltas ? `${R.deltas} Δ` : null, ...(R.items || []).map(x => `${x.count || 1}× ${D.items?.[x.item]?.name || x.item}`)].filter(Boolean).join(' · '); };
     const items = [
-      ...J.ready.map(id => ({ label: `Abgeben: ${D.quests[id].name}`, sub: 'Erledigt', primary: true, act: () => {
-        const q = D.quests[id], r = claim(D, save, id);
-        if (r.ok) { this.say(c, r.line || 'Danke, Leyla.'); s.hud.toast(`Erledigt: ${q.name}`, r.got.join(' · '), 'good'); }
-        done();
+      ...J.ready.map(id => ({ label: `Abgeben: ${D.quests[id].name}`, sub: rew(D.quests[id]), primary: true, icon: 'check', act: () => {
+        this.claimOne(id);   // the giver thanks in the speech bubble
       } })),
-      ...J.offer.map(id => ({ label: `Auftrag: ${D.quests[id].name}`, sub: 'Neu', primary: !J.ready.length, act: () => {
-        const q = D.quests[id], R = q.reward || {}, rew = [R.deltas ? `${R.deltas} Δ` : null, ...(R.items || []).map(x => `${x.count || 1}× ${D.items?.[x.item]?.name || x.item}`)].filter(Boolean).join(' · ');
-        this.say(c, q.text || '');
-        s.hud.menu({ title: `${name}: ${q.name}`, sub: `„${q.text || ''}“${rew ? `  Belohnung: ${rew}` : ''}`, items: [
-          { label: 'Annehmen', primary: true, act: () => { accept(D, save, id); this.say(c, 'Gut. Ich verlass mich auf dich.'); s.hud.toast(`Auftrag angenommen: ${q.name}`, `${name} · steht im Questlog`, 'info'); done(); } },
-          { label: 'Später', act: () => this.say(c, 'Überleg es dir.') }] });
+      ...J.offer.map(id => ({ label: `Auftrag: ${D.quests[id].name}`, sub: 'Neu', primary: !J.ready.length, icon: 'sign', act: () => {
+        const q = D.quests[id], R = rew(q);
+        s.hud.menu({ title: q.name, sub: q.text || '', talk: { ...who, note: 'offer' }, items: [
+          { label: 'Annehmen', sub: R ? `Belohnung: ${R}` : '', primary: true, icon: 'check', act: () => { accept(D, save, id); s.hud.toast(`Auftrag angenommen: ${q.name}`, `${who.name} · steht im Questlog`, 'info'); this.jobsChanged(); this.say(c, 'Gut. Ich verlass mich auf dich.'); } },
+          { label: 'Später', icon: 'clock', act: () => this.say(c, 'Überleg es dir.') }] });
       } })),
-      ...J.active.map(id => ({ label: `Wie läuft „${D.quests[id].name}“?`, sub: `${progressOf(D, save, id).n} / ${progressOf(D, save, id).target}`, act: () => { const p = progressOf(D, save, id); this.say(c, p.n ? `${p.n} von ${p.target}. Weiter so.` : 'Noch nichts? Ich warte.'); } })),
-      { label: 'Plaudern', act: () => this.bark(c, true) },
-      { label: 'Zurück', act: () => {} }];
-    s.hud.menu({ title: name, sub: c.def.role || '', items });
+      ...J.active.map(id => ({ label: `Wie läuft „${D.quests[id].name}“?`, sub: `${progressOf(D, save, id).n} / ${progressOf(D, save, id).target}`, icon: 'help', act: () => { const p = progressOf(D, save, id); this.say(c, p.n ? `${p.n} von ${p.target}. Weiter so.` : 'Noch nichts? Ich warte.'); } })),
+      { label: 'Plaudern', icon: 'speechBubble', act: () => this.bark(c, true) },
+      { label: 'Tschüss', icon: 'x', act: () => {} }];
+    const greet = (J.ready.length ? 'Na? Sieht aus, als hättest du was für mich.' : J.offer.length ? 'Gut, dass du kommst. Ich hab da was.' : 'Und, wie läuft es da draußen?');
+    s.hud.menu({ title: who.name, sub: greet, items, talk: who });
   }
   bark(c, now = false) {
     const lines = c.def.lines || [];

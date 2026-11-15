@@ -66,7 +66,7 @@
    "soundVolume": 12
   }
  },
- "companions": {"at": [6, 13], "barkEvery": [7, 15], "barkTime": 4},
+ "companions": {"at": [7, 13], "barkEvery": [7, 15], "barkTime": 4},
  "clock": {"startDay": 1, "startHour": 18.5, "wakeHour": 7, "runHours": 3, "fireHours": 1, "arriveHour": 18.5},
  "daytime": [
   {"from": 5, "weather": "morgen", "shade": 12, "light": 15, "name": "Morgen"},
@@ -130,5 +130,6 @@
  },
  "mood": {"vignette": 35, "warm": 30, "fireflies": 18, "smoke": true},
  "solar": {"look": "rig_solar", "power": 1, "battery": 6, "day": [7, 19], "price": 220, "weight": 40},
- "rain": {"enabled": true, "chance": 30, "hours": [2, 6], "look": "abendglut_regen"}
+ "rain": {"enabled": true, "chance": 30, "hours": [2, 6], "look": "abendglut_regen"},
+ "board": {"enabled": true, "name": "Schwarzes Brett", "offset": -220, "lift": 210, "width": 132, "height": 96}
 }

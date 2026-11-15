@@ -35,6 +35,7 @@ export class MegarigView {
       else if (p.type === 'bridge') this.bridge(p);
     }
     for (const p of build.pieces) if (p.type === 'addon') this.addon(p);
+    if (V.brand && this.brandAt) this.stencil(V.brand, ...this.brandAt);
   }
 
   // ---------- helpers ----------
@@ -146,6 +147,7 @@ export class MegarigView {
     this.r(g, wx, wy, ww, wh, C.glass, 0.9);
     this.r(g, wx + PX, wy + PX, ww * 0.35, wh - 2 * PX, C.pale, 0.35);
     this.logo(g, cx + cw * 0.42, top + 2 * T, 3 * T, P.dark);
+    this.brandAt = [cx + cw * 0.42 + 1.5 * T, top + 6.2 * T, 1.0 * T];   // #025: the maker's name stencilled on the engine block under the logo
     this.hazard(g, cx, top + T, cw, 3 * PX);
     this.r(g, cx - 2 * PX, top - 1.6 * T, 6 * PX, 1.2 * T, C.ink);   // headlights
     this.r(g, cx - PX, top - 1.4 * T, 3 * PX, 0.8 * T, P.neon);
@@ -285,6 +287,13 @@ export class MegarigView {
     this.r(g, cx - 0.4 * T, cy - 1.6 * T, 0.3 * T, 1.2 * T, C.rust); this.r(g, cx - 0.4 * T, cy - 0.6 * T, 0.9 * T, 0.25 * T, C.rust); this.r(g, cx, cy - 0.4 * T, 0.12 * T, 0.4 * T, C.ink);
   }
 
+  // #025: the maker's name, sprayed through a stencil (gaps in the letters, a bit faded, worn)
+  stencil(text, x, y, size) {
+    const words = text.toUpperCase().split(' '), lines = words.length > 2 ? [words[0], words.slice(1).join(' ')] : [words.join(' ')];
+    const t = this.s.add.text(x, y, lines.join('\n'), { fontFamily: 'VT323, monospace', fontSize: `${Math.round(size)}px`, color: this.paint.dark, letterSpacing: Math.round(size * 0.18), align: 'center', lineSpacing: -Math.round(size * 0.2) })
+      .setOrigin(0.5).setDepth(-4.4).setAlpha(0.82);
+    return t;
+  }
   label(x, y, text) {
     this.s.add.text(x, y, text.toUpperCase(), { fontFamily: 'VT323, monospace', fontSize: '30px', color: '#a6fcdb' }).setOrigin(0.5, 0).setDepth(-2.4).setAlpha(0.85);
   }

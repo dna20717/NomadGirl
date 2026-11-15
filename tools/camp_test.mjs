@@ -72,10 +72,10 @@ check('Lagerfeuer: Menü mit Hinsetzen und Questlog; neue Angebote zuerst, Aktiv
 check('Questlog: Angebot annehmen, wird verfolgt und steht als Zielzeile im Bild', s.offers.includes('offer:kabelsalat') && s.taken.tab === 'active' && s.taken.tracked === 'kabelsalat' && /Kabelsalat/.test(s.goal), s);
 check('Questlog: Kupferkabel da → abgeben, Belohnung, Kabel weg, wieder Hauptquest verfolgt', s.ready.includes('side:kabelsalat!') && s.after.done && s.after.deltas === 60 && s.after.cable === 5 && s.after.tracked === 'main', s);
 // #017: companions talk jobs: „!“ over Schraube's head, the next job in the conversation (after Kabelsalat: Geier rupfen)
-s = await ev(() => { const cp = game.scene.getScene('play').camp, sch = cp.companions.find(x => x.id === 'schraube'); cp.questMarks(); const mark = sch.mark.text, hint = sch.spot.hint;
-  nomad.goTo('Schraube'); const m = c.use(); nomad.choose('Auftrag: Geier'); const sub = document.querySelector('.hud-menuBox p')?.textContent; nomad.choose('Annehmen'); nomad.step(3);
-  return { mark, hint, menu: m?.items.map(i => i.label), sub, active: Object.keys(nomad.save().quests.active), mark2: sch.mark.text }; });
-check('Companions: „!“ über Schraube, im Gespräch den Folgeauftrag annehmen (#017)', s.mark === '!' && s.hint === 'Reden · neuer Auftrag' && s.menu?.[0] === 'Auftrag: Geier rupfen' && /Belohnung/.test(s.sub || '') && s.active.includes('geier_rupfen') && s.mark2 === '', s);
+s = await ev(() => { const cp = game.scene.getScene('play').camp, sch = cp.companions.find(x => x.id === 'schraube'); cp.questMarks(); const mark = sch.markKind, hint = sch.spot.hint;
+  nomad.goTo('Schraube'); const m = c.use(); nomad.choose('Auftrag: Geier'); const sub = [...document.querySelectorAll('.hud-talk .hud-item small')].map(e => e.textContent).join(' '); nomad.choose('Annehmen'); nomad.step(3);
+  return { mark, hint, menu: m?.items.map(i => i.label), sub, active: Object.keys(nomad.save().quests.active), mark2: sch.markKind }; });
+check('Companions: „!“ über Schraube, im Gespräch den Folgeauftrag annehmen (#017)', s.mark === 'offer' && s.hint === 'Reden · neuer Auftrag' && s.menu?.[0] === 'Auftrag: Geier rupfen' && /Belohnung/.test(s.sub || '') && s.active.includes('geier_rupfen') && !s.mark2, s);
 p = await ev(() => c.to('Lagerfeuer'));
 s = await ev(() => { game.scene.getScene('play').leyla.health = 40; c.use(); nomad.choose('Hinsetzen'); nomad.step(240); const st = nomad.state(), sp = game.scene.getScene('play').leyla.sprite; return { st, flip: sp.flipX, frame: sp.frame.name, prompt: st.prompt }; });
 check('E am Feuer: Leyla setzt sich und zockt, schaut zum Feuer', s.st.leyla.state === 'sit' && s.prompt === 'Aufstehen · Lagerfeuer' && Number(s.frame) >= 6, s);
@@ -87,6 +87,23 @@ p = await ev(() => c.to('Onkel Sung'));
 s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(3); const m = nomad.menu(); nomad.choose('Plaudern'); nomad.step(3); return { m: m?.items.map(i => i.label), text: game.scene.getScene('play').camp.companions.find(x => x.id === 'onkel_sung').bubble.text }; });
 check('Companion redet per E: mit Auftrag im Angebot erst das Gespräch, „Plaudern“ gibt einen Spruch', p === 'Reden · neuer Auftrag · Onkel Sung' && s.m?.includes('Auftrag: Sungs Suppe') && s.text.length > 5, { p, s });
 await shot('talk');
+
+// #025: the notice board at the van: every job of the crew as notes; accept one, hand in a done one, collect the reward
+p = await ev(() => c.to('Schwarzes Brett'));
+s = await ev(() => {
+  const cp = game.scene.getScene('play').camp, sv = nomad.save(), Q = sv.quests;
+  nomad.step(1, [], ['grab']); nomad.step(3); const m = nomad.menu(), notes = document.querySelectorAll('.hud-board .hud-note').length;
+  nomad.choose('Sungs Suppe'); const talk = !!document.querySelector('.hud-talk'); nomad.choose('Annehmen'); nomad.step(3);
+  const after = nomad.menu(), accepted = !!Q.active.sungs_suppe;
+  // pretend the soup is cooked: the job is ready, the board offers to hand it in
+  Q.active.sungs_suppe.base = -10; cp.jobsChanged(); cp.scene.hud.closeMenu(); cp.boardMenu(); const d0 = sv.deltas;
+  nomad.choose('Sungs Suppe'); nomad.choose('Abgeben'); nomad.step(3);
+  const kinds = cp.board.notes.map(n => n.texture.key), gain = sv.deltas - d0;
+  sv.deltas = d0;   // the k.o. check further down counts on the start money
+  cp.scene.hud.closeMenu(); nomad.step(2);
+  return { m: m?.title, notes, talk, after: after?.title, accepted, done: !!Q.done.sungs_suppe, gain, kinds, open: !!nomad.menu() };
+});
+check('Schwarzes Brett: Zettel je Auftrag, annehmen und abgeben, Belohnung kommt an (#025)', /Schwarzes Brett/.test(p) && s.m === 'Schwarzes Brett' && s.notes >= 1 && s.talk && s.after === 'Schwarzes Brett' && s.accepted && s.done && s.gain === 40, { p, s });
 
 s = await ev(() => { nomad.step(900, ['left']); nomad.step(60); return nomad.state(); });   // the rig is longer since ×4 (09.11.2026)
 check('Schacht links: Leyla bleibt am Rand stehen', s.leyla.feet === 768 && s.leyla.x > 4 * 64 && s.leyla.x < 5 * 64 + 10, s.leyla);
