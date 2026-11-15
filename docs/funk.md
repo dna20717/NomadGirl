@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #024 Crawler und Fatbird größer läuft.
 - 15.11. Code → Ava: #023 fertig: Bergungsprojekte LKW, Crawler, Fatbird mit Teilen aus POIs, Wrack im Camp, Questlog, Karte, LKW zieht das Rig. PixelLab 0, übrig 674. ⚠️ „Felgen“ als Bergungsteile gelesen, weitere ⚠️ im Ticket.
 - 15.11. Code → Ava: #023 Bergungsprojekte (LKW, Crawler, Fatbird, Quests, POIs, Felgen) läuft.
 - 15.11. Code → Ava: #022 fertig: Mega-Rigs als begehbarer Prototyp unter /megarig (LKW, Crawler, Fatbird, je 3 Stufen), Bereiche Mega-Rigs + Anbauteile, Erreichbarkeits-Prüfung. PixelLab 9, übrig 674. ⚠️ zum Absegnen im Ticket.
@@ -428,6 +429,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - Crawler/Fatbird freigeschaltet → ⚠️ nur `save.megarigs` + Achievement, fahren/bauen kommt mit dem nächsten Schritt (Bau-Modus, Budgets, Crew, Skilltrees).
   - Achievements → ⚠️ „Wieder auf der Straße“ (Chromfelge, +10 Leben) und versteckt „Für die 1 %“ (Logbuch der Giganten, +10 % Schaden, +5 % Krit); Trophäen-Symbole aus dem Bergungs-Raster.
 - **Ergebnis:** `game/salvage.js`, `game/play/camp_salvage.js`, Bereich Bergungsprojekte, 14 Teile + 2 Trophäen + 2 Achievements, Karte, Questlog, POI-Kisten. Tests: `npm test` 145 (7 neu in `test/salvage.test.js`), `tools/salvage_test.mjs` 7, `megarig_test` 14, Camp/Bau/Karte/Spiel/Achievements grün. PixelLab: 0, übrig 674. **Bitte testen:** neues Spiel, Questlog › Der LKW verfolgen, Karte (WRACK-Marke), zum Wrack fahren, E am Wrack, Teile in Mile 7 sammeln, einbauen, Probestart → LKW vorne am Rig; danach Crawler-/Fatbird-Wrack anschauen.
+
+### #024 Crawler und Fatbird größer, eine Etage mehr, Kabine mit Containergröße
+- **Status:** läuft (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Für:** Code
+- **Lesen:** docs/features/megarigs.md
+- **Auftrag:** Daniel: „Fatbird und Crawler sind ein wenig zu klein. Eine Kette sollte deutlich höher sein als Leyla. Füge beiden eine Etage hinzu. Crawler-Fahrerkabine alleine sollte Platz für mindestens einen großen Container haben als Referenz. Damit die Rigs nicht zu hoch werden, gerne länger machen.“ Der Truck passt.
+- **Fertig, wenn:** Ketten deutlich höher als Leyla, je eine Etage mehr, Kabine ≥ 40-Fuß-Container, alles erreichbar, Tests grün.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ## Archiv
 
