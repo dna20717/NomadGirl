@@ -16,6 +16,7 @@ import { offers, accept, claim, progressOf, qstate } from '../quests.js';
 import { Benches, benchTexture, crateTexture } from './benches.js';
 import { wreckHere } from './camp_salvage.js';
 import { campMegaLayout } from './camp_mega.js';
+import { ladderArt } from './ladder_art.js';
 import { activeMega, flies, travelSpeed } from '../mega.js';
 import { synergyAt, synergyText, links } from '../synergy.js';
 
@@ -658,11 +659,15 @@ export class Camp {
     // a short container sits in the middle of a long trailer, a ladder beside it ended in the air (Daniel, 09.11.2026)
     const in1 = u.in0 + u.cell * u.places, edge = Math.min(s.T * 0.75, (in1 - u.in0) / 2);
     const x = Math.min(Math.max(foot.x0 + (foot.x1 - foot.x0) * (R.ladderAt ?? 8) / 100, u.in0 + edge), in1 - edge), top = u.floorY, bottom = u.level > 1 ? below.floorY : this.ground;
-    const g = s.add.graphics().setDepth(-18);
-    g.fillStyle(0x30363d).fillRect(x - 22, top - 30, 6, bottom - top + 30).fillRect(x + 16, top - 30, 6, bottom - top + 30);
-    g.fillStyle(0x8b949e).fillRect(x - 22, top - 30, 2, bottom - top + 30).fillRect(x + 16, top - 30, 2, bottom - top + 30);
-    for (let y = bottom - 20; y > top - 20; y -= 28) g.fillStyle(0x6b7280).fillRect(x - 16, y, 32, 5);
-    this.rigObjs.push(g);
+    const art = ladderArt(s, x - s.T / 2, x + s.T / 2, top, bottom, { depth: -18 });   // #034
+    if (art) this.rigObjs.push(art);
+    else {
+      const g = s.add.graphics().setDepth(-18);
+      g.fillStyle(0x30363d).fillRect(x - 22, top - 30, 6, bottom - top + 30).fillRect(x + 16, top - 30, 6, bottom - top + 30);
+      g.fillStyle(0x8b949e).fillRect(x - 22, top - 30, 2, bottom - top + 30).fillRect(x + 16, top - 30, 2, bottom - top + 30);
+      for (let y = bottom - 20; y > top - 20; y -= 28) g.fillStyle(0x6b7280).fillRect(x - 16, y, 32, 5);
+      this.rigObjs.push(g);
+    }
     s.ladders.push({ cx: x, x0: x - s.T / 2, x1: x + s.T / 2, top, bottom, rig: true });
   }
   // a short ladder from the ground into a container on the ground floor (Camp › Rig-Ansicht › Leiter ins Erdgeschoss bei),

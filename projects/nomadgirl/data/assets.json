@@ -5464,5 +5464,13 @@
   "source": "KI (PixelLab, Create Image Pro, Referenz Motorraum + Zelle, Palette AAP-64, streng frontal)",
   "date": "15.11.2026",
   "description": "#033, zweiter Versuch (Daniel: erster „Perspektive etwas zu gewagt“): Kühlregale, Fleischhaken, Frostrohre, Thermostat-Tafel, Lüfter, alles flach von vorn. Erster Versuch: source/cold_room_rejected.png."
+ },
+ "ladder_steel": {
+  "name": "Leiter · Stahl (einfärbbar)",
+  "kind": "image",
+  "file": "assets/ladders/ladder_steel.png",
+  "source": "KI (PixelLab, Create Image Pro, Graustufen aus AAP-64, streng frontal) + Code (zugeschnitten)",
+  "date": "15.11.2026",
+  "description": "#034: Stahlleiter von vorn, 76 × 256: Anfang mit Haken (Zeile 0–38), Mitte mit Halteplatte und 4 Sprossen (38–118, wiederholbar, Sprossen alle 20 px), kaputtes Stück (118–198), Ende mit Fußplatten (198–256). Graustufen, im Spiel per Tint eingefärbt. Original: source/ladder_steel.png; Käfigleiter source/ladder_cage.png (verworfen, unruhig)."
  }
 }

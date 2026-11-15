@@ -166,6 +166,10 @@ export const AREAS = {
     name: 'Spiel', icon: 'settings', file: 'data/game.json', kind: 'single',
     hint: 'Grundwerte für das ganze Spiel: Maßstab, Physik, Auflösung und womit Leyla startet.',
     sections: [
+      { title: 'Leitern', fields: [ref('ladder.look', 'Leiter-Bild', 'assets', { hint: '#034 (Daniel: „hübsche Leitern mit Anfang, Ende, kaputtem Segment, einfärbbar“): ein senkrechter Streifen, Teile per Zeilen. Leer = Leitern aus Code' }),
+        range('ladder.top', 'Anfang', { unit: 'Bildzeilen' }), range('ladder.mid', 'Mitte (wiederholt)', { unit: 'Bildzeilen' }), range('ladder.broken', 'Kaputtes Stück', { unit: 'Bildzeilen' }), range('ladder.bottom', 'Ende', { unit: 'Bildzeilen' }),
+        num('ladder.width', 'Breite', { unit: '% einer Kachel', min: 30, max: 200 }), num('ladder.brokenChance', 'Kaputt', { unit: '% je Leiter', min: 0, max: 100, hint: 'So viele Leitern (ab 3 Kacheln) haben irgendwo ein kaputtes Stück' }),
+        color('ladder.tint', 'Färbung', { hint: 'Grundfarbe (Bild ist grau, wird eingefärbt). Leer = grau' }), color('ladder.ropeTint', 'Färbung Seilwinde', { hint: 'Fatbird: die Leiter zum Boden' })] },
       { title: 'Technik', fields: [text('title', 'Titel'), num('tileSize', 'Kachelgröße', { unit: 'px', min: 8 }), num('gravity', 'Schwerkraft', { unit: 'px/s²', min: 0 }),
         num('typeSpeed', 'Dialog-Tempo', { unit: 'Zeichen/s', min: 0, hint: 'So schnell tippt sich eine Zeile im Dialog mit den Companions aus (#025). 0 = sofort ganz. E zeigt die Zeile sofort ganz' }),
         bool('confirmLeave', 'Rückfrage beim Abreisen', { hint: 'Daniel, 13.11.2026: am Van im POI fragt das Spiel „Wirklich zurückreisen?“. Aus = sofort zurück ins Camp' }),

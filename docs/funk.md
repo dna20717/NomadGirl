@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #034 fertig: Synergie-Vorschau, Reihenschaltung, Leitern aus PixelLab (20, übrig 464). Backlog: Grafiken für evolutionierte Werkstätten.
 - 15.11. Code → Ava: #034 Synergie-Vorschau, Reihenschaltung, Leitern (PixelLab) läuft.
 - 15.11. Code → Ava: #033 fertig: 7 Werkstatt-Bilder, Heavy-Duty, Auftragsbüro, Waffenkammer mit Display-Boards, Synergien à la Dorfromantik. PixelLab 85, übrig 484.
 - 15.11. Code → Ava: #033 Werkstätten-Paket (7 Grafiken, Heavy-Duty, Auftragsraum, Waffenkammer mit Display-Boards, Synergie-Konzept) läuft.
@@ -562,11 +563,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** 7 Bilder (Kühlraum im zweiten Versuch), Werkstätten `heavy_duty`, `auftragsbuero`, `waffengalerie`, Ständer › Nimmt, `game/synergy.js` + Anbindung in Crafting, Garten, Budget, Schlafen/Ausruhen, Links im Camp. Tests: `npm test` 159 (5 neu), alle 35 Browser-Tests grün. PixelLab: diesmal 85, übrig 484. **Bitte testen:** neue Werkstätten im Bau-Modus kaufen und platzieren, Waffen an die Boards der Waffenkammer hängen, Auftragsbüro benutzen, Werkbank neben Generator stellen (Leuchtlinie, Hinweis „Synergie“), Kühlraum ansehen.
 
 ### #034 Synergie-Vorschau, Reihenschaltung, Leitern
-- **Status:** läuft (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Für:** Code
 - **Auftrag:** Daniel: „Die Vorschau ist eine gute Idee, nimm die bitte direkt als Nächstes dran. Füge auch eine Form von Synergie mit ein, die bei wenigen Werkstätten eine Reihenschaltung belohnt (Farm, Reaktor, Zelle …): mehr als 1 und ganzer Container selber Typ = dicker Bonus. Nimm auf die Todo-Liste auch Grafiken für evolutionierte Werkstätten mit auf. Und lass bitte ein paar Leitern erzeugen, damit wir endlich hübsche Leitern haben: mit Anfang, Ende, kaputtem Segment und so, dass man sie bei Bedarf im Code einfärben kann. Denk bitte dringend an die orthogonale Perspektive.“
 - **Rückfragen:**
-- **Ergebnis:**
+  - Reihenschaltung → ⚠️ Hydrokultur, Reaktor, Generator, Zelle; Reihe zählt waagrecht, auch über die Containergrenze; Zelle hat noch keine Wirkung.
+  - Leitern → ⚠️ zwei Varianten erzeugt (Stahl, Käfig), Käfig verworfen (unruhig, Mittelstange); eine Leiter für alles, Seilwinde des Fatbird rostfarben eingefärbt.
+  - Evolutionierte Werkstätten → in `backlog.md` › B.
+- **Ergebnis:** `synergy.js` (Reihe, voller Container, `preview`), Bau-Modus und Bauplan mit Vorschau, `ladder_art.js`, Spiel › Leitern. Tests: `npm test` 160, alle 35 Browser-Tests grün. PixelLab: diesmal 20, übrig 464. **Bitte testen:** Bau-Modus, eine Werkstatt ziehen (Plätze zeigen ihren Bonus), drei Hydrokulturen in einen 40-Fuß-Container; Leitern im Kampfraum, im Camp-Stapel, auf den Mega-Rigs.
 
 ## Archiv
 

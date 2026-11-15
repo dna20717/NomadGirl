@@ -5,6 +5,7 @@ import { chassisPlan, chassisTexture } from './camp.js';
 import { SOLID_TILES } from '../../engine/room.js';
 import { benchTexture } from './benches.js';
 import { catenary, lightsConfig } from '../string_lights.js';
+import { ladderArt } from './ladder_art.js';
 const PX = 4;   // one art pixel = 4 game pixels, like the container and truck pictures
 // #027: the tile sets are doubled with EPX (Scale2x) before they are scaled up, so stairs and diagonals stay clean instead of
 // turning into big blocks (Daniel: „ein paar der Grafiken sind sehr grob“); the skin canvas holds 2 game px per pixel
@@ -697,6 +698,8 @@ export class MegarigView {
       if (skip.has(l.tx)) continue;
       // #027: readable from afar: dark outline, light rails and rungs, a yellow cap where Leyla gets on at the top
       const below = rope && l.bottom >= this.b.G * T - T, c = below ? C.sand : C.white, rail = below ? C.copper : C.silver;
+      const art = ladderArt(this.s, l.x0, l.x1, l.top, l.bottom, { depth: -2.5, tint: below ? this.s.data_?.game?.ladder?.ropeTint : undefined });   // #034
+      if (art) { this.r(g, l.x0 + 6, l.top - 2 * PX, T - 12, 3 * PX, C.ink, 0); continue; }
       for (const rx of [l.x0 + 10, l.x1 - 10 - 2 * PX]) { this.r(g, rx - PX, l.top, 4 * PX, l.bottom - l.top, C.ink); this.r(g, rx, l.top, 2 * PX, l.bottom - l.top, rail); }
       for (let y = l.top + 12; y < l.bottom; y += 22) { this.r(g, l.x0 + 10, y - PX, T - 20, 3 * PX, C.ink); this.r(g, l.x0 + 10, y, T - 20, PX, c); }
       if (!below) { this.r(g, l.x0 + 6, l.top - 2 * PX, T - 12, 3 * PX, C.ink); this.r(g, l.x0 + 8, l.top - PX, T - 16, PX, C.gold); }

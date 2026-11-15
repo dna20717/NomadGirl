@@ -334,7 +334,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       g.fillStyle(0x7a6235).fillRect(px, py, T, 14).fillStyle(0x4a3b20).fillRect(px, py + 14, T, 4);
       g.fillStyle(0x3b2f1a); for (let i = 6; i < T; i += 12) g.fillRect(px + i, py + 3, 5, 8);
       g.fillStyle(0xd4a72c).fillRect(px, py, T, 2);
-    } else if (t === 'H') {
+    } else if (t === 'H' && !scene.data_?.game?.ladder?.look) {
       g.fillStyle(0x7d6a4a).fillRect(px + 12, py, 7, T).fillRect(px + T - 19, py, 7, T);
       g.fillStyle(0xa58e62); for (let i = 8; i < T; i += 21) g.fillRect(px + 12, py + i, T - 24, 6);
     } else if (t === 'o') {

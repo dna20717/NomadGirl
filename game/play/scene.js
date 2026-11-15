@@ -35,6 +35,7 @@ import { CraftUI } from './craft_ui.js';
 import { TechtreeUI } from './techtree_ui.js';
 import { BuildMode } from './build_mode.js';
 import { MegaBuild } from './mega_build.js';
+import { ladderArt } from './ladder_art.js';
 import { Tutorial } from './tutorial.js';
 import { AchievementsUI } from './achievements_ui.js';
 import { QuestLogUI } from './questlog_ui.js';
@@ -72,6 +73,7 @@ export class PlayScene extends Phaser.Scene {
     for (const id of kitted.ids) ids.add(id);
     for (const [key, file] of kitted.extra) if (!this.textures.exists(key)) this.load.image(key, new URL(file, this.base).href);
     for (const [k, id] of Object.entries(this.data_.game?.tiles || {})) if (k !== 'terrain') ids.add(id);
+    if (this.data_.game?.ladder?.look) ids.add(this.data_.game.ladder.look);   // #034 ladders
     for (const t of Object.values(this.data_.terrain || {})) for (const id of [t.look, t.props, t.propsBig]) if (id) ids.add(id);   // Kachel-Sets (TileSet00)
     const DR = this.data_.drone || {};
     for (const id of [DR.look, DR.face?.look, DR.face?.glass, ...(DR.parts || []).filter(r => r.on).map(r => r.look)]) if (id) ids.add(id);
@@ -299,6 +301,8 @@ export class PlayScene extends Phaser.Scene {
       let y1 = y; while (R.tiles[y1 + 1]?.[x] === 'H') { seen.add(x + ',' + (y1 + 1)); y1++; }
       this.ladders.push({ cx: (x + 0.5) * T, x0: x * T, x1: (x + 1) * T, top: y * T, bottom: (y1 + 1) * T, tx: x, ty: y });
     }
+    // #034 ladders from the picture (Spiel › Leitern); the mega rig view draws its own
+    if (!this.megarig) for (const l of this.ladders) ladderArt(this, l.x0, l.x1, l.top, l.bottom, { depth: -9.5 });
     this.platformTiles = new Set([...R.platforms.map(([x, y]) => x + ',' + y), ...this.ladders.map(l => l.tx + ',' + l.ty)]);
     this.platforms = this.physics.add.staticGroup();
     for (const key of this.platformTiles) {

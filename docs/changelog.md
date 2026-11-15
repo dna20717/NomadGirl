@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 15.11.2026: **Synergie-Vorschau, Reihenschaltung, neue Leitern** (#034): beim Platzieren zeigt jeder Platz seinen Bonus wie bei Dorfromantik; gleiche Werkstätten in Reihe und volle Container geben dicke Boni; alle Leitern aus einer PixelLab-Stahlleiter mit Haken, Halteplatten, kaputten Sprossen und Fußplatten, einfärbbar.
 - 15.11.2026: **Synergien** (#033): Werkstätten, die nebeneinander (auch über Containergrenzen, Stapel und das Mega-Rig-Raster) passend stehen, arbeiten schneller, machen mehr Strom oder geben stärkere Buffs; voller Bonus, wenn alle angrenzenden Plätze passen; leuchtende Verbindungen im Rig. Kühlraum mit neuem, flachem Bild.
 - 15.11.2026: **Werkstätten-Paket** (#033): Bilder für Motorraum, Zelle, Reaktor; neu Heavy-Duty-Werkbank (alle Rig-Teile), Auftragsbüro (Schwarzes Brett als Raum), Waffenkammer mit Display-Boards (Waffen hängen sichtbar); alte Waffenkammer heißt Waffenwerkbank.
 - 15.11.2026: **Sauber gestapelt** (#032): Container an Bord Kante auf Kante statt ineinander, Laufstege auf Stelzen; Fatbird mit Trägern über die ganze Länge.
