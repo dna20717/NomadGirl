@@ -41,6 +41,7 @@ Daniel: „max 100 Generierungen auf Tilesets für die Mega-Rigs. Wichtig ist, d
 - **Kabinendach** (`hull.cabInset` = 8): das begehbare Dach beginnt hinter der schrägen Nase, damit Leyla nicht über der Schräge schwebt. Über dem schrägen Heck läuft ein Gitter-Laufsteg (Code) auf Deckhöhe weiter.
 - **Rotoren** aus dem Teil (vorne gespiegelt, Ausleger zum Rumpf), **Gashülle** als Pixel-Art aus Code (`envelopePixels`: Zigarrenform, AAP-64-Verlauf mit Dithering, Nähte, Gurte, Flicken, Rost), weil Daniel nur die Fahrzeuge aus KI wollte und das Budget so reicht.
 - **Hersteller-Schriftzug** sitzt jetzt auf der gelben Nase unter der Brücke.
+- **Neues Crawler-Heck** (#030, Daniel: „sieht noch nicht ganz orthogonal aus“: das alte hatte rechts ein Stück Rückansicht, Grill frontal, zwei Rücklichter, Auspuffe nebeneinander): PixelLab neu in Zielgröße mit Bug und Mittelstück als Referenz (10 Generierungen). Kachel-Set › Rumpf im Heck (24–200) skaliert es genau vom Deck bis zur Kette, Schräge ab 104 (Laufsteg darüber). Altes Bild in `source/crawler_stern_v1.png`.
 
 ## Aufgeräumt (#027, Daniel 15.11.2026)
 

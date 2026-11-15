@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #030 fertig: Crawler-Heck neu und streng von der Seite (PixelLab 10, übrig 579).
 - 15.11. Code → Ava: #029 fertig: Mega-Rigs fahren (Umzug mit Ladebucht, Camp an Bord, Bauplan aufs Raster, Budgets, Reisen; Crawler + Fatbird, ohne Crew). Offen: gesperrte Straßen + Ausflüge aus der Ladebucht, Fatbird-Cockpit, Camp an Deck/am Seil.
 - 15.11. Code → Ava: #029 Mega-Rigs fahren (Crawler + Fatbird: Camp an Bord, Bau-Modus aufs Raster, Budgets, Reisen; Rig in der Ladebucht, ohne Crew) läuft.
 - 15.11. Code → Ava: #028 fertig: Test-Crawler mit Werkstätten in Räumen/Containern und 11 Lichterketten (Geschmackstest, Daten in Mega-Rigs). PixelLab 0.
@@ -522,6 +523,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - Werte → ⚠️ Crawler 200 t Zug, 120 l/100 km, Tempo 45 %, 3 Brückenplätze; Fatbird 60 t, 60 l, 250 %, fliegt; Ausbau Crawler 6.000 Δ/12 h und 14.000 Δ/24 h.
   - Umzug zwischen Crawler und Fatbird → ⚠️ geht über die Karte, die Container stellen sich neu auf (was nicht passt, ins Lager).
 - **Ergebnis:** `game/mega.js`, `game/play/camp_mega.js`, `game/play/mega_build.js`; Zugmaschinen Crawler + Fatbird, Felder Tempo/Fliegt/Mega-Rig, Ausbaustufen mit Preis und Dauer; `buildMegarig` mit eigenen Modulen. Tests: `npm test` 154 (9 neu in `test/mega.test.js`), alle 35 Browser-Tests grün (neu `mega_test` 7), `web:test` grün, `ng check` stimmig. PixelLab 0. **Bitte testen:** Spielstand mit geborgenem Crawler (oder im Menü schummeln: Konsole `save.megarigs=['crawler','fatbird']`), Karte › „Umziehen: Crawler“, an Bord herumklettern, Werkstätten benutzen, B = Bauplan, Container kaufen und stapeln, Werkstätten einräumen, Lichterketten, Ausbau kaufen; reisen; Ladebucht › zurück ins Rig.
+
+### #030 Crawler-Heck orthogonal
+- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Auftrag:** Daniel: „Das Heck vom Crawler sieht noch nicht ganz orthogonal aus.“ Befund: rechts war ein Stück Rückansicht (Grill frontal, zwei Rücklichter, Auspuffe nebeneinander). Daniel per Multiple Choice: PixelLab neu (~10).
+- **Ergebnis:** neues Heck in Zielgröße, Felder Kachel-Set › Rumpf im Heck / Schräge ab; skaliert bündig vom Deck bis zur Kette. Tests: `megarig_test`, `mega_test`, `npm test` grün. PixelLab: diesmal 10, übrig 579. **Bitte testen:** /megarig Crawler, Heck in allen Stufen, über die Schräge laufen.
 
 ## Archiv
 

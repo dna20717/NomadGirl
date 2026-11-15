@@ -200,7 +200,9 @@ export class MegarigView {
     const roof = 31, foot = bow.height - 10, bk = (bottom + T - cabTop) / (foot - roof);
     const bw = bow.width * bk, bx = x0 + front + 2 * T - bw, by = cabTop - roof * bk;
     // stern: its body (14 px down) level with the deck, a bit bigger than the middle pieces
-    const sk = (V.sternScale || 1.75) * A, sw = st.width * sk, sx = x0 + len + 1.5 * T - sw, sy = top - 14 * sk;
+    // stern: its hull band (Kachel-Set › Heck: Rumpf im Bild von – bis) exactly from the deck to the top of the tracks (#030)
+    const [b0, b1] = V.sternBody || [14, 14 + st.height / ((V.sternScale || 1.75))], sk = V.sternBody ? (bottom - top) / (b1 - b0) : (V.sternScale || 1.75) * A;
+    const sw = st.width * sk, sx = x0 + len + (V.sternBody ? 0.5 : 1.5) * T - sw, sy = top - b0 * sk;
     const gx = Math.min(bx, x0) - T, gy = Math.min(by, sy) - T;
     this.skinCanvas(gx, gy, x0 + len + 3 * T - gx, ground - gy, A);
     const end = x0 + len - back;
@@ -221,7 +223,7 @@ export class MegarigView {
     this.glow(sx + sw - 6 * sk, sy + 62 * sk, 90, 60, P.light, 0.55);
     this.r(this.gf, x0 + front, top - 0.7 * T, end - x0 - front, PX, C.steel);
     for (let i = x0 + front; i < end; i += T) this.r(this.gf, i, top - 0.7 * T, PX, 0.7 * T, C.steel);
-    const cw0 = sx + 57 * sk;
+    const cw0 = sx + (V.sternSlope ?? 57) * sk;
     this.r(this.gf, cw0, top - PX, x0 + len - cw0, 3 * PX, C.ink); this.r(this.gf, cw0, top - PX, x0 + len - cw0, PX, C.steel);
     for (let i = cw0; i < x0 + len; i += 0.5 * T) this.r(this.gf, i, top + 2 * PX, PX, 0.5 * T, C.night);   // struts down to the slope
     this.brandAt = [bx + 84 * bk, by + 116 * bk, 0.62 * T];   // on the yellow nose plate under the bridge

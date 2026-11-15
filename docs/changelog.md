@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 15.11.2026: **Crawler-Heck streng von der Seite** (#030): neu aus PixelLab, ohne die angeklebte Rückansicht, bündig vom Deck bis zu den Ketten.
 - 15.11.2026: **Mega-Rigs fahren** (#029): nach der Bergung zieht Leyla in Crawler oder Fatbird um, das alte Rig parkt in der Ladebucht. Camp an Bord mit Werkstätten per E und Kommandobrücke als Karte, Bauplan aufs Raster (Container, Räume, Werkstätten, Lichterketten, Ausbaustufen), Budgets wie beim Rig, Crawler langsam und durstig, Fatbird schnell und Luftlinie.
 - 15.11.2026: **Crawler eingerichtet** (#028, Geschmackstest): Werkstätten stehen in Räumen und Containern des Mega-Rigs, Lichterketten hängen zwischen den Container-Dächern, Wand-Banner blenden beim Betreten mit der Außenwand aus.
 - 15.11.2026: **Mega-Rigs aufgeräumt** (#027): feinere Kachel-Grafik (EPX statt Riesenpixel), Rumpf in klaren Feldern (Spanten, Träger), Laufwege als helle Gitterkanten, deutlichere Leitern, Raumnamen erst im offenen Raum; der LKW zieht normale Container-Anhänger auf dem Camp-Fahrgestell.
