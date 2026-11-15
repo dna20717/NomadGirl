@@ -6,6 +6,7 @@
 import { decorDef, placeOf, plantStage, dstate } from '../decor.js';
 import { catenary } from '../string_lights.js';
 import { glowTexture } from './camp.js';
+import { advance, clockText } from '../save.js';
 
 const PX = 4;
 const col = c => parseInt(String(c || '#ff00ff').slice(1), 16);
@@ -60,6 +61,7 @@ export class CampDecor {
     this.crows?.forEach(c => c.o.destroy()); this.crows = [];
     R.decor.forEach((x, i) => { try { this.drawPiece(x, i); } catch (e) { console.warn('Deko', x.id, e); } });
     if (R.decor.some(x => decorDef(this.D, x.id)?.art === 'birdhouse')) this.spawnCrows();
+    this.drawRainBits();
   }
   dAdd(o) { this.rigObjs.push(o); return o; }
   shellOf(u) { return (this.shells || []).find(c => c.u === u) || null; }
@@ -101,7 +103,7 @@ export class CampDecor {
     lit.setShadow(0, 0, c, 10, true, true);
     const glow = this.dAdd(s.add.image(x, y, glowTexture(s)).setDisplaySize(w * 1.6, h * 1.8).setTint(col(c)).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.35).setDepth(-19.15));
     const l = this.light(x, y + h, w * 0.9, c, 0.5); l.rig = true;
-    this.decorAnim.push(time => { const off = Math.sin(time / 130 + seed * 40) > 0.985 || (seed > 0.6 && Math.sin(time / 47 + seed * 9) > 0.97), k = t.alpha > 0.01 ? 1 : 0; lit.setAlpha(k * (off ? 0.15 : 0.9) * (this.lightK || 0)); glow.setAlpha(k * (off ? 0.08 : 0.35)); });
+    this.decorAnim.push(time => { const off = Math.sin(time / 130 + seed * 40) > 0.985 || (seed > 0.6 && Math.sin(time / 47 + seed * 9) > 0.97), k = t.alpha > 0.01 ? 1 : 0; lit.setAlpha(k * (off ? 0.15 : 0.9) * (this.lightK || 0)); glow.setAlpha(k * (off ? 0.04 : 0.1 + 0.25 * (this.lightK || 0))); });
   }
   art_banner(x, y, w, h, d, seed) {
     const s = this.scene, c = d.color || '#b4202a', g = s.add.graphics(), top = -h / 2;
@@ -122,6 +124,7 @@ export class CampDecor {
   }
   art_graffiti(x, y, w, h, d, seed, pick) {
     const s = this.scene, c = pick(d.colors) || '#ff7ac0', text = pick(d.text) || 'LEYLA', fs = Math.round(h * 0.75);
+    y += h * 1.1;   // low on the wall, under the workshop's outside picture
     const t = this.dAdd(s.add.text(x, y, text, { fontFamily: 'VT323, monospace', fontSize: `${fs}px`, color: c, stroke: '#' + darker(c, 0.45).toString(16).padStart(6, '0'), strokeThickness: 5 })
       .setOrigin(0.5).setAngle((seed - 0.5) * 9).setDepth(-19.25).setAlpha(0.88));
     const g = this.dG(-19.26), n = 3 + Math.floor(seed * 4);   // drips
@@ -275,6 +278,15 @@ export class CampDecor {
     const T = this.scene.T, len = Math.hypot(q.x - p.x, q.y - p.y), g = this.dG(-15.55), sag = Math.min(2.2 * T, 30 + len * 0.18);
     g.lineStyle(PX * 0.75, col(C.sand)).lineBetween(p.x, p.y, p.x + (q.x - p.x) * 0.18, p.y + sag * 0.55).lineBetween(q.x, q.y, q.x - (q.x - p.x) * 0.18, q.y + sag * 0.55);
     this.decorCloth({ x: p.x + (q.x - p.x) * 0.15, y: p.y + sag * 0.5 }, { x: q.x - (q.x - p.x) * 0.15, y: q.y + sag * 0.5 }, 16, sag * 0.9, sag * 0.9, d.colors, -15.5);
+    // E under it: an hour in the hammock (heals a little, Gemütlichkeit makes the next buff stronger)
+    const mx = (p.x + q.x) / 2, low = Math.max(p.y, q.y) + sag;
+    this.hotspots.push({ rig: true, x: mx, w: Math.max(80, (q.x - p.x) / 3), top: this.ground - low < 260 ? undefined : low, name: d.name || 'Hängematte', hint: 'Abhängen', act: () => this.hammockRest(d) });
+  }
+  hammockRest(d) {
+    const s = this.scene, save = this.box.save, heal = d.heal ?? 15, max = s.leyla.maxHealth;
+    s.hud.menu({ title: d.name || 'Hängematte', sub: `Eine Stunde abhängen. Heilt ${heal} %.`, items: [
+      { label: 'Abhängen', primary: true, act: () => { advance(save, 1); save.health = Math.min(max, Math.max(save.health, s.leyla.health) + max * heal / 100); s.box.persist?.(); s.goCamp({ banner: ['Kurz abgehangen', clockText(save)], fade: 600, keepPlace: true }); } },
+      { label: 'Zurück', act: () => {} }] });
   }
   // the big tent (Daniel: „große Zelte zwischen zwei Containern“): the ridge hangs between the two points, the walls reach down to the
   // ground and out on both sides; a dark entrance in the middle, guy ropes, a warm glow inside at night
@@ -298,6 +310,55 @@ export class CampDecor {
     for (const [a, sx] of [[p, -1], [q, 1]]) { g.lineStyle(PX * 0.75, col(C.sand), 0.9).lineBetween(a.x, a.y, a.x + sx * spread * 1.4, G); this.dR(g, a.x + sx * spread * 1.4 - PX, G - 2 * PX, 2 * PX, 2 * PX, C.ink); }
     const glow = this.dAdd(s.add.image(mx, G - eh * 0.3, glowTexture(s)).setDisplaySize(ew * 2.2, eh * 1.3).setTint(0xffb347).setBlendMode(Phaser.BlendModes.ADD).setDepth(-17.1).setAlpha(0.6 * (this.lightK || 0)));
     this.decorAnim.push(time => glow.setAlpha((this.lightK || 0) * (0.5 + 0.1 * Math.sin(time / 230 + seed * 5))));
+  }
+
+  // ---- more pieces (#036, second round) ----
+  // a string of triangle pennants between two points
+  art_pennants(p, q, d, seed) {
+    const g = this.dG(-15.5), cat = catenary(p, q, 22, 30), cols = String(d.colors || '#df3e23,#ffd541,#249fde,#59c135').split(',').map(t => t.trim());
+    g.lineStyle(2, 0x141013, 0.9).beginPath(); g.moveTo(cat.line[0].x, cat.line[0].y); for (const pt of cat.line) g.lineTo(pt.x, pt.y); g.strokePath();
+    const flags = [];
+    cat.bulbs.forEach((b, k) => {
+      const c = cols[k % cols.length], gg = this.scene.add.graphics();
+      gg.fillStyle(0x141013).fillTriangle(-11, -1, 11, -1, 0, 24).fillStyle(col(c)).fillTriangle(-9, 0, 9, 0, 0, 20).fillStyle(0xffffff, 0.25).fillTriangle(-9, 0, -2, 0, 0, 8);
+      flags.push(this.dAdd(this.scene.add.container(b.x, b.y, [gg]).setDepth(-15.45)));
+    });
+    this.decorAnim.push(time => flags.forEach((f, k) => { f.angle = Math.sin(time / 520 + k * 0.9 + seed * 3) * 8; }));
+  }
+  // a parachute canopy: one big sagging cloth with panels, no walls
+  art_canopy(p, q, d) {
+    const T = this.scene.T, len = q.x - p.x, sag = Math.min(2.5 * T, 24 + len * 0.16);
+    this.decorCloth(p, q, (d.size?.[1] ?? 0.6) * T, sag, sag * 1.05, d.colors || '#e9b5a3,#8e5252', -15.65);
+    const g = this.dG(-15.6);   // the shroud lines at both ends
+    for (const a of [p, q]) for (let k = 0; k < 3; k++) g.lineStyle(1.5, 0xdae0ea, 0.6).lineBetween(a.x, a.y, p.x + (q.x - p.x) * (a === p ? 0.08 + k * 0.05 : 0.92 - k * 0.05), a.y + sag * 0.5);
+  }
+  // an oil drum with a fire: flames from code, a warm light at night
+  art_barrel(x, y, w, h, d, seed) {
+    const s = this.scene, g = this.dG(-16), bw = w * 0.8, bh = h * 0.7;
+    this.dR(g, x - bw / 2 - PX, y - bh - PX, bw + 2 * PX, bh + PX, C.ink);
+    this.dR(g, x - bw / 2, y - bh, bw, bh, C.rust); this.dR(g, x - bw / 2, y - bh, PX * 2, bh, C.copper, 0.6);
+    for (const k of [0.25, 0.6]) this.dR(g, x - bw / 2, y - bh + bh * k, bw, PX, C.brown);
+    for (let k = 0; k < 4; k++) this.dR(g, x - bw / 2 + PX * 2 + k * bw / 4.5, y - bh * 0.45, PX, PX * 2, '#ffb347', 0.8);   // glowing holes
+    const fl = this.dAdd(s.add.graphics().setDepth(-15.9));
+    const l = this.light(x, y - bh, 220, '#ff8a2a', 0.8); l.rig = true;
+    this.decorAnim.push(time => {
+      fl.clear(); const t = time / 1000;
+      for (const [dx, base, ph] of [[-bw * 0.25, 30, 0], [bw * 0.2, 26, 2.1], [0, 42, 4.3]]) {
+        const top = base + Math.sin(t * 7 + ph + seed * 9) * 6;
+        for (let yy = 0; yy < top; yy += 6) { const wd = Math.max(4, (1 - yy / top) * 18), sw = Math.sin(t * 5 + ph + yy / 9) * 3; fl.fillStyle(yy > top * 0.55 ? 0xff5a1f : yy > top * 0.25 ? 0xff9a2a : 0xffe08a).fillRect(x + dx + sw - wd / 2, y - bh - yy - 6, wd, 6); }
+      }
+      l.setAlpha(l.base * Math.max(0.35, this.lightK || 0) * (0.85 + 0.15 * Math.sin(t * 11 + seed)));
+    });
+  }
+  // rain on the rig (#036, Wetter am Rig): puddles on the campsite and drips from the container edges while it rains
+  drawRainBits() {
+    const s = this.scene, T = s.T;
+    if (!s.rain) return;
+    const g = this.dG(-15.95), seed = this.box.save.day || 1;
+    for (let k = 0; k < 7; k++) { const x = this.groundX(-2 + ((k * 3.7 + seed) % 22)), w = 60 + ((k * 37) % 70); g.fillStyle(0x285cc4, 0.35).fillEllipse(x, this.ground - 2, w, 8).fillStyle(0xa6fcdb, 0.25).fillEllipse(x - w * 0.15, this.ground - 3, w * 0.4, 3); }
+    const drips = [];
+    for (const u of this.geo.units || []) if (u.ui > 0) for (const x of [u.in0 + 6, u.in0 + u.cell * u.places - 6]) drips.push({ x, y: u.floorY + 8, o: this.dAdd(s.add.rectangle(x, u.floorY + 8, 3, 7, 0xa6fcdb, 0.8).setDepth(-15.9)), ph: Math.random() });
+    this.decorAnim.push(time => drips.forEach(d => { const t = ((time / 900 + d.ph) % 1); d.o.y = d.y + t * (this.ground - d.y); d.o.setAlpha(0.8 * (1 - t * 0.6)); }));
   }
 
   updateDecor(time, dt) {

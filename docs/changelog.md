@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 15.11.2026: **Deko fürs Camp** (#036): 27 Stücke vom Händler im Bau-Modus, frei platzierbar am Boden, an Container-Wänden, auf Dächern oder zwischen zwei Punkten: Neon, Banner, Graffiti, Wäsche, Wimpel, Segel, Fallschirm, Hängematte, große Zelte, Windrad, Pflanzen, Feuertonne, Krähen … Gemütlichkeit stärkt Buffs; Pfützen bei Regen.
 - 15.11.2026: **Leiter orthogonal, Anhänger mit Leiter** (#035): Anfang und Ende der Leiter streng von vorn aus Code; Container-Anhänger auf dem Fahrgestell haben eine Leiter statt der Klapptreppe.
 - 15.11.2026: **Synergie-Vorschau, Reihenschaltung, neue Leitern** (#034): beim Platzieren zeigt jeder Platz seinen Bonus wie bei Dorfromantik; gleiche Werkstätten in Reihe und volle Container geben dicke Boni; alle Leitern aus einer PixelLab-Stahlleiter mit Haken, Halteplatten, kaputten Sprossen und Fußplatten, einfärbbar.
 - 15.11.2026: **Synergien** (#033): Werkstätten, die nebeneinander (auch über Containergrenzen, Stapel und das Mega-Rig-Raster) passend stehen, arbeiten schneller, machen mehr Strom oder geben stärkere Buffs; voller Bonus, wenn alle angrenzenden Plätze passen; leuchtende Verbindungen im Rig. Kühlraum mit neuem, flachem Bild.

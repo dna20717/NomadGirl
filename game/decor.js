@@ -12,7 +12,7 @@
 export const DECOR_PLACES = [['ground', 'Auf dem Boden'], ['wall', 'An der Container-Wand'], ['roof', 'Auf dem Dach'], ['span', 'Zwischen zwei Punkten']];
 export const DECOR_ARTS = [['addon', 'Ausschnitt eines Anbauteils'], ['neon', 'Neon-Schild'], ['banner', 'Banner'], ['graffiti', 'Graffiti'], ['line', 'Wäscheleine'],
   ['sail', 'Sonnensegel'], ['tent', 'Zelt'], ['pole', 'Zeltstange (Ankerpunkt)'], ['windmill', 'Windrad'], ['plant', 'Pflanze im Topf'], ['tripod', 'Dreibein mit Topf'],
-  ['birdhouse', 'Vogelhaus (Krähen)'], ['trophies', 'Kiste mit Fundstücken'], ['hammock', 'Hängematte'], ['lantern', 'Laterne']];
+  ['birdhouse', 'Vogelhaus (Krähen)'], ['trophies', 'Kiste mit Fundstücken'], ['hammock', 'Hängematte'], ['lantern', 'Laterne'], ['pennants', 'Wimpelkette'], ['canopy', 'Fallschirm-Plane'], ['barrel', 'Feuertonne']];
 
 export const decorDef = (D, id) => D.decor?.[id] || null;
 export const placeOf = (D, id) => decorDef(D, id)?.place || 'ground';

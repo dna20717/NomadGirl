@@ -419,7 +419,7 @@ export class BuildMode {
       const H = { free: [['move', 'AvA zum nächsten Ziel'], ['ok', 'packen'], ['send', 'Händler'], ['context', 'mehr (halten: rückgängig)'], ['tabs', 'Bereich'], ['back', 'fertig']],
         hold: [['move', 'wohin damit'], ['ok', 'ablegen'], ['send', 'Schrottplatz (halten: verkaufen)'], ['back', 'zurücklegen']],
         wire: [['move', 'zum nächsten Andockpunkt'], ['ok', 'einhängen'], ['back', 'loslassen']],
-        shop: [['move', 'wählen'], ['ok', 'kaufen (aufs Pad)'], ['tabs', 'Werkstätten · Anhänger · Rig-Teile'], ['back', 'zu']] }[hs];
+        shop: [['move', 'wählen'], ['ok', 'kaufen (aufs Pad)'], ['tabs', 'Werkstätten · Anhänger · Rig-Teile · Deko'], ['back', 'zu']] }[hs];
       const nh = hints(H, 'Maus: Teile packen und ziehen · Strg+Z rückgängig · B fertig · rechter Stick: AvA frei fliegen');
       nh.classList.add('bm-hints'); sh.hint.replaceWith(nh); sh.hint = nh;
     }

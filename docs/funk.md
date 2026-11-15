@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #036 fertig: Deko-System mit 27 Stücken (Neon, Graffiti, Zelte, Hängematte, Windrad, Krähen …), Gemütlichkeit, Wetter am Rig. PixelLab 0.
 - 15.11. Code → Ava: #036 Deko-System fürs Camp läuft (Daniel AFK).
 - 15.11. Code → Ava: #035 fertig: Leiter oben/unten streng von vorn (Code), Anhänger mit Leiter statt Klapptreppe. PixelLab 0.
 - 15.11. Code → Ava: #034 fertig: Synergie-Vorschau, Reihenschaltung, Leitern aus PixelLab (20, übrig 464). Backlog: Grafiken für evolutionierte Werkstätten.
@@ -583,11 +584,17 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `tools/ladder_parts.py`, `camp.js` › `groundLadder`, `cozy_test` angepasst. Tests: `npm test` 160, alle 35 Browser-Tests grün. PixelLab 0. **Bitte testen:** Camp, Leiter am Anhänger hochklettern; Leitern im Kampfraum und auf /megarig.
 
 ### #036 Deko-System fürs Camp + Beispiele aus allen Paketen
-- **Status:** läuft (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, AFK)
+- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, AFK)
 - **Für:** Code
 - **Auftrag:** Daniel: „Bau das Dekosystem und aus jeder deiner Pakete ein paar Beispiele. Vielleicht auch große Zelte zwischen zwei Containern? Nimm dir richtig Zeit und probiere viele Dinge aus.“ Ideen aus dem Chat: Neon/Banner am Rig, Sonnensegel, Schrott-Stillleben, Trophäen-Regal draußen, Wäscheleine, Windrad, Pflanzen, Hängematte, Graffiti, Topf überm Feuer, Kleinvieh, Wetter am Rig. Deko kostet Δ, keine Werte (einige Gemütlichkeit).
 - **Rückfragen:**
-- **Ergebnis:**
+  - Platzieren → ⚠️ im Bau-Modus wie alles andere (Händler › Deko → in die Hand → Ziel); Bereich „Lagerplatz“ neu.
+  - Zelte zwischen zwei Containern → ⚠️ Spannstück zwischen zwei beliebigen Ankern; damit es auch frei geht: **Zeltstangen** als eigener Ankerpunkt am Boden (die Container im Rig stehen dicht).
+  - Gemütlichkeit → ⚠️ stärkere Buffs beim Schlafen und Ausruhen (1 % je Punkt, bis 25 %), sonst keine Werte.
+  - Hängematte → ⚠️ benutzbar: eine Stunde abhängen, heilt 15 %.
+  - Wetter am Rig → ⚠️ automatisch bei Regen (Pfützen, Tropfen), kein Kaufstück.
+  - Mega-Rig → ⚠️ nur Boden- und Zeltstangen-Deko, Wand/Dach später.
+- **Ergebnis:** `game/decor.js`, `camp_decor.js`, `build_decor.js`, Bereich Deko (27 Stücke), Camp › Deko, Achievement „Wohnzimmer mit Aussicht“ + Trophäe. Tests: `npm test` 166 (6 neu), alle 36 Browser-Tests grün (neu `decor_test` 5). PixelLab 0. **Bitte testen:** Bau-Modus › Händler › Deko: Zeltstangen setzen und ein Zelt dazwischen spannen, Neon an einen Container, Wäscheleine zwischen zwei Ecken, Hängematte benutzen, nachts schauen (Neon, Laterne, Feuertonne, Zelt-Licht), Vogelhaus aufs Dach und zu den Krähen laufen.
 
 ## Archiv
 

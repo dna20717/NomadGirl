@@ -53,6 +53,19 @@ r = await ev(() => {
   return { n: save.rig.decor.length, anim: s.camp.decorAnim.length, objs: s.camp.rigObjs.length };
 });
 check('Alle Deko-Arten zeichnen sich ohne Fehler, bewegte haben eine Animation', r.n >= 15 && r.anim >= 5, r);
+// the hammock between two poles: E under it, an hour passes, a little health
+r = await ev(() => {
+  const s = game.scene.getScene('play'), save = s.box.save, c = s.camp;
+  save.rig.decor = [{ id: 'zeltstange', at: { x: 12 } }, { id: 'zeltstange', at: { x: 15 } }, { id: 'haengematte', at: { a: 'pole:0', b: 'pole:1' } }];
+  c.drawRig();
+  const h = c.hotspots.find(x => x.name === s.data_.decor.haengematte.name);
+  if (!h) return { h: null };
+  save.health = 40; s.leyla.health = 40; const t0 = save.day * 24 + save.hour;
+  h.act(); const m = nomad.menu(); nomad.choose('Abhängen'); nomad.release();
+  return { h: h.hint, m: m?.title, hours: save.day * 24 + save.hour - t0, health: save.health };
+});
+check('Hängematte: E unter ihr, eine Stunde abhängen heilt', r.h === 'Abhängen' && r.hours === 1 && r.health > 40, r);
+await page.waitForFunction(() => { const s = game.scene.getScene('play'); return s?.camp && !s.leaving; }, null, { timeout: 60000 });
 if (shots) { fs.mkdirSync('output', { recursive: true }); await page.waitForTimeout(800); await page.screenshot({ path: 'output/decor_alle.png' }); }
 
 await browser.close();

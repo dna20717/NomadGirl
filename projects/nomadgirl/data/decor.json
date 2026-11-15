@@ -200,7 +200,7 @@
    1
   ],
   "colors": "#bc4a9b,#f2e3c4",
-  "description": "Zwischen zwei Punkten, nah beieinander am schönsten."
+  "description": "Zwischen zwei Punkten, nah beieinander am schönsten. E: eine Stunde abhängen (heilt etwas)."
  },
  "graffiti": {
   "name": "Graffiti",
@@ -277,5 +277,80 @@
   ],
   "colors": "#8e5252,#c7b08b",
   "description": "Zwischen zwei Containern, zwei Zeltstangen oder Container und Mast: der First hängt zwischen den Punkten, die Bahnen reichen bis zum Boden."
+ },
+ "wimpelkette": {
+  "name": "Wimpelkette",
+  "art": "pennants",
+  "place": "span",
+  "value": 20,
+  "cozy": 2,
+  "colors": "#df3e23,#ffd541,#249fde,#59c135,#bc4a9b",
+  "size": [
+   0,
+   0.4
+  ],
+  "description": "Bunte Wimpel zwischen zwei Punkten, flattern im Wind."
+ },
+ "fallschirm": {
+  "name": "Fallschirm-Plane",
+  "art": "canopy",
+  "place": "span",
+  "value": 70,
+  "cozy": 3,
+  "colors": "#e9b5a3,#8e5252",
+  "size": [
+   0,
+   0.6
+  ],
+  "description": "Ein alter Lastenfallschirm als Dach: hängt tief durch, Schatten für alle."
+ },
+ "feuertonne": {
+  "name": "Feuertonne",
+  "art": "barrel",
+  "place": "ground",
+  "value": 35,
+  "cozy": 3,
+  "size": [
+   1,
+   1.4
+  ],
+  "description": "Ölfass mit Feuer drin. Wärmt, leuchtet, knistert."
+ },
+ "neon_herz": {
+  "name": "Neon-Herz",
+  "art": "neon",
+  "place": "wall",
+  "value": 50,
+  "cozy": 2,
+  "size": [
+   1.2,
+   1
+  ],
+  "color": "#ff4b8b",
+  "text": "<3",
+  "description": "Ein kleines Herz in Pink."
+ },
+ "neon_pfeil": {
+  "name": "Neon-Pfeil",
+  "art": "neon",
+  "place": "wall",
+  "value": 45,
+  "cozy": 1,
+  "size": [
+   2,
+   1
+  ],
+  "color": "#ffd541",
+  "text": ">>>|EINGANG|BAR >",
+  "description": "Zeigt, wo es langgeht."
+ },
+ "zelt_militaer": {
+  "name": "Armeezelt",
+  "art": "tent",
+  "place": "span",
+  "value": 110,
+  "cozy": 4,
+  "colors": "#5a4e44,#796755",
+  "description": "Olivgrün, geflickt, bombenfest."
  }
 }
