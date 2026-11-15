@@ -31,6 +31,8 @@ Stand: 12.11.2026 abends (Durchsicht von Ava). Kleinigkeiten sind schon behoben 
 - **design.md, offene Fragen:** Ranking-Bonus pro Rang, was macht die Zelle im Rig, das „vielleicht noch Gefährlichere“, Feinschliff nach dem ersten Anspielen.
 - **Ressourcen verdienen:** design.md nennt Ressourcen für Kisten, Kills, Secrets, Kochen, Bauen, guten Rang. Gebaut sind bisher Zerlegen und der Tresor.
 
+- **Grafiken für weiterentwickelte Werkstätten** (Daniel, 15.11.2026, #034): jede Werkstatt mit Stufen (Techtree, Ausbau) bekommt je Stufe ein eigenes Bild (PixelLab, streng frontal, gleiche Box), damit man den Fortschritt im Rig sieht.
+
 ## C. Technische Schulden
 
 | # | Stelle | Problem | Aufwand |
