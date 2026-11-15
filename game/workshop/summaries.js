@@ -132,7 +132,8 @@ export const SUMMARY = {
       box.replaceChildren(roomMap(r, 320), roomLegend(), facts([
         ['Hauptweg', main.join(' → ')],
         ['Abzweige', L.rooms.filter(o => o.band === 'branch').map(o => R[o.id]?.name || o.id).join(', ') || 'keine'],
-        ['Abkürzung', L.shortcut ? 'Tunnel vom Ausgang zum Eingang' : 'keine'],
+        ['Aufbau', L.stack === 'tower' ? 'Turm: vom Eingang nach oben' : L.stack === 'deep' ? 'Tiefe: vom Eingang nach unten' : 'Nebeneinander'],
+        ['Abkürzung', !L.shortcut ? 'keine' : L.shortcut.kind === 'shaft' ? 'Schacht mit Leiter neben dem Stapel, Tür unten' : 'Tunnel vom Ausgang zum Eingang'],
         ['Kisten · Secrets · Gegner', `${r.marks.C.length} · ${new Set([...r.marks.B, ...r.marks['%'], ...r.marks.$].map(([bx]) => bx)).size} · ${r.spawns.length}`],
         ['Größe', `${r.w} × ${r.h} Kacheln · Seed ${seed}`],
         ...L.problems.map(t => ['Hinweis', t])]),

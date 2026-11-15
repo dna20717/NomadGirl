@@ -12,7 +12,7 @@ import { ensureSites } from '../salvage.js';
 import { drawMap } from '../map_render.js';
 import { ITEM_CATEGORIES, optionLabel as optLabel } from '../../engine/schema.js';
 
-const KIND_NAMES = { gasStation: 'Tankstelle', mall: 'Markt', bunker: 'Bunker', government: 'Behörde' };
+const KIND_NAMES = { gasStation: 'Tankstelle', mall: 'Markt', bunker: 'Bunker', government: 'Behörde', highrise: 'Hochhaus', underground: 'Untergrund', factory: 'Fabrik', settlement: 'Siedlung', ruin: 'Ruine' };
 const HINT_COLORS = { valuable: '#f9a31b', blueprint: '#249fde', implant: '#20d6c7', ingredient: '#59c135', food: '#9cdb43', resource: '#c7b08b', component: '#8b93af', consumable: '#e86a73', armor: '#6d758d', weapon: '#df3e23', dronepart: '#bc4a9b' };
 const de = n => String(n).replace('.', ',');
 

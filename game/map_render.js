@@ -5,6 +5,8 @@ import { mapConfig, neighbours, hops } from './worldmap.js';
 
 const KIND = {   // pin colour and a tiny pictogram per POI kind
   gasStation: { color: '#df3e23', glyph: 'pump' }, mall: { color: '#bc4a9b', glyph: 'cart' }, bunker: { color: '#4a5462', glyph: 'hatch' }, government: { color: '#143464', glyph: 'columns' },
+  highrise: { color: '#5d6872', glyph: 'tower' }, underground: { color: '#7a4841', glyph: 'stairs' }, factory: { color: '#a36633', glyph: 'chimney' },
+  settlement: { color: '#5a8a3a', glyph: 'trailer' }, ruin: { color: '#8a7a5a', glyph: 'mast' },
 };
 const INK = '#322b28', RED = '#b4202a';
 const hashOf = s => { let h = 2166136261; for (const c of String(s)) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return (h >>> 0) / 4294967296; };
@@ -141,6 +143,11 @@ function glyph(ctx, kind, x, y, r) {
   else if (kind === 'cart') { ctx.beginPath(); ctx.moveTo(x - s, y - s * 0.6); ctx.lineTo(x - s * 0.6, y + s * 0.4); ctx.lineTo(x + s, y + s * 0.4); ctx.lineTo(x + s * 0.9, y - s * 0.4); ctx.closePath(); ctx.fill(); ctx.fillRect(x - s * 0.5, y + s * 0.6, s * 0.3, s * 0.3); ctx.fillRect(x + s * 0.4, y + s * 0.6, s * 0.3, s * 0.3); }
   else if (kind === 'hatch') { ctx.beginPath(); ctx.moveTo(x - s, y + s * 0.7); ctx.lineTo(x, y - s); ctx.lineTo(x + s, y + s * 0.7); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#4a5462'; ctx.fillRect(x - s * 0.3, y, s * 0.6, s * 0.7); }
   else if (kind === 'columns') { ctx.fillRect(x - s, y - s, s * 2, s * 0.35); for (const dx of [-0.7, 0, 0.7]) ctx.fillRect(x + dx * s - s * 0.15, y - s * 0.6, s * 0.3, s * 1.2); ctx.fillRect(x - s, y + s * 0.65, s * 2, s * 0.3); }
+  else if (kind === 'tower') { ctx.fillRect(x - s * 0.55, y - s, s * 1.1, s * 2); ctx.fillStyle = '#5d6872'; for (const yy of [-0.7, -0.2, 0.3]) for (const xx of [-0.3, 0.1]) ctx.fillRect(x + xx * s, y + yy * s, s * 0.22, s * 0.25); }
+  else if (kind === 'stairs') { ctx.beginPath(); ctx.moveTo(x - s, y - s * 0.8); for (let i = 0; i < 4; i++) { ctx.lineTo(x - s + (i + 1) * s * 0.5, y - s * 0.8 + i * s * 0.45); ctx.lineTo(x - s + (i + 1) * s * 0.5, y - s * 0.8 + (i + 1) * s * 0.45); } ctx.lineTo(x - s, y + s); ctx.closePath(); ctx.fill(); }
+  else if (kind === 'chimney') { ctx.fillRect(x - s, y, s * 2, s * 0.9); ctx.fillRect(x - s * 0.7, y - s, s * 0.35, s); ctx.fillRect(x + s * 0.2, y - s * 0.6, s * 0.35, s * 0.6); }
+  else if (kind === 'trailer') { ctx.fillRect(x - s, y - s * 0.4, s * 1.7, s * 0.9); ctx.beginPath(); ctx.arc(x - s * 0.4, y + s * 0.6, s * 0.25, 0, Math.PI * 2); ctx.fill(); ctx.fillRect(x + s * 0.7, y + s * 0.2, s * 0.35, s * 0.12); }
+  else if (kind === 'mast') { ctx.beginPath(); ctx.moveTo(x, y - s); ctx.lineTo(x + s * 0.6, y + s); ctx.moveTo(x, y - s); ctx.lineTo(x - s * 0.6, y + s); ctx.moveTo(x - s * 0.4, y + s * 0.3); ctx.lineTo(x + s * 0.4, y + s * 0.3); ctx.stroke(); ctx.beginPath(); ctx.arc(x, y - s, s * 0.2, 0, Math.PI * 2); ctx.fill(); }
   else { ctx.beginPath(); ctx.arc(x, y, s * 0.5, 0, Math.PI * 2); ctx.fill(); }
   ctx.restore();
 }

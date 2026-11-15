@@ -115,3 +115,48 @@ test('Spannungskurve: ruhiger Eingang, lauter Ausgang, kein Boss aus der 1', () 
   const off = buildPoi({ ...D, pois: { ...D.pois, tankstelle_km7: { ...D.pois.tankstelle_km7, curve: '' } } }, 'tankstelle_km7', 3);
   assert.ok(off.rooms.every(x => x.intensity === 100));
 });
+
+// #038: eight new POIs, three of them towers and three deep (stacked rooms, a shaft as the shortcut)
+const NEW_POIS = ['delta_heights', 'parkhaus_sued', 'funkmast_km31', 'metro_line4', 'storm_drain9', 'pit6', 'delta_crude', 'sunny_acres'];
+test('neue POIs (#038): spielbar, alles erreichbar, das Ziel auch ohne die Abkürzungs-Tür', () => {
+  for (const p of NEW_POIS) {
+    assert.equal(poiReady(D, p).ok, true, p);
+    for (const seed of [1, 2, 3, 4, 5, 6, 7, 8]) {
+      const L = buildPoi(D, p, seed), lay = L.def.layout, R = reach(lay), miss = [];
+      assert.equal(L.problems.length, 0, `${p} ${seed}: ${L.problems.join('; ')}`);
+      for (let y = 0; y < lay.length; y++) for (let x = 0; x < lay[0].length; x++) if ('CZvS'.includes(lay[y][x]) && !R.can(x, y)) miss.push(`${lay[y][x]} ${x},${y}`);
+      assert.deepEqual(miss, [], `${p} Seed ${seed}`);
+      if (!L.stack) continue;
+      // the main way works without the shortcut: with the door shut the goal is still reachable
+      const shut = reach(lay.map(r => r.replace(/D/g, '#'))), z = [];
+      lay.forEach((r, y) => [...r].forEach((c, x) => { if (c === 'Z') z.push([x, y]); }));
+      assert.ok(z.length === 1 && shut.can(...z[0]), `${p} ${seed}: Ziel ohne Tür`);
+    }
+  }
+});
+test('Stapel (#038): Turm geht nach oben, Tiefe nach unten, Leitern verbinden die Räume, Schacht mit Tür', () => {
+  for (const [p, dir] of [['delta_heights', 'tower'], ['parkhaus_sued', 'tower'], ['funkmast_km31', 'tower'], ['metro_line4', 'deep'], ['storm_drain9', 'deep'], ['pit6', 'deep']]) for (let seed = 1; seed <= 6; seed++) {
+    const L = buildPoi(D, p, seed), lay = L.def.layout, main = L.rooms.filter(r => r.band === 'main');
+    assert.equal(L.stack, dir);
+    assert.equal(main[0].id, L.start); assert.equal(main.at(-1).id, L.exit);
+    for (let i = 1; i < main.length; i++) assert.ok(dir === 'tower' ? main[i].y < main[i - 1].y : main[i].y > main[i - 1].y, `${p} ${seed}: Raum ${i} ${dir}`);
+    // between two stacked rooms a ladder goes through floor and ceiling
+    for (let i = 1; i < main.length; i++) {
+      const [up, lo] = dir === 'tower' ? [main[i], main[i - 1]] : [main[i - 1], main[i]], fy = up.y + up.h - 1;
+      assert.ok([...lay[fy]].some((c, x) => c === 'H' && lay[fy + 1][x] === 'H' && x >= lo.x && x < lo.x + lo.w), `${p} ${seed}: Leiter ${up.id} ↔ ${lo.id}`);
+    }
+    // the shaft: a ladder from the top room's floor to the bottom room's floor, a door at the bottom, a switch on the far side
+    const sc = L.shortcut, [lx, top] = dir === 'tower' ? sc.down : sc.up, bottom = sc.floor;
+    for (let y = top; y < bottom; y++) assert.equal(lay[y][lx], 'H', `${p} ${seed}: Schacht-Leiter ${lx},${y}`);
+    assert.equal(lay[sc.door[1]][sc.door[0]], 'D');
+    assert.ok(lay.some(r => r.includes('S')));
+    // compact: the stack stays roughly above its first room
+    assert.ok(L.def.size[0] < 100, `${p} ${seed}: ${L.def.size[0]} breit`);
+  }
+});
+test('Stapel (#038): gespiegelte Räume, gleicher Seed = gleiches Level', () => {
+  const a = buildPoi(D, 'pit6', 4), b = buildPoi(D, 'pit6', 4);
+  assert.deepEqual(a.def.layout, b.def.layout);
+  const flips = [1, 2, 3, 4, 5, 6, 7, 8].flatMap(s => buildPoi(D, 'pit6', s).rooms.filter(r => r.flip)).length;
+  assert.ok(flips > 0, 'manche Räume gespiegelt');
+});

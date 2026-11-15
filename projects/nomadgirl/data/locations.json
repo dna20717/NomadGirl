@@ -2,5 +2,7 @@
  "tankstelle_km7": {"name": "Mile 7 Gas & Go", "poi": "tankstelle_km7", "position": [-6, 8], "region": "South Badlands"},
  "grossmarkt": {"name": "Delta South Megamall", "poi": "grossmarkt", "position": [42, 10], "region": "The Outskirts"},
  "bunker_13": {"name": "Deadlock Bunker 13", "poi": "bunker_13", "position": [-40, 30], "region": "Salt Flats"},
- "ministerium": {"name": "Ministry of Order", "poi": "ministerium", "position": [50, -30], "region": "Delta Ring"}
+ "ministerium": {"name": "Ministry of Order", "poi": "ministerium", "position": [50, -30], "region": "Delta Ring"},
+ "delta_heights": {"name": "Delta Heights", "poi": "delta_heights", "position": [16, 4], "region": "The Outskirts"},
+ "pit6": {"name": "Pit 6", "poi": "pit6", "position": [-20, 46], "region": "Salt Flats"}
 }

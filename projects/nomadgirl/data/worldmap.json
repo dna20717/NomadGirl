@@ -13,7 +13,15 @@
   {"poi": "tankstelle_km7", "weight": 4, "names": "Mile {km} Gas & Go|{brand} Station {word}|{word} Truck Stop|{word} Fuel Depot"},
   {"poi": "grossmarkt", "weight": 3, "names": "{word} Megamall|{brand} Market {word}|{word} Plaza|{region} Outlet"},
   {"poi": "bunker_13", "weight": 2, "names": "Bunker {nr}|{word} Shelter|Silo {nr}|{word} Depot"},
-  {"poi": "ministerium", "weight": 1, "names": "Bureau of {office}|Ministry of {office}|{word} Authority"}
+  {"poi": "ministerium", "weight": 1, "names": "Bureau of {office}|Ministry of {office}|{word} Authority"},
+  {"poi": "delta_heights", "weight": 2, "names": "{word} Heights|{word} Tower|{brand} Plaza Tower|Skyline {nr}"},
+  {"poi": "parkhaus_sued", "weight": 2, "names": "P+R {word}|{word} Car Park|{brand} Parking|Deck {nr}"},
+  {"poi": "funkmast_km31", "weight": 3, "names": "Radio Mast KM {km}|{word} Relay|{word} Transmitter|Antenna {nr}"},
+  {"poi": "metro_line4", "weight": 2, "names": "Metro Line {nr}|{word} Station|{word} Underground|Subway {nr}"},
+  {"poi": "storm_drain9", "weight": 3, "names": "Storm Drain {nr}|{word} Sewer|{word} Overflow|Culvert {nr}"},
+  {"poi": "pit6", "weight": 1, "names": "Pit {nr}|{word} Mine|{word} Salt Works|Shaft {nr}"},
+  {"poi": "delta_crude", "weight": 2, "names": "{brand} Refinery|{word} Crude|{word} Oil Works|Plant {nr}"},
+  {"poi": "sunny_acres", "weight": 3, "names": "{word} Acres|{word} Trailer Park|{word} Mobile Homes|Camp {nr}"}
  ],
  "words": "Sunhollow, Saltcross, Thornfield, East Bend, Crowbay, Tinhaven, Rustvale, Sparkridge, Emberpit, Copperfield, Ashfall, Neon Flats, Static Creek, Slagmoor, Chrome Hollow, Daybreak, Wireheath, Mirrorlake",
  "offices": "Order, Water, Tomorrow, Radiation Control, Homeland, Reconstruction, Rations, Weather",

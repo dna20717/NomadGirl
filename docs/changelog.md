@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 15.11.2026: **Acht neue POIs, auch vertikal** (#038): Hochhaus-Ruine Delta Heights, Parkhaus P+R Delta Süd und Funkmast KM 31 gehen nach oben, Metro Line 4, Storm Drain 9 und das Salzbergwerk Pit 6 nach unten, dazu Raffinerie Delta Crude und Trailerpark Sunny Acres; 53 neue Raum-Bausteine, Stapel-Modus mit Leitern zwischen den Etagen, gespiegelten Räumen und einem Schacht als Abkürzung.
 - 15.11.2026: **Balkone, Brücken, Aussichtsturm** (#037): begehbare Deko; vom Turm über die Hängebrücke auf den Balkon in den oberen Container.
 - 15.11.2026: **Deko fürs Camp** (#036): 27 Stücke vom Händler im Bau-Modus, frei platzierbar am Boden, an Container-Wänden, auf Dächern oder zwischen zwei Punkten: Neon, Banner, Graffiti, Wäsche, Wimpel, Segel, Fallschirm, Hängematte, große Zelte, Windrad, Pflanzen, Feuertonne, Krähen … Gemütlichkeit stärkt Buffs; Pfützen bei Regen.
 - 15.11.2026: **Leiter orthogonal, Anhänger mit Leiter** (#035): Anfang und Ende der Leiter streng von vorn aus Code; Container-Anhänger auf dem Fahrgestell haben eine Leiter statt der Klapptreppe.

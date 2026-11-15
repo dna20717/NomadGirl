@@ -159,12 +159,18 @@ export class PoiLevel {
   nearest() {
     const l = this.scene.leyla, range = this.scene.data_.camp?.interactRange ?? 130;
     const close = o => Math.abs(o.x - l.x) < range && Math.abs(o.feet - l.feet) < 60;
-    for (const z of this.goals) if (close(z)) return this.done ? { text: 'Geknackt · Abkürzung zum Van: unten durch den Tunnel' } : { text: 'Tresor knacken · POI abschließen', act: () => this.finish() };
+    for (const z of this.goals) if (close(z)) return this.done ? { text: `Geknackt · Abkürzung zum Van: ${this.shortcutWay()}` } : { text: 'Tresor knacken · POI abschließen', act: () => this.finish() };
     for (const c of this.chests) if (!c.open && close(c)) return { text: 'Kiste öffnen', act: () => this.openChest(c) };
     for (const sw of this.switches) if (close(sw)) return sw.on ? { text: 'Schalter ist umgelegt' } : { text: 'Schalter umlegen', act: () => this.pull(sw) };
     for (const d of this.doors) if (!d.open && Math.abs((d.x0 + d.x1) / 2 * this.scene.T - l.x) < range * 0.8 && l.feet > d.y0 * this.scene.T && l.feet <= d.y1 * this.scene.T + 4)
       return { text: 'Die Tür geht von dieser Seite nicht auf' };
     return null;
+  }
+
+  // where the way back is (#038: stacked POIs have a shaft beside the rooms instead of the tunnel underneath)
+  shortcutWay() {
+    const st = this.scene.levelInfo?.stack;
+    return st === 'tower' ? 'der Schacht neben dem Turm, ganz nach unten' : st === 'deep' ? 'durch die Tür am Schacht, die Leiter hoch' : 'unten durch den Tunnel';
   }
 
   openChest(c) {
@@ -247,7 +253,7 @@ export class PoiLevel {
         { label: `Kills ${kills}/${this.killsMax}`, sub: `${r.parts.kills} Punkte` },
         { label: `Secrets ${this.secrets}/${this.secretsMax}`, sub: `${r.parts.secrets} Punkte` },
         { label: `Tresor: ${haul.reduce((n, t) => n + t.n, 0)} Dinge`, sub: haul.slice(0, 6).map(t => D.items?.[t.id]?.name || t.id).join(', ') + (haul.length > 6 ? ' …' : '') + (extra ? ` · +${extra} für den Rang` : '') },
-        { label: 'Weiter', primary: true, sub: 'Zurück zum Van: die Abkürzung führt unten durch den Tunnel', act: () => {} },
+        { label: 'Weiter', primary: true, sub: `Zurück zum Van: ${this.shortcutWay()}`, act: () => {} },
       ].map(i => ({ ...i, act: i.act || (() => {}) })),
     });
   }

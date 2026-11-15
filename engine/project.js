@@ -87,7 +87,7 @@ function usageChecks(p, m) {
     const e = r.area === 'enemies' && p.data.enemies?.[r.value];
     if (e && !e.kit) m.push({ kind: 'error', text: `${AREAS[a].singular || AREAS[a].name} „${x.name || eid}“: Gegner „${e.name || r.value}“ ist aus Code gezeichnet (kein Bausatz) und darf nicht auftauchen`, place: { area: a, id: eid } });
   }
-  for (const [id, x] of Object.entries(p.data.pois || {})) if (!Object.values(p.data.locations || {}).some(l => l.poi === id)) m.push({ kind: 'hint', text: `POI „${x.name || id}“ hat noch keinen Ort auf der Oberwelt`, place: { area: 'pois', id } });
+  for (const [id, x] of Object.entries(p.data.pois || {})) if (!Object.values(p.data.locations || {}).some(l => l.poi === id) && !(p.data.worldmap?.kinds || []).some(k => k.poi === id)) m.push({ kind: 'hint', text: `POI „${x.name || id}“ hat noch keinen Ort auf der Oberwelt (weder Ort noch Reisekarte › Arten)`, place: { area: 'pois', id } });
 }
 
 // Where is area:id used? → [{ area, id, name, path }]
