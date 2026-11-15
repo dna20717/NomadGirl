@@ -28,8 +28,9 @@ Werkstatt-Bilder mit Licht und Effekten, Füllstand, Benutzen, verpackte Werkst�
 
 ## Neue Werkstätten und Grafiken (#033, Daniel 15.11.2026)
 
-- **Bilder für die letzten vier** ohne Grafik: Kühlraum, Motorraum, Zelle, Reaktor (2 Plätze, 384 × 224), PixelLab streng frontal mit Hydrokultur und Ripperdoc als Stilreferenz.
+- **Bilder** für Motorraum, Zelle, Reaktor (2 Plätze, 384 × 224), PixelLab streng frontal mit Hydrokultur und Ripperdoc als Stilreferenz.
 - **Heavy-Duty-Werkbank** (`heavy_duty`, Funktion „Fahrzeuge“): stellt jedes Rig-Teil her (alle Rezepte mit „Teil“, `recipesFor`), Fahrzeug-Skilltrees kommen später hierher.
 - **Auftragsbüro** (`auftragsbuero`, Funktion „Aufträge“): das Schwarze Brett als Raum im Rig, E öffnet dasselbe Brett (`boardMenu`). Später: fertige Aufträge gegen bessere Belohnungen tauschen.
 - **Waffenkammer** (`waffengalerie`, Funktion „Waffenkammer“): Raum wie die Halle der Beute mit drei Display-Boards und einer Vitrine; Ständer nehmen Waffen (Ständer › Nimmt = „melee, ranged“, neu in Werkstätten › Trophäen-Ständer, leer = nur Trophäen), dazu eine Kiste für Waffenteile. Maßstab 78 %, damit der ganze Raum in den Container passt.
 - Die alte **Waffenkammer** heißt jetzt **Waffenwerkbank** (ID `waffenkammer` bleibt, alte Spielstände unverändert), weiter ein Lager für Waffen und Teile.
+- Kühlraum: Bild abgelehnt (Daniel: „Perspektive etwas zu gewagt“), liegt als `source/cold_room_rejected.png`; der Kühlraum bleibt vorerst aus Code.

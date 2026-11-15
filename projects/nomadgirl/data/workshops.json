@@ -114,7 +114,7 @@
   "outside": "out_storage",
   "description": "Werkbank und Lager für Waffen: Teile, Munition, Ersatzläufe. Ausgestellt wird in der Waffenkammer (#033)."
  },
- "kuehlraum": {"name": "Kühlraum", "function": "cooling", "stage": "1", "places": 1, "power": -2, "capacity": 20, "value": 250, "grid": [6, 4], "outside": "out_tank", "look": "ws_cold_room"},
+ "kuehlraum": {"name": "Kühlraum", "function": "cooling", "stage": "1", "places": 1, "power": -2, "capacity": 20, "value": 250, "grid": [6, 4], "outside": "out_tank"},
  "chill_area": {
   "name": "Chill Area",
   "function": "chill",

@@ -5402,15 +5402,6 @@
   "date": "15.11.2026",
   "description": "#026, neu #031 (Daniel: Heck nicht orthogonal): streng von der Seite, Leitwerk oben und unten als Kontur, Triebwerk als Zylinder im Profil mit Flamme nach rechts, Neonband in Zeile 103 (= Zeile 84 im Mittelstück). Altes Heck: source/fatbird_tail_v1.png."
  },
- "ws_cold_room": {
-  "name": "Werkstatt · Kühlraum",
-  "kind": "image",
-  "file": "assets/workshops/cold_room.png",
-  "origin": [128, 237],
-  "source": "KI (PixelLab, Create Image Pro, Referenz Hydrokultur + Ripperdoc bzw. Halle der Beute, Palette AAP-64, streng frontal)",
-  "date": "15.11.2026",
-  "description": "#033: Kühlraum: Kühlzelle mit Frosttür, Fleischhaken, Kühltruhe, Eiszapfen. Original in source/."
- },
  "ws_engine_room": {
   "name": "Werkstatt · Motorraum",
   "kind": "image",
