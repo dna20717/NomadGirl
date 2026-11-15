@@ -9,10 +9,10 @@
 //   save.rig.spare.decor = [id]          bought or taken down, waiting in the Lager
 // Gemütlichkeit (cozy): every piece adds its points; the sum makes sleeping and resting give stronger buffs (capped, Camp › Deko).
 
-export const DECOR_PLACES = [['ground', 'Auf dem Boden'], ['wall', 'An der Container-Wand'], ['roof', 'Auf dem Dach'], ['span', 'Zwischen zwei Punkten']];
+export const DECOR_PLACES = [['ground', 'Auf dem Boden'], ['wall', 'An der Container-Wand'], ['roof', 'Auf dem Dach'], ['side', 'Am Container-Ende (Balkon)'], ['span', 'Zwischen zwei Punkten']];
 export const DECOR_ARTS = [['addon', 'Ausschnitt eines Anbauteils'], ['neon', 'Neon-Schild'], ['banner', 'Banner'], ['graffiti', 'Graffiti'], ['line', 'Wäscheleine'],
   ['sail', 'Sonnensegel'], ['tent', 'Zelt'], ['pole', 'Zeltstange (Ankerpunkt)'], ['windmill', 'Windrad'], ['plant', 'Pflanze im Topf'], ['tripod', 'Dreibein mit Topf'],
-  ['birdhouse', 'Vogelhaus (Krähen)'], ['trophies', 'Kiste mit Fundstücken'], ['hammock', 'Hängematte'], ['lantern', 'Laterne'], ['pennants', 'Wimpelkette'], ['canopy', 'Fallschirm-Plane'], ['barrel', 'Feuertonne']];
+  ['birdhouse', 'Vogelhaus (Krähen)'], ['trophies', 'Kiste mit Fundstücken'], ['hammock', 'Hängematte'], ['lantern', 'Laterne'], ['pennants', 'Wimpelkette'], ['canopy', 'Fallschirm-Plane'], ['barrel', 'Feuertonne'], ['balcony', 'Balkon (begehbar)'], ['bridge', 'Brücke (begehbar)'], ['tower', 'Aussichtsturm (begehbar, Leiter)']];
 
 export const decorDef = (D, id) => D.decor?.[id] || null;
 export const placeOf = (D, id) => decorDef(D, id)?.place || 'ground';
@@ -36,6 +36,8 @@ export function put(D, save, id, at) {
   if (!at) return { ok: false, why: 'Kein Platz' };
   if (kind === 'span' && (!at.a || !at.b || at.a === at.b)) return { ok: false, why: 'Zwei verschiedene Punkte wählen' };
   if ((kind === 'wall' || kind === 'roof') && (at.ui == null || at.p == null)) return { ok: false, why: 'An einen Container' };
+  if (kind === 'side' && (at.ui == null || (at.side !== 0 && at.side !== 1))) return { ok: false, why: 'An ein Container-Ende' };
+  if (kind === 'side' && R.decor.some(o => o.at?.ui === at.ui && o.at?.side === at.side)) return { ok: false, why: 'Da ist schon ein Balkon' };
   if (kind === 'ground' && !Number.isFinite(at.x)) return { ok: false, why: 'Auf den Boden' };
   const max = D.camp?.decor?.max ?? 40;
   if (R.decor.length >= max) return { ok: false, why: `Mehr als ${max} Deko-Stücke hat das Camp nicht` };
@@ -47,7 +49,7 @@ export function lift(D, save, i) {
   const R = dstate(save), x = R.decor[i];
   if (!x) return null;
   R.decor.splice(i, 1);
-  const fix = a => { const m = /^pole:(\d+)$/.exec(a || ''); if (!m) return a; const n = Number(m[1]); return n === i ? null : n > i ? `pole:${n - 1}` : a; };
+  const fix = a => { const m = /^(pole|balc|tower):(\d+)$/.exec(a || ''); if (!m) return a; const n = Number(m[2]); return n === i ? null : n > i ? `${m[1]}:${n - 1}` : a; };
   R.decor = R.decor.filter(o => {
     if (o.at?.a == null) return true;
     o.at.a = fix(o.at.a); o.at.b = fix(o.at.b);
@@ -73,7 +75,7 @@ export const cozyBonus = (D, save) => Math.min(D.camp?.decor?.cozyMax ?? 25, coz
 export function remap(rig, move) {
   if (!rig.decor?.length) return;
   rig.spare ??= { workshops: [], containers: [] }; rig.spare.decor ??= [];
-  const corner = a => { if (!a || /^(mast|pole):/.test(a)) return a; const [ui, side] = String(a).split(':'); const n = move(Number(ui)); return n == null ? null : `${n}:${side}`; };
+  const corner = a => { if (!a || /^(mast|pole|balc|tower):/.test(a)) return a; const [ui, side] = String(a).split(':'); const n = move(Number(ui)); return n == null ? null : `${n}:${side}`; };
   rig.decor = rig.decor.filter(o => {
     const at = o.at || {};
     if (at.ui != null) { const n = move(at.ui); if (n == null) { rig.spare.decor.push(o.id); return false; } at.ui = n; }
@@ -83,3 +85,5 @@ export function remap(rig, move) {
 }
 // a plant's growth stage 0…3 by days since it was placed (Deko › Wächst in Tagen)
 export const plantStage = (D, save, x) => Math.max(0, Math.min(3, Math.floor(((save.day ?? 1) - (x.at?.day ?? 1)) / Math.max(1, decorDef(D, x.id)?.growDays ?? 2))));
+// the balconies at a unit's ends (for the camp: no end wall where a balcony is): Set of 'ui:side'
+export const balconies = rig => new Set((rig?.decor || []).filter(o => o.at?.side != null).map(o => `${o.at.ui}:${o.at.side}`));

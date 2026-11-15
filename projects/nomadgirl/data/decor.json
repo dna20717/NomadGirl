@@ -352,5 +352,68 @@
   "cozy": 4,
   "colors": "#5a4e44,#796755",
   "description": "Olivgrün, geflickt, bombenfest."
+ },
+ "balkon": {
+  "name": "Balkon",
+  "art": "balcony",
+  "place": "side",
+  "value": 60,
+  "cozy": 2,
+  "size": [
+   1.6,
+   0.3
+  ],
+  "color": "#6d758d",
+  "description": "Gitterrost am Container-Ende auf Höhe des Bodens, mit Geländer. Begehbar; bei gestapelten Containern öffnet er die Endwand. Sein äußeres Ende ist ein Ankerpunkt für Brücken."
+ },
+ "balkon_breit": {
+  "name": "Breiter Balkon",
+  "art": "balcony",
+  "place": "side",
+  "value": 90,
+  "cozy": 3,
+  "size": [
+   2.4,
+   0.3
+  ],
+  "color": "#8e5252",
+  "description": "Wie der Balkon, nur mehr Platz für einen Stuhl und Pflanzen."
+ },
+ "haengebruecke": {
+  "name": "Hängebrücke",
+  "art": "bridge",
+  "place": "span",
+  "value": 80,
+  "cozy": 2,
+  "size": [
+   0,
+   1
+  ],
+  "description": "Holzplanken an Seilen zwischen zwei Punkten, begehbar. Von Balkon zu Balkon, zu einem Aussichtsturm oder zu einer Zeltstange."
+ },
+ "stahlsteg": {
+  "name": "Stahlsteg",
+  "art": "bridge",
+  "place": "span",
+  "value": 120,
+  "cozy": 1,
+  "size": [
+   0,
+   1
+  ],
+  "description": "Ein gerader Gittersteg mit Geländer, begehbar."
+ },
+ "aussichtsturm": {
+  "name": "Aussichtsturm",
+  "art": "tower",
+  "place": "ground",
+  "value": 150,
+  "cozy": 3,
+  "size": [
+   1.6,
+   4.5
+  ],
+  "colors": "#71413b",
+  "description": "Gerüst mit Leiter und Plattform unterm Dach. Begehbar; oben ein Ankerpunkt für Brücken."
  }
 }

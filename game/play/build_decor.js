@@ -52,7 +52,7 @@ export class BuildDecor {
     this.shopOpen = false;
     const k = placeOf(this.D, id);
     if (k === 'ground' || k === 'span') { const A = this.areas().find(a => a.key === 'camp'); if (A) { this.areaNow = A; this.frame(A); } }   // to the campsite
-    this.say(k === 'span' ? 'Erster Punkt: Container-Ecke, Mast oder Zeltstange' : k === 'ground' ? 'Auf den Boden am Lagerplatz stellen' : k === 'wall' ? 'An eine Container-Wand hängen' : 'Auf ein Container-Dach stellen', 'idle');
+    this.say(k === 'span' ? 'Erster Punkt: Container-Ecke, Mast oder Zeltstange' : k === 'ground' ? 'Auf den Boden am Lagerplatz stellen' : k === 'wall' ? 'An eine Container-Wand hängen' : k === 'side' ? 'An ein Container-Ende (Balkon)' : 'Auf ein Container-Dach stellen', 'idle');
     this.draw();
   }
   // Esc / B: the piece in hand goes into the Lager
@@ -103,6 +103,7 @@ export class BuildDecor {
       let box = null;
       if (d.place === 'ground') { const gx = camp.groundX(at.x); box = { x0: gx - w / 2, x1: gx + w / 2, y0: camp.ground - h, y1: camp.ground }; }
       else if (d.place === 'wall') { const q = camp.wallAt(at.ui, at.p); if (q) box = { x0: q.x - w / 2, x1: q.x + w / 2, y0: q.y - h / 2, y1: q.y + h / 2 }; }
+      else if (d.place === 'side') { const b = camp.balconyAt(at.ui, at.side, d); if (b) box = { x0: b.x0, x1: b.x1, y0: b.y - T, y1: b.y + 20 }; }
       else if (d.place === 'roof') { const q = camp.roofAt(at.ui, at.p); if (q) box = { x0: q.x - w / 2, x1: q.x + w / 2, y0: q.y - h, y1: q.y }; }
       else { const a = camp.spanPoint(at.a), b = camp.spanPoint(at.b); if (a && b) { const mx = (a.x + b.x) / 2, my = Math.max(a.y, b.y) + 30; box = { x0: mx - 60, x1: mx + 60, y0: my - 60, y1: my + 60 }; } }
       if (box && x >= box.x0 && x <= box.x1 && y >= box.y0 && y <= box.y1) return { kind: 'decor', i, id: o.id, item: box };
@@ -141,4 +142,4 @@ export class BuildDecor {
     return this.camp.decorSpots(h.id).filter((q, i) => i % 2 === 0 || placeOf(this.D, h.id) !== 'ground').map(q => ({ x: q.x, y: q.y - 10, label: q.label }));
   }
 }
-const placeName = p => ({ ground: 'Boden', wall: 'Wand', roof: 'Dach', span: 'zwischen zwei Punkten' })[p] || '';
+const placeName = p => ({ ground: 'Boden', wall: 'Wand', roof: 'Dach', side: 'Container-Ende', span: 'zwischen zwei Punkten' })[p] || '';

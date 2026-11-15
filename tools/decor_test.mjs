@@ -66,6 +66,25 @@ r = await ev(() => {
 });
 check('Hängematte: E unter ihr, eine Stunde abhängen heilt', r.h === 'Abhängen' && r.hours === 1 && r.health > 40, r);
 await page.waitForFunction(() => { const s = game.scene.getScene('play'); return s?.camp && !s.leaving; }, null, { timeout: 60000 });
+// #037 walkable pieces: from the lookout tower over the rope bridge onto the balcony and into the stacked container
+r = await ev(() => {
+  const s = game.scene.getScene('play'), save = s.box.save, c = s.camp;
+  save.rig.tractor = 'lkw'; save.rig.units[0].id = 'lkw';
+  save.rig.units = [save.rig.units[0], { kind: 'container', id: 'container_40', workshops: [] }, { kind: 'container', id: 'container_20', level: 1, workshops: [] }];
+  save.rig.decor = [{ id: 'balkon_breit', at: { ui: 2, side: 1 } }, { id: 'aussichtsturm', at: { x: 2 } }, { id: 'haengebruecke', at: { a: 'balc:0', b: 'tower:1' } }];
+  return true;
+});
+await ev(() => { nomad.release(); game.scene.getScene('play').goCamp({ fade: 0 }); });
+await page.waitForFunction(() => { const s = game.scene.getScene('play'); return s?.camp && !s.leaving && s.camp.spanAnchors().some(a => a.id === 'tower:1'); }, null, { timeout: 60000 });
+r = await ev(() => {
+  const s = game.scene.getScene('play'), A = s.camp.spanAnchors(), t = A.find(a => a.id === 'tower:1'), b = A.find(a => a.id === 'balc:0');
+  nomad.tp(t.x, t.y); nomad.step(20); const top = nomad.state().leyla.feet;
+  nomad.step(320, ['left']); const st = nomad.state().leyla;
+  const lad = s.ladders.filter(l => l.rig && Math.abs(l.top - t.y) < 4).length;
+  nomad.release();
+  return { top, ty: t.y, feet: st.feet, by: b.y, x: Math.round(st.x), bx: Math.round(b.x), lad };
+});
+check('Aussichtsturm mit Leiter, über die Hängebrücke auf den Balkon und in den oberen Container (#037)', Math.abs(r.top - r.ty) < 4 && Math.abs(r.feet - r.by) < 4 && r.x < r.bx && r.lad === 1, r);
 if (shots) { fs.mkdirSync('output', { recursive: true }); await page.waitForTimeout(800); await page.screenshot({ path: 'output/decor_alle.png' }); }
 
 await browser.close();

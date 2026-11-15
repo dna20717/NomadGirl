@@ -18,6 +18,7 @@ import { wreckHere } from './camp_salvage.js';
 import { campMegaLayout } from './camp_mega.js';
 import { ladderArt } from './ladder_art.js';
 import { activeMega, flies, travelSpeed } from '../mega.js';
+import { balconies } from '../decor.js';
 import { synergyAt, synergyText, links } from '../synergy.js';
 
 export const de = n => Number(n).toLocaleString('de-DE', { maximumFractionDigits: 1 });
@@ -643,7 +644,9 @@ export class Camp {
     Object.assign(z.body.checkCollision, { down: false, left: false, right: false });
     this.rigObjs.push(z);
     // a stacked container has end walls: up there Leyla can walk from end to end without stepping off into the air (down = ladder)
-    if (u.level) for (const wx of [u.in0 - 8, u.in0 + u.cell * u.places + 8]) {
+    const balc = balconies(this.box.save.rig);   // #037: a balcony opens that end
+    if (u.level) for (const [side, wx] of [[0, u.in0 - 8], [1, u.in0 + u.cell * u.places + 8]]) {
+      if (balc.has(`${u.ui}:${side}`)) continue;
       const wall = s.add.zone(wx, (u.inTop + u.floorY) / 2, 16, u.floorY - u.inTop);
       s.solids.add(wall); this.rigObjs.push(wall);
     }

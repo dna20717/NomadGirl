@@ -7,6 +7,7 @@ import { decorDef, placeOf, plantStage, dstate } from '../decor.js';
 import { catenary } from '../string_lights.js';
 import { glowTexture } from './camp.js';
 import { advance, clockText } from '../save.js';
+import { ladderArt } from './ladder_art.js';
 
 const PX = 4;
 const col = c => parseInt(String(c || '#ff00ff').slice(1), 16);
@@ -25,8 +26,23 @@ export class CampDecor {
   // every point a span can hang on: container corners, the mast (string lights), and the tops of poles
   spanAnchors() {
     const out = this.geo.mega ? [] : [...(this.anchors?.() || [])], T = this.scene.T;
-    (this.box.save.rig.decor || []).forEach((x, i) => { const d = decorDef(this.D, x.id); if (d?.art === 'pole') out.push({ id: `pole:${i}`, x: this.groundX(x.at.x), y: this.ground - (d.size?.[1] ?? 4) * T + 8 }); });
+    (this.box.save.rig.decor || []).forEach((x, i) => {
+      const d = decorDef(this.D, x.id);
+      if (d?.art === 'pole') out.push({ id: `pole:${i}`, x: this.groundX(x.at.x), y: this.ground - (d.size?.[1] ?? 4) * T + 8 });
+      if (d?.art === 'tower') out.push({ id: `tower:${i}`, x: this.groundX(x.at.x), y: this.ground - (d.size?.[1] ?? 4.5) * T, walk: true });
+      if (d?.art === 'balcony') { const b = this.balconyAt(x.at.ui, x.at.side, d); if (b) out.push({ id: `balc:${i}`, x: b.tip, y: b.y, walk: true }); }
+    });
     return out;
+  }
+  // a balcony at a unit's end: on the interior floor, as long as the free space allows (to the next box on that level)
+  balconyAt(ui, side, d) {
+    const u = this.decorUnit(ui), T = this.scene.T;
+    if (!u) return null;
+    const x0 = u.in0, x1 = u.in0 + u.cell * u.places, want = (d?.size?.[0] ?? 1.6) * T;
+    const others = (this.geo.units || []).filter(o => o !== u && o.ui > 0 && Math.abs(o.floorY - u.floorY) < 40).map(o => side ? o.in0 : o.in0 + o.cell * o.places);
+    const room = side ? Math.min(want, ...others.filter(x => x >= x1).map(x => x - x1 - 12)) : Math.min(want, ...others.filter(x => x <= x0).map(x => x0 - x - 12));
+    if (room < T * 0.6) return null;
+    return side ? { x0: x1, x1: x1 + room, tip: x1 + room - 6, y: u.floorY, u } : { x0: x0 - room, x1: x0, tip: x0 - room + 6, y: u.floorY, u };
   }
   spanPoint(id) { return this.spanAnchors().find(a => a.id === id) || null; }
   // candidate places for a piece of this kind (build mode): [{ at, x, y, label }]
@@ -38,6 +54,13 @@ export class CampDecor {
         const gx = this.groundX(x);
         if (this.geo.shaft && gx < (this.geo.shaft.to + 1) * T) continue;
         out.push({ at: { x }, x: gx, y: this.ground - 10, label: 'Hier hinstellen' });
+      }
+    } else if (kind === 'side') {
+      if (this.geo.mega) return out;
+      for (const u of this.geo.units || []) for (const side of [0, 1]) {
+        if (u.ui === 0 || used.has(JSON.stringify({ ui: u.ui, side }))) continue;
+        const b = this.balconyAt(u.ui, side, decorDef(D, id));
+        if (b) out.push({ at: { ui: u.ui, side }, x: (b.x0 + b.x1) / 2, y: b.y, label: 'Balkon hier' });
       }
     } else if (kind === 'wall' || kind === 'roof') {
       if (this.geo.mega) return out;
@@ -57,6 +80,7 @@ export class CampDecor {
   // ---------- drawing ----------
   drawDecor() {
     const R = dstate(this.box.save);
+    this.walkTops = [];
     this.decorAnim = [];
     this.crows?.forEach(c => c.o.destroy()); this.crows = [];
     R.decor.forEach((x, i) => { try { this.drawPiece(x, i); } catch (e) { console.warn('Deko', x.id, e); } });
@@ -77,6 +101,7 @@ export class CampDecor {
       const [p, q] = a.x <= b.x ? [a, b] : [b, a];
       return this[`art_${d.art}`]?.(p, q, d, seed, pick);
     }
+    if (kind === 'side') { const b = this.balconyAt(at.ui, at.side, d); if (b) this.art_balcony(b, d, seed, at.side); return; }
     let pos;
     if (kind === 'ground') pos = { x: this.groundX(at.x), y: this.ground };
     else if (kind === 'wall') pos = this.wallAt(at.ui, at.p);
@@ -361,7 +386,76 @@ export class CampDecor {
     this.decorAnim.push(time => drips.forEach(d => { const t = ((time / 900 + d.ph) % 1); d.o.y = d.y + t * (this.ground - d.y); d.o.setAlpha(0.8 * (1 - t * 0.6)); }));
   }
 
+  // ---- walkable pieces (#037, Daniel: „Balkone und Brücken auch mitdenken“) ----
+  // a one-way platform Leyla can stand on (like the interior floors), destroyed with the rig drawing
+  walkZone(x0, x1, y) {
+    const s = this.scene, z = this.dAdd(s.add.zone((x0 + x1) / 2, y + 8, Math.max(8, x1 - x0), 16));
+    s.platforms.add(z);
+    Object.assign(z.body.checkCollision, { down: false, left: false, right: false });
+    (this.walkTops ??= []).push({ x0, x1, y });
+    return z;
+  }
+  // sloped walkways (bridges) are steps of one-way platforms: walking on them, Leyla steps up onto the next one when it is at most
+  // a small step higher (Arcade physics would let her walk under it and fall through)
+  stepUpDecor() {
+    const l = this.scene.leyla, b = l?.body;
+    if (!b || !this.walkTops?.length || !b.blocked.down || Math.abs(b.velocity.x) < 5) return;
+    const dir = Math.sign(b.velocity.x), feet = b.bottom, fx = l.x + dir * (b.width / 2 + 6);
+    const next = this.walkTops.find(w => fx >= w.x0 && fx <= w.x1 && w.y < feet - 0.5 && w.y >= feet - 16);
+    if (next) b.y -= feet - next.y + 0.5;
+  }
+  // a balcony at a container's end: a steel grating on brackets, a railing at the outer end, a little plant pot
+  art_balcony(b, d, seed, side) {
+    const g = this.dG(-17.5), T = this.scene.T, y = b.y, w = b.x1 - b.x0, rail = 1.1 * T, c = d.color || '#6d758d';
+    this.dR(g, b.x0, y - PX, w, 4 * PX, C.ink); this.dR(g, b.x0, y - PX, w, PX, C.pale); this.dR(g, b.x0, y, w, 2 * PX, c);
+    for (let x = b.x0 + 6; x < b.x1 - 4; x += 12) this.dR(g, x, y + PX, PX, PX, C.ink);
+    // brackets under it, diagonal to the container wall
+    const wallX = side ? b.x0 : b.x1;
+    g.lineStyle(2 * PX, col(C.ink)).lineBetween(wallX, y + 0.9 * T, side ? b.x0 + w * 0.7 : b.x1 - w * 0.7, y + 3 * PX);
+    g.lineStyle(PX, col(C.steel)).lineBetween(wallX, y + 0.9 * T, side ? b.x0 + w * 0.7 : b.x1 - w * 0.7, y + 3 * PX);
+    // railing: posts and a top bar, the outer end closed
+    const out = side ? b.x1 - 2 * PX : b.x0;
+    for (let x = b.x0 + (side ? 12 : 0); x <= b.x1 - (side ? 0 : 12); x += 20) this.dR(g, x, y - rail * 0.75, PX, rail * 0.75, C.silver, 0.9);
+    this.dR(g, b.x0, y - rail, w, 2 * PX, C.ink); this.dR(g, b.x0, y - rail, w, PX, C.pale);
+    this.dR(g, out - PX, y - rail, 3 * PX, rail, C.ink); this.dR(g, out, y - rail, PX, rail, C.silver);
+    if (seed > 0.4) { const px = side ? b.x1 - 0.55 * T : b.x0 + 0.35 * T; this.dR(g, px, y - 4 * PX, 4 * PX, 4 * PX, C.pot); this.dR(g, px + PX, y - 7 * PX, 2 * PX, 3 * PX, C.green); this.dR(g, px - PX, y - 6 * PX, 2 * PX, PX, C.leaf); }
+    this.walkZone(b.x0, b.x1, y);
+  }
+  // a walkable bridge between two anchors: planks along a slight sag, two rope (or steel) rails, posts; platforms all along
+  art_bridge(p, q, d, seed) {
+    const s = this.scene, T = s.T, steel = /stahl|steel/i.test(d.name || ''), g = this.dG(-15.4), n = Math.max(4, Math.round((q.x - p.x) / 24));
+    const sag = steel ? 4 : Math.min(26, (q.x - p.x) * 0.05), at = t => ({ x: p.x + (q.x - p.x) * t, y: p.y + (q.y - p.y) * t + sag * 4 * t * (1 - t) });
+    const rail = 0.9 * T;
+    for (let k = 0; k < n; k++) {
+      const a = at(k / n), b = at((k + 1) / n);
+      if (steel) { this.dR(g, a.x, Math.min(a.y, b.y) - PX, b.x - a.x + 1, 3 * PX, C.ink); this.dR(g, a.x, Math.min(a.y, b.y), b.x - a.x + 1, PX, C.pale); }
+      else { g.fillStyle(0x141013).fillRect(a.x, a.y - 2, b.x - a.x - 2, 12); g.fillStyle(col(k % 3 ? C.wood : C.woodL)).fillRect(a.x + 1, a.y, b.x - a.x - 4, 8); }
+      this.walkZone(a.x - 2, b.x + 2, Math.min(a.y, b.y) - 2);
+    }
+    const hand = (t, dy) => { const pt = at(t); return { x: pt.x, y: pt.y - dy }; };
+    g.lineStyle(steel ? 2 * PX : PX, col(steel ? C.silver : C.sand), 0.95).beginPath();
+    for (let k = 0; k <= 16; k++) { const pt = hand(k / 16, rail - (steel ? 0 : sag * 0.6 * 4 * (k / 16) * (1 - k / 16))); k ? g.lineTo(pt.x, pt.y) : g.moveTo(pt.x, pt.y); } g.strokePath();
+    for (let k = 0; k <= n; k += steel ? 2 : 3) { const pt = at(k / n); g.lineStyle(PX * 0.75, col(steel ? C.steel : C.sand), 0.9).lineBetween(pt.x, pt.y, pt.x, pt.y - rail + (steel ? 0 : sag * 0.6 * 4 * (k / n) * (1 - k / n))); }
+  }
+  // a lookout tower on the ground: a scaffold with a ladder up the side, a platform on top with a railing and a little roof
+  art_tower(x, y, w, h, d, seed) {
+    const s = this.scene, T = s.T, g = this.dG(-16.6), top = y - h, pw = Math.max(w, 1.6 * T);
+    for (const lx of [x - pw / 2 + 2 * PX, x + pw / 2 - 4 * PX]) { this.dR(g, lx - PX, top, 4 * PX, h, C.ink); this.dR(g, lx, top, 2 * PX, h, C.grey); }
+    for (let yy = top + T; yy < y - T * 0.5; yy += T * 1.1) { g.lineStyle(PX, col(C.ink)).lineBetween(x - pw / 2 + 3 * PX, yy, x + pw / 2 - 3 * PX, yy + T * 1.1); g.lineStyle(PX, col(C.ink)).lineBetween(x + pw / 2 - 3 * PX, yy, x - pw / 2 + 3 * PX, yy + T * 1.1); }
+    this.dR(g, x - pw / 2 - 2 * PX, top - PX, pw + 4 * PX, 4 * PX, C.ink); this.dR(g, x - pw / 2 - 2 * PX, top - PX, pw + 4 * PX, PX, C.pale); this.dR(g, x - pw / 2 - 2 * PX, top, pw + 4 * PX, 2 * PX, d.color || C.wood);
+    const r = 0.9 * T; this.dR(g, x - pw / 2, top - r, PX, r, C.silver); this.dR(g, x + pw / 2 - PX, top - r, PX, r, C.silver); this.dR(g, x - pw / 2, top - r, pw, PX * 1.5, C.pale);
+    g.fillStyle(col(C.ink)).fillTriangle(x - pw / 2 - 3 * PX, top - r - 2 * PX, x, top - r - 0.9 * T, x + pw / 2 + 3 * PX, top - r - 2 * PX);
+    g.fillStyle(col(d.colors?.split(',')[0] || C.rust)).fillTriangle(x - pw / 2, top - r - 3 * PX, x, top - r - 0.8 * T, x + pw / 2, top - r - 3 * PX);
+    this.walkZone(x - pw / 2 - 8, x + pw / 2 + 8, top);
+    // the ladder up the side (climbable, from the ladder picture)
+    const lx = x - pw / 2 - T / 2 + 4;
+    const art = ladderArt(s, lx - T / 2, lx + T / 2, top, y, { depth: -16.5 });
+    if (art) this.dAdd(art);
+    s.ladders.push({ cx: lx, x0: lx - T / 2, x1: lx + T / 2, top, bottom: y, rig: true });
+  }
+
   updateDecor(time, dt) {
+    this.stepUpDecor();
     for (const f of this.decorAnim || []) f(time, dt);
     this.updateCrows(time);
   }

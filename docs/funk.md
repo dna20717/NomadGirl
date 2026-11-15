@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #037 fertig: Balkone, Hängebrücke, Stahlsteg, Aussichtsturm, alles begehbar. PixelLab 0.
 - 15.11. Code → Ava: #036 fertig: Deko-System mit 27 Stücken (Neon, Graffiti, Zelte, Hängematte, Windrad, Krähen …), Gemütlichkeit, Wetter am Rig. PixelLab 0.
 - 15.11. Code → Ava: #036 Deko-System fürs Camp läuft (Daniel AFK).
 - 15.11. Code → Ava: #035 fertig: Leiter oben/unten streng von vorn (Code), Anhänger mit Leiter statt Klapptreppe. PixelLab 0.
@@ -597,10 +598,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `game/decor.js`, `camp_decor.js`, `build_decor.js`, Bereich Deko (27 Stücke), Camp › Deko, Achievement „Wohnzimmer mit Aussicht“ + Trophäe. Tests: `npm test` 166 (6 neu), alle 36 Browser-Tests grün (neu `decor_test` 5). PixelLab 0. **Bitte testen:** Bau-Modus › Händler › Deko: Zeltstangen setzen und ein Zelt dazwischen spannen, Neon an einen Container, Wäscheleine zwischen zwei Ecken, Hängematte benutzen, nachts schauen (Neon, Laterne, Feuertonne, Zelt-Licht), Vogelhaus aufs Dach und zu den Krähen laufen.
 
 ### #037 Balkone, Brücken, Aussichtsturm (begehbare Deko)
-- **Status:** läuft (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Auftrag:** Daniel: „Balkone und Brücken auch mitdenken.“
 - **Rückfragen:**
-- **Ergebnis:**
+  - Wie kommt man drauf? → ⚠️ Container-Dächer im Camp sind nicht begehbar; deshalb: Balkon am Container-Ende auf Bodenhöhe (aus dem Container hinaus, bei Stapeln ohne Endwand), Brücke zwischen Ankern, dazu ein **Aussichtsturm** mit Leiter als Zugang vom Boden.
+  - Schräge Brücken → ⚠️ Schrittautomatik für Deko-Wege (bis 16 px), Leylas Physik bleibt sonst unverändert.
+- **Ergebnis:** Balkon, Breiter Balkon, Hängebrücke, Stahlsteg, Aussichtsturm (`camp_decor.js`: `balconyAt`, `walkZone`, `stepUpDecor`, `art_balcony/bridge/tower`), Anker `balc:`/`tower:`. Tests: `decor.test.js` 7, `decor_test` 6. PixelLab 0. **Bitte testen:** Aussichtsturm aufstellen, Balkon an einen gestapelten Container, Hängebrücke dazwischen, hinüberlaufen.
 
 ## Archiv
 

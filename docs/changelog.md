@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 15.11.2026: **Balkone, Brücken, Aussichtsturm** (#037): begehbare Deko; vom Turm über die Hängebrücke auf den Balkon in den oberen Container.
 - 15.11.2026: **Deko fürs Camp** (#036): 27 Stücke vom Händler im Bau-Modus, frei platzierbar am Boden, an Container-Wänden, auf Dächern oder zwischen zwei Punkten: Neon, Banner, Graffiti, Wäsche, Wimpel, Segel, Fallschirm, Hängematte, große Zelte, Windrad, Pflanzen, Feuertonne, Krähen … Gemütlichkeit stärkt Buffs; Pfützen bei Regen.
 - 15.11.2026: **Leiter orthogonal, Anhänger mit Leiter** (#035): Anfang und Ende der Leiter streng von vorn aus Code; Container-Anhänger auf dem Fahrgestell haben eine Leiter statt der Klapptreppe.
 - 15.11.2026: **Synergie-Vorschau, Reihenschaltung, neue Leitern** (#034): beim Platzieren zeigt jeder Platz seinen Bonus wie bei Dorfromantik; gleiche Werkstätten in Reihe und volle Container geben dicke Boni; alle Leitern aus einer PixelLab-Stahlleiter mit Haken, Halteplatten, kaputten Sprossen und Fußplatten, einfärbbar.

@@ -70,3 +70,15 @@ test('Umbau: Deko wandert mit ihrem Container, alte Spielstände bleiben heil', 
   const back = repairSave(JSON.parse(JSON.stringify(s)), D);
   assert.equal(back.rig.decor.length, 2);
 });
+
+test('Balkon am Container-Ende (#037): einer je Ende, wandert mit, Brücke an Balkon und Turm', () => {
+  const s = fresh();
+  assert.ok(put(D, s, 'balkon', { ui: 1, side: 1 }).ok);
+  assert.equal(put(D, s, 'balkon_breit', { ui: 1, side: 1 }).ok, false);
+  assert.equal(put(D, s, 'balkon', { ui: 1 }).ok, false);
+  put(D, s, 'aussichtsturm', { x: 4 });
+  assert.ok(put(D, s, 'haengebruecke', { a: 'balc:0', b: 'tower:1' }).ok);
+  lift(D, s, 1);   // the tower goes: the bridge comes down, the balcony stays
+  assert.deepEqual(dstate(s).decor.map(x => x.id), ['balkon']);
+  assert.ok(dstate(s).spare.decor.includes('haengebruecke'));
+});
