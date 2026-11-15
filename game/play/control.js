@@ -101,7 +101,8 @@ export function installControl(game) {
       return api.state();
     },
     save() { return scene().box?.save || null; },
-    build() { return scene().hud.build?.state() || null; },   // building in the camp (B): rig, budgets, Δ, scrapyard, Leyla's jobs, undo
+    build() { return scene().hud.build?.state() || null; },
+    megaBuild(choice) { const m = scene().hud.megaBuild; if (choice != null) { const ok = m?.choose(choice); api.step(2); return ok; } return m?.state() || null; },   // #029 build plan aboard: state, or do an action by its label   // building in the camp (B): rig, budgets, Δ, scrapyard, Leyla's jobs, undo
     buildSpots() { return scene().hud.build?.spots() || null; },   // page positions of places, couplings, units, scrapyard items, dealer (for real mouse drags)
     craft() { return scene().hud.craft?.state() || null; },
     tech() { return scene().hud.tech?.state() || null; },

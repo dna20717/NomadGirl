@@ -374,7 +374,7 @@ export function applyDraft(D, save, d) {
   if (bad.length) return { ok: false, reason: bad[0] };
   const old = save.inv.grids, grids = {};
   for (const [k, g] of Object.entries(old)) if (!rigGrid(k)) grids[k] = g;
-  const rig = { tractor: d.rig.tractor, units: d.rig.units.map(u => ({ kind: u.kind, id: u.id, ...(u.level ? { level: u.level } : {}), ...(u.level && u.slot != null ? { slot: u.slot } : {}), workshops: u.workshops.map(w => ({ id: w.id, at: w.at })) })),
+  const rig = { tractor: d.rig.tractor, units: d.rig.units.map(u => ({ kind: u.kind, id: u.id, ...(u.level ? { level: u.level } : {}), ...(u.level && u.slot != null ? { slot: u.slot } : {}), ...(u.pos ? { pos: { place: u.pos.place, story: u.pos.story } } : {}), workshops: u.workshops.map(w => ({ id: w.id, at: w.at })) })),
     spare: { workshops: d.rig.spare.workshops.map(w => w.id), containers: [...d.rig.spare.containers], parts: [...d.rig.spare.parts] }, parts: clone(d.rig.parts || {}) };
   // string lights (#009) stay up: they hang on units by index, so they move with their unit (units keep their old key rig:<ui>),
   // the mast at the campfire (#014) stays where it is; a string whose unit left the rig comes down (Daniel, 13.11.2026: „Lichterketten verschwinden, wenn man eine Werkstatt platziert oder neu baut“)

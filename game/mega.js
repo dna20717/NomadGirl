@@ -42,17 +42,59 @@ export function cells(D, rig, skip = -1) {
   });
   return out;
 }
-// may unit ui (or a container of that type) stand at place/story? → reason or null
-export function canPut(D, save, ui, place, story, id = save.rig.units[ui]?.id) {
-  const mid = activeMega(D, save), g = mid && grid(D, mid, stageOf(D, save, mid)), n = D.containers?.[id]?.places || 1;
+// may unit ui (or a container of type id) stand at place/story in this rig (also a draft)? → reason or null
+export function fitsGrid(D, g, rig, ui, place, story, id = rig.units[ui]?.id) {
+  const n = D.containers?.[id]?.places || 1;
   if (!g) return 'Kein Mega-Rig';
   if (place < 0 || story < 0 || place + n > g.places || story >= g.stories) return 'Außerhalb des Rasters';
-  const taken = cells(D, save.rig, ui);
+  const taken = cells(D, rig, ui);
   for (let k = 0; k < n; k++) if (taken.has(`${story}:${place + k}`)) return 'Da steht schon etwas';
   // on top of the hull a container needs something to stand on (and a way up): the deck, or a container under part of it
   if (story > g.inside && ![...Array(n)].some((_, k) => taken.has(`${story - 1}:${place + k}`))) return 'Darunter steht nichts';
   return null;
 }
+export const gridNow = (D, save) => { const id = activeMega(D, save); return id ? grid(D, id, stageOf(D, save, id)) : null; };
+export const canPut = (D, save, ui, place, story, id = save.rig.units[ui]?.id) => fitsGrid(D, gridNow(D, save), save.rig, ui, place, story, id);
+
+// ---------- building on the grid (drafts of game/rig.js: startDraft → op → applyDraft, via act()) ----------
+const work = (D, d, k, def) => { d.changes++; d.minutes += D.build?.minutes?.[k] ?? def; };
+// a container from the Lager onto a cell
+export function putFromSpare(D, save, d, i, place, story) {
+  const id = d.rig.spare.containers[i], why = id ? fitsGrid(D, gridNow(D, save), d.rig, -1, place, story, id) : 'Liegt nicht im Lager';
+  if (why) return { ok: false, reason: why };
+  d.rig.spare.containers.splice(i, 1);
+  d.rig.units.push({ kind: 'container', id, workshops: [], pos: { place, story } });
+  work(D, d, 'container', 90);
+  return { ok: true, ui: d.rig.units.length - 1 };
+}
+// a built container to another cell (its workshops and storages move along); everything that stood on it must still stand
+export function moveTo(D, save, d, ui, place, story) {
+  const u = d.rig.units[ui], g = gridNow(D, save);
+  if (!u?.pos) return { ok: false, reason: 'Das ist kein Container' };
+  const why = fitsGrid(D, g, d.rig, ui, place, story);
+  if (why) return { ok: false, reason: why };
+  const was = u.pos;
+  u.pos = { place, story };
+  const loose = d.rig.units.findIndex((x, xi) => xi !== ui && x.pos && x.pos.story > g.inside && fitsGrid(D, g, d.rig, xi, x.pos.place, x.pos.story));
+  if (loose >= 0) { u.pos = was; return { ok: false, reason: 'Darauf steht noch etwas' }; }
+  work(D, d, 'container', 90);
+  return { ok: true };
+}
+// a built container into the Lager, with its workshops (storages must be empty); returns the removed unit index
+export function storeUnit(D, save, d, ui) {
+  const u = d.rig.units[ui], g = gridNow(D, save);
+  if (!u?.pos) return { ok: false, reason: 'Das ist kein Container' };
+  if (u.workshops.some(w => w.key && Object.entries(d.grids).some(([k, x]) => (k === w.key || k.startsWith(w.key + ':s')) && x?.items?.length))) return { ok: false, reason: 'Erst das Lager darin ausräumen' };
+  if (d.grids[u.key]?.items?.length) return { ok: false, reason: 'Erst ausräumen' };
+  const rest = d.rig.units.filter((_, xi) => xi !== ui);
+  if (rest.some((x, xi) => x.pos && x.pos.story > g.inside && fitsGrid(D, g, { units: rest }, xi, x.pos.place, x.pos.story))) return { ok: false, reason: 'Darauf steht noch etwas' };
+  d.rig.units.splice(ui, 1);
+  d.rig.spare.containers.push(u.id);
+  for (const w of u.workshops) { delete w.at; d.rig.spare.workshops.push(w); }
+  work(D, d, 'container', 90);
+  return { ok: true, removed: ui };
+}
+
 // the first free cell where a container fits: hull first, then upwards, from the bow
 export function freeCell(D, save, ui, id = save.rig.units[ui]?.id) {
   const mid = activeMega(D, save), g = mid && grid(D, mid, stageOf(D, save, mid));

@@ -5,8 +5,8 @@ import assert from 'node:assert/strict';
 import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
 import { newSave } from '../game/save.js';
-import { budgets } from '../game/rig.js';
-import { activate, deactivate, activeMega, canPut, grid, stageOf, buildOwn, buyStage, nextStage, hangLight, fixLights, settle, mstate, travelSpeed, flies } from '../game/mega.js';
+import { budgets, act, buyContainer, buyWorkshop, place, fromSpare } from '../game/rig.js';
+import { activate, deactivate, activeMega, canPut, grid, stageOf, buildOwn, buyStage, nextStage, hangLight, fixLights, settle, mstate, travelSpeed, flies, putFromSpare, moveTo, storeUnit } from '../game/mega.js';
 
 const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
 const fresh = (id = 'crawler') => { const s = newSave(D); s.deltas = 50000; s.megarigs = [id]; return s; };
@@ -99,4 +99,26 @@ test('Fatbird: Container im Lastrahmen mit Haut, Decks als Räume; reist schnell
   assert.equal(b.kind, 'airship');
   assert.ok(flies(D, 'fatbird') && !flies(D, 'crawler'));
   assert.ok(travelSpeed(D, 'fatbird') > 1 && travelSpeed(D, 'crawler') < 1);
+});
+
+test('Bauen auf dem Raster: kaufen, setzen, Werkstatt einräumen, verschieben, ins Lager (Positionen bleiben im Spielstand)', () => {
+  const s = fresh();
+  activate(D, s, 'crawler');
+  const n0 = s.rig.units.length;
+  let r = act(D, s, d => { buyContainer(D, d, 'container_20'); return putFromSpare(D, s, d, d.rig.spare.containers.length - 1, 2, 0); });
+  assert.ok(r.ok, r.reason);
+  const ui = s.rig.units.length - 1;
+  assert.equal(s.rig.units.length, n0 + 1);
+  assert.deepEqual(s.rig.units[ui].pos, { place: 2, story: 0 });
+  r = act(D, s, d => { const b = buyWorkshop(D, d, 'werkbank'); return { ok: place(D, d, fromSpare(d, b.inst.uid), ui, 0) }; });
+  assert.ok(r.ok);
+  assert.equal(s.rig.units[ui].workshops[0].id, 'werkbank');
+  r = act(D, s, d => moveTo(D, s, d, ui, 3, 1));
+  assert.ok(r.ok, r.reason);
+  assert.deepEqual(s.rig.units[ui].pos, { place: 3, story: 1 });
+  assert.match(act(D, s, d => moveTo(D, s, d, ui, 0, 0)).reason || '', /schon/);
+  r = act(D, s, d => storeUnit(D, s, d, ui));
+  assert.ok(r.ok, r.reason);
+  assert.equal(s.rig.units.length, n0);
+  assert.ok(s.rig.spare.containers.includes('container_20') && s.rig.spare.workshops.includes('werkbank'));
 });

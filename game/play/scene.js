@@ -34,6 +34,7 @@ import { gearStats, add, GEAR_KEYS, rollLoot } from '../inventory.js';
 import { CraftUI } from './craft_ui.js';
 import { TechtreeUI } from './techtree_ui.js';
 import { BuildMode } from './build_mode.js';
+import { MegaBuild } from './mega_build.js';
 import { Tutorial } from './tutorial.js';
 import { AchievementsUI } from './achievements_ui.js';
 import { QuestLogUI } from './questlog_ui.js';
@@ -460,12 +461,15 @@ export class PlayScene extends Phaser.Scene {
     hud.map.close(); hud.map.el.hidden = true;
     // building the rig right in the camp (game/play/build_mode.js): B in the camp or Warroom › Rig umbauen
     hud.build ??= new BuildMode(hud.root, { scene: () => hud.scene });
+    hud.megaBuild ??= new MegaBuild(hud.root, { scene: () => hud.scene });   // #029: the build plan aboard a mega rig
+    if (hud.megaBuild.isOpen) { hud.megaBuild.isOpen = false; hud.megaBuild.el.hidden = true; }
     hud.build.reset();
   }
   openBuild() {
     if (this.mode !== 'camp' || !this.box || this.hud.build.active) return;
     this.hud.inv?.close();
     this.hud.closeMenu?.();
+    if (this.campGeo?.mega) { if (!this.hud.megaBuild.isOpen) this.hud.megaBuild.open(); return; }
     this.hud.build.open();
   }
   // the sky changed since the camp was drawn: another time of day, or the rain started or stopped (#014)
@@ -664,6 +668,7 @@ export class PlayScene extends Phaser.Scene {
     const eat = () => { for (const k of ['jump', 'grab', 'dash', 'up', 'down', 'left', 'right', 'melee', 'ranged', 'reload', 'holster']) if (input[k]) input[k].pressed = false; };
     if (hud.tut?.isOpen) { hud.tut.nav(u); eat(); input.help.pressed = false; return; }   
     if (hud.sum?.isOpen) { hud.sum.nav(u); eat(); input.help.pressed = false; return; }   // Beute-Bilanz (#017)
+    if (hud.megaBuild?.isOpen) { hud.megaBuild.nav(u); eat(); input.help.pressed = false; return; }   // build plan aboard (#029)
     if (hud.quests?.isOpen) { hud.quests.nav(u); eat(); input.help.pressed = false; return; }   // Questlog (#016)
     if (hud.ach?.isOpen) { hud.ach.nav(u); eat(); input.help.pressed = false; return; }   // Menü › Achievements (#012)   // the field guide card / archive (#011)
     if (hud.paused && !hud.modal) { if (u.pressed('ok') || u.pressed('back')) { hud.toggleHelp(false); eat(); input.help.pressed = false; } return; }
@@ -727,7 +732,7 @@ export class PlayScene extends Phaser.Scene {
     // every window pauses the game (Daniel, 12.11.2026: „Fenster pausieren immer, auch im Run“): menus, controls, cooking and the inventory
     let invDone = false;
     if (this.hud.inv?.isOpen && !this.hud.paused && !this.hud.modal && !this.leaving) { this.inventoryUpdate(input); invDone = true; }
-    if (this.hud.tut?.isOpen || this.hud.ach?.isOpen || this.hud.quests?.isOpen || this.hud.sum?.isOpen || this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
+    if (this.hud.tut?.isOpen || this.hud.ach?.isOpen || this.hud.quests?.isOpen || this.hud.megaBuild?.isOpen || this.hud.sum?.isOpen || this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
       // cooking, crafting, a menu: the workshops keep glowing, steaming and sparking behind the window
       if (this.camp && !this.hud.paused && !this.leaving) { this.camp.benches?.update(time, Math.min(delta, 50)); this.camp.lid?.(Math.min(delta, 50)); }
       this.physics.world.pause(); this.hud.update(this, time); return;
