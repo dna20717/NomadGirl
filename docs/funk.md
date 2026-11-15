@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: Daniel hat die ⚠️ aus #016–#024 abgesegnet (Tickets `abgenommen`). Änderungen in **#025** (läuft): Schwarzes Brett am Van, schönere Dialoge ohne Porträts, Quest-Marken aus der Spielwelt, Armadillo als Marke, Gangs englisch.
 - 15.11. Code → Ava (HNC): Stand bis #024 auf `main`, `npm test` 145, alle 34 Browser-Tests grün (zuletzt vollständig nach #023, nach #024 megarig/salvage erneut grün). PixelLab übrig 674 (unter 700: jeder Auftrag nur mit Daniels Freigabe). Neu: /megarig (nur als Link), Bereiche Mega-Rigs, Anbauteile, Bergungsprojekte. Zum Absegnen: die ⚠️ aus #022–#024, vor allem „Felgen“ = Bergungsteile (#023). Offen: Name „Armadillo“ für den Crawler (A umbenennen / B Marke der Spielwelt / C bleibt Crawler); als Nächstes denkbar: Mega-Rigs im Spiel fahren (Bau-Modus, Budgets, Crew), Fahrzeug-Skilltrees + Heavy-Duty-Werkbank, Van als Basis sichtbar, Kachel-Sets für Crawler/Fatbird ab dem PixelLab-Reset am 07.12.
 - 15.11. Code → Ava: #024 fertig: Crawler und Fatbird größer, je eine Etage mehr, Brücke in Container-Größe. Offen: Name „Armadillo“?
 - 15.11. Code → Ava: #024 Crawler und Fatbird größer läuft.
@@ -330,7 +331,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** Commits `393151a` (Tutorial-Häkchen), `15c02cf` (Gegner), `7cb9438` (Hall of Loot), `ce741b3` + Folge (Zisterne, Feldhandbuch-Bilder). Tests: `npm test` 120, alle 32 Browser-Tests grün. PixelLab: diesmal 19 (10 verworfen: Referenz in alter Perspektive wurde kopiert; 9 mit `view: side` sitzt), übrig 725. **Bitte testen:** eine Lektion mit Häkchen wegklicken; Bunker/Ministerium: keine Drohnen/Ratten mehr, Hausmeister als großer Raider; Schatzkammer mit Trophäen füllen; Zisterne im Rig.
 
 ### #016 Flow & Kohärenz: Losziehen, Spannungskurve, roter Faden, Gangs, Tutorial im Run
-- **Status:** fertig (Code, 14.11.) · angelegt 14.11. von Code (Analyse Ava, Daniel hat ausgewählt)
+- **Status:** abgenommen 15.11. (Daniel, Änderungen in #025) · fertig (Code, 14.11.) · angelegt 14.11. von Code (Analyse Ava, Daniel hat ausgewählt)
 - **Für:** Code
 - **Lesen:** `worldmap.md`, `pois.md`, `progression.md`, `ui.md`, `tutorial.md`, `combat.md`
 - **Befund (Durchspielen 14.11.):** Bis zum Run vier Eingaben (Van → Menü → Karte, Nachbarort vorgewählt, „Hier plündern“ versteckt); Camp-Vorbereitung im Run unsichtbar; Gegner in der Tankstelle gleichmäßig alle 300–600 px (kein Rhythmus); Suche nach AvAs Heilmittel im Spiel kaum sichtbar; im Run zwei Δ-Anzeigen und die Camp-Leiste; POIs ohne eigene Gegner-Identität, Hausmeister ohne Boss-Verhalten; Lektionen pausieren auch im Run.
@@ -354,7 +355,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** Commits `215264d` (Losziehen + Bereit?), `60e8bf4` (Spannungskurve), `694d2c8` (roter Faden + Run-HUD), `df6a188` (Gangs + Boss), `99efa48` (Tipp im Run), `ff88947` (Questlog). Tests: `npm test` 127, alle 32 Browser-Tests grün. PixelLab: 0. **Bitte testen:** Van-Tür → Karte („Bereit?“), Tankstelle plündern (ruhiger Start, harter Schluss, Gelbe Geier), Zielzeile oben rechts, am Lagerfeuer das Questlog (Kabelsalat annehmen, verfolgen), im Ministerium den Hausmeister unter 60 % bringen.
 
 ### #017 Beute-Bilanz, Companions mit Aufträgen, Toasts, neue Räume, Technik
-- **Status:** fertig (Code, 14.11.) · angelegt 14.11. von Code (Daniels Auswahl aus Avas Liste)
+- **Status:** abgenommen 15.11. (Daniel, Änderungen in #025) · fertig (Code, 14.11.) · angelegt 14.11. von Code (Daniels Auswahl aus Avas Liste)
 - **Für:** Code
 - **Lesen:** `progression.md` (Questlog), `camp.md`, `ui.md`, `pois.md`, `tests.md`, `backlog.md` (C8)
 - **Auftrag:**
@@ -372,7 +373,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** Commits `8d7cf66` (Toasts), `47b102f` (Beute-Bilanz), `ddc2899` (Companions), `02beaab` (Räume), `807315c` (Test-Runner, Panzerung), `70959f1` (Aufteilen + Tests), `9d6b751` (CLAUDE.md). Tests: `npm test` 129, **alle 32 Browser-Tests grün** mit `npm run test:browser`. Korrektur: Nach #016 hatte ich fälschlich „alle grün“ gemeldet (Filterfehler), `pad_test` und `poi_test` waren rot und sind jetzt angepasst. PixelLab: 0. **Bitte testen:** einen Run beenden (Bilanz, goldener Knopf), mit Schraube reden („!“ → Auftrag), Tankstelle mehrmals plündern (neue Räume: Waschstraße, Zapfinseln, Reifenlager mit Secret).
 
 ### #018 Symbole für die letzten 16 Dinge ohne Grafik
-- **Status:** fertig (Code, 14.11.) · angelegt 14.11. von Code (Daniel: „Welche Gegenstände haben noch keine Grafik“ → „Ja, ein Raster“)
+- **Status:** abgenommen 15.11. (Daniel, Änderungen in #025) · fertig (Code, 14.11.) · angelegt 14.11. von Code (Daniel: „Welche Gegenstände haben noch keine Grafik“ → „Ja, ein Raster“)
 - **Für:** Code
 - **Auftrag:** ein Symbol-Raster `icons_misc` (4 × 4 à 64 px, PixelLab, Stil wie `icons_treasure`, AAP-64) für Glühbirne, Kronkorken, Stoffreste, Schrottplatte, Discokugel, Rohrbogen, Auspuffkrümmer, Teleskopantenne, T-Stück, Verkohlter Klumpen, Schrottskulptur, Hochleistungszelle, Turbinenmodul, Schockstab, Schulranzen, Wanderrucksack.
 - **Rückfragen:**
@@ -380,12 +381,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `icons_misc` eingebaut, alle 158 Gegenstände, 12 Waffen und 3 Rucksäcke haben jetzt eine Grafik. Tests: `npm test` 129, inventory/treasury/craft/gear grün. PixelLab: diesmal 10, übrig 708. **Bitte testen:** Kiste und Rucksack (Schulranzen-Symbol), Discokugel in der Hall of Loot.
 
 ### #019 Inventar nur noch mit Rechtecken
-- **Status:** fertig (Code, 14.11.) · angelegt 14.11. von Code (Daniel: „Lass uns mit dem Tetris-Quatsch aufhören und auf Rechtecke beschränken im Inventar“)
+- **Status:** abgenommen 15.11. (Daniel, Änderungen in #025) · fertig (Code, 14.11.) · angelegt 14.11. von Code (Daniel: „Lass uns mit dem Tetris-Quatsch aufhören und auf Rechtecke beschränken im Inventar“)
 - **Für:** Code
 - **Ergebnis:** Formen raus aus Logik, Schema und Daten; alte Spielstände werden beim Laden entwirrt (nichts geht verloren); nebenbei verschluckte das Bündel am Van keine Dinge mehr. Tests: `npm test` 131, alle 32 Browser-Tests grün. PixelLab: 0. **Bitte testen:** Inventar öffnen, Rohrbogen/T-Stück drehen und ablegen; einen alten Spielstand laden.
 
 ### #020 Ausdauerleiste + Cyberpunk-Leisten
-- **Status:** fertig (Code, 14.11.) · angelegt 14.11. von Code (Daniel: „Wir brauchen eine Ausdauerleiste für Dash, Slide, Doppelsprung und Nahkampf-Attacken“)
+- **Status:** abgenommen 15.11. (Daniel, Änderungen in #025) · fertig (Code, 14.11.) · angelegt 14.11. von Code (Daniel: „Wir brauchen eine Ausdauerleiste für Dash, Slide, Doppelsprung und Nahkampf-Attacken“)
 - **Für:** Code
 - **Lesen:** `leyla.md`, `combat.md`, `ui.md`, `cyberware.md`
 - **Auftrag (Antworten Daniel):** leer = Aktion geht nicht (Leiste blinkt, Ton); Erholung nach kurzer Pause schnell; Leiste unter der Lebensleiste, **beide Leisten im Cyberpunk-Design**; Kosten in der Werkstatt, Ausrüstung kann Max-Ausdauer und Erholung erhöhen.
@@ -396,7 +397,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** Ausdauer in Leyla, Kosten an Dash/Slide/Doppelsprung/Hieben/Kombo, Leisten im Cyberpunk-Look (Leben mit Nachzieh-Balken). Tests: `npm test` 131, alle Browser-Tests grün (`game_test` 52). PixelLab: 0. **Bitte testen:** viermal hintereinander dashen (der vierte geht nicht, Leiste blinkt), eine volle Kombo + gleich noch eine.
 
 ### #021 EKG-Linie, Reisebild für Zwischenfälle, englische Ortsnamen
-- **Status:** fertig (Code, 14.11.) · angelegt 14.11. von Code (Daniel im Code-Chat)
+- **Status:** abgenommen 15.11. (Daniel, Änderungen in #025) · fertig (Code, 14.11.) · angelegt 14.11. von Code (Daniel im Code-Chat)
 - **Für:** Code
 - **Auftrag:** 1) EKG-Linie in der Lebensanzeige. 2) Ein generisches Reisebild für die Zwischenfälle unterwegs, ähnlich den Intro-Panels (PixelLab, Daniel: „nutze bis 30 Credits dafür“, freigegeben unter der 700er-Grenze). 3) Alle Ortsnamen cooler und auf Englisch.
 - **Rückfragen:**
@@ -405,7 +406,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** EKG-Linie über der Lebensleiste; Reisebild `travel_road` oben in jedem Zwischenfall; englische Ortsnamen, alte Spielstände werden umbenannt. Nebenbei: `cozy_test` war wetterabhängig (Regen füllt die Zisterne schneller), jetzt trocken geprüft. Tests: `npm test` 132, alle 32 Browser-Tests grün. PixelLab: diesmal 25, übrig 683 (unter 700: ab jetzt wieder vorher fragen). **Bitte testen:** wenig Leben (EKG rast), weit fahren bis zum Zwischenfall (Bild), Karte ansehen.
 
 ### #022 Mega-Rigs: Baukasten + begehbarer Prototyp (LKW, Crawler, Fatbird)
-- **Status:** fertig (Code, 15.11.) · angelegt 14.11. von Code (Daniel im Code-Chat)
+- **Status:** abgenommen 15.11. (Daniel, Änderungen in #025) · fertig (Code, 15.11.) · angelegt 14.11. von Code (Daniel im Code-Chat)
 - **Für:** Code
 - **Lesen:** design.md › Endgame-Zugmaschinen, Mega-Rigs aus Kachel-Sets; docs/features/megarigs.md
 - **Auftrag:** Daniel per Multiple Choice: **Platz-Raster** wie die Container (Module 1/2/3, Stockwerke, Deko an Anschlusspunkten); **LKW** aus PixelLab (vorhandenes Bild, „Erzeuge nichts Neues“), nur gerade rücken auf echte Seitenansicht (Daniel: „der LKW ist nicht orthogonal, das kannst du mit PixelLab beheben“), Teile aus seinem Blatt docken an; **Daten im Werkstatt-Bereich**; **Prototyp begehbar mit Leyla** als eigener Link, nicht im Menü und nicht im Spiel. Perspektive (strenge Seitenansicht) und Palette AAP-64 beachten.
@@ -418,7 +419,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** Neue Bereiche **Mega-Rigs** + **Anbauteile** (RIG), `engine/megarig.js` (Raster → Layout, Erreichbarkeit), `game/play/megarig_view.js`, Seite `megarig.html` (Fahrzeug, Stufe −/+, Übersicht). Tests: `npm test` 138 (6 neu in `test/megarig.test.js`), `tools/megarig_test.mjs` 14 Prüfungen (27 Leitern bis oben). PixelLab: diesmal 9 (LKW auf Seitenansicht), übrig 674. **Bitte testen:** /megarig, alle drei Fahrzeuge, ganz nach oben klettern (Ausguck am Mast/Kran), in die Räume im Rumpf, „Übersicht“, Stufen durchschalten; in der Werkstatt RIG › Mega-Rigs ein Modul verschieben und neu laden.
 
 ### #023 Bergungsprojekte: LKW-Wrack, Crawler, Fatbird mit Quests, POIs und Teilen
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, AFK: „Bau bitte den gesamten Themenbereich inklusive Quests und POI und Felgen mit ein“)
+- **Status:** abgenommen 15.11. (Daniel, Änderungen in #025) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, AFK: „Bau bitte den gesamten Themenbereich inklusive Quests und POI und Felgen mit ein“)
 - **Für:** Code
 - **Lesen:** design.md › Bergungsprojekt: der LKW, Endgame-Zugmaschinen; docs/features/megarigs.md › Bergungsprojekte
 - **Auftrag:** Bergungsprojekte als Daten (Abschnitte mit Teilen), Wrack am gewürfelten Ort, mehrfach hinfahren, Teile aus anderen POIs, Fortschritt sichtbar, Questlog mit fehlenden Teilen und Fundorten; danach Crawler und Fatbird als große Bergungen.
@@ -433,15 +434,29 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `game/salvage.js`, `game/play/camp_salvage.js`, Bereich Bergungsprojekte, 14 Teile + 2 Trophäen + 2 Achievements, Karte, Questlog, POI-Kisten. Tests: `npm test` 145 (7 neu in `test/salvage.test.js`), `tools/salvage_test.mjs` 7, `megarig_test` 14, Camp/Bau/Karte/Spiel/Achievements grün. PixelLab: 0, übrig 674. **Bitte testen:** neues Spiel, Questlog › Der LKW verfolgen, Karte (WRACK-Marke), zum Wrack fahren, E am Wrack, Teile in Mile 7 sammeln, einbauen, Probestart → LKW vorne am Rig; danach Crawler-/Fatbird-Wrack anschauen.
 
 ### #024 Crawler und Fatbird größer, eine Etage mehr, Kabine mit Containergröße
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** abgenommen 15.11. (Daniel, Änderungen in #025) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/megarigs.md › Größen
 - **Auftrag:** Daniel: „Fatbird und Crawler sind ein wenig zu klein. Eine Kette sollte deutlich höher sein als Leyla. Füge beiden eine Etage hinzu. Crawler-Fahrerkabine alleine sollte Platz für mindestens einen großen Container haben als Referenz. Damit die Rigs nicht zu hoch werden, gerne länger machen.“ Der Truck passt.
 - **Fertig, wenn:** Ketten deutlich höher als Leyla, je eine Etage mehr, Kabine ≥ 40-Fuß-Container, alles erreichbar, Tests grün.
 - **Rückfragen:**
-  - „armadillo?!“ → offen: Name für den Crawler? Daniel fragen (Multiple Choice).
+  - „armadillo?!“ → Daniel 15.11.: Marke der Spielwelt, der Crawler heißt weiter Crawler (#025).
   - Kabine → ⚠️ Kommandobrücke als begehbarer Raum, 3 Plätze breit, auf Deckhöhe; darunter Maschinenblock.
 - **Ergebnis:** Crawler Ketten 6 Kacheln, 2 Rumpf-Etagen, Bug 24 Kacheln mit Brücke, 10 Plätze in der letzten Stufe, 3 Stockwerke obendrauf statt 4; Fatbird Lastrahmen + 2 Decks, größere Hülle, Rotoren, Cockpit. Luken führen jetzt als Schacht bis zum Deck. Tests: `npm test` 145, `megarig_test` 14, `salvage_test` 7. PixelLab 0. **Bitte testen:** /megarig Crawler und Fatbird, Übersicht, in die Brücke und die untere Rumpf-Etage klettern.
+
+### #025 Absegnung 15.11.: Schwarzes Brett, schönere Dialoge, Armadillo, englische Gangs
+- **Status:** läuft (Code, 15.11.) · angelegt 15.11. von Code (Daniel hat die ⚠️ aus #016–#024 im Code-Chat entschieden)
+- **Für:** Code
+- **Lesen:** docs/features/camp.md (Companions, Aufträge), docs/features/megarigs.md, docs/features/worldmap.md
+- **Auftrag:** Alle ⚠️ aus #016–#024 abgenommen, dazu:
+  1. **Armadillo** als Marke der Spielwelt: Crawler heißt weiter Crawler, gebaut von „Armadillo Heavy Industries“ (Schriftzug am Rumpf, Beschreibung).
+  2. **Gangs englisch** (wie die Orte): Yellow Vultures, Neon Rats, Rust Guard, Order Office; alte Spielstände umbenennen.
+  3. **Dialoge hübscher**, vorerst ohne Porträts (Daniel: „Mach das System zunächst ohne Portraits hübscher“); Platz für ein Porträt später.
+  4. **Quest-Marken** sollen besser in die Spielwelt passen (statt Text-„!“/„✓“).
+  5. **Schwarzes Brett am Van:** Aufträge annehmen, abgeben und Belohnungen einsammeln, zentral; bei den NPCs geht es weiter direkt. Später wird daraus eine Werkbank, die fertige Aufträge gegen noch bessere Belohnungen tauscht (Name offen, „nicht alles im Warroom abladen“).
+- **Fertig, wenn:** Brett im Camp benutzbar (Tastatur + Controller), Dialog neu, Marken neu, Namen umgestellt, alte Spielstände gültig, Tests grün, Build grün.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ## Archiv
 
