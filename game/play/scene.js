@@ -316,7 +316,7 @@ export class PlayScene extends Phaser.Scene {
     if (TL && TL !== S?.look && this.assetInfo(TL)) S = { ...S, look: TL, flip: !!this.data_.assets[TL].flip, door: { enabled: false }, dish: null, roof: null };
     this.megaView = this.megarig ? new MegarigView(this, this.megarig, T) : null;
     this.megaView?.ladders(this.ladders, new Set((this.data_.megarigs[this.args.megarig.id].walk || []).filter(w => w.kind === 'ladder').map(w => this.megarig.x0 + Number(w.x || 0))));
-    this.van = !this.megarig && S?.enabled !== false && S?.look && this.assetInfo(S.look) ? new Van(this, S, [(start[0] + 0.5) * T, (start[1] + 1) * T]) : null;
+    this.van = !this.megarig && !this.campGeo?.mega && S?.enabled !== false && S?.look && this.assetInfo(S.look) ? new Van(this, S, [(start[0] + 0.5) * T, (start[1] + 1) * T]) : null;
     this.spawnArt = this.van?.sprite;
     // buffs from the savegame count in a run (health, defense, damage)
     this.mods = {};

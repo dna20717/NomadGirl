@@ -4,6 +4,7 @@
 import { here, progress, missing, install, finish, sstate } from '../salvage.js';
 import { advance, clockText, swapTractor } from '../save.js';
 import { buildMegarig } from '../../engine/megarig.js';
+import { activate, activeMega, owned } from '../mega.js';
 import { MegarigView } from './megarig_view.js';
 
 const col = c => parseInt(String(c).slice(1), 16);
@@ -127,9 +128,25 @@ export class CampSalvage {
     s.cam?.shake?.(900, 0.008);
     s.hud.toast(`${x.name} läuft!`, res.text, 'trophy', 6500);
     const sub = res.tractor ? `${D.tractors[res.tractor].name} zieht jetzt dein Rig` : res.megarig ? `Mega-Rig ${D.megarigs?.[res.megarig]?.name || res.megarig} freigeschaltet` : '';
-    s.time.delayedCall(2600, () => s.goCamp({ banner: [`${x.name} geborgen`, sub, 'trophy'], fade: 800, keepPlace: true }));
+    // #029: a mega rig asks right away whether Leyla moves aboard (the rig goes into its loading bay); later via the map's header
+    if (res.megarig) s.time.delayedCall(2600, () => this.moveAboard(res.megarig, `${x.name} geborgen`));
+    else s.time.delayedCall(2600, () => s.goCamp({ banner: [`${x.name} geborgen`, sub, 'trophy'], fade: 800, keepPlace: true }));
   }
 }
+
+// #029 moving into a mega rig (from the test start or the map): the rig parks in the loading bay, the workshops move aboard
+CampSalvage.prototype.moveAboard = function (id, title = null) {
+  const s = this.scene, D = this.D, save = this.box.save, V = D.megarigs?.[id] || {}, bay = D.tractors?.[save.rig.tractor]?.name || 'Rig';
+  const go = () => {
+    const r = activate(D, save, id);
+    if (!r.ok) return s.hud.toast('Umzug geht nicht', r.why, 'warn');
+    s.box.persist?.(true);
+    s.goCamp({ banner: [`Willkommen an Bord: ${V.name || id}`, r.lost ? `${r.lost} Container passen noch nicht, sie warten im Lager` : `Dein ${bay} parkt in der Ladebucht`, 'trophy'], fade: 900 });
+  };
+  s.hud.menu({ title: title || `Umziehen: ${V.name || id}`, sub: `Ziehst du in ${V.name || id} um? Dein ${bay} fährt in die Ladebucht, alle Container und Werkstätten kommen mit an Bord. Zurück geht es jederzeit über die Ladebucht.`,
+    items: [{ label: 'An Bord gehen', primary: true, act: go }, { label: 'Später (über die Karte)', act: () => s.goCamp({ fade: 600, keepPlace: true }) }],
+    onClose: () => s.goCamp({ fade: 600, keepPlace: true }) });
+};
 
 // the wreck of this place for campLayout: id + width in tiles, if one stands here and is not done yet
 export function wreckHere(D, save) {

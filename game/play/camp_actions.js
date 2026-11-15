@@ -1,5 +1,6 @@
 // What Leyla does in the camp (#017 split from camp.js): use a workshop, sleep, sit by the fire, the warroom, the van door, driving.
 // Mixed into Camp (game/play/camp.js): the methods keep their `this`, nothing else changes.
+import { owned, activeMega } from '../mega.js';
 import { ensureMap, placeOf } from '../worldmap.js';
 import { rollEncounter, choose, blocked } from '../travel.js';
 import { potsOf, stage, ripe, harvest, STAGES, canWater, waterOf, water } from '../garden.js';
@@ -102,6 +103,8 @@ export class CampActions {
   // workshops (bunk, kitchen) sit as buttons in its header
   vanMenu(ids) {
     const extras = ids.map(w => { const d = this.D.workshops?.[w.id] || {}; return { label: VERB[d.function] || d.name || w.id, icon: d.function === 'sleep' ? 'moon' : d.function === 'kitchen' ? 'light' : 'workbench', act: () => this.use(w.id) }; });
+    // #029: salvaged mega rigs you do not live in yet: move aboard from here
+    for (const id of owned(this.box.save).filter(m => m !== activeMega(this.D, this.box.save) && this.D.megarigs?.[m]?.tractor)) extras.push({ label: `Umziehen: ${this.D.megarigs[id].name}`, icon: 'vehicle', act: () => { this.scene.hud.map?.close?.(); this.moveAboard(id); } });
     this.openMap({ extras, sel: this.box.save.location });
   }
   // Loadout-Check next to „Hier plündern“ (#016): what Leyla takes along, each line ok or a warning

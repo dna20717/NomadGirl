@@ -15,6 +15,8 @@ import { occupancy } from '../inventory.js';
 import { offers, accept, claim, progressOf, qstate } from '../quests.js';
 import { Benches, benchTexture, crateTexture } from './benches.js';
 import { wreckHere } from './camp_salvage.js';
+import { campMegaLayout } from './camp_mega.js';
+import { activeMega } from '../mega.js';
 
 export const de = n => Number(n).toLocaleString('de-DE', { maximumFractionDigits: 1 });
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
@@ -119,6 +121,7 @@ export function rigUnits(D, rig, vanLeft, ground, T = 64) {
 // geometry of the camp in tiles and pixels: margin | scrapyard | room for the rig (as long as the tractor may pull) | van | campsite.
 // The van stands still while building: the rig grows to the left from it.
 export function campLayout(D, save, T = 64) {
+  if (activeMega(D, save)) return campMegaLayout(D, save, T);   // #029: camp aboard the crawler / fatbird
   const C = D.camp || {}, gap = (C.rig?.gap ?? 1) * T, margin = C.margin ?? 6;
   let H = Math.max(8, C.height ?? 14);
   const vanA = D.assets?.[D.tractors?.[save.rig.tractor]?.look] || D.assets?.[D.game?.spawn?.look];
@@ -448,7 +451,7 @@ export class Camp {
     this.startSound();
     // the van: E at its door shows the van's own workshops
     const vanWs = geo.tractor?.workshops || [];
-    this.hotspots.push({ x: geo.doorX, w: 110, name: D.tractors?.[geo.tractor?.id]?.name || 'Van', hint: vanWs.length ? 'Einsteigen' : 'Fahrerhaus',
+    this.hotspots.push({ x: geo.doorX, w: 110, floor: geo.doorFloor ?? undefined, name: geo.mega ? (geo.mega.b.kind === 'airship' ? 'Cockpit' : 'Kommandobrücke') : D.tractors?.[geo.tractor?.id]?.name || 'Van', hint: geo.mega ? 'Karte' : vanWs.length ? 'Einsteigen' : 'Fahrerhaus',
       act: () => this.vanMenu(vanWs) });
     // the van's own storage (Kofferraum): E at the rear door
     const T0 = D.tractors?.[geo.tractor?.id] || {};
@@ -483,7 +486,7 @@ export class Camp {
     this.shut = Object.fromEntries((this.shells || []).map(c => [c.key, c.a]));
     this.shells = [];
     this.labels = [];
-    this.geo.units = rigUnits(this.D, this.box.save.rig, this.geo.vanLeft, this.ground, s.T);
+    this.geo.units = this.geo.mega ? [] : rigUnits(this.D, this.box.save.rig, this.geo.vanLeft, this.ground, s.T);
     this.budget = budgets(this.D, this.box.save.rig);
     // solar: in the sun full power, at night only while the battery holds (#008)
     this.solar = solarState(this.D, this.box.save);
@@ -491,11 +494,14 @@ export class Camp {
     { const x = powerBoost(this.box.save, clockHours(this.box.save)); if (x) { this.budget.power.made += x; this.budget.power.net = this.budget.power.made - this.budget.power.used; } }   // the regulator in the green band (#013)
     this.noPower = this.D.build?.rules?.power !== false && this.budget.power.net < 0;
     this.tooHeavy = this.D.build?.rules?.weight !== false && this.budget.heavy;
-    for (const u of this.geo.units) u.view = this.drawUnit(u);
-    this.drawVanParts();
-    this.drawVanDoor();
-    this.drawYard();
-    this.drawStringLights();
+    if (this.geo.mega) { this.drawMega(); this.drawYard(); }   // #029 aboard a mega rig
+    else {
+      for (const u of this.geo.units) u.view = this.drawUnit(u);
+      this.drawVanParts();
+      this.drawVanDoor();
+      this.drawYard();
+      this.drawStringLights();
+    }
     if (this.night) for (const l of this.lights) if (l.rig) l.setAlpha(l.base * this.lightK).setVisible(this.lightK > 0);
     this.updateShells(0);   // labels and lights of closed containers right away, not one frame later
   }
@@ -934,7 +940,7 @@ export class Camp {
   // ---------- van: at night warm light pours out of the open sliding door ----------
   vanGlow() {
     const V = this.C.vanLight || {};
-    if (V.enabled === false) return;
+    if (V.enabled === false || this.geo.mega) return;
     const x = this.geo.doorX, y = this.ground, k = (V.strength ?? 100) / 100, color = V.color || '#ffcf7a';
     this.doorLights = [
       this.light(x, y - (V.lift ?? 150), (V.width ?? 110), color, 0.55 * k, (V.height ?? 150)),   // the open doorway glows
@@ -1107,4 +1113,5 @@ import { CampLife } from './camp_life.js';
 import { CampActions } from './camp_actions.js';
 import { CampSalvage } from './camp_salvage.js';
 import { CampBoard } from './camp_board.js';
-for (const M of [CampLife, CampActions, CampSalvage, CampBoard]) for (const k of Object.getOwnPropertyNames(M.prototype)) if (k !== 'constructor') Object.defineProperty(Camp.prototype, k, Object.getOwnPropertyDescriptor(M.prototype, k));
+import { CampMega } from './camp_mega.js';
+for (const M of [CampLife, CampActions, CampSalvage, CampBoard, CampMega]) for (const k of Object.getOwnPropertyNames(M.prototype)) if (k !== 'constructor') Object.defineProperty(Camp.prototype, k, Object.getOwnPropertyDescriptor(M.prototype, k));

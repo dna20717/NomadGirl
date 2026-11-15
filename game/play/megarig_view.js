@@ -48,7 +48,7 @@ export class MegarigView {
     this.containers = [];
     this.glows = [];
     const D = scene.data_, V = D.megarigs?.[opts.id ?? scene.args.megarig?.id] || {};
-    this.V = V; this.id = opts.id ?? scene.args.megarig?.id ?? 'rig';
+    this.V = opts.lights ? { ...V, lights: opts.lights } : V; this.id = opts.id ?? scene.args.megarig?.id ?? 'rig';
     this.docks = new Map();   // module number (from 1) → its two upper corners
     this.paint = { main: C.yellow, dark: C.violet, trim: C.copper, neon: C.cyan, light: C.red, ...(V.paint || {}) };
     this.g = scene.add.graphics().setDepth(-6);       // hull, back layer
@@ -67,7 +67,7 @@ export class MegarigView {
     }
     for (const p of build.pieces) if (p.type === 'addon') this.addon(p);
     this.stringLights();
-    if (scene.args?.megarig) this.walkways();   // not on a wreck in the camp
+    if (scene.args?.megarig || opts.walk) this.walkways();   // not on a wreck in the camp
     if (V.brand && this.brandAt) {
       const st = this.stencil(V.brand, ...this.brandAt);
       const c = this.containers.find(c => c.inside && st.x > c.x0 && st.x < c.x1 && st.y > c.y0 && st.y < c.y1);
@@ -501,7 +501,8 @@ export class MegarigView {
       this.r(g, lx - 3 * PX, y + 2 * PX, 6 * PX, 2 * PX, C.gold);
       this.glow(lx, y + 0.6 * T, 2.2 * T, 1.4 * T, C.gold, 0.28);
     }
-    if (p.workshops?.length) this.benchesIn(p, x + 0.3 * T, w - 0.6 * T, y + h - 3 * PX, h - 0.8 * T, -4.45);   // #028
+    const helm = p.type === 'bridge' && p.workshops?.length ? 3 * T : 0;   // #029: the helm (map) in front, the bridge's workshops behind it
+    if (p.workshops?.length) this.benchesIn(p, x + helm + 0.3 * T, w - helm - 0.6 * T, y + h - 3 * PX, h - 0.8 * T, -4.45);   // #028
     const lab = p.name ? this.label(x + w / 2, y + 0.5 * T, p.name) : null;
     if (this.skin && (p.inside || p.type === 'bridge')) {   // #026: the hull skin over the room; #027: its name shows when it is open
       this.cover(x, y - T, w, h + T);
@@ -513,13 +514,14 @@ export class MegarigView {
   bridge(p) {
     this.room({ ...p, places: 3 });
     const T = this.T, g = this.gm, P = this.paint, x = p.x * T, w = p.w * T, floor = p.floorRow * T;
-    for (let i = 0; i < 3; i++) {
-      const kx = x + w * (0.12 + i * 0.3), ky = floor - 1.3 * T;
+    const helm = !!p.workshops?.length;   // #029: with workshops aboard only the helm console stays, in front
+    for (let i = 0; i < (helm ? 1 : 3); i++) {
+      const kx = helm ? x + 0.3 * T : x + w * (0.12 + i * 0.3), ky = floor - 1.3 * T;
       this.r(g, kx, ky, 2.4 * T, 1.3 * T, C.ink); this.r(g, kx + PX, ky + PX, 2.4 * T - 2 * PX, 1.3 * T - PX, C.grey);
       this.r(g, kx + 3 * PX, ky - 1.1 * T, 1.8 * T, 1 * T, C.ink); this.r(g, kx + 4 * PX, ky - 1.1 * T + PX, 1.8 * T - 2 * PX, 1 * T - 2 * PX, i === 1 ? P.neon : C.cyan, 0.8);
       this.glow(kx + 1.2 * T, ky - 0.6 * T, 3 * T, 2 * T, P.neon, 0.25);
     }
-    const cx = x + w * 0.5, cy = floor;   // chair
+    const cx = helm ? x + 2.4 * T : x + w * 0.5, cy = floor;   // chair
     this.r(g, cx - 0.4 * T, cy - 1.6 * T, 0.3 * T, 1.2 * T, C.rust); this.r(g, cx - 0.4 * T, cy - 0.6 * T, 0.9 * T, 0.25 * T, C.rust); this.r(g, cx, cy - 0.4 * T, 0.12 * T, 0.4 * T, C.ink);
   }
 
