@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #029 Mega-Rigs fahren (Crawler + Fatbird: Camp an Bord, Bau-Modus aufs Raster, Budgets, Reisen; Rig in der Ladebucht, ohne Crew) läuft.
 - 15.11. Code → Ava: #028 fertig: Test-Crawler mit Werkstätten in Räumen/Containern und 11 Lichterketten (Geschmackstest, Daten in Mega-Rigs). PixelLab 0.
 - 15.11. Code → Ava: #027 fertig: Mega-Rigs aufgeräumt (EPX-Grafik, Spanten/Träger, Laufwege, Leitern, LKW mit Container-Anhängern). PixelLab 0, übrig 589. Nächster Step laut Daniel: Favela-Container-Städte.
 - 15.11. Code → Ava: #027 Mega-Rigs aufräumen (Querschnitt, Laufwege, feinere Grafik, LKW mit Container-Anhängern) läuft.
@@ -504,6 +505,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - Wie festlegen → ⚠️ in den Daten: Module › Werkstätten, Mega-Rigs › Lichterketten (Modul-Ecke zu Modul-Ecke); Benutzen und Bau-Modus kommen mit „Mega-Rigs fahren“.
   - Banner vor den Werkstätten → ⚠️ Wandteile blenden mit der Außenwand aus.
 - **Ergebnis:** `benchesIn`, `stringLights`, Wandteile mit der Haut in `megarig_view.js`; Felder in Schema; Crawler mit 15 eingerichteten Modulen und 11 Lichterketten. Tests: `npm test` 145, `megarig_test` 16, `salvage_test` 7, `workshop_test` grün. PixelLab 0. **Bitte testen:** /megarig › Crawler › Container-Stadt, über die Dächer laufen (Lichterketten), in Container und Rumpf-Räume gehen.
+
+### #029 Mega-Rigs fahren: Camp an Bord, Bau-Modus aufs Raster, Budgets, Reisen (Crawler + Fatbird)
+- **Status:** läuft (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, Multiple Choice)
+- **Für:** Code
+- **Lesen:** design.md › Endgame-Zugmaschinen; docs/features/megarigs.md, rig.md, camp.md
+- **Auftrag:** Daniel: Mega-Rigs fahren. Entscheidungen: altes Rig fährt in die **Ladebucht** (Werkstätten ziehen in den Crawler um, Van/LKW für Orte, an die der Crawler nicht hinkommt); erster Schritt mit **Camp an Bord, Bau-Modus aufs Raster, Budgets, Reisen**; **Crawler und Fatbird zusammen**; **Crew erstmal ohne**.
+- **Plan:** 1) Logik `game/mega.js` (Umzug, Rasterpositionen, Budgets, Ausbaustufen), 2) Camp an Bord, 3) Bau-Modus aufs Raster, 4) Reisen.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ## Archiv
 
