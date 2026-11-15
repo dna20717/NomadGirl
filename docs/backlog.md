@@ -21,7 +21,7 @@ Stand: 12.11.2026 abends (Durchsicht von Ava). Kleinigkeiten sind schon behoben 
 
 - **Foodtruck:** „Verkaufen kommt später“ (Werkstatt ohne Funktion).
 - **Zugmaschine tauschen** im Bau-Modus fehlt (Van ↔ LKW).
-- **Gegner:** Boss-Verhalten Hausmeister, Gruppen-Alarm, echte Gegner-Grafiken (alle Gegner sind noch Platzhalter aus Code); To-do **Gegnerbaukasten für Sprites** (design.md, noch zu definieren).
+- **Gegner:** Boss-Verhalten Hausmeister, Gruppen-Alarm. (Grafiken: erledigt mit dem Raider-Bausatz #004/#015, 13 von 15 Gegnern; `rattenschwarm` und `wachdrohne` sind noch aus Code und gesperrt, bräuchten einen eigenen Bausatz für Tiere/Drohnen.)
 - **Companions** sind noch Figuren aus Code ohne Aussehen.
 - **AvA:** Akku aus einem Drohnenteil (Kern), Tastatur-Steuerung für das Gummiband (heute nur rechter Stick), wie man Anbauteile freischaltet.
 - **Kachel-Sets:** Vorschau eines Sets in der Werkstatt, großer Clutter für Wüste und Ruine.
