@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #031 fertig: Container ohne Dachkante, Fatbird-Heck neu (PixelLab 10, übrig 569), Rotoren an Fachwerk-Auslegern.
 - 15.11. Code → Ava: #030 fertig: Crawler-Heck neu und streng von der Seite (PixelLab 10, übrig 579).
 - 15.11. Code → Ava: #029 fertig: Mega-Rigs fahren (Umzug mit Ladebucht, Camp an Bord, Bauplan aufs Raster, Budgets, Reisen; Crawler + Fatbird, ohne Crew). Offen: gesperrte Straßen + Ausflüge aus der Ladebucht, Fatbird-Cockpit, Camp an Deck/am Seil.
 - 15.11. Code → Ava: #029 Mega-Rigs fahren (Crawler + Fatbird: Camp an Bord, Bau-Modus aufs Raster, Budgets, Reisen; Rig in der Ladebucht, ohne Crew) läuft.
@@ -528,6 +529,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Auftrag:** Daniel: „Das Heck vom Crawler sieht noch nicht ganz orthogonal aus.“ Befund: rechts war ein Stück Rückansicht (Grill frontal, zwei Rücklichter, Auspuffe nebeneinander). Daniel per Multiple Choice: PixelLab neu (~10).
 - **Ergebnis:** neues Heck in Zielgröße, Felder Kachel-Set › Rumpf im Heck / Schräge ab; skaliert bündig vom Deck bis zur Kette. Tests: `megarig_test`, `mega_test`, `npm test` grün. PixelLab: diesmal 10, übrig 579. **Bitte testen:** /megarig Crawler, Heck in allen Stufen, über die Schräge laufen.
+
+### #031 Container ohne Dachkante, Fatbird-Heck neu, Rotor-Halterung
+- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Auftrag:** Daniel: „Wenn du jetzt noch die räumliche Kante der Container in der obersten Reihe ausblendest, so dass die Perspektive einheitlich ist, ist es perfekt. Lass uns Fatbird deshalb auch noch einmal anschauen.“ Dann per Multiple Choice: „Heck neu 10 Gen und reparier die vordere Drohnendüse. Die hängt komplett in der Luft. Das muss zumindest eine ordentliche Halterung hin.“
+- **Rückfragen:**
+  - Dachkante → ⚠️ bei allen Containern an Bord abgeschnitten (nicht nur oberste Reihe), weil die Kante auch unten zwischen den Stapeln Draufsicht zeigt. Im Camp (Puppenhaus-Rig) bleibt sie.
+  - Halterung → ⚠️ beide Rotoren: zwei Fachwerk-Träger in den Rumpf + Pfosten aufs Deck, aus Code.
+- **Ergebnis:** `megarig_view.js` (`setCrop`, `pylon`, `post`, Heck-Ausrichtung), Felder Kachel-Set › Heck-Zeile, Heck beginnt vor dem Ende, Triebwerk-Glühen. Tests grün. PixelLab: diesmal 10, übrig 569. **Bitte testen:** /megarig Fatbird und Crawler, Container-Dächer, Rotoren, Fatbird-Heck.
 
 ## Archiv
 

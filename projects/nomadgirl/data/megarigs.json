@@ -135,7 +135,16 @@
    {"addon": "neon", "place": 3, "story": 2, "from": 1, "at": "wall", "text": "FATBIRD", "color": "#249fde", "shift": 3},
    {"addon": "schuessel", "place": 6, "story": 3, "from": 2}
   ],
-  "skin": {"bow": "megarig_fatbird_nose", "mid": "megarig_fatbird_mid", "stern": "megarig_fatbird_tail", "rotor": "megarig_fatbird_rotor", "scale": 6},
+  "skin": {
+   "bow": "megarig_fatbird_nose",
+   "mid": "megarig_fatbird_mid",
+   "stern": "megarig_fatbird_tail",
+   "rotor": "megarig_fatbird_rotor",
+   "scale": 6,
+   "sternAlign": [103, 84],
+   "sternInset": 11,
+   "sternGlow": 84
+  },
   "tractor": "fatbird"
  }
 }

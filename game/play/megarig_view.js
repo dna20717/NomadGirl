@@ -277,10 +277,12 @@ export class MegarigView {
     const frameBottom = (b.G - h.under) * T, top = (b.G - h.hullTop) * T, front = h.front * T, back = h.back * T;
     const nose = this.src(V.bow), mid = this.src(V.mid), tail = this.src(V.stern);
     const nw = nose.width * A, nh = nose.height * A, nx = x0 + front + 2 * T - nw, ny = frameBottom + 1.5 * T - nh;
-    const tx = x0 + len - back - 5 * T, ty = top - 4.5 * T, tw = tail.width * A, th = tail.height * A;
+    // #031: the tail lines up with the middle pieces (Kachel-Set › Heck-Zeile = Zeile im Mittelstück: the neon strip), sternInset tiles before the end
+    const [rowT, rowM] = V.sternAlign || [null, null];
+    const tx = x0 + len - back - (V.sternInset ?? 5) * T, ty = rowT != null ? top + (rowM - rowT) * A : top - 4.5 * T, tw = tail.width * A, th = tail.height * A;
     const gx = Math.min(nx, x0) - T, gy = Math.min(ny, ty) - T;
     this.skinCanvas(gx, gy, Math.max(tx + tw, x0 + len) + T - gx, Math.max(ny + nh, ty + th, frameBottom + 2 * T) - gy, A);
-    const end = tx + 4 * T;
+    const end = tx + (rowT != null ? 1 : 4) * T;
     for (let x = x0 + front - T; x < end; x += mid.width * A) this.put(V.mid, x, top, A, false, Math.ceil((end - x) / A));
     this.bays(x0 + front, x0 + front + h.places * h.P * T, top, frameBottom - h.frames * h.S * T, h.places, h.P, h.inside - h.frames, h.S);
     this.put(V.stern, tx, ty, A);
@@ -288,7 +290,7 @@ export class MegarigView {
     this.finishSkin(-6);
     this.glow(nx + 50 * A, ny + 80 * A, 260, 200, C.gold, 0.35);   // the cockpit window
     this.glow(nx + 40 * A, ny + nh - 12 * A, 160, 90, P.neon, 0.5);   // hover nozzle under the nose
-    this.glow(tx + tw - 5 * A, ty + 125 * A, 220, 160, P.neon, 0.5);   // the tail engine
+    this.glow(tx + tw - 5 * A, ty + (V.sternGlow ?? 125) * A, 220, 160, P.neon, 0.5);   // the tail engine
     return true;
   }
 
@@ -437,13 +439,22 @@ export class MegarigView {
     const T = this.T, g = this.gf, P = this.paint, x = p.x * T, y = p.y * T, w = p.w * T;
     const hullX = this.b.x0 * T + (x < this.b.x0 * T ? 2 * T : (this.b.len - 1) * T);
     const hullTop = (this.b.G - this.b.pieces[0].hullTop) * T, ax = x + w / 2;   // outrigger: an arm to the hull roof plus a strut
-    this.g.lineStyle(0.7 * T, col(C.night)).lineBetween(ax, y + 0.8 * T, hullX, hullTop + T);
-    this.g.lineStyle(2 * PX, col(this.paint.dark)).lineBetween(ax, y + 1.4 * T, hullX, hullTop + 2.5 * T);
     const R = this.V.skin?.rotor;
+    if (!(R && this.s.textures.exists(R))) {
+      this.g.lineStyle(0.7 * T, col(C.night)).lineBetween(ax, y + 0.8 * T, hullX, hullTop + T);
+      this.g.lineStyle(2 * PX, col(this.paint.dark)).lineBetween(ax, y + 1.4 * T, hullX, hullTop + 2.5 * T);
+    }
     if (R && this.s.textures.exists(R)) {   // #026: the rotor pod from the tile set, its outrigger stub towards the hull
       const key = R + '_x2';
       if (!this.s.textures.exists(key)) this.s.textures.addCanvas(key, this.fine(R));
       const im = this.src(R), k = w / im.width, left = x < this.b.x0 * T + this.b.len * T / 2;
+      // #031 (Daniel: „die vordere Drohnendüse hängt komplett in der Luft, da muss eine ordentliche Halterung hin“): a truss pylon
+      // from the pod into the hull, behind the skin (it disappears into the hull) plus a strut underneath; both orthogonal
+      const midY = y - 0.3 * T + im.height * k * 0.42, inner = left ? x + w - 0.6 * T : x + 0.6 * T, into = left ? this.b.x0 * T + this.b.pieces[0].front * T + 2 * T : (this.b.x0 + this.b.len - this.b.pieces[0].back - 2) * T;
+      this.pylon(inner, into, midY, 1.3 * T);
+      this.pylon(left ? x + w * 0.62 : x + w * 0.38, into, midY + 1.6 * T, 0.7 * T);
+      const deck = (this.b.G - this.b.pieces[0].hullTop) * T;   // and a post from the beam down onto the deck, so nothing hangs in the air
+      this.post(into + (left ? -0.6 : 0) * T, midY - 0.65 * T, deck + T, 1.2 * T);
       this.s.add.image(x, y - 0.3 * T, key).setOrigin(0).setScale(k / 2).setFlipX(left).setDepth(-3);
       this.glow(x + w / 2, y + im.height * k + 0.4 * T, w * 1.1, 1.6 * T, P.neon, 0.5);
       this.blink(x + w * (left ? 0.44 : 0.56), y - 0.2 * T, P.light);
@@ -460,6 +471,32 @@ export class MegarigView {
     this.blink(x + w / 2, y - PX, P.light);
   }
 
+  // a horizontal truss beam (two chords, zigzag braces, rivets, a hazard band at the pod end), from x0 to x1 at centre y, behind the skin
+  pylon(x0, x1, cy, h) {
+    const g = this.s.add.graphics().setDepth(-6.2), a = Math.min(x0, x1), w = Math.abs(x1 - x0), top = cy - h / 2, ch = Math.max(2 * PX, h * 0.22);
+    this.r(g, a, top - PX, w, h + 2 * PX, C.ink, 0.35);   // shadow of the gap
+    for (const yy of [top, top + h - ch]) { this.r(g, a, yy - PX, w, ch + 2 * PX, C.ink); this.r(g, a, yy, w, ch, C.grey); this.r(g, a, yy, w, PX, C.silver); }
+    const step = h * 0.9;
+    g.lineStyle(2 * PX, col(C.ink));
+    for (let xx = a; xx < a + w - step / 2; xx += step) g.lineBetween(xx, top + ch, xx + step / 2, top + h - ch).lineBetween(xx + step / 2, top + h - ch, xx + step, top + ch);
+    g.lineStyle(PX, col(C.steel));
+    for (let xx = a; xx < a + w - step / 2; xx += step) g.lineBetween(xx, top + ch, xx + step / 2, top + h - ch).lineBetween(xx + step / 2, top + h - ch, xx + step, top + ch);
+    for (let xx = a + 8; xx < a + w; xx += 24) { this.r(g, xx, top + ch / 2, PX, PX, C.ink); this.r(g, xx, top + h - ch / 2, PX, PX, C.ink); }
+    const end = x0 < x1 ? x0 : x0 - 0.6 * this.T;   // a clamp at the pod
+    this.r(g, end - PX, top - 2 * PX, 0.6 * this.T + 2 * PX, h + 4 * PX, C.ink); this.r(g, end, top - PX, 0.6 * this.T, h + 2 * PX, this.paint.main);
+    this.hazard(g, end, top + h * 0.35, 0.6 * this.T, h * 0.3);
+  }
+  // a vertical truss post (x = left edge), from y0 down to y1, behind the skin
+  post(x, y0, y1, w) {
+    const g = this.s.add.graphics().setDepth(-6.2), cw = Math.max(2 * PX, w * 0.22), h = y1 - y0;
+    for (const xx of [x, x + w - cw]) { this.r(g, xx - PX, y0, cw + 2 * PX, h, C.ink); this.r(g, xx, y0, cw, h, C.grey); this.r(g, xx, y0, PX, h, C.silver); }
+    const step = w * 0.9;
+    for (const [lw, c] of [[2 * PX, C.ink], [PX, C.steel]]) {
+      g.lineStyle(lw, col(c));
+      for (let yy = y0; yy < y1 - step / 2; yy += step) g.lineBetween(x + cw, yy, x + w - cw, yy + step / 2).lineBetween(x + w - cw, yy + step / 2, x + cw, yy + step);
+    }
+    this.r(g, x - 2 * PX, y1 - 2 * PX, w + 4 * PX, 3 * PX, C.ink); this.r(g, x - PX, y1 - PX, w + 2 * PX, PX, this.paint.main);   // foot plate
+  }
   logo(g, x, y, s, c) {   // the triangle mark of the concept art
     g.fillStyle(col(c), 0.9).fillTriangle(x, y + s, x + s / 2, y, x + s, y + s);
     g.fillStyle(col(this.paint.main), 1).fillTriangle(x + s * 0.25, y + s * 0.82, x + s / 2, y + s * 0.38, x + s * 0.75, y + s * 0.82);
