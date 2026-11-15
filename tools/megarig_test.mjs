@@ -55,6 +55,22 @@ const c = await page.evaluate(() => {
 });
 check('Container öffnet sich in der Nähe, schließt sich weit weg', c.near < 0.1 && c.far > 0.9, c);
 
+// #026/#027: a room in the hull opens only from inside (the skin over it fades), its name shows then; walkways are drawn
+const r = await page.evaluate(() => {
+  const n = nomad, s = game.scene.getScene('play'), T = s.T, v = s.megaView;
+  const room = v.containers.find(c => c.inside && c.inner?.length);
+  n.tp(3 * T, s.megarig.G * T); n.step(60);
+  const out = room.closed.alpha;
+  n.tp((room.x0 + room.x1) / 2, room.y1 - T); n.step(60);
+  return { out, inside: room.closed.alpha, label: room.inner[0].alpha, walk: s.children.list.filter(o => o.type === 'Graphics' && o.depth === -2.6).length };
+});
+check('Raum im Rumpf: Haut zu von außen, offen von innen, Name sichtbar; Laufwege gezeichnet', r.out > 0.9 && r.inside < 0.1 && r.label > 0.5 && r.walk >= 1, r);
+// #027: the truck pulls the camp's container trailer (modular chassis), no own semi-trailer
+await open('lkw', 0);
+const t = await page.evaluate(() => game.scene.getScene('play').children.list.filter(o => o.type === 'Image' && /^chassis_/.test(o.texture?.key)).length);
+check('LKW: leerer Container-Anhänger aus dem Camp-Fahrgestell', t >= 1, t);
+await open('crawler');
+
 // overview button
 const z = await page.evaluate(() => { nomad.release(); document.querySelector('[data-zoom]').click(); const s = game.scene.getScene('play'); return s.cam.zoom; });
 check('Übersicht zoomt raus', z < 0.6, z);

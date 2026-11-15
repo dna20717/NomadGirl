@@ -5,7 +5,7 @@
   "tractor": "lkw",
   "description": "Die Zugmaschine aus der Bergung mit Auflieger. Bild aus PixelLab, Teile aus seinem Blatt docken an (Daniel, 14.11.2026: „Teile andocken“).",
   "grid": {"place": 7, "story": 6},
-  "hull": {"look": "truck", "lookScale": 5, "lookOffset": [0, 0], "under": 4, "inside": 0, "front": 10, "back": 2, "segPlaces": 3},
+  "hull": {"look": "truck", "lookScale": 5, "lookOffset": [0, 0], "under": 3, "inside": 0, "front": 19, "back": 2, "segPlaces": 3},
   "paint": {"main": "#4a5462", "dark": "#242234", "trim": "#71413b", "neon": "#bc4a9b", "light": "#df3e23"},
   "stages": [{"name": "Leer", "mids": 1, "top": 0},{"name": "Beladen", "mids": 1, "top": 1},{"name": "Gestapelt", "mids": 1, "top": 2}],
   "modules": [

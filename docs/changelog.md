@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 15.11.2026: **Mega-Rigs aufgeräumt** (#027): feinere Kachel-Grafik (EPX statt Riesenpixel), Rumpf in klaren Feldern (Spanten, Träger), Laufwege als helle Gitterkanten, deutlichere Leitern, Raumnamen erst im offenen Raum; der LKW zieht normale Container-Anhänger auf dem Camp-Fahrgestell.
 - 15.11.2026: **Kachel-Sets für Crawler und Fatbird** (#026, PixelLab 85 von 100): durchgehende Außenhaut aus Bug, wiederholbaren Mittelstücken und Heck, echte Kettenfahrwerke, Rotor-Gondeln, Gashülle als Pixel-Art; Räume im Rumpf öffnen sich wie eine Schnittzeichnung, wenn Leyla hineinklettert.
 - 15.11.2026: **Schwarzes Brett, Dialoge, Armadillo** (#025, Daniel segnet #016–#024 ab): Brett am Van mit Zetteln für alle Aufträge (annehmen, abgeben, alles einsammeln); Gespräche mit den Companions im neuen Dialog-Kasten (Namensschild, Text tippt sich aus, Platz fürs Porträt); Papierzettel statt „!“/„✓“ über den Köpfen; Crawler von „Armadillo Heavy Industries“ (Schriftzug am Rumpf); Gangs englisch (Yellow Vultures, Neon Rats, Rust Guard, Order Office).
 - 15.11.2026: **Crawler und Fatbird größer** (#024, Daniel): Ketten doppelt so hoch wie Leyla, je eine Etage mehr im Rumpf, Crawler mit Kommandobrücke in Container-Größe, länger statt höher.

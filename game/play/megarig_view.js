@@ -1,7 +1,34 @@
 // Mega rigs (#022): draws a vehicle built by engine/megarig.js. The raw vehicle comes from its image (truck) or from code
 // (crawler, fatbird) in strict side view on a 4 px pixel grid with AAP-64 colours; modules are the container pictures of the camp,
 // rooms inside the hull are drawn from code; add-ons are cut-outs of a parts sheet or code. Everything lies behind Leyla.
+import { chassisPlan, chassisTexture } from './camp.js';
+import { SOLID_TILES } from '../../engine/room.js';
 const PX = 4;   // one art pixel = 4 game pixels, like the container and truck pictures
+// #027: the tile sets are doubled with EPX (Scale2x) before they are scaled up, so stairs and diagonals stay clean instead of
+// turning into big blocks (Daniel: „ein paar der Grafiken sind sehr grob“); the skin canvas holds 2 game px per pixel
+const SKIN_RES = 2;
+const EPX = new Map();
+export function epx(img) {
+  const w = img.width, h = img.height, src = document.createElement('canvas');
+  src.width = w; src.height = h;
+  const sc = src.getContext('2d'); sc.drawImage(img, 0, 0);
+  const a = new Uint32Array(sc.getImageData(0, 0, w, h).data.buffer), out = document.createElement('canvas');
+  out.width = w * 2; out.height = h * 2;
+  const oc = out.getContext('2d'), od = oc.createImageData(w * 2, h * 2), o = new Uint32Array(od.data.buffer);
+  const at = (x, y) => a[Math.max(0, Math.min(h - 1, y)) * w + Math.max(0, Math.min(w - 1, x))];
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const P = a[y * w + x], A = at(x, y - 1), B = at(x + 1, y), Cc = at(x - 1, y), D = at(x, y + 1);
+    let p1 = P, p2 = P, p3 = P, p4 = P;
+    if (Cc === A && Cc !== D && A !== B) p1 = A;
+    if (A === B && A !== Cc && B !== D) p2 = B;
+    if (D === Cc && D !== B && Cc !== A) p3 = Cc;
+    if (B === D && B !== A && D !== Cc) p4 = D;
+    const i = (y * 2) * w * 2 + x * 2;
+    o[i] = p1; o[i + 1] = p2; o[i + w * 2] = p3; o[i + w * 2 + 1] = p4;
+  }
+  oc.putImageData(od, 0, 0);
+  return out;
+}
 const col = c => (typeof c === 'number' ? c : parseInt(String(c || '#ff00ff').slice(1), 16));
 const snap = v => Math.round(v / PX) * PX;
 // AAP-64 colours used by the code art
@@ -36,6 +63,7 @@ export class MegarigView {
       else if (p.type === 'bridge') this.bridge(p);
     }
     for (const p of build.pieces) if (p.type === 'addon') this.addon(p);
+    if (scene.args?.megarig) this.walkways();   // not on a wreck in the camp
     if (V.brand && this.brandAt) {
       const st = this.stencil(V.brand, ...this.brandAt);
       const c = this.containers.find(c => c.inside && st.x > c.x0 && st.x < c.x1 && st.y > c.y0 && st.y < c.y1);
@@ -88,19 +116,24 @@ export class MegarigView {
   // resolution; rooms inside the hull lie behind it and a piece of the skin over each room fades when Leyla is inside (cover()).
   skinOk(...keys) { return keys.every(k => k && this.s.textures.exists(k)); }
   src(k) { return this.s.textures.get(k).getSourceImage(); }
+  // the picture doubled with EPX (cached per texture)
+  // n = 2: doubled twice (4×) for pieces that are scaled up a lot (bow, stern, the whole fatbird)
+  fine(k, n = 1) { const key = `${k}:${n}`; if (!EPX.has(key)) EPX.set(key, n > 1 ? epx(this.fine(k, n - 1)) : epx(this.src(k))); return EPX.get(key); }
   skinCanvas(gx, gy, gw, gh, A) {
     const s = this.s, key = `mr_skin_${this.id}_${this.b.pieces[0].stage}`;
     if (s.textures.exists(key)) s.textures.remove(key);
+    A = SKIN_RES;
     const t = s.textures.createCanvas(key, Math.ceil(gw / A), Math.ceil(gh / A)), ctx = t.getContext();
-    ctx.imageSmoothingEnabled = false;
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
     this.skin = { key, t, ctx, gx, gy, A };
     return ctx;
   }
   // a picture into the skin: game position of its top-left corner, game px per picture px, flipped, only the first `cut` picture px
   put(k, x, y, sc, flip = false, cut = null) {
-    const S = this.skin, im = this.src(k), w = Math.min(im.width, cut ?? im.width), k2 = sc / S.A, dx = (x - S.gx) / S.A, dy = (y - S.gy) / S.A;
+    const n = sc > 4.5 ? 2 : 1, f = 2 ** n, S = this.skin, im = this.fine(k, n), w = Math.min(im.width, f * (cut ?? im.width)), k2 = sc / f / S.A, dx = (x - S.gx) / S.A, dy = (y - S.gy) / S.A;
     const c = S.ctx;
     c.save();
+    c.imageSmoothingEnabled = Math.abs(k2 - Math.round(k2)) > 0.01;   // whole steps stay sharp, the rest is smoothed
     if (flip) { c.translate(dx + w * k2, dy); c.scale(-1, 1); c.drawImage(im, 0, 0, w, im.height, 0, 0, w * k2, im.height * k2); }
     else c.drawImage(im, 0, 0, w, im.height, dx, dy, w * k2, im.height * k2);
     c.restore();
@@ -109,6 +142,28 @@ export class MegarigView {
     const S = this.skin;
     S.t.refresh(); S.t.setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.s.add.image(S.gx, S.gy, S.key).setOrigin(0).setScale(S.A).setDepth(depth);
+  }
+  // #027 order in the hull (Daniel: „weniger Durcheinander“): the machinery of the middle pieces a little calmer, a steel frame
+  // per place and a beam per story, so the hull reads as bays of the grid and the floors line up with the walkways
+  bays(x0, x1, top, bottom, places, P, stories, S, under) {
+    const Sk = this.skin, c = Sk.ctx, T = this.T, X = v => (v - Sk.gx) / Sk.A, Y = v => (v - Sk.gy) / Sk.A, u = 1 / Sk.A;
+    c.save();
+    c.fillStyle = 'rgba(20,16,19,0.28)'; c.fillRect(X(x0), Y(top + 2.6 * T), (x1 - x0) * u, (bottom - top - 2.6 * T) * u);   // calmer machinery
+    const beam = (y, h) => {   // a steel beam with a lit top edge and rivets
+      c.fillStyle = '#141013'; c.fillRect(X(x0), Y(y), (x1 - x0) * u, h * u);
+      c.fillStyle = '#4a5462'; c.fillRect(X(x0), Y(y + 4), (x1 - x0) * u, (h - 8) * u);
+      c.fillStyle = '#8b93af'; c.fillRect(X(x0), Y(y + 4), (x1 - x0) * u, 4 * u);
+      c.fillStyle = '#333941'; for (let rx = x0 + 16; rx < x1; rx += 48) c.fillRect(X(rx), Y(y + h / 2), 4 * u, 4 * u);
+    };
+    for (let st = 1; st < stories; st++) beam(bottom - st * S * T - 12, 24);
+    beam(bottom - 12, 20);
+    for (let p = 0; p <= places; p++) {   // frames between the places
+      const fx = x0 + p * P * T;
+      c.fillStyle = '#141013'; c.fillRect(X(fx - 14), Y(top + 2.6 * T), 28 * u, (bottom - top - 2.6 * T) * u);
+      c.fillStyle = '#4a5462'; c.fillRect(X(fx - 10), Y(top + 2.6 * T), 20 * u, (bottom - top - 2.6 * T) * u);
+      c.fillStyle = '#6d758d'; c.fillRect(X(fx - 10), Y(top + 2.6 * T), 6 * u, (bottom - top - 2.6 * T) * u);
+    }
+    c.restore();
   }
   // the skin over a room: closed until Leyla climbs in (update())
   cover(x, y, w, h) {
@@ -119,7 +174,8 @@ export class MegarigView {
   }
   // a long picture stretched by repeating its middle [r0, r1] (the track: one road wheel), as its own texture, picture px
   stretched(k, artW, r0, r1) {
-    const s = this.s, im = this.src(k), key = `mr_str_${k}_${artW}`;
+    const s = this.s, im = this.fine(k), key = `mr_str_${k}_${artW}`;
+    artW *= 2; r0 *= 2; r1 *= 2;
     if (!s.textures.exists(key)) {
       const t = s.textures.createCanvas(key, artW, im.height), c = t.getContext(), tail = im.width - r1;
       c.imageSmoothingEnabled = false;
@@ -145,6 +201,7 @@ export class MegarigView {
     this.skinCanvas(gx, gy, x0 + len + 3 * T - gx, ground - gy, A);
     const end = x0 + len - back;
     for (let x = x0 + front - T; x < end; x += mid.width * A) this.put(V.mid, x, top, A, false, Math.ceil((end - x) / A));
+    this.bays(x0 + front, x0 + front + h.places * h.P * T, top, bottom, h.places, h.P, h.inside, h.S);
     this.put(V.stern, sx, sy, sk);
     this.put(V.bow, bx, by, bk);
     // under the hull between the track units: the bogie, from code
@@ -154,7 +211,7 @@ export class MegarigView {
     // two track units, the middle of the picture repeated to their length
     const [r0, r1] = V.trackRepeat || [Math.round(tr.width * 0.35), Math.round(tr.width * 0.5)];
     const tk = h.under * T / tr.height, uw = len * 0.42, key = this.stretched(V.track, Math.round(uw / tk), r0, r1);
-    for (const ux of [x0 + T, x0 + len - uw - T]) s.add.image(ux, ground, key).setOrigin(0, 1).setScale(tk).setDepth(-5.9);
+    for (const ux of [x0 + T, x0 + len - uw - T]) s.add.image(ux, ground, key).setOrigin(0, 1).setScale(tk / 2).setDepth(-5.9);
     // lights, the deck railing, a catwalk over the sloped stern (the deck walks on to the end)
     this.glow(bx + 26 * bk, by + 147 * bk, 200, 110, C.gold, 0.5);
     this.glow(sx + sw - 6 * sk, sy + 62 * sk, 90, 60, P.light, 0.55);
@@ -163,7 +220,7 @@ export class MegarigView {
     const cw0 = sx + 57 * sk;
     this.r(this.gf, cw0, top - PX, x0 + len - cw0, 3 * PX, C.ink); this.r(this.gf, cw0, top - PX, x0 + len - cw0, PX, C.steel);
     for (let i = cw0; i < x0 + len; i += 0.5 * T) this.r(this.gf, i, top + 2 * PX, PX, 0.5 * T, C.night);   // struts down to the slope
-    this.brandAt = [bx + 92 * bk, by + 116 * bk, 0.62 * T];   // on the yellow nose plate under the bridge
+    this.brandAt = [bx + 84 * bk, by + 116 * bk, 0.62 * T];   // on the yellow nose plate under the bridge
     return true;
   }
   // the gas envelope as pixel art (#026): a silver cigar shaded in AAP-64 bands with ordered dithering, light from the top left,
@@ -219,6 +276,7 @@ export class MegarigView {
     this.skinCanvas(gx, gy, Math.max(tx + tw, x0 + len) + T - gx, Math.max(ny + nh, ty + th, frameBottom + 2 * T) - gy, A);
     const end = tx + 4 * T;
     for (let x = x0 + front - T; x < end; x += mid.width * A) this.put(V.mid, x, top, A, false, Math.ceil((end - x) / A));
+    this.bays(x0 + front, x0 + front + h.places * h.P * T, top, frameBottom - h.frames * h.S * T, h.places, h.P, h.inside - h.frames, h.S);
     this.put(V.stern, tx, ty, A);
     this.put(V.bow, nx, ny, A);
     this.finishSkin(-6);
@@ -229,21 +287,21 @@ export class MegarigView {
   }
 
   // ---------- raw vehicles ----------
+  // #027 (Daniel: „der LKW soll mit den normalen Container-Anhängern funktionieren, da braucht es keine gesonderte Auflieger-Grafik“):
+  // every container on the bed stands on the camp's modular chassis (Camp › Fahrgestell), drawbar towards the truck; with nothing
+  // loaded an empty 40-foot chassis waits behind the truck
   truck(h) {
-    const T = this.T, s = this.s, g = this.g, b = this.b, ground = b.G * T, x0 = b.x0 * T;
-    // semi-trailer: bed at the deck height from the fifth wheel to the end, gooseneck, landing legs, three axles
-    const bx = (b.x0 + h.front - 1.5) * T, bw = (h.places * h.P + h.back + 1.5) * T, deck = (b.G - h.under) * T;
-    this.r(g, bx, deck, bw, T, C.night);
-    this.r(g, bx + PX, deck + PX, bw - 2 * PX, T - 6 * PX, this.paint.main);
-    this.rivets(g, bx, deck + 3 * PX, bw, C.night, 32);
-    this.hazard(g, bx + bw - 2 * T, deck + T - 5 * PX, 2 * T, 4 * PX);
-    this.r(g, bx + 2 * T, deck + T, bw - 3 * T, 6 * PX, C.ink);   // main beam under the bed
-    this.r(g, bx + 1.2 * T + bw * 0.25, deck + T, 6 * PX, ground - deck - T - 2 * PX, C.grey);   // landing leg
-    this.r(g, bx + 1.2 * T + bw * 0.25 - 4 * PX, ground - 3 * PX, 14 * PX, 3 * PX, C.ink);
-    for (let i = 0; i < 3; i++) this.wheel(bx + bw - (1.6 + i * 2.15) * T, ground - T, 2 * T);
-    this.r(g, bx + bw - 7.6 * T, deck + T, 6.6 * T, 5 * PX, C.ink);   // mudguard bar
-    this.r(g, bx + bw - PX * 3, deck + 2 * PX, PX * 2, PX * 3, C.red);   // tail light
-    this.glow(bx + bw, deck + 4 * PX, 70, 50, C.red, 0.5);
+    const T = this.T, s = this.s, b = this.b, ground = b.G * T, x0 = b.x0 * T, D = s.data_;
+    const ground0 = b.pieces.filter(p => p.type === 'container' && p.story === 0);
+    const beds = ground0.length ? ground0 : [{ x: b.x0 + h.front, w: h.P * h.places, h: h.S - 1, places: h.places, container: Object.keys(D.containers || {}).find(k => D.containers[k].chassis && D.containers[k].places === h.places) }];
+    for (const p of beds) {
+      const def = D.containers?.[p.container], plan = def && chassisPlan(D, def), key = plan && chassisTexture(s, plan);
+      if (!key) continue;
+      const k = (p.h + 3) * T / (BOX.bottom - BOX.roof), n = p.places || def.places || 1, cxImg = BOX.left + (BOX.one + (n - 1) * BOX.more) / 2;
+      const bedLeft = (p.x + p.w / 2) * T - (cxImg - BOX.left) * k, hgt = (plan.rows[1] - plan.rows[0]) * k;
+      s.add.image(bedLeft - plan.drawbar * k, ground, key).setOrigin(0, 1).setScale(k).setFlipX(true).setDepth(-5.2);
+      if (!ground0.length) this.r(this.g, bedLeft, ground - hgt - PX, plan.bed * k, PX, C.ink, 0);   // nothing on it: the bed alone
+    }
     // the cab: the truck picture from PixelLab, strict side view
     if (h.look && s.textures.exists(h.look)) {
       const [ox, oy] = h.lookOffset || [0, 0];
@@ -377,8 +435,10 @@ export class MegarigView {
     this.g.lineStyle(2 * PX, col(this.paint.dark)).lineBetween(ax, y + 1.4 * T, hullX, hullTop + 2.5 * T);
     const R = this.V.skin?.rotor;
     if (R && this.s.textures.exists(R)) {   // #026: the rotor pod from the tile set, its outrigger stub towards the hull
+      const key = R + '_x2';
+      if (!this.s.textures.exists(key)) this.s.textures.addCanvas(key, this.fine(R));
       const im = this.src(R), k = w / im.width, left = x < this.b.x0 * T + this.b.len * T / 2;
-      this.s.add.image(x, y - 0.3 * T, R).setOrigin(0).setScale(k).setFlipX(left).setDepth(-3).texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+      this.s.add.image(x, y - 0.3 * T, key).setOrigin(0).setScale(k / 2).setFlipX(left).setDepth(-3);
       this.glow(x + w / 2, y + im.height * k + 0.4 * T, w * 1.1, 1.6 * T, P.neon, 0.5);
       this.blink(x + w * (left ? 0.44 : 0.56), y - 0.2 * T, P.light);
       return;
@@ -433,8 +493,11 @@ export class MegarigView {
       this.r(g, lx - 3 * PX, y + 2 * PX, 6 * PX, 2 * PX, C.gold);
       this.glow(lx, y + 0.6 * T, 2.2 * T, 1.4 * T, C.gold, 0.28);
     }
-    if (p.name) this.label(x + w / 2, y + 0.5 * T, p.name);
-    if (this.skin && (p.inside || p.type === 'bridge')) this.cover(x, y - T, w, h + T);   // #026: the hull skin over the room
+    const lab = p.name ? this.label(x + w / 2, y + 0.5 * T, p.name) : null;
+    if (this.skin && (p.inside || p.type === 'bridge')) {   // #026: the hull skin over the room; #027: its name shows when it is open
+      this.cover(x, y - T, w, h + T);
+      if (lab) { lab.setAlpha(0); this.containers[this.containers.length - 1].inner = [lab]; }
+    }
   }
 
   // the crawler's bridge (#024): a room as big as a 40-foot container, consoles with screens, the captain's chair
@@ -459,7 +522,7 @@ export class MegarigView {
     return t;
   }
   label(x, y, text) {
-    this.s.add.text(x, y, text.toUpperCase(), { fontFamily: 'VT323, monospace', fontSize: '30px', color: '#a6fcdb' }).setOrigin(0.5, 0).setDepth(-2.4).setAlpha(0.85);
+    return this.s.add.text(x, y, text.toUpperCase(), { fontFamily: 'VT323, monospace', fontSize: '30px', color: '#a6fcdb' }).setOrigin(0.5, 0).setDepth(-2.4).setAlpha(0.85);
   }
 
   // ---------- add-ons ----------
@@ -554,10 +617,40 @@ export class MegarigView {
     const T = this.T, g = this.gl, rope = this.b.kind === 'airship';
     for (const l of list) {
       if (skip.has(l.tx)) continue;
-      const below = rope && l.bottom >= this.b.G * T - T, c = below ? C.copper : C.silver, rail = below ? C.rust : C.grey;
-      this.r(g, l.x0 + 10, l.top, 2 * PX, l.bottom - l.top, rail);
-      this.r(g, l.x1 - 10 - 2 * PX, l.top, 2 * PX, l.bottom - l.top, rail);
-      for (let y = l.top + 12; y < l.bottom; y += 22) this.r(g, l.x0 + 10, y, T - 20, PX, c);
+      // #027: readable from afar: dark outline, light rails and rungs, a yellow cap where Leyla gets on at the top
+      const below = rope && l.bottom >= this.b.G * T - T, c = below ? C.sand : C.white, rail = below ? C.copper : C.silver;
+      for (const rx of [l.x0 + 10, l.x1 - 10 - 2 * PX]) { this.r(g, rx - PX, l.top, 4 * PX, l.bottom - l.top, C.ink); this.r(g, rx, l.top, 2 * PX, l.bottom - l.top, rail); }
+      for (let y = l.top + 12; y < l.bottom; y += 22) { this.r(g, l.x0 + 10, y - PX, T - 20, 3 * PX, C.ink); this.r(g, l.x0 + 10, y, T - 20, PX, c); }
+      if (!below) { this.r(g, l.x0 + 6, l.top - 2 * PX, T - 12, 3 * PX, C.ink); this.r(g, l.x0 + 8, l.top - PX, T - 16, PX, C.gold); }
+    }
+  }
+
+  // #027 walkways (Daniel: „die Laufwege müssen besser sichtbar und für den Spieler lesbar sein“): every surface Leyla can stand on
+  // gets a light grating edge, taken from the layout itself (solid or platform with air above), except the floors inside rooms and
+  // containers (they have their own floors); open ends get a small yellow post
+  walkways() {
+    const T = this.T, b = this.b, rows = b.rows || b.layout || [], g = this.s.add.graphics().setDepth(-2.6);
+    const walk = ch => SOLID_TILES.has(ch) || ch === '=', air = ch => ch === undefined || ch === '.' || ch === 'H' || ch === 'L' || ch === '*';
+    const boxes = this.b.pieces.filter(p => p.type === 'room' || p.type === 'container' || p.type === 'bridge').map(p => ({ x0: p.x, x1: p.x + p.w, row: p.floorRow }));
+    const inBox = (x, y) => boxes.some(q => y === q.row && x >= q.x0 && x < q.x1);
+    for (let y = 1; y < rows.length; y++) {
+      if (y >= b.G) break;   // the ground has its own look
+      let run = null;
+      const flush = () => {
+        if (!run) return;
+        const x = run[0] * T, w = (run[1] - run[0] + 1) * T, top = y * T;
+        this.r(g, x, top - PX, w, 4 * PX, C.ink, 0.9);
+        this.r(g, x, top - PX, w, PX, C.white, 0.95);
+        this.r(g, x, top, w, 2 * PX, C.steel, 0.95);
+        for (let gx = x + 6; gx < x + w - 4; gx += 12) this.r(g, gx, top + PX, PX, PX, C.ink, 0.8);   // grating holes
+        for (const ex of [x, x + w - 2 * PX]) this.r(g, ex, top - 3 * PX, 2 * PX, 3 * PX, C.gold);   // posts at the ends
+        run = null;
+      };
+      for (let x = 0; x < rows[y].length; x++) {
+        const ok = walk(rows[y][x]) && air(rows[y - 1]?.[x]) && !inBox(x, y);
+        if (ok) { if (run && run[1] === x - 1) run[1] = x; else { flush(); run = [x, x]; } }
+      }
+      flush();
     }
   }
 
@@ -571,6 +664,7 @@ export class MegarigView {
       const want = near ? 0 : 1;
       c.closed.alpha += (want - c.closed.alpha) * 0.15;
       for (const e of c.extra || []) e.alpha = c.closed.alpha * 0.82;
+      for (const e of c.inner || []) e.alpha = (1 - c.closed.alpha) * 0.85;
     }
   }
 }

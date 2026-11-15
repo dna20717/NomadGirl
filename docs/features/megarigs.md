@@ -42,6 +42,18 @@ Daniel: „max 100 Generierungen auf Tilesets für die Mega-Rigs. Wichtig ist, d
 - **Rotoren** aus dem Teil (vorne gespiegelt, Ausleger zum Rumpf), **Gashülle** als Pixel-Art aus Code (`envelopePixels`: Zigarrenform, AAP-64-Verlauf mit Dithering, Nähte, Gurte, Flicken, Rost), weil Daniel nur die Fahrzeuge aus KI wollte und das Budget so reicht.
 - **Hersteller-Schriftzug** sitzt jetzt auf der gelben Nase unter der Brücke.
 
+## Aufgeräumt (#027, Daniel 15.11.2026)
+
+Daniel: „Räume und Kacheln so anpassen, dass es weniger Durcheinander wirkt. Laufwege besser sichtbar und lesbar. Wichtig ist zunächst der Querschnitt, die Favela-Container-Städte kommen im zweiten Step. Ein paar Grafiken sind sehr grob. Der LKW soll mit den normalen Container-Anhängern funktionieren.“ Entschieden: Räume bleiben zu und öffnen beim Betreten; Grafik per Code (PixelLab nur, wenn es nicht anders geht: 0 verbraucht).
+
+- **Feinere Grafik:** Die Kachel-Set-Teile werden mit **EPX/Scale2x** verdoppelt (`epx()`), stark vergrößerte Teile (Maßstab über 4,5: Crawler-Bug, -Heck, der ganze Fatbird) zweimal (4×), dann weich auf die Zielgröße gebracht. Die Haut-Leinwand hält 2 Spielpixel je Pixel (`SKIN_RES`). Keine Riesenpixel mehr, Kanten und Schrägen bleiben sauber.
+- **Ordnung im Rumpf** (`bays()`): Maschinerie der Mittelstücke etwas abgedunkelt, Stahlspant an jeder Platzgrenze, Träger an jeder Stockwerksgrenze und am Kiel. Der Rumpf liest sich als Felder des Rasters, die Böden liegen auf Laufweghöhe.
+- **Raumnamen** erscheinen erst, wenn der Raum offen ist (`inner` an der Abdeckung), außen bleibt die Haut ruhig.
+- **Laufwege** (`walkways()`): Jede Fläche, auf der Leyla stehen kann (fest oder Plattform mit Luft darüber, aus dem Layout), bekommt eine helle Gitterkante mit gelben Pfosten an den Enden; nicht in Räumen und Containern (die haben eigene Böden), nicht am Boden und nicht am Wrack im Camp.
+- **Leitern:** dunkle Kontur, helle Holme und Sprossen, gelbe Kappe oben am Einstieg.
+- **LKW mit Container-Anhängern:** Kein eigener Auflieger mehr. Jeder Container auf dem Bett steht auf dem modularen Fahrgestell aus dem Camp (Camp › Fahrgestell, `chassisPlan`/`chassisTexture`), Deichsel zum LKW; leer wartet ein 40-Fuß-Fahrgestell. LKW: Bug 19 Kacheln (Platz für die Deichsel), Bett 3 Kacheln hoch.
+- Geprüft in `megarig_test` (16): Raum zu von außen, offen von innen, Name sichtbar, Laufwege gezeichnet; LKW-Fahrgestell.
+
 ## Wege und Erreichbarkeit
 
 - `engine/megarig.js` › `buildMegarig(data, id, stage)` baut ein Raum-Layout (Legende aus `engine/room.js`): Böden der Module sind Plattformen, Decks fest, Leitern automatisch (Stapel: an einem Ende abwechselnd links/rechts, nur wenn darunter etwas steht; Räume: Luke; vom Boden: Bug und Heck, Fatbird: Seilwinde in der Mitte).
