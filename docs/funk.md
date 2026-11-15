@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #033 Werkstätten-Paket (7 Grafiken, Heavy-Duty, Auftragsraum, Waffenkammer mit Display-Boards, Synergie-Konzept) läuft.
 - 15.11. Code → Ava: #032 fertig: Container sauber gestapelt, Laufstege auf Stelzen, Fatbird-Träger über die ganze Länge. PixelLab 0.
 - 15.11. Code → Ava: #031 fertig: Container ohne Dachkante, Fatbird-Heck neu (PixelLab 10, übrig 569), Rotoren an Fachwerk-Auslegern.
 - 15.11. Code → Ava: #030 fertig: Crawler-Heck neu und streng von der Seite (PixelLab 10, übrig 579).
@@ -545,6 +546,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:**
   - Ursache → Container-Bilder waren 8 statt 6 Kacheln hoch und 9,3 statt 7 breit. ⚠️ Jetzt genau eine Zelle; der Laufsteg auf dem Dach liegt eine Kachel über dem Bild und steht deshalb auf Stelzen.
 - **Ergebnis:** `megarig_view.js` (Maßstab, Stelzen, `airshipTruss`, `clamp`). Tests: `npm test` 154, `megarig_test` 16, `mega_test` 7, `salvage_test` 7. PixelLab 0. **Bitte testen:** /megarig Crawler (Container-Stadt) und Fatbird.
+
+### #033 Werkstätten mit Grafik, Heavy-Duty, Auftragsraum, echte Waffenkammer, Synergien
+- **Status:** läuft (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Für:** Code
+- **Auftrag:** Daniel: „Die vier, die du genannt hast (Kühlraum, Motorraum, Zelle, Reaktor) + Heavy Duty + Aufträge (schwarzes Brett als Werkbank, ähnlicher Raum). Wichtig ist die orthogonale Betrachtung. Dazu noch eine echte Waffenkammer mit Display-Boards analog zur Loot-Kammer. Dann ist die aktuelle Waffenkammer eher die Werkbank dazu. Parallel kannst du ein System ersinnen, wie man Synergien zwischen nebeneinander platzierten Werkbänken schaffen kann.“ PixelLab freigegeben (~75).
+- **Rückfragen:**
+- **Ergebnis:**
 
 ## Archiv
 
