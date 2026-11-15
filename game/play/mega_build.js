@@ -10,6 +10,7 @@ import { act, budgets, buyContainer, buyWorkshop, place, fromSpare, lift, stow, 
 import { activeMega, gridNow, cells, fitsGrid, putFromSpare, moveTo, storeUnit, nextStage, buyStage, mstate, hangLight, unhangLight, fixLights, stageOf } from '../mega.js';
 import { clockText, advance } from '../save.js';
 import { makeSfx } from './sfx.js';
+import { preview as synPreview, synergyText, synergies } from '../synergy.js';
 
 export class MegaBuild {
   constructor(root, host) {
@@ -70,7 +71,7 @@ export class MegaBuild {
       if (w) out.push({ label: `${wsDef(D, w.id).name || w.id} herausnehmen`, sub: 'ins Lager', icon: 'box', do: () => this.run(d => { const inst = lift(D, d, ui, slot); return inst ? stow(D, d, inst) : { ok: false }; }, 'Ins Lager') });
       else {
         const seen = new Set();
-        rig.spare.workshops.forEach((id, i) => { if (seen.has(id)) return; seen.add(id); out.push({ label: `${wsDef(D, id).name || id} einräumen`, sub: `aus dem Lager · Platz ${slot + 1}`, icon: 'workbench', disabled: fits(D, rig, ui, slot, id) ? null : 'Passt hier nicht hin', do: () => this.run(d => { const inst = d.rig.spare.workshops.find(x => x.id === id); return { ok: !!inst && place(D, d, fromSpare(d, inst.uid), ui, slot) }; }, 'Eingeräumt') }); });
+        rig.spare.workshops.forEach((id, i) => { if (seen.has(id)) return; seen.add(id); const pv = synPreview(D, save, id, ui, slot), syn = pv && (pv.near || pv.chain > 1) && pv.bonus > 0 ? ` · ${synergyText(pv)}` : ''; out.push({ label: `${wsDef(D, id).name || id} einräumen`, sub: `aus dem Lager · Platz ${slot + 1}${syn}`, primary: !!syn, icon: 'workbench', disabled: fits(D, rig, ui, slot, id) ? null : 'Passt hier nicht hin', do: () => this.run(d => { const inst = d.rig.spare.workshops.find(x => x.id === id); return { ok: !!inst && place(D, d, fromSpare(d, inst.uid), ui, slot) }; }, 'Eingeräumt') }); });
         out.push({ label: 'Werkstatt kaufen …', icon: 'coins', do: () => this.shopFor(ui, slot) });
       }
       out.push({ label: 'Verschieben', icon: 'arrow_right', do: () => { this.mode = 'move'; this.from = ui; this.msg = `${c.name || u.id}: Ziel wählen`; this.pick = 0; this.draw(); } });
@@ -83,8 +84,8 @@ export class MegaBuild {
   }
   shopFor(ui, slot) {
     const D = this.D, save = this.save, rig = save.rig;
-    const items = Object.entries(D.workshops || {}).filter(([id, w]) => !w.retired && w.value != null && fits(D, rig, ui, slot, id)).map(([id, w]) => ({ label: w.name || id, sub: `${priceOf(D, 'workshops', id)} Δ · ${w.places || 1} Platz${(w.places || 1) > 1 ? 'e' : ''}`, disabled: save.deltas < priceOf(D, 'workshops', id) ? 'Zu wenig Δ' : null,
-      act: () => this.run(d => { const b = buyWorkshop(D, d, id); return b.ok ? { ok: place(D, d, fromSpare(d, b.inst.uid), ui, slot) } : b; }, `${w.name || id} gekauft`) }));
+    const items = Object.entries(D.workshops || {}).filter(([id, w]) => !w.retired && w.value != null && fits(D, rig, ui, slot, id)).map(([id, w]) => { const pv = synPreview(D, save, id, ui, slot), syn = pv && (pv.near || pv.chain > 1) && pv.bonus > 0 ? ` · ${synergyText(pv)}` : ''; return { label: w.name || id, sub: `${priceOf(D, 'workshops', id)} Δ · ${w.places || 1} Platz${(w.places || 1) > 1 ? 'e' : ''}${syn}`, primary: !!syn, disabled: save.deltas < priceOf(D, 'workshops', id) ? 'Zu wenig Δ' : null,
+      act: () => this.run(d => { const b = buyWorkshop(D, d, id); return b.ok ? { ok: place(D, d, fromSpare(d, b.inst.uid), ui, slot) } : b; }, `${w.name || id} gekauft`) }; });
     this.scene.hud.menu({ title: 'Werkstatt kaufen', sub: `Platz ${slot + 1} · ${save.deltas} Δ`, items: [...items, { label: 'Zurück', act: () => {} }] });
   }
   hang(to) {
@@ -113,7 +114,7 @@ export class MegaBuild {
   draw() {
     const D = this.D, save = this.save, id = activeMega(D, save), V = D.megarigs?.[id] || {}, g = gridNow(D, save);
     if (!g) return this.close();
-    const rig = save.rig, B = budgets(D, rig), taken = cells(D, rig), st = V.stages?.[stageOf(D, save, id)], nx = nextStage(D, save);
+    const rig = save.rig, B = budgets(D, rig), taken = cells(D, rig), syns = synergies(D, save), st = V.stages?.[stageOf(D, save, id)], nx = nextStage(D, save);
     const chip = (ic, text, warn) => el('span', { class: 'mb-chip' + (warn ? ' warn' : '') }, icon(ic, 14), text);
     const head = el('header', {}, icon('build', 20), el('h2', {}, `Bauplan · ${V.name || id}`), el('small', {}, st?.name || ''),
       chip('coins', `${save.deltas} Δ`), chip('flash', `${B.power.net >= 0 ? '+' : ''}${B.power.net} ⚡`, B.power.net < 0), chip('scale', `${Math.round(B.weight / 100) / 10} / ${Math.round(B.pull / 1000)} t`, B.heavy),
@@ -131,7 +132,7 @@ export class MegaBuild {
           const u = rig.units[ui];
           if (u.pos.place !== p) continue;   // the container spans its places
           const n = placesOf(D, u), c = D.containers[u.id] || {};
-          const slots = Array.from({ length: n }, (_, k) => { const w = u.workshops.find(x => k >= x.at && k < x.at + (wsDef(D, x.id).places || 1)); return el('span', { class: 'mb-slot' + (w ? ' full' : ''), title: w ? wsDef(D, w.id).name : 'frei' }, w ? (wsDef(D, w.id).name || w.id).slice(0, 10) : '·'); });
+          const slots = Array.from({ length: n }, (_, k) => { const w = u.workshops.find(x => k >= x.at && k < x.at + (wsDef(D, x.id).places || 1)); const sx = w && syns.find(x => x.ui === ui && x.at === w.at && x.bonus > 0); return el('span', { class: 'mb-slot' + (w ? ' full' : '') + (sx ? ' syn' : ''), title: w ? `${wsDef(D, w.id).name}${sx ? ' · ' + synergyText(sx) : ''}` : 'frei' }, w ? (wsDef(D, w.id).name || w.id).slice(0, 10) : '·'); });
           const inCur = this.cur.story === s && this.cur.place >= p && this.cur.place < p + n;
           gridEl.append(el('div', { class: `mb-unit ${zone}` + (inCur ? ' cur' : '') + (this.mode && this.from === ui ? ' from' : ''), style: `grid-column: span ${n}`, onclick: e => { const r = e.currentTarget.getBoundingClientRect(); this.cur = { place: p + Math.min(n - 1, Math.floor((e.clientX - r.left) / r.width * n)), story: s }; this.pick = 0; this.draw(); } },
             el('b', {}, `${zone === 'hull' ? 'Raum' : c.name || u.id}`), el('div', { class: 'mb-slots' }, ...slots)));

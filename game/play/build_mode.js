@@ -17,6 +17,7 @@ import { budgets, act, snapshot, restore, lift, place, fits, at as wsAt, toSpare
 import { clockText } from '../save.js';
 import { workshopTexture, partView, socketRects, unitShape } from './camp.js';
 import { makeSfx } from './sfx.js';
+import { preview as synPreview, synergyText } from '../synergy.js';
 
 const FN_COLORS = { storage: '#5c6b7a', cooling: '#4a7a9a', cell: '#5a4a4a', sleep: '#6a5a9a', chill: '#9a4a7a', drone: '#3a8a6a', warroom: '#7a6a3a', kitchen: '#a8642a', foodtruck: '#c0703a', craft: '#7a6235', engine: '#5a5a5a', power: '#a8862a' };
 const FN_NAMES = { storage: 'Lager', cooling: 'Kühlung', cell: 'Zelle', sleep: 'Schlafen', chill: 'Chillen', drone: 'Drohnen', warroom: 'Planung', kitchen: 'Kochen', foodtruck: 'Verkauf', craft: 'Herstellen', engine: 'Motor', power: 'Energie' };
@@ -718,7 +719,9 @@ export class BuildMode {
     if (t.type === 'stack') return 'Obendrauf stapeln';
     if (t.type === 'home') return 'Zurück an seinen Platz';
     const there = wsAt(D, this.save.rig, t.slot.ui, t.slot.p);
-    return there ? `Tauschen mit ${wsDef(D, there.id).name || there.id}` : 'Einbauen';
+    // #034 preview (Daniel: Dorfromantik): what this place would bring
+    const pv = synPreview(D, this.save, d.id, t.slot.ui, t.slot.p, d.from === 'rig' ? { ui: d.ui, at: d.at } : null), syn = pv && (pv.near || pv.chain > 1) ? ` · ${synergyText(pv)}` : pv?.avail ? ' · keine Synergie' : '';
+    return (there ? `Tauschen mit ${wsDef(D, there.id).name || there.id}` : 'Einbauen') + syn;
   }
   sellOf(d) { return sellPrice(this.D, d.kind === 'ws' ? 'workshops' : d.kind === 'part' ? 'rigParts' : 'containers', d.id); }
   cancelDrag(silent = false) {
@@ -992,6 +995,17 @@ export class BuildMode {
         const there = wsAt(D, this.save.rig, sl.ui, sl.p), mine = d.from === 'rig' && there && sl.ui === d.ui && there.at === d.at, hot = t?.slot === sl || (t?.slot && t.slot.ui === sl.ui && t.slot.p === sl.p);
         g.lineStyle(lw, hot ? 0xffd27a : there && !mine ? 0xc77dff : 0x3fae6a, hot ? 1 : 0.45 * pulse).strokeRoundedRect(sl.x0 + 6, sl.y0 + 6, sl.x1 - sl.x0 - 12, sl.y1 - sl.y0 - 12, 10);
         if (hot) g.fillStyle(0xffd27a, 0.12).fillRoundedRect(sl.x0 + 6, sl.y0 + 6, sl.x1 - sl.x0 - 12, sl.y1 - sl.y0 - 12, 10);
+        // #034 Dorfromantik preview: every place shows what it would bring (computed once per drag, the rig stands still meanwhile)
+        if (!mine && !sl.van) {
+          const key = `${sl.ui}:${sl.p}`, cache = (d.syn ??= new Map());
+          if (!cache.has(key)) cache.set(key, synPreview(D, this.save, d.id, sl.ui, sl.p, d.from === 'rig' ? { ui: d.ui, at: d.at } : null));
+          const pv = cache.get(key);
+          if (pv && (pv.near || pv.chain > 1) && pv.bonus > 0) {
+            const k = Math.min(1, pv.score + (pv.chain > 1 ? 0.3 : 0) + (pv.full ? 0.4 : 0));
+            g.fillStyle(0x3fe0d0, 0.06 + 0.16 * k).fillRoundedRect(sl.x0 + 6, sl.y0 + 6, sl.x1 - sl.x0 - 12, sl.y1 - sl.y0 - 12, 10);
+            label((sl.x0 + sl.x1) / 2, (sl.y0 + sl.y1) / 2, pv.effect === 'power' ? `+${Math.floor(pv.bonus)} ⚡` : `+${Math.round(pv.bonus)} %`, pv.full ? '#ffd27a' : '#7ff6ff');
+          }
+        }
       } else {
         if (D.containers?.[d.id]?.stackable) for (const st of this.stacks()) {
           const mine = d.from === 'rig' && blockAt(this.save.rig.units, d.ui)[0] === st.onto && !st.own, hot = t?.type === 'stack' && t.onto === st.onto && t.slot === st.slot;

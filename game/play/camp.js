@@ -705,7 +705,7 @@ export class Camp {
   // ---------- synergies (#033): the bonus in the prompt, a glowing link between neighbours that like each other ----------
   synHint(place, verb) {
     const x = synergyAt(this.D, this.box.save, place);
-    return x && x.near ? () => `${verb} · ${synergyText(x)}` : verb;   // only with at least one partner next to it
+    return x && (x.near || x.chain > 1) ? () => `${verb} · ${synergyText(x)}` : verb;   // only with at least one partner next to it
   }
   drawSynergies() {
     const s = this.scene, T = s.T, save = this.box.save, L = links(this.D, save);

@@ -92,7 +92,7 @@
    {"kind": "twinkle", "x": 210, "y": 80, "w": 30, "h": 120, "size": 3, "rate": 1, "when": "always"}
   ],
   "outside": "out_ac",
-  "synergy": {"partners": ["motorraum", "reaktor"], "effect": "power", "max": 2}
+  "synergy": {"partners": ["motorraum", "reaktor"], "effect": "power", "max": 2, "chain": 1, "full": 3}
  },
  "waffenkammer": {
   "name": "Waffenwerkbank",
@@ -243,7 +243,18 @@
   "synergy": {"partners": ["kuehlraum", "kueche", "kochnische"], "effect": "speed", "max": 30}
  },
  "motorraum": {"name": "Motorraum", "function": "engine", "stage": "1", "places": 1, "power": 0, "value": 300, "outside": "out_ac", "look": "ws_engine_room"},
- "zelle": {"name": "Zelle", "function": "cell", "stage": "2", "places": 1, "power": 0, "capacity": 1, "value": 200, "outside": "out_graffiti", "look": "ws_cell"},
+ "zelle": {
+  "name": "Zelle",
+  "function": "cell",
+  "stage": "2",
+  "places": 1,
+  "power": 0,
+  "capacity": 1,
+  "value": 200,
+  "outside": "out_graffiti",
+  "look": "ws_cell",
+  "synergy": {"effect": "quality", "chain": 10, "full": 40, "partners": [], "max": 0}
+ },
  "reaktor": {
   "name": "Reaktor",
   "function": "power",
@@ -253,7 +264,7 @@
   "value": 3000,
   "outside": "out_ac",
   "look": "ws_reactor",
-  "synergy": {"partners": ["kuehlraum", "generator", "motorraum"], "effect": "power", "max": 4}
+  "synergy": {"partners": ["kuehlraum", "generator", "motorraum"], "effect": "power", "max": 4, "chain": 1, "full": 4}
  },
  "lagerregal": {
   "name": "Lagerregal",
@@ -371,7 +382,7 @@
    {"kind": "screen", "x": 219, "y": 116, "w": 13, "h": 7, "color": "#56e07a", "size": 0, "rate": 2, "when": "always"}
   ],
   "outside": "out_garden",
-  "synergy": {"partners": ["zisterne", "generator", "reaktor", "kuehlraum"], "effect": "speed", "max": 50}
+  "synergy": {"partners": ["zisterne", "generator", "reaktor", "kuehlraum"], "effect": "speed", "max": 50, "chain": 15, "full": 60}
  },
  "ripperdoc": {
   "name": "Ripperdoc-Liege",

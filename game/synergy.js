@@ -49,7 +49,7 @@ export function synergies(D, save) {
   const rig = save?.rig || save, mega = (rig?.units || []).some(u => u.pos), C = cells(D, rig, mega), out = [];
   (rig?.units || []).forEach((u, ui) => (u.workshops || []).forEach(w => {
     const S = D.workshops?.[w.id]?.synergy, partners = (S?.partners || []).filter(Boolean);
-    if (!partners.length || !S.effect) return;
+    if (!S?.effect || (!partners.length && !S.chain && !S.full)) return;
     const mine = [...C.values()].filter(c => c.ui === ui && c.ws?.at === w.at);
     if (!mine.length) return;
     const own = new Set(mine.map(c => `${c.x},${c.y}`)), seen = new Set(), hits = [];
@@ -64,7 +64,14 @@ export function synergies(D, save) {
       if (n.ws && fits(D, partners, n.ws.id)) { good++; hits.push(n.ws.id); }
     }
     const score = avail ? good / avail : 0, max = Number(S.max) || 0;
-    out.push({ ui, at: w.at, id: w.id, effect: S.effect, max, score, bonus: Math.round(max * score * 10) / 10, avail, near: good, hits: [...new Set(hits)] });
+    // #034 Reihenschaltung (Daniel: „mehr als 1 und ganzer Container selber Typ: dicker Bonus“): the same workshop side by side in a
+    // row (also across container borders) adds „Je weitere in der Reihe“; a whole container of it (at least two) adds „Ganzer Container“
+    const row = mine[0].y, xs = mine.map(c => c.x), sameAt = x => { const c = C.get(`${x},${row}`); return c?.ws?.id === w.id ? c : null; };
+    let chain = 1;
+    for (const dir of [-1, 1]) { let x = dir < 0 ? Math.min(...xs) - 1 : Math.max(...xs) + 1, last = null; for (let c; (c = sameAt(x)); x += dir) { const k = `${c.ui}:${c.ws.at}`; if (k !== last) { chain++; last = k; } } }
+    const unitWs = u.workshops || [], full = unitWs.length > 1 && unitWs.every(x => x.id === w.id) && unitWs.reduce((n, x) => n + sizeOf(D, x.id), 0) >= placesOf(D, u);
+    const chainBonus = (Number(S.chain) || 0) * (chain - 1) + (full ? Number(S.full) || 0 : 0);
+    out.push({ ui, at: w.at, id: w.id, effect: S.effect, max, score, bonus: Math.round((max * score + chainBonus) * 10) / 10, avail, near: good, hits: [...new Set(hits)], chain, full, chainBonus });
   }));
   return out;
 }
@@ -78,7 +85,8 @@ export const synergyPower = (D, save) => synergies(D, save).filter(s => s.effect
 export function synergyText(s) {
   if (!s) return '';
   const what = s.effect === 'speed' ? `${Math.round(s.bonus)} % schneller` : s.effect === 'power' ? `+${Math.floor(s.bonus)} ⚡` : `Buff +${Math.round(s.bonus)} %`;
-  return `Synergie ${s.near}/${s.avail} · ${what}`;
+  const parts = [s.near ? `Synergie ${s.near}/${s.avail}` : null, s.chain > 1 ? `Reihe ×${s.chain}` : null, s.full ? 'voller Container' : null].filter(Boolean);
+  return `${parts.join(' · ') || 'Synergie'} · ${what}`;
 }
 export const SYNERGY_EFFECTS = [['speed', 'Schneller (Herstellen, Kochen, Wachsen)'], ['power', 'Mehr Strom'], ['quality', 'Stärkerer Buff']];
 // the pairs to draw (a glowing link between two neighbours where at least one likes the other): [{ a: { ui, at }, b: { ui, at } }]
@@ -98,4 +106,14 @@ export function links(D, save) {
     }
   }
   return out;
+}
+// #034 preview while placing: the synergy a workshop `id` would have at unit ui, place at (lifted from `from` = { ui, at } first,
+// a workshop that stands there swaps to where it came from); → the synergy object or null
+export function preview(D, save, id, ui, at, from = null) {
+  const rig = JSON.parse(JSON.stringify(save?.rig || save)), U = rig.units, there = U[ui]?.workshops?.find(w => at >= w.at && at < w.at + sizeOf(D, w.id));
+  if (!U[ui]) return null;
+  if (from) { const f = U[from.ui]; if (f) f.workshops = f.workshops.filter(w => w.at !== from.at); if (there && from) U[from.ui].workshops.push({ id: there.id, at: from.at }); }
+  U[ui].workshops = U[ui].workshops.filter(w => w !== there);
+  U[ui].workshops.push({ id, at });
+  return synergies(D, rig).find(s => s.ui === ui && s.at === at) || null;
 }

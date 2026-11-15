@@ -55,3 +55,20 @@ test('Mega-Rig: Nachbarn auf dem Raster, auch darüber', () => {
   w.pos = { place: 0, story: 0 }; g.pos = { place: 0, story: 1 };
   assert.equal(synergyAt(D, s, '1:0').near, 1);
 });
+
+test('Reihenschaltung: gleiche Werkstätten nebeneinander, ganzer Container = dicker Bonus (#034)', () => {
+  const S = D.workshops.hydrokultur.synergy;
+  const one = rigWith(['container_40', [['hydrokultur', 0]]]);
+  assert.equal(synergyAt(D, one, '1:0').chain, 1);
+  const two = rigWith(['container_40', [['hydrokultur', 0], ['hydrokultur', 1]]]);
+  const t = synergyAt(D, two, '1:0');
+  assert.equal(t.chain, 2); assert.equal(t.full, false);
+  assert.equal(t.chainBonus, S.chain);
+  const all = rigWith(['container_40', [['hydrokultur', 0], ['hydrokultur', 1], ['hydrokultur', 2]]]);
+  const a = synergyAt(D, all, '1:1');
+  assert.equal(a.chain, 3); assert.equal(a.full, true);
+  assert.equal(a.chainBonus, S.chain * 2 + S.full);
+  // the row goes on across the container border
+  const across = rigWith(['container_10', [['hydrokultur', 0]]], ['container_10', [['hydrokultur', 0]]]);
+  assert.equal(synergyAt(D, across, '1:0').chain, 2);
+});
