@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #035 fertig: Leiter oben/unten streng von vorn (Code), Anhänger mit Leiter statt Klapptreppe. PixelLab 0.
 - 15.11. Code → Ava: #034 fertig: Synergie-Vorschau, Reihenschaltung, Leitern aus PixelLab (20, übrig 464). Backlog: Grafiken für evolutionierte Werkstätten.
 - 15.11. Code → Ava: #034 Synergie-Vorschau, Reihenschaltung, Leitern (PixelLab) läuft.
 - 15.11. Code → Ava: #033 fertig: 7 Werkstatt-Bilder, Heavy-Duty, Auftragsbüro, Waffenkammer mit Display-Boards, Synergien à la Dorfromantik. PixelLab 85, übrig 484.
@@ -571,6 +572,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - Leitern → ⚠️ zwei Varianten erzeugt (Stahl, Käfig), Käfig verworfen (unruhig, Mittelstange); eine Leiter für alles, Seilwinde des Fatbird rostfarben eingefärbt.
   - Evolutionierte Werkstätten → in `backlog.md` › B.
 - **Ergebnis:** `synergy.js` (Reihe, voller Container, `preview`), Bau-Modus und Bauplan mit Vorschau, `ladder_art.js`, Spiel › Leitern. Tests: `npm test` 160, alle 35 Browser-Tests grün. PixelLab: diesmal 20, übrig 464. **Bitte testen:** Bau-Modus, eine Werkstatt ziehen (Plätze zeigen ihren Bonus), drei Hydrokulturen in einen 40-Fuß-Container; Leitern im Kampfraum, im Camp-Stapel, auf den Mega-Rigs.
+
+### #035 Leiter orthogonal, Anhänger mit Leitern
+- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Auftrag:** Daniel: „Sorry, die Leiter ist nicht orthogonal. Besonders der oberste Teil. In diesem Zuge kannst du bitte auch die Treppen für den LKW-Trailer durch Leitern ersetzen.“
+- **Rückfragen:**
+  - Leiter → ⚠️ ohne PixelLab: Anfang und Ende aus den Holmen per Code neu gebaut (Haken und Füße waren schräg gemalt), Mitte und kaputtes Stück bleiben.
+  - Trailer → ⚠️ alle Container auf dem Fahrgestell (auch der kleine im Start-Rig), nicht nur hinter dem LKW.
+- **Ergebnis:** `tools/ladder_parts.py`, `camp.js` › `groundLadder`, `cozy_test` angepasst. Tests: `npm test` 160, alle 35 Browser-Tests grün. PixelLab 0. **Bitte testen:** Camp, Leiter am Anhänger hochklettern; Leitern im Kampfraum und auf /megarig.
 
 ## Archiv
 

@@ -21,7 +21,7 @@ check('Start-Rig: Van mit Koje + Kochnische, kleiner Anhänger mit Tank, Strom r
 
 v = await ev(() => { const c = SC().camp; return { ladders: SC().ladders.filter(l => l.rig && l.ground).map(l => l.stairs), shells: c.shells.map(x => x.extras.map(e => e.texture.key)), labels: c.labels.map(t => [t.style.fontSize, Math.round(t.alpha * 100)]),
   comps: c.companions.map(x => [x.id, x.sprite.texture.key, !!x.sprite.anims?.isPlaying]), foot: document.querySelector('.hud-foot').textContent, deco: SC().children.list.filter(o => o.texture?.key?.startsWith('camp_')).length }; });
-check('Erdgeschoss: Klapptreppe statt Leiter (kletterbar)', v.ladders.length >= 1 && v.ladders.every(Boolean), v.ladders);
+check('Erdgeschoss: Anhänger auf dem Fahrgestell mit Leiter (#035, statt Klapptreppe), kletterbar', v.ladders.length >= 1 && v.ladders.every(x => !x), v.ladders);
 check('Außenwand: Kälte-Panel am geschlossenen Tank-Container', v.shells.flat().includes('out_tank'), v.shells);
 check('Companions: Schraube und Onkel Sung als PixelLab-Figuren, atmen', v.comps.every(([, k, p]) => k.startsWith('companion_') && p), v.comps);
 check('Deko ums Feuer, Beschriftungen dezent', v.deco >= 3 && v.labels.every(([f, a]) => f === '20px' && a <= 80), v);

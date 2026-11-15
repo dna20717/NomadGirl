@@ -676,6 +676,9 @@ export class Camp {
     const s = this.scene, R = this.C.rig || {}, in1 = u.in0 + u.cell * u.places, edge = Math.min(s.T * 0.75, (in1 - u.in0) / 2);
     const x = Math.min(Math.max(u.in0 + (in1 - u.in0) * (R.groundLadderAt ?? 92) / 100, u.in0 + edge), in1 - edge), top = u.floorY, bottom = this.ground;
     // a folding metal stair (Camp › Gemütlichkeit › Klapptreppe, Daniel 13.11.2026): its landing reaches the container's floor
+    // #035 (Daniel: „die Treppen für den LKW-Trailer durch Leitern ersetzen“): a container on its chassis gets a ladder
+    const art = u.chassis && ladderArt(s, x - s.T / 2, x + s.T / 2, top, bottom, { depth: -18 });
+    if (art) { this.rigObjs.push(art); s.ladders.push({ cx: x, x0: x - s.T / 2, x1: x + s.T / 2, top, bottom, rig: true, ground: true }); return; }
     const info = this.C.stairs?.look && s.assetInfo(this.C.stairs.look);
     if (info) {
       s.textures.get(info.key).setFilter(NEAREST());
