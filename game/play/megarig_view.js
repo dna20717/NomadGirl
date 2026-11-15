@@ -3,6 +3,8 @@
 // rooms inside the hull are drawn from code; add-ons are cut-outs of a parts sheet or code. Everything lies behind Leyla.
 import { chassisPlan, chassisTexture } from './camp.js';
 import { SOLID_TILES } from '../../engine/room.js';
+import { benchTexture } from './benches.js';
+import { catenary, lightsConfig } from '../string_lights.js';
 const PX = 4;   // one art pixel = 4 game pixels, like the container and truck pictures
 // #027: the tile sets are doubled with EPX (Scale2x) before they are scaled up, so stairs and diagonals stay clean instead of
 // turning into big blocks (Daniel: „ein paar der Grafiken sind sehr grob“); the skin canvas holds 2 game px per pixel
@@ -47,6 +49,7 @@ export class MegarigView {
     this.glows = [];
     const D = scene.data_, V = D.megarigs?.[opts.id ?? scene.args.megarig?.id] || {};
     this.V = V; this.id = opts.id ?? scene.args.megarig?.id ?? 'rig';
+    this.docks = new Map();   // module number (from 1) → its two upper corners
     this.paint = { main: C.yellow, dark: C.violet, trim: C.copper, neon: C.cyan, light: C.red, ...(V.paint || {}) };
     this.g = scene.add.graphics().setDepth(-6);       // hull, back layer
     this.gm = scene.add.graphics().setDepth(-4.5);    // rooms
@@ -63,6 +66,7 @@ export class MegarigView {
       else if (p.type === 'bridge') this.bridge(p);
     }
     for (const p of build.pieces) if (p.type === 'addon') this.addon(p);
+    this.stringLights();
     if (scene.args?.megarig) this.walkways();   // not on a wreck in the camp
     if (V.brand && this.brandAt) {
       const st = this.stencil(V.brand, ...this.brandAt);
@@ -477,6 +481,10 @@ export class MegarigView {
     const c = closed && s.textures.exists(closed) ? s.add.image(x, y, closed, 0).setOrigin(cxImg / frameW, BOX.bottom / 256).setScale(k).setDepth(depth + 0.005) : null;
     if (p.color) { o.setTint(col(p.color)); c?.setTint(col(p.color)); }
     this.containers.push({ open: o, closed: c, x0: p.x * T, x1: (p.x + p.w) * T, y0: (p.y - 1) * T, y1: (p.floorRow + 1) * T });
+    // #028: workshops inside (seen when it is open), docking points for string lights on the upper corners of the box
+    const ins = Cn.inside?.y || [90, 175], roofY = y - (BOX.bottom - BOX.roof) * k;
+    this.benchesIn(p, p.x * T + 0.35 * T, p.w * T - 0.7 * T, y - (BOX.bottom - ins[1]) * k, (ins[1] - ins[0]) * k, depth + 0.002);
+    if (p.module != null) this.docks.set(p.module + 1, [{ x: p.x * T + 0.4 * T, y: roofY + 6 }, { x: (p.x + p.w) * T - 0.4 * T, y: roofY + 6 }]);
     if (p.name && p.name !== Cn.name) this.label(x, (p.y - 1) * T + 0.3 * T, p.name);
   }
 
@@ -493,6 +501,7 @@ export class MegarigView {
       this.r(g, lx - 3 * PX, y + 2 * PX, 6 * PX, 2 * PX, C.gold);
       this.glow(lx, y + 0.6 * T, 2.2 * T, 1.4 * T, C.gold, 0.28);
     }
+    if (p.workshops?.length) this.benchesIn(p, x + 0.3 * T, w - 0.6 * T, y + h - 3 * PX, h - 0.8 * T, -4.45);   // #028
     const lab = p.name ? this.label(x + w / 2, y + 0.5 * T, p.name) : null;
     if (this.skin && (p.inside || p.type === 'bridge')) {   // #026: the hull skin over the room; #027: its name shows when it is open
       this.cover(x, y - T, w, h + T);
@@ -526,8 +535,17 @@ export class MegarigView {
   }
 
   // ---------- add-ons ----------
+  // #028: a part on the outer wall of a container belongs to its skin: it fades out with it when Leyla goes in (no banner in front
+  // of the workshops); it gets its own graphics for that
   addon(p) {
-    const s = this.s, T = this.T, g = this.gf, P = this.paint, x = p.cx * T, base = p.base * T, w = p.w * T, h = p.h * T, c = p.color || P.main;
+    if (p.at !== 'wall') return this.addonDraw(p, this.gf);
+    const x = p.cx * this.T, y = p.base * this.T, box = this.containers.find(c => c.closed && !c.inside && x > c.x0 && x < c.x1 && y > c.y0 && y < c.y1);
+    const before = new Set(this.s.children.list), g = this.s.add.graphics().setDepth(-3);
+    this.addonDraw(p, g);
+    if (box) (box.skin ??= []).push(...this.s.children.list.filter(o => !before.has(o) && !this.glows.includes(o)));
+  }
+  addonDraw(p, g) {
+    const s = this.s, T = this.T, P = this.paint, x = p.cx * T, base = p.base * T, w = p.w * T, h = p.h * T, c = p.color || P.main;
     const onWall = p.at === 'wall';
     if (p.look && s.textures.exists(p.look) && !p.code) {
       const im = s.add.image(x, onWall ? base : base, p.look, this.frame(p.look, p.crop)).setOrigin(0.5, onWall ? 0.5 : 1).setDisplaySize(w, h).setDepth(-2.8);
@@ -625,6 +643,40 @@ export class MegarigView {
     }
   }
 
+  // #028 (Daniel: „richte testhalber einen Crawler mit Werkbänken und Lichterketten ein“): the workshops of a module stand on its
+  // floor side by side, each as wide as its places (Werkstätten › Plätze), pictures trimmed like in the camp
+  benchesIn(p, x, w, floor, h, depth) {
+    const D = this.s.data_, ids = (p.workshops || []).filter(id => D.workshops?.[id]);
+    if (!ids.length) return;
+    const slots = Math.max(p.places || 1, ids.reduce((n, id) => n + (D.workshops[id].places || 1), 0)), slot = w / slots;
+    let at = x;
+    for (const id of ids) {
+      const n = D.workshops[id].places || 1, bw = slot * n, key = benchTexture(this.s, D, id, bw * 0.92, h * 0.86);
+      if (key) this.s.add.image(at + bw / 2, floor, key).setOrigin(0.5, 1).setDepth(depth);
+      at += bw;
+    }
+  }
+  // string lights between the upper corners of two containers (Mega-Rigs › Lichterketten), the camp's colours, sag and spacing;
+  // the bulbs glow and breathe a little
+  stringLights() {
+    const L = lightsConfig(this.s.data_), g = this.s.add.graphics().setDepth(-2.7);
+    let n = 0;
+    for (const r of this.V.lights || []) {
+      const a = this.docks.get(Number(r.from))?.[Number(r.fromCorner) || 0], b = this.docks.get(Number(r.to))?.[Number(r.toCorner) || 0];
+      if (!a || !b) continue;
+      const cat = catenary(a, b, L.sag, L.spacing);
+      g.lineStyle(3, 0x141013, 0.9).beginPath(); g.moveTo(cat.line[0].x, cat.line[0].y); for (const q of cat.line) g.lineTo(q.x, q.y); g.strokePath();
+      cat.bulbs.forEach((q, i) => {
+        const c = L.colors[(i + n) % L.colors.length];
+        g.fillStyle(0x141013).fillRect(q.x - 2, q.y, 4, 4); g.fillStyle(col(c)).fillCircle(q.x, q.y + 9, 5);
+        const gl = this.glow(q.x, q.y + 9, 46, 46, c, 0.55);
+        this.s.tweens.add({ targets: gl, alpha: 0.3, duration: 900 + Math.random() * 900, yoyo: true, repeat: -1, delay: Math.random() * 1200 });
+      });
+      n++;
+    }
+    this.lightCount = n;
+  }
+
   // #027 walkways (Daniel: „die Laufwege müssen besser sichtbar und für den Spieler lesbar sein“): every surface Leyla can stand on
   // gets a light grating edge, taken from the layout itself (solid or platform with air above), except the floors inside rooms and
   // containers (they have their own floors); open ends get a small yellow post
@@ -665,6 +717,7 @@ export class MegarigView {
       c.closed.alpha += (want - c.closed.alpha) * 0.15;
       for (const e of c.extra || []) e.alpha = c.closed.alpha * 0.82;
       for (const e of c.inner || []) e.alpha = (1 - c.closed.alpha) * 0.85;
+      for (const e of c.skin || []) e.alpha = c.closed.alpha;
     }
   }
 }

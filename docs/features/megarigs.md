@@ -54,6 +54,14 @@ Daniel: „Räume und Kacheln so anpassen, dass es weniger Durcheinander wirkt. 
 - **LKW mit Container-Anhängern:** Kein eigener Auflieger mehr. Jeder Container auf dem Bett steht auf dem modularen Fahrgestell aus dem Camp (Camp › Fahrgestell, `chassisPlan`/`chassisTexture`), Deichsel zum LKW; leer wartet ein 40-Fuß-Fahrgestell. LKW: Bug 19 Kacheln (Platz für die Deichsel), Bett 3 Kacheln hoch.
 - Geprüft in `megarig_test` (16): Raum zu von außen, offen von innen, Name sichtbar, Laufwege gezeichnet; LKW-Fahrgestell.
 
+## Werkstätten und Lichterketten an Bord (#028, Daniel 15.11.2026: „richte testhalber einen Crawler mit Werkbänken und Lichterketten ein“)
+
+- **Module › Werkstätten** (Liste je Modul): die Bilder der Werkstätten stehen nebeneinander auf dem Boden des Raums bzw. Containers, je so breit wie ihre Plätze (`benchesIn`, Bilder wie im Camp über `benchTexture`). Sichtbar, wenn Raum oder Container offen ist. Lädt nur die Werkstätten, die an Bord stehen.
+- **Mega-Rigs › Lichterketten** (Tabelle Von Modul/Ecke → Zu Modul/Ecke, Modul-Nummer ab 1): Ketten zwischen den oberen Ecken zweier Container, Farben, Durchhang und Abstand wie im Camp (`catenary`, `lightsConfig`), Glühbirnen atmen leicht. Fehlt ein Modul in der Stufe, hängt die Kette nicht.
+- **Wandteile** (Banner, Auspuff an der Wand) gehören zur Außenwand ihres Containers und blenden mit ihr aus, wenn Leyla hineingeht.
+- **Test-Crawler** (Daten): Maschinenraum mit Generator + Werkbank, Lager, Werkstatt mit Drohnenwerkstatt + Waffenkammer, Krankenstation mit Ripperdoc, Kantine mit Küche, Cryo-Tank, Quartiere, darüber Chill-Ecke, Hydrokultur, Zisterne, Kochnische, Warroom, Schatzkammer, Foodtruck …; 11 Lichterketten über den Dächern (Container-Stadt).
+- Noch nicht: Werkstätten an Bord benutzen (E), Budgets (Strom, Gewicht), Bau-Modus. Kommt mit „Mega-Rigs fahren“.
+
 ## Wege und Erreichbarkeit
 
 - `engine/megarig.js` › `buildMegarig(data, id, stage)` baut ein Raum-Layout (Legende aus `engine/room.js`): Böden der Module sind Plattformen, Decks fest, Leitern automatisch (Stapel: an einem Ende abwechselnd links/rechts, nur wenn darunter etwas steht; Räume: Luke; vom Boden: Bug und Heck, Fatbird: Seilwinde in der Mitte).

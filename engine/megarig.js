@@ -103,12 +103,12 @@ export function buildMegarig(data, id, stageIndex = null) {
     const insideHull = s < inside, shell = m.shell ?? !insideHull;
     const clash = placed.find(o => o.s === s && o.p < p + n && p < o.p + o.n);
     if (clash) { problems.push(['warning', `Modul ${i + 1} überlappt Modul ${clash.i + 1}`]); continue; }
-    placed.push({ i, p, n, s, insideHull, shell, container: m.container, name: m.name || C.name, color: m.color || null });
+    placed.push({ i, p, n, s, insideHull, shell, container: m.container, name: m.name || C.name, color: m.color || null, workshops: m.workshops || [] });
   }
   const at = new Map(placed.flatMap(o => Array.from({ length: o.n * P }, (_, k) => [`${o.s}:${placeX(o.p) + k}`, o])));
   for (const o of placed) {
     const x = placeX(o.p), w = o.n * P, fr = slab(o.s), roof = slab(o.s + 1);
-    pieces.push({ type: o.shell ? 'container' : 'room', x, w, y: roof + 1, h: S - 1, floorRow: fr, story: o.s, inside: o.insideHull, container: o.container, name: o.name, places: o.n, color: o.color });
+    pieces.push({ type: o.shell ? 'container' : 'room', x, w, y: roof + 1, h: S - 1, floorRow: fr, story: o.s, inside: o.insideHull, container: o.container, name: o.name, places: o.n, color: o.color, workshops: o.workshops, module: o.i });
     if (o.insideHull) {
       fill(x, roof + 1, w, S - 1, '.', ['H']);   // cut the room out of the hull plating (ladders stay)
       // hatch: a shaft from the deck down into the room, through every hull story above it

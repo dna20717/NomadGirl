@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #028 fertig: Test-Crawler mit Werkstätten in Räumen/Containern und 11 Lichterketten (Geschmackstest, Daten in Mega-Rigs). PixelLab 0.
 - 15.11. Code → Ava: #027 fertig: Mega-Rigs aufgeräumt (EPX-Grafik, Spanten/Träger, Laufwege, Leitern, LKW mit Container-Anhängern). PixelLab 0, übrig 589. Nächster Step laut Daniel: Favela-Container-Städte.
 - 15.11. Code → Ava: #027 Mega-Rigs aufräumen (Querschnitt, Laufwege, feinere Grafik, LKW mit Container-Anhängern) läuft.
 - 15.11. Code → Ava: #026 fertig: Crawler und Fatbird aus PixelLab-Kachel-Sets (85 Generierungen, übrig 589), Räume als Schnittzeichnung, Gashülle als Pixel-Art aus Code.
@@ -494,6 +495,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - Laufwege → ⚠️ automatisch aus dem Layout: helle Gitterkante + gelbe Endpfosten auf allem Begehbaren außerhalb von Räumen und Containern.
   - LKW → ⚠️ Bug 19 Kacheln, damit die Deichsel des Anhängers an der Kupplung hängt; leer = leeres 40-Fuß-Fahrgestell.
 - **Ergebnis:** `megarig_view.js` (`epx`, `bays`, `walkways`, LKW mit `chassisPlan`), Daten LKW (Bug 19, Bett 3). Tests: `npm test` 145, alle 34 Browser-Tests grün (`megarig_test` 16 mit 2 neuen Prüfungen), `ng check` stimmig. PixelLab: 0, übrig 589. **Bitte testen:** /megarig alle drei Fahrzeuge und Stufen, Übersicht und nah ran (Bug, Heck, Fatbird-Nase), Laufwege lesen, in Räume klettern; LKW leer und beladen.
+
+### #028 Test-Crawler mit Werkbänken und Lichterketten
+- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, Geschmackstest)
+- **Für:** Code
+- **Auftrag:** Daniel: „Richte mal testhalber einen Crawler mit Werkbänken und Lichterketten ein.“
+- **Rückfragen:**
+  - Wie festlegen → ⚠️ in den Daten: Module › Werkstätten, Mega-Rigs › Lichterketten (Modul-Ecke zu Modul-Ecke); Benutzen und Bau-Modus kommen mit „Mega-Rigs fahren“.
+  - Banner vor den Werkstätten → ⚠️ Wandteile blenden mit der Außenwand aus.
+- **Ergebnis:** `benchesIn`, `stringLights`, Wandteile mit der Haut in `megarig_view.js`; Felder in Schema; Crawler mit 15 eingerichteten Modulen und 11 Lichterketten. Tests: `npm test` 145, `megarig_test` 16, `salvage_test` 7, `workshop_test` grün. PixelLab 0. **Bitte testen:** /megarig › Crawler › Container-Stadt, über die Dächer laufen (Lichterketten), in Container und Rumpf-Räume gehen.
 
 ## Archiv
 
