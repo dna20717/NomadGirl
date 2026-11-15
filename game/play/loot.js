@@ -2,6 +2,7 @@
 // The ground inventory (like XCOM) shows the nearest bundle within reach (Leyla › Inventar › Boden-Reichweite);
 // stackable things Leyla already carries are picked up by walking past, as far as the stacks have room.
 import { newGrid, add, rollLoot, thing, stackMax, addEntry } from '../inventory.js';
+import { earn } from '../earn.js';
 
 const PILE = [6, 4];
 
@@ -110,6 +111,8 @@ export class Loot {
     const t = (e.d.loot && (this.scene.lootRoll ? this.scene.lootRoll(e.d.loot) : rollLoot(this.scene.data_, e.d.loot))) || [];
     // Gegner › Beute › Lässt seine Waffe fallen (#004): what a raider fights with, Leyla can pick up and use
     if (e.d.weapon && this.scene.data_.weapons?.[e.d.weapon] && Math.random() * 100 < (e.d.dropWeapon ?? 0)) t.push({ a: 'weapons', id: e.d.weapon, n: 1 });
+    // Ressourcen verdienen (#039): Mutanten lassen Bio, Plünderer Technik, Bosse viel von beidem (Ranking › Ressourcen verdienen)
+    for (const r of earn(this.scene.data_, 'kill', { family: e.d.family, boss: e.d.behavior === 'boss' })) { const same = t.find(x => x.a === 'items' && x.id === r.id); if (same) same.n += r.n; else t.push(r); }
     if (t.length) this.drop(e.x, e.feet, t);
   }
 

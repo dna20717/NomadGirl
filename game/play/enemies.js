@@ -27,7 +27,7 @@ export class Enemy {
     const S = def.sense || {}, M = def.move || {}, C = def.counter || {};
     // senses: the old field "Bemerkt Leyla ab" is the sight range
     this.S = { sight: def.aggroRange ?? 400, cone: S.cone ?? (this.kind === 'flyer' ? 360 : 140), behind: S.behind ?? 140, hearing: S.hearing ?? 100,
-      react: S.react ?? 300, lost: S.lost ?? 900, search: S.search ?? 5000 };
+      react: S.react ?? 300, lost: S.lost ?? 900, search: S.search ?? 5000, call: S.call ?? 100 };
     this.M = { patrol: M.patrol ?? 200, jump: M.jump ?? 1, drop: M.drop ?? 3, fly: M.flyHeight ?? 230 };
     this.C = { shield: !!C.shield, turn: C.shieldTurn ?? 650, stagger: C.shieldStagger ?? 900, dodge: C.dodge ?? 0, dodgeEvery: C.dodgeCooldown ?? 1400,
       dodgeDist: C.dodgeDistance ?? 200, plates: C.armor ?? 0, chip: C.armorChip ?? 15,
@@ -93,6 +93,34 @@ export class Enemy {
     if (this.state === 'patrol') { this.state = 'alert'; this.until = time + this.S.react; this.heard = true; this.say('?', '#ffd27a'); }
     else if (this.state === 'search') this.searchStart = time;
   }
+  // Gruppen-Alarm (#039, Daniel 15.11.2026): who spots Leyla shouts; the same family within reach (Spiel › Kampf › Rufweite ×
+  // Gegner › Ruft andere, through walls half) comes to look where she was. Those who then see her shout on themselves.
+  callOthers(time) {
+    const s = this.scene, C = s.data_.game?.combat || {}, range = (C.alarmRange ?? 900) * (this.S.call ?? 100) / 100;
+    if (!(range > 0) || time < (this.calledAt ?? -1e9) + 6000 || !this.lastKnown) return;
+    this.calledAt = time;
+    const shouts = String(this.d.sense?.shouts || 'Da!').split('|').map(t => t.trim()).filter(Boolean);
+    this.say(shouts[Math.floor(Math.random() * shouts.length)] || 'Da!', '#ff4060');
+    const k = { ...this.lastKnown }, delay = C.alarmDelay ?? 350, called = [];
+    for (const e of s.enemies) {
+      if (e === this || !e.alive || (e.d.family || '') !== (this.d.family || '') || !['patrol', 'search'].includes(e.state)) continue;
+      let reach = range;
+      if (!s.lineFree(this.x, this.eyeY, e.x, e.eyeY)) reach *= 0.5;
+      const d = Math.hypot(e.x - this.x, e.chest - this.chest);
+      if (d > reach) continue;
+      called.push(e.id);
+      s.time.delayedCall(delay + d * 0.4, () => e.alarmed?.(s.now ?? s.time.now, k));
+    }
+    s.lastAlarm = { by: this.id, x: Math.round(this.x), called, at: time };
+  }
+  // called by a mate: look where she was (no new call unless it sees her itself)
+  alarmed(time, k) {
+    if (!this.alive || !['patrol', 'search'].includes(this.state)) return;
+    this.lastKnown = { ...k, at: time };
+    if (this.state === 'patrol') { this.state = 'alert'; this.until = time + this.S.react; this.heard = true; this.say('?!', '#ffd27a'); }
+    else this.searchStart = time;
+    this.alarmedAt = time;
+  }
   say(t, color) { this.scene.fx.text(this.x, this.body.top - 16, t, { color, size: 48, rise: 30 }); }
 
   // ---------- update ----------
@@ -126,7 +154,7 @@ export class Enemy {
         this.stop();
         if (this.lastKnown) this.face(time, this.lastKnown.x - this.x, true);
         if (time >= this.until) {
-          if (this.seeing) this.state = 'engage';
+          if (this.seeing) { this.state = 'engage'; this.callOthers(time); }
           else if (this.lastKnown) { this.state = 'search'; this.searchStart = time; }
           else this.state = 'patrol';
         }
@@ -140,7 +168,7 @@ export class Enemy {
         break;
       }
       case 'search': {   // go to where she was last seen or heard, look around, then give up
-        if (this.seeing) { this.state = 'engage'; this.say('!', '#ff4060'); break; }
+        if (this.seeing) { this.state = 'engage'; this.say('!', '#ff4060'); this.callOthers(time); break; }
         const k = this.lastKnown;
         const there = !k || (this.kind === 'flyer' ? Math.hypot(k.x - this.x, k.y - this.chest) < 60 : Math.abs(k.x - this.x) < 40);
         if (!there && !this.stuck) this.moveTo(time, k.x, k.y - (this.kind === 'flyer' ? 40 : 0), (this.d.speed ?? 120) * 0.7);
@@ -477,7 +505,7 @@ export class Enemy {
     if (this.state === 'duck' || this.state === 'cover') this.standUp(time);
     // hit from somewhere: it knows where she is now, turns round and fights
     this.lastSeen = time; this.lastKnown = { x: s.leyla.x, y: s.leyla.chest, at: time };
-    if (['windup', 'patrol', 'alert', 'search'].includes(this.state)) { this.state = 'engage'; this.readyAt = Math.max(this.readyAt, time + 350); }
+    if (['windup', 'patrol', 'alert', 'search'].includes(this.state)) { this.state = 'engage'; this.readyAt = Math.max(this.readyAt, time + 350); this.callOthers(time); }
     if (!this.C.shield || this.guardOpen) this.facing = -dir || this.facing;
     if (this.hp <= 0) this.die(time, dir);
     else while (this.phase < this.phases.length && this.hp / this.maxHp * 100 <= (this.phases[this.phase].at ?? 0)) this.enterPhase(time, this.phases[this.phase++]);

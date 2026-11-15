@@ -14,6 +14,7 @@ import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
 import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from './megarig.js';
 import { ACHIEVEMENT_COUNTERS, ACHIEVEMENT_SPECIALS, ACHIEVEMENT_CATEGORIES } from '../game/achievements.js';
 import { DECOR_PLACES, DECOR_ARTS } from '../game/decor.js';
+import { EARN_WHEN } from '../game/earn.js';
 
 const text = (key, label, o = {}) => ({ key, label, type: 'text', ...o });
 const area_ = (key, label, o = {}) => ({ key, label, type: 'textarea', ...o });
@@ -202,7 +203,9 @@ export const AREAS = {
         num('combat.cone', 'Zielkegel', { unit: '°', min: 0, max: 89, hint: 'Cells-like: ± um die Blickrichtung' }), num('combat.range', 'Zielweite', { unit: 'Kacheln', min: 0 }),
         num('combat.bulletSpeed', 'Kugeltempo', { unit: 'px/s', min: 0, hint: 'Cells-like; leer = Tempo der Waffe' }), bool('combat.marker', 'Ziel-Marker', { hint: 'Ecken um den Gegner, den der nächste Schuss trifft' }), color('combat.markerColor', 'Marker-Farbe'),
         num('combat.noiseShot', 'Lärm: Schuss', { unit: 'px', min: 0, hint: 'So weit hören Gegner Leylas Schüsse (× ihr „Hört“, durch Wände die Hälfte). Leer = 900' }),
-        num('combat.noiseMelee', 'Lärm: Nahkampf', { unit: 'px', min: 0, hint: 'Treffer, Block, Hieb gegen die Wand. Leer = 380' })] },
+        num('combat.noiseMelee', 'Lärm: Nahkampf', { unit: 'px', min: 0, hint: 'Treffer, Block, Hieb gegen die Wand. Leer = 380' }),
+        num('combat.alarmRange', 'Gruppen-Alarm: Rufweite', { unit: 'px', min: 0, hint: '#039: Wer Leyla entdeckt, ruft Gegner derselben Familie in dieser Weite (× ihr „Ruft andere“). Gerufene schauen nach, wo sie war; wer sie dann sieht, ruft weiter. 0 = aus. Leer = 900' }),
+        num('combat.alarmDelay', 'Gruppen-Alarm: Verzögerung', { unit: 'ms', min: 0, hint: 'So lange, bis die Gerufenen reagieren (dazu etwas je Entfernung). Leer = 350' })] },
       { title: 'Kampf · Blut', fields: [bool('combat.blood.enabled', 'Blutspritzer', { hint: 'Daniel, 12.11.2026: „mehr Treffer-Feedback in Form von Blutspritzern“. Spritzer in Schlagrichtung (mehr bei mehr Schaden und Krits), roter Nebel, Tropfen bleiben am Boden und laufen Wände runter, beim Tod eine Lache. Maschinen sprühen Funken und Öl. Aus = die alten kleinen Partikel' }),
         num('combat.blood.amount', 'Menge', { unit: '%', min: 0, max: 400, hint: 'Leer = 100' }), bool('combat.blood.decals', 'Bleibt liegen', { hint: 'Flecken am Boden und an Wänden' }),
         num('combat.blood.stay', 'Verblasst nach', { unit: 's', min: 1, hint: 'Leer = 20' }), num('combat.blood.max', 'Höchstens', { unit: 'Flecken', min: 10, hint: 'Ältere verschwinden zuerst. Leer = 160' }),
@@ -358,12 +361,15 @@ export const AREAS = {
       { title: 'Kategorien', fields: [num('points.time', 'Durchlaufzeit', { unit: 'Punkte', min: 0, hint: 'Volle Punkte bei Bestzeit des POI oder schneller' }), num('points.kills', 'Kills', { unit: 'Punkte', min: 0, hint: 'Anteil besiegter Gegner × Punkte' }),
         num('points.secrets', 'Secrets', { unit: 'Punkte', min: 0, hint: 'Anteil gefundener Secrets × Punkte' }), num('timeFalloff', 'Zeit-Abfall', { unit: '%/10 s', min: 0, hint: 'Punktabzug je 10 s über der Bestzeit' })] },
       { title: 'Ränge', fields: [table('grades', 'Ränge', [text('grade', 'Rang'), num('minPoints', 'ab Punkten', { min: 0 }), num('bonus', 'Bonus %', { min: 0 })], { hint: 'Von schlecht nach gut sortiert' })] },
+      { title: 'Ressourcen verdienen', fields: [table('earn', 'Regeln', [select('when', 'Wofür', EARN_WHEN), ref('item', 'Gegenstand', 'items'), num('chance', 'Chance', { unit: '%', min: 0, max: 100 }), num('min', 'Min', { min: 0 }), num('max', 'Max', { min: 0 }), select('grade', 'ab Rang', [['', '–'], ['F', 'F'], ['D', 'D'], ['C', 'C'], ['B', 'B'], ['A', 'A'], ['S', 'S']])],
+        { hint: '#039 (design.md: Ressourcen-Rohstoffe für erledigte Aktionen). Jede passende Zeile würfelt für sich: Kisten legen es dazu, besiegte Gegner lassen es fallen (alle bzw. nach Familie, Bosse), Secrets dort, wo die Wand war, der Rang in den Tresor („ab Rang“), Kochen/Herstellen nur beim ersten Mal je Rezept (kein Farming), direkt ins Lager' })] },
     ],
     check: (x, report) => {
       const g = x.grades || [];
       for (let i = 1; i < g.length; i++) if ((g[i].minPoints ?? 0) <= (g[i - 1].minPoints ?? 0)) report('warning', `Rang ${g[i].grade} braucht nicht mehr Punkte als ${g[i - 1].grade}`);
       const max = (x.points?.time || 0) + (x.points?.kills || 0) + (x.points?.secrets || 0);
       if (g.length && g.at(-1).minPoints > max) report('error', `Rang ${g.at(-1).grade} braucht ${g.at(-1).minPoints} Punkte, es gibt aber nur ${max}`);
+      for (const r of x.earn || []) { if ((r.max ?? r.min ?? 1) < (r.min ?? 1)) report('warning', `Ressourcen verdienen: ${r.item} hat Max unter Min`); if (r.when === 'rank' && !r.grade) report('hint', `Ressourcen verdienen: ${r.item} für den Rang ohne „ab Rang“ gilt schon ab F`); }
     },
   },
 
@@ -644,7 +650,9 @@ export const AREAS = {
         num('sense.hearing', 'Hört', { unit: '%', min: 0, hint: 'Lärm (Spiel › Kampf › Lärm) trägt so weit × diesen Anteil, durch Wände die Hälfte. 0 = taub. Leer = 100' }),
         num('sense.react', 'Reaktion', { unit: 'ms', min: 0, hint: 'Steht kurz mit „?!“, bevor er loslegt. Leer = 300' }),
         num('sense.lost', 'Verliert sie nach', { unit: 'ms', min: 0, hint: 'So lange ohne Sicht, dann sucht er an der letzten Stelle. Leer = 900' }),
-        num('sense.search', 'Sucht', { unit: 'ms', min: 0, hint: 'So lange schaut er sich dort um, dann gibt er auf („…“) und patrouilliert wieder. Leer = 5000' })] },
+        num('sense.search', 'Sucht', { unit: 'ms', min: 0, hint: 'So lange schaut er sich dort um, dann gibt er auf („…“) und patrouilliert wieder. Leer = 5000' }),
+        num('sense.call', 'Ruft andere', { unit: '%', min: 0, hint: '#039 Gruppen-Alarm: sieht er Leyla (oder trifft sie ihn), ruft er seine Familie in Spiel › Kampf › Rufweite × diesen Anteil herbei, durch Wände die Hälfte. 0 = ruft nicht. Leer = 100' }),
+        text('sense.shouts', 'Rufe', { hint: 'Was er dabei ruft, mit | getrennt (zufällig). Leer = „Da!“' })] },
       { title: 'Bewegung', fields: [num('move.patrol', 'Patrouille', { unit: 'px', min: 0, hint: 'Läuft so weit um seinen Platz hin und her. 0 = steht. Leer = 200' }),
         num('move.jump', 'Springt hoch bis', { unit: 'Kacheln', min: 0, hint: 'Stufen bis zu dieser Höhe nimmt er im Sprung. Leer = 1' }),
         num('move.drop', 'Springt runter bis', { unit: 'Kacheln', min: 0, hint: 'Beim Verfolgen und Suchen springt er so tief runter (Patrouille nie). Leer = 3' }),

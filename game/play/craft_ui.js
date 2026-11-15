@@ -14,6 +14,7 @@ import { phase, canMaintain, update as tankUpdate, clockHours } from '../tank.js
 import { RECIPE_PANELS, OWN_PANELS } from './station_ui.js';
 import { installBoard, noteSurgery, tuneResult, modsText, droneBonuses, CHIP_STATS } from '../stations.js';
 import { take } from '../crafting.js';
+import { earnText } from '../earn.js';
 
 const VERBS = { kitchen: ['Kochen', 'Kochnische'], foodtruck: ['Kochen', 'Foodtruck'], craft: ['Bauen', 'Werkbank'], cyber: ['Operieren', 'Ripperdoc'], tank: ['Warten', 'Cryo-Tank'], warroom: ['Auswerten', 'Warroom'], drone: ['Platine', 'Drohnenwerkstatt'], power: ['Regeln', 'Generator'] };
 const QNAMES = ['', 'gut', 'perfekt'];
@@ -280,6 +281,7 @@ export class CraftUI {
   }
   // after an action: leftovers go on the ground, a companion of this workshop comments, the savegame is written
   after(r, kind, text) {
+    if (r.earned?.length) text += ` · Zum ersten Mal: ${earnText(this.D, r.earned)}`;   // #039
     if (r.left > 0) { this.host.leftover?.(r.made.id, r.left, r.made.weapon ? 'weapons' : 'items', { ...(r.made.q ? { q: r.made.q } : {}), ...(r.made.mods ? { mods: r.made.mods } : {}) }); text += ` (${r.left} ${r.left === 1 ? 'liegt' : 'liegen'} am Boden, kein Platz)`; }
     const line = this.companionLine(kind === 'miss' || kind === 'near' ? 'miss' : kind === 'read' ? null : 'hit');
     this.log = { kind, text, minutes: r.minutes, ...line };

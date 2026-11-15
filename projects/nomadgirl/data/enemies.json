@@ -13,7 +13,7 @@
   "description": "Ausgezehrter Plünderer, bleich wie ein Kellerkind. Schleicht durch die Ruinen und schlägt mit der Nagelkeule zu.",
   "height": 172,
   "attack": {"windup": 520, "cooldown": 1100, "range": 120},
-  "sense": {"cone": 120, "react": 500, "hearing": 80},
+  "sense": {"cone": 120, "react": 500, "hearing": 80, "shouts": "Kreeesch!|Hssss!", "call": 60},
   "placeholderColor": "olive",
   "kit": "raider",
   "weapon": "nagelkeule",
@@ -34,7 +34,7 @@
   "description": "Hängt kopfüber an Rohren unter der Decke und lässt sich fallen, wenn jemand drunter durchläuft.",
   "height": 178,
   "attack": {"windup": 350, "cooldown": 1000, "range": 150},
-  "sense": {"hearing": 60},
+  "sense": {"hearing": 60, "shouts": "Kreeesch!|Hssss!", "call": 60},
   "placeholderColor": "violet",
   "kit": "raider",
   "weapon": "machete",
@@ -76,7 +76,8 @@
   "kitHead": "mohawk",
   "kitGang": "Magenta",
   "dropWeapon": 20,
-  "counter": {"duck": 20}
+  "counter": {"duck": 20},
+  "sense": {"shouts": "Da!|Eindringling!|Hier drüben!|Alarm!|Schnappt sie!"}
  },
  "schuetze": {
   "name": "Plünderer-Schütze",
@@ -98,7 +99,8 @@
   "kitHead": "hood",
   "kitSkin": "dunkel",
   "kitGang": "Cyan",
-  "dropWeapon": 20
+  "dropWeapon": 20,
+  "sense": {"shouts": "Da!|Eindringling!|Hier drüben!|Alarm!|Schnappt sie!"}
  },
  "wachdrohne": {
   "name": "Wachdrohne",
@@ -140,7 +142,8 @@
    "phases": [{"at": 60, "say": "RUHE IM FLUR!", "speed": 20, "windup": 25, "adds": 2, "wave": true},{"at": 30, "say": "FEIERABEND!", "speed": 20, "windup": 20, "adds": 2, "wave": true}],
    "waveSpeed": 620,
    "waveDamage": 60
-  }
+  },
+  "sense": {"shouts": "MEIN Gebäude!|Ruhe im Amt!"}
  },
  "schildtraeger": {
   "name": "Plünderer mit Schild",
@@ -163,7 +166,8 @@
   "kitHead": "helmet",
   "kitSkin": "hell",
   "kitGang": "Orange",
-  "dropWeapon": 15
+  "dropWeapon": 15,
+  "sense": {"shouts": "Da!|Eindringling!|Hier drüben!|Alarm!|Schnappt sie!"}
  },
  "panzerwache": {
   "name": "Panzerwache",
@@ -180,7 +184,7 @@
   "height": 196,
   "placeholderColor": "steel",
   "counter": {"armor": 2, "armorChip": 15},
-  "sense": {"hearing": 120},
+  "sense": {"hearing": 120, "shouts": "Da!|Eindringling!|Hier drüben!|Alarm!|Schnappt sie!"},
   "description": "Schwer gepanzerter Plünderer mit Stachelhelm und Rohrhammer. Leichte Treffer kratzen nur, schwere knacken die Platten.",
   "kit": "raider",
   "weapon": "rohrhammer",
@@ -208,7 +212,8 @@
   "kitSkin": "hell",
   "kitGang": "Gelb",
   "counter": {"duck": 25},
-  "description": "Schwingt die Keule, als wäre es ein Spiel. Duckt sich unter Nägeln weg."
+  "description": "Schwingt die Keule, als wäre es ein Spiel. Duckt sich unter Nägeln weg.",
+  "sense": {"shouts": "Da!|Eindringling!|Hier drüben!|Alarm!|Schnappt sie!"}
  },
  "brecher": {
   "family": "raider",
@@ -230,7 +235,8 @@
   "kitSkin": "sehr dunkel",
   "kitGang": "Blutrot",
   "counter": {"duck": 10},
-  "description": "Holt weit aus, trifft hart. Wer das Ausholen sieht, hat Zeit wegzukommen."
+  "description": "Holt weit aus, trifft hart. Wer das Ausholen sieht, hat Zeit wegzukommen.",
+  "sense": {"shouts": "Da!|Eindringling!|Hier drüben!|Alarm!|Schnappt sie!"}
  },
  "gewehrschuetze": {
   "family": "raider",
@@ -252,7 +258,7 @@
   "kitSkin": "dunkel",
   "kitGang": "Cyan",
   "counter": {"duck": 40, "duckTime": 900, "cover": 70},
-  "sense": {"cone": 150},
+  "sense": {"cone": 150, "shouts": "Da!|Eindringling!|Hier drüben!|Alarm!|Schnappt sie!"},
   "description": "Legt an, zielt lange, feuert eine Salve. Geht in die Hocke, wenn es zurückkommt."
  },
  "schrotflinter": {
@@ -275,7 +281,8 @@
   "kitSkin": "oliv",
   "kitGang": "Orange",
   "counter": {"duck": 30, "cover": 40},
-  "description": "Kommt nah ran, bevor er abdrückt."
+  "description": "Kommt nah ran, bevor er abdrückt.",
+  "sense": {"shouts": "Da!|Eindringling!|Hier drüben!|Alarm!|Schnappt sie!"}
  },
  "pistolero": {
   "family": "raider",
@@ -296,7 +303,8 @@
   "kitHead": "topknot",
   "kitGang": "Magenta",
   "counter": {"duck": 30, "dodge": 15, "cover": 60},
-  "description": "Der pinke Laser verrät ihn, bevor er schießt."
+  "description": "Der pinke Laser verrät ihn, bevor er schießt.",
+  "sense": {"shouts": "Da!|Eindringling!|Hier drüben!|Alarm!|Schnappt sie!"}
  },
  "streuner": {
   "name": "Streuner",
@@ -317,7 +325,7 @@
   "kitSkin": "oliv",
   "kitGang": "Gelb",
   "attack": {"windup": 520, "cooldown": 1100, "range": 130},
-  "sense": {"cone": 120, "react": 500, "hearing": 80},
+  "sense": {"cone": 120, "react": 500, "hearing": 80, "shouts": "Da!|Eindringling!|Hier drüben!|Alarm!|Schnappt sie!"},
   "description": "Hat sich an der Tankstelle eingerichtet und verteidigt sein Revier mit der Machete. Zögert lieber, als dass er stirbt."
  }
 }

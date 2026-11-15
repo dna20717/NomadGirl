@@ -7,6 +7,7 @@ import { rollLoot } from '../inventory.js';
 import { chestPart } from '../salvage.js';
 import { bonuses as trophyBonuses } from '../achievements.js';
 import { rankRun } from '../../engine/poi.js';
+import { earn, earnText } from '../earn.js';
 
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
 
@@ -179,6 +180,7 @@ export class PoiLevel {
     if (c.sprite) { let f = 0; s.time.addEvent({ delay: 70, repeat: c.frames - 1, callback: () => c.sprite.setFrame(Math.min(c.frames - 1, ++f)) }); }
     else this.drawChest(c);
     const things = s.lootRoll ? s.lootRoll(this.lootTable) : rollLoot(s.data_, this.lootTable);
+    for (const r of earn(s.data_, 'chest')) { const same = things.find(x => x.a === 'items' && x.id === r.id); if (same) same.n += r.n; else things.push(r); }   // #039
     this.salvagePart(things);
     s.fx.sparks(c.x, c.feet - 50, 0xffd27a, 14);
     if (things.length) s.loot?.drop(c.x, c.feet, things, 140);
@@ -223,7 +225,13 @@ export class PoiLevel {
       s.achieve?.('secrets', 1, [this.poi]);
       s.drone.react('curious');
       s.hud.toast('Geheimnis gefunden!', `${this.secrets} von ${this.secretsMax}`, 'secret', 3200);
+      this.secretReward((w.x0 + w.x1) / 2 * T, w.y1 * T);
     }
+  }
+  // a secret pays out (#039): what Ranking › Ressourcen verdienen gives for it lies where the wall was
+  secretReward(x, feet) {
+    const s = this.scene, got = earn(s.data_, 'secret');
+    if (got.length) s.loot?.drop(x, feet, got, 120);
   }
 
   // goal reached: time stops, ranking; the bonus is paid at the van
@@ -237,6 +245,8 @@ export class PoiLevel {
     const table = this.P.vault || (D.lootTables?.tresor ? 'tresor' : this.lootTable), extra = Math.floor((r.bonus || 0) / 10), haul = [];
     const things = [...(s.lootRoll ? s.lootRoll(table) : rollLoot(D, table)), ...Array.from({ length: extra }, () => rollLoot(D, table)[0]).filter(Boolean)];
     this.salvagePart(things, true);   // the vault holds one missing salvage part for sure, if this POI is a Fundort
+    const earned = earn(D, 'rank', { grade: r.grade });   // #039: a good rank gives Wissen extra
+    things.push(...earned);
     for (const t of things) { const same = haul.find(h => h.id === t.id); if (same) same.n += t.n; else haul.push({ ...t }); }
     this.done.haul = haul.map(t => `${t.id}×${t.n}`);
     const z = this.goals[0];
@@ -252,7 +262,7 @@ export class PoiLevel {
         { label: `Zeit ${mm}`, sub: `Bestzeit ${Math.floor(par / 60)}:${String(par % 60).padStart(2, '0')} · ${r.parts.time} Punkte` },
         { label: `Kills ${kills}/${this.killsMax}`, sub: `${r.parts.kills} Punkte` },
         { label: `Secrets ${this.secrets}/${this.secretsMax}`, sub: `${r.parts.secrets} Punkte` },
-        { label: `Tresor: ${haul.reduce((n, t) => n + t.n, 0)} Dinge`, sub: haul.slice(0, 6).map(t => D.items?.[t.id]?.name || t.id).join(', ') + (haul.length > 6 ? ' …' : '') + (extra ? ` · +${extra} für den Rang` : '') },
+        { label: `Tresor: ${haul.reduce((n, t) => n + t.n, 0)} Dinge`, sub: haul.slice(0, 6).map(t => D.items?.[t.id]?.name || t.id).join(', ') + (haul.length > 6 ? ' …' : '') + (extra ? ` · +${extra} für den Rang` : '') + (earned.length ? ` · Rang: ${earnText(D, earned)}` : '') },
         { label: 'Weiter', primary: true, sub: `Zurück zum Van: ${this.shortcutWay()}`, act: () => {} },
       ].map(i => ({ ...i, act: i.act || (() => {}) })),
     });
@@ -267,6 +277,7 @@ export class PoiLevel {
       f.found = true; f.fade = 0; this.secrets++; s.achieve?.('secrets', 1, [this.poi]);
       s.drone.react('curious');
       s.hud.toast('Geheimnis gefunden!', `${this.secrets} von ${this.secretsMax}`, 'secret', 3200);
+      this.secretReward((f.x0 + f.x1) / 2 * T, f.y1 * T);
       s.fog?.reveal(true);
     }
   }

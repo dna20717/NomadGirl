@@ -12,6 +12,7 @@ import { add, remove, count } from './inventory.js';
 import { containers, advance } from './save.js';
 import { canMaintain, maintain } from './tank.js';
 import { madeOnce, markMade } from './achievements.js';
+import { earn } from './earn.js';
 
 // % more buff for a good / perfect dish (#013, Kochen & Craften › Herd › Bonus je Qualität)
 export const qualityBonus = (D, q = 0) => (D.crafting?.stations?.cook?.bonus ?? [0, 25, 50])[q || 0] ?? 0;
@@ -96,7 +97,19 @@ export function craft(D, save, id, ws, x = {}) {
   advance(save, minutes / 60);
   markMade(D, save, id);
   for (const p of x.parts || []) take(D, save, p, 1);   // the weapon parts go into the weapon
-  return { ok: true, recipe: id, made: { ...resultOf(r), n, ...(x.q ? { q: x.q } : {}), ...(x.mods ? { mods: x.mods } : {}) }, left: produce(D, save, r, n, x), minutes };
+  const left = produce(D, save, r, n, x);
+  return { ok: true, recipe: id, made: { ...resultOf(r), n, ...(x.q ? { q: x.q } : {}), ...(x.mods ? { mods: x.mods } : {}) }, left, minutes, earned: firstTime(D, save, id, ws) };
+}
+
+// Ressourcen verdienen (#039): a recipe made for the first time pays out (kitchen: cook, everything else: build), into the stores like
+// the result. Only the first time, so nothing can be farmed by crafting the same cheap thing again and again. → [{ a, id, n }]
+function firstTime(D, save, rid, ws) {
+  const list = save.firstMade ??= [];
+  if (list.includes(rid)) return [];
+  list.push(rid);
+  const got = earn(D, functionOf(D, ws) === 'kitchen' ? 'cook' : 'build');
+  for (const t of got) t.left = give(D, save, t.id, t.n);
+  return got;
 }
 
 // the pot: { item id: count } → the recipe it makes at this workshop (or null)
@@ -138,7 +151,8 @@ export function experiment(D, save, ws, pot, rnd = Math.random) {
     const n = r.count || 1, minutes = Math.round((r.time ?? 10) * (1 - Math.min(90, speedOf(D, save, ws)) / 100));
     advance(save, minutes / 60);
     markMade(D, save, r.id);
-    return { ok: true, hit: true, recipe: r.id, learnt, made: { ...resultOf(r), n }, left: produce(D, save, r, n), minutes };
+    const left = produce(D, save, r, n);
+    return { ok: true, hit: true, recipe: r.id, learnt, made: { ...resultOf(r), n }, left, minutes, earned: firstTime(D, save, r.id, ws) };
   }
   const near = C.nearMiss !== false ? nearMiss(D, ws, pot) : null;
   const share = (C.failConsume ?? 100) / 100;
