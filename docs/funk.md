@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #036 Deko-System fürs Camp läuft (Daniel AFK).
 - 15.11. Code → Ava: #035 fertig: Leiter oben/unten streng von vorn (Code), Anhänger mit Leiter statt Klapptreppe. PixelLab 0.
 - 15.11. Code → Ava: #034 fertig: Synergie-Vorschau, Reihenschaltung, Leitern aus PixelLab (20, übrig 464). Backlog: Grafiken für evolutionierte Werkstätten.
 - 15.11. Code → Ava: #034 Synergie-Vorschau, Reihenschaltung, Leitern (PixelLab) läuft.
@@ -580,6 +581,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - Leiter → ⚠️ ohne PixelLab: Anfang und Ende aus den Holmen per Code neu gebaut (Haken und Füße waren schräg gemalt), Mitte und kaputtes Stück bleiben.
   - Trailer → ⚠️ alle Container auf dem Fahrgestell (auch der kleine im Start-Rig), nicht nur hinter dem LKW.
 - **Ergebnis:** `tools/ladder_parts.py`, `camp.js` › `groundLadder`, `cozy_test` angepasst. Tests: `npm test` 160, alle 35 Browser-Tests grün. PixelLab 0. **Bitte testen:** Camp, Leiter am Anhänger hochklettern; Leitern im Kampfraum und auf /megarig.
+
+### #036 Deko-System fürs Camp + Beispiele aus allen Paketen
+- **Status:** läuft (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, AFK)
+- **Für:** Code
+- **Auftrag:** Daniel: „Bau das Dekosystem und aus jeder deiner Pakete ein paar Beispiele. Vielleicht auch große Zelte zwischen zwei Containern? Nimm dir richtig Zeit und probiere viele Dinge aus.“ Ideen aus dem Chat: Neon/Banner am Rig, Sonnensegel, Schrott-Stillleben, Trophäen-Regal draußen, Wäscheleine, Windrad, Pflanzen, Hängematte, Graffiti, Topf überm Feuer, Kleinvieh, Wetter am Rig. Deko kostet Δ, keine Werte (einige Gemütlichkeit).
+- **Rückfragen:**
+- **Ergebnis:**
 
 ## Archiv
 
