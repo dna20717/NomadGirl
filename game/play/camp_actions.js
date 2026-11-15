@@ -19,6 +19,8 @@ export class CampActions {
         items: [{ label: 'Rig umbauen', primary: true, act: () => s.openBuild() }, { label: 'Zurück', act: () => {} }] });
     if (def.function === 'sleep') return this.sleep(def);
     if (def.function === 'warroom') return this.warroom();
+    if (def.function === 'jobs') return this.boardMenu();   // #033 the Auftragsbüro: the notice board as a room in the rig
+    if (def.function === 'vehicle') { s.hud.inv?.close(); return s.hud.craft?.open(id); }   // #033 Heavy-Duty: vehicle recipes (skill trees later)
     if (['kitchen', 'craft', 'cyber', 'tank', 'foodtruck', 'power'].includes(def.function)) { s.hud.inv?.close(); return s.hud.craft?.open(id); }   // #013: foodtruck counter, regulator
     if (def.function === 'drone') {   // AvA's board (#013) or her rest (Werkstätten › Benutzen)
       s.hud.inv?.close();

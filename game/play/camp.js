@@ -1070,7 +1070,7 @@ export class Camp {
   }
 }
 
-export const VERB = { sleep: 'Schlafen', warroom: 'Planen', kitchen: 'Kochen', foodtruck: 'Verkaufen', craft: 'Herstellen', storage: 'Lager', cooling: 'Kühlraum', chill: 'Chillen', drone: 'Drohne', engine: 'Motor', power: 'Energie', cell: 'Zelle', guests: 'Gäste', treasury: 'Schatzkammer', tank: 'Nach AvA sehen', garden: 'Gärtnern', cistern: 'Wasser' };
+export const VERB = { sleep: 'Schlafen', warroom: 'Planen', kitchen: 'Kochen', foodtruck: 'Verkaufen', craft: 'Herstellen', storage: 'Lager', cooling: 'Kühlraum', chill: 'Chillen', drone: 'Drohne', engine: 'Motor', power: 'Energie', cell: 'Zelle', guests: 'Gäste', treasury: 'Schatzkammer', tank: 'Nach AvA sehen', garden: 'Gärtnern', cistern: 'Wasser', armory: 'Waffenkammer', vehicle: 'Fahrzeuge', jobs: 'Aufträge' };
 export const SOON = { foodtruck: 'Verkaufen kommt später.', power: 'Liefert Energie für die Werkstätten im Rig.',
   storage: 'Ein Lager fürs Camp: Kochen, Herstellen und Zerlegen nehmen sich, was hier liegt.', cooling: 'Hält Essen frisch. Kochen nimmt sich, was hier liegt.' };
 

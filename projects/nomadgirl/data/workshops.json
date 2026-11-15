@@ -91,7 +91,7 @@
   "outside": "out_ac"
  },
  "waffenkammer": {
-  "name": "Waffenkammer",
+  "name": "Waffenwerkbank",
   "function": "storage",
   "stage": "1",
   "places": 1,
@@ -111,9 +111,10 @@
    {"kind": "twinkle", "x": 212, "y": 80, "w": 30, "h": 45, "size": 3, "rate": 1, "when": "always"},
    {"kind": "twinkle", "x": 215, "y": 160, "w": 30, "h": 45, "size": 3, "rate": 1, "when": "always"}
   ],
-  "outside": "out_storage"
+  "outside": "out_storage",
+  "description": "Werkbank und Lager für Waffen: Teile, Munition, Ersatzläufe. Ausgestellt wird in der Waffenkammer (#033)."
  },
- "kuehlraum": {"name": "Kühlraum", "function": "cooling", "stage": "1", "places": 1, "power": -2, "capacity": 20, "value": 250, "grid": [6, 4], "outside": "out_tank"},
+ "kuehlraum": {"name": "Kühlraum", "function": "cooling", "stage": "1", "places": 1, "power": -2, "capacity": 20, "value": 250, "grid": [6, 4], "outside": "out_tank", "look": "ws_cold_room"},
  "chill_area": {
   "name": "Chill Area",
   "function": "chill",
@@ -232,9 +233,9 @@
   ],
   "outside": "out_kitchen"
  },
- "motorraum": {"name": "Motorraum", "function": "engine", "stage": "1", "places": 1, "power": 0, "value": 300, "outside": "out_ac"},
- "zelle": {"name": "Zelle", "function": "cell", "stage": "2", "places": 1, "power": 0, "capacity": 1, "value": 200, "outside": "out_graffiti"},
- "reaktor": {"name": "Reaktor", "function": "power", "stage": "2", "places": 2, "power": 8, "value": 3000, "outside": "out_ac"},
+ "motorraum": {"name": "Motorraum", "function": "engine", "stage": "1", "places": 1, "power": 0, "value": 300, "outside": "out_ac", "look": "ws_engine_room"},
+ "zelle": {"name": "Zelle", "function": "cell", "stage": "2", "places": 1, "power": 0, "capacity": 1, "value": 200, "outside": "out_graffiti", "look": "ws_cell"},
+ "reaktor": {"name": "Reaktor", "function": "power", "stage": "2", "places": 2, "power": 8, "value": 3000, "outside": "out_ac", "look": "ws_reactor"},
  "lagerregal": {
   "name": "Lagerregal",
   "function": "storage",
@@ -388,5 +389,67 @@
    {"kind": "bubbles", "x": 72, "y": 110, "w": 82, "h": 80, "color": "#a6fcdb", "size": 2, "rate": 2, "when": "always"}
   ],
   "outside": "out_cistern"
+ },
+ "waffengalerie": {
+  "name": "Waffenkammer",
+  "function": "armory",
+  "places": 1,
+  "power": -1,
+  "stage": "1",
+  "value": 700,
+  "look": "ws_armory",
+  "grid": [4, 2],
+  "accept": ["weaponpart", "component"],
+  "description": "Ein Raum wie die Halle der Beute, nur für Waffen: drei Display-Boards mit Neonrahmen und eine Vitrine. Was hier hängt, sieht man im Rig. Dazu eine Kiste für Waffenteile.",
+  "stands": [
+   {"name": "Board Pink", "grid": [3, 3], "x": 42, "y": 82, "w": 52, "h": 46, "align": "bottom", "cell": 16, "rows": "97@43+50; 112@43+50; 127@43+50", "accept": "melee, ranged"},
+   {
+    "name": "Board Cyan",
+    "grid": [3, 3],
+    "x": 103,
+    "y": 82,
+    "w": 50,
+    "h": 46,
+    "align": "bottom",
+    "cell": 16,
+    "rows": "97@104+48; 112@104+48; 127@104+48",
+    "accept": "melee, ranged"
+   },
+   {"name": "Board Rot", "grid": [3, 3], "x": 160, "y": 82, "w": 53, "h": 46, "align": "bottom", "cell": 16, "rows": "97@161+51; 112@161+51; 127@161+51", "accept": "melee, ranged"},
+   {"name": "Vitrine", "grid": [3, 1], "x": 98, "y": 140, "w": 60, "h": 32, "align": "bottom", "cell": 18, "rows": "168@100+56", "accept": "melee, ranged"}
+  ],
+  "fx": [
+   {"kind": "light", "x": 175, "y": 30, "w": 40, "h": 120, "color": "#7ff6ff", "size": 70, "rate": 4, "when": "always"},
+   {"kind": "screen", "x": 80, "y": 40, "w": 96, "h": 18, "color": "#ff7ac0", "size": 0, "rate": 3, "when": "always"}
+  ],
+  "scale": 78
+ },
+ "heavy_duty": {
+  "name": "Heavy-Duty-Werkbank",
+  "function": "vehicle",
+  "places": 1,
+  "power": -2,
+  "stage": "1",
+  "value": 1200,
+  "look": "ws_heavy_duty",
+  "description": "Hydraulikpresse, Kettenzug, LKW-Baupläne: hier entstehen alle Rig-Teile. Später auch die Fahrzeug-Skilltrees.",
+  "fx": [
+   {"kind": "sparks", "x": 36, "y": 150, "w": 12, "h": 8, "color": "#7ff6ff", "size": 2, "rate": 10, "when": "use", "idle": 20},
+   {"kind": "light", "x": 100, "y": 40, "w": 60, "h": 10, "color": "#fff1c8", "size": 60, "rate": 5, "when": "always"}
+  ]
+ },
+ "auftragsbuero": {
+  "name": "Auftragsbüro",
+  "function": "jobs",
+  "places": 1,
+  "power": 0,
+  "stage": "1",
+  "value": 400,
+  "look": "ws_job_office",
+  "description": "Das schwarze Brett als Raum im Rig: alle Aufträge der Crew annehmen, abgeben, Belohnungen einsammeln. Später: fertige Aufträge gegen bessere Belohnungen tauschen.",
+  "fx": [
+   {"kind": "light", "x": 30, "y": 25, "w": 24, "h": 30, "color": "#ff4b4b", "size": 55, "rate": 3, "when": "always"},
+   {"kind": "light", "x": 100, "y": 170, "w": 30, "h": 10, "color": "#ffd27a", "size": 55, "rate": 6, "when": "always"}
+  ]
  }
 }

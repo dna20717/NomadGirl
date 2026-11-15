@@ -66,7 +66,7 @@ export function containers(D, save) {
     const def = D.workshops[w.id];
     if (g) out.push({ key: `store:${ui}:${w.at}`, name: def.name || w.id, size: g, workshop: w.id, ...(def.accept?.length ? { accept: { categories: def.accept } } : {}) });
     // trophy stands (Werkstätten › Schatzkammer & Trophäen): every stand is an inventory of its own, only things tagged "trophy"
-    (def.stands || []).forEach((st, i) => { if (st.grid?.[0] && st.grid?.[1]) out.push({ key: `store:${ui}:${w.at}:s${i}`, name: `${def.name || w.id} · ${st.name || 'Ständer ' + (i + 1)}`, size: st.grid, workshop: w.id, stand: i, parent: `store:${ui}:${w.at}`, accept: { tag: 'trophy' } }); });
+    (def.stands || []).forEach((st, i) => { if (st.grid?.[0] && st.grid?.[1]) out.push({ key: `store:${ui}:${w.at}:s${i}`, name: `${def.name || w.id} · ${st.name || 'Ständer ' + (i + 1)}`, size: st.grid, workshop: w.id, stand: i, parent: `store:${ui}:${w.at}`, accept: st.accept ? { categories: String(st.accept).split(',').map(x => x.trim()).filter(Boolean) } : { tag: 'trophy' } }); });
   }));
   return out;
 }

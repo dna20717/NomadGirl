@@ -5401,5 +5401,68 @@
   "derivedFrom": "concept_fatbird",
   "date": "15.11.2026",
   "description": "#026, neu #031 (Daniel: Heck nicht orthogonal): streng von der Seite, Leitwerk oben und unten als Kontur, Triebwerk als Zylinder im Profil mit Flamme nach rechts, Neonband in Zeile 103 (= Zeile 84 im Mittelstück). Altes Heck: source/fatbird_tail_v1.png."
+ },
+ "ws_cold_room": {
+  "name": "Werkstatt · Kühlraum",
+  "kind": "image",
+  "file": "assets/workshops/cold_room.png",
+  "origin": [128, 237],
+  "source": "KI (PixelLab, Create Image Pro, Referenz Hydrokultur + Ripperdoc bzw. Halle der Beute, Palette AAP-64, streng frontal)",
+  "date": "15.11.2026",
+  "description": "#033: Kühlraum: Kühlzelle mit Frosttür, Fleischhaken, Kühltruhe, Eiszapfen. Original in source/."
+ },
+ "ws_engine_room": {
+  "name": "Werkstatt · Motorraum",
+  "kind": "image",
+  "file": "assets/workshops/engine_room.png",
+  "origin": [129, 239],
+  "source": "KI (PixelLab, Create Image Pro, Referenz Hydrokultur + Ripperdoc bzw. Halle der Beute, Palette AAP-64, streng frontal)",
+  "date": "15.11.2026",
+  "description": "#033: Motorraum: Dieselblock mit Schwungrad, Auspuffrohre zur Decke, Ölfässer, Schalttafel. Original in source/."
+ },
+ "ws_cell": {
+  "name": "Werkstatt · Zelle",
+  "kind": "image",
+  "file": "assets/workshops/cell.png",
+  "origin": [129, 237],
+  "source": "KI (PixelLab, Create Image Pro, Referenz Hydrokultur + Ripperdoc bzw. Halle der Beute, Palette AAP-64, streng frontal)",
+  "date": "15.11.2026",
+  "description": "#033: Zelle: Stahlkäfig mit Gitterfront, Pritsche, Strichliste an der Wand, Schloss mit roter LED. Original in source/."
+ },
+ "ws_reactor": {
+  "name": "Werkstatt · Reaktor (2 Plätze)",
+  "kind": "image",
+  "file": "assets/workshops/reactor.png",
+  "origin": [192, 224],
+  "source": "KI (PixelLab, Create Image Pro, Referenz Hydrokultur + Ripperdoc bzw. Halle der Beute, Palette AAP-64, streng frontal)",
+  "date": "15.11.2026",
+  "description": "#033: Reaktor (2 Plätze): Kern im Käfig mit Cyan-Glühen, Schaltschrank links, Kühltank und Konsole rechts. Original in source/."
+ },
+ "ws_heavy_duty": {
+  "name": "Werkstatt · Heavy-Duty-Werkbank",
+  "kind": "image",
+  "file": "assets/workshops/heavy_duty.png",
+  "origin": [128, 244],
+  "source": "KI (PixelLab, Create Image Pro, Referenz Hydrokultur + Ripperdoc bzw. Halle der Beute, Palette AAP-64, streng frontal)",
+  "date": "15.11.2026",
+  "description": "#033: Heavy-Duty-Werkbank: Hydraulikpresse, Kettenzug mit Motorteil, LKW-Bauplan, Reifen, Schweißbrenner. Original in source/."
+ },
+ "ws_job_office": {
+  "name": "Werkstatt · Auftragsbüro",
+  "kind": "image",
+  "file": "assets/workshops/job_office.png",
+  "origin": [128, 245],
+  "source": "KI (PixelLab, Create Image Pro, Referenz Hydrokultur + Ripperdoc bzw. Halle der Beute, Palette AAP-64, streng frontal)",
+  "date": "15.11.2026",
+  "description": "#033: Auftragsbüro: Brett voller Zettel, Karte mit roten Fäden, Schreibtisch mit Stempel und Funkgerät, Neon-!. Original in source/."
+ },
+ "ws_armory": {
+  "name": "Werkstatt · Waffenkammer",
+  "kind": "image",
+  "file": "assets/workshops/armory.png",
+  "origin": [128, 252],
+  "source": "KI (PixelLab, Create Image Pro, Referenz Hydrokultur + Ripperdoc bzw. Halle der Beute, Palette AAP-64, streng frontal)",
+  "date": "15.11.2026",
+  "description": "#033: Waffenkammer: Raum wie die Halle der Beute, drei leere Display-Boards mit Neonrahmen, Vitrine, Spot, Neon ARMORY. Original in source/."
  }
 }

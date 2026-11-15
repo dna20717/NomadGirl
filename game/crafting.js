@@ -23,7 +23,8 @@ export function learn(save, id) { save.recipes ??= []; if (known(save, id)) retu
 export const functionOf = (D, ws) => D.workshops?.[ws]?.function || null;
 export function recipesFor(D, ws) {
   const f = functionOf(D, ws);
-  return Object.entries(D.recipes || {}).filter(([, r]) => r.station === ws || (f && functionOf(D, r.station) === f)).map(([id, r]) => ({ id, ...r }));
+  // #033: the Heavy-Duty bench (function „vehicle“) builds every rig part (recipes with „part“), wherever they are written down
+  return Object.entries(D.recipes || {}).filter(([, r]) => r.station === ws || (f && functionOf(D, r.station) === f) || (f === 'vehicle' && r.part)).map(([id, r]) => ({ id, ...r }));
 }
 
 // the grids Leyla can use in the camp, in the order things are taken from them

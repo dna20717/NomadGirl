@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 15.11.2026: **Werkstätten-Paket** (#033): Bilder für Kühlraum, Motorraum, Zelle, Reaktor; neu Heavy-Duty-Werkbank (alle Rig-Teile), Auftragsbüro (Schwarzes Brett als Raum), Waffenkammer mit Display-Boards (Waffen hängen sichtbar); alte Waffenkammer heißt Waffenwerkbank.
 - 15.11.2026: **Sauber gestapelt** (#032): Container an Bord Kante auf Kante statt ineinander, Laufstege auf Stelzen; Fatbird mit Trägern über die ganze Länge.
 - 15.11.2026: **Seitenansicht vereinheitlicht** (#031): Container an Bord ohne Dachkante; Fatbird mit neuem Heck streng von der Seite und Rotoren an Fachwerk-Auslegern mit Pfosten aufs Deck.
 - 15.11.2026: **Crawler-Heck streng von der Seite** (#030): neu aus PixelLab, ohne die angeklebte Rückansicht, bündig vom Deck bis zu den Ketten.
