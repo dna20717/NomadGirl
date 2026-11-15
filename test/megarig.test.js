@@ -48,7 +48,7 @@ test('Platz-Raster: ein Modul belegt n × Platz Kacheln, Räume im Rumpf sind Co
 
 test('Erreichbarkeit: ein Container ohne Unterbau wird gemeldet', () => {
   const data = JSON.parse(JSON.stringify(D));
-  data.megarigs.crawler.modules.push({ container: 'container_10', place: 7, story: 4, from: 0 });   // story 4 over an empty place 7 (story 3)
+  data.megarigs.crawler.modules.push({ container: 'container_10', place: 3, story: 4, from: 0 });   // story 4 over an empty place 3 (story 3)
   const b = buildMegarig(data, 'crawler', 2);
   assert.ok(b.problems.some(([k, t]) => k === 'warning' && /nicht erreichbar|keinen Weg/.test(t)), JSON.stringify(b.problems));
 });

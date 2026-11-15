@@ -32,6 +32,7 @@ export class MegarigView {
       if (p.type === 'container') this.container(p);
       else if (p.type === 'room') this.room(p);
       else if (p.type === 'rotor') this.rotor(p);
+      else if (p.type === 'bridge') this.bridge(p);
     }
     for (const p of build.pieces) if (p.type === 'addon') this.addon(p);
   }
@@ -104,7 +105,7 @@ export class MegarigView {
     const T = this.T, g = this.g, b = this.b, P = this.paint, ground = b.G * T, x0 = b.x0 * T, len = h.len * T;
     const bottom = (b.G - h.under) * T, top = (b.G - h.hullTop) * T, front = h.front * T, r = rng(7);
     // two track units: dark tread loops with road wheels, a bogie block between them
-    const units = [[x0 + 1 * T, Math.min(len * 0.44, 24 * T)], [x0 + len - Math.min(len * 0.44, 24 * T) - T, Math.min(len * 0.44, 24 * T)]];
+    const uw0 = len * 0.42, units = [[x0 + 1 * T, uw0], [x0 + len - uw0 - T, uw0]];   // #024: as long as the hull allows, no cap
     this.r(g, x0 + 3 * T, bottom, len - 6 * T, h.under * T * 0.55, C.night);
     for (let i = x0 + 4 * T; i < x0 + len - 4 * T; i += 3 * T) this.r(g, i, bottom + 2 * PX, 2 * T, 6 * PX, C.violet);
     for (const [ux, uw] of units) {
@@ -113,14 +114,17 @@ export class MegarigView {
       this.r(g, ux, ty + 4 * PX, uw, th - 8 * PX, C.mud);
       for (let i = ux + 2 * PX; i < ux + uw - 2 * PX; i += 6 * PX) { this.r(g, i, ty, 3 * PX, 2 * PX, C.brown); this.r(g, i, ground - 2 * PX, 3 * PX, 2 * PX, C.brown); }   // tread teeth
       this.r(g, ux + 3 * PX, ty + 3 * PX, uw - 6 * PX, th - 6 * PX, C.brown);
-      const n = Math.max(3, Math.round(uw / (2.6 * T))), d = Math.min(th - 8 * PX, 2.2 * T);
+      const d = th * 0.52, n = Math.max(3, Math.round(uw / (d * 1.18)));   // big road wheels: the tracks tower over Leyla
       for (let k = 0; k < n; k++) {
         const cx = ux + uw * (k + 0.5) / n, cy = ground - th / 2;
         g.fillStyle(col(C.ink)).fillCircle(cx, cy, d / 2);
         g.fillStyle(col(C.grey)).fillCircle(cx, cy, d / 2 - 3 * PX);
         g.fillStyle(col(C.steel)).fillCircle(cx, cy, d / 5);
         this.r(g, cx - PX, cy - PX, 2 * PX, 2 * PX, C.ink);
+        for (let a = 0; a < 6; a++) { const ang = a * Math.PI / 3 + k; this.r(g, cx + Math.cos(ang) * d * 0.32 - PX, cy + Math.sin(ang) * d * 0.32 - PX, 2 * PX, 2 * PX, C.ink); }   // bolts
       }
+      // return rollers on top of the track
+      for (let k = 0; k < n - 1; k++) { const rx = ux + uw * (k + 1) / n; g.fillStyle(col(C.grey)).fillCircle(rx, ty + 5 * PX, 3 * PX); }
       this.r(g, ux + 6 * PX, ty - 3 * PX, uw - 12 * PX, 3 * PX, P.dark);   // track guard
       this.hazard(g, ux + uw * 0.3, ty - 3 * PX, uw * 0.4, 3 * PX);
     }
@@ -129,18 +133,20 @@ export class MegarigView {
     for (let p = 0; p <= h.places; p++) { const px = x0 + front + p * h.P * T; this.r(g, px - PX, top + T, 2 * PX, bottom - top - T, P.dark, 0.7); }
     this.hazard(g, x0 + 2 * T, bottom + T - 4 * PX, len - 2 * T, 4 * PX);
     this.r(g, x0 + 2 * T, top, len - 2 * T, T, P.dark);   // deck slab
+    for (let st = 1; st < h.inside; st++) { const sy = (b.G - h.under - st * h.S) * T; this.r(g, x0 + front, sy, len - front - h.back * T, T * 0.6, P.dark, 0.85); this.rivets(g, x0 + front, sy + 2 * PX, len - front - h.back * T, P.main, 28); }   // slabs between the hull stories
     this.rivets(g, x0 + 2 * T, top + 6 * PX, len - 2 * T, P.main, 28);
     // cab: block up to one story above the deck, slanted nose, a lit bridge window
     const cy = top - h.S * T, cx = x0 + 2 * T, cw = front - 3 * T;
     this.plate(g, cx, cy, cw, top - cy + T, P.main, P.dark, P.trim, 5);
     // slanted nose: cut the top-left corner with sky-coloured steps of the dark tone
     for (let i = 0; i < 8; i++) this.r(g, cx, cy + i * 2 * PX, (8 - i) * 3 * PX, 2 * PX, P.dark);
-    const wx = cx + 2.4 * T, wy = cy + 1.4 * T, ww = cw - 3.4 * T, wh = 2 * T;
+    // windshield in the nose in front of the bridge (the bridge itself is a room, see bridge())
+    const wx = cx + 0.8 * T, wy = cy + 1.4 * T, ww = 2.4 * T, wh = h.S * T - 2.4 * T;
     this.r(g, wx - PX, wy - PX, ww + 2 * PX, wh + 2 * PX, C.ink);
-    this.r(g, wx, wy, ww, wh, C.gold, 0.85);
-    for (let i = wx + T; i < wx + ww; i += T * 1.3) this.r(g, i, wy, 2 * PX, wh, C.ink);
-    this.glow(wx + ww / 2, wy + wh / 2, ww * 1.4, wh * 2.2, C.gold, 0.35);
-    this.logo(g, cx + cw - 3.2 * T, cy + 3.8 * T, 1.8 * T, P.dark);
+    this.r(g, wx, wy, ww, wh, C.glass, 0.9);
+    this.r(g, wx + PX, wy + PX, ww * 0.35, wh - 2 * PX, C.pale, 0.35);
+    this.logo(g, cx + cw * 0.42, top + 2 * T, 3 * T, P.dark);
+    this.hazard(g, cx, top + T, cw, 3 * PX);
     this.r(g, cx - 2 * PX, top - 1.6 * T, 6 * PX, 1.2 * T, C.ink);   // headlights
     this.r(g, cx - PX, top - 1.4 * T, 3 * PX, 0.8 * T, P.neon);
     this.glow(cx - 20, top - 1 * T, 160, 120, P.neon, 0.4);
@@ -178,12 +184,13 @@ export class MegarigView {
     this.r(g, x0 + 2 * T, top, len - 3 * T, T, P.dark);
     this.hazard(g, x0 + 2 * T, frameTop + T - 4 * PX, len - 3 * T, 4 * PX);
     // cockpit: rounded nose with a glowing window, a front balcony
-    const nx = x0 - 1 * T, ny = top + 1.2 * T, nw = 3.5 * T, nh = frameTop - top - 0.6 * T;
+    const nx = x0 - 1.5 * T, ny = top + 1 * T, nw = front * 0.3, nh = Math.min(frameTop - top - 0.6 * T, h.S * T * 1.4);
     g.fillStyle(col(P.dark)).fillRoundedRect(nx, ny, nw + 2 * T, nh, 40);
     g.fillStyle(col(P.main)).fillRoundedRect(nx + PX, ny + PX, nw + 2 * T, nh - 2 * PX, 36);
-    this.r(g, nx + 2 * PX, ny + 1.2 * T, 2.8 * T, 1.6 * T, C.ink);
-    this.r(g, nx + 3 * PX, ny + 1.2 * T + PX, 2.8 * T - 2 * PX, 1.6 * T - 2 * PX, C.gold, 0.85);
-    this.glow(nx + 1.4 * T, ny + 2 * T, 260, 150, C.gold, 0.4);
+    const cw_ = nw * 0.8, ch_ = nh * 0.32;
+    this.r(g, nx + 2 * PX, ny + nh * 0.18, cw_, ch_, C.ink);
+    this.r(g, nx + 3 * PX, ny + nh * 0.18 + PX, cw_ - 2 * PX, ch_ - 2 * PX, C.gold, 0.85);
+    this.glow(nx + cw_ / 2, ny + nh * 0.18 + ch_ / 2, cw_ * 1.6, ch_ * 2, C.gold, 0.4);
     this.logo(g, x0 + front - 4 * T, top + 2.5 * T, 1.6 * T, P.dark);
     const bx = x0 + len - h.back * T;
     this.r(g, bx + T, top + T, 4 * PX, frameTop - top, C.ink);
@@ -209,14 +216,15 @@ export class MegarigView {
     const T = this.T, g = this.gf, P = this.paint, x = p.x * T, y = p.y * T, w = p.w * T;
     const hullX = this.b.x0 * T + (x < this.b.x0 * T ? 2 * T : (this.b.len - 1) * T);
     const hullTop = (this.b.G - this.b.pieces[0].hullTop) * T, ax = x + w / 2;   // outrigger: an arm to the hull roof plus a strut
-    this.g.lineStyle(0.5 * T, col(C.night)).lineBetween(ax, y + 0.8 * T, hullX, hullTop + T);
+    this.g.lineStyle(0.7 * T, col(C.night)).lineBetween(ax, y + 0.8 * T, hullX, hullTop + T);
     this.g.lineStyle(2 * PX, col(this.paint.dark)).lineBetween(ax, y + 1.4 * T, hullX, hullTop + 2.5 * T);
-    g.fillStyle(col(C.ink)).fillRoundedRect(x, y, w, 1.6 * T, 20);
-    g.fillStyle(col(C.grey)).fillRoundedRect(x + PX, y + PX, w - 2 * PX, 1.6 * T - 2 * PX, 18);
-    this.r(g, x + w * 0.42, y + PX, w * 0.16, 1.6 * T - 2 * PX, P.main);
-    this.r(g, x + 2 * PX, y + 1.6 * T - 3 * PX, w - 4 * PX, 2 * PX, C.night);
-    this.r(g, x + w * 0.2, y + 1.6 * T, w * 0.6, PX, P.neon);
-    this.glow(x + w / 2, y + 2.2 * T, w * 1.1, 1.6 * T, P.neon, 0.55);
+    const rh = Math.max(1.6 * T, w * 0.22);   // #024: housing grows with the rotor
+    g.fillStyle(col(C.ink)).fillRoundedRect(x, y, w, rh, 20);
+    g.fillStyle(col(C.grey)).fillRoundedRect(x + PX, y + PX, w - 2 * PX, rh - 2 * PX, 18);
+    this.r(g, x + w * 0.42, y + PX, w * 0.16, rh - 2 * PX, P.main);
+    this.r(g, x + 2 * PX, y + rh - 3 * PX, w - 4 * PX, 2 * PX, C.night);
+    this.r(g, x + w * 0.2, y + rh, w * 0.6, PX, P.neon);
+    this.glow(x + w / 2, y + rh + 0.6 * T, w * 1.1, rh, P.neon, 0.55);
     this.r(g, x + w / 2 - PX, y - 2 * PX, 2 * PX, 2 * PX, P.light);
     this.blink(x + w / 2, y - PX, P.light);
   }
@@ -261,6 +269,20 @@ export class MegarigView {
       this.glow(lx, y + 0.6 * T, 2.2 * T, 1.4 * T, C.gold, 0.28);
     }
     if (p.name) this.label(x + w / 2, y + 0.5 * T, p.name);
+  }
+
+  // the crawler's bridge (#024): a room as big as a 40-foot container, consoles with screens, the captain's chair
+  bridge(p) {
+    this.room({ ...p, places: 3 });
+    const T = this.T, g = this.gm, P = this.paint, x = p.x * T, w = p.w * T, floor = p.floorRow * T;
+    for (let i = 0; i < 3; i++) {
+      const kx = x + w * (0.12 + i * 0.3), ky = floor - 1.3 * T;
+      this.r(g, kx, ky, 2.4 * T, 1.3 * T, C.ink); this.r(g, kx + PX, ky + PX, 2.4 * T - 2 * PX, 1.3 * T - PX, C.grey);
+      this.r(g, kx + 3 * PX, ky - 1.1 * T, 1.8 * T, 1 * T, C.ink); this.r(g, kx + 4 * PX, ky - 1.1 * T + PX, 1.8 * T - 2 * PX, 1 * T - 2 * PX, i === 1 ? P.neon : C.cyan, 0.8);
+      this.glow(kx + 1.2 * T, ky - 0.6 * T, 3 * T, 2 * T, P.neon, 0.25);
+    }
+    const cx = x + w * 0.5, cy = floor;   // chair
+    this.r(g, cx - 0.4 * T, cy - 1.6 * T, 0.3 * T, 1.2 * T, C.rust); this.r(g, cx - 0.4 * T, cy - 0.6 * T, 0.9 * T, 0.25 * T, C.rust); this.r(g, cx, cy - 0.4 * T, 0.12 * T, 0.4 * T, C.ink);
   }
 
   label(x, y, text) {

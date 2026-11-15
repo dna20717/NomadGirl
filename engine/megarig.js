@@ -28,7 +28,7 @@ export function buildMegarig(data, id, stageIndex = null) {
   const front = num(H0.front, 8), back = num(H0.back, 3), places = mids * segPlaces, len = front + places * P + back;
   const top = Math.max(0, num(stage.top, 1)), stories = inside + top;
   const envelope = kind === 'airship' ? num(H0.envelope, 9) : 0;
-  const margin = 14, sky = 8, groundRows = 3;
+  const margin = 16, sky = 8, groundRows = 3;
   const W = margin * 2 + len, contentH = under + stories * S + envelope + (kind === 'crawler' ? 6 : 0);
   const H = sky + contentH + groundRows, G = H - groundRows, x0 = margin;
   const tiles = Array.from({ length: H }, (_, y) => Array.from({ length: W }, () => (y >= G ? '#' : '.')));
@@ -58,6 +58,8 @@ export function buildMegarig(data, id, stageIndex = null) {
     fill(x0 + 2, rowOf(hullTop) + 1, front - 2, inside * S - 1, '#');   // cab block below the deck
     fill(x0 + 2, rowOf(cabTop), front - 3, 1, '=');   // cab roof
     ladder(x0 + front - 2, rowOf(cabTop), slab(inside) - 1);
+    // the bridge (#024, Daniel: „Fahrerkabine alleine sollte Platz für mindestens einen großen Container haben“): a room behind the nose
+    pieces.push({ type: 'bridge', x: x0 + 5, w: front - 7, y: rowOf(cabTop) + 1, floorRow: slab(inside), name: H0.bridge || 'Kommandobrücke' });
     // the back end and ladders from the ground
     fill(x0 + len - back, rowOf(hullTop) + 1, back, inside * S - 1, '#');
     ladder(x0 + len - 1, slab(inside), G - 1);
@@ -71,10 +73,10 @@ export function buildMegarig(data, id, stageIndex = null) {
     // winch: a rope ladder from the frame to the ground in the middle
     ladder(x0 + front + Math.floor(places * P / 2), slab(0), G - 1);
     // rotor nacelles front and back on outriggers: walkable tops
-    const ry = rowOf(hullTop + 3);
-    fill(x0 - 4, ry, 7, 1, '=');
-    fill(x0 + len - 3, ry, 7, 1, '=');
-    pieces.push({ type: 'rotor', x: x0 - 4, w: 7, y: ry }, { type: 'rotor', x: x0 + len - 3, w: 7, y: ry });
+    const ry = rowOf(hullTop + 4), rw = 11;   // #024: bigger rotors
+    fill(x0 - 7, ry, rw, 1, '=');
+    fill(x0 + len - 4, ry, rw, 1, '=');
+    pieces.push({ type: 'rotor', x: x0 - 7, w: rw, y: ry }, { type: 'rotor', x: x0 + len - 4, w: rw, y: ry });
     // envelope catwalk + ladder up its back
     const cat = rowOf(hullTop + envelope);
     fill(x0 + front, cat, places * P, 1, '=');
@@ -108,8 +110,8 @@ export function buildMegarig(data, id, stageIndex = null) {
     pieces.push({ type: o.shell ? 'container' : 'room', x, w, y: roof + 1, h: S - 1, floorRow: fr, story: o.s, inside: o.insideHull, container: o.container, name: o.name, places: o.n, color: o.color });
     if (o.insideHull) {
       fill(x, roof + 1, w, S - 1, '.', ['H']);   // cut the room out of the hull plating (ladders stay)
-      // hatch: a ladder from the deck above down into the room
-      ladder(x + (o.p % 2 ? w - 2 : 1), roof, fr - 1);
+      // hatch: a shaft from the deck down into the room, through every hull story above it
+      ladder(x + (o.p % 2 ? w - 2 : 1), slab(inside), fr - 1);
     } else {
       fill(x, fr, w, 1, '=', ['#', 'H']);
       fill(x, roof, w, 1, '=', ['#', 'H']);   // the roof: walkable, the floor of the story above

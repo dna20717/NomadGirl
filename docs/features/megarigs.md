@@ -18,6 +18,13 @@ Prototyp zum Begehen unter **/megarig** (`megarig.html?id=lkw|crawler|fatbird&st
 - **Länge wächst mit Mittelstücken:** Bug (`hull.front`) + Mittelstücke × `hull.segPlaces` Plätze + Heck (`hull.back`). Ausbaustufen (`stages`) legen Mittelstücke und Stockwerke obendrauf fest; Module und Anbauteile haben „Ab Stufe“.
 - **Fatbird:** `hull.frame` = die unteren Stockwerke im Rumpf sind ein offener Lastrahmen (Container hängen darin), darüber die geschlossenen Decks, oben die Gashülle (`hull.envelope`) mit Laufsteg; Länge bleibt gleich (voll ist voll), die Stufen füllen nur.
 
+## Größen (#024, Daniel 15.11.2026)
+
+Daniel: „Eine Kette sollte deutlich höher sein als Leyla. Füge beiden eine Etage hinzu. Crawler-Fahrerkabine alleine sollte Platz für mindestens einen großen Container haben. Damit die Rigs nicht zu hoch werden, gerne länger machen.“ Der Truck passt.
+
+- **Crawler:** Ketten 6 Kacheln hoch (doppelt so hoch wie Leyla) mit großen Laufrollen und Stützrollen; **2 Etagen im Rumpf** (Räume mit Luken-Schacht bis zum Deck); Bug 24 Kacheln mit der **Kommandobrücke** (Raum so breit wie ein 40-Fuß-Container: Konsolen, Kapitänsstuhl, Frontscheibe); 3/4/5 Mittelstücke (6/8/10 Plätze), 1/2/3 Stockwerke obendrauf.
+- **Fatbird:** Schwebehöhe 6, Lastrahmen + **2 Decks**, Gashülle 13 Kacheln, Rotoren 11 Kacheln breit, größeres Cockpit, 8 Plätze.
+
 ## Wege und Erreichbarkeit
 
 - `engine/megarig.js` › `buildMegarig(data, id, stage)` baut ein Raum-Layout (Legende aus `engine/room.js`): Böden der Module sind Plattformen, Decks fest, Leitern automatisch (Stapel: an einem Ende abwechselnd links/rechts, nur wenn darunter etwas steht; Räume: Luke; vom Boden: Bug und Heck, Fatbird: Seilwinde in der Mitte).
