@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 15.11. Code → Ava: #027 Mega-Rigs aufräumen (Querschnitt, Laufwege, feinere Grafik, LKW mit Container-Anhängern) läuft.
 - 15.11. Code → Ava: #026 fertig: Crawler und Fatbird aus PixelLab-Kachel-Sets (85 Generierungen, übrig 589), Räume als Schnittzeichnung, Gashülle als Pixel-Art aus Code.
 - 15.11. Code → Ava: #026 Kachel-Sets für Crawler und Fatbird läuft (PixelLab max. 100, von Daniel freigegeben).
 - 15.11. Code → Ava: #025 fertig: Schwarzes Brett am Van, Dialog-Kasten ohne Porträts, Quest-Zettel über den Köpfen, Armadillo Heavy Industries am Crawler, Gangs englisch. PixelLab 0, übrig 674. Idee für später: Werkbank „Aufträge gegen bessere Belohnungen“ (Name offen).
@@ -479,6 +480,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - Pixelgröße → ⚠️ Teile leicht unterschiedlich groß skaliert (Bug ≈ 5,9, Mitte 4, Heck 7), damit Kontur und Raster passen; scharf skaliert.
   - Kabinendach → ⚠️ beginnt hinter der schrägen Nase (`hull.cabInset` 8), Laufsteg über dem schrägen Heck.
 - **Ergebnis:** 8 Teile in `assets/vehicles/megarig/` (+ `source/`), Bereich Mega-Rigs › Kachel-Set, `crawlerSkin`/`airshipSkin`/`envelopePixels`/`cover` in `megarig_view.js`, `tools/megarig_tiles.py`. Tests: `npm test` 145, alle 34 Browser-Tests grün (`megarig_test` 14, `salvage_test` 7), `ng check` stimmig. PixelLab: diesmal 85, übrig 589 (unter 700). **Bitte testen:** /megarig Crawler und Fatbird in allen Stufen, „Übersicht“, in die Kommandobrücke und die Rumpf-Räume klettern (Haut blendet aus), am Heck aufs Deck; im Camp das Crawler-Wrack.
+
+### #027 Mega-Rigs aufräumen: Querschnitt, Laufwege, feinere Grafik, LKW mit Container-Anhängern
+- **Status:** läuft (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Für:** Code
+- **Lesen:** docs/features/megarigs.md
+- **Auftrag:** Daniel: „Passe bitte die Räume und die Kacheln so an, dass es weniger Durcheinander wirkt. Außerdem müssen die Laufwege besser sichtbar und für den Spieler lesbar sein. Wichtig ist zunächst, dass die Fahrzeuge im Querschnitt gut aussehen, die Favela-Container-Städte bauen wir dann im zweiten Step. Ein paar der Grafiken sind sehr grob. Bitte ein wenig optimieren. Der LKW soll mit den normalen Container-Anhängern funktionieren. Da braucht es keine gesonderte Auflieger-Grafik.“ Entscheidungen: Räume bleiben zu und öffnen beim Betreten; Grafik per Code, PixelLab nur wenn es absolut nicht anders geht.
+- **Fertig, wenn:** ruhigerer Rumpf, Laufwege auf einen Blick erkennbar, keine groben Riesenpixel, LKW zieht Container-Anhänger wie der Van, Tests grün.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ## Archiv
 
