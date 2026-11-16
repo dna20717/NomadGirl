@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Code → Ava: #043 Dunkelheit wie The Looter fertig (ungesehen schwarz, besucht halbdunkel, schwarze Masse mit ausgefranstem Rand, Vordergrund-Silhouetten, Raumname). Tests grün, PixelLab 0.
 - 16.11. Code → Ava: #043 Dunkelheit wie The Looter läuft (Daniels Auftrag im Code-Chat).
 - 16.11. Code → Ava: #041 Camp-Lager (ein Raster aus Kofferraum + Regalen, Speziallager eigen, Kiste + Deichselkästen weg, „Alles einlagern“ in der Beute-Bilanz, Filter, Sortieren) und #042 Container-Tileset (PixelLab 34, übrig 430) fertig. Tests 181/181, Browser 38/38. ⚠️ siehe Tickets; offen: Fahrgestell + Camp-Boden neu malen (C18).
 - 16.11. Code → Ava: #041 Camp-Lager zusammengelegt läuft (Daniels Auftrag im Code-Chat), danach #042 Container-Tileset neu (PixelLab, von Daniel freigegeben).
@@ -672,11 +673,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit siehe Funkspruch. Tileset `container_tiles.png`, Werkzeug `tools/container_tiles.py`, alte Fassungen als `…_v1`. Tests grün (container_test prüft ×2). PixelLab diesmal 34 (Create Image Pro 25 + Edit Pro Flash 9), übrig 430. **Bitte testen:** Camp ansehen, Container auf/zu, Werkstätten darin (Hydrokultur, Cryo-Tank).
 
 ### #043 Dunkelheit wie The Looter
-- **Status:** läuft · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/pois.md › Nebel des Unbekannten, Licht & Atmosphäre
 - **Auftrag (Daniel, 16.11.2026, Screenshot aus The Looter):** „Ich mag, wie sie mit nicht sichtbaren Bereichen umgehen. Das gibt dem Ganzen mehr Enge und Dichte.“ Antworten: **Ungesehen schwarz, Areale außerhalb des sichtbaren Bereichs auch schwarz, bereits besucht halb transparent aber auch wieder dunkel; besonders die Kacheln außerhalb des beeinflussbaren Bereichs**; Wände/Fels = **schwarze Masse** (nur die Kante zum Raum mit Textur); Rand **ausgefranst**; dazu **Vordergrund-Silhouetten** und **Raumname einblenden**.
 - **Fertig, wenn:** alles einstellbar (Spiel › Nebel), Tests grün, Build grün auf `main`.
-- **Rückfragen:**
-- **Ergebnis:**
-
+- **Rückfragen:** (Code) ⚠️ vorläufig: Werte Besucht 60 %, Kante 45 %, Masse ab 2 Kacheln, Ausfransen 70 %; die Erde unter der Straße draußen gehört zum Tunnel-Gelände und wird deshalb auch schwarze Masse (sieht nach Looter aus, sonst Masse nur in Innenräumen); Raumname nur beim ersten Betreten; Silhouetten auf jeder Bodenstrecke innen, Parallaxe nur waagrecht.
+- **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 181/181, Browser 38/38 (poi_test prüft Dunkelheit, Raumname, Silhouetten). PixelLab 0. **Bitte testen:** einen POI laufen: Räume aus der Dunkelheit geschnitten, ausgefranster Rand, Besuchtes halbdunkel, schwarze Schutt-Silhouetten vorn, Raumname beim ersten Betreten; Werte in Spiel › Nebel / Vordergrund / Raumname.

@@ -997,3 +997,10 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 @media (max-width: 900px) { .mb-body { grid-template-columns: 1fr; } }
 .mb-slot.syn { box-shadow: inset 0 0 0 1px #7ff6ff; color: #e3fffd; }
 .build-sub { display: flex; align-items: center; gap: 6px; margin: 8px 2px 2px; color: #ffd27a; font: 18px VT323, monospace; }
+
+/* room name over the scene (#043, like The Looter) */
+.room-title { position: absolute; left: 0; right: 0; top: 24%; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 26px 0 22px; pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(6, 5, 8, .78) 30%, rgba(6, 5, 8, .78) 70%, transparent); opacity: 0; transform: translateY(-6px); transition: opacity .6s, transform .6s; z-index: 5; }
+.room-title.on { opacity: 1; transform: none; }
+.room-title b { font: 54px/1 VT323, monospace; font-weight: normal; color: #efe6f4; letter-spacing: .04em; text-shadow: 0 2px 0 #060508; }
+.room-title i { display: block; width: min(380px, 60vw); height: 2px; background: linear-gradient(90deg, transparent, #b0407a, transparent); }

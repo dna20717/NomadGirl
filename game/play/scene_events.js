@@ -169,7 +169,13 @@ export class SceneEvents {
     if (LI?.def) {
       const tx = l.x / this.T, ty = l.feet / this.T - 0.5, here = LI.rooms.find(r => tx >= r.x && tx < r.x + r.w && ty >= r.y && ty < r.y + r.h);
       const name = here ? this.data_.rooms?.[here.id]?.name || here.id : 'Abkürzung';
-      if (name !== this.roomName) { this.roomName = name; this.hud.room(`${LI.def.name} · ${name}`, this.enemies.length); }
+      if (name !== this.roomName) {
+        this.roomName = name; this.hud.room(`${LI.def.name} · ${name}`, this.enemies.length);
+        // #043 (Daniel: „Raumname einblenden“, like The Looter): the first time she enters a room its name stands over the scene
+        const RT = this.data_.game?.roomTitle || {}, seen = this.titled ??= new Set();
+        if (here && RT.enabled !== false && !seen.has(here.id) && this.elapsed > 400) { seen.add(here.id); this.hud.roomTitle?.(name, RT.ms ?? 2600); }
+        else if (here) seen.add(here.id);
+      }
     }
     const thing = !near && l.alive ? this.level?.nearest() : null;
     const pile = !near && !thing && this.loot?.nearest();

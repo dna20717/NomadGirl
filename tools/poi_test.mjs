@@ -64,7 +64,7 @@ check('Brüchige Wand: zählt als Secret', s.lv.secrets === 1 && s.lv.secretsMax
 check('Getarnte brüchige Wand: sieht aus wie Wand, verschwindet beim Brechen', s.lv.walls[0].kind === '$' && s.camo, s);
 await shot('secret');
 
-// fog of war (Daniel, 11.11.2026): indoors only, over air Leyla can reach; dense behind secrets; a fake wall fades when she walks in
+// darkness (#043, before: fog of war 11.11.2026): indoors only, over air Leyla can reach; unseen black, behind secrets too; a fake wall fades when she walks in
 s = await ev(() => {
   const sc = game.scene.getScene('play'), F = sc.fog, lv = nomad.state().level, f = lv.fakes[0], c = sc.camo.find(c => c.kind === '%');
   const tun = L.shortcut.up, deep = c.secret.find(([x]) => x > f.x0 + 1) || c.secret[0];
@@ -74,9 +74,11 @@ s = await ev(() => {
   nomad.step(40, ['right']); nomad.step(40);
   const lv2 = nomad.state().level;
   out.found = lv2.fakes[0].found; out.alpha = lv2.fakes[0].alpha; out.secrets = lv2.secrets; out.secretAfter = F.at((deep[0] + 0.5) * T, (deep[1] + 0.5) * T); out.inRoom = nomad.state().leyla.x > (f.x1 - 0.2) * T;
+  out.titles = [...(sc.titled || [])]; out.titleEl = document.querySelector('.room-title b')?.textContent || null; out.fg = sc.foreground?.length || 0;
   return out;
 });
-check('Nebel: draußen klar, im Tunnel Dunst, hinter dem Secret dicht', s.on && s.outdoor === 0 && s.tunnel >= 0.7 && s.tunnel <= 0.9 && s.secret >= 0.95, s);
+check('Dunkelheit: draußen klar, ungesehener Tunnel schwarz, hinter dem Secret schwarz (#043)', s.on && s.outdoor === 0 && s.tunnel >= 0.95 && s.secret >= 0.95, s);
+check('Raumname beim ersten Betreten (#043) und Silhouetten im Vordergrund', s.titles.length >= 2 && !!s.titleEl && s.fg > 0, { titles: s.titles, el: s.titleEl, fg: s.fg });
 check('Scheinwand: sieht aus wie Wand und deckt den Raum dahinter ab', s.coverBefore === 1 && s.stillHidden >= 0.95, s);
 check('Scheinwand: Leyla läuft hindurch, die Wand blendet aus, zählt als Secret', s.found && s.alpha === 0 && s.secrets === 2 && s.inRoom, s);
 check('Nebel: der geheime Raum klart auf, wenn sie drin ist', s.secretAfter === 0, s);

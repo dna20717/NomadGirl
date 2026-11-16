@@ -11,6 +11,7 @@ import { MegarigView } from './megarig_view.js';
 import { PoiLevel } from './poi_level.js';
 import { Pad, PAD_ACTIONS } from './pad.js';
 import { Fog } from './fog.js';
+import { placeForeground } from './foreground.js';
 import { makeTextures, drawBackground, drawRoom, terrainKits, PLACEHOLDER_COLORS } from './art.js';
 import { Leyla } from './leyla.js';
 import { Enemy } from './enemies.js';
@@ -356,10 +357,11 @@ export class PlayScene extends Phaser.Scene {
     this.camo = drawn?.camo || [];
     this.level = this.mode !== 'camp' && (this.levelInfo?.def || ['C', 'S', 'D', 'B', 'Z', '%', '$'].some(k => M[k]?.length)) ? new PoiLevel(this, run?.poi || null) : null;
     this.props = drawn?.props || [];
-    this.fog = new Fog(this);   // soft fog of war indoors (Spiel › Nebel)
+    this.fog = new Fog(this);   // darkness like The Looter indoors (#043, Spiel › Nebel)
 
     const cam = this.cam, C = this.data_.game?.camera || {};
     cam.setZoom(C.zoom || 1);
+    this.foreground = placeForeground(this);   // black silhouettes in front of the floors indoors (#043, Spiel › Vordergrund)
     // room lower than the view (zoomed out): floor stays at the bottom edge, sky above
     const viewH = this.scale.height / (C.zoom || 1);
     cam.setBounds(0, Math.min(0, H - viewH), W, Math.max(H, viewH));

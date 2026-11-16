@@ -285,6 +285,15 @@ export class Hud {
   menuState() { return this.modal ? { title: this.menuTitle, items: this.menuItems.map(i => ({ label: i.label, sub: i.sub || '', disabled: i.disabled || null })) } : null; }
   toggleHelp(on = !this.paused) { this.paused = on; this.help.hidden = !on; }
   room(name, count) { this.roomName.textContent = name; this.total = count; }
+  // a room's name over the scene (#043, like The Looter): a dark band across the screen, the name, a thin line; fades in and out
+  roomTitle(name, ms = 2600) {
+    this.titleEl?.remove();
+    const t = this.titleEl = el('div', { class: 'room-title' }, el('b', {}, name), el('i'));
+    this.root.append(t);
+    requestAnimationFrame(() => t.classList.add('on'));
+    clearTimeout(this.titleTimer);
+    this.titleTimer = setTimeout(() => { t.classList.remove('on'); setTimeout(() => t.remove(), 700); }, ms);
+  }
   // banners go by themselves after ms (default 3.5 s; 0 = stays until the next banner or ✕). Before, a banner stayed until
   // the next one replaced it, so „Wieder auf den Beinen“ never left (Daniel, 12.11.2026)
   // Since #014 (Daniel, 13.11.2026: „Toast und Sound, aber stell sicher, dass alle diese Hinweise auf diese Art dargestellt
