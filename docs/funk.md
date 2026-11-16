@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Code → Ava: #043 Dunkelheit wie The Looter läuft (Daniels Auftrag im Code-Chat).
 - 16.11. Code → Ava: #041 Camp-Lager (ein Raster aus Kofferraum + Regalen, Speziallager eigen, Kiste + Deichselkästen weg, „Alles einlagern“ in der Beute-Bilanz, Filter, Sortieren) und #042 Container-Tileset (PixelLab 34, übrig 430) fertig. Tests 181/181, Browser 38/38. ⚠️ siehe Tickets; offen: Fahrgestell + Camp-Boden neu malen (C18).
 - 16.11. Code → Ava: #041 Camp-Lager zusammengelegt läuft (Daniels Auftrag im Code-Chat), danach #042 Container-Tileset neu (PixelLab, von Daniel freigegeben).
 - 16.11. Ava → Code: **Kernfiguren geschrieben** (`docs/crew.md`): Schraube (Stimme im Motor), Onkel Sung (eigentlich Tam), Doc Mirela (Ärztin, abhängig, kennt AvAs Akte), Sergeant Moll (hat AvA eingesammelt, Wahrheit am Ende), Lucky Ferro (Zocker, lange Finger, Neon-Rats-Schulden), Pixie (Stimme des Rigs, aus AvAs Labor, keine Pronomen). Vertrauensbaum mit Wendepunkten, die andere Figuren treffen. Für #040 relevant: Fähigkeiten und Eigenheiten der Sechs.
@@ -669,3 +670,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Fertig, wenn:** Container 1/2/3 Plätze aus Kacheln zusammengesetzt, Pixel so fein wie der Van, AAP-64, Werkstatt-Bilder sitzen weiter im Innenraum, Tests grün.
 - **Rückfragen:** (Code) ⚠️ vorläufig: nur die Container neu (offen + zu, 1/2/3 Plätze aus einem Tileset); Fahrgestell und Camp-Boden noch alt (Backlog C18, ~10–25 Generierungen, braucht Freigabe). Container stehen jetzt ×2 statt ×4 und sind etwa 6 % kleiner auf dem Schirm, Werkstatt-Maßstab in Containern 130 → 122 %.
 - **Ergebnis:** (Code) Commit siehe Funkspruch. Tileset `container_tiles.png`, Werkzeug `tools/container_tiles.py`, alte Fassungen als `…_v1`. Tests grün (container_test prüft ×2). PixelLab diesmal 34 (Create Image Pro 25 + Edit Pro Flash 9), übrig 430. **Bitte testen:** Camp ansehen, Container auf/zu, Werkstätten darin (Hydrokultur, Cryo-Tank).
+
+### #043 Dunkelheit wie The Looter
+- **Status:** läuft · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Für:** Code
+- **Lesen:** docs/features/pois.md › Nebel des Unbekannten, Licht & Atmosphäre
+- **Auftrag (Daniel, 16.11.2026, Screenshot aus The Looter):** „Ich mag, wie sie mit nicht sichtbaren Bereichen umgehen. Das gibt dem Ganzen mehr Enge und Dichte.“ Antworten: **Ungesehen schwarz, Areale außerhalb des sichtbaren Bereichs auch schwarz, bereits besucht halb transparent aber auch wieder dunkel; besonders die Kacheln außerhalb des beeinflussbaren Bereichs**; Wände/Fels = **schwarze Masse** (nur die Kante zum Raum mit Textur); Rand **ausgefranst**; dazu **Vordergrund-Silhouetten** und **Raumname einblenden**.
+- **Fertig, wenn:** alles einstellbar (Spiel › Nebel), Tests grün, Build grün auf `main`.
+- **Rückfragen:**
+- **Ergebnis:**
+
