@@ -23,7 +23,7 @@ Stand: 12.11.2026 abends (Durchsicht von Ava). Kleinigkeiten sind schon behoben 
 - **Zugmaschine tauschen** im Bau-Modus fehlt (Van ↔ LKW).
 - **Gegner:** Boss-Verhalten Hausmeister. (Gruppen-Alarm erledigt #039.) (Grafiken: erledigt mit dem Raider-Bausatz #004/#015, 13 von 15 Gegnern; `rattenschwarm` und `wachdrohne` sind noch aus Code und gesperrt, bräuchten einen eigenen Bausatz für Tiere/Drohnen.)
 - **Companions** sind noch Figuren aus Code ohne Aussehen.
-- **AvA:** Akku aus einem Drohnenteil (Kern), Tastatur-Steuerung für das Gummiband (heute nur rechter Stick), wie man Anbauteile freischaltet.
+- **AvA:** Akku aus einem Drohnenteil (Kern), wie man Anbauteile freischaltet. (Keine Tastatur-Steuerung fürs Gummiband: Daniel 16.11.2026, primäre Eingabe ist der Controller.)
 - **Kachel-Sets:** Vorschau eines Sets in der Werkstatt, großer Clutter für Wüste und Ruine.
 - **Licht:** Lichtstrahlen (God Rays), Schatten/Verdeckung, Stromausfall-Event per Schalter.
 - **Waffen:** Gewehr in Kletter-/Sprung-Animationen malen (statt Bild auf dem Rücken), weitere Langwaffen per „Posen von“.
