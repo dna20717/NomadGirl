@@ -99,12 +99,13 @@ function newInventory(D, save) {
   return inv;
 }
 
-export function newSave(D) {
-  return withMap(D, newSaveCore(D));
+// handed: what Spiel › Start › Nachreichen already gave (a new Durchgang keeps it, Daniel 16.11.2026: „A“, only once per savegame)
+export function newSave(D, handed = []) {
+  return withMap(D, newSaveCore(D, handed));
 }
 // the travel map (#007): rolled for every new game and every Durchgang (game/worldmap.js)
 function withMap(D, s) { ensureMap(D, s); return s; }
-function newSaveCore(D) {
+function newSaveCore(D, handed = []) {
   const S = D.game?.start || {}, C = D.camp?.clock || {};
   const { units, left } = placeWorkshops(D, S.tractor, S.containers || [], S.workshops || []);
   const spare = [...(S.spare || []), ...left].filter(id => D.workshops?.[id]);   // packed on the scrapyard: Spiel › Start › Verpackt auf dem Schrottplatz, plus what did not fit
@@ -120,12 +121,13 @@ function newSaveCore(D) {
     recipes: startRecipes(D),
     run: null,
     log: [],
+    handedOut: [...handed],
   }));
 }
 // a new Durchgang (design.md › Progression: „War alles nur ein Traum?“): AvA is dead, Leyla wakes up at the fire.
 // What stays: the tech tree nodes (and the recipes they unlock), the count of Durchgänge. Everything else starts small.
 export function newCycle(D, old) {
-  const s = newSave(D);
+  const s = newSave(D, old.handedOut || []);
   s.nodes = [...(old.nodes || [])].filter(id => D.techtree?.[id]);
   s.cycle = (old.cycle || 1) + 1;
   s.map = null; ensureMap(D, s);   // a new Durchgang, a new map

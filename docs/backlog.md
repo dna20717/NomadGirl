@@ -52,7 +52,7 @@ Stand: 12.11.2026 abends (Durchsicht von Ava). Kleinigkeiten sind schon behoben 
 | C14 | Kleinigkeiten Deko/Synergie | Wand- und Dach-Deko teilen sich die Plätze eines Containers; Dach-Deko bleibt, wenn etwas daraufgestapelt wird (steckt dann im oberen Container); Synergie-Nachbarn für Stapel ab Höhe 3 (heute max. 2). | klein |
 | C15 | Mega-Rig Kleinigkeiten | Lichterketten des Camps verschwinden beim Einsteigen ohne Δ zurück (an Bord eigene Ketten); `megaSpot` (camp_mega.js) dupliziert `workshopHotspot` (camp.js) mit leicht anderem Verhalten. | klein |
 | C16 | Toter Spielstand | `save.log`, `save.dreams`, `save.base`, `tank.diedOn`, `run.location` werden geschrieben, aber (außer in Tests) nie gelesen. Harmlos; `dreams`/`base` sind für später gedacht. | – |
-| C17 | Neuer Durchgang | Mega-Rig-Ausbaustufen beginnen neu, nur das Rig selbst bleibt (Daniel 16.11.2026: „nein, nur das Rig selbst“, so gebaut). Offen: `handedOut` (Nachreichen) wird zurückgesetzt, Nachreich-Gegenstände kommen jeden Durchgang neu. | – |
+| C17 | ~~Neuer Durchgang~~ | erledigt 16.11.2026: Mega-Rig-Ausbaustufen beginnen neu, nur das Rig bleibt (Daniel: „nur das Rig selbst“); Nachreichen gibt es nur einmal pro Spielstand, auch über Durchgänge hinweg (Daniel: „A“, `newSave(D, handed)`). | – |
 
 
 ## Erledigt bei der Durchsicht (16.11.2026, Daniel: „keine unsichtbaren technischen Schulden … nichts kaputt machen“)

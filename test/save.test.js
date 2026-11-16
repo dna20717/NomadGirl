@@ -113,3 +113,17 @@ test('Deichselkästen sind weg: alter Inhalt wandert in die Kiste, das Raster ve
   assert.ok(r.inv.grids.chest.items.some(e => e.id === 'schrott' && e.n === 2));
   assert.ok(r.inv.grids['rig:0'], 'Kofferraum bleibt');
 });
+
+// Daniel 16.11.2026 („A“): Spiel › Start › Nachreichen gives a thing once per savegame, a new Durchgang does not give it again
+test('Nachreichen: einmal pro Spielstand, auch über einen neuen Durchgang hinweg', async () => {
+  const { newCycle } = await import('../game/save.js');
+  const w = 'schrott', D2 = { ...D, game: { ...D.game, start: { ...D.game.start, later: [{ where: 'chest', item: w, count: 1 }] } } };
+  const s = newSave(D2);
+  assert.ok(s.handedOut.includes(`items:${w}`));
+  const has = x => x.inv.grids.chest.items.filter(e => e.id === w).reduce((n, e) => n + e.n, 0);
+  const n0 = has(newSave(D));
+  assert.equal(has(s), n0 + 1);
+  const c = newCycle(D2, s);
+  assert.equal(has(c), n0, 'im neuen Durchgang nicht noch einmal');
+  assert.ok(c.handedOut.includes(`items:${w}`));
+});
