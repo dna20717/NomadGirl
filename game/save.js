@@ -10,7 +10,9 @@
 
 import { keepThrough } from './achievements.js';
 import { ensureMap } from './worldmap.js';
-import { settle as settleMega, fixLights as fixMegaLights } from './mega.js';
+import { settle as settleMega, fixLights as fixMegaLights, deactivate as deactivateMega } from './mega.js';
+import { compact as compactDecor } from './decor.js';
+import { rehome, removeUnits } from './reindex.js';
 import { ensureTank } from './tank.js';
 import { newGrid, add, fits, startWear, wearOf, WEAR_KEYS, addEntry, untangle } from './inventory.js';
 
@@ -230,18 +232,6 @@ function refit(D, s) {
     rehome(D, s, g);
   }
 }
-// the contents of a grid that is gone: into the chest, the Kofferraum, and what is left lies as a bundle next to the van
-function rehome(D, s, g) {
-  const grids = s.inv?.grids || {};
-  let rest = g.items.map(e => ({ ...e }));
-  for (const key of ['chest', 'rig:0']) if (grids[key]) rest = rest.map(e => ({ ...e, n: addEntry(D, grids[key], e, e.n) })).filter(e => e.n > 0);
-  if (rest.length) {
-    const pile = { x: null, feet: null, grid: newGrid(Math.max(4, g.w), Math.max(3, g.h)) };
-    // the bundle grows until everything is in (#019: it used to drop what did not fit)
-    for (const e of rest) { let left = e.n, guard = 0; while ((left = addEntry(D, pile.grid, e, left)) > 0 && guard++ < 40) pile.grid.h += 3; }
-    ((s.ground ??= {})[s.location] ??= []).push(pile);
-  }
-}
 // Deichselkästen und Staufächer are gone (Daniel, 12.11.2026, design.md › Ausbaustufe Progression): only the tractor keeps its own storage;
 // what an older savegame kept in a trailer's box moves into the chest (then the Kofferraum, then a bundle by the van)
 function dropStorage(D, s) {
@@ -262,22 +252,26 @@ export function repairSave(save, D) {
   const s = { ...fresh, ...save };
   if (!D.locations?.[s.location] && !s.map?.nodes?.some(n => n.id === s.location)) s.location = fresh.location;
   ensureMap(D, s);   // older savegames get their map here (#007)
-  if (!D.tractors?.[s.rig?.tractor]) s.rig = fresh.rig;
+  // a tractor that no longer exists: only the tractor is replaced, the containers, workshops and storages stay (Aufräumen 16.11.)
+  if (!s.rig?.units?.length) s.rig = fresh.rig;
+  else if (!D.tractors?.[s.rig.tractor]) { s.rig.tractor = fresh.rig.tractor; const t = s.rig.units.find(u => u.kind === 'tractor'); if (t) t.id = fresh.rig.tractor; }
   // retired containers (Modul-Anhänger, Daniel 13.11.2026) become their replacement, with the same workshops
   for (const u of s.rig.units) { const c = D.containers?.[u.id]; if (u.kind === 'container' && c?.retired && D.containers?.[c.replacedBy]) u.id = c.replacedBy; }
   if (s.rig.spare?.containers) s.rig.spare.containers = s.rig.spare.containers.map(id => D.containers?.[id]?.retired && D.containers?.[D.containers[id].replacedBy] ? D.containers[id].replacedBy : id);
-  s.rig.units = s.rig.units.filter(u => u.kind === 'tractor' || D.containers?.[u.id]);
-  for (const u of s.rig.units) u.workshops = (u.workshops || []).filter(w => D.workshops?.[w.id]);
+  // containers that no longer exist leave the rig; everything keyed by unit index moves along, their storages are rehomed (Aufräumen 16.11.)
+  removeUnits(D, s, s.rig.units.map((u, i) => (u.kind === 'tractor' || D.containers?.[u.id] ? -1 : i)).filter(i => i >= 0));
+  // workshops that no longer exist: what lay in their storage is rehomed instead of being lost
+  s.rig.units.forEach((u, ui) => { u.workshops = (u.workshops || []).filter(w => { if (D.workshops?.[w.id]) return true; for (const k of Object.keys(s.inv?.grids || {})) if (k === `store:${ui}:${w.at}` || k.startsWith(`store:${ui}:${w.at}:s`)) { const g = s.inv.grids[k]; delete s.inv.grids[k]; if (g?.items?.length) rehome(D, s, g); } return false; }); });
   refit(D, s);
   dropStorage(D, s);
   // stacks stay whole: a level is at most one above the unit before it, nothing stands on the tractor
   s.rig.units.forEach((u, i) => { const prev = s.rig.units[i - 1]; if (!u.level) { delete u.slot; return; } const max = !prev || prev.kind === 'tractor' ? 0 : (prev.level || 0) + 1; if (u.level > max) u.level = max; if (!u.level) { delete u.level; delete u.slot; } });   // a slot only counts on a stack
   const sp = s.rig.spare || {};
   s.rig.spare = { workshops: (sp.workshops || []).filter(w => D.workshops?.[w]), containers: (sp.containers || []).filter(c => D.containers?.[c]), parts: (sp.parts || []).filter(c => D.rigParts?.[c]), decor: (sp.decor || []).filter(c => D.decor?.[c]) };
-  if (s.rig.decor) s.rig.decor = s.rig.decor.filter(x => D.decor?.[x.id] && x.at && (x.at.ui == null || s.rig.units[x.at.ui]));   // #036
+  if (s.rig.decor) { compactDecor(s.rig, x => !D.decor?.[x.id] || !x.at); compactDecor(s.rig, x => x.at.ui != null && !s.rig.units[x.at.ui], { spare: true }); }   // #036, anchors stay right (Aufräumen 16.11.)
   // a mega rig (#029): every container on a free cell of its grid, the rest into the Lager; strings only between units that are there
   if (s.mega?.active && D.megarigs?.[s.mega.active] && D.tractors?.[s.rig.tractor]?.megarig) { settleMega(D, s); fixMegaLights(s); }
-  else if (s.mega?.active) s.mega.active = null;
+  else if (s.mega?.active) { if (D.tractors?.[s.mega.bay?.tractor]) deactivateMega(D, s); else s.mega.active = null; }   // the link broke in the data: back into the old rig from the bay (Aufräumen 16.11.)
   // rig parts were things in the inventory for a morning (08.11.2026): they move onto the scrapyard
   for (const g of Object.values(save.inv?.grids || {})) for (const e of [...(g.items || [])]) if (e.a === 'rigParts') { g.items.splice(g.items.indexOf(e), 1); if (D.rigParts?.[e.id]) for (let k = 0; k < (e.n || 1); k++) s.rig.spare.parts.push(e.id); }
   s.rig.parts = Object.fromEntries(Object.entries(s.rig.parts || {}).map(([k, l]) => [k, (l || []).map(id => D.rigParts?.[id]?.slot === k ? id : null)]));

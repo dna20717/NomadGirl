@@ -1008,7 +1008,7 @@ export const AREAS = {
         num('hull.under', 'Unter dem ersten Stockwerk', { unit: 'Kacheln', min: 1, hint: 'LKW: Höhe der Ladefläche, Crawler: Höhe der Ketten, Fatbird: Schwebehöhe' }),
         num('hull.inside', 'Stockwerke im Rumpf', { min: 0, hint: 'So viele Stockwerke liegen im Rumpf (Räume = Container ohne Außenhaut), alles darüber wird obendrauf gebaut' }),
         num('hull.frame', 'Davon offener Lastrahmen', { min: 0, hint: 'Fatbird: die unteren Stockwerke im Rumpf sind ein offener Rahmen, in dem Container hängen' }),
-        num('hull.front', 'Bug', { unit: 'Kacheln', min: 2, hint: 'Kabine/Cockpit vor dem ersten Platz' }), num('hull.back', 'Heck', { unit: 'Kacheln', min: 1 }),
+        text('hull.bridge', 'Name der Brücke', { hint: 'Crawler: der Raum vorne im Rumpf. Leer = Kommandobrücke' }), num('hull.front', 'Bug', { unit: 'Kacheln', min: 2, hint: 'Kabine/Cockpit vor dem ersten Platz' }), num('hull.back', 'Heck', { unit: 'Kacheln', min: 1 }),
         num('hull.cabInset', 'Kabinendach ab', { unit: 'Kacheln', min: 2, hint: 'Crawler: das begehbare Kabinendach beginnt so weit hinter der Spitze (hinter der schrägen Nase des Bilds)' }),
         num('hull.segPlaces', 'Plätze je Mittelstück', { min: 1, hint: 'Das wiederholbare Segment: so viele Plätze kommen je Mittelstück dazu' }),
         num('hull.envelope', 'Gashülle', { unit: 'Kacheln', min: 0, hint: 'Nur Fatbird: Höhe der Hülle über dem Rumpf, oben ein Laufsteg' })] },
@@ -1077,6 +1077,12 @@ export const AREAS = {
       { title: 'Aussehen', fields: [size('size', 'Größe', { unit: 'Kacheln', hint: 'Breite × Höhe; bei Zelt und Segel: Höhe = wie tief es hängt' }), color('color', 'Farbe'), text('colors', 'Farben', { hint: 'Mehrere mit Komma (Wäsche, Streifen)' }),
         text('text', 'Text', { hint: 'Neon, Banner, Graffiti; mehrere mit | (zufällig je Ort)' }), ref('addon', 'Ausschnitt von', 'rigAddons', { hint: 'Art „Ausschnitt“: das Bild dieses Anbauteils' }),
         refs('items', 'Fundstücke', 'items', { hint: 'Art „Kiste mit Fundstücken“: diese Symbole' }), num('growDays', 'Wächst in Tagen', { min: 1, hint: 'Pflanze: Tage je Stufe' })] }],
+    // art and place must go together, else the camp cannot draw or anchor it (Aufräumen 16.11.2026)
+    check: (x, report) => {
+      const need = { pole: ['ground'], tower: ['ground'], balcony: ['side'], bridge: ['span'], tent: ['span'], sail: ['span'], line: ['span'], hammock: ['span'], pennants: ['span'], canopy: ['span'] }[x.art];
+      if (need && !need.includes(x.place)) report('error', `Art „${label(DECOR_ARTS, x.art)}“ geht nur ${need.map(p => label(DECOR_PLACES, p)).join(' / ')}`);
+      if (x.place === 'span' && need == null && x.art) report('warning', `Art „${label(DECOR_ARTS, x.art)}“ hängt nicht zwischen zwei Punkten`);
+    },
   },
   companions: {
     name: 'Companions', singular: 'Companion', icon: 'humans', file: 'data/companions.json', kind: 'catalog',

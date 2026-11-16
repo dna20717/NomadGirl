@@ -9,6 +9,9 @@
 // Module number = unit index (units[0] is the tractor), so string lights point at units.
 import { buildMegarig } from '../engine/megarig.js';
 import { swapTractor } from './save.js';
+import { removeUnits, reindexUnits, rehome } from './reindex.js';
+import { containers as storeList } from './save.js';
+import { addEntry, newGrid } from './inventory.js';
 
 const clone = x => JSON.parse(JSON.stringify(x));
 const num = (v, d) => (Number.isFinite(Number(v)) ? Number(v) : d);
@@ -17,7 +20,6 @@ export const mstate = save => { const m = (save.mega ??= {}); m.stage ??= {}; m.
 // the mega rig the player lives in right now (or null: the normal rig)
 export const activeMega = (D, save) => { const id = save?.mega?.active; return id && D.megarigs?.[id] ? id : null; };
 export const owned = save => save?.megarigs || [];
-export const megaOfTractor = (D, tractor) => D.tractors?.[tractor]?.megarig || null;
 export const stageOf = (D, save, id = activeMega(D, save)) => Math.max(0, Math.min((D.megarigs?.[id]?.stages?.length || 1) - 1, num(save?.mega?.stage?.[id], 0)));
 
 // the grid of a mega rig at a stage: places, stories, which stories lie in the hull, the frame (fatbird)
@@ -105,18 +107,18 @@ export function freeCell(D, save, ui, id = save.rig.units[ui]?.id) {
 // every container gets a valid cell; what does not fit goes to the spare list (Lager), its workshops with it
 export function settle(D, save) {
   const rig = save.rig, out = [];
-  rig.units.forEach((u, ui) => {
-    if (u.kind !== 'container') return;
-    delete u.level; delete u.slot;
-    if (u.pos && !canPut(D, save, ui, u.pos.place, u.pos.story)) delete u.pos;
-  });
+  rig.units.forEach(u => { if (u.kind === 'container') { delete u.level; delete u.slot; } });
+  for (let changed = true; changed;) {   // until nothing changes: an upper container whose lower one lost its cell must not float
+    changed = false;
+    rig.units.forEach((u, ui) => { if (u.kind === 'container' && u.pos && canPut(D, save, ui, u.pos.place, u.pos.story)) { delete u.pos; changed = true; } });
+  }
   rig.units.forEach((u, ui) => { if (u.kind === 'container' && !u.pos) { const c = freeCell(D, save, ui); if (c) u.pos = c; else out.push(ui); } });
-  for (const ui of out.sort((a, b) => b - a)) {
+  for (const ui of out) {
     const u = rig.units[ui];
     (rig.spare ??= { workshops: [], containers: [], parts: [] }).containers.push(u.id);
     for (const w of u.workshops) rig.spare.workshops.push(w.id);
-    rig.units.splice(ui, 1);
   }
+  removeUnits(D, save, out);   // storages, decor and lights of the others move along (Aufräumen 16.11.)
   return out.length;
 }
 
@@ -125,8 +127,9 @@ export function settle(D, save) {
 export function activate(D, save, id) {
   const V = D.megarigs?.[id], T = V?.tractor;
   if (!V || !T || !D.tractors?.[T] || !owned(save).includes(id)) return { ok: false, why: 'Noch nicht geborgen' };
+  if (D.tractors[T].megarig !== id) return { ok: false, why: 'Nicht fahrbar (Zugmaschine › Mega-Rig fehlt)' };   // else the next load would undo it
   const m = mstate(save);
-  if (!m.active) m.bay = { tractor: save.rig.tractor, parts: clone(save.rig.parts || {}) };
+  if (!m.active) { m.bay = { tractor: save.rig.tractor, parts: clone(save.rig.parts || {}) }; save.rig.parts = {}; }   // the old tractor's parts stay with it in the bay
   m.active = id;
   m.stage[id] ??= 0;
   delete save.rig.lights;   // the camp's strings hang on trailer corners; aboard they hang on the grid (mega.lights)
@@ -134,20 +137,40 @@ export function activate(D, save, id) {
   const lost = settle(D, save);
   return { ok: true, lost };
 }
-// back into the old rig from the loading bay: containers line up behind it again (as many as it may pull, the rest to the Lager)
+// back into the old rig from the loading bay: the containers line up behind it again and stack as far as it may (Aufräumen 16.11.:
+// the tank's container always comes along, the rest in their order; what does not fit goes into the Lager, its storages rehomed)
 export function deactivate(D, save) {
   const m = mstate(save);
   if (!m.active || !m.bay?.tractor) return { ok: false };
   m.active = null;
-  const max = Math.max(1, D.tractors?.[m.bay.tractor]?.length ?? 1);
-  let n = 0;
-  for (let ui = save.rig.units.length - 1; ui >= 1; ui--) delete save.rig.units[ui].pos;
-  const keep = save.rig.units.filter(u => u.kind !== 'container' || ++n <= max), gone = save.rig.units.filter(u => !keep.includes(u));
-  for (const u of gone) { save.rig.spare.containers.push(u.id); for (const w of u.workshops) save.rig.spare.workshops.push(w.id); }
-  save.rig.units = keep;
+  const T = D.tractors?.[m.bay.tractor] || {}, len = Math.max(1, T.length ?? 1), high = Math.max(1, T.stack ?? 1);
+  const U = save.rig.units;
+  for (const u of U) { delete u.pos; delete u.level; delete u.slot; }
+  const isTank = u => u.workshops.some(w => D.workshops?.[w.id]?.function === 'tank');
+  const order = U.map((u, i) => i).filter(i => U[i].kind === 'container').sort((a, b) => (isTank(U[b]) - isTank(U[a])) || a - b);
+  const blocks = [], gone = [];
+  for (const i of order) {
+    const u = U[i], def = D.containers?.[u.id] || {};
+    if (blocks.length < len) { blocks.push([i]); continue; }
+    const b = def.stackable && blocks.find(bl => bl.length < high && D.containers?.[U[bl.at(-1)].id]?.carries);
+    if (b) { u.level = b.length; b.push(i); } else gone.push(i);
+  }
+  for (const i of gone) { save.rig.spare.containers.push(U[i].id); for (const w of U[i].workshops) save.rig.spare.workshops.push(w.id); }
+  // the new order: tractor, then every block from the ground up; everything keyed by unit index moves along
+  const tractor = U.findIndex(u => u.kind === 'tractor'), next = [tractor, ...blocks.flat()], map = new Map(next.map((o, n) => [o, n]));
+  save.rig.units = next.map(i => U[i]);
+  reindexUnits(D, save, i => (map.has(i) ? map.get(i) : null));
   save.rig.parts = m.bay.parts || {};
   swapTractor(D, save, m.bay.tractor);
   m.lights = [];
+  // the Kofferraum gets smaller again: what does not fit any more is rehomed instead of falling out
+  const g = save.inv?.grids?.['rig:0'], want = storeList(D, save).find(c => c.key === 'rig:0')?.size;
+  if (g && want && (g.w !== want[0] || g.h !== want[1])) {
+    const old = g.items || [], fresh = newGrid(want[0], want[1]), rest = [];
+    for (const e of old) { const left = addEntry(D, fresh, e, e.n); if (left > 0) rest.push({ ...e, n: left }); }
+    save.inv.grids['rig:0'] = fresh;
+    if (rest.length) rehome(D, save, { w: g.w, h: g.h, items: rest });
+  }
   return { ok: true, lost: gone.length };
 }
 

@@ -70,7 +70,7 @@ export class SceneRuns {
     paid = Math.round(paid * (1 + (trophyBonuses(this.data_, save).sell || 0) / 100));   // Rang-S-Abzeichen & Co. (#012)
     if (!ko) { save.health = Math.round(this.leyla.health); save.deltas += paid; }
     // achievements (#012): knocked out, or home safe (the tank never went critical in this run), Δ earned
-    const later = list => (save.achievements.news ??= []).push(...list.map(a => a.id));   // announced when the camp is there
+    const later = list => ((save.achievements ??= {}).news ??= []).push(...list.map(a => a.id));   // announced when the camp is there
     if (ko) later(bump(this.data_, save, 'knockouts'));
     else {
       if (save.tank) tankUpdate(this.data_, save);
@@ -164,7 +164,7 @@ export class SceneRuns {
     this.leyla.reset();
     this.drone.reset();
     this.van?.reset();
-    this.kills = 0; this.deltas = 0; this.cleared = false; this.startTime = 0;
+    this.kills = 0; this.earnedKills = new Set(); this.deltas = 0; this.cleared = false; this.startTime = 0;
     this.hud.room(this.data_.rooms?.[this.roomId]?.name || this.roomId, this.enemies.length);
     this.hud.banner(null);
     this.cam.flash(250, 13, 10, 18);

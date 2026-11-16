@@ -40,6 +40,22 @@ let r = await ev(() => {
 check('Händler › Deko: Stücke zum Kaufen', r.rows >= 15, r);
 check('Laterne, Neon, zwei Zeltstangen und ein Zelt dazwischen platziert', ['laterne', 'neon_open', 'zeltstange', 'zeltstange', 'zelt'].every((id, i) => r.placed[i] === id), r);
 check('Anklicken nimmt ein Stück auf, Esc legt es ins Lager, Rückgängig holt es zurück', r.hit === 'decor' && r.spare.includes('laterne') && r.undo === 5, r);
+// Aufräumen 16.11.2026: undo with a piece in hand would duplicate it; closing build mode puts the piece in hand into the Lager
+await ev(() => game.scene.getScene('play').openBuild());
+await page.waitForTimeout(1500);
+r = await ev(() => {
+  const s = game.scene.getScene('play'), bm = s.hud.build, camp = s.camp, save = s.box.save, out = { d0: save.deltas, n0: save.rig.decor.length, sp0: save.rig.spare.decor.length };
+  bm.buyDecor('laterne');
+  bm.undoLast(); out.blocked = !!bm.decorHold && save.deltas < out.d0;
+  bm.dropDecorToSpare(); bm.undoLast();
+  out.d1 = save.deltas; out.sp1 = save.rig.spare.decor.length;
+  bm.buyDecor('laterne'); const g = camp.decorSpots('laterne')[4]; bm.placeDecor({ x: g.x, y: g.y });
+  bm.undoLast(); out.back = bm.decorHold?.id; out.n1 = save.rig.decor.length;
+  bm.close(); out.sp2 = save.rig.spare.decor.length; out.d2 = save.deltas;
+  return out;
+});
+check('Rückgängig mit Deko in der Hand gesperrt, nach Esc: Kauf zurück, nichts doppelt', r.blocked && r.d1 === r.d0 && r.sp1 === r.sp0, r);
+check('Platzieren rückgängig: zurück in die Hand, Schließen legt es ins Lager', r.back === 'laterne' && r.n1 === r.n0 && r.sp2 === r.sp0 + 1, r);
 
 // every kind of piece draws (wall, roof, ground, spans) without errors, the campsite shows them
 r = await ev(() => {

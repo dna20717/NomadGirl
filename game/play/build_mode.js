@@ -104,6 +104,7 @@ export class BuildMode {
   }
   close() {
     if (!this.active) return;
+    if (this.decorHold) this.dropDecorToSpare();   // a piece in hand goes into the Lager instead of vanishing
     const s = this.scene, cam = s.cam, back = this.camBack;
     if (s.drone) s.drone.build = null;
     if (this.atFire && s.leyla.state === 'sit' && s.leyla.sit && !s.leyla.sit.up) s.leyla.sit.up = s.time.now;   // back to the player: she gets up
@@ -924,8 +925,11 @@ export class BuildMode {
   undoLast() {
     const top = this.undo[this.undo.length - 1];
     if (!this.active || !top || top.done || this.drag) return;
+    // a decor piece in hand first goes down (Esc: into the Lager), else undo would leave it in hand AND restore it (duplicate)
+    if (this.decorHold) return this.say('Erst ablegen oder ins Lager (Esc), dann rückgängig', 'idle');
     this.undo.pop();
     restore(this.save, top.snap);
+    this.decorHold = top.hold ? { ...top.hold, a: null } : null;   // undoing „platziert“ puts the piece back into the hand it came from
     if (top.job) { this.jobs = this.jobs.filter(j => j !== top.job); if (this.job === top.job) { this.job = null; this.working = false; } }
     this.camp.drawRig();
     this.scene.fx.puff(top.at?.x ?? top.job?.fx ?? 0, this.camp.ground - 10, 0xb9a2c8);

@@ -122,3 +122,58 @@ test('Bauen auf dem Raster: kaufen, setzen, Werkstatt einräumen, verschieben, i
   assert.equal(s.rig.units.length, n0);
   assert.ok(s.rig.spare.containers.includes('container_20') && s.rig.spare.workshops.includes('werkbank'));
 });
+
+// Aufräumen 16.11.2026: the review found these
+import { repairSave } from '../game/save.js';
+import { add, count } from '../game/inventory.js';
+import { finish } from '../game/salvage.js';
+test('Laden behält die Plätze an Bord (settle löschte früher gerade die gültigen)', () => {
+  const s = fresh(); activate(D, s, 'crawler');
+  // the player moved the last container to another free cell
+  const g = grid(D, 'crawler', stageOf(D, s, 'crawler')), ui = s.rig.units.length - 1, u = s.rig.units[ui], was = u.pos;
+  let moved = false;
+  for (let story = g.stories - 1; story >= 0 && !moved; story--) for (let place = g.places - 1; place >= 0 && !moved; place--) if ((place !== was.place || story !== was.story) && !canPut(D, s, ui, place, story)) { u.pos = { place, story }; moved = true; }
+  assert.ok(moved);
+  const before = s.rig.units.map(u => u.pos && `${u.pos.place}/${u.pos.story}`);
+  const r = repairSave(JSON.parse(JSON.stringify(s)), D);
+  assert.deepEqual(r.rig.units.map(u => u.pos && `${u.pos.place}/${u.pos.story}`), before);
+});
+test('Aussteigen: der Tank-Container kommt immer mit, gestapelt wird wieder, nichts doppelt', () => {
+  const s = fresh();
+  activate(D, s, 'crawler');
+  for (let i = 0; i < 3; i++) { s.rig.spare.containers.push('container_10'); }
+  const tankAt = () => s.rig.units.findIndex(u => u.workshops.some(w => D.workshops[w.id]?.function === 'tank'));
+  assert.ok(tankAt() > 0);
+  // the tank container last in the order: before, the first ones were kept and the tank went into the Lager
+  const t = s.rig.units.splice(tankAt(), 1)[0]; s.rig.units.push(t);
+  const conts = s.rig.units.filter(u => u.kind === 'container').length;
+  const r = deactivate(D, s);
+  assert.ok(r.ok);
+  assert.ok(tankAt() > 0, 'Tank-Container ist noch im Rig');
+  const T = D.tractors[s.rig.tractor], kept = s.rig.units.filter(u => u.kind === 'container').length;
+  assert.ok(kept <= (T.length ?? 1) * (T.stack ?? 1));
+  assert.equal(kept + r.lost, conts);
+  const r2 = repairSave(JSON.parse(JSON.stringify(s)), D);
+  assert.equal(r2.rig.units.filter(u => u.workshops.some(w => D.workshops[w.id]?.function === 'tank')).length, 1, 'kein zweiter Tank');
+});
+test('Aussteigen: was im großen Kofferraum lag, fällt nicht heraus', () => {
+  const s = fresh(); activate(D, s, 'crawler');
+  const g = s.inv.grids['rig:0'], item = Object.keys(D.items).find(id => D.items[id].category === 'junk' && (D.items[id].stack || 1) === 1) || 'schrott';
+  let n = 0; while (n < 200 && add(D, g, 'items', item, 1) === 0) n++;
+  const total = () => Object.values(s.inv.grids).reduce((k, gr) => k + count(gr, 'items', item), 0) + (s.ground?.[s.location] || []).reduce((k, p) => k + count(p.grid, 'items', item), 0);
+  const before = total();
+  deactivate(D, s);
+  assert.equal(total(), before);
+});
+test('Zugmaschinen-Bergung an Bord: die neue wartet in der Ladebucht', () => {
+  const s = fresh(); activate(D, s, 'crawler');
+  const id = Object.keys(D.salvage || {}).find(k => D.salvage[k].tractor);
+  if (!id) return;
+  const S = (s.salvage ??= { built: {}, done: {}, seen: {} });
+  const steps = D.salvage[id].steps || [];
+  S.built ??= {}; S.built[id] = steps.map(st => st.count || 1);
+  const r = finish(D, s, id, (D2, s2, t) => { s2.rig.tractor = t; });
+  if (!r.ok) return;
+  assert.equal(s.rig.tractor, 'crawler');
+  assert.equal(s.mega.bay.tractor, D.salvage[id].tractor);
+});

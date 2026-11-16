@@ -11,7 +11,7 @@
 //         · rank (POI finished with at least `grade`) · craft (every recipe made; `function` = only at that kind of workshop)
 
 export const EARN_WHEN = [['chest', 'Kiste geöffnet'], ['kill', 'Gegner besiegt (alle)'], ['kill_mutant', 'Mutant besiegt'], ['kill_raider', 'Plünderer besiegt'],
-  ['kill_wildlife', 'Tier besiegt'], ['kill_machine', 'Maschine besiegt'], ['boss', 'Boss besiegt'], ['secret', 'Secret gefunden'],
+  ['kill_wildlife', 'Tier besiegt'], ['kill_machine', 'Maschine besiegt'], ['kill_anomaly', 'Anomalie besiegt'], ['boss', 'Boss besiegt'], ['secret', 'Secret gefunden'],
   ['rank', 'POI geschafft (ab Rang)'], ['craft', 'Etwas hergestellt (Nebenergebnis)']];
 const GRADES = ['F', 'D', 'C', 'B', 'A', 'S'];
 

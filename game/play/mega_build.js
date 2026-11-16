@@ -99,7 +99,7 @@ export class MegaBuild {
     const D = this.D, save = this.save, x = nextStage(D, save);
     if (!x) return;
     this.scene.hud.menu({ title: `Ausbau: ${x.name}`, sub: `Das Fahrzeug wächst: mehr Plätze und Stockwerke. Kostet ${x.price} Δ und ${x.hours} h. Lässt sich nicht rückgängig machen.`,
-      items: [{ label: 'Ausbauen', primary: true, disabled: save.deltas < x.price ? 'Zu wenig Δ' : null, act: () => { const r = buyStage(D, save); if (r.ok) { if (x.hours) advance(save, x.hours); this.changed = true; this.msg = `${x.name}: ausgebaut`; this.scene.box.persist?.(); } this.draw(); } }, { label: 'Noch nicht', act: () => {} }] });
+      items: [{ label: 'Ausbauen', primary: true, disabled: save.deltas < x.price ? 'Zu wenig Δ' : null, act: () => { const r = buyStage(D, save); if (r.ok) { if (x.hours) advance(save, x.hours); this.undo = []; this.changed = true; this.msg = `${x.name}: ausgebaut`; this.scene.box.persist?.(); } this.draw(); } }, { label: 'Noch nicht', act: () => {} }] });
   }
   // ---------- input ----------
   nav(u) {

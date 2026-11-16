@@ -373,7 +373,7 @@ export class PlayScene extends Phaser.Scene {
     this.input.keyboard.on('keydown', () => this.hud.firstKey());
     this.physics.world.drawDebug = false;
     this.physics.world.debugGraphic?.setVisible(false);
-    this.startTime = 0; this.kills = 0; this.deltas = 0; this.cleared = false; this.hitstopUntil = 0;
+    this.startTime = 0; this.earnedKills = new Set(); this.kills = 0; this.deltas = 0; this.cleared = false; this.hitstopUntil = 0;
     this.hud.room(def?.name || this.roomId, this.enemies.length);
     this.hud.mode(this.mode, this.box?.save, this.data_);
     if (this.mode === 'run') this.hud.room(`${this.data_.pois?.[this.box.save.run?.poi]?.name || ''} · ${def?.name || this.roomId}`, this.enemies.length);

@@ -82,3 +82,19 @@ test('Balkon am Container-Ende (#037): einer je Ende, wandert mit, Brücke an Ba
   assert.deepEqual(dstate(s).decor.map(x => x.id), ['balkon']);
   assert.ok(dstate(s).spare.decor.includes('haengebruecke'));
 });
+
+// Aufräumen 16.11.2026: anchors are array indices; removing pieces must keep the rest pointing at the right ones
+test('Deko-Anker: Aufnehmen und Umbauen nummerieren Zeltstangen um, Spannen ohne Anker kommen ins Lager', async () => {
+  const { lift, remap } = await import('../game/decor.js');
+  const save = { rig: { units: [{}, {}, {}], decor: [
+    { id: 'zeltstange', at: { x: 1 } }, { id: 'zelt', at: { a: 'pole:0', b: '1:0' } },
+    { id: 'zeltstange', at: { x: 5 } }, { id: 'zelt', at: { a: 'pole:2', b: '2:1' } }], spare: { workshops: [], containers: [] } } };
+  lift({}, save, 0);   // the first pole goes: its tent comes down, the second pole moves to index 0
+  assert.deepEqual(save.rig.decor.map(o => o.id), ['zeltstange', 'zelt']);
+  assert.equal(save.rig.decor[1].at.a, 'pole:0');
+  assert.deepEqual(save.rig.spare.decor, ['zelt']);
+  // unit 2 leaves the rig: the tent on its corner comes down, the pole stays
+  remap(save.rig, ui => (ui === 2 ? null : ui));
+  assert.deepEqual(save.rig.decor.map(o => o.id), ['zeltstange']);
+  assert.deepEqual(save.rig.spare.decor, ['zelt', 'zelt']);
+});

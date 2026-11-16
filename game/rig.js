@@ -397,6 +397,11 @@ export function applyDraft(D, save, d) {
     for (const [k, g] of Object.entries(old)) if (k.startsWith(w.key + ':s')) grids[`store:${ui}:${w.at}` + k.slice(w.key.length)] = g;   // trophy stands move along
   }));
   d.rig.units.forEach((u, ui) => { if (u.key && old[u.key]) grids[`rig:${ui}`] = old[u.key]; });
+  // hydroponics, cistern and watering are keyed '<unit>:<place>' (Aufräumen 16.11.): they move with their workshop, a workshop
+  // that went into the Lager starts fresh when it is built again (before, another workshop on the old spot inherited its plants)
+  const homes = {};
+  d.rig.units.forEach((u, ui) => u.workshops.forEach(w => { if (w.home) homes[w.home] = `${ui}:${w.at}`; }));
+  for (const k of ['garden', 'cistern', 'watered']) if (save[k] && typeof save[k] === 'object') save[k] = Object.fromEntries(Object.entries(save[k]).filter(([key]) => homes[key]).map(([key, v]) => [homes[key], v]));
   save.rig = rig;
   save.inv.grids = grids;
   save.deltas = d.deltas;

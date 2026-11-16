@@ -105,7 +105,10 @@ export function finish(D, save, id, swapTractor = null) {
   if (!x || !progress(D, save, id).ready) return { ok: false };
   S.done[id] = { day: save.day ?? 1, cycle: save.cycle || 1 };
   const out = { ok: true, text: x.finale || '', tractor: null, megarig: null };
-  if (x.tractor && D.tractors?.[x.tractor]) { swapTractor?.(D, save, x.tractor); save.base = { node: siteOf(save, id), tractor: 'van' }; out.tractor = x.tractor; }
+  if (x.tractor && D.tractors?.[x.tractor]) {
+    if (save.mega?.active && save.mega.bay) save.mega.bay.tractor = x.tractor;   // aboard a mega rig: the new tractor waits in the loading bay (Aufräumen 16.11.)
+    else swapTractor?.(D, save, x.tractor); save.base = { node: siteOf(save, id), tractor: 'van' }; out.tractor = x.tractor;
+  }
   if (x.megarig) { (save.megarigs ??= []).includes(x.megarig) || save.megarigs.push(x.megarig); out.megarig = x.megarig; }
   ensureSites(D, save);
   return out;

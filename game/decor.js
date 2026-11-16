@@ -2,8 +2,8 @@
 // auch große Zelte zwischen zwei Containern?“). Pure cosmetics, bought from the dealer in build mode and placed in the world.
 // No DOM: browser and Node.
 //
-//   D.decor[id] = { name, art, place: 'ground' | 'wall' | 'roof' | 'span', value, cozy, size: [w, h] tiles, color, colors, text,
-//                   addon (rig add-on with a cut-out), items (icons), anchor (a ground piece that offers a span anchor at its top) }
+//   D.decor[id] = { name, art, place: 'ground' | 'wall' | 'roof' | 'side' | 'span', value, cozy, size: [w, h] tiles, color, colors, text,
+//                   addon (rig add-on with a cut-out), items (icons), growDays }   poles, balconies and towers offer span anchors
 //   save.rig.decor = [{ id, at }]       at: ground { x } (tiles from the campsite's left edge) · wall/roof { ui, p } (unit, place)
 //                                            · span { a, b } (anchor ids: '<ui>:<0|1>' container corners, 'mast:0', 'pole:<i>')
 //   save.rig.spare.decor = [id]          bought or taken down, waiting in the Lager
@@ -44,19 +44,11 @@ export function put(D, save, id, at) {
   R.decor.push({ id, at: { ...at, day: at.day ?? save.day ?? 1 } });
   return { ok: true, i: R.decor.length - 1 };
 }
-// take a placed piece back into the hand; spans that hung on a pole at index i come down into the Lager, later poles shift
+// take a placed piece back into the hand; spans that hung on it (a pole, a balcony, a tower) come down into the Lager
 export function lift(D, save, i) {
   const R = dstate(save), x = R.decor[i];
   if (!x) return null;
-  R.decor.splice(i, 1);
-  const fix = a => { const m = /^(pole|balc|tower):(\d+)$/.exec(a || ''); if (!m) return a; const n = Number(m[2]); return n === i ? null : n > i ? `${m[1]}:${n - 1}` : a; };
-  R.decor = R.decor.filter(o => {
-    if (o.at?.a == null) return true;
-    o.at.a = fix(o.at.a); o.at.b = fix(o.at.b);
-    if (o.at.a && o.at.b) return true;
-    R.spare.decor.push(o.id);
-    return false;
-  });
+  compact(R, (o, k) => k === i, { spare: true, except: i });
   return x;
 }
 export function stow(save, id) { dstate(save).spare.decor.push(id); }
@@ -70,18 +62,41 @@ export function sell(D, save, id) {
 export const cozy = (D, save) => (save?.rig?.decor || []).reduce((n, x) => n + (decorDef(D, x.id)?.cozy || 0), 0);
 export const cozyBonus = (D, save) => Math.min(D.camp?.decor?.cozyMax ?? 25, cozy(D, save));
 
+// removes pieces from rig.decor and keeps the rest pointing at the right pieces (Aufräumen 16.11.2026: anchors are array indices,
+// 'pole:3' must become 'pole:2' when piece 1 goes; a span whose anchor piece went comes down too, and so on until nothing changes).
+// drop(o, i) → true = remove; opts.spare = removed pieces go into the Lager (except index opts.except, the piece taken into the hand)
+export function compact(rig, drop, opts = {}) {
+  const L = rig.decor || [], gone = new Set(L.map((o, i) => (drop(o, i) ? i : -1)).filter(i => i >= 0));
+  const ref = a => { const m = /^(pole|balc|tower):(\d+)$/.exec(a || ''); return m ? Number(m[2]) : null; };
+  for (let changed = true; changed;) {
+    changed = false;
+    L.forEach((o, i) => { if (gone.has(i) || o.at?.a == null) return; if ([o.at.a, o.at.b].some(a => { const r = ref(a); return r != null && (gone.has(r) || !L[r]); })) { gone.add(i); changed = true; } });
+  }
+  if (!gone.size) return [];
+  const map = new Map(); let n = 0;
+  L.forEach((o, i) => { if (!gone.has(i)) map.set(i, n++); });
+  const fix = a => { const r = ref(a); return r == null ? a : a.replace(/\d+$/, String(map.get(r))); };
+  const removed = [];
+  rig.decor = L.filter((o, i) => {
+    if (gone.has(i)) { removed.push(o); if (opts.spare && i !== opts.except) ((rig.spare ??= { workshops: [], containers: [] }).decor ??= []).push(o.id); return false; }
+    if (o.at?.a != null) { o.at.a = fix(o.at.a); o.at.b = fix(o.at.b); }
+    return true;
+  });
+  return removed;
+}
 // the rig was rebuilt (units moved or left): pieces on a unit follow it by its key; gone units drop theirs into the Lager
 // move(key) → new unit index or null (the same mapping applyDraft uses for string lights)
 export function remap(rig, move) {
   if (!rig.decor?.length) return;
   rig.spare ??= { workshops: [], containers: [] }; rig.spare.decor ??= [];
   const corner = a => { if (!a || /^(mast|pole|balc|tower):/.test(a)) return a; const [ui, side] = String(a).split(':'); const n = move(Number(ui)); return n == null ? null : `${n}:${side}`; };
-  rig.decor = rig.decor.filter(o => {
+  const lost = new Set();
+  rig.decor.forEach((o, i) => {
     const at = o.at || {};
-    if (at.ui != null) { const n = move(at.ui); if (n == null) { rig.spare.decor.push(o.id); return false; } at.ui = n; }
-    if (at.a != null) { at.a = corner(at.a); at.b = corner(at.b); if (!at.a || !at.b) { rig.spare.decor.push(o.id); return false; } }
-    return true;
+    if (at.ui != null) { const n = move(at.ui); if (n == null) lost.add(i); else at.ui = n; }
+    if (at.a != null) { at.a = corner(at.a); at.b = corner(at.b); if (!at.a || !at.b) lost.add(i); }
   });
+  compact(rig, (o, i) => lost.has(i), { spare: true });
 }
 // a plant's growth stage 0…3 by days since it was placed (Deko › Wächst in Tagen)
 export const plantStage = (D, save, x) => Math.max(0, Math.min(3, Math.floor(((save.day ?? 1) - (x.at?.day ?? 1)) / Math.max(1, decorDef(D, x.id)?.growDays ?? 2))));

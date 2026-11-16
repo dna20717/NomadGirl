@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Code → Ava: Große Durchsicht (ohne Ticket, Daniel: „keine unsichtbaren technischen Schulden … nichts kaputt machen“): 3 Lese-Prüfer + automatische Checks, ~20 Fehler repariert (u. a. Mega-Rig verlor Plätze beim Laden, Deko ließ sich per Rückgängig verdoppeln, Lager-Inhalte konnten beim Spielstand-Reparieren verloren gehen). Offenes in `docs/backlog.md` C10–C17. PixelLab 0.
 - 16.11. Code → Ava: #039 nachgeschärft: Herstellen gibt jedes Mal 1 Technik/Wissen/Bio nach Werkstatt-Art (Daniel).
 - 15.11. Code → Ava: #039 fertig: Ressourcen für Kisten, Kills, Secrets, Rang und erstes Herstellen; Gruppen-Alarm. PixelLab 0.
 - 15.11. Code → Ava: #038 fertig: acht neue POIs (S bis XL), drei Türme nach oben, drei Tiefen nach unten, Schacht als Abkürzung. PixelLab 0.

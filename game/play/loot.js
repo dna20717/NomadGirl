@@ -112,7 +112,10 @@ export class Loot {
     // Gegner › Beute › Lässt seine Waffe fallen (#004): what a raider fights with, Leyla can pick up and use
     if (e.d.weapon && this.scene.data_.weapons?.[e.d.weapon] && Math.random() * 100 < (e.d.dropWeapon ?? 0)) t.push({ a: 'weapons', id: e.d.weapon, n: 1 });
     // Ressourcen verdienen (#039): Mutanten lassen Bio, Plünderer Technik, Bosse viel von beidem (Ranking › Ressourcen verdienen)
-    for (const r of earn(this.scene.data_, 'kill', { family: e.d.family, boss: e.d.behavior === 'boss' })) { const same = t.find(x => x.a === 'items' && x.id === r.id); if (same) same.n += r.n; else t.push(r); }
+    // … once per spawn point and run: after a k.o. everyone stands up again, the resources do not come twice (Aufräumen 16.11.)
+    const paid = (this.scene.earnedKills ??= new Set()), key = `${e.id}@${e.spawnAt}`, first = !paid.has(key);
+    paid.add(key);
+    if (first) for (const r of earn(this.scene.data_, 'kill', { family: e.d.family, boss: e.d.behavior === 'boss' })) { const same = t.find(x => x.a === 'items' && x.id === r.id); if (same) same.n += r.n; else t.push(r); }
     if (t.length) this.drop(e.x, e.feet, t);
   }
 

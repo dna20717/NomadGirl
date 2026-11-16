@@ -218,7 +218,7 @@ function buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, sta
   const side = rnd() < 0.5 ? -1 : 1;   // the shaft's side; side rooms go to the other one
   const pool = ready.filter(id => tagged(R, id, 'loot', 'secret') && seamOpen(parsed[id], side));
   const chance = (P.branchChance ?? 60) / 100, branches = [];
-  const free = (x, y, w, h) => ![...order, ...branches].some(o => x < o.x + o.w && o.x < x + w && y < o.y + o.h && o.y < y + h);
+  const free = (x, y, w, h) => y >= 0 && ![...order, ...branches].some(o => x < o.x + o.w && o.x < x + w && y < o.y + o.h && o.y < y + h);   // y < 0: taller than the top room
   for (const m of order.slice(0, -1)) {
     if (!pool.length || rnd() >= chance || !seamOpen(m.p, -side)) continue;
     const id = pick(pool, rnd, R), b = parsed[id], x = side > 0 ? m.x - b.w : m.x + m.w, y = m.y + m.h - b.h;

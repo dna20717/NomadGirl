@@ -55,6 +55,7 @@ export class Enemy {
     this.phases = this.kind === 'boss' ? [...(def.boss?.phases || [])].sort((a, b) => (b.at ?? 0) - (a.at ?? 0)) : [];
     this.phase = 0; this.waves = false;
     this.state = 'patrol'; this.facing = -1; this.home = { x: feet[0], y: feet[1] - bodyH / 2 };
+    this.spawnAt = `${Math.round(feet[0])}:${Math.round(feet[1])}`;   // stays the same when the run respawns its enemies after a k.o.
     this.readyAt = 0; this.stunUntil = 0; this.barUntil = 0; this.lastSeen = -1e9; this.lastKnown = null; this.seeing = false;
     this.senseAt = 0; this.dodgeReady = 0; this.dodged = new WeakSet(); this.turnAt = 0; this.until = 0;
     if (this.kind === 'flyer') { this.body.allowGravity = false; this.body.setMaxVelocity(900, 900); }

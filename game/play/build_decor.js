@@ -47,7 +47,11 @@ export class BuildDecor {
   }
   // a piece in hand (from: shop = just bought, spare = from the Lager, moved = picked up in the world)
   holdDecor(id, from) {
-    if (from === 'spare' && !fromSpare(this.save, id)) return;
+    if (from === 'spare') {
+      const before = snapshot(this.save);
+      if (!fromSpare(this.save, id)) return;
+      this.undo.push({ snap: before, label: `${decorDef(this.D, id)?.name || id} aus dem Lager`, job: null, at: null, done: false });
+    }
     this.decorHold = { id, from, a: null };
     this.shopOpen = false;
     const k = placeOf(this.D, id);
@@ -84,7 +88,7 @@ export class BuildDecor {
     const before = snapshot(this.save), at = placeOf(this.D, h.id) === 'span' ? { a: h.a.id, b: t.anchor.id } : t.at;
     const r = put(this.D, this.save, h.id, at);
     if (!r.ok) return this.say(r.why);
-    this.undo.push({ snap: before, label: `${decorDef(this.D, h.id)?.name || h.id} platziert`, job: null, at: { x: t.x, y: t.y }, done: false });
+    this.undo.push({ snap: before, label: `${decorDef(this.D, h.id)?.name || h.id} platziert`, job: null, at: { x: t.x, y: t.y }, done: false, hold: { id: h.id, from: h.from } });
     this.decorHold = null;
     this.camp.drawRig();
     this.sfx.klonk?.(0.6);
