@@ -5,10 +5,7 @@
   "place": "wall",
   "value": 60,
   "cozy": 2,
-  "size": [
-   2.4,
-   1
-  ],
+  "size": [2.4, 1],
   "color": "#ff7ac0",
   "text": "OPEN",
   "description": "Pinkes Neon an der Container-Wand, flackert ab und zu."
@@ -19,10 +16,7 @@
   "place": "wall",
   "value": 60,
   "cozy": 2,
-  "size": [
-   2,
-   1
-  ],
+  "size": [2, 1],
   "color": "#20d6c7",
   "text": "BAR|NUDELN|24/7|LEYLA'S",
   "description": "Cyan-Neon, Text je Stück zufällig aus einer Liste."
@@ -33,10 +27,7 @@
   "place": "wall",
   "value": 40,
   "cozy": 1,
-  "size": [
-   1.6,
-   2.4
-  ],
+  "size": [1.6, 2.4],
   "color": "#b4202a",
   "description": "Stoffbanner mit dem Dreieck der Spielwelt."
  },
@@ -46,10 +37,7 @@
   "place": "wall",
   "value": 40,
   "cozy": 1,
-  "size": [
-   1.6,
-   2.4
-  ],
+  "size": [1.6, 2.4],
   "color": "#285cc4",
   "text": "skull",
   "description": "Blaues Banner mit Totenkopf, Trophäe aus dem Revier."
@@ -60,10 +48,7 @@
   "place": "span",
   "value": 80,
   "cozy": 3,
-  "size": [
-   0,
-   1.2
-  ],
+  "size": [0, 1.2],
   "colors": "#f9a31b,#f2e3c4",
   "description": "Gestreiftes Segel zwischen zwei Punkten: Container-Ecken, Mast oder Zeltstangen."
  },
@@ -73,10 +58,7 @@
   "place": "ground",
   "value": 15,
   "cozy": 0,
-  "size": [
-   1.6,
-   1.6
-  ],
+  "size": [1.6, 1.6],
   "addon": "rad",
   "description": "Ersatzräder aus dem LKW-Teileblatt, gestapelt."
  },
@@ -86,53 +68,20 @@
   "place": "ground",
   "value": 20,
   "cozy": 1,
-  "size": [
-   2.2,
-   1.4
-  ],
+  "size": [2.2, 1.4],
   "addon": "werkzeugkiste",
   "description": "Werkzeugkisten, aufeinandergestellt."
  },
- "seesaecke": {
-  "name": "Seesäcke",
-  "art": "addon",
-  "place": "ground",
-  "value": 15,
-  "cozy": 1,
-  "size": [
-   1.9,
-   1.2
-  ],
-  "addon": "seesaecke"
- },
- "warnschild": {
-  "name": "Warnschild",
-  "art": "addon",
-  "place": "wall",
-  "value": 10,
-  "cozy": 0,
-  "size": [
-   1.1,
-   1.1
-  ],
-  "addon": "warnschild"
- },
+ "seesaecke": {"name": "Seesäcke", "art": "addon", "place": "ground", "value": 15, "cozy": 1, "size": [1.9, 1.2], "addon": "seesaecke"},
+ "warnschild": {"name": "Warnschild", "art": "addon", "place": "wall", "value": 10, "cozy": 0, "size": [1.1, 1.1], "addon": "warnschild"},
  "fundstuecke": {
   "name": "Kiste mit Fundstücken",
   "art": "trophies",
   "place": "ground",
   "value": 90,
   "cozy": 3,
-  "size": [
-   2,
-   1.2
-  ],
-  "items": [
-   "winkekatze",
-   "schallplatte",
-   "kristallschaedel",
-   "discokugel"
-  ],
+  "size": [2, 1.2],
+  "items": ["winkekatze", "schallplatte", "kristallschaedel", "discokugel"],
   "description": "Eine Kiste vor dem Feuer, darauf die schönsten Fundstücke."
  },
  "waescheleine": {
@@ -141,10 +90,7 @@
   "place": "span",
   "value": 25,
   "cozy": 2,
-  "size": [
-   0,
-   0.6
-  ],
+  "size": [0, 0.6],
   "colors": "#e86a73,#249fde,#f2e3c4,#9cdb43,#ffd541",
   "description": "Leine mit Wäsche, zwischen zwei Punkten. Bläht sich im Wind."
  },
@@ -154,10 +100,7 @@
   "place": "roof",
   "value": 70,
   "cozy": 2,
-  "size": [
-   1.6,
-   2.6
-  ],
+  "size": [1.6, 2.6],
   "color": "#dae0ea",
   "description": "Dreht sich im Wind, schneller bei Böen."
  },
@@ -167,10 +110,7 @@
   "place": "ground",
   "value": 20,
   "cozy": 2,
-  "size": [
-   0.8,
-   1.2
-  ],
+  "size": [0.8, 1.2],
   "growDays": 2,
   "color": "#59c135",
   "description": "Wächst über die Tage, bis sie blüht."
@@ -181,10 +121,7 @@
   "place": "roof",
   "value": 15,
   "cozy": 1,
-  "size": [
-   0.6,
-   1
-  ],
+  "size": [0.6, 1],
   "growDays": 3,
   "color": "#328464",
   "description": "Steht auf dem Dach und wird langsam größer."
@@ -195,10 +132,7 @@
   "place": "span",
   "value": 45,
   "cozy": 4,
-  "size": [
-   0,
-   1
-  ],
+  "size": [0, 1],
   "colors": "#bc4a9b,#f2e3c4",
   "description": "Zwischen zwei Punkten, nah beieinander am schönsten. E: eine Stunde abhängen (heilt etwas)."
  },
@@ -208,10 +142,7 @@
   "place": "wall",
   "value": 10,
   "cozy": 1,
-  "size": [
-   2.4,
-   1
-  ],
+  "size": [2.4, 1],
   "colors": "#ff7ac0,#20d6c7,#ffd541,#9cdb43",
   "text": "LEYLA|AvA <3|NO FUTURE|MILE 7|KEEP ROLLIN|NOMAD",
   "description": "Gesprühter Tag in Neonfarben, Text und Farbe je Stelle anders."
@@ -222,10 +153,7 @@
   "place": "ground",
   "value": 35,
   "cozy": 3,
-  "size": [
-   1.4,
-   1.6
-  ],
+  "size": [1.4, 1.6],
   "description": "Über dem Feuer oder daneben, der Kessel dampft."
  },
  "vogelhaus": {
@@ -234,35 +162,17 @@
   "place": "roof",
   "value": 30,
   "cozy": 2,
-  "size": [
-   0.8,
-   1.4
-  ],
+  "size": [0.8, 1.4],
   "description": "Lockt Krähen an, die auf den Dächern sitzen und auffliegen, wenn Leyla kommt."
  },
- "laterne": {
-  "name": "Laterne",
-  "art": "lantern",
-  "place": "ground",
-  "value": 25,
-  "cozy": 2,
-  "size": [
-   0.6,
-   1.8
-  ],
-  "color": "#ffd27a",
-  "description": "Leuchtet nachts warm."
- },
+ "laterne": {"name": "Laterne", "art": "lantern", "place": "ground", "value": 25, "cozy": 2, "size": [0.6, 1.8], "color": "#ffd27a", "description": "Leuchtet nachts warm."},
  "zeltstange": {
   "name": "Zeltstange",
   "art": "pole",
   "place": "ground",
   "value": 10,
   "cozy": 0,
-  "size": [
-   0.4,
-   4
-  ],
+  "size": [0.4, 4],
   "description": "Ein Ankerpunkt für Zelte, Segel und Leinen, frei auf dem Boden."
  },
  "zelt": {
@@ -271,10 +181,7 @@
   "place": "span",
   "value": 120,
   "cozy": 5,
-  "size": [
-   0,
-   0
-  ],
+  "size": [0, 0],
   "colors": "#8e5252,#c7b08b",
   "description": "Zwischen zwei Containern, zwei Zeltstangen oder Container und Mast: der First hängt zwischen den Punkten, die Bahnen reichen bis zum Boden."
  },
@@ -285,10 +192,7 @@
   "value": 20,
   "cozy": 2,
   "colors": "#df3e23,#ffd541,#249fde,#59c135,#bc4a9b",
-  "size": [
-   0,
-   0.4
-  ],
+  "size": [0, 0.4],
   "description": "Bunte Wimpel zwischen zwei Punkten, flattern im Wind."
  },
  "fallschirm": {
@@ -298,71 +202,30 @@
   "value": 70,
   "cozy": 3,
   "colors": "#e9b5a3,#8e5252",
-  "size": [
-   0,
-   0.6
-  ],
+  "size": [0, 0.6],
   "description": "Ein alter Lastenfallschirm als Dach: hängt tief durch, Schatten für alle."
  },
- "feuertonne": {
-  "name": "Feuertonne",
-  "art": "barrel",
-  "place": "ground",
-  "value": 35,
-  "cozy": 3,
-  "size": [
-   1,
-   1.4
-  ],
-  "description": "Ölfass mit Feuer drin. Wärmt, leuchtet, knistert."
- },
- "neon_herz": {
-  "name": "Neon-Herz",
-  "art": "neon",
-  "place": "wall",
-  "value": 50,
-  "cozy": 2,
-  "size": [
-   1.2,
-   1
-  ],
-  "color": "#ff4b8b",
-  "text": "<3",
-  "description": "Ein kleines Herz in Pink."
- },
+ "feuertonne": {"name": "Feuertonne", "art": "barrel", "place": "ground", "value": 35, "cozy": 3, "size": [1, 1.4], "description": "Ölfass mit Feuer drin. Wärmt, leuchtet, knistert."},
+ "neon_herz": {"name": "Neon-Herz", "art": "neon", "place": "wall", "value": 50, "cozy": 2, "size": [1.2, 1], "color": "#ff4b8b", "text": "<3", "description": "Ein kleines Herz in Pink."},
  "neon_pfeil": {
   "name": "Neon-Pfeil",
   "art": "neon",
   "place": "wall",
   "value": 45,
   "cozy": 1,
-  "size": [
-   2,
-   1
-  ],
+  "size": [2, 1],
   "color": "#ffd541",
   "text": ">>>|EINGANG|BAR >",
   "description": "Zeigt, wo es langgeht."
  },
- "zelt_militaer": {
-  "name": "Armeezelt",
-  "art": "tent",
-  "place": "span",
-  "value": 110,
-  "cozy": 4,
-  "colors": "#5a4e44,#796755",
-  "description": "Olivgrün, geflickt, bombenfest."
- },
+ "zelt_militaer": {"name": "Armeezelt", "art": "tent", "place": "span", "value": 110, "cozy": 4, "colors": "#5a4e44,#796755", "description": "Olivgrün, geflickt, bombenfest."},
  "balkon": {
   "name": "Balkon",
   "art": "balcony",
   "place": "side",
   "value": 60,
   "cozy": 2,
-  "size": [
-   1.6,
-   0.3
-  ],
+  "size": [1.6, 0.3],
   "color": "#6d758d",
   "description": "Gitterrost am Container-Ende auf Höhe des Bodens, mit Geländer. Begehbar; bei gestapelten Containern öffnet er die Endwand. Sein äußeres Ende ist ein Ankerpunkt für Brücken."
  },
@@ -372,10 +235,7 @@
   "place": "side",
   "value": 90,
   "cozy": 3,
-  "size": [
-   2.4,
-   0.3
-  ],
+  "size": [2.4, 0.3],
   "color": "#8e5252",
   "description": "Wie der Balkon, nur mehr Platz für einen Stuhl und Pflanzen."
  },
@@ -385,35 +245,28 @@
   "place": "span",
   "value": 80,
   "cozy": 2,
-  "size": [
-   0,
-   1
-  ],
+  "size": [0, 1],
   "description": "Holzplanken an Seilen zwischen zwei Punkten, begehbar. Von Balkon zu Balkon, zu einem Aussichtsturm oder zu einer Zeltstange."
  },
- "stahlsteg": {
-  "name": "Stahlsteg",
-  "art": "bridge",
-  "place": "span",
-  "value": 120,
-  "cozy": 1,
-  "size": [
-   0,
-   1
-  ],
-  "description": "Ein gerader Gittersteg mit Geländer, begehbar."
- },
+ "stahlsteg": {"name": "Stahlsteg", "art": "bridge", "place": "span", "value": 120, "cozy": 1, "size": [0, 1], "description": "Ein gerader Gittersteg mit Geländer, begehbar."},
  "aussichtsturm": {
   "name": "Aussichtsturm",
   "art": "tower",
   "place": "ground",
   "value": 150,
   "cozy": 3,
-  "size": [
-   1.6,
-   4.5
-  ],
+  "size": [1.6, 4.5],
   "colors": "#71413b",
   "description": "Gerüst mit Leiter und Plattform unterm Dach. Begehbar; oben ein Ankerpunkt für Brücken."
+ },
+ "spiegel": {
+  "name": "Spiegel",
+  "art": "mirror",
+  "place": "ground",
+  "value": 60,
+  "cozy": 2,
+  "size": [1, 2.4],
+  "colors": "#bb7547,#b9bffb",
+  "description": "Ein Standspiegel mit Rostrahmen. E: Haare färben (Leylas Signaturfarbe) mit Färbemitteln."
  }
 }

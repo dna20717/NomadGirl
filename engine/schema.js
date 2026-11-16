@@ -466,6 +466,10 @@ export const AREAS = {
     hint: 'Alle Werte der Spielfigur. Tempo in Pixel pro Sekunde, Zeiten in Millisekunden.',
     sections: [
       { title: 'Allgemein', fields: [NAME, num('health', 'Leben', { min: 1 }), num('invulnerableAfterHit', 'Unverwundbar nach Treffer', { unit: 'ms', min: 0 }), DESCRIPTION] },
+      { title: 'Signaturfarbe', fields: [range('signature.hue', 'Farbton der Signatur', { unit: '°', hint: '#044 (Daniel, 16.11.2026: Haare färben ohne neue Grafik): Haare und Outfit-Akzente teilen sich dieselben Pinktöne; alle Pixel in diesem Farbton wechseln zusammen die Farbe (am Spiegel im Camp)' }),
+        num('signature.satMin', 'Sättigung ab', { unit: '%', min: 0, max: 100, hint: 'Grautöne darunter bleiben' }), num('signature.sat', 'Sättigung der Signatur', { unit: '%', min: 5, max: 100, hint: 'Wie satt das gemalte Pink ist; die neue Farbe behält das Verhältnis' }),
+        num('signature.mid', 'Mitte Helligkeit', { unit: '%', min: 0, max: 100, hint: 'Die Schattierung bleibt: jeder Ton behält seinen Abstand zu dieser Mitte' }),
+        table('signature.colors', 'Farben', [text('name', 'Name'), color('color', 'Farbe'), ref('item', 'Färbemittel', 'items')], { hint: 'Die erste Zeile ist Leyla wie gemalt (ohne Farbe). Mit Färbemittel: eine Packung schaltet die Farbe am Spiegel für immer frei; ohne = von Anfang an' })] },
       { title: 'Laufen & Springen', fields: [num('movement.walkSpeed', 'Gehen', { unit: 'px/s', min: 0 }), num('movement.runSpeed', 'Rennen', { unit: 'px/s', min: 0 }),
         num('movement.acceleration', 'Beschleunigung', { unit: 'px/s²', min: 0 }), num('movement.jumpVelocity', 'Sprungkraft', { unit: 'px/s', min: 0 }),
         num('movement.airJumps', 'Luftsprünge', { min: 0, hint: '1 = Doppelsprung' }), num('movement.airJumpFromFrame', 'Doppelsprung ab Frame', { min: 1, hint: '1 = ganze Animation einmal; größer = nur die Frames ab hier, über die Doppelsprung-Dauer (z. B. die letzten Dash-Frames)' }),

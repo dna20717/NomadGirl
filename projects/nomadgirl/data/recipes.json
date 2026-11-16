@@ -768,5 +768,75 @@
   "discovery": ["achievement"],
   "once": true,
   "hint": "Trophäe für „Wohnzimmer mit Aussicht“"
+ },
+ "faerbemittel_giftgruen": {
+  "name": "Färbemittel Giftgrün",
+  "station": "kochnische",
+  "time": 20,
+  "ingredients": [{"item": "mutantengemuese", "count": 2},{"item": "wasser", "count": 1}],
+  "result": "faerbemittel_giftgruen",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "Was grün leuchtet, färbt auch grün."
+ },
+ "faerbemittel_neontuerkis": {
+  "name": "Färbemittel Neontürkis",
+  "station": "kochnische",
+  "time": 20,
+  "ingredients": [{"item": "leuchteier", "count": 2},{"item": "wasser", "count": 1}],
+  "result": "faerbemittel_neontuerkis",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "Eier, die im Dunkeln leuchten. Und Wasser."
+ },
+ "faerbemittel_eisblau": {
+  "name": "Färbemittel Eisblau",
+  "station": "werkbank",
+  "time": 20,
+  "ingredients": [{"item": "batteriezelle", "count": 1},{"item": "wasser", "count": 1}],
+  "result": "faerbemittel_eisblau",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "Batteriesäure, verdünnt. Bitte nicht trinken."
+ },
+ "faerbemittel_feuerrot": {
+  "name": "Färbemittel Feuerrot",
+  "station": "kochnische",
+  "time": 20,
+  "ingredients": [{"item": "chili", "count": 3},{"item": "wasser", "count": 1}],
+  "result": "faerbemittel_feuerrot",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "Scharf auf dem Kopf."
+ },
+ "faerbemittel_kurkumagold": {
+  "name": "Färbemittel Kurkuma-Gold",
+  "station": "kochnische",
+  "time": 20,
+  "ingredients": [{"item": "gewuerzmischung", "count": 2},{"item": "wasser", "count": 1}],
+  "result": "faerbemittel_kurkumagold",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "Die Gewürzmischung färbt alles. Wirklich alles."
+ },
+ "faerbemittel_rost": {
+  "name": "Färbemittel Rost",
+  "station": "werkbank",
+  "time": 20,
+  "ingredients": [{"item": "schrott", "count": 3},{"item": "wasser", "count": 1}],
+  "result": "faerbemittel_rost",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "Schrott einweichen, bis das Wasser braun wird."
+ },
+ "faerbemittel_russschwarz": {
+  "name": "Färbemittel Rußschwarz",
+  "station": "werkbank",
+  "time": 20,
+  "ingredients": [{"item": "stoffreste", "count": 1},{"item": "speiseoel", "count": 1}],
+  "result": "faerbemittel_russschwarz",
+  "count": 1,
+  "discovery": ["experiment", "found"],
+  "hint": "Ein verkohlter Lappen in Öl."
  }
 }

@@ -2108,5 +2108,95 @@
   "tags": ["trophy"],
   "look": "icons_misc",
   "icon": 4
+ },
+ "faerbemittel_giftgruen": {
+  "name": "Färbemittel Giftgrün",
+  "category": "consumable",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 20,
+  "look": "icons_kitchen",
+  "icon": 43,
+  "description": "Eine Packung Haarfarbe in Giftgrün. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+ },
+ "faerbemittel_neontuerkis": {
+  "name": "Färbemittel Neontürkis",
+  "category": "consumable",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 20,
+  "look": "icons_kitchen",
+  "icon": 43,
+  "description": "Eine Packung Haarfarbe in Neontürkis. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+ },
+ "faerbemittel_eisblau": {
+  "name": "Färbemittel Eisblau",
+  "category": "consumable",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 20,
+  "look": "icons_kitchen",
+  "icon": 43,
+  "description": "Eine Packung Haarfarbe in Eisblau. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+ },
+ "faerbemittel_feuerrot": {
+  "name": "Färbemittel Feuerrot",
+  "category": "consumable",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 20,
+  "look": "icons_kitchen",
+  "icon": 43,
+  "description": "Eine Packung Haarfarbe in Feuerrot. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+ },
+ "faerbemittel_kurkumagold": {
+  "name": "Färbemittel Kurkuma-Gold",
+  "category": "consumable",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 20,
+  "look": "icons_kitchen",
+  "icon": 43,
+  "description": "Eine Packung Haarfarbe in Kurkuma-Gold. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+ },
+ "faerbemittel_rost": {
+  "name": "Färbemittel Rost",
+  "category": "consumable",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 20,
+  "look": "icons_kitchen",
+  "icon": 43,
+  "description": "Eine Packung Haarfarbe in Rost. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+ },
+ "faerbemittel_russschwarz": {
+  "name": "Färbemittel Rußschwarz",
+  "category": "consumable",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 20,
+  "look": "icons_kitchen",
+  "icon": 43,
+  "description": "Eine Packung Haarfarbe in Rußschwarz. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+ },
+ "faerbemittel_violett": {
+  "name": "Färbemittel Violett",
+  "category": "consumable",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 60,
+  "look": "icons_kitchen",
+  "icon": 43,
+  "description": "Eine Packung Haarfarbe in Violett. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+ },
+ "faerbemittel_platin": {
+  "name": "Färbemittel Platin",
+  "category": "consumable",
+  "size": [1, 1],
+  "stack": 3,
+  "value": 60,
+  "look": "icons_kitchen",
+  "icon": 43,
+  "description": "Eine Packung Haarfarbe in Platin. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
  }
 }

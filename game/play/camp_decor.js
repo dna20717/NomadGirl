@@ -8,6 +8,8 @@ import { catenary } from '../string_lights.js';
 import { glowTexture } from './camp.js';
 import { advance, clockText } from '../save.js';
 import { ladderArt } from './ladder_art.js';
+import { mirrorRows, dye, dyedUrl } from './signature.js';
+import { have, take } from '../crafting.js';
 
 const PX = 4;
 const col = c => parseInt(String(c || '#ff00ff').slice(1), 16);
@@ -311,6 +313,29 @@ export class CampDecor {
     const s = this.scene, save = this.box.save, heal = d.heal ?? 15, max = s.leyla.maxHealth;
     s.hud.menu({ title: d.name || 'Hängematte', sub: `Eine Stunde abhängen. Heilt ${heal} %.`, items: [
       { label: 'Abhängen', primary: true, act: () => { advance(save, 1); save.health = Math.min(max, Math.max(save.health, s.leyla.health) + max * heal / 100); s.box.persist?.(); s.goCamp({ banner: ['Kurz abgehangen', clockText(save)], fade: 600, keepPlace: true }); } },
+      { label: 'Zurück', act: () => {} }] });
+  }
+  // a standing mirror (#044): rusty frame on two feet, glass with a sheen; E = Leylas Signaturfarbe (game/play/signature.js)
+  art_mirror(x, y, w, h, d) {
+    const g = this.dG(-15.6), [fc, gc] = String(d.colors || '#bb7547,#b9bffb').split(',').map(c => c.trim()), fw = Math.max(10 * PX, w * 0.7), fh = h * 0.8, top = y - h;
+    this.dR(g, x - fw / 2 - 2 * PX, y - 2 * PX, 3 * PX, 2 * PX, C.ink); this.dR(g, x + fw / 2 - PX, y - 2 * PX, 3 * PX, 2 * PX, C.ink);   // feet
+    this.dR(g, x - fw / 2, y - h * 0.2, PX, h * 0.2, C.ink); this.dR(g, x + fw / 2 - PX, y - h * 0.2, PX, h * 0.2, C.ink);
+    this.dR(g, x - fw / 2 - PX, top - PX, fw + 2 * PX, fh + 2 * PX, C.ink);
+    this.dR(g, x - fw / 2, top, fw, fh, fc);
+    this.dR(g, x - fw / 2 + 2 * PX, top + 2 * PX, fw - 4 * PX, fh - 4 * PX, gc, 0.85);
+    this.dR(g, x - fw / 2 + 2 * PX, top + 2 * PX, fw - 4 * PX, fh * 0.35, '#ffffff', 0.18);
+    for (let k = 0; k < 3; k++) this.dR(g, x - fw / 2 + (4 + k * 3) * PX, top + (4 + k * 5) * PX, PX, (6 - k) * PX, '#ffffff', 0.55);   // the sheen
+    this.hotspots.push({ rig: true, x, w: Math.max(70, fw), name: d.name || 'Spiegel', hint: 'Haare färben', act: () => this.mirrorMenu(d) });
+  }
+  mirrorMenu(d) {
+    const s = this.scene, D = this.D, save = this.box.save;
+    const rows = mirrorRows(D, save, id => have(D, save, id)), P = D.assets?.[D.leyla?.inventory?.portrait];
+    const pic = P?.file ? dyedUrl(D, save, new URL(P.file, s.base).href, () => { if (s.hud.menuTitle === (d.name || 'Spiegel')) this.mirrorMenu(d); }) : null;
+    s.hud.menu({ title: d.name || 'Spiegel', sub: 'Leylas Signaturfarbe: Haare und Akzente. Ein Färbemittel schaltet eine Farbe für immer frei.', image: pic, items: [
+      ...rows.map(r => ({ label: r.name, primary: r.on, icon: 'star',
+        sub: r.on ? 'trägst du' : r.unlocked ? 'freigeschaltet' : `${D.items?.[r.item]?.name || r.item} · ${r.have} da`,
+        disabled: !r.on && !r.unlocked && !r.have ? `fehlt: ${D.items?.[r.item]?.name || r.item}` : null,
+        act: () => { if (r.on) return; const res = dye(D, save, r.i, (id, n) => take(D, save, id, n)); if (!res.ok) return s.hud.toast(res.reason, '', 'warn', 2600); s.box.persist?.(); s.goCamp({ banner: [`Signaturfarbe: ${r.name}`, res.used ? 'Ein Färbemittel verbraucht' : 'Schon freigeschaltet'], fade: 500, keepPlace: true }); } })),
       { label: 'Zurück', act: () => {} }] });
   }
   // the big tent (Daniel: „große Zelte zwischen zwei Containern“): the ridge hangs between the two points, the walls reach down to the

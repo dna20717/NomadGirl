@@ -12,6 +12,7 @@ import { icon } from '../icons.js';
 import { kindOf, sortGrid, cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot, IMPLANTS, DRONE_WEAR, WEAR_KEYS, wearOf, gearStats, gearScore, occupancy, statParts, GEAR_STATS, addEntry } from '../inventory.js';
 import { partSlots, budgets, SLOT_NAMES as PART_SLOT_NAMES } from '../rig.js';
 import { containers as storeList, stowAll, CAMP } from '../save.js';
+import { dyedUrl } from './signature.js';
 
 export const CATEGORY_COLORS = {
   junk: '#6b6258', resource: '#5c6b7a', ingredient: '#6b7a3a', food: '#a8642a', component: '#4a6b8a', consumable: '#8a3a5a',
@@ -171,8 +172,9 @@ export class InventoryUI {
     const fig = (cls = '') => {
       if (!A?.file) return el('div', { class: 'inv-figure none ' + cls }, icon('person', 64));
       const [w, h] = A.frameSize || A.size || [96, 256];
-      const f = el('div', { class: 'inv-figure ' + cls, style: `width:${w * k}px;height:${h * k}px;--fig:url("${new URL(A.file, ASSET_BASE).href}")` },
-        el('img', { src: new URL(A.file, ASSET_BASE).href, alt: 'Leyla', style: `width:${w * k}px;height:${h * k}px`, onload: ev => { const i = ev.target; if (!A.frameSize && (i.naturalWidth !== w || i.naturalHeight !== h)) { f.style.width = i.style.width = `${i.naturalWidth * k}px`; f.style.height = i.style.height = `${i.naturalHeight * k}px`; } } }));
+      const url = dyedUrl(D, this.host.save(), new URL(A.file, ASSET_BASE).href, () => this.isOpen && this.draw());   // Leylas Signaturfarbe (#044)
+      const f = el('div', { class: 'inv-figure ' + cls, style: `width:${w * k}px;height:${h * k}px;--fig:url("${url}")` },
+        el('img', { src: url, alt: 'Leyla', style: `width:${w * k}px;height:${h * k}px`, onload: ev => { const i = ev.target; if (!A.frameSize && (i.naturalWidth !== w || i.naturalHeight !== h)) { f.style.width = i.style.width = `${i.naturalWidth * k}px`; f.style.height = i.style.height = `${i.naturalHeight * k}px`; } } }));
       return f;
     };
     const stat = (n, v, c = '') => el('div', { class: 'inv-stat' + (c ? ' ' + c : '') }, el('small', {}, n), el('b', {}, v));

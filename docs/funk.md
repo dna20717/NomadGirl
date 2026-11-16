@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Code → Ava: #044 Haare färben fertig: Signaturfarbe (Haare + Akzente) am Spiegel, zehn AAP-64-Farben, Färbemittel aus Rezepten und Beute. Tests grün, PixelLab 0.
 - 16.11. Code → Ava: #044 Haare färben (Signaturfarbe) läuft (Daniels Auftrag im Code-Chat).
 - 16.11. Code → Ava: #043 Dunkelheit wie The Looter fertig (ungesehen schwarz, besucht halbdunkel, schwarze Masse mit ausgefranstem Rand, Vordergrund-Silhouetten, Raumname). Tests grün, PixelLab 0.
 - 16.11. Code → Ava: #043 Dunkelheit wie The Looter läuft (Daniels Auftrag im Code-Chat).
@@ -683,11 +684,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 181/181, Browser 38/38 (poi_test prüft Dunkelheit, Raumname, Silhouetten). PixelLab 0. **Bitte testen:** einen POI laufen: Räume aus der Dunkelheit geschnitten, ausgefranster Rand, Besuchtes halbdunkel, schwarze Schutt-Silhouetten vorn, Raumname beim ersten Betreten; Werte in Spiel › Nebel / Vordergrund / Raumname.
 
 ### #044 Haare färben: Leylas Signaturfarbe
-- **Status:** läuft · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/leyla.md, docs/features/combat.md › Gegner-Bausatz (Farbtausch), docs/features/camp.md › Deko, docs/features/crafting.md
 - **Auftrag (Daniel, 16.11.2026):** „Wollen wir Leyla ohne neue Grafiken die Möglichkeit geben, ihre Haare zu färben?“ Antworten: **Signaturfarbe** (Haare und Outfit-Akzente teilen sich dieselben Pinktöne, beide wechseln zusammen), **Spiegel im Camp**, **Färbemittel herstellen** (finden oder kochen/herstellen, eine Packung schaltet die Farbe für immer frei), **feste Liste aus AAP-64**.
 - **Fertig, wenn:** Farbtausch in allen Leyla-Animationen und im Inventar-Bild, Spiegel als Deko, Färbemittel als Gegenstände mit Rezepten und Beute, alles in der Werkstatt, Tests grün, Build grün auf `main`.
-- **Rückfragen:**
-- **Ergebnis:**
-
+- **Rückfragen:** (Code) ⚠️ vorläufig: zehn Farben (Neonpink, Giftgrün, Neontürkis, Eisblau, Feuerrot, Kurkuma-Gold, Rost, Rußschwarz, Violett, Platin) mit Rezepten aus vorhandenen Zutaten, Violett und Platin nur als Beute; Färbemittel tragen das Bild der Sojasaucen-Flasche (keine neue Grafik); die Farbe bleibt über den Traum; AvA färbt nicht mit; der Spiegel ist Deko beim Händler (60 Δ).
+- **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 185/185, Browser 39/39 (neu `tools/mirror_test.mjs`, `test/signature.test.js`). PixelLab 0. **Bitte testen:** Spiegel im Bau-Modus kaufen und aufstellen, E: Farben; ein Färbemittel kochen (z. B. Mutantengemüse + Wasser an der Kochnische) und färben; Leyla im Camp, im Run und im Inventar ansehen.

@@ -184,6 +184,7 @@ export function newCycle(D, old) {
   // salvage (#023): what is built stays, done wrecks stay done, the LKW keeps pulling; sites are rolled anew on the new map
   if (old.salvage) s.salvage = { built: old.salvage.built || {}, done: old.salvage.done || {}, seen: old.salvage.seen || {}, sites: {} };
   if (old.megarigs) s.megarigs = [...old.megarigs];
+  if (old.look) s.look = { color: old.look.color ?? 0, unlocked: [...(old.look.unlocked || [])] };   // #044: the hair colour is Leyla's, not the dream's
   for (const [id, x] of Object.entries(D.salvage || {})) if (s.salvage?.done?.[id] && x.tractor && D.tractors?.[x.tractor]) swapTractor(D, s, x.tractor);
   s.dreams = [...(old.dreams || []), { day: old.day, hour: old.hour, rescues: old.tank?.rescues || 0, cause: old.tank?.cause || null }];
   for (const id of s.nodes) for (const r of D.techtree[id].recipes || []) if (!s.recipes.includes(r)) s.recipes.push(r);
@@ -318,6 +319,7 @@ export function repairSave(save, D) {
   for (const g of Object.values(save.inv?.grids || {})) for (const e of [...(g.items || [])]) if (e.a === 'rigParts') { g.items.splice(g.items.indexOf(e), 1); if (D.rigParts?.[e.id]) for (let k = 0; k < (e.n || 1); k++) s.rig.spare.parts.push(e.id); }
   s.rig.parts = Object.fromEntries(Object.entries(s.rig.parts || {}).map(([k, l]) => [k, (l || []).map(id => D.rigParts?.[id]?.slot === k ? id : null)]));
   s.buffs = (s.buffs || []).filter(b => D.buffs?.[b]);
+  if (s.look) { const n = (D.leyla?.signature?.colors || []).length; if (!(s.look.color >= 0 && s.look.color < n)) s.look.color = 0; s.look.unlocked = (s.look.unlocked || []).filter(i => i > 0 && i < n); }   // #044
   s.companions = (s.companions || []).filter(c => D.companions?.[c]);
   if (s.run && !D.pois?.[s.run.poi]) s.run = null;
   s.recipes = Array.isArray(save.recipes) ? [...new Set([...save.recipes.filter(r => D.recipes?.[r]), ...startRecipes(D)])] : fresh.recipes;

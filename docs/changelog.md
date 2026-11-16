@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 16.11.2026: **Haare färben** (#044): Leylas Signaturfarbe (Haare + Outfit-Akzente) am Spiegel im Camp, zehn Farben aus AAP-64, Färbemittel aus Rezepten und Beute; ohne neue Grafik.
 - 16.11.2026: **Dunkelheit wie The Looter** (#043): innen ist Ungesehenes schwarz, Sichtbares klar, Besuchtes halbdunkel; Wände und Fels außerhalb des bespielbaren Bereichs sind schwarze Masse mit ausgefranstem Rand; schwarze Silhouetten vorn am Boden; Raumname beim ersten Betreten.
 - 16.11.2026: **Container doppelt so fein, aus einem Tileset** (#042): PixelLab-Container (AAP-64, streng seitlich, offen + zu), Tileset linkes Ende | Platz | rechtes Ende, daraus 1/2/3 Plätze; jetzt so fein wie der Van. PixelLab 34.
 - 16.11.2026: **Camp-Lager zusammengelegt** (#041): Kofferraum und alle Lagerregale bilden EIN Raster (Regale bestimmen nur das Volumen), Speziallager (Kühlraum, Waffenkammer, Schatzkammer, Waffen-Galerie) bleiben eigen; Kiste im Camp und Deichselkästen sind weg (Inhalt zieht ins Camp-Lager), der Van-Kofferraum ist doppelt so groß wie die alte Kiste (10 × 8); „Alles einlagern“ in der Beute-Bilanz und im Lager (Speziallager bekommen ihr Bevorzugtes zuerst, der Rest ins Camp-Lager, was nicht passt, bleibt im Rucksack); Filter nach Art und „Sortieren“.

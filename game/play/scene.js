@@ -12,6 +12,7 @@ import { PoiLevel } from './poi_level.js';
 import { Pad, PAD_ACTIONS } from './pad.js';
 import { Fog } from './fog.js';
 import { placeForeground } from './foreground.js';
+import { applySignature } from './signature.js';
 import { makeTextures, drawBackground, drawRoom, terrainKits, PLACEHOLDER_COLORS } from './art.js';
 import { Leyla } from './leyla.js';
 import { Enemy } from './enemies.js';
@@ -241,6 +242,7 @@ export class PlayScene extends Phaser.Scene {
     this.sound.stopAll(); this.sound.removeAll();   // camp sounds belong to one visit
     try { this.sound.mute = localStorage.getItem('nomadgirl-mute') === '1'; } catch { /* private mode */ }
     makeTextures(this);
+    applySignature(this);   // Leylas Signaturfarbe (#044): her textures in the colour from the mirror
     this.pad ??= new Pad(this.data_.game?.gamepad);   // kept over restarts (camp ↔ run)
     this.hud.pad = this.pad;
     const PI = this.data_.assets?.[this.data_.game?.gamepad?.icons];
