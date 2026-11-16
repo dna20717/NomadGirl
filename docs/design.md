@@ -41,7 +41,7 @@ Im POI spielt sich NomadGirl wie Dead Cells: schnelle Bewegung, harter Kampf, un
 - **Ende eines Runs:** Ziel erreichen (z. B. den Tresor knacken) = POI geschafft, die Uhr steht, der Rang ist fest. Ausgezahlt wird am Van, also erst nach dem Rückweg: k.o. auf dem Rückweg kostet trotzdem alles. Vorher zum Van = Abbruch, die Beute ist sicher, kein Ranking.
 - **Bewegung:** Gehen, Rennen, Springen, Schwingen, Klettern, Dashen, Sliden.
 - **Steuerung:** Tastatur oder Controller (Xbox, PlayStation, Stadia, Switch Pro; Belegung in der Werkstatt). Seit 12.11.2026 geht alles auch ohne Maus: Inventar, Kochen und Rig bauen mit Cursor (Select halten = Rig bauen, Select im Bau-Modus = Rig offen/zu). Jedes Ding im Inventar zeigt seine Aktionen (Essen/Heilen/Ausrüsten, Drohne geben, Wegwerfen; Daniel, 12.11.2026). Der rechte Stick zieht AvA sanft wie an einem Gummiband weg, ihr Scheinwerfer wird zur Tischlampe. Kanten greifen ist verzeihend (etwas über den Händen, etwas daneben, ohne Richtung nach einem Sprung). **AvA als Tritt:** mit dem rechten Stick rausgezogen (oder kurz danach geparkt) kann Leyla an ihr hochklettern und auf ihr stehen, bis der Akku leer ist (Daniel, 12.11.2026). Unten im Bild zeigt eine **Boden-Leiste** (Scan-Raster im Cyberware-Look, blendet zu den Rändern aus), was in der Nähe liegt; E / Stick ↑ hebt das erste auf, I öffnet alles.
-- **Kampf:** Nahkampf, Fernkampf, später optional Hacking über das Cyberdeck (Entwurf: „Hacking: AvA im Netz“).
+- **Kampf:** Nahkampf, Fernkampf, später optional Hacking über das Cyberdeck (Entwürfe: „Hacking v1: AvA im Netz“, „Hacking v2: Die Schneiderin“).
 - **Waffen mit eigenen Posen (Daniel, 12.11.2026, Test):** eine Fernkampfwaffe kann Leyla eigene Animationen mitgeben (Waffen › Posen). Erstes Beispiel: generisches Sturmgewehr (Ziehen vom Rücken, Anlegen, Schießen, Nachladen, Gehen und Rennen). Weitere Gewehre entstehen daraus, indem PixelLab in denselben Posen nur die Waffe tauscht.
 - **Kampfmodus (Daniel, 11.11.2026, gebaut):** Leyla ist friedlich (Waffe weg, Idles) oder im Kampfmodus mit gezogener Waffe. Automatisch rein, wenn ein Gegner in Sicht kommt, sie getroffen wird oder abdrückt; nach ein paar ruhigen Sekunden steckt sie die Waffe weg. Dazu eine Taste (Q) zum Ziehen und Wegstecken von Hand.
 - **Schießstil (Daniel, 11.11.2026, gebaut 11.11.2026 abends, Cells-like als Standard):** als Einstellung (Werkstatt › Spiel › Kampf › Schießstil, dazu Pause-Menü › Optionen) mit zwei Varianten zum Ausprobieren:
@@ -463,7 +463,7 @@ Daniel, 16.11.2026: „Ich möchte, dass wir uns jetzt mit dem Sozialsystem ause
 - [ ] Aussehen der gewürfelten Siedler: Bausatz wie beim Raider (Köpfe, Körper, Farben)? Kostet PixelLab (unter 700: nur mit Freigabe).
 - [ ] Welche Gangs und Siedlungen gibt es, und wo liegen ihre Gebiete auf der Karte?
 
-## Hacking: AvA im Netz (Entwurf Ava, 16.11.2026, wartet auf Daniel)
+## Hacking v1: AvA im Netz (Entwurf Ava, 16.11.2026; Daniel: „interessant, aber nicht so kreativ wie es sein könnte, merken wir uns als v1“)
 
 Daniel, 16.11.2026 (AFK): „Überleg dir bitte mal ein Hacking-System für uns. Es darf gerne über den Tellerrand gedacht sein, anstatt nur Terminals zu knacken oder Gegner auszuschalten.“ Alles hier ist ⚠️ vorläufig, ein Vorschlag zum Absegnen (Fragen am Ende).
 
@@ -542,6 +542,70 @@ Ein Spiel im Spiel, aus dem, was wir schon haben. Für geschützte Geräte wechs
 - Datenlauf als Einbruchs-Spiel, oder schlichter (Halten-Balken, Rhythmus, gar keins)?
 - Drohne fällt beim Sprung leblos zu Boden (Risiko), oder schwebt sie weiter?
 - Welche Tellerrand-Ideen zuerst: Plakate/Ruf, Funk mit Pixie, Erinnerungs-Splitter, Daemons?
+
+## Hacking v2: Die Schneiderin (Entwurf Ava, 16.11.2026, wartet auf Daniel)
+
+Daniel, 16.11.2026: „Interessantes Konzept, aber leider nicht so kreativ wie es sein könnte. Merken wir es uns als v1, aber iterieren weiter. Spannend: nichts aus v1 darf konzeptionell in v2 vorkommen.“ Alles ⚠️ vorläufig.
+
+**Die Idee in einem Satz:** Die Welt ist ein Traum, der schlecht genäht ist, und Leyla lernt, ihn **aufzutrennen und neu zu nähen**. Gehackt wird kein Computer. Gehackt wird die Wirklichkeit selbst, mit Schere, Nadel und Faden.
+
+Das greift die offene Frage des Spiels auf („War alles nur ein Traum?“, neuer Durchgang): Wer genau hinschaut, sieht, dass es einer ist.
+
+### Nähte
+
+- In jedem POI gibt es **Nähte**: Stellen, an denen der Traum nicht sauber sitzt. Man erkennt sie mit den Augen, ohne Sonderansicht. Eine Kachel wiederholt sich zu oft, ein Schatten fällt falsch, ein Plakat ist spiegelverkehrt, eine Ratte läuft rückwärts, eine Lampe brummt im falschen Ton.
+- Wer sie findet, lernt den Ort lesen. Die Nähte sind zugleich das neue „Secret“, aufmerksames Schauen wird belohnt.
+
+### Schneiden und Nähen
+
+Leyla trägt eine **Traumschere** (neue Waffe im Cyberdeck-Slot, der dann „Werkzeug“ heißt). Damit gibt es drei Handgriffe, die man in der Welt mit dem Stick zieht, nicht in einem Menü:
+
+1. **Ausschneiden:** Ein Rechteck der Welt um eine Naht herum ausschneiden: ein Stück Wand, eine Tür, eine Treppe, eine Kiste, ein Stück Boden. Leyla hält dann einen **Flicken** in der Hand (immer nur einen).
+2. **Einnähen:** Den Flicken woanders einsetzen, wo eine Naht ist. Die Tür kommt in eine Wand, durch die man vorher nicht kam. Das Bodenstück wird eine Brücke über die Schlucht. Die Treppe kommt an den Turm, an dem die Leiter fehlte. Das Loch, wo der Flicken war, bleibt: Ausschneiden verändert auch den Ort, von dem er kommt (das Gelände wird ein Rätsel aus Geben und Nehmen).
+3. **Wenden:** Einen Flicken umgedreht einnähen. Ein Stück Decke wird Boden, ein Gegner auf einem gewendeten Stück fällt nach oben, ein Wasserfall läuft hinauf. Schwerkraft gilt je Flicken.
+
+**Gegner schneiden:** Auch ein Raider hat Nähte (sein Schatten, seine Silhouette). Schneidet Leyla den Schatten ab, steht der Raider „ohne Schatten“ da und ist für den Traum nur noch halb echt: Er sieht durch Wände, aber seine Treffer gehen durch Leyla hindurch. Näht sie den Schatten an eine Kiste, verfolgt der Raider die Kiste.
+
+### Der Preis: Narben
+
+- Jeder Schnitt hinterlässt eine **Narbe** im Ort, eine sichtbare, unordentliche Naht, die bleibt, solange der Durchgang läuft.
+- Viele Narben machen einen Ort **unruhig**: Kacheln flackern zwischen zwei Versionen, Räume tauschen kurz die Plätze, Gegner aus anderen Orten tauchen durch die Narben auf, das Ranking zählt den Ort als „zerschnitten“.
+- **Die Toten des letzten Traums:** Durch besonders viele Narben schauen **Echos von Menschen, die im vorigen Durchgang gestorben sind** (Permadeath der Karawane, docs/crew.md). Sie stehen als halbdurchsichtige Figuren in den Narben, kennen Leyla und sagen ihr etwas, das sie in diesem Traum ändern kann. Man kann sie nicht retten, nur hören.
+- Faden ist begrenzt: **Traumgarn** findet man an Nähten, aufgetrennt. Ohne Garn kann man schneiden, aber nicht nähen; der Flicken zerfällt dann in der Hand.
+
+### Über den Tellerrand
+
+- **Die Karte falten:** Auf der Reisekarte (dem alten 60er-Papier) kann Leyla mit genug Garn **zwei Orte aufeinander falten**. Die Reise zwischen ihnen dauert dann nichts, aber die Karte behält den Knick: Die Orte dazwischen werden für den Rest des Durchgangs unruhig.
+- **Das Rig von innen größer:** Im Camp kann Leyla einen Container von innen weiter nähen als von außen. Ein 10-Fuß-Container fasst zwei Werkstätten, sieht aber von außen gleich aus. Teuer, und der Container knarzt nachts.
+- **Etwas durch den Traum tragen:** Beim Aufwachen am Feuer (neuer Durchgang) darf Leyla **einen einzigen Flicken mitnehmen**: ein Ding, einen Ort, eine Straße der alten Karte oder eine Begegnung. Die Wahl ist der eigentliche Hack am Spiel: Wer weiß, wie es endet, schneidet sich ein Stück heraus.
+- **Den Himmel flicken:** An bestimmten Nächten hat der Himmel über dem Camp eine Naht. Ein Stück Morgen ins Nachtblau genäht macht einen Morgen früher hell, ein Stück Regen in die Wolken gibt Wasser.
+- **Die Lehrerin:** Wer Leyla das beibringt, ist eine neue Figur, die nur in Nähten wohnt: **Madame Nadel**, eine alte Schneiderin, die behauptet, sie habe diesen Traum genäht. Ob sie lügt, bleibt lange offen.
+
+### Warum das zu NomadGirl passt
+
+- Es beantwortet die Traum-Frage nicht, aber es macht sie **spielbar**.
+- Es ist **Raum-Hacking** für ein Jump'n'Run: Wege bauen, Gelände umformen, Schwerkraft drehen. Leylas Bewegung (Dash, Salto, Kanten) bekommt neue Bühnen.
+- **Geben und Nehmen:** Jede Lösung schafft ein neues Problem, das hält Rätsel frisch.
+- **Wenig neue Grafik:** Flicken, Narben, Flackern und Echos entstehen aus Code (Ausschnitte der Kachelwelt, Masken, Verschiebungen). Neu bräuchte es nur die Schere und Madame Nadel.
+
+### Abgrenzung zu v1 (geprüft)
+
+Kein Gerät, kein Netz, keine Drohne im Spiel, keine Bandbreite oder Spur, kein Tank als Preis, keine Programme oder Speicherplätze, kein Cyberraum-Lauf, keine Markenqualität als Härte, kein Schleichen über Licht und Kameras, keine Implantate, keine Plakate, kein Funk, keine verschlüsselten Erinnerungen, keine Automatisierung, keine Szene mit Ilka.
+
+### Ausbaustufen
+
+1. **Nähte + Ausschneiden + Einnähen** mit Wand, Tür, Bodenstück; Narben bleiben; Traumgarn.
+2. **Wenden** (Schwerkraft je Flicken) und unruhige Orte.
+3. **Schatten schneiden** bei Gegnern.
+4. **Echos der Toten** in den Narben, **Madame Nadel**.
+5. **Draußen:** Karte falten, Container von innen größer, Himmel flicken, ein Flicken durch den Traum.
+
+### Fragen an Daniel
+
+- Darf die Welt offen ein Traum sein, oder soll es bis zum Ende zweideutig bleiben?
+- Schneiden frei mit dem Stick, oder nur an vorgezeichneten Nähten (leichter zu bauen, weniger Chaos)?
+- Echos der Toten: berührend oder zu düster?
+- Welche Tellerrand-Idee zuerst: Karte falten, Container größer, Himmel flicken, ein Flicken durch den Traum?
 
 ## Look & Feel
 
