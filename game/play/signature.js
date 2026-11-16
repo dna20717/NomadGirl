@@ -9,9 +9,11 @@ export const sig = D => D.leyla?.signature || {};
 export const colors = D => sig(D).colors || [];
 // the colour Leyla wears now (a row of the list) or null = as painted
 export function current(D, save) { const i = save?.look?.color ?? 0, c = colors(D)[i]; return i > 0 && c?.color ? c : null; }
-export function swapFor(D, save) {
-  const c = current(D, save), S = sig(D);
-  if (!c) return null;
+export function swapFor(D, save) { return swapOf(D, current(D, save)); }
+// the swap for one row of the list (null = as painted)
+export function swapOf(D, c) {
+  const S = sig(D);
+  if (!c?.color) return null;
   const [h0, h1] = S.hue || [290, 350];
   return swapper([{ hueFrom: h0, hueTo: h1, satMin: S.satMin ?? 35, mid: S.mid ?? 55, sat: (S.sat ?? 75) / 100, to: c.color }]);
 }
@@ -75,8 +77,9 @@ function recolor(ctx, w, h, swap) {
 }
 // a picture (URL) in Leyla's colour → data URL (the inventory portrait, the mirror preview); cached per URL and colour
 const shots = new Map();
-export function dyedUrl(D, save, url, onReady) {
-  const swap = swapFor(D, save), key = (current(D, save)?.color || '') + '|' + url;
+// index: a colour of the list instead of the one she wears (the mirror shows the focused colour)
+export function dyedUrl(D, save, url, onReady, index = null) {
+  const row = index == null ? current(D, save) : colors(D)[index], swap = swapOf(D, row), key = (row?.color || '') + '|' + url;
   if (!swap) return url;
   if (shots.has(key)) return shots.get(key) || url;
   shots.set(key, null);

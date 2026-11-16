@@ -173,13 +173,24 @@ export class Hud {
   // talk (#025): { name, role, color, initials, portrait } turns the box into a dialogue at the bottom: a name plate in the speaker's colour,
   // the line typed out, the answers below; the portrait slot shows the initials until there are portraits (Daniel: „zunächst ohne Portraits“)
   // board (#025): the notice board, the items as pinned notes in a grid (item.note: { kind, from, stamp }); ←/→ move along, ↑/↓ a row
-  menu({ title, sub = '', items = [], onClose = null, image = null, talk = null, board = false }) {
+  menu({ title, sub = '', items = [], onClose = null, image = null, talk = null, board = false, mirror = null }) {
     this.stopType();
     this.modal = true; this.menuItems = items; this.menuTitle = title; this.menuOnClose = onClose;
-    this.menuCols = board ? 3 : 1;
+    this.menuCols = board || mirror ? 3 : 1;
     this.menuIndex = Math.max(0, items.findIndex(i => !i.disabled));
     const keyHints = hints([['move', 'wählen'], ['ok', talk ? 'antworten' : 'nehmen'], ['back', 'zurück']], '1–9 direkt');
-    if (board) {
+    if (mirror) {
+      // the mirror (#044): Leyla whole in a frame on the left, the colours as swatches on the right (3 per row, like the board);
+      // focusing a colour shows her in it (item.onFocus sets mirror.img)
+      this.menuButtons = items.map((it, i) => el('button', { class: 'hud-swatch' + (it.primary ? ' primary' : ''), disabled: !!it.disabled, style: `--sw:${it.swatch || '#ff7ac0'}`, onclick: () => this.choose(i), onmouseenter: () => this.focus(i) },
+        el('i'), el('b', {}, it.label), el('small', {}, it.disabled || it.sub || '')));
+      this.mirrorImg = el('img', { src: mirror.image || '', alt: 'Leyla' });
+      this.menuEl.replaceChildren(el('div', { class: 'hud-mirror ui-frame' },
+        el('div', { class: 'hud-mirrorGlass' }, this.mirrorImg),
+        el('div', { class: 'hud-mirrorMain' }, el('h2', {}, title), sub ? el('p', {}, sub) : null, el('div', { class: 'hud-swatches' }, ...this.menuButtons),
+          hints([['move', 'wählen'], ['ok', 'färben'], ['back', 'zurück']])),
+        closeX(() => this.closeMenu())));
+    } else if (board) {
       this.menuButtons = items.map((it, i) => el('button', { class: `hud-note ${it.note?.kind || ''}` + (it.primary ? ' primary' : ''), disabled: !!it.disabled, style: `--tilt:${((i * 37) % 7) - 3}deg`, onclick: () => this.choose(i), onmouseenter: () => this.focus(i) },
         el('i', { class: 'hud-pin' }), el('small', { class: 'hud-noteFrom' }, it.note?.from || ''), el('b', {}, it.label), it.sub ? el('span', {}, it.sub) : null,
         it.note?.stamp ? el('em', { class: 'hud-stamp' }, it.note.stamp) : null, el('kbd', {}, String(i + 1))));
@@ -203,6 +214,7 @@ export class Hud {
     }
     this.menuEl.classList.toggle('talk', !!talk);
     this.menuEl.classList.toggle('board', !!board);
+    this.menuEl.classList.toggle('mirror', !!mirror);
     this.menuEl.hidden = false;
     this.promptEl.hidden = true;
     this.focus(this.menuIndex);
@@ -219,7 +231,7 @@ export class Hud {
     }, 16) };
   }
   stopType() { const T = this.typing; if (!T) return false; clearInterval(T.timer); T.elm.textContent = T.text; this.typing = null; return true; }
-  focus(i) { this.menuIndex = i; this.menuButtons?.forEach((b, k) => b.classList.toggle('focus', k === i)); }
+  focus(i) { this.menuIndex = i; this.menuButtons?.forEach((b, k) => b.classList.toggle('focus', k === i)); this.menuItems?.[i]?.onFocus?.(); }
   closeMenu(chosen = false) {
     this.stopType();
     const f = this.menuOnClose; this.menuOnClose = null;

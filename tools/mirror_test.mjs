@@ -44,9 +44,15 @@ r = await ev(() => {
   const s = game.scene.getScene('play'), h = s.camp.hotspots.find(x => x.name === 'Spiegel');
   if (!h) return { none: true, names: s.camp.hotspots.map(x => x.name) };
   nomad.walkTo(h.x); nomad.step(200); nomad.step(1, [], ['grab']); nomad.step(2);
-  return { title: s.hud.menuTitle, items: s.hud.menuItems?.map(i => i.label + (i.disabled ? '×' : '')), pic: !!document.querySelector('.hud-menuPic img') };
+  return { title: s.hud.menuTitle, items: s.hud.menuItems?.map(i => i.label + (i.disabled ? '×' : '')), pic: !!document.querySelector('.hud-mirrorGlass img'), box: (b => b && { top: b.top, bottom: b.bottom, left: b.left, right: b.right })(document.querySelector('.hud-mirror')?.getBoundingClientRect()), vw: innerWidth, vh: innerHeight, swatches: document.querySelectorAll('.hud-swatch').length };
 });
 check('E am Spiegel: Farben, Neonpink zuerst, ohne Färbemittel gesperrt', r.title === 'Spiegel' && r.items?.[0] === 'Neonpink' && r.items.includes('Giftgrün×') && r.pic, r);
+check('Spiegel-Fenster bleibt im Bild (Leyla im Rahmen, Farbfelder daneben)', r.box && r.box.top >= 0 && r.box.left >= 0 && r.box.bottom <= r.vh && r.box.right <= r.vw && r.swatches === r.items.length, r);
+await page.waitForTimeout(500);
+r = await ev(() => { const h = game.scene.getScene('play').hud, a = h.mirrorImg.src; h.focus(h.menuItems.findIndex(x => x.label === 'Lavendel')); return a; });
+await page.waitForTimeout(800);
+r = { before: r, after: await ev(() => game.scene.getScene('play').hud.mirrorImg.src) };
+check('Vorschau: eine gewählte Farbe zeigt Leyla schon darin', r.after.startsWith('data:image') && r.after !== r.before, { before: r.before.slice(0, 40), after: r.after.slice(0, 40) });
 await shot('menu');
 // a packet of green into the Camp-Lager, choose it
 r = await ev(async () => {

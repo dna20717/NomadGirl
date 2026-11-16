@@ -329,14 +329,17 @@ export class CampDecor {
   }
   mirrorMenu(d) {
     const s = this.scene, D = this.D, save = this.box.save;
-    const rows = mirrorRows(D, save, id => have(D, save, id)), P = D.assets?.[D.leyla?.inventory?.portrait];
-    const pic = P?.file ? dyedUrl(D, save, new URL(P.file, s.base).href, () => { if (s.hud.menuTitle === (d.name || 'Spiegel')) this.mirrorMenu(d); }) : null;
-    s.hud.menu({ title: d.name || 'Spiegel', sub: 'Leylas Signaturfarbe: Haare und Akzente. Ein Färbemittel schaltet eine Farbe für immer frei.', image: pic, items: [
-      ...rows.map(r => ({ label: r.name, primary: r.on, icon: 'star',
-        sub: r.on ? 'trägst du' : r.unlocked ? 'freigeschaltet' : `${D.items?.[r.item]?.name || r.item} · ${r.have} da`,
-        disabled: !r.on && !r.unlocked && !r.have ? `fehlt: ${D.items?.[r.item]?.name || r.item}` : null,
-        act: () => { if (r.on) return; const res = dye(D, save, r.i, (id, n) => take(D, save, id, n)); if (!res.ok) return s.hud.toast(res.reason, '', 'warn', 2600); s.box.persist?.(); s.goCamp({ banner: [`Signaturfarbe: ${r.name}`, res.used ? 'Ein Färbemittel verbraucht' : 'Schon freigeschaltet'], fade: 500, keepPlace: true }); } })),
-      { label: 'Zurück', act: () => {} }] });
+    const rows = mirrorRows(D, save, id => have(D, save, id)), P = D.assets?.[D.leyla?.inventory?.portrait], url = P?.file ? new URL(P.file, s.base).href : null;
+    // the focused colour in the glass: Leyla dyed with it (made once per colour, then cached)
+    const show = i => { if (!url || !s.hud.mirrorImg) return; const img = s.hud.mirrorImg, u = dyedUrl(D, save, url, () => { if (s.hud.menuIndex === i) img.src = dyedUrl(D, save, url, null, i); }, i); img.src = u; };
+    const name = id => D.items?.[id]?.name || id;
+    s.hud.menu({ title: d.name || 'Spiegel', sub: 'Leylas Signaturfarbe: Haare und Akzente. Ein Färbemittel schaltet eine Farbe für immer frei.', mirror: { image: url ? dyedUrl(D, save, url, null) : null },
+      items: rows.map(r => ({ label: r.name, primary: r.on, swatch: r.color || '#ff7ac0',
+        sub: r.on ? 'trägst du' : r.unlocked ? 'frei' : `${r.have} Färbemittel da`,
+        disabled: !r.on && !r.unlocked && !r.have ? `fehlt: ${name(r.item).replace('Färbemittel ', '')}-Färbemittel` : null,
+        onFocus: () => show(r.i),
+        act: () => { if (r.on) return; const res = dye(D, save, r.i, (id, n) => take(D, save, id, n)); if (!res.ok) return s.hud.toast(res.reason, '', 'warn', 2600); s.box.persist?.(); s.goCamp({ banner: [`Signaturfarbe: ${r.name}`, res.used ? 'Ein Färbemittel verbraucht' : 'Schon freigeschaltet'], fade: 500, keepPlace: true }); } })) });
+    show(rows.find(r => r.on)?.i ?? 0);
   }
   // the big tent (Daniel: „große Zelte zwischen zwei Containern“): the ridge hangs between the two points, the walls reach down to the
   // ground and out on both sides; a dark entrance in the middle, guy ropes, a warm glow inside at night
