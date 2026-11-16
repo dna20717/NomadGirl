@@ -790,7 +790,7 @@
   "hint": "Eier, die im Dunkeln leuchten. Und Wasser."
  },
  "faerbemittel_eisblau": {
-  "name": "Kryo Blue · Kessler Kosmetik",
+  "name": "Kryo Blue · Kessler Cosmetics",
   "station": "werkbank",
   "time": 20,
   "ingredients": [{"item": "batteriezelle", "count": 1},{"item": "wasser", "count": 1}],

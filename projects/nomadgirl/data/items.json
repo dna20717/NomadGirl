@@ -2147,7 +2147,7 @@
   "value": 20,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Haarfarbe „Toxic Bloom“ von CHROMA//KILL: Färbt dich, bevor die Stadt es tut. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "description": "Haarfarbe „Toxic Bloom“ von CHROMA//KILL: „Dye before the city dyes you.“ Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
   "brand": "chroma_kill"
  },
  "faerbemittel_neontuerkis": {
@@ -2158,18 +2158,18 @@
   "value": 20,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Haarfarbe „Glitch Teal“ von CHROMA//KILL: Färbt dich, bevor die Stadt es tut. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "description": "Haarfarbe „Glitch Teal“ von CHROMA//KILL: „Dye before the city dyes you.“ Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
   "brand": "chroma_kill"
  },
  "faerbemittel_eisblau": {
-  "name": "Kryo Blue · Kessler Kosmetik",
+  "name": "Kryo Blue · Kessler Cosmetics",
   "category": "consumable",
   "size": [1, 1],
   "stack": 3,
   "value": 20,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Haarfarbe „Kryo Blue“ von Kessler Kosmetik: Wir ersetzen, was fehlt. Jetzt auch Farbe. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "description": "Haarfarbe „Kryo Blue“ von Kessler Cosmetics: „Now in color.“ Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
   "brand": "kessler_kosmetik"
  },
  "faerbemittel_feuerrot": {
@@ -2180,7 +2180,7 @@
   "value": 20,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Haarfarbe „Molotov Red“ von CHROMA//KILL: Färbt dich, bevor die Stadt es tut. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "description": "Haarfarbe „Molotov Red“ von CHROMA//KILL: „Dye before the city dyes you.“ Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
   "brand": "chroma_kill"
  },
  "faerbemittel_kurkumagold": {
@@ -2191,7 +2191,7 @@
   "value": 20,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Haarfarbe „Brass Halo“ von DeltaTint: Hält länger als dein Rig. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "description": "Haarfarbe „Brass Halo“ von DeltaTint: „Outlasts your rig.“ Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
   "brand": "deltatint"
  },
  "faerbemittel_rost": {
@@ -2202,7 +2202,7 @@
   "value": 20,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Haarfarbe „Rust Belt“ von DeltaTint: Hält länger als dein Rig. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "description": "Haarfarbe „Rust Belt“ von DeltaTint: „Outlasts your rig.“ Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
   "brand": "deltatint"
  },
  "faerbemittel_russschwarz": {
@@ -2213,7 +2213,7 @@
   "value": 20,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Haarfarbe „Blackout“ von DeltaTint: Hält länger als dein Rig. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "description": "Haarfarbe „Blackout“ von DeltaTint: „Outlasts your rig.“ Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
   "brand": "deltatint"
  },
  "faerbemittel_violett": {
@@ -2224,18 +2224,18 @@
   "value": 60,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Haarfarbe „Ultraviolence“ von CHROMA//KILL: Färbt dich, bevor die Stadt es tut. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "description": "Haarfarbe „Ultraviolence“ von CHROMA//KILL: „Dye before the city dyes you.“ Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
   "brand": "chroma_kill"
  },
  "faerbemittel_platin": {
-  "name": "Platinum Elite · Kessler Kosmetik",
+  "name": "Platinum Elite · Kessler Cosmetics",
   "category": "consumable",
   "size": [1, 1],
   "stack": 3,
   "value": 60,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Haarfarbe „Platinum Elite“ von Kessler Kosmetik: Wir ersetzen, was fehlt. Jetzt auch Farbe. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "description": "Haarfarbe „Platinum Elite“ von Kessler Cosmetics: „Now in color.“ Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
   "brand": "kessler_kosmetik"
  }
 }

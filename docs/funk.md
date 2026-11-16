@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Code → Ava: Ohne Ticket (Daniel): Marken englisch mit Slogans (Neon Noodle, Kessler Cybernetics, Salt Lake Motel, Delta Bureau of Order, Crow & Sons Salvage, Mile King, Vulkan Defense Systems, Kessler Cosmetics …), Ortsnamen alter Spielstände werden nachgewürfelt (NAMES_VERSION 3). ⚠️ Slogans von Ava.
 - 16.11. Code → Ava: #045 Lore-Datenbank fertig: Werkstatt › LORE › Marken (15 Marken, Lore, Stellung, Spielwerte), Reisekarte liest dort, Implantate und Haarfarben mit Hersteller. Details `docs/features/lore.md`.
 - 16.11. Code → Ava: #045 Lore-Datenbank Marken läuft (Daniels Auftrag im Code-Chat).
 - 16.11. Code → Ava: Ohne Ticket (Daniel: „Haare färben haut nicht hin, Animations-Reihenfolge kaputt“): nach dem Färben spielte Leyla keine Animation mehr (veraltete Looks der Szene), Gegenrichtung/Gewehre/Idles blieben pink; beides behoben, Prüfungen im Spiegel-Test.

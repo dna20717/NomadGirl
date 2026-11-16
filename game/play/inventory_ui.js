@@ -14,7 +14,7 @@ import { partSlots, budgets, SLOT_NAMES as PART_SLOT_NAMES } from '../rig.js';
 import { containers as storeList, stowAll, CAMP } from '../save.js';
 import { dyedUrl } from './signature.js';
 import { brandOf, valueOf } from '../brands.js';
-// the maker of a thing (#045): „Kessler Kybernetik · Qualität +15 %“
+// the maker of a thing (#045): „Kessler Cybernetics · Qualität +15 %“
 const brandLine = (D, t) => { const b = brandOf(D, t); return b ? [b.name, b.quality ? `Qualität ${b.quality > 0 ? '+' : ''}${b.quality} %` : null].filter(Boolean).join(' · ') : null; };
 
 export const CATEGORY_COLORS = {
