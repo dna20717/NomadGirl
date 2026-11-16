@@ -41,7 +41,7 @@ Im POI spielt sich NomadGirl wie Dead Cells: schnelle Bewegung, harter Kampf, un
 - **Ende eines Runs:** Ziel erreichen (z. B. den Tresor knacken) = POI geschafft, die Uhr steht, der Rang ist fest. Ausgezahlt wird am Van, also erst nach dem Rückweg: k.o. auf dem Rückweg kostet trotzdem alles. Vorher zum Van = Abbruch, die Beute ist sicher, kein Ranking.
 - **Bewegung:** Gehen, Rennen, Springen, Schwingen, Klettern, Dashen, Sliden.
 - **Steuerung:** Tastatur oder Controller (Xbox, PlayStation, Stadia, Switch Pro; Belegung in der Werkstatt). Seit 12.11.2026 geht alles auch ohne Maus: Inventar, Kochen und Rig bauen mit Cursor (Select halten = Rig bauen, Select im Bau-Modus = Rig offen/zu). Jedes Ding im Inventar zeigt seine Aktionen (Essen/Heilen/Ausrüsten, Drohne geben, Wegwerfen; Daniel, 12.11.2026). Der rechte Stick zieht AvA sanft wie an einem Gummiband weg, ihr Scheinwerfer wird zur Tischlampe. Kanten greifen ist verzeihend (etwas über den Händen, etwas daneben, ohne Richtung nach einem Sprung). **AvA als Tritt:** mit dem rechten Stick rausgezogen (oder kurz danach geparkt) kann Leyla an ihr hochklettern und auf ihr stehen, bis der Akku leer ist (Daniel, 12.11.2026). Unten im Bild zeigt eine **Boden-Leiste** (Scan-Raster im Cyberware-Look, blendet zu den Rändern aus), was in der Nähe liegt; E / Stick ↑ hebt das erste auf, I öffnet alles.
-- **Kampf:** Nahkampf, Fernkampf, später optional Hacking über das Cyberdeck.
+- **Kampf:** Nahkampf, Fernkampf, später optional Hacking über das Cyberdeck (Entwurf: „Hacking: AvA im Netz“).
 - **Waffen mit eigenen Posen (Daniel, 12.11.2026, Test):** eine Fernkampfwaffe kann Leyla eigene Animationen mitgeben (Waffen › Posen). Erstes Beispiel: generisches Sturmgewehr (Ziehen vom Rücken, Anlegen, Schießen, Nachladen, Gehen und Rennen). Weitere Gewehre entstehen daraus, indem PixelLab in denselben Posen nur die Waffe tauscht.
 - **Kampfmodus (Daniel, 11.11.2026, gebaut):** Leyla ist friedlich (Waffe weg, Idles) oder im Kampfmodus mit gezogener Waffe. Automatisch rein, wenn ein Gegner in Sicht kommt, sie getroffen wird oder abdrückt; nach ein paar ruhigen Sekunden steckt sie die Waffe weg. Dazu eine Taste (Q) zum Ziehen und Wegstecken von Hand.
 - **Schießstil (Daniel, 11.11.2026, gebaut 11.11.2026 abends, Cells-like als Standard):** als Einstellung (Werkstatt › Spiel › Kampf › Schießstil, dazu Pause-Menü › Optionen) mit zwei Varianten zum Ausprobieren:
@@ -462,6 +462,86 @@ Daniel, 16.11.2026: „Ich möchte, dass wir uns jetzt mit dem Sozialsystem ause
 - [x] Kernfiguren: sechs (Schraube, Onkel Sung, Doc Mirela, Sergeant Moll, Lucky Ferro, Pixie), Vertrauensbaum mit Wendepunkten, ausgeschrieben in `docs/crew.md` (Schreib-Session 16.11.2026).
 - [ ] Aussehen der gewürfelten Siedler: Bausatz wie beim Raider (Köpfe, Körper, Farben)? Kostet PixelLab (unter 700: nur mit Freigabe).
 - [ ] Welche Gangs und Siedlungen gibt es, und wo liegen ihre Gebiete auf der Karte?
+
+## Hacking: AvA im Netz (Entwurf Ava, 16.11.2026, wartet auf Daniel)
+
+Daniel, 16.11.2026 (AFK): „Überleg dir bitte mal ein Hacking-System für uns. Es darf gerne über den Tellerrand gedacht sein, anstatt nur Terminals zu knacken oder Gegner auszuschalten.“ Alles hier ist ⚠️ vorläufig, ein Vorschlag zum Absegnen (Fragen am Ende).
+
+**Die Idee in einem Satz:** Leyla hackt nicht selbst; **AvA ist der Hack**. Ihr Verstand lebt ohnehin in einer Maschine, also kann sie über Kabel und Funk in andere Maschinen springen und sie für kurze Zeit *bewohnen*. Das Cyberdeck an Leylas Gürtel ist nur der Verstärker und die Leine, an der AvA zurückfindet.
+
+Damit hängt das Hacking am Herz des Spiels: Jeder Sprung ins Netz kostet AvA Kraft, und AvAs Kraft ist ihr Cryo-Tank.
+
+### Die vier Säulen
+
+1. **Netzblick (sehen)**
+   - Mit dem Cyberdeck schaltet Leyla in den Netzblick: Die Welt wird dunkel und blau, alle Geräte im Umkreis leuchten als Knoten auf, Kabel und Funkreichweiten als Linien.
+   - Die Zeit läuft dabei langsam weiter (etwa 25 %), Leyla ist verwundbar.
+   - Geräte sind schon da oder kommen einfach dazu: Kameras, Lampen, Türen und Schalter, Lautsprecher, Automaten (AtomCola, Neon Noodle), Geschütze, Aufzüge, Gegner-Drohnen, Plakate, Raider mit Implantaten.
+   - Der Netzblick zeigt auch Verborgenes: Kabel, die in eine Scheinwand laufen, verraten ein Secret.
+2. **Sprung (bewohnen)**
+   - AvA verlässt die Drohne (die Drohne sinkt dabei leblos zu Boden und ist angreifbar, ein Risiko) und springt von Knoten zu Knoten, nur entlang verbundener Linien.
+   - Im Gerät steuert man das Gerät selbst:
+     - **Kamera:** schwenken und durch sie sehen. Hebt die Looter-Dunkelheit (#043) in ihrem Sichtkegel auf, die Räume dahinter sind dann bekannt.
+     - **Lampe:** an und aus. Dunkelheit wird zur Waffe: Gegner sehen im Dunkeln schlechter, Leyla schleicht vorbei.
+     - **Lautsprecher und Funkgerät:** ein Geräusch, eine falsche Durchsage („Alle in die Halle!“). Lockt Gegner weg oder in eine Falle.
+     - **Tür, Aufzug, Förderband:** öffnen, sperren, Gegner einschließen.
+     - **Geschütz:** Leyla zielt damit.
+     - **Gegner-Drohne:** fliegen und rammen.
+     - **Automat:** Ausgabe (Beute) oder Überladung (Explosion, Lärm).
+     - **Raider mit Implantat:** je nach Implantat. Kessler-Augen blenden, Vulkan-Arm verkrampft (Waffe fällt), Dash-Synapse zuckt (er stolpert).
+   - Raus mit einer Taste oder wenn die Bandbreite leer ist. AvA fliegt das Kabel zurück, die Drohne erwacht.
+3. **Gegenwehr (ICE und Spur)**
+   - Jedes Gerät hat einen **Hersteller aus Lore › Marken**. Dessen Qualität ist die Härte des Geräts: Backalley-Schrott springt sofort auf, Kessler- und Vulkan-Technik ist geschützt.
+   - Je härter das Gerät, desto mehr kostet der Sprung, und ein kurzes **Einbruchs-Spiel** steht davor (siehe unten).
+   - Jeder Hack füllt die **Spur**. Ist sie voll, wird zurückverfolgt: Gruppen-Alarm (#039) im POI, bei Kessler-Geräten kommt später eine Jäger-Drohne.
+   - Das Wichtigste: **AvA wird verletzt.** Rückverfolgung kostet Tank-Zustand. Hacking ist also stark, aber man bezahlt es mit AvA. Das passt zu „Rettung kostet AvA Kraft“ und macht jede Entscheidung spürbar.
+4. **Programme (ausrüsten)**
+   - Das Cyberdeck hat ein kleines **RAM-Raster** wie ein Rucksack, nur Rechtecke. Hinein kommen **Programme**, Gegenstände wie Implantate, mit Hersteller (Ghostwire, NeuroLux, Kessler …).
+   - Beispiele:
+     - **Ping:** Netzblick weiter
+     - **Ghost:** Kameras sehen Leyla nicht
+     - **Overload:** Gerät explodiert
+     - **Echo:** falsche Geräusche
+     - **Puppenspieler:** Raider kurz steuern
+     - **Langer Draht:** weiter springen
+     - **Leise Pfote:** weniger Spur
+   - Programme findet man in POIs, kauft sie bei Ghostwire oder stellt sie an einer neuen Werkstatt her (**Serverschrank**, Kühlung mag sie).
+   - Das Bastler-Deck („ein sehr teurer Briefbeschwerer“) bekommt endlich seinen Sinn. Bessere Decks haben mehr RAM und mehr Bandbreite.
+
+### Das Einbruchs-Spiel: der Datenlauf
+
+Ein Spiel im Spiel, aus dem, was wir schon haben. Für geschützte Geräte wechselt das Bild für ein paar Sekunden in den **Cyberraum desselben Raums**: dieselben Kacheln als Neon-Drahtgitter (Kabel werden Plattformen), AvA als kleiner Lichtfunke, der mit Leylas Bewegungen (Sprung, Dash) zum Kern des Geräts rennt, vorbei an ICE (wandernde Firewalls, Zähler). Je höher die Qualität der Marke, desto länger und gemeiner der Lauf. Das kostet kaum neue Grafik: Raum und Physik sind da, nur ein anderer Look aus Code. Wer keine Lust hat, nimmt das Programm **Brecheisen** (stumpf, laut, viel Spur).
+
+### Über den Tellerrand: Hacking außerhalb der POIs
+
+- **Plakate und Marken (Reisekarte):** Die Werbeplakate der Marken an den Straßen sind hackbar. Verunstalten heißt Ruf bei der Marke runter und Ruhm bei den Gangs rauf. Für eine Marke werben (Gegenpropaganda) bringt bessere Preise bei ihr. Andockpunkt fürs Ruf-System der Karawane.
+- **Funkkanäle (mit Pixie):** Am Warroom hört Pixie den Gang-Funk ab: welcher POI gerade überfallen wird (Beute weg, aber Gefangene zu retten), wo eine Gang patrouilliert (Gefahr auf der Karte sichtbar). Falsche Befehle schicken eine Gang weg, der Ort wird für einen Run leichter, die Gang erfährt es aber später (Kopfgeld).
+- **Erinnerungs-Splitter (Story):** In POIs liegen verschlüsselte Datensplitter aus dem Klinikturm. Am Cryo-Tank kann AvA sie entschlüsseln, und das sind **ihre eigenen Erinnerungen**: Bruchstücke von Ebene 40, ihrem Namen, wer sie eingeliefert hat. Ein Story-Faden, der die Hacking-Mechanik mit Mirelas Akte und Molls Geheimnis verbindet (docs/crew.md). Entschlüsseln kostet Tank, die Wahrheit hat ihren Preis.
+- **Daemons im Rig (Automatisierung):** Programme laufen auch im eigenen Rig. Ein Daemon in der Kochnische kocht nachts, einer im Generator spart Strom, einer im Warroom sucht Routen. Das ist der Anfang der „Automatisierung“ aus Ausbaustufe 2 und später der Homestead-Keystone „Rollende Stadt“.
+- **Schraube und Ilka:** Mit AvA im Netz kann Leyla Ilka im Motor begegnen. Zwei Verstände in Maschinen, die sich erkennen. Eine Szene für Schraubes Vertrauensbaum, Ast A.
+- **AvA und Pixie:** Pixie ist die einzige Crew, die AvA im Netz hört und mitlaufen kann. Mit Pixies Vertrauen wachsen Bandbreite und Reichweite, mit Pixies Tod wird das Netz einsamer.
+
+### Warum das zu NomadGirl passt
+
+- **Stealth als dritter Weg** neben Nahkampf und Fernkampf, und er passt zur neuen Dunkelheit: Licht aus, Kamera an, vorbei. Ein eigener Rang-Bonus für „nie entdeckt“ liegt nahe.
+- **Risiko mit Gewicht:** Jeder Hack kostet AvA, also die Uhr der Suche. Spielerinnen müssen abwägen, und das ist High Risk, High Reward wie der Rest.
+- **Lore wird Spielmechanik:** Die Marken-Datenbank bestimmt, wie hart ein Gerät ist.
+- **Wenig neue Grafik:** Netzblick, Cyberraum und Linien kommen aus Code. Neu bräuchte es nur ein paar Geräte-Symbole und Programm-Icons (PixelLab, klein).
+
+### Ausbaustufen
+
+1. **Netzblick + Sprung** mit 4 Gerätearten (Kamera, Lampe, Tür, Lautsprecher), Bandbreite, Spur, Rückverfolgung kostet Tank, Bastler-Deck wird nützlich.
+2. **Programme und RAM-Raster** im Cyberdeck, Serverschrank als Werkstatt, Ghostwire als Händler.
+3. **Datenlauf** (Cyberraum aus dem Raum) für geschützte Geräte, Härte aus der Markenqualität.
+4. **Körper-Hacks** an Raidern mit Implantaten, Gegner-Drohnen und Geschütze übernehmen.
+5. **Hacking draußen:** Plakate und Ruf, Funkkanäle mit Pixie, Erinnerungs-Splitter am Tank, Daemons im Rig.
+
+### Fragen an Daniel (zum Absegnen)
+
+- AvA als Hackerin, mit Tank als Preis: ja, oder lieber eine eigene Ressource ohne Tank-Folgen?
+- Datenlauf als Einbruchs-Spiel, oder schlichter (Halten-Balken, Rhythmus, gar keins)?
+- Drohne fällt beim Sprung leblos zu Boden (Risiko), oder schwebt sie weiter?
+- Welche Tellerrand-Ideen zuerst: Plakate/Ruf, Funk mit Pixie, Erinnerungs-Splitter, Daemons?
 
 ## Look & Feel
 

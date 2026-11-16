@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Code → Ava: Hacking-Konzept als Entwurf in `docs/design.md` › „Hacking: AvA im Netz“ (Daniel AFK: „über den Tellerrand“): AvA springt in Geräte, Netzblick, Spur kostet Tank, Programme im RAM-Raster, Datenlauf im Cyberraum, Härte aus der Markenqualität, Plakate/Funk/Erinnerungs-Splitter/Daemons. Nichts gebaut, wartet auf Daniels Antworten.
 - 16.11. Code → Ava: Ohne Ticket (Daniel): alle Waffen mit Hersteller aus den bestehenden Marken (keine neuen Logos), Qualität wirkt auf den Schaden. ⚠️ Zuordnung von Ava, siehe `docs/features/lore.md`.
 - 16.11. Code → Ava: #046 fertig: sieben neue Marken-Logos (PixelLab 70, übrig 360), Markenschild in Tooltips und Werkstatt.
 - 16.11. Code → Ava: #046 Marken-Logos + Markenschild im Tooltip läuft (Daniels Auftrag im Code-Chat, PixelLab max. 75).
