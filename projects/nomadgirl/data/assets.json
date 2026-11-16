@@ -4282,7 +4282,7 @@
   "kind": "icons",
   "file": "assets/map/logos.png",
   "cell": [64, 64],
-  "grid": [4, 2],
+  "grid": [4, 4],
   "names": [
    "Delta Petrol",
    "Neon Noodle",
@@ -4291,11 +4291,18 @@
    "Salt Lake Motel",
    "Delta Bureau of Order",
    "Crow & Sons Salvage",
-   "Mile King"
+   "Mile King",
+   "NeuroLux",
+   "Vulkan Defense Systems",
+   "Backalley Chrome",
+   "Ghostwire",
+   "CHROMA//KILL",
+   "Kessler Cosmetics",
+   "DeltaTint"
   ],
-  "source": "KI (PixelLab, Create Image Pro je Marke, AAP-64, bester von 16 Kandidaten) + Code (Raster)",
+  "source": "KI (PixelLab, Create Image Pro je Marke, AAP-64, bester von 16 Kandidaten) + Code (Raster); #046: 7 Logos mit Create Image Pro (Stilbild: das Raster selbst, AAP-64, bester von 16)",
   "date": "13.11.2026",
-  "description": "Logos im Stil der 60er-Werbung für die Reisekarte (#007), Einzelbilder in assets/map/logos/."
+  "description": "Logos im Stil der 60er-Werbung für die Reisekarte (#007), Einzelbilder in assets/map/logos/. Seit #046 auch die Marken ohne Kartenplatz (Cyberware, Kosmetik), Zeilen 3–4."
  },
  "rig_stairs": {
   "name": "Rig · Klapptreppe",

@@ -9,13 +9,22 @@ import { qualityBonus } from '../crafting.js';
 import { el } from '../ui.js';
 import { hints, padInUse, keyGlyph, closeX } from './ui_nav.js';
 import { icon } from '../icons.js';
-import { kindOf, sortGrid, cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot, IMPLANTS, DRONE_WEAR, WEAR_KEYS, wearOf, gearStats, gearScore, occupancy, statParts, GEAR_STATS, addEntry } from '../inventory.js';
+import { brandStats, kindOf, sortGrid, cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot, IMPLANTS, DRONE_WEAR, WEAR_KEYS, wearOf, gearStats, gearScore, occupancy, statParts, GEAR_STATS, addEntry } from '../inventory.js';
 import { partSlots, budgets, SLOT_NAMES as PART_SLOT_NAMES } from '../rig.js';
 import { containers as storeList, stowAll, CAMP } from '../save.js';
 import { dyedUrl } from './signature.js';
 import { brandOf, valueOf } from '../brands.js';
 // the maker of a thing (#045): „Kessler Cybernetics · Qualität +15 %“
-const brandLine = (D, t) => { const b = brandOf(D, t); return b ? [b.name, b.quality ? `Qualität ${b.quality > 0 ? '+' : ''}${b.quality} %` : null].filter(Boolean).join(' · ') : null; };
+// the maker's plate on top of a tooltip (#046, Daniel: „in den Tooltips markierter Items die Logos und Brands mit anzeigen“):
+// logo from Lore › Marken, the name in the brand's colour, the slogan
+export function brandPlate(D, t) {
+  const b = brandOf(D, t);
+  if (!b) return null;
+  const logo = b.icon != null ? artOf(D, null, null, 40, 0, null, { look: D.worldmap?.logos, icon: b.icon }) : null;
+  return el('div', { class: 'inv-brand', style: `--brand:${b.color || '#ffd27a'}` }, logo || el('i', {}, (b.short || b.name).slice(0, 2)),
+    el('span', {}, el('b', {}, b.name), b.slogan ? el('em', {}, `„${b.slogan}“`) : null));
+}
+const brandLine = (D, t) => { const b = brandOf(D, t); return b?.quality ? `Qualität ${b.quality > 0 ? '+' : ''}${b.quality} %` : null; };   // the name stands on the plate (#046)
 
 export const CATEGORY_COLORS = {
   junk: '#6b6258', resource: '#5c6b7a', ingredient: '#6b7a3a', food: '#a8642a', component: '#4a6b8a', consumable: '#8a3a5a',
@@ -49,8 +58,8 @@ export function iconCell(D, t) {
 }
 // the picture of a thing; wide icon sheets (e.g. 128 × 64 for long guns, Daniel 12.11.2026) keep their shape:
 // px × ph is the box before turning, without ph the picture fits into a px square
-export function artOf(D, a, id, px, turn = 0, ph = null) {
-  const k = iconCell(D, thing(D, a, id));
+export function artOf(D, a, id, px, turn = 0, ph = null, cell = null) {   // cell: { look, icon } instead of a thing (a brand's logo, #046)
+  const k = iconCell(D, cell || thing(D, a, id));
   if (!k) return null;
   let w = px, h = ph ?? px;
   if (ph == null && k.aspect !== 1) { if (k.aspect > 1) h = px / k.aspect; else w = px * k.aspect; }
@@ -414,14 +423,14 @@ export class InventoryUI {
     const acts = key != null && !this.held ? this.actionsFor(key, e) : [];
     const row = x => el('li', {}, ...(this.padOn ? [...keyGlyph(x.k), x.hold ? el('small', {}, 'halten') : null, ' '] : []), x.label);
     // Cyberware (#006): every value on its own line, perks green, flaws red (like Fallout's traits)
-    const parts = statParts(t.stats);
+    const parts = statParts(brandStats(D, t));   // with the maker's Qualität, like they work (#045)
     // a trophy (#012): its achievement and its bonus, and whether it works right now (only on a stand in a treasury)
     const aid = e.a === 'items' && achievementOf(D, e.id), save = this.host.save?.();
     const live = aid && save && displayed(D, save).some(d => d.id === aid);
     const trophy = aid ? el('div', { class: 'inv-trophy' + (live ? ' live' : '') }, el('small', {}, `Achievement: ${D.achievements[aid].name}`),
       el('ul', { class: 'inv-perks' }, ...bonusText(D, D.achievements[aid], GEAR_STATS).map(x => el('li', { class: 'perk' }, '▲ ' + x))),
       el('small', {}, live ? 'Bonus aktiv: steht in der Schatzkammer' : 'Auf einen Trophäen-Ständer in der Schatzkammer stellen, dann wirkt der Bonus')) : null;
-    this.tip.replaceChildren(...[el('b', {}, t.name || e.id), el('small', {}, facts.join(' · ')), trophy,
+    this.tip.replaceChildren(...[brandPlate(D, t), el('b', {}, t.name || e.id), el('small', {}, facts.join(' · ')), trophy,
       parts.length ? el('ul', { class: 'inv-perks' }, ...parts.map(x => el('li', { class: x.good ? 'perk' : 'flaw' }, (x.good ? '▲ ' : '▼ ') + x.text))) : null,
       e.q ? el('small', { class: 'inv-quality q' + e.q }, `Qualität: ${e.q === 2 ? 'perfekt' : 'gut'}${t.buff ? ` · Buff +${qualityBonus(D, e.q)} %` : ''}`) : null,
       e.a === 'weapons' && e.mods ? el('div', { class: 'inv-mods' }, el('small', {}, 'Eigenbau: ' + (modsText(e.mods) || 'Grundwerte')),

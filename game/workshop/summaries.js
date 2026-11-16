@@ -158,6 +158,18 @@ export const SUMMARY = {
       ['In Pixeln', `${r.w * (w.p.data.game?.tileSize || 64)} × ${r.h * (w.p.data.game?.tileSize || 64)}`]]), play) };
   },
 
+  // a brand (#046): its plate like the tooltip shows it (logo from the raster, name in the brand's colour, slogan) and what it makes
+  brands(w, x, id) {
+    const D = w.p.data, L = D.assets?.[D.worldmap?.logos], base = new URL('../../projects/nomadgirl/', import.meta.url);
+    const [c, r] = L?.grid || [1, 1], i = x.icon, pos = (k, n) => n > 1 ? (k / (n - 1)) * 100 : 0;
+    const logo = L?.file && i != null && i < c * r ? el('span', { style: `display:inline-block;width:72px;height:72px;image-rendering:pixelated;background:url("${new URL(L.file, base).href}");background-size:${c * 100}% ${r * 100}%;background-position:${pos(i % c, c)}% ${pos(Math.floor(i / c), r)}%` }) : el('span', { class: 'ed-small' }, 'kein Logo');
+    const made = Object.entries(D.items || {}).filter(([, t]) => t.brand === id).map(([, t]) => t.name);
+    const kids = Object.entries(D.brands || {}).filter(([, b]) => b.parent === id).map(([, b]) => b.name);
+    return { title: 'Markenschild', body: el('div', {},
+      el('div', { style: 'display:flex;gap:14px;align-items:center' }, logo, el('div', {}, el('b', { style: `font:26px/1 VT323,monospace;color:${x.color || '#ffd27a'};text-transform:uppercase` }, x.name || id), x.slogan ? el('div', { style: 'font-style:italic;opacity:.8' }, `„${x.slogan}“`) : null)),
+      el('p', { class: 'ed-small' }, made.length ? `Stellt her (${made.length}): ${made.join(', ')}` : 'Stellt (noch) nichts her, was Leyla findet.'),
+      kids.length ? el('p', { class: 'ed-small' }, `Töchter: ${kids.join(', ')}`) : null) };
+  },
   // the travel map (#007): one rolled map with the current values, „Neu würfeln“ rolls another (the game rolls one per Durchgang)
   worldmap(w, x) {
     const D = w.p.data, c = el('canvas', { class: 'ng-worldmap', width: 960, height: 540, style: 'width:100%;border-radius:6px' });

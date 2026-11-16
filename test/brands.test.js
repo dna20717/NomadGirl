@@ -32,6 +32,15 @@ test('Qualität wirkt auf die Boni, nicht auf die Nachteile', () => {
   assert.equal(gearStats(D2, { eyes: 'tunnelblick_optik' }).ranged, t.stats.ranged);
 });
 
+test('Tooltip-Werte = wirkende Werte (Qualität auf die Boni), jede Marke hat ein Logo im Raster (#046)', async () => {
+  const { brandStats } = await import('../game/inventory.js');
+  const t = D.items.herzpumpe, st = brandStats(D, t), q = 1 + D.brands[t.brand].quality / 100;
+  assert.equal(st.health, Math.round(t.stats.health * q * 10) / 10);
+  const L = D.assets[D.worldmap.logos], cells = L.grid[0] * L.grid[1];
+  for (const [id, b] of Object.entries(D.brands)) assert.ok(b.icon != null && b.icon < cells, id);
+  assert.equal(new Set(Object.values(D.brands).map(b => b.icon)).size, Object.keys(D.brands).length, 'jedes Logo nur einmal');
+});
+
 test('Preis und Beute: Faktoren der Marke', () => {
   const t = D.items.billig_kameraauge, b = D.brands[t.brand];
   assert.equal(valueOf(D, t), Math.round(t.value * b.price / 100));

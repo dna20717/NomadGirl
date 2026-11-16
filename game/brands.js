@@ -11,4 +11,4 @@ export const lootOf = (D, t) => Math.max(0, (brandOf(D, t)?.loot ?? 100) / 100);
 export const valueOf = (D, t) => Math.round((t?.value || 0) * priceOf(D, t));
 // the brands of the travel map (worldmap.js): every brand with „Auf der Karte“, in the shape the map has always used
 export const mapBrands = D => Object.entries(D.brands || {}).filter(([, b]) => b.map?.on && b.name)
-  .map(([id, b]) => ({ id, name: b.name, short: b.short || b.name, slogan: b.slogan || '', kind: b.map.kind || '', icon: b.map.icon ?? 0, color: b.color || '#ffd27a', weight: b.map.weight ?? 1 }));
+  .map(([id, b]) => ({ id, name: b.name, short: b.short || b.name, slogan: b.slogan || '', kind: b.map.kind || '', icon: b.icon ?? b.map.icon ?? 0, color: b.color || '#ffd27a', weight: b.map.weight ?? 1 }));

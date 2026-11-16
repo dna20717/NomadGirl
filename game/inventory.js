@@ -214,6 +214,13 @@ export function statParts(st = {}) {
 }
 // what everything worn adds up to; strain = load of the implants
 // boost (#013, Ripperdoc): { implant id: % } a clean operation makes the good sides of an implant stronger, never its flaws
+// a thing's stats as they work: the bonuses with its maker's Qualität (#045), drawbacks and unlocks as they are
+export function brandStats(D, t) {
+  if (!t?.stats) return t?.stats;
+  const q = qualityOf(D, t), dir = Object.fromEntries(GEAR_STATS.map(x => [x[0], x[3] || 1]));
+  if (q === 1) return t.stats;
+  return Object.fromEntries(Object.entries(t.stats).map(([k, v]) => [k, v * (dir[k] ?? 1) > 0 && k !== 'airJumps' && k !== 'airDash' ? Math.round(v * q * 10) / 10 : v]));
+}
 export function gearStats(D, wear = {}, boost = null) {
   const s = { strain: 0 }, dir = Object.fromEntries(GEAR_STATS.map(x => [x[0], x[3] || 1]));
   for (const k of GEAR_KEYS) s[k] = 0;

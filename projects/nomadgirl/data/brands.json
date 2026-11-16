@@ -13,7 +13,8 @@
   "short": "Delta",
   "slogan": "Fill up. Zone out.",
   "color": "#fa6a0a",
-  "map": {"on": true, "kind": "gasStation", "icon": 0, "weight": 3}
+  "map": {"on": true, "kind": "gasStation", "weight": 3},
+  "icon": 0
  },
  "neon_nudel": {
   "sector": "food",
@@ -29,7 +30,8 @@
   "short": "Neon",
   "slogan": "Hot as the asphalt.",
   "color": "#bc4a9b",
-  "map": {"on": true, "kind": "mall", "icon": 1, "weight": 2}
+  "map": {"on": true, "kind": "mall", "weight": 2},
+  "icon": 1
  },
  "kessler": {
   "sector": "cyber",
@@ -45,7 +47,8 @@
   "short": "Kessler",
   "slogan": "We replace what's missing.",
   "color": "#249fde",
-  "map": {"on": true, "kind": "", "icon": 2, "weight": 1}
+  "map": {"on": true, "kind": "", "weight": 1},
+  "icon": 2
  },
  "atomcola": {
   "sector": "drink",
@@ -61,7 +64,8 @@
   "short": "AtomCola",
   "slogan": "Fizz to the bone.",
   "color": "#b4202a",
-  "map": {"on": true, "kind": "mall", "icon": 3, "weight": 2}
+  "map": {"on": true, "kind": "mall", "weight": 2},
+  "icon": 3
  },
  "motel_salzsee": {
   "sector": "lodging",
@@ -77,7 +81,8 @@
   "short": "Salt Lake",
   "slogan": "Vacancy. No questions.",
   "color": "#20d6c7",
-  "map": {"on": true, "kind": "", "icon": 4, "weight": 1}
+  "map": {"on": true, "kind": "", "weight": 1},
+  "icon": 4
  },
  "ordnungsamt": {
   "sector": "authority",
@@ -93,7 +98,8 @@
   "short": "Bureau",
   "slogan": "Order is safety.",
   "color": "#143464",
-  "map": {"on": true, "kind": "government", "icon": 5, "weight": 1}
+  "map": {"on": true, "kind": "government", "weight": 1},
+  "icon": 5
  },
  "kraehe": {
   "sector": "trade",
@@ -109,7 +115,8 @@
   "short": "Crow",
   "slogan": "We take everything.",
   "color": "#71413b",
-  "map": {"on": true, "kind": "bunker", "icon": 6, "weight": 1}
+  "map": {"on": true, "kind": "bunker", "weight": 1},
+  "icon": 6
  },
  "kilometerkoenig": {
   "sector": "vehicle",
@@ -125,7 +132,8 @@
   "short": "Mile King",
   "slogan": "Rolls till it don't.",
   "color": "#f9a31b",
-  "map": {"on": true, "kind": "gasStation", "icon": 7, "weight": 2}
+  "map": {"on": true, "kind": "gasStation", "weight": 2},
+  "icon": 7
  },
  "chroma_kill": {
   "name": "CHROMA//KILL",
@@ -140,7 +148,8 @@
   "quality": 0,
   "price": 100,
   "loot": 110,
-  "description": "Straßenmarke für Haarfarbe und Neon-Make-up, gemischt in Hinterhöfen, verkauft aus Rucksäcken. Laut, giftig, unkaputtbar. Jede Gang im Delta trägt irgendwann CHROMA."
+  "description": "Straßenmarke für Haarfarbe und Neon-Make-up, gemischt in Hinterhöfen, verkauft aus Rucksäcken. Laut, giftig, unkaputtbar. Jede Gang im Delta trägt irgendwann CHROMA.",
+  "icon": 12
  },
  "kessler_kosmetik": {
   "name": "Kessler Cosmetics",
@@ -156,7 +165,8 @@
   "quality": 10,
   "price": 180,
   "loot": 40,
-  "description": "Die Schönheitssparte von Kessler Cybernetics: Farben, die nicht verblassen, für Köpfe, die nie Regen gesehen haben. Platin trägt nur, wer von Ebene 40 kommt, oder wer einen Tresor geknackt hat."
+  "description": "Die Schönheitssparte von Kessler Cybernetics: Farben, die nicht verblassen, für Köpfe, die nie Regen gesehen haben. Platin trägt nur, wer von Ebene 40 kommt, oder wer einen Tresor geknackt hat.",
+  "icon": 13
  },
  "deltatint": {
   "name": "DeltaTint",
@@ -171,7 +181,8 @@
   "quality": -5,
   "price": 70,
   "loot": 130,
-  "description": "Die Eigenmarke der Delta-Drugstores: staubige Wastelandtöne in Papiertüten. Färbt Haare, Hände und das Waschbecken gleich mit."
+  "description": "Die Eigenmarke der Delta-Drugstores: staubige Wastelandtöne in Papiertüten. Färbt Haare, Hände und das Waschbecken gleich mit.",
+  "icon": 14
  },
  "neurolux": {
   "name": "NeuroLux",
@@ -186,7 +197,8 @@
   "quality": 0,
   "price": 100,
   "loot": 100,
-  "description": "Cyberware von der Stange für alle, die keine Kessler-Termine bekommen. Solide, bunt verpackt, mit Garantie, die niemand einlöst."
+  "description": "Cyberware von der Stange für alle, die keine Kessler-Termine bekommen. Solide, bunt verpackt, mit Garantie, die niemand einlöst.",
+  "icon": 8
  },
  "vulkan": {
   "name": "Vulkan Defense Systems",
@@ -201,7 +213,8 @@
   "quality": 10,
   "price": 130,
   "loot": 70,
-  "description": "Lieferant des Ordnungsamts: Panzerhaut, Hydraulikarme, Zieloptiken. Schwer, laut und verlässlich. Was in den Wastelands davon auftaucht, hat meist einen toten Vorbesitzer."
+  "description": "Lieferant des Ordnungsamts: Panzerhaut, Hydraulikarme, Zieloptiken. Schwer, laut und verlässlich. Was in den Wastelands davon auftaucht, hat meist einen toten Vorbesitzer.",
+  "icon": 9
  },
  "backalley_chrome": {
   "name": "Backalley Chrome",
@@ -216,7 +229,8 @@
   "quality": -15,
   "price": 60,
   "loot": 150,
-  "description": "Kein Konzern, eher ein Gerücht: Ripperdocs in Garagen, die aus Schrott Implantate löten. Billig, überall zu finden und manchmal überraschend gut."
+  "description": "Kein Konzern, eher ein Gerücht: Ripperdocs in Garagen, die aus Schrott Implantate löten. Billig, überall zu finden und manchmal überraschend gut.",
+  "icon": 10
  },
  "ghostwire": {
   "name": "Ghostwire",
@@ -231,6 +245,7 @@
   "quality": 5,
   "price": 120,
   "loot": 80,
-  "description": "Ein Kollektiv aus Hackern und Ex-Kessler-Ingenieuren, das experimentelle Chips verkauft: Overclocking, Berserker-Schaltungen, Beine, die mehr wollen als der Körper. Starke Ware mit Nebenwirkungen."
+  "description": "Ein Kollektiv aus Hackern und Ex-Kessler-Ingenieuren, das experimentelle Chips verkauft: Overclocking, Berserker-Schaltungen, Beine, die mehr wollen als der Körper. Starke Ware mit Nebenwirkungen.",
+  "icon": 11
  }
 }

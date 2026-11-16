@@ -52,8 +52,10 @@ v = await ev(() => { const s = nomad.save(); s.inv.wear.eyes = 'tunnelblick_opti
   return { q, ranged: m.ranged, crit: m.crit, defense: m.defense, boost: c?.boost('ranged'), expect: 1 + ((m.damage || 0) + 35 * q) / 100 }; });
 check('Tunnelblick-Optik: +35 % Fernkampf, +15 % Krit (× Qualität des Herstellers), −15 % Abwehr', Math.abs(v.ranged - 35 * v.q) < 0.06 && Math.abs(v.crit - 15 * v.q) < 0.06 && v.defense === -15 && Math.abs(v.boost - v.expect) < 0.001, v);
 v = await ev(() => { const inv = SC().hud.inv; inv.open?.(); inv.showTip({ a: 'items', id: 'kaenguru_beine', n: 1 }); const t = inv.tip;
-  return { text: t.textContent, perks: [...t.querySelectorAll('.inv-perks .perk')].map(x => x.textContent), flaws: [...t.querySelectorAll('.inv-perks .flaw')].map(x => x.textContent) }; });
+  return { text: t.textContent, perks: [...t.querySelectorAll('.inv-perks .perk')].map(x => x.textContent), flaws: [...t.querySelectorAll('.inv-perks .flaw')].map(x => x.textContent),
+    plate: t.querySelector('.inv-brand b')?.textContent || null, logo: !!t.querySelector('.inv-brand .inv-art'), slogan: t.querySelector('.inv-brand em')?.textContent || null }; });
 check('Tooltip: Vorteile grün, Nachteile rot', v.perks.length >= 3 && v.flaws.some(x => /Leben/.test(x)) && !v.text.includes('null'), v);
+check('Tooltip: Markenschild des Herstellers mit Logo, Name und Slogan (#046)', !!v.plate && v.logo && /„.+“/.test(v.slogan || ''), { plate: v.plate, logo: v.logo, slogan: v.slogan });
 await shot('tooltip');
 await ev(() => { SC().hud.inv.close?.(); SC().hud.inv.tip.hidden = true; nomad.step(3); });
 

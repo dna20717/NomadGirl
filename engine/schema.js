@@ -1461,6 +1461,7 @@ export const AREAS = {
     row: x => [label(BRAND_SECTORS, x.sector), label(BRAND_TIERS, x.tier), x.status && x.status !== 'active' ? label(BRAND_STATUS, x.status) : null, x.map?.on ? 'auf der Karte' : null].filter(Boolean).join(' · '),
     sections: [
       { title: 'Marke', fields: [NAME, text('short', 'Kurzname', { hint: 'Für Ortsnamen auf der Karte ({brand}) und kurze Etiketten' }), text('slogan', 'Slogan'), select('sector', 'Branche', BRAND_SECTORS), color('color', 'Farbe'),
+        num('icon', 'Logo', { min: 0, hint: '#046: Feld im Symbol-Raster „Logos“ (Reisekarte › Aussehen). Zeigt sich auf der Karte, auf Plakaten und im Markenschild der Tooltips' }),
         area_('description', 'Lore', { hint: 'Was man in BigCityDelta über sie weiß (und was man lieber nicht weiß)' })] },
       { title: 'Stellung in der Welt', fields: [select('tier', 'Preisklasse', BRAND_TIERS), text('seat', 'Sitz', { hint: 'z. B. BigCityDelta, Klinikturm Ebene 40 · Salt Flats · unbekannt' }), ref('parent', 'Mutterkonzern', 'brands'),
         select('status', 'Zustand', BRAND_STATUS), select('street', 'Ruf auf der Straße', BRAND_STREET)] },
@@ -1468,11 +1469,12 @@ export const AREAS = {
         num('price', 'Preis', { unit: '%', min: 10, max: 500, hint: 'Wert ihrer Produkte (Tooltip, Δ-Summen, Aufträge); 100 = wie eingetragen' }),
         num('loot', 'In der Beute', { unit: '%', min: 0, max: 300, hint: 'Wie oft ihre Produkte in Beutetabellen fallen; 100 = wie eingetragen, 0 = nie' })] },
       { title: 'Auf der Reisekarte', fields: [bool('map.on', 'Auf der Karte', { hint: 'Steht an passenden Orten und als Plakat an den Straßen' }), select('map.kind', 'Bei', [['', 'überall'], ['gasStation', 'Tankstelle'], ['mall', 'Markt'], ['bunker', 'Bunker'], ['government', 'Amt']]),
-        num('map.icon', 'Logo', { min: 0, hint: 'Feld im Symbol-Raster „Logos“ der Reisekarte' }), num('map.weight', 'Gewicht', { min: 0 })] },
+        num('map.weight', 'Gewicht', { min: 0 })] },
     ],
     check: (x, report, p) => {
       const L = p.data?.assets?.[p.data?.worldmap?.logos];
-      if (x.map?.on && L?.grid && (x.map.icon ?? 0) >= L.grid[0] * L.grid[1]) report('warning', `Logo ${x.map.icon} gibt es nicht`);
+      if (x.icon != null && L?.grid && x.icon >= L.grid[0] * L.grid[1]) report('warning', `Logo ${x.icon} gibt es nicht`);
+      if (x.map?.on && x.icon == null) report('hint', 'Auf der Karte ohne Logo');
       if (x.map?.on && !x.short) report('hint', 'Auf der Karte ohne Kurzname');
     },
   },

@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Code → Ava: #046 fertig: sieben neue Marken-Logos (PixelLab 70, übrig 360), Markenschild in Tooltips und Werkstatt.
 - 16.11. Code → Ava: #046 Marken-Logos + Markenschild im Tooltip läuft (Daniels Auftrag im Code-Chat, PixelLab max. 75).
 - 16.11. Code → Ava: Ohne Ticket (Daniel): Marken englisch mit Slogans (Neon Noodle, Kessler Cybernetics, Salt Lake Motel, Delta Bureau of Order, Crow & Sons Salvage, Mile King, Vulkan Defense Systems, Kessler Cosmetics …), Ortsnamen alter Spielstände werden nachgewürfelt (NAMES_VERSION 3). ⚠️ Slogans von Ava.
 - 16.11. Code → Ava: #045 Lore-Datenbank fertig: Werkstatt › LORE › Marken (15 Marken, Lore, Stellung, Spielwerte), Reisekarte liest dort, Implantate und Haarfarben mit Hersteller. Details `docs/features/lore.md`.
@@ -708,11 +709,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 189/189, Browser 39/39 (neu `test/brands.test.js`, cyberware_test rechnet mit Qualität). PixelLab 0. **Bitte testen:** Werkstatt › LORE › Marken; Reisekarte sieht aus wie vorher; Tooltip eines Implantats nennt den Hersteller; Spiegel zeigt die Marken.
 
 ### #046 Marken-Logos und Markenschild im Tooltip
-- **Status:** läuft · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/lore.md, docs/features/worldmap.md › Marken
 - **Auftrag (Daniel, 16.11.2026):** „In den Tooltips markierter Items gerne die Logos und Brands mit anzeigen.“ Antworten: **Logos für die sieben Marken ohne Logo mit PixelLab („dann müssen die Logos auch wirklich richtig geil werden“, max. 75 Generierungen)**, Markenschild = **Logo + Name in Markenfarbe + Slogan**.
 - **Fertig, wenn:** 15 Marken mit Logo im Raster, Tooltip mit Markenschild, Werkstatt zeigt das Logo, Tests grün, Build grün auf `main`.
-- **Rückfragen:**
-- **Ergebnis:**
-
+- **Rückfragen:** (Code) ⚠️ vorläufig: Auswahl der Logos (je bester von 16), Färbemittel ohne Marke im Namen, Tooltip-Werte mit Qualität. Beobachtung: PixelLab hat bei DeltaTint und Vulkan den Kandidatenbogen versetzt geliefert; per Code aus dem Gesamtbogen neu geschnitten (9 bzw. 8 brauchbare Kandidaten).
+- **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 190/190, Browser 39/39 (cyberware_test prüft das Markenschild, brands.test die Logos). PixelLab diesmal 70, übrig 360. **Bitte testen:** Inventar: über ein Implantat oder Färbemittel fahren; Werkstatt › Marken › Markenschild; Reisekarte unverändert.
