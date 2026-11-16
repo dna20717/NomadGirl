@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 16.11.2026: **Nachreichen nur einmal pro Spielstand** (Daniel „A“), Mega-Rig-Ausbaustufen beginnen im neuen Durchgang neu (Daniel).
 - 16.11.2026: **Große Durchsicht** (Daniel: „keine unsichtbaren technischen Schulden“): zentrales Umschlüsseln der Einheiten (Lager, Deko, Lichter, Garten ziehen mit), Mega-Rig behält seine Plätze beim Laden, Aussteigen nimmt den Tank mit und stapelt, Deko-Rückgängig ohne Verdopplung, Deko-Anker stimmen, Felder ohne Wirkung markiert; Rest in `docs/backlog.md` C10–C17.
 - 16.11.2026: **Herstellen gibt immer eine Ressource** (#039): jedes Rezept bringt nebenbei 1 Technik, Wissen oder Bio, je nach Werkstatt.
 - 15.11.2026: **Ressourcen verdienen, Gruppen-Alarm** (#039): Kisten, besiegte Gegner (Mutanten Bio, Plünderer Technik, Bosse viel), Secrets, ein guter Rang und das erste Kochen/Herstellen je Rezept bringen Technik, Wissen und Bio (Ranking › Ressourcen verdienen); wer Leyla entdeckt, ruft „Da!“ und seine Familie kommt nachschauen.
