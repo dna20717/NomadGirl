@@ -103,10 +103,20 @@ export class Leyla {
   get alive() { return this.state !== 'dead'; }
   invulnerable(time) { return time < this.invulnerableUntil || (this.state === 'dash' && this.m.dashInvulnerable); }
 
-  setStanding() { const z = this.size; this.body.setSize(z.w, z.h, false); this.body.setOffset(0, 0); }
-  setNarrow() { const z = this.size; this.body.setSize(z.climbW, z.h, false); this.body.setOffset((z.w - z.climbW) / 2, 0); }   // on ladders next to ledges
-  setCrouch() { const z = this.size; this.body.setSize(z.w, z.crouchH, false); this.body.setOffset(0, z.h - z.crouchH); }
-  setLow() { const z = this.size; this.body.setSize(z.w, z.slideH, false); this.body.setOffset(0, z.h - z.slideH); }
+  // a new box keeps her feet and her middle where they are in this very frame (Daniel, 16.11.2026: „nach dem Slide noch immer ein
+  // Frame-Glitch“: Phaser moves the body only in the next physics step, so for one frame the feet sat 90 px lower, slide 78 → 168)
+  resizeBox(w, h, ox, oy) {
+    const b = this.body, bottom = b.bottom, cx = b.center.x;
+    b.setSize(w, h, false); b.setOffset(ox, oy);
+    const dx = cx - w / 2 - b.position.x, dy = bottom - h - b.position.y;
+    b.position.x += dx; b.position.y += dy;
+    for (const p of [b.prev, b.prevFrame]) if (p) { p.x += dx; p.y += dy; }   // no movement for the physics step: the game object stays put
+    b.updateCenter();
+  }
+  setStanding() { const z = this.size; this.resizeBox(z.w, z.h, 0, 0); }
+  setNarrow() { const z = this.size; this.resizeBox(z.climbW, z.h, (z.w - z.climbW) / 2, 0); }   // on ladders next to ledges
+  setCrouch() { const z = this.size; this.resizeBox(z.w, z.crouchH, 0, z.h - z.crouchH); }
+  setLow() { const z = this.size; this.resizeBox(z.w, z.slideH, 0, z.h - z.slideH); }
   canStand() { const z = this.size; return this.scene.rectFree(this.x - z.w / 2 + 2, this.feet - z.h, z.w - 4, z.h - 2); }
 
   // ---------- update ----------

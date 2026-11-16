@@ -14,7 +14,8 @@ const C = D.leyla.signature.colors, green = C.findIndex(c => c.name === 'GiftgrÃ
 test('Spiegel: wie gemalt zuerst, Farben mit FÃ¤rbemittel gesperrt, bis eine Packung da ist', () => {
   const s = newSave(D), rows = mirrorRows(D, s, id => have(D, s, id));
   assert.ok(rows[0].on && rows[0].unlocked && !rows[0].color);
-  assert.ok(rows.length >= 8 && rows.slice(1).every(r => r.color && r.item && !r.unlocked));
+  assert.ok(rows.length >= 8 && rows.slice(1).every(r => r.color && (r.item ? !r.unlocked : r.unlocked)));
+  assert.ok(rows.filter(r => r.i > 0 && !r.item).length >= 3, 'ein paar Farben sind gratis (Daniel, 16.11.2026)');
   assert.equal(current(D, s), null);
   assert.equal(swapFor(D, s), null, 'wie gemalt: kein Farbtausch');
 });

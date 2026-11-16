@@ -190,6 +190,16 @@ v = await t(t => t.run(2, ['right'], ['down']));
 check('Slide startet', v.st === 'slide', v);
 v = await t(t => t.until(v => v.x > 1330, 200, ['right']));
 check('Slide durch den Tunnel', v.x > 1330 && v.st === 'normal', v);
+// Daniel, 16.11.2026: „nach dem Slide noch immer ein Frame-Glitch“: the box changed size, for one frame her feet sat 90 px lower
+v = await page.evaluate(() => {
+  const s = game.scene.getScene('play'), l = s.leyla, feet = [];
+  nomad.tp(560, 960); nomad.step(20, ['right']); nomad.step(1, ['right', 'down'], ['down']);
+  for (let i = 0; i < 45; i++) { nomad.step(1, i < 20 ? ['right'] : []); if (l.body.blocked.down) feet.push(Math.round(l.feet)); }
+  const out = { min: Math.min(...feet), max: Math.max(...feet), n: feet.length };
+  nomad.restart(); nomad.calm(); nomad.step(10);   // leave her as the next checks expect
+  return out;
+});
+check('Slide-Ende: die Füße bleiben auf dem Boden (kein Ein-Frame-Sprung)', v.n > 30 && v.max - v.min <= 2, v);
 
 v = await t(t => t.tp(28 * 64, 960));
 for (const want of [832, 704, 576]) { v = await t(t => t.run(30, ['right', 'jump'], ['jump'])); v = await t(t => t.run(10)); check(`Sprung auf Plattform ${want}`, v.feet === want, v); }

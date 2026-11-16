@@ -210,7 +210,11 @@
    {"name": "Rost", "color": "#bb7547", "item": "faerbemittel_rost"},
    {"name": "Rußschwarz", "color": "#322b28", "item": "faerbemittel_russschwarz"},
    {"name": "Violett", "color": "#793a80", "item": "faerbemittel_violett"},
-   {"name": "Platin", "color": "#e3e6ff", "item": "faerbemittel_platin"}
+   {"name": "Platin", "color": "#e3e6ff", "item": "faerbemittel_platin"},
+   {"name": "Lavendel", "color": "#b9bffb"},
+   {"name": "Mint", "color": "#92dcba"},
+   {"name": "Neonorange", "color": "#fa6a0a"},
+   {"name": "Weißblond", "color": "#fef3c0"}
   ]
  }
 }
