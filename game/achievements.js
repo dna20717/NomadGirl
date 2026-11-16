@@ -48,7 +48,6 @@ export function achievementOf(D, itemId) {
   for (const [id] of Object.entries(D.achievements || {})) if (trophyOf(D, id) === itemId) return id;
   return null;
 }
-export const isTrophy = (D, a, id) => a === 'items' && !!achievementOf(D, id);
 // a trophy recipe can be made once (Rezepte › Einmalig)
 export const madeOnce = (save, rid) => (save?.achievements?.made || []).includes(rid);
 export function markMade(D, save, rid) { if (D.recipes?.[rid]?.once && !madeOnce(save, rid)) state(save).made.push(rid); }

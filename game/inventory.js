@@ -8,8 +8,6 @@
 // Rectangles only (Daniel, 14.11.2026: „Lass uns mit dem Tetris-Quatsch aufhören und auf Rechtecke beschränken“): items and weapons
 // take their "size" [w, h], backpacks their "bag" footprint (default 2 × 3). Older savegames are tidied by untangle().
 
-export const AREAS_WITH_THINGS = ['items', 'weapons', 'backpacks'];
-
 export function thing(D, a, id) { return D[a]?.[id] || null; }
 
 // the cells of a thing (unturned): list of [x, y], always its whole rectangle

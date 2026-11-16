@@ -68,8 +68,11 @@ export class NavCursor {
     this.root = root; this.start = start; this.i = -1; this.on = false; this.rep = {};
     this.box = el('div', { class: 'ui-cursor', hidden: true });
     document.body.append(this.box);
-    document.addEventListener('mousemove', () => { if (this.on) { this.on = false; this.box.hidden = true; } });
+    this.onMouse = () => { if (this.on) { this.on = false; this.box.hidden = true; } };
+    document.addEventListener('mousemove', this.onMouse);
   }
+  // gone for good (a cursor made for a short-lived menu): its box and its mouse listener go too
+  destroy() { this.hide(); this.box.remove(); document.removeEventListener('mousemove', this.onMouse); }
   targets() {
     return [...this.root.querySelectorAll('button:not([disabled]), [data-nav]')].filter(n => n.offsetParent !== null && !n.closest('[hidden]'));
   }

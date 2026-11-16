@@ -166,7 +166,7 @@
   "discovery": ["start"],
   "tank": 8,
   "tankUpTo": 3,
-  "description": "Tape drauf, Daumen drücken."
+  "hint": "Tape drauf, Daumen drücken."
  },
  "tank_stromzelle": {
   "name": "Stromzelle tauschen",

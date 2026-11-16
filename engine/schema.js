@@ -64,7 +64,6 @@ export const ITEM_CATEGORIES = [['junk', 'Schrott'], ['resource', 'Ressource'], 
 export const WEAR_SLOTS = [['head', 'Kopf'], ['armor', 'Rüstung'], ['eyes', 'Implantat: Augen'], ['nerves', 'Implantat: Nerven'], ['arm', 'Implantat: Cyberarm'], ['heart', 'Implantat: Herz'], ['legs', 'Implantat: Beine'], ['skin', 'Implantat: Haut'],
   ['bow', 'Drohne: Bug'], ['tail', 'Drohne: Heck'], ['core', 'Drohne: Kern'], ['module', 'Drohne: Modul']];
 export const IMPLANT_SLOTS = ['eyes', 'nerves', 'arm', 'heart', 'legs', 'skin'];
-export const DRONE_SLOTS = ['bow', 'tail', 'core', 'module'];
 export const BUFF_STATS = [['health', 'Leben'], ['damage', 'Schaden'], ['speed', 'Tempo'], ['defense', 'Abwehr'], ['luck', 'Glück (Beute)'], ['backpack', 'Rucksackplätze'], ['fuel', 'Spritverbrauch']];
 export const BUFF_DURATIONS = [['instant', 'Sofort'], ['run', 'Nächster Run'], ['travel', 'Nächste Reise'], ['seconds', 'Sekunden'], ['permanent', 'Dauerhaft']];
 export const DISCOVERY = [['experiment', 'Experimentieren'], ['found', 'Fund im POI'], ['companion', 'Tipp von Companion'], ['shop', 'Bei NPCs kaufen'], ['start', 'Von Anfang an'], ['techtree', 'Knoten im Techtree'], ['achievement', 'Achievement']];
@@ -88,7 +87,6 @@ export const DRONE_MOODS = [['idle', 'Normal'], ['kill', 'Gegner erledigt'], ['c
   ['gearBetter', 'Inventar: bessere Ausrüstung'], ['gearWorse', 'Inventar: schlechtere Ausrüstung'], ['gearOff', 'Inventar: Slot geleert'], ['dronePart', 'Inventar: Teil an AvA'],
   ['rescue', 'Inventar: ins Rettungsfach'], ['rescueFood', 'Inventar: Essen ins Rettungsfach'], ['valuable', 'Inventar: Wertsache eingepackt'], ['bagFull', 'Inventar: Rucksack fast voll'], ['invIdle', 'Inventar: lange offen'],
   ['love', 'Nahe beim Cryo-Tank'], ['tankWeak', 'Tank schwach (im Run)']];
-export const RANKING_CATEGORIES = [['time', 'Durchlaufzeit'], ['kills', 'Kills in %'], ['secrets', 'Secrets']];
 
 const label = (list, v) => list.find(([k]) => k === v)?.[1] ?? v ?? '';
 
@@ -348,10 +346,10 @@ export const AREAS = {
     name: 'Wirtschaft', icon: 'coins', file: 'data/economy.json', kind: 'single',
     hint: 'Währung, Startgeld und was beim Tod passiert.',
     sections: [
-      { title: 'Währung', fields: [text('currency.name', 'Name'), text('currency.symbol', 'Symbol'), num('startDeltas', 'Startgeld', { unit: 'Δ', min: 0 }), area_('currency.description', 'Hintergrund')] },
-      { title: 'Tod', fields: [text('rescue.drone', 'Rettungsdrohne'), bool('rescue.losesRunLoot', 'Run-Beute geht verloren'), bool('rescue.losesEquipped', 'Ausgerüstetes geht verloren'),
+      { title: 'Währung', fields: [text('currency.name', 'Name', { hint: 'Noch ohne Wirkung: das Spiel schreibt überall „Δ“' }), text('currency.symbol', 'Symbol', { hint: 'Noch ohne Wirkung: das Spiel schreibt überall „Δ“' }), num('startDeltas', 'Startgeld', { unit: 'Δ', min: 0 }), area_('currency.description', 'Hintergrund')] },
+      { title: 'Tod (noch ohne Wirkung: der k.o. steht unter Camp › Heilen)', fields: [text('rescue.drone', 'Rettungsdrohne'), bool('rescue.losesRunLoot', 'Run-Beute geht verloren'), bool('rescue.losesEquipped', 'Ausgerüstetes geht verloren'),
         num('rescue.keepPercent', 'AvA rettet', { unit: '%', min: 0, max: 100, hint: 'Anteil der Run-Beute, den AvA mitbringt (später über Drohnen-Upgrades)' }), area_('rescue.description', 'Ablauf')] },
-      { title: 'Foodtruck', fields: [num('foodtruck.priceFactor', 'Preisfaktor', { step: 0.05, min: 0, hint: 'Verkaufspreis = Wert × Faktor' }), num('foodtruck.maxPerStop', 'Max. Verkäufe pro Halt', { min: 0 })] },
+      { title: 'Foodtruck (noch ohne Wirkung: kommt mit dem Verkauf)', fields: [num('foodtruck.priceFactor', 'Preisfaktor', { step: 0.05, min: 0, hint: 'Verkaufspreis = Wert × Faktor' }), num('foodtruck.maxPerStop', 'Max. Verkäufe pro Halt', { min: 0 })] },
     ],
   },
   ranking: {
@@ -1104,7 +1102,7 @@ export const AREAS = {
         color('ground.color', 'Boden'), color('ground.top', 'Bodenkante'), color('ground.far', 'Ebene in der Ferne'), num('horizon', 'Horizont', { unit: '%', min: 20, max: 95, hint: 'Vom oberen Bildschirmrand' }), DESCRIPTION] },
       { title: 'Schrottplatz', fields: [bool('yard.enabled', 'Zeigen', { hint: 'Daniel: Lager beim Bauen = Schrottplatz links beim Schacht. Ausgebaute Werkstätten stehen auf Paletten, abgehängte Anhänger parken dahinter' }),
         num('yard.width', 'Breite', { unit: 'Kacheln', min: 4 }), bool('yard.dealer', 'Händler-Platz', { hint: 'Hier abstellen = verkaufen; Gekauftes wird hier geliefert' }), text('yard.dealerName', 'Name am Schild'),
-        num('yard.dealerWidth', 'Breite Händler-Platz', { unit: 'px', min: 80 }), num('yard.palletScale', 'Werkstätten auf Paletten', { unit: '% Größe', min: 20, max: 100 }), num('yard.partScale', 'Rig-Teile im Regal', { unit: '% Größe', min: 20, max: 200 }),
+        num('yard.dealerWidth', 'Breite Händler-Platz', { unit: 'px', min: 80 }), num('yard.palletScale', 'Werkstätten auf Paletten', { unit: '% Größe', min: 20, max: 100, hint: 'Noch ohne Wirkung: verpackte Werkstätten stehen als Kisten auf dem Schrottplatz' }), num('yard.partScale', 'Rig-Teile im Regal', { unit: '% Größe', min: 20, max: 200 }),
         num('yard.parkScale', 'Geparkte Anhänger', { unit: '% Größe', min: 20, max: 100 })] },
       { title: 'Verpackte Werkstätten', fields: [ref('yard.crate.look', 'Kiste', 'assets', { hint: 'Ausgebaute Werkstätten liegen auf dem Schrottplatz verpackt in Kisten. Grafik der Kiste mit Label; leer = Platzhalter aus Code' }),
         num('yard.crate.height', 'Höhe', { unit: 'px', min: 40 }), point('yard.crate.labelAt', 'Label Mitte', { unit: 'Bildpixel', hint: 'Wo auf der Kiste das Label sitzt; dort steht der Name der Werkstatt' }), size('yard.crate.labelSize', 'Label Größe', { unit: 'Bildpixel' }),
@@ -1200,7 +1198,7 @@ export const AREAS = {
     hint: 'Daniel, 12.11.2026: AvA ist ein kleines Mädchen, ihr Körper liegt im Cryo-Tank, ihr Verstand ist in der Drohne geparkt. Der Tank verfällt in Ereignis-Zeit, immer schneller; Wartung = Rezepte an der Werkstatt mit Funktion Cryo-Tank (Rezepte › Oder Tank-Wartung). Jede Rettung beim k.o. kostet Zustand, ist er zu niedrig, stirbt AvA bei der letzten Rettung. Ohne Pflege etwa 10 Runs.',
     sections: [
       { title: 'Tank', fields: [bool('enabled', 'An'), ref('workshop', 'Werkstatt', 'workshops', { hint: 'Steht von Anfang an im kleinsten Container, auch in alten Spielständen' }), ref('container', 'Im Container', 'containers'),
-        num('start', 'Zustand am Anfang', { unit: '%', min: 1, max: 100 }), text('deadName', 'Name, wenn tot')] },
+        num('start', 'Zustand am Anfang', { unit: '%', min: 1, max: 100 }), text('deadName', 'Name, wenn tot'), DESCRIPTION] },
       { title: 'Verfall', fields: [num('rate', 'Grundrate', { unit: '% je Stunde', min: 0, hint: 'Verfall je Stunde Ereignis-Zeit bei vollem Tank' }),
         num('accel', 'Beschleunigung', { min: 0, hint: 'Je schlechter der Zustand, desto schneller: × (1 + Beschleunigung × (100 − Zustand) / 100)' }),
         num('aging', 'Alterung', { unit: 'je Tag', min: 0, hint: 'Je länger der Durchgang dauert, desto schneller: × (1 + Tage × Alterung)' }),
@@ -1267,7 +1265,7 @@ export const AREAS = {
         ref('tunnelAtmosphere', 'Atmosphäre im Tunnel', 'atmosphere', { hint: 'Licht und Stimmung der Abkürzung. Leer = Atmosphäre des Kachel-Sets im Tunnel' }),
         num('seed', 'Fester Seed', { min: 0, hint: 'Zum Testen: immer dasselbe Level. Leer/0 = jeder Run neu gewürfelt' })] },
       { title: 'Ranking', fields: [num('parTime', 'Bestzeit', { unit: 's', min: 0 }), num('secrets', 'Secrets', { min: 0, hint: 'Im Level zählen die brüchigen Wände (B); diese Zahl gilt nur für POIs ohne Level' })] },
-      { title: 'Leben', fields: [bool('npcs', 'NPCs vor Ort'), bool('foodtruck', 'Foodtruck-Verkauf möglich'), bool('shop', 'Händler')] },
+      { title: 'Leben (noch ohne Wirkung)', fields: [bool('npcs', 'NPCs vor Ort'), bool('foodtruck', 'Foodtruck-Verkauf möglich'), bool('shop', 'Händler')] },
     ],
     check: (x, report, p, id) => {
       if (x.gang?.color && !Object.values(p.data.kits || {}).some(K => (K.gangs || []).some(g => g.name === x.gang.color))) report('warning', `Gang-Farbe „${x.gang.color}“ gibt es in keinem Gegner-Bausatz`);

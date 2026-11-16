@@ -26,7 +26,6 @@ export const WEAR_NAMES = { head: 'Kopf', armor: 'Rüstung', eyes: 'Augen', nerv
 const WEAR_ICONS = { head: 'person', armor: 'armor', bow: 'target', tail: 'settings', core: 'flash', module: 'box' };
 // Cyberware tiers (#006): simple = scrap grey, good = cyan, perk + flaw = gold that glows red
 const TIER_COLORS = { 1: '#6d758d', 2: '#249fde', 3: '#f9a31b' };
-export const statLine = st => statParts(st).map(x => x.text).join(' · ');
 
 export function kindOf(D, a, id) {
   const t = thing(D, a, id) || {};

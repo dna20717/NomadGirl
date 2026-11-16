@@ -358,7 +358,7 @@ export class BuildMode {
     if (u.pressed('back') || u.pressed('context')) { this.closeCtx(); this.holds = {}; return; }
     this.ctx.cur.update(u);
   }
-  closeCtx() { if (!this.ctx) return; this.ctx.cur.hide(); this.ctx.cur.box.remove(); this.ctx.box.remove(); this.ctx = null; }
+  closeCtx() { if (!this.ctx) return; this.ctx.cur.destroy(); this.ctx.box.remove(); this.ctx = null; }
 
   // world point → page pixels (for the tooltip and the context menu)
   screenOf(w) {

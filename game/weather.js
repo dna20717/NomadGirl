@@ -20,8 +20,6 @@ const mix = (a, b, k) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
 const css = ([r, g, b], a = 1) => `rgba(${r},${g},${b},${a})`;
 const rng = seed => () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 
-export function weatherDefaults() { return structuredClone(DEFAULTS); }
-
 export function makeWeather(def = {}) {
   const D = Object.fromEntries(Object.entries(DEFAULTS).map(([k, v]) => [k, { ...v, ...(def[k] || {}) }]));
   const r = rng(4711);
