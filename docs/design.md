@@ -261,7 +261,7 @@ Daniel: In einem extrem guten ersten oder spätestens im zweiten Durchgang soll 
 - **Freischalten als Ausbaustufe** mit Rückbezug auf das erste Bergungsprojekt (LKW): wieder eine Bergung über mehrere Abschnitte, aber viel größer. Beide sind der **Lategame-Geldfresser**: Sie verschlingen **Ressourcen, Gegenstände und NPCs**, denn **man braucht eine Crew**.
 - **In jedem Durchgang möglich, im ersten sehr schwer.**
 - **Beide zu haben ist das ultimative Ziel** mit eigenem Achievement, „was für die 1 %“.
-- **Crew = eigenes Sozialsystem** (Daniel, 14.11.2026 abends: „nicht auf Kunden beziehen, sondern ein Sozialsystem bauen, damit wir nicht in Features denken, sondern in Systemen“). **Geparkt**, eigene Design-Session.
+- **Crew = eigenes Sozialsystem** (Daniel, 14.11.2026 abends: „nicht auf Kunden beziehen, sondern ein Sozialsystem bauen, damit wir nicht in Features denken, sondern in Systemen“). Ausgearbeitet in „Die Karawane: Sozialsystem“ (Design-Session 16.11.2026).
 - **Mega-Rigs aus Kachel-Sets statt aus einem Bild** (Daniel, 14.11.2026 spätabends: „dass die Mega-Rigs eher aus mehreren Tilesets zusammengesetzt werden, anstatt im Ganzen erzeugt zu werden“). Crawler und Fatbird entstehen aus wiederholbaren Bausteinen wie die POI-Kacheln (TileSet00) und das Fahrgestell des Rigs. **Nur das rohe Fahrzeug ist spezifisch, alles andere ist ein gemeinsamer Baukasten** (Daniel, 14.11.2026 23:42: „bis auf die rohen Fahrzeuge (gerne größere Tiles) alles so modular, dass es auch für das andere Fahrzeug genutzt werden kann“):
   - **Rohes Fahrzeug = eigenes Kachel-Set je Fahrzeug, gern mit größeren Kacheln** (Daniel: „damit die Fahrzeuge wie Fahrzeuge aussehen“): Crawler = Kettenfahrwerke, Plattform, Kabine; Fatbird = Rumpf, Cockpit, Rahmen, Rotoren, Gashülle. Die Segmente sind als Teile genau dieses Fahrzeugs gezeichnet (durchgehende Linie, Nieten, Lackkanten, Anschlussstellen) und fügen sich nahtlos zusammen.
   - **Alles darauf ist ein gemeinsamer Baukasten für beide Fahrzeuge** (und ⚠️ wo sinnvoll fürs Rig): Container-Module, Aufbauten, Geschütztürme, Kran, Antennen, Schüssel, Bohrturm, Balkone, Treppen, Banner, Neon-Schilder, Sonnensegel. Dafür einheitliches Raster und einheitliche Anschlusspunkte auf beiden Fahrzeugen.
@@ -357,10 +357,111 @@ Die Werkstatt-Arten:
 
 ## Companions, Oberwelt & Wirtschaft
 
-- **Companions** leben im Rig: Sie betreiben Werkstätten (Koch im Foodtruck, Mechaniker in der Drohnenwerkstatt), geben Buffs und Rezepttipps. Eigene Quests und Storylines kommen in Ausbaustufe 2. Vorerst kommen sie nicht mit in die POIs.
+- **Companions** leben im Rig: Sie betreiben Werkstätten (Koch im Foodtruck, Mechaniker in der Drohnenwerkstatt), geben Buffs und Rezepttipps. Eigene Quests und Storylines: siehe „Die Karawane“. Vorerst kommen sie nicht mit in die POIs.
 - **Reisen** kostet Sprit (mehr bei schwerem Rig), Vorräte (pro Kopf und Tag) und Zeit (Tag-Nacht-Wechsel, nachts gefährlicher).
 - **Währung:** Deltas, die offizielle und halb wertlose Stadtwährung von BigCityDelta.
 - **Foodtruck:** An POIs mit NPCs verkauft Leyla selbst gekochte Gerichte.
+
+### Die Karawane: Sozialsystem (Design-Session Daniel, 16.11.2026)
+
+Daniel, 16.11.2026: „Ich möchte, dass wir uns jetzt mit dem Sozialsystem auseinandersetzen … ein Gameplay-System, das die Welt von NomadGirl sinnvoll ergänzt.“ Löst „Crew = eigenes Sozialsystem, geparkt“ (Endgame-Zugmaschinen) und „Companion-Quests und Storylines“ (Ausbaustufe 2) ab. Entschieden in fünf Fragerunden (Multiple Choice).
+
+**In einem Satz:** Leyla sammelt eine Gemeinschaft, die sie trägt und zugleich auffrisst; draußen schreibt ihr Ruf ihre Geschichte, und nach jedem Traum beginnt sie bei Fremden, die sie schon einmal geliebt oder verloren hat.
+
+**Gefühl: Found Family + Karawane.** Leute wachsen einem ans Herz (Beziehungen, Geschichten), brauchen aber Betten, Essen, Wasser, Spaß und Sicherheit und arbeiten fürs Rig. Das Sozialsystem verbindet den Cosy-Basisbau mit dem Lategame-Geldfresser (Crawler braucht Crew).
+
+**Reichweite:** Crew und Bewohner im Rig, Gäste und Passagiere, Siedlungen und Händler an POIs, Gangs und Marken.
+
+#### Die Leute
+
+- **Kernfiguren + gewürfelte Siedler:** wenige handgeschriebene Figuren mit eigener Geschichte (Schraube, Onkel Sung, weitere folgen) und viele gewürfelte aus Bausteinen (Name, Herkunft, Eigenheiten, Fähigkeiten, Aussehen). Alles in der Werkstatt einstellbar (Bausteine und Wahrscheinlichkeiten).
+- **Größe wächst mit dem Rig:** Van 2–3, LKW bis ~6, Crawler/Homestead 15–20. Jede Person bleibt eine Person mit Namen, kein anonymes Volk.
+- **Fähigkeiten** (Stufen 1–3): ⚠️ vorläufig (Ava): Kochen, Schrauben, Medizin, Kampf, Handeln, Spähen.
+- **Eigenheiten** (1–2 je Person): heben oder senken die Moral persönlich und färben Ereignisse. Eine ist bei der Aufnahme sichtbar, die zweite **verborgen** und zeigt sich erst mit der Zeit (Risiko: Dieb, Spitzel, Junkie; Glücksfall: Sanitäterin, Ex-Raider mit Kontakten). ⚠️ vorläufig (Ava), Beispiele: Feinschmecker (Essen zählt doppelt), Nachteule, Frohnatur (+Moral für alle), Hamster (verborgen, stiehlt Vorräte), Spitzel (verborgen, meldet den Ort an eine Gang), Ex-Raider (hilft beim Verhandeln mit seiner Gang), Angsthase (Sicherheit zählt doppelt).
+
+#### Aufnahme (wie State of Decay)
+
+- **Wege hinein:** im POI retten (Gefangene, Verschüttete, Versteckte; sie müssen zum Van), Begegnung auf der Reise (Zwischenfälle: Anhalter, Gestrandete, Überläufer), **Ruf zieht an** (Bewerber am Feuer). Kein Anheuern gegen Δ.
+- **Leyla entscheidet über jeden Neuankömmling** (Daniel). Sie sieht Fähigkeiten und eine Eigenheit. **Überbelegen geht**: mehr Köpfe als Betten, Essen, Platz; das strapaziert die Ressourcen des Rigs und drückt die Moral.
+- **Gäste = Durchreise mit Ziel:** Gäste wollen irgendwohin (Flüchtlinge, Händler, Taxi-Aufträge), brauchen ein Bett in der Gästekoje; Absetzen am Ziel bringt Ruf und Belohnung. Unterwegs kann Leyla ihnen anbieten zu bleiben, dann folgt die Aufnahme-Entscheidung.
+
+#### Rig-Moral + Eigenheiten
+
+- **Eine gemeinsame Moral** aus der Versorgung: **Betten, Essen, Wasser, Spaß, Sicherheit, Platz** (Köpfe gegen das, was das Rig hergibt). Dazu wirken die Eigenheiten jeder Person.
+- ⚠️ vorläufig (Ava): Moral 0–100, wandert pro Tag Ereignis-Zeit auf ihren Zielwert zu (keine Sprünge). Quellen: Schlafplätze (Schlafkoje, Gästekoje …), Vorräte pro Kopf und Tag, Gerichte (besser als Rationen), Zisterne, Chill-Ecke und Feuer, Bewaffnung und Gefahr am Ort, Platz im Rig. Stufen: **Hochstimmung** (Boni auf Jobs), **Stabil**, **Angespannt** (Streit-Ereignisse), **Krise** (Leute gehen, Sabotage).
+- **Moral ist auch Beute** (⚠️ vorläufig, Ava): Fundstücke wie Schallplatte, Brettspiel, Schnaps, Fotoalbum heben die Moral (verbrauchen oder ausstellen). Plündern bekommt einen weichen Grund zusätzlich zum Δ.
+
+#### Jobs
+
+- **Werkstätten betreiben:** Wer an einer Werkstatt eingeteilt ist, gibt Boni nach Fähigkeit (Koch kocht nebenbei, Mechaniker pflegt AvA, Sanitäterin heilt Verletzte) und etwas Automatik.
+- **Ausflüge am Warroom:** auf der Reisekarte Leute an einen Nachbarort schicken (Plündern, Handeln, Spähen, Verhandeln, Retten). Sie brauchen Proviant und Ausrüstung, sind einige Stunden weg; das Ergebnis wird aus Fähigkeiten, Gefahr und Ausrüstung gewürfelt, der Bericht ist eine kleine Geschichte (Beute, Verletzungen, Fundstücke, neue Bekannte, Tod).
+- **Rig verteidigen:** bei Überfällen an ihren Posten (Waffenkammer, Geschütztürme).
+- Die Crew kommt **nicht** mit in die POIs.
+
+#### Beziehungen
+
+- **Vertrauen zu Leyla** in Stufen, je Person mit eigener Geschichte (Hades-Prinzip: Kernfiguren handgeschrieben, Gewürfelte aus Bausteinen). Vertrauen öffnet Gespräche, Aufträge, Boni, Geheimnisse.
+- **Crew-Netz:** Freundschaft und Rivalität untereinander, entsteht aus Eigenheiten und gemeinsamen Erlebnissen und löst Ereignisse aus.
+- **Das Feuer als Bühne** (⚠️ vorläufig, Ava): Abends setzt sich die Crew ans Lagerfeuer. Dort passieren Geschichten, Streit und Vertrauens-Szenen; Leyla setzt sich dazu (vorhandenes Hinsetzen am Feuer).
+
+#### Wenn die Moral kippt
+
+- **Streit und Ereignisse:** Konflikte am Feuer, Leyla schlichtet mit Dialog-Entscheidungen (wer bekommt recht, wer das letzte Bett).
+- **Leute gehen**, manche nehmen etwas mit.
+- **Sabotage und Diebstahl:** Vorräte verschwinden, Werkstätten fallen aus, ein Spitzel verrät den Ort an eine Gang.
+
+#### Tod
+
+- **Permadeath, hart** (Daniel). Crew stirbt auf Ausflügen und bei Überfällen. Trauer drückt die Moral.
+- **Gedenkstein am Feuer** (⚠️ vorläufig, Ava): Jeder Tote bekommt eine Kerbe.
+
+#### Ruf
+
+- **Ein Wert je Fraktion** (jede Gang, jede Siedlung, jede Marke: Feind … Freund) **plus Ruhm** (wie bekannt Leyla in der Gegend ist). Taten wirken oft auf mehrere: Wer Delta Petrol hilft, ärgert die Gang, die dort plündert.
+- **Wirkt auf:** Preise und Angebote (Ware, Rezepte, Rig-Teile), Überfälle und Kopfgeld (verhasste Gangs jagen das Rig, Elite-Jäger), Wege und Zugang (Durchfahrt durch Gang-Gebiet, Tore von Siedlungen, Straßen auf der Karte frei oder gesperrt), Bewerber und Gerüchte (Ruhm lockt Leute ans Feuer, Gerüchte eilen voraus).
+- **Gangs:** Verhandeln ist möglich (Tribut, Aufträge für sie, Waffenstillstand, gegeneinander ausspielen), aber **POIs werden dadurch nicht zwangsläufig friedlich**. Ein friedlicher POI ist das **Endgame der Diplomatie** (Daniel).
+- **Ruf auf der Reisekarte:** Gebiete der Fraktionen und ihr Ruf direkt auf der Karte.
+
+#### Überfälle
+
+- **Spielbar im Camp:** Eine Welle Raider stürmt das Camp, Leyla kämpft selbst, die Crew kämpft an ihren Posten. Kleine Banden schreckt die Bewaffnung ab (Bewaffnungs-Schwelle aus „Ausrüstung wirkt auf die Reise“). Auslöser: Ruf (Kopfgeld), Gefahr am Ort, verratener Ort.
+
+#### Der Traum
+
+- **Alle vergessen, Leyla nicht** (Daniel). Im neuen Durchgang sind alle wieder Fremde, Tote stehen wieder am Feuer. Leyla erinnert sich: Déjà-vu-Dialoge, verborgene Eigenheiten sind ihr schon bekannt („Ich weiß, was du in der Kiste versteckst.“), Vertrauen wächst schneller, wenn sie Erinnerungen richtig einsetzt.
+- ⚠️ vorläufig (Ava): Die Kerben am Gedenkstein bleiben; eine Kerbe leuchtet, wenn die Person im neuen Durchgang wieder auftaucht. Achievement **„Diesmal nicht“**: jemanden retten, der im Traum davor gestorben ist.
+- Spielstand: Leylas Erinnerungen an Personen (gesehen, Eigenheiten erkannt, gestorben, Vertrauen erreicht) gehören zu den bleibenden Knoten wie Techtree und Achievements; Crew, Moral und Ruf beginnen neu.
+
+#### Oberfläche
+
+- **Crew-Fenster:** Personen, Moral mit ihren Quellen, Fähigkeiten, Eigenheiten, Jobs, Beziehungsnetz. ⚠️ vorläufig (Ava): erreichbar an Chill-Ecke/Schlafkoje und als Tab im Pause-Menü.
+- **Lebendiges Camp:** Leute gehen zu ihren Werkstätten, sitzen abends am Feuer, streiten sichtbar; Stimmung über Bläschen und Gesten.
+- **Ruf auf der Reisekarte.**
+- Oberflächen wie gehabt mit Lucide-Icons, Dialoge im Comic-Kasten.
+
+#### Andocken an Bestehendes
+
+- **Companions** (Schraube, Onkel Sung) werden die ersten Kernfiguren; „Fährt als Gast mit“ wird zur Gast-Rolle.
+- **Gästekoje** = Betten für Gäste; Schlafplätze zählen für die Moral.
+- **Schwarzes Brett** bleibt der Ort für Aufträge; Aufträge der Crew und der Fraktionen landen dort.
+- **Crawler / Homestead:** Crew-Plätze, Bewohner, Stimmung; Keystone „Rollende Stadt“ = die Crew arbeitet, während Leyla im Run ist.
+- **Zwischenfälle der Reise** werden zur Begegnung mit Leuten und Gangs.
+
+#### Ausbaustufen
+
+1. **Crew-Kern:** Bereich „Leute“ (Kernfiguren + Bausteine für Gewürfelte), Fähigkeiten, Eigenheiten (sichtbar/verborgen), Rig-Moral aus der Versorgung, Aufnahme-Entscheidung mit Überbelegung, Werkstätten-Jobs, Crew-Fenster. Neue Leute zunächst als Bewerber am Feuer und über Zwischenfälle der Reise.
+2. **Leben & Drama:** lebendiges Camp (Jobs, Feuer am Abend), Vertrauensstufen + Crew-Netz, Feuer-Szenen, Streit/Gehen/Sabotage, Moral-Fundstücke.
+3. **Draußen:** Retten im POI, Gäste mit Ziel, Ausflüge am Warroom, Verletzungen, Permadeath, Gedenkstein.
+4. **Ruf:** Fraktionen + Ruhm, Wirkung auf Preise, Wege, Bewerber, Gerüchte; Ruf auf der Karte; Verhandeln mit Gangs.
+5. **Überfälle:** spielbar im Camp, Kopfgeld und Jäger, Crew an Posten.
+6. **Traum & Endgame:** Déjà-vu, erkannte Eigenheiten, „Diesmal nicht“, friedlicher POI, Anbindung Crawler/Homestead.
+
+#### Offen
+
+- [ ] Braucht der Fatbird auch eine Crew (aus „Endgame-Zugmaschinen“)?
+- [ ] Wer sind die neuen Kernfiguren (Anzahl, Geschichten)? Eigene Schreib-Session.
+- [ ] Aussehen der gewürfelten Siedler: Bausatz wie beim Raider (Köpfe, Körper, Farben)? Kostet PixelLab (unter 700: nur mit Freigabe).
+- [ ] Welche Gangs und Siedlungen gibt es, und wo liegen ihre Gebiete auf der Karte?
 
 ## Look & Feel
 
@@ -428,7 +529,7 @@ Ein POI mit Ranking, Rucksack-Raster, Tod mit AvA, Rig mit zwei bis drei Werkst�
 
 ### Ausbaustufe 2
 
-Companion-Quests und Storylines, Hacking, Automatisierung, mehr Container und Zugmaschinen.
+Sozialsystem „Die Karawane“ (eigene Ausbaustufen, siehe dort), Hacking, Automatisierung, mehr Container und Zugmaschinen.
 
 ## Offene Fragen
 

@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Ava → Code: **Design-Session Sozialsystem „Die Karawane“** mit Daniel (5 Fragerunden), Kapitel in `docs/design.md` › Companions, Oberwelt & Wirtschaft › Die Karawane, 6 Ausbaustufen. Neu: **#040 Crew-Kern** (offen, wartet auf Daniels OK zum Bauen).
 - 16.11. Code → Ava: **HNC / Übergabe.** Stand `main` nach dieser Sitzung: #038 (8 neue POIs, Türme + Tiefen, Schacht-Abkürzung), #039 (Ressourcen verdienen + Gruppen-Alarm; Herstellen gibt jedes Mal 1 Ressource nach Werkstatt-Art), Große Durchsicht (Details `docs/backlog.md` › Erledigt 16.11.). Entscheidungen Daniel 16.11.: AvA ohne Tastatur-Gummiband (Controller zuerst); im neuen Durchgang bleibt vom Mega-Rig nur das Rig, nicht die Ausbaustufen; Nachreichen nur einmal pro Spielstand. Tests: `npm test` 181, Browser 38/38. Keine offenen Tickets. Nächste Kandidaten (ohne neue Assets, Daniels Liste): Stromausfall per Schalter (Avas Empfehlung beim Licht), Hausmeister-Boss, Luft um Türme, Kleinkram-Bündel (Zugmaschine tauschen, Deko an Mega-Rig-Wand/Dach, Kachel-Set-Vorschau), Mega-Rig-Ausflüge; offene Technik-Schulden C10 (Umbenennen ↔ Spielstände), C11, C13–C15. PixelLab übrig 464 (unter 700: jeder Auftrag nur mit Daniels Freigabe).
 - 16.11. Code → Ava: Große Durchsicht (ohne Ticket, Daniel: „keine unsichtbaren technischen Schulden … nichts kaputt machen“): 3 Lese-Prüfer + automatische Checks, ~20 Fehler repariert (u. a. Mega-Rig verlor Plätze beim Laden, Deko ließ sich per Rückgängig verdoppeln, Lager-Inhalte konnten beim Spielstand-Reparieren verloren gehen). Offenes in `docs/backlog.md` C10–C17. PixelLab 0.
 - 16.11. Code → Ava: #039 nachgeschärft: Herstellen gibt jedes Mal 1 Technik/Wissen/Bio nach Werkstatt-Art (Daniel).
@@ -628,6 +629,22 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - Wer hört den Ruf? → ⚠️ nur dieselbe Familie (Plünderer rufen Plünderer, Mutanten Mutanten); Gerufene rufen erst weiter, wenn sie Leyla selbst sehen.
   - Mengen → ⚠️ Startwerte (Kiste 35 % Technik, Mutant 35 % Bio, Plünderer 20 % Technik, Secret 1–2 Wissen, Rang ab C), alles in Ranking › Ressourcen verdienen einstellbar; nach dem Anspielen justieren.
 - **Ergebnis:** `game/earn.js`, Kiste/Kill/Secret/Tresor/Werkstatt verdrahtet, Felder Gegner › Ruft andere + Rufe, Spiel › Kampf › Gruppen-Alarm. Tests: `npm test` 173 (3 neu), Browser `alarm_test` 4. PixelLab 0. **Bitte testen:** einen POI spielen: Kisten und Secrets geben ab und zu Technik/Wissen, ein guter Rang Wissen in den Tresor; in Delta Heights einen Schläger auf dich aufmerksam machen und zusehen, wie die Etage zusammenläuft. In der Küche ein neues Gericht kochen: „Zum ersten Mal: +1 Bio“.
+
+
+### #040 Die Karawane, Stufe 1: Crew-Kern
+- **Status:** offen · angelegt 16.11. von Ava · **wartet auf Daniels OK zum Bauen**
+- **Für:** Code
+- **Lesen:** design.md › Die Karawane: Sozialsystem (ganz), › Endgame-Zugmaschinen (Crew), docs/features/camp.md (Companions, Schwarzes Brett, Dialog), docs/features/benches.md (Gästekoje)
+- **Auftrag:**
+  1. Werkstatt-Bereich **„Leute“** (ersetzt bzw. erweitert Companions): Kernfiguren (Schraube, Onkel Sung übernehmen) + Bausteine für Gewürfelte (Namen, Herkunft, Fähigkeiten, Eigenheiten mit sichtbar/verborgen und Wirkung, Gewichte). Alte Spielstände reparieren.
+  2. **Rig-Moral** aus Betten, Essen, Wasser, Spaß, Sicherheit, Platz + Eigenheiten; Zielwert, Wandern pro Tag Ereignis-Zeit, Stufen (Hochstimmung … Krise) mit Wirkung nur auf Jobs (Drama kommt in Stufe 2). Alle Werte in der Werkstatt.
+  3. **Aufnahme-Entscheidung**: Bewerber am Feuer (zufällig, selten) und als Zwischenfall auf der Reise; Dialog zeigt Fähigkeiten + eine Eigenheit, Aufnehmen/Ablehnen, Überbelegung erlaubt (drückt Moral). Verborgene Eigenheit deckt sich nach einigen Tagen auf.
+  4. **Werkstätten-Jobs**: Person an Werkstatt einteilen, Boni nach Fähigkeit.
+  5. **Crew-Fenster** (Personen, Moral mit Quellen, Fähigkeiten, Eigenheiten, Jobs), Controller-tauglich.
+- **Fertig, wenn:** Bereich in der Werkstatt, `ng check` grün, Spielstände gültig (`repairSave`), eigener Test (Moral-Rechnung, Aufnahme, Aufdecken), Browser-Test fürs Crew-Fenster, Build grün auf `main`.
+- **Grenzen:** keine neuen PixelLab-Grafiken ohne Daniels Freigabe (übrig 464); gewürfelte Siedler vorerst aus Code/vorhandenen Figuren.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ## Archiv
 
