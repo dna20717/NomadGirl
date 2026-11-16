@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Code → Ava: #045 Lore-Datenbank Marken läuft (Daniels Auftrag im Code-Chat).
 - 16.11. Code → Ava: Ohne Ticket (Daniel: „Haare färben haut nicht hin, Animations-Reihenfolge kaputt“): nach dem Färben spielte Leyla keine Animation mehr (veraltete Looks der Szene), Gegenrichtung/Gewehre/Idles blieben pink; beides behoben, Prüfungen im Spiegel-Test.
 - 16.11. Code → Ava: Ohne Ticket (Daniel im Code-Chat): Slide-Frame-Glitch behoben (Kollisionsbox verschob die Füße einen Frame lang um 90 px), vier Gratis-Farben am Spiegel. ⚠️ vorläufig: Lavendel, Mint, Neonorange, Weißblond.
 - 16.11. Code → Ava: #044 Haare färben fertig: Signaturfarbe (Haare + Akzente) am Spiegel, zehn AAP-64-Farben, Färbemittel aus Rezepten und Beute. Tests grün, PixelLab 0.
@@ -693,3 +694,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Fertig, wenn:** Farbtausch in allen Leyla-Animationen und im Inventar-Bild, Spiegel als Deko, Färbemittel als Gegenstände mit Rezepten und Beute, alles in der Werkstatt, Tests grün, Build grün auf `main`.
 - **Rückfragen:** (Code) ⚠️ vorläufig: zehn Farben (Neonpink, Giftgrün, Neontürkis, Eisblau, Feuerrot, Kurkuma-Gold, Rost, Rußschwarz, Violett, Platin) mit Rezepten aus vorhandenen Zutaten, Violett und Platin nur als Beute; Färbemittel tragen das Bild der Sojasaucen-Flasche (keine neue Grafik); die Farbe bleibt über den Traum; AvA färbt nicht mit; der Spiegel ist Deko beim Händler (60 Δ).
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 185/185, Browser 39/39 (neu `tools/mirror_test.mjs`, `test/signature.test.js`). PixelLab 0. **Bitte testen:** Spiegel im Bau-Modus kaufen und aufstellen, E: Farben; ein Färbemittel kochen (z. B. Mutantengemüse + Wasser an der Kochnische) und färben; Leyla im Camp, im Run und im Inventar ansehen.
+
+### #045 Lore-Datenbank: Marken
+- **Status:** läuft · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Für:** Code
+- **Lesen:** docs/features/worldmap.md › Marken, docs/features/cyberware.md, docs/features/leyla.md › Signaturfarbe
+- **Auftrag (Daniel, 16.11.2026):** „Lass uns die Gelegenheit nutzen, eine Lore-Datenbank in der Werkstatt anzulegen, wo wir Brands sammeln und mit sinnvollen Eigenschaften versehen können … Cyberware auf jeden Fall mitnehmen.“ Haarfarben-Marken abgesegnet (CHROMA//KILL, Kessler Kosmetik, DeltaTint, „Toxic Bloom“ …). Antworten: **eine Quelle** (Karten-Marken ziehen um, die Reisekarte liest dort), Felder **Grundlagen + Stellung in der Welt + Spielwerte** (keine Fraktion), **neue Cyberware-Hersteller + Zuordnung** der 30 Implantate.
+- **Fertig, wenn:** Bereich „Marken“ in der Werkstatt, Reisekarte unverändert, Implantate und Färbemittel mit Hersteller, Spielwerte wirken, Tests grün, Build grün auf `main`.
+- **Rückfragen:**
+- **Ergebnis:**
+
