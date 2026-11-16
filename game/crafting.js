@@ -98,16 +98,14 @@ export function craft(D, save, id, ws, x = {}) {
   markMade(D, save, id);
   for (const p of x.parts || []) take(D, save, p, 1);   // the weapon parts go into the weapon
   const left = produce(D, save, r, n, x);
-  return { ok: true, recipe: id, made: { ...resultOf(r), n, ...(x.q ? { q: x.q } : {}), ...(x.mods ? { mods: x.mods } : {}) }, left, minutes, earned: firstTime(D, save, id, ws) };
+  return { ok: true, recipe: id, made: { ...resultOf(r), n, ...(x.q ? { q: x.q } : {}), ...(x.mods ? { mods: x.mods } : {}) }, left, minutes, earned: byProduct(D, save, id, ws) };
 }
 
-// Ressourcen verdienen (#039): a recipe made for the first time pays out (kitchen: cook, everything else: build), into the stores like
-// the result. Only the first time, so nothing can be farmed by crafting the same cheap thing again and again. → [{ a, id, n }]
-function firstTime(D, save, rid, ws) {
-  const list = save.firstMade ??= [];
-  if (list.includes(rid)) return [];
-  list.push(rid);
-  const got = earn(D, functionOf(D, ws) === 'kitchen' ? 'cook' : 'build');
+// Ressourcen verdienen (#039, Daniel 16.11.2026): every recipe made gives a by-product, one of the three resources by the kind of
+// workshop (Ranking › Ressourcen verdienen › Etwas hergestellt), into the stores like the result. The tree's costs grow, the
+// by-product does not: resources turn into progress, but slowly. → [{ a, id, n }]
+function byProduct(D, save, rid, ws) {
+  const got = earn(D, 'craft', { function: functionOf(D, ws) });
   for (const t of got) t.left = give(D, save, t.id, t.n);
   return got;
 }
@@ -152,7 +150,7 @@ export function experiment(D, save, ws, pot, rnd = Math.random) {
     advance(save, minutes / 60);
     markMade(D, save, r.id);
     const left = produce(D, save, r, n);
-    return { ok: true, hit: true, recipe: r.id, learnt, made: { ...resultOf(r), n }, left, minutes, earned: firstTime(D, save, r.id, ws) };
+    return { ok: true, hit: true, recipe: r.id, learnt, made: { ...resultOf(r), n }, left, minutes, earned: byProduct(D, save, r.id, ws) };
   }
   const near = C.nearMiss !== false ? nearMiss(D, ws, pot) : null;
   const share = (C.failConsume ?? 100) / 100;

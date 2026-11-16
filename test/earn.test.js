@@ -28,13 +28,18 @@ test('Rang: guter Rang gibt Wissen extra, S auch Technik, F nichts', () => {
   assert.deepEqual(ids(earn(D, 'rank', { grade: 'S' }, sure)), ['technik×2', 'wissen×2']);
   assert.equal(earnRows(D, 'rank', { grade: 'B' }).length, 1);
 });
-test('Kochen/Herstellen: nur beim ersten Mal je Rezept, landet im Lager (kein Farming)', () => {
+test('Herstellen: jedes Mal ein Nebenergebnis, die Ressource nach Werkstatt-Art (Küche Bio, Ripperdoc Wissen, sonst Technik)', () => {
+  assert.deepEqual(ids(earn(D, 'craft', { function: 'kitchen' }, sure)), ['bio×1']);
+  assert.deepEqual(ids(earn(D, 'craft', { function: 'cyber' }, sure)), ['wissen×1']);
+  assert.deepEqual(ids(earn(D, 'craft', { function: 'craft' }, sure)), ['technik×1']);
+  assert.deepEqual(ids(earn(D, 'craft', {}, sure)), ['technik×1']);
   const s = newSave(D); s.hour = 18.5;
   const bio0 = stock(D, s).bio || 0;
   const a = craft(D, s, 'bohneneintopf', 'kochnische');
   assert.ok(a.ok, a.reason);
   assert.deepEqual(ids(a.earned), ['bio×1']);
-  assert.equal(stock(D, s).bio || 0, bio0 + 1);
   const b = craft(D, s, 'bohneneintopf', 'kochnische');
-  if (b.ok) assert.deepEqual(b.earned, []);
+  assert.ok(b.ok, b.reason);
+  assert.deepEqual(ids(b.earned), ['bio×1']);   // every time, not only the first
+  assert.equal(stock(D, s).bio || 0, bio0 + 2);
 });

@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 16.11.2026: **Herstellen gibt immer eine Ressource** (#039): jedes Rezept bringt nebenbei 1 Technik, Wissen oder Bio, je nach Werkstatt.
 - 15.11.2026: **Ressourcen verdienen, Gruppen-Alarm** (#039): Kisten, besiegte Gegner (Mutanten Bio, Plünderer Technik, Bosse viel), Secrets, ein guter Rang und das erste Kochen/Herstellen je Rezept bringen Technik, Wissen und Bio (Ranking › Ressourcen verdienen); wer Leyla entdeckt, ruft „Da!“ und seine Familie kommt nachschauen.
 - 15.11.2026: **Acht neue POIs, auch vertikal** (#038): Hochhaus-Ruine Delta Heights, Parkhaus P+R Delta Süd und Funkmast KM 31 gehen nach oben, Metro Line 4, Storm Drain 9 und das Salzbergwerk Pit 6 nach unten, dazu Raffinerie Delta Crude und Trailerpark Sunny Acres; 53 neue Raum-Bausteine, Stapel-Modus mit Leitern zwischen den Etagen, gespiegelten Räumen und einem Schacht als Abkürzung.
 - 15.11.2026: **Balkone, Brücken, Aussichtsturm** (#037): begehbare Deko; vom Turm über die Hängebrücke auf den Balkon in den oberen Container.

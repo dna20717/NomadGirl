@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Code → Ava: #039 nachgeschärft: Herstellen gibt jedes Mal 1 Technik/Wissen/Bio nach Werkstatt-Art (Daniel).
 - 15.11. Code → Ava: #039 fertig: Ressourcen für Kisten, Kills, Secrets, Rang und erstes Herstellen; Gruppen-Alarm. PixelLab 0.
 - 15.11. Code → Ava: #038 fertig: acht neue POIs (S bis XL), drei Türme nach oben, drei Tiefen nach unten, Schacht als Abkürzung. PixelLab 0.
 - 15.11. Code → Ava: #037 fertig: Balkone, Hängebrücke, Stahlsteg, Aussichtsturm, alles begehbar. PixelLab 0.
@@ -621,7 +622,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Auftrag:** Daniel wählt aus der Liste „ohne neue Assets“: Ressourcen verdienen (Kisten, Kills, Secrets, guter Rang, design.md) und Gruppen-Alarm (wer Leyla sieht, ruft die anderen).
 - **Rückfragen:**
-  - Kochen/Bauen farmbar? → ⚠️ nur beim ersten Mal je Rezept (passt zu „Kein Farming“ beim Zerlegen).
+  - Kochen/Bauen farmbar? → Daniel 16.11.: jedes Herstellen gibt eine der drei Ressourcen (nach Werkstatt-Art), nicht nur das erste Mal; der Techtree wird teurer, das Nebenergebnis nicht.
   - Wer hört den Ruf? → ⚠️ nur dieselbe Familie (Plünderer rufen Plünderer, Mutanten Mutanten); Gerufene rufen erst weiter, wenn sie Leyla selbst sehen.
   - Mengen → ⚠️ Startwerte (Kiste 35 % Technik, Mutant 35 % Bio, Plünderer 20 % Technik, Secret 1–2 Wissen, Rang ab C), alles in Ranking › Ressourcen verdienen einstellbar; nach dem Anspielen justieren.
 - **Ergebnis:** `game/earn.js`, Kiste/Kill/Secret/Tresor/Werkstatt verdrahtet, Felder Gegner › Ruft andere + Rufe, Spiel › Kampf › Gruppen-Alarm. Tests: `npm test` 173 (3 neu), Browser `alarm_test` 4. PixelLab 0. **Bitte testen:** einen POI spielen: Kisten und Secrets geben ab und zu Technik/Wissen, ein guter Rang Wissen in den Tresor; in Delta Heights einen Schläger auf dich aufmerksam machen und zusehen, wie die Etage zusammenläuft. In der Küche ein neues Gericht kochen: „Zum ersten Mal: +1 Bio“.
