@@ -43,10 +43,12 @@ export function applySignature(scene) {
   const D = scene.data_, save = scene.box?.save, swap = swapFor(D, save), key = current(D, save)?.color || '';
   const orig = scene.game[ORIG] ??= {};
   if ((scene.game.__signatureKey ?? '') === key) return false;
-  const ids = new Set(Object.values(D.leyla?.look || {}).filter(id => id && D.assets?.[id]?.kind === 'animation'));
+  // every animation of Leyla: her look, the painted other direction (Asset › Gegenrichtung), rifles, random idles, sitting … (all „leyla_*“)
+  const A = D.assets || {}, ids = new Set([...Object.values(D.leyla?.look || {}), ...Object.keys(A).filter(k => k.startsWith('leyla_'))].filter(id => A[id]?.kind === 'animation'));
+  for (const id of [...ids]) if (A[A[id]?.mirror]?.kind === 'animation') ids.add(A[id].mirror);
   for (const id of ids) {
     if (!scene.textures.exists(id)) continue;
-    const A = D.assets[id], [fw, fh] = A.frameSize;
+    const [fw, fh] = A[id].frameSize;
     const src = orig[id] ??= scene.textures.get(id).getSourceImage();
     const cv = document.createElement('canvas'); cv.width = src.width; cv.height = src.height;
     const ctx = cv.getContext('2d', { willReadFrequently: true });
@@ -59,6 +61,10 @@ export function applySignature(scene) {
     scene.textures.addSpriteSheet(id, swap ? cv : src, { frameWidth: fw, frameHeight: fh });
     scene.textures.get(id).setFilter(filter);
   }
+  // the scene keeps Leyla's looks over restarts (scene.js playLook: this.looks); they pointed at the old animations:
+  // forget them and build the animations again, otherwise she plays nothing after a new colour (Daniel, 16.11.2026: „Animations-Reihenfolge kaputt“)
+  scene.looks = {};
+  for (const id of ids) if (scene.textures.exists(id)) scene.assetInfo?.(id);
   scene.game.__signatureKey = key;
   return true;
 }

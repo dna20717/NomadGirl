@@ -62,6 +62,17 @@ await page.waitForFunction(() => { if (game.__signatureKey !== '#59c135') nomad.
 const after = await colours();
 check('Leylas Pixel: Pink weg, Grün da', before.pink > 200 && after.pink < before.pink * 0.05 && after.green > before.pink * 0.5, { before, after });
 await shot('green');
+// Daniel, 16.11.2026: „das Haare färben haut noch nicht hin … die Animations-Reihenfolge kaputt“: after a colour she played nothing
+// (the scene kept looks of the old animations), and the painted other direction, rifles, idles stayed pink
+r = await ev(() => {
+  const s = game.scene.getScene('play'), l = s.leyla, seen = [];
+  nomad.take(); for (let i = 0; i < 30; i++) { nomad.step(2, ['right']); seen.push(l.sprite.anims.currentFrame?.index ?? null); }
+  const pinkIn = id => { if (!s.textures.exists(id)) return -1; const src = s.textures.get(id).getSourceImage(), cv = document.createElement('canvas'); cv.width = src.width; cv.height = src.height; const c = cv.getContext('2d'); c.drawImage(src, 0, 0); const d = c.getImageData(0, 0, cv.width, cv.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i + 3] && d[i] > 180 && d[i + 2] > 120 && d[i + 1] < 120) n++; return n; };
+  const ids = Object.keys(s.data_.assets).filter(k => k.startsWith('leyla_') && s.data_.assets[k].kind === 'animation' && s.textures.exists(k));
+  return { frames: [...new Set(seen)].length, missing: seen.filter(f => f == null).length, pinky: ids.filter(id => pinkIn(id) > 20), total: ids.length };
+});
+check('Nach dem Färben laufen die Animationen weiter (Rennen zählt seine Frames durch)', r.frames >= 6 && !r.missing, r);
+check('Jede Leyla-Animation ist gefärbt (auch Gegenrichtung, Gewehr, Idles)', r.total > 50 && !r.pinky.length, r);
 r = await ev(() => { const s = game.scene.getScene('play'); s.hud.inv.open(); return document.querySelector('.inv-figure img')?.getAttribute('src')?.slice(0, 22); });
 await page.waitForTimeout(800);
 r = await ev(() => document.querySelector('.inv-figure img')?.getAttribute('src')?.slice(0, 22));

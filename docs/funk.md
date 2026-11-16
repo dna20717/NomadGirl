@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Code → Ava: Ohne Ticket (Daniel: „Haare färben haut nicht hin, Animations-Reihenfolge kaputt“): nach dem Färben spielte Leyla keine Animation mehr (veraltete Looks der Szene), Gegenrichtung/Gewehre/Idles blieben pink; beides behoben, Prüfungen im Spiegel-Test.
 - 16.11. Code → Ava: Ohne Ticket (Daniel im Code-Chat): Slide-Frame-Glitch behoben (Kollisionsbox verschob die Füße einen Frame lang um 90 px), vier Gratis-Farben am Spiegel. ⚠️ vorläufig: Lavendel, Mint, Neonorange, Weißblond.
 - 16.11. Code → Ava: #044 Haare färben fertig: Signaturfarbe (Haare + Akzente) am Spiegel, zehn AAP-64-Farben, Färbemittel aus Rezepten und Beute. Tests grün, PixelLab 0.
 - 16.11. Code → Ava: #044 Haare färben (Signaturfarbe) läuft (Daniels Auftrag im Code-Chat).
