@@ -335,8 +335,8 @@ export class CampDecor {
     const name = id => D.items?.[id]?.name || id;
     s.hud.menu({ title: d.name || 'Spiegel', sub: 'Leylas Signaturfarbe: Haare und Akzente. Ein Färbemittel schaltet eine Farbe für immer frei.', mirror: { image: url ? dyedUrl(D, save, url, null) : null },
       items: rows.map(r => ({ label: r.name, primary: r.on, swatch: r.color || '#ff7ac0',
-        sub: r.on ? 'trägst du' : r.unlocked ? 'frei' : `${r.have} Färbemittel da`,
-        disabled: !r.on && !r.unlocked && !r.have ? `fehlt: ${name(r.item).replace('Färbemittel ', '')}-Färbemittel` : null,
+        sub: [r.brand, r.on ? 'trägst du' : r.unlocked ? 'frei' : `${r.have} da`].filter(Boolean).join(' · '),
+        disabled: !r.on && !r.unlocked && !r.have ? [r.brand, 'fehlt'].filter(Boolean).join(' · ') : null,
         onFocus: () => show(r.i),
         act: () => { if (r.on) return; const res = dye(D, save, r.i, (id, n) => take(D, save, id, n)); if (!res.ok) return s.hud.toast(res.reason, '', 'warn', 2600); s.box.persist?.(); s.goCamp({ banner: [`Signaturfarbe: ${r.name}`, res.used ? 'Ein Färbemittel verbraucht' : 'Schon freigeschaltet'], fade: 500, keepPlace: true }); } })) });
     show(rows.find(r => r.on)?.i ?? 0);

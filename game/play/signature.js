@@ -20,7 +20,7 @@ export function swapOf(D, c) {
 // what the mirror shows: every colour with its state; unlocked = free to put on again
 export function mirrorRows(D, save, have) {
   const L = save.look || {}, un = new Set([0, ...(L.unlocked || [])]);
-  return colors(D).map((c, i) => ({ i, name: c.name || `Farbe ${i + 1}`, color: c.color || null, item: c.item || null, on: (L.color ?? 0) === i, unlocked: un.has(i) || !c.item, have: c.item ? have(c.item) : 0 }));
+  return colors(D).map((c, i) => ({ i, name: c.name || `Farbe ${i + 1}`, brand: D.brands?.[c.brand]?.name || '', color: c.color || null, item: c.item || null, on: (L.color ?? 0) === i, unlocked: un.has(i) || !c.item, have: c.item ? have(c.item) : 0 }));
 }
 // dye: unlock (one packet used up, if it was not unlocked) and wear it. take(id, n) → how many were taken. → { ok, used, reason }
 export function dye(D, save, i, take) {

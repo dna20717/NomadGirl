@@ -531,7 +531,8 @@
   "description": "Cyber-Augen mit Restlichtverstärker. Leyla trifft besser, auch im Dunkeln.",
   "tags": ["trophy"],
   "salvageAt": "werkbank",
-  "salvage": [{"item": "chip", "count": 1}]
+  "salvage": [{"item": "chip", "count": 1}],
+  "brand": "neurolux"
  },
  "reflex_booster": {
   "name": "Reflex-Booster",
@@ -547,7 +548,8 @@
   "value": 300,
   "description": "Chip am Rückenmark. Alles fühlt sich ein bisschen langsamer an, nur Leyla nicht.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "kupferkabel", "count": 1}]
+  "salvage": [{"item": "kupferkabel", "count": 1}],
+  "brand": "neurolux"
  },
  "cyberarm_mk1": {
   "name": "Cyberarm Mk I",
@@ -563,7 +565,8 @@
   "value": 400,
   "description": "Leylas eigener Arm, selbst geflickt. Schlägt härter zu als Fleisch.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "zahnraeder", "count": 1}]
+  "salvage": [{"item": "zahnraeder", "count": 1}],
+  "brand": "backalley_chrome"
  },
  "subdermale_platten": {
   "name": "Subdermale Platten",
@@ -579,7 +582,8 @@
   "value": 320,
   "description": "Dünne Panzerplatten unter der Haut. Zieht beim Wetterumschwung.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrottplatte", "count": 1}]
+  "salvage": [{"item": "schrottplatte", "count": 1}],
+  "brand": "vulkan"
  },
  "herzpumpe": {
   "name": "Herzpumpe",
@@ -595,7 +599,8 @@
   "value": 380,
   "description": "Zweites Herz aus Titan. Mehr Ausdauer, tickt leise beim Schlafen.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "zahnraeder", "count": 1}]
+  "salvage": [{"item": "zahnraeder", "count": 1}],
+  "brand": "kessler"
  },
  "suchscheinwerfer": {
   "name": "Suchscheinwerfer",
@@ -948,7 +953,8 @@
   "value": 120,
   "description": "Ein Kameramodul in einer Plastikkugel. Fokussiert, wenn man es freundlich bittet.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrott", "count": 1}]
+  "salvage": [{"item": "schrott", "count": 1}],
+  "brand": "backalley_chrome"
  },
  "zielsucher_linse": {
   "name": "Zielsucher-Linse",
@@ -964,7 +970,8 @@
   "value": 620,
   "description": "Ein Fadenkreuz direkt auf der Netzhaut. Blinzeln zählt als Zielen.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "chip", "count": 1}]
+  "salvage": [{"item": "chip", "count": 1}],
+  "brand": "vulkan"
  },
  "bauplan_zielsucher_linse": {
   "name": "Bauplan: Zielsucher-Linse",
@@ -993,7 +1000,8 @@
   "value": 780,
   "description": "Geschliffenes Prisma, sieht Schwachstellen als feine Risse im Licht.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "juwelenchip", "count": 1}]
+  "salvage": [{"item": "juwelenchip", "count": 1}],
+  "brand": "kessler"
  },
  "bauplan_kristallauge": {
   "name": "Bauplan: Kristallauge",
@@ -1022,7 +1030,8 @@
   "value": 1600,
   "description": "Militärware. Was vorn ist, trifft sie immer. Was von der Seite kommt, sieht sie nie.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "chip", "count": 1}]
+  "salvage": [{"item": "chip", "count": 1}],
+  "brand": "vulkan"
  },
  "bauplan_tunnelblick_optik": {
   "name": "Bauplan: Tunnelblick-Optik",
@@ -1051,7 +1060,8 @@
   "value": 280,
   "description": "Brückt zwei Nerven kurz. Danach kann Leyla in der Luft noch einmal nach vorn schnellen.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "chip", "count": 1}]
+  "salvage": [{"item": "chip", "count": 1}],
+  "brand": "backalley_chrome"
  },
  "kinetik_rueckenmark": {
   "name": "Kinetik-Rückenmark",
@@ -1067,7 +1077,8 @@
   "value": 900,
   "description": "Eine Wirbelsäule aus Chrom mit eigenem Taktgeber. Dashen fühlt sich an wie Atmen.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "chip", "count": 1},{"item": "zahnraeder", "count": 1},{"item": "kabelbaum", "count": 1}]
+  "salvage": [{"item": "chip", "count": 1},{"item": "zahnraeder", "count": 1},{"item": "kabelbaum", "count": 1}],
+  "brand": "kessler"
  },
  "bauplan_kinetik_rueckenmark": {
   "name": "Bauplan: Kinetik-Rückenmark",
@@ -1096,7 +1107,8 @@
   "value": 1400,
   "description": "Läuft heißer, als er dürfte. Leyla auch. Das Leben sickert dabei langsam aus ihr heraus.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "chip", "count": 1}]
+  "salvage": [{"item": "chip", "count": 1}],
+  "brand": "ghostwire"
  },
  "bauplan_overclock_chip": {
   "name": "Bauplan: Overclock-Chip",
@@ -1125,7 +1137,8 @@
   "value": 1500,
   "description": "Schaltet die Angst ab und gleich ein paar Heilreflexe mit. Medikits wirken nur noch halb.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "chip", "count": 1}]
+  "salvage": [{"item": "chip", "count": 1}],
+  "brand": "ghostwire"
  },
  "bauplan_berserker_chip": {
   "name": "Bauplan: Berserker-Chip",
@@ -1154,7 +1167,8 @@
   "value": 820,
   "description": "Aus einem Gabelstapler. Riecht noch nach Lagerhalle.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "rohrbogen", "count": 1},{"item": "schrottplatte", "count": 1}]
+  "salvage": [{"item": "rohrbogen", "count": 1},{"item": "schrottplatte", "count": 1}],
+  "brand": "vulkan"
  },
  "bauplan_hydraulik_arm": {
   "name": "Bauplan: Hydraulik-Arm",
@@ -1183,7 +1197,8 @@
   "value": 880,
   "description": "Eine Klinge klappt aus dem Unterarm. Leyla übt noch, sie nicht beim Kochen auszufahren.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrottplatte", "count": 1}]
+  "salvage": [{"item": "schrottplatte", "count": 1}],
+  "brand": "ghostwire"
  },
  "bauplan_klingenarm": {
   "name": "Bauplan: Klingenarm",
@@ -1212,7 +1227,8 @@
   "value": 840,
   "description": "Kreisel im Handgelenk halten die Waffe still, auch wenn der Rest von Leyla zittert.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "zahnraeder", "count": 1}]
+  "salvage": [{"item": "zahnraeder", "count": 1}],
+  "brand": "vulkan"
  },
  "bauplan_schuetzenarm": {
   "name": "Bauplan: Schützenarm",
@@ -1241,7 +1257,8 @@
   "value": 1800,
   "description": "Schlägt Löcher in Wände und Raider. Wiegt so viel, dass Leyla schief läuft.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrottplatte", "count": 1}]
+  "salvage": [{"item": "schrottplatte", "count": 1}],
+  "brand": "vulkan"
  },
  "bauplan_presslufthammer_arm": {
   "name": "Bauplan: Presslufthammer-Arm",
@@ -1270,7 +1287,8 @@
   "value": 160,
   "description": "Eine Klappe aus Kunststoff. Klickt beim Treppensteigen.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrott", "count": 1}]
+  "salvage": [{"item": "schrott", "count": 1}],
+  "brand": "backalley_chrome"
  },
  "blutfilter": {
   "name": "Blutfilter",
@@ -1286,7 +1304,8 @@
   "value": 240,
   "description": "Wäscht das Blut, während Leyla rennt. Langsam, aber gründlich.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "rohrbogen", "count": 1}]
+  "salvage": [{"item": "rohrbogen", "count": 1}],
+  "brand": "neurolux"
  },
  "bauplan_herzpumpe": {
   "name": "Bauplan: Herzpumpe",
@@ -1315,7 +1334,8 @@
   "value": 520,
   "description": "Misst alles und dosiert jede Heilung genau dorthin, wo es wehtut.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "chip", "count": 1}]
+  "salvage": [{"item": "chip", "count": 1}],
+  "brand": "kessler"
  },
  "bauplan_biomonitor": {
   "name": "Bauplan: Biomonitor",
@@ -1344,7 +1364,8 @@
   "value": 2000,
   "description": "Ein Mikroreaktor statt Herz. Zieht seinen Strom über die Leitungen des Rigs, auch aus AvAs Tank.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "notstrom", "count": 1}]
+  "salvage": [{"item": "notstrom", "count": 1}],
+  "brand": "kessler"
  },
  "bauplan_reaktor_herz": {
   "name": "Bauplan: Reaktor-Herz",
@@ -1373,7 +1394,8 @@
   "value": 260,
   "description": "Zwei Spiralfedern statt Waden. Damit springt Leyla in der Luft noch einmal ab.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrott", "count": 1}]
+  "salvage": [{"item": "schrott", "count": 1}],
+  "brand": "backalley_chrome"
  },
  "sprintwaden": {
   "name": "Sprintwaden",
@@ -1389,7 +1411,8 @@
   "value": 240,
   "description": "Leichte Waden mit Laufstreifen. Für die Strecke vom Van bis zum Tresor.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "kupferkabel", "count": 1},{"item": "schrott", "count": 1}]
+  "salvage": [{"item": "kupferkabel", "count": 1},{"item": "schrott", "count": 1}],
+  "brand": "backalley_chrome"
  },
  "federbeine_mk2": {
   "name": "Federbeine Mk II",
@@ -1405,7 +1428,8 @@
   "value": 760,
   "description": "Doppelte Federn und kleine Düsen an der Ferse. Der zweite Sprung trägt weiter.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "zahnraeder", "count": 1}]
+  "salvage": [{"item": "zahnraeder", "count": 1}],
+  "brand": "kessler"
  },
  "bauplan_federbeine_mk2": {
   "name": "Bauplan: Federbeine Mk II",
@@ -1434,7 +1458,8 @@
   "value": 700,
   "description": "Kolben in den Knien schlucken Stürze und Tritte gleichermaßen.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "kompressor", "count": 1}]
+  "salvage": [{"item": "kompressor", "count": 1}],
+  "brand": "neurolux"
  },
  "bauplan_stossdaempfer_beine": {
   "name": "Bauplan: Stoßdämpfer-Beine",
@@ -1463,7 +1488,8 @@
   "value": 1700,
   "description": "Rückwärts geknickte Hochleistungsbeine. Drei Sprünge in der Luft, dafür ziehen sie Blut aus dem Rest.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "zahnraeder", "count": 1}]
+  "salvage": [{"item": "zahnraeder", "count": 1}],
+  "brand": "ghostwire"
  },
  "bauplan_kaenguru_beine": {
   "name": "Bauplan: Känguru-Beine",
@@ -1492,7 +1518,8 @@
   "value": 280,
   "description": "Ein Wabennetz in der Haut, leuchtet leicht im Dunkeln.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "kupferkabel", "count": 1},{"item": "stoffreste", "count": 1}]
+  "salvage": [{"item": "kupferkabel", "count": 1},{"item": "stoffreste", "count": 1}],
+  "brand": "backalley_chrome"
  },
  "faserhaut": {
   "name": "Faserhaut",
@@ -1508,7 +1535,8 @@
   "value": 740,
   "description": "Ballistisches Gewebe statt Unterhaut. Kugeln bleiben stecken, Leyla nicht.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "stoffreste", "count": 1}]
+  "salvage": [{"item": "stoffreste", "count": 1}],
+  "brand": "neurolux"
  },
  "bauplan_faserhaut": {
   "name": "Bauplan: Faserhaut",
@@ -1537,7 +1565,8 @@
   "value": 820,
   "description": "Ein Gel voller Nanobots schließt kleine Wunden, bevor Leyla sie bemerkt.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "chip", "count": 1}]
+  "salvage": [{"item": "chip", "count": 1}],
+  "brand": "neurolux"
  },
  "bauplan_heilgel_haut": {
   "name": "Bauplan: Heilgel-Haut",
@@ -1566,7 +1595,8 @@
   "value": 1900,
   "description": "Titanschuppen von Kopf bis Fuß. Fast nichts kommt durch, auch Leyla kommt kaum noch hoch.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrottplatte", "count": 2}]
+  "salvage": [{"item": "schrottplatte", "count": 2}],
+  "brand": "vulkan"
  },
  "bauplan_panzerhaut_titan": {
   "name": "Bauplan: Panzerhaut Titan",
@@ -2110,93 +2140,102 @@
   "icon": 4
  },
  "faerbemittel_giftgruen": {
-  "name": "Färbemittel Giftgrün",
+  "name": "Toxic Bloom · CHROMA//KILL",
   "category": "consumable",
   "size": [1, 1],
   "stack": 3,
   "value": 20,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Eine Packung Haarfarbe in Giftgrün. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+  "description": "Haarfarbe „Toxic Bloom“ von CHROMA//KILL: Färbt dich, bevor die Stadt es tut. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "brand": "chroma_kill"
  },
  "faerbemittel_neontuerkis": {
-  "name": "Färbemittel Neontürkis",
+  "name": "Glitch Teal · CHROMA//KILL",
   "category": "consumable",
   "size": [1, 1],
   "stack": 3,
   "value": 20,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Eine Packung Haarfarbe in Neontürkis. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+  "description": "Haarfarbe „Glitch Teal“ von CHROMA//KILL: Färbt dich, bevor die Stadt es tut. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "brand": "chroma_kill"
  },
  "faerbemittel_eisblau": {
-  "name": "Färbemittel Eisblau",
+  "name": "Kryo Blue · Kessler Kosmetik",
   "category": "consumable",
   "size": [1, 1],
   "stack": 3,
   "value": 20,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Eine Packung Haarfarbe in Eisblau. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+  "description": "Haarfarbe „Kryo Blue“ von Kessler Kosmetik: Wir ersetzen, was fehlt. Jetzt auch Farbe. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "brand": "kessler_kosmetik"
  },
  "faerbemittel_feuerrot": {
-  "name": "Färbemittel Feuerrot",
+  "name": "Molotov Red · CHROMA//KILL",
   "category": "consumable",
   "size": [1, 1],
   "stack": 3,
   "value": 20,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Eine Packung Haarfarbe in Feuerrot. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+  "description": "Haarfarbe „Molotov Red“ von CHROMA//KILL: Färbt dich, bevor die Stadt es tut. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "brand": "chroma_kill"
  },
  "faerbemittel_kurkumagold": {
-  "name": "Färbemittel Kurkuma-Gold",
+  "name": "Brass Halo · DeltaTint",
   "category": "consumable",
   "size": [1, 1],
   "stack": 3,
   "value": 20,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Eine Packung Haarfarbe in Kurkuma-Gold. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+  "description": "Haarfarbe „Brass Halo“ von DeltaTint: Hält länger als dein Rig. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "brand": "deltatint"
  },
  "faerbemittel_rost": {
-  "name": "Färbemittel Rost",
+  "name": "Rust Belt · DeltaTint",
   "category": "consumable",
   "size": [1, 1],
   "stack": 3,
   "value": 20,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Eine Packung Haarfarbe in Rost. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+  "description": "Haarfarbe „Rust Belt“ von DeltaTint: Hält länger als dein Rig. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "brand": "deltatint"
  },
  "faerbemittel_russschwarz": {
-  "name": "Färbemittel Rußschwarz",
+  "name": "Blackout · DeltaTint",
   "category": "consumable",
   "size": [1, 1],
   "stack": 3,
   "value": 20,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Eine Packung Haarfarbe in Rußschwarz. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+  "description": "Haarfarbe „Blackout“ von DeltaTint: Hält länger als dein Rig. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "brand": "deltatint"
  },
  "faerbemittel_violett": {
-  "name": "Färbemittel Violett",
+  "name": "Ultraviolence · CHROMA//KILL",
   "category": "consumable",
   "size": [1, 1],
   "stack": 3,
   "value": 60,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Eine Packung Haarfarbe in Violett. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+  "description": "Haarfarbe „Ultraviolence“ von CHROMA//KILL: Färbt dich, bevor die Stadt es tut. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "brand": "chroma_kill"
  },
  "faerbemittel_platin": {
-  "name": "Färbemittel Platin",
+  "name": "Platinum Elite · Kessler Kosmetik",
   "category": "consumable",
   "size": [1, 1],
   "stack": 3,
   "value": 60,
   "look": "icons_kitchen",
   "icon": 43,
-  "description": "Eine Packung Haarfarbe in Platin. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe am Spiegel frei."
+  "description": "Haarfarbe „Platinum Elite“ von Kessler Kosmetik: Wir ersetzen, was fehlt. Jetzt auch Farbe. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
+  "brand": "kessler_kosmetik"
  }
 }

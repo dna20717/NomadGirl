@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Code → Ava: #045 Lore-Datenbank fertig: Werkstatt › LORE › Marken (15 Marken, Lore, Stellung, Spielwerte), Reisekarte liest dort, Implantate und Haarfarben mit Hersteller. Details `docs/features/lore.md`.
 - 16.11. Code → Ava: #045 Lore-Datenbank Marken läuft (Daniels Auftrag im Code-Chat).
 - 16.11. Code → Ava: Ohne Ticket (Daniel: „Haare färben haut nicht hin, Animations-Reihenfolge kaputt“): nach dem Färben spielte Leyla keine Animation mehr (veraltete Looks der Szene), Gegenrichtung/Gewehre/Idles blieben pink; beides behoben, Prüfungen im Spiegel-Test.
 - 16.11. Code → Ava: Ohne Ticket (Daniel im Code-Chat): Slide-Frame-Glitch behoben (Kollisionsbox verschob die Füße einen Frame lang um 90 px), vier Gratis-Farben am Spiegel. ⚠️ vorläufig: Lavendel, Mint, Neonorange, Weißblond.
@@ -696,11 +697,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 185/185, Browser 39/39 (neu `tools/mirror_test.mjs`, `test/signature.test.js`). PixelLab 0. **Bitte testen:** Spiegel im Bau-Modus kaufen und aufstellen, E: Farben; ein Färbemittel kochen (z. B. Mutantengemüse + Wasser an der Kochnische) und färben; Leyla im Camp, im Run und im Inventar ansehen.
 
 ### #045 Lore-Datenbank: Marken
-- **Status:** läuft · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/worldmap.md › Marken, docs/features/cyberware.md, docs/features/leyla.md › Signaturfarbe
 - **Auftrag (Daniel, 16.11.2026):** „Lass uns die Gelegenheit nutzen, eine Lore-Datenbank in der Werkstatt anzulegen, wo wir Brands sammeln und mit sinnvollen Eigenschaften versehen können … Cyberware auf jeden Fall mitnehmen.“ Haarfarben-Marken abgesegnet (CHROMA//KILL, Kessler Kosmetik, DeltaTint, „Toxic Bloom“ …). Antworten: **eine Quelle** (Karten-Marken ziehen um, die Reisekarte liest dort), Felder **Grundlagen + Stellung in der Welt + Spielwerte** (keine Fraktion), **neue Cyberware-Hersteller + Zuordnung** der 30 Implantate.
 - **Fertig, wenn:** Bereich „Marken“ in der Werkstatt, Reisekarte unverändert, Implantate und Färbemittel mit Hersteller, Spielwerte wirken, Tests grün, Build grün auf `main`.
-- **Rückfragen:**
-- **Ergebnis:**
-
+- **Rückfragen:** (Code) ⚠️ vorläufig: 15 Marken (8 von der Karte, 3 Kosmetik, 4 neue Cyberware/Militär), Lore-Texte, Zuordnung der Implantate (Backalley Chrome 7, NeuroLux 6, Vulkan 7, Kessler 6, Ghostwire 4), Spielwerte (z. B. Kessler Q +15, Backalley Q −15); Preis wirkt nur auf Werte-Anzeigen und Aufträge (Gegenstände werden sonst nirgends verkauft); `CLAUDE.md` gekürzt (unter 20 KB).
+- **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 189/189, Browser 39/39 (neu `test/brands.test.js`, cyberware_test rechnet mit Qualität). PixelLab 0. **Bitte testen:** Werkstatt › LORE › Marken; Reisekarte sieht aus wie vorher; Tooltip eines Implantats nennt den Hersteller; Spiegel zeigt die Marken.

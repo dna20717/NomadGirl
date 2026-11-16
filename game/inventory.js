@@ -8,6 +8,7 @@
 // Rectangles only (Daniel, 14.11.2026: „Lass uns mit dem Tetris-Quatsch aufhören und auf Rechtecke beschränken“): items and weapons
 // take their "size" [w, h], backpacks their "bag" footprint (default 2 × 3). Older savegames are tidied by untangle().
 
+import { qualityOf, lootOf, valueOf } from './brands.js';
 export function thing(D, a, id) { return D[a]?.[id] || null; }
 
 // the cells of a thing (unturned): list of [x, y], always its whole rectangle
@@ -151,10 +152,12 @@ export function moveAll(D, from, to) {
 export function rollLoot(D, tableId, rnd = Math.random) {
   const T = D.lootTables?.[tableId];
   if (!T?.entries?.length) return [];
-  const [r0, r1] = T.rolls || [1, 1], rolls = r0 + Math.floor(rnd() * (r1 - r0 + 1)), total = T.entries.reduce((s, e) => s + (e.weight || 0), 0), out = [];
+  // the maker's „In der Beute“ (#045) scales the weight of its products
+  const w = e => (e.weight || 0) * (e.item ? lootOf(D, D.items?.[e.item]) : 1);
+  const [r0, r1] = T.rolls || [1, 1], rolls = r0 + Math.floor(rnd() * (r1 - r0 + 1)), total = T.entries.reduce((s, e) => s + w(e), 0), out = [];
   for (let i = 0; i < rolls && total > 0; i++) {
     let k = rnd() * total;
-    const e = T.entries.find(x => (k -= x.weight || 0) < 0) || T.entries[0];
+    const e = T.entries.find(x => (k -= w(x)) < 0) || T.entries[0];
     // an entry is a thing (Gegenstand) or a weapon (Waffe, #004: raider weapons can lie in the loot)
     const a = e.weapon && D.weapons?.[e.weapon] ? 'weapons' : 'items', id = a === 'weapons' ? e.weapon : e.item;
     if (!D[a]?.[id]) continue;
@@ -174,7 +177,7 @@ export function canResize(D, grid, w, h, cap = null) {
   for (const e of grid.items) if (!g.items.some(x => x.x === e.x && x.y === e.y && x.id === e.id)) kept += e.n - addEntry(D, g, e);
   return kept === total;
 }
-export function worth(D, grid) { return grid.items.reduce((s, e) => s + (thing(D, e.a, e.id)?.value || 0) * e.n, 0); }
+export function worth(D, grid) { return grid.items.reduce((s, e) => s + valueOf(D, thing(D, e.a, e.id)) * e.n, 0); }   // with the maker's Preis (#045)
 
 // ---------- worn things (Daniel, 10.11.2026: Inventar im Diablo-Stil) ----------
 // inv.wear = { head, armor, eyes, nerves, arm, heart, legs, skin, bow, tail, core, module } → item id or null.
@@ -217,7 +220,7 @@ export function gearStats(D, wear = {}, boost = null) {
   for (const [k, id] of Object.entries(wear)) {
     const t = id && D.items?.[id];
     if (!t || t.wear !== k) continue;
-    const f = 1 + (IMPLANTS.includes(k) ? boost?.[id] || 0 : 0) / 100;
+    const f = (1 + (IMPLANTS.includes(k) ? boost?.[id] || 0 : 0) / 100) * qualityOf(D, t);   // + the maker's Qualität (#045)
     for (const st of GEAR_KEYS) { const v = t.stats?.[st] || 0; s[st] += v * (dir[st] ?? 1) > 0 && st !== 'airJumps' && st !== 'airDash' ? Math.round(v * f * 10) / 10 : v; }
     if (IMPLANTS.includes(k)) s.strain += t.strain || 0;
   }

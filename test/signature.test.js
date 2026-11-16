@@ -9,7 +9,7 @@ import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
 
 const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
-const C = D.leyla.signature.colors, green = C.findIndex(c => c.name === 'Giftgrün');
+const C = D.leyla.signature.colors, green = C.findIndex(c => c.name === 'Toxic Bloom');
 
 test('Spiegel: wie gemalt zuerst, Farben mit Färbemittel gesperrt, bis eine Packung da ist', () => {
   const s = newSave(D), rows = mirrorRows(D, s, id => have(D, s, id));
@@ -27,7 +27,7 @@ test('Färben: eine Packung schaltet frei und wird verbraucht, danach kostenlos;
   const r = dye(D, s, green, t);
   assert.ok(r.ok && r.used);
   assert.equal(have(D, s, C[green].item), 0);
-  assert.equal(current(D, s).name, 'Giftgrün');
+  assert.equal(current(D, s).name, 'Toxic Bloom');
   assert.ok(dye(D, s, 0, t).ok && current(D, s) === null);
   const again = dye(D, s, green, t);
   assert.ok(again.ok && !again.used, 'freigeschaltet: keine Packung mehr nötig');

@@ -770,7 +770,7 @@
   "hint": "Trophäe für „Wohnzimmer mit Aussicht“"
  },
  "faerbemittel_giftgruen": {
-  "name": "Färbemittel Giftgrün",
+  "name": "Toxic Bloom · CHROMA//KILL",
   "station": "kochnische",
   "time": 20,
   "ingredients": [{"item": "mutantengemuese", "count": 2},{"item": "wasser", "count": 1}],
@@ -780,7 +780,7 @@
   "hint": "Was grün leuchtet, färbt auch grün."
  },
  "faerbemittel_neontuerkis": {
-  "name": "Färbemittel Neontürkis",
+  "name": "Glitch Teal · CHROMA//KILL",
   "station": "kochnische",
   "time": 20,
   "ingredients": [{"item": "leuchteier", "count": 2},{"item": "wasser", "count": 1}],
@@ -790,7 +790,7 @@
   "hint": "Eier, die im Dunkeln leuchten. Und Wasser."
  },
  "faerbemittel_eisblau": {
-  "name": "Färbemittel Eisblau",
+  "name": "Kryo Blue · Kessler Kosmetik",
   "station": "werkbank",
   "time": 20,
   "ingredients": [{"item": "batteriezelle", "count": 1},{"item": "wasser", "count": 1}],
@@ -800,7 +800,7 @@
   "hint": "Batteriesäure, verdünnt. Bitte nicht trinken."
  },
  "faerbemittel_feuerrot": {
-  "name": "Färbemittel Feuerrot",
+  "name": "Molotov Red · CHROMA//KILL",
   "station": "kochnische",
   "time": 20,
   "ingredients": [{"item": "chili", "count": 3},{"item": "wasser", "count": 1}],
@@ -810,7 +810,7 @@
   "hint": "Scharf auf dem Kopf."
  },
  "faerbemittel_kurkumagold": {
-  "name": "Färbemittel Kurkuma-Gold",
+  "name": "Brass Halo · DeltaTint",
   "station": "kochnische",
   "time": 20,
   "ingredients": [{"item": "gewuerzmischung", "count": 2},{"item": "wasser", "count": 1}],
@@ -820,7 +820,7 @@
   "hint": "Die Gewürzmischung färbt alles. Wirklich alles."
  },
  "faerbemittel_rost": {
-  "name": "Färbemittel Rost",
+  "name": "Rust Belt · DeltaTint",
   "station": "werkbank",
   "time": 20,
   "ingredients": [{"item": "schrott", "count": 3},{"item": "wasser", "count": 1}],
@@ -830,7 +830,7 @@
   "hint": "Schrott einweichen, bis das Wasser braun wird."
  },
  "faerbemittel_russschwarz": {
-  "name": "Färbemittel Rußschwarz",
+  "name": "Blackout · DeltaTint",
   "station": "werkbank",
   "time": 20,
   "ingredients": [{"item": "stoffreste", "count": 1},{"item": "speiseoel", "count": 1}],

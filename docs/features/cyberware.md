@@ -22,3 +22,4 @@
 - **Beute:** einfache Implantate in Tankstellen-Kisten und bei Plünderern, Baupläne der guten bei Plünderern und im Tresor, gute bei Drohnen, Baupläne und Teile der starken im Tresor und bei Bossen.
 - **Daten neu schreiben:** `node tools/cyberware_data.mjs` (Tabelle oben im Skript; überschreibt Werkstatt-Änderungen an diesen Einträgen). **Symbole:** Einzelbilder `assets/items/cyberware/<id>.png` (PixelLab Create Image Pro je Teil, AAP-64, bester von bis zu 16 Kandidaten), `python3 tools/cyberware_icons.py` baut daraus die Raster `icons_cyberware_1x1`, `_1x2`, `_1x3`, `_2x2` (64 px je Feld, Reihenfolge = Feld „Symbol“).
 - Test `tools/cyberware_test.mjs` (15 Prüfungen).
+- **Hersteller** (#045, 16.11.2026): jedes Implantat hat eine Marke aus Lore › Marken (Backalley Chrome, NeuroLux, Vulkan Wehrtechnik, Kessler Kybernetik, Ghostwire); ihre Qualität wirkt auf die Boni, ihr Preis auf den Wert, „In der Beute“ auf die Häufigkeit. Tabelle in `docs/features/lore.md`.

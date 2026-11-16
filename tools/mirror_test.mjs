@@ -46,10 +46,10 @@ r = await ev(() => {
   nomad.walkTo(h.x); nomad.step(200); nomad.step(1, [], ['grab']); nomad.step(2);
   return { title: s.hud.menuTitle, items: s.hud.menuItems?.map(i => i.label + (i.disabled ? '×' : '')), pic: !!document.querySelector('.hud-mirrorGlass img'), box: (b => b && { top: b.top, bottom: b.bottom, left: b.left, right: b.right })(document.querySelector('.hud-mirror')?.getBoundingClientRect()), vw: innerWidth, vh: innerHeight, swatches: document.querySelectorAll('.hud-swatch').length };
 });
-check('E am Spiegel: Farben, Neonpink zuerst, ohne Färbemittel gesperrt', r.title === 'Spiegel' && r.items?.[0] === 'Neonpink' && r.items.includes('Giftgrün×') && r.pic, r);
+check('E am Spiegel: Farben, Hot Wire Pink zuerst, ohne Färbemittel gesperrt', r.title === 'Spiegel' && r.items?.[0] === 'Hot Wire Pink' && r.items.includes('Toxic Bloom×') && r.pic, r);
 check('Spiegel-Fenster bleibt im Bild (Leyla im Rahmen, Farbfelder daneben)', r.box && r.box.top >= 0 && r.box.left >= 0 && r.box.bottom <= r.vh && r.box.right <= r.vw && r.swatches === r.items.length, r);
 await page.waitForTimeout(500);
-r = await ev(() => { const h = game.scene.getScene('play').hud, a = h.mirrorImg.src; h.focus(h.menuItems.findIndex(x => x.label === 'Lavendel')); return a; });
+r = await ev(() => { const h = game.scene.getScene('play').hud, a = h.mirrorImg.src; h.focus(h.menuItems.findIndex(x => x.label === 'Lavender Haze')); return a; });
 await page.waitForTimeout(800);
 r = { before: r, after: await ev(() => game.scene.getScene('play').hud.mirrorImg.src) };
 check('Vorschau: eine gewählte Farbe zeigt Leyla schon darin', r.after.startsWith('data:image') && r.after !== r.before, { before: r.before.slice(0, 40), after: r.after.slice(0, 40) });
@@ -59,11 +59,11 @@ r = await ev(async () => {
   const s = game.scene.getScene('play'), C = await import('/game/crafting.js');
   s.hud.closeMenu?.(); C.give(s.data_, s.box.save, 'faerbemittel_giftgruen', 1);
   const h = s.camp.hotspots.find(x => x.name === 'Spiegel'); h.act(); nomad.step(2);
-  const i = s.hud.menuItems.findIndex(x => x.label === 'Giftgrün'), dis = !!s.hud.menuItems[i].disabled;
+  const i = s.hud.menuItems.findIndex(x => x.label === 'Toxic Bloom'), dis = !!s.hud.menuItems[i].disabled;
   s.hud.choose(i); for (let k = 0; k < 6; k++) nomad.step(30);
   return { dis, look: s.box.save.look, left: C.have(s.data_, s.box.save, 'faerbemittel_giftgruen') };
 });
-check('Giftgrün: Packung verbraucht, Farbe frei und getragen', !r.dis && r.look?.color > 0 && r.look.unlocked.includes(r.look.color) && r.left === 0, r);
+check('Toxic Bloom: Packung verbraucht, Farbe frei und getragen', !r.dis && r.look?.color > 0 && r.look.unlocked.includes(r.look.color) && r.left === 0, r);
 await page.waitForFunction(() => { if (game.__signatureKey !== '#59c135') nomad.step(10); return game.__signatureKey === '#59c135' && game.scene.getScene('play')?.camp; }, null, { timeout: 30000, polling: 200 });   // the camp came back in the new colour
 const after = await colours();
 check('Leylas Pixel: Pink weg, Grün da', before.pink > 200 && after.pink < before.pink * 0.05 && after.green > before.pink * 0.5, { before, after });
@@ -91,7 +91,7 @@ r = await ev(() => {
 });
 await page.waitForFunction(() => { if (game.__signatureKey !== '') nomad.step(10); return game.__signatureKey === '' && game.scene.getScene('play')?.camp; }, null, { timeout: 30000, polling: 200 });
 const back = await colours();
-check('Zurück zu Neonpink, kostenlos', r.color === 0 && back.pink === before.pink && back.green === before.green, { r, back, before });
+check('Zurück zu Hot Wire Pink, kostenlos', r.color === 0 && back.pink === before.pink && back.green === before.green, { r, back, before });
 
 await browser.close();
 for (const o of ok) console.log('✔', o);

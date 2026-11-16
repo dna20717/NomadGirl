@@ -59,6 +59,11 @@ export const ENEMY_FAMILIES = [['mutant', 'Mutant'], ['raider', 'Plünderer'], [
 export const ENEMY_BEHAVIORS = [['patrol', 'Patrouille'], ['charger', 'Stürmer'], ['shooter', 'Schütze'], ['ambusher', 'Lauerer'], ['flyer', 'Flieger'], ['boss', 'Boss']];
 // tags on things (Daniel, 11.11.2026: „mach ein Tag trophy“): trophy = may hang on a trophy stand in the treasury
 export const ITEM_TAGS = [['trophy', 'Trophäe']];
+// Lore › Marken (#045)
+export const BRAND_SECTORS = [['cyber', 'Cyberware'], ['military', 'Militär'], ['cosmetics', 'Kosmetik'], ['fuel', 'Treibstoff'], ['food', 'Essen'], ['drink', 'Getränke'], ['vehicle', 'Fahrzeuge'], ['trade', 'Handel & Schrott'], ['lodging', 'Unterkunft'], ['authority', 'Behörde'], ['medical', 'Medizin'], ['other', 'Sonstiges']];
+export const BRAND_TIERS = [['cheap', 'Billig'], ['mid', 'Mittel'], ['premium', 'Premium'], ['elite', 'Elite']];
+export const BRAND_STATUS = [['active', 'aktiv'], ['bankrupt', 'pleite'], ['ruin', 'Ruine'], ['underground', 'Untergrund']];
+export const BRAND_STREET = [['hated', 'verhasst'], ['feared', 'gefürchtet'], ['neutral', 'egal'], ['liked', 'beliebt'], ['cult', 'Kult']];
 export const ITEM_CATEGORIES = [['junk', 'Schrott'], ['resource', 'Ressource'], ['ingredient', 'Zutat'], ['food', 'Gericht'], ['component', 'Bauteil'], ['consumable', 'Verbrauchsgut'], ['valuable', 'Wertsache'], ['blueprint', 'Bauplan/Rezept'], ['armor', 'Rüstung'], ['implant', 'Implantat'], ['dronepart', 'Drohnenteil'], ['progress', 'Fortschritt'], ['weaponpart', 'Waffenteil']];
 // where a thing is worn (Daniel, 10.11.2026: Inventar im Diablo-Stil): Leyla's head + armor, implants in her body, parts on AvA
 export const WEAR_SLOTS = [['head', 'Kopf'], ['armor', 'Rüstung'], ['eyes', 'Implantat: Augen'], ['nerves', 'Implantat: Nerven'], ['arm', 'Implantat: Cyberarm'], ['heart', 'Implantat: Herz'], ['legs', 'Implantat: Beine'], ['skin', 'Implantat: Haut'],
@@ -469,7 +474,7 @@ export const AREAS = {
       { title: 'Signaturfarbe', fields: [range('signature.hue', 'Farbton der Signatur', { unit: '°', hint: '#044 (Daniel, 16.11.2026: Haare färben ohne neue Grafik): Haare und Outfit-Akzente teilen sich dieselben Pinktöne; alle Pixel in diesem Farbton wechseln zusammen die Farbe (am Spiegel im Camp)' }),
         num('signature.satMin', 'Sättigung ab', { unit: '%', min: 0, max: 100, hint: 'Grautöne darunter bleiben' }), num('signature.sat', 'Sättigung der Signatur', { unit: '%', min: 5, max: 100, hint: 'Wie satt das gemalte Pink ist; die neue Farbe behält das Verhältnis' }),
         num('signature.mid', 'Mitte Helligkeit', { unit: '%', min: 0, max: 100, hint: 'Die Schattierung bleibt: jeder Ton behält seinen Abstand zu dieser Mitte' }),
-        table('signature.colors', 'Farben', [text('name', 'Name'), color('color', 'Farbe'), ref('item', 'Färbemittel', 'items')], { hint: 'Die erste Zeile ist Leyla wie gemalt (ohne Farbe). Mit Färbemittel: eine Packung schaltet die Farbe am Spiegel für immer frei; ohne = von Anfang an' })] },
+        table('signature.colors', 'Farben', [text('name', 'Name'), color('color', 'Farbe'), ref('item', 'Färbemittel', 'items'), ref('brand', 'Marke', 'brands')], { hint: 'Die erste Zeile ist Leyla wie gemalt (ohne Farbe). Mit Färbemittel: eine Packung schaltet die Farbe am Spiegel für immer frei; ohne = von Anfang an' })] },
       { title: 'Laufen & Springen', fields: [num('movement.walkSpeed', 'Gehen', { unit: 'px/s', min: 0 }), num('movement.runSpeed', 'Rennen', { unit: 'px/s', min: 0 }),
         num('movement.acceleration', 'Beschleunigung', { unit: 'px/s²', min: 0 }), num('movement.jumpVelocity', 'Sprungkraft', { unit: 'px/s', min: 0 }),
         num('movement.airJumps', 'Luftsprünge', { min: 0, hint: '1 = Doppelsprung' }), num('movement.airJumpFromFrame', 'Doppelsprung ab Frame', { min: 1, hint: '1 = ganze Animation einmal; größer = nur die Frames ab hier, über die Doppelsprung-Dauer (z. B. die letzten Dash-Frames)' }),
@@ -779,7 +784,8 @@ export const AREAS = {
     sections: [
       { title: 'Gegenstand', fields: [NAME, LOOK, ICON, select('category', 'Kategorie', ITEM_CATEGORIES), multi('tags', 'Tags', ITEM_TAGS, { hint: 'Trophäe = darf an einen Trophäen-Ständer in der Schatzkammer' }), DESCRIPTION] },
       { title: 'Rucksack & Handel', fields: [size('size', 'Größe', { unit: 'Felder', hint: 'Rechteck im Raster (Daniel, 14.11.2026: nur noch Rechtecke, keine Tetris-Formen). Im Spiel mit Rechtsklick drehbar' }),
-        num('stack', 'Stapel', { min: 1 }), text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar, solange es kein Aussehen gibt: 1–3 Zeichen oder ein Emoji' }), VALUE] },
+        num('stack', 'Stapel', { min: 1 }), text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar, solange es kein Aussehen gibt: 1–3 Zeichen oder ein Emoji' }), VALUE,
+        ref('brand', 'Hersteller', 'brands', { hint: '#045: Marke aus der Lore-Datenbank. Ihre Spielwerte wirken: Qualität auf die Boni (Implantate), Preis auf den Wert, „In der Beute“ auf die Häufigkeit' })] },
       { title: 'Wirkung', fields: [ref('buff', 'Buff beim Essen/Benutzen', 'buffs'), ref('teaches', 'Bringt Rezept bei', 'recipes', { hint: 'Für Baupläne und Kochbücher' })] },
       { title: 'Ausrüstung', fields: [select('wear', 'Trägt man als', [['', '—'], ...WEAR_SLOTS], { hint: 'Kopf und Rüstung an Leyla, Implantate in ihrem Körper (nur im Camp einbauen), Teile an AvA' }),
         select('tier', 'Stufe', [['', '—'], [1, 'Einfach'], [2, 'Gut'], [3, 'Perk + Flaw']], { hint: 'Cyberware (#006): Stufe 3 = sehr großer Vorteil mit Nachteil (negativer Wert), wie Traits in Fallout. Rahmen im Inventar: grau, cyan, gold' }),
@@ -1441,14 +1447,33 @@ export const AREAS = {
           { hint: 'Namen mit | getrennt, Platzhalter: {km} Entfernung zur Stadt, {nr} Nummer, {word} Ortswort, {office} Amt, {region}, {brand} Kurzname der Marke' }),
         text('words', 'Ortswörter', { hint: 'Mit Komma getrennt, für {word}' }), text('offices', 'Ämter', { hint: 'Für {office}' }),
         text('regions', 'Regionen', { hint: 'Mit Komma getrennt, im Kreis um die Stadt verteilt (beginnend im Westen, gegen den Uhrzeigersinn über Norden)' })] },
-      { title: 'Marken', fields: [table('brands', 'Marken', [text('id', 'ID'), text('name', 'Name'), text('short', 'Kurz'), text('slogan', 'Slogan'), select('kind', 'Bei', [['', 'überall'], ['gasStation', 'Tankstelle'], ['mall', 'Markt'], ['bunker', 'Bunker'], ['government', 'Amt']]), num('icon', 'Logo', { min: 0 }), color('color', 'Farbe'), num('weight', 'Gewicht', { min: 0 })],
-          { hint: 'Logo = Feld im Symbol-Raster „Logos“. Marken stehen an passenden Orten und als Plakate an den Straßen' }), num('signs', 'Plakate', { min: 0, max: 30 })] },
+      { title: 'Plakate', fields: [num('signs', 'Plakate', { min: 0, max: 30, hint: 'Marken-Plakate an den Straßen. Die Marken selbst stehen seit #045 in Lore › Marken (dort „Auf der Karte“)' })] },
       { title: 'Aussehen', fields: [ref('paper', 'Papier', 'assets'), ref('logos', 'Logos', 'assets', { hint: 'Symbol-Raster mit den Marken-Logos' }), text('title', 'Titel'), text('edition', 'Ausgabe')] },
     ],
     check: (x, report, p) => {
-      for (const b of x.brands || []) if (!b.id) report('error', `Marke „${b.name || '?'}“ ohne ID`);
       if (!(x.kinds || []).length) report('hint', 'Keine POI-Arten: es gibt nur die Wahrzeichen aus dem Bereich Orte');
-      const L = p.data?.assets?.[x.logos]; for (const b of x.brands || []) if (L?.grid && b.icon >= L.grid[0] * L.grid[1]) report('warning', `${b.name}: Logo ${b.icon} gibt es nicht`);
+    },
+  },
+  brands: {
+    name: 'Marken', singular: 'Marke', icon: 'sign', file: 'data/brands.json', kind: 'catalog', groupBy: { key: 'sector', options: BRAND_SECTORS },
+    hint: 'Lore-Datenbank (#045, Daniel 16.11.2026: „Brands sammeln und mit sinnvollen Eigenschaften versehen“): Konzerne, Läden, Straßenmarken der Welt. Gegenstände nennen ihren Hersteller; die Reisekarte holt ihre Marken von hier.',
+    template: { name: 'Neue Marke', sector: 'trade', tier: 'mid', status: 'active', street: 'neutral', quality: 0, price: 100, loot: 100 },
+    row: x => [label(BRAND_SECTORS, x.sector), label(BRAND_TIERS, x.tier), x.status && x.status !== 'active' ? label(BRAND_STATUS, x.status) : null, x.map?.on ? 'auf der Karte' : null].filter(Boolean).join(' · '),
+    sections: [
+      { title: 'Marke', fields: [NAME, text('short', 'Kurzname', { hint: 'Für Ortsnamen auf der Karte ({brand}) und kurze Etiketten' }), text('slogan', 'Slogan'), select('sector', 'Branche', BRAND_SECTORS), color('color', 'Farbe'),
+        area_('description', 'Lore', { hint: 'Was man in BigCityDelta über sie weiß (und was man lieber nicht weiß)' })] },
+      { title: 'Stellung in der Welt', fields: [select('tier', 'Preisklasse', BRAND_TIERS), text('seat', 'Sitz', { hint: 'z. B. BigCityDelta, Klinikturm Ebene 40 · Salt Flats · unbekannt' }), ref('parent', 'Mutterkonzern', 'brands'),
+        select('status', 'Zustand', BRAND_STATUS), select('street', 'Ruf auf der Straße', BRAND_STREET)] },
+      { title: 'Spielwerte', fields: [num('quality', 'Qualität', { unit: '%', min: -50, max: 100, hint: 'Ihre Implantate: die Boni (nicht die Nachteile) um so viel stärker oder schwächer' }),
+        num('price', 'Preis', { unit: '%', min: 10, max: 500, hint: 'Wert ihrer Produkte (Tooltip, Δ-Summen, Aufträge); 100 = wie eingetragen' }),
+        num('loot', 'In der Beute', { unit: '%', min: 0, max: 300, hint: 'Wie oft ihre Produkte in Beutetabellen fallen; 100 = wie eingetragen, 0 = nie' })] },
+      { title: 'Auf der Reisekarte', fields: [bool('map.on', 'Auf der Karte', { hint: 'Steht an passenden Orten und als Plakat an den Straßen' }), select('map.kind', 'Bei', [['', 'überall'], ['gasStation', 'Tankstelle'], ['mall', 'Markt'], ['bunker', 'Bunker'], ['government', 'Amt']]),
+        num('map.icon', 'Logo', { min: 0, hint: 'Feld im Symbol-Raster „Logos“ der Reisekarte' }), num('map.weight', 'Gewicht', { min: 0 })] },
+    ],
+    check: (x, report, p) => {
+      const L = p.data?.assets?.[p.data?.worldmap?.logos];
+      if (x.map?.on && L?.grid && (x.map.icon ?? 0) >= L.grid[0] * L.grid[1]) report('warning', `Logo ${x.map.icon} gibt es nicht`);
+      if (x.map?.on && !x.short) report('hint', 'Auf der Karte ohne Kurzname');
     },
   },
   travel: {
@@ -1475,6 +1500,7 @@ export const GROUPS = [
   ['PROGRESSION', ['techtree', 'resources']],
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'megarigs', 'rigAddons', 'salvage', 'companions']],
   ['WELT', ['worldmap', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'travel']],
+  ['LORE', ['brands']],
 ];
 
 export const optionLabel = label;

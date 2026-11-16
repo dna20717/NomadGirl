@@ -201,20 +201,20 @@
   "sat": 75,
   "mid": 55,
   "colors": [
-   {"name": "Neonpink"},
-   {"name": "Giftgrün", "color": "#59c135", "item": "faerbemittel_giftgruen"},
-   {"name": "Neontürkis", "color": "#20d6c7", "item": "faerbemittel_neontuerkis"},
-   {"name": "Eisblau", "color": "#249fde", "item": "faerbemittel_eisblau"},
-   {"name": "Feuerrot", "color": "#df3e23", "item": "faerbemittel_feuerrot"},
-   {"name": "Kurkuma-Gold", "color": "#f9a31b", "item": "faerbemittel_kurkumagold"},
-   {"name": "Rost", "color": "#bb7547", "item": "faerbemittel_rost"},
-   {"name": "Rußschwarz", "color": "#322b28", "item": "faerbemittel_russschwarz"},
-   {"name": "Violett", "color": "#793a80", "item": "faerbemittel_violett"},
-   {"name": "Platin", "color": "#e3e6ff", "item": "faerbemittel_platin"},
-   {"name": "Lavendel", "color": "#b9bffb"},
-   {"name": "Mint", "color": "#92dcba"},
-   {"name": "Neonorange", "color": "#fa6a0a"},
-   {"name": "Weißblond", "color": "#fef3c0"}
+   {"name": "Hot Wire Pink", "brand": "chroma_kill"},
+   {"name": "Toxic Bloom", "color": "#59c135", "item": "faerbemittel_giftgruen", "brand": "chroma_kill"},
+   {"name": "Glitch Teal", "color": "#20d6c7", "item": "faerbemittel_neontuerkis", "brand": "chroma_kill"},
+   {"name": "Kryo Blue", "color": "#249fde", "item": "faerbemittel_eisblau", "brand": "kessler_kosmetik"},
+   {"name": "Molotov Red", "color": "#df3e23", "item": "faerbemittel_feuerrot", "brand": "chroma_kill"},
+   {"name": "Brass Halo", "color": "#f9a31b", "item": "faerbemittel_kurkumagold", "brand": "deltatint"},
+   {"name": "Rust Belt", "color": "#bb7547", "item": "faerbemittel_rost", "brand": "deltatint"},
+   {"name": "Blackout", "color": "#322b28", "item": "faerbemittel_russschwarz", "brand": "deltatint"},
+   {"name": "Ultraviolence", "color": "#793a80", "item": "faerbemittel_violett", "brand": "chroma_kill"},
+   {"name": "Platinum Elite", "color": "#e3e6ff", "item": "faerbemittel_platin", "brand": "kessler_kosmetik"},
+   {"name": "Lavender Haze", "color": "#b9bffb", "brand": "kessler_kosmetik"},
+   {"name": "Mint Static", "color": "#92dcba", "brand": "deltatint"},
+   {"name": "Hazard Orange", "color": "#fa6a0a", "brand": "chroma_kill"},
+   {"name": "Bleach Protocol", "color": "#fef3c0", "brand": "kessler_kosmetik"}
   ]
  }
 }

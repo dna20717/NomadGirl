@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 16.11.2026: **Lore-Datenbank: Marken** (#045): 15 Marken mit Lore, Stellung in der Welt und Spielwerten; die Reisekarte liest ihre Marken von dort; alle 30 Implantate haben Hersteller (Qualität wirkt auf die Boni), Haarfarben heißen jetzt „Toxic Bloom · CHROMA//KILL“ und Co.; Spiegel als eigenes Fenster mit Vorschau.
 - 16.11.2026: **Slide-Ende ohne Frame-Glitch** (Kollisionsbox hält die Füße beim Umschalten), **vier Gratis-Farben** am Spiegel (Lavendel, Mint, Neonorange, Weißblond).
 - 16.11.2026: **Haare färben** (#044): Leylas Signaturfarbe (Haare + Outfit-Akzente) am Spiegel im Camp, zehn Farben aus AAP-64, Färbemittel aus Rezepten und Beute; ohne neue Grafik.
 - 16.11.2026: **Dunkelheit wie The Looter** (#043): innen ist Ungesehenes schwarz, Sichtbares klar, Besuchtes halbdunkel; Wände und Fels außerhalb des bespielbaren Bereichs sind schwarze Masse mit ausgefranstem Rand; schwarze Silhouetten vorn am Boden; Raumname beim ersten Betreten.

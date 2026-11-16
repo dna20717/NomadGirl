@@ -7,6 +7,7 @@
 //   Ripperdoc a steady hand: the better the cut, the stronger the implant's perks (never worse flaws)
 //   Foodtruck customers order dishes; served quick or their favourite = tip
 //   Energie  a regulator in the green band = a little extra power for a while
+import { valueOf } from './brands.js';
 import { stock, take } from './crafting.js';
 
 export const QUALITY_NAMES = ['normal', 'gut', 'perfekt'];
@@ -132,7 +133,7 @@ export function serve(D, save, c, secondsWaited) {
   const C = stationConfig(D).truck, st = stock(D, save);
   if (!(st[c.want] > 0)) return { ok: false, reason: 'Ist aus' };
   take(D, save, c.want, 1);
-  const base = Math.round((D.items[c.want].value || 10) * C.price / 100);
+  const base = Math.round((valueOf(D, D.items[c.want]) || 10) * C.price / 100);   // with the maker's Preis (#045)
   const quick = secondsWaited <= c.patience * 0.5, tip = Math.round(base * ((quick ? C.tip : 0) + (c.favourite ? C.favourite : 0)) / 100);
   save.deltas = (save.deltas || 0) + base + tip;
   return { ok: true, deltas: base + tip, tip, quick };

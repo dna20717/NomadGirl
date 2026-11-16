@@ -9,6 +9,8 @@
 //   save.map = { v, seed, cycle, start, nodes: [{ id, name, poi, pos: [km x, km y], region, danger, hints: [category], brand, landmark }],
 //                edges: [[a, b]], visited: [id], signs: [{ brand, pos, rot }] }
 
+import { mapBrands } from './brands.js';
+
 export const MAP_VERSION = 1;
 // names of the places (#021, Daniel 14.11.2026: „Alle Ortsnamen müssen ein wenig cooler werden und auf Englisch sein“): a savegame with
 // older names gets the new ones, the roads, visited places and dangers stay (renameMap)
@@ -30,7 +32,7 @@ export function mapConfig(D) {
   return {
     count: M.count || [10, 14], radius: M.radius ?? 75, gap: M.gap ?? 11, city: M.city || [0, 0], cityName: M.cityName || 'BigCityDelta', cityRadius: M.cityRadius ?? 9,
     dangerStep: M.dangerStep ?? 30, reveal: M.reveal ?? 2, signs: M.signs ?? 6, detour: M.detour ?? 15,
-    kinds: (M.kinds || []).filter(k => D.pois?.[k.poi]), regions: words(M.regions), brands: (M.brands || []).filter(b => b.name),
+    kinds: (M.kinds || []).filter(k => D.pois?.[k.poi]), regions: words(M.regions), brands: mapBrands(D),   // Lore › Marken (#045)
     fill: { word: words(M.words), office: words(M.offices) },
     title: M.title || 'Straßenkarte BigCityDelta & Umland', edition: M.edition || 'Ausgabe 1962', paper: M.paper, logos: M.logos,
   };

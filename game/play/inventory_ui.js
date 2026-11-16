@@ -13,6 +13,9 @@ import { kindOf, sortGrid, cellsOf, boxOf, drop, remove, add, fits, moveAll, thi
 import { partSlots, budgets, SLOT_NAMES as PART_SLOT_NAMES } from '../rig.js';
 import { containers as storeList, stowAll, CAMP } from '../save.js';
 import { dyedUrl } from './signature.js';
+import { brandOf, valueOf } from '../brands.js';
+// the maker of a thing (#045): „Kessler Kybernetik · Qualität +15 %“
+const brandLine = (D, t) => { const b = brandOf(D, t); return b ? [b.name, b.quality ? `Qualität ${b.quality > 0 ? '+' : ''}${b.quality} %` : null].filter(Boolean).join(' · ') : null; };
 
 export const CATEGORY_COLORS = {
   junk: '#6b6258', resource: '#5c6b7a', ingredient: '#6b7a3a', food: '#a8642a', component: '#4a6b8a', consumable: '#8a3a5a',
@@ -407,7 +410,7 @@ export class InventoryUI {
       e.a === 'rigParts' && t.armor ? `+${t.armor} Panzerung` : null, e.a === 'rigParts' && t.storageRows ? `+${t.storageRows} Reihen Stauraum` : null,
       (e.a === 'weapons' || e.a === 'rigParts') && t.damage ? `${t.damage} Schaden` : null, e.a === 'backpacks' && t.size ? `Raster ${t.size.join(' × ')}` : null,
       t.wear ? `${DRONE_WEAR.includes(t.wear) ? 'AvA: ' : 'Platz: '}${WEAR_NAMES[t.wear] || t.wear}` : null, t.strain ? `Belastung ${t.strain}` : null,
-      stackMax(D, e.a, e.id) > 1 ? `Stapel ${e.n}/${stackMax(D, e.a, e.id)}` : null, `${(t.value || 0) * e.n} Δ`, t.buff ? `Buff: ${D.buffs?.[t.buff]?.name || t.buff}` : null].filter(Boolean);
+      stackMax(D, e.a, e.id) > 1 ? `Stapel ${e.n}/${stackMax(D, e.a, e.id)}` : null, `${valueOf(D, t) * e.n} Δ`, brandLine(D, t), t.buff ? `Buff: ${D.buffs?.[t.buff]?.name || t.buff}` : null].filter(Boolean);
     const acts = key != null && !this.held ? this.actionsFor(key, e) : [];
     const row = x => el('li', {}, ...(this.padOn ? [...keyGlyph(x.k), x.hold ? el('small', {}, 'halten') : null, ' '] : []), x.label);
     // Cyberware (#006): every value on its own line, perks green, flaws red (like Fallout's traits)
