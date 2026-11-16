@@ -54,6 +54,7 @@ Stand: 12.11.2026 abends (Durchsicht von Ava). Kleinigkeiten sind schon behoben 
 | C16 | Toter Spielstand | `save.log`, `save.dreams`, `save.base`, `tank.diedOn`, `run.location` werden geschrieben, aber (außer in Tests) nie gelesen. Harmlos; `dreams`/`base` sind für später gedacht. | – |
 | C17 | ~~Neuer Durchgang~~ | erledigt 16.11.2026: Mega-Rig-Ausbaustufen beginnen neu, nur das Rig bleibt (Daniel: „nur das Rig selbst“); Nachreichen gibt es nur einmal pro Spielstand, auch über Durchgänge hinweg (Daniel: „A“, `newSave(D, handed)`). | – |
 | C18 | Alte Bilder nach #041/#042 | Feldhandbuch-Lektion „Das Camp-Lager“ zeigt noch Bilder der alten Kiste (`tut_kiste_1/2`): mit dem Aufnahme-Tool neu aufnehmen. Fahrgestell (`trailer_chassis`) und Camp-Boden sind noch so grob wie die alten Container (#042 hat nur die Container neu gemalt). |
+| C19 | Wackeliger Test | `map_test` „Gefahr wirkt“ vergleicht zufällig gewürfelte Gegnermischungen (Leben Gefahr 4 > 1,3 × Gefahr 1); fiel am 16.11. einmal knapp durch (101 gegen 117), danach dreimal grün. Mit festem Seed oder Mittel über mehrere Würfe prüfen. |
 
 
 ## Erledigt bei der Durchsicht (16.11.2026, Daniel: „keine unsichtbaren technischen Schulden … nichts kaputt machen“)
