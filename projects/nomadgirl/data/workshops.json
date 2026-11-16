@@ -117,9 +117,24 @@
   ],
   "outside": "out_storage",
   "description": "Werkbank und Lager für Waffen: Teile, Munition, Ersatzläufe. Ausgestellt wird in der Waffenkammer (#033).",
-  "synergy": {"partners": ["waffengalerie", "werkbank", "generator"], "effect": "speed", "max": 30}
+  "synergy": {"partners": ["waffengalerie", "werkbank", "generator"], "effect": "speed", "max": 30},
+  "ownStorage": true,
+  "prefers": ["melee", "ranged", "cyberdeck", "weaponpart"]
  },
- "kuehlraum": {"name": "Kühlraum", "function": "cooling", "stage": "1", "places": 1, "power": -2, "capacity": 20, "value": 250, "grid": [6, 4], "outside": "out_tank", "look": "ws_cold_room"},
+ "kuehlraum": {
+  "name": "Kühlraum",
+  "function": "cooling",
+  "stage": "1",
+  "places": 1,
+  "power": -2,
+  "capacity": 20,
+  "value": 250,
+  "grid": [6, 4],
+  "outside": "out_tank",
+  "look": "ws_cold_room",
+  "ownStorage": true,
+  "prefers": ["food", "ingredient"]
+ },
  "chill_area": {
   "name": "Chill Area",
   "function": "chill",
@@ -324,7 +339,9 @@
   "lookEmpty": "ws_treasury_hall_empty",
   "fill": [{"y": 158},{"y": 178},{"y": 196},{"y": 212}],
   "scale": 78,
-  "outside": "out_treasury"
+  "outside": "out_treasury",
+  "ownStorage": true,
+  "prefers": ["valuable"]
  },
  "cryotank": {
   "name": "Cryo-Tank",
@@ -454,7 +471,8 @@
    {"kind": "light", "x": 175, "y": 30, "w": 40, "h": 120, "color": "#7ff6ff", "size": 70, "rate": 4, "when": "always"},
    {"kind": "screen", "x": 80, "y": 40, "w": 96, "h": 18, "color": "#ff7ac0", "size": 0, "rate": 3, "when": "always"}
   ],
-  "scale": 78
+  "scale": 78,
+  "ownStorage": true
  },
  "heavy_duty": {
   "name": "Heavy-Duty-Werkbank",

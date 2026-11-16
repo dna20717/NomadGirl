@@ -260,6 +260,15 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .inv-name { position: absolute; left: 4px; right: 4px; bottom: 2px; font-size: 9.5px; line-height: 1.1; color: #f2eef7; text-shadow: 0 1px 0 #000; pointer-events: none; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .inv-count { position: absolute; right: 3px; top: 1px; font: 18px/1 VT323, monospace; color: #ffd27a; text-shadow: 0 1px 0 #000; pointer-events: none; }
 .inv-actions { display: flex; gap: 6px; margin-top: 10px; }
+/* Camp-Lager (#041): closed cells after the last one, filter chips, fill */
+.inv-closed { position: absolute; pointer-events: none; background: repeating-linear-gradient(135deg, #0a070e 0 6px, #17111f 6px 12px); border-left: 1px solid #2a2233; }
+.inv-item.dim { opacity: .22; filter: grayscale(.8); }
+.inv-filter { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 8px; max-width: 460px; }
+.inv-chip { padding: 3px 9px; border-radius: 999px; border: 1px solid #3a3045; background: #1a1422; color: #cfc6da; font: 500 11.5px var(--ui-font); cursor: pointer; box-shadow: inset 3px 0 0 var(--col, transparent); }
+.inv-chip.on { background: #ffd27a; color: #0d0a12; border-color: #ffd27a; }
+.inv-cap { margin-left: auto; margin-right: 8px; color: #9fd8c8; font-variant-numeric: tabular-nums; }
+.inv-cap.full { color: #ff8a7a; }
+.inv-cap + small { margin-left: 0; }
 .inv-btn { padding: 6px 12px; border-radius: 6px; border: 0; background: #ffd27a; color: #0d0a12; font: 600 12.5px var(--ui-font); cursor: pointer; }
 .inv-btn.ghost { background: #2a2233; color: #f2eef7; }
 /* Diablo layout (Daniel, 10.11.2026): backpack | Leyla from the front with slots around her | AvA with her parts and the rescue pocket */
@@ -930,6 +939,7 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .sum-btns { display: flex; justify-content: flex-end; gap: 10px; }
 .sum-btns .inv-btn { padding: 10px 18px; display: flex; align-items: center; gap: 6px; }
 .sum-btns .inv-btn small { margin-left: 6px; font-size: 12px; opacity: .8; }
+.sum-btns .sum-stow { margin-right: auto; }
 .sum-btns .inv-btn.on { outline: 2px solid #ffd27a; outline-offset: 2px; }
 @media (max-width: 760px) { .sum-head, .sum-cols { grid-template-columns: 1fr; } }
 

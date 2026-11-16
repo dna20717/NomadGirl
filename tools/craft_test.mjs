@@ -60,8 +60,8 @@ c = await craft();
 check('Fehlschlag: kurioser Müll, knapp daneben erkannt', c.log?.kind === 'near' && (c.stock.verkohlter_klumpen || c.stock.graue_pampe) && !c.stock.mutantenfleisch && Object.keys(c.pot).length === 0, c);
 await shot('miss');
 
-// experiment hit: curry (meat comes from a run normally; here into the chest)
-await ev(() => { const s = window.game.scene.getScene('play'); s.box.save.inv.grids.chest.items.push({ a: 'items', id: 'mutantenfleisch', n: 1, x: 5, y: 3, r: 0 }); s.hud.craft.draw(); });
+// experiment hit: curry (meat comes from a run normally; here into the Camp-Lager)
+await ev(() => { const s = window.game.scene.getScene('play'); s.box.save.inv.grids.camp.items.push({ a: 'items', id: 'mutantenfleisch', n: 1, x: 5, y: 3, r: 0 }); s.hud.craft.draw(); });
 await supply('Mutantenfleisch'); await supply('Reis'); await supply('Gewürzmischung');
 await clickText('button', 'Ausprobieren');
 c = await craft();
@@ -69,8 +69,8 @@ check('Treffer: Mutanten-Curry gelernt und gekocht', c.log?.kind === 'learnt' &&
 check('Treffer verbraucht nur, was das Rezept braucht', c.stock.reis === 1, c.stock);
 await shot('learnt');
 
-// a note in the chest teaches a recipe
-await ev(() => { const s = window.game.scene.getScene('play'); s.box.save.recipes = s.box.save.recipes.filter(r => r !== 'mutanten_curry'); s.box.save.inv.grids.chest.items.push({ a: 'items', id: 'zettel_curry', n: 1, x: 5, y: 2, r: 0 }); s.hud.craft.draw(); });
+// a note in the Camp-Lager teaches a recipe
+await ev(() => { const s = window.game.scene.getScene('play'); s.box.save.recipes = s.box.save.recipes.filter(r => r !== 'mutanten_curry'); s.box.save.inv.grids.camp.items.push({ a: 'items', id: 'zettel_curry', n: 1, x: 5, y: 2, r: 0 }); s.hud.craft.draw(); });
 check('Zettel erscheint im Rezeptbuch', (await craft()).notes.includes('zettel_curry'));
 await page.locator('.craft-note', { hasText: 'Notizzettel' }).locator('button').click();
 c = await craft();
@@ -90,7 +90,7 @@ await clickText('button', 'Ausprobieren');
 c = await craft();
 check('Werkbank-Fehlschlag ergibt Werkbank-Müll', c.log?.kind === 'miss' && (c.stock.kabelsalat || c.stock.schrottskulptur), c);
 // Zerlegen (Gegenstände › Zerlegen): tab at the Werkbank, real clicks; parts land in the camp inventories
-await ev(() => { const g = nomad.save().inv.grids.chest; g.items = g.items.filter(e => !['alte_platine', 'technik', 'kupferkabel'].includes(e.id)); g.items.push({ a: 'items', id: 'alte_platine', n: 2, x: 7, y: 4, r: 0 }); game.scene.getScene('play').hud.craft.draw(); });
+await ev(() => { const g = nomad.save().inv.grids.camp; g.items = g.items.filter(e => !['alte_platine', 'technik', 'kupferkabel'].includes(e.id)); g.items.push({ a: 'items', id: 'alte_platine', n: 2, x: 7, y: 4, r: 0 }); game.scene.getScene('play').hud.craft.draw(); });
 await clickText('.craft-modes .inv-tab', 'Zerlegen');
 c = await craft();
 const platinen = c.stock.alte_platine;
@@ -107,7 +107,7 @@ await page.keyboard.press('Escape');
 await ev(() => nomad.step(5));
 await page.keyboard.press('i'); await ev(() => nomad.step(3));
 if (!(await ev(() => nomad.inv()?.open))) await ev(() => { window.game.scene.getScene('play').hud.inv.open(); });
-const stew = await ev(() => { const g = document.querySelectorAll('.inv-grid')[0], c = parseFloat(g.style.getPropertyValue('--c')), r = g.getBoundingClientRect(), e = nomad.save().inv.grids.backpack.items.find(e => e.id === 'bohneneintopf'); return [r.left + (e.x + 0.5) * c, r.top + (e.y + 0.5) * c]; });
+const stew = await ev(() => { const g = document.querySelectorAll('.inv-grid')[0], r = g.getBoundingClientRect(), c = parseFloat(g.style.getPropertyValue('--c')) * r.width / g.offsetWidth, e = nomad.save().inv.grids.backpack.items.find(e => e.id === 'bohneneintopf'); return [r.left + (e.x + 0.5) * c, r.top + (e.y + 0.5) * c]; });
 await page.mouse.click(...stew); await page.waitForTimeout(30);
 await clickText('.inv-slot.use', 'Essen');
 const sv = await ev(() => nomad.save());

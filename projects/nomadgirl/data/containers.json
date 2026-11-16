@@ -21,15 +21,15 @@
   "weight": 2300,
   "stackable": true,
   "value": 900,
-  "inside": {"x": [26, 229], "y": [90, 175]},
-  "deck": 83,
+  "inside": {"x": [66, 446], "y": [190, 350]},
+  "deck": 173,
   "carries": true,
   "look": "container_open_2",
   "lookClosed": "container_closed_2",
   "chassis": true,
-  "benchScale": 130,
+  "benchScale": 122,
   "benchInset": 16,
-  "divider": {"x": [18, 26], "y": [91, 175], "keep": "18, 19, 21, 25, 26", "foot": 168, "back": 162, "shadow": 70}
+  "divider": {"x": [47, 66], "y": [191, 350], "foot": 337, "back": 325, "shadow": 70}
  },
  "container_40": {
   "name": "40-Fuß-Container",
@@ -39,14 +39,14 @@
   "stackable": true,
   "value": 1500,
   "carries": true,
-  "inside": {"x": [26, 330], "y": [90, 175]},
-  "deck": 83,
+  "inside": {"x": [66, 636], "y": [190, 350]},
+  "deck": 173,
   "look": "container_open_3",
   "lookClosed": "container_closed_3",
   "chassis": true,
-  "benchScale": 130,
+  "benchScale": 122,
   "benchInset": 16,
-  "divider": {"x": [18, 26], "y": [91, 175], "keep": "18, 19, 21, 25, 26", "foot": 168, "back": 162, "shadow": 70}
+  "divider": {"x": [47, 66], "y": [191, 350], "foot": 337, "back": 325, "shadow": 70}
  },
  "modulanhaenger": {
   "name": "Modul-Anhänger",
@@ -70,14 +70,14 @@
   "value": 500,
   "stackable": true,
   "carries": true,
-  "inside": {"x": [26, 128], "y": [90, 175]},
-  "deck": 83,
+  "inside": {"x": [66, 256], "y": [190, 350]},
+  "deck": 173,
   "description": "Der Kleine: fasst genau eine Werkstatt.",
   "look": "container_open_1",
   "lookClosed": "container_closed_1",
   "chassis": true,
-  "benchScale": 130,
+  "benchScale": 122,
   "benchInset": 16,
-  "divider": {"x": [18, 26], "y": [91, 175], "keep": "18, 19, 21, 25, 26", "foot": 168, "back": 162, "shadow": 70}
+  "divider": {"x": [47, 66], "y": [191, 350], "foot": 337, "back": 325, "shadow": 70}
  }
 }

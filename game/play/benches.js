@@ -95,10 +95,10 @@ export function crateTexture(scene, D, id) {
   return key;
 }
 
-// how full an inventory is: occupied cells / all cells
+// how full an inventory is: occupied cells / all cells (the Camp-Lager counts its real cells; every shelf shows how full it is, #041)
 export function fillOf(D, grid) {
   if (!grid?.w || !grid?.h) return 0;
-  return Math.min(1, occupancy(D, grid).size / (grid.w * grid.h));
+  return Math.min(1, occupancy(D, grid).size / (grid.cap ?? grid.w * grid.h));
 }
 
 // ---------- benches in the rig ----------

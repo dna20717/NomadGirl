@@ -11,7 +11,7 @@
 // Budgets: weight of the containers ≤ pull of the tractor (else no driving), number of ground containers ≤ "Plätze hintereinander",
 // levels < "Stapelhöhe",
 // energy: tractor "Lichtmaschine" + workshops with + minus workshops with − (below 0: workshops that need power do not work).
-import { containers as storeList, advance, ensureGrid } from './save.js';
+import { advance, fitContainers, campStore, CAMP, campName } from './save.js';
 import { canResize } from './inventory.js';
 import { synergyPower } from './synergy.js';
 import { remap as remapDecor } from './decor.js';
@@ -249,7 +249,6 @@ export function detach(D, d, ui) {
   if (!u || u.kind !== 'container') return { ok: false, reason: 'Das ist kein Container' };
   if (hasAbove(d.rig.units, ui)) return { ok: false, reason: 'Erst den Container oben abnehmen' };
   if (u.workshops.length) return { ok: false, reason: 'Erst die Werkstätten ausbauen' };
-  if (d.grids[u.key]?.items?.length) return { ok: false, reason: `Erst den ${D.containers?.[u.id]?.storageName || 'Deichselkasten'} ausräumen` };
   d.rig.units.splice(ui, 1);
   d.rig.spare.containers.push(u.id);
   spend(D, d, 0, M(D, 'container', 90));
@@ -364,9 +363,9 @@ export function problems(D, d) {
   const out = [];
   for (const w of d.rig.spare.workshops) if (storeFull(d, w)) out.push(`${wsDef(D, w.id).name || w.id} ist nicht leer und muss eingebaut bleiben`);
   if (d.deltas < 0) out.push('Zu wenig Δ');
-  // the Dachbox comes off: the Kofferraum shrinks, nothing may fall out
-  const S = D.tractors?.[d.rig.tractor]?.storage, g = d.grids['rig:0'];
-  if (S?.[0] && g && !canResize(D, g, S[0], S[1] + extraRows(D, d.rig.parts))) out.push(`Erst den ${D.tractors[d.rig.tractor].storageName || 'Kofferraum'} ausräumen, sonst fällt etwas raus`);
+  // a shelf leaves or the Dachbox comes off: the Camp-Lager (#041) shrinks, nothing may fall out
+  const C = campStore(D, d.rig), g = d.grids[CAMP];
+  if (g?.items?.length && (!C.cap || !canResize(D, g, C.size[0], C.size[1], C.cap))) out.push(`Erst das ${campName(D)} leeren, sonst fällt etwas raus`);
   return out;
 }
 
@@ -405,7 +404,7 @@ export function applyDraft(D, save, d) {
   save.rig = rig;
   save.inv.grids = grids;
   save.deltas = d.deltas;
-  for (const c of storeList(D, save)) ensureGrid(D, save.inv, c.key, c.size);
+  fitContainers(D, save);
   if (d.minutes) advance(save, d.minutes / 60);
   return { ok: true, minutes: d.minutes };
 }

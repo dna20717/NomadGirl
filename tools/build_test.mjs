@@ -81,14 +81,16 @@ await drag(await slot('werkbank'), (await spots()).yardFree);
 b = await drag(await yardItem('generator'), await freeSlot());
 check('Generator vom Schrottplatz eingebaut: Energie +4', b.rig.includes('generator@0') && b.budgets.power.net === 4 && b.spare.workshops.join() === 'werkbank', b);
 
-// the full shelf may not go onto the scrapyard; swapping it keeps its contents
-const shelf = await ev(() => nomad.save().inv.grids['store:1:2'].items.length);
+// the shelf adds its cells to the Camp-Lager (#041): with a full Camp-Lager it may not go onto the scrapyard; swapping keeps the contents
+const shelf = await ev(async () => { const I = await import('/game/inventory.js'), D = game.scene.getScene('play').data_, g = nomad.save().inv.grids.camp; g.keep = g.items.map(e => ({ ...e }));
+  for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) { const e = { a: 'items', id: 'zettel_curry', n: 1, x, y, r: 0 }; if (I.fits(D, g, e, x, y)) g.items.push(e); } return g.items.length; });
 b = await drag(await slot('lagerregal'), (await spots()).yardFree);
-check('Volles Lagerregal bleibt drin', b.rig.includes('lagerregal@2') && /nicht leer/.test(b.msg || ''), b);
+check('Volles Camp-Lager: Lagerregal bleibt drin', b.rig.includes('lagerregal@2') && /leeren/.test(b.msg || ''), b);
 await ev(() => nomad.step(30));
 b = await drag(await slot('lagerregal'), await slot('kochnische'));
 check('Lagerregal und Kochnische getauscht', b.rig.includes('lagerregal@1') && b.rig.includes('kochnische@2'), b);
-check('Lagerregal-Inhalt zieht mit', (await ev(() => { const g = nomad.save().inv.grids; return [g['store:1:1']?.items.length, !!g['store:1:2']]; })).join() === `${shelf},false`);
+check('Camp-Lager-Inhalt bleibt beim Tauschen', (await ev(() => { const g = nomad.save().inv.grids; return [g.camp?.items.length, Object.keys(g).some(k => k.startsWith('store:1:'))]; })).join() === `${shelf},false`);
+await ev(() => { const g = nomad.save().inv.grids.camp; g.items = g.keep; delete g.keep; });
 
 // a crate trailer: the van pulls only one; selling it at the dealer
 await page.locator('.bm-shopbtn').click();

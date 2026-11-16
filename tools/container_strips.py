@@ -4,7 +4,7 @@
   python3 tools/container_strips.py [source.png]
 
 Source: projects/nomadgirl/assets/rig/container_source.png (1792 × 1792, two containers above each other, open on top,
-closed below, every art pixel 7 × 7 screen pixels). Writes into projects/nomadgirl/assets/rig/:
+closed below, every art pixel 7 × 7 screen pixels). Writes into projects/nomadgirl/assets/rig/v1/ (since #042 only as the first version, the game uses tools/container_tiles.py):
   container_open_1.png … _3.png, container_closed_1.png … _3.png   (one frame each, 256 high, content at y 73–186 like container_stack)
 The 2-place container is the picture as it is (interior x 26–228 = 203 px = about 101 per place). For 1 place a band of
 STEP columns is cut out of the middle, for 3 places the same band is repeated. The band starts at the column where
@@ -17,6 +17,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'projects/nomadgirl/assets/rig'
+DST = OUT / 'v1'   # since #042 the containers come from tools/container_tiles.py; these first ones stay as v1
 SRC = Path(sys.argv[1]) if len(sys.argv) > 1 else OUT / 'container_source.png'
 PX, STEP, TOP = 7, 101, 64   # art pixel size, columns per place, rows the art moves down so it sits like container_stack
 
@@ -41,5 +42,5 @@ for name, f in frames.items():
         3: np.concatenate([f[:, :a + STEP], f[:, a:]], axis=1),
     }
     for places, img in variants.items():
-        Image.fromarray(img).save(OUT / f'container_{name}_{places}.png', optimize=True)
+        Image.fromarray(img).save(DST / f'container_{name}_{places}.png', optimize=True)
         print(f'container_{name}_{places}.png', img.shape[1], '×', img.shape[0])

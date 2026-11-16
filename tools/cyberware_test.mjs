@@ -74,8 +74,8 @@ v = await ev(async () => { const { shop } = await import('/game/rig.js'); const 
   return { shop: shop(D).workshops.includes('ripperdoc'), rd: recipesFor(D, 'ripperdoc').filter(r => D.items[r.result]?.category === 'implant').length, wb: recipesFor(D, 'werkbank').filter(r => D.items[r.result]?.category === 'implant').length,
     start: (nomad.save().recipes || []).filter(id => D.recipes[id]?.station === 'ripperdoc').length, look: D.workshops.ripperdoc.look }; });
 check('Ripperdoc-Liege kaufbar, 30 Rezepte, die Werkbank kann keine Cyberware', v.shop && v.rd === 30 && v.wb === 0 && v.start >= 3 && v.look === 'ws_ripperdoc', v);
-v = await ev(async () => { const { craft } = await import('/game/crafting.js'); const D = SC().data_, s = nomad.save();
-  s.inv.grids.chest.items.push({ a: 'items', id: 'zahnraeder', n: 2, x: 9, y: 0, r: 0 }, { a: 'items', id: 'schrott', n: 5, x: 9, y: 1, r: 0 }, { a: 'items', id: 'panzertape', n: 2, x: 9, y: 2, r: 0 });
+v = await ev(async () => { const { craft, give } = await import('/game/crafting.js'); const D = SC().data_, s = nomad.save();
+  give(D, s, 'zahnraeder', 2); give(D, s, 'schrott', 5); give(D, s, 'panzertape', 2);   // into the backpack or the Camp-Lager (#041)
   const r = craft(D, s, 'sprungfedern', 'ripperdoc'), at = craft(D, s, 'sprungfedern', 'werkbank');
   const found = Object.values(s.inv.grids).some(g => (g.items || []).some(e => e.id === 'sprungfedern'));
   return { ok: r.ok, reason: r.reason, wb: at.ok, found }; });

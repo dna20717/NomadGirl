@@ -46,9 +46,10 @@ check('E am Wrack öffnet die Bergungsliste', r.modal && /Freilegen/.test(r.text
 await shot('liste');
 await ev(() => game.scene.getScene('play').hud.closeMenu());
 
-// parts into the chest, build in section by section, then the test start
+// parts into the Camp-Lager (#041, emptied first so everything fits), build in section by section, then the test start
 r = await ev(async () => {
   const S = await import('/game/salvage.js'), C = await import('/game/crafting.js'), s = game.scene.getScene('play'), D = s.data_, save = s.box.save;
+  save.inv.grids.camp.items = []; save.inv.grids.backpack.items = [];
   const log = [];
   for (let i = 0; i < 6 && !S.progress(D, save, 'lkw').ready; i++) {
     for (const m of S.missing(D, save, 'lkw')) C.give(D, save, m.item, m.need - m.have);

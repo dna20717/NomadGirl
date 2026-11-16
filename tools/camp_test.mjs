@@ -45,10 +45,21 @@ await shot('warroom');
 s = await ev(() => c.pick('Plündern'));
 check('Run startet im POI-Level mit Van (Tankstelle, tools/poi_test.mjs prüft das Level)', s.mode === 'run' && s.level?.poi === 'tankstelle_km7' && s.prompt === 'Zurück ins Camp · Van' && !s.camp, { mode: s.mode, level: !!s.level, prompt: s.prompt });
 await shot('run');
-s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(3); const m = nomad.menu(); nomad.choose('Hierbleiben'); nomad.step(3); const stay = nomad.state().mode; nomad.step(1, [], ['grab']); nomad.step(3); nomad.choose('Zurückreisen'); nomad.step(40); const H = game.scene.getScene('play').hud, sum = { ...H.sum.state(), title: H.sum.S?.title, poi: H.sum.S?.poi }; H.sum.close(); nomad.step(2); return { ...nomad.state(), sum, ask: m?.title, stay }; });
+s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(3); const m = nomad.menu(); nomad.choose('Hierbleiben'); nomad.step(3); const stay = nomad.state().mode; nomad.step(1, [], ['grab']); nomad.step(3); nomad.choose('Zurückreisen'); nomad.step(40); const H = game.scene.getScene('play').hud, sum = { ...H.sum.state(), title: H.sum.S?.title, poi: H.sum.S?.poi }; return { ...nomad.state(), sum, ask: m?.title, stay }; });
 check('Am Van: Rückfrage „Wirklich zurückreisen?“, Hierbleiben bleibt im POI', s.ask === 'Wirklich zurückreisen?' && s.stay === 'run', { ask: s.ask, stay: s.stay });
 check('Mit dem Van zurück ins Camp, Ankunft in der Dämmerung, Beute-Bilanz statt Banner (#017)', s.mode === 'camp' && s.camp.clock === 'Tag 2 · 18:30' && s.sum.open && s.sum.title === 'Zurück im Camp' && /Mile 7/.test(s.sum.poi) && !s.sum.grade, { mode: s.mode, sum: s.sum, clock: s.camp?.clock });
 check('Dämmerung', s.camp.daytime === 'Abend', s.camp.daytime);
+// #041: „Alles einlagern“ on the Beute-Bilanz: dishes and ingredients into a Kühlraum (here in place of the workbench, only for this check), the rest into the Camp-Lager
+s = await ev(async () => { const { fitContainers } = await import('/game/save.js'); const sc = game.scene.getScene('play'), H = sc.hud, sv = nomad.save(), w = sv.rig.units[1].workshops.find(w => w.id === 'werkbank'), key = `store:1:${w.at}`;
+  w.id = 'kuehlraum'; fitContainers(sc.data_, sv);
+  const camp = sv.inv.grids.camp, n = id => camp.items.filter(e => e.id === id).reduce((k, e) => k + e.n, 0), scrap0 = n('schrott'), reis0 = n('reis');
+  sv.inv.grids.backpack.items = [{ a: 'items', id: 'bohneneintopf', n: 1, x: 0, y: 0, r: 0 }, { a: 'items', id: 'reis', n: 2, x: 1, y: 0, r: 0 }, { a: 'items', id: 'schrott', n: 3, x: 2, y: 0, r: 0 }]; H.sum.draw();
+  const before = H.sum.state().buttons, label = document.querySelector('.sum-stow')?.textContent; document.querySelector('.sum-stow')?.click();
+  const after = H.sum.state(), r = { before, label, after: after.buttons, stowed: after.stowed, open: after.open, disabled: !!document.querySelector('.sum-stow')?.disabled, bag: sv.inv.grids.backpack.items.length,
+    cool: sv.inv.grids[key]?.items.map(e => `${e.id}×${e.n}`), scrap: n('schrott') - scrap0, reis: n('reis') - reis0 };
+  w.id = 'werkbank'; delete sv.inv.grids[key]; H.sum.close(); nomad.step(2); return r; });
+check('Beute-Bilanz: „Alles einlagern“ bringt Gerichte + Zutaten in den Kühlraum, den Rest ins Camp-Lager, die Karte bleibt offen', s.before?.[0] === 'stow' && /Alles einlagern/.test(s.label || '') && s.open && s.disabled && s.bag === 0 && s.stowed?.moved === 3
+  && s.cool?.includes('bohneneintopf×1') && s.cool?.includes('reis×2') && s.reis === 0 && s.scrap === 3, s);
 s = await ev(() => { nomad.save().hour = 23; game.scene.getScene('play').goCamp({}); nomad.step(40); const sc = game.scene.getScene('play'); return { ...nomad.state(), door: sc.camp.doorLights.map(l => l.alpha), lightK: sc.camp.lightK }; });
 check('Nachts: Licht quillt aus der offenen Van-Tür', s.camp.daytime === 'Nacht' && s.van.open && s.door[0] > 0.3, { d: s.camp.daytime, van: s.van, door: s.door });
 await shot('night');
@@ -63,7 +74,7 @@ check('Hinweis am Lagerfeuer', p === 'Hinsetzen · Questlog · Lagerfeuer', p);
 s = await ev(() => { const m = c.use(); nomad.choose('Questlog'); const sc = game.scene.getScene('play'), Q = sc.hud.quests, first = nomad.quests().tab; Q.open('active'); const a = { ...nomad.quests(), first };
   Q.open('offers'); const offers = nomad.quests().rows; Q.pick = offers.indexOf('offer:kabelsalat'); Q.act('ok'); const taken = nomad.quests();
   const sv = nomad.save(), d0 = sv.deltas; sc.hud.goalAt = 0; nomad.step(3); const goal = document.querySelector('.hud-goal')?.textContent || '';
-  const g = sv.inv.grids.chest, cables = () => Object.values(sv.inv.grids).reduce((n, gr) => n + (gr?.items || []).filter(e => e.id === 'kupferkabel').reduce((k, e) => k + e.n, 0), 0); g.items.push({ a: 'items', id: 'kupferkabel', n: 5, x: g.w - 1, y: g.h - 1 }); const c0 = cables(); Q.draw();
+  const g = sv.inv.grids.camp, cables = () => Object.values(sv.inv.grids).reduce((n, gr) => n + (gr?.items || []).filter(e => e.id === 'kupferkabel').reduce((k, e) => k + e.n, 0), 0); g.items.push({ a: 'items', id: 'kupferkabel', n: 5, x: g.w - 1, y: g.h - 1 }); const c0 = cables(); Q.draw();
   const ready = nomad.quests(); Q.pick = ready.rows.indexOf('side:kabelsalat!'); Q.act('ok');
   const after = { ...nomad.quests(), deltas: sv.deltas - d0, done: !!sv.quests.done.kabelsalat, cable: c0 - cables() };
   sv.deltas = d0; Q.close(); nomad.step(2);   // the later checks count from the start money
@@ -107,16 +118,17 @@ check('Schwarzes Brett: Zettel je Auftrag, annehmen und abgeben, Belohnung kommt
 
 s = await ev(() => { nomad.step(900, ['left']); nomad.step(60); return nomad.state(); });   // the rig is longer since ×4 (09.11.2026)
 check('Schacht links: Leyla bleibt am Rand stehen', s.leyla.feet === 768 && s.leyla.x > 4 * 64 && s.leyla.x < 5 * 64 + 10, s.leyla);
-p = await ev(() => c.to('Kiste'));
-s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(60); return nomad.state(); });
-check('Kiste geht mit E auf (Fenster pausiert, der Deckel geht trotzdem auf)', p === 'Öffnen · Kiste' && s.camp.chest.open && s.camp.chest.frame === 4, { p, chest: s.camp.chest, prompt: s.prompt });
-await shot('chest');
-s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(60); return nomad.state(); });
-check('… und wieder zu', !s.camp.chest.open && s.camp.chest.frame === 0, s.camp.chest);
+// #041: the chest is gone; E at the van's rear door (Kofferraum) opens the Camp-Lager
+p = await ev(() => c.to('Kofferraum'));
+s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(60); return { st: nomad.state(), inv: nomad.inv() }; });
+check('Keine Kiste mehr im Camp, E an der Hecktür öffnet das Camp-Lager', p === 'Öffnen · Kofferraum' && !s.st.camp.hotspots.some(h => h.name === 'Kiste') && !('chest' in s.st.camp) && s.inv?.open && s.inv.other?.key === 'camp' && s.inv.other.title === 'Camp-Lager', { p, inv: s.inv?.other && { key: s.inv.other.key, title: s.inv.other.title }, prompt: s.st.prompt });
+await shot('camp_store');
+s = await ev(() => { nomad.step(1, [], ['grab']); nomad.step(60); return nomad.inv(); });
+check('… und E schließt es wieder', !s?.open, s?.open);
 // Daniel, 12.11.2026: W / ↑ (controller: stick up) counts as E while an E prompt shows; an open window pauses the game
-s = await ev(() => { nomad.step(1, [], ['up']); nomad.step(20); const x0 = nomad.state().leyla.x, open = nomad.state().camp.chest.open; nomad.step(40, ['dash'], ['dash']);   // a dash would move her (arrows would move the window's cursor)
-  const x1 = nomad.state().leyla.x; nomad.step(1, [], ['grab']); nomad.step(60); return { open, moved: Math.abs(x1 - x0), closed: !nomad.state().camp.chest.open }; });
-check('W mit E-Hinweis öffnet die Kiste, offenes Fenster pausiert (Leyla läuft nicht), E schließt', s.open && s.moved < 1 && s.closed, s);
+s = await ev(() => { nomad.step(1, [], ['up']); nomad.step(20); const x0 = nomad.state().leyla.x, open = !!nomad.inv()?.open; nomad.step(40, ['dash'], ['dash']);   // a dash would move her (arrows would move the window's cursor)
+  const x1 = nomad.state().leyla.x; nomad.step(1, [], ['grab']); nomad.step(60); return { open, moved: Math.abs(x1 - x0), closed: !nomad.inv()?.open }; });
+check('W mit E-Hinweis öffnet das Camp-Lager, offenes Fenster pausiert (Leyla läuft nicht), E schließt', s.open && s.moved < 1 && s.closed, s);
 s = await ev(() => { const near = (c.to('Lagerfeuer'), nomad.state().camp.sound.fire); c.to('Kochnische'); return { near, far: nomad.state().camp.sound.fire, wind: nomad.state().camp.sound.wind }; });
 check('Feuer lauter, je näher Leyla ist; Wind läuft', s.near >= 80 && s.far < 15 && s.wind, s);
 

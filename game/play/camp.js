@@ -9,7 +9,7 @@ import { clockHours } from '../tank.js';
 import { potsOf, stage, ripe, harvest, STAGES, canWater, waterOf, water } from '../garden.js';
 import { level as cisternLevel, tap as cisternTap } from '../cistern.js';
 import { anchors as lightAnchors, catenary, lightsConfig, mastAt } from '../string_lights.js';
-import { clockText, advance, hoursUntil, containers, solarState } from '../save.js';
+import { clockText, advance, hoursUntil, solarState, storeKeyOf, CAMP } from '../save.js';
 import { budgets, partSlots, passengers, roofFree } from '../rig.js';
 import { occupancy } from '../inventory.js';
 import { offers, accept, claim, progressOf, qstate } from '../quests.js';
@@ -446,7 +446,6 @@ export class Camp {
     // the rig and the scrapyard; also the budgets (Rig-Bau › Regeln): without power, workshops that need it do not work; too heavy, no driving
     this.drawRig();
     this.drawFire();
-    this.placeChest();
     this.vanGlow();
     this.placeCompanions();
     this.placeBoard();
@@ -458,7 +457,7 @@ export class Camp {
       act: () => this.vanMenu(vanWs) });
     // the van's own storage (Kofferraum): E at the rear door
     const T0 = D.tractors?.[geo.tractor?.id] || {};
-    if (T0.storage?.[0]) this.storeHotspot('rig:0', geo.vanLeft + (geo.vanRight - geo.vanLeft) * (C.rig?.trunkAt ?? 12) / 100, T0.storageName || 'Kofferraum', false);
+    if (T0.storage?.[0]) this.storeHotspot(CAMP, geo.vanLeft + (geo.vanRight - geo.vanLeft) * (C.rig?.trunkAt ?? 12) / 100, T0.storageName || 'Kofferraum', false);   // #041: opens the Camp-Lager
     // earth below the bottom of the world: visible when the camera zooms out to build
     scene.add.rectangle(-4000, geo.H * T, geo.W * T + 8000, 4000, col(C.ground?.color || '#4a3628')).setOrigin(0).setDepth(-9);
     scene.add.rectangle(-4000, geo.floor * T, 4000, geo.H * T, col(C.ground?.color || '#4a3628')).setOrigin(0).setDepth(-9);
@@ -560,7 +559,7 @@ export class Camp {
       const def = D.workshops?.[w.id] || {}, cx = u.in0 + w.at * u.cell - u.x0, cw = (def.places || 1) * u.cell, place = `${u.ui}:${w.at}`;
       // Daniel's picture with its lights and effects (benches.js), otherwise furniture from code
       const px0 = u.in0 + w.at * u.cell, clip = { x0: px0, x1: px0 + cw, y0: u.inTop, y1: u.floorY + 4 };   // the place inside the container
-      const art = this.benches.add({ id: w.id, place, x0: px0, w: cw, floor: u.floorY - inset, h, view, mid, G, grid: def.grid && `store:${place}`, clip, unitScale: (u.def.benchScale ?? 100) / 100 });
+      const art = this.benches.add({ id: w.id, place, x0: px0, w: cw, floor: u.floorY - inset, h, view, mid, G, grid: def.grid && storeKeyOf(D, this.scene.box.save, ...place.split(':').map(Number)), clip, unitScale: (u.def.benchScale ?? 100) / 100 });
       if (art) shades.push(clip);
       if (!art) furniture(g, def.function, cx, h + 40, cw, h, R.light || '#ffcf7a');
       if (!u.sprite && !art) g.fillStyle(0x0d0a12).fillRect(cx + cw / 2 - 26, 40 + 22, 52, 34).fillStyle(col(R.light || '#ffcf7a')).fillRect(cx + cw / 2 - 22, 40 + 26, 44, 26);   // window
@@ -626,18 +625,6 @@ export class Camp {
         add(s.add.image(x - mid, footY - G, tk).setOrigin(0.5, 1).setScale(k).setFlipX(u.sprite.flip));
       }
     }
-    // Deichselkasten: a little steel box on the drawbar (code), E opens the trailer's own storage
-    if (u.def.storage?.[0]) {
-      // stacked: no drawbar, the box stands on the floor at the front end
-      const k = (this.C.rig?.boxAt ?? 55) / 100, b0 = u.in0 + (u.body || 0) + 12, bx = u.level ? u.in0 + u.cell * u.places - 34 : u.sprite ? u.x1 - 40 : b0 + (u.x1 - 10 - b0) * k;
-      const by = u.level ? u.floorY : u.sprite ? G - 40 : u.floorY + (G - 40 - u.floorY) * k, bw = 44, bh = 26;
-      const bg = s.add.graphics();
-      bg.fillStyle(0x1b1d22).fillRect(bx - bw / 2 - 2, by - bh - 4, bw + 4, bh + 4).fillStyle(0x5a616b).fillRect(bx - bw / 2, by - bh - 2, bw, bh)
-        .fillStyle(0x8b949e).fillRect(bx - bw / 2, by - bh - 2, bw, 4).fillStyle(0x2b2f36).fillRect(bx - 5, by - bh + 8, 10, 5)
-        .fillStyle(0xd9a441).fillRect(bx - bw / 2 + 4, by - 8, bw - 8, 2);
-      bg.x = -mid; bg.y = -G; add(bg);
-      this.storeHotspot(`rig:${u.ui}`, bx, u.def.storageName || 'Deichselkasten');
-    }
     // the interior floor carries Leyla (jump in), workshops are used with E from the ground or from inside
     const z = s.add.zone(u.in0 + u.cell * u.places / 2, u.floorY + 8, u.cell * u.places, 16);
     s.platforms.add(z);
@@ -698,14 +685,14 @@ export class Camp {
     }
     s.ladders.push({ cx: x, x0: x - s.T / 2, x1: x + s.T / 2, top, bottom, rig: true, ground: true, stairs: !!info });
   }
-  // a small storage of its own (Kofferraum, Deichselkasten): E opens and closes it
+  // the Kofferraum at the rear door: E opens and closes the Camp-Lager (#041)
   storeHotspot(key, x, name, rig = true) {
     const inv = () => this.scene.hud.inv, isOpen = () => inv()?.isOpen && inv().other?.key === key;
     this.hotspots.push({ rig, x, w: 50, top: this.curTop, name, hint: () => isOpen() ? 'Schließen' : 'Öffnen', store: key, act: () => { if (isOpen()) inv().close(); else this.scene.openContainer(key); } });
   }
   workshopHotspot(u, w, def, cx, cw, labelY) {
     const R = this.C.rig || {};
-    const store = def.grid && `store:${u.ui}:${w.at}`;
+    const store = def.grid && storeKeyOf(this.D, this.scene.box.save, u.ui, w.at);   // a Speziallager its own, a shelf the Camp-Lager (#041)
     this.hotspots.push({ rig: true, place: `${u.ui}:${w.at}`, x: cx + cw / 2, w: cw / 2, top: this.curTop, floor: u.floorY, name: def.name || w.id, hint: this.synHint(`${u.ui}:${w.at}`, store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen'), ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id, `${u.ui}:${w.at}`) });
     if (R.labels !== false && def.function !== 'tank') {   // the cryo tank has its own screen
       // subtle (#008): small, soft, a little see-through; they still say what stands where
@@ -767,7 +754,7 @@ export class Camp {
     view.add(s.add.rectangle(clip.x0, clip.y0, clip.x1 - clip.x0, clip.y1 - clip.y0, col(Dr.backdrop || '#241a2c')).setOrigin(0));
     // the bench stands on the van's floor, centred in the door, in the shared scale
     const def = D.workshops?.[w.id] || {}, cw = Math.max(clip.x1 - clip.x0, 200);
-    const bench = this.benches.add({ id: w.id, place: `0:${w.at}`, x0: (clip.x0 + clip.x1) / 2 - cw / 2, w: cw, floor: clip.y1, h: clip.y1 - clip.y0, view, mid: 0, G: 0, grid: def.grid && `store:0:${w.at}`, clip });
+    const bench = this.benches.add({ id: w.id, place: `0:${w.at}`, x0: (clip.x0 + clip.x1) / 2 - cw / 2, w: cw, floor: clip.y1, h: clip.y1 - clip.y0, view, mid: 0, G: 0, grid: def.grid && storeKeyOf(this.D, this.scene.box.save, 0, w.at), clip });
     if (!bench) { view.destroy(); return; }
     bench.door = true;
     view.setAlpha(0);
@@ -988,31 +975,6 @@ export class Camp {
     ];
   }
 
-  // chest lid: open while its inventory is open (also while the window pauses the game)
-  lid(dt) {
-    const c = this.chest, s = this.scene;
-    if (!c) return;
-    c.open = !!(s.hud.inv?.isOpen && s.hud.inv.other?.key === 'chest');
-    const target = c.open ? c.frames - 1 : 0;
-    if (c.frame !== target) c.frame = c.frame < target ? Math.min(target, c.frame + c.fps * dt / 1000) : Math.max(target, c.frame - c.fps * dt / 1000);
-    c.sprite.setFrame(Math.round(c.frame));
-  }
-  // ---------- chest: closed, E opens and closes it (the frames run forward or back) ----------
-  placeChest() {
-    const K = this.C.chest || {}, s = this.scene;
-    const info = K.enabled !== false && K.look && s.assetInfo(K.look);
-    if (!info) return;
-    s.textures.get(info.key).setFilter(NEAREST());
-    const x = ((this.geo.campCol ?? this.geo.vanCol) + (K.at ?? 16) + 0.5) * s.T, A = this.D.assets?.[K.look] || {};
-    const sprite = s.add.sprite(x, this.ground, info.key, 0).setOrigin(info.ox, info.oy).setScale(info.scale).setFlipX(!!K.flip).setDepth(-3);
-    this.chest = { x, sprite, frames: A.frames || 1, fps: A.fps || 8, frame: 0, open: false };
-    // E opens the lid and the chest's inventory, E again closes both
-    const inv = () => this.scene.hud.inv, isOpen = () => inv()?.isOpen && inv().other?.key === 'chest';
-    this.hotspots.push({ x, w: 70, name: 'Kiste', hint: () => isOpen() ? 'Schließen' : 'Öffnen', act: () => {
-      if (isOpen()) inv().close(); else this.scene.openContainer('chest');
-    } });
-  }
-
   // ---------- loop ----------
   update(time, dt, input) {
     const s = this.scene, l = s.leyla, range = this.C.interactRange ?? 130;
@@ -1047,7 +1009,6 @@ export class Camp {
       const v = s.van, open = v && v.frames > 1 ? v.frame / (v.frames - 1) : 0;
       for (const d of this.doorLights) d.setAlpha(d.base * this.lightK * open).setVisible(this.lightK > 0 && open > 0.02);
     }
-    this.lid(dt);
     this.updateSound(time);
     // the van's door: the workshop behind it shows only while the door is fully open
     if (this.vanDoor) {
@@ -1102,7 +1063,6 @@ export class Camp {
     const sv = this.box.save;
     return { clock: clockText(sv), day: sv.day, hour: sv.hour, daytime: this.day.name, location: sv.location, deltas: sv.deltas, fuel: sv.fuel, food: sv.food, health: sv.health, buffs: [...sv.buffs],
       prompt: this.promptText || null, hotspots: this.hotspots.map(h => ({ name: h.name, hint: typeof h.hint === 'function' ? h.hint() : h.hint, x: Math.round(h.x), floor: h.floor ?? null })),
-      chest: this.chest && { open: this.chest.open, frame: Math.round(this.chest.frame) },
       sound: { wind: !!this.wind, music: this.music ? Math.round(this.music.volume * 100) : null, fire: this.fireVolume != null ? Math.round(this.fireVolume * 100) : null, muted: this.scene.sound.mute },
       benches: this.benches?.state() || [], resting: this.resting || null,
       shells: (this.shells || []).map(c => ({ unit: c.u.ui, id: c.u.id, closed: Math.round(c.a * 100) / 100, x0: Math.round(c.u.x0), x1: Math.round(c.u.x1) })), rigOpen: !!this.scene.hud.rigOpen,

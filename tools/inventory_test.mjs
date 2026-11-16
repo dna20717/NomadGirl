@@ -1,5 +1,5 @@
-// Headless check of the inventory with real mouse clicks (game.html?camp): chest, picking up, putting down, turning,
-// stacking, double click, equipping, "Alles einlagern", the storage shelf, loot on the ground in a run, knocked out.
+// Headless check of the inventory with real mouse clicks (game.html?camp): Camp-Lager (#041), picking up, putting down, turning,
+// stacking, double click, equipping, "Alles einlagern", closed cells, filter chips, "Sortieren", the storage shelf, loot on the ground in a run, knocked out.
 //   node tools/inventory_test.mjs [--shots]   (server must run: npm run serve), pictures to output/inv_*.png
 import fs from 'node:fs';
 import { chromium } from 'playwright';
@@ -19,29 +19,29 @@ const ev = (f, a) => page.evaluate(f, a);
 const check = (name, cond, info) => { (cond ? ok : errors).push(cond ? name : `${name}: ${JSON.stringify(info)}`); if (!cond && process.env.DBG) console.log("FAIL", name, JSON.stringify(info).slice(0, 800)); };
 const shot = async n => { if (!shots) return; fs.mkdirSync('output', { recursive: true }); await page.screenshot({ path: `output/inv_${n}.png` }); };
 const inv = () => ev(() => nomad.inv());
-// cell centre of a grid (0 = backpack, 1 = the other panel) in page pixels
-const cell = (panel, x, y) => ev(([panel, x, y]) => { const g = document.querySelectorAll('.inv-grid')[panel], r = g.getBoundingClientRect(), c = parseFloat(g.style.getPropertyValue('--c')); return [r.left + (x + 0.5) * c, r.top + (y + 0.5) * c]; }, [panel, x, y]);
+// cell centre of a grid (0 = backpack, 1 = the other panel) in page pixels (the window zooms out for the tall Camp-Lager)
+const cell = (panel, x, y) => ev(([panel, x, y]) => { const g = document.querySelectorAll('.inv-grid')[panel], r = g.getBoundingClientRect(), c = parseFloat(g.style.getPropertyValue('--c')) * r.width / g.offsetWidth; return [r.left + (x + 0.5) * c, r.top + (y + 0.5) * c]; }, [panel, x, y]);
 const click = async (panel, x, y, opt = {}) => { const [px, py] = await cell(panel, x, y); await page.mouse.click(px, py, opt); await page.waitForTimeout(30); };
 const slot = async name => { const b = await page.locator('.inv-slot', { hasText: name }).first().boundingBox(); await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2); await page.waitForTimeout(30); };
 const has = (g, id) => g.items.some(i => i.startsWith(id + '×'));
 
-// the start ingredients for cooking and crafting (Spiel › Start-Inventar) are not part of this test: the shelf as it was before
-await ev(() => { const g = nomad.save().inv.grids; for (const k of Object.keys(g)) if (k.startsWith('store:')) g[k].items = g[k].items.filter(e => !['stoffreste', 'schrott', 'reis', 'gewuerzmischung', 'mutantenfleisch', 'batteriezelle', 'alte_platine', 'leuchteier', 'mutantengemuese', 'sojasauce', 'speiseoel', 'schrauben'].includes(e.id)); });
+// the start ingredients for cooking and crafting (Spiel › Start-Inventar) are not part of this test: the Camp-Lager without them
+await ev(() => { const g = nomad.save().inv.grids; for (const k of Object.keys(g)) if (k === 'camp' || k.startsWith('store:')) g[k].items = g[k].items.filter(e => !['stoffreste', 'schrott', 'reis', 'gewuerzmischung', 'mutantenfleisch', 'batteriezelle', 'alte_platine', 'leuchteier', 'mutantengemuese', 'sojasauce', 'speiseoel', 'schrauben'].includes(e.id)); });
 // handed out once to every savegame (Spiel › Start › Nachreichen, the revolver test): not part of this test
-// (the revolver and the assault rifle; the rifle pushed the copper cables into the chest, they go back)
+// (the revolver and the assault rifle; the rifle pushed the copper cables into the Camp-Lager, they go back)
 await ev(() => { const G = nomad.save().inv.grids; for (const g of Object.values(G)) g.items = g.items.filter(e => !['trommelrevolver', 'sturmgewehr'].includes(e.id));
-  const k = G.chest.items.find(e => e.id === 'kupferkabel'); if (k) { G.chest.items.splice(G.chest.items.indexOf(k), 1); G.backpack.items.push({ ...k, x: 1, y: 0, r: 0 }); } });
-await ev(() => { nomad.take(); nomad.step(5); const h = nomad.state().camp.hotspots.find(h => h.name === 'Kiste'); nomad.walkTo(h.x); nomad.step(1, [], ['grab']); nomad.step(5); });
+  const k = G.camp.items.find(e => e.id === 'kupferkabel'); if (k) { G.camp.items.splice(G.camp.items.indexOf(k), 1); G.backpack.items.push({ ...k, x: 1, y: 0, r: 0 }); } });
+await ev(() => { nomad.take(); nomad.step(5); const h = nomad.state().camp.hotspots.find(h => h.name === 'Kofferraum'); nomad.walkTo(h.x); nomad.step(1, [], ['grab']); nomad.step(5); });
 let s = await inv();
-check('E an der Kiste öffnet Rucksack + Kiste', s.open && s.other?.key === 'chest' && has(s.other.grid, 'discokugel') && has(s.backpack, 'verband'), s);
-await shot('chest');
+check('E an der Hecktür öffnet Rucksack + Camp-Lager', s.open && s.other?.key === 'camp' && s.other.title === 'Camp-Lager' && has(s.other.grid, 'discokugel') && has(s.backpack, 'verband'), s);
+await shot('camp');
 // pictures from the icon sheets (Assets › Symbole) instead of glyphs: the Verband in the backpack, the Karambit in its slot
 const pics = await ev(() => [...document.querySelectorAll('.inv-item.pic .inv-art, .inv-slot .inv-art')].map(e => getComputedStyle(e).backgroundImage).filter(b => b.includes('icons_')));
 check('Symbole statt Kürzel (Rucksack + Slot)', pics.length >= 2, pics);
 const sheetOk = await ev(() => fetch('projects/nomadgirl/assets/items/icons_gear.png').then(r => r.ok));
 check('Symbol-Raster lädt', sheetOk, sheetOk);
 
-// machete (1×3) from the chest into the backpack
+// machete (1×3) from the Camp-Lager into the backpack
 await click(1, 2, 0);
 s = await inv();
 check('Klick nimmt die Machete', s.held === 'machete×1' && !has(s.other.grid, 'machete'), s);
@@ -58,7 +58,7 @@ s = await inv();
 check('Machete in den Nahkampf-Slot, Karambit in der Hand', s.slots.melee === 'machete' && s.held === 'karambit×1', s);
 await click(1, 2, 0);
 s = await inv();
-check('Karambit in die Kiste', !s.held && has(s.other.grid, 'karambit'), s);
+check('Karambit ins Camp-Lager', !s.held && has(s.other.grid, 'karambit'), s);
 check('Kampf nutzt die neue Waffe', await ev(() => game.scene.getScene('play').weapon('melee')?.name === 'Machete'), null);
 // wrong slot
 await click(1, 0, 0); await slot('Fernkampf');
@@ -72,31 +72,51 @@ check('Doppelklick schickt die Bohnen in den Rucksack', has(s.backpack, 'dosenbo
 // stacking: kupferkabel ×3 onto … take the cable and drop it on itself elsewhere is trivial; use "Alles einlagern"
 await page.getByText('Alles einlagern').click({ timeout: 3000 }); await page.waitForTimeout(40);
 s = await inv();
-check('Alles einlagern leert den Rucksack in die Kiste', s.backpack.items.length === 0 && has(s.other.grid, 'verband') && has(s.other.grid, 'kupferkabel'), s);
+check('Alles einlagern leert den Rucksack ins Camp-Lager', s.backpack.items.length === 0 && has(s.other.grid, 'verband') && has(s.other.grid, 'kupferkabel'), s);
 await page.getByText('Alles nehmen').click(); await page.waitForTimeout(40);
 s = await inv();
 check('Alles nehmen packt ein, was passt', s.backpack.items.length > 0, s);
+// #041: the Camp-Lager has exactly as many cells as its shelves give; the rest of the last row is closed (here: 5 cells less, only for this check)
+s = await ev(async () => { const I = await import('/game/inventory.js'), sc = game.scene.getScene('play'), ui = sc.hud.inv, g = nomad.save().inv.grids.camp, cap0 = g.cap;
+  g.cap = g.w * g.h - 5; ui.draw(); const closed = document.querySelectorAll('.inv-closed').length, cap = g.cap;
+  const fit = I.fits(sc.data_, g, { a: 'items', id: 'schrott', n: 1 }, g.w - 1, g.h - 1), head = document.querySelector('.inv-panel.camp header')?.textContent || '';
+  if (cap0 == null) delete g.cap; else g.cap = cap0; ui.draw(); return { closed, fit, head, cap, after: document.querySelectorAll('.inv-closed').length }; });
+check('Geschlossene Felder am Ende der letzten Reihe (.inv-closed), dort passt nichts hin', s.closed === 1 && !s.fit && s.after === 0 && s.head.includes(`/ ${s.cap} Felder`), s);
+// filter chips: one per kind, a click dims everything of another kind, „Alles“ shows all again
+s = await ev(async () => { const { kindOf } = await import('/game/inventory.js'), sc = game.scene.getScene('play'), D = sc.data_, g = nomad.save().inv.grids.camp;
+  const chips = [...document.querySelectorAll('.inv-filter .inv-chip')], chip = chips.find(c => c.textContent === 'Zutat') || chips[1]; chip.click();
+  const on = document.querySelector('.inv-filter .inv-chip.on')?.textContent, items = [...document.querySelectorAll('.inv-panel.camp .inv-item')], dim = items.filter(e => e.classList.contains('dim')).length;
+  const kinds = new Set(g.items.map(e => kindOf(D, e.a, e.id))), want = sc.hud.inv.filter, same = g.items.filter(e => kindOf(D, e.a, e.id) === want).length;
+  [...document.querySelectorAll('.inv-filter .inv-chip')].find(c => c.textContent === 'Alles').click(); const back = document.querySelectorAll('.inv-panel.camp .inv-item.dim').length;
+  return { chips: chips.map(c => c.textContent), on, n: items.length, dim, same, kinds: kinds.size, back }; });
+check('Filter-Chips: eine Art gewählt, alles andere ist gedimmt, „Alles“ zeigt wieder alles', s.chips[0] === 'Alles' && s.chips.length === s.kinds + 1 && s.on && s.dim === s.n - s.same && s.same > 0 && s.back === 0, s);
+// „Sortieren“: stacks merge, kinds in order, nothing gets lost
+s = await ev(() => { const g = nomad.save().inv.grids.camp, total = () => { const t = {}; for (const e of g.items) t[e.id] = (t[e.id] || 0) + e.n; return JSON.stringify(Object.entries(t).sort()); };
+  const t0 = total(); [...document.querySelectorAll('.inv-panel.camp .inv-btn')].find(b => b.textContent === 'Sortieren').click(); return { same: total() === t0, first: g.items.find(e => e.x === 0 && e.y === 0)?.id, n: g.items.length }; });
+check('„Sortieren“ ordnet das Camp-Lager, nichts geht verloren', s.same && s.n > 0 && !!s.first, s);
+await ev(async () => { const I = await import('/game/inventory.js'), sc = game.scene.getScene('play'), G = nomad.save().inv.grids, e = G.backpack.items.find(x => x.id === 'wanderrucksack');   // the hiking backpack (taken with „Alles nehmen“) back into the Camp-Lager
+  if (e && !I.addEntry(sc.data_, G.camp, e)) I.remove(G.backpack, e); sc.hud.inv.draw(); });
 await shot('moved');
 
-// storage shelf in the trailer: swap the backpack for the hiking backpack
+// storage shelf in the trailer: it opens the same Camp-Lager (#041); swap the backpack for the hiking backpack
 s = await ev(() => { nomad.step(1, [], ['grab']); nomad.goTo('Lagerregal'); nomad.step(1, [], ['grab']); nomad.step(5); return nomad.inv(); });
-check('Lagerregal ist ein Inventar', s.open && s.other?.title === 'Lagerregal' && has(s.other.grid, 'wanderrucksack') && has(s.other.grid, 'kronkorken'), s);
-const ruck = await ev(() => { const g = nomad.save().inv.grids; const k = Object.keys(g).find(k => k.startsWith('store:')); return g[k].items.find(e => e.id === 'wanderrucksack'); });
+check('E am Lagerregal öffnet das Camp-Lager', s.open && s.other?.key === 'camp' && s.other?.title === 'Camp-Lager' && has(s.other.grid, 'wanderrucksack') && has(s.other.grid, 'kronkorken'), s);
+const ruck = await ev(() => nomad.save().inv.grids.camp.items.find(e => e.id === 'wanderrucksack'));
 await click(1, ruck.x, ruck.y); await slot('Rucksack');
 s = await inv();
 check('Größerer Rucksack angelegt, Inhalt bleibt', s.slots.backpack === 'wanderrucksack' && s.backpack.w === 6 && s.backpack.h === 4 && s.held === 'schulranzen×1', s);
-// a free spot for the held school bag in the shelf (#019: rectangles only, the shelf's layout is not fixed)
+// a free spot for the held school bag in the Camp-Lager (#019: rectangles only, the layout is not fixed)
 const free = await ev(async () => { const { findSpot } = await import('./game/inventory.js'); const sc = game.scene.getScene('play'), u = sc.hud.inv, g = nomad.save().inv.grids[u.other.key]; return findSpot(sc.data_, g, u.held.e.a, u.held.e.id, [u.held.e.r || 0]); });
 await click(1, free.x, free.y);
 s = await inv();
-check('Schulranzen ins Regal', !s.held && has(s.other.grid, 'schulranzen'), s);
+check('Schulranzen ins Camp-Lager', !s.held && has(s.other.grid, 'schulranzen'), s);
 await shot('shelf');
 const saved = await ev(() => new Promise(r => setTimeout(() => r(JSON.parse(localStorage.getItem('nomadgirl-save'))), 1500)));
 check('Spielstand merkt sich das Inventar', saved.inv.backpack === 'wanderrucksack' && saved.inv.slots.melee === 'machete', saved.inv.slots);
 
 // throw something on the ground in the camp: a new bundle, it stays after reloading
 s = await ev(() => { nomad.step(1, [], ['inventory']); nomad.step(1, [], ['inventory']); return nomad.inv(); });
-await click(0, 0, 0);
+{ const e0 = await ev(() => nomad.save().inv.grids.backpack.items[0]); await click(0, e0?.x ?? 0, e0?.y ?? 0); }   // whatever lies first in the backpack
 const thrown = (await inv()).held;
 const out = await ev(() => { const inv = game.scene.getScene('play').hud.inv.el; for (const [x, y] of [[30, 780], [8, 430], [1390, 430], [700, 6], [8, 8]]) if (!inv.contains(document.elementFromPoint(x, y))) return [x, y]; return [30, 780]; });   // next to the panels (they grew)
 await page.mouse.click(out[0], out[1]); await page.waitForTimeout(40);

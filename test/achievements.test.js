@@ -11,7 +11,7 @@ import { loadProject, validateProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
 
 const P = await loadProject(nodeLoader('projects/nomadgirl')), D = P.data;
-const rich = s => { s.inv.grids.chest = newGrid(40, 40); for (const r of Object.values(D.recipes)) for (const i of r.ingredients || []) give(D, s, i.item, (i.count || 1) * 2); };
+const rich = s => { s.inv.grids.camp = newGrid(40, 40); for (const r of Object.values(D.recipes)) for (const i of r.ingredients || []) give(D, s, i.item, (i.count || 1) * 2); };
 // a rig with a treasury in a 20-foot container (and optionally a second one)
 function withTreasury(n = 1) {
   const s = newSave(D);
@@ -48,7 +48,7 @@ test('Rezepte automatisch lernen: Zettel im Rucksack → Rezeptbuch, Rucksack le
   assert.equal(r2[0].learnt, false); assert.equal(r2[0].knowledge, D.crafting.knownKnowledge ?? 1);
   assert.deepEqual(bag.items.map(e => [e.id, e.n]), [['wissen', D.crafting.knownKnowledge ?? 1]]);
   // Schnellaktion „Lernen“: a note in the chest (older savegames)
-  const chest = s.inv.grids.chest = newGrid(10, 10); add(D, chest, 'items', 'bauplan_medikit', 1);
+  const chest = s.inv.grids.camp = newGrid(10, 10); add(D, chest, 'items', 'bauplan_medikit', 1);
   const e = chest.items.find(x => x.id === 'bauplan_medikit');
   assert.ok(learnNote(D, s, chest, e).learnt);
   assert.ok(!chest.items.some(x => x.id === 'bauplan_medikit'));
@@ -81,7 +81,7 @@ test('Bonus: Trophäe auf einem Ständer wirkt, im Lager nicht; zweite Schatzkam
   const s = withTreasury(2), st = stands(s);
   assert.ok(st.length >= 8, 'zwei Schatzkammern mit je 4 Ständern');
   assert.deepEqual(bonuses(D, s), {});
-  add(D, s.inv.grids.chest, 'items', 'messing_patrone', 1);
+  add(D, s.inv.grids.camp, 'items', 'messing_patrone', 1);
   assert.deepEqual(bonuses(D, s), {}, 'in der Kiste wirkt nichts');
   const second = st.filter(c => c.parent !== st[0].parent);
   assert.equal(add(D, s.inv.grids[second[1].key], 'items', 'messing_patrone', 1), 0);

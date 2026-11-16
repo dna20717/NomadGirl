@@ -36,7 +36,7 @@ test('Fundort je Durchgang: Straßen vom Start wie eingestellt, gleich bei gleic
 });
 
 test('Einbauen: nur der aktuelle Abschnitt, Teile verschwinden aus dem Lager, Abschnitte nacheinander', () => {
-  const s = fresh();
+  const s = fresh(); s.inv.grids.camp.items = [];   // the start supplies (all of them fit into the Camp-Lager since #041) hold parts
   assert.equal(install(D, s, 'lkw').ok, false, 'ohne Teile');
   give(D, s, 'felge', 2);   // a part of a later section does not count yet
   assert.equal(install(D, s, 'lkw').ok, false);

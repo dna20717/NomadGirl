@@ -1,15 +1,14 @@
 // Stacking containers (game/rig.js): onto a trailer that carries, on top of a container, the tractor's height, blocks move together.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { newSave, repairSave, containers } from '../game/save.js';
+import { newSave, repairSave } from '../game/save.js';
 import { act, buyContainer, stackOn, stackSlots, moveContainer, detach, attachAt, budgets, blockAt, toSpare } from '../game/rig.js';
 import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
 import { classicRig } from './fixture.js';
 
 const D0 = classicRig((await loadProject(nodeLoader('projects/nomadgirl'))).data);   // fixed setup (fixture.js)
-// the trailers lost their own storage (12.11.2026); the code still carries one along, so the test gives the 20 Fuß one back
-const D = { ...D0, containers: { ...D0.containers, container_20: { ...D0.containers.container_20, storage: [4, 2] } } };
+const D = D0;   // the trailers' own storage (Deichselkasten) is gone for good (#041)
 const fresh = () => { const s = newSave(D); s.deltas = 9000; return s; };
 const ids = s => s.rig.units.map(u => u.id + (u.level ? '^' + u.level : '')).join(' ');
 
@@ -25,8 +24,6 @@ test('Container auf den Wohnanhänger stapeln; Holzkiste trägt nichts; Van stap
   const r2 = act(D, s, d => stackOn(D, d, { spare: 0 }, 1));
   assert.equal(r2.ok, false);
   assert.match(r2.reason, /höchstens 2/);
-  // the stacked container gets its own storage and places
-  assert.ok(containers(D, s).some(c => c.key === 'rig:2'));
 });
 
 test('Abhängen: erst oben abnehmen; gestapelter Container kommt runter in die Reihe', () => {
@@ -53,11 +50,9 @@ test('Block zieht mit: Anhänger mit Container drauf umsortieren', () => {
   // the block (trailer + container) behind the Modul-Anhänger
   assert.equal(act(D, s, d => moveContainer(D, d, 1, 4)).ok, true);
   assert.equal(ids(s), 'lkw modulanhaenger wohnanhaenger container_20^1');
-  // the container moves over onto the Modul-Anhänger, with its storage
-  s.inv.grids['rig:3'].items.push({ a: 'items', id: 'schrott', n: 1, x: 0, y: 0, r: 0 });
+  // the container moves over onto the Modul-Anhänger
   assert.equal(act(D, s, d => stackOn(D, d, { ui: 3 }, 1)).ok, true);
   assert.equal(ids(s), 'lkw modulanhaenger container_20^1 wohnanhaenger');
-  assert.equal(s.inv.grids['rig:2'].items[0].id, 'schrott');
 });
 
 test('Alter/kaputter Stand: Stapel bleiben heil', () => {

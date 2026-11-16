@@ -1,8 +1,8 @@
 // Cooking and crafting in the camp (Camp step 3, design.md › Crafting & Kochen): pure logic, browser and Node, no DOM.
 // The interface is game/play/craft_ui.js. Values come from the area "Kochen & Craften" (data/crafting.json) and "Rezepte".
 //
-// Where things come from: every camp inventory (storage places in the rig, the chest, then the backpack).
-// Where things go: backpack first, then the chest, then the storage places; what is left is returned (the scene drops it on the ground).
+// Where things come from: every camp inventory (the Camp-Lager, the Speziallager, then the backpack, #041).
+// Where things go: backpack first, then the Camp-Lager, then the Speziallager; what is left is returned (the scene drops it on the ground).
 // Recipe book: save.recipes = [recipe id]; at the start every recipe with discovery "start".
 // Experimenting: ingredients go into the pot; a recipe of this kind of workshop with the same kinds of ingredients
 // (and enough of each, or exactly as many with "Genaue Mengen") is a hit, everything else is curious junk.
@@ -32,8 +32,7 @@ export function recipesFor(D, ws) {
 // the grids Leyla can use in the camp, in the order things are taken from them
 export function sources(D, save) {
   const g = save.inv.grids, out = [];
-  for (const c of containers(D, save)) if (c.key !== 'chest' && c.stand == null && g[c.key]) out.push({ key: c.key, name: c.name, grid: g[c.key] });
-  if (g.chest) out.push({ key: 'chest', name: 'Kiste', grid: g.chest });
+  for (const c of containers(D, save)) if (c.stand == null && g[c.key]) out.push({ key: c.key, name: c.name, grid: g[c.key] });   // Camp-Lager first, then the Speziallager (#041)
   if (g.backpack) out.push({ key: 'backpack', name: 'Rucksack', grid: g.backpack });
   return out;
 }
@@ -59,7 +58,7 @@ export function take(D, save, id, n, a = 'items') {
   }
   return n - left;
 }
-// puts n of a thing into the backpack, the chest, the storage places; → how many did not fit
+// puts n of a thing into the backpack, the Camp-Lager, the Speziallager; → how many did not fit
 // a recipe's result: a thing into the inventories, or a rig part onto the scrapyard (Rezepte › Oder Rig-Teil). → what did not fit
 function produce(D, save, r, n, x = {}) {
   if (r.tank) { for (let i = 0; i < n; i++) maintain(D, save, r); return 0; }   // Rezepte › Oder Tank-Wartung: the cryo tank gets condition back
@@ -69,7 +68,7 @@ function produce(D, save, r, n, x = {}) {
 }
 export const resultOf = r => r.tank ? { id: 'tank', tank: r.tank } : r.part ? { id: r.part, part: true } : r.weapon ? { id: r.weapon, weapon: true } : { id: r.result };
 export function give(D, save, id, n, a = 'items', opts = {}) {
-  const g = save.inv.grids, order = ['backpack', 'chest', ...sources(D, save).map(s => s.key).filter(k => k !== 'backpack' && k !== 'chest')];
+  const g = save.inv.grids, order = ['backpack', ...sources(D, save).map(s => s.key).filter(k => k !== 'backpack')];
   for (const key of order) { if (!n) break; if (g[key]) n = add(D, g[key], a, id, n, opts); }
   return n;
 }
@@ -232,7 +231,7 @@ export function salvageable(D, save, ws) {
   }
   return [...out.values()];
 }
-// takes n of a thing apart: its parts go into the backpack, the chest, the storages (left = what did not fit); the clock moves on
+// takes n of a thing apart: its parts go into the backpack, the Camp-Lager, the Speziallager (left = what did not fit); the clock moves on
 export function salvage(D, save, a, id, ws, n = 1) {
   if (!canSalvageAt(D, a, id, ws)) return { ok: false, reason: 'Lässt sich hier nicht zerlegen' };
   const have = sources(D, save).reduce((k, s) => k + count(s.grid, a, id), 0);

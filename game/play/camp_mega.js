@@ -7,6 +7,7 @@ import { activeMega, buildOwn, mstate, deactivate } from '../mega.js';
 import { wreckHere } from './camp_salvage.js';
 import { MegarigView } from './megarig_view.js';
 import { VERB } from './camp.js';
+import { storeKeyOf } from '../save.js';
 
 // the front of the bridge (tiles): the helm with the map; the workshops of the tractor stand behind it
 export const BRIDGE_HELM = 3;
@@ -84,7 +85,7 @@ export class CampMega {
     return { x: (p.x + 0.35 + (at + k / 2) * cell) * T, y: (p.floorRow - (p.h || 5) * 0.45) * T };
   }
   megaSpot(ui, w, def, cx, cw, floor) {
-    const store = def.grid && `store:${ui}:${w.at}`;
+    const store = def.grid && storeKeyOf(this.D, this.box.save, ui, w.at);   // #041
     this.hotspots.push({ rig: true, place: `${ui}:${w.at}`, x: cx + cw / 2, w: Math.max(40, cw / 2), floor, name: def.name || w.id,
       hint: this.synHint(`${ui}:${w.at}`, store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Benutzen'), ws: w.id,
       act: () => store ? this.scene.openContainer(store) : this.use(w.id, `${ui}:${w.at}`) });

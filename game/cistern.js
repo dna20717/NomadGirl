@@ -18,7 +18,7 @@ export function level(D, save, ws, place) {
   return { water: t.water, full: Math.floor(t.water), max: C.max, item: C.item, perHour: C.perHour, rain: C.rain, fill: t.water / C.max };
 }
 
-// fill every whole bottle into the camp inventories (backpack, chest, storage) → { got, left }
+// fill every whole bottle into the camp inventories (backpack, Camp-Lager, Speziallager) → { got, left }
 export function tap(D, save, ws, place) {
   const L = level(D, save, ws, place), key = Array.isArray(place) ? place.join(':') : String(place);
   if (!L.full || !D.items?.[L.item]) return { got: 0, left: 0, item: L.item };

@@ -3,9 +3,9 @@
 // without the worker (local, tests) in this browser (localStorage). Shape:
 //   { version, day, hour, location, fuel, food, deltas, health, buffs: [id], rig: { tractor, units: [{ kind, id, workshops: [{ id, at }] }], spare: { workshops: [id], containers: [id] } } (game/rig.js),
 //     companions: [id], recipes: [id] (recipe book), run: null | { poi, room, location }, log: [text],
-//     inv: { backpack: id, slots: { melee, ranged, cyberdeck }, wear: { head, armor, eyes … module }, grids: { backpack, drone (rescue pocket), chest, 'store:<unit>:<place>': grid, 'rig:<unit>': grid } } }   (grids: game/inventory.js)
+//     inv: { backpack: id, slots: { melee, ranged, cyberdeck }, wear: { head, armor, eyes … module }, grids: { backpack, drone (rescue pocket), camp (Camp-Lager, #041), 'store:<unit>:<place>': grid (Speziallager + trophy stands) } } }   (grids: game/inventory.js)
 //   rig.parts = { engine: [id|null], armor: [...], weapon: [...], roof: [...] }: rig parts on the tractor's sockets (Rig bauen), rig.spare.parts = on the scrapyard
-//   'rig:<unit>' = the own storage of the tractor (Kofferraum, plus rows from a Dachbox) or of a trailer (Deichselkasten)
+//   camp = the Kofferraum (plus rows from a Dachbox) and every Lagerregal as ONE grid; older 'chest' and 'rig:<unit>' grids move into it on load
 // Times are hours (18.5 = 18:30). "Ereignis-Zeit": the clock only moves on actions (sleeping, runs, sitting at the fire).
 
 import { keepThrough } from './achievements.js';
@@ -14,7 +14,7 @@ import { settle as settleMega, fixLights as fixMegaLights, deactivate as deactiv
 import { compact as compactDecor } from './decor.js';
 import { rehome, removeUnits } from './reindex.js';
 import { ensureTank } from './tank.js';
-import { newGrid, add, fits, startWear, wearOf, WEAR_KEYS, addEntry, untangle } from './inventory.js';
+import { newGrid, add, fits, startWear, wearOf, WEAR_KEYS, addEntry, untangle, kindOf, thing, remove } from './inventory.js';
 
 const LOCAL_KEY = 'nomadgirl-save';
 export const SAVE_VERSION = 1;
@@ -51,36 +51,88 @@ export function ensureTankInRig(D, s) {
   return s;
 }
 
-// every inventory the camp has: the chest and each storage place in the rig (workshops with a "Lager-Raster")
-export function containers(D, save) {
-  const out = [];
-  const K = D.camp?.chest;
-  if (K?.enabled !== false && K?.grid) out.push({ key: 'chest', name: 'Kiste', size: K.grid });
-  save.rig.units.forEach((u, ui) => {
-    const def = u.kind === 'tractor' ? D.tractors?.[u.id] : D.containers?.[u.id], S = def?.storage;
-    if (!S?.[0] || !S?.[1]) return;
-    const rows = u.kind === 'tractor' ? Object.values(save.rig.parts || {}).flat().reduce((n, id) => n + (D.rigParts?.[id]?.storageRows || 0), 0) : 0;   // Dachbox
-    const own = def.storageName || (u.kind === 'tractor' ? 'Kofferraum' : 'Deichselkasten');
-    out.push({ key: `rig:${ui}`, name: u.kind === 'tractor' ? own : `${own} · ${def.name || u.id}`, size: [S[0], S[1] + rows], unit: ui });
+// the Camp-Lager (#041, Daniel 16.11.2026: „das Camp-Inventar konsolidiert einsehbar und nutzbar, die einzelnen Regale bestimmen lediglich
+// das Volumen; Ausnahme sind Speziallager wie Kühlen, Waffen oder Trophäen“): the tractor's own storage (Kofferraum, plus the Dachbox)
+// and every workshop with a Lager-Raster that is no Speziallager add their cells to ONE grid. rig = { units, parts } (a savegame's or a draft's)
+export function campStore(D, rig) {
+  const parts = [];
+  (rig?.units || []).forEach((u, ui) => {
+    if (u.kind === 'tractor') {
+      const T = D.tractors?.[u.id], S = T?.storage;
+      const rows = Object.values(rig.parts || {}).flat().reduce((n, id) => n + (D.rigParts?.[id]?.storageRows || 0), 0);   // Dachbox
+      if (S?.[0] && S?.[1]) parts.push({ name: T.storageName || 'Kofferraum', cells: S[0] * (S[1] + rows), unit: ui });
+    }
+    for (const w of u.workshops || []) {
+      const def = D.workshops?.[w.id], g = def?.grid;
+      if (g?.[0] && g?.[1] && !def.ownStorage) parts.push({ name: def.name || w.id, cells: g[0] * g[1], place: `${ui}:${w.at}`, workshop: w.id });
+    }
   });
+  const cap = parts.reduce((n, p) => n + p.cells, 0), W = Math.max(1, D.camp?.storage?.width || 10);
+  return { cap, size: [Math.min(W, Math.max(1, cap)), Math.max(1, Math.ceil(cap / W))], parts };
+}
+export const CAMP = 'camp';
+export const campName = D => D.camp?.storage?.name || 'Camp-Lager';
+
+// every inventory the camp has: the Camp-Lager and each Speziallager in the rig (Werkstätten › Speziallager), with their trophy stands
+export function containers(D, save) {
+  const out = [], C = campStore(D, save.rig);
+  if (C.cap) out.push({ key: CAMP, name: campName(D), size: C.size, cap: C.cap, parts: C.parts });
   save.rig.units.forEach((u, ui) => u.workshops.forEach(w => {
-    const g = D.workshops?.[w.id]?.grid;
-    const def = D.workshops[w.id];
-    if (g) out.push({ key: `store:${ui}:${w.at}`, name: def.name || w.id, size: g, workshop: w.id, ...(def.accept?.length ? { accept: { categories: def.accept } } : {}) });
+    const def = D.workshops[w.id], g = def?.grid;
+    if (!def) return;
+    if (g && def.ownStorage) out.push({ key: `store:${ui}:${w.at}`, name: def.name || w.id, size: g, workshop: w.id, own: true, ...(def.accept?.length ? { accept: { categories: def.accept } } : {}) });
     // trophy stands (Werkstätten › Schatzkammer & Trophäen): every stand is an inventory of its own, only things tagged "trophy"
     (def.stands || []).forEach((st, i) => { if (st.grid?.[0] && st.grid?.[1]) out.push({ key: `store:${ui}:${w.at}:s${i}`, name: `${def.name || w.id} · ${st.name || 'Ständer ' + (i + 1)}`, size: st.grid, workshop: w.id, stand: i, parent: `store:${ui}:${w.at}`, accept: st.accept ? { categories: String(st.accept).split(',').map(x => x.trim()).filter(Boolean) } : { tag: 'trophy' } }); });
   }));
   return out;
 }
-// a grid with the right size: created when missing, things that no longer fit after a resize look for a new spot (or are lost)
-export function ensureGrid(D, inv, key, [w, h]) {
-  let g = inv.grids[key];
-  if (!g) return (inv.grids[key] = newGrid(w, h));
-  if (g.w !== w || g.h !== h) {
-    const old = g.items; g.w = w; g.h = h; g.items = [];
-    for (const e of old) if (fits(D, g, e, e.x, e.y)) g.items.push(e); else addEntry(D, g, e, e.n);
+// the key of the inventory a workshop opens: its own (Speziallager) or the Camp-Lager; null = it has none
+export function storeKeyOf(D, save, ui, at) {
+  const own = `store:${ui}:${at}`, all = containers(D, save);
+  if (all.some(c => c.key === own)) return own;
+  const id = save.rig.units[ui]?.workshops.find(w => w.at === at)?.id, def = D.workshops?.[id];
+  return def?.grid && !def.ownStorage && all.some(c => c.key === CAMP) ? CAMP : null;
+}
+// „Alles einlagern“ (#041, Daniel 16.11.2026: „nach einem POI im Camp einen Button, alles Mitgebrachte einzulagern, sofern genug Lagerraum
+// vorhanden ist“; Antwort: teilweise): everything from `from` (the backpack) goes first to a Speziallager that prefers its kind
+// (Werkstätten › Einlagern bevorzugt, e.g. dishes into the Kühlraum) and takes it, then into the Camp-Lager; what fits nowhere stays.
+// → { moved: things moved, left: things that stayed, places: { name: count } }
+export function stowAll(D, save, from = 'backpack') {
+  const G = save.inv?.grids || {}, src = G[from], out = { moved: 0, left: 0, places: {} };
+  if (!src) return out;
+  const all = containers(D, save), camp = all.find(c => c.key === CAMP);
+  const takes = (c, e) => !c.accept || ((!c.accept.categories?.length || c.accept.categories.includes(kindOf(D, e.a, e.id))) && (!c.accept.tag || (thing(D, e.a, e.id)?.tags || []).includes(c.accept.tag)));
+  for (const e of [...src.items]) {
+    const kind = kindOf(D, e.a, e.id);
+    const special = all.filter(c => c.own && c.stand == null && (D.workshops?.[c.workshop]?.prefers || []).includes(kind) && takes(c, e));
+    for (const c of [...special, ...(camp ? [camp] : [])]) {
+      const g = G[c.key];
+      if (!g || !e.n) continue;
+      const left = addEntry(D, g, e, e.n);
+      if (left < e.n) out.places[c.name] = (out.places[c.name] || 0) + (e.n - left);
+      e.n = left;
+    }
+    if (e.n > 0) out.left++; else { remove(src, e); out.moved++; }
   }
-  return g;
+  return out;
+}
+// a grid with the right size: created when missing; things that no longer fit after a resize look for a new spot.
+// → the entries that found no room at all (the caller rehomes them: Camp-Lager, else a bundle by the van)
+export function ensureGrid(D, inv, key, [w, h], cap = null) {
+  let g = inv.grids[key];
+  if (!g) { inv.grids[key] = newGrid(w, h, cap); return []; }
+  const want = cap != null && cap < w * h ? cap : undefined;
+  if (g.w === w && g.h === h && g.cap === want) return [];
+  const old = g.items, out = []; g.w = w; g.h = h; if (want == null) delete g.cap; else g.cap = want; g.items = [];
+  for (const e of old) if (!fits(D, g, e, e.x, e.y)) out.push(e); else g.items.push(e);
+  return out.filter(e => (e.n = addEntry(D, g, e, e.n)) > 0);
+}
+// every container at its size; what falls out goes into the Camp-Lager, else a bundle by the van (never lost)
+export function fitContainers(D, save) {
+  const lost = [];
+  for (const c of containers(D, save)) lost.push(...ensureGrid(D, save.inv, c.key, c.size, c.cap));
+  if (lost.length) rehome(D, save, { w: 4, h: 3, items: lost });
+  return lost.length;
 }
 export function backpackSize(D, inv) { return D.backpacks?.[inv.backpack]?.size || [4, 3]; }
 
@@ -88,11 +140,9 @@ function newInventory(D, save) {
   const L = D.leyla?.loadout || {}, S = D.game?.start || {};
   const inv = { backpack: L.backpack || Object.keys(D.backpacks || {})[0] || null, slots: { melee: L.melee || null, ranged: L.ranged || null, cyberdeck: L.cyberdeck || null }, grids: {} };
   ensureGrid(D, inv, 'backpack', backpackSize(D, inv));
-  const conts = containers(D, save);
-  for (const c of conts) ensureGrid(D, inv, c.key, c.size);
-  const firstStore = conts.find(c => c.key.startsWith('store:') && !c.accept)?.key;
+  for (const c of containers(D, save)) ensureGrid(D, inv, c.key, c.size, c.cap);
   for (const row of S.inventory || []) {
-    const key = row.where === 'chest' ? 'chest' : row.where === 'storage' ? firstStore || 'chest' : 'backpack', g = key && inv.grids[key];   // no storage at the start: into the chest
+    const key = row.where === 'storage' || row.where === 'chest' ? (inv.grids[CAMP] ? CAMP : 'backpack') : 'backpack', g = inv.grids[key];   // #041: the chest is gone, „Kiste“ = Camp-Lager
     const [a, id] = row.item ? ['items', row.item] : row.weapon ? ['weapons', row.weapon] : row.backpack ? ['backpacks', row.backpack] : [];
     if (g && a && D[a]?.[id]) add(D, g, a, id, row.count || 1);
   }
@@ -157,11 +207,16 @@ function withInventory(D, save) {
   for (const k of WEAR_KEYS) if (inv.wear[k] && wearOf(D, inv.wear[k]) !== k) inv.wear[k] = null; else inv.wear[k] ??= null;
   for (const g of Object.values(inv.grids)) g.items = (g.items || []).filter(e => D[e.a]?.[e.id] && e.n > 0);
   for (const piles of Object.values(save.ground || {})) for (const p of piles) p.grid.items = (p.grid?.items || []).filter(e => D[e.a]?.[e.id] && e.n > 0);
-  ensureGrid(D, inv, 'backpack', backpackSize(D, inv));
-  for (const c of containers(D, save)) ensureGrid(D, inv, c.key, c.size);
-  ensureGrid(D, inv, 'drone', D.drone?.rescue?.size || [3, 2]);   // AvA's rescue pocket: survives a knock-out
-  // rectangles only (14.11.2026): what overlaps now moves to a free spot, else into the chest / Kofferraum / a bundle by the van
+  // #041: the camp chest, the Kofferraum and the shelves became one Camp-Lager; what an older savegame kept there moves in
+  // (the Camp-Lager is filled after the Speziallager, what does not fit lies as a bundle by the van)
+  const conts = containers(D, save), keep = new Set(conts.map(c => c.key)), loose = [];
+  for (const k of Object.keys(inv.grids)) if (k === 'chest' || /^rig:\d+$/.test(k) || (k.startsWith('store:') && !keep.has(k))) { loose.push(...(inv.grids[k]?.items || [])); delete inv.grids[k]; }
   const homeless = [];
+  homeless.push(...ensureGrid(D, inv, 'backpack', backpackSize(D, inv)));
+  for (const c of conts) homeless.push(...ensureGrid(D, inv, c.key, c.size, c.cap));
+  homeless.push(...ensureGrid(D, inv, 'drone', D.drone?.rescue?.size || [3, 2]));   // AvA's rescue pocket: survives a knock-out
+  if (loose.length) { const camp = inv.grids[CAMP]; for (const e of loose) { const left = camp ? addEntry(D, camp, e, e.n) : e.n; if (left > 0) homeless.push({ ...e, n: left }); } }
+  // rectangles only (14.11.2026): what overlaps now moves to a free spot, else into the Camp-Lager / a bundle by the van
   for (const g of Object.values(inv.grids)) if (g?.items?.length) homeless.push(...untangle(D, g));
   for (const piles of Object.values(save.ground || {})) for (const p of piles) if (p.grid?.items?.length) homeless.push(...untangle(D, p.grid));
   if (homeless.length) rehome(D, save, { w: 4, h: 3, items: homeless });
@@ -171,16 +226,16 @@ function withInventory(D, save) {
     const [a, id] = row.item ? ['items', row.item] : row.weapon ? ['weapons', row.weapon] : row.backpack ? ['backpacks', row.backpack] : [];
     const key = `${a}:${id}${row.force ? '!' : ''}`;
     if (!a || !D[a]?.[id] || save.handedOut.includes(key)) continue;
-    const g = inv.grids[row.where === 'chest' ? 'chest' : 'backpack'] || inv.grids.chest;
+    const g = inv.grids[row.where === 'chest' || row.where === 'storage' ? CAMP : 'backpack'] || inv.grids[CAMP];
     if (!g) continue;
     // „Platz machen“ (Daniel, 12.11.2026: „lösch einfach andere Items, bis es passt“): whoever already owns it keeps theirs,
-    // otherwise the newest things in that grid move to the camp chest (or are gone when it is full) until it fits
+    // otherwise the newest things in that grid move to the Camp-Lager (or are gone when it is full) until it fits
     if (row.force) {
       const owned = Object.values(inv.grids).some(x => x?.items?.some(e => e.a === a && e.id === id)) || Object.values(inv.slots || {}).includes(id);
       if (!owned) while (add(D, g, a, id, row.count || 1) !== 0 && g.items.some(e => !(e.a === a && e.id === id))) {
         const i = g.items.map((e, k) => [e, k]).filter(([e]) => !(e.a === a && e.id === id)).pop()[1];
-        const [out] = g.items.splice(i, 1), chest = inv.grids.chest;
-        if (chest && chest !== g) addEntry(D, chest, out, out.n);   // into the camp chest while there is room, otherwise gone
+        const [out] = g.items.splice(i, 1), camp = inv.grids[CAMP];
+        if (camp && camp !== g) addEntry(D, camp, out, out.n);   // into the Camp-Lager while there is room, otherwise gone
       }
       save.handedOut.push(key);
       continue;
@@ -234,20 +289,6 @@ function refit(D, s) {
     rehome(D, s, g);
   }
 }
-// Deichselkästen und Staufächer are gone (Daniel, 12.11.2026, design.md › Ausbaustufe Progression): only the tractor keeps its own storage;
-// what an older savegame kept in a trailer's box moves into the chest (then the Kofferraum, then a bundle by the van)
-function dropStorage(D, s) {
-  const grids = s.inv?.grids || {};
-  for (const key of Object.keys(grids)) {
-    const m = /^rig:(\d+)$/.exec(key);
-    if (!m) continue;
-    const u = s.rig.units[Number(m[1])];
-    if (u?.kind === 'tractor' || (u && D.containers?.[u.id]?.storage)) continue;
-    const g = grids[key]; delete grids[key];
-    if (g?.items?.length) rehome(D, s, g);
-  }
-}
-
 export function repairSave(save, D) {
   const fresh = newSave(D);
   if (!save || typeof save !== 'object' || save.version !== SAVE_VERSION) return fresh;
@@ -265,7 +306,6 @@ export function repairSave(save, D) {
   // workshops that no longer exist: what lay in their storage is rehomed instead of being lost
   s.rig.units.forEach((u, ui) => { u.workshops = (u.workshops || []).filter(w => { if (D.workshops?.[w.id]) return true; for (const k of Object.keys(s.inv?.grids || {})) if (k === `store:${ui}:${w.at}` || k.startsWith(`store:${ui}:${w.at}:s`)) { const g = s.inv.grids[k]; delete s.inv.grids[k]; if (g?.items?.length) rehome(D, s, g); } return false; }); });
   refit(D, s);
-  dropStorage(D, s);
   // stacks stay whole: a level is at most one above the unit before it, nothing stands on the tractor
   s.rig.units.forEach((u, i) => { const prev = s.rig.units[i - 1]; if (!u.level) { delete u.slot; return; } const max = !prev || prev.kind === 'tractor' ? 0 : (prev.level || 0) + 1; if (u.level > max) u.level = max; if (!u.level) { delete u.level; delete u.slot; } });   // a slot only counts on a stack
   const sp = s.rig.spare || {};

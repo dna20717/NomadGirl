@@ -48,7 +48,7 @@ export function claim(D, save, id) {
   for (const r of R.items || []) {
     if (!r.item || !D.items?.[r.item]) continue;
     let left = r.count || 1;
-    for (const k of ['chest', 'backpack']) if (left > 0 && G[k]) left = addTo(D, G[k], 'items', r.item, left);
+    for (const k of ['camp', 'backpack']) if (left > 0 && G[k]) left = addTo(D, G[k], 'items', r.item, left);
     got.push(`${(r.count || 1) - (left || 0)}× ${D.items[r.item].name || r.item}`);
   }
   delete Q.active[id]; Q.done[id] = { day: save.day ?? 1 };

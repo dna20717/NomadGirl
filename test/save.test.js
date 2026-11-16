@@ -18,7 +18,7 @@ test('Start-Rig (Daniel, 13.11.2026): Van mit Koje + Kochnische, der kleine Anh�
   const old = repairSave({ ...s, rig: { ...s.rig, units: [s.rig.units[0], { kind: 'container', id: 'wohnanhaenger', workshops: [{ id: 'werkbank', at: 0 }] }, s.rig.units[1]] } }, D);
   assert.deepEqual(old.rig.units.map(u => u.id), ['van', 'container_20', 'container_10']);   // old savegames: the trailer becomes a 20-foot container
   assert.ok(old.rig.units[1].workshops.some(w => w.id === 'werkbank'));
-  assert.ok(s.inv.grids.chest.items.some(e => e.id === 'reis'), 'Vorräte ohne Lager liegen in der Kiste');
+  assert.ok(s.inv.grids.camp.items.some(e => e.id === 'reis'), 'Vorräte liegen im Camp-Lager (Kofferraum, #041)');
   const { left } = placeWorkshops(D, 'van', [], ['kueche', 'schlafkoje', 'warroom']);   // Küche needs 2 places → fills the van, the rest has no room
   assert.deepEqual(left, ['schlafkoje', 'warroom']);
 });
@@ -75,13 +75,19 @@ test('Alter Spielstand: Werkstatt auf einem Platz, den es nicht mehr gibt, kommt
   const r = repairSave(structuredClone(old), D);
   assert.deepEqual(r.rig.units[1].workshops.map(w => `${w.id}@${w.at}`), ['kochnische@0', 'werkbank@1']);
   assert.deepEqual(r.rig.spare.workshops, ['lagerregal']);
-  assert.ok(!r.inv.grids['store:1:2']);
-  assert.equal(count(r), before);   // nothing lost: chest, Kofferraum, a bundle by the van
-  // with a free place it moves there, with its contents
+  assert.ok(!Object.keys(r.inv.grids).some(k => k.startsWith('store:')));
+  assert.equal(count(r), before);   // nothing lost: Camp-Lager, a bundle by the van
+  // with a free place it moves there; the Camp-Lager keeps everything (#041)
   const old2 = newSave(classicRig(D)); old2.rig.units.push({ kind: 'container', id: 'holzkiste', workshops: [] });
-  const n = old2.inv.grids['store:1:2'].items.length, r2 = repairSave(structuredClone(old2), D);
+  const n = count(old2), r2 = repairSave(structuredClone(old2), D);
   assert.deepEqual(r2.rig.units[2].workshops, [{ id: 'lagerregal', at: 0 }]);
-  assert.equal(r2.inv.grids['store:2:0'].items.length, n);
+  assert.equal(count(r2), n);
+  // an older savegame (before #041): the camp chest, the Kofferraum and a shelf of its own move into the Camp-Lager, nothing is lost
+  const old3 = structuredClone(old2), camp = old3.inv.grids.camp; delete old3.inv.grids.camp;
+  old3.inv.grids.chest = { w: 8, h: 5, items: camp.items.slice(0, 3) }; old3.inv.grids['rig:0'] = { w: 4, h: 3, items: camp.items.slice(3, 5) }; old3.inv.grids['store:2:0'] = { w: 8, h: 5, items: camp.items.slice(5) };
+  const r3 = repairSave(structuredClone(old3), D);
+  assert.ok(!r3.inv.grids.chest && !r3.inv.grids['rig:0'] && !r3.inv.grids['store:2:0'], 'die alten Raster sind weg');
+  assert.equal(count(r3), n);
 });
 
 test('Nachreichen mit „Platz machen“ (Daniel, 12.11.2026): das Sturmgewehr kommt in jeden Rucksack, notfalls fliegen andere Dinge raus', () => {
@@ -100,27 +106,26 @@ test('Nachreichen mit „Platz machen“ (Daniel, 12.11.2026): das Sturmgewehr k
   assert.ok(!t.inv.grids.backpack.items.some(e => e.id === 'sturmgewehr'), 'wer es schon trägt, bekommt kein zweites');
 });
 
-test('Deichselkästen sind weg: alter Inhalt wandert in die Kiste, das Raster verschwindet', async () => {
+test('Deichselkästen sind weg: alter Inhalt wandert ins Camp-Lager, das Raster verschwindet', async () => {
   const { loadProject } = await import('../engine/project.js');
   const { nodeLoader } = await import('../tools/loader.js');
   const { newSave, repairSave } = await import('../game/save.js');
   const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
   const s = newSave(D);
-  s.inv.grids.chest.items = [];
+  s.inv.grids.camp.items = [];
   s.inv.grids['rig:1'] = { w: 3, h: 2, items: [{ a: 'items', id: 'schrott', n: 2, x: 0, y: 0, r: 0 }] };
   const r = repairSave(JSON.parse(JSON.stringify(s)), D);
   assert.equal(r.inv.grids['rig:1'], undefined);
-  assert.ok(r.inv.grids.chest.items.some(e => e.id === 'schrott' && e.n === 2));
-  assert.ok(r.inv.grids['rig:0'], 'Kofferraum bleibt');
+  assert.ok(r.inv.grids.camp.items.some(e => e.id === 'schrott' && e.n === 2));
 });
 
 // Daniel 16.11.2026 („A“): Spiel › Start › Nachreichen gives a thing once per savegame, a new Durchgang does not give it again
 test('Nachreichen: einmal pro Spielstand, auch über einen neuen Durchgang hinweg', async () => {
   const { newCycle } = await import('../game/save.js');
-  const w = 'schrott', D2 = { ...D, game: { ...D.game, start: { ...D.game.start, later: [{ where: 'chest', item: w, count: 1 }] } } };
+  const w = 'schrott', D2 = { ...D, game: { ...D.game, start: { ...D.game.start, later: [{ where: 'storage', item: w, count: 1 }] } } };
   const s = newSave(D2);
   assert.ok(s.handedOut.includes(`items:${w}`));
-  const has = x => x.inv.grids.chest.items.filter(e => e.id === w).reduce((n, e) => n + e.n, 0);
+  const has = x => x.inv.grids.camp.items.filter(e => e.id === w).reduce((n, e) => n + e.n, 0);
   const n0 = has(newSave(D));
   assert.equal(has(s), n0 + 1);
   const c = newCycle(D2, s);

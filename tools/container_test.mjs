@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Closed shipping containers in the camp (Daniel, 09.11.2026): closed from afar, open when Leyla is near, while building
-// and with the button „Rig offen“; three lengths (1, 2, 3 places) drawn ×4. Server must run (npm run serve).
+// and with the button „Rig offen“; three lengths (1, 2, 3 places) drawn ×2 since #042 (×4 before). Server must run (npm run serve).
 //   node tools/container_test.mjs [--shots]   (images → output/container_*.png)
 import fs from 'node:fs';
 import { chromium } from 'playwright';
@@ -30,7 +30,7 @@ const sizes = await ev(() => {
   const A = D.assets;
   return ['container_10', 'container_20', 'container_40'].map(id => { const c = D.containers[id]; return { id, places: c.places, w: A[c.look].frameSize[0], same: A[c.look].frameSize.join() === A[c.lookClosed].frameSize.join(), k: A[c.look].height / A[c.look].frameSize[1] }; });
 });
-check('Drei Längen: 1, 2, 3 Plätze, offen und zu deckungsgleich, ×4', sizes.map(x => x.places).join() === '1,2,3' && sizes.every(x => x.same && x.k === 4) && sizes[0].w < sizes[1].w && sizes[1].w < sizes[2].w, sizes);
+check('Drei Längen: 1, 2, 3 Plätze, offen und zu deckungsgleich, ×2 (#042)', sizes.map(x => x.places).join() === '1,2,3' && sizes.every(x => x.same && x.k === 2) && sizes[0].w < sizes[1].w && sizes[1].w < sizes[2].w, sizes);
 let c = (await shells())[0];
 check('Container hat eine geschlossene Hülle', !!c, await shells());
 

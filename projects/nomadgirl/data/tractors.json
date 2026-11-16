@@ -12,7 +12,7 @@
   "description": "Leylas Van: rostig, laut, treu. Schlafkoje und Warroom an Bord, Radarschüssel auf dem Dach.",
   "look": "van",
   "places": 2,
-  "storage": [4, 3],
+  "storage": [10, 8],
   "storageName": "Kofferraum",
   "door": {"x": [99, 147], "y": [69, 138], "place": 1, "backdrop": "#2a1f2e"}
  },
@@ -27,7 +27,7 @@
   "slots": {"engine": 1, "armor": 2, "weapon": 2, "roof": 1},
   "value": 6000,
   "description": "Ein echtes Rig. Endlich.",
-  "storage": [6, 3],
+  "storage": [12, 8],
   "storageName": "Staukasten",
   "look": "truck"
  },
@@ -44,7 +44,7 @@
   "power": 10,
   "speed": 45,
   "places": 3,
-  "storage": [8, 4],
+  "storage": [14, 10],
   "storageName": "Ladebucht-Spind",
   "megarig": "crawler"
  },
@@ -62,7 +62,7 @@
   "speed": 250,
   "air": true,
   "places": 2,
-  "storage": [6, 4],
+  "storage": [12, 10],
   "storageName": "Frachtspind",
   "megarig": "fatbird"
  }

@@ -9,7 +9,7 @@ import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
 
 const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
-const give = (s, id, n) => add(D, s.inv.grids.chest, 'items', id, n);
+const give = (s, id, n) => add(D, s.inv.grids.camp, 'items', id, n);
 
 test('Tabs: Technik, Wissen, Bio; Dunkelheit bleibt versteckt', () => {
   assert.deepEqual(tabs(D).map(t => t.id), ['technik', 'wissen', 'bio']);

@@ -55,13 +55,13 @@ test('Volles Raster, Alles einlagern, Beute', () => {
   remove(big, big.items[0]); assert.equal(big.items.length, 0);
 });
 
-test('Start-Inventar: Rucksack, Kiste und Lager', () => {
+test('Start-Inventar: Rucksack und Camp-Lager (#041: die Kiste ist weg)', () => {
   const g = newSave(D).inv.grids;
   assert.equal(count(g.backpack, 'items', 'verband'), 2);
-  assert.equal(count(g.chest, 'weapons', 'machete'), 1);
-  const store = Object.keys(g).find(k => k.startsWith('store:'));
-  assert.equal(count(g[store], 'items', 'kronkorken'), 37);
-  assert.equal(count(g[store], 'backpacks', 'wanderrucksack'), 1);
+  assert.equal(count(g.camp, 'weapons', 'machete'), 1);
+  assert.equal(count(g.camp, 'items', 'kronkorken'), 37);
+  assert.equal(count(g.camp, 'backpacks', 'wanderrucksack'), 1);
+  assert.ok(!g.chest && !Object.keys(g).some(k => /^rig:/.test(k)), 'keine Kiste, kein eigener Kofferraum');
 });
 
 // older savegames: two L shapes nested into each other overlap as rectangles → the second one moves, nothing is lost

@@ -2,6 +2,8 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 16.11.2026: **Container doppelt so fein, aus einem Tileset** (#042): PixelLab-Container (AAP-64, streng seitlich, offen + zu), Tileset linkes Ende | Platz | rechtes Ende, daraus 1/2/3 Plätze; jetzt so fein wie der Van. PixelLab 34.
+- 16.11.2026: **Camp-Lager zusammengelegt** (#041): Kofferraum und alle Lagerregale bilden EIN Raster (Regale bestimmen nur das Volumen), Speziallager (Kühlraum, Waffenkammer, Schatzkammer, Waffen-Galerie) bleiben eigen; Kiste im Camp und Deichselkästen sind weg (Inhalt zieht ins Camp-Lager), der Van-Kofferraum ist doppelt so groß wie die alte Kiste (10 × 8); „Alles einlagern“ in der Beute-Bilanz und im Lager (Speziallager bekommen ihr Bevorzugtes zuerst, der Rest ins Camp-Lager, was nicht passt, bleibt im Rucksack); Filter nach Art und „Sortieren“.
 - 16.11.2026: **Nachreichen nur einmal pro Spielstand** (Daniel „A“), Mega-Rig-Ausbaustufen beginnen im neuen Durchgang neu (Daniel).
 - 16.11.2026: **Große Durchsicht** (Daniel: „keine unsichtbaren technischen Schulden“): zentrales Umschlüsseln der Einheiten (Lager, Deko, Lichter, Garten ziehen mit), Mega-Rig behält seine Plätze beim Laden, Aussteigen nimmt den Tank mit und stapelt, Deko-Rückgängig ohne Verdopplung, Deko-Anker stimmen, Felder ohne Wirkung markiert; Rest in `docs/backlog.md` C10–C17.
 - 16.11.2026: **Herstellen gibt immer eine Ressource** (#039): jedes Rezept bringt nebenbei 1 Technik, Wissen oder Bio, je nach Werkstatt.

@@ -54,17 +54,17 @@ await ev(() => { const h = nomad.state().camp.hotspots.find(h => h.name === 'Van
 dr = await door();
 check('Van-Tür offen: der Warroom zeigt sich durch die Tür', dr?.id === 'warroom' && dr.a === 1, dr);
 
-// the shelf: empty → no shelf filled, full → all four
-await ev(() => { const g = nomad.save().inv.grids['store:2:0']; g.keep = g.items; g.items = []; nomad.step(30); });
+// the shelf shows how full the Camp-Lager is (#041): empty → no shelf filled, full → all four
+await ev(() => { const g = nomad.save().inv.grids.camp; g.keep = g.items; g.items = []; nomad.step(30); });
 let sh = await bench('lagerregal');
-check('Leeres Regal: kein Fach gefüllt', sh.fill === 0 && sh.shelves === 0, sh);
-await ev(() => { const g = nomad.save().inv.grids['store:2:0']; g.items = g.keep.slice(0, 2); nomad.step(30); });
+check('Leeres Camp-Lager: kein Fach im Regal gefüllt', sh.fill === 0 && sh.shelves === 0, sh);
+await ev(() => { const g = nomad.save().inv.grids.camp; g.items = g.keep.slice(0, 2); nomad.step(30); });
 sh = await bench('lagerregal');
 check('Ein bisschen drin: unterstes Fach', sh.shelves === 1, sh);
-await ev(() => { const g = nomad.save().inv.grids['store:2:0']; g.items = []; for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) g.items.push({ a: 'items', id: 'schrott', n: 1, x, y, r: 0 }); nomad.step(30); });
+await ev(() => { const g = nomad.save().inv.grids.camp; g.items = []; for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) if (y * g.w + x < (g.cap ?? g.w * g.h)) g.items.push({ a: 'items', id: 'schrott', n: 1, x, y, r: 0 }); nomad.step(30); });
 sh = await bench('lagerregal');
-check('Randvoll: alle vier Fächer', sh.fill === 100 && sh.shelves === 4, sh);
-await ev(() => { const g = nomad.save().inv.grids['store:2:0']; g.items = g.keep; delete g.keep; nomad.step(30); });
+check('Camp-Lager randvoll: alle vier Fächer', sh.fill === 100 && sh.shelves === 4, sh);
+await ev(() => { const g = nomad.save().inv.grids.camp; g.items = g.keep; delete g.keep; nomad.step(30); });
 
 // evening; Leyla at the workbench, the craft window open: the bench is "in use", sparks fly behind the window
 await reload('sv.hour = 21.5;');

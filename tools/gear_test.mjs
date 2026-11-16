@@ -32,9 +32,9 @@ const freeCell = key => ev(key => { const ui = game.scene.getScene('play').hud.i
   return [r.left + 0.5 * c, r.top + 0.5 * c]; }, key);
 const mods = () => ev(() => ({ ...game.scene.getScene('play').mods }));
 
-await ev(() => { nomad.take(); nomad.step(5); const h = nomad.state().camp.hotspots.find(h => h.name === 'Kiste'); nomad.walkTo(h.x); nomad.step(1, [], ['grab']); nomad.step(5); });
+await ev(() => { nomad.take(); nomad.step(5); const h = nomad.state().camp.hotspots.find(h => h.name === 'Kofferraum'); nomad.walkTo(h.x); nomad.step(1, [], ['grab']); nomad.step(5); });
 let s = await inv();
-check('Kiste offen, Gasmaske + Plattenträger liegen drin', s.open && s.other?.key === 'chest' && s.other.grid.items.some(i => i.startsWith('gasmaske')) && s.other.grid.items.some(i => i.startsWith('plattentraeger')), s);
+check('Camp-Lager offen (Hecktür), Gasmaske + Plattenträger liegen drin', s.open && s.other?.key === 'camp' && s.other.grid.items.some(i => i.startsWith('gasmaske')) && s.other.grid.items.some(i => i.startsWith('plattentraeger')), s);
 const order = await ev(() => ['.inv-panel.bag', '.inv-panel.leyla', '.inv-panel.drone'].map(q => document.querySelector(q)?.getBoundingClientRect().left ?? -1));
 check('Rucksack links, Leyla in der Mitte, AvA rechts', order[0] >= 0 && order[0] < order[1] && order[1] < order[2], order);
 const pics = await ev(() => ({ leyla: document.querySelector('.inv-figure img')?.complete && document.querySelector('.inv-figure img').naturalWidth, hull: [...document.querySelectorAll('.inv-dronefig img')].length, face: !!document.querySelector('.inv-face') }));
@@ -42,23 +42,23 @@ check('Leyla von vorn und AvA mit Gesicht und Teilen', pics.leyla > 0 && pics.hu
 check('Start: Cyberarm eingebaut, Scheinwerfer + Greifarm an AvA, Rettungsfach 3 × 2', s.wear.arm === 'cyberarm_mk1' && s.wear.bow === 'suchscheinwerfer' && s.wear.tail === 'greifarm' && s.drone?.w === 3 && s.drone?.h === 2, s);
 await shot('open');
 
-// head: the gas mask from the chest
+// head: the gas mask from the Camp-Lager
 const m0 = await mods();
-await clickAt(await thingAt('chest', 'gasmaske'));
+await clickAt(await thingAt('camp', 'gasmaske'));
 await clickAt(await slot('wear:head'));
 s = await inv();
 let m = await mods();
 check('Gasmaske auf den Kopf: +4 Abwehr', s.wear.head === 'gasmaske' && !s.held && (m.defense || 0) === (m0.defense || 0) + 4, { s, m });
 check('AvA freut sich über bessere Ausrüstung', s.face === 'gearBetter' && await ev(() => !document.querySelector('.inv-bubble').hidden), s.face);
 // armor
-await clickAt(await thingAt('chest', 'plattentraeger'));
+await clickAt(await thingAt('camp', 'plattentraeger'));
 await clickAt(await slot('wear:armor'));
 s = await inv(); m = await mods();
 check('Plattenträger: Abwehr, Leben, etwas langsamer', s.wear.armor === 'plattentraeger' && m.defense === (m0.defense || 0) + 16 && m.health === (m0.health || 0) + 10 && m.speed === (m0.speed || 0) - 3, m);
 const stats = await ev(() => document.querySelector('.inv-stats').textContent);
 check('Werte unter Leyla: Abwehr 16 %, Tempo 97 %', /16 %/.test(stats) && /97 %/.test(stats), stats);
 // wrong place
-await clickAt(await thingAt('chest', 'discokugel'));
+await clickAt(await thingAt('camp', 'discokugel'));
 await clickAt(await slot('wear:head'));
 s = await inv();
 check('Discokugel passt nicht auf den Kopf', s.wear.head === 'gasmaske' && s.held === 'discokugel×1', s);
@@ -74,13 +74,13 @@ check('Umschalten im selben Fenster: Panel und Leyla bleiben stehen', before.pan
 s = await inv();
 const scan = await ev(() => ({ fig: !!document.querySelector('.inv-figure.scan'), slots: document.querySelectorAll('.inv-doll.implants .inv-slot').length, wires: document.querySelectorAll('.inv-wire.on').length }));
 check('Tab Implantate: Leyla als Scan, 6 Plätze, Linie zum Cyberarm', s.view === 'implants' && scan.fig && scan.slots === 6 && scan.wires >= 2, scan);
-await clickAt(await thingAt('chest', 'nachtsicht_optik'));
+await clickAt(await thingAt('camp', 'nachtsicht_optik'));
 await clickAt(await slot('wear:eyes'));
 s = await inv(); m = await mods();
 check('Nachtsicht-Optik in die Augen (im Camp): +8 % Fernkampf, Belastung 3', s.wear.eyes === 'nachtsicht_optik' && m.ranged === (m0.ranged || 0) + 8 && /3 \/ 10/.test(await ev(() => document.querySelector('.inv-stats').textContent)), m);
 await shot('implants');
 // strain limit
-const refused = await ev(() => { const sc = game.scene.getScene('play'), ui = sc.hud.inv; ui.held = { e: { a: 'items', id: 'herzpumpe', n: 1, r: 0 }, from: 'chest' };
+const refused = await ev(() => { const sc = game.scene.getScene('play'), ui = sc.hud.inv; ui.held = { e: { a: 'items', id: 'herzpumpe', n: 1, r: 0 }, from: 'camp' };
   const lim = sc.data_.leyla.inventory.strainMax; sc.data_.leyla.inventory.strainMax = 5; ui.slotClick('wear:heart'); const r = { heart: ui.inv.wear.heart, held: !!ui.held }; sc.data_.leyla.inventory.strainMax = lim; ui.held = null; return r; });
 check('Zu viel Belastung: Herzpumpe passt nicht mehr', !refused.heart && refused.held, refused);
 
@@ -96,11 +96,11 @@ check('Greifarm wieder dran: AvA dreht sich stolz', s.wear.tail === 'greifarm' &
 await shot('drone');
 
 // rescue pocket: a valuable goes in, food makes her angry
-await clickAt(await thingAt('chest', 'discokugel'));
+await clickAt(await thingAt('camp', 'discokugel'));
 await clickAt(await freeCell('drone'));
 s = await inv();
 check('Discokugel ins Rettungsfach, AvA: „hab ich!“', s.drone.items.some(i => i.startsWith('discokugel')) && s.face === 'rescue', s);
-await ev(() => { const ui = game.scene.getScene('play').hud.inv; ui.held = { e: { a: 'items', id: 'dosenbohnen', n: 1, r: 0 }, from: 'chest' }; });
+await ev(() => { const ui = game.scene.getScene('play').hud.inv; ui.held = { e: { a: 'items', id: 'dosenbohnen', n: 1, r: 0 }, from: 'camp' }; });
 await clickAt(await ev(() => { const box = [...document.querySelectorAll('.inv-grid')].pop(), r = box.getBoundingClientRect(), c = 44; return [r.left + 2.5 * c, r.top + 0.5 * c]; }));
 s = await inv();
 check('Bohnen ins Rettungsfach: AvA ist sauer', s.face === 'rescueFood', s.face);

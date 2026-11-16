@@ -27,13 +27,13 @@ let v = await ev(async () => {
 });
 check('Zettel einsammeln: sofort im Rezeptbuch, Rucksack leer, Meldung „Rezept gelernt“', v.known && !v.bag.includes('rezept_ramen') && v.toasts.some(t => /Rezept gelernt: /.test(t)), v);
 v = await ev(async () => {
-  const I = await import('/game/inventory.js'), s = SC(), save = nomad.save(), chest = save.inv.grids.chest;
-  chest.items = []; I.add(s.data_, chest, 'items', 'bauplan_medikit', 1);
-  const e = chest.items[0], acts = s.hud.inv.actionsFor('chest', e).map(a => a.label);
-  const r = s.learnFrom(chest, e);
-  return { acts, learnt: r?.learnt, left: chest.items.map(x => x.id) };
+  const I = await import('/game/inventory.js'), s = SC(), save = nomad.save(), camp = save.inv.grids.camp;
+  camp.items = []; I.add(s.data_, camp, 'items', 'bauplan_medikit', 1);
+  const e = camp.items[0], acts = s.hud.inv.actionsFor('camp', e).map(a => a.label);
+  const r = s.learnFrom(camp, e);
+  return { acts, learnt: r?.learnt, left: camp.items.map(x => x.id) };
 });
-check('Schnellaktion „Lernen“ für einen Zettel in der Kiste (alte Spielstände)', v.acts[0] === 'Lernen' && v.learnt && !v.left.length, v);
+check('Schnellaktion „Lernen“ für einen Zettel im Camp-Lager (alte Spielstände)', v.acts[0] === 'Lernen' && v.learnt && !v.left.length, v);
 
 // 2. Achievement: kills (only raiders count for Plünderer-Plage), then the trophy recipe
 v = await ev(() => {
@@ -51,7 +51,7 @@ await shot('toast');
 // 3. craft once
 v = await ev(async () => {
   const C = await import('/game/crafting.js'), I = await import('/game/inventory.js'), s = SC(), D = s.data_, save = nomad.save();
-  save.inv.grids.chest = I.newGrid(12, 12);
+  save.inv.grids.camp.items = []; save.inv.grids.backpack.items = [];
   for (const i of D.recipes.trophaee_raider_maske.ingredients) C.give(D, save, i.item, i.count * 2);
   const a = C.craft(D, save, 'trophaee_raider_maske', 'werkbank'), b = C.craft(D, save, 'trophaee_raider_maske', 'werkbank');
   return { a: a.ok, b: b.reason, have: C.have(D, save, 'raider_maske') };

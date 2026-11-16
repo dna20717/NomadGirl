@@ -26,7 +26,7 @@ await ev(async () => {
   const { give } = await import('/game/crafting.js');
   nomad.take(); nomad.step(5);
   const S = game.scene.getScene('play'), D = S.data_, save = nomad.save();
-  save.inv.grids.backpack.items.length = 0; save.inv.grids.chest && (save.inv.grids.chest.items.length = 0);   // room for what comes out
+  save.inv.grids.backpack.items.length = 0; save.inv.grids.camp && (save.inv.grids.camp.items.length = 0);   // room for what comes out (Camp-Lager, #041)
   for (const [id, n] of [['dosenbohnen', 10], ['gewuerzmischung', 2], ['schrott', 12], ['schrauben', 6], ['schrottplatte', 2], ['langer_lauf', 1], ['kurzer_lauf', 1], ['tape_griff', 2], ['rotpunkt_visier', 1], ['trommelmagazin', 1],
     ['chip', 2], ['led_chip', 2], ['turbo_regler', 1], ['notfall_relais', 1], ['batteriezelle', 4], ['kupferkabel', 4], ['bohneneintopf', 3], ['grillsteak', 2]]) give(D, save, id, n);
   save.deltas = 5000;

@@ -77,7 +77,7 @@
  "heal": {"sleep": 100, "fire": 25, "afterKo": 30},
  "interactRange": 130,
  "fallbackRoom": "kampfraum",
- "chest": {"enabled": true, "look": "chest", "at": 16, "flip": false, "grid": [8, 5]},
+ "chest": {"look": "chest"},
  "sound": {
   "wind": "sound_wind",
   "windVolume": 22,
@@ -132,5 +132,6 @@
  "solar": {"look": "rig_solar", "power": 1, "battery": 6, "day": [7, 19], "price": 220, "weight": 40},
  "rain": {"enabled": true, "chance": 30, "hours": [2, 6], "look": "abendglut_regen"},
  "board": {"enabled": true, "name": "Schwarzes Brett", "offset": -220, "lift": 210, "width": 132, "height": 96},
- "decor": {"max": 40, "back": 50, "cozyMax": 25, "ground": [-4, 20]}
+ "decor": {"max": 40, "back": 50, "cozyMax": 25, "ground": [-4, 20]},
+ "storage": {"name": "Camp-Lager", "width": 10}
 }

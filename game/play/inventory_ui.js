@@ -9,9 +9,9 @@ import { qualityBonus } from '../crafting.js';
 import { el } from '../ui.js';
 import { hints, padInUse, keyGlyph, closeX } from './ui_nav.js';
 import { icon } from '../icons.js';
-import { cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot, IMPLANTS, DRONE_WEAR, WEAR_KEYS, wearOf, gearStats, gearScore, occupancy, statParts, GEAR_STATS, addEntry } from '../inventory.js';
+import { kindOf, sortGrid, cellsOf, boxOf, drop, remove, add, fits, moveAll, thing, stackMax, canTurn, worth, newGrid, findSpot, IMPLANTS, DRONE_WEAR, WEAR_KEYS, wearOf, gearStats, gearScore, occupancy, statParts, GEAR_STATS, addEntry } from '../inventory.js';
 import { partSlots, budgets, SLOT_NAMES as PART_SLOT_NAMES } from '../rig.js';
-import { containers as storeList } from '../save.js';
+import { containers as storeList, stowAll, CAMP } from '../save.js';
 
 export const CATEGORY_COLORS = {
   junk: '#6b6258', resource: '#5c6b7a', ingredient: '#6b7a3a', food: '#a8642a', component: '#4a6b8a', consumable: '#8a3a5a',
@@ -19,6 +19,8 @@ export const CATEGORY_COLORS = {
 };
 const PART_ICONS = { engine: 'settings', armor: 'armor', weapon: 'target', roof: 'box' };
 const CATEGORY_NAMES = { junk: 'Schrott', resource: 'Ressource', ingredient: 'Zutat', food: 'Gericht', component: 'Bauteil', consumable: 'Verbrauchsgut', valuable: 'Wertsache', blueprint: 'Bauplan', armor: 'Rüstung', implant: 'Implantat', dronepart: 'Drohnenteil', progress: 'Fortschritt', melee: 'Nahkampf', ranged: 'Fernkampf', cyberdeck: 'Cyberdeck', backpack: 'Rucksack', rigpart: 'Rig-Teil' };
+// the order of kinds in the Camp-Lager (filter chips, Sortieren)
+const KIND_ORDER = ['food', 'ingredient', 'consumable', 'resource', 'component', 'junk', 'weaponpart', 'melee', 'ranged', 'cyberdeck', 'armor', 'implant', 'dronepart', 'backpack', 'valuable', 'blueprint', 'progress', 'rigpart'];
 const SLOT_NAMES = { melee: 'Nahkampf', ranged: 'Fernkampf', cyberdeck: 'Cyberdeck', backpack: 'Rucksack' };
 const SLOT_ICONS = { melee: 'weapon', ranged: 'target', cyberdeck: 'brain', backpack: 'bags' };
 // worn places (game/inventory.js WEAR_KEYS): Leyla's head + armor, implants in her body, AvA's parts
@@ -27,10 +29,7 @@ const WEAR_ICONS = { head: 'person', armor: 'armor', bow: 'target', tail: 'setti
 // Cyberware tiers (#006): simple = scrap grey, good = cyan, perk + flaw = gold that glows red
 const TIER_COLORS = { 1: '#6d758d', 2: '#249fde', 3: '#f9a31b' };
 
-export function kindOf(D, a, id) {
-  const t = thing(D, a, id) || {};
-  return a === 'weapons' ? t.kind || 'melee' : a === 'backpacks' ? 'backpack' : a === 'rigParts' ? 'rigpart' : t.category || 'junk';
-}
+export { kindOf };
 export const glyphOf = (D, a, id) => { const t = thing(D, a, id) || {}; return t.glyph || (t.name || id).replace(/[^A-Za-zÄÖÜäöü]/g, '').slice(0, 2).toUpperCase(); };
 
 // The picture of a thing whose look is a cell in an icon sheet (asset kind "icons"), as a CSS sprite; null without one.
@@ -86,7 +85,7 @@ export class InventoryUI {
 
   open(other = null, { tab } = {}) { this.other = other; if (tab) this.tab = tab; this.el.hidden = false; if (padInUse() || this.host.padActive?.()) this.padOn = true; this.draw(); }   // padActive: opened with the very first controller press
   get vanTab() { return this.tab === 'van' && !!this.host.inCamp?.() && !!this.vanStore(); }
-  vanStore() { return storeList(this.D, this.host.save()).find(c => c.unit === 0) || null; }
+  vanStore() { return storeList(this.D, this.host.save()).find(c => c.key === CAMP) || null; }   // the Kofferraum is part of the Camp-Lager (#041)
   setTab(t) { this.tab = t; this.draw(); }
   close() { if (this.held) this.putBack(); if (this.menuOn) this.closeMenu(); this.el.hidden = true; this.tip.hidden = true; this.cursor.hidden = true; this.other = null; }
   toggle(other = null) { if (this.isOpen && (!other || other.key === this.other?.key)) this.close(); else this.open(other); }
@@ -148,17 +147,20 @@ export class InventoryUI {
   pageKey(i) { return this.padOn && padInUse() ? [keyGlyph('tabs')[i]].filter(Boolean) : []; }
   otherEl() {
     const D = this.D, o = this.other;
-    return el('section', { class: 'inv-panel' + (o.kind === 'floor' ? ' floor' : '') },
-      el('header', {}, icon(o.kind === 'floor' ? 'down' : 'box', 16), el('b', {}, o.title),
+    const camp = o.key === CAMP, used = camp ? occupancy(D, o.grid).size : 0, cap = o.grid.cap ?? o.grid.w * o.grid.h;
+    return el('section', { class: 'inv-panel' + (o.kind === 'floor' ? ' floor' : '') + (camp ? ' camp' : '') },
+      el('header', {}, icon(o.kind === 'floor' ? 'down' : 'box', 16), el('b', {}, o.title), camp ? el('small', { class: 'inv-cap' + (used >= cap ? ' full' : '') }, `${used} / ${cap} Felder`) : null,
         // several bundles in reach: page through them (L1/R1 with the cursor on the ground, or the arrows)
         o.pages > 1 ? el('span', { class: 'inv-pages' }, el('button', { class: 'inv-page', title: 'Vorheriges Bündel', onclick: () => o.flip(-1) }, ...this.pageKey(0), '‹'),
           el('b', {}, `${o.page + 1} / ${o.pages}`), el('button', { class: 'inv-page', title: 'Nächstes Bündel', onclick: () => o.flip(1) }, '›', ...this.pageKey(1))) : null,
         el('small', {}, `${worth(D, o.grid)} Δ`)),
+      camp ? this.filterEl(o.grid) : null,
       this.gridEl(o.key, o.grid),
       // trophy stands of the treasury: one small grid each, side by side
       o.extra?.length ? el('div', { class: 'inv-stands' }, ...o.extra.map(x => el('div', { class: 'inv-stand' }, el('small', {}, icon('star', 12), x.title), this.gridEl(x.key, x.grid)))) : null,
       o.kind === 'container' ? el('div', { class: 'inv-actions' },
         el('button', { class: 'inv-btn', onclick: () => this.storeAll() }, 'Alles einlagern'),
+        camp ? el('button', { class: 'inv-btn ghost', title: 'Stapel zusammenlegen, nach Art ordnen', onclick: () => this.sortCamp() }, 'Sortieren') : null,
         el('button', { class: 'inv-btn ghost', onclick: () => this.takeAll() }, 'Alles nehmen')) :
         el('div', { class: 'inv-actions' }, el('button', { class: 'inv-btn', onclick: () => this.takeAll() }, 'Alles aufheben')));
   }
@@ -290,8 +292,26 @@ export class InventoryUI {
       if (ev.button === 2 || ev.ctrlKey) { if (this.held) this.turnHeld(); return; }
       if (this.held) this.place(key, x, y, ev);
     });
-    for (const e of g.items) box.append(this.itemEl(key, g, e));
+    // the Camp-Lager has exactly as many cells as its shelves give (#041): the rest of the last row is closed
+    if (g.cap != null && g.cap < g.w * g.h) { const x = g.cap % g.w, y = Math.floor(g.cap / g.w); box.append(el('div', { class: 'inv-closed', style: `left:${x * c}px;top:${y * c}px;width:${(g.w - x) * c}px;height:${c}px` })); }
+    const f = key === CAMP && this.filter;
+    for (const e of g.items) { const it = this.itemEl(key, g, e); if (f && kindOf(D, e.a, e.id) !== f) it.classList.add('dim'); box.append(it); }
     return box;
+  }
+  // Camp-Lager (#041): one chip per kind that lies in it, a click shows only that kind (the rest dims), again = all
+  filterEl(g) {
+    const D = this.D, kinds = [...new Set(g.items.map(e => kindOf(D, e.a, e.id)))].sort((a, b) => KIND_ORDER.indexOf(a) - KIND_ORDER.indexOf(b));
+    if (this.filter && !kinds.includes(this.filter)) this.filter = null;
+    if (kinds.length < 2) return null;
+    const chip = (k, label) => el('button', { class: 'inv-chip' + ((this.filter || null) === k ? ' on' : ''), style: k ? `--col:${CATEGORY_COLORS[k] || '#555'}` : '', onclick: () => { this.filter = k; this.draw(); } }, label);
+    return el('div', { class: 'inv-filter' }, chip(null, 'Alles'), ...kinds.map(k => chip(k, CATEGORY_NAMES[k] || k)));
+  }
+  sortCamp() {
+    const g = this.inv.grids[CAMP];
+    if (!g) return;
+    const ok = sortGrid(this.D, g, e => { const i = KIND_ORDER.indexOf(kindOf(this.D, e.a, e.id)); return i < 0 ? 99 : i; });
+    this.host.notify?.(ok ? 'Camp-Lager sortiert' : 'Zu voll zum Sortieren', ok ? 'good' : 'warn');
+    if (ok) this.changed(CAMP);
   }
 
   // a thing in a grid: coloured cells of its shape + glyph, name and count
@@ -723,6 +743,11 @@ export class InventoryUI {
     this.changed(to);
   }
   storeAll() {
+    if (this.other.key === CAMP) {   // #041: Speziallager first for what they prefer (Kühlraum, Waffenkammer …), the rest into the Camp-Lager
+      const r = stowAll(this.D, this.host.save(), 'backpack'), where = Object.entries(r.places).map(([n, k]) => `${n} ${k}`).join(' · ');
+      this.host.notify?.(r.moved ? `${r.moved} ${r.moved === 1 ? 'Sache' : 'Sachen'} eingelagert${where ? ' · ' + where : ''}${r.left ? ` · ${r.left} passen nicht mehr` : ''}` : r.left ? 'Kein Platz mehr im Lager' : 'Rucksack ist leer', r.moved && !r.left ? 'good' : 'warn');
+      return this.changed(CAMP);
+    }
     if (this.other.accept) {   // only what this storage takes
       let n = 0;
       for (const e of [...this.inv.grids.backpack.items]) if (this.allows(this.other.key, e, false) && addEntry(this.D, this.other.grid, e, e.n) === 0) { remove(this.inv.grids.backpack, e); n++; }

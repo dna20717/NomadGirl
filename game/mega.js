@@ -10,7 +10,7 @@
 import { buildMegarig } from '../engine/megarig.js';
 import { swapTractor } from './save.js';
 import { removeUnits, reindexUnits, rehome } from './reindex.js';
-import { containers as storeList } from './save.js';
+import { fitContainers } from './save.js';
 import { addEntry, newGrid } from './inventory.js';
 
 const clone = x => JSON.parse(JSON.stringify(x));
@@ -163,14 +163,8 @@ export function deactivate(D, save) {
   save.rig.parts = m.bay.parts || {};
   swapTractor(D, save, m.bay.tractor);
   m.lights = [];
-  // the Kofferraum gets smaller again: what does not fit any more is rehomed instead of falling out
-  const g = save.inv?.grids?.['rig:0'], want = storeList(D, save).find(c => c.key === 'rig:0')?.size;
-  if (g && want && (g.w !== want[0] || g.h !== want[1])) {
-    const old = g.items || [], fresh = newGrid(want[0], want[1]), rest = [];
-    for (const e of old) { const left = addEntry(D, fresh, e, e.n); if (left > 0) rest.push({ ...e, n: left }); }
-    save.inv.grids['rig:0'] = fresh;
-    if (rest.length) rehome(D, save, { w: g.w, h: g.h, items: rest });
-  }
+  // the Camp-Lager (#041) gets smaller again with the old tractor: what does not fit any more is rehomed instead of falling out
+  fitContainers(D, save);
   return { ok: true, lost: gone.length };
 }
 

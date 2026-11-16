@@ -1,6 +1,6 @@
 // Unit indices in the savegame (Aufräumen 16.11.2026, game/reindex.js): when a unit leaves the rig outside the build draft, storages,
 // decoration, string lights and garden keys move with their unit instead of pointing at the wrong one, storages of the leaver are
-// rehomed (chest, Kofferraum, bundle by the van) instead of being lost.
+// rehomed (Camp-Lager, bundle by the van) instead of being lost.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { newSave, repairSave } from '../game/save.js';
@@ -10,7 +10,7 @@ import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
 
 const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
-const storeWs = Object.entries(D.workshops).find(([, w]) => w.grid && !w.accept?.length && (w.places || 1) <= 2)[0];
+const storeWs = Object.entries(D.workshops).find(([, w]) => w.grid && w.ownStorage && !w.accept?.length && (w.places || 1) <= 2)[0];   // a Speziallager keeps its own grid (#041)
 const item = Object.keys(D.items).find(id => D.items[id].category === 'junk') || Object.keys(D.items)[0];
 // a rig: tractor, GONE (a container that will vanish from the data), container_20 with a storage holding one thing
 function rig() {
@@ -35,10 +35,10 @@ test('Spielstand-Reparatur: ein gelöschter Container verschiebt nichts, das Lag
   assert.deepEqual(r.rig.lights, [['1:0', 'mast:0']]);
   assert.ok(r.garden['1:0'] && !r.garden['2:0']);
 });
-test('removeUnits: das Lager einer Einheit, die geht, landet in der Kiste statt im Nichts', () => {
-  const s = rig(), before = things(s, 'chest') + things(s, 'rig:0');
+test('removeUnits: das Lager einer Einheit, die geht, landet im Camp-Lager statt im Nichts', () => {
+  const s = rig(), before = things(s, 'camp');
   removeUnits(D, s, [2]);   // container_20 with the full storage leaves
-  assert.equal(things(s, 'chest') + things(s, 'rig:0') + (s.ground?.[s.location] || []).reduce((n, p) => n + count(p.grid, 'items', item), 0), before + 1);
+  assert.equal(things(s, 'camp') + (s.ground?.[s.location] || []).reduce((n, p) => n + count(p.grid, 'items', item), 0), before + 1);
   assert.equal(s.rig.lights.length, 0, 'die Lichterkette an ihr kommt ab');
   assert.equal(s.garden['2:0'], undefined);
 });

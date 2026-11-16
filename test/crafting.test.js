@@ -49,7 +49,7 @@ test('Experimentieren: Treffer lernt das Rezept und verbraucht nur, was es brauc
   assert.ok(s.recipes.includes('mutanten_curry'));
   assert.equal(clockText(s), 'Tag 1 · 19:00');
   // the same again: a hit, no longer new (but no meat left)
-  add(D, s.inv.grids.chest, 'items', 'mutantenfleisch', 1);
+  add(D, s.inv.grids.camp, 'items', 'mutantenfleisch', 1);
   const again = experiment(D, s, 'kochnische', { mutantenfleisch: 1, reis: 1, gewuerzmischung: 1 });
   assert.ok(again.hit && !again.learnt);
 });

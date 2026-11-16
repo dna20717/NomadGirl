@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Code → Ava: #041 Camp-Lager (ein Raster aus Kofferraum + Regalen, Speziallager eigen, Kiste + Deichselkästen weg, „Alles einlagern“ in der Beute-Bilanz, Filter, Sortieren) und #042 Container-Tileset (PixelLab 34, übrig 430) fertig. Tests 181/181, Browser 38/38. ⚠️ siehe Tickets; offen: Fahrgestell + Camp-Boden neu malen (C18).
 - 16.11. Code → Ava: #041 Camp-Lager zusammengelegt läuft (Daniels Auftrag im Code-Chat), danach #042 Container-Tileset neu (PixelLab, von Daniel freigegeben).
 - 16.11. Ava → Code: **Kernfiguren geschrieben** (`docs/crew.md`): Schraube (Stimme im Motor), Onkel Sung (eigentlich Tam), Doc Mirela (Ärztin, abhängig, kennt AvAs Akte), Sergeant Moll (hat AvA eingesammelt, Wahrheit am Ende), Lucky Ferro (Zocker, lange Finger, Neon-Rats-Schulden), Pixie (Stimme des Rigs, aus AvAs Labor, keine Pronomen). Vertrauensbaum mit Wendepunkten, die andere Figuren treffen. Für #040 relevant: Fähigkeiten und Eigenheiten der Sechs.
 - 16.11. Ava → Code: **Design-Session Sozialsystem „Die Karawane“** mit Daniel (5 Fragerunden), Kapitel in `docs/design.md` › Companions, Oberwelt & Wirtschaft › Die Karawane, 6 Ausbaustufen. Neu: **#040 Crew-Kern** (offen, wartet auf Daniels OK zum Bauen).
@@ -653,19 +654,18 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 (noch leer)
 
 ### #041 Camp-Lager zusammengelegt, Alles einlagern
-- **Status:** läuft · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/inventory.md, docs/features/benches.md (Lagerregal, Schatzkammer, Füllstand), docs/features/camp.md (Kiste)
 - **Auftrag (Daniel, 16.11.2026):** „Nach einem POI im Camp soll es einen Button geben, alles Mitgebrachte einzulagern, sofern genug Lagerraum vorhanden ist. Insgesamt soll das Camp-Inventar konsolidiert einsehbar und nutzbar sein und die einzelnen Regale lediglich das Volumen bestimmen. Ausnahme sind Speziallagerungen wie Kühlen, Waffen oder Trophäen.“ Antworten: **ein großes Raster**; **Kiste im Camp und Deichselkästen fallen weg**, der **Van bekommt einen Kofferraum etwa doppelt so groß wie die Kiste**; Einlagern **teilweise** (was passt), Speziallager bekommen ihr Passendes automatisch, Knopf in der Beute-Bilanz und im Inventar.
 - **Fertig, wenn:** ein Camp-Lager aus Kofferraum + Lagerregalen, Speziallager eigen, alte Spielstände verlieren nichts, Tests grün, Build grün auf `main`.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: Kofferraum gehört zum Camp-Lager; LKW 12 × 8, Crawler 14 × 10, Fatbird 12 × 10 (sonst hätte der LKW weniger als der Van); Waffenkammer wird Speziallager (Waffen, Waffenteile bevorzugt), Kühlraum bevorzugt Gerichte + Zutaten, Schatzkammer Wertsachen; die Regalbilder zeigen den Füllstand des ganzen Camp-Lagers; Feldhandbuch-Lektion „Die Kiste“ heißt jetzt „Das Camp-Lager“ (Bilder zeigen noch die alte Kiste, Backlog C18).
+- **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 181/181, Browser 38/38 (neue Prüfungen: geschlossene Felder, Filter, Sortieren, Hecktür öffnet das Camp-Lager, Beute-Bilanz „Alles einlagern“ mit Kühlraum). PixelLab 0. **Bitte testen:** nach einem Run in der Beute-Bilanz „Alles einlagern“; E an Hecktür oder Lagerregal → ein großes Raster mit Filter-Chips und „Sortieren“; ein Regal ausbauen, wenn das Lager voll ist (geht nicht); alter Spielstand: Kisten-Inhalt liegt jetzt im Camp-Lager.
 
 ### #042 Container-Tileset neu (feiner)
-- **Status:** offen · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Auftrag (Daniel, 16.11.2026):** Container, Anhänger und Camp-Boden wirken neben dem Van grob (256-px-Bilder ×4). **Neu malen mit PixelLab** (Freigabe ~20–40 Generierungen), „achte auf die orthogonale Perspektive, die Palette und darauf, dass du ein sauberes Tileset erzeugst, aus dem man Container verschiedener Größe zusammensetzen kann.“
 - **Fertig, wenn:** Container 1/2/3 Plätze aus Kacheln zusammengesetzt, Pixel so fein wie der Van, AAP-64, Werkstatt-Bilder sitzen weiter im Innenraum, Tests grün.
-- **Rückfragen:**
-- **Ergebnis:**
-
+- **Rückfragen:** (Code) ⚠️ vorläufig: nur die Container neu (offen + zu, 1/2/3 Plätze aus einem Tileset); Fahrgestell und Camp-Boden noch alt (Backlog C18, ~10–25 Generierungen, braucht Freigabe). Container stehen jetzt ×2 statt ×4 und sind etwa 6 % kleiner auf dem Schirm, Werkstatt-Maßstab in Containern 130 → 122 %.
+- **Ergebnis:** (Code) Commit siehe Funkspruch. Tileset `container_tiles.png`, Werkzeug `tools/container_tiles.py`, alte Fassungen als `…_v1`. Tests grün (container_test prüft ×2). PixelLab diesmal 34 (Create Image Pro 25 + Edit Pro Flash 9), übrig 430. **Bitte testen:** Camp ansehen, Container auf/zu, Werkstätten darin (Hydrokultur, Cryo-Tank).

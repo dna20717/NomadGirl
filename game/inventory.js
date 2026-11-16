@@ -33,7 +33,9 @@ export function boxOf(D, e) {
 export const stackMax = (D, a, id) => a === 'items' ? Math.max(1, thing(D, a, id)?.stack || 1) : 1;
 export const canTurn = (D, a, id) => { const c = baseCells(D, a, id); const b = cellsOf(D, a, id, 1); return JSON.stringify(c.sort()) !== JSON.stringify(b.sort()); };
 
-export function newGrid(w, h) { return { w: Math.max(1, w | 0), h: Math.max(1, h | 0), items: [] }; }
+export function newGrid(w, h, cap = null) { const g = { w: Math.max(1, w | 0), h: Math.max(1, h | 0), items: [] }; if (cap != null && cap < g.w * g.h) g.cap = cap; return g; }
+// is the cell x/y part of the grid? A grid with `cap` (the Camp-Lager, #041) has exactly that many cells, the rest of its last row is closed
+export const cellOpen = (grid, x, y) => x >= 0 && y >= 0 && x < grid.w && y < grid.h && (grid.cap == null || y * grid.w + x < grid.cap);
 
 // which entry occupies each cell: Map "x,y" → entry
 export function occupancy(D, grid, skip = null) {
@@ -46,7 +48,7 @@ export function fits(D, grid, e, x, y, skip = null) {
   const occ = occupancy(D, grid, skip);
   return cellsOf(D, e.a, e.id, e.r || 0).every(([cx, cy]) => {
     const px = x + cx, py = y + cy;
-    return px >= 0 && py >= 0 && px < grid.w && py < grid.h && !occ.has(`${px},${py}`);
+    return cellOpen(grid, px, py) && !occ.has(`${px},${py}`);
   });
 }
 // what lies under a shape placed at x/y (to swap or stack onto)
@@ -97,6 +99,20 @@ export function add(D, grid, a, id, n = 1, { stackOnly = false, q = 0, mods = nu
 }
 // an entry taken out of somewhere back into a grid, with its quality and values; → how many did NOT fit
 export const addEntry = (D, grid, e, n = e.n, opts = {}) => add(D, grid, e.a, e.id, n, { ...opts, q: e.q || 0, mods: e.mods || null });
+// the kind of a thing for colours, filters and „Einlagern bevorzugt“: weapons by their kind, items by their category
+export function kindOf(D, a, id) {
+  const t = thing(D, a, id) || {};
+  return a === 'weapons' ? t.kind || 'melee' : a === 'backpacks' ? 'backpack' : a === 'rigParts' ? 'rigpart' : t.category || 'junk';
+}
+// tidy a grid (#041, „Sortieren“ im Camp-Lager): stacks merge, things go in by order(e) (kind first), big before small, from the top left.
+// → false and nothing changes when the packing would not hold everything
+export function sortGrid(D, grid, order = () => 0) {
+  const g = { ...grid, items: [] }, size = e => cellsOf(D, e.a, e.id, 0).length;
+  const list = [...grid.items].sort((x, y) => order(x) - order(y) || size(y) - size(x) || String(x.id).localeCompare(String(y.id)) || (y.q || 0) - (x.q || 0));
+  for (const e of list) if (addEntry(D, g, e, e.n) > 0) return false;
+  grid.items = g.items;
+  return true;
+}
 export function remove(grid, e) { const i = grid.items.indexOf(e); if (i >= 0) grid.items.splice(i, 1); return e; }
 export function count(grid, a, id) { return grid.items.filter(e => e.a === a && e.id === id).reduce((s, e) => s + e.n, 0); }
 
@@ -104,7 +120,7 @@ export function count(grid, a, id) { return grid.items.filter(e => e.a === a && 
 // one other thing in the way → swapped (the other one comes back as "held"). → { ok, held }
 export function drop(D, grid, e, x, y) {
   const hit = under(D, grid, e, x, y);
-  const inside = cellsOf(D, e.a, e.id, e.r || 0).every(([cx, cy]) => x + cx >= 0 && y + cy >= 0 && x + cx < grid.w && y + cy < grid.h);
+  const inside = cellsOf(D, e.a, e.id, e.r || 0).every(([cx, cy]) => cellOpen(grid, x + cx, y + cy));
   if (!inside) return { ok: false, held: e };
   if (!hit.length) { grid.items.push(Object.assign(e, { x, y })); return { ok: true, held: null }; }
   if (hit.length === 1) {
@@ -151,8 +167,8 @@ export function rollLoot(D, tableId, rnd = Math.random) {
 
 // value of a grid in Δ (shown in the interface)
 // would the grid's contents survive a new size w × h (nothing lost)? (the Dachbox comes off, the Kofferraum shrinks)
-export function canResize(D, grid, w, h) {
-  const g = newGrid(w, h), total = grid.items.reduce((n, e) => n + e.n, 0);
+export function canResize(D, grid, w, h, cap = null) {
+  const g = newGrid(w, h, cap), total = grid.items.reduce((n, e) => n + e.n, 0);
   let kept = 0;
   for (const e of grid.items) if (fits(D, g, e, e.x, e.y)) { g.items.push({ ...e }); kept += e.n; }
   for (const e of grid.items) if (!g.items.some(x => x.x === e.x && x.y === e.y && x.id === e.id)) kept += e.n - addEntry(D, g, e);

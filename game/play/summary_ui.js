@@ -5,6 +5,7 @@ import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { hints, closeX } from './ui_nav.js';
 import { markOf } from './inventory_ui.js';
+import { stowAll, CAMP } from '../save.js';
 
 export class SummaryUI {
   // host: { scene(), go(next) }
@@ -21,13 +22,31 @@ export class SummaryUI {
     }, true);
   }
   get isOpen() { return !this.el.hidden; }
-  open(S) { this.S = S; this.btn = S.next ? 1 : 0; this.draw(); this.el.hidden = false; }
+  // the buttons in their order: „Alles einlagern“ (#041, back from a run with something in the backpack), „Weiter“, the next stop
+  buttons() { const S = this.S; return [...(this.canStow() ? ['stow'] : []), 'ok', ...(S?.next ? ['next'] : [])]; }
+  canStow() { const s = this.host.scene(), save = s?.box?.save; return !!(this.S && !this.S.ko && save?.inv?.grids?.[CAMP] && (save.inv.grids.backpack?.items?.length || this.stowed)); }
+  open(S) { this.S = S; this.stowed = null; this.btn = this.buttons().indexOf(S.next ? 'next' : 'ok'); this.draw(); this.el.hidden = false; }
   close() { this.el.hidden = true; this.el.replaceChildren(); this.S = null; }
   nav(u) { for (const a of ['back', 'ok', 'left', 'right']) if (u.pressed(a)) return this.act(a); }
   act(a) {
     if (a === 'back') return this.close();
-    if ((a === 'left' || a === 'right') && this.S?.next) { this.btn = a === 'left' ? 0 : 1; return this.draw(); }
-    if (a === 'ok') { const next = this.btn === 1 ? this.S?.next : null; this.close(); if (next) this.host.go?.(next); }
+    const B = this.buttons();
+    if (a === 'left' || a === 'right') { this.btn = Math.max(0, Math.min(B.length - 1, this.btn + (a === 'left' ? -1 : 1))); return this.draw(); }
+    if (a === 'ok') {
+      const b = B[this.btn] || 'ok';
+      if (b === 'stow') return this.stow();
+      const next = b === 'next' ? this.S?.next : null; this.close(); if (next) this.host.go?.(next);
+    }
+  }
+  // everything from the backpack into the Speziallager and the Camp-Lager (game/save.js stowAll); the card stays open
+  stow() {
+    if (this.stowed) return;
+    const s = this.host.scene(), r = stowAll(s.data_, s.box.save, 'backpack');
+    this.stowed = r;
+    s.box.persist?.(); s.hud.inv?.isOpen && s.hud.inv.draw();
+    s.hud.toast(r.moved ? `${r.moved} ${r.moved === 1 ? 'Sache' : 'Sachen'} eingelagert${r.left ? ` · ${r.left} passen nicht mehr` : ''}` : 'Kein Platz mehr im Lager', '', r.left ? 'warn' : 'good', 2600);
+    this.btn = this.buttons().indexOf('ok');
+    this.draw();
   }
   draw() {
     const S = this.S, D = this.host.scene()?.data_ || {};
@@ -49,11 +68,14 @@ export class SummaryUI {
       ...(S.tank ? [el('li', { class: S.tank.to < 45 ? 'warn' : '' }, icon('heart', 14), el('span', {}, `AvAs Tank: ${S.tank.from} % → `, el('b', {}, `${S.tank.to} %`)))] : []),
     ];
     const newCol = el('div', { class: 'sum-col' }, el('h3', {}, icon('star', 14), ' Neu'), news.length ? el('ul', { class: 'sum-news' }, ...news) : el('p', {}, 'Nichts Neues. Morgen vielleicht.'));
+    const B = this.buttons(), on = b => B[this.btn] === b ? ' on' : '', press = b => () => { this.btn = B.indexOf(b); this.act('ok'); }, St = this.stowed;
     const btns = el('div', { class: 'sum-btns' },
-      el('button', { class: 'inv-btn' + (this.btn === 0 ? ' on' : ''), onclick: () => { this.btn = 0; this.act('ok'); } }, 'Weiter'),
-      S.next ? el('button', { class: 'inv-btn wm-go' + (this.btn === 1 ? ' on' : ''), onclick: () => { this.btn = 1; this.act('ok'); } }, icon('arrow_right', 16), ` ${S.next.label}`, el('small', {}, S.next.sub)) : null);
+      B.includes('stow') ? el('button', { class: 'inv-btn ghost sum-stow' + on('stow'), disabled: !!St, onclick: press('stow') }, icon('box', 16),
+        St ? ` Eingelagert: ${St.moved}${St.left ? ` · ${St.left} passen nicht` : ''}` : ' Alles einlagern') : null,
+      el('button', { class: 'inv-btn' + on('ok'), onclick: press('ok') }, 'Weiter'),
+      S.next ? el('button', { class: 'inv-btn wm-go' + on('next'), onclick: press('next') }, icon('arrow_right', 16), ` ${S.next.label}`, el('small', {}, S.next.sub)) : null);
     this.el.replaceChildren(el('div', { class: 'tut-card sum-card ui-frame' }, head, el('div', { class: 'sum-cols' }, home, newCol), btns,
-      hints([...(S.next ? [['move', 'wählen']] : []), ['ok', 'weiter'], ['back', 'schließen']]), closeX(() => this.close())));
+      hints([...(B.length > 1 ? [['move', 'wählen']] : []), ['ok', 'weiter'], ['back', 'schließen']]), closeX(() => this.close())));
   }
-  state() { const S = this.S; return { open: this.isOpen, grade: S?.grade || null, ko: !!S?.ko, gained: (S?.gained || []).map(x => `${x.id}×${x.n}`), lost: (S?.lost || []).map(x => `${x.id}×${x.n}`), recipes: S?.recipes || [], ready: S?.ready || [], quests: (S?.quests || []).map(q => q.id + (q.ready ? '!' : '')), next: S?.next || null, btn: this.btn }; }
+  state() { const S = this.S; return { open: this.isOpen, grade: S?.grade || null, ko: !!S?.ko, gained: (S?.gained || []).map(x => `${x.id}×${x.n}`), lost: (S?.lost || []).map(x => `${x.id}×${x.n}`), recipes: S?.recipes || [], ready: S?.ready || [], quests: (S?.quests || []).map(q => q.id + (q.ready ? '!' : '')), next: S?.next || null, btn: this.btn, buttons: this.S ? this.buttons() : [], stowed: this.stowed || null }; }
 }

@@ -9,7 +9,7 @@ import { classicRig } from './fixture.js';
 
 const D = classicRig((await loadProject(nodeLoader('projects/nomadgirl'))).data);   // fixed setup (fixture.js)
 const fresh = () => { const s = newSave(D); s.deltas = 5000; return s; };
-const trunk = s => containers(D, s).find(c => c.key === 'rig:0');
+const trunk = s => containers(D, s).find(c => c.key === 'camp');   // the Kofferraum is part of the Camp-Lager (#041)
 
 test('Rig-Teil kaufen: liegt auf dem Schrottplatz, kostet Δ', () => {
   const s = fresh();
@@ -46,16 +46,17 @@ test('Dachbox macht den Kofferraum höher, ab nur wenn nichts rausfällt; Rückg
   act(D, s, d => buyPart(D, d, 'dachbox'));
   const snap = snapshot(s);
   act(D, s, d => mountPart(D, d, 'roof', 0, { yard: 0 }));
-  assert.equal(trunk(s).size[1], D.tractors.van.storage[1] + 2);
-  assert.equal(s.inv.grids['rig:0'].h, D.tractors.van.storage[1] + 2);
-  const g = s.inv.grids['rig:0'];
-  for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) g.items.push({ a: 'items', id: 'zettel_curry', n: 1, x, y, r: 0 });   // does not stack
+  const [vw, vh] = D.tractors.van.storage, shelves = cap0 => trunk(s).cap - cap0;
+  assert.equal(shelves(vw * (vh + 2)), D.workshops.lagerregal.grid[0] * D.workshops.lagerregal.grid[1], 'Kofferraum mit Dachbox: zwei Reihen mehr');
+  const g = s.inv.grids.camp, cap = g.cap ?? g.w * g.h;
+  g.items.length = 0;
+  for (let i = 0; i < cap; i++) g.items.push({ a: 'items', id: 'zettel_curry', n: 1, x: i % g.w, y: Math.floor(i / g.w), r: 0 });   // does not stack
   const r = act(D, s, d => unmountPart(D, d, 'roof', 0));
   assert.equal(r.ok, false);
-  assert.match(r.reason, /Kofferraum/);
+  assert.match(r.reason, /Camp-Lager/);
   g.items.length = 0;
   assert.equal(act(D, s, d => unmountPart(D, d, 'roof', 0)).ok, true);
-  assert.equal(s.inv.grids['rig:0'].h, D.tractors.van.storage[1]);
+  assert.equal(shelves(vw * vh), D.workshops.lagerregal.grid[0] * D.workshops.lagerregal.grid[1]);
   restore(s, snap);
   assert.deepEqual(s.rig.spare.parts, ['dachbox']);
 });
@@ -66,5 +67,5 @@ test('Alter Spielstand: Rig-Teile aus dem Inventar ziehen auf den Schrottplatz',
   delete s.rig.spare.parts;
   const t = repairSave(JSON.parse(JSON.stringify(s)), D);
   assert.deepEqual(t.rig.spare.parts, ['dachbox']);
-  assert.ok(!t.inv.grids['rig:0'].items.some(e => e.a === 'rigParts'));   // (the van's boot holds start supplies since #008)
+  assert.ok(!Object.values(t.inv.grids).some(g => g.items.some(e => e.a === 'rigParts')));
 });

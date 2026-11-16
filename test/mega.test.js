@@ -158,7 +158,7 @@ test('Aussteigen: der Tank-Container kommt immer mit, gestapelt wird wieder, nic
 });
 test('Aussteigen: was im großen Kofferraum lag, fällt nicht heraus', () => {
   const s = fresh(); activate(D, s, 'crawler');
-  const g = s.inv.grids['rig:0'], item = Object.keys(D.items).find(id => D.items[id].category === 'junk' && (D.items[id].stack || 1) === 1) || 'schrott';
+  const g = s.inv.grids.camp, item = Object.keys(D.items).find(id => D.items[id].category === 'junk' && (D.items[id].stack || 1) === 1) || 'schrott';
   let n = 0; while (n < 200 && add(D, g, 'items', item, 1) === 0) n++;
   const total = () => Object.values(s.inv.grids).reduce((k, gr) => k + count(gr, 'items', item), 0) + (s.ground?.[s.location] || []).reduce((k, p) => k + count(p.grid, 'items', item), 0);
   const before = total();

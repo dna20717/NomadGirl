@@ -45,7 +45,7 @@ test('Rettung kostet Zustand, die letzte Rettung kostet AvA das Leben', () => {
 test('Wartung am Tank: Rezept füllt auf, hilft nur bis zur Phase', () => {
   const s = newSave(D);
   for (const g of Object.values(s.inv.grids)) g.items = [];
-  add(D, s.inv.grids.chest, 'items', 'panzertape', 4); add(D, s.inv.grids.chest, 'items', 'schrott', 2);
+  add(D, s.inv.grids.camp, 'items', 'panzertape', 4); add(D, s.inv.grids.camp, 'items', 'schrott', 2);
   s.tank.cond = 50;
   let r = craft(D, s, 'tank_notflicken', D.tank.workshop);
   assert.ok(r.ok, r.reason); assert.equal(Math.round(s.tank.cond), 58);

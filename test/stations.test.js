@@ -32,17 +32,18 @@ test('Bauplan + Teile: zwei Teile-Sätze ergeben zwei Exemplare mit anderen Wert
   const s = newSave(D);
   for (const id of ['schrott', 'schrauben']) give(D, s, id, 10);
   give(D, s, 'langer_lauf', 1); give(D, s, 'kurzer_lauf', 1); give(D, s, 'rotpunkt_visier', 1);
+  const lauf = have(D, s, 'langer_lauf');   // the start supplies in the Camp-Lager hold one more (#041)
   const a = weaponMods(D, ['langer_lauf', 'rotpunkt_visier'], 2), b = weaponMods(D, ['kurzer_lauf'], 0);
   assert.ok(craft(D, s, 'bauplan_nagelpistole', 'werkbank', { mods: a, parts: ['langer_lauf', 'rotpunkt_visier'], q: 2 }).ok);
   assert.ok(craft(D, s, 'bauplan_nagelpistole', 'werkbank', { mods: b, parts: ['kurzer_lauf'] }).ok);
-  assert.equal(have(D, s, 'langer_lauf'), 0, 'die Teile stecken jetzt in der Waffe');
+  assert.equal(have(D, s, 'langer_lauf'), lauf - 1, 'die Teile stecken jetzt in der Waffe');
   const copies = Object.values(s.inv.grids).flatMap(g => g.items).filter(e => e.a === 'weapons' && e.id === 'nagelpistole');
   assert.equal(copies.length, 2);
   const w = copies.map(e => applyMods(D.weapons.nagelpistole, e.mods));
   assert.ok(w[0].range > D.weapons.nagelpistole.range && w[1].range < D.weapons.nagelpistole.range);
   assert.ok(w[0].critChance > (D.weapons.nagelpistole.critChance || 0));
   assert.ok(w[1].cooldown < D.weapons.nagelpistole.cooldown);
-  assert.equal(craft(D, s, 'bauplan_nagelpistole', 'werkbank', { parts: ['langer_lauf'] }).ok, false, 'ohne das Teil geht es nicht');
+  assert.equal(craft(D, s, 'bauplan_nagelpistole', 'werkbank', { parts: ['kurzer_lauf'] }).ok, false, 'ohne das Teil geht es nicht');
 });
 
 test('AvAs Platine: Energie-Budget, Chips verbraucht, Bonus mit Lötqualität', () => {

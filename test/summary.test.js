@@ -11,7 +11,7 @@ import { newGrid } from '../game/inventory.js';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '../projects/nomadgirl');
 const D = (await loadProject(nodeLoader(root))).data;
-const fresh = () => ({ day: 1, hour: 8, deltas: 0, nodes: [], recipes: [], tank: { cond: 90, at: 0, since: 1 }, inv: { grids: { chest: newGrid(8, 6), backpack: newGrid(6, 4) } }, rig: { units: [] } });
+const fresh = () => ({ day: 1, hour: 8, deltas: 0, nodes: [], recipes: [], tank: { cond: 90, at: 0, since: 1 }, inv: { grids: { camp: newGrid(8, 6), backpack: newGrid(6, 4) } }, rig: { units: [] } });
 
 test('Bilanz: Mitgebrachtes (Ressourcen zuerst), neue Rezepte, Techtree bezahlbar → Techtree', () => {
   const s = fresh(), before = snapshot(D, s);

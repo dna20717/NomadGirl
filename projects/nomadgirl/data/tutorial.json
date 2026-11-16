@@ -298,17 +298,17 @@
   "mode": "camp"
  },
  "kiste": {
-  "name": "Die Kiste",
+  "name": "Das Camp-Lager",
   "chapter": "camp",
   "order": 40,
   "text": "",
   "media": "slides",
   "slides": [
-   {"look": "tut_kiste_1", "caption": "Die Kiste ist das Lager des Camps."},
-   {"look": "tut_kiste_2", "caption": "Was hier liegt, bleibt im Camp, auch wenn ein Run schiefgeht."}
+   {"look": "tut_kiste_1", "caption": "Kofferraum und Lagerregale bilden zusammen das Camp-Lager. Die Regale geben nur Platz dazu."},
+   {"look": "tut_kiste_2", "caption": "Was hier liegt, bleibt im Camp, auch wenn ein Run schiefgeht. Nach dem Run: Alles einlagern."}
   ],
   "trigger": "near",
-  "on": "Kiste",
+  "on": "Kofferraum",
   "mode": "camp"
  },
  "kochen": {

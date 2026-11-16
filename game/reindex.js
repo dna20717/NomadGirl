@@ -7,11 +7,11 @@
 import { addEntry, newGrid } from './inventory.js';
 import { remap as remapDecor } from './decor.js';
 
-// the contents of a grid that is gone: into the chest, the Kofferraum, and what is left lies as a bundle next to the van
+// the contents of a grid that is gone: into the Camp-Lager (#041), and what is left lies as a bundle next to the van
 export function rehome(D, s, g) {
-  const grids = s.inv?.grids || {};
+  const camp = s.inv?.grids?.camp;
   let rest = (g.items || []).map(e => ({ ...e }));
-  for (const key of ['chest', 'rig:0']) if (grids[key]) rest = rest.map(e => ({ ...e, n: addEntry(D, grids[key], e, e.n) })).filter(e => e.n > 0);
+  if (camp) rest = rest.map(e => ({ ...e, n: addEntry(D, camp, e, e.n) })).filter(e => e.n > 0);
   if (rest.length) {
     const pile = { x: null, feet: null, grid: newGrid(Math.max(4, g.w || 4), Math.max(3, g.h || 3)) };
     // the bundle grows until everything is in (#019: it used to drop what did not fit)

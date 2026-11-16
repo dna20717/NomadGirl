@@ -40,9 +40,10 @@ check('Esc schließt die Karte (kein Pause-Menü dahinter), Lektion ist gesehen'
 v = await ev(() => { nomad.step(300); return TU().state(); });
 check('Gleich danach keine zweite Karte (Abstand)', !v.open, v);
 
-// a prompt: near the chest → „Die Kiste“
-v = await ev(() => { nomad.goTo('Kiste'); nomad.step(20); const first = TU().state().lesson; if (first === 'feuer') { TU().close(); nomad.step(200); nomad.goTo('Kiste'); nomad.step(20); } return { ...TU().state(), first, slides: document.querySelectorAll('.tut-slide').length }; });   // on the way she passes the fire: its card first
-check('Hinweis „Kiste“ sichtbar → Lektion „Die Kiste“ (Slideshow)', v.open && v.lesson === 'kiste' && v.slides === 2, v);
+// a prompt: near the Kofferraum → „Das Camp-Lager“ (#041: the camp chest is gone, the van's rear door opens the Camp-Lager)
+v = await ev(() => { const go = () => { nomad.goTo('Kofferraum'); nomad.step(20); };
+  go(); const first = TU().state().lesson; if (first && first !== 'kiste') { TU().close(); nomad.step(200); go(); } return { ...TU().state(), first, slides: document.querySelectorAll('.tut-slide').length }; });   // on the way she may pass the fire: its card first
+check('Hinweis „Kofferraum“ sichtbar → Lektion „Das Camp-Lager“ (Slideshow)', v.open && v.lesson === 'kiste' && v.slides === 2, v);
 v = await ev(() => { const a = TU().state().slide; TU().act('right'); const b = TU().state().slide; return { a, b, src: document.querySelector('.tut-slide.on img')?.getAttribute('src') }; });
 check('Slideshow blättert, Bilder aus dem Spiel', v.a === 0 && v.b === 1 && /tut_kiste_2\.webp$/.test(v.src || ''), v);
 await shot('slides');

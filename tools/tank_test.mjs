@@ -25,8 +25,8 @@ check('Anzeige tippt Text, Gesicht lächelt, wenn Leyla davor steht', v.text.len
 await shot('stable');
 
 // maintenance at the tank: E opens the window with the tank bar, Notflicken brings condition back
-v = await ev(() => { const s = nomad.save(); s.tank.cond = 62; s.tank.at = s.day * 24 + s.hour;
-  const g = s.inv.grids.chest; g.items.push({ a: 'items', id: 'panzertape', n: 4, x: 7, y: 4, r: 0 }, { a: 'items', id: 'schrott', n: 2, x: 6, y: 4, r: 0 });
+v = await ev(async () => { const s = nomad.save(); s.tank.cond = 62; s.tank.at = s.day * 24 + s.hour;
+  const I = await import('/game/inventory.js'), D = game.scene.getScene('play').data_, g = s.inv.grids.camp; I.add(D, g, 'items', 'panzertape', 4); I.add(D, g, 'items', 'schrott', 2);   // into the Camp-Lager (#041)
   nomad.step(1, [], ['grab']); nomad.step(3); const open = game.scene.getScene('play').hud.craft.isOpen, bar = document.querySelector('.craft-tank')?.textContent;
   const btn = [...document.querySelectorAll('.craft-recipe')].find(r => r.textContent.includes('Notflicken'))?.querySelector('button'); btn?.click();
   return { open, bar, cond: Math.round(s.tank.cond) }; });
