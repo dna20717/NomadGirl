@@ -400,7 +400,7 @@ Daniel, 16.11.2026: „Ich möchte, dass wir uns jetzt mit dem Sozialsystem ause
 
 #### Beziehungen
 
-- **Vertrauen zu Leyla** in Stufen, je Person mit eigener Geschichte (Hades-Prinzip: Kernfiguren handgeschrieben, Gewürfelte aus Bausteinen). Vertrauen öffnet Gespräche, Aufträge, Boni, Geheimnisse.
+- **Vertrauen zu Leyla** als Baum (5 Stufen, Perk-Wahl, Wendepunkt mit großer Entscheidung, die eine andere Figur treffen kann; Details `docs/crew.md`), je Person mit eigener Geschichte (Hades-Prinzip: Kernfiguren handgeschrieben, Gewürfelte aus Bausteinen). Vertrauen öffnet Gespräche, Aufträge, Boni, Geheimnisse.
 - **Crew-Netz:** Freundschaft und Rivalität untereinander, entsteht aus Eigenheiten und gemeinsamen Erlebnissen und löst Ereignisse aus.
 - **Das Feuer als Bühne** (⚠️ vorläufig, Ava): Abends setzt sich die Crew ans Lagerfeuer. Dort passieren Geschichten, Streit und Vertrauens-Szenen; Leyla setzt sich dazu (vorhandenes Hinsetzen am Feuer).
 
@@ -459,7 +459,7 @@ Daniel, 16.11.2026: „Ich möchte, dass wir uns jetzt mit dem Sozialsystem ause
 #### Offen
 
 - [ ] Braucht der Fatbird auch eine Crew (aus „Endgame-Zugmaschinen“)?
-- [ ] Wer sind die neuen Kernfiguren (Anzahl, Geschichten)? Eigene Schreib-Session.
+- [x] Kernfiguren: sechs (Schraube, Onkel Sung, Doc Mirela, Sergeant Moll, Lucky Ferro, Pixie), Vertrauensbaum mit Wendepunkten, ausgeschrieben in `docs/crew.md` (Schreib-Session 16.11.2026).
 - [ ] Aussehen der gewürfelten Siedler: Bausatz wie beim Raider (Köpfe, Körper, Farben)? Kostet PixelLab (unter 700: nur mit Freigabe).
 - [ ] Welche Gangs und Siedlungen gibt es, und wo liegen ihre Gebiete auf der Karte?
 

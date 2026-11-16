@@ -74,6 +74,7 @@ tools/ng.js            Kommandozeile für Daten
 tools/play.mjs         Spiel per Kommandozeile (kopflos)
 projects/nomadgirl/    Spieldaten (project.json + data/*.json)
 docs/design.md         Game Design Document
+docs/crew.md           Kernfiguren der Crew (Geschichten, Vertrauensbäume)
 docs/glossary.md       Deutsch → Englisch
 docs/assets.md         alle Assets mit Herkunft (KI/Code)
 docs/backlog.md        offene Punkte, technische Schulden, Relikte (Durchsicht 12.11.2026)
