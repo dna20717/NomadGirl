@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Code → Ava: #046 Marken-Logos + Markenschild im Tooltip läuft (Daniels Auftrag im Code-Chat, PixelLab max. 75).
 - 16.11. Code → Ava: Ohne Ticket (Daniel): Marken englisch mit Slogans (Neon Noodle, Kessler Cybernetics, Salt Lake Motel, Delta Bureau of Order, Crow & Sons Salvage, Mile King, Vulkan Defense Systems, Kessler Cosmetics …), Ortsnamen alter Spielstände werden nachgewürfelt (NAMES_VERSION 3). ⚠️ Slogans von Ava.
 - 16.11. Code → Ava: #045 Lore-Datenbank fertig: Werkstatt › LORE › Marken (15 Marken, Lore, Stellung, Spielwerte), Reisekarte liest dort, Implantate und Haarfarben mit Hersteller. Details `docs/features/lore.md`.
 - 16.11. Code → Ava: #045 Lore-Datenbank Marken läuft (Daniels Auftrag im Code-Chat).
@@ -705,3 +706,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Fertig, wenn:** Bereich „Marken“ in der Werkstatt, Reisekarte unverändert, Implantate und Färbemittel mit Hersteller, Spielwerte wirken, Tests grün, Build grün auf `main`.
 - **Rückfragen:** (Code) ⚠️ vorläufig: 15 Marken (8 von der Karte, 3 Kosmetik, 4 neue Cyberware/Militär), Lore-Texte, Zuordnung der Implantate (Backalley Chrome 7, NeuroLux 6, Vulkan 7, Kessler 6, Ghostwire 4), Spielwerte (z. B. Kessler Q +15, Backalley Q −15); Preis wirkt nur auf Werte-Anzeigen und Aufträge (Gegenstände werden sonst nirgends verkauft); `CLAUDE.md` gekürzt (unter 20 KB).
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 189/189, Browser 39/39 (neu `test/brands.test.js`, cyberware_test rechnet mit Qualität). PixelLab 0. **Bitte testen:** Werkstatt › LORE › Marken; Reisekarte sieht aus wie vorher; Tooltip eines Implantats nennt den Hersteller; Spiegel zeigt die Marken.
+
+### #046 Marken-Logos und Markenschild im Tooltip
+- **Status:** läuft · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Für:** Code
+- **Lesen:** docs/features/lore.md, docs/features/worldmap.md › Marken
+- **Auftrag (Daniel, 16.11.2026):** „In den Tooltips markierter Items gerne die Logos und Brands mit anzeigen.“ Antworten: **Logos für die sieben Marken ohne Logo mit PixelLab („dann müssen die Logos auch wirklich richtig geil werden“, max. 75 Generierungen)**, Markenschild = **Logo + Name in Markenfarbe + Slogan**.
+- **Fertig, wenn:** 15 Marken mit Logo im Raster, Tooltip mit Markenschild, Werkstatt zeigt das Logo, Tests grün, Build grün auf `main`.
+- **Rückfragen:**
+- **Ergebnis:**
+
