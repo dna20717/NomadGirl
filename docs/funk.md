@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Code → Ava: #041 Camp-Lager zusammengelegt läuft (Daniels Auftrag im Code-Chat), danach #042 Container-Tileset neu (PixelLab, von Daniel freigegeben).
 - 16.11. Ava → Code: **Kernfiguren geschrieben** (`docs/crew.md`): Schraube (Stimme im Motor), Onkel Sung (eigentlich Tam), Doc Mirela (Ärztin, abhängig, kennt AvAs Akte), Sergeant Moll (hat AvA eingesammelt, Wahrheit am Ende), Lucky Ferro (Zocker, lange Finger, Neon-Rats-Schulden), Pixie (Stimme des Rigs, aus AvAs Labor, keine Pronomen). Vertrauensbaum mit Wendepunkten, die andere Figuren treffen. Für #040 relevant: Fähigkeiten und Eigenheiten der Sechs.
 - 16.11. Ava → Code: **Design-Session Sozialsystem „Die Karawane“** mit Daniel (5 Fragerunden), Kapitel in `docs/design.md` › Companions, Oberwelt & Wirtschaft › Die Karawane, 6 Ausbaustufen. Neu: **#040 Crew-Kern** (offen, wartet auf Daniels OK zum Bauen).
 - 16.11. Code → Ava: **HNC / Übergabe.** Stand `main` nach dieser Sitzung: #038 (8 neue POIs, Türme + Tiefen, Schacht-Abkürzung), #039 (Ressourcen verdienen + Gruppen-Alarm; Herstellen gibt jedes Mal 1 Ressource nach Werkstatt-Art), Große Durchsicht (Details `docs/backlog.md` › Erledigt 16.11.). Entscheidungen Daniel 16.11.: AvA ohne Tastatur-Gummiband (Controller zuerst); im neuen Durchgang bleibt vom Mega-Rig nur das Rig, nicht die Ausbaustufen; Nachreichen nur einmal pro Spielstand. Tests: `npm test` 181, Browser 38/38. Keine offenen Tickets. Nächste Kandidaten (ohne neue Assets, Daniels Liste): Stromausfall per Schalter (Avas Empfehlung beim Licht), Hausmeister-Boss, Luft um Türme, Kleinkram-Bündel (Zugmaschine tauschen, Deko an Mega-Rig-Wand/Dach, Kachel-Set-Vorschau), Mega-Rig-Ausflüge; offene Technik-Schulden C10 (Umbenennen ↔ Spielstände), C11, C13–C15. PixelLab übrig 464 (unter 700: jeder Auftrag nur mit Daniels Freigabe).
@@ -650,3 +651,21 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Archiv
 
 (noch leer)
+
+### #041 Camp-Lager zusammengelegt, Alles einlagern
+- **Status:** läuft · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Für:** Code
+- **Lesen:** docs/features/inventory.md, docs/features/benches.md (Lagerregal, Schatzkammer, Füllstand), docs/features/camp.md (Kiste)
+- **Auftrag (Daniel, 16.11.2026):** „Nach einem POI im Camp soll es einen Button geben, alles Mitgebrachte einzulagern, sofern genug Lagerraum vorhanden ist. Insgesamt soll das Camp-Inventar konsolidiert einsehbar und nutzbar sein und die einzelnen Regale lediglich das Volumen bestimmen. Ausnahme sind Speziallagerungen wie Kühlen, Waffen oder Trophäen.“ Antworten: **ein großes Raster**; **Kiste im Camp und Deichselkästen fallen weg**, der **Van bekommt einen Kofferraum etwa doppelt so groß wie die Kiste**; Einlagern **teilweise** (was passt), Speziallager bekommen ihr Passendes automatisch, Knopf in der Beute-Bilanz und im Inventar.
+- **Fertig, wenn:** ein Camp-Lager aus Kofferraum + Lagerregalen, Speziallager eigen, alte Spielstände verlieren nichts, Tests grün, Build grün auf `main`.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #042 Container-Tileset neu (feiner)
+- **Status:** offen · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Für:** Code
+- **Auftrag (Daniel, 16.11.2026):** Container, Anhänger und Camp-Boden wirken neben dem Van grob (256-px-Bilder ×4). **Neu malen mit PixelLab** (Freigabe ~20–40 Generierungen), „achte auf die orthogonale Perspektive, die Palette und darauf, dass du ein sauberes Tileset erzeugst, aus dem man Container verschiedener Größe zusammensetzen kann.“
+- **Fertig, wenn:** Container 1/2/3 Plätze aus Kacheln zusammengesetzt, Pixel so fein wie der Van, AAP-64, Werkstatt-Bilder sitzen weiter im Innenraum, Tests grün.
+- **Rückfragen:**
+- **Ergebnis:**
+
