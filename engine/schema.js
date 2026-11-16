@@ -610,9 +610,11 @@ export const AREAS = {
     hint: 'Nahkampf, Fernkampf und Cyberdecks (Hacking, später). Leyla trägt je eine davon in ihren Slots.',
     template: { name: 'Neue Waffe', kind: 'melee', damage: 10, cooldown: 400, range: 40, knockback: 100, size: [1, 2], tier: 1, value: 20 },
     row: x => `${label(WEAPON_KINDS, x.kind)} · ${x.damage ?? 0} Schaden · ${x.cooldown ?? 0} ms`,
+    check: (x, report) => { if (!x.brand) report('hint', 'Ohne Hersteller (Lore › Marken)'); },
     sections: [
       { title: 'Waffe', fields: [NAME, LOOK, ICON, multi('tags', 'Tags', ITEM_TAGS), select('kind', 'Art', WEAPON_KINDS, { required: true }), num('tier', 'Stufe', { min: 1, max: 5 }),
         text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar: 1–3 Zeichen oder ein Emoji' }), DESCRIPTION,
+        ref('brand', 'Hersteller', 'brands', { hint: 'Daniel, 16.11.2026: „Alle Waffen im Spiel brauchen auch eine Brand“. Qualität der Marke wirkt auf den Schaden, Preis auf den Wert, „In der Beute“ auf die Häufigkeit' }),
         select('skin', 'Aussehen aus Code', [['', 'wie gemalt'], ['revolver', 'Revolver']], { hint: 'Nur Fernkampf, Test (Daniel, 12.11.2026): legt eine Waffe aus Code über die gemalte Pistole in den Posen mit ausgestreckten Armen. An der Brust bleibt vorerst die gemalte' })] },
       { title: 'Werte', fields: [num('damage', 'Schaden', { min: 0 }), num('cooldown', 'Abklingzeit', { unit: 'ms', min: 0 }), num('range', 'Reichweite', { unit: 'px', min: 0 }),
         num('knockback', 'Rückstoß', { unit: 'px/s', min: 0 }), num('critChance', 'Krit-Chance', { unit: '%', min: 0, max: 100 }), num('ammo', 'Munition', { min: 0, hint: 'Leer = unendlich' }),

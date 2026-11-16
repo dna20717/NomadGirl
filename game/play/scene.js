@@ -13,6 +13,7 @@ import { Pad, PAD_ACTIONS } from './pad.js';
 import { Fog } from './fog.js';
 import { placeForeground } from './foreground.js';
 import { applySignature } from './signature.js';
+import { qualityOf, brandWeapon } from '../brands.js';
 import { makeTextures, drawBackground, drawRoom, terrainKits, PLACEHOLDER_COLORS } from './art.js';
 import { Leyla } from './leyla.js';
 import { Enemy } from './enemies.js';
@@ -207,9 +208,10 @@ export class PlayScene extends Phaser.Scene {
   }
   // the weapon in a slot; a copy from the bench brings its own values (#013, inv.slotMods)
   weapon(slot) { const id = this.box ? this.box.save.inv?.slots?.[slot] : this.testSlots?.[slot] || this.data_.leyla?.loadout?.[slot]; const def = this.data_.weapons?.[id] || null, mods = this.box?.save.inv?.slotMods?.[slot];
-    if (!def || !mods) return def;
-    const key = id + JSON.stringify(mods), C = (this.weaponCache ??= {});   // the same object while nothing changes (leyla.js compares it)
-    if (C[slot]?.key !== key || C[slot].def !== def) C[slot] = { key, def, w: applyMods(def, mods) };
+    const q = qualityOf(this.data_, def);   // the maker's Qualität on the damage (Lore › Marken, Daniel 16.11.2026)
+    if (!def || (!mods && q === 1)) return def;
+    const key = id + JSON.stringify(mods || {}) + q, C = (this.weaponCache ??= {});   // the same object while nothing changes (leyla.js compares it)
+    if (C[slot]?.key !== key || C[slot].def !== def) C[slot] = { key, def, w: brandWeapon(this.data_, applyMods(def, mods)) };
     return C[slot].w; }
   // V / L3: the next ranged weapon from the backpack into the hand, the old one into the backpack (Daniel, 12.11.2026: „wir proben den Switch“);
   // in a test room without a savegame: through all ranged weapons

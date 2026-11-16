@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 16.11.2026: **Waffen mit Hersteller**: alle 12 Waffen haben eine Marke (Crow & Sons, Delta Bureau of Order, Mile King, Vulkan, Ghostwire, Backalley Chrome); Qualität wirkt auf den Schaden, Markenschild im Tooltip.
 - 16.11.2026: **Marken-Logos und Markenschild** (#046): sieben neue Logos (PixelLab), alle 15 Marken im Logo-Raster; Tooltips von Implantaten und Färbemitteln zeigen oben Logo, Name und Slogan des Herstellers, die Werte mit Qualität.
 - 16.11.2026: **Marken englisch mit Slogans**: Neon Noodle, Kessler Cybernetics, Salt Lake Motel, Delta Bureau of Order, Crow & Sons Salvage, Mile King, Vulkan Defense Systems, Kessler Cosmetics; alle mit englischem Slogan.
 - 16.11.2026: **Lore-Datenbank: Marken** (#045): 15 Marken mit Lore, Stellung in der Welt und Spielwerten; die Reisekarte liest ihre Marken von dort; alle 30 Implantate haben Hersteller (Qualität wirkt auf die Boni), Haarfarben heißen jetzt „Toxic Bloom · CHROMA//KILL“ und Co.; Spiegel als eigenes Fenster mit Vorschau.

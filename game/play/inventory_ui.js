@@ -13,7 +13,7 @@ import { brandStats, kindOf, sortGrid, cellsOf, boxOf, drop, remove, add, fits, 
 import { partSlots, budgets, SLOT_NAMES as PART_SLOT_NAMES } from '../rig.js';
 import { containers as storeList, stowAll, CAMP } from '../save.js';
 import { dyedUrl } from './signature.js';
-import { brandOf, valueOf } from '../brands.js';
+import { brandOf, valueOf, brandWeapon } from '../brands.js';
 // the maker of a thing (#045): „Kessler Cybernetics · Qualität +15 %“
 // the maker's plate on top of a tooltip (#046, Daniel: „in den Tooltips markierter Items die Logos und Brands mit anzeigen“):
 // logo from Lore › Marken, the name in the brand's colour, the slogan
@@ -417,7 +417,7 @@ export class InventoryUI {
     const D = this.D, t = thing(D, e.a, e.id) || {}, k = kindOf(D, e.a, e.id);
     const facts = [CATEGORY_NAMES[k], e.a === 'rigParts' ? `Slot: ${PART_SLOT_NAMES[t.slot] || t.slot}` : null, e.a === 'rigParts' && t.pull ? `+${t.pull} kg Zugkraft` : null,
       e.a === 'rigParts' && t.armor ? `+${t.armor} Panzerung` : null, e.a === 'rigParts' && t.storageRows ? `+${t.storageRows} Reihen Stauraum` : null,
-      (e.a === 'weapons' || e.a === 'rigParts') && t.damage ? `${t.damage} Schaden` : null, e.a === 'backpacks' && t.size ? `Raster ${t.size.join(' × ')}` : null,
+      (e.a === 'weapons' || e.a === 'rigParts') && t.damage ? `${(e.a === 'weapons' ? brandWeapon(D, t) : t).damage} Schaden` : null, e.a === 'backpacks' && t.size ? `Raster ${t.size.join(' × ')}` : null,
       t.wear ? `${DRONE_WEAR.includes(t.wear) ? 'AvA: ' : 'Platz: '}${WEAR_NAMES[t.wear] || t.wear}` : null, t.strain ? `Belastung ${t.strain}` : null,
       stackMax(D, e.a, e.id) > 1 ? `Stapel ${e.n}/${stackMax(D, e.a, e.id)}` : null, `${valueOf(D, t) * e.n} Δ`, brandLine(D, t), t.buff ? `Buff: ${D.buffs?.[t.buff]?.name || t.buff}` : null].filter(Boolean);
     const acts = key != null && !this.held ? this.actionsFor(key, e) : [];

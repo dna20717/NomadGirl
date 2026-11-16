@@ -41,6 +41,14 @@ test('Tooltip-Werte = wirkende Werte (Qualität auf die Boni), jede Marke hat ei
   assert.equal(new Set(Object.values(D.brands).map(b => b.icon)).size, Object.keys(D.brands).length, 'jedes Logo nur einmal');
 });
 
+test('Jede Waffe hat einen Hersteller; Qualität wirkt auf den Schaden (Daniel, 16.11.2026)', async () => {
+  const { brandWeapon } = await import('../game/brands.js');
+  for (const [id, w] of Object.entries(D.weapons)) assert.ok(D.brands[w.brand], id);
+  const w = D.weapons.schrotflinte, q = 1 + D.brands[w.brand].quality / 100;
+  assert.equal(brandWeapon(D, w).damage, Math.max(1, Math.round(w.damage * q)));
+  assert.equal(brandWeapon(D, D.weapons.bastlerdeck).damage, D.weapons.bastlerdeck.damage, 'ohne Schaden bleibt alles');
+});
+
 test('Preis und Beute: Faktoren der Marke', () => {
   const t = D.items.billig_kameraauge, b = D.brands[t.brand];
   assert.equal(valueOf(D, t), Math.round(t.value * b.price / 100));

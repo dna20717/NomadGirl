@@ -15,7 +15,8 @@
   "icon": 17,
   "tags": ["trophy"],
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrott", "count": 2},{"item": "schrauben", "count": 1}]
+  "salvage": [{"item": "schrott", "count": 2},{"item": "schrauben", "count": 1}],
+  "brand": "kraehe"
  },
  "machete": {
   "name": "Machete",
@@ -34,7 +35,8 @@
   "salvage": [{"item": "schrott", "count": 2},{"item": "stoffreste", "count": 1}],
   "look": "icons_raider_weapons",
   "icon": 0,
-  "held": {"class": "light", "look": "icons_raider_weapons", "icon": 0, "grip": [14, 32], "tip": [125, 30], "cm": 60}
+  "held": {"class": "light", "look": "icons_raider_weapons", "icon": 0, "grip": [14, 32], "tip": [125, 30], "cm": 60},
+  "brand": "kraehe"
  },
  "schockstab": {
   "name": "Schockstab",
@@ -53,7 +55,8 @@
   "salvageAt": "werkbank",
   "salvage": [{"item": "batteriezelle", "count": 1},{"item": "kupferkabel", "count": 1},{"item": "technik", "count": 1}],
   "look": "icons_misc",
-  "icon": 13
+  "icon": 13,
+  "brand": "ordnungsamt"
  },
  "trommelrevolver": {
   "name": "Trommelrevolver",
@@ -78,7 +81,8 @@
   "skin": "revolver",
   "description": "Sechs Schuss, schwer in der Hand, laut wie ein Gewitter. Test: Aussehen aus Code.",
   "salvageAt": "werkbank",
-  "salvage": [{"item": "zahnraeder", "count": 1},{"item": "schrott", "count": 2},{"item": "technik", "count": 1}]
+  "salvage": [{"item": "zahnraeder", "count": 1},{"item": "schrott", "count": 2},{"item": "technik", "count": 1}],
+  "brand": "ordnungsamt"
  },
  "nagelpistole": {
   "name": "Nagelpistole",
@@ -101,7 +105,8 @@
   "tags": ["trophy"],
   "salvageAt": "werkbank",
   "salvage": [{"item": "schrauben", "count": 2},{"item": "batteriezelle", "count": 1}],
-  "held": {"class": "pistol", "look": "icons_raider_weapons", "icon": 3, "grip": [44, 36], "tip": [98, 7], "cm": 32}
+  "held": {"class": "pistol", "look": "icons_raider_weapons", "icon": 3, "grip": [44, 36], "tip": [98, 7], "cm": 32},
+  "brand": "kilometerkoenig"
  },
  "schrotflinte": {
   "name": "Schrotflinte",
@@ -125,7 +130,8 @@
   "look": "icons_raider_weapons",
   "icon": 5,
   "hands": 2,
-  "held": {"class": "long", "look": "icons_raider_weapons", "icon": 5, "grip": [36, 34], "tip": [124, 21], "cm": 75}
+  "held": {"class": "long", "look": "icons_raider_weapons", "icon": 5, "grip": [36, 34], "tip": [124, 21], "cm": 75},
+  "brand": "vulkan"
  },
  "bastlerdeck": {
   "name": "Bastler-Deck",
@@ -142,7 +148,8 @@
   "look": "icons_gear",
   "icon": 42,
   "salvageAt": "werkbank",
-  "salvage": [{"item": "chip", "count": 1},{"item": "alte_platine", "count": 1},{"item": "wissen", "count": 1},{"item": "technik", "count": 1}]
+  "salvage": [{"item": "chip", "count": 1},{"item": "alte_platine", "count": 1},{"item": "wissen", "count": 1},{"item": "technik", "count": 1}],
+  "brand": "ghostwire"
  },
  "karambit": {
   "name": "Karambit",
@@ -161,7 +168,8 @@
   "icon": 52,
   "tags": ["trophy"],
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrott", "count": 1}]
+  "salvage": [{"item": "schrott", "count": 1}],
+  "brand": "backalley_chrome"
  },
  "sturmgewehr": {
   "name": "Sturmgewehr",
@@ -204,7 +212,8 @@
   "salvageAt": "werkbank",
   "salvage": [{"item": "zahnraeder", "count": 2},{"item": "schrott", "count": 3},{"item": "schrauben", "count": 2},{"item": "technik", "count": 3}],
   "hands": 2,
-  "held": {"class": "long", "look": "icons_raider_weapons", "icon": 6, "grip": [46, 42], "tip": [121, 21], "cm": 85}
+  "held": {"class": "long", "look": "icons_raider_weapons", "icon": 6, "grip": [46, 42], "tip": [121, 21], "cm": 85},
+  "brand": "vulkan"
  },
  "nagelkeule": {
   "name": "Nagelkeule",
@@ -224,7 +233,8 @@
   "tags": ["trophy"],
   "held": {"class": "light", "look": "icons_raider_weapons", "icon": 1, "grip": [16, 31], "tip": [125, 31], "cm": 80},
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrauben", "count": 2},{"item": "stoffreste", "count": 1}]
+  "salvage": [{"item": "schrauben", "count": 2},{"item": "stoffreste", "count": 1}],
+  "brand": "backalley_chrome"
  },
  "rohrhammer": {
   "name": "Rohrhammer",
@@ -245,7 +255,8 @@
   "tags": ["trophy"],
   "held": {"class": "heavy", "look": "icons_raider_weapons", "icon": 2, "grip": [34, 30], "tip": [125, 31], "cm": 100},
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrott", "count": 3},{"item": "rohrbogen", "count": 1}]
+  "salvage": [{"item": "schrott", "count": 3},{"item": "rohrbogen", "count": 1}],
+  "brand": "kraehe"
  },
  "rohrpistole": {
   "name": "Rohrpistole",
@@ -271,6 +282,7 @@
   "tags": ["trophy"],
   "held": {"class": "pistol", "look": "icons_raider_weapons", "icon": 4, "grip": [32, 44], "tip": [106, 15], "cm": 34},
   "salvageAt": "werkbank",
-  "salvage": [{"item": "schrott", "count": 2},{"item": "batteriezelle", "count": 1},{"item": "technik", "count": 1}]
+  "salvage": [{"item": "schrott", "count": 2},{"item": "batteriezelle", "count": 1},{"item": "technik", "count": 1}],
+  "brand": "backalley_chrome"
  }
 }

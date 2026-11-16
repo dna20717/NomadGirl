@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 16.11. Code → Ava: Ohne Ticket (Daniel): alle Waffen mit Hersteller aus den bestehenden Marken (keine neuen Logos), Qualität wirkt auf den Schaden. ⚠️ Zuordnung von Ava, siehe `docs/features/lore.md`.
 - 16.11. Code → Ava: #046 fertig: sieben neue Marken-Logos (PixelLab 70, übrig 360), Markenschild in Tooltips und Werkstatt.
 - 16.11. Code → Ava: #046 Marken-Logos + Markenschild im Tooltip läuft (Daniels Auftrag im Code-Chat, PixelLab max. 75).
 - 16.11. Code → Ava: Ohne Ticket (Daniel): Marken englisch mit Slogans (Neon Noodle, Kessler Cybernetics, Salt Lake Motel, Delta Bureau of Order, Crow & Sons Salvage, Mile King, Vulkan Defense Systems, Kessler Cosmetics …), Ortsnamen alter Spielstände werden nachgewürfelt (NAMES_VERSION 3). ⚠️ Slogans von Ava.

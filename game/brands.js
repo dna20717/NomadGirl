@@ -12,3 +12,8 @@ export const valueOf = (D, t) => Math.round((t?.value || 0) * priceOf(D, t));
 // the brands of the travel map (worldmap.js): every brand with „Auf der Karte“, in the shape the map has always used
 export const mapBrands = D => Object.entries(D.brands || {}).filter(([, b]) => b.map?.on && b.name)
   .map(([id, b]) => ({ id, name: b.name, short: b.short || b.name, slogan: b.slogan || '', kind: b.map.kind || '', icon: b.icon ?? b.map.icon ?? 0, color: b.color || '#ffd27a', weight: b.map.weight ?? 1 }));
+// a weapon as it hits: damage × its maker's Qualität (Daniel, 16.11.2026: „Alle Waffen im Spiel brauchen auch eine Brand“, Schaden ± Qualität)
+export function brandWeapon(D, w) {
+  const q = qualityOf(D, w);
+  return !w || q === 1 || !(w.damage > 0) ? w : { ...w, damage: Math.max(1, Math.round(w.damage * q)) };
+}

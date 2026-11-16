@@ -153,7 +153,7 @@ export function rollLoot(D, tableId, rnd = Math.random) {
   const T = D.lootTables?.[tableId];
   if (!T?.entries?.length) return [];
   // the maker's „In der Beute“ (#045) scales the weight of its products
-  const w = e => (e.weight || 0) * (e.item ? lootOf(D, D.items?.[e.item]) : 1);
+  const w = e => (e.weight || 0) * (e.weapon ? lootOf(D, D.weapons?.[e.weapon]) : e.item ? lootOf(D, D.items?.[e.item]) : 1);
   const [r0, r1] = T.rolls || [1, 1], rolls = r0 + Math.floor(rnd() * (r1 - r0 + 1)), total = T.entries.reduce((s, e) => s + w(e), 0), out = [];
   for (let i = 0; i < rolls && total > 0; i++) {
     let k = rnd() * total;
