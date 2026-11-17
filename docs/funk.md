@@ -155,13 +155,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ```
 
 ### #052 Glitch-Duell im Hauptspiel
-- **Status:** läuft · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/glitchlings.md, docs/features/pois.md, docs/features/ui.md
 - **Auftrag (Daniel, 17.11.2026):** „Die ganze Kampfanimation, das ganze Kampfinterface für die Duelle so anpassen, dass es im Hauptspiel als Overlay funktionieren würde und sich nahtlos in die vorhandenen UI-UX-Konventionen eingliedert … alle Hebel, die Türen öffnen, durch Schalter ersetzen, die man erst bedienen kann, wenn man ein Duell ausgetragen hat. Dabei geht es nicht darum, zwangsläufig zu gewinnen. Das Gewinnen ist nur dafür da, die KI zu fangen … KIs in verschiedenen anderen Dingen versteckt, so dass, wenn man da vorbeigeht, durch die normale Aktionsbelegung (Stick nach oben oder E) das Duell-Event getriggert wird.“
 - **Fertig, wenn:** Duell-Overlay im Spiel (Rahmen, Hilfezeile, ✕, Tastatur und Controller, pausiert), Schalter in POIs starten ein Duell und öffnen danach die Tür, Sieg fängt die KI (ins Deck), KIs in Automaten per E/↑, Tests, Build grün auf `main`.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: ohne Glitchling im Deck kämpft AvA (2 Bit); Aufgeben zählt als ausgetragen; Schalter legt nach dem Duell sofort um; Unikate wohnen in keinem Schalter/Automaten; Automaten-KIs auch in fünf weiteren POIs; Tempo und Integrität wie in der Demo (Dauerfeuer, 50).
+- **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 220/220 (neu `test/glitch_world.test.js`), Browser alle grün (neu `tools/glitch_duel_test.mjs`, `poi_test`/`poi_stack_test` mit Duell). PixelLab 0. **Bitte testen:** Run zur Mile 7 Gas & Go: an einem NomadCola-Automaten E/↑, am Schalter in der Kammer E/↑, mit Controller ←/→ und A.
 
 ### #051 Glitch-Duell: Bit-Stapel
 - **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)

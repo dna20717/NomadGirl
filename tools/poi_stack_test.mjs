@@ -57,11 +57,13 @@ const shot = async (page, name) => {
     let st = nomad.until(st => st.leyla.feet >= F * T - 70 && st.leyla.state !== 'climb', 1800, ['down']);
     const sw = nomad.state().level.switches.at(-1);
     nomad.until(st => Math.abs(st.leyla.x - sw.x) < 50, 300, [st.leyla.x < sw.x ? 'right' : 'left']);
-    nomad.step(5); const p = nomad.state().prompt; nomad.step(1, [], ['grab']); nomad.step(80);
+    nomad.step(5); const p = nomad.state().prompt; nomad.step(1, [], ['grab']); nomad.step(2);
+    // #052: the switch first asks for a Glitch-Duell (won or lost, afterwards it is thrown); the duel runs out at once and closes
+    const D_ = game.scene.getScene('play').hud.duel, duel = !!D_?.isOpen; D_?.quick(); D_?.close(); nomad.step(80);
     const lv = nomad.state().level, door = lv.doors.find(d => d.x0 === L.shortcut.door[0]);
-    return { p, feet: nomad.state().leyla.feet, F: F * T, door, room: sc.roomName };
+    return { p, duel, feet: nomad.state().leyla.feet, F: F * T, door, room: sc.roomName };
   });
-  check('Turm: den Schacht hinunter bis zum Schalter', s.p === 'Schalter umlegen' && s.room === 'Abkürzung', s);
+  check('Turm: den Schacht hinunter bis zum Schalter (Glitch-Duell)', s.p === 'Schalter hacken · Glitch-Duell' && s.duel && s.room === 'Abkürzung', s);
   check('Turm: Schalter öffnet die Tür in die Lobby', s.door?.open === true, s);
   await shot(page, 'tower_shaft');
   // overview: the whole tower, zoomed out
@@ -87,7 +89,9 @@ const shot = async (page, name) => {
     const sc = game.scene.getScene('play'), L = sc.levelInfo, T = sc.T, [dx, dy] = L.shortcut.door;
     const sw = nomad.state().level.switches.find(w => Math.abs(w.x / T - dx) < 6);
     nomad.tp(sw.x, sw.feet - 2); nomad.step(10);
-    const p = nomad.state().prompt; nomad.step(1, [], ['grab']); nomad.step(80);
+    const p = nomad.state().prompt; nomad.step(1, [], ['grab']); nomad.step(2);
+    // #052: the switch first asks for a Glitch-Duell (won or lost, afterwards it is thrown); the duel runs out at once and closes
+    const D_ = game.scene.getScene('play').hud.duel, duel = !!D_?.isOpen; D_?.quick(); D_?.close(); nomad.step(80);
     const door = nomad.state().level.doors.find(d => d.x0 === dx);
     const [ux, uy] = L.shortcut.up;
     // through the open door to the ladder, up
@@ -95,9 +99,9 @@ const shot = async (page, name) => {
     nomad.until(st => st.leyla.state === 'climb', 60, ['up'], ['up']);
     const st = nomad.until(st => st.leyla.state === 'normal' && st.leyla.feet <= uy * T + 4, 2400, ['up']);
     nomad.step(10);
-    return { p, door, feet: st.leyla.feet, want: uy * T, room: sc.roomName };
+    return { p, duel, door, feet: st.leyla.feet, want: uy * T, room: sc.roomName };
   });
-  check('Tiefe: Schalter im Ausgang öffnet die Tür zum Schacht', s.p === 'Schalter umlegen' && s.door?.open === true, s);
+  check('Tiefe: Schalter im Ausgang (nach dem Duell) öffnet die Tür zum Schacht', s.p === 'Schalter hacken · Glitch-Duell' && s.duel && s.door?.open === true, s);
   check('Tiefe: durch den Schacht hoch bis zum Eingang', Math.abs(s.feet - s.want) < 10, s);
   await shot(page, 'deep_top');
   if (shots) {

@@ -258,7 +258,7 @@ function brandKit(scene) {
   const D = scene.data_, rows = (D?.pois?.[scene.levelPoi]?.brandProps || []).filter(b => b.look && scene.textures.exists(b.look));
   if (!rows.length) return null;
   const A = D.assets || {}, L = A[D.leyla?.look?.idle], sizes = new Map(), list = [];
-  for (const b of rows) { const i = (A[b.look]?.names || []).indexOf(b.name); if (i < 0) continue; scene.textures.get(b.look).setFilter(1); if (b.cm > 0) sizes.set(b.look + '#' + i, b.cm); list.push({ key: b.look, frame: i, cm: b.cm || 100, chance: b.chance ?? 5 }); }
+  for (const b of rows) { const i = (A[b.look]?.names || []).indexOf(b.name); if (i < 0) continue; scene.textures.get(b.look).setFilter(1); if (b.cm > 0) sizes.set(b.look + '#' + i, b.cm); list.push({ key: b.look, frame: i, cm: b.cm || 100, chance: b.chance ?? 5, ai: !!b.ai }); }
   return list.length ? { def: {}, sizes, pxPerCm: (L?.height || 192) / (D.game?.tiles?.leylaCm || 170), maxScale: 5, list } : null;
 }
 export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = null) {
@@ -319,7 +319,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       if (top && air && !cg && brands && !taken.has(x) && solid(x - 1, y) && solid(x + 1, y)) {   // Marken-Clutter (brandKit)
         const B = brands.list[Math.floor(hash(x, y, 31) * brands.list.length)], tall = Math.ceil(B.cm * brands.pxPerCm / T);
         let room_ = true; for (let k = 1; k <= tall; k++) if (room.tiles[y - k]?.[x] !== '.') room_ = false;
-        if (room_ && hash(x, y, 37) * 100 < B.chance) { clutter.push(placed(brands, B.key, B.frame, px + T / 2, py + 4)); taken.add(x); }
+        if (room_ && hash(x, y, 37) * 100 < B.chance) { clutter.push({ ...placed(brands, B.key, B.frame, px + T / 2, py + 4), ai: B.ai }); taken.add(x); }   // ai: a KI lives in it (poi_level.js hosts, #052)
       }
       if (top && air && !cg && !taken.has(x) && kit.clutter.length && solid(x - 1, y) && solid(x + 1, y) && hash(x, y, seed + 3) * 100 < (D.clutterChance ?? 0))
         clutter.push(placed(kit, kit.props, kit.clutter[Math.floor(hash(x, y, seed + 4) * kit.clutter.length)], px + T / 2, py + 4));

@@ -43,6 +43,7 @@ import { Tutorial } from './tutorial.js';
 import { AchievementsUI } from './achievements_ui.js';
 import { QuestLogUI } from './questlog_ui.js';
 import { SummaryUI } from './summary_ui.js';
+import { GlitchDuelUI } from './glitch_duel_ui.js';
 import { snapshot as runSnapshot, compare as runCompare } from '../summary.js';
 import { use as useThing, learnAll, learnNote } from '../crafting.js';
 import { bump, level as achieveLevel, check as achieveCheck, bonuses as trophyBonuses } from '../achievements.js';
@@ -414,6 +415,7 @@ export class PlayScene extends Phaser.Scene {
   // ---------- inventory (game/play/inventory_ui.js, game/inventory.js) ----------
   setupInventory() {
     this.hud.scene = this;
+    this.hud.duel ??= new GlitchDuelUI(this.hud.root, { scene: () => this.hud.scene });   // Glitch-Duell (#052): also in test rooms without a savegame
     if (!this.box) return;
     const hud = this.hud;
     hud.floor ??= new FloorStrip(hud.root, this.data_);   // Boden-Leiste (floor_strip.js)
@@ -670,7 +672,7 @@ export class PlayScene extends Phaser.Scene {
   }
   useByUp() {
     const l = this.leyla, h = this.hud, G = this.data_.game?.gamepad || {};
-    if (G.useUp === false || !l?.alive || h.modal || h.paused || h.inv?.isOpen || h.craft?.isOpen || (h.tech?.isOpen || h.map?.isOpen) || h.build?.active) return false;
+    if (G.useUp === false || !l?.alive || h.modal || h.paused || h.duel?.isOpen || h.inv?.isOpen || h.craft?.isOpen || (h.tech?.isOpen || h.map?.isOpen) || h.build?.active) return false;
     if (!h.promptText || (h.promptKey || 'E') !== 'E' || h.promptEl?.hidden) return false;
     return l.state === 'normal' && (l.body.blocked.down || l.body.touching.down) && Math.abs(l.body.velocity.x) <= (l.m.walkSpeed ?? 240) * 1.15;
   }
@@ -681,6 +683,7 @@ export class PlayScene extends Phaser.Scene {
     const eat = () => { for (const k of ['jump', 'grab', 'dash', 'up', 'down', 'left', 'right', 'melee', 'ranged', 'reload', 'holster']) if (input[k]) input[k].pressed = false; };
     if (hud.tut?.isOpen) { hud.tut.nav(u); eat(); input.help.pressed = false; return; }   
     if (hud.sum?.isOpen) { hud.sum.nav(u); eat(); input.help.pressed = false; return; }   // Beute-Bilanz (#017)
+    if (hud.duel?.isOpen) { hud.duel.nav(u); eat(); input.help.pressed = false; return; }   // Glitch-Duell (#052)
     if (hud.megaBuild?.isOpen) { hud.megaBuild.nav(u); eat(); input.help.pressed = false; return; }   // build plan aboard (#029)
     if (hud.quests?.isOpen) { hud.quests.nav(u); eat(); input.help.pressed = false; return; }   // Questlog (#016)
     if (hud.ach?.isOpen) { hud.ach.nav(u); eat(); input.help.pressed = false; return; }   // Menü › Achievements (#012)   // the field guide card / archive (#011)
@@ -745,7 +748,7 @@ export class PlayScene extends Phaser.Scene {
     // every window pauses the game (Daniel, 12.11.2026: „Fenster pausieren immer, auch im Run“): menus, controls, cooking and the inventory
     let invDone = false;
     if (this.hud.inv?.isOpen && !this.hud.paused && !this.hud.modal && !this.leaving) { this.inventoryUpdate(input); invDone = true; }
-    if (this.hud.tut?.isOpen || this.hud.ach?.isOpen || this.hud.quests?.isOpen || this.hud.megaBuild?.isOpen || this.hud.sum?.isOpen || this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
+    if (this.hud.tut?.isOpen || this.hud.ach?.isOpen || this.hud.quests?.isOpen || this.hud.megaBuild?.isOpen || this.hud.sum?.isOpen || this.hud.duel?.isOpen || this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
       // cooking, crafting, a menu: the workshops keep glowing, steaming and sparking behind the window
       if (this.camp && !this.hud.paused && !this.leaving) { this.camp.benches?.update(time, Math.min(delta, 50)); this.camp.lid?.(Math.min(delta, 50)); }
       this.physics.world.pause(); this.hud.update(this, time); return;

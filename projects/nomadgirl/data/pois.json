@@ -19,14 +19,14 @@
   "curve": "30, 75, 20, 90, 100",
   "gang": {"name": "Yellow Vultures", "color": "Gelb", "motto": "Wer tankt, zahlt. Wer nicht zahlt, tankt Blei."},
   "brandProps": [
-   {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 6},
-   {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 4},
-   {"look": "icons_nomadcola", "name": "Automat (Creme)", "cm": 175, "chance": 2},
+   {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 6, "ai": true},
+   {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 4, "ai": true},
+   {"look": "icons_nomadcola", "name": "Automat (Creme)", "cm": 175, "chance": 2, "ai": true},
    {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 4},
    {"look": "icons_nomadcola", "name": "Kiste mit Flaschen (Holz)", "cm": 40, "chance": 4},
    {"look": "icons_nomadcola", "name": "Sechserpack Dosen", "cm": 20, "chance": 3},
-   {"look": "icons_nomadcola", "name": "Automat (vernagelt)", "cm": 180, "chance": 3},
-   {"look": "icons_nomadcola", "name": "Automat (Neon)", "cm": 180, "chance": 2},
+   {"look": "icons_nomadcola", "name": "Automat (vernagelt)", "cm": 180, "chance": 3, "ai": true},
+   {"look": "icons_nomadcola", "name": "Automat (Neon)", "cm": 180, "chance": 2, "ai": true},
    {"look": "icons_nomadcola", "name": "Kistenstapel", "cm": 80, "chance": 3}
   ]
  },
@@ -46,7 +46,12 @@
   "description": "Ein Konsumtempel am Stadtrand, halb eingestürzt. Die Rolltreppen laufen nicht mehr, die Kakerlaken schon.",
   "branchChance": 70,
   "curve": "35, 80, 25, 70, 30, 95, 100",
-  "gang": {"name": "Neon Rats", "color": "Magenta", "motto": "Alles muss raus. Du zuerst."}
+  "gang": {"name": "Neon Rats", "color": "Magenta", "motto": "Alles muss raus. Du zuerst."},
+  "brandProps": [
+   {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 3, "ai": true},
+   {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 3, "ai": true},
+   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2}
+  ]
  },
  "bunker_13": {
   "name": "Deadlock Bunker 13",
@@ -131,7 +136,12 @@
   "branchChance": 50,
   "curve": "35, 75, 45, 100",
   "gang": {"name": "Level Five", "color": "Magenta", "motto": "Parken verboten. Atmen auch."},
-  "description": "Ein Parkhaus voller ausgebrannter Autos. Jede Ebene ein Revier, oben auf dem Dach die Kasse."
+  "description": "Ein Parkhaus voller ausgebrannter Autos. Jede Ebene ein Revier, oben auf dem Dach die Kasse.",
+  "brandProps": [
+   {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 2, "ai": true},
+   {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 2, "ai": true},
+   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2}
+  ]
  },
  "funkmast_km31": {
   "name": "Funkmast KM 31",
@@ -169,7 +179,12 @@
   "branchChance": 60,
   "curve": "25, 60, 40, 85, 100",
   "gang": {"name": "Tunnel Kings", "color": "Gelb", "motto": "Nächster Halt: Endstation."},
-  "description": "Eine U-Bahn-Station unter der Stadtgrenze. Unten im Stellwerk sitzt, wer die Linie 4 kontrolliert."
+  "description": "Eine U-Bahn-Station unter der Stadtgrenze. Unten im Stellwerk sitzt, wer die Linie 4 kontrolliert.",
+  "brandProps": [
+   {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 2, "ai": true},
+   {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 2, "ai": true},
+   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2}
+  ]
  },
  "storm_drain9": {
   "name": "Storm Drain 9",
@@ -224,7 +239,12 @@
   "branchChance": 60,
   "curve": "30, 75, 40, 85, 100",
   "gang": {"name": "Crude Boys", "color": "Orange", "motto": "Wir raffinieren alles. Auch dich."},
-  "description": "Eine Raffinerie, die noch tropft. Die Crude Boys zapfen ab, was die Tanks hergeben."
+  "description": "Eine Raffinerie, die noch tropft. Die Crude Boys zapfen ab, was die Tanks hergeben.",
+  "brandProps": [
+   {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 1, "ai": true},
+   {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 1, "ai": true},
+   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2}
+  ]
  },
  "sunny_acres": {
   "name": "Sunny Acres",
@@ -242,6 +262,11 @@
   "branchChance": 60,
   "curve": "30, 70, 100",
   "gang": {"name": "Sunny Side", "color": "Magenta", "motto": "Lächeln! Oder wir helfen nach."},
-  "description": "Ein Trailerpark am Highway. Früher Rentner, heute Leute mit Gewehren auf Liegestühlen."
+  "description": "Ein Trailerpark am Highway. Früher Rentner, heute Leute mit Gewehren auf Liegestühlen.",
+  "brandProps": [
+   {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 2, "ai": true},
+   {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 2, "ai": true},
+   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2}
+  ]
  }
 }

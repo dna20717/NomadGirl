@@ -662,6 +662,14 @@ Daniel: „Jeder Glitchling bekommt ein individuelles, animiertes Code-Porträt,
 
 Daniel: „Eine Kraft soll noch sein ‚Archäologe‘, die dazu führt, dass die Locations aller einzigartigen Beutestücke im Warroom angezeigt werden.“ Wohnt er im **Warroom**, zeigt die Reisekarte an jedem Ort, wo ein einzigartiges Beutestück liegt (Marke am Ort, im Tooltip welches). Stärke spielt keine Rolle (je Bit 0), in einer fremden Werkbank wirkt er nicht. Auch: Schatzkammer. ⚠️ vorläufig: „einzigartig“ heißt zunächst alles mit dem Merkmal **Trophäe** (33 Gegenstände); später vielleicht eigene Unikat-Beute (benannte Waffen).
 
+### Das Duell in der Welt (Daniel, 17.11.2026, gebaut als #052)
+
+Daniel: „Alle Hebel, die Türen öffnen, durch Schalter ersetzen, die man erst bedienen kann, wenn man ein Duell ausgetragen hat. Dabei geht es nicht darum, zwangsläufig zu gewinnen. Das Gewinnen ist nur dafür da, die KI zu fangen. Aber erstmal ist das einer der Trigger in der Spielwelt … KIs in verschiedenen anderen Dingen versteckt, so dass, wenn man da vorbeigeht, durch die normale Aktionsbelegung (Stick nach oben oder E) das Duell-Event getriggert wird.“
+- **Schalter** an Abkürzungs-Türen: In jedem wohnt eine wilde KI. E/↑ startet das Glitch-Duell (die Welt pausiert). Danach, egal wie es ausgeht, legt Leyla den Schalter um. Sieg = die KI ist gefangen (ins Deck, sonst Rucksack, sonst Lager).
+- **Automaten mit KI** (NomadCola-Automaten an Tankstellen, im Großmarkt, Parkhaus, Sunny Acres, Metro, Raffinerie): E/↑ davor = Duell, einmal je Run.
+- **Leylas Kämpfer:** ihr AI-Core aus dem Cyberdeck (mehrere: vor dem Duell wählen); ohne Glitchling kämpft **AvA** selbst (2 Bit). ⚠️
+- Unikate wohnen in keinem Schalter und Automaten (sie haben eigene Orte).
+
 ### Ein Glitchling je Duell, das Deck als AI-Core (Daniel, 17.11.2026)
 
 Daniel: „Ein Einstiegs-Cyberdeck kann nur einen AI Core haben (so wie die Drohne); später wären zwei oder gar drei Glitchlinge in teuren Decks möglich. Vorteil: ich kann vor dem Duell wählen.“

@@ -6,6 +6,7 @@
 <title>NomadGirl – Glitch-Duell</title>
 <script>try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme') || 'gray'; } catch (e) { document.documentElement.dataset.theme = 'gray'; }</script>
 <link rel="stylesheet" href="game/ui.css">
+<link rel="stylesheet" href="game/duel.css">
 <style>
   /* Glitch-Duell demo (#050): cards in two rows, the dice tray between them. Only --ui-* tokens plus the duel's own signal colours. */
   :root { --dl-hit: #59c135; --dl-miss: #4a5462; --dl-block: #249fde; --dl-wound: #df3e23; --dl-gold: #ffd541; --dl-cyan: #20d6c7; }
@@ -64,60 +65,8 @@
   .dl-act:disabled { opacity: .35; cursor: default; } .dl-act.on { background: var(--dl-gold); color: #241a00; border-color: #c28d29; }
   .dl-rules { color: var(--ui-text3); font-size: 12px; max-width: 760px; margin: 18px auto 0; text-align: center; line-height: 1.5; }
   .dl-boot { margin: 40px auto; max-width: 560px; text-align: center; color: var(--ui-text3); font: 22px/1.4 var(--ui-pixel); } .dl-boot.err { color: #f5a097; font: 15px/1.5 var(--ui-font); } .dl-boot code { color: #ffd541; word-break: break-word; }
-  /* Bit-Stapel (#051): one AI per side, three pipelines, the bit in a reel; neon on black (AAP-64: cyan #20d6c7, magenta #bc4a9b, amber #ffd541) */
   body:has(.sb-board) { background: #07060c; background-image: linear-gradient(rgba(32,214,199,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(32,214,199,.05) 1px, transparent 1px); background-size: 32px 32px; }
   body:has(.sb-board)::after { content: ''; position: fixed; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px); z-index: 50; }
-  .sb-board { --pc: #20d6c7; --ec: #e43b9a; display: grid; gap: 6px; margin: 8px auto 0; justify-items: center; max-width: 640px; font-family: var(--ui-pixel); }
-  .sb-ai { width: 100%; display: grid; grid-template-columns: auto 1fr auto auto; gap: 4px 14px; align-items: center; padding: 4px 12px; border: 1px solid var(--c); border-radius: 4px; position: relative;
-    background: linear-gradient(90deg, color-mix(in srgb, var(--c) 14%, #07060c), #07060c 70%); box-shadow: 0 0 18px color-mix(in srgb, var(--c) 25%, transparent), inset 0 0 0 1px rgba(0,0,0,.6); clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px)); }
-  .sb-ai.player { --c: var(--pc); } .sb-ai.enemy { --c: var(--ec); }
-  .sb-ai.active { box-shadow: 0 0 28px color-mix(in srgb, var(--c) 55%, transparent); } .sb-ai.hit { animation: dl-shake .3s 2; }
-  .sb-portrait canvas { display: block; image-rendering: pixelated; filter: drop-shadow(0 0 6px var(--c)); }
-  .sb-id { display: grid; gap: 2px; min-width: 0; } .sb-id b { font: 28px/1 var(--ui-pixel); color: #fff; letter-spacing: .04em; text-shadow: 0 0 8px var(--c); }
-  .sb-id small { font: 15px/1.1 var(--ui-pixel); color: #b3b9d1; letter-spacing: .03em; } .sb-tag { color: var(--c) !important; text-transform: uppercase; letter-spacing: .12em !important; }
-  .sb-fav { display: inline-flex; gap: 6px; align-items: center; }
-  .sb-hp { position: relative; width: 150px; height: 22px; background: #140c16; border: 1px solid var(--c); display: flex; align-items: center; justify-content: center; gap: 4px; }
-  .sb-hp i { position: absolute; left: 0; top: 0; bottom: 0; background: repeating-linear-gradient(90deg, var(--c) 0 8px, transparent 8px 10px); opacity: .85; transition: width .35s; box-shadow: 0 0 10px var(--c); }
-  .sb-hp b { position: relative; font: 22px/1 var(--ui-pixel); color: #fff; text-shadow: 0 0 4px #000, 0 1px 0 #000; } .sb-hp small { position: relative; font: 14px/1 var(--ui-pixel); color: #fff; opacity: .7; }
-  .sb-delta { position: absolute; right: -4px; top: -20px; font: 24px/1 var(--ui-pixel); animation: dl-up 1.4s ease-out forwards; } .sb-delta.up { color: #59c135; } .sb-delta.down { color: #df3e23; text-shadow: 0 0 8px #df3e23; }
-  .sb-firesum { display: inline-flex; align-items: center; gap: 2px; font: 26px/1 var(--ui-pixel); color: #4a5462; } .sb-firesum.on { color: #fa6a0a; text-shadow: 0 0 10px #fa6a0a; }
-  .sb-pipes { display: flex; gap: 14px; justify-content: center; }
-  .sb-pipe { --c: var(--pc); position: relative; width: 112px; display: grid; gap: 4px; justify-items: center; padding: 6px 6px; cursor: default; user-select: none; border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
-    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--c) 7%, transparent)), #0b0a12; transition: transform .15s, box-shadow .15s; }
-  .sb-pipe.enemy { --c: var(--ec); background: linear-gradient(0deg, transparent, color-mix(in srgb, var(--c) 7%, transparent)), #0b0a12; }
-  .sb-pipe::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; transform: translateX(-50%); background: repeating-linear-gradient(180deg, var(--c) 0 6px, transparent 6px 14px); opacity: .35; animation: sb-flow 1.2s linear infinite; }
-  .sb-pipe.player::before { animation-direction: reverse; } .sb-pipe.firing::before { opacity: .9; box-shadow: 0 0 8px var(--c); animation-duration: .5s; }
-  @keyframes sb-flow { to { background-position: 0 14px; } }
-  .sb-pipe.pick { cursor: pointer; } .sb-pipe.pick:hover { transform: translateY(-4px); box-shadow: 0 0 0 1px #ffd541, 0 0 22px rgba(255,213,65,.35); }
-  .sb-pipe.hit { animation: dl-shake .3s 2; box-shadow: 0 0 22px #df3e23; } .sb-pipe.put { box-shadow: 0 0 18px color-mix(in srgb, var(--c) 60%, transparent); }
-  .sb-stack { position: relative; display: grid; gap: 4px; }
-  .sb-slot { width: 42px; height: 42px; display: grid; place-items: center; border: 1px dashed color-mix(in srgb, var(--c) 35%, transparent); background: rgba(0,0,0,.4); }
-  .sb-value { display: flex; gap: 8px; align-items: center; justify-content: center; min-height: 24px; } .sb-value small { font: 14px/1 var(--ui-pixel); color: var(--c); letter-spacing: .1em; opacity: .8; } .sb-value b { font: 24px/1 var(--ui-pixel); color: #fff; }
-  .sb-fire { display: inline-flex; align-items: center; font: 22px/1 var(--ui-pixel); color: #fa6a0a; text-shadow: 0 0 8px #fa6a0a; }
-  .sb-gain { display: inline-flex; align-items: center; font: 20px/1 var(--ui-pixel); color: #59c135; }
-  .sb-die { width: 36px; height: 36px; display: inline-grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 6px; box-sizing: border-box; background: #10101a; border: 2px solid var(--c, #20d6c7); border-radius: 3px; box-shadow: 0 0 8px color-mix(in srgb, var(--c, #20d6c7) 40%, transparent), inset 0 0 8px rgba(0,0,0,.6); }
-  .sb-die i.p { width: 5px; height: 5px; background: var(--c, #20d6c7); box-shadow: 0 0 4px var(--c, #20d6c7); place-self: center; }
-  .sb-die.x2 { --c: #ffd541; } .sb-die.x3 { --c: #fa6a0a; background: #2a1408; }
-  .sb-die.fav { position: relative; } .sb-die.fav::after { content: '♥'; position: absolute; right: -7px; top: -9px; font: 13px/1 var(--ui-font); color: #e86a73; text-shadow: 0 0 4px #e86a73; }
-  .sb-die.new { animation: sb-drop .28s cubic-bezier(.2,.9,.3,1.3); } @keyframes sb-drop { from { transform: translateY(-26px); opacity: 0; } }
-  .sb-die.ghost { opacity: .45; }
-  .sb-slot.ghost .sb-die, .sb-gain, .sb-tip { visibility: hidden; } .sb-pipe.pick:hover .sb-slot.ghost .sb-die, .sb-pipe.pick:hover .sb-gain, .sb-pipe.pick:hover .sb-tip { visibility: visible; }
-  .sb-board.hover-0 .sb-pipe.enemy[data-col="0"] .sb-die.will, .sb-board.hover-1 .sb-pipe.enemy[data-col="1"] .sb-die.will, .sb-board.hover-2 .sb-pipe.enemy[data-col="2"] .sb-die.will { --c: #df3e23; background: #3b0c10; animation: dl-pulse .7s infinite; }
-  .sb-die.mini { width: 18px; height: 18px; padding: 2px; border-width: 1px; } .sb-die.mini i.p { width: 3px; height: 3px; }
-  .sb-die.big { width: 56px; height: 56px; padding: 10px; flex: none; } .sb-die.big i.p { width: 8px; height: 8px; }
-  .sb-tip { position: absolute; left: 50%; bottom: -26px; transform: translateX(-50%); width: max-content; font: 15px/1 var(--ui-pixel); background: #000; border: 1px solid #df3e23; color: #fff; padding: 3px 7px; display: inline-flex; gap: 4px; align-items: center; z-index: 3; }
-  .sb-mid { display: grid; justify-items: center; gap: 4px; padding: 4px 0; }
-  .sb-turn { font: 15px/1 var(--ui-pixel); letter-spacing: .18em; } .sb-turn.player { color: var(--pc); } .sb-turn.enemy { color: var(--ec); }
-  .sb-reel { --c: #ffd541; padding: 6px; border: 2px solid #ffd541; background: #000; box-shadow: 0 0 20px rgba(255,213,65,.35), inset 0 0 12px rgba(255,213,65,.2); }
-  .sb-reel.enemy { --c: var(--ec); border-color: var(--ec); box-shadow: 0 0 20px color-mix(in srgb, var(--ec) 40%, transparent); } .sb-reel.player { --c: var(--pc); border-color: var(--pc); box-shadow: 0 0 20px color-mix(in srgb, var(--pc) 40%, transparent); }
-  .sb-window { width: 56px; height: var(--h); overflow: hidden; position: relative; -webkit-mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent); }
-  .sb-strip { display: flex; flex-direction: column; } .sb-strip .sb-die.big { height: var(--h); }
-  .sb-strip.spin { transform: translateY(calc(var(--n) * var(--h) * -1)); animation: sb-spin var(--t) cubic-bezier(.12,.75,.25,1) forwards; }
-  @keyframes sb-spin { from { transform: translateY(calc(var(--n) * var(--h) * -1)); } 92% { transform: translateY(5px); } to { transform: translateY(0); } }
-  .sb-say { text-align: center; color: #b3b9d1; font: 16px/1.2 var(--ui-pixel); letter-spacing: .03em; min-height: 18px; }
-  .sb-mid.end { gap: 8px; } .sb-mid.end b { font: 28px/1 var(--ui-pixel); letter-spacing: .06em; } .sb-mid.end.player b { color: var(--pc); text-shadow: 0 0 12px var(--pc); } .sb-mid.end.enemy b { color: var(--ec); text-shadow: 0 0 12px var(--ec); }
-  .sb-score { font: 26px/1 var(--ui-pixel); color: #fff; }
-  @media (max-width: 640px) { .sb-ai { grid-template-columns: auto 1fr; } .sb-pipes { gap: 6px; } .sb-pipe { width: 30vw; } .sb-slot { width: 42px; height: 42px; } .sb-die { width: 36px; height: 36px; padding: 6px; } .sb-id b { font-size: 22px; } }
   @media (max-width: 640px) { .dl-card { width: 140px; } .dl-line small { min-width: 0; } .dl-row { min-height: 0; } }
 </style>
 </head>

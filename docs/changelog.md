@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 17.11.2026: **Glitch-Duell im Spiel** (#052): Duell als Fenster im Hauptspiel (Rahmen, ✕, Hilfezeile, pausiert, Tastatur und Controller); Schalter statt Hebel, erst nach einem Duell legen sie um; KIs in Automaten per E/↑; Sieg fängt die KI ins Deck.
 - 17.11.2026: **Glitchlings als digitale Geister**: 32 gepixelte Geister-Köpfe (PixelLab), getönt im Licht des Glitchlings, Mimik weiter aus Code, schweben; überall, wo Porträts erscheinen (Duell, Werkstatt, Inventar); Kammerjäger bleiben Bildschirme.
 - 17.11.2026: **Bit-Stapel: eine KI, drei Pipelines, Cyberpunk-Look**: je Seite ein AI-Core (vor dem Duell wählbar), Neon-Pipelines mit Datenfluss, Kopfzeilen mit Porträt, Integrität und Feuer, das Bit rollt wie ein Spielautomat ein.
 - 17.11.2026: **Bit-Stapel mit Dauerfeuer**: 50 Integrität, Paare und Drillinge schaden jeden Zug, bis sie zerstört werden, Lieblingsbit obendrauf; Heilen und Summe bleiben umschaltbar.

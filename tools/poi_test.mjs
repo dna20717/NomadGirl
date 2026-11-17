@@ -124,10 +124,12 @@ await shot('closet');
 s = await ev(() => {
   const sw = nomad.state().level.switches[0];
   nomad.until(st => Math.abs(st.leyla.x - sw.x) < 50, 300, [nomad.state().leyla.x < sw.x ? 'right' : 'left']);
-  nomad.step(5); const p = nomad.state().prompt; nomad.step(1, [], ['grab']); nomad.step(80);
-  return { p, lv: nomad.state().level };
+  nomad.step(5); const p = nomad.state().prompt; nomad.step(1, [], ['grab']); nomad.step(2);
+    // #052: the switch first asks for a Glitch-Duell (won or lost, afterwards it is thrown); the duel runs out at once and closes
+    const D_ = game.scene.getScene('play').hud.duel, duel = !!D_?.isOpen; D_?.quick(); D_?.close(); nomad.step(80);
+  return { p, duel, lv: nomad.state().level };
 });
-check('Schalter: E-Hinweis in der Kammer', s.p === 'Schalter umlegen', s.p);
+check('Schalter: E-Hinweis in der Kammer startet ein Glitch-Duell', s.p === 'Schalter hacken · Glitch-Duell' && s.duel, { p: s.p, duel: s.duel });
 check('Schalter: Tür geht auf', s.lv.switches[0].on && s.lv.doors[0].open, s.lv);
 await shot('door');
 s = await ev(() => {

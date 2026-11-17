@@ -8,6 +8,7 @@ import { chestPart } from '../salvage.js';
 import { bonuses as trophyBonuses } from '../achievements.js';
 import { rankRun } from '../../engine/poi.js';
 import { earn, earnText } from '../earn.js';
+import { foeFor } from '../glitch_world.js';
 
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
 
@@ -121,12 +122,24 @@ export class PoiLevel {
       g.fillStyle(0x4a4650).fillRect(px + 6, py + 50, 12, 6).fillRect(px + 40, py + 8, 14, 5);
     }
   }
+  // a switch panel instead of a lever (#052, Daniel 17.11.2026: „alle Hebel, die Türen öffnen, durch Schalter ersetzen, die man erst bedienen
+  // kann, wenn man ein Duell ausgetragen hat“): a box on a post with a little screen; a KI lives in it (magenta, glitching) until the duel,
+  // then the screen is calm (cyan) and the rocker can be thrown
   drawSwitch(sw) {
-    const g = sw.art.clear(), x = sw.x, f = sw.feet;
-    g.fillStyle(0x3a3f48).fillRect(x - 22, f - 120, 44, 70);
-    g.fillStyle(0x15141a).fillRect(x - 6, f - 110, 12, 50);
-    g.lineStyle(8, 0xb9c0c9); g.beginPath(); g.moveTo(x, f - 85); g.lineTo(x + (sw.on ? 26 : -26), f - (sw.on ? 128 : 128)); g.strokePath();
-    g.fillStyle(sw.on ? 0x3fe0d0 : 0xff4060).fillCircle(x + (sw.on ? 26 : -26), f - 130, 9);
+    const g = sw.art.clear(), x = sw.x, f = sw.feet, live = !sw.dueled, on = sw.on;
+    g.fillStyle(0x24272e).fillRect(x - 5, f - 60, 10, 60);                                   // post
+    g.fillStyle(0x060608).fillRect(x - 30, f - 142, 60, 86);                                 // box outline
+    g.fillStyle(0x3a3f48).fillRect(x - 27, f - 139, 54, 80);
+    g.fillStyle(0x4a5462).fillRect(x - 27, f - 139, 54, 4);
+    const scr = live ? 0x3b1730 : on ? 0x12302e : 0x122020, glow = live ? 0xe43b9a : 0x3fe0d0;
+    g.fillStyle(0x060608).fillRect(x - 21, f - 131, 42, 30); g.fillStyle(scr).fillRect(x - 19, f - 129, 38, 26);
+    if (live) { g.fillStyle(glow).fillRect(x - 11, f - 121, 5, 5).fillRect(x + 6, f - 121, 5, 5).fillRect(x - 8, f - 112, 16, 3); for (let i = 0; i < 4; i++) g.fillStyle(glow, 0.35).fillRect(x - 19, f - 128 + i * 7, 38, 1); }
+    else { g.fillStyle(glow).fillRect(x - 13, f - 117, 26, 3); }
+    g.fillStyle(0x15141a).fillRect(x - 9, f - 95, 18, 30);                                   // rocker
+    g.fillStyle(on ? 0x3fe0d0 : live ? 0x6d758d : 0xb9c0c9).fillRect(x - 7, on ? f - 93 : f - 81, 14, 14);
+    g.fillStyle(on ? 0x3fe0d0 : live ? 0xe43b9a : 0xffd27a).fillCircle(x + 19, f - 70, 4);    // lamp
+    if (live && !sw.pulse) { sw.pulse = this.scene.tweens.add({ targets: sw.art, alpha: 0.82, duration: 260, yoyo: true, repeat: -1, repeatDelay: 900 }); }
+    if (!live && sw.pulse) { sw.pulse.stop(); sw.pulse = null; sw.art.setAlpha(1); }
   }
   // chests are cover (#014): raiders hide behind them, shots stop at them → [{ x, w, top, feet }]
   covers() {
@@ -162,10 +175,29 @@ export class PoiLevel {
     const close = o => Math.abs(o.x - l.x) < range && Math.abs(o.feet - l.feet) < 60;
     for (const z of this.goals) if (close(z)) return this.done ? { text: `Geknackt · Abkürzung zum Van: ${this.shortcutWay()}` } : { text: 'Tresor knacken · POI abschließen', act: () => this.finish() };
     for (const c of this.chests) if (!c.open && close(c)) return { text: 'Kiste öffnen', act: () => this.openChest(c) };
-    for (const sw of this.switches) if (close(sw)) return sw.on ? { text: 'Schalter ist umgelegt' } : { text: 'Schalter umlegen', act: () => this.pull(sw) };
+    for (const sw of this.switches) if (close(sw)) return sw.on ? { text: 'Schalter ist umgelegt' } : sw.dueled ? { text: 'Schalter umlegen', act: () => this.pull(sw) } : { text: 'Schalter hacken · Glitch-Duell', act: () => this.duelAt(sw, 'Schalter', `sw${this.switches.indexOf(sw)}`) };
+    // KIs in machines (Marken-Clutter marked „KI“, e.g. NomadCola-Automaten): once per run
+    for (const h of this.hosts()) if (!h.done && close(h)) return { text: `${h.name} anzapfen · Glitch-Duell`, act: () => this.duelAt(h, h.name, `host${this.hosts().indexOf(h)}`) };
     for (const d of this.doors) if (!d.open && Math.abs((d.x0 + d.x1) / 2 * this.scene.T - l.x) < range * 0.8 && l.feet > d.y0 * this.scene.T && l.feet <= d.y1 * this.scene.T + 4)
       return { text: 'Die Tür geht von dieser Seite nicht auf' };
     return null;
+  }
+
+  // the machines with a KI in them: clutter of the POI's Marken-Clutter rows marked „KI“ (art.js brandKit)
+  hosts() { return this.hostList ??= (this.scene.props || []).filter(p => p.ai).map(p => ({ x: p.ax ?? p.x + (p.cw || 0) / 2, feet: (p.ay ?? p.y + (p.ch || 0)) - 4, name: String(p.name || 'Automat').replace(/\s*\(.*\)/, ''), done: false })); }
+  // a Glitch-Duell against the KI living here (#052): the switch can be thrown afterwards (won or lost), a won duel catches the KI
+  duelAt(host, where, key) {
+    const s = this.scene, save = s.box?.save, foe = foeFor(s.data_, save, `${this.poi}:${s.levelInfo?.seed ?? s.args?.seed ?? 0}:${key}`);
+    if (!s.hud.duel || !foe) { host.dueled = host.done = true; if (host.door !== undefined) this.pull(host); return; }
+    s.hud.duel.open({ foe, title: 'Glitch-Duell', sub: `${where} · hier wohnt ${foe.name}`, onDone: r => {
+      host.dueled = true; host.done = true;
+      if (r.caught) s.box?.persist?.();
+      s.hud.toast(r.won ? (r.caught ? `Gefangen: ${foe.name}` : `${foe.name} ist entwischt`) : r.gaveUp ? 'Duell abgebrochen' : `${foe.name} hat gewonnen`,
+        host.door !== undefined ? (r.won ? 'Der Schalter gehört dir' : 'Der Schalter lässt sich trotzdem umlegen') : r.won ? (r.caught ? 'Er wohnt jetzt in deinem Deck' : 'Kein Platz im Deck, Rucksack oder Lager') : 'Er ist in die Leitungen geflohen',
+        r.won ? 'good' : 'info', 3200);
+      if (host.door !== undefined) { this.drawSwitch(host); this.pull(host); }
+      else s.fx?.sparks?.(host.x, host.feet - 80, r.won ? 0x3fe0d0 : 0xe43b9a, 10);
+    } });
   }
 
   // where the way back is (#038: stacked POIs have a shaft beside the rooms instead of the tunnel underneath)
