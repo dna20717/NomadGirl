@@ -1468,7 +1468,7 @@ export const AREAS = {
       { title: 'Namen', fields: [area_('names.first', 'Erstes Wort', { hint: 'Material, Farbe, Stoff (Marble, Amber, Velvet …), mit Komma getrennt. Name = erstes + zweites Wort, jedes Wort je Durchgang nur einmal' }),
         area_('names.second', 'Zweites Wort', { hint: 'Kante, Geräusch, Tat (Sting, Slay, Hex …)' })] },
       { title: 'Begabungen', wide: true, fields: [table('talents', 'Begabungen', [text('name', 'Name'), select('function', 'Werkbank', WORKSHOP_FUNCTIONS), select('also', 'Auch', WORKSHOP_FUNCTIONS), text('effect', 'Effekt'), num('perBit', 'Je Bit', { min: 0 }), text('stat', 'Wert')],
-        { hint: 'Effekt mit {n} = „Je Bit“ × Stärke. In „Werkbank“ und „Auch“ wirkt er voll. „Wert“ ist der Schlüssel, den das Spiel später ausliest (perfect, refund, growth, power …)' })] },
+        { hint: 'Effekt mit {n} = „Je Bit“ × Stärke. In „Werkbank“ und „Auch“ wirkt er voll. „Wert“ ist der Schlüssel, den das Spiel später ausliest (perfect, refund, growth, power …). Je Bit 0 = wirkt ohne Stärke (Archäologe). Der Wert bestimmt auch, was das Code-Porträt trägt' })] },
       { title: 'Macken & Wünsche', wide: true, fields: [table('quirks', 'Macken', [text('text', 'Macke'), select('kind', 'Art', GLITCH_QUIRKS)], { hint: 'Jeder Glitchling hat eine; immer ein Haken mit Charme' }),
         table('wishes', 'Wünsche', [text('text', 'Wunsch')], { hint: 'Was er will, um freiwillig mitzukommen (Überreden, kommt mit Stufe 2)' }),
         area_('homes', 'Wohnorte', { hint: 'Maschinen, in denen Glitchlings in POIs wohnen, mit Komma getrennt' })] },
@@ -1478,7 +1478,7 @@ export const AREAS = {
     check: (x, report) => {
       const T = new Set((x.talents || []).map(t => t.name));
       for (const u of x.unique || []) { if (!T.has(u.talent)) report('warning', `Unikat ${u.name}: Begabung „${u.talent}“ gibt es nicht`); if (String(u.name || '').trim().split(/\s+/).length !== 2) report('hint', `Unikat ${u.name}: Namen haben zwei Wörter`); }
-      for (const t of x.talents || []) if (!String(t.effect || '').includes('{n}')) report('hint', `Begabung ${t.name}: Effekt ohne {n}`);
+      for (const t of x.talents || []) if (t.perBit && !String(t.effect || '').includes('{n}')) report('hint', `Begabung ${t.name}: Effekt ohne {n}, „Je Bit“ wirkt nicht`);
     },
   },
   brands: {

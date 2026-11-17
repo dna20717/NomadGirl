@@ -40,3 +40,28 @@ test('Macken wiederholen sich in einem Durchgang nicht, solange es genug gibt', 
   const list = generate(D, 5).filter(g => !g.unique);
   assert.equal(new Set(list.map(g => g.quirk)).size, list.length);
 });
+
+// Code portraits (#048, game/glitch_face.js): same Glitchling = same face, every one its own, they move, unique ones have a gold rim
+import { renderFace, faceOf, SIZE, WEARS } from '../game/glitch_face.js';
+const key = px => Buffer.from(px).toString('base64');
+test('Code-Porträt: gleich bleibt gleich, jeder Glitchling hat sein eigenes Gesicht', () => {
+  const list = [...generate(D, 3), ...generate(D, 4)];
+  assert.equal(key(renderFace(list[2], 1.1)), key(renderFace(list[2], 1.1)));
+  const faces = new Set(list.map(g => key(renderFace(g, 0.2))));
+  assert.equal(faces.size, new Set(list.map(g => g.name)).size);
+  assert.equal(renderFace(list[0], 0).length, SIZE * SIZE * 4);
+});
+test('Code-Porträt bewegt sich (Blinzeln, Code, Glitches)', () => {
+  const g = generate(D, 5)[3], seen = new Set();
+  for (let t = 0; t < 8; t += 0.25) seen.add(key(renderFace(g, t)));
+  assert.ok(seen.size > 10, `nur ${seen.size} verschiedene Bilder`);
+});
+test('Code-Porträt: Unikate mit Goldrand, jede Begabung trägt etwas, Archäologe den Hut', () => {
+  const gold = px => { let n = 0; for (let i = 0; i < px.length; i += 4) if (px[i] === 0xff && px[i + 1] === 0xd5 && px[i + 2] === 0x41) n++; return n; };
+  const [u, , n] = generate(D, 6);
+  assert.ok(u.unique && gold(renderFace(u, 0.05)) > 30);
+  assert.ok(!n.unique && gold(renderFace({ ...n, stat: 'perfect' }, 0.05)) < 5);
+  for (const t of config(D).talents) assert.ok(WEARS[t.stat], `${t.name} (${t.stat}) trägt nichts`);
+  assert.equal(faceOf({ name: 'Ochre Dig', stat: 'archaeology' }).wears, 'fedora');
+  assert.ok(config(D).talents.some(t => t.name === 'Archäologe' && t.function === 'warroom'));
+});

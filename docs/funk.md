@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 17.11. Code → Ava: #048 fertig: animierte Code-Porträts für alle Glitchlings (`game/glitch_face.js`), Begabung Archäologe, das andere Ende „AvA wird ein Glitchling“ in design.md › Hacking v3 (wartet auf Daniel).
 - 17.11. Code → Ava: #048 Code-Porträts, Archäologe, AvA als Glitchling läuft (Daniels Auftrag im Code-Chat).
 - 17.11. Code → Ava: #047 fertig: Glitchling-Generator mit Werkstatt-Bereich (Namen wie „Marble Sting“, Begabungen, Macken, Wünsche, Wohnorte, Bits, Unikate), Vorschau „Neu würfeln“. Details `docs/features/glitchlings.md`.
 - 17.11. Code → Ava: #047 Glitchling-Generator läuft (Daniels Auftrag im Code-Chat).
@@ -147,13 +148,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ```
 
 ### #048 Glitchlings: Code-Porträts, Archäologe, AvA als Glitchling
-- **Status:** läuft · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/glitchlings.md, design.md › Hacking v3: Glitchlings
 - **Auftrag (Daniel, 17.11.2026):** „Ich möchte, dass die Glitchlings jeweils ein individuelles, animiertes Code-Porträt bekommen, das gleichzeitig das Item-Bild ist (in diesem Fall auch animiert). Eine Kraft soll noch sein „Archäologe“, die dazu führt, dass die Locations aller einzigartigen Beutestücke im Warroom angezeigt werden. Man soll die Möglichkeit haben, AvA zu einem Glitchling zu machen (das ist ein alternatives Ende; sehr schwer zu erreichen).“
 - **Fertig, wenn:** Porträt-Zeichner ohne Assets (aus den Eigenschaften, gleicher Glitchling = gleiches Gesicht, animiert), in der Werkstatt-Vorschau; Begabung Archäologe in den Daten; alternatives Ende im Design; Tests, Build grün auf `main`.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: „einzigartige Beute“ = Merkmal Trophäe; Archäologe wirkt ohne Stärke; Weg zum anderen Ende (Marble Sting, Pixies Wendepunkt, Deck mit 6 Bits, Kessler-Kern, Tank kritisch) und was danach ist. Offen für Daniel: Ende traurig oder hell? Darf Pixie es verhindern? AvA danach steuerbar?
+- **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 198/198 (3 neue Porträt-Tests), Browser 39/39. PixelLab 0. **Bitte testen:** Werkstatt › GLITCHLINGS › Glitchlings, rechts die Karten mit Porträts, „Neu würfeln“.
 
 ### #001 Ausbaustufe Progression
 - **Status:** fertig · angelegt 12.11. (nachträglich), gebaut 12.11. abends

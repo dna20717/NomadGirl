@@ -17,7 +17,15 @@
   {"name": "Gastgeber", "function": "chill", "also": "guests", "effect": "Ruhe-Buffs {n} % stärker", "perBit": 6, "stat": "rest"},
   {"name": "Buchhalter", "function": "storage", "also": "treasury", "effect": "Beute ist {n} % mehr wert", "perBit": 4, "stat": "value"},
   {"name": "Kühlwart", "function": "cooling", "also": "kitchen", "effect": "Gerichte halten {n} % länger (Buffs)", "perBit": 8, "stat": "freshness"},
-  {"name": "Schläfer", "function": "sleep", "also": "chill", "effect": "Schlafen heilt {n} % mehr", "perBit": 7, "stat": "sleepHeal"}
+  {"name": "Schläfer", "function": "sleep", "also": "chill", "effect": "Schlafen heilt {n} % mehr", "perBit": 7, "stat": "sleepHeal"},
+  {
+   "name": "Archäologe",
+   "function": "warroom",
+   "also": "treasury",
+   "effect": "Die Karte im Warroom zeigt die Fundorte aller einzigartigen Beutestücke",
+   "perBit": 0,
+   "stat": "archaeology"
+  }
  ],
  "quirks": [
   {"text": "kocht alles scharf", "kind": "odd"},

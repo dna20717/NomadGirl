@@ -644,6 +644,40 @@ Jeder Glitchling ist **einzigartig** (pro Durchgang gibt es ihn genau einmal). L
 - **Pixie** versteht sie am besten und kann zwischen Glitchling und Crew vermitteln.
 - **Im neuen Traum** sind alle wieder fremd und wohnen wieder in ihren alten Maschinen. Leyla erinnert sich: wo jeder wohnt, was er will, welche Macke er verschweigt. Verschmolzene sind im neuen Traum wieder frei, und Leyla kann diesmal anders entscheiden.
 
+### Code-Porträts (Daniel, 17.11.2026, gebaut als #048)
+
+Daniel: „Jeder Glitchling bekommt ein individuelles, animiertes Code-Porträt, das gleichzeitig das Item-Bild ist (in diesem Fall auch animiert).“ Jeder Glitchling ist ein kleiner Bildschirm im Gehäuse, ein Gesicht aus Licht auf scrollenden Code-Zeilen, ganz aus Code und ohne PixelLab:
+- **Erstes Namenswort** → Farbe des Lichts (Amber gelb, Cobalt blau, Moss grün …, AAP-64), **zweites Wort** → Augen und Mund, **der Name** → Bildschirmform (Röhre, Breitbild, rund, hochkant), Glas und Gehäuse.
+- **Begabung** → was er trägt: Koch Kochmütze, Schweißer Schutzbrille, Gärtner Keimling, Ingenieur Blitz, Chirurg rotes Kreuz, Navigator Antenne, Waffenmeister Fadenkreuz, Drohnenflüsterer Propeller, Gastgeber Fliege, Buchhalter Monokel, Kühlwart Schneeflocke, Schläfer Zzz, Archäologe Fedora.
+- **Bits** → fünf Lämpchen am Gehäuse, **Macke** → wie er glitcht (schrullig oft, Wetter mit Schneegestöber, Tageszeit mit müden Lidern, Nachbarn schielt zur Seite, Laune pulsiert). **Unikate** haben einen Goldrand.
+- Er blinzelt, spricht ab und zu, Code läuft durch, eine helle Zeile rollt über die Röhre. Dasselbe Bild ist sein **Item-Bild** im Inventar (Deck-Plätze), dort ebenfalls animiert.
+
+### Begabung Archäologe (Daniel, 17.11.2026)
+
+Daniel: „Eine Kraft soll noch sein ‚Archäologe‘, die dazu führt, dass die Locations aller einzigartigen Beutestücke im Warroom angezeigt werden.“ Wohnt er im **Warroom**, zeigt die Reisekarte an jedem Ort, wo ein einzigartiges Beutestück liegt (Marke am Ort, im Tooltip welches). Stärke spielt keine Rolle (je Bit 0), in einer fremden Werkbank wirkt er nicht. Auch: Schatzkammer. ⚠️ vorläufig: „einzigartig“ heißt zunächst alles mit dem Merkmal **Trophäe** (33 Gegenstände); später vielleicht eigene Unikat-Beute (benannte Waffen).
+
+### Das andere Ende: AvA wird ein Glitchling (Daniel, 17.11.2026; ausgearbeitet von Ava, wartet auf Daniel)
+
+Daniel: „Man soll die Möglichkeit haben, AvA zu einem Glitchling zu machen (das ist ein alternatives Ende; sehr schwer zu erreichen).“
+
+**Die Idee:** AvAs Verstand wohnt schon in der Drohne, sie ist längst halb ein Glitchling. Das Heilmittel holt sie zurück in ihren Körper. Das andere Ende lässt den Körper gehen und macht sie frei: der erste Glitchling, der einmal ein Mensch war. Kein Herz für Donnerstag mehr, kein Tank, keine Uhr.
+
+**Der Weg (sehr schwer, über mehrere Träume):** ⚠️ vorläufig
+1. **Marble Sting gewinnen** (Unikat, Chirurg, weiß etwas über die Kinder in den Tanks): Er muss freiwillig mitkommen (überreden, nie fangen) und volles Vertrauen haben. Nur er kann einen Verstand übertragen. Sein Wunsch, Ebene 40, ist Teil des Wegs.
+2. **Pixies Wendepunkt:** Pixie ist aus demselben Labor ausgebüchst (docs/crew.md). Erst wenn Pixie Leyla die Wahrheit sagt, weiß Leyla, dass es geht. Pixie kann sich dagegen stellen: Es ist auch Pixies Geschichte.
+3. **Ein Deck der höchsten Stufe** mit einem freien Platz für **6 Bits** (stärker als jeder Glitchling, den man fangen kann).
+4. **Der Kessler-Kern** von Ebene 40 (⚠️ ein Speicher von Kessler Cybernetics mit den Akten der Kinder in den Tanks, Doc Mirela kennt AvAs Akte): ein einziges Beutestück, das man nur mit dem Archäologen findet.
+5. **Der Augenblick:** Nur wenn der Tank **kritisch** ist (die letzte Rettung steht bevor), bietet der Tank die Wahl an. Wer zu gut wartet, sieht das Ende nie; wer zu schlecht wartet, verliert AvA ganz. Ein schmales Fenster.
+- Leyla erinnert sich über Träume hinweg (wie bei den Glitchlings im neuen Traum), also lässt sich der Weg über mehrere Durchgänge vorbereiten. In einem einzigen Traum gelingt er kaum.
+
+**Was danach ist:** ⚠️ vorläufig
+- Eigener **Abspann** (ein Comic wie das Intro): Der Tank wird leer, Leyla trägt ihn hinaus, AvAs Gesicht erscheint zum ersten Mal als Code-Porträt.
+- AvA ist ein **Glitchling mit 6 Bits** und der Begabung **„Alles“**: Sie wirkt in jeder Werkbank ein wenig, in der Drohne voll. Ihr Porträt ist das Gesicht ihrer Drohne (die Stimmungen von AvA).
+- Das Spiel läuft **offen** weiter, ohne Tank und ohne Uhr. Dafür fehlt die Rettung beim k.o.: AvA kann Leyla nicht mehr tragen, nur noch führen (k.o. = zurück ins Camp, Rucksack weg).
+- Gegenstück zum Heilmittel-Ende (AvA wird spielbar, mit Körper). Beide Enden schließen einander aus; ein Spielstand kennt nur eins.
+
+**Offen (für Daniel):** Ist das Glitchling-Ende traurig oder hell? Darf Pixie es verhindern? Bleibt AvA danach steuerbar (als Drohne) oder nur Companion?
+
 ### Ausbaustufen
 
 1. **Bereich „Glitchlings“** in der Werkstatt (Name, Begabung, Bits, Macke, Wünsche, Sondereffekte je Werkbank), Deck mit Stufe und Plätzen, **Fangen** in POIs, **Einzug** in Werkbänke mit Effekten.
@@ -656,7 +690,7 @@ Jeder Glitchling ist **einzigartig** (pro Durchgang gibt es ihn genau einmal). L
 
 - Wie fängt man genau (eine Aktion mit Halten/Timing, ein kurzer Kampf, nur Deck-Stufe)?
 - Wie viele Glitchlings zum Start (Vorschlag: 12 handgemacht, später gewürfelte aus Bausteinen wie bei der Crew)?
-- Grafik: Glitchlings als kleine Gesichter/Symbole auf Bildschirmen aus Code, oder je einer ein PixelLab-Porträt?
+- ~~Grafik~~: entschieden (Daniel, 17.11.2026): animierte Code-Porträts, gebaut (#048).
 
 ## Look & Feel
 
