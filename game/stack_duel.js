@@ -10,7 +10,11 @@
 // zuerst reduziert hat. Zwei oder mehr Würfel pro Säule erhöhen meine Punkte, während jeder zerstörte Würfel die des anderen reduziert“):
 // each side has hp (25); a bit that joins k equal bits in its column heals bit × k (favourite: double); destroyed bits take from the
 // opponent what they were worth in their column (colValue lost); hp 0 = overwritten. A side whose columns are all full on its turn
-// overflows: its board is wiped (Überlauf). The default; „Summe“ is the first version.
+// overflows: its board is wiped (Überlauf). „Summe“ is the first version.
+// Wertung „Dauerfeuer“ (the default; Daniel, 17.11.2026: „Integrität ein wenig erhöhen und dafür alle Paare und Trippel jeden Zug Schaden
+// anrichten, bis sie zerstört werden. Lieblingsbits bekommen dann einen Bonus obendrauf“): 50 Integrität, no healing; at the end of its
+// turn every group of equal bits fires at the opponent: bit × (count − 1) (pair = bit, triple = 2 × bit), a group of the favourite bit
+// + bit on top; destroyed bits take their pips from the opponent at once.
 //
 //   side = { cols: [[values], [values], [values]], glitch: [glitchling | stats] }
 //   duel = { sides: { player, enemy }, turn, die, log: [event], winner, moves }
@@ -31,8 +35,15 @@ export function colValue(col, fav = 0) {
 export const total = side => side.cols.reduce((s, c, i) => s + colValue(c, side.fav[i]), 0);
 export const full = side => side.cols.every(c => c.length >= ROWS);
 
-export const RULES = [['hp', 'Integrität'], ['sum', 'Summe']];
-export function newStack(player, enemy, rnd = Math.random, first = 'player', { rules = 'hp', hp = 25 } = {}) {
+export const RULES = [['dot', 'Dauerfeuer'], ['hp', 'Heilen'], ['sum', 'Summe']];
+// what the groups of a side fire at the end of its turn
+export function fireOf(side) {
+  let t = 0;
+  side.cols.forEach((col, i) => { const n = {}; for (const v of col) n[v] = (n[v] || 0) + 1; for (const [v, k] of Object.entries(n)) if (k >= 2) t += Number(v) * (k - 1) + (Number(v) === side.fav[i] ? Number(v) : 0); });
+  return t;
+}
+export const colFire = (side, i) => fireOf({ cols: [side.cols[i]], fav: [side.fav[i]] });
+export function newStack(player, enemy, rnd = Math.random, first = 'player', { rules = 'dot', hp = 50 } = {}) {
   const mk = list => ({ cols: Array.from({ length: COLS }, () => []), glitch: list.slice(0, COLS), fav: Array.from({ length: COLS }, (_, i) => favourite(list[i])), hp, max: hp });
   return { sides: { player: mk(player), enemy: mk(enemy) }, turn: first, die: roll(rnd), log: [], winner: null, moves: 0, rules };
 }
@@ -46,7 +57,10 @@ export function preview(duel, c, side = duel.turn, die = duel.die) {
   const me = duel.sides[side], op = duel.sides[other(side)];
   const before = colValue(me.cols[c], me.fav[c]), after = colValue([...me.cols[c], die], me.fav[c]);
   const left = op.cols[c].filter(v => v !== die), lost = colValue(op.cols[c], op.fav[c]) - colValue(left, op.fav[c]);
-  return { gain: after - before, lost, destroyed: op.cols[c].length - left.length, heal: healOf(me, c, die) };
+  const destroyed = op.cols[c].length - left.length;
+  const fireBefore = fireOf(me), fireAfter = fireOf({ cols: me.cols.map((x, i) => (i === c ? [...x, die] : x)), fav: me.fav });
+  const theirBefore = fireOf(op), theirAfter = fireOf({ cols: op.cols.map((x, i) => (i === c ? left : x)), fav: op.fav });
+  return { gain: after - before, lost, destroyed, heal: healOf(me, c, die), hit: destroyed * die, fire: fireAfter, fireUp: fireAfter - fireBefore, silenced: theirBefore - theirAfter };
 }
 
 // put the die of the side on turn into column c → events; then the other side rolls (or the duel ends)
@@ -57,6 +71,14 @@ export function place(duel, c, rnd = Math.random) {
   op.cols[c] = op.cols[c].filter(v => v !== die);
   const ev = { type: 'place', side, col: c, die, gain: pv.gain, destroyed: pv.destroyed, lost: pv.lost, heal: 0, damage: 0 };
   duel.log.push(ev); duel.moves++;
+  if (duel.rules === 'dot') {
+    ev.damage = pv.hit; ev.fire = pv.fire;
+    op.hp = Math.max(0, op.hp - pv.hit - pv.fire);
+    if (op.hp <= 0) { duel.winner = side; duel.turn = null; duel.die = null; duel.log.push({ type: 'end', winner: side, hp: { [side]: me.hp, [other(side)]: 0 } }); return ev; }
+    duel.turn = other(side); duel.die = roll(rnd);
+    if (!open(duel).length) { duel.sides[duel.turn].cols = Array.from({ length: COLS }, () => []); duel.log.push({ type: 'overflow', side: duel.turn }); ev.overflow = duel.turn; }
+    return ev;
+  }
   if (duel.rules === 'hp') {
     ev.heal = pv.heal; ev.damage = pv.lost;
     me.hp += pv.heal; op.hp = Math.max(0, op.hp - pv.lost);
@@ -85,7 +107,8 @@ export function choose(duel, rnd = Math.random, noise = 0.15) {
     // expected loss from the opponent's next bit: for every face, what it would wipe in this column
     let risk = 0;
     for (let f = 1; f <= 6; f++) if (col.includes(f) && duel.sides[other(side)].cols[c].length < ROWS) risk += (colValue(col, me.fav[c]) - colValue(col.filter(v => v !== f), me.fav[c])) / 6;
-    const v = (duel.rules === 'hp' ? pv.heal * 1.3 : pv.gain) + pv.lost * 1.1 - risk * 0.5 + (rnd() - 0.5) * noise * 20;
+    const v = duel.rules === 'dot' ? pv.fireUp * 1.6 + pv.silenced * 1.8 + pv.hit - risk * 0.25 + (rnd() - 0.5) * noise * 16
+      : (duel.rules === 'hp' ? pv.heal * 1.3 : pv.gain) + pv.lost * 1.1 - risk * 0.5 + (rnd() - 0.5) * noise * 20;
     if (!best || v > best.v) best = { col: c, v };
   }
   return best;

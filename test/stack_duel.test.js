@@ -54,6 +54,24 @@ test('Integrität: gleiche Bits heilen, zerstörte Bits kosten den Gegner ihren 
   o.sides.enemy.cols = [[6, 6, 5], [6, 5, 5], [5, 6, 6]];
   place(o, 0, fixed(1));
   assert.ok(o.log.some(e => e.type === 'overflow' && e.side === 'enemy')); assert.ok(o.sides.enemy.cols.every(c => !c.length));
-  let n = 0; for (let i = 0; i < 300; i++) { const r = play(newStack(g(i), g(i + 3), Math.random, 'player', { rules: 'hp' })); assert.ok(r.winner); n += r.moves; }
+  let n = 0; for (let i = 0; i < 300; i++) { const r = play(newStack(g(i), g(i + 3), Math.random, 'player', { rules: 'hp', hp: 25 })); assert.ok(r.winner); n += r.moves; }
   assert.ok(n / 600 > 8 && n / 600 < 20, `Züge je Seite ${n / 600}`);
+});
+
+// Wertung Dauerfeuer (Daniel, 17.11.2026: „alle Paare und Trippel jeden Zug Schaden, bis sie zerstört werden; Lieblingsbits Bonus obendrauf“)
+import { fireOf } from '../game/stack_duel.js';
+test('Dauerfeuer: Paare und Drillinge feuern jeden Zug, Lieblingsbit obendrauf, Zerstören kostet die Augen', () => {
+  assert.equal(fireOf({ cols: [[4, 4], [5, 5, 5], [2, 3]], fav: [0, 0, 0] }), 4 + 10);
+  assert.equal(fireOf({ cols: [[4, 4], [], []], fav: [4, 0, 0] }), 8, 'Paar aus Lieblingsbits: 4 + 4');
+  const d = newStack(g(1), g(2), fixed(3, 6, 3, 1), 'player', { rules: 'dot', hp: 50 });
+  d.sides.player.fav = [0, 0, 0]; d.sides.enemy.fav = [0, 0, 0];
+  d.sides.player.cols[0] = [3]; d.sides.enemy.cols[1] = [5, 5];
+  let ev = place(d, 0, fixed(6));                       // player 3 on 3: pair fires 3
+  assert.equal(ev.fire, 3); assert.equal(d.sides.enemy.hp, 47);
+  ev = place(d, 2, fixed(5));                           // enemy 6 elsewhere: its 5-5 pair fires 5
+  assert.equal(ev.fire, 5); assert.equal(d.sides.player.hp, 45);
+  ev = place(d, 1, fixed(1));                           // player 5 into col 1: destroys 5,5 (10 at once), fires 3
+  assert.equal(ev.damage, 10); assert.equal(ev.fire, 3); assert.equal(d.sides.enemy.hp, 34); assert.deepEqual(d.sides.enemy.cols[1], []);
+  let n = 0; for (let i = 0; i < 300; i++) { const r = play(newStack(g(i), g(i + 3))); assert.ok(r.winner); n += r.moves; }
+  assert.ok(n / 600 > 6 && n / 600 < 16, `Züge je Seite ${n / 600}`);
 });
