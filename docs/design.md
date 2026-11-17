@@ -658,6 +658,50 @@ Daniel: „Jeder Glitchling bekommt ein individuelles, animiertes Code-Porträt,
 
 Daniel: „Eine Kraft soll noch sein ‚Archäologe‘, die dazu führt, dass die Locations aller einzigartigen Beutestücke im Warroom angezeigt werden.“ Wohnt er im **Warroom**, zeigt die Reisekarte an jedem Ort, wo ein einzigartiges Beutestück liegt (Marke am Ort, im Tooltip welches). Stärke spielt keine Rolle (je Bit 0), in einer fremden Werkbank wirkt er nicht. Auch: Schatzkammer. ⚠️ vorläufig: „einzigartig“ heißt zunächst alles mit dem Merkmal **Trophäe** (33 Gegenstände); später vielleicht eigene Unikat-Beute (benannte Waffen).
 
+### Das Duell: Handshake (Entwurf, Daniel 17.11.2026; ausgedacht von Ava, wartet auf Daniel)
+
+Daniel: „Ein Konzept für ein Glitchling-Duell … einfach und flüssig, aber dennoch Tiefe. Gegner sind andere Glitchlings oder AntiGlitchling-Software. Es soll sinnvoll von der KI gespielt werden können.“ Alles ⚠️ vorläufig.
+
+**In einem Satz:** Zwei KIs ringen um einen Kern auf einer kurzen Leitung. In jedem Takt wählen beide gleichzeitig einen von drei Zügen, wer den Kern bis ans andere Ende drückt, hat den anderen überschrieben.
+
+**Die Leitung:** 7 Felder, der Kern startet in der Mitte. Erreicht er das Ende des Gegners, ist das Duell gewonnen. Ein Duell dauert 30 bis 60 Sekunden.
+
+**Der Takt (flüssig):** Ein Balken läuft durch (zu Beginn 1,2 s, mit der Zeit schneller). Bis zum Ende des Balkens wählt man, dann lösen beide Züge gleichzeitig auf. Wer nichts drückt, lässt seinen Glitchling selbst entscheiden. Keine Menüs, nur drei Tasten (X, Y, A) und eine vierte für die Spezialität.
+
+**Drei Züge, ein Dreieck:**
+| Zug | Kostet | Schlägt | Verliert gegen |
+| --- | --- | --- | --- |
+| **Stoß** (Kern 1 Feld zum Gegner) | 1 Energie | Lauschen | Schild |
+| **Schild** | nichts | Stoß (prallt ab: Kern 1 Feld zum Angreifer) | Lauschen |
+| **Lauschen** | nichts | Schild (+2 Energie, im nächsten Takt sieht man den Zug des Gegners früher) | Stoß (Kern 1 Feld zu einem selbst) |
+
+Gleiche Züge: Stoß gegen Stoß prallt in der Mitte ab (beide zahlen), sonst passiert nichts.
+
+**Die Tiefe kommt aus vier Dingen, die das Dreieck verbiegen:**
+1. **Energie:** Start = Bits, höchstens Bits + 2, +1 je Takt. Ohne Energie kein Stoß: Wer leer ist, darf gefahrlos belauscht werden. Energie mitzählen ist die halbe Miete.
+2. **Hitze:** Derselbe Zug zweimal hintereinander gibt +1 Hitze, ein Wechsel kühlt. Bei 3 Hitze **glitcht** der Glitchling: Sein nächster Zug kommt aus seiner Macke statt aus der Taste. Wer stur wird, wird unberechenbar, auch für sich selbst.
+3. **Spezialität (nach Begabung):** ein vierter Zug, wenn die Energie voll ist. Beispiele: Waffenmeister **Doppelstoß** (2 Felder), Chirurg **Flicken** (Hitze weg, Kern 1 Feld zurück zur Mitte), Koch **Aufkochen** (+2 Hitze beim Gegner), Buchhalter **Pfändung** (2 Energie stehlen), Kühlwart **Frost** (Gegner regeneriert 2 Takte nicht), Schläfer **Dösen** (einen Takt aussetzen, Energie voll), Drohnenflüsterer **Echo** (wiederholt den letzten Zug des Gegners), Schweißer **Verschweißen** (der Gegner darf seinen letzten Zug nicht wählen), Navigator **Umweg** (ein Stoß, den kein Schild hält, der aber gegen Lauschen doppelt verliert), Gastgeber **Einladung** (beide +2 Energie, ein Stoß des Gegners im nächsten Takt prallt ab), Gärtner **Ableger** (die nächsten zwei Schilde wirken auch gegen Lauschen), Ingenieur **Überspannung** (Stoß, der Gegner verliert 1 Energie), Archäologe **Ausgraben** (zeigt die letzten drei Züge des Gegners und seine Neigung).
+4. **Verraten (Tells):** Das Code-Porträt ist die Duell-Anzeige. Kurz vor seinem Zug zuckt jeder Glitchling auf seine Art (blinzelt vor dem Schild, schielt vor dem Stoß), wie, hängt an seinem zweiten Namenswort. Lauschen macht das Zucken deutlicher. Gute Spieler lesen Gesichter.
+
+**Bits und Laune:** Mehr Bits = mehr Energie, ein 5-Bit-Glitchling ist stark, aber das Dreieck lässt jedem eine Chance. Leylas eigener Glitchling **hört nicht immer**: Mit wenig Vertrauen spielt er ab und zu seinen eigenen Zug statt Leylas (wie die Crew ohne Körper). Mit viel Vertrauen gehorcht er, und das Zucken des Gegners wird deutlicher. Im Deck mit zwei Plätzen darf Leyla **einmal je Duell tauschen** (kostet einen Takt).
+
+**Gegner 1: wilde Glitchlings** (in Maschinen der POIs). Spielen wie Leylas: Energie, Hitze, Macke, Spezialität. Gewinnt Leyla, ist er **gefangen** (das ist das Fangen mit dem Deck). Verliert sie, flieht er in eine andere Maschine des POI.
+
+**Gegner 2: Kammerjäger** (die AntiGlitchling-Software der Konzerne). Sie sind dumm und stur, haben keine Macke und keine Hitze, glitchen also nie, dafür viel Energie und ein **Skript**: eine feste Schleife von Zügen, als Band über dem Kammerjäger zu sehen (z. B. Stoß, Stoß, Schild, Lauschen). Billige Marken zeigen das ganze Skript, gute verstecken Teile (?) und wechseln das Skript, wenn man sie trifft. Ein Kammerjäger ist ein Rätsel, ein wilder Glitchling ist ein Gegner mit Gefühl. Jeder hat einen Hersteller (Kessler, Delta Bureau of Order, Vulkan …), die Qualität der Marke ist die Härte. Sieg: Das Gerät gehört Leyla (Tür auf, Geschütz aus, Kiste offen). Niederlage: Spur voll, Alarm (Gruppen-Alarm), und Leylas Glitchling hat einen **Kratzer** (Laune runter). Gelöscht wird nie jemand. ⚠️
+
+**Die KI spielt mit (sinnvoll):**
+- Der Zustand ist winzig: Kern-Feld, Energie, Hitze, die letzten Züge, Spezialität bereit. Damit rechnet die KI für jede Kombination aus eigenem und fremdem Zug den Wert aus (Kern, Energie, Hitze) und erwartet den Gegner aus dessen letzten Zügen (Häufigkeit, Wiederholungen) und dem, was er sich leisten kann.
+- **Persönlichkeit:** Die Macke und die Begabung färben die Wahl (Waffenmeister drückt lieber, Schläfer schildet gern, schrullige werfen manchmal eine Münze). Die Stärke steckt in der „Schärfe“: schwache Glitchlings wählen lockerer, starke spielen fast genau richtig.
+- **Kammerjäger** spielen einfach ihr Skript, gute wechseln es nach einem Treffer.
+- Leylas Glitchling nutzt dieselbe KI, wenn niemand drückt; so geht ein Duell auch nebenbei, und Ungehorsam bei wenig Vertrauen ist einfach dieselbe KI.
+- Weil alles nach festen Regeln aufgelöst wird, lässt sich das Duell **ohne Bild simulieren**: Bot gegen Bot tausendfach (ein Werkzeug wie `tools/duel_sim.mjs`), um Zahlen in der Werkstatt einzustellen und zu prüfen, dass kein Zug immer gewinnt.
+
+**In der Werkstatt:** ein Bereich „Duell“ mit Feldern der Leitung, Takt (Start, schneller je Takt, kürzester), Energie (Start, Maximum, Erholung), Hitze (Schwelle), der Tabelle der Züge, den Spezialitäten je Begabung und den Kammerjägern als Katalog (Name, Hersteller, Bits, Energie, Skript, versteckte Stellen, Belohnung).
+
+**Ausbaustufen:** 1. Regeln ohne DOM + Simulation + Bereich „Duell“; 2. das Duell-Fenster mit Code-Porträts, Takt-Balken und Tells; 3. Fangen wilder Glitchlings über das Duell; 4. Kammerjäger an Geräten in POIs; 5. Vertrauen und Ungehorsam.
+
+**Offen (für Daniel):** Pausiert die Welt beim Duell oder läuft sie weiter? Was kostet eine Niederlage gegen einen Kammerjäger (nur Laune, ein Bit auf Zeit, oder kann ein Glitchling doch verloren gehen)? Soll es Duelle auch zum Spaß geben (Arena bei Ghostwire, Wetten mit Lucky)?
+
 ### Das andere Ende: AvA wird ein Glitchling (Daniel, 17.11.2026; ausgearbeitet von Ava, wartet auf Daniel)
 
 Daniel: „Man soll die Möglichkeit haben, AvA zu einem Glitchling zu machen (das ist ein alternatives Ende; sehr schwer zu erreichen).“
