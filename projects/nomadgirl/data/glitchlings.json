@@ -110,7 +110,7 @@
    "name": "Kühlwart",
    "function": "cooling",
    "also": "kitchen",
-   "brand": "atomcola",
+   "brand": "nomadcola",
    "effect": "Gerichte halten {n} % länger (Buffs)",
    "perBit": 8,
    "stat": "freshness",

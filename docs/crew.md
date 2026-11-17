@@ -142,12 +142,12 @@ Mirela ──── will Pixies Mods untersuchen ── Pixie
 ## 📡 Pixie · Späher, Funk & Fahren
 
 - **Pronomen:** keine. Alle sagen „Pixie“ (Daniel).
-- **Oben:** Kennt jede Straße und jeden Kanal, lebt von AtomCola und Chips. Dank Gen-Mods und Cyberware aus dem Labor ist Pixie quasi **die Stimme des Rigs** (Daniel): hört Funk, Motoren, Elektronik, spricht Warnungen, liest Straßen.
+- **Oben:** Kennt jede Straße und jeden Kanal, lebt von NomadCola und Chips. Dank Gen-Mods und Cyberware aus dem Labor ist Pixie quasi **die Stimme des Rigs** (Daniel): hört Funk, Motoren, Elektronik, spricht Warnungen, liest Straßen.
 - **Unten:** Aus der Stadt geflohen, aus **demselben Labor wie AvA** ausgebüchst. Pixie hält das bis kurz vor Schluss geheim, aus Angst, rausgeworfen zu werden (Daniel).
 - **Fähigkeit:** Spähen 3.
 - **Eigenheiten:** sichtbar **Stimme des Rigs** (Pixie meldet Überfälle, Wetter und Pannen früher, die Karte zeigt mehr); verborgen **Aus dem Labor** (Pixie meidet Mirela und alles, was nach Klinik riecht).
 - **Wie Pixie dazukommt:** ⚠️ vorläufig (Ava): ein Funkspruch auf der Reise. Eine Stimme leitet das Rig an einer Falle vorbei und fragt dann, ob noch ein Platz frei ist.
-- **Sprüche:** „Kanal neun rauscht komisch. Fahr links.“ · „Das Rig hat Hunger. Den Tank mein ich. Okay, mich auch.“ · „Noch eine AtomCola und ich höre Farben.“ · „AvA summt im Schlaf. Hast du das schon gehört?“ · „Straßen lügen nie. Karten ständig.“
+- **Sprüche:** „Kanal neun rauscht komisch. Fahr links.“ · „Das Rig hat Hunger. Den Tank mein ich. Okay, mich auch.“ · „Noch eine NomadCola und ich höre Farben.“ · „AvA summt im Schlaf. Hast du das schon gehört?“ · „Straßen lügen nie. Karten ständig.“
 
 | Stufe | Szene | Wahl |
 |---|---|---|

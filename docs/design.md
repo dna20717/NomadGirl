@@ -199,7 +199,7 @@ Zu Beginn kennt man „Notflicken“, „Stromzelle tauschen“ und „Kühlmitt
 
 ### Reisekarte (Daniel, 13.11.2026, gebaut als #007)
 
-- Reisen ist eine **verwitterte Touristen-Karte der 60er** mit Marken der Spielwelt (Delta Petrol, AtomCola, Motel Salzsee …), kein Menü mehr. Am Warroom und an der Van-Tür.
+- Reisen ist eine **verwitterte Touristen-Karte der 60er** mit Marken der Spielwelt (Delta Petrol, NomadCola, Motel Salzsee …), kein Menü mehr. Am Warroom und an der Van-Tür.
 - **Jeder Durchgang würfelt ein Straßennetz** um BigCityDelta: feste Wahrzeichen plus gewürfelte Orte. Leyla fährt immer eine Straße weit; weiter draußen ist es gefährlicher und lohnender, Unbekanntes bleibt „?“.
 - Jedes Ziel zeigt Kosten (Strecke, Fahrzeit, Sprit, Vorräte), Gefahr und Art, und welche Beute dort vermutlich liegt. Details: `docs/features/worldmap.md`.
 
@@ -476,7 +476,7 @@ Damit hängt das Hacking am Herz des Spiels: Jeder Sprung ins Netz kostet AvA Kr
 1. **Netzblick (sehen)**
    - Mit dem Cyberdeck schaltet Leyla in den Netzblick: Die Welt wird dunkel und blau, alle Geräte im Umkreis leuchten als Knoten auf, Kabel und Funkreichweiten als Linien.
    - Die Zeit läuft dabei langsam weiter (etwa 25 %), Leyla ist verwundbar.
-   - Geräte sind schon da oder kommen einfach dazu: Kameras, Lampen, Türen und Schalter, Lautsprecher, Automaten (AtomCola, Neon Noodle), Geschütze, Aufzüge, Gegner-Drohnen, Plakate, Raider mit Implantaten.
+   - Geräte sind schon da oder kommen einfach dazu: Kameras, Lampen, Türen und Schalter, Lautsprecher, Automaten (NomadCola, Neon Noodle), Geschütze, Aufzüge, Gegner-Drohnen, Plakate, Raider mit Implantaten.
    - Der Netzblick zeigt auch Verborgenes: Kabel, die in eine Scheinwand laufen, verraten ein Secret.
 2. **Sprung (bewohnen)**
    - AvA verlässt die Drohne (die Drohne sinkt dabei leblos zu Boden und ist angreifbar, ein Risiko) und springt von Knoten zu Knoten, nur entlang verbundener Linien.
@@ -627,7 +627,7 @@ Daniel, 16.11.2026: „Das Konzept von Software existiert in dieser Welt nicht m
 - **Überreden:** Im Gespräch (Comic-Dialog wie die Crew) will jeder Glitchling etwas: ein Ding, einen Ort („zeig mir das Meer“), eine Tat („schalte die Kessler-Kamera ab, die mich jagt“), eine Werkbank. Freiwillige sind **gut gelaunt und loyal** und starten mit Vertrauen.
 - **Kaufen und Tauschen:** Ghostwire und manche Händler bieten Glitchlings an, teuer, manchmal mit verschwiegener zweiter Macke (wie die verborgene Eigenheit bei der Crew).
 - **Erben:** In Wracks (Bergungsprojekte) und Mega-Rigs wohnen alte Glitchlings, die mit dem Fahrzeug kommen, manchmal treu zum Fahrzeug statt zu Leyla.
-- **Hersteller (Daniel, 17.11.2026: „KIs brauchen einen Hersteller“, gebaut als #049):** Jede Art KI kommt von einer Marke aus Lore › Marken, nach Begabung: Koch-KIs von Neon Noodle, Schweißer von Backalley Chrome, Gärtner von Kessler Cosmetics, Ingenieure von Delta Petrol, Chirurgen von Kessler Cybernetics, Navigatoren von Mile King, Waffenmeister von Vulkan, Drohnenflüsterer von Ghostwire, Gastgeber vom Salt Lake Motel, Buchhalter vom Delta Bureau of Order, Kühlwarte von AtomCola, Schläfer von NeuroLux, Archäologen von Crow & Sons. Unikate können einen eigenen haben. ⚠️ vorläufig; später kann die Qualität der Marke wirken (wie bei Waffen).
+- **Hersteller (Daniel, 17.11.2026: „KIs brauchen einen Hersteller“, gebaut als #049):** Jede Art KI kommt von einer Marke aus Lore › Marken, nach Begabung: Koch-KIs von Neon Noodle, Schweißer von Backalley Chrome, Gärtner von Kessler Cosmetics, Ingenieure von Delta Petrol, Chirurgen von Kessler Cybernetics, Navigatoren von Mile King, Waffenmeister von Vulkan, Drohnenflüsterer von Ghostwire, Gastgeber vom Salt Lake Motel, Buchhalter vom Delta Bureau of Order, Kühlwarte von NomadCola, Schläfer von NeuroLux, Archäologen von Crow & Sons. Unikate können einen eigenen haben. ⚠️ vorläufig; später kann die Qualität der Marke wirken (wie bei Waffen).
 - **Das Cyberdeck ist ein Fach für Glitchlings (Daniel, 17.11.2026, gebaut als #049):** „Man muss sie nicht im Inventar transportieren, wenn man ein Cyberdeck hat (was im Grunde zunächst mal ein eigenes Inventar für Glitchlinge ist).“ Jedes Deck hat Plätze (Bastler-Deck: 2 ⚠️), dort tragen Glitchlings keinen Platz im Rucksack weg und überstehen ein k.o. wie die Ausrüstung. Ohne Deck gehen sie auch in den Rucksack oder ins Lager.
 - **Das Deck** wird damit wichtig: Seine Stufe bestimmt, wie starke Glitchlings man fangen kann, und es hat **Plätze**, wie viele man unterwegs bei sich tragen kann (Bastler-Deck: 1 Platz, Stufe 1).
 

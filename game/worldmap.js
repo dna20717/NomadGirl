@@ -14,7 +14,8 @@ import { mapBrands } from './brands.js';
 export const MAP_VERSION = 1;
 // names of the places (#021, Daniel 14.11.2026: „Alle Ortsnamen müssen ein wenig cooler werden und auf Englisch sein“): a savegame with
 // older names gets the new ones, the roads, visited places and dangers stay (renameMap)
-export const NAMES_VERSION = 3;   // 3: English brand names (Lore › Marken, 16.11.2026)
+export const NAMES_VERSION = 4;   // 3: English brand names (Lore › Marken, 16.11.2026); 4: AtomCola is NomadCola (Daniel, 17.11.2026)
+const RENAMED_BRANDS = { atomcola: 'nomadcola' };
 
 // small seeded random numbers (mulberry32), the same seed gives the same map
 export function rng(seed) {
@@ -112,6 +113,8 @@ export function ensureMap(D, save) {
 // new names for an older map: the same seed rolls the same places, so names and regions are taken over where id and position match;
 // landmarks take theirs from the area Orte; a place without a twin gets a fresh name of its kind
 export function renameMap(D, map) {
+  for (const n of map.nodes) if (RENAMED_BRANDS[n.brand]) n.brand = RENAMED_BRANDS[n.brand];
+  for (const s of map.signs || []) if (RENAMED_BRANDS[s.brand]) s.brand = RENAMED_BRANDS[s.brand];
   const fresh = generateMap(D, map.seed, map.cycle), C = mapConfig(D);
   for (const n of map.nodes) {
     const L = n.landmark && D.locations?.[n.id], twin = fresh.nodes.find(x => x.id === n.id && dist(x.pos, n.pos) < 0.05);

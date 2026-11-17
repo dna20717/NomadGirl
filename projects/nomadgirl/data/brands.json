@@ -50,7 +50,7 @@
   "map": {"on": true, "kind": "", "weight": 1},
   "icon": 2
  },
- "atomcola": {
+ "nomadcola": {
   "sector": "drink",
   "tier": "cheap",
   "seat": "BigCityDelta, Abfüllwerk Süd",
@@ -60,8 +60,8 @@
   "price": 100,
   "loot": 120,
   "description": "Die Cola mit dem grünen Leuchten. Pixie lebt quasi davon. Die Werbung verspricht Energie für drei Tage; die Wahrheit ist irgendwo zwischen Koffein und Halbwertszeit.",
-  "name": "AtomCola",
-  "short": "AtomCola",
+  "name": "NomadCola",
+  "short": "NomadCola",
   "slogan": "Fizz to the bone.",
   "color": "#b4202a",
   "map": {"on": true, "kind": "mall", "weight": 2},

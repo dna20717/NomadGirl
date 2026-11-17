@@ -11,7 +11,7 @@ const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
 
 test('Reisekarte holt ihre Marken aus Lore › Marken (die acht von vorher, gleiche IDs)', () => {
   const ids = mapConfig(D).brands.map(b => b.id);
-  for (const id of ['delta_petrol', 'neon_nudel', 'kessler', 'atomcola', 'motel_salzsee', 'ordnungsamt', 'kraehe', 'kilometerkoenig']) assert.ok(ids.includes(id), id);
+  for (const id of ['delta_petrol', 'neon_nudel', 'kessler', 'nomadcola', 'motel_salzsee', 'ordnungsamt', 'kraehe', 'kilometerkoenig']) assert.ok(ids.includes(id), id);
   assert.ok(!ids.includes('chroma_kill'), 'Haarfarben-Marken stehen nicht auf der Karte');
   assert.ok(mapBrands(D).every(b => b.short && b.slogan && b.color));
   assert.equal(D.worldmap.brands, undefined, 'keine zweite Liste mehr');
