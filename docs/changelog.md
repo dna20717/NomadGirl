@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 17.11.2026: **Glitch-Duell als Demo** (#050) unter /duel: Kern von OPR Firefight als Kartenspiel (Präzision, Abschirmung, Integrität, Impulse; Einflüstern, Verschränken, Kalibrieren; Selbsttest und Flackern), Code-Porträts als Karten, Würfel aus Code, KI für beide Seiten, Kammerjäger, 1000× simulieren.
 - 17.11.2026: **Glitchlings mit Hersteller, Cyberdeck als Glitchling-Fach** (#049): jede KI hat eine Marke (nach Begabung, Markenschild im Tooltip); das Cyberdeck trägt Glitchlings in eigenen Plätzen (Bastler-Deck: 2) statt im Rucksack; ältere Spielstände bekommen einmal ein Bastler-Deck, Amber Slay zieht ein.
 - 17.11.2026: **Ein Glitchling im Inventar** (#048): Amber Slay liegt als Gegenstand mit laufendem Code-Porträt im Rucksack (einmal je Spielstand), Tooltip mit Begabung, Effekt, Macke und Wunsch; Entscheidungen zum anderen Ende.
 - 17.11.2026: **Glitchling-Code-Porträts** (#048): jeder Glitchling ein eigenes animiertes Gesicht auf einem kleinen Bildschirm, ganz aus Code (Farbe, Augen, Mund, Form, Zubehör je Begabung, Lämpchen je Bit, Glitches je Macke, Goldrand für Unikate), in der Werkstatt-Vorschau und bereit als Item-Bild; neue Begabung **Archäologe** (Warroom zeigt Unikat-Beute); das andere Ende „AvA wird ein Glitchling“ im Design.

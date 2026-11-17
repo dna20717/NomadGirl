@@ -6,7 +6,17 @@
   "second": "Sting, Slay, Hex, Bite, Lullaby, Whisper, Spark, Fang, Drift, Riot, Knot, Howl, Glare, Stitch, Rattle, Snare, Flicker, Thorn, Echo, Hymn, Rush, Grin, Hush, Snap, Waltz, Mutter, Claw, Psalm, Crash, Purr, Jinx, Halo"
  },
  "talents": [
-  {"name": "Koch", "function": "kitchen", "also": "foodtruck", "brand": "neon_nudel", "effect": "Gerichte gelingen um {n} % öfter perfekt", "perBit": 6, "stat": "perfect"},
+  {
+   "name": "Koch",
+   "function": "kitchen",
+   "also": "foodtruck",
+   "brand": "neon_nudel",
+   "effect": "Gerichte gelingen um {n} % öfter perfekt",
+   "perBit": 6,
+   "stat": "perfect",
+   "remote": 1,
+   "link": 2
+  },
   {
    "name": "Schweißer",
    "function": "craft",
@@ -14,7 +24,9 @@
    "brand": "backalley_chrome",
    "effect": "{n} % Chance, dass Herstellen ein Teil zurückgibt",
    "perBit": 5,
-   "stat": "refund"
+   "stat": "refund",
+   "remote": 1,
+   "link": 3
   },
   {
    "name": "Gärtner",
@@ -23,17 +35,99 @@
    "brand": "kessler_kosmetik",
    "effect": "Pflanzen und Wasser kommen {n} % schneller",
    "perBit": 8,
-   "stat": "growth"
+   "stat": "growth",
+   "remote": 1,
+   "link": 2
   },
-  {"name": "Ingenieur", "function": "power", "also": "engine", "brand": "delta_petrol", "effect": "+{n} ⚡ Strom", "perBit": 1, "stat": "power"},
-  {"name": "Chirurg", "function": "cyber", "also": "tank", "brand": "kessler", "effect": "Implantate belasten {n} % weniger", "perBit": 8, "stat": "strain"},
-  {"name": "Navigator", "function": "warroom", "also": "jobs", "brand": "kilometerkoenig", "effect": "Reisen kosten {n} % weniger Sprit", "perBit": 6, "stat": "fuel"},
-  {"name": "Waffenmeister", "function": "armory", "also": "craft", "brand": "vulkan", "effect": "Eigenbau-Waffen +{n} % Schaden", "perBit": 4, "stat": "weaponDamage"},
-  {"name": "Drohnenflüsterer", "function": "drone", "also": "power", "brand": "ghostwire", "effect": "AvAs Akku hält {n} % länger", "perBit": 7, "stat": "battery"},
-  {"name": "Gastgeber", "function": "chill", "also": "guests", "brand": "motel_salzsee", "effect": "Ruhe-Buffs {n} % stärker", "perBit": 6, "stat": "rest"},
-  {"name": "Buchhalter", "function": "storage", "also": "treasury", "brand": "ordnungsamt", "effect": "Beute ist {n} % mehr wert", "perBit": 4, "stat": "value"},
-  {"name": "Kühlwart", "function": "cooling", "also": "kitchen", "brand": "atomcola", "effect": "Gerichte halten {n} % länger (Buffs)", "perBit": 8, "stat": "freshness"},
-  {"name": "Schläfer", "function": "sleep", "also": "chill", "brand": "neurolux", "effect": "Schlafen heilt {n} % mehr", "perBit": 7, "stat": "sleepHeal"},
+  {"name": "Ingenieur", "function": "power", "also": "engine", "brand": "delta_petrol", "effect": "+{n} ⚡ Strom", "perBit": 1, "stat": "power", "remote": 2, "link": 2},
+  {
+   "name": "Chirurg",
+   "function": "cyber",
+   "also": "tank",
+   "brand": "kessler",
+   "effect": "Implantate belasten {n} % weniger",
+   "perBit": 8,
+   "stat": "strain",
+   "remote": 1,
+   "link": 3
+  },
+  {
+   "name": "Navigator",
+   "function": "warroom",
+   "also": "jobs",
+   "brand": "kilometerkoenig",
+   "effect": "Reisen kosten {n} % weniger Sprit",
+   "perBit": 6,
+   "stat": "fuel",
+   "remote": 2,
+   "link": 1
+  },
+  {
+   "name": "Waffenmeister",
+   "function": "armory",
+   "also": "craft",
+   "brand": "vulkan",
+   "effect": "Eigenbau-Waffen +{n} % Schaden",
+   "perBit": 4,
+   "stat": "weaponDamage",
+   "remote": 2,
+   "link": 3
+  },
+  {
+   "name": "Drohnenflüsterer",
+   "function": "drone",
+   "also": "power",
+   "brand": "ghostwire",
+   "effect": "AvAs Akku hält {n} % länger",
+   "perBit": 7,
+   "stat": "battery",
+   "remote": 3,
+   "link": 1
+  },
+  {
+   "name": "Gastgeber",
+   "function": "chill",
+   "also": "guests",
+   "brand": "motel_salzsee",
+   "effect": "Ruhe-Buffs {n} % stärker",
+   "perBit": 6,
+   "stat": "rest",
+   "remote": 1,
+   "link": 2
+  },
+  {
+   "name": "Buchhalter",
+   "function": "storage",
+   "also": "treasury",
+   "brand": "ordnungsamt",
+   "effect": "Beute ist {n} % mehr wert",
+   "perBit": 4,
+   "stat": "value",
+   "remote": 2,
+   "link": 1
+  },
+  {
+   "name": "Kühlwart",
+   "function": "cooling",
+   "also": "kitchen",
+   "brand": "atomcola",
+   "effect": "Gerichte halten {n} % länger (Buffs)",
+   "perBit": 8,
+   "stat": "freshness",
+   "remote": 1,
+   "link": 2
+  },
+  {
+   "name": "Schläfer",
+   "function": "sleep",
+   "also": "chill",
+   "brand": "neurolux",
+   "effect": "Schlafen heilt {n} % mehr",
+   "perBit": 7,
+   "stat": "sleepHeal",
+   "remote": 1,
+   "link": 1
+  },
   {
    "name": "Archäologe",
    "function": "warroom",
@@ -41,7 +135,9 @@
    "brand": "kraehe",
    "effect": "Die Karte im Warroom zeigt die Fundorte aller einzigartigen Beutestücke",
    "perBit": 0,
-   "stat": "archaeology"
+   "stat": "archaeology",
+   "remote": 2,
+   "link": 1
   }
  ],
  "quirks": [
@@ -104,5 +200,33 @@
    "brand": "kessler"
   }
  ],
- "bitWeights": [{"w": 40},{"w": 30},{"w": 18},{"w": 9},{"w": 3}]
+ "bitWeights": [{"w": 40},{"w": 30},{"w": 18},{"w": 9},{"w": 3}],
+ "duel": {"quality": [{"q": 5},{"q": 5},{"q": 4},{"q": 4},{"q": 3}], "defense": {"cheap": 5, "mid": 4, "premium": 4, "elite": 3}, "tough": 1, "team": 2},
+ "hunters": [
+  {
+   "id": "sanitizer",
+   "name": "Sanitizer",
+   "brand": "kessler",
+   "quality": 5,
+   "defense": 3,
+   "tough": 4,
+   "remote": 1,
+   "link": 2,
+   "description": "Kessler wischt nach. Gründlich, langsam, unbestechlich."
+  },
+  {
+   "id": "doorman",
+   "name": "Doorman",
+   "brand": "ordnungsamt",
+   "quality": 4,
+   "defense": 4,
+   "tough": 3,
+   "remote": 2,
+   "link": 1,
+   "description": "Prüft Ausweise, die es nicht mehr gibt."
+  },
+  {"id": "watchdog", "name": "Watchdog", "brand": "vulkan", "quality": 4, "defense": 4, "tough": 4, "remote": 1, "link": 3, "description": "Beißt erst, fragt nie."},
+  {"id": "tollbooth", "name": "Tollbooth", "brand": "kilometerkoenig", "quality": 5, "defense": 5, "tough": 3, "remote": 2, "link": 2, "description": "Jeder Bit kostet Maut."},
+  {"id": "bleach", "name": "Bleach", "brand": "neurolux", "quality": 4, "defense": 5, "tough": 2, "remote": 3, "link": 1, "description": "Macht weiß, was vorher bunt war."}
+ ]
 }

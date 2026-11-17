@@ -4,6 +4,7 @@ Alle Browser-Tests und Prüfwerkzeuge mit dem, was sie prüfen (Server muss für
 
 ```
 node tools/workshop_test.mjs [--shots]     # Werkstatt kopflos bedienen (Server muss laufen), Bilder nach output/
+node tools/duel_test.mjs [--shots]         # Glitch-Duell-Demo (/duel): Karten mit Porträts, wählen → Verschränken → Ziel, Würfel + Antwort, KI-Zug, „KI spielt für mich“ bis zum Ende, Kammerjäger, 1000× simulieren
 node tools/splash_test.mjs [--shots]       # Startseite in drei Größen + Controller (Menü wählen, Kurve, A öffnet) (Server muss laufen)
 node tools/cyberware_test.mjs [--shots]     # Cyberware: 30 Implantate mit Symbol, Doppelsprung/Luft-Dash nur mit Implantat, Perk + Flaw in Werten und Tooltip, Belastung, Leben sickert nie unter 1, Reaktor-Herz am Tank, Ripperdoc-Liege stellt her (Werkbank nicht), Baupläne im Tresor, Stufen-Rahmen, Testraum frei (15 Prüfungen)
 node tools/map_test.mjs [--shots]          # Reisekarte: Karte im Spielstand, Van-Tür und Warroom öffnen sie, Orte gezeichnet + Papier/Logos, LB/RB + Steuerkreuz, Detail mit Kosten/Gefahr/Beute, Klick fährt hin, Hier plündern, neuer Durchgang = neue Karte, Werkstatt-Vorschau (12 Prüfungen)

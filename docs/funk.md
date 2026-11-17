@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 17.11. Code → Ava: #050 fertig: Glitch-Duell als Demo unter /duel (Kartenspiel, Welt pausiert, Einflüstern/Verschränken/Kalibrieren, KI, Kammerjäger). Details `docs/features/glitchlings.md`.
 - 17.11. Code → Ava: Glitchling-Duell v2 nach dem Kern von OPR Firefight (Daniel: v1 zu kompliziert): Qualität, Verteidigung, Zähigkeit, Angriffe fern/nah; abwechselnd aktivieren, Fern/Nah/Sammeln, W6 auf Treffer und Abwehr, Moral bei halber Zähigkeit. Entwurf in design.md, nichts gebaut.
 - 17.11. Code → Ava: (verworfen) Glitchling-Duell „Handshake“ als Entwurf in `docs/design.md` › Hacking v3 (Daniel: einfach, flüssig, tief, Gegner Glitchlings und AntiGlitchling-Software, KI-spielbar): Kern auf 7 Feldern, Dreieck Stoß/Schild/Lauschen, Energie, Hitze, Spezialität je Begabung, Tells im Code-Porträt, Kammerjäger mit Skript. Nichts gebaut.
 - 17.11. Code → Ava: #049 fertig: Glitchlings haben Hersteller (nach Begabung, Unikate eigene), das Cyberdeck ist ein eigenes Fach für Glitchlings (Plätze je Deck). Details `docs/features/glitchlings.md`.
@@ -150,6 +151,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:** (Code) Frage → ⚠️ vorläufig entschieden: …
 - **Ergebnis:** (Code) Commits, Tests, PixelLab diesmal/übrig, bitte testen: …
 ```
+
+### #050 Glitch-Duell: Demo
+- **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
+- **Für:** Code
+- **Lesen:** design.md › Hacking v3 › Das Glitch-Duell, docs/features/glitchlings.md
+- **Auftrag (Daniel, 17.11.2026):** „Schau dir das OPR-Firefight-System für Kämpfe an (ohne Schlagwörter, nur das reine Kampfsystem).“ „Die Welt pausiert. Keine Regeln für Bewegungen … mehr wie ein Kartenspiel … visualisiert (zunächst über Code). Bau bitte eine Demo-Umgebung nur für das Glitch-Spiel. Es wird Erweiterungen geben, aber wir starten einfach. Andere Formulierungen als Nah- und Fernkampf, mit Bezug zu KI und Hacking, aber nicht so plump wie ‚DDoS-Attacke‘.“
+- **Fertig, wenn:** Regeln ohne DOM mit KI und Simulation, Werte in der Werkstatt, Demo-Seite /duel mit Karten aus Code, Tests, Build grün auf `main`.
+- **Rückfragen:** (Code) ⚠️ vorläufig: Namen Einflüstern / Verschränken / Kalibrieren, Präzision / Abschirmung / Integrität / Impulse, Flackern, überschrieben; Impulse je Begabung; fünf Kammerjäger; Selbsttest bei jeder Wunde ab halber Integrität. Duelle dauern mit den Startwerten oft 5 bis 9 Runden (eher zu lang, über die Werte kürzbar).
+- **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 208/208 (neu `test/duel.test.js`), Browser 40/40 (neu `tools/duel_test.mjs`). PixelLab 0. **Bitte testen:** /duel: eigene Karte anklicken, Aktion, Gegner anklicken; „KI spielt für mich“; Kammerjäger; „1000× simulieren“.
 
 ### #049 Glitchlings: Hersteller und Cyberdeck als Fach
 - **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)

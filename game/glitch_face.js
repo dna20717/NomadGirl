@@ -34,6 +34,9 @@ const hash = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.code
 export function faceOf(g) {
   const [a = '', b = ''] = String(g.name || g.id || '').split(/\s+/), h = hash(g.id || g.name), hb = hash(b), r = rng(h);
   const tint = hex(TINT[a] || BRIGHT[hash(a) % BRIGHT.length]);
+  // a Kammerjäger (#050, AntiGlitchling-Software): always the same stiff face, red light on a wide black screen, never glitches
+  if (g.hunter) return { tint: hex(['df3e23', 'fa6a0a', 'e86a73', 'b4202a'][h % 4]), glass: hex('060608'), bezel: hex(['333941', '4a5462', '242234'][(h >>> 3) % 3]), shape: 'wide',
+    eyes: 'bars', mouth: 'flat', wears: null, bits: 0, glitch: null, unique: false, blink: 99, phase: r() * 10, talk: 99, seed: h, hunter: true };
   return { tint, glass: hex(GLASS[h % GLASS.length]), bezel: hex(BEZEL[(h >>> 4) % BEZEL.length]), shape: SHAPES[(h >>> 8) % SHAPES.length],
     eyes: EYES[hb % EYES.length], mouth: MOUTHS[(hb >>> 5) % MOUTHS.length], wears: WEARS[g.stat] || null, bits: Math.max(0, Math.min(5, g.bits || 0)),
     glitch: g.quirkKind || null, unique: !!g.unique, blink: 2.4 + r() * 3.5, phase: r() * 10, talk: 3 + r() * 4, seed: h };

@@ -658,38 +658,28 @@ Daniel: „Jeder Glitchling bekommt ein individuelles, animiertes Code-Porträt,
 
 Daniel: „Eine Kraft soll noch sein ‚Archäologe‘, die dazu führt, dass die Locations aller einzigartigen Beutestücke im Warroom angezeigt werden.“ Wohnt er im **Warroom**, zeigt die Reisekarte an jedem Ort, wo ein einzigartiges Beutestück liegt (Marke am Ort, im Tooltip welches). Stärke spielt keine Rolle (je Bit 0), in einer fremden Werkbank wirkt er nicht. Auch: Schatzkammer. ⚠️ vorläufig: „einzigartig“ heißt zunächst alles mit dem Merkmal **Trophäe** (33 Gegenstände); später vielleicht eigene Unikat-Beute (benannte Waffen).
 
-### Das Duell (v2, Daniel 17.11.2026: „zu kompliziert. Schau dir das OPR-Firefight-System für Kämpfe an, ohne Schlagwörter, nur das reine Kampfsystem“; Entwurf von Ava, wartet auf Daniel)
+### Das Glitch-Duell (Daniel 17.11.2026, Demo gebaut als #050)
 
-Vorbild ist der Kern von OPR Firefight ohne Sonderregeln: abwechselnd aktivieren, Treffer auf Qualität würfeln, Verteidigung würfeln, Zähigkeit, Moral bei halber Zähigkeit. Alles ⚠️ vorläufig. (v1 „Handshake“ mit Leitung, Dreieck, Hitze und Tells: verworfen, zu kompliziert.)
+Daniel: „Schau dir das OPR-Firefight-System für Kämpfe an (ohne Schlagwörter, nur das reine Kampfsystem).“ Dann: „Die Welt pausiert. Es gibt keine Regeln für Bewegungen im Glitch-Duell, sondern es soll mehr wie ein Kartenspiel funktionieren und visualisiert werden (zunächst über Code). Es wird auf jeden Fall Erweiterungen für diese Regeln geben, aber wir starten einfach. Wir brauchen andere Formulierungen als Nah- und Fernkampf, die mehr Bezug zu KI und Hacking haben.“ (v1 „Handshake“ mit Leitung, Dreieck, Hitze und Tells: verworfen, zu kompliziert.)
 
-**Werte eines Glitchlings** (vier Zahlen, alle aus dem, was er schon hat):
-| Wert | Bedeutung | Woher |
-| --- | --- | --- |
-| **Qualität** | trifft bei W6 ≥ Qualität, auch für die Moral | Bits: 1–2 Bits 5+, 3–4 Bits 4+, 5 Bits 3+ |
-| **Verteidigung** | wehrt einen Treffer ab bei W6 ≥ Verteidigung | Hersteller: Billig 5+, Mittel und Premium 4+, Elite 3+ |
-| **Zähigkeit** | so viele Wunden, dann ist er überschrieben | Bits + 1 (2 bis 6) |
-| **Angriffe** | Würfel je Angriff, **fern** und **nah** | Begabung (z. B. Waffenmeister fern 2 / nah 3, Schläfer 1 / 1, die meisten 1 / 2) |
-
-**Ablauf:**
-1. Jede Seite hat 1 bis 3 Glitchlings (Leyla: die aus ihrem Deck).
-2. **Abwechselnd aktivieren:** Eine Seite aktiviert einen ihrer Glitchlings, dann die andere, bis jeder einmal dran war. Das ist eine Runde. In der nächsten Runde beginnt, wer in der letzten zuletzt dran war.
-3. **Eine Aktivierung = eine von drei Aktionen:**
-   - **Fern:** greift ein Ziel mit den Fern-Angriffen an. Keine Antwort.
-   - **Nah:** greift mit den Nah-Angriffen an, danach schlägt das Ziel mit seinen Nah-Angriffen zurück (wenn es noch steht).
-   - **Sammeln:** greift nicht an. Ein wackelnder Glitchling wackelt danach nicht mehr.
-4. **Angriff auflösen:** Je Angriff ein W6, jeder Wurf ≥ Qualität ist ein Treffer. Für jeden Treffer würfelt das Ziel einen W6, jeder Wurf ≥ Verteidigung hält ihn ab, jeder andere ist eine Wunde. Wunden ≥ Zähigkeit: überschrieben.
-5. **Moral:** Fällt ein Glitchling auf die Hälfte seiner Zähigkeit oder darunter, würfelt er einmal auf Qualität. Misslingt der Wurf, **wackelt** er: Er kann nur Sammeln, und im Nahkampf schlägt er nicht zurück.
-6. **Ende:** Eine Seite hat keinen Glitchling mehr, der steht. Ein wilder Glitchling, der überschrieben wird, ist **gefangen** (Leylas überschriebene kommen erschöpft ins Deck zurück, nie gelöscht).
-
-**Warum das trotzdem Tiefe hat:** die Reihenfolge der Aktivierungen (wen ziehe ich vor, bevor der Gegner zuschlägt), Fern gegen Nah (sicherer Schaden oder mehr Schaden mit Rückschlag), wann man einen Wackelnden sammelt statt anzugreifen, und welches Ziel man nimmt (den Starken, den Fast-Toten, den mit dem Rückschlag).
-
-**Kammerjäger** (AntiGlitchling-Software der Konzerne) haben dieselben vier Werte, meist hohe Verteidigung und Zähigkeit, schwache Qualität, kommen oft zu zweit oder zu dritt. Sieg: Das Gerät gehört Leyla. Niederlage: Alarm, Leylas Glitchlings sind erschöpft.
-
-**Die KI spielt es sinnvoll,** weil alles offen und kurz ist: Für jede mögliche Aktion (Glitchling × Fern/Nah/Sammeln × Ziel) rechnet sie den erwarteten Schaden aus (Angriffe × Trefferchance × Chance, dass die Verteidigung versagt), zieht beim Nahkampf den erwarteten Rückschlag ab, bevorzugt Ziele, die sie überschreiben kann, und sammelt Wackelnde, wenn sonst nichts lohnt. Leylas Glitchlings können auf Wunsch genauso automatisch kämpfen. Simulation ohne Bild (Bot gegen Bot) für die Zahlen in der Werkstatt.
-
-**Bedienung:** Glitchling wählen, Aktion wählen, Ziel wählen; die Würfel rollen schnell als Pixelwürfel unter den Code-Porträts. Ein Duell dauert ein bis drei Runden.
-
-**Offen (für Daniel):** Welt pausiert beim Duell? Gibt es später Sonderregeln (Schlagwörter) über Begabung und Macke, oder bleibt es beim reinen Kern?
+- **Die Welt pausiert** während eines Duells. Keine Bewegung: Die Glitchlings liegen wie Karten in zwei Reihen einander gegenüber.
+- **Vier Werte** (alle aus dem, was ein Glitchling schon hat, in der Werkstatt einstellbar):
+  - **Präzision:** trifft bei W6 ≥ Präzision (nach Bits: 5+, 5+, 4+, 4+, 3+).
+  - **Abschirmung:** wehrt einen Treffer ab bei W6 ≥ Abschirmung (nach der Stufe des Herstellers: Billig 5+, Mittel und Premium 4+, Elite 3+).
+  - **Integrität:** so viele Wunden, dann ist er **überschrieben** (Bits + 1).
+  - **Impulse:** Würfel je Angriff, je für Einflüstern und Verschränken (nach Begabung).
+- **Abwechselnd aktivieren:** Eine Seite ist mit einem Glitchling dran, dann die andere, bis jeder einmal dran war (eine Runde). Die nächste Runde beginnt die andere Seite.
+- **Drei Aktionen** (statt Fern- und Nahkampf):
+  - **Einflüstern:** aus der Ferne eingreifen, Angriff mit den Einflüster-Impulsen, das Ziel antwortet nicht.
+  - **Verschränken:** sich direkt mit dem Ziel koppeln, mehr Impulse, danach antwortet das Ziel mit seinen Verschränk-Impulsen.
+  - **Kalibrieren:** kein Angriff, beendet das Flackern.
+- **Selbsttest:** Wer Wunden nimmt und bei halber Integrität oder darunter steht, würfelt auf Präzision. Misslungen = er **flackert**: Er kann nur kalibrieren und antwortet beim Verschränken nicht.
+- **Ende:** Eine Seite hat niemanden mehr. Ein überschriebener wilder Glitchling ist **gefangen**; Leylas Glitchlings werden nie gelöscht, nur erschöpft. Kammerjäger-Sieg: Das Gerät gehört Leyla.
+- **Kammerjäger** (AntiGlitchling-Software der Konzerne) mit festen Werten und Hersteller: Sanitizer (Kessler), Doorman (Delta Bureau of Order), Watchdog (Vulkan), Tollbooth (Mile King), Bleach (NeuroLux). ⚠️ vorläufig.
+- **Die KI** rechnet für jede Aktion (Glitchling × Aktion × Ziel) die erwarteten Wunden, die Chance zu überschreiben und beim Verschränken die erwartete Antwort und nimmt die beste, mit etwas Rauschen. Sie schlägt eine Zufalls-KI deutlich (Test).
+- **Demo** unter **/duel** (`duel.html`): Karten mit Code-Porträts, Würfel aus Code, „KI spielt für mich“, Tempo, 1000× simulieren. Im Spiel noch nicht.
+- **Erweiterungen** kommen (Daniel): z. B. Sonderregeln über Begabung und Macke, Hersteller-Eigenheiten, Kammerjäger mit Skript. Erst der Kern.
+- **Offen:** Duelle zum Spaß (Arena, Wetten mit Lucky)? Wo das Duell im Spiel startet (Maschinen in POIs, Geräte mit Kammerjägern).
 
 ### Das andere Ende: AvA wird ein Glitchling (Daniel, 17.11.2026; ausgearbeitet von Ava, wartet auf Daniel)
 
