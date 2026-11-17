@@ -41,7 +41,7 @@ Im POI spielt sich NomadGirl wie Dead Cells: schnelle Bewegung, harter Kampf, un
 - **Ende eines Runs:** Ziel erreichen (z. B. den Tresor knacken) = POI geschafft, die Uhr steht, der Rang ist fest. Ausgezahlt wird am Van, also erst nach dem Rückweg: k.o. auf dem Rückweg kostet trotzdem alles. Vorher zum Van = Abbruch, die Beute ist sicher, kein Ranking.
 - **Bewegung:** Gehen, Rennen, Springen, Schwingen, Klettern, Dashen, Sliden.
 - **Steuerung:** Tastatur oder Controller (Xbox, PlayStation, Stadia, Switch Pro; Belegung in der Werkstatt). Seit 12.11.2026 geht alles auch ohne Maus: Inventar, Kochen und Rig bauen mit Cursor (Select halten = Rig bauen, Select im Bau-Modus = Rig offen/zu). Jedes Ding im Inventar zeigt seine Aktionen (Essen/Heilen/Ausrüsten, Drohne geben, Wegwerfen; Daniel, 12.11.2026). Der rechte Stick zieht AvA sanft wie an einem Gummiband weg, ihr Scheinwerfer wird zur Tischlampe. Kanten greifen ist verzeihend (etwas über den Händen, etwas daneben, ohne Richtung nach einem Sprung). **AvA als Tritt:** mit dem rechten Stick rausgezogen (oder kurz danach geparkt) kann Leyla an ihr hochklettern und auf ihr stehen, bis der Akku leer ist (Daniel, 12.11.2026). Unten im Bild zeigt eine **Boden-Leiste** (Scan-Raster im Cyberware-Look, blendet zu den Rändern aus), was in der Nähe liegt; E / Stick ↑ hebt das erste auf, I öffnet alles.
-- **Kampf:** Nahkampf, Fernkampf, später optional Hacking über das Cyberdeck (Entwürfe: „Hacking v1: AvA im Netz“, „Hacking v2: Die Schneiderin“).
+- **Kampf:** Nahkampf, Fernkampf, später optional Hacking über das Cyberdeck (Richtung: „Hacking v3: Glitchlings“; Entwürfe v1, v2).
 - **Waffen mit eigenen Posen (Daniel, 12.11.2026, Test):** eine Fernkampfwaffe kann Leyla eigene Animationen mitgeben (Waffen › Posen). Erstes Beispiel: generisches Sturmgewehr (Ziehen vom Rücken, Anlegen, Schießen, Nachladen, Gehen und Rennen). Weitere Gewehre entstehen daraus, indem PixelLab in denselben Posen nur die Waffe tauscht.
 - **Kampfmodus (Daniel, 11.11.2026, gebaut):** Leyla ist friedlich (Waffe weg, Idles) oder im Kampfmodus mit gezogener Waffe. Automatisch rein, wenn ein Gegner in Sicht kommt, sie getroffen wird oder abdrückt; nach ein paar ruhigen Sekunden steckt sie die Waffe weg. Dazu eine Taste (Q) zum Ziehen und Wegstecken von Hand.
 - **Schießstil (Daniel, 11.11.2026, gebaut 11.11.2026 abends, Cells-like als Standard):** als Einstellung (Werkstatt › Spiel › Kampf › Schießstil, dazu Pause-Menü › Optionen) mit zwei Varianten zum Ausprobieren:
@@ -543,7 +543,7 @@ Ein Spiel im Spiel, aus dem, was wir schon haben. Für geschützte Geräte wechs
 - Drohne fällt beim Sprung leblos zu Boden (Risiko), oder schwebt sie weiter?
 - Welche Tellerrand-Ideen zuerst: Plakate/Ruf, Funk mit Pixie, Erinnerungs-Splitter, Daemons?
 
-## Hacking v2: Die Schneiderin (Entwurf Ava, 16.11.2026, wartet auf Daniel)
+## Hacking v2: Die Schneiderin (Entwurf Ava, 16.11.2026; Daniel: „zu weit über den Tellerrand“)
 
 Daniel, 16.11.2026: „Interessantes Konzept, aber leider nicht so kreativ wie es sein könnte. Merken wir es uns als v1, aber iterieren weiter. Spannend: nichts aus v1 darf konzeptionell in v2 vorkommen.“ Alles ⚠️ vorläufig.
 
@@ -606,6 +606,57 @@ Kein Gerät, kein Netz, keine Drohne im Spiel, keine Bandbreite oder Spur, kein 
 - Schneiden frei mit dem Stick, oder nur an vorgezeichneten Nähten (leichter zu bauen, weniger Chaos)?
 - Echos der Toten: berührend oder zu düster?
 - Welche Tellerrand-Idee zuerst: Karte falten, Container größer, Himmel flicken, ein Flicken durch den Traum?
+
+## Hacking v3: Glitchlings (Daniels Ausgangspunkt, 16.11.2026; ausgearbeitet von Ava, wartet auf Daniel)
+
+Daniel, 16.11.2026: „Das Konzept von Software existiert in dieser Welt nicht mehr. Statt einer Anwendung gibt es nur noch entwickelte spezialisierte KIs, die aber alle kleine Eigenarten und Macken haben … Mit einem starken Deck kann man sie fangen (oder aktiv überreden, einen zu begleiten). Sie können in Werkbänke einziehen und dann Sondereffekte produzieren. Auch kann man mit ihnen permanent Cyberware verbessern usw. Aber sie sind einzigartig und deshalb muss man mit Bedacht wählen, was man tut.“ Antworten: Name **Glitchlings** (niedlich und englisch); bekommen durch **Fangen, Überreden, Kaufen/Tauschen, Erben**; **Einzug oder Verschmelzen**; **wie Crew ohne Körper**. Löst v1 und v2 ab (die bleiben als Entwürfe). Alles Weitere ⚠️ vorläufig.
+
+**In einem Satz:** Programme gibt es nicht mehr, nur noch Glitchlings, kleine spezialisierte KIs mit Macken. Leyla sammelt sie mit ihrem Deck, gibt ihnen ein Zuhause in ihren Werkbänken oder verschmilzt sie für immer mit ihrer Cyberware. Jeder ist einzigartig, und jede Entscheidung bleibt.
+
+### Was ein Glitchling ist
+
+- **Name** (englisch, niedlich): z. B. **Amberslay** (Daniel), dazu ⚠️ Entwürfe von Ava: **Kettle** (wird warm, wenn er sich freut), **Lady Lag** (antwortet immer einen Herzschlag zu spät), **Sprocket** (zählt alles), **Mumbles** (flüstert Rezepte), **Pocket Saint** (verzeiht alles, vergisst nichts), **Moth** (zieht es zum Licht), **Tin Tin** (spricht nur in Reimen), **Nimbus Nine** (wartet seit dem Zusammenbruch auf ein Update). Wintermute ist die KI aus „Neuromancer“ und bekommt einen eigenen Namen.
+- **Begabung:** wofür er gebaut wurde (Kochen, Schweißen, Rechnen, Heilen, Navigieren, Wachen, Zielen, Gärtnern …). Bestimmt, in welcher Werkbank er glänzt.
+- **Stärke** (1–5 Bits): wie mächtig er ist und welches Deck ihn halten kann.
+- **Macke:** sein Glitch, immer ein Haken mit Charme, z. B. „kocht nur scharf“, „repariert, aber lackiert alles pink“, „arbeitet nur nachts“, „verträgt keinen Regen“, „hasst den Generator“, „singt beim Arbeiten (die Crew wird müde oder fröhlich)“.
+- **Laune und Vertrauen** wie bei der Crew (Die Karawane, docs/crew.md): Er mag bestimmte Werkbänke, Leute und Gerichte, streitet mit anderen Glitchlings, hat Wünsche. Er hat keinen Körper, spricht aber im Camp durch seine Werkbank (Bläschen am Bildschirm, ein Brummen, ein Licht).
+
+### Wie Leyla sie bekommt
+
+- **Fangen mit dem Deck:** In POIs wohnen Glitchlings in alten Maschinen (Automaten, Kassen, Kühlanlagen, Aufzüge). Man erkennt sie an ihrer Macke in der Welt: ein Automat, der Gedichte druckt, ein Aufzug, der nur zu Ebene 4 will. Ist das Deck stark genug (Deck-Stufe ≥ Bits), kann Leyla ihn einfangen. Gefangene sind **mürrisch**: Laune unten, Vertrauen null, aber sofort nutzbar.
+- **Überreden:** Im Gespräch (Comic-Dialog wie die Crew) will jeder Glitchling etwas: ein Ding, einen Ort („zeig mir das Meer“), eine Tat („schalte die Kessler-Kamera ab, die mich jagt“), eine Werkbank. Freiwillige sind **gut gelaunt und loyal** und starten mit Vertrauen.
+- **Kaufen und Tauschen:** Ghostwire und manche Händler bieten Glitchlings an, teuer, manchmal mit verschwiegener zweiter Macke (wie die verborgene Eigenheit bei der Crew).
+- **Erben:** In Wracks (Bergungsprojekte) und Mega-Rigs wohnen alte Glitchlings, die mit dem Fahrzeug kommen, manchmal treu zum Fahrzeug statt zu Leyla.
+- **Das Deck** wird damit wichtig: Seine Stufe bestimmt, wie starke Glitchlings man fangen kann, und es hat **Plätze**, wie viele man unterwegs bei sich tragen kann (Bastler-Deck: 1 Platz, Stufe 1).
+
+### Einzug oder Verschmelzen
+
+Jeder Glitchling ist **einzigartig** (pro Durchgang gibt es ihn genau einmal). Leyla entscheidet:
+
+1. **Einzug in eine Werkbank:** Er wohnt dort und erzeugt einen **Sondereffekt**, abhängig von Begabung und Werkbank, z. B. Kochnische: Gerichte gelingen öfter „perfekt“; Werkbank: Herstellen gibt manchmal ein Teil zurück; Generator: mehr Strom, aber nachts flackert das Licht; Hydrokultur: Pflanzen wachsen schneller und manchmal mutiert eine Sorte; Ripperdoc: Implantate einbauen ohne Belastung; Warroom: zeigt eine verborgene Straße; Waffenkammer: Eigenbau-Waffen bekommen einen Bonus; Gästekoje: Gäste bleiben länger. Passt Begabung zur Werkbank, ist der Effekt stark; passt sie nicht, schwach und die Macke stärker. **Umziehen geht jederzeit**, kostet aber Laune. Synergien wie bei den Werkstätten: Zwei Glitchlings, die sich mögen, in benachbarten Werkbänken verstärken sich, zwei, die sich hassen, sabotieren sich.
+2. **Verschmelzen mit einem Implantat:** Er geht **für immer** in ein Implantat ein. Das Implantat wird dauerhaft stärker (neuer Bonus nach Begabung, z. B. Zielen auf das Kristallauge) und **erbt die Macke** („das Auge zwinkert, wenn ein Raider lügt“, „das Herz schlägt im Takt von Kettles Summen“). Der Glitchling ist danach weg, keine Werkbank, kein Gespräch mehr. Eine Entscheidung für die Stärke gegen die Gesellschaft.
+
+**Mit Bedacht:** Es gibt nie genug Glitchlings für alle Werkbänke, und jeder kann nur eins von beidem. Wer verschmilzt, wird stärker und einsamer; wer einziehen lässt, wird reicher und behält Gesellschaft.
+
+### Im Camp und in der Crew
+
+- Glitchlings zählen zur **Karawane**: Sie beeinflussen die Moral (ein singender Glitchling hebt sie, ein jammernder senkt sie), haben Beziehungen zur Crew (Schraube mag den, der mit Motoren redet; Mirela misstraut allem, was Kessler gebaut hat) und lösen Ereignisse aus.
+- **Pixie** versteht sie am besten und kann zwischen Glitchling und Crew vermitteln.
+- **Im neuen Traum** sind alle wieder fremd und wohnen wieder in ihren alten Maschinen. Leyla erinnert sich: wo jeder wohnt, was er will, welche Macke er verschweigt. Verschmolzene sind im neuen Traum wieder frei, und Leyla kann diesmal anders entscheiden.
+
+### Ausbaustufen
+
+1. **Bereich „Glitchlings“** in der Werkstatt (Name, Begabung, Bits, Macke, Wünsche, Sondereffekte je Werkbank), Deck mit Stufe und Plätzen, **Fangen** in POIs, **Einzug** in Werkbänke mit Effekten.
+2. **Überreden** (Wünsche, Gespräch), Laune und Vertrauen, Umziehen.
+3. **Verschmelzen** mit Implantaten (Bonus + geerbte Macke).
+4. **Kaufen/Tauschen** (Ghostwire, verschwiegene Macken) und **Erben** (Wracks, Mega-Rigs).
+5. **Crew-Anbindung:** Moral, Beziehungen, Ereignisse, Traum-Wissen.
+
+### Offen
+
+- Wie fängt man genau (eine Aktion mit Halten/Timing, ein kurzer Kampf, nur Deck-Stufe)?
+- Wie viele Glitchlings zum Start (Vorschlag: 12 handgemacht, später gewürfelte aus Bausteinen wie bei der Crew)?
+- Grafik: Glitchlings als kleine Gesichter/Symbole auf Bildschirmen aus Code, oder je einer ein PixelLab-Porträt?
 
 ## Look & Feel
 
