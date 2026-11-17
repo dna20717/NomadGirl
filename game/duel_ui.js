@@ -38,6 +38,11 @@ export async function startDuel(root) {
   }
   function newGame() {
     const { player, enemy } = teams();
+    if (!player.length || !enemy.length) {   // the data did not come (a file missing or not readable): say so instead of an empty board
+      const missing = ['glitchlings', 'brands'].filter(a => !Object.keys(D[a] || {}).length);
+      root.replaceChildren(el('div', { class: 'dl-boot err' }, el('b', {}, 'Keine Glitchlings zum Duellieren.'), el('br'), el('code', {}, missing.length ? `Spieldaten fehlen: ${missing.map(a => project.paths[a]).join(', ')}` : 'Aufstellung leer'), el('br'), el('small', {}, 'Bitte diese Zeile an Ava schicken.')));
+      return;
+    }
     S.duel = newDuel(player, enemy); S.sel = null; S.action = 'whisper'; S.last = null; S.busy = false; S.faces = {};
     draw(); step();
   }

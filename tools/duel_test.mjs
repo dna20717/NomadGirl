@@ -43,6 +43,12 @@ await page.click('text=1000× simulieren');
 r = await page.textContent('.dl-sim');
 check('1000× simulieren zeigt die Gewinnchance', /Du gewinnst \d+ %/.test(r || ''), r);
 await shot('hunters');
+// Daniel, 17.11.2026: „/duel lädt nicht“: what goes wrong is written on the page instead of a blank page
+const bad = await browser.newPage();
+await bad.route('**/game/duel.js', r => r.fulfill({ status: 404, body: 'nope' }));
+await bad.goto(base); await bad.waitForTimeout(2000);
+r = await bad.textContent('#duel');
+check('Fehler beim Laden steht auf der Seite (fehlende Datei)', /konnte nicht starten/.test(r) && /duel_ui\.js/.test(r), r);
 
 await browser.close();
 for (const o of ok) console.log('✔', o);
