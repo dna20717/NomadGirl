@@ -17,7 +17,15 @@
   "tunnelTerrain": "metal",
   "tunnelAtmosphere": "tunnel_blau",
   "curve": "30, 75, 20, 90, 100",
-  "gang": {"name": "Yellow Vultures", "color": "Gelb", "motto": "Wer tankt, zahlt. Wer nicht zahlt, tankt Blei."}
+  "gang": {"name": "Yellow Vultures", "color": "Gelb", "motto": "Wer tankt, zahlt. Wer nicht zahlt, tankt Blei."},
+  "brandProps": [
+   {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 6},
+   {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 4},
+   {"look": "icons_nomadcola", "name": "Automat (Creme)", "cm": 175, "chance": 2},
+   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 4},
+   {"look": "icons_nomadcola", "name": "Kiste mit Flaschen (Holz)", "cm": 40, "chance": 4},
+   {"look": "icons_nomadcola", "name": "Sechserpack Dosen", "cm": 20, "chance": 3}
+  ]
  },
  "grossmarkt": {
   "name": "Delta South Megamall",

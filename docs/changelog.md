@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 17.11.2026: **NomadCola im Spiel**: Getränk (Buff Flink), leere Dose, Kronkorken mit Bild in der Tankstellen- und Plünderer-Beute; Automaten, Kühlbox und Kiste als Kauf-Deko (neue Deko-Art „Bild aus einem Symbol-Raster“); Marken-Clutter an der Mile 7 Gas & Go (POIs › Marken-Clutter).
 - 17.11.2026: **NomadCola-Logo und -Produkte**: neues Logo mit lesbarem Schriftzug (PixelLab + Schrift von Hand), 16 Produkt-Symbole zum Wiederverwenden (Flaschen, Dosen, Kisten, Automaten).
 - 17.11.2026: **AtomCola heißt jetzt NomadCola** (Marke, Logo-Datei, Texte; alte Reisekarten werden beim Laden umbenannt).
 - 17.11.2026: **Glitch-Duell als Demo** (#050) unter /duel: Kern von OPR Firefight als Kartenspiel (Präzision, Abschirmung, Integrität, Impulse; Einflüstern, Verschränken, Kalibrieren; Selbsttest und Flackern), Code-Porträts als Karten, Würfel aus Code, KI für beide Seiten, Kammerjäger, 1000× simulieren.

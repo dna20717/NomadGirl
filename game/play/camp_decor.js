@@ -212,6 +212,15 @@ export class CampDecor {
     for (let k = 0; k < 4; k++) puffs.push(this.dAdd(s.add.image(x, ky, glowTexture(s)).setDisplaySize(26, 26).setTint(0xdae0ea).setAlpha(0).setDepth(-13.9)));
     this.decorAnim.push(time => puffs.forEach((p, k) => { const t = ((time / 2400 + k / 4 + seed) % 1); p.setPosition(x + Math.sin(t * 6 + k) * 10, ky - t * 110).setAlpha(0.35 * (1 - t)).setDisplaySize(18 + t * 40, 18 + t * 40); }));
   }
+  // a picture from an icon sheet (Daniel, 17.11.2026: NomadCola-Automaten als Kauf-Deko): stands on its base (ground) or hangs centred
+  // (wall, roof); the square cell is h high, its width follows (the transparent margins of the cell stay invisible)
+  art_icon(x, y, w, h, d) {
+    const s = this.scene;
+    if (!d.look || !s.textures.exists(d.look)) return;
+    s.textures.get(d.look).setFilter(Phaser.Textures.FilterMode.NEAREST);
+    const f = s.textures.getFrame(d.look, d.icon ?? 0), k = h / (f?.height || 64), ground = d.place !== 'wall';
+    this.dAdd(s.add.image(x, ground ? y + 4 : y, d.look, d.icon ?? 0).setOrigin(0.5, ground ? 1 : 0.5).setScale(k).setDepth(ground ? -15.9 : -16.2));
+  }
   art_lantern(x, y, w, h, d) {
     const s = this.scene, g = this.dG(-16), c = d.color || '#ffd27a';
     this.dR(g, x - PX, y - h, 2 * PX, h, C.ink); this.dR(g, x - PX / 2, y - h, PX, h, C.steel);

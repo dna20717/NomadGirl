@@ -252,7 +252,17 @@ function massShade(g, x, y, T, val) {
 // terrain = { at(x, y) → kit | null, back(x, y) → kit | null }: tiles from a Kachel-Set instead of code (walls, back wall in indoor rooms)
 // tiles = { platform: textureKey | null } (asset strips: single, left, middle, right)
 // style (camp): { ground, top, hide(x, y) } = earth instead of concrete, side walls invisible
+// Marken-Clutter of the POI (Daniel, 17.11.2026: NomadCola-Automaten in Tankstellen-POIs): rows { look (icon sheet), name, cm, chance % };
+// each stands on a floor with enough air above it, like clutter, at its real height (cm)
+function brandKit(scene) {
+  const D = scene.data_, rows = (D?.pois?.[scene.levelPoi]?.brandProps || []).filter(b => b.look && scene.textures.exists(b.look));
+  if (!rows.length) return null;
+  const A = D.assets || {}, L = A[D.leyla?.look?.idle], sizes = new Map(), list = [];
+  for (const b of rows) { const i = (A[b.look]?.names || []).indexOf(b.name); if (i < 0) continue; scene.textures.get(b.look).setFilter(1); if (b.cm > 0) sizes.set(b.look + '#' + i, b.cm); list.push({ key: b.look, frame: i, cm: b.cm || 100, chance: b.chance ?? 5 }); }
+  return list.length ? { def: {}, sizes, pxPerCm: (L?.height || 192) / (D.game?.tiles?.leylaCm || 170), maxScale: 5, list } : null;
+}
 export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = null) {
+  const brands = !style ? brandKit(scene) : null;
   const g0 = scene.make.graphics({}, false), solid = (x, y) => x < 0 || y < 0 || x >= room.w || y >= room.h || WALLS.has(room.tiles[y][x]) || CAMO.has(room.tiles[y][x]), stamps0 = [];
   // camouflaged tiles: one group per connected patch, each with its own graphics and stamps (poi_level fades or breaks them)
   const camo = [], camoAt = new Map();
@@ -305,6 +315,11 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
         const B = kit.big;
         clutter.push(placed(kit, B.key, B.list[Math.floor(hash(x, y, seed + 8) * B.list.length)], px + T, py + 4));
         taken.add(x); taken.add(x + 1);
+      }
+      if (top && air && !cg && brands && !taken.has(x) && solid(x - 1, y) && solid(x + 1, y)) {   // Marken-Clutter (brandKit)
+        const B = brands.list[Math.floor(hash(x, y, 31) * brands.list.length)], tall = Math.ceil(B.cm * brands.pxPerCm / T);
+        let room_ = true; for (let k = 1; k <= tall; k++) if (room.tiles[y - k]?.[x] !== '.') room_ = false;
+        if (room_ && hash(x, y, 37) * 100 < B.chance) { clutter.push(placed(brands, B.key, B.frame, px + T / 2, py + 4)); taken.add(x); }
       }
       if (top && air && !cg && !taken.has(x) && kit.clutter.length && solid(x - 1, y) && solid(x + 1, y) && hash(x, y, seed + 3) * 100 < (D.clutterChance ?? 0))
         clutter.push(placed(kit, kit.props, kit.clutter[Math.floor(hash(x, y, seed + 4) * kit.clutter.length)], px + T / 2, py + 4));

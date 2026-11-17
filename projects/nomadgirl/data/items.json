@@ -33,8 +33,9 @@
   "value": 0,
   "description": "Hier nichts wert. Leyla sammelt sie trotzdem.",
   "glyph": "KK",
-  "look": "icons_misc",
-  "icon": 1
+  "look": "icons_nomadcola",
+  "icon": 3,
+  "brand": "nomadcola"
  },
  "schrott": {"name": "Schrott", "category": "resource", "size": [2, 1], "stack": 20, "value": 1, "glyph": "⚙", "look": "icons_gear", "icon": 30},
  "stoffreste": {"name": "Stoffreste", "category": "resource", "size": [1, 1], "stack": 10, "value": 1, "glyph": "🧵", "look": "icons_misc", "icon": 2},
@@ -2246,5 +2247,32 @@
   "value": 0,
   "glyph": "📺",
   "description": "Eine kleine KI mit Macken, eingefangen in einem Speicherkern. Wohnt bald in einer Werkbank oder verschmilzt mit einem Implantat."
+ },
+ "nomadcola": {
+  "name": "NomadCola",
+  "category": "consumable",
+  "size": [1, 1],
+  "stack": 6,
+  "value": 8,
+  "buff": "flink",
+  "brand": "nomadcola",
+  "glyph": "🥤",
+  "look": "icons_nomadcola",
+  "icon": 0,
+  "description": "Die Cola der Straße. Der erste Schluck nach der Wüste macht Beine."
+ },
+ "leere_dose": {
+  "name": "Leere NomadCola-Dose",
+  "category": "junk",
+  "size": [1, 1],
+  "stack": 10,
+  "value": 1,
+  "brand": "nomadcola",
+  "glyph": "🥫",
+  "look": "icons_nomadcola",
+  "icon": 2,
+  "description": "Zerdrückt, verbeult, liegt überall rum. Gutes Blech.",
+  "salvageAt": "werkbank",
+  "salvage": [{"item": "schrott", "count": 1}]
  }
 }

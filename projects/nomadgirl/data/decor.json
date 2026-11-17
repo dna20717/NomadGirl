@@ -268,5 +268,60 @@
   "size": [1, 2.4],
   "colors": "#bb7547,#b9bffb",
   "description": "Ein Standspiegel mit Rostrahmen. E: Haare färben (Leylas Signaturfarbe) mit Färbemitteln."
+ },
+ "cola_automat": {
+  "name": "NomadCola-Automat",
+  "art": "icon",
+  "place": "ground",
+  "value": 90,
+  "cozy": 2,
+  "size": [1.4, 3.3],
+  "look": "icons_nomadcola",
+  "icon": 15,
+  "description": "Der rote Automat von jeder Tankstelle zwischen BigCityDelta und dem Salzsee. Leuchtet, brummt, gibt nichts mehr aus."
+ },
+ "cola_automat_retro": {
+  "name": "NomadCola-Automat (Retro)",
+  "art": "icon",
+  "place": "ground",
+  "value": 110,
+  "cozy": 3,
+  "size": [1.4, 3.1],
+  "look": "icons_nomadcola",
+  "icon": 6,
+  "description": "Cremefarbener Automat aus der guten alten Zeit, mit Sonne im Fenster."
+ },
+ "cola_automat_rost": {
+  "name": "Rostiger NomadCola-Automat",
+  "art": "icon",
+  "place": "ground",
+  "value": 40,
+  "cozy": 1,
+  "size": [1.4, 3.2],
+  "look": "icons_nomadcola",
+  "icon": 11,
+  "description": "Aus einem Wrack gezogen. Die Sonne leuchtet noch."
+ },
+ "cola_kuehlbox": {
+  "name": "NomadCola-Kühlbox",
+  "art": "icon",
+  "place": "ground",
+  "value": 30,
+  "cozy": 1,
+  "size": [1.2, 1.1],
+  "look": "icons_nomadcola",
+  "icon": 14,
+  "description": "Eis, Flaschen, Feierabend."
+ },
+ "cola_kiste": {
+  "name": "Kiste NomadCola",
+  "art": "icon",
+  "place": "ground",
+  "value": 20,
+  "cozy": 1,
+  "size": [1.2, 1.1],
+  "look": "icons_nomadcola",
+  "icon": 13,
+  "description": "Eine Holzkiste voller Flaschen. Leer, aber hübsch."
  }
 }

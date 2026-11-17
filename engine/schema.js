@@ -1098,7 +1098,7 @@ export const AREAS = {
     sections: [{ title: 'Deko', fields: [NAME, select('art', 'Art', DECOR_ARTS), select('place', 'Sitzt', DECOR_PLACES), VALUE, num('cozy', 'Gemütlichkeit', { min: 0 }), DESCRIPTION] },
       { title: 'Aussehen', fields: [size('size', 'Größe', { unit: 'Kacheln', hint: 'Breite × Höhe; bei Zelt und Segel: Höhe = wie tief es hängt' }), color('color', 'Farbe'), text('colors', 'Farben', { hint: 'Mehrere mit Komma (Wäsche, Streifen)' }),
         text('text', 'Text', { hint: 'Neon, Banner, Graffiti; mehrere mit | (zufällig je Ort)' }), ref('addon', 'Ausschnitt von', 'rigAddons', { hint: 'Art „Ausschnitt“: das Bild dieses Anbauteils' }),
-        refs('items', 'Fundstücke', 'items', { hint: 'Art „Kiste mit Fundstücken“: diese Symbole' }), num('growDays', 'Wächst in Tagen', { min: 1, hint: 'Pflanze: Tage je Stufe' })] }],
+        refs('items', 'Fundstücke', 'items', { hint: 'Art „Kiste mit Fundstücken“: diese Symbole' }), ref('look', 'Symbol-Raster', 'assets', { hint: 'Art „Bild aus einem Symbol-Raster“: aus diesem Raster …' }), num('icon', 'Symbol', { min: 0, hint: '… dieses Feld (0 = erstes); Höhe = Größe-Höhe' }), num('growDays', 'Wächst in Tagen', { min: 1, hint: 'Pflanze: Tage je Stufe' })] }],
     // art and place must go together, else the camp cannot draw or anchor it (Aufräumen 16.11.2026)
     check: (x, report) => {
       const need = { pole: ['ground'], tower: ['ground'], balcony: ['side'], bridge: ['span'], tent: ['span'], sail: ['span'], line: ['span'], hammock: ['span'], pennants: ['span'], canopy: ['span'] }[x.art];
@@ -1292,6 +1292,7 @@ export const AREAS = {
         ref('tunnelTerrain', 'Kachel-Set im Tunnel', 'terrain', { hint: 'Wände und Rückwand der Abkürzung. Leer = Kachel-Set des Eingangs' }),
         ref('tunnelAtmosphere', 'Atmosphäre im Tunnel', 'atmosphere', { hint: 'Licht und Stimmung der Abkürzung. Leer = Atmosphäre des Kachel-Sets im Tunnel' }),
         num('seed', 'Fester Seed', { min: 0, hint: 'Zum Testen: immer dasselbe Level. Leer/0 = jeder Run neu gewürfelt' })] },
+      { title: 'Marken-Clutter', wide: true, fields: [table('brandProps', 'Marken-Clutter', [ref('look', 'Symbol-Raster', 'assets'), text('name', 'Symbol'), num('cm', 'Höhe', { unit: 'cm', min: 1 }), num('chance', 'Chance', { unit: '%', min: 0, max: 100 })], { hint: 'Daniel, 17.11.2026: Dinge einer Marke, die in diesem POI auf freiem Boden stehen (z. B. NomadCola-Automaten an Tankstellen). Symbol = Name im Raster, Höhe in echten cm, Chance je freier Bodenkachel' })] },
       { title: 'Ranking', fields: [num('parTime', 'Bestzeit', { unit: 's', min: 0 }), num('secrets', 'Secrets', { min: 0, hint: 'Im Level zählen die brüchigen Wände (B); diese Zahl gilt nur für POIs ohne Level' })] },
       { title: 'Leben (noch ohne Wirkung)', fields: [bool('npcs', 'NPCs vor Ort'), bool('foodtruck', 'Foodtruck-Verkauf möglich'), bool('shop', 'Händler')] },
     ],

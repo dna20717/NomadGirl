@@ -78,6 +78,7 @@ export class PlayScene extends Phaser.Scene {
     for (const [k, id] of Object.entries(this.data_.game?.tiles || {})) if (k !== 'terrain') ids.add(id);
     if (this.data_.game?.ladder?.look) ids.add(this.data_.game.ladder.look);   // #034 ladders
     for (const t of Object.values(this.data_.terrain || {})) for (const id of [t.look, t.props, t.propsBig]) if (id) ids.add(id);   // Kachel-Sets (TileSet00)
+    for (const P of Object.values(this.data_.pois || {})) for (const b of P.brandProps || []) if (b.look) ids.add(b.look);   // Marken-Clutter (NomadCola-Automaten …)
     const DR = this.data_.drone || {};
     for (const id of [DR.look, DR.face?.look, DR.face?.glass, ...(DR.parts || []).filter(r => r.on).map(r => r.look)]) if (id) ids.add(id);
     for (const r of this.data_.leyla?.idles || []) if (r.look) ids.add(r.look);
@@ -106,6 +107,7 @@ export class PlayScene extends Phaser.Scene {
       for (const V of Object.values(this.data_.megarigs || {})) for (const v of Object.values(V.skin || {})) if (typeof v === 'string') ids.add(v);   // mega rig wrecks wear their tile sets (#026)
       for (const t of Object.values(this.data_.tractors || {})) if (t.look) ids.add(t.look);   // the tractor in front (the salvaged LKW)
       for (const a of Object.values(this.data_.rigAddons || {})) if (a.look) ids.add(a.look);   // mega rig wrecks wear add-ons
+      for (const d of Object.values(this.data_.decor || {})) if (d.art === 'icon' && d.look) ids.add(d.look);   // Deko as a picture (NomadCola-Automat …)
       // workshop pictures (and the empty shelf), the crate for packed workshops
       for (const w of Object.values(this.data_.workshops || {})) for (const id of [w.look, w.lookEmpty, w.garden?.plants]) if (id) ids.add(id);
       { const T = this.data_.tank || {}; for (const p of T.phases || []) for (const id of [p.look, p.anim, p.hand]) if (id) ids.add(id); if (T.deadLook) ids.add(T.deadLook); }   // the cryo tank in all its phases (tank_view.js)
@@ -266,6 +268,7 @@ export class PlayScene extends Phaser.Scene {
     // a run in a POI: the rooms welded to one level (engine/poi.js), same seed = same level
     const run = this.mode === 'run' ? this.box.save.run : this.mode === 'test' && this.args.poi ? { poi: this.args.poi, seed: this.args.seed } : null;
     this.levelInfo = run?.seed ? buildPoi(this.data_, run.poi, run.seed) : null;
+    this.levelPoi = run?.poi || null;   // Marken-Clutter of the POI (art.js brandKit)
     if (this.levelInfo?.def) def = this.levelInfo.def;
     // mega rig prototype (#022): the vehicle as a walkable room, evening sky and the camp ground
     this.megarig = this.args.megarig ? buildMegarig(this.data_, this.args.megarig.id, this.args.megarig.stage) : null;
