@@ -8,7 +8,7 @@ import { icon } from './icons.js';
 import { generate } from './glitchlings.js';
 import { faceCanvas } from './glitch_face.js';
 import { duelConfig } from './duel.js';
-import { COLS, ROWS, newStack, place, choose, preview, colValue, total, open, play, noiseOf } from './stack_duel.js';
+import { COLS, ROWS, RULES, newStack, place, choose, preview, colValue, total, open, play, noiseOf } from './stack_duel.js';
 
 const TEMPO = { langsam: 1.6, normal: 1, schnell: 0.4 };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -18,7 +18,7 @@ const PIPS = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6,
 export async function startStack(root, switchTo) {
   const project = await loadProject(browserLoader(new URL('projects/nomadgirl/', location.href)));
   const D = project.data, C = duelConfig(D), q = new URLSearchParams(location.search);
-  const S = { foe: q.get('foe') || 'wild', seed: +(q.get('seed') || (1 + Math.floor(Math.random() * 99999))), auto: q.has('auto'), tempo: q.get('tempo') || 'normal', duel: null, busy: false, last: null, hover: null, sim: '', faces: {} };
+  const S = { rules: q.get('rules') === 'sum' ? 'sum' : 'hp', foe: q.get('foe') || 'wild', seed: +(q.get('seed') || (1 + Math.floor(Math.random() * 99999))), auto: q.has('auto'), tempo: q.get('tempo') || 'normal', duel: null, busy: false, last: null, hover: null, sim: '', faces: {} };
   window.duelDemo = { S, D, mode: 'stack', newGame: () => newGame(), place: c => playerPlace(c), state: () => S.duel };
 
   function teams() {
@@ -28,10 +28,11 @@ export async function startStack(root, switchTo) {
       : shuffle(generate(D, S.seed * 7 + 3)).filter(g => !used.has(g.name)).slice(0, COLS);
     return { player, enemy };
   }
+  const opts = () => ({ rules: S.rules, hp: D.glitchlings?.duel?.stackHp ?? 25 });
   function newGame() {
     const { player, enemy } = teams();
     if (player.length < COLS || enemy.length < COLS) { root.replaceChildren(el('div', { class: 'dl-boot err' }, el('b', {}, 'Zu wenige Glitchlings für den Bit-Stapel.'), el('br'), el('small', {}, 'Bitte an Ava schicken.'))); return; }
-    S.duel = newStack(player, enemy); S.duel.noise = { player: noiseOf(player), enemy: S.foe === 'hunters' ? 0.05 : noiseOf(enemy) };
+    S.duel = newStack(player, enemy, Math.random, 'player', opts()); S.duel.noise = { player: noiseOf(player), enemy: S.foe === 'hunters' ? 0.05 : noiseOf(enemy) };
     S.last = null; S.busy = false; S.faces = {}; S.hover = null;
     draw(); step();
   }
@@ -78,28 +79,36 @@ export async function startStack(root, switchTo) {
     if (!mine) slots.reverse();   // the enemy's columns grow down towards the middle
     const head = el('div', { class: 'sb-head' }, face(side, i, g), el('b', {}, g.name), el('small', { style: b?.color ? `color:${b.color}` : '' }, g.hunter ? `Kammerjäger · ${b?.name || ''}` : `${g.talent} · ${b?.name || ''}`),
       fav ? el('small', { class: 'sb-fav', title: 'Lieblingsbit: zählt in dieser Spalte doppelt' }, '♥ ', die(fav, 'mini')) : el('small', { class: 'sb-fav' }, 'ohne Lieblingsbit'));
-    const value = el('div', { class: 'sb-value' }, String(colValue(col, fav)), pv ? el('small', { class: 'sb-gain' }, ` +${pv.gain}`) : null);
+    const hpMode = d.rules === 'hp';
+    const value = el('div', { class: 'sb-value', title: hpMode ? 'Wert der Spalte: so viel kostet es dich, wenn der Gegner sie leert' : 'Wert der Spalte' }, String(colValue(col, fav)),
+      pv && !hpMode ? el('small', { class: 'sb-gain' }, ` +${pv.gain}`) : null, pv && hpMode && pv.heal ? el('small', { class: 'sb-gain' }, ` ♥+${pv.heal}`) : null);
     const c = el('div', { class: ['sb-col', side, canPick ? 'pick' : '', hit ? 'hit' : '', justPut ? 'put' : ''].filter(Boolean).join(' '), 'data-col': i,
       onmouseenter: () => { if (canPick) c.closest('.sb-board')?.classList.add('hover-' + i); }, onmouseleave: () => c.closest('.sb-board')?.classList.remove('hover-' + i), onclick: () => playerPlace(i) },
       ...(mine ? [el('div', { class: 'sb-stack' }, ...slots), value, head] : [head, value, el('div', { class: 'sb-stack' }, ...slots)]),
-      pv && pv.destroyed ? el('div', { class: 'sb-tip' }, `zerstört ${pv.destroyed} × `, die(d.die, 'mini'), ` drüben (−${pv.lost})`) : null);
+      pv && pv.destroyed ? el('div', { class: 'sb-tip' }, `zerstört ${pv.destroyed} × `, die(d.die, 'mini'), hpMode ? ` · Gegner −${pv.lost} Integrität` : ` drüben (−${pv.lost})`) : null);
     return c;
   }
+  function hpBar(side) {
+    const sd = S.duel.sides[side], L = S.last, w = Math.max(0, Math.min(100, sd.hp / sd.max * 100));
+    const delta = L ? (L.side === side ? (L.heal ? `+${L.heal}` : '') : (L.damage ? `−${L.damage}` : '')) : '';
+    return el('div', { class: 'sb-hp ' + side, title: 'Integrität' }, el('i', { style: `width:${w}%` }), el('small', {}, side === 'player' ? 'Du' : 'Gegner'), el('b', {}, `${sd.hp}`), delta ? el('span', { class: 'sb-delta ' + (delta[0] === '+' ? 'up' : 'down') }, delta) : null);
+  }
   function middle() {
-    const d = S.duel, p = total(d.sides.player), e = total(d.sides.enemy), L = S.last;
+    const d = S.duel, hpMode = d.rules === 'hp', p = hpMode ? d.sides.player.hp : total(d.sides.player), e = hpMode ? d.sides.enemy.hp : total(d.sides.enemy), L = S.last;
     if (d.winner) return el('div', { class: 'sb-mid end ' + d.winner }, el('b', {}, d.winner === 'player' ? (S.foe === 'hunters' ? 'Gewonnen: das Gerät gehört dir' : 'Gewonnen: gefangen!') : 'Verloren: deine Glitchlings sind erschöpft'),
-      el('span', { class: 'sb-score' }, `${p} : ${e}`), el('button', { class: 'dl-main', onclick: () => { S.seed++; newGame(); } }, icon('restart', 16), 'Nächstes Duell'));
-    const mine = d.turn === 'player';
-    const say = L ? `${L.side === 'player' ? 'Du' : 'Gegner'}: ${L.die} in Spalte ${L.col + 1}${L.destroyed ? ` · ${L.destroyed} drüben zerstört!` : ''}` : 'Klick eine deiner Spalten (oder Taste 1–3).';
-    return el('div', { class: 'sb-mid' }, el('span', { class: 'sb-score enemy' }, String(e)),
+      el('span', { class: 'sb-score' }, hpMode ? `Integrität ${p} : ${e}` : `${p} : ${e}`), el('button', { class: 'dl-main', onclick: () => { S.seed++; newGame(); } }, icon('restart', 16), 'Nächstes Duell'));
+    const mine = d.turn === 'player', who = s => (s === 'player' ? 'Du' : 'Gegner');
+    const say = !L ? 'Klick eine deiner Spalten (oder Taste 1–3).' : `${who(L.side)}: ${L.die} in Spalte ${L.col + 1}` + (L.heal ? ` · heilt ${L.heal}` : '') + (L.destroyed ? ` · ${L.destroyed} drüben zerstört${hpMode ? `, −${L.damage}` : ''}!` : '') + (L.overflow ? ` · Überlauf: ${L.overflow === 'player' ? 'deine' : 'seine'} Spalten waren voll und sind gelöscht` : '');
+    return el('div', { class: 'sb-mid' }, hpMode ? hpBar('enemy') : el('span', { class: 'sb-score enemy' }, String(e)),
       el('div', { class: 'sb-roll ' + (mine ? 'player' : 'enemy') }, el('small', {}, mine ? (S.auto ? 'Deine KI würfelt' : 'Dein Bit') : 'Gegner würfelt'), die(d.die, 'big')),
-      el('span', { class: 'sb-score player' }, String(p)), el('div', { class: 'sb-say' }, say));
+      hpMode ? hpBar('player') : el('span', { class: 'sb-score player' }, String(p)), el('div', { class: 'sb-say' }, say));
   }
   function setup() {
     const sel = (label, key, opts) => el('label', {}, el('small', {}, label), el('select', { onchange: e => { S[key] = e.target.value; newGame(); } }, ...opts.map(([v, n]) => { const o = el('option', { value: v }, n); if (String(S[key]) === String(v)) o.selected = true; return o; })));
     return el('div', { class: 'dl-setup' },
       el('b', { class: 'dl-title' }, 'Bit-Stapel'), el('span', { class: 'dl-sub' }, 'Glitch-Duell · Demo'),
       el('button', { title: 'Das ältere Gefecht (OPR-Kern) zum Vergleich', onclick: () => switchTo('fight') }, icon('arrow_right', 15), 'Gefecht (alt)'),
+      sel('Wertung', 'rules', RULES.map(([k, n]) => [k, k === 'hp' ? `${n} (neu)` : `${n} (alt)`])),
       sel('Gegner', 'foe', [['wild', 'Wilde Glitchlings'], ['hunters', 'Kammerjäger']]),
       el('label', {}, el('small', {}, 'Seed'), el('input', { type: 'number', value: S.seed, onchange: e => { S.seed = +e.target.value || 1; newGame(); } })),
       el('button', { onclick: () => { S.seed = 1 + Math.floor(Math.random() * 99999); newGame(); } }, icon('restart', 15), 'Neu würfeln'),
@@ -111,7 +120,7 @@ export async function startStack(root, switchTo) {
   function simulate() {
     const { player, enemy } = teams(), noise = { player: noiseOf(player), enemy: S.foe === 'hunters' ? 0.05 : noiseOf(enemy) };
     let won = 0, moves = 0;
-    for (let i = 0; i < 1000; i++) { const r = play(newStack(player, enemy), Math.random, noise); if (r.winner === 'player') won++; moves += r.moves; }
+    for (let i = 0; i < 1000; i++) { const r = play(newStack(player, enemy, Math.random, 'player', opts()), Math.random, noise); if (r.winner === 'player') won++; moves += r.moves; }
     S.sim = `Du gewinnst ${Math.round(won / 10)} % · im Schnitt ${Math.round(moves / 2000)} Züge je Seite`; draw();
   }
   function draw() {
@@ -120,8 +129,11 @@ export async function startStack(root, switchTo) {
     root.replaceChildren(setup(),
       el('div', { class: 'sb-board' }, el('div', { class: 'sb-row enemy' }, ...Array.from({ length: COLS }, (_, i) => column('enemy', i))), middle(),
         el('div', { class: 'sb-row player' }, ...Array.from({ length: COLS }, (_, i) => column('player', i)))),
-      el('p', { class: 'dl-rules' }, 'Du hast ein gewürfeltes Bit und legst es in eine deiner drei Spalten, eine je Glitchling. ', el('b', {}, 'Gleiche Bits in einer Spalte multiplizieren sich'), ' (zweimal die 4 zählt 4 × 2 × 2 = 16), das ',
-        el('b', {}, 'Lieblingsbit'), ' des Glitchlings zählt doppelt. Legst du ein Bit, ', el('b', {}, 'zerstört es alle gleichen Bits in der gegenüberliegenden Spalte'), '. Sind alle Spalten einer Seite voll, ist Schluss: die höhere Summe gewinnt.'));
+      (S.duel.rules === 'hp'
+        ? el('p', { class: 'dl-rules' }, 'Beide haben ', el('b', {}, `${S.duel.sides.player.max} Integrität`), '. Du hast ein gewürfeltes Bit und legst es in eine deiner drei Spalten. ', el('b', {}, 'Ein Bit zu gleichen Bits heilt dich'), ' (Wert × gleiche darunter, Lieblingsbit doppelt). Legst du ein Bit, ',
+          el('b', {}, 'zerstört es alle gleichen Bits gegenüber'), ', und der Gegner verliert, was sie in seiner Spalte wert waren (gleiche multiplizieren sich: zwei Vieren = 16). Wer auf 0 fällt, ist überschrieben. Sind deine Spalten voll, läuft der Speicher über und wird gelöscht.')
+        : el('p', { class: 'dl-rules' }, 'Du hast ein gewürfeltes Bit und legst es in eine deiner drei Spalten, eine je Glitchling. ', el('b', {}, 'Gleiche Bits in einer Spalte multiplizieren sich'), ' (zweimal die 4 zählt 4 × 2 × 2 = 16), das ',
+        el('b', {}, 'Lieblingsbit'), ' des Glitchlings zählt doppelt. Legst du ein Bit, ', el('b', {}, 'zerstört es alle gleichen Bits in der gegenüberliegenden Spalte'), '. Sind alle Spalten einer Seite voll, ist Schluss: die höhere Summe gewinnt.')));
   }
   newGame();
 }

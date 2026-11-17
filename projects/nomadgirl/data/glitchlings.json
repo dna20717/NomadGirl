@@ -201,7 +201,7 @@
   }
  ],
  "bitWeights": [{"w": 40},{"w": 30},{"w": 18},{"w": 9},{"w": 3}],
- "duel": {"quality": [{"q": 5},{"q": 5},{"q": 4},{"q": 4},{"q": 3}], "defense": {"cheap": 5, "mid": 4, "premium": 4, "elite": 3}, "tough": 1, "team": 2},
+ "duel": {"quality": [{"q": 5},{"q": 5},{"q": 4},{"q": 4},{"q": 3}], "defense": {"cheap": 5, "mid": 4, "premium": 4, "elite": 3}, "tough": 1, "team": 2, "stackHp": 25},
  "hunters": [
   {
    "id": "sanitizer",
