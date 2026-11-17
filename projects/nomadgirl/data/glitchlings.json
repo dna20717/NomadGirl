@@ -154,7 +154,7 @@
   {"text": "will jede Nacht eine Gutenachtgeschichte", "kind": "mood"},
   {"text": "zieht es zu jedem Licht", "kind": "odd"},
   {"text": "verwechselt Schraube mit seinem alten Besitzer", "kind": "odd"},
-  {"text": "wird eifersüchtig auf andere Glitchlings", "kind": "neighbour"},
+  {"text": "wird eifersüchtig auf andere Entities", "kind": "neighbour"},
   {"text": "macht bei Vollmond Fehler", "kind": "time"},
   {"text": "druckt Gedichte auf jeden Zettel", "kind": "odd"},
   {"text": "hält Neon Noodle für das beste Essen der Welt", "kind": "odd"},
@@ -170,7 +170,7 @@
   {"text": "Koch mir etwas, das nach Zuhause riecht."},
   {"text": "Lass mich bei der Hydrokultur wohnen."},
   {"text": "Erzähl mir, wie die Stadt vor dem Zusammenbruch aussah."},
-  {"text": "Ich will einen Freund unter den anderen Glitchlings."},
+  {"text": "Ich will einen Freund unter den anderen Entities."},
   {"text": "Bring mir ein Teil von Delta Petrol."},
   {"text": "Lass mich einmal das Rig fahren."},
   {"text": "Hör dir meine Musik an. Ganz."},
@@ -186,7 +186,7 @@
    "wish": "Lass mich in eine Waffe, die schon jemanden gerettet hat.",
    "home": "Schließfach eines Pfandhauses",
    "always": true,
-   "description": "Ein Waffenmeister-Glitchling aus der Zeit, als Vulkan noch Jagdgewehre baute. Höflich, gefährlich, sentimental."
+   "description": "Ein Waffenmeister-Entity aus der Zeit, als Vulkan noch Jagdgewehre baute. Höflich, gefährlich, sentimental."
   },
   {
    "name": "Marble Sting",
@@ -196,7 +196,7 @@
    "wish": "Bring mich auf Ebene 40 zurück. Ich muss jemanden um Verzeihung bitten.",
    "home": "OP-Lampe einer verlassenen Klinik",
    "always": true,
-   "description": "Ein alter Chirurgie-Glitchling von Kessler. Präzise, kühl, und er weiß etwas über die Kinder in den Tanks.",
+   "description": "Ein alter Chirurgie-Entity von Kessler. Präzise, kühl, und er weiß etwas über die Kinder in den Tanks.",
    "brand": "kessler"
   }
  ],

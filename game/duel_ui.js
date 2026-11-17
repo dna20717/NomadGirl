@@ -1,4 +1,4 @@
-// Demo of the Glitchling duel (#050, Daniel 17.11.2026: „bau bitte eine Demo-Umgebung nur für das Glitch-Spiel“; „mehr wie ein
+// Demo of the Entity duel (#050, Daniel 17.11.2026: „bau bitte eine Demo-Umgebung nur für das Glitch-Spiel“; „mehr wie ein
 // Kartenspiel … visualisiert (zunächst über Code)“; „die Welt pausiert“). Own page duel.html (address /duel), not in the game yet.
 // Rules: game/duel.js. Cards = Code-Porträts (glitch_face.js) with the four values; dice from code; the AI plays the other side
 // (and on request Leyla's side too).
@@ -40,7 +40,7 @@ export async function startDuel(root, switchTo = null) {
     const { player, enemy } = teams();
     if (!player.length || !enemy.length) {   // the data did not come (a file missing or not readable): say so instead of an empty board
       const missing = ['glitchlings', 'brands'].filter(a => !Object.keys(D[a] || {}).length);
-      root.replaceChildren(el('div', { class: 'dl-boot err' }, el('b', {}, 'Keine Glitchlings zum Duellieren.'), el('br'), el('code', {}, missing.length ? `Spieldaten fehlen: ${missing.map(a => project.paths[a]).join(', ')}` : 'Aufstellung leer'), el('br'), el('small', {}, 'Bitte diese Zeile an Ava schicken.')));
+      root.replaceChildren(el('div', { class: 'dl-boot err' }, el('b', {}, 'Keine Entities zum Duellieren.'), el('br'), el('code', {}, missing.length ? `Spieldaten fehlen: ${missing.map(a => project.paths[a]).join(', ')}` : 'Aufstellung leer'), el('br'), el('small', {}, 'Bitte diese Zeile an Ava schicken.')));
       return;
     }
     S.duel = newDuel(player, enemy); S.sel = null; S.action = 'whisper'; S.last = null; S.busy = false; S.faces = {};
@@ -120,7 +120,7 @@ export async function startDuel(root, switchTo = null) {
   }
   function tray() {
     const L = S.last, d = S.duel;
-    if (!L) return el('div', { class: 'dl-tray empty' }, d.turn === 'player' && !S.auto ? 'Wähle einen deiner Glitchlings, eine Aktion und ein Ziel.' : '…');
+    if (!L) return el('div', { class: 'dl-tray empty' }, d.turn === 'player' && !S.auto ? 'Wähle einen deiner Entities, eine Aktion und ein Ziel.' : '…');
     const nm = uid => fighter(d, uid)?.name || '?', rows = [];
     for (const e of L.ev) {
       if (e.type === 'act') rows.push(el('div', { class: 'dl-line head' }, icon(ICONS[e.action], 16), el('b', {}, nm(e.uid)), `: ${NAMES[e.action]}${e.target ? ' → ' : ''}`, e.target ? el('b', {}, nm(e.target)) : null));
@@ -148,7 +148,7 @@ export async function startDuel(root, switchTo = null) {
   }
   function status() {
     const d = S.duel;
-    if (d.winner) return el('div', { class: 'dl-status end ' + d.winner }, d.winner === 'player' ? (S.foe === 'hunters' ? 'Gewonnen: das Gerät gehört dir' : 'Gewonnen: gefangen!') : 'Verloren: deine Glitchlings sind erschöpft',
+    if (d.winner) return el('div', { class: 'dl-status end ' + d.winner }, d.winner === 'player' ? (S.foe === 'hunters' ? 'Gewonnen: das Gerät gehört dir' : 'Gewonnen: gefangen!') : 'Verloren: deine Entities sind erschöpft',
       el('button', { class: 'dl-main', onclick: () => { S.seed++; newGame(); } }, icon('restart', 16), 'Nächstes Duell'));
     return el('div', { class: 'dl-status' }, el('span', { class: 'dl-round' }, `Runde ${d.round}`), d.turn === 'player' ? (S.auto ? 'Deine Seite (KI)' : 'Du bist dran') : 'Der Gegner ist dran');
   }
@@ -157,7 +157,7 @@ export async function startDuel(root, switchTo = null) {
     return el('div', { class: 'dl-setup' },
       el('b', { class: 'dl-title' }, 'Glitch-Duell'), el('span', { class: 'dl-sub' }, 'Gefecht (alt) · Demo'),
       switchTo ? el('button', { title: 'Der neue Bit-Stapel (Knucklebones-Prinzip)', onclick: () => switchTo('stack') }, icon('arrow_right', 15), 'Bit-Stapel (neu)') : null,
-      sel('Gegner', 'foe', [['wild', 'Wilde Glitchlings'], ['hunters', 'Kammerjäger']]),
+      sel('Gegner', 'foe', [['wild', 'Wilde Entities'], ['hunters', 'Kammerjäger']]),
       sel('Anzahl', 'foes', [[1, '1'], [2, '2'], [3, '3']], Number),
       sel('Dein Deck', 'team', [[1, '1'], [2, '2'], [3, '3']], Number),
       el('label', {}, el('small', {}, 'Seed'), el('input', { type: 'number', value: S.seed, onchange: e => { S.seed = +e.target.value || 1; newGame(); } })),
@@ -178,7 +178,7 @@ export async function startDuel(root, switchTo = null) {
     const row = side => el('div', { class: 'dl-row ' + side }, ...d.fighters.filter(f => f.side === side).map(card));
     root.replaceChildren(setup(),
       el('div', { class: 'dl-board' }, row('enemy'), el('div', { class: 'dl-mid' }, status(), tray(), actionsBar()), row('player')),
-      el('p', { class: 'dl-rules' }, 'Abwechselnd ist jede Seite mit einem Glitchling dran. ', el('b', {}, 'Sicherer Angriff'), ': würfeln, das Ziel schlägt nicht zurück. ', el('b', {}, 'Harter Angriff'), ': meist mehr Würfel, aber das Ziel schlägt zurück. ',
+      el('p', { class: 'dl-rules' }, 'Abwechselnd ist jede Seite mit einem Entity dran. ', el('b', {}, 'Sicherer Angriff'), ': würfeln, das Ziel schlägt nicht zurück. ', el('b', {}, 'Harter Angriff'), ': meist mehr Würfel, aber das Ziel schlägt zurück. ',
         el('b', {}, 'Stabilisieren'), ': kein Angriff, beendet das Flackern. Jeder Würfel ab „trifft“ ist ein Treffer, jeder Treffer wird abgewehrt mit einem Würfel ab „hält“. Die Balken sind die Integrität. Bei halber Integrität ein Selbsttest: misslungen = flackert (nur Stabilisieren, kein Gegenschlag).'));
   }
   newGame();

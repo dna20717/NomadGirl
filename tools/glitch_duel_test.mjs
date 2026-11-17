@@ -33,7 +33,7 @@ r = await ev(() => { const D = game.scene.getScene('play').hud.duel, before = D.
 check('Controller: Stick links wählt, A schickt', r.mid !== r.before && r.n >= 2, r);
 await page.waitForTimeout(1400); await shot('mid');
 await page.keyboard.press('Escape'); await page.waitForTimeout(200);
-r = await ev(() => { const sc = game.scene.getScene('play'); return { open: sc.hud.duel.isOpen, done: sc.level.hosts()[0].done, pause: !!document.querySelector('.hud-menu:not([hidden])') && sc.hud.modal }; });
+r = await ev(() => { const sc = game.scene.getScene('play'); nomad.step(3); return { open: sc.hud.duel.isOpen, done: sc.level.hosts()[0].done, pause: !!sc.hud.modal || !!sc.hud.paused }; });
 check('Esc gibt auf: Fenster zu, die KI ist weg, kein Pause-Menü', !r.open && r.done && !r.pause, r);
 // the switch: a duel first, then the door opens
 r = await ev(() => { const sc = game.scene.getScene('play'), sw = sc.level.switches[0]; nomad.tp(sw.x - 30, sw.feet - 4); nomad.step(12); const p = nomad.state().prompt; nomad.step(1, [], ['grab']); nomad.step(2); return { p, open: sc.hud.duel.isOpen, door: sw.door?.open }; });
@@ -47,6 +47,6 @@ check('Nach dem Duell (gewonnen oder verloren) ist der Schalter umgelegt, die T�
 
 await browser.close();
 for (const o of ok) console.log('✔', o);
-for (const e of errors) console.log('✘', e);
+for (const e of errors) console.log('✖', e);   // ✖: tools/test_all.mjs shows these lines when the test is red
 console.log(errors.length ? `${ok.length} ok, ${errors.length} Fehler` : `Glitch-Duell im Spiel: alle ${ok.length} Prüfungen ok`);
 process.exit(errors.length ? 1 : 0);

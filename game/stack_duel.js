@@ -1,9 +1,9 @@
-// „Bit-Stapel“: the Glitchling duel after the Knucklebones principle (#051, Daniel 17.11.2026: „Knucklebones klingt interessant. Mach uns
+// „Bit-Stapel“: the Entity duel after the Knucklebones principle (#051, Daniel 17.11.2026: „Knucklebones klingt interessant. Mach uns
 // mal eine abstrakte Demo mit unseren Glitchlingen“; before: the OPR duel „läuft zu stockend“, an duel should take 40–60 s).
 // No DOM: the demo (duel.html › Bit-Stapel, game/stack_ui.js), tests, simulation.
 //
-// Each side has three columns, one per Glitchling, three places each. Whoever is on turn has a rolled bit (d6) and puts it into one
-// of their columns with room. The value of a column: equal bits multiply (a value n times counts n × n × value), and the Glitchling's
+// Each side has three columns, one per Entity, three places each. Whoever is on turn has a rolled bit (d6) and puts it into one
+// of their columns with room. The value of a column: equal bits multiply (a value n times counts n × n × value), and the Entity's
 // favourite bit counts double. Putting a bit destroys all bits of the same value in the opponent's opposite column. When one side's
 // columns are all full, the duel ends; the higher total wins (draw: the side that did not fill up).
 // Wertung „Integrität“ (Daniel, 17.11.2026: „das Duell geht nicht darum, wer die meisten Punkte hat, sondern wer die Lebenspunkte des anderen
@@ -21,10 +21,10 @@
 export const COLS = 3, ROWS = 3;
 const other = s => (s === 'player' ? 'enemy' : 'player');
 
-// the favourite bit of a Glitchling: from its name (same Glitchling, same favourite); 0 = none
+// the favourite bit of an Entity: from its name (same Entity, same favourite); 0 = none
 export function favourite(g) { let h = 7; for (const c of String(g?.name || g?.id || '')) h = (h * 31 + c.codePointAt(0)) >>> 0; return g ? 1 + (h % 6) : 0; }
 
-// the value of one column (with the favourite of its Glitchling)
+// the value of one column (with the favourite of its Entity)
 export function colValue(col, fav = 0) {
   const n = {};
   for (const v of col) n[v] = (n[v] || 0) + 1;
@@ -45,7 +45,7 @@ export function fireOf(side) {
 export const colFire = (side, i) => fireOf({ cols: [side.cols[i]], fav: [side.fav[i]] });
 export function newStack(player, enemy, rnd = Math.random, first = 'player', { rules = 'dot', hp = 50 } = {}) {
   // one AI per side with three pipelines (Daniel, 17.11.2026: „nicht drei KIs gegeneinander, sondern jeweils eine, die wiederum 3 Pipelines
-  // hat“): a single Glitchling has one favourite bit for all its pipelines; a list (the first version) gives one per column
+  // hat“): a single Entity has one favourite bit for all its pipelines; a list (the first version) gives one per column
   const mk = x => {
     const one = !Array.isArray(x), list = one ? [x, x, x] : x;
     return { ai: one ? x : null, cols: Array.from({ length: COLS }, () => []), glitch: list.slice(0, COLS), fav: Array.from({ length: COLS }, (_, i) => favourite(list[i])), hp, max: hp };
@@ -103,7 +103,7 @@ export function place(duel, c, rnd = Math.random) {
 
 // ---------- the AI ----------
 // greedy with a look at the danger: own gain + what it takes from the opponent, minus how exposed the column becomes
-// (the opponent's next bit could hit equal values there). noise 0 = always the best (strong Glitchlings), more = looser
+// (the opponent's next bit could hit equal values there). noise 0 = always the best (strong Entities), more = looser
 export function choose(duel, rnd = Math.random, noise = 0.15) {
   const side = duel.turn, me = duel.sides[side];
   let best = null;
@@ -123,5 +123,5 @@ export function play(duel, rnd = Math.random, noise = { player: 0.15, enemy: 0.1
   for (let i = 0; i < 400 && !duel.winner; i++) { const c = choose(duel, rnd, typeof noise === 'number' ? noise : noise[duel.turn]); place(duel, c.col, rnd); }
   return { winner: duel.winner, moves: duel.moves, score: duel.log.at(-1)?.score };
 }
-// the AI's sharpness from the bits of its Glitchlings: more bits, less noise
+// the AI's sharpness from the bits of its Entities: more bits, less noise
 export const noiseOf = x => { const list = Array.isArray(x) ? x : [x]; return Math.max(0.02, 0.35 - (list.reduce((s, g) => s + (g?.bits || 1), 0) / Math.max(1, list.length)) * 0.06); };

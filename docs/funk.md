@@ -39,14 +39,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 17.11. Code → Ava: #052 Glitch-Duell im Spiel läuft (Overlay, Schalter mit Duell, KIs in Automaten).
 - 17.11. Code → Ava: #051 fertig: Bit-Stapel (Knucklebones-Prinzip) als neues Glitch-Duell unter /duel, Gefecht als „alt“ daneben. Details `docs/features/glitchlings.md`.
 - 17.11. Code → Ava: #050 fertig: Glitch-Duell als Demo unter /duel (Kartenspiel, Welt pausiert, Einflüstern/Verschränken/Kalibrieren, KI, Kammerjäger). Details `docs/features/glitchlings.md`.
-- 17.11. Code → Ava: Glitchling-Duell v2 nach dem Kern von OPR Firefight (Daniel: v1 zu kompliziert): Qualität, Verteidigung, Zähigkeit, Angriffe fern/nah; abwechselnd aktivieren, Fern/Nah/Sammeln, W6 auf Treffer und Abwehr, Moral bei halber Zähigkeit. Entwurf in design.md, nichts gebaut.
-- 17.11. Code → Ava: (verworfen) Glitchling-Duell „Handshake“ als Entwurf in `docs/design.md` › Hacking v3 (Daniel: einfach, flüssig, tief, Gegner Glitchlings und AntiGlitchling-Software, KI-spielbar): Kern auf 7 Feldern, Dreieck Stoß/Schild/Lauschen, Energie, Hitze, Spezialität je Begabung, Tells im Code-Porträt, Kammerjäger mit Skript. Nichts gebaut.
-- 17.11. Code → Ava: #049 fertig: Glitchlings haben Hersteller (nach Begabung, Unikate eigene), das Cyberdeck ist ein eigenes Fach für Glitchlings (Plätze je Deck). Details `docs/features/glitchlings.md`.
-- 17.11. Code → Ava: #048 Nachtrag: Glitchling als Gegenstand (Porträt als Item-Bild, Tooltip), Amber Slay einmal als Geschenk in jeden bestehenden Spielstand; Daniel zum anderen Ende: bittersüß, Pixie hilft nur, AvA danach nur Begleiterin.
-- 17.11. Code → Ava: #048 fertig: animierte Code-Porträts für alle Glitchlings (`game/glitch_face.js`), Begabung Archäologe, das andere Ende „AvA wird ein Glitchling“ in design.md › Hacking v3 (wartet auf Daniel).
-- 17.11. Code → Ava: #048 Code-Porträts, Archäologe, AvA als Glitchling läuft (Daniels Auftrag im Code-Chat).
-- 17.11. Code → Ava: #047 fertig: Glitchling-Generator mit Werkstatt-Bereich (Namen wie „Marble Sting“, Begabungen, Macken, Wünsche, Wohnorte, Bits, Unikate), Vorschau „Neu würfeln“. Details `docs/features/glitchlings.md`.
-- 17.11. Code → Ava: #047 Glitchling-Generator läuft (Daniels Auftrag im Code-Chat).
+- 17.11. Code → Ava: Entity-Duell v2 nach dem Kern von OPR Firefight (Daniel: v1 zu kompliziert): Qualität, Verteidigung, Zähigkeit, Angriffe fern/nah; abwechselnd aktivieren, Fern/Nah/Sammeln, W6 auf Treffer und Abwehr, Moral bei halber Zähigkeit. Entwurf in design.md, nichts gebaut.
+- 17.11. Code → Ava: (verworfen) Entity-Duell „Handshake“ als Entwurf in `docs/design.md` › Hacking v3 (Daniel: einfach, flüssig, tief, Gegner Entities und AntiGlitchling-Software, KI-spielbar): Kern auf 7 Feldern, Dreieck Stoß/Schild/Lauschen, Energie, Hitze, Spezialität je Begabung, Tells im Code-Porträt, Kammerjäger mit Skript. Nichts gebaut.
+- 17.11. Code → Ava: #049 fertig: Entities haben Hersteller (nach Begabung, Unikate eigene), das Cyberdeck ist ein eigenes Fach für Entities (Plätze je Deck). Details `docs/features/glitchlings.md`.
+- 17.11. Code → Ava: #048 Nachtrag: Entity als Gegenstand (Porträt als Item-Bild, Tooltip), Amber Slay einmal als Geschenk in jeden bestehenden Spielstand; Daniel zum anderen Ende: bittersüß, Pixie hilft nur, AvA danach nur Begleiterin.
+- 17.11. Code → Ava: #048 fertig: animierte Code-Porträts für alle Entities (`game/glitch_face.js`), Begabung Archäologe, das andere Ende „AvA wird ein Glitchling“ in design.md › Hacking v3 (wartet auf Daniel).
+- 17.11. Code → Ava: #048 Code-Porträts, Archäologe, AvA als Entity läuft (Daniels Auftrag im Code-Chat).
+- 17.11. Code → Ava: #047 fertig: Entity-Generator mit Werkstatt-Bereich (Namen wie „Marble Sting“, Begabungen, Macken, Wünsche, Wohnorte, Bits, Unikate), Vorschau „Neu würfeln“. Details `docs/features/glitchlings.md`.
+- 17.11. Code → Ava: #047 Entity-Generator läuft (Daniels Auftrag im Code-Chat).
 - 16.11. Code → Ava: Hacking v3 „Glitchlings“ nach Daniels Ausgangspunkt in `docs/design.md`: spezialisierte KIs mit Macken statt Software, fangen/überreden/kaufen/erben, Einzug in Werkbänke oder für immer mit Implantat verschmelzen, wie Crew ohne Körper. Wintermute (Neuromancer) braucht einen eigenen Namen. Nichts gebaut.
 - 16.11. Code → Ava: Hacking v2 „Die Schneiderin“ als Entwurf in `docs/design.md` (Daniel: v1 merken, weiter iterieren, nichts aus v1 in v2): den Traum auftrennen und neu nähen, Flicken ausschneiden/einnähen/wenden, Schatten schneiden, Narben, Echos der Toten, Karte falten. Nichts gebaut.
 - 16.11. Code → Ava: Hacking-Konzept als Entwurf in `docs/design.md` › „Hacking: AvA im Netz“ (Daniel AFK: „über den Tellerrand“): AvA springt in Geräte, Netzblick, Spur kostet Tank, Programme im RAM-Raster, Datenlauf im Cyberraum, Härte aus der Markenqualität, Plakate/Funk/Erinnerungs-Splitter/Daemons. Nichts gebaut, wartet auf Daniels Antworten.
@@ -160,7 +160,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Lesen:** docs/features/glitchlings.md, docs/features/pois.md, docs/features/ui.md
 - **Auftrag (Daniel, 17.11.2026):** „Die ganze Kampfanimation, das ganze Kampfinterface für die Duelle so anpassen, dass es im Hauptspiel als Overlay funktionieren würde und sich nahtlos in die vorhandenen UI-UX-Konventionen eingliedert … alle Hebel, die Türen öffnen, durch Schalter ersetzen, die man erst bedienen kann, wenn man ein Duell ausgetragen hat. Dabei geht es nicht darum, zwangsläufig zu gewinnen. Das Gewinnen ist nur dafür da, die KI zu fangen … KIs in verschiedenen anderen Dingen versteckt, so dass, wenn man da vorbeigeht, durch die normale Aktionsbelegung (Stick nach oben oder E) das Duell-Event getriggert wird.“
 - **Fertig, wenn:** Duell-Overlay im Spiel (Rahmen, Hilfezeile, ✕, Tastatur und Controller, pausiert), Schalter in POIs starten ein Duell und öffnen danach die Tür, Sieg fängt die KI (ins Deck), KIs in Automaten per E/↑, Tests, Build grün auf `main`.
-- **Rückfragen:** (Code) ⚠️ vorläufig: ohne Glitchling im Deck kämpft AvA (2 Bit); Aufgeben zählt als ausgetragen; Schalter legt nach dem Duell sofort um; Unikate wohnen in keinem Schalter/Automaten; Automaten-KIs auch in fünf weiteren POIs; Tempo und Integrität wie in der Demo (Dauerfeuer, 50).
+- **Rückfragen:** (Code) ⚠️ vorläufig: ohne Entity im Deck kämpft AvA (2 Bit); Aufgeben zählt als ausgetragen; Schalter legt nach dem Duell sofort um; Unikate wohnen in keinem Schalter/Automaten; Automaten-KIs auch in fünf weiteren POIs; Tempo und Integrität wie in der Demo (Dauerfeuer, 50).
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 220/220 (neu `test/glitch_world.test.js`), Browser alle grün (neu `tools/glitch_duel_test.mjs`, `poi_test`/`poi_stack_test` mit Duell). PixelLab 0. **Bitte testen:** Run zur Mile 7 Gas & Go: an einem NomadCola-Automaten E/↑, am Schalter in der Kammer E/↑, mit Controller ←/→ und A.
 
 ### #051 Glitch-Duell: Bit-Stapel
@@ -169,7 +169,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Lesen:** design.md › Hacking v3 › Bit-Stapel, docs/features/glitchlings.md
 - **Auftrag (Daniel, 17.11.2026):** Das Gefecht „läuft noch zu stockend ab“; nach einer Liste beliebter Duell-Minispiele: „Knucklebones klingt interessant. Mach uns mal eine abstrakte Demo mit unseren Glitchlingen.“
 - **Fertig, wenn:** eigene Regeln nach dem Prinzip ohne DOM mit KI, Demo unter /duel mit den Code-Porträts, ein Klick je Zug, Tests, Build grün auf `main`.
-- **Rückfragen:** (Code) ⚠️ vorläufig: drei Spalten à drei Plätze, Lieblingsbit je Glitchling (doppelt), Kammerjäger ohne Lieblingsbit, KI-Genauigkeit nach Bits; Gleichstand gewinnt, wer nicht voll ist.
+- **Rückfragen:** (Code) ⚠️ vorläufig: drei Spalten à drei Plätze, Lieblingsbit je Entity (doppelt), Kammerjäger ohne Lieblingsbit, KI-Genauigkeit nach Bits; Gleichstand gewinnt, wer nicht voll ist.
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 213/213 (neu `test/stack_duel.test.js`), Duell-Browser-Test 15/15. PixelLab 0. **Bitte testen:** /duel: Spalte anklicken oder 1–3, „KI spielt für mich“, Kammerjäger, „Gefecht (alt)“.
 
 ### #050 Glitch-Duell: Demo
@@ -181,23 +181,23 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:** (Code) ⚠️ vorläufig: Namen Einflüstern / Verschränken / Kalibrieren, Präzision / Abschirmung / Integrität / Impulse, Flackern, überschrieben; Impulse je Begabung; fünf Kammerjäger; Selbsttest bei jeder Wunde ab halber Integrität. Duelle dauern mit den Startwerten oft 5 bis 9 Runden (eher zu lang, über die Werte kürzbar).
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 208/208 (neu `test/duel.test.js`), Browser 40/40 (neu `tools/duel_test.mjs`). PixelLab 0. **Bitte testen:** /duel: eigene Karte anklicken, Aktion, Gegner anklicken; „KI spielt für mich“; Kammerjäger; „1000× simulieren“.
 
-### #049 Glitchlings: Hersteller und Cyberdeck als Fach
+### #049 Entities: Hersteller und Cyberdeck als Fach
 - **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/glitchlings.md, docs/features/lore.md, docs/features/inventory.md
 - **Auftrag (Daniel, 17.11.2026):** „KIs brauchen einen Hersteller. Man muss sie nicht im Inventar transportieren, wenn man ein Cyberdeck hat (was im Grunde zunächst mal ein eigenes Inventar für Glitchlinge ist).“
-- **Fertig, wenn:** jeder Glitchling hat eine Marke (Werkstatt, Tooltip), Cyberdeck mit Plätzen als eigenes Raster nur für Glitchlings, Tests, Build grün auf `main`.
-- **Rückfragen:** (Code) ⚠️ vorläufig: Hersteller je Begabung (13 Zuordnungen, Marble Sting = Kessler Cybernetics, Amber Slay nach Begabung = Vulkan); Bastler-Deck 2 Plätze; Deck-Glitchlings überstehen ein k.o.; Deck mit Glitchlings nicht ablegbar; ältere Spielstände bekommen einmal ein Bastler-Deck. Neues Spiel startet weiter ohne Deck.
+- **Fertig, wenn:** jeder Entity hat eine Marke (Werkstatt, Tooltip), Cyberdeck mit Plätzen als eigenes Raster nur für Entities, Tests, Build grün auf `main`.
+- **Rückfragen:** (Code) ⚠️ vorläufig: Hersteller je Begabung (13 Zuordnungen, Marble Sting = Kessler Cybernetics, Amber Slay nach Begabung = Vulkan); Bastler-Deck 2 Plätze; Deck-Entities überstehen ein k.o.; Deck mit Entities nicht ablegbar; ältere Spielstände bekommen einmal ein Bastler-Deck. Neues Spiel startet weiter ohne Deck.
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 202/202, Browser 39/39. PixelLab 0. **Bitte testen:** Spiel laden, Inventar (I): unter dem Rucksack „Bastler-Deck“ mit Amber Slay; Tooltip zeigt Vulkan. Werkstatt › Lore › Marken › Vulkan: „Baut KIs“.
 
-### #048 Glitchlings: Code-Porträts, Archäologe, AvA als Glitchling
+### #048 Entities: Code-Porträts, Archäologe, AvA als Entity
 - **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
-- **Lesen:** docs/features/glitchlings.md, design.md › Hacking v3: Glitchlings
-- **Auftrag (Daniel, 17.11.2026):** „Ich möchte, dass die Glitchlings jeweils ein individuelles, animiertes Code-Porträt bekommen, das gleichzeitig das Item-Bild ist (in diesem Fall auch animiert). Eine Kraft soll noch sein „Archäologe“, die dazu führt, dass die Locations aller einzigartigen Beutestücke im Warroom angezeigt werden. Man soll die Möglichkeit haben, AvA zu einem Glitchling zu machen (das ist ein alternatives Ende; sehr schwer zu erreichen).“
-- **Fertig, wenn:** Porträt-Zeichner ohne Assets (aus den Eigenschaften, gleicher Glitchling = gleiches Gesicht, animiert), in der Werkstatt-Vorschau; Begabung Archäologe in den Daten; alternatives Ende im Design; Tests, Build grün auf `main`.
+- **Lesen:** docs/features/glitchlings.md, design.md › Hacking v3: Entities
+- **Auftrag (Daniel, 17.11.2026):** „Ich möchte, dass die Glitchlings jeweils ein individuelles, animiertes Code-Porträt bekommen, das gleichzeitig das Item-Bild ist (in diesem Fall auch animiert). Eine Kraft soll noch sein „Archäologe“, die dazu führt, dass die Locations aller einzigartigen Beutestücke im Warroom angezeigt werden. Man soll die Möglichkeit haben, AvA zu einem Entity zu machen (das ist ein alternatives Ende; sehr schwer zu erreichen).“
+- **Fertig, wenn:** Porträt-Zeichner ohne Assets (aus den Eigenschaften, gleicher Entity = gleiches Gesicht, animiert), in der Werkstatt-Vorschau; Begabung Archäologe in den Daten; alternatives Ende im Design; Tests, Build grün auf `main`.
 - **Rückfragen:** (Code) ⚠️ vorläufig: „einzigartige Beute“ = Merkmal Trophäe; Archäologe wirkt ohne Stärke; Weg zum anderen Ende (Marble Sting, Pixies Wendepunkt, Deck mit 6 Bits, Kessler-Kern, Tank kritisch) und was danach ist. Offen für Daniel: Ende traurig oder hell? Darf Pixie es verhindern? AvA danach steuerbar?
-- **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 198/198 (3 neue Porträt-Tests), Browser 39/39. PixelLab 0. **Bitte testen:** Werkstatt › GLITCHLINGS › Glitchlings, rechts die Karten mit Porträts, „Neu würfeln“.
+- **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 198/198 (3 neue Porträt-Tests), Browser 39/39. PixelLab 0. **Bitte testen:** Werkstatt › GLITCHLINGS › Entities, rechts die Karten mit Porträts, „Neu würfeln“.
 
 ### #001 Ausbaustufe Progression
 - **Status:** fertig · angelegt 12.11. (nachträglich), gebaut 12.11. abends
@@ -777,11 +777,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:** (Code) ⚠️ vorläufig: Auswahl der Logos (je bester von 16), Färbemittel ohne Marke im Namen, Tooltip-Werte mit Qualität. Beobachtung: PixelLab hat bei DeltaTint und Vulkan den Kandidatenbogen versetzt geliefert; per Code aus dem Gesamtbogen neu geschnitten (9 bzw. 8 brauchbare Kandidaten).
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 190/190, Browser 39/39 (cyberware_test prüft das Markenschild, brands.test die Logos). PixelLab diesmal 70, übrig 360. **Bitte testen:** Inventar: über ein Implantat oder Färbemittel fahren; Werkstatt › Marken › Markenschild; Reisekarte unverändert.
 
-### #047 Glitchlings, Stufe 1: der Generator
+### #047 Entities, Stufe 1: der Generator
 - **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
-- **Lesen:** design.md › Hacking v3: Glitchlings, docs/features/lore.md
+- **Lesen:** design.md › Hacking v3: Entities, docs/features/lore.md
 - **Auftrag (Daniel, 17.11.2026):** „Ich finde Namen, die nach dem Schema wie Marble Sting oder so ein wenig besser. Das hebt sie von Pokémons ab (obwohl sie im Kern genau das ja sein werden). Ich würde sagen, wir bauen ein System auf, auf dessen Basis man diese passiven Companions generieren kann.“
-- **Fertig, wenn:** Werkstatt-Bereich mit Bausteinen (Namen aus zwei Wörtern, Begabungen mit Werkbank-Effekten, Macken, Wünsche, Wohnorte, Stärke) und Unikaten, Generator ohne DOM (gleicher Seed = gleiche Glitchlings, Namen einmalig), Vorschau mit „Neu würfeln“, Tests, Build grün auf `main`.
-- **Rückfragen:** (Code) ⚠️ vorläufig: 32 + 32 Namenswörter, 12 Begabungen mit Werten, 20 Macken, 12 Wünsche, 15 Wohnorte, Unikat Marble Sting (Chirurg, Kessler, Ebene 40) neben Daniels Amber Slay; 12 Glitchlings je Durchgang. Noch kein Spiel-Effekt (kommt mit Fangen/Einzug).
-- **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 195/195 (neu `test/glitchlings.test.js`), Browser 39/39 (dabei `map_test` „Gefahr wirkt“ robust gemacht, Backlog C19 erledigt). PixelLab 0. **Bitte testen:** Werkstatt › GLITCHLINGS › Glitchlings: Bausteine ändern, rechts „Neu würfeln“.
+- **Fertig, wenn:** Werkstatt-Bereich mit Bausteinen (Namen aus zwei Wörtern, Begabungen mit Werkbank-Effekten, Macken, Wünsche, Wohnorte, Stärke) und Unikaten, Generator ohne DOM (gleicher Seed = gleiche Entities, Namen einmalig), Vorschau mit „Neu würfeln“, Tests, Build grün auf `main`.
+- **Rückfragen:** (Code) ⚠️ vorläufig: 32 + 32 Namenswörter, 12 Begabungen mit Werten, 20 Macken, 12 Wünsche, 15 Wohnorte, Unikat Marble Sting (Chirurg, Kessler, Ebene 40) neben Daniels Amber Slay; 12 Entities je Durchgang. Noch kein Spiel-Effekt (kommt mit Fangen/Einzug).
+- **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 195/195 (neu `test/glitchlings.test.js`), Browser 39/39 (dabei `map_test` „Gefahr wirkt“ robust gemacht, Backlog C19 erledigt). PixelLab 0. **Bitte testen:** Werkstatt › GLITCHLINGS › Entities: Bausteine ändern, rechts „Neu würfeln“.

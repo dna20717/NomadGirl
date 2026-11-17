@@ -5629,12 +5629,12 @@
   ]
  },
  "glitch_heads": {
-  "name": "Glitchlings: Geister-Köpfe",
+  "name": "Entities: Geister-Köpfe",
   "kind": "icons",
   "file": "assets/glitchlings/heads.png",
   "cell": [64, 64],
   "grid": [8, 4],
-  "description": "Köpfe der Glitchlings als digitale Geister (Daniel, 17.11.2026: „mehr wie digitale Geister und weniger wie Fernseher … die Mimiken weiterhin aus dem Code, aber die Köpfe cool gepixelt“). Hell, fast weiß, mit leerer schwarzer Gesichtsfläche: der Code färbt sie in der Farbe des Glitchlings und malt die Mimik hinein (game/glitch_face.js). Einzelbilder in assets/glitchlings/heads/.",
+  "description": "Köpfe der Entities als digitale Geister (Daniel, 17.11.2026: „mehr wie digitale Geister und weniger wie Fernseher … die Mimiken weiterhin aus dem Code, aber die Köpfe cool gepixelt“). Hell, fast weiß, mit leerer schwarzer Gesichtsfläche: der Code färbt sie in der Farbe des Entities und malt die Mimik hinein (game/glitch_face.js). Einzelbilder in assets/glitchlings/heads/.",
   "source": "KI (PixelLab, Create Image Pro 64 px, helle AAP-64-Töne, zwei Aufträge, alle 32 Kandidaten)",
   "date": "2026-11-17",
   "names": [

@@ -59,14 +59,14 @@ export const ENEMY_FAMILIES = [['mutant', 'Mutant'], ['raider', 'Plünderer'], [
 export const ENEMY_BEHAVIORS = [['patrol', 'Patrouille'], ['charger', 'Stürmer'], ['shooter', 'Schütze'], ['ambusher', 'Lauerer'], ['flyer', 'Flieger'], ['boss', 'Boss']];
 // tags on things (Daniel, 11.11.2026: „mach ein Tag trophy“): trophy = may hang on a trophy stand in the treasury
 export const ITEM_TAGS = [['trophy', 'Trophäe']];
-// Glitchlings (#047): kinds of quirks
+// Entities (#047): kinds of quirks
 export const GLITCH_QUIRKS = [['odd', 'schrullig'], ['mood', 'Laune'], ['time', 'Tageszeit'], ['weather', 'Wetter'], ['neighbour', 'Nachbarn']];
 // Lore › Marken (#045)
 export const BRAND_SECTORS = [['cyber', 'Cyberware'], ['military', 'Militär'], ['cosmetics', 'Kosmetik'], ['fuel', 'Treibstoff'], ['food', 'Essen'], ['drink', 'Getränke'], ['vehicle', 'Fahrzeuge'], ['trade', 'Handel & Schrott'], ['lodging', 'Unterkunft'], ['authority', 'Behörde'], ['medical', 'Medizin'], ['other', 'Sonstiges']];
 export const BRAND_TIERS = [['cheap', 'Billig'], ['mid', 'Mittel'], ['premium', 'Premium'], ['elite', 'Elite']];
 export const BRAND_STATUS = [['active', 'aktiv'], ['bankrupt', 'pleite'], ['ruin', 'Ruine'], ['underground', 'Untergrund']];
 export const BRAND_STREET = [['hated', 'verhasst'], ['feared', 'gefürchtet'], ['neutral', 'egal'], ['liked', 'beliebt'], ['cult', 'Kult']];
-export const ITEM_CATEGORIES = [['junk', 'Schrott'], ['resource', 'Ressource'], ['ingredient', 'Zutat'], ['food', 'Gericht'], ['component', 'Bauteil'], ['consumable', 'Verbrauchsgut'], ['valuable', 'Wertsache'], ['blueprint', 'Bauplan/Rezept'], ['armor', 'Rüstung'], ['implant', 'Implantat'], ['dronepart', 'Drohnenteil'], ['progress', 'Fortschritt'], ['weaponpart', 'Waffenteil'], ['glitchling', 'Glitchling']];
+export const ITEM_CATEGORIES = [['junk', 'Schrott'], ['resource', 'Ressource'], ['ingredient', 'Zutat'], ['food', 'Gericht'], ['component', 'Bauteil'], ['consumable', 'Verbrauchsgut'], ['valuable', 'Wertsache'], ['blueprint', 'Bauplan/Rezept'], ['armor', 'Rüstung'], ['implant', 'Implantat'], ['dronepart', 'Drohnenteil'], ['progress', 'Fortschritt'], ['weaponpart', 'Waffenteil'], ['glitchling', 'Entity']];
 // where a thing is worn (Daniel, 10.11.2026: Inventar im Diablo-Stil): Leyla's head + armor, implants in her body, parts on AvA
 export const WEAR_SLOTS = [['head', 'Kopf'], ['armor', 'Rüstung'], ['eyes', 'Implantat: Augen'], ['nerves', 'Implantat: Nerven'], ['arm', 'Implantat: Cyberarm'], ['heart', 'Implantat: Herz'], ['legs', 'Implantat: Beine'], ['skin', 'Implantat: Haut'],
   ['bow', 'Drohne: Bug'], ['tail', 'Drohne: Heck'], ['core', 'Drohne: Kern'], ['module', 'Drohne: Modul']];
@@ -618,7 +618,7 @@ export const AREAS = {
         text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar: 1–3 Zeichen oder ein Emoji' }), DESCRIPTION,
         ref('brand', 'Hersteller', 'brands', { hint: 'Daniel, 16.11.2026: „Alle Waffen im Spiel brauchen auch eine Brand“. Qualität der Marke wirkt auf den Schaden, Preis auf den Wert, „In der Beute“ auf die Häufigkeit' }),
         select('skin', 'Aussehen aus Code', [['', 'wie gemalt'], ['revolver', 'Revolver']], { hint: 'Nur Fernkampf, Test (Daniel, 12.11.2026): legt eine Waffe aus Code über die gemalte Pistole in den Posen mit ausgestreckten Armen. An der Brust bleibt vorerst die gemalte' })] },
-      { title: 'Glitchlings', when: x => x.kind === 'cyberdeck', fields: [num('glitchSlots', 'Plätze', { min: 0, max: 8, hint: 'Ein Cyberdeck ist ein eigenes Inventar für Glitchlings (#049, Daniel 17.11.2026): so viele trägt Leyla darin, ohne Platz im Rucksack' })] },
+      { title: 'Entities', when: x => x.kind === 'cyberdeck', fields: [num('glitchSlots', 'Plätze', { min: 0, max: 8, hint: 'Ein Cyberdeck ist ein eigenes Inventar für Entities (#049, Daniel 17.11.2026): so viele trägt Leyla darin, ohne Platz im Rucksack' })] },
       { title: 'Werte', fields: [num('damage', 'Schaden', { min: 0 }), num('cooldown', 'Abklingzeit', { unit: 'ms', min: 0 }), num('range', 'Reichweite', { unit: 'px', min: 0 }),
         num('knockback', 'Rückstoß', { unit: 'px/s', min: 0 }), num('critChance', 'Krit-Chance', { unit: '%', min: 0, max: 100 }), num('ammo', 'Munition', { min: 0, hint: 'Leer = unendlich' }),
         num('projectileSpeed', 'Geschosstempo', { unit: 'px/s', min: 0, hint: 'Nur Fernkampf: so schnell fliegt das Geschoss' }), ref('sound', 'Schuss-Ton', 'assets', { hint: 'Asset der Art Ton' }),
@@ -1292,7 +1292,7 @@ export const AREAS = {
         ref('tunnelTerrain', 'Kachel-Set im Tunnel', 'terrain', { hint: 'Wände und Rückwand der Abkürzung. Leer = Kachel-Set des Eingangs' }),
         ref('tunnelAtmosphere', 'Atmosphäre im Tunnel', 'atmosphere', { hint: 'Licht und Stimmung der Abkürzung. Leer = Atmosphäre des Kachel-Sets im Tunnel' }),
         num('seed', 'Fester Seed', { min: 0, hint: 'Zum Testen: immer dasselbe Level. Leer/0 = jeder Run neu gewürfelt' })] },
-      { title: 'Marken-Clutter', wide: true, fields: [table('brandProps', 'Marken-Clutter', [ref('look', 'Symbol-Raster', 'assets'), text('name', 'Symbol'), num('cm', 'Höhe', { unit: 'cm', min: 1 }), num('chance', 'Chance', { unit: '%', min: 0, max: 100 }), bool('ai', 'KI')], { hint: 'Daniel, 17.11.2026: Dinge einer Marke, die in diesem POI auf freiem Boden stehen (z. B. NomadCola-Automaten an Tankstellen). Symbol = Name im Raster, Höhe in echten cm, Chance je freier Bodenkachel. KI = darin wohnt ein Glitchling: E / ↑ davor startet ein Glitch-Duell (#052)' })] },
+      { title: 'Marken-Clutter', wide: true, fields: [table('brandProps', 'Marken-Clutter', [ref('look', 'Symbol-Raster', 'assets'), text('name', 'Symbol'), num('cm', 'Höhe', { unit: 'cm', min: 1 }), num('chance', 'Chance', { unit: '%', min: 0, max: 100 }), bool('ai', 'KI')], { hint: 'Daniel, 17.11.2026: Dinge einer Marke, die in diesem POI auf freiem Boden stehen (z. B. NomadCola-Automaten an Tankstellen). Symbol = Name im Raster, Höhe in echten cm, Chance je freier Bodenkachel. KI = darin wohnt ein Entity: E / ↑ davor startet ein Glitch-Duell (#052)' })] },
       { title: 'Ranking', fields: [num('parTime', 'Bestzeit', { unit: 's', min: 0 }), num('secrets', 'Secrets', { min: 0, hint: 'Im Level zählen die brüchigen Wände (B); diese Zahl gilt nur für POIs ohne Level' })] },
       { title: 'Leben (noch ohne Wirkung)', fields: [bool('npcs', 'NPCs vor Ort'), bool('foodtruck', 'Foodtruck-Verkauf möglich'), bool('shop', 'Händler')] },
     ],
@@ -1461,28 +1461,28 @@ export const AREAS = {
     },
   },
   glitchlings: {
-    name: 'Glitchlings', icon: 'brain', file: 'data/glitchlings.json', kind: 'single',
+    name: 'Entities', icon: 'brain', file: 'data/glitchlings.json', kind: 'single',
     hint: '#047 (Daniel, 16./17.11.2026: „Software gibt es nicht mehr, nur spezialisierte KIs mit Eigenarten und Macken“; „Namen wie Marble Sting“; „ein System, auf dessen Basis man diese passiven Companions generieren kann“). Bausteine für den Generator (game/glitchlings.js); jeder Durchgang würfelt seine eigenen. Design: design.md › Hacking v3.',
     sections: [
-      { title: 'Generator', fields: [num('count', 'Je Durchgang', { min: 1, max: 40, hint: 'So viele Glitchlings gibt es in einem Durchgang (die Unikate mit „immer“ zählen mit)' }),
+      { title: 'Generator', fields: [num('count', 'Je Durchgang', { min: 1, max: 40, hint: 'So viele Entities gibt es in einem Durchgang (die Unikate mit „immer“ zählen mit)' }),
         table('bitWeights', 'Stärke', [num('w', 'Gewicht', { min: 0 })], { hint: 'Zeile 1 = 1 Bit … Zeile 5 = 5 Bits: wie oft jede Stärke gewürfelt wird' }),
-        num('off', 'Fremde Werkbank', { unit: '%', min: 0, max: 100, hint: 'In einer Werkbank, die nicht zu seiner Begabung passt, wirkt ein Glitchling nur so stark' })] },
+        num('off', 'Fremde Werkbank', { unit: '%', min: 0, max: 100, hint: 'In einer Werkbank, die nicht zu seiner Begabung passt, wirkt ein Entity nur so stark' })] },
       { title: 'Namen', fields: [area_('names.first', 'Erstes Wort', { hint: 'Material, Farbe, Stoff (Marble, Amber, Velvet …), mit Komma getrennt. Name = erstes + zweites Wort, jedes Wort je Durchgang nur einmal' }),
         area_('names.second', 'Zweites Wort', { hint: 'Kante, Geräusch, Tat (Sting, Slay, Hex …)' })] },
       { title: 'Begabungen', wide: true, fields: [table('talents', 'Begabungen', [text('name', 'Name'), select('function', 'Werkbank', WORKSHOP_FUNCTIONS), select('also', 'Auch', WORKSHOP_FUNCTIONS), ref('brand', 'Hersteller', 'brands'), text('effect', 'Effekt'), num('perBit', 'Je Bit', { min: 0 }), text('stat', 'Wert'), num('remote', 'Einflüstern', { min: 0, max: 6 }), num('link', 'Verschränken', { min: 0, max: 6 })],
         { hint: 'Effekt mit {n} = „Je Bit“ × Stärke. In „Werkbank“ und „Auch“ wirkt er voll. „Wert“ ist der Schlüssel, den das Spiel später ausliest (perfect, refund, growth, power …). Je Bit 0 = wirkt ohne Stärke (Archäologe). Der Wert bestimmt auch, was das Code-Porträt trägt. Hersteller = wer diese Art KI baut (#049), Unikate können einen eigenen haben' })] },
-      { title: 'Macken & Wünsche', wide: true, fields: [table('quirks', 'Macken', [text('text', 'Macke'), select('kind', 'Art', GLITCH_QUIRKS)], { hint: 'Jeder Glitchling hat eine; immer ein Haken mit Charme' }),
+      { title: 'Macken & Wünsche', wide: true, fields: [table('quirks', 'Macken', [text('text', 'Macke'), select('kind', 'Art', GLITCH_QUIRKS)], { hint: 'Jeder Entity hat eine; immer ein Haken mit Charme' }),
         table('wishes', 'Wünsche', [text('text', 'Wunsch')], { hint: 'Was er will, um freiwillig mitzukommen (Überreden, kommt mit Stufe 2)' }),
-        area_('homes', 'Wohnorte', { hint: 'Maschinen, in denen Glitchlings in POIs wohnen, mit Komma getrennt' })] },
+        area_('homes', 'Wohnorte', { hint: 'Maschinen, in denen Entities in POIs wohnen, mit Komma getrennt' })] },
       { title: 'Duell', fields: [table('duel.quality', 'Präzision je Bits', [num('q', 'Präzision', { min: 2, max: 6 })], { hint: 'Zeile 1 = 1 Bit … Zeile 5 = 5 Bits: trifft bei W6 ≥ diesem Wert (Glitch-Duell #050, Kern von OPR Firefight). Impulse je Begabung stehen bei den Begabungen (Einflüstern, Verschränken)' }),
         num('duel.defense.cheap', 'Abschirmung Billig', { min: 2, max: 6, hint: 'Abschirmung nach der Stufe des Herstellers: wehrt einen Treffer ab bei W6 ≥ diesem Wert' }), num('duel.defense.mid', 'Abschirmung Mittel', { min: 2, max: 6 }),
         num('duel.defense.premium', 'Abschirmung Premium', { min: 2, max: 6 }), num('duel.defense.elite', 'Abschirmung Elite', { min: 2, max: 6 }),
         num('duel.tough', 'Integrität', { unit: '+ Bits', min: 0, hint: 'Gefecht: Integrität = Bits + dieser Wert (so viele Wunden, dann überschrieben)' }), num('duel.stackHp', 'Bit-Stapel: Integrität', { min: 1, hint: 'Startwert beider Seiten im Bit-Stapel, Wertung Dauerfeuer (Wertung Heilen: 25)' }), num('duel.team', 'Deck in der Demo', { min: 1, max: 3 })] },
       { title: 'Kammerjäger', wide: true, fields: [table('hunters', 'Kammerjäger', [text('id', 'ID'), text('name', 'Name'), ref('brand', 'Hersteller', 'brands'), num('quality', 'Präzision', { min: 2, max: 6 }), num('defense', 'Abschirmung', { min: 2, max: 6 }),
         num('tough', 'Integrität', { min: 1 }), num('remote', 'Einflüstern', { min: 0 }), num('link', 'Verschränken', { min: 0 }), text('description', 'Beschreibung')],
-        { hint: 'AntiGlitchling-Software der Konzerne: Gegner im Glitch-Duell, mit festen Werten. Demo: /duel' })] },
+        { hint: 'Anti-Entity-Software der Konzerne: Gegner im Glitch-Duell, mit festen Werten. Demo: /duel' })] },
       { title: 'Unikate', wide: true, fields: [table('unique', 'Unikate', [text('name', 'Name'), text('talent', 'Begabung'), ref('brand', 'Hersteller', 'brands'), num('bits', 'Bits', { min: 1, max: 5 }), text('quirk', 'Macke'), text('wish', 'Wunsch'), text('home', 'Wohnort'), bool('always', 'Immer'), text('description', 'Beschreibung')],
-        { hint: 'Handgemachte Glitchlings (z. B. Amber Slay). „Immer“ = in jedem Durchgang dabei' })] },
+        { hint: 'Handgemachte Entities (z. B. Amber Slay). „Immer“ = in jedem Durchgang dabei' })] },
     ],
     check: (x, report) => {
       const T = new Set((x.talents || []).map(t => t.name));
@@ -1540,7 +1540,7 @@ export const GROUPS = [
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'megarigs', 'rigAddons', 'salvage', 'companions']],
   ['WELT', ['worldmap', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'travel']],
   ['LORE', ['brands']],
-  ['GLITCHLINGS', ['glitchlings']],
+  ['ENTITIES', ['glitchlings']],
 ];
 
 export const optionLabel = label;

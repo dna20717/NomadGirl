@@ -2240,7 +2240,7 @@
   "brand": "kessler_kosmetik"
  },
  "glitchling": {
-  "name": "Glitchling",
+  "name": "Entity",
   "category": "glitchling",
   "size": [2, 2],
   "stack": 1,

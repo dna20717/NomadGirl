@@ -1,4 +1,4 @@
-// Demo „Bit-Stapel“ (#051): the Glitchling duel after the Knucklebones principle, from code. Rules: game/stack_duel.js, board: game/stack_view.js
+// Demo „Bit-Stapel“ (#051): the Entity duel after the Knucklebones principle, from code. Rules: game/stack_duel.js, board: game/stack_view.js
 // (the same board runs in the game as an overlay, game/play/glitch_duel_ui.js). Daniel, 17.11.2026: „nicht drei KIs gegeneinander, sondern
 // jeweils eine, die wiederum 3 Pipelines hat … cyberpunkiger … Animation des Würfels mehr wie eine Slotmaschine“. duel.html shows it by default
 // (?mode=stack), the older Gefecht with ?mode=fight.
@@ -26,7 +26,7 @@ export async function startStack(root, switchTo) {
   window.duelDemo = { S, D, view, mode: 'stack', newGame: () => newGame(), place: c => view.playerPlace(c), state: () => view.duel };
   const opts = () => ({ rules: S.rules, hp: S.rules === 'dot' ? (D.glitchlings?.duel?.stackHp ?? 50) : 25 });
 
-  // Leyla's deck (three to pick from: her AI-Core for this duel) and the opponent: one wild Glitchling or one Kammerjäger
+  // Leyla's deck (three to pick from: her AI-Core for this duel) and the opponent: one wild Entity or one Kammerjäger
   function lineup() {
     const r = rngOf(S.seed), shuffle = a => a.map(x => [r(), x]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
     const deck = shuffle(generate(D, S.seed)).slice(0, 3), used = new Set(deck.map(g => g.name));
@@ -36,7 +36,7 @@ export async function startStack(root, switchTo) {
   }
   function newGame() {
     const { me, foe } = lineup();
-    if (!me || !foe) { root.replaceChildren(el('div', { class: 'dl-boot err' }, el('b', {}, 'Keine Glitchlings für den Bit-Stapel.'), el('br'), el('small', {}, 'Bitte an Ava schicken.'))); return; }
+    if (!me || !foe) { root.replaceChildren(el('div', { class: 'dl-boot err' }, el('b', {}, 'Keine Entities für den Bit-Stapel.'), el('br'), el('small', {}, 'Bitte an Ava schicken.'))); return; }
     view.start(me, foe, opts());
   }
   addEventListener('keydown', e => { if (window.duelDemo?.mode === 'stack' && /^[1-3]$/.test(e.key)) view.playerPlace(Number(e.key) - 1); });

@@ -1,4 +1,4 @@
-// The Glitchling duel (#050, game/duel.js): the core of OPR Firefight without special rules, as a card game. Taking turns, the three
+// The Entity duel (#050, game/duel.js): the core of OPR Firefight without special rules, as a card game. Taking turns, the three
 // actions, dice against Präzision and Abschirmung, Integrität, Selbsttest and Flackern, the AI plays sensibly.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -12,7 +12,7 @@ const seq = (...v) => { let i = 0; return () => v[i++ % v.length]; };   // dice:
 const die = f => (f - 1) / 6 + 0.01;
 const mk = (o = {}) => ({ kind: 'glitchling', id: 'x', name: 'X', quality: 4, defense: 4, tough: 3, remote: 1, link: 2, ...o });
 
-test('Werte aus dem Glitchling: Präzision nach Bits, Abschirmung nach Hersteller, Integrität = Bits + 1, Impulse nach Begabung', () => {
+test('Werte aus dem Entity: Präzision nach Bits, Abschirmung nach Hersteller, Integrität = Bits + 1, Impulse nach Begabung', () => {
   const amber = generate(D, 1).find(g => g.name === 'Amber Slay'), s = statsOf(D, amber);
   assert.equal(s.quality, 4); assert.equal(s.defense, D.glitchlings.duel.defense[D.brands.vulkan.tier]); assert.equal(s.tough, 5);
   assert.deepEqual([s.remote, s.link], [2, 3]);

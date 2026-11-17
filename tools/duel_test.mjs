@@ -20,7 +20,7 @@ let r = await page.evaluate(() => ({ cards: document.querySelectorAll('.dl-card'
 check('Vier Karten mit Code-Porträts, Leyla beginnt, Aktionen Sicherer Angriff/Harter Angriff/Stabilisieren', r.cards === 4 && r.faces === 4 && r.turn === 'player' && r.acts.join() === 'Sicherer Angriff,Harter Angriff,Stabilisieren', r);
 await page.click('.dl-card.player.pick'); await page.click('[data-action=link]');
 r = await page.evaluate(() => document.querySelectorAll('.dl-card.target').length);
-check('Glitchling gewählt, Harter Angriff: beide Gegner sind Ziele', r === 2, r);
+check('Entity gewählt, Harter Angriff: beide Gegner sind Ziele', r === 2, r);
 await page.hover('.dl-card.target'); await shot('choose');
 r = await page.evaluate(() => getComputedStyle(document.querySelector('.dl-card.target:hover .dl-preview') || document.body).display);
 check('Vorschau am Ziel: erwartete Wunden', r === 'block', r);

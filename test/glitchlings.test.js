@@ -1,4 +1,4 @@
-// Glitchlings (#047, game/glitchlings.js): the generator of passive companions. Same seed = same set, names from two words and
+// Entities (#047, game/glitchlings.js): the generator of passive companions. Same seed = same set, names from two words and
 // never twice (no word twice), unique ones marked „immer“ always there, effect = per bit × bits, weaker in a foreign workbench.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -8,7 +8,7 @@ import { nodeLoader } from '../tools/loader.js';
 
 const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
 
-test('Gleicher Seed, gleiche Glitchlings; anderer Seed, andere', () => {
+test('Gleicher Seed, gleiche Entities; anderer Seed, andere', () => {
   assert.deepEqual(generate(D, 42), generate(D, 42));
   assert.notDeepEqual(generate(D, 42).map(g => g.name), generate(D, 43).map(g => g.name));
 });
@@ -41,10 +41,10 @@ test('Macken wiederholen sich in einem Durchgang nicht, solange es genug gibt', 
   assert.equal(new Set(list.map(g => g.quirk)).size, list.length);
 });
 
-// Code portraits (#048, game/glitch_face.js): same Glitchling = same face, every one its own, they move, unique ones have a gold rim
+// Code portraits (#048, game/glitch_face.js): same Entity = same face, every one its own, they move, unique ones have a gold rim
 import { renderFace, faceOf, SIZE, WEARS } from '../game/glitch_face.js';
 const key = px => Buffer.from(px).toString('base64');
-test('Code-Porträt: gleich bleibt gleich, jeder Glitchling hat sein eigenes Gesicht', () => {
+test('Code-Porträt: gleich bleibt gleich, jeder Entity hat sein eigenes Gesicht', () => {
   const list = [...generate(D, 3), ...generate(D, 4)];
   assert.equal(key(renderFace(list[2], 1.1)), key(renderFace(list[2], 1.1)));
   const faces = new Set(list.map(g => key(renderFace(g, 0.2))));
@@ -66,10 +66,10 @@ test('Code-Porträt: Unikate mit Goldrand, jede Begabung trägt etwas, Archäolo
   assert.ok(config(D).talents.some(t => t.name === 'Archäologe' && t.function === 'warroom'));
 });
 
-// a Glitchling as a thing (#048, Daniel: „Kannst du mir einen Glitchling ins Inventar legen?“): once per older savegame, Amber Slay
+// an Entity as a thing (#048, Daniel: „Kannst du mir einen Glitchling ins Inventar legen?“): once per older savegame, Amber Slay
 import { newSave, repairSave } from '../game/save.js';
 import { addEntry, newGrid } from '../game/inventory.js';
-test('Geschenk: ein alter Spielstand bekommt einmal Amber Slay als Glitchling, er bleibt er selbst', () => {
+test('Geschenk: ein alter Spielstand bekommt einmal Amber Slay als Entity, er bleibt er selbst', () => {
   const old = newSave(D); delete old.gifts;
   const s = repairSave(structuredClone(old), D), all = x => Object.values(x.inv.grids).flatMap(g => g.items).filter(e => e.id === 'glitchling');
   assert.equal(all(s).length, 1);
@@ -79,19 +79,19 @@ test('Geschenk: ein alter Spielstand bekommt einmal Amber Slay als Glitchling, e
   assert.equal(all(repairSave(structuredClone(newSave(D)), D)).length, 0, 'ein neues Spiel startet ohne');
   const g = newGrid(6, 6), e = all(s)[0];
   addEntry(D, g, e); addEntry(D, g, { ...e, g: { ...e.g, name: 'Moss Fang' } });
-  assert.deepEqual(g.items.map(x => x.g.name), ['Amber Slay', 'Moss Fang'], 'Glitchlings stapeln nie');
+  assert.deepEqual(g.items.map(x => x.g.name), ['Amber Slay', 'Moss Fang'], 'Entities stapeln nie');
 });
 
 // #049 (Daniel, 17.11.2026): „KIs brauchen einen Hersteller“; „Man muss sie nicht im Inventar transportieren, wenn man ein Cyberdeck hat“
 import { brandOf } from '../game/glitchlings.js';
 import { deckSize, fitDeck, DECK } from '../game/save.js';
-test('Jeder Glitchling hat einen Hersteller (Unikate auch einen eigenen)', () => {
+test('Jeder Entity hat einen Hersteller (Unikate auch einen eigenen)', () => {
   const list = generate(D, 11);
   for (const g of list) assert.ok(D.brands[g.brand], `${g.name} ohne Hersteller`);
   assert.equal(list.find(g => g.name === 'Marble Sting').brand, 'kessler');
-  assert.equal(brandOf(D, { talent: 'Koch' }), 'neon_nudel', 'alte Glitchlings (ohne brand) nach ihrer Begabung');
+  assert.equal(brandOf(D, { talent: 'Koch' }), 'neon_nudel', 'alte Entities (ohne brand) nach ihrer Begabung');
 });
-test('Cyberdeck = Fach für Glitchlings: Plätze je Deck, ohne Deck kein Fach, nichts geht verloren', () => {
+test('Cyberdeck = Fach für Entities: Plätze je Deck, ohne Deck kein Fach, nichts geht verloren', () => {
   assert.deepEqual(deckSize(D, 'bastlerdeck'), [2 * D.weapons.bastlerdeck.glitchSlots, 2]);
   assert.equal(deckSize(D, 'rohrzange'), null);
   const inv = { slots: { cyberdeck: 'bastlerdeck' }, grids: {} };
@@ -119,7 +119,7 @@ test('Alter Spielstand ohne Deck: bekommt einmal ein Bastler-Deck, Amber Slay zi
 // Geister-Köpfe (Daniel, 17.11.2026: „mehr wie digitale Geister und weniger wie Fernseher“): a pale head with a black void, tinted,
 // the face drawn by code inside the void; Kammerjäger stay screens
 import { setHeads, renderGhost, GSIZE, headsReady } from '../game/glitch_face.js';
-test('Geist: Kopf in der Farbe des Glitchlings, Gesicht in der Leere, schwebt; Kammerjäger bleiben Bildschirme', () => {
+test('Geist: Kopf in der Farbe des Entities, Gesicht in der Leere, schwebt; Kammerjäger bleiben Bildschirme', () => {
   const S = GSIZE, head = new Uint8ClampedArray(S * S * 4);
   for (let y = 8; y < 56; y++) for (let x = 12; x < 52; x++) { const i = (y * S + x) * 4, voidPx = (x - 32) ** 2 / 144 + (y - 30) ** 2 / 196 < 1; head[i] = head[i + 1] = head[i + 2] = voidPx ? 6 : 235; head[i + 3] = 255; }
   const [H] = setHeads([head]);

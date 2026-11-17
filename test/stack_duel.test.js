@@ -1,4 +1,4 @@
-// Bit-Stapel (#051, game/stack_duel.js): the Glitchling duel after the Knucklebones principle. Equal bits multiply, the favourite bit
+// Bit-Stapel (#051, game/stack_duel.js): the Entity duel after the Knucklebones principle. Equal bits multiply, the favourite bit
 // counts double, a placed bit destroys equal bits opposite, the duel ends when one side is full; the AI beats random play.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

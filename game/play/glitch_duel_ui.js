@@ -43,7 +43,7 @@ export class GlitchDuelUI {
     this.view.start(me, this.foe, { rules: 'dot', hp: D.glitchlings?.duel?.stackHp ?? 50 });
   }
   close() {
-    this.view?.stop(); this.el.hidden = true; this.el.replaceChildren();
+    this.view?.stop(); this.el.hidden = true; this.el.replaceChildren(); this.swallow = 3;   // the next game frames ignore Esc / E (scene.padMenus)
     const r = this.result || { won: false, gaveUp: true }, cb = this.onDone;
     this.onDone = null; this.view = null;
     cb?.(r);

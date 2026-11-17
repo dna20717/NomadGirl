@@ -160,7 +160,7 @@ export const SUMMARY = {
       ['In Pixeln', `${r.w * (w.p.data.game?.tileSize || 64)} × ${r.h * (w.p.data.game?.tileSize || 64)}`]]), play) };
   },
 
-  // Glitchlings (#047): one rolled Durchgang as cards, „Neu würfeln“ rolls another (the game will roll one per Durchgang)
+  // Entities (#047): one rolled Durchgang as cards, „Neu würfeln“ rolls another (the game will roll one per Durchgang)
   glitchlings(w) {
     const D = w.p.data, box = el('div', { class: 'ng-glitch' }), info = el('p', { class: 'ed-small' });
     let seed = w.glitchSeed ??= 1 + Math.floor(Math.random() * 1e6);
@@ -171,7 +171,7 @@ export const SUMMARY = {
         el('div', { style: 'display:flex;justify-content:space-between;gap:8px' }, el('b', { style: 'font:22px/1 VT323,monospace;letter-spacing:.03em' }, g.name), el('span', { title: `${g.bits} Bits`, style: 'color:#20d6c7;letter-spacing:2px' }, '▮'.repeat(g.bits) + '▯'.repeat(5 - g.bits))),
         el('small', {}, `${g.talent}${g.unique ? ' · Unikat' : ''} · `, (b => b ? el('b', { style: `color:${b.color || 'inherit'}` }, b.name) : 'ohne Hersteller')(D.brands?.[brandOf(D, g)]), ` · wohnt in: ${g.home}`), el('span', {}, g.effect), el('small', { style: 'opacity:.75' }, `Macke: ${g.quirk}`), el('small', { style: 'opacity:.6;font-style:italic' }, `„${g.wish}“`))));
       const by = {}; for (const g of list) by[g.bits] = (by[g.bits] || 0) + 1;
-      info.textContent = `Seed ${seed} · ${list.length} Glitchlings · Stärke ${[1, 2, 3, 4, 5].map(b => `${b} Bit: ${by[b] || 0}`).join(', ')}`;
+      info.textContent = `Seed ${seed} · ${list.length} Entities · Stärke ${[1, 2, 3, 4, 5].map(b => `${b} Bit: ${by[b] || 0}`).join(', ')}`;
     };
     paint();
     const again = el('button', { class: 'ed-button wide', onclick: () => { seed = w.glitchSeed = 1 + Math.floor(Math.random() * 1e6); paint(); } }, 'Neu würfeln');
@@ -189,7 +189,7 @@ export const SUMMARY = {
     return { title: 'Markenschild', body: el('div', {},
       el('div', { style: 'display:flex;gap:14px;align-items:center' }, logo, el('div', {}, el('b', { style: `font:26px/1 VT323,monospace;color:${x.color || '#ffd27a'};text-transform:uppercase` }, x.name || id), x.slogan ? el('div', { style: 'font-style:italic;opacity:.8' }, `„${x.slogan}“`) : null)),
       el('p', { class: 'ed-small' }, made.length ? `Stellt her (${made.length}): ${made.join(', ')}` : 'Stellt (noch) nichts her, was Leyla findet.'),
-      ais.length ? el('p', { class: 'ed-small' }, `Baut KIs (Glitchlings): ${ais.join(', ')}`) : null,
+      ais.length ? el('p', { class: 'ed-small' }, `Baut KIs (Entities): ${ais.join(', ')}`) : null,
       kids.length ? el('p', { class: 'ed-small' }, `Töchter: ${kids.join(', ')}`) : null) };
   },
   // the travel map (#007): one rolled map with the current values, „Neu würfeln“ rolls another (the game rolls one per Durchgang)

@@ -34,7 +34,7 @@ export const CATEGORY_COLORS = {
   valuable: '#a8862a', blueprint: '#7a6a9a', armor: '#5a5a7a', implant: '#2f7f8a', dronepart: '#3a7a6a', progress: '#b0407a', melee: '#8a4a3a', ranged: '#3a6a7a', cyberdeck: '#3a8a6a', backpack: '#7a5a8a', rigpart: '#8a6a3a', glitchling: '#20a6a0',
 };
 const PART_ICONS = { engine: 'settings', armor: 'armor', weapon: 'target', roof: 'box' };
-const CATEGORY_NAMES = { junk: 'Schrott', resource: 'Ressource', ingredient: 'Zutat', food: 'Gericht', component: 'Bauteil', consumable: 'Verbrauchsgut', valuable: 'Wertsache', blueprint: 'Bauplan', armor: 'Rüstung', implant: 'Implantat', dronepart: 'Drohnenteil', progress: 'Fortschritt', melee: 'Nahkampf', ranged: 'Fernkampf', cyberdeck: 'Cyberdeck', backpack: 'Rucksack', rigpart: 'Rig-Teil', glitchling: 'Glitchling' };
+const CATEGORY_NAMES = { junk: 'Schrott', resource: 'Ressource', ingredient: 'Zutat', food: 'Gericht', component: 'Bauteil', consumable: 'Verbrauchsgut', valuable: 'Wertsache', blueprint: 'Bauplan', armor: 'Rüstung', implant: 'Implantat', dronepart: 'Drohnenteil', progress: 'Fortschritt', melee: 'Nahkampf', ranged: 'Fernkampf', cyberdeck: 'Cyberdeck', backpack: 'Rucksack', rigpart: 'Rig-Teil', glitchling: 'Entity' };
 // the order of kinds in the Camp-Lager (filter chips, Sortieren)
 const KIND_ORDER = ['food', 'ingredient', 'consumable', 'resource', 'component', 'junk', 'weaponpart', 'melee', 'ranged', 'cyberdeck', 'armor', 'implant', 'dronepart', 'backpack', 'valuable', 'glitchling', 'blueprint', 'progress', 'rigpart'];
 const SLOT_NAMES = { melee: 'Nahkampf', ranged: 'Fernkampf', cyberdeck: 'Cyberdeck', backpack: 'Rucksack' };
@@ -109,8 +109,8 @@ export class InventoryUI {
   // what a grid takes (treasury: only valuables on the pile, only things tagged "trophy" on the stands)
   acceptOf(key) { return key === this.other?.key ? this.other.accept : this.other?.extra?.find(x => x.key === key)?.accept; }
   allows(key, e, say = true) {
-    // the cyberdeck carries only Glitchlings (#049)
-    if (key === DECK) { const ok = kindOf(this.D, e.a, e.id) === 'glitchling'; if (!ok && say) this.host.notify?.('Ins Cyberdeck passen nur Glitchlings'); return ok; }
+    // the cyberdeck carries only Entities (#049)
+    if (key === DECK) { const ok = kindOf(this.D, e.a, e.id) === 'glitchling'; if (!ok && say) this.host.notify?.('Ins Cyberdeck passen nur Entities'); return ok; }
     const A = this.acceptOf(key);
     if (!A) return true;
     const t = thing(this.D, e.a, e.id) || {}, ok = (!A.categories?.length || A.categories.includes(kindOf(this.D, e.a, e.id))) && (!A.tag || (t.tags || []).includes(A.tag));
@@ -161,11 +161,11 @@ export class InventoryUI {
       el('header', {}, icon('bags', 16), el('b', {}, bp?.name || 'Rucksack'), el('small', {}, `${worth(D, inv.grids.backpack)} Δ`)),
       this.gridEl('backpack', inv.grids.backpack), this.deckEl());
   }
-  // the cyberdeck's places for Glitchlings (#049), under the backpack while Leyla holds a deck
+  // the cyberdeck's places for Entities (#049), under the backpack while Leyla holds a deck
   deckEl() {
     const D = this.D, g = this.inv.grids[DECK], deck = D.weapons?.[this.inv.slots?.cyberdeck];
     if (!g || !deck) return null;
-    return el('div', { class: 'inv-deck' }, el('div', { class: 'inv-sub cyan' }, icon('brain', 14), deck.name, el('small', {}, `${g.items.length}/${g.w / 2} Glitchlings`)), this.gridEl(DECK, g));
+    return el('div', { class: 'inv-deck' }, el('div', { class: 'inv-sub cyan' }, icon('brain', 14), deck.name, el('small', {}, `${g.items.length}/${g.w / 2} Entities`)), this.gridEl(DECK, g));
   }
   // the shoulder button that pages (controller only, keyGlyph shows L1 / R1 or LB / RB)
   pageKey(i) { return this.padOn && padInUse() ? [keyGlyph('tabs')[i]].filter(Boolean) : []; }
@@ -349,7 +349,7 @@ export class InventoryUI {
     // the picture fills the box in its own shape (square icons a square, wide ones as wide as the thing), turned with it
     const [lx, ly] = cells[0], k = iconCell(D, t), odd = (e.r || 0) % 2 === 1, W = b.w * c, H = b.h * c;
     const [uw, uh] = odd ? [H, W] : [W, H], sz = k ? Math.min(uw / k.aspect, uh) : 0, aw = sz * (k?.aspect || 1) * 0.92, ah = sz * 0.92;
-    // a Glitchling (#048): its code portrait, moving (it is the item picture)
+    // an Entity (#048): its code portrait, moving (it is the item picture)
     if (e.g) { const s = Math.floor(Math.min(W, H) * 0.92 / SIZE) * SIZE || Math.min(W, H); wrap.classList.add('pic'); wrap.append(el('span', { class: 'inv-pic', style: `left:${(W - s) / 2}px;top:${(H - s) / 2}px;width:${s}px;height:${s}px` }, faceCanvas(e.g, s))); }
     const art = !e.g && k && artOf(D, e.a, e.id, aw, e.r || 0, ah);
     if (e.g) { /* portrait above */ } else if (art) { wrap.classList.add('pic'); wrap.append(el('span', { class: 'inv-pic', style: `left:${(W - aw) / 2}px;top:${(H - ah) / 2}px;width:${aw}px;height:${ah}px` }, art)); }
@@ -808,7 +808,7 @@ export class InventoryUI {
     }
     const id = inv.slots[slot];
     if (!id) return;
-    if (slot === 'cyberdeck' && inv.grids[DECK]?.items.length) return this.host.notify?.('Erst die Glitchlings aus dem Cyberdeck nehmen');   // #049
+    if (slot === 'cyberdeck' && inv.grids[DECK]?.items.length) return this.host.notify?.('Erst die Entities aus dem Cyberdeck nehmen');   // #049
     inv.slots[slot] = null;
     if (slot === 'cyberdeck') fitDeck(this.D, inv);
     const mods = inv.slotMods?.[slot]; if (inv.slotMods) delete inv.slotMods[slot];   // a weapon copy keeps its own values (#013)
@@ -831,9 +831,9 @@ export class InventoryUI {
       return true;
     }
     if (e.a !== 'weapons' || (D.weapons?.[e.id]?.kind || 'melee') !== slot) return say(`Hier gehört eine ${SLOT_NAMES[slot]}-Waffe hin`);
-    if (slot === 'cyberdeck' && inv.grids[DECK]?.items.length) {   // #049: the Glitchlings move into the new deck, or it stays
+    if (slot === 'cyberdeck' && inv.grids[DECK]?.items.length) {   // #049: the Entities move into the new deck, or it stays
       const size = deckSize(D, e.id), test = size && newGrid(...size);
-      if (!test || inv.grids[DECK].items.some(x => addEntry(D, test, x, x.n) > 0)) return say('Die Glitchlings passen nicht in dieses Deck');
+      if (!test || inv.grids[DECK].items.some(x => addEntry(D, test, x, x.n) > 0)) return say('Die Entities passen nicht in dieses Deck');
     }
     const prev = inv.slots[slot], prevMods = inv.slotMods?.[slot];
     inv.slots[slot] = e.id;

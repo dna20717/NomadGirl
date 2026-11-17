@@ -1,12 +1,12 @@
-// Code portraits of the Glitchlings (#048, Daniel 17.11.2026: „jeweils ein individuelles, animiertes Code-Porträt, das gleichzeitig das
-// Item-Bild ist (in diesem Fall auch animiert)“). No assets: every Glitchling is a little screen in a bezel, a face of light on lines of
-// code. Everything comes from its traits, so the same Glitchling always has the same face:
+// Code portraits of the Entities (#048, Daniel 17.11.2026: „jeweils ein individuelles, animiertes Code-Porträt, das gleichzeitig das
+// Item-Bild ist (in diesem Fall auch animiert)“). No assets: every Entity is a little screen in a bezel, a face of light on lines of
+// code. Everything comes from its traits, so the same Entity always has the same face:
 //   first name word → colour of the light (Amber orange, Cobalt blue …), second word → eyes and mouth, the name → screen shape,
 //   glass and bezel; talent → what it wears (chef's hat, propeller, fedora …); bits → the lamps on the bezel; quirk kind → how it glitches;
 //   unique ones get a gold rim.
 // Since 17.11.2026 (Daniel: „mehr wie digitale Geister und weniger wie Fernseher … die Mimiken weiterhin aus dem Code, aber die Köpfe cool
-// gepixelt“) Glitchlings are ghosts: a head from the sheet glitch_heads (PixelLab, pale with an empty black face), tinted in the
-// Glitchling's light; the face (eyes, mouth, blinking, glitches) is drawn into the black void by code; it floats. The screen faces stay for
+// gepixelt“) Entities are ghosts: a head from the sheet glitch_heads (PixelLab, pale with an empty black face), tinted in the
+// Entity's light; the face (eyes, mouth, blinking, glitches) is drawn into the black void by code; it floats. The screen faces stay for
 // Kammerjäger (software, no ghost) and as long as the heads are not loaded (Node, tests). renderGhost() paints that, setHeads() gives the heads.
 // renderFace(g, t) paints one frame into RGBA pixels (SIZE × SIZE, no DOM: tests and Node), drawGlitchFace() puts it on a canvas,
 // animateFace() keeps a canvas moving while it is on the page (workshop cards, later the item picture in the inventory).
@@ -34,11 +34,11 @@ export const WEARS = { perfect: 'chef', refund: 'visor', growth: 'sprout', power
 
 const hash = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 
-// the traits of a face (stable per Glitchling)
+// the traits of a face (stable per Entity)
 export function faceOf(g) {
   const [a = '', b = ''] = String(g.name || g.id || '').split(/\s+/), h = hash(g.id || g.name), hb = hash(b), r = rng(h);
   const tint = hex(TINT[a] || BRIGHT[hash(a) % BRIGHT.length]);
-  // a Kammerjäger (#050, AntiGlitchling-Software): always the same stiff face, red light on a wide black screen, never glitches
+  // a Kammerjäger (#050, Anti-Entity-Software): always the same stiff face, red light on a wide black screen, never glitches
   if (g.hunter) return { tint: hex(['df3e23', 'fa6a0a', 'e86a73', 'b4202a'][h % 4]), glass: hex('060608'), bezel: hex(['333941', '4a5462', '242234'][(h >>> 3) % 3]), shape: 'wide',
     eyes: 'bars', mouth: 'flat', wears: null, bits: 0, glitch: null, unique: false, blink: 99, phase: r() * 10, talk: 99, seed: h, hunter: true };
   return { tint, glass: hex(GLASS[h % GLASS.length]), bezel: hex(BEZEL[(h >>> 4) % BEZEL.length]), shape: SHAPES[(h >>> 8) % SHAPES.length],
@@ -207,7 +207,7 @@ export function renderGhost(g, t = 0, out = null) {
   const fr = Math.floor(t * FPS), T = fr / FPS, r = rng(F.seed + fr * 7919);
   const bob = Math.round(Math.sin(T * 2.1 + F.phase) * 1.4), dark = [10, 8, 18], gold = GOLD;
   const mood = F.glitch === 'mood' ? 0.85 + 0.15 * Math.sin(T * 1.7 + F.phase) : 1;
-  // the head: brightness of the pale art → from deep shade to the light of the Glitchling (unique ones: gold outline)
+  // the head: brightness of the pale art → from deep shade to the light of the Entity (unique ones: gold outline)
   for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
     const sy = y - bob; if (sy < 0 || sy >= S) continue;
     const i = (sy * S + x) * 4, a = src[i + 3]; if (!a) continue;

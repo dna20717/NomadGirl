@@ -1,4 +1,4 @@
-// The Glitchling duel (#050, Daniel 17.11.2026: „Schau dir das OPR-Firefight-System für Kämpfe an (ohne Schlagwörter, nur das reine
+// The Entity duel (#050, Daniel 17.11.2026: „Schau dir das OPR-Firefight-System für Kämpfe an (ohne Schlagwörter, nur das reine
 // Kampfsystem)“; „keine Regeln für Bewegungen … mehr wie ein Kartenspiel“; „wir starten einfach“). No DOM: the demo page (duel.html,
 // game/duel_ui.js), later the game, tests and the simulation.
 //
@@ -27,7 +27,7 @@ export function duelConfig(D) {
   const G = D.glitchlings || {}, d = G.duel || {};
   return { quality: (d.quality || []).map(x => x.q), defense: { cheap: 5, mid: 4, premium: 4, elite: 3, ...(d.defense || {}) }, tough: d.tough ?? 1, team: d.team ?? 2, hunters: (G.hunters || []).filter(h => h.id) };
 }
-// the values of a Glitchling: Präzision from its bits, Abschirmung from its maker's tier, Integrität = bits + Zähigkeit-Bonus, Impulse from the talent
+// the values of an Entity: Präzision from its bits, Abschirmung from its maker's tier, Integrität = bits + Zähigkeit-Bonus, Impulse from the talent
 export function statsOf(D, g) {
   const C = duelConfig(D), t = config(D).talents.find(x => x.name === g.talent) || {}, brand = g.brand || t.brand || null, tier = D.brands?.[brand]?.tier || 'mid';
   const bits = Math.max(1, Math.min(5, g.bits || 1));
@@ -134,7 +134,7 @@ export function score(duel, uid, o) {
   }
   return v;
 }
-// the AI's choice for the side on turn: the best (fighter, option); noise 0 = always the best, more = looser (weak Glitchlings)
+// the AI's choice for the side on turn: the best (fighter, option); noise 0 = always the best, more = looser (weak Entities)
 export function choose(duel, rnd = Math.random, noise = 0.15) {
   let best = null;
   for (const f of ready(duel, duel.turn)) for (const o of options(duel, f.uid)) {

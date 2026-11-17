@@ -607,52 +607,52 @@ Kein Gerät, kein Netz, keine Drohne im Spiel, keine Bandbreite oder Spur, kein 
 - Echos der Toten: berührend oder zu düster?
 - Welche Tellerrand-Idee zuerst: Karte falten, Container größer, Himmel flicken, ein Flicken durch den Traum?
 
-## Hacking v3: Glitchlings (Daniels Ausgangspunkt, 16.11.2026; ausgearbeitet von Ava, wartet auf Daniel)
+## Hacking v3: Entities (Daniels Ausgangspunkt, 16.11.2026; ausgearbeitet von Ava, wartet auf Daniel)
 
-Daniel, 16.11.2026: „Das Konzept von Software existiert in dieser Welt nicht mehr. Statt einer Anwendung gibt es nur noch entwickelte spezialisierte KIs, die aber alle kleine Eigenarten und Macken haben … Mit einem starken Deck kann man sie fangen (oder aktiv überreden, einen zu begleiten). Sie können in Werkbänke einziehen und dann Sondereffekte produzieren. Auch kann man mit ihnen permanent Cyberware verbessern usw. Aber sie sind einzigartig und deshalb muss man mit Bedacht wählen, was man tut.“ Antworten: Name **Glitchlings** (niedlich und englisch); bekommen durch **Fangen, Überreden, Kaufen/Tauschen, Erben**; **Einzug oder Verschmelzen**; **wie Crew ohne Körper**. Löst v1 und v2 ab (die bleiben als Entwürfe). Alles Weitere ⚠️ vorläufig.
+Daniel, 16.11.2026: „Das Konzept von Software existiert in dieser Welt nicht mehr. Statt einer Anwendung gibt es nur noch entwickelte spezialisierte KIs, die aber alle kleine Eigenarten und Macken haben … Mit einem starken Deck kann man sie fangen (oder aktiv überreden, einen zu begleiten). Sie können in Werkbänke einziehen und dann Sondereffekte produzieren. Auch kann man mit ihnen permanent Cyberware verbessern usw. Aber sie sind einzigartig und deshalb muss man mit Bedacht wählen, was man tut.“ Antworten: Name **Entities** (niedlich und englisch); bekommen durch **Fangen, Überreden, Kaufen/Tauschen, Erben**; **Einzug oder Verschmelzen**; **wie Crew ohne Körper**. Löst v1 und v2 ab (die bleiben als Entwürfe). Alles Weitere ⚠️ vorläufig.
 
-**In einem Satz:** Programme gibt es nicht mehr, nur noch Glitchlings, kleine spezialisierte KIs mit Macken. Leyla sammelt sie mit ihrem Deck, gibt ihnen ein Zuhause in ihren Werkbänken oder verschmilzt sie für immer mit ihrer Cyberware. Jeder ist einzigartig, und jede Entscheidung bleibt.
+**In einem Satz:** Programme gibt es nicht mehr, nur noch Entities, kleine spezialisierte KIs mit Macken. Leyla sammelt sie mit ihrem Deck, gibt ihnen ein Zuhause in ihren Werkbänken oder verschmilzt sie für immer mit ihrer Cyberware. Jeder ist einzigartig, und jede Entscheidung bleibt.
 
-### Was ein Glitchling ist
+### Was ein Entity ist
 
 - **Name** aus zwei Wörtern, Material + Kante (Daniel, 17.11.2026: „Namen nach dem Schema wie Marble Sting … hebt sie von Pokémons ab“): **Amber Slay** (Daniel), **Marble Sting**, gewürfelt z. B. Velvet Bite, Rust Purr, Paper Waltz, Ochre Waltz. Wintermute ist die KI aus „Neuromancer“ und bekommt einen eigenen Namen. Generator und Bausteine: `docs/features/glitchlings.md` (#047).
 - **Begabung:** wofür er gebaut wurde (Kochen, Schweißen, Rechnen, Heilen, Navigieren, Wachen, Zielen, Gärtnern …). Bestimmt, in welcher Werkbank er glänzt.
 - **Stärke** (1–5 Bits): wie mächtig er ist und welches Deck ihn halten kann.
 - **Macke:** sein Glitch, immer ein Haken mit Charme, z. B. „kocht nur scharf“, „repariert, aber lackiert alles pink“, „arbeitet nur nachts“, „verträgt keinen Regen“, „hasst den Generator“, „singt beim Arbeiten (die Crew wird müde oder fröhlich)“.
-- **Laune und Vertrauen** wie bei der Crew (Die Karawane, docs/crew.md): Er mag bestimmte Werkbänke, Leute und Gerichte, streitet mit anderen Glitchlings, hat Wünsche. Er hat keinen Körper, spricht aber im Camp durch seine Werkbank (Bläschen am Bildschirm, ein Brummen, ein Licht).
+- **Laune und Vertrauen** wie bei der Crew (Die Karawane, docs/crew.md): Er mag bestimmte Werkbänke, Leute und Gerichte, streitet mit anderen Entities, hat Wünsche. Er hat keinen Körper, spricht aber im Camp durch seine Werkbank (Bläschen am Bildschirm, ein Brummen, ein Licht).
 
 ### Wie Leyla sie bekommt
 
-- **Fangen mit dem Deck:** In POIs wohnen Glitchlings in alten Maschinen (Automaten, Kassen, Kühlanlagen, Aufzüge). Man erkennt sie an ihrer Macke in der Welt: ein Automat, der Gedichte druckt, ein Aufzug, der nur zu Ebene 4 will. Ist das Deck stark genug (Deck-Stufe ≥ Bits), kann Leyla ihn einfangen. Gefangene sind **mürrisch**: Laune unten, Vertrauen null, aber sofort nutzbar.
-- **Überreden:** Im Gespräch (Comic-Dialog wie die Crew) will jeder Glitchling etwas: ein Ding, einen Ort („zeig mir das Meer“), eine Tat („schalte die Kessler-Kamera ab, die mich jagt“), eine Werkbank. Freiwillige sind **gut gelaunt und loyal** und starten mit Vertrauen.
-- **Kaufen und Tauschen:** Ghostwire und manche Händler bieten Glitchlings an, teuer, manchmal mit verschwiegener zweiter Macke (wie die verborgene Eigenheit bei der Crew).
-- **Erben:** In Wracks (Bergungsprojekte) und Mega-Rigs wohnen alte Glitchlings, die mit dem Fahrzeug kommen, manchmal treu zum Fahrzeug statt zu Leyla.
+- **Fangen mit dem Deck:** In POIs wohnen Entities in alten Maschinen (Automaten, Kassen, Kühlanlagen, Aufzüge). Man erkennt sie an ihrer Macke in der Welt: ein Automat, der Gedichte druckt, ein Aufzug, der nur zu Ebene 4 will. Ist das Deck stark genug (Deck-Stufe ≥ Bits), kann Leyla ihn einfangen. Gefangene sind **mürrisch**: Laune unten, Vertrauen null, aber sofort nutzbar.
+- **Überreden:** Im Gespräch (Comic-Dialog wie die Crew) will jeder Entity etwas: ein Ding, einen Ort („zeig mir das Meer“), eine Tat („schalte die Kessler-Kamera ab, die mich jagt“), eine Werkbank. Freiwillige sind **gut gelaunt und loyal** und starten mit Vertrauen.
+- **Kaufen und Tauschen:** Ghostwire und manche Händler bieten Entities an, teuer, manchmal mit verschwiegener zweiter Macke (wie die verborgene Eigenheit bei der Crew).
+- **Erben:** In Wracks (Bergungsprojekte) und Mega-Rigs wohnen alte Entities, die mit dem Fahrzeug kommen, manchmal treu zum Fahrzeug statt zu Leyla.
 - **Hersteller (Daniel, 17.11.2026: „KIs brauchen einen Hersteller“, gebaut als #049):** Jede Art KI kommt von einer Marke aus Lore › Marken, nach Begabung: Koch-KIs von Neon Noodle, Schweißer von Backalley Chrome, Gärtner von Kessler Cosmetics, Ingenieure von Delta Petrol, Chirurgen von Kessler Cybernetics, Navigatoren von Mile King, Waffenmeister von Vulkan, Drohnenflüsterer von Ghostwire, Gastgeber vom Salt Lake Motel, Buchhalter vom Delta Bureau of Order, Kühlwarte von NomadCola, Schläfer von NeuroLux, Archäologen von Crow & Sons. Unikate können einen eigenen haben. ⚠️ vorläufig; später kann die Qualität der Marke wirken (wie bei Waffen).
-- **Das Cyberdeck ist ein Fach für Glitchlings (Daniel, 17.11.2026, gebaut als #049):** „Man muss sie nicht im Inventar transportieren, wenn man ein Cyberdeck hat (was im Grunde zunächst mal ein eigenes Inventar für Glitchlinge ist).“ Jedes Deck hat Plätze (Bastler-Deck: 2 ⚠️), dort tragen Glitchlings keinen Platz im Rucksack weg und überstehen ein k.o. wie die Ausrüstung. Ohne Deck gehen sie auch in den Rucksack oder ins Lager.
-- **Das Deck** wird damit wichtig: Seine Stufe bestimmt, wie starke Glitchlings man fangen kann, und es hat **Plätze**, wie viele man unterwegs bei sich tragen kann (Bastler-Deck: 1 Platz, Stufe 1).
+- **Das Cyberdeck ist ein Fach für Entities (Daniel, 17.11.2026, gebaut als #049):** „Man muss sie nicht im Inventar transportieren, wenn man ein Cyberdeck hat (was im Grunde zunächst mal ein eigenes Inventar für Glitchlinge ist).“ Jedes Deck hat Plätze (Bastler-Deck: 2 ⚠️), dort tragen Entities keinen Platz im Rucksack weg und überstehen ein k.o. wie die Ausrüstung. Ohne Deck gehen sie auch in den Rucksack oder ins Lager.
+- **Das Deck** wird damit wichtig: Seine Stufe bestimmt, wie starke Entities man fangen kann, und es hat **Plätze**, wie viele man unterwegs bei sich tragen kann (Bastler-Deck: 1 Platz, Stufe 1).
 
 ### Einzug oder Verschmelzen
 
-Jeder Glitchling ist **einzigartig** (pro Durchgang gibt es ihn genau einmal). Leyla entscheidet:
+Jeder Entity ist **einzigartig** (pro Durchgang gibt es ihn genau einmal). Leyla entscheidet:
 
-1. **Einzug in eine Werkbank:** Er wohnt dort und erzeugt einen **Sondereffekt**, abhängig von Begabung und Werkbank, z. B. Kochnische: Gerichte gelingen öfter „perfekt“; Werkbank: Herstellen gibt manchmal ein Teil zurück; Generator: mehr Strom, aber nachts flackert das Licht; Hydrokultur: Pflanzen wachsen schneller und manchmal mutiert eine Sorte; Ripperdoc: Implantate einbauen ohne Belastung; Warroom: zeigt eine verborgene Straße; Waffenkammer: Eigenbau-Waffen bekommen einen Bonus; Gästekoje: Gäste bleiben länger. Passt Begabung zur Werkbank, ist der Effekt stark; passt sie nicht, schwach und die Macke stärker. **Umziehen geht jederzeit**, kostet aber Laune. Synergien wie bei den Werkstätten: Zwei Glitchlings, die sich mögen, in benachbarten Werkbänken verstärken sich, zwei, die sich hassen, sabotieren sich.
-2. **Verschmelzen mit einem Implantat:** Er geht **für immer** in ein Implantat ein. Das Implantat wird dauerhaft stärker (neuer Bonus nach Begabung, z. B. Zielen auf das Kristallauge) und **erbt die Macke** („das Auge zwinkert, wenn ein Raider lügt“, „das Herz schlägt im Takt von Kettles Summen“). Der Glitchling ist danach weg, keine Werkbank, kein Gespräch mehr. Eine Entscheidung für die Stärke gegen die Gesellschaft.
+1. **Einzug in eine Werkbank:** Er wohnt dort und erzeugt einen **Sondereffekt**, abhängig von Begabung und Werkbank, z. B. Kochnische: Gerichte gelingen öfter „perfekt“; Werkbank: Herstellen gibt manchmal ein Teil zurück; Generator: mehr Strom, aber nachts flackert das Licht; Hydrokultur: Pflanzen wachsen schneller und manchmal mutiert eine Sorte; Ripperdoc: Implantate einbauen ohne Belastung; Warroom: zeigt eine verborgene Straße; Waffenkammer: Eigenbau-Waffen bekommen einen Bonus; Gästekoje: Gäste bleiben länger. Passt Begabung zur Werkbank, ist der Effekt stark; passt sie nicht, schwach und die Macke stärker. **Umziehen geht jederzeit**, kostet aber Laune. Synergien wie bei den Werkstätten: Zwei Entities, die sich mögen, in benachbarten Werkbänken verstärken sich, zwei, die sich hassen, sabotieren sich.
+2. **Verschmelzen mit einem Implantat:** Er geht **für immer** in ein Implantat ein. Das Implantat wird dauerhaft stärker (neuer Bonus nach Begabung, z. B. Zielen auf das Kristallauge) und **erbt die Macke** („das Auge zwinkert, wenn ein Raider lügt“, „das Herz schlägt im Takt von Kettles Summen“). Der Entity ist danach weg, keine Werkbank, kein Gespräch mehr. Eine Entscheidung für die Stärke gegen die Gesellschaft.
 
-**Mit Bedacht:** Es gibt nie genug Glitchlings für alle Werkbänke, und jeder kann nur eins von beidem. Wer verschmilzt, wird stärker und einsamer; wer einziehen lässt, wird reicher und behält Gesellschaft.
+**Mit Bedacht:** Es gibt nie genug Entities für alle Werkbänke, und jeder kann nur eins von beidem. Wer verschmilzt, wird stärker und einsamer; wer einziehen lässt, wird reicher und behält Gesellschaft.
 
 ### Im Camp und in der Crew
 
-- Glitchlings zählen zur **Karawane**: Sie beeinflussen die Moral (ein singender Glitchling hebt sie, ein jammernder senkt sie), haben Beziehungen zur Crew (Schraube mag den, der mit Motoren redet; Mirela misstraut allem, was Kessler gebaut hat) und lösen Ereignisse aus.
-- **Pixie** versteht sie am besten und kann zwischen Glitchling und Crew vermitteln.
+- Entities zählen zur **Karawane**: Sie beeinflussen die Moral (ein singender Entity hebt sie, ein jammernder senkt sie), haben Beziehungen zur Crew (Schraube mag den, der mit Motoren redet; Mirela misstraut allem, was Kessler gebaut hat) und lösen Ereignisse aus.
+- **Pixie** versteht sie am besten und kann zwischen Entity und Crew vermitteln.
 - **Im neuen Traum** sind alle wieder fremd und wohnen wieder in ihren alten Maschinen. Leyla erinnert sich: wo jeder wohnt, was er will, welche Macke er verschweigt. Verschmolzene sind im neuen Traum wieder frei, und Leyla kann diesmal anders entscheiden.
 
 ### Geister statt Fernseher (Daniel, 17.11.2026)
 
-Daniel: „Hübschere Grafiken für den KI-Baukasten, so dass sie mehr aussehen wie digitale Geister und weniger wie Fernseher. Die Mimiken kannst du weiterhin aus dem Code generieren, aber die Köpfe sollen cool gepixelt sein.“ 32 Geister-Köpfe von PixelLab (Kapuzen, Flammen, Quallen, Katzen, Hörner, Halos, Kronen, Kopfhörer …), hell mit leerer schwarzer Gesichtsfläche. Jeder Glitchling bekommt einen Kopf nach seinem Namen, **getönt in seinem Licht**, schwebt leicht, und der Code malt Augen, Mund, Blinzeln, Sprechen und Glitches in die Gesichtsfläche (große Gesichter: doppelt so große Züge). Unikate haben einen goldenen Umriss. **Kammerjäger bleiben Bildschirme** (Software gegen Geister). Das Zubehör nach Begabung (Kochmütze …) zeigen die Geister nicht mehr; die Köpfe selbst bringen die Vielfalt. ⚠️
+Daniel: „Hübschere Grafiken für den KI-Baukasten, so dass sie mehr aussehen wie digitale Geister und weniger wie Fernseher. Die Mimiken kannst du weiterhin aus dem Code generieren, aber die Köpfe sollen cool gepixelt sein.“ 32 Geister-Köpfe von PixelLab (Kapuzen, Flammen, Quallen, Katzen, Hörner, Halos, Kronen, Kopfhörer …), hell mit leerer schwarzer Gesichtsfläche. Jeder Entity bekommt einen Kopf nach seinem Namen, **getönt in seinem Licht**, schwebt leicht, und der Code malt Augen, Mund, Blinzeln, Sprechen und Glitches in die Gesichtsfläche (große Gesichter: doppelt so große Züge). Unikate haben einen goldenen Umriss. **Kammerjäger bleiben Bildschirme** (Software gegen Geister). Das Zubehör nach Begabung (Kochmütze …) zeigen die Geister nicht mehr; die Köpfe selbst bringen die Vielfalt. ⚠️
 
 ### Code-Porträts (Daniel, 17.11.2026, gebaut als #048)
 
-Daniel: „Jeder Glitchling bekommt ein individuelles, animiertes Code-Porträt, das gleichzeitig das Item-Bild ist (in diesem Fall auch animiert).“ Jeder Glitchling ist ein kleiner Bildschirm im Gehäuse, ein Gesicht aus Licht auf scrollenden Code-Zeilen, ganz aus Code und ohne PixelLab:
+Daniel: „Jeder Glitchling bekommt ein individuelles, animiertes Code-Porträt, das gleichzeitig das Item-Bild ist (in diesem Fall auch animiert).“ Jeder Entity ist ein kleiner Bildschirm im Gehäuse, ein Gesicht aus Licht auf scrollenden Code-Zeilen, ganz aus Code und ohne PixelLab:
 - **Erstes Namenswort** → Farbe des Lichts (Amber gelb, Cobalt blau, Moss grün …, AAP-64), **zweites Wort** → Augen und Mund, **der Name** → Bildschirmform (Röhre, Breitbild, rund, hochkant), Glas und Gehäuse.
 - **Begabung** → was er trägt: Koch Kochmütze, Schweißer Schutzbrille, Gärtner Keimling, Ingenieur Blitz, Chirurg rotes Kreuz, Navigator Antenne, Waffenmeister Fadenkreuz, Drohnenflüsterer Propeller, Gastgeber Fliege, Buchhalter Monokel, Kühlwart Schneeflocke, Schläfer Zzz, Archäologe Fedora.
 - **Bits** → fünf Lämpchen am Gehäuse, **Macke** → wie er glitcht (schrullig oft, Wetter mit Schneegestöber, Tageszeit mit müden Lidern, Nachbarn schielt zur Seite, Laune pulsiert). **Unikate** haben einen Goldrand.
@@ -667,30 +667,30 @@ Daniel: „Eine Kraft soll noch sein ‚Archäologe‘, die dazu führt, dass di
 Daniel: „Alle Hebel, die Türen öffnen, durch Schalter ersetzen, die man erst bedienen kann, wenn man ein Duell ausgetragen hat. Dabei geht es nicht darum, zwangsläufig zu gewinnen. Das Gewinnen ist nur dafür da, die KI zu fangen. Aber erstmal ist das einer der Trigger in der Spielwelt … KIs in verschiedenen anderen Dingen versteckt, so dass, wenn man da vorbeigeht, durch die normale Aktionsbelegung (Stick nach oben oder E) das Duell-Event getriggert wird.“
 - **Schalter** an Abkürzungs-Türen: In jedem wohnt eine wilde KI. E/↑ startet das Glitch-Duell (die Welt pausiert). Danach, egal wie es ausgeht, legt Leyla den Schalter um. Sieg = die KI ist gefangen (ins Deck, sonst Rucksack, sonst Lager).
 - **Automaten mit KI** (NomadCola-Automaten an Tankstellen, im Großmarkt, Parkhaus, Sunny Acres, Metro, Raffinerie): E/↑ davor = Duell, einmal je Run.
-- **Leylas Kämpfer:** ihr AI-Core aus dem Cyberdeck (mehrere: vor dem Duell wählen); ohne Glitchling kämpft **AvA** selbst (2 Bit). ⚠️
+- **Leylas Kämpfer:** ihr AI-Core aus dem Cyberdeck (mehrere: vor dem Duell wählen); ohne Entity kämpft **AvA** selbst (2 Bit). ⚠️
 - Unikate wohnen in keinem Schalter und Automaten (sie haben eigene Orte).
 
-### Ein Glitchling je Duell, das Deck als AI-Core (Daniel, 17.11.2026)
+### Ein Entity je Duell, das Deck als AI-Core (Daniel, 17.11.2026)
 
 Daniel: „Ein Einstiegs-Cyberdeck kann nur einen AI Core haben (so wie die Drohne); später wären zwei oder gar drei Glitchlinge in teuren Decks möglich. Vorteil: ich kann vor dem Duell wählen.“
 - Das **Bastler-Deck hat einen Platz** (vorher 2), teure Decks zwei oder drei.
-- **Duelle sind 1 gegen 1:** Vor dem Duell wählt Leyla, welcher Glitchling aus dem Deck antritt. Die drei Säulen im Bit-Stapel gehören dann alle zu diesem einen Glitchling (Metapher offen: Threads, Kopf · Herz · Macke oder Ports).
+- **Duelle sind 1 gegen 1:** Vor dem Duell wählt Leyla, welcher Entity aus dem Deck antritt. Die drei Säulen im Bit-Stapel gehören dann alle zu diesem einen Entity (Metapher offen: Threads, Kopf · Herz · Macke oder Ports).
 - **Offen:** Der Name „Glitchlinge“ ist im Deutschen holprig (Daniel). Bis ein besserer da ist, bleibt „Glitchlings“; im Spiel könnte „AI-Core“ für den Platz im Deck stehen.
 
 ### Bit-Stapel: das Glitch-Duell nach dem Knucklebones-Prinzip (Daniel 17.11.2026, Demo gebaut als #051)
 
 Daniel: Das Gefecht (unten) „läuft noch zu stockend ab … ich spüre, dass da Potential liegt“; ein Duell soll 40 bis 60 Sekunden dauern. Nach einer Liste beliebter Duell-Minispiele: „Knucklebones klingt interessant. Mach uns mal eine abstrakte Demo mit unseren Glitchlingen.“ Eigene Mechanik nach dem Prinzip, kein Nachbau. Alles ⚠️ vorläufig.
 
-- **Aufbau:** Jede Seite hat drei Spalten, eine je Glitchling, mit drei Plätzen.
+- **Aufbau:** Jede Seite hat drei Spalten, eine je Entity, mit drei Plätzen.
 - **Zug = ein Klick:** Das Bit ist schon gewürfelt (W6), man legt es in eine eigene Spalte mit Platz. Dann ist sofort die andere Seite dran.
-- **Wert einer Spalte:** Gleiche Bits multiplizieren sich (n gleiche Bits zählen n × n × Wert). Jeder Glitchling hat ein **Lieblingsbit** (aus seinem Namen), das in seiner Spalte doppelt zählt.
+- **Wert einer Spalte:** Gleiche Bits multiplizieren sich (n gleiche Bits zählen n × n × Wert). Jeder Entity hat ein **Lieblingsbit** (aus seinem Namen), das in seiner Spalte doppelt zählt.
 - **Angriff:** Ein gelegtes Bit **zerstört alle gleichen Bits** in der gegenüberliegenden Spalte des Gegners.
 - **Ende:** Sind alle Spalten einer Seite voll, gewinnt die höhere Summe (Gleichstand: die Seite, die nicht voll ist). Rund 15 Züge je Seite, also 40 bis 60 Sekunden.
 - **Kammerjäger** haben kein Lieblingsbit, spielen dafür fast fehlerfrei.
-- **Eine KI, drei Pipelines** (Daniel, 17.11.2026: „nicht drei KIs gegeneinander, sondern jeweils eine, die wiederum 3 Pipelines hat“): Je Seite ein Glitchling (Leyla wählt ihren AI-Core vor dem Duell), seine drei Spalten heißen **Pipelines**, sein Lieblingsbit gilt für alle drei. Darstellung cyberpunkig (Neon auf Schwarz, Raster, Scanlines, Datenfluss in den Pipelines, Kopfzeile je KI mit Porträt, Integrität, Feuer); das Bit rollt wie bei einem **Spielautomaten** von oben in die Walze.
+- **Eine KI, drei Pipelines** (Daniel, 17.11.2026: „nicht drei KIs gegeneinander, sondern jeweils eine, die wiederum 3 Pipelines hat“): Je Seite ein Entity (Leyla wählt ihren AI-Core vor dem Duell), seine drei Spalten heißen **Pipelines**, sein Lieblingsbit gilt für alle drei. Darstellung cyberpunkig (Neon auf Schwarz, Raster, Scanlines, Datenfluss in den Pipelines, Kopfzeile je KI mit Porträt, Integrität, Feuer); das Bit rollt wie bei einem **Spielautomaten** von oben in die Walze.
 - **Wertung Dauerfeuer** (jetzt Standard; Daniel, 17.11.2026: „Integrität ein wenig erhöhen und dafür alle Paare und Trippel jeden Zug Schaden anrichten, bis sie zerstört werden. Lieblingsbits bekommen dann einen Bonus obendrauf“): **50 Integrität**, kein Heilen. Am Ende jedes eigenen Zugs **feuert** jede Gruppe gleicher Bits: Paar = Bitwert, Drilling = doppelter Bitwert, eine Gruppe des Lieblingsbits legt ihren Wert **obendrauf**. Ein gelegtes Bit zerstört gleiche Bits gegenüber und kostet den Gegner sofort deren Augen (und sein Feuer aus dieser Spalte). Rund 10 Züge je Seite, beide Seiten gleich stark (51 %), die KI schlägt Zufall in 88 %. Die Spalte zeigt ihr Feuer mit einem Blitz.
-- **Wertung Heilen** (vorher Integrität, Daniel, 17.11.2026: „das Duell geht nicht darum, wer die meisten Punkte hat, sondern wer die Lebenspunkte des anderen zuerst reduziert hat. Zwei oder mehr Würfel pro Säule erhöhen meine Punkte, während jeder zerstörte Würfel die des anderen reduziert“), jetzt Standard: beide Seiten haben **25 Integrität** (Werkstatt: Glitchlings › Duell). Ein Bit zu gleichen Bits **heilt** (Wert × gleiche darunter, Lieblingsbit doppelt). Zerstörte Bits **kosten den Gegner**, was sie in seiner Spalte wert waren (gleiche multiplizieren sich). 0 = überschrieben. Sind die eigenen Spalten am Zug alle voll, **läuft der Speicher über** und wird gelöscht. Rund 12 Züge je Seite. ⚠️ Ein zerstörtes Paar Sechsen kostet 24 von 25: sehr schwankend, mit Integrität oder Heilfaktor einstellbar. Die alte Summen-Wertung bleibt umschaltbar.
-- **KI:** gierig mit Blick auf die Gefahr (eigener Gewinn + was sie drüben zerstört − wie verwundbar die Spalte wird); die Bits der Glitchlings bestimmen, wie genau sie spielt. Schlägt Zufall in rund 85 % der Partien.
+- **Wertung Heilen** (vorher Integrität, Daniel, 17.11.2026: „das Duell geht nicht darum, wer die meisten Punkte hat, sondern wer die Lebenspunkte des anderen zuerst reduziert hat. Zwei oder mehr Würfel pro Säule erhöhen meine Punkte, während jeder zerstörte Würfel die des anderen reduziert“), jetzt Standard: beide Seiten haben **25 Integrität** (Werkstatt: Entities › Duell). Ein Bit zu gleichen Bits **heilt** (Wert × gleiche darunter, Lieblingsbit doppelt). Zerstörte Bits **kosten den Gegner**, was sie in seiner Spalte wert waren (gleiche multiplizieren sich). 0 = überschrieben. Sind die eigenen Spalten am Zug alle voll, **läuft der Speicher über** und wird gelöscht. Rund 12 Züge je Seite. ⚠️ Ein zerstörtes Paar Sechsen kostet 24 von 25: sehr schwankend, mit Integrität oder Heilfaktor einstellbar. Die alte Summen-Wertung bleibt umschaltbar.
+- **KI:** gierig mit Blick auf die Gefahr (eigener Gewinn + was sie drüben zerstört − wie verwundbar die Spalte wird); die Bits der Entities bestimmen, wie genau sie spielt. Schlägt Zufall in rund 85 % der Partien.
 - **Demo** unter /duel (Standard), das Gefecht daneben (Knopf „Gefecht (alt)“).
 - **Ideen für später:** Begabungen als Spaltenregeln (Koch: Paare zählen dreifach, Kühlwart: 1er schützen die Spalte …), Macken als Störungen, Standoff als Finale.
 
@@ -698,43 +698,43 @@ Daniel: Das Gefecht (unten) „läuft noch zu stockend ab … ich spüre, dass d
 
 Daniel: „Schau dir das OPR-Firefight-System für Kämpfe an (ohne Schlagwörter, nur das reine Kampfsystem).“ Dann: „Die Welt pausiert. Es gibt keine Regeln für Bewegungen im Glitch-Duell, sondern es soll mehr wie ein Kartenspiel funktionieren und visualisiert werden (zunächst über Code). Es wird auf jeden Fall Erweiterungen für diese Regeln geben, aber wir starten einfach. Wir brauchen andere Formulierungen als Nah- und Fernkampf, die mehr Bezug zu KI und Hacking haben.“ (v1 „Handshake“ mit Leitung, Dreieck, Hitze und Tells: verworfen, zu kompliziert.)
 
-- **Die Welt pausiert** während eines Duells. Keine Bewegung: Die Glitchlings liegen wie Karten in zwei Reihen einander gegenüber.
-- **Vier Werte** (alle aus dem, was ein Glitchling schon hat, in der Werkstatt einstellbar):
+- **Die Welt pausiert** während eines Duells. Keine Bewegung: Die Entities liegen wie Karten in zwei Reihen einander gegenüber.
+- **Vier Werte** (alle aus dem, was ein Entity schon hat, in der Werkstatt einstellbar):
   - **Präzision:** trifft bei W6 ≥ Präzision (nach Bits: 5+, 5+, 4+, 4+, 3+).
   - **Abschirmung:** wehrt einen Treffer ab bei W6 ≥ Abschirmung (nach der Stufe des Herstellers: Billig 5+, Mittel und Premium 4+, Elite 3+).
   - **Integrität:** so viele Wunden, dann ist er **überschrieben** (Bits + 1).
   - **Impulse:** Würfel je Angriff, je für Einflüstern und Verschränken (nach Begabung).
-- **Abwechselnd aktivieren:** Eine Seite ist mit einem Glitchling dran, dann die andere, bis jeder einmal dran war (eine Runde). Die nächste Runde beginnt die andere Seite.
+- **Abwechselnd aktivieren:** Eine Seite ist mit einem Entity dran, dann die andere, bis jeder einmal dran war (eine Runde). Die nächste Runde beginnt die andere Seite.
 - **Sprechende Namen für jetzt** (Daniel, 17.11.2026: „sonst wirkt es unübersichtlich“): in der Demo heißen die Aktionen **Sicherer Angriff** (Einflüstern), **Harter Angriff** (Verschränken) und **Stabilisieren** (Kalibrieren), die Karten zeigen „trifft 4+ · hält 4+“ und „sicher 2 · hart 3“, die Antwort heißt Gegenschlag. Die Hacking-Namen unten bleiben als spätere Fassung.
 - **Drei Aktionen** (statt Fern- und Nahkampf):
   - **Einflüstern:** aus der Ferne eingreifen, Angriff mit den Einflüster-Impulsen, das Ziel antwortet nicht.
   - **Verschränken:** sich direkt mit dem Ziel koppeln, mehr Impulse, danach antwortet das Ziel mit seinen Verschränk-Impulsen.
   - **Kalibrieren:** kein Angriff, beendet das Flackern.
 - **Selbsttest:** Wer Wunden nimmt und bei halber Integrität oder darunter steht, würfelt auf Präzision. Misslungen = er **flackert**: Er kann nur kalibrieren und antwortet beim Verschränken nicht.
-- **Ende:** Eine Seite hat niemanden mehr. Ein überschriebener wilder Glitchling ist **gefangen**; Leylas Glitchlings werden nie gelöscht, nur erschöpft. Kammerjäger-Sieg: Das Gerät gehört Leyla.
+- **Ende:** Eine Seite hat niemanden mehr. Ein überschriebener wilder Entity ist **gefangen**; Leylas Entities werden nie gelöscht, nur erschöpft. Kammerjäger-Sieg: Das Gerät gehört Leyla.
 - **Kammerjäger** (AntiGlitchling-Software der Konzerne) mit festen Werten und Hersteller: Sanitizer (Kessler), Doorman (Delta Bureau of Order), Watchdog (Vulkan), Tollbooth (Mile King), Bleach (NeuroLux). ⚠️ vorläufig.
-- **Die KI** rechnet für jede Aktion (Glitchling × Aktion × Ziel) die erwarteten Wunden, die Chance zu überschreiben und beim Verschränken die erwartete Antwort und nimmt die beste, mit etwas Rauschen. Sie schlägt eine Zufalls-KI deutlich (Test).
+- **Die KI** rechnet für jede Aktion (Entity × Aktion × Ziel) die erwarteten Wunden, die Chance zu überschreiben und beim Verschränken die erwartete Antwort und nimmt die beste, mit etwas Rauschen. Sie schlägt eine Zufalls-KI deutlich (Test).
 - **Demo** unter **/duel** (`duel.html`): Karten mit Code-Porträts, Würfel aus Code, „KI spielt für mich“, Tempo, 1000× simulieren. Im Spiel noch nicht.
 - **Erweiterungen** kommen (Daniel): z. B. Sonderregeln über Begabung und Macke, Hersteller-Eigenheiten, Kammerjäger mit Skript. Erst der Kern.
 - **Offen:** Duelle zum Spaß (Arena, Wetten mit Lucky)? Wo das Duell im Spiel startet (Maschinen in POIs, Geräte mit Kammerjägern).
 
-### Das andere Ende: AvA wird ein Glitchling (Daniel, 17.11.2026; ausgearbeitet von Ava, wartet auf Daniel)
+### Das andere Ende: AvA wird ein Entity (Daniel, 17.11.2026; ausgearbeitet von Ava, wartet auf Daniel)
 
 Daniel: „Man soll die Möglichkeit haben, AvA zu einem Glitchling zu machen (das ist ein alternatives Ende; sehr schwer zu erreichen).“
 
-**Die Idee:** AvAs Verstand wohnt schon in der Drohne, sie ist längst halb ein Glitchling. Das Heilmittel holt sie zurück in ihren Körper. Das andere Ende lässt den Körper gehen und macht sie frei: der erste Glitchling, der einmal ein Mensch war. Kein Herz für Donnerstag mehr, kein Tank, keine Uhr.
+**Die Idee:** AvAs Verstand wohnt schon in der Drohne, sie ist längst halb ein Entity. Das Heilmittel holt sie zurück in ihren Körper. Das andere Ende lässt den Körper gehen und macht sie frei: der erste Entity, der einmal ein Mensch war. Kein Herz für Donnerstag mehr, kein Tank, keine Uhr.
 
 **Der Weg (sehr schwer, über mehrere Träume):** ⚠️ vorläufig
 1. **Marble Sting gewinnen** (Unikat, Chirurg, weiß etwas über die Kinder in den Tanks): Er muss freiwillig mitkommen (überreden, nie fangen) und volles Vertrauen haben. Nur er kann einen Verstand übertragen. Sein Wunsch, Ebene 40, ist Teil des Wegs.
 2. **Pixies Wendepunkt:** Pixie ist aus demselben Labor ausgebüchst (docs/crew.md). Erst wenn Pixie Leyla die Wahrheit sagt, weiß Leyla, dass es geht. Pixie hilft dann dabei (Daniel: hilft nur).
-3. **Ein Deck der höchsten Stufe** mit einem freien Platz für **6 Bits** (stärker als jeder Glitchling, den man fangen kann).
+3. **Ein Deck der höchsten Stufe** mit einem freien Platz für **6 Bits** (stärker als jeder Entity, den man fangen kann).
 4. **Der Kessler-Kern** von Ebene 40 (⚠️ ein Speicher von Kessler Cybernetics mit den Akten der Kinder in den Tanks, Doc Mirela kennt AvAs Akte): ein einziges Beutestück, das man nur mit dem Archäologen findet.
 5. **Der Augenblick:** Nur wenn der Tank **kritisch** ist (die letzte Rettung steht bevor), bietet der Tank die Wahl an. Wer zu gut wartet, sieht das Ende nie; wer zu schlecht wartet, verliert AvA ganz. Ein schmales Fenster.
-- Leyla erinnert sich über Träume hinweg (wie bei den Glitchlings im neuen Traum), also lässt sich der Weg über mehrere Durchgänge vorbereiten. In einem einzigen Traum gelingt er kaum.
+- Leyla erinnert sich über Träume hinweg (wie bei den Entities im neuen Traum), also lässt sich der Weg über mehrere Durchgänge vorbereiten. In einem einzigen Traum gelingt er kaum.
 
 **Was danach ist:** ⚠️ vorläufig
 - Eigener **Abspann** (ein Comic wie das Intro): Der Tank wird leer, Leyla trägt ihn hinaus, AvAs Gesicht erscheint zum ersten Mal als Code-Porträt.
-- AvA ist ein **Glitchling mit 6 Bits** und der Begabung **„Alles“**: Sie wirkt in jeder Werkbank ein wenig, in der Drohne voll. Ihr Porträt ist das Gesicht ihrer Drohne (die Stimmungen von AvA).
+- AvA ist ein **Entity mit 6 Bits** und der Begabung **„Alles“**: Sie wirkt in jeder Werkbank ein wenig, in der Drohne voll. Ihr Porträt ist das Gesicht ihrer Drohne (die Stimmungen von AvA).
 - Das Spiel läuft **offen** weiter, ohne Tank und ohne Uhr. Dafür fehlt die Rettung beim k.o.: AvA kann Leyla nicht mehr tragen, nur noch führen (k.o. = zurück ins Camp, Rucksack weg).
 - Gegenstück zum Heilmittel-Ende (AvA wird spielbar, mit Körper). Beide Enden schließen einander aus; ein Spielstand kennt nur eins.
 
@@ -751,7 +751,7 @@ Daniel: „Man soll die Möglichkeit haben, AvA zu einem Glitchling zu machen (d
 ### Offen
 
 - Wie fängt man genau (eine Aktion mit Halten/Timing, ein kurzer Kampf, nur Deck-Stufe)?
-- Wie viele Glitchlings zum Start (Vorschlag: 12 handgemacht, später gewürfelte aus Bausteinen wie bei der Crew)?
+- Wie viele Entities zum Start (Vorschlag: 12 handgemacht, später gewürfelte aus Bausteinen wie bei der Crew)?
 - ~~Grafik~~: entschieden (Daniel, 17.11.2026): animierte Code-Porträts, gebaut (#048).
 
 ## Look & Feel

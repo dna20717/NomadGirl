@@ -1,8 +1,8 @@
-// Glitchlings (#047, Daniel 16./17.11.2026: „Das Konzept von Software existiert in dieser Welt nicht mehr … spezialisierte KIs, die
+// Entities (#047, Daniel 16./17.11.2026: „Das Konzept von Software existiert in dieser Welt nicht mehr … spezialisierte KIs, die
 // aber alle kleine Eigenarten und Macken haben“; „Namen nach dem Schema wie Marble Sting … ein System, auf dessen Basis man diese
-// passiven Companions generieren kann“). No DOM: game, workshop and tests. design.md › Hacking v3: Glitchlings.
+// passiven Companions generieren kann“). No DOM: game, workshop and tests. design.md › Hacking v3: Entities.
 //
-// The building blocks are in the workshop (area Glitchlings, data/glitchlings.json): two name words (material + edge), talents with the
+// The building blocks are in the workshop (area Entities, data/glitchlings.json): two name words (material + edge), talents with the
 // workbench they shine in and the effect per bit, quirks, wishes, the machines they live in, how often each strength (1–5 bits) comes,
 // and hand-made unique ones (always in every Durchgang). One seed = one set (a Durchgang rolls its own).
 //
@@ -21,7 +21,7 @@ export function config(D) {
     talents: (G.talents || []).filter(t => t.name), quirks: (G.quirks || []).filter(q => q.text), wishes: (G.wishes || []).filter(w => w.text), homes: words(G.homes), unique: (G.unique || []).filter(u => u.name) };
 }
 
-// the effect of a talent at a strength: „{n}“ = per bit × bits; in a workbench that is not its own only „Fremd %“ of it (Glitchlings › Fremde Werkbank)
+// the effect of a talent at a strength: „{n}“ = per bit × bits; in a workbench that is not its own only „Fremd %“ of it (Entities › Fremde Werkbank)
 export function effectOf(C, talent, bits, own = true) {
   const t = typeof talent === 'string' ? C.talents.find(x => x.name === talent) : talent;
   if (!t) return { text: '', value: 0 };
@@ -34,8 +34,8 @@ const make = (C, o) => {
     effect: e.text, stat: e.stat, value: e.value, quirk: o.quirk || '', quirkKind: o.quirkKind || null, wish: o.wish || '', home: o.home || '', description: o.description || '' };
 };
 
-// the Glitchlings of one Durchgang: the unique ones marked „immer“ first, the rest rolled; no name and no name word twice
-// the maker of a Glitchling (older ones, e.g. a gift from before #049, by their talent)
+// the Entities of one Durchgang: the unique ones marked „immer“ first, the rest rolled; no name and no name word twice
+// the maker of an Entity (older ones, e.g. a gift from before #049, by their talent)
 export function brandOf(D, g) { return g?.brand || config(D).talents.find(t => t.name === g?.talent)?.brand || null; }
 
 export function generate(D, seed = 1, count = null) {

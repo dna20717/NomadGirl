@@ -5,7 +5,7 @@
 // grid  = { w, h, items: [entry] }
 // entry = { a, id, n, x, y, r, q?, mods? }   a = area of the thing ('items' | 'weapons' | 'backpacks'), n = count, x/y = top left cell, r = quarter turns (0–3)
 //         q = quality of a dish or thing (#013: 1 gut, 2 perfekt; only the same quality stacks), mods = values of one weapon copy (#013)
-//         g = the Glitchling in a Glitchling item (#048: game/glitchlings.js, its picture is its code portrait); never stacks
+//         g = the Entity in an Entity item (#048: game/glitchlings.js, its picture is its code portrait); never stacks
 // Rectangles only (Daniel, 14.11.2026: „Lass uns mit dem Tetris-Quatsch aufhören und auf Rechtecke beschränken“): items and weapons
 // take their "size" [w, h], backpacks their "bag" footprint (default 2 × 3). Older savegames are tidied by untangle().
 
