@@ -36,7 +36,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
-- 17.11. Code → Ava: Glitchling-Duell „Handshake“ als Entwurf in `docs/design.md` › Hacking v3 (Daniel: einfach, flüssig, tief, Gegner Glitchlings und AntiGlitchling-Software, KI-spielbar): Kern auf 7 Feldern, Dreieck Stoß/Schild/Lauschen, Energie, Hitze, Spezialität je Begabung, Tells im Code-Porträt, Kammerjäger mit Skript. Nichts gebaut.
+- 17.11. Code → Ava: Glitchling-Duell v2 nach dem Kern von OPR Firefight (Daniel: v1 zu kompliziert): Qualität, Verteidigung, Zähigkeit, Angriffe fern/nah; abwechselnd aktivieren, Fern/Nah/Sammeln, W6 auf Treffer und Abwehr, Moral bei halber Zähigkeit. Entwurf in design.md, nichts gebaut.
+- 17.11. Code → Ava: (verworfen) Glitchling-Duell „Handshake“ als Entwurf in `docs/design.md` › Hacking v3 (Daniel: einfach, flüssig, tief, Gegner Glitchlings und AntiGlitchling-Software, KI-spielbar): Kern auf 7 Feldern, Dreieck Stoß/Schild/Lauschen, Energie, Hitze, Spezialität je Begabung, Tells im Code-Porträt, Kammerjäger mit Skript. Nichts gebaut.
 - 17.11. Code → Ava: #049 fertig: Glitchlings haben Hersteller (nach Begabung, Unikate eigene), das Cyberdeck ist ein eigenes Fach für Glitchlings (Plätze je Deck). Details `docs/features/glitchlings.md`.
 - 17.11. Code → Ava: #048 Nachtrag: Glitchling als Gegenstand (Porträt als Item-Bild, Tooltip), Amber Slay einmal als Geschenk in jeden bestehenden Spielstand; Daniel zum anderen Ende: bittersüß, Pixie hilft nur, AvA danach nur Begleiterin.
 - 17.11. Code → Ava: #048 fertig: animierte Code-Porträts für alle Glitchlings (`game/glitch_face.js`), Begabung Archäologe, das andere Ende „AvA wird ein Glitchling“ in design.md › Hacking v3 (wartet auf Daniel).
