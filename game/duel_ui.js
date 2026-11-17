@@ -18,14 +18,14 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const rngOf = seed => () => { seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 const pct = v => `${Math.round(v * 100)} %`, num = v => v.toLocaleString('de-DE', { maximumFractionDigits: 1 });
 
-export async function startDuel(root) {
+export async function startDuel(root, switchTo = null) {
   const project = await loadProject(browserLoader(new URL('projects/nomadgirl/', location.href)));
   const D = project.data, C = duelConfig(D);
   const q = new URLSearchParams(location.search);
   const S = { foe: q.get('foe') || 'wild', foes: +(q.get('foes') || 1), team: +(q.get('team') || C.team), seed: +(q.get('seed') || (1 + Math.floor(Math.random() * 99999))),
     auto: q.has('auto'), tempo: q.get('tempo') || 'normal', duel: null, sel: null, action: 'whisper', busy: false, last: null, sim: '' };
   const ui = {};
-  window.duelDemo = { S, D, newGame: () => newGame(), act: (uid, a, t) => playerAct(uid, a, t), state: () => S.duel };
+  window.duelDemo = { S, D, mode: 'fight', newGame: () => newGame(), act: (uid, a, t) => playerAct(uid, a, t), state: () => S.duel };
 
   // ---------- setup ----------
   function teams() {
@@ -155,7 +155,8 @@ export async function startDuel(root) {
   function setup() {
     const sel = (label, key, opts, conv = v => v) => el('label', {}, el('small', {}, label), el('select', { onchange: e => { S[key] = conv(e.target.value); newGame(); } }, ...opts.map(([v, n]) => { const o = el('option', { value: v }, n); if (String(S[key]) === String(v)) o.selected = true; return o; })));
     return el('div', { class: 'dl-setup' },
-      el('b', { class: 'dl-title' }, 'Glitch-Duell'), el('span', { class: 'dl-sub' }, 'Demo'),
+      el('b', { class: 'dl-title' }, 'Glitch-Duell'), el('span', { class: 'dl-sub' }, 'Gefecht (alt) · Demo'),
+      switchTo ? el('button', { title: 'Der neue Bit-Stapel (Knucklebones-Prinzip)', onclick: () => switchTo('stack') }, icon('arrow_right', 15), 'Bit-Stapel (neu)') : null,
       sel('Gegner', 'foe', [['wild', 'Wilde Glitchlings'], ['hunters', 'Kammerjäger']]),
       sel('Anzahl', 'foes', [[1, '1'], [2, '2'], [3, '3']], Number),
       sel('Dein Deck', 'team', [[1, '1'], [2, '2'], [3, '3']], Number),

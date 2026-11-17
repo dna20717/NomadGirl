@@ -658,7 +658,21 @@ Daniel: „Jeder Glitchling bekommt ein individuelles, animiertes Code-Porträt,
 
 Daniel: „Eine Kraft soll noch sein ‚Archäologe‘, die dazu führt, dass die Locations aller einzigartigen Beutestücke im Warroom angezeigt werden.“ Wohnt er im **Warroom**, zeigt die Reisekarte an jedem Ort, wo ein einzigartiges Beutestück liegt (Marke am Ort, im Tooltip welches). Stärke spielt keine Rolle (je Bit 0), in einer fremden Werkbank wirkt er nicht. Auch: Schatzkammer. ⚠️ vorläufig: „einzigartig“ heißt zunächst alles mit dem Merkmal **Trophäe** (33 Gegenstände); später vielleicht eigene Unikat-Beute (benannte Waffen).
 
-### Das Glitch-Duell (Daniel 17.11.2026, Demo gebaut als #050)
+### Bit-Stapel: das Glitch-Duell nach dem Knucklebones-Prinzip (Daniel 17.11.2026, Demo gebaut als #051)
+
+Daniel: Das Gefecht (unten) „läuft noch zu stockend ab … ich spüre, dass da Potential liegt“; ein Duell soll 40 bis 60 Sekunden dauern. Nach einer Liste beliebter Duell-Minispiele: „Knucklebones klingt interessant. Mach uns mal eine abstrakte Demo mit unseren Glitchlingen.“ Eigene Mechanik nach dem Prinzip, kein Nachbau. Alles ⚠️ vorläufig.
+
+- **Aufbau:** Jede Seite hat drei Spalten, eine je Glitchling, mit drei Plätzen.
+- **Zug = ein Klick:** Das Bit ist schon gewürfelt (W6), man legt es in eine eigene Spalte mit Platz. Dann ist sofort die andere Seite dran.
+- **Wert einer Spalte:** Gleiche Bits multiplizieren sich (n gleiche Bits zählen n × n × Wert). Jeder Glitchling hat ein **Lieblingsbit** (aus seinem Namen), das in seiner Spalte doppelt zählt.
+- **Angriff:** Ein gelegtes Bit **zerstört alle gleichen Bits** in der gegenüberliegenden Spalte des Gegners.
+- **Ende:** Sind alle Spalten einer Seite voll, gewinnt die höhere Summe (Gleichstand: die Seite, die nicht voll ist). Rund 15 Züge je Seite, also 40 bis 60 Sekunden.
+- **Kammerjäger** haben kein Lieblingsbit, spielen dafür fast fehlerfrei.
+- **KI:** gierig mit Blick auf die Gefahr (eigener Gewinn + was sie drüben zerstört − wie verwundbar die Spalte wird); die Bits der Glitchlings bestimmen, wie genau sie spielt. Schlägt Zufall in rund 85 % der Partien.
+- **Demo** unter /duel (Standard), das Gefecht daneben (Knopf „Gefecht (alt)“).
+- **Ideen für später:** Begabungen als Spaltenregeln (Koch: Paare zählen dreifach, Kühlwart: 1er schützen die Spalte …), Macken als Störungen, Standoff als Finale.
+
+### Das Glitch-Duell (Daniel 17.11.2026, Demo gebaut als #050; heute „Gefecht (alt)“)
 
 Daniel: „Schau dir das OPR-Firefight-System für Kämpfe an (ohne Schlagwörter, nur das reine Kampfsystem).“ Dann: „Die Welt pausiert. Es gibt keine Regeln für Bewegungen im Glitch-Duell, sondern es soll mehr wie ein Kartenspiel funktionieren und visualisiert werden (zunächst über Code). Es wird auf jeden Fall Erweiterungen für diese Regeln geben, aber wir starten einfach. Wir brauchen andere Formulierungen als Nah- und Fernkampf, die mehr Bezug zu KI und Hacking haben.“ (v1 „Handshake“ mit Leitung, Dreieck, Hitze und Tells: verworfen, zu kompliziert.)
 

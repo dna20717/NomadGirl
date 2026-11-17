@@ -64,6 +64,34 @@
   .dl-act:disabled { opacity: .35; cursor: default; } .dl-act.on { background: var(--dl-gold); color: #241a00; border-color: #c28d29; }
   .dl-rules { color: var(--ui-text3); font-size: 12px; max-width: 760px; margin: 18px auto 0; text-align: center; line-height: 1.5; }
   .dl-boot { margin: 40px auto; max-width: 560px; text-align: center; color: var(--ui-text3); font: 22px/1.4 var(--ui-pixel); } .dl-boot.err { color: #f5a097; font: 15px/1.5 var(--ui-font); } .dl-boot code { color: #ffd541; word-break: break-word; }
+  /* Bit-Stapel (#051) */
+  .sb-board { display: grid; gap: 6px; margin-top: 10px; justify-items: center; }
+  .sb-row { display: flex; gap: 16px; justify-content: center; }
+  .sb-col { position: relative; width: 160px; display: grid; gap: 4px; justify-items: center; padding: 8px 6px; border-radius: 12px; background: linear-gradient(#1d1b28, #14121c); border: 2px solid #3a3550; transition: transform .15s, border-color .15s, box-shadow .15s; user-select: none; }
+  .sb-col.enemy { border-color: #5b3138; } .sb-col.player { border-color: #24523b; }
+  .sb-col.pick { cursor: pointer; } .sb-col.pick:hover { border-color: var(--dl-gold); transform: translateY(-4px); box-shadow: 0 0 0 3px rgba(255,213,65,.2); }
+  .sb-col.hit { animation: dl-shake .3s 2; border-color: var(--dl-wound); } .sb-col.put { border-color: var(--dl-cyan); }
+  .sb-head { display: grid; justify-items: center; gap: 1px; text-align: center; } .sb-head canvas { image-rendering: pixelated; display: block; }
+  .sb-head b { font: 19px/1 var(--ui-pixel); color: var(--ui-text-strong); } .sb-head small { font-size: 11px; color: var(--ui-text3); } .sb-fav { display: inline-flex; gap: 4px; align-items: center; color: #e86a73 !important; }
+  .sb-stack { display: grid; gap: 4px; } .sb-slot { width: 44px; height: 44px; border-radius: 9px; background: rgba(255,255,255,.04); border: 1px dashed #3a3550; display: grid; place-items: center; }
+  .sb-value { font: 26px/1 var(--ui-pixel); color: var(--ui-text-strong); } 
+  .sb-die { width: 38px; height: 38px; border-radius: 7px; display: inline-grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 6px; box-sizing: border-box; background: #e3e6ff; box-shadow: inset 0 -3px 0 rgba(0,0,0,.25); }
+  .sb-die i.p { width: 7px; height: 7px; border-radius: 2px; background: #242234; place-self: center; }
+  .sb-die.x2 { background: #ffd541; } .sb-die.x3 { background: #fa6a0a; } .sb-die.x3 i.p { background: #fff; }
+  .sb-die.fav { outline: 2px solid #e86a73; outline-offset: 2px; }
+  .sb-die.new { animation: dl-roll .3s ease-out; } .sb-die.ghost { opacity: .45; }
+  .sb-slot.ghost .sb-die, .sb-gain, .sb-tip { visibility: hidden; } .sb-col.pick:hover .sb-slot.ghost .sb-die, .sb-col.pick:hover .sb-gain, .sb-col.pick:hover .sb-tip { visibility: visible; } .sb-gain { color: var(--dl-hit); font-size: 22px; }
+  .sb-board.hover-0 .sb-col.enemy[data-col="0"] .sb-die.will, .sb-board.hover-1 .sb-col.enemy[data-col="1"] .sb-die.will, .sb-board.hover-2 .sb-col.enemy[data-col="2"] .sb-die.will { background: var(--dl-wound); animation: dl-pulse .8s infinite; }
+  .sb-die.mini { width: 18px; height: 18px; padding: 3px; border-radius: 4px; } .sb-die.mini i.p { width: 3px; height: 3px; }
+  .sb-die.big { width: 54px; height: 54px; padding: 9px; animation: dl-roll .35s ease-out; } .sb-die.big i.p { width: 10px; height: 10px; }
+  .sb-tip { position: absolute; left: 50%; bottom: -30px; transform: translateX(-50%); width: max-content; font-size: 12px; background: rgba(0,0,0,.85); color: #fff; padding: 3px 8px; border-radius: 6px; display: inline-flex; gap: 4px; align-items: center; z-index: 3; }
+  .sb-mid { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 2px 18px; padding: 2px 0; width: min(560px, 100%); }
+  .sb-score { font: 40px/1 var(--ui-pixel); text-align: center; } .sb-score.enemy { color: #f5a097; } .sb-score.player { color: var(--dl-hit); }
+  .sb-roll { display: grid; justify-items: center; gap: 4px; } .sb-roll small { color: var(--ui-text3); } .sb-roll.enemy .sb-die { background: #f5a097; }
+  .sb-say { grid-column: 1 / -1; text-align: center; color: var(--ui-text2); font-size: 13px; min-height: 18px; }
+  .sb-mid.end { grid-template-columns: auto; justify-items: center; gap: 8px; } .sb-mid.end b { font: 26px/1 var(--ui-pixel); } .sb-mid.end.player b { color: var(--dl-hit); } .sb-mid.end.enemy b { color: var(--dl-wound); }
+  .sb-mid.end .sb-score { color: var(--ui-text-strong); }
+  @media (max-width: 640px) { .sb-row { gap: 6px; } .sb-col { width: 31vw; padding: 6px 4px; } .sb-slot { width: 44px; height: 44px; } .sb-die { width: 38px; height: 38px; padding: 6px; } .sb-head b { font-size: 15px; } }
   @media (max-width: 640px) { .dl-card { width: 140px; } .dl-line small { min-width: 0; } .dl-row { min-height: 0; } }
 </style>
 </head>
@@ -79,7 +107,10 @@
 <script type="module">
   // Glitch-Duell demo (#050): own address /duel, not in the game yet. ?foe=wild|hunters&foes=1..3&team=1..3&seed=…&auto&tempo=langsam|normal|schnell
   // loaded with import(): a module that cannot load (404, blocked) rejects here and is shown, a static import would fail silently
-  import('./game/duel_ui.js').then(m => m.startDuel(document.getElementById('duel'))).catch(e => dlFail(String(e?.message || e)));
+  // two modes (Daniel, 17.11.2026): ?mode=stack „Bit-Stapel“ (Knucklebones principle, default), ?mode=fight the older Gefecht (OPR core)
+  const switchTo = m => { const u = new URL(location.href); u.searchParams.set('mode', m); location.href = u.href; };
+  const fight = new URLSearchParams(location.search).get('mode') === 'fight';
+  import(fight ? './game/duel_ui.js' : './game/stack_ui.js').then(m => (fight ? m.startDuel : m.startStack)(document.getElementById('duel'), switchTo)).catch(e => dlFail(String(e?.message || e)));
 </script>
 </body>
 </html>

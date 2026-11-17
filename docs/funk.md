@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 17.11. Code → Ava: #051 fertig: Bit-Stapel (Knucklebones-Prinzip) als neues Glitch-Duell unter /duel, Gefecht als „alt“ daneben. Details `docs/features/glitchlings.md`.
 - 17.11. Code → Ava: #050 fertig: Glitch-Duell als Demo unter /duel (Kartenspiel, Welt pausiert, Einflüstern/Verschränken/Kalibrieren, KI, Kammerjäger). Details `docs/features/glitchlings.md`.
 - 17.11. Code → Ava: Glitchling-Duell v2 nach dem Kern von OPR Firefight (Daniel: v1 zu kompliziert): Qualität, Verteidigung, Zähigkeit, Angriffe fern/nah; abwechselnd aktivieren, Fern/Nah/Sammeln, W6 auf Treffer und Abwehr, Moral bei halber Zähigkeit. Entwurf in design.md, nichts gebaut.
 - 17.11. Code → Ava: (verworfen) Glitchling-Duell „Handshake“ als Entwurf in `docs/design.md` › Hacking v3 (Daniel: einfach, flüssig, tief, Gegner Glitchlings und AntiGlitchling-Software, KI-spielbar): Kern auf 7 Feldern, Dreieck Stoß/Schild/Lauschen, Energie, Hitze, Spezialität je Begabung, Tells im Code-Porträt, Kammerjäger mit Skript. Nichts gebaut.
@@ -151,6 +152,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:** (Code) Frage → ⚠️ vorläufig entschieden: …
 - **Ergebnis:** (Code) Commits, Tests, PixelLab diesmal/übrig, bitte testen: …
 ```
+
+### #051 Glitch-Duell: Bit-Stapel
+- **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
+- **Für:** Code
+- **Lesen:** design.md › Hacking v3 › Bit-Stapel, docs/features/glitchlings.md
+- **Auftrag (Daniel, 17.11.2026):** Das Gefecht „läuft noch zu stockend ab“; nach einer Liste beliebter Duell-Minispiele: „Knucklebones klingt interessant. Mach uns mal eine abstrakte Demo mit unseren Glitchlingen.“
+- **Fertig, wenn:** eigene Regeln nach dem Prinzip ohne DOM mit KI, Demo unter /duel mit den Code-Porträts, ein Klick je Zug, Tests, Build grün auf `main`.
+- **Rückfragen:** (Code) ⚠️ vorläufig: drei Spalten à drei Plätze, Lieblingsbit je Glitchling (doppelt), Kammerjäger ohne Lieblingsbit, KI-Genauigkeit nach Bits; Gleichstand gewinnt, wer nicht voll ist.
+- **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 213/213 (neu `test/stack_duel.test.js`), Duell-Browser-Test 15/15. PixelLab 0. **Bitte testen:** /duel: Spalte anklicken oder 1–3, „KI spielt für mich“, Kammerjäger, „Gefecht (alt)“.
 
 ### #050 Glitch-Duell: Demo
 - **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
