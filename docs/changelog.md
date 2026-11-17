@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 17.11.2026: **Bastler-Deck mit einem AI-Core-Platz** (Daniel: Einstiegs-Deck = ein Glitchling, teure Decks zwei oder drei, Wahl vor dem Duell).
 - 17.11.2026: **Bit-Stapel** (#051): neues Glitch-Duell nach dem Knucklebones-Prinzip unter /duel (drei Spalten je Seite, gleiche Bits multiplizieren, Lieblingsbit doppelt, gleiche Bits drüben zerstören), ein Klick je Zug, rund 40–60 s; das Gefecht bleibt als „Gefecht (alt)“.
 - 17.11.2026: **Glitch-Duell mit sprechenden Namen**: Sicherer Angriff, Harter Angriff, Stabilisieren (mit Unterzeile), Karten „trifft · hält · sicher · hart“, Gegenschlag; Ladefehler stehen auf der Seite.
 - 17.11.2026: **NomadCola-Sachen in Seitenansicht** (Daniel: „Perspektive nicht orthogonal genug“): Automaten, Kühlboxen, Kisten, Sechserpack neu von PixelLab streng von vorn/der Seite; dazu Neon-Automat (Deko + Clutter), vernagelter Automat, Kistenstapel.

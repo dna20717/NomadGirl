@@ -658,6 +658,13 @@ Daniel: „Jeder Glitchling bekommt ein individuelles, animiertes Code-Porträt,
 
 Daniel: „Eine Kraft soll noch sein ‚Archäologe‘, die dazu führt, dass die Locations aller einzigartigen Beutestücke im Warroom angezeigt werden.“ Wohnt er im **Warroom**, zeigt die Reisekarte an jedem Ort, wo ein einzigartiges Beutestück liegt (Marke am Ort, im Tooltip welches). Stärke spielt keine Rolle (je Bit 0), in einer fremden Werkbank wirkt er nicht. Auch: Schatzkammer. ⚠️ vorläufig: „einzigartig“ heißt zunächst alles mit dem Merkmal **Trophäe** (33 Gegenstände); später vielleicht eigene Unikat-Beute (benannte Waffen).
 
+### Ein Glitchling je Duell, das Deck als AI-Core (Daniel, 17.11.2026)
+
+Daniel: „Ein Einstiegs-Cyberdeck kann nur einen AI Core haben (so wie die Drohne); später wären zwei oder gar drei Glitchlinge in teuren Decks möglich. Vorteil: ich kann vor dem Duell wählen.“
+- Das **Bastler-Deck hat einen Platz** (vorher 2), teure Decks zwei oder drei.
+- **Duelle sind 1 gegen 1:** Vor dem Duell wählt Leyla, welcher Glitchling aus dem Deck antritt. Die drei Säulen im Bit-Stapel gehören dann alle zu diesem einen Glitchling (Metapher offen: Threads, Kopf · Herz · Macke oder Ports).
+- **Offen:** Der Name „Glitchlinge“ ist im Deutschen holprig (Daniel). Bis ein besserer da ist, bleibt „Glitchlings“; im Spiel könnte „AI-Core“ für den Platz im Deck stehen.
+
 ### Bit-Stapel: das Glitch-Duell nach dem Knucklebones-Prinzip (Daniel 17.11.2026, Demo gebaut als #051)
 
 Daniel: Das Gefecht (unten) „läuft noch zu stockend ab … ich spüre, dass da Potential liegt“; ein Duell soll 40 bis 60 Sekunden dauern. Nach einer Liste beliebter Duell-Minispiele: „Knucklebones klingt interessant. Mach uns mal eine abstrakte Demo mit unseren Glitchlingen.“ Eigene Mechanik nach dem Prinzip, kein Nachbau. Alles ⚠️ vorläufig.

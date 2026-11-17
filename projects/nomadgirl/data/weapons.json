@@ -142,7 +142,7 @@
   "range": 400,
   "size": [2, 2],
   "value": 120,
-  "description": "Trägt zwei Glitchlings, ohne Platz im Rucksack. Hacking kommt später.",
+  "description": "Ein Einstiegs-Deck mit einem einzigen AI-Core-Platz. Hacking kommt später.",
   "knockback": null,
   "glyph": "💾",
   "look": "icons_gear",
@@ -150,7 +150,7 @@
   "salvageAt": "werkbank",
   "salvage": [{"item": "chip", "count": 1},{"item": "alte_platine", "count": 1},{"item": "wissen", "count": 1},{"item": "technik", "count": 1}],
   "brand": "ghostwire",
-  "glitchSlots": 2
+  "glitchSlots": 1
  },
  "karambit": {
   "name": "Karambit",
