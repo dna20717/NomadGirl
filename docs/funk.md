@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 17.11. Code → Ava: #052 Glitch-Duell im Spiel läuft (Overlay, Schalter mit Duell, KIs in Automaten).
 - 17.11. Code → Ava: #051 fertig: Bit-Stapel (Knucklebones-Prinzip) als neues Glitch-Duell unter /duel, Gefecht als „alt“ daneben. Details `docs/features/glitchlings.md`.
 - 17.11. Code → Ava: #050 fertig: Glitch-Duell als Demo unter /duel (Kartenspiel, Welt pausiert, Einflüstern/Verschränken/Kalibrieren, KI, Kammerjäger). Details `docs/features/glitchlings.md`.
 - 17.11. Code → Ava: Glitchling-Duell v2 nach dem Kern von OPR Firefight (Daniel: v1 zu kompliziert): Qualität, Verteidigung, Zähigkeit, Angriffe fern/nah; abwechselnd aktivieren, Fern/Nah/Sammeln, W6 auf Treffer und Abwehr, Moral bei halber Zähigkeit. Entwurf in design.md, nichts gebaut.
@@ -152,6 +153,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:** (Code) Frage → ⚠️ vorläufig entschieden: …
 - **Ergebnis:** (Code) Commits, Tests, PixelLab diesmal/übrig, bitte testen: …
 ```
+
+### #052 Glitch-Duell im Hauptspiel
+- **Status:** läuft · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
+- **Für:** Code
+- **Lesen:** docs/features/glitchlings.md, docs/features/pois.md, docs/features/ui.md
+- **Auftrag (Daniel, 17.11.2026):** „Die ganze Kampfanimation, das ganze Kampfinterface für die Duelle so anpassen, dass es im Hauptspiel als Overlay funktionieren würde und sich nahtlos in die vorhandenen UI-UX-Konventionen eingliedert … alle Hebel, die Türen öffnen, durch Schalter ersetzen, die man erst bedienen kann, wenn man ein Duell ausgetragen hat. Dabei geht es nicht darum, zwangsläufig zu gewinnen. Das Gewinnen ist nur dafür da, die KI zu fangen … KIs in verschiedenen anderen Dingen versteckt, so dass, wenn man da vorbeigeht, durch die normale Aktionsbelegung (Stick nach oben oder E) das Duell-Event getriggert wird.“
+- **Fertig, wenn:** Duell-Overlay im Spiel (Rahmen, Hilfezeile, ✕, Tastatur und Controller, pausiert), Schalter in POIs starten ein Duell und öffnen danach die Tür, Sieg fängt die KI (ins Deck), KIs in Automaten per E/↑, Tests, Build grün auf `main`.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #051 Glitch-Duell: Bit-Stapel
 - **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
