@@ -5601,16 +5601,16 @@
   "kind": "icons",
   "file": "assets/items/nomadcola.png",
   "cell": [64, 64],
-  "grid": [4, 4],
+  "grid": [4, 5],
   "description": "NomadCola-Produkte zum Wiederverwenden (Daniel, 17.11.2026: „Dinge erzeugen, die man wiederverwenden kann“): Flaschen, Dosen, Kronkorken, Kisten, Kühlbox, Automaten. Einzelbilder in assets/items/nomadcola/.",
-  "source": "KI (PixelLab, Create Image Pro 64 px, Stilbild = Logo-Raster, AAP-64, alle 16 Kandidaten)",
+  "source": "KI (PixelLab, Create Image Pro 64 px, AAP-64): Flaschen, Dosen, Kronkorken aus dem ersten Auftrag (Stilbild Logo-Raster); alles, was in der Welt steht (Automaten, Kühlboxen, Kisten, Sechserpack), aus zwei Aufträgen in strenger Seitenansicht (Stilbild TileSet00 Großer Clutter, 17.11.2026, Daniel: „Perspektive nicht orthogonal genug“), unten bündig gesetzt; alte Fassung in assets/items/v1/",
   "date": "2026-11-17",
   "names": [
    "Flasche",
    "Dose",
    "Zerdrückte Dose",
    "Kronkorken",
-   "Leere Kiste",
+   "Kistenstapel",
    "Kiste mit Flaschen (Pappe)",
    "Automat (Creme)",
    "Flasche, offen",
@@ -5621,7 +5621,11 @@
    "Flasche, liegend",
    "Kiste mit Flaschen (Holz)",
    "Kühlbox",
-   "Automat (Rot)"
+   "Automat (Rot)",
+   "Automat (Neon)",
+   "Automat (vernagelt)",
+   "Kühlbox mit Sechserpack",
+   "Leere Holzkiste"
   ]
  }
 }

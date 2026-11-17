@@ -323,5 +323,16 @@
   "look": "icons_nomadcola",
   "icon": 13,
   "description": "Eine Holzkiste voller Flaschen. Leer, aber hübsch."
+ },
+ "cola_automat_neon": {
+  "name": "NomadCola-Automat (Neon)",
+  "art": "icon",
+  "place": "ground",
+  "value": 140,
+  "cozy": 3,
+  "size": [1.4, 3.3],
+  "look": "icons_nomadcola",
+  "icon": 16,
+  "description": "Mit rotem Neonrahmen. Nachts sieht man ihn bis zur nächsten Düne."
  }
 }

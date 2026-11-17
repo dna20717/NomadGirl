@@ -24,7 +24,10 @@
    {"look": "icons_nomadcola", "name": "Automat (Creme)", "cm": 175, "chance": 2},
    {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 4},
    {"look": "icons_nomadcola", "name": "Kiste mit Flaschen (Holz)", "cm": 40, "chance": 4},
-   {"look": "icons_nomadcola", "name": "Sechserpack Dosen", "cm": 20, "chance": 3}
+   {"look": "icons_nomadcola", "name": "Sechserpack Dosen", "cm": 20, "chance": 3},
+   {"look": "icons_nomadcola", "name": "Automat (vernagelt)", "cm": 180, "chance": 3},
+   {"look": "icons_nomadcola", "name": "Automat (Neon)", "cm": 180, "chance": 2},
+   {"look": "icons_nomadcola", "name": "Kistenstapel", "cm": 80, "chance": 3}
   ]
  },
  "grossmarkt": {

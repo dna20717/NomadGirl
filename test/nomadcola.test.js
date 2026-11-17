@@ -16,7 +16,7 @@ test('Gegenstände: NomadCola (Buff), leere Dose, Kronkorken mit Bild und Marke;
 });
 test('Automaten als Deko (Bild aus dem Symbol-Raster) und als Marken-Clutter der Tankstelle', () => {
   assert.ok(DECOR_ARTS.some(([k]) => k === 'icon'));
-  for (const id of ['cola_automat', 'cola_automat_retro', 'cola_automat_rost', 'cola_kuehlbox', 'cola_kiste']) { const d = D.decor[id]; assert.equal(d.art, 'icon'); assert.ok(d.icon < names.length, id); }
+  for (const id of ['cola_automat', 'cola_automat_retro', 'cola_automat_rost', 'cola_automat_neon', 'cola_kuehlbox', 'cola_kiste']) { const d = D.decor[id]; assert.equal(d.art, 'icon'); assert.ok(d.icon < names.length, id); }
   const rows = D.pois.tankstelle_km7.brandProps;
   assert.ok(rows.some(r => /Automat/.test(r.name)));
   for (const r of rows) assert.ok(D.assets[r.look].names.includes(r.name), r.name);
