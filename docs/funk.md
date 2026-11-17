@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 17.11. Code → Ava: #047 Glitchling-Generator läuft (Daniels Auftrag im Code-Chat).
 - 16.11. Code → Ava: Hacking v3 „Glitchlings“ nach Daniels Ausgangspunkt in `docs/design.md`: spezialisierte KIs mit Macken statt Software, fangen/überreden/kaufen/erben, Einzug in Werkbänke oder für immer mit Implantat verschmelzen, wie Crew ohne Körper. Wintermute (Neuromancer) braucht einen eigenen Namen. Nichts gebaut.
 - 16.11. Code → Ava: Hacking v2 „Die Schneiderin“ als Entwurf in `docs/design.md` (Daniel: v1 merken, weiter iterieren, nichts aus v1 in v2): den Traum auftrennen und neu nähen, Flicken ausschneiden/einnähen/wenden, Schatten schneiden, Narben, Echos der Toten, Karte falten. Nichts gebaut.
 - 16.11. Code → Ava: Hacking-Konzept als Entwurf in `docs/design.md` › „Hacking: AvA im Netz“ (Daniel AFK: „über den Tellerrand“): AvA springt in Geräte, Netzblick, Spur kostet Tank, Programme im RAM-Raster, Datenlauf im Cyberraum, Härte aus der Markenqualität, Plakate/Funk/Erinnerungs-Splitter/Daemons. Nichts gebaut, wartet auf Daniels Antworten.
@@ -720,3 +721,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Fertig, wenn:** 15 Marken mit Logo im Raster, Tooltip mit Markenschild, Werkstatt zeigt das Logo, Tests grün, Build grün auf `main`.
 - **Rückfragen:** (Code) ⚠️ vorläufig: Auswahl der Logos (je bester von 16), Färbemittel ohne Marke im Namen, Tooltip-Werte mit Qualität. Beobachtung: PixelLab hat bei DeltaTint und Vulkan den Kandidatenbogen versetzt geliefert; per Code aus dem Gesamtbogen neu geschnitten (9 bzw. 8 brauchbare Kandidaten).
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 190/190, Browser 39/39 (cyberware_test prüft das Markenschild, brands.test die Logos). PixelLab diesmal 70, übrig 360. **Bitte testen:** Inventar: über ein Implantat oder Färbemittel fahren; Werkstatt › Marken › Markenschild; Reisekarte unverändert.
+
+### #047 Glitchlings, Stufe 1: der Generator
+- **Status:** läuft · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
+- **Für:** Code
+- **Lesen:** design.md › Hacking v3: Glitchlings, docs/features/lore.md
+- **Auftrag (Daniel, 17.11.2026):** „Ich finde Namen, die nach dem Schema wie Marble Sting oder so ein wenig besser. Das hebt sie von Pokémons ab (obwohl sie im Kern genau das ja sein werden). Ich würde sagen, wir bauen ein System auf, auf dessen Basis man diese passiven Companions generieren kann.“
+- **Fertig, wenn:** Werkstatt-Bereich mit Bausteinen (Namen aus zwei Wörtern, Begabungen mit Werkbank-Effekten, Macken, Wünsche, Wohnorte, Stärke) und Unikaten, Generator ohne DOM (gleicher Seed = gleiche Glitchlings, Namen einmalig), Vorschau mit „Neu würfeln“, Tests, Build grün auf `main`.
+- **Rückfragen:**
+- **Ergebnis:**
+
