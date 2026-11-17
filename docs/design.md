@@ -646,6 +646,10 @@ Jeder Glitchling ist **einzigartig** (pro Durchgang gibt es ihn genau einmal). L
 - **Pixie** versteht sie am besten und kann zwischen Glitchling und Crew vermitteln.
 - **Im neuen Traum** sind alle wieder fremd und wohnen wieder in ihren alten Maschinen. Leyla erinnert sich: wo jeder wohnt, was er will, welche Macke er verschweigt. Verschmolzene sind im neuen Traum wieder frei, und Leyla kann diesmal anders entscheiden.
 
+### Geister statt Fernseher (Daniel, 17.11.2026)
+
+Daniel: „Hübschere Grafiken für den KI-Baukasten, so dass sie mehr aussehen wie digitale Geister und weniger wie Fernseher. Die Mimiken kannst du weiterhin aus dem Code generieren, aber die Köpfe sollen cool gepixelt sein.“ 32 Geister-Köpfe von PixelLab (Kapuzen, Flammen, Quallen, Katzen, Hörner, Halos, Kronen, Kopfhörer …), hell mit leerer schwarzer Gesichtsfläche. Jeder Glitchling bekommt einen Kopf nach seinem Namen, **getönt in seinem Licht**, schwebt leicht, und der Code malt Augen, Mund, Blinzeln, Sprechen und Glitches in die Gesichtsfläche (große Gesichter: doppelt so große Züge). Unikate haben einen goldenen Umriss. **Kammerjäger bleiben Bildschirme** (Software gegen Geister). Das Zubehör nach Begabung (Kochmütze …) zeigen die Geister nicht mehr; die Köpfe selbst bringen die Vielfalt. ⚠️
+
 ### Code-Porträts (Daniel, 17.11.2026, gebaut als #048)
 
 Daniel: „Jeder Glitchling bekommt ein individuelles, animiertes Code-Porträt, das gleichzeitig das Item-Bild ist (in diesem Fall auch animiert).“ Jeder Glitchling ist ein kleiner Bildschirm im Gehäuse, ein Gesicht aus Licht auf scrollenden Code-Zeilen, ganz aus Code und ohne PixelLab:

@@ -80,7 +80,7 @@ export async function startStack(root, switchTo) {
     const delta = !L || !hpMode ? '' : L.side === side ? (L.heal ? `+${L.heal}` : '') : (hurt ? `−${hurt}` : '');
     const fire = dot ? fireOf(sd) : 0, active = d.turn === side && !d.winner;
     return el('div', { class: ['sb-ai', side, active ? 'active' : '', L && L.side !== side && hurt ? 'hit' : ''].filter(Boolean).join(' ') },
-      el('div', { class: 'sb-portrait' }, face(side, g, 72)),
+      el('div', { class: 'sb-portrait' }, face(side, g, 88)),
       el('div', { class: 'sb-id' },
         el('small', { class: 'sb-tag' }, side === 'player' ? 'Dein AI-Core' : g.hunter ? 'Kammerjäger' : 'Wilde KI'),
         el('b', {}, g.name),

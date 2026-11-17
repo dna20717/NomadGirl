@@ -4,6 +4,10 @@
 //   first name word → colour of the light (Amber orange, Cobalt blue …), second word → eyes and mouth, the name → screen shape,
 //   glass and bezel; talent → what it wears (chef's hat, propeller, fedora …); bits → the lamps on the bezel; quirk kind → how it glitches;
 //   unique ones get a gold rim.
+// Since 17.11.2026 (Daniel: „mehr wie digitale Geister und weniger wie Fernseher … die Mimiken weiterhin aus dem Code, aber die Köpfe cool
+// gepixelt“) Glitchlings are ghosts: a head from the sheet glitch_heads (PixelLab, pale with an empty black face), tinted in the
+// Glitchling's light; the face (eyes, mouth, blinking, glitches) is drawn into the black void by code; it floats. The screen faces stay for
+// Kammerjäger (software, no ghost) and as long as the heads are not loaded (Node, tests). renderGhost() paints that, setHeads() gives the heads.
 // renderFace(g, t) paints one frame into RGBA pixels (SIZE × SIZE, no DOM: tests and Node), drawGlitchFace() puts it on a canvas,
 // animateFace() keeps a canvas moving while it is on the page (workshop cards, later the item picture in the inventory).
 import { rng } from './worldmap.js';
@@ -156,14 +160,114 @@ function lamps(F, M, put) {
   for (let i = 0; i < 5; i++) put(x0 + i * 2, y, i < F.bits ? LAMP : DARK);
 }
 
+
+// ---------- ghosts (glitch_heads) ----------
+export const GSIZE = 64;
+let HEADS = null, loading = null;
+const lum = (r, g, b) => (r * 0.3 + g * 0.59 + b * 0.11) / 255;
+// the heads: [{ data: RGBA GSIZE × GSIZE, face: { cx, cy, rx, ry } }]; the face is the black void, found by filling from the middle
+export function setHeads(cells) {
+  HEADS = cells.map(data => {
+    const S = GSIZE, dark = i => data[i * 4 + 3] > 128 && lum(data[i * 4], data[i * 4 + 1], data[i * 4 + 2]) < 0.16;
+    let start = -1;
+    for (let d = 0; d < 20 && start < 0; d++) for (const [x, y] of [[32, 30 + d], [32, 30 - d], [32 - d, 30], [32 + d, 30]]) if (start < 0 && dark(y * S + x)) start = y * S + x;
+    let x0 = S, x1 = 0, y0 = S, y1 = 0;
+    if (start >= 0) {
+      const seen = new Uint8Array(S * S), todo = [start]; seen[start] = 1;
+      while (todo.length) { const i = todo.pop(), x = i % S, y = (i / S) | 0; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+        for (const j of [i - 1, i + 1, i - S, i + S]) if (j >= 0 && j < S * S && !seen[j] && Math.abs((j % S) - x) <= 1 && dark(j)) { seen[j] = 1; todo.push(j); } }
+    }
+    const ok = start >= 0 && x1 - x0 >= 8 && y1 - y0 >= 8;
+    return { data, face: ok ? { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, rx: (x1 - x0) / 2, ry: (y1 - y0) / 2 } : { cx: 32, cy: 30, rx: 10, ry: 12 } };
+  });
+  return HEADS;
+}
+export const headsReady = () => !!HEADS?.length;
+// in the browser: load the sheet once (next to the game data)
+export function loadHeads(url = new URL('../projects/nomadgirl/assets/glitchlings/heads.png', import.meta.url).href) {
+  if (HEADS || loading || typeof document === 'undefined') return loading;
+  loading = new Promise(res => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+      const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0);
+      const cells = [];
+      for (let y = 0; y + GSIZE <= c.height; y += GSIZE) for (let k = 0; k + GSIZE <= c.width; k += GSIZE) { const d = x.getImageData(k, y, GSIZE, GSIZE).data; if (d.some((v, i) => i % 4 === 3 && v)) cells.push(new Uint8ClampedArray(d)); }
+      res(setHeads(cells));
+    };
+    img.onerror = () => res(null);
+    img.src = url;
+  });
+  return loading;
+}
+// one frame of a ghost: its head tinted, floating, the face from code in the void
+export function renderGhost(g, t = 0, out = null) {
+  const F = faceOf(g), S = GSIZE, px = out || new Uint8ClampedArray(S * S * 4), H = HEADS[(F.seed >>> 3) % HEADS.length], src = H.data, f = H.face;
+  px.fill(0);
+  const fr = Math.floor(t * FPS), T = fr / FPS, r = rng(F.seed + fr * 7919);
+  const bob = Math.round(Math.sin(T * 2.1 + F.phase) * 1.4), dark = [10, 8, 18], gold = GOLD;
+  const mood = F.glitch === 'mood' ? 0.85 + 0.15 * Math.sin(T * 1.7 + F.phase) : 1;
+  // the head: brightness of the pale art → from deep shade to the light of the Glitchling (unique ones: gold outline)
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+    const sy = y - bob; if (sy < 0 || sy >= S) continue;
+    const i = (sy * S + x) * 4, a = src[i + 3]; if (!a) continue;
+    const l = lum(src[i], src[i + 1], src[i + 2]), o = (y * S + x) * 4;
+    let c;
+    if (l < 0.16) c = dark;                                                      // the void and the outline stay dark
+    else { const k = Math.min(1, (l - 0.16) / 0.75) * mood; c = [dark[0] + (F.tint[0] - dark[0]) * k + (255 - F.tint[0]) * Math.max(0, k - 0.8), dark[1] + (F.tint[1] - dark[1]) * k + (255 - F.tint[1]) * Math.max(0, k - 0.8), dark[2] + (F.tint[2] - dark[2]) * k + (255 - F.tint[2]) * Math.max(0, k - 0.8)]; }
+    if (F.unique && l < 0.16) { const edge = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => { const xx = x + dx, yy = sy + dy; return xx < 0 || yy < 0 || xx >= S || yy >= S || !src[(yy * S + xx) * 4 + 3]; }); if (edge) c = gold; }
+    px[o] = c[0]; px[o + 1] = c[1]; px[o + 2] = c[2]; px[o + 3] = a;
+  }
+  // the face in the void: same eyes and mouth as the screens, placed by the void's size
+  const put = (x, y, c, a = 1) => { x = Math.round(x); y = Math.round(y + bob); if (x < 0 || y < 0 || x >= S || y >= S) return; const i = (y * S + x) * 4; px[i] = px[i] * (1 - a) + c[0] * a; px[i + 1] = px[i + 1] * (1 - a) + c[1] * a; px[i + 2] = px[i + 2] * (1 - a) + c[2] * a; px[i + 3] = Math.max(px[i + 3], 255 * a); };
+  const light = [Math.min(255, F.tint[0] + 70), Math.min(255, F.tint[1] + 70), Math.min(255, F.tint[2] + 70)];
+  // big voids get chunkier features: every pattern pixel becomes k × k around its anchor (eye or mouth centre)
+  const k = f.rx >= 11 ? 2 : 1, dots = []; let ax = 0, ay = 0;
+  const dot = (x, y) => { const X = Math.round(ax + (x - ax) * k), Y = Math.round(ay + (y - ay) * k); for (let j = 0; j < k; j++) for (let i = 0; i < k; i++) dots.push([X + i, Y + j]); };
+  const cx = f.cx, ey = f.cy - f.ry * 0.22, my = f.cy + f.ry * 0.42, d = Math.max(3, f.rx * 0.45);
+  const blinkAt = (T + F.phase) % F.blink, shut = blinkAt < 0.17 || (F.glitch === 'time' && Math.sin(T * 0.5 + F.phase) > 0.7);
+  const look = F.glitch === 'neighbour' ? Math.round(Math.sin(T * 0.9 + F.phase) * 1.4) : F.glitch === 'odd' && r() < 0.15 ? (r() < 0.5 ? -1 : 1) : Math.round(Math.sin(T * 0.4 + F.phase) * 0.7);
+  for (const sd of [-1, 1]) {
+    const x = Math.round(cx + sd * d - 0.5) + look * k, y = Math.round(ey); ax = x; ay = y;
+    if (shut) { for (let i = -1; i <= 1; i++) dot(x + i, y + 1); continue; }
+    if (F.eyes === 'dots') { dot(x, y); dot(x + 1, y); dot(x, y + 1); dot(x + 1, y + 1); }
+    else if (F.eyes === 'blocks') { for (let j = -1; j <= 1; j++) for (let i = -1; i <= 1; i++) dot(x + i, y + j + 1); }
+    else if (F.eyes === 'bars') { for (let i = -1; i <= 2; i++) dot(x + i, y + 1); }
+    else if (F.eyes === 'arcs') { dot(x - 1, y + 1); dot(x, y); dot(x + 1, y); dot(x + 2, y + 1); }
+    else if (F.eyes === 'rings') { for (let j = -1; j <= 1; j++) for (let i = -1; i <= 1; i++) if (i || j) dot(x + i, y + j); }
+    else if (sd < 0) { for (let j = -1; j <= 1; j++) for (let i = -1; i <= 1; i++) dot(x + i, y + j); } else dot(x, y);
+  }
+  const talking = (T + F.phase * 3) % F.talk < 1 && fr % 3 !== 0, mouth = talking ? 'o' : F.mouth, my_ = Math.round(my), mx = Math.round(cx); ax = mx; ay = my_;
+  if (mouth === 'smile') { dot(mx - 3, my_ - 1); for (let i = -2; i <= 1; i++) dot(mx + i, my_); dot(mx + 2, my_ - 1); }
+  else if (mouth === 'flat') for (let i = -2; i <= 2; i++) dot(mx + i, my_);
+  else if (mouth === 'o') { dot(mx - 1, my_ - 1); dot(mx, my_ - 1); dot(mx - 2, my_); dot(mx + 1, my_); dot(mx - 1, my_ + 1); dot(mx, my_ + 1); }
+  else if (mouth === 'zigzag') for (let i = -3; i <= 2; i++) dot(mx + i, my_ - ((i & 1) ? 1 : 0));
+  else if (mouth === 'smirk') { for (let i = -2; i <= 1; i++) dot(mx + i, my_); dot(mx + 2, my_ - 1); dot(mx + 3, my_ - 2); }
+  else { dot(mx - 3, my_ - 1); dot(mx - 2, my_); dot(mx - 1, my_ - 1); dot(mx, my_); dot(mx + 1, my_ - 1); }
+  for (const [x, y] of dots) for (const [i, j] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) put(x + i, y + j, F.tint, 0.4);
+  for (const [x, y] of dots) put(x, y, light);
+  // glitches: rows slide, the ghost flickers (how often comes from the quirk)
+  const every = { odd: 1.3, mood: 3, time: 5, weather: 2.5, neighbour: 3.5 }[F.glitch] ?? 4;
+  if ((T + F.phase * 0.7) % every < 0.25) {
+    for (let n = 1 + Math.floor(r() * 3); n > 0; n--) {
+      const y0 = Math.floor(r() * S), h = 1 + Math.floor(r() * 3), sh = (r() < 0.5 ? -1 : 1) * (1 + Math.floor(r() * 3));
+      for (let y = y0; y < Math.min(S, y0 + h); y++) { const row = px.slice(y * S * 4, (y + 1) * S * 4); for (let x = 0; x < S; x++) { const sx = x - sh, o = (y * S + x) * 4; if (sx < 0 || sx >= S) { px[o + 3] = 0; continue; } for (let c = 0; c < 4; c++) px[o + c] = row[sx * 4 + c]; } }
+    }
+  }
+  if (F.glitch === 'weather' && (T + F.phase) % 5 < 0.6) for (let n = 0; n < 30; n++) { const x = Math.floor(r() * S), y = Math.floor(r() * S), o = (y * S + x) * 4; if (px[o + 3]) { px[o] = px[o + 1] = px[o + 2] = 230; } }
+  return px;
+}
+
 // ---------- canvas ----------
 // one frame onto a canvas context, scaled up with sharp pixels
 const buffers = new WeakMap();
+const ghostOf = g => !g?.hunter && headsReady();
 export function drawGlitchFace(ctx, g, t = 0, x = 0, y = 0, size = SIZE * 4) {
+  const ghost = ghostOf(g), N = ghost ? GSIZE : SIZE;
   let b = buffers.get(ctx);
-  if (!b) { const c = (ctx.canvas.ownerDocument || document).createElement('canvas'); c.width = c.height = SIZE; b = { c, cx: c.getContext('2d') }; buffers.set(ctx, b); }
-  const img = b.cx.createImageData(SIZE, SIZE);
-  renderFace(g, t, img.data);
+  if (!b || b.n !== N) { const c = (ctx.canvas.ownerDocument || document).createElement('canvas'); c.width = c.height = N; b = { c, cx: c.getContext('2d'), n: N }; buffers.set(ctx, b); }
+  const img = b.cx.createImageData(N, N);
+  if (ghost) renderGhost(g, t, img.data); else renderFace(g, t, img.data);
   b.cx.putImageData(img, 0, 0);
   ctx.imageSmoothingEnabled = false;
   ctx.clearRect(x, y, size, size);
@@ -175,6 +279,7 @@ export function faceCanvas(g, size = SIZE * 3, doc = document) {
   cv.width = cv.height = size; cv.className = 'glitch-face'; cv.style.imageRendering = 'pixelated';
   const ctx = cv.getContext('2d'), t0 = performance.now();
   let last = -1, seen = false;
+  if (!headsReady()) loadHeads()?.then(() => { last = -1; });   // the ghost heads come a moment later
   const tick = now => {
     if (!cv.isConnected) { if (seen || now - t0 > 10000) return; } else seen = true;   // gone from the page, or never put there
     const fr = Math.floor((now - t0) / 1000 * FPS);

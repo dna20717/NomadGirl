@@ -115,3 +115,21 @@ test('Alter Spielstand ohne Deck: bekommt einmal ein Bastler-Deck, Amber Slay zi
   assert.ok(!s.inv.grids.camp.items.some(e => e.g), 'nicht mehr im Lager');
   assert.equal(repairSave(structuredClone(s), D).inv.grids[DECK].items.length, 1);
 });
+
+// Geister-Köpfe (Daniel, 17.11.2026: „mehr wie digitale Geister und weniger wie Fernseher“): a pale head with a black void, tinted,
+// the face drawn by code inside the void; Kammerjäger stay screens
+import { setHeads, renderGhost, GSIZE, headsReady } from '../game/glitch_face.js';
+test('Geist: Kopf in der Farbe des Glitchlings, Gesicht in der Leere, schwebt; Kammerjäger bleiben Bildschirme', () => {
+  const S = GSIZE, head = new Uint8ClampedArray(S * S * 4);
+  for (let y = 8; y < 56; y++) for (let x = 12; x < 52; x++) { const i = (y * S + x) * 4, voidPx = (x - 32) ** 2 / 144 + (y - 30) ** 2 / 196 < 1; head[i] = head[i + 1] = head[i + 2] = voidPx ? 6 : 235; head[i + 3] = 255; }
+  const [H] = setHeads([head]);
+  assert.ok(headsReady()); assert.ok(Math.abs(H.face.cx - 32) <= 1 && Math.abs(H.face.cy - 30) <= 1, JSON.stringify(H.face));
+  const amber = generate(D, 1).find(g => g.name === 'Amber Slay'), px = renderGhost(amber, 0.3);
+  assert.equal(px.length, S * S * 4);
+  const at = (x, y) => [...px.slice((y * S + x) * 4, (y * S + x) * 4 + 4)];
+  const body = at(14, 50); assert.ok(body[0] > 150 && body[2] < body[0], `Körper in Bernstein getönt: ${body}`);
+  let lit = 0; for (let y = 18; y < 42; y++) for (let x = 22; x < 42; x++) { const p = at(x, y); if (p[0] + p[1] + p[2] > 300) lit++; }
+  assert.ok(lit > 4, 'Augen und Mund leuchten in der Leere');
+  const frames = new Set(); for (let t = 0; t < 4; t += 0.3) frames.add(Buffer.from(renderGhost(amber, t)).toString('base64'));
+  assert.ok(frames.size >= 3, `bewegt sich (${frames.size} Bilder)`);
+});
