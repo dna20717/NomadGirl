@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 17.11.2026: **Glitch-Duell mit sprechenden Namen**: Sicherer Angriff, Harter Angriff, Stabilisieren (mit Unterzeile), Karten „trifft · hält · sicher · hart“, Gegenschlag; Ladefehler stehen auf der Seite.
 - 17.11.2026: **NomadCola-Sachen in Seitenansicht** (Daniel: „Perspektive nicht orthogonal genug“): Automaten, Kühlboxen, Kisten, Sechserpack neu von PixelLab streng von vorn/der Seite; dazu Neon-Automat (Deko + Clutter), vernagelter Automat, Kistenstapel.
 - 17.11.2026: **NomadCola im Spiel**: Getränk (Buff Flink), leere Dose, Kronkorken mit Bild in der Tankstellen- und Plünderer-Beute; Automaten, Kühlbox und Kiste als Kauf-Deko (neue Deko-Art „Bild aus einem Symbol-Raster“); Marken-Clutter an der Mile 7 Gas & Go (POIs › Marken-Clutter).
 - 17.11.2026: **NomadCola-Logo und -Produkte**: neues Logo mit lesbarem Schriftzug (PixelLab + Schrift von Hand), 16 Produkt-Symbole zum Wiederverwenden (Flaschen, Dosen, Kisten, Automaten).

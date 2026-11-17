@@ -16,16 +16,16 @@ const shot = async n => { if (!shots) return; fs.mkdirSync('output', { recursive
 
 await page.goto(base + '?seed=42&foes=2&team=2&tempo=schnell');
 await page.waitForFunction(() => window.duelDemo?.S.duel, null, { timeout: 15000 });
-let r = await page.evaluate(() => ({ cards: document.querySelectorAll('.dl-card').length, faces: document.querySelectorAll('.dl-card canvas.glitch-face').length, turn: duelDemo.S.duel.turn, acts: [...document.querySelectorAll('.dl-act')].map(b => b.textContent.trim()) }));
-check('Vier Karten mit Code-Porträts, Leyla beginnt, Aktionen Einflüstern/Verschränken/Kalibrieren', r.cards === 4 && r.faces === 4 && r.turn === 'player' && r.acts.join() === 'Einflüstern,Verschränken,Kalibrieren', r);
+let r = await page.evaluate(() => ({ cards: document.querySelectorAll('.dl-card').length, faces: document.querySelectorAll('.dl-card canvas.glitch-face').length, turn: duelDemo.S.duel.turn, acts: [...document.querySelectorAll('.dl-act')].map(b => b.querySelector('.dl-act-text').firstChild.textContent.trim()) }));
+check('Vier Karten mit Code-Porträts, Leyla beginnt, Aktionen Sicherer Angriff/Harter Angriff/Stabilisieren', r.cards === 4 && r.faces === 4 && r.turn === 'player' && r.acts.join() === 'Sicherer Angriff,Harter Angriff,Stabilisieren', r);
 await page.click('.dl-card.player.pick'); await page.click('[data-action=link]');
 r = await page.evaluate(() => document.querySelectorAll('.dl-card.target').length);
-check('Glitchling gewählt, Verschränken: beide Gegner sind Ziele', r === 2, r);
+check('Glitchling gewählt, Harter Angriff: beide Gegner sind Ziele', r === 2, r);
 await page.hover('.dl-card.target'); await shot('choose');
 r = await page.evaluate(() => getComputedStyle(document.querySelector('.dl-card.target:hover .dl-preview') || document.body).display);
 check('Vorschau am Ziel: erwartete Wunden', r === 'block', r);
 await page.click('.dl-card.target');
-r = await page.evaluate(() => ({ dice: document.querySelectorAll('.dl-tray .dl-die').length, answer: /Antwort/.test(document.querySelector('.dl-tray').textContent), turn: duelDemo.S.duel.turn }));
+r = await page.evaluate(() => ({ dice: document.querySelectorAll('.dl-tray .dl-die').length, answer: /Gegenschlag/.test(document.querySelector('.dl-tray').textContent), turn: duelDemo.S.duel.turn }));
 check('Würfel im Tablett, das Ziel antwortet, der Gegner ist dran', r.dice >= 2 && r.answer && r.turn === 'enemy', r);
 await page.waitForFunction(() => duelDemo.S.duel.turn === 'player' && !duelDemo.S.busy || duelDemo.S.duel.winner, null, { timeout: 15000 });
 r = await page.evaluate(() => duelDemo.S.duel.log.filter(e => e.type === 'act').map(e => e.uid[0]));

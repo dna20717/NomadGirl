@@ -58,7 +58,9 @@
   .dl-die.hit { background: var(--dl-hit); } .dl-die.miss { background: var(--dl-miss); } .dl-die.block { background: var(--dl-block); } .dl-die.wound { background: var(--dl-wound); }
   @keyframes dl-roll { from { transform: rotate(-180deg) scale(.4); opacity: 0; } }
   .dl-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-  .dl-act { height: 38px; padding: 0 14px; border-radius: var(--ui-r-button); border: 1px solid var(--ui-border-strong); background: var(--ui-panel); color: var(--ui-text); font: 600 14px var(--ui-font); display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+  .dl-act { min-height: 44px; text-align: left; padding: 0 14px; border-radius: var(--ui-r-button); border: 1px solid var(--ui-border-strong); background: var(--ui-panel); color: var(--ui-text); font: 600 14px var(--ui-font); display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+  .dl-act-text { display: grid; line-height: 1.15; } .dl-act-text small { font-weight: 500; font-size: 11px; opacity: .75; }
+  .dl-stats.small { font-size: 16px; margin-top: 0; color: var(--ui-text2); }
   .dl-act:disabled { opacity: .35; cursor: default; } .dl-act.on { background: var(--dl-gold); color: #241a00; border-color: #c28d29; }
   .dl-rules { color: var(--ui-text3); font-size: 12px; max-width: 760px; margin: 18px auto 0; text-align: center; line-height: 1.5; }
   .dl-boot { margin: 40px auto; max-width: 560px; text-align: center; color: var(--ui-text3); font: 22px/1.4 var(--ui-pixel); } .dl-boot.err { color: #f5a097; font: 15px/1.5 var(--ui-font); } .dl-boot code { color: #ffd541; word-break: break-word; }

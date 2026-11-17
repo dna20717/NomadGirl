@@ -8,11 +8,11 @@ import { el } from './ui.js';
 import { icon } from './icons.js';
 import { generate, brandOf } from './glitchlings.js';
 import { faceCanvas } from './glitch_face.js';
-import { ACTIONS, statsOf, hunterStats, duelConfig, newDuel, options, act, choose, preview, fighter, standing, play } from './duel.js';
+import { ACTIONS, ACTION_SUBS, statsOf, hunterStats, duelConfig, newDuel, options, act, choose, preview, fighter, standing, play } from './duel.js';
 
 const NAMES = Object.fromEntries(ACTIONS);
 const ICONS = { whisper: 'wave', link: 'connect', calibrate: 'restart' };
-const HINTS = { whisper: 'Angriff mit den Einflüster-Impulsen, ohne Antwort', link: 'Angriff mit den Verschränk-Impulsen, danach antwortet das Ziel', calibrate: 'Kein Angriff; wer flackert, flackert danach nicht mehr' };
+const HINTS = { whisper: 'Würfelt die Würfel für den sicheren Angriff; das Ziel schlägt nicht zurück', link: 'Würfelt die Würfel für den harten Angriff (meist mehr); danach schlägt das Ziel mit seinen eigenen zurück', calibrate: 'Kein Angriff; wer flackert, flackert danach nicht mehr' };
 const TEMPO = { langsam: 1.6, normal: 1, schnell: 0.45 };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const rngOf = seed => () => { seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
@@ -102,15 +102,16 @@ export async function startDuel(root) {
       el('small', { class: 'dl-maker', style: b?.color ? `color:${b.color}` : '' }, b?.name || (f.kind === 'hunter' ? 'Kammerjäger' : '—')),
       el('div', { class: 'dl-kind' }, f.kind === 'hunter' ? 'Kammerjäger' : `${f.g?.talent || ''} · ${'▮'.repeat(f.g?.bits || 0)}`),
       el('div', { class: 'dl-stats' },
-        el('span', { title: 'Präzision: trifft bei W6 ≥ diesem Wert' }, icon('target', 13), `${f.quality}+`),
-        el('span', { title: 'Abschirmung: wehrt einen Treffer ab bei W6 ≥ diesem Wert' }, icon('armor', 13), `${f.defense}+`),
-        el('span', { title: 'Impulse beim Einflüstern' }, icon('wave', 13), f.remote),
-        el('span', { title: 'Impulse beim Verschränken' }, icon('connect', 13), f.link)),
+        el('span', { title: 'Trifft bei einem Würfel ab diesem Wert' }, icon('target', 13), `trifft ${f.quality}+`),
+        el('span', { title: 'Wehrt einen Treffer ab bei einem Würfel ab diesem Wert' }, icon('armor', 13), `hält ${f.defense}+`)),
+      el('div', { class: 'dl-stats small' },
+        el('span', { title: 'Würfel beim sicheren Angriff' }, icon('wave', 13), `sicher ${f.remote}`),
+        el('span', { title: 'Würfel beim harten Angriff' }, icon('connect', 13), `hart ${f.link}`)),
       pips,
       f.flicker ? el('div', { class: 'dl-tag' }, 'flackert') : null,
       f.out ? el('div', { class: 'dl-stamp' }, 'überschrieben') : null,
       wounds && !f.out ? el('div', { class: 'dl-float' }, `−${wounds}`) : null,
-      pv ? el('div', { class: 'dl-preview' }, `≈ ${num(pv.wounds)} Wunden · ${pct(pv.overwrite)} überschreiben`, pv.answer != null ? el('br') : null, pv.answer != null ? `Antwort ≈ ${num(pv.answer)}` : null) : null);
+      pv ? el('div', { class: 'dl-preview' }, `≈ ${num(pv.wounds)} Wunden · ${pct(pv.overwrite)} überschreiben`, pv.answer != null ? el('br') : null, pv.answer != null ? `Gegenschlag ≈ ${num(pv.answer)}` : null) : null);
     return c;
   }
   function die(v, cls) {
@@ -122,12 +123,12 @@ export async function startDuel(root) {
     if (!L) return el('div', { class: 'dl-tray empty' }, d.turn === 'player' && !S.auto ? 'Wähle einen deiner Glitchlings, eine Aktion und ein Ziel.' : '…');
     const nm = uid => fighter(d, uid)?.name || '?', rows = [];
     for (const e of L.ev) {
-      if (e.type === 'act') rows.push(el('div', { class: 'dl-line head' }, icon(ICONS[e.action], 16), el('b', {}, nm(e.uid)), ` ${NAMES[e.action].toLowerCase()}${e.target ? ' → ' : ''}`, e.target ? el('b', {}, nm(e.target)) : null));
+      if (e.type === 'act') rows.push(el('div', { class: 'dl-line head' }, icon(ICONS[e.action], 16), el('b', {}, nm(e.uid)), `: ${NAMES[e.action]}${e.target ? ' → ' : ''}`, e.target ? el('b', {}, nm(e.target)) : null));
       if (e.type === 'attack' || e.type === 'answer') {
         const a = fighter(d, e.uid), t = fighter(d, e.target);
-        rows.push(el('div', { class: 'dl-line' }, el('small', {}, e.type === 'answer' ? `Antwort ${nm(e.uid)}` : 'Präzision', ` ${a.quality}+`),
+        rows.push(el('div', { class: 'dl-line' }, el('small', {}, e.type === 'answer' ? `Gegenschlag ${nm(e.uid)}, trifft` : 'Trifft', ` ${a.quality}+`),
           el('span', { class: 'dl-dice' }, ...e.rolls.map(r => die(r, r === 6 || (r !== 1 && r >= a.quality) ? 'hit' : 'miss')))));
-        if (e.hits) rows.push(el('div', { class: 'dl-line' }, el('small', {}, `Abschirmung ${nm(e.target)} ${t.defense}+`),
+        if (e.hits) rows.push(el('div', { class: 'dl-line' }, el('small', {}, `${nm(e.target)} hält ${t.defense}+`),
           el('span', { class: 'dl-dice' }, ...e.saves.map(r => die(r, r === 6 || (r !== 1 && r >= t.defense) ? 'block' : 'wound'))), el('b', { class: e.wounds ? 'red' : '' }, e.wounds ? ` −${e.wounds}` : ' gehalten')));
         else rows.push(el('div', { class: 'dl-line' }, el('small', {}, 'kein Treffer')));
       }
@@ -142,7 +143,7 @@ export async function startDuel(root) {
     return el('div', { class: 'dl-actions' }, ...ACTIONS.map(([id, name]) => {
       const can = opts.some(o => o.action === id);
       return el('button', { class: 'dl-act' + (S.action === id && can ? ' on' : ''), disabled: !can, title: HINTS[id], 'data-action': id,
-        onclick: () => { if (id === 'calibrate') run(S.sel, 'calibrate'); else { S.action = id; draw(); } } }, icon(ICONS[id], 16), name);
+        onclick: () => { if (id === 'calibrate') run(S.sel, 'calibrate'); else { S.action = id; draw(); } } }, icon(ICONS[id], 16), el('span', { class: 'dl-act-text' }, name, el('small', {}, ACTION_SUBS[id])));
     }));
   }
   function status() {
@@ -176,8 +177,8 @@ export async function startDuel(root) {
     const row = side => el('div', { class: 'dl-row ' + side }, ...d.fighters.filter(f => f.side === side).map(card));
     root.replaceChildren(setup(),
       el('div', { class: 'dl-board' }, row('enemy'), el('div', { class: 'dl-mid' }, status(), tray(), actionsBar()), row('player')),
-      el('p', { class: 'dl-rules' }, 'Abwechselnd ist jede Seite mit einem Glitchling dran. ', el('b', {}, 'Einflüstern'), ': Angriff ohne Antwort. ', el('b', {}, 'Verschränken'), ': mehr Impulse, aber das Ziel antwortet. ',
-        el('b', {}, 'Kalibrieren'), ': beendet das Flackern. Jeder Impuls trifft bei W6 ≥ Präzision, jeder Treffer wird abgewehrt bei W6 ≥ Abschirmung. Bei halber Integrität ein Selbsttest: misslungen = flackert (nur Kalibrieren, keine Antwort).'));
+      el('p', { class: 'dl-rules' }, 'Abwechselnd ist jede Seite mit einem Glitchling dran. ', el('b', {}, 'Sicherer Angriff'), ': würfeln, das Ziel schlägt nicht zurück. ', el('b', {}, 'Harter Angriff'), ': meist mehr Würfel, aber das Ziel schlägt zurück. ',
+        el('b', {}, 'Stabilisieren'), ': kein Angriff, beendet das Flackern. Jeder Würfel ab „trifft“ ist ein Treffer, jeder Treffer wird abgewehrt mit einem Würfel ab „hält“. Die Balken sind die Integrität. Bei halber Integrität ein Selbsttest: misslungen = flackert (nur Stabilisieren, kein Gegenschlag).'));
   }
   newGame();
 }

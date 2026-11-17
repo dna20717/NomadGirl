@@ -669,6 +669,7 @@ Daniel: „Schau dir das OPR-Firefight-System für Kämpfe an (ohne Schlagwörte
   - **Integrität:** so viele Wunden, dann ist er **überschrieben** (Bits + 1).
   - **Impulse:** Würfel je Angriff, je für Einflüstern und Verschränken (nach Begabung).
 - **Abwechselnd aktivieren:** Eine Seite ist mit einem Glitchling dran, dann die andere, bis jeder einmal dran war (eine Runde). Die nächste Runde beginnt die andere Seite.
+- **Sprechende Namen für jetzt** (Daniel, 17.11.2026: „sonst wirkt es unübersichtlich“): in der Demo heißen die Aktionen **Sicherer Angriff** (Einflüstern), **Harter Angriff** (Verschränken) und **Stabilisieren** (Kalibrieren), die Karten zeigen „trifft 4+ · hält 4+“ und „sicher 2 · hart 3“, die Antwort heißt Gegenschlag. Die Hacking-Namen unten bleiben als spätere Fassung.
 - **Drei Aktionen** (statt Fern- und Nahkampf):
   - **Einflüstern:** aus der Ferne eingreifen, Angriff mit den Einflüster-Impulsen, das Ziel antwortet nicht.
   - **Verschränken:** sich direkt mit dem Ziel koppeln, mehr Impulse, danach antwortet das Ziel mit seinen Verschränk-Impulsen.

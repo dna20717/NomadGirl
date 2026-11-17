@@ -15,7 +15,10 @@
 //   duel    = { fighters, round, turn (side to act), starts (side that began this round), log: [event], winner: side | null }
 import { config } from './glitchlings.js';
 
-export const ACTIONS = [['whisper', 'Einflüstern'], ['link', 'Verschränken'], ['calibrate', 'Kalibrieren']];
+// names for now (Daniel, 17.11.2026: „sprechende Namen, sonst wirkt es unübersichtlich“); the flavour names Einflüstern / Verschränken /
+// Kalibrieren can come back later
+export const ACTIONS = [['whisper', 'Sicherer Angriff'], ['link', 'Harter Angriff'], ['calibrate', 'Stabilisieren']];
+export const ACTION_SUBS = { whisper: 'ohne Gegenschlag', link: 'mehr Würfel, Ziel schlägt zurück', calibrate: 'kein Angriff, beendet Flackern' };
 export const SIDES = ['player', 'enemy'];
 const other = s => (s === 'player' ? 'enemy' : 'player');
 const clampRoll = v => Math.max(2, Math.min(6, v | 0));
