@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 17.11.2026: **Bit-Stapel: eine KI, drei Pipelines, Cyberpunk-Look**: je Seite ein AI-Core (vor dem Duell wählbar), Neon-Pipelines mit Datenfluss, Kopfzeilen mit Porträt, Integrität und Feuer, das Bit rollt wie ein Spielautomat ein.
 - 17.11.2026: **Bit-Stapel mit Dauerfeuer**: 50 Integrität, Paare und Drillinge schaden jeden Zug, bis sie zerstört werden, Lieblingsbit obendrauf; Heilen und Summe bleiben umschaltbar.
 - 17.11.2026: **Bit-Stapel mit Integrität**: wer die Integrität des anderen zuerst auf 0 bringt, gewinnt; gleiche Bits heilen, zerstörte Bits schaden, volle Spalten laufen über; Lebensleisten in der Mitte, Summe umschaltbar.
 - 17.11.2026: **Bastler-Deck mit einem AI-Core-Platz** (Daniel: Einstiegs-Deck = ein Glitchling, teure Decks zwei oder drei, Wahl vor dem Duell).

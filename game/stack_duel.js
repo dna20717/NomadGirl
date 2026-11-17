@@ -44,7 +44,12 @@ export function fireOf(side) {
 }
 export const colFire = (side, i) => fireOf({ cols: [side.cols[i]], fav: [side.fav[i]] });
 export function newStack(player, enemy, rnd = Math.random, first = 'player', { rules = 'dot', hp = 50 } = {}) {
-  const mk = list => ({ cols: Array.from({ length: COLS }, () => []), glitch: list.slice(0, COLS), fav: Array.from({ length: COLS }, (_, i) => favourite(list[i])), hp, max: hp });
+  // one AI per side with three pipelines (Daniel, 17.11.2026: „nicht drei KIs gegeneinander, sondern jeweils eine, die wiederum 3 Pipelines
+  // hat“): a single Glitchling has one favourite bit for all its pipelines; a list (the first version) gives one per column
+  const mk = x => {
+    const one = !Array.isArray(x), list = one ? [x, x, x] : x;
+    return { ai: one ? x : null, cols: Array.from({ length: COLS }, () => []), glitch: list.slice(0, COLS), fav: Array.from({ length: COLS }, (_, i) => favourite(list[i])), hp, max: hp };
+  };
   return { sides: { player: mk(player), enemy: mk(enemy) }, turn: first, die: roll(rnd), log: [], winner: null, moves: 0, rules };
 }
 // what a bit heals in a column: bit × the equal bits already there (favourite: double)
@@ -119,4 +124,4 @@ export function play(duel, rnd = Math.random, noise = { player: 0.15, enemy: 0.1
   return { winner: duel.winner, moves: duel.moves, score: duel.log.at(-1)?.score };
 }
 // the AI's sharpness from the bits of its Glitchlings: more bits, less noise
-export const noiseOf = list => Math.max(0.02, 0.35 - (list.reduce((s, g) => s + (g?.bits || 1), 0) / Math.max(1, list.length)) * 0.06);
+export const noiseOf = x => { const list = Array.isArray(x) ? x : [x]; return Math.max(0.02, 0.35 - (list.reduce((s, g) => s + (g?.bits || 1), 0) / Math.max(1, list.length)) * 0.06); };

@@ -75,3 +75,12 @@ test('Dauerfeuer: Paare und Drillinge feuern jeden Zug, Lieblingsbit obendrauf, 
   let n = 0; for (let i = 0; i < 300; i++) { const r = play(newStack(g(i), g(i + 3))); assert.ok(r.winner); n += r.moves; }
   assert.ok(n / 600 > 6 && n / 600 < 16, `Züge je Seite ${n / 600}`);
 });
+
+// one AI per side with three pipelines (Daniel, 17.11.2026)
+test('Eine KI je Seite: drei Pipelines, ein Lieblingsbit für alle, KI-Schärfe aus ihren Bits', () => {
+  const d = newStack({ name: 'Amber Slay', bits: 4 }, { name: 'Moss Fang', bits: 1 });
+  assert.equal(d.sides.player.ai.name, 'Amber Slay');
+  assert.equal(new Set(d.sides.player.fav).size, 1);
+  assert.equal(d.sides.player.cols.length, 3);
+  assert.ok(play(d).winner);
+});
