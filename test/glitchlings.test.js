@@ -74,10 +74,44 @@ test('Geschenk: ein alter Spielstand bekommt einmal Amber Slay als Glitchling, e
   const s = repairSave(structuredClone(old), D), all = x => Object.values(x.inv.grids).flatMap(g => g.items).filter(e => e.id === 'glitchling');
   assert.equal(all(s).length, 1);
   assert.equal(all(s)[0].g.name, 'Amber Slay');
-  assert.ok(['backpack', 'camp'].some(k => s.inv.grids[k]?.items.includes(all(s)[0])), 'im Rucksack, sonst im Camp-Lager');
+  assert.ok(['deck', 'backpack', 'camp'].some(k => s.inv.grids[k]?.items.includes(all(s)[0])), 'im Cyberdeck, sonst Rucksack, sonst Camp-Lager');
   assert.equal(all(repairSave(structuredClone(s), D)).length, 1, 'nur einmal');
   assert.equal(all(repairSave(structuredClone(newSave(D)), D)).length, 0, 'ein neues Spiel startet ohne');
   const g = newGrid(6, 6), e = all(s)[0];
   addEntry(D, g, e); addEntry(D, g, { ...e, g: { ...e.g, name: 'Moss Fang' } });
   assert.deepEqual(g.items.map(x => x.g.name), ['Amber Slay', 'Moss Fang'], 'Glitchlings stapeln nie');
+});
+
+// #049 (Daniel, 17.11.2026): „KIs brauchen einen Hersteller“; „Man muss sie nicht im Inventar transportieren, wenn man ein Cyberdeck hat“
+import { brandOf } from '../game/glitchlings.js';
+import { deckSize, fitDeck, DECK } from '../game/save.js';
+test('Jeder Glitchling hat einen Hersteller (Unikate auch einen eigenen)', () => {
+  const list = generate(D, 11);
+  for (const g of list) assert.ok(D.brands[g.brand], `${g.name} ohne Hersteller`);
+  assert.equal(list.find(g => g.name === 'Marble Sting').brand, 'kessler');
+  assert.equal(brandOf(D, { talent: 'Koch' }), 'neon_nudel', 'alte Glitchlings (ohne brand) nach ihrer Begabung');
+});
+test('Cyberdeck = Fach für Glitchlings: Plätze je Deck, ohne Deck kein Fach, nichts geht verloren', () => {
+  assert.deepEqual(deckSize(D, 'bastlerdeck'), [2 * D.weapons.bastlerdeck.glitchSlots, 2]);
+  assert.equal(deckSize(D, 'rohrzange'), null);
+  const inv = { slots: { cyberdeck: 'bastlerdeck' }, grids: {} };
+  fitDeck(D, inv);
+  addEntry(D, inv.grids[DECK], { a: 'items', id: 'glitchling', n: 1, g: generate(D, 1)[0] });
+  inv.slots.cyberdeck = null;
+  const out = fitDeck(D, inv);
+  assert.equal(inv.grids[DECK], undefined);
+  assert.equal(out[0].g.name, 'Amber Slay');
+  // the gift goes into the deck when Leyla has one
+  const old = newSave(D); delete old.gifts; old.inv.slots.cyberdeck = 'bastlerdeck';
+  const s = repairSave(structuredClone(old), D);
+  assert.equal(s.inv.grids[DECK].items[0]?.g?.name, 'Amber Slay');
+});
+test('Alter Spielstand ohne Deck: bekommt einmal ein Bastler-Deck, Amber Slay zieht aus dem Rucksack ins Deck', () => {
+  const old = newSave(D); old.gifts = ['glitchling_048']; old.inv.slots.cyberdeck = null;
+  addEntry(D, old.inv.grids.camp, { a: 'items', id: 'glitchling', n: 1, g: generate(D, 1)[0] });
+  const s = repairSave(structuredClone(old), D);
+  assert.equal(s.inv.slots.cyberdeck, 'bastlerdeck');
+  assert.equal(s.inv.grids[DECK].items[0]?.g?.name, 'Amber Slay');
+  assert.ok(!s.inv.grids.camp.items.some(e => e.g), 'nicht mehr im Lager');
+  assert.equal(repairSave(structuredClone(s), D).inv.grids[DECK].items.length, 1);
 });

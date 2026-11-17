@@ -135,6 +135,16 @@ export function fitContainers(D, save) {
   if (lost.length) rehome(D, save, { w: 4, h: 3, items: lost });
   return lost.length;
 }
+// the cyberdeck is an inventory for Glitchlings (#049, Daniel 17.11.2026: „Man muss sie nicht im Inventar transportieren, wenn man ein
+// Cyberdeck hat (was im Grunde zunächst mal ein eigenes Inventar für Glitchlinge ist)“): one place = 2 × 2 (a Glitchling), side by side
+export const DECK = 'deck';
+export function deckSize(D, id) { const n = D.weapons?.[id]?.kind === 'cyberdeck' ? D.weapons[id].glitchSlots || 0 : 0; return n > 0 ? [2 * n, 2] : null; }
+// the deck grid for the deck Leyla holds (none without one); → what no longer fits
+export function fitDeck(D, inv) {
+  const size = deckSize(D, inv.slots?.cyberdeck);
+  if (size) return ensureGrid(D, inv, DECK, size);
+  const out = inv.grids[DECK]?.items || []; delete inv.grids[DECK]; return out;
+}
 export function backpackSize(D, inv) { return D.backpacks?.[inv.backpack]?.size || [4, 3]; }
 
 function newInventory(D, save) {
@@ -218,6 +228,7 @@ function withInventory(D, save) {
   homeless.push(...ensureGrid(D, inv, 'backpack', backpackSize(D, inv)));
   for (const c of conts) homeless.push(...ensureGrid(D, inv, c.key, c.size, c.cap));
   homeless.push(...ensureGrid(D, inv, 'drone', D.drone?.rescue?.size || [3, 2]));   // AvA's rescue pocket: survives a knock-out
+  homeless.push(...fitDeck(D, inv));   // the cyberdeck's Glitchlings (#049)
   if (loose.length) { const camp = inv.grids[CAMP]; for (const e of loose) { const left = camp ? addEntry(D, camp, e, e.n) : e.n; if (left > 0) homeless.push({ ...e, n: left }); } }
   // rectangles only (14.11.2026): what overlaps now moves to a free spot, else into the Camp-Lager / a bundle by the van
   for (const g of Object.values(inv.grids)) if (g?.items?.length) homeless.push(...untangle(D, g));
@@ -328,20 +339,34 @@ export function repairSave(save, D) {
   if (save.inv === undefined) delete s.inv;   // older savegame: inventory from the start values
   if (!save.tank) delete s.tank;   // older savegame: the tank starts full at today's clock
   ensureTankInRig(D, s);
-  return giftGlitchling(D, withInventory(D, s));
+  return giftDeck(D, giftGlitchling(D, withInventory(D, s)));
 }
 
 // Daniel, 17.11.2026: „Kannst du mir einen Glitchling ins Inventar legen?“ (#048): once per savegame, Amber Slay (his unique one, the
-// first of the Durchgang) as a Glitchling item into the backpack, if it is full into the Camp-Lager. Until catching comes (Stufe 1).
+// first of the Durchgang) as a Glitchling item into the cyberdeck (#049), else the backpack, else the Camp-Lager. Until catching comes (Stufe 1).
 export const GIFT_GLITCHLING = 'glitchling_048';
 // a new game starts without it (its Lager is tight); the gift is for savegames that were there before
-const noGift = s => { s.gifts = [GIFT_GLITCHLING]; return s; };
-export function giftGlitchling(D, s, where = ['backpack', 'camp']) {
+const noGift = s => { s.gifts = [GIFT_GLITCHLING, GIFT_DECK]; return s; };
+export function giftGlitchling(D, s, where = [DECK, 'backpack', 'camp']) {
   if (!D.items?.glitchling || !s.inv?.grids || (s.gifts || []).includes(GIFT_GLITCHLING)) return s;
   const g = generate(D, s.cycle || 1)[0];
   if (!g) return s;
   const left = where.reduce((n, k) => n && s.inv.grids[k] ? add(D, s.inv.grids[k], 'items', 'glitchling', 1, { g }) : n, 1);
   if (!left) s.gifts = [...(s.gifts || []), GIFT_GLITCHLING];
+  return s;
+}
+
+// #049: a savegame from before gets a Bastler-Deck in the empty cyberdeck slot once, and its Glitchlings move from backpack and
+// Camp-Lager into the deck (as far as there is room)
+export const GIFT_DECK = 'deck_049';
+export function giftDeck(D, s) {
+  if (!s.inv?.slots || (s.gifts || []).includes(GIFT_DECK)) return s;
+  const deck = D.game?.start?.deck || 'bastlerdeck';
+  if (!s.inv.slots.cyberdeck && deckSize(D, deck)) s.inv.slots.cyberdeck = deck;
+  fitDeck(D, s.inv);
+  const g = s.inv.grids[DECK];
+  if (g) for (const k of ['backpack', CAMP]) for (const e of [...(s.inv.grids[k]?.items || [])]) if (e.g && addEntry(D, g, e, e.n) === 0) remove(s.inv.grids[k], e);
+  s.gifts = [...(s.gifts || []), GIFT_DECK];
   return s;
 }
 

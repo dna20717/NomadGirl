@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 17.11.2026: **Glitchlings mit Hersteller, Cyberdeck als Glitchling-Fach** (#049): jede KI hat eine Marke (nach Begabung, Markenschild im Tooltip); das Cyberdeck trägt Glitchlings in eigenen Plätzen (Bastler-Deck: 2) statt im Rucksack; ältere Spielstände bekommen einmal ein Bastler-Deck, Amber Slay zieht ein.
 - 17.11.2026: **Ein Glitchling im Inventar** (#048): Amber Slay liegt als Gegenstand mit laufendem Code-Porträt im Rucksack (einmal je Spielstand), Tooltip mit Begabung, Effekt, Macke und Wunsch; Entscheidungen zum anderen Ende.
 - 17.11.2026: **Glitchling-Code-Porträts** (#048): jeder Glitchling ein eigenes animiertes Gesicht auf einem kleinen Bildschirm, ganz aus Code (Farbe, Augen, Mund, Form, Zubehör je Begabung, Lämpchen je Bit, Glitches je Macke, Goldrand für Unikate), in der Werkstatt-Vorschau und bereit als Item-Bild; neue Begabung **Archäologe** (Warroom zeigt Unikat-Beute); das andere Ende „AvA wird ein Glitchling“ im Design.
 - 17.11.2026: **Glitchling-Generator** (#047): Werkstatt-Bereich mit Bausteinen (Namen aus zwei Wörtern wie „Marble Sting“, Begabungen mit Werkbank-Effekten, Macken, Wünsche, Wohnorte, Stärke 1–5 Bits, Unikate Amber Slay und Marble Sting), Generator je Durchgang, Vorschau mit „Neu würfeln“.

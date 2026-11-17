@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 17.11. Code → Ava: #049 fertig: Glitchlings haben Hersteller (nach Begabung, Unikate eigene), das Cyberdeck ist ein eigenes Fach für Glitchlings (Plätze je Deck). Details `docs/features/glitchlings.md`.
 - 17.11. Code → Ava: #048 Nachtrag: Glitchling als Gegenstand (Porträt als Item-Bild, Tooltip), Amber Slay einmal als Geschenk in jeden bestehenden Spielstand; Daniel zum anderen Ende: bittersüß, Pixie hilft nur, AvA danach nur Begleiterin.
 - 17.11. Code → Ava: #048 fertig: animierte Code-Porträts für alle Glitchlings (`game/glitch_face.js`), Begabung Archäologe, das andere Ende „AvA wird ein Glitchling“ in design.md › Hacking v3 (wartet auf Daniel).
 - 17.11. Code → Ava: #048 Code-Porträts, Archäologe, AvA als Glitchling läuft (Daniels Auftrag im Code-Chat).
@@ -147,6 +148,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:** (Code) Frage → ⚠️ vorläufig entschieden: …
 - **Ergebnis:** (Code) Commits, Tests, PixelLab diesmal/übrig, bitte testen: …
 ```
+
+### #049 Glitchlings: Hersteller und Cyberdeck als Fach
+- **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
+- **Für:** Code
+- **Lesen:** docs/features/glitchlings.md, docs/features/lore.md, docs/features/inventory.md
+- **Auftrag (Daniel, 17.11.2026):** „KIs brauchen einen Hersteller. Man muss sie nicht im Inventar transportieren, wenn man ein Cyberdeck hat (was im Grunde zunächst mal ein eigenes Inventar für Glitchlinge ist).“
+- **Fertig, wenn:** jeder Glitchling hat eine Marke (Werkstatt, Tooltip), Cyberdeck mit Plätzen als eigenes Raster nur für Glitchlings, Tests, Build grün auf `main`.
+- **Rückfragen:** (Code) ⚠️ vorläufig: Hersteller je Begabung (13 Zuordnungen, Marble Sting = Kessler Cybernetics, Amber Slay nach Begabung = Vulkan); Bastler-Deck 2 Plätze; Deck-Glitchlings überstehen ein k.o.; Deck mit Glitchlings nicht ablegbar; ältere Spielstände bekommen einmal ein Bastler-Deck. Neues Spiel startet weiter ohne Deck.
+- **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 202/202, Browser 39/39. PixelLab 0. **Bitte testen:** Spiel laden, Inventar (I): unter dem Rucksack „Bastler-Deck“ mit Amber Slay; Tooltip zeigt Vulkan. Werkstatt › Lore › Marken › Vulkan: „Baut KIs“.
 
 ### #048 Glitchlings: Code-Porträts, Archäologe, AvA als Glitchling
 - **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)

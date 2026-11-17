@@ -5,7 +5,7 @@ import { ROOM_TAGS } from '../../engine/project.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
 import { parseRoom } from '../../engine/room.js';
 import { generateMap, neighbours } from '../worldmap.js';
-import { generate } from '../glitchlings.js';
+import { generate, brandOf } from '../glitchlings.js';
 import { faceCanvas } from '../glitch_face.js';
 import { drawMap } from '../map_render.js';
 
@@ -169,7 +169,7 @@ export const SUMMARY = {
       box.replaceChildren(...list.map(g => el('div', { style: 'border:1px solid var(--ui-line,#333);border-radius:8px;padding:8px 10px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:start' + (g.unique ? ';border-color:#ffd27a' : '') },
         el('div', { style: 'grid-row:span 5' }, faceCanvas(g, 120)),
         el('div', { style: 'display:flex;justify-content:space-between;gap:8px' }, el('b', { style: 'font:22px/1 VT323,monospace;letter-spacing:.03em' }, g.name), el('span', { title: `${g.bits} Bits`, style: 'color:#20d6c7;letter-spacing:2px' }, '▮'.repeat(g.bits) + '▯'.repeat(5 - g.bits))),
-        el('small', {}, `${g.talent}${g.unique ? ' · Unikat' : ''} · wohnt in: ${g.home}`), el('span', {}, g.effect), el('small', { style: 'opacity:.75' }, `Macke: ${g.quirk}`), el('small', { style: 'opacity:.6;font-style:italic' }, `„${g.wish}“`))));
+        el('small', {}, `${g.talent}${g.unique ? ' · Unikat' : ''} · `, (b => b ? el('b', { style: `color:${b.color || 'inherit'}` }, b.name) : 'ohne Hersteller')(D.brands?.[brandOf(D, g)]), ` · wohnt in: ${g.home}`), el('span', {}, g.effect), el('small', { style: 'opacity:.75' }, `Macke: ${g.quirk}`), el('small', { style: 'opacity:.6;font-style:italic' }, `„${g.wish}“`))));
       const by = {}; for (const g of list) by[g.bits] = (by[g.bits] || 0) + 1;
       info.textContent = `Seed ${seed} · ${list.length} Glitchlings · Stärke ${[1, 2, 3, 4, 5].map(b => `${b} Bit: ${by[b] || 0}`).join(', ')}`;
     };
@@ -185,9 +185,11 @@ export const SUMMARY = {
     const logo = L?.file && i != null && i < c * r ? el('span', { style: `display:inline-block;width:72px;height:72px;image-rendering:pixelated;background:url("${new URL(L.file, base).href}");background-size:${c * 100}% ${r * 100}%;background-position:${pos(i % c, c)}% ${pos(Math.floor(i / c), r)}%` }) : el('span', { class: 'ed-small' }, 'kein Logo');
     const made = [...Object.values(D.weapons || {}), ...Object.values(D.items || {})].filter(t => t.brand === id).map(t => t.name);
     const kids = Object.entries(D.brands || {}).filter(([, b]) => b.parent === id).map(([, b]) => b.name);
+    const ais = [...(D.glitchlings?.talents || []).filter(t => t.brand === id).map(t => t.name), ...(D.glitchlings?.unique || []).filter(u => u.brand === id).map(u => u.name)];
     return { title: 'Markenschild', body: el('div', {},
       el('div', { style: 'display:flex;gap:14px;align-items:center' }, logo, el('div', {}, el('b', { style: `font:26px/1 VT323,monospace;color:${x.color || '#ffd27a'};text-transform:uppercase` }, x.name || id), x.slogan ? el('div', { style: 'font-style:italic;opacity:.8' }, `„${x.slogan}“`) : null)),
       el('p', { class: 'ed-small' }, made.length ? `Stellt her (${made.length}): ${made.join(', ')}` : 'Stellt (noch) nichts her, was Leyla findet.'),
+      ais.length ? el('p', { class: 'ed-small' }, `Baut KIs (Glitchlings): ${ais.join(', ')}`) : null,
       kids.length ? el('p', { class: 'ed-small' }, `Töchter: ${kids.join(', ')}`) : null) };
   },
   // the travel map (#007): one rolled map with the current values, „Neu würfeln“ rolls another (the game rolls one per Durchgang)

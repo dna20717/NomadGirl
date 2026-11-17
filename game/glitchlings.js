@@ -6,7 +6,8 @@
 // workbench they shine in and the effect per bit, quirks, wishes, the machines they live in, how often each strength (1–5 bits) comes,
 // and hand-made unique ones (always in every Durchgang). One seed = one set (a Durchgang rolls its own).
 //
-//   glitchling = { id, name, unique, talent, function, also, bits, effect, stat, value, quirk, quirkKind, wish, home, description }
+//   glitchling = { id, name, unique, talent, function, also, brand, bits, effect, stat, value, quirk, quirkKind, wish, home, description }
+// brand (#049, Daniel 17.11.2026: „KIs brauchen einen Hersteller“): who builds this kind of AI (Begabung › Hersteller), a unique one may have its own
 import { rng } from './worldmap.js';
 
 const words = s => String(s || '').split(/[,|]/).map(x => x.trim()).filter(Boolean);
@@ -29,11 +30,14 @@ export function effectOf(C, talent, bits, own = true) {
 }
 const make = (C, o) => {
   const t = C.talents.find(x => x.name === o.talent) || C.talents[0] || {}, e = effectOf(C, t, o.bits);
-  return { id: slug(o.name), name: o.name, unique: !!o.unique, talent: t.name || '', function: t.function || null, also: t.also || null, bits: o.bits,
+  return { id: slug(o.name), name: o.name, unique: !!o.unique, talent: t.name || '', function: t.function || null, also: t.also || null, brand: o.brand || t.brand || null, bits: o.bits,
     effect: e.text, stat: e.stat, value: e.value, quirk: o.quirk || '', quirkKind: o.quirkKind || null, wish: o.wish || '', home: o.home || '', description: o.description || '' };
 };
 
 // the Glitchlings of one Durchgang: the unique ones marked „immer“ first, the rest rolled; no name and no name word twice
+// the maker of a Glitchling (older ones, e.g. a gift from before #049, by their talent)
+export function brandOf(D, g) { return g?.brand || config(D).talents.find(t => t.name === g?.talent)?.brand || null; }
+
 export function generate(D, seed = 1, count = null) {
   const C = config(D), r = rng(seed), n = count ?? C.count, out = [], usedA = new Set(), usedB = new Set(), usedQ = new Set(), usedW = new Set();
   for (const u of C.unique) if (u.always && out.length < n) {

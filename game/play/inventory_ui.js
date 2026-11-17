@@ -3,7 +3,9 @@
 // Mouse: click picks a thing up (it follows the pointer), click on a cell puts it down (stacks or swaps), right click turns it,
 // double click moves it to the other side, a click outside the panels puts it back. Placeholders until things have a look:
 // coloured cells by category with a short glyph, the name and the count.
+import { DECK, deckSize, fitDeck } from '../save.js';
 import { faceCanvas, SIZE } from '../glitch_face.js';
+import { brandOf as glitchBrand } from '../glitchlings.js';
 import { achievementOf, displayed, bonusText } from '../achievements.js';
 import { modsText, weaponStats, PART_SLOTS, CHIP_STATS } from '../stations.js';
 import { qualityBonus } from '../crafting.js';
@@ -107,6 +109,8 @@ export class InventoryUI {
   // what a grid takes (treasury: only valuables on the pile, only things tagged "trophy" on the stands)
   acceptOf(key) { return key === this.other?.key ? this.other.accept : this.other?.extra?.find(x => x.key === key)?.accept; }
   allows(key, e, say = true) {
+    // the cyberdeck carries only Glitchlings (#049)
+    if (key === DECK) { const ok = kindOf(this.D, e.a, e.id) === 'glitchling'; if (!ok && say) this.host.notify?.('Ins Cyberdeck passen nur Glitchlings'); return ok; }
     const A = this.acceptOf(key);
     if (!A) return true;
     const t = thing(this.D, e.a, e.id) || {}, ok = (!A.categories?.length || A.categories.includes(kindOf(this.D, e.a, e.id))) && (!A.tag || (t.tags || []).includes(A.tag));
@@ -155,7 +159,13 @@ export class InventoryUI {
     const D = this.D, inv = this.inv, bp = D.backpacks?.[inv.backpack];
     return el('section', { class: 'inv-panel bag' },
       el('header', {}, icon('bags', 16), el('b', {}, bp?.name || 'Rucksack'), el('small', {}, `${worth(D, inv.grids.backpack)} Δ`)),
-      this.gridEl('backpack', inv.grids.backpack));
+      this.gridEl('backpack', inv.grids.backpack), this.deckEl());
+  }
+  // the cyberdeck's places for Glitchlings (#049), under the backpack while Leyla holds a deck
+  deckEl() {
+    const D = this.D, g = this.inv.grids[DECK], deck = D.weapons?.[this.inv.slots?.cyberdeck];
+    if (!g || !deck) return null;
+    return el('div', { class: 'inv-deck' }, el('div', { class: 'inv-sub cyan' }, icon('brain', 14), deck.name, el('small', {}, `${g.items.length}/${g.w / 2} Glitchlings`)), this.gridEl(DECK, g));
   }
   // the shoulder button that pages (controller only, keyGlyph shows L1 / R1 or LB / RB)
   pageKey(i) { return this.padOn && padInUse() ? [keyGlyph('tabs')[i]].filter(Boolean) : []; }
@@ -435,7 +445,7 @@ export class InventoryUI {
       el('small', {}, live ? 'Bonus aktiv: steht in der Schatzkammer' : 'Auf einen Trophäen-Ständer in der Schatzkammer stellen, dann wirkt der Bonus')) : null;
     const gl = e.g ? el('div', { class: 'inv-glitch' }, faceCanvas(e.g, SIZE * 2), el('div', {}, el('small', {}, `${e.g.talent}${e.g.unique ? ' · Unikat' : ''} · ${'▮'.repeat(e.g.bits)}${'▯'.repeat(5 - e.g.bits)}`),
       el('ul', { class: 'inv-perks' }, el('li', { class: 'perk' }, '▲ ' + e.g.effect), el('li', { class: 'flaw' }, '▼ ' + e.g.quirk)), e.g.wish ? el('small', { class: 'inv-wish' }, `„${e.g.wish}“`) : null)) : null;
-    this.tip.replaceChildren(...[brandPlate(D, t), el('b', {}, e.g?.name || t.name || e.id), gl, el('small', {}, facts.join(' · ')), trophy,
+    this.tip.replaceChildren(...[brandPlate(D, e.g ? { brand: glitchBrand(D, e.g) } : t), el('b', {}, e.g?.name || t.name || e.id), gl, el('small', {}, facts.join(' · ')), trophy,
       parts.length ? el('ul', { class: 'inv-perks' }, ...parts.map(x => el('li', { class: x.good ? 'perk' : 'flaw' }, (x.good ? '▲ ' : '▼ ') + x.text))) : null,
       e.q ? el('small', { class: 'inv-quality q' + e.q }, `Qualität: ${e.q === 2 ? 'perfekt' : 'gut'}${t.buff ? ` · Buff +${qualityBonus(D, e.q)} %` : ''}`) : null,
       e.a === 'weapons' && e.mods ? el('div', { class: 'inv-mods' }, el('small', {}, 'Eigenbau: ' + (modsText(e.mods) || 'Grundwerte')),
@@ -462,6 +472,8 @@ export class InventoryUI {
     if (to && this.grid(to) && this.allows(to, e, false) && this.hasRoom(to, e))
       out.push({ id: 'send', k: 'send', label: to === 'drone' ? 'Drohne geben' : key === 'drone' ? 'In den Rucksack' : to === 'backpack' ? 'In den Rucksack' : `Rüber: ${this.other?.title || 'Kiste'}` });
     if (to !== 'drone' && key !== 'drone' && this.inv.grids.drone && this.hasRoom('drone', e)) out.push({ id: 'drone', k: null, label: 'Drohne geben' });
+    if (e.g && key !== DECK && this.inv.grids[DECK] && this.hasRoom(DECK, e)) out.unshift({ id: 'deck', k: null, label: 'Ins Cyberdeck' });   // #049
+    if (key === DECK && this.inv.grids.backpack && this.hasRoom('backpack', e)) out.unshift({ id: 'bag', k: null, label: 'In den Rucksack' });
     if (this.host.canThrow?.()) out.push({ id: 'throw', k: 'send', hold: true, label: 'Wegwerfen' });
     if (canTurn(D, e.a, e.id)) out.push({ id: 'turn', k: out.some(x => x.k === 'context') ? null : 'context', label: 'Drehen' });
     // the first action without a key goes on X / R held (Ausrüsten next to Essen, Drohne geben next to a chest …)
@@ -491,6 +503,7 @@ export class InventoryUI {
     if (id === 'learn') { if (this.host.learn?.(g, e)) this.changed(key); return; }
     if (id === 'equip') return this.equipFrom(key, g, e);
     if (id === 'send') return this.quickMove(key, e);
+    if (id === 'deck' || id === 'bag') { const to = id === 'deck' ? DECK : 'backpack'; if (addEntry(this.D, this.inv.grids[to], e, e.n) === 0) { remove(g, e); this.changed(to); } return; }
     if (id === 'drone') { const left = addEntry(this.D, this.inv.grids.drone, e, e.n); if (left === e.n) return this.host.notify?.('AvA hat keinen Platz'); if (left === 0) remove(g, e); else e.n = left; this.changed('drone'); return this.moodAfter('drone', e); }
     if (id === 'throw') { this.pick(key, g, e); this.throwDown(); return this.draw(); }
     if (id === 'turn') return this.turnInPlace(g, e);
@@ -795,7 +808,9 @@ export class InventoryUI {
     }
     const id = inv.slots[slot];
     if (!id) return;
+    if (slot === 'cyberdeck' && inv.grids[DECK]?.items.length) return this.host.notify?.('Erst die Glitchlings aus dem Cyberdeck nehmen');   // #049
     inv.slots[slot] = null;
+    if (slot === 'cyberdeck') fitDeck(this.D, inv);
     const mods = inv.slotMods?.[slot]; if (inv.slotMods) delete inv.slotMods[slot];   // a weapon copy keeps its own values (#013)
     this.held = { e: { a: 'weapons', id, n: 1, r: 0, ...(mods ? { mods } : {}) }, from: slot };
     this.host.equipChanged?.(slot);
@@ -816,8 +831,13 @@ export class InventoryUI {
       return true;
     }
     if (e.a !== 'weapons' || (D.weapons?.[e.id]?.kind || 'melee') !== slot) return say(`Hier gehört eine ${SLOT_NAMES[slot]}-Waffe hin`);
+    if (slot === 'cyberdeck' && inv.grids[DECK]?.items.length) {   // #049: the Glitchlings move into the new deck, or it stays
+      const size = deckSize(D, e.id), test = size && newGrid(...size);
+      if (!test || inv.grids[DECK].items.some(x => addEntry(D, test, x, x.n) > 0)) return say('Die Glitchlings passen nicht in dieses Deck');
+    }
     const prev = inv.slots[slot], prevMods = inv.slotMods?.[slot];
     inv.slots[slot] = e.id;
+    if (slot === 'cyberdeck') { const lost = fitDeck(D, inv); for (const x of lost) addEntry(D, inv.grids[DECK], x, x.n); }
     inv.slotMods ??= {}; if (e.mods) inv.slotMods[slot] = { ...e.mods }; else delete inv.slotMods[slot];
     this.held = prev ? { e: { a: 'weapons', id: prev, n: 1, r: 0, ...(prevMods ? { mods: prevMods } : {}) }, from: slot } : null;
     this.host.equipChanged?.(slot);

@@ -618,6 +618,7 @@ export const AREAS = {
         text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar: 1–3 Zeichen oder ein Emoji' }), DESCRIPTION,
         ref('brand', 'Hersteller', 'brands', { hint: 'Daniel, 16.11.2026: „Alle Waffen im Spiel brauchen auch eine Brand“. Qualität der Marke wirkt auf den Schaden, Preis auf den Wert, „In der Beute“ auf die Häufigkeit' }),
         select('skin', 'Aussehen aus Code', [['', 'wie gemalt'], ['revolver', 'Revolver']], { hint: 'Nur Fernkampf, Test (Daniel, 12.11.2026): legt eine Waffe aus Code über die gemalte Pistole in den Posen mit ausgestreckten Armen. An der Brust bleibt vorerst die gemalte' })] },
+      { title: 'Glitchlings', when: x => x.kind === 'cyberdeck', fields: [num('glitchSlots', 'Plätze', { min: 0, max: 8, hint: 'Ein Cyberdeck ist ein eigenes Inventar für Glitchlings (#049, Daniel 17.11.2026): so viele trägt Leyla darin, ohne Platz im Rucksack' })] },
       { title: 'Werte', fields: [num('damage', 'Schaden', { min: 0 }), num('cooldown', 'Abklingzeit', { unit: 'ms', min: 0 }), num('range', 'Reichweite', { unit: 'px', min: 0 }),
         num('knockback', 'Rückstoß', { unit: 'px/s', min: 0 }), num('critChance', 'Krit-Chance', { unit: '%', min: 0, max: 100 }), num('ammo', 'Munition', { min: 0, hint: 'Leer = unendlich' }),
         num('projectileSpeed', 'Geschosstempo', { unit: 'px/s', min: 0, hint: 'Nur Fernkampf: so schnell fliegt das Geschoss' }), ref('sound', 'Schuss-Ton', 'assets', { hint: 'Asset der Art Ton' }),
@@ -1467,17 +1468,18 @@ export const AREAS = {
         num('off', 'Fremde Werkbank', { unit: '%', min: 0, max: 100, hint: 'In einer Werkbank, die nicht zu seiner Begabung passt, wirkt ein Glitchling nur so stark' })] },
       { title: 'Namen', fields: [area_('names.first', 'Erstes Wort', { hint: 'Material, Farbe, Stoff (Marble, Amber, Velvet …), mit Komma getrennt. Name = erstes + zweites Wort, jedes Wort je Durchgang nur einmal' }),
         area_('names.second', 'Zweites Wort', { hint: 'Kante, Geräusch, Tat (Sting, Slay, Hex …)' })] },
-      { title: 'Begabungen', wide: true, fields: [table('talents', 'Begabungen', [text('name', 'Name'), select('function', 'Werkbank', WORKSHOP_FUNCTIONS), select('also', 'Auch', WORKSHOP_FUNCTIONS), text('effect', 'Effekt'), num('perBit', 'Je Bit', { min: 0 }), text('stat', 'Wert')],
-        { hint: 'Effekt mit {n} = „Je Bit“ × Stärke. In „Werkbank“ und „Auch“ wirkt er voll. „Wert“ ist der Schlüssel, den das Spiel später ausliest (perfect, refund, growth, power …). Je Bit 0 = wirkt ohne Stärke (Archäologe). Der Wert bestimmt auch, was das Code-Porträt trägt' })] },
+      { title: 'Begabungen', wide: true, fields: [table('talents', 'Begabungen', [text('name', 'Name'), select('function', 'Werkbank', WORKSHOP_FUNCTIONS), select('also', 'Auch', WORKSHOP_FUNCTIONS), ref('brand', 'Hersteller', 'brands'), text('effect', 'Effekt'), num('perBit', 'Je Bit', { min: 0 }), text('stat', 'Wert')],
+        { hint: 'Effekt mit {n} = „Je Bit“ × Stärke. In „Werkbank“ und „Auch“ wirkt er voll. „Wert“ ist der Schlüssel, den das Spiel später ausliest (perfect, refund, growth, power …). Je Bit 0 = wirkt ohne Stärke (Archäologe). Der Wert bestimmt auch, was das Code-Porträt trägt. Hersteller = wer diese Art KI baut (#049), Unikate können einen eigenen haben' })] },
       { title: 'Macken & Wünsche', wide: true, fields: [table('quirks', 'Macken', [text('text', 'Macke'), select('kind', 'Art', GLITCH_QUIRKS)], { hint: 'Jeder Glitchling hat eine; immer ein Haken mit Charme' }),
         table('wishes', 'Wünsche', [text('text', 'Wunsch')], { hint: 'Was er will, um freiwillig mitzukommen (Überreden, kommt mit Stufe 2)' }),
         area_('homes', 'Wohnorte', { hint: 'Maschinen, in denen Glitchlings in POIs wohnen, mit Komma getrennt' })] },
-      { title: 'Unikate', wide: true, fields: [table('unique', 'Unikate', [text('name', 'Name'), text('talent', 'Begabung'), num('bits', 'Bits', { min: 1, max: 5 }), text('quirk', 'Macke'), text('wish', 'Wunsch'), text('home', 'Wohnort'), bool('always', 'Immer'), text('description', 'Beschreibung')],
+      { title: 'Unikate', wide: true, fields: [table('unique', 'Unikate', [text('name', 'Name'), text('talent', 'Begabung'), ref('brand', 'Hersteller', 'brands'), num('bits', 'Bits', { min: 1, max: 5 }), text('quirk', 'Macke'), text('wish', 'Wunsch'), text('home', 'Wohnort'), bool('always', 'Immer'), text('description', 'Beschreibung')],
         { hint: 'Handgemachte Glitchlings (z. B. Amber Slay). „Immer“ = in jedem Durchgang dabei' })] },
     ],
     check: (x, report) => {
       const T = new Set((x.talents || []).map(t => t.name));
       for (const u of x.unique || []) { if (!T.has(u.talent)) report('warning', `Unikat ${u.name}: Begabung „${u.talent}“ gibt es nicht`); if (String(u.name || '').trim().split(/\s+/).length !== 2) report('hint', `Unikat ${u.name}: Namen haben zwei Wörter`); }
+      for (const t of x.talents || []) if (!t.brand) report('hint', `Begabung ${t.name}: kein Hersteller`);
       for (const t of x.talents || []) if (t.perBit && !String(t.effect || '').includes('{n}')) report('hint', `Begabung ${t.name}: Effekt ohne {n}, „Je Bit“ wirkt nicht`);
     },
   },

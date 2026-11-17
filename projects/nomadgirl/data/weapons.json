@@ -142,14 +142,15 @@
   "range": 400,
   "size": [2, 2],
   "value": 120,
-  "description": "Hacking kommt später. Bis dahin ein sehr teurer Briefbeschwerer.",
+  "description": "Trägt zwei Glitchlings, ohne Platz im Rucksack. Hacking kommt später.",
   "knockback": null,
   "glyph": "💾",
   "look": "icons_gear",
   "icon": 42,
   "salvageAt": "werkbank",
   "salvage": [{"item": "chip", "count": 1},{"item": "alte_platine", "count": 1},{"item": "wissen", "count": 1},{"item": "technik", "count": 1}],
-  "brand": "ghostwire"
+  "brand": "ghostwire",
+  "glitchSlots": 2
  },
  "karambit": {
   "name": "Karambit",

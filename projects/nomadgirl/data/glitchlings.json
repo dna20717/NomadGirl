@@ -6,22 +6,39 @@
   "second": "Sting, Slay, Hex, Bite, Lullaby, Whisper, Spark, Fang, Drift, Riot, Knot, Howl, Glare, Stitch, Rattle, Snare, Flicker, Thorn, Echo, Hymn, Rush, Grin, Hush, Snap, Waltz, Mutter, Claw, Psalm, Crash, Purr, Jinx, Halo"
  },
  "talents": [
-  {"name": "Koch", "function": "kitchen", "also": "foodtruck", "effect": "Gerichte gelingen um {n} % öfter perfekt", "perBit": 6, "stat": "perfect"},
-  {"name": "Schweißer", "function": "craft", "also": "vehicle", "effect": "{n} % Chance, dass Herstellen ein Teil zurückgibt", "perBit": 5, "stat": "refund"},
-  {"name": "Gärtner", "function": "garden", "also": "cistern", "effect": "Pflanzen und Wasser kommen {n} % schneller", "perBit": 8, "stat": "growth"},
-  {"name": "Ingenieur", "function": "power", "also": "engine", "effect": "+{n} ⚡ Strom", "perBit": 1, "stat": "power"},
-  {"name": "Chirurg", "function": "cyber", "also": "tank", "effect": "Implantate belasten {n} % weniger", "perBit": 8, "stat": "strain"},
-  {"name": "Navigator", "function": "warroom", "also": "jobs", "effect": "Reisen kosten {n} % weniger Sprit", "perBit": 6, "stat": "fuel"},
-  {"name": "Waffenmeister", "function": "armory", "also": "craft", "effect": "Eigenbau-Waffen +{n} % Schaden", "perBit": 4, "stat": "weaponDamage"},
-  {"name": "Drohnenflüsterer", "function": "drone", "also": "power", "effect": "AvAs Akku hält {n} % länger", "perBit": 7, "stat": "battery"},
-  {"name": "Gastgeber", "function": "chill", "also": "guests", "effect": "Ruhe-Buffs {n} % stärker", "perBit": 6, "stat": "rest"},
-  {"name": "Buchhalter", "function": "storage", "also": "treasury", "effect": "Beute ist {n} % mehr wert", "perBit": 4, "stat": "value"},
-  {"name": "Kühlwart", "function": "cooling", "also": "kitchen", "effect": "Gerichte halten {n} % länger (Buffs)", "perBit": 8, "stat": "freshness"},
-  {"name": "Schläfer", "function": "sleep", "also": "chill", "effect": "Schlafen heilt {n} % mehr", "perBit": 7, "stat": "sleepHeal"},
+  {"name": "Koch", "function": "kitchen", "also": "foodtruck", "brand": "neon_nudel", "effect": "Gerichte gelingen um {n} % öfter perfekt", "perBit": 6, "stat": "perfect"},
+  {
+   "name": "Schweißer",
+   "function": "craft",
+   "also": "vehicle",
+   "brand": "backalley_chrome",
+   "effect": "{n} % Chance, dass Herstellen ein Teil zurückgibt",
+   "perBit": 5,
+   "stat": "refund"
+  },
+  {
+   "name": "Gärtner",
+   "function": "garden",
+   "also": "cistern",
+   "brand": "kessler_kosmetik",
+   "effect": "Pflanzen und Wasser kommen {n} % schneller",
+   "perBit": 8,
+   "stat": "growth"
+  },
+  {"name": "Ingenieur", "function": "power", "also": "engine", "brand": "delta_petrol", "effect": "+{n} ⚡ Strom", "perBit": 1, "stat": "power"},
+  {"name": "Chirurg", "function": "cyber", "also": "tank", "brand": "kessler", "effect": "Implantate belasten {n} % weniger", "perBit": 8, "stat": "strain"},
+  {"name": "Navigator", "function": "warroom", "also": "jobs", "brand": "kilometerkoenig", "effect": "Reisen kosten {n} % weniger Sprit", "perBit": 6, "stat": "fuel"},
+  {"name": "Waffenmeister", "function": "armory", "also": "craft", "brand": "vulkan", "effect": "Eigenbau-Waffen +{n} % Schaden", "perBit": 4, "stat": "weaponDamage"},
+  {"name": "Drohnenflüsterer", "function": "drone", "also": "power", "brand": "ghostwire", "effect": "AvAs Akku hält {n} % länger", "perBit": 7, "stat": "battery"},
+  {"name": "Gastgeber", "function": "chill", "also": "guests", "brand": "motel_salzsee", "effect": "Ruhe-Buffs {n} % stärker", "perBit": 6, "stat": "rest"},
+  {"name": "Buchhalter", "function": "storage", "also": "treasury", "brand": "ordnungsamt", "effect": "Beute ist {n} % mehr wert", "perBit": 4, "stat": "value"},
+  {"name": "Kühlwart", "function": "cooling", "also": "kitchen", "brand": "atomcola", "effect": "Gerichte halten {n} % länger (Buffs)", "perBit": 8, "stat": "freshness"},
+  {"name": "Schläfer", "function": "sleep", "also": "chill", "brand": "neurolux", "effect": "Schlafen heilt {n} % mehr", "perBit": 7, "stat": "sleepHeal"},
   {
    "name": "Archäologe",
    "function": "warroom",
    "also": "treasury",
+   "brand": "kraehe",
    "effect": "Die Karte im Warroom zeigt die Fundorte aller einzigartigen Beutestücke",
    "perBit": 0,
    "stat": "archaeology"
@@ -83,7 +100,8 @@
    "wish": "Bring mich auf Ebene 40 zurück. Ich muss jemanden um Verzeihung bitten.",
    "home": "OP-Lampe einer verlassenen Klinik",
    "always": true,
-   "description": "Ein alter Chirurgie-Glitchling von Kessler. Präzise, kühl, und er weiß etwas über die Kinder in den Tanks."
+   "description": "Ein alter Chirurgie-Glitchling von Kessler. Präzise, kühl, und er weiß etwas über die Kinder in den Tanks.",
+   "brand": "kessler"
   }
  ],
  "bitWeights": [{"w": 40},{"w": 30},{"w": 18},{"w": 9},{"w": 3}]
