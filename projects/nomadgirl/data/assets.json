@@ -5595,5 +5595,33 @@
   "derivedFrom": "container_hd_open",
   "date": "16.11.2026",
   "description": "Original für container_tiles (#042); die KI-Hälfte liegt daneben als container_hd_closed_left.png"
+ },
+ "icons_nomadcola": {
+  "name": "Symbole: NomadCola",
+  "kind": "icons",
+  "file": "assets/items/nomadcola.png",
+  "cell": [64, 64],
+  "grid": [4, 4],
+  "description": "NomadCola-Produkte zum Wiederverwenden (Daniel, 17.11.2026: „Dinge erzeugen, die man wiederverwenden kann“): Flaschen, Dosen, Kronkorken, Kisten, Kühlbox, Automaten. Einzelbilder in assets/items/nomadcola/.",
+  "source": "KI (PixelLab, Create Image Pro 64 px, Stilbild = Logo-Raster, AAP-64, alle 16 Kandidaten)",
+  "date": "2026-11-17",
+  "names": [
+   "Flasche",
+   "Dose",
+   "Zerdrückte Dose",
+   "Kronkorken",
+   "Leere Kiste",
+   "Kiste mit Flaschen (Pappe)",
+   "Automat (Creme)",
+   "Flasche, offen",
+   "Zwei Flaschen",
+   "Kronkorken (Seite)",
+   "Sechserpack Dosen",
+   "Rostiger Automat",
+   "Flasche, liegend",
+   "Kiste mit Flaschen (Holz)",
+   "Kühlbox",
+   "Automat (Rot)"
+  ]
  }
 }

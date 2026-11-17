@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 17.11.2026: **NomadCola-Logo und -Produkte**: neues Logo mit lesbarem Schriftzug (PixelLab + Schrift von Hand), 16 Produkt-Symbole zum Wiederverwenden (Flaschen, Dosen, Kisten, Automaten).
 - 17.11.2026: **AtomCola heißt jetzt NomadCola** (Marke, Logo-Datei, Texte; alte Reisekarten werden beim Laden umbenannt).
 - 17.11.2026: **Glitch-Duell als Demo** (#050) unter /duel: Kern von OPR Firefight als Kartenspiel (Präzision, Abschirmung, Integrität, Impulse; Einflüstern, Verschränken, Kalibrieren; Selbsttest und Flackern), Code-Porträts als Karten, Würfel aus Code, KI für beide Seiten, Kammerjäger, 1000× simulieren.
 - 17.11.2026: **Glitchlings mit Hersteller, Cyberdeck als Glitchling-Fach** (#049): jede KI hat eine Marke (nach Begabung, Markenschild im Tooltip); das Cyberdeck trägt Glitchlings in eigenen Plätzen (Bastler-Deck: 2) statt im Rucksack; ältere Spielstände bekommen einmal ein Bastler-Deck, Amber Slay zieht ein.
