@@ -10,6 +10,7 @@
 
 import { keepThrough } from './achievements.js';
 import { ensureMap } from './worldmap.js';
+import { generate } from './glitchlings.js';
 import { settle as settleMega, fixLights as fixMegaLights, deactivate as deactivateMega } from './mega.js';
 import { compact as compactDecor } from './decor.js';
 import { rehome, removeUnits } from './reindex.js';
@@ -159,7 +160,7 @@ function newSaveCore(D, handed = []) {
   const S = D.game?.start || {}, C = D.camp?.clock || {};
   const { units, left } = placeWorkshops(D, S.tractor, S.containers || [], S.workshops || []);
   const spare = [...(S.spare || []), ...left].filter(id => D.workshops?.[id]);   // packed on the scrapyard: Spiel › Start › Verpackt auf dem Schrottplatz, plus what did not fit
-  return withInventory(D, ensureTankInRig(D, {
+  return noGift(withInventory(D, ensureTankInRig(D, {
     version: SAVE_VERSION,
     day: C.startDay ?? 1, hour: C.startHour ?? 18,
     location: S.location || Object.keys(D.locations || {})[0] || null,
@@ -172,7 +173,7 @@ function newSaveCore(D, handed = []) {
     run: null,
     log: [],
     handedOut: [...handed],
-  }));
+  })));
 }
 // a new Durchgang (design.md › Progression: „War alles nur ein Traum?“): AvA is dead, Leyla wakes up at the fire.
 // What stays: the tech tree nodes (and the recipes they unlock), the count of Durchgänge. Everything else starts small.
@@ -185,6 +186,7 @@ export function newCycle(D, old) {
   if (old.salvage) s.salvage = { built: old.salvage.built || {}, done: old.salvage.done || {}, seen: old.salvage.seen || {}, sites: {} };
   if (old.megarigs) s.megarigs = [...old.megarigs];
   if (old.look) s.look = { color: old.look.color ?? 0, unlocked: [...(old.look.unlocked || [])] };   // #044: the hair colour is Leyla's, not the dream's
+  if (old.gifts) s.gifts = [...old.gifts];   // a gift (#048) comes once per savegame, not per dream
   for (const [id, x] of Object.entries(D.salvage || {})) if (s.salvage?.done?.[id] && x.tractor && D.tractors?.[x.tractor]) swapTractor(D, s, x.tractor);
   s.dreams = [...(old.dreams || []), { day: old.day, hour: old.hour, rescues: old.tank?.rescues || 0, cause: old.tank?.cause || null }];
   for (const id of s.nodes) for (const r of D.techtree[id].recipes || []) if (!s.recipes.includes(r)) s.recipes.push(r);
@@ -293,7 +295,7 @@ function refit(D, s) {
 export function repairSave(save, D) {
   const fresh = newSave(D);
   if (!save || typeof save !== 'object' || save.version !== SAVE_VERSION) return fresh;
-  const s = { ...fresh, ...save };
+  const s = { ...fresh, ...save, gifts: save.gifts || [] };   // a savegame from before a gift gets it (#048)
   if (!D.locations?.[s.location] && !s.map?.nodes?.some(n => n.id === s.location)) s.location = fresh.location;
   ensureMap(D, s);   // older savegames get their map here (#007)
   // a tractor that no longer exists: only the tractor is replaced, the containers, workshops and storages stay (Aufräumen 16.11.)
@@ -326,7 +328,21 @@ export function repairSave(save, D) {
   if (save.inv === undefined) delete s.inv;   // older savegame: inventory from the start values
   if (!save.tank) delete s.tank;   // older savegame: the tank starts full at today's clock
   ensureTankInRig(D, s);
-  return withInventory(D, s);
+  return giftGlitchling(D, withInventory(D, s));
+}
+
+// Daniel, 17.11.2026: „Kannst du mir einen Glitchling ins Inventar legen?“ (#048): once per savegame, Amber Slay (his unique one, the
+// first of the Durchgang) as a Glitchling item into the backpack, if it is full into the Camp-Lager. Until catching comes (Stufe 1).
+export const GIFT_GLITCHLING = 'glitchling_048';
+// a new game starts without it (its Lager is tight); the gift is for savegames that were there before
+const noGift = s => { s.gifts = [GIFT_GLITCHLING]; return s; };
+export function giftGlitchling(D, s, where = ['backpack', 'camp']) {
+  if (!D.items?.glitchling || !s.inv?.grids || (s.gifts || []).includes(GIFT_GLITCHLING)) return s;
+  const g = generate(D, s.cycle || 1)[0];
+  if (!g) return s;
+  const left = where.reduce((n, k) => n && s.inv.grids[k] ? add(D, s.inv.grids[k], 'items', 'glitchling', 1, { g }) : n, 1);
+  if (!left) s.gifts = [...(s.gifts || []), GIFT_GLITCHLING];
+  return s;
 }
 
 // the clock: day + hour → "Tag 2 · 07:30"

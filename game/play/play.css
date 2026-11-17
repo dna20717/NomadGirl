@@ -826,6 +826,9 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .craft-recipe.made { opacity: .7; }
 .inv-trophy { margin: 6px 0; padding: 6px 8px; border-radius: 6px; border: 1px solid #5a4a2a; background: rgba(255, 210, 122, .06); }
 .inv-trophy.live { border-color: #c28d29; box-shadow: 0 0 12px rgba(255, 210, 122, .2); }
+.inv-glitch { display: flex; gap: 10px; align-items: center; margin: 6px 0; padding: 6px 8px; border-radius: 6px; border: 1px solid #1f6f6a; background: rgba(32, 214, 199, .06); }
+.inv-glitch canvas { flex: none; image-rendering: pixelated; }
+.inv-glitch .inv-wish { opacity: .7; font-style: italic; }
 .inv-trophy > small:first-child { color: #ffd27a; }
 /* Menü › Achievements (#012) */
 .ach-list { list-style: none; margin: 0; padding: 0 4px 0 0; flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 10px; align-content: start; }

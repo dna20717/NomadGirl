@@ -664,7 +664,7 @@ Daniel: „Man soll die Möglichkeit haben, AvA zu einem Glitchling zu machen (d
 
 **Der Weg (sehr schwer, über mehrere Träume):** ⚠️ vorläufig
 1. **Marble Sting gewinnen** (Unikat, Chirurg, weiß etwas über die Kinder in den Tanks): Er muss freiwillig mitkommen (überreden, nie fangen) und volles Vertrauen haben. Nur er kann einen Verstand übertragen. Sein Wunsch, Ebene 40, ist Teil des Wegs.
-2. **Pixies Wendepunkt:** Pixie ist aus demselben Labor ausgebüchst (docs/crew.md). Erst wenn Pixie Leyla die Wahrheit sagt, weiß Leyla, dass es geht. Pixie kann sich dagegen stellen: Es ist auch Pixies Geschichte.
+2. **Pixies Wendepunkt:** Pixie ist aus demselben Labor ausgebüchst (docs/crew.md). Erst wenn Pixie Leyla die Wahrheit sagt, weiß Leyla, dass es geht. Pixie hilft dann dabei (Daniel: hilft nur).
 3. **Ein Deck der höchsten Stufe** mit einem freien Platz für **6 Bits** (stärker als jeder Glitchling, den man fangen kann).
 4. **Der Kessler-Kern** von Ebene 40 (⚠️ ein Speicher von Kessler Cybernetics mit den Akten der Kinder in den Tanks, Doc Mirela kennt AvAs Akte): ein einziges Beutestück, das man nur mit dem Archäologen findet.
 5. **Der Augenblick:** Nur wenn der Tank **kritisch** ist (die letzte Rettung steht bevor), bietet der Tank die Wahl an. Wer zu gut wartet, sieht das Ende nie; wer zu schlecht wartet, verliert AvA ganz. Ein schmales Fenster.
@@ -676,7 +676,7 @@ Daniel: „Man soll die Möglichkeit haben, AvA zu einem Glitchling zu machen (d
 - Das Spiel läuft **offen** weiter, ohne Tank und ohne Uhr. Dafür fehlt die Rettung beim k.o.: AvA kann Leyla nicht mehr tragen, nur noch führen (k.o. = zurück ins Camp, Rucksack weg).
 - Gegenstück zum Heilmittel-Ende (AvA wird spielbar, mit Körper). Beide Enden schließen einander aus; ein Spielstand kennt nur eins.
 
-**Offen (für Daniel):** Ist das Glitchling-Ende traurig oder hell? Darf Pixie es verhindern? Bleibt AvA danach steuerbar (als Drohne) oder nur Companion?
+**Entschieden (Daniel, 17.11.2026):** Das Ende ist **bittersüß-traurig**. **Pixie hilft nur** und stellt sich nicht quer. AvA ist danach **nur Begleiterin** (für jetzt), nicht steuerbar.
 
 ### Ausbaustufen
 

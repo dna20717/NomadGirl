@@ -3,6 +3,7 @@
 // Mouse: click picks a thing up (it follows the pointer), click on a cell puts it down (stacks or swaps), right click turns it,
 // double click moves it to the other side, a click outside the panels puts it back. Placeholders until things have a look:
 // coloured cells by category with a short glyph, the name and the count.
+import { faceCanvas, SIZE } from '../glitch_face.js';
 import { achievementOf, displayed, bonusText } from '../achievements.js';
 import { modsText, weaponStats, PART_SLOTS, CHIP_STATS } from '../stations.js';
 import { qualityBonus } from '../crafting.js';
@@ -28,12 +29,12 @@ const brandLine = (D, t) => { const b = brandOf(D, t); return b?.quality ? `Qual
 
 export const CATEGORY_COLORS = {
   junk: '#6b6258', resource: '#5c6b7a', ingredient: '#6b7a3a', food: '#a8642a', component: '#4a6b8a', consumable: '#8a3a5a',
-  valuable: '#a8862a', blueprint: '#7a6a9a', armor: '#5a5a7a', implant: '#2f7f8a', dronepart: '#3a7a6a', progress: '#b0407a', melee: '#8a4a3a', ranged: '#3a6a7a', cyberdeck: '#3a8a6a', backpack: '#7a5a8a', rigpart: '#8a6a3a',
+  valuable: '#a8862a', blueprint: '#7a6a9a', armor: '#5a5a7a', implant: '#2f7f8a', dronepart: '#3a7a6a', progress: '#b0407a', melee: '#8a4a3a', ranged: '#3a6a7a', cyberdeck: '#3a8a6a', backpack: '#7a5a8a', rigpart: '#8a6a3a', glitchling: '#20a6a0',
 };
 const PART_ICONS = { engine: 'settings', armor: 'armor', weapon: 'target', roof: 'box' };
-const CATEGORY_NAMES = { junk: 'Schrott', resource: 'Ressource', ingredient: 'Zutat', food: 'Gericht', component: 'Bauteil', consumable: 'Verbrauchsgut', valuable: 'Wertsache', blueprint: 'Bauplan', armor: 'Rüstung', implant: 'Implantat', dronepart: 'Drohnenteil', progress: 'Fortschritt', melee: 'Nahkampf', ranged: 'Fernkampf', cyberdeck: 'Cyberdeck', backpack: 'Rucksack', rigpart: 'Rig-Teil' };
+const CATEGORY_NAMES = { junk: 'Schrott', resource: 'Ressource', ingredient: 'Zutat', food: 'Gericht', component: 'Bauteil', consumable: 'Verbrauchsgut', valuable: 'Wertsache', blueprint: 'Bauplan', armor: 'Rüstung', implant: 'Implantat', dronepart: 'Drohnenteil', progress: 'Fortschritt', melee: 'Nahkampf', ranged: 'Fernkampf', cyberdeck: 'Cyberdeck', backpack: 'Rucksack', rigpart: 'Rig-Teil', glitchling: 'Glitchling' };
 // the order of kinds in the Camp-Lager (filter chips, Sortieren)
-const KIND_ORDER = ['food', 'ingredient', 'consumable', 'resource', 'component', 'junk', 'weaponpart', 'melee', 'ranged', 'cyberdeck', 'armor', 'implant', 'dronepart', 'backpack', 'valuable', 'blueprint', 'progress', 'rigpart'];
+const KIND_ORDER = ['food', 'ingredient', 'consumable', 'resource', 'component', 'junk', 'weaponpart', 'melee', 'ranged', 'cyberdeck', 'armor', 'implant', 'dronepart', 'backpack', 'valuable', 'glitchling', 'blueprint', 'progress', 'rigpart'];
 const SLOT_NAMES = { melee: 'Nahkampf', ranged: 'Fernkampf', cyberdeck: 'Cyberdeck', backpack: 'Rucksack' };
 const SLOT_ICONS = { melee: 'weapon', ranged: 'target', cyberdeck: 'brain', backpack: 'bags' };
 // worn places (game/inventory.js WEAR_KEYS): Leyla's head + armor, implants in her body, AvA's parts
@@ -338,10 +339,12 @@ export class InventoryUI {
     // the picture fills the box in its own shape (square icons a square, wide ones as wide as the thing), turned with it
     const [lx, ly] = cells[0], k = iconCell(D, t), odd = (e.r || 0) % 2 === 1, W = b.w * c, H = b.h * c;
     const [uw, uh] = odd ? [H, W] : [W, H], sz = k ? Math.min(uw / k.aspect, uh) : 0, aw = sz * (k?.aspect || 1) * 0.92, ah = sz * 0.92;
-    const art = k && artOf(D, e.a, e.id, aw, e.r || 0, ah);
-    if (art) { wrap.classList.add('pic'); wrap.append(el('span', { class: 'inv-pic', style: `left:${(W - aw) / 2}px;top:${(H - ah) / 2}px;width:${aw}px;height:${ah}px` }, art)); }
+    // a Glitchling (#048): its code portrait, moving (it is the item picture)
+    if (e.g) { const s = Math.floor(Math.min(W, H) * 0.92 / SIZE) * SIZE || Math.min(W, H); wrap.classList.add('pic'); wrap.append(el('span', { class: 'inv-pic', style: `left:${(W - s) / 2}px;top:${(H - s) / 2}px;width:${s}px;height:${s}px` }, faceCanvas(e.g, s))); }
+    const art = !e.g && k && artOf(D, e.a, e.id, aw, e.r || 0, ah);
+    if (e.g) { /* portrait above */ } else if (art) { wrap.classList.add('pic'); wrap.append(el('span', { class: 'inv-pic', style: `left:${(W - aw) / 2}px;top:${(H - ah) / 2}px;width:${aw}px;height:${ah}px` }, art)); }
     else wrap.append(el('span', { class: 'inv-glyph', style: `left:${lx * c}px;top:${ly * c}px;width:${c}px;height:${c}px` }, glyphOf(D, e.a, e.id)));
-    if (!art && (b.w * c >= 80 || b.h > 1)) wrap.append(el('span', { class: 'inv-name' }, t.name || e.id));
+    if (!art && !e.g && (b.w * c >= 80 || b.h > 1)) wrap.append(el('span', { class: 'inv-name' }, t.name || e.id));
     if (e.n > 1) wrap.append(el('span', { class: 'inv-count' }, String(e.n)));
     if (e.q || e.mods) wrap.append(el('span', { class: 'inv-badge' + (e.q ? ' q' + e.q : ' mod') }, e.mods ? '⚙' : e.q === 2 ? '★★' : '★'));   // good dish / own weapon (#013)
     wrap.addEventListener('mousedown', ev => {
@@ -430,7 +433,9 @@ export class InventoryUI {
     const trophy = aid ? el('div', { class: 'inv-trophy' + (live ? ' live' : '') }, el('small', {}, `Achievement: ${D.achievements[aid].name}`),
       el('ul', { class: 'inv-perks' }, ...bonusText(D, D.achievements[aid], GEAR_STATS).map(x => el('li', { class: 'perk' }, '▲ ' + x))),
       el('small', {}, live ? 'Bonus aktiv: steht in der Schatzkammer' : 'Auf einen Trophäen-Ständer in der Schatzkammer stellen, dann wirkt der Bonus')) : null;
-    this.tip.replaceChildren(...[brandPlate(D, t), el('b', {}, t.name || e.id), el('small', {}, facts.join(' · ')), trophy,
+    const gl = e.g ? el('div', { class: 'inv-glitch' }, faceCanvas(e.g, SIZE * 2), el('div', {}, el('small', {}, `${e.g.talent}${e.g.unique ? ' · Unikat' : ''} · ${'▮'.repeat(e.g.bits)}${'▯'.repeat(5 - e.g.bits)}`),
+      el('ul', { class: 'inv-perks' }, el('li', { class: 'perk' }, '▲ ' + e.g.effect), el('li', { class: 'flaw' }, '▼ ' + e.g.quirk)), e.g.wish ? el('small', { class: 'inv-wish' }, `„${e.g.wish}“`) : null)) : null;
+    this.tip.replaceChildren(...[brandPlate(D, t), el('b', {}, e.g?.name || t.name || e.id), gl, el('small', {}, facts.join(' · ')), trophy,
       parts.length ? el('ul', { class: 'inv-perks' }, ...parts.map(x => el('li', { class: x.good ? 'perk' : 'flaw' }, (x.good ? '▲ ' : '▼ ') + x.text))) : null,
       e.q ? el('small', { class: 'inv-quality q' + e.q }, `Qualität: ${e.q === 2 ? 'perfekt' : 'gut'}${t.buff ? ` · Buff +${qualityBonus(D, e.q)} %` : ''}`) : null,
       e.a === 'weapons' && e.mods ? el('div', { class: 'inv-mods' }, el('small', {}, 'Eigenbau: ' + (modsText(e.mods) || 'Grundwerte')),

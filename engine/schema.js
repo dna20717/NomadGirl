@@ -66,7 +66,7 @@ export const BRAND_SECTORS = [['cyber', 'Cyberware'], ['military', 'Militär'], 
 export const BRAND_TIERS = [['cheap', 'Billig'], ['mid', 'Mittel'], ['premium', 'Premium'], ['elite', 'Elite']];
 export const BRAND_STATUS = [['active', 'aktiv'], ['bankrupt', 'pleite'], ['ruin', 'Ruine'], ['underground', 'Untergrund']];
 export const BRAND_STREET = [['hated', 'verhasst'], ['feared', 'gefürchtet'], ['neutral', 'egal'], ['liked', 'beliebt'], ['cult', 'Kult']];
-export const ITEM_CATEGORIES = [['junk', 'Schrott'], ['resource', 'Ressource'], ['ingredient', 'Zutat'], ['food', 'Gericht'], ['component', 'Bauteil'], ['consumable', 'Verbrauchsgut'], ['valuable', 'Wertsache'], ['blueprint', 'Bauplan/Rezept'], ['armor', 'Rüstung'], ['implant', 'Implantat'], ['dronepart', 'Drohnenteil'], ['progress', 'Fortschritt'], ['weaponpart', 'Waffenteil']];
+export const ITEM_CATEGORIES = [['junk', 'Schrott'], ['resource', 'Ressource'], ['ingredient', 'Zutat'], ['food', 'Gericht'], ['component', 'Bauteil'], ['consumable', 'Verbrauchsgut'], ['valuable', 'Wertsache'], ['blueprint', 'Bauplan/Rezept'], ['armor', 'Rüstung'], ['implant', 'Implantat'], ['dronepart', 'Drohnenteil'], ['progress', 'Fortschritt'], ['weaponpart', 'Waffenteil'], ['glitchling', 'Glitchling']];
 // where a thing is worn (Daniel, 10.11.2026: Inventar im Diablo-Stil): Leyla's head + armor, implants in her body, parts on AvA
 export const WEAR_SLOTS = [['head', 'Kopf'], ['armor', 'Rüstung'], ['eyes', 'Implantat: Augen'], ['nerves', 'Implantat: Nerven'], ['arm', 'Implantat: Cyberarm'], ['heart', 'Implantat: Herz'], ['legs', 'Implantat: Beine'], ['skin', 'Implantat: Haut'],
   ['bow', 'Drohne: Bug'], ['tail', 'Drohne: Heck'], ['core', 'Drohne: Kern'], ['module', 'Drohne: Modul']];

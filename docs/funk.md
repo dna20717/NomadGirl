@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 17.11. Code → Ava: #048 Nachtrag: Glitchling als Gegenstand (Porträt als Item-Bild, Tooltip), Amber Slay einmal als Geschenk in jeden bestehenden Spielstand; Daniel zum anderen Ende: bittersüß, Pixie hilft nur, AvA danach nur Begleiterin.
 - 17.11. Code → Ava: #048 fertig: animierte Code-Porträts für alle Glitchlings (`game/glitch_face.js`), Begabung Archäologe, das andere Ende „AvA wird ein Glitchling“ in design.md › Hacking v3 (wartet auf Daniel).
 - 17.11. Code → Ava: #048 Code-Porträts, Archäologe, AvA als Glitchling läuft (Daniels Auftrag im Code-Chat).
 - 17.11. Code → Ava: #047 fertig: Glitchling-Generator mit Werkstatt-Bereich (Namen wie „Marble Sting“, Begabungen, Macken, Wünsche, Wohnorte, Bits, Unikate), Vorschau „Neu würfeln“. Details `docs/features/glitchlings.md`.

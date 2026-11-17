@@ -5,6 +5,7 @@
 // grid  = { w, h, items: [entry] }
 // entry = { a, id, n, x, y, r, q?, mods? }   a = area of the thing ('items' | 'weapons' | 'backpacks'), n = count, x/y = top left cell, r = quarter turns (0–3)
 //         q = quality of a dish or thing (#013: 1 gut, 2 perfekt; only the same quality stacks), mods = values of one weapon copy (#013)
+//         g = the Glitchling in a Glitchling item (#048: game/glitchlings.js, its picture is its code portrait); never stacks
 // Rectangles only (Daniel, 14.11.2026: „Lass uns mit dem Tetris-Quatsch aufhören und auf Rechtecke beschränken“): items and weapons
 // take their "size" [w, h], backpacks their "bag" footprint (default 2 × 3). Older savegames are tidied by untangle().
 
@@ -83,23 +84,23 @@ export function untangle(D, grid) {
 // add n of a thing: first onto existing stacks, then into free spots. Returns how many did NOT fit.
 // q / mods (#013): only the same quality stacks; a weapon with its own values keeps them
 export const sameKind = (e, a, id, q = 0) => e.a === a && e.id === id && (e.q || 0) === (q || 0);
-export function add(D, grid, a, id, n = 1, { stackOnly = false, q = 0, mods = null } = {}) {
+export function add(D, grid, a, id, n = 1, { stackOnly = false, q = 0, mods = null, g = null } = {}) {
   const max = stackMax(D, a, id);
   for (const e of grid.items) {
     if (!n) break;
-    if (sameKind(e, a, id, q) && e.n < max && !mods) { const k = Math.min(n, max - e.n); e.n += k; n -= k; }
+    if (sameKind(e, a, id, q) && e.n < max && !mods && !g && !e.g) { const k = Math.min(n, max - e.n); e.n += k; n -= k; }
   }
   while (n > 0 && !stackOnly) {
     const spot = findSpot(D, grid, a, id);
     if (!spot) break;
     const k = Math.min(n, max);
-    grid.items.push({ a, id, n: k, ...spot, ...(q ? { q } : {}), ...(mods ? { mods: { ...mods } } : {}) });
+    grid.items.push({ a, id, n: k, ...spot, ...(q ? { q } : {}), ...(mods ? { mods: { ...mods } } : {}), ...(g ? { g: { ...g } } : {}) });
     n -= k;
   }
   return n;
 }
 // an entry taken out of somewhere back into a grid, with its quality and values; → how many did NOT fit
-export const addEntry = (D, grid, e, n = e.n, opts = {}) => add(D, grid, e.a, e.id, n, { ...opts, q: e.q || 0, mods: e.mods || null });
+export const addEntry = (D, grid, e, n = e.n, opts = {}) => add(D, grid, e.a, e.id, n, { ...opts, q: e.q || 0, mods: e.mods || null, g: e.g || null });
 // the kind of a thing for colours, filters and „Einlagern bevorzugt“: weapons by their kind, items by their category
 export function kindOf(D, a, id) {
   const t = thing(D, a, id) || {};
@@ -126,7 +127,7 @@ export function drop(D, grid, e, x, y) {
   if (!hit.length) { grid.items.push(Object.assign(e, { x, y })); return { ok: true, held: null }; }
   if (hit.length === 1) {
     const o = hit[0], max = stackMax(D, e.a, e.id);
-    if (sameKind(o, e.a, e.id, e.q) && max > 1 && !e.mods && !o.mods) {
+    if (sameKind(o, e.a, e.id, e.q) && max > 1 && !e.mods && !o.mods && !e.g && !o.g) {
       const k = Math.min(e.n, max - o.n);
       if (k <= 0) return { ok: false, held: e };
       o.n += k; e.n -= k;

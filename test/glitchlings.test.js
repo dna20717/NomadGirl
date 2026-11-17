@@ -65,3 +65,19 @@ test('Code-Porträt: Unikate mit Goldrand, jede Begabung trägt etwas, Archäolo
   assert.equal(faceOf({ name: 'Ochre Dig', stat: 'archaeology' }).wears, 'fedora');
   assert.ok(config(D).talents.some(t => t.name === 'Archäologe' && t.function === 'warroom'));
 });
+
+// a Glitchling as a thing (#048, Daniel: „Kannst du mir einen Glitchling ins Inventar legen?“): once per older savegame, Amber Slay
+import { newSave, repairSave } from '../game/save.js';
+import { addEntry, newGrid } from '../game/inventory.js';
+test('Geschenk: ein alter Spielstand bekommt einmal Amber Slay als Glitchling, er bleibt er selbst', () => {
+  const old = newSave(D); delete old.gifts;
+  const s = repairSave(structuredClone(old), D), all = x => Object.values(x.inv.grids).flatMap(g => g.items).filter(e => e.id === 'glitchling');
+  assert.equal(all(s).length, 1);
+  assert.equal(all(s)[0].g.name, 'Amber Slay');
+  assert.ok(['backpack', 'camp'].some(k => s.inv.grids[k]?.items.includes(all(s)[0])), 'im Rucksack, sonst im Camp-Lager');
+  assert.equal(all(repairSave(structuredClone(s), D)).length, 1, 'nur einmal');
+  assert.equal(all(repairSave(structuredClone(newSave(D)), D)).length, 0, 'ein neues Spiel startet ohne');
+  const g = newGrid(6, 6), e = all(s)[0];
+  addEntry(D, g, e); addEntry(D, g, { ...e, g: { ...e.g, name: 'Moss Fang' } });
+  assert.deepEqual(g.items.map(x => x.g.name), ['Amber Slay', 'Moss Fang'], 'Glitchlings stapeln nie');
+});

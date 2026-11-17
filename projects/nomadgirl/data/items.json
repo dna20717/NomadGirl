@@ -2237,5 +2237,14 @@
   "icon": 43,
   "description": "Haarfarbe „Platinum Elite“. Am Spiegel im Camp: Leylas Signaturfarbe (Haare und Akzente). Einmal benutzt, bleibt die Farbe frei.",
   "brand": "kessler_kosmetik"
+ },
+ "glitchling": {
+  "name": "Glitchling",
+  "category": "glitchling",
+  "size": [2, 2],
+  "stack": 1,
+  "value": 0,
+  "glyph": "📺",
+  "description": "Eine kleine KI mit Macken, eingefangen in einem Speicherkern. Wohnt bald in einer Werkbank oder verschmilzt mit einem Implantat."
  }
 }
