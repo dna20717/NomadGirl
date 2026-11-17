@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#07060c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Bit-Stapel</title>
+<script>try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme') || 'gray'; } catch (e) { document.documentElement.dataset.theme = 'gray'; }</script>
+<link rel="stylesheet" href="game/ui.css">
+<link rel="stylesheet" href="game/duel.css">
+<style>
+  /* Bit-Stapel mobile (Daniel, 17.11.2026: „eine weitere Version des Spiels als Standalone mobile Variante“, Umfang: nur Layout + Touch).
+     Portrait, the board fills the screen, big pipelines to tap: first tap shows what the bit would do, second tap sends it. */
+  html, body { margin: 0; height: 100%; background: #07060c; color: #e3e6ff; overscroll-behavior: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  body { background-image: linear-gradient(rgba(32,214,199,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(32,214,199,.05) 1px, transparent 1px); background-size: 28px 28px; font-family: var(--ui-pixel); }
+  body::after { content: ''; position: fixed; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px); z-index: 50; }
+  #app { height: 100dvh; display: grid; grid-template-rows: auto 1fr auto; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); box-sizing: border-box; }
+  .mb-top { display: flex; align-items: center; gap: 8px; padding: 8px 12px 4px; } .mb-top b { font-size: 24px; color: #20d6c7; letter-spacing: .06em; text-shadow: 0 0 8px #20d6c7; } .mb-top small { color: #8b93af; font-size: 15px; margin-left: auto; }
+  .mb-main { display: grid; align-items: start; justify-items: center; overflow: hidden; padding: 0 6px; min-height: 0; }
+  .mb-bar { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; padding: 6px 10px 10px; }
+  .mb-bar select, .mb-bar button { height: 44px; min-width: 0; border-radius: 8px; border: 1px solid rgba(32,214,199,.45); background: #0b0a12; color: #e3e6ff; font: 18px/1 var(--ui-pixel); padding: 0 10px; }
+  .mb-bar button { display: inline-flex; align-items: center; gap: 6px; color: #ffd541; border-color: #ffd541; }
+  .mb-hint { text-align: center; color: #8b93af; font-size: 15px; min-height: 18px; }
+  .mb-boot { color: #8b93af; font-size: 22px; } .mb-boot.err { color: #f5a097; font: 15px/1.5 var(--ui-font); padding: 20px; }
+  /* the board scaled to the phone: widths from the screen width, heights from the screen height */
+  .mob .sb-board { width: 100%; max-width: 520px; gap: clamp(2px, .8vh, 8px); margin: 0 auto; }
+  .mob .sb-ai { grid-template-columns: auto 1fr auto; gap: 2px 10px; padding: 2px 10px; }
+  .mob .sb-ai .sb-firesum { display: none; } .mob .sb-portrait canvas { width: clamp(48px, 13vw, 72px); height: clamp(48px, 13vw, 72px); }
+  .mob .sb-id b { font-size: clamp(18px, 5.5vw, 26px); } .mob .sb-id small { font-size: 13px; } .mob .sb-fav { display: none; }
+  .mob .sb-hp { width: clamp(90px, 28vw, 150px); }
+  .mob .sb-pipes { gap: 2.5vw; width: 100%; }
+  .mob .sb-pipe { width: 30vw; max-width: 160px; padding: 4px; gap: 2px; }
+  .mob .sb-slot { width: clamp(38px, min(15vw, 6.4vh), 64px); height: clamp(38px, min(15vw, 6.4vh), 64px); }
+  .mob .sb-die { width: calc(clamp(38px, min(15vw, 6.4vh), 64px) - 6px); height: calc(clamp(38px, min(15vw, 6.4vh), 64px) - 6px); padding: 18%; }
+  .mob .sb-die i.p { width: 70%; height: 70%; }
+  .mob .sb-die.big { width: 56px; height: 56px; padding: 10px; } .mob .sb-die.big i.p { width: 8px; height: 8px; }
+  .mob .sb-die.mini { width: 16px; height: 16px; padding: 2px; } .mob .sb-die.mini i.p { width: 3px; height: 3px; }
+  .mob .sb-mid { gap: 2px; } .mob .sb-say { font-size: 14px; padding: 0 8px; }
+  .mob .sb-pipe.pick.cursor { transform: none; }
+  .mob .sb-tip { bottom: auto; top: -24px; font-size: 13px; }
+  .mob .sb-mid.end .dl-main { height: 48px; font-size: 18px; padding: 0 18px; border-radius: 10px; }
+  .dl-main { background: #ffd541; color: #241a00; border: 1px solid #c28d29; font: 700 16px var(--ui-font); display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+</style>
+</head>
+<body>
+<div id="app"><div class="mb-main"><p class="mb-boot">Lade den Bit-Stapel …</p></div></div>
+<script>
+  const mbFail = msg => { const a = document.getElementById('app'); if (a && !window.duelDemo) a.innerHTML = '<div class="mb-boot err"><b>Der Bit-Stapel konnte nicht starten.</b><br><code></code></div>', a.querySelector('code').textContent = msg; };
+  addEventListener('error', e => mbFail(e.message));
+  addEventListener('unhandledrejection', e => mbFail(String(e.reason?.stack || e.reason)));
+</script>
+<script type="module">
+  // Bit-Stapel mobile: address /mobile; ?foe=wild|hunters&seed=…&tempo=…
+  import('./game/stack_mobile.js').then(m => m.startMobile(document.getElementById('app'))).catch(e => mbFail(String(e?.message || e)));
+</script>
+</body>
+</html>

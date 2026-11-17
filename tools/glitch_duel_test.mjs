@@ -26,10 +26,10 @@ check('Overlay im Spielrahmen: ✕, Hilfezeile, zwei KIs, sechs Pipelines', r.op
 r = await ev(() => { const sc = game.scene.getScene('play'), x = sc.leyla.x; nomad.step(30, ['right']); return { moved: Math.abs(sc.leyla.x - x), paused: sc.physics.world.isPaused }; });
 check('Das Spiel pausiert (Leyla läuft nicht)', r.moved < 1, r);
 await ready(); await page.keyboard.press('ArrowRight'); await page.keyboard.press('e'); await page.waitForTimeout(150);
-r = await ev(() => game.scene.getScene('play').hud.duel.view.duel.sides.player.cols.reduce((s, c) => s + c.length, 0));
+r = await ev(() => game.scene.getScene('play').hud.duel.view.duel.log.filter(e => e.type === 'place' && e.side === 'player').length);   // placed bits (a placed one can be wiped again)
 check('Tastatur: Pfeil + E schickt das Bit', r === 1, r);
 await ready();
-r = await ev(() => { const D = game.scene.getScene('play').hud.duel, before = D.view.cursor; D.nav({ keys: false, pressed: a => a === 'left' }); const mid = D.view.cursor; D.nav({ keys: false, pressed: a => a === 'ok' }); return { before, mid, n: D.view.duel.sides.player.cols.reduce((s, c) => s + c.length, 0) }; });
+r = await ev(() => { const D = game.scene.getScene('play').hud.duel, before = D.view.cursor; D.nav({ keys: false, pressed: a => a === 'left' }); const mid = D.view.cursor; D.nav({ keys: false, pressed: a => a === 'ok' }); return { before, mid, n: D.view.duel.log.filter(e => e.type === 'place' && e.side === 'player').length }; });
 check('Controller: Stick links wählt, A schickt', r.mid !== r.before && r.n >= 2, r);
 await page.waitForTimeout(1400); await shot('mid');
 await page.keyboard.press('Escape'); await page.waitForTimeout(200);

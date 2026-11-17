@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 17.11.2026: **Bit-Stapel mobil** unter /mobile: Hochformat, große Pipelines, erst tippen = Vorschau, nochmal = schicken; passt von iPhone SE bis Pixel 5.
 - 17.11.2026: **Glitchlings heißen jetzt Entities** (Oberflächen, Spieldaten, Werkstatt-Gruppe ENTITIES, Doku; interne Kennungen bleiben).
 - 17.11.2026: **Glitch-Duell im Spiel** (#052): Duell als Fenster im Hauptspiel (Rahmen, ✕, Hilfezeile, pausiert, Tastatur und Controller); Schalter statt Hebel, erst nach einem Duell legen sie um; KIs in Automaten per E/↑; Sieg fängt die KI ins Deck.
 - 17.11.2026: **Entities als digitale Geister**: 32 gepixelte Geister-Köpfe (PixelLab), getönt im Licht des Entities, Mimik weiter aus Code, schweben; überall, wo Porträts erscheinen (Duell, Werkstatt, Inventar); Kammerjäger bleiben Bildschirme.

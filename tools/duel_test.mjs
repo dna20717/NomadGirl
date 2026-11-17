@@ -58,7 +58,7 @@ r = await page.evaluate(() => ({ n: duelDemo.S.duel.sides.player.cols.reduce((s,
 check('Bit-Stapel: Klick legt das Bit, der Gegner ist dran', r.n === 1 && r.turn === 'enemy', r);
 await page.waitForFunction(() => duelDemo.S.duel.turn === 'player' && !duelDemo.S.busy, null, { timeout: 15000 });
 await page.keyboard.press('2');
-r = await page.evaluate(() => duelDemo.S.duel.sides.player.cols[1].length);
+r = await page.evaluate(() => duelDemo.S.duel.log.filter(e => e.type === 'place' && e.side === 'player' && e.col === 1).length);   // placed into pipe 2 (it can be wiped again)
 check('Bit-Stapel: Taste 2 legt in Spalte 2', r >= 1, r);
 await page.click('.dl-check input');
 await page.waitForFunction(() => duelDemo.S.duel.winner, null, { timeout: 60000 });
