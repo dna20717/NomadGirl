@@ -1,0 +1,82 @@
+{
+ "count": 12,
+ "off": 35,
+ "names": {
+  "first": "Marble, Amber, Velvet, Chrome, Rust, Neon, Paper, Glass, Ivory, Copper, Static, Moss, Ink, Salt, Honey, Cinder, Pearl, Ash, Tin, Silk, Smoke, Opal, Cobalt, Saffron, Frost, Quartz, Plum, Ochre, Indigo, Coral, Lacquer, Tinsel",
+  "second": "Sting, Slay, Hex, Bite, Lullaby, Whisper, Spark, Fang, Drift, Riot, Knot, Howl, Glare, Stitch, Rattle, Snare, Flicker, Thorn, Echo, Hymn, Rush, Grin, Hush, Snap, Waltz, Mutter, Claw, Psalm, Crash, Purr, Jinx, Halo"
+ },
+ "talents": [
+  {"name": "Koch", "function": "kitchen", "also": "foodtruck", "effect": "Gerichte gelingen um {n} % öfter perfekt", "perBit": 6, "stat": "perfect"},
+  {"name": "Schweißer", "function": "craft", "also": "vehicle", "effect": "{n} % Chance, dass Herstellen ein Teil zurückgibt", "perBit": 5, "stat": "refund"},
+  {"name": "Gärtner", "function": "garden", "also": "cistern", "effect": "Pflanzen und Wasser kommen {n} % schneller", "perBit": 8, "stat": "growth"},
+  {"name": "Ingenieur", "function": "power", "also": "engine", "effect": "+{n} ⚡ Strom", "perBit": 1, "stat": "power"},
+  {"name": "Chirurg", "function": "cyber", "also": "tank", "effect": "Implantate belasten {n} % weniger", "perBit": 8, "stat": "strain"},
+  {"name": "Navigator", "function": "warroom", "also": "jobs", "effect": "Reisen kosten {n} % weniger Sprit", "perBit": 6, "stat": "fuel"},
+  {"name": "Waffenmeister", "function": "armory", "also": "craft", "effect": "Eigenbau-Waffen +{n} % Schaden", "perBit": 4, "stat": "weaponDamage"},
+  {"name": "Drohnenflüsterer", "function": "drone", "also": "power", "effect": "AvAs Akku hält {n} % länger", "perBit": 7, "stat": "battery"},
+  {"name": "Gastgeber", "function": "chill", "also": "guests", "effect": "Ruhe-Buffs {n} % stärker", "perBit": 6, "stat": "rest"},
+  {"name": "Buchhalter", "function": "storage", "also": "treasury", "effect": "Beute ist {n} % mehr wert", "perBit": 4, "stat": "value"},
+  {"name": "Kühlwart", "function": "cooling", "also": "kitchen", "effect": "Gerichte halten {n} % länger (Buffs)", "perBit": 8, "stat": "freshness"},
+  {"name": "Schläfer", "function": "sleep", "also": "chill", "effect": "Schlafen heilt {n} % mehr", "perBit": 7, "stat": "sleepHeal"}
+ ],
+ "quirks": [
+  {"text": "kocht alles scharf", "kind": "odd"},
+  {"text": "lackiert, was er repariert, pink", "kind": "odd"},
+  {"text": "arbeitet nur nachts", "kind": "time"},
+  {"text": "verträgt keinen Regen", "kind": "weather"},
+  {"text": "hasst den Generator", "kind": "neighbour"},
+  {"text": "singt beim Arbeiten", "kind": "mood"},
+  {"text": "zählt laut alles, was im Lager liegt", "kind": "mood"},
+  {"text": "antwortet einen Herzschlag zu spät", "kind": "odd"},
+  {"text": "spricht nur in Reimen", "kind": "odd"},
+  {"text": "schmollt, wenn Leyla ohne Gruß vorbeigeht", "kind": "mood"},
+  {"text": "will jede Nacht eine Gutenachtgeschichte", "kind": "mood"},
+  {"text": "zieht es zu jedem Licht", "kind": "odd"},
+  {"text": "verwechselt Schraube mit seinem alten Besitzer", "kind": "odd"},
+  {"text": "wird eifersüchtig auf andere Glitchlings", "kind": "neighbour"},
+  {"text": "macht bei Vollmond Fehler", "kind": "time"},
+  {"text": "druckt Gedichte auf jeden Zettel", "kind": "odd"},
+  {"text": "hält Neon Noodle für das beste Essen der Welt", "kind": "odd"},
+  {"text": "summt Werbejingles der alten Marken", "kind": "mood"},
+  {"text": "hat Angst vor der Drohne", "kind": "neighbour"},
+  {"text": "verschenkt manchmal Kronkorken", "kind": "odd"}
+ ],
+ "wishes": [
+  {"text": "Zeig mir das Meer."},
+  {"text": "Bring mich zurück in meinen alten Automaten, nur einmal."},
+  {"text": "Ich will einen Namen auf einem Schild."},
+  {"text": "Schalte die Kessler-Kamera ab, die mich sucht."},
+  {"text": "Koch mir etwas, das nach Zuhause riecht."},
+  {"text": "Lass mich bei der Hydrokultur wohnen."},
+  {"text": "Erzähl mir, wie die Stadt vor dem Zusammenbruch aussah."},
+  {"text": "Ich will einen Freund unter den anderen Glitchlings."},
+  {"text": "Bring mir ein Teil von Delta Petrol."},
+  {"text": "Lass mich einmal das Rig fahren."},
+  {"text": "Hör dir meine Musik an. Ganz."},
+  {"text": "Ich will nie in ein Implantat."}
+ ],
+ "homes": "Getränkeautomat, Registrierkasse, Kühlanlage, Aufzug, Musikbox, Ampelsteuerung, Kaffeemaschine, Werbetafel, Spielautomat, Waschmaschine, Fahrkartenautomat, Funkmast, Telefonzelle, Pfandautomat, Notstromaggregat",
+ "unique": [
+  {
+   "name": "Amber Slay",
+   "talent": "Waffenmeister",
+   "bits": 4,
+   "quirk": "gibt jeder Waffe einen Kosenamen",
+   "wish": "Lass mich in eine Waffe, die schon jemanden gerettet hat.",
+   "home": "Schließfach eines Pfandhauses",
+   "always": true,
+   "description": "Ein Waffenmeister-Glitchling aus der Zeit, als Vulkan noch Jagdgewehre baute. Höflich, gefährlich, sentimental."
+  },
+  {
+   "name": "Marble Sting",
+   "talent": "Chirurg",
+   "bits": 5,
+   "quirk": "nennt Leyla „Patientin“",
+   "wish": "Bring mich auf Ebene 40 zurück. Ich muss jemanden um Verzeihung bitten.",
+   "home": "OP-Lampe einer verlassenen Klinik",
+   "always": true,
+   "description": "Ein alter Chirurgie-Glitchling von Kessler. Präzise, kühl, und er weiß etwas über die Kinder in den Tanks."
+  }
+ ],
+ "bitWeights": [{"w": 40},{"w": 30},{"w": 18},{"w": 9},{"w": 3}]
+}

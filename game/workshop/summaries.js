@@ -5,6 +5,7 @@ import { ROOM_TAGS } from '../../engine/project.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
 import { parseRoom } from '../../engine/room.js';
 import { generateMap, neighbours } from '../worldmap.js';
+import { generate } from '../glitchlings.js';
 import { drawMap } from '../map_render.js';
 
 const ROOM_COLORS = { '#': '#8b919c', '=': '#d4a72c', H: '#5fb4d9', o: '#e45aa8', L: '#3fe0d0', C: '#c08a4a', S: '#7ee0a0', D: '#5b8a6a', B: '#6e5a7a', Z: '#ffd27a', 1: '#ff8a5c', A: '#b0b8c4', '^': '#3fe0d0', v: '#3fe0d0', '*': '#fff2a8', '%': '#9a7ab8', $: '#8a6e9a' };
@@ -158,6 +159,23 @@ export const SUMMARY = {
       ['In Pixeln', `${r.w * (w.p.data.game?.tileSize || 64)} × ${r.h * (w.p.data.game?.tileSize || 64)}`]]), play) };
   },
 
+  // Glitchlings (#047): one rolled Durchgang as cards, „Neu würfeln“ rolls another (the game will roll one per Durchgang)
+  glitchlings(w) {
+    const D = w.p.data, box = el('div', { class: 'ng-glitch' }), info = el('p', { class: 'ed-small' });
+    let seed = w.glitchSeed ??= 1 + Math.floor(Math.random() * 1e6);
+    const paint = () => {
+      const list = generate(D, seed);
+      box.replaceChildren(...list.map(g => el('div', { style: 'border:1px solid var(--ui-line,#333);border-radius:8px;padding:8px 10px;display:grid;gap:2px' + (g.unique ? ';border-color:#ffd27a' : '') },
+        el('div', { style: 'display:flex;justify-content:space-between;gap:8px' }, el('b', { style: 'font:22px/1 VT323,monospace;letter-spacing:.03em' }, g.name), el('span', { title: `${g.bits} Bits`, style: 'color:#20d6c7;letter-spacing:2px' }, '▮'.repeat(g.bits) + '▯'.repeat(5 - g.bits))),
+        el('small', {}, `${g.talent}${g.unique ? ' · Unikat' : ''} · wohnt in: ${g.home}`), el('span', {}, g.effect), el('small', { style: 'opacity:.75' }, `Macke: ${g.quirk}`), el('small', { style: 'opacity:.6;font-style:italic' }, `„${g.wish}“`))));
+      const by = {}; for (const g of list) by[g.bits] = (by[g.bits] || 0) + 1;
+      info.textContent = `Seed ${seed} · ${list.length} Glitchlings · Stärke ${[1, 2, 3, 4, 5].map(b => `${b} Bit: ${by[b] || 0}`).join(', ')}`;
+    };
+    paint();
+    const again = el('button', { class: 'ed-button wide', onclick: () => { seed = w.glitchSeed = 1 + Math.floor(Math.random() * 1e6); paint(); } }, 'Neu würfeln');
+    box.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px';
+    return { title: 'Ein Durchgang', body: el('div', {}, box, info, again) };
+  },
   // a brand (#046): its plate like the tooltip shows it (logo from the raster, name in the brand's colour, slogan) and what it makes
   brands(w, x, id) {
     const D = w.p.data, L = D.assets?.[D.worldmap?.logos], base = new URL('../../projects/nomadgirl/', import.meta.url);

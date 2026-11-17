@@ -131,7 +131,8 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 - `docs/features/tutorial.md`: Feldhandbuch (#011): Lektionen mit Clips/Bildern aus dem Spiel, Karte beim ersten Mal, Archiv im Menü, Aufnahme-Tool.
 - `docs/features/intro.md`: Intro als Comic (#005): Panels, Textboxen, Countdown, Effekte, nur übers Hauptmenü.
 - `docs/features/worldmap.md`: Reisekarte (#007): Routen-Netz je Durchgang, Marken der Spielwelt, Fenster am Warroom und an der Van-Tür.
-- `docs/features/lore.md`: Lore-Datenbank (#045): Marken mit Lore, Stellung und Spielwerten (Qualität, Preis, Beute), Hersteller von Implantaten und Haarfarben, Quelle der Reisekarte.
+- `docs/features/lore.md`: Lore-Datenbank (#045): Marken, Spielwerte, Hersteller, Logos.
+- `docs/features/glitchlings.md`: Glitchlings (#047): Generator für passive Companions (KIs mit Macken).
 - `docs/features/splash.md`: Startseite: Szene, Horizont-Dunst, AvA, Highway mit Textur-Boden, Überraschungen.
 - `docs/features/art.md`: Feld `look` an Entitäten, Asset-Vorschau, Symbol-Raster, Gegenrichtung beim Spiegeln.
 - `docs/features/editor.md`: Werkstatt-Editor: Spielen-Knopf, Scroll-Position.

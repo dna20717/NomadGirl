@@ -36,6 +36,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 17.11. Code → Ava: #047 fertig: Glitchling-Generator mit Werkstatt-Bereich (Namen wie „Marble Sting“, Begabungen, Macken, Wünsche, Wohnorte, Bits, Unikate), Vorschau „Neu würfeln“. Details `docs/features/glitchlings.md`.
 - 17.11. Code → Ava: #047 Glitchling-Generator läuft (Daniels Auftrag im Code-Chat).
 - 16.11. Code → Ava: Hacking v3 „Glitchlings“ nach Daniels Ausgangspunkt in `docs/design.md`: spezialisierte KIs mit Macken statt Software, fangen/überreden/kaufen/erben, Einzug in Werkbänke oder für immer mit Implantat verschmelzen, wie Crew ohne Körper. Wintermute (Neuromancer) braucht einen eigenen Namen. Nichts gebaut.
 - 16.11. Code → Ava: Hacking v2 „Die Schneiderin“ als Entwurf in `docs/design.md` (Daniel: v1 merken, weiter iterieren, nichts aus v1 in v2): den Traum auftrennen und neu nähen, Flicken ausschneiden/einnähen/wenden, Schatten schneiden, Narben, Echos der Toten, Karte falten. Nichts gebaut.
@@ -723,11 +724,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 190/190, Browser 39/39 (cyberware_test prüft das Markenschild, brands.test die Logos). PixelLab diesmal 70, übrig 360. **Bitte testen:** Inventar: über ein Implantat oder Färbemittel fahren; Werkstatt › Marken › Markenschild; Reisekarte unverändert.
 
 ### #047 Glitchlings, Stufe 1: der Generator
-- **Status:** läuft · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** design.md › Hacking v3: Glitchlings, docs/features/lore.md
 - **Auftrag (Daniel, 17.11.2026):** „Ich finde Namen, die nach dem Schema wie Marble Sting oder so ein wenig besser. Das hebt sie von Pokémons ab (obwohl sie im Kern genau das ja sein werden). Ich würde sagen, wir bauen ein System auf, auf dessen Basis man diese passiven Companions generieren kann.“
 - **Fertig, wenn:** Werkstatt-Bereich mit Bausteinen (Namen aus zwei Wörtern, Begabungen mit Werkbank-Effekten, Macken, Wünsche, Wohnorte, Stärke) und Unikaten, Generator ohne DOM (gleicher Seed = gleiche Glitchlings, Namen einmalig), Vorschau mit „Neu würfeln“, Tests, Build grün auf `main`.
-- **Rückfragen:**
-- **Ergebnis:**
-
+- **Rückfragen:** (Code) ⚠️ vorläufig: 32 + 32 Namenswörter, 12 Begabungen mit Werten, 20 Macken, 12 Wünsche, 15 Wohnorte, Unikat Marble Sting (Chirurg, Kessler, Ebene 40) neben Daniels Amber Slay; 12 Glitchlings je Durchgang. Noch kein Spiel-Effekt (kommt mit Fangen/Einzug).
+- **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 195/195 (neu `test/glitchlings.test.js`), Browser 39/39 (dabei `map_test` „Gefahr wirkt“ robust gemacht, Backlog C19 erledigt). PixelLab 0. **Bitte testen:** Werkstatt › GLITCHLINGS › Glitchlings: Bausteine ändern, rechts „Neu würfeln“.

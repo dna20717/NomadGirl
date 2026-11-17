@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 17.11.2026: **Glitchling-Generator** (#047): Werkstatt-Bereich mit Bausteinen (Namen aus zwei Wörtern wie „Marble Sting“, Begabungen mit Werkbank-Effekten, Macken, Wünsche, Wohnorte, Stärke 1–5 Bits, Unikate Amber Slay und Marble Sting), Generator je Durchgang, Vorschau mit „Neu würfeln“.
 - 16.11.2026: **Waffen mit Hersteller**: alle 12 Waffen haben eine Marke (Crow & Sons, Delta Bureau of Order, Mile King, Vulkan, Ghostwire, Backalley Chrome); Qualität wirkt auf den Schaden, Markenschild im Tooltip.
 - 16.11.2026: **Marken-Logos und Markenschild** (#046): sieben neue Logos (PixelLab), alle 15 Marken im Logo-Raster; Tooltips von Implantaten und Färbemitteln zeigen oben Logo, Name und Slogan des Herstellers, die Werte mit Qualität.
 - 16.11.2026: **Marken englisch mit Slogans**: Neon Noodle, Kessler Cybernetics, Salt Lake Motel, Delta Bureau of Order, Crow & Sons Salvage, Mile King, Vulkan Defense Systems, Kessler Cosmetics; alle mit englischem Slogan.

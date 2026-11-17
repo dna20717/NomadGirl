@@ -615,7 +615,7 @@ Daniel, 16.11.2026: „Das Konzept von Software existiert in dieser Welt nicht m
 
 ### Was ein Glitchling ist
 
-- **Name** (englisch, niedlich): z. B. **Amberslay** (Daniel), dazu ⚠️ Entwürfe von Ava: **Kettle** (wird warm, wenn er sich freut), **Lady Lag** (antwortet immer einen Herzschlag zu spät), **Sprocket** (zählt alles), **Mumbles** (flüstert Rezepte), **Pocket Saint** (verzeiht alles, vergisst nichts), **Moth** (zieht es zum Licht), **Tin Tin** (spricht nur in Reimen), **Nimbus Nine** (wartet seit dem Zusammenbruch auf ein Update). Wintermute ist die KI aus „Neuromancer“ und bekommt einen eigenen Namen.
+- **Name** aus zwei Wörtern, Material + Kante (Daniel, 17.11.2026: „Namen nach dem Schema wie Marble Sting … hebt sie von Pokémons ab“): **Amber Slay** (Daniel), **Marble Sting**, gewürfelt z. B. Velvet Bite, Rust Purr, Paper Waltz, Ochre Waltz. Wintermute ist die KI aus „Neuromancer“ und bekommt einen eigenen Namen. Generator und Bausteine: `docs/features/glitchlings.md` (#047).
 - **Begabung:** wofür er gebaut wurde (Kochen, Schweißen, Rechnen, Heilen, Navigieren, Wachen, Zielen, Gärtnern …). Bestimmt, in welcher Werkbank er glänzt.
 - **Stärke** (1–5 Bits): wie mächtig er ist und welches Deck ihn halten kann.
 - **Macke:** sein Glitch, immer ein Haken mit Charme, z. B. „kocht nur scharf“, „repariert, aber lackiert alles pink“, „arbeitet nur nachts“, „verträgt keinen Regen“, „hasst den Generator“, „singt beim Arbeiten (die Crew wird müde oder fröhlich)“.

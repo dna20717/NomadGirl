@@ -59,6 +59,8 @@ export const ENEMY_FAMILIES = [['mutant', 'Mutant'], ['raider', 'Plünderer'], [
 export const ENEMY_BEHAVIORS = [['patrol', 'Patrouille'], ['charger', 'Stürmer'], ['shooter', 'Schütze'], ['ambusher', 'Lauerer'], ['flyer', 'Flieger'], ['boss', 'Boss']];
 // tags on things (Daniel, 11.11.2026: „mach ein Tag trophy“): trophy = may hang on a trophy stand in the treasury
 export const ITEM_TAGS = [['trophy', 'Trophäe']];
+// Glitchlings (#047): kinds of quirks
+export const GLITCH_QUIRKS = [['odd', 'schrullig'], ['mood', 'Laune'], ['time', 'Tageszeit'], ['weather', 'Wetter'], ['neighbour', 'Nachbarn']];
 // Lore › Marken (#045)
 export const BRAND_SECTORS = [['cyber', 'Cyberware'], ['military', 'Militär'], ['cosmetics', 'Kosmetik'], ['fuel', 'Treibstoff'], ['food', 'Essen'], ['drink', 'Getränke'], ['vehicle', 'Fahrzeuge'], ['trade', 'Handel & Schrott'], ['lodging', 'Unterkunft'], ['authority', 'Behörde'], ['medical', 'Medizin'], ['other', 'Sonstiges']];
 export const BRAND_TIERS = [['cheap', 'Billig'], ['mid', 'Mittel'], ['premium', 'Premium'], ['elite', 'Elite']];
@@ -1456,6 +1458,29 @@ export const AREAS = {
       if (!(x.kinds || []).length) report('hint', 'Keine POI-Arten: es gibt nur die Wahrzeichen aus dem Bereich Orte');
     },
   },
+  glitchlings: {
+    name: 'Glitchlings', icon: 'brain', file: 'data/glitchlings.json', kind: 'single',
+    hint: '#047 (Daniel, 16./17.11.2026: „Software gibt es nicht mehr, nur spezialisierte KIs mit Eigenarten und Macken“; „Namen wie Marble Sting“; „ein System, auf dessen Basis man diese passiven Companions generieren kann“). Bausteine für den Generator (game/glitchlings.js); jeder Durchgang würfelt seine eigenen. Design: design.md › Hacking v3.',
+    sections: [
+      { title: 'Generator', fields: [num('count', 'Je Durchgang', { min: 1, max: 40, hint: 'So viele Glitchlings gibt es in einem Durchgang (die Unikate mit „immer“ zählen mit)' }),
+        table('bitWeights', 'Stärke', [num('w', 'Gewicht', { min: 0 })], { hint: 'Zeile 1 = 1 Bit … Zeile 5 = 5 Bits: wie oft jede Stärke gewürfelt wird' }),
+        num('off', 'Fremde Werkbank', { unit: '%', min: 0, max: 100, hint: 'In einer Werkbank, die nicht zu seiner Begabung passt, wirkt ein Glitchling nur so stark' })] },
+      { title: 'Namen', fields: [area_('names.first', 'Erstes Wort', { hint: 'Material, Farbe, Stoff (Marble, Amber, Velvet …), mit Komma getrennt. Name = erstes + zweites Wort, jedes Wort je Durchgang nur einmal' }),
+        area_('names.second', 'Zweites Wort', { hint: 'Kante, Geräusch, Tat (Sting, Slay, Hex …)' })] },
+      { title: 'Begabungen', wide: true, fields: [table('talents', 'Begabungen', [text('name', 'Name'), select('function', 'Werkbank', WORKSHOP_FUNCTIONS), select('also', 'Auch', WORKSHOP_FUNCTIONS), text('effect', 'Effekt'), num('perBit', 'Je Bit', { min: 0 }), text('stat', 'Wert')],
+        { hint: 'Effekt mit {n} = „Je Bit“ × Stärke. In „Werkbank“ und „Auch“ wirkt er voll. „Wert“ ist der Schlüssel, den das Spiel später ausliest (perfect, refund, growth, power …)' })] },
+      { title: 'Macken & Wünsche', wide: true, fields: [table('quirks', 'Macken', [text('text', 'Macke'), select('kind', 'Art', GLITCH_QUIRKS)], { hint: 'Jeder Glitchling hat eine; immer ein Haken mit Charme' }),
+        table('wishes', 'Wünsche', [text('text', 'Wunsch')], { hint: 'Was er will, um freiwillig mitzukommen (Überreden, kommt mit Stufe 2)' }),
+        area_('homes', 'Wohnorte', { hint: 'Maschinen, in denen Glitchlings in POIs wohnen, mit Komma getrennt' })] },
+      { title: 'Unikate', wide: true, fields: [table('unique', 'Unikate', [text('name', 'Name'), text('talent', 'Begabung'), num('bits', 'Bits', { min: 1, max: 5 }), text('quirk', 'Macke'), text('wish', 'Wunsch'), text('home', 'Wohnort'), bool('always', 'Immer'), text('description', 'Beschreibung')],
+        { hint: 'Handgemachte Glitchlings (z. B. Amber Slay). „Immer“ = in jedem Durchgang dabei' })] },
+    ],
+    check: (x, report) => {
+      const T = new Set((x.talents || []).map(t => t.name));
+      for (const u of x.unique || []) { if (!T.has(u.talent)) report('warning', `Unikat ${u.name}: Begabung „${u.talent}“ gibt es nicht`); if (String(u.name || '').trim().split(/\s+/).length !== 2) report('hint', `Unikat ${u.name}: Namen haben zwei Wörter`); }
+      for (const t of x.talents || []) if (!String(t.effect || '').includes('{n}')) report('hint', `Begabung ${t.name}: Effekt ohne {n}`);
+    },
+  },
   brands: {
     name: 'Marken', singular: 'Marke', icon: 'sign', file: 'data/brands.json', kind: 'catalog', groupBy: { key: 'sector', options: BRAND_SECTORS },
     hint: 'Lore-Datenbank (#045, Daniel 16.11.2026: „Brands sammeln und mit sinnvollen Eigenschaften versehen“): Konzerne, Läden, Straßenmarken der Welt. Gegenstände nennen ihren Hersteller; die Reisekarte holt ihre Marken von hier.',
@@ -1505,6 +1530,7 @@ export const GROUPS = [
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'megarigs', 'rigAddons', 'salvage', 'companions']],
   ['WELT', ['worldmap', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'travel']],
   ['LORE', ['brands']],
+  ['GLITCHLINGS', ['glitchlings']],
 ];
 
 export const optionLabel = label;
