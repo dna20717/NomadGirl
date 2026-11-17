@@ -76,3 +76,20 @@
 .gd-card .sb-board { gap: 3px; } .gd-card .sb-ai { padding: 0 10px; } .gd-card .sb-portrait canvas { width: 62px; height: 62px; }
 .gd-card .sb-slot { width: 34px; height: 34px; } .gd-card .sb-die { width: 29px; height: 29px; padding: 5px; } .gd-card .sb-die i.p { width: 4px; height: 4px; } .gd-card .sb-die.big { width: 46px; height: 46px; padding: 8px; } .gd-card .sb-die.big i.p { width: 7px; height: 7px; } .gd-card .sb-window { width: 46px; }
 .gd-card .sb-pipe { width: 104px; padding: 4px; gap: 2px; } .gd-card .sb-stack { gap: 3px; } .gd-card .sb-mid { padding: 0; gap: 2px; } .gd-card .sb-id b { font-size: 22px; } .gd-card .sb-id small { font-size: 13px; } .gd-card .sb-value { min-height: 18px; } .gd-card .sb-say { font-size: 14px; min-height: 14px; }
+
+/* why bits vanish: the striking bit and the equal ones opposite framed red, the pipelines linked, the wiped bits shatter (stack_view.js wipe) */
+.sb-pipe.wipe-link { box-shadow: 0 0 0 2px #df3e23, 0 0 26px rgba(223,62,35,.55) !important; border-color: #df3e23 !important; }
+.sb-die.striker { --c: #ffd541; outline: 3px solid #df3e23; outline-offset: 3px; animation: sb-strike var(--wipe, 900ms) ease-out both; }
+@keyframes sb-strike { 0% { transform: scale(1.35); box-shadow: 0 0 26px #df3e23; } 30% { transform: scale(1); } 100% { box-shadow: 0 0 6px #df3e23; } }
+.sb-die.dying { --c: #ff5a3c; background: #3b0c10; outline: 3px solid #df3e23; outline-offset: 2px; animation: sb-shatter var(--wipe, 900ms) steps(14) both; }
+@keyframes sb-shatter {
+  0% { transform: none; opacity: 1; filter: none; }
+  25% { transform: scale(1.18); box-shadow: 0 0 24px #df3e23; }
+  45% { transform: translateX(-4px) skewX(12deg); clip-path: inset(0 0 55% 0); filter: brightness(1.8); }
+  55% { transform: translateX(5px) skewX(-14deg); clip-path: inset(40% 0 0 0); }
+  70% { transform: translateY(-6px) scale(.85) rotate(8deg); opacity: .7; clip-path: inset(20% 10% 30% 0); }
+  100% { transform: translateY(-14px) scale(.3) rotate(-25deg); opacity: 0; clip-path: inset(50% 50% 50% 50%); }
+}
+.sb-wipe-label { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 4; width: max-content; max-width: 94%; box-sizing: border-box; flex-wrap: wrap; justify-content: center; text-align: center; display: inline-flex; gap: 4px; align-items: center; padding: 3px 8px;
+  font: 15px/1 var(--ui-pixel); color: #fff; background: #000; border: 1px solid #df3e23; box-shadow: 0 0 12px rgba(223,62,35,.6); animation: sb-label .9s ease-out both; pointer-events: none; }
+@keyframes sb-label { 0% { opacity: 0; transform: translate(-50%, -30%); } 20% { opacity: 1; transform: translate(-50%, -50%); } 85% { opacity: 1; } 100% { opacity: 0; } }

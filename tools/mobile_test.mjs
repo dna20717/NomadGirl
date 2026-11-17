@@ -41,6 +41,17 @@ for (const name of ['iPhone 13', 'iPhone SE', 'Pixel 5']) {
   if (shots) { fs.mkdirSync('output', { recursive: true }); await page.screenshot({ path: `output/mobile_${name.replace(/\s/g, '_')}.png` }); }
   await page.close();
 }
+// why bits vanish: framed red, linked, shattering, with a label (the AI plays both sides until something is wiped)
+{
+  const page = await browser.newPage({ ...devices['iPhone SE'] });
+  await page.goto(base + '?seed=21&tempo=langsam');
+  await page.waitForFunction(() => window.duelDemo?.view?.duel, null, { timeout: 20000 });
+  await page.evaluate(() => { duelDemo.view.host.auto = () => true; duelDemo.view.step(); });
+  const r = await page.evaluate(() => new Promise(res => { const t = setInterval(() => { if (duelDemo.view.wipe) { clearInterval(t); res({ dying: document.querySelectorAll('.sb-die.dying').length, striker: document.querySelectorAll('.sb-die.striker').length, link: document.querySelectorAll('.sb-pipe.wipe-link').length, label: document.querySelector('.sb-wipe-label')?.textContent || '', inside: (() => { const l = document.querySelector('.sb-wipe-label')?.getBoundingClientRect(); return !!l && l.left >= 0 && l.right <= innerWidth; })() }); } }, 5); setTimeout(() => res({ timeout: true }), 60000); }));
+  check('Gelöschte Bits: rot gerahmt, beide Pipelines verbunden, zersplittern, Schild „gleiche Zahl → gelöscht“ im Bild', r.dying >= 1 && r.striker === 1 && r.link === 2 && /gleiche Zahl.*gelöscht/.test(r.label) && r.inside, r);
+  if (shots) { await page.waitForTimeout(250); await page.screenshot({ path: 'output/mobile_wipe.png' }); }
+  await page.close();
+}
 await browser.close();
 for (const o of ok) console.log('✔', o);
 for (const e of errors) console.log('✖', e);

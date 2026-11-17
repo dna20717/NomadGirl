@@ -50,11 +50,16 @@ export class StackView {
     this.redraw();
   }
   async go(c) {
-    const d = this.duel, tk = this.token, ev = place(d, c);
+    const d = this.duel, tk = this.token, foe = d.turn === 'player' ? 'enemy' : 'player', before = d.sides[foe]?.cols[c]?.slice() || [], ev = place(d, c);
     if (!ev) return;
+    // why bits vanish (Daniel, 17.11.2026: „ein visuelles Hilfsmittel, das zeigt, warum Würfel verschwinden … ein Rahmen und/oder eine kurze
+    // Animation“): for a moment the opponent's pipeline shows its old bits, the equal ones framed red and shattering, both pipelines linked
+    const ms = Math.round(900 * this.tempo());
+    this.wipe = ev.destroyed ? { side: foe, col: c, die: ev.die, before, until: performance.now() + ms, ms } : null;
     this.last = ev; this.busy = true; this.picked = null; this.redraw();
     this.host.onPlace?.(ev, d);   // haptics on the phone (stack_mobile.js)
-    await sleep((ev.destroyed || ev.fire ? 700 : 380) * this.tempo());
+    await sleep((ev.destroyed ? 900 : ev.fire ? 700 : 380) * this.tempo());
+    this.wipe = null;
     if (tk !== this.token) return;
     this.busy = false; this.step();
   }
@@ -108,22 +113,28 @@ export class StackView {
     const canPick = mine && this.canAct() && col.length < ROWS, cur = canPick && this.cursor === i;
     const L = this.last, justPut = L && L.side === side && L.col === i, hit = L && L.side !== side && L.col === i && L.destroyed;
     const pv = canPick ? preview(d, i) : null, threat = !mine && d.turn === 'player' && !this.auto() ? d.die : null, fire = dot ? colFire(me, i) : 0;
-    const counts = {}; for (const v of col) counts[v] = (counts[v] || 0) + 1;
+    const W = this.wipe && performance.now() < this.wipe.until ? this.wipe : null, wiped = W && W.side === side && W.col === i, striker = W && W.side !== side && W.col === i;
+    const show = wiped ? W.before : col, left = W ? Math.max(0, W.until - performance.now()) : 0;   // the wiped pipeline keeps its old bits until they have shattered
+    const counts = {}; for (const v of show) counts[v] = (counts[v] || 0) + 1;
     const slots = Array.from({ length: ROWS }, (_, k) => {
-      const v = col[k];
+      const v = show[k];
       if (v == null) return el('span', { class: 'sb-slot' + (pv && k === col.length ? ' ghost' : '') }, pv && k === col.length ? chip(d.die, 'ghost') : null);
-      return el('span', { class: 'sb-slot' }, chip(v, [counts[v] > 1 ? `x${counts[v]}` : '', v === fav ? 'fav' : '', justPut && k === col.length - 1 ? 'new' : '', threat === v ? 'will' : ''].filter(Boolean).join(' ')));
+      const dying = wiped && v === W.die, strike = striker && k === col.length - 1;
+      const c = chip(v, [counts[v] > 1 && !dying ? `x${counts[v]}` : '', v === fav ? 'fav' : '', justPut && k === col.length - 1 ? 'new' : '', threat === v ? 'will' : '', dying ? 'dying' : '', strike ? 'striker' : ''].filter(Boolean).join(' '));
+      if (dying || strike) c.style.setProperty('--wipe', `${W.ms}ms`), c.style.animationDelay = `-${W.ms - left}ms`;   // a redraw picks the animation up where it is
+      return el('span', { class: 'sb-slot' }, c);
     });
     if (!mine) slots.reverse();   // the enemy's pipelines run down towards the middle
     const info = el('div', { class: 'sb-value' }, el('small', {}, `PIPE ${i + 1}`), dot ? null : el('b', {}, String(colValue(col, fav))),
       fire ? el('span', { class: 'sb-fire' }, icon('flash', 15), String(fire)) : null,
       pv && dot && pv.fireUp ? el('span', { class: 'sb-gain' }, '+', icon('flash', 13), String(pv.fireUp)) : null,
       pv && d.rules === 'hp' && pv.heal ? el('span', { class: 'sb-gain' }, `♥+${pv.heal}`) : null, pv && d.rules === 'sum' ? el('span', { class: 'sb-gain' }, `+${pv.gain}`) : null);
-    const c = el('div', { class: ['sb-pipe', side, canPick ? 'pick' : '', cur ? 'cursor' : '', hit ? 'hit' : '', justPut ? 'put' : '', fire ? 'firing' : ''].filter(Boolean).join(' '), 'data-col': i,
+    const c = el('div', { class: ['sb-pipe', side, canPick ? 'pick' : '', cur ? 'cursor' : '', hit ? 'hit' : '', justPut ? 'put' : '', fire ? 'firing' : '', wiped || striker ? 'wipe-link' : ''].filter(Boolean).join(' '), 'data-col': i,
       onmouseenter: () => { if (canPick) { this.cursor = i; c.closest('.sb-board')?.querySelectorAll('.sb-pipe.cursor').forEach(n => n.classList.remove('cursor')); c.classList.add('cursor'); } },
       // touch (host.confirmTap, the mobile page): the first tap picks the pipeline and shows what the bit would do, the second sends it
       onclick: () => { if (this.host.confirmTap && canPick && this.picked !== i) { this.picked = this.cursor = i; this.host.onPick?.(i); return this.redraw(); } this.playerPlace(i); } },
       ...(mine ? [el('div', { class: 'sb-stack' }, ...slots), info] : [info, el('div', { class: 'sb-stack' }, ...slots)]),
+      wiped ? el('div', { class: 'sb-wipe-label' }, 'gleiche Zahl ', chip(W.die, 'mini'), ' → gelöscht') : null,
       pv && pv.destroyed ? el('div', { class: 'sb-tip' }, `löscht ${pv.destroyed} × `, chip(d.die, 'mini'), dot ? ` · −${pv.hit}${pv.silenced ? `, sein Feuer −${pv.silenced}` : ''}` : ` · −${pv.lost}`) : null);
     return c;
   }

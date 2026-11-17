@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 17.11.2026: **Bit-Stapel: sichtbar, warum Bits verschwinden**: rote Rahmen am legenden und an den gelöschten Bits, beide Pipelines verbunden, die gelöschten zersplittern, Schild „gleiche Zahl → gelöscht“ (Demo, Spiel, mobil).
 - 17.11.2026: **Bit-Stapel mobil: Haptik und Wischen**: Vibrationsmuster je Ereignis (Android; iOS-Tick beim eigenen Tippen), abschaltbar; nach oben wischen schickt sofort; Pipelines geben unter dem Finger nach.
 - 17.11.2026: **Bit-Stapel mobil** unter /mobile: Hochformat, große Pipelines, erst tippen = Vorschau, nochmal = schicken; passt von iPhone SE bis Pixel 5.
 - 17.11.2026: **Glitchlings heißen jetzt Entities** (Oberflächen, Spieldaten, Werkstatt-Gruppe ENTITIES, Doku; interne Kennungen bleiben).
