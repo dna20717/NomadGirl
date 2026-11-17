@@ -1,5 +1,6 @@
 // Bit-Stapel mobile (/mobile, Daniel 17.11.2026: „Standalone mobile Variante“, nur Layout + Touch): on three phones the whole duel fits between
 // the title and the bar, no sideways scrolling; the first tap on a pipeline only shows what the bit would do, the second sends it; the AI answers.
+// Haptics (Daniel: „Haptik und Touch sind auch wichtig“): a vibration pattern per event (pick, send, hit …), switchable; swipe up sends at once.
 // Server must run (npm run serve).   node tools/mobile_test.mjs [--shots]
 import fs from 'node:fs';
 import { chromium, devices } from 'playwright';
@@ -11,6 +12,7 @@ const errors = [], ok = [];
 const check = (name, cond, info) => { if (cond) ok.push(name); else errors.push(`${name}: ${JSON.stringify(info)}`); };
 for (const name of ['iPhone 13', 'iPhone SE', 'Pixel 5']) {
   const page = await browser.newPage({ ...devices[name] });
+  await page.addInitScript(() => { window.__buzz = []; navigator.vibrate = p => { window.__buzz.push(p); return true; }; try { localStorage.removeItem('bitstapel.buzz'); } catch {} });
   page.on('pageerror', e => errors.push(`${name}: ${e.message}`));
   await page.goto(base + '?seed=33&tempo=schnell');
   await page.waitForFunction(() => window.duelDemo?.view?.canAct(), null, { timeout: 20000 });
@@ -23,6 +25,19 @@ for (const name of ['iPhone 13', 'iPhone SE', 'Pixel 5']) {
   r = await page.evaluate(() => ({ n: duelDemo.view.duel.sides.player.cols.flat().length, turn: duelDemo.view.duel.turn }));
   check(`${name}: zweiter Tipp schickt das Bit, der Gegner ist dran`, r.n === 1 && r.turn === 'enemy', r);
   await page.waitForFunction(() => duelDemo.view.canAct() || duelDemo.view.duel.winner, null, { timeout: 20000 });
+  r = await page.evaluate(() => ({ kinds: duelDemo.S.buzzed, raw: window.__buzz.length }));
+  check(`${name}: Vibration bei Antippen und Schicken (und beim Gegner-Zug, wenn er trifft)`, r.kinds[0] === 'pick' && /send|wipe/.test(r.kinds[1]) && r.raw >= 2, r);
+  // swipe up on a pipeline with room: sends at once
+  const col = await page.evaluate(() => [2, 1, 0].find(i => duelDemo.view.duel.sides.player.cols[i].length < 3));
+  const box = await page.locator(`.sb-pipe.player[data-col="${col}"]`).boundingBox();
+  const before = await page.evaluate(() => duelDemo.view.duel.log.filter(e => e.type === 'place' && e.side === 'player').length);
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height * 0.8); await page.mouse.down(); await page.mouse.move(box.x + box.width / 2, box.y + box.height * 0.2, { steps: 4 }); await page.mouse.up();
+  await page.waitForTimeout(80);
+  r = await page.evaluate(() => ({ n: duelDemo.view.duel.log.filter(e => e.type === 'place' && e.side === 'player').length, last: duelDemo.view.duel.log.filter(e => e.type === 'place').at(-1) }));
+  check(`${name}: nach oben wischen schickt sofort`, r.n === before + 1 && r.last.col === col, { ...r, before, col });
+  await page.click('.mb-buzz'); await page.waitForTimeout(50);
+  r = await page.evaluate(() => { const n = window.__buzz.length; duelDemo.S.buzzOn || duelDemo.view.host.onPick(0); return { off: !duelDemo.S.buzzOn, same: window.__buzz.length === n, stored: localStorage.getItem('bitstapel.buzz') }; });
+  check(`${name}: Vibration abschaltbar (gemerkt)`, r.off && r.same && r.stored === '0', r);
   if (shots) { fs.mkdirSync('output', { recursive: true }); await page.screenshot({ path: `output/mobile_${name.replace(/\s/g, '_')}.png` }); }
   await page.close();
 }

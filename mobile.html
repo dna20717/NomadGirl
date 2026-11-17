@@ -22,6 +22,10 @@
   .mb-bar { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; padding: 6px 10px 10px; }
   .mb-bar select, .mb-bar button { height: 44px; min-width: 0; border-radius: 8px; border: 1px solid rgba(32,214,199,.45); background: #0b0a12; color: #e3e6ff; font: 18px/1 var(--ui-pixel); padding: 0 10px; }
   .mb-bar button { display: inline-flex; align-items: center; gap: 6px; color: #ffd541; border-color: #ffd541; }
+  .mb-buzz { margin-left: 6px; width: 40px; height: 34px; display: grid; place-items: center; border-radius: 8px; border: 1px solid #4a5462; background: #0b0a12; color: #6d758d; }
+  .mb-buzz.on { color: #20d6c7; border-color: rgba(32,214,199,.6); box-shadow: 0 0 10px rgba(32,214,199,.25); }
+  .mob .sb-pipe { -webkit-touch-callout: none; touch-action: none; transition: transform .08s, box-shadow .15s, filter .1s; }
+  .mob .sb-pipe.player.pick:active { transform: scale(.96); filter: brightness(1.25); }
   .mb-hint { text-align: center; color: #8b93af; font-size: 15px; min-height: 18px; }
   .mb-boot { color: #8b93af; font-size: 22px; } .mb-boot.err { color: #f5a097; font: 15px/1.5 var(--ui-font); padding: 20px; }
   /* the board scaled to the phone: widths from the screen width, heights from the screen height */

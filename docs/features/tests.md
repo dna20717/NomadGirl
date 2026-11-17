@@ -4,7 +4,7 @@ Alle Browser-Tests und Prüfwerkzeuge mit dem, was sie prüfen (Server muss für
 
 ```
 node tools/workshop_test.mjs [--shots]     # Werkstatt kopflos bedienen (Server muss laufen), Bilder nach output/
-node tools/mobile_test.mjs [--shots]       # Bit-Stapel mobil (/mobile) auf iPhone 13, iPhone SE, Pixel 5: passt aufs Display, erster Tipp = Vorschau, zweiter schickt
+node tools/mobile_test.mjs [--shots]       # Bit-Stapel mobil (/mobile) auf iPhone 13, iPhone SE, Pixel 5: passt aufs Display, erster Tipp = Vorschau, zweiter schickt, Vibration je Ereignis, Wischen nach oben, Vibration abschaltbar
 node tools/glitch_duel_test.mjs [--shots]  # Glitch-Duell im Spiel (Tankstelle): Automat mit KI per E, Overlay mit Rahmen/✕/Hilfezeile, pausiert, Tastatur + Controller, Esc gibt auf, Schalter erst nach dem Duell, Tür offen
 node tools/duel_test.mjs [--shots]         # Glitch-Duell-Demo (/duel): Bit-Stapel (je eine KI mit Porträt und drei Pipelines, Walze, AI-Core-Wahl, Vorschau beim Überfahren, Klick und Taste legen, KI spielt zu Ende, simulieren), Gefecht (?mode=fight): Karten mit Porträts, wählen → Verschränken → Ziel, Würfel + Antwort, KI-Zug, „KI spielt für mich“ bis zum Ende, Kammerjäger, 1000× simulieren
 node tools/splash_test.mjs [--shots]       # Startseite in drei Größen + Controller (Menü wählen, Kurve, A öffnet) (Server muss laufen)

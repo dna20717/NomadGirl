@@ -53,6 +53,7 @@ export class StackView {
     const d = this.duel, tk = this.token, ev = place(d, c);
     if (!ev) return;
     this.last = ev; this.busy = true; this.picked = null; this.redraw();
+    this.host.onPlace?.(ev, d);   // haptics on the phone (stack_mobile.js)
     await sleep((ev.destroyed || ev.fire ? 700 : 380) * this.tempo());
     if (tk !== this.token) return;
     this.busy = false; this.step();
@@ -121,7 +122,7 @@ export class StackView {
     const c = el('div', { class: ['sb-pipe', side, canPick ? 'pick' : '', cur ? 'cursor' : '', hit ? 'hit' : '', justPut ? 'put' : '', fire ? 'firing' : ''].filter(Boolean).join(' '), 'data-col': i,
       onmouseenter: () => { if (canPick) { this.cursor = i; c.closest('.sb-board')?.querySelectorAll('.sb-pipe.cursor').forEach(n => n.classList.remove('cursor')); c.classList.add('cursor'); } },
       // touch (host.confirmTap, the mobile page): the first tap picks the pipeline and shows what the bit would do, the second sends it
-      onclick: () => { if (this.host.confirmTap && canPick && this.picked !== i) { this.picked = this.cursor = i; return this.redraw(); } this.playerPlace(i); } },
+      onclick: () => { if (this.host.confirmTap && canPick && this.picked !== i) { this.picked = this.cursor = i; this.host.onPick?.(i); return this.redraw(); } this.playerPlace(i); } },
       ...(mine ? [el('div', { class: 'sb-stack' }, ...slots), info] : [info, el('div', { class: 'sb-stack' }, ...slots)]),
       pv && pv.destroyed ? el('div', { class: 'sb-tip' }, `löscht ${pv.destroyed} × `, chip(d.die, 'mini'), dot ? ` · −${pv.hit}${pv.silenced ? `, sein Feuer −${pv.silenced}` : ''}` : ` · −${pv.lost}`) : null);
     return c;
