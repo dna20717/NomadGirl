@@ -10,10 +10,13 @@ import { level as cisternLevel, tap as cisternTap } from '../cistern.js';
 import { clockText, advance, hoursUntil } from '../save.js';
 import { passengers } from '../rig.js';
 import { clockHours } from '../tank.js';
+import { rainHours } from '../rain.js';
 import { gangOfPlace, levelName } from '../reputation.js';
 import { driveConfig } from '../road.js';
 import { snapshotRig } from './rig_snapshot.js';
 import { offers } from '../quests.js';
+import { legSky, cisternWater } from '../weather_fx.js';
+import { level as cisternLevelOf } from '../cistern.js';
 import { workerBonus, placesFor, workplaceOf, assign, unassign, flawOf, syncWorkers, farmEntities, befriend, bondOf, BOND_MAX, WORKING_STATS } from '../workers.js';
 import { occupancy } from '../inventory.js';
 import { de, VERB, SOON, costLine } from './camp.js';
@@ -224,12 +227,12 @@ export class CampActions {
   // Under remote control (nomad, tests) it is skipped unless the test wants to see it (scene.showDrive).
   drive(id, t) {
     const save = this.box.save, D = this.D, s = this.scene, legs = t.legs?.length ? t.legs : [{ from: save.location, to: id, km: t.km, hours: t.hours, fuel: t.fuel, food: t.food }];
-    this.driving = { id, t, legs, log: [], from: save.location };
+    this.driving = { id, t, legs, log: [], from: save.location, seed: ((save.map?.seed ?? 1) * 31 + (save.day || 1)) | 0, water0: cisternWater(D, save, cisternLevelOf), h0: clockHours(save), told: new Set() };   // #063
     if (!s.hud.drive || !driveConfig(D).enabled || (s.script && !s.showDrive)) return this.nextLeg(0);
     this.driving.show = true;
     const go = rig => {
       if (this.driving?.id !== id) return;
-      s.hud.drive.open({ rig, from: placeOf(D, save, save.location)?.name || save.location, to: placeOf(D, save, id)?.name || id, legs: legs.length, seed: ((save.map?.seed ?? 1) * 31 + (save.day || 1)) | 0 });
+      s.hud.drive.open({ rig, from: placeOf(D, save, save.location)?.name || save.location, to: placeOf(D, save, id)?.name || id, legs: legs.length, seed: this.driving.seed });
       this.nextLeg(0);
     };
     snapshotRig(s).then(go, () => go(null));
@@ -247,6 +250,11 @@ export class CampActions {
     // under remote control (nomad, tests) no random encounters, unless forced (scene.forceEncounter = id) or wanted (scene.randomEncounters)
     // #054: hand-made or from the Ereignis-Baukasten; the destination's danger, region and name go into the generated one
     const node = save.map?.nodes?.find(x => x.id === L.to), ctx = { danger: node?.danger || 1, region: node?.region || '', place: placeOf(D, save, L.to)?.name || L.to, here: gangOfPlace(D, save, L.to) };
+    // #063 the weather of the leg: some incidents likelier, a message once per kind and trip
+    const sky = legSky(D, save, R.seed ?? 1, i, node?.region || '', h0, h1);
+    ctx.bias = sky.bias;
+    const fresh = sky.kinds.filter(k => !R.told?.has(k));
+    if (fresh.length && sky.line) { for (const k of fresh) R.told?.add(k); s.hud.toast(sky.dust ? 'Sandsturm' : sky.fog ? 'Nebel' : 'Regen', sky.line, 'travel', 5200); }
     const forced = s.forceEncounter;
     s.forceEncounter = null;
     const E = forced ? encounterById(D, save, forced, Math.random, ctx) : save.road?.chain?.step || !(s.script && !s.randomEncounters) ? pickEncounter(D, save, L.km, Math.random, ctx) : null;   // a running story (#055) goes on even under remote control
@@ -280,6 +288,10 @@ export class CampActions {
     if (this.driving?.show && !this.driving.landed) { this.driving.landed = true; this.scene.hud.drive.finish(() => this.arrive()); return; }   // fade to black first
     const save = this.box.save, D = this.D, R = this.driving, id = R.id, t = R.t, from = R.from;
     this.driving = null;
+    // #063 rain on the way filled the cistern (it collects in event time): say so
+    const gain = cisternWater(D, save, cisternLevelOf) - (R.water0 ?? 0), wetH = rainHours(D, save, R.h0 ?? clockHours(save), clockHours(save));
+    if (gain >= 0.5) this.scene.time.delayedCall(1800, () => this.scene.hud.toast('Regen unterwegs', `Die Zisterne hat ${de(Math.round(gain * 10) / 10)} Flaschen gesammelt`, 'good', 5200));
+    else if (wetH >= 1) this.scene.time.delayedCall(1800, () => this.scene.hud.toast('Regen unterwegs', `${de(Math.round(wetH))} h Regen · eine Zisterne im Rig hätte ihn gesammelt`, 'info', 4600));
     // guests without a bed wait where they are; whoever waits at the new place comes back aboard
     const P = passengers(D, save);
     save.waiting ||= {};

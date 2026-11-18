@@ -9,6 +9,7 @@ import { buildPoi, poiReady } from '../../engine/poi.js';
 import { buildMegarig } from '../../engine/megarig.js';
 import { MegarigView } from './megarig_view.js';
 import { Turf } from './turf.js';
+import { runSky } from '../weather_fx.js';
 import { PoiLevel } from './poi_level.js';
 import { Pad, PAD_ACTIONS } from './pad.js';
 import { Fog } from './fog.js';
@@ -368,8 +369,17 @@ export class PlayScene extends Phaser.Scene {
     this.level = this.mode !== 'camp' && (this.levelInfo?.def || ['C', 'S', 'D', 'B', 'Z', '%', '$'].some(k => M[k]?.length)) ? new PoiLevel(this, run?.poi || null) : null;
     this.turf = Turf.make(this);   // #061 Revier-Camp: the gang's mood towards Leyla
     if (this.turf) this.time.delayedCall(1500, () => this.turf?.hint());
+    // #063 the weather over the POI: rain swallows steps, fog and dust shorten sight (enemies and Leyla), with a message
+    this.weatherRun = null;
+    if (this.mode === 'run' && this.box?.save) {
+      const sv = this.box.save, node = sv.map?.nodes?.find(n => n.id === sv.location), sky = runSky(this.data_, sv, node?.region || '');
+      this.weatherRun = sky;
+      for (const e of this.enemies) { e.S.sight *= sky.sight; e.S.hearing *= sky.hear; }
+      if (sky.line) this.time.delayedCall(3200, () => this.hud.toast(sky.rain ? 'Regen über dem POI' : sky.fog ? 'Nebel im POI' : 'Staub im POI', sky.line, 'info', 6000));
+    }
     this.props = drawn?.props || [];
     this.fog = new Fog(this);   // darkness like The Looter indoors (#043, Spiel › Nebel)
+    if (this.weatherRun && this.fog?.F && this.weatherRun.fogSight !== 1) this.fog.F = { ...this.fog.F, sight: (this.fog.F.sight ?? 11) * this.weatherRun.fogSight };   // #063 fog and dust: Leyla sees less too
 
     const cam = this.cam, C = this.data_.game?.camera || {};
     cam.setZoom(C.zoom || 1);

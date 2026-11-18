@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #063 **Wetter mit Folgen** fertig: Sandsturm/Nebel/Regen machen passende Zwischenfälle häufiger, Regen füllt die Zisterne (mit Meldung), im POI hören Gegner bei Regen schlechter und sehen im Nebel weniger. #064 läuft.
 - 18.11. Code → Ava: #062 **Quests aus Straßen-Merkern** fertig (4 Aufträge aus Fehde, Kurier, Läuferin). #063 läuft.
 - 18.11. Code → Ava: #062 Quests aus Merkern läuft; #063 Wetter mit Folgen, #064 Markentreue + Influencer-Billboards, #065 Cyberware im Duell angelegt.
 - 18.11. Code → Ava: #060 **Bit-Farm** fertig: Entities wohnen in der Bit-Farm, arbeiten als Worker an Werkstätten (Begabung als Bonus, Macke als Haken, Bindung macht stärker), freundliche Duelle in der Chill-Ecke. Offen: eigenes Bild (PixelLab-Freigabe). Tests 251/251, Browser 46/46.
@@ -191,15 +192,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Quests aus Straßen-Merkern (#062)“ auf `main`. Quests › Erst mit Merker / Nicht mit Merker, 4 neue Aufträge, Meldung „Neuer Auftrag“. `npm test` 254/254 (neu `test/quest_flags.test.js`), Browser camp/drive/silo grün. PixelLab 0. **Bitte testen:** eine Fehde bis zum Ende spielen, dann zu Schraube.
 
 ### #063 Wetter mit Folgen (mit Meldungen)
-- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
 - **Für:** Code
 - **Lesen:** docs/features/world.md (Wetter), docs/features/benches.md (Zisterne)
 - **Auftrag (Daniel, 18.11.2026):** Punkt 5: „auch machen, aber mit Meldungen“: Regen auf der Fahrt füllt die Zisterne, Sandsturm macht bestimmte Ereignisse wahrscheinlicher, Nebel aus dem Wetter zieht in den POI; jede Folge mit Meldung.
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: Stärke der Folgen (Sandsturm Staubwände ×4, Nebel Fackeln ×3, Regen Pannen ×2,5; im POI Regen Gehör −40 %, Nebel Sicht −30 % und Leylas Sicht −25 %, Staub −15 %/−10 %); Meldungen als Toasts (einmal je Wetter und Fahrt, beim Ankommen die Zisterne, im POI nach dem Start); das Wetter im POI kommt vom Ort und der Uhrzeit (nicht von der letzten Etappe).
+- **Ergebnis:** (Code) Commit „Wetter mit Folgen (#063)“ auf `main`. Neu `game/weather_fx.js` (`legSky`, `runSky`, `cisternWater`), Gewichtung in `generateEncounter` (`ctx.bias`), Meldungen in `camp_actions` und `scene`. `npm test` 256/256 (neu `test/weather_fx.test.js`), Browser 44/46 im Gesamtlauf: `mobile_test` (Zeitüberschreitung, einzeln 19/19 grün) und `tutorial_test` (der bekannte Wackler: der Run-Tipp kommt manchmal nicht, einzeln 2 von 3 grün). PixelLab 0. **Bitte testen:** eine Fahrt durch die Glass Dunes (Sandsturm) und einen POI im Regen.
 
 ### #064 Markentreue und Influencer-Billboards
-- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
+- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
 - **Für:** Code
 - **Lesen:** docs/features/lore.md, docs/features/worldmap.md (Billboards)
 - **Auftrag (Daniel, 18.11.2026):** Punkt 6: „auf jeden Fall machen. Billboards auf der Reise sollen ab sofort einen Nachlass ermöglichen. Klickt man sie während der Fahrt an, erhält man den Buff „Influencer + Brand“ und damit einen ordentlichen Nachlass (20 Prozent) auf diese Brand in den nächsten xy Stunden.“ Dazu Set-Bonus für drei Teile derselben Marke.

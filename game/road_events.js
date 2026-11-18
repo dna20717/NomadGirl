@@ -60,8 +60,9 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
   if (!S) {
     const all = situationsFor(D, { night: !!ctx.night, danger, save, here: ctx.here || null });
     if (!all.length) return null;
-    let k = rnd() * all.reduce((n, s) => n + (s.weight ?? 1), 0);
-    S = all.find(s => (k -= s.weight ?? 1) < 0) || all[all.length - 1];
+    const wt = s => (s.weight ?? 1) * (ctx.bias?.[s.roadside] ?? 1);   // #063 the weather of the leg makes some likelier
+    let k = rnd() * all.reduce((n, s) => n + wt(s), 0);
+    S = all.find(s => (k -= wt(s)) < 0) || all[all.length - 1];
   }
   // the gang and its rival (a running story keeps its gangs); the Ruf with the gang picks the mood
   const gang = chain?.gang ?? gangFor(D, S, save, ctx.here || null, rnd) ?? (S.gangName || (S.gang ? pick(rnd, gangs(D).map(g => g.name).concat('Plünderer')) : null));

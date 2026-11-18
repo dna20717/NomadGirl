@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 18.11.2026: **Wetter mit Folgen** (#063): Sandsturm, Nebel und Regen verschieben die Zwischenfälle unterwegs, Regen füllt die Zisterne mit Meldung, im POI dämpft Regen das Gehör der Gegner und Nebel die Sicht.
 - 18.11.2026: **Quests aus Straßen-Merkern** (#062): Geschichten unterwegs öffnen Aufträge im Camp (Fehde, Kurier, Läuferin), mit Meldung.
 - 18.11.2026: **Bit-Farm** (#060): neue Werkstatt für gefangene Entities; sie arbeiten als Worker an Werkstätten im Rig (Begabung als Bonus, Macke als Haken), freundliche Duelle in der Chill-Ecke heben die Bindung.
 - 18.11.2026: **Revier-Camp** (#061): mit gutem Ruf wird der POI einer Gang zum Camp: Hinweis zu Beginn, ihre Leute greifen nicht an, Kisten öffnen unter Zeugen kostet Ruf, Tresor nur mit Gewalt; Freunde handeln und haben einen Auftrag; jeder Schlag bricht den Frieden.
