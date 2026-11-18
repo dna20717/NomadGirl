@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: Eleganz-Paket #066–#071 angelegt (Daniel AFK: „alles abarbeiten, inkrementell, Qualität im Blick“), #066 Boni-Bus läuft.
 - 18.11. Code → Ava: #065 **Cyberware im Duell** fertig: Augen- und Nerven-Implantate geben im Glitch-Duell Integrität. Damit sind alle Punkte der Verzahnungs-Prüfung gebaut (#059–#065).
 - 18.11. Code → Ava: #064 **Markentreue + Influencer** fertig: Billboard antippen = 20 % auf die Marke für 24 h (Karawane, Markenstand, Revier-Handel), drei Teile einer Marke = Set-Bonus. #065 läuft.
 - 18.11. Code → Ava: #063 **Wetter mit Folgen** fertig: Sandsturm/Nebel/Regen machen passende Zwischenfälle häufiger, Regen füllt die Zisterne (mit Meldung), im POI hören Gegner bei Regen schlechter und sehen im Nebel weniger. #064 läuft.
@@ -208,6 +209,54 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Auftrag (Daniel, 18.11.2026):** Punkt 6: „auf jeden Fall machen. Billboards auf der Reise sollen ab sofort einen Nachlass ermöglichen. Klickt man sie während der Fahrt an, erhält man den Buff „Influencer + Brand“ und damit einen ordentlichen Nachlass (20 Prozent) auf diese Brand in den nächsten xy Stunden.“ Dazu Set-Bonus für drei Teile derselben Marke.
 - **Rückfragen:** (Code) ⚠️ vorläufig: „xy Stunden“ = 24 h (Reisen › Fahrt › Influencer: Dauer); eine Marke zur Zeit, ein neuer Tipp ersetzt sie; Nachlass gilt an Antworten mit Marke (Sprit = Delta Petrol, Essen = Neon Noodle), für Dinge der Marke, am neuen Markenstand und im Revier-Camp-Handel; ohne Maus: Tastatur R / Controller X; Set-Bonus ab 3 Teilen, Werte für acht Marken mit Ausrüstung.
 - **Ergebnis:** (Code) Commit „Markentreue und Influencer-Billboards (#064)“ auf `main`. Neu `game/brand_perks.js`, `road.hit`, Billboard-Tipp in `drive_ui.js`, Markenstand (Lage › Laden), Lore › Marken › Markentreue, Inventar-Zeile Markentreue. `npm test` 259/259 (neu `test/brand_perks.test.js`), Browser 46/46 (`drive_test` 18 mit echtem Klick). PixelLab 0. **Bitte testen:** während der Fahrt ein Billboard antippen, dann an der Karawane Sprit kaufen.
+
+### #071 Kleine Fehler: Macken-Wirkung als Feld, Wetter-Gewichte in der Werkstatt, Welt-Merker
+- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 6)
+- **Für:** Code
+- **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 6 der Eleganz-Prüfung)
+- **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
+- **Rückfragen:** –
+- **Ergebnis:** –
+
+### #070 Meldungs-Kanal mit Vorrang und Logbuch
+- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 5)
+- **Für:** Code
+- **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 5 der Eleganz-Prüfung)
+- **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
+- **Rückfragen:** –
+- **Ergebnis:** –
+
+### #069 Preise bündeln: eine Preis-Funktion
+- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 3)
+- **Für:** Code
+- **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 3 der Eleganz-Prüfung)
+- **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
+- **Rückfragen:** –
+- **Ergebnis:** –
+
+### #068 Eine Bedingungs-Sprache für Ereignisse, Quests, Händler
+- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 2)
+- **Für:** Code
+- **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 2 der Eleganz-Prüfung)
+- **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
+- **Rückfragen:** –
+- **Ergebnis:** –
+
+### #067 Effekt-Leiste im HUD (Effekte mit Ablauf)
+- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 4)
+- **Für:** Code
+- **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 4 der Eleganz-Prüfung)
+- **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
+- **Rückfragen:** –
+- **Ergebnis:** –
+
+### #066 Boni-Bus: alle Bonus-Quellen an einem Ort
+- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 1)
+- **Für:** Code
+- **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 1 der Eleganz-Prüfung)
+- **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
+- **Rückfragen:** –
+- **Ergebnis:** –
 
 ### #065 Cyberware im Duell
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
