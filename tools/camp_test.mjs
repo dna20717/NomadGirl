@@ -64,7 +64,7 @@ s = await ev(() => { nomad.save().hour = 23; game.scene.getScene('play').goCamp(
 check('Nachts: Licht quillt aus der offenen Van-Tür', s.camp.daytime === 'Nacht' && s.van.open && s.door[0] > 0.3, { d: s.camp.daytime, van: s.van, door: s.door });
 await shot('night');
 
-s = await ev(() => { c.use(); return c.pick('Schlafen', 'Schlafen'); });
+s = await ev(() => { c.to('Van'); c.use(); return c.pick('Schlafen', 'Schlafen'); });   // #056: the van's door is now the driver's door
 check('Schlafen bis 7 Uhr mit Buff', s.camp.clock === 'Tag 3 · 07:00' && s.camp.buffs.includes('ausgeschlafen') && s.camp.daytime === 'Morgen', s.camp);
 await shot('morning');
 

@@ -456,7 +456,7 @@ export class Camp {
     // #056 the van in cross-section: getting in at the driver's door (Zugmaschine › Einsteigen bei), the benches in the bays have their own E spots
     const Dr0 = D.tractors?.[geo.tractor?.id]?.door, inBays = !geo.mega && Dr0?.bays?.length && scene.van, enterX = inBays && Dr0.enter != null ? scene.van.toWorld(Dr0.enter, 0).x : geo.doorX;
     this.hotspots.push({ x: enterX, w: inBays ? 60 : 110, floor: geo.doorFloor ?? undefined, name: geo.mega ? (geo.mega.b.kind === 'airship' ? 'Cockpit' : 'Kommandobrücke') : D.tractors?.[geo.tractor?.id]?.name || 'Van', hint: geo.mega ? 'Karte' : vanWs.length ? 'Einsteigen' : 'Fahrerhaus',
-      act: () => this.vanMenu(inBays ? [] : vanWs) });
+      act: () => this.vanMenu(vanWs) });   // the van's benches stay as shortcuts in the map's header
     // the van's own storage (Kofferraum): E at the rear door
     const T0 = D.tractors?.[geo.tractor?.id] || {};
     if (T0.storage?.[0]) this.storeHotspot(CAMP, geo.vanLeft + (geo.vanRight - geo.vanLeft) * (C.rig?.trunkAt ?? 12) / 100, T0.storageName || 'Kofferraum', false);   // #041: opens the Camp-Lager
@@ -982,7 +982,9 @@ export class Camp {
   vanGlow() {
     const V = this.C.vanLight || {};
     if (V.enabled === false || this.geo.mega) return;
-    const x = this.geo.doorX, y = this.ground, k = (V.strength ?? 100) / 100, color = V.color || '#ffcf7a';
+    // #056: with bays the light comes out of the cut-open box (between the bays), else out of the door
+    const B = this.D.tractors?.[this.geo.tractor?.id]?.door?.bays, van = this.scene.van;
+    const x = B?.length && van ? van.toWorld((Math.min(...B.map(b => b.x[0])) + Math.max(...B.map(b => b.x[1]))) / 2, 0).x : this.geo.doorX, y = this.ground, k = (V.strength ?? 100) / 100, color = V.color || '#ffcf7a';
     this.doorLights = [
       this.light(x, y - (V.lift ?? 150), (V.width ?? 110), color, 0.55 * k, (V.height ?? 150)),   // the open doorway glows
       this.light(x + (V.spill ?? 40), y + 4, (V.pool ?? 260), color, 0.45 * k, (V.pool ?? 260) * 0.16),   // light spills onto the ground

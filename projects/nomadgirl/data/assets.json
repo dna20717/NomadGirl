@@ -5697,19 +5697,19 @@
   "frames": 5,
   "fps": 7,
   "loop": false,
-  "origin": [107, 171],
+  "origin": [175, 171],
   "height": 450,
   "source": "Code (tools/van_side.py: Überblendung zu → Querschnitt, Leiter zurück auf die Schnittkante)",
   "derivedFrom": "van_side_cut_source",
   "date": "18.11.2026",
-  "description": "Frame 1 zu, Frame 5 Querschnitt offen, dazwischen überblendet; beide Bilder decken sich Pixel für Pixel. Nischen: links x 50–101, rechts x 114–157, Decke y 71, Boden y 117."
+  "description": "Frame 1 zu, Frame 5 Querschnitt offen, dazwischen überblendet; beide Bilder decken sich Pixel für Pixel. Nischen: links x 50–101, rechts x 114–157, Decke y 71, Boden y 117. Ankerpunkt = Fahrertür auf dem Boden (dort steht Leyla beim Start, dort steigt sie ein)."
  },
  "van_side_closed": {
   "name": "Leylas Van seitlich · zu",
   "kind": "image",
   "file": "assets/vehicles/van_side_closed.png",
   "height": 450,
-  "origin": [107, 171],
+  "origin": [175, 171],
   "source": "Code (tools/van_side.py)",
   "derivedFrom": "van_side_source",
   "date": "18.11.2026"
@@ -5719,7 +5719,7 @@
   "kind": "image",
   "file": "assets/vehicles/van_side_open.png",
   "height": 450,
-  "origin": [107, 171],
+  "origin": [175, 171],
   "source": "Code (tools/van_side.py)",
   "derivedFrom": "van_side_cut_source",
   "date": "18.11.2026"

@@ -50,7 +50,7 @@ const door = async () => ev(() => { const c = game.scene.getScene('play').camp, 
 await ev(() => { const h = nomad.state().camp.hotspots.find(h => h.name === 'Van'); nomad.walkTo(h.x + 900); nomad.step(60); });
 let dr = await door();
 check('Van zu: in den Nischen nichts zu sehen', dr && dr.amax === 0, dr);
-await ev(() => { const h = nomad.state().camp.hotspots.find(h => h.name === 'Van'); nomad.walkTo(h.x + 150); nomad.step(60); });
+await ev(() => { nomad.walkTo(game.scene.getScene('play').van.x); nomad.step(60); });   // #056: in front of the van's bays
 dr = await door();
 check('Van im Querschnitt: beide Nischen zeigen ihre Werkstatt, der Warroom ist dabei', dr?.ids.includes('warroom') && dr.ids.length === 2 && dr.a === 1, dr);
 
