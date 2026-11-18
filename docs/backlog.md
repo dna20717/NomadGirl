@@ -57,6 +57,20 @@ Stand: 12.11.2026 abends (Durchsicht von Ava). Kleinigkeiten sind schon behoben 
 | C19 | ~~Wackeliger Test~~ | erledigt 17.11.2026: `map_test` vergleicht jetzt die Leben derselben Gegnerart (Gefahr 4 > 1,15 × Gefahr 1) statt des Mittels über eine zufällige Mischung. Vorher: | `map_test` „Gefahr wirkt“ vergleicht zufällig gewürfelte Gegnermischungen (Leben Gefahr 4 > 1,3 × Gefahr 1); fiel am 16.11. einmal knapp durch (101 gegen 117), danach dreimal grün. Mit festem Seed oder Mittel über mehrere Würfe prüfen. |
 
 
+## D. Ideenspeicher (Daniel, 18.11.2026: „Alle deine Vorschläge kommen in den Ideenspeicher“)
+
+Ideen ohne Auftrag. Wer eine angeht, macht daraus ein Ticket im Funkbuch und streicht sie hier.
+
+- **Straßen-Ereignisse:** zwischen zwei Orten der Reisekarte passiert etwas (Anhalter als künftige Crew, Händlerkonvoi, Hinterhalt, Wrack zum Bergen, wilde Entity im Funkmast).
+- **Crew-Kern (#040):** Companions mit Aussehen und Aufgabe, Einstieg über die Straßen-Ereignisse.
+- **Hausmeister-Boss + Stromausfall per Schalter:** ein verlorenes Glitch-Duell könnte den Blackout auslösen.
+- **Fahndungsstufe:** jede gefangene Entity macht die Kammerjäger aufmerksamer; ab einer Stufe jagen sie Leyla im Run (Duell oder echte Gegner).
+- **Bit-Stapel in der Kneipe:** NPCs spielen um Einsätze (Teile, Rezepte, Gerüchte über POIs).
+- **Entities mit Camp-Jobs:** Entities im Deck steuern Werkstätten, ihr Charakter färbt die Arbeit (die Diva schlampt, der Bürokrat sortiert).
+- **Rig-Radio:** Sender mit Musik aus Code, Durchsagen aus BigCityDelta, Lore-Häppchen, Hinweise auf POIs, vielleicht eine DJ-Entity mit Banter.
+- **Fotomodus:** AvA als Kamera, Rig und Camp festhalten und teilen.
+- **Täglicher Run:** ein Tages-Seed für alle mit Ranking.
+
 ## Erledigt bei der Durchsicht (16.11.2026, Daniel: „keine unsichtbaren technischen Schulden … nichts kaputt machen“)
 
 Automatische Prüfungen (Exporte, Mixin-Kollisionen, Felder ohne Wirkung, Daten ohne Feld, Listener, Speicher-Zugriffe, Docs-Verweise, Assets, Build) und drei unabhängige Lese-Prüfungen (Mega-Rigs, Deko/Synergie/Ressourcen/POI-Stapel, Spielstand). Repariert, jeweils mit Test:
