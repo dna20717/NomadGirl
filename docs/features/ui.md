@@ -13,3 +13,7 @@ Steuerung neu (Quick Draw, Benutzen auf ↑, Fenster pausieren, UI-Grammatik) un
 ## Effekt-Leiste (#067)
 
 Daniel, 18.11.2026 (Eleganz-Prüfung Punkt 4: „Effekte mit Ablaufzeit ohne Zuhause“). `game/effects.js` (ohne DOM) sammelt, was gerade wirkt, egal wo es liegt: Buffs für den nächsten Run (`save.buffs`), **Influencer** (#064, mit Stunden), **Strom-Boost** vom Regler (#013), **Markentreue** (#064), **Worker** (#060, wer heute nicht arbeitet steht im Tooltip), **Wetter** (im Camp der Regen, im Run Regen/Nebel/Staub aus `scene.weatherRun`, #063), **Waffenstillstand / Frieden gebrochen** im Revier (#061). Das HUD zeigt sie statt der alten Zeile „BUFFS“ als Chips unter „EFFEKTE“ (gold = gut, blau = Hinweis, rot = schlecht, Stunden klein dahinter, Erklärung als Tooltip). Test `test/effects.test.js`.
+
+## Meldungs-Kanal und Logbuch (#070)
+
+Daniel, 18.11.2026 (Eleganz-Prüfung Punkt 5: „Meldungen ohne Ordnung“). In `hud.toast`: stehen schon **drei** Meldungen (ohne Banner), warten **Hinweise** und **Reise-Meldungen** (`info`, `travel`) in einer Reihe (`toastQueue`) und kommen der Reihe nach, sobald eine geht; Warnungen, Erfolge, Beute, Trophäen kommen sofort. Jede Meldung landet mit der Spieluhr im **Logbuch** des Spielstands (`save.journal`, die neuesten 150); Menü › **Logbuch** zeigt die letzten 40, neueste zuerst. Test `tools/logbook_test.mjs` (3 Prüfungen).

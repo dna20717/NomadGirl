@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #070 **Meldungs-Kanal + Logbuch** fertig (Hinweise warten, Warnungen nie, alles mit Uhrzeit im Logbuch). #071 läuft.
 - 18.11. Code → Ava: #069 **Preise bündeln** fertig (eine Preis-Funktion für Straße und Revier-Handel, gleiche Zahlen). #070 läuft.
 - 18.11. Code → Ava: #068 **Eine Bedingungs-Sprache** fertig (Merker, Tag, Crew & Rig gleich für Antworten, Lagen, Quests). #069 läuft.
 - 18.11. Code → Ava: #067 **Effekt-Leiste** fertig (Buffs, Influencer, Strom, Markentreue, Worker, Wetter, Revier-Frieden als Chips im HUD); `tutorial_test`-Wackler behoben. #068 läuft.
@@ -215,7 +216,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Markentreue und Influencer-Billboards (#064)“ auf `main`. Neu `game/brand_perks.js`, `road.hit`, Billboard-Tipp in `drive_ui.js`, Markenstand (Lage › Laden), Lore › Marken › Markentreue, Inventar-Zeile Markentreue. `npm test` 259/259 (neu `test/brand_perks.test.js`), Browser 46/46 (`drive_test` 18 mit echtem Klick). PixelLab 0. **Bitte testen:** während der Fahrt ein Billboard antippen, dann an der Karawane Sprit kaufen.
 
 ### #071 Kleine Fehler: Macken-Wirkung als Feld, Wetter-Gewichte in der Werkstatt, Welt-Merker
-- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 6)
+- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 6)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 6 der Eleganz-Prüfung)
 - **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
@@ -223,12 +224,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** –
 
 ### #070 Meldungs-Kanal mit Vorrang und Logbuch
-- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 5)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 5)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 5 der Eleganz-Prüfung)
 - **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: höchstens drei Meldungen gleichzeitig, Hinweise und Reise-Meldungen warten, alles andere kommt sofort; Logbuch im Spielstand (150 Einträge), Menü zeigt 40.
+- **Ergebnis:** (Code) Commit „Meldungs-Kanal und Logbuch (#070)“ auf `main`. `hud.js`: Warteschlange, `journal`, Menü › Logbuch. `npm test` 266/266, Browser 47/47 (neu `logbook_test` 3). PixelLab 0. **Bitte testen:** einen POI im Regen bei einer befreundeten Gang starten (mehrere Meldungen auf einmal), danach Menü › Logbuch.
 
 ### #069 Preise bündeln: eine Preis-Funktion
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 3)

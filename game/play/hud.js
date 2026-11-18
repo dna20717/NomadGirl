@@ -36,6 +36,8 @@ const CONTROLS = [
 const caps = keys => keys.split(' / ').flatMap((k, i) => [...(i ? [el('i', {}, '/')] : []), ...k.split(' + ').flatMap((p, j) => [...(j ? [el('i', {}, '+')] : []), el('kbd', {}, p)])]);
 const section = g => el('section', {}, el('h3', {}, icon(g.icon, 16), g.title), el('dl', {}, ...g.rows.flatMap(([k, t]) => [el('dt', {}, ...caps(k)), el('dd', {}, t)])));
 
+const TOAST_MAX = 3, WAITS = new Set(['info', 'travel']);   // #070 Meldungs-Kanal
+
 export class Hud {
   constructor(root, { workshopDrafts = 0, commit = null } = {}) {
     // #020 vitals in cyberpunk style (Daniel, 14.11.2026): slanted neon bars with segments and scanlines; health with a ghost bar that
@@ -115,7 +117,7 @@ export class Hud {
       { label: 'Weiter', primary: true, act: () => {} },
       { label: 'Steuerung', sub: 'Tasten und Controller', act: () => this.toggleHelp(true) },
       { label: 'Feldhandbuch', sub: 'Alle Lektionen mit Clips', act: () => setTimeout(() => this.tut?.openGuide(), 0) },
-      ...(sc.box ? [{ label: 'Achievements', sub: 'Erreicht, offen, Trophäen', act: () => setTimeout(() => this.ach?.open(), 0) }] : []),
+      ...(sc.box ? [{ label: 'Achievements', sub: 'Erreicht, offen, Trophäen', act: () => setTimeout(() => this.ach?.open(), 0) }, { label: 'Logbuch', sub: 'Alle Meldungen mit Uhrzeit', act: () => setTimeout(() => this.logbook(), 0) }] : []),
       { label: 'Optionen', sub: 'Ton, Schießstil', act: () => setTimeout(() => this.optionsMenu(), 0) },
       ...(this.modeName === 'test' ? [{ label: 'Raum neu starten', sub: 'Rücktaste', act: () => sc.level ? sc.restartAs({}) : sc.restartRoom() }] : []),
       { label: 'Werkstatt', act: () => { location.href = 'workshop.html'; } },
@@ -323,11 +325,34 @@ export class Hud {
   }
   // the text of the banner toast still on screen (for the remote control and the tests)
   bannerText() { const t = this.bannerToast; return t?.isConnected && !t.classList.contains('out') ? t.textContent : null; }
-  dismiss(t) { if (!t || t.classList.contains('out')) return; clearTimeout(t._timer); t.classList.add('out'); setTimeout(() => t.remove(), 450); }
+  dismiss(t) { if (!t || t.classList.contains('out')) return; clearTimeout(t._timer); t.classList.add('out'); setTimeout(() => t.remove(), 450); setTimeout(() => this.nextQueued(), 500); }
+  // #070 Meldungs-Kanal: hints and travel news wait in line while three notes are up; warnings, rewards and loot never wait
+  nextQueued() {
+    const q = this.toastQueue;
+    if (!q?.length || this.liveToasts() >= TOAST_MAX) return;
+    const [title, sub, kind, ms, o] = q.shift();
+    this.toast(title, sub, kind, ms, { ...o, queued: true });
+  }
+  liveToasts() { return [...this.toastsEl.children].filter(x => !x.classList.contains('out') && !x.classList.contains('banner')).length; }
+  // #070 Logbuch: every message with the game clock, kept in the savegame (the newest 150)
+  journal(title, sub, kind) {
+    const sv = this.scene?.box?.save;
+    if (!sv) return;
+    const J = (sv.journal ??= []);
+    J.push({ at: clockText(sv), title, sub, kind });
+    if (J.length > 150) J.splice(0, J.length - 150);
+  }
+  logbook() {
+    const sv = this.scene?.box?.save, J = (sv?.journal || []).slice(-40).reverse();
+    this.menu({ title: 'Logbuch', sub: J.length ? `Die letzten ${J.length} Meldungen, neueste zuerst` : 'Noch keine Meldungen', items: [...J.map(e => ({ label: e.title, sub: [e.at, e.sub].filter(Boolean).join(' · '), icon: (TOAST_KINDS[e.kind] || TOAST_KINDS.info).icon, act: () => setTimeout(() => this.logbook(), 0) })),
+      { label: 'Zurück', icon: 'x', act: () => setTimeout(() => this.pauseMenu(), 0) }] });
+  }
   // every message of the game: a note top right that stacks and goes by itself, with its own icon, colour and sound.
   // The same title twice in a row does not stack: the toast already there starts its time again (and nods). → the element
-  toast(title, sub = '', kind = 'info', ms = 4200, { banner = false, sound = true } = {}) {
+  toast(title, sub = '', kind = 'info', ms = 4200, { banner = false, sound = true, queued = false } = {}) {
     const K = TOAST_KINDS[kind] || TOAST_KINDS.info;
+    if (!queued) this.journal(title, sub, kind);   // #070 everything goes into the Logbuch
+    if (!queued && !banner && WAITS.has(kind) && this.liveToasts() >= TOAST_MAX) { (this.toastQueue ??= []).push([title, sub, kind, ms, { banner, sound }]); return null; }
     const same = [...this.toastsEl.children].find(x => !x.classList.contains('out') && x._title === title && x._sub === sub);
     if (same) {
       clearTimeout(same._timer); same.classList.remove('nod'); void same.offsetWidth; same.classList.add('nod');
