@@ -862,6 +862,8 @@ export const AREAS = {
       { title: 'Ziel', fields: [select('counter', 'Zähler', [['', '– Dinge abgeben –'], ...ACHIEVEMENT_COUNTERS], { hint: 'Was das Spiel zählt (ab dem Annehmen). Leer = Dinge abgeben' }), text('filter', 'Filter', { hint: 'Wie bei Achievements: Gegner, Familie, POI, Rang, Rezept …' }), num('target', 'Ziel', { min: 1 }),
         ref('item', 'Abgeben: Ding', 'items'), num('count', 'Abgeben: Anzahl', { min: 1 }),
         refs('pieces', 'Abgeben: alle diese', 'items', { hint: '#057 Schatzsuche: je eins von jedem (z. B. fünf Kartenstücke); statt „Abgeben: Ding“' }),
+        text('needsFlag', 'Erst mit Merker', { hint: '#062: erst im Angebot, wenn alle diese Merker gesetzt sind (Komma), z. B. aus einer Straßen-Geschichte (Ereignis-Baukasten › Antworten › Merker)' }),
+        text('notFlag', 'Nicht mit Merker', { hint: 'nicht mehr im Angebot, sobald einer dieser Merker gesetzt ist' }),
         bool('whenHas', 'Erst wenn eins davon da ist', { hint: '#057: im Angebot erst, wenn Leyla eines der Stücke hat (sie spricht den Auftraggeber darauf an)' }),
         text('flag', 'Merker beim Annehmen', { hint: '#057: setzt einen Merker für den Ereignis-Baukasten (z. B. Händler, die Stücke verkaufen, tauchen erst dann auf)' })] },
       { title: 'Belohnung', fields: [ref('reward.reveal', 'Ort aufdecken', 'locations', { hint: '#057: ein versteckter Ort kommt auf die Reisekarte' }), num('reward.deltas', 'Deltas', { unit: 'Δ', min: 0 }), table('reward.items', 'Dinge', [ref('item', 'Ding', 'items'), num('count', 'Anzahl', { min: 1 })], { hint: 'Kommen in die Kiste im Camp, ist sie voll, in den Rucksack' })] },

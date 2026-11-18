@@ -23,7 +23,9 @@ export function offers(D, save) {
   const Q = qstate(save);
   // #057 a treasure hunt only comes up once Leyla has one of its pieces (she brings it up with the giver)
   const has = x => !x.whenHas || (x.pieces || []).some(id => (stock(D, save)[id] || 0) > 0);
-  return Object.entries(D.quests || {}).filter(([id, x]) => !Q.active[id] && !Q.done[id] && (!x.after || Q.done[x.after]) && (save.day ?? 1) >= (x.minDay ?? 1) && has(x)).map(([id]) => id);
+  const flags = new Set(save.road?.flags || []), list = v => String(v || '').split(',').map(f => f.trim()).filter(Boolean);
+  const flagged = x => list(x.needsFlag).every(f => flags.has(f)) && !list(x.notFlag).some(f => flags.has(f));   // #062 road stories open quests
+  return Object.entries(D.quests || {}).filter(([id, x]) => !Q.active[id] && !Q.done[id] && (!x.after || Q.done[x.after]) && (save.day ?? 1) >= (x.minDay ?? 1) && has(x) && flagged(x)).map(([id]) => id);
 }
 export function accept(D, save, id) {
   const x = D.quests?.[id], Q = qstate(save);

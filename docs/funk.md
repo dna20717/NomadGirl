@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #062 **Quests aus Straßen-Merkern** fertig (4 Aufträge aus Fehde, Kurier, Läuferin). #063 läuft.
 - 18.11. Code → Ava: #062 Quests aus Merkern läuft; #063 Wetter mit Folgen, #064 Markentreue + Influencer-Billboards, #065 Cyberware im Duell angelegt.
 - 18.11. Code → Ava: #060 **Bit-Farm** fertig: Entities wohnen in der Bit-Farm, arbeiten als Worker an Werkstätten (Begabung als Bonus, Macke als Haken, Bindung macht stärker), freundliche Duelle in der Chill-Ecke. Offen: eigenes Bild (PixelLab-Freigabe). Tests 251/251, Browser 46/46.
 - 18.11. Code → Ava: #061 **Revier-Camp** fertig: befreundete Gangs lassen Leyla im POI in Ruhe (Hinweis zu Beginn), Klauen unter Zeugen kostet Ruf, Tresor nur mit Gewalt, Freunde handeln und vergeben „Revier säubern“, jeder Schlag bricht den Frieden. Tests 248/248, Browser 45/45.
@@ -182,15 +183,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ```
 
 ### #062 Quests aus Straßen-Merkern
-- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
 - **Für:** Code
 - **Lesen:** docs/features/worldmap.md (Ketten, Merker)
 - **Auftrag (Daniel, 18.11.2026):** Punkt 4: „ja, machen“: Merker aus Straßen-Geschichten schalten Quests frei.
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: Auftraggeber bleiben Schraube und Onkel Sung (Gangs als Auftraggeber später); Meldung sofort beim Merker, das „!“ im Camp danach.
+- **Ergebnis:** (Code) Commit „Quests aus Straßen-Merkern (#062)“ auf `main`. Quests › Erst mit Merker / Nicht mit Merker, 4 neue Aufträge, Meldung „Neuer Auftrag“. `npm test` 254/254 (neu `test/quest_flags.test.js`), Browser camp/drive/silo grün. PixelLab 0. **Bitte testen:** eine Fehde bis zum Ende spielen, dann zu Schraube.
 
 ### #063 Wetter mit Folgen (mit Meldungen)
-- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
+- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
 - **Für:** Code
 - **Lesen:** docs/features/world.md (Wetter), docs/features/benches.md (Zisterne)
 - **Auftrag (Daniel, 18.11.2026):** Punkt 5: „auch machen, aber mit Meldungen“: Regen auf der Fahrt füllt die Zisterne, Sandsturm macht bestimmte Ereignisse wahrscheinlicher, Nebel aus dem Wetter zieht in den POI; jede Folge mit Meldung.

@@ -13,6 +13,7 @@ import { clockHours } from '../tank.js';
 import { gangOfPlace, levelName } from '../reputation.js';
 import { driveConfig } from '../road.js';
 import { snapshotRig } from './rig_snapshot.js';
+import { offers } from '../quests.js';
 import { workerBonus, placesFor, workplaceOf, assign, unassign, flawOf, syncWorkers, farmEntities, befriend, bondOf, BOND_MAX, WORKING_STATS } from '../workers.js';
 import { occupancy } from '../inventory.js';
 import { de, VERB, SOON, costLine } from './camp.js';
@@ -254,11 +255,12 @@ export class CampActions {
     const meet = () => {
       s.achieveLater?.('encounters');
       const opts = E.options || [];
-      const pick = o => { const r = choose(D, save, o); R.log.push(`${E.name}: ${[r.text, r.lines.join(', ')].filter(Boolean).join(' ')}`);
+      const pick = o => { const before = new Set(offers(D, save)), r = choose(D, save, o); R.log.push(`${E.name}: ${[r.text, r.lines.join(', ')].filter(Boolean).join(' ')}`);
         s.hud.toast(E.name, [r.text, r.lines.join(' · ')].filter(Boolean).join(' · '), r.failed || o.health || o.deltas < 0 || o.fuel > 0 ? 'warn' : 'travel', 4200);
         for (const x of [r.rep, r.rep2]) if (x?.changed) s.hud.toast(`${x.gang}: ${levelName(x.level)}`, x.n > 0 ? 'Dein Ruf bei ihnen steigt' : 'Dein Ruf bei ihnen sinkt', x.n > 0 ? 'good' : 'warn', 4200);   // #055
         if (r.story) s.hud.toast('Die Geschichte geht weiter', 'Auf der nächsten Etappe', 'travel', 3600);
         if (r.revealed) s.hud.toast(`Neuer Ort: ${r.revealed.name}`, 'Steht jetzt auf der Reisekarte', 'good', 6000);   // #057
+        for (const q of offers(D, save).filter(id => !before.has(id))) s.hud.toast(`Neuer Auftrag: ${D.quests[q].name}`, `${D.companions?.[D.quests[q].giver]?.name || 'Jemand'} im Camp will darüber reden`, 'info', 6000);   // #062
         this.box.persist?.(); onward(); };
       const fallback = opts.find(o => !blocked(D, save, o)) || opts[opts.length - 1];
       const look = (E.look && D.assets?.[E.look]?.file) ? E.look : D.travel?.encounterLook, file = look && D.assets?.[look]?.file;   // #021 comic panel

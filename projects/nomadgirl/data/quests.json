@@ -58,5 +58,47 @@
   "pieces": ["silo_karte_1", "silo_karte_2", "silo_karte_3", "silo_karte_4", "silo_karte_5"],
   "text": "Zeig mal her … Das ist Armeepapier. Ich kenne das Zeichen: Silo Zero, irgendwo in den Bergen. Oppenheimer hat gesagt: „Jetzt bin ich der Tod geworden, der Zerstörer der Welten.“ Die Leute, die das gebaut haben, haben ihre Karte in fünf Stücke gerissen, damit sie keiner allein findet. Eins hast du. Zwei liegen in Tresoren, in Bunker 13 und im Ministerium. Den Rest kaufst du auf der Straße oder holst ihn dir. Bring mir alle fünf, dann setze ich sie zusammen.",
   "done": "Fünf Stücke, eine Karte. Da. Zwischen den Felsnadeln. Leyla … was immer da unten schläft: weck es nicht ohne Grund."
+ },
+ "kreuzung_nachspiel": {
+  "name": "Nachspiel an der Kreuzung",
+  "counter": "kills",
+  "target": 6,
+  "reward": {"deltas": 120, "items": [{"item": "technik", "count": 2}]},
+  "giver": "schraube",
+  "needsFlag": "fehde_held",
+  "filter": "raider",
+  "text": "Die Leute von der Kreuzung haben über Funk nach dir gefragt. Die anderen sind noch nicht fertig mit uns. Erledige sechs Plünderer, bevor sie zu uns kommen, dann schlafe ich wieder ruhig.",
+  "done": "Sechs. Hab mitgezählt. Die Kreuzung schickt Grüße und ein Fass Schmiere."
+ },
+ "kuriers_dank": {
+  "name": "Ein Paket mit Absender",
+  "counter": "pois",
+  "target": 2,
+  "reward": {"deltas": 180},
+  "giver": "onkel_sung",
+  "needsFlag": "kurier_gerettet",
+  "text": "Der Kurier, den du gerettet hast, hat uns eine Nachricht hinterlassen: Seine Firma zahlt gut für Leute, die sich trauen. Zwei POIs, egal welche, dann kommt das Geld per Bote.",
+  "done": "Der Bote war da. Er hat sich dreimal verbeugt. Ich mag Leute mit Manieren."
+ },
+ "laeuferins_versteck": {
+  "name": "Wo die Läuferin schläft",
+  "counter": "secrets",
+  "target": 2,
+  "reward": {"deltas": 90, "items": [{"item": "medikit", "count": 2}]},
+  "giver": "schraube",
+  "needsFlag": "laeuferin_freundin",
+  "text": "Deine neue Freundin, die Läuferin, hat mir ein Rätsel gefunkt: Ihre Leute verstecken Vorräte hinter falschen Wänden. Finde zwei Secrets, dann verrät sie uns ihr bestes Versteck.",
+  "done": "Sie hat geantwortet. Koordinaten, ein Smiley und das Wort „Danke“. Ich glaub, ich mag sie."
+ },
+ "schlechtes_gewissen": {
+  "name": "Schlechtes Gewissen",
+  "reward": {"deltas": 40},
+  "giver": "onkel_sung",
+  "needsFlag": "laeuferin_bestohlen",
+  "notFlag": "laeuferin_freundin",
+  "item": "bohneneintopf",
+  "count": 3,
+  "text": "Ich hab gehört, was mit der Läuferin war. Ich sag nichts. Aber koch drei Eintöpfe, ich bring sie ihren Leuten. Manches kann man nicht zurückgeben, aber man kann es satt machen.",
+  "done": "Sie haben gegessen. Keiner hat dich gelobt. Keiner hat dich verflucht. Das ist ein Anfang."
  }
 }
