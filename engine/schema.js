@@ -39,7 +39,7 @@ const DESCRIPTION = area_('description', 'Beschreibung');
 const VALUE = num('value', 'Wert', { unit: 'Δ', min: 0, hint: 'Verkaufswert in Deltas' });
 // what a trophy can give (Achievements › Bonus): Leyla's gear values (game/inventory.js › GEAR_STATS) plus the tank
 const TROPHY_GEAR = [['defense', 'Abwehr %'], ['health', 'Leben'], ['damage', 'Schaden %'], ['melee', 'Nahkampf %'], ['ranged', 'Fernkampf %'], ['crit', 'Krit-Chance %'], ['speed', 'Tempo %'],
-  ['jump', 'Sprungkraft %'], ['dashCooldown', 'Dash-Abklingzeit %'], ['regen', 'Heilt sich (LP/10 s)'], ['heal', 'Heilung %'], ['droneBattery', 'AvA-Akku %'], ['tankDecay', 'Tank: Verfall %']];
+  ['jump', 'Sprungkraft %'], ['dashCooldown', 'Dash-Abklingzeit %'], ['regen', 'Heilt sich (LP/10 s)'], ['heal', 'Heilung %'], ['droneBattery', 'AvA-Akku %'], ['tankDecay', 'Tank: Verfall %'], ['hack', 'Duell-Integrität']];
 export const TECH_BONUS = [['tankDecay', 'Tank: Verfall %'], ['tankRescue', 'Tank: Rettung kostet %'], ['tankAccel', 'Tank: Beschleunigung %'],
   ['tankStatus', 'Tank-Anzeige im Run (1 = an)'], ['droneBattery', 'AvA: Akku %'], ['health', 'Leyla: Leben'], ['damage', 'Leyla: Schaden %']];
 const LOOK = ref('look', 'Aussehen', 'assets', { hint: 'Grafik aus dem Bereich Assets' });
@@ -800,7 +800,7 @@ export const AREAS = {
         num('stats.defense', 'Abwehr', { unit: '%', hint: 'Weniger Schaden, zählt mit Buffs zusammen (höchstens 90 %). Negative Werte sind Nachteile (rot im Tooltip)' }), num('stats.health', 'Leben', { unit: 'LP' }), num('stats.damage', 'Schaden', { unit: '%' }), num('stats.speed', 'Tempo', { unit: '%' }),
         num('stats.melee', 'Nahkampf', { unit: '%', hint: 'Nur Nahkampf-Schaden, zusätzlich zu Schaden' }), num('stats.ranged', 'Fernkampf', { unit: '%', hint: 'Nur Fernkampf-Schaden, zusätzlich zu Schaden' }),
         num('stats.crit', 'Krit-Chance', { unit: '%', hint: 'Kommt zur Krit-Chance der Waffe dazu (Krit = doppelter Schaden)' }), num('stats.jump', 'Sprungkraft', { unit: '%' }),
-        num('stats.dashCooldown', 'Dash-Abklingzeit', { unit: '%', hint: 'Negativ = schneller wieder bereit' }),
+        num('stats.dashCooldown', 'Dash-Abklingzeit', { unit: '%', hint: 'Negativ = schneller wieder bereit' }), num('stats.hack', 'Duell-Integrität', { hint: '#065: so viel mehr Integrität im Glitch-Duell im Spiel (Augen- und Nerven-Implantate); negativ = Nachteil' }),
         num('stats.airJumps', 'Sprünge in der Luft', { hint: 'Doppelsprung: 1 = einer in der Luft. Mit Leyla › Fähigkeiten › nur mit Implantat kommt er nur von hier' }),
         num('stats.airDash', 'Luft-Dash', { min: 0, max: 1, hint: '1 = Leyla darf in der Luft dashen (mit Leyla › Fähigkeiten › nur mit Implantat). Am Boden geht der Dash immer' }),
         num('stats.regen', 'Heilt sich', { unit: 'LP/10 s', step: 0.5, hint: 'Negativ = Leben sickert (nie unter 1 LP)' }), num('stats.heal', 'Heilung', { unit: '%', hint: 'Wirkung von Medikits und Heil-Essen' }),

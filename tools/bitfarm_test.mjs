@@ -32,9 +32,10 @@ check('Inventar: „Als Worker einsetzen“, Auswahl der Werkstätten (eigene zu
 v = await ev(async () => { const W = await import('/game/workers.js'), s = SC(); return { bonus: W.workerBonus(s.data_, nomad.save(), 'perfect'), list: W.workers(s.data_, nomad.save()).map(k => [k.g.name, k.def.name, k.value, k.flaw.why]) }; });
 check('Worker wirkt: Koch-Bonus mit Macke (−15 %, lenkt sich ab)', v.bonus > 0 && v.list[0]?.[3] === 'lenkt sich ab', v);
 // the Chill-Ecke: a friendly duel
-v = await ev(() => { const s = SC(), b = s.camp.benches.list.find(x => x.id === 'chill_area'); s.camp.use('chill_area', b.place); nomad.step(2); const items = (s.hud.menuItems || []).map(x => x.label);
-  nomad.choose('Freundliches Duell'); nomad.step(3); const d = s.hud.duel; return { items, open: d?.isOpen, friendly: !!d?.foe?.friendly, foe: d?.foe?.name }; });
+v = await ev(() => { const s = SC(), b = s.camp.benches.list.find(x => x.id === 'chill_area'); nomad.save().inv.wear.nerves = 'overclock_chip'; s.camp.use('chill_area', b.place); nomad.step(2); const items = (s.hud.menuItems || []).map(x => x.label);
+  nomad.choose('Freundliches Duell'); nomad.step(3); const d = s.hud.duel; return { items, open: d?.isOpen, friendly: !!d?.foe?.friendly, foe: d?.foe?.name, hp: d?.state?.()?.hp, hack: document.querySelector('.gd-hack')?.textContent || '' }; });
 check('Chill-Ecke: „Freundliches Duell“ gegen die eigene Entity', v.items.includes('Freundliches Duell') && v.open && v.friendly && v.foe === 'Pepper Hiss', v);
+check('Cyberware im Duell (#065): Overclock-Chip (Ghostwire, Qualität +5 %) gibt +16 Integrität nur für Leyla, der Kopf sagt es', v.hp?.[0] === 66 && v.hp?.[1] === 50 && /Implantate: \+16 Integrität/.test(v.hack), v);
 v = await ev(async () => { const s = SC(), d = s.hud.duel, caught0 = (nomad.save().glitch?.caught || []).length; d.ended({ winner: 'player' }); nomad.step(2); const txt = d.endExtra()[0]?.textContent || ''; d.close(); nomad.step(3);
   const W = await import('/game/workers.js'), g = W.farmEntities(s.data_, nomad.save())[0].g; return { txt, bond: W.bondOf(g), n: W.farmEntities(s.data_, nomad.save()).length, caught: (nomad.save().glitch?.caught || []).length - caught0, backpack: nomad.save().inv.grids.backpack.items.filter(e => e.g).length }; });
 check('Sieg im freundlichen Duell: Bindung ♥, nichts gefangen, keine Kopie', v.bond === 1 && v.n === 1 && v.caught === 0 && v.backpack === 0 && /grinst/.test(v.txt), v);

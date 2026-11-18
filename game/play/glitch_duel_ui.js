@@ -7,6 +7,8 @@
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { hints, closeX } from './ui_nav.js';
+import { gearStats } from '../inventory.js';
+import { implantBoosts } from '../stations.js';
 import { StackView } from '../stack_view.js';
 import { faceCanvas } from '../glitch_face.js';
 import { cores, catchGlitchling } from '../glitch_world.js';
@@ -38,9 +40,12 @@ export class GlitchDuelUI {
     if (this.phase === 'duel') this.begin(); else this.draw();
   }
   begin() {
-    const D = this.D, me = this.cores[this.pick];
+    const D = this.D, me = this.cores[this.pick], save = this.host.scene()?.box?.save;
     this.phase = 'duel';
-    this.view.start(me, this.foe, { rules: 'dot', hp: D.glitchlings?.duel?.stackHp ?? 50 });
+    // #065 Cyberware im Duell: implants with „Duell-Integrität“ (eyes, nerves) give Leyla's side more Integrität (a friendly duel too)
+    this.hack = save ? Math.round(gearStats(D, save.inv?.wear, implantBoosts(D, save)).hack || 0) : 0;
+    const base = D.glitchlings?.duel?.stackHp ?? 50;
+    this.view.start(me, this.foe, { rules: 'dot', hp: Math.max(10, base + this.hack), foeHp: this.foe.duelHp ?? base });   // the opponent keeps its own
   }
   close() {
     this.view?.stop(); this.el.hidden = true; this.el.replaceChildren(); this.swallow = 3;   // the next game frames ignore Esc / E (scene.padMenus)
@@ -88,7 +93,7 @@ export class GlitchDuelUI {
 
   draw() {
     if (!this.isOpen) return;
-    const head = el('div', { class: 'gd-head' }, icon('brain', 18), el('b', {}, this.title), this.sub ? el('small', {}, this.sub) : null);
+    const head = el('div', { class: 'gd-head' }, icon('brain', 18), el('b', {}, this.title), this.sub ? el('small', {}, this.sub) : null, this.hack && this.phase !== 'pick' ? el('small', { class: this.hack > 0 ? 'gd-hack up' : 'gd-hack down' }, icon('brain', 14), ` Implantate: ${this.hack > 0 ? '+' : ''}${this.hack} Integrität`) : null);   // #065
     let body, help;
     if (this.phase === 'pick') {
       body = el('div', { class: 'gd-pick' }, el('p', {}, 'Welcher AI-Core tritt an?'),
