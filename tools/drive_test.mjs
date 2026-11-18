@@ -98,6 +98,12 @@ await until(() => SC().hud.drive?.isOpen && SC().hud.drive.road?.screens?.length
 await page.waitForTimeout(1200); await shot('billboards');
 v = await ev(() => ({ screens: SC().hud.drive.road.screens.length, brand: SC().hud.drive.road.screens[0]?.brand?.name, lines: SC().hud.drive.road.screens[0]?.brand?.lines.length }));
 check('Riesen-Billboards mit Werbung der Marken stehen in der Landschaft', v.screens >= 1 && v.brand && v.lines >= 1, v);
+// #064 a billboard tapped during the drive: Influencer buff for its brand (a real click on the screen's place in the canvas)
+const at = await ev(() => { const d = SC().hud.drive, c = d.canvas, r = c.getBoundingClientRect(), u = c.width / 480, sc = d.visibleAd() || d.road.screens[0];
+  return { x: r.left + (sc.x + sc.w / 2) * u * r.width / c.width, y: r.top + (sc.y + sc.h / 2) * u * r.height / c.height, brand: sc.brand.id }; });
+await page.mouse.click(at.x, at.y);
+v = await ev(async () => { const B = await import('/game/brand_perks.js'), s = SC(); return { inf: B.influencer(s.data_, nomad.save()), fast: s.hud.drive.keys.has('ptr') }; });
+check('Billboard angetippt: Buff „Influencer“ für die Marke, 20 % Nachlass für 24 h, kein Vorspulen', v.inf?.brand === at.brand && v.inf.discount === 20 && Math.round(v.inf.left) === 24 && !v.fast, { v, at });
 await until(() => SC().hud.modal, null, 40000);
 v = await ev(() => ({ title: document.querySelector('.hud-menu h2')?.textContent || '', items: [...document.querySelectorAll('.hud-menu .hud-item b')].map(b => b.textContent) }));
 check('Freund der Gang: Freie Fahrt statt Wegzoll, keine Kampf-Antworten', /Freie Fahrt|Bekannte Gesichter/.test(v.title) && !v.items.some(t => /Durchbrechen|kämpfen|Gas geben/.test(t)), v);

@@ -7,6 +7,7 @@
 import { addRep, repOf, levelOf, levelName, repConfig, repPrice, REP_LEVELS } from '../reputation.js';
 import { rollLoot } from '../inventory.js';
 import { give } from '../crafting.js';
+import { brandDiscount } from '../brand_perks.js';
 
 const rank = id => REP_LEVELS.findIndex(([k]) => k === id);
 const GANG_FAMILIES = ['raider', 'machine'];
@@ -110,7 +111,7 @@ export class Turf {
       for (let i = 0; i < 6 && seen.size < 4; i++) for (const t of rollLoot(D, table)) if (t.a === 'items' && D.items?.[t.id] && !seen.has(t.id)) seen.set(t.id, { id: t.id, n: t.n });
       this.stock = [...seen.values()].slice(0, 4);
     }
-    const price = t => Math.max(5, Math.round((D.items[t.id].value || 5) * 1.5 * repPrice(D, save, this.gang)));
+    const price = t => Math.max(5, Math.round((D.items[t.id].value || 5) * 1.5 * repPrice(D, save, this.gang) * brandDiscount(D, save, D.items[t.id].brand)));   // #064 Influencer
     const items = this.stock.map(t => ({ label: `${D.items[t.id].name}${t.n > 1 ? ` ×${t.n}` : ''}`, sub: `${price(t) * t.n} Δ`, icon: 'coins', disabled: t.sold ? 'verkauft' : (save.deltas || 0) < price(t) * t.n ? 'zu wenig Δ' : null,
       act: () => { const cost = price(t) * t.n, rest = give(D, save, t.id, t.n); if (rest >= t.n) return s.hud.toast('Kein Platz', 'Rucksack, Kiste und Lager sind voll', 'warn'); save.deltas -= cost; t.sold = true; s.hud.toast(`Gekauft: ${D.items[t.id].name}`, `−${cost} Δ`, 'loot', 2600); this.trade(); } }));
     items.push({ label: 'Fertig', icon: 'x', act: () => {} });

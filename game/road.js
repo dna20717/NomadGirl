@@ -603,7 +603,9 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
   }
   // a new bolt for a lightning flash
   const strike = () => { bolt = { x: Math.round(40 + Math.random() * (BW - 80)), s: Math.floor(Math.random() * 1e6) }; };
-  return { draw, light, front, strike, ads, sky: skyAt, get screens() { return screens; } };
+  // #064 which giant screen is at this canvas pixel (the canvas is W wide) → { brand, x, y, w, h } or null
+  const hit = (px, py, W) => { const u = W / BW, m = 6 * u; return screens.find(sc => px >= sc.x * u - m && px <= (sc.x + sc.w) * u + m && py >= sc.y * u - m && py <= (sc.y + sc.h) * u + m) || null; };
+  return { draw, light, front, strike, ads, hit, sky: skyAt, get screens() { return screens; } };
 }
 
 // the weather of a leg: dust and fog by region and hour (the same leg always the same), the Sandsturm brings its own wall of dust

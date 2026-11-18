@@ -9,6 +9,7 @@ import { buildPoi, poiReady } from '../../engine/poi.js';
 import { buildMegarig } from '../../engine/megarig.js';
 import { MegarigView } from './megarig_view.js';
 import { Turf } from './turf.js';
+import { brandSets } from '../brand_perks.js';
 import { runSky } from '../weather_fx.js';
 import { PoiLevel } from './poi_level.js';
 import { Pad, PAD_ACTIONS } from './pad.js';
@@ -415,6 +416,7 @@ export class PlayScene extends Phaser.Scene {
     const g = this.box ? { ...gearStats(this.data_, this.box.save.inv?.wear, implantBoosts(this.data_, this.box.save)) } : {};
     if (this.box) { const b = bonuses(this.data_, this.box.save); for (const k of ['health', 'damage']) if (b[k]) g[k] = (g[k] || 0) + b[k]; }   // Techtree: passive bonuses count like gear
     if (this.box) { const b = trophyBonuses(this.data_, this.box.save); for (const k of GEAR_KEYS) if (b[k] && k !== 'tankDecay' && k !== 'droneBattery') g[k] = (g[k] || 0) + b[k]; }   // trophies on the stands (#012)
+    if (this.box) { const b = brandSets(this.data_, this.box.save).stats; for (const k of GEAR_KEYS) if (b[k]) g[k] = (g[k] || 0) + b[k]; }   // #064 Markentreue: three of one brand
     for (const k of GEAR_KEYS) { const v = (this.mods[k] || 0) - (this.gearMods?.[k] || 0) + (g[k] || 0); if (v) this.mods[k] = v; else delete this.mods[k]; }
     this.gearMods = g;
     // Cyberware (#006, Daniel, 13.11.2026: Implantate „ermöglichen Doppelsprung und Dash“): with a savegame and Leyla › Fähigkeiten › nur mit Implantat

@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #064 **Markentreue + Influencer** fertig: Billboard antippen = 20 % auf die Marke für 24 h (Karawane, Markenstand, Revier-Handel), drei Teile einer Marke = Set-Bonus. #065 läuft.
 - 18.11. Code → Ava: #063 **Wetter mit Folgen** fertig: Sandsturm/Nebel/Regen machen passende Zwischenfälle häufiger, Regen füllt die Zisterne (mit Meldung), im POI hören Gegner bei Regen schlechter und sehen im Nebel weniger. #064 läuft.
 - 18.11. Code → Ava: #062 **Quests aus Straßen-Merkern** fertig (4 Aufträge aus Fehde, Kurier, Läuferin). #063 läuft.
 - 18.11. Code → Ava: #062 Quests aus Merkern läuft; #063 Wetter mit Folgen, #064 Markentreue + Influencer-Billboards, #065 Cyberware im Duell angelegt.
@@ -200,15 +201,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Wetter mit Folgen (#063)“ auf `main`. Neu `game/weather_fx.js` (`legSky`, `runSky`, `cisternWater`), Gewichtung in `generateEncounter` (`ctx.bias`), Meldungen in `camp_actions` und `scene`. `npm test` 256/256 (neu `test/weather_fx.test.js`), Browser 44/46 im Gesamtlauf: `mobile_test` (Zeitüberschreitung, einzeln 19/19 grün) und `tutorial_test` (der bekannte Wackler: der Run-Tipp kommt manchmal nicht, einzeln 2 von 3 grün). PixelLab 0. **Bitte testen:** eine Fahrt durch die Glass Dunes (Sandsturm) und einen POI im Regen.
 
 ### #064 Markentreue und Influencer-Billboards
-- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
 - **Für:** Code
 - **Lesen:** docs/features/lore.md, docs/features/worldmap.md (Billboards)
 - **Auftrag (Daniel, 18.11.2026):** Punkt 6: „auf jeden Fall machen. Billboards auf der Reise sollen ab sofort einen Nachlass ermöglichen. Klickt man sie während der Fahrt an, erhält man den Buff „Influencer + Brand“ und damit einen ordentlichen Nachlass (20 Prozent) auf diese Brand in den nächsten xy Stunden.“ Dazu Set-Bonus für drei Teile derselben Marke.
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: „xy Stunden“ = 24 h (Reisen › Fahrt › Influencer: Dauer); eine Marke zur Zeit, ein neuer Tipp ersetzt sie; Nachlass gilt an Antworten mit Marke (Sprit = Delta Petrol, Essen = Neon Noodle), für Dinge der Marke, am neuen Markenstand und im Revier-Camp-Handel; ohne Maus: Tastatur R / Controller X; Set-Bonus ab 3 Teilen, Werte für acht Marken mit Ausrüstung.
+- **Ergebnis:** (Code) Commit „Markentreue und Influencer-Billboards (#064)“ auf `main`. Neu `game/brand_perks.js`, `road.hit`, Billboard-Tipp in `drive_ui.js`, Markenstand (Lage › Laden), Lore › Marken › Markentreue, Inventar-Zeile Markentreue. `npm test` 259/259 (neu `test/brand_perks.test.js`), Browser `drive_test` 18 (echter Klick). PixelLab 0. **Bitte testen:** während der Fahrt ein Billboard antippen, dann an der Karawane Sprit kaufen.
 
 ### #065 Cyberware im Duell
-- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
+- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
 - **Für:** Code
 - **Lesen:** docs/features/cyberware.md, docs/features/glitchlings.md
 - **Auftrag (Daniel, 18.11.2026):** Punkt 7: „ja. Machen.“ (Implantate wirken im Glitch-Duell, z. B. mehr Integrität).

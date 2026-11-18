@@ -5,6 +5,7 @@
 // coloured cells by category with a short glyph, the name and the count.
 import { DECK, deckSize, fitDeck } from '../save.js';
 import { farmKeys, workplaceOf } from '../workers.js';
+import { brandSets } from '../brand_perks.js';
 import { faceCanvas, SIZE } from '../glitch_face.js';
 import { brandOf as glitchBrand } from '../glitchlings.js';
 import { achievementOf, displayed, bonusText } from '../achievements.js';
@@ -206,7 +207,9 @@ export class InventoryUI {
     const stats = el('div', { class: 'inv-stats' }, stat('Leben', String(base + st.health), st.health ? 'up' : ''), stat('Abwehr', `${st.defense} %`), stat('Schaden', `${st.damage >= 0 ? '+' : ''}${st.damage} %`),
       stat('Tempo', `${100 + st.speed} %`, st.speed < 0 ? 'down' : st.speed > 0 ? 'up' : ''), stat('Belastung', `${st.strain} / ${max}`, st.strain > max * 0.8 ? 'warn' : 'cyan'),
       // Cyberware (#006): what the implants unlock in the air (Leyla › Inventar › nur mit Implantat)
-      D.leyla?.abilities?.gated !== false ? stat('In der Luft', [st.airJumps > 0 ? `${st.airJumps}× Sprung` : null, st.airDash > 0 ? 'Dash' : null].filter(Boolean).join(' + ') || '—', st.airJumps > 0 || st.airDash > 0 ? 'up' : '') : null);
+      D.leyla?.abilities?.gated !== false ? stat('In der Luft', [st.airJumps > 0 ? `${st.airJumps}× Sprung` : null, st.airDash > 0 ? 'Dash' : null].filter(Boolean).join(' + ') || '—', st.airJumps > 0 || st.airDash > 0 ? 'up' : '') : null,
+      // #064 Markentreue: the best set in progress (three of one brand = its bonus)
+      (b => b ? stat('Markentreue', `${b.name} ${Math.min(b.n, b.need)}/${b.need}${b.on ? ' ✓' : ''}`, b.on ? 'up' : '') : null)(brandSets(D, this.host.save()).list.find(x => x.n >= 2)));
     // one layout for both tabs (Daniel, 11.11.2026: "der Switch soll im selben Fenster stattfinden"): Leyla stays put,
     // only the six places left and right change, and she fades into the scan; the wires are drawn once the layout stands
     const col = keys => el('div', { class: 'inv-wearcol' }, ...keys.map(([x, n]) => this.slotEl(x, n)));

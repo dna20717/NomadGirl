@@ -513,6 +513,19 @@
    "text": "Am Feuer verkauft jemand Dinge, die es nicht geben dürfte. Auf einer Kiste liegt ein Stück Karte mit eingebranntem Raketen-Zeichen.",
    "answers": "silo_brand_kaufen, silo_brand_stehlen, weiterfahren",
    "not": "silo_k5"
+  },
+  {
+   "figures": "",
+   "time": "any",
+   "weight": 3,
+   "danger": 1,
+   "moods": "freundlich, gierig, gelangweilt",
+   "id": "markenstand",
+   "name": "Markenstand|Pop-up-Store am Highway",
+   "roadside": "trader",
+   "shop": "brand",
+   "text": "Ein Truck mit aufgeklappter Seite, Neonschrift, Musik aus Boxen: {brand} verkauft direkt vom Laster.|Ein Verkaufsstand im Logo-Look. Wer ein Billboard gesehen hat, kennt die Preise schon.",
+   "answers": "weiterfahren"
   }
  ],
  "moods": [
@@ -713,8 +726,8 @@
    "failResult": "Sie hat dir eine verpasst und ist mit dem Kleingeld weg."
   },
   {"id": "essen_teilen", "label": "Essen teilen", "when": "friendly", "food": 1, "loot": "situation", "result": "Zum Dank zieht sie etwas aus dem Rucksack."},
-  {"id": "essen_kaufen", "label": "Essen kaufen ({price} Δ)", "when": "any", "deltas": -15, "food": -2, "result": "Zwei Portionen, noch warm. Fast."},
-  {"id": "tanken", "label": "Sprit kaufen ({price} Δ)", "when": "any", "deltas": -30, "fuel": -8, "result": "Acht Liter, kaum Sand drin."},
+  {"id": "essen_kaufen", "label": "Essen kaufen ({price} Δ)", "when": "any", "deltas": -15, "food": -2, "result": "Zwei Portionen, noch warm. Fast.", "brand": "neon_nudel"},
+  {"id": "tanken", "label": "Sprit kaufen ({price} Δ)", "when": "any", "deltas": -30, "fuel": -8, "result": "Acht Liter, kaum Sand drin.", "brand": "delta_petrol"},
   {
    "id": "tauschen_schrott",
    "label": "Schrott gegen eine Batteriezelle",

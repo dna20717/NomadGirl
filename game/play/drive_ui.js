@@ -10,6 +10,7 @@ import { icon } from '../icons.js';
 import { hints } from './ui_nav.js';
 import { makeRoad, driveConfig, landscapeOf, legWeather, skyAt, BW, BH, WHEEL_Y } from '../road.js';
 import { mapBrands } from '../brands.js';
+import { becomeInfluencer } from '../brand_perks.js';
 import { mapConfig } from '../worldmap.js';
 import { rainingAt } from '../rain.js';
 import { kitLook } from './enemy_kit.js';
@@ -30,13 +31,14 @@ export class DriveUI {
     this.keys = new Set();
     window.addEventListener('keydown', e => {
       if (!this.isOpen || this.host.scene()?.hud?.modal) return;
-      const a = { Escape: 'back', Enter: 'ok', ' ': 'ok', e: 'ok', E: 'ok' }[e.key];
+      const a = { Escape: 'back', Enter: 'ok', ' ': 'ok', e: 'ok', E: 'ok', r: 'ad', R: 'ad' }[e.key];
       if (!a) return;
       e.preventDefault(); e.stopPropagation();
+      if (a === 'ad') { if (!e.repeat) this.tapVisible(); return; }   // #064 keyboard: the billboard in view
       if (a === 'ok') this.keys.add('ok'); else if (!e.repeat) this.skip();
     }, true);
     window.addEventListener('keyup', e => { if (['Enter', ' ', 'e', 'E'].includes(e.key)) this.keys.delete('ok'); }, true);
-    this.canvas.addEventListener('pointerdown', () => this.keys.add('ptr'));
+    this.canvas.addEventListener('pointerdown', e => { if (!this.tapAd(e)) this.keys.add('ptr'); });   // #064 a billboard tapped = Influencer, else hold = faster
     window.addEventListener('pointerup', () => this.keys.delete('ptr'));
   }
   get isOpen() { return !this.el.hidden; }
@@ -80,7 +82,10 @@ export class DriveUI {
     else if (L.stopT == null || L.stopped) L.time = L.T;
   }
   // pad (scene.padMenus): hold A to go faster, B skips
-  nav(u) { if (u.down('ok')) this.keys.add('pad'); else this.keys.delete('pad'); if (u.pressed('back')) this.skip(); }
+  nav(u) { if (u.down('ok')) this.keys.add('pad'); else this.keys.delete('pad'); if (u.pressed('back')) this.skip(); if (u.pressed('context')) this.tapVisible(); }
+  // #064 without a pointer (keyboard R, controller X): the giant screen most in view
+  visibleAd() { const sc = (this.road?.screens || []).filter(x => x.x + x.w > 0 && x.x < BW); return sc.sort((a, b) => Math.abs(a.x + a.w / 2 - BW / 2) - Math.abs(b.x + b.w / 2 - BW / 2))[0] || null; }
+  tapVisible() { const sc = this.phase === 'drive' && this.visibleAd(); return sc ? this.influence(sc) : false; }
   // seconds the rig needs to slow down from the right edge to the incident (it comes into view at the edge)
   approach() { const v0 = this.C.speed, d = Math.max(40, BW + 10 - (this.stopX())); return 2 * d / v0; }
   stopX() { const r = this.rigBox(); return r ? r.frontBg + 16 : BW * 0.7; }
@@ -246,6 +251,23 @@ export class DriveUI {
     return { front: b.x1 - 2 * b.k, lampY: b.y - (r.ground - r.lampY) * b.k, back: b.x0 + 3 * b.k, tailY: b.y - (r.ground - r.tailY) * b.k };
   }
 
+  // #064 Influencer (Daniel 18.11.2026: „Klickt man sie während der Fahrt an, erhält man den Buff „Influencer + Brand““)
+  tapAd(e) {
+    if (!this.road?.hit || this.phase !== 'drive') return false;
+    const c = this.canvas, r = c.getBoundingClientRect(), px = (e.clientX - r.left) * c.width / (r.width || 1), py = (e.clientY - r.top) * c.height / (r.height || 1);
+    const sc = this.road.hit(px, py, c.width);
+    return sc ? this.influence(sc) : false;
+  }
+  influence(sc) {
+    const s = this.host.scene(), save = s?.box?.save, D = this.D, id = sc?.brand?.id;
+    if (!save || !id) return false;
+    const r = becomeInfluencer(D, save, id);
+    if (!r) return false;
+    this.ping = { sc, t: 0 };
+    s.hud.toast(`Influencer: ${r.name}`, `${r.renewed ? 'Verlängert' : 'Geteilt, geliked'}: ${r.discount} % Nachlass auf ${r.name} für ${r.hours} h`, 'good', 4200);
+    s.box.persist?.();
+    return true;
+  }
   // ---------- drawing ----------
   draw() {
     if (this.el.hidden || !this.road) return;
@@ -265,6 +287,14 @@ export class DriveUI {
       ctx.drawImage(this.bg, 0, 172, BW, BH - 172, 0, 172 * u, W, (BH - 172) * u);
     } else ctx.drawImage(this.bg, 0, 0, W, H);
     this.road.ads(ctx, W, H, st);   // #055 giant screens of the brands
+    if (this.ping) {   // #064 the tapped screen flashes and a ring goes out
+      const p = this.ping, u = W / BW, sc = p.sc, k = Math.min(1, p.t / 0.9);
+      p.t += 1 / 60;
+      ctx.save(); ctx.strokeStyle = `rgba(255,232,160,${1 - k})`; ctx.lineWidth = Math.max(2, 3 * u);
+      const pad = 8 * u * (1 + k * 2); ctx.strokeRect(sc.x * u - pad, sc.y * u - pad, sc.w * u + 2 * pad, sc.h * u + 2 * pad);
+      ctx.fillStyle = `rgba(255,255,255,${0.35 * (1 - k)})`; ctx.fillRect(sc.x * u, sc.y * u, sc.w * u, sc.h * u); ctx.restore();
+      if (k >= 1) this.ping = null;
+    }
     this.drawCast(ctx, W, S);
     const lamps = this.drawRig(ctx, W, H, S);
     this.road.light(ctx, W, H, st, lamps);
@@ -290,7 +320,7 @@ export class DriveUI {
       this.say && this.say.until > this.st.t ? el('div', { class: 'dv-say' }, icon('warning', 18), this.say.text) : null,
       el('div', { class: 'dv-bottom' },
         el('div', { class: 'dv-track' }, el('div', { class: 'dv-fill', style: `width:${total}%` }), ...dots, el('span', { class: 'dv-van', style: `left:${total}%` }, icon('vehicle', 16))),
-        this.phase === 'stop' ? null : hints([['ok', 'vorspulen (halten)'], ['back', 'überspringen']])));
+        this.phase === 'stop' ? null : hints([['ok', 'vorspulen (halten)'], ['back', 'überspringen'], ...(this.visibleAd() ? [['context', 'Billboard: Influencer']] : [])])));
   }
   image(file) {
     if (!file) return null;

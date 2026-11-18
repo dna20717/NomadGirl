@@ -14,7 +14,8 @@
 // four legs. Situations with „Nur als Folge“ only come that way, „needs“/„not“ ask for Merker (who was helped turns up again).
 // Placeholders also {gang} {rival} {motto}.
 // No DOM.
-import { mapBrands } from './brands.js';
+import { mapBrands, valueOf } from './brands.js';
+import { brandDiscount, influencer } from './brand_perks.js';
 import { gangs, repOf, levelOf, gangOfPlace, repPrice } from './reputation.js';
 import { NEED_KEYS, hasNeeds, needBlocked, needTag } from './needs.js';
 
@@ -82,6 +83,19 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
   const friendly = M ? !!M.friendly : true, hostile = M ? !!M.hostile : true;
   const fits = a => !a.when || a.when === 'any' || (a.when === 'friendly' && friendly) || (a.when === 'hostile' && hostile);
   let A = answerRefs(S).map(r => { const a = C.answers.find(x => x.id === r.id); return a && { ...a, next: r.next }; }).filter(Boolean).filter(fits);
+  // #064 a Markenstand sells up to three things of one brand (the Influencer's, if it makes things), cheaper with the Influencer buff
+  if (S.shop === 'brand') {
+    const makes = b => Object.keys(D.items || {}).filter(id => { const t = D.items[id]; return t.brand === b && (t.value || 0) > 0 && !(t.tags || []).some(x => x === 'quest' || x === 'trophy'); });
+    const inf = influencer(D, save), have = Object.keys(D.brands || {}).filter(b => makes(b).length);
+    const B = inf && makes(inf.brand).length ? inf.brand : have.length ? pick(rnd, have) : null;
+    if (B) {
+      fill.brand = D.brands[B].short || D.brands[B].name;
+      const pool = makes(B), wares = [];
+      while (pool.length && wares.length < 3) wares.push(pool.splice(Math.floor(rnd() * pool.length), 1)[0]);
+      A = [...wares.map(id => ({ id: `kauf_${id}`, label: `${D.items[id].name} ({price} Δ)`, when: 'any', deltas: -Math.max(5, Math.round(valueOf(D, D.items[id]) * 1.4)), item: id, count: 1, brand: B,
+        result: 'Eingepackt, mit Aufkleber und einem Lächeln, das nichts kostet.|Der Verkäufer scannt deinen Daumen. „Danke für Ihren Einkauf.“' })), ...A];
+    }
+  }
   const free = a => !(a.deltas < 0) && !a.use && !hasNeeds(a);   // always possible (time and fuel she has; Δ and things maybe not)
   // #059 answers that need someone or something: open ones come first, missing ones only where there is room (greyed, with the reason)
   if (save) { const open = a => !hasNeeds(a) || !needBlocked(D, save, a); A = [...A.filter(a => hasNeeds(a) && open(a)), ...A.filter(a => !hasNeeds(a)), ...A.filter(a => !open(a))]; }
@@ -94,6 +108,8 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
     const o = { answer: a.id };
     for (const f of ['hours', 'fuel', 'food']) if (a[f]) o[f] = a[f];
     if (a.deltas) o.deltas = Math.round(a.deltas < 0 ? a.deltas * price * k : a.deltas * k / price);
+    const brand = a.brand || D.items?.[a.item]?.brand || null, off = o.deltas < 0 && save ? brandDiscount(D, save, brand) : 1;   // #064 Influencer: cheaper at this brand
+    if (off < 1) { o.deltas = Math.round(o.deltas * off); o.influencer = brand; }
     if (a.health) o.health = Math.round(a.health * k);
     if (a.use) { o.use = a.use; o.useCount = a.useCount || 1; }
     if (a.item) { o.item = a.item; o.count = a.count || 1; }
@@ -110,7 +126,7 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
     if (S.once) o.once = S.id;
     if (inChain) { o.chain = { next: a.next || null, gang, rival, n: (chain?.n || 1) + (a.next ? 1 : 0) }; }
     const extra = { price: String(Math.abs(o.deltas || 0)) };
-    o.label = cap(text(a.label, extra)) || 'Weiter';
+    o.label = (cap(text(a.label, extra)) || 'Weiter') + (o.influencer ? ` · Influencer −${Math.round((1 - brandDiscount(D, save, o.influencer)) * 100)} %` : '');
     for (const key of NEED_KEYS) if (a[key]) o[key] = a[key];   // #059
     const tag = hasNeeds(o) && save ? needTag(D, save, o) : '';
     if (tag) o.label = `${tag} · ${o.label}`;

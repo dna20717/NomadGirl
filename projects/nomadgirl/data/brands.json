@@ -51,7 +51,8 @@
   "color": "#249fde",
   "map": {"on": true, "kind": "", "weight": 1},
   "icon": 2,
-  "ads": "WE REPLACE WHAT'S MISSING|NEW HEART? NO WAITING LIST*|*WAITING LIST APPLIES|UPGRADE YOUR SADNESS"
+  "ads": "WE REPLACE WHAT'S MISSING|NEW HEART? NO WAITING LIST*|*WAITING LIST APPLIES|UPGRADE YOUR SADNESS",
+  "set": {"stat": "health", "value": 25, "count": 3}
  },
  "nomadcola": {
   "sector": "drink",
@@ -105,7 +106,8 @@
   "color": "#143464",
   "map": {"on": true, "kind": "government", "weight": 1},
   "icon": 5,
-  "ads": "ORDER IS SAFETY|REPORT YOUR NEIGHBOUR TODAY|CURFEW 22:00 · SMILE|TAKE A NUMBER"
+  "ads": "ORDER IS SAFETY|REPORT YOUR NEIGHBOUR TODAY|CURFEW 22:00 · SMILE|TAKE A NUMBER",
+  "set": {"stat": "defense", "value": 8, "count": 3}
  },
  "kraehe": {
   "sector": "trade",
@@ -123,7 +125,8 @@
   "color": "#71413b",
   "map": {"on": true, "kind": "bunker", "weight": 1},
   "icon": 6,
-  "ads": "WE TAKE EVERYTHING|YOUR WRECK = OUR TREASURE|CASH FOR SCRAP · NO QUESTIONS"
+  "ads": "WE TAKE EVERYTHING|YOUR WRECK = OUR TREASURE|CASH FOR SCRAP · NO QUESTIONS",
+  "set": {"stat": "heal", "value": 15, "count": 3}
  },
  "kilometerkoenig": {
   "sector": "vehicle",
@@ -141,7 +144,8 @@
   "color": "#f9a31b",
   "map": {"on": true, "kind": "gasStation", "weight": 2},
   "icon": 7,
-  "ads": "ROLLS TILL IT DON'T|TIRES! TIRES! TIRES!|THE KING OF EVERY MILE"
+  "ads": "ROLLS TILL IT DON'T|TIRES! TIRES! TIRES!|THE KING OF EVERY MILE",
+  "set": {"stat": "speed", "value": 6, "count": 3}
  },
  "chroma_kill": {
   "name": "CHROMA//KILL",
@@ -210,7 +214,8 @@
   "loot": 100,
   "description": "Cyberware von der Stange für alle, die keine Kessler-Termine bekommen. Solide, bunt verpackt, mit Garantie, die niemand einlöst.",
   "icon": 8,
-  "ads": "SEE SHARPER. FEEL FASTER.|NO APPOINTMENT NEEDED|CHROME FOR THE PEOPLE"
+  "ads": "SEE SHARPER. FEEL FASTER.|NO APPOINTMENT NEEDED|CHROME FOR THE PEOPLE",
+  "set": {"stat": "crit", "value": 6, "count": 3}
  },
  "vulkan": {
   "name": "Vulkan Defense Systems",
@@ -227,7 +232,8 @@
   "loot": 70,
   "description": "Lieferant des Ordnungsamts: Panzerhaut, Hydraulikarme, Zieloptiken. Schwer, laut und verlässlich. Was in den Wastelands davon auftaucht, hat meist einen toten Vorbesitzer.",
   "icon": 9,
-  "ads": "STEEL THAT HITS BACK|ARMOR UP, BIG CITY|PEACE THROUGH CALIBER"
+  "ads": "STEEL THAT HITS BACK|ARMOR UP, BIG CITY|PEACE THROUGH CALIBER",
+  "set": {"stat": "defense", "value": 10, "count": 3}
  },
  "backalley_chrome": {
   "name": "Backalley Chrome",
@@ -244,7 +250,8 @@
   "loot": 150,
   "description": "Kein Konzern, eher ein Gerücht: Ripperdocs in Garagen, die aus Schrott Implantate löten. Billig, überall zu finden und manchmal überraschend gut.",
   "icon": 10,
-  "ads": "WORKS. MOSTLY.|ASK FOR DOC. NO NAMES."
+  "ads": "WORKS. MOSTLY.|ASK FOR DOC. NO NAMES.",
+  "set": {"stat": "speed", "value": 8, "count": 3}
  },
  "ghostwire": {
   "name": "Ghostwire",
@@ -261,6 +268,7 @@
   "loot": 80,
   "description": "Ein Kollektiv aus Hackern und Ex-Kessler-Ingenieuren, das experimentelle Chips verkauft: Overclocking, Berserker-Schaltungen, Beine, die mehr wollen als der Körper. Starke Ware mit Nebenwirkungen.",
   "icon": 11,
-  "ads": "WHAT YOU CAN'T SEE CAN'T SEE YOU|01000111 01001000 01001111 01010011 01010100|THIS AD IS NOT HERE"
+  "ads": "WHAT YOU CAN'T SEE CAN'T SEE YOU|01000111 01001000 01001111 01010011 01010100|THIS AD IS NOT HERE",
+  "set": {"stat": "jump", "value": 12, "count": 3}
  }
 }

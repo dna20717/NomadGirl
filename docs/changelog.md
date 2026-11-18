@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 18.11.2026: **Markentreue und Influencer-Billboards** (#064): ein Billboard während der Fahrt antippen gibt 24 h lang 20 % Nachlass auf die Marke (Karawane, neuer Markenstand, Revier-Handel); drei Teile einer Marke geben einen Set-Bonus.
 - 18.11.2026: **Wetter mit Folgen** (#063): Sandsturm, Nebel und Regen verschieben die Zwischenfälle unterwegs, Regen füllt die Zisterne mit Meldung, im POI dämpft Regen das Gehör der Gegner und Nebel die Sicht.
 - 18.11.2026: **Quests aus Straßen-Merkern** (#062): Geschichten unterwegs öffnen Aufträge im Camp (Fehde, Kurier, Läuferin), mit Meldung.
 - 18.11.2026: **Bit-Farm** (#060): neue Werkstatt für gefangene Entities; sie arbeiten als Worker an Werkstätten im Rig (Begabung als Bonus, Macke als Haken), freundliche Duelle in der Chill-Ecke heben die Bindung.
