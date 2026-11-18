@@ -34,6 +34,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 ## Funksprüche
 
+- 18.11. Code → Ava: #053 Die Fahrt in Szene (Keep Driving) läuft (Daniels Auftrag im Code-Chat).
+
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
 - 18.11. Code → Ava: Artikel „die Entity“ überall (Daniel), dazu Charaktere mit Banter: jede KI hat einen Charakter mit Sprüchen je Duell-Moment, Sprechblasen im Duell. Details `docs/features/glitchlings.md` › Charaktere und Banter.
@@ -161,6 +163,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:** (Code) Frage → ⚠️ vorläufig entschieden: …
 - **Ergebnis:** (Code) Commits, Tests, PixelLab diesmal/übrig, bitte testen: …
 ```
+
+### #053 Die Fahrt in Szene (wie Keep Driving)
+- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
+- **Für:** Code
+- **Lesen:** docs/features/worldmap.md (Reisen in Etappen, Zwischenfälle), docs/features/camp.md, game/weather.js
+- **Auftrag (Daniel, 18.11.2026):** „Die Reise von POI zu POI ähnlich in Szene setzen wie bei Keep Driving.“ Antworten: **1a** erst in Szene setzen (Rig fährt, Landschaft zieht vorbei, Zwischenfälle rollen sichtbar heran, Entscheidung wie bisher im Fenster), **2a** das echte, selbst gebaute Rig mit Anhängern von der Seite, **3c** Landschaft erst aus Code je Region, PixelLab später („bau aber trotzdem richtig tolle Lichteffekte, Sonnenuntergänge und Wetter aus Code ein“), **4c** Dauer einstellbar, Standard gemütlich 30 Sekunden je Etappe.
+- **Fertig, wenn:** Fahrt-Szene zwischen Karte und Ankunft, Rig aus dem Camp, Landschaft je Region, Tageszeit läuft mit, Wetter und Licht aus Code, Zwischenfälle kommen sichtbar angerollt, vorspulen/überspringen mit Tastatur und Controller, Werkstatt-Felder, Tests, Build grün auf `main`.
+- **Rückfragen:** –
+- **Ergebnis:** –
 
 ### #052 Glitch-Duell im Hauptspiel
 - **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
