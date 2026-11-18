@@ -13,6 +13,7 @@ export function showDiag(game) {
       `Dokument ${document.documentElement.clientWidth}×${document.documentElement.clientHeight} · Scrollbreite ${document.documentElement.scrollWidth}`,
       `Leinwand ${c.width}×${c.height} Pixel · auf dem Schirm ${Math.round(r.width)}×${Math.round(r.height)} bei ${Math.round(r.left)},${Math.round(r.top)}`,
       `Spiel ${game.scale.width}×${game.scale.height} · Kamera-Zoom ${cam?.zoom ?? '–'} · ${game.renderer.type === 2 ? 'WebGL' : 'Canvas'} · Leyla ${lyH ?? '–'} px hoch auf dem Schirm`,
+      `Daten: ${window.__nomadData?.commit ? `Repository ${window.__nomadData.commit.slice(0, 7)}` : 'ausgelieferte Dateien'}${window.__nomadData?.drafts?.length ? ` + lokale Werkstatt-Entwürfe: ${window.__nomadData.drafts.join(', ')}` : ''}`,
       navigator.userAgent.slice(0, 120),
     ].join('\n');
   };

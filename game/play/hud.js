@@ -79,7 +79,7 @@ export class Hud {
       el('div', { class: 'hud-foot' }, // tidy (#008, Daniel: „HUD aufräumen“): only the menu button and the version; Werkstatt, Startseite and Neues Spiel live in the menu
         el('button', { class: 'hud-menubtn', title: 'Menü (Esc)', onclick: e => { e.currentTarget.blur(); this.pauseMenu(); } }, icon('menu', 14), 'Menü'),
         this.versionEl = el('span', { class: 'hud-version' })));
-    loadVersion().then(v => { this.versionEl.textContent = ' · ' + v.text; this.versionEl.title = 'Version dieses Spiels' + (v.commit ? ': ' + v.commit : ''); this.version = v; });
+    loadVersion().then(v => { this.versionEl.textContent = ' · ' + v.text + (workshopDrafts ? ` · Werkstatt-Entwurf aktiv (${workshopDrafts})` : ''); if (workshopDrafts) this.versionEl.style.color = '#fa6a0a'; this.versionEl.title = 'Version dieses Spiels' + (v.commit ? ': ' + v.commit : ''); this.version = v; });
     this.root = root;
     this.paused = false;   // the controls wait in the menu (Esc › Steuerung, or H)
   }
@@ -136,6 +136,8 @@ export class Hud {
           this.banner(`Schießstil: ${cells ? 'Klassisch' : 'Cells-like'}`, 'Gilt in diesem Browser'); sc.time.delayedCall(1400, () => this.banner(null)); } },
       ...(this.tut ? [{ label: `Lektionen beim ersten Mal: ${this.tut.off ? 'aus' : this.tut.sessionOff ? 'aus (diese Sitzung)' : 'an'}`, sub: 'Feldhandbuch-Karten, wenn du etwas Neues siehst', act: () => { if (this.tut.sessionOff && !this.tut.off) this.tut.setSessionOff(false); else this.tut.setOff(!this.tut.off); setTimeout(() => this.optionsMenu(), 0); } },
         { label: 'Lektionen neu zeigen', sub: 'Alle Karten erscheinen wieder beim ersten Mal', act: () => { this.tut.reset(); this.banner('Lektionen zurückgesetzt', '', 1600); } }] : []),
+      ...((window.__nomadData?.drafts || []).length ? [{ label: `Lokale Werkstatt-Entwürfe verwerfen (${window.__nomadData.drafts.length})`, sub: `${window.__nomadData.drafts.join(', ')} · ändern das Spiel nur in diesem Browser · danach lädt die Seite neu`,
+        act: () => { try { for (const k of Object.keys(localStorage)) if (k.startsWith('nomadgirl-drafts:')) localStorage.removeItem(k); } catch { /* private mode */ } location.reload(); } }] : []),
       { label: 'Zurück', act: () => setTimeout(() => this.pauseMenu(), 0) },
     ] });
   }

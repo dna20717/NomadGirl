@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 18.11.2026: **Unscharf auf dem iPad aufgeklärt**: ein alter lokaler Werkstatt-Entwurf von `game.json` (640×360, Zoom 0,5) galt in diesem Browser; jetzt sichtbar (Hinweis neben der Version, Toast) und unter Menü › Optionen verwerfbar; Diagnose unter `/game?camp&diag`.
 - 18.11.2026: **Fahrt wieder scharf**: die Fahrt-Szene rechnet mit der echten Pixeldichte des Bildschirms statt mit 1,5 × Fensterbreite (war auf Retina/4K verwaschen).
 - 18.11.2026: **Übergabe (HNC)**: Stand nach #053–#055 im Funkbuch; Tests 239, Browser 43/43; PixelLab übrig 290.
 - 18.11.2026: **Riesen-Billboards, Ruf, Folgen und Ketten** (#055): Bildschirme mit laufender Werbung aller 15 Marken an der Straße; Ruf je Gang (Feind … Freund), Freunde werden nicht mehr angehalten oder überfallen (Freie Fahrt), Feinde von Kopfgeldjägern gejagt, Kills im Revier kosten Ruf; Antworten setzen Merker und Buffs, spätere Ereignisse greifen sie auf; drei Geschichten über drei bis vier Etappen (Fehde, SOS, Die Läuferin).

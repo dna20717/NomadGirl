@@ -27,7 +27,11 @@ export async function start(parent, hudRoot, loading, opts = {}) {
   if (!roomId) throw new Error('Kein Raum mit Layout gefunden (Werkstatt › Raum-Bausteine › Layout).');
   if (asked && asked !== roomId) console.warn(`Raum „${asked}“ hat kein Layout, spiele „${roomId}“`);
   const [width, height] = D.game?.resolution || [1920, 1080];
+  window.__nomadData = { commit: cloud?.commit || null, drafts: [...drafts.keys()] };   // where the data came from (diag.js, Menü › Optionen)
   const hud = new Hud(hudRoot, { workshopDrafts: drafts.size, commit: cloud?.commit });
+  // local workshop drafts change the game in this browser only (Daniel, 18.11.2026: the iPad played 640×360 with zoom 0.5 from an old
+  // draft of game.json): say so right away, not only in the controls window; Menü › Optionen can throw them away
+  if (drafts.size) setTimeout(() => hud.toast('Lokaler Werkstatt-Stand aktiv', `${[...drafts.keys()].join(', ')} · nur in diesem Browser · Menü › Optionen › verwerfen`, 'warn', 9000), 7000);
   const game = new Phaser.Game({
     type: Phaser.AUTO, parent, width, height, backgroundColor: '#0d0a12',
     pixelArt: !!D.game?.pixelArt, antialias: !D.game?.pixelArt,
