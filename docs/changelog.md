@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 18.11.2026: **Fahrt wieder scharf**: die Fahrt-Szene rechnet mit der echten Pixeldichte des Bildschirms statt mit 1,5 × Fensterbreite (war auf Retina/4K verwaschen).
 - 18.11.2026: **Übergabe (HNC)**: Stand nach #053–#055 im Funkbuch; Tests 239, Browser 43/43; PixelLab übrig 290.
 - 18.11.2026: **Riesen-Billboards, Ruf, Folgen und Ketten** (#055): Bildschirme mit laufender Werbung aller 15 Marken an der Straße; Ruf je Gang (Feind … Freund), Freunde werden nicht mehr angehalten oder überfallen (Freie Fahrt), Feinde von Kopfgeldjägern gejagt, Kills im Revier kosten Ruf; Antworten setzen Merker und Buffs, spätere Ereignisse greifen sie auf; drei Geschichten über drei bis vier Etappen (Fehde, SOS, Die Läuferin).
 - 18.11.2026: **Ereignis-Baukasten** (#054): Zwischenfälle unterwegs werden aus Lagen, Stimmungen, Antworten und Wörtern gewürfelt (16 Lagen, 8 Stimmungen, 27 Antworten), Gefahr macht teurer und härter, Antworten können schiefgehen (Risiko), sieben neue Dinge am Straßenrand (Lagerfeuer, Wrack, Bus, Drohne, Schrein, Funkmast, Geröll); Werkstatt-Bereich mit Vorschau.

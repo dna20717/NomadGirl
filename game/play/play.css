@@ -1041,7 +1041,7 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 /* the drive between two places (#053, drive_ui.js): the landscape fills the screen, a slim strip on top and a track at the bottom */
 .dv { position: fixed; inset: 0; background: #060508; pointer-events: auto; user-select: none; display: grid; place-items: center; overflow: hidden; }
 .dv[hidden] { display: none; }
-.dv-canvas { width: 100vw; height: 56.25vw; max-height: 100vh; max-width: 177.78vh; image-rendering: auto; }
+.dv-canvas { width: 100vw; height: 56.25vw; max-height: 100vh; max-width: 177.78vh; image-rendering: pixelated; }
 .dv-hud { position: absolute; inset: 0; pointer-events: none; font-family: var(--ui-font); color: #f2eef7; }
 .dv-top { position: absolute; left: 0; right: 0; top: 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 16px 22px 30px;
   background: linear-gradient(180deg, rgba(6, 5, 10, .7), transparent); }

@@ -211,7 +211,7 @@ export class DriveUI {
     ctx.fillStyle = `rgba(8,6,14,${0.35 * (1 - S.dark * 0.5)})`; ctx.beginPath(); ctx.ellipse((b.x0 + b.x1) / 2, b.y + 2 * b.u * 0.4, (b.x1 - b.x0) * 0.52, 3.2 * b.u, 0, 0, Math.PI * 2); ctx.fill();
     // every unit sways on its own springs, the trailers a little after the van
     const cuts = [0, ...r.cuts, r.w], amp = C.bounce * (W / 1920) * (0.25 + 0.75 * run);
-    ctx.imageSmoothingEnabled = false;
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';   // the rig's art is scaled down smooth, like in the camp (pixelArt off)
     for (let i = 0; i < cuts.length - 1; i++) {
       const a = cuts[i], z = cuts[i + 1], lag = (cuts.length - 2 - i) * 0.35;
       const bump = Math.max(0, Math.sin((st.dist / 37) - lag * 3) * Math.sin(st.dist / 91 + i)) ** 6 * 2.2;
@@ -249,7 +249,9 @@ export class DriveUI {
   // ---------- drawing ----------
   draw() {
     if (this.el.hidden || !this.road) return;
-    const c = this.canvas, W = Math.round(innerWidth * (devicePixelRatio > 1 ? 1.5 : 1)), H = Math.round(W * 9 / 16);
+    // one canvas pixel per screen pixel (Daniel, 18.11.2026: „unscharf und verwaschen“: the canvas was 1.5 × the window and the browser
+    // stretched it soft onto Retina/4K screens); the background pixels are scaled up sharp in here, nothing is stretched afterwards
+    const c = this.canvas, box = c.getBoundingClientRect(), dpr = Math.min(3, devicePixelRatio || 1), W = Math.min(3840, Math.round((box.width || innerWidth) * dpr)), H = Math.round(W * 9 / 16);
     if (c.width !== W || c.height !== H) { c.width = W; c.height = H; }
     const ctx = c.getContext('2d'), st = this.st, S = skyAt(st.hour);
     this.road.draw(this.bg.getContext('2d'), st);
