@@ -209,8 +209,10 @@ export class PoiLevel {
   nearest() {
     const l = this.scene.leyla, range = this.scene.data_.camp?.interactRange ?? 130;
     const close = o => Math.abs(o.x - l.x) < range && Math.abs(o.feet - l.feet) < 60;
-    for (const z of this.goals) if (close(z)) return this.done ? { text: `Geknackt · Abkürzung zum Van: ${this.shortcutWay()}` } : { text: 'Tresor knacken · POI abschließen', act: () => this.finish() };
-    for (const c of this.chests) if (!c.open && close(c)) return { text: 'Kiste öffnen', act: () => this.openChest(c) };
+    const T = this.scene.turf;
+    for (const z of this.goals) if (close(z)) return this.done ? { text: `Geknackt · Abkürzung zum Van: ${this.shortcutWay()}` } : T?.active ? { text: `Tresor der ${T.gang} · nur mit Gewalt`, act: () => T.vault(() => this.finish()) } : { text: 'Tresor knacken · POI abschließen', act: () => this.finish() };
+    for (const c of this.chests) if (!c.open && close(c)) return { text: T?.active ? `Kiste der ${T.gang} öffnen` : 'Kiste öffnen', act: () => this.openChest(c) };
+    const talk = T?.near(); if (talk) return talk;   // #061
     for (const sw of this.switches) if (close(sw)) return sw.on ? { text: 'Schalter ist umgelegt' } : sw.dueled ? { text: 'Schalter umlegen', act: () => this.pull(sw) } : { text: 'Schalter hacken · Glitch-Duell', act: () => this.duelAt(sw, 'Schalter', `sw${this.switches.indexOf(sw)}`) };
     for (const t of this.terminals || []) if (close(t)) return t.done ? { text: 'Das Terminal ist still' } : t.tried ? { text: `${t.ai} schweigt · nächster Run` } : { text: `${t.ai} anzapfen · Glitch-Duell (sehr schwer)`, act: () => this.terminalDuel(t) };   // #057
     // KIs in machines (Marken-Clutter marked „KI“, e.g. NomadCola-Automaten): once per run
@@ -246,6 +248,7 @@ export class PoiLevel {
   openChest(c) {
     const s = this.scene;
     c.open = true; this.chestsOpened++;
+    s.turf?.chestOpened(c);   // #061 seen = theft
     if (c.sprite) { let f = 0; s.time.addEvent({ delay: 70, repeat: c.frames - 1, callback: () => c.sprite.setFrame(Math.min(c.frames - 1, ++f)) }); }
     else this.drawChest(c);
     const things = s.lootRoll ? s.lootRoll(this.lootTable) : rollLoot(s.data_, this.lootTable);

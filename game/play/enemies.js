@@ -85,8 +85,9 @@ export class Enemy {
     return s.lineFree(ex, ey, tx, ty) || s.lineFree(ex, ey, tx, l.feet - l.height * 0.92);
   }
   // hearing (scene.noise): a sound at (x, y) that carries r px; walls in between halve it (Gegner › Wahrnehmung › Hört)
+  get peaceful() { return !!this.scene.turf?.calm(this); }   // #061
   hear(time, x, y, r) {
-    if (!this.alive || this.S.hearing <= 0 || this.state === 'lurk') return;
+    if (!this.alive || this.S.hearing <= 0 || this.state === 'lurk' || this.peaceful) return;
     let reach = r * this.S.hearing / 100;
     if (!this.scene.lineFree(this.x, this.eyeY, x, y)) reach *= 0.5;
     if (Math.hypot(x - this.x, y - this.chest) > reach) return;
@@ -116,7 +117,7 @@ export class Enemy {
   }
   // called by a mate: look where she was (no new call unless it sees her itself)
   alarmed(time, k) {
-    if (!this.alive || !['patrol', 'search'].includes(this.state)) return;
+    if (!this.alive || !['patrol', 'search'].includes(this.state) || this.peaceful) return;
     this.lastKnown = { ...k, at: time };
     if (this.state === 'patrol') { this.state = 'alert'; this.until = time + this.S.react; this.heard = true; this.say('?!', '#ffd27a'); }
     else this.searchStart = time;
@@ -131,6 +132,8 @@ export class Enemy {
     if (time >= this.senseAt) {   // a few looks a second are enough
       this.senseAt = time + 90;
       this.seeing = this.sees(l);
+      // #061 Revier-Camp: the gang's people see her, nod once and leave her be
+      if (this.peaceful) { if (this.seeing && !this.greeted) { this.greeted = true; this.say(['Na?', 'Hey.', '*nickt*', 'Benimm dich.'][this.id % 4 || 0] || 'Na?', '#9fe0a0'); } this.seeing = false; if (this.state !== 'patrol') this.state = 'patrol'; }
       if (this.seeing) { this.lastSeen = time; this.lastKnown = { x: l.x, y: l.chest, at: time }; }
     }
     this.warn.setVisible(this.state === 'windup');
@@ -495,6 +498,7 @@ export class Enemy {
         knockback = (knockback ?? 0) * 0.3;
       }
     }
+    if (this.peaceful) this.scene.turf.attacked(this);   // #061: a hit breaks the peace
     this.hp -= damage;
     this.barUntil = time + 2500;
     this.sprite.setTintFill(crit ? 0xffd27a : 0xffffff);

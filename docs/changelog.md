@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 18.11.2026: **Revier-Camp** (#061): mit gutem Ruf wird der POI einer Gang zum Camp: Hinweis zu Beginn, ihre Leute greifen nicht an, Kisten öffnen unter Zeugen kostet Ruf, Tresor nur mit Gewalt; Freunde handeln und haben einen Auftrag; jeder Schlag bricht den Frieden.
 - 18.11.2026: **Antworten mit Voraussetzungen** (#059): unterwegs öffnen Crew an Bord, Implantate, AvA-Teile, Rig-Teile und Werkstätten eigene Antworten („Schraube · Schraube ranlassen“), eine verschlossene bleibt grau als Anreiz.
 - 18.11.2026: **Schatzsuche „I become death …“** (#058): fünf Kartenstücke zu Silo Zero (Tresore in Bunker 13 und im Ministerium, die Straßen-Geschichte, Kartenhändler, Schwarzmarkt); mit dem ersten Stück bietet Onkel Sung die Quest an, alle fünf decken den Ort auf. Neu in der Werkstatt: POI › Fundstücke, Quests mit Stücken, Merker und Ort als Belohnung, Tag Questgegenstand.
 - 18.11.2026: **Silo Zero** (#057): Raketensilo nach Daniels Bild als XXL-Tiefen-POI mit 26–32 Räumen je Run, Gang Zero Hour, Boss Major Null an der Startrampe, optionales sehr schweres Duell gegen die einzigartige Silo-KI Titan Lullaby (120 Integrität); in den Bergen versteckt, bis eine Geschichte unterwegs (Kalte Frequenz → Konvoi → Silo Zero) es auf die Karte bringt.

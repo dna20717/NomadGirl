@@ -8,6 +8,7 @@ import { parseRoom, solidRects } from '../../engine/room.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
 import { buildMegarig } from '../../engine/megarig.js';
 import { MegarigView } from './megarig_view.js';
+import { Turf } from './turf.js';
 import { PoiLevel } from './poi_level.js';
 import { Pad, PAD_ACTIONS } from './pad.js';
 import { Fog } from './fog.js';
@@ -365,6 +366,8 @@ export class PlayScene extends Phaser.Scene {
     const M = R.marks || {};
     this.camo = drawn?.camo || [];
     this.level = this.mode !== 'camp' && (this.levelInfo?.def || ['C', 'S', 'D', 'B', 'Z', '%', '$'].some(k => M[k]?.length)) ? new PoiLevel(this, run?.poi || null) : null;
+    this.turf = Turf.make(this);   // #061 Revier-Camp: the gang's mood towards Leyla
+    if (this.turf) this.time.delayedCall(1500, () => this.turf?.hint());
     this.props = drawn?.props || [];
     this.fog = new Fog(this);   // darkness like The Looter indoors (#043, Spiel › Nebel)
 

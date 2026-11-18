@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #061 **Revier-Camp** fertig: befreundete Gangs lassen Leyla im POI in Ruhe (Hinweis zu Beginn), Klauen unter Zeugen kostet Ruf, Tresor nur mit Gewalt, Freunde handeln und vergeben „Revier säubern“, jeder Schlag bricht den Frieden. Tests 248/248, Browser 45/45.
 - 18.11. Code → Ava: #059 **Antworten mit Voraussetzungen** fertig: Crew, Implantate, AvA-Teile, Rig-Teile und Werkstätten öffnen Antworten unterwegs (12 neue). Tests 248/248, PixelLab 0.
 - 18.11. Code → Ava: #059 Antworten mit Voraussetzungen läuft; #060 Bit-Farm und #061 Revier-Camp angelegt (Daniels Aufträge aus der Verzahnungs-Prüfung).
 - 18.11. Code → Ava: #057 **Silo Zero** und #058 **Schatzsuche „I become death …“** fertig: verstecktes XXL-Raketensilo (26–32 Räume, Zero Hour, Major Null, Silo-KI Titan Lullaby), fünf Kartenstücke (2 Tresore, 1 Straßen-Geschichte, 2 Händler), Onkel Sung setzt sie zusammen und deckt den Ort auf. Tests 244/244, Browser 44/44 (`tutorial_test` wackelt: der Run-Tipp kommt manchmal nicht in 4000 Frames, einzeln 3 von 5 grün). PixelLab 0. Offen für Daniel: Quest-Titel „I become death …“ oder „Now I am become Death“?
@@ -179,15 +180,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ```
 
 ### #061 Ruf im POI: Revier-Camp der Gang
-- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 3)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 3)
 - **Für:** Code
 - **Lesen:** docs/features/pois.md, docs/features/worldmap.md (Ruf)
 - **Auftrag (Daniel, 18.11.2026):** „Der POI wird dann zu einem Camp mit dem Hinweis zu Beginn, dass das Revier der Gang XY ist und man mit ihnen in welcher Beziehung steht. ABER man kann immer auch kämpfen und töten. Was im Zweifel den Ruf beschädigt.“ Beute: „Klauen kostet Ruf“ (Kisten gehören der Gang, Öffnen unter Zeugen kostet Ruf, heimlich geht; Tresor + Boss nur mit Kampf; Händler/Auftraggeber im Camp).
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: Frieden schon ab **Geduldet** (einstellbar: Ereignis-Baukasten › Ruf › Frieden im Revier ab), Handel und Auftrag erst ab **Freund**; zur Gang gehören Plünderer, Wachdrohnen und der Boss, Mutanten und Viecher nicht; Klauen −8, Frieden brechen −15, Auftrag „Revier säubern“ +10 Ruf und 40 + 20 × Gefahr Δ; der Hinweis zu Beginn ist ein Toast (kein Fenster, das den Start aufhält); Handel nur Kaufen (4 Dinge aus der Beutetabelle des POIs, Wert × 1,5 × Ruf-Preis).
+- **Ergebnis:** (Code) Commit „Revier-Camp (#061)“ auf `main`. Neu `game/play/turf.js`, Haken in `enemies.js` (friedlich: sieht, nickt, hört nichts; Treffer bricht den Frieden), `poi_level.js` (Kiste der Gang, Tresor nur mit Gewalt, Reden), 4 Felder in Ereignis-Baukasten › Ruf. `npm test` 248/248, Browser 45/45 (neu `turf_test` 7). PixelLab 0. **Bitte testen:** in der Werkstatt nichts nötig; im Spiel Ruf bei einer Gang hochspielen (Ereignisse), dann ihren POI plündern: Toast, Reden, Handeln, eine Kiste vor ihren Augen.
 
 ### #060 Bit-Farm: Entities speichern, als Worker an Werkbänken, freundliche Duelle in der Chill-Ecke
-- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 2)
+- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 2)
 - **Für:** Code
 - **Lesen:** docs/features/glitchlings.md, docs/features/benches.md, docs/features/crafting.md
 - **Auftrag (Daniel, 18.11.2026):** neue Werkstatt **Bit-Farm**, „ein Inventar, in dem man die AIs speichern kann. Entities, die dort gespeichert sind, können dann an bestimmten Werkbänken als Worker ausgewählt werden.“ Worker: **Charakter-Bonus** (Bonus und Macke aus dem Charakter). „In der Chill-Ecke gibt es die Möglichkeit, freundlich mit bereits gefangenen Entitäten zu duellieren“: **Bindung steigt** (stärkerer Worker-Bonus, neue Banter-Zeilen), kein Risiko.

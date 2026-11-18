@@ -37,3 +37,14 @@ POI-Level aus Raum-Bausteinen (Tankstelle KM7, Großmarkt, Bunker 13, Ministeriu
     - **Quest** `silo_schatz` bei Onkel Sung (Quests › Ziel: **Abgeben: alle diese**, **Erst wenn eins davon da ist**, **Merker beim Annehmen**; Belohnung › **Ort aufdecken**): erscheint, sobald ein Stück im Lager, in der Kiste oder im Rucksack liegt; Fortschritt zählt Stücke, Onkel nennt die fehlenden, der Questlog hakt sie ab; Abgeben deckt Silo Zero auf (+150 Δ). Onkel fährt als Gast: ohne Gästekoje bleibt er am alten Ort.
   - Tests: `test/silo.test.js` (3), `tools/silo_test.mjs` (8).
 
+## Revier-Camp (#061)
+
+Daniel, 18.11.2026 (aus der Verzahnungs-Prüfung): „Der POI wird dann zu einem Camp mit dem Hinweis zu Beginn, dass das Revier der Gang XY ist und man mit ihnen in welcher Beziehung steht. ABER man kann immer auch kämpfen und töten. Was im Zweifel den Ruf beschädigt.“ Beute: „Klauen kostet Ruf“.
+
+- `game/play/turf.js` (`scene.turf`, für jeden POI mit Gang, nur im Spiel mit Spielstand): **Hinweis zu Beginn** (Toast „Revier der … · Freund (+75)“ mit dem, was das heißt).
+- **Frieden** ab Ereignis-Baukasten › Ruf › **Frieden im Revier ab** (Standard Geduldet): ihre Leute (Plünderer, Wachdrohnen, der Boss) greifen nicht an, hören keinen Lärm und keine Rufe, nicken einmal („Na?“). Mutanten und Viecher bleiben feindlich.
+- **Klauen:** Kisten heißen „Kiste der … öffnen“; sieht einer zu (`sees`), kostet es Ruf (**Beim Klauen gesehen**, Standard 8), „Hey! Finger weg!“. Heimlich geht.
+- **Tresor nur mit Gewalt:** E am Tresor fragt „Aufbrechen“ (bricht den Frieden) oder „Lassen“.
+- **Frieden brechen:** jeder Treffer auf einen von ihnen (`Enemy.hit` → `turf.attacked`) oder der Tresor: Ruf −**Frieden brechen kostet** (Standard 15), alle greifen an („Verrat!“); Kills kosten danach wie immer Ruf. Fällt der Ruf unter die Friedens-Stufe (z. B. durch Klauen), ist der Frieden auch vorbei.
+- **Freunde** (Ruf ≥ Freund): E neben einem von ihnen = **Reden**: **Handeln** (bis zu 4 Dinge aus der Beutetabelle des POIs, Preis Wert × 1,5 × Ruf-Preis, einmal gewürfelt je Run) und **Auftrag: Revier säubern** (alle Mutanten und Viecher im Level; Lohn 40 + 20 × Gefahr Δ und Ruf +**Auftrag: Ruf**, Standard 10). Geduldete bekommen nur ein Nicken.
+- Test: `tools/turf_test.mjs` (7 Prüfungen).

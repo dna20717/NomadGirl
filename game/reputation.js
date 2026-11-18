@@ -7,7 +7,8 @@ export const REP_LEVELS = [['feind', 'Feind'], ['unbeliebt', 'Unbeliebt'], ['neu
 
 export function repConfig(D) {
   const R = D?.roadEvents?.rep || {};
-  return { enemy: R.enemy ?? -60, disliked: R.disliked ?? -20, tolerated: R.tolerated ?? 20, friend: R.friend ?? 60, price: (R.price ?? 30) / 100, kill: R.kill ?? 1 };
+  return { enemy: R.enemy ?? -60, disliked: R.disliked ?? -20, tolerated: R.tolerated ?? 20, friend: R.friend ?? 60, price: (R.price ?? 30) / 100, kill: R.kill ?? 1,
+    peace: R.peace || 'geduldet', breakPeace: R.breakPeace ?? 15, theft: R.theft ?? 8, job: R.job ?? 10 };   // #061 Revier-Camp
 }
 // every gang of the world: name, colour (kit gang colour), motto, its POIs
 export function gangs(D) {
