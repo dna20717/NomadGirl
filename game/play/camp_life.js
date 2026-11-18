@@ -115,7 +115,7 @@ export class CampLife {
   talk(c) {
     const D = this.D, save = this.box.save, s = this.scene, J = this.jobsOf(c), who = this.talkOf(c.id);
     if (!J.offer.length && !J.ready.length && !J.active.length) return this.bark(c, true);
-    const rew = q => { const R = q.reward || {}; return [R.deltas ? `${R.deltas} Δ` : null, ...(R.items || []).map(x => `${x.count || 1}× ${D.items?.[x.item]?.name || x.item}`)].filter(Boolean).join(' · '); };
+    const rew = q => { const R = q.reward || {}; return [R.reveal ? 'Ein Ort auf der Karte' : null, R.deltas ? `${R.deltas} Δ` : null, ...(R.items || []).map(x => `${x.count || 1}× ${D.items?.[x.item]?.name || x.item}`)].filter(Boolean).join(' · '); };
     const items = [
       ...J.ready.map(id => ({ label: `Abgeben: ${D.quests[id].name}`, sub: rew(D.quests[id]), primary: true, icon: 'check', act: () => {
         this.claimOne(id);   // the giver thanks in the speech bubble
@@ -126,7 +126,7 @@ export class CampLife {
           { label: 'Annehmen', sub: R ? `Belohnung: ${R}` : '', primary: true, icon: 'check', act: () => { accept(D, save, id); s.hud.toast(`Auftrag angenommen: ${q.name}`, `${who.name} · steht im Questlog`, 'info'); this.jobsChanged(); this.say(c, 'Gut. Ich verlass mich auf dich.'); } },
           { label: 'Später', icon: 'clock', act: () => this.say(c, 'Überleg es dir.') }] });
       } })),
-      ...J.active.map(id => ({ label: `Wie läuft „${D.quests[id].name}“?`, sub: `${progressOf(D, save, id).n} / ${progressOf(D, save, id).target}`, icon: 'help', act: () => { const p = progressOf(D, save, id); this.say(c, p.n ? `${p.n} von ${p.target}. Weiter so.` : 'Noch nichts? Ich warte.'); } })),
+      ...J.active.map(id => ({ label: `Wie läuft „${D.quests[id].name}“?`, sub: `${progressOf(D, save, id).n} / ${progressOf(D, save, id).target}`, icon: 'help', act: () => { const p = progressOf(D, save, id); this.say(c, p.missing?.length ? `${p.n} von ${p.target}. Es fehlt noch: ${p.missing.map(x => D.items?.[x]?.name || x).join(', ')}.` : p.n ? `${p.n} von ${p.target}. Weiter so.` : 'Noch nichts? Ich warte.'); } })),
       { label: 'Plaudern', icon: 'speechBubble', act: () => this.bark(c, true) },
       { label: 'Tschüss', icon: 'x', act: () => {} }];
     const greet = (J.ready.length ? 'Na? Sieht aus, als hättest du was für mich.' : J.offer.length ? 'Gut, dass du kommst. Ich hab da was.' : 'Und, wie läuft es da draußen?');

@@ -454,7 +454,6 @@
    "id": "silo_frequenz",
    "name": "Eine Stimme zählt rückwärts|Kalte Frequenz",
    "roadside": "tower",
-   "once": true,
    "not": "silo_gefunden",
    "text": "Auf einer alten Militärfrequenz zählt eine Stimme rückwärts: neun, acht, sieben … dann Stille. AvA ortet das Signal irgendwo in den Bergen der South Badlands.|Das Radio springt von selbst an. Zahlen, rückwärts, auf Russisch, Englisch, Deutsch. AvA flüstert: „Das ist kein Sender. Das ist ein Countdown.“",
    "answers": "silo_peilen>silo_konvoi, weiterfahren"
@@ -484,8 +483,36 @@
    "roadside": "rocks",
    "only": true,
    "look": "rocket_silo",
-   "text": "Zwischen zwei Felsnadeln: Stacheldraht, eine Betonluke, eine Radarschüssel unter Tarnnetzen. Darunter, sagt AvA, ist es hohl. Neunzig Meter hohl.",
+   "text": "Zwischen zwei Felsnadeln: Stacheldraht, Tarnnetze, eine Radarschüssel. Dann dreht der Wind, Staub verschluckt alles. AvA hat nur ein paar Zahlen aufgefangen.",
    "answers": "silo_markieren, silo_umsehen"
+  },
+  {
+   "figures": "",
+   "time": "day",
+   "weight": 4,
+   "danger": 1,
+   "moods": "gelangweilt, freundlich",
+   "id": "silo_kartenhaendler",
+   "name": "Der Kartenhändler|Papier, so weit das Auge reicht",
+   "roadside": "trader",
+   "needs": "silo_jagd",
+   "text": "Ein Stand aus Kartenrollen und Regenplanen. Der Alte dahinter tippt auf ein vergilbtes Blatt: „Totenpass. Militärgebiet. Sucht keiner, außer Leuten wie dir.“",
+   "answers": "silo_karte_kaufen, silo_karte_feilschen, weiterfahren",
+   "not": "silo_k2"
+  },
+  {
+   "figures": "schlaeger",
+   "time": "night",
+   "weight": 4,
+   "danger": 1,
+   "moods": "gierig, misstrauisch",
+   "id": "silo_schwarzmarkt",
+   "name": "Feuer am Straßenrand|Der Schwarzmarkt schläft nie",
+   "roadside": "campfire",
+   "needs": "silo_jagd",
+   "text": "Am Feuer verkauft jemand Dinge, die es nicht geben dürfte. Auf einer Kiste liegt ein Stück Karte mit eingebranntem Raketen-Zeichen.",
+   "answers": "silo_brand_kaufen, silo_brand_stehlen, weiterfahren",
+   "not": "silo_k5"
   }
  ],
  "moods": [
@@ -962,22 +989,65 @@
    "id": "silo_markieren",
    "label": "Auf der Karte markieren",
    "when": "any",
-   "reveal": "silo_zero",
    "flag": "silo_gefunden",
-   "result": "Ein roter Kringel in den Bergen. Silo Zero."
+   "result": "AvA speichert die Funkkoordinaten. Ein Stück der Wahrheit, mehr nicht: ohne die anderen Kartenstücke findet ihr den Abzweig nie wieder.",
+   "item": "silo_karte_4"
   },
   {
    "id": "silo_umsehen",
    "label": "Sich vorsichtig umsehen",
    "when": "any",
    "hours": 1,
-   "reveal": "silo_zero",
    "flag": "silo_gefunden",
    "loot": "pluenderer_beute",
    "risk": 25,
    "failHealth": 15,
-   "result": "Ein Wachposten schläft. Seine Tasche nicht mehr. Silo Zero steht jetzt auf deiner Karte.",
-   "failResult": "Der Wachposten schläft nicht. Aber du hast gesehen, was du sehen wolltest."
+   "result": "Ein Wachposten schläft. Seine Tasche nicht mehr, und darin: ein Zettel mit Funkkoordinaten.",
+   "failResult": "Der Wachposten schläft nicht. Aber die Koordinaten hast du trotzdem im Kopf.",
+   "item": "silo_karte_4"
+  },
+  {
+   "id": "silo_karte_kaufen",
+   "label": "Kaufen ({price} Δ)",
+   "when": "any",
+   "deltas": -120,
+   "item": "silo_karte_2",
+   "result": "Er rollt das Blatt zusammen. „Wenn du da raufgehst, komm nicht zurück und beschwer dich.“",
+   "flag": "silo_k2"
+  },
+  {
+   "id": "silo_karte_feilschen",
+   "label": "Feilschen ({price} Δ)",
+   "when": "any",
+   "deltas": -60,
+   "hours": 1,
+   "item": "silo_karte_2",
+   "risk": 35,
+   "failHours": 1,
+   "result": "Eine Stunde, zwei Tassen Kaffee, die Hälfte des Preises.",
+   "failResult": "Er wird stur. Am Ende zahlst du halb und er schimpft trotzdem.",
+   "flag": "silo_k2"
+  },
+  {
+   "id": "silo_brand_kaufen",
+   "label": "Bezahlen ({price} Δ)",
+   "when": "any",
+   "deltas": -200,
+   "item": "silo_karte_5",
+   "result": "Das Geld verschwindet, das Kartenstück auch, in deiner Jacke.",
+   "flag": "silo_k5"
+  },
+  {
+   "id": "silo_brand_stehlen",
+   "label": "Einstecken und rennen",
+   "when": "any",
+   "item": "silo_karte_5",
+   "risk": 50,
+   "failHealth": 25,
+   "rep": -10,
+   "result": "Ein Griff, ein Sprint, der Motor läuft schon.",
+   "failResult": "Sie erwischen dich am Rig. Das Stück hast du, ein paar Rippen weniger.",
+   "flag": "silo_k5"
   }
  ],
  "words": {

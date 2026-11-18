@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 18.11.2026: **Schatzsuche „I become death …“** (#058): fünf Kartenstücke zu Silo Zero (Tresore in Bunker 13 und im Ministerium, die Straßen-Geschichte, Kartenhändler, Schwarzmarkt); mit dem ersten Stück bietet Onkel Sung die Quest an, alle fünf decken den Ort auf. Neu in der Werkstatt: POI › Fundstücke, Quests mit Stücken, Merker und Ort als Belohnung, Tag Questgegenstand.
 - 18.11.2026: **Silo Zero** (#057): Raketensilo nach Daniels Bild als XXL-Tiefen-POI mit 26–32 Räumen je Run, Gang Zero Hour, Boss Major Null an der Startrampe, optionales sehr schweres Duell gegen die einzigartige Silo-KI Titan Lullaby (120 Integrität); in den Bergen versteckt, bis eine Geschichte unterwegs (Kalte Frequenz → Konvoi → Silo Zero) es auf die Karte bringt.
 - 18.11.2026: **Werkbänke im Van benutzen**: E vor der Schlafkoje schläft, E vor der Kochnische kocht; Einsteigen (Karte) an der Fahrertür.
 - 18.11.2026: **Van streng von der Seite** (#056): neuer Van im alten Stil (PixelLab, 19 Generierungen), zu und im Querschnitt deckungsgleich, die Tür blendet über statt zu springen; im Querschnitt zwei Nischen mit Schlafkoje und Kochnische; Tileset für längere Aufbauten.

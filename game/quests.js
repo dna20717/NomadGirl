@@ -11,6 +11,7 @@ import { add as addTo } from './inventory.js';
 import { goal as mainGoal, pathTo, progress as mainProgress, goalId } from './quest.js';
 import { status, owned } from './techtree.js';
 import { phase, hoursLeft } from './tank.js';
+import { revealPlace } from './worldmap.js';
 import { active as salvageOpen, progress as salvageProgress, goal as salvageGoal, siteOf, ensureSites } from './salvage.js';
 
 export const qstate = save => { const q = (save.quests ??= {}); q.active ??= {}; q.done ??= {}; return q; };
@@ -20,12 +21,15 @@ const countOf = (save, x) => achState(save).counts[keyOf(x)] || 0;
 // side jobs on offer: not taken, not done, the one before is done, the day has come
 export function offers(D, save) {
   const Q = qstate(save);
-  return Object.entries(D.quests || {}).filter(([id, x]) => !Q.active[id] && !Q.done[id] && (!x.after || Q.done[x.after]) && (save.day ?? 1) >= (x.minDay ?? 1)).map(([id]) => id);
+  // #057 a treasure hunt only comes up once Leyla has one of its pieces (she brings it up with the giver)
+  const has = x => !x.whenHas || (x.pieces || []).some(id => (stock(D, save)[id] || 0) > 0);
+  return Object.entries(D.quests || {}).filter(([id, x]) => !Q.active[id] && !Q.done[id] && (!x.after || Q.done[x.after]) && (save.day ?? 1) >= (x.minDay ?? 1) && has(x)).map(([id]) => id);
 }
 export function accept(D, save, id) {
   const x = D.quests?.[id], Q = qstate(save);
   if (!x || Q.active[id] || Q.done[id]) return false;
   Q.active[id] = { base: x.counter ? countOf(save, x) : 0, day: save.day ?? 1 };
+  if (x.flag) { const R = save.road ??= { flags: [], seen: [], chain: null }; R.flags ??= []; if (!R.flags.includes(x.flag)) R.flags.push(x.flag); }   // #057
   if (!Q.tracked) Q.tracked = id;
   return true;
 }
@@ -33,6 +37,10 @@ export function accept(D, save, id) {
 export function progressOf(D, save, id) {
   const x = D.quests?.[id], a = qstate(save).active[id];
   if (!x) return { n: 0, target: 1 };
+  if (!x.counter && (x.pieces || []).length) {   // #057 one of each piece
+    const st = stock(D, save), have = x.pieces.filter(id => (st[id] || 0) > 0);
+    return { n: have.length, target: x.pieces.length, ready: have.length >= x.pieces.length, have, missing: x.pieces.filter(id => !have.includes(id)) };
+  }
   const target = x.counter ? (x.target || 1) : (x.count || 1);
   const n = x.counter ? countOf(save, x) - (a?.base ?? 0) : (stock(D, save)[x.item] || 0);
   return { n: Math.max(0, Math.min(target, n)), target, ready: n >= target };
@@ -42,7 +50,9 @@ export function claim(D, save, id) {
   const x = D.quests?.[id], Q = qstate(save);
   if (!x || !Q.active[id] || !progressOf(D, save, id).ready) return { ok: false };
   if (!x.counter && x.item) take(D, save, x.item, x.count || 1);
+  if (!x.counter) for (const id of x.pieces || []) take(D, save, id, 1);
   const R = x.reward || {}, got = [];
+  if (R.reveal) { const n = revealPlace(D, save, R.reveal); if (n) got.push(`Neuer Ort: ${n.name}`); }   // #057
   if (R.deltas) { save.deltas = (save.deltas || 0) + R.deltas; got.push(`+${R.deltas} Δ`); }
   const G = save.inv?.grids || {};
   for (const r of R.items || []) {

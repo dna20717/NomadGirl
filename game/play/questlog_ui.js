@@ -6,6 +6,7 @@ import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { hints, closeX, keyGlyph } from './ui_nav.js';
 import { questLog, accept, claim, track } from '../quests.js';
+import { stock } from '../crafting.js';
 
 const TABS = [['active', 'Aktiv'], ['offers', 'Angebote'], ['done', 'Erledigt']];
 const STEP = { owned: ['check', 'erledigt'], ready: ['star', 'bereit'], open: ['target', 'jetzt'], locked: ['lock', 'später'] };
@@ -82,7 +83,7 @@ export class QuestLogUI {
   detail(r, L) {
     const D = this.D, giver = q => D.companions?.[q.giver]?.name || '';
     const btn = (label, ic) => el('button', { class: 'inv-btn wm-go ql-go', onclick: () => this.primary(r) }, icon(ic, 16), ' ', label);
-    const reward = q => { const R = q.reward || {}, parts = [R.deltas ? `${R.deltas} Δ` : null, ...(R.items || []).map(x => `${x.count || 1}× ${D.items?.[x.item]?.name || x.item}`)].filter(Boolean); return parts.length ? el('p', { class: 'ql-reward' }, icon('gift', 14), ' ', parts.join(' · ')) : null; };
+    const reward = q => { const R = q.reward || {}, parts = [R.reveal ? `Ort: ${D.locations?.[R.reveal]?.name || R.reveal}` : null, R.deltas ? `${R.deltas} Δ` : null, ...(R.items || []).map(x => `${x.count || 1}× ${D.items?.[x.item]?.name || x.item}`)].filter(Boolean); return parts.length ? el('p', { class: 'ql-reward' }, icon('gift', 14), ' ', parts.join(' · ')) : null; };
     const bar = (n, t) => el('div', { class: 'ach-bar' }, el('i', { style: `width:${Math.round(100 * n / Math.max(1, t))}%` }), el('span', {}, `${n} / ${t}`));
     if (r.kind === 'main') {
       const G = L.main.goal;
@@ -115,6 +116,7 @@ export class QuestLogUI {
       el('p', { class: 'ql-say' }, `„${q.text || ''}“`),
       r.kind === 'side' ? bar(q.n, q.target) : null,
       r.kind === 'side' && !q.counter && q.item ? el('small', {}, `Abgeben aus Lager, Kiste und Rucksack: ${D.items?.[q.item]?.name || q.item}`) : null,
+      r.kind === 'side' && !q.counter && q.pieces?.length ? el('small', {}, q.pieces.map(x => `${(stock(D, this.save)[x] || 0) > 0 ? '✓' : '·'} ${D.items?.[x]?.name || x}`).join('  ')) : null,   // #057
       r.kind === 'done' && q.done ? el('p', { class: 'ql-say' }, `„${q.done}“`) : null,
       reward(q),
       r.kind === 'offer' ? btn('Annehmen', 'check') : r.kind === 'side' && q.ready ? btn('Abgeben', 'gift') : r.kind === 'side' ? (L.tracked === q.id ? el('p', { class: 'ql-tracked' }, '◆ Wird verfolgt') : btn('Verfolgen', 'target')) : null));

@@ -10,6 +10,9 @@ import { newSave } from '../game/save.js';
 import { revealPlace } from '../game/worldmap.js';
 import { generateEncounter } from '../game/road_events.js';
 import { choose } from '../game/travel.js';
+import { situationsFor } from '../game/road_events.js';
+import { give, have } from '../game/crafting.js';
+import { offers, accept, claim, progressOf } from '../game/quests.js';
 import { uniqueEntity } from '../game/glitchlings.js';
 import { newStack } from '../game/stack_duel.js';
 
@@ -30,22 +33,57 @@ test('Silo Zero: XXL, tief, eigene Gang, mindestens 20 Räume in jedem Run, Boss
   }
 });
 
-test('Versteckt: nicht auf der Karte, bis die Geschichte es verrät; dann mit Straße von hier', () => {
+test('Versteckt: nicht auf der Karte; die Straßenkette gibt Kartenstück 4, auch wenn es schiefgeht', () => {
   const save = newSave(D);
   assert.ok(!save.map.nodes.some(n => n.id === 'silo_zero'));
-  const chain = ['silo_frequenz', 'silo_konvoi', 'silo_entdeckt'];
-  let e = generateEncounter(D, rng(1), { save, situation: chain[0] });
+  let e = generateEncounter(D, rng(1), { save, situation: 'silo_frequenz' });
   choose(D, save, e.options.find(o => o.answer === 'silo_peilen'), () => 0.99);
   assert.equal(save.road.chain.step, 'silo_konvoi');
   e = generateEncounter(D, rng(2), { save, chain: save.road.chain });
   assert.equal(e.gang, 'Zero Hour');
   choose(D, save, e.options.find(o => o.answer === 'silo_folgen'), () => 0.99);
   e = generateEncounter(D, rng(3), { save, chain: save.road.chain });
-  const r = choose(D, save, e.options.find(o => o.answer === 'silo_markieren'), () => 0.99);
-  assert.ok(r.revealed && save.map.revealed.includes('silo_zero') && save.road.flags.includes('silo_gefunden'));
+  choose(D, save, e.options.find(o => o.answer === 'silo_umsehen'), () => 0);   // goes wrong
+  assert.equal(have(D, save, 'silo_karte_4'), 1);
+  assert.ok(save.road.flags.includes('silo_gefunden'));
+  assert.ok(!save.map.revealed?.includes('silo_zero') && !save.map.nodes.some(n => n.id === 'silo_zero'));
+});
+
+test('Schatzsuche „I become death …“: Onkel bietet sie erst mit einem Stück an, Händler erst danach, fünf Stücke decken Silo Zero auf', () => {
+  const save = newSave(D), Q = D.quests.silo_schatz;
+  assert.equal(Q.giver, 'onkel_sung'); assert.equal(Q.pieces.length, 5);
+  assert.ok(!offers(D, save).includes('silo_schatz'));
+  const traders = () => situationsFor(D, { night: true, danger: 3, save }).map(s => s.id).concat(situationsFor(D, { night: false, danger: 3, save }).map(s => s.id));
+  assert.ok(!traders().includes('silo_kartenhaendler') && !traders().includes('silo_schwarzmarkt'));
+  give(D, save, 'silo_karte_1', 1);
+  assert.ok(offers(D, save).includes('silo_schatz'));
+  accept(D, save, 'silo_schatz');
+  assert.ok(save.road.flags.includes('silo_jagd'));
+  assert.ok(traders().includes('silo_kartenhaendler') && traders().includes('silo_schwarzmarkt'));
+  save.deltas = 1000;
+  let e = generateEncounter(D, rng(5), { save, situation: 'silo_kartenhaendler' });
+  choose(D, save, e.options.find(o => o.answer === 'silo_karte_kaufen'), () => 0.99);
+  e = generateEncounter(D, rng(6), { save, situation: 'silo_schwarzmarkt', night: true });
+  choose(D, save, e.options.find(o => o.answer === 'silo_brand_stehlen'), () => 0);   // caught, still has it
+  assert.equal(have(D, save, 'silo_karte_2'), 1); assert.equal(have(D, save, 'silo_karte_5'), 1);
+  assert.ok(!traders().includes('silo_kartenhaendler') && !traders().includes('silo_schwarzmarkt'), 'Händler kommen nicht wieder');
+  const p = progressOf(D, save, 'silo_schatz');
+  assert.equal(p.n, 3); assert.deepEqual(p.missing, ['silo_karte_3', 'silo_karte_4']);
+  assert.equal(claim(D, save, 'silo_schatz').ok, false);
+  give(D, save, 'silo_karte_3', 1); give(D, save, 'silo_karte_4', 1);
+  const r = claim(D, save, 'silo_schatz');
+  assert.ok(r.ok && r.got.some(x => x.includes('Silo Zero')));
+  assert.ok(save.map.revealed.includes('silo_zero'));
   assert.ok(save.map.edges.some(([a, b]) => (a === save.location && b === 'silo_zero') || (b === save.location && a === 'silo_zero')));
+  for (const id of Q.pieces) assert.equal(have(D, save, id), 0);
   assert.equal(revealPlace(D, save, 'silo_zero').id, 'silo_zero');   // twice = still one place
   assert.equal(save.map.nodes.filter(n => n.id === 'silo_zero').length, 1);
+});
+
+test('Fundstücke: Stück 1 im Tresor von Bunker 13, Stück 3 im Ministerium', () => {
+  assert.ok(D.pois.bunker_13.treasure.some(t => t.item === 'silo_karte_1' && t.where === 'vault'));
+  assert.ok(D.pois.ministerium.treasure.some(t => t.item === 'silo_karte_3' && t.where === 'vault'));
+  for (let i = 1; i <= 5; i++) assert.ok(D.items[`silo_karte_${i}`].tags.includes('quest'));
 });
 
 test('Titan Lullaby: einzigartig, mehr Integrität, fast fehlerfrei', () => {

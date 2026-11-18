@@ -61,7 +61,7 @@ export const KIT_STATES = [['alert', 'Alarm'], ['walk', 'Gehen'], ['run', 'Renne
 export const ENEMY_FAMILIES = [['mutant', 'Mutant'], ['raider', 'Plünderer'], ['machine', 'Maschine'], ['wildlife', 'Getier'], ['anomaly', 'Anomalie']];
 export const ENEMY_BEHAVIORS = [['patrol', 'Patrouille'], ['charger', 'Stürmer'], ['shooter', 'Schütze'], ['ambusher', 'Lauerer'], ['flyer', 'Flieger'], ['boss', 'Boss']];
 // tags on things (Daniel, 11.11.2026: „mach ein Tag trophy“): trophy = may hang on a trophy stand in the treasury
-export const ITEM_TAGS = [['trophy', 'Trophäe']];
+export const ITEM_TAGS = [['trophy', 'Trophäe'], ['quest', 'Questgegenstand (#057: nicht verkaufen, nicht zerlegen)']];
 // Entities (#047): kinds of quirks
 export const GLITCH_QUIRKS = [['odd', 'schrullig'], ['mood', 'Laune'], ['time', 'Tageszeit'], ['weather', 'Wetter'], ['neighbour', 'Nachbarn']];
 // Lore › Marken (#045)
@@ -860,10 +860,13 @@ export const AREAS = {
       { title: 'Auftrag', fields: [NAME, ref('giver', 'Auftraggeber', 'companions'), area_('text', 'Text', { hint: 'Was der Auftraggeber sagt' }), area_('done', 'Beim Abgeben', { hint: 'Sein Satz, wenn Leyla den Auftrag abgibt' }),
         ref('after', 'Nach Auftrag', 'quests', { hint: 'Erst im Angebot, wenn dieser Auftrag erledigt ist' }), num('minDay', 'Ab Tag', { min: 1 })] },
       { title: 'Ziel', fields: [select('counter', 'Zähler', [['', '– Dinge abgeben –'], ...ACHIEVEMENT_COUNTERS], { hint: 'Was das Spiel zählt (ab dem Annehmen). Leer = Dinge abgeben' }), text('filter', 'Filter', { hint: 'Wie bei Achievements: Gegner, Familie, POI, Rang, Rezept …' }), num('target', 'Ziel', { min: 1 }),
-        ref('item', 'Abgeben: Ding', 'items'), num('count', 'Abgeben: Anzahl', { min: 1 })] },
-      { title: 'Belohnung', fields: [num('reward.deltas', 'Deltas', { unit: 'Δ', min: 0 }), table('reward.items', 'Dinge', [ref('item', 'Ding', 'items'), num('count', 'Anzahl', { min: 1 })], { hint: 'Kommen in die Kiste im Camp, ist sie voll, in den Rucksack' })] },
+        ref('item', 'Abgeben: Ding', 'items'), num('count', 'Abgeben: Anzahl', { min: 1 }),
+        refs('pieces', 'Abgeben: alle diese', 'items', { hint: '#057 Schatzsuche: je eins von jedem (z. B. fünf Kartenstücke); statt „Abgeben: Ding“' }),
+        bool('whenHas', 'Erst wenn eins davon da ist', { hint: '#057: im Angebot erst, wenn Leyla eines der Stücke hat (sie spricht den Auftraggeber darauf an)' }),
+        text('flag', 'Merker beim Annehmen', { hint: '#057: setzt einen Merker für den Ereignis-Baukasten (z. B. Händler, die Stücke verkaufen, tauchen erst dann auf)' })] },
+      { title: 'Belohnung', fields: [ref('reward.reveal', 'Ort aufdecken', 'locations', { hint: '#057: ein versteckter Ort kommt auf die Reisekarte' }), num('reward.deltas', 'Deltas', { unit: 'Δ', min: 0 }), table('reward.items', 'Dinge', [ref('item', 'Ding', 'items'), num('count', 'Anzahl', { min: 1 })], { hint: 'Kommen in die Kiste im Camp, ist sie voll, in den Rucksack' })] },
     ],
-    check: (x, report) => { if (!x.counter && !x.item) report('warning', 'Weder Zähler noch Ding zum Abgeben'); if (!x.reward?.deltas && !(x.reward?.items || []).length) report('hint', 'Keine Belohnung'); },
+    check: (x, report) => { if (!x.counter && !x.item && !(x.pieces || []).length) report('warning', 'Weder Zähler noch Ding zum Abgeben'); if (!x.reward?.deltas && !(x.reward?.items || []).length && !x.reward?.reveal) report('hint', 'Keine Belohnung'); },
   },
 
   achievements: {
@@ -1292,6 +1295,8 @@ export const AREAS = {
       { title: 'POI', fields: [NAME, LOOK, select('kind', 'Art', POI_KINDS), select('size', 'Größe', POI_SIZES), num('danger', 'Gefahr', { min: 1, max: 5 }), DESCRIPTION] },
       { title: 'Aufbau', fields: [range('roomCount', 'Räume', { hint: 'Wie viele Räume zusammengesetzt werden' }), refs('rooms', 'Raum-Bausteine', 'rooms'), refs('enemies', 'Gegner', 'enemies', { hint: 'Für das Zeichen 1 im Layout: ein zufälliger dieser Gegner' }), ref('loot', 'Kisten-Beute', 'lootTables', { hint: 'Für Kisten (C) in den Räumen' }), ref('vault', 'Tresor-Beute', 'lootTables', { hint: 'Liegt im Tresor am Ziel (Z), dazu je 10 % Rang-Bonus ein Extra-Wurf. Leer = Tabelle „tresor“' })] },
       { title: 'Gang', fields: [text('gang.name', 'Name', { hint: '#016: Wem dieser Ort gehört. Steht beim Betreten als Toast („Revier der …“)' }), text('gang.color', 'Gang-Farbe', { hint: 'Name einer Gang-Farbe aus dem Gegner-Bausatz (Magenta, Cyan, Orange, Gelb, Blutrot). Alle Plünderer aus dem Bausatz tragen hier diese Farbe (nicht Mutanten, nicht der Boss)' }), area_('gang.motto', 'Spruch')] },
+      { title: 'Fundstücke', fields: [table('treasure', 'Fundstücke', [ref('item', 'Ding', 'items'), select('where', 'Wo', [['vault', 'im Tresor'], ['chest', 'in einer Kiste']]), num('chance', 'Chance', { unit: '%', min: 1, max: 100 })],
+        { hint: '#057 Schatzsuche: ein bestimmtes Ding liegt hier, einmal je Durchgang und nur, solange Leyla es nicht hat (z. B. ein Kartenstück im Tresor)' })] },
       { title: 'KI-Terminal', fields: [text('terminalAi', 'Terminal-KI', { hint: '#057: Name einer Entity aus Entities › Unikate; sie wohnt im KI-Terminal (@ im Raum-Baustein). Glitch-Duell optional, gewonnen = sie zieht ins Cyberdeck (einmal je Spielstand)' })] },
       { title: 'Level', fields: [text('curve', 'Spannungskurve', { hint: 'Intensität in % vom Eingang bis zum Ausgang, mit Komma, z. B. „30, 70, 20, 85, 100“: so wahrscheinlich wird ein Zufallsgegner (1) in einem Raum auf dem Hauptweg gesetzt; unter 50 % nur die schwächere Hälfte der Gegner, ab 85 % die zähere. Seitenräume halb so laut. Leer = jede 1 ist ein Gegner' }), num('branchChance', 'Abzweige', { unit: '%', min: 0, max: 100, hint: 'Chance je Abzweig-Haken (A in der Decke eines Hauptraums), dass ein Seitenraum (Merkmal Beute/Geheimnis, A im Boden) darüber hängt. Leer = 60' }),
         select('stack', 'Aufbau', [['', 'Nebeneinander (Hauptweg von links nach rechts)'], ['tower', 'Turm: vom Eingang nach oben'], ['deep', 'Tiefe: vom Eingang nach unten']], { hint: '#038: Turm/Tiefe stapelt die Haupträume übereinander: A im Boden des oberen Raums sitzt über A in der Decke des unteren, eine Leiter verbindet sie. Seitenräume (Beute/Geheimnis) stehen neben einem Hauptraum auf derselben Etage. Die Abkürzung ist ein Schacht neben dem Stapel mit einer Tür unten, die nur von der anderen Seite aufgeht' }),

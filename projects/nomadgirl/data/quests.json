@@ -48,5 +48,15 @@
   "counter": "lights",
   "target": 2,
   "reward": {"deltas": 30, "items": [{"item": "wissen", "count": 1}]}
+ },
+ "silo_schatz": {
+  "name": "I become death …",
+  "reward": {"reveal": "silo_zero", "deltas": 150},
+  "giver": "onkel_sung",
+  "whenHas": true,
+  "flag": "silo_jagd",
+  "pieces": ["silo_karte_1", "silo_karte_2", "silo_karte_3", "silo_karte_4", "silo_karte_5"],
+  "text": "Zeig mal her … Das ist Armeepapier. Ich kenne das Zeichen: Silo Zero, irgendwo in den Bergen. Oppenheimer hat gesagt: „Jetzt bin ich der Tod geworden, der Zerstörer der Welten.“ Die Leute, die das gebaut haben, haben ihre Karte in fünf Stücke gerissen, damit sie keiner allein findet. Eins hast du. Zwei liegen in Tresoren, in Bunker 13 und im Ministerium. Den Rest kaufst du auf der Straße oder holst ihn dir. Bring mir alle fünf, dann setze ich sie zusammen.",
+  "done": "Fünf Stücke, eine Karte. Da. Zwischen den Felsnadeln. Leyla … was immer da unten schläft: weck es nicht ohne Grund."
  }
 }

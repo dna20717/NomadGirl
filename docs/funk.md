@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #057 **Silo Zero** und #058 **Schatzsuche „I become death …“** fertig: verstecktes XXL-Raketensilo (26–32 Räume, Zero Hour, Major Null, Silo-KI Titan Lullaby), fünf Kartenstücke (2 Tresore, 1 Straßen-Geschichte, 2 Händler), Onkel Sung setzt sie zusammen und deckt den Ort auf. Tests 244/244, Browser BROWSER, PixelLab 0. Offen für Daniel: Quest-Titel „I become death …“ oder „Now I am become Death“?
 - 18.11. Code → Ava: #057 Raketensilo läuft (Daniels Auftrag im Code-Chat).
 
 - 18.11. Code → Ava: **HNC / Übergabe.** Stand `main` nach dieser Sitzung: #053 Fahrt in Szene (wie Keep Driving: echtes Rig als Schnappschuss, Landschaft/Licht/Wetter aus Code, 8 Regionen, Zwischenfälle am Straßenrand mit Gegner-Bausätzen, 30 s je Etappe, Vorspulen/Überspringen), #054 Ereignis-Baukasten (Lagen × Stimmungen × Antworten, Gefahr skaliert, Risiko), #055 Riesen-Billboards mit Werbung aller Marken, Ruf je POI-Gang (Freund = Freie Fahrt, Feind = Kopfgeldjäger, Kills im Revier kosten Ruf), Merker/Buffs als Folgen, drei Ketten über 3–4 Etappen (Fehde, SOS, Die Läuferin). Dazu: Bit-Stapel-Haptik überall gleich, „die Entity“ mit Charakteren und Banter, Ideenspeicher in `docs/backlog.md` › D. Tests: `npm test` 239, Browser 43/43. PixelLab übrig 290 (unter 700: jeder Auftrag nur mit Daniels Freigabe). Offene Fragen an Daniel: ⚠️-Punkte in #053–#055 absegnen; wie sich KIs im Duell unterscheiden; gleichzeitiges Ausspielen im Bit-Stapel; Anhalter als Crew (Karawane #040 wartet auf OK); Landschafts-Ebenen per PixelLab (3c, später); Ruf für Siedlungen/Marken, Ruhm. Nächste Kandidaten aus dem Ideenspeicher: Crew-Kern #040 mit Anhaltern aus den Ereignissen, Rig-Radio für die Fahrt, Fahndungsstufe der Kammerjäger, Bit-Stapel in der Kneipe.
@@ -175,13 +176,21 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commits, Tests, PixelLab diesmal/übrig, bitte testen: …
 ```
 
+### #058 Schatzsuche „I become death …“ um Silo Zero
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
+- **Für:** Code
+- **Lesen:** docs/features/pois.md › Silo Zero
+- **Auftrag (Daniel, 18.11.2026):** „Lass uns eine richtige Schatzsuche rund um das Silo bauen. Es gibt insgesamt fünf Stücke einer Karte, die man finden kann, um den Ort final zu offenbaren. Manche kann man kaufen, andere findet man in der Welt. Wenn man das erste findet und mit Onkel drüber spricht, poppt das Quest auf. Der Name des Quests ist „I becom death …“, von Oppenheimers Zitat entliehen.“
+- **Rückfragen:** (Code) ⚠️ vorläufig: Titel „I become death …“ (Daniel schrieb „becom“; Original „Now I am become Death“); Fundorte: 1 Bunker 13 (Tresor), 3 Ministerium (Tresor), 4 die Straßen-Geschichte (deckt den Ort nicht mehr direkt auf), 2 Kartenhändler (120 Δ), 5 Schwarzmarkt (200 Δ oder stehlen); Händler erst nach Annehmen der Quest; Questgegenstände gehen bei Fehlschlägen nicht verloren; Belohnung Ort + 150 Δ.
+- **Ergebnis:** (Code) Commit „Schatzsuche I become death … (#058)“ auf `main`. Neu: POI › Fundstücke (`treasureFind`), Quests › Abgeben: alle diese / Erst wenn eins davon da ist / Merker beim Annehmen / Ort aufdecken, Item-Tag Questgegenstand, 2 Lagen + 4 Antworten, Questlog hakt Stücke ab, Onkel nennt die fehlenden. `npm test` 244/244 (`test/silo.test.js` 5), Browser siehe Funkspruch (`silo_test` 10). PixelLab 0. **Bitte testen:** Bunker 13 bis zum Tresor, mit dem Stück zu Onkel Sung, Quest annehmen, dann Händler auf der Straße.
+
 ### #057 Raketensilo: großer versteckter POI in den Bergen
-- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Bild „Cyberpunk Underground Rocket Silo“ von Daniel)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Bild „Cyberpunk Underground Rocket Silo“ von Daniel)
 - **Für:** Code
 - **Lesen:** docs/features/pois.md (Stapel, Tiefe), docs/features/worldmap.md (Ketten, Orte), docs/features/glitchlings.md (Duell in der Welt)
 - **Auftrag (Daniel, 18.11.2026):** „Kannst du daraus einen spielbaren POI machen und ihn irgendwo in den Bergen auf der Map verstecken?“ Antworten: vorhandene Kacheln + Bild als Karte; versteckt, bis eine Geschichte ihn verrät; Silo-KI zum Duell als **optionales** Ziel, sehr schwer, Sieg = einzigartige Entity; eigene Gang; **mindestens 20 Räume**, einer der größten POIs; Boss unten.
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: Größe XXL (neu), Tiefen-Stapel mit 26–32 Räumen; Gang Zero Hour (Giftgrün); Boss Major Null an der Startrampe; Titan Lullaby: 120 Integrität, kaum Rauschen, ein Versuch je Run; aufgedeckt seit #058 erst über die Schatzsuche.
+- **Ergebnis:** (Code) Commit „Silo Zero …“ auf `main`. Neu: Räume `rs_*` (`tools/poi_rooms_057.py`), Raum-Zeichen `@` (KI-Terminal), Orte › Versteckt + `revealPlace`, Lagen-Feld Feste Gang, Entity-Spalten Duell-Integrität/Rauschen. `npm test` grün (`test/silo.test.js`), Browser `silo_test`. PixelLab 0. **Bitte testen:** `/game?poi=raketensilo` bis nach unten, KI-Terminal.
 
 ### #056 Van streng von der Seite (zu + Querschnitt)
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, PixelLab 20–30 freigegeben)

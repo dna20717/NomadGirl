@@ -80,7 +80,8 @@
   "description": "Zone 13. Gebaut für den Krieg, der nie kam. Irgendwer hält die Notbeleuchtung am Laufen.",
   "branchChance": 70,
   "curve": "40, 85, 30, 90, 35, 100",
-  "gang": {"name": "Rust Guard", "color": "Orange", "motto": "Der Bunker hält. Wir halten den Bunker."}
+  "gang": {"name": "Rust Guard", "color": "Orange", "motto": "Der Bunker hält. Wir halten den Bunker."},
+  "treasure": [{"item": "silo_karte_1", "where": "vault", "chance": 100}]
  },
  "ministerium": {
   "name": "Ministry of Order",
@@ -98,7 +99,8 @@
   "tunnelAtmosphere": "ministerium_kalt",
   "branchChance": 65,
   "curve": "30, 70, 25, 85, 40, 100",
-  "gang": {"name": "Order Office", "color": "Cyan", "motto": "Bitte ziehen Sie eine Nummer. Sie werden erschossen."}
+  "gang": {"name": "Order Office", "color": "Cyan", "motto": "Bitte ziehen Sie eine Nummer. Sie werden erschossen."},
+  "treasure": [{"item": "silo_karte_3", "where": "vault", "chance": 100}]
  },
  "delta_heights": {
   "name": "Delta Heights",

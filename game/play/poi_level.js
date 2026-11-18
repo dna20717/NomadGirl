@@ -10,6 +10,7 @@ import { rankRun } from '../../engine/poi.js';
 import { earn, earnText } from '../earn.js';
 import { foeFor, glitchState } from '../glitch_world.js';
 import { uniqueEntity } from '../glitchlings.js';
+import { stock } from '../crafting.js';
 
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
 
@@ -250,11 +251,23 @@ export class PoiLevel {
     const things = s.lootRoll ? s.lootRoll(this.lootTable) : rollLoot(s.data_, this.lootTable);
     for (const r of earn(s.data_, 'chest')) { const same = things.find(x => x.a === 'items' && x.id === r.id); if (same) same.n += r.n; else things.push(r); }   // #039
     this.salvagePart(things);
+    this.treasureFind(things, 'chest');   // #057
     s.fx.sparks(c.x, c.feet - 50, 0xffd27a, 14);
     if (things.length) s.loot?.drop(c.x, c.feet, things, 140);
     else s.hud.toast('Leer …', 'Hier hat schon jemand geplündert', 'info', 2400);
   }
   // salvage (#023): a part a wreck still needs, if it lies in this POI (Bergungsprojekte › Fundorte)
+  // #057 POI › Fundstücke: a certain thing lies here (a map piece), once per Durchgang and only while Leyla does not have it
+  treasureFind(things, where) {
+    const s = this.scene, save = s.box?.save, D = s.data_;
+    if (!save) return;
+    const found = save.found ??= [], st = stock(D, save);
+    for (const t of this.P.treasure || []) {
+      if (t.where !== where || !D.items?.[t.item] || found.includes(t.item) || (st[t.item] || 0) > 0 || Math.random() * 100 >= (t.chance ?? 100)) continue;
+      found.push(t.item); things.push({ a: 'items', id: t.item, n: 1 });
+      s.time.delayedCall(700, () => s.hud.toast(`Gefunden: ${D.items[t.item].name}`, D.items[t.item].description || '', 'loot', 5200));
+    }
+  }
   salvagePart(things, sure = false) {
     const s = this.scene, save = s.box?.save;
     if (!this.poi || !save) return;
@@ -313,6 +326,7 @@ export class PoiLevel {
     const table = this.P.vault || (D.lootTables?.tresor ? 'tresor' : this.lootTable), extra = Math.floor((r.bonus || 0) / 10), haul = [];
     const things = [...(s.lootRoll ? s.lootRoll(table) : rollLoot(D, table)), ...Array.from({ length: extra }, () => rollLoot(D, table)[0]).filter(Boolean)];
     this.salvagePart(things, true);   // the vault holds one missing salvage part for sure, if this POI is a Fundort
+    this.treasureFind(things, 'vault');   // #057 a map piece of the treasure hunt
     const earned = earn(D, 'rank', { grade: r.grade });   // #039: a good rank gives Wissen extra
     things.push(...earned);
     for (const t of things) { const same = haul.find(h => h.id === t.id); if (same) same.n += t.n; else haul.push({ ...t }); }

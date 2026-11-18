@@ -2274,5 +2274,65 @@
   "description": "Zerdrückt, verbeult, liegt überall rum. Gutes Blech.",
   "salvageAt": "werkbank",
   "salvage": [{"item": "schrott", "count": 1}]
+ },
+ "silo_karte_1": {
+  "name": "Kartenstück 1/5: Nordgrat",
+  "category": "valuable",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 1,
+  "glyph": "🗺️",
+  "look": "icons_kitchen",
+  "icon": 61,
+  "tags": ["quest"],
+  "description": "Ein Fetzen Militärkarte, Höhenlinien und ein Pfeil: „N-Grat, Zufahrt gesprengt“. Der Rand ist angekokelt."
+ },
+ "silo_karte_2": {
+  "name": "Kartenstück 2/5: Totenpass",
+  "category": "valuable",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 1,
+  "glyph": "🗺️",
+  "look": "icons_kitchen",
+  "icon": 61,
+  "tags": ["quest"],
+  "description": "Ein Stück Wanderkarte, jemand hat einen Pass mit Kreuzen markiert. Daneben: „nicht nachts“."
+ },
+ "silo_karte_3": {
+  "name": "Kartenstück 3/5: Siegel des Amts",
+  "category": "valuable",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 1,
+  "glyph": "🗺️",
+  "look": "icons_kitchen",
+  "icon": 61,
+  "tags": ["quest"],
+  "description": "Ein gestempeltes Blatt aus dem Ministerium: „Anlage Z, Sperrgebiet, Zutritt nur mit Freigabe Null“."
+ },
+ "silo_karte_4": {
+  "name": "Kartenstück 4/5: Funkkoordinaten",
+  "category": "valuable",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 1,
+  "glyph": "🗺️",
+  "look": "icons_kitchen",
+  "icon": 61,
+  "tags": ["quest"],
+  "description": "AvAs Ausdruck der Peilung: zwei Linien, die sich in den South Badlands kreuzen."
+ },
+ "silo_karte_5": {
+  "name": "Kartenstück 5/5: Brandzeichen",
+  "category": "valuable",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 1,
+  "glyph": "🗺️",
+  "look": "icons_kitchen",
+  "icon": 61,
+  "tags": ["quest"],
+  "description": "Ein Lederlappen mit einem eingebrannten Raketen-Emblem und Zahlen: der Code für das äußere Tor."
  }
 }

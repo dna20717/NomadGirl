@@ -67,11 +67,12 @@ export function blocked(D, save, o) {
 // take a choice → { lines: [what happened], things: [{ id, n }], health (% of max, negative = damage) }
 // Risiko (#054): with o.risk % it goes wrong: the extra damage and hours of the failure, no reward (Δ gained, thing, loot), the text of the failure
 export function choose(D, save, o, rnd = Math.random) {
-  const lines = [], things = [], failed = o.risk > 0 && rnd() * 100 < o.risk;
+  const lines = [], things = [], failed = o.risk > 0 && rnd() * 100 < o.risk, quest = !!D.items?.[o.item]?.tags?.includes('quest');
   if (failed) {
     o = { ...o, health: (o.health || 0) + (o.failHealth || 0), hours: (o.hours || 0) + (o.failHours || 0), result: o.failResult || 'Das ging schief.' };
     if (o.deltas > 0) delete o.deltas;
-    delete o.item; delete o.loot;
+    if (!quest) delete o.item;   // #057: a quest piece is found also when it hurts (and its Merker counts)
+    delete o.loot;
     lines.push('Schiefgegangen');
   }
   if (o.use) { take(D, save, o.use, o.useCount || 1); lines.push(`−${o.useCount || 1} ${D.items?.[o.use]?.name || o.use}`); }
@@ -89,7 +90,7 @@ export function choose(D, save, o, rnd = Math.random) {
   const rep2 = o.repRival && o.rival ? addRep(D, save, o.rival, o.repRival) : null;
   if (rep2?.n) lines.push(`Ruf ${rep2.gang} ${rep2.n > 0 ? '+' : '−'}${Math.abs(rep2.n)}`);
   const R = save.road ??= { flags: [], seen: [], chain: null };
-  if (!failed) for (const f of String(o.flag || '').split(',').map(x => x.trim()).filter(Boolean)) {
+  if (!failed || quest) for (const f of String(o.flag || '').split(',').map(x => x.trim()).filter(Boolean)) {
     if (f.startsWith('-')) R.flags = R.flags.filter(x => x !== f.slice(1)); else if (!R.flags.includes(f)) R.flags.push(f);
   }
   if (!failed && o.buff && D.buffs?.[o.buff] && !(save.buffs ||= []).includes(o.buff)) { save.buffs.push(o.buff); lines.push(`Buff: ${D.buffs[o.buff].name}`); }
