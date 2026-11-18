@@ -18,6 +18,7 @@ import { mapBrands, valueOf } from './brands.js';
 import { brandDiscount, influencer } from './brand_perks.js';
 import { gangs, repOf, levelOf, gangOfPlace, repPrice } from './reputation.js';
 import { NEED_KEYS, hasNeeds, needBlocked, needTag } from './needs.js';
+import { ok as condOk } from './conditions.js';
 
 const pick = (r, a) => a[Math.floor(r() * a.length) % a.length];
 const variants = s => String(s || '').split('|').map(x => x.trim()).filter(Boolean);
@@ -36,9 +37,9 @@ export function eventsConfig(D) {
 // the situations that may happen now (time of day, danger), by weight; id forces one
 // (#055) not „only as a follow-up“, Merker needed / forbidden, once per Durchgang, the Ruf with its gang in range
 export function situationsFor(D, { night = false, danger = 1, save = null, here = null } = {}) {
-  const flags = new Set(save?.road?.flags || []), seen = new Set(save?.road?.seen || []);
+  const seen = new Set(save?.road?.seen || []);
   return eventsConfig(D).situations.filter(s => (s.weight ?? 1) > 0 && !s.only && (!s.time || s.time === 'any' || (s.time === 'night') === night) && (s.danger ?? 1) <= danger
-    && list(s.needs).every(f => flags.has(f)) && !list(s.not).some(f => flags.has(f)) && !(s.once && seen.has(s.id)) && (!(s.gang || s.gangName) || gangFor(D, s, save, here, () => 0.5) !== undefined));
+    && condOk(D, save, s) && !(s.once && seen.has(s.id)) && (!(s.gang || s.gangName) || gangFor(D, s, save, here, () => 0.5) !== undefined));
 }
 const inRange = (s, n) => { const [a, b] = Array.isArray(s.rep) ? s.rep : [-100, 100]; return n >= (a ?? -100) && n <= (b ?? 100); };
 // the gang of a situation: the destination's („here“) or one whose Ruf fits („any“, or „here“ without a gang); undefined = none fits

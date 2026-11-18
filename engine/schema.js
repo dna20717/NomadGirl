@@ -83,6 +83,12 @@ export const WORKSHOP_FUNCTIONS = [['tank', 'Cryo-Tank'], ['garden', 'Hydrokultu
 export const BENCH_FX = [['light', 'Licht'], ['screen', 'Bildschirm'], ['steam', 'Dampf'], ['smoke', 'Rauch'], ['sparks', 'Funken'], ['flame', 'Flamme'], ['blink', 'LED blinkt'], ['twinkle', 'Lichter funkeln'], ['bubbles', 'Blasen'], ['fish', 'Fische'], ['lava', 'Lavalampe'], ['scan', 'Druckkopf'], ['shine', 'Glanz']];
 export const BENCH_FX_WHEN = [['always', 'Immer'], ['night', 'Abends'], ['near', 'In der Nähe'], ['use', 'Bei Benutzung']];
 export const RIG_SLOTS = [['engine', 'Motor'], ['armor', 'Panzerung'], ['weapon', 'Waffe'], ['roof', 'Dach'], ['solar', 'Solar (Container-Dach)']];
+// #068 one condition language (game/conditions.js): the crew & rig needs, the same fields wherever something can be required
+// (Ereignis-Baukasten › Antworten and Lagen, Quests › Bedingung); without a value they ask for nothing
+const CREW_NEEDS = () => [ref('needCompanion', 'Braucht: Companion', 'companions', { hint: '#059/#068: nur mit diesem Companion an Bord; sonst grau mit Grund bzw. nicht im Angebot' }),
+  select('needWear', 'Braucht: Implantat/AvA-Teil', [['', '–'], ...WEAR_SLOTS], { hint: 'irgendein Teil an diesem Platz (Leyla oder AvA)' }),
+  ref('needItem', 'Braucht: genau dieses Teil', 'items', { hint: 'eingebaut bei Leyla oder AvA' }), select('needRigSlot', 'Braucht: Rig-Teil am Slot', [['', '–'], ...RIG_SLOTS]),
+  ref('needRigPart', 'Braucht: genau dieses Rig-Teil', 'rigParts'), select('needWorkshop', 'Braucht: Werkstatt im Rig', [['', '–'], ...WORKSHOP_FUNCTIONS])];
 export const POI_KINDS = [['gasStation', 'Tankstelle'], ['settlement', 'Siedlung'], ['factory', 'Fabrik'], ['bunker', 'Bunker'], ['government', 'Regierungskomplex'], ['mall', 'Einkaufszentrum'], ['ruin', 'Ruine'], ['highrise', 'Hochhaus'], ['underground', 'Untergrund']];
 export const POI_SIZES = [['S', 'S'], ['M', 'M'], ['L', 'L'], ['XL', 'XL'], ['XXL', 'XXL']];
 export const ROOM_TAGS = [['start', 'Eingang'], ['exit', 'Ausgang'], ['combat', 'Kampf'], ['loot', 'Beute'], ['secret', 'Geheimnis'], ['npc', 'NPCs'], ['boss', 'Boss'], ['corridor', 'Gang']];
@@ -864,6 +870,7 @@ export const AREAS = {
         refs('pieces', 'Abgeben: alle diese', 'items', { hint: '#057 Schatzsuche: je eins von jedem (z. B. fünf Kartenstücke); statt „Abgeben: Ding“' }),
         text('needsFlag', 'Erst mit Merker', { hint: '#062: erst im Angebot, wenn alle diese Merker gesetzt sind (Komma), z. B. aus einer Straßen-Geschichte (Ereignis-Baukasten › Antworten › Merker)' }),
         text('notFlag', 'Nicht mit Merker', { hint: 'nicht mehr im Angebot, sobald einer dieser Merker gesetzt ist' }),
+        ...CREW_NEEDS(),
         bool('whenHas', 'Erst wenn eins davon da ist', { hint: '#057: im Angebot erst, wenn Leyla eines der Stücke hat (sie spricht den Auftraggeber darauf an)' }),
         text('flag', 'Merker beim Annehmen', { hint: '#057: setzt einen Merker für den Ereignis-Baukasten (z. B. Händler, die Stücke verkaufen, tauchen erst dann auf)' })] },
       { title: 'Belohnung', fields: [ref('reward.reveal', 'Ort aufdecken', 'locations', { hint: '#057: ein versteckter Ort kommt auf die Reisekarte' }), num('reward.deltas', 'Deltas', { unit: 'Δ', min: 0 }), table('reward.items', 'Dinge', [ref('item', 'Ding', 'items'), num('count', 'Anzahl', { min: 1 })], { hint: 'Kommen in die Kiste im Camp, ist sie voll, in den Rucksack' })] },
@@ -1454,7 +1461,7 @@ export const AREAS = {
         range('rep', 'Ruf von–bis', { hint: 'nur, wenn Leylas Ruf bei der Gang in diesem Bereich liegt (−100 … 100); leer = immer' }),
         text('needs', 'Braucht Merker', { hint: 'mit Komma; alle müssen gesetzt sein (z. B. „hank_geholfen“)' }), text('not', 'Nicht bei Merker', { hint: 'mit Komma' }),
         bool('only', 'Nur als Folge', { hint: 'kommt nur über eine Antwort „…>diese Lage“ (Kettenschritt)' }), bool('once', 'Einmal je Durchgang'),
-        ref('loot', 'Beute', 'lootTables', { hint: 'für Antworten mit Beute „situation“' }), ref('look', 'Bild', 'assets', { hint: 'Comic-Bild im Fenster; leer = Reisen › Bild für Zwischenfälle' })])] },
+        ref('loot', 'Beute', 'lootTables', { hint: 'für Antworten mit Beute „situation“' }), ref('look', 'Bild', 'assets', { hint: 'Comic-Bild im Fenster; leer = Reisen › Bild für Zwischenfälle' }), ...CREW_NEEDS()])] },
       { title: 'Stimmungen', fields: [table('moods', 'Stimmungen', [text('id', 'ID'), text('name', 'Wort', { hint: 'Adjektiv mit -e: „gierige“, für {mood}' }), text('text', 'Satz', { hint: 'hängt an den Text der Lage; Varianten mit |' }),
         num('price', 'Preise', { unit: '%', min: 10 }), num('risk', 'Risiko', { unit: '± %' }), bool('friendly', 'Freundlich'), bool('hostile', 'Feindselig')],
         { hint: 'Antworten „nur bei freundlicher/feindseliger Stimmung“ erscheinen nur, wenn die Stimmung das ist; beides geht (verzweifelt)' })] },
@@ -1465,9 +1472,7 @@ export const AREAS = {
         num('failHours', 'Fehlschlag: Zeit', { unit: 'h', min: 0 }), text('result', 'Danach', { hint: 'Varianten mit |' }), text('failResult', 'Fehlschlag', { hint: 'Varianten mit |' }),
         num('rep', 'Ruf', { hint: '#055: −100 … 100, Änderung des Rufs bei der Gang der Lage (auch wenn es schiefgeht)' }), num('repRival', 'Ruf Rivalen', { hint: 'Änderung bei der rivalisierenden Gang ({rival}), z. B. in einer Fehde' }), text('flag', 'Merker', { hint: 'setzen; „-name“ löscht; mehrere mit Komma (nur wenn es klappt)' }),
         ref('buff', 'Buff', 'buffs', { hint: 'wirkt im nächsten Run (nur wenn es klappt)' }), ref('reveal', 'Ort aufdecken', 'locations', { hint: '#057: ein versteckter Ort (Orte › Versteckt) kommt auf die Reisekarte (auch wenn es schiefgeht: gesehen ist gesehen)' }),
-        ref('needCompanion', 'Braucht: Companion', 'companions', { hint: '#059: nur mit diesem Companion an Bord; sonst grau mit Grund' }), select('needWear', 'Braucht: Implantat/AvA-Teil', [['', '–'], ...WEAR_SLOTS], { hint: 'irgendein Teil an diesem Platz (Leyla oder AvA)' }),
-        ref('needItem', 'Braucht: genau dieses Teil', 'items', { hint: 'eingebaut bei Leyla oder AvA' }), select('needRigSlot', 'Braucht: Rig-Teil am Slot', [['', '–'], ...RIG_SLOTS]), ref('needRigPart', 'Braucht: genau dieses Rig-Teil', 'rigParts'),
-        select('needWorkshop', 'Braucht: Werkstatt im Rig', [['', '–'], ...WORKSHOP_FUNCTIONS]), ref('brand', 'Marke', 'brands', { hint: '#064: Δ, die hier bezahlt werden, gehen an diese Marke (Influencer-Nachlass)' })])] },
+        ...CREW_NEEDS(), ref('brand', 'Marke', 'brands', { hint: '#064: Δ, die hier bezahlt werden, gehen an diese Marke (Influencer-Nachlass)' })])] },
       { title: 'Ruf', fields: [num('rep.enemy', 'Feind bis', { min: -100, max: 0 }), num('rep.disliked', 'Unbeliebt bis', { min: -100, max: 0 }), num('rep.tolerated', 'Geduldet ab', { min: 0, max: 100 }), num('rep.friend', 'Freund ab', { min: 0, max: 100 }),
         num('rep.price', 'Preise', { unit: '% bei ±100', min: 0, max: 90, hint: 'Freunde zahlen weniger, Feinde mehr' }), num('rep.kill', 'Je Kill im Revier', { min: 0, hint: 'so viel Ruf kostet ein Kill in einem POI der Gang' }),
         select('rep.peace', 'Frieden im Revier ab', [['geduldet', 'Geduldet'], ['freund', 'Freund'], ['neutral', 'Neutral']], { hint: '#061: ab dieser Stufe wird der POI zum Revier-Camp: die Gang greift nicht an; Freunde handeln und haben einen Auftrag' }),
