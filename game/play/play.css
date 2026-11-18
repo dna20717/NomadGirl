@@ -131,6 +131,11 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .hud-buildbtn kbd { display: inline-grid; place-items: center; min-width: 22px; height: 22px; border-radius: 5px; background: #ffd27a; color: #17111f; font: 18px/1 VT323, monospace; }
 .hud-buildbtn[hidden], #hud[data-building] .hud-buildbtn { display: none; }
 .hud-buffs b { color: #ffd27a; }
+.hud-fx { flex-wrap: wrap; gap: 4px 6px; max-width: 420px; }
+.hud-fxchip { padding: 1px 7px; border-radius: 9px; border: 1px solid #3a2f45; background: rgba(23, 17, 31, .7); color: #ffd27a; font: 18px/1.2 VT323, monospace; pointer-events: auto; }   /* #067 */
+.hud-fxchip.info { color: #9fd8ff; }
+.hud-fxchip.bad { color: #ff7a7a; border-color: #5a2a33; }
+.hud-fxchip small { color: #c8bcd6; font: inherit; }
 .hud-prompt { position: fixed; left: 50%; bottom: 3%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 8px 16px; border-radius: 8px; background: rgba(13, 10, 18, .8); border: 1px solid #3a2f45; font: 26px/1 VT323, monospace; color: #f2eef7; }
 .hud-prompt[hidden], .hud-menu[hidden] { display: none; }
 .hud-prompt kbd, .hud-item kbd { display: inline-grid; place-items: center; min-width: 26px; height: 26px; border-radius: 5px; background: #ffd27a; color: #0d0a12; font: 22px/1 VT323, monospace; }

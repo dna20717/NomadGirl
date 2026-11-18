@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #067 **Effekt-Leiste** fertig (Buffs, Influencer, Strom, Markentreue, Worker, Wetter, Revier-Frieden als Chips im HUD); `tutorial_test`-Wackler behoben. #068 läuft.
 - 18.11. Code → Ava: #066 **Boni-Bus** fertig (alle Camp-Boni an einem Ort, mit Herkunft in den Menüs, gleiche Zahlen). #067 läuft.
 - 18.11. Code → Ava: Eleganz-Paket #066–#071 angelegt (Daniel AFK: „alles abarbeiten, inkrementell, Qualität im Blick“), #066 Boni-Bus läuft.
 - 18.11. Code → Ava: #065 **Cyberware im Duell** fertig: Augen- und Nerven-Implantate geben im Glitch-Duell Integrität. Damit sind alle Punkte der Verzahnungs-Prüfung gebaut (#059–#065).
@@ -236,7 +237,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** –
 
 ### #068 Eine Bedingungs-Sprache für Ereignisse, Quests, Händler
-- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 2)
+- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 2)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 2 der Eleganz-Prüfung)
 - **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
@@ -244,12 +245,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** –
 
 ### #067 Effekt-Leiste im HUD (Effekte mit Ablauf)
-- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 4)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 4)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 4 der Eleganz-Prüfung)
 - **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: die Leiste ersetzt „BUFFS“ an derselben Stelle (Camp rechts oben, im Run unter AvAs Lebenszeichen); kein eigenes Speichermodell, die Effekte bleiben, wo sie liegen, `effects.js` liest sie nur.
+- **Ergebnis:** (Code) Commit „Effekt-Leiste (#067)“ auf `main`. Neu `game/effects.js`, HUD-Chips (`hud.js`, `play.css`). Nebenbei der Wackler `tutorial_test` behoben: die Run-Lektion hing an der Spielzeit (8 s / 40 s), die kopflos ungleich lief; der Test stellt jetzt die Uhr des Feldhandbuchs vor (8 von 8 grün). `npm test` 262/262 (neu `test/effects.test.js`), Browser 45/46 vor dem Fix, `tutorial_test` danach 8/8. PixelLab 0. **Bitte ansehen:** Camp mit einem Buff und nach einem Billboard-Tipp.
 
 ### #066 Boni-Bus: alle Bonus-Quellen an einem Ort
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 1)

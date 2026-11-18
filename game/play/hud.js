@@ -1,4 +1,5 @@
 // HUD as HTML over the canvas: health, ammo, dash, time, kills, Δ, banners and the controls overlay.
+import { activeEffects, effectsKey } from '../effects.js';
 import { hapticsOn, setHaptics } from '../haptics.js';
 import { placeOf } from '../worldmap.js';
 import { bonuses } from '../techtree.js';
@@ -404,10 +405,10 @@ export class Hud {
         else if (before && this.goal && !before.quest && !this.goal.quest && this.goal.progress > before.progress + 1e-6) this.toast('Ein Schritt näher an AvA', `${Math.round(this.goal.progress * 100)} % des Weges · nächster: ${this.goal.text.replace(/^[^:]*:\s*/, '')}`, 'good');
       }
       const G = this.goal, run = this.modeName === 'run';
-      const key = [sv.day, sv.hour, sv.location, sv.deltas, sv.fuel, sv.food, sv.buffs.join(), this.modeName, vit ? `${Math.round(sv.tank.cond)}${sv.tank.dead}` : '', G ? G.text + G.sub : ''].join('|');
+      const fx = activeEffects(D, sv, { run: this.modeName === 'run', sky: scene.weatherRun, turf: scene.turf?.state?.() });   // #067 Effekt-Leiste
+      const key = [sv.day, sv.hour, sv.location, sv.deltas, sv.fuel, sv.food, effectsKey(fx), this.modeName, vit ? `${Math.round(sv.tank.cond)}${sv.tank.dead}` : '', G ? G.text + G.sub : ''].join('|');
       if (key !== this.campKey) {
         this.campKey = key;
-        const buffs = sv.buffs.map(b => D.buffs?.[b]?.name || b);
         // #016 Run-HUD aufräumen: in the run only what matters in the run (AvA's vital signs, buffs, the goal); clock, Δ, fuel and
         // supplies of the camp stay in the camp (the run shows its own Δ top right)
         this.campEl.replaceChildren(
@@ -415,7 +416,7 @@ export class Hud {
             el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'Δ'), el('b', {}, String(sv.deltas)), el('span', { class: 'hud-label' }, 'SPRIT'), el('b', {}, `${Math.round(sv.fuel)} l`),
               el('span', { class: 'hud-label' }, 'VORRÄTE'), el('b', {}, (Math.round(sv.food * 10) / 10).toLocaleString('de-DE')))]),
           ...(vit ? [el('div', { class: 'hud-row hud-vital' + (vit.index >= 4 || vit.dead ? ' bad' : '') }, el('span', { class: 'hud-label' }, '♥ AvA'), el('b', {}, vit.dead ? 'kein Signal' : `${Math.round(sv.tank.cond)} % · ${vit.name}`))] : []),
-          ...(buffs.length ? [el('div', { class: 'hud-row hud-buffs' }, el('span', { class: 'hud-label' }, 'BUFFS'), el('b', {}, buffs.join(' · ')))] : []),
+          ...(fx.length ? [el('div', { class: 'hud-row hud-buffs hud-fx' }, el('span', { class: 'hud-label' }, 'EFFEKTE'), ...fx.map(e => el('span', { class: `hud-fxchip ${e.kind}`, title: e.sub || '' }, e.label, e.left != null ? el('small', {}, ` ${Math.ceil(e.left)} h`) : null)))] : []),
           ...(G ? [goalEl(G, run)] : []));
         // #017: in the camp the toasts start below this column (they covered the goal line)
         requestAnimationFrame(() => { const r = !run && !this.campEl.hidden ? this.campEl.getBoundingClientRect() : null; this.toastsEl.style.setProperty('--toast-top', `${r && r.height ? Math.round(r.bottom + 10) : 110}px`); });

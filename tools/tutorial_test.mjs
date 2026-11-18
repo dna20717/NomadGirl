@@ -99,7 +99,9 @@ await ev(() => TU().setOff(false));
 await ev(() => { TU().setSessionOff(false); TU().events.clear(); nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(4); if (TU().state().open) TU().close(); nomad.choose('Plündern'); nomad.release(); });   // #056: the map's first-time card may come up here now
 await page.waitForFunction(() => { const s = game.scene.getScene('play'); return s?.mode === 'run' && s.leyla; }, null, { timeout: 40000 });
 await page.waitForTimeout(800);
-v = await ev(() => { nomad.take(); const r = nomad.until(() => !!TU().state().tip, 4000, []); const st = TU().state(); const x = SC().leyla.x; nomad.step(30, ['right']);
+v = await ev(() => { nomad.take(); nomad.calm(); const T = TU(); T.modeAt -= 120000; T.lastClose -= 120000;   // the field guide's clock moved on: its time lessons are due (the scene clock stepped unevenly headless, that made this check flaky)
+  const r = nomad.until(() => !!TU().state().tip, 4000, []);
+  const st = TU().state(); const x = SC().leyla.x; nomad.step(30, ['right']);
   return { tip: st.tip, open: st.open, moved: SC().leyla.x !== x, shown: !document.querySelector('.tut-tip')?.hidden, text: document.querySelector('.tut-tip b')?.textContent || '' }; });
 check('Run: Lektion als Tipp in der Ecke, das Spiel läuft weiter', !!v.tip && !v.open && v.moved && v.shown && !!v.text, v);
 v = await ev(() => { document.querySelector('.tut-tip-more')?.click(); nomad.step(2); return TU().state(); });
