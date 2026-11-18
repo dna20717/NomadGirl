@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #055 Billboards, Ruf, Ereignis-Ketten läuft (Daniels Auftrag im Code-Chat).
+
 - 18.11. Code → Ava: #054 **Ereignis-Baukasten** fertig: Zwischenfälle aus 16 Lagen × 8 Stimmungen × 27 Antworten, Gefahr skaliert, Risiko bei Antworten, 7 neue Dinge am Straßenrand. Tests 234/234, Browser 43/43, PixelLab 0.
 - 18.11. Code → Ava: #054 Ereignis-Baukasten läuft (Daniels Auftrag im Code-Chat, Daniel AFK).
 
@@ -168,6 +170,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:** (Code) Frage → ⚠️ vorläufig entschieden: …
 - **Ergebnis:** (Code) Commits, Tests, PixelLab diesmal/übrig, bitte testen: …
 ```
+
+### #055 Riesen-Billboards, Ruf bei den Gangs, Ereignisse mit Folgen und Ketten
+- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
+- **Für:** Code
+- **Lesen:** design.md › Die Karawane › Ruf; docs/features/worldmap.md (Fahrt, Ereignis-Baukasten); docs/features/lore.md (Marken)
+- **Auftrag (Daniel, 18.11.2026):** „Nimm in die Welt noch riesige digitale Billboards für unsere ganzen Brands auf. Lass dort Werbung laufen. Verzahne den Ruf bei den einzelnen Fraktionen mit den Ereignissen und nutze die existierenden Gangs dafür. Es wäre ärgerlich, wenn Leyla von Gang A angegriffen würde, obwohl ihr Ruf bei denen auf max ist. Auch sollen die Ereignisse Auswirkungen auf den Verlauf des weiteren Spiels haben und ggf. auch Events sein, die in drei bis vier Etappen passieren (wie ein Micro-Choose-your-own-Adventure).“
+- **Fertig, wenn:** Riesen-Bildschirme mit laufender Werbung der Marken in der Fahrt-Landschaft; Ruf je Gang (die 11 POI-Gangs) im Spielstand, Ereignisse mit Gang wählen Lage und Stimmung nach Ruf (Freund wird nicht überfallen), Antworten ändern Ruf; Folgen: Merker, spätere Ereignisse, Buffs; Ketten über 3–4 Etappen; Werkstatt, Tests, Build grün auf `main`.
+- **Rückfragen:** –
+- **Ergebnis:** –
 
 ### #054 Ereignis-Baukasten für unterwegs
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
