@@ -57,7 +57,8 @@
    {"name": "Cyan", "color": "#20d6c7"},
    {"name": "Orange", "color": "#fa6a0a"},
    {"name": "Gelb", "color": "#ffd541"},
-   {"name": "Blutrot", "color": "#b4202a"}
+   {"name": "Blutrot", "color": "#b4202a"},
+   {"name": "Giftgrün", "color": "#9cdb43"}
   ],
   "offsets": [{"class": "pistol", "offset": [-4, 8]}],
   "headPivot": [119, 30]

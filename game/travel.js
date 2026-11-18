@@ -7,6 +7,7 @@ import { give, take, have } from './crafting.js';
 import { rollLoot } from './inventory.js';
 import { generateEncounter, eventsConfig } from './road_events.js';
 import { addRep, repOf, gangs } from './reputation.js';
+import { revealPlace } from './worldmap.js';
 
 const isNight = (D, hour) => { const T = D.travel || {}, len = T.dayLength || 24, night = (T.nightShare ?? 40) / 100 * len; return hour >= len - night / 2 || hour < night / 2; };
 
@@ -92,7 +93,10 @@ export function choose(D, save, o, rnd = Math.random) {
     if (f.startsWith('-')) R.flags = R.flags.filter(x => x !== f.slice(1)); else if (!R.flags.includes(f)) R.flags.push(f);
   }
   if (!failed && o.buff && D.buffs?.[o.buff] && !(save.buffs ||= []).includes(o.buff)) { save.buffs.push(o.buff); lines.push(`Buff: ${D.buffs[o.buff].name}`); }
+  // #057: a hidden place comes onto the map
+  const revealed = o.reveal ? revealPlace(D, save, o.reveal) : null;   // seen is seen, also when it went wrong
+  if (revealed) lines.push(`Neuer Ort auf der Karte: ${revealed.name}`);
   if (o.chain) R.chain = o.chain.next ? { step: o.chain.next, gang: o.chain.gang, rival: o.chain.rival, n: o.chain.n } : null;
   if (o.once && !R.seen.includes(o.once)) R.seen.push(o.once);   // a situation that happens once per Durchgang
-  return { lines, things, text: o.result || '', failed, rep, rep2, story: R.chain ? 'weiter' : null };
+  return { lines, things, text: o.result || '', failed, rep, rep2, revealed, story: R.chain ? 'weiter' : null };
 }

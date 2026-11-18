@@ -8,7 +8,8 @@ import { chestPart } from '../salvage.js';
 import { bonuses as trophyBonuses } from '../achievements.js';
 import { rankRun } from '../../engine/poi.js';
 import { earn, earnText } from '../earn.js';
-import { foeFor } from '../glitch_world.js';
+import { foeFor, glitchState } from '../glitch_world.js';
+import { uniqueEntity } from '../glitchlings.js';
 
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
 
@@ -74,6 +75,14 @@ export class PoiLevel {
     });
     this.goals = (R.marks.Z || []).map(([x, y]) => ({ x: (x + 0.5) * T, feet: (y + 1) * T, art: s.add.graphics().setDepth(-4), glow: null }));
     for (const z of this.goals) this.drawGoal(z);
+    // #057 the KI-Terminal (@): the POI's Terminal-KI, a unique Entity, optional and very hard; one try per run; caught = the terminal is quiet
+    const caught = new Set(s.box ? glitchState(s.box.save).caught : []);
+    this.terminals = (R.marks['@'] || []).map(([x, y]) => {
+      const t = { x: (x + 0.5) * T, feet: (y + 1) * T, ai: this.P.terminalAi || null, art: s.add.graphics().setDepth(-8), done: false, tried: false };
+      t.done = !t.ai || caught.has(t.ai);
+      this.drawTerminal(t);
+      return t;
+    });
     this.secretsMax = this.walls.length + this.fakes.length;
     // Bunker-Schlüsselbund (#012, Bonus „Secrets schimmern“): hidden walls glimmer pink now and then until they are found
     this.shimmer = [];
@@ -125,6 +134,32 @@ export class PoiLevel {
   // a switch panel instead of a lever (#052, Daniel 17.11.2026: „alle Hebel, die Türen öffnen, durch Schalter ersetzen, die man erst bedienen
   // kann, wenn man ein Duell ausgetragen hat“): a box on a post with a little screen; a KI lives in it (magenta, glitching) until the duel,
   // then the screen is calm (cyan) and the rocker can be thrown
+  // the KI-Terminal: a tall cabinet with a big screen; it sings (a slow wave) while the AI lives in it, it is dark when she is gone
+  drawTerminal(t) {
+    const g = t.art.clear(), x = t.x, f = t.feet, live = !t.done;
+    g.fillStyle(0x060608).fillRect(x - 46, f - 210, 92, 210);
+    g.fillStyle(0x333941).fillRect(x - 42, f - 206, 84, 206);
+    g.fillStyle(0x4a5462).fillRect(x - 42, f - 206, 84, 5);
+    g.fillStyle(0x9cdb43).fillRect(x - 42, f - 30, 84, 4); g.fillStyle(0x060608); for (let i = -40; i < 42; i += 12) g.fillRect(x + i, f - 30, 6, 4);   // the gang's green and black stripes
+    g.fillStyle(0x060608).fillRect(x - 34, f - 190, 68, 70); g.fillStyle(live ? 0x1a0f2a : 0x122020).fillRect(x - 31, f - 187, 62, 64);
+    if (live) {
+      for (let i = 0; i < 31; i++) { const h = Math.round(6 + 10 * Math.abs(Math.sin(i * 0.55))); g.fillStyle(0xbc4a9b).fillRect(x - 30 + i * 2, f - 155 - h / 2, 2, h); }
+      g.fillStyle(0x20d6c7).fillRect(x - 12, f - 177, 6, 6).fillRect(x + 6, f - 177, 6, 6);
+      if (!t.pulse) t.pulse = this.scene.tweens.add({ targets: t.art, alpha: 0.85, duration: 700, yoyo: true, repeat: -1 });
+    } else { g.fillStyle(0x3fe0d0, 0.5).fillRect(x - 20, f - 156, 40, 2); if (t.pulse) { t.pulse.stop(); t.pulse = null; t.art.setAlpha(1); } }
+    for (let i = 0; i < 4; i++) g.fillStyle(live ? [0xe43b9a, 0x20d6c7, 0xffd541, 0x9cdb43][i] : 0x4a5462).fillRect(x - 30 + i * 18, f - 108, 8, 8);
+  }
+  // the Silo-KI's duel (#057): a unique Entity with more Integrität that hardly makes mistakes; won = she moves into the cyberdeck
+  terminalDuel(t) {
+    const s = this.scene, foe = uniqueEntity(s.data_, t.ai);
+    if (!foe || !s.hud.duel) return;
+    t.tried = true;
+    s.hud.duel.open({ foe, title: 'Glitch-Duell · KI-Terminal', sub: `${this.P.name || 'POI'} · hier wohnt ${foe.name} · sehr schwer`, onDone: r => {
+      if (r.won && r.caught) { t.done = true; s.box?.persist?.(); this.drawTerminal(t); }
+      s.hud.toast(r.won ? (r.caught ? `Gefangen: ${foe.name}` : `${foe.name} findet keinen Platz`) : r.gaveUp ? 'Duell abgebrochen' : `${foe.name} hat gewonnen`,
+        r.won ? (r.caught ? 'Eine einzigartige Entity. Sie wohnt jetzt in deinem Deck' : 'Mach Platz im Deck, Rucksack oder Lager und komm wieder') : 'Sie zieht sich zurück. Versuch es im nächsten Run', r.won ? 'good' : 'info', 4200);
+    } });
+  }
   drawSwitch(sw) {
     const g = sw.art.clear(), x = sw.x, f = sw.feet, live = !sw.dueled, on = sw.on;
     g.fillStyle(0x24272e).fillRect(x - 5, f - 60, 10, 60);                                   // post
@@ -176,6 +211,7 @@ export class PoiLevel {
     for (const z of this.goals) if (close(z)) return this.done ? { text: `Geknackt · Abkürzung zum Van: ${this.shortcutWay()}` } : { text: 'Tresor knacken · POI abschließen', act: () => this.finish() };
     for (const c of this.chests) if (!c.open && close(c)) return { text: 'Kiste öffnen', act: () => this.openChest(c) };
     for (const sw of this.switches) if (close(sw)) return sw.on ? { text: 'Schalter ist umgelegt' } : sw.dueled ? { text: 'Schalter umlegen', act: () => this.pull(sw) } : { text: 'Schalter hacken · Glitch-Duell', act: () => this.duelAt(sw, 'Schalter', `sw${this.switches.indexOf(sw)}`) };
+    for (const t of this.terminals || []) if (close(t)) return t.done ? { text: 'Das Terminal ist still' } : t.tried ? { text: `${t.ai} schweigt · nächster Run` } : { text: `${t.ai} anzapfen · Glitch-Duell (sehr schwer)`, act: () => this.terminalDuel(t) };   // #057
     // KIs in machines (Marken-Clutter marked „KI“, e.g. NomadCola-Automaten): once per run
     for (const h of this.hosts()) if (!h.done && close(h)) return { text: `${h.name} anzapfen · Glitch-Duell`, act: () => this.duelAt(h, h.name, `host${this.hosts().indexOf(h)}`) };
     for (const d of this.doors) if (!d.open && Math.abs((d.x0 + d.x1) / 2 * this.scene.T - l.x) < range * 0.8 && l.feet > d.y0 * this.scene.T && l.feet <= d.y1 * this.scene.T + 4)
@@ -323,6 +359,7 @@ export class PoiLevel {
       poi: this.poi, done: this.done, secrets: this.secrets, secretsMax: this.secretsMax, killsMax: this.killsMax,
       chests: this.chests.map(c => ({ x: Math.round(c.x), feet: c.feet, open: c.open })),
       switches: this.switches.map(sw => ({ x: Math.round(sw.x), feet: sw.feet, on: sw.on })),
+      terminals: (this.terminals || []).map(t => ({ x: Math.round(t.x), feet: t.feet, ai: t.ai, done: t.done, tried: t.tried })),   // #057
       doors: this.doors.map(d => ({ x0: d.x0, x1: d.x1, y0: d.y0, y1: d.y1, open: d.open })),
       walls: this.walls.map(w => ({ x0: w.x0, x1: w.x1, y0: w.y0, y1: w.y1, open: w.open, kind: w.kind })),
       fakes: this.fakes.map(f => ({ x0: f.x0, x1: f.x1, y0: f.y0, y1: f.y1, found: f.found, alpha: +(f.rts[0]?.alpha ?? 1).toFixed(2) })),

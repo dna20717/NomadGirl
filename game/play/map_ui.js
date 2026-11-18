@@ -53,7 +53,7 @@ export class MapUI {
   // the places worth choosing: where she is, the neighbours, every other known place (to look at)
   choices() {
     const m = this.map, here = this.save.location, hop = hops(m, here), reveal = mapConfig(this.D).reveal;
-    return m.nodes.filter(n => n.id === here || m.visited.includes(n.id) || (hop[n.id] ?? 99) <= reveal).map(n => n.id);
+    return m.nodes.filter(n => n.id === here || m.visited.includes(n.id) || (m.revealed || []).includes(n.id) || (hop[n.id] ?? 99) <= reveal).map(n => n.id);   // #057: a revealed place has its name
   }
   select(id) { if (id && id !== this.sel) { this.sel = id; this.detail(); this.paint(); } }
   move(dx, dy) {

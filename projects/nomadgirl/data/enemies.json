@@ -327,5 +327,30 @@
   "attack": {"windup": 520, "cooldown": 1100, "range": 130},
   "sense": {"cone": 120, "react": 500, "hearing": 80, "shouts": "Da!|Eindringling!|Hier drüben!|Alarm!|Schnappt sie!"},
   "description": "Hat sich an der Tankstelle eingerichtet und verteidigt sein Revier mit der Machete. Zögert lieber, als dass er stirbt."
+ },
+ "major_null": {
+  "name": "Major Null",
+  "family": "anomaly",
+  "behavior": "boss",
+  "health": 950,
+  "damage": 28,
+  "speed": 190,
+  "aggroRange": 1000,
+  "deltas": [150, 220],
+  "countsForRanking": true,
+  "loot": "boss_beute",
+  "description": "Kommandantin der Zero Hour und letzte Wache des Silos. Sie hat den Countdown angehalten, damit sie ihn selbst zu Ende zählen kann.",
+  "kit": "raider",
+  "weapon": "rohrhammer",
+  "kitHead": "helmet",
+  "kitSkin": "wie gemalt",
+  "kitGang": "Giftgrün",
+  "height": 240,
+  "boss": {
+   "phases": [{"at": 60, "say": "T MINUS SECHZIG!", "speed": 20, "windup": 25, "adds": 2, "wave": true},{"at": 30, "say": "ZÜNDUNG!", "speed": 25, "windup": 18, "adds": 3, "wave": true}],
+   "waveSpeed": 660,
+   "waveDamage": 65
+  },
+  "sense": {"shouts": "Countdown läuft!|Niemand startet ohne mich!"}
  }
 }

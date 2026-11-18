@@ -24,7 +24,7 @@ export function mapView(D, map, W, H) {
 export function drawMap(ctx, W, H, D, map, opt = {}) {
   const C = mapConfig(D), V = mapView(D, map, W, H), u = Math.min(W / 1200, H / 680), t = opt.t || 0;
   const here = opt.here, near = new Set(neighbours(map, here)), hop = hops(map, here), reveal = opt.reveal ?? C.reveal;
-  const known = n => n.id === here || map.visited?.includes(n.id) || (hop[n.id] ?? 99) <= reveal;
+  const known = n => n.id === here || map.visited?.includes(n.id) || map.revealed?.includes(n.id) || (hop[n.id] ?? 99) <= reveal;   // #057 revealed places too
   const brand = id => C.brands.find(b => b.id === id);
   ctx.save();
   // paper (pixel art, scaled sharp) or a plain sheet

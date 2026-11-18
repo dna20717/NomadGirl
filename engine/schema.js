@@ -84,7 +84,7 @@ export const BENCH_FX = [['light', 'Licht'], ['screen', 'Bildschirm'], ['steam',
 export const BENCH_FX_WHEN = [['always', 'Immer'], ['night', 'Abends'], ['near', 'In der Nähe'], ['use', 'Bei Benutzung']];
 export const RIG_SLOTS = [['engine', 'Motor'], ['armor', 'Panzerung'], ['weapon', 'Waffe'], ['roof', 'Dach'], ['solar', 'Solar (Container-Dach)']];
 export const POI_KINDS = [['gasStation', 'Tankstelle'], ['settlement', 'Siedlung'], ['factory', 'Fabrik'], ['bunker', 'Bunker'], ['government', 'Regierungskomplex'], ['mall', 'Einkaufszentrum'], ['ruin', 'Ruine'], ['highrise', 'Hochhaus'], ['underground', 'Untergrund']];
-export const POI_SIZES = [['S', 'S'], ['M', 'M'], ['L', 'L'], ['XL', 'XL']];
+export const POI_SIZES = [['S', 'S'], ['M', 'M'], ['L', 'L'], ['XL', 'XL'], ['XXL', 'XXL']];
 export const ROOM_TAGS = [['start', 'Eingang'], ['exit', 'Ausgang'], ['combat', 'Kampf'], ['loot', 'Beute'], ['secret', 'Geheimnis'], ['npc', 'NPCs'], ['boss', 'Boss'], ['corridor', 'Gang']];
 export const ASSET_KINDS = [['animation', 'Animation'], ['tiles', 'Kacheln'], ['image', 'Bild'], ['video', 'Clip (Video)'], ['sound', 'Ton'], ['icons', 'Symbole'], ['reference', 'Referenz'], ['source', 'Original']];
 // tutorial (#011): chapters of the field guide and what makes a lesson show up the first time
@@ -1292,6 +1292,7 @@ export const AREAS = {
       { title: 'POI', fields: [NAME, LOOK, select('kind', 'Art', POI_KINDS), select('size', 'Größe', POI_SIZES), num('danger', 'Gefahr', { min: 1, max: 5 }), DESCRIPTION] },
       { title: 'Aufbau', fields: [range('roomCount', 'Räume', { hint: 'Wie viele Räume zusammengesetzt werden' }), refs('rooms', 'Raum-Bausteine', 'rooms'), refs('enemies', 'Gegner', 'enemies', { hint: 'Für das Zeichen 1 im Layout: ein zufälliger dieser Gegner' }), ref('loot', 'Kisten-Beute', 'lootTables', { hint: 'Für Kisten (C) in den Räumen' }), ref('vault', 'Tresor-Beute', 'lootTables', { hint: 'Liegt im Tresor am Ziel (Z), dazu je 10 % Rang-Bonus ein Extra-Wurf. Leer = Tabelle „tresor“' })] },
       { title: 'Gang', fields: [text('gang.name', 'Name', { hint: '#016: Wem dieser Ort gehört. Steht beim Betreten als Toast („Revier der …“)' }), text('gang.color', 'Gang-Farbe', { hint: 'Name einer Gang-Farbe aus dem Gegner-Bausatz (Magenta, Cyan, Orange, Gelb, Blutrot). Alle Plünderer aus dem Bausatz tragen hier diese Farbe (nicht Mutanten, nicht der Boss)' }), area_('gang.motto', 'Spruch')] },
+      { title: 'KI-Terminal', fields: [text('terminalAi', 'Terminal-KI', { hint: '#057: Name einer Entity aus Entities › Unikate; sie wohnt im KI-Terminal (@ im Raum-Baustein). Glitch-Duell optional, gewonnen = sie zieht ins Cyberdeck (einmal je Spielstand)' })] },
       { title: 'Level', fields: [text('curve', 'Spannungskurve', { hint: 'Intensität in % vom Eingang bis zum Ausgang, mit Komma, z. B. „30, 70, 20, 85, 100“: so wahrscheinlich wird ein Zufallsgegner (1) in einem Raum auf dem Hauptweg gesetzt; unter 50 % nur die schwächere Hälfte der Gegner, ab 85 % die zähere. Seitenräume halb so laut. Leer = jede 1 ist ein Gegner' }), num('branchChance', 'Abzweige', { unit: '%', min: 0, max: 100, hint: 'Chance je Abzweig-Haken (A in der Decke eines Hauptraums), dass ein Seitenraum (Merkmal Beute/Geheimnis, A im Boden) darüber hängt. Leer = 60' }),
         select('stack', 'Aufbau', [['', 'Nebeneinander (Hauptweg von links nach rechts)'], ['tower', 'Turm: vom Eingang nach oben'], ['deep', 'Tiefe: vom Eingang nach unten']], { hint: '#038: Turm/Tiefe stapelt die Haupträume übereinander: A im Boden des oberen Raums sitzt über A in der Decke des unteren, eine Leiter verbindet sie. Seitenräume (Beute/Geheimnis) stehen neben einem Hauptraum auf derselben Etage. Die Abkürzung ist ein Schacht neben dem Stapel mit einer Tür unten, die nur von der anderen Seite aufgeht' }),
         bool('shortcut', 'Abkürzung zum Van', { hint: 'Nebeneinander: Tunnel unter allen Räumen, v im Boden des Ausgangs → ^ im Boden des Eingangs. Turm/Tiefe: Schacht mit Leiter neben dem Stapel. Aus = keine Abkürzung. Leer = an' }),
@@ -1414,7 +1415,8 @@ export const AREAS = {
     hint: 'Punkte auf der Oberweltkarte rund um BigCityDelta. Jeder Ort zeigt auf einen POI.',
     template: { name: 'Neuer Ort', poi: '', position: [0, 0], region: '' },
     row: (x, p) => `${p?.data.pois?.[x.poi]?.name || x.poi || '–'} · ${x.region || ''}`,
-    sections: [{ title: 'Ort', fields: [NAME, LOOK, ref('poi', 'POI', 'pois', { required: true }), point('position', 'Position', { unit: 'km' }), text('region', 'Region'), DESCRIPTION] }],
+    sections: [{ title: 'Ort', fields: [NAME, LOOK, ref('poi', 'POI', 'pois', { required: true }), point('position', 'Position', { unit: 'km' }), text('region', 'Region'), DESCRIPTION,
+      bool('hidden', 'Versteckt', { hint: '#057: nicht auf der Reisekarte, bis ein Ereignis ihn verrät (Ereignis-Baukasten › Antworten › Ort aufdecken); dann mit Straßen zum nächsten Ort und dorthin, wo Leyla gerade ist. Nie der erste Ort (Start)' })] }],
   },
   encounters: {
     name: 'Encounter', singular: 'Encounter', icon: 'flash', file: 'data/encounters.json', kind: 'catalog',
@@ -1440,6 +1442,7 @@ export const AREAS = {
       { title: 'Lagen', fields: [table('situations', 'Lagen', [text('id', 'ID'), text('name', 'Titel', { hint: 'Varianten mit |' }), select('roadside', 'Am Straßenrand', ROADSIDE),
         text('figures', 'Figuren', { hint: 'Gegner-IDs mit Komma; stehen in Rig-Größe am Rand' }), select('time', 'Tageszeit', DAYTIME), num('weight', 'Gewicht', { min: 0 }), num('danger', 'Ab Gefahr', { min: 1, max: 5 }),
         text('text', 'Text', { hint: 'Varianten mit |' }), text('answers', 'Antworten', { hint: 'IDs mit Komma, in dieser Reihenfolge (die erste ist hervorgehoben); „antwort>lage“ = danach kommt auf der nächsten Etappe diese Lage (Kette)' }), text('moods', 'Stimmungen', { hint: 'IDs mit Komma; leer = ohne Stimmung (niemand da)' }),
+        text('gangName', 'Feste Gang', { hint: '#057: Name einer bestimmten Gang (POI › Gang), statt „Gang“ unten' }),
         select('gang', 'Gang', GANG_FROM, { hint: '#055: wessen Leute das sind; ihr Ruf wählt die Stimmung (Freund: nur freundliche, Feind: nur feindselige) und ändert sich mit den Antworten' }),
         range('rep', 'Ruf von–bis', { hint: 'nur, wenn Leylas Ruf bei der Gang in diesem Bereich liegt (−100 … 100); leer = immer' }),
         text('needs', 'Braucht Merker', { hint: 'mit Komma; alle müssen gesetzt sein (z. B. „hank_geholfen“)' }), text('not', 'Nicht bei Merker', { hint: 'mit Komma' }),
@@ -1454,7 +1457,7 @@ export const AREAS = {
         text('loot', 'Beute-Wurf', { hint: 'ID einer Beutetabelle oder „situation“ = die der Lage' }), num('risk', 'Risiko', { unit: '%', min: 0, max: 95 }), num('failHealth', 'Fehlschlag: Schaden', { unit: 'Leben', min: 0 }),
         num('failHours', 'Fehlschlag: Zeit', { unit: 'h', min: 0 }), text('result', 'Danach', { hint: 'Varianten mit |' }), text('failResult', 'Fehlschlag', { hint: 'Varianten mit |' }),
         num('rep', 'Ruf', { hint: '#055: −100 … 100, Änderung des Rufs bei der Gang der Lage (auch wenn es schiefgeht)' }), num('repRival', 'Ruf Rivalen', { hint: 'Änderung bei der rivalisierenden Gang ({rival}), z. B. in einer Fehde' }), text('flag', 'Merker', { hint: 'setzen; „-name“ löscht; mehrere mit Komma (nur wenn es klappt)' }),
-        ref('buff', 'Buff', 'buffs', { hint: 'wirkt im nächsten Run (nur wenn es klappt)' })])] },
+        ref('buff', 'Buff', 'buffs', { hint: 'wirkt im nächsten Run (nur wenn es klappt)' }), ref('reveal', 'Ort aufdecken', 'locations', { hint: '#057: ein versteckter Ort (Orte › Versteckt) kommt auf die Reisekarte (auch wenn es schiefgeht: gesehen ist gesehen)' })])] },
       { title: 'Ruf', fields: [num('rep.enemy', 'Feind bis', { min: -100, max: 0 }), num('rep.disliked', 'Unbeliebt bis', { min: -100, max: 0 }), num('rep.tolerated', 'Geduldet ab', { min: 0, max: 100 }), num('rep.friend', 'Freund ab', { min: 0, max: 100 }),
         num('rep.price', 'Preise', { unit: '% bei ±100', min: 0, max: 90, hint: 'Freunde zahlen weniger, Feinde mehr' }), num('rep.kill', 'Je Kill im Revier', { min: 0, hint: 'so viel Ruf kostet ein Kill in einem POI der Gang' })] },
       { title: 'Wörter', fields: [text('words.group', 'Banden {group}', { hint: 'mit |' }), text('words.cargo', 'Ladung {cargo}', { hint: 'mit |, „ein Laster mit …“' }),
@@ -1525,7 +1528,8 @@ export const AREAS = {
       { title: 'Charaktere', wide: true, fields: [table('characters', 'Charaktere', [text('id', 'ID'), text('name', 'Name'), text('description', 'Wesen'), ...MOMENTS.map(([k, n]) => text(k, n))],
           { hint: 'Daniel, 18.11.2026: jede KI hat einen Charakter mit Sprüchen für die Momente im Duell (mehrere mit | trennen). Erzeugte Entities bekommen einen nach ihrem Namen, Unikate ihren eigenen (Spalte Charakter), kammerjaeger und ava sind fest vergeben' }),
         num('banter.chance', 'Banter-Chance', { unit: '%', min: 0, max: 100, hint: 'Wie oft nach einem Zug jemand etwas sagt (Knapp, Start und Ende immer)' })] },
-      { title: 'Unikate', wide: true, fields: [table('unique', 'Unikate', [text('name', 'Name'), text('talent', 'Begabung'), text('character', 'Charakter'), ref('brand', 'Hersteller', 'brands'), num('bits', 'Bits', { min: 1, max: 5 }), text('quirk', 'Macke'), text('wish', 'Wunsch'), text('home', 'Wohnort'), bool('always', 'Immer'), text('description', 'Beschreibung')],
+      { title: 'Unikate', wide: true, fields: [table('unique', 'Unikate', [text('name', 'Name'), text('talent', 'Begabung'), text('character', 'Charakter'), ref('brand', 'Hersteller', 'brands'), num('bits', 'Bits', { min: 1, max: 5 }), text('quirk', 'Macke'), text('wish', 'Wunsch'), text('home', 'Wohnort'), bool('always', 'Immer'), text('description', 'Beschreibung'),
+        num('duelHp', 'Integrität im Duell', { min: 10, hint: '#057: mehr als die übliche Integrität (Duell › Integrität), z. B. die Silo-KI' }), num('duelNoise', 'Patzer im Duell', { unit: '%', min: 0, max: 50, hint: 'wie oft sie danebenliegt; leer = nach Bits, 2 = fast fehlerfrei' })],
         { hint: 'Handgemachte Entities (z. B. Amber Slay). „Immer“ = in jedem Durchgang dabei' })] },
     ],
     check: (x, report) => {

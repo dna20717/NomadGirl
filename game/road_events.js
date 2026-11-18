@@ -36,11 +36,12 @@ export function eventsConfig(D) {
 export function situationsFor(D, { night = false, danger = 1, save = null, here = null } = {}) {
   const flags = new Set(save?.road?.flags || []), seen = new Set(save?.road?.seen || []);
   return eventsConfig(D).situations.filter(s => (s.weight ?? 1) > 0 && !s.only && (!s.time || s.time === 'any' || (s.time === 'night') === night) && (s.danger ?? 1) <= danger
-    && list(s.needs).every(f => flags.has(f)) && !list(s.not).some(f => flags.has(f)) && !(s.once && seen.has(s.id)) && (!s.gang || gangFor(D, s, save, here, () => 0.5) !== undefined));
+    && list(s.needs).every(f => flags.has(f)) && !list(s.not).some(f => flags.has(f)) && !(s.once && seen.has(s.id)) && (!(s.gang || s.gangName) || gangFor(D, s, save, here, () => 0.5) !== undefined));
 }
 const inRange = (s, n) => { const [a, b] = Array.isArray(s.rep) ? s.rep : [-100, 100]; return n >= (a ?? -100) && n <= (b ?? 100); };
 // the gang of a situation: the destination's („here“) or one whose Ruf fits („any“, or „here“ without a gang); undefined = none fits
 function gangFor(D, S, save, here, rnd) {
+  if (S.gangName) return inRange(S, repOf(save, S.gangName)) ? S.gangName : undefined;   // #057 a fixed gang
   if (!S.gang) return null;
   if (S.gang === 'here' && here) return inRange(S, repOf(save, here)) ? here : undefined;
   const ok = gangs(D).filter(g => inRange(S, repOf(save, g.name)));
@@ -62,7 +63,7 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
     S = all.find(s => (k -= s.weight ?? 1) < 0) || all[all.length - 1];
   }
   // the gang and its rival (a running story keeps its gangs); the Ruf with the gang picks the mood
-  const gang = chain?.gang ?? gangFor(D, S, save, ctx.here || null, rnd) ?? (S.gang ? pick(rnd, gangs(D).map(g => g.name).concat('Plünderer')) : null);
+  const gang = chain?.gang ?? gangFor(D, S, save, ctx.here || null, rnd) ?? (S.gangName || (S.gang ? pick(rnd, gangs(D).map(g => g.name).concat('Plünderer')) : null));
   const others = gangs(D).map(g => g.name).filter(g => g !== gang), rival = chain?.rival || (others.length ? pick(rnd, others) : 'Plünderer');
   const lvl = gang ? levelOf(D, repOf(save, gang)) : 'neutral';
   const moodIds = list(S.moods); let moods = moodIds.length ? C.moods.filter(m => moodIds.includes(m.id)) : [];
@@ -99,6 +100,7 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
     if (a.repRival && rival) { o.repRival = a.repRival; o.rival = rival; }
     if (a.flag) o.flag = a.flag;
     if (a.buff) o.buff = a.buff;
+    if (a.reveal) o.reveal = a.reveal;
     if (S.once) o.once = S.id;
     if (inChain) { o.chain = { next: a.next || null, gang, rival, n: (chain?.n || 1) + (a.next ? 1 : 0) }; }
     const extra = { price: String(Math.abs(o.deltas || 0)) };

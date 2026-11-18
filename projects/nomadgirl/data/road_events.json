@@ -444,6 +444,48 @@
    "once": true,
    "text": "Sie hat dein Rig wiedererkannt. Diesmal hat sie Freunde mit Waffen dabei.",
    "answers": "zahlen, durchbrechen, umweg"
+  },
+  {
+   "figures": "",
+   "time": "night",
+   "weight": 3,
+   "danger": 2,
+   "moods": "",
+   "id": "silo_frequenz",
+   "name": "Eine Stimme zählt rückwärts|Kalte Frequenz",
+   "roadside": "tower",
+   "once": true,
+   "not": "silo_gefunden",
+   "text": "Auf einer alten Militärfrequenz zählt eine Stimme rückwärts: neun, acht, sieben … dann Stille. AvA ortet das Signal irgendwo in den Bergen der South Badlands.|Das Radio springt von selbst an. Zahlen, rückwärts, auf Russisch, Englisch, Deutsch. AvA flüstert: „Das ist kein Sender. Das ist ein Countdown.“",
+   "answers": "silo_peilen>silo_konvoi, weiterfahren"
+  },
+  {
+   "figures": "schlaeger, schuetze",
+   "time": "any",
+   "weight": 2,
+   "danger": 1,
+   "moods": "misstrauisch, gelangweilt, nervoes",
+   "id": "silo_konvoi",
+   "name": "Konvoi der {gang}|Raketen auf den Türen",
+   "roadside": "truck",
+   "only": true,
+   "gangName": "Zero Hour",
+   "text": "Ein Konvoi der {gang} mit einem Raketen-Emblem auf den Türen biegt von der Straße ab, hinein in die Berge. Einer bleibt am Abzweig zurück und raucht.",
+   "answers": "silo_folgen>silo_entdeckt, silo_ausfragen>silo_entdeckt, weiterfahren"
+  },
+  {
+   "figures": "",
+   "time": "any",
+   "weight": 2,
+   "danger": 1,
+   "moods": "",
+   "id": "silo_entdeckt",
+   "name": "Silo Zero|Was auf keiner Karte steht",
+   "roadside": "rocks",
+   "only": true,
+   "look": "rocket_silo",
+   "text": "Zwischen zwei Felsnadeln: Stacheldraht, eine Betonluke, eine Radarschüssel unter Tarnnetzen. Darunter, sagt AvA, ist es hohl. Neunzig Meter hohl.",
+   "answers": "silo_markieren, silo_umsehen"
   }
  ],
  "moods": [
@@ -889,6 +931,53 @@
    "loot": "kiste_tankstelle",
    "deltas": 50,
    "result": "Darin: Δ, ein Foto von euch beiden am Schrein und etwas Brauchbares."
+  },
+  {
+   "id": "silo_peilen",
+   "label": "AvA peilt das Signal an",
+   "when": "any",
+   "hours": 0.5,
+   "result": "AvA zeichnet eine Linie in die Berge. „Da ist etwas. Und jemand bewacht es.“"
+  },
+  {
+   "id": "silo_folgen",
+   "label": "Mit Abstand folgen",
+   "when": "any",
+   "hours": 1.5,
+   "fuel": 3,
+   "risk": 30,
+   "failHealth": 15,
+   "result": "Staubfahnen, Serpentinen, dann eine Schranke im Fels.",
+   "failResult": "Sie haben dich bemerkt. Ein paar Kugeln, aber du findest den Weg trotzdem."
+  },
+  {
+   "id": "silo_ausfragen",
+   "label": "Den Raucher ausfragen ({price} Δ)",
+   "when": "any",
+   "deltas": -40,
+   "rep": 5,
+   "result": "„Silo Zero“, sagt er und steckt das Geld ein. „Aber du warst nie hier.“"
+  },
+  {
+   "id": "silo_markieren",
+   "label": "Auf der Karte markieren",
+   "when": "any",
+   "reveal": "silo_zero",
+   "flag": "silo_gefunden",
+   "result": "Ein roter Kringel in den Bergen. Silo Zero."
+  },
+  {
+   "id": "silo_umsehen",
+   "label": "Sich vorsichtig umsehen",
+   "when": "any",
+   "hours": 1,
+   "reveal": "silo_zero",
+   "flag": "silo_gefunden",
+   "loot": "pluenderer_beute",
+   "risk": 25,
+   "failHealth": 15,
+   "result": "Ein Wachposten schläft. Seine Tasche nicht mehr. Silo Zero steht jetzt auf deiner Karte.",
+   "failResult": "Der Wachposten schläft nicht. Aber du hast gesehen, was du sehen wolltest."
   }
  ],
  "words": {

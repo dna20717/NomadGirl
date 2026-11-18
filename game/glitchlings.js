@@ -31,8 +31,10 @@ export function effectOf(C, talent, bits, own = true) {
 const make = (C, o) => {
   const t = C.talents.find(x => x.name === o.talent) || C.talents[0] || {}, e = effectOf(C, t, o.bits);
   return { id: slug(o.name), name: o.name, unique: !!o.unique, talent: t.name || '', function: t.function || null, also: t.also || null, brand: o.brand || t.brand || null, character: o.character || null, bits: o.bits,
-    effect: e.text, stat: e.stat, value: e.value, quirk: o.quirk || '', quirkKind: o.quirkKind || null, wish: o.wish || '', home: o.home || '', description: o.description || '' };
+    effect: e.text, stat: e.stat, value: e.value, quirk: o.quirk || '', quirkKind: o.quirkKind || null, wish: o.wish || '', home: o.home || '', description: o.description || '', ...(o.duelHp ? { duelHp: o.duelHp } : {}), ...(o.duelNoise != null ? { duelNoise: o.duelNoise / 100 } : {}) };
 };
+// #057: one of the hand-made unique Entities as a full Entity (the Silo-KI lives in its terminal, not in the Durchgang's set)
+export function uniqueEntity(D, name) { const C = config(D), u = C.unique.find(x => x.name === name); return u ? make(C, { ...u, unique: true }) : null; }
 
 // the Entities of one Durchgang: the unique ones marked „immer“ first, the rest rolled; no name and no name word twice
 // the maker of an Entity (older ones, e.g. a gift from before #049, by their talent)

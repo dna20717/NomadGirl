@@ -62,6 +62,7 @@ export function generateMap(D, seed, cycle = 1) {
   const brandFor = (kind, rr = r) => { const own = C.brands.filter(b => !b.kind || b.kind === kind); return own.length ? pickW(rr, own) : null; };
   // landmarks: the places from the area Orte at their own position (the first one is where every Durchgang starts)
   for (const [id, L] of Object.entries(D.locations || {})) {
+    if (L.hidden && nodes.length) continue;   // #057: a hidden place comes onto the map only when an event gives it away (revealPlace)
     const P = D.pois?.[L.poi];
     nodes.push({ id, name: L.name || id, poi: L.poi || null, pos: [...(L.position || [0, 0])], region: L.region || regionAt(L.position || [0, 0]), danger: P?.danger || 1,
       hints: lootHints(D, L.poi), brand: brandFor(P?.kind)?.id || null, landmark: true });
@@ -168,3 +169,21 @@ export function route(D, map, from, to, ok = () => true) {
   while (out[0] !== from) out.unshift(prev[out[0]]);
   return out;
 }
+
+// #057: a hidden place (Orte › Versteckt) comes onto this Durchgang's map: at its own position, with roads to the two nearest places;
+// remembered in map.revealed → the node, or null (no such place / no map); a place already on the map stays as it is
+export function revealPlace(D, save, id) {
+  const map = save?.map, L = D.locations?.[id];
+  if (!map || !L) return null;
+  let node = map.nodes.find(n => n.id === id);
+  if (!node) {
+    const P = D.pois?.[L.poi];
+    node = { id, name: L.name || id, poi: L.poi || null, pos: [...(L.position || [0, 0])], region: L.region || '', danger: P?.danger || 1, hints: lootHints(D, L.poi), brand: null, landmark: true, secret: true };
+    const near = [...map.nodes].sort((a, b) => dist(a.pos, node.pos) - dist(b.pos, node.pos))[0], here = map.nodes.find(n => n.id === save.location);
+    map.nodes.push(node);
+    for (const n of new Set([near, here].filter(Boolean))) map.edges.push([n.id, id]);
+  }
+  if (!(map.revealed ??= []).includes(id)) map.revealed.push(id);
+  return node;
+}
+

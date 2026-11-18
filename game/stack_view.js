@@ -23,8 +23,8 @@ export class StackView {
   tempo() { return this.host.tempo?.() ?? 1; }
   auto() { return !!this.host.auto?.(); }
   start(me, foe, opts = {}) {
-    this.duel = newStack(me, foe, Math.random, 'player', opts);
-    this.duel.noise = { player: noiseOf(me), enemy: foe.hunter ? 0.05 : noiseOf(foe) };
+    this.duel = newStack(me, foe, Math.random, 'player', { ...opts, foeHp: opts.foeHp ?? foe.duelHp ?? null });   // #057 a tougher Entity has its own Integrität
+    this.duel.noise = { player: noiseOf(me), enemy: foe.hunter ? 0.05 : foe.duelNoise ?? noiseOf(foe) };
     this.last = null; this.busy = false; this.faces = {}; this.spun = -1; this.cursor = 1; this.token++;
     this.speak('enemy', line(this.D, foe, 'start'), 3200);   // banter (banter.js): the opponent greets
     this.step();

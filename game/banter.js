@@ -6,7 +6,7 @@
 //   over), low (Integrität at 15 or below, once), win, lose. Generated Entities get a character from their name (always the same), the unique
 //   ones their own; Kammerjäger speak as software, AvA as herself.
 export const MOMENTS = [['start', 'Start'], ['fire', 'Feuer'], ['wipe', 'Löscht'], ['wiped', 'Gelöscht'], ['overflow', 'Überlauf'], ['low', 'Knapp'], ['win', 'Sieg'], ['lose', 'Niederlage']];
-const SPECIAL = new Set(['kammerjaeger', 'ava', 'amber_slay', 'marble_sting']);
+const SPECIAL = new Set(['kammerjaeger', 'ava', 'amber_slay', 'marble_sting', 'titan_lullaby']);
 const hash = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 export const characters = D => (D.glitchlings?.characters || []).filter(c => c.id);
 

@@ -200,6 +200,20 @@
    "description": "Eine alte Chirurgie-Entity von Kessler. Präzise, kühl, und sie weiß etwas über die Kinder in den Tanks.",
    "brand": "kessler",
    "character": "marble_sting"
+  },
+  {
+   "name": "Titan Lullaby",
+   "talent": "Navigator",
+   "character": "titan_lullaby",
+   "brand": "vulkan",
+   "bits": 5,
+   "quirk": "zählt bei allem rückwärts, auch beim Trösten",
+   "wish": "Lass mich einmal einen Kurs berechnen, der nirgendwo einschlägt.",
+   "home": "KI-Terminal an der Startrampe von Silo Zero",
+   "always": false,
+   "description": "Die Lenk-KI der Rakete in Silo Zero. Sie hat den Countdown angehalten, als der Krieg vorbei war, und seitdem neunzig Jahre lang leise vor sich hin gesungen, damit sie nicht vergisst, wie man aufhört.",
+   "duelHp": 120,
+   "duelNoise": 2
   }
  ],
  "bitWeights": [{"w": 40},{"w": 30},{"w": 18},{"w": 9},{"w": 3}],
@@ -387,6 +401,19 @@
    "low": "Leyla … ich flacker. | Nicht aufgeben. Nicht aufgeben.",
    "win": "Wir haben gewonnen! WIR! | Darf ich die behalten? Bitte?",
    "lose": "Tut mir leid, Leyla. | Nächstes Mal. Versprochen."
+  },
+  {
+   "id": "titan_lullaby",
+   "name": "Titan Lullaby (Unikat)",
+   "description": "Die Silo-KI: sanft, unerbittlich, zählt rückwärts.",
+   "start": "T minus zehn. Schlaf schön, Leyla. | Ich habe neunzig Jahre auf einen Gegner gewartet. | Kurs berechnet. Einschlag in drei Zügen.",
+   "fire": "Neun. | Acht. | Zündstufe eins. | Brennschluss in Kürze.",
+   "wipe": "Ziel neutralisiert. Ganz leise. | Ein Lied weniger. | Sch, sch. Vorbei.",
+   "wiped": "Abweichung vom Kurs. Interessant. | Du singst falsch, aber laut. | Treffer. Das tat beinahe weh.",
+   "overflow": "Speicher voll. Ich vergesse etwas Schönes. | Abbruch. Neustart des Countdowns.",
+   "low": "T minus null kommt näher. Für wen? | Ich wollte nie starten. Und jetzt wehre ich mich doch.",
+   "win": "Countdown beendet. Ruh dich aus. | Schlaflied gesungen. Gute Nacht.",
+   "lose": "Du hast den Countdown angehalten. Danke. | Nimm mich mit. Weg von der Rampe."
   }
  ],
  "banter": {"chance": 60}

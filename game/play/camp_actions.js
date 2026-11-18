@@ -229,6 +229,7 @@ export class CampActions {
         s.hud.toast(E.name, [r.text, r.lines.join(' · ')].filter(Boolean).join(' · '), r.failed || o.health || o.deltas < 0 || o.fuel > 0 ? 'warn' : 'travel', 4200);
         for (const x of [r.rep, r.rep2]) if (x?.changed) s.hud.toast(`${x.gang}: ${levelName(x.level)}`, x.n > 0 ? 'Dein Ruf bei ihnen steigt' : 'Dein Ruf bei ihnen sinkt', x.n > 0 ? 'good' : 'warn', 4200);   // #055
         if (r.story) s.hud.toast('Die Geschichte geht weiter', 'Auf der nächsten Etappe', 'travel', 3600);
+        if (r.revealed) s.hud.toast(`Neuer Ort: ${r.revealed.name}`, 'Steht jetzt auf der Reisekarte', 'good', 6000);   // #057
         this.box.persist?.(); onward(); };
       const fallback = opts.find(o => !blocked(D, save, o)) || opts[opts.length - 1];
       const look = (E.look && D.assets?.[E.look]?.file) ? E.look : D.travel?.encounterLook, file = look && D.assets?.[look]?.file;   // #021 comic panel

@@ -16,6 +16,7 @@ export const TILE_LEGEND = [
   ['A', 'Abzweig (Hauptraum: Decke, Seitenraum: Boden)'], ['^', 'Abkürzung kommt hier hoch (Boden im Eingang)'], ['v', 'Abkürzung geht hier runter (Boden im Ausgang)'],
   ['*', 'Lampe (hängt an der Decke darüber, Art aus der Atmosphäre des Raums)'],
   ['%', 'Scheinwand (sieht aus wie Wand, Leyla läuft hindurch, zählt als Secret)'], ['$', 'Getarnte brüchige Wand (sieht aus wie Wand, Nahkampf bricht sie, zählt als Secret)'],
+  ['@', 'KI-Terminal (#057: Glitch-Duell gegen die Entity aus POI › Terminal-KI, optional)'],
 ];
 // tiles that block like a wall: doors and brittle walls until opened, unused branch/shortcut markers stay wall
 export const SOLID_TILES = new Set(['#', 'D', 'B', '$', 'A', '^', 'v']);
@@ -33,7 +34,7 @@ export function parseRoom(room = {}) {
   const [w0, h0] = room.size || [];
   const w = w0 || Math.max(0, ...rows.map(r => r.length)), h = h0 || rows.length;
   const problems = [], start = [], spawns = [], ladders = [], anchors = [], platforms = [], unknown = new Set();
-  const marks = { C: [], S: [], D: [], B: [], Z: [], 1: [], A: [], '^': [], v: [], '*': [], '%': [], $: [] };
+  const marks = { C: [], S: [], D: [], B: [], Z: [], 1: [], A: [], '^': [], v: [], '*': [], '%': [], $: [], '@': [] };
   const tiles = Array.from({ length: h }, (_, y) => Array.from({ length: w }, (_, x) => rows[y]?.[x] ?? '.'));
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
     const c = tiles[y][x];
