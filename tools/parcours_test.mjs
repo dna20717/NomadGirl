@@ -65,15 +65,15 @@ v = await page.evaluate(() => nomad.state().van); check('Van: Tür offen am Star
 v = await page.evaluate(() => { nomad.step(90, ['right']); return nomad.state().van; }); check('Van: Tür geht zu', v && !v.open && v.frame === 0, v);
 v = await page.evaluate(() => { nomad.step(90, ['left']); return nomad.state().van; }); check('Van: Tür geht wieder auf', v?.open && v.frame === 4, v);
 v = await page.evaluate(() => {
-  const n = nomad, s = n.state().van, T = 64; P.tp(5.2, 18); n.step(10);
+  const n = nomad, s = n.state().van, T = 64, lad = game.scene.getScene('play').ladders.find(l => l.van); n.tp(lad.cx, lad.bottom); n.step(10);   // #056: the ladder where the van's picture has it
   n.step(1, ['up'], ['up']); n.until(x => x.leyla.state !== 'climb', 200, ['up']); const pulled = n.state().leyla.state; n.until(x => x.leyla.state === 'normal', 90); n.step(25, ['right']);
   return { ...P.L(), roof: s.roof.y, front: n.state().van.front, pulled };
 });
-check('Van: Leiter hoch (oben seitlich hochziehen), Dach begehbar', v.pulled === 'mantle' && Math.abs(v.feet - v.roof) < 3 && v.front, v);
+check('Van: Leiter hoch (oben seitlich hochziehen), Dach begehbar', v.pulled === 'mantle' && Math.abs(v.feet - v.roof) < 3, v);   // #056: the roof rail is in the picture, no foreground any more
 await shot('van');
 // ladder: frames follow the way climbed (8 frames = 64 px), ↓ slides down fast without animation
 v = await page.evaluate(() => {
-  const n = nomad, l = game.scene.getScene('play').leyla; P.tp(5.2, 18); n.step(10);
+  const n = nomad, l = game.scene.getScene('play').leyla, lad = game.scene.getScene('play').ladders.find(x => x.van); n.tp(lad.cx, lad.bottom); n.step(10);
   n.step(1, ['up'], ['up']); n.step(12, ['up']); const y0 = l.feet, f0 = l.sprite.anims.currentFrame?.index; const frames = new Set();
   for (let i = 0; i < 20; i++) { n.step(1, ['up']); frames.add(l.sprite.frame.name); }
   const climbed = y0 - l.feet, fr = l.sprite.anims.currentFrame?.index, slideFrames = new Set(); let vy = 0;

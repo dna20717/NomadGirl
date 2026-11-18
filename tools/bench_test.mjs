@@ -46,13 +46,13 @@ check('Pixel-Magie: kein Bild ragt über seinen Platz im Container hinaus', insi
 const depths = await ev(() => { const s = game.scene.getScene('play'), B = s.camp.benches; return { leyla: s.leyla.sprite.depth, fx: B.add_.depth, flat: B.flat.depth }; });
 check('Leyla steht vor den Werkbänken und ihren Effekten', depths.leyla > depths.fx && depths.leyla > depths.flat, depths);
 // the van's door: the workshop behind it shows only while the door is open
-const door = async () => ev(() => { const c = game.scene.getScene('play').camp; return c.vanDoor && { id: c.vanDoor.bench.id, a: c.vanDoor.view.alpha }; });
+const door = async () => ev(() => { const c = game.scene.getScene('play').camp, all = (c.vanDoors || []).map(d => ({ id: d.bench.id, a: d.view.alpha })); return all.length ? { ids: all.map(d => d.id), a: Math.min(...all.map(d => d.a)), amax: Math.max(...all.map(d => d.a)) } : null; });   // #056: one bench per bay
 await ev(() => { const h = nomad.state().camp.hotspots.find(h => h.name === 'Van'); nomad.walkTo(h.x + 900); nomad.step(60); });
 let dr = await door();
-check('Van-Tür zu: dahinter nichts zu sehen', dr && dr.a === 0, dr);
+check('Van zu: in den Nischen nichts zu sehen', dr && dr.amax === 0, dr);
 await ev(() => { const h = nomad.state().camp.hotspots.find(h => h.name === 'Van'); nomad.walkTo(h.x + 150); nomad.step(60); });
 dr = await door();
-check('Van-Tür offen: der Warroom zeigt sich durch die Tür', dr?.id === 'warroom' && dr.a === 1, dr);
+check('Van im Querschnitt: beide Nischen zeigen ihre Werkstatt, der Warroom ist dabei', dr?.ids.includes('warroom') && dr.ids.length === 2 && dr.a === 1, dr);
 
 // the shelf shows how full the Camp-Lager is (#041): empty → no shelf filled, full → all four
 await ev(() => { const g = nomad.save().inv.grids.camp; g.keep = g.items; g.items = []; nomad.step(30); });
