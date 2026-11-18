@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #055 **Billboards, Ruf, Folgen, Ketten** fertig: Riesen-Bildschirme mit Werbung aller Marken, Ruf je Gang (Freund = Freie Fahrt, Feind = Kopfgeldjäger, Kills im Revier kosten Ruf), Merker/Buffs als Folgen, drei Geschichten über 3–4 Etappen. Tests 239/239, Browser 43/43, PixelLab 0.
 - 18.11. Code → Ava: #055 Billboards, Ruf, Ereignis-Ketten läuft (Daniels Auftrag im Code-Chat).
 
 - 18.11. Code → Ava: #054 **Ereignis-Baukasten** fertig: Zwischenfälle aus 16 Lagen × 8 Stimmungen × 27 Antworten, Gefahr skaliert, Risiko bei Antworten, 7 neue Dinge am Straßenrand. Tests 234/234, Browser 43/43, PixelLab 0.
@@ -172,13 +173,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ```
 
 ### #055 Riesen-Billboards, Ruf bei den Gangs, Ereignisse mit Folgen und Ketten
-- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** design.md › Die Karawane › Ruf; docs/features/worldmap.md (Fahrt, Ereignis-Baukasten); docs/features/lore.md (Marken)
 - **Auftrag (Daniel, 18.11.2026):** „Nimm in die Welt noch riesige digitale Billboards für unsere ganzen Brands auf. Lass dort Werbung laufen. Verzahne den Ruf bei den einzelnen Fraktionen mit den Ereignissen und nutze die existierenden Gangs dafür. Es wäre ärgerlich, wenn Leyla von Gang A angegriffen würde, obwohl ihr Ruf bei denen auf max ist. Auch sollen die Ereignisse Auswirkungen auf den Verlauf des weiteren Spiels haben und ggf. auch Events sein, die in drei bis vier Etappen passieren (wie ein Micro-Choose-your-own-Adventure).“
 - **Fertig, wenn:** Riesen-Bildschirme mit laufender Werbung der Marken in der Fahrt-Landschaft; Ruf je Gang (die 11 POI-Gangs) im Spielstand, Ereignisse mit Gang wählen Lage und Stimmung nach Ruf (Freund wird nicht überfallen), Antworten ändern Ruf; Folgen: Merker, spätere Ereignisse, Buffs; Ketten über 3–4 Etappen; Werkstatt, Tests, Build grün auf `main`.
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: Fraktionen sind erst die 11 POI-Gangs (Siedlungen/Marken später); Stufen Feind ≤ −60 … Freund ≥ 60; POIs bleiben feindlich (Design: friedlicher POI = Endgame der Diplomatie), aber Kills dort kosten Ruf; Ketten-Schritte kommen auf der nächsten Etappe, auch auf einer späteren Fahrt; Ruf startet je Durchgang neu (Design); Billboard-Sprüche englisch wie die Slogans.
+- **Ergebnis:** (Code) Commit „Riesen-Billboards mit Werbung, Ruf bei den Gangs …“ auf `main`. Neu: `game/reputation.js`; `road.js` Billboards + `ads()`; `road_events.js` Gang/Ruf/Merker/Ketten; `travel.js` Folgen in `choose`, Ketten in `pickEncounter`; Reisekarte Revier + Ruf; 14 neue Lagen, 23 neue Antworten. `npm test` 239/239 (neu `test/reputation.test.js`), Browser 43/43 (`drive_test` 17). PixelLab 0. **Bitte testen:** abends durch den Delta Ring fahren (Billboards), Werkstatt › Ereignis-Baukasten mit „Ruf: Freund/Feind“ würfeln, eine Fehde bis zum Ende spielen.
 
 ### #054 Ereignis-Baukasten für unterwegs
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
