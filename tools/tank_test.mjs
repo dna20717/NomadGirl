@@ -50,7 +50,7 @@ v = await ev(() => { const s = game.scene.getScene('play'), d = s.drone, b = TK(
 check('AvA beim Tank: verliebtes Gesicht', v.mood === 'love' && v.face === 14, v);
 
 // dead: dark picture, screen says so
-v = await ev(() => { const s = nomad.save(), b = TK(); s.tank.cond = 0; s.tank.dead = true; b.tank.refresh(true); nomad.step(80); return { key: b.picture.texture.key, st: b.tank.state() }; });
+v = await ev(() => { const s = nomad.save(), b = TK(); s.tank.cond = 0; s.tank.dead = true; b.tank.refresh(true); nomad.step(80); for (let i = 0; i < 240 && !/TOT/.test(b.tank.state().text); i++) nomad.step(1); return { key: b.picture.texture.key, st: b.tank.state() }; });   // the screen types its line in; a new line may just have begun
 check('Tot: Bild dunkel, Anzeige zeigt es', v.key === 'ws_cryotank_dead' && /TOT/.test(v.st.text), v);
 await shot('dead');
 

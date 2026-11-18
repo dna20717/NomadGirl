@@ -96,7 +96,7 @@ check('Optionen: Lektionen abschalten, dann kommt keine Karte mehr', v.m.some(x 
 await ev(() => TU().setOff(false));
 
 // #016: in the run a lesson is a tip in the corner, the game keeps running; „Mehr“ opens the card
-await ev(() => { TU().setSessionOff(false); TU().events.clear(); nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(4); nomad.choose('Plündern'); nomad.release(); });
+await ev(() => { TU().setSessionOff(false); TU().events.clear(); nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(4); if (TU().state().open) TU().close(); nomad.choose('Plündern'); nomad.release(); });   // #056: the map's first-time card may come up here now
 await page.waitForFunction(() => { const s = game.scene.getScene('play'); return s?.mode === 'run' && s.leyla; }, null, { timeout: 40000 });
 await page.waitForTimeout(800);
 v = await ev(() => { nomad.take(); const r = nomad.until(() => !!TU().state().tip, 4000, []); const st = TU().state(); const x = SC().leyla.x; nomad.step(30, ['right']);
