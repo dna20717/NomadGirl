@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 18.11.2026: **Werkbänke im Van benutzen**: E vor der Schlafkoje schläft, E vor der Kochnische kocht; Einsteigen (Karte) an der Fahrertür.
 - 18.11.2026: **Van streng von der Seite** (#056): neuer Van im alten Stil (PixelLab, 19 Generierungen), zu und im Querschnitt deckungsgleich, die Tür blendet über statt zu springen; im Querschnitt zwei Nischen mit Schlafkoje und Kochnische; Tileset für längere Aufbauten.
 - 18.11.2026: **Unscharf auf dem iPad aufgeklärt**: ein alter lokaler Werkstatt-Entwurf von `game.json` (640×360, Zoom 0,5) galt in diesem Browser; jetzt sichtbar (Hinweis neben der Version, Toast) und unter Menü › Optionen verwerfbar; Diagnose unter `/game?camp&diag`.
 - 18.11.2026: **Fahrt wieder scharf**: die Fahrt-Szene rechnet mit der echten Pixeldichte des Bildschirms statt mit 1,5 × Fensterbreite (war auf Retina/4K verwaschen).

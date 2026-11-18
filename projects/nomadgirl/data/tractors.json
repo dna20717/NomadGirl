@@ -14,7 +14,7 @@
   "places": 2,
   "storage": [10, 8],
   "storageName": "Kofferraum",
-  "door": {"x": [50, 157], "y": [71, 117], "place": 1, "backdrop": "", "bays": [{"x": [50, 101], "y": [71, 117], "place": 0},{"x": [114, 157], "y": [71, 117], "place": 1}]}
+  "door": {"x": [50, 157], "y": [71, 117], "place": 1, "backdrop": "", "bays": [{"x": [50, 101], "y": [71, 117], "place": 0},{"x": [114, 157], "y": [71, 117], "place": 1}], "enter": 175}
  },
  "lkw": {
   "name": "LKW",

@@ -453,8 +453,10 @@ export class Camp {
     this.startSound();
     // the van: E at its door shows the van's own workshops
     const vanWs = geo.tractor?.workshops || [];
-    this.hotspots.push({ x: geo.doorX, w: 110, floor: geo.doorFloor ?? undefined, name: geo.mega ? (geo.mega.b.kind === 'airship' ? 'Cockpit' : 'Kommandobrücke') : D.tractors?.[geo.tractor?.id]?.name || 'Van', hint: geo.mega ? 'Karte' : vanWs.length ? 'Einsteigen' : 'Fahrerhaus',
-      act: () => this.vanMenu(vanWs) });
+    // #056 the van in cross-section: getting in at the driver's door (Zugmaschine › Einsteigen bei), the benches in the bays have their own E spots
+    const Dr0 = D.tractors?.[geo.tractor?.id]?.door, inBays = !geo.mega && Dr0?.bays?.length && scene.van, enterX = inBays && Dr0.enter != null ? scene.van.toWorld(Dr0.enter, 0).x : geo.doorX;
+    this.hotspots.push({ x: enterX, w: inBays ? 60 : 110, floor: geo.doorFloor ?? undefined, name: geo.mega ? (geo.mega.b.kind === 'airship' ? 'Cockpit' : 'Kommandobrücke') : D.tractors?.[geo.tractor?.id]?.name || 'Van', hint: geo.mega ? 'Karte' : vanWs.length ? 'Einsteigen' : 'Fahrerhaus',
+      act: () => this.vanMenu(inBays ? [] : vanWs) });
     // the van's own storage (Kofferraum): E at the rear door
     const T0 = D.tractors?.[geo.tractor?.id] || {};
     if (T0.storage?.[0]) this.storeHotspot(CAMP, geo.vanLeft + (geo.vanRight - geo.vanLeft) * (C.rig?.trunkAt ?? 12) / 100, T0.storageName || 'Kofferraum', false);   // #041: opens the Camp-Lager
@@ -762,6 +764,13 @@ export class Camp {
       bench.door = true;
       view.setAlpha(0);
       this.vanDoors.push({ view, bench });
+      // E in front of the bay uses its workshop like one in a container (a Speziallager opens, the rest does its thing)
+      if (Dr.bays?.length) {
+        const store = def.grid && storeKeyOf(this.D, this.scene.box.save, 0, w.at), place = `0:${w.at}`;
+        this.hotspots.push({ rig: true, place, x: (clip.x0 + clip.x1) / 2, w: (clip.x1 - clip.x0) / 2, name: def.name || w.id,
+          hint: this.synHint(place, store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen'), ws: w.id,
+          act: () => store ? this.scene.openContainer(store) : this.use(w.id, place) });
+      }
     }
     this.vanDoor = this.vanDoors[0] || null;
   }

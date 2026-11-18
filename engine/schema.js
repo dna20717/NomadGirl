@@ -944,6 +944,7 @@ export const AREAS = {
       { title: 'Blick durch die Tür', fields: [range('door.x', 'Türöffnung von – bis', { unit: 'Bildpixel', hint: 'Waagrecht im Bild des Aussehens (letzter Frame = Tür offen). Durch die offene Tür sieht man die Werkstatt dahinter, am Rand abgeschnitten' }),
         range('door.y', 'Türöffnung oben – unten', { unit: 'Bildpixel', hint: 'Unten = Boden im Fahrzeug, darauf steht die Werkstatt' }), num('door.place', 'Platz hinter der Tür', { min: 0, max: 2, hint: '0 = erster Werkstatt-Platz im Fahrzeug, 1 = zweiter …' }),
         color('door.backdrop', 'Innenraum dahinter', { hint: 'Farbe hinter dem Bild, wo die Werkstatt durchsichtig ist; leer = keine (der Querschnitt hat seinen Innenraum selbst)' }),
+        num('door.enter', 'Einsteigen bei', { unit: 'Bildpixel x', hint: '#056: mit Nischen steigt Leyla hier ein (Fahrertür): E öffnet die Karte; die Werkbänke in den Nischen haben eigene E-Punkte' }),
         table('door.bays', 'Nischen im Querschnitt', [range('x', 'von – bis', { unit: 'Bildpixel' }), range('y', 'oben – unten (Boden)', { unit: 'Bildpixel' }), num('place', 'Platz', { min: 0, max: 2 })],
           { hint: '#056 (Daniel, 18.11.2026: Van streng von der Seite, zu und im Querschnitt): je Nische eine Werkstatt, sie blendet mit dem Bild auf. Statt der Türöffnung oben' })] },
       { title: 'Slots', fields: [num('slots.engine', 'Motor', { min: 0 }), num('slots.armor', 'Panzerung', { min: 0 }), num('slots.weapon', 'Waffen', { min: 0 }),
