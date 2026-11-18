@@ -1,4 +1,5 @@
 // HUD as HTML over the canvas: health, ammo, dash, time, kills, Δ, banners and the controls overlay.
+import { hapticsOn, setHaptics } from '../haptics.js';
 import { placeOf } from '../worldmap.js';
 import { bonuses } from '../techtree.js';
 import { phase } from '../tank.js';
@@ -129,6 +130,7 @@ export class Hud {
     const cells = sc.cellsLike();
     this.menu({ title: 'Optionen', items: [
       { label: sc.sound.mute ? 'Ton an' : 'Ton aus', sub: 'M', act: () => sc.toggleMute() },
+      { label: `Vibration: ${hapticsOn() ? 'an' : 'aus'}`, sub: 'Glitch-Duell: Controller-Rumble und Handy-Vibration (gilt auch für /duel und /mobile)', act: () => { setHaptics(!hapticsOn()); this.banner(`Vibration ${hapticsOn() ? 'an' : 'aus'}`, '', 1400); } },
       { label: `Schießstil: ${cells ? 'Cells-like' : 'Klassisch'}`, sub: cells ? 'Schießen im Rennen mit Zielhilfe · umschalten auf Klassisch' : 'Zum Schießen stehen oder gehen · umschalten auf Cells-like',
         act: () => { try { localStorage.setItem('nomadgirl-shoot-style', cells ? 'classic' : 'cells'); } catch { /* private mode */ }
           this.banner(`Schießstil: ${cells ? 'Klassisch' : 'Cells-like'}`, 'Gilt in diesem Browser'); sc.time.delayedCall(1400, () => this.banner(null)); } },

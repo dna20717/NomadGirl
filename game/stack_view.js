@@ -8,6 +8,7 @@ import { el } from './ui.js';
 import { icon } from './icons.js';
 import { faceCanvas } from './glitch_face.js';
 import { banter, line } from './banter.js';
+import { buzz, buzzPlace } from './haptics.js';
 import { COLS, ROWS, colFire, fireOf, newStack, place, choose, preview, colValue, total, open, noiseOf } from './stack_duel.js';
 
 const PIPS = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
@@ -31,7 +32,7 @@ export class StackView {
   stop() { this.token++; this.duel = null; this.say = null; }
   // a speech bubble at one AI's head for a while (banter.js)
   speak(side, text, ms = 2600) { if (text) this.say = { side, text, until: performance.now() + ms * Math.max(0.6, this.tempo()) }; }
-  endWords(d) { if (d.endSaid) return; d.endSaid = true; const loser = d.winner === 'player' ? 'enemy' : 'player'; this.speak(loser, line(this.D, d.sides[loser].ai, 'lose'), 4000); }
+  endWords(d) { if (d.endSaid) return; d.endSaid = true; buzz(d.winner === 'player' ? 'win' : 'lose'); const loser = d.winner === 'player' ? 'enemy' : 'player'; this.speak(loser, line(this.D, d.sides[loser].ai, 'lose'), 4000); }
   redraw() { this.host.redraw?.(); }
   // every turn: the reel spins (the bit was rolled by the rules already), then the side places
   async step() {
@@ -63,7 +64,7 @@ export class StackView {
     this.wipe = ev.destroyed ? { side: foe, col: c, die: ev.die, before, until: performance.now() + ms, ms } : null;
     const b = banter(this.D, d, ev); if (b) this.speak(b.side, b.text);
     this.last = ev; this.busy = true; this.picked = null; this.redraw();
-    this.host.onPlace?.(ev, d);   // haptics on the phone (stack_mobile.js)
+    buzzPlace(ev); this.host.onPlace?.(ev, d);   // haptics everywhere: demo, phone, the game's window (haptics.js)
     await sleep((ev.destroyed ? 900 : ev.fire ? 700 : 380) * this.tempo());
     this.wipe = null;
     if (tk !== this.token) return;
@@ -78,7 +79,7 @@ export class StackView {
     if (u.pressed('left') || u.pressed('right')) {
       const dir = u.pressed('left') ? -1 : 1;
       for (let k = 1; k <= COLS; k++) { const c = (this.cursor + dir * k + COLS * 3) % COLS; if (o.includes(c)) { this.cursor = c; break; } }
-      this.redraw(); return true;
+      buzz('pick', { user: true }); this.redraw(); return true;
     }
     if (u.pressed('ok')) return this.playerPlace(this.cursor);
     return false;
@@ -141,7 +142,7 @@ export class StackView {
     const c = el('div', { class: ['sb-pipe', side, canPick ? 'pick' : '', cur ? 'cursor' : '', hit ? 'hit' : '', justPut ? 'put' : '', fire ? 'firing' : '', wiped || striker ? 'wipe-link' : ''].filter(Boolean).join(' '), 'data-col': i,
       onmouseenter: () => { if (canPick) { this.cursor = i; c.closest('.sb-board')?.querySelectorAll('.sb-pipe.cursor').forEach(n => n.classList.remove('cursor')); c.classList.add('cursor'); } },
       // touch (host.confirmTap, the mobile page): the first tap picks the pipeline and shows what the bit would do, the second sends it
-      onclick: () => { if (this.host.confirmTap && canPick && this.picked !== i) { this.picked = this.cursor = i; this.host.onPick?.(i); return this.redraw(); } this.playerPlace(i); } },
+      onclick: () => { if (this.host.confirmTap && canPick && this.picked !== i) { this.picked = this.cursor = i; buzz('pick', { user: true }); this.host.onPick?.(i); return this.redraw(); } this.playerPlace(i); } },
       ...(mine ? [el('div', { class: 'sb-stack' }, ...slots), info] : [info, el('div', { class: 'sb-stack' }, ...slots)]),
       wiped ? el('div', { class: 'sb-wipe-label' }, 'gleiche Zahl ', chip(W.die, 'mini'), ' → gelöscht') : null,
       pv && pv.destroyed ? el('div', { class: 'sb-tip' }, `löscht ${pv.destroyed} × `, chip(d.die, 'mini'), dot ? ` · −${pv.hit}${pv.silenced ? `, sein Feuer −${pv.silenced}` : ''}` : ` · −${pv.lost}`) : null);

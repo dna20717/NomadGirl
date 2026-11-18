@@ -12,7 +12,7 @@ const errors = [], ok = [];
 const check = (name, cond, info) => { if (cond) ok.push(name); else errors.push(`${name}: ${JSON.stringify(info)}`); };
 for (const name of ['iPhone 13', 'iPhone SE', 'Pixel 5']) {
   const page = await browser.newPage({ ...devices[name] });
-  await page.addInitScript(() => { window.__buzz = []; navigator.vibrate = p => { window.__buzz.push(p); return true; }; try { localStorage.removeItem('bitstapel.buzz'); } catch {} });
+  await page.addInitScript(() => { window.__buzz = []; navigator.vibrate = p => { window.__buzz.push(p); return true; }; try { localStorage.removeItem('bitstapel.buzz'); localStorage.removeItem('nomad.haptics'); } catch {} });
   page.on('pageerror', e => errors.push(`${name}: ${e.message}`));
   await page.goto(base + '?seed=33&tempo=schnell');
   await page.waitForFunction(() => window.duelDemo?.view?.canAct(), null, { timeout: 20000 });
@@ -36,7 +36,11 @@ for (const name of ['iPhone 13', 'iPhone SE', 'Pixel 5']) {
   r = await page.evaluate(() => ({ n: duelDemo.view.duel.log.filter(e => e.type === 'place' && e.side === 'player').length, last: duelDemo.view.duel.log.filter(e => e.type === 'place').at(-1) }));
   check(`${name}: nach oben wischen schickt sofort`, r.n === before + 1 && r.last.col === col, { ...r, before, col });
   await page.click('.mb-buzz'); await page.waitForTimeout(50);
-  r = await page.evaluate(() => { const n = window.__buzz.length; duelDemo.S.buzzOn || duelDemo.view.host.onPick(0); return { off: !duelDemo.S.buzzOn, same: window.__buzz.length === n, stored: localStorage.getItem('bitstapel.buzz') }; });
+  const n0 = await page.evaluate(() => window.__buzz.length);
+  await page.waitForFunction(() => duelDemo.view.canAct() || duelDemo.view.duel.winner, null, { timeout: 20000 });
+  const free = await page.evaluate(() => [0, 1, 2].find(i => duelDemo.view.duel.sides.player.cols[i].length < 3 && duelDemo.view.picked !== i));
+  if (free != null) await page.tap(`.sb-pipe.player[data-col="${free}"]`);
+  r = await page.evaluate(n0 => ({ off: !duelDemo.S.buzzOn, same: window.__buzz.length === n0, stored: localStorage.getItem('nomad.haptics') }), n0);
   check(`${name}: Vibration abschaltbar (gemerkt)`, r.off && r.same && r.stored === '0', r);
   if (shots) { fs.mkdirSync('output', { recursive: true }); await page.screenshot({ path: `output/mobile_${name.replace(/\s/g, '_')}.png` }); }
   await page.close();

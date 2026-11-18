@@ -132,7 +132,7 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 - `docs/features/intro.md`: Intro als Comic (#005): Panels, Textboxen, Countdown, Effekte, nur übers Hauptmenü.
 - `docs/features/worldmap.md`: Reisekarte (#007): Routen-Netz je Durchgang, Marken der Spielwelt, Fenster am Warroom und an der Van-Tür.
 - `docs/features/lore.md`: Lore-Datenbank (#045): Marken, Spielwerte, Hersteller, Logos.
-- `docs/features/glitchlings.md`: Entities (#047–#050): Generator, Code-Porträts, Hersteller, Cyberdeck, Glitch-Duell (/duel).
+- `docs/features/glitchlings.md`: Entities (#047–#052): Generator, Porträts, Hersteller, Cyberdeck, Bit-Stapel. **Jede Duell-Änderung gilt für /duel, /mobile und das Duell im Spiel** (Daniel, 18.11.2026).
 - `docs/features/splash.md`: Startseite: Szene, Horizont-Dunst, AvA, Highway mit Textur-Boden, Überraschungen.
 - `docs/features/art.md`: Feld `look` an Entitäten, Asset-Vorschau, Symbol-Raster, Gegenrichtung beim Spiegeln.
 - `docs/features/editor.md`: Werkstatt-Editor: Spielen-Knopf, Scroll-Position.

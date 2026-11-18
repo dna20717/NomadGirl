@@ -17,6 +17,7 @@ const shot = async n => { if (!shots) return; fs.mkdirSync('output', { recursive
 const ev = f => page.evaluate(f);
 const ready = () => page.waitForFunction(() => { const v = game.scene.getScene('play').hud.duel.view; return v?.canAct() || v?.duel?.winner; }, null, { timeout: 20000 });
 
+await page.addInitScript(() => { window.__rumble = []; window.__vib = []; navigator.vibrate = p => { window.__vib.push(p); return true; }; const pad = { id: 'Test Pad', index: 0, connected: true, buttons: [], axes: [], vibrationActuator: { playEffect: (t, o) => { window.__rumble.push(o.duration); return Promise.resolve('complete'); } } }; Object.defineProperty(navigator, 'getGamepads', { value: () => [pad] }); });
 await page.goto(url);
 await page.waitForFunction(() => window.nomad && window.game?.scene.getScene('play')?.leyla, null, { timeout: 120000 });
 let r = await ev(() => { nomad.take(); const sc = game.scene.getScene('play'), h = sc.level.hosts(); if (!h.length) return { hosts: 0 }; nomad.tp(h[0].x - 40, h[0].feet - 4); nomad.step(12); return { hosts: h.length, p: nomad.state().prompt }; });
@@ -28,6 +29,8 @@ check('Das Spiel pausiert (Leyla läuft nicht)', r.moved < 1, r);
 await ready(); await page.keyboard.press('ArrowRight'); await page.keyboard.press('e'); await page.waitForTimeout(150);
 r = await ev(() => game.scene.getScene('play').hud.duel.view.duel.log.filter(e => e.type === 'place' && e.side === 'player').length);   // placed bits (a placed one can be wiped again)
 check('Tastatur: Pfeil + E schickt das Bit', r === 1, r);
+r = await ev(() => ({ rumble: window.__rumble.length, vib: window.__vib.length }));
+check('Haptik auch im Spiel: Controller-Rumble (und Handy-Vibration) beim Schicken', r.rumble >= 1 && r.vib >= 1, r);
 await ready();
 r = await ev(() => { const D = game.scene.getScene('play').hud.duel, before = D.view.cursor; D.nav({ keys: false, pressed: a => a === 'left' }); const mid = D.view.cursor; D.nav({ keys: false, pressed: a => a === 'ok' }); return { before, mid, n: D.view.duel.log.filter(e => e.type === 'place' && e.side === 'player').length }; });
 check('Controller: Stick links wählt, A schickt', r.mid !== r.before && r.n >= 2, r);

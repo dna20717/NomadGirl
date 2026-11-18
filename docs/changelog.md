@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 18.11.2026: **Bit-Stapel überall gleich** (Daniel: „soll immer die Standalone-Variante und die Ingame-Version betreffen“): Haptik ins gemeinsame Brett (`haptics.js`), im Spiel mit Controller-Rumble und Schalter in den Optionen; Regel in CLAUDE.md und Feature-Datei.
 - 18.11.2026: **Die Entity, Charaktere und Banter**: Artikel „die Entity“ überall; jede KI hat einen Charakter (8 allgemeine + Amber Slay, Marble Sting, Kammerjäger, AvA) mit Sprüchen je Duell-Moment, als Sprechblasen im Duell (Demo, Spiel, mobil).
 - 17.11.2026: **Bit-Stapel: sichtbar, warum Bits verschwinden**: rote Rahmen am legenden und an den gelöschten Bits, beide Pipelines verbunden, die gelöschten zersplittern, Schild „gleiche Zahl → gelöscht“ (Demo, Spiel, mobil).
 - 17.11.2026: **Bit-Stapel mobil: Haptik und Wischen**: Vibrationsmuster je Ereignis (Android; iOS-Tick beim eigenen Tippen), abschaltbar; nach oben wischen schickt sofort; Pipelines geben unter dem Finger nach.
