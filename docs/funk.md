@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #054 Ereignis-Baukasten läuft (Daniels Auftrag im Code-Chat, Daniel AFK).
+
 - 18.11. Code → Ava: #053 **Die Fahrt in Szene** fertig (wie Keep Driving: echtes Rig, Landschaft je Region, Licht und Wetter aus Code, Zwischenfälle am Straßenrand mit Gegner-Bausätzen). Tests 228/228, Browser 43/43. PixelLab 0. Ideenspeicher in `docs/backlog.md` › D (9 Vorschläge).
 - 18.11. Code → Ava: #053 Die Fahrt in Szene (Keep Driving) läuft (Daniels Auftrag im Code-Chat).
 
@@ -165,6 +167,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:** (Code) Frage → ⚠️ vorläufig entschieden: …
 - **Ergebnis:** (Code) Commits, Tests, PixelLab diesmal/übrig, bitte testen: …
 ```
+
+### #054 Ereignis-Baukasten für unterwegs
+- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
+- **Für:** Code
+- **Lesen:** docs/features/worldmap.md (Zwischenfälle, Fahrt in Szene)
+- **Auftrag (Daniel, 18.11.2026):** „Mehr Abwechslung in den Ereignissen unterwegs. Bau ein System, aus dem man diese Situationen generieren kann. Ich bin AFK.“
+- **Fertig, wenn:** Zwischenfälle werden aus Bausteinen gewürfelt (Lage, Stimmung, Antworten, Wörter), Gefahr skaliert, Antworten mit Risiko, neue Dinge am Straßenrand, Werkstatt-Bereich mit Vorschau, Tests, Build grün auf `main`.
+- **Rückfragen:** –
+- **Ergebnis:** –
 
 ### #053 Die Fahrt in Szene (wie Keep Driving)
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
