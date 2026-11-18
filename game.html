@@ -22,7 +22,7 @@
   import { createLoading } from './game/play/loading.js';
   const loading = createLoading(document.getElementById('load'), new URL('projects/nomadgirl/', location.href));
   start(document.getElementById('game'), document.getElementById('hud'), loading)
-    .then(g => { window.game = g; })
+    .then(g => { window.game = g; if (new URLSearchParams(location.search).has('diag')) import('./game/play/diag.js').then(m => m.showDiag(g)); })
     .catch(e => { loading.fail('Fehler beim Laden: ' + e.message); console.error(e); });
 </script>
 </body>
