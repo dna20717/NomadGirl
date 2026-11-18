@@ -203,6 +203,7 @@ Zu Beginn kennt man „Notflicken“, „Stromzelle tauschen“ und „Kühlmitt
 - **Jeder Durchgang würfelt ein Straßennetz** um BigCityDelta: feste Wahrzeichen plus gewürfelte Orte. Leyla fährt immer eine Straße weit; weiter draußen ist es gefährlicher und lohnender, Unbekanntes bleibt „?“.
 - Jedes Ziel zeigt Kosten (Strecke, Fahrzeit, Sprit, Vorräte), Gefahr und Art, und welche Beute dort vermutlich liegt. Details: `docs/features/worldmap.md`.
 - **Die Fahrt** (Daniel, 18.11.2026: „wie bei Keep Driving“, gebaut als #053): Zwischen Karte und Ankunft rollt das selbst gebaute Rig von der Seite durch die Wastelands, gemütlich 30 Sekunden je Etappe. Uhr, Himmel und Wetter laufen mit, jede Region sieht anders aus, Zwischenfälle stehen sichtbar am Straßenrand, bevor das Rig hält. Erst nur Inszenierung (Entscheidung wie bisher im Fenster); Landschaft aus Code, PixelLab-Ebenen später. Nächste Stufen (Ideenspeicher): Gas geben/drosseln, Crew im Rig sichtbar, Radio, Zwischenfälle mit Crew-Fähigkeiten.
+- **Ereignis-Baukasten** (Daniel, 18.11.2026: „mehr Abwechslung … ein System, aus dem man diese Situationen generieren kann“, gebaut als #054): Zwischenfälle entstehen aus Lage × Stimmung × Antworten, die Gefahr des Ziels macht sie teurer und härter, manche Antworten können schiefgehen. Ideen für später: Anhalter werden Crew (Karawane), Funkmast führt zu einer Entity, Ruf bei Banden (wer zahlt, wird erkannt), Folge-Ereignisse (wer geholfen hat, taucht wieder auf).
 
 ### Achievements & Trophäen (Design-Session Daniel, 13.11.2026)
 

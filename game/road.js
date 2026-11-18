@@ -11,7 +11,8 @@
 export const BW = 480, BH = 270, HORIZON = 148, ROAD = [214, 238], WHEEL_Y = 229;
 export const RELIEFS = [['mesas', 'Tafelberge'], ['dunes', 'Dünen'], ['jagged', 'Grate'], ['hills', 'Hügel'], ['flat', 'Salzpfanne']];
 export const ROADSIDE = [['', 'nichts am Rand'], ['barrier', 'Straßensperre'], ['creatures', 'Kreaturen mit leuchtenden Augen'], ['truck', 'Liegengebliebener LKW'],
-  ['breakdown', 'Panne: Dampf aus dem Motor'], ['trader', 'Händler mit Laternen'], ['storm', 'Staubwand am Horizont'], ['hitchhiker', 'Anhalterin'], ['flare', 'Rauchfackel']];
+  ['breakdown', 'Panne: Dampf aus dem Motor'], ['trader', 'Händler mit Laternen'], ['storm', 'Staubwand am Horizont'], ['hitchhiker', 'Anhalterin'], ['flare', 'Rauchfackel'],
+  ['campfire', 'Lagerfeuer'], ['wreck', 'Rauchendes Autowrack'], ['bus', 'Verlassener Bus'], ['drone', 'Abgestürzte Drohne'], ['shrine', 'Schrein mit Kerzen'], ['tower', 'Blinkender Funkmast'], ['rocks', 'Geröll auf der Straße']];
 
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 const hex = c => { const n = parseInt(String(c || '#000000').slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
@@ -236,6 +237,41 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [] } = {}) {
     } else if (kind === 'hitchhiker') {
       ctx.fillStyle = dark('#4a5462'); ctx.fillRect(x + 14, y - 18, 1, 18); ctx.fillStyle = dark('#df3e23'); ctx.fillRect(x + 10, y - 20, 9, 4);
       ctx.fillStyle = dark('#bb7547'); ctx.fillRect(x - 4, y - 4, 4, 4);
+    } else if (kind === 'campfire') {   // a fire of tyres and pallets, sparks rising, a pool of warm light
+      const f = 0.7 + 0.3 * Math.sin(t * 19) * Math.sin(t * 6.3);
+      glow(x + 8, y - 4, 34, '255,150,60', 0.4 * f);
+      ctx.fillStyle = dark('#322b28'); ctx.fillRect(x, y - 3, 17, 3); ctx.fillRect(x + 2, y - 5, 4, 2); ctx.fillRect(x + 11, y - 5, 4, 2);
+      for (let j = 0; j < 6; j++) { const w = 9 - j * 1.5, hh = Math.round(2 * f + Math.sin(t * 13 + j) * 0.8); ctx.fillStyle = j < 2 ? `rgb(255,${120 + 60 * f},40)` : j < 4 ? `rgb(255,${180 + 50 * f},70)` : 'rgb(255,240,170)'; ctx.fillRect(Math.round(x + 8.5 - w / 2 + Math.sin(t * 7 + j) * 0.6), y - 4 - j * 2 - hh, Math.max(1, Math.round(w)), 2 + hh); }
+      for (let i = 0; i < 6; i++) { const life = (t * 0.7 + i / 6) % 1; ctx.fillStyle = `rgba(255,200,90,${1 - life})`; ctx.fillRect(Math.round(x + 8 + Math.sin(t * 2 + i * 4) * 4 * life), Math.round(y - 10 - life * 26), 1, 1); }
+      ctx.fillStyle = dark('#5a4e44'); ctx.fillRect(x - 10, y - 3, 6, 3); ctx.fillRect(x + 22, y - 3, 7, 3);   // seats: crates
+    } else if (kind === 'wreck') {   // a car on its roof, wheels in the air, smoke
+      ctx.fillStyle = dark('#73172d'); ctx.fillRect(x, y - 7, 26, 6); ctx.fillRect(x + 6, y - 2, 13, 2);
+      ctx.fillStyle = dark('#141013'); ctx.fillRect(x + 3, y - 11, 5, 4); ctx.fillRect(x + 18, y - 11, 5, 4);
+      ctx.fillStyle = dark('#a6fcdb'); ctx.fillRect(x + 8, y - 2, 4, 1);
+      for (let i = 0; i < 8; i++) { const life = (t * 0.3 + i / 8) % 1, r = 1 + life * 3.5; ctx.fillStyle = `rgba(70,64,72,${0.4 * (1 - life)})`; ctx.beginPath(); ctx.arc(x + 20 + life * 8 + Math.sin(t + i) * 1.5, y - 10 - life * 24, r, 0, Math.PI * 2); ctx.fill(); }
+      if (Math.sin(t * 9) > 0.6) { ctx.fillStyle = 'rgb(255,190,80)'; ctx.fillRect(x + 22, y - 6, 2, 2); glow(x + 23, y - 5, 6, '255,160,60', 0.4); }
+    } else if (kind === 'bus') {   // an old bus, doors open, a dim light inside now and then
+      ctx.fillStyle = dark('#f9a31b'); ctx.fillRect(x, y - 16, 44, 13); ctx.fillStyle = dark('#141013'); ctx.fillRect(x + 4, y - 3, 6, 3); ctx.fillRect(x + 32, y - 3, 6, 3);
+      for (let i = 0; i < 6; i++) { const lit = S.dark > 0.3 && Math.sin(t * 0.9 + i * 1.7) > 0.85; ctx.fillStyle = lit ? 'rgba(170,230,255,.9)' : dark('#242234'); ctx.fillRect(x + 3 + i * 6, y - 14, 4, 4); }
+      ctx.fillStyle = dark('#141013'); ctx.fillRect(x + 38, y - 13, 4, 10); ctx.fillStyle = dark('#b4202a'); ctx.fillRect(x, y - 7, 44, 1);
+    } else if (kind === 'drone') {   // a courier drone nose down in the sand, sparks, a blinking SOS light
+      ctx.save(); ctx.translate(x + 10, y - 6); ctx.rotate(0.5);
+      ctx.fillStyle = dark('#4a5462'); ctx.fillRect(-9, -3, 18, 6); ctx.fillStyle = dark('#20d6c7'); ctx.fillRect(-2, -1, 4, 2);
+      ctx.fillStyle = dark('#333941'); ctx.fillRect(-12, -5, 6, 1); ctx.fillRect(6, -5, 6, 1); ctx.restore();
+      const sos = [1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0][Math.floor(t * 4) % 12];
+      if (sos) { ctx.fillStyle = 'rgb(255,70,70)'; ctx.fillRect(x + 16, y - 10, 2, 2); glow(x + 17, y - 9, 8, '255,60,60', 0.5); }
+      if (Math.random() < 0.3) { ctx.fillStyle = 'rgb(180,240,255)'; ctx.fillRect(x + 4 + Math.round(Math.random() * 10), y - 8 - Math.round(Math.random() * 6), 1, 1); }
+    } else if (kind === 'shrine') {   // a little shrine by a mile stone: photos, a figure, candles
+      ctx.fillStyle = dark('#5a4e44'); ctx.fillRect(x, y - 12, 12, 12); ctx.fillStyle = dark('#423934'); ctx.fillRect(x - 1, y - 14, 14, 2);
+      ctx.fillStyle = dark('#c7b08b'); ctx.fillRect(x + 4, y - 10, 4, 6);
+      for (let i = 0; i < 5; i++) { const f = 0.7 + 0.3 * Math.sin(t * 11 + i * 3); const cx = x - 6 + i * 6, cy = y - 2; ctx.fillStyle = dark('#fef3c0'); ctx.fillRect(cx, cy, 1, 2); ctx.fillStyle = `rgba(255,${190 + 40 * f},90,1)`; ctx.fillRect(cx, cy - 1, 1, 1); glow(cx, cy - 1, 6, '255,190,90', 0.3 * f); }
+    } else if (kind === 'tower') {   // a radio mast, blinking in a pattern that is no accident
+      ctx.fillStyle = dark('#4a5462'); ctx.fillRect(x + 5, y - 44, 1, 44); for (let i = 0; i < 44; i += 6) { ctx.fillRect(x + 3, y - i - 1, 5, 1); ctx.fillRect(x + 4, y - i - 4, 1, 3); ctx.fillRect(x + 6, y - i - 4, 1, 3); }
+      ctx.fillRect(x + 1, y - 40, 9, 1); ctx.fillRect(x + 2, y - 36, 7, 1);
+      const on = [1, 1, 0, 1, 0, 0, 1, 0][Math.floor(t * 3) % 8];
+      if (on) { ctx.fillStyle = 'rgb(255,90,200)'; ctx.fillRect(x + 5, y - 46, 1, 2); glow(x + 5, y - 45, 12, '255,90,200', 0.55); }
+    } else if (kind === 'rocks') {   // a landslide across the road
+      for (let i = 0; i < 11; i++) { const mid = 1 - Math.abs(i - 5) / 6, w = 4 + Math.floor(hash(i, 3) * 6), h = Math.round(3 + mid * 9 + hash(i, 4) * 4); ctx.fillStyle = dark(i % 2 ? '#71413b' : '#5a4e44'); ctx.fillRect(x + i * 4, y - h, w, h); ctx.fillStyle = dark('#8e5252'); ctx.fillRect(x + i * 4, y - h, w, 1); }
     } else if (kind === 'flare') {
       const f = 0.6 + 0.4 * Math.sin(t * 31) * Math.sin(t * 13);
       glow(x, y - 2, 30, '255,40,40', 0.45 * f); ctx.fillStyle = 'rgb(255,120,110)'; ctx.fillRect(x - 1, y - 2, 2, 2);
@@ -383,9 +419,6 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [] } = {}) {
       for (let j = 0; j + 1 < xs.length; j++) for (const dx of [-4, 5]) { ctx.moveTo(xs[j] + dx + 0.5, 174.5); ctx.quadraticCurveTo((xs[j] + xs[j + 1]) / 2, 183, xs[j + 1] + dx + 0.5, 174.5); }
       ctx.stroke();
     }
-    // the incident stands on the road's far edge; a dust storm is a wall rolling in from the right
-    if (st.stop?.kind === 'storm' && st.stop.x != null) dustWall(ctx, st.stop.x, S, st, t);
-    else if (st.stop?.kind && st.stop.x != null) incident(ctx, st.stop.kind, Math.round(st.stop.x), S, t);
     // the road: shoulder, asphalt with grain and patches, the dashed middle line (p 1)
     const roff = st.dist, asphalt = tone(L.road, 0, S, st), dash = tone('#ffd541', 0, S, st), edge = tone('#c7b08b', 0.02, S, st);
     ctx.fillStyle = css(edge); ctx.fillRect(0, ROAD[0], BW, 2);
@@ -400,6 +433,9 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [] } = {}) {
       ctx.globalAlpha = 0.18 * st.wet; ctx.drawImage(sky, 0, HORIZON - 30, BW, 22, 0, ROAD[0] + 3, BW, ROAD[1] - ROAD[0] - 6); ctx.globalAlpha = 1;
     }
     ctx.fillStyle = css(mix(asphalt, edge, 0.5)); ctx.fillRect(0, ROAD[1] - 2, BW, 2);
+    // the incident stands on the road's far lane (over the asphalt); a dust storm is a wall rolling in from the right
+    if (st.stop?.kind === 'storm' && st.stop.x != null) dustWall(ctx, st.stop.x, S, st, t);
+    else if (st.stop?.kind && st.stop.x != null) incident(ctx, st.stop.kind, Math.round(st.stop.x), S, t);
     // the near ground below the road and tufts in front (p 1.5, dark)
     const fo = st.dist * 1.5, fc = tone(L.ground, 0, S, st).map(v => Math.round(v * 0.62)), tuft = tone(L.plants, 0, S, st).map(v => Math.round(v * 0.55));
     ctx.fillStyle = css(fc); ctx.fillRect(0, ROAD[1], BW, BH - ROAD[1]);

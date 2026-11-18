@@ -7,6 +7,7 @@ import { parseRoom } from '../../engine/room.js';
 import { generateMap, neighbours } from '../worldmap.js';
 import { makeRoad, landscapeOf, ROADSIDE, BW, BH } from '../road.js';
 import { mapBrands } from '../brands.js';
+import { generateEncounter, eventsConfig } from '../road_events.js';
 import { generate, brandOf } from '../glitchlings.js';
 import { characterOf, characters } from '../banter.js';
 import { faceCanvas } from '../glitch_face.js';
@@ -245,6 +246,31 @@ export const SUMMARY = {
         sel('region', regions.map(r => [r, r || 'Andere Regionen'])), sel('weather', [['clear', 'Klar'], ['rain', 'Regen'], ['dust', 'Staub'], ['fog', 'Nebel']]),
         sel('stop', ROADSIDE.map(([v, n]) => [v, v ? n : 'Kein Zwischenfall'])), hour, clock),
       el('p', { class: 'ed-small' }, 'Landschaft, Licht und Wetter aus Code. Im Spiel fährt davor das echte Rig, die Figuren am Rand sind die Gegner-Bausätze.')) };
+  },
+
+  // the Ereignis-Baukasten (#054): six incidents rolled from the parts, with danger and night; „Neu würfeln“ rolls six others
+  roadEvents(w, x) {
+    const D = w.p.data, P = w.eventPreview ??= { seed: 1 + Math.floor(Math.random() * 1e6), danger: 1, night: false };
+    const box = el('div', { style: 'display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px' }), info = el('p', { class: 'ed-small' });
+    const cost = o => { const p = []; const de = n => String(n).replace('.', ',');
+      if (o.use) p.push(`−${o.useCount || 1} ${D.items?.[o.use]?.name || o.use}`); if (o.hours) p.push(`+${de(o.hours)} h`); if (o.fuel) p.push(`${o.fuel > 0 ? '−' : '+'}${de(Math.abs(o.fuel))} l`);
+      if (o.food) p.push(`${o.food > 0 ? '−' : '+'}${Math.abs(o.food)} Vorräte`); if (o.deltas) p.push(`${o.deltas > 0 ? '+' : '−'}${Math.abs(o.deltas)} Δ`); if (o.health) p.push(`−${o.health} Leben`);
+      if (o.item) p.push(`+${o.count || 1} ${D.items?.[o.item]?.name || o.item}`); if (o.loot) p.push('Beute'); if (o.risk) p.push(`Risiko ${o.risk} %`); return p.join(' · '); };
+    function paint() {
+      let s = P.seed; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+      const list = Array.from({ length: 6 }, () => generateEncounter(D, r, { danger: P.danger, night: P.night, place: 'Rustvale Truck Stop', region: 'Crow Valley' })).filter(Boolean);
+      box.replaceChildren(...list.map(e => el('div', { style: 'padding:10px 12px;border-radius:8px;border:1px solid var(--ui-border, #3a2f45);background:var(--ui-field, #1f1729)' },
+        el('b', {}, e.name), el('div', { class: 'ed-small' }, [ROADSIDE.find(([k]) => k === e.roadside)?.[1] || 'nichts am Rand', e.figures.map(f => D.enemies?.[f]?.name || f).join(', '), e.mood ? `Stimmung ${e.mood}` : ''].filter(Boolean).join(' · ')),
+        el('p', { style: 'margin:6px 0' }, e.description),
+        el('ul', { style: 'margin:0;padding-left:18px' }, ...e.options.map(o => el('li', {}, el('span', {}, o.label), el('small', { class: 'ed-small' }, ` ${cost(o)}`)))))));
+      const C = eventsConfig(D);
+      info.textContent = `${C.situations.length} Lagen × ${C.moods.length} Stimmungen × ${C.answers.length} Antworten · ${C.share} % der Zwischenfälle kommen aus dem Baukasten · Seed ${P.seed}`;
+    }
+    paint();
+    const danger = el('select', { class: 'ed-input', onchange: e => { P.danger = +e.target.value; paint(); } }, ...[1, 2, 3, 4, 5].map(n => { const o = el('option', { value: n }, `Gefahr ${n}`); if (n === P.danger) o.selected = true; return o; }));
+    const night = el('label', { class: 'ed-small' }, el('input', { type: 'checkbox', checked: P.night, onchange: e => { P.night = e.target.checked; paint(); } }), ' Nacht');
+    const again = el('button', { class: 'ed-button', onclick: () => { P.seed = 1 + Math.floor(Math.random() * 1e6); paint(); } }, 'Neu würfeln');
+    return { title: 'Gewürfelte Zwischenfälle', body: el('div', {}, el('div', { style: 'display:flex;gap:10px;align-items:center;margin-bottom:8px' }, danger, night, again), box, info) };
   },
 
   locations(w, x, id) {

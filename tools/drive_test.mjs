@@ -74,6 +74,16 @@ v = await ev(() => { const h = SC().hud, modal = h.modal; setPad([1]); nomad.ste
 check('B am Controller springt ans Ende der Etappe', !v.modal && (!v.open || v.phase === 'out' || v.time >= 29.9 || v.leg === null), v);
 await until(() => !SC().hud.drive?.isOpen, null, 30000);
 
+// #054: an incident from the Ereignis-Baukasten (forced: Lagerfeuer at night): the campfire by the road, two people, the window with its options
+await ev(() => { const s = SC(); s.data_.travel.drive.seconds = 4; s.showDrive = true; s.forceEncounter = 'gen:lagerfeuer'; s.box.save.hour = 22;
+  nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(3); const mp = s.hud.map, to = nomad.map().near.find(n => n !== nomad.save().location) || nomad.map().near[0]; mp.select(to); document.querySelector('.wm-go').click(); nomad.release?.(); });
+await until(() => SC().hud.modal && SC().hud.drive?.state().phase === 'stop', null, 40000);
+v = await ev(() => ({ st: SC().hud.drive.state(), cast: SC().hud.drive.st.stop?.cast?.length || 0, title: document.querySelector('.hud-menu h2')?.textContent || '', items: [...document.querySelectorAll('.hud-menu .hud-item b')].map(b => b.textContent) }));
+check('Gewürfelter Zwischenfall: Lagerfeuer am Rand, zwei Figuren, Titel und Antworten aus dem Baukasten', v.st.stop === 'campfire' && v.cast === 2 && /Lagerfeuer|Nomaden/.test(v.title) && v.items.length >= 2 && v.items.some(t => /Weiterfahren|Nicht anhalten/.test(t)), v);
+await shot('campfire');
+await ev(() => SC().hud.closeMenu());
+await until(() => !SC().hud.drive?.isOpen, null, 30000);
+
 // workshop: Reisen › Fahrt-Vorschau
 await page.goto('http://localhost:8766/workshop.html');
 await page.waitForFunction(() => window.workshop?.p && !document.querySelector('#load.loading-on'), null, { timeout: 30000 });
@@ -83,6 +93,10 @@ v = await ev(() => { const h = [...document.querySelectorAll('h2, h3, .ed-sectio
   let lit = 0; if (c) { const d = c.getContext('2d').getImageData(0, 0, 960, 540).data; for (let i = 0; i < d.length; i += 4 * 97) if (d[i] + d[i + 1] + d[i + 2] > 60) lit++; }
   return { pre: /Fahrt-Vorschau/.test(document.body.textContent), canvas: !!c, lit, fields: h.some(t => /Landschaften/.test(t)) }; });
 check('Werkstatt › Reisen: Fahrt-Vorschau läuft, Abschnitt Landschaften da', v.pre && v.canvas && v.lit > 100 && v.fields, v);
+await ev(() => workshop.go({ area: 'roadEvents' }));
+await page.waitForTimeout(500);
+v = await ev(() => ({ pre: /Gewürfelte Zwischenfälle/.test(document.body.textContent), cards: [...document.querySelectorAll('ul')].filter(u => u.closest('div')?.querySelector('b')).length, sections: ['Lagen', 'Stimmungen', 'Antworten', 'Wörter'].every(t => document.body.textContent.includes(t)) }));
+check('Werkstatt › Ereignis-Baukasten: Lagen, Stimmungen, Antworten, Wörter und sechs gewürfelte Zwischenfälle', v.pre && v.cards >= 6 && v.sections, v);
 if (shots) await page.screenshot({ path: 'output/drive_workshop.png', fullPage: false });
 
 console.log(ok.map(x => '✔ ' + x).join('\n'));

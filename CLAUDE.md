@@ -130,7 +130,7 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 - `docs/features/tiles.md`: Kacheln und Kachel-Sets (TileSet00): Clutter, Decals, Einschlüsse, echte Größen, Tiefe aus Code.
 - `docs/features/tutorial.md`: Feldhandbuch (#011): Lektionen mit Clips/Bildern aus dem Spiel, Karte beim ersten Mal, Archiv im Menü, Aufnahme-Tool.
 - `docs/features/intro.md`: Intro als Comic (#005): Panels, Textboxen, Countdown, Effekte, nur übers Hauptmenü.
-- `docs/features/worldmap.md`: Reisekarte (#007): Routen-Netz je Durchgang, Marken, Fenster am Warroom und an der Van-Tür; Fahrt in Szene (#053, Landschaft aus Code).
+- `docs/features/worldmap.md`: Reisekarte (#007): Routen-Netz je Durchgang, Marken, Fenster am Warroom und an der Van-Tür; Fahrt in Szene (#053), Ereignis-Baukasten (#054).
 - `docs/features/lore.md`: Lore-Datenbank (#045): Marken, Spielwerte, Hersteller, Logos.
 - `docs/features/glitchlings.md`: Entities (#047–#052): Generator, Porträts, Hersteller, Cyberdeck, Bit-Stapel. **Jede Duell-Änderung gilt für /duel, /mobile und das Duell im Spiel** (Daniel, 18.11.2026).
 - `docs/features/splash.md`: Startseite: Szene, Horizont-Dunst, AvA, Highway mit Textur-Boden, Überraschungen.

@@ -1086,6 +1086,7 @@ export function costLine(D, o) {
   if (o.health) p.push(`−${o.health} Leben`);
   if (o.item) p.push(`+${o.count || 1} ${D.items?.[o.item]?.name || o.item}`);
   if (o.loot) p.push('Beute');
+  if (o.risk) p.push(`Risiko ${o.risk} %`);   // #054: may go wrong
   return p.join(' · ');
 }
 // distance, hours, fuel and food for driving from the current place to a location; since #014 over several legs: the shortest

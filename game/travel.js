@@ -5,6 +5,7 @@
 import { advance } from './save.js';
 import { give, take, have } from './crafting.js';
 import { rollLoot } from './inventory.js';
+import { generateEncounter, eventsConfig } from './road_events.js';
 
 const isNight = (D, hour) => { const T = D.travel || {}, len = T.dayLength || 24, night = (T.nightShare ?? 40) / 100 * len; return hour >= len - night / 2 || hour < night / 2; };
 
@@ -23,6 +24,21 @@ export function rollEncounter(D, save, km, rnd = Math.random) {
   for (const [id, e] of all) if ((k -= e.weight ?? 1) < 0) return id;
   return all[0]?.[0] || null;
 }
+// #054: the incident of a leg as an object: hand-made (Welt › Encounter) or put together by the Ereignis-Baukasten (Regeln › Anteil gewürfelt)
+// ctx: { danger, region, place } of the destination
+export function pickEncounter(D, save, km, rnd = Math.random, ctx = {}) {
+  const id = rollEncounter(D, save, km, rnd);
+  if (!id) return null;
+  const night = isNight(D, save.hour ?? 12);
+  if (rnd() * 100 < eventsConfig(D).share) { const g = generateEncounter(D, rnd, { ...ctx, night }); if (g) return g; }
+  return { id, ...D.encounters[id] };
+}
+// an incident by id (tests, scene.forceEncounter): 'gen' or 'gen:<Lage>' from the Baukasten, else a hand-made one
+export function encounterById(D, save, id, rnd = Math.random, ctx = {}) {
+  if (!id) return null;
+  if (String(id).startsWith('gen')) return generateEncounter(D, rnd, { ...ctx, night: isNight(D, save.hour ?? 12), situation: String(id).split(':')[1] || null });
+  return D.encounters?.[id] ? { id, ...D.encounters[id] } : null;
+}
 // may this choice be taken? → reason or null (enough Δ, fuel, the thing it uses)
 export function blocked(D, save, o) {
   if (o.deltas < 0 && (save.deltas || 0) < -o.deltas) return `Zu wenig Δ (${-o.deltas})`;
@@ -31,8 +47,15 @@ export function blocked(D, save, o) {
   return null;
 }
 // take a choice → { lines: [what happened], things: [{ id, n }], health (% of max, negative = damage) }
+// Risiko (#054): with o.risk % it goes wrong: the extra damage and hours of the failure, no reward (Δ gained, thing, loot), the text of the failure
 export function choose(D, save, o, rnd = Math.random) {
-  const lines = [], things = [];
+  const lines = [], things = [], failed = o.risk > 0 && rnd() * 100 < o.risk;
+  if (failed) {
+    o = { ...o, health: (o.health || 0) + (o.failHealth || 0), hours: (o.hours || 0) + (o.failHours || 0), result: o.failResult || 'Das ging schief.' };
+    if (o.deltas > 0) delete o.deltas;
+    delete o.item; delete o.loot;
+    lines.push('Schiefgegangen');
+  }
   if (o.use) { take(D, save, o.use, o.useCount || 1); lines.push(`−${o.useCount || 1} ${D.items?.[o.use]?.name || o.use}`); }
   if (o.hours) { advance(save, o.hours); lines.push(`${o.hours > 0 ? '+' : ''}${o.hours} h`); }
   if (o.fuel) { save.fuel = Math.max(0, Math.round(((save.fuel || 0) - o.fuel) * 10) / 10); lines.push(`${o.fuel > 0 ? '−' : '+'}${Math.abs(o.fuel)} l Sprit`); }
@@ -42,5 +65,5 @@ export function choose(D, save, o, rnd = Math.random) {
   if (o.loot) for (const e of rollLoot(D, o.loot, rnd)) { if (e.a !== 'items') continue; const rest = give(D, save, e.id, e.n); things.push({ id: e.id, n: e.n - rest }); }
   for (const t of things) if (t.n > 0) lines.push(`+${t.n} ${D.items?.[t.id]?.name || t.id}`);
   if (o.health) { save.health = Math.max(1, Math.round((save.health ?? 100) - o.health)); lines.push(`−${o.health} Leben`); }
-  return { lines, things, text: o.result || '' };
+  return { lines, things, text: o.result || '', failed };
 }

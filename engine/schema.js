@@ -17,6 +17,7 @@ import { DECOR_PLACES, DECOR_ARTS } from '../game/decor.js';
 import { MOMENTS } from '../game/banter.js';
 import { EARN_WHEN } from '../game/earn.js';
 import { RELIEFS, ROADSIDE } from '../game/road.js';
+import { ANSWER_WHEN, eventProblems } from '../game/road_events.js';
 
 const text = (key, label, o = {}) => ({ key, label, type: 'text', ...o });
 const area_ = (key, label, o = {}) => ({ key, label, type: 'textarea', ...o });
@@ -1422,8 +1423,32 @@ export const AREAS = {
         select('roadside', 'Am Straßenrand', ROADSIDE, { hint: '#053: was in der Fahrt-Szene am Rand steht und näher kommt, bevor das Rig hält und das Fenster aufgeht (aus Code gezeichnet)' })] },
       { title: 'Entscheidungen', fields: [table('options', 'Entscheidungen', [text('label', 'Knopf'), num('hours', 'Zeit', { unit: 'h' }), num('fuel', 'Sprit', { unit: 'l', hint: 'positiv = kostet' }),
         num('food', 'Vorräte', { hint: 'positiv = kostet' }), num('deltas', 'Δ', { hint: 'negativ = zahlen' }), num('health', 'Schaden', { unit: 'Leben', min: 0 }),
-        ref('use', 'Verbraucht', 'items'), num('useCount', 'Wie viele', { min: 1 }), ref('item', 'Gibt', 'items'), num('count', 'Anzahl', { min: 1 }), ref('loot', 'Beute-Wurf', 'lootTables'), text('result', 'Danach')],
+        ref('use', 'Verbraucht', 'items'), num('useCount', 'Wie viele', { min: 1 }), ref('item', 'Gibt', 'items'), num('count', 'Anzahl', { min: 1 }), ref('loot', 'Beute-Wurf', 'lootTables'), text('result', 'Danach'),
+        num('risk', 'Risiko', { unit: '%', min: 0, max: 95, hint: '#054: so oft geht es schief: kein Gewinn, dafür der Schaden und die Zeit des Fehlschlags' }), num('failHealth', 'Fehlschlag: Schaden', { unit: 'Leben', min: 0 }), num('failHours', 'Fehlschlag: Zeit', { unit: 'h', min: 0 }), text('failResult', 'Fehlschlag: Text')],
         { hint: 'Die erste ist hervorgehoben; wer das Fenster schließt, nimmt die erste, die geht. Ausgegraut, wenn Δ, Sprit oder der verbrauchte Gegenstand fehlen' })] }],
+  },
+  roadEvents: {
+    name: 'Ereignis-Baukasten', icon: 'flash', file: 'data/road_events.json', kind: 'single',
+    hint: '#054 (Daniel, 18.11.2026: „mehr Abwechslung in den Ereignissen unterwegs. Bau ein System, aus dem man diese Situationen generieren kann“). Ein Zwischenfall wird aus Bausteinen gewürfelt: eine Lage (wo, was, wer), eine Stimmung (wie die Leute drauf sind) und die Antworten, die dazu passen. Platzhalter in allen Texten: {mood} {place} {region} {brand} {group} {cargo} {thing} {creature} {n}, in Antworten {price}; mehrere Varianten mit „|“. Die Gefahr des Ziels macht Zahlen teurer, Schaden härter und Lohn größer.',
+    sections: [
+      { title: 'Regeln', fields: [num('share', 'Anteil gewürfelt', { unit: '%', min: 0, max: 100, hint: 'so viele Zwischenfälle kommen aus dem Baukasten, der Rest sind die handgemachten (Welt › Encounter)' }),
+        num('scale', 'Je Gefahrstufe', { unit: '%', min: 0, hint: 'ab Gefahr 2: Preise, Schaden und Lohn wachsen um so viel je Stufe' }), num('maxAnswers', 'Antworten höchstens', { min: 2, max: 6 })] },
+      { title: 'Lagen', fields: [table('situations', 'Lagen', [text('id', 'ID'), text('name', 'Titel', { hint: 'Varianten mit |' }), select('roadside', 'Am Straßenrand', ROADSIDE),
+        text('figures', 'Figuren', { hint: 'Gegner-IDs mit Komma; stehen in Rig-Größe am Rand' }), select('time', 'Tageszeit', DAYTIME), num('weight', 'Gewicht', { min: 0 }), num('danger', 'Ab Gefahr', { min: 1, max: 5 }),
+        text('text', 'Text', { hint: 'Varianten mit |' }), text('answers', 'Antworten', { hint: 'IDs mit Komma, in dieser Reihenfolge (die erste ist hervorgehoben)' }), text('moods', 'Stimmungen', { hint: 'IDs mit Komma; leer = ohne Stimmung (niemand da)' }),
+        ref('loot', 'Beute', 'lootTables', { hint: 'für Antworten mit Beute „situation“' }), ref('look', 'Bild', 'assets', { hint: 'Comic-Bild im Fenster; leer = Reisen › Bild für Zwischenfälle' })])] },
+      { title: 'Stimmungen', fields: [table('moods', 'Stimmungen', [text('id', 'ID'), text('name', 'Wort', { hint: 'Adjektiv mit -e: „gierige“, für {mood}' }), text('text', 'Satz', { hint: 'hängt an den Text der Lage; Varianten mit |' }),
+        num('price', 'Preise', { unit: '%', min: 10 }), num('risk', 'Risiko', { unit: '± %' }), bool('friendly', 'Freundlich'), bool('hostile', 'Feindselig')],
+        { hint: 'Antworten „nur bei freundlicher/feindseliger Stimmung“ erscheinen nur, wenn die Stimmung das ist; beides geht (verzweifelt)' })] },
+      { title: 'Antworten', fields: [table('answers', 'Antworten', [text('id', 'ID'), text('label', 'Knopf', { hint: 'Varianten mit |, {price} = Δ nach Stimmung und Gefahr' }), select('when', 'Wann', ANSWER_WHEN),
+        num('hours', 'Zeit', { unit: 'h' }), num('fuel', 'Sprit', { unit: 'l', hint: 'positiv = kostet, negativ = bekommt' }), num('food', 'Vorräte', { hint: 'positiv = kostet' }), num('deltas', 'Δ', { hint: 'negativ = zahlen' }),
+        num('health', 'Schaden', { unit: 'Leben', min: 0 }), ref('use', 'Verbraucht', 'items'), num('useCount', 'Wie viele', { min: 1 }), ref('item', 'Gibt', 'items'), num('count', 'Anzahl', { min: 1 }),
+        text('loot', 'Beute-Wurf', { hint: 'ID einer Beutetabelle oder „situation“ = die der Lage' }), num('risk', 'Risiko', { unit: '%', min: 0, max: 95 }), num('failHealth', 'Fehlschlag: Schaden', { unit: 'Leben', min: 0 }),
+        num('failHours', 'Fehlschlag: Zeit', { unit: 'h', min: 0 }), text('result', 'Danach', { hint: 'Varianten mit |' }), text('failResult', 'Fehlschlag', { hint: 'Varianten mit |' })])] },
+      { title: 'Wörter', fields: [text('words.group', 'Banden {group}', { hint: 'mit |' }), text('words.cargo', 'Ladung {cargo}', { hint: 'mit |, „ein Laster mit …“' }),
+        text('words.thing', 'Dinge {thing}', { hint: 'mit |, „ein Feuer aus …“' }), text('words.creature', 'Kreaturen {creature}', { hint: 'mit |, Mehrzahl' })] },
+    ],
+    check: (x, report, P) => { for (const m of eventProblems(P.data || {})) report(/keine Antwort/.test(m) ? 'warning' : 'error', m); },
   },
   tutorial: {
     name: 'Lektionen', singular: 'Lektion', icon: 'help', file: 'data/tutorial.json', kind: 'catalog', groupBy: { key: 'chapter', options: TUT_CHAPTERS },
@@ -1562,7 +1587,7 @@ export const GROUPS = [
   ['ACHIEVEMENTS & AUFTRÄGE', ['achievements', 'quests']],
   ['PROGRESSION', ['techtree', 'resources']],
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'megarigs', 'rigAddons', 'salvage', 'companions']],
-  ['WELT', ['worldmap', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'travel']],
+  ['WELT', ['worldmap', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel']],
   ['LORE', ['brands']],
   ['ENTITIES', ['glitchlings']],
 ];
