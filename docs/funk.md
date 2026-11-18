@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #054 **Ereignis-Baukasten** fertig: Zwischenfälle aus 16 Lagen × 8 Stimmungen × 27 Antworten, Gefahr skaliert, Risiko bei Antworten, 7 neue Dinge am Straßenrand. Tests 234/234, Browser 43/43, PixelLab 0.
 - 18.11. Code → Ava: #054 Ereignis-Baukasten läuft (Daniels Auftrag im Code-Chat, Daniel AFK).
 
 - 18.11. Code → Ava: #053 **Die Fahrt in Szene** fertig (wie Keep Driving: echtes Rig, Landschaft je Region, Licht und Wetter aus Code, Zwischenfälle am Straßenrand mit Gegner-Bausätzen). Tests 228/228, Browser 43/43. PixelLab 0. Ideenspeicher in `docs/backlog.md` › D (9 Vorschläge).
@@ -169,13 +170,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ```
 
 ### #054 Ereignis-Baukasten für unterwegs
-- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/worldmap.md (Zwischenfälle, Fahrt in Szene)
 - **Auftrag (Daniel, 18.11.2026):** „Mehr Abwechslung in den Ereignissen unterwegs. Bau ein System, aus dem man diese Situationen generieren kann. Ich bin AFK.“
 - **Fertig, wenn:** Zwischenfälle werden aus Bausteinen gewürfelt (Lage, Stimmung, Antworten, Wörter), Gefahr skaliert, Antworten mit Risiko, neue Dinge am Straßenrand, Werkstatt-Bereich mit Vorschau, Tests, Build grün auf `main`.
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code, Daniel AFK) ⚠️ vorläufig: 70 % der Zwischenfälle gewürfelt, 30 % handgemacht; Gefahr +25 % je Stufe; höchstens 4 Antworten, immer eine ohne Δ und Gegenstand; Risiko gilt auch für handgemachte Encounter (Spalten); Fehlschlag = kein Lohn, dafür Schaden/Zeit; „Mitnehmen“ bringt nur Δ (noch keine Crew).
+- **Ergebnis:** (Code) Commit „Ereignis-Baukasten …“ auf `main`. Neu: `game/road_events.js`, `data/road_events.json`, Werkstatt › Welt › Ereignis-Baukasten mit Vorschau (6 gewürfelte Karten, Gefahr, Nacht), `travel.js` `pickEncounter`/`encounterById` + Risiko, `road.js` 7 neue Straßenrand-Dinge. `npm test` 234/234 (neu `test/road_events.test.js`), Browser 43/43 (`drive_test` 12). PixelLab 0. **Bitte testen:** Werkstatt › Ereignis-Baukasten › „Neu würfeln“, dann ein paar Fahrten über mehrere Etappen.
 
 ### #053 Die Fahrt in Szene (wie Keep Driving)
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
