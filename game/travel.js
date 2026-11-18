@@ -8,6 +8,7 @@ import { rollLoot } from './inventory.js';
 import { generateEncounter, eventsConfig } from './road_events.js';
 import { addRep, repOf, gangs } from './reputation.js';
 import { revealPlace } from './worldmap.js';
+import { needBlocked } from './needs.js';
 
 const isNight = (D, hour) => { const T = D.travel || {}, len = T.dayLength || 24, night = (T.nightShare ?? 40) / 100 * len; return hour >= len - night / 2 || hour < night / 2; };
 
@@ -62,7 +63,7 @@ export function blocked(D, save, o) {
   if (o.deltas < 0 && (save.deltas || 0) < -o.deltas) return `Zu wenig Δ (${-o.deltas})`;
   if (o.fuel > 0 && (save.fuel || 0) < o.fuel) return 'Zu wenig Sprit';
   if (o.use && have(D, save, o.use) < (o.useCount || 1)) return `Braucht ${o.useCount || 1}× ${D.items?.[o.use]?.name || o.use}`;
-  return null;
+  return needBlocked(D, save, o);   // #059 crew, implant, AvA part, rig part, workshop
 }
 // take a choice → { lines: [what happened], things: [{ id, n }], health (% of max, negative = damage) }
 // Risiko (#054): with o.risk % it goes wrong: the extra damage and hours of the failure, no reward (Δ gained, thing, loot), the text of the failure

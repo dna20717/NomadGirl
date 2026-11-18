@@ -109,7 +109,7 @@ await until(() => SC().hud.modal, null, 40000);
 v = await ev(() => { const items = [...document.querySelectorAll('.hud-menu .hud-item b')].map(b => b.textContent); SC().hud.choose(0); return { items, chain: nomad.save().road?.chain }; });
 check('Fehde: Partei ergreifen startet eine Geschichte (nächster Schritt gemerkt)', v.chain?.step === 'fehde2' && v.items.length >= 3, v);
 await until(() => !SC().hud.drive?.isOpen, null, 30000);
-await ev(() => { const s = SC(); nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(3); const mp = s.hud.map, to = nomad.map().near.find(n => n !== nomad.save().location) || nomad.map().near[0]; mp.select(to); document.querySelector('.wm-go').click(); nomad.release?.(); });
+await ev(() => { const s = SC(); nomad.save().fuel = 40; nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(3); const mp = s.hud.map, to = nomad.map().near.find(n => n !== nomad.save().location) || nomad.map().near[0]; mp.select(to); document.querySelector('.wm-go').click(); nomad.release?.(); });
 await until(() => SC().hud.modal, null, 40000);
 v = await ev(() => ({ title: document.querySelector('.hud-menu h2')?.textContent || '', chain: nomad.save().road?.chain }));
 check('Nächste Fahrt: die Geschichte geht weiter („Die Rache der …“)', /Rache/.test(v.title), v);

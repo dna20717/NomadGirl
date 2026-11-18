@@ -16,6 +16,7 @@
 // No DOM.
 import { mapBrands } from './brands.js';
 import { gangs, repOf, levelOf, gangOfPlace, repPrice } from './reputation.js';
+import { NEED_KEYS, hasNeeds, needBlocked, needTag } from './needs.js';
 
 const pick = (r, a) => a[Math.floor(r() * a.length) % a.length];
 const variants = s => String(s || '').split('|').map(x => x.trim()).filter(Boolean);
@@ -80,8 +81,12 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
   const friendly = M ? !!M.friendly : true, hostile = M ? !!M.hostile : true;
   const fits = a => !a.when || a.when === 'any' || (a.when === 'friendly' && friendly) || (a.when === 'hostile' && hostile);
   let A = answerRefs(S).map(r => { const a = C.answers.find(x => x.id === r.id); return a && { ...a, next: r.next }; }).filter(Boolean).filter(fits);
-  const free = a => !(a.deltas < 0) && !a.use;   // always possible (time and fuel she has; Δ and things maybe not)
+  const free = a => !(a.deltas < 0) && !a.use && !hasNeeds(a);   // always possible (time and fuel she has; Δ and things maybe not)
+  // #059 answers that need someone or something: open ones come first, missing ones only where there is room (greyed, with the reason)
+  if (save) { const open = a => !hasNeeds(a) || !needBlocked(D, save, a); A = [...A.filter(a => hasNeeds(a) && open(a)), ...A.filter(a => !hasNeeds(a)), ...A.filter(a => !open(a))]; }
+  const locked = save ? A.find(a => hasNeeds(a) && needBlocked(D, save, a)) : null;
   if (A.length > C.maxAnswers) { const keep = A.slice(0, C.maxAnswers); if (!keep.some(free)) { const f = A.find(free); if (f) keep[keep.length - 1] = f; } A = keep; }
+  if (locked && !A.includes(locked)) A.push(locked);   // one closed door as a teaser: what a crew member, implant or rig part would open
   const k = 1 + C.scale * (danger - 1), price = (M?.price ?? 100) / 100 * repPrice(D, save, gang), riskAdd = M?.risk ?? 0;
   const inChain = !!chain || A.some(a => a.next);
   const options = A.map(a => {
@@ -105,6 +110,9 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
     if (inChain) { o.chain = { next: a.next || null, gang, rival, n: (chain?.n || 1) + (a.next ? 1 : 0) }; }
     const extra = { price: String(Math.abs(o.deltas || 0)) };
     o.label = cap(text(a.label, extra)) || 'Weiter';
+    for (const key of NEED_KEYS) if (a[key]) o[key] = a[key];   // #059
+    const tag = hasNeeds(o) && save ? needTag(D, save, o) : '';
+    if (tag) o.label = `${tag} · ${o.label}`;
     o.result = text(a.result, extra);
     if (o.risk) o.failResult = text(a.failResult, extra) || 'Das ging schief.';
     return o;

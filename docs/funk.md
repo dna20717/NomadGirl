@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #059 **Antworten mit Voraussetzungen** fertig: Crew, Implantate, AvA-Teile, Rig-Teile und Werkstätten öffnen Antworten unterwegs (12 neue). Tests 248/248, PixelLab 0.
 - 18.11. Code → Ava: #059 Antworten mit Voraussetzungen läuft; #060 Bit-Farm und #061 Revier-Camp angelegt (Daniels Aufträge aus der Verzahnungs-Prüfung).
 - 18.11. Code → Ava: #057 **Silo Zero** und #058 **Schatzsuche „I become death …“** fertig: verstecktes XXL-Raketensilo (26–32 Räume, Zero Hour, Major Null, Silo-KI Titan Lullaby), fünf Kartenstücke (2 Tresore, 1 Straßen-Geschichte, 2 Händler), Onkel Sung setzt sie zusammen und deckt den Ort auf. Tests 244/244, Browser 44/44 (`tutorial_test` wackelt: der Run-Tipp kommt manchmal nicht in 4000 Frames, einzeln 3 von 5 grün). PixelLab 0. Offen für Daniel: Quest-Titel „I become death …“ oder „Now I am become Death“?
 - 18.11. Code → Ava: #057 Raketensilo läuft (Daniels Auftrag im Code-Chat).
@@ -194,12 +195,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** –
 
 ### #059 Antworten mit Voraussetzungen aus anderen Systemen
-- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 1)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 1)
 - **Für:** Code
 - **Lesen:** docs/features/worldmap.md (Ereignis-Baukasten)
 - **Auftrag (Daniel, 18.11.2026):** „1 auf jeden Fall“: Antworten im Ereignis-Baukasten verlangen ein Implantat, einen Companion an Bord, ein AvA-Anbauteil, ein Rig-Teil oder eine Werkstatt im Rig („Schraube flickt den LKW“, „Mit dem Rammbock durch die Sperre“, „Optik-Implantat erkennt die Falle“).
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: „an Bord“ = `save.companions` (Gäste ohne Koje bleiben zurück und zählen nicht); Implantat-Platz meint Leyla und AvA; eine verschlossene Antwort als Anreiz; Voraussetzungen erst im Ereignis-Baukasten (handgemachte Zwischenfälle später).
+- **Ergebnis:** (Code) Commit „Antworten mit Voraussetzungen (#059)“ auf `main`. Neu `game/needs.js`, 6 Spalten in Ereignis-Baukasten › Antworten, 12 Antworten. `npm test` 248/248 (neu `test/needs.test.js`), `drive_test` 17 (tankt vor der zweiten Fehde-Fahrt auf, weil `choose(0)` jetzt oft Panzerung rammt). PixelLab 0. **Bitte testen:** Fahrten mit Schraube an Bord (Pannenfahrzeug), Hinterhalt mit und ohne Augen-Implantat.
 
 ### #058 Schatzsuche „I become death …“ um Silo Zero
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)

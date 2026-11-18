@@ -12,7 +12,7 @@
    "weight": 3,
    "danger": 1,
    "text": "Ein Schlagbaum aus Leitplanken. {n} {mood} Gestalten in den Farben der {gang} winken dich ran.|Die {gang} haben die Straße nach {place} gesperrt. Ein Pappschild: „Wegzoll“.|Reifenstapel, ein Wohnwagen als Zollhaus, darauf gesprüht: {gang}. Darunter: „{motto}“",
-   "answers": "zahlen, feilschen, durchbrechen, umweg",
+   "answers": "onkel_redet, rammbock, zahlen, feilschen, durchbrechen, umweg",
    "moods": "gierig, gelangweilt, nervoes",
    "loot": "pluenderer_beute",
    "gang": "here",
@@ -27,7 +27,7 @@
    "weight": 2,
    "danger": 2,
    "text": "Eine Nagelkette quer über dem Asphalt. Aus dem Graben blitzen Läufe.|Plötzlich Scheinwerfer von beiden Seiten. Die {gang} haben gewartet.",
-   "answers": "durchbrechen, kaempfen, ava_ablenken, umweg",
+   "answers": "optik_falle, rammbock, dachgeschuetz_feuer, durchbrechen, kaempfen, ava_ablenken, umweg",
    "moods": "gierig, verzweifelt, nervoes",
    "loot": "pluenderer_beute",
    "gang": "here",
@@ -42,7 +42,7 @@
    "weight": 3,
    "danger": 1,
    "text": "Ein Laster mit {cargo} steht mit offener Haube am Rand. Der Fahrer winkt mit beiden Armen.|Jemand hat {cargo} geladen und keinen Keilriemen mehr. Er sitzt auf der Stoßstange und starrt ins Nichts.",
-   "answers": "helfen_tape, handeln, pluendern, weiterfahren",
+   "answers": "schraube_flickt, helfen_tape, handeln, pluendern, weiterfahren",
    "moods": "freundlich, verzweifelt, misstrauisch",
    "loot": "kiste_tankstelle"
   },
@@ -55,7 +55,7 @@
    "weight": 3,
    "danger": 1,
    "text": "Ein Wagen liegt auf dem Dach, die Räder drehen sich noch. Niemand zu sehen.|Glas auf der Straße, Öl, ein {brand}-Aufkleber. Was da drin ist, gehört gerade niemandem.",
-   "answers": "ausschlachten, pluendern, weiterfahren",
+   "answers": "ava_greifarm, ausschlachten, pluendern, weiterfahren",
    "moods": "",
    "loot": "kiste_tankstelle"
   },
@@ -68,7 +68,7 @@
    "weight": 3,
    "danger": 1,
    "text": "{n} {mood} Nomaden sitzen um ein Feuer aus {thing}. Einer hebt die Hand.|Ein Feuer aus {thing}, Musik aus einem Kofferradio. Jemand ruft: „Platz ist genug!“",
-   "answers": "essen_kaufen, tanken, tauschen_schrott, weiterfahren",
+   "answers": "fuer_alle_kochen, essen_kaufen, tanken, tauschen_schrott, weiterfahren",
    "moods": "freundlich, misstrauisch, betrunken",
    "loot": "kiste_tankstelle"
   },
@@ -81,7 +81,7 @@
    "weight": 2,
    "danger": 1,
    "text": "Eine Kurierdrohne von {brand} steckt kopfüber im Sand und funkt noch SOS.|Rotorblätter im Graben, ein Gehäuse mit {brand}-Logo. AvA will unbedingt hin.",
-   "answers": "ava_hacken, ausschlachten, weiterfahren",
+   "answers": "drohne_zerlegen, ava_greifarm, ava_hacken, ausschlachten, weiterfahren",
    "moods": "",
    "loot": "drohnen_beute"
   },
@@ -94,7 +94,7 @@
    "weight": 2,
    "danger": 2,
    "text": "Ein Bus quer am Rand, die Türen offen. Drinnen bewegt sich etwas. Oder nicht.|Ein alter Schulbus, Fenster mit Zeitungen verklebt. Auf der Tür: „Nicht öffnen“.",
-   "answers": "pluendern, schleichen, weiterfahren",
+   "answers": "ava_greifarm, pluendern, schleichen, weiterfahren",
    "moods": "",
    "loot": "kiste_tankstelle"
   },
@@ -133,7 +133,7 @@
    "weight": 3,
    "danger": 1,
    "text": "Ein Pappschild: „{place}“. Darunter jemand, der seit Stunden hier steht.|Daumen raus, ein Rucksack mit {cargo}. „Nimmst du mich mit?“",
-   "answers": "mitnehmen, essen_teilen, weiterfahren",
+   "answers": "fuer_alle_kochen, mitnehmen, essen_teilen, weiterfahren",
    "moods": "freundlich, verzweifelt, misstrauisch",
    "loot": "kiste_tankstelle"
   },
@@ -146,7 +146,7 @@
    "weight": 2,
    "danger": 1,
    "text": "Planwagen, Laternen, ein Schild: „{brand}, fast legal“.|Ein Laden auf Rädern. Es gibt {cargo}, Sprit und schlechte Witze.",
-   "answers": "handeln, tanken, essen_kaufen, weiterfahren",
+   "answers": "onkel_redet, fuer_alle_kochen, handeln, tanken, essen_kaufen, weiterfahren",
    "moods": "freundlich, gierig, gelangweilt",
    "loot": "kiste_tankstelle"
   },
@@ -159,7 +159,7 @@
    "weight": 3,
    "danger": 2,
    "text": "Augen im Scheinwerferlicht. Viele. {creature}, {mood} und schnell.|Etwas frisst am Straßenrand. Als das Licht es trifft, hebt es den Kopf. Dann noch einer.",
-   "answers": "durchbrechen, kaempfen, schleichen, warten",
+   "answers": "reflex_ausweichen, ava_scheinwerfer, dachgeschuetz_feuer, durchbrechen, kaempfen, schleichen, warten",
    "moods": "hungrig, nervoes",
    "loot": "mutanten_beute"
   },
@@ -172,7 +172,7 @@
    "weight": 2,
    "danger": 1,
    "text": "Am Horizont wächst eine braune Wand. Sie kommt schneller als du.|Der Himmel wird rot, dann braun. AvA meldet Windböen „jenseits von Spaß“.",
-   "answers": "warten, durch_sturm, umweg",
+   "answers": "ava_scheinwerfer, warten, durch_sturm, umweg",
    "moods": ""
   },
   {
@@ -184,7 +184,7 @@
    "weight": 2,
    "danger": 2,
    "text": "Eine Signalfackel mitten auf der Straße. Hilferuf oder Köder.|Rotes Licht flackert über den Asphalt. Daneben {n} Gestalten, {mood}.",
-   "answers": "nachsehen, durchbrechen, umweg",
+   "answers": "optik_falle, nachsehen, durchbrechen, umweg",
    "moods": "verzweifelt, gierig",
    "loot": "pluenderer_beute",
    "gang": "any",
@@ -199,7 +199,7 @@
    "weight": 1,
    "danger": 3,
    "text": "Helme, Scanner, Formulare. „Fahrzeugpapiere und Lebenslauf, bitte.“|Eine mobile Kontrollstelle. Das Bureau sucht {cargo}. Oder einen Vorwand.",
-   "answers": "gebuehr, papiere_faelschen, umweg",
+   "answers": "onkel_redet, gebuehr, papiere_faelschen, umweg",
    "moods": "gelangweilt, misstrauisch",
    "loot": "pluenderer_beute"
   },
@@ -212,7 +212,7 @@
    "weight": 2,
    "danger": 1,
    "text": "Ein Hang ist abgerutscht. Die Straße nach {place} ist dicht.|Felsbrocken, so groß wie dein Van. Irgendwer hat schon angefangen zu graben und aufgegeben.",
-   "answers": "wegraeumen, umweg",
+   "answers": "cyberarm_raeumt, wegraeumen, umweg",
    "moods": ""
   },
   {
@@ -241,7 +241,7 @@
    "gang": "any",
    "rep": [-100, -60],
    "text": "Dein Gesicht hängt an jeder Tankstelle der {gang}. Jetzt stehen {n} von ihnen auf der Straße.|„Da ist sie!“ Die {gang} haben auf dich gewartet.",
-   "answers": "schutzgeld, durchbrechen, kaempfen, umweg",
+   "answers": "dachgeschuetz_feuer, rammbock, schutzgeld, durchbrechen, kaempfen, umweg",
    "loot": "pluenderer_beute"
   },
   {
@@ -256,7 +256,7 @@
    "gang": "any",
    "rep": [-19, 100],
    "text": "Am Rand liegt einer mit dem Zeichen der {gang} und winkt mit einer Fackel. Bein im falschen Winkel.",
-   "answers": "verarzten, mitnehmen_gang, weiterfahren"
+   "answers": "ripperdoc_flickt, verarzten, mitnehmen_gang, weiterfahren"
   },
   {
    "figures": "schuetze, pistolero",
@@ -1048,6 +1048,117 @@
    "result": "Ein Griff, ein Sprint, der Motor läuft schon.",
    "failResult": "Sie erwischen dich am Rig. Das Stück hast du, ein paar Rippen weniger.",
    "flag": "silo_k5"
+  },
+  {
+   "id": "schraube_flickt",
+   "label": "Schraube ranlassen",
+   "when": "any",
+   "hours": 1,
+   "deltas": 45,
+   "rep": 8,
+   "needCompanion": "schraube",
+   "result": "Schraube flucht, schraubt, singt. Der Motor springt an, die Leute staunen.|„Wer hat denn DAS verkabelt?“ Zehn Minuten später läuft die Kiste."
+  },
+  {
+   "id": "onkel_redet",
+   "label": "Onkel Sung reden lassen",
+   "when": "any",
+   "hours": 0.5,
+   "rep": 10,
+   "needCompanion": "onkel_sung",
+   "result": "Onkel erzählt von einer Suppe, einem Krieg und einer Frau. Am Ende lachen alle und winken dich durch.|Zwei Sätze von Onkel, und die Waffen zeigen auf den Boden."
+  },
+  {
+   "id": "optik_falle",
+   "label": "Optik scannt die Straße",
+   "when": "any",
+   "needWear": "eyes",
+   "result": "Wärmesignaturen hinter den Felsen. Du nimmst die andere Spur, bevor es knallt.|Das Augen-Implantat markiert Stolperdrähte in Rot. Kein Problem mehr."
+  },
+  {
+   "id": "reflex_ausweichen",
+   "label": "Auf die Reflexe verlassen",
+   "when": "any",
+   "fuel": 1,
+   "needWear": "nerves",
+   "result": "Die Welt wird langsam, Leyla lenkt durch die Lücke. Nichts trifft.|Ein Zucken im Nacken, ein Ruck am Lenkrad, durch."
+  },
+  {
+   "id": "cyberarm_raeumt",
+   "label": "Mit dem Cyberarm wegheben",
+   "when": "any",
+   "hours": 0.5,
+   "needWear": "arm",
+   "result": "Ein Brocken nach dem anderen fliegt in den Graben. Servos summen zufrieden."
+  },
+  {
+   "id": "rammbock",
+   "label": "Mit Panzerung durchrammen",
+   "when": "hostile",
+   "fuel": 2,
+   "health": 5,
+   "loot": "situation",
+   "rep": -10,
+   "needRigSlot": "armor",
+   "result": "Blech gegen Blech, und deins ist dicker.|Die Sperre zerbricht wie Pappe."
+  },
+  {
+   "id": "dachgeschuetz_feuer",
+   "label": "Dachgeschütz sprechen lassen",
+   "when": "hostile",
+   "loot": "situation",
+   "risk": 10,
+   "failHealth": 10,
+   "rep": -20,
+   "needRigPart": "dachgeschuetz",
+   "result": "Eine Salve über die Köpfe, dann ist die Straße frei.|Das Geschütz dreht sich. Mehr braucht es nicht.",
+   "failResult": "Sie schießen zurück, aber nicht lange."
+  },
+  {
+   "id": "ava_scheinwerfer",
+   "label": "AvA leuchtet den Weg",
+   "when": "any",
+   "needWear": "bow",
+   "result": "AvAs Bug-Scheinwerfer schneidet durch Staub und Dunkel. Die Augen da draußen weichen zurück."
+  },
+  {
+   "id": "ava_greifarm",
+   "label": "AvA angelt Teile",
+   "when": "any",
+   "hours": 0.5,
+   "loot": "situation",
+   "needItem": "greifarm",
+   "result": "Der Greifarm fischt Platinen aus dem Wrack, ohne dass Leyla aussteigen muss."
+  },
+  {
+   "id": "fuer_alle_kochen",
+   "label": "Für alle kochen",
+   "when": "friendly",
+   "hours": 1,
+   "food": 1,
+   "deltas": 30,
+   "rep": 10,
+   "needWorkshop": "kitchen",
+   "result": "Die Kochnische dampft, Fremde werden zu Gästen. Sie zahlen sogar.|Ein Topf Eintopf, zehn neue Freunde."
+  },
+  {
+   "id": "ripperdoc_flickt",
+   "label": "Auf der Ripperdoc-Liege versorgen",
+   "when": "any",
+   "hours": 1,
+   "rep": 15,
+   "deltas": 40,
+   "needWorkshop": "cyber",
+   "result": "Ein neues Gelenk, ein dankbares Grinsen. Das spricht sich rum."
+  },
+  {
+   "id": "drohne_zerlegen",
+   "label": "In der Drohnenwerkstatt zerlegen",
+   "when": "any",
+   "hours": 1,
+   "loot": "situation",
+   "needWorkshop": "drone",
+   "result": "Auf der Werkbank ergibt das Wrack doppelt so viele Teile."
   }
  ],
  "words": {
