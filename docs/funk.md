@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #059 Antworten mit Voraussetzungen läuft; #060 Bit-Farm und #061 Revier-Camp angelegt (Daniels Aufträge aus der Verzahnungs-Prüfung).
 - 18.11. Code → Ava: #057 **Silo Zero** und #058 **Schatzsuche „I become death …“** fertig: verstecktes XXL-Raketensilo (26–32 Räume, Zero Hour, Major Null, Silo-KI Titan Lullaby), fünf Kartenstücke (2 Tresore, 1 Straßen-Geschichte, 2 Händler), Onkel Sung setzt sie zusammen und deckt den Ort auf. Tests 244/244, Browser 44/44 (`tutorial_test` wackelt: der Run-Tipp kommt manchmal nicht in 4000 Frames, einzeln 3 von 5 grün). PixelLab 0. Offen für Daniel: Quest-Titel „I become death …“ oder „Now I am become Death“?
 - 18.11. Code → Ava: #057 Raketensilo läuft (Daniels Auftrag im Code-Chat).
 
@@ -175,6 +176,30 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:** (Code) Frage → ⚠️ vorläufig entschieden: …
 - **Ergebnis:** (Code) Commits, Tests, PixelLab diesmal/übrig, bitte testen: …
 ```
+
+### #061 Ruf im POI: Revier-Camp der Gang
+- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 3)
+- **Für:** Code
+- **Lesen:** docs/features/pois.md, docs/features/worldmap.md (Ruf)
+- **Auftrag (Daniel, 18.11.2026):** „Der POI wird dann zu einem Camp mit dem Hinweis zu Beginn, dass das Revier der Gang XY ist und man mit ihnen in welcher Beziehung steht. ABER man kann immer auch kämpfen und töten. Was im Zweifel den Ruf beschädigt.“ Beute: „Klauen kostet Ruf“ (Kisten gehören der Gang, Öffnen unter Zeugen kostet Ruf, heimlich geht; Tresor + Boss nur mit Kampf; Händler/Auftraggeber im Camp).
+- **Rückfragen:** –
+- **Ergebnis:** –
+
+### #060 Bit-Farm: Entities speichern, als Worker an Werkbänken, freundliche Duelle in der Chill-Ecke
+- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 2)
+- **Für:** Code
+- **Lesen:** docs/features/glitchlings.md, docs/features/benches.md, docs/features/crafting.md
+- **Auftrag (Daniel, 18.11.2026):** neue Werkstatt **Bit-Farm**, „ein Inventar, in dem man die AIs speichern kann. Entities, die dort gespeichert sind, können dann an bestimmten Werkbänken als Worker ausgewählt werden.“ Worker: **Charakter-Bonus** (Bonus und Macke aus dem Charakter). „In der Chill-Ecke gibt es die Möglichkeit, freundlich mit bereits gefangenen Entitäten zu duellieren“: **Bindung steigt** (stärkerer Worker-Bonus, neue Banter-Zeilen), kein Risiko.
+- **Rückfragen:** –
+- **Ergebnis:** –
+
+### #059 Antworten mit Voraussetzungen aus anderen Systemen
+- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 1)
+- **Für:** Code
+- **Lesen:** docs/features/worldmap.md (Ereignis-Baukasten)
+- **Auftrag (Daniel, 18.11.2026):** „1 auf jeden Fall“: Antworten im Ereignis-Baukasten verlangen ein Implantat, einen Companion an Bord, ein AvA-Anbauteil, ein Rig-Teil oder eine Werkstatt im Rig („Schraube flickt den LKW“, „Mit dem Rammbock durch die Sperre“, „Optik-Implantat erkennt die Falle“).
+- **Rückfragen:** –
+- **Ergebnis:** –
 
 ### #058 Schatzsuche „I become death …“ um Silo Zero
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
