@@ -19,6 +19,7 @@ import { brandDiscount, influencer } from './brand_perks.js';
 import { gangs, repOf, levelOf, gangOfPlace, repPrice } from './reputation.js';
 import { NEED_KEYS, hasNeeds, needBlocked, needTag } from './needs.js';
 import { ok as condOk } from './conditions.js';
+import { pay, earn } from './pricing.js';
 
 const pick = (r, a) => a[Math.floor(r() * a.length) % a.length];
 const variants = s => String(s || '').split('|').map(x => x.trim()).filter(Boolean);
@@ -103,14 +104,15 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
   const locked = save ? A.find(a => hasNeeds(a) && needBlocked(D, save, a)) : null;
   if (A.length > C.maxAnswers) { const keep = A.slice(0, C.maxAnswers); if (!keep.some(free)) { const f = A.find(free); if (f) keep[keep.length - 1] = f; } A = keep; }
   if (locked && !A.includes(locked)) A.push(locked);   // one closed door as a teaser: what a crew member, implant or rig part would open
-  const k = 1 + C.scale * (danger - 1), price = (M?.price ?? 100) / 100 * repPrice(D, save, gang), riskAdd = M?.risk ?? 0;
+  const k = 1 + C.scale * (danger - 1), riskAdd = M?.risk ?? 0;
   const inChain = !!chain || A.some(a => a.next);
   const options = A.map(a => {
     const o = { answer: a.id };
     for (const f of ['hours', 'fuel', 'food']) if (a[f]) o[f] = a[f];
-    if (a.deltas) o.deltas = Math.round(a.deltas < 0 ? a.deltas * price * k : a.deltas * k / price);
-    const brand = a.brand || D.items?.[a.item]?.brand || null, off = o.deltas < 0 && save ? brandDiscount(D, save, brand) : 1;   // #064 Influencer: cheaper at this brand
-    if (off < 1) { o.deltas = Math.round(o.deltas * off); o.influencer = brand; }
+    // #069 one price function: Ruf of the gang, mood, danger, Influencer of the brand (#064)
+    const brand = a.brand || D.items?.[a.item]?.brand || null, P = { gang, mood: M?.price ?? 100, danger, scale: C.scale, brand };
+    if (a.deltas) o.deltas = a.deltas < 0 ? pay(D, save, a.deltas, P) : earn(D, save, a.deltas, P);
+    if (o.deltas < 0 && brand && save && brandDiscount(D, save, brand) < 1) o.influencer = brand;
     if (a.health) o.health = Math.round(a.health * k);
     if (a.use) { o.use = a.use; o.useCount = a.useCount || 1; }
     if (a.item) { o.item = a.item; o.count = a.count || 1; }

@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #069 **Preise bündeln** fertig (eine Preis-Funktion für Straße und Revier-Handel, gleiche Zahlen). #070 läuft.
 - 18.11. Code → Ava: #068 **Eine Bedingungs-Sprache** fertig (Merker, Tag, Crew & Rig gleich für Antworten, Lagen, Quests). #069 läuft.
 - 18.11. Code → Ava: #067 **Effekt-Leiste** fertig (Buffs, Influencer, Strom, Markentreue, Worker, Wetter, Revier-Frieden als Chips im HUD); `tutorial_test`-Wackler behoben. #068 läuft.
 - 18.11. Code → Ava: #066 **Boni-Bus** fertig (alle Camp-Boni an einem Ort, mit Herkunft in den Menüs, gleiche Zahlen). #067 läuft.
@@ -222,7 +223,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** –
 
 ### #070 Meldungs-Kanal mit Vorrang und Logbuch
-- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 5)
+- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 5)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 5 der Eleganz-Prüfung)
 - **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
@@ -230,12 +231,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** –
 
 ### #069 Preise bündeln: eine Preis-Funktion
-- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 3)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 3)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 3 der Eleganz-Prüfung)
 - **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: gerundet wird vor dem Influencer-Nachlass (so zeigte es die Straße schon); im Revier-Handel heißt das mit Influencer höchstens 1 Δ Unterschied; der Bau-Modus (Werkstätten, Container, Rig-Teile) hat keine Marken und bleibt bei seinem Preis.
+- **Ergebnis:** (Code) Commit „Preise bündeln (#069)“ auf `main`. Neu `game/pricing.js` (`pay`, `earn`, `factors`, `factorText`), umgestellt Antworten unterwegs (inkl. Markenstand) und Revier-Handel. `npm test` 266/266 (neu `test/pricing.test.js` vergleicht mit der alten Formel), Browser 46/46. PixelLab 0.
 
 ### #068 Eine Bedingungs-Sprache für Ereignisse, Quests, Händler
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 2)

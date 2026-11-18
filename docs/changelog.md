@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 18.11.2026: **Preise bündeln** (#069): Ruf, Stimmung, Gefahr und Influencer in einer Preis-Funktion; Straße und Revier-Handel rechnen gleich.
 - 18.11.2026: **Eine Bedingungs-Sprache** (#068): Antworten, Lagen und Quests prüfen Merker, Tag, Crew und Rig mit derselben Logik; die Werkstatt bietet die Crew-&-Rig-Felder überall an.
 - 18.11.2026: **Effekt-Leiste** (#067): alles, was gerade wirkt (Buffs, Influencer, Strom-Boost, Markentreue, Worker, Wetter, Frieden im Revier), als Chips im HUD statt der alten Buff-Zeile; der wackelige Feldhandbuch-Test ist jetzt verlässlich.
 - 18.11.2026: **Boni-Bus** (#066): alle Camp-Boni (Trophäen, Synergie, Worker, Markentreue) an einem Ort; Hydrokultur, Schlafkoje und Chill-Ecke zeigen, woher ihr Bonus kommt.
