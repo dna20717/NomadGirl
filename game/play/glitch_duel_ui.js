@@ -60,7 +60,7 @@ export class GlitchDuelUI {
   }
   endExtra() {
     const r = this.result, where = { deck: 'ins Cyberdeck', backpack: 'in den Rucksack', camp: 'ins Camp-Lager' };
-    return [r?.won && !this.foe.hunter ? el('small', { class: 'gd-caught' }, r.caught ? `${this.foe.name} ist ${where[r.caught]} gewandert.` : 'Kein Platz: er ist entwischt.') : null,
+    return [r?.won && !this.foe.hunter ? el('small', { class: 'gd-caught' }, r.caught ? `${this.foe.name} ist ${where[r.caught]} gewandert.` : 'Kein Platz: sie ist entwischt.') : null,
       el('button', { class: 'inv-btn gd-go on', onclick: () => this.close() }, icon('arrow_right', 16), ' Weiter')];
   }
   // pad (scene.padMenus): only when no keyboard key is down (the keyboard comes through the keydown above)

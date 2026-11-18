@@ -9,6 +9,10 @@ Neuer Code nimmt die Wörter aus dieser Liste. Die Grundbegriffe (Werkstatt, Pr�
 | Werkstatt (Daten-Editor) | workshop |
 | Werkstatt (Raum im Rig) | workshop (Daten: `workshops`) |
 | Bereich | area |
+| die Entity (früher Glitchling, KI mit Macken) | glitchling (Kennungen bleiben) |
+| Charakter (einer Entity) | character |
+| Banter (Sprüche im Duell) | banter |
+| Pipeline (Spalte im Bit-Stapel) | pipe |
 | Feld | field |
 | Prüfung | validation |
 | Spieldaten | data |

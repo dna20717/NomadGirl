@@ -30,7 +30,7 @@ export function effectOf(C, talent, bits, own = true) {
 }
 const make = (C, o) => {
   const t = C.talents.find(x => x.name === o.talent) || C.talents[0] || {}, e = effectOf(C, t, o.bits);
-  return { id: slug(o.name), name: o.name, unique: !!o.unique, talent: t.name || '', function: t.function || null, also: t.also || null, brand: o.brand || t.brand || null, bits: o.bits,
+  return { id: slug(o.name), name: o.name, unique: !!o.unique, talent: t.name || '', function: t.function || null, also: t.also || null, brand: o.brand || t.brand || null, character: o.character || null, bits: o.bits,
     effect: e.text, stat: e.stat, value: e.value, quirk: o.quirk || '', quirkKind: o.quirkKind || null, wish: o.wish || '', home: o.home || '', description: o.description || '' };
 };
 

@@ -178,7 +178,7 @@ export async function startDuel(root, switchTo = null) {
     const row = side => el('div', { class: 'dl-row ' + side }, ...d.fighters.filter(f => f.side === side).map(card));
     root.replaceChildren(setup(),
       el('div', { class: 'dl-board' }, row('enemy'), el('div', { class: 'dl-mid' }, status(), tray(), actionsBar()), row('player')),
-      el('p', { class: 'dl-rules' }, 'Abwechselnd ist jede Seite mit einem Entity dran. ', el('b', {}, 'Sicherer Angriff'), ': würfeln, das Ziel schlägt nicht zurück. ', el('b', {}, 'Harter Angriff'), ': meist mehr Würfel, aber das Ziel schlägt zurück. ',
+      el('p', { class: 'dl-rules' }, 'Abwechselnd ist jede Seite mit einer Entity dran. ', el('b', {}, 'Sicherer Angriff'), ': würfeln, das Ziel schlägt nicht zurück. ', el('b', {}, 'Harter Angriff'), ': meist mehr Würfel, aber das Ziel schlägt zurück. ',
         el('b', {}, 'Stabilisieren'), ': kein Angriff, beendet das Flackern. Jeder Würfel ab „trifft“ ist ein Treffer, jeder Treffer wird abgewehrt mit einem Würfel ab „hält“. Die Balken sind die Integrität. Bei halber Integrität ein Selbsttest: misslungen = flackert (nur Stabilisieren, kein Gegenschlag).'));
   }
   newGame();

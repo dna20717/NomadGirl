@@ -8,7 +8,7 @@ import { loadProject } from '../engine/project.js';
 import { nodeLoader } from '../tools/loader.js';
 
 const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
-test('Bewohner: gleicher Ort = gleicher Entity, keine Unikate, Gefangene kommen nicht wieder', () => {
+test('Bewohner: gleicher Ort = gleiche Entity, keine Unikate, Gefangene kommen nicht wieder', () => {
   const s = newSave(D);
   const a = foeFor(D, s, 'tankstelle_km7:3:sw0'), b = foeFor(D, s, 'tankstelle_km7:3:sw0');
   assert.equal(a.name, b.name); assert.ok(!a.unique);

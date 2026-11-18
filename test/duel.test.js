@@ -12,7 +12,7 @@ const seq = (...v) => { let i = 0; return () => v[i++ % v.length]; };   // dice:
 const die = f => (f - 1) / 6 + 0.01;
 const mk = (o = {}) => ({ kind: 'glitchling', id: 'x', name: 'X', quality: 4, defense: 4, tough: 3, remote: 1, link: 2, ...o });
 
-test('Werte aus dem Entity: Präzision nach Bits, Abschirmung nach Hersteller, Integrität = Bits + 1, Impulse nach Begabung', () => {
+test('Werte aus der Entity: Präzision nach Bits, Abschirmung nach Hersteller, Integrität = Bits + 1, Impulse nach Begabung', () => {
   const amber = generate(D, 1).find(g => g.name === 'Amber Slay'), s = statsOf(D, amber);
   assert.equal(s.quality, 4); assert.equal(s.defense, D.glitchlings.duel.defense[D.brands.vulkan.tier]); assert.equal(s.tough, 5);
   assert.deepEqual([s.remote, s.link], [2, 3]);

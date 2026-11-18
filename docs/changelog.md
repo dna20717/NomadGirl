@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 18.11.2026: **Die Entity, Charaktere und Banter**: Artikel „die Entity“ überall; jede KI hat einen Charakter (8 allgemeine + Amber Slay, Marble Sting, Kammerjäger, AvA) mit Sprüchen je Duell-Moment, als Sprechblasen im Duell (Demo, Spiel, mobil).
 - 17.11.2026: **Bit-Stapel: sichtbar, warum Bits verschwinden**: rote Rahmen am legenden und an den gelöschten Bits, beide Pipelines verbunden, die gelöschten zersplittern, Schild „gleiche Zahl → gelöscht“ (Demo, Spiel, mobil).
 - 17.11.2026: **Bit-Stapel mobil: Haptik und Wischen**: Vibrationsmuster je Ereignis (Android; iOS-Tick beim eigenen Tippen), abschaltbar; nach oben wischen schickt sofort; Pipelines geben unter dem Finger nach.
 - 17.11.2026: **Bit-Stapel mobil** unter /mobile: Hochformat, große Pipelines, erst tippen = Vorschau, nochmal = schicken; passt von iPhone SE bis Pixel 5.
@@ -11,7 +12,7 @@ Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge o
 - 17.11.2026: **Bit-Stapel: eine KI, drei Pipelines, Cyberpunk-Look**: je Seite ein AI-Core (vor dem Duell wählbar), Neon-Pipelines mit Datenfluss, Kopfzeilen mit Porträt, Integrität und Feuer, das Bit rollt wie ein Spielautomat ein.
 - 17.11.2026: **Bit-Stapel mit Dauerfeuer**: 50 Integrität, Paare und Drillinge schaden jeden Zug, bis sie zerstört werden, Lieblingsbit obendrauf; Heilen und Summe bleiben umschaltbar.
 - 17.11.2026: **Bit-Stapel mit Integrität**: wer die Integrität des anderen zuerst auf 0 bringt, gewinnt; gleiche Bits heilen, zerstörte Bits schaden, volle Spalten laufen über; Lebensleisten in der Mitte, Summe umschaltbar.
-- 17.11.2026: **Bastler-Deck mit einem AI-Core-Platz** (Daniel: Einstiegs-Deck = ein Entity, teure Decks zwei oder drei, Wahl vor dem Duell).
+- 17.11.2026: **Bastler-Deck mit einem AI-Core-Platz** (Daniel: Einstiegs-Deck = eine Entity, teure Decks zwei oder drei, Wahl vor dem Duell).
 - 17.11.2026: **Bit-Stapel** (#051): neues Glitch-Duell nach dem Knucklebones-Prinzip unter /duel (drei Spalten je Seite, gleiche Bits multiplizieren, Lieblingsbit doppelt, gleiche Bits drüben zerstören), ein Klick je Zug, rund 40–60 s; das Gefecht bleibt als „Gefecht (alt)“.
 - 17.11.2026: **Glitch-Duell mit sprechenden Namen**: Sicherer Angriff, Harter Angriff, Stabilisieren (mit Unterzeile), Karten „trifft · hält · sicher · hart“, Gegenschlag; Ladefehler stehen auf der Seite.
 - 17.11.2026: **NomadCola-Sachen in Seitenansicht** (Daniel: „Perspektive nicht orthogonal genug“): Automaten, Kühlboxen, Kisten, Sechserpack neu von PixelLab streng von vorn/der Seite; dazu Neon-Automat (Deko + Clutter), vernagelter Automat, Kistenstapel.
@@ -20,8 +21,8 @@ Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge o
 - 17.11.2026: **AtomCola heißt jetzt NomadCola** (Marke, Logo-Datei, Texte; alte Reisekarten werden beim Laden umbenannt).
 - 17.11.2026: **Glitch-Duell als Demo** (#050) unter /duel: Kern von OPR Firefight als Kartenspiel (Präzision, Abschirmung, Integrität, Impulse; Einflüstern, Verschränken, Kalibrieren; Selbsttest und Flackern), Code-Porträts als Karten, Würfel aus Code, KI für beide Seiten, Kammerjäger, 1000× simulieren.
 - 17.11.2026: **Entities mit Hersteller, Cyberdeck als Entity-Fach** (#049): jede KI hat eine Marke (nach Begabung, Markenschild im Tooltip); das Cyberdeck trägt Entities in eigenen Plätzen (Bastler-Deck: 2) statt im Rucksack; ältere Spielstände bekommen einmal ein Bastler-Deck, Amber Slay zieht ein.
-- 17.11.2026: **Ein Entity im Inventar** (#048): Amber Slay liegt als Gegenstand mit laufendem Code-Porträt im Rucksack (einmal je Spielstand), Tooltip mit Begabung, Effekt, Macke und Wunsch; Entscheidungen zum anderen Ende.
-- 17.11.2026: **Entity-Code-Porträts** (#048): jeder Entity ein eigenes animiertes Gesicht auf einem kleinen Bildschirm, ganz aus Code (Farbe, Augen, Mund, Form, Zubehör je Begabung, Lämpchen je Bit, Glitches je Macke, Goldrand für Unikate), in der Werkstatt-Vorschau und bereit als Item-Bild; neue Begabung **Archäologe** (Warroom zeigt Unikat-Beute); das andere Ende „AvA wird ein Glitchling“ im Design.
+- 17.11.2026: **Eine Entity im Inventar** (#048): Amber Slay liegt als Gegenstand mit laufendem Code-Porträt im Rucksack (einmal je Spielstand), Tooltip mit Begabung, Effekt, Macke und Wunsch; Entscheidungen zum anderen Ende.
+- 17.11.2026: **Entity-Code-Porträts** (#048): jede Entity ein eigenes animiertes Gesicht auf einem kleinen Bildschirm, ganz aus Code (Farbe, Augen, Mund, Form, Zubehör je Begabung, Lämpchen je Bit, Glitches je Macke, Goldrand für Unikate), in der Werkstatt-Vorschau und bereit als Item-Bild; neue Begabung **Archäologe** (Warroom zeigt Unikat-Beute); das andere Ende „AvA wird ein Glitchling“ im Design.
 - 17.11.2026: **Entity-Generator** (#047): Werkstatt-Bereich mit Bausteinen (Namen aus zwei Wörtern wie „Marble Sting“, Begabungen mit Werkbank-Effekten, Macken, Wünsche, Wohnorte, Stärke 1–5 Bits, Unikate Amber Slay und Marble Sting), Generator je Durchgang, Vorschau mit „Neu würfeln“.
 - 16.11.2026: **Waffen mit Hersteller**: alle 12 Waffen haben eine Marke (Crow & Sons, Delta Bureau of Order, Mile King, Vulkan, Ghostwire, Backalley Chrome); Qualität wirkt auf den Schaden, Markenschild im Tooltip.
 - 16.11.2026: **Marken-Logos und Markenschild** (#046): sieben neue Logos (PixelLab), alle 15 Marken im Logo-Raster; Tooltips von Implantaten und Färbemitteln zeigen oben Logo, Name und Slogan des Herstellers, die Werte mit Qualität.

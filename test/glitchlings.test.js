@@ -44,7 +44,7 @@ test('Macken wiederholen sich in einem Durchgang nicht, solange es genug gibt', 
 // Code portraits (#048, game/glitch_face.js): same Entity = same face, every one its own, they move, unique ones have a gold rim
 import { renderFace, faceOf, SIZE, WEARS } from '../game/glitch_face.js';
 const key = px => Buffer.from(px).toString('base64');
-test('Code-Porträt: gleich bleibt gleich, jeder Entity hat sein eigenes Gesicht', () => {
+test('Code-Porträt: gleich bleibt gleich, jede Entity hat sein eigenes Gesicht', () => {
   const list = [...generate(D, 3), ...generate(D, 4)];
   assert.equal(key(renderFace(list[2], 1.1)), key(renderFace(list[2], 1.1)));
   const faces = new Set(list.map(g => key(renderFace(g, 0.2))));
@@ -85,7 +85,7 @@ test('Geschenk: ein alter Spielstand bekommt einmal Amber Slay als Entity, er bl
 // #049 (Daniel, 17.11.2026): „KIs brauchen einen Hersteller“; „Man muss sie nicht im Inventar transportieren, wenn man ein Cyberdeck hat“
 import { brandOf } from '../game/glitchlings.js';
 import { deckSize, fitDeck, DECK } from '../game/save.js';
-test('Jeder Entity hat einen Hersteller (Unikate auch einen eigenen)', () => {
+test('Jede Entity hat einen Hersteller (Unikate auch einen eigenen)', () => {
   const list = generate(D, 11);
   for (const g of list) assert.ok(D.brands[g.brand], `${g.name} ohne Hersteller`);
   assert.equal(list.find(g => g.name === 'Marble Sting').brand, 'kessler');

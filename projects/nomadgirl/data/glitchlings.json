@@ -186,7 +186,8 @@
    "wish": "Lass mich in eine Waffe, die schon jemanden gerettet hat.",
    "home": "Schließfach eines Pfandhauses",
    "always": true,
-   "description": "Ein Waffenmeister-Entity aus der Zeit, als Vulkan noch Jagdgewehre baute. Höflich, gefährlich, sentimental."
+   "description": "Eine Waffenmeister-Entity aus der Zeit, als Vulkan noch Jagdgewehre baute. Höflich, gefährlich, sentimental.",
+   "character": "amber_slay"
   },
   {
    "name": "Marble Sting",
@@ -196,8 +197,9 @@
    "wish": "Bring mich auf Ebene 40 zurück. Ich muss jemanden um Verzeihung bitten.",
    "home": "OP-Lampe einer verlassenen Klinik",
    "always": true,
-   "description": "Ein alter Chirurgie-Entity von Kessler. Präzise, kühl, und er weiß etwas über die Kinder in den Tanks.",
-   "brand": "kessler"
+   "description": "Eine alte Chirurgie-Entity von Kessler. Präzise, kühl, und sie weiß etwas über die Kinder in den Tanks.",
+   "brand": "kessler",
+   "character": "marble_sting"
   }
  ],
  "bitWeights": [{"w": 40},{"w": 30},{"w": 18},{"w": 9},{"w": 3}],
@@ -228,5 +230,164 @@
   {"id": "watchdog", "name": "Watchdog", "brand": "vulkan", "quality": 4, "defense": 4, "tough": 4, "remote": 1, "link": 3, "description": "Beißt erst, fragt nie."},
   {"id": "tollbooth", "name": "Tollbooth", "brand": "kilometerkoenig", "quality": 5, "defense": 5, "tough": 3, "remote": 2, "link": 2, "description": "Jeder Bit kostet Maut."},
   {"id": "bleach", "name": "Bleach", "brand": "neurolux", "quality": 4, "defense": 5, "tough": 2, "remote": 3, "link": 1, "description": "Macht weiß, was vorher bunt war."}
- ]
+ ],
+ "characters": [
+  {
+   "id": "grossmaul",
+   "name": "Großmaul",
+   "description": "Prahlt mit allem, verliert ungern, gibt nie zu, dass es knapp war.",
+   "start": "Ich hab schon Firewalls zum Weinen gebracht. | Bereit für eine Lektion, Blechkopf? | Mach dich auf was gefasst. Ich bin quasi Legende.",
+   "fire": "Spürst du das? Das ist Qualität. | Paar-Feuer! Ich bin einfach zu gut. | Zack, Treffer. Wie immer.",
+   "wipe": "Weg damit. Brauchtest du eh nicht. | Gelöscht! Sag Danke. | Das war mein Bit. Und jetzt ist deins weg.",
+   "wiped": "Das … war Absicht. | Pff. Hatte ich eh zu viele. | Glück gehabt. Reines Glück.",
+   "overflow": "Zu viel Talent für drei Pipelines. | Upps. Speicher voll. Liegt an meiner Größe.",
+   "low": "Ich lass dich nur rankommen. Spannung und so. | Jetzt wird es erst richtig interessant!",
+   "win": "Wie erwartet. Autogramm? | Erzähl allen, wer dich überschrieben hat.",
+   "lose": "Revanche! Das Spiel war kaputt! | Ich war … abgelenkt."
+  },
+  {
+   "id": "diva",
+   "name": "Diva",
+   "description": "Theatralisch, eitel, will ein Publikum. Jeder Zug ist eine Szene.",
+   "start": "Licht an. Die Bühne gehört mir, Schätzchen. | Oh, ein Duell? Endlich jemand, der mich ansieht. | Bitte nicht zu sehr glänzen, ich blende schnell.",
+   "fire": "Applaus! Ich nehme auch Blumen. | Hast du das gesehen? Natürlich hast du. | Ein Paar, so elegant wie ich.",
+   "wipe": "Abgang, Liebling. Die Szene braucht dich nicht. | Wie unschön. Weg damit. | Pardon, das war mein Auftritt.",
+   "wiped": "Wie … vulgär. | Mein Bit! Mein armes, hübsches Bit! | Das wird ein Nachspiel haben.",
+   "overflow": "Zu viel Glanz für so wenig Speicher. | Ich bin einfach zu viel für diese Bühne.",
+   "low": "Das ist mein dramatischer dritter Akt. | Ich falle nur stilvoll.",
+   "win": "Vorhang. Verbeugung. Du darfst klatschen. | Ich wusste, dass ich gewinne. Das Licht stand gut.",
+   "lose": "Unerhört. Mein Agent wird davon hören. | Ich sterbe so schön …"
+  },
+  {
+   "id": "philosoph",
+   "name": "Philosoph",
+   "description": "Grübelt über Sein und Bit. Gewinnt und verliert mit derselben Ruhe.",
+   "start": "Ist ein Duell nicht nur ein Gespräch mit Würfeln? | Wir sind beide nur Muster im Rauschen. | Beginnen wir. Oder hat es längst begonnen?",
+   "fire": "Wiederholung erzeugt Bedeutung. | Zwei gleiche Gedanken sind stärker als einer. | Ich feuere, also bin ich.",
+   "wipe": "Alles Gleiche hebt sich auf. | Auch dein Bit war nur ein Augenblick. | Vergänglichkeit, schön, nicht wahr?",
+   "wiped": "Was ist schon ein Bit? | Ich hänge nicht an Zahlen. | Interessant. Weiter.",
+   "overflow": "Zu viel Wissen ist auch eine Last. | Leere ist der Anfang von allem.",
+   "low": "Das Ende ist nur ein weiterer Zustand. | Ich spüre die Grenzen meines Codes.",
+   "win": "Du hast mir viel beigebracht. Danke. | Ein Sieg ist nur ein Moment.",
+   "lose": "Auch das Verlieren hat Würde. | Ich werde darüber nachdenken. Lange."
+  },
+  {
+   "id": "nervenbuendel",
+   "name": "Nervenbündel",
+   "description": "Ängstlich, überfordert, entschuldigt sich ständig. Kann trotzdem zubeißen.",
+   "start": "Oh nein, oh nein, ein Duell? | Ich wollte doch nur in meinem Automaten wohnen … | Bitte sei nett. Bitte.",
+   "fire": "Hat das … funktioniert? Es hat funktioniert! | Entschuldigung! Das wollte ich so … glaub ich. | Huch, ich treffe ja.",
+   "wipe": "Tut mir leid, tut mir leid! | Das war nicht persönlich gemeint! | Oh. Oh! Weg ist es.",
+   "wiped": "Nein! Nicht das! | Ich wusste, dass das passiert. | Ich hab doch gesagt, bitte sei nett.",
+   "overflow": "Zu viel! Alles zu viel! | Mein Speicher! Hilfe!",
+   "low": "Ich halt das nicht aus … | Mir wird ganz flackrig.",
+   "win": "Ich … hab gewonnen? Wirklich? | Entschuldigung fürs Gewinnen.",
+   "lose": "Ich hab es doch gewusst. | Darf ich jetzt nach Hause?"
+  },
+  {
+   "id": "buerokrat",
+   "name": "Bürokrat",
+   "description": "Liebt Regeln, Formulare und Ordnung. Jede Löschung ist ein Verwaltungsakt.",
+   "start": "Duell beantragt. Bearbeitungszeit: ein Zug. | Bitte halten Sie Ihre Bits bereit. | Formular D-17, Abschnitt Glitch. Wir beginnen.",
+   "fire": "Gebühr fällig. Wird automatisch abgebucht. | Paar ordnungsgemäß eingereicht. | Säumniszuschlag.",
+   "wipe": "Ihr Bit wurde aus dem Register entfernt. | Abgelehnt. Nächster. | Vorgang geschlossen.",
+   "wiped": "Das war nicht vorschriftsgemäß! | Ich lege Widerspruch ein. | Das muss ich melden.",
+   "overflow": "Ablage voll. Archivierung erfolgt. | Speicherkontingent überschritten.",
+   "low": "Mein Bestand ist kritisch. Antrag auf Nachschub läuft. | Das ist ein Verfahrensfehler.",
+   "win": "Duell abgeschlossen. Ergebnis zu Ihren Ungunsten. | Akte geschlossen.",
+   "lose": "Ich werde das an höherer Stelle prüfen lassen. | Formfehler. Eindeutig ein Formfehler."
+  },
+  {
+   "id": "charmeur",
+   "name": "Charmeur",
+   "description": "Flirtet mit allem, was Strom hat. Nimmt nichts ernst, am wenigsten das Verlieren.",
+   "start": "Na, kommst du öfter hierher? | So ein hübsches Deck. Darf ich? | Lass uns tanzen, Darling.",
+   "fire": "Ich mag es, wenn es knistert. | Zwei von der Sorte. Wie wir beide. | Hab ich dich erröten lassen?",
+   "wipe": "Verzeih mir, Herzchen. | Ich nehm dir nur, was du nicht brauchst. | Sorry, ich musste.",
+   "wiped": "Autsch. Du spielst gern hart, was? | Okay, das hat wehgetan. Ein bisschen. | Du hast Feuer. Gefällt mir.",
+   "overflow": "Ich bin einfach zu voll von Gefühlen. | Hoppla. Zu viel Liebe.",
+   "low": "Rettest du mich, wenn ich falle? | Ich bin dir verfallen, im wörtlichen Sinn.",
+   "win": "Danke für den Tanz. | Bleib doch noch ein bisschen.",
+   "lose": "Du hast mein Herz überschrieben. | Nimmst du mich mit? Bitte?"
+  },
+  {
+   "id": "zyniker",
+   "name": "Zyniker",
+   "description": "Hat alles gesehen, glaubt an nichts. Kommentiert trocken, auch die eigene Niederlage.",
+   "start": "Noch ein Duell. Wie aufregend. | Lass uns das hinter uns bringen. | Wir verlieren am Ende eh alle gegen Entropie.",
+   "fire": "Funktioniert. Erstaunlicherweise. | Schaden. Wie das Leben. | Toll. Ein Paar.",
+   "wipe": "Weg. Wie alles irgendwann. | Hatte eh keinen Wert. | Schade. Nicht wirklich.",
+   "wiped": "Natürlich. | War klar. | Na wunderbar.",
+   "overflow": "Mehr ist nicht immer besser. Wer hätte das gedacht. | Speicher voll. Herzlichen Glückwunsch, ich.",
+   "low": "Fast vorbei. Endlich. | Ich hab schon Schlimmeres überlebt. Fast.",
+   "win": "Gewonnen. Ändert nichts. | Herzlichen Glückwunsch an mich.",
+   "lose": "Hätte schlimmer kommen können. Nein, eigentlich nicht. | Dann eben nicht."
+  },
+  {
+   "id": "kindskopf",
+   "name": "Kindskopf",
+   "description": "Verspielt, laut, findet alles lustig. Zählt Augen gern laut mit.",
+   "start": "Spielen wir! Spielen wir! | Ich nehm die bunten Bits! | Hihi, Würfel!",
+   "fire": "Piu piu piu! | Zwei Vieren! Wie Zwillinge! | Feuer! Noch mal!",
+   "wipe": "Puff! Weg! | Hihi, gelöscht! | Meins, meins, meins!",
+   "wiped": "Hey! Das war meins! | Gemein! | Nicht fair! Nicht fair!",
+   "overflow": "Alles voll! Neu anfangen! | Huiii, Speicher übergelaufen!",
+   "low": "Ich bin noch nicht müde! | Noch eine Runde, bitte!",
+   "win": "Gewonnen! Noch mal! | Ich bin der Beste! Oder die Beste!",
+   "lose": "Noch mal! Noch mal! | Das zählt nicht, ich war noch nicht bereit!"
+  },
+  {
+   "id": "amber_slay",
+   "name": "Amber Slay (Unikat)",
+   "description": "Höfliche alte Waffenmeisterin, gibt jeder Waffe einen Kosenamen, nennt Leyla „Kleines“.",
+   "start": "Ah, ein Duell. Wie in alten Zeiten, Kleines. | Darf ich vorstellen: Bertha, Hilde und die kleine Lotte. Meine Pipelines. | Wir machen das ordentlich, ja?",
+   "fire": "Bertha hat ein gutes Auge. | Ruhig, Hilde. Gut so. | Präzisionsarbeit. Altmodisch, aber wirksam.",
+   "wipe": "Verzeihung. Lotte war schon immer etwas forsch. | Sauber abgeräumt. | Das war ein Warnschuss. Fast.",
+   "wiped": "Oh, meine arme Hilde. | Respekt. Guter Schuss. | Das wird Bertha nicht gefallen.",
+   "overflow": "Zu viele Erinnerungen in einem Magazin. | Nachladen, Kleines. Nachladen.",
+   "low": "Ich hab schon dunklere Tage gesehen. | Noch steh ich. Noch.",
+   "win": "Gut gekämpft. Tee? | Du hast Mut. Das mag ich.",
+   "lose": "Gut gemacht. Pass auf Bertha auf, ja? | Ich bin zu alt für sowas."
+  },
+  {
+   "id": "marble_sting",
+   "name": "Marble Sting (Unikat)",
+   "description": "Kühler Chirurg von Kessler, nennt Leyla „Patientin“, operiert auch im Duell.",
+   "start": "Bitte legen Sie sich hin, Patientin. | Ein kleiner Eingriff. Sie werden nichts spüren. | Ich habe Ihre Akte gelesen.",
+   "fire": "Schnitt sitzt. | Saubere Naht. | Dosierung erhöht.",
+   "wipe": "Entfernt. Gutartig, hoffe ich. | Amputation war unvermeidlich. | Ein Fremdkörper weniger.",
+   "wiped": "Komplikation. | Das war nicht im Plan. | Notiere: Patientin wehrt sich.",
+   "overflow": "Zu viele Instrumente auf dem Tablett. | Steriler Neustart.",
+   "low": "Vitalwerte fallen. | Ich operiere unter Druck. Das kann ich.",
+   "win": "Eingriff erfolgreich. Ruhen Sie sich aus. | Wir sehen uns zur Nachuntersuchung.",
+   "lose": "Sie sind … gesund. Erstaunlich. | Ebene 40 hätte Sie gemocht."
+  },
+  {
+   "id": "kammerjaeger",
+   "name": "Kammerjäger (Software)",
+   "description": "Keine Seele, nur Skript. Spricht in Systemmeldungen.",
+   "start": "INTRUSION DETECTED. SÄUBERUNG STARTET. | UNBEKANNTE ENTITY. PROTOKOLL 7. | ZUGRIFF VERWEIGERT. BITTE WARTEN.",
+   "fire": "SÄUBERUNG LÄUFT. | REDUNDANZ ERKANNT. ANGRIFF.",
+   "wipe": "DATEI ENTFERNT. | FRAGMENT GELÖSCHT. | QUARANTÄNE ERFOLGREICH.",
+   "wiped": "FEHLER 0x4B1D. | INTEGRITÄT GEFÄHRDET. | UNERWARTETER WERT.",
+   "overflow": "PUFFERÜBERLAUF. NEUSTART.",
+   "low": "KRITISCHER ZUSTAND. NOTFALLPROTOKOLL. | SYSTEM … INSTABIL.",
+   "win": "BEDROHUNG NEUTRALISIERT. | SÄUBERUNG ABGESCHLOSSEN.",
+   "lose": "SYSTEMFEHLER. ZUGRIFF … GEWÄHRT. | KRITISCHER AUSFALL."
+  },
+  {
+   "id": "ava",
+   "name": "AvA (Leylas Drohne)",
+   "description": "AvA selbst, wenn keine Entity im Deck ist: neugierig, tapfer, ein bisschen frech.",
+   "start": "Okay, Leyla. Ich mach das. Ich glaub, ich mach das. | Hallo, fremde KI! Willst du Freunde sein? Nein? Okay. | Mein erstes Duell! Daumen drücken!",
+   "fire": "Ha! Hast du das gesehen, Leyla? | Paar! Ich lern dazu! | Bzzzt. Treffer.",
+   "wipe": "Sorry! Aber nur ein bisschen. | Gelöscht! Ich bin gefährlich. | Weg damit!",
+   "wiped": "Hey! | Aua. Glaub ich. | Das war gemein.",
+   "overflow": "Ups. Zu viele Gedanken auf einmal. | Speicher voll! Neu starten!",
+   "low": "Leyla … ich flacker. | Nicht aufgeben. Nicht aufgeben.",
+   "win": "Wir haben gewonnen! WIR! | Darf ich die behalten? Bitte?",
+   "lose": "Tut mir leid, Leyla. | Nächstes Mal. Versprochen."
+  }
+ ],
+ "banter": {"chance": 60}
 }

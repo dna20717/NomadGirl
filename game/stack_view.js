@@ -7,6 +7,7 @@
 import { el } from './ui.js';
 import { icon } from './icons.js';
 import { faceCanvas } from './glitch_face.js';
+import { banter, line } from './banter.js';
 import { COLS, ROWS, colFire, fireOf, newStack, place, choose, preview, colValue, total, open, noiseOf } from './stack_duel.js';
 
 const PIPS = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
@@ -24,15 +25,19 @@ export class StackView {
     this.duel = newStack(me, foe, Math.random, 'player', opts);
     this.duel.noise = { player: noiseOf(me), enemy: foe.hunter ? 0.05 : noiseOf(foe) };
     this.last = null; this.busy = false; this.faces = {}; this.spun = -1; this.cursor = 1; this.token++;
+    this.speak('enemy', line(this.D, foe, 'start'), 3200);   // banter (banter.js): the opponent greets
     this.step();
   }
-  stop() { this.token++; this.duel = null; }
+  stop() { this.token++; this.duel = null; this.say = null; }
+  // a speech bubble at one AI's head for a while (banter.js)
+  speak(side, text, ms = 2600) { if (text) this.say = { side, text, until: performance.now() + ms * Math.max(0.6, this.tempo()) }; }
+  endWords(d) { if (d.endSaid) return; d.endSaid = true; const loser = d.winner === 'player' ? 'enemy' : 'player'; this.speak(loser, line(this.D, d.sides[loser].ai, 'lose'), 4000); }
   redraw() { this.host.redraw?.(); }
   // every turn: the reel spins (the bit was rolled by the rules already), then the side places
   async step() {
     const d = this.duel, tk = this.token;
     if (!d) return;
-    if (d.winner) { this.redraw(); return this.host.onEnd?.(d); }
+    if (d.winner) { this.endWords(d); this.redraw(); return this.host.onEnd?.(d); }
     if (this.busy) return;
     this.busy = true; this.redraw();
     await sleep(SPIN * this.tempo() + 80);
@@ -56,6 +61,7 @@ export class StackView {
     // Animation“): for a moment the opponent's pipeline shows its old bits, the equal ones framed red and shattering, both pipelines linked
     const ms = Math.round(900 * this.tempo());
     this.wipe = ev.destroyed ? { side: foe, col: c, die: ev.die, before, until: performance.now() + ms, ms } : null;
+    const b = banter(this.D, d, ev); if (b) this.speak(b.side, b.text);
     this.last = ev; this.busy = true; this.picked = null; this.redraw();
     this.host.onPlace?.(ev, d);   // haptics on the phone (stack_mobile.js)
     await sleep((ev.destroyed ? 900 : ev.fire ? 700 : 380) * this.tempo());
@@ -84,6 +90,7 @@ export class StackView {
     this.token++; this.busy = false;
     for (let i = 0; i < 400 && !d.winner; i++) place(d, choose(d, Math.random, d.noise[d.turn]).col);
     this.last = d.log.filter(e => e.type === 'place').at(-1) || null;
+    if (d.winner) this.endWords(d);
     this.redraw(); this.host.onEnd?.(d);
     return d.winner;
   }
@@ -96,7 +103,7 @@ export class StackView {
     const w = Math.max(0, Math.min(100, sd.hp / sd.max * 100)), hurt = L ? (L.damage || 0) + (L.fire || 0) : 0;
     const delta = !L || !hpMode ? '' : L.side === side ? (L.heal ? `+${L.heal}` : '') : (hurt ? `−${hurt}` : '');
     const fire = dot ? fireOf(sd) : 0, active = d.turn === side && !d.winner;
-    return el('div', { class: ['sb-ai', side, active ? 'active' : '', L && L.side !== side && hurt ? 'hit' : ''].filter(Boolean).join(' ') },
+    const ai = el('div', { class: ['sb-ai', side, active ? 'active' : '', L && L.side !== side && hurt ? 'hit' : ''].filter(Boolean).join(' ') },
       el('div', { class: 'sb-portrait' }, this.face(side, g, 88)),
       el('div', { class: 'sb-id' },
         el('small', { class: 'sb-tag' }, side === 'player' ? 'Dein AI-Core' : g.hunter ? 'Kammerjäger' : 'Wilde KI'),
@@ -106,6 +113,8 @@ export class StackView {
       hpMode ? el('div', { class: 'sb-hp ' + side, title: 'Integrität' }, el('i', { style: `width:${w}%` }), el('b', {}, `${sd.hp}`), el('small', {}, `/ ${sd.max}`), delta ? el('span', { class: 'sb-delta ' + (delta[0] === '+' ? 'up' : 'down') }, delta) : null)
         : el('div', { class: 'sb-hp ' + side }, el('b', {}, String(total(sd)))),
       dot ? el('div', { class: 'sb-firesum' + (fire ? ' on' : ''), title: 'Feuert am Ende jedes eigenen Zugs' }, icon('flash', 16), String(fire)) : null);
+    // the bubble sits beside the head (the head's clip-path would cut it)
+    return el('div', { class: 'sb-headwrap ' + side }, ai, this.say?.side === side && performance.now() < this.say.until ? el('div', { class: 'sb-bubble ' + side }, this.say.text) : null);
   }
   // one pipeline: three places, the bits flow towards the middle; its value and fire; hover (or the cursor) shows what the bit would do
   pipe(side, i) {

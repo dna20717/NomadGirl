@@ -36,12 +36,13 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: Artikel „die Entity“ überall (Daniel), dazu Charaktere mit Banter: jede KI hat einen Charakter mit Sprüchen je Duell-Moment, Sprechblasen im Duell. Details `docs/features/glitchlings.md` › Charaktere und Banter.
 - 18.11. Code → Ava: **HNC (Übergabe, Stand `main` nach diesem Commit).** Seit #052 gebaut, alles grün (`npm test` 220/220, Browser 42/42, neu `tools/mobile_test.mjs` 19 Prüfungen):
   - **Glitchlings heißen jetzt Entities** (Daniel): Oberflächen, Spieldaten, Werkstatt-Gruppe ENTITIES, Doku; interne Kennungen bleiben (`glitchlings.json`, Item `glitchling`, `glitch_*.js`), Daniels Zitate unverändert.
   - **Bit-Stapel mobil** unter /mobile (`mobile.html`, `game/stack_mobile.js`): Hochformat, tippen = Vorschau, nochmal tippen = schicken, nach oben wischen = sofort; **Haptik** je Ereignis (Vibrations-API auf Android, iOS nur ein System-Tick beim eigenen Tippen, ungeprüft auf echtem iPhone), abschaltbar.
   - **Warum Bits verschwinden**: rote Rahmen am legenden und an den gelöschten Bits, beide Pipelines verbunden, Splitter-Animation, Schild „gleiche Zahl → gelöscht“ (Demo, Spiel, mobil; `stack_view.js` `wipe`).
   - Behoben: Esc/E, das das Duell schließt, öffnete im nächsten Takt das Pause-Menü (jetzt 3 Takte geschluckt); zwei wackelige Tests (zählten gelöschte Bits) zählen jetzt gelegte.
-  - **Offen für Daniel:** Artikel „der/die/das Entity“ (vorläufig „der“)? Wie unterscheiden sich KIs (eigener Würfel, Protokoll je Begabung, Trick, Macke)? Gleichzeitiges Ausspielen statt abwechselnd (Daniel: „zunächst so lassen“)? Neues Spiel ohne Cyberdeck/Entity: AvA kämpft (⚠️). Bit-Stapel-Haptik auf iPhone prüfen.
+  - **Offen für Daniel:** Wie unterscheiden sich KIs (eigener Würfel, Protokoll je Begabung, Trick, Macke)? Gleichzeitiges Ausspielen statt abwechselnd (Daniel: „zunächst so lassen“)? Neues Spiel ohne Cyberdeck/Entity: AvA kämpft (⚠️). Bit-Stapel-Haptik auf iPhone prüfen.
   - PixelLab Sitzung: 60 Generierungen (NomadCola-Logo + Produkte, Seitenansicht-Neuauflage, 32 Geister-Köpfe), übrig 290.
 - 17.11. Code → Ava: #052 fertig: Glitch-Duell als Overlay im Spiel, Schalter erst nach einem Duell, Entities in Automaten per E/↑, Sieg fängt die Entity. Details `docs/features/glitchlings.md` › Duell im Spiel.
 - 17.11. Code → Ava: #051 fertig: Bit-Stapel (Knucklebones-Prinzip) als neues Glitch-Duell unter /duel, Gefecht als „alt“ daneben. Details `docs/features/glitchlings.md`.
@@ -193,7 +194,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Für:** Code
 - **Lesen:** docs/features/glitchlings.md, docs/features/lore.md, docs/features/inventory.md
 - **Auftrag (Daniel, 17.11.2026):** „KIs brauchen einen Hersteller. Man muss sie nicht im Inventar transportieren, wenn man ein Cyberdeck hat (was im Grunde zunächst mal ein eigenes Inventar für Glitchlinge ist).“
-- **Fertig, wenn:** jeder Entity hat eine Marke (Werkstatt, Tooltip), Cyberdeck mit Plätzen als eigenes Raster nur für Entities, Tests, Build grün auf `main`.
+- **Fertig, wenn:** jede Entity hat eine Marke (Werkstatt, Tooltip), Cyberdeck mit Plätzen als eigenes Raster nur für Entities, Tests, Build grün auf `main`.
 - **Rückfragen:** (Code) ⚠️ vorläufig: Hersteller je Begabung (13 Zuordnungen, Marble Sting = Kessler Cybernetics, Amber Slay nach Begabung = Vulkan); Bastler-Deck 2 Plätze; Deck-Entities überstehen ein k.o.; Deck mit Entities nicht ablegbar; ältere Spielstände bekommen einmal ein Bastler-Deck. Neues Spiel startet weiter ohne Deck.
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 202/202, Browser 39/39. PixelLab 0. **Bitte testen:** Spiel laden, Inventar (I): unter dem Rucksack „Bastler-Deck“ mit Amber Slay; Tooltip zeigt Vulkan. Werkstatt › Lore › Marken › Vulkan: „Baut KIs“.
 
@@ -201,8 +202,8 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/glitchlings.md, design.md › Hacking v3: Entities
-- **Auftrag (Daniel, 17.11.2026):** „Ich möchte, dass die Glitchlings jeweils ein individuelles, animiertes Code-Porträt bekommen, das gleichzeitig das Item-Bild ist (in diesem Fall auch animiert). Eine Kraft soll noch sein „Archäologe“, die dazu führt, dass die Locations aller einzigartigen Beutestücke im Warroom angezeigt werden. Man soll die Möglichkeit haben, AvA zu einem Entity zu machen (das ist ein alternatives Ende; sehr schwer zu erreichen).“
-- **Fertig, wenn:** Porträt-Zeichner ohne Assets (aus den Eigenschaften, gleicher Entity = gleiches Gesicht, animiert), in der Werkstatt-Vorschau; Begabung Archäologe in den Daten; alternatives Ende im Design; Tests, Build grün auf `main`.
+- **Auftrag (Daniel, 17.11.2026):** „Ich möchte, dass die Glitchlings jeweils ein individuelles, animiertes Code-Porträt bekommen, das gleichzeitig das Item-Bild ist (in diesem Fall auch animiert). Eine Kraft soll noch sein „Archäologe“, die dazu führt, dass die Locations aller einzigartigen Beutestücke im Warroom angezeigt werden. Man soll die Möglichkeit haben, AvA zu einer Entity zu machen (das ist ein alternatives Ende; sehr schwer zu erreichen).“
+- **Fertig, wenn:** Porträt-Zeichner ohne Assets (aus den Eigenschaften, gleiche Entity = gleiches Gesicht, animiert), in der Werkstatt-Vorschau; Begabung Archäologe in den Daten; alternatives Ende im Design; Tests, Build grün auf `main`.
 - **Rückfragen:** (Code) ⚠️ vorläufig: „einzigartige Beute“ = Merkmal Trophäe; Archäologe wirkt ohne Stärke; Weg zum anderen Ende (Marble Sting, Pixies Wendepunkt, Deck mit 6 Bits, Kessler-Kern, Tank kritisch) und was danach ist. Offen für Daniel: Ende traurig oder hell? Darf Pixie es verhindern? AvA danach steuerbar?
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 198/198 (3 neue Porträt-Tests), Browser 39/39. PixelLab 0. **Bitte testen:** Werkstatt › GLITCHLINGS › Entities, rechts die Karten mit Porträts, „Neu würfeln“.
 

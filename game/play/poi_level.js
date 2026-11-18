@@ -193,7 +193,7 @@ export class PoiLevel {
       host.dueled = true; host.done = true;
       if (r.caught) s.box?.persist?.();
       s.hud.toast(r.won ? (r.caught ? `Gefangen: ${foe.name}` : `${foe.name} ist entwischt`) : r.gaveUp ? 'Duell abgebrochen' : `${foe.name} hat gewonnen`,
-        host.door !== undefined ? (r.won ? 'Der Schalter gehört dir' : 'Der Schalter lässt sich trotzdem umlegen') : r.won ? (r.caught ? 'Er wohnt jetzt in deinem Deck' : 'Kein Platz im Deck, Rucksack oder Lager') : 'Er ist in die Leitungen geflohen',
+        host.door !== undefined ? (r.won ? 'Der Schalter gehört dir' : 'Der Schalter lässt sich trotzdem umlegen') : r.won ? (r.caught ? 'Sie wohnt jetzt in deinem Deck' : 'Kein Platz im Deck, Rucksack oder Lager') : 'Sie ist in die Leitungen geflohen',
         r.won ? 'good' : 'info', 3200);
       if (host.door !== undefined) { this.drawSwitch(host); this.pull(host); }
       else s.fx?.sparks?.(host.x, host.feet - 80, r.won ? 0x3fe0d0 : 0xe43b9a, 10);

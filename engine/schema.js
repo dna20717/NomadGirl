@@ -14,6 +14,7 @@ import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
 import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from './megarig.js';
 import { ACHIEVEMENT_COUNTERS, ACHIEVEMENT_SPECIALS, ACHIEVEMENT_CATEGORIES } from '../game/achievements.js';
 import { DECOR_PLACES, DECOR_ARTS } from '../game/decor.js';
+import { MOMENTS } from '../game/banter.js';
 import { EARN_WHEN } from '../game/earn.js';
 
 const text = (key, label, o = {}) => ({ key, label, type: 'text', ...o });
@@ -1292,7 +1293,7 @@ export const AREAS = {
         ref('tunnelTerrain', 'Kachel-Set im Tunnel', 'terrain', { hint: 'Wände und Rückwand der Abkürzung. Leer = Kachel-Set des Eingangs' }),
         ref('tunnelAtmosphere', 'Atmosphäre im Tunnel', 'atmosphere', { hint: 'Licht und Stimmung der Abkürzung. Leer = Atmosphäre des Kachel-Sets im Tunnel' }),
         num('seed', 'Fester Seed', { min: 0, hint: 'Zum Testen: immer dasselbe Level. Leer/0 = jeder Run neu gewürfelt' })] },
-      { title: 'Marken-Clutter', wide: true, fields: [table('brandProps', 'Marken-Clutter', [ref('look', 'Symbol-Raster', 'assets'), text('name', 'Symbol'), num('cm', 'Höhe', { unit: 'cm', min: 1 }), num('chance', 'Chance', { unit: '%', min: 0, max: 100 }), bool('ai', 'KI')], { hint: 'Daniel, 17.11.2026: Dinge einer Marke, die in diesem POI auf freiem Boden stehen (z. B. NomadCola-Automaten an Tankstellen). Symbol = Name im Raster, Höhe in echten cm, Chance je freier Bodenkachel. KI = darin wohnt ein Entity: E / ↑ davor startet ein Glitch-Duell (#052)' })] },
+      { title: 'Marken-Clutter', wide: true, fields: [table('brandProps', 'Marken-Clutter', [ref('look', 'Symbol-Raster', 'assets'), text('name', 'Symbol'), num('cm', 'Höhe', { unit: 'cm', min: 1 }), num('chance', 'Chance', { unit: '%', min: 0, max: 100 }), bool('ai', 'KI')], { hint: 'Daniel, 17.11.2026: Dinge einer Marke, die in diesem POI auf freiem Boden stehen (z. B. NomadCola-Automaten an Tankstellen). Symbol = Name im Raster, Höhe in echten cm, Chance je freier Bodenkachel. KI = darin wohnt eine Entity: E / ↑ davor startet ein Glitch-Duell (#052)' })] },
       { title: 'Ranking', fields: [num('parTime', 'Bestzeit', { unit: 's', min: 0 }), num('secrets', 'Secrets', { min: 0, hint: 'Im Level zählen die brüchigen Wände (B); diese Zahl gilt nur für POIs ohne Level' })] },
       { title: 'Leben (noch ohne Wirkung)', fields: [bool('npcs', 'NPCs vor Ort'), bool('foodtruck', 'Foodtruck-Verkauf möglich'), bool('shop', 'Händler')] },
     ],
@@ -1466,12 +1467,12 @@ export const AREAS = {
     sections: [
       { title: 'Generator', fields: [num('count', 'Je Durchgang', { min: 1, max: 40, hint: 'So viele Entities gibt es in einem Durchgang (die Unikate mit „immer“ zählen mit)' }),
         table('bitWeights', 'Stärke', [num('w', 'Gewicht', { min: 0 })], { hint: 'Zeile 1 = 1 Bit … Zeile 5 = 5 Bits: wie oft jede Stärke gewürfelt wird' }),
-        num('off', 'Fremde Werkbank', { unit: '%', min: 0, max: 100, hint: 'In einer Werkbank, die nicht zu seiner Begabung passt, wirkt ein Entity nur so stark' })] },
+        num('off', 'Fremde Werkbank', { unit: '%', min: 0, max: 100, hint: 'In einer Werkbank, die nicht zu ihrer Begabung passt, wirkt eine Entity nur so stark' })] },
       { title: 'Namen', fields: [area_('names.first', 'Erstes Wort', { hint: 'Material, Farbe, Stoff (Marble, Amber, Velvet …), mit Komma getrennt. Name = erstes + zweites Wort, jedes Wort je Durchgang nur einmal' }),
         area_('names.second', 'Zweites Wort', { hint: 'Kante, Geräusch, Tat (Sting, Slay, Hex …)' })] },
       { title: 'Begabungen', wide: true, fields: [table('talents', 'Begabungen', [text('name', 'Name'), select('function', 'Werkbank', WORKSHOP_FUNCTIONS), select('also', 'Auch', WORKSHOP_FUNCTIONS), ref('brand', 'Hersteller', 'brands'), text('effect', 'Effekt'), num('perBit', 'Je Bit', { min: 0 }), text('stat', 'Wert'), num('remote', 'Einflüstern', { min: 0, max: 6 }), num('link', 'Verschränken', { min: 0, max: 6 })],
         { hint: 'Effekt mit {n} = „Je Bit“ × Stärke. In „Werkbank“ und „Auch“ wirkt er voll. „Wert“ ist der Schlüssel, den das Spiel später ausliest (perfect, refund, growth, power …). Je Bit 0 = wirkt ohne Stärke (Archäologe). Der Wert bestimmt auch, was das Code-Porträt trägt. Hersteller = wer diese Art KI baut (#049), Unikate können einen eigenen haben' })] },
-      { title: 'Macken & Wünsche', wide: true, fields: [table('quirks', 'Macken', [text('text', 'Macke'), select('kind', 'Art', GLITCH_QUIRKS)], { hint: 'Jeder Entity hat eine; immer ein Haken mit Charme' }),
+      { title: 'Macken & Wünsche', wide: true, fields: [table('quirks', 'Macken', [text('text', 'Macke'), select('kind', 'Art', GLITCH_QUIRKS)], { hint: 'Jede Entity hat eine; immer ein Haken mit Charme' }),
         table('wishes', 'Wünsche', [text('text', 'Wunsch')], { hint: 'Was er will, um freiwillig mitzukommen (Überreden, kommt mit Stufe 2)' }),
         area_('homes', 'Wohnorte', { hint: 'Maschinen, in denen Entities in POIs wohnen, mit Komma getrennt' })] },
       { title: 'Duell', fields: [table('duel.quality', 'Präzision je Bits', [num('q', 'Präzision', { min: 2, max: 6 })], { hint: 'Zeile 1 = 1 Bit … Zeile 5 = 5 Bits: trifft bei W6 ≥ diesem Wert (Glitch-Duell #050, Kern von OPR Firefight). Impulse je Begabung stehen bei den Begabungen (Einflüstern, Verschränken)' }),
@@ -1481,13 +1482,19 @@ export const AREAS = {
       { title: 'Kammerjäger', wide: true, fields: [table('hunters', 'Kammerjäger', [text('id', 'ID'), text('name', 'Name'), ref('brand', 'Hersteller', 'brands'), num('quality', 'Präzision', { min: 2, max: 6 }), num('defense', 'Abschirmung', { min: 2, max: 6 }),
         num('tough', 'Integrität', { min: 1 }), num('remote', 'Einflüstern', { min: 0 }), num('link', 'Verschränken', { min: 0 }), text('description', 'Beschreibung')],
         { hint: 'Anti-Entity-Software der Konzerne: Gegner im Glitch-Duell, mit festen Werten. Demo: /duel' })] },
-      { title: 'Unikate', wide: true, fields: [table('unique', 'Unikate', [text('name', 'Name'), text('talent', 'Begabung'), ref('brand', 'Hersteller', 'brands'), num('bits', 'Bits', { min: 1, max: 5 }), text('quirk', 'Macke'), text('wish', 'Wunsch'), text('home', 'Wohnort'), bool('always', 'Immer'), text('description', 'Beschreibung')],
+      { title: 'Charaktere', wide: true, fields: [table('characters', 'Charaktere', [text('id', 'ID'), text('name', 'Name'), text('description', 'Wesen'), ...MOMENTS.map(([k, n]) => text(k, n))],
+          { hint: 'Daniel, 18.11.2026: jede KI hat einen Charakter mit Sprüchen für die Momente im Duell (mehrere mit | trennen). Erzeugte Entities bekommen einen nach ihrem Namen, Unikate ihren eigenen (Spalte Charakter), kammerjaeger und ava sind fest vergeben' }),
+        num('banter.chance', 'Banter-Chance', { unit: '%', min: 0, max: 100, hint: 'Wie oft nach einem Zug jemand etwas sagt (Knapp, Start und Ende immer)' })] },
+      { title: 'Unikate', wide: true, fields: [table('unique', 'Unikate', [text('name', 'Name'), text('talent', 'Begabung'), text('character', 'Charakter'), ref('brand', 'Hersteller', 'brands'), num('bits', 'Bits', { min: 1, max: 5 }), text('quirk', 'Macke'), text('wish', 'Wunsch'), text('home', 'Wohnort'), bool('always', 'Immer'), text('description', 'Beschreibung')],
         { hint: 'Handgemachte Entities (z. B. Amber Slay). „Immer“ = in jedem Durchgang dabei' })] },
     ],
     check: (x, report) => {
       const T = new Set((x.talents || []).map(t => t.name));
       for (const u of x.unique || []) { if (!T.has(u.talent)) report('warning', `Unikat ${u.name}: Begabung „${u.talent}“ gibt es nicht`); if (String(u.name || '').trim().split(/\s+/).length !== 2) report('hint', `Unikat ${u.name}: Namen haben zwei Wörter`); }
       for (const t of x.talents || []) if (!t.brand) report('hint', `Begabung ${t.name}: kein Hersteller`);
+      const C = new Set((x.characters || []).map(c => c.id));
+      for (const u of x.unique || []) if (u.character && !C.has(u.character)) report('warning', `Unikat ${u.name}: Charakter „${u.character}“ gibt es nicht`);
+      for (const id of ['kammerjaeger', 'ava']) if (x.characters?.length && !C.has(id)) report('hint', `Charakter „${id}“ fehlt (Kammerjäger bzw. AvA sprechen dann nicht)`);
       for (const t of x.talents || []) if (t.perBit && !String(t.effect || '').includes('{n}')) report('hint', `Begabung ${t.name}: Effekt ohne {n}, „Je Bit“ wirkt nicht`);
     },
   },

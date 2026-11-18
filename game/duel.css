@@ -2,7 +2,7 @@
    Neon on black (AAP-64: cyan #20d6c7, magenta, amber #ffd541). */
   /* (was inline in duel.html): one AI per side, three pipelines, the bit in a reel; neon on black (AAP-64: cyan #20d6c7, magenta #bc4a9b, amber #ffd541) */
   .sb-board { --pc: #20d6c7; --ec: #e43b9a; display: grid; gap: 6px; margin: 8px auto 0; justify-items: center; max-width: 640px; font-family: var(--ui-pixel); }
-  .sb-ai { width: 100%; display: grid; grid-template-columns: auto 1fr auto auto; gap: 4px 14px; align-items: center; padding: 4px 12px; border: 1px solid var(--c); border-radius: 4px; position: relative;
+  .sb-ai { box-sizing: border-box; width: 100%; display: grid; grid-template-columns: auto 1fr auto auto; gap: 4px 14px; align-items: center; padding: 4px 12px; border: 1px solid var(--c); border-radius: 4px; position: relative;
     background: linear-gradient(90deg, color-mix(in srgb, var(--c) 14%, #07060c), #07060c 70%); box-shadow: 0 0 18px color-mix(in srgb, var(--c) 25%, transparent), inset 0 0 0 1px rgba(0,0,0,.6); clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px)); }
   .sb-ai.player { --c: var(--pc); } .sb-ai.enemy { --c: var(--ec); }
   .sb-ai.active { box-shadow: 0 0 28px color-mix(in srgb, var(--c) 55%, transparent); } .sb-ai.hit { animation: dl-shake .3s 2; }
@@ -93,3 +93,14 @@
 .sb-wipe-label { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 4; width: max-content; max-width: 94%; box-sizing: border-box; flex-wrap: wrap; justify-content: center; text-align: center; display: inline-flex; gap: 4px; align-items: center; padding: 3px 8px;
   font: 15px/1 var(--ui-pixel); color: #fff; background: #000; border: 1px solid #df3e23; box-shadow: 0 0 12px rgba(223,62,35,.6); animation: sb-label .9s ease-out both; pointer-events: none; }
 @keyframes sb-label { 0% { opacity: 0; transform: translate(-50%, -30%); } 20% { opacity: 1; transform: translate(-50%, -50%); } 85% { opacity: 1; } 100% { opacity: 0; } }
+
+/* banter (banter.js): a speech bubble at the AI's head; the opponent's hangs below its head, Leyla's core's above */
+.sb-headwrap { position: relative; width: 100%; } .sb-headwrap.player { --c: var(--pc); } .sb-headwrap.enemy { --c: var(--ec); }
+.sb-bubble { position: absolute; left: 84px; z-index: 6; max-width: min(320px, 70%); padding: 6px 10px; font: 16px/1.15 var(--ui-pixel); letter-spacing: .02em; color: #f4f1ff;
+  background: #0d0b16; border: 1px solid var(--c); box-shadow: 0 0 14px color-mix(in srgb, var(--c) 45%, transparent); animation: sb-bubble .25s cubic-bezier(.2,.9,.3,1.3) both; pointer-events: none; }
+.sb-bubble.enemy { top: calc(100% - 4px); } .sb-bubble.player { bottom: calc(100% - 4px); }
+.sb-bubble::before { content: ''; position: absolute; left: 14px; width: 10px; height: 10px; background: #0d0b16; border: 1px solid var(--c); transform: rotate(45deg); }
+.sb-bubble.enemy::before { top: -6px; border-right: 0; border-bottom: 0; } .sb-bubble.player::before { bottom: -6px; border-left: 0; border-top: 0; }
+@keyframes sb-bubble { from { opacity: 0; transform: translateY(6px) scale(.9); } }
+.gd-card .sb-bubble { font-size: 14px; left: 70px; }
+.mob .sb-bubble { left: 56px; font-size: 14px; max-width: 72%; }
