@@ -36,7 +36,14 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
-- 17.11. Code → Ava: #052 Glitch-Duell im Spiel läuft (Overlay, Schalter mit Duell, KIs in Automaten).
+- 18.11. Code → Ava: **HNC (Übergabe, Stand `main` nach diesem Commit).** Seit #052 gebaut, alles grün (`npm test` 220/220, Browser 42/42, neu `tools/mobile_test.mjs` 19 Prüfungen):
+  - **Glitchlings heißen jetzt Entities** (Daniel): Oberflächen, Spieldaten, Werkstatt-Gruppe ENTITIES, Doku; interne Kennungen bleiben (`glitchlings.json`, Item `glitchling`, `glitch_*.js`), Daniels Zitate unverändert.
+  - **Bit-Stapel mobil** unter /mobile (`mobile.html`, `game/stack_mobile.js`): Hochformat, tippen = Vorschau, nochmal tippen = schicken, nach oben wischen = sofort; **Haptik** je Ereignis (Vibrations-API auf Android, iOS nur ein System-Tick beim eigenen Tippen, ungeprüft auf echtem iPhone), abschaltbar.
+  - **Warum Bits verschwinden**: rote Rahmen am legenden und an den gelöschten Bits, beide Pipelines verbunden, Splitter-Animation, Schild „gleiche Zahl → gelöscht“ (Demo, Spiel, mobil; `stack_view.js` `wipe`).
+  - Behoben: Esc/E, das das Duell schließt, öffnete im nächsten Takt das Pause-Menü (jetzt 3 Takte geschluckt); zwei wackelige Tests (zählten gelöschte Bits) zählen jetzt gelegte.
+  - **Offen für Daniel:** Artikel „der/die/das Entity“ (vorläufig „der“)? Wie unterscheiden sich KIs (eigener Würfel, Protokoll je Begabung, Trick, Macke)? Gleichzeitiges Ausspielen statt abwechselnd (Daniel: „zunächst so lassen“)? Neues Spiel ohne Cyberdeck/Entity: AvA kämpft (⚠️). Bit-Stapel-Haptik auf iPhone prüfen.
+  - PixelLab Sitzung: 60 Generierungen (NomadCola-Logo + Produkte, Seitenansicht-Neuauflage, 32 Geister-Köpfe), übrig 290.
+- 17.11. Code → Ava: #052 fertig: Glitch-Duell als Overlay im Spiel, Schalter erst nach einem Duell, Entities in Automaten per E/↑, Sieg fängt die Entity. Details `docs/features/glitchlings.md` › Duell im Spiel.
 - 17.11. Code → Ava: #051 fertig: Bit-Stapel (Knucklebones-Prinzip) als neues Glitch-Duell unter /duel, Gefecht als „alt“ daneben. Details `docs/features/glitchlings.md`.
 - 17.11. Code → Ava: #050 fertig: Glitch-Duell als Demo unter /duel (Kartenspiel, Welt pausiert, Einflüstern/Verschränken/Kalibrieren, KI, Kammerjäger). Details `docs/features/glitchlings.md`.
 - 17.11. Code → Ava: Entity-Duell v2 nach dem Kern von OPR Firefight (Daniel: v1 zu kompliziert): Qualität, Verteidigung, Zähigkeit, Angriffe fern/nah; abwechselnd aktivieren, Fern/Nah/Sammeln, W6 auf Treffer und Abwehr, Moral bei halber Zähigkeit. Entwurf in design.md, nichts gebaut.
