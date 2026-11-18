@@ -34,9 +34,11 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 ## Funksprüche
 
-- 18.11. Code → Ava: #053 Die Fahrt in Szene (Keep Driving) läuft (Daniels Auftrag im Code-Chat).
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
+
+- 18.11. Code → Ava: #053 **Die Fahrt in Szene** fertig (wie Keep Driving: echtes Rig, Landschaft je Region, Licht und Wetter aus Code, Zwischenfälle am Straßenrand mit Gegner-Bausätzen). Tests 228/228, Browser 43/43. PixelLab 0. Ideenspeicher in `docs/backlog.md` › D (9 Vorschläge).
+- 18.11. Code → Ava: #053 Die Fahrt in Szene (Keep Driving) läuft (Daniels Auftrag im Code-Chat).
 
 - 18.11. Code → Ava: Artikel „die Entity“ überall (Daniel), dazu Charaktere mit Banter: jede KI hat einen Charakter mit Sprüchen je Duell-Moment, Sprechblasen im Duell. Details `docs/features/glitchlings.md` › Charaktere und Banter.
 - 18.11. Code → Ava: **HNC (Übergabe, Stand `main` nach diesem Commit).** Seit #052 gebaut, alles grün (`npm test` 220/220, Browser 42/42, neu `tools/mobile_test.mjs` 19 Prüfungen):
@@ -165,13 +167,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ```
 
 ### #053 Die Fahrt in Szene (wie Keep Driving)
-- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/worldmap.md (Reisen in Etappen, Zwischenfälle), docs/features/camp.md, game/weather.js
 - **Auftrag (Daniel, 18.11.2026):** „Die Reise von POI zu POI ähnlich in Szene setzen wie bei Keep Driving.“ Antworten: **1a** erst in Szene setzen (Rig fährt, Landschaft zieht vorbei, Zwischenfälle rollen sichtbar heran, Entscheidung wie bisher im Fenster), **2a** das echte, selbst gebaute Rig mit Anhängern von der Seite, **3c** Landschaft erst aus Code je Region, PixelLab später („bau aber trotzdem richtig tolle Lichteffekte, Sonnenuntergänge und Wetter aus Code ein“), **4c** Dauer einstellbar, Standard gemütlich 30 Sekunden je Etappe.
 - **Fertig, wenn:** Fahrt-Szene zwischen Karte und Ankunft, Rig aus dem Camp, Landschaft je Region, Tageszeit läuft mit, Wetter und Licht aus Code, Zwischenfälle kommen sichtbar angerollt, vorspulen/überspringen mit Tastatur und Controller, Werkstatt-Felder, Tests, Build grün auf `main`.
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: an Bord eines Mega-Rigs zeigt die Fahrt nur die Landschaft (kein Schnappschuss); Anhalterin und Händler stehen als „Streuner“-Bausatz am Rand, bis Companions ein Aussehen haben; Dauer gilt je Etappe (nicht je km); Lichter in den Fenstern des Rigs fehlen noch.
+- **Ergebnis:** (Code) Commit „Fahrt in Szene wie Keep Driving …“ auf `main`. Neu: `game/road.js` (Landschaft, Himmel, Licht, Wetter), `game/play/drive_ui.js` (Fahrt-Fenster), `game/play/rig_snapshot.js`; Werkstatt › Reisen: Fahrt, Licht & Wetter unterwegs, Landschaften (8 Regionen), Fahrt-Vorschau; Encounter › Figuren + Am Straßenrand. `npm test` 228/228 (neu `test/road.test.js`), Browser 43/43 (neu `tools/drive_test.mjs`). PixelLab 0. **Bitte testen:** Van-Tür › Karte › Hinfahren (abends für Sonnenuntergang, nachts für Scheinwerfer), E halten = vorspulen, Esc = überspringen; Werkstatt › Welt › Reisen › Fahrt-Vorschau mit Uhrzeit-Regler.
 
 ### #052 Glitch-Duell im Hauptspiel
 - **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
