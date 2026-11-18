@@ -1,6 +1,7 @@
 // Camp ↔ run (#017 split from scene.js): restart, go to the camp, start and end a run (Beute-Bilanz), enemies of the run.
 // Mixed into PlayScene (game/play/scene.js): the methods keep their `this`, nothing else changes.
 import { placeOf, threatOf } from '../worldmap.js';
+import { repLine } from '../reputation.js';
 import { update as tankUpdate, phase as tankPhase } from '../tank.js';
 import { poiReady } from '../../engine/poi.js';
 import { Enemy } from './enemies.js';
@@ -38,7 +39,7 @@ export class SceneRuns {
       this.box.save.health = this.leyla.health;
       this.box.save.run = { poi, room: null, seed: P.seed || 1 + Math.floor(Math.random() * 2 ** 31), location: this.box.save.location, danger: this.placeDanger(poi), before: runSnapshot(D, this.box.save) };   // before: for the Beute-Bilanz (#017)
       this.box.persist();
-      return this.restartAs({ mode: 'run', roomId: null, banner: [P.name || poi, `${P.gang?.name ? `Revier: ${P.gang.name} · ` : ''}Finde den Tresor · E am Van: zurück ins Camp`] }, 700);   // #016 whose place this is
+      return this.restartAs({ mode: 'run', roomId: null, banner: [P.name || poi, `${P.gang?.name ? `Revier: ${repLine(this.data_, this.box.save, P.gang.name)} · ` : ''}Finde den Tresor · E am Van: zurück ins Camp`] }, 700);   // #016 whose place this is
     }
     const ready = (P.rooms || []).filter(has);
     const room = ready.find(id => R[id].tags?.includes('start')) || ready[0] || [D.camp?.fallbackRoom, D.game?.testRoom].find(has);

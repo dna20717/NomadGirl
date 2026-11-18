@@ -8,6 +8,7 @@ import { generateMap, neighbours } from '../worldmap.js';
 import { makeRoad, landscapeOf, ROADSIDE, BW, BH } from '../road.js';
 import { mapBrands } from '../brands.js';
 import { generateEncounter, eventsConfig } from '../road_events.js';
+import { gangs } from '../reputation.js';
 import { generate, brandOf } from '../glitchlings.js';
 import { characterOf, characters } from '../banter.js';
 import { faceCanvas } from '../glitch_face.js';
@@ -234,7 +235,7 @@ export const SUMMARY = {
       st.flash = Math.max(0, st.flash - dt * 4); if (st.wet > 0.6 && Math.random() < dt * 0.15) { st.flash = 1; road.strike(); }
       if (P.stop) { st.stop ??= { kind: P.stop, x: BW * 0.75 }; st.stop.kind = P.stop; st.stop.x = BW * 0.75; } else st.stop = null;
       road.draw(bg.getContext('2d'), st);
-      const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false; ctx.drawImage(bg, 0, 0, c.width, c.height);
+      const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false; ctx.drawImage(bg, 0, 0, c.width, c.height); road.ads(ctx, c.width, c.height, st);
       road.light(ctx, c.width, c.height, st, { front: c.width * 0.62, lampY: c.height * 0.78, back: c.width * 0.3, tailY: c.height * 0.8 });
       road.front(ctx, c.width, c.height, st);
       clock.textContent = `${String(Math.floor(P.hour)).padStart(2, '0')}:${String(Math.floor((P.hour % 1) * 60)).padStart(2, '0')} Uhr`;
@@ -250,17 +251,20 @@ export const SUMMARY = {
 
   // the Ereignis-Baukasten (#054): six incidents rolled from the parts, with danger and night; „Neu würfeln“ rolls six others
   roadEvents(w, x) {
-    const D = w.p.data, P = w.eventPreview ??= { seed: 1 + Math.floor(Math.random() * 1e6), danger: 1, night: false };
+    const D = w.p.data, P = w.eventPreview ??= { seed: 1 + Math.floor(Math.random() * 1e6), danger: 1, night: false, gang: gangs(D)[0]?.name || '', rep: 0 };
     const box = el('div', { style: 'display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px' }), info = el('p', { class: 'ed-small' });
     const cost = o => { const p = []; const de = n => String(n).replace('.', ',');
       if (o.use) p.push(`−${o.useCount || 1} ${D.items?.[o.use]?.name || o.use}`); if (o.hours) p.push(`+${de(o.hours)} h`); if (o.fuel) p.push(`${o.fuel > 0 ? '−' : '+'}${de(Math.abs(o.fuel))} l`);
       if (o.food) p.push(`${o.food > 0 ? '−' : '+'}${Math.abs(o.food)} Vorräte`); if (o.deltas) p.push(`${o.deltas > 0 ? '+' : '−'}${Math.abs(o.deltas)} Δ`); if (o.health) p.push(`−${o.health} Leben`);
-      if (o.item) p.push(`+${o.count || 1} ${D.items?.[o.item]?.name || o.item}`); if (o.loot) p.push('Beute'); if (o.risk) p.push(`Risiko ${o.risk} %`); return p.join(' · '); };
+      if (o.item) p.push(`+${o.count || 1} ${D.items?.[o.item]?.name || o.item}`); if (o.loot) p.push('Beute'); if (o.risk) p.push(`Risiko ${o.risk} %`);
+      if (o.rep) p.push(`Ruf ${o.rep > 0 ? '+' : ''}${o.rep}`); if (o.repRival) p.push(`Rivalen ${o.repRival > 0 ? '+' : ''}${o.repRival}`); if (o.chain?.next) p.push(`→ ${o.chain.next}`); if (o.flag) p.push(`Merker ${o.flag}`); if (o.buff) p.push(`Buff ${D.buffs?.[o.buff]?.name || o.buff}`);
+      return p.join(' · '); };
     function paint() {
       let s = P.seed; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
-      const list = Array.from({ length: 6 }, () => generateEncounter(D, r, { danger: P.danger, night: P.night, place: 'Rustvale Truck Stop', region: 'Crow Valley' })).filter(Boolean);
+      const save = { rep: P.gang ? { [P.gang]: P.rep } : {}, road: { flags: [], seen: [], chain: null } };   // #055: Ruf with the destination's gang
+      const list = Array.from({ length: 6 }, () => generateEncounter(D, r, { danger: P.danger, night: P.night, place: 'Rustvale Truck Stop', region: 'Crow Valley', save, here: P.gang || null })).filter(Boolean);
       box.replaceChildren(...list.map(e => el('div', { style: 'padding:10px 12px;border-radius:8px;border:1px solid var(--ui-border, #3a2f45);background:var(--ui-field, #1f1729)' },
-        el('b', {}, e.name), el('div', { class: 'ed-small' }, [ROADSIDE.find(([k]) => k === e.roadside)?.[1] || 'nichts am Rand', e.figures.map(f => D.enemies?.[f]?.name || f).join(', '), e.mood ? `Stimmung ${e.mood}` : ''].filter(Boolean).join(' · ')),
+        el('b', {}, e.name), el('div', { class: 'ed-small' }, [ROADSIDE.find(([k]) => k === e.roadside)?.[1] || 'nichts am Rand', e.figures.map(f => D.enemies?.[f]?.name || f).join(', '), e.gang ? `Gang ${e.gang}` : '', e.mood ? `Stimmung ${e.mood}` : ''].filter(Boolean).join(' · ')),
         el('p', { style: 'margin:6px 0' }, e.description),
         el('ul', { style: 'margin:0;padding-left:18px' }, ...e.options.map(o => el('li', {}, el('span', {}, o.label), el('small', { class: 'ed-small' }, ` ${cost(o)}`)))))));
       const C = eventsConfig(D);
@@ -270,7 +274,10 @@ export const SUMMARY = {
     const danger = el('select', { class: 'ed-input', onchange: e => { P.danger = +e.target.value; paint(); } }, ...[1, 2, 3, 4, 5].map(n => { const o = el('option', { value: n }, `Gefahr ${n}`); if (n === P.danger) o.selected = true; return o; }));
     const night = el('label', { class: 'ed-small' }, el('input', { type: 'checkbox', checked: P.night, onchange: e => { P.night = e.target.checked; paint(); } }), ' Nacht');
     const again = el('button', { class: 'ed-button', onclick: () => { P.seed = 1 + Math.floor(Math.random() * 1e6); paint(); } }, 'Neu würfeln');
-    return { title: 'Gewürfelte Zwischenfälle', body: el('div', {}, el('div', { style: 'display:flex;gap:10px;align-items:center;margin-bottom:8px' }, danger, night, again), box, info) };
+    const opt = (v, n, on) => { const o = el('option', { value: v }, n); if (on) o.selected = true; return o; };
+    const gang = el('select', { class: 'ed-input', onchange: e => { P.gang = e.target.value; paint(); } }, opt('', 'Ziel ohne Gang', !P.gang), ...gangs(D).map(g => opt(g.name, `Ziel: ${g.name}`, g.name === P.gang)));
+    const rep = el('select', { class: 'ed-input', onchange: e => { P.rep = +e.target.value; paint(); } }, ...[[-90, 'Feind'], [-40, 'Unbeliebt'], [0, 'Neutral'], [40, 'Geduldet'], [90, 'Freund']].map(([v, n]) => opt(v, `Ruf: ${n}`, v === P.rep)));
+    return { title: 'Gewürfelte Zwischenfälle', body: el('div', {}, el('div', { style: 'display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:8px' }, danger, night, gang, rep, again), box, info) };
   },
 
   locations(w, x, id) {

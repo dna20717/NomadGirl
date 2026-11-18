@@ -10,6 +10,7 @@ import { level as cisternLevel, tap as cisternTap } from '../cistern.js';
 import { clockText, advance, hoursUntil } from '../save.js';
 import { passengers } from '../rig.js';
 import { clockHours } from '../tank.js';
+import { gangOfPlace, levelName } from '../reputation.js';
 import { driveConfig } from '../road.js';
 import { snapshotRig } from './rig_snapshot.js';
 import { occupancy } from '../inventory.js';
@@ -215,10 +216,10 @@ export class CampActions {
     if (save.map && L.to !== R.id && !save.map.visited.includes(L.to)) save.map.visited.push(L.to);   // passed through
     // under remote control (nomad, tests) no random encounters, unless forced (scene.forceEncounter = id) or wanted (scene.randomEncounters)
     // #054: hand-made or from the Ereignis-Baukasten; the destination's danger, region and name go into the generated one
-    const node = save.map?.nodes?.find(x => x.id === L.to), ctx = { danger: node?.danger || 1, region: node?.region || '', place: placeOf(D, save, L.to)?.name || L.to };
+    const node = save.map?.nodes?.find(x => x.id === L.to), ctx = { danger: node?.danger || 1, region: node?.region || '', place: placeOf(D, save, L.to)?.name || L.to, here: gangOfPlace(D, save, L.to) };
     const forced = s.forceEncounter;
     s.forceEncounter = null;
-    const E = forced ? encounterById(D, save, forced, Math.random, ctx) : s.script && !s.randomEncounters ? null : pickEncounter(D, save, L.km, Math.random, ctx);
+    const E = forced ? encounterById(D, save, forced, Math.random, ctx) : save.road?.chain?.step || !(s.script && !s.randomEncounters) ? pickEncounter(D, save, L.km, Math.random, ctx) : null;   // a running story (#055) goes on even under remote control
     const where = placeOf(D, save, L.to)?.name || L.to, region = n => save.map?.nodes?.find(x => x.id === n)?.region || '';
     const onward = () => R.show ? s.hud.drive.resume(clockHours(save) - h1) : s.time.delayedCall(s.script ? 0 : 120, () => this.nextLeg(i + 1));
     const meet = () => {
@@ -226,6 +227,8 @@ export class CampActions {
       const opts = E.options || [];
       const pick = o => { const r = choose(D, save, o); R.log.push(`${E.name}: ${[r.text, r.lines.join(', ')].filter(Boolean).join(' ')}`);
         s.hud.toast(E.name, [r.text, r.lines.join(' · ')].filter(Boolean).join(' · '), r.failed || o.health || o.deltas < 0 || o.fuel > 0 ? 'warn' : 'travel', 4200);
+        for (const x of [r.rep, r.rep2]) if (x?.changed) s.hud.toast(`${x.gang}: ${levelName(x.level)}`, x.n > 0 ? 'Dein Ruf bei ihnen steigt' : 'Dein Ruf bei ihnen sinkt', x.n > 0 ? 'good' : 'warn', 4200);   // #055
+        if (r.story) s.hud.toast('Die Geschichte geht weiter', 'Auf der nächsten Etappe', 'travel', 3600);
         this.box.persist?.(); onward(); };
       const fallback = opts.find(o => !blocked(D, save, o)) || opts[opts.length - 1];
       const look = (E.look && D.assets?.[E.look]?.file) ? E.look : D.travel?.encounterLook, file = look && D.assets?.[look]?.file;   // #021 comic panel

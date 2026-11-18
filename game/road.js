@@ -62,7 +62,13 @@ export function skyAt(hours) {
 }
 
 // ---------- the road ----------
-export function makeRoad(D, { seed = 1, logos = null, brands = [] } = {}) {
+// the brands for the giant screens (#055): every brand of the Lore with its ads (Marke › Werbung auf Billboards, else the slogan)
+export const adBrands = D => Object.entries(D?.brands || {}).filter(([, b]) => b.name && b.billboard !== false)
+  .map(([id, b]) => ({ id, name: b.name, slogan: b.slogan || '', lines: String(b.ads || b.slogan || b.name).split('|').map(x => x.trim()).filter(Boolean), color: b.color || '#ffd27a', icon: b.icon ?? null }));
+
+export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList = null } = {}) {
+  const adList = adBrandList || adBrands(D);
+  let screens = [];
   const sky = document.createElement('canvas'); sky.width = BW; sky.height = BH;
   const sctx = sky.getContext('2d');
   let skyKey = '';
@@ -370,6 +376,26 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [] } = {}) {
       ctx.globalAlpha = 1;
     }
     drawLayer(ctx, st, S, { p: 0.14, base: 176, H: 24, depth: 0.45, s: seed + 12, color: 'mid', kind: L.relief === 'flat' ? 'flat' : L.relief === 'jagged' ? 'jagged' : 'hills' });
+    // giant digital billboards of the brands (#055, Daniel: „riesige digitale Billboards für unsere ganzen Brands … lass dort Werbung laufen“):
+    // a steel frame on two masts towering over the plain; the picture on the screen is drawn sharp by ads() over the scaled background
+    screens = [];
+    if (adList.length) {
+      const off = st.dist * 0.1, cw = 230;
+      for (let ci = Math.floor((off - 120) / cw); ci * cw - off < BW + 40; ci++) {
+        const x = Math.round(ci * cw - off + hash(ci, seed + 71) * 60), Lc = landAt(st, x / 0.1 + st.dist);
+        if (hash(ci, seed + 70) * 100 >= (Lc.screens ?? 25)) continue;
+        const w = 64 + Math.floor(hash(ci, seed + 72) * 3) * 8, h = Math.round(w * 0.55), y = 66 + Math.floor(hash(ci, seed + 73) * 14), base = 180;
+        const steel = tone('#242234', 0.4, S, st), lit = tone('#4a5462', 0.35, S, st), B = adList[Math.floor(hash(ci, seed + 74) * adList.length)];
+        ctx.fillStyle = css(steel);
+        for (const mx of [x + Math.round(w * 0.25), x + Math.round(w * 0.75)]) { ctx.fillRect(mx - 1, y + h, 3, base - y - h); for (let yy = y + h + 6; yy < base; yy += 8) { ctx.fillRect(mx - 3, yy, 7, 1); } }
+        ctx.fillRect(x - 2, y - 2, w + 4, h + 4); ctx.fillStyle = css(lit); ctx.fillRect(x - 2, y - 2, w + 4, 1); ctx.fillRect(x + 4, y + h + 2, w - 8, 2);
+        ctx.fillStyle = css(mix(hex(B.color), [8, 6, 14], 0.82)); ctx.fillRect(x, y, w, h);
+        // red aircraft lamps on top, the screen's light on the ground at night
+        if (Math.sin(t * 2.2 + ci) > 0) { ctx.fillStyle = 'rgb(255,60,60)'; ctx.fillRect(x - 2, y - 4, 1, 2); ctx.fillRect(x + w + 1, y - 4, 1, 2); }
+        if (S.dark > 0.2) { const g = ctx.createRadialGradient(x + w / 2, base, 2, x + w / 2, base, w * 0.9); g.addColorStop(0, css(hex(B.color), 0.22 * S.dark)); g.addColorStop(1, css(hex(B.color), 0)); ctx.fillStyle = g; ctx.fillRect(x - w, base - w, w * 3, w * 1.4); }
+        screens.push({ x, y, w, h, brand: B, ph: hash(ci, seed + 75) * 20, ci });
+      }
+    }
     // things in the middle distance (p 0.35)
     const midOff = st.dist * 0.35, cw = 46;
     const brandsOn = brands.filter(b => b.icon != null);
@@ -453,6 +479,54 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [] } = {}) {
       for (let x = -BW; x < BW * 2; x += 120) ctx.fillRect(Math.round(x - o), y + Math.round(Math.sin(x + i) * 3), 90, 6); }
   }
 
+  // ---------- the ads on the giant screens, sharp at full resolution (#055) ----------
+  // a slide every few seconds: the logo with the brand's name, then its lines (Marke › Werbung) as a running or typed text; a glitch
+  // between slides, scanlines, a little sun glare by day and a glow round the screen at night
+  const adBuf = typeof document !== 'undefined' ? document.createElement('canvas') : null;
+  function ads(ctx, W, H, st) {
+    if (!adBuf || !screens.length) return;
+    const u = W / BW, S = skyAt(st.hour), lg = typeof logos === 'function' ? logos() : logos;
+    for (const sc of screens) {
+      const x = Math.round(sc.x * u), y = Math.round(sc.y * u), w = Math.round(sc.w * u), h = Math.round(sc.h * u), B = sc.brand, col = hex(B.color);
+      if (x > W || x + w < 0) continue;
+      adBuf.width = w; adBuf.height = h;
+      const c = adBuf.getContext('2d'), n = B.lines.length + 1, period = 3.6, T = st.t * 1 + sc.ph, k = Math.floor(T / period), f = (T % period) / period, slide = k % n;
+      const g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, css(mix(col, [10, 8, 20], 0.55))); g.addColorStop(1, css(mix(col, [4, 3, 10], 0.85)));
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
+      c.textAlign = 'center'; c.textBaseline = 'middle';
+      if (slide === 0) {   // the logo and the name
+        const z = Math.round(h * 0.62), pulse = 1 + 0.04 * Math.sin(T * 5);
+        if (lg && B.icon != null) { c.imageSmoothingEnabled = false; const cx = B.icon % 4, cy = Math.floor(B.icon / 4); c.drawImage(lg, cx * 64, cy * 64, 64, 64, w / 2 - z * pulse / 2, h * 0.06, z * pulse, z * pulse); }
+        c.font = `${Math.round(h * 0.24)}px VT323, monospace`; c.fillStyle = css(mix(col, [255, 255, 255], 0.55)); c.shadowColor = css(col); c.shadowBlur = h * 0.12;
+        c.fillText(B.name.toUpperCase(), w / 2, h * 0.86); c.shadowBlur = 0;
+      } else {   // a line: long ones run through, short ones type themselves
+        const line = B.lines[slide - 1], size = Math.round(h * 0.42);
+        c.font = `${size}px VT323, monospace`;
+        const tw = c.measureText(line).width, hue = mix(col, [255, 255, 255], 0.35 + 0.25 * Math.sin(T * 3));
+        c.fillStyle = css(hue); c.shadowColor = css(col); c.shadowBlur = h * 0.15;
+        if (tw > w * 0.9) { c.textAlign = 'left'; c.fillText(line, w - f * (tw + w * 1.1), h * 0.52); }
+        else { const shown = line.slice(0, Math.max(0, Math.ceil(line.length * Math.min(1, f * 3)))); c.fillText(shown + (f < 0.33 && Math.floor(T * 6) % 2 ? '_' : ''), w / 2, h * 0.52); }
+        c.shadowBlur = 0;
+        c.fillStyle = css(col, 0.9); c.fillRect(0, h - Math.max(2, h * 0.06), w * f, Math.max(2, h * 0.06));   // the slide's progress
+      }
+      // scanlines and a few dead pixels
+      c.fillStyle = 'rgba(0,0,0,.22)'; for (let yy = 0; yy < h; yy += 3) c.fillRect(0, yy, w, 1);
+      if (S.dark < 0.4) { c.fillStyle = `rgba(255,250,230,${0.16 * (1 - S.dark)})`; c.fillRect(0, 0, w, h); }   // sun on the glass
+      // a glitch at the change of slides: slices shifted, the colours split
+      const glitch = f < 0.06 || (hash(k, sc.ci + 99) < 0.15 && Math.abs(f - 0.5) < 0.02);
+      ctx.save(); ctx.globalAlpha = Math.max(0.15, 1 - 0.75 * Math.max(st.dust || 0, st.fog || 0) - 0.3 * (st.wet || 0));   // dust, fog and rain veil it
+      if (glitch) {
+        for (let yy = 0; yy < h; yy += Math.max(2, Math.round(h / 9))) { const sh = Math.round((hash(yy, Math.floor(st.t * 30)) - 0.5) * w * 0.14), sl = Math.max(2, Math.round(h / 9)); ctx.drawImage(adBuf, 0, yy, w, sl, x + sh, y + yy, w, sl); }
+        ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha *= 0.35; ctx.drawImage(adBuf, x + 3, y);
+      } else ctx.drawImage(adBuf, x, y);
+      ctx.restore();
+      // the glow round the screen, stronger at night
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      const gl = ctx.createRadialGradient(x + w / 2, y + h / 2, h * 0.3, x + w / 2, y + h / 2, w * 0.9); gl.addColorStop(0, css(col, 0.1 + 0.22 * S.dark)); gl.addColorStop(1, css(col, 0));
+      ctx.fillStyle = gl; ctx.fillRect(x - w * 0.5, y - h, w * 2, h * 3); ctx.restore();
+    }
+  }
+
   // ---------- over the rig, at full resolution ----------
   // lights: headlights and the road they light, the sun's glow and lens flare (lighter compositing)
   function light(ctx, W, H, st, rig) {
@@ -529,7 +603,7 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [] } = {}) {
   }
   // a new bolt for a lightning flash
   const strike = () => { bolt = { x: Math.round(40 + Math.random() * (BW - 80)), s: Math.floor(Math.random() * 1e6) }; };
-  return { draw, light, front, strike, sky: skyAt };
+  return { draw, light, front, strike, ads, sky: skyAt, get screens() { return screens; } };
 }
 
 // the weather of a leg: dust and fog by region and hour (the same leg always the same), the Sandsturm brings its own wall of dust

@@ -14,7 +14,8 @@
   "slogan": "Fill up. Zone out.",
   "color": "#fa6a0a",
   "map": {"on": true, "kind": "gasStation", "weight": 3},
-  "icon": 0
+  "icon": 0,
+  "ads": "NOW 3% LESS SAND|FILL UP. ZONE OUT.|NEXT PUMP: 7 MILES|YOUR TANK MISSES YOU"
  },
  "neon_nudel": {
   "sector": "food",
@@ -31,7 +32,8 @@
   "slogan": "Hot as the asphalt.",
   "color": "#bc4a9b",
   "map": {"on": true, "kind": "mall", "weight": 2},
-  "icon": 1
+  "icon": 1,
+  "ads": "GLOWS IN THE DARK. LIKE YOU.|3 MINUTES TO HAPPINESS|NEW: EXTRA RADIOACTIVE SPICE|HOT AS THE ASPHALT"
  },
  "kessler": {
   "sector": "cyber",
@@ -48,7 +50,8 @@
   "slogan": "We replace what's missing.",
   "color": "#249fde",
   "map": {"on": true, "kind": "", "weight": 1},
-  "icon": 2
+  "icon": 2,
+  "ads": "WE REPLACE WHAT'S MISSING|NEW HEART? NO WAITING LIST*|*WAITING LIST APPLIES|UPGRADE YOUR SADNESS"
  },
  "nomadcola": {
   "sector": "drink",
@@ -65,7 +68,8 @@
   "slogan": "Fizz to the bone.",
   "color": "#b4202a",
   "map": {"on": true, "kind": "mall", "weight": 2},
-  "icon": 3
+  "icon": 3,
+  "ads": "FIZZ TO THE BONE|ICE COLD. ROAD HOT.|NOW WITH 40% MORE FIZZ|DRINK NOMAD. STAY NOMAD."
  },
  "motel_salzsee": {
   "sector": "lodging",
@@ -82,7 +86,8 @@
   "slogan": "Vacancy. No questions.",
   "color": "#20d6c7",
   "map": {"on": true, "kind": "", "weight": 1},
-  "icon": 4
+  "icon": 4,
+  "ads": "VACANCY. NO QUESTIONS.|CLEAN SHEETS SINCE 2061|POOL NOW 80% WATER"
  },
  "ordnungsamt": {
   "sector": "authority",
@@ -99,7 +104,8 @@
   "slogan": "Order is safety.",
   "color": "#143464",
   "map": {"on": true, "kind": "government", "weight": 1},
-  "icon": 5
+  "icon": 5,
+  "ads": "ORDER IS SAFETY|REPORT YOUR NEIGHBOUR TODAY|CURFEW 22:00 · SMILE|TAKE A NUMBER"
  },
  "kraehe": {
   "sector": "trade",
@@ -116,7 +122,8 @@
   "slogan": "We take everything.",
   "color": "#71413b",
   "map": {"on": true, "kind": "bunker", "weight": 1},
-  "icon": 6
+  "icon": 6,
+  "ads": "WE TAKE EVERYTHING|YOUR WRECK = OUR TREASURE|CASH FOR SCRAP · NO QUESTIONS"
  },
  "kilometerkoenig": {
   "sector": "vehicle",
@@ -133,7 +140,8 @@
   "slogan": "Rolls till it don't.",
   "color": "#f9a31b",
   "map": {"on": true, "kind": "gasStation", "weight": 2},
-  "icon": 7
+  "icon": 7,
+  "ads": "ROLLS TILL IT DON'T|TIRES! TIRES! TIRES!|THE KING OF EVERY MILE"
  },
  "chroma_kill": {
   "name": "CHROMA//KILL",
@@ -149,7 +157,8 @@
   "price": 100,
   "loot": 110,
   "description": "Straßenmarke für Haarfarbe und Neon-Make-up, gemischt in Hinterhöfen, verkauft aus Rucksäcken. Laut, giftig, unkaputtbar. Jede Gang im Delta trägt irgendwann CHROMA.",
-  "icon": 12
+  "icon": 12,
+  "ads": "DYE BEFORE THE CITY DYES YOU|BE LOUD. BE PINK.|NEON IS A LIFESTYLE"
  },
  "kessler_kosmetik": {
   "name": "Kessler Cosmetics",
@@ -166,7 +175,8 @@
   "price": 180,
   "loot": 40,
   "description": "Die Schönheitssparte von Kessler Cybernetics: Farben, die nicht verblassen, für Köpfe, die nie Regen gesehen haben. Platin trägt nur, wer von Ebene 40 kommt, oder wer einen Tresor geknackt hat.",
-  "icon": 13
+  "icon": 13,
+  "ads": "NOW IN COLOR|BEAUTY, UPGRADED|YOUR FACE, VERSION 2.0"
  },
  "deltatint": {
   "name": "DeltaTint",
@@ -182,7 +192,8 @@
   "price": 70,
   "loot": 130,
   "description": "Die Eigenmarke der Delta-Drugstores: staubige Wastelandtöne in Papiertüten. Färbt Haare, Hände und das Waschbecken gleich mit.",
-  "icon": 14
+  "icon": 14,
+  "ads": "OUTLASTS YOUR RIG|DUST IS A COLOR TOO"
  },
  "neurolux": {
   "name": "NeuroLux",
@@ -198,7 +209,8 @@
   "price": 100,
   "loot": 100,
   "description": "Cyberware von der Stange für alle, die keine Kessler-Termine bekommen. Solide, bunt verpackt, mit Garantie, die niemand einlöst.",
-  "icon": 8
+  "icon": 8,
+  "ads": "SEE SHARPER. FEEL FASTER.|NO APPOINTMENT NEEDED|CHROME FOR THE PEOPLE"
  },
  "vulkan": {
   "name": "Vulkan Defense Systems",
@@ -214,7 +226,8 @@
   "price": 130,
   "loot": 70,
   "description": "Lieferant des Ordnungsamts: Panzerhaut, Hydraulikarme, Zieloptiken. Schwer, laut und verlässlich. Was in den Wastelands davon auftaucht, hat meist einen toten Vorbesitzer.",
-  "icon": 9
+  "icon": 9,
+  "ads": "STEEL THAT HITS BACK|ARMOR UP, BIG CITY|PEACE THROUGH CALIBER"
  },
  "backalley_chrome": {
   "name": "Backalley Chrome",
@@ -230,7 +243,8 @@
   "price": 60,
   "loot": 150,
   "description": "Kein Konzern, eher ein Gerücht: Ripperdocs in Garagen, die aus Schrott Implantate löten. Billig, überall zu finden und manchmal überraschend gut.",
-  "icon": 10
+  "icon": 10,
+  "ads": "WORKS. MOSTLY.|ASK FOR DOC. NO NAMES."
  },
  "ghostwire": {
   "name": "Ghostwire",
@@ -246,6 +260,7 @@
   "price": 120,
   "loot": 80,
   "description": "Ein Kollektiv aus Hackern und Ex-Kessler-Ingenieuren, das experimentelle Chips verkauft: Overclocking, Berserker-Schaltungen, Beine, die mehr wollen als der Körper. Starke Ware mit Nebenwirkungen.",
-  "icon": 11
+  "icon": 11,
+  "ads": "WHAT YOU CAN'T SEE CAN'T SEE YOU|01000111 01001000 01001111 01010011 01010100|THIS AD IS NOT HERE"
  }
 }

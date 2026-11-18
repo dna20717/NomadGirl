@@ -79,8 +79,40 @@ await ev(() => { const s = SC(); s.data_.travel.drive.seconds = 4; s.showDrive =
   nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(3); const mp = s.hud.map, to = nomad.map().near.find(n => n !== nomad.save().location) || nomad.map().near[0]; mp.select(to); document.querySelector('.wm-go').click(); nomad.release?.(); });
 await until(() => SC().hud.modal && SC().hud.drive?.state().phase === 'stop', null, 40000);
 v = await ev(() => ({ st: SC().hud.drive.state(), cast: SC().hud.drive.st.stop?.cast?.length || 0, title: document.querySelector('.hud-menu h2')?.textContent || '', items: [...document.querySelectorAll('.hud-menu .hud-item b')].map(b => b.textContent) }));
-check('Gewürfelter Zwischenfall: Lagerfeuer am Rand, zwei Figuren, Titel und Antworten aus dem Baukasten', v.st.stop === 'campfire' && v.cast === 2 && /Lagerfeuer|Nomaden/.test(v.title) && v.items.length >= 2 && v.items.some(t => /Weiterfahren|Nicht anhalten/.test(t)), v);
+check('Gewürfelter Zwischenfall: Lagerfeuer am Rand, zwei Figuren, Titel und Antworten aus dem Baukasten', v.st.stop === 'campfire' && v.cast === 2 && /Lagerfeuer|Nomaden/.test(v.title) && v.items.length >= 2 && v.items.some(t => /Weiter/.test(t)), v);
 await shot('campfire');
+await ev(() => SC().hud.closeMenu());
+await until(() => !SC().hud.drive?.isOpen, null, 30000);
+
+// #055: Ruf. At the gang's place with Ruf „Freund“ the forced zollstation does not happen there … the generator gives „Freie Fahrt“;
+// the map shows the gang and the Ruf; giant billboards stand by the road; a story (Fehde) goes on on the next drive
+v = await ev(() => { const s = SC(), save = nomad.save(), mp = s.hud.map; nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(3);
+  const near = nomad.map().near, gangOf = id => { const n = save.map.nodes.find(x => x.id === id); return s.data_.pois?.[n?.poi]?.gang?.name || null; };
+  const to = near.find(id => gangOf(id)) || near[0], g = gangOf(to); save.rep = { ...(save.rep || {}), [g]: 90 }; mp.select(to);
+  return { to, g, rep: document.querySelector('.wm-rep')?.textContent || '' }; });
+check('Reisekarte: Revier der Gang mit Ruf „Freund (+90)“', v.g && v.rep.includes(v.g) && /Freund \(\+90\)/.test(v.rep), v);
+const toG = v;
+await ev(() => { const s = SC(); s.data_.travel.drive.seconds = 4; s.showDrive = true; s.forceEncounter = 'gen:freie_fahrt'; s.box.save.hour = 21; for (const l of s.data_.travel.landscapes) l.screens = 100;
+  document.querySelector('.wm-go').click(); nomad.release?.(); });
+await until(() => SC().hud.drive?.isOpen && SC().hud.drive.road?.screens?.length > 0, null, 30000);
+await page.waitForTimeout(1200); await shot('billboards');
+v = await ev(() => ({ screens: SC().hud.drive.road.screens.length, brand: SC().hud.drive.road.screens[0]?.brand?.name, lines: SC().hud.drive.road.screens[0]?.brand?.lines.length }));
+check('Riesen-Billboards mit Werbung der Marken stehen in der Landschaft', v.screens >= 1 && v.brand && v.lines >= 1, v);
+await until(() => SC().hud.modal, null, 40000);
+v = await ev(() => ({ title: document.querySelector('.hud-menu h2')?.textContent || '', items: [...document.querySelectorAll('.hud-menu .hud-item b')].map(b => b.textContent) }));
+check('Freund der Gang: Freie Fahrt statt Wegzoll, keine Kampf-Antworten', /Freie Fahrt|Bekannte Gesichter/.test(v.title) && !v.items.some(t => /Durchbrechen|kämpfen|Gas geben/.test(t)), v);
+await ev(() => SC().hud.choose(0));
+await until(() => !SC().hud.drive?.isOpen, null, 30000);
+// a story: Fehde over two drives
+await ev(() => { const s = SC(); s.forceEncounter = 'gen:fehde1'; nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(3); const mp = s.hud.map, to = nomad.map().near.find(n => n !== nomad.save().location) || nomad.map().near[0]; mp.select(to); document.querySelector('.wm-go').click(); nomad.release?.(); });
+await until(() => SC().hud.modal, null, 40000);
+v = await ev(() => { const items = [...document.querySelectorAll('.hud-menu .hud-item b')].map(b => b.textContent); SC().hud.choose(0); return { items, chain: nomad.save().road?.chain }; });
+check('Fehde: Partei ergreifen startet eine Geschichte (nächster Schritt gemerkt)', v.chain?.step === 'fehde2' && v.items.length >= 3, v);
+await until(() => !SC().hud.drive?.isOpen, null, 30000);
+await ev(() => { const s = SC(); nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(3); const mp = s.hud.map, to = nomad.map().near.find(n => n !== nomad.save().location) || nomad.map().near[0]; mp.select(to); document.querySelector('.wm-go').click(); nomad.release?.(); });
+await until(() => SC().hud.modal, null, 40000);
+v = await ev(() => ({ title: document.querySelector('.hud-menu h2')?.textContent || '', chain: nomad.save().road?.chain }));
+check('Nächste Fahrt: die Geschichte geht weiter („Die Rache der …“)', /Rache/.test(v.title), v);
 await ev(() => SC().hud.closeMenu());
 await until(() => !SC().hud.drive?.isOpen, null, 30000);
 

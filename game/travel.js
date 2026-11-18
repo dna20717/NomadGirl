@@ -6,6 +6,7 @@ import { advance } from './save.js';
 import { give, take, have } from './crafting.js';
 import { rollLoot } from './inventory.js';
 import { generateEncounter, eventsConfig } from './road_events.js';
+import { addRep, repOf, gangs } from './reputation.js';
 
 const isNight = (D, hour) => { const T = D.travel || {}, len = T.dayLength || 24, night = (T.nightShare ?? 40) / 100 * len; return hour >= len - night / 2 || hour < night / 2; };
 
@@ -27,17 +28,33 @@ export function rollEncounter(D, save, km, rnd = Math.random) {
 // #054: the incident of a leg as an object: hand-made (Welt › Encounter) or put together by the Ereignis-Baukasten (Regeln › Anteil gewürfelt)
 // ctx: { danger, region, place } of the destination
 export function pickEncounter(D, save, km, rnd = Math.random, ctx = {}) {
+  const night = isNight(D, save.hour ?? 12), full = { ...ctx, night, save };
+  // #055: a running story comes first, on the very next leg
+  if (save.road?.chain?.step) { const g = generateEncounter(D, rnd, { ...full, chain: save.road.chain }); if (g) return g; save.road.chain = null; }
   const id = rollEncounter(D, save, km, rnd);
   if (!id) return null;
-  const night = isNight(D, save.hour ?? 12);
-  if (rnd() * 100 < eventsConfig(D).share) { const g = generateEncounter(D, rnd, { ...ctx, night }); if (g) return g; }
-  return { id, ...D.encounters[id] };
+  if (rnd() * 100 < eventsConfig(D).share) { const g = generateEncounter(D, rnd, full); if (g) return g; }
+  return handMade(D, save, id, rnd, ctx) || generateEncounter(D, rnd, full);
 }
 // an incident by id (tests, scene.forceEncounter): 'gen' or 'gen:<Lage>' from the Baukasten, else a hand-made one
 export function encounterById(D, save, id, rnd = Math.random, ctx = {}) {
   if (!id) return null;
-  if (String(id).startsWith('gen')) return generateEncounter(D, rnd, { ...ctx, night: isNight(D, save.hour ?? 12), situation: String(id).split(':')[1] || null });
-  return D.encounters?.[id] ? { id, ...D.encounters[id] } : null;
+  if (String(id).startsWith('gen')) return generateEncounter(D, rnd, { ...ctx, save, night: isNight(D, save.hour ?? 12), situation: String(id).split(':')[1] || null });
+  return handMade(D, save, id, rnd, ctx, true);
+}
+// a hand-made encounter with its gang (#055: Encounter › Gang, Ruf von–bis): out of the Ruf range it does not happen (a friend is not
+// stopped at a road block), unless forced; its options carry the gang for their Ruf change
+function handMade(D, save, id, rnd, ctx, force = false) {
+  const E = D.encounters?.[id]; if (!E) return null;
+  let gang = null;
+  if (E.gang) {
+    const ok = n => { const [a, b] = Array.isArray(E.rep) ? E.rep : [-100, 100]; return n >= (a ?? -100) && n <= (b ?? 100); };
+    const cand = E.gang === 'here' && ctx.here ? [ctx.here] : gangs(D).map(g => g.name);
+    const fit = cand.filter(g => ok(repOf(save, g)));
+    if (!fit.length && !force) return null;
+    gang = (fit.length ? fit : cand)[Math.floor(rnd() * (fit.length || cand.length))] || null;
+  }
+  return { id, ...E, gang, options: (E.options || []).map(o => (o.rep && gang ? { ...o, gang } : o)) };
 }
 // may this choice be taken? → reason or null (enough Δ, fuel, the thing it uses)
 export function blocked(D, save, o) {
@@ -65,5 +82,17 @@ export function choose(D, save, o, rnd = Math.random) {
   if (o.loot) for (const e of rollLoot(D, o.loot, rnd)) { if (e.a !== 'items') continue; const rest = give(D, save, e.id, e.n); things.push({ id: e.id, n: e.n - rest }); }
   for (const t of things) if (t.n > 0) lines.push(`+${t.n} ${D.items?.[t.id]?.name || t.id}`);
   if (o.health) { save.health = Math.max(1, Math.round((save.health ?? 100) - o.health)); lines.push(`−${o.health} Leben`); }
-  return { lines, things, text: o.result || '', failed };
+  // #055: consequences that last: Ruf with the gang (also when it went wrong), Merker and buff (only when it worked), the story goes on or ends
+  const rep = o.rep && o.gang ? addRep(D, save, o.gang, o.rep) : null;
+  if (rep?.n) lines.push(`Ruf ${rep.gang} ${rep.n > 0 ? '+' : '−'}${Math.abs(rep.n)}`);
+  const rep2 = o.repRival && o.rival ? addRep(D, save, o.rival, o.repRival) : null;
+  if (rep2?.n) lines.push(`Ruf ${rep2.gang} ${rep2.n > 0 ? '+' : '−'}${Math.abs(rep2.n)}`);
+  const R = save.road ??= { flags: [], seen: [], chain: null };
+  if (!failed) for (const f of String(o.flag || '').split(',').map(x => x.trim()).filter(Boolean)) {
+    if (f.startsWith('-')) R.flags = R.flags.filter(x => x !== f.slice(1)); else if (!R.flags.includes(f)) R.flags.push(f);
+  }
+  if (!failed && o.buff && D.buffs?.[o.buff] && !(save.buffs ||= []).includes(o.buff)) { save.buffs.push(o.buff); lines.push(`Buff: ${D.buffs[o.buff].name}`); }
+  if (o.chain) R.chain = o.chain.next ? { step: o.chain.next, gang: o.chain.gang, rival: o.chain.rival, n: o.chain.n } : null;
+  if (o.once && !R.seen.includes(o.once)) R.seen.push(o.once);   // a situation that happens once per Durchgang
+  return { lines, things, text: o.result || '', failed, rep, rep2, story: R.chain ? 'weiter' : null };
 }

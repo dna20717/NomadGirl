@@ -2,6 +2,7 @@
 // Zielen, die zur Wahl stehen“). Opens at the warroom and at the van door. Left the map (game/map_render.js), right the chosen place:
 // kind, danger, loot hints, cost of the drive, and the action (Hinfahren, Hier plündern). One UI grammar (ui_nav.js):
 // stick / arrows pick a place in that direction, ok = the action, back = close; mouse: hover / click a place, click the button.
+import { repOf, levelOf, levelName } from '../reputation.js';
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { hints } from './ui_nav.js';
@@ -137,6 +138,7 @@ export class MapUI {
       el('div', { class: 'wm-row' }, el('small', {}, 'Beute'), this.intel ? el('div', { class: 'wm-hints' }, ...(n.hints || []).map(h => el('span', { style: `--c:${HINT_COLORS[h] || '#c7b08b'}` }, optLabel(ITEM_CATEGORIES, h) || h))) : el('b', { class: 'wm-unknown' }, '? ? ?')),
       this.intel ? null : el('p', { class: 'wm-intel' }, icon('research', 14), ' Was dort wartet, zeigt erst ein Warroom. Bau einen ins Rig (B), dann siehst du Gefahr und Beute.'),
       b ? el('p', { class: 'wm-brand' }, `${b.name}: „${b.slogan}“`) : null,
+      P.gang?.name ? this.repRow(P.gang) : null,   // #055 whose turf, and Leyla's Ruf with them
       // the POI's own text only at the landmark itself; rolled places say what kind of place it is
       el('p', { class: 'wm-desc' }, n.landmark && P.description ? P.description : `Wie ${P.name || 'ein POI'}, nur ${n.danger > (P.danger || 1) ? 'weiter draußen und gefährlicher' : 'ein anderer Ort'}. Was genau dort liegt, weiß man erst drinnen.`),
       cost ? el('div', { class: 'wm-cost' }, ...[['Strecke', `${cost.km} km${(cost.legs?.length || 1) > 1 ? ` · ${cost.legs.length} Etappen` : ''}`], ['Fahrt', `${de(cost.hours)} h`], ['Sprit', `${de(cost.fuel)} l`, cost.fuel > save.fuel], ['Vorräte', de(cost.food), cost.food > save.food]]
@@ -144,6 +146,12 @@ export class MapUI {
       here && a && !a.disabled ? this.readyBox() : null,
       a ? el('button', { class: 'inv-btn wm-go', disabled: !!a.disabled, title: a.disabled || '', onclick: () => this.act() }, a.icon ? icon(a.icon, 18) : null, ' ', a.disabled && a.cost ? a.disabled : a.label) : null,
       a?.disabled && !a.cost ? el('small', { class: 'wm-why' }, a.disabled) : null].filter(Boolean));   // replaceChildren would write "null"
+  }
+  // #055: the gang of the place with Leyla's Ruf (a bar from Feind to Freund) and its motto
+  repRow(g) {
+    const n = repOf(this.save, g.name), lv = levelOf(this.D, n), col = { feind: '#df3e23', unbeliebt: '#fa6a0a', neutral: '#c8bcd6', geduldet: '#9cdb43', freund: '#20d6c7' }[lv];
+    return el('div', { class: 'wm-rep', style: `--rep:${(n + 100) / 2}%;--rc:${col}` }, el('div', { class: 'wm-row' }, el('small', {}, 'Revier'), el('b', {}, g.name)),
+      el('div', { class: 'wm-repbar' }, el('i')), el('small', { class: 'wm-replv' }, `Ruf: ${levelName(lv)} (${n > 0 ? '+' : ''}${n})${g.motto ? ` · „${g.motto}“` : ''}`));
   }
   // Loadout-Check (#016): what Leyla takes into the run, warnings in amber
   readyBox() {

@@ -11,10 +11,12 @@
    "time": "any",
    "weight": 3,
    "danger": 1,
-   "text": "Ein Schlagbaum aus Leitplanken. {n} {mood} Gestalten in den Farben der {group} winken dich ran.|Die {group} haben die Straße nach {place} gesperrt. Ein Pappschild: „Wegzoll“.|Reifenstapel, ein Wohnwagen als Zollhaus, darauf gesprüht: {group}.",
+   "text": "Ein Schlagbaum aus Leitplanken. {n} {mood} Gestalten in den Farben der {gang} winken dich ran.|Die {gang} haben die Straße nach {place} gesperrt. Ein Pappschild: „Wegzoll“.|Reifenstapel, ein Wohnwagen als Zollhaus, darauf gesprüht: {gang}. Darunter: „{motto}“",
    "answers": "zahlen, feilschen, durchbrechen, umweg",
    "moods": "gierig, gelangweilt, nervoes",
-   "loot": "pluenderer_beute"
+   "loot": "pluenderer_beute",
+   "gang": "here",
+   "rep": [-100, 59]
   },
   {
    "id": "hinterhalt",
@@ -24,10 +26,12 @@
    "time": "night",
    "weight": 2,
    "danger": 2,
-   "text": "Eine Nagelkette quer über dem Asphalt. Aus dem Graben blitzen Läufe.|Plötzlich Scheinwerfer von beiden Seiten. Die {group} haben gewartet.",
+   "text": "Eine Nagelkette quer über dem Asphalt. Aus dem Graben blitzen Läufe.|Plötzlich Scheinwerfer von beiden Seiten. Die {gang} haben gewartet.",
    "answers": "durchbrechen, kaempfen, ava_ablenken, umweg",
    "moods": "gierig, verzweifelt, nervoes",
-   "loot": "pluenderer_beute"
+   "loot": "pluenderer_beute",
+   "gang": "here",
+   "rep": [-100, 19]
   },
   {
    "id": "panne_fremd",
@@ -116,7 +120,7 @@
    "weight": 2,
    "danger": 1,
    "text": "Ein Mast blinkt in einem Muster, das kein Zufall ist. AvA wird ganz still.|Das Radio knackt, dann eine Stimme aus dem Mast da vorne: „…{place}… nicht…“",
-   "answers": "ava_hacken, lauschen, weiterfahren",
+   "answers": "ava_hacken, lauschen>sos2, weiterfahren",
    "moods": "",
    "loot": "drohnen_beute"
   },
@@ -182,7 +186,9 @@
    "text": "Eine Signalfackel mitten auf der Straße. Hilferuf oder Köder.|Rotes Licht flackert über den Asphalt. Daneben {n} Gestalten, {mood}.",
    "answers": "nachsehen, durchbrechen, umweg",
    "moods": "verzweifelt, gierig",
-   "loot": "pluenderer_beute"
+   "loot": "pluenderer_beute",
+   "gang": "any",
+   "rep": [-100, 39]
   },
   {
    "id": "ordnungsamt",
@@ -208,6 +214,236 @@
    "text": "Ein Hang ist abgerutscht. Die Straße nach {place} ist dicht.|Felsbrocken, so groß wie dein Van. Irgendwer hat schon angefangen zu graben und aufgegeben.",
    "answers": "wegraeumen, umweg",
    "moods": ""
+  },
+  {
+   "figures": "schlaeger, schuetze",
+   "time": "any",
+   "weight": 4,
+   "danger": 1,
+   "moods": "freundlich",
+   "id": "freie_fahrt",
+   "name": "Freie Fahrt|Bekannte Gesichter",
+   "roadside": "barrier",
+   "gang": "here",
+   "rep": [60, 100],
+   "text": "Die {gang} erkennen dein Rig und heben den Schlagbaum, bevor du bremst.|„Für dich ist die Straße frei.“ Einer der {gang} wirft dir eine Dose zu.",
+   "answers": "gruessen, weiterfahren"
+  },
+  {
+   "figures": "gewehrschuetze, brecher",
+   "time": "any",
+   "weight": 3,
+   "danger": 1,
+   "moods": "gierig, nervoes",
+   "id": "kopfgeld",
+   "name": "Kopfgeldjäger der {gang}|Dein Gesicht auf einem Steckbrief",
+   "roadside": "barrier",
+   "gang": "any",
+   "rep": [-100, -60],
+   "text": "Dein Gesicht hängt an jeder Tankstelle der {gang}. Jetzt stehen {n} von ihnen auf der Straße.|„Da ist sie!“ Die {gang} haben auf dich gewartet.",
+   "answers": "schutzgeld, durchbrechen, kaempfen, umweg",
+   "loot": "pluenderer_beute"
+  },
+  {
+   "figures": "streuner",
+   "time": "any",
+   "weight": 2,
+   "danger": 1,
+   "moods": "verzweifelt, freundlich",
+   "id": "verletzter",
+   "name": "Verletzter der {gang}",
+   "roadside": "flare",
+   "gang": "any",
+   "rep": [-19, 100],
+   "text": "Am Rand liegt einer mit dem Zeichen der {gang} und winkt mit einer Fackel. Bein im falschen Winkel.",
+   "answers": "verarzten, mitnehmen_gang, weiterfahren"
+  },
+  {
+   "figures": "schuetze, pistolero",
+   "time": "any",
+   "weight": 2,
+   "danger": 2,
+   "moods": "verzweifelt",
+   "id": "fehde1",
+   "name": "Schusswechsel an der Kreuzung|Fehde",
+   "roadside": "barrier",
+   "gang": "any",
+   "rep": [-59, 100],
+   "text": "Die {gang} und die {rival} beschießen sich über die Straße hinweg. Beide Seiten winken dich zu sich.",
+   "answers": "partei_gang>fehde2, partei_rival>fehde2b, raushalten"
+  },
+  {
+   "figures": "schrotflinter, keulenschwinger",
+   "time": "any",
+   "weight": 2,
+   "danger": 1,
+   "moods": "gierig, nervoes",
+   "id": "fehde2",
+   "name": "Die Rache der {rival}",
+   "roadside": "barrier",
+   "only": true,
+   "text": "Die {rival} haben nicht vergessen, wem du geholfen hast. Sie stehen quer auf der Straße.",
+   "answers": "durchbrechen_rivalen>fehde3, kaempfen_rivalen>fehde3, schleichen>fehde3"
+  },
+  {
+   "figures": "schlaeger, schuetze",
+   "time": "any",
+   "weight": 2,
+   "danger": 1,
+   "moods": "freundlich",
+   "id": "fehde3",
+   "name": "Dank der {gang}",
+   "roadside": "campfire",
+   "only": true,
+   "text": "Die {gang} haben ein Feuer gemacht, für dich. „Wer mit uns blutet, fährt mit uns.“",
+   "answers": "dank_annehmen, weiterfahren"
+  },
+  {
+   "figures": "schrotflinter, keulenschwinger",
+   "time": "any",
+   "weight": 2,
+   "danger": 1,
+   "moods": "gierig, nervoes",
+   "id": "fehde2b",
+   "name": "Die Rache der {gang}",
+   "roadside": "barrier",
+   "only": true,
+   "text": "Die {gang} haben nicht vergessen, wem du geholfen hast. Sie stehen quer auf der Straße.",
+   "answers": "durchbrechen>fehde3b, kaempfen>fehde3b, schleichen>fehde3b"
+  },
+  {
+   "figures": "schlaeger, schuetze",
+   "time": "any",
+   "weight": 2,
+   "danger": 1,
+   "moods": "freundlich",
+   "id": "fehde3b",
+   "name": "Dank der {rival}",
+   "roadside": "campfire",
+   "only": true,
+   "text": "Die {rival} haben ein Feuer gemacht, für dich. „Wer mit uns blutet, fährt mit uns.“",
+   "answers": "dank_rivalen, weiterfahren"
+  },
+  {
+   "figures": "",
+   "time": "any",
+   "weight": 2,
+   "danger": 1,
+   "moods": "",
+   "id": "sos2",
+   "name": "Das Signal im Canyon",
+   "roadside": "wreck",
+   "only": true,
+   "text": "AvA folgt dem Signal bis in einen Canyon. Ein Kurierwagen von {brand}, abgestürzt. Fußspuren führen weg.",
+   "answers": "spuren_folgen>sos3, ausschlachten, weiterfahren"
+  },
+  {
+   "figures": "streuner",
+   "time": "any",
+   "weight": 2,
+   "danger": 1,
+   "moods": "verzweifelt",
+   "id": "sos3",
+   "name": "Der Kurier",
+   "roadside": "hitchhiker",
+   "only": true,
+   "text": "Unter einem Felsvorsprung: ein Kurier von {brand}, halb verdurstet. Die Fracht hängt noch an seinem Gürtel.",
+   "answers": "kurier_retten, fracht_nehmen, weiterfahren"
+  },
+  {
+   "figures": "streuner",
+   "time": "any",
+   "weight": 6,
+   "danger": 1,
+   "moods": "freundlich",
+   "id": "kurier_dank",
+   "name": "Ein Dankeschön von {brand}",
+   "roadside": "truck",
+   "needs": "kurier_gerettet",
+   "once": true,
+   "text": "Ein Laster hält neben dir. Am Steuer: der Kurier von damals. „Ich hab dich überall gesucht!“",
+   "answers": "geschenk_kurier, weiterfahren"
+  },
+  {
+   "figures": "panzerwache, gewehrschuetze",
+   "time": "any",
+   "weight": 6,
+   "danger": 1,
+   "moods": "misstrauisch, gelangweilt",
+   "id": "kurier_steckbrief",
+   "name": "Ein Steckbrief",
+   "roadside": "barrier",
+   "needs": "kurier_verlassen",
+   "once": true,
+   "text": "Ein Wachtrupp sucht die Fahrerin, die eine Kurier-Fracht gestohlen hat. Die Beschreibung passt verdächtig gut.",
+   "answers": "gebuehr, papiere_faelschen, umweg"
+  },
+  {
+   "figures": "streuner",
+   "time": "any",
+   "weight": 2,
+   "danger": 1,
+   "moods": "verzweifelt",
+   "id": "flucht1",
+   "name": "Die Läuferin",
+   "roadside": "hitchhiker",
+   "gang": "any",
+   "text": "Eine junge Frau mit dem Zeichen der {gang} auf dem Arm rennt auf die Straße. Hinter ihr Staub von Motorrädern.",
+   "answers": "aufnehmen_flucht>flucht2, ausliefern, weiterfahren"
+  },
+  {
+   "figures": "pistolero, schrotflinter",
+   "time": "any",
+   "weight": 2,
+   "danger": 1,
+   "moods": "gierig, nervoes",
+   "id": "flucht2",
+   "name": "Verfolger der {gang}",
+   "roadside": "barrier",
+   "only": true,
+   "text": "Die {gang} haben dich eingeholt. „Gib sie raus, dann vergessen wir dein Gesicht.“",
+   "answers": "durchbrechen>flucht3, zahlen>flucht3, ausliefern"
+  },
+  {
+   "figures": "",
+   "time": "any",
+   "weight": 2,
+   "danger": 1,
+   "moods": "",
+   "id": "flucht3",
+   "name": "Ihr Versteck",
+   "roadside": "shrine",
+   "only": true,
+   "text": "Sie führt dich zu einem alten Schrein am Kilometerstein. Darunter: alles, was sie den {gang} je abgenommen hat.",
+   "answers": "teilen_versteck, alles_nehmen"
+  },
+  {
+   "figures": "streuner",
+   "time": "any",
+   "weight": 6,
+   "danger": 1,
+   "moods": "freundlich",
+   "id": "laeuferin_wieder",
+   "name": "Ein bekanntes Gesicht",
+   "roadside": "campfire",
+   "needs": "laeuferin_freundin",
+   "once": true,
+   "text": "Am Feuer sitzt die Läuferin von damals. Neue Jacke, neue Freunde, ein Päckchen für dich.",
+   "answers": "geschenk_laeuferin, weiterfahren"
+  },
+  {
+   "figures": "pistolero",
+   "time": "any",
+   "weight": 6,
+   "danger": 1,
+   "moods": "gierig",
+   "id": "laeuferin_rache",
+   "name": "Die Läuferin ist zurück",
+   "roadside": "barrier",
+   "needs": "laeuferin_bestohlen",
+   "once": true,
+   "text": "Sie hat dein Rig wiedererkannt. Diesmal hat sie Freunde mit Waffen dabei.",
+   "answers": "zahlen, durchbrechen, umweg"
   }
  ],
  "moods": [
@@ -274,7 +510,8 @@
    "label": "Zahlen ({price} Δ)|Den Wegzoll zahlen ({price} Δ)",
    "when": "any",
    "deltas": -40,
-   "result": "Sie zählen nach. Zweimal.|Geld wechselt den Besitzer, der Schlagbaum geht hoch."
+   "result": "Sie zählen nach. Zweimal.|Geld wechselt den Besitzer, der Schlagbaum geht hoch.",
+   "rep": 5
   },
   {
    "id": "feilschen",
@@ -284,7 +521,8 @@
    "risk": 35,
    "failHealth": 10,
    "result": "Halber Preis und ein schiefes Grinsen.",
-   "failResult": "Feilschen kam nicht gut an. Gar nicht gut."
+   "failResult": "Feilschen kam nicht gut an. Gar nicht gut.",
+   "rep": -3
   },
   {
    "id": "durchbrechen",
@@ -296,7 +534,8 @@
    "risk": 25,
    "failHealth": 15,
    "result": "Blech kreischt, dann bist du durch.|Durch! Im Rückspiegel fliegt was.",
-   "failResult": "Du bist durch, aber das Rig hat ordentlich eingesteckt."
+   "failResult": "Du bist durch, aber das Rig hat ordentlich eingesteckt.",
+   "rep": -15
   },
   {
    "id": "umweg",
@@ -368,7 +607,8 @@
    "risk": 20,
    "failHealth": 15,
    "result": "AvA spielt laut Musik aus dem Graben. Alle schauen hin, du bist weg.",
-   "failResult": "Die Ablenkung klappt nur halb."
+   "failResult": "Die Ablenkung klappt nur halb.",
+   "rep": -5
   },
   {
    "id": "kaempfen",
@@ -379,7 +619,8 @@
    "risk": 30,
    "failHealth": 20,
    "result": "Kurz und laut. Danach gehört dir, was sie dabeihatten.",
-   "failResult": "Du gewinnst. Knapp. Sehr knapp."
+   "failResult": "Du gewinnst. Knapp. Sehr knapp.",
+   "rep": -20
   },
   {
    "id": "schleichen",
@@ -434,7 +675,7 @@
    "deltas": 20,
    "risk": 20,
    "failHours": 1,
-   "result": "AvA entschlüsselt Koordinaten einer Versorgungskiste. Δ für die Info.",
+   "result": "AvA entschlüsselt Koordinaten. Ein Notruf, irgendwo vor dir.",
    "failResult": "Nur Rauschen. Und eine verlorene Stunde."
   },
   {
@@ -481,6 +722,173 @@
    "failHealth": 10,
    "result": "Stein für Stein. Leyla flucht in drei Sprachen.",
    "failResult": "Ein Brocken rutscht nach. Autsch."
+  },
+  {
+   "id": "gruessen",
+   "label": "Hupen und winken",
+   "when": "any",
+   "rep": 2,
+   "item": "nomadcola",
+   "count": 1,
+   "result": "Die Dose ist sogar kalt.|Im Rückspiegel heben sie die Fäuste. Freundlich gemeint."
+  },
+  {
+   "id": "schutzgeld",
+   "label": "Schutzgeld zahlen ({price} Δ)",
+   "when": "any",
+   "deltas": -80,
+   "rep": 10,
+   "result": "Sie nehmen das Geld und streichen dich von der Liste. Vorerst."
+  },
+  {
+   "id": "verarzten",
+   "label": "Verarzten",
+   "when": "any",
+   "use": "verband",
+   "useCount": 1,
+   "hours": 0.5,
+   "rep": 12,
+   "deltas": 20,
+   "result": "Die {gang} erfahren davon. Das spricht sich rum."
+  },
+  {
+   "id": "mitnehmen_gang",
+   "label": "Zu seinen Leuten bringen",
+   "when": "any",
+   "hours": 1.5,
+   "fuel": 2,
+   "rep": 15,
+   "result": "Die {gang} nicken dir zu. Bei ihnen bist du jetzt jemand."
+  },
+  {
+   "id": "partei_gang",
+   "label": "Den {gang} helfen",
+   "when": "any",
+   "health": 10,
+   "rep": 15,
+   "repRival": -25,
+   "result": "Ein paar Schüsse aus dem Rig, und die {rival} ziehen ab. Für jetzt."
+  },
+  {
+   "id": "partei_rival",
+   "label": "Den {rival} helfen",
+   "when": "any",
+   "health": 10,
+   "rep": -25,
+   "repRival": 15,
+   "result": "Du schlägst dich auf die Seite der {rival}. Die {gang} merken sich dein Kennzeichen."
+  },
+  {"id": "raushalten", "label": "Raushalten, Umweg fahren", "when": "any", "hours": 1, "fuel": 2, "result": "Nicht dein Krieg."},
+  {
+   "id": "durchbrechen_rivalen",
+   "label": "Durchbrechen",
+   "when": "any",
+   "health": 15,
+   "fuel": 2,
+   "repRival": -10,
+   "risk": 25,
+   "failHealth": 15,
+   "result": "Durch!",
+   "failResult": "Durch, aber teuer."
+  },
+  {
+   "id": "kaempfen_rivalen",
+   "label": "Aussteigen und kämpfen",
+   "when": "any",
+   "health": 25,
+   "repRival": -15,
+   "loot": "pluenderer_beute",
+   "risk": 30,
+   "failHealth": 20,
+   "result": "Die {rival} werden das so schnell nicht vergessen.",
+   "failResult": "Knapp gewonnen."
+  },
+  {
+   "id": "dank_annehmen",
+   "label": "Mit ihnen anstoßen",
+   "when": "any",
+   "hours": 2,
+   "rep": 20,
+   "buff": "gestaerkt",
+   "flag": "fehde_held",
+   "result": "Eine lange Nacht. Du bist jetzt eine von ihnen. Fast."
+  },
+  {
+   "id": "dank_rivalen",
+   "label": "Mit ihnen anstoßen",
+   "when": "any",
+   "hours": 2,
+   "repRival": 20,
+   "buff": "gestaerkt",
+   "flag": "fehde_held",
+   "result": "Eine lange Nacht. Die {rival} haben eine neue Freundin."
+  },
+  {"id": "spuren_folgen", "label": "Den Spuren folgen", "when": "any", "hours": 1, "result": "Die Spuren werden unsicherer. Dann ein Stöhnen."},
+  {
+   "id": "kurier_retten",
+   "label": "Ihn retten",
+   "when": "any",
+   "food": 1,
+   "hours": 1,
+   "deltas": 40,
+   "flag": "kurier_gerettet",
+   "result": "Du bringst ihn zur nächsten Siedlung. {brand} wird davon hören."
+  },
+  {
+   "id": "fracht_nehmen",
+   "label": "Die Fracht nehmen",
+   "when": "any",
+   "loot": "drohnen_beute",
+   "flag": "kurier_verlassen",
+   "result": "Die Fracht ist schwer. Das Gewissen auch. Ein bisschen."
+  },
+  {
+   "id": "geschenk_kurier",
+   "label": "Das Geschenk annehmen",
+   "when": "any",
+   "deltas": 120,
+   "buff": "flink",
+   "item": "nomadcola",
+   "count": 3,
+   "result": "Ein Umschlag voller Δ, drei NomadCola und ein Gutschein „Einmal Turbo“."
+  },
+  {"id": "aufnehmen_flucht", "label": "Einsteigen lassen", "when": "any", "rep": -10, "result": "Sie wirft sich auf den Beifahrersitz. „Fahr!“"},
+  {
+   "id": "ausliefern",
+   "label": "Sie den {gang} ausliefern",
+   "when": "any",
+   "rep": 15,
+   "deltas": 30,
+   "flag": "laeuferin_verraten",
+   "result": "Die {gang} nehmen sie mit. Sie sieht dich nicht an."
+  },
+  {
+   "id": "teilen_versteck",
+   "label": "Teilen, wie versprochen",
+   "when": "any",
+   "loot": "kiste_tankstelle",
+   "buff": "flink",
+   "flag": "laeuferin_freundin",
+   "result": "Sie umarmt dich. „Wir sehen uns, Leyla.“"
+  },
+  {
+   "id": "alles_nehmen",
+   "label": "Alles nehmen und abhauen",
+   "when": "any",
+   "loot": "tresor",
+   "flag": "laeuferin_bestohlen",
+   "risk": 20,
+   "failHealth": 15,
+   "result": "Sie schreit dir hinterher. Du drehst das Radio lauter.",
+   "failResult": "Sie wehrt sich. Mit einem Messer."
+  },
+  {
+   "id": "geschenk_laeuferin",
+   "label": "Das Päckchen öffnen",
+   "when": "any",
+   "loot": "kiste_tankstelle",
+   "deltas": 50,
+   "result": "Darin: Δ, ein Foto von euch beiden am Schrein und etwas Brauchbares."
   }
  ],
  "words": {

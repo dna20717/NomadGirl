@@ -27,7 +27,8 @@
    "pylons": 0,
    "city": 20,
    "dust": 15,
-   "fog": 10
+   "fog": 10,
+   "screens": 25
   },
   {
    "region": "Glass Dunes",
@@ -47,7 +48,8 @@
    "pylons": 0,
    "city": 10,
    "dust": 35,
-   "fog": 5
+   "fog": 5,
+   "screens": 15
   },
   {
    "region": "South Badlands",
@@ -67,7 +69,8 @@
    "pylons": 0,
    "city": 5,
    "dust": 20,
-   "fog": 5
+   "fog": 5,
+   "screens": 15
   },
   {
    "region": "Salt Flats",
@@ -87,7 +90,8 @@
    "pylons": 1,
    "city": 15,
    "dust": 10,
-   "fog": 15
+   "fog": 15,
+   "screens": 35
   },
   {
    "region": "Scrap Desert",
@@ -107,7 +111,8 @@
    "pylons": 1,
    "city": 10,
    "dust": 25,
-   "fog": 5
+   "fog": 5,
+   "screens": 25
   },
   {
    "region": "Crow Valley",
@@ -127,7 +132,8 @@
    "pylons": 0,
    "city": 5,
    "dust": 10,
-   "fog": 25
+   "fog": 25,
+   "screens": 15
   },
   {
    "region": "East Bend",
@@ -147,7 +153,8 @@
    "pylons": 1,
    "city": 15,
    "dust": 5,
-   "fog": 30
+   "fog": 30,
+   "screens": 30
   },
   {
    "region": "Delta Ring",
@@ -167,7 +174,8 @@
    "pylons": 1,
    "city": 90,
    "dust": 10,
-   "fog": 20
+   "fog": 20,
+   "screens": 75
   },
   {
    "region": "The Outskirts",
@@ -187,7 +195,8 @@
    "pylons": 1,
    "city": 55,
    "dust": 15,
-   "fog": 10
+   "fog": 10,
+   "screens": 50
   }
  ]
 }

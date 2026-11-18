@@ -423,6 +423,7 @@ Daniel, 16.11.2026: „Ich möchte, dass wir uns jetzt mit dem Sozialsystem ause
 - **Wirkt auf:** Preise und Angebote (Ware, Rezepte, Rig-Teile), Überfälle und Kopfgeld (verhasste Gangs jagen das Rig, Elite-Jäger), Wege und Zugang (Durchfahrt durch Gang-Gebiet, Tore von Siedlungen, Straßen auf der Karte frei oder gesperrt), Bewerber und Gerüchte (Ruhm lockt Leute ans Feuer, Gerüchte eilen voraus).
 - **Gangs:** Verhandeln ist möglich (Tribut, Aufträge für sie, Waffenstillstand, gegeneinander ausspielen), aber **POIs werden dadurch nicht zwangsläufig friedlich**. Ein friedlicher POI ist das **Endgame der Diplomatie** (Daniel).
 - **Ruf auf der Reisekarte:** Gebiete der Fraktionen und ihr Ruf direkt auf der Karte.
+- **Erster Bau (#055, 18.11.2026):** Ruf je Gang der POIs im Spielstand, Stufen Feind … Freund; Ereignisse unterwegs wählen Lage und Stimmung nach dem Ruf (Freunde werden nicht überfallen, Feinde gejagt), Antworten ändern ihn, Kills im Revier kosten ihn, Preise folgen ihm; Revier und Ruf am Ort auf der Reisekarte. Noch offen: Siedlungen und Marken als Fraktionen, Ruhm, Wege/Tore, Bewerber, Gerüchte.
 
 #### Überfälle
 

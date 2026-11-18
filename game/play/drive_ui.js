@@ -50,9 +50,10 @@ export class DriveUI {
     this.road = makeRoad(D, { seed, logos, brands: mapBrands(D) });
     this.trip = { from, to, legs, seed };
     this.st = { dist: 0, t: 0, dt: 0, v: 0, hour: 12, land: [landscapeOf(D, ''), landscapeOf(D, ''), 0], wet: 0, dust: 0, fog: 0, flash: 0, stop: null };
-    this.legInfo = null; this.phase = 'idle'; this.fade = 1; this.fading = -1.6; this.lit = null; this.litKey = '';
+    this.legInfo = null; this.phase = 'idle'; this.fade = 1; this.steam = 0; this.steamP = []; this.puffs = []; this.say = null; this.lastLeg = null; this.fading = -1.6; this.lit = null; this.litKey = '';
     this.el.hidden = false; this.el.parentNode?.classList.add('dv-on');
     s.cameras?.main?.setVisible(false);   // the camp underneath does not need to be drawn
+    s.hud?.banner?.(null);   // an old „Angekommen“ does not ride along
     this.last = performance.now();
     cancelAnimationFrame(this.raf); this.raf = requestAnimationFrame(t => this.frame(t));
   }
@@ -261,6 +262,7 @@ export class DriveUI {
       for (let y = 120; y < 172; y++) { const o = Math.sin(st.t * 6 + y * 0.9) * haze * 1.2 * (1 - Math.abs(y - 150) / 26); ctx.drawImage(this.bg, 0, y, BW, 1, Math.round(o * u), y * u, W, Math.ceil(u)); }
       ctx.drawImage(this.bg, 0, 172, BW, BH - 172, 0, 172 * u, W, (BH - 172) * u);
     } else ctx.drawImage(this.bg, 0, 0, W, H);
+    this.road.ads(ctx, W, H, st);   // #055 giant screens of the brands
     this.drawCast(ctx, W, S);
     const lamps = this.drawRig(ctx, W, H, S);
     this.road.light(ctx, W, H, st, lamps);

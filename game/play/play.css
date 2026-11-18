@@ -1062,3 +1062,8 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .dv-dot.done { background: #ffd27a; border-color: #ffd27a; }
 .dv-van { position: absolute; top: -24px; transform: translateX(-50%); color: #7ff6ff; filter: drop-shadow(0 0 6px rgba(127, 246, 255, .6)); }
 .dv-on .hud-foot, .dv-on .hud-prompt { visibility: hidden; }
+/* #055 Ruf bei der Gang des Orts on the travel map */
+.wm-rep { display: grid; gap: 4px; margin: 6px 0; }
+.wm-repbar { position: relative; height: 6px; border-radius: 3px; background: linear-gradient(90deg, #df3e23, #fa6a0a 30%, #4a3f55 50%, #9cdb43 70%, #20d6c7); opacity: .85; }
+.wm-repbar i { position: absolute; top: -3px; left: var(--rep); width: 4px; height: 12px; margin-left: -2px; border-radius: 2px; background: #fff; box-shadow: 0 0 6px var(--rc); }
+.wm-replv { color: var(--rc); }

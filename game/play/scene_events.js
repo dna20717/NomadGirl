@@ -1,6 +1,7 @@
 // Events of the play scene (#017 split from scene.js): knock-out, waking up, the dropped backpack, notes and achievements, kills.
 // Mixed into PlayScene (game/play/scene.js): the methods keep their `this`, nothing else changes.
 import { rescue } from '../tank.js';
+import { addRep, repConfig, levelName } from '../reputation.js';
 import { Camp } from './camp.js';
 import { droneBonuses } from '../stations.js';
 import { add, rollLoot } from '../inventory.js';
@@ -149,6 +150,9 @@ export class SceneEvents {
     this.achieve('kills', 1, [e.id, e.d.family, h.kind === 'shot' ? slots.ranged : h.kind === 'melee' ? slots.melee : null, h.crit ? 'crit' : null]);
     this.loot?.fromEnemy(e);
     this.drone.react('kill');
+    // #055: a kill on a gang's turf costs Ruf with that gang (Ereignis-Baukasten › Ruf › je Kill im Revier)
+    const G = this.mode === 'run' && this.box?.save ? this.gang?.() : null;
+    if (G?.name) { const r = addRep(this.data_, this.box.save, G.name, -repConfig(this.data_).kill); if (r?.changed) this.hud.toast(`${G.name}: ${levelName(r.level)}`, 'Dein Ruf bei ihnen sinkt', 'warn', 3600); }
     const [a, b] = e.d.deltas || [0, 0], d = a + Math.floor(Math.random() * (b - a + 1));
     this.deltas += d;
     if (d) this.fx.text(e.x, e.feet - e.h - 20, `+${d} Δ`, { color: '#ffd27a', size: 48, rise: 90, life: 1100 });

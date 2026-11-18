@@ -6,6 +6,10 @@ Neuer Code nimmt die Wörter aus dieser Liste. Die Grundbegriffe (Werkstatt, Pr�
 
 | Deutsch | Englisch |
 |---|---|
+| Ruf (bei einer Gang) | rep |
+| Merker (Folgen von Ereignissen) | flag |
+| Kette (Ereignisse über mehrere Etappen) | chain |
+| Riesen-Billboard | screen (Werbung: ads) |
 | Fahrt (Szene zwischen zwei Orten) | drive |
 | Landschaft | landscape |
 | Straßenrand | roadside |

@@ -8,14 +8,21 @@
 // Templates: {mood} {place} {region} {brand} {group} {cargo} {thing} {creature} {n} {price}; several variants separated by „|“.
 // The danger of the place she drives to makes paying dearer, hurting harder and rewards bigger (Regeln › je Gefahrstufe).
 // The result has the shape of a hand-made encounter (Welt › Encounter), so the road, the window and travel.choose take it as it is.
+// #055 Ruf, Folgen, Ketten: a situation may belong to a gang (the destination's or any) and only happen in a range of Leyla's Ruf with it;
+// the Ruf picks the mood (friends are never met with hostile moods, so they never attack). Answers change the Ruf („rep“), set or clear
+// Merker („flag“, „-flag“), give a buff, and may lead to a next situation („antwort>lage“): the next leg brings it, a story over three or
+// four legs. Situations with „Nur als Folge“ only come that way, „needs“/„not“ ask for Merker (who was helped turns up again).
+// Placeholders also {gang} {rival} {motto}.
 // No DOM.
 import { mapBrands } from './brands.js';
+import { gangs, repOf, levelOf, gangOfPlace, repPrice } from './reputation.js';
 
 const pick = (r, a) => a[Math.floor(r() * a.length) % a.length];
 const variants = s => String(s || '').split('|').map(x => x.trim()).filter(Boolean);
 const list = s => (Array.isArray(s) ? s : String(s || '').split(',')).map(x => String(x).trim()).filter(Boolean);
 const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
 
+export const GANG_FROM = [['', 'keine Gang'], ['here', 'die Gang des Ziels (sonst eine zufällige)'], ['any', 'eine zufällige Gang']];
 export const ANSWER_WHEN = [['any', 'immer'], ['friendly', 'nur bei freundlicher Stimmung'], ['hostile', 'nur bei feindseliger Stimmung']];
 
 export function eventsConfig(D) {
@@ -25,36 +32,57 @@ export function eventsConfig(D) {
 }
 
 // the situations that may happen now (time of day, danger), by weight; id forces one
-export function situationsFor(D, { night = false, danger = 1 } = {}) {
-  return eventsConfig(D).situations.filter(s => (s.weight ?? 1) > 0 && (!s.time || s.time === 'any' || (s.time === 'night') === night) && (s.danger ?? 1) <= danger);
+// (#055) not „only as a follow-up“, Merker needed / forbidden, once per Durchgang, the Ruf with its gang in range
+export function situationsFor(D, { night = false, danger = 1, save = null, here = null } = {}) {
+  const flags = new Set(save?.road?.flags || []), seen = new Set(save?.road?.seen || []);
+  return eventsConfig(D).situations.filter(s => (s.weight ?? 1) > 0 && !s.only && (!s.time || s.time === 'any' || (s.time === 'night') === night) && (s.danger ?? 1) <= danger
+    && list(s.needs).every(f => flags.has(f)) && !list(s.not).some(f => flags.has(f)) && !(s.once && seen.has(s.id)) && (!s.gang || gangFor(D, s, save, here, () => 0.5) !== undefined));
 }
+const inRange = (s, n) => { const [a, b] = Array.isArray(s.rep) ? s.rep : [-100, 100]; return n >= (a ?? -100) && n <= (b ?? 100); };
+// the gang of a situation: the destination's („here“) or one whose Ruf fits („any“, or „here“ without a gang); undefined = none fits
+function gangFor(D, S, save, here, rnd) {
+  if (!S.gang) return null;
+  if (S.gang === 'here' && here) return inRange(S, repOf(save, here)) ? here : undefined;
+  const ok = gangs(D).filter(g => inRange(S, repOf(save, g.name)));
+  return ok.length ? pick(rnd, ok).name : undefined;
+}
+// parse „answer>next“ of a situation's answer list
+const answerRefs = S => list(S.answers).map(x => { const [id, next] = x.split('>').map(y => y.trim()); return { id, next: next || null }; });
 
 // one incident from the parts → an encounter ({ id: 'gen:<situation>', generated, name, description, roadside, figures, enemies, options … }) or null
-// ctx: { night, danger (1–5), region, place (name of the destination), situation (id, forces it) }
+// ctx: { night, danger (1–5), region, place (name of the destination), situation (id, forces it), save (Ruf, Merker), here (gang of the
+//   destination), chain ({ step, gang, rival, n } of a running story) }
 export function generateEncounter(D, rnd = Math.random, ctx = {}) {
-  const C = eventsConfig(D), danger = Math.max(1, Math.min(5, ctx.danger ?? 1));
-  let S = ctx.situation ? C.situations.find(s => s.id === ctx.situation) : null;
+  const C = eventsConfig(D), danger = Math.max(1, Math.min(5, ctx.danger ?? 1)), save = ctx.save || null, chain = ctx.chain || null;
+  let S = chain ? C.situations.find(s => s.id === chain.step) : ctx.situation ? C.situations.find(s => s.id === ctx.situation) : null;
   if (!S) {
-    const all = situationsFor(D, { night: !!ctx.night, danger });
+    const all = situationsFor(D, { night: !!ctx.night, danger, save, here: ctx.here || null });
     if (!all.length) return null;
     let k = rnd() * all.reduce((n, s) => n + (s.weight ?? 1), 0);
     S = all.find(s => (k -= s.weight ?? 1) < 0) || all[all.length - 1];
   }
-  const moodIds = list(S.moods), moods = moodIds.length ? C.moods.filter(m => moodIds.includes(m.id)) : [];
+  // the gang and its rival (a running story keeps its gangs); the Ruf with the gang picks the mood
+  const gang = chain?.gang ?? gangFor(D, S, save, ctx.here || null, rnd) ?? (S.gang ? pick(rnd, gangs(D).map(g => g.name).concat('Plünderer')) : null);
+  const others = gangs(D).map(g => g.name).filter(g => g !== gang), rival = chain?.rival || (others.length ? pick(rnd, others) : 'Plünderer');
+  const lvl = gang ? levelOf(D, repOf(save, gang)) : 'neutral';
+  const moodIds = list(S.moods); let moods = moodIds.length ? C.moods.filter(m => moodIds.includes(m.id)) : [];
+  const byRep = { freund: m => m.friendly && !m.hostile, geduldet: m => m.friendly, unbeliebt: m => m.hostile, feind: m => m.hostile && !m.friendly }[lvl];
+  if (gang && byRep && moods.some(byRep)) moods = moods.filter(byRep);
   const M = moods.length ? pick(rnd, moods) : null;
   const W = C.words, brands = mapBrands(D), word = (s, d) => { const v = variants(s); return pick(rnd, v.length ? v : [d]); };
   const fill = {
     mood: M?.name || '', place: ctx.place || 'die Stadt', region: ctx.region || 'Ödland', brand: brands.length ? (b => b.short || b.name)(pick(rnd, brands)) : 'NomadCola',
-    group: word(W.group, 'Plünderer'), cargo: word(W.cargo, 'Ersatzteile'), thing: word(W.thing, 'Schrott'), creature: word(W.creature, 'Kreaturen'), n: String(2 + Math.floor(rnd() * 4)),
+    group: gang || word(W.group, 'Plünderer'), gang: gang || word(W.group, 'Plünderer'), rival, motto: gangs(D).find(g => g.name === gang)?.motto || '', cargo: word(W.cargo, 'Ersatzteile'), thing: word(W.thing, 'Schrott'), creature: word(W.creature, 'Kreaturen'), n: String(2 + Math.floor(rnd() * 4)),
   };
   const text = (tpl, extra = {}) => { const v = variants(tpl); if (!v.length) return ''; return pick(rnd, v).replace(/\{(\w+)\}/g, (all, k) => (extra[k] ?? fill[k] ?? all)).replace(/\s+/g, ' ').trim(); };
   // answers: those of the situation that fit the mood, in the situation's order, at most „Antworten höchstens“; always one that costs nothing to try
   const friendly = M ? !!M.friendly : true, hostile = M ? !!M.hostile : true;
   const fits = a => !a.when || a.when === 'any' || (a.when === 'friendly' && friendly) || (a.when === 'hostile' && hostile);
-  let A = list(S.answers).map(id => C.answers.find(a => a.id === id)).filter(Boolean).filter(fits);
+  let A = answerRefs(S).map(r => { const a = C.answers.find(x => x.id === r.id); return a && { ...a, next: r.next }; }).filter(Boolean).filter(fits);
   const free = a => !(a.deltas < 0) && !a.use;   // always possible (time and fuel she has; Δ and things maybe not)
   if (A.length > C.maxAnswers) { const keep = A.slice(0, C.maxAnswers); if (!keep.some(free)) { const f = A.find(free); if (f) keep[keep.length - 1] = f; } A = keep; }
-  const k = 1 + C.scale * (danger - 1), price = (M?.price ?? 100) / 100, riskAdd = M?.risk ?? 0;
+  const k = 1 + C.scale * (danger - 1), price = (M?.price ?? 100) / 100 * repPrice(D, save, gang), riskAdd = M?.risk ?? 0;
+  const inChain = !!chain || A.some(a => a.next);
   const options = A.map(a => {
     const o = { answer: a.id };
     for (const f of ['hours', 'fuel', 'food']) if (a[f]) o[f] = a[f];
@@ -67,6 +95,12 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
     if (a.risk > 0) o.risk = Math.max(0, Math.min(95, Math.round(a.risk + riskAdd)));
     if (a.failHealth) o.failHealth = Math.round(a.failHealth * k);
     if (a.failHours) o.failHours = a.failHours;
+    if (a.rep && gang) { o.rep = a.rep; o.gang = gang; }
+    if (a.repRival && rival) { o.repRival = a.repRival; o.rival = rival; }
+    if (a.flag) o.flag = a.flag;
+    if (a.buff) o.buff = a.buff;
+    if (S.once) o.once = S.id;
+    if (inChain) { o.chain = { next: a.next || null, gang, rival, n: (chain?.n || 1) + (a.next ? 1 : 0) }; }
     const extra = { price: String(Math.abs(o.deltas || 0)) };
     o.label = cap(text(a.label, extra)) || 'Weiter';
     o.result = text(a.result, extra);
@@ -75,7 +109,7 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
   });
   if (!options.length) options.push({ label: 'Weiterfahren', result: '' });
   const figures = list(S.figures).filter(id => D.enemies?.[id]);
-  return { id: `gen:${S.id}`, generated: true, situation: S.id, mood: M?.id || null, name: cap(text(S.name)) || 'Zwischenfall', description: [text(S.text), M ? text(M.text) : ''].filter(Boolean).join(' '),
+  return { id: `gen:${S.id}`, generated: true, situation: S.id, mood: M?.id || null, gang, rival, step: chain ? chain.n : null, once: !!S.once, name: cap(text(S.name)) || 'Zwischenfall', description: [text(S.text), M ? text(M.text) : ''].filter(Boolean).join(' '),
     roadside: S.roadside || '', figures, enemies: figures, time: S.time || 'any', loot: S.loot || null, look: S.look || null, danger, options };
 }
 
@@ -83,10 +117,14 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
 export function eventProblems(D) {
   const C = eventsConfig(D), out = [];
   for (const s of C.situations) {
-    for (const id of list(s.answers)) if (!C.answers.some(a => a.id === id)) out.push(`Lage „${s.id}“: Antwort „${id}“ gibt es nicht`);
+    for (const { id, next } of answerRefs(s)) {
+      if (!C.answers.some(a => a.id === id)) out.push(`Lage „${s.id}“: Antwort „${id}“ gibt es nicht`);
+      if (next && !C.situations.some(x => x.id === next)) out.push(`Lage „${s.id}“: Folge „${next}“ gibt es nicht`);
+    }
+    if (s.only && !C.situations.some(x => answerRefs(x).some(r => r.next === s.id))) out.push(`Lage „${s.id}“: „Nur als Folge“, aber keine Antwort führt hierher`);
     for (const id of list(s.moods)) if (!C.moods.some(m => m.id === id)) out.push(`Lage „${s.id}“: Stimmung „${id}“ gibt es nicht`);
     for (const id of list(s.figures)) if (!D.enemies?.[id]) out.push(`Lage „${s.id}“: Figur „${id}“ ist kein Gegner`);
-    const A = list(s.answers).map(id => C.answers.find(a => a.id === id)).filter(Boolean);
+    const A = answerRefs(s).map(r => C.answers.find(a => a.id === r.id)).filter(Boolean);
     if (A.length && !A.some(a => !(a.deltas < 0) && !a.use && (!a.when || a.when === 'any'))) out.push(`Lage „${s.id}“: keine Antwort, die immer geht (ohne Δ und Gegenstand)`);
   }
   return out;

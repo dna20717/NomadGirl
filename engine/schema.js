@@ -17,7 +17,7 @@ import { DECOR_PLACES, DECOR_ARTS } from '../game/decor.js';
 import { MOMENTS } from '../game/banter.js';
 import { EARN_WHEN } from '../game/earn.js';
 import { RELIEFS, ROADSIDE } from '../game/road.js';
-import { ANSWER_WHEN, eventProblems } from '../game/road_events.js';
+import { ANSWER_WHEN, GANG_FROM, eventProblems } from '../game/road_events.js';
 
 const text = (key, label, o = {}) => ({ key, label, type: 'text', ...o });
 const area_ = (key, label, o = {}) => ({ key, label, type: 'textarea', ...o });
@@ -1420,11 +1420,12 @@ export const AREAS = {
     row: x => `${label(DAYTIME, x.time)} · Gewicht ${x.weight ?? 0} · ${(x.options || []).length} Entscheidungen`,
     sections: [{ title: 'Encounter', fields: [NAME, LOOK, num('weight', 'Gewicht', { min: 0 }), select('time', 'Tageszeit', DAYTIME), refs('enemies', 'Gegner', 'enemies', { hint: 'Noch ohne Wirkung: ein Kampf auf der Straße als kleines Level kommt später' }), ref('loot', 'Beute', 'lootTables'), DESCRIPTION,
         refs('figures', 'Figuren am Straßenrand', 'enemies', { hint: '#053: wer in der Fahrt-Szene am Rand steht (Gegner-Bausätze in Rig-Größe, schauen zum Rig); leer = die Gegner' }),
+        select('gang', 'Gang', GANG_FROM, { hint: '#055: wessen Leute das sind; außerhalb des Ruf-Bereichs passiert er nicht (ein Freund wird nicht angehalten)' }), range('rep', 'Ruf von–bis'),
         select('roadside', 'Am Straßenrand', ROADSIDE, { hint: '#053: was in der Fahrt-Szene am Rand steht und näher kommt, bevor das Rig hält und das Fenster aufgeht (aus Code gezeichnet)' })] },
       { title: 'Entscheidungen', fields: [table('options', 'Entscheidungen', [text('label', 'Knopf'), num('hours', 'Zeit', { unit: 'h' }), num('fuel', 'Sprit', { unit: 'l', hint: 'positiv = kostet' }),
         num('food', 'Vorräte', { hint: 'positiv = kostet' }), num('deltas', 'Δ', { hint: 'negativ = zahlen' }), num('health', 'Schaden', { unit: 'Leben', min: 0 }),
         ref('use', 'Verbraucht', 'items'), num('useCount', 'Wie viele', { min: 1 }), ref('item', 'Gibt', 'items'), num('count', 'Anzahl', { min: 1 }), ref('loot', 'Beute-Wurf', 'lootTables'), text('result', 'Danach'),
-        num('risk', 'Risiko', { unit: '%', min: 0, max: 95, hint: '#054: so oft geht es schief: kein Gewinn, dafür der Schaden und die Zeit des Fehlschlags' }), num('failHealth', 'Fehlschlag: Schaden', { unit: 'Leben', min: 0 }), num('failHours', 'Fehlschlag: Zeit', { unit: 'h', min: 0 }), text('failResult', 'Fehlschlag: Text')],
+        num('risk', 'Risiko', { unit: '%', min: 0, max: 95, hint: '#054: so oft geht es schief: kein Gewinn, dafür der Schaden und die Zeit des Fehlschlags' }), num('failHealth', 'Fehlschlag: Schaden', { unit: 'Leben', min: 0 }), num('failHours', 'Fehlschlag: Zeit', { unit: 'h', min: 0 }), text('failResult', 'Fehlschlag: Text'), num('rep', 'Ruf', { hint: 'bei der Gang des Encounters, −100 … 100' })],
         { hint: 'Die erste ist hervorgehoben; wer das Fenster schließt, nimmt die erste, die geht. Ausgegraut, wenn Δ, Sprit oder der verbrauchte Gegenstand fehlen' })] }],
   },
   roadEvents: {
@@ -1435,7 +1436,11 @@ export const AREAS = {
         num('scale', 'Je Gefahrstufe', { unit: '%', min: 0, hint: 'ab Gefahr 2: Preise, Schaden und Lohn wachsen um so viel je Stufe' }), num('maxAnswers', 'Antworten höchstens', { min: 2, max: 6 })] },
       { title: 'Lagen', fields: [table('situations', 'Lagen', [text('id', 'ID'), text('name', 'Titel', { hint: 'Varianten mit |' }), select('roadside', 'Am Straßenrand', ROADSIDE),
         text('figures', 'Figuren', { hint: 'Gegner-IDs mit Komma; stehen in Rig-Größe am Rand' }), select('time', 'Tageszeit', DAYTIME), num('weight', 'Gewicht', { min: 0 }), num('danger', 'Ab Gefahr', { min: 1, max: 5 }),
-        text('text', 'Text', { hint: 'Varianten mit |' }), text('answers', 'Antworten', { hint: 'IDs mit Komma, in dieser Reihenfolge (die erste ist hervorgehoben)' }), text('moods', 'Stimmungen', { hint: 'IDs mit Komma; leer = ohne Stimmung (niemand da)' }),
+        text('text', 'Text', { hint: 'Varianten mit |' }), text('answers', 'Antworten', { hint: 'IDs mit Komma, in dieser Reihenfolge (die erste ist hervorgehoben); „antwort>lage“ = danach kommt auf der nächsten Etappe diese Lage (Kette)' }), text('moods', 'Stimmungen', { hint: 'IDs mit Komma; leer = ohne Stimmung (niemand da)' }),
+        select('gang', 'Gang', GANG_FROM, { hint: '#055: wessen Leute das sind; ihr Ruf wählt die Stimmung (Freund: nur freundliche, Feind: nur feindselige) und ändert sich mit den Antworten' }),
+        range('rep', 'Ruf von–bis', { hint: 'nur, wenn Leylas Ruf bei der Gang in diesem Bereich liegt (−100 … 100); leer = immer' }),
+        text('needs', 'Braucht Merker', { hint: 'mit Komma; alle müssen gesetzt sein (z. B. „hank_geholfen“)' }), text('not', 'Nicht bei Merker', { hint: 'mit Komma' }),
+        bool('only', 'Nur als Folge', { hint: 'kommt nur über eine Antwort „…>diese Lage“ (Kettenschritt)' }), bool('once', 'Einmal je Durchgang'),
         ref('loot', 'Beute', 'lootTables', { hint: 'für Antworten mit Beute „situation“' }), ref('look', 'Bild', 'assets', { hint: 'Comic-Bild im Fenster; leer = Reisen › Bild für Zwischenfälle' })])] },
       { title: 'Stimmungen', fields: [table('moods', 'Stimmungen', [text('id', 'ID'), text('name', 'Wort', { hint: 'Adjektiv mit -e: „gierige“, für {mood}' }), text('text', 'Satz', { hint: 'hängt an den Text der Lage; Varianten mit |' }),
         num('price', 'Preise', { unit: '%', min: 10 }), num('risk', 'Risiko', { unit: '± %' }), bool('friendly', 'Freundlich'), bool('hostile', 'Feindselig')],
@@ -1444,7 +1449,11 @@ export const AREAS = {
         num('hours', 'Zeit', { unit: 'h' }), num('fuel', 'Sprit', { unit: 'l', hint: 'positiv = kostet, negativ = bekommt' }), num('food', 'Vorräte', { hint: 'positiv = kostet' }), num('deltas', 'Δ', { hint: 'negativ = zahlen' }),
         num('health', 'Schaden', { unit: 'Leben', min: 0 }), ref('use', 'Verbraucht', 'items'), num('useCount', 'Wie viele', { min: 1 }), ref('item', 'Gibt', 'items'), num('count', 'Anzahl', { min: 1 }),
         text('loot', 'Beute-Wurf', { hint: 'ID einer Beutetabelle oder „situation“ = die der Lage' }), num('risk', 'Risiko', { unit: '%', min: 0, max: 95 }), num('failHealth', 'Fehlschlag: Schaden', { unit: 'Leben', min: 0 }),
-        num('failHours', 'Fehlschlag: Zeit', { unit: 'h', min: 0 }), text('result', 'Danach', { hint: 'Varianten mit |' }), text('failResult', 'Fehlschlag', { hint: 'Varianten mit |' })])] },
+        num('failHours', 'Fehlschlag: Zeit', { unit: 'h', min: 0 }), text('result', 'Danach', { hint: 'Varianten mit |' }), text('failResult', 'Fehlschlag', { hint: 'Varianten mit |' }),
+        num('rep', 'Ruf', { hint: '#055: −100 … 100, Änderung des Rufs bei der Gang der Lage (auch wenn es schiefgeht)' }), num('repRival', 'Ruf Rivalen', { hint: 'Änderung bei der rivalisierenden Gang ({rival}), z. B. in einer Fehde' }), text('flag', 'Merker', { hint: 'setzen; „-name“ löscht; mehrere mit Komma (nur wenn es klappt)' }),
+        ref('buff', 'Buff', 'buffs', { hint: 'wirkt im nächsten Run (nur wenn es klappt)' })])] },
+      { title: 'Ruf', fields: [num('rep.enemy', 'Feind bis', { min: -100, max: 0 }), num('rep.disliked', 'Unbeliebt bis', { min: -100, max: 0 }), num('rep.tolerated', 'Geduldet ab', { min: 0, max: 100 }), num('rep.friend', 'Freund ab', { min: 0, max: 100 }),
+        num('rep.price', 'Preise', { unit: '% bei ±100', min: 0, max: 90, hint: 'Freunde zahlen weniger, Feinde mehr' }), num('rep.kill', 'Je Kill im Revier', { min: 0, hint: 'so viel Ruf kostet ein Kill in einem POI der Gang' })] },
       { title: 'Wörter', fields: [text('words.group', 'Banden {group}', { hint: 'mit |' }), text('words.cargo', 'Ladung {cargo}', { hint: 'mit |, „ein Laster mit …“' }),
         text('words.thing', 'Dinge {thing}', { hint: 'mit |, „ein Feuer aus …“' }), text('words.creature', 'Kreaturen {creature}', { hint: 'mit |, Mehrzahl' })] },
     ],
@@ -1532,7 +1541,7 @@ export const AREAS = {
     template: { name: 'Neue Marke', sector: 'trade', tier: 'mid', status: 'active', street: 'neutral', quality: 0, price: 100, loot: 100 },
     row: x => [label(BRAND_SECTORS, x.sector), label(BRAND_TIERS, x.tier), x.status && x.status !== 'active' ? label(BRAND_STATUS, x.status) : null, x.map?.on ? 'auf der Karte' : null].filter(Boolean).join(' · '),
     sections: [
-      { title: 'Marke', fields: [NAME, text('short', 'Kurzname', { hint: 'Für Ortsnamen auf der Karte ({brand}) und kurze Etiketten' }), text('slogan', 'Slogan'), select('sector', 'Branche', BRAND_SECTORS), color('color', 'Farbe'),
+      { title: 'Marke', fields: [NAME, text('short', 'Kurzname', { hint: 'Für Ortsnamen auf der Karte ({brand}) und kurze Etiketten' }), text('slogan', 'Slogan'), text('ads', 'Werbung auf Billboards', { hint: '#055: Sprüche für die Riesen-Bildschirme an der Straße, mehrere mit |; leer = der Slogan' }), select('sector', 'Branche', BRAND_SECTORS), color('color', 'Farbe'),
         num('icon', 'Logo', { min: 0, hint: '#046: Feld im Symbol-Raster „Logos“ (Reisekarte › Aussehen). Zeigt sich auf der Karte, auf Plakaten und im Markenschild der Tooltips' }),
         area_('description', 'Lore', { hint: 'Was man in BigCityDelta über sie weiß (und was man lieber nicht weiß)' })] },
       { title: 'Stellung in der Welt', fields: [select('tier', 'Preisklasse', BRAND_TIERS), text('seat', 'Sitz', { hint: 'z. B. BigCityDelta, Klinikturm Ebene 40 · Salt Flats · unbekannt' }), ref('parent', 'Mutterkonzern', 'brands'),
@@ -1570,7 +1579,7 @@ export const AREAS = {
       { title: 'Landschaften', fields: [table('landscapes', 'Landschaft je Region', [text('region', 'Region', { hint: 'wie in Reisekarte › Regionen; leer = für alle anderen' }), select('relief', 'Relief', RELIEFS),
         color('far', 'Berge'), color('mid', 'Hügel'), color('ground', 'Boden'), color('rock', 'Felsen'), color('plants', 'Pflanzen'), color('road', 'Asphalt'),
         num('ruins', 'Ruinen', { unit: '%', min: 0 }), num('wrecks', 'Wracks', { unit: '%', min: 0 }), num('towers', 'Türme', { unit: '%', min: 0 }), num('signs', 'Plakate', { unit: '%', min: 0 }),
-        num('plantsN', 'Kakteen', { unit: '%', min: 0 }), num('poles', 'Masten', { min: 0, max: 1 }), num('pylons', 'Hochspannung', { min: 0, max: 1 }), num('city', 'Stadt am Horizont', { unit: '%', min: 0, max: 100 }),
+        num('plantsN', 'Kakteen', { unit: '%', min: 0 }), num('poles', 'Masten', { min: 0, max: 1 }), num('pylons', 'Hochspannung', { min: 0, max: 1 }), num('city', 'Stadt am Horizont', { unit: '%', min: 0, max: 100 }), num('screens', 'Riesen-Billboards', { unit: '%', min: 0, max: 100, hint: '#055: Chance je Abschnitt für einen Bildschirm mit Werbung der Marken' }),
         num('dust', 'Staub', { unit: '% der Etappen', min: 0, max: 100 }), num('fog', 'Morgennebel', { unit: '% der Etappen', min: 0, max: 100 })],
         { hint: 'Aus Code gezeichnet (Daniel: 3c, PixelLab später). Die Dinge am Rand: je Abschnitt eine Chance in % (zusammen höchstens 100), Plakate zeigen die Marken der Lore. Die Etappe blendet von der Landschaft des Startorts in die des Ziels' })] },
     ],

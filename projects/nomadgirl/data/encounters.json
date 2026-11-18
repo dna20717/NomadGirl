@@ -7,11 +7,13 @@
   "loot": "pluenderer_beute",
   "description": "Zwei Autowracks quer über der Straße, dahinter Gewehrläufe. Wegzoll, sagt einer. Oder auch nicht.",
   "options": [
-   {"label": "Wegzoll zahlen", "deltas": -60, "result": "Sie winken dich durch."},
-   {"label": "Durchbrechen", "health": 25, "fuel": 3, "loot": "pluenderer_beute", "result": "Blech kreischt, Kugeln prasseln. Hinten fällt etwas vom Wrack."},
+   {"label": "Wegzoll zahlen", "deltas": -60, "result": "Sie winken dich durch.", "rep": 5},
+   {"label": "Durchbrechen", "health": 25, "fuel": 3, "loot": "pluenderer_beute", "result": "Blech kreischt, Kugeln prasseln. Hinten fällt etwas vom Wrack.", "rep": -15},
    {"label": "Umweg fahren", "hours": 2, "fuel": 4, "result": "Ein langer Bogen über die Schotterpiste."}
   ],
-  "roadside": "barrier"
+  "roadside": "barrier",
+  "gang": "here",
+  "rep": [-100, 59]
  },
  "ghulrudel": {
   "name": "Ghul-Rudel",
