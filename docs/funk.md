@@ -215,7 +215,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Lesen:** docs/features/cyberware.md, docs/features/glitchlings.md
 - **Auftrag (Daniel, 18.11.2026):** Punkt 7: „ja. Machen.“ (Implantate wirken im Glitch-Duell, z. B. mehr Integrität).
 - **Rückfragen:** (Code) ⚠️ vorläufig: ein neuer Wert „Duell-Integrität“ auf Augen- und Nerven-Implantaten (+3 bis +15, Berserker-Chip −10), nur für Leylas Seite und nur im Spiel (/duel und /mobile haben keine Leyla); mehr Bits oder Sonderregeln später.
-- **Ergebnis:** (Code) Commit „Cyberware im Duell (#065)“ auf `main`. Neu: Ausrüstungswert `hack`, 10 Implantate, Duell-Kopf „Implantate: +N Integrität“, Gegner behält seine Integrität. `npm test` 259/259, `bitfarm_test` 6, `duel_test`, `silo_test` grün. PixelLab 0. **Bitte testen:** Overclock-Chip einbauen, dann ein Schalter-Duell im POI.
+- **Ergebnis:** (Code) Commit „Cyberware im Duell (#065)“ auf `main`. Neu: Ausrüstungswert `hack`, 10 Implantate, Duell-Kopf „Implantate: +N Integrität“, Gegner behält seine Integrität. `npm test` 259/259, Browser 46/46 (`bitfarm_test` 6). PixelLab 0. **Bitte testen:** Overclock-Chip einbauen, dann ein Schalter-Duell im POI.
 
 ### #061 Ruf im POI: Revier-Camp der Gang
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 3)
