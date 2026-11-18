@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #057 Raketensilo läuft (Daniels Auftrag im Code-Chat).
+
 - 18.11. Code → Ava: **HNC / Übergabe.** Stand `main` nach dieser Sitzung: #053 Fahrt in Szene (wie Keep Driving: echtes Rig als Schnappschuss, Landschaft/Licht/Wetter aus Code, 8 Regionen, Zwischenfälle am Straßenrand mit Gegner-Bausätzen, 30 s je Etappe, Vorspulen/Überspringen), #054 Ereignis-Baukasten (Lagen × Stimmungen × Antworten, Gefahr skaliert, Risiko), #055 Riesen-Billboards mit Werbung aller Marken, Ruf je POI-Gang (Freund = Freie Fahrt, Feind = Kopfgeldjäger, Kills im Revier kosten Ruf), Merker/Buffs als Folgen, drei Ketten über 3–4 Etappen (Fehde, SOS, Die Läuferin). Dazu: Bit-Stapel-Haptik überall gleich, „die Entity“ mit Charakteren und Banter, Ideenspeicher in `docs/backlog.md` › D. Tests: `npm test` 239, Browser 43/43. PixelLab übrig 290 (unter 700: jeder Auftrag nur mit Daniels Freigabe). Offene Fragen an Daniel: ⚠️-Punkte in #053–#055 absegnen; wie sich KIs im Duell unterscheiden; gleichzeitiges Ausspielen im Bit-Stapel; Anhalter als Crew (Karawane #040 wartet auf OK); Landschafts-Ebenen per PixelLab (3c, später); Ruf für Siedlungen/Marken, Ruhm. Nächste Kandidaten aus dem Ideenspeicher: Crew-Kern #040 mit Anhaltern aus den Ereignissen, Rig-Radio für die Fahrt, Fahndungsstufe der Kammerjäger, Bit-Stapel in der Kneipe.
 - 18.11. Code → Ava: #055 **Billboards, Ruf, Folgen, Ketten** fertig: Riesen-Bildschirme mit Werbung aller Marken, Ruf je Gang (Freund = Freie Fahrt, Feind = Kopfgeldjäger, Kills im Revier kosten Ruf), Merker/Buffs als Folgen, drei Geschichten über 3–4 Etappen. Tests 239/239, Browser 43/43, PixelLab 0.
 - 18.11. Code → Ava: #055 Billboards, Ruf, Ereignis-Ketten läuft (Daniels Auftrag im Code-Chat).
@@ -172,6 +174,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:** (Code) Frage → ⚠️ vorläufig entschieden: …
 - **Ergebnis:** (Code) Commits, Tests, PixelLab diesmal/übrig, bitte testen: …
 ```
+
+### #057 Raketensilo: großer versteckter POI in den Bergen
+- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Bild „Cyberpunk Underground Rocket Silo“ von Daniel)
+- **Für:** Code
+- **Lesen:** docs/features/pois.md (Stapel, Tiefe), docs/features/worldmap.md (Ketten, Orte), docs/features/glitchlings.md (Duell in der Welt)
+- **Auftrag (Daniel, 18.11.2026):** „Kannst du daraus einen spielbaren POI machen und ihn irgendwo in den Bergen auf der Map verstecken?“ Antworten: vorhandene Kacheln + Bild als Karte; versteckt, bis eine Geschichte ihn verrät; Silo-KI zum Duell als **optionales** Ziel, sehr schwer, Sieg = einzigartige Entity; eigene Gang; **mindestens 20 Räume**, einer der größten POIs; Boss unten.
+- **Rückfragen:** –
+- **Ergebnis:** –
 
 ### #056 Van streng von der Seite (zu + Querschnitt)
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, PixelLab 20–30 freigegeben)
