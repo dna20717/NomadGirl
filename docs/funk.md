@@ -173,6 +173,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commits, Tests, PixelLab diesmal/übrig, bitte testen: …
 ```
 
+### #056 Van streng von der Seite (zu + Querschnitt)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, PixelLab 20–30 freigegeben)
+- **Für:** Code
+- **Auftrag (Daniel, 18.11.2026):** „Der Van hat eine Version mit offener und mit geschlossener Tür, aber sie sind nicht deckungsgleich … erzeuge einen orthogonalen Van im gleichen Stil, einmal von außen (Tür zu) und einmal im Seitenquerschnitt offen mit Platz für zwei Werkbänke … idealerweise in einer Art Tileset. WICHTIG: der Style des alten Vans soll erhalten bleiben, aber 100 % orthogonal.“
+- **Rückfragen:** (Code) ⚠️ vorläufig: die animierte Drehschüssel und das Dachgeländer im Vordergrund sind aus (die Schüssel ist jetzt im Bild); Tür = Überblendung in 5 Frames; Tileset als Bild mit festen Spalten (Heck, Nische, Stütze, Nische, Fahrerhaus), noch nicht im Code zusammengesetzt.
+- **Ergebnis:** (Code) siehe Commit „Van streng von der Seite …“. PixelLab diesmal 19 (übrig ~270). **Bitte testen:** Camp, zum Van gehen: Querschnitt mit Schlafkoje und Kochnische, weggehen: zu; Leiter aufs Dach.
+
 ### #055 Riesen-Billboards, Ruf bei den Gangs, Ereignisse mit Folgen und Ketten
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code

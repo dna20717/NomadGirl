@@ -12,7 +12,7 @@ export function snapshotRig(scene) {
   // the sliding door shut, nothing to see through it (camp.drawVanDoor), no roof foreground
   const van = scene.van;
   if (van?.door) { van.frame = 0; van.open = false; van.place(); }
-  camp.vanDoor?.view.setAlpha(0).setVisible(false);
+  for (const d of camp.vanDoors || []) d.view.setAlpha(0).setVisible(false);
   van?.front?.setVisible(false);
   const objs = scene.children.list.filter(o => o.visible && o.alpha > 0.01 && o.depth >= RIG_DEPTH[0] && o.depth <= RIG_DEPTH[1] && !['Text', 'Zone', 'BitmapText'].includes(o.type) && !o.isLadder);
   const units = geo.units || [], ground = camp.ground;

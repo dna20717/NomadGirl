@@ -5671,5 +5671,66 @@
    "Atom-Geist",
    "Strahlen-Geist"
   ]
+ },
+ "van_side_source": {
+  "name": "Leylas Van seitlich · Original zu",
+  "kind": "source",
+  "file": "assets/vehicles/van_side_source.png",
+  "source": "KI (PixelLab, Create Image Pro 256 × 176, AAP-64, Vorlage: alter Van)",
+  "date": "18.11.2026",
+  "description": "Streng orthogonale Seitenansicht im Stil des alten Vans, Tür zu (#056)."
+ },
+ "van_side_cut_source": {
+  "name": "Leylas Van seitlich · Original Querschnitt",
+  "kind": "source",
+  "file": "assets/vehicles/van_side_cut_source.png",
+  "source": "KI (PixelLab, Inpaint Pro Flash auf van_side_source, Maske 124 × 68)",
+  "derivedFrom": "van_side_source",
+  "date": "18.11.2026",
+  "description": "Seitenwand des Wohnaufbaus aufgeschnitten: Rückwand, Deckenlampen, Lichterkette, zwei Nischen für Werkbänke; außerhalb der Maske pixelgleich mit dem geschlossenen Van."
+ },
+ "van_side": {
+  "name": "Leylas Van (seitlich)",
+  "kind": "animation",
+  "file": "assets/vehicles/van_side.png",
+  "frameSize": [256, 176],
+  "frames": 5,
+  "fps": 7,
+  "loop": false,
+  "origin": [107, 171],
+  "height": 450,
+  "source": "Code (tools/van_side.py: Überblendung zu → Querschnitt, Leiter zurück auf die Schnittkante)",
+  "derivedFrom": "van_side_cut_source",
+  "date": "18.11.2026",
+  "description": "Frame 1 zu, Frame 5 Querschnitt offen, dazwischen überblendet; beide Bilder decken sich Pixel für Pixel. Nischen: links x 50–101, rechts x 114–157, Decke y 71, Boden y 117."
+ },
+ "van_side_closed": {
+  "name": "Leylas Van seitlich · zu",
+  "kind": "image",
+  "file": "assets/vehicles/van_side_closed.png",
+  "height": 450,
+  "origin": [107, 171],
+  "source": "Code (tools/van_side.py)",
+  "derivedFrom": "van_side_source",
+  "date": "18.11.2026"
+ },
+ "van_side_open": {
+  "name": "Leylas Van seitlich · Querschnitt",
+  "kind": "image",
+  "file": "assets/vehicles/van_side_open.png",
+  "height": 450,
+  "origin": [107, 171],
+  "source": "Code (tools/van_side.py)",
+  "derivedFrom": "van_side_cut_source",
+  "date": "18.11.2026"
+ },
+ "van_side_kit": {
+  "name": "Leylas Van seitlich · Tileset",
+  "kind": "image",
+  "file": "assets/vehicles/van_side_kit.png",
+  "source": "Code (tools/van_side.py)",
+  "derivedFrom": "van_side_cut_source",
+  "date": "18.11.2026",
+  "description": "Zeile 1 zu, Zeile 2 Querschnitt (je 256 × 176), gleiche Spalten: Heck x 0–49, Nische 1 x 50–101, Stütze x 101–114, Nische 2 x 114–157, Fahrerhaus x 157–256. Für längere Aufbauten (mehr Nischen) und andere Fahrzeuge."
  }
 }

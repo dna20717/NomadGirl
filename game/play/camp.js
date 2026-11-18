@@ -743,22 +743,27 @@ export class Camp {
   // open door, cut at the door frame, with its lights and effects; it fades in when the door is fully open
   drawVanDoor() {
     const s = this.scene, D = this.D, rig = this.box.save.rig, T0 = D.tractors?.[rig.tractor] || {}, Dr = T0.door, van = s.van;
-    this.vanDoor = null;
-    if (!Dr?.x || !Dr?.y || !van?.sprite) return;
-    const w = (rig.units[0]?.workshops || []).find(x => x.at === (Dr.place ?? 0));
-    if (!w || (this.hide && this.hide.ui === 0 && this.hide.at === w.at)) return;
-    const a = van.toWorld(Dr.x[0], Dr.y[0]), b = van.toWorld(Dr.x[1], Dr.y[1]);
-    const clip = { x0: Math.min(a.x, b.x), x1: Math.max(a.x, b.x), y0: a.y, y1: b.y };
-    const view = s.add.container(0, 0).setDepth(van.depth + 0.05);
-    this.rigObjs.push(view);
-    view.add(s.add.rectangle(clip.x0, clip.y0, clip.x1 - clip.x0, clip.y1 - clip.y0, col(Dr.backdrop || '#241a2c')).setOrigin(0));
-    // the bench stands on the van's floor, centred in the door, in the shared scale
-    const def = D.workshops?.[w.id] || {}, cw = Math.max(clip.x1 - clip.x0, 200);
-    const bench = this.benches.add({ id: w.id, place: `0:${w.at}`, x0: (clip.x0 + clip.x1) / 2 - cw / 2, w: cw, floor: clip.y1, h: clip.y1 - clip.y0, view, mid: 0, G: 0, grid: def.grid && storeKeyOf(this.D, this.scene.box.save, 0, w.at), clip });
-    if (!bench) { view.destroy(); return; }
-    bench.door = true;
-    view.setAlpha(0);
-    this.vanDoor = { view, bench };
+    this.vanDoor = null; this.vanDoors = [];
+    if (!van?.sprite || !Dr) return;
+    // #056 the van in cross-section (Zugmaschine › Blick ins Innere › Nischen): one bench per bay, its place in the van; the old single door slot still works
+    const bays = Dr.bays?.length ? Dr.bays : Dr.x && Dr.y ? [{ x: Dr.x, y: Dr.y, place: Dr.place ?? 0 }] : [];
+    for (const B of bays) {
+      const w = (rig.units[0]?.workshops || []).find(x => x.at === (B.place ?? 0));
+      if (!w || !B.x || !B.y || (this.hide && this.hide.ui === 0 && this.hide.at === w.at)) continue;
+      const a = van.toWorld(B.x[0], B.y[0]), b = van.toWorld(B.x[1], B.y[1]);
+      const clip = { x0: Math.min(a.x, b.x), x1: Math.max(a.x, b.x), y0: a.y, y1: b.y };
+      const view = s.add.container(0, 0).setDepth(van.depth + 0.05);
+      this.rigObjs.push(view);
+      if (Dr.backdrop) view.add(s.add.rectangle(clip.x0, clip.y0, clip.x1 - clip.x0, clip.y1 - clip.y0, col(Dr.backdrop)).setOrigin(0));
+      // the bench stands on the van's floor, centred in the opening, in the shared scale
+      const def = D.workshops?.[w.id] || {}, cw = Math.max(clip.x1 - clip.x0, 200);
+      const bench = this.benches.add({ id: w.id, place: `0:${w.at}`, x0: (clip.x0 + clip.x1) / 2 - cw / 2, w: cw, floor: clip.y1, h: clip.y1 - clip.y0, view, mid: 0, G: 0, grid: def.grid && storeKeyOf(this.D, this.scene.box.save, 0, w.at), clip });
+      if (!bench) { view.destroy(); continue; }
+      bench.door = true;
+      view.setAlpha(0);
+      this.vanDoors.push({ view, bench });
+    }
+    this.vanDoor = this.vanDoors[0] || null;
   }
   drawYard() {
     const s = this.scene, D = this.D, Y = this.geo.yard, sp = this.box.save.rig.spare || { workshops: [], containers: [] }, y = this.ground;
@@ -1011,11 +1016,12 @@ export class Camp {
     }
     this.updateSound(time);
     // the van's door: the workshop behind it shows only while the door is fully open
-    if (this.vanDoor) {
-      const v = this.scene.van, open = v && Math.round(v.frame) === v.frames - 1 && !this.scene.hud.build?.active;
-      const a = Math.max(0, Math.min(1, this.vanDoor.view.alpha + (open ? 1 : -1) * dt / 180));
-      this.vanDoor.view.setAlpha(a).setVisible(a > 0);
-      this.vanDoor.bench.shut = a < 0.99;
+    for (const d of this.vanDoors || []) {
+      // the benches fade in with the van's frames (#056: closed → cross-section), or as before after the door opened
+      const v = this.scene.van, k = v && v.frames > 1 ? v.frame / (v.frames - 1) : 0, build = !!this.scene.hud.build?.active;
+      const a = this.D.tractors?.[this.box.save.rig.tractor]?.door?.bays?.length ? (build ? 0 : k) : Math.max(0, Math.min(1, d.view.alpha + (v && Math.round(v.frame) === v.frames - 1 && !build ? 1 : -1) * dt / 180));
+      d.view.setAlpha(a).setVisible(a > 0);
+      d.bench.shut = a < 0.99;
     }
     this.benches?.update(time, dt);
     this.updateShells(dt);

@@ -10,11 +10,11 @@
   "slots": {"engine": 1, "armor": 1, "weapon": 0, "roof": 1},
   "value": 400,
   "description": "Leylas Van: rostig, laut, treu. Schlafkoje und Warroom an Bord, Radarschüssel auf dem Dach.",
-  "look": "van",
+  "look": "van_side",
   "places": 2,
   "storage": [10, 8],
   "storageName": "Kofferraum",
-  "door": {"x": [99, 147], "y": [69, 138], "place": 1, "backdrop": "#2a1f2e"}
+  "door": {"x": [50, 157], "y": [71, 117], "place": 1, "backdrop": "", "bays": [{"x": [50, 101], "y": [71, 117], "place": 0},{"x": [114, 157], "y": [71, 117], "place": 1}]}
  },
  "lkw": {
   "name": "LKW",
