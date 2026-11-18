@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #060 **Bit-Farm** fertig: Entities wohnen in der Bit-Farm, arbeiten als Worker an Werkstätten (Begabung als Bonus, Macke als Haken, Bindung macht stärker), freundliche Duelle in der Chill-Ecke. Offen: eigenes Bild (PixelLab-Freigabe). Tests 251/251, Browser 46/46.
 - 18.11. Code → Ava: #061 **Revier-Camp** fertig: befreundete Gangs lassen Leyla im POI in Ruhe (Hinweis zu Beginn), Klauen unter Zeugen kostet Ruf, Tresor nur mit Gewalt, Freunde handeln und vergeben „Revier säubern“, jeder Schlag bricht den Frieden. Tests 248/248, Browser 45/45.
 - 18.11. Code → Ava: #059 **Antworten mit Voraussetzungen** fertig: Crew, Implantate, AvA-Teile, Rig-Teile und Werkstätten öffnen Antworten unterwegs (12 neue). Tests 248/248, PixelLab 0.
 - 18.11. Code → Ava: #059 Antworten mit Voraussetzungen läuft; #060 Bit-Farm und #061 Revier-Camp angelegt (Daniels Aufträge aus der Verzahnungs-Prüfung).
@@ -188,12 +189,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Revier-Camp (#061)“ auf `main`. Neu `game/play/turf.js`, Haken in `enemies.js` (friedlich: sieht, nickt, hört nichts; Treffer bricht den Frieden), `poi_level.js` (Kiste der Gang, Tresor nur mit Gewalt, Reden), 4 Felder in Ereignis-Baukasten › Ruf. `npm test` 248/248, Browser 45/45 (neu `turf_test` 7). PixelLab 0. **Bitte testen:** in der Werkstatt nichts nötig; im Spiel Ruf bei einer Gang hochspielen (Ereignisse), dann ihren POI plündern: Toast, Reden, Handeln, eine Kiste vor ihren Augen.
 
 ### #060 Bit-Farm: Entities speichern, als Worker an Werkbänken, freundliche Duelle in der Chill-Ecke
-- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 2)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 2)
 - **Für:** Code
 - **Lesen:** docs/features/glitchlings.md, docs/features/benches.md, docs/features/crafting.md
 - **Auftrag (Daniel, 18.11.2026):** neue Werkstatt **Bit-Farm**, „ein Inventar, in dem man die AIs speichern kann. Entities, die dort gespeichert sind, können dann an bestimmten Werkbänken als Worker ausgewählt werden.“ Worker: **Charakter-Bonus** (Bonus und Macke aus dem Charakter). „In der Chill-Ecke gibt es die Möglichkeit, freundlich mit bereits gefangenen Entitäten zu duellieren“: **Bindung steigt** (stärkerer Worker-Bonus, neue Banter-Zeilen), kein Risiko.
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: Worker werden im Inventar eingeteilt (Entity in der Bit-Farm › „Als Worker einsetzen“, Liste der Werkstätten mit Effekt), nicht an jeder Werkbank einzeln; Bonus = die vorhandene Begabung, Macke = die Art der Macke (Tageszeit, Wetter, Nachbarn, Laune, schrullig −15 %); Bindung 0–5, +10 % je Stufe, einmal am Tag +1 (Sieg) / +½ (Niederlage); sieben Begabungen wirken schon, sechs zeigen „wirkt bald“ (Waffenmeister, Drohnenflüsterer, Chirurg, Buchhalter, Kühlwart, Archäologe); Bit-Farm 600 Δ, Strom −1, drei Plätze, **Bild vorläufig die Elektronik-Werkbank** (eigenes Bild mit PixelLab nur mit Daniels Freigabe, < 700 übrig).
+- **Ergebnis:** (Code) Commit „Bit-Farm (#060)“ auf `main`. Neu `game/workers.js`, Werkstatt `bitfarm`, Werkstatt-Art Bit-Farm, Banter-Moment „Vertraut“ (13 Charaktere), Haken in Kochen/Herstellen, Garten, Strom, Reisen, Schlafen, Chillen; Freundliches Duell (fängt nichts). `npm test` 251/251 (neu `test/workers.test.js`), Browser 46/46 (neu `bitfarm_test` 5). PixelLab 0. **Bitte testen:** Bit-Farm im Bau-Modus kaufen, eine Entity hineinlegen, als Worker an die Kochnische, in der Chill-Ecke ein freundliches Duell.
 
 ### #059 Antworten mit Voraussetzungen aus anderen Systemen
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 1)

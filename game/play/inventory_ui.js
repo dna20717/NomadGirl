@@ -4,6 +4,7 @@
 // double click moves it to the other side, a click outside the panels puts it back. Placeholders until things have a look:
 // coloured cells by category with a short glyph, the name and the count.
 import { DECK, deckSize, fitDeck } from '../save.js';
+import { farmKeys, workplaceOf } from '../workers.js';
 import { faceCanvas, SIZE } from '../glitch_face.js';
 import { brandOf as glitchBrand } from '../glitchlings.js';
 import { achievementOf, displayed, bonusText } from '../achievements.js';
@@ -114,7 +115,7 @@ export class InventoryUI {
     const A = this.acceptOf(key);
     if (!A) return true;
     const t = thing(this.D, e.a, e.id) || {}, ok = (!A.categories?.length || A.categories.includes(kindOf(this.D, e.a, e.id))) && (!A.tag || (t.tags || []).includes(A.tag));
-    if (!ok && say) this.host.notify?.(A.tag === 'trophy' ? 'Nur Trophäen (Tag „Trophäe“)' : 'Hier nur Wertsachen');
+    if (!ok && say) this.host.notify?.(A.tag === 'trophy' ? 'Nur Trophäen (Tag „Trophäe“)' : A.categories?.includes('glitchling') ? 'Hier wohnen nur Entities' : 'Hier nur Wertsachen');
     return ok;
   }
 
@@ -474,6 +475,10 @@ export class InventoryUI {
     if (to !== 'drone' && key !== 'drone' && this.inv.grids.drone && this.hasRoom('drone', e)) out.push({ id: 'drone', k: null, label: 'Drohne geben' });
     if (e.g && key !== DECK && this.inv.grids[DECK] && this.hasRoom(DECK, e)) out.unshift({ id: 'deck', k: null, label: 'Ins Cyberdeck' });   // #049
     if (key === DECK && this.inv.grids.backpack && this.hasRoom('backpack', e)) out.unshift({ id: 'bag', k: null, label: 'In den Rucksack' });
+    if (e.g && camp && this.host.worker && farmKeys(D, this.host.save()).includes(key)) {   // #060 a resident of the Bit-Farm can work in the rig
+      const wp = workplaceOf(D, this.host.save(), e.g.id);
+      out.unshift({ id: 'worker', k: null, label: wp ? `Worker: ${wp.def.name || wp.w.id}` : 'Als Worker einsetzen' });
+    }
     if (this.host.canThrow?.()) out.push({ id: 'throw', k: 'send', hold: true, label: 'Wegwerfen' });
     if (canTurn(D, e.a, e.id)) out.push({ id: 'turn', k: out.some(x => x.k === 'context') ? null : 'context', label: 'Drehen' });
     // the first action without a key goes on X / R held (Ausrüsten next to Essen, Drohne geben next to a chest …)
@@ -507,6 +512,7 @@ export class InventoryUI {
     if (id === 'drone') { const left = addEntry(this.D, this.inv.grids.drone, e, e.n); if (left === e.n) return this.host.notify?.('AvA hat keinen Platz'); if (left === 0) remove(g, e); else e.n = left; this.changed('drone'); return this.moodAfter('drone', e); }
     if (id === 'throw') { this.pick(key, g, e); this.throwDown(); return this.draw(); }
     if (id === 'turn') return this.turnInPlace(g, e);
+    if (id === 'worker') { this.close(); return this.host.worker?.(e.g); }   // #060
   }
   useFrom(key, g, e) {
     const r = this.host.use?.(e.id, e.q || 0);

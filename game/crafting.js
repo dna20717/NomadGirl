@@ -8,6 +8,7 @@
 // (and enough of each, or exactly as many with "Genaue Mengen") is a hit, everything else is curious junk.
 // Time: recipes take minutes (Rezepte › Dauer), the clock jumps on (Ereignis-Zeit).
 import { speedOf } from './synergy.js';
+import { workerBonus } from './workers.js';
 import { add, remove, count } from './inventory.js';
 import { containers, advance } from './save.js';
 import { canMaintain, maintain } from './tank.js';
@@ -92,12 +93,17 @@ export function craft(D, save, id, ws, x = {}) {
   if (missing(D, save, r).length) return { ok: false, reason: 'Es fehlen Zutaten' };
   { const need = {}, st = stock(D, save); for (const p of x.parts || []) need[p] = (need[p] || 0) + 1; for (const [p, k] of Object.entries(need)) if ((st[p] || 0) < k) return { ok: false, reason: `Teil fehlt: ${D.items?.[p]?.name || p}` }; }
   for (const i of r.ingredients || []) take(D, save, i.item, i.count || 1);
+  // #060 Entities at work: the cook makes a dish better (one step, Koch: „perfekt“), the welder gets an ingredient back (Schweißer)
+  const perfect = workerBonus(D, save, 'perfect'), refund = workerBonus(D, save, 'refund'), rnd = x.rnd || Math.random;
+  if (perfect > 0 && D.items?.[r.result]?.buff && (x.q || 0) < 2 && rnd() * 100 < perfect) x = { ...x, q: (x.q || 0) + 1, helped: true };
+  const back = refund > 0 && (r.ingredients || []).length && rnd() * 100 < refund ? r.ingredients[Math.floor(rnd() * r.ingredients.length)] : null;
+  if (back) give(D, save, back.item, 1);
   const n = r.count || 1, minutes = Math.round((r.time ?? 10) * (1 - Math.min(90, speedOf(D, save, ws)) / 100));   // #033 synergy: faster
   advance(save, minutes / 60);
   markMade(D, save, id);
   for (const p of x.parts || []) take(D, save, p, 1);   // the weapon parts go into the weapon
   const left = produce(D, save, r, n, x);
-  return { ok: true, recipe: id, made: { ...resultOf(r), n, ...(x.q ? { q: x.q } : {}), ...(x.mods ? { mods: x.mods } : {}) }, left, minutes, earned: byProduct(D, save, id, ws) };
+  return { ok: true, recipe: id, made: { ...resultOf(r), n, ...(x.q ? { q: x.q } : {}), ...(x.mods ? { mods: x.mods } : {}) }, left, minutes, earned: byProduct(D, save, id, ws), ...(back ? { refund: back.item } : {}), ...(x.helped ? { helped: true } : {}) };
 }
 
 // Ressourcen verdienen (#039, Daniel 16.11.2026): every recipe made gives a by-product, one of the three resources by the kind of

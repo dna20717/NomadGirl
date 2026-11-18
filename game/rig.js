@@ -140,7 +140,7 @@ export function budgets(D, rig) {
   const T = D.tractors?.[rig.tractor] || {}, Tr = D.travel || {}, P = partStats(D, rig), pull = (T.pull || 0) + P.pull;
   const conts = rig.units.filter(u => u.kind === 'container'), ground = conts.filter(u => !levelOf(u));
   const weight = conts.reduce((n, u) => n + (D.containers?.[u.id]?.weight || 0), 0);
-  let made = (T.power || 0) + solarPower(D, rig), used = 0;   // + solar panels (in the sun; at night from the battery, camp.js)
+  let made = (T.power || 0) + solarPower(D, rig) + (rig.workerPower || 0), used = 0;   // #060 Ingenieur-Entities at work (workers.js syncWorkers)   // + solar panels (in the sun; at night from the battery, camp.js)
   for (const u of rig.units) for (const w of u.workshops) { const p = wsDef(D, w.id).power || 0; if (p > 0) made += p; else used -= p; }
   made += synergyPower(D, rig);   // #033: generators and reactors in good company
   const fuel = Math.round(((T.fuelUse ?? 12) + P.fuelUse) * (1 + (Tr.weightFuelFactor ?? 0) / 100 * weight / 1000) * 10) / 10;

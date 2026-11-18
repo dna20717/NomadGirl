@@ -439,6 +439,7 @@ export class PlayScene extends Phaser.Scene {
       react: mood => hud.scene.drone?.react(mood),
       rigChanged: () => hud.scene.camp?.drawRig(),
       notify: (text, kind = 'warn') => hud.toast(text, '', kind, 2600),
+      worker: g => hud.scene.camp?.workerMenu?.(g),   // #060 Bit-Farm
     });
     hud.inv.close();
     // cooking and crafting at the workshops in the camp (game/play/craft_ui.js)

@@ -502,5 +502,23 @@
    {"kind": "light", "x": 30, "y": 25, "w": 24, "h": 30, "color": "#ff4b4b", "size": 55, "rate": 3, "when": "always"},
    {"kind": "light", "x": 100, "y": 170, "w": 30, "h": 10, "color": "#ffd27a", "size": 55, "rate": 6, "when": "always"}
   ]
+ },
+ "bitfarm": {
+  "name": "Bit-Farm",
+  "function": "bitfarm",
+  "places": 1,
+  "power": -1,
+  "stage": "1",
+  "value": 600,
+  "grid": [6, 2],
+  "ownStorage": true,
+  "accept": ["glitchling"],
+  "look": "ws_generator_bench_v2",
+  "description": "Racks voller summender Platinen: hier wohnen gefangene Entities. Wer hier wohnt, kann an einer Werkstatt im Rig arbeiten (Inventar: Entity anklicken › Als Worker einsetzen).",
+  "fx": [
+   {"kind": "screen", "x": 200, "y": 96, "w": 18, "h": 12, "color": "#56e07a", "size": 0, "rate": 2, "when": "always"},
+   {"kind": "blink", "x": 40, "y": 150, "w": 30, "h": 20, "color": "#7fd6ff", "size": 3, "rate": 3, "when": "always"},
+   {"kind": "light", "x": 60, "y": 60, "w": 140, "h": 10, "color": "#a8f0ff", "size": 60, "rate": 3, "when": "always"}
+  ]
  }
 }

@@ -13,6 +13,7 @@ import { clockHours } from '../tank.js';
 import { gangOfPlace, levelName } from '../reputation.js';
 import { driveConfig } from '../road.js';
 import { snapshotRig } from './rig_snapshot.js';
+import { workerBonus, placesFor, workplaceOf, assign, unassign, flawOf, syncWorkers, farmEntities, befriend, bondOf, BOND_MAX, WORKING_STATS } from '../workers.js';
 import { occupancy } from '../inventory.js';
 import { de, VERB, SOON, costLine } from './camp.js';
 
@@ -90,7 +91,7 @@ export class CampActions {
   // #033 synergy „quality“: the buff of this bench gets stronger (save.buffQ, like a good dish)
   synergyBuff(def, place) {
     const x = place && synergyAt(this.D, this.box.save, place), cz = cozyBonus(this.D, this.box.save);   // #036: Gemütlichkeit of the decoration on top
-    const add = (x?.effect === 'quality' ? x.bonus : 0) + cz;
+    const add = (x?.effect === 'quality' ? x.bonus : 0) + cz + (def.function === 'chill' || def.function === 'guests' ? workerBonus(this.D, this.box.save, 'rest') : 0);   // #060 Gastgeber: rest buffs stronger
     if (def.buff && add > 0) { const Q = (this.box.save.buffQ ??= {}); Q[def.buff] = Math.max(Q[def.buff] || 0, Math.round(add)); }
   }
   // a workshop to spend time at (Werkstätten › Benutzen): Chill Area, Drohnenwerkstatt … time passes, heals, gives its buff;
@@ -103,7 +104,7 @@ export class CampActions {
         const done = () => {
           this.resting = null;
           advance(save, R.hours || 0);
-          if (R.heal) save.health = Math.min(s.leyla.maxHealth, s.leyla.health + s.leyla.maxHealth * R.heal / 100);
+          if (R.heal) save.health = Math.min(s.leyla.maxHealth, s.leyla.health + s.leyla.maxHealth * R.heal / 100 * (1 + workerBonus(this.D, save, 'rest') / 100));   // #060 Gastgeber at work
           if (def.buff && !save.buffs.includes(def.buff)) save.buffs.push(def.buff);
           this.synergyBuff(def, place);
           s.goCamp({ banner: [R.banner || def.name || id, clockText(save) + (buff ? ' · ' + buff : '')], fade: 700, keepPlace: true });
@@ -112,7 +113,35 @@ export class CampActions {
         const dock = R.drone && place && this.benches?.dockOf(place);
         if (dock && s.drone) { s.drone.dock = { ...dock, until: s.time.now + 3200 }; s.drone.react('cleared'); s.time.delayedCall(3000, done); }
         else s.time.delayedCall(1400, done);
-      } }, { label: 'Zurück', act: () => {} }] });
+      } }, ...(def.function === 'chill' && farmEntities(this.D, save).length ? [{ label: 'Freundliches Duell', sub: 'mit einer Entity aus der Bit-Farm · Bindung', icon: 'heart', act: () => this.friendlyDuel() }] : []),
+      { label: 'Zurück', act: () => {} }] });
+  }
+  // ---------- #060 Bit-Farm: Entities as workers, friendly duels in the Chill-Ecke ----------
+  workerMenu(g) {
+    const s = this.scene, D = this.D, save = this.box.save, wp = workplaceOf(D, save, g.id), flaw = flawOf(D, save, g);
+    const hearts = '♥'.repeat(bondOf(g)) + '♡'.repeat(BOND_MAX - bondOf(g));
+    const items = placesFor(D, save, g).map(b => {
+      const soon = b.effect.stat && !WORKING_STATS.includes(b.effect.stat) ? ' (wirkt bald)' : '';
+      return { label: `${b.def.name || b.w.id}${b.own ? ' · eigene Werkbank' : ''}`, sub: (b.effect.text || 'kein Effekt') + soon, primary: b.own && !wp, icon: b.w.worker === g.id ? 'check' : 'workbench',
+        disabled: b.w.worker === g.id ? 'arbeitet schon hier' : null,
+        act: () => { const other = b.w.worker && b.w.worker !== g.id ? b.w.worker : null; assign(D, save, g.id, b.ui, b.at); syncWorkers(D, save); this.box.persist?.(); this.drawRig?.();
+          s.hud.toast(`${g.name} arbeitet jetzt: ${b.def.name || b.w.id}`, [b.effect.text, other ? 'die Entity dort ist zurück in der Farm' : null].filter(Boolean).join(' · '), 'good', 3600); } };
+    });
+    if (wp) items.unshift({ label: 'Abziehen', sub: `zurück in die Farm (arbeitet an ${wp.def.name || wp.w.id})`, icon: 'x', act: () => { unassign(D, save, g.id); syncWorkers(D, save); this.box.persist?.(); this.drawRig?.(); s.hud.toast(`${g.name} hat frei`, '', 'info', 2400); } });
+    items.push({ label: 'Zurück', icon: 'x', act: () => {} });
+    s.hud.menu({ title: `${g.name} · ${g.talent} · ${g.bits} Bits`, sub: `Bindung ${hearts} · Macke: ${g.quirk || '–'}${flaw.factor < 1 ? ` (heute: ${flaw.why})` : ''}. Eigene Werkbank voll, fremde schwächer.`, items });
+  }
+  friendlyDuel() {
+    const s = this.scene, D = this.D, save = this.box.save, list = farmEntities(D, save);
+    if (!list.length || !s.hud.duel) return;
+    const go = g => s.hud.duel.open({ foe: { ...g, friendly: true }, title: 'Freundliches Duell', sub: `Chill-Ecke · gegen ${g.name} · kein Risiko, nur Bindung`, onDone: r => {
+      if (r.gaveUp) return;
+      const b = befriend(D, save, g.id, r.won);
+      this.box.persist?.();
+      s.hud.toast(b?.up ? `Bindung mit ${g.name}: ${'♥'.repeat(b.bond)}` : `${g.name}: schönes Spiel`, b?.up ? 'Als Worker arbeitet sie jetzt besser' : 'Heute steigt die Bindung nicht mehr', b?.up ? 'good' : 'info', 3600);
+    } });
+    if (list.length === 1) return go(list[0].g);
+    s.hud.menu({ title: 'Freundliches Duell', sub: 'Mit wem? Einmal am Tag steigt die Bindung (Sieg ♥, Niederlage ♡).', items: [...list.map(({ g }) => ({ label: g.name, sub: `${g.talent} · ${g.bits} Bits · ${'♥'.repeat(bondOf(g)) || 'noch keine Bindung'}${g.bondDay === save.day ? ' · heute schon gespielt' : ''}`, act: () => go(g) })), { label: 'Zurück', icon: 'x', act: () => {} }] });
   }
   // the van door (#016, Daniel 14.11.2026: Losziehen in einem Schritt): straight to the map with this place chosen; the van's own
   // workshops (bunk, kitchen) sit as buttons in its header
@@ -145,7 +174,7 @@ export class CampActions {
     s.hud.menu({ title: def.name || 'Schlafen', sub: `Schlafen bis ${String(C.clock?.wakeHour ?? 7).padStart(2, '0')}:00 (${h} h). Heilt ${C.heal?.sleep ?? 100} %.${def.buff ? ` Danach: ${this.D.buffs?.[def.buff]?.name || def.buff} für den nächsten Run.` : ''}`,
       items: [{ label: 'Schlafen', primary: true, act: () => {
         advance(save, h);
-        save.health = Math.min(max, Math.max(save.health, s.leyla.health) + max * (C.heal?.sleep ?? 100) / 100);
+        save.health = Math.min(max, Math.max(save.health, s.leyla.health) + max * (C.heal?.sleep ?? 100) / 100 * (1 + workerBonus(this.D, save, 'sleepHeal') / 100));   // #060 Schläfer at work
         if (def.buff && !save.buffs.includes(def.buff)) save.buffs.push(def.buff);
         this.synergyBuff(def, place);
         s.drone.react('sleep');

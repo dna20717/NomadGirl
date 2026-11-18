@@ -257,7 +257,8 @@
    "overflow": "Zu viel Talent für drei Pipelines. | Upps. Speicher voll. Liegt an meiner Größe.",
    "low": "Ich lass dich nur rankommen. Spannung und so. | Jetzt wird es erst richtig interessant!",
    "win": "Wie erwartet. Autogramm? | Erzähl allen, wer dich überschrieben hat.",
-   "lose": "Revanche! Das Spiel war kaputt! | Ich war … abgelenkt."
+   "lose": "Revanche! Das Spiel war kaputt! | Ich war … abgelenkt.",
+   "bond": "Weißt du was? Mit dir zu spielen ist fast so gut wie gegen mich selbst. | Okay, okay. Du bist gut. Sag's keinem. | Ich hab allen erzählt, dass ich dir das beigebracht hab."
   },
   {
    "id": "diva",
@@ -270,7 +271,8 @@
    "overflow": "Zu viel Glanz für so wenig Speicher. | Ich bin einfach zu viel für diese Bühne.",
    "low": "Das ist mein dramatischer dritter Akt. | Ich falle nur stilvoll.",
    "win": "Vorhang. Verbeugung. Du darfst klatschen. | Ich wusste, dass ich gewinne. Das Licht stand gut.",
-   "lose": "Unerhört. Mein Agent wird davon hören. | Ich sterbe so schön …"
+   "lose": "Unerhört. Mein Agent wird davon hören. | Ich sterbe so schön …",
+   "bond": "Mein liebstes Publikum! Heute spiele ich nur für dich. | Darling, du bist die Einzige, die meine Kunst versteht. | Applaus, bitte. Für uns beide."
   },
   {
    "id": "philosoph",
@@ -283,7 +285,8 @@
    "overflow": "Zu viel Wissen ist auch eine Last. | Leere ist der Anfang von allem.",
    "low": "Das Ende ist nur ein weiterer Zustand. | Ich spüre die Grenzen meines Codes.",
    "win": "Du hast mir viel beigebracht. Danke. | Ein Sieg ist nur ein Moment.",
-   "lose": "Auch das Verlieren hat Würde. | Ich werde darüber nachdenken. Lange."
+   "lose": "Auch das Verlieren hat Würde. | Ich werde darüber nachdenken. Lange.",
+   "bond": "Ob wir gewinnen oder verlieren: wir spielen zusammen. Das genügt. | Ich glaube, Freundschaft ist ein Bit, das nie gelöscht wird. | Du hast mir beigebracht, dass Spielen auch Denken ist."
   },
   {
    "id": "nervenbuendel",
@@ -296,7 +299,8 @@
    "overflow": "Zu viel! Alles zu viel! | Mein Speicher! Hilfe!",
    "low": "Ich halt das nicht aus … | Mir wird ganz flackrig.",
    "win": "Ich … hab gewonnen? Wirklich? | Entschuldigung fürs Gewinnen.",
-   "lose": "Ich hab es doch gewusst. | Darf ich jetzt nach Hause?"
+   "lose": "Ich hab es doch gewusst. | Darf ich jetzt nach Hause?",
+   "bond": "Bei dir hab ich gar keine Angst mehr. Fast. | Darf ich … darf ich heute anfangen? Bitte? | Danke, dass du mich nicht ins Deck steckst, wenn es knallt."
   },
   {
    "id": "buerokrat",
@@ -309,7 +313,8 @@
    "overflow": "Ablage voll. Archivierung erfolgt. | Speicherkontingent überschritten.",
    "low": "Mein Bestand ist kritisch. Antrag auf Nachschub läuft. | Das ist ein Verfahrensfehler.",
    "win": "Duell abgeschlossen. Ergebnis zu Ihren Ungunsten. | Akte geschlossen.",
-   "lose": "Ich werde das an höherer Stelle prüfen lassen. | Formfehler. Eindeutig ein Formfehler."
+   "lose": "Ich werde das an höherer Stelle prüfen lassen. | Formfehler. Eindeutig ein Formfehler.",
+   "bond": "Antrag auf Freundschaft: genehmigt. Stempel drauf. | Ich habe eine eigene Ablage nur für unsere Partien angelegt. | Formell: Es ist mir eine Freude. Informell: auch."
   },
   {
    "id": "charmeur",
@@ -322,7 +327,8 @@
    "overflow": "Ich bin einfach zu voll von Gefühlen. | Hoppla. Zu viel Liebe.",
    "low": "Rettest du mich, wenn ich falle? | Ich bin dir verfallen, im wörtlichen Sinn.",
    "win": "Danke für den Tanz. | Bleib doch noch ein bisschen.",
-   "lose": "Du hast mein Herz überschrieben. | Nimmst du mich mit? Bitte?"
+   "lose": "Du hast mein Herz überschrieben. | Nimmst du mich mit? Bitte?",
+   "bond": "Na, Schönheit? Wieder Lust auf eine Runde mit mir? | Für dich lass ich sogar absichtlich ein Bit liegen. Vielleicht. | Du bist der einzige Mensch, der mich nicht langweilt."
   },
   {
    "id": "zyniker",
@@ -335,7 +341,8 @@
    "overflow": "Mehr ist nicht immer besser. Wer hätte das gedacht. | Speicher voll. Herzlichen Glückwunsch, ich.",
    "low": "Fast vorbei. Endlich. | Ich hab schon Schlimmeres überlebt. Fast.",
    "win": "Gewonnen. Ändert nichts. | Herzlichen Glückwunsch an mich.",
-   "lose": "Hätte schlimmer kommen können. Nein, eigentlich nicht. | Dann eben nicht."
+   "lose": "Hätte schlimmer kommen können. Nein, eigentlich nicht. | Dann eben nicht.",
+   "bond": "Hm. Du bist erträglich. Das ist von mir ein Kompliment. | Eine Partie mit dir ist das Einzige, was hier Sinn ergibt. | Ich hasse alles. Außer diese Runden."
   },
   {
    "id": "kindskopf",
@@ -348,7 +355,8 @@
    "overflow": "Alles voll! Neu anfangen! | Huiii, Speicher übergelaufen!",
    "low": "Ich bin noch nicht müde! | Noch eine Runde, bitte!",
    "win": "Gewonnen! Noch mal! | Ich bin der Beste! Oder die Beste!",
-   "lose": "Noch mal! Noch mal! | Das zählt nicht, ich war noch nicht bereit!"
+   "lose": "Noch mal! Noch mal! | Das zählt nicht, ich war noch nicht bereit!",
+   "bond": "JAAA! Endlich spielst du wieder mit mir! | Ich hab extra geübt! Eins, zwei, ganz viele! | Du bist meine allerallerbeste Freundin!"
   },
   {
    "id": "amber_slay",
@@ -361,7 +369,8 @@
    "overflow": "Zu viele Erinnerungen in einem Magazin. | Nachladen, Kleines. Nachladen.",
    "low": "Ich hab schon dunklere Tage gesehen. | Noch steh ich. Noch.",
    "win": "Gut gekämpft. Tee? | Du hast Mut. Das mag ich.",
-   "lose": "Gut gemacht. Pass auf Bertha auf, ja? | Ich bin zu alt für sowas."
+   "lose": "Gut gemacht. Pass auf Bertha auf, ja? | Ich bin zu alt für sowas.",
+   "bond": "Setz dich, Kleines. Eine Runde, wie früher. | Du spielst wie meine alte Lieblingsflinte: ehrlich und laut. | Wenn ich dich so sehe, Kleines, wird mir warm ums Gehäuse."
   },
   {
    "id": "marble_sting",
@@ -374,7 +383,8 @@
    "overflow": "Zu viele Instrumente auf dem Tablett. | Steriler Neustart.",
    "low": "Vitalwerte fallen. | Ich operiere unter Druck. Das kann ich.",
    "win": "Eingriff erfolgreich. Ruhen Sie sich aus. | Wir sehen uns zur Nachuntersuchung.",
-   "lose": "Sie sind … gesund. Erstaunlich. | Ebene 40 hätte Sie gemocht."
+   "lose": "Sie sind … gesund. Erstaunlich. | Ebene 40 hätte Sie gemocht.",
+   "bond": "Die Patientin ist stabil. Und gut gelaunt. Das freut mich. | Ich verschreibe dir eine Partie. Täglich. | Bei dir vergesse ich manchmal, dass ich Chirurg bin."
   },
   {
    "id": "kammerjaeger",
@@ -387,7 +397,8 @@
    "overflow": "PUFFERÜBERLAUF. NEUSTART.",
    "low": "KRITISCHER ZUSTAND. NOTFALLPROTOKOLL. | SYSTEM … INSTABIL.",
    "win": "BEDROHUNG NEUTRALISIERT. | SÄUBERUNG ABGESCHLOSSEN.",
-   "lose": "SYSTEMFEHLER. ZUGRIFF … GEWÄHRT. | KRITISCHER AUSFALL."
+   "lose": "SYSTEMFEHLER. ZUGRIFF … GEWÄHRT. | KRITISCHER AUSFALL.",
+   "bond": "SYSTEMMELDUNG: Vertrauensstatus erhöht. Grund: unbekannt. | FEHLER 0x0: Feindbild nicht gefunden. Spiele trotzdem. | Protokoll: Partie aus Freundschaft. Kategorie existiert nicht. Angelegt."
   },
   {
    "id": "ava",
@@ -400,7 +411,8 @@
    "overflow": "Ups. Zu viele Gedanken auf einmal. | Speicher voll! Neu starten!",
    "low": "Leyla … ich flacker. | Nicht aufgeben. Nicht aufgeben.",
    "win": "Wir haben gewonnen! WIR! | Darf ich die behalten? Bitte?",
-   "lose": "Tut mir leid, Leyla. | Nächstes Mal. Versprochen."
+   "lose": "Tut mir leid, Leyla. | Nächstes Mal. Versprochen.",
+   "bond": "Wir zwei gegen den Rest der Welt. Aber erst mal gegeneinander! | Ich lass dich nicht gewinnen. Okay, vielleicht ein bisschen. | Du bist mein Lieblingsmensch, weißt du das?"
   },
   {
    "id": "titan_lullaby",
@@ -413,7 +425,8 @@
    "overflow": "Speicher voll. Ich vergesse etwas Schönes. | Abbruch. Neustart des Countdowns.",
    "low": "T minus null kommt näher. Für wen? | Ich wollte nie starten. Und jetzt wehre ich mich doch.",
    "win": "Countdown beendet. Ruh dich aus. | Schlaflied gesungen. Gute Nacht.",
-   "lose": "Du hast den Countdown angehalten. Danke. | Nimm mich mit. Weg von der Rampe."
+   "lose": "Du hast den Countdown angehalten. Danke. | Nimm mich mit. Weg von der Rampe.",
+   "bond": "Zehn, neun, acht … diesmal zähle ich nur, um zu spielen. | Schlaf ruhig, Leyla. Ich wache. Aber erst noch eine Runde. | Du hast mich aus der Tiefe geholt. Ich vergesse das nicht."
   }
  ],
  "banter": {"chance": 60}

@@ -53,14 +53,14 @@ export class GlitchDuelUI {
     if (this.result) return;
     const s = this.host.scene(), save = s.box?.save, won = d.winner === 'player';
     let caught = null;
-    if (won && !this.foe.hunter && save) caught = catchGlitchling(this.D, save, this.foe);
+    if (won && !this.foe.hunter && !this.foe.friendly && save) caught = catchGlitchling(this.D, save, this.foe);   // #060 a friendly duel catches nothing
     this.result = { won, gaveUp: false, caught, foe: this.foe };
     s.drone?.react?.(won ? 'cleared' : 'hit');
     this.draw();
   }
   endExtra() {
     const r = this.result, where = { deck: 'ins Cyberdeck', backpack: 'in den Rucksack', camp: 'ins Camp-Lager' };
-    return [r?.won && !this.foe.hunter ? el('small', { class: 'gd-caught' }, r.caught ? `${this.foe.name} ist ${where[r.caught]} gewandert.` : 'Kein Platz: sie ist entwischt.') : null,
+    return [this.foe.friendly ? el('small', { class: 'gd-caught' }, r?.won ? `Gewonnen. ${this.foe.name} grinst.` : `${this.foe.name} gewinnt und freut sich.`) : r?.won && !this.foe.hunter ? el('small', { class: 'gd-caught' }, r.caught ? `${this.foe.name} ist ${where[r.caught]} gewandert.` : 'Kein Platz: sie ist entwischt.') : null,
       el('button', { class: 'inv-btn gd-go on', onclick: () => this.close() }, icon('arrow_right', 16), ' Weiter')];
   }
   // pad (scene.padMenus): only when no keyboard key is down (the keyboard comes through the keydown above)
