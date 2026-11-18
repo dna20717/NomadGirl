@@ -14,6 +14,12 @@ NomadGirl ist ein 2D-Action-Roguelite mit Cosy-Basisbau: Leyla plündert gefähr
 
 ## Core Gameplay Loop
 
+**Die vier Modi** (Daniel, 18.11.2026: „Lass uns eine Semantik festlegen“):
+- **CampMode:** alles im Camp, mit Bauen, Craften, Kochen, Schlafen, Crew und Co.
+- **ActionMode:** alles in den POIs (Plündern, Kämpfen, Klettern).
+- **DuellMode:** die Duelle der Entities (Bit-Stapel), im Spiel als Fenster, dazu /duel und /mobile.
+- **TravelMode:** Reisen: Reisekarte, die Fahrt in Szene, Zwischenfälle und Ketten unterwegs.
+
 ```mermaid
 flowchart LR
   A["Ankunft am POI<br/>Buffs, Loadout, Companions"] --> B["POI-Run<br/>Kampf und Loot"]

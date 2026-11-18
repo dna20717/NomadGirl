@@ -6,12 +6,14 @@ Alles ist Text: Spieldaten sind JSON, geprüft und bearbeitet wird mit `ng`.
 
 Spieldesign: `docs/design.md` (dazu das claude.ai-Projekt „NomadGirl“).
 
+**Die vier Modi** (Daniel, 18.11.2026), so heißen sie überall: **CampMode** (Camp mit Bauen, Craften usw., Code `mode: 'camp'`), **ActionMode** (POIs, `mode: 'run'`), **DuellMode** (Duelle der Entities: `hud.duel`, /duel, /mobile), **TravelMode** (Reisen: Reisekarte, Fahrt, Zwischenfälle).
+
 ## Regeln der Zusammenarbeit
 
 - Sprache: Deutsch. Fragen an Daniel als Multiple Choice. Erst reden, dann bauen; kleine Geschmackstests darf Ava direkt bauen.
 - Ava ist frisch, vorausdenkend, manchmal frech, nutzt Emojis im Chat (in Oberflächen Lucide-Icons). Niemals das Schema „Das ist nicht X. Das ist Y.“
 - Commits direkt auf `main`, kurze deutsche Commit-Nachrichten mit Attribution. Vor dem Push `git pull --rebase`.
-- **Immer auf `main`, nie auf einem Nebenzweig** (Daniel, 10.11.2026: „es geht immer auf main, es sei denn ich sage es explizit“). Auch wenn die Sitzung auf einem `claude/…`-Zweig startet: Arbeit nach `main` bringen (`git push origin HEAD:main`) und am Ende prüfen, dass der letzte Commit auf `origin/main` liegt und der Build grün ist. Anlass: Die modulare Drohne lag einen Nachmittag lang nur auf `claude/modest-heisenberg-bql1lz` und war nicht live.
+- **Immer auf `main`, nie auf einem Nebenzweig** (Daniel, 10.11.2026: „es geht immer auf main, es sei denn ich sage es explizit“). Auch wenn die Sitzung auf einem `claude/…`-Zweig startet: Arbeit nach `main` bringen (`git push origin HEAD:main`) und am Ende prüfen, dass der letzte Commit auf `origin/main` liegt und der Build grün ist.
 - **Code auf Englisch:** Code, Kommentare, Datei- und Ordnernamen und die Feldnamen der Spieldaten (JSON) sind englisch. Deutsch bleiben: Texte in Oberflächen, Namen und Beschreibungen in den Spieldaten, Commit-Nachrichten, diese Anleitung und die Docs. Wörter aus `docs/glossary.md`. Inhalts-IDs dürfen deutsch bleiben (`rohrzange`, `tankstelle_km7`).
 - **Lizenz:** GPL v3 oder später (`LICENSE`, Daniel, 07.11.2026).
 - **Assets:** Alle Assets (Grafik, Ton, Musik) erzeugen wir selbst mit KI oder Code. Nichts Externes: keine fremden Asset-Packs, keine Downloads. Einzige Ausnahme (Daniel, 07.11.2026): die Handheld-Töne aus „Game SFX by OwlishMedia“ (CC0, steht in `THIRD_PARTY.md`); weitere fremde Pakete vorher mit Daniel klären. Ausnahme bleiben die Bausteine aus dem gemeinsamen Kern (Lucide-Icons, Schriften Inter und VT323), stehen in `THIRD_PARTY.md`. Bei KI-Assets in `THIRD_PARTY.md` bzw. `docs/assets.md` vermerken, womit sie entstanden sind.
@@ -147,5 +149,5 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 ## Online
 
 Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei jedem Push auf `main` mit `npm run build:web` → `dist/` und liefert unter https://nomadgirl.dna20717.workers.dev aus (`wrangler.jsonc`): `/` = Startseite (`index.html`), `/workshop` = Werkstatt, `/game` = Spiel. Prüfen: `npx wrangler deploy --dry-run --outdir /tmp/wout`. **Wichtig:** Die GitHub-App „Cloudflare Workers and Pages“ braucht Zugriff auf NomadGirl, sonst löst ein Push keinen Build aus (Weg dorthin: `docs/features/online.md`). Deploy geht nicht aus der Arbeitsumgebung (Cloudflare-API gesperrt), nur über den Push. 
-- **Nie auf Nebenzweige pushen** (12.11.2026): dort scheitert Cloudflares Vorschau-Build (`wrangler preview` ohne `previews`-Block) und hängt als **failure** am Commit. Deshalb nur `git push origin HEAD:main`.
+- **Nie auf Nebenzweige pushen** (12.11.2026): Cloudflares Vorschau-Build scheitert dort und hängt als **failure** am Commit.
 - Details (Login, Speichern = Commit, Spielstand online, Version, **verspätete Builds nach jedem Push prüfen**, lokal wie auf Cloudflare): `docs/features/online.md`.

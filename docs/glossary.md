@@ -6,6 +6,10 @@ Neuer Code nimmt die Wörter aus dieser Liste. Die Grundbegriffe (Werkstatt, Pr�
 
 | Deutsch | Englisch |
 |---|---|
+| CampMode (Camp: Bauen, Craften, Leben im Rig) | camp (`scene.mode === 'camp'`) |
+| ActionMode (alles in den POIs) | run (`scene.mode === 'run'`) |
+| DuellMode (Duelle der Entities) | duel (`hud.duel`, `/duel`, `/mobile`) |
+| TravelMode (Reisen: Karte, Fahrt, Zwischenfälle) | travel (`hud.map`, `hud.drive`, `travel.js`) |
 | Ruf (bei einer Gang) | rep |
 | Merker (Folgen von Ereignissen) | flag |
 | Kette (Ereignisse über mehrere Etappen) | chain |
