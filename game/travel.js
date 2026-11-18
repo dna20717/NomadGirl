@@ -9,6 +9,7 @@ import { generateEncounter, eventsConfig } from './road_events.js';
 import { addRep, repOf, gangs } from './reputation.js';
 import { revealPlace } from './worldmap.js';
 import { needBlocked } from './needs.js';
+import { setFlag } from './conditions.js';
 
 const isNight = (D, hour) => { const T = D.travel || {}, len = T.dayLength || 24, night = (T.nightShare ?? 40) / 100 * len; return hour >= len - night / 2 || hour < night / 2; };
 
@@ -92,7 +93,7 @@ export function choose(D, save, o, rnd = Math.random) {
   if (rep2?.n) lines.push(`Ruf ${rep2.gang} ${rep2.n > 0 ? '+' : '−'}${Math.abs(rep2.n)}`);
   const R = save.road ??= { flags: [], seen: [], chain: null };
   if (!failed || quest) for (const f of String(o.flag || '').split(',').map(x => x.trim()).filter(Boolean)) {
-    if (f.startsWith('-')) R.flags = R.flags.filter(x => x !== f.slice(1)); else if (!R.flags.includes(f)) R.flags.push(f);
+    setFlag(save, f);   // #071 Welt-Merker
   }
   if (!failed && o.buff && D.buffs?.[o.buff] && !(save.buffs ||= []).includes(o.buff)) { save.buffs.push(o.buff); lines.push(`Buff: ${D.buffs[o.buff].name}`); }
   // #057: a hidden place comes onto the map

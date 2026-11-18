@@ -82,6 +82,9 @@ export const PART_SLOTS_SCHEMA = [['lauf', 'Lauf'], ['griff', 'Griff'], ['schaft
 export const WORKSHOP_FUNCTIONS = [['tank', 'Cryo-Tank'], ['garden', 'Hydrokultur'], ['cistern', 'Zisterne'], ['storage', 'Lager'], ['guests', 'Gäste'], ['treasury', 'Schatzkammer'], ['cooling', 'Kühlung'], ['cell', 'Zelle'], ['sleep', 'Schlafen'], ['chill', 'Chillen'], ['drone', 'Drohnen'], ['warroom', 'Planung'], ['kitchen', 'Kochen'], ['foodtruck', 'Verkauf'], ['craft', 'Herstellen'], ['cyber', 'Cyberware (Ripperdoc)'], ['engine', 'Motor'], ['power', 'Energie'], ['armory', 'Waffenkammer'], ['vehicle', 'Fahrzeuge (Heavy-Duty)'], ['jobs', 'Aufträge'], ['bitfarm', 'Bit-Farm (Entities)']];
 export const BENCH_FX = [['light', 'Licht'], ['screen', 'Bildschirm'], ['steam', 'Dampf'], ['smoke', 'Rauch'], ['sparks', 'Funken'], ['flame', 'Flamme'], ['blink', 'LED blinkt'], ['twinkle', 'Lichter funkeln'], ['bubbles', 'Blasen'], ['fish', 'Fische'], ['lava', 'Lavalampe'], ['scan', 'Druckkopf'], ['shine', 'Glanz']];
 export const BENCH_FX_WHEN = [['always', 'Immer'], ['night', 'Abends'], ['near', 'In der Nähe'], ['use', 'Bei Benutzung']];
+// #071 what a quirk does to an Entity at work (game/workers.js flawOf)
+export const QUIRK_EFFECTS = [['', 'nach Art'], ['night', 'arbeitet nur nachts (20–6 Uhr)'], ['fullmoon', 'jeder 7. Tag: nichts'], ['rain', 'bei Regen: nichts'], ['generator', 'Generator im Rig: halb'],
+  ['drone', 'Drohnenwerkstatt im Rig: halb'], ['jealous', 'andere Worker: halb'], ['mood', 'jeder 4. Tag keine Lust'], ['odd', 'lenkt sich ab: −15 %'], ['none', 'keine']];
 export const RIG_SLOTS = [['engine', 'Motor'], ['armor', 'Panzerung'], ['weapon', 'Waffe'], ['roof', 'Dach'], ['solar', 'Solar (Container-Dach)']];
 // #068 one condition language (game/conditions.js): the crew & rig needs, the same fields wherever something can be required
 // (Ereignis-Baukasten › Antworten and Lagen, Quests › Bedingung); without a value they ask for nothing
@@ -1478,6 +1481,8 @@ export const AREAS = {
         select('rep.peace', 'Frieden im Revier ab', [['geduldet', 'Geduldet'], ['freund', 'Freund'], ['neutral', 'Neutral']], { hint: '#061: ab dieser Stufe wird der POI zum Revier-Camp: die Gang greift nicht an; Freunde handeln und haben einen Auftrag' }),
         num('rep.breakPeace', 'Frieden brechen kostet', { min: 0, hint: 'Ruf, wenn Leyla einen von ihnen angreift oder den Tresor knackt' }), num('rep.theft', 'Beim Klauen gesehen', { min: 0, hint: 'Ruf je Kiste, die einer von ihnen öffnen sieht' }),
         num('rep.job', 'Auftrag: Ruf', { min: 0, hint: 'Ruf für „Revier säubern“' })] },
+      { title: 'Wetter', fields: [table('weather', 'Wetter macht wahrscheinlicher', [select('kind', 'Wetter', [['dust', 'Sandsturm'], ['fog', 'Morgennebel'], ['wet', 'Regen']]), select('roadside', 'Am Straßenrand', ROADSIDE), num('factor', 'Gewicht ×', { min: 0, max: 10 })],
+        { hint: '#063/#071: das Wetter einer Etappe ändert das Gewicht der Lagen nach dem, was am Straßenrand steht (×1 = gleich, ×0,4 = seltener). Leer = die eingebauten Werte' })] },
       { title: 'Wörter', fields: [text('words.group', 'Banden {group}', { hint: 'mit |' }), text('words.cargo', 'Ladung {cargo}', { hint: 'mit |, „ein Laster mit …“' }),
         text('words.thing', 'Dinge {thing}', { hint: 'mit |, „ein Feuer aus …“' }), text('words.creature', 'Kreaturen {creature}', { hint: 'mit |, Mehrzahl' })] },
     ],
@@ -1533,7 +1538,7 @@ export const AREAS = {
         area_('names.second', 'Zweites Wort', { hint: 'Kante, Geräusch, Tat (Sting, Slay, Hex …)' })] },
       { title: 'Begabungen', wide: true, fields: [table('talents', 'Begabungen', [text('name', 'Name'), select('function', 'Werkbank', WORKSHOP_FUNCTIONS), select('also', 'Auch', WORKSHOP_FUNCTIONS), ref('brand', 'Hersteller', 'brands'), text('effect', 'Effekt'), num('perBit', 'Je Bit', { min: 0 }), text('stat', 'Wert'), num('remote', 'Einflüstern', { min: 0, max: 6 }), num('link', 'Verschränken', { min: 0, max: 6 })],
         { hint: 'Effekt mit {n} = „Je Bit“ × Stärke. In „Werkbank“ und „Auch“ wirkt er voll. „Wert“ ist der Schlüssel, den das Spiel später ausliest (perfect, refund, growth, power …). Je Bit 0 = wirkt ohne Stärke (Archäologe). Der Wert bestimmt auch, was das Code-Porträt trägt. Hersteller = wer diese Art KI baut (#049), Unikate können einen eigenen haben' })] },
-      { title: 'Macken & Wünsche', wide: true, fields: [table('quirks', 'Macken', [text('text', 'Macke'), select('kind', 'Art', GLITCH_QUIRKS)], { hint: 'Jede Entity hat eine; immer ein Haken mit Charme' }),
+      { title: 'Macken & Wünsche', wide: true, fields: [table('quirks', 'Macken', [text('text', 'Macke'), select('kind', 'Art', GLITCH_QUIRKS), select('effect', 'Wirkung als Worker', QUIRK_EFFECTS, { hint: '#060/#071: was die Macke an der Werkbank tut; leer = nach Art (schrullig −15 %)' })], { hint: 'Jede Entity hat eine; immer ein Haken mit Charme' }),
         table('wishes', 'Wünsche', [text('text', 'Wunsch')], { hint: 'Was er will, um freiwillig mitzukommen (Überreden, kommt mit Stufe 2)' }),
         area_('homes', 'Wohnorte', { hint: 'Maschinen, in denen Entities in POIs wohnen, mit Komma getrennt' })] },
       { title: 'Duell', fields: [table('duel.quality', 'Präzision je Bits', [num('q', 'Präzision', { min: 2, max: 6 })], { hint: 'Zeile 1 = 1 Bit … Zeile 5 = 5 Bits: trifft bei W6 ≥ diesem Wert (Glitch-Duell #050, Kern von OPR Firefight). Impulse je Begabung stehen bei den Begabungen (Einflüstern, Verschränken)' }),

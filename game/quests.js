@@ -5,7 +5,7 @@
 //   save.quests = { active: { <id>: { base, day } }, done: { <id>: { day } }, tracked: 'main' | <id> }
 //   D.quests[id] = { name, giver (companion), text, after (quest), minDay, counter + filter + target (like achievements) | item + count
 //                    (deliver), reward: { deltas, items: [{ item, count }] }, done (line of the giver when it is handed in) }
-import { ok as condOk } from './conditions.js';
+import { ok as condOk, setFlag } from './conditions.js';
 import { state as achState } from './achievements.js';
 import { stock, take } from './crafting.js';
 import { add as addTo } from './inventory.js';
@@ -31,7 +31,7 @@ export function accept(D, save, id) {
   const x = D.quests?.[id], Q = qstate(save);
   if (!x || Q.active[id] || Q.done[id]) return false;
   Q.active[id] = { base: x.counter ? countOf(save, x) : 0, day: save.day ?? 1 };
-  if (x.flag) { const R = save.road ??= { flags: [], seen: [], chain: null }; R.flags ??= []; if (!R.flags.includes(x.flag)) R.flags.push(x.flag); }   // #057
+  if (x.flag) setFlag(save, x.flag);   // #057, #071 Welt-Merker
   if (!Q.tracked) Q.tracked = id;
   return true;
 }

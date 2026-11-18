@@ -15,6 +15,10 @@ const RIG_NAMES = { engine: 'Motor', armor: 'Panzerung', weapon: 'Waffe am Rig',
 const FN_NAMES = { kitchen: 'Küche', cyber: 'Ripperdoc-Liege', drone: 'Drohnenwerkstatt', craft: 'Werkbank', cell: 'Zelle', guests: 'Gästekoje', garden: 'Hydrokultur', cistern: 'Zisterne',
   cooling: 'Kühlraum', warroom: 'Warroom', armory: 'Waffenkammer', engine: 'Motorraum', chill: 'Chill-Ecke', sleep: 'Schlafkoje', storage: 'Lager', tank: 'Cryo-Tank', jobs: 'Auftragsbüro', bitfarm: 'Bit-Farm' };
 
+// #071 Welt-Merker: set by answers on the road, by quests when taken, read by situations, quests and answers. They live in
+// save.road.flags (the name from #055; kept so no savegame breaks); everyone reaches them through these two.
+export const worldFlags = save => { const R = (save.road ??= { flags: [], seen: [], chain: null }); return (R.flags ??= []); };
+export function setFlag(save, f) { const F = worldFlags(save); if (f.startsWith('-')) { const i = F.indexOf(f.slice(1)); if (i >= 0) F.splice(i, 1); } else if (!F.includes(f)) F.push(f); }
 const flagsOf = save => new Set(save?.road?.flags || []);
 const wear = save => save?.inv?.wear || {};
 const rigParts = save => Object.entries(save?.rig?.parts || {}).flatMap(([slot, ids]) => (Array.isArray(ids) ? ids : [ids]).filter(Boolean).map(id => ({ slot, id })));

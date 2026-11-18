@@ -51,23 +51,33 @@ export function assign(D, save, id, ui, at) {
 }
 export function unassign(D, save, id) { let n = 0; for (const b of rigBenches(D, save)) if (b.w.worker === id) { delete b.w.worker; n++; } return n > 0; }
 
-// the Macke today → { factor (0–1), why }
+// the Macke today → { factor (0–1), why }. #071: the quirk's „Wirkung als Worker“ (Entities › Macken) decides; older Entities without it
+// fall back to the quirk's kind and text (as before)
+export function quirkEffectOf(D, g) {
+  if (g?.quirkEffect) return g.quirkEffect;
+  const q = String(g?.quirk || '').toLowerCase(), byText = (D?.glitchlings?.quirks || []).find(x => x.text && x.text.toLowerCase() === q)?.effect;
+  if (byText) return byText;
+  switch (g?.quirkKind) {
+    case 'time': return q.includes('vollmond') ? 'fullmoon' : 'night';
+    case 'weather': return 'rain';
+    case 'neighbour': return q.includes('generator') ? 'generator' : q.includes('drohne') ? 'drone' : 'jealous';
+    case 'mood': return 'mood';
+    case 'odd': return 'odd';
+    default: return 'none';
+  }
+}
 export function flawOf(D, save, g, others = 0) {
-  const q = String(g.quirk || '').toLowerCase(), day = save?.day ?? 1, h = clockHours(save) % 24;
-  switch (g.quirkKind) {
-    case 'time':
-      if (q.includes('vollmond')) return day % 7 === 0 ? { factor: 0, why: 'Vollmond: macht nur Fehler' } : { factor: 1, why: '' };
-      return h >= 20 || h < 6 ? { factor: 1, why: '' } : { factor: 0, why: 'schläft bis 20 Uhr' };
-    case 'weather': return raining(D, save) ? { factor: 0, why: 'es regnet' } : { factor: 1, why: '' };
-    case 'neighbour': {
-      const has = fn => rigBenches(D, save).some(b => b.def.function === fn);
-      if (q.includes('generator')) return has('power') ? { factor: 0.5, why: 'hasst den Generator' } : { factor: 1, why: '' };
-      if (q.includes('drohne')) return has('drone') ? { factor: 0.5, why: 'Angst vor der Drohne' } : { factor: 1, why: '' };
-      return others > 0 ? { factor: 0.5, why: 'eifersüchtig auf die anderen' } : { factor: 1, why: '' };
-    }
-    case 'mood': return hash(`${g.id}:${day}`) % 4 === 0 ? { factor: 0, why: 'keine Lust heute' } : { factor: 1, why: '' };
+  const day = save?.day ?? 1, h = clockHours(save) % 24, has = fn => rigBenches(D, save).some(b => b.def.function === fn), ok = { factor: 1, why: '' };
+  switch (quirkEffectOf(D, g)) {
+    case 'night': return h >= 20 || h < 6 ? ok : { factor: 0, why: 'schläft bis 20 Uhr' };
+    case 'fullmoon': return day % 7 === 0 ? { factor: 0, why: 'Vollmond: macht nur Fehler' } : ok;
+    case 'rain': return raining(D, save) ? { factor: 0, why: 'es regnet' } : ok;
+    case 'generator': return has('power') ? { factor: 0.5, why: 'hasst den Generator' } : ok;
+    case 'drone': return has('drone') ? { factor: 0.5, why: 'Angst vor der Drohne' } : ok;
+    case 'jealous': return others > 0 ? { factor: 0.5, why: 'eifersüchtig auf die anderen' } : ok;
+    case 'mood': return hash(`${g.id}:${day}`) % 4 === 0 ? { factor: 0, why: 'keine Lust heute' } : ok;
     case 'odd': return { factor: 0.85, why: 'lenkt sich ab' };
-    default: return { factor: 1, why: '' };
+    default: return ok;
   }
 }
 export const bondOf = g => Math.max(0, Math.min(BOND_MAX, Math.floor(g?.bond || 0)));

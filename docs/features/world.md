@@ -30,3 +30,4 @@ Daniel, 18.11.2026 (aus der Verzahnungs-Prüfung): „auch machen, aber mit Meld
 - **Zisterne:** Regen füllt sie in Ereignis-Zeit, auch während der Fahrt; beim Ankommen sagt jetzt ein Toast, wie viele Flaschen dazukamen (ohne Zisterne: wie viele Stunden es geregnet hat).
 - **Im POI** (`runSky`, beim Start des Runs, Wetter am Ort): Regen: Gegner hören 40 % schlechter („deine Schritte gehen im Prasseln unter“); Nebel: Gegner sehen 30 % weniger weit, Leylas Sicht im Nebel (#043) 25 % kürzer; Staub: −15 % / −10 %. Meldung nach dem Start.
 - Test `test/weather_fx.test.js`.
+- **Wetter-Gewichte in der Werkstatt** (#071): Ereignis-Baukasten › **Wetter** (Tabelle: Wetter, Am Straßenrand, Gewicht ×); ohne Zeilen gelten die eingebauten Werte (`weather_fx.roadBias`).

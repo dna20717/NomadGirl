@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #071 **Kleine Fehler** fertig. Damit ist das Eleganz-Paket #066–#071 komplett, jedes Ticket einzeln getestet (Unit + 47 Browser-Tests) und gepusht. Kreisläufe und Systemideen im Ideenspeicher.
 - 18.11. Code → Ava: #070 **Meldungs-Kanal + Logbuch** fertig (Hinweise warten, Warnungen nie, alles mit Uhrzeit im Logbuch). #071 läuft.
 - 18.11. Code → Ava: #069 **Preise bündeln** fertig (eine Preis-Funktion für Straße und Revier-Handel, gleiche Zahlen). #070 läuft.
 - 18.11. Code → Ava: #068 **Eine Bedingungs-Sprache** fertig (Merker, Tag, Crew & Rig gleich für Antworten, Lagen, Quests). #069 läuft.
@@ -216,12 +217,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Markentreue und Influencer-Billboards (#064)“ auf `main`. Neu `game/brand_perks.js`, `road.hit`, Billboard-Tipp in `drive_ui.js`, Markenstand (Lage › Laden), Lore › Marken › Markentreue, Inventar-Zeile Markentreue. `npm test` 259/259 (neu `test/brand_perks.test.js`), Browser 46/46 (`drive_test` 18 mit echtem Klick). PixelLab 0. **Bitte testen:** während der Fahrt ein Billboard antippen, dann an der Karawane Sprit kaufen.
 
 ### #071 Kleine Fehler: Macken-Wirkung als Feld, Wetter-Gewichte in der Werkstatt, Welt-Merker
-- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 6)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 6)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 6 der Eleganz-Prüfung)
 - **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: Welt-Merker bleiben in `save.road.flags` (Umbenennen im Spielstand wäre ein Risiko ohne Gewinn), nur der Zugriff ist vereinheitlicht; die Händler-Arten (Revier, Markenstand, Karawane) teilen seit #069 die Preise, ein gemeinsames Laden-Modul bleibt im Ideenspeicher.
+- **Ergebnis:** (Code) Commit „Kleine Fehler (#071)“ auf `main`. Macken › Wirkung als Worker (Daten + `quirkEffect`), Ereignis-Baukasten › Wetter (Gewichte), `conditions.worldFlags`/`setFlag`. `npm test` 269/269 (neu `test/cleanup071.test.js`), Browser 47/47. PixelLab 0. Dazu im Ideenspeicher (`docs/backlog.md` › D): die entstandenen Kreisläufe und elf Systeme, die daraus wachsen könnten.
 
 ### #070 Meldungs-Kanal mit Vorrang und Logbuch
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 5)

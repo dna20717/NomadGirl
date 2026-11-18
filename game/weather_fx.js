@@ -14,11 +14,20 @@ export const ROAD_BIAS = {
   fog: { flare: 3, barrier: 1.5, hitchhiker: 1.5 },
   wet: { breakdown: 2.5, truck: 1.5, campfire: 0.4 },
 };
+// #071 the weights from the workshop (Ereignis-Baukasten › Wetter), else the built-in ones
+export function roadBias(D) {
+  const rows = (D?.roadEvents?.weather || []).filter(r => r.kind && r.roadside && r.factor != null);
+  if (!rows.length) return ROAD_BIAS;
+  const out = { dust: {}, fog: {}, wet: {} };
+  for (const r of rows) (out[r.kind] ??= {})[r.roadside] = Number(r.factor);
+  return out;
+}
 // the sky of one leg: { dust, fog, wet, bias, line } (line = the message, '' when the weather is plain)
 export function legSky(D, save, seed, i, region, h0, h1) {
   const w = legWeather(D, seed, i, region, h0), wet = rainHours(D, save, h0, h1) > 0 || rainingAt(D, save, h0);
   const kinds = [w.dust > 0 && 'dust', w.fog > 0 && 'fog', wet && 'wet'].filter(Boolean), bias = {};
-  for (const k of kinds) for (const [r, f] of Object.entries(ROAD_BIAS[k])) bias[r] = (bias[r] ?? 1) * f;
+  const B = roadBias(D);
+  for (const k of kinds) for (const [r, f] of Object.entries(B[k] || {})) bias[r] = (bias[r] ?? 1) * f;
   const line = [w.dust > 0 && 'Sandsturm auf der Strecke: Staubwände, Wracks und Viecher häufiger', w.fog > 0 && 'Morgennebel: Rauchfackeln und Sperren tauchen spät auf', wet && 'Regen unterwegs: Pannen häufiger, die Zisterne füllt sich'].filter(Boolean);
   return { dust: w.dust, fog: w.fog, wet, bias, kinds, line: line.join(' · ') };
 }

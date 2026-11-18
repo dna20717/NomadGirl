@@ -31,7 +31,7 @@ export function effectOf(C, talent, bits, own = true) {
 const make = (C, o) => {
   const t = C.talents.find(x => x.name === o.talent) || C.talents[0] || {}, e = effectOf(C, t, o.bits);
   return { id: slug(o.name), name: o.name, unique: !!o.unique, talent: t.name || '', function: t.function || null, also: t.also || null, brand: o.brand || t.brand || null, character: o.character || null, bits: o.bits,
-    effect: e.text, stat: e.stat, value: e.value, quirk: o.quirk || '', quirkKind: o.quirkKind || null, wish: o.wish || '', home: o.home || '', description: o.description || '', ...(o.duelHp ? { duelHp: o.duelHp } : {}), ...(o.duelNoise != null ? { duelNoise: o.duelNoise / 100 } : {}) };
+    effect: e.text, stat: e.stat, value: e.value, quirk: o.quirk || '', quirkKind: o.quirkKind || null, quirkEffect: o.quirkEffect || C.quirks.find(q => q.text === o.quirk)?.effect || null, wish: o.wish || '', home: o.home || '', description: o.description || '', ...(o.duelHp ? { duelHp: o.duelHp } : {}), ...(o.duelNoise != null ? { duelNoise: o.duelNoise / 100 } : {}) };
 };
 // #057: one of the hand-made unique Entities as a full Entity (the Silo-KI lives in its terminal, not in the Durchgang's set)
 export function uniqueEntity(D, name) { const C = config(D), u = C.unique.find(x => x.name === name); return u ? make(C, { ...u, unique: true }) : null; }
@@ -55,7 +55,7 @@ export function generate(D, seed = 1, count = null) {
     const fresh = (list, used) => { const f = list.filter(x => !used.has(x.text)); return f.length ? f : list; };   // no quirk or wish twice while there are enough
     const q = C.quirks.length ? pick(r, fresh(C.quirks, usedQ)) : null, w = C.wishes.length ? pick(r, fresh(C.wishes, usedW)) : null;
     if (q) usedQ.add(q.text); if (w) usedW.add(w.text);
-    out.push(make(C, { name, talent: C.talents.length ? pick(r, C.talents).name : '', bits: 1 + weighted(r, C.bits), quirk: q?.text, quirkKind: q?.kind,
+    out.push(make(C, { name, talent: C.talents.length ? pick(r, C.talents).name : '', bits: 1 + weighted(r, C.bits), quirk: q?.text, quirkKind: q?.kind, quirkEffect: q?.effect,
       wish: w?.text || '', home: C.homes.length ? pick(r, C.homes) : '' }));
   }
   return out;

@@ -71,6 +71,29 @@ Ideen ohne Auftrag. Wer eine angeht, macht daraus ein Ticket im Funkbuch und str
 - **Fotomodus:** AvA als Kamera, Rig und Camp festhalten und teilen.
 - **Täglicher Run:** ein Tages-Seed für alle mit Ranking.
 
+### Aus der Verzahnung (#057–#071, Daniel 18.11.2026: „Liste Synergien und Systeme auf, die auf diese Weise entstanden sind und das Gameplay ergänzen könnten“)
+
+Schon entstandene Kreisläufe (zum Ausbalancieren und Erzählen):
+- **Schatzsuche-Kreislauf:** Straßen-Geschichte → Kartenstück → Onkels Quest → Händler (Merker) → Silo Zero → Titan Lullaby gefangen → als Navigator-Worker in der Bit-Farm (weniger Sprit) → mehr Reisen.
+- **Ruf-Kreislauf:** Antworten heben Ruf → Revier-Camp (Frieden, Handel, Auftrag) → Revier-Handel mit Ruf- und Influencer-Rabatt → Klauen kostet Ruf → Kopfgeldjäger.
+- **Crew und Rig öffnen die Straße:** jede Werkstatt, jedes Implantat, jeder Companion bringt neue Antworten (Ripperdoc versorgt Verletzte → Ruf).
+- **Duell-Kreislauf:** Implantate (Duell-Integrität) → mehr Siege → mehr Entities → Worker → bessere Werkstätten.
+- **Wetter-Kreislauf:** Regen → Zisterne → Garten (Gärtner) → Kochen (Koch: perfekt) → stärkere Buffs → Run im Regen (Gegner hören schlechter).
+- **Marken-Kreislauf:** Billboard → Influencer → Markenstand → Set-Bonus → Marken-Build.
+
+Neue Systeme, die daraus wachsen könnten:
+- **Gangs als Auftraggeber:** Quests von Gangs (Bedingungs-Sprache + Revier-Camp), Lohn Ruf und Revier-Zugang.
+- **Revierkrieg:** Ruf bei einer Gang senkt den bei ihren Rivalen; Reviere verschieben sich auf der Reisekarte, Fehden werden zu Fronten.
+- **Wettervorhersage im Warroom:** eine Navigator-Entity zeigt Regen und Sandsturm der nächsten Etappen → Routenwahl.
+- **Influencer-Karriere:** viele Billboard-Tipps → Follower-Stufe → Sponsor-Pakete einer Marke, Ärger mit der Konkurrenz-Marke.
+- **Lieblingsmarken der Gangs:** wer die Marke einer Gang trägt (Markentreue), startet mit mehr Ruf bei ihr.
+- **Hochform:** bestimmte Kombinationen in der Effekt-Leiste (perfektes Gericht + Gemütlich + Influencer) geben einen Bonus-Effekt.
+- **Bindung 5:** eine treue Entity hilft im Duell mit einem Spezialzug; wer sie lange nicht besucht, verliert Bindung.
+- **Logbuch als Chronik:** Leyla kommentiert Einträge; am Ende eines Durchgangs ein Comic-Rückblick mit der Intro-Engine.
+- **Märkte:** Angebot und Preise je Ort, der Influencer verschiebt die Nachfrage, der Foodtruck verkauft im Revier-Camp.
+- **Companions reden über die Welt:** Sprüche nach Merkern, Crew und Wetter (dieselbe Bedingungs-Sprache).
+- **Werte-Bildschirm:** Leylas Ausrüstung und der Tank auch über den Boni-Bus, ein Bildschirm mit allen Quellen.
+
 ## Erledigt bei der Durchsicht (16.11.2026, Daniel: „keine unsichtbaren technischen Schulden … nichts kaputt machen“)
 
 Automatische Prüfungen (Exporte, Mixin-Kollisionen, Felder ohne Wirkung, Daten ohne Feld, Listener, Speicher-Zugriffe, Docs-Verweise, Assets, Build) und drei unabhängige Lese-Prüfungen (Mega-Rigs, Deko/Synergie/Ressourcen/POI-Stapel, Spielstand). Repariert, jeweils mit Test:

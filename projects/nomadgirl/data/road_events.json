@@ -1179,5 +1179,17 @@
   "cargo": "Ersatzteilen|Dosenbohnen|Kühlschränken|lebenden Hühnern|NomadCola|Medizin|Gartenzwergen",
   "thing": "Autoreifen|Paletten|alten Möbeln|Schrott|Schulbänken",
   "creature": "Ghule|Mutantenhunde|Kriecher|Riesenratten"
- }
+ },
+ "weather": [
+  {"kind": "dust", "roadside": "storm", "factor": 4},
+  {"kind": "dust", "roadside": "wreck", "factor": 2},
+  {"kind": "dust", "roadside": "creatures", "factor": 1.5},
+  {"kind": "dust", "roadside": "drone", "factor": 1.5},
+  {"kind": "fog", "roadside": "flare", "factor": 3},
+  {"kind": "fog", "roadside": "barrier", "factor": 1.5},
+  {"kind": "fog", "roadside": "hitchhiker", "factor": 1.5},
+  {"kind": "wet", "roadside": "breakdown", "factor": 2.5},
+  {"kind": "wet", "roadside": "truck", "factor": 1.5},
+  {"kind": "wet", "roadside": "campfire", "factor": 0.4}
+ ]
 }
