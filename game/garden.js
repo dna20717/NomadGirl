@@ -4,11 +4,9 @@
 //
 //   save.garden['<unit>:<place>'] = [hour planted, …]   one entry per pot (clock hours: day * 24 + hour)
 //   save.watered['<unit>:<place>'] = clock hour of the last watering (#014)
-import { synergyAt } from './synergy.js';
-import { workerBonus } from './workers.js';
+import { modFactor } from './mods.js';
 import { clockHours } from './tank.js';
 import { give, have, take } from './crafting.js';
-import { bonuses as trophyBonuses } from './achievements.js';
 
 export const STAGES = 4;
 
@@ -31,7 +29,7 @@ export function bed(D, save, ws, place) {
 export function stage(D, save, ws, place, i) {
   const pot = potsOf(D, ws)[i], c = pot && cropOf(D, ws, pot);
   if (!c) return { stage: 0, p: 0 };
-  const syn = synergyAt(D, save, place), fast = (1 + Math.max(0, trophyBonuses(D, save).growth || 0) / 100) * (1 + (syn?.effect === 'speed' ? syn.bonus : 0) / 100) * (1 + workerBonus(D, save, 'growth') / 100);   // #060 Gärtner at work   // Goldene Gießkanne (#012), synergy (#033)
+  const fast = modFactor(D, save, 'growth', { place, synergy: 'speed' });   // #066 Boni-Bus: Goldene Gießkanne (#012), synergy (#033), Gärtner (#060)
   const p = Math.max(0, Math.min(1, (clockHours(save) - bed(D, save, ws, place)[i]) * fast / Math.max(0.1, c.hours || 24)));
   return { stage: p >= 1 ? STAGES - 1 : Math.min(STAGES - 2, Math.floor(p * (STAGES - 1))), p, crop: c };
 }

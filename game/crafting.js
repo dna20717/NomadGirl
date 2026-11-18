@@ -8,7 +8,7 @@
 // (and enough of each, or exactly as many with "Genaue Mengen") is a hit, everything else is curious junk.
 // Time: recipes take minutes (Rezepte › Dauer), the clock jumps on (Ereignis-Zeit).
 import { speedOf } from './synergy.js';
-import { workerBonus } from './workers.js';
+import { mod } from './mods.js';
 import { add, remove, count } from './inventory.js';
 import { containers, advance } from './save.js';
 import { canMaintain, maintain } from './tank.js';
@@ -94,7 +94,7 @@ export function craft(D, save, id, ws, x = {}) {
   { const need = {}, st = stock(D, save); for (const p of x.parts || []) need[p] = (need[p] || 0) + 1; for (const [p, k] of Object.entries(need)) if ((st[p] || 0) < k) return { ok: false, reason: `Teil fehlt: ${D.items?.[p]?.name || p}` }; }
   for (const i of r.ingredients || []) take(D, save, i.item, i.count || 1);
   // #060 Entities at work: the cook makes a dish better (one step, Koch: „perfekt“), the welder gets an ingredient back (Schweißer)
-  const perfect = workerBonus(D, save, 'perfect'), refund = workerBonus(D, save, 'refund'), rnd = x.rnd || Math.random;
+  const perfect = mod(D, save, 'perfect'), refund = mod(D, save, 'refund'), rnd = x.rnd || Math.random;   // #066 Boni-Bus
   if (perfect > 0 && D.items?.[r.result]?.buff && (x.q || 0) < 2 && rnd() * 100 < perfect) x = { ...x, q: (x.q || 0) + 1, helped: true };
   const back = refund > 0 && (r.ingredients || []).length && rnd() * 100 < refund ? r.ingredients[Math.floor(rnd() * r.ingredients.length)] : null;
   if (back) give(D, save, back.item, 1);

@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 18.11. Code → Ava: #066 **Boni-Bus** fertig (alle Camp-Boni an einem Ort, mit Herkunft in den Menüs, gleiche Zahlen). #067 läuft.
 - 18.11. Code → Ava: Eleganz-Paket #066–#071 angelegt (Daniel AFK: „alles abarbeiten, inkrementell, Qualität im Blick“), #066 Boni-Bus läuft.
 - 18.11. Code → Ava: #065 **Cyberware im Duell** fertig: Augen- und Nerven-Implantate geben im Glitch-Duell Integrität. Damit sind alle Punkte der Verzahnungs-Prüfung gebaut (#059–#065).
 - 18.11. Code → Ava: #064 **Markentreue + Influencer** fertig: Billboard antippen = 20 % auf die Marke für 24 h (Karawane, Markenstand, Revier-Handel), drei Teile einer Marke = Set-Bonus. #065 läuft.
@@ -243,7 +244,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** –
 
 ### #067 Effekt-Leiste im HUD (Effekte mit Ablauf)
-- **Status:** offen · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 4)
+- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 4)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 4 der Eleganz-Prüfung)
 - **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
@@ -251,12 +252,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** –
 
 ### #066 Boni-Bus: alle Bonus-Quellen an einem Ort
-- **Status:** läuft (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 1)
+- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 1)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 1 der Eleganz-Prüfung)
 - **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: der Bus deckt die Camp-Seite ab (Wachstum, Sprit, Schlaf, Ruhe, Kochen, Herstellen, Strom, Δ aus Runs, Beute); Leylas Ausrüstung (`applyGear`) und der Tank (`techtree.bonuses`) haben schon eigene Sammler und bleiben; Chancen werden addiert, Raten multipliziert, damit keine Zahl sich ändert.
+- **Ergebnis:** (Code) Commit „Boni-Bus (#066)“ auf `main`. Neu `game/mods.js`, umgestellt Garten, Kochen/Herstellen, Reisen, Schlafen, Chillen, Δ aus Runs, Extra-Beute; Anzeigen „Wachstum: …“, „Heilt 100 % (…)“, „Ruhe: …“. `npm test` 261/261 (neu `test/mods.test.js` prüft die alte Formel), Browser 46/46. PixelLab 0.
 
 ### #065 Cyberware im Duell
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)

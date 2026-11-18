@@ -9,7 +9,8 @@ import { Van } from './van.js';
 import { Camp } from './camp.js';
 import { advance, arrive, clockText } from '../save.js';
 import { snapshot as runSnapshot, compare as runCompare } from '../summary.js';
-import { bump, bonuses as trophyBonuses } from '../achievements.js';
+import { bump } from '../achievements.js';
+import { mod } from '../mods.js';
 
 export class SceneRuns {
   // ---------- camp ↔ run (savegame) ----------
@@ -68,7 +69,7 @@ export class SceneRuns {
     if (ko) { save.health = Math.round(base * (C.heal?.afterKo ?? 30) / 100); save.inv.grids.backpack.items = []; }   // AvA only brings Leyla: the backpack stays behind
     let paid = this.level?.payout(this.deltas) ?? this.deltas;
     const rank = !ko && this.level?.done;
-    paid = Math.round(paid * (1 + (trophyBonuses(this.data_, save).sell || 0) / 100));   // Rang-S-Abzeichen & Co. (#012)
+    paid = Math.round(paid * (1 + mod(this.data_, save, 'sell') / 100));   // #066 Boni-Bus (Rang-S-Abzeichen & Co., #012)   // Rang-S-Abzeichen & Co. (#012)
     if (!ko) { save.health = Math.round(this.leyla.health); save.deltas += paid; }
     // achievements (#012): knocked out, or home safe (the tank never went critical in this run), Δ earned
     const later = list => ((save.achievements ??= {}).news ??= []).push(...list.map(a => a.id));   // announced when the camp is there

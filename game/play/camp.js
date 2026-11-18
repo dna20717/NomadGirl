@@ -20,7 +20,8 @@ import { ladderArt } from './ladder_art.js';
 import { activeMega, flies, travelSpeed } from '../mega.js';
 import { balconies } from '../decor.js';
 import { synergyAt, synergyText, links } from '../synergy.js';
-import { workerBonus, syncWorkers } from '../workers.js';
+import { syncWorkers } from '../workers.js';
+import { mod } from '../mods.js';
 
 export const de = n => Number(n).toLocaleString('de-DE', { maximumFractionDigits: 1 });
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
@@ -1125,7 +1126,7 @@ export function legCost(D, save, fromId, to) {
   const tons = save.rig.units.filter(u => u.kind === 'container').reduce((n, u) => n + (D.containers?.[u.id]?.weight || 0), 0) / 1000;
   const fuelUse = D.tractors?.[save.rig.tractor]?.fuelUse ?? 12;
   const hours = Math.max(0.25, Math.round(km / ((Tr.speed || 40) * travelSpeed(D, save.rig.tractor)) * 4) / 4);   // #029: the crawler crawls, the fatbird races
-  const fuel = Math.round(km * fuelUse / 100 * (1 + (Tr.weightFuelFactor ?? 0) / 100 * tons) * (1 - Math.min(60, workerBonus(D, save, 'fuel')) / 100) * 10) / 10;   // #060 Navigator at work: less fuel
+  const fuel = Math.round(km * fuelUse / 100 * (1 + (Tr.weightFuelFactor ?? 0) / 100 * tons) * (1 - Math.min(60, mod(D, save, 'fuel')) / 100) * 10) / 10;   // #060 Navigator at work: less fuel
   const food = Math.round(hours / (Tr.dayLength || 24) * (Tr.foodPerDay ?? 1) * (1 + (save.companions?.length || 0)) * 10) / 10;
   return { from: fromId, to, km, hours, fuel, food };
 }

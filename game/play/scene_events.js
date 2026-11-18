@@ -6,7 +6,8 @@ import { Camp } from './camp.js';
 import { droneBonuses } from '../stations.js';
 import { add, rollLoot } from '../inventory.js';
 import { learnAll, learnNote } from '../crafting.js';
-import { bump, level as achieveLevel, check as achieveCheck, bonuses as trophyBonuses } from '../achievements.js';
+import { bump, level as achieveLevel, check as achieveCheck } from '../achievements.js';
+import { mod } from '../mods.js';
 
 export class SceneEvents {
   // ---------- events ----------
@@ -107,7 +108,7 @@ export class SceneEvents {
   achieveLevel(counter, value) { if (this.box) this.announce(achieveLevel(this.data_, this.box.save, counter, value)); }
   // a loot roll; Delta-Petrol-Schild & Co. (#012, Extra-Beute %) give a chance of one more thing
   lootRoll(table) {
-    const D = this.data_, out = rollLoot(D, table) || [], k = (this.box ? trophyBonuses(D, this.box.save).loot || 0 : 0) + (this.threat()?.loot || 0) + (this.box ? droneBonuses(D, this.box.save).loot || 0 : 0);   // + danger of the place (#014), AvA's board (#013)
+    const D = this.data_, out = rollLoot(D, table) || [], k = (this.box ? mod(D, this.box.save, 'loot') : 0) + (this.threat()?.loot || 0) + (this.box ? droneBonuses(D, this.box.save).loot || 0 : 0);   // + danger of the place (#014), AvA's board (#013)
     for (let left = k; left > 0; left -= 100) if (Math.random() * 100 < Math.min(100, left)) { const x = rollLoot(D, table)?.[0]; if (x) out.push(x); }
     return out;
   }

@@ -17,7 +17,8 @@ import { snapshotRig } from './rig_snapshot.js';
 import { offers } from '../quests.js';
 import { legSky, cisternWater } from '../weather_fx.js';
 import { level as cisternLevelOf } from '../cistern.js';
-import { workerBonus, placesFor, workplaceOf, assign, unassign, flawOf, syncWorkers, farmEntities, befriend, bondOf, BOND_MAX, WORKING_STATS } from '../workers.js';
+import { mod, modFactor, parts as modParts, modText } from '../mods.js';
+import { placesFor, workplaceOf, assign, unassign, flawOf, syncWorkers, farmEntities, befriend, bondOf, BOND_MAX, WORKING_STATS } from '../workers.js';
 import { occupancy } from '../inventory.js';
 import { de, VERB, SOON, costLine } from './camp.js';
 
@@ -61,8 +62,8 @@ export class CampActions {
       const r = mine.filter(x => x.stage === STAGES - 1).length, left = Math.min(...mine.filter(x => x.stage < STAGES - 1).map(x => (1 - x.p) * (c.hours || 24)));
       return `${c.name}: ${r ? `${r} reif` : ''}${r && r < mine.length ? ' · ' : ''}${r < mine.length ? `noch ~${Math.max(1, Math.ceil(left))} h` : ''}`;
     }).filter(Boolean);
-    const n = ripe(D, save, id, key);
-    s.hud.menu({ title: def.name || id, sub: [def.description, ...rows].filter(Boolean).join(' · '),
+    const n = ripe(D, save, id, key), boost = modParts(D, save, 'growth', { place: key, synergy: 'speed' });   // #066 where the speed comes from
+    s.hud.menu({ title: def.name || id, sub: [def.description, ...rows, boost.length ? `Wachstum: ${modText(boost, 'growth')}` : null].filter(Boolean).join(' · '),
       items: [{ label: n ? `Ernten (${n})` : 'Noch nichts reif', primary: !!n, disabled: n ? null : 'Wächst noch', act: () => {
         const r = harvest(D, save, id, key);
         const got = r.got.reduce((n, g) => n + g.n, 0); if (got) s.achieve?.('harvests', 1);
@@ -95,20 +96,21 @@ export class CampActions {
   // #033 synergy „quality“: the buff of this bench gets stronger (save.buffQ, like a good dish)
   synergyBuff(def, place) {
     const x = place && synergyAt(this.D, this.box.save, place), cz = cozyBonus(this.D, this.box.save);   // #036: Gemütlichkeit of the decoration on top
-    const add = (x?.effect === 'quality' ? x.bonus : 0) + cz + (def.function === 'chill' || def.function === 'guests' ? workerBonus(this.D, this.box.save, 'rest') : 0);   // #060 Gastgeber: rest buffs stronger
+    const add = (x?.effect === 'quality' ? x.bonus : 0) + cz + (def.function === 'chill' || def.function === 'guests' ? mod(this.D, this.box.save, 'rest') : 0);   // #060 Gastgeber: rest buffs stronger
     if (def.buff && add > 0) { const Q = (this.box.save.buffQ ??= {}); Q[def.buff] = Math.max(Q[def.buff] || 0, Math.round(add)); }
   }
   // a workshop to spend time at (Werkstätten › Benutzen): Chill Area, Drohnenwerkstatt … time passes, heals, gives its buff;
   // AvA can fly over and dock on the bench while it happens
   restMenu(id, def, place, who) {
     const s = this.scene, save = this.box.save, R = def.rest, buff = def.buff && this.D.buffs?.[def.buff]?.name;
-    const facts = [R.hours ? `${de(R.hours)} h` : null, R.heal ? `heilt ${R.heal} %` : null, buff ? `danach ${buff}` : null].filter(Boolean).join(' · ');
+    const restBoost = modParts(this.D, save, 'rest');   // #066
+    const facts = [R.hours ? `${de(R.hours)} h` : null, R.heal ? `heilt ${R.heal} %` : null, buff ? `danach ${buff}` : null, restBoost.length ? `Ruhe: ${modText(restBoost, 'rest')}` : null].filter(Boolean).join(' · ');
     s.hud.menu({ title: def.name || id, sub: [def.description, who.length ? `Betreut von ${who.join(' und ')}.` : null, facts].filter(Boolean).join(' '),
       items: [{ label: R.verb, primary: true, act: () => {
         const done = () => {
           this.resting = null;
           advance(save, R.hours || 0);
-          if (R.heal) save.health = Math.min(s.leyla.maxHealth, s.leyla.health + s.leyla.maxHealth * R.heal / 100 * (1 + workerBonus(this.D, save, 'rest') / 100));   // #060 Gastgeber at work
+          if (R.heal) save.health = Math.min(s.leyla.maxHealth, s.leyla.health + s.leyla.maxHealth * R.heal / 100 * modFactor(this.D, save, 'rest'));   // #060 Gastgeber at work
           if (def.buff && !save.buffs.includes(def.buff)) save.buffs.push(def.buff);
           this.synergyBuff(def, place);
           s.goCamp({ banner: [R.banner || def.name || id, clockText(save) + (buff ? ' · ' + buff : '')], fade: 700, keepPlace: true });
@@ -175,10 +177,10 @@ export class CampActions {
     sleep(def, place = null) {
     const s = this.scene, box = this.box, save = box.save, C = this.C, max = s.leyla.maxHealth;
     const h = hoursUntil(save, C.clock?.wakeHour ?? 7);
-    s.hud.menu({ title: def.name || 'Schlafen', sub: `Schlafen bis ${String(C.clock?.wakeHour ?? 7).padStart(2, '0')}:00 (${h} h). Heilt ${C.heal?.sleep ?? 100} %.${def.buff ? ` Danach: ${this.D.buffs?.[def.buff]?.name || def.buff} für den nächsten Run.` : ''}`,
+    s.hud.menu({ title: def.name || 'Schlafen', sub: `Schlafen bis ${String(C.clock?.wakeHour ?? 7).padStart(2, '0')}:00 (${h} h). Heilt ${C.heal?.sleep ?? 100} %${(b => b.length ? ` (${modText(b, 'sleepHeal')})` : '')(modParts(this.D, save, 'sleepHeal'))}.${def.buff ? ` Danach: ${this.D.buffs?.[def.buff]?.name || def.buff} für den nächsten Run.` : ''}`,
       items: [{ label: 'Schlafen', primary: true, act: () => {
         advance(save, h);
-        save.health = Math.min(max, Math.max(save.health, s.leyla.health) + max * (C.heal?.sleep ?? 100) / 100 * (1 + workerBonus(this.D, save, 'sleepHeal') / 100));   // #060 Schläfer at work
+        save.health = Math.min(max, Math.max(save.health, s.leyla.health) + max * (C.heal?.sleep ?? 100) / 100 * modFactor(this.D, save, 'sleepHeal'));   // #060 Schläfer at work
         if (def.buff && !save.buffs.includes(def.buff)) save.buffs.push(def.buff);
         this.synergyBuff(def, place);
         s.drone.react('sleep');
