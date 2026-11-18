@@ -9,6 +9,9 @@ import { potsOf, stage, ripe, harvest, STAGES, canWater, waterOf, water } from '
 import { level as cisternLevel, tap as cisternTap } from '../cistern.js';
 import { clockText, advance, hoursUntil } from '../save.js';
 import { passengers } from '../rig.js';
+import { clockHours } from '../tank.js';
+import { driveConfig } from '../road.js';
+import { snapshotRig } from './rig_snapshot.js';
 import { occupancy } from '../inventory.js';
 import { de, VERB, SOON, costLine } from './camp.js';
 
@@ -186,17 +189,27 @@ export class CampActions {
   driveBlocked(t) { const save = this.box.save; return this.tooHeavy ? `Rig zu schwer (${this.budget.weight} von ${this.budget.pull} kg)` : t.fuel > save.fuel ? 'Zu wenig Sprit' : null; }
   plunderHere() { const here = placeOf(this.D, this.box.save); if (here?.poi && this.D.pois?.[here.poi]) this.scene.startRun(here.poi); }
   // driving (#014: several legs, an encounter may happen after each one; Welt › Encounter, Reisen › Chance pro 10 km)
+  // #053: with Reisen › Fahrt › Zeigen the drive is a scene (drive_ui.js): the rig rolls through the landscape, incidents come by the road.
+  // Under remote control (nomad, tests) it is skipped unless the test wants to see it (scene.showDrive).
   drive(id, t) {
-    const save = this.box.save, legs = t.legs?.length ? t.legs : [{ from: save.location, to: id, km: t.km, hours: t.hours, fuel: t.fuel, food: t.food }];
+    const save = this.box.save, D = this.D, s = this.scene, legs = t.legs?.length ? t.legs : [{ from: save.location, to: id, km: t.km, hours: t.hours, fuel: t.fuel, food: t.food }];
     this.driving = { id, t, legs, log: [], from: save.location };
-    this.nextLeg(0);
+    if (!s.hud.drive || !driveConfig(D).enabled || (s.script && !s.showDrive)) return this.nextLeg(0);
+    this.driving.show = true;
+    const go = rig => {
+      if (this.driving?.id !== id) return;
+      s.hud.drive.open({ rig, from: placeOf(D, save, save.location)?.name || save.location, to: placeOf(D, save, id)?.name || id, legs: legs.length, seed: ((save.map?.seed ?? 1) * 31 + (save.day || 1)) | 0 });
+      this.nextLeg(0);
+    };
+    snapshotRig(s).then(go, () => go(null));
   }
   nextLeg(i) {
     const save = this.box.save, D = this.D, R = this.driving, s = this.scene;
     if (!R) return;
     if (i >= R.legs.length) return this.arrive();
-    const L = R.legs[i];
+    const L = R.legs[i], h0 = clockHours(save), fuel0 = save.fuel;
     advance(save, L.hours);
+    const h1 = clockHours(save);
     save.fuel = Math.max(0, Math.round((save.fuel - L.fuel) * 10) / 10);
     save.food = Math.max(0, Math.round((save.food - L.food) * 10) / 10);
     if (save.map && L.to !== R.id && !save.map.visited.includes(L.to)) save.map.visited.push(L.to);   // passed through
@@ -204,19 +217,30 @@ export class CampActions {
     const enc = s.forceEncounter || (s.script && !s.randomEncounters ? null : rollEncounter(D, save, L.km));
     s.forceEncounter = null;
     const E = enc && D.encounters?.[enc];
+    const where = placeOf(D, save, L.to)?.name || L.to, region = n => save.map?.nodes?.find(x => x.id === n)?.region || '';
+    const onward = () => R.show ? s.hud.drive.resume(clockHours(save) - h1) : s.time.delayedCall(s.script ? 0 : 120, () => this.nextLeg(i + 1));
+    const meet = () => {
+      s.achieveLater?.('encounters');
+      const opts = E.options || [];
+      const pick = o => { const r = choose(D, save, o); R.log.push(`${E.name}: ${[r.text, r.lines.join(', ')].filter(Boolean).join(' ')}`);
+        s.hud.toast(E.name, [r.text, r.lines.join(' · ')].filter(Boolean).join(' · '), o.health || o.deltas < 0 || o.fuel > 0 ? 'warn' : 'travel', 4200);
+        this.box.persist?.(); onward(); };
+      const fallback = opts.find(o => !blocked(D, save, o)) || opts[opts.length - 1];
+      const look = (E.look && D.assets?.[E.look]?.file) ? E.look : D.travel?.encounterLook, file = look && D.assets?.[look]?.file;   // #021 comic panel
+      s.hud.menu({ image: file ? new URL(file, s.base).href : null, title: E.name, sub: [E.description, `Etappe ${i + 1} von ${R.legs.length} · kurz vor ${where} · ${R.show ? s.hud.drive.clock() : clockText(save)}`].filter(Boolean).join(' · '),
+        items: opts.map(o => ({ label: o.label || 'Weiter', sub: costLine(D, o), disabled: blocked(D, save, o), primary: o === opts[0], act: () => pick(o) })),
+        onClose: () => pick(fallback) });
+    };
+    if (R.show) {
+      s.hud.drive.leg({ i, n: R.legs.length, h0, h1, fuel0, fuel1: save.fuel, km: L.km, toName: where, region0: region(L.from ?? (i ? R.legs[i - 1].to : R.from)), region1: region(L.to),
+        stop: E ? { kind: E.roadside || 'flare', name: E.name, figures: E.figures?.length ? E.figures : E.enemies || [] } : null }, { atStop: meet, end: () => this.nextLeg(i + 1) });
+      return;
+    }
     if (!E) return this.nextLeg(i + 1);
-    s.achieveLater?.('encounters');
-    const where = placeOf(D, save, L.to)?.name || L.to, opts = E.options || [];
-    const pick = o => { const r = choose(D, save, o); R.log.push(`${E.name}: ${[r.text, r.lines.join(', ')].filter(Boolean).join(' ')}`);
-      s.hud.toast(E.name, [r.text, r.lines.join(' · ')].filter(Boolean).join(' · '), o.health || o.deltas < 0 || o.fuel > 0 ? 'warn' : 'travel', 4200);
-      this.box.persist?.(); s.time.delayedCall(s.script ? 0 : 120, () => this.nextLeg(i + 1)); };
-    const fallback = opts.find(o => !blocked(D, save, o)) || opts[opts.length - 1];
-    const look = (E.look && D.assets?.[E.look]?.file) ? E.look : D.travel?.encounterLook, file = look && D.assets?.[look]?.file;   // #021 comic panel
-    s.hud.menu({ image: file ? new URL(file, s.base).href : null, title: E.name, sub: [E.description, `Etappe ${i + 1} von ${R.legs.length} · kurz vor ${where} · ${clockText(save)}`].filter(Boolean).join(' · '),
-      items: opts.map(o => ({ label: o.label || 'Weiter', sub: costLine(D, o), disabled: blocked(D, save, o), primary: o === opts[0], act: () => pick(o) })),
-      onClose: () => pick(fallback) });
+    meet();
   }
   arrive() {
+    if (this.driving?.show && !this.driving.landed) { this.driving.landed = true; this.scene.hud.drive.finish(() => this.arrive()); return; }   // fade to black first
     const save = this.box.save, D = this.D, R = this.driving, id = R.id, t = R.t, from = R.from;
     this.driving = null;
     // guests without a bed wait where they are; whoever waits at the new place comes back aboard

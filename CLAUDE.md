@@ -130,7 +130,7 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 - `docs/features/tiles.md`: Kacheln und Kachel-Sets (TileSet00): Clutter, Decals, Einschlüsse, echte Größen, Tiefe aus Code.
 - `docs/features/tutorial.md`: Feldhandbuch (#011): Lektionen mit Clips/Bildern aus dem Spiel, Karte beim ersten Mal, Archiv im Menü, Aufnahme-Tool.
 - `docs/features/intro.md`: Intro als Comic (#005): Panels, Textboxen, Countdown, Effekte, nur übers Hauptmenü.
-- `docs/features/worldmap.md`: Reisekarte (#007): Routen-Netz je Durchgang, Marken der Spielwelt, Fenster am Warroom und an der Van-Tür.
+- `docs/features/worldmap.md`: Reisekarte (#007): Routen-Netz je Durchgang, Marken, Fenster am Warroom und an der Van-Tür; Fahrt in Szene (#053, Landschaft aus Code).
 - `docs/features/lore.md`: Lore-Datenbank (#045): Marken, Spielwerte, Hersteller, Logos.
 - `docs/features/glitchlings.md`: Entities (#047–#052): Generator, Porträts, Hersteller, Cyberdeck, Bit-Stapel. **Jede Duell-Änderung gilt für /duel, /mobile und das Duell im Spiel** (Daniel, 18.11.2026).
 - `docs/features/splash.md`: Startseite: Szene, Horizont-Dunst, AvA, Highway mit Textur-Boden, Überraschungen.
@@ -147,5 +147,5 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 ## Online
 
 Cloudflare Worker `nomadgirl` (Workers Builds, mit GitHub verbunden): baut bei jedem Push auf `main` mit `npm run build:web` → `dist/` und liefert unter https://nomadgirl.dna20717.workers.dev aus (`wrangler.jsonc`): `/` = Startseite (`index.html`), `/workshop` = Werkstatt, `/game` = Spiel. Prüfen: `npx wrangler deploy --dry-run --outdir /tmp/wout`. **Wichtig:** Die GitHub-App „Cloudflare Workers and Pages“ braucht Zugriff auf NomadGirl, sonst löst ein Push keinen Build aus (Weg dorthin: `docs/features/online.md`). Deploy geht nicht aus der Arbeitsumgebung (Cloudflare-API gesperrt), nur über den Push. 
-- **Nie auf Nebenzweige pushen** (12.11.2026): ein Push auf einen anderen Zweig (z. B. den `claude/…`-Zweig einer Sitzung) startet bei Cloudflare einen Vorschau-Build mit `npx wrangler preview`, der ohne `previews`-Block in `wrangler.jsonc` scheitert („missing a `previews` block“) und als **failure** am Commit hängt, auch wenn derselbe Commit auf `main` liegt. Deshalb nur `git push origin HEAD:main`.
+- **Nie auf Nebenzweige pushen** (12.11.2026): dort scheitert Cloudflares Vorschau-Build (`wrangler preview` ohne `previews`-Block) und hängt als **failure** am Commit. Deshalb nur `git push origin HEAD:main`.
 - Details (Login, Speichern = Commit, Spielstand online, Version, **verspätete Builds nach jedem Push prüfen**, lokal wie auf Cloudflare): `docs/features/online.md`.

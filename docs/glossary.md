@@ -6,6 +6,10 @@ Neuer Code nimmt die Wörter aus dieser Liste. Die Grundbegriffe (Werkstatt, Pr�
 
 | Deutsch | Englisch |
 |---|---|
+| Fahrt (Szene zwischen zwei Orten) | drive |
+| Landschaft | landscape |
+| Straßenrand | roadside |
+| Schnappschuss (des Rigs) | snapshot |
 | Werkstatt (Daten-Editor) | workshop |
 | Werkstatt (Raum im Rig) | workshop (Daten: `workshops`) |
 | Bereich | area |

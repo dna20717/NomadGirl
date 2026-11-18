@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 18.11.2026: **Die Fahrt in Szene** (#053, wie Keep Driving): zwischen Karte und Ankunft rollt das echte Rig von der Seite durch eine Landschaft aus Code (8 Regionen), 30 Sekunden je Etappe, Uhr, Sprit und Himmel laufen mit; Sonnenuntergänge mit Lichtstrahlen und Lens Flare, Mond und Milchstraße, Scheinwerfer, Regen mit Blitzen, Staub, Morgennebel, Sandsturm als Staubwand; Zwischenfälle stehen am Straßenrand (Gegner-Bausätze in Rig-Größe), das Rig hält, das Fenster geht auf; Vorspulen (halten) und Überspringen; Werkstatt-Vorschau unter Reisen.
 - 18.11.2026: **Bit-Stapel überall gleich** (Daniel: „soll immer die Standalone-Variante und die Ingame-Version betreffen“): Haptik ins gemeinsame Brett (`haptics.js`), im Spiel mit Controller-Rumble und Schalter in den Optionen; Regel in CLAUDE.md und Feature-Datei.
 - 18.11.2026: **Die Entity, Charaktere und Banter**: Artikel „die Entity“ überall; jede KI hat einen Charakter (8 allgemeine + Amber Slay, Marble Sting, Kammerjäger, AvA) mit Sprüchen je Duell-Moment, als Sprechblasen im Duell (Demo, Spiel, mobil).
 - 17.11.2026: **Bit-Stapel: sichtbar, warum Bits verschwinden**: rote Rahmen am legenden und an den gelöschten Bits, beide Pipelines verbunden, die gelöschten zersplittern, Schild „gleiche Zahl → gelöscht“ (Demo, Spiel, mobil).

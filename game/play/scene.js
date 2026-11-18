@@ -24,6 +24,7 @@ import { Fx } from './fx.js';
 import { Atmosphere } from './atmosphere.js';
 import { Drone } from './drone.js';
 import { Van } from './van.js';
+import { DriveUI } from './drive_ui.js';
 import { Backdrop } from './backdrop.js';
 import { Camp, campLayout, daytimeAt, drawCampBackground, drawCampGround, travelCost } from './camp.js';
 import { raining, rainConfig } from '../rain.js';
@@ -474,6 +475,9 @@ export class PlayScene extends Phaser.Scene {
       closed: () => {},
     });
     hud.map.close(); hud.map.el.hidden = true;
+    // the drive between two places (#053, game/play/drive_ui.js): under the menu, so an incident's window lies over it
+    hud.drive ??= new DriveUI(hud.root, { scene: () => hud.scene }, hud.menuEl);
+    if (hud.drive.isOpen && !hud.scene.camp?.driving) hud.drive.close();
     // building the rig right in the camp (game/play/build_mode.js): B in the camp or Warroom › Rig umbauen
     hud.build ??= new BuildMode(hud.root, { scene: () => hud.scene });
     hud.megaBuild ??= new MegaBuild(hud.root, { scene: () => hud.scene });   // #029: the build plan aboard a mega rig
@@ -686,6 +690,7 @@ export class PlayScene extends Phaser.Scene {
     if (hud.duel?.isOpen) { hud.duel.nav(u); eat(); input.help.pressed = false; return; }   // Glitch-Duell (#052)
     if (hud.duel?.swallow > 0) { hud.duel.swallow--; eat(); input.help.pressed = false; return; }   // the Esc / E that closed it must not open the pause menu or act again (3 frames)
     if (hud.megaBuild?.isOpen) { hud.megaBuild.nav(u); eat(); input.help.pressed = false; return; }   // build plan aboard (#029)
+    if (hud.drive?.isOpen && !hud.modal) { hud.drive.nav(u); eat(); input.help.pressed = false; return; }   // the drive (#053); its incident's window is a menu
     if (hud.quests?.isOpen) { hud.quests.nav(u); eat(); input.help.pressed = false; return; }   // Questlog (#016)
     if (hud.ach?.isOpen) { hud.ach.nav(u); eat(); input.help.pressed = false; return; }   // Menü › Achievements (#012)   // the field guide card / archive (#011)
     if (hud.paused && !hud.modal) { if (u.pressed('ok') || u.pressed('back')) { hud.toggleHelp(false); eat(); input.help.pressed = false; } return; }
@@ -735,7 +740,7 @@ export class PlayScene extends Phaser.Scene {
     if (input.help.pressed) {
       if (this.hud.inv?.isOpen && !this.hud.paused) this.hud.inv.close();
       else if (this.hud.paused) this.hud.toggleHelp(false);
-      else if (!this.hud.modal && !this.hud.craft?.isOpen && !(this.hud.tech?.isOpen || this.hud.map?.isOpen) && !this.hud.build?.active && !this.leaving) this.hud.pauseMenu();
+      else if (!this.hud.modal && !this.hud.craft?.isOpen && !(this.hud.tech?.isOpen || this.hud.map?.isOpen) && !this.hud.build?.active && !this.hud.drive?.isOpen && !this.leaving) this.hud.pauseMenu();
     }
     if (input.controls?.pressed && !this.hud.modal) this.hud.toggleHelp();
     if (input.mute.pressed) this.toggleMute();
@@ -745,11 +750,11 @@ export class PlayScene extends Phaser.Scene {
     const building = this.hud.build?.active;
     if (input.swap?.pressed && !building && !this.hud.modal && !this.hud.paused && !this.hud.inv?.isOpen && !this.hud.craft?.isOpen && !(this.hud.tech?.isOpen || this.hud.map?.isOpen) && this.leyla.alive) this.swapRanged();
     if (input.build?.pressed && building) this.hud.build.close();
-    else if (input.build?.pressed && this.mode === 'camp' && !this.hud.modal && !this.hud.paused && !this.leaving && !this.hud.craft?.isOpen && !(this.hud.tech?.isOpen || this.hud.map?.isOpen)) this.openBuild();
+    else if (input.build?.pressed && this.mode === 'camp' && !this.hud.modal && !this.hud.paused && !this.leaving && !this.hud.drive?.isOpen && !this.hud.craft?.isOpen && !(this.hud.tech?.isOpen || this.hud.map?.isOpen)) this.openBuild();
     // every window pauses the game (Daniel, 12.11.2026: „Fenster pausieren immer, auch im Run“): menus, controls, cooking and the inventory
     let invDone = false;
     if (this.hud.inv?.isOpen && !this.hud.paused && !this.hud.modal && !this.leaving) { this.inventoryUpdate(input); invDone = true; }
-    if (this.hud.tut?.isOpen || this.hud.ach?.isOpen || this.hud.quests?.isOpen || this.hud.megaBuild?.isOpen || this.hud.sum?.isOpen || this.hud.duel?.isOpen || this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
+    if (this.hud.tut?.isOpen || this.hud.ach?.isOpen || this.hud.quests?.isOpen || this.hud.megaBuild?.isOpen || this.hud.sum?.isOpen || this.hud.duel?.isOpen || this.hud.drive?.isOpen || this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
       // cooking, crafting, a menu: the workshops keep glowing, steaming and sparking behind the window
       if (this.camp && !this.hud.paused && !this.leaving) { this.camp.benches?.update(time, Math.min(delta, 50)); this.camp.lid?.(Math.min(delta, 50)); }
       this.physics.world.pause(); this.hud.update(this, time); return;

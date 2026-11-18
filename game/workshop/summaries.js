@@ -5,6 +5,8 @@ import { ROOM_TAGS } from '../../engine/project.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
 import { parseRoom } from '../../engine/room.js';
 import { generateMap, neighbours } from '../worldmap.js';
+import { makeRoad, landscapeOf, ROADSIDE, BW, BH } from '../road.js';
+import { mapBrands } from '../brands.js';
 import { generate, brandOf } from '../glitchlings.js';
 import { characterOf, characters } from '../banter.js';
 import { faceCanvas } from '../glitch_face.js';
@@ -208,6 +210,41 @@ export const SUMMARY = {
     document.fonts?.load('20px VT323').then(paint); paint();
     const again = el('button', { class: 'ed-button wide', onclick: () => { seed = w.mapSeed = 1 + Math.floor(Math.random() * 1e6); paint(); } }, 'Neu würfeln');
     return { title: 'Vorschau', body: el('div', {}, c, info, again) };
+  },
+
+  // the drive (#053): the landscape of a region at an hour and in a weather, moving; the rig is the game's own (here only its lights)
+  travel(w, x) {
+    const D = w.p.data, c = el('canvas', { width: 960, height: 540, style: 'width:100%;border-radius:6px;background:#060508' }), bg = Object.assign(document.createElement('canvas'), { width: BW, height: BH });
+    const base = new URL('../../projects/nomadgirl/', import.meta.url), L = D.assets?.[D.worldmap?.logos];
+    let logos = null; if (L?.file) { const i = new Image(); i.onload = () => { logos = i; }; i.src = new URL(L.file, base).href; }
+    const P = w.drivePreview ??= { region: '', hour: 18.4, weather: 'clear', stop: '' };
+    const road = makeRoad(D, { seed: 7, logos: () => logos, brands: mapBrands(D) });
+    const regions = ['', ...(x.landscapes || []).map(r => r.region).filter(Boolean)];
+    const sel = (key, opts) => { const s = el('select', { class: 'ed-input', onchange: e => { P[key] = e.target.value; } }, ...opts.map(([v, n]) => { const o = el('option', { value: v }, n); if (String(P[key]) === String(v)) o.selected = true; return o; })); return s; };
+    const hour = el('input', { type: 'range', min: 0, max: 24, step: 0.1, value: P.hour, oninput: e => { P.hour = +e.target.value; } }), clock = el('span', { class: 'ed-small' });
+    const st = { dist: 0, t: 0, dt: 0, v: 0, hour: P.hour, land: null, wet: 0, dust: 0, fog: 0, flash: 0, stop: null };
+    let last = performance.now();
+    const tick = now => {
+      if (!c.isConnected && st.t > 1) return;
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      const C = D.travel?.drive || {}, v = C.speed ?? 120, Lr = landscapeOf(D, P.region);
+      st.t += dt; st.dt = dt; st.v = v; st.dist += v * dt; st.hour = P.hour; st.land = [Lr, Lr, 0];
+      const k = Math.min(1, dt * 2); st.wet += ((P.weather === 'rain') - st.wet) * k; st.dust += ((P.weather === 'dust') * 0.8 - st.dust) * k; st.fog += ((P.weather === 'fog') * 0.8 - st.fog) * k;
+      st.flash = Math.max(0, st.flash - dt * 4); if (st.wet > 0.6 && Math.random() < dt * 0.15) { st.flash = 1; road.strike(); }
+      if (P.stop) { st.stop ??= { kind: P.stop, x: BW * 0.75 }; st.stop.kind = P.stop; st.stop.x = BW * 0.75; } else st.stop = null;
+      road.draw(bg.getContext('2d'), st);
+      const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false; ctx.drawImage(bg, 0, 0, c.width, c.height);
+      road.light(ctx, c.width, c.height, st, { front: c.width * 0.62, lampY: c.height * 0.78, back: c.width * 0.3, tailY: c.height * 0.8 });
+      road.front(ctx, c.width, c.height, st);
+      clock.textContent = `${String(Math.floor(P.hour)).padStart(2, '0')}:${String(Math.floor((P.hour % 1) * 60)).padStart(2, '0')} Uhr`;
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    return { title: 'Fahrt-Vorschau', body: el('div', {}, c,
+      el('div', { style: 'display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px' },
+        sel('region', regions.map(r => [r, r || 'Andere Regionen'])), sel('weather', [['clear', 'Klar'], ['rain', 'Regen'], ['dust', 'Staub'], ['fog', 'Nebel']]),
+        sel('stop', ROADSIDE.map(([v, n]) => [v, v ? n : 'Kein Zwischenfall'])), hour, clock),
+      el('p', { class: 'ed-small' }, 'Landschaft, Licht und Wetter aus Code. Im Spiel fährt davor das echte Rig, die Figuren am Rand sind die Gegner-Bausätze.')) };
   },
 
   locations(w, x, id) {

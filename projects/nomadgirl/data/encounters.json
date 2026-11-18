@@ -10,7 +10,8 @@
    {"label": "Wegzoll zahlen", "deltas": -60, "result": "Sie winken dich durch."},
    {"label": "Durchbrechen", "health": 25, "fuel": 3, "loot": "pluenderer_beute", "result": "Blech kreischt, Kugeln prasseln. Hinten fällt etwas vom Wrack."},
    {"label": "Umweg fahren", "hours": 2, "fuel": 4, "result": "Ein langer Bogen über die Schotterpiste."}
-  ]
+  ],
+  "roadside": "barrier"
  },
  "ghulrudel": {
   "name": "Ghul-Rudel",
@@ -22,7 +23,8 @@
   "options": [
    {"label": "Vollgas", "fuel": 2, "health": 10, "result": "Etwas schlägt gegen die Tür, dann seid ihr durch."},
    {"label": "Licht aus und warten", "hours": 3, "result": "Sie ziehen vorbei. Leyla zählt bis tausend."}
-  ]
+  ],
+  "roadside": "creatures"
  },
  "liegengebliebener_lkw": {
   "name": "Liegengebliebener LKW",
@@ -35,7 +37,8 @@
    {"label": "Durchsuchen", "hours": 1, "loot": "kiste_tankstelle", "result": "Kisten, Dosen, ein Kalender von 2061."},
    {"label": "Tank abzapfen", "hours": 0.5, "fuel": -6, "result": "Der Diesel riecht alt, läuft aber."},
    {"label": "Weiterfahren", "result": "Lieber nicht."}
-  ]
+  ],
+  "roadside": "truck"
  },
  "panne": {
   "name": "Panne",
@@ -47,7 +50,8 @@
    {"label": "Mit Panzertape flicken", "use": "panzertape", "useCount": 1, "hours": 0.5, "result": "Hält. Vorerst."},
    {"label": "Richtig reparieren", "hours": 3, "result": "Drei Stunden mit dem Kopf im Motorraum."},
    {"label": "AvA schicken", "hours": 1.5, "deltas": -25, "result": "AvA findet das Leck und ein Ersatzteil, das sie dir in Rechnung stellt."}
-  ]
+  ],
+  "roadside": "breakdown"
  },
  "haendler": {
   "name": "Fahrender Händler",
@@ -60,7 +64,9 @@
    {"label": "Sprit kaufen", "deltas": -50, "fuel": -8, "result": "Acht Liter, etwas trüb."},
    {"label": "Vorräte tauschen", "deltas": -40, "food": -2, "result": "Zwei Kisten Rationen."},
    {"label": "Nur grüßen", "result": "Er hupt zum Abschied."}
-  ]
+  ],
+  "roadside": "trader",
+  "figures": ["streuner"]
  },
  "sandsturm": {
   "name": "Sandsturm",
@@ -71,7 +77,8 @@
   "options": [
    {"label": "Abwarten", "hours": 4, "food": 0.5, "result": "Vier Stunden Sand an den Scheiben."},
    {"label": "Weiterfahren", "fuel": 4, "health": 5, "result": "Blind durch die Wand. Irgendwann wird es wieder hell."}
-  ]
+  ],
+  "roadside": "storm"
  },
  "anhalterin": {
   "name": "Anhalterin",
@@ -82,6 +89,8 @@
   "options": [
    {"label": "Mitnehmen", "hours": 0.5, "item": "wasser", "count": 2, "result": "Sie bedankt sich mit zwei Flaschen Wasser und einer Geschichte über BigCityDelta."},
    {"label": "Vorbeifahren", "result": "Im Rückspiegel winkt sie noch."}
-  ]
+  ],
+  "roadside": "hitchhiker",
+  "figures": ["streuner"]
  }
 }

@@ -16,6 +16,7 @@ import { ACHIEVEMENT_COUNTERS, ACHIEVEMENT_SPECIALS, ACHIEVEMENT_CATEGORIES } fr
 import { DECOR_PLACES, DECOR_ARTS } from '../game/decor.js';
 import { MOMENTS } from '../game/banter.js';
 import { EARN_WHEN } from '../game/earn.js';
+import { RELIEFS, ROADSIDE } from '../game/road.js';
 
 const text = (key, label, o = {}) => ({ key, label, type: 'text', ...o });
 const area_ = (key, label, o = {}) => ({ key, label, type: 'textarea', ...o });
@@ -1416,7 +1417,9 @@ export const AREAS = {
     hint: 'Zwischenfälle auf der Reise (#014, Daniel, 13.11.2026: „Mehrere Etappen + Ereignisse (Panne, Händler, Hinterhalt)“). Nach jeder Etappe kann einer passieren (Reisen › Chance pro 10 km, nachts mehr); er erzählt, was los ist, und bietet Entscheidungen an. Jede kostet oder bringt Zeit, Sprit, Vorräte, Δ, Leben oder Dinge.',
     template: { name: 'Neuer Encounter', weight: 1, time: 'any', enemies: [], options: [{ label: 'Weiterfahren' }] },
     row: x => `${label(DAYTIME, x.time)} · Gewicht ${x.weight ?? 0} · ${(x.options || []).length} Entscheidungen`,
-    sections: [{ title: 'Encounter', fields: [NAME, LOOK, num('weight', 'Gewicht', { min: 0 }), select('time', 'Tageszeit', DAYTIME), refs('enemies', 'Gegner', 'enemies', { hint: 'Noch ohne Wirkung: ein Kampf auf der Straße als kleines Level kommt später' }), ref('loot', 'Beute', 'lootTables'), DESCRIPTION] },
+    sections: [{ title: 'Encounter', fields: [NAME, LOOK, num('weight', 'Gewicht', { min: 0 }), select('time', 'Tageszeit', DAYTIME), refs('enemies', 'Gegner', 'enemies', { hint: 'Noch ohne Wirkung: ein Kampf auf der Straße als kleines Level kommt später' }), ref('loot', 'Beute', 'lootTables'), DESCRIPTION,
+        refs('figures', 'Figuren am Straßenrand', 'enemies', { hint: '#053: wer in der Fahrt-Szene am Rand steht (Gegner-Bausätze in Rig-Größe, schauen zum Rig); leer = die Gegner' }),
+        select('roadside', 'Am Straßenrand', ROADSIDE, { hint: '#053: was in der Fahrt-Szene am Rand steht und näher kommt, bevor das Rig hält und das Fenster aufgeht (aus Code gezeichnet)' })] },
       { title: 'Entscheidungen', fields: [table('options', 'Entscheidungen', [text('label', 'Knopf'), num('hours', 'Zeit', { unit: 'h' }), num('fuel', 'Sprit', { unit: 'l', hint: 'positiv = kostet' }),
         num('food', 'Vorräte', { hint: 'positiv = kostet' }), num('deltas', 'Δ', { hint: 'negativ = zahlen' }), num('health', 'Schaden', { unit: 'Leben', min: 0 }),
         ref('use', 'Verbraucht', 'items'), num('useCount', 'Wie viele', { min: 1 }), ref('item', 'Gibt', 'items'), num('count', 'Anzahl', { min: 1 }), ref('loot', 'Beute-Wurf', 'lootTables'), text('result', 'Danach')],
@@ -1531,6 +1534,20 @@ export const AREAS = {
         num('weightFuelFactor', 'Mehrverbrauch je Tonne', { unit: '%', min: 0 })] },
       { title: 'Tag & Nacht', fields: [num('dayLength', 'Tageslänge', { unit: 'Spiel-h', min: 1 }), num('nightShare', 'Anteil Nacht', { unit: '%', min: 0, max: 100 }), num('nightDanger', 'Gefahr nachts', { unit: '%', min: 0 })] },
       { title: 'Encounter', fields: [num('encounterChance', 'Chance pro 10 km', { unit: '%', min: 0, max: 100 })] },
+      { title: 'Fahrt', fields: [bool('drive.enabled', 'Fahrt zeigen', { hint: '#053 (Daniel, 18.11.2026: „wie bei Keep Driving“): zwischen Karte und Ankunft rollt das Rig durch die Landschaft, Zwischenfälle stehen am Straßenrand. Aus = sofort da wie früher' }),
+        num('drive.seconds', 'Dauer je Etappe', { unit: 's', min: 3, hint: 'Daniel: gemütlich, Standard 30' }), num('drive.fast', 'Vorspulen', { unit: '×', min: 1, hint: 'E / A halten (Maus: gedrückt halten); Esc / B springt zum nächsten Halt' }),
+        num('drive.speed', 'Tempo im Bild', { unit: 'Bildpixel/s', min: 10 }), num('drive.stopAt', 'Zwischenfall bei', { unit: '% der Etappe', min: 30, max: 95 }),
+        num('drive.rigHeight', 'Rig-Höhe', { unit: '% des Bildes', min: 10, max: 70, hint: 'lange Rigs werden kleiner, damit sie ins Bild passen' }), num('drive.rigX', 'Rig-Front bei', { unit: '% von links', min: 30, max: 90 }),
+        num('drive.bounce', 'Federn', { unit: 'px', min: 0, hint: 'jeder Anhänger federt für sich, etwas nach dem Van' })] },
+      { title: 'Licht & Wetter unterwegs', fields: [num('drive.rays', 'Lichtstrahlen', { unit: '%', min: 0, max: 100, hint: 'bei tiefer Sonne' }), num('drive.flare', 'Lens Flare', { unit: '%', min: 0, max: 100 }),
+        num('drive.headlights', 'Scheinwerfer', { unit: '%', min: 0, max: 100, hint: 'ab der Dämmerung, dazu rote Rücklichter' }), num('drive.haze', 'Hitzeflimmern', { unit: '%', min: 0, max: 100, hint: 'mittags über dem Horizont' }),
+        num('drive.grain', 'Filmkorn', { unit: '%', min: 0, max: 100 })] },
+      { title: 'Landschaften', fields: [table('landscapes', 'Landschaft je Region', [text('region', 'Region', { hint: 'wie in Reisekarte › Regionen; leer = für alle anderen' }), select('relief', 'Relief', RELIEFS),
+        color('far', 'Berge'), color('mid', 'Hügel'), color('ground', 'Boden'), color('rock', 'Felsen'), color('plants', 'Pflanzen'), color('road', 'Asphalt'),
+        num('ruins', 'Ruinen', { unit: '%', min: 0 }), num('wrecks', 'Wracks', { unit: '%', min: 0 }), num('towers', 'Türme', { unit: '%', min: 0 }), num('signs', 'Plakate', { unit: '%', min: 0 }),
+        num('plantsN', 'Kakteen', { unit: '%', min: 0 }), num('poles', 'Masten', { min: 0, max: 1 }), num('pylons', 'Hochspannung', { min: 0, max: 1 }), num('city', 'Stadt am Horizont', { unit: '%', min: 0, max: 100 }),
+        num('dust', 'Staub', { unit: '% der Etappen', min: 0, max: 100 }), num('fog', 'Morgennebel', { unit: '% der Etappen', min: 0, max: 100 })],
+        { hint: 'Aus Code gezeichnet (Daniel: 3c, PixelLab später). Die Dinge am Rand: je Abschnitt eine Chance in % (zusammen höchstens 100), Plakate zeigen die Marken der Lore. Die Etappe blendet von der Landschaft des Startorts in die des Ziels' })] },
     ],
   },
 };

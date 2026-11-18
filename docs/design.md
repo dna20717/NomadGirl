@@ -202,6 +202,7 @@ Zu Beginn kennt man „Notflicken“, „Stromzelle tauschen“ und „Kühlmitt
 - Reisen ist eine **verwitterte Touristen-Karte der 60er** mit Marken der Spielwelt (Delta Petrol, NomadCola, Motel Salzsee …), kein Menü mehr. Am Warroom und an der Van-Tür.
 - **Jeder Durchgang würfelt ein Straßennetz** um BigCityDelta: feste Wahrzeichen plus gewürfelte Orte. Leyla fährt immer eine Straße weit; weiter draußen ist es gefährlicher und lohnender, Unbekanntes bleibt „?“.
 - Jedes Ziel zeigt Kosten (Strecke, Fahrzeit, Sprit, Vorräte), Gefahr und Art, und welche Beute dort vermutlich liegt. Details: `docs/features/worldmap.md`.
+- **Die Fahrt** (Daniel, 18.11.2026: „wie bei Keep Driving“, gebaut als #053): Zwischen Karte und Ankunft rollt das selbst gebaute Rig von der Seite durch die Wastelands, gemütlich 30 Sekunden je Etappe. Uhr, Himmel und Wetter laufen mit, jede Region sieht anders aus, Zwischenfälle stehen sichtbar am Straßenrand, bevor das Rig hält. Erst nur Inszenierung (Entscheidung wie bisher im Fenster); Landschaft aus Code, PixelLab-Ebenen später. Nächste Stufen (Ideenspeicher): Gas geben/drosseln, Crew im Rig sichtbar, Radio, Zwischenfälle mit Crew-Fähigkeiten.
 
 ### Achievements & Trophäen (Design-Session Daniel, 13.11.2026)
 
