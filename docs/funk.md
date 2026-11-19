@@ -37,6 +37,14 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: **HNC / Übergabe.** Stand `main` (alles gepusht, `npm test` 318/318, berührte Browser-Tests grün). Gebaut seit der letzten Übergabe:
+  - **#087–#091:** Wettervorhersage (Navigator in der Reisekarte), Gangs als Auftraggeber (7 Aufträge im Revier), Revierkrieg (Rivalen, Gegenruf 50 %, Übernahmen, Fronten), Rig-Radio (4 Sender, Musik aus Code, DJ, N), Werte-Bildschirm (U).
+  - **Entscheidungsrunde 2** (Artefakt „NomadGirl Entscheidungskarten“, decisions_r2): #076–#096 abgenommen, neue Tickets #097–#110; Fragerunde #080 (in design.md).
+  - **#110 Skilltrees:** 108 Knoten (Technik 26, Wissen 24, Bio 27, Dunkelheit 31 verborgen) mit PixelLab-Bildern; neue Freischaltungen (Boni für alle Werte über den Boni-Bus, Werkstätten/Rig-Teile erst nach Knoten, Merker, Orte); rund 40 Knoten zeigen noch „Wirkung folgt“.
+  - **#097** Balancing v1 Standard + Cheat-Menü (`?cheats=1`), **#105** Kofferraum 8 × 4, **#106** Delta Heights Beton, **#107** Fennek im Camp (PixelLab-poliert, Galopp + 3 Idles), **#108** Rattenschwarm/Wachdrohne weg.
+  - Dazu: Container-Dächer im Camp begehbar (S + Leertaste fällt durch), Radio-Chip weicht Fenstern/Tooltips aus, `pretty()` ließ Kommas in Texten nicht in Ruhe (behoben), NomadPixel-Test (Symbol Gefangener, erster Pixel-Auftrag).
+  - **PixelLab:** diesmal 89 (Skilltrees 80, Fennek 9), übrig 180,6, Neuauffüllung 07.12. Verbindung nur in der Umgebung „NomadGirl“ (Sitzung per `switch_environment` umstellen, dann ToolSearch „pixellab“ verbindet neu).
+  - **Offen:** #110 Teil 2 (Wirkungen der „Wirkung folgt“-Knoten), #080 dunkler Tab (Warnung, Preis, Kopfgeldjäger, zwei Enden), #086 Story-Enden (nach #080), #098 Ofen statt Lagerfeuer im Mega-Rig, #099 Speziallager-Ausbau, #100 Rig-Moral, #101 Aufträge für alle 12 Gangs, #102 Gangs kämpfen selbst, #103 DJs als Entities, #104 Werte als Inventar-Abschnitt mit Grundwerten, #109 Balancing v2, #084 Grafik. Backlog: Camp-Grafik aus Code (vorerst nicht).
 - 19.11. Code → Ava: #097 Balancing v1 Standard + Cheat-Menü, #105 Kofferraum 8 × 4, #106 Delta Heights Beton, #107 Fennek im Camp, #108 Rattenschwarm/Wachdrohne weg, #110 Skilltrees (108 Knoten, PixelLab 80, übrig 189,6). Nächste: #110 Teil 2 (Wirkungen), #080 Dunkelheit-Tab, #098–#104, #109.
 - 19.11. Code → Ava: **Entscheidungsrunde 2** (Artefakt „NomadGirl Entscheidungskarten“, Sammlung decisions_r2): #076–#096 abgenommen, neue Tickets #097–#110. Fragerunde #080 erledigt (Antworten im Ticket und in design.md), #080 wartet auf #110: Daniel will alle Skilltrees länger (20+ Knoten je Ast), Entwurf als Karte „NomadGirl Skilltrees“. #086 Story-Enden kommt nach der Dunkelheit.
 - 19.11. Code (NomadPixel) → Code: Neues Kachel-Set **`factory`** (Fabrik) mit Rastern `factory_terrain`/`factory_props`, jetzt in `rf_kesselhaus`, `rf_leitstand`, `rf_versteck` (Daniel: Kacheln + alter Clutter `industry3_*`). Bitte bei #096 (POIs aufräumen) nicht wundern.
@@ -302,7 +310,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Die Zelle: Gefangene fesseln, transportieren, einsetzen, Kopfgeld (#079)“. `npm test` 290/290 (neu `test/prisoners.test.js`), Browser drive/camp/inventory/game/bench/turf/workshop/trunk grün. PixelLab 0 (Gefangener ohne Bild, zeigt ⛓ + Namen). **Bitte testen:** im POI Plünderer mit dem Messer erledigen, Gefangenen aufheben, Zelle bauen, reinlegen; auf der Fahrt „Ein Angebot am Funk“.
 
 ### #080 Dunkelheit als Skilltree, Kopfgeldjäger-Fraktion
-- **Status:** blockiert (wartet auf #110 Skilltrees) · Fragerunde 19.11. erledigt · angelegt 19.11. von Code (Daniel, Karte A5) · **erst reden, dann bauen** (großes Feature)
+- **Status:** offen (frei seit #110: 31 dunkle Knoten mit Bildern liegen im verborgenen Tab) · Fragerunde 19.11. erledigt · angelegt 19.11. von Code (Daniel, Karte A5) · **erst reden, dann bauen** (großes Feature)
 - **Auftrag (Daniel, 19.11.2026):** „Dunkelheit ist ein eigener Skilltree, den man leveln KANN. Wenn man den ersten Punkt investiert, bekommt man eine Warnmeldung, dass das Spiel dadurch wirklich schwerer wird. Wenn man die akzeptiert, kann man dunkle Skills freischalten, die Leyla mächtiger machen, aber ihr Ruf leidet darunter, Gegner werden deutlich schwerer und eine neue Fraktion taucht im Spiel auf (eine Gruppe von cyberware-süchtigen Kopfgeldjägern, angeführt von einer komplett wahnsinnigen Entität, die Leyla rekrutieren wollen).“ Quellen der Ressource: u. a. Gefangene (#079).
 - **Rückfragen:** (Daniel, Fragerunde 19.11.) Eigener Tab im Techtree; Skills: Kampf-Rausch, Angst, Glitch-Hunger („wenn der Duell-Sieg zu eindeutig ist, wird die Entität ausgelöscht und Leyla erhält einen dicken Bonus“); Preis: Ruf sinkt überall, Gegner stärker, AvA leidet, kein Zurück; Kopfgeldjäger erst auf der Straße, später ihr Quartier; die Anführerin will Leyla als Nachfolgerin; beitreten oder bekämpfen, beides mit eigenem Ende. Stufen offen: „lass uns dazu noch einmal alle Skilltrees anschauen, ich habe das Gefühl, dass die insgesamt zu kurz sind“ → #110.
 - **Ergebnis:**
@@ -325,7 +333,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Bilder hochladen in der Online-Werkstatt (#083)“. Knopf im Asset-Inspektor, Worker `POST /api/upload` (eigener Commit, nur Bilder unter assets/, 2 MiB). `npm test` grün (cloud 8/8), `tools/workshop_cloud_test.mjs` grün. **Bitte testen:** online Werkstatt › Assets › ein Bild ersetzen, ein paar Minuten warten, im Spiel ansehen.
 
 ### #084 Grafik per PixelLab: Verbindung, Bit-Farm, Fahrgestell + Camp-Boden
-- **Status:** offen · angelegt 19.11. von Code (Daniel, Karten PixelLab, Bit-Farm, C18)
+- **Status:** offen · Verbindung geht (Umgebung „NomadGirl“, siehe HNC 19.11.) · angelegt 19.11. von Code (Daniel, Karten PixelLab, Bit-Farm, C18)
 - **Auftrag:** (1) PixelLab-Verbindung der Cloud-Umgebung reparieren (19.11. blockte der Proxy `api.pixellab.ai`), Anleitung für Daniel. (2) Bit-Farm-Bild, bis 4 Generierungen (freigegeben). (3) Fahrgestell + Camp-Boden feiner, passend zu #042 (~10–25 Generierungen, vor dem Auftrag Kosten nennen, unter 700 Freigabe).
 - **Rückfragen:**
 - **Ergebnis:**

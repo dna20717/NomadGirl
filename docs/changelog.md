@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Übergabe (HNC)**: Stand nach #087–#091, Entscheidungsrunde 2, #097/#105–#108, #110 Skilltrees (108 Knoten mit PixelLab-Bildern), Fennek mit Idles, begehbaren Container-Dächern; Tests 318 grün; PixelLab übrig 180,6; offen #110 Teil 2, #080, #086, #098–#104, #109, #084.
 - 19.11.2026: **Fennek von PixelLab aufpoliert** (Daniel: „ordentlich aufpolieren und ein paar Idle-Animationen“): neue Grundpose, neuer Galopp, drei Idles (Umschauen mit Zwinkern, Schnuppern, Hinsetzen und Kratzen). Im Camp bleibt er meist in der Bildmitte stehen, spielt eine Idle und flitzt weiter. Werkstatt › Camp › Kleinvieh: Idles, Bleibt stehen %. PixelLab 9.
 - 19.11.2026: **Skilltrees** (#110): 108 Knoten statt 7. Technik 26, Wissen 24, Bio 27, Dunkelheit 31 (der dunkle Tab bleibt bis #080 verborgen). Jeder Knoten hat ein PixelLab-Bild im Stil der alten. Neue Freischaltungen: Boni für jeden Leyla- und Camp-Wert über den Boni-Bus, Werkstätten und Rig-Teile erst nach ihrem Knoten kaufbar, Merker und Orte; Knoten mit eigener Mechanik zeigen „Wirkung folgt“. Kinder stehen im Baum auf der Höhe ihrer Eltern.
 - 19.11.2026: **Balancing v1 ist Standard** (#097): Startgeld 600 Δ, Bio auch aus Kisten und Mutanten, Techtree in der Mitte teurer. Die alten Werte liegen als Datenset „Vor Balancing v1“. Dazu ein **Cheat-Menü** im Pause-Menü, nur auf Geräten, die einmal mit `?cheats=1` geöffnet wurden (Δ, Ressourcen, Leben, Tank, Sprit, Karte, Uhr).
