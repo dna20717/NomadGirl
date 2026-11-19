@@ -189,6 +189,8 @@ Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich 
 
 | (keine Datei) | Rig-Radio (#090): vier Sender mit Musik, Rauschen und Knistern, live erzeugt (`game/radio.js` Noten, `game/radio_audio.js` Web Audio) | Code | 19.11.2026 |
 
+| `assets/techtree/nodes_2.png` … `nodes_8.png` (+ `source/`: Motive, Wirkungen, Bau-Skript) | Techtree-Knoten #110 (`tt_nodes_2` … `tt_nodes_8`, je 4 × 4 à 64 px): 101 neue Knoten-Bilder, dazu 11 Zweitversionen von Schlusssteinen (`*_alt`) | KI (PixelLab, Create Image Pro, Stilbild tt_nodes, Palette AAP-64), 7 Blätter à 10 Generierungen | 19.11.2026 |
+
 ## Ordner
 
 Alle Grafiken liegen unter `projects/nomadgirl/assets/`, nach Figur oder Thema in Unterordnern (`leyla/`, `backgrounds/`, `tiles/`, später z. B. `enemies/`, `rig/`). Dort werden sie auch online ausgeliefert, damit die Werkstatt sie zeigen kann.

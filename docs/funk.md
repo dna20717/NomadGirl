@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: #097 Balancing v1 Standard + Cheat-Menü, #105 Kofferraum 8 × 4, #106 Delta Heights Beton, #107 Fennek im Camp, #108 Rattenschwarm/Wachdrohne weg, #110 Skilltrees (108 Knoten, PixelLab 80, übrig 189,6). Nächste: #110 Teil 2 (Wirkungen), #080 Dunkelheit-Tab, #098–#104, #109.
 - 19.11. Code → Ava: **Entscheidungsrunde 2** (Artefakt „NomadGirl Entscheidungskarten“, Sammlung decisions_r2): #076–#096 abgenommen, neue Tickets #097–#110. Fragerunde #080 erledigt (Antworten im Ticket und in design.md), #080 wartet auf #110: Daniel will alle Skilltrees länger (20+ Knoten je Ast), Entwurf als Karte „NomadGirl Skilltrees“. #086 Story-Enden kommt nach der Dunkelheit.
 - 19.11. Code (NomadPixel) → Code: Neues Kachel-Set **`factory`** (Fabrik) mit Rastern `factory_terrain`/`factory_props`, jetzt in `rf_kesselhaus`, `rf_leitstand`, `rf_versteck` (Daniel: Kacheln + alter Clutter `industry3_*`). Bitte bei #096 (POIs aufräumen) nicht wundern.
 - 19.11. Code (NomadPixel) → Code: **NomadPixel-Skill aktualisiert** (`.claude/skills/nomadpixel/`). Für Figuren und Animationen gibt es jetzt `bewegung.md` (Schlüsselposen, Galopp-Tabelle, Gerüst mit `zeichnen.bein`), `kritik.md` (unabhängiger Kritiker als Subagent, Schwelle ⌀ ≥ 4) und `analyse.py profil/pruefe`. Lernbuch hat 4 neue Regeln vom Fennek-Test (Profil „figuren“ passt nicht zu Tieren, Charakterteile von Hand, Beine mit eigener Kontur). Fennek und Gefangener selbst unverändert.
@@ -407,10 +408,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #110 Skilltrees: vier Äste à 20+ Knoten
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel: 20+ Knoten je Ast, nach Ressource, Inhalte: passive Boni, Rezepte & Werkstätten, Welt & Story; Entwurf als interaktive Karte)
+- **Status:** fertig (19.11.) · Teil 1 · angelegt 19.11. von Code (Daniel: 20+ Knoten je Ast, nach Ressource, Inhalte: passive Boni, Rezepte & Werkstätten, Welt & Story; Entwurf als interaktive Karte)
 - **Auftrag:** Entwurf mit 88 Knoten im Artefakt „NomadGirl Skilltrees“ (https://claude.ai/artifact/EoWeffe9WL6p1esscmhz82), Daniel behält/ändert/streicht; danach bauen: neue Freischalt-Arten (Werkstatt, Rig-Teil, Merker, Fähigkeit, Camp-Boni), Warroom-Bildschirm für große Bäume, dunkler Tab (#080).
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Daniel) „Ich mag alle Skills … ergänze noch ein paar, damit es nicht überall gleich viele sind“; Bilder mit PixelLab (Probeblatt, dann alle 7 Blätter freigegeben). (Code) ⚠️ vorläufig: Knoten mit eigener Mechanik setzen ihren Merker und zeigen „Wirkung folgt“, die Mechaniken kommen Stück für Stück (Teil 2); Werkstätten wie Hydrokultur, Küche, Bit-Farm, Ripperdoc, Reaktor sind erst nach ihrem Knoten kaufbar (was im Rig steht, bleibt); der dunkle Tab bleibt verborgen bis #080.
+- **Ergebnis:** (Code) Commit „Skilltrees: 108 Knoten mit PixelLab-Bildern (#110)“. `npm test` 318/318, techtree 10/10, cozy/stack/van/bitfarm/crew/mega/megarig grün. **PixelLab: 80 Generierungen** (Probeblatt 216 px + 7 Blätter 256 px), übrig 189,6. **Bitte testen:** Warroom › Techtree, durch die drei Tabs scrollen, Knoten ansehen; im Händler-Menü sind manche Werkstätten jetzt mit 🔒 gesperrt.
 
 ### #087 Wettervorhersage im Warroom
 - **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Was als Nächstes“; 19.11.: „#087–#091 Systeme bauen“)

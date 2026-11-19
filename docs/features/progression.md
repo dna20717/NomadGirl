@@ -16,3 +16,12 @@ Cryo-Tank, k.o. neu, Techtree, Durchgang / Traum, Zerlegen und voller Tresor.
 ## Cheat-Menü (#097)
 
 Daniel, 19.11.2026: „600, aber ein Cheat-Menü nur für mich“. Freigeschaltet **pro Gerät**: das Spiel einmal mit `?cheats=1` öffnen (`?cheats=0` sperrt wieder), dann steht im Pause-Menü **Cheats** (+1.000 Δ, +10 jeder Ressource, Leben voll, Tank 100 %, Sprit und Vorräte, alle Orte aufdecken, Uhr +6 h). Nichts über die Person liegt im öffentlichen Repo, das Gerät merkt es sich (`localStorage nomadgirl-cheats`). Code `game/cheats.js`, Menü `hud.cheatMenu`. Test `test/cheats.test.js`.
+
+## Skilltrees (#110)
+
+Daniel, 19.11.2026: „ich habe das Gefühl, dass die insgesamt zu kurz sind“ → 20+ Knoten je Ast, nach Ressource, Inhalte passive Boni, Rezepte & Werkstätten, Welt & Story, „damit es nicht überall gleich viele sind“. Entwurf im Artefakt „NomadGirl Skilltrees“, Daniel: „Ich mag alle Skills“.
+- **108 Knoten:** Technik 26 (Rig, Waffen, AvA), Wissen 24 (Karte, Duell, Handel, Welt), Bio 27 (Garten, Küche, Heilung, Heilmittel), Dunkelheit 31 (Tab verborgen, bis #080 die Warnung und den Preis baut). Stufen = Spalten, Kinder auf der Höhe ihrer Eltern (`build_tree.py`: Schwerpunkt der Eltern-Zeilen), damit → zum Nachfolger führt.
+- **Neue Freischaltungen** (Werkstatt › Techtree › Schaltet frei): **Boni** für jeden Wert (`TECH_BONUS`: Tank, AvA, alle Leyla-Werte, alle Camp-Werte; fließen über den Boni-Bus `gearParts`/`parts`), **Werkstätten** und **Rig-Teile** (erst kaufbar mit dem Knoten: `techLock`, Händler zeigt „🔒 Knoten“; was schon im Rig steht, bleibt), **Merker** (Welt-Merker für Zwischenfälle, Quests, Orte), **Ort aufdecken**, **Wirkung folgt** (die eigene Mechanik fehlt noch; der Merker ist gesetzt).
+- **Bilder:** 7 PixelLab-Blätter (`tt_nodes_2` … `tt_nodes_8`, 4 × 4 à 64 px, Stilbild aus tt_nodes); Blatt 8 enthält Zweitversionen der Schlusssteine (`*_alt`). Quelle und Bau-Skript in `assets/techtree/source/`.
+- Noch ohne Wirkung (Merker gesetzt, „Wirkung folgt“): z. B. Rostschutz, Werkbank ★★, Funkbake, Kran-Greifarm, Lizenzen, Schrott-Alchemie, Overdrive, Kartograf, Feilschen, Navigator+, Diplomatie, Gang-Codes, Netzwerk, Störsender, Wildkräuter, Saatgut, Medkit, Pilzzucht, Mutanten-Biologie, Antitoxin, Chirurgie, Blutbank, Story-Knoten, alle dunklen Knoten.
+- Tests: `test/techtree110.test.js`, `tools/techtree_test.mjs` (10).
