@@ -20,7 +20,16 @@ import { remap as remapDecor } from './decor.js';
 const clone = x => JSON.parse(JSON.stringify(x));
 export const B = D => D.build || {};
 export const wsDef = (D, id) => D.workshops?.[id] || {};
-export const placesOf = (D, u) => (u.kind === 'tractor' ? D.tractors?.[u.id]?.places : D.containers?.[u.id]?.places) || 0;
+export const placesOf = (D, u) => (u.kind === 'tractor' ? D.tractors?.[u.id]?.places : containerPlaces(D, u)) || 0;
+// #113 Container ziehen (Daniel 19.11.2026: „Container nur noch insgesamt kaufen und über Ziehen die Anzahl der Slots bestimmen, ganz
+// dynamisch ohne Aufpreis“): a container with „Länge ziehbar“ keeps its own length (u.places), its weight grows per place
+export const sizeRange = (D, id) => { const c = D.containers?.[id]; return c?.resize ? [Math.max(1, c.resize[0] ?? 1), Math.max(1, c.resize[1] ?? c.places ?? 1)] : null; };
+export function containerPlaces(D, u) {
+  const c = D.containers?.[u?.id], r = sizeRange(D, u?.id);
+  if (!c) return 0;
+  return r && u.places != null ? Math.max(r[0], Math.min(r[1], Math.round(u.places))) : c.places || 1;
+}
+export const containerWeight = (D, u) => { const c = D.containers?.[u?.id] || {}; return c.resize && c.weightPerPlace ? (c.weightBase || 0) + c.weightPerPlace * containerPlaces(D, u) : c.weight || 0; };
 export const priceOf = (D, area, id) => D[area]?.[id]?.value || 0;
 export const sellPrice = (D, area, id) => Math.round(priceOf(D, area, id) * (B(D).sellFactor ?? 50) / 100);
 
@@ -102,7 +111,7 @@ export function shop(D) {
   const stages = B(D).stages || ['mvp', '1'];
   return {
     workshops: Object.entries(D.workshops || {}).filter(([, w]) => stages.includes(w.stage || 'mvp') && (w.value || 0) > 0).map(([id]) => id),
-    containers: Object.entries(D.containers || {}).filter(([, c]) => (c.value || 0) > 0 && !c.retired).map(([id]) => id),   // retired (Modul-Anhänger) are gone
+    containers: Object.entries(D.containers || {}).filter(([, c]) => (c.value || 0) > 0 && !c.retired && !c.noShop).map(([id]) => id),   // #113 noShop: one container to buy, pulled to length   // retired (Modul-Anhänger) are gone
     rigParts: Object.entries(D.rigParts || {}).filter(([, c]) => (c.value || 0) > 0).map(([id]) => id),
   };
 }
@@ -140,7 +149,7 @@ function takeOut(U, ui) {
 export function budgets(D, rig) {
   const T = D.tractors?.[rig.tractor] || {}, Tr = D.travel || {}, P = partStats(D, rig), pull = (T.pull || 0) + P.pull;
   const conts = rig.units.filter(u => u.kind === 'container'), ground = conts.filter(u => !levelOf(u));
-  const weight = conts.reduce((n, u) => n + (D.containers?.[u.id]?.weight || 0), 0);
+  const weight = conts.reduce((n, u) => n + containerWeight(D, u), 0);
   let made = (T.power || 0) + solarPower(D, rig) + (rig.workerPower || 0), used = 0;   // #060 Ingenieur-Entities at work (workers.js syncWorkers)   // + solar panels (in the sun; at night from the battery, camp.js)
   for (const u of rig.units) for (const w of u.workshops) { const p = wsDef(D, w.id).power || 0; if (p > 0) made += p; else used -= p; }
   made += synergyPower(D, rig);   // #033: generators and reactors in good company
@@ -298,7 +307,8 @@ export function moveContainer(D, d, ui, gap) {
 }
 // container slots (Daniel, 09.11.2026: „einen kurzen Container auf einen langen links oder rechts ausrichten“): a container with
 // p places on a top unit with P places can stand at offset 0 … P − p (0 = left, P − p = right); same length or longer = centred
-export const stackSlots = (D, topId, id) => Math.max(0, (D.containers?.[topId]?.places || 1) - (D.containers?.[id]?.places || 1));
+// (#113: by the units, so a container's own length counts; ids still work for the scrapyard)
+export const stackSlots = (D, top, u) => Math.max(0, (containerPlaces(D, typeof top === 'string' ? { id: top } : top) || 1) - (containerPlaces(D, typeof u === 'string' ? { id: u } : u) || 1));
 // stack a container onto the block of unit `onto`: from = { spare: i } (scrapyard) or { ui } (a container in the rig without anything on it);
 // slot = offset in places on the unit below (see stackSlots), leave out = centred
 export function stackOn(D, d, from, onto, slot) {
@@ -306,7 +316,7 @@ export function stackOn(D, d, from, onto, slot) {
   if (from.ui != null && levelOf(U[from.ui]) > 0) {   // the top of this very block: only moves to another slot
     const [a, b] = blockAt(U, from.ui);
     if (onto >= a && onto < b && from.ui === b - 1) {
-      const u = U[from.ui], max = stackSlots(D, U[from.ui - 1]?.id, u.id);
+      const u = U[from.ui], max = stackSlots(D, U[from.ui - 1], u);
       const to = slot == null || !max ? undefined : Math.max(0, Math.min(max, slot));
       if (to === u.slot) return { ok: false, reason: 'Steht schon da', same: true };
       u.slot = to;
@@ -327,12 +337,30 @@ export function stackOn(D, d, from, onto, slot) {
     if (hasAbove(U, from.ui)) return { ok: false, reason: 'Erst den Container darüber abnehmen' };
     unit = takeOut(U, from.ui).units[0];
   }
-  const top = st.top, at = U.indexOf(top) + 1, max = stackSlots(D, top.id, unit.id);
+  const top = st.top, at = U.indexOf(top) + 1, max = stackSlots(D, top, unit);
   unit.level = levelOf(top) + 1;
   unit.slot = slot == null || !max ? undefined : Math.max(0, Math.min(max, slot));
   U.splice(at, 0, unit);
   spend(D, d, 0, M(D, 'stack', M(D, 'container', 90)));
   return { ok: true };
+}
+
+// #113: pull a container longer or shorter (n places, within its range); costs no Δ, only a few minutes. Workshops that no longer fit
+// pop out onto the scrapyard (as crates); a full storage refuses (applyDraft: „ist nicht leer“). A container standing on top keeps
+// its slot within the new length. → { ok, popped: [workshop ids], reason }
+export function resizeContainer(D, d, ui, n) {
+  const U = d.rig.units, u = U[ui], r = sizeRange(D, u?.id);
+  if (!u || u.kind !== 'container' || !r) return { ok: false, reason: 'Lässt sich nicht ziehen' };
+  const to = Math.max(r[0], Math.min(r[1], Math.round(n))), from = containerPlaces(D, u);
+  if (to === from) return { ok: false, reason: to === r[1] ? `Länger geht nicht (höchstens ${r[1]} Plätze)` : to === r[0] ? 'Kürzer geht nicht' : 'Gleich lang', same: true };
+  const popped = u.workshops.filter(w => w.at + (wsDef(D, w.id).places || 1) > to);
+  for (const w of popped) { u.workshops.splice(u.workshops.indexOf(w), 1); toSpare(d, w); }
+  u.places = to;
+  const above = U[ui + 1];
+  if (above && levelOf(above) === levelOf(u) + 1 && above.slot != null) { const max = stackSlots(D, u, above); above.slot = max ? Math.min(max, above.slot) : undefined; }
+  if (levelOf(u) > 0 && u.slot != null) { const max = stackSlots(D, U[ui - 1], u); u.slot = max ? Math.min(max, u.slot) : undefined; }
+  spend(D, d, 0, M(D, 'resize', 5));
+  return { ok: true, popped: popped.map(w => w.id), from, to };
 }
 
 // ---------- building right away (Rig bauen 2.0): every action is a small draft that is applied at once ----------
@@ -380,7 +408,7 @@ export function applyDraft(D, save, d) {
   if (bad.length) return { ok: false, reason: bad[0] };
   const old = save.inv.grids, grids = {};
   for (const [k, g] of Object.entries(old)) if (!rigGrid(k)) grids[k] = g;
-  const rig = { tractor: d.rig.tractor, units: d.rig.units.map(u => ({ kind: u.kind, id: u.id, ...(u.level ? { level: u.level } : {}), ...(u.level && u.slot != null ? { slot: u.slot } : {}), ...(u.pos ? { pos: { place: u.pos.place, story: u.pos.story } } : {}), workshops: u.workshops.map(w => ({ id: w.id, at: w.at, ...(starsOf(w) ? { level: starsOf(w) } : {}) })) })),   // #078 the upgrade moves with the workshop
+  const rig = { tractor: d.rig.tractor, units: d.rig.units.map(u => ({ kind: u.kind, id: u.id, ...(u.places != null && u.kind === 'container' ? { places: u.places } : {}), ...(u.level ? { level: u.level } : {}), ...(u.level && u.slot != null ? { slot: u.slot } : {}), ...(u.pos ? { pos: { place: u.pos.place, story: u.pos.story } } : {}), workshops: u.workshops.map(w => ({ id: w.id, at: w.at, ...(starsOf(w) ? { level: starsOf(w) } : {}) })) })),   // #078 the upgrade moves with the workshop
     spare: { workshops: d.rig.spare.workshops.map(w => w.id), containers: [...d.rig.spare.containers], parts: [...d.rig.spare.parts], ...(d.rig.spare.decor ? { decor: [...d.rig.spare.decor] } : {}) }, parts: clone(d.rig.parts || {}) };
   const spareLevels = d.rig.spare.workshops.filter(w => starsOf(w)).map(w => ({ id: w.id, level: starsOf(w) }));   // #078 packed on the scrapyard, the stars stay
   if (spareLevels.length) rig.spareLevels = spareLevels;

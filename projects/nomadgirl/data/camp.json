@@ -106,7 +106,7 @@
   "rows": [163, 204],
   "couple": 172,
   "frontMin": 12,
-  "axles": {"1": 1, "2": 2, "3": 2},
+  "axles": {"1": 1, "2": 2, "3": 2, "4": 3, "5": 3},
   "beamRows": 15
  },
  "deco": [
@@ -134,5 +134,7 @@
  "board": {"enabled": true, "name": "Schwarzes Brett", "offset": -220, "lift": 210, "width": 132, "height": 96},
  "decor": {"max": 40, "back": 50, "cozyMax": 25, "ground": [-4, 20], "stackMax": 4, "near": 2.5, "linkMax": 8, "mossDays": 3, "ivyDays": 2, "cat": "kit_cat", "catName": "Mieze", "catCozy": 8},
  "storage": {"name": "Camp-Lager", "width": 10},
- "critters": [{"look": "fennek_run", "every": [35, 80], "speed": 380, "night": 2, "idles": "fennek_look,fennek_sniff,fennek_scratch", "stopChance": 75}]
+ "critters": [{"look": "fennek_run", "every": [35, 80], "speed": 380, "night": 2, "idles": "fennek_look,fennek_sniff,fennek_scratch", "stopChance": 75}],
+ "null": "chassis.axles",
+ "containers": {"height": 130, "tiles": "container_tiles", "ends": [81, 241], "step": 190, "rows": 228, "top": 153, "frame": 512, "band": [84, 96], "inner": 160}
 }

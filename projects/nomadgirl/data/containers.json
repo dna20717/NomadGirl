@@ -15,7 +15,7 @@
  },
  "holzkiste": {"name": "Holzkiste", "kind": "crate", "places": 1, "weight": 250, "stackable": true, "value": 60},
  "container_20": {
-  "name": "20-Fuß-Container",
+  "name": "Container",
   "kind": "shipping",
   "places": 2,
   "weight": 2300,
@@ -29,10 +29,15 @@
   "chassis": true,
   "benchScale": 122,
   "benchInset": 16,
-  "divider": {"x": [47, 66], "y": [191, 350], "foot": 337, "back": 325, "shadow": 70}
+  "divider": {"x": [47, 66], "y": [191, 350], "foot": 337, "back": 325, "shadow": 70},
+  "resize": [1, 5],
+  "weightBase": 450,
+  "weightPerPlace": 950,
+  "tiles": true,
+  "description": "Hochseecontainer zum Ziehen: im Bau-Modus am hinteren Ende länger oder kürzer ziehen (1–5 Plätze), ohne Aufpreis. Jeder Platz wiegt 950 kg."
  },
  "container_40": {
-  "name": "40-Fuß-Container",
+  "name": "Container",
   "kind": "shipping",
   "places": 3,
   "weight": 3800,
@@ -46,7 +51,12 @@
   "chassis": true,
   "benchScale": 122,
   "benchInset": 16,
-  "divider": {"x": [47, 66], "y": [191, 350], "foot": 337, "back": 325, "shadow": 70}
+  "divider": {"x": [47, 66], "y": [191, 350], "foot": 337, "back": 325, "shadow": 70},
+  "resize": [1, 5],
+  "weightBase": 450,
+  "weightPerPlace": 950,
+  "tiles": true,
+  "noShop": true
  },
  "modulanhaenger": {
   "name": "Modul-Anhänger",
@@ -63,7 +73,7 @@
   "replacedBy": "container_20"
  },
  "container_10": {
-  "name": "10-Fuß-Container",
+  "name": "Container",
   "kind": "shipping",
   "places": 1,
   "weight": 1400,
@@ -78,6 +88,11 @@
   "chassis": true,
   "benchScale": 122,
   "benchInset": 16,
-  "divider": {"x": [47, 66], "y": [191, 350], "foot": 337, "back": 325, "shadow": 70}
+  "divider": {"x": [47, 66], "y": [191, 350], "foot": 337, "back": 325, "shadow": 70},
+  "resize": [1, 5],
+  "weightBase": 450,
+  "weightPerPlace": 950,
+  "tiles": true,
+  "noShop": true
  }
 }

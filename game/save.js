@@ -23,7 +23,7 @@ export const SAVE_VERSION = 1;
 // rig layout from a tractor, containers and workshops: the tractor's own places first, then the containers in order
 export function placeWorkshops(D, tractor, containers, workshops) {
   const units = [{ kind: 'tractor', id: tractor, workshops: [] }, ...containers.map(id => ({ kind: 'container', id, workshops: [] }))];
-  const cap = u => (u.kind === 'tractor' ? D.tractors?.[u.id]?.places : D.containers?.[u.id]?.places) || 0;
+  const cap = u => (u.kind === 'tractor' ? D.tractors?.[u.id]?.places : u.places ?? D.containers?.[u.id]?.places) || 0;
   const free = u => { const used = new Set(); for (const w of u.workshops) for (let i = 0; i < (D.workshops?.[w.id]?.places || 1); i++) used.add(w.at + i); return used; };
   const left = [];
   for (const id of workshops) {
@@ -291,7 +291,7 @@ export function swapTractor(D, s, id) {
   return true;
 }
 function refit(D, s) {
-  const U = s.rig.units, cap = u => (u.kind === 'tractor' ? D.tractors?.[u.id]?.places : D.containers?.[u.id]?.places) || 0, size = id => D.workshops?.[id]?.places || 1;
+  const U = s.rig.units, cap = u => (u.kind === 'tractor' ? D.tractors?.[u.id]?.places : (D.containers?.[u.id]?.resize && u.places != null ? Math.max(D.containers[u.id].resize[0] ?? 1, Math.min(D.containers[u.id].resize[1] ?? 9, u.places)) : D.containers?.[u.id]?.places)) || 0, size = id => D.workshops?.[id]?.places || 1;
   const taken = U.map(() => new Set()), out = [];
   U.forEach((u, ui) => {
     u.workshops = u.workshops.filter(w => {
@@ -328,7 +328,8 @@ export function repairSave(save, D) {
   if (!s.rig?.units?.length) s.rig = fresh.rig;
   else if (!D.tractors?.[s.rig.tractor]) { s.rig.tractor = fresh.rig.tractor; const t = s.rig.units.find(u => u.kind === 'tractor'); if (t) t.id = fresh.rig.tractor; }
   // retired containers (Modul-Anhänger, Daniel 13.11.2026) become their replacement, with the same workshops
-  for (const u of s.rig.units) { const c = D.containers?.[u.id]; if (u.kind === 'container' && c?.retired && D.containers?.[c.replacedBy]) u.id = c.replacedBy; }
+  // #113: a retired fixed size (10-/40-Fuß) becomes the pullable container with its old length
+  for (const u of s.rig.units) { const c = D.containers?.[u.id]; if (u.kind === 'container' && !u.pos && c?.retired && D.containers?.[c.replacedBy]) { if (D.containers[c.replacedBy].resize && u.places == null && c.places !== D.containers[c.replacedBy].places) u.places = c.places; u.id = c.replacedBy; } }
   if (s.rig.spare?.containers) s.rig.spare.containers = s.rig.spare.containers.map(id => D.containers?.[id]?.retired && D.containers?.[D.containers[id].replacedBy] ? D.containers[id].replacedBy : id);
   // containers that no longer exist leave the rig; everything keyed by unit index moves along, their storages are rehomed (Aufräumen 16.11.)
   removeUnits(D, s, s.rig.units.map((u, i) => (u.kind === 'tractor' || D.containers?.[u.id] ? -1 : i)).filter(i => i >= 0));

@@ -60,7 +60,7 @@ r = await ev(() => {
   const s = game.scene.getScene('play'); nomad.release(); s.openBuild();
   const mb = s.hud.megaBuild, g = mb.save && mb.save.mega && mb;   // open
   mb.cur = { place: 2, story: 2 }; mb.draw();
-  const a = mb.choose('20-Fuß-Container kaufen');
+  const a = mb.choose('Container (2 Plätze) kaufen');
   mb.save.rig.spare.workshops.push('werkbank');
   mb.cur = { place: 2, story: 2 }; mb.draw();
   const b = mb.choose('Werkbank einräumen');

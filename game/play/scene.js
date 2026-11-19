@@ -99,6 +99,7 @@ export class PlayScene extends Phaser.Scene {
       const V = this.data_.megarigs?.[this.args.megarig.id] || {};
       for (const id of [V.hull?.look, ...Object.values(V.skin || {}).filter(v => typeof v === 'string'), this.data_.camp?.chassis?.look, this.data_.camp?.ground?.tiles, ...Object.values(this.data_.rigAddons || {}).map(a => a.look)]) if (id) ids.add(id);
       for (const c of Object.values(this.data_.containers || {})) for (const k of [c.look, c.lookClosed]) if (k) ids.add(k);
+      if (this.data_.camp?.containers?.tiles) ids.add(this.data_.camp.containers.tiles);   // #113 containers of any length
       for (const m of V.modules || []) for (const w of m.workshops || []) if (this.data_.workshops?.[w]?.look) ids.add(this.data_.workshops[w].look);   // #028 workshops on board
     }
     if (this.mode === 'camp') {
@@ -108,6 +109,7 @@ export class PlayScene extends Phaser.Scene {
       if (this.data_.camp?.chest?.look) ids.add(this.data_.camp.chest.look);
       // every container's look: bought or stacked ones appear while building, without reloading the scene
       for (const c of Object.values(this.data_.containers || {})) for (const k of [c.look, c.lookClosed]) if (k) ids.add(k);
+      if (this.data_.camp?.containers?.tiles) ids.add(this.data_.camp.containers.tiles);   // #113 containers of any length, made in the game
       for (const c of Object.values(this.data_.rigParts || {})) if (c.look) ids.add(c.look);
       for (const x of Object.values(this.data_.salvage || {})) if (x.look) ids.add(x.look);   // wrecks (#023)
       for (const V of Object.values(this.data_.megarigs || {})) for (const v of Object.values(V.skin || {})) if (typeof v === 'string') ids.add(v);   // mega rig wrecks wear their tile sets (#026)

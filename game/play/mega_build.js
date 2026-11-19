@@ -64,7 +64,7 @@ export class MegaBuild {
     if (ui == null) {
       // empty cell: a container from the Lager or the shop
       rig.spare.containers.forEach((id, i) => out.push({ label: `${D.containers[id]?.name || id} hinstellen`, sub: 'aus dem Lager', icon: 'box', disabled: fitsGrid(D, g, rig, -1, p, s, id), do: () => this.run(d => putFromSpare(D, save, d, i, p, s), 'Hingestellt') }));
-      for (const [id, c] of Object.entries(D.containers || {})) if (!c.retired && c.look && c.chassis) out.push({ label: `${c.name} kaufen`, sub: `${priceOf(D, 'containers', id)} Δ · ${c.places || 1} Plätze`, icon: 'coins', disabled: fitsGrid(D, g, rig, -1, p, s, id) || (save.deltas < priceOf(D, 'containers', id) ? 'Zu wenig Δ' : null),
+      for (const [id, c] of Object.entries(D.containers || {})) if (!c.retired && c.look && c.chassis) out.push({ label: `${c.name}${c.resize ? ` (${c.places || 1} ${(c.places || 1) === 1 ? 'Platz' : 'Plätze'})` : ''} kaufen`,   // #113 all pullable ones are called „Container“; in the mega rig grid the size is fixed sub: `${priceOf(D, 'containers', id)} Δ · ${c.places || 1} Plätze`, icon: 'coins', disabled: fitsGrid(D, g, rig, -1, p, s, id) || (save.deltas < priceOf(D, 'containers', id) ? 'Zu wenig Δ' : null),
         do: () => this.run(d => { const b = buyContainer(D, d, id); return b.ok ? putFromSpare(D, save, d, d.rig.spare.containers.length - 1, p, s) : b; }, `${c.name} gekauft`) });
     } else {
       const u = rig.units[ui], n = placesOf(D, u), c = D.containers[u.id] || {}, slot = Math.min(n - 1, p - u.pos.place);

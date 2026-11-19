@@ -10,7 +10,7 @@
 // #076 Gegenpaare (Daniel 19.11.2026: „Plus Gegenpaare“): Werkstätten › Synergie › Stört sich mit. Every neighbour cell holding such a
 // workshop counts against it: score = (partners − foes) / neighbour cells, so the bonus can turn negative (slower, less power, weaker buff).
 
-const placesOf = (D, u) => (u.kind === 'tractor' ? D.tractors?.[u.id]?.places : D.containers?.[u.id]?.places) || 0;
+const placesOf = (D, u) => (u.kind === 'tractor' ? D.tractors?.[u.id]?.places : (D.containers?.[u.id]?.resize && u.places != null ? u.places : D.containers?.[u.id]?.places)) || 0;   // #113 own length
 const sizeOf = (D, id) => D.workshops?.[id]?.places || 1;
 
 // cells: Map "x,y" → { ui, at, ws? } for every place of the rig (ws = the workshop instance standing there)

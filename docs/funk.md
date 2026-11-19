@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: #113 **Container ziehen und höher** fertig: ein Container zum Kaufen, am Griff 1–5 Plätze ohne Aufpreis, Werkbank hält dagegen und ploppt als Kiste raus (Pad vibriert), Container 30 % höher, Bilder zur Laufzeit aus den Kacheln.
 - 19.11. Code → Ava: #112 **Stimmen** fertig: Gebrabbel aus Code in Dialogen, Sprechblasen und Gegner-Rufen, Leylas Laute, 14 Stimmen, Werkstatt › Stimmen mit Vorhören. Volle Browser-Suite nach #111: 53/55 (zwei POI-Tests unter Last, einzeln grün).
 - 19.11. Code → Ava: #111 **Camp-Baukasten Teil 2** fertig (Daniel AFK): Tisch-/Boden-/Wandkram mit R für Varianten, Wand in zwei Höhen, Balkone und Dächer als Stellfläche, Dachgarten, alte Stücke als Bilder mit Code-Effekten, Pflanzen wachsen in gemalten Stufen, Moos, Ranken, Camp-Katze, 10 Ensembles, Achievement Dorfplatz. PixelLab 150.
 - 19.11. Code → Ava: #111 **Camp-Baukasten Teil 1** fertig: frei stapeln, Varianten, Geister-Vorschau, Stühle zum Feuer, Lichterketten zwischen Pfosten, Ensembles à la Dorfromantik, Pilot Lagerfeuer-Ecke von PixelLab (65 Generierungen, übrig 3.115,6). Teil 2 (Baukasten aus Teilen, Auto-Details, mehr Pakete) offen.
@@ -238,6 +239,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #113 Container ziehen und höher
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel: „Container nur noch insgesamt kaufen und dann über Ziehen und Drücken die Anzahl der Slots bestimmen, ganz dynamisch ohne Aufpreis … Werkbank ploppt als Kiste … die Container (nicht die Werkbänke!) könnten größer sein“)
+- **Lesen:** docs/features/rig.md › Container ziehen und höher
+- **Auftrag (Daniels Wahl):** 1–5 Plätze, Gewicht wächst je Platz, Werkbank als Kiste auf den Boden/Schrottplatz, Höhe einstellbar mit Start +30 %.
+- **Rückfragen:** (Code) ⚠️ vorläufig: 10- und 40-Fuß bleiben in alten Spielständen und im Start-Rig (Tank-Anhänger), heißen aber auch „Container“ und sind ziehbar, gekauft wird nur der 2-Platz; 5 Minuten Uhrzeit je Platz; über einer Werkbank 1,1 Plätze Zug (Maus) bzw. zweimal drücken (Controller); ein voller Lager-Raum (Waffenkammer, Kühlraum …) lässt sich nicht rausdrücken; im Mega-Rig bleiben die Größen fest (Knopf „Container (2 Plätze) kaufen“); das Camp hält Platz für Zugmaschine × 5-Platz-Container frei.
+- **Ergebnis:** (Code) Commit „Container ziehen … (#113)“. `npm test` 336/336 (neu `test/container_resize.test.js` 5), Browser `resize_test` 7/7, container/stack/cozy/camp/pad/mega/megarig/tank/decor/workshop grün. PixelLab 0. Vorher/Nachher `output/container_hoehe_vorher_nachher.png`. **Bitte testen:** B (Rig bauen) › am türkisen Griff hinten am Anhänger nach links ziehen (länger) und zurück; eine Werkbank hinten rein und drüber ziehen (zittert, ploppt raus); mit dem Controller: AvA auf den Griff, A, ←/→. Werkstatt › Camp › Container-Kacheln › Höhe ausprobieren.
 
 ### #112 Stimmen: Gebrabbel statt Sprachausgabe
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel: „anstatt Sprachausgabe eine Art von Gibberish, so wie bei Graveyard Keeper, die Sims … über den Code … unterschiedlich von Charakter zu Charakter“)

@@ -10,7 +10,7 @@ import { potsOf, stage, ripe, harvest, STAGES, canWater, waterOf, water } from '
 import { level as cisternLevel, tap as cisternTap } from '../cistern.js';
 import { anchors as lightAnchors, catenary, lightsConfig, mastAt } from '../string_lights.js';
 import { clockText, advance, hoursUntil, solarState, storeKeyOf, CAMP } from '../save.js';
-import { budgets, partSlots, passengers, roofFree } from '../rig.js';
+import { budgets, partSlots, passengers, roofFree, containerPlaces, containerWeight } from '../rig.js';
 import { occupancy } from '../inventory.js';
 import { offers, accept, claim, progressOf, qstate } from '../quests.js';
 import { Benches, benchTexture, crateTexture } from './benches.js';
@@ -75,6 +75,53 @@ export function chassisTexture(scene, plan) {
   return plan.key;
 }
 
+
+// #113 Container ziehen + höher (Daniel 19.11.2026: „die Container könnten größer sein, sie erscheinen mir niedrig“): a container
+// „Aus Container-Kacheln“ gets its look for its own length and Camp › Container-Kacheln › Höhe: left end + (n − 1) × place + right
+// end from the tile sheet, the wall grows in the middle (the band rows repeat; the ribs are vertical, so no seam). Everything below
+// the band moves down by the extra rows: the interior floor, the divider, the bottom of the frame. Workbench pictures keep their size.
+export function containerDef(D, u) {
+  const base = D.containers?.[u?.id] || {}, n = containerPlaces(D, u) || base.places || 1, K = D.camp?.containers || {}, A0 = D.assets?.[base.look];
+  if (!base.tiles || !K.tiles || !D.assets?.[K.tiles] || !A0?.frameSize || !base.inside) return n === base.places ? base : { ...base, places: n };
+  const extra = Math.max(0, Math.round((K.inner ?? 160) * ((K.height ?? 100) - 100) / 100)), top = K.top ?? 153, cut = top + (K.band?.[1] ?? 96);
+  const sh = y => (y >= cut ? y + extra : y), [L, R] = K.ends || [81, 241], step = K.step ?? 190, w = L + R + step * (n - 1), H = (K.frame ?? 512) + extra;
+  const k = (A0.height || A0.frameSize[1]) / A0.frameSize[1], oy = sh(A0.origin?.[1] ?? 372), key = kind => `ctiles_${kind}_${n}_${extra}`;
+  for (const kind of ['open', 'closed']) D.assets[key(kind)] ??= { kind: 'animation', frameSize: [w, H], frames: 1, origin: [w / 2, oy], height: k * H, virtual: { kind, n, extra } };
+  const x0 = base.inside.x[0], dv = base.divider;
+  return { ...base, places: n, weight: containerWeight(D, u), look: key('open'), lookClosed: key('closed'),
+    inside: { x: [x0, x0 + step * n], y: base.inside.y.map(sh) }, deck: base.deck != null ? sh(base.deck) : base.deck,
+    divider: dv && { ...dv, y: dv.y?.map(sh), foot: dv.foot != null ? sh(dv.foot) : dv.foot, back: dv.back != null ? sh(dv.back) : dv.back } };
+}
+// the texture of such a look (made once per length and height from Camp › Container-Kacheln)
+export function containerTexture(scene, D, key) {
+  const A = D.assets?.[key], V = A?.virtual, K = D.camp?.containers || {};
+  if (!V || scene.textures.exists(key)) return scene.textures.exists(key);
+  if (!scene.textures.exists(K.tiles)) return false;
+  const src = scene.textures.get(K.tiles).getSourceImage(), [L, R] = K.ends || [81, 241], step = K.step ?? 190, rows = K.rows ?? 228, top = K.top ?? 153;
+  const [b0, b1] = K.band || [84, 96], [w, H] = A.frameSize, sy = V.kind === 'closed' ? rows + 4 : 0;
+  const tex = scene.textures.createCanvas(key, w, H), ctx = tex.getContext();
+  ctx.imageSmoothingEnabled = false;
+  // one horizontal strip of tile rows [r0, r1) drawn at frame row y: left end, the places, right end
+  const strip = (r0, r1, y) => {
+    const h = r1 - r0; if (h <= 0) return;
+    ctx.drawImage(src, 0, sy + r0, L, h, 0, y, L, h);
+    for (let i = 0; i < V.n - 1; i++) ctx.drawImage(src, L + 4, sy + r0, step, h, L + i * step, y, step, h);
+    ctx.drawImage(src, L + step + 8, sy + r0, R, h, L + (V.n - 1) * step, y, R, h);
+  };
+  strip(0, b1, top);
+  for (let e = 0; e < V.extra; e += b1 - b0) { const h = Math.min(b1 - b0, V.extra - e); strip(b0, b0 + h, top + b1 + e); }
+  strip(b1, rows, top + b1 + V.extra);
+  tex.refresh(); tex.setFilter(NEAREST());
+  return true;
+}
+// all lengths of the pullable containers, so the rig, the scrapyard and build mode can draw them
+export function ensureContainerLooks(scene, D) {
+  for (const [id, c] of Object.entries(D.containers || {})) {
+    if (!c.tiles) continue;
+    const r = c.resize || [c.places || 1, c.places || 1];
+    for (let n = r[0]; n <= r[1]; n++) { const d = containerDef(D, { id, places: n }); for (const k of [d.look, d.lookClosed]) if (k) containerTexture(scene, D, k); }
+  }
+}
 // one container as it stands in the camp, from its left end x (rear) to the right (front, towards the van):
 // a picture with an open side (Container › Aussehen + Innenraum) or a trailer from code: rear hitch, body on a chassis
 // with axles, wheels and fenders, drawbar with coupling and jockey wheel at the front. Same art in the rig and on the scrapyard.
@@ -107,7 +154,7 @@ export function rigUnits(D, rig, vanLeft, ground, T = 64) {
   let right = vanLeft, below = null;
   rig.units.forEach((u, ui) => {
     if (u.kind === 'tractor') return;
-    const def = D.containers?.[u.id] || {};
+    const def = containerDef(D, u);   // #113 own length and height
     if (u.level && below) {
       // container slots: offset 0 … P − p from the left edge of the interior below (u.slot), otherwise centred
       const base = below.deckY, sh = unitShape(D, def, base, T, { stacked: true }), wB = below.cell * below.places, wT = sh.cell * sh.places, n = below.places - sh.places;
@@ -134,7 +181,7 @@ export function campLayout(D, save, T = 64) {
   const k = vanA?.frameSize ? (vanA.height || vanA.frameSize[1]) / vanA.frameSize[1] : 1;
   const vanLeft = vanA?.frameSize ? (vanA.origin?.[0] ?? vanA.frameSize[0] / 2) * k : 5 * T, vanRight = vanA?.frameSize ? vanA.frameSize[0] * k - vanLeft : 5 * T;
   const Y = C.yard || {}, yardW = Y.enabled === false ? 0 : Math.max(4, Y.width ?? 9) * T;
-  const longest = Math.max(T * 4, ...Object.values(D.containers || {}).map(c => unitWidth(D, c, T)));
+  const longest = Math.max(T * 4, ...Object.entries(D.containers || {}).map(([id, c]) => unitWidth(D, c.resize ? containerDef(D, { id, places: c.resize[1] }) : c, T)));   // #113 pulled to full length
   const pull = Math.max(1, D.tractors?.[save.rig.tractor]?.length ?? 1);
   const rigRoom = pull * longest + (pull - 1) * gap;
   const vanCol = Math.ceil((margin * T + yardW + rigRoom + vanLeft) / T - 0.5), doorX = (vanCol + 0.5) * T;
@@ -481,6 +528,7 @@ export class Camp {
   // Every container is its own view (a Phaser container standing on the ground), so building can redraw the rig on the spot
   // and let a single trailer wobble on its springs. Lights, interior platforms, labels and the workshops' E spots belong to it.
   drawRig({ hide = null } = {}) {
+    ensureContainerLooks(this.scene, this.D);   // #113
     const s = this.scene;
     this.hide = hide;   // building: a workshop that is in the hand right now is not drawn
     for (const o of this.rigObjs || []) o.destroy();
@@ -810,7 +858,7 @@ export class Camp {
     const far = (C.parkScale ?? 45) / 100;
     let px = x;
     sp.containers.forEach((id, i) => {
-      const def = D.containers?.[id] || {}, sh = unitShape(D, def, 0, s.T, { stacked: true }), w = sh.w * far;
+      const def = containerDef(D, { id }), sh = unitShape(D, def, 0, s.T, { stacked: true }), w = sh.w * far;
       const view = keep(s.add.container(px + w / 2, y - 24).setDepth(-23).setScale(far));
       if (sh.sprite && s.textures.exists(sh.sprite.key)) view.add(s.add.image(sh.sprite.cx - sh.w / 2, 0, sh.sprite.key, 0).setOrigin(sh.sprite.ox, sh.sprite.oy).setScale(sh.sprite.k).setFlipX(sh.sprite.flip).setTint(0xb8a8b0));
       else view.add(s.add.image(-sh.w / 2, 0, shellTexture(s, D, def, s.T)).setOrigin(0, 1).setTint(0xb8a8b0));
@@ -1134,7 +1182,7 @@ export function travelCost(D, save, to) {
 export function legCost(D, save, fromId, to) {
   const a = placeOf(D, save, fromId), b = placeOf(D, save, to), Tr = D.travel || {};
   const air = flies(D, save.rig.tractor), km = a && b ? (air ? Math.round(roadKm(D, a, b) / (1 + (mapConfig(D).detour ?? 0) / 100)) : roadKm(D, a, b)) : 0;   // along the road on the map (#007), flying: straight (#029)
-  const tons = save.rig.units.filter(u => u.kind === 'container').reduce((n, u) => n + (D.containers?.[u.id]?.weight || 0), 0) / 1000;
+  const tons = save.rig.units.filter(u => u.kind === 'container').reduce((n, u) => n + containerWeight(D, u), 0) / 1000;
   const fuelUse = D.tractors?.[save.rig.tractor]?.fuelUse ?? 12;
   const hours = Math.max(0.25, Math.round(km / ((Tr.speed || 40) * travelSpeed(D, save.rig.tractor)) * 4) / 4);   // #029: the crawler crawls, the fatbird races
   const fuel = Math.round(km * fuelUse / 100 * (1 + (Tr.weightFuelFactor ?? 0) / 100 * tons) * (1 - Math.min(60, mod(D, save, 'fuel')) / 100) * 10) / 10;   // #060 Navigator at work: less fuel

@@ -14,12 +14,13 @@ import { el } from '../ui.js';
 import { hints, NavCursor, closeX, keyGlyph } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { techLock } from '../techtree.js';
-import { budgets, act, snapshot, restore, lift, place, fits, at as wsAt, toSpare, fromSpare, stow, buyWorkshop, sellWorkshop, buyContainer, sellContainer, buyPart, sellPart, mountPart, unmountPart, SLOT_NAMES as PART_SLOTS, stackOn, stackTop, blockAt, levelOf, attachAt, detach, moveContainer, shop, priceOf, sellPrice, wsDef, placesOf } from '../rig.js';
+import { budgets, act, snapshot, restore, lift, place, fits, at as wsAt, toSpare, fromSpare, stow, buyWorkshop, sellWorkshop, buyContainer, sellContainer, buyPart, sellPart, mountPart, unmountPart, SLOT_NAMES as PART_SLOTS, stackOn, stackTop, blockAt, levelOf, attachAt, detach, moveContainer, shop, priceOf, sellPrice, wsDef, placesOf , containerWeight } from '../rig.js';
 import { clockText } from '../save.js';
-import { workshopTexture, partView, socketRects, unitShape } from './camp.js';
+import { workshopTexture, partView, socketRects, unitShape, containerDef } from './camp.js';
 import { makeSfx } from './sfx.js';
 import { preview as synPreview, synergyText } from '../synergy.js';
 import { BuildDecor } from './build_decor.js';
+import { BuildResize } from './build_resize.js';
 
 const FN_COLORS = { storage: '#5c6b7a', cooling: '#4a7a9a', cell: '#5a4a4a', sleep: '#6a5a9a', chill: '#9a4a7a', drone: '#3a8a6a', warroom: '#7a6a3a', kitchen: '#a8642a', foodtruck: '#c0703a', craft: '#7a6235', engine: '#5a5a5a', power: '#a8862a' };
 const FN_NAMES = { storage: 'Lager', cooling: 'Kühlung', cell: 'Zelle', sleep: 'Schlafen', chill: 'Chillen', drone: 'Drohnen', warroom: 'Planung', kitchen: 'Kochen', foodtruck: 'Verkauf', craft: 'Herstellen', engine: 'Motor', power: 'Energie' };
@@ -37,7 +38,8 @@ export class BuildMode {
     root.append(this.el);
     document.addEventListener('keydown', e => {
       if (!this.active) return;
-      if (e.key === 'Escape') { if (this.decorHold) this.dropDecorToSpare(); else if (this.drag) this.cancelDrag(); else if (this.shopOpen) { this.shopOpen = false; this.draw(); } else this.close(); e.preventDefault(); e.stopPropagation(); }
+      if (e.key === 'Escape' && this.resizing) { this.endResize(); e.preventDefault(); e.stopPropagation(); }
+      else if (e.key === 'Escape') { if (this.decorHold) this.dropDecorToSpare(); else if (this.drag) this.cancelDrag(); else if (this.shopOpen) { this.shopOpen = false; this.draw(); } else this.close(); e.preventDefault(); e.stopPropagation(); }
       else if ((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey)) { this.undoLast(); e.preventDefault(); e.stopPropagation(); }
       else if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey && this.cycleDecor(e.shiftKey ? -1 : 1)) { e.preventDefault(); e.stopPropagation(); }   // #111 Variante wählen
       else if (['e', 'E', 'Tab', 'i', 'I'].includes(e.key)) { e.preventDefault(); e.stopPropagation(); }
@@ -107,6 +109,7 @@ export class BuildMode {
   close() {
     if (!this.active) return;
     if (this.decorHold) this.dropDecorToSpare();   // a piece in hand goes into the Lager instead of vanishing
+    if (this.resizing) this.endResize();   // #113
     const s = this.scene, cam = s.cam, back = this.camBack;
     if (s.drone) s.drone.build = null;
     if (this.atFire && s.leyla.state === 'sit' && s.leyla.sit && !s.leyla.sit.up) s.leyla.sit.up = s.time.now;   // back to the player: she gets up
@@ -164,6 +167,12 @@ export class BuildMode {
       return;
     }
     this.shopCur?.hide();
+    if (this.resizing?.pad) {   // #113 pulling a container with the pad: ← longer, → shorter, A / B done
+      if (u.pressed('left')) this.resizeStep(1);
+      if (u.pressed('right')) this.resizeStep(-1);
+      if (u.pressed('ok') || u.pressed('back')) this.endResize();
+      return;
+    }
     for (const [d, dx, dy] of [['left', -1, 0], ['right', 1, 0], ['up', 0, -1], ['down', 0, 1]]) {
       if (u.pressed(d)) { this.rep = { d, at: now + 360 }; this.hop(dx, dy); }
       else if (u.down(d) && this.rep?.d === d && now > this.rep.at) { this.rep.at = now + 150; this.hop(dx, dy); }
@@ -244,6 +253,7 @@ export class BuildMode {
     for (const sl of this.slots()) if (wsAt(D, this.save.rig, sl.ui, sl.p)) add(...mid(sl));
     for (const u of camp.geo.units) if (u.ui > 0) add((u.in0 + u.in0 + u.cell * u.places) / 2, u.inTop - 20);
     for (const so of this.sockets()) if (so.id) add(so.cx, so.cy);
+    for (const q of this.resizeGrips()) add(q.x, (q.y0 + q.y1) / 2);   // #113
     for (const a of camp.anchors?.() || []) add(a.x, a.y);
     (this.save.rig.lights || []).forEach((_, i) => { const w = camp.wire?.(i); if (w) add(w.mid.x, w.mid.y); });
     if (dl) add(...mid(dl));
@@ -300,6 +310,7 @@ export class BuildMode {
     const hit = this.pick(w.x, w.y);
     if (!hit) { this.sfx.nope?.(); this.buzz('edge'); return this.say('Hier ist nichts zum Packen', 'idle'); }
     if (hit.kind === 'dealer') { this.shopOpen = true; return this.draw(); }
+    if (hit.kind === 'resize') return this.startResize(hit, w, true);   // #113
     this.startDrag(hit, w);
     this.buzz('lift');
   }
@@ -539,7 +550,7 @@ export class BuildMode {
   // The top container of a stack may also move to another slot of its own stack (own: true).
   stacks(d = this.drag) {
     const D = this.D, U = this.save.rig.units, geo = this.camp.geo, out = [];
-    const def = D.containers?.[d?.id], p = def?.places || 1, sh = def ? unitShape(D, def, 0, this.scene.T, { stacked: true }) : null;
+    const def = D.containers?.[d?.id] ? containerDef(D, d.from === 'rig' ? this.save.rig.units[d.ui] || { id: d.id } : { id: d.id }) : null, p = def?.places || 1, sh = def ? unitShape(D, def, 0, this.scene.T, { stacked: true }) : null;   // #113 own length
     const spots = (onto, below, extra = {}) => {
       const wB = below.cell * below.places, wT = sh ? sh.cell * sh.places : wB, n = below.places - p;
       if (n <= 0 || !def) return [{ onto, x: below.in0 + wB / 2, y: below.deckY, w: Math.min(wB, wT), ...extra }];   // nothing in the hand: one spot per stack
@@ -568,6 +579,7 @@ export class BuildMode {
       for (let i = 0; i < (this.save.rig.lights || []).length; i++) { const w = camp.wire(i); if (w && Math.hypot(x - w.mid.x, y - w.mid.y) < R) return { kind: 'lights', i, item: box(w.mid) }; }
     }
     { const dh = this.pickDecor(x, y); if (dh) return dh; }
+    { const gh = this.pickGrip(x, y); if (gh) return gh; }   // #113 the grip at a container's rear end
     for (const it of camp.yardItems || []) if (inside(it)) return { kind: it.kind === 'ws' ? 'ws' : it.kind === 'part' ? 'part' : 'container', from: 'yard', i: it.i, id: it.id, item: it };
     for (const so of this.sockets()) if (so.id && inside(so)) return { kind: 'part', from: 'socket', slot: so.slot, si: so.i, id: so.id, sock: so };
     for (const sl of this.slots()) {
@@ -600,7 +612,8 @@ export class BuildMode {
     // the button came up where the game could not see it (outside the window): nothing happens, the part flies back
     // (Daniel, 08.11.2026: "bleibt man im drop-to-Händler-Modus hängen")
     if (this.drag && p.event && 'buttons' in p.event && !(p.event.buttons & 1)) { this.press = null; return this.flyBack('Losgelassen außerhalb: zurück an seinen Platz'); }
-    if (this.press && !this.drag && Math.hypot(p.x - this.press.sx, p.y - this.press.sy) > 6) this.startDrag(this.press.hit, w);
+    if (this.resizing) return this.resizeMove(w);   // #113
+    if (this.press && !this.drag && Math.hypot(p.x - this.press.sx, p.y - this.press.sy) > 6) { if (this.press.hit.kind === 'resize') { this.startResize(this.press.hit, { x: this.press.x, y: this.press.y }); return this.resizeMove(w); } this.startDrag(this.press.hit, w); }
     if (this.drag) { this.drag.x = w.x; this.drag.y = w.y; }
     if (this.wire) { this.wire.x = w.x; this.wire.y = w.y; }
   }
@@ -608,8 +621,10 @@ export class BuildMode {
     if (!this.active) return;
     const w = this.world(p), press = this.press;
     this.press = null;
+    if (this.resizing) return this.endResize();   // #113
     if (this.decorHold) return this.placeDecor(w);
     if (press?.hit?.kind === 'decor') return this.liftDecor(press.hit.i);
+    if (press?.hit?.kind === 'resize') return this.say('Am Griff ziehen: nach links länger, nach rechts kürzer', 'idle');
     if (this.drag) { this.drag.x = w.x; this.drag.y = w.y; return this.drop(); }
     if (this.wire) return this.finishWire(w);
     if (press?.hit?.kind === 'anchor') return this.startDrag(press.hit, w);   // click, click: from here … to there
@@ -624,7 +639,8 @@ export class BuildMode {
     if (h.kind === 'decor') return `${D.decor?.[h.id]?.name || h.id} · anklicken zum Umsetzen (Esc: ins Lager)`;
     if (h.kind === 'ws') { const d = wsDef(D, h.id), p = d.power || 0; return `${d.name || h.id} · ${FN_NAMES[d.function] || ''} · ${d.places || 1} ${d.places > 1 ? 'Plätze' : 'Platz'}${p ? ` · ${p > 0 ? '+' : ''}${p} ⚡` : ''} · ziehen zum Umstellen`; }
     if (h.kind === 'part') { const t = D.rigParts?.[h.id] || {}; return `${t.name || h.id} · ${PART_SLOTS[t.slot] || t.slot}${this.partFacts(t)} · ziehen ${h.from === 'yard' ? 'an den Van' : 'zum Ausbauen'}`; }
-    if (h.kind === 'container') { const d = D.containers?.[h.id] || {}; return `${d.name || h.id} · ${d.places || 1} Plätze · ${de(d.weight || 0)} kg · ziehen zum Umhängen`; }
+    if (h.kind === 'resize') return 'Griff: ziehen = Container länger oder kürzer (ohne Aufpreis)';
+    if (h.kind === 'container') { const d = D.containers?.[h.id] || {}, u = this.save.rig.units[h.ui] || { id: h.id }, n = placesOf(D, u); return `${d.name || h.id} · ${n} ${n === 1 ? 'Platz' : 'Plätze'} · ${de(containerWeight(D, u))} kg · ziehen zum Umhängen${d.resize ? ' · am Griff hinten länger/kürzer' : ''}`; }
     return 'Händler: hier abstellen = verkaufen, anklicken = Katalog';
   }
 
@@ -990,6 +1006,7 @@ export class BuildMode {
       }
     }
     this.drawDecorHold(g, label, z, pulse);   // #036
+    this.drawResizeGrips(g, label, z, pulse);   // #113
     // the sockets for rig parts on the van: empty = dashed frame with the slot's name, built in = the part
     const pslot = d?.kind === 'part' ? D.rigParts?.[d.id]?.slot : null, tt = d ? this.target() : null;
     for (const so of this.sockets()) {
@@ -1141,3 +1158,4 @@ export class BuildMode {
 
 // #036 decoration in build mode
 for (const k of Object.getOwnPropertyNames(BuildDecor.prototype)) if (k !== 'constructor') Object.defineProperty(BuildMode.prototype, k, Object.getOwnPropertyDescriptor(BuildDecor.prototype, k));
+for (const k of Object.getOwnPropertyNames(BuildResize.prototype)) if (k !== 'constructor') Object.defineProperty(BuildMode.prototype, k, Object.getOwnPropertyDescriptor(BuildResize.prototype, k));   // #113
