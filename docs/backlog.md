@@ -90,7 +90,6 @@ Neue Systeme, die daraus wachsen könnten:
 - **Logbuch als Chronik:** Leyla kommentiert Einträge; am Ende eines Durchgangs ein Comic-Rückblick mit der Intro-Engine.
 - **Märkte:** Angebot und Preise je Ort, der Influencer verschiebt die Nachfrage, der Foodtruck verkauft im Revier-Camp.
 - **Companions reden über die Welt:** Sprüche nach Merkern, Crew und Wetter (dieselbe Bedingungs-Sprache).
-- **Werte-Bildschirm:** Leylas Ausrüstung und der Tank auch über den Boni-Bus, ein Bildschirm mit allen Quellen.
 
 ## Erledigt bei der Durchsicht (16.11.2026, Daniel: „keine unsichtbaren technischen Schulden … nichts kaputt machen“)
 

@@ -29,6 +29,7 @@ import { Van } from './van.js';
 import { DriveUI } from './drive_ui.js';
 import { Backdrop } from './backdrop.js';
 import { RadioUI } from './radio_ui.js';
+import { StatsUI } from './stats_ui.js';
 import { Camp, campLayout, daytimeAt, drawCampBackground, drawCampGround, travelCost } from './camp.js';
 import { raining, rainConfig } from '../rain.js';
 import { applyMods, droneBonuses } from '../stations.js';
@@ -57,7 +58,7 @@ const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'], hangOne: ['ha
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
   jump: ['SPACE'], walk: ['SHIFT'], dash: ['L', 'C'], melee: ['J', 'Y'], ranged: ['K', 'X'], grab: ['E'],
-  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], uiOk: ['ENTER'], uiSend: ['F'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'], build: ['B'], holster: ['Q'], swap: ['V'], radio: ['N'],
+  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], uiOk: ['ENTER'], uiSend: ['F'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'], build: ['B'], holster: ['Q'], swap: ['V'], radio: ['N'], stats: ['U'],
 };
 
 export class PlayScene extends Phaser.Scene {
@@ -478,6 +479,7 @@ export class PlayScene extends Phaser.Scene {
     // the field guide (#011, game/play/tutorial.js): a card the first time, Menü › Feldhandbuch
     hud.tut ??= new Tutorial(hud.root, { scene: () => hud.scene, hud });
     hud.ach ??= new AchievementsUI(hud.root, { scene: () => hud.scene });   // Menü › Achievements (#012)
+    hud.stats ??= new StatsUI(hud.root, { scene: () => hud.scene });   // #091 Werte-Bildschirm
     hud.sum ??= new SummaryUI(hud.root, { scene: () => hud.scene, go: next => hud.scene.goNext?.(next) });   // Beute-Bilanz (#017)
     hud.quests ??= new QuestLogUI(hud.root, { scene: () => hud.scene, toast: (t, sub, kind) => hud.toast(t, sub, kind), changed: () => { hud.campKey = null; hud.goalAt = 0; hud.scene.camp?.questMarks?.(); } });   // Questlog (#016)
     // the travel map (#007, game/play/map_ui.js): warroom and van door
@@ -711,6 +713,7 @@ export class PlayScene extends Phaser.Scene {
     if (hud.megaBuild?.isOpen) { hud.megaBuild.nav(u); eat(); input.help.pressed = false; return; }   // build plan aboard (#029)
     if (hud.drive?.isOpen && !hud.modal) { hud.drive.nav(u); eat(); input.help.pressed = false; return; }   // the drive (#053); its incident's window is a menu
     if (hud.quests?.isOpen) { hud.quests.nav(u); eat(); input.help.pressed = false; return; }   // Questlog (#016)
+    if (hud.stats?.isOpen) { hud.stats.nav(u); eat(); input.help.pressed = false; return; }   // #091
     if (hud.ach?.isOpen) { hud.ach.nav(u); eat(); input.help.pressed = false; return; }   // Menü › Achievements (#012)   // the field guide card / archive (#011)
     if (hud.paused && !hud.modal) { if (u.pressed('ok') || u.pressed('back')) { hud.toggleHelp(false); eat(); input.help.pressed = false; } return; }
     if (hud.modal) {
@@ -765,6 +768,7 @@ export class PlayScene extends Phaser.Scene {
     if (input.controls?.pressed && !this.hud.modal) this.hud.toggleHelp();
     if (input.mute.pressed) this.toggleMute();
     if (input.radio?.pressed && !this.hud.modal) this.hud.radio?.next();   // #090
+    if (input.stats?.pressed && this.box && !this.hud.modal && !this.hud.paused && !this.hud.stats?.isOpen && !this.hud.drive?.isOpen && !this.hud.build?.active) { this.hud.inv?.isOpen && this.hud.inv.close(); this.hud.stats?.open(); }   // #091
     if (input.debug.pressed) { const w = this.physics.world; w.drawDebug = !w.drawDebug; if (!w.debugGraphic) w.createDebugGraphic(); w.debugGraphic.clear().setVisible(w.drawDebug); }
     if (input.restart.pressed && this.mode === 'test' && this.level) this.restartAs({});   // doors, chests, walls: fresh room
     else if (input.restart.pressed && this.mode !== 'camp' && !this.level) this.restartRoom();
@@ -775,7 +779,7 @@ export class PlayScene extends Phaser.Scene {
     // every window pauses the game (Daniel, 12.11.2026: „Fenster pausieren immer, auch im Run“): menus, controls, cooking and the inventory
     let invDone = false;
     if (this.hud.inv?.isOpen && !this.hud.paused && !this.hud.modal && !this.leaving) { this.inventoryUpdate(input); invDone = true; }
-    if (this.hud.tut?.isOpen || this.hud.ach?.isOpen || this.hud.quests?.isOpen || this.hud.megaBuild?.isOpen || this.hud.sum?.isOpen || this.hud.duel?.isOpen || this.hud.drive?.isOpen || this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
+    if (this.hud.tut?.isOpen || this.hud.ach?.isOpen || this.hud.stats?.isOpen || this.hud.quests?.isOpen || this.hud.megaBuild?.isOpen || this.hud.sum?.isOpen || this.hud.duel?.isOpen || this.hud.drive?.isOpen || this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
       // cooking, crafting, a menu: the workshops keep glowing, steaming and sparking behind the window
       if (this.camp && !this.hud.paused && !this.leaving) { this.camp.benches?.update(time, Math.min(delta, 50)); this.camp.lid?.(Math.min(delta, 50)); }
       this.physics.world.pause(); this.hud.update(this, time); return;

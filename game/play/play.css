@@ -1100,3 +1100,23 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .radio-chip.on svg { color: #20d6c7; }
 .radio-chip.talk { max-width: min(680px, calc(100vw - 40px)); border-color: #20d6c7; }
 .radio-chip.talk span { white-space: normal; color: #f2eef7; text-align: left; }
+
+/* #091 Werte-Bildschirm */
+.stats-list { list-style: none; margin: 0; padding: 0 4px 0 0; display: grid; gap: 8px; overflow: auto; max-height: 62vh; }
+.stats-row { padding: 10px 12px; border-radius: 8px; background: #241b30; border: 1px solid #3a2f45; }
+.stats-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.stats-head b { color: #f2eef7; font-size: 15px; }
+.stats-total { font: 28px/1 VT323, monospace; color: #9cdb43; }
+.stats-row.bad .stats-total { color: #e86a73; }
+.stats-total.small { font-size: 16px; color: #8d7f9c; }
+.stats-parts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.stats-part { display: inline-flex; align-items: baseline; gap: 4px; padding: 3px 8px; border-radius: 999px; background: #1b1424; border: 1px solid #3a2f45; color: #c8bcd6; font-size: 13px; }
+.stats-part small { color: #8d7f9c; font-size: 11px; text-transform: uppercase; }
+.stats-part b { color: #9cdb43; font-weight: 600; }
+.stats-part.neg b { color: #e86a73; }
+.stats-row.fx small { color: #b9a9c9; }
+.stats-row.fx.bad { border-color: #6b2f3a; }
+.stats-empty { color: #8d7f9c; }
+.stats-intro { margin: 0 0 8px; color: #8d7f9c; font-size: 13px; }
+.stats-box header { padding-right: 48px; }
+.stats-box header .tut-tabs { margin-left: auto; }

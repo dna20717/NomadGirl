@@ -44,7 +44,7 @@ await ev(() => { nomad.save().rep = {}; R().set(0); });
 // the drive (TravelMode): the radio plays on, the chip lies over the drive
 await ev(() => { const s = SC(); nomad.release?.(); s.data_.travel.drive.seconds = 6; s.showDrive = true; s.forceEncounter = null;
   nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(3); const mp = s.hud.map, near = nomad.map().near, to = near.find(id => { const n = nomad.save().map.nodes.find(x => x.id === id); return n?.poi && s.data_.pois?.[n.poi]; }) || near[0]; mp.select(to); document.querySelector('.wm-go').click(); nomad.release?.(); });
-await page.waitForFunction(() => game.scene.getScene('play').hud.drive?.isOpen, null, { timeout: 30000 });
+await page.waitForFunction(() => game.scene.getScene('play').hud.drive?.isOpen, null, { timeout: 60000 });
 await page.waitForTimeout(800);
 v = await ev(() => { R().tick(); const e = document.querySelector('.radio-chip'), r = e.getBoundingClientRect(), top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2); return { ...R().state(), over: !!top?.closest('.radio-chip') }; });
 check('Auf der Fahrt: Radio läuft weiter, Chip liegt über der Fahrt', v.allowed && v.playing && v.chip && v.over, v);

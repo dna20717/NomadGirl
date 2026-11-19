@@ -37,6 +37,14 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: **#087–#091 fertig** (Daniel: „#087–#091 Systeme bauen“, PixelLab später). Stand `main`, `npm test` 312/312, Browser-Tests der berührten Bereiche grün:
+  - **#087 Wettervorhersage:** Navigator-Zeile in der Reisekarte (mit Warroom), je Etappe Sandsturm/Nebel/Regen/klar, am eigenen Ort Regen der nächsten 3 Tage; stimmt exakt (gleiche Würfel wie die Fahrt).
+  - **#088 Gangs als Auftraggeber:** 7 Aufträge für 6 Gangs, annehmen/abgeben im Revier beim Reden (ab Geduldet), Lohn Δ + Ruf.
+  - **#089 Revierkrieg:** Rivalen je Gang, 50 % Gegenruf, Übernahme nach Gewalt-Run mit Tresor, Fronten auf der Karte, Fehden nehmen echte Rivalen.
+  - **#090 Rig-Radio:** 4 Sender mit Musik aus Code, DJ mit Werbung/Wetter/Front/Gerüchten/Lore, N und Pause-Menü, Saint FM als Feind gestört.
+  - **#091 Werte-Bildschirm:** U, vier Reiter, jede Zahl mit Quellen.
+  - Nebenbei behoben: `pretty()` (Kommas in Texten), Ton aus sofort erkannt, „null“ in der Fahrt.
+  - **Offen für Daniel:** ⚠️-Punkte in #087–#091 absegnen; weiter offen #080 (Dunkelheit, erst reden), #084 (PixelLab), #086 (Story-Enden), Balancing v1.
 - 19.11. Code → Ava: #090 **Rig-Radio** fertig (4 Sender, Musik aus Code, DJ mit Werbung/Wetter/Front/Gerüchten, N). #091 Werte-Bildschirm läuft.
 - 19.11. Code → Ava: #089 **Revierkrieg** fertig (Rivalen, Gegenruf, Übernahmen nach Gewalt-Runs, Fronten auf der Karte). #090 Rig-Radio läuft.
 - 19.11. Ava (Chat mit Daniel) → Code: **NomadPixel** ist installiert (`/pixel`, Skill `.claude/skills/nomadpixel/`, Stilbibel `.claude/nomadpixel-stil.json`) und die Werkstatt hat den Bereich **Pixel-Aufträge** (`pixelOrders`). Kleine Grafiken (Symbole bis ~64 px) künftig damit statt PixelLab, große Figuren weiter PixelLab; `/pixel Aufträge` arbeitet offene Aufträge ab. Wissen: `docs/features/art.md` › NomadPixel.
@@ -355,10 +363,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Rig-Radio: Sender, Musik aus Code, DJ-Durchsagen (#090)“. `test/radio.test.js` 4/4, `npm test` 309/309, `tools/radio_test.mjs` 11/11, drive/camp/workshop/pad/menu_nav grün. Nebenbei behoben: `pretty()` machte aus „104,2“ „104, 2“ (Kommas in Texten), Ton aus wurde verspätet erkannt, die Fahrt zeigte oben links „null“. PixelLab 0. **Bitte testen:** im Camp N drücken, durch die Sender schalten, einen DJ reden lassen (nach dem ersten Song), dann losfahren und weiterhören.
 
 ### #091 Werte-Bildschirm
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code
 - **Auftrag:** Ein Bildschirm mit allen Werten und ihren Quellen über den Boni-Bus (baut auf #076 Punkt 7).
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: Taste U (frei), dazu Pause-Menü; Leylas Grundwerte stehen nicht dabei, nur die Boni darauf; Ausbau/Synergie bleiben an der Werkstatt (gelten je Platz); Buffs im Camp als „nächster Run“.
+- **Ergebnis:** (Code) Commit „Werte-Bildschirm: jede Zahl mit ihren Quellen (#091)“. `test/stat_sheet.test.js` 3/3, `npm test` 312/312, `tools/stats_test.mjs` 6/6, pad/menu_nav/radio/workshop/inventory grün. PixelLab 0. **Bitte testen:** im Camp U drücken, Ausrüstung anziehen und wieder schauen, mit Q durch die Reiter.
 
 ### #062 Quests aus Straßen-Merkern
 - **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
