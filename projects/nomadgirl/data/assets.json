@@ -5795,7 +5795,7 @@
   "kind": "icons",
   "file": "assets/tiles/factory/props.png",
   "cell": [64, 64],
-  "grid": [8, 3],
+  "grid": [8, 5],
   "names": [
    "factory_0",
    "factory_1",
@@ -5820,10 +5820,27 @@
    "decal_factory_2",
    "decal_factory_3",
    "",
-   ""
+   "",
+   "industry3_0",
+   "industry3_1",
+   "industry3_2",
+   "industry3_3",
+   "industry3_4",
+   "industry3_5",
+   "industry3_6",
+   "industry3_7",
+   "industry3_8",
+   "industry3_9",
+   "industry3_10",
+   "industry3_11",
+   "industry3_12",
+   "industry3_13",
+   "industry3_14",
+   "industry3_15"
   ],
-  "description": "Clutter streng von der Seite, auf der Unterkante: Ölfass, Rohr mit Handrad, Förderband, Schaltkasten, Gasflaschen, Zahnrad im Bock, Werkzeugwagen, Raupenkettenglieder, Säcke auf Palette, Feuerlöscher, Kanister, Warnlampe. Einschlüsse (detail_factory_*): Lüftungsgitter, Rohr, Typenschild, zugemauertes Fenster, Kabelkanal, Riss. Decals (decal_factory_*): Ruß, Crude-Boys-Zeichen, Pfeil, Öl.",
+  "description": "Clutter streng von der Seite, auf der Unterkante. Zeilen 1–2: eigene Fabrik-Objekte (factory_0–11: Ölfass, Rohr mit Handrad, Förderband, Schaltkasten, Gasflaschen, Zahnrad, Werkzeugwagen, Raupenkettenglieder, Säcke, Feuerlöscher, Kanister, Warnlampe), Einschlüsse (detail_factory_*: Lüftungsgitter, Rohr, Typenschild, zugemauertes Fenster, Kabelkanal, Riss), Decals (decal_factory_*: Ruß, Crude-Boys-Zeichen, Pfeil, Öl). Zeilen 4–5: Kopie der gemalten Industrie-Objekte aus TileSet00 (industry3_*), damit das Set sie verteilen kann (Daniel: Kacheln + alter Clutter).",
   "source": "NomadPixel (Claude Code, Code-Pixel-Art, Palette AAP-64, Quelle source/factory_props.py)",
-  "date": "19.11.2026"
+  "date": "19.11.2026",
+  "derivedFrom": "tileset00_props"
  }
 }
