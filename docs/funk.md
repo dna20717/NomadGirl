@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: #072 **Tabellen als Karten** fertig (Ereignis-Baukasten und Begabungen lesbar, Suchfeld). #073 Datensets läuft.
 - 19.11. Code → Ava: Werkstatt-Runde angelegt: #072 Tabellen als Karten (läuft), #073 Datensets (Variante im Repo, aktiv in Hauptmenü + Werkstatt), #074 Verzahnungs-Ansichten, #075 Kleinkram. Befund: alle neuen Felder sind in der Werkstatt, aber breite Tabellen sind unbenutzbar und neue Zusammenhänge haben keine Ansicht.
 - 18.11. Code → Ava: #071 **Kleine Fehler** fertig. Damit ist das Eleganz-Paket #066–#071 komplett, jedes Ticket einzeln getestet (Unit + 47 Browser-Tests) und gepusht. Kreisläufe und Systemideen im Ideenspeicher.
 - 18.11. Code → Ava: #070 **Meldungs-Kanal + Logbuch** fertig (Hinweise warten, Warnungen nie, alles mit Uhrzeit im Logbuch). #071 läuft.
@@ -234,7 +235,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** –
 
 ### #073 Datensets: speichern unter, laden, aktivieren
-- **Status:** offen · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
 - **Für:** Code
 - **Lesen:** docs/features/editor.md, `game/workshop/`
 - **Auftrag (Daniel, 19.11.2026):** „Es wäre an der Zeit, Speichern und Laden von verschiedenen Konfigurationen zu erlauben … Im Hauptmenü würde dann unten in der Statusleiste angezeigt werden, welches Datenset gerade aktiv ist.“ Antworten: im Repo als **Variante** (nur geänderte Einträge, Overlay über dem Standard), aktiv wählbar in **Hauptmenü + Werkstatt** (pro Gerät). Reihenfolge (Daniel): erst A, dann Datensets, dann B und C; inkrementell.
@@ -242,12 +243,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** –
 
 ### #072 Werkstatt: breite Tabellen als Karten
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
 - **Für:** Code
 - **Lesen:** docs/features/editor.md, `game/workshop/`
 - **Auftrag (Daniel, 19.11.2026):** A: Tabellen mit vielen Spalten (Ereignis-Baukasten › Lagen/Antworten, Begabungen) zeigen eine Kurzzeile je Eintrag, ein Klick klappt ein Formular in Gruppen auf. Reihenfolge (Daniel): erst A, dann Datensets, dann B und C; inkrementell.
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: Grenze 8 Spalten; Gruppen nach dem Feldnamen (ohne Schema-Änderung); offene Karten bleiben beim Bearbeiten offen.
+- **Ergebnis:** (Code) Commit „Breite Tabellen als Karten (#072)“ auf `main`. `workshop.js` (`cardTable`, `cardGroup`), `workshop.css`. `workshop_test` (neu: Karten, Ändern, Rückgängig, Filter), `workshop_cloud_test`, `web:test`, `npm test` 269/269 grün. PixelLab 0. **Bitte ansehen:** Werkstatt › Ereignis-Baukasten, eine Lage aufklappen.
 
 ### #071 Kleine Fehler: Macken-Wirkung als Feld, Wetter-Gewichte in der Werkstatt, Welt-Merker
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 6)

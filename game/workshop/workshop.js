@@ -19,6 +19,16 @@ const secondsText = s => s % 60 ? `${s} s` : s === 60 ? '1 Minute' : `${s / 60} 
 const clockTime = () => new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 const PAIR = { size: ['B', 'H'], point: ['x', 'y'], range: ['min', 'max'] };
 
+// #072 tables with more columns than this become cards; the groups of a card by the column's key
+const CARD_COLUMNS = 8;
+function cardGroup(c) {
+  const k = c.key;
+  if (/^need|^needs$|^not$|^only$|^once$|^gang|^time$|^danger$|^weight$/.test(k) || (k === 'rep' && c.type === 'range')) return 'Wann und für wen';
+  if (/^(hours|fuel|food|deltas|health|use|useCount|item|count|loot|risk|failHealth|failHours|shop|price)$/.test(k)) return 'Kosten und Lohn';
+  if (/^(rep|repRival|flag|buff|reveal|brand|result|failResult|chain)$/.test(k)) return 'Folgen';
+  return 'Grundlage';
+}
+
 export class Workshop {
   constructor(root, basis) {
     this.root = root; this.basis = basis;
@@ -429,6 +439,7 @@ export class Workshop {
       return inp;
     };
     const blank = () => Object.fromEntries(f.columns.map(c => [c.key, c.type === 'number' ? (c.min ?? 1) : c.type === 'ref' ? (this.refOptions(c.area)[0]?.[0] ?? '') : '']));
+    if (f.columns.length > CARD_COLUMNS) return this.cardTable(a, f, rows, put, cell, blank);   // #072 wide tables: one card per row
     // pairs (points, sizes) need room for two numbers
     const style = f.columns.some(c => PAIR[c.type]) ? `grid-template-columns:${f.columns.map((c, i) => PAIR[c.type] ? 'minmax(150px, 2fr)' : i === 0 ? 'minmax(120px, 2fr)' : 'minmax(52px, 1fr)').join(' ')} 28px` : `--cols:${f.columns.length}`;
     return el('div', { class: 'ng-table' },
@@ -436,6 +447,42 @@ export class Workshop {
       ...rows.map((row, i) => el('div', { class: 'ng-trow', style }, ...f.columns.map(c => cell(c, row, i)),
         el('button', { class: 'ed-button small', title: 'Zeile entfernen', onclick: () => put(rows.filter((_, j) => j !== i)) }, icon('x', 12)))),
       el('button', { class: 'ed-button small ng-addRow', onclick: () => put([...rows, blank()]) }, icon('plus', 12), ' Zeile'));
+  }
+
+  // #072 Breite Tabellen als Karten (Daniel, 19.11.2026: „das Interface untersuchen und das gute Stück weiter polieren“): a table with many
+  // columns (Ereignis-Baukasten › Lagen/Antworten, Begabungen …) shows one short line per row; a click opens the row as a form in groups
+  // (Grundlage, Kosten & Lohn, Folgen, Bedingungen); a filter for long tables. The values and their editors are the table's own.
+  cardTable(a, f, rows, put, cell, blank) {
+    const key = `${a}:${f.key}`, open = (this.openCards ??= {})[key] ??= new Set(), q = (this.cardFilter ??= {})[key] || '';
+    const first = f.columns[0], titleCol = f.columns.find(c => ['name', 'label'].includes(c.key));
+    const shown = v => v == null || v === '' ? '' : Array.isArray(v) ? v.join('×') : typeof v === 'boolean' ? (v ? 'ja' : '') : String(v);
+    const brief = row => f.columns.filter(c => c !== first && c !== titleCol && c.type !== 'textarea' && shown(row[c.key]) && !/^(text|result|failResult)$/.test(c.key))
+      .slice(0, 5).map(c => `${c.label} ${c.type === 'ref' ? (this.p.data[c.area]?.[row[c.key]]?.name || row[c.key]) : c.type === 'select' ? optionLabel(c.options, row[c.key]) : shown(row[c.key]).slice(0, 24)}`).join(' · ');
+    const match = row => !q || f.columns.some(c => shown(row[c.key]).toLowerCase().includes(q.toLowerCase()));
+    const groups = row => {
+      const G = new Map();
+      for (const c of f.columns) { const g = cardGroup(c); if (!G.has(g)) G.set(g, []); G.get(g).push(c); }
+      return [...G].map(([g, cs]) => el('div', { class: 'ng-cardGroup' }, el('h5', {}, g), el('div', { class: 'ng-cardGrid' },
+        ...cs.map(c => el('label', { class: 'ng-cardField' + (c.type === 'text' && /text|result|label|name|answers|moods|figures/.test(c.key) ? ' wide' : ''), title: c.hint || '' }, el('span', {}, c.label, c.hint ? el('i', { class: 'ng-hintMark' }, ' ⓘ') : null), cell(c, row, rows.indexOf(row)))))));
+    };
+    const filter = el('input', { class: 'ed-field ng-cardFilter', placeholder: `Suchen in ${rows.length} Zeilen …`, value: q });
+    filter.addEventListener('input', () => { this.cardFilter[key] = filter.value; const pos = filter.selectionStart; this.draw(); const n = document.querySelector(`.ng-cardFilter[data-key="${CSS.escape(key)}"]`); if (n) { n.focus(); n.setSelectionRange(pos, pos); } });
+    filter.dataset.key = key;
+    const list = rows.map((row, i) => [row, i]).filter(([row]) => match(row));
+    return el('div', { class: 'ng-rowcards' },
+      rows.length > 6 ? filter : null,
+      ...list.map(([row, i]) => {
+        const isOpen = open.has(i), toggle = () => { if (isOpen) open.delete(i); else open.add(i); this.draw(); };
+        return el('div', { class: 'ng-rowcard' + (isOpen ? ' open' : '') },
+          el('div', { class: 'ng-cardHead', onclick: toggle },
+            el('span', { class: 'ng-cardChevron' }, icon(isOpen ? 'down' : 'right', 14)),
+            el('b', {}, shown(row[first.key]) || `Zeile ${i + 1}`), titleCol && row[titleCol.key] ? el('span', { class: 'ng-cardTitle' }, shown(row[titleCol.key]).split('|')[0]) : null,
+            el('small', {}, brief(row)), el('span', { class: 'da-grow' }),
+            el('button', { class: 'ed-button small', title: 'Zeile entfernen', onclick: e => { e.stopPropagation(); open.clear(); put(rows.filter((_, j) => j !== i)); } }, icon('x', 12))),
+          isOpen ? el('div', { class: 'ng-cardBody' }, ...groups(row)) : null);
+      }),
+      q && !list.length ? el('p', { class: 'ed-small' }, 'Keine Zeile passt.') : null,
+      el('button', { class: 'ed-button small ng-addRow', onclick: () => { open.add(rows.length); put([...rows, blank()]); } }, icon('plus', 12), ' Zeile'));
   }
 
   // ---------- shared building blocks (as in the Tactics workshop) ----------

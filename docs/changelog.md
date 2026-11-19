@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Werkstatt: breite Tabellen als Karten** (#072): Lagen, Antworten und Begabungen zeigen je Zeile eine Karte mit Kurzzeile, aufgeklappt ein Formular in Gruppen, dazu ein Suchfeld.
 - 18.11.2026: **Kleine Fehler** (#071): Macken wirken über ein eigenes Datenfeld, Wetter-Gewichte stehen in der Werkstatt, Welt-Merker haben einen Zugang; Ideenspeicher um Kreisläufe und neue Systeme ergänzt.
 - 18.11.2026: **Meldungs-Kanal und Logbuch** (#070): höchstens drei Meldungen auf einmal, Hinweise warten, Warnungen nie; alle Meldungen mit Uhrzeit im Logbuch (Menü).
 - 18.11.2026: **Preise bündeln** (#069): Ruf, Stimmung, Gefahr und Influencer in einer Preis-Funktion; Straße und Revier-Handel rechnen gleich.

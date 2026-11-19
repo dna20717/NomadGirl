@@ -85,6 +85,22 @@ if (!(await page.locator('.da-entry .ng-thumb canvas, .da-entry .ng-thumb img').
 await go({ area: 'assets', choice: 'icons_gear' });
 await page.waitForSelector('.ng-icons .ng-icon', { timeout: 5000 }).catch(() => errors.push('Symbol-Raster in der Asset-Vorschau fehlt'));
 
+// #072 wide tables as cards: Ereignis-Baukasten › Lagen shows one line per row, a click opens the form, edits work, the filter narrows
+await go({ area: 'roadEvents' });
+const cards = await page.evaluate(() => ({ cards: document.querySelectorAll('.ng-rowcard').length, rows: document.querySelectorAll('.ng-table .ng-trow').length }));
+if (cards.cards < 20) errors.push(`Breite Tabellen nicht als Karten: ${JSON.stringify(cards)}`);
+await page.locator('.ng-rowcard .ng-cardHead').first().click();
+const w0 = await page.evaluate(() => window.workshop.p.data.roadEvents.situations[0].weight);
+await page.evaluate(() => { const inp = [...document.querySelectorAll('.ng-rowcard.open .ng-cardField')].find(l => l.textContent.startsWith('Gewicht')).querySelector('input'); inp.value = '7'; inp.dispatchEvent(new Event('change')); });
+if (await page.evaluate(() => window.workshop.p.data.roadEvents.situations[0].weight) !== 7) errors.push('Karte: Feld ändert den Wert nicht');
+if (!(await page.locator('.ng-rowcard.open').count())) errors.push('Karte klappt nach dem Ändern wieder zu');
+await page.keyboard.press('Control+z');
+if (await page.evaluate(() => window.workshop.p.data.roadEvents.situations[0].weight) !== w0) errors.push('Karte: Rückgängig geht nicht');
+await page.locator('.ng-cardFilter').first().fill('silo');
+const filtered = await page.evaluate(() => document.querySelectorAll('.ng-rowcards')[0].querySelectorAll('.ng-rowcard').length);
+if (!(filtered >= 3 && filtered <= 6)) errors.push(`Filter „silo“ zeigt ${filtered} Lagen`);
+await shot('cards');
+
 await browser.close();
 if (errors.length) { console.error('Fehler:\n' + errors.join('\n')); process.exit(1); }
 console.log(`Werkstatt ok: ${Object.keys(AREAS).length} Bereiche gezeichnet, Bearbeiten + Rückgängig gehen.`);

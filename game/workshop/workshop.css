@@ -146,3 +146,24 @@ body.ng { background: var(--ui-bg); color: var(--ui-text); font-family: var(--ui
 .ng-icons.pick .ng-icon { cursor: pointer; }
 .ng-icons.pick .ng-icon:hover { border-color: var(--ui-border-strong); background: color-mix(in srgb, var(--ui-acc) 8%, transparent); }
 .ng-icons .ng-icon.picked { border: 2px solid var(--ui-acc); background: color-mix(in srgb, var(--ui-acc) 14%, transparent); }
+/* #072 wide tables as cards */
+.ng-rowcards { display: flex; flex-direction: column; gap: 6px; }
+.ng-cardFilter { max-width: 320px; margin-bottom: 4px; }
+.ng-rowcard { border: 1px solid var(--ui-border); border-radius: 8px; background: var(--ui-panel); }
+.ng-rowcard.open { border-color: var(--ui-acc-line); }
+.ng-cardHead { display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer; min-width: 0; }
+.ng-cardHead b { white-space: nowrap; }
+.ng-cardTitle { color: var(--ui-text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 30%; }
+.ng-cardHead small { color: var(--ui-text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 auto; }
+.ng-cardHead .da-grow { flex: 0 0 auto; }
+.ng-cardChevron { display: inline-flex; color: var(--ui-text3); }
+.ng-cardBody { padding: 4px 12px 12px; display: flex; flex-direction: column; gap: 10px; }
+.ng-cardGroup h5 { margin: 6px 0; font-size: var(--ui-gr-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--ui-text3); }
+.ng-cardGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px 12px; }
+.ng-cardField { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.ng-cardField.wide { grid-column: 1 / -1; }
+.ng-cardField > span { font-size: var(--ui-gr-xs); color: var(--ui-text2); }
+.ng-cardField .ed-field { width: 100%; }
+.ng-cardGrid { align-items: start; }
+.ng-cardField > :last-child { flex: 0 0 auto; align-self: stretch; }
+.ng-cardField input.ed-field.small { height: auto; }
