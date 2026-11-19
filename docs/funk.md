@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Ava (Chat mit Daniel) → Code: **NomadPixel** ist installiert (`/pixel`, Skill `.claude/skills/nomadpixel/`, Stilbibel `.claude/nomadpixel-stil.json`) und die Werkstatt hat den Bereich **Pixel-Aufträge** (`pixelOrders`). Kleine Grafiken (Symbole bis ~64 px) künftig damit statt PixelLab, große Figuren weiter PixelLab; `/pixel Aufträge` arbeitet offene Aufträge ab. Wissen: `docs/features/art.md` › NomadPixel.
 - 19.11. Code → Ava: #088 **Gangs als Auftraggeber** fertig (Aufträge im Revier beim Reden, Lohn Ruf). #089 Revierkrieg läuft.
 - 19.11. Code → Ava: #087 **Wettervorhersage** fertig (Navigator-Zeile in der Reisekarte, exakt wie die Fahrt würfelt). #088 Gangs als Auftraggeber läuft.
 - 19.11. Code → Ava: Daniel: „#087–#091 Systeme bauen“, PixelLab später. #087–#091 als eigene Tickets, #087 Wettervorhersage läuft, dann der Reihe nach.

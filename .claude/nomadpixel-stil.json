@@ -20,5 +20,16 @@
     "Neue Symbole bevorzugt in freie Felder bestehender Raster oder als neues 8 × 8-Raster in assets/items/; Eintrag in data/assets.json (names!), Verweis per look + icon an den Gegenständen.",
     "Herkunft als Zeile in docs/assets.md: KI (NomadPixel, Claude Code, Text-Pixel-Art, AAP-64, .pix-Quelle).",
     "Danach node tools/ng.js check und npm test; Arbeitsdateien nach output/nomadpixel/ (ignoriert)."
-  ]
+  ],
+  "auftraege": {
+    "bereich": "pixelOrders",
+    "datei": "projects/nomadgirl/data/pixel_orders.json",
+    "status": {
+      "offen": "open",
+      "inArbeit": "working",
+      "fertig": "done",
+      "rueckfrage": "question"
+    },
+    "schreiben": "node tools/ng.js set pixelOrders <id> <feld> '<json>'"
+  }
 }

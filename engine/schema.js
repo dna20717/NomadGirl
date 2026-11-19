@@ -96,6 +96,8 @@ const CREW_NEEDS = () => [ref('needCompanion', 'Braucht: Companion', 'companions
 export const POI_KINDS = [['gasStation', 'Tankstelle'], ['settlement', 'Siedlung'], ['factory', 'Fabrik'], ['bunker', 'Bunker'], ['government', 'Regierungskomplex'], ['mall', 'Einkaufszentrum'], ['ruin', 'Ruine'], ['highrise', 'Hochhaus'], ['underground', 'Untergrund']];
 export const POI_SIZES = [['S', 'S'], ['M', 'M'], ['L', 'L'], ['XL', 'XL'], ['XXL', 'XXL']];
 export const ROOM_TAGS = [['start', 'Eingang'], ['exit', 'Ausgang'], ['combat', 'Kampf'], ['loot', 'Beute'], ['secret', 'Geheimnis'], ['npc', 'NPCs'], ['boss', 'Boss'], ['corridor', 'Gang']];
+export const PIXEL_TYPES = [['icons', 'Symbole (Raster)'], ['image', 'Einzelbild / Objekt'], ['tiles', 'Kacheln'], ['animation', 'Animation'], ['photo', 'Foto → Pixel'], ['edit', 'Überarbeiten']];
+export const PIXEL_STATUS = [['open', 'Offen'], ['working', 'In Arbeit'], ['done', 'Fertig'], ['question', 'Rückfrage']];
 export const ASSET_KINDS = [['animation', 'Animation'], ['tiles', 'Kacheln'], ['image', 'Bild'], ['video', 'Clip (Video)'], ['sound', 'Ton'], ['icons', 'Symbole'], ['reference', 'Referenz'], ['source', 'Original']];
 // tutorial (#011): chapters of the field guide and what makes a lesson show up the first time
 export const TUT_CHAPTERS = [['move', 'Bewegung'], ['fight', 'Kampf'], ['ava', 'AvA'], ['inventory', 'Inventar'], ['camp', 'Camp'], ['build', 'Rig bauen'], ['travel', 'Reisen'], ['poi', 'Im POI'], ['progress', 'Fortschritt']];
@@ -1146,6 +1148,24 @@ export const AREAS = {
       if (x.place === 'span' && need == null && x.art) report('warning', `Art „${label(DECOR_ARTS, x.art)}“ hängt nicht zwischen zwei Punkten`);
     },
   },
+  pixelOrders: {
+    name: 'Pixel-Aufträge', singular: 'Pixel-Auftrag', icon: 'brush', file: 'data/pixel_orders.json', kind: 'catalog', lookOptional: true, groupBy: { key: 'status', options: PIXEL_STATUS },
+    hint: 'Daniel, 19.11.2026: Grafik-Wünsche an Claude Code (NomadPixel). Hier beschreiben, was gezeichnet werden soll, speichern; dann in Claude Code „/pixel Aufträge“ sagen. Claude zeichnet in AAP-64 im Stil der Referenzen, legt die Ergebnisse als Assets an und trägt sie unten ein. Foto als Vorlage: im Bereich Assets ein Asset der Art „Referenz“ anlegen, Bild hochladen und hier verknüpfen.',
+    template: { name: 'Neuer Pixel-Auftrag', type: 'icons', status: 'open', size: [32, 32] },
+    row: x => `${label(PIXEL_TYPES, x.type)} · ${label(PIXEL_STATUS, x.status)}${x.motifs?.length ? ` · ${x.motifs.length} Motive` : ''}`,
+    sections: [
+      { title: 'Auftrag', fields: [NAME, select('type', 'Art', PIXEL_TYPES, { required: true }), select('status', 'Status', PIXEL_STATUS, { required: true }),
+        area_('brief', 'Was gebraucht wird', { hint: 'Wofür, wo im Spiel, Stimmung, Must-haves' }), lines('motifs', 'Motive', { hint: 'eine Zeile je Grafik, z. B. „Angelrute“' })] },
+      { title: 'Format', fields: [size('size', 'Größe', { unit: 'px', hint: 'je Grafik bzw. Feld; Symbole 32 × 32' }), size('grid', 'Raster', { unit: 'Felder', hint: 'Spalten × Zeilen bei Symbolen/Kacheln' }),
+        num('frames', 'Frames', { min: 1, hint: 'nur bei Animationen' }), text('view', 'Ansicht', { hint: 'z. B. frontal, diagonal, von der Seite' })] },
+      { title: 'Vorlage', fields: [refs('references', 'Vorbilder', 'assets', { hint: 'Stil-Vorbilder oder Foto (Asset der Art Referenz)' }), ref('target', 'Ziel-Raster', 'assets', { hint: 'bestehendes Symbol-Raster, in dessen freie Felder die Grafiken sollen' })] },
+      { title: 'Ergebnis', fields: [refs('results', 'Ergebnis-Assets', 'assets'), area_('answer', 'Antwort von Claude'), text('date', 'Erledigt am')] },
+    ],
+    check: (x, report) => {
+      if (!x.brief && !x.motifs?.length) report('hint', 'Beschreibung oder Motive fehlen');
+      if (x.status === 'done' && !x.results?.length) report('warning', 'Fertig, aber ohne Ergebnis-Assets');
+    },
+  },
   people: {
     name: 'Leute', icon: 'humans', file: 'data/people.json', kind: 'single',
     hint: '#085 Crew-Kern (Die Karawane, design.md): Bausteine für gewürfelte Siedler, ihre Fähigkeiten (Jobs an Werkstätten) und Eigenheiten. Kernfiguren wie Schraube und Onkel Sung stehen unter Companions.',
@@ -1660,7 +1680,7 @@ export const AREAS = {
 
 // Navigation: groups of areas in the order of the design document
 export const GROUPS = [
-  ['ASSETS', ['assets']],
+  ['ASSETS', ['assets', 'pixelOrders']],
   ['GRUNDLAGEN', ['game', 'splash', 'intro', 'tutorial', 'weather', 'economy', 'ranking']],
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'kits', 'buffs']],

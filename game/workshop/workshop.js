@@ -446,7 +446,7 @@ export class Workshop {
   lookBlock(a, x) {
     if (a === 'assets') return [el('h4', {}, 'Vorschau'), assetPreview(this, x), this.uploadBlock(x)];
     const A = this.p.data.assets || {}, refs = references(a, x).filter(r => r.area === 'assets' && A[r.value] && !(SUMMARY[a] && r.path.includes(' › ')));   // #075 a picture in a table row is not the look of the whole area
-    const hasLook = fields(a).some(f => f.area === 'assets');
+    const hasLook = !AREAS[a]?.lookOptional && fields(a).some(f => f.area === 'assets');   // e.g. pixel orders: assets are templates/results, not a look
     if (!refs.length) return hasLook ? el('p', { class: 'ed-small ng-noLook' }, icon('image', 14), ' Noch kein Aussehen. Unter „Aussehen“ ein Asset wählen.') : null;
     this.lookPick = this.lookPick || {};
     const r = refs.find(r => r.path === this.lookPick[a]) || refs[0];
