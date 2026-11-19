@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: #111 **Camp-Baukasten** läuft (Daniel: Townscaper/Tiny Glade von der Seite, PixelLab-Pilot Lagerfeuer-Ecke). PixelLab: Daniel hat aufgestockt, übrig 3.180,6.
 - 19.11. Code → Ava: **HNC / Übergabe.** Stand `main` (alles gepusht, `npm test` 318/318, berührte Browser-Tests grün). Gebaut seit der letzten Übergabe:
   - **#087–#091:** Wettervorhersage (Navigator in der Reisekarte), Gangs als Auftraggeber (7 Aufträge im Revier), Revierkrieg (Rivalen, Gegenruf 50 %, Übernahmen, Fronten), Rig-Radio (4 Sender, Musik aus Code, DJ, N), Werte-Bildschirm (U).
   - **Entscheidungsrunde 2** (Artefakt „NomadGirl Entscheidungskarten“, decisions_r2): #076–#096 abgenommen, neue Tickets #097–#110; Fragerunde #080 (in design.md).
@@ -234,6 +235,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #111 Camp-Baukasten (Townscaper/Tiny Glade von der Seite)
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel: „Das System überarbeiten und flexibler machen … Modularität besonders wichtig … gemütlich, hübsch, wie Townscaper oder Tiny Glade aus der Sidescroll-Perspektive“, Grafiken mit PixelLab „echt nice“, streng orthogonal)
+- **Für:** Code
+- **Lesen:** docs/features/camp.md › Deko (#036), docs/features/tiles.md › Clutter streng orthogonal
+- **Auftrag (Daniels Wahl, 19.11.):** alle vier Säulen, Reihenfolge **Stapeln → Nachbarn → Ensembles → Baukasten/Auto-Details**; Ort: draußen ums Rig + auf/an Containern (nicht innen); Perspektive **streng seitlich** (keine Oberseite); Grafik zuerst **Pilot Lagerfeuer-Ecke** (Feuerstelle, Campingstuhl, Tisch, Laternen-Pfosten, Kiste, Topfpflanze), dann Pakete; animierte Stücke **hybrid** (PixelLab malt das Feste, Code bewegt Stoff/Flammen/Licht); Gemütlichkeit **wie Dorfromantik**: passende Nachbarn/Ensembles geben Bonus, nie Nachteile. Mechanik und Pilot parallel, damit Daniel direkt testen kann.
+- **Fertig, wenn:** Stücke lassen sich frei auf Boden, Dächern, Balkonen und aufeinander setzen; Nachbar-Regeln und Ensembles stehen im Schema (Werkstatt); Pilot-Grafiken im Spiel; alte Spielstände gültig; Tests grün.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### Vorlage
 
