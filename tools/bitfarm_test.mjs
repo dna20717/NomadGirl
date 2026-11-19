@@ -32,7 +32,7 @@ check('Inventar: „Als Worker einsetzen“, Auswahl der Werkstätten (eigene zu
 v = await ev(async () => { const W = await import('/game/workers.js'), s = SC(); return { bonus: W.workerBonus(s.data_, nomad.save(), 'perfect'), list: W.workers(s.data_, nomad.save()).map(k => [k.g.name, k.def.name, k.value, k.flaw.why]) }; });
 check('Worker wirkt: Koch-Bonus mit Macke (−15 %, lenkt sich ab)', v.bonus > 0 && v.list[0]?.[3] === 'lenkt sich ab', v);
 // #076 Worker right at the bench: a button in the Kochnische's window, an entry in the Chill-Ecke's menu
-v = await ev(() => { const s = SC(); s.camp.use('kochnische', '0:0'); nomad.step(2); const btn = document.querySelector('.craft-worker')?.textContent || ''; document.querySelector('.craft-worker')?.click(); nomad.step(2);
+v = await ev(() => { const s = SC(); s.camp.use('kochnische', '0:0'); nomad.step(2); const btn = document.querySelector('.craft-worker:not(.craft-up)')?.textContent || ''; document.querySelector('.craft-worker:not(.craft-up)')?.click(); nomad.step(2);
   const items = (s.hud.menuItems || []).map(x => x.label); nomad.choose('Zurück'); nomad.step(2); const back = !s.hud.craft.el.hidden; s.hud.craft.close(); nomad.step(2);
   const b = s.camp.benches.list.find(x => x.id === 'chill_area'); s.camp.use('chill_area', b.place); nomad.step(2); const rest = (s.hud.menuItems || []).map(x => x.label);
   nomad.choose('Worker einteilen'); nomad.step(2); const pick = (s.hud.menuItems || []).map(x => x.label); nomad.choose('Pepper Hiss'); nomad.step(2);
