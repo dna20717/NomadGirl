@@ -243,6 +243,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 ## Tickets
 
+### #116 Ziehen zum Wachsen: Laterne, Stangen, Turm, Leitern, Kistenstapel, Zelte
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel: „Dinge wie Laterne so designen, dass man die Ziehen-zum-Vergrößern-Funktion benutzen kann, wie Laterne, Pfosten oder Wachturm“)
+- **Lesen:** docs/features/camp.md › Camp-Baukasten, docs/features/rig.md › Container ziehen und höher
+- **Auftrag (Daniels Wahl):** Im Bau-Modus am Griff ziehen: Laternenpfosten, Zeltstangen, Aussichtsturm, Leitern (Höhe), Kisten (Ziehen macht einen Stapel, der dynamisch wächst), Zelte (dynamisch in der Breite, eingeschränkt in der Höhe). Grafik neu in Modulen (PixelLab, Kopf/Mittelstücke/Fuß), streng orthogonal. Höhe wirkt (Laterne leuchtet weiter, Turm zeigt mehr, Stangen heben Zelte). Stufen passend zum Modell. Bebaubarer Raum sichtbar wie die Beute auf dem Boden im POI (Scan-Raster), das Raster richtet sich nach AvAs Position.
+- **Rückfragen:**
+- **Ergebnis:**
+
 ### #115 Parallax-Hintergründe, Vordergrund-Silhouetten, Billboard-Scan
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel: „Die Parallax-Hintergründe überall können bitte in hübsch umgesetzt werden. Modular. Auch ein paar schwarze Vordergrund-Formen wären spannend. Billboards nicht mehr fotografieren, sondern AvA scannen. Man kann sie bewegen (Gummiband)“)
 - **Auftrag (Daniels Wahl):** PixelLab-Ebenen modular für Camp, Fahrt, POIs draußen, Startseite; gemalte schwarze Vordergrund-Formen für Fahrt und POIs draußen; Billboards: AvA am Gummiband ziehen, sie schnellt hin und scannt.
