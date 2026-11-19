@@ -442,6 +442,7 @@ export class PlayScene extends Phaser.Scene {
       padActive: () => { const p = hud.scene.pad; if (!(p?.active && p.kind)) return false; hud.padHelp?.(p, PAD_ACTIONS); return true; },
       use: (id, q) => hud.scene.useThing(id, q),
       learn: (g, e) => hud.scene.learnFrom(g, e),
+      dyeOf: id => hud.scene.dyeOf(id), learnDye: (g, e) => hud.scene.learnDyeFrom(g, e),   // #092
       canThrow: () => !!hud.scene.loot,
       inCamp: () => hud.scene.mode === 'camp',
       gearChanged: () => hud.scene.applyGear(),

@@ -93,6 +93,22 @@ await page.waitForFunction(() => { if (game.__signatureKey !== '') nomad.step(10
 const back = await colours();
 check('Zurück zu Hot Wire Pink, kostenlos', r.color === 0 && back.pink === before.pink && back.green === before.green, { r, back, before });
 
+// #092 learn a colour in the inventory, without the mirror: the packet is used up, the mirror offers it for free
+r = await ev(async () => {
+  const s = game.scene.getScene('play'), C = await import('/game/crafting.js'), D = s.data_, save = s.box.save;
+  C.give(D, save, 'faerbemittel_feuerrot', 2);
+  s.hud.inv.open?.(); nomad.step(2);
+  const key = Object.keys(save.inv.grids).find(k => save.inv.grids[k].items.some(e => e.id === 'faerbemittel_feuerrot')), g = save.inv.grids[key], e = g.items.find(x => x.id === 'faerbemittel_feuerrot');
+  const acts = s.hud.inv.actionsFor(key, e).map(a => a.label);
+  s.hud.inv.act('learnDye', key, e);
+  nomad.step(2);
+  const i = D.leyla.signature.colors.findIndex(c => c.item === 'faerbemittel_feuerrot');
+  const left = C.have(D, save, 'faerbemittel_feuerrot'), e2 = Object.values(save.inv.grids).flatMap(x => x.items).find(x => x.id === 'faerbemittel_feuerrot');
+  const acts2 = e2 ? s.hud.inv.actionsFor(key, e2).map(a => a.label) : [];
+  return { acts, acts2, left, unlocked: save.look.unlocked.includes(i), worn: save.look.color === i };
+});
+check('Färbemittel im Inventar: „Farbe lernen“, eine Packung weg, Farbe frei, noch nicht getragen (#092)', r.acts.includes('Farbe lernen') && r.left === 1 && r.unlocked && !r.worn && !r.acts2.includes('Farbe lernen'), r);
+
 await browser.close();
 for (const o of ok) console.log('✔', o);
 for (const e of errors) console.log('✘', e);

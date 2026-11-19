@@ -37,6 +37,20 @@ export function dye(D, save, i, take) {
   return { ok: true, used };
 }
 
+// #092 (Daniel 19.11.2026: „dass man Farbe im Inventar lernen kann … unabhängig vom Spiegel“): the colour of a Färbemittel
+// → its index in Leyla › Signaturfarbe › Farben, or -1
+export const colorOfItem = (D, id) => colors(D).findIndex((c, i) => i > 0 && c.item === id);
+export const knowsColor = (save, i) => i === 0 || (save?.look?.unlocked || []).includes(i);
+// learn it from the packet (the packet is used up), wear it later at the mirror → { ok, i, name } or { ok: false, reason }
+export function learnColor(D, save, id) {
+  const i = colorOfItem(D, id);
+  if (i < 0) return { ok: false, reason: 'Kein Färbemittel' };
+  if (knowsColor(save, i)) return { ok: false, reason: 'Schon gelernt' };
+  const L = save.look ??= { color: 0, unlocked: [] };
+  (L.unlocked ??= []).push(i);
+  return { ok: true, i, name: colors(D)[i].name || `Farbe ${i + 1}` };
+}
+
 // ---------- textures ----------
 const ORIG = '__signatureOriginals';
 // every texture of Leyla's look gets the colour; the painted originals are kept (per game) so a later colour starts from them.

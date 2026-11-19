@@ -4,7 +4,8 @@ import { rescue } from '../tank.js';
 import { addRep, repConfig, levelName } from '../reputation.js';
 import { Camp } from './camp.js';
 import { droneBonuses } from '../stations.js';
-import { add, rollLoot } from '../inventory.js';
+import { add, rollLoot, remove } from '../inventory.js';
+import { colorOfItem, knowsColor, learnColor } from './signature.js';
 import { learnAll, learnNote } from '../crafting.js';
 import { bump, level as achieveLevel, check as achieveCheck } from '../achievements.js';
 import { mod } from '../mods.js';
@@ -91,6 +92,16 @@ export class SceneEvents {
     const r = learnNote(this.data_, this.box.save, grid, e);
     if (r) this.announceNotes([r]);
     return r;
+  }
+  // #092 Haarfarbe lernen (inventory): the packet is used up, the colour waits at the mirror
+  dyeOf(id) { const i = colorOfItem(this.data_, id); return i < 0 ? null : { i, known: knowsColor(this.box?.save, i) }; }
+  learnDyeFrom(grid, e) {
+    const r = learnColor(this.data_, this.box.save, e.id);
+    if (!r.ok) { this.hud.toast(r.reason, '', 'info', 2200); return false; }
+    if ((e.n || 1) > 1) e.n--; else remove(grid, e);
+    this.hud.toast(`Farbe gelernt: ${r.name}`, 'Am Spiegel im Camp kannst du sie jederzeit tragen', 'recipe', 4200);
+    this.box.persist?.();
+    return true;
   }
   announceNotes(list) {
     const D = this.data_, T = D.crafting?.texts || {}, fill = (t, n, k) => t.replace('{name}', n).replace('{n}', k);

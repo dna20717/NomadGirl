@@ -210,13 +210,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ```
 
 ### #092 Haarfarben im Inventar lernen
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat)
 - **Auftrag (Daniel, 19.11.2026):** „Haarfarbe sollen wie Rezepte funktionieren und benutzt werden können.“ Rückfrage: „dass man Farbe im Inventar ‚lernen‘ kann. Das braucht nicht automatisch passieren, kann aber unabhängig vom Spiegel sein.“ → Schnellaktion „Lernen“ an Färbemitteln (wie bei Zetteln), schaltet die Farbe frei, getragen wird am Spiegel.
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Commit „Haarfarben im Inventar lernen (#092)“. `npm test` 280/280, `tools/mirror_test.mjs` 11/11. PixelLab 0. **Bitte testen:** Färbemittel im Inventar → „Farbe lernen“, dann am Spiegel tragen.
 
 ### #093 Van im POI bleibt zu
-- **Status:** offen · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Van im POI soll nicht aufgehen.“)
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Van im POI soll nicht aufgehen.“)
 - **Rückfragen:**
 - **Ergebnis:**
 

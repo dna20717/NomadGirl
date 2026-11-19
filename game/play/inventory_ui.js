@@ -468,6 +468,8 @@ export class InventoryUI {
     const b = e.a === 'items' && t.buff && D.buffs?.[t.buff];
     // Rezepte lernen (#012): notes that are still lying somewhere (older savegames, chests) teach their recipe on the spot
     if (e.a === 'items' && t.teaches && D.recipes?.[t.teaches]) out.push({ id: 'learn', k: 'context', label: 'Lernen' });
+    // #092 Haarfarbe lernen: a Färbemittel teaches its colour (worn at the mirror)
+    if (e.a === 'items' && this.host.dyeOf) { const c = this.host.dyeOf(e.id); if (c && !c.known) out.push({ id: 'learnDye', k: out.some(x => x.k === 'context') ? null : 'context', label: 'Farbe lernen' }); }
     if (b) out.push({ id: 'use', k: out.some(x => x.k === 'context') ? null : 'context', label: t.category === 'food' ? 'Essen' : b.duration === 'instant' && b.stat === 'health' ? 'Heilen' : 'Benutzen' });
     const slot = this.slotFor(e);
     if (slot && !(slot.startsWith('wear:') && IMPLANTS.includes(slot.slice(5)) && !camp))
@@ -509,6 +511,7 @@ export class InventoryUI {
     if (!g) return;
     if (id === 'use') return this.useFrom(key, g, e);
     if (id === 'learn') { if (this.host.learn?.(g, e)) this.changed(key); return; }
+    if (id === 'learnDye') { if (this.host.learnDye?.(g, e)) this.changed(key); return; }   // #092
     if (id === 'equip') return this.equipFrom(key, g, e);
     if (id === 'send') return this.quickMove(key, e);
     if (id === 'deck' || id === 'bag') { const to = id === 'deck' ? DECK : 'backpack'; if (addEntry(this.D, this.inv.grids[to], e, e.n) === 0) { remove(g, e); this.changed(to); } return; }
