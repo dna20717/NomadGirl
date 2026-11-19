@@ -130,3 +130,22 @@ test('Spielstand pro Login im KV', async () => {
   delete env.SAVES;
   assert.equal((await call('/api/save')).status, 503);
 });
+
+// #083 Bilder hochladen: a picture becomes its own commit under the project's assets/, only pictures, not too big
+import { validUpload, UPLOAD_MAX } from '../worker/index.js';
+test('Bild hochladen: eigener Commit unter assets/, nur Bilder, Größe begrenzt, Autor ohne E-Mail', async () => {
+  const { g, call } = await setup();
+  const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 1, 2, 3, 4]).toString('base64');
+  const r = await call('/api/upload', { method: 'POST', body: { path: 'assets/uploads/neu.png', data: png, name: 'Daniel' } });
+  assert.equal(r.status, 200, JSON.stringify(r.data));
+  assert.equal(r.data.path, 'assets/uploads/neu.png');
+  assert.ok(g.fileAt('projects/nomadgirl/assets/uploads/neu.png') !== undefined);
+  const c = g.commits.get(g.refs.main);
+  assert.match(c.message, /Bild neu\.png \(Daniel\)/); assert.match(c.author.email, /werkstatt\.nomadgirl\.invalid$/);
+  assert.equal((await call('/api/upload', { method: 'POST', body: { path: '../worker/index.js', data: png } })).status, 400);
+  assert.equal((await call('/api/upload', { method: 'POST', body: { path: 'data/weapons.png', data: png } })).status, 400);
+  assert.equal((await call('/api/upload', { method: 'POST', body: { path: 'assets/x.svg', data: png } })).status, 400);
+  assert.equal((await call('/api/upload', { method: 'POST', body: { path: 'assets/x.png', data: 'A'.repeat(Math.ceil(UPLOAD_MAX * 4 / 3) + 8) } })).status, 413);
+  assert.equal((await call('/api/upload', { method: 'POST', body: { path: 'assets/x.png', data: png }, email: null })).status, 401);
+  assert.ok(validUpload('assets/leyla/run.png') && !validUpload('assets/a/../b.png'));
+});

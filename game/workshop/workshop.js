@@ -444,7 +444,7 @@ export class Workshop {
 
   // ---------- Look: preview of the assets an entry points to (or of the asset itself) ----------
   lookBlock(a, x) {
-    if (a === 'assets') return [el('h4', {}, 'Vorschau'), assetPreview(this, x)];
+    if (a === 'assets') return [el('h4', {}, 'Vorschau'), assetPreview(this, x), this.uploadBlock(x)];
     const A = this.p.data.assets || {}, refs = references(a, x).filter(r => r.area === 'assets' && A[r.value] && !(SUMMARY[a] && r.path.includes(' › ')));   // #075 a picture in a table row is not the look of the whole area
     const hasLook = fields(a).some(f => f.area === 'assets');
     if (!refs.length) return hasLook ? el('p', { class: 'ed-small ng-noLook' }, icon('image', 14), ' Noch kein Aussehen. Unter „Aussehen“ ein Asset wählen.') : null;
@@ -456,6 +456,30 @@ export class Workshop {
       A[r.value].kind === 'icons' && r.holder === x && r.key === 'look' && fields(a).some(f => f.key === 'icon')
         ? iconSheet(this, A[r.value], { value: x.icon, set: i => this.change(a, () => { x.icon = i; }) })
         : assetPreview(this, A[r.value])];
+  }
+
+  // ---------- #083 Bild hochladen: online a commit (worker /api/upload), locally into this browser ----------
+  uploadBlock(x) {
+    const id = this.page.choice, input = el('input', { type: 'file', accept: 'image/png,image/gif,image/jpeg,image/webp', hidden: true });
+    input.addEventListener('change', () => { const f = input.files?.[0]; if (f) this.uploadPicture(id, x, f); input.value = ''; });
+    const cloud = this.store?.kind === 'cloud';
+    return el('div', { class: 'ng-upload' }, input,
+      el('button', { class: 'ed-button small', title: cloud ? 'Bild als Commit ins Repository (bis 2 MiB)' : 'Bild in diesem Browser (bis ca. 180 KB)', onclick: () => input.click() }, icon('upload', 13), x.file ? ' Bild ersetzen' : ' Bild hochladen'),
+      this.uploadNote ? el('small', { class: 'ed-small' }, this.uploadNote) : null);
+  }
+  async uploadPicture(id, x, file) {
+    const ext = (file.name.match(/\.(png|gif|jpe?g|webp)$/i)?.[1] || 'png').toLowerCase().replace('jpeg', 'jpg');
+    const keep = typeof x.file === 'string' && /^assets\//.test(x.file) && x.file.toLowerCase().endsWith('.' + ext) ? x.file : null;
+    const path = keep || `assets/uploads/${String(id).replace(/[^A-Za-z0-9_\-]/g, '_')}.${ext}`;
+    this.uploadNote = 'Lädt hoch …'; this.draw();
+    try {
+      const where = await this.store.loadUp(file, path);
+      this.blobs = this.blobs || new Map(); this.blobs.set(new URL(where, this.basis).href, Promise.resolve(file)); this.bitmaps?.delete(where);   // the preview shows it right away
+      if (x.file !== where) this.change('assets', () => { x.file = where; });
+      this.uploadNote = this.store.kind === 'cloud' ? `Hochgeladen als ${where} (eigener Commit). Im Spiel nach dem nächsten Build, Speichern nicht vergessen.` : 'Im Browser gespeichert.';
+      this.hint(this.uploadNote);
+    } catch (e) { this.uploadNote = 'Hochladen fehlgeschlagen: ' + e.message; this.hint(this.uploadNote); }
+    this.draw();
   }
 
   // ---------- Field editors from the schema ----------

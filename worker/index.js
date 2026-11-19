@@ -33,6 +33,11 @@ export async function handle(request, env, fetchFn) {
     if (!env.GITHUB_TOKEN) return failure(503, 'GitHub-Schlüssel fehlt (GITHUB_TOKEN).');
     const gh = github(env, fetchFn);
     if (url.pathname === '/api/files' && request.method === 'GET') return json(await readFiles(gh, env));
+    if (url.pathname === '/api/upload' && request.method === 'POST') {   // #083 a picture for an asset, as its own commit
+      const body = await request.json();
+      const name = authorName(body?.name) || user.name;
+      return await upload(gh, env, { name, email: commitEmail(name) }, body);
+    }
     if (url.pathname === '/api/commit' && request.method === 'POST') {
       const body = await request.json();
       const name = authorName(body?.name) || user.name;
@@ -229,4 +234,31 @@ async function commit(gh, env, user, body) {
     return json({ commit: c.sha, files: shas });
   }
   return failure(409, 'Das Repository ändert sich gerade zu oft. Bitte gleich noch einmal speichern.', { conflicts: [] });
+}
+
+// ---------- pictures (#083, Daniel 19.11.2026: „Bilder hochladen in der Online-Werkstatt“) ----------
+// body: { path: 'assets/<folder>/<name>.png', data: base64, name } → { path, commit }. Only pictures under the project's assets/,
+// at most UPLOAD_MAX bytes; a file that is there already is replaced (that is how a picture is updated).
+export const UPLOAD_MAX = 2 * 1024 * 1024;
+export function validUpload(path) {
+  return typeof path === 'string' && /^assets\/[A-Za-z0-9_\-]+(\/[A-Za-z0-9_\-]+)*\.(png|gif|jpe?g|webp)$/.test(path) && !path.includes('..');
+}
+async function upload(gh, env, user, body) {
+  const path = body?.path, data = String(body?.data || '').replace(/^data:[^,]*,/, '').replace(/\s/g, '');
+  if (!validUpload(path)) return failure(400, `Ungültiger Bildpfad: ${path}`);
+  if (!data || !/^[A-Za-z0-9+/]+=*$/.test(data)) return failure(400, 'Bilddaten fehlen.');
+  const bytes = Math.floor(data.length * 3 / 4) - (data.endsWith('==') ? 2 : data.endsWith('=') ? 1 : 0);
+  if (bytes > UPLOAD_MAX) return failure(413, `Bild zu groß (${Math.round(bytes / 1024)} KiB, höchstens ${UPLOAD_MAX / 1024 / 1024} MiB).`);
+  const blob = await gh('POST', 'git/blobs', { content: data, encoding: 'base64' });
+  const full = `${dataDir(env)}/${path}`;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const ref = await gh('GET', `git/ref/heads/${branch(env)}`), parent = await gh('GET', `git/commits/${ref.object.sha}`);
+    const tree = await gh('POST', 'git/trees', { base_tree: parent.tree.sha, tree: [{ path: full, mode: '100644', type: 'blob', sha: blob.sha }] });
+    const who = { name: user.name, email: user.email, date: new Date().toISOString() };
+    const c = await gh('POST', 'git/commits', { message: `Werkstatt: Bild ${path.split('/').pop()} (${user.name})\n\nHochgeladen in der Web-Werkstatt von ${user.name}.`, tree: tree.sha, parents: [ref.object.sha], author: who, committer: who });
+    try { await gh('PATCH', `git/refs/heads/${branch(env)}`, { sha: c.sha, force: false }); }
+    catch (e) { if (e.github === 422 || e.github === 409) continue; throw e; }
+    return json({ path, commit: c.sha, sha: blob.sha });
+  }
+  return failure(409, 'Das Repository ändert sich gerade zu oft. Bitte gleich noch einmal hochladen.');
 }

@@ -23,3 +23,10 @@ Details zu Cloudflare Access, „Speichern = Commit“, Spielstand online, Versi
 
 **Cloud-Umgebung „NomadGirl“** (persönlich, mit dem Repo verknüpft, eingerichtet 10.11.2026): Netzwerk eingeschränkt mit Paketquellen + MCP-Servern + `api.pixellab.ai`; der Schlüssel ist ein **Netzwerk-Geheimnis** für `api.pixellab.ai` (`Authorization: Bearer`), der Proxy setzt ihn selbst ein; `PIXELLAB_API_KEY=vom-proxy-ersetzt` ist nur ein Platzhalter, damit `.mcp.json` einen Header schickt (der Proxy überschreibt ihn). Setup-Skript: Playwright-Verknüpfung in `node_modules/`. Neue Sitzung in der Umgebung „NomadGirl“ starten, `/mcp` zeigt `pixellab`. Schlüssel tauschen: Umgebung › Bearbeiten › Netzwerk-Geheimnisse (oder Ava fragt per sicherem Formular).
 - **GitHub-App für Builds** (07.11.2026 behoben): GitHub › Profil › Settings › Applications › Installed GitHub Apps › „Cloudflare Workers and Pages“ › Configure: Zugriff auf NomadGirl. Sonst löst ein Push keinen Build aus. An jedem Commit hängt dann eine Rückmeldung von Workers Builds.
+
+## Bilder hochladen (#083)
+
+Daniel, 19.11.2026 (Karte „Bilder hochladen in der Online-Werkstatt: als Nächstes“). Werkstatt › Assets › ein Asset › rechts unter der Vorschau **„Bild hochladen“ / „Bild ersetzen“** (PNG, GIF, JPG, WebP).
+- **Online:** `cloud_store.loadUp` schickt das Bild (Base64) an `POST /api/upload` (`worker/index.js` › `upload`): nur Pfade `assets/…/*.png|gif|jpg|webp` im Projekt, höchstens 2 MiB, **eigener Commit** „Werkstatt: Bild x.png (Name)“ (Autor ohne Login-E-Mail, wie beim Speichern). Hat das Asset schon eine Datei unter `assets/` mit derselben Endung, wird sie ersetzt, sonst entsteht `assets/uploads/<id>.<endung>`. Das Asset zeigt danach auf die Datei (Speichern nicht vergessen); die Vorschau zeigt das Bild sofort, im Spiel ist es nach dem nächsten Cloudflare-Build da.
+- **Lokal/Artefakt:** wie bisher `store.loadUp` (Artefakt-Ablage oder Data-URL bis ca. 180 KB).
+- Geprüft: `test/cloud.test.js` (Upload, Pfade, Größe, Login), `tools/workshop_cloud_test.mjs` (Knopf, Commit, Asset zeigt darauf).

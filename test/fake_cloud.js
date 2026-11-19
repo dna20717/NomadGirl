@@ -42,10 +42,12 @@ export function fakeGitHub(files, repo = 'dna20717/NomadGirl') {
     if (method === 'GET' && (m = p.match(/^git\/commits\/(\w+)$/))) return ok({ sha: m[1], tree: { sha: commits.get(m[1]).tree } });
     if (method === 'GET' && (m = p.match(/^git\/trees\/(\w+)$/))) return ok({ tree: [...trees.get(m[1])].map(([path, sha]) => ({ path, sha, type: 'blob', mode: '100644' })) });
     if (method === 'GET' && (m = p.match(/^git\/blobs\/(\w+)$/))) return ok({ content: b64(blobs.get(m[1])), encoding: 'base64' });
+    if (method === 'POST' && p === 'git/blobs') { const sha = id(); blobs.set(sha, Buffer.from(body.content, 'base64').toString('latin1')); g.binary = (g.binary || 0) + 1; return ok({ sha }, 201); }
     if (method === 'POST' && p === 'git/trees') {
       const entries = new Map(trees.get(body.base_tree));
       for (const e of body.tree) {
         if (e.sha === null) entries.delete(e.path);
+        else if (e.sha) entries.set(e.path, e.sha);   // #083 a blob made before (a picture)
         else { const sha = await blobSha(e.content); blobs.set(sha, e.content); entries.set(e.path, sha); }
       }
       return ok({ sha: await putTree(entries) }, 201);

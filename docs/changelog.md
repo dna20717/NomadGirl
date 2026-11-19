@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Bilder hochladen** (#083): Knopf „Bild hochladen“ im Asset der Werkstatt; online ein eigener Commit über `/api/upload`.
 - 19.11.2026: **Crew-Kern klein** (#085): Werkstatt-Bereich „Leute“, gewürfelte Siedler, Bewerber am Feuer und Aufnahme auf der Reise, verborgene Eigenheiten, Jobs an Werkstätten über den Boni-Bus, Crew-Fenster am Lagerfeuer.
 - 19.11.2026: **Mega-Rigs: Hauptcontainer** (#077): Feuer, Brett und Crew wohnen an Bord in einem festen Raum im Rumpf statt am Boden daneben.
 - 19.11.2026: **Die Zelle: Gefangene** (#079): Plünderer im Nahkampf fesseln, als Beute tragen, in der Zelle halten (Dunkelheit je Tag), auf der Straße Lösegeld/verkaufen/laufen lassen (Ruf), Unruhe im Laderaum, Auftragsart Kopfgeld.

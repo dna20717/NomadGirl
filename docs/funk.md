@@ -285,15 +285,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #082 Licht: God Rays, Schatten, Stromausfall per Schalter
-- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)
 - **Rückfragen:**
 - **Ergebnis:**
 
 ### #083 Bilder hochladen in der Online-Werkstatt
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)
 - **Auftrag:** `cloud_store.js` kann Bilder als Commit speichern (Größe prüfen, Asset-Eintrag anlegen).
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: jedes Bild ist ein eigener Commit (sofort, nicht erst beim Speichern), höchstens 2 MiB; neue Bilder landen in `assets/uploads/`; Animationen brauchen danach von Hand Frame-Größe und Frames.
+- **Ergebnis:** (Code) Commit „Bilder hochladen in der Online-Werkstatt (#083)“. Knopf im Asset-Inspektor, Worker `POST /api/upload` (eigener Commit, nur Bilder unter assets/, 2 MiB). `npm test` grün (cloud 8/8), `tools/workshop_cloud_test.mjs` grün. **Bitte testen:** online Werkstatt › Assets › ein Bild ersetzen, ein paar Minuten warten, im Spiel ansehen.
 
 ### #084 Grafik per PixelLab: Verbindung, Bit-Farm, Fahrgestell + Camp-Boden
 - **Status:** offen · angelegt 19.11. von Code (Daniel, Karten PixelLab, Bit-Farm, C18)

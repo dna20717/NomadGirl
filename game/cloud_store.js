@@ -66,6 +66,13 @@ function cloudStore(base, session) {
     },
     async persist(file, content) { return this.saveAll([{ file, content }]); },
     async discard(file) { return this.saveAll([{ file, content: null }]); },
-    async loadUp() { throw new Error('Bilder hochladen geht in der Web-Werkstatt noch nicht.'); },
+    // #083 a picture: committed to the repository under the project's assets/ (path relative to the project), → the path
+    async loadUp(blob, path) {
+      if (blob.size > 2 * 1024 * 1024) throw new Error(`Bild zu groß (${Math.round(blob.size / 1024)} KiB, höchstens 2 MiB).`);
+      const data = await new Promise((ok, bad) => { const r = new FileReader(); r.onload = () => ok(String(r.result).replace(/^data:[^,]*,/, '')); r.onerror = bad; r.readAsDataURL(blob); });
+      const x = await call('/api/upload', { method: 'POST', body: JSON.stringify({ path, data, name: this.user.name }) });
+      this.commit = x.commit;
+      return x.path;
+    },
   };
 }

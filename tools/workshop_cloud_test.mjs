@@ -126,6 +126,16 @@ check(!/"jumpSpeed": 1234/.test(g.fileAt(leylaFile)), 'Datenset: der Standard bl
 await page.goto(base + '/');
 await page.waitForFunction(() => window.dataSets, null, { timeout: 20000 });
 check(await page.evaluate(() => document.getElementById('dataset').textContent) === 'Datenset: Sprungtest', 'Hauptmenü zeigt das aktive Datenset unten');
+// #083 Bild hochladen: an asset gets a picture from the file picker, it becomes its own commit under assets/, the asset points to it
+await page.goto(base + '/workshop'); await page.waitForSelector('.ng-user', { timeout: 20000 });
+await page.evaluate(() => window.workshop.go({ area: 'assets', choice: 'van_dish' }));
+await page.waitForSelector('.ng-upload input[type=file]', { state: 'attached', timeout: 10000 });
+const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+const upRef = g.refs.main;
+await page.setInputFiles('.ng-upload input[type=file]', { name: 'schuessel.png', mimeType: 'image/png', buffer: png });
+await page.waitForFunction(() => /Hochgeladen als|fehlgeschlagen/.test(document.querySelector('.ng-upload small')?.textContent || ''), null, { timeout: 15000 });
+const upNote = await page.textContent('.ng-upload small');
+check(/Hochgeladen als assets\//.test(upNote) && g.refs.main !== upRef && !!g.fileAt('projects/nomadgirl/' + (await page.evaluate(() => window.workshop.p.data.assets.van_dish.file))), 'Bild hochgeladen: eigener Commit, Asset zeigt darauf (' + upNote + ')');
 const game2 = page;
 await game2.goto(base + '/game');
 await game2.waitForFunction(() => window.game?.scene.getScene('play')?.leyla, null, { timeout: 30000 });

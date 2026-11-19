@@ -185,3 +185,4 @@ body.ng { background: var(--ui-bg); color: var(--ui-text); font-family: var(--ui
 /* #075 Kleinkram */
 .ng-cardHint { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 .ng-rowLabel { font-size: var(--ui-gr-xs); color: var(--ui-text2); }
+.ng-upload { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
