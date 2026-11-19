@@ -183,7 +183,7 @@ export class Hud {
   menu({ title, sub = '', items = [], onClose = null, image = null, talk = null, board = false, mirror = null }) {
     this.stopType();
     this.modal = true; this.menuItems = items; this.menuTitle = title; this.menuOnClose = onClose;
-    this.menuCols = board || mirror ? 3 : 1;
+    this.menuColsFixed = board || mirror ? 3 : 1;
     this.menuIndex = Math.max(0, items.findIndex(i => !i.disabled));
     const keyHints = hints([['move', 'wählen'], ['ok', talk ? 'antworten' : 'nehmen'], ['back', 'zurück']], '1–9 direkt');
     if (mirror) {
@@ -276,6 +276,15 @@ export class Hud {
     const [cw, ch] = I.cell, k = (size ?? I.size ?? 32) / ch, x = i % I.grid[0], y = Math.floor(i / I.grid[0]);
     return el('i', { class: 'pad-ico', title, 'data-icon': name, style: `width:${cw * k}px;height:${ch * k}px;background-image:url("${I.url}");background-size:${I.grid[0] * cw * k}px ${I.grid[1] * ch * k}px;background-position:-${x * cw * k}px -${y * ch * k}px` });
   }
+  // how many choices stand side by side right now (Daniel 19.11.2026: „im Dialog-Menü sind die Optionen horizontal angeordnet, aber
+  // nur vertikale Eingaben funktionieren“): measured from the layout (the talk grid has 1–3 columns depending on the width),
+  // so ←/→ move along a row and ↑/↓ a whole row wherever the choices are laid out next to each other
+  get menuCols() {
+    const B = (this.menuButtons || []).filter(b => b.isConnected && b.offsetParent !== null);
+    if (B.length > 1) { const top = B[0].offsetTop, n = B.filter(b => Math.abs(b.offsetTop - top) < 4).length; if (n >= 1) return n; }
+    return this.menuColsFixed || 1;
+  }
+  set menuCols(v) { this.menuColsFixed = v; }
   menuMove(d) { const n = this.menuItems?.length || 0; let i = this.menuIndex; for (let s = 0; s < n; s++) { i = (i + d + n) % n; if (!this.menuItems[i].disabled) break; } this.focus(i); }
   // the help shows the controller's buttons once one is connected (labels for Xbox/Stadia, PlayStation or Switch)
   padHelp(pad, actions) {

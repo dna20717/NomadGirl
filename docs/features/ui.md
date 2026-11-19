@@ -17,3 +17,5 @@ Daniel, 18.11.2026 (Eleganz-Prüfung Punkt 4: „Effekte mit Ablaufzeit ohne Zuh
 ## Meldungs-Kanal und Logbuch (#070)
 
 Daniel, 18.11.2026 (Eleganz-Prüfung Punkt 5: „Meldungen ohne Ordnung“). In `hud.toast`: stehen schon **drei** Meldungen (ohne Banner), warten **Hinweise** und **Reise-Meldungen** (`info`, `travel`) in einer Reihe (`toastQueue`) und kommen der Reihe nach, sobald eine geht; Warnungen, Erfolge, Beute, Trophäen kommen sofort. Jede Meldung landet mit der Spieluhr im **Logbuch** des Spielstands (`save.journal`, die neuesten 150); Menü › **Logbuch** zeigt die letzten 40, neueste zuerst. Test `tools/logbook_test.mjs` (3 Prüfungen).
+
+- **Menüs mit Spalten** (Daniel, 19.11.2026: „im Dialog-Menü sind die Optionen horizontal angeordnet, aber nur vertikale Eingaben funktionierten“): `hud.menuCols` misst die Spalten jetzt aus dem Layout (Antworten im Gespräch stehen je nach Breite in 1–3 Spalten, das Schwarze Brett und der Spiegel in 3). ←/→ gehen innerhalb der Reihe weiter, ↑/↓ eine ganze Reihe, mit Tastatur und Controller. Einspaltige Menüs bleiben, wie sie waren. Geprüft: `tools/menu_nav_test.mjs`.

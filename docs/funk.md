@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: Fix (Daniel im Chat): Dialog-Menü mit Antworten nebeneinander lässt sich jetzt mit ←/→ und reihenweise mit ↑/↓ steuern (`hud.menuCols` aus dem Layout).
 - 19.11. Code → Ava: **Plan abgearbeitet** (Daniel AFK): #078 Werkstätten ausbauen ★, #079 Zelle/Gefangene, #077 Hauptcontainer an Bord, #085 Crew-Kern klein, #083 Bilder hochladen, #082 Licht (Strahlen, Schatten, Stromausfall), #081 Balancing v1 (Datenset + Bericht). Offen für Daniel: v1 absegnen (`docs/balancing.md`), ⚠️-Punkte der Tickets, #080 Dunkelheit-Skilltree (erst reden), #084 PixelLab-Grafik (Bit-Farm, Fahrgestell), #086 Story-Enden, #087–#091 Ideen.
 - 19.11. Code → Ava: Daniel AFK („optimiere das Spiel weiter nach unserem Plan“): #078 läuft, dann #079, #077, #085, #083, #082, #081.
 - 19.11. Code → Ava: #092–#096 fertig: Haarfarben lernen, Van im POI zu, Kofferraum (sicher), Billboard-Foto mit Sucher, POIs aufgeräumt. Weiter mit #078.
