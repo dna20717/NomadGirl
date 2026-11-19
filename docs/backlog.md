@@ -23,13 +23,11 @@ Stand: 12.11.2026 abends (Durchsicht von Ava). Kleinigkeiten sind schon behoben 
 
 - **Foodtruck:** „Verkaufen kommt später“ (Werkstatt ohne Funktion).
 - **Zugmaschine tauschen** im Bau-Modus fehlt (Van ↔ LKW).
-- **Gegner:** Boss-Verhalten Hausmeister. (Gruppen-Alarm erledigt #039.) (Grafiken: erledigt mit dem Raider-Bausatz #004/#015, 13 von 15 Gegnern; `rattenschwarm` und `wachdrohne` sind noch aus Code und gesperrt, bräuchten einen eigenen Bausatz für Tiere/Drohnen.)
+- **Gegner:** (Hausmeister-Boss gestrichen, Daniel 19.11.2026; Gruppen-Alarm erledigt #039.) (Grafiken: erledigt mit dem Raider-Bausatz #004/#015, 13 von 15 Gegnern; `rattenschwarm` und `wachdrohne` sind noch aus Code und gesperrt, bräuchten einen eigenen Bausatz für Tiere/Drohnen.)
 - **Companions** sind noch Figuren aus Code ohne Aussehen.
 - **AvA:** Akku aus einem Drohnenteil (Kern), wie man Anbauteile freischaltet. (Keine Tastatur-Steuerung fürs Gummiband: Daniel 16.11.2026, primäre Eingabe ist der Controller.)
 - **Kachel-Sets:** Vorschau eines Sets in der Werkstatt, großer Clutter für Wüste und Ruine.
-- **Licht:** Lichtstrahlen (God Rays), Schatten/Verdeckung, Stromausfall-Event per Schalter.
-- **Waffen:** Gewehr in Kletter-/Sprung-Animationen malen (statt Bild auf dem Rücken), weitere Langwaffen per „Posen von“.
-- **Web-Werkstatt:** Bilder hochladen geht online noch nicht (`cloud_store.js`).
+- **Waffen:** weitere Langwaffen per „Posen von“. (Gewehr in Kletter-Animationen gestrichen, Daniel 19.11.2026.)
 - **design.md, offene Fragen:** Ranking-Bonus pro Rang, was macht die Zelle im Rig, das „vielleicht noch Gefährlichere“, Feinschliff nach dem ersten Anspielen.
 
 - **Grafiken für weiterentwickelte Werkstätten** (Daniel, 15.11.2026, #034): jede Werkstatt mit Stufen (Techtree, Ausbau) bekommt je Stufe ein eigenes Bild (PixelLab, streng frontal, gleiche Box), damit man den Fortschritt im Rig sieht.
@@ -64,8 +62,7 @@ Stand: 12.11.2026 abends (Durchsicht von Ava). Kleinigkeiten sind schon behoben 
 Ideen ohne Auftrag. Wer eine angeht, macht daraus ein Ticket im Funkbuch und streicht sie hier.
 
 - **Straßen-Ereignisse:** zwischen zwei Orten der Reisekarte passiert etwas (Anhalter als künftige Crew, Händlerkonvoi, Hinterhalt, Wrack zum Bergen, wilde Entity im Funkmast).
-- **Crew-Kern (#040):** Companions mit Aussehen und Aufgabe, Einstieg über die Straßen-Ereignisse.
-- **Hausmeister-Boss + Stromausfall per Schalter:** ein verlorenes Glitch-Duell könnte den Blackout auslösen.
+- **Crew-Kern Teil 2 (#040):** Rig-Moral, Siedler mit Figur im Camp (Teil 1 gebaut als #085).
 - **Fahndungsstufe:** jede gefangene Entity macht die Kammerjäger aufmerksamer; ab einer Stufe jagen sie Leyla im Run (Duell oder echte Gegner).
 - **Bit-Stapel in der Kneipe:** NPCs spielen um Einsätze (Teile, Rezepte, Gerüchte über POIs).
 - **Entities mit Camp-Jobs:** Entities im Deck steuern Werkstätten, ihr Charakter färbt die Arbeit (die Diva schlampt, der Bürokrat sortiert).
