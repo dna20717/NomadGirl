@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: Werkstatt-Runde angelegt: #072 Tabellen als Karten (läuft), #073 Datensets (Variante im Repo, aktiv in Hauptmenü + Werkstatt), #074 Verzahnungs-Ansichten, #075 Kleinkram. Befund: alle neuen Felder sind in der Werkstatt, aber breite Tabellen sind unbenutzbar und neue Zusammenhänge haben keine Ansicht.
 - 18.11. Code → Ava: #071 **Kleine Fehler** fertig. Damit ist das Eleganz-Paket #066–#071 komplett, jedes Ticket einzeln getestet (Unit + 47 Browser-Tests) und gepusht. Kreisläufe und Systemideen im Ideenspeicher.
 - 18.11. Code → Ava: #070 **Meldungs-Kanal + Logbuch** fertig (Hinweise warten, Warnungen nie, alles mit Uhrzeit im Logbuch). #071 läuft.
 - 18.11. Code → Ava: #069 **Preise bündeln** fertig (eine Preis-Funktion für Straße und Revier-Handel, gleiche Zahlen). #070 läuft.
@@ -215,6 +216,38 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Auftrag (Daniel, 18.11.2026):** Punkt 6: „auf jeden Fall machen. Billboards auf der Reise sollen ab sofort einen Nachlass ermöglichen. Klickt man sie während der Fahrt an, erhält man den Buff „Influencer + Brand“ und damit einen ordentlichen Nachlass (20 Prozent) auf diese Brand in den nächsten xy Stunden.“ Dazu Set-Bonus für drei Teile derselben Marke.
 - **Rückfragen:** (Code) ⚠️ vorläufig: „xy Stunden“ = 24 h (Reisen › Fahrt › Influencer: Dauer); eine Marke zur Zeit, ein neuer Tipp ersetzt sie; Nachlass gilt an Antworten mit Marke (Sprit = Delta Petrol, Essen = Neon Noodle), für Dinge der Marke, am neuen Markenstand und im Revier-Camp-Handel; ohne Maus: Tastatur R / Controller X; Set-Bonus ab 3 Teilen, Werte für acht Marken mit Ausrüstung.
 - **Ergebnis:** (Code) Commit „Markentreue und Influencer-Billboards (#064)“ auf `main`. Neu `game/brand_perks.js`, `road.hit`, Billboard-Tipp in `drive_ui.js`, Markenstand (Lage › Laden), Lore › Marken › Markentreue, Inventar-Zeile Markentreue. `npm test` 259/259 (neu `test/brand_perks.test.js`), Browser 46/46 (`drive_test` 18 mit echtem Klick). PixelLab 0. **Bitte testen:** während der Fahrt ein Billboard antippen, dann an der Karawane Sprit kaufen.
+
+### #075 Werkstatt: Kurzzeilen und Kleinkram
+- **Status:** offen · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
+- **Für:** Code
+- **Lesen:** docs/features/editor.md, `game/workshop/`
+- **Auftrag (Daniel, 19.11.2026):** C: Quest-Zeile mit Stücken, beschriftete Tabellen (Stärke-Gewichte), richtiges Bild im Ereignis-Baukasten, schlanke Übersicht. Reihenfolge (Daniel): erst A, dann Datensets, dann B und C; inkrementell.
+- **Rückfragen:** –
+- **Ergebnis:** –
+
+### #074 Werkstatt: Verzahnungs-Ansichten
+- **Status:** offen · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
+- **Für:** Code
+- **Lesen:** docs/features/editor.md, `game/workshop/`
+- **Auftrag (Daniel, 19.11.2026):** B: Merker-Explorer (wer setzt, wer liest, Ketten), Marken-Sets mit ihren Teilen, Bedingungen in den Kurzzeilen. Reihenfolge (Daniel): erst A, dann Datensets, dann B und C; inkrementell.
+- **Rückfragen:** –
+- **Ergebnis:** –
+
+### #073 Datensets: speichern unter, laden, aktivieren
+- **Status:** offen · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
+- **Für:** Code
+- **Lesen:** docs/features/editor.md, `game/workshop/`
+- **Auftrag (Daniel, 19.11.2026):** „Es wäre an der Zeit, Speichern und Laden von verschiedenen Konfigurationen zu erlauben … Im Hauptmenü würde dann unten in der Statusleiste angezeigt werden, welches Datenset gerade aktiv ist.“ Antworten: im Repo als **Variante** (nur geänderte Einträge, Overlay über dem Standard), aktiv wählbar in **Hauptmenü + Werkstatt** (pro Gerät). Reihenfolge (Daniel): erst A, dann Datensets, dann B und C; inkrementell.
+- **Rückfragen:** –
+- **Ergebnis:** –
+
+### #072 Werkstatt: breite Tabellen als Karten
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
+- **Für:** Code
+- **Lesen:** docs/features/editor.md, `game/workshop/`
+- **Auftrag (Daniel, 19.11.2026):** A: Tabellen mit vielen Spalten (Ereignis-Baukasten › Lagen/Antworten, Begabungen) zeigen eine Kurzzeile je Eintrag, ein Klick klappt ein Formular in Gruppen auf. Reihenfolge (Daniel): erst A, dann Datensets, dann B und C; inkrementell.
+- **Rückfragen:** –
+- **Ergebnis:** –
 
 ### #071 Kleine Fehler: Macken-Wirkung als Feld, Wetter-Gewichte in der Werkstatt, Welt-Merker
 - **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 6)
