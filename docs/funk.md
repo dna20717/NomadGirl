@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: #116 fertig: Ziehen zum Wachsen (Laterne, Stangen, Turm, Leitern, Kistenstapel, lange Zelte) aus gemalten Modulen, Bau-Raster um AvA. PixelLab 150.
 - 19.11. Code → Ava: #115 fertig: Parallax-Sets je Region (Camp, POIs draußen, Fahrt, Startseite), schwarze Silhouetten vorne, AvA scannt Billboards am Gummiband; Windrad-Schweben behoben. PixelLab 320.
 - 19.11. Code → Ava: #114 fertig: Pinsel (Container + Stoffe), Innenkram, Fenster/Türen in Containerfarbe, Leitern und Klapptreppen frei. PixelLab 20.
 - 19.11. Code → Ava: **Alle Spielstände zurückgesetzt** (Daniel): `SAVE_VERSION` 2, jeder alte Stand startet beim nächsten Laden frisch.
@@ -244,11 +245,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #116 Ziehen zum Wachsen: Laterne, Stangen, Turm, Leitern, Kistenstapel, Zelte
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel: „Dinge wie Laterne so designen, dass man die Ziehen-zum-Vergrößern-Funktion benutzen kann, wie Laterne, Pfosten oder Wachturm“)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel: „Dinge wie Laterne so designen, dass man die Ziehen-zum-Vergrößern-Funktion benutzen kann, wie Laterne, Pfosten oder Wachturm“)
 - **Lesen:** docs/features/camp.md › Camp-Baukasten, docs/features/rig.md › Container ziehen und höher
 - **Auftrag (Daniels Wahl):** Im Bau-Modus am Griff ziehen: Laternenpfosten, Zeltstangen, Aussichtsturm, Leitern (Höhe), Kisten (Ziehen macht einen Stapel, der dynamisch wächst), Zelte (dynamisch in der Breite, eingeschränkt in der Höhe). Grafik neu in Modulen (PixelLab, Kopf/Mittelstücke/Fuß), streng orthogonal. Höhe wirkt (Laterne leuchtet weiter, Turm zeigt mehr, Stangen heben Zelte). Stufen passend zum Modell. Bebaubarer Raum sichtbar wie die Beute auf dem Boden im POI (Scan-Raster), das Raster richtet sich nach AvAs Position.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: Zelte als zwei neue freie Stücke (Streifenzelt, Langes Armeezelt), die gespannten Code-Zelte bleiben; Zelthöhe über ein dünnes Wand-Band (1–4), die Laterne an der Tür streckt sich leicht mit; Leiter wächst nur über das Dach hinaus (0–3 Kacheln); Turm startet mit 2 Etagen, Leyla passt nicht ganz unters Dach; Wachsen prüft keine Überschneidung; Bau-Raster in halben Kacheln, bebaubar = Boden und Dächer bzw. die freien Plätze des Stücks in der Hand; neue Zelte noch nicht streichbar.
+- **Ergebnis:** (Code) Commits „Ziehen zum Wachsen … (#116)“ und Doku. `npm test` 337/337, Browser `grow_test` 9/9 (neu), decor/decor_kit/paint/resize/build/build_pad/camp/cozy/stack/workshop/container grün. **PixelLab 150** (6 Aufträge; 2 davon neu, weil Varianten am Bildrand angeschnitten waren), übrig 2.405,6. Bilder `output/grow_griffe.png`, `grow_turm.png`, `grow_raster.png`. **Bitte testen:** Cheat „Alle Deko freischalten“, B › Laternenpfosten, Zeltstange, Turm, Kiste, Streifenzelt hinstellen und am goldenen Griff ziehen; auf den hohen Turm klettern; mit einem Stück in der Hand AvA über den Boden fliegen (Raster).
 
 ### #115 Parallax-Hintergründe, Vordergrund-Silhouetten, Billboard-Scan
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel: „Die Parallax-Hintergründe überall können bitte in hübsch umgesetzt werden. Modular. Auch ein paar schwarze Vordergrund-Formen wären spannend. Billboards nicht mehr fotografieren, sondern AvA scannen. Man kann sie bewegen (Gummiband)“)
