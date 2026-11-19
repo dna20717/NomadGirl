@@ -6,6 +6,8 @@ Stand: 12.11.2026 abends (Durchsicht von Ava). Kleinigkeiten sind schon behoben 
 
 **Entschieden 12.11.2026 abends (Daniel):** A1 machen (Funkbuch #002) · A2, A3 erstmal so lassen · A4 Abspann, danach offenes Spiel mit AvA als spielbarer Figur (design.md) · A6 ja, 2.400 kg bleiben · A7 keine der beiden Fassungen: ein **Trophäenraum im Cyberpunk-Stil** (Funkbuch #003). Offen: A5, A8.
 
+**Entschieden 19.11.2026 (Daniel, Entscheidungskarten):** A5 Dunkelheit wird ein eigener Skilltree mit Warnung, dunklen Skills und einer Kopfgeldjäger-Fraktion (Funkbuch #080) · A8 Balancing wird versioniert, v1 per Simulation (#081). Aus B: Hausmeister-Boss und Gewehr in Kletter-Animationen **gestrichen**; Licht (#082), Bild-Upload (#083), Werkstatt-Stufen (#078), Zelle (#079), Fahrgestell/Camp-Boden (#084) als Nächstes; Companions-Aussehen und Tier-/Drohnen-Bausatz später.
+
 | # | Thema | Worum es geht | Vorschlag Ava |
 |---|---|---|---|
 | A1 | **CLAUDE.md ist 184 KB groß** | Jede Sitzung lädt die ganze Datei (grob 50.000 Tokens), bevor die Arbeit beginnt. Der Großteil ist Feature-Beschreibung und Verlauf („Stand“). | Aufteilen: CLAUDE.md behält Regeln, Ordner, Tests und Kurzregeln (≈ 15 KB); die Feature-Abschnitte ziehen nach `docs/features/*.md` (Leyla, Kampf, Camp, Rig, POIs, Inventar, Progression …), der Verlauf nach `docs/changelog.md`. |

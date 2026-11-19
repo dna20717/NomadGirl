@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: **Entscheidungsrunde** (Daniel über Entscheidungskarten, Artefakt „NomadGirl Entscheidungskarten“): alle ⚠️ aus #026–#075 entschieden, Tickets `abgenommen`; Änderungen gesammelt in **#076**. Neu offen: #077 Mega-Rig-Hauptcontainer, #078 Werkstätten ausbauen, #079 Zelle/Gefangene, #080 Dunkelheit-Skilltree (erst reden), #081 Balancing v1, #082 Licht, #083 Bild-Upload, #084 PixelLab-Grafik, #085 Crew-Kern klein (ersetzt #040), #086 Story-Enden, #087–#091 Ideen. Gestrichen: Hausmeister-Boss, Gewehr in Kletter-Animationen. Später: Companions-Aussehen, Tier-/Drohnen-Bausatz.
 - 19.11. Code → Ava: **HNC / Übergabe.** Stand `main` (alles gepusht, `npm test` 273/273, letzte volle Browser-Suite 47/48 nach #073 mit behobenem Rennen in der Werkstatt, danach Werkstatt-, Online-, Datenset- und Karten-Test grün). Gebaut seit der letzten Übergabe:
   - **#057 Silo Zero** (XXL-Raketensilo, Zero Hour, Major Null, Silo-KI Titan Lullaby) und **#058 Schatzsuche „I become death …“** (fünf Kartenstücke, Onkel Sung deckt den Ort auf).
   - **Verzahnung #059–#065:** Antworten mit Voraussetzungen (Crew, Implantate, AvA, Rig, Werkstätten) · Bit-Farm mit Entity-Workern und freundlichen Duellen · Revier-Camp (Frieden, Klauen, Tresor nur mit Gewalt, Handel) · Quests aus Straßen-Merkern · Wetter mit Folgen und Meldungen · Influencer-Billboards und Markentreue · Cyberware im Duell.
@@ -205,8 +206,87 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commits, Tests, PixelLab diesmal/übrig, bitte testen: …
 ```
 
+### #076 Absegnung 19.11.: Änderungen aus #026–#075
+- **Status:** offen · angelegt 19.11. von Code (Daniel hat alle ⚠️ aus #026–#075 über die Entscheidungskarten entschieden, Tickets `abgenommen`)
+- **Für:** Code
+- **Auftrag (Daniel, 19.11.2026, Entscheidungskarten):** Alles andere bleibt wie gebaut. Ändern:
+  1. **Gegenpaare (#033):** manche Nachbar-Werkstätten stören sich (z. B. Generator neben Schlafkoje), in der Synergie-Vorschau sichtbar.
+  2. **Neues Spiel mit Bastler-Deck (#049).**
+  3. **Duelle kürzer (#050):** Integrität 50 → 35, Ziel 3–6 Runden; gilt für /duel, /mobile und das Spiel.
+  4. **Van-Tileset einbauen (#056):** Van im Code aus den Teilen zusammensetzen.
+  5. **Silo Zero mehr Belohnung (#057/#058):** Ort + 400 Δ und ein Unikat-Teil; Quest-Titel **„Now I am become Death“**.
+  6. **Worker auch an der Werkbank einteilen (#060)**, zusätzlich zum Inventar.
+  7. **Ausrüstung + Tank in den Boni-Bus (#066)** (Vorstufe Werte-Bildschirm #091).
+  8. **Verschlossene Antworten (#059):** man sieht als Anreiz, *was* fehlt (z. B. „braucht Ripperdoc“).
+  9. **Verrat an der Läuferin (#074):** Ketten-Quest, die Läuferin kommt zurück und bietet gegen Bezahlung eine zweite Chance.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #077 Mega-Rigs: Hauptcontainer statt Lager am Boden
+- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte #029)
+- **Auftrag (Daniel, 19.11.2026):** „beide Rigs sollen kein Lager mehr am Boden haben, sondern das Lager sein. Das heißt, wir brauchen einen Hauptcontainer je Rig (zunächst nur mit Code-Grafiken), der das Lager ersetzt.“ Feuer, Kiste, Brett, Companions ziehen an Bord.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #078 Werkstätten ausbauen (Stufen mit Sternchen)
+- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte „Werkstatt-Bilder je Ausbaustufe“: als Nächstes)
+- **Auftrag (Daniel, 19.11.2026):** „Bau bitte das ganze Fundament dafür und ermögliche den Ausbau von Werkstätten. Kennzeichne es dann mit Sternchen neben dem Titel der Werkstatt in der Rig-Ansicht und in der jeweiligen Werkstatt.“ Stufen in der Werkstatt (Schema), Kosten, Wirkung je Stufe, Bild je Stufe (Platzhalter, PixelLab später nach Freigabe).
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #079 Die Zelle: Gefangene
+- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte „Wirkung der Zelle“: als Nächstes)
+- **Auftrag (Daniel, 19.11.2026):** „Ist zunächst die Grundlage, um Gefangene transportieren zu können. Also ein spezielles Inventar. Bau aber die Auftragsart direkt mit ein. Gefangene können in Auseinandersetzungen durch Events beschädigt werden oder auch in Dialogen als Ressource zum Einsatz kommen (mit Auswirkungen auf Ruf, produziert Dunkelheit).“
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #080 Dunkelheit als Skilltree, Kopfgeldjäger-Fraktion
+- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte A5) · **erst reden, dann bauen** (großes Feature)
+- **Auftrag (Daniel, 19.11.2026):** „Dunkelheit ist ein eigener Skilltree, den man leveln KANN. Wenn man den ersten Punkt investiert, bekommt man eine Warnmeldung, dass das Spiel dadurch wirklich schwerer wird. Wenn man die akzeptiert, kann man dunkle Skills freischalten, die Leyla mächtiger machen, aber ihr Ruf leidet darunter, Gegner werden deutlich schwerer und eine neue Fraktion taucht im Spiel auf (eine Gruppe von cyberware-süchtigen Kopfgeldjägern, angeführt von einer komplett wahnsinnigen Entität, die Leyla rekrutieren wollen).“ Quellen der Ressource: u. a. Gefangene (#079).
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #081 Balancing v1 (versioniert, simuliert)
+- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte A8)
+- **Auftrag (Daniel, 19.11.2026):** „Lass uns Balancing auch versionieren. Erarbeite bitte v1 durch einige Simulationen und identifiziere Choke Points, übermäßigen Grind und Imbalance.“ Vorschlag: Balancing als Datenset (#073) `balancing-v1`, Simulation per Fernsteuerung/ohne DOM, Bericht in `docs/balancing.md`.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #082 Licht: God Rays, Schatten, Stromausfall per Schalter
+- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #083 Bilder hochladen in der Online-Werkstatt
+- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)
+- **Auftrag:** `cloud_store.js` kann Bilder als Commit speichern (Größe prüfen, Asset-Eintrag anlegen).
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #084 Grafik per PixelLab: Verbindung, Bit-Farm, Fahrgestell + Camp-Boden
+- **Status:** offen · angelegt 19.11. von Code (Daniel, Karten PixelLab, Bit-Farm, C18)
+- **Auftrag:** (1) PixelLab-Verbindung der Cloud-Umgebung reparieren (19.11. blockte der Proxy `api.pixellab.ai`), Anleitung für Daniel. (2) Bit-Farm-Bild, bis 4 Generierungen (freigegeben). (3) Fahrgestell + Camp-Boden feiner, passend zu #042 (~10–25 Generierungen, vor dem Auftrag Kosten nennen, unter 700 Freigabe).
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #085 Crew-Kern klein (aus #040)
+- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte #040: „Ja, erst klein“)
+- **Auftrag:** #040 Teile 1, 3, 4: Bereich „Leute“, Aufnahme-Entscheidung, Werkstätten-Jobs (dazu ein schlichtes Crew-Fenster). Rig-Moral (Teil 2) danach.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #086 Story: mehrere Enden, Pixies geheimes Ende
+- **Status:** offen · angelegt 19.11. von Code (Daniel, Karten Ende + Pixie) · Design-Ticket, erst Text in `docs/design.md`, dann mit Daniel reden
+- **Auftrag:** Mehrere Enden je nach Entscheidungen und Bindungen; Pixie kann das Ende als **geheimes Ende** verhindern (hohe Bindung + versteckter Merker). Danach offenes Spiel mit AvA (A4).
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #087–#091 Nächste Systeme aus dem Ideenspeicher
+- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte „Was als Nächstes“) · je eigenes Ticket, wenn es losgeht
+- #087 **Wettervorhersage im Warroom** · #088 **Gangs als Auftraggeber** · #089 **Revierkrieg** · #090 **Rig-Radio** · #091 **Werte-Bildschirm** (baut auf #076 Punkt 7)
+
 ### #062 Quests aus Straßen-Merkern
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
 - **Für:** Code
 - **Lesen:** docs/features/worldmap.md (Ketten, Merker)
 - **Auftrag (Daniel, 18.11.2026):** Punkt 4: „ja, machen“: Merker aus Straßen-Geschichten schalten Quests frei.
@@ -214,7 +294,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Quests aus Straßen-Merkern (#062)“ auf `main`. Quests › Erst mit Merker / Nicht mit Merker, 4 neue Aufträge, Meldung „Neuer Auftrag“. `npm test` 254/254 (neu `test/quest_flags.test.js`), Browser camp/drive/silo grün. PixelLab 0. **Bitte testen:** eine Fehde bis zum Ende spielen, dann zu Schraube.
 
 ### #063 Wetter mit Folgen (mit Meldungen)
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
 - **Für:** Code
 - **Lesen:** docs/features/world.md (Wetter), docs/features/benches.md (Zisterne)
 - **Auftrag (Daniel, 18.11.2026):** Punkt 5: „auch machen, aber mit Meldungen“: Regen auf der Fahrt füllt die Zisterne, Sandsturm macht bestimmte Ereignisse wahrscheinlicher, Nebel aus dem Wetter zieht in den POI; jede Folge mit Meldung.
@@ -222,7 +302,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Wetter mit Folgen (#063)“ auf `main`. Neu `game/weather_fx.js` (`legSky`, `runSky`, `cisternWater`), Gewichtung in `generateEncounter` (`ctx.bias`), Meldungen in `camp_actions` und `scene`. `npm test` 256/256 (neu `test/weather_fx.test.js`), Browser 44/46 im Gesamtlauf: `mobile_test` (Zeitüberschreitung, einzeln 19/19 grün) und `tutorial_test` (der bekannte Wackler: der Run-Tipp kommt manchmal nicht, einzeln 2 von 3 grün). PixelLab 0. **Bitte testen:** eine Fahrt durch die Glass Dunes (Sandsturm) und einen POI im Regen.
 
 ### #064 Markentreue und Influencer-Billboards
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
 - **Für:** Code
 - **Lesen:** docs/features/lore.md, docs/features/worldmap.md (Billboards)
 - **Auftrag (Daniel, 18.11.2026):** Punkt 6: „auf jeden Fall machen. Billboards auf der Reise sollen ab sofort einen Nachlass ermöglichen. Klickt man sie während der Fahrt an, erhält man den Buff „Influencer + Brand“ und damit einen ordentlichen Nachlass (20 Prozent) auf diese Brand in den nächsten xy Stunden.“ Dazu Set-Bonus für drei Teile derselben Marke.
@@ -230,7 +310,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Markentreue und Influencer-Billboards (#064)“ auf `main`. Neu `game/brand_perks.js`, `road.hit`, Billboard-Tipp in `drive_ui.js`, Markenstand (Lage › Laden), Lore › Marken › Markentreue, Inventar-Zeile Markentreue. `npm test` 259/259 (neu `test/brand_perks.test.js`), Browser 46/46 (`drive_test` 18 mit echtem Klick). PixelLab 0. **Bitte testen:** während der Fahrt ein Billboard antippen, dann an der Karawane Sprit kaufen.
 
 ### #075 Werkstatt: Kurzzeilen und Kleinkram
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
+- **Status:** abgenommen (19.11., #076) · fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
 - **Für:** Code
 - **Lesen:** docs/features/editor.md, `game/workshop/`
 - **Auftrag (Daniel, 19.11.2026):** C: Quest-Zeile mit Stücken, beschriftete Tabellen (Stärke-Gewichte), richtiges Bild im Ereignis-Baukasten, schlanke Übersicht. Reihenfolge (Daniel): erst A, dann Datensets, dann B und C; inkrementell.
@@ -238,7 +318,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Werkstatt: Kurzzeilen und Kleinkram (#075)“ auf `main`. Quest-Kurzzeilen, `rowLabel`, Aussehen ohne Tabellenbilder, Karten-Text gekürzt, Datenset-Beschreibung. `npm test` 273/273, `workshop_test`, `workshop_cloud_test`, `datasets_test`, `map_test` grün. PixelLab 0.
 
 ### #074 Werkstatt: Verzahnungs-Ansichten
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
+- **Status:** abgenommen (19.11., #076) · fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
 - **Für:** Code
 - **Lesen:** docs/features/editor.md, `game/workshop/`
 - **Auftrag (Daniel, 19.11.2026):** B: Merker-Explorer (wer setzt, wer liest, Ketten), Marken-Sets mit ihren Teilen, Bedingungen in den Kurzzeilen. Reihenfolge (Daniel): erst A, dann Datensets, dann B und C; inkrementell.
@@ -246,7 +326,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Verzahnungs-Ansichten (#074)“ auf `main`. `summaries.js` (`flagGraph`, `chainEdges`, Quests, Markentreue, Worker), `workshop.css`. `npm test` 273/273 (neu `test/workshop_views.test.js`), `workshop_test`, `workshop_cloud_test` grün. PixelLab 0.
 
 ### #073 Datensets: speichern unter, laden, aktivieren
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
+- **Status:** abgenommen (19.11., #076) · fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
 - **Für:** Code
 - **Lesen:** docs/features/editor.md, `game/workshop/`
 - **Auftrag (Daniel, 19.11.2026):** „Es wäre an der Zeit, Speichern und Laden von verschiedenen Konfigurationen zu erlauben … Im Hauptmenü würde dann unten in der Statusleiste angezeigt werden, welches Datenset gerade aktiv ist.“ Antworten: im Repo als **Variante** (nur geänderte Einträge, Overlay über dem Standard), aktiv wählbar in **Hauptmenü + Werkstatt** (pro Gerät). Reihenfolge (Daniel): erst A, dann Datensets, dann B und C; inkrementell.
@@ -254,7 +334,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Datensets (#073)“ auf `main`. Neu `engine/sets.js`, `projects/nomadgirl/sets/index.json`, Werkstatt-Knopf + Dialog, Hauptmenü-Eintrag + Statusleiste, Spiel lädt das Overlay. Nebenbei behoben: Werkstatt setzte `workshop.p` zu früh (Rennen mit Tests, `map_test`). `npm test` 271/271 (neu `test/sets.test.js`), Browser 47/48 vor dem Fix (danach `map_test` 3×, `workshop_test`, `datasets_test` 6, `workshop_cloud_test` grün). PixelLab 0. **Bitte testen:** Werkstatt › Knopf „Standard“ › Speichern unter …, etwas ändern, Spiel starten; im Hauptmenü zurück auf Standard klicken.
 
 ### #072 Werkstatt: breite Tabellen als Karten
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
+- **Status:** abgenommen (19.11., #076) · fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
 - **Für:** Code
 - **Lesen:** docs/features/editor.md, `game/workshop/`
 - **Auftrag (Daniel, 19.11.2026):** A: Tabellen mit vielen Spalten (Ereignis-Baukasten › Lagen/Antworten, Begabungen) zeigen eine Kurzzeile je Eintrag, ein Klick klappt ein Formular in Gruppen auf. Reihenfolge (Daniel): erst A, dann Datensets, dann B und C; inkrementell.
@@ -262,7 +342,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Breite Tabellen als Karten (#072)“ auf `main`. `workshop.js` (`cardTable`, `cardGroup`), `workshop.css`. `workshop_test` (neu: Karten, Ändern, Rückgängig, Filter), `workshop_cloud_test`, `web:test`, `npm test` 269/269 grün. PixelLab 0. **Bitte ansehen:** Werkstatt › Ereignis-Baukasten, eine Lage aufklappen.
 
 ### #071 Kleine Fehler: Macken-Wirkung als Feld, Wetter-Gewichte in der Werkstatt, Welt-Merker
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 6)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 6)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 6 der Eleganz-Prüfung)
 - **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
@@ -270,7 +350,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Kleine Fehler (#071)“ auf `main`. Macken › Wirkung als Worker (Daten + `quirkEffect`), Ereignis-Baukasten › Wetter (Gewichte), `conditions.worldFlags`/`setFlag`. `npm test` 269/269 (neu `test/cleanup071.test.js`), Browser 47/47. PixelLab 0. Dazu im Ideenspeicher (`docs/backlog.md` › D): die entstandenen Kreisläufe und elf Systeme, die daraus wachsen könnten.
 
 ### #070 Meldungs-Kanal mit Vorrang und Logbuch
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 5)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 5)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 5 der Eleganz-Prüfung)
 - **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
@@ -278,7 +358,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Meldungs-Kanal und Logbuch (#070)“ auf `main`. `hud.js`: Warteschlange, `journal`, Menü › Logbuch. `npm test` 266/266, Browser 47/47 (neu `logbook_test` 3). PixelLab 0. **Bitte testen:** einen POI im Regen bei einer befreundeten Gang starten (mehrere Meldungen auf einmal), danach Menü › Logbuch.
 
 ### #069 Preise bündeln: eine Preis-Funktion
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 3)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 3)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 3 der Eleganz-Prüfung)
 - **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
@@ -286,7 +366,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Preise bündeln (#069)“ auf `main`. Neu `game/pricing.js` (`pay`, `earn`, `factors`, `factorText`), umgestellt Antworten unterwegs (inkl. Markenstand) und Revier-Handel. `npm test` 266/266 (neu `test/pricing.test.js` vergleicht mit der alten Formel), Browser 46/46. PixelLab 0.
 
 ### #068 Eine Bedingungs-Sprache für Ereignisse, Quests, Händler
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 2)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 2)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 2 der Eleganz-Prüfung)
 - **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
@@ -294,7 +374,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Eine Bedingungs-Sprache (#068)“ auf `main`. Neu `game/conditions.js`, `needs.js` als Hülle, Lagen und Quests prüfen über `check`, Werkstatt: Crew-&-Rig-Felder jetzt auch bei Lagen und Quests (`CREW_NEEDS`). `npm test` 264/264 (neu `test/conditions.test.js`), Browser 46/46. PixelLab 0.
 
 ### #067 Effekt-Leiste im HUD (Effekte mit Ablauf)
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 4)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 4)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 4 der Eleganz-Prüfung)
 - **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
@@ -302,7 +382,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Effekt-Leiste (#067)“ auf `main`. Neu `game/effects.js`, HUD-Chips (`hud.js`, `play.css`). Nebenbei der Wackler `tutorial_test` behoben: die Run-Lektion hing an der Spielzeit (8 s / 40 s), die kopflos ungleich lief; der Test stellt jetzt die Uhr des Feldhandbuchs vor (8 von 8 grün). `npm test` 262/262 (neu `test/effects.test.js`), Browser 45/46 vor dem Fix, `tutorial_test` danach 8/8. PixelLab 0. **Bitte ansehen:** Camp mit einem Buff und nach einem Billboard-Tipp.
 
 ### #066 Boni-Bus: alle Bonus-Quellen an einem Ort
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 1)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, „Wo konnte die Vernetzung eleganter sein?“ Punkt 1)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Ich bin eine Weile AFK, arbeite ruhig alles ab, hab aber die Qualität im Blick und gehe inkrementell vor, damit wir nicht versehentlich alles kaputt machen.“ (Punkt 1 der Eleganz-Prüfung)
 - **Fertig, wenn:** gleiche Zahlen wie vorher (Tests), Werkstatt/Spiel ohne Fehler, Build grün auf `main`, je Ticket ein eigener Commit.
@@ -310,7 +390,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Boni-Bus (#066)“ auf `main`. Neu `game/mods.js`, umgestellt Garten, Kochen/Herstellen, Reisen, Schlafen, Chillen, Δ aus Runs, Extra-Beute; Anzeigen „Wachstum: …“, „Heilt 100 % (…)“, „Ruhe: …“. `npm test` 261/261 (neu `test/mods.test.js` prüft die alte Formel), Browser 46/46. PixelLab 0.
 
 ### #065 Cyberware im Duell
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
 - **Für:** Code
 - **Lesen:** docs/features/cyberware.md, docs/features/glitchlings.md
 - **Auftrag (Daniel, 18.11.2026):** Punkt 7: „ja. Machen.“ (Implantate wirken im Glitch-Duell, z. B. mehr Integrität).
@@ -318,7 +398,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Cyberware im Duell (#065)“ auf `main`. Neu: Ausrüstungswert `hack`, 10 Implantate, Duell-Kopf „Implantate: +N Integrität“, Gegner behält seine Integrität. `npm test` 259/259, Browser 46/46 (`bitfarm_test` 6). PixelLab 0. **Bitte testen:** Overclock-Chip einbauen, dann ein Schalter-Duell im POI.
 
 ### #061 Ruf im POI: Revier-Camp der Gang
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 3)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 3)
 - **Für:** Code
 - **Lesen:** docs/features/pois.md, docs/features/worldmap.md (Ruf)
 - **Auftrag (Daniel, 18.11.2026):** „Der POI wird dann zu einem Camp mit dem Hinweis zu Beginn, dass das Revier der Gang XY ist und man mit ihnen in welcher Beziehung steht. ABER man kann immer auch kämpfen und töten. Was im Zweifel den Ruf beschädigt.“ Beute: „Klauen kostet Ruf“ (Kisten gehören der Gang, Öffnen unter Zeugen kostet Ruf, heimlich geht; Tresor + Boss nur mit Kampf; Händler/Auftraggeber im Camp).
@@ -326,7 +406,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Revier-Camp (#061)“ auf `main`. Neu `game/play/turf.js`, Haken in `enemies.js` (friedlich: sieht, nickt, hört nichts; Treffer bricht den Frieden), `poi_level.js` (Kiste der Gang, Tresor nur mit Gewalt, Reden), 4 Felder in Ereignis-Baukasten › Ruf. `npm test` 248/248, Browser 45/45 (neu `turf_test` 7). PixelLab 0. **Bitte testen:** in der Werkstatt nichts nötig; im Spiel Ruf bei einer Gang hochspielen (Ereignisse), dann ihren POI plündern: Toast, Reden, Handeln, eine Kiste vor ihren Augen.
 
 ### #060 Bit-Farm: Entities speichern, als Worker an Werkbänken, freundliche Duelle in der Chill-Ecke
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 2)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 2)
 - **Für:** Code
 - **Lesen:** docs/features/glitchlings.md, docs/features/benches.md, docs/features/crafting.md
 - **Auftrag (Daniel, 18.11.2026):** neue Werkstatt **Bit-Farm**, „ein Inventar, in dem man die AIs speichern kann. Entities, die dort gespeichert sind, können dann an bestimmten Werkbänken als Worker ausgewählt werden.“ Worker: **Charakter-Bonus** (Bonus und Macke aus dem Charakter). „In der Chill-Ecke gibt es die Möglichkeit, freundlich mit bereits gefangenen Entitäten zu duellieren“: **Bindung steigt** (stärkerer Worker-Bonus, neue Banter-Zeilen), kein Risiko.
@@ -334,7 +414,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Bit-Farm (#060)“ auf `main`. Neu `game/workers.js`, Werkstatt `bitfarm`, Werkstatt-Art Bit-Farm, Banter-Moment „Vertraut“ (13 Charaktere), Haken in Kochen/Herstellen, Garten, Strom, Reisen, Schlafen, Chillen; Freundliches Duell (fängt nichts). `npm test` 251/251 (neu `test/workers.test.js`), Browser 46/46 (neu `bitfarm_test` 5). PixelLab 0. **Bitte testen:** Bit-Farm im Bau-Modus kaufen, eine Entity hineinlegen, als Worker an die Kochnische, in der Chill-Ecke ein freundliches Duell.
 
 ### #059 Antworten mit Voraussetzungen aus anderen Systemen
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 1)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung Punkt 1)
 - **Für:** Code
 - **Lesen:** docs/features/worldmap.md (Ereignis-Baukasten)
 - **Auftrag (Daniel, 18.11.2026):** „1 auf jeden Fall“: Antworten im Ereignis-Baukasten verlangen ein Implantat, einen Companion an Bord, ein AvA-Anbauteil, ein Rig-Teil oder eine Werkstatt im Rig („Schraube flickt den LKW“, „Mit dem Rammbock durch die Sperre“, „Optik-Implantat erkennt die Falle“).
@@ -342,7 +422,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Antworten mit Voraussetzungen (#059)“ auf `main`. Neu `game/needs.js`, 6 Spalten in Ereignis-Baukasten › Antworten, 12 Antworten. `npm test` 248/248 (neu `test/needs.test.js`), `drive_test` 17 (tankt vor der zweiten Fehde-Fahrt auf, weil `choose(0)` jetzt oft Panzerung rammt). PixelLab 0. **Bitte testen:** Fahrten mit Schraube an Bord (Pannenfahrzeug), Hinterhalt mit und ohne Augen-Implantat.
 
 ### #058 Schatzsuche „I become death …“ um Silo Zero
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/pois.md › Silo Zero
 - **Auftrag (Daniel, 18.11.2026):** „Lass uns eine richtige Schatzsuche rund um das Silo bauen. Es gibt insgesamt fünf Stücke einer Karte, die man finden kann, um den Ort final zu offenbaren. Manche kann man kaufen, andere findet man in der Welt. Wenn man das erste findet und mit Onkel drüber spricht, poppt das Quest auf. Der Name des Quests ist „I becom death …“, von Oppenheimers Zitat entliehen.“
@@ -350,7 +430,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Schatzsuche I become death … (#058)“ auf `main`. Neu: POI › Fundstücke (`treasureFind`), Quests › Abgeben: alle diese / Erst wenn eins davon da ist / Merker beim Annehmen / Ort aufdecken, Item-Tag Questgegenstand, 2 Lagen + 4 Antworten, Questlog hakt Stücke ab, Onkel nennt die fehlenden. `npm test` 244/244 (`test/silo.test.js` 5), Browser siehe Funkspruch (`silo_test` 10). PixelLab 0. **Bitte testen:** Bunker 13 bis zum Tresor, mit dem Stück zu Onkel Sung, Quest annehmen, dann Händler auf der Straße.
 
 ### #057 Raketensilo: großer versteckter POI in den Bergen
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Bild „Cyberpunk Underground Rocket Silo“ von Daniel)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Bild „Cyberpunk Underground Rocket Silo“ von Daniel)
 - **Für:** Code
 - **Lesen:** docs/features/pois.md (Stapel, Tiefe), docs/features/worldmap.md (Ketten, Orte), docs/features/glitchlings.md (Duell in der Welt)
 - **Auftrag (Daniel, 18.11.2026):** „Kannst du daraus einen spielbaren POI machen und ihn irgendwo in den Bergen auf der Map verstecken?“ Antworten: vorhandene Kacheln + Bild als Karte; versteckt, bis eine Geschichte ihn verrät; Silo-KI zum Duell als **optionales** Ziel, sehr schwer, Sieg = einzigartige Entity; eigene Gang; **mindestens 20 Räume**, einer der größten POIs; Boss unten.
@@ -358,14 +438,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Silo Zero …“ auf `main`. Neu: Räume `rs_*` (`tools/poi_rooms_057.py`), Raum-Zeichen `@` (KI-Terminal), Orte › Versteckt + `revealPlace`, Lagen-Feld Feste Gang, Entity-Spalten Duell-Integrität/Rauschen. `npm test` grün (`test/silo.test.js`), Browser `silo_test`. PixelLab 0. **Bitte testen:** `/game?poi=raketensilo` bis nach unten, KI-Terminal.
 
 ### #056 Van streng von der Seite (zu + Querschnitt)
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, PixelLab 20–30 freigegeben)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, PixelLab 20–30 freigegeben)
 - **Für:** Code
 - **Auftrag (Daniel, 18.11.2026):** „Der Van hat eine Version mit offener und mit geschlossener Tür, aber sie sind nicht deckungsgleich … erzeuge einen orthogonalen Van im gleichen Stil, einmal von außen (Tür zu) und einmal im Seitenquerschnitt offen mit Platz für zwei Werkbänke … idealerweise in einer Art Tileset. WICHTIG: der Style des alten Vans soll erhalten bleiben, aber 100 % orthogonal.“
 - **Rückfragen:** (Code) ⚠️ vorläufig: die animierte Drehschüssel und das Dachgeländer im Vordergrund sind aus (die Schüssel ist jetzt im Bild); Tür = Überblendung in 5 Frames; Tileset als Bild mit festen Spalten (Heck, Nische, Stütze, Nische, Fahrerhaus), noch nicht im Code zusammengesetzt.
 - **Ergebnis:** (Code) siehe Commit „Van streng von der Seite …“. PixelLab diesmal 19 (übrig ~270). **Bitte testen:** Camp, zum Van gehen: Querschnitt mit Schlafkoje und Kochnische, weggehen: zu; Leiter aufs Dach.
 
 ### #055 Riesen-Billboards, Ruf bei den Gangs, Ereignisse mit Folgen und Ketten
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** design.md › Die Karawane › Ruf; docs/features/worldmap.md (Fahrt, Ereignis-Baukasten); docs/features/lore.md (Marken)
 - **Auftrag (Daniel, 18.11.2026):** „Nimm in die Welt noch riesige digitale Billboards für unsere ganzen Brands auf. Lass dort Werbung laufen. Verzahne den Ruf bei den einzelnen Fraktionen mit den Ereignissen und nutze die existierenden Gangs dafür. Es wäre ärgerlich, wenn Leyla von Gang A angegriffen würde, obwohl ihr Ruf bei denen auf max ist. Auch sollen die Ereignisse Auswirkungen auf den Verlauf des weiteren Spiels haben und ggf. auch Events sein, die in drei bis vier Etappen passieren (wie ein Micro-Choose-your-own-Adventure).“
@@ -374,7 +454,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Riesen-Billboards mit Werbung, Ruf bei den Gangs …“ auf `main`. Neu: `game/reputation.js`; `road.js` Billboards + `ads()`; `road_events.js` Gang/Ruf/Merker/Ketten; `travel.js` Folgen in `choose`, Ketten in `pickEncounter`; Reisekarte Revier + Ruf; 14 neue Lagen, 23 neue Antworten. `npm test` 239/239 (neu `test/reputation.test.js`), Browser 43/43 (`drive_test` 17). PixelLab 0. **Bitte testen:** abends durch den Delta Ring fahren (Billboards), Werkstatt › Ereignis-Baukasten mit „Ruf: Freund/Feind“ würfeln, eine Fehde bis zum Ende spielen.
 
 ### #054 Ereignis-Baukasten für unterwegs
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/worldmap.md (Zwischenfälle, Fahrt in Szene)
 - **Auftrag (Daniel, 18.11.2026):** „Mehr Abwechslung in den Ereignissen unterwegs. Bau ein System, aus dem man diese Situationen generieren kann. Ich bin AFK.“
@@ -383,7 +463,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Ereignis-Baukasten …“ auf `main`. Neu: `game/road_events.js`, `data/road_events.json`, Werkstatt › Welt › Ereignis-Baukasten mit Vorschau (6 gewürfelte Karten, Gefahr, Nacht), `travel.js` `pickEncounter`/`encounterById` + Risiko, `road.js` 7 neue Straßenrand-Dinge. `npm test` 234/234 (neu `test/road_events.test.js`), Browser 43/43 (`drive_test` 12). PixelLab 0. **Bitte testen:** Werkstatt › Ereignis-Baukasten › „Neu würfeln“, dann ein paar Fahrten über mehrere Etappen.
 
 ### #053 Die Fahrt in Szene (wie Keep Driving)
-- **Status:** fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/worldmap.md (Reisen in Etappen, Zwischenfälle), docs/features/camp.md, game/weather.js
 - **Auftrag (Daniel, 18.11.2026):** „Die Reise von POI zu POI ähnlich in Szene setzen wie bei Keep Driving.“ Antworten: **1a** erst in Szene setzen (Rig fährt, Landschaft zieht vorbei, Zwischenfälle rollen sichtbar heran, Entscheidung wie bisher im Fenster), **2a** das echte, selbst gebaute Rig mit Anhängern von der Seite, **3c** Landschaft erst aus Code je Region, PixelLab später („bau aber trotzdem richtig tolle Lichteffekte, Sonnenuntergänge und Wetter aus Code ein“), **4c** Dauer einstellbar, Standard gemütlich 30 Sekunden je Etappe.
@@ -392,7 +472,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Fahrt in Szene wie Keep Driving …“ auf `main`. Neu: `game/road.js` (Landschaft, Himmel, Licht, Wetter), `game/play/drive_ui.js` (Fahrt-Fenster), `game/play/rig_snapshot.js`; Werkstatt › Reisen: Fahrt, Licht & Wetter unterwegs, Landschaften (8 Regionen), Fahrt-Vorschau; Encounter › Figuren + Am Straßenrand. `npm test` 228/228 (neu `test/road.test.js`), Browser 43/43 (neu `tools/drive_test.mjs`). PixelLab 0. **Bitte testen:** Van-Tür › Karte › Hinfahren (abends für Sonnenuntergang, nachts für Scheinwerfer), E halten = vorspulen, Esc = überspringen; Werkstatt › Welt › Reisen › Fahrt-Vorschau mit Uhrzeit-Regler.
 
 ### #052 Glitch-Duell im Hauptspiel
-- **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/glitchlings.md, docs/features/pois.md, docs/features/ui.md
 - **Auftrag (Daniel, 17.11.2026):** „Die ganze Kampfanimation, das ganze Kampfinterface für die Duelle so anpassen, dass es im Hauptspiel als Overlay funktionieren würde und sich nahtlos in die vorhandenen UI-UX-Konventionen eingliedert … alle Hebel, die Türen öffnen, durch Schalter ersetzen, die man erst bedienen kann, wenn man ein Duell ausgetragen hat. Dabei geht es nicht darum, zwangsläufig zu gewinnen. Das Gewinnen ist nur dafür da, die KI zu fangen … KIs in verschiedenen anderen Dingen versteckt, so dass, wenn man da vorbeigeht, durch die normale Aktionsbelegung (Stick nach oben oder E) das Duell-Event getriggert wird.“
@@ -401,7 +481,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 220/220 (neu `test/glitch_world.test.js`), Browser alle grün (neu `tools/glitch_duel_test.mjs`, `poi_test`/`poi_stack_test` mit Duell). PixelLab 0. **Bitte testen:** Run zur Mile 7 Gas & Go: an einem NomadCola-Automaten E/↑, am Schalter in der Kammer E/↑, mit Controller ←/→ und A.
 
 ### #051 Glitch-Duell: Bit-Stapel
-- **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** design.md › Hacking v3 › Bit-Stapel, docs/features/glitchlings.md
 - **Auftrag (Daniel, 17.11.2026):** Das Gefecht „läuft noch zu stockend ab“; nach einer Liste beliebter Duell-Minispiele: „Knucklebones klingt interessant. Mach uns mal eine abstrakte Demo mit unseren Glitchlingen.“
@@ -410,7 +490,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 213/213 (neu `test/stack_duel.test.js`), Duell-Browser-Test 15/15. PixelLab 0. **Bitte testen:** /duel: Spalte anklicken oder 1–3, „KI spielt für mich“, Kammerjäger, „Gefecht (alt)“.
 
 ### #050 Glitch-Duell: Demo
-- **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** design.md › Hacking v3 › Das Glitch-Duell, docs/features/glitchlings.md
 - **Auftrag (Daniel, 17.11.2026):** „Schau dir das OPR-Firefight-System für Kämpfe an (ohne Schlagwörter, nur das reine Kampfsystem).“ „Die Welt pausiert. Keine Regeln für Bewegungen … mehr wie ein Kartenspiel … visualisiert (zunächst über Code). Bau bitte eine Demo-Umgebung nur für das Glitch-Spiel. Es wird Erweiterungen geben, aber wir starten einfach. Andere Formulierungen als Nah- und Fernkampf, mit Bezug zu KI und Hacking, aber nicht so plump wie ‚DDoS-Attacke‘.“
@@ -419,7 +499,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 208/208 (neu `test/duel.test.js`), Browser 40/40 (neu `tools/duel_test.mjs`). PixelLab 0. **Bitte testen:** /duel: eigene Karte anklicken, Aktion, Gegner anklicken; „KI spielt für mich“; Kammerjäger; „1000× simulieren“.
 
 ### #049 Entities: Hersteller und Cyberdeck als Fach
-- **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/glitchlings.md, docs/features/lore.md, docs/features/inventory.md
 - **Auftrag (Daniel, 17.11.2026):** „KIs brauchen einen Hersteller. Man muss sie nicht im Inventar transportieren, wenn man ein Cyberdeck hat (was im Grunde zunächst mal ein eigenes Inventar für Glitchlinge ist).“
@@ -428,7 +508,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 202/202, Browser 39/39. PixelLab 0. **Bitte testen:** Spiel laden, Inventar (I): unter dem Rucksack „Bastler-Deck“ mit Amber Slay; Tooltip zeigt Vulkan. Werkstatt › Lore › Marken › Vulkan: „Baut KIs“.
 
 ### #048 Entities: Code-Porträts, Archäologe, AvA als Entity
-- **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/glitchlings.md, design.md › Hacking v3: Entities
 - **Auftrag (Daniel, 17.11.2026):** „Ich möchte, dass die Glitchlings jeweils ein individuelles, animiertes Code-Porträt bekommen, das gleichzeitig das Item-Bild ist (in diesem Fall auch animiert). Eine Kraft soll noch sein „Archäologe“, die dazu führt, dass die Locations aller einzigartigen Beutestücke im Warroom angezeigt werden. Man soll die Möglichkeit haben, AvA zu einer Entity zu machen (das ist ein alternatives Ende; sehr schwer zu erreichen).“
@@ -801,7 +881,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `game/play/camp_board.js` (Brett, Zettel, `talkOf`), Dialog- und Brett-Variante von `hud.menu` (`talk`, `board`), neue Felder Camp › Schwarzes Brett, Spiel › Dialog-Tempo, Companions › Porträt, Mega-Rigs › Hersteller. Tests: `npm test` 145, alle 34 Browser-Tests grün (`camp_test` 33 mit neuer Brett-Prüfung), `web:test` grün, `ng check` stimmig. PixelLab: 0, übrig 674. **Bitte testen:** Camp, E am Brett (Zettel durchblättern mit Pfeilen/Steuerkreuz, annehmen, später abgeben), mit Schraube und Onkel Sung reden (neuer Dialog), Zettel über den Köpfen; /megarig Crawler (Schriftzug am Bug); Mile 7 betreten (Banner „Revier: Yellow Vultures“).
 
 ### #026 Kachel-Sets für Crawler und Fatbird (PixelLab, max. 100)
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Für:** Code
 - **Lesen:** design.md › Mega-Rigs aus Kachel-Sets, Konzeptbilder; docs/features/megarigs.md
 - **Auftrag:** Daniel: „Bitte nutze max 100 Generierungen auf Tilesets für die Mega-Rigs. Wichtig ist, dass sie wirklich cool aussehen (orthogonal!), das ist die maximale Belohnung für den Spieler. Aber versuche auch, das so ökonomisch wie möglich zu machen. Wichtig ist auch, dass die Dinger trotz des Gameplays nicht aussehen wie Boxen. Orientiere dich an den Konzept-Grafiken für die Kontur.“
@@ -814,7 +894,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** 8 Teile in `assets/vehicles/megarig/` (+ `source/`), Bereich Mega-Rigs › Kachel-Set, `crawlerSkin`/`airshipSkin`/`envelopePixels`/`cover` in `megarig_view.js`, `tools/megarig_tiles.py`. Tests: `npm test` 145, alle 34 Browser-Tests grün (`megarig_test` 14, `salvage_test` 7), `ng check` stimmig. PixelLab: diesmal 85, übrig 589 (unter 700). **Bitte testen:** /megarig Crawler und Fatbird in allen Stufen, „Übersicht“, in die Kommandobrücke und die Rumpf-Räume klettern (Haut blendet aus), am Heck aufs Deck; im Camp das Crawler-Wrack.
 
 ### #027 Mega-Rigs aufräumen: Querschnitt, Laufwege, feinere Grafik, LKW mit Container-Anhängern
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/megarigs.md
 - **Auftrag:** Daniel: „Passe bitte die Räume und die Kacheln so an, dass es weniger Durcheinander wirkt. Außerdem müssen die Laufwege besser sichtbar und für den Spieler lesbar sein. Wichtig ist zunächst, dass die Fahrzeuge im Querschnitt gut aussehen, die Favela-Container-Städte bauen wir dann im zweiten Step. Ein paar der Grafiken sind sehr grob. Bitte ein wenig optimieren. Der LKW soll mit den normalen Container-Anhängern funktionieren. Da braucht es keine gesonderte Auflieger-Grafik.“ Entscheidungen: Räume bleiben zu und öffnen beim Betreten; Grafik per Code, PixelLab nur wenn es absolut nicht anders geht.
@@ -827,7 +907,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `megarig_view.js` (`epx`, `bays`, `walkways`, LKW mit `chassisPlan`), Daten LKW (Bug 19, Bett 3). Tests: `npm test` 145, alle 34 Browser-Tests grün (`megarig_test` 16 mit 2 neuen Prüfungen), `ng check` stimmig. PixelLab: 0, übrig 589. **Bitte testen:** /megarig alle drei Fahrzeuge und Stufen, Übersicht und nah ran (Bug, Heck, Fatbird-Nase), Laufwege lesen, in Räume klettern; LKW leer und beladen.
 
 ### #028 Test-Crawler mit Werkbänken und Lichterketten
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, Geschmackstest)
+- **Status:** abgenommen (19.11., #076) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, Geschmackstest)
 - **Für:** Code
 - **Auftrag:** Daniel: „Richte mal testhalber einen Crawler mit Werkbänken und Lichterketten ein.“
 - **Rückfragen:**
@@ -836,7 +916,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `benchesIn`, `stringLights`, Wandteile mit der Haut in `megarig_view.js`; Felder in Schema; Crawler mit 15 eingerichteten Modulen und 11 Lichterketten. Tests: `npm test` 145, `megarig_test` 16, `salvage_test` 7, `workshop_test` grün. PixelLab 0. **Bitte testen:** /megarig › Crawler › Container-Stadt, über die Dächer laufen (Lichterketten), in Container und Rumpf-Räume gehen.
 
 ### #029 Mega-Rigs fahren: Camp an Bord, Bau-Modus aufs Raster, Budgets, Reisen (Crawler + Fatbird)
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, Multiple Choice)
+- **Status:** abgenommen (19.11., #076) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, Multiple Choice)
 - **Für:** Code
 - **Lesen:** design.md › Endgame-Zugmaschinen; docs/features/megarigs.md, rig.md, camp.md
 - **Auftrag:** Daniel: Mega-Rigs fahren. Entscheidungen: altes Rig fährt in die **Ladebucht** (Werkstätten ziehen in den Crawler um, Van/LKW für Orte, an die der Crawler nicht hinkommt); erster Schritt mit **Camp an Bord, Bau-Modus aufs Raster, Budgets, Reisen**; **Crawler und Fatbird zusammen**; **Crew erstmal ohne**.
@@ -852,12 +932,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `game/mega.js`, `game/play/camp_mega.js`, `game/play/mega_build.js`; Zugmaschinen Crawler + Fatbird, Felder Tempo/Fliegt/Mega-Rig, Ausbaustufen mit Preis und Dauer; `buildMegarig` mit eigenen Modulen. Tests: `npm test` 154 (9 neu in `test/mega.test.js`), alle 35 Browser-Tests grün (neu `mega_test` 7), `web:test` grün, `ng check` stimmig. PixelLab 0. **Bitte testen:** Spielstand mit geborgenem Crawler (oder im Menü schummeln: Konsole `save.megarigs=['crawler','fatbird']`), Karte › „Umziehen: Crawler“, an Bord herumklettern, Werkstätten benutzen, B = Bauplan, Container kaufen und stapeln, Werkstätten einräumen, Lichterketten, Ausbau kaufen; reisen; Ladebucht › zurück ins Rig.
 
 ### #030 Crawler-Heck orthogonal
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Auftrag:** Daniel: „Das Heck vom Crawler sieht noch nicht ganz orthogonal aus.“ Befund: rechts war ein Stück Rückansicht (Grill frontal, zwei Rücklichter, Auspuffe nebeneinander). Daniel per Multiple Choice: PixelLab neu (~10).
 - **Ergebnis:** neues Heck in Zielgröße, Felder Kachel-Set › Rumpf im Heck / Schräge ab; skaliert bündig vom Deck bis zur Kette. Tests: `megarig_test`, `mega_test`, `npm test` grün. PixelLab: diesmal 10, übrig 579. **Bitte testen:** /megarig Crawler, Heck in allen Stufen, über die Schräge laufen.
 
 ### #031 Container ohne Dachkante, Fatbird-Heck neu, Rotor-Halterung
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Auftrag:** Daniel: „Wenn du jetzt noch die räumliche Kante der Container in der obersten Reihe ausblendest, so dass die Perspektive einheitlich ist, ist es perfekt. Lass uns Fatbird deshalb auch noch einmal anschauen.“ Dann per Multiple Choice: „Heck neu 10 Gen und reparier die vordere Drohnendüse. Die hängt komplett in der Luft. Das muss zumindest eine ordentliche Halterung hin.“
 - **Rückfragen:**
   - Dachkante → ⚠️ bei allen Containern an Bord abgeschnitten (nicht nur oberste Reihe), weil die Kante auch unten zwischen den Stapeln Draufsicht zeigt. Im Camp (Puppenhaus-Rig) bleibt sie.
@@ -865,14 +945,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `megarig_view.js` (`setCrop`, `pylon`, `post`, Heck-Ausrichtung), Felder Kachel-Set › Heck-Zeile, Heck beginnt vor dem Ende, Triebwerk-Glühen. Tests grün. PixelLab: diesmal 10, übrig 569. **Bitte testen:** /megarig Fatbird und Crawler, Container-Dächer, Rotoren, Fatbird-Heck.
 
 ### #032 Container sauber gestapelt, Träger über die ganze Länge
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Auftrag:** Daniel: „Sortieren wir noch den Container-Stapel auf dem Crawler so, dass sie nicht mehr ineinander reichen, sondern sauber gestapelt sind. Lass die Halterungsträger doch über die gesamte Länge laufen. Das gibt einen industriellen Look.“
 - **Rückfragen:**
   - Ursache → Container-Bilder waren 8 statt 6 Kacheln hoch und 9,3 statt 7 breit. ⚠️ Jetzt genau eine Zelle; der Laufsteg auf dem Dach liegt eine Kachel über dem Bild und steht deshalb auf Stelzen.
 - **Ergebnis:** `megarig_view.js` (Maßstab, Stelzen, `airshipTruss`, `clamp`). Tests: `npm test` 154, `megarig_test` 16, `mega_test` 7, `salvage_test` 7. PixelLab 0. **Bitte testen:** /megarig Crawler (Container-Stadt) und Fatbird.
 
 ### #033 Werkstätten mit Grafik, Heavy-Duty, Auftragsraum, echte Waffenkammer, Synergien
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Für:** Code
 - **Auftrag:** Daniel: „Die vier, die du genannt hast (Kühlraum, Motorraum, Zelle, Reaktor) + Heavy Duty + Aufträge (schwarzes Brett als Werkbank, ähnlicher Raum). Wichtig ist die orthogonale Betrachtung. Dazu noch eine echte Waffenkammer mit Display-Boards analog zur Loot-Kammer. Dann ist die aktuelle Waffenkammer eher die Werkbank dazu. Parallel kannst du ein System ersinnen, wie man Synergien zwischen nebeneinander platzierten Werkbänken schaffen kann.“ PixelLab freigegeben (~75). Nachtrag Daniel: Kühlraum „Perspektive etwas zu gewagt“ → neu (10). Synergien: „wie bei Civilization oder Dorfromantik: wenn in allen verfügbaren angrenzenden Slots passende Werkstätten sind, maximaler Bonus, sonst weniger“.
 - **Rückfragen:**
@@ -884,7 +964,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** 7 Bilder (Kühlraum im zweiten Versuch), Werkstätten `heavy_duty`, `auftragsbuero`, `waffengalerie`, Ständer › Nimmt, `game/synergy.js` + Anbindung in Crafting, Garten, Budget, Schlafen/Ausruhen, Links im Camp. Tests: `npm test` 159 (5 neu), alle 35 Browser-Tests grün. PixelLab: diesmal 85, übrig 484. **Bitte testen:** neue Werkstätten im Bau-Modus kaufen und platzieren, Waffen an die Boards der Waffenkammer hängen, Auftragsbüro benutzen, Werkbank neben Generator stellen (Leuchtlinie, Hinweis „Synergie“), Kühlraum ansehen.
 
 ### #034 Synergie-Vorschau, Reihenschaltung, Leitern
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Für:** Code
 - **Auftrag:** Daniel: „Die Vorschau ist eine gute Idee, nimm die bitte direkt als Nächstes dran. Füge auch eine Form von Synergie mit ein, die bei wenigen Werkstätten eine Reihenschaltung belohnt (Farm, Reaktor, Zelle …): mehr als 1 und ganzer Container selber Typ = dicker Bonus. Nimm auf die Todo-Liste auch Grafiken für evolutionierte Werkstätten mit auf. Und lass bitte ein paar Leitern erzeugen, damit wir endlich hübsche Leitern haben: mit Anfang, Ende, kaputtem Segment und so, dass man sie bei Bedarf im Code einfärben kann. Denk bitte dringend an die orthogonale Perspektive.“
 - **Rückfragen:**
@@ -894,7 +974,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `synergy.js` (Reihe, voller Container, `preview`), Bau-Modus und Bauplan mit Vorschau, `ladder_art.js`, Spiel › Leitern. Tests: `npm test` 160, alle 35 Browser-Tests grün. PixelLab: diesmal 20, übrig 464. **Bitte testen:** Bau-Modus, eine Werkstatt ziehen (Plätze zeigen ihren Bonus), drei Hydrokulturen in einen 40-Fuß-Container; Leitern im Kampfraum, im Camp-Stapel, auf den Mega-Rigs.
 
 ### #035 Leiter orthogonal, Anhänger mit Leitern
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Auftrag:** Daniel: „Sorry, die Leiter ist nicht orthogonal. Besonders der oberste Teil. In diesem Zuge kannst du bitte auch die Treppen für den LKW-Trailer durch Leitern ersetzen.“
 - **Rückfragen:**
   - Leiter → ⚠️ ohne PixelLab: Anfang und Ende aus den Holmen per Code neu gebaut (Haken und Füße waren schräg gemalt), Mitte und kaputtes Stück bleiben.
@@ -902,7 +982,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `tools/ladder_parts.py`, `camp.js` › `groundLadder`, `cozy_test` angepasst. Tests: `npm test` 160, alle 35 Browser-Tests grün. PixelLab 0. **Bitte testen:** Camp, Leiter am Anhänger hochklettern; Leitern im Kampfraum und auf /megarig.
 
 ### #036 Deko-System fürs Camp + Beispiele aus allen Paketen
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, AFK)
+- **Status:** abgenommen (19.11., #076) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat, AFK)
 - **Für:** Code
 - **Auftrag:** Daniel: „Bau das Dekosystem und aus jeder deiner Pakete ein paar Beispiele. Vielleicht auch große Zelte zwischen zwei Containern? Nimm dir richtig Zeit und probiere viele Dinge aus.“ Ideen aus dem Chat: Neon/Banner am Rig, Sonnensegel, Schrott-Stillleben, Trophäen-Regal draußen, Wäscheleine, Windrad, Pflanzen, Hängematte, Graffiti, Topf überm Feuer, Kleinvieh, Wetter am Rig. Deko kostet Δ, keine Werte (einige Gemütlichkeit).
 - **Rückfragen:**
@@ -915,7 +995,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `game/decor.js`, `camp_decor.js`, `build_decor.js`, Bereich Deko (27 Stücke), Camp › Deko, Achievement „Wohnzimmer mit Aussicht“ + Trophäe. Tests: `npm test` 166 (6 neu), alle 36 Browser-Tests grün (neu `decor_test` 5). PixelLab 0. **Bitte testen:** Bau-Modus › Händler › Deko: Zeltstangen setzen und ein Zelt dazwischen spannen, Neon an einen Container, Wäscheleine zwischen zwei Ecken, Hängematte benutzen, nachts schauen (Neon, Laterne, Feuertonne, Zelt-Licht), Vogelhaus aufs Dach und zu den Krähen laufen.
 
 ### #037 Balkone, Brücken, Aussichtsturm (begehbare Deko)
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Auftrag:** Daniel: „Balkone und Brücken auch mitdenken.“
 - **Rückfragen:**
   - Wie kommt man drauf? → ⚠️ Container-Dächer im Camp sind nicht begehbar; deshalb: Balkon am Container-Ende auf Bodenhöhe (aus dem Container hinaus, bei Stapeln ohne Endwand), Brücke zwischen Ankern, dazu ein **Aussichtsturm** mit Leiter als Zugang vom Boden.
@@ -923,7 +1003,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** Balkon, Breiter Balkon, Hängebrücke, Stahlsteg, Aussichtsturm (`camp_decor.js`: `balconyAt`, `walkZone`, `stepUpDecor`, `art_balcony/bridge/tower`), Anker `balc:`/`tower:`. Tests: `decor.test.js` 7, `decor_test` 6. PixelLab 0. **Bitte testen:** Aussichtsturm aufstellen, Balkon an einen gestapelten Container, Hängebrücke dazwischen, hinüberlaufen.
 
 ### #038 Stapel neuer POIs, auch unterirdisch und vertikal
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Auftrag:** Daniel: „Jetzt kannst du gerne noch einen Stapel verschiedene POIs verschiedener Größe erzeugen. Gerne auch unterirdische oder insgesamt vertikale wie Hochhaus-Ruinen.“
 - **Rückfragen:**
   - Abkürzung in Türmen und Tiefen → ⚠️ Schacht mit Leiter neben dem Stapel, unten eine Tür, die nur von der anderen Seite aufgeht (Turm: Schalter unten im Schacht; Tiefe: Schalter im Ausgang).
@@ -933,7 +1013,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** `engine/poi.js` (`buildStack`, Spiegeln, Schacht), Feld POIs › Level › Aufbau, POI-Arten Hochhaus/Untergrund mit Karten-Symbolen, 53 Raum-Bausteine (`tools/poi_rooms_038.py`, `tools/merge_rooms.mjs`), 8 POIs: Delta Heights (Turm L), P+R Delta Süd (Turm M), Funkmast KM 31 (Turm S), Metro Line 4 (Tiefe M), Storm Drain 9 (Tiefe S), Pit 6 (Tiefe XL), Delta Crude Refinery (L), Sunny Acres (S). Tests: `npm test` 170 (3 neu), Browser `poi_stack_test` 8. PixelLab 0. **Bitte testen:** Werkstatt › POIs › Delta Heights › „Im Spiel testen“: Etage für Etage hoch, oben den Tresor, dann den Schacht runter und den Schalter; Metro Line 4 und Pit 6 nach unten.
 
 ### #039 Ressourcen verdienen, Gruppen-Alarm
-- **Status:** fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig (Code, 15.11.) · angelegt 15.11. von Code (Daniel im Code-Chat)
 - **Auftrag:** Daniel wählt aus der Liste „ohne neue Assets“: Ressourcen verdienen (Kisten, Kills, Secrets, guter Rang, design.md) und Gruppen-Alarm (wer Leyla sieht, ruft die anderen).
 - **Rückfragen:**
   - Kochen/Bauen farmbar? → Daniel 16.11.: jedes Herstellen gibt eine der drei Ressourcen (nach Werkstatt-Art), nicht nur das erste Mal; der Techtree wird teurer, das Nebenergebnis nicht.
@@ -943,7 +1023,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 
 ### #040 Die Karawane, Stufe 1: Crew-Kern
-- **Status:** offen · angelegt 16.11. von Ava · **wartet auf Daniels OK zum Bauen**
+- **Status:** abgenommen als kleine Fassung → #085 (Daniel, 19.11.) · angelegt 16.11. von Ava
 - **Für:** Code
 - **Lesen:** design.md › Die Karawane: Sozialsystem (ganz), docs/crew.md (Fähigkeiten, Eigenheiten), › Endgame-Zugmaschinen (Crew), docs/features/camp.md (Companions, Schwarzes Brett, Dialog), docs/features/benches.md (Gästekoje)
 - **Auftrag:**
@@ -962,7 +1042,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 (noch leer)
 
 ### #041 Camp-Lager zusammengelegt, Alles einlagern
-- **Status:** fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/inventory.md, docs/features/benches.md (Lagerregal, Schatzkammer, Füllstand), docs/features/camp.md (Kiste)
 - **Auftrag (Daniel, 16.11.2026):** „Nach einem POI im Camp soll es einen Button geben, alles Mitgebrachte einzulagern, sofern genug Lagerraum vorhanden ist. Insgesamt soll das Camp-Inventar konsolidiert einsehbar und nutzbar sein und die einzelnen Regale lediglich das Volumen bestimmen. Ausnahme sind Speziallagerungen wie Kühlen, Waffen oder Trophäen.“ Antworten: **ein großes Raster**; **Kiste im Camp und Deichselkästen fallen weg**, der **Van bekommt einen Kofferraum etwa doppelt so groß wie die Kiste**; Einlagern **teilweise** (was passt), Speziallager bekommen ihr Passendes automatisch, Knopf in der Beute-Bilanz und im Inventar.
@@ -971,7 +1051,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 181/181, Browser 38/38 (neue Prüfungen: geschlossene Felder, Filter, Sortieren, Hecktür öffnet das Camp-Lager, Beute-Bilanz „Alles einlagern“ mit Kühlraum). PixelLab 0. **Bitte testen:** nach einem Run in der Beute-Bilanz „Alles einlagern“; E an Hecktür oder Lagerregal → ein großes Raster mit Filter-Chips und „Sortieren“; ein Regal ausbauen, wenn das Lager voll ist (geht nicht); alter Spielstand: Kisten-Inhalt liegt jetzt im Camp-Lager.
 
 ### #042 Container-Tileset neu (feiner)
-- **Status:** fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Auftrag (Daniel, 16.11.2026):** Container, Anhänger und Camp-Boden wirken neben dem Van grob (256-px-Bilder ×4). **Neu malen mit PixelLab** (Freigabe ~20–40 Generierungen), „achte auf die orthogonale Perspektive, die Palette und darauf, dass du ein sauberes Tileset erzeugst, aus dem man Container verschiedener Größe zusammensetzen kann.“
 - **Fertig, wenn:** Container 1/2/3 Plätze aus Kacheln zusammengesetzt, Pixel so fein wie der Van, AAP-64, Werkstatt-Bilder sitzen weiter im Innenraum, Tests grün.
@@ -979,7 +1059,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit siehe Funkspruch. Tileset `container_tiles.png`, Werkzeug `tools/container_tiles.py`, alte Fassungen als `…_v1`. Tests grün (container_test prüft ×2). PixelLab diesmal 34 (Create Image Pro 25 + Edit Pro Flash 9), übrig 430. **Bitte testen:** Camp ansehen, Container auf/zu, Werkstätten darin (Hydrokultur, Cryo-Tank).
 
 ### #043 Dunkelheit wie The Looter
-- **Status:** fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/pois.md › Nebel des Unbekannten, Licht & Atmosphäre
 - **Auftrag (Daniel, 16.11.2026, Screenshot aus The Looter):** „Ich mag, wie sie mit nicht sichtbaren Bereichen umgehen. Das gibt dem Ganzen mehr Enge und Dichte.“ Antworten: **Ungesehen schwarz, Areale außerhalb des sichtbaren Bereichs auch schwarz, bereits besucht halb transparent aber auch wieder dunkel; besonders die Kacheln außerhalb des beeinflussbaren Bereichs**; Wände/Fels = **schwarze Masse** (nur die Kante zum Raum mit Textur); Rand **ausgefranst**; dazu **Vordergrund-Silhouetten** und **Raumname einblenden**.
@@ -988,7 +1068,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 181/181, Browser 38/38 (poi_test prüft Dunkelheit, Raumname, Silhouetten). PixelLab 0. **Bitte testen:** einen POI laufen: Räume aus der Dunkelheit geschnitten, ausgefranster Rand, Besuchtes halbdunkel, schwarze Schutt-Silhouetten vorn, Raumname beim ersten Betreten; Werte in Spiel › Nebel / Vordergrund / Raumname.
 
 ### #044 Haare färben: Leylas Signaturfarbe
-- **Status:** fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/leyla.md, docs/features/combat.md › Gegner-Bausatz (Farbtausch), docs/features/camp.md › Deko, docs/features/crafting.md
 - **Auftrag (Daniel, 16.11.2026):** „Wollen wir Leyla ohne neue Grafiken die Möglichkeit geben, ihre Haare zu färben?“ Antworten: **Signaturfarbe** (Haare und Outfit-Akzente teilen sich dieselben Pinktöne, beide wechseln zusammen), **Spiegel im Camp**, **Färbemittel herstellen** (finden oder kochen/herstellen, eine Packung schaltet die Farbe für immer frei), **feste Liste aus AAP-64**.
@@ -997,7 +1077,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 185/185, Browser 39/39 (neu `tools/mirror_test.mjs`, `test/signature.test.js`). PixelLab 0. **Bitte testen:** Spiegel im Bau-Modus kaufen und aufstellen, E: Farben; ein Färbemittel kochen (z. B. Mutantengemüse + Wasser an der Kochnische) und färben; Leyla im Camp, im Run und im Inventar ansehen.
 
 ### #045 Lore-Datenbank: Marken
-- **Status:** fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/worldmap.md › Marken, docs/features/cyberware.md, docs/features/leyla.md › Signaturfarbe
 - **Auftrag (Daniel, 16.11.2026):** „Lass uns die Gelegenheit nutzen, eine Lore-Datenbank in der Werkstatt anzulegen, wo wir Brands sammeln und mit sinnvollen Eigenschaften versehen können … Cyberware auf jeden Fall mitnehmen.“ Haarfarben-Marken abgesegnet (CHROMA//KILL, Kessler Kosmetik, DeltaTint, „Toxic Bloom“ …). Antworten: **eine Quelle** (Karten-Marken ziehen um, die Reisekarte liest dort), Felder **Grundlagen + Stellung in der Welt + Spielwerte** (keine Fraktion), **neue Cyberware-Hersteller + Zuordnung** der 30 Implantate.
@@ -1006,7 +1086,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 189/189, Browser 39/39 (neu `test/brands.test.js`, cyberware_test rechnet mit Qualität). PixelLab 0. **Bitte testen:** Werkstatt › LORE › Marken; Reisekarte sieht aus wie vorher; Tooltip eines Implantats nennt den Hersteller; Spiegel zeigt die Marken.
 
 ### #046 Marken-Logos und Markenschild im Tooltip
-- **Status:** fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig · angelegt 16.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** docs/features/lore.md, docs/features/worldmap.md › Marken
 - **Auftrag (Daniel, 16.11.2026):** „In den Tooltips markierter Items gerne die Logos und Brands mit anzeigen.“ Antworten: **Logos für die sieben Marken ohne Logo mit PixelLab („dann müssen die Logos auch wirklich richtig geil werden“, max. 75 Generierungen)**, Markenschild = **Logo + Name in Markenfarbe + Slogan**.
@@ -1015,7 +1095,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit siehe Funkspruch. `npm test` 190/190, Browser 39/39 (cyberware_test prüft das Markenschild, brands.test die Logos). PixelLab diesmal 70, übrig 360. **Bitte testen:** Inventar: über ein Implantat oder Färbemittel fahren; Werkstatt › Marken › Markenschild; Reisekarte unverändert.
 
 ### #047 Entities, Stufe 1: der Generator
-- **Status:** fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., #076) · fertig · angelegt 17.11. von Code (Daniels Auftrag im Code-Chat)
 - **Für:** Code
 - **Lesen:** design.md › Hacking v3: Entities, docs/features/lore.md
 - **Auftrag (Daniel, 17.11.2026):** „Ich finde Namen, die nach dem Schema wie Marble Sting oder so ein wenig besser. Das hebt sie von Pokémons ab (obwohl sie im Kern genau das ja sein werden). Ich würde sagen, wir bauen ein System auf, auf dessen Basis man diese passiven Companions generieren kann.“
