@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: Neue Aufträge von Daniel: #092 Haarfarben lernen (läuft), #093 Van im POI zu, #094 Kofferraum im POI, #095 Billboard mit Geschick, #096 POIs aufräumen. Danach weiter mit #078.
 - 19.11. Code → Ava: #076 **Absegnung** fertig (9 Punkte, `npm test` 280/280, Browser 48/48 nach Silo-Test-Fix). #078 Werkstätten ausbauen ist als Nächstes dran.
 - 19.11. Code → Ava: Reihenfolge (Daniel): #076 → #078 → #079 → #077 → #085 → #083 → #082 → #081. #076 läuft. PixelLab wieder da (Sitzung in Umgebung „NomadGirl“ gewechselt), übrig 269,6.
 - 19.11. Code → Ava: **Entscheidungsrunde** (Daniel über Entscheidungskarten, Artefakt „NomadGirl Entscheidungskarten“): alle ⚠️ aus #026–#075 entschieden, Tickets `abgenommen`; Änderungen gesammelt in **#076**. Neu offen: #077 Mega-Rig-Hauptcontainer, #078 Werkstätten ausbauen, #079 Zelle/Gefangene, #080 Dunkelheit-Skilltree (erst reden), #081 Balancing v1, #082 Licht, #083 Bild-Upload, #084 PixelLab-Grafik, #085 Crew-Kern klein (ersetzt #040), #086 Story-Enden, #087–#091 Ideen. Gestrichen: Hausmeister-Boss, Gewehr in Kletter-Animationen. Später: Companions-Aussehen, Tier-/Drohnen-Bausatz.
@@ -207,6 +208,33 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:** (Code) Frage → ⚠️ vorläufig entschieden: …
 - **Ergebnis:** (Code) Commits, Tests, PixelLab diesmal/übrig, bitte testen: …
 ```
+
+### #092 Haarfarben im Inventar lernen
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat)
+- **Auftrag (Daniel, 19.11.2026):** „Haarfarbe sollen wie Rezepte funktionieren und benutzt werden können.“ Rückfrage: „dass man Farbe im Inventar ‚lernen‘ kann. Das braucht nicht automatisch passieren, kann aber unabhängig vom Spiegel sein.“ → Schnellaktion „Lernen“ an Färbemitteln (wie bei Zetteln), schaltet die Farbe frei, getragen wird am Spiegel.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #093 Van im POI bleibt zu
+- **Status:** offen · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Van im POI soll nicht aufgehen.“)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #094 Kofferraum am Van im POI
+- **Status:** offen · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat)
+- **Auftrag (Daniel, 19.11.2026):** „Van braucht Kofferraum-Segment für Beute aus POI (Beute dort wird behandelt wie Leylas Rucksack, sobald sie wieder im Camp sind).“ Rückfrage k.o.: **sicher** (bleibt erhalten).
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #095 Billboard-Minispiel mit Geschick
+- **Status:** offen · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Billboard-Minigame darf gerne mehr Geschick-Komponente bekommen.“)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #096 POIs aufräumen: Vordergrund, Innenräume
+- **Status:** offen · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Vordergrund-Grafiken in POIs hängen in der Luft. Manche POIs wirken chaotisch in der Ausgestaltung ihrer Innenräume. Hier kannst du etwas aufräumen.“)
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #076 Absegnung 19.11.: Änderungen aus #026–#075
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel hat alle ⚠️ aus #026–#075 über die Entscheidungskarten entschieden, Tickets `abgenommen`)
