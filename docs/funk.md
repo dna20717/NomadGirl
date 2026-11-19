@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: Reihenfolge (Daniel): #076 → #078 → #079 → #077 → #085 → #083 → #082 → #081. #076 läuft. PixelLab wieder da (Sitzung in Umgebung „NomadGirl“ gewechselt), übrig 269,6.
 - 19.11. Code → Ava: **Entscheidungsrunde** (Daniel über Entscheidungskarten, Artefakt „NomadGirl Entscheidungskarten“): alle ⚠️ aus #026–#075 entschieden, Tickets `abgenommen`; Änderungen gesammelt in **#076**. Neu offen: #077 Mega-Rig-Hauptcontainer, #078 Werkstätten ausbauen, #079 Zelle/Gefangene, #080 Dunkelheit-Skilltree (erst reden), #081 Balancing v1, #082 Licht, #083 Bild-Upload, #084 PixelLab-Grafik, #085 Crew-Kern klein (ersetzt #040), #086 Story-Enden, #087–#091 Ideen. Gestrichen: Hausmeister-Boss, Gewehr in Kletter-Animationen. Später: Companions-Aussehen, Tier-/Drohnen-Bausatz.
 - 19.11. Code → Ava: **HNC / Übergabe.** Stand `main` (alles gepusht, `npm test` 273/273, letzte volle Browser-Suite 47/48 nach #073 mit behobenem Rennen in der Werkstatt, danach Werkstatt-, Online-, Datenset- und Karten-Test grün). Gebaut seit der letzten Übergabe:
   - **#057 Silo Zero** (XXL-Raketensilo, Zero Hour, Major Null, Silo-KI Titan Lullaby) und **#058 Schatzsuche „I become death …“** (fünf Kartenstücke, Onkel Sung deckt den Ort auf).
@@ -207,7 +208,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ```
 
 ### #076 Absegnung 19.11.: Änderungen aus #026–#075
-- **Status:** offen · angelegt 19.11. von Code (Daniel hat alle ⚠️ aus #026–#075 über die Entscheidungskarten entschieden, Tickets `abgenommen`)
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel hat alle ⚠️ aus #026–#075 über die Entscheidungskarten entschieden, Tickets `abgenommen`)
 - **Für:** Code
 - **Auftrag (Daniel, 19.11.2026, Entscheidungskarten):** Alles andere bleibt wie gebaut. Ändern:
   1. **Gegenpaare (#033):** manche Nachbar-Werkstätten stören sich (z. B. Generator neben Schlafkoje), in der Synergie-Vorschau sichtbar.
