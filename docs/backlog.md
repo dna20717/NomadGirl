@@ -32,6 +32,8 @@ Stand: 12.11.2026 abends (Durchsicht von Ava). Kleinigkeiten sind schon behoben 
 
 - **Grafiken für weiterentwickelte Werkstätten** (Daniel, 15.11.2026, #034): jede Werkstatt mit Stufen (Techtree, Ausbau) bekommt je Stufe ein eigenes Bild (PixelLab, streng frontal, gleiche Box), damit man den Fortschritt im Rig sieht.
 
+- **Camp-Grafik aus Code** (Bestand 19.11.2026, Daniel: „streichen wir das für jetzt“): 33 von 39 Deko-Stücken, 5 Rig-Teile (V8, Bleche, Stachelgitter, Dachgeschütz, Dachbox), 8 von 25 Mega-Rig-Anbauteilen ohne Bild. Für PixelLab lohnen sich die ca. 18 festen Stücke (Pflanze, Kaktus, Vogelhaus, Laterne, Feuertonne, Dreibein, Windrad, Zelte, Turm, Spiegel, Hängematte, Schrott, Seesäcke, Warnschild, Fundstücke, Fallschirm) + Rig-Teile, ca. 30 Generierungen; Dehnbares (Neon, Banner, Brücken …) bleibt aus Code.
+
 ## C. Technische Schulden
 
 | # | Stelle | Problem | Aufwand |
