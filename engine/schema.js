@@ -1158,9 +1158,11 @@ export const AREAS = {
       { title: 'Auftrag', fields: [NAME, select('type', 'Art', PIXEL_TYPES, { required: true }), select('status', 'Status', PIXEL_STATUS, { required: true }),
         area_('brief', 'Was gebraucht wird', { hint: 'Wofür, wo im Spiel, Stimmung, Must-haves' }), lines('motifs', 'Motive', { hint: 'eine Zeile je Grafik, z. B. „Angelrute“' })] },
       { title: 'Format', fields: [size('size', 'Größe', { unit: 'px', hint: 'je Grafik bzw. Feld; Symbole 32 × 32' }), size('grid', 'Raster', { unit: 'Felder', hint: 'Spalten × Zeilen bei Symbolen/Kacheln' }),
-        num('frames', 'Frames', { min: 1, hint: 'nur bei Animationen' }), text('view', 'Ansicht', { hint: 'z. B. frontal, diagonal, von der Seite' })] },
+        num('frames', 'Frames', { min: 1, hint: 'nur bei Animationen' }), num('variants', 'Varianten', { min: 1, max: 3, hint: 'Entwürfe je Motiv zur Auswahl' }), text('view', 'Ansicht', { hint: 'z. B. frontal, diagonal, von der Seite' })] },
       { title: 'Vorlage', fields: [refs('references', 'Vorbilder', 'assets', { hint: 'Stil-Vorbilder oder Foto (Asset der Art Referenz)' }), ref('target', 'Ziel-Raster', 'assets', { hint: 'bestehendes Symbol-Raster, in dessen freie Felder die Grafiken sollen' })] },
-      { title: 'Ergebnis', fields: [refs('results', 'Ergebnis-Assets', 'assets'), area_('answer', 'Antwort von Claude'), text('date', 'Erledigt am')] },
+      { title: 'Ergebnis', fields: [refs('results', 'Ergebnis-Assets', 'assets'), area_('answer', 'Antwort von Claude'), text('date', 'Erledigt am'),
+        ref('favorite', 'Favorit', 'assets', { hint: 'bei Varianten: die gewählte' }), select('feedback', 'Rückmeldung', [['ok', 'Passt'], ['change', 'Nachbessern']]),
+        area_('feedbackNote', 'Was soll anders werden?'), bool('learned', 'Ins Lernbuch übernommen')] },
     ],
     check: (x, report) => {
       if (!x.brief && !x.motifs?.length) report('hint', 'Beschreibung oder Motive fehlen');

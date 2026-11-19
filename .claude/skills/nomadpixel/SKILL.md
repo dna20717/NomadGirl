@@ -7,7 +7,7 @@ description: Hochwertige Pixel-Art erzeugen (Tilesets mit Autotiles, Charakter-A
 
 Pixel-Art entsteht als Text-Raster im `.pix`-Format, wird mit `scripts/pixelart.py` gerendert und **jedes Zwischenergebnis wird mit dem Read-Tool angesehen**, bevor es abgegeben wird. Die Qualität entsteht in der Schleife:
 
-> zeichnen → `check` → rendern → **ansehen** → korrigieren → (2–3 Runden) → **Detail-Runde** → abgeben
+> **vorbereiten** (Lernbuch, Bibliothek, Rampen) → zeichnen → `check` → rendern → **ansehen** → korrigieren → (2–3 Runden) → **Detail-Runde** → **Feinschliff** → abgeben → **Bibliothek/Lernbuch pflegen**
 
 **Zwei Modi – zuerst feststellen, wo du bist:**
 - **Werkstatt-Modus:** Im NomadPixel-Repo (es gibt `auftraege/` und `projekte/`). Aufträge kommen aus der GUI → Abschnitte 1–4.
@@ -110,6 +110,9 @@ Bei großen Grafiken (≥ 24 px) das Raster per kleinem Python-Skript mit `scrip
 | `PA contact F [--scale 4]` | Prüfbogen: jedes Icon auf dunklem + hellem Grund |
 | `PA setcheck F` | Konsistenz: Größe, Rand, Zentrierung, Farben, Outline, Helligkeit |
 | `PA refcheck F --ref RASTER.png [--cell 32]` | Detaildichte und Farbstufen im Vergleich zu bestehenden Icons des Spiels |
+| `AN rampen --ref RASTER.png … [--stil stil.json] [--png tafel.png]` | Farbrampen messen, die die bestehenden Grafiken fürs Schattieren benutzen (`AN` = `python3 .claude/skills/nomadpixel/scripts/analyse.py`) |
+| `AN grau F.pix [--out grau.png]` | Helligkeits-Check: farbig, Graustufen, 1:1 nebeneinander + Kontrastwerte |
+| `AN bibliothek ORDNER` | Übersichtsbogen aller Bausteine einer Bibliothek |
 | `PA palcheck F --pal-file PALETTE` | alle Farben aus der Projektpalette? (.hex, .png, .json oder `--palette "#hex,…"`) |
 | `PA outline F --char C [--name N] [--diagonal]` | automatische Outline |
 | `PA fromimg BILD --width 48 [...]` | Foto → `.pix` |
@@ -182,7 +185,7 @@ Nach den Form- und Licht-Runden, wenn Silhouette und Schattierung sitzen. Ziel: 
 
 Für den Fall „Baue Feature X und erzeuge dir die Grafiken mit /pixel“. Die Spielregeln haben immer Vorrang vor diesem Skill.
 
-**Aufträge aus der Spiel-Werkstatt (`/pixel Aufträge`):** Nennt die Stilbibel unter `auftraege` einen Bereich/eine Datei (NomadGirl: Bereich `pixelOrders`, Datei `projects/nomadgirl/data/pixel_orders.json`), dort alle Einträge mit Status `open` abarbeiten (ältester zuerst): Status auf `working` setzen, zeichnen wie unten, Ergebnisse als Assets anlegen, im Auftrag `results` (Asset-IDs), `answer` (1–3 Sätze, nicht-technisch) und `date` setzen, Status `done`. Unklarheiten: Status `question` und die Frage in `answer`. Vorlagen stehen in `references` (Stil-Vorbilder oder Foto-Asset), ein Ziel-Raster in `target`. Daten mit dem Werkzeug des Spiels schreiben (NomadGirl: `node tools/ng.js set pixelOrders <id> <feld> '<json>'`).
+**Aufträge aus der Spiel-Werkstatt (`/pixel Aufträge`):** Nennt die Stilbibel unter `auftraege` einen Bereich/eine Datei (NomadGirl: Bereich `pixelOrders`, Datei `projects/nomadgirl/data/pixel_orders.json`), dort alle Einträge mit Status `open` abarbeiten (ältester zuerst; `feedback: change` = Nachbesserung, siehe Abschnitt 15; `variants` = Anzahl Entwürfe je Motiv): Status auf `working` setzen, zeichnen wie unten, Ergebnisse als Assets anlegen, im Auftrag `results` (Asset-IDs), `answer` (1–3 Sätze, nicht-technisch) und `date` setzen, Status `done`. Unklarheiten: Status `question` und die Frage in `answer`. Vorlagen stehen in `references` (Stil-Vorbilder oder Foto-Asset), ein Ziel-Raster in `target`. Daten mit dem Werkzeug des Spiels schreiben (NomadGirl: `node tools/ng.js set pixelOrders <id> <feld> '<json>'`).
 
 1. **Regeln des Spiels lesen:** `CLAUDE.md`/`AGENTS.md` und die dort genannte Grafik-/Asset-Doku. Herausfinden: Palette, Größen und Raster (z. B. Symbol-Raster 8×8 à 32 px), Ablageordner, Dateinamen-Sprache, wie Assets registriert werden (z. B. Daten-JSON), wo die Herkunft vermerkt wird, welche Prüfungen/Tests laufen müssen, Branch- und Commit-Regeln.
 2. **Stilbibel laden:** `.claude/nomadpixel-stil.json` (Palette bzw. `paletteDatei`, `outline`, `licht`, `stil`, `referenzen` = Pfade zu bestehenden Grafiken im Repo, `hinweise`). Fehlt sie: aus den Spielregeln und vorhandenen Grafiken ableiten und anlegen.
@@ -198,3 +201,27 @@ Für den Fall „Baue Feature X und erzeuge dir die Grafiken mit /pixel“. Die 
 9. **Berichten:** kurz und nicht-technisch, mit Vergleichsbild. Committen/pushen nach den Regeln des Spiels.
 
 Aktualisieren: Der Skill wird aus dem NomadPixel-Repo installiert (`werkzeuge/installieren.py`). In `.claude/skills/nomadpixel/VERSION` steht, welche NomadPixel-Version installiert ist.
+
+## 13. Vorbereiten: Lernbuch, Bibliothek, gemessene Farbrampen
+
+Vor jedem Auftrag, in dieser Reihenfolge:
+1. **Lernbuch lesen** (Direkt-Modus: `.claude/nomadpixel-lernbuch.md`, Werkstatt-Modus: `projekte/<slug>/lernbuch.md`). Die Regeln dort gelten wie Daniels Vorgaben.
+2. **Bibliothek ansehen** (`.claude/nomadpixel-bibliothek/` bzw. `projekte/<slug>/bibliothek/`): Gibt es passende Bausteine (Glas, Griff, Fleisch, Deckel …), werden sie mit `zeichnen.stamp(c, datei, name, x, y, fx, fy, recolor)` wiederverwendet oder als Vorlage genommen. Ähnliche Motive sehen dadurch gleich aus.
+3. **Farbrampen der Stilbibel benutzen** (`zeichnen.rampen_laden(stil.json)` → `{name: [dunkel … hell]}`): Für jedes Material die passende gemessene Rampe nehmen (sand = Holz/Stoff/Pappe, stahl = Metall/Plastik, braun/haut = Fleisch/Leder, türkis/grün = Glow). Eigene Rampen nur für Materialien, die es in den Referenzen nicht gibt; dann aus Farben der Projektpalette, mit Hue-Shift. Fehlen die Rampen in der Stilbibel: `AN rampen --ref <referenz> … --stil <stil.json>` einmal laufen lassen.
+
+## 14. Feinschliff (nach der Detail-Runde, vor der Abgabe)
+
+1. `zeichnen.clean(c)` nach `outline`: entfernt Doppelpixel in Outline-Treppen, Nippel an Kreispolen und Rauschpixel (bewusste Lichter und dunkle Details bleiben). Danach ansehen, ob nichts Gewolltes verschwunden ist.
+2. `AN grau <datei>`: Ist jede Grafik auch in Graustufen lesbar? **Nebeneinanderliegende Bauteile müssen sich in der Helligkeit unterscheiden**, nicht nur in der Farbe. Sonst Helligkeit eines Teils verschieben (Rampenstufe wechseln).
+3. **Drehen** (Waffen und Werkzeuge diagonal, Varianten): `zeichnen.rotate(c, grad)` statt neu zeichnen oder einfach drehen; danach `outline` + `clean`.
+4. **Varianten:** Wünscht der Auftrag mehrere (`variants`), je Motiv 2–3 Entwürfe mit **unterschiedlicher Silhouette** (Form, Haltung, Proportion), alle durch die volle Prüfung. Als eigene Ergebnis-Assets bzw. Dateien `<name>_a/_b/_c` abgeben; Daniel wählt den Favoriten.
+5. Pflicht-Prüfungen vor der Abgabe: `palcheck`, `refcheck`, `AN grau`, Vergleichsbild mit Referenzen (vergrößert und 1:1).
+
+## 15. Nach der Abgabe: Bibliothek und Lernbuch pflegen
+
+- **Bibliothek:** Gelungene, wiederverwendbare Teile (Behälter, Griffe, Materialien, Effekte) als `[part name]` in eine thematische Datei der Bibliothek legen (`glas.pix`, `waffen.pix` …) und in deren `README.md` eintragen. Nicht jedes Icon, nur echte Bausteine.
+- **Lernbuch aus Rückmeldungen:** Pixel-Aufträge der Spiel-Werkstatt haben `feedback` (`ok` = passt, `change` = nachbessern) und `feedbackNote`. Beim Abarbeiten:
+  - `change` (Status ist wieder `open`): Notiz lesen, Überarbeitung als neue Version (bestehende Ergebnisse nicht überschreiben), danach in `answer` kurz sagen, was geändert wurde. Die Lehre daraus als Regel ins Lernbuch.
+  - `ok` ohne `learned`: Was hat funktioniert? Eine kurze Zeile unter „Rückmeldungen“ im Lernbuch, dann `learned: true` setzen.
+  - Gewählter Favorit (`favorite`) bei Varianten: Regel ins Lernbuch, warum diese Variante (Silhouette, Größe, Stil).
+- Eigene Erkenntnisse aus den Prüfungen (z. B. Graustufen-Problem) ebenfalls als Regel eintragen, wenn sie allgemein gelten.

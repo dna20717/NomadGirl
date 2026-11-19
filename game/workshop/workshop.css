@@ -234,3 +234,8 @@ body.ng { background: var(--ui-bg); color: var(--ui-text); font-family: var(--ui
 .px-tick { position: absolute; top: 4px; right: 4px; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--ui-acc); color: var(--ui-acc-text); }
 .px-thumb > .ed-button { position: absolute; top: -6px; right: -6px; width: 26px; height: 26px; padding: 0; border-radius: 50%; background: var(--ui-head); }
 .px-types { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.px-thumb.fav .px-thumbPic { border-color: var(--ui-acc-line); box-shadow: 0 0 0 2px var(--ui-acc-soft); }
+.px-star { position: absolute; top: -6px; left: -6px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--ui-border); background: var(--ui-head); color: var(--ui-text3); cursor: pointer; }
+.px-star.on { color: var(--ui-acc-line); border-color: var(--ui-acc-line); }
+.px-feedback { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--ui-border); }
+.px-feedback > b { display: block; margin-bottom: 2px; color: var(--ui-text); }

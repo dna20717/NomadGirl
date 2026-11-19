@@ -153,3 +153,114 @@ def rim(c, ramp, col, side=(1, 1), every=1):
                 if not (0 <= nx < T and 0 <= ny < T) or src[ny][nx] is None:
                     n += 1
                     if n % every == 0: c.g[y][x] = col
+
+
+# ---------------------------------------------------------------- Stilbibel-Rampen
+def rampen_laden(stil_json):
+    """Gemessene Farbrampen der Stilbibel (analyse.py rampen --stil …) als {name: [hex dunkel → hell]}."""
+    import json
+    d = json.load(open(stil_json, encoding="utf-8"))
+    return {r["name"]: r["farben"] for r in d.get("rampen", [])}
+
+
+# ---------------------------------------------------------------- Feinschliff
+def _l(h):
+    return 0.299 * int(h[1:3], 16) + 0.587 * int(h[3:5], 16) + 0.114 * int(h[5:7], 16)
+
+def clean(c, outline="#060608"):
+    """Saubere Kanten: (1) Doppelpixel in Outline-Treppen entfernen (pixel-perfekte Linien),
+    (2) Rauschen: Einzelpixel, die rundum von EINER Farbe umgeben sind und sich kaum von ihr abheben.
+    Bewusste Lichter und dunkle Details (Helligkeitsabstand > 25) bleiben. → Anzahl Änderungen"""
+    n = 0
+    g = c.g
+    for y in range(T):
+        for x in range(T):
+            if g[y][x] != outline:
+                continue
+            nb = {d: c.get(x + d[0], y + d[1]) for d in ((1, 0), (-1, 0), (0, 1), (0, -1))}
+            hs = [d for d in ((1, 0), (-1, 0)) if nb[d] == outline]
+            vs = [d for d in ((0, 1), (0, -1)) if nb[d] == outline]
+            if len(hs) == 1 and len(vs) == 1:
+                ox, oy = (-hs[0][0], 0), (0, -vs[0][1])          # die beiden anderen Seiten
+                a, b = c.get(x + ox[0], y + ox[1]), c.get(x + oy[0], y + oy[1])
+                diag = c.get(x + hs[0][0] + vs[0][0], y + hs[0][1] + vs[0][1])
+                if diag == outline:
+                    continue                                      # 2x2-Block: dicke Stelle, nicht anfassen
+                if a is None and b is None:
+                    g[y][x] = None; n += 1                         # Außenecke einer Treppe
+                elif a is not None and a == b and a != outline:
+                    g[y][x] = a; n += 1                            # Innenecke
+    # (3) Spitzen: Outline-Pixel, das nur an EINEM gefüllten Pixel hängt (Nippel an Kreispolen) → glätten
+    for y in range(T):
+        for x in range(T):
+            if g[y][x] != outline:
+                continue
+            nbs = [(x + dx, y + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))]
+            filled = [(xx, yy) for xx, yy in nbs if c.get(xx, yy) is not None]
+            if len(filled) == 1:
+                fx_, fy_ = filled[0]
+                if c.get(fx_, fy_) != outline:
+                    ox, oy = fx_ - x, fy_ - y          # Seiten quer zur Spitze müssen Outline sein
+                    side = [c.get(fx_ + oy, fy_ + ox), c.get(fx_ - oy, fy_ - ox)]
+                    if all(v == outline for v in side):
+                        g[y][x] = None; g[fy_][fx_] = outline; n += 2
+    src = [r[:] for r in g]
+    for y in range(1, T - 1):
+        for x in range(1, T - 1):
+            v = src[y][x]
+            if v is None or v == outline:
+                continue
+            ring = {src[y + dy][x + dx] for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))}
+            if len(ring) == 1:
+                o = next(iter(ring))
+                if o is not None and o != outline and o != v and abs(_l(o) - _l(v)) <= 25:
+                    g[y][x] = o; n += 1
+    return n
+
+def rotate(c, deg):
+    """Saubere Drehung (RotSprite-Prinzip): 8-fach vergrößern, drehen, pro Zelle Mehrheitsfarbe zurück.
+    Hält Farben exakt (keine Mischfarben) und Linien geschlossener als einfaches Drehen. → neue Leinwand"""
+    from PIL import Image
+    S = 8
+    cols = sorted({v for r in c.g for v in r if v})
+    idx = {v: i + 1 for i, v in enumerate(cols)}
+    im = Image.new("L", (T, T), 0)
+    for y in range(T):
+        for x in range(T):
+            if c.g[y][x]:
+                im.putpixel((x, y), idx[c.g[y][x]])
+    big = im.resize((T * S, T * S), Image.NEAREST).rotate(-deg, resample=Image.NEAREST, center=(T * S / 2, T * S / 2))
+    px = big.load()
+    out = C()
+    from collections import Counter
+    for y in range(T):
+        for x in range(T):
+            cnt = Counter(px[x * S + i, y * S + j] for i in range(1, S, 2) for j in range(1, S, 2))
+            v, k = cnt.most_common(1)[0]
+            if v == 0 and k < 0.6 * sum(cnt.values()):
+                v = next((vv for vv, _ in cnt.most_common() if vv), 0)   # dünne Linien nicht verlieren
+            out.g[y][x] = cols[v - 1] if v else None
+    return out
+
+
+# ---------------------------------------------------------------- Bibliothek
+def stamp(c, pixfile, name, x=0, y=0, fx=False, fy=False, recolor=None):
+    """Baustein aus einer .pix-Datei (part/icon/tile) auf die Leinwand setzen. recolor: {alt_hex: neu_hex}."""
+    from pixelart import Pix
+    p = Pix.load(pixfile)
+    e = p.find(name, ("part", "icon", "tile", "frame"))
+    if not e:
+        raise KeyError(f"Baustein '{name}' fehlt in {pixfile}")
+    im = p.image(e)
+    W, H = im.size
+    for yy in range(H):
+        for xx in range(W):
+            r, gg, b, a = im.getpixel((xx, yy))
+            if not a:
+                continue
+            h = "#%02x%02x%02x" % (r, gg, b)
+            if recolor:
+                h = recolor.get(h, h)
+            tx = x + (W - 1 - xx if fx else xx)
+            ty = y + (H - 1 - yy if fy else yy)
+            c.set(tx, ty, h)

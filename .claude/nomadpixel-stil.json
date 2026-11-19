@@ -31,5 +31,89 @@
       "rueckfrage": "question"
     },
     "schreiben": "node tools/ng.js set pixelOrders <id> <feld> '<json>'"
-  }
+  },
+  "rampen": [
+    {
+      "name": "sand-1",
+      "familie": "sand",
+      "farben": [
+        "#322b28",
+        "#423934",
+        "#5a4e44",
+        "#796755",
+        "#a08662",
+        "#c7b08b",
+        "#e4d2aa",
+        "#fad6b8"
+      ],
+      "anteil": 0.34
+    },
+    {
+      "name": "stahl-1",
+      "familie": "stahl",
+      "farben": [
+        "#242234",
+        "#333941",
+        "#4a5462",
+        "#6d758d",
+        "#8b93af",
+        "#b3b9d1",
+        "#dae0ea",
+        "#ffffff"
+      ],
+      "anteil": 0.236
+    },
+    {
+      "name": "braun-1",
+      "familie": "braun",
+      "farben": [
+        "#422433",
+        "#5b3138",
+        "#8e5252",
+        "#ba756a",
+        "#e9b5a3",
+        "#e4d2aa",
+        "#fad6b8",
+        "#ffffff"
+      ],
+      "anteil": 0.067
+    },
+    {
+      "name": "tuerkis-1",
+      "familie": "tuerkis",
+      "farben": [
+        "#5daf8d",
+        "#20d6c7",
+        "#92dcba",
+        "#cdf7e2",
+        "#ffffff"
+      ],
+      "anteil": 0.041
+    },
+    {
+      "name": "gruen-1",
+      "familie": "gruen",
+      "farben": [
+        "#477d85",
+        "#92dcba",
+        "#cdf7e2",
+        "#ffffff"
+      ],
+      "anteil": 0.039
+    },
+    {
+      "name": "gruen-2",
+      "familie": "gruen",
+      "farben": [
+        "#a6fcdb",
+        "#cdf7e2",
+        "#ffffff"
+      ],
+      "anteil": 0.016
+    }
+  ],
+  "outlineFarbe": "#060608",
+  "rampenQuelle": "gemessen mit analyse.py rampen aus icons_kitchen, icons_gear, icons_misc (19.11.2026)",
+  "bibliothek": ".claude/nomadpixel-bibliothek/",
+  "lernbuch": ".claude/nomadpixel-lernbuch.md"
 }

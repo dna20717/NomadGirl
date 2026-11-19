@@ -72,6 +72,8 @@ export function pixelOrderInspector(w, x, id) {
       el('button', { class: 'px-choice' + (size[0] === s && size[1] === s ? ' on' : ''), onclick: () => put('size', [s, s]) }, el('b', {}, `${s} × ${s}`), el('small', {}, text)))) : null,
     x.type === 'animation' ? el('div', { class: 'px-row' }, el('span', { class: 'px-label' }, 'Frames'),
       ...[4, 6, 8].map(n => el('button', { class: 'px-choice small' + (x.frames === n ? ' on' : ''), onclick: () => put('frames', n) }, String(n)))) : null,
+    x.type !== 'edit' ? el('div', { class: 'px-row' }, el('span', { class: 'px-label' }, 'Entwürfe'),
+      ...[[1, 'einer'], [2, '2 zur Wahl'], [3, '3 zur Wahl']].map(([n, t]) => el('button', { class: 'px-choice small' + ((x.variants || 1) === n ? ' on' : ''), onclick: () => put('variants', n === 1 ? undefined : n) }, t))) : null,
     el('div', { class: 'px-row' }, el('span', { class: 'px-label' }, 'Ansicht'),
       ...VIEWS.map(v => el('button', { class: 'px-choice small' + (x.view === v ? ' on' : ''), onclick: () => put('view', x.view === v ? undefined : v) }, v))),
     autoGrid ? el('p', { class: 'px-help' }, icon('grid', 13), ` Raster: ${(x.grid || autoGrid).join(' × ')} Felder`, x.grid ? null : ' (ergibt sich aus den Motiven)') : null,
@@ -100,10 +102,13 @@ export function pixelOrderInspector(w, x, id) {
 
   // 5 result
   const results = (x.results || []).filter(r => assets[r]);
-  out.push(step(5, 'Ergebnis', results.length ? 'Antippen öffnet die Grafik groß.' : 'Hier erscheinen die fertigen Grafiken, sobald Claude den Auftrag erledigt hat.',
-    results.length ? el('div', { class: 'px-thumbs big' }, ...results.map(r => el('div', { class: 'px-thumb' },
-      el('button', { class: 'px-thumbPic', onclick: () => w.go({ area: 'assets', choice: r }) }, assetThumb(w, assets[r], 160)), el('span', {}, assets[r].name || r)))) : null,
-    x.date ? el('p', { class: 'px-help' }, `Erledigt am ${x.date}`) : null));
+  const multi = results.length > 1;
+  out.push(step(5, 'Ergebnis', results.length ? (multi ? 'Antippen öffnet die Grafik groß, der Stern wählt deinen Favoriten.' : 'Antippen öffnet die Grafik groß.') : 'Hier erscheinen die fertigen Grafiken, sobald Claude den Auftrag erledigt hat.',
+    results.length ? el('div', { class: 'px-thumbs big' }, ...results.map(r => el('div', { class: 'px-thumb' + (x.favorite === r ? ' fav' : '') },
+      el('button', { class: 'px-thumbPic', onclick: () => w.go({ area: 'assets', choice: r }) }, assetThumb(w, assets[r], 160)), el('span', {}, assets[r].name || r),
+      multi ? el('button', { class: 'px-star' + (x.favorite === r ? ' on' : ''), title: 'Favorit', onclick: () => put('favorite', x.favorite === r ? undefined : r) }, icon(x.favorite === r ? 'star_full' : 'star', 16)) : null))) : null,
+    x.date ? el('p', { class: 'px-help' }, `Erledigt am ${x.date}`) : null,
+    results.length ? feedbackBlock(w, x, put) : null));
 
   // next step: what to do now
   if (x.status === 'open' || !x.status) out.push(el('div', { class: 'px-next' },
@@ -113,6 +118,24 @@ export function pixelOrderInspector(w, x, id) {
         el('button', { class: 'ed-button small', title: 'Kopieren', onclick: () => navigator.clipboard?.writeText('/pixel Aufträge').then(() => w.hint('Kopiert: /pixel Aufträge'), () => {}) }, icon('duplicate', 12)))),
     el('small', {}, 'Claude zeichnet in AAP-64, legt die Grafiken als Assets an und trägt sie hier ein.')));
   return out;
+}
+
+// feedback on a result: "passt" teaches the learning log, "nachbessern" sends it back to Claude with a note
+function feedbackBlock(w, x, put) {
+  const note = el('textarea', { class: 'ed-field px-text', rows: 3, placeholder: 'z. B. zu dunkel, Griff dicker, mehr wie die Küchen-Symbole …' }, x.feedbackNote || '');
+  const send = () => w.change(AREA, () => {
+    x.feedback = 'change'; x.status = 'open'; delete x.learned;
+    if (note.value.trim()) x.feedbackNote = note.value.trim(); else delete x.feedbackNote;
+  });
+  const ok = () => w.change(AREA, () => { x.feedback = 'ok'; x.status = 'done'; delete x.feedbackNote; });
+  return el('div', { class: 'px-feedback' },
+    el('b', {}, 'Wie gefällt es dir?'),
+    el('p', { class: 'px-help' }, 'Deine Rückmeldung landet im Lernbuch, Claude berücksichtigt sie bei allen künftigen Grafiken.'),
+    el('div', { class: 'px-row' },
+      el('button', { class: 'px-choice' + (x.feedback === 'ok' ? ' on' : ''), onclick: ok }, el('b', {}, '👍 Passt so'), el('small', {}, x.learned ? 'gelernt' : 'Auftrag ist fertig')),
+      el('button', { class: 'px-choice' + (x.feedback === 'change' ? ' on' : ''), onclick: () => { w.pxFeedback = true; w.draw(); } }, el('b', {}, '✏️ Nachbessern'), el('small', {}, 'zurück an Claude'))),
+    w.pxFeedback || x.feedback === 'change' ? el('div', {}, el('label', { class: 'px-label' }, 'Was soll anders werden?', note),
+      el('button', { class: 'ed-button wide main', onclick: () => { w.pxFeedback = false; send(); w.hint('Zurück an Claude. In Claude Code: /pixel Aufträge'); } }, icon('restart', 16), x.feedback === 'change' ? ' Notiz aktualisieren' : ' Zurück an Claude')) : null);
 }
 
 // dialog with all pictures that make sense as a template; tap toggles, search filters
