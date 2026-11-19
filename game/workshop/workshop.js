@@ -12,6 +12,10 @@ import { AREAS, GROUPS, fields, loadProject, validateProject, usages, references
 import { SUMMARY } from './summaries.js';
 import { listSets, applySet, diffArea, setFile, slugSet, activeSetId, chooseSet, SET_INDEX } from '../../engine/sets.js';
 import { assetPreview, assetThumb, iconSheet } from './asset_preview.js';
+import { pixelOrderInspector } from './pixel_orders.js';
+
+// areas with their own inspector instead of the generic form
+const INSPECTORS = { pixelOrders: pixelOrderInspector };
 
 const THEMES = { gray: 'Grau', violet: 'Violett', brightness: 'Hell' };
 // Web workshop: save automatically after this many seconds without a new change (?autosave=5 for tests)
@@ -398,7 +402,7 @@ export class Workshop {
     const m = this.messages || [];
     const row = (id, x) => {
       const bad = m.filter(y => y.place.area === a && y.place.id === id && y.kind !== 'hint');
-      const look = a === 'assets' ? x : this.p.data.assets?.[x.look];
+      const look = a === 'assets' ? x : this.p.data.assets?.[x.look ?? (A.lookOptional ? x.results?.[0] ?? x.references?.[0] : undefined)];
       return [bad.length ? el('span', { class: 'ng-dot ' + (bad.some(y => y.kind === 'error') ? 'error' : 'warning'), title: bad.map(y => y.text).join('\n') }) : null,
         A.gallery ? assetThumb(this, look, 96) : look ? assetThumb(this, look, 28, x.icon) : null,
         el('span', { class: 'da-name' }, x.name || id), el('small', {}, rowText(this.p, a, x))];
@@ -419,8 +423,11 @@ export class Workshop {
       this.go({ area: a, choice: newId });
     }));
     for (const msg of m.filter(y => y.place.area === a && y.place.id === choice)) insp.append(el('p', { class: 'ng-inline ' + msg.kind }, icon(msg.kind === 'hint' ? 'info' : msg.kind, 14), ' ' + msg.text.replace(/^[^:]*: /, '')));
-    insp.append(this.lookBlock(a, x));
-    for (const s of A.sections) if (!s.when || s.when(x)) insp.append(el('h4', {}, s.title), ...s.fields.map(f => this.fieldEditor(a, f, x)));
+    if (INSPECTORS[a]) insp.append(INSPECTORS[a](this, x, choice));
+    else {
+      insp.append(this.lookBlock(a, x));
+      for (const s of A.sections) if (!s.when || s.when(x)) insp.append(el('h4', {}, s.title), ...s.fields.map(f => this.fieldEditor(a, f, x)));
+    }
     for (const extra of [SUMMARY[a]?.(this, x, choice)].flat()) if (extra) insp.append(el('h4', {}, extra.title), extra.body);
     const u = usages(this.p, a, choice);
     insp.append(el('h4', {}, `Verwendet (${u.length})`), u.length ? el('div', { class: 'da-tags' }, ...u.map(v => el('button', { class: 'da-tag ng-leap', title: v.path, onclick: () => this.go({ area: v.area, choice: v.id }) }, icon(AREAS[v.area].icon, 12), ' ' + v.name)))
@@ -600,12 +607,21 @@ export class Workshop {
         : el('input', { type, class: 'ed-field' + (type === 'number' ? ' small' : ''), value: type === 'color' ? (stat || '#cccccc') : stat, step: type === 'number' ? (opt.step ?? 'any') : null });
     let last = type === 'checkbox' ? !!stat : String(stat);
     inp.addEventListener('change', () => { const v = type === 'checkbox' ? inp.checked : inp.value; if (v === last) return; last = v; opt.set(type === 'number' ? (v === '' ? undefined : +v) : v); });
-    const name = el('span', { title: opt.hint || '' }, label, opt.hint ? el('i', { class: 'ng-hintMark' }, ' ⓘ') : null);
+    const [mark, text] = this.hintToggle(opt.hint);
+    const name = el('span', { title: opt.hint || '' }, label, mark);
     if (type === 'number' && opt.live) draggable(name, inp, { start: () => this.begin(), live: v => opt.live(v), end: () => this.draw(), min: opt.min, max: opt.max });
-    return el('label', { class: 'da-field' + (type === 'checkbox' ? ' across' : '') }, name, inp);
+    return el('label', { class: 'da-field' + (type === 'checkbox' ? ' across' : '') }, name, inp, text);
   }
   labeled(label, content, hint, extra = '') {
-    return el('div', { class: 'da-field ' + extra }, el('span', { title: hint || '' }, label, hint ? el('i', { class: 'ng-hintMark' }, ' ⓘ') : null), content);
+    const [mark, text] = this.hintToggle(hint);
+    return el('div', { class: 'da-field ' + extra }, el('span', { title: hint || '' }, label, mark), content, text);
+  }
+  // ⓘ to tap (Daniel, 19.11.2026: tooltips don't work on the iPad): shows the explanation below the field; hover still shows it as before
+  hintToggle(hint) {
+    if (!hint) return [null, null];
+    const text = el('small', { class: 'ng-hintText' }, hint);
+    const mark = el('button', { type: 'button', class: 'ng-hintMark', title: hint, 'aria-label': 'Erklärung', onclick: e => { e.preventDefault(); e.stopPropagation(); text.classList.toggle('on'); mark.classList.toggle('on'); } }, 'ⓘ');
+    return [mark, text];
   }
   selection(options, stat, onChange, empty = null) {
     if (options.length > 6) return suchChoice({ options: options.map(([v, n]) => ({ stat: v, name: n ?? v })), stat: stat ?? '', empty, onChoice: onChange });

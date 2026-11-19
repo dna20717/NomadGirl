@@ -36,3 +36,5 @@ Was die Systeme verbindet, sichtbar im Inspektor (`game/workshop/summaries.js`, 
 - „Aussehen“ zeigt kein Bild aus einer Tabellenzeile mehr, wenn der Bereich eine eigene Vorschau hat (Ereignis-Baukasten zeigte das Silo).
 - Übersichtskarten zeigen höchstens vier Zeilen Text, der ganze Text steht im Tooltip.
 - Datensets › Speichern unter …: Name und Beschreibung (steht in der Liste und im Hauptmenü).
+
+- **Erklärungen antippen** (Daniel, 19.11.2026: Tooltips gehen am iPad nicht): das ⓘ an einem Feld ist ein Knopf und klappt die Erklärung unter dem Feld auf (`hintToggle` in `workshop.js`); mit Maus zeigt Überfahren sie weiter als Tooltip. Bis 980 px Breite (iPad hochkant) werden die drei Spalten schmaler (`workshop.css`).
