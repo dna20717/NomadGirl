@@ -2354,6 +2354,8 @@
   "stack": 1,
   "value": 0,
   "glyph": "⛓",
-  "description": "Gefesselt, wütend, schwer. In der Zelle sicher, im Rucksack leidet er. Für Kopfgeld, Lösegeld oder dunkle Geschäfte."
+  "description": "Gefesselt, wütend, schwer. In der Zelle sicher, im Rucksack leidet er. Für Kopfgeld, Lösegeld oder dunkle Geschäfte.",
+  "look": "icons_misc2",
+  "icon": 0
  }
 }

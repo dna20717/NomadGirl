@@ -5740,5 +5740,16 @@
   "source": "KI-Bild von Daniel (Cyberpunk Underground Rocket Silo), auf 128 Farben verkleinert",
   "date": "18.11.2026",
   "description": "Vorlage für die Räume von Silo Zero (#057); Comic-Bild, wenn die Geschichte das Silo verrät."
+ },
+ "icons_misc2": {
+  "name": "Symbole: Kleinkram 2 (NomadPixel)",
+  "kind": "icons",
+  "file": "assets/items/icons_misc2.png",
+  "grid": [4, 4],
+  "cell": [64, 64],
+  "names": ["gefangener", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+  "description": "Neues Raster für Symbole, die Claude Code selbst zeichnet (NomadPixel, Text-Pixel-Art). Feld 1: Gefangener (#079). Die übrigen 15 Felder sind frei.",
+  "source": "NomadPixel (Claude Code, Text-Pixel-Art, Palette AAP-64, .pix-Quelle)",
+  "date": "19.11.2026"
  }
 }

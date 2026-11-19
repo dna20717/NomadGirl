@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Erstes NomadPixel-Symbol**: Der Gefangene (#079) hat jetzt ein Bild im Inventar statt nur „⛓ Name“, selbst gezeichnet mit `/pixel` (64 px, AAP-64). Neues Raster `icons_misc2` mit 15 freien Feldern für weitere.
 - 19.11.2026: **Speichern ohne Verlust**: Konflikte mit Änderungen anderer an anderen Einträgen werden automatisch zusammengeführt; vor „Neu laden“ werden ungespeicherte Änderungen gesichert und danach angeboten; Pixel-Aufträge nie im Datenset. Test in `npm run web:test`.
 - 19.11.2026: **Werte-Bildschirm** (#091): U (oder Pause-Menü › Werte) zeigt jede Zahl mit ihren Quellen, in vier Reitern: Leyla (Ausrüstung, Implantate, Techtree, Trophäen, Markentreue, Buffs für den nächsten Run), Camp (Boni-Bus), Tank & AvA, Effekte. Gleiche Zahlen wie im Spiel, Malus rot.
 - 19.11.2026: **Rig-Radio** (#090): Vier Sender mit Musik aus Code (Synthwave, Wüsten-Folk, Glitch, Nachtsender), ein DJ redet zwischen den Songs: Werbung der Marken, Wetter vom Navigator, Frontberichte aus dem Revierkrieg, Gerüchte über Orte, Lore. Läuft im Camp und auf der Fahrt, im POI still. N schaltet weiter (nach dem letzten Sender aus), Pause-Menü › Radio. Saint FM gehört den Static Saints: als Feind nur Rauschen. Werkstatt › Welt › Radio. Nebenbei: `pretty()` lässt Kommas in Texten in Ruhe, Ton aus (M) wird sofort erkannt, die Fahrt zeigte manchmal „null“.
