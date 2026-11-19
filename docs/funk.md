@@ -382,24 +382,24 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #105 Kofferraum im POI 8 × 4
-- **Status:** offen · angelegt 19.11. von Code (Runde 2, #094)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Runde 2, #094)
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Commit „Kofferraum im POI 8 × 4 (#105) …“. Spiel › Spawn-Punkt › Kofferraum: Größe 8 × 4; alte Spielstände wachsen automatisch mit (`ensureGrid`). `tools/trunk_test.mjs` 5/5. PixelLab 0.
 
 ### #106 Delta Heights einheitlich Beton
-- **Status:** offen · angelegt 19.11. von Code (Runde 2, #096)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Runde 2, #096)
+- **Rückfragen:** (Code) ⚠️ vorläufig: Lobby, Büro, Einsturz, Rohbau und Penthouse von Ruine auf Beton, wie Treppenhaus und Archiv; Serverraum (Metall) und Chefzimmer (Marmor) bleiben als Sonderräume.
+- **Ergebnis:** (Code) gleicher Commit wie #105. poi_levels grün. PixelLab 0. **Bitte ansehen:** Delta Heights spielen (im kopflosen Browser zu dunkel für ein Bild).
 
 ### #107 Fennek huscht durchs Camp
-- **Status:** offen · angelegt 19.11. von Code (Runde 2: Camp)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Runde 2: Camp)
+- **Rückfragen:** (Code) ⚠️ vorläufig: alle 35–80 s einer, abends doppelt so oft, über den Camp-Boden von Bildrand zu Bildrand; Werkstatt › Camp › Kleinvieh (Tabelle, weitere Tiere möglich).
+- **Ergebnis:** (Code) Commit „Fennek huscht durchs Camp (#107)“. Im Browser geprüft (läuft, gespiegelt nach links). PixelLab 0. **Bitte testen:** im Camp eine Weile warten, abends öfter.
 
 ### #108 Rattenschwarm und Wachdrohne streichen
-- **Status:** offen · angelegt 19.11. von Code (Runde 2: „Streichen“)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Runde 2: „Streichen“)
+- **Rückfragen:** (Code) ⚠️ vorläufig: Daten gelöscht; das Flug-Verhalten bleibt im Code und wird im Gegner-Test mit einer Testdrohne geprüft.
+- **Ergebnis:** (Code) Commit „Rattenschwarm und Wachdrohne gestrichen (#108)“. `tools/enemy_test.mjs` 25/25. PixelLab 0.
 
 ### #109 Balancing v2 per Simulation (Tank-Druck, Mega-Rig-Preise)
 - **Status:** offen · angelegt 19.11. von Code (Runde 2: „Ava simuliert jetzt“; nach #110, weil die neuen Äste die Kurve ändern)

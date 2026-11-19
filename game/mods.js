@@ -31,6 +31,7 @@ export function parts(D, save, stat, ctx = {}) {
   for (const k of workers(D, save)) if (k.stat === stat) push('worker', k.g.name, k.value);
   for (const c of crewBonuses(D, save)) if (c.stat === stat) push('crew', c.name, c.value);   // #085 the crew at work
   const b = brandSets(D, save); for (const x of b.list) if (x.on && x.stat === stat) push('brand', `Markentreue ${x.name}`, x.value);
+  for (const p of bonusParts(D, save)) if (p.source === 'techtree' && p.stat === stat) push('techtree', p.label, p.value);   // #110 camp values from the tree
   return out;
 }
 export const mod = (D, save, stat, ctx) => parts(D, save, stat, ctx).reduce((n, p) => n + p.value, 0);
@@ -44,7 +45,7 @@ export function modText(list, stat = '') {
 // Leyla's values (Ausrüstung › Werte: Schaden, Abwehr, Leben …) with their sources: every worn thing and implant, the Techtree
 // (Leben, Schaden), the trophies on the stands, Markentreue. scene.applyGear takes the sums from here.
 //   gearParts(D, save) → { stat: [{ source, label, value }] }      gearTotals(D, save) → { stat: sum, strain }
-const LEYLA_TREE = ['health', 'damage'], NOT_LEYLA = ['tankDecay', 'droneBattery'];
+const NOT_LEYLA = ['tankDecay', 'droneBattery'], TANK_STATS = ['tankDecay', 'tankRescue', 'tankAccel', 'tankStatus', 'droneBattery'];
 export function gearParts(D, save) {
   const out = {}, push = (stat, source, label, value) => { if (value) (out[stat] ??= []).push({ source, label, value: Math.round(value * 10) / 10 }); };
   if (!save) return out;
@@ -53,7 +54,7 @@ export function gearParts(D, save) {
     const g = gearStats(D, { [slot]: id }, boost), t = D.items?.[id], src = t?.category === 'implant' ? 'implant' : 'gear';
     for (const k of GEAR_KEYS) push(k, src, t?.name || id, g[k]);
   }
-  for (const p of bonusParts(D, save)) if (p.source === 'techtree' && LEYLA_TREE.includes(p.stat)) push(p.stat, 'techtree', p.label, p.value);
+  for (const p of bonusParts(D, save)) if (p.source === 'techtree' && GEAR_KEYS.includes(p.stat) && !NOT_LEYLA.includes(p.stat)) push(p.stat, 'techtree', p.label, p.value);   // #110 every Leyla value
   const tb = trophyBonuses(D, save); for (const k of GEAR_KEYS) if (!NOT_LEYLA.includes(k)) push(k, 'trophy', 'Trophäen', tb[k]);
   const b = brandSets(D, save); for (const x of b.list) if (x.on && GEAR_KEYS.includes(x.stat)) push(x.stat, 'brand', `Markentreue ${x.name}`, x.value);
   return out;
@@ -66,6 +67,6 @@ export function gearTotals(D, save) {
 // the tank and AvA (Tank-Verfall, Rettung, Beschleuniger, AvA-Akku, Lebenszeichen) with their sources → { stat: [{ source, label, value }] }
 export function tankParts(D, save) {
   const out = {};
-  for (const p of bonusParts(D, save)) if (!LEYLA_TREE.includes(p.stat)) (out[p.stat] ??= []).push({ source: p.source, label: p.label, value: p.value });
+  for (const p of bonusParts(D, save)) if (TANK_STATS.includes(p.stat)) (out[p.stat] ??= []).push({ source: p.source, label: p.label, value: p.value });
   return out;
 }

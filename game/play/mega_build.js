@@ -3,6 +3,7 @@
 // Lager or buy one, move it, put it into the Lager, place workshops on its places, hang string lights to another container, buy the
 // next stage of the vehicle. Every action is a draft of game/rig.js (act), with "Rückgängig"; the camp is rebuilt on closing.
 // Keys like every window (ui_nav.js): arrows = cell, Q / LB / RB = next action, E / A = do it, Esc / B = back. Mouse: click.
+import { techLock } from '../techtree.js';
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { hints, closeX } from './ui_nav.js';
@@ -85,6 +86,7 @@ export class MegaBuild {
   shopFor(ui, slot) {
     const D = this.D, save = this.save, rig = save.rig;
     const items = Object.entries(D.workshops || {}).filter(([id, w]) => !w.retired && w.value != null && fits(D, rig, ui, slot, id)).map(([id, w]) => { const pv = synPreview(D, save, id, ui, slot), syn = pv && (pv.near || pv.chain > 1) && pv.bonus > 0 ? ` · ${synergyText(pv)}` : ''; return { label: w.name || id, sub: `${priceOf(D, 'workshops', id)} Δ · ${w.places || 1} Platz${(w.places || 1) > 1 ? 'e' : ''}${syn}`, primary: !!syn, disabled: save.deltas < priceOf(D, 'workshops', id) ? 'Zu wenig Δ' : null,
+      disabled: techLock(D, save, 'workshops', id) ? `Erst im Techtree: ${techLock(D, save, 'workshops', id)}` : null,   // #110
       act: () => this.run(d => { const b = buyWorkshop(D, d, id); return b.ok ? { ok: place(D, d, fromSpare(d, b.inst.uid), ui, slot) } : b; }, `${w.name || id} gekauft`) }; });
     this.scene.hud.menu({ title: 'Werkstatt kaufen', sub: `Platz ${slot + 1} · ${save.deltas} Δ`, items: [...items, { label: 'Zurück', act: () => {} }] });
   }

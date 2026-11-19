@@ -43,7 +43,12 @@ const VALUE = num('value', 'Wert', { unit: 'Δ', min: 0, hint: 'Verkaufswert in 
 export const TROPHY_GEAR = [['defense', 'Abwehr %'], ['health', 'Leben'], ['damage', 'Schaden %'], ['melee', 'Nahkampf %'], ['ranged', 'Fernkampf %'], ['crit', 'Krit-Chance %'], ['speed', 'Tempo %'],
   ['jump', 'Sprungkraft %'], ['dashCooldown', 'Dash-Abklingzeit %'], ['regen', 'Heilt sich (LP/10 s)'], ['heal', 'Heilung %'], ['droneBattery', 'AvA-Akku %'], ['tankDecay', 'Tank: Verfall %'], ['hack', 'Duell-Integrität']];
 export const TECH_BONUS = [['tankDecay', 'Tank: Verfall %'], ['tankRescue', 'Tank: Rettung kostet %'], ['tankAccel', 'Tank: Beschleunigung %'],
-  ['tankStatus', 'Tank-Anzeige im Run (1 = an)'], ['droneBattery', 'AvA: Akku %'], ['health', 'Leyla: Leben'], ['damage', 'Leyla: Schaden %']];
+  ['tankStatus', 'Tank-Anzeige im Run (1 = an)'], ['droneBattery', 'AvA: Akku %'], ['health', 'Leyla: Leben'], ['damage', 'Leyla: Schaden %'],
+  // #110 every value of the Boni-Bus: Leyla's gear values and the camp
+  ['defense', 'Leyla: Abwehr %'], ['melee', 'Leyla: Nahkampf %'], ['ranged', 'Leyla: Fernkampf %'], ['crit', 'Leyla: Krit-Chance %'], ['speed', 'Leyla: Tempo %'],
+  ['jump', 'Leyla: Sprungkraft %'], ['regen', 'Leyla: heilt sich (LP/10 s)'], ['heal', 'Leyla: Heilung %'], ['stamina', 'Leyla: Ausdauer'], ['staminaRegen', 'Leyla: Erholung %'],
+  ['hack', 'Duell-Integrität'], ['growth', 'Camp: Wachstum %'], ['fuel', 'Camp: Spritersparnis %'], ['sleepHeal', 'Camp: Schlaf heilt %'], ['rest', 'Camp: Ruhe %'],
+  ['perfect', 'Camp: perfekt kochen %'], ['refund', 'Camp: Zutat zurück %'], ['power', 'Camp: Strom ⚡'], ['sell', 'Camp: mehr Δ aus Runs %'], ['loot', 'Camp: Extra-Beute %']];
 const LOOK = ref('look', 'Aussehen', 'assets', { hint: 'Grafik aus dem Bereich Assets' });
 const ICON = num('icon', 'Symbol', { min: 0, hint: 'Nur bei Aussehen der Art „Symbole“: welches Feld im Raster (0 = oben links, zeilenweise). Am einfachsten rechts in der Vorschau anklicken' });
 // an entry whose look is an icon sheet must name a cell that exists
@@ -792,7 +797,12 @@ export const AREAS = {
       { title: 'Kosten & Voraussetzungen', fields: [table('cost', 'Kosten', [ref('resource', 'Ressource', 'resources'), num('count', 'Menge', { min: 1 })]),
         refs('requires', 'Braucht', 'techtree', { hint: 'Erst wenn diese Knoten freigeschaltet sind' })] },
       { title: 'Schaltet frei', fields: [refs('recipes', 'Rezepte', 'recipes', { hint: 'Am besten mit Entdecken „Knoten im Techtree“' }),
-        table('bonus', 'Boni', [select('stat', 'Wert', TECH_BONUS), num('value', 'Änderung')], { hint: 'Passive Boni, gelten sofort und in jedem Durchgang. Prozent: −15 = 15 % weniger' })] },
+        table('bonus', 'Boni', [select('stat', 'Wert', TECH_BONUS), num('value', 'Änderung')], { hint: 'Passive Boni, gelten sofort und in jedem Durchgang. Prozent: −15 = 15 % weniger' }),
+        refs('workshops', 'Werkstätten', 'workshops', { hint: '#110: erst kaufbar, wenn dieser Knoten freigeschaltet ist (was schon im Rig steht, bleibt)' }),
+        refs('rigParts', 'Rig-Teile', 'rigParts', { hint: '#110: erst kaufbar mit diesem Knoten' }),
+        text('flags', 'Merker', { hint: '#110: Welt-Merker beim Freischalten (Komma), z. B. für Zwischenfälle, Quests, Orte (Bedingungs-Sprache)' }),
+        ref('reveal', 'Ort aufdecken', 'locations', { hint: '#110: ein Ort kommt auf die Reisekarte' }),
+        bool('soon', 'Wirkung folgt', { hint: '#110: die eigentliche Wirkung ist noch nicht gebaut; im Warroom steht „Wirkung folgt“' })] },
     ],
     check: (x, report, p) => {
       const T = p.data.techtree || {};
@@ -1268,6 +1278,8 @@ export const AREAS = {
       { title: 'Camp-Lager', fields: [text('storage.name', 'Name', { hint: '#041: Kofferraum und alle Lagerregale bilden zusammen EIN Lager; die Regale bestimmen nur das Volumen. Speziallager (Werkstätten › Speziallager) bleiben eigene Inventare' }),
         num('storage.width', 'Breite des Rasters', { unit: 'Felder', min: 4, max: 16, hint: 'Die Höhe ergibt sich aus der Summe der Felder; die letzte Reihe ist nur so weit offen, wie Felder da sind' })] },
       { title: 'Kiste (in POIs)', fields: [ref('chest.look', 'Aussehen', 'assets', { hint: 'Kisten in den POI-Leveln. Animation: erster Frame zu, letzter offen. Die Kiste im Camp gibt es seit #041 nicht mehr (ihr Inhalt zog ins Camp-Lager)' })] },
+      { title: 'Kleinvieh', fields: [table('critters', 'Tiere', [ref('look', 'Animation', 'assets'), range('every', 'Alle', { unit: 's' }), num('speed', 'Tempo', { unit: 'px/s', min: 20 }), num('night', 'Abends öfter', { unit: '×', min: 1 })],
+        { hint: '#107 (Daniel 19.11.2026: der Fennek huscht durchs Camp): ab und zu läuft ein Tier über den Camp-Boden, von einem Bildrand zum anderen. Die Animation schaut nach rechts, nach links wird sie gespiegelt' })] },
       { title: 'Ton', fields: [ref('sound.wind', 'Wind', 'assets', { hint: 'Läuft leise in Schleife' }), num('sound.windVolume', 'Wind-Lautstärke', { unit: '%', min: 0, max: 100 }),
         refs('sound.gusts', 'Böen', 'assets', { hint: 'Kommen ab und zu dazu, zufällig' }), range('sound.gustEvery', 'Böen alle', { unit: 's' }), num('sound.gustVolume', 'Böen-Lautstärke', { unit: '%', min: 0, max: 100 }),
         ref('sound.fire', 'Lagerfeuer', 'assets', { hint: 'Wird lauter, je näher Leyla den Flammen kommt, und klingt von links oder rechts' }), num('sound.fireVolume', 'Feuer ganz nah', { unit: '%', min: 0, max: 100 }),

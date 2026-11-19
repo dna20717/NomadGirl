@@ -13,6 +13,7 @@ import { hang, unhang, canHang, lightsConfig } from '../string_lights.js';
 import { el } from '../ui.js';
 import { hints, NavCursor, closeX, keyGlyph } from './ui_nav.js';
 import { icon } from '../icons.js';
+import { techLock } from '../techtree.js';
 import { budgets, act, snapshot, restore, lift, place, fits, at as wsAt, toSpare, fromSpare, stow, buyWorkshop, sellWorkshop, buyContainer, sellContainer, buyPart, sellPart, mountPart, unmountPart, SLOT_NAMES as PART_SLOTS, stackOn, stackTop, blockAt, levelOf, attachAt, detach, moveContainer, shop, priceOf, sellPrice, wsDef, placesOf } from '../rig.js';
 import { clockText } from '../save.js';
 import { workshopTexture, partView, socketRects, unitShape } from './camp.js';
@@ -457,7 +458,7 @@ export class BuildMode {
     const D = this.D, S = shop(D), save = this.save;
     this.shopTab ??= 'workshops';
     const row = (area, id) => {
-      const x = D[area][id], price = priceOf(D, area, id), poor = price > save.deltas;
+      const x = D[area][id], price = priceOf(D, area, id), lock = techLock(D, save, area, id), poor = price > save.deltas || !!lock;   // #110 Techtree
       const sub = area === 'workshops' ? `${FN_NAMES[x.function] || ''} · ${x.places || 1} ${x.places > 1 ? 'Plätze' : 'Platz'} · ${x.power > 0 ? '+' : ''}${x.power || 0} ⚡`
         : area === 'rigParts' ? [PART_SLOTS[x.slot] || x.slot, x.pull ? `+${de(x.pull)} kg` : null, x.armor ? `+${x.armor} Panzerung` : null, x.damage ? `${x.damage} Schaden` : null, x.storageRows ? `+${x.storageRows} Reihen Stauraum` : null].filter(Boolean).join(' · ')
         : `${x.places || 1} Plätze · ${de(x.weight || 0)} kg`;
@@ -466,7 +467,7 @@ export class BuildMode {
         : area === 'workshops' ? el('span', { class: 'build-dot', style: `--col:${FN_COLORS[x.function] || '#555'}` }) : icon(area === 'rigParts' ? 'settings' : 'box', 16);
       return el('div', { class: 'build-row' + (pic ? ' has-pic' : ''), title: pic ? '' : x.description || '', onmouseenter: ev => area === 'workshops' && this.peek(id, ev.currentTarget), onmouseleave: () => this.peek(null) }, lead,
         el('span', {}, el('b', {}, x.name || id), el('small', {}, sub)),
-        el('button', { class: 'inv-btn', disabled: poor, title: poor ? 'Zu wenig Δ' : 'Wird auf den Händler-Platz geliefert', onclick: () => this.buy(area, id) }, `${de(price)} Δ`));
+        el('button', { class: 'inv-btn', disabled: poor, title: lock ? `Erst im Techtree: ${lock}` : poor ? 'Zu wenig Δ' : 'Wird auf den Händler-Platz geliefert', onclick: () => this.buy(area, id) }, lock ? `🔒 ${lock}` : `${de(price)} Δ`));
     };
     return el('section', { class: 'inv-panel bm-shop' },
       el('header', {}, icon('shop', 16), el('b', {}, D.camp?.yard?.dealerName || 'Händler'), el('small', {}, 'liefert auf den Händler-Platz'), el('button', { class: 'craft-x', onclick: () => { this.shopOpen = false; this.draw(); } }, '×')),
@@ -840,6 +841,7 @@ export class BuildMode {
   }
   buy(area, id) {
     const D = this.D, save = this.save, before = snapshot(save), name = D[area]?.[id]?.name || id;
+    const lock = techLock(D, save, area, id); if (lock) return this.say(`Erst im Techtree: ${lock}`);
     const r = act(D, save, dd => area === 'workshops' ? buyWorkshop(D, dd, id) : area === 'rigParts' ? buyPart(D, dd, id) : buyContainer(D, dd, id));
     if (!r.ok) return this.say(r.reason);
     if (area === 'workshops') this.scene.achieve?.('workshops', 1, [id]);

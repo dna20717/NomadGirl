@@ -69,7 +69,7 @@ export class TechtreeUI {
     if (!r.ok) { this.shake = id; this.draw(); this.host.notify?.(r.reason, 'warn'); return r; }
     this.flash = id; this.host.changed?.(r); this.draw();
     const n = this.D.techtree[id];
-    this.host.notify?.(`${n.name} freigeschaltet!` + (r.learnt.length ? ` Neues Rezept: ${r.learnt.map(x => this.D.recipes?.[x]?.name || x).join(', ')}` : ''), 'good');
+    this.host.notify?.(`${n.name} freigeschaltet!` + (r.learnt.length ? ` Neues Rezept: ${r.learnt.map(x => this.D.recipes?.[x]?.name || x).join(', ')}` : '') + (r.revealed ? ` Neuer Ort: ${r.revealed.name}` : '') + ((n.workshops || []).length ? ` Werkstatt kaufbar: ${n.workshops.map(w => this.D.workshops?.[w]?.name || w).join(', ')}` : ''), 'good');
     return r;
   }
 
@@ -127,8 +127,12 @@ export class TechtreeUI {
     const cost = (n.cost || []).map(c => { const h = have(D, save, c.resource), r = D.resources?.[c.resource]; return el('span', { class: 'tt-cost ' + (st.state === 'owned' || h >= c.count ? 'ok' : 'no'), style: `--c:${r?.color || '#fff'}` },
       r?.item ? markOf(D, 'items', r.item, 28) : null, ` ${st.state === 'owned' ? c.count : `${Math.min(h, 999)}/${c.count}`} ${r?.name || c.resource}`); });
     const fx = [
-      ...(n.bonus || []).map(b => `${(TECH_BONUS.find(([k]) => k === b.stat) || [])[1]?.replace(' (1 = an)', '').replace(' %', '') || b.stat}${b.stat === 'tankStatus' ? '' : ` ${b.value > 0 ? '+' : ''}${b.value} %`}`),
-      ...(n.recipes || []).map(r => `Rezept: ${D.recipes?.[r]?.name || r}`)];
+      ...(n.bonus || []).map(b => { const L = (TECH_BONUS.find(([k]) => k === b.stat) || [])[1] || b.stat, pct = / %$/.test(L); return `${L.replace(' (1 = an)', '').replace(/ %$/, '')}${b.stat === 'tankStatus' ? '' : ` ${b.value > 0 ? '+' : ''}${b.value}${pct ? ' %' : ''}`}`; }),
+      ...(n.recipes || []).map(r => `Rezept: ${D.recipes?.[r]?.name || r}`),
+      ...(n.workshops || []).map(w => `Werkstatt: ${D.workshops?.[w]?.name || w}`),   // #110
+      ...(n.rigParts || []).map(p => `Rig-Teil: ${D.rigParts?.[p]?.name || p}`),
+      ...(n.reveal ? [`Neuer Ort: ${D.locations?.[n.reveal]?.name || n.reveal}`] : []),
+      ...(n.soon ? ['Wirkung folgt'] : [])];
     return el('aside', { class: 'tt-detail ' + st.state },
       this.pic(n, 216),
       el('h3', {}, n.name || this.sel), el('span', { class: 'tt-state' }, STATE_TEXT[st.state] || ''),

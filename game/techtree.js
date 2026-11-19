@@ -9,6 +9,8 @@ import { bonuses as trophyBonuses } from './achievements.js';
 import { stock, take, learn } from './crafting.js';
 import { gearStats } from './inventory.js';
 import { droneBonuses } from './stations.js';
+import { setFlag } from './conditions.js';
+import { revealPlace } from './worldmap.js';
 
 export const nodes = save => (save.nodes ??= []);
 export const owned = (save, id) => nodes(save).includes(id);
@@ -41,7 +43,9 @@ export function unlock(D, save, id) {
   for (const c of n.cost || []) { const it = D.resources?.[c.resource]?.item; if (it) take(D, save, it, c.count || 0); }
   nodes(save).push(id);
   const learnt = (n.recipes || []).filter(r => learn(save, r));
-  return { ok: true, node: id, learnt };
+  for (const f of String(n.flags || '').split(',').map(x => x.trim()).filter(Boolean)) setFlag(save, f);   // #110 Welt & Story
+  const revealed = n.reveal ? revealPlace(D, save, n.reveal) : null;
+  return { ok: true, node: id, learnt, revealed };
 }
 
 // all passive bonuses with their source (#076 Boni-Bus: the tank and AvA's battery show where each point comes from)
@@ -70,3 +74,9 @@ export function tankMods(D, save) {
   return { decay: f(b.tankDecay), rescue: f(b.tankRescue), accel: f(b.tankAccel) };
 }
 
+// #110 a workshop or rig part that a node unlocks can only be bought once one of those nodes is owned → the node's name, or null
+export function techLock(D, save, area, id) {
+  const by = Object.entries(D.techtree || {}).filter(([, n]) => (n[area] || []).includes(id));
+  if (!by.length || by.some(([k]) => owned(save, k))) return null;
+  return by[0][1].name || by[0][0];
+}
