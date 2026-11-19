@@ -8,6 +8,7 @@ import { addRep, repOf, levelOf, levelName, repConfig, repPrice, REP_LEVELS } fr
 import { rollLoot } from '../inventory.js';
 import { give } from '../crafting.js';
 import { pay } from '../pricing.js';
+import { gangJobs, accept, claim, progressOf } from '../quests.js';
 
 const rank = id => REP_LEVELS.findIndex(([k]) => k === id);
 const GANG_FAMILIES = ['raider', 'machine'];
@@ -90,7 +91,8 @@ export class Turf {
     if (!this.active) return null;
     const s = this.scene, l = s.leyla, range = (this.D.camp?.interactRange ?? 130) * 1.2;
     const e = s.enemies.find(x => this.calm(x) && Math.abs(x.x - l.x) < range && Math.abs(x.body.bottom - l.feet) < 80);
-    return e ? { text: this.friend ? `Reden · ${this.gang} (Handel, Auftrag)` : `Reden · ${this.gang}`, act: () => this.talk(e) } : null;
+    const J = gangJobs(this.D, this.save, this.gang), news = J.offers.length + J.ready.length;   // #088
+    return e ? { text: `Reden · ${this.gang}${this.friend ? ' (Handel, Auftrag)' : news ? ' (Auftrag)' : ''}${news ? ' !' : ''}`, act: () => this.talk(e) } : null;
   }
   talk(e) {
     const s = this.scene, D = this.D, items = [];
@@ -99,9 +101,23 @@ export class Turf {
       const J = this.jobState();
       if (J) items.push(J);
     }
+    items.push(...this.questItems(e));   // #088 the gang's own jobs (Aufträge mit Gang), from Geduldet
     items.push({ label: 'Plaudern', icon: 'speechBubble', act: () => e.say(this.G.motto || 'Hm.', '#ffd27a') });
     items.push({ label: 'Tschüss', icon: 'x', act: () => {} });
-    s.hud.menu({ title: this.gang, sub: this.friend ? `„${this.G.motto || 'Willkommen, Freundin.'}“ · ${levelName(levelOf(D, this.rep()))} (+${this.rep()})` : 'Sie mustern dich. Mehr als ein Nicken gibt es nicht.', items });
+    s.hud.menu({ title: this.gang, sub: this.friend ? `„${this.G.motto || 'Willkommen, Freundin.'}“ · ${levelName(levelOf(D, this.rep()))} (+${this.rep()})` : items.length > 2 ? `Geduldet (+${this.rep()}): für Handel reicht es nicht, für einen Auftrag schon.` : 'Sie mustern dich. Mehr als ein Nicken gibt es nicht.', items });
+  }
+  // #088 Gangs als Auftraggeber: offers to take, done jobs to hand in (Ruf, Δ, Dinge), running ones say how far
+  questItems(e) {
+    const D = this.D, save = this.save, s = this.scene, J = gangJobs(D, save, this.gang), out = [];
+    for (const id of J.ready) { const q = D.quests[id]; out.push({ label: `Abgeben: ${q.name}`, sub: [q.reward?.deltas ? `${q.reward.deltas} Δ` : '', q.reward?.rep ? `Ruf +${q.reward.rep}` : ''].filter(Boolean).join(' · '), icon: 'gift', primary: true,
+      act: () => { const r = claim(D, save, id); if (!r.ok) return; if (q.done) e.say(q.done, '#ffd27a'); s.hud.toast(`Erledigt: ${q.name}`, r.got.join(' · '), 'good', 4200);
+        if (r.rep?.changed) { s.hud.toast(`${this.gang}: ${levelName(r.rep.level)}`, r.rep.level === 'freund' ? 'Freunde: Handel und Revier-Auftrag offen' : 'Dein Ruf bei ihnen steigt', 'good', 4200); this.friend = r.rep.level === 'freund'; }
+        } });
+    }
+    for (const id of J.active.filter(x => !J.ready.includes(x))) { const q = D.quests[id], p = progressOf(D, save, id); out.push({ label: `${q.name}: ${p.n} / ${p.target}`, icon: 'clock', act: () => e.say(q.text ? 'Na? Läuft es?' : 'Hm.', '#ffd27a') }); }
+    for (const id of J.offers) { const q = D.quests[id]; out.push({ label: `Auftrag: ${q.name}`, sub: [q.text, q.reward?.rep ? `Ruf +${q.reward.rep}` : '', q.reward?.deltas ? `${q.reward.deltas} Δ` : ''].filter(Boolean).join(' · '), icon: 'sign',
+      act: () => { if (!accept(D, save, id)) return; s.hud.toast(`Auftrag angenommen: ${q.name}`, `${this.gang} · steht im Questlog`, 'info', 4200); } }); }
+    return out;
   }
   // a few things from the POI's loot, at Ruf prices (once rolled per run)
   trade() {

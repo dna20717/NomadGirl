@@ -47,6 +47,17 @@ v = await ev(() => { const s = SC(), T = s.turf, e = s.enemies.find(x => T.membe
   e.hit(s.time.now, 5, 1, 0); nomad.step(60); return { r0, r1: T.rep(), broken: T.state().broken, peaceful: e.peaceful, state: e.state }; });
 check('Ein Schlag bricht den Frieden: Ruf sinkt, sie greifen an', v.broken && !v.peaceful && v.r1 <= v.r0 - 15 && v.state !== 'patrol', v);
 
+// #088 Gangs als Auftraggeber: geduldet, kein Handel, aber ihr Auftrag; annehmen, erledigen, im Revier abgeben → Δ und Ruf
+v = await run(30);
+v = await ev(() => { const s = SC(), e = s.enemies.find(x => s.turf.member(x) && x.alive); nomad.tp(e.x - 60, e.body.bottom - 4); nomad.step(2); const talk = s.level.nearest()?.text || ''; s.level.nearest().act(); nomad.step(2);
+  const m = (s.hud.menuItems || []).map(x => x.label); nomad.choose('Auftrag: Ratten im Markt'); nomad.step(2); return { talk, m, active: Object.keys(nomad.save().quests?.active || {}) }; });
+check('Geduldet: Reden zeigt den Gang-Auftrag (kein Handel), Annehmen landet im Questlog', /Reden · Yellow Vultures \(Auftrag\) !/.test(v.talk) && !v.m.includes('Handeln') && v.m.includes('Auftrag: Ratten im Markt') && v.active.includes('vultures_ratten'), v);
+v = await ev(() => { const s = SC(), C = (nomad.save().achievements ??= {}).counts ??= {}; C['pois:grossmarkt'] = (C['pois:grossmarkt'] || 0) + 1; const d0 = nomad.save().deltas, r0 = s.turf.rep();
+  const e = s.enemies.find(x => s.turf.member(x) && x.alive); nomad.tp(e.x - 60, e.body.bottom - 4); nomad.step(2); s.level.nearest().act(); nomad.step(2);
+  const m = (s.hud.menuItems || []).map(x => x.label); nomad.choose('Abgeben: Ratten im Markt'); nomad.step(2); return { m, d: nomad.save().deltas - d0, r: s.turf.rep() - r0, done: !!nomad.save().quests.done.vultures_ratten }; });
+check('Abgeben im Revier: +80 Δ, Ruf +15, erledigt', v.m.includes('Abgeben: Ratten im Markt') && v.d === 80 && v.r === 15 && v.done, v);
+await ev(() => SC().hud.closeMenu?.());
+
 // neutral: no peace, the old POI
 v = await run(0);
 check('Neutral: kein Frieden, Hinweis „Sie kennen dich nicht“', v.turf && !v.turf.active && /Neutral/.test(v.toast), v);

@@ -47,7 +47,8 @@ Daniel, 18.11.2026 (aus der Verzahnungs-Prüfung): „Der POI wird dann zu einem
 - **Tresor nur mit Gewalt:** E am Tresor fragt „Aufbrechen“ (bricht den Frieden) oder „Lassen“.
 - **Frieden brechen:** jeder Treffer auf einen von ihnen (`Enemy.hit` → `turf.attacked`) oder der Tresor: Ruf −**Frieden brechen kostet** (Standard 15), alle greifen an („Verrat!“); Kills kosten danach wie immer Ruf. Fällt der Ruf unter die Friedens-Stufe (z. B. durch Klauen), ist der Frieden auch vorbei.
 - **Freunde** (Ruf ≥ Freund): E neben einem von ihnen = **Reden**: **Handeln** (bis zu 4 Dinge aus der Beutetabelle des POIs, Preis Wert × 1,5 × Ruf-Preis, einmal gewürfelt je Run) und **Auftrag: Revier säubern** (alle Mutanten und Viecher im Level; Lohn 40 + 20 × Gefahr Δ und Ruf +**Auftrag: Ruf**, Standard 10). Geduldete bekommen nur ein Nicken.
-- Test: `tools/turf_test.mjs` (7 Prüfungen).
+- **Gangs als Auftraggeber** (#088, Daniel 19.11.2026: „#087–#091 Systeme bauen“): Aufträge mit **Gang** (Werkstatt › Aufträge › Auftrag › Gang, dazu **Ab Ruf**: Geduldet oder Freund) stehen nicht im Camp-Angebot, sondern beim **Reden** im Revier: ab Geduldet (Frieden) heißt es „Reden · Gang (Auftrag) !“, im Menü „Auftrag: …“ zum Annehmen, laufende mit Stand, erledigte als „Abgeben: …“ (Δ, Dinge und **Belohnung › Ruf bei der Gang**; ein Stufenwechsel wird gemeldet, als Freund öffnen sich Handel und Revier-Auftrag). Im Questlog steht der Auftrag mit der Gang als Auftraggeber, „Abgeben im Revier der …“ statt Knopf; das Schwarze Brett zeigt ihn nicht als abgabebereit. Code: `offers(D, save, gang)`, `gangJobs`, `claim` → `rep` in `game/quests.js`; `Turf.questItems` in `game/play/turf.js`. Prüfung: Gang braucht ein Revier, Ruf-Lohn braucht eine Gang.
+- Test: `tools/turf_test.mjs` (9 Prüfungen), `test/gang_quests.test.js`.
 
 ## Aufgeräumt (#096)
 

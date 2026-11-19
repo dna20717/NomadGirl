@@ -13,6 +13,7 @@ import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
 import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
 import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from './megarig.js';
 import { ACHIEVEMENT_COUNTERS, ACHIEVEMENT_SPECIALS, ACHIEVEMENT_CATEGORIES } from '../game/achievements.js';
+import { REP_LEVELS } from '../game/reputation.js';
 import { DECOR_PLACES, DECOR_ARTS } from '../game/decor.js';
 import { MOMENTS } from '../game/banter.js';
 import { EARN_WHEN } from '../game/earn.js';
@@ -870,9 +871,10 @@ export const AREAS = {
     name: 'Aufträge', singular: 'Auftrag', icon: 'list', file: 'data/quests.json', kind: 'catalog', groupBy: { key: 'giver' },
     hint: 'Nebenaufträge im Questlog (#016, Daniel 14.11.2026: „Wir brauchen eine Art Questlog!“). Ein Auftrag zählt ab dem Annehmen einen Zähler hoch (wie Achievements) oder will Dinge abgegeben haben. Die Hauptquest (Heilmittel) und AvAs Tank kommen aus Techtree und Cryo-Tank. Geöffnet am Warroom und am Lagerfeuer.',
     template: { name: 'Neuer Auftrag', counter: 'kills', target: 5, reward: { deltas: 50 } },
-    row: (x, p) => `${p?.data.companions?.[x.giver]?.name || 'ohne Auftraggeber'} · ${x.counter ? `${x.target || 1}× ${ACHIEVEMENT_COUNTERS.find(c => c[0] === x.counter)?.[1]?.replace(/ \(.*$/, '') || x.counter}${x.filter ? ' · ' + x.filter : ''}` : x.pieces?.length ? `${x.pieces.length} Stücke abgeben` : `${x.count || 1}× ${p?.data.items?.[x.item]?.name || x.item || '?'} abgeben`}${x.needsFlag ? ` · nach Merker ${x.needsFlag}` : ''}`,
+    row: (x, p) => `${x.gang || p?.data.companions?.[x.giver]?.name || 'ohne Auftraggeber'} · ${x.counter ? `${x.target || 1}× ${ACHIEVEMENT_COUNTERS.find(c => c[0] === x.counter)?.[1]?.replace(/ \(.*$/, '') || x.counter}${x.filter ? ' · ' + x.filter : ''}` : x.pieces?.length ? `${x.pieces.length} Stücke abgeben` : `${x.count || 1}× ${p?.data.items?.[x.item]?.name || x.item || '?'} abgeben`}${x.needsFlag ? ` · nach Merker ${x.needsFlag}` : ''}`,
     sections: [
-      { title: 'Auftrag', fields: [NAME, ref('giver', 'Auftraggeber', 'companions'), area_('text', 'Text', { hint: 'Was der Auftraggeber sagt' }), area_('done', 'Beim Abgeben', { hint: 'Sein Satz, wenn Leyla den Auftrag abgibt' }),
+      { title: 'Auftrag', fields: [NAME, ref('giver', 'Auftraggeber', 'companions'), text('gang', 'Gang', { hint: '#088 Gangs als Auftraggeber: statt einer Begleiterin vergibt eine Gang den Auftrag (Name wie POI › Gang). Annehmen und Abgeben nur in ihrem Revier, beim Reden mit einem von ihnen' }),
+        select('minRep', 'Ab Ruf', [['', 'Geduldet (Standard)'], ...REP_LEVELS.filter(([k]) => k === 'freund')], { hint: '#088: erst ab diesem Ruf bei der Gang im Angebot. Unter Geduldet gibt es keinen Frieden, also kein Gespräch' }), area_('text', 'Text', { hint: 'Was der Auftraggeber sagt' }), area_('done', 'Beim Abgeben', { hint: 'Sein Satz, wenn Leyla den Auftrag abgibt' }),
         ref('after', 'Nach Auftrag', 'quests', { hint: 'Erst im Angebot, wenn dieser Auftrag erledigt ist' }), num('minDay', 'Ab Tag', { min: 1 })] },
       { title: 'Ziel', fields: [select('counter', 'Zähler', [['', '– Dinge abgeben –'], ...ACHIEVEMENT_COUNTERS], { hint: 'Was das Spiel zählt (ab dem Annehmen). Leer = Dinge abgeben' }), text('filter', 'Filter', { hint: 'Wie bei Achievements: Gegner, Familie, POI, Rang, Rezept …' }), num('target', 'Ziel', { min: 1 }),
         ref('item', 'Abgeben: Ding', 'items'), num('count', 'Abgeben: Anzahl', { min: 1 }),
@@ -882,9 +884,12 @@ export const AREAS = {
         ...CREW_NEEDS(),
         bool('whenHas', 'Erst wenn eins davon da ist', { hint: '#057: im Angebot erst, wenn Leyla eines der Stücke hat (sie spricht den Auftraggeber darauf an)' }),
         text('flag', 'Merker beim Annehmen', { hint: '#057: setzt einen Merker für den Ereignis-Baukasten (z. B. Händler, die Stücke verkaufen, tauchen erst dann auf)' })] },
-      { title: 'Belohnung', fields: [ref('reward.reveal', 'Ort aufdecken', 'locations', { hint: '#057: ein versteckter Ort kommt auf die Reisekarte' }), num('reward.deltas', 'Deltas', { unit: 'Δ', min: 0 }), table('reward.items', 'Dinge', [ref('item', 'Ding', 'items'), num('count', 'Anzahl', { min: 1 })], { hint: 'Kommen in die Kiste im Camp, ist sie voll, in den Rucksack' })] },
+      { title: 'Belohnung', fields: [ref('reward.reveal', 'Ort aufdecken', 'locations', { hint: '#057: ein versteckter Ort kommt auf die Reisekarte' }), num('reward.rep', 'Ruf bei der Gang', { min: 0, max: 100, hint: '#088: nur bei Aufträgen mit Gang' }), num('reward.deltas', 'Deltas', { unit: 'Δ', min: 0 }), table('reward.items', 'Dinge', [ref('item', 'Ding', 'items'), num('count', 'Anzahl', { min: 1 })], { hint: 'Kommen in die Kiste im Camp, ist sie voll, in den Rucksack' })] },
     ],
-    check: (x, report) => { if (!x.counter && !x.item && !(x.pieces || []).length) report('warning', 'Weder Zähler noch Ding zum Abgeben'); if (!x.reward?.deltas && !(x.reward?.items || []).length && !x.reward?.reveal) report('hint', 'Keine Belohnung'); },
+    check: (x, report, p) => { if (!x.counter && !x.item && !(x.pieces || []).length) report('warning', 'Weder Zähler noch Ding zum Abgeben');
+      if (x.gang && !Object.values(p?.data?.pois || {}).some(o => o.gang?.name === x.gang)) report('error', `Gang „${x.gang}“ hat kein Revier (kein POI mit dieser Gang)`);
+      if (x.gang && x.giver) report('warning', 'Gang und Auftraggeber zugleich: die Gang vergibt ihn');
+      if (x.reward?.rep && !x.gang) report('warning', 'Ruf als Belohnung braucht eine Gang'); if (!x.reward?.deltas && !(x.reward?.items || []).length && !x.reward?.reveal && !x.reward?.rep) report('hint', 'Keine Belohnung'); },
   },
 
   achievements: {

@@ -51,7 +51,7 @@ export class QuestLogUI {
     const D = this.D, save = this.save;
     if (!save) return;
     if (r.kind === 'offer') { accept(D, save, r.q.id); this.host.toast?.(`Auftrag angenommen: ${r.q.name}`, D.companions?.[r.q.giver]?.name || '', 'info'); this.tab = 'active'; this.pick = this.rows().findIndex(x => x.q?.id === r.q.id); }
-    else if (r.kind === 'side' && r.q.ready) { const res = claim(D, save, r.q.id); if (res.ok) { this.host.toast?.(`Erledigt: ${r.q.name}`, res.got.join(' · '), 'good'); this.host.claimed?.(r.q, res); this.pick = 0; } }
+    else if (r.kind === 'side' && r.q.ready && !r.q.gang) { const res = claim(D, save, r.q.id); if (res.ok) { this.host.toast?.(`Erledigt: ${r.q.name}`, res.got.join(' · '), 'good'); this.host.claimed?.(r.q, res); this.pick = 0; } }
     else if (r.kind === 'salvage') track(save, 'salvage:' + r.q.id);
     else if (r.kind === 'side' || r.kind === 'main') track(save, r.kind === 'main' ? 'main' : r.q.id);
     this.scene?.box?.persist?.();
@@ -64,7 +64,7 @@ export class QuestLogUI {
     const R = this.rows(L);
     this.pick = Math.max(0, Math.min(this.pick, R.length - 1));
     const tabs = el('div', { class: 'tut-tabs' }, ...keyGlyph('tabs').slice(0, 1), ...TABS.map(([k, n]) => el('button', { class: 'tut-tab' + (k === this.tab ? ' on' : ''), onclick: () => { this.tab = k; this.pick = 0; this.draw(); } }, n, k === 'offers' && L.offers.length ? el('i', { class: 'ql-dot' }, String(L.offers.length)) : null)), ...keyGlyph('tabs').slice(1));
-    const giver = q => D.companions?.[q.giver]?.name || '';
+    const giver = q => q.gang || D.companions?.[q.giver]?.name || '';
     const tracked = r => r.kind === 'main' ? L.tracked === 'main' : r.kind === 'salvage' ? L.tracked === 'salvage:' + r.q.id : r.kind === 'side' && L.tracked === r.q.id;
     const title = r => r.kind === 'main' ? L.main.name : r.kind === 'tank' ? 'AvAs Tank' : r.q.name || r.q.id;
     const sub = r => r.kind === 'salvage' ? `Bergung · ${Math.round(r.q.share * 100)} %${r.q.site ? ` · ${r.q.site}` : ''}` : r.kind === 'main' ? `Hauptquest · ${Math.round(L.main.progress * 100)} %` : r.kind === 'tank' ? (L.tank.dead ? 'Kein Signal' : `${L.tank.cond} % · ${L.tank.phase}`) : r.kind === 'done' ? `${giver(r.q)} · Tag ${r.q.day}` : `${giver(r.q)}${r.kind === 'side' ? ` · ${r.q.n} / ${r.q.target}` : ''}`;
@@ -83,7 +83,7 @@ export class QuestLogUI {
   detail(r, L) {
     const D = this.D, giver = q => D.companions?.[q.giver]?.name || '';
     const btn = (label, ic) => el('button', { class: 'inv-btn wm-go ql-go', onclick: () => this.primary(r) }, icon(ic, 16), ' ', label);
-    const reward = q => { const R = q.reward || {}, parts = [R.reveal ? `Ort: ${D.locations?.[R.reveal]?.name || R.reveal}` : null, R.deltas ? `${R.deltas} Δ` : null, ...(R.items || []).map(x => `${x.count || 1}× ${D.items?.[x.item]?.name || x.item}`)].filter(Boolean); return parts.length ? el('p', { class: 'ql-reward' }, icon('gift', 14), ' ', parts.join(' · ')) : null; };
+    const reward = q => { const R = q.reward || {}, parts = [R.reveal ? `Ort: ${D.locations?.[R.reveal]?.name || R.reveal}` : null, R.rep && q.gang ? `Ruf ${q.gang} +${R.rep}` : null, R.deltas ? `${R.deltas} Δ` : null, ...(R.items || []).map(x => `${x.count || 1}× ${D.items?.[x.item]?.name || x.item}`)].filter(Boolean); return parts.length ? el('p', { class: 'ql-reward' }, icon('gift', 14), ' ', parts.join(' · ')) : null; };
     const bar = (n, t) => el('div', { class: 'ach-bar' }, el('i', { style: `width:${Math.round(100 * n / Math.max(1, t))}%` }), el('span', {}, `${n} / ${t}`));
     if (r.kind === 'main') {
       const G = L.main.goal;
@@ -119,7 +119,7 @@ export class QuestLogUI {
       r.kind === 'side' && !q.counter && q.pieces?.length ? el('small', {}, q.pieces.map(x => `${(stock(D, this.save)[x] || 0) > 0 ? '✓' : '·'} ${D.items?.[x]?.name || x}`).join('  ')) : null,   // #057
       r.kind === 'done' && q.done ? el('p', { class: 'ql-say' }, `„${q.done}“`) : null,
       reward(q),
-      r.kind === 'offer' ? btn('Annehmen', 'check') : r.kind === 'side' && q.ready ? btn('Abgeben', 'gift') : r.kind === 'side' ? (L.tracked === q.id ? el('p', { class: 'ql-tracked' }, '◆ Wird verfolgt') : btn('Verfolgen', 'target')) : null));
+      r.kind === 'side' && q.gang && q.ready ? el('p', { class: 'ql-now' }, el('b', {}, '◆ Erledigt'), el('br'), `Abgeben im Revier der ${q.gang}: mit einem von ihnen reden`) : r.kind === 'offer' ? btn('Annehmen', 'check') : r.kind === 'side' && q.ready ? btn('Abgeben', 'gift') : r.kind === 'side' ? (L.tracked === q.id ? el('p', { class: 'ql-tracked' }, '◆ Wird verfolgt') : btn('Verfolgen', 'target')) : null));
   }
   state() { const L = this.log(); return { open: this.isOpen, tab: this.tab, pick: this.pick, rows: this.rows(L).map(r => r.kind === 'main' || r.kind === 'tank' ? r.kind : r.kind === 'salvage' ? `salvage:${r.q.id}` : `${r.kind}:${r.q.id}${r.q.ready ? '!' : ''}`), tracked: L?.tracked || null }; }
 }

@@ -122,5 +122,82 @@
   "text": "Ich habe eine Liste. Nicht meine, ich trage sie nur. Zwei von denen da draußen sollen reden, nicht sterben. Bring sie mir.",
   "done": "Sie reden. Ich höre zu. Leyla … pass auf, dass dich das nicht verändert.",
   "needWorkshop": "cell"
+ },
+ "vultures_ratten": {
+  "name": "Ratten im Markt",
+  "counter": "pois",
+  "target": 1,
+  "reward": {"deltas": 80, "rep": 15},
+  "gang": "Yellow Vultures",
+  "filter": "grossmarkt",
+  "text": "Die Neon Rats verticken unseren Sprit im Großmarkt. Geh rein, räum ihre Regale leer. Wer fragt, du warst nie hier.",
+  "done": "Ha! Die Ratten zählen ihre Dosen nach. Du tankst ab jetzt mit Rabatt, Kleine."
+ },
+ "vultures_kanister": {
+  "name": "Leere Kanister",
+  "counter": "kills",
+  "target": 5,
+  "reward": {"deltas": 120, "rep": 10, "items": [{"item": "technik", "count": 2}]},
+  "gang": "Yellow Vultures",
+  "after": "vultures_ratten",
+  "minRep": "freund",
+  "item": "dieselkanister",
+  "count": 2,
+  "text": "Die Pumpe ist trocken, die Kanister auch. Bring uns zwei volle, dann gehört die Zapfsäule dir, wann immer du willst.",
+  "done": "Riecht nach Geld. Hier, und der Schlüssel zur Waschanlage."
+ },
+ "rats_kupfer": {
+  "name": "Kupfer für die Leuchtreklame",
+  "counter": "kills",
+  "target": 5,
+  "reward": {"deltas": 50, "rep": 12},
+  "gang": "Neon Rats",
+  "item": "kabelbaum",
+  "count": 2,
+  "text": "Unser Schild flackert. Ein Markt ohne Neon ist ein Grab mit Regalen. Zwei Kabelbäume, und wir reden über Preise.",
+  "done": "Es leuchtet! ALLES MUSS RAUS, in Pink. Du bist eine von uns, fast."
+ },
+ "rustguard_mutanten": {
+  "name": "Etwas kratzt an der Tür",
+  "counter": "kills",
+  "target": 10,
+  "reward": {"deltas": 100, "rep": 15},
+  "gang": "Rust Guard",
+  "filter": "mutant",
+  "text": "Die Mutanten graben sich zur Lüftung durch. Der Bunker hält, aber nur, wenn draußen jemand aufräumt. Zehn Stück.",
+  "done": "Ruhig heute Nacht. Zum ersten Mal seit Wochen. Danke, Läuferin."
+ },
+ "skywolves_dach": {
+  "name": "Was oben liegt",
+  "counter": "secrets",
+  "target": 2,
+  "reward": {"deltas": 70, "rep": 15},
+  "gang": "Sky Wolves",
+  "filter": "delta_heights",
+  "text": "Der Turm hat Verstecke, die selbst wir nicht kennen. Find zwei davon. Wer so weit klettert, darf mit uns aufs Dach.",
+  "done": "Zwei? Wir wohnen hier seit Jahren. Respekt. Das Dach steht dir offen."
+ },
+ "kings_kopfgeld": {
+  "name": "Fahrgast ohne Ticket",
+  "counter": "kills",
+  "target": 5,
+  "reward": {"deltas": 150, "rep": 15},
+  "gang": "Tunnel Kings",
+  "item": "gefangener",
+  "count": 1,
+  "needWorkshop": "cell",
+  "text": "Einer von den Salt Dogs hat unsere Gleise verkauft. Bring ihn uns, lebend. Nächster Halt: Endstation.",
+  "done": "Er fährt jetzt mit uns. Für immer. Dein Lohn, und die Tunnel sind deine."
+ },
+ "saints_antenne": {
+  "name": "Störsender",
+  "counter": "kills",
+  "target": 5,
+  "reward": {"deltas": 40, "rep": 12, "items": [{"item": "wissen", "count": 2}]},
+  "gang": "Static Saints",
+  "item": "antenne",
+  "count": 3,
+  "text": "Wir senden, aber keiner empfängt. Drei Antennen, dann hört dich ganz BigCityDelta, wenn du was zu sagen hast.",
+  "done": "Hörst du das Rauschen? Das ist die Stadt. Sie kennt jetzt deinen Namen."
  }
 }

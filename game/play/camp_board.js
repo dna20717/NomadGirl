@@ -54,7 +54,8 @@ export class CampBoard {
   boardJobs() {
     const D = this.D, save = this.box.save, Q = qstate(save);
     const active = Object.keys(Q.active).filter(id => D.quests?.[id]);
-    return { offer: offers(D, save), ready: active.filter(id => progressOf(D, save, id).ready), run: active.filter(id => !progressOf(D, save, id).ready) };
+    return { offer: offers(D, save), ready: active.filter(id => !D.quests[id].gang && progressOf(D, save, id).ready),   // #088 gang jobs are handed in on their turf
+      run: active.filter(id => !progressOf(D, save, id).ready) };
   }
   boardHint() {
     const J = this.boardJobs();

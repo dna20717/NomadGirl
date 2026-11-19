@@ -14,19 +14,26 @@ import { goal as mainGoal, pathTo, progress as mainProgress, goalId } from './qu
 import { status, owned } from './techtree.js';
 import { phase, hoursLeft } from './tank.js';
 import { revealPlace } from './worldmap.js';
+import { addRep, repOf, levelOf, REP_LEVELS } from './reputation.js';
 import { active as salvageOpen, progress as salvageProgress, goal as salvageGoal, siteOf, ensureSites } from './salvage.js';
 
 export const qstate = save => { const q = (save.quests ??= {}); q.active ??= {}; q.done ??= {}; return q; };
 const keyOf = x => x.filter ? `${x.counter}:${x.filter}` : x.counter;
 const countOf = (save, x) => achState(save).counts[keyOf(x)] || 0;
 
-// side jobs on offer: not taken, not done, the one before is done, the day has come
-export function offers(D, save) {
+// #088 Gangs als Auftraggeber: a quest with a gang (Auftrag › Gang) is offered and handed in only on their turf, by talking to one of
+// them, and only from a Ruf (Auftrag › Ab Ruf, Standard Geduldet); its reward can be Ruf with them (Belohnung › Ruf)
+const rank = lvl => REP_LEVELS.findIndex(([k]) => k === lvl);
+export const gangOf = (D, id) => D.quests?.[id]?.gang || null;
+export const repEnough = (D, save, x) => rank(levelOf(D, repOf(save, x.gang))) >= rank(x.minRep || 'geduldet');
+
+// side jobs on offer: not taken, not done, the one before is done, the day has come; companions' jobs, or with `gang` that gang's
+export function offers(D, save, gang = null) {
   const Q = qstate(save);
   // #057 a treasure hunt only comes up once Leyla has one of its pieces (she brings it up with the giver)
   const has = x => !x.whenHas || (x.pieces || []).some(id => (stock(D, save)[id] || 0) > 0);
   const flagged = x => condOk(D, save, x);   // #062 Merker, #068 one condition language (Merker, Tag, Crew & Rig)
-  return Object.entries(D.quests || {}).filter(([id, x]) => !Q.active[id] && !Q.done[id] && (!x.after || Q.done[x.after]) && has(x) && flagged(x)).map(([id]) => id);
+  return Object.entries(D.quests || {}).filter(([id, x]) => (x.gang || null) === gang && (!gang || repEnough(D, save, x)) && !Q.active[id] && !Q.done[id] && (!x.after || Q.done[x.after]) && has(x) && flagged(x)).map(([id]) => id);
 }
 export function accept(D, save, id) {
   const x = D.quests?.[id], Q = qstate(save);
@@ -58,6 +65,8 @@ export function claim(D, save, id) {
   const R = x.reward || {}, got = [];
   if (R.reveal) { const n = revealPlace(D, save, R.reveal); if (n) got.push(`Neuer Ort: ${n.name}`); }   // #057
   if (R.deltas) { save.deltas = (save.deltas || 0) + R.deltas; got.push(`+${R.deltas} Δ`); }
+  let rep = null;
+  if (R.rep && x.gang) { rep = addRep(D, save, x.gang, R.rep); if (rep) got.push(`Ruf ${x.gang} ${rep.n >= 0 ? '+' : '−'}${Math.abs(rep.n)}`); }   // #088
   const G = save.inv?.grids || {};
   for (const r of R.items || []) {
     if (!r.item || !D.items?.[r.item]) continue;
@@ -67,7 +76,12 @@ export function claim(D, save, id) {
   }
   delete Q.active[id]; Q.done[id] = { day: save.day ?? 1 };
   if (Q.tracked === id) Q.tracked = 'main';
-  return { ok: true, got, line: x.done || '' };
+  return { ok: true, got, line: x.done || '', rep };
+}
+// #088 the jobs of one gang, for the talk on their turf: on offer, taken (ready or not)
+export function gangJobs(D, save, gang) {
+  const Q = qstate(save), active = Object.keys(Q.active).filter(id => gangOf(D, id) === gang);
+  return { offers: offers(D, save, gang), active, ready: active.filter(id => progressOf(D, save, id).ready) };
 }
 export function track(save, id) { qstate(save).tracked = id || 'main'; }
 
@@ -89,8 +103,8 @@ export function trackedGoal(D, save) {
   // a salvage project (#023) as the tracked line: the next missing part and where it lies
   if (G && G.kind !== 'tank' && G.kind !== 'lost' && String(id).startsWith('salvage:')) { const sg = salvageGoal(D, save, id.slice(8)); if (sg) return { ...G, ...sg }; }
   if (!G || G.kind === 'tank' || G.kind === 'lost' || !id || id === 'main' || !Q.active[id] || !D.quests?.[id]) return G;
-  const x = D.quests[id], p = progressOf(D, save, id), giver = D.companions?.[x.giver]?.name;
-  return { kind: p.ready ? 'ready' : 'side', text: `${x.name || id}${p.ready ? ' · erledigt' : ''}`, sub: p.ready ? `Abgeben im Questlog${giver ? ` bei ${giver}` : ''}` : `${p.n} / ${p.target}${giver ? ` · für ${giver}` : ''}`, progress: p.n / p.target, quest: id };
+  const x = D.quests[id], p = progressOf(D, save, id), giver = x.gang || D.companions?.[x.giver]?.name;
+  return { kind: p.ready ? 'ready' : 'side', text: `${x.name || id}${p.ready ? ' · erledigt' : ''}`, sub: p.ready ? (x.gang ? `Abgeben im Revier der ${x.gang}` : `Abgeben im Questlog${giver ? ` bei ${giver}` : ''}`) : `${p.n} / ${p.target}${giver ? ` · für ${giver}` : ''}`, progress: p.n / p.target, quest: id };
 }
 
 // everything for the window
