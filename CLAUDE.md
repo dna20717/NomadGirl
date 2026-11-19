@@ -80,7 +80,7 @@ docs/crew.md           Kernfiguren der Crew (Geschichten, Vertrauensbäume)
 docs/glossary.md       Deutsch → Englisch
 docs/assets.md         alle Assets mit Herkunft (KI/Code)
 docs/backlog.md        offene Punkte, technische Schulden, Relikte (Durchsicht 12.11.2026)
-docs/balancing.md      Balancing: Simulation (tools/balance_sim.mjs), Befunde, Fassungen als Datenset (#081)
+docs/balancing.md      Balancing-Bericht, Simulation (tools/balance_sim.mjs)
 docs/funk.md           Funkbuch: Tickets und Rückmeldungen zwischen Projekt-Chat und Claude Code
 docs/features/         Feature-Wissen je Bereich (siehe Landkarte)
 docs/changelog.md      Verlauf: was wann gebaut wurde (früher „Stand“)
