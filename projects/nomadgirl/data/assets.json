@@ -5760,10 +5760,10 @@
   "frames": 8,
   "fps": 12,
   "loop": true,
-  "origin": [32, 61],
+  "origin": [32, 63],
   "height": 64,
-  "description": "Ein Wüstenfuchs huscht seitlich nach rechts (Galopp, 8 Frames): Kleinvieh für den Hintergrund. Die Ohren schwingen beim Laufen mit (beim Absprung nach hinten, beim Landen hoch). v2 mit mehr Fell-Details. Gegenrichtung per Spiegeln.",
-  "source": "NomadPixel (Claude Code, Text-Pixel-Art, Palette AAP-64, .pix-Quelle run_source.pix)",
+  "description": "Ein Wüstenfuchs galoppiert seitlich nach rechts (8 Frames, von PixelLab aufpoliert, Daniel 19.11.2026). Der handgezeichnete Vorgänger liegt in assets/fennek/handgezeichnet/. Gegenrichtung per Spiegeln.",
+  "source": "KI (PixelLab: Create Image Pro Flash mit dem handgezeichneten Fennek als Stilbild, Animate Image), Palette AAP-64",
   "date": "19.11.2026"
  },
  "factory_terrain": {
@@ -6044,6 +6044,48 @@
   "description": "#110 Skilltrees: 16 Knoten-Bilder à 64 px (Szenen wie tt_nodes). Felder 6–16 sind Zweitversionen der Schlusssteine (_alt).",
   "source": "KI (PixelLab, Create Image Pro, Stilbild tt_nodes, Palette AAP-64, 4 × 4-Blatt 256 px)",
   "derivedFrom": "tt_nodes",
+  "date": "19.11.2026"
+ },
+ "fennek_look": {
+  "name": "Fennek · Umschauen",
+  "kind": "animation",
+  "file": "assets/fennek/look.png",
+  "frameSize": [64, 64],
+  "frames": 9,
+  "fps": 7,
+  "loop": true,
+  "origin": [32, 63],
+  "height": 64,
+  "description": "Idle: Ohren zucken, Kopf dreht sich zur Kamera, zwinkert, schaut zurück.",
+  "source": "KI (PixelLab: Create Image Pro Flash mit dem handgezeichneten Fennek als Stilbild, Animate Image), Palette AAP-64",
+  "date": "19.11.2026"
+ },
+ "fennek_sniff": {
+  "name": "Fennek · Schnuppern",
+  "kind": "animation",
+  "file": "assets/fennek/sniff.png",
+  "frameSize": [64, 64],
+  "frames": 9,
+  "fps": 7,
+  "loop": true,
+  "origin": [32, 63],
+  "height": 64,
+  "description": "Idle: senkt den Kopf und schnuppert am Boden, hebt ihn wieder.",
+  "source": "KI (PixelLab: Create Image Pro Flash mit dem handgezeichneten Fennek als Stilbild, Animate Image), Palette AAP-64",
+  "date": "19.11.2026"
+ },
+ "fennek_scratch": {
+  "name": "Fennek · Kratzen",
+  "kind": "animation",
+  "file": "assets/fennek/scratch.png",
+  "frameSize": [64, 64],
+  "frames": 13,
+  "fps": 8,
+  "loop": true,
+  "origin": [32, 63],
+  "height": 64,
+  "description": "Idle: setzt sich, kratzt sich hinterm Ohr, steht wieder auf.",
+  "source": "KI (PixelLab: Create Image Pro Flash mit dem handgezeichneten Fennek als Stilbild, Animate Image), Palette AAP-64",
   "date": "19.11.2026"
  }
 }
