@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: **Plan abgearbeitet** (Daniel AFK): #078 Werkstätten ausbauen ★, #079 Zelle/Gefangene, #077 Hauptcontainer an Bord, #085 Crew-Kern klein, #083 Bilder hochladen, #082 Licht (Strahlen, Schatten, Stromausfall), #081 Balancing v1 (Datenset + Bericht). Offen für Daniel: v1 absegnen (`docs/balancing.md`), ⚠️-Punkte der Tickets, #080 Dunkelheit-Skilltree (erst reden), #084 PixelLab-Grafik (Bit-Farm, Fahrgestell), #086 Story-Enden, #087–#091 Ideen.
 - 19.11. Code → Ava: Daniel AFK („optimiere das Spiel weiter nach unserem Plan“): #078 läuft, dann #079, #077, #085, #083, #082, #081.
 - 19.11. Code → Ava: #092–#096 fertig: Haarfarben lernen, Van im POI zu, Kofferraum (sicher), Billboard-Foto mit Sucher, POIs aufgeräumt. Weiter mit #078.
 - 19.11. Code → Ava: Neue Aufträge von Daniel: #092 Haarfarben lernen (läuft), #093 Van im POI zu, #094 Kofferraum im POI, #095 Billboard mit Geschick, #096 POIs aufräumen. Danach weiter mit #078.
@@ -279,10 +280,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #081 Balancing v1 (versioniert, simuliert)
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte A8)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte A8)
 - **Auftrag (Daniel, 19.11.2026):** „Lass uns Balancing auch versionieren. Erarbeite bitte v1 durch einige Simulationen und identifiziere Choke Points, übermäßigen Grind und Imbalance.“ Vorschlag: Balancing als Datenset (#073) `balancing-v1`, Simulation per Fernsteuerung/ohne DOM, Bericht in `docs/balancing.md`.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: Ziel-Tempo Heilmittel um Tag 17–20 (Gefahr 4 ab Tag 13); v1 bleibt ein Datenset, bis Daniel es übernimmt; Tank und Mega-Rig-Preise erst in v2 (Daniels Gefühl für den Tank-Druck fehlt).
+- **Ergebnis:** (Code) Commit „Balancing v1: Simulation, Bericht, Datenset (#081)“. Simulator `tools/balance_sim.mjs` (echte Level, Beute, Ressourcen, Tank, Techtree; 60 Spieler × 40 Tage), Bericht `docs/balancing.md`, Datenset **Balancing v1** (`sets/balancing_v1`). Befunde: Choke Point **Bio** (Heilmittel erst Tag 29), Technik/Wissen im Überfluss (Baum bis Stasis in einer Woche), **Startgeld 40.000 Δ** macht Δ bedeutungslos, Tank kaum Druck, Mega-Rig-Ausbau ein langer Grind. v1: Heilmittel Tag 17, Stasis Tag 11, Startgeld 600 Δ. `npm test` grün, datasets/workshop grün. **Bitte testen:** Hauptmenü unten auf „Balancing v1“ wechseln, neues Spiel, ein paar Tage spielen; Bericht lesen und v1 absegnen oder ändern.
 
 ### #082 Licht: God Rays, Schatten, Stromausfall per Schalter
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)

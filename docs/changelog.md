@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Balancing v1** (#081): Simulator `tools/balance_sim.mjs`, Bericht `docs/balancing.md` (Choke Point Bio, Überfluss Technik/Wissen, Startgeld 40.000 Δ, Tank, Mega-Rig-Grind), Datenset „Balancing v1“ (Heilmittel Tag 29 → 17, Startgeld 600 Δ).
 - 19.11.2026: **Licht** (#082): Lichtstrahlen unter Lampen, weiche Schatten unter Figuren, Stromausfall per Sicherungskasten im POI (Notlicht rot, Gegner sehen schlechter).
 - 19.11.2026: **Bilder hochladen** (#083): Knopf „Bild hochladen“ im Asset der Werkstatt; online ein eigener Commit über `/api/upload`.
 - 19.11.2026: **Crew-Kern klein** (#085): Werkstatt-Bereich „Leute“, gewürfelte Siedler, Bewerber am Feuer und Aufnahme auf der Reise, verborgene Eigenheiten, Jobs an Werkstätten über den Boni-Bus, Crew-Fenster am Lagerfeuer.

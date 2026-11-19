@@ -26,7 +26,7 @@ await page.keyboard.press('Enter');
 await page.waitForFunction(() => window.workshop?.dataSet?.id === 'schnelle_leyla', null, { timeout: 20000 });
 v = await page.evaluate(() => ({ label: document.querySelector('.ng-setButton')?.textContent.trim(), run: window.workshop.p.data.leyla.movement.runSpeed, std: window.workshop.base.leyla.movement.runSpeed,
   draft: JSON.parse(localStorage.getItem('nomadgirl-drafts:sets/schnelle_leyla/data/leyla.json') || 'null'), index: JSON.parse(localStorage.getItem('nomadgirl-drafts:sets/index.json') || 'null'), active: localStorage.getItem('nomadgirl-set') }));
-check('Speichern unter: Variante mit nur dem Unterschied, aktiv, Standard unverändert', v.label === 'Schnelle Leyla' && v.run === 777 && v.std !== 777 && JSON.stringify(v.draft) === '{"movement":{"runSpeed":777}}' && v.index?.[0]?.id === 'schnelle_leyla' && v.active === 'schnelle_leyla', v);
+check('Speichern unter: Variante mit nur dem Unterschied, aktiv, Standard unverändert', v.label === 'Schnelle Leyla' && v.run === 777 && v.std !== 777 && JSON.stringify(v.draft) === '{"movement":{"runSpeed":777}}' && v.index?.some(s => s.id === 'schnelle_leyla') && v.active === 'schnelle_leyla', v);
 // the game plays it
 await page.goto(B + 'game.html?camp&new'); await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.camp, null, { timeout: 60000 });
 v = await page.evaluate(() => ({ set: window.__nomadData?.set, run: game.scene.getScene('play').data_.leyla.movement.runSpeed }));

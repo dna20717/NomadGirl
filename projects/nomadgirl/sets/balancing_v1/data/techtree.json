@@ -1,0 +1,64 @@
+{
+ "thermohuelle": {
+  "name": "Thermohülle",
+  "tab": "technik",
+  "look": "tt_nodes",
+  "icon": 1,
+  "pos": [1, 0],
+  "cost": [{"resource": "technik", "count": 8},{"resource": "wissen", "count": 3}],
+  "requires": ["wartungsklappe"],
+  "recipes": [],
+  "bonus": [{"stat": "tankDecay", "value": -15}],
+  "description": "Ein gesteppter Mantel um das Glas. Die Kälte bleibt drin: der Tank verfällt 15 % langsamer."
+ },
+ "notreserve": {
+  "name": "Notreserve",
+  "tab": "technik",
+  "look": "tt_nodes",
+  "icon": 3,
+  "pos": [1, 2],
+  "cost": [{"resource": "technik", "count": 6},{"resource": "bio", "count": 4}],
+  "requires": ["wartungsklappe"],
+  "recipes": [],
+  "bonus": [{"stat": "tankRescue", "value": -25}],
+  "description": "Ein Akku nur für den Notfall. Wenn AvA Leyla heimholt, kostet es den Tank ein Viertel weniger."
+ },
+ "kuehlkreislauf": {
+  "name": "Kühlkreislauf",
+  "tab": "technik",
+  "look": "tt_nodes",
+  "icon": 4,
+  "pos": [2, 1],
+  "cost": [{"resource": "technik", "count": 14},{"resource": "wissen", "count": 6}],
+  "requires": ["thermohuelle"],
+  "recipes": [
+   "kuehlmittel_destillieren"
+  ],
+  "bonus": [],
+  "description": "Rohre, Pumpe, ein bisschen Magie. An der Werkbank lässt sich jetzt Kühlmittel destillieren."
+ },
+ "stasis": {
+  "name": "Stasis-Stabilisator",
+  "tab": "technik",
+  "look": "tt_nodes",
+  "icon": 5,
+  "pos": [3, 1],
+  "cost": [{"resource": "technik", "count": 18},{"resource": "wissen", "count": 10},{"resource": "bio", "count": 8}],
+  "requires": ["kuehlkreislauf", "notreserve", "lebenszeichen"],
+  "recipes": [],
+  "bonus": [{"stat": "tankAccel", "value": -50}],
+  "description": "Ein Kern, der die Zeit im Tank fast anhält. Ein schwacher Tank zerfällt nur noch halb so schnell schneller."
+ },
+ "heilmittel": {
+  "name": "Das Heilmittel",
+  "tab": "bio",
+  "look": "tt_nodes",
+  "icon": 6,
+  "pos": [3, 1],
+  "cost": [{"resource": "bio", "count": 30},{"resource": "wissen", "count": 30},{"resource": "technik", "count": 30}],
+  "requires": ["stasis"],
+  "recipes": [],
+  "bonus": [],
+  "description": "Irgendwo da draußen gibt es ein Rezept. Noch weiß niemand, wie es aussieht."
+ }
+}
