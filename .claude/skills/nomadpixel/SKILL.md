@@ -113,6 +113,7 @@ Bei großen Grafiken (≥ 24 px) das Raster per kleinem Python-Skript mit `scrip
 | `AN rampen --ref RASTER.png … [--stil stil.json] [--png tafel.png]` | Farbrampen messen, die die bestehenden Grafiken fürs Schattieren benutzen (`AN` = `python3 .claude/skills/nomadpixel/scripts/analyse.py`) |
 | `AN grau F.pix [--out grau.png]` | Helligkeits-Check: farbig, Graustufen, 1:1 nebeneinander + Kontrastwerte |
 | `AN bibliothek ORDNER` | Übersichtsbogen aller Bausteine einer Bibliothek |
+| `relief.py` (Python-Modul) | **Relief-Licht** für Objekte ab 32 px: Höhenkarte + Material → Licht, Glanz, Eigen- und Schlagschatten, Fugen-Schatten, Abnutzung (Abschnitt 16; Beispiele `scripts/relief_beispiel.py`) |
 | `AN profil NAME --ref RASTER.png:BxH … --stil stil.json` | Stil-Profil einer Kategorie messen (Helligkeit, Schatten, Licht, Stufensprung, Sättigung, Einzelpixel, Farben) und in der Stilbibel unter `profile` speichern |
 | `AN pruefe F.png:BxH --profil NAME --stil stil.json` | Neue Grafik gegen das Profil prüfen, mit Hinweisen (zu hell, zu grob, zu bunt …) |
 | `PA palcheck F --pal-file PALETTE` | alle Farben aus der Projektpalette? (.hex, .png, .json oder `--palette "#hex,…"`) |
@@ -236,3 +237,14 @@ Vor jedem Auftrag, in dieser Reihenfolge:
   - `ok` ohne `learned`: Was hat funktioniert? Eine kurze Zeile unter „Rückmeldungen“ im Lernbuch, dann `learned: true` setzen.
   - Gewählter Favorit (`favorite`) bei Varianten: Regel ins Lernbuch, warum diese Variante (Silhouette, Größe, Stil).
 - Eigene Erkenntnisse aus den Prüfungen (z. B. Graustufen-Problem) ebenfalls als Regel eintragen, wenn sie allgemein gelten.
+
+## 16. Relief-Licht: Objekte rund statt flach (ab 32 px, Pflicht für Clutter, Requisiten, Maschinen)
+
+Flach wirkt Pixel-Art, wenn Flächen einzeln „angemalt“ werden. Mit `relief.py` bekommt jedes Objekt stattdessen eine **Höhenkarte** (wie weit ragt jeder Pixel nach vorn) und eine **Materialkarte**; `render()` beleuchtet das: Licht und Glanz aus den Flächennormalen, Fugen- und Eckschatten (AO), Schlagschatten innerhalb des Objekts (Griff wirft Schatten auf die Tür), Abnutzung. Test 19.11.2026 (Fabrik-Objekte, unabhängige Kritiker): flach gezeichnet 2,3 → Relief 3,3–3,4.
+
+1. **Materialien** mit `r.mat(name, rampe, glanz, rau)`: Rampe dunkel → hell mit 5–7 Stufen aus der Projektpalette. **Schatten warm** (`#141013`, `#221c1a`), Lichter höchstens zwei Stufen unter Weiß (keine grellen Spitzlichter). Metall `glanz` 0,4–0,6, Lack 0,3–0,6, Guss/Rost 0,2–0,3, Stoff/Holz 0–0,1.
+2. **Formen aufbauen wie ein Modell**, von hinten nach vorn, mit Höhe `z`: `zylinder` (Fass, Flasche, Rohr), `kugel` (Schulter, Kuppel), `kasten` mit `fase` (Gehäuse, Tür, Fuß), `scheibe` mit `maske` (Zahnrad, Deckel; Dicke als zweite, dunklere Scheibe leicht versetzt dahinter), `ring`, `linie` (Speiche, Griff, Kabel), `niete`, `rille` (Fugen, Türspalt), `wulst` (Bördelrand, Sicke), `farbe` (Lackband, Etikett, Rostläufer: Material wechseln, Höhe bleibt), `fest` (Lämpchen, Zeiger, Kreide: unbeleuchtet).
+3. **Struktur** sparsam (`struktur(name, 0.1–0.3)`): Sie wird mitbeleuchtet und wirkt als Material; zu stark sieht sie wie Marmor aus.
+4. **Rendern** mit `r.render(alter=0.6–0.9)` für die Endzeit: Rost/Dreck sitzen dann automatisch in Fugen, Ecken und am Fuß, helle Schrammen an den Lichtkanten. `dither` bleibt aus (ruhige Flächen); `r.nach_c(c)` überträgt in eine `zeichnen.C`-Leinwand, danach `clean`.
+5. Danach wie immer: Profil prüfen (`AN pruefe … --profil clutter`), Vergleichsbild mit dem Bestand, Kritiker-Runde.
+

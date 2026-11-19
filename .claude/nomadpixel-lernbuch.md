@@ -4,6 +4,7 @@ Was bei Grafiken für NomadGirl funktioniert und was nicht. **Vor jedem Auftrag 
 
 ## Regeln
 
+- 19.11.2026 (Relief-Licht, Fabrik-Objekte): Objekte ab 32 px mit `relief.py` bauen (Höhenkarte → Licht, Glanz, Schatten, Abnutzung); Kritiker: flach 2,3 → Relief 3,3–3,4. Schatten warm, Lichter zwei Stufen unter Weiß, Struktur sparsam (≤ 0,3), Abnutzung `alter` 0,6–0,9.
 - 19.11.2026 (Kachel-Set Fabrik, 3 Kritiker-Runden 2,6 → 2,7 → 2,7): Code-Pixel-Art-Clutter wirkt neben dem gemalten PixelLab-Clutter (TileSet00) fremd: zu sauber, zu flach. Für Clutter, der neben dem Bestand steht, dichte gemalte Textur, kräftige Rost-Verläufe und echtes Volumen nötig; sonst lieber den vorhandenen Clutter nehmen oder PixelLab.
 - 19.11.2026 (Kachel-Set Fabrik): Kacheln immer im echten Spiel vor dem Himmel prüfen (Bildschirmfoto). Die Ziegelwand verschwand zuerst im Sonnenuntergang; Wand muss sich in der Helligkeit klar vom Hintergrund absetzen.
 - 19.11.2026 (Kachel-Set Fabrik): Akzentsteine (grau, sandig) höchstens ~10 % und zufällig je Stein, nie in Gruppen je Lage, sonst entstehen waagerechte Streifen im Kachelraster. Senkrechte Stahlstütze höchstens alle 4 Kacheln.
