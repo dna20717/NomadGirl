@@ -3,13 +3,12 @@ import { MapUI } from './map_ui.js';
 import { makeSfx } from './sfx.js';
 import { placeOf, threatOf } from '../worldmap.js';
 import { rescue, update as tankUpdate, phase as tankPhase } from '../tank.js';
-import { bonuses } from '../techtree.js';
+import { gearTotals } from '../mods.js';
 import { parseRoom, solidRects } from '../../engine/room.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
 import { buildMegarig } from '../../engine/megarig.js';
 import { MegarigView } from './megarig_view.js';
 import { Turf } from './turf.js';
-import { brandSets } from '../brand_perks.js';
 import { runSky } from '../weather_fx.js';
 import { PoiLevel } from './poi_level.js';
 import { Pad, PAD_ACTIONS } from './pad.js';
@@ -31,13 +30,13 @@ import { DriveUI } from './drive_ui.js';
 import { Backdrop } from './backdrop.js';
 import { Camp, campLayout, daytimeAt, drawCampBackground, drawCampGround, travelCost } from './camp.js';
 import { raining, rainConfig } from '../rain.js';
-import { applyMods, implantBoosts, droneBonuses } from '../stations.js';
+import { applyMods, droneBonuses } from '../stations.js';
 import { advance, arrive, clockText, containers, newCycle } from '../save.js';
 import { Loot } from './loot.js';
 import { InventoryUI } from './inventory_ui.js';
 import { FloorStrip } from './floor_strip.js';
 import { skinnedLook, SKIN_LOOKS } from './gun_skins.js';
-import { gearStats, add, GEAR_KEYS, rollLoot } from '../inventory.js';
+import { add, GEAR_KEYS, rollLoot } from '../inventory.js';
 import { CraftUI } from './craft_ui.js';
 import { TechtreeUI } from './techtree_ui.js';
 import { BuildMode } from './build_mode.js';
@@ -50,7 +49,7 @@ import { SummaryUI } from './summary_ui.js';
 import { GlitchDuelUI } from './glitch_duel_ui.js';
 import { snapshot as runSnapshot, compare as runCompare } from '../summary.js';
 import { use as useThing, learnAll, learnNote } from '../crafting.js';
-import { bump, level as achieveLevel, check as achieveCheck, bonuses as trophyBonuses } from '../achievements.js';
+import { bump, level as achieveLevel, check as achieveCheck } from '../achievements.js';
 
 const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'], hangOne: ['hang'] };
 
@@ -413,10 +412,8 @@ export class PlayScene extends Phaser.Scene {
 
   // worn gear and implants (inv.wear) on top of the buffs: swap the old sums for the new ones, AvA shows her parts
   applyGear() {
-    const g = this.box ? { ...gearStats(this.data_, this.box.save.inv?.wear, implantBoosts(this.data_, this.box.save)) } : {};
-    if (this.box) { const b = bonuses(this.data_, this.box.save); for (const k of ['health', 'damage']) if (b[k]) g[k] = (g[k] || 0) + b[k]; }   // Techtree: passive bonuses count like gear
-    if (this.box) { const b = trophyBonuses(this.data_, this.box.save); for (const k of GEAR_KEYS) if (b[k] && k !== 'tankDecay' && k !== 'droneBattery') g[k] = (g[k] || 0) + b[k]; }   // trophies on the stands (#012)
-    if (this.box) { const b = brandSets(this.data_, this.box.save).stats; for (const k of GEAR_KEYS) if (b[k]) g[k] = (g[k] || 0) + b[k]; }   // #064 Markentreue: three of one brand
+    // worn gear and implants, Techtree (Leben, Schaden), trophies on the stands (#012), Markentreue (#064): one sum from the Boni-Bus (#076)
+    const g = this.box ? gearTotals(this.data_, this.box.save) : {};
     for (const k of GEAR_KEYS) { const v = (this.mods[k] || 0) - (this.gearMods?.[k] || 0) + (g[k] || 0); if (v) this.mods[k] = v; else delete this.mods[k]; }
     this.gearMods = g;
     // Cyberware (#006, Daniel, 13.11.2026: Implantate „ermöglichen Doppelsprung und Dash“): with a savegame and Leyla › Fähigkeiten › nur mit Implantat

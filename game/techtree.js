@@ -44,16 +44,23 @@ export function unlock(D, save, id) {
   return { ok: true, node: id, learnt };
 }
 
-// all passive bonuses of the owned nodes, summed per stat
+// all passive bonuses with their source (#076 Boni-Bus: the tank and AvA's battery show where each point comes from)
+// → [{ stat, source: 'techtree' | 'implant' | 'trophy' | 'drone', label, value }]
+export function bonusParts(D, save) {
+  const out = [], push = (stat, source, label, value) => { if (value) out.push({ stat, source, label, value }); };
+  for (const id of save?.nodes || []) for (const b of D.techtree?.[id]?.bonus || []) if (b.stat) push(b.stat, 'techtree', D.techtree[id].name || id, Number(b.value) || 0);
+  // Cyberware (#006): implants that pull on the tank or on AvA's battery (Reaktor-Herz: Tank-Verfall +30 %) count like Techtree bonuses
+  for (const [slot, id] of Object.entries(save?.inv?.wear || {})) { const g = gearStats(D, { [slot]: id }); for (const k of ['tankDecay', 'droneBattery']) push(k, 'implant', D.items?.[id]?.name || id, g[k]); }
+  // trophies on the stands (#012): AvAs erstes Bild (Tank-Verfall), Notfall-Chip (Rettung), AvA-Akku
+  const t = trophyBonuses(D, save); for (const k of ['tankDecay', 'tankRescue', 'droneBattery']) push(k, 'trophy', 'Trophäen', t[k]);
+  // AvA's board from the drone workshop (#013): more battery, a cheaper rescue
+  const d = droneBonuses(D, save); push('droneBattery', 'drone', 'AvAs Platine', d.battery); push('tankRescue', 'drone', 'AvAs Platine', d.rescue ? -d.rescue : 0);
+  return out;
+}
+// all passive bonuses of the owned nodes (and the tank's other sources), summed per stat
 export function bonuses(D, save) {
   const out = {};
-  for (const id of save?.nodes || []) for (const b of D.techtree?.[id]?.bonus || []) if (b.stat) out[b.stat] = (out[b.stat] || 0) + (Number(b.value) || 0);
-  // Cyberware (#006): implants that pull on the tank or on AvA's battery (Reaktor-Herz: Tank-Verfall +30 %) count like Techtree bonuses
-  if (save?.inv?.wear) { const g = gearStats(D, save.inv.wear); for (const k of ['tankDecay', 'droneBattery']) if (g[k]) out[k] = (out[k] || 0) + g[k]; }
-  // trophies on the stands (#012): AvAs erstes Bild (Tank-Verfall), Notfall-Chip (Rettung), AvA-Akku
-  const t = trophyBonuses(D, save); for (const k of ['tankDecay', 'tankRescue', 'droneBattery']) if (t[k]) out[k] = (out[k] || 0) + t[k];
-  // AvA's board from the drone workshop (#013): more battery, a cheaper rescue
-  const d = droneBonuses(D, save); if (d.battery) out.droneBattery = (out.droneBattery || 0) + d.battery; if (d.rescue) out.tankRescue = (out.tankRescue || 0) - d.rescue;
+  for (const p of bonusParts(D, save)) out[p.stat] = (out[p.stat] || 0) + p.value;
   return out;
 }
 

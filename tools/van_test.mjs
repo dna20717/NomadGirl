@@ -20,7 +20,7 @@ const ev = (f, a) => page.evaluate(f, a);
 const check = (name, cond, info) => (cond ? ok : errors).push(cond ? name : `${name}: ${JSON.stringify(info)}`);
 const shot = async n => { if (!shots) return; fs.mkdirSync('output', { recursive: true }); await ev(() => nomad.freeze?.()); await page.waitForTimeout(300); await page.screenshot({ path: `output/van_${n}.png` }); await ev(() => nomad.thaw?.()); };
 const inv = () => ev(() => nomad.inv());
-const cell = (panel, x, y) => ev(([panel, x, y]) => { const g = document.querySelectorAll('.inv-grid')[panel], r = g.getBoundingClientRect(), c = parseFloat(g.style.getPropertyValue('--c')) * r.width / g.offsetWidth; return [r.left + (x + 0.5) * c, r.top + (y + 0.5) * c]; }, [panel, x, y]);
+const cell = (panel, x, y) => ev(([panel, x, y]) => { const g = [...document.querySelectorAll('.inv-grid')].filter(x => x.dataset.key !== 'deck').filter(x => x.dataset.key !== 'deck')[panel], r = g.getBoundingClientRect(), c = parseFloat(g.style.getPropertyValue('--c')) * r.width / g.offsetWidth; return [r.left + (x + 0.5) * c, r.top + (y + 0.5) * c]; }, [panel, x, y]);
 const walkE = name => ev(n => { nomad.take(); nomad.step(5); const h = nomad.state().camp.hotspots.find(h => h.name === n || h.name.startsWith(n)); if (!h) return null; nomad.goTo(h.name); nomad.step(1, [], ['grab']); nomad.step(5); return h; }, name);
 const grid = key => ev(k => { const g = nomad.save().inv.grids[k]; return g && { w: g.w, h: g.h, cells: g.cap ?? g.w * g.h, items: g.items.map(e => `${e.id}×${e.n}@${e.x},${e.y}`) }; }, key);
 const minutes = () => ev(() => { const s = nomad.save(); return s.day * 1440 + Math.round(s.hour * 60); });

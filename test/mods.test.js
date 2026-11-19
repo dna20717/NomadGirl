@@ -32,3 +32,37 @@ test('Gärtner in der Hydrokultur: der Bus nennt ihn und rechnet wie vorher (Tro
   assert.ok(Math.abs(modFactor(D, s, 'growth', { place: `${b.ui}:${b.at}`, synergy: 'speed' }) - old) < 1e-9);
   assert.match(modText(P0, 'growth'), /Moss Hum \+\d/);
 });
+
+// #076 Ausrüstung + Tank im Bus: dieselben Summen wie vorher (scene.applyGear, techtree.bonuses), jede Quelle mit Namen
+import { gearParts, gearTotals, tankParts } from '../game/mods.js';
+import { gearStats, GEAR_KEYS } from '../game/inventory.js';
+import { implantBoosts } from '../game/stations.js';
+import { bonuses as treeBonuses } from '../game/techtree.js';
+import { brandSets } from '../game/brand_perks.js';
+function oldGear(s) {   // the sum scene.applyGear built before #076
+  const g = { ...gearStats(D, s.inv?.wear, implantBoosts(D, s)) };
+  const b = treeBonuses(D, s); for (const k of ['health', 'damage']) if (b[k]) g[k] = (g[k] || 0) + b[k];
+  const t = trophyBonuses(D, s); for (const k of GEAR_KEYS) if (t[k] && k !== 'tankDecay' && k !== 'droneBattery') g[k] = (g[k] || 0) + t[k];
+  const m = brandSets(D, s).stats; for (const k of GEAR_KEYS) if (m[k]) g[k] = (g[k] || 0) + m[k];
+  return g;
+}
+test('Ausrüstung im Bus: gleiche Werte wie applyGear, jede Quelle benannt', () => {
+  const s = rig();
+  const wearable = Object.entries(D.items).filter(([, t]) => t.wear);
+  const bySlot = {}; for (const [id, t] of wearable) bySlot[t.wear] ??= id;
+  s.inv.wear = { ...s.inv.wear, ...bySlot };
+  s.nodes = Object.keys(D.techtree).filter(id => (D.techtree[id].bonus || []).some(b => ['health', 'damage'].includes(b.stat))).slice(0, 3);
+  const old = oldGear(s), now = gearTotals(D, s);
+  for (const k of GEAR_KEYS) assert.ok(Math.abs((old[k] || 0) - (now[k] || 0)) < 0.051, `${k}: ${old[k]} vs ${now[k]}`);
+  assert.equal(now.strain, old.strain);
+  const P = gearParts(D, s), labels = Object.values(P).flat().map(p => p.label);
+  assert.ok(labels.includes(D.items[bySlot.armor].name), 'die Rüstung steht mit Namen drin');
+  if (s.nodes.length) assert.ok(Object.values(P).flat().some(p => p.source === 'techtree'));
+});
+test('Tank im Bus: Quellen summieren sich zu techtree.bonuses', () => {
+  const s = rig();
+  s.nodes = Object.keys(D.techtree).filter(id => (D.techtree[id].bonus || []).some(b => /^tank/.test(b.stat))).slice(0, 4);
+  const T = tankParts(D, s), B = treeBonuses(D, s);
+  for (const [stat, list] of Object.entries(T)) assert.equal(list.reduce((n, p) => n + p.value, 0), B[stat]);
+  assert.ok(Object.keys(T).length > 0);
+});

@@ -20,7 +20,7 @@ const check = (name, cond, info) => { (cond ? ok : errors).push(cond ? name : `$
 const shot = async n => { if (!shots) return; fs.mkdirSync('output', { recursive: true }); await page.screenshot({ path: `output/inv_${n}.png` }); };
 const inv = () => ev(() => nomad.inv());
 // cell centre of a grid (0 = backpack, 1 = the other panel) in page pixels (the window zooms out for the tall Camp-Lager)
-const cell = (panel, x, y) => ev(([panel, x, y]) => { const g = document.querySelectorAll('.inv-grid')[panel], r = g.getBoundingClientRect(), c = parseFloat(g.style.getPropertyValue('--c')) * r.width / g.offsetWidth; return [r.left + (x + 0.5) * c, r.top + (y + 0.5) * c]; }, [panel, x, y]);
+const cell = (panel, x, y) => ev(([panel, x, y]) => { const g = [...document.querySelectorAll('.inv-grid')].filter(x => x.dataset.key !== 'deck').filter(x => x.dataset.key !== 'deck')[panel], r = g.getBoundingClientRect(), c = parseFloat(g.style.getPropertyValue('--c')) * r.width / g.offsetWidth; return [r.left + (x + 0.5) * c, r.top + (y + 0.5) * c]; }, [panel, x, y]);
 const click = async (panel, x, y, opt = {}) => { const [px, py] = await cell(panel, x, y); await page.mouse.click(px, py, opt); await page.waitForTimeout(30); };
 const slot = async name => { const b = await page.locator('.inv-slot', { hasText: name }).first().boundingBox(); await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2); await page.waitForTimeout(30); };
 const has = (g, id) => g.items.some(i => i.startsWith(id + '×'));

@@ -25,10 +25,10 @@ const clickAt = async ([x, y], opt) => { await page.mouse.click(x, y, opt); awai
 const slot = s => center(`.inv-slot[data-slot="${s}"]`);
 // a thing in a grid (by key order on screen: backpack 0, other 1, rescue pocket last) → page position of its first cell
 const thingAt = (key, id) => ev(([key, id]) => { const ui = game.scene.getScene('play').hud.inv, g = ui.grid(key), e = g.items.find(x => x.id === id); if (!e) return null;
-  const grids = [...document.querySelectorAll('.inv-grid')], box = grids[ui.pair.indexOf(key) >= 0 ? ui.pair.indexOf(key) : grids.length - 1], r = box.getBoundingClientRect(), c = ui.cell * (ui.zoom || 1);
+  const grids = [...document.querySelectorAll('.inv-grid')].filter(x => x.dataset.key !== 'deck'), box = grids[ui.pair.indexOf(key) >= 0 ? ui.pair.indexOf(key) : grids.length - 1], r = box.getBoundingClientRect(), c = ui.cell * (ui.zoom || 1);
   return [r.left + (e.x + 0.5) * c, r.top + (e.y + 0.5) * c]; }, [key, id]);
 const freeCell = key => ev(key => { const ui = game.scene.getScene('play').hud.inv, g = ui.grid(key), taken = new Set(); for (const e of g.items) taken.add(`${e.x},${e.y}`);
-  const grids = [...document.querySelectorAll('.inv-grid')], box = key === 'drone' ? grids[grids.length - 1] : grids[ui.pair.indexOf(key)], r = box.getBoundingClientRect(), c = ui.cell * (ui.zoom || 1);
+  const grids = [...document.querySelectorAll('.inv-grid')].filter(x => x.dataset.key !== 'deck'), box = key === 'drone' ? grids[grids.length - 1] : grids[ui.pair.indexOf(key)], r = box.getBoundingClientRect(), c = ui.cell * (ui.zoom || 1);
   return [r.left + 0.5 * c, r.top + 0.5 * c]; }, key);
 const mods = () => ev(() => ({ ...game.scene.getScene('play').mods }));
 
@@ -101,7 +101,7 @@ await clickAt(await freeCell('drone'));
 s = await inv();
 check('Discokugel ins Rettungsfach, AvA: „hab ich!“', s.drone.items.some(i => i.startsWith('discokugel')) && s.face === 'rescue', s);
 await ev(() => { const ui = game.scene.getScene('play').hud.inv; ui.held = { e: { a: 'items', id: 'dosenbohnen', n: 1, r: 0 }, from: 'camp' }; });
-await clickAt(await ev(() => { const box = [...document.querySelectorAll('.inv-grid')].pop(), r = box.getBoundingClientRect(), c = 44; return [r.left + 2.5 * c, r.top + 0.5 * c]; }));
+await clickAt(await ev(() => { const box = [...document.querySelectorAll('.inv-grid')].filter(x => x.dataset.key !== 'deck').pop(), r = box.getBoundingClientRect(), ui = game.scene.getScene('play').hud.inv, c = ui.cell * (ui.zoom || 1); return [r.left + 2.5 * c, r.top + 0.5 * c]; }));
 s = await inv();
 check('Bohnen ins Rettungsfach: AvA ist sauer', s.face === 'rescueFood', s.face);
 

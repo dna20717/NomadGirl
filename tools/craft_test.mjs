@@ -107,7 +107,7 @@ await page.keyboard.press('Escape');
 await ev(() => nomad.step(5));
 await page.keyboard.press('i'); await ev(() => nomad.step(3));
 if (!(await ev(() => nomad.inv()?.open))) await ev(() => { window.game.scene.getScene('play').hud.inv.open(); });
-const stew = await ev(() => { const g = document.querySelectorAll('.inv-grid')[0], r = g.getBoundingClientRect(), c = parseFloat(g.style.getPropertyValue('--c')) * r.width / g.offsetWidth, e = nomad.save().inv.grids.backpack.items.find(e => e.id === 'bohneneintopf'); return [r.left + (e.x + 0.5) * c, r.top + (e.y + 0.5) * c]; });
+const stew = await ev(() => { const g = document.querySelector('.inv-grid[data-key="backpack"]'), r = g.getBoundingClientRect(), c = parseFloat(g.style.getPropertyValue('--c')) * r.width / g.offsetWidth, e = nomad.save().inv.grids.backpack.items.find(e => e.id === 'bohneneintopf'); return [r.left + (e.x + 0.5) * c, r.top + (e.y + 0.5) * c]; });
 await page.mouse.click(...stew); await page.waitForTimeout(30);
 await clickText('.inv-slot.use', 'Essen');
 const sv = await ev(() => nomad.save());
