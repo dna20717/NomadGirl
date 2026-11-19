@@ -27,7 +27,8 @@
     "Mehr Kabel. Es braucht immer mehr Kabel."
    ]
   },
-  "look": "companion_schraube_idle"
+  "look": "companion_schraube_idle",
+  "voice": "schraube"
  },
  "onkel_sung": {
   "name": "Onkel Sung",
@@ -59,6 +60,7 @@
   },
   "passenger": true,
   "look": "companion_onkel_sung_idle",
-  "height": 240
+  "height": 240,
+  "voice": "onkel_sung"
  }
 }

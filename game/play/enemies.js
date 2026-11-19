@@ -123,7 +123,11 @@ export class Enemy {
     else this.searchStart = time;
     this.alarmedAt = time;
   }
-  say(t, color) { this.scene.fx.text(this.x, this.body.top - 16, t, { color, size: 48, rise: 30 }); }
+  say(t, color) {
+    this.scene.fx.text(this.x, this.body.top - 16, t, { color, size: 48, rise: 30 });
+    // #112 Gebrabbel: „?“ / „?!“ / „!“ become a shout, words are babbled
+    this.scene.hud?.voice?.()?.bark(this, /[a-zäöü]/i.test(t) ? t.replace(/\*/g, '') : t.includes('!') ? 'alert' : 'oh');
+  }
 
   // ---------- update ----------
   update(time, dt, leyla) {
@@ -513,7 +517,8 @@ export class Enemy {
     if (['windup', 'patrol', 'alert', 'search'].includes(this.state)) { this.state = 'engage'; this.readyAt = Math.max(this.readyAt, time + 350); this.callOthers(time); }
     if (!this.C.shield || this.guardOpen) this.facing = -dir || this.facing;
     if (this.hp <= 0) this.die(time, dir);
-    else while (this.phase < this.phases.length && this.hp / this.maxHp * 100 <= (this.phases[this.phase].at ?? 0)) this.enterPhase(time, this.phases[this.phase++]);
+    else this.scene.hud?.voice?.()?.bark(this, 'hurt');   // #112
+    if (this.hp > 0) while (this.phase < this.phases.length && this.hp / this.maxHp * 100 <= (this.phases[this.phase].at ?? 0)) this.enterPhase(time, this.phases[this.phase++]);
   }
 
   // ---------- boss ----------
@@ -568,6 +573,7 @@ export class Enemy {
 
   die(time, dir) {
     this.state = 'dead';
+    this.scene.hud?.voice?.()?.bark(this, 'die');   // #112
     this.body.enable = false;
     this.warn.setVisible(false); this.aim.clear(); this.bar.clear(); this.gear.clear();
     const machine = this.d.family === 'machine';

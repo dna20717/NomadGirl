@@ -216,5 +216,7 @@
    {"name": "Hazard Orange", "color": "#fa6a0a", "brand": "chroma_kill"},
    {"name": "Bleach Protocol", "color": "#fef3c0", "brand": "kessler_kosmetik"}
   ]
- }
+ },
+ "null": "voice",
+ "voice": "leyla"
 }

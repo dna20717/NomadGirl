@@ -18,7 +18,8 @@
   "kit": "raider",
   "weapon": "nagelkeule",
   "kitSkin": "hell",
-  "kitGang": "Blutrot"
+  "kitGang": "Blutrot",
+  "voice": "mutant"
  },
  "schleimbeisser": {
   "name": "Schleimbeißer",
@@ -40,7 +41,8 @@
   "weapon": "machete",
   "kitHead": "dreads",
   "kitSkin": "hell",
-  "kitGang": "Gelb"
+  "kitGang": "Gelb",
+  "voice": "mutant"
  },
  "schlaeger": {
   "name": "Plünderer-Schläger",
@@ -110,7 +112,8 @@
    "waveSpeed": 620,
    "waveDamage": 60
   },
-  "sense": {"shouts": "MEIN Gebäude!|Ruhe im Amt!"}
+  "sense": {"shouts": "MEIN Gebäude!|Ruhe im Amt!"},
+  "voice": "anomalie"
  },
  "schildtraeger": {
   "name": "Plünderer mit Schild",
@@ -318,6 +321,7 @@
    "waveSpeed": 660,
    "waveDamage": 65
   },
-  "sense": {"shouts": "Countdown läuft!|Niemand startet ohne mich!"}
+  "sense": {"shouts": "Countdown läuft!|Niemand startet ohne mich!"},
+  "voice": "anomalie"
  }
 }

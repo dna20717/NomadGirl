@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: #112 **Stimmen** fertig: Gebrabbel aus Code in Dialogen, Sprechblasen und Gegner-Rufen, Leylas Laute, 14 Stimmen, Werkstatt › Stimmen mit Vorhören. Volle Browser-Suite nach #111: 53/55 (zwei POI-Tests unter Last, einzeln grün).
 - 19.11. Code → Ava: #111 **Camp-Baukasten Teil 2** fertig (Daniel AFK): Tisch-/Boden-/Wandkram mit R für Varianten, Wand in zwei Höhen, Balkone und Dächer als Stellfläche, Dachgarten, alte Stücke als Bilder mit Code-Effekten, Pflanzen wachsen in gemalten Stufen, Moos, Ranken, Camp-Katze, 10 Ensembles, Achievement Dorfplatz. PixelLab 150.
 - 19.11. Code → Ava: #111 **Camp-Baukasten Teil 1** fertig: frei stapeln, Varianten, Geister-Vorschau, Stühle zum Feuer, Lichterketten zwischen Pfosten, Ensembles à la Dorfromantik, Pilot Lagerfeuer-Ecke von PixelLab (65 Generierungen, übrig 3.115,6). Teil 2 (Baukasten aus Teilen, Auto-Details, mehr Pakete) offen.
 - 19.11. Code → Ava: #111 **Camp-Baukasten** läuft (Daniel: Townscaper/Tiny Glade von der Seite, PixelLab-Pilot Lagerfeuer-Ecke). PixelLab: Daniel hat aufgestockt, übrig 3.180,6.
@@ -237,6 +238,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #112 Stimmen: Gebrabbel statt Sprachausgabe
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel: „anstatt Sprachausgabe eine Art von Gibberish, so wie bei Graveyard Keeper, die Sims … über den Code … unterschiedlich von Charakter zu Charakter“)
+- **Lesen:** docs/features/voices.md
+- **Auftrag (Daniels Wahl):** Mix je Figur (Mensch/Roboter/Glitch/Grob), Dialogfenster + Sprechblasen + Gegner-Rufe (kein Radio-DJ), Leyla nur kurze Laute, Werkstatt-Bereich Stimmen mit Hörprobe.
+- **Rückfragen:** (Code) ⚠️ vorläufig: Gebrabbel höchstens 4 s je Zeile; Sprechblasen brabbeln nur, wenn Leyla den Spruch auslöst (Zufallssprüche bleiben still, sonst plappert das Camp dauernd); Gang-Gespräch und Bewerber sprechen in einer Vorratsstimme; Raider rufen höchstens alle 4 s, bei Treffern zu 35 %; Stimmen der Kernfiguren (Schraube kratzig-schnell, Sung langsam-warm) von Ava gewählt.
+- **Ergebnis:** (Code) Commit „Stimmen: Gebrabbel aus Code … (#112)“. `npm test` 331/331 (neu `test/voice.test.js` 6), Browser `voice_test` 5/5, workshop/decor grün; volle Suite davor 53/55 (poi_stack/poi kippten unter Last, einzeln grün). PixelLab 0. Hörprobe `output/voices/hoerprobe.wav` (`node tools/voice_demo.mjs`). **Bitte testen:** Ton an, im Camp mit Schraube und Onkel Sung reden (E überspringt), antworten (Leylas Laut), Plaudern (Sprechblase), in einem POI Raider aufschrecken; Werkstatt › ASSETS › Stimmen › Vorhören und an den Reglern drehen.
 
 ### #111 Camp-Baukasten (Townscaper/Tiny Glade von der Seite)
 - **Status:** fertig (19.11., Teil 1 + 2) · angelegt 19.11. von Code (Daniel: „Das System überarbeiten und flexibler machen … Modularität besonders wichtig … gemütlich, hübsch, wie Townscaper oder Tiny Glade aus der Sidescroll-Perspektive“, Grafiken mit PixelLab „echt nice“, streng orthogonal)

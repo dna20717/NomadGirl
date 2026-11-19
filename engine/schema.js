@@ -15,6 +15,7 @@ import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from
 import { ACHIEVEMENT_COUNTERS, ACHIEVEMENT_SPECIALS, ACHIEVEMENT_CATEGORIES } from '../game/achievements.js';
 import { REP_LEVELS } from '../game/reputation.js';
 import { RADIO_STYLES, RADIO_TALK, RADIO_SCALES, RADIO_KEYS } from '../game/radio_kinds.js';
+import { VOICE_STYLES, VOICE_SOUNDS } from '../game/voice.js';
 import { DECOR_PLACES, DECOR_ARTS, DECOR_CARRY, DECOR_EXTRAS, DECOR_USES } from '../game/decor.js';
 import { MOMENTS } from '../game/banter.js';
 import { EARN_WHEN } from '../game/earn.js';
@@ -202,6 +203,10 @@ export const AREAS = {
         num('typeSpeed', 'Dialog-Tempo', { unit: 'Zeichen/s', min: 0, hint: 'So schnell tippt sich eine Zeile im Dialog mit den Companions aus (#025). 0 = sofort ganz. E zeigt die Zeile sofort ganz' }),
         bool('confirmLeave', 'Rückfrage beim Abreisen', { hint: 'Daniel, 13.11.2026: am Van im POI fragt das Spiel „Wirklich zurückreisen?“. Aus = sofort zurück ins Camp' }),
         size('resolution', 'Auflösung', { unit: 'px', hint: 'Interne Auflösung, wird skaliert' }), bool('pixelArt', 'Pixel-Art (scharf skalieren)')] },
+      { title: 'Stimmen', fields: [bool('voice.enabled', 'Gebrabbel an', { hint: 'Daniel, 19.11.2026: statt Sprachausgabe Gebrabbel aus Code (Werkstatt › Stimmen), nichts zu übersetzen' }),
+        num('voice.volume', 'Lautstärke', { unit: '%', min: 0, max: 200 }), num('voice.bubbles', 'Sprechblasen', { unit: '% der Lautstärke', min: 0, max: 200, hint: 'Im Camp leiser, je weiter Leyla weg ist' }),
+        num('voice.max', 'Höchstens', { unit: 's je Zeile', min: 1, hint: 'Lange Zeilen brabbeln nur so lange' }), bool('voice.leyla', 'Leyla macht Laute', { hint: 'Beim Antworten im Dialog ein kurzes Hm, Ha!, Mhm …' }),
+        bool('voice.barks', 'Gegner rufen', { hint: 'Raider rufen, wenn sie Leyla entdecken, getroffen werden oder fallen' }), num('voice.barkGap', 'Rufe höchstens alle', { unit: 's je Gegner', min: 0 }), num('voice.barkChance', 'Ruft bei Treffer', { unit: '%', min: 0, max: 100 })] },
       { title: 'Beute-Bilanz', fields: [bool('summary', 'Bilanz nach dem Run', { hint: '#017: zurück im Camp eine Karte mit Rang, Δ, Mitgebrachtem, Neuem (Rezepte, Techtree, Aufträge, Tank) und einem Knopf zur passenden Station. Aus = nur der Banner wie früher' })] },
       { title: 'Zielzeile', fields: [bool('quest.enabled', 'Zielzeile zeigen', { hint: '#016 roter Faden: im HUD, auf der Karte und nach dem Run steht der nächste Schritt zum Heilmittel bzw. der Tank, wenn er schwach ist' }),
         ref('quest.goal', 'Endziel', 'techtree', { hint: 'Knoten, auf den alles hinläuft. Leer = heilmittel' }), num('quest.tankWarn', 'Tank zuerst unter', { unit: '%', min: 0, max: 100, hint: 'Unter diesem Zustand zeigt die Zielzeile den Tank statt des Techtrees. Leer = 45' })] },
@@ -440,7 +445,7 @@ export const AREAS = {
     name: 'Drohne', icon: 'air', file: 'data/drone.json', kind: 'single',
     hint: 'Leylas Drohne: fliegt immer hinter ihr her, reine Deko ohne Physik. Gebaut aus Ebenen (Daniel, 10.11.2026: „modulare Drohne“): Kabel hinten, Hülle, Gesicht auf dem Bildschirm, Glanz darüber, Anbauteile davor oder dahinter. Alle Punkte in Bildpixeln der Hülle. Zeiten in Millisekunden bzw. Sekunden.',
     sections: [
-      { title: 'Drohne', fields: [NAME, ref('look', 'Hülle', 'assets', { hint: 'Bild der Drohne ohne Gesicht, Ankerpunkt = Mitte des Körpers. Ältere Drohnen: Animation mit einem Frame pro Stimmung' }), num('height', 'Höhe im Spiel', { unit: 'px', min: 8, hint: 'Leer = Höhe aus dem Asset' }),
+      { title: 'Drohne', fields: [NAME, ref('voice', 'Stimme', 'voices', { hint: 'AvAs Piepser (Stil Roboter)' }), ref('look', 'Hülle', 'assets', { hint: 'Bild der Drohne ohne Gesicht, Ankerpunkt = Mitte des Körpers. Ältere Drohnen: Animation mit einem Frame pro Stimmung' }), num('height', 'Höhe im Spiel', { unit: 'px', min: 8, hint: 'Leer = Höhe aus dem Asset' }),
         bool('enabled', 'Fliegt mit'), select('layer', 'Ebene', [['behind', 'Hinter Leyla'], ['front', 'Vor Leyla']]), DESCRIPTION] },
       { title: 'Gesicht', fields: [ref('face.look', 'Gesichter', 'assets', { hint: 'Animation mit einem Gesicht pro Frame, Ankerpunkt = Mitte des Glases. Leer = die Hülle selbst wechselt den Frame (alte Drohne)' }),
         ref('face.glass', 'Glanz', 'assets', { hint: 'Spiegelung auf dem Glas, liegt über dem Gesicht (gleiche Fläche und Ankerpunkt wie die Hülle)' }), point('face.screen', 'Bildschirm-Mitte', { unit: 'px', hint: 'In Bildpixeln der Hülle' }),
@@ -499,7 +504,7 @@ export const AREAS = {
     name: 'Leyla', icon: 'person', file: 'data/leyla.json', kind: 'single',
     hint: 'Alle Werte der Spielfigur. Tempo in Pixel pro Sekunde, Zeiten in Millisekunden.',
     sections: [
-      { title: 'Allgemein', fields: [NAME, num('health', 'Leben', { min: 1 }), num('invulnerableAfterHit', 'Unverwundbar nach Treffer', { unit: 'ms', min: 0 }), DESCRIPTION] },
+      { title: 'Allgemein', fields: [NAME, num('health', 'Leben', { min: 1 }), num('invulnerableAfterHit', 'Unverwundbar nach Treffer', { unit: 'ms', min: 0 }), DESCRIPTION, ref('voice', 'Stimme', 'voices', { hint: 'Leyla brabbelt nicht, sie macht beim Antworten kurze Laute (Hm, Ha!, Mhm, Oh?, Nö) in dieser Stimme' })] },
       { title: 'Signaturfarbe', fields: [range('signature.hue', 'Farbton der Signatur', { unit: '°', hint: '#044 (Daniel, 16.11.2026: Haare färben ohne neue Grafik): Haare und Outfit-Akzente teilen sich dieselben Pinktöne; alle Pixel in diesem Farbton wechseln zusammen die Farbe (am Spiegel im Camp)' }),
         num('signature.satMin', 'Sättigung ab', { unit: '%', min: 0, max: 100, hint: 'Grautöne darunter bleiben' }), num('signature.sat', 'Sättigung der Signatur', { unit: '%', min: 5, max: 100, hint: 'Wie satt das gemalte Pink ist; die neue Farbe behält das Verhältnis' }),
         num('signature.mid', 'Mitte Helligkeit', { unit: '%', min: 0, max: 100, hint: 'Die Schattierung bleibt: jeder Ton behält seinen Abstand zu dieser Mitte' }),
@@ -684,7 +689,7 @@ export const AREAS = {
     template: { name: 'Neuer Gegner', family: 'mutant', behavior: 'patrol', health: 30, damage: 8, speed: 80, aggroRange: 200, deltas: [1, 4], countsForRanking: true },
     row: x => `${label(ENEMY_BEHAVIORS, x.behavior)} · ${x.health ?? 0} Leben · ${x.damage ?? 0} Schaden`,
     sections: [
-      { title: 'Gegner', fields: [NAME, LOOK, select('family', 'Familie', ENEMY_FAMILIES), select('behavior', 'Verhalten', ENEMY_BEHAVIORS), DESCRIPTION] },
+      { title: 'Gegner', fields: [NAME, LOOK, select('family', 'Familie', ENEMY_FAMILIES), select('behavior', 'Verhalten', ENEMY_BEHAVIORS), DESCRIPTION, ref('voice', 'Stimme', 'voices', { hint: 'Rufe im Kampf (Entdeckt, Getroffen, Fällt) (Werkstatt › Stimmen). Leer = eine Stimme aus dem Vorrat, nach dem Namen gewählt' })] },
       { title: 'Aussehen aus dem Bausatz', fields: [ref('kit', 'Bausatz', 'kits', { hint: 'Daniel, 12.11.2026 (#004): Körper aus dem Bausatz, die Waffe kommt aus „Waffe“ (Waffen › In der Hand). Geht vor „Aussehen“' }),
         text('kitHead', 'Kopf', { hint: 'ID aus Gegner-Bausätze › Köpfe; leer = gemalter Kopf' }), text('kitSkin', 'Hautton', { hint: 'Name aus Bausatz › Hauttöne; leer = wie gemalt' }),
         text('kitGang', 'Gang-Farbe', { hint: 'Name aus Bausatz › Gang-Farben; leer = wie gemalt' })] },
@@ -1143,6 +1148,17 @@ export const AREAS = {
       { title: 'Aussehen', fields: [ref('look', 'Bild', 'assets'), point('crop.at', 'Ausschnitt ab', { unit: 'Bildpixel', hint: 'Oben links im Teileblatt' }), size('crop.size', 'Ausschnitt Größe', { unit: 'Bildpixel' }),
         select('code', 'Aus Code', ADDON_CODE, { hint: 'Ohne Bild: aus Code gezeichnet' }), color('color', 'Farbe'), text('text', 'Text', { hint: 'Neon-Schild, Banner' })] }],
   },
+  voices: {
+    name: 'Stimmen', singular: 'Stimme', icon: 'loudspeaker', file: 'data/voices.json', kind: 'catalog', groupBy: { key: 'style', options: VOICE_STYLES },
+    hint: 'Gebrabbel statt Sprachausgabe (Daniel, 19.11.2026: „so wie bei Graveyard Keeper, die Sims … dass sie sich unterscheiden von Charakter zu Charakter“). Alles aus Code: der echte Text gibt nur den Rhythmus, seine Vokale die Klangfarbe; „?“ hebt die Stimme, „!“ macht sie lauter. Figuren wählen eine Stimme (Feld „Stimme“), Leute aus der Crew und Fremde bekommen eine aus dem Vorrat.',
+    template: { name: 'Neue Stimme', style: 'human', pitch: 180, range: 6, speed: 9, formant: 100, breath: 15, rasp: 0, vibrato: 10, volume: 100, pool: true },
+    row: x => `${label(VOICE_STYLES, x.style)} · ${x.pitch ?? 180} Hz · ${x.speed ?? 9} Silben/s${x.pool ? ' · Vorrat' : ''}`,
+    sections: [{ title: 'Stimme', fields: [NAME, select('style', 'Stil', VOICE_STYLES, { required: true }), DESCRIPTION, bool('pool', 'Im Vorrat', { hint: 'Crew-Leute, Gangs und Fremde ohne eigene Stimme bekommen eine aus dem Vorrat ihres Stils (fest nach dem Namen)' }),
+        text('sample', 'Probesatz', { hint: 'Was der Knopf „Vorhören“ sagt' })] },
+      { title: 'Klang', fields: [num('pitch', 'Tonhöhe', { unit: 'Hz', min: 40, max: 900, hint: 'Männer um 110, Frauen um 210, Kinder 300+' }), num('range', 'Melodie', { unit: 'Halbtöne', min: 0, max: 24 }),
+        num('speed', 'Tempo', { unit: 'Silben/s', min: 2, max: 25 }), num('formant', 'Kopfgröße', { unit: '%', min: 50, max: 200, hint: 'Verschiebt die Vokale: unter 100 groß und dumpf, über 100 klein und hell' }),
+        num('breath', 'Hauchig', { unit: '%', min: 0, max: 100 }), num('rasp', 'Kratzig', { unit: '%', min: 0, max: 100 }), num('vibrato', 'Vibrato', { unit: '%', min: 0, max: 100 }), num('volume', 'Lautstärke', { unit: '%', min: 0, max: 200 })] }],
+  },
   decor: {
     name: 'Deko', singular: 'Deko-Stück', icon: 'star', file: 'data/decor.json', kind: 'catalog', groupBy: { key: 'place', options: DECOR_PLACES },
     hint: '#036 (Daniel: „das Dekosystem“): Kosmetik fürs Camp, beim Händler im Bau-Modus kaufen und in der Welt platzieren. Keine Werte, nur Gemütlichkeit (stärkere Buffs beim Schlafen und Ausruhen, Camp › Deko).',
@@ -1232,7 +1248,7 @@ export const AREAS = {
     template: { name: 'Neuer Companion', role: '', workshops: [], buffs: [], tips: [], stage: '1' },
     row: x => x.role || '',
     sections: [
-      { title: 'Companion', fields: [NAME, LOOK, ref('portrait', 'Porträt', 'assets', { hint: 'Kopf in Nahaufnahme für den Dialog (#025). Leer = Initialen in der Farbe des Companions' }), text('role', 'Rolle'), STAGE, DESCRIPTION] },
+      { title: 'Companion', fields: [NAME, LOOK, ref('voice', 'Stimme', 'voices', { hint: 'Gebrabbel im Dialog (Werkstatt › Stimmen). Leer = eine Stimme aus dem Vorrat, nach dem Namen gewählt' }), ref('portrait', 'Porträt', 'assets', { hint: 'Kopf in Nahaufnahme für den Dialog (#025). Leer = Initialen in der Farbe des Companions' }), text('role', 'Rolle'), STAGE, DESCRIPTION] },
       { title: 'Im Rig', fields: [bool('passenger', 'Fährt als Gast mit', { hint: 'Braucht beim Fahren einen freien Platz in einer Gästekoje (Werkstatt-Funktion Gäste, Kapazität = Betten), sonst bleibt der Companion am Ort und wartet dort' }), refs('workshops', 'Betreibt', 'workshops'), refs('buffs', 'Gibt Buffs', 'buffs'), refs('tips', 'Kennt Rezepte', 'recipes')] },
       { title: 'Im Camp', fields: [lines('lines', 'Sprüche', { hint: 'Eine Zeile pro Spruch, erscheint als Bläschen (zufällig und per E)' }),
         lines('craftLines.hit', 'Beim Kochen/Craften: Treffer', { hint: 'Sagt der Companion, wenn an seiner Werkstatt etwas gelingt (eine Zeile pro Spruch)' }),
@@ -1755,7 +1771,7 @@ export const AREAS = {
 
 // Navigation: groups of areas in the order of the design document
 export const GROUPS = [
-  ['ASSETS', ['assets', 'pixelOrders']],
+  ['ASSETS', ['assets', 'pixelOrders', 'voices']],
   ['GRUNDLAGEN', ['game', 'splash', 'intro', 'tutorial', 'weather', 'economy', 'ranking']],
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'kits', 'buffs']],

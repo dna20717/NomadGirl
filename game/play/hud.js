@@ -10,6 +10,7 @@ import { icon } from '../icons.js';
 import { loadVersion } from '../version.js';
 import { clockText } from '../save.js';
 import { trackedGoal as questGoal } from '../quests.js';
+import { voices } from './voices.js';
 import { makeSfx } from './sfx.js';
 import { cheatsOn, CHEATS, runCheat } from '../cheats.js';
 
@@ -191,8 +192,9 @@ export class Hud {
   // talk (#025): { name, role, color, initials, portrait } turns the box into a dialogue at the bottom: a name plate in the speaker's colour,
   // the line typed out, the answers below; the portrait slot shows the initials until there are portraits (Daniel: „zunächst ohne Portraits“)
   // board (#025): the notice board, the items as pinned notes in a grid (item.note: { kind, from, stamp }); ←/→ move along, ↑/↓ a row
-  menu({ title, sub = '', items = [], onClose = null, image = null, talk = null, board = false, mirror = null }) {
+  menu({ title, sub = '', items = [], onClose = null, image = null, talk = null, board = false, mirror = null, voice = null }) {
     this.stopType();
+    this.speaker = talk ? { id: talk.id, name: talk.name, voice: talk.voice, style: talk.style } : voice;   // #112 Gebrabbel: who speaks the line
     this.modal = true; this.menuItems = items; this.menuTitle = title; this.menuOnClose = onClose;
     this.menuColsFixed = board || mirror ? 3 : 1;
     this.menuIndex = Math.max(0, items.findIndex(i => !i.disabled));
@@ -227,6 +229,7 @@ export class Hud {
         this.typeLine(line, sub ? `„${sub}“` : '');
       } else {
         // image (#021): a comic panel on top of the box, e.g. the road for the encounters on the way
+        if (voice && sub) this.voice()?.line(sub, voice);
         this.menuEl.replaceChildren(el('div', { class: 'hud-menuBox ui-frame' + (image ? ' pic' : '') }, image ? el('div', { class: 'hud-menuPic' }, el('img', { src: image, alt: '' })) : null, el('h2', {}, title), sub ? el('p', {}, sub) : null, el('div', { class: 'hud-items' }, ...this.menuButtons),
           keyHints, closeX(() => this.closeMenu())));
       }
@@ -241,15 +244,17 @@ export class Hud {
   // the line of a dialogue types itself out (Spiel › Technik could slow it down later); E while typing shows it whole
   typeLine(elm, text) {
     const speed = this.D?.game?.typeSpeed ?? 55;   // characters per second
+    if (this.speaker && text) this.voice()?.line(text.replace(/[„“]/g, ''), this.speaker);   // #112: the speaker babbles along
     if (!text || speed <= 0 || navigator.webdriver) { elm.textContent = text; return; }
     let n = 0; const t0 = performance.now();
     this.typing = { elm, text, timer: setInterval(() => {
       n = Math.min(text.length, Math.floor((performance.now() - t0) / 1000 * speed));
       elm.textContent = text.slice(0, n);
-      if (n >= text.length) this.stopType();
+      if (n >= text.length) this.stopType(true);
     }, 16) };
   }
-  stopType() { const T = this.typing; if (!T) return false; clearInterval(T.timer); T.elm.textContent = T.text; this.typing = null; return true; }
+  // natural = the line finished typing (the babble may end on its own); else the player skipped it: the babble stops too
+  stopType(natural = false) { if (!natural) this.voiceObj?.stop(0.06); const T = this.typing; if (!T) return false; clearInterval(T.timer); T.elm.textContent = T.text; this.typing = null; return true; }
   focus(i) { this.menuIndex = i; this.menuButtons?.forEach((b, k) => b.classList.toggle('focus', k === i)); this.menuItems?.[i]?.onFocus?.(); }
   closeMenu(chosen = false) {
     this.stopType();
@@ -260,7 +265,9 @@ export class Hud {
   choose(i) {
     const it = this.menuItems?.[i];
     if (!it || it.disabled) return false;
+    const talking = !!this.speaker;
     this.closeMenu(true);
+    if (talking) this.voice()?.leyla(it.label);   // #112: Leyla answers with a short noise
     it.act?.();
     return true;
   }
@@ -391,6 +398,8 @@ export class Hud {
     if (sound) this.toastSound(K.sound);
     return t;
   }
+  // #112 Gebrabbel (game/play/voices.js), bound to the current scene
+  voice() { const s = this.scene; if (!s?.sound) return null; if (this.voiceScene !== s) { this.voiceScene = s; this.voiceObj = voices(s); } return this.voiceObj; }
   toastSound(name) {
     const s = this.scene; if (!s?.sound || !name) return;
     if (this.sfxScene !== s) { this.sfxScene = s; this.sfx = makeSfx(s, (s.data_?.build?.view?.volume ?? 50) / 100 * 0.8); }

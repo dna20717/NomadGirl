@@ -266,7 +266,7 @@ export class CampActions {
     const s = this.scene, D = this.D, save = this.box.save, p = save.applicant;
     if (!p) return;
     const H = heads(D, save);
-    s.hud.menu({ title: `${p.name} will mitfahren`, sub: [`${skillText(D, p)}.`, this.personSub(p), `Rig: ${headsText(H)}${H.heads + 1 > H.beds && H.heads <= H.beds ? ' (mit ihr zu wenig)' : ''}.`].join(' '),
+    s.hud.menu({ voice: { name: p.name, voice: p.voice }, title: `${p.name} will mitfahren`, sub: [`${skillText(D, p)}.`, this.personSub(p), `Rig: ${headsText(H)}${H.heads + 1 > H.beds && H.heads <= H.beds ? ' (mit ihr zu wenig)' : ''}.`].join(' '),
       items: [{ label: 'Aufnehmen', primary: true, icon: 'check', act: () => { const q = admit(D, save, p); this.box.persist?.(); s.hud.toast(`${q.name} ist jetzt in der Crew`, 'Am Feuer › Crew teilst du ihr einen Job zu', 'good', 4200); this.crewPerson(q.id); } },
         { label: 'Ablehnen', icon: 'x', act: () => { reject(save); this.box.persist?.(); s.hud.toast(`${p.name} zieht weiter`, '', 'info', 2600); } },
         { label: 'Später', act: () => {} }] });

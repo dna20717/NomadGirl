@@ -104,7 +104,7 @@ export class Turf {
     items.push(...this.questItems(e));   // #088 the gang's own jobs (Aufträge mit Gang), from Geduldet
     items.push({ label: 'Plaudern', icon: 'speechBubble', act: () => e.say(this.G.motto || 'Hm.', '#ffd27a') });
     items.push({ label: 'Tschüss', icon: 'x', act: () => {} });
-    s.hud.menu({ title: this.gang, sub: this.friend ? `„${this.G.motto || 'Willkommen, Freundin.'}“ · ${levelName(levelOf(D, this.rep()))} (+${this.rep()})` : items.length > 2 ? `Geduldet (+${this.rep()}): für Handel reicht es nicht, für einen Auftrag schon.` : 'Sie mustern dich. Mehr als ein Nicken gibt es nicht.', items });
+    s.hud.menu({ voice: { name: this.gang, style: 'beast' }, title: this.gang, sub: this.friend ? `„${this.G.motto || 'Willkommen, Freundin.'}“ · ${levelName(levelOf(D, this.rep()))} (+${this.rep()})` : items.length > 2 ? `Geduldet (+${this.rep()}): für Handel reicht es nicht, für einen Auftrag schon.` : 'Sie mustern dich. Mehr als ein Nicken gibt es nicht.', items });
   }
   // #088 Gangs als Auftraggeber: offers to take, done jobs to hand in (Ruf, Δ, Dinge), running ones say how far
   questItems(e) {

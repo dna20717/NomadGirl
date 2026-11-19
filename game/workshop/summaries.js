@@ -67,7 +67,24 @@ const sizeView = (x, base = [4, 3]) => {
   return { title: 'Im Rucksack', body: el('div', {}, grid(Math.max(base[0], w), Math.max(base[1], h), [w, h]), el('p', { class: 'ed-small' }, `Belegt ${w}×${h} = ${w * h} Felder.`)) };
 };
 
+// #112 Gebrabbel: one AudioContext for the workshop's „Vorhören“ buttons
+let voiceCtx = null, voiceNow = null;
+async function hear(v, text) {
+  const { speak } = await import('../voice.js');
+  voiceCtx ??= new (window.AudioContext || window.webkitAudioContext)();
+  if (voiceCtx.state === 'suspended') await voiceCtx.resume();
+  voiceNow?.stop(0.05);
+  voiceNow = speak(voiceCtx, voiceCtx.destination, v, text, { volume: 0.8, max: 10 });
+}
+const SAMPLES = ['Hallo! Schön, dich zu sehen.', 'Hast du das gehört? Da draußen ist was.', 'Nein, nein, nein. Das machen wir anders!', 'Hm … vielleicht morgen?'];
+
 export const SUMMARY = {
+  voices(w, x) {
+    const own = x.sample || SAMPLES[0];
+    return { title: 'Vorhören', body: el('div', { class: 'ed-voice' },
+      el('p', { class: 'ed-small' }, 'Gebrabbel aus Code: der Text gibt nur den Rhythmus und die Vokale. Gleicher Satz, gleiches Gebrabbel.'),
+      ...[own, ...SAMPLES.filter(t => t !== own)].map(t => el('button', { class: 'ui-btn', style: 'display:block;margin:4px 0;text-align:left', onclick: () => hear(x, t) }, '▶ ', t))) };
+  },
   leyla(w, x) {
     const g = w.p.data.game?.gravity || 1800, t = w.p.data.game?.tileSize || 32, m = x.movement || {};
     const jump = (m.jumpVelocity || 0) ** 2 / (2 * g);

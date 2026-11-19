@@ -119,6 +119,6 @@ export class CampBoard {
   talkOf(id) {
     const d = this.D.companions?.[id] || {}, name = d.name || id || '';
     const A = d.portrait && this.D.assets?.[d.portrait];
-    return { name, role: d.role || '', color: d.color || '#ffd27a', initials: name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase(), portrait: A?.file ? new URL(A.file, this.scene.base).href : null };
+    return { id, voice: d.voice, name, role: d.role || '', color: d.color || '#ffd27a', initials: name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase(), portrait: A?.file ? new URL(A.file, this.scene.base).href : null };
   }
 }

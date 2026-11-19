@@ -146,7 +146,9 @@ export class CampLife {
       c.spot.hint = J.ready.length ? 'Reden · Auftrag abgeben' : J.offer.length ? 'Reden · neuer Auftrag' : 'Reden';
     }
   }
-  say(c, text) { c.bubble.setText(text).setAlpha(1); c.until = this.scene.time.now + Math.max(4000, text.length * 70); }
+  say(c, text) { c.bubble.setText(text).setAlpha(1); c.until = this.scene.time.now + Math.max(4000, text.length * 70); this.babble(c, text); }
+  // #112 Gebrabbel: the bubble speaks, quieter the further Leyla is
+  babble(c, text) { this.scene.hud?.voice?.()?.bubble(text, { id: c.id, name: c.def?.name || c.id, voice: c.def?.voice }, c.x ?? c.sprite?.x); }
   // #025: a conversation in the dialogue box (name plate, colour, room for a portrait later), not a plain menu
   talk(c) {
     const D = this.D, save = this.box.save, s = this.scene, J = this.jobsOf(c), who = this.talkOf(c.id);
@@ -175,6 +177,7 @@ export class CampLife {
     if (lines.length > 1 && i === c.last) i = (i + 1) % lines.length;
     c.last = i;
     c.bubble.setText(lines[i]).setAlpha(1);
+    if (now) this.babble(c, lines[i]);   // random barks stay quiet, the one Leyla asked for speaks
     c.until = this.scene.time.now + (this.C.companions?.barkTime ?? 4) * 1000 + (now ? 1000 : 0);
   }
 }

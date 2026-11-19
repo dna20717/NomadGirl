@@ -76,5 +76,6 @@
   "hangAt": [40, 80],
   "grab": 70
  },
- "leash": {"enabled": true, "reach": 380, "stiffness": 2.4, "smooth": 0.06, "aimLight": true, "aimHold": 600}
+ "leash": {"enabled": true, "reach": 380, "stiffness": 2.4, "smooth": 0.06, "aimLight": true, "aimHold": 600},
+ "voice": "ava"
 }
