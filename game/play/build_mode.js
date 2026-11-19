@@ -1018,6 +1018,9 @@ export class BuildMode {
             const k = Math.min(1, pv.score + (pv.chain > 1 ? 0.3 : 0) + (pv.full ? 0.4 : 0));
             g.fillStyle(0x3fe0d0, 0.06 + 0.16 * k).fillRoundedRect(sl.x0 + 6, sl.y0 + 6, sl.x1 - sl.x0 - 12, sl.y1 - sl.y0 - 12, 10);
             label((sl.x0 + sl.x1) / 2, (sl.y0 + sl.y1) / 2, pv.effect === 'power' ? `+${Math.floor(pv.bonus)} ⚡` : `+${Math.round(pv.bonus)} %`, pv.full ? '#ffd27a' : '#7ff6ff');
+          } else if (pv?.bad && pv.bonus < 0) {   // #076 Gegenpaare: a red place, the minus on it
+            g.fillStyle(0xff5c7a, 0.08 + 0.14 * Math.min(1, -pv.score)).fillRoundedRect(sl.x0 + 6, sl.y0 + 6, sl.x1 - sl.x0 - 12, sl.y1 - sl.y0 - 12, 10);
+            label((sl.x0 + sl.x1) / 2, (sl.y0 + sl.y1) / 2, pv.effect === 'power' ? `−${Math.ceil(-pv.bonus)} ⚡` : `−${Math.round(-pv.bonus)} %`, '#ff8aa0');
           }
         }
       } else {

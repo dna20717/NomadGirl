@@ -208,7 +208,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ```
 
 ### #076 Absegnung 19.11.: Änderungen aus #026–#075
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel hat alle ⚠️ aus #026–#075 über die Entscheidungskarten entschieden, Tickets `abgenommen`)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel hat alle ⚠️ aus #026–#075 über die Entscheidungskarten entschieden, Tickets `abgenommen`)
 - **Für:** Code
 - **Auftrag (Daniel, 19.11.2026, Entscheidungskarten):** Alles andere bleibt wie gebaut. Ändern:
   1. **Gegenpaare (#033):** manche Nachbar-Werkstätten stören sich (z. B. Generator neben Schlafkoje), in der Synergie-Vorschau sichtbar.
@@ -220,8 +220,8 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   7. **Ausrüstung + Tank in den Boni-Bus (#066)** (Vorstufe Werte-Bildschirm #091).
   8. **Verschlossene Antworten (#059):** man sieht als Anreiz, *was* fehlt (z. B. „braucht Ripperdoc“).
   9. **Verrat an der Läuferin (#074):** Ketten-Quest, die Läuferin kommt zurück und bietet gegen Bezahlung eine zweite Chance.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: Gegenpaare (Schlafkoje ↔ Generator, Reaktor, Motorraum, Heavy-Duty, Werkbank; Chill-Ecke ↔ Generator, Heavy-Duty, Zelle; Kochnische/Küche ↔ Zelle, Heavy-Duty; Foodtruck ↔ Zelle; Hydrokultur ↔ Heavy-Duty; Ripperdoc ↔ Heavy-Duty, Hydrokultur), Bonus kann ins Minus gehen; Titan Lullaby 120 → 85 (gleiches Verhältnis wie 50 → 35); Unikat-Teil = Trophäe „Startschlüssel von Silo Zero“; Läuferin: zweite Chance 150 Δ, Probefahrt → Freundin, ablehnen → Feindin (Rache-Lage); Punkt 8 gab es schon („Braucht … an Bord“), dazu ein Schloss-Symbol.
+- **Ergebnis:** (Code) Commits `9660feb`, Worker an der Werkbank, `9706d2d` Boni-Bus, `339c1f7` Van aus dem Tileset, `8614709` Läuferin (alle mit #076). `npm test` 280/280 (neu: Gegenpaare, Ausrüstung/Tank im Bus, `test/vehicle_kit.test.js`, Läuferin-Kette), Browser-Suite siehe Funkspruch. Simulation Bit-Stapel: 9,6 → 7,8 Züge je Seite. Browser-Tests finden Inventar-Raster jetzt über `data-key` (das Start-Deck schob ein Raster dazwischen). PixelLab 0. **Bitte testen:** Neues Spiel: Bastler-Deck steckt; Generator neben die Schlafkoje bauen (rote Linie, „Buff −30 %“); Kochnische mit Bit-Farm-Entity: Knopf „Worker einteilen“ oben im Kochfenster; Duell in /duel ist kürzer; Läuferin ausliefern und weiterfahren.
 
 ### #077 Mega-Rigs: Hauptcontainer statt Lager am Boden
 - **Status:** offen · angelegt 19.11. von Code (Daniel, Karte #029)
