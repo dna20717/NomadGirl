@@ -1,7 +1,7 @@
 // Savegame (game/save.js): start rig, clock, repair of old savegames, travel costs.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { newSave, placeWorkshops, advance, hoursUntil, clockText, repairSave, arrive } from '../game/save.js';
+import { newSave, placeWorkshops, advance, hoursUntil, clockText, repairSave, arrive , SAVE_VERSION } from '../game/save.js';
 import { travelCost, legCost } from '../game/play/camp.js';
 import { shop } from '../game/rig.js';
 import { loadProject } from '../engine/project.js';
@@ -32,7 +32,10 @@ test('Uhr: Ereignis-Zeit über Mitternacht', () => {
 });
 
 test('Alter Spielstand wird repariert', () => {
-  assert.equal(repairSave(null, D).version, 1);
+  assert.equal(repairSave(null, D).version, SAVE_VERSION);
+  // Daniel, 19.11.2026: „alle Spielstände reset“ — a savegame of an older version starts fresh
+  const old = { ...newSave(D), version: SAVE_VERSION - 1, deltas: 99999 };
+  assert.equal(repairSave(old, D).deltas, newSave(D).deltas);
   const s = newSave(D), n = s.rig.units[1].workshops.length; s.buffs = ['gibtsnicht', 'satt']; s.rig.units[1].workshops.push({ id: 'weg', at: 3 }); s.location = 'nirgendwo';
   const r = repairSave(s, D);
   assert.deepEqual(r.buffs, ['satt']);

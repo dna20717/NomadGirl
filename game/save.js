@@ -18,7 +18,7 @@ import { ensureTank } from './tank.js';
 import { newGrid, add, fits, startWear, wearOf, WEAR_KEYS, addEntry, untangle, kindOf, thing, remove } from './inventory.js';
 
 const LOCAL_KEY = 'nomadgirl-save';
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;   // 2: Daniel, 19.11.2026 „alle Spielstände reset“ (after #111–#113): every older savegame starts fresh
 
 // rig layout from a tractor, containers and workshops: the tractor's own places first, then the containers in order
 export function placeWorkshops(D, tractor, containers, workshops) {

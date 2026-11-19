@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: **Alle Spielstände zurückgesetzt** (Daniel): `SAVE_VERSION` 2, jeder alte Stand startet beim nächsten Laden frisch.
 - 19.11. Code → Ava: #113 **Container ziehen und höher** fertig: ein Container zum Kaufen, am Griff 1–5 Plätze ohne Aufpreis, Werkbank hält dagegen und ploppt als Kiste raus (Pad vibriert), Container 30 % höher, Bilder zur Laufzeit aus den Kacheln.
 - 19.11. Code → Ava: #112 **Stimmen** fertig: Gebrabbel aus Code in Dialogen, Sprechblasen und Gegner-Rufen, Leylas Laute, 14 Stimmen, Werkstatt › Stimmen mit Vorhören. Volle Browser-Suite nach #111: 53/55 (zwei POI-Tests unter Last, einzeln grün).
 - 19.11. Code → Ava: #111 **Camp-Baukasten Teil 2** fertig (Daniel AFK): Tisch-/Boden-/Wandkram mit R für Varianten, Wand in zwei Höhen, Balkone und Dächer als Stellfläche, Dachgarten, alte Stücke als Bilder mit Code-Effekten, Pflanzen wachsen in gemalten Stufen, Moos, Ranken, Camp-Katze, 10 Ensembles, Achievement Dorfplatz. PixelLab 150.
