@@ -28,7 +28,8 @@
    "city": 20,
    "dust": 15,
    "fog": 10,
-   "screens": 25
+   "screens": 25,
+   "parallax": "wueste"
   },
   {
    "region": "Glass Dunes",
@@ -49,7 +50,8 @@
    "city": 10,
    "dust": 35,
    "fog": 5,
-   "screens": 15
+   "screens": 15,
+   "parallax": "wueste"
   },
   {
    "region": "South Badlands",
@@ -70,7 +72,8 @@
    "city": 5,
    "dust": 20,
    "fog": 5,
-   "screens": 15
+   "screens": 15,
+   "parallax": "canyon"
   },
   {
    "region": "Salt Flats",
@@ -91,7 +94,8 @@
    "city": 15,
    "dust": 10,
    "fog": 15,
-   "screens": 35
+   "screens": 35,
+   "parallax": "salzpfanne"
   },
   {
    "region": "Scrap Desert",
@@ -112,7 +116,8 @@
    "city": 10,
    "dust": 25,
    "fog": 5,
-   "screens": 25
+   "screens": 25,
+   "parallax": "industrie"
   },
   {
    "region": "Crow Valley",
@@ -133,7 +138,8 @@
    "city": 5,
    "dust": 10,
    "fog": 25,
-   "screens": 15
+   "screens": 15,
+   "parallax": "canyon"
   },
   {
    "region": "East Bend",
@@ -154,7 +160,8 @@
    "city": 15,
    "dust": 5,
    "fog": 30,
-   "screens": 30
+   "screens": 30,
+   "parallax": "industrie"
   },
   {
    "region": "Delta Ring",
@@ -175,7 +182,8 @@
    "city": 90,
    "dust": 10,
    "fog": 20,
-   "screens": 75
+   "screens": 75,
+   "parallax": "stadt"
   },
   {
    "region": "The Outskirts",
@@ -196,7 +204,8 @@
    "city": 55,
    "dust": 15,
    "fog": 10,
-   "screens": 50
+   "screens": 50,
+   "parallax": "stadt"
   }
  ],
  "forecast": {"enabled": true, "warroom": true, "days": 3}

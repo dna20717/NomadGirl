@@ -11,6 +11,7 @@ import { level as cisternLevel, tap as cisternTap } from '../cistern.js';
 import { anchors as lightAnchors, catenary, lightsConfig, mastAt } from '../string_lights.js';
 import { clockText, advance, hoursUntil, solarState, storeKeyOf, CAMP } from '../save.js';
 import { budgets, partSlots, passengers, roofFree, containerPlaces, containerWeight } from '../rig.js';
+import { parallaxLayers, setFor } from './parallax.js';
 import { occupancy } from '../inventory.js';
 import { offers, accept, claim, progressOf, qstate } from '../quests.js';
 import { Benches, benchTexture, crateTexture } from './benches.js';
@@ -252,6 +253,11 @@ export function drawCampBackground(scene, C) {
       ctx.globalAlpha = 1;
     })).setOrigin(0).setScrollFactor(0.01, 0).setDepth(-99.5).setAlpha(night * (E.milkyWay ?? 85) / 100);
   }
+  // #115 painted parallax layers (Welt › Parallax-Sets) instead of the ridges and the city from code: Camp › Parallax-Set, else the set
+  // of the region the camp stands in (Reisen › Landschaften)
+  const D = scene.data_ || {}, save = scene.box?.save, loc = D.locations?.[save?.location] || save?.map?.nodes?.find(n => n.id === save?.location);
+  const plx = C.parallax || setFor(D, loc?.region);
+  if (plx && D.parallax?.[plx]) parallaxLayers(scene, D, plx, { horizon: hy + k, depth: -98.8, night, worldW: scene.physics?.world?.bounds?.width || W * 4 });
   // 2 · far mountain ranges, two layers of jagged mesas with a lit rim
   // haze: by day the far layers fade into the sky (atmospheric perspective), at night they stand dark
   const haze = (near) => Math.min(1, near + (1 - near) * night);
@@ -270,12 +276,13 @@ export function drawCampBackground(scene, C) {
       }
     })).setOrigin(0).setScrollFactor(sf, 0).setDepth(depth).setAlpha(haze(near));
   };
-  ridge('camp_ridge_far', -98.8, 0.015, 70, 80, E.farRidge || '#2c2347', E.farRim || '#45386b', 11, 0.35);
+  const coded = !(plx && D.parallax?.[plx]);
+  if (coded) ridge('camp_ridge_far', -98.8, 0.015, 70, 80, E.farRidge || '#2c2347', E.farRim || '#45386b', 11, 0.35);
   // 3 · BigCityDelta: bigger, with megatowers, spires and lit windows at night, a neon haze behind it
   const cw = W * 0.42, ch = Math.round(H * (E.cityHeight ?? 22) / 100), cx0 = W * (E.cityAt ?? 0.66);
-  if (night > 0.2) for (const [c, sx, a] of [['#e86a73', 1, 0.22], ['#20d6c7', 0.6, 0.14]])
+  if (coded && night > 0.2) for (const [c, sx, a] of [['#e86a73', 1, 0.22], ['#20d6c7', 0.6, 0.14]])
     scene.add.image(cx0 + cw / 2, hy - 30, glowTexture(scene)).setDisplaySize(cw * 1.3 * sx, ch * 0.9).setTint(col(c)).setAlpha(a * night).setBlendMode(Phaser.BlendModes.ADD).setScrollFactor(0.03, 0).setDepth(-98.4);
-  scene.add.image(cx0, hy - ch, tex('camp_city', cw, ch, ctx => {
+  if (coded) scene.add.image(cx0, hy - ch, tex('camp_city', cw, ch, ctx => {
     const lit = ['#20d6c7', '#e86a73', '#ffd541', '#bc4a9b', '#fef3c0'];
     let x = 0;
     while (x < cw) {
@@ -291,7 +298,7 @@ export function drawCampBackground(scene, C) {
     }
     ctx.globalAlpha = 1;
   })).setOrigin(0).setScrollFactor(0.035, 0).setDepth(-98.2).setAlpha(haze(0.5));
-  ridge('camp_ridge_near', -97.6, 0.05, 6, 16, E.nearRidge || '#1d1626', E.nearRim || '#3a2b3d', 23, 0.8);
+  if (coded) ridge('camp_ridge_near', -97.6, 0.05, 6, 16, E.nearRidge || '#1d1626', E.nearRim || '#3a2b3d', 23, 0.8);
   // 4 · the plain: bands getting lighter towards us, dunes
   const g = scene.make.graphics({}, false), far = C.ground?.far || '#6b4a36';
   for (let i = 0; i < 6; i++) g.fillStyle(shadeOf(far, 0.62 + i * 0.09)).fillRect(0, hy + Math.round((H - hy) * Math.pow(i / 6, 1.6) / k) * k, W * 1.3, H);

@@ -242,6 +242,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 ## Tickets
 
+### #115 Parallax-Hintergründe, Vordergrund-Silhouetten, Billboard-Scan
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel: „Die Parallax-Hintergründe überall können bitte in hübsch umgesetzt werden. Modular. Auch ein paar schwarze Vordergrund-Formen wären spannend. Billboards nicht mehr fotografieren, sondern AvA scannen. Man kann sie bewegen (Gummiband)“)
+- **Auftrag (Daniels Wahl):** PixelLab-Ebenen modular für Camp, Fahrt, POIs draußen, Startseite; gemalte schwarze Vordergrund-Formen für Fahrt und POIs draußen; Billboards: AvA am Gummiband ziehen, sie schnellt hin und scannt.
+- **Rückfragen:**
+- **Ergebnis:** Teil 1 (Code): Bereich Welt › Parallax-Sets, 12 Ebenen + 32 Silhouetten von PixelLab (295), Sets Wüste/BigCityDelta/Industrie/Canyon/Salzpfanne je Region (Reisen › Landschaften), Camp und POIs draußen. Offen: Fahrt, Startseite, Billboard-Scan.
+
 ### #114 Farbe, Innenräume, Wand-Module, Treppen & Wege
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel: „Nächste Stufe Deco und Ausbau“, Wahl: Innenräume einrichten, Farbe wie Townscaper, Wand-Module, Treppen & Wege frei)
 - **Lesen:** docs/features/camp.md › Camp-Baukasten, docs/features/rig.md › Container ziehen und höher

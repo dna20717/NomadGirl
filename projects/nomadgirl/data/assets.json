@@ -6435,5 +6435,145 @@
   "source": "KI (PixelLab, Create Image Pro 256 × 256, 4 × 4, AAP-64, Referenz Container bzw. Pilot-Stücke) + Code (tools/camp_kit.py)",
   "date": "2026-11-19",
   "description": "#114: Innen an die Rückwand oder an die Decke."
+ },
+ "plx_desert_far": {
+  "name": "Parallax · Wüste fern: Tafelberge im Dunst",
+  "kind": "image",
+  "file": "assets/backgrounds/parallax/desert_far.png",
+  "source": "KI (PixelLab, Create Image Pro 512 × 256, AAP-64, transparenter Himmel, Referenzen: ruins_relay + die erste Wüsten-Ebene als Stilanker)",
+  "date": "2026-11-19",
+  "description": "#115: Ebene mit transparentem Himmel, wird gespiegelt wiederholt."
+ },
+ "plx_desert_mid": {
+  "name": "Parallax · Wüste Mitte: Dünen, Felsnadeln, tote Bäume",
+  "kind": "image",
+  "file": "assets/backgrounds/parallax/desert_mid.png",
+  "source": "KI (PixelLab, Create Image Pro 512 × 256, AAP-64, transparenter Himmel, Referenzen: ruins_relay + die erste Wüsten-Ebene als Stilanker)",
+  "date": "2026-11-19",
+  "description": "#115: Ebene mit transparentem Himmel, wird gespiegelt wiederholt."
+ },
+ "plx_desert_near": {
+  "name": "Parallax · Wüste nah: Dünenkamm, Gestrüpp, Kakteen, Schädel",
+  "kind": "image",
+  "file": "assets/backgrounds/parallax/desert_near.png",
+  "source": "KI (PixelLab, Create Image Pro 512 × 256, AAP-64, transparenter Himmel, Referenzen: ruins_relay + die erste Wüsten-Ebene als Stilanker)",
+  "date": "2026-11-19",
+  "description": "#115: Ebene mit transparentem Himmel, wird gespiegelt wiederholt."
+ },
+ "plx_city_far": {
+  "name": "Parallax · BigCityDelta fern: Skyline mit Arkologien",
+  "kind": "image",
+  "file": "assets/backgrounds/parallax/city_far.png",
+  "source": "KI (PixelLab, Create Image Pro 512 × 256, AAP-64, transparenter Himmel, Referenzen: ruins_relay + die erste Wüsten-Ebene als Stilanker)",
+  "date": "2026-11-19",
+  "description": "#115: Ebene mit transparentem Himmel, wird gespiegelt wiederholt."
+ },
+ "plx_city_mid": {
+  "name": "Parallax · Stadtrand Mitte: Ruinen, Hochstraße, Kran",
+  "kind": "image",
+  "file": "assets/backgrounds/parallax/city_mid.png",
+  "source": "KI (PixelLab, Create Image Pro 512 × 256, AAP-64, transparenter Himmel, Referenzen: ruins_relay + die erste Wüsten-Ebene als Stilanker)",
+  "date": "2026-11-19",
+  "description": "#115: Ebene mit transparentem Himmel, wird gespiegelt wiederholt."
+ },
+ "plx_city_near": {
+  "name": "Parallax · Stadtrand nah: Schutt, Autowrack, Neonschild",
+  "kind": "image",
+  "file": "assets/backgrounds/parallax/city_near.png",
+  "source": "KI (PixelLab, Create Image Pro 512 × 256, AAP-64, transparenter Himmel, Referenzen: ruins_relay + die erste Wüsten-Ebene als Stilanker)",
+  "date": "2026-11-19",
+  "description": "#115: Ebene mit transparentem Himmel, wird gespiegelt wiederholt."
+ },
+ "plx_industry_far": {
+  "name": "Parallax · Industrie fern: Raffinerie, Schornsteine",
+  "kind": "image",
+  "file": "assets/backgrounds/parallax/industry_far.png",
+  "source": "KI (PixelLab, Create Image Pro 512 × 256, AAP-64, transparenter Himmel, Referenzen: ruins_relay + die erste Wüsten-Ebene als Stilanker)",
+  "date": "2026-11-19",
+  "description": "#115: Ebene mit transparentem Himmel, wird gespiegelt wiederholt."
+ },
+ "plx_industry_mid": {
+  "name": "Parallax · Industrie Mitte: Tanks, Rohrbrücken, Kran",
+  "kind": "image",
+  "file": "assets/backgrounds/parallax/industry_mid.png",
+  "source": "KI (PixelLab, Create Image Pro 512 × 256, AAP-64, transparenter Himmel, Referenzen: ruins_relay + die erste Wüsten-Ebene als Stilanker)",
+  "date": "2026-11-19",
+  "description": "#115: Ebene mit transparentem Himmel, wird gespiegelt wiederholt."
+ },
+ "plx_industry_near": {
+  "name": "Parallax · Industrie nah: Schrott, Fässer, Zaun",
+  "kind": "image",
+  "file": "assets/backgrounds/parallax/industry_near.png",
+  "source": "KI (PixelLab, Create Image Pro 512 × 256, AAP-64, transparenter Himmel, Referenzen: ruins_relay + die erste Wüsten-Ebene als Stilanker)",
+  "date": "2026-11-19",
+  "description": "#115: Ebene mit transparentem Himmel, wird gespiegelt wiederholt."
+ },
+ "plx_mountain_far": {
+  "name": "Parallax · Gebirge fern: verschneite Gipfel",
+  "kind": "image",
+  "file": "assets/backgrounds/parallax/mountain_far.png",
+  "source": "KI (PixelLab, Create Image Pro 512 × 256, AAP-64, transparenter Himmel, Referenzen: ruins_relay + die erste Wüsten-Ebene als Stilanker)",
+  "date": "2026-11-19",
+  "description": "#115: Ebene mit transparentem Himmel, wird gespiegelt wiederholt."
+ },
+ "plx_canyon_mid": {
+  "name": "Parallax · Canyon Mitte: Sandsteinwände, Felsbogen",
+  "kind": "image",
+  "file": "assets/backgrounds/parallax/canyon_mid.png",
+  "source": "KI (PixelLab, Create Image Pro 512 × 256, AAP-64, transparenter Himmel, Referenzen: ruins_relay + die erste Wüsten-Ebene als Stilanker)",
+  "date": "2026-11-19",
+  "description": "#115: Ebene mit transparentem Himmel, wird gespiegelt wiederholt."
+ },
+ "plx_canyon_near": {
+  "name": "Parallax · Canyon nah: Felsbrocken, toter Wacholder",
+  "kind": "image",
+  "file": "assets/backgrounds/parallax/canyon_near.png",
+  "source": "KI (PixelLab, Create Image Pro 512 × 256, AAP-64, transparenter Himmel, Referenzen: ruins_relay + die erste Wüsten-Ebene als Stilanker)",
+  "date": "2026-11-19",
+  "description": "#115: Ebene mit transparentem Himmel, wird gespiegelt wiederholt."
+ },
+ "plx_silhouettes": {
+  "name": "Parallax · Vordergrund-Silhouetten",
+  "kind": "icons",
+  "file": "assets/backgrounds/parallax/silhouettes.png",
+  "cell": [64, 64],
+  "grid": [8, 4],
+  "names": [
+   "Strommast",
+   "Verkehrsschild",
+   "Busch",
+   "Kaktus",
+   "Schutt",
+   "Hängende Kabel",
+   "Kranhaken",
+   "Gerüst",
+   "Fels",
+   "Autowrack",
+   "Träger",
+   "Straßenlaterne",
+   "Reifen",
+   "Fässer",
+   "Säule",
+   "Farn",
+   "Zaun",
+   "Toter Baum",
+   "Schüssel",
+   "Billboard-Rahmen",
+   "Drohne",
+   "Kisten",
+   "Funkmast",
+   "Bootsgerippe",
+   "Gras",
+   "Absperrung",
+   "Rohr",
+   "Steppenläufer",
+   "Zahnrad",
+   "Einkaufswagen",
+   "Stacheldraht",
+   "Mutantenpflanze"
+  ],
+  "source": "KI (PixelLab, Create Image Pro 256 × 256, 4 × 4, Palette 4 dunkle Töne) + Code (zwei Blätter nebeneinander)",
+  "date": "2026-11-19",
+  "description": "#115: schwarze Formen ganz vorne (Fahrt, POIs draußen)."
  }
 }

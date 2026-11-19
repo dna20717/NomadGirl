@@ -2,10 +2,11 @@
 // the weather drawn by code behind it (game/weather.js) and rain in front of the world.
 // Everything is drawn in background pixels and scaled up sharp (NEAREST), whole pixels only.
 import { makeWeather } from '../weather.js';
+import { parallaxLayers, setFor } from './parallax.js';
 
 export class Backdrop {
   // call inside the background block (objects go to bgCam); front() later for the rain (objects go to the world camera)
-  constructor(scene, bd, roomH) {
+  constructor(scene, bd, roomH, roomW = 0) {
     const W = scene.scale.width, H = scene.scale.height, D = scene.data_;
     this.scene = scene; this.bd = bd; this.roomH = roomH;
     const img = bd.image && scene.textures.exists(bd.image) ? scene.textures.get(bd.image) : null;
@@ -25,7 +26,18 @@ export class Backdrop {
     } else {
       scene.add.rectangle(0, 0, W, H, 0x1a1030).setOrigin(0).setScrollFactor(0).setDepth(-100);
     }
-    if (img) {
+    // #115 painted parallax: Raum › Hintergrund › Parallax-Set, else outdoors (a room with a picture, or „Draußen: ja“) the set of the
+    // region the run is in (Reisen › Landschaften); it replaces the picture
+    const save = scene.box?.save, loc = D.locations?.[save?.location] || save?.map?.nodes?.find(n => n.id === save?.location);
+    const outdoor = bd.outdoor === 'yes' || (bd.outdoor !== 'no' && !!(bd.image || bd.weather) && (scene.mode === 'run' || !!scene.levelPoi));
+    const set = bd.parallax || (outdoor ? setFor(D, loc?.region) : null);
+    this.parallax = set && D.parallax?.[set] ? set : null;
+    scene.parallaxSet = this.parallax;
+    if (this.parallax) {
+      const hour = save?.hour ?? 18, night = hour >= 21 || hour < 5 ? 0.9 : hour >= 19 || hour < 7 ? 0.5 : 0;
+      parallaxLayers(scene, D, this.parallax, { horizon: H * (bd.horizon ?? 64) / 100, depth: -98, night, worldW: roomW || W * 3, maxSpeed: bd.parallaxNear ? 100 : 8, veil: (bd.veil ?? 35) / 100 });
+      this.under = scene.add.rectangle(0, H * (bd.horizon ?? 64) / 100, W, H, bd.ground ? parseInt(bd.ground.slice(1), 16) : 0x2a1f2a).setOrigin(0).setScrollFactor(0).setDepth(-97.5);
+    } else if (img) {
       img.setFilter(Phaser.Textures.FilterMode.NEAREST);
       this.pic = scene.add.image(0, 0, bd.image).setOrigin(0.5, 1).setScale(this.k).setScrollFactor(0).setDepth(-98);
       // below the picture: ground colour (the bottom row of the picture, or „Boden“)
@@ -47,7 +59,7 @@ export class Backdrop {
     const x = W / 2 - (cam.scrollX || 0) * f * 0.5, y = H * (this.bd.bottom ?? 100) / 100 + (maxY - (cam.scrollY || 0)) * f;
     this.x = Math.round(x / this.k) * this.k; this.y = Math.round(y / this.k) * this.k;
     this.pic?.setPosition(this.x, this.y);
-    this.under?.setPosition(0, this.y - this.k);
+    if (!this.parallax) this.under?.setPosition(0, this.y - this.k);
   }
 
   front() {

@@ -6,8 +6,9 @@
 const rng = seed => () => { seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 
 export function placeForeground(scene) {
+  const out = [...placeOutdoor(scene)];   // #115 painted silhouettes under the open sky
   const s = scene, G = s.data_.game?.foreground || {}, f = s.fog;
-  if (G.enabled === false || s.mode === 'camp' || !f?.on) return [];
+  if (G.enabled === false || s.mode === 'camp' || !f?.on) return out;
   const R = s.room, T = s.T, w = R.w, h = R.h, rnd = rng((s.levelInfo?.seed ?? s.box?.save?.run?.seed ?? 7) * 977 + 13);
   const [e0, e1] = G.every || [5, 11], [h0, h1] = G.height || [0.4, 1.2], p = (G.parallax ?? 118) / 100;
   const color = parseInt(String(G.color || '#060508').slice(1), 16), alpha = (G.alpha ?? 96) / 100;
@@ -18,7 +19,6 @@ export function placeForeground(scene) {
   // #096 (Daniel 19.11.2026: „Vordergrund-Grafiken hängen in der Luft“): a silhouette slides (p − 1) × its distance to the screen
   // centre sideways, at most (p − 1) × half a screen; it keeps that far from the ends of its floor, so it never hangs over a gap
   const margin = Math.ceil(Math.max(0, p - 1) * halfW / T + 0.5);
-  const out = [];
   for (let y = 1; y < h - 2; y++) {
     let x = 0;
     while (x < w) {
@@ -62,4 +62,34 @@ function shape(g, kind, H, T, rnd, color) {
     let x = -q(T * 0.7);
     for (let i = 0; i < 1 + Math.floor(rnd() * 3); i++) { const bw = q(T * 0.5), bh = q(Math.min(H, T * 0.85)); g.fillRoundedRect(x, -bh, bw, bh + base, 6); x += bw + 4; }
   }
+}
+
+// #115 (Daniel 19.11.2026: „ein paar schwarze Vordergrund-Formen“, gemalt): under the open sky (no indoor air) the painted silhouettes
+// of the run's parallax set (Parallax-Sets › Vordergrund) stand on the floors' front edge, faster than the world, like the ones indoors
+function placeOutdoor(scene) {
+  const s = scene, D = s.data_, P = D.parallax?.[s.parallaxSet], F = P?.fg, G = D.game?.foreground || {};
+  if (!F?.look || G.enabled === false || s.mode === 'camp' || !s.textures.exists(F.look)) return [];
+  s.textures.get(F.look).setFilter(Phaser.Textures.FilterMode.NEAREST);
+  const R = s.room, T = s.T, w = R.w, h = R.h, f = s.fog, rnd = rng((s.levelInfo?.seed ?? s.box?.save?.run?.seed ?? 7) * 613 + 5);
+  const A = D.assets?.[F.look], n = A?.grid ? A.grid[0] * A.grid[1] : 1, cells = String(F.cells || '').split(',').map(t => Number(t.trim()) - 1).filter(v => v >= 0 && v < n);
+  const pool = cells.length ? cells : [...Array(n).keys()], p = (F.speed ?? 135) / 100, [g0, g1] = F.gap || [900, 2200], [s0, s1] = F.size || [350, 600];
+  const cam = s.cam || s.cameras.main, halfW = cam.width / (cam.zoom || 1) / 2, margin = Math.ceil(Math.max(0, p - 1) * halfW / T + 0.5);
+  const air = (x, y) => R.tiles[y]?.[x] !== '#' && !(f?.on && f.kind[y * w + x] >= 1), ground = (x, y) => R.tiles[y]?.[x] === '#';
+  const out = [];
+  for (let y = 1; y < h - 1; y++) {
+    let x = 0;
+    while (x < w) {
+      const at = x0 => air(x0, y) && ground(x0, y + 1);
+      if (!at(x)) { x++; continue; }
+      let x1 = x; while (x1 < w && at(x1)) x1++;
+      const a = (x + margin) * T, b = (x1 - margin) * T;
+      for (let X = a + g0 * rnd(); X < b; X += g0 + (g1 - g0) * rnd()) {
+        const fr = pool[Math.floor(rnd() * pool.length)], k = (s0 + (s1 - s0) * rnd()) / 100, Y = (y + 1) * T + (F.drop ?? 40);
+        const img = s.add.image(halfW + (X - halfW) * p, Y, F.look, fr).setOrigin(0.5, 1).setScale(k).setFlipX(rnd() < 0.5).setScrollFactor(p, 1).setDepth(15.8).setAlpha((F.alpha ?? 100) / 100);
+        out.push({ g: img, kind: 'painted', x: X, y: Y });
+      }
+      x = x1;
+    }
+  }
+  return out;
 }
