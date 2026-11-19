@@ -2,7 +2,8 @@
 // Zielen, die zur Wahl stehen“). Opens at the warroom and at the van door. Left the map (game/map_render.js), right the chosen place:
 // kind, danger, loot hints, cost of the drive, and the action (Hinfahren, Hier plündern). One UI grammar (ui_nav.js):
 // stick / arrows pick a place in that direction, ok = the action, back = close; mouse: hover / click a place, click the button.
-import { repOf, levelOf, levelName } from '../reputation.js';
+import { repOf, levelOf, levelName, gangOfPlace, gangInfo, rivalsOf } from '../reputation.js';
+import { fronts } from '../turf_war.js';
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { hints } from './ui_nav.js';
@@ -113,7 +114,7 @@ export class MapUI {
     const W = Math.max(200, Math.floor(r.width)), H = Math.max(120, Math.floor(r.height));
     if (c.width !== W * dpr || c.height !== H * dpr) { c.width = W * dpr; c.height = H * dpr; c.style.width = W + 'px'; c.style.height = H + 'px'; }
     const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const M = mapConfig(this.D), res = drawMap(ctx, W, H, this.D, this.map, { paper: this.image(M.paper), logos: this.image(M.logos), here: this.save.location, sel: this.sel, route: this.routeTo(this.sel), t: (performance.now() - this.t0) / 1000, hideDanger: !this.intel });
+    const M = mapConfig(this.D), res = drawMap(ctx, W, H, this.D, this.map, { paper: this.image(M.paper), logos: this.image(M.logos), here: this.save.location, sel: this.sel, route: this.routeTo(this.sel), t: (performance.now() - this.t0) / 1000, hideDanger: !this.intel, fronts: fronts(this.D, this.save) });
     this.places = res.places;
   }
   hover(e) {
@@ -139,7 +140,7 @@ export class MapUI {
       el('div', { class: 'wm-row' }, el('small', {}, 'Beute'), this.intel ? el('div', { class: 'wm-hints' }, ...(n.hints || []).map(h => el('span', { style: `--c:${HINT_COLORS[h] || '#c7b08b'}` }, optLabel(ITEM_CATEGORIES, h) || h))) : el('b', { class: 'wm-unknown' }, '? ? ?')),
       this.intel ? null : el('p', { class: 'wm-intel' }, icon('research', 14), ' Was dort wartet, zeigt erst ein Warroom. Bau einen ins Rig (B), dann siehst du Gefahr, Beute und das Wetter.'),
       b ? el('p', { class: 'wm-brand' }, `${b.name}: „${b.slogan}“`) : null,
-      P.gang?.name ? this.repRow(P.gang) : null,   // #055 whose turf, and Leyla's Ruf with them
+      gangOfPlace(D, save, n.id) ? this.repRow(gangInfo(D, gangOfPlace(D, save, n.id)), save.turfs?.[n.id] ? P.gang?.name : null) : null,   // #055 whose turf, and Leyla's Ruf with them; #089 who moved in
       // the POI's own text only at the landmark itself; rolled places say what kind of place it is
       el('p', { class: 'wm-desc' }, n.landmark && P.description ? P.description : `Wie ${P.name || 'ein POI'}, nur ${n.danger > (P.danger || 1) ? 'weiter draußen und gefährlicher' : 'ein anderer Ort'}. Was genau dort liegt, weiß man erst drinnen.`),
       cost ? el('div', { class: 'wm-cost' }, ...[['Strecke', `${cost.km} km${(cost.legs?.length || 1) > 1 ? ` · ${cost.legs.length} Etappen` : ''}`], ['Fahrt', `${de(cost.hours)} h`], ['Sprit', `${de(cost.fuel)} l`, cost.fuel > save.fuel], ['Vorräte', de(cost.food), cost.food > save.food]]
@@ -172,10 +173,12 @@ export class MapUI {
     return el('div', { class: 'wm-fc' + (bad.length ? ' wx' : '') }, el('small', {}, icon('cloud', 12), ' Wetter · Navigator'), el('div', { class: 'wm-fc-chips' }, ...chips), tip ? el('p', {}, tip) : null);
   }
   // #055: the gang of the place with Leyla's Ruf (a bar from Feind to Freund) and its motto
-  repRow(g) {
+  repRow(g, was = null) {
     const n = repOf(this.save, g.name), lv = levelOf(this.D, n), col = { feind: '#df3e23', unbeliebt: '#fa6a0a', neutral: '#c8bcd6', geduldet: '#9cdb43', freund: '#20d6c7' }[lv];
     return el('div', { class: 'wm-rep', style: `--rep:${(n + 100) / 2}%;--rc:${col}` }, el('div', { class: 'wm-row' }, el('small', {}, 'Revier'), el('b', {}, g.name)),
-      el('div', { class: 'wm-repbar' }, el('i')), el('small', { class: 'wm-replv' }, `Ruf: ${levelName(lv)} (${n > 0 ? '+' : ''}${n})${g.motto ? ` · „${g.motto}“` : ''}`));
+      el('div', { class: 'wm-repbar' }, el('i')), el('small', { class: 'wm-replv' }, `Ruf: ${levelName(lv)} (${n > 0 ? '+' : ''}${n})${g.motto ? ` · „${g.motto}“` : ''}`),
+      was ? el('small', { class: 'wm-front' }, icon('flag', 12), ` Übernommen, vorher ${was}`) : null,
+      rivalsOf(this.D, g.name).length ? el('small', { class: 'wm-rivals' }, `Rivalen: ${rivalsOf(this.D, g.name).join(', ')}`) : null);   // #089
   }
   // Loadout-Check (#016): what Leyla takes into the run, warnings in amber
   readyBox() {
@@ -185,6 +188,6 @@ export class MapUI {
   }
   state() {
     const m = this.map;
-    return { open: this.isOpen, intel: this.intel, extras: (this.opts?.extras || []).map(x => x.label), here: this.save.location, sel: this.sel, nodes: m.nodes.length, edges: m.edges.length, near: neighbours(m, this.save.location), action: this.action()?.label || null, disabled: this.action()?.disabled || null, forecast: (() => { const a = this.action(), F = this.forecast(this.sel === this.save.location ? null : a?.cost); return F ? (F.legs ? F.legs.map(L => L.kinds.join('+') || 'klar') : F.days.map(x => x.rain ? 'Regen' : 'trocken')) : null; })(), ready: this.sel === this.save.location ? (this.host.loadout?.() || []).map(r => r.label + (r.warn ? '!' : '')) : [] };
+    return { open: this.isOpen, intel: this.intel, extras: (this.opts?.extras || []).map(x => x.label), here: this.save.location, sel: this.sel, nodes: m.nodes.length, edges: m.edges.length, near: neighbours(m, this.save.location), action: this.action()?.label || null, disabled: this.action()?.disabled || null, fronts: fronts(this.D, this.save).length, forecast: (() => { const a = this.action(), F = this.forecast(this.sel === this.save.location ? null : a?.cost); return F ? (F.legs ? F.legs.map(L => L.kinds.join('+') || 'klar') : F.days.map(x => x.rain ? 'Regen' : 'trocken')) : null; })(), ready: this.sel === this.save.location ? (this.host.loadout?.() || []).map(r => r.label + (r.warn ? '!' : '')) : [] };
   }
 }

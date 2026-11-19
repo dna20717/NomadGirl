@@ -1359,7 +1359,7 @@ export const AREAS = {
     sections: [
       { title: 'POI', fields: [NAME, LOOK, select('kind', 'Art', POI_KINDS), select('size', 'Größe', POI_SIZES), num('danger', 'Gefahr', { min: 1, max: 5 }), DESCRIPTION] },
       { title: 'Aufbau', fields: [range('roomCount', 'Räume', { hint: 'Wie viele Räume zusammengesetzt werden' }), refs('rooms', 'Raum-Bausteine', 'rooms'), refs('enemies', 'Gegner', 'enemies', { hint: 'Für das Zeichen 1 im Layout: ein zufälliger dieser Gegner' }), ref('loot', 'Kisten-Beute', 'lootTables', { hint: 'Für Kisten (C) in den Räumen' }), ref('vault', 'Tresor-Beute', 'lootTables', { hint: 'Liegt im Tresor am Ziel (Z), dazu je 10 % Rang-Bonus ein Extra-Wurf. Leer = Tabelle „tresor“' })] },
-      { title: 'Gang', fields: [text('gang.name', 'Name', { hint: '#016: Wem dieser Ort gehört. Steht beim Betreten als Toast („Revier der …“)' }), text('gang.color', 'Gang-Farbe', { hint: 'Name einer Gang-Farbe aus dem Gegner-Bausatz (Magenta, Cyan, Orange, Gelb, Blutrot). Alle Plünderer aus dem Bausatz tragen hier diese Farbe (nicht Mutanten, nicht der Boss)' }), area_('gang.motto', 'Spruch')] },
+      { title: 'Gang', fields: [text('gang.name', 'Name', { hint: '#016: Wem dieser Ort gehört. Steht beim Betreten als Toast („Revier der …“)' }), text('gang.color', 'Gang-Farbe', { hint: 'Name einer Gang-Farbe aus dem Gegner-Bausatz (Magenta, Cyan, Orange, Gelb, Blutrot). Alle Plünderer aus dem Bausatz tragen hier diese Farbe (nicht Mutanten, nicht der Boss)' }), area_('gang.motto', 'Spruch'), text('gang.rivals', 'Rivalen', { hint: '#089 Revierkrieg: Namen anderer Gangs (Komma), gilt in beide Richtungen. Ruf bei der einen kostet Ruf bei der anderen; Straßen zwischen ihren Orten werden Fronten' })] },
       { title: 'Fundstücke', fields: [table('treasure', 'Fundstücke', [ref('item', 'Ding', 'items'), select('where', 'Wo', [['vault', 'im Tresor'], ['chest', 'in einer Kiste']]), num('chance', 'Chance', { unit: '%', min: 1, max: 100 })],
         { hint: '#057 Schatzsuche: ein bestimmtes Ding liegt hier, einmal je Durchgang und nur, solange Leyla es nicht hat (z. B. ein Kartenstück im Tresor)' })] },
       { title: 'KI-Terminal', fields: [text('terminalAi', 'Terminal-KI', { hint: '#057: Name einer Entity aus Entities › Unikate; sie wohnt im KI-Terminal (@ im Raum-Baustein). Glitch-Duell optional, gewonnen = sie zieht ins Cyberdeck (einmal je Spielstand)' })] },
@@ -1374,6 +1374,7 @@ export const AREAS = {
       { title: 'Leben (noch ohne Wirkung)', fields: [bool('npcs', 'NPCs vor Ort'), bool('foodtruck', 'Foodtruck-Verkauf möglich'), bool('shop', 'Händler')] },
     ],
     check: (x, report, p, id) => {
+      for (const r of String(x.gang?.rivals || '').split(',').map(v => v.trim()).filter(Boolean)) if (!Object.values(p?.data?.pois || {}).some(o => o.gang?.name === r)) report('warning', `Rivale „${r}“ ist keine Gang (POI › Gang › Name)`);   // #089
       if (x.gang?.color && !Object.values(p.data.kits || {}).some(K => (K.gangs || []).some(g => g.name === x.gang.color))) report('warning', `Gang-Farbe „${x.gang.color}“ gibt es in keinem Gegner-Bausatz`);
       const R = p.data.rooms || {};
       if (!(x.rooms || []).some(r => R[r]?.tags?.includes('start'))) report('warning', 'Kein Raum mit Eingang');
@@ -1538,7 +1539,9 @@ export const AREAS = {
         num('rep.price', 'Preise', { unit: '% bei ±100', min: 0, max: 90, hint: 'Freunde zahlen weniger, Feinde mehr' }), num('rep.kill', 'Je Kill im Revier', { min: 0, hint: 'so viel Ruf kostet ein Kill in einem POI der Gang' }),
         select('rep.peace', 'Frieden im Revier ab', [['geduldet', 'Geduldet'], ['freund', 'Freund'], ['neutral', 'Neutral']], { hint: '#061: ab dieser Stufe wird der POI zum Revier-Camp: die Gang greift nicht an; Freunde handeln und haben einen Auftrag' }),
         num('rep.breakPeace', 'Frieden brechen kostet', { min: 0, hint: 'Ruf, wenn Leyla einen von ihnen angreift oder den Tresor knackt' }), num('rep.theft', 'Beim Klauen gesehen', { min: 0, hint: 'Ruf je Kiste, die einer von ihnen öffnen sieht' }),
-        num('rep.job', 'Auftrag: Ruf', { min: 0, hint: 'Ruf für „Revier säubern“' })] },
+        num('rep.job', 'Auftrag: Ruf', { min: 0, hint: 'Ruf für „Revier säubern“' }),
+        num('rep.rivalShare', 'Rivalen: Gegenruf', { unit: '%', min: 0, max: 100, hint: '#089 Revierkrieg: was Leyla bei einer Gang gewinnt, verliert sie bei deren Rivalen (und umgekehrt), zu diesem Anteil. 0 = aus' }),
+        bool('rep.takeover', 'Rivalen übernehmen Orte', { hint: '#089: kämpft Leyla sich durch einen Ort einer Gang (kein Frieden, Tresor geknackt), zieht die Rivalen-Gang ein, bei der sie am besten dasteht' })] },
       { title: 'Wetter', fields: [table('weather', 'Wetter macht wahrscheinlicher', [select('kind', 'Wetter', [['dust', 'Sandsturm'], ['fog', 'Morgennebel'], ['wet', 'Regen']]), select('roadside', 'Am Straßenrand', ROADSIDE), num('factor', 'Gewicht ×', { min: 0, max: 10 })],
         { hint: '#063/#071: das Wetter einer Etappe ändert das Gewicht der Lagen nach dem, was am Straßenrand steht (×1 = gleich, ×0,4 = seltener). Leer = die eingebauten Werte' })] },
       { title: 'Wörter', fields: [text('words.group', 'Banden {group}', { hint: 'mit |' }), text('words.cargo', 'Ladung {cargo}', { hint: 'mit |, „ein Laster mit …“' }),

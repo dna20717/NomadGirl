@@ -4,7 +4,7 @@
 // (plunderers, their drones, the boss) do not attack, do not come to noise or calls. Their chests are theirs: opening one while one of
 // them sees it costs Ruf. The vault only by breaking the peace. A friend can talk to them: trade (a few things from the POI's loot at
 // Ruf prices) and a job (clear the turf of mutants and vermin). Any hit on one of them breaks the peace: all of them fight, Ruf drops.
-import { addRep, repOf, levelOf, levelName, repConfig, repPrice, REP_LEVELS } from '../reputation.js';
+import { addRep, repOf, levelOf, levelName, repConfig, repPrice, REP_LEVELS, rivalLines } from '../reputation.js';
 import { rollLoot } from '../inventory.js';
 import { give } from '../crafting.js';
 import { pay } from '../pricing.js';
@@ -74,7 +74,7 @@ export class Turf {
   change(n, why, quiet = false) {
     const r = addRep(this.D, this.save, this.gang, n);
     if (!r) return;
-    if (!quiet) this.scene.hud.toast(`${why}: Ruf ${this.gang} ${r.n > 0 ? '+' : '−'}${Math.abs(r.n)}`, r.changed ? `Jetzt: ${levelName(r.level)}` : '', r.n > 0 ? 'good' : 'warn', 3600);
+    if (!quiet) this.scene.hud.toast(`${why}: Ruf ${this.gang} ${r.n > 0 ? '+' : '−'}${Math.abs(r.n)}`, [r.changed ? `Jetzt: ${levelName(r.level)}` : '', ...rivalLines(r)].filter(Boolean).join(' · '), r.n > 0 ? 'good' : 'warn', 3600);   // #089 rivals
     // the Ruf falls below the peace: no more truce
     if (this.active && rank(r.level) < rank(repConfig(this.D).peace)) this.breakPeace('Jetzt reicht es ihnen');
     if (r.level !== 'freund') this.friend = false;

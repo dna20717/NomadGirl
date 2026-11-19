@@ -8,7 +8,7 @@ import { advance } from './save.js';
 import { give, take, have } from './crafting.js';
 import { rollLoot } from './inventory.js';
 import { generateEncounter, eventsConfig } from './road_events.js';
-import { addRep, repOf, gangs } from './reputation.js';
+import { addRep, repOf, gangs, rivalLines } from './reputation.js';
 import { revealPlace } from './worldmap.js';
 import { needBlocked } from './needs.js';
 import { setFlag } from './conditions.js';
@@ -100,8 +100,10 @@ export function choose(D, save, o, rnd = Math.random) {
   // #055: consequences that last: Ruf with the gang (also when it went wrong), Merker and buff (only when it worked), the story goes on or ends
   const rep = o.rep && o.gang ? addRep(D, save, o.gang, o.rep) : null;
   if (rep?.n) lines.push(`Ruf ${rep.gang} ${rep.n > 0 ? '+' : '−'}${Math.abs(rep.n)}`);
+  if (rep?.n) lines.push(...rivalLines(rep));   // #089
   const rep2 = o.repRival && o.rival ? addRep(D, save, o.rival, o.repRival) : null;
   if (rep2?.n) lines.push(`Ruf ${rep2.gang} ${rep2.n > 0 ? '+' : '−'}${Math.abs(rep2.n)}`);
+  if (rep2?.n) lines.push(...rivalLines(rep2));
   const R = save.road ??= { flags: [], seen: [], chain: null };
   if (!failed || quest) for (const f of String(o.flag || '').split(',').map(x => x.trim()).filter(Boolean)) {
     setFlag(save, f);   // #071 Welt-Merker

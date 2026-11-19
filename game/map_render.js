@@ -50,6 +50,18 @@ export function drawMap(ctx, W, H, D, map, opt = {}) {
     if (seen) { ctx.strokeStyle = '#71413b'; ctx.lineWidth = 6 * u; ctx.setLineDash([]); ctx.stroke(); ctx.strokeStyle = '#f9a31b'; ctx.lineWidth = 3 * u; ctx.stroke(); }
     else { ctx.strokeStyle = 'rgba(113,65,59,.45)'; ctx.lineWidth = 2 * u; ctx.setLineDash([4 * u, 6 * u]); ctx.stroke(); ctx.setLineDash([]); }
   }
+  // #089 Revierkrieg: fronts (roads between rival gangs) as a jagged red line with crossed blades in the middle; known roads only
+  if (!opt.hideDanger) for (const f of opt.fronts || []) {
+    const a = P(f.a), b = P(f.b); if (!a || !b || !(known(a) && known(b))) continue;
+    const [ax, ay, qx, qy, bx, by] = curve(a, b), pt = k => [(1 - k) ** 2 * ax + 2 * (1 - k) * k * qx + k * k * bx, (1 - k) ** 2 * ay + 2 * (1 - k) * k * qy + k * k * by];
+    ctx.save(); ctx.strokeStyle = 'rgba(190,35,35,.85)'; ctx.lineWidth = 2 * u; ctx.beginPath();
+    for (let i = 0; i <= 24; i++) { const k = 0.12 + 0.76 * i / 24, [x, y] = pt(k), [x2, y2] = pt(Math.min(1, k + 0.01)), dx = x2 - x, dy = y2 - y, l = Math.hypot(dx, dy) || 1, z = (i % 2 ? 1 : -1) * 5 * u; ctx.lineTo(x - dy / l * z, y + dx / l * z); }
+    ctx.stroke();
+    const [mx, my] = pt(0.5), s2 = 7 * u;
+    ctx.fillStyle = '#fef3c0'; circle(ctx, mx, my, s2 * 1.3); ctx.strokeStyle = 'rgba(190,35,35,.95)'; ctx.lineWidth = 2.5 * u;
+    ctx.beginPath(); ctx.moveTo(mx - s2 * 0.75, my - s2 * 0.75); ctx.lineTo(mx + s2 * 0.75, my + s2 * 0.75); ctx.moveTo(mx + s2 * 0.75, my - s2 * 0.75); ctx.lineTo(mx - s2 * 0.75, my + s2 * 0.75); ctx.stroke();
+    ctx.restore();
+  }
   // the chosen route: red pencil along the road (Leyla's marker)
   // since #014 along every leg of the way (opt.route: [here, …, sel])
   const way = opt.route?.length > 1 ? opt.route : opt.sel && near.has(opt.sel) ? [here, opt.sel] : null;

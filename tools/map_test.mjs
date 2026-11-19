@@ -54,6 +54,12 @@ check('Navigator: Wetter je Etappe der Route (mit Warroom)', v.intel && Array.is
 await shot('forecast');
 v = await ev(() => { const mp = SC().hud.map; mp.select(nomad.save().location); const st = mp.state(); const r = { intel: st.intel, fc: st.forecast, text: document.querySelector('.wm-fc')?.textContent || '' }; mp.host.intel = mp.intelWas; return r; });
 check('Navigator am eigenen Ort: Regen der nächsten 3 Tage', v.intel && (v.fc?.length === 3 && /Heute/.test(v.text) && /Morgen/.test(v.text)), v);
+// #089 Revierkrieg: a road between places of rival gangs is a front on the map, the place panel names who moved in
+v = await ev(() => { const mp = SC().hud.map, here = nomad.save().location, near = nomad.map().near[0]; nomad.save().turfs = { [here]: 'Sky Wolves', [near]: 'Level Five' }; mp.host.intel = () => true; mp.select(near); mp.detail(); mp.paint();
+  const st = mp.state(), text = document.querySelector('.wm-detail')?.textContent || ''; return { fronts: st.fronts, text }; });
+check('Revierkrieg: Front auf der Karte, Ort zeigt die neue Gang und die alte', v.fronts >= 1 && /Level Five/.test(v.text) && /vorher/.test(v.text) && /Rivalen: Sky Wolves/.test(v.text), v);
+await shot('front');
+await ev(() => { delete nomad.save().turfs; const mp = SC().hud.map; mp.host.intel = mp.intelWas; });
 await tap(1);
 check('B schließt die Karte', !(await ev(() => nomad.map())).open);
 

@@ -16,7 +16,7 @@
 // No DOM.
 import { mapBrands, valueOf } from './brands.js';
 import { brandDiscount, influencer } from './brand_perks.js';
-import { gangs, repOf, levelOf, gangOfPlace, repPrice } from './reputation.js';
+import { gangs, repOf, levelOf, gangOfPlace, repPrice, rivalsOf } from './reputation.js';
 import { NEED_KEYS, hasNeeds, needBlocked, needTag } from './needs.js';
 import { ok as condOk } from './conditions.js';
 import { pay, earn } from './pricing.js';
@@ -63,13 +63,16 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
   if (!S) {
     const all = situationsFor(D, { night: !!ctx.night, danger, save, here: ctx.here || null });
     if (!all.length) return null;
-    const wt = s => (s.weight ?? 1) * (ctx.bias?.[s.roadside] ?? 1);   // #063 the weather of the leg makes some likelier
+    const wt = s => (s.weight ?? 1) * (ctx.bias?.[s.roadside] ?? 1) * (ctx.front && s.gang && s.gang !== 'here' ? 2 : 1);   // #063 the weather of the leg makes some likelier; #089 on a front gang trouble
     let k = rnd() * all.reduce((n, s) => n + wt(s), 0);
     S = all.find(s => (k -= wt(s)) < 0) || all[all.length - 1];
   }
   // the gang and its rival (a running story keeps its gangs); the Ruf with the gang picks the mood
-  const gang = chain?.gang ?? gangFor(D, S, save, ctx.here || null, rnd) ?? (S.gangName || (S.gang ? pick(rnd, gangs(D).map(g => g.name).concat('Plünderer')) : null));
-  const others = gangs(D).map(g => g.name).filter(g => g !== gang), rival = chain?.rival || (others.length ? pick(rnd, others) : 'Plünderer');
+  // #089 on a front (a road between rival gangs) one of the two, the other is the rival
+  const F = !chain && ctx.front && S.gang && S.gang !== 'here' ? [ctx.front.ga, ctx.front.gb].filter(g => inRange(S, repOf(save, g))) : [];
+  const gang = chain?.gang ?? (F.length ? pick(rnd, F) : null) ?? gangFor(D, S, save, ctx.here || null, rnd) ?? (S.gangName || (S.gang ? pick(rnd, gangs(D).map(g => g.name).concat('Plünderer')) : null));
+  const others = gangs(D).map(g => g.name).filter(g => g !== gang), mine = gang ? rivalsOf(D, gang).filter(r => others.includes(r)) : [];   // #089 the gang's own rivals first
+  const rival = chain?.rival || (F.length && gang === ctx.front.ga ? ctx.front.gb : F.length && gang === ctx.front.gb ? ctx.front.ga : null) || (mine.length ? pick(rnd, mine) : others.length ? pick(rnd, others) : 'Plünderer');
   const lvl = gang ? levelOf(D, repOf(save, gang)) : 'neutral';
   const moodIds = list(S.moods); let moods = moodIds.length ? C.moods.filter(m => moodIds.includes(m.id)) : [];
   const byRep = { freund: m => m.friendly && !m.hostile, geduldet: m => m.friendly, unbeliebt: m => m.hostile, feind: m => m.hostile && !m.friendly }[lvl];

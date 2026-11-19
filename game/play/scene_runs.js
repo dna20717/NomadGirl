@@ -1,7 +1,8 @@
 // Camp ↔ run (#017 split from scene.js): restart, go to the camp, start and end a run (Beute-Bilanz), enemies of the run.
 // Mixed into PlayScene (game/play/scene.js): the methods keep their `this`, nothing else changes.
 import { placeOf, threatOf } from '../worldmap.js';
-import { repLine } from '../reputation.js';
+import { repLine, gangOfPlace, gangInfo } from '../reputation.js';
+import { takeover } from '../turf_war.js';
 import { update as tankUpdate, phase as tankPhase } from '../tank.js';
 import { poiReady } from '../../engine/poi.js';
 import { Enemy } from './enemies.js';
@@ -41,7 +42,7 @@ export class SceneRuns {
       this.box.save.health = this.leyla.health;
       this.box.save.run = { poi, room: null, seed: P.seed || 1 + Math.floor(Math.random() * 2 ** 31), location: this.box.save.location, danger: this.placeDanger(poi), before: runSnapshot(D, this.box.save) };   // before: for the Beute-Bilanz (#017)
       this.box.persist();
-      return this.restartAs({ mode: 'run', roomId: null, banner: [P.name || poi, `${P.gang?.name ? `Revier: ${repLine(this.data_, this.box.save, P.gang.name)} · ` : ''}Finde den Tresor · E am Van: zurück ins Camp`] }, 700);   // #016 whose place this is
+      return this.restartAs({ mode: 'run', roomId: null, banner: [P.name || poi, `${(gangOfPlace(D, this.box.save, this.box.save.location) || P.gang?.name) ? `Revier: ${repLine(this.data_, this.box.save, gangOfPlace(D, this.box.save, this.box.save.location) || P.gang.name)} · ` : ''}Finde den Tresor · E am Van: zurück ins Camp`] }, 700);   // #016 whose place this is
     }
     const ready = (P.rooms || []).filter(has);
     const room = ready.find(id => R[id].tags?.includes('start')) || ready[0] || [D.camp?.fallbackRoom, D.game?.testRoom].find(has);
@@ -84,6 +85,9 @@ export class SceneRuns {
       if (rank) later(bump(this.data_, save, 'pois', 1, [this.level.poi, rank.grade]));
       if (rank && this.level.secretsMax > 0 && this.level.secrets >= this.level.secretsMax) later(bump(this.data_, save, 'secretsAll', 1, [this.level.poi]));
     }
+    // #089 Revierkrieg: fought through their place (no peace) and cracked the vault: the rival she stands best with moves in
+    const moved = rank && this.turf && !this.turf.active && this.kills > 0 ? takeover(this.data_, save, save.run?.location ?? save.location, this.turf.gang) : null;
+    const movedLine = moved ? `${moved.to} übernehmen ${placeOf(this.data_, save, moved.node)?.name || 'den Ort'} (vorher ${moved.from})` : '';
     save.buffs = []; save.buffQ = {};
     // Beute-Bilanz (#017): what changed since she drove off
     let summary = null;
@@ -91,12 +95,12 @@ export class SceneRuns {
       const R = this.level?.done, P = this.data_.pois?.[save.run?.poi] || {}, sec = R?.seconds ?? Math.round((this.elapsed || 0) / 1000);
       summary = runCompare(this.data_, save, save.run?.before || {}, { ko, poi: P.name || save.run?.poi || '', title: ko ? 'AvA hat dich heimgebracht' : rank ? `Tresor geknackt · Rang ${rank.grade}` : 'Zurück im Camp',
         grade: rank?.grade || null, parts: rank?.parts || null, paid, base: this.deltas, bonus: rank?.bonus || 0, kills: this.kills, killsMax: this.level?.killsMax ?? null,
-        secrets: this.level?.secrets ?? 0, secretsMax: this.level?.secretsMax ?? 0, time: `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}` });
+        secrets: this.level?.secrets ?? 0, secretsMax: this.level?.secretsMax ?? 0, turf: movedLine, time: `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}` });
     } catch (e) { console.warn('Bilanz', e); }
     save.run = null;
     this.hud.inv?.close();
     const banner = ko ? ['AvA hat dich heimgebracht', `${clockText(save)} · Der Rucksack ist weg.${trunk.moved ? ' Der Kofferraum ist sicher.' : ''}`, 'drama']
-      : rank ? [`Zurück im Camp · Rang ${rank.grade}`, `${clockText(save)} · +${paid} Δ (${this.deltas} + ${rank.bonus} %) · ${this.kills} Kills`, 'good']
+      : rank ? [`Zurück im Camp · Rang ${rank.grade}`, `${clockText(save)} · +${paid} Δ (${this.deltas} + ${rank.bonus} %) · ${this.kills} Kills${movedLine ? ` · ${movedLine}` : ''}`, 'good']
       : ['Zurück im Camp', `${clockText(save)} · +${paid} Δ · ${this.kills} Kills`, 'good'];
     this.goCamp({ banner: summary && this.data_.game?.summary !== false ? null : banner, fade: ko ? 900 : 600, arriving: true, summary: this.data_.game?.summary !== false ? summary : null });
   }
@@ -151,7 +155,12 @@ export class SceneRuns {
     if (G?.color && def.kit && def.family === 'raider' && def.behavior !== 'boss') def = { ...def, kitGang: G.color };
     return def;
   }
-  gang() { const poi = (this.mode === 'run' && this.box?.save?.run?.poi) || this.level?.poi; return poi ? this.data_.pois?.[poi]?.gang || null : null; }
+  gang() {
+    const save = this.box?.save, poi = (this.mode === 'run' && save?.run?.poi) || this.level?.poi;
+    if (!poi) return null;
+    const moved = this.mode === 'run' && save?.turfs?.[save.run?.location ?? save.location];   // #089 a rival moved in
+    return moved ? gangInfo(this.data_, moved) : this.data_.pois?.[poi]?.gang || null;
+  }
   addEnemy(id, col, row) {
     const def = this.enemyDef(id), T = this.T;
     if (!def) return null;

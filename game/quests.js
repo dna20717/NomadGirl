@@ -14,7 +14,7 @@ import { goal as mainGoal, pathTo, progress as mainProgress, goalId } from './qu
 import { status, owned } from './techtree.js';
 import { phase, hoursLeft } from './tank.js';
 import { revealPlace } from './worldmap.js';
-import { addRep, repOf, levelOf, REP_LEVELS } from './reputation.js';
+import { addRep, repOf, levelOf, REP_LEVELS, rivalLines } from './reputation.js';
 import { active as salvageOpen, progress as salvageProgress, goal as salvageGoal, siteOf, ensureSites } from './salvage.js';
 
 export const qstate = save => { const q = (save.quests ??= {}); q.active ??= {}; q.done ??= {}; return q; };
@@ -66,7 +66,7 @@ export function claim(D, save, id) {
   if (R.reveal) { const n = revealPlace(D, save, R.reveal); if (n) got.push(`Neuer Ort: ${n.name}`); }   // #057
   if (R.deltas) { save.deltas = (save.deltas || 0) + R.deltas; got.push(`+${R.deltas} Δ`); }
   let rep = null;
-  if (R.rep && x.gang) { rep = addRep(D, save, x.gang, R.rep); if (rep) got.push(`Ruf ${x.gang} ${rep.n >= 0 ? '+' : '−'}${Math.abs(rep.n)}`); }   // #088
+  if (R.rep && x.gang) { rep = addRep(D, save, x.gang, R.rep); if (rep) got.push(`Ruf ${x.gang} ${rep.n >= 0 ? '+' : '−'}${Math.abs(rep.n)}`, ...rivalLines(rep)); }   // #088
   const G = save.inv?.grids || {};
   for (const r of R.items || []) {
     if (!r.item || !D.items?.[r.item]) continue;

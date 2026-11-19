@@ -12,6 +12,7 @@ import { passengers } from '../rig.js';
 import { clockHours } from '../tank.js';
 import { rainHours } from '../rain.js';
 import { gangOfPlace, levelName } from '../reputation.js';
+import { onFront } from '../turf_war.js';
 import { driveConfig } from '../road.js';
 import { snapshotRig } from './rig_snapshot.js';
 import { offers } from '../quests.js';
@@ -334,7 +335,7 @@ export class CampActions {
     if (save.map && L.to !== R.id && !save.map.visited.includes(L.to)) save.map.visited.push(L.to);   // passed through
     // under remote control (nomad, tests) no random encounters, unless forced (scene.forceEncounter = id) or wanted (scene.randomEncounters)
     // #054: hand-made or from the Ereignis-Baukasten; the destination's danger, region and name go into the generated one
-    const node = save.map?.nodes?.find(x => x.id === L.to), ctx = { danger: node?.danger || 1, region: node?.region || '', place: placeOf(D, save, L.to)?.name || L.to, here: gangOfPlace(D, save, L.to) };
+    const node = save.map?.nodes?.find(x => x.id === L.to), ctx = { danger: node?.danger || 1, region: node?.region || '', place: placeOf(D, save, L.to)?.name || L.to, here: gangOfPlace(D, save, L.to), front: onFront(D, save, L.from ?? (i ? R.legs[i - 1].to : R.from), L.to) };   // #089
     // #063 the weather of the leg: some incidents likelier, a message once per kind and trip
     const sky = legSky(D, save, R.seed ?? 1, i, node?.region || '', h0, h1);
     ctx.bias = sky.bias;
@@ -350,7 +351,7 @@ export class CampActions {
       const opts = E.options || [];
       const pick = o => { const before = new Set(offers(D, save)), r = choose(D, save, o); R.log.push(`${E.name}: ${[r.text, r.lines.join(', ')].filter(Boolean).join(' ')}`);
         s.hud.toast(E.name, [r.text, r.lines.join(' · ')].filter(Boolean).join(' · '), r.failed || o.health || o.deltas < 0 || o.fuel > 0 ? 'warn' : 'travel', 4200);
-        for (const x of [r.rep, r.rep2]) if (x?.changed) s.hud.toast(`${x.gang}: ${levelName(x.level)}`, x.n > 0 ? 'Dein Ruf bei ihnen steigt' : 'Dein Ruf bei ihnen sinkt', x.n > 0 ? 'good' : 'warn', 4200);   // #055
+        for (const x of [r.rep, r.rep2, ...(r.rep?.rivals || []), ...(r.rep2?.rivals || [])]) if (x?.changed) s.hud.toast(`${x.gang}: ${levelName(x.level)}`, x.n > 0 ? 'Dein Ruf bei ihnen steigt' : 'Dein Ruf bei ihnen sinkt', x.n > 0 ? 'good' : 'warn', 4200);   // #055
         if (r.story) s.hud.toast('Die Geschichte geht weiter', 'Auf der nächsten Etappe', 'travel', 3600);
         if (r.revealed) s.hud.toast(`Neuer Ort: ${r.revealed.name}`, 'Steht jetzt auf der Reisekarte', 'good', 6000);   // #057
         for (const q of offers(D, save).filter(id => !before.has(id))) s.hud.toast(`Neuer Auftrag: ${D.quests[q].name}`, `${D.companions?.[D.quests[q].giver]?.name || 'Jemand'} im Camp will darüber reden`, 'info', 6000);   // #062

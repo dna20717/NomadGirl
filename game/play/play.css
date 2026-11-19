@@ -1086,3 +1086,5 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .wm-repbar { position: relative; height: 6px; border-radius: 3px; background: linear-gradient(90deg, #df3e23, #fa6a0a 30%, #4a3f55 50%, #9cdb43 70%, #20d6c7); opacity: .85; }
 .wm-repbar i { position: absolute; top: -3px; left: var(--rep); width: 4px; height: 12px; margin-left: -2px; border-radius: 2px; background: #fff; box-shadow: 0 0 6px var(--rc); }
 .wm-replv { color: var(--rc); }
+.wm-front { display: flex; align-items: center; gap: 4px; color: #e86a73; }   /* #089 */
+.wm-rivals { color: #8d7f9c; }

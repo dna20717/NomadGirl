@@ -65,6 +65,7 @@ export class SummaryUI {
       ...S.recipes.map(r => el('li', {}, icon('item', 14), el('span', {}, 'Rezept gelernt: ', el('b', {}, r)))),
       ...S.ready.map(n => el('li', { class: 'gold' }, icon('tree', 14), el('span', {}, 'Techtree: ', el('b', {}, n), ' jetzt bezahlbar'))),
       ...S.quests.map(q => el('li', { class: q.ready ? 'gold' : '' }, icon('list', 14), el('span', {}, el('b', {}, q.name), q.ready ? ' · erledigt, abgeben' : ` · ${q.from} → ${q.to} / ${q.target}`))),
+      ...(S.turf ? [el('li', { class: 'warn' }, icon('flag', 14), el('span', {}, 'Revierkrieg: ', el('b', {}, S.turf)))] : []),   // #089
       ...(S.tank ? [el('li', { class: S.tank.to < 45 ? 'warn' : '' }, icon('heart', 14), el('span', {}, `AvAs Tank: ${S.tank.from} % → `, el('b', {}, `${S.tank.to} %`)))] : []),
     ];
     const newCol = el('div', { class: 'sum-col' }, el('h3', {}, icon('star', 14), ' Neu'), news.length ? el('ul', { class: 'sum-news' }, ...news) : el('p', {}, 'Nichts Neues. Morgen vielleicht.'));

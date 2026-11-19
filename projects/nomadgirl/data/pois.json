@@ -17,7 +17,7 @@
   "tunnelTerrain": "metal",
   "tunnelAtmosphere": "tunnel_blau",
   "curve": "30, 75, 20, 90, 100",
-  "gang": {"name": "Yellow Vultures", "color": "Gelb", "motto": "Wer tankt, zahlt. Wer nicht zahlt, tankt Blei."},
+  "gang": {"name": "Yellow Vultures", "color": "Gelb", "motto": "Wer tankt, zahlt. Wer nicht zahlt, tankt Blei.", "rivals": "Neon Rats, Crude Boys"},
   "brandProps": [
    {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 6, "ai": true},
    {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 4, "ai": true},
@@ -80,7 +80,7 @@
   "description": "Zone 13. Gebaut für den Krieg, der nie kam. Irgendwer hält die Notbeleuchtung am Laufen.",
   "branchChance": 70,
   "curve": "40, 85, 30, 90, 35, 100",
-  "gang": {"name": "Rust Guard", "color": "Orange", "motto": "Der Bunker hält. Wir halten den Bunker."},
+  "gang": {"name": "Rust Guard", "color": "Orange", "motto": "Der Bunker hält. Wir halten den Bunker.", "rivals": "Salt Dogs"},
   "treasure": [{"item": "silo_karte_1", "where": "vault", "chance": 100}]
  },
  "ministerium": {
@@ -118,7 +118,7 @@
   "tunnelAtmosphere": "beton_lager",
   "branchChance": 55,
   "curve": "30, 70, 40, 85, 50, 100",
-  "gang": {"name": "Sky Wolves", "color": "Cyan", "motto": "Je höher, desto weiter fällst du."},
+  "gang": {"name": "Sky Wolves", "color": "Cyan", "motto": "Je höher, desto weiter fällst du.", "rivals": "Level Five"},
   "description": "Ein Wohn- und Bürotum am Rand von BigCityDelta, halb eingestürzt. Ganz oben hat sich eine Gang ein Penthouse eingerichtet. Rauf geht es Etage für Etage, runter schneller: durch den Lastenschacht."
  },
  "parkhaus_sued": {
@@ -161,7 +161,7 @@
   "tunnelAtmosphere": "metall_rost",
   "branchChance": 50,
   "curve": "30, 60, 100",
-  "gang": {"name": "Static Saints", "color": "Gelb", "motto": "Wir senden. Du empfängst."},
+  "gang": {"name": "Static Saints", "color": "Gelb", "motto": "Wir senden. Du empfängst.", "rivals": "Order Office"},
   "description": "Ein Sendemast mitten in der Ebene. Wer hinaufklettert, findet Elektronik und schlechte Gesellschaft."
  },
  "metro_line4": {
@@ -180,7 +180,7 @@
   "tunnelAtmosphere": "tunnel_blau",
   "branchChance": 60,
   "curve": "25, 60, 40, 85, 100",
-  "gang": {"name": "Tunnel Kings", "color": "Gelb", "motto": "Nächster Halt: Endstation."},
+  "gang": {"name": "Tunnel Kings", "color": "Gelb", "motto": "Nächster Halt: Endstation.", "rivals": "Salt Dogs"},
   "description": "Eine U-Bahn-Station unter der Stadtgrenze. Unten im Stellwerk sitzt, wer die Linie 4 kontrolliert.",
   "brandProps": [
    {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 2, "ai": true},
@@ -263,7 +263,7 @@
   "tunnelAtmosphere": "beton_lager",
   "branchChance": 60,
   "curve": "30, 70, 100",
-  "gang": {"name": "Sunny Side", "color": "Magenta", "motto": "Lächeln! Oder wir helfen nach."},
+  "gang": {"name": "Sunny Side", "color": "Magenta", "motto": "Lächeln! Oder wir helfen nach.", "rivals": "Crude Boys"},
   "description": "Ein Trailerpark am Highway. Früher Rentner, heute Leute mit Gewehren auf Liegestühlen.",
   "brandProps": [
    {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 2, "ai": true},
@@ -312,7 +312,7 @@
   "roomCount": [15, 17],
   "loot": "pluenderer_beute",
   "vault": "tresor",
-  "gang": {"name": "Zero Hour", "color": "Giftgrün", "motto": "Der Countdown läuft. Für dich zuerst."},
+  "gang": {"name": "Zero Hour", "color": "Giftgrün", "motto": "Der Countdown läuft. Für dich zuerst.", "rivals": "Order Office"},
   "curve": "30, 55, 70, 45, 75, 85, 50, 80, 90, 60, 85, 95, 100",
   "branchChance": 95,
   "stack": "deep",

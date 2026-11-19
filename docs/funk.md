@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: #089 **Revierkrieg** fertig (Rivalen, Gegenruf, Übernahmen nach Gewalt-Runs, Fronten auf der Karte). #090 Rig-Radio läuft.
 - 19.11. Ava (Chat mit Daniel) → Code: **NomadPixel** ist installiert (`/pixel`, Skill `.claude/skills/nomadpixel/`, Stilbibel `.claude/nomadpixel-stil.json`) und die Werkstatt hat den Bereich **Pixel-Aufträge** (`pixelOrders`). Kleine Grafiken (Symbole bis ~64 px) künftig damit statt PixelLab, große Figuren weiter PixelLab; `/pixel Aufträge` arbeitet offene Aufträge ab. Wissen: `docs/features/art.md` › NomadPixel.
 - 19.11. Code → Ava: #088 **Gangs als Auftraggeber** fertig (Aufträge im Revier beim Reden, Lohn Ruf). #089 Revierkrieg läuft.
 - 19.11. Code → Ava: #087 **Wettervorhersage** fertig (Navigator-Zeile in der Reisekarte, exakt wie die Fahrt würfelt). #088 Gangs als Auftraggeber läuft.
@@ -341,13 +342,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Gangs als Auftraggeber (#088)“. `test/gang_quests.test.js` 3/3, `npm test` 301/301, `tools/turf_test.mjs` 9/9, camp/workshop/silo grün. PixelLab 0. **Bitte testen:** Ruf bei den Yellow Vultures über die Straße auf Geduldet bringen (oder Datenset), Tankstelle plündern, mit einem von ihnen reden, „Ratten im Markt“ annehmen, Großmarkt schaffen, zurück und abgeben.
 
 ### #089 Revierkrieg
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code
 - **Auftrag:** Ruf bei einer Gang senkt den bei ihren Rivalen; Reviere verschieben sich auf der Reisekarte, Fehden werden zu Fronten.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: Rivalen-Paare von Code gesetzt (Vultures ↔ Neon Rats + Crude Boys, Rust Guard ↔ Salt Dogs ↔ Tunnel Kings, Sky Wolves ↔ Level Five, Order Office ↔ Static Saints + Zero Hour, Crude Boys ↔ Sunny Side); Gegenruf 50 %; Übernahme nur bei geknacktem Tresor ohne Frieden mit Kill, durch den Rivalen mit dem besten Ruf; Fronten nur sichtbar mit Warroom; Gangs ziehen nicht von selbst weiter (nur durch Leyla).
+- **Ergebnis:** (Code) Commit „Revierkrieg: Rivalen, Gegenruf, Übernahmen, Fronten (#089)“. `test/turf_war.test.js` 4/4, `npm test` 305/305, turf 10/10, map 17/17, drive 19/19, poi 31/31, camp 34/34. PixelLab 0. **Bitte testen:** mit Warroom die Reisekarte ansehen (Bunker 13 ↔ Pit 6 ist von Anfang an eine Front), die Tankstelle mit Gewalt plündern (Tresor knacken) und schauen, wer danach einzieht.
 
 ### #090 Rig-Radio
-- **Status:** offen · angelegt 19.11. von Code
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code
 - **Auftrag:** Sender mit Musik aus Code, Durchsagen aus BigCityDelta, Lore-Häppchen, Hinweise auf POIs, vielleicht eine DJ-Entity.
 - **Rückfragen:**
 - **Ergebnis:**

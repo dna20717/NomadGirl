@@ -84,7 +84,6 @@ Schon entstandene Kreisläufe (zum Ausbalancieren und Erzählen):
 - **Marken-Kreislauf:** Billboard → Influencer → Markenstand → Set-Bonus → Marken-Build.
 
 Neue Systeme, die daraus wachsen könnten:
-- **Revierkrieg:** Ruf bei einer Gang senkt den bei ihren Rivalen; Reviere verschieben sich auf der Reisekarte, Fehden werden zu Fronten.
 - **Influencer-Karriere:** viele Billboard-Tipps → Follower-Stufe → Sponsor-Pakete einer Marke, Ärger mit der Konkurrenz-Marke.
 - **Lieblingsmarken der Gangs:** wer die Marke einer Gang trägt (Markentreue), startet mit mehr Ruf bei ihr.
 - **Hochform:** bestimmte Kombinationen in der Effekt-Leiste (perfektes Gericht + Gemütlich + Influencer) geben einen Bonus-Effekt.

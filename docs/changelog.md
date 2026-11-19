@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Revierkrieg** (#089): Jede Gang hat Rivalen (POI › Gang › Rivalen). Ruf bei einer Gang kostet die Hälfte bei ihren Rivalen (und umgekehrt). Kämpft Leyla sich durch einen Ort und knackt den Tresor, zieht die Rivalen-Gang ein, bei der sie am besten dasteht. Straßen zwischen Rivalen sind Fronten (rote Zickzack-Linie auf der Karte), dort gibt es öfter Gang-Ärger, die Fehden nehmen die echten Rivalen.
 - 19.11.2026: **Pixel-Aufträge in der Werkstatt**: neuer Bereich unter Assets; Grafik-Wünsche online anlegen (auch am iPad), Claude Code erledigt sie mit `/pixel Aufträge` und hängt die Ergebnisse als Assets an.
 - 19.11.2026: **Gangs als Auftraggeber** (#088): Aufträge mit Gang (ab Geduldet) nimmt man im Revier beim Reden an und gibt sie dort ab; Lohn Δ, Dinge und Ruf. Sieben Aufträge für Yellow Vultures (mit Folge-Auftrag als Freund), Neon Rats, Rust Guard, Sky Wolves, Tunnel Kings, Static Saints.
 - 19.11.2026: **Wettervorhersage** (#087): Mit Warroom zeigt der Navigator in der Reisekarte das Wetter jeder Etappe (Sandsturm, Nebel, Regen, klar) und am eigenen Ort den Regen der nächsten 3 Tage. Er würfelt wie die Fahrt, die Vorhersage stimmt. Werkstatt › Reisen › Vorhersage.
