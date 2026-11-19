@@ -1,0 +1,155 @@
+"""zeichnen.py – Zeichenhelfer für größere Pixel-Art (ab ca. 24 px).
+
+Nutzung in einem eigenen Skript:
+    import sys; sys.path.insert(0, ".claude/skills/nomadpixel/scripts")
+    from zeichnen import C, to_pix, grain, speckle, inner_line, rim
+    c = C()                                   # 32x32-Leinwand (T ändern für andere Größen)
+    c.ellipse(16, 16, 8, 6, RAMPE)            # Kugel-Schattierung, Licht oben links
+    c.thick(4, 28, 20, 12, 3, RAMPE)          # dicker Stab, quer schattiert
+    c.rellipse(...), c.rbox(...), c.rect(...), c.line(...), c.shade_mask(maske, RAMPE)
+    # Detail-Runde (siehe SKILL.md):
+    grain(c, HOLZ, winkel), speckle(c, FLEISCH, 0.2), inner_line(c, HUT, LAMELLEN, DUNKEL), rim(c, HUT, GLOW)
+    c.outline("#060608")
+    to_pix([("name", c)], "ausgabe.pix", "icon = 32")
+Rampen sind Listen von Hex-Farben von dunkel nach hell (nur Farben der Projektpalette verwenden!).
+"""
+
+import math
+T = 32
+class C:
+    def __init__(s): s.g = [[None]*T for _ in range(T)]
+    def set(s, x, y, col):
+        if 0 <= x < T and 0 <= y < T: s.g[y][x] = col
+    def get(s, x, y): return s.g[y][x] if 0 <= x < T and 0 <= y < T else None
+    def shade_mask(s, mask, ramp, cx=None, cy=None, rx=None, ry=None, bias=0.0, light=(-0.7, -0.7)):
+        pts = [(x, y) for y in range(T) for x in range(T) if mask(x, y)]
+        if not pts: return
+        xs = [p[0] for p in pts]; ys = [p[1] for p in pts]
+        cx = cx if cx is not None else (min(xs)+max(xs))/2; cy = cy if cy is not None else (min(ys)+max(ys))/2
+        rx = rx or max(1, (max(xs)-min(xs))/2+0.5); ry = ry or max(1, (max(ys)-min(ys))/2+0.5)
+        lx, ly = light; ln = math.hypot(lx, ly); lx, ly = lx/ln, ly/ln
+        for x, y in pts:
+            nx, ny = (x-cx)/rx, (y-cy)/ry
+            nz = math.sqrt(max(0, 1-min(1, nx*nx+ny*ny)))
+            d = max(0, -(nx*lx+ny*ly)*0.75 + nz*0.55) + bias   # 0..~1.3
+            i = int(round(min(1, max(0, d/1.15)) * (len(ramp)-1)))
+            s.set(x, y, ramp[i])
+    def ellipse(s, cx, cy, rx, ry, ramp, **k):
+        s.shade_mask(lambda x, y: ((x-cx)/rx)**2+((y-cy)/ry)**2 <= 1.0, ramp, cx, cy, rx, ry, **k)
+    def rellipse(s, cx, cy, a, b, ang, ramp, **k):
+        ca, sa = math.cos(ang), math.sin(ang)
+        def m(x, y):
+            dx, dy = x-cx, y-cy
+            u, v = dx*ca+dy*sa, -dx*sa+dy*ca
+            return (u/a)**2+(v/b)**2 <= 1
+        s.shade_mask(m, ramp, cx, cy, max(a, b), max(a, b), **k)
+    def rbox(s, cx, cy, h, ramp, r=1.5, **k):
+        """abgerundeter Würfel (Kantenlänge 2h)"""
+        def m(x, y):
+            dx, dy = abs(x-cx), abs(y-cy)
+            if dx > h or dy > h: return False
+            ex, ey = max(0, dx-(h-r)), max(0, dy-(h-r))
+            return ex*ex+ey*ey <= r*r
+        s.shade_mask(m, ramp, cx, cy, h+0.5, h+0.5, **k)
+    def rect(s, x0, y0, x1, y1, col):
+        for y in range(y0, y1+1):
+            for x in range(x0, x1+1): s.set(x, y, col)
+    def line(s, x0, y0, x1, y1, col, w=1):
+        n = max(abs(x1-x0), abs(y1-y0), 1)
+        for i in range(n+1):
+            x = round(x0+(x1-x0)*i/n); y = round(y0+(y1-y0)*i/n)
+            for dx in range(w):
+                for dy in range(w): s.set(x+dx-w//2, y+dy-w//2, col)
+    def thick(s, x0, y0, x1, y1, w, ramp):
+        """Dicker Stab, quer schattiert (Licht oben links)."""
+        L = math.hypot(x1-x0, y1-y0); ux, uy = (x1-x0)/L, (y1-y0)/L; px, py = -uy, ux
+        if px+py > 0: px, py = -px, -py   # Normale zeigt nach oben links
+        for y in range(T):
+            for x in range(T):
+                t = ((x-x0)*ux+(y-y0)*uy); d = ((x-x0)*px+(y-y0)*py)
+                if -0.5 <= t <= L+0.5 and abs(d) <= w/2:
+                    f = (d + w/2) / w   # 1 = Lichtseite
+                    s.set(x, y, ramp[min(len(ramp)-1, int(f*len(ramp)))])
+    def outline(s, col="#060608"):
+        src = [r[:] for r in s.g]
+        for y in range(T):
+            for x in range(T):
+                if src[y][x] is None and any(0 <= y+dy < T and 0 <= x+dx < T and src[y+dy][x+dx] is not None for dx, dy in ((1,0),(-1,0),(0,1),(0,-1))):
+                    s.g[y][x] = col
+    def drop(s, col="#060608"):
+        """Schatten-Pixel unten rechts außerhalb der Outline (wie in den Referenzen nicht nötig: optional)."""
+        pass
+
+def to_pix(icons, path, meta):
+    cols = {}
+    chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJLMNOPQRSTUVWXYZ0123456789"
+    out_icons = []
+    for name, c in icons:
+        rows = []
+        for r in c.g:
+            line = ""
+            for v in r:
+                if v is None: line += "."
+                else:
+                    if v not in cols: cols[v] = "K" if v == "#060608" else chars[len([k for k in cols if cols[k] != "K"])]
+                    line += cols[v]
+            rows.append(line)
+        out_icons.append((name, rows))
+    with open(path, "w") as f:
+        f.write("[meta]\n" + meta + "\n\n[palette]\n. = transparent\n")
+        for v, ch in cols.items(): f.write(f"{ch} = {v}\n")
+        for name, rows in out_icons:
+            f.write(f"\n[icon {name}]\n" + "\n".join(rows) + "\n")
+
+# ---------------------------------------------------------------- Detail-Runde
+def _h(x, y, seed=0):
+    v = (x * 374761393 + y * 668265263 + seed * 1442695041) & 0xFFFFFFFF
+    v = (v ^ (v >> 13)) * 1274126177 & 0xFFFFFFFF
+    return (v ^ (v >> 16)) / 0xFFFFFFFF
+
+def _step(ramp, col, d):
+    i = ramp.index(col)
+    return ramp[max(0, min(len(ramp) - 1, i + d))]
+
+def grain(c, ramp, angle, period=3.0, seed=1, strength=0.55):
+    """Maserung/Fasern entlang einer Richtung: Streifen +-1 Rampenstufe, unregelmäßig unterbrochen."""
+    ca, sa = math.cos(angle), math.sin(angle)
+    for y in range(T):
+        for x in range(T):
+            col = c.g[y][x]
+            if col not in ramp: continue
+            v = -x * sa + y * ca            # quer zur Faser
+            u = x * ca + y * sa             # entlang der Faser
+            w = math.sin(v * 2 * math.pi / period + _h(int(u // 3), int(v), seed) * 2.2)
+            if w > 1 - strength and _h(x, y, seed + 7) > 0.25: c.g[y][x] = _step(ramp, col, -1)
+            elif w < -1 + strength * 0.6 and _h(x, y, seed + 9) > 0.45: c.g[y][x] = _step(ramp, col, +1)
+
+def speckle(c, ramp, density=0.18, seed=3, up=True):
+    """Sprenkel: kleine Tupfer (1–2 px) eine Stufe heller/dunkler."""
+    for y in range(T):
+        for x in range(T):
+            col = c.g[y][x]
+            if col in ramp and _h(x, y, seed) < density:
+                d = 1 if (up and _h(x, y, seed + 1) > 0.5) else -1
+                c.g[y][x] = _step(ramp, col, d)
+                if _h(x, y, seed + 2) > 0.6 and c.get(x + 1, y) == col: c.g[y][x + 1] = _step(ramp, col, d)
+
+def inner_line(c, ramp_a, ramp_b, col):
+    """Dunkle Innenlinie: Pixel aus A, die unten/rechts an B grenzen."""
+    src = [r[:] for r in c.g]
+    for y in range(T):
+        for x in range(T):
+            if src[y][x] in ramp_a and any(0 <= y + dy < T and 0 <= x + dx < T and src[y + dy][x + dx] in ramp_b for dx, dy in ((1, 0), (0, 1))):
+                c.g[y][x] = col
+
+def rim(c, ramp, col, side=(1, 1), every=1):
+    """Randlicht auf der Schattenseite: Pixel aus ramp, deren Nachbar in Richtung side transparent ist."""
+    src = [r[:] for r in c.g]
+    n = 0
+    for y in range(T):
+        for x in range(T):
+            if src[y][x] in ramp:
+                nx, ny = x + side[0], y + side[1]
+                if not (0 <= nx < T and 0 <= ny < T) or src[ny][nx] is None:
+                    n += 1
+                    if n % every == 0: c.g[y][x] = col

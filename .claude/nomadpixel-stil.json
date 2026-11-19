@@ -1,0 +1,24 @@
+{
+  "projekt": "NomadGirl",
+  "paletteName": "AAP-64",
+  "paletteDatei": "projects/nomadgirl/assets/palette/aap-64.hex",
+  "outline": "#060608 (fast schwarz), außen geschlossen",
+  "licht": "oben links",
+  "stil": "Cyberpunk-Wasteland, Essen soll lecker aussehen. Ca. 15–20 Farben pro 32-px-Icon, entsättigte Metalle (#333941–#dae0ea), Mutanten-Glow türkis (#23674e–#cdf7e2), Fleisch #5b3138–#e9b5a3, Füllgrad 30–45 %, Detaildichte 0,51–0,63 (refcheck).",
+  "groessen": {
+    "symbolRaster": "8 × 8 Felder à 32 × 32 px pro PNG (Asset-Art icons: cell, grid, names)",
+    "kacheln": "64 px",
+    "spiel": "1920 × 1080, pixelArt aus (Grafiken werden geglättet skaliert); Symbole im Inventar pixelscharf als CSS-Sprite"
+  },
+  "referenzen": [
+    "projects/nomadgirl/assets/items/icons_kitchen.png",
+    "projects/nomadgirl/assets/items/icons_gear.png",
+    "projects/nomadgirl/assets/items/icons_misc.png"
+  ],
+  "hinweise": [
+    "Regeln in CLAUDE.md › Assets und Fidelity sowie docs/features/art.md haben Vorrang.",
+    "Neue Symbole bevorzugt in freie Felder bestehender Raster oder als neues 8 × 8-Raster in assets/items/; Eintrag in data/assets.json (names!), Verweis per look + icon an den Gegenständen.",
+    "Herkunft als Zeile in docs/assets.md: KI (NomadPixel, Claude Code, Text-Pixel-Art, AAP-64, .pix-Quelle).",
+    "Danach node tools/ng.js check und npm test; Arbeitsdateien nach output/nomadpixel/ (ignoriert)."
+  ]
+}

@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **NomadPixel installiert**: Claude Code zeichnet Pixel-Art jetzt selbst (`/pixel`, Skill `.claude/skills/nomadpixel/`, Stilbibel AAP-64 mit den Küchen-/Ausrüstungs-Symbolen als Referenz, Prüfungen `palcheck`/`refcheck`); Wissen in `docs/features/art.md`.
 - 19.11.2026: **Übergabe (HNC)**: Stand nach der Entscheidungsrunde, #076, #092–#096 und dem Plan #078–#081; Tests 295, Browser 52 Dateien grün; PixelLab übrig 269,6; offen: Balancing v1 absegnen, #080 Dunkelheit, #084 PixelLab, #086 Story-Enden.
 - 19.11.2026: **Menüs mit Spalten**: Im Gespräch (Antworten nebeneinander) gehen jetzt ←/→ und ↑/↓ reihenweise, mit Tastatur und Controller.
 - 19.11.2026: **Balancing v1** (#081): Simulator `tools/balance_sim.mjs`, Bericht `docs/balancing.md` (Choke Point Bio, Überfluss Technik/Wissen, Startgeld 40.000 Δ, Tank, Mega-Rig-Grind), Datenset „Balancing v1“ (Heilmittel Tag 29 → 17, Startgeld 600 Δ).
