@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: Daniel: „#087–#091 Systeme bauen“, PixelLab später. #087–#091 als eigene Tickets, #087 Wettervorhersage läuft, dann der Reihe nach.
 - 19.11. Code → Ava: **HNC / Übergabe.** Stand `main` (alles gepusht, `npm test` 295/295, volle Browser-Suite 51/51 grün plus `tools/menu_nav_test.mjs`). Gebaut seit der letzten Übergabe:
   - **Entscheidungsrunde:** Daniel hat alle offenen Fragen über ein Artefakt mit Entscheidungskarten beantwortet. #026–#075 sind `abgenommen`, neue Tickets #076–#091. PixelLab geht wieder (Sitzung in Umgebung „NomadGirl“ statt „Default“).
   - **#076 Absegnung:** Gegenpaare, Start mit Bastler-Deck, Duelle kürzer (Integrität 35), Silo-Belohnung + Titel „Now I am become Death“, Worker an der Werkbank, Ausrüstung/Tank im Boni-Bus, Van aus dem Tileset, Läuferin mit Folge.
@@ -324,9 +325,35 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:**
 - **Ergebnis:**
 
-### #087–#091 Nächste Systeme aus dem Ideenspeicher
-- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte „Was als Nächstes“) · je eigenes Ticket, wenn es losgeht
-- #087 **Wettervorhersage im Warroom** · #088 **Gangs als Auftraggeber** · #089 **Revierkrieg** · #090 **Rig-Radio** · #091 **Werte-Bildschirm** (baut auf #076 Punkt 7)
+### #087 Wettervorhersage im Warroom
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Was als Nächstes“; 19.11.: „#087–#091 Systeme bauen“)
+- **Auftrag:** Navigator zeigt Regen, Sandsturm und Nebel der nächsten Etappen → Routenwahl (`docs/backlog.md` › Ideen).
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #088 Gangs als Auftraggeber
+- **Status:** offen · angelegt 19.11. von Code
+- **Auftrag:** Quests von Gangs (Bedingungs-Sprache + Revier-Camp), Lohn Ruf und Revier-Zugang.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #089 Revierkrieg
+- **Status:** offen · angelegt 19.11. von Code
+- **Auftrag:** Ruf bei einer Gang senkt den bei ihren Rivalen; Reviere verschieben sich auf der Reisekarte, Fehden werden zu Fronten.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #090 Rig-Radio
+- **Status:** offen · angelegt 19.11. von Code
+- **Auftrag:** Sender mit Musik aus Code, Durchsagen aus BigCityDelta, Lore-Häppchen, Hinweise auf POIs, vielleicht eine DJ-Entity.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #091 Werte-Bildschirm
+- **Status:** offen · angelegt 19.11. von Code
+- **Auftrag:** Ein Bildschirm mit allen Werten und ihren Quellen über den Boni-Bus (baut auf #076 Punkt 7).
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #062 Quests aus Straßen-Merkern
 - **Status:** abgenommen (19.11., #076) · fertig (18.11.) · angelegt 18.11. von Code (Daniels Auftrag im Code-Chat, Verzahnungs-Prüfung)
