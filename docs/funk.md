@@ -37,6 +37,14 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: **HNC / Übergabe.** Stand `main` (alles gepusht, `npm test` 295/295, volle Browser-Suite 51/51 grün plus `tools/menu_nav_test.mjs`). Gebaut seit der letzten Übergabe:
+  - **Entscheidungsrunde:** Daniel hat alle offenen Fragen über ein Artefakt mit Entscheidungskarten beantwortet. #026–#075 sind `abgenommen`, neue Tickets #076–#091. PixelLab geht wieder (Sitzung in Umgebung „NomadGirl“ statt „Default“).
+  - **#076 Absegnung:** Gegenpaare, Start mit Bastler-Deck, Duelle kürzer (Integrität 35), Silo-Belohnung + Titel „Now I am become Death“, Worker an der Werkbank, Ausrüstung/Tank im Boni-Bus, Van aus dem Tileset, Läuferin mit Folge.
+  - **#092–#096 (Daniels Runde):** Haarfarben im Inventar lernen, Van im POI zu, Kofferraum (sicher bei k.o.), Billboard-Foto mit Sucher, POIs aufgeräumt.
+  - **Plan #078 → #081 (Daniel AFK):** Werkstätten ausbauen ★ · Zelle/Gefangene + Kopfgeld + Dunkelheit · Hauptcontainer an Bord der Mega-Rigs · Crew-Kern klein (Leute, Bewerber, Jobs) · Bilder hochladen online · Licht (Strahlen, Schatten, Stromausfall) · Balancing v1 (Simulator, `docs/balancing.md`, Datenset „Balancing v1“).
+  - Fix: Dialog-Menü mit Antworten nebeneinander lässt sich mit ←/→ und ↑/↓ reihenweise steuern.
+  - **Offen für Daniel:** (1) Balancing v1 anspielen und absegnen (Heilmittel Tag 29 → 17, Startgeld 40.000 → 600 Δ). (2) ⚠️-Punkte in #077–#085, #092–#096. (3) #080 Dunkelheit-Skilltree mit Kopfgeldjäger-Fraktion: erst reden. (4) #084 PixelLab (Bit-Farm-Bild bis 4, Fahrgestell + Camp-Boden ~10–25, übrig 269,6, unter 700 Freigabe). (5) #086 Story-Enden (Design-Ticket). (6) Delta Heights mischt Ziegel und Beton je Raum. (7) Balancing v2: Tank-Druck, Mega-Rig-Preise.
+  - **Nächste Kandidaten:** #087–#091 (Wettervorhersage, Gangs als Auftraggeber, Revierkrieg, Rig-Radio, Werte-Bildschirm auf dem Boni-Bus), Rig-Moral (#040 Teil 2), Siedler mit Figur im Camp.
 - 19.11. Code → Ava: Volle Browser-Suite 51/51 grün (bitfarm_test griff nach dem neuen Ausbau-Knopf, Auswahl korrigiert), `npm test` 295/295.
 - 19.11. Code → Ava: Fix (Daniel im Chat): Dialog-Menü mit Antworten nebeneinander lässt sich jetzt mit ←/→ und reihenweise mit ↑/↓ steuern (`hud.menuCols` aus dem Layout).
 - 19.11. Code → Ava: **Plan abgearbeitet** (Daniel AFK): #078 Werkstätten ausbauen ★, #079 Zelle/Gefangene, #077 Hauptcontainer an Bord, #085 Crew-Kern klein, #083 Bilder hochladen, #082 Licht (Strahlen, Schatten, Stromausfall), #081 Balancing v1 (Datenset + Bericht). Offen für Daniel: v1 absegnen (`docs/balancing.md`), ⚠️-Punkte der Tickets, #080 Dunkelheit-Skilltree (erst reden), #084 PixelLab-Grafik (Bit-Farm, Fahrgestell), #086 Story-Enden, #087–#091 Ideen.
