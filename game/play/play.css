@@ -148,6 +148,7 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .hud-item { display: flex; gap: 12px; align-items: center; text-align: left; padding: 9px 12px; border-radius: 8px; border: 1px solid #3a2f45; background: #1f1729; color: #f2eef7; cursor: pointer; font: 15px var(--ui-font); }
 .hud-item kbd { background: #3a2f45; color: #f2eef7; }
 .hud-item b { display: block; font-weight: 600; }
+.hud-item .hud-lock { margin-left: auto; flex: none; color: #ffd27a; opacity: .8; }
 .hud-item small { display: block; margin-top: 2px; color: #b9a2c8; font-size: 12.5px; }
 .hud-item.primary b { color: #ffd27a; }
 .hud-item.focus { border-color: #3fe0d0; background: #231a30; }

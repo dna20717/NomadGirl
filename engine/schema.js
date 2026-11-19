@@ -1016,6 +1016,7 @@ export const AREAS = {
           text('accept', 'Nimmt', { hint: '#033: leer = nur Trophäen; sonst Arten mit Komma, z. B. „melee, ranged“ für Waffen an Display-Boards' })],
           { hint: 'Daniel, 11.11.2026: Platz an der Wand für Trophäen, jeder Ständer ist ein eigenes Inventar und zeigt jedes Ding in seiner echten Größe. x/y/Breite/Höhe = Fläche im Aussehen (Bildpixel); nur Dinge mit Tag „Trophäe“' })] },
       { title: 'Synergie', fields: [refs('synergy.partners', 'Passt zu', 'workshops', { hint: '#033 (Daniel: „wie bei Civilization oder Dorfromantik“): Werkstätten, die als direkte Nachbarn (links, rechts, darüber, darunter) den Bonus bringen' }),
+        refs('synergy.foes', 'Stört sich mit', 'workshops', { hint: '#076 Gegenpaare: direkte Nachbarn, die den Bonus senken (bis ins Minus: langsamer, weniger Strom, schwächerer Buff)' }),
         select('synergy.effect', 'Wirkung', [['', 'keine'], ['speed', 'Schneller (Herstellen, Kochen, Wachsen)'], ['power', 'Mehr Strom'], ['quality', 'Stärkerer Buff']]),
         num('synergy.max', 'Höchstens', { min: 0, hint: 'Bei allen angrenzenden Plätzen passend belegt: % (schneller, Buff) bzw. ⚡ (Strom). Sonst anteilig: passende Nachbarn / angrenzende Plätze' }),
         num('synergy.chain', 'Reihe: je weitere', { min: 0, hint: '#034 Reihenschaltung: so viel mehr für jede weitere gleiche Werkstatt direkt daneben in derselben Reihe (auch über die Containergrenze)' }),

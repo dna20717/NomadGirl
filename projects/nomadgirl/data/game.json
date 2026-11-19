@@ -25,7 +25,6 @@
    {"where": "storage", "item": "rohrbogen", "count": 1},
    {"where": "storage", "item": "schrottplatte", "count": 2},
    {"where": "storage", "item": "kronkorken", "count": 37},
-   {"where": "storage", "weapon": "bastlerdeck", "count": 1},
    {"where": "storage", "item": "stoffreste", "count": 4},
    {"where": "storage", "item": "schrott", "count": 6},
    {"where": "storage", "item": "reis", "count": 3},

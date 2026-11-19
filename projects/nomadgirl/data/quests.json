@@ -50,8 +50,8 @@
   "reward": {"deltas": 30, "items": [{"item": "wissen", "count": 1}]}
  },
  "silo_schatz": {
-  "name": "I become death …",
-  "reward": {"reveal": "silo_zero", "deltas": 150},
+  "name": "Now I am become Death",
+  "reward": {"reveal": "silo_zero", "deltas": 400, "items": [{"item": "silo_startschluessel", "count": 1}]},
   "giver": "onkel_sung",
   "whenHas": true,
   "flag": "silo_jagd",

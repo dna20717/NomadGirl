@@ -72,3 +72,20 @@ test('Reihenschaltung: gleiche Werkstätten nebeneinander, ganzer Container = di
   const across = rigWith(['container_10', [['hydrokultur', 0]]], ['container_10', [['hydrokultur', 0]]]);
   assert.equal(synergyAt(D, across, '1:0').chain, 2);
 });
+
+// #076 Gegenpaare (Daniel 19.11.2026): a noisy neighbour pulls the bonus down, into the minus; the link is drawn red
+import { synergyText } from '../game/synergy.js';
+test('Gegenpaare: Generator neben der Schlafkoje senkt den Buff, beide Seiten laut = Minus, rote Verbindung', () => {
+  const both = rigWith(['container_40', [['generator', 0], ['schlafkoje', 1], ['reaktor', 2]]]);
+  const x = synergyAt(D, both, '1:1');
+  assert.equal(x.bad, 2); assert.equal(x.score, -1);
+  assert.equal(x.bonus, -D.workshops.schlafkoje.synergy.max);
+  assert.match(synergyText(x), /stört 2\/2 · Buff −30 %/);
+  const mixed = rigWith(['container_40', [['generator', 0], ['schlafkoje', 1], ['chill_area', 2]]]);
+  assert.equal(synergyAt(D, mixed, '1:1').score, 0);   // one friend, one foe
+  assert.ok(links(D, both).some(l => l.foe), 'rote Linie');
+  assert.ok(links(D, mixed).some(l => !l.foe), 'die Freunde bleiben türkis');
+  const slow = rigWith(['container_40', [['zelle', 0], ['kochnische', 1], ['heavy_duty', 2]]]);
+  assert.ok(synergyAt(D, slow, '1:1').bonus < 0, 'Kochen wird langsamer');
+  assert.match(synergyText(synergyAt(D, slow, '1:1')), /langsamer/);
+});

@@ -205,7 +205,8 @@ export class Hud {
         el('div', { class: 'hud-notes' }, ...this.menuButtons), keyHints, closeX(() => this.closeMenu())));
     } else {
       this.menuButtons = items.map((it, i) => el('button', { class: 'hud-item' + (it.primary ? ' primary' : ''), disabled: !!it.disabled, onclick: () => this.choose(i), onmouseenter: () => this.focus(i) },
-        el('kbd', {}, String(i + 1)), it.icon && talk ? icon(it.icon, 16) : null, el('span', {}, el('b', {}, it.label), it.sub || it.disabled ? el('small', {}, [it.sub, it.disabled].filter(Boolean).join(' · ')) : null)));
+        el('kbd', {}, String(i + 1)), it.icon && talk ? icon(it.icon, 16) : null, el('span', {}, el('b', {}, it.label), it.sub || it.disabled ? el('small', {}, [it.sub, it.disabled].filter(Boolean).join(' · ')) : null),
+        typeof it.disabled === 'string' && it.disabled.startsWith('Braucht') ? icon('lock', 14, 'hud-lock') : null));   // #076: a closed door shows what opens it
       if (talk) {
         const line = el('p', { class: 'hud-line' });
         const face = talk.portrait ? el('div', { class: 'hud-face pic' }, el('img', { src: talk.portrait, alt: talk.name })) : el('div', { class: 'hud-face' }, el('span', {}, talk.initials || '?'));

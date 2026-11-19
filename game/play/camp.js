@@ -709,7 +709,7 @@ export class Camp {
   // ---------- synergies (#033): the bonus in the prompt, a glowing link between neighbours that like each other ----------
   synHint(place, verb) {
     const x = synergyAt(this.D, this.box.save, place);
-    return x && (x.near || x.chain > 1) ? () => `${verb} · ${synergyText(x)}` : verb;   // only with at least one partner next to it
+    return x && (x.near || x.bad || x.chain > 1) ? () => `${verb} · ${synergyText(x)}` : verb;   // only with at least one partner (or foe, #076) next to it
   }
   drawSynergies() {
     const s = this.scene, T = s.T, save = this.box.save, L = links(this.D, save);
@@ -717,16 +717,17 @@ export class Camp {
     const where = p => this.geo.mega ? this.megaBenchAt(p) : this.benches?.dockOf(`${p.ui}:${p.at}`);
     const g = s.add.graphics().setDepth(-13.5);
     this.rigObjs.push(g);
-    for (const { a, b } of L) {
+    for (const { a, b, foe } of L) {
+      const col = foe ? 0xff5c7a : 0x7ff6ff;   // #076 Gegenpaare: red
       const A = where(a), B = where(b);
       if (!A || !B) continue;
       const vert = Math.abs(A.x - B.x) < Math.abs(A.y - B.y), y = vert ? null : Math.min(A.y, B.y) - 0.6 * T;
       const pts = vert ? [A, B] : [{ x: A.x, y }, { x: B.x, y }];
       g.lineStyle(6, 0x0d0a12, 0.55).lineBetween(pts[0].x, pts[0].y, pts[1].x, pts[1].y);
-      g.lineStyle(2, 0x7ff6ff, 0.75).lineBetween(pts[0].x, pts[0].y, pts[1].x, pts[1].y);
-      for (const p of pts) g.fillStyle(0x7ff6ff, 0.9).fillCircle(p.x, p.y, 4);
+      g.lineStyle(2, col, 0.75).lineBetween(pts[0].x, pts[0].y, pts[1].x, pts[1].y);
+      for (const p of pts) g.fillStyle(col, 0.9).fillCircle(p.x, p.y, 4);
       const m = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
-      const glow = s.add.image(m.x, m.y, glowTexture(s)).setDisplaySize(70, 70).setTint(0x7ff6ff).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.35).setDepth(-13.4);
+      const glow = s.add.image(m.x, m.y, glowTexture(s)).setDisplaySize(70, 70).setTint(col).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.35).setDepth(-13.4);
       s.tweens.add({ targets: glow, alpha: 0.12, duration: 1100, yoyo: true, repeat: -1 });
       this.rigObjs.push(glow);
     }

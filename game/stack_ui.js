@@ -24,7 +24,7 @@ export async function startStack(root, switchTo) {
   // the demo's handle (tests): S with the duel and the board's state mirrored
   Object.defineProperties(S, { duel: { get: () => view.duel }, busy: { get: () => view.busy, set: v => { view.busy = v; } }, last: { get: () => view.last, set: v => { view.last = v; } } });
   window.duelDemo = { S, D, view, mode: 'stack', newGame: () => newGame(), place: c => view.playerPlace(c), state: () => view.duel };
-  const opts = () => ({ rules: S.rules, hp: S.rules === 'dot' ? (D.glitchlings?.duel?.stackHp ?? 50) : 25 });
+  const opts = () => ({ rules: S.rules, hp: S.rules === 'dot' ? (D.glitchlings?.duel?.stackHp ?? 35) : 25 });
 
   // Leyla's deck (three to pick from: her AI-Core for this duel) and the opponent: one wild Entity or one Kammerjäger
   function lineup() {

@@ -212,12 +212,12 @@
    "home": "KI-Terminal an der Startrampe von Silo Zero",
    "always": false,
    "description": "Die Lenk-KI der Rakete in Silo Zero. Sie hat den Countdown angehalten, als der Krieg vorbei war, und seitdem neunzig Jahre lang leise vor sich hin gesungen, damit sie nicht vergisst, wie man aufhört.",
-   "duelHp": 120,
+   "duelHp": 85,
    "duelNoise": 2
   }
  ],
  "bitWeights": [{"w": 40},{"w": 30},{"w": 18},{"w": 9},{"w": 3}],
- "duel": {"quality": [{"q": 5},{"q": 5},{"q": 4},{"q": 4},{"q": 3}], "defense": {"cheap": 5, "mid": 4, "premium": 4, "elite": 3}, "tough": 1, "team": 2, "stackHp": 50},
+ "duel": {"quality": [{"q": 5},{"q": 5},{"q": 4},{"q": 4},{"q": 3}], "defense": {"cheap": 5, "mid": 4, "premium": 4, "elite": 3}, "tough": 1, "team": 2, "stackHp": 35},
  "hunters": [
   {
    "id": "sanitizer",

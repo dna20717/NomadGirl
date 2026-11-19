@@ -730,7 +730,7 @@ export class BuildMode {
     if (t.type === 'home') return 'Zurück an seinen Platz';
     const there = wsAt(D, this.save.rig, t.slot.ui, t.slot.p);
     // #034 preview (Daniel: Dorfromantik): what this place would bring
-    const pv = synPreview(D, this.save, d.id, t.slot.ui, t.slot.p, d.from === 'rig' ? { ui: d.ui, at: d.at } : null), syn = pv && (pv.near || pv.chain > 1) ? ` · ${synergyText(pv)}` : pv?.avail ? ' · keine Synergie' : '';
+    const pv = synPreview(D, this.save, d.id, t.slot.ui, t.slot.p, d.from === 'rig' ? { ui: d.ui, at: d.at } : null), syn = pv && (pv.near || pv.bad || pv.chain > 1) ? ` · ${synergyText(pv)}` : pv?.avail ? ' · keine Synergie' : '';
     return (there ? `Tauschen mit ${wsDef(D, there.id).name || there.id}` : 'Einbauen') + syn;
   }
   sellOf(d) { return sellPrice(this.D, d.kind === 'ws' ? 'workshops' : d.kind === 'part' ? 'rigParts' : 'containers', d.id); }

@@ -59,7 +59,7 @@
   "ladderSlideIn": 3,
   "ladderSlideFps": 12
  },
- "loadout": {"melee": "karambit", "ranged": "nagelpistole", "backpack": "schulranzen", "wear": ["cyberarm_mk1", "suchscheinwerfer", "greifarm"]},
+ "loadout": {"melee": "karambit", "ranged": "nagelpistole", "backpack": "schulranzen", "wear": ["cyberarm_mk1", "suchscheinwerfer", "greifarm"], "cyberdeck": "bastlerdeck"},
  "look": {
   "idle": "leyla_idle_side",
   "reference": "leyla_sheet",

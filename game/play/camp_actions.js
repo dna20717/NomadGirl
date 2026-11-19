@@ -98,6 +98,7 @@ export class CampActions {
     const x = place && synergyAt(this.D, this.box.save, place), cz = cozyBonus(this.D, this.box.save);   // #036: Gemütlichkeit of the decoration on top
     const add = (x?.effect === 'quality' ? x.bonus : 0) + cz + (def.function === 'chill' || def.function === 'guests' ? mod(this.D, this.box.save, 'rest') : 0);   // #060 Gastgeber: rest buffs stronger
     if (def.buff && add > 0) { const Q = (this.box.save.buffQ ??= {}); Q[def.buff] = Math.max(Q[def.buff] || 0, Math.round(add)); }
+    else if (def.buff && add < 0) { const Q = (this.box.save.buffQ ??= {}); Q[def.buff] = Math.min(Q[def.buff] || 0, Math.round(add)); }   // #076 Gegenpaare: a noisy neighbour weakens it
   }
   // a workshop to spend time at (Werkstätten › Benutzen): Chill Area, Drohnenwerkstatt … time passes, heals, gives its buff;
   // AvA can fly over and dock on the bench while it happens

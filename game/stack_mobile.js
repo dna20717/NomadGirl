@@ -35,7 +35,7 @@ export async function startMobile(root) {
   function newGame() {
     const { me, foe } = lineup();
     if (!me || !foe) { root.replaceChildren(el('div', { class: 'mb-main' }, el('p', { class: 'mb-boot err' }, 'Keine Entities für den Bit-Stapel.'))); return; }
-    view.start(me, foe, { rules: 'dot', hp: D.glitchlings?.duel?.stackHp ?? 50 });
+    view.start(me, foe, { rules: 'dot', hp: D.glitchlings?.duel?.stackHp ?? 35 });
   }
   function draw() {
     if (!view.duel) return;

@@ -44,7 +44,7 @@ export class GlitchDuelUI {
     this.phase = 'duel';
     // #065 Cyberware im Duell: implants with „Duell-Integrität“ (eyes, nerves) give Leyla's side more Integrität (a friendly duel too)
     this.hack = save ? Math.round(gearStats(D, save.inv?.wear, implantBoosts(D, save)).hack || 0) : 0;
-    const base = D.glitchlings?.duel?.stackHp ?? 50;
+    const base = D.glitchlings?.duel?.stackHp ?? 35;
     this.view.start(me, this.foe, { rules: 'dot', hp: Math.max(10, base + this.hack), foeHp: this.foe.duelHp ?? base });   // the opponent keeps its own
   }
   close() {

@@ -49,7 +49,7 @@ test('Versteckt: nicht auf der Karte; die Straßenkette gibt Kartenstück 4, auc
   assert.ok(!save.map.revealed?.includes('silo_zero') && !save.map.nodes.some(n => n.id === 'silo_zero'));
 });
 
-test('Schatzsuche „I become death …“: Onkel bietet sie erst mit einem Stück an, Händler erst danach, fünf Stücke decken Silo Zero auf', () => {
+test('Schatzsuche „Now I am become Death“: Onkel bietet sie erst mit einem Stück an, Händler erst danach, fünf Stücke decken Silo Zero auf', () => {
   const save = newSave(D), Q = D.quests.silo_schatz;
   assert.equal(Q.giver, 'onkel_sung'); assert.equal(Q.pieces.length, 5);
   assert.ok(!offers(D, save).includes('silo_schatz'));
@@ -88,7 +88,7 @@ test('Fundstücke: Stück 1 im Tresor von Bunker 13, Stück 3 im Ministerium', (
 
 test('Titan Lullaby: einzigartig, mehr Integrität, fast fehlerfrei', () => {
   const g = uniqueEntity(D, 'Titan Lullaby');
-  assert.ok(g.unique && g.duelHp === 120 && g.duelNoise <= 0.05);
-  const duel = newStack({ name: 'AvA Core', bits: 2 }, g, rng(4), 'player', { hp: 50, foeHp: g.duelHp });
-  assert.equal(duel.sides.player.hp, 50); assert.equal(duel.sides.enemy.hp, 120);
+  assert.ok(g.unique && g.duelHp === 85 && g.duelNoise <= 0.05);
+  const duel = newStack({ name: 'AvA Core', bits: 2 }, g, rng(4), 'player', { hp: D.glitchlings.duel.stackHp, foeHp: g.duelHp });
+  assert.equal(duel.sides.player.hp, 35); assert.equal(duel.sides.enemy.hp, 85);
 });

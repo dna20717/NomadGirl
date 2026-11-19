@@ -2334,5 +2334,17 @@
   "icon": 61,
   "tags": ["quest"],
   "description": "Ein Lederlappen mit einem eingebrannten Raketen-Emblem und Zahlen: der Code für das äußere Tor."
+ },
+ "silo_startschluessel": {
+  "name": "Startschlüssel von Silo Zero",
+  "category": "valuable",
+  "size": [1, 2],
+  "stack": 1,
+  "value": 0,
+  "glyph": "🔑",
+  "description": "Zwei Schlüssel, zwei Offiziere, ein Knopf. Den zweiten hat Onkel Sung aus der Karte gefaltet. Ein Unikat: Davon gibt es auf der ganzen Welt nur einen.",
+  "tags": ["trophy"],
+  "look": "icons_trophies",
+  "icon": 3
  }
 }

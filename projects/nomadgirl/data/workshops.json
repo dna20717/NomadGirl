@@ -21,7 +21,7 @@
    {"kind": "screen", "x": 210, "y": 167, "w": 18, "h": 10, "color": "#3fe0d0", "size": 0, "rate": 1, "when": "always"}
   ],
   "outside": "out_sleep",
-  "synergy": {"partners": ["chill_area", "gaestekoje"], "effect": "quality", "max": 30}
+  "synergy": {"partners": ["chill_area", "gaestekoje"], "effect": "quality", "max": 30, "foes": ["generator", "reaktor", "motorraum", "heavy_duty", "werkbank"]}
  },
  "kochnische": {
   "name": "Kochnische",
@@ -44,7 +44,7 @@
    {"kind": "smoke", "x": 124, "y": 26, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
   ],
   "outside": "out_kitchen",
-  "synergy": {"partners": ["kuehlraum", "zisterne", "hydrokultur", "kueche"], "effect": "speed", "max": 30}
+  "synergy": {"partners": ["kuehlraum", "zisterne", "hydrokultur", "kueche"], "effect": "speed", "max": 30, "foes": ["zelle", "heavy_duty"]}
  },
  "werkbank": {
   "name": "Werkbank",
@@ -159,7 +159,7 @@
   ],
   "rest": {"verb": "Fernsehen und abhängen", "hours": 1, "heal": 20, "banner": "Flimmern, Sofa, Lavalampe"},
   "outside": "out_graffiti",
-  "synergy": {"partners": ["schlafkoje", "kochnische", "kueche", "hydrokultur"], "effect": "quality", "max": 25}
+  "synergy": {"partners": ["schlafkoje", "kochnische", "kueche", "hydrokultur"], "effect": "quality", "max": 25, "foes": ["generator", "heavy_duty", "zelle"]}
  },
  "drohnenwerkstatt": {
   "name": "Drohnenwerkstatt",
@@ -232,7 +232,7 @@
    {"kind": "smoke", "x": 124, "y": 26, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
   ],
   "outside": "out_kitchen",
-  "synergy": {"partners": ["kuehlraum", "zisterne", "hydrokultur", "kochnische"], "effect": "speed", "max": 30}
+  "synergy": {"partners": ["kuehlraum", "zisterne", "hydrokultur", "kochnische"], "effect": "speed", "max": 30, "foes": ["zelle", "heavy_duty"]}
  },
  "foodtruck": {
   "name": "Foodtruck",
@@ -255,7 +255,7 @@
    {"kind": "smoke", "x": 124, "y": 26, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
   ],
   "outside": "out_kitchen",
-  "synergy": {"partners": ["kuehlraum", "kueche", "kochnische"], "effect": "speed", "max": 30}
+  "synergy": {"partners": ["kuehlraum", "kueche", "kochnische"], "effect": "speed", "max": 30, "foes": ["zelle"]}
  },
  "motorraum": {"name": "Motorraum", "function": "engine", "stage": "1", "places": 1, "power": 0, "value": 300, "outside": "out_ac", "look": "ws_engine_room"},
  "zelle": {
@@ -399,7 +399,7 @@
    {"kind": "screen", "x": 219, "y": 116, "w": 13, "h": 7, "color": "#56e07a", "size": 0, "rate": 2, "when": "always"}
   ],
   "outside": "out_garden",
-  "synergy": {"partners": ["zisterne", "generator", "reaktor", "kuehlraum"], "effect": "speed", "max": 50, "chain": 15, "full": 60}
+  "synergy": {"partners": ["zisterne", "generator", "reaktor", "kuehlraum"], "effect": "speed", "max": 50, "chain": 15, "full": 60, "foes": ["heavy_duty"]}
  },
  "ripperdoc": {
   "name": "Ripperdoc-Liege",
@@ -421,7 +421,7 @@
    {"kind": "smoke", "x": 120, "y": 98, "w": 10, "h": 4, "color": "#c2b9cc", "size": 6, "rate": 2, "when": "use", "idle": 0}
   ],
   "outside": "out_ripper",
-  "synergy": {"partners": ["cryotank", "kuehlraum", "generator", "reaktor"], "effect": "speed", "max": 30}
+  "synergy": {"partners": ["cryotank", "kuehlraum", "generator", "reaktor"], "effect": "speed", "max": 30, "foes": ["heavy_duty", "hydrokultur"]}
  },
  "zisterne": {
   "name": "Zisterne",
