@@ -20,4 +20,8 @@ test('Jeder Cheat wirkt auf den Spielstand', () => {
   assert.equal(save.deltas, d0 + 1000 + 50000);   // +1.000 and +50.000 (Daniel: „viele Deltas zum Testen“)
   assert.equal((stock(D, save).technik || 0) - t0, 10);
   assert.equal(save.map.revealed.length, save.map.nodes.length);
+  // Daniel: „alle Deko freischalten“ — every decor piece in the Lager, a second time adds nothing
+  const owned = new Set([...save.rig.decor.map(o => o.id), ...save.rig.spare.decor]);
+  assert.ok(Object.keys(D.decor).every(id => owned.has(id)));
+  const n = save.rig.spare.decor.length; runCheat(D, save, 'decor'); assert.equal(save.rig.spare.decor.length, n);
 });

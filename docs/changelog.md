@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Cheat „Alle Deko freischalten“** (Daniel): Pause-Menü › Cheats legt jedes fehlende Deko-Stück gratis ins Lager.
 - 19.11.2026: **Parallax-Sets, Silhouetten, AvA scannt Billboards** (#115): Welt › Parallax-Sets mit gemalten PixelLab-Ebenen je Region (Wüste, BigCityDelta, Industrie, Canyon, Salzpfanne) im Camp, in POIs draußen, auf der Fahrt und auf der Startseite; schwarze Vordergrund-Silhouetten auf der Fahrt und in POIs draußen; Billboards scannt jetzt AvA am Gummiband (ziehen oder R/X halten, Ring füllt sich, Perfekt/Gut/Knapp). Dazu: Windrad schwebt nicht mehr über einem gekürzten Container (Deko dahinter geht ins Lager).
 - 19.11.2026: **Cheats repariert** (Daniel: „Geht nicht“): `?cheats=1` wird beim Start gemerkt; im Spiel „deltas“ tippen schaltet frei und gibt +50.000 Δ; neuer Cheat +50.000 Δ.
 - 19.11.2026: **Farbe, Innenräume, Wand-Module, Treppen** (#114): Pinsel im Bau-Modus (P) färbt Container (Warnstreifen und Rost bleiben) und Stoffe wie bei Townscaper; Innenkram an Decke und Rückwand hinter den Werkbänken; Fenster und Türen in der Containerwand, in seiner Farbe, nachts beleuchtet; Leitern und Klapptreppen frei an Containern, kletterbar bis aufs Dach. PixelLab 20.

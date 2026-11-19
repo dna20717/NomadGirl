@@ -4,6 +4,7 @@
 import { give } from './crafting.js';
 import { advance } from './save.js';
 import { ensureMap } from './worldmap.js';
+import { dstate } from './decor.js';
 
 const KEY = 'nomadgirl-cheats';
 export function cheatsOn(search = globalThis.location?.search || '') {
@@ -22,6 +23,12 @@ export const CHEATS = [
     const got = [];
     for (const r of Object.values(D.resources || {})) if (r.item && D.items?.[r.item]) { give(D, save, r.item, 10); got.push(r.name); }
     return `+10 ${got.join(', ')}`;
+  } },
+  // Daniel 19.11.2026: „alle Deko freischalten“ — every decor piece not owned yet (placed or in the Lager) goes into the Lager for free
+  { id: 'decor', label: 'Alle Deko freischalten', sub: 'Jedes Deko-Stück gratis ins Lager (Bau-Modus › Deko)', act: (D, save) => {
+    const R = dstate(save), have = new Set([...R.decor.map(o => o.id), ...R.spare.decor]), add = Object.keys(D.decor || {}).filter(id => !have.has(id));
+    R.spare.decor.push(...add);
+    return add.length ? `${add.length} Deko-Stücke im Lager` : 'Alle Deko schon da';
   } },
   { id: 'heal', label: 'Leben voll', sub: 'Leyla geheilt', act: (D, save) => { save.health = 9999; return 'Leben voll'; } },
   { id: 'tank', label: 'Tank 100 %', sub: 'AvAs Cryo-Tank frisch gewartet', act: (D, save) => { if (save.tank) { save.tank.cond = 100; save.tank.dead = false; } return 'Tank 100 %'; } },

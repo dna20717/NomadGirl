@@ -16,6 +16,7 @@ Cryo-Tank, k.o. neu, Techtree, Durchgang / Traum, Zerlegen und voller Tresor.
 ## Cheat-Menü (#097)
 
 - **Fix 19.11.2026** (Daniel: „Geht nicht“): Das Hauptmenü startet das Spiel als `/game?camp`, `?cheats=1` war bis zum Pause-Menü weg. Jetzt liest `main.js` den Parameter gleich beim Start (`cheatsOn()`), und **„deltas“ tippen** irgendwo im Spiel schaltet die Cheats frei und gibt sofort **+50.000 Δ** (`watchCheatWord` in `cheats.js`). Neuer Cheat **+50.000 Δ** im Menü.
+- **Alle Deko freischalten** (Cheat, Daniel 19.11.2026): legt jedes Deko-Stück, das noch nicht steht oder im Lager liegt, gratis ins Lager (`save.rig.spare.decor`); im Bau-Modus › Deko gleich hinstellen.
 Daniel, 19.11.2026: „600, aber ein Cheat-Menü nur für mich“. Freigeschaltet **pro Gerät**: das Spiel einmal mit `?cheats=1` öffnen (`?cheats=0` sperrt wieder), dann steht im Pause-Menü **Cheats** (+1.000 Δ, +10 jeder Ressource, Leben voll, Tank 100 %, Sprit und Vorräte, alle Orte aufdecken, Uhr +6 h). Nichts über die Person liegt im öffentlichen Repo, das Gerät merkt es sich (`localStorage nomadgirl-cheats`). Code `game/cheats.js`, Menü `hud.cheatMenu`. Test `test/cheats.test.js`.
 
 ## Skilltrees (#110)
