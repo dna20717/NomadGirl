@@ -251,6 +251,8 @@ export const AREAS = {
         num('spawn.door.openRange', 'Öffnet ab', { unit: 'px', min: 0, hint: 'Abstand Leyla – Ankerpunkt (Höhe zählt 1,5-fach)' }),
         num('spawn.door.closeRange', 'Schließt ab', { unit: 'px', min: 0, hint: 'Etwas größer als „Öffnet ab“, sonst flattert die Tür' }),
         num('spawn.door.fps', 'Tempo', { unit: 'fps', min: 1, hint: 'Leer = fps des Assets' })] },
+      { title: 'Spawn-Punkt · Kofferraum im POI', fields: [bool('spawn.trunk.enabled', 'Kofferraum im POI', { hint: '#094 (Daniel 19.11.2026): am Heck des Vans Beute sicher verstauen, auch bei k.o.; zurück im Camp kommt sie in den Rucksack (Rest ins Camp-Lager, was dann noch fehlt, bleibt im Kofferraum)' }),
+        num('spawn.trunk.x', 'Hecktür bei', { unit: 'Bildpixel x', hint: 'x im Bild des Aussehens, dort zeigt E „Kofferraum“' }), size('spawn.trunk.size', 'Größe', { unit: 'Felder' })] },
       { title: 'Spawn-Punkt · Dach', fields: [bool('spawn.roof.enabled', 'Begehbar', { hint: 'Plattform wie „=“: von unten durchspringbar, S + Leertaste fällt durch' }),
         range('spawn.roof.x', 'Von – bis', { unit: 'Bildpixel', hint: 'x im Bild des Aussehens (Frame 1, ohne Spiegeln)' }),
         num('spawn.roof.y', 'Höhe', { unit: 'Bildpixel', hint: 'y im Bild, auf dieser Zeile stehen Leylas Füße' }),

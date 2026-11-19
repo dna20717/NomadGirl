@@ -6,6 +6,7 @@ import { update as tankUpdate, phase as tankPhase } from '../tank.js';
 import { poiReady } from '../../engine/poi.js';
 import { Enemy } from './enemies.js';
 import { Van } from './van.js';
+import { unloadTrunk } from '../save.js';
 import { Camp } from './camp.js';
 import { advance, arrive, clockText } from '../save.js';
 import { snapshot as runSnapshot, compare as runCompare } from '../summary.js';
@@ -67,6 +68,7 @@ export class SceneRuns {
     const save = this.box.save, C = this.data_.camp || {}, base = this.data_.leyla?.health ?? 100;
     advance(save, C.clock?.runHours ?? 3);
     if (ko) { save.health = Math.round(base * (C.heal?.afterKo ?? 30) / 100); save.inv.grids.backpack.items = []; }   // AvA only brings Leyla: the backpack stays behind
+    const trunk = unloadTrunk(this.data_, save);   // #094 the trunk's loot is home safe (also after a knock-out), like the backpack's
     let paid = this.level?.payout(this.deltas) ?? this.deltas;
     const rank = !ko && this.level?.done;
     paid = Math.round(paid * (1 + mod(this.data_, save, 'sell') / 100));   // #066 Boni-Bus (Rang-S-Abzeichen & Co., #012)   // Rang-S-Abzeichen & Co. (#012)
@@ -93,7 +95,7 @@ export class SceneRuns {
     } catch (e) { console.warn('Bilanz', e); }
     save.run = null;
     this.hud.inv?.close();
-    const banner = ko ? ['AvA hat dich heimgebracht', `${clockText(save)} · Der Rucksack ist weg.`, 'drama']
+    const banner = ko ? ['AvA hat dich heimgebracht', `${clockText(save)} · Der Rucksack ist weg.${trunk.moved ? ' Der Kofferraum ist sicher.' : ''}`, 'drama']
       : rank ? [`Zurück im Camp · Rang ${rank.grade}`, `${clockText(save)} · +${paid} Δ (${this.deltas} + ${rank.bonus} %) · ${this.kills} Kills`, 'good']
       : ['Zurück im Camp', `${clockText(save)} · +${paid} Δ · ${this.kills} Kills`, 'good'];
     this.goCamp({ banner: summary && this.data_.game?.summary !== false ? null : banner, fade: ko ? 900 : 600, arriving: true, summary: this.data_.game?.summary !== false ? summary : null });

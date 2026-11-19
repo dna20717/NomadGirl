@@ -216,18 +216,18 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Haarfarben im Inventar lernen (#092)“. `npm test` 280/280, `tools/mirror_test.mjs` 11/11. PixelLab 0. **Bitte testen:** Färbemittel im Inventar → „Farbe lernen“, dann am Spiegel tragen.
 
 ### #093 Van im POI bleibt zu
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Van im POI soll nicht aufgehen.“)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Van im POI soll nicht aufgehen.“)
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Commit „Van im POI bleibt zu, Kofferraum am Heck (#093, #094)“. Im Run ist die Tür aus. `tools/trunk_test.mjs` 4/4. PixelLab 0. **Bitte testen:** POI starten, am Van vorbei: die Tür bleibt zu.
 
 ### #094 Kofferraum am Van im POI
-- **Status:** offen · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat)
 - **Auftrag (Daniel, 19.11.2026):** „Van braucht Kofferraum-Segment für Beute aus POI (Beute dort wird behandelt wie Leylas Rucksack, sobald sie wieder im Camp sind).“ Rückfrage k.o.: **sicher** (bleibt erhalten).
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) gleicher Commit. ⚠️ vorläufig: 6 × 4 Felder (Spiel › Spawn-Punkt › Kofferraum im POI), Hecktür bei Bildpixel x 18; zurück im Camp in den Rucksack, Rest ins Camp-Lager, was dann noch fehlt, bleibt im Kofferraum. `npm test` grün, `tools/trunk_test.mjs` 4/4. **Bitte testen:** im POI etwas zum Heck tragen, E, einlagern, sich k.o. schlagen lassen: im Camp liegt es im Rucksack.
 
 ### #095 Billboard-Minispiel mit Geschick
-- **Status:** offen · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Billboard-Minigame darf gerne mehr Geschick-Komponente bekommen.“)
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Billboard-Minigame darf gerne mehr Geschick-Komponente bekommen.“)
 - **Rückfragen:**
 - **Ergebnis:**
 

@@ -138,6 +138,20 @@ export function fitContainers(D, save) {
 // the cyberdeck is an inventory for Entities (#049, Daniel 17.11.2026: „Man muss sie nicht im Inventar transportieren, wenn man ein
 // Cyberdeck hat (was im Grunde zunächst mal ein eigenes Inventar für Glitchlinge ist)“): one place = 2 × 2 (an Entity), side by side
 export const DECK = 'deck';
+export const TRUNK = 'trunk';   // #094 the van's trunk in a POI
+// #094 back in the camp the trunk's loot is treated like the backpack's: into the backpack, the rest into the Camp-Lager, what still
+// does not fit waits in the trunk → { moved, left }
+export function unloadTrunk(D, save) {
+  const g = save?.inv?.grids?.[TRUNK];
+  let moved = 0;
+  if (!g?.items?.length) return { moved, left: 0 };
+  for (const e of [...g.items]) {
+    let n = e.n;
+    for (const k of ['backpack', CAMP]) { const t = save.inv.grids[k]; if (t && n > 0) { const was = n; n = addEntry(D, t, e, n); moved += was - n; } }
+    if (n <= 0) g.items.splice(g.items.indexOf(e), 1); else e.n = n;
+  }
+  return { moved, left: g.items.reduce((s, e) => s + e.n, 0) };
+}
 export function deckSize(D, id) { const n = D.weapons?.[id]?.kind === 'cyberdeck' ? D.weapons[id].glitchSlots || 0 : 0; return n > 0 ? [2 * n, 2] : null; }
 // the deck grid for the deck Leyla holds (none without one); → what no longer fits
 export function fitDeck(D, inv) {
@@ -228,6 +242,7 @@ function withInventory(D, save) {
   homeless.push(...ensureGrid(D, inv, 'backpack', backpackSize(D, inv)));
   for (const c of conts) homeless.push(...ensureGrid(D, inv, c.key, c.size, c.cap));
   homeless.push(...ensureGrid(D, inv, 'drone', D.drone?.rescue?.size || [3, 2]));   // AvA's rescue pocket: survives a knock-out
+  if (D.game?.spawn?.trunk?.enabled !== false) homeless.push(...ensureGrid(D, inv, TRUNK, D.game?.spawn?.trunk?.size || [6, 4]));   // #094 the van's trunk in a POI: survives a knock-out too
   homeless.push(...fitDeck(D, inv));   // the cyberdeck's Entities (#049)
   if (loose.length) { const camp = inv.grids[CAMP]; for (const e of loose) { const left = camp ? addEntry(D, camp, e, e.n) : e.n; if (left > 0) homeless.push({ ...e, n: left }); } }
   // rectangles only (14.11.2026): what overlaps now moves to a free spot, else into the Camp-Lager / a bundle by the van

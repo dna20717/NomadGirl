@@ -176,6 +176,10 @@ export class SceneEvents {
   }
   clock() { const s = Math.floor(this.elapsed / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
 
+  openTrunk() {
+    const g = this.box?.save?.inv?.grids?.trunk;
+    if (g) this.hud.inv.open({ key: 'trunk', title: 'Kofferraum', grid: g, kind: 'container', x: this.leyla.x });
+  }
   // in a run: E at the van's door goes back to the camp
   runUpdate(input) {
     const l = this.leyla, v = this.van;
@@ -192,6 +196,15 @@ export class SceneEvents {
         if (here && RT.enabled !== false && !seen.has(here.id) && this.elapsed > 400) { seen.add(here.id); this.hud.roomTitle?.(name, RT.ms ?? 2600); }
         else if (here) seen.add(here.id);
       }
+    }
+    // #094 the trunk at the van's rear: loot put there is safe (also from a knock-out)
+    const TK = v?.S?.trunk, tx = TK?.enabled !== false && TK?.x != null && this.box?.save?.inv?.grids?.trunk ? v.toWorld(TK.x, 0).x : null;
+    const nearTrunk = !near && tx != null && l.alive && l.body.blocked.down && Math.abs(l.x - tx) < 90 && Math.abs(l.feet - v.y) < 40;
+    if (nearTrunk) {
+      const open = this.hud.inv?.isOpen && this.hud.inv.other?.key === 'trunk', text = open ? 'Kofferraum schließen' : 'Kofferraum · Beute sicher verstauen';
+      if (text !== this.vanPrompt || this.vanKey !== 'E') { this.vanPrompt = text; this.vanKey = 'E'; this.hud.prompt(text, 'E'); }
+      if (input.grab.pressed) { if (open) this.hud.inv.close(); else this.openTrunk(); }
+      return;
     }
     const thing = !near && l.alive ? this.level?.nearest() : null;
     const pile = !near && !thing && this.loot?.nearest();
