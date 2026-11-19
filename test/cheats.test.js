@@ -17,7 +17,7 @@ test('Freischalten pro Gerät: ?cheats=1 an, ?cheats=0 aus, sonst gemerkt', () =
 test('Jeder Cheat wirkt auf den Spielstand', () => {
   const save = newSave(D), d0 = save.deltas, t0 = stock(D, save).technik || 0;
   for (const c of CHEATS) assert.ok(runCheat(D, save, c.id));
-  assert.equal(save.deltas, d0 + 1000);
+  assert.equal(save.deltas, d0 + 1000 + 50000);   // +1.000 and +50.000 (Daniel: „viele Deltas zum Testen“)
   assert.equal((stock(D, save).technik || 0) - t0, 10);
   assert.equal(save.map.revealed.length, save.map.nodes.length);
 });
