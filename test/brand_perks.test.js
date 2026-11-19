@@ -43,3 +43,12 @@ test('Markentreue: drei Teile derselben Marke geben ihren Set-Bonus', () => {
   save.inv.wear[slots[2]] = V.find(id => D.items[id].wear === slots[2]);
   assert.equal(brandSets(D, save).stats.defense, D.brands.vulkan.set.value);
 });
+
+// #095 the photo: centred = 1.5 × the discount, near = 1 ×, at the edge = ½, outside = nothing; the discount is kept with the buff
+import { shotGrade } from '../game/brand_perks.js';
+test('Billboard-Foto: der Sucher entscheidet den Nachlass', () => {
+  assert.deepEqual([0, 0.3, 0.8, 1.4].map(o => shotGrade(D, o).grade), ['perfect', 'good', 'edge', 'miss']);
+  const save = newSave(D), r = becomeInfluencer(D, save, 'vulkan', shotGrade(D, 0).factor);
+  assert.equal(r.discount, 30); assert.equal(influencer(D, save).discount, 30);
+  assert.equal(brandDiscount(D, save, 'vulkan'), 0.7);
+});

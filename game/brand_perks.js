@@ -7,21 +7,32 @@ import { clockHours } from './tank.js';
 
 export function influencerConfig(D) {
   const I = D?.travel?.drive?.influencer || {};
-  return { discount: Math.max(0, Math.min(90, I.discount ?? 20)), hours: Math.max(1, I.hours ?? 24) };
+  return { discount: Math.max(0, Math.min(90, I.discount ?? 20)), hours: Math.max(1, I.hours ?? 24),
+    perfect: I.perfect ?? 150, edge: I.edge ?? 50, frame: Math.max(0.3, (I.frame ?? 100) / 100) };
+}
+// #095 (Daniel 19.11.2026: „Billboard-Minigame darf gerne mehr Geschick-Komponente bekommen“): a snapshot through the viewfinder.
+// off = how far the billboard's middle is from the viewfinder's middle, in half viewfinder widths (0 = dead centre, 1 = at its edge)
+// → { grade: 'perfect' | 'good' | 'edge' | 'miss', name, factor (of the discount) }
+export function shotGrade(D, off) {
+  const C = influencerConfig(D), a = Math.abs(off);
+  if (a <= 0.18) return { grade: 'perfect', name: 'Perfektes Foto', factor: C.perfect / 100 };
+  if (a <= 0.5) return { grade: 'good', name: 'Gutes Foto', factor: 1 };
+  if (a <= 1) return { grade: 'edge', name: 'Knapp im Bild', factor: C.edge / 100 };
+  return { grade: 'miss', name: 'Verwackelt', factor: 0 };
 }
 // the running Influencer buff → { brand, name, until, left (h), discount } or null
 export function influencer(D, save) {
   const I = save?.influencer;
   if (!I?.brand || !D?.brands?.[I.brand]) return null;
   const left = I.until - clockHours(save);
-  return left > 0 ? { brand: I.brand, name: D.brands[I.brand].name, until: I.until, left, discount: influencerConfig(D).discount } : null;
+  return left > 0 ? { brand: I.brand, name: D.brands[I.brand].name, until: I.until, left, discount: I.discount ?? influencerConfig(D).discount } : null;
 }
 // a billboard was tapped → the buff (replaces another brand's) → { brand, name, hours, renewed }
-export function becomeInfluencer(D, save, brand) {
+export function becomeInfluencer(D, save, brand, factor = 1) {
   if (!D?.brands?.[brand]) return null;
-  const C = influencerConfig(D), had = influencer(D, save);
-  save.influencer = { brand, until: clockHours(save) + C.hours };
-  return { brand, name: D.brands[brand].name, hours: C.hours, discount: C.discount, renewed: had?.brand === brand };
+  const C = influencerConfig(D), had = influencer(D, save), discount = Math.max(0, Math.min(90, Math.round(C.discount * factor)));
+  save.influencer = { brand, until: clockHours(save) + C.hours, discount };   // #095 the photo decides how much
+  return { brand, name: D.brands[brand].name, hours: C.hours, discount, renewed: had?.brand === brand };
 }
 // price factor for something of this brand (1 = full price, 0.8 = 20 % off)
 export const brandDiscount = (D, save, brand) => { const I = brand && influencer(D, save); return I && I.brand === brand ? 1 - I.discount / 100 : 1; };

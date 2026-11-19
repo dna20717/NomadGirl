@@ -199,7 +199,7 @@ export class SceneEvents {
     }
     // #094 the trunk at the van's rear: loot put there is safe (also from a knock-out)
     const TK = v?.S?.trunk, tx = TK?.enabled !== false && TK?.x != null && this.box?.save?.inv?.grids?.trunk ? v.toWorld(TK.x, 0).x : null;
-    const nearTrunk = !near && tx != null && l.alive && l.body.blocked.down && Math.abs(l.x - tx) < 90 && Math.abs(l.feet - v.y) < 40;
+    const nearTrunk = !near && tx != null && !this.level?.nearest()?.act && l.alive && l.body.blocked.down && Math.abs(l.x - tx) < 80 && Math.abs(l.feet - v.y) < 40;
     if (nearTrunk) {
       const open = this.hud.inv?.isOpen && this.hud.inv.other?.key === 'trunk', text = open ? 'Kofferraum schließen' : 'Kofferraum · Beute sicher verstauen';
       if (text !== this.vanPrompt || this.vanKey !== 'E') { this.vanPrompt = text; this.vanKey = 'E'; this.hud.prompt(text, 'E'); }

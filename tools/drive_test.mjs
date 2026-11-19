@@ -102,8 +102,11 @@ check('Riesen-Billboards mit Werbung der Marken stehen in der Landschaft', v.scr
 const at = await ev(() => { const d = SC().hud.drive, c = d.canvas, r = c.getBoundingClientRect(), u = c.width / 480, sc = d.visibleAd() || d.road.screens[0];
   return { x: r.left + (sc.x + sc.w / 2) * u * r.width / c.width, y: r.top + (sc.y + sc.h / 2) * u * r.height / c.height, brand: sc.brand.id }; });
 await page.mouse.click(at.x, at.y);
-v = await ev(async () => { const B = await import('/game/brand_perks.js'), s = SC(); return { inf: B.influencer(s.data_, nomad.save()), fast: s.hud.drive.keys.has('ptr') }; });
-check('Billboard angetippt: Buff „Influencer“ für die Marke, 20 % Nachlass für 24 h, kein Vorspulen', v.inf?.brand === at.brand && v.inf.discount === 20 && Math.round(v.inf.left) === 24 && !v.fast, { v, at });
+v = await ev(async () => { const B = await import('/game/brand_perks.js'), s = SC(); return { inf: B.influencer(s.data_, nomad.save()), fast: s.hud.drive.keys.has('ptr'), shot: s.hud.drive.shots?.size || 0 }; });
+// #095 the photo decides: centred = more, at the edge = less, outside the viewfinder = nothing (one try per billboard)
+check('Billboard angetippt: genau ein Foto, kein Vorspulen; im Sucher gibt es den Influencer-Buff (24 h), daneben nichts', v.shot === 1 && !v.fast && (v.inf ? v.inf.brand === at.brand && Math.round(v.inf.left) === 24 && [10, 20, 30].includes(v.inf.discount) : true), { v, at });
+v = await ev(async () => { const B = await import('/game/brand_perks.js'), D = SC().data_; return [0, 0.3, 0.8, 1.4].map(o => [B.shotGrade(D, o).grade, Math.round(20 * B.shotGrade(D, o).factor)]); });
+check('Sucher: Mitte perfekt (30 %), nah gut (20 %), Rand knapp (10 %), daneben verwackelt (0)', JSON.stringify(v) === JSON.stringify([['perfect', 30], ['good', 20], ['edge', 10], ['miss', 0]]), v);
 await until(() => SC().hud.modal, null, 40000);
 v = await ev(() => ({ title: document.querySelector('.hud-menu h2')?.textContent || '', items: [...document.querySelectorAll('.hud-menu .hud-item b')].map(b => b.textContent) }));
 check('Freund der Gang: Freie Fahrt statt Wegzoll, keine Kampf-Antworten', /Freie Fahrt|Bekannte Gesichter/.test(v.title) && !v.items.some(t => /Durchbrechen|kämpfen|Gas geben/.test(t)), v);

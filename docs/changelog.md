@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Daniels Runde #092–#096**: Haarfarben im Inventar lernen; Van im POI bleibt zu; Kofferraum am Van im POI (sicher bei k.o., kommt im Camp in den Rucksack); Billboard-Foto mit Sucher (Perfekt/Gut/Knapp/Verwackelt); POIs aufgeräumt (Silhouetten schweben nicht mehr, Clutter mit Luft).
 - 19.11.2026: **Absegnung #026–#075** (#076, Daniel über Entscheidungskarten): Gegenpaare bei Werkstatt-Nachbarn (Bonus bis ins Minus, rote Linie), neues Spiel mit Bastler-Deck, kürzere Duelle (Integrität 35), Silo-Belohnung 400 Δ + Startschlüssel, Quest „Now I am become Death“, Worker direkt an der Werkbank, Ausrüstung und Tank im Boni-Bus, Van aus dem Tileset (Nischen je Werkstatt-Platz), Verrat an der Läuferin mit Folge (zweite Chance), Schloss an gesperrten Antworten.
 - 19.11.2026: **Entscheidungsrunde**: alle offenen Fragen als Entscheidungskarten (Artefakt), Daniels Wahl im Funkbuch (#076–#091); PixelLab wieder verbunden (Sitzung in Umgebung „NomadGirl“).
 - 19.11.2026: **Übergabe (HNC)**: Stand nach #057–#075 im Funkbuch; Tests 273, Browser 48 Dateien; PixelLab übrig ~270; offene Fragen: Bit-Farm-Bild, Quest-Titel, Folge für den Verrat an der Läuferin.

@@ -10,7 +10,7 @@ import { icon } from '../icons.js';
 import { hints } from './ui_nav.js';
 import { makeRoad, driveConfig, landscapeOf, legWeather, skyAt, BW, BH, WHEEL_Y } from '../road.js';
 import { mapBrands } from '../brands.js';
-import { becomeInfluencer } from '../brand_perks.js';
+import { becomeInfluencer, shotGrade, influencerConfig } from '../brand_perks.js';
 import { mapConfig } from '../worldmap.js';
 import { rainingAt } from '../rain.js';
 import { kitLook } from './enemy_kit.js';
@@ -63,6 +63,7 @@ export class DriveUI {
   leg(info, cb) {
     const D = this.D, C = this.C, w = legWeather(D, this.trip.seed, info.i, info.region1 || info.region0, info.h0);
     this.legInfo = { ...info, T: C.seconds, time: 0, cb, weather: w, stopT: info.stop ? C.seconds * C.stopAt : null, said: false, stopped: false };
+    this.shots = new Set();   // #095 one photo per billboard and leg
     this.st.land = [landscapeOf(D, info.region0), landscapeOf(D, info.region1 || info.region0), 0];
     this.phase = 'drive';
     if (this.host.scene()?.script && !this.host.scene()?.showDrive) this.legInfo.time = this.legInfo.T;   // remote control: no waiting
@@ -258,15 +259,32 @@ export class DriveUI {
     const sc = this.road.hit(px, py, c.width);
     return sc ? this.influence(sc) : false;
   }
+  shotAt(sc) { return !!sc && !!this.shots?.has(sc.ci); }
+  // #095 the viewfinder: in the middle of the picture, as wide as a billboard (Reisen › Fahrt › Influencer: Sucher-Breite)
+  finder(sc) { const half = (sc?.w || 60) * influencerConfig(this.D).frame / 2; return { x: BW / 2, half }; }
+  // one photo per billboard: how centred it sits in the viewfinder decides the discount (perfect / good / edge / shaky = nothing)
   influence(sc) {
     const s = this.host.scene(), save = s?.box?.save, D = this.D, id = sc?.brand?.id;
-    if (!save || !id) return false;
-    const r = becomeInfluencer(D, save, id);
+    if (!save || !id || this.shotAt(sc)) return false;
+    const F = this.finder(sc), g = shotGrade(D, (sc.x + sc.w / 2 - F.x) / F.half);
+    (this.shots ??= new Set()).add(sc.ci);   // the screens are new objects every frame: remember the column
+    this.ping = { sc, t: 0, miss: g.grade === 'miss' };
+    if (g.grade === 'miss') { s.hud.toast('Verwackelt', `${sc.brand.name || 'Das Billboard'} war nicht im Sucher. Das nächste kommt bestimmt.`, 'info', 2600); return true; }
+    const r = becomeInfluencer(D, save, id, g.factor);
     if (!r) return false;
-    this.ping = { sc, t: 0 };
-    s.hud.toast(`Influencer: ${r.name}`, `${r.renewed ? 'Verlängert' : 'Geteilt, geliked'}: ${r.discount} % Nachlass auf ${r.name} für ${r.hours} h`, 'good', 4200);
+    s.hud.toast(`${g.name} · Influencer: ${r.name}`, `${r.renewed ? 'Verlängert' : 'Geteilt, geliked'}: ${r.discount} % Nachlass auf ${r.name} für ${r.hours} h`, 'good', 4200);
     s.box.persist?.();
     return true;
+  }
+  drawFinder(ctx, W, H) {
+    const sc = this.phase === 'drive' && this.visibleAd();
+    if (!sc || this.shotAt(sc)) return;
+    const u = W / BW, F = this.finder(sc), off = Math.abs(sc.x + sc.w / 2 - F.x) / F.half, hot = off <= 0.18 ? '#7dffb0' : off <= 0.5 ? '#ffe8a0' : off <= 1 ? '#ffb070' : 'rgba(255,255,255,0.55)';
+    const x0 = (F.x - F.half) * u, x1 = (F.x + F.half) * u, y0 = (sc.y - 6) * u, y1 = (sc.y + sc.h + 6) * u, L = Math.min(14 * u, (x1 - x0) / 4);
+    ctx.save(); ctx.strokeStyle = hot; ctx.lineWidth = Math.max(2, 2 * u);
+    for (const [x, dx] of [[x0, 1], [x1, -1]]) for (const [y, dy] of [[y0, 1], [y1, -1]]) { ctx.beginPath(); ctx.moveTo(x + dx * L, y); ctx.lineTo(x, y); ctx.lineTo(x, y + dy * L); ctx.stroke(); }
+    const cx = F.x * u, cy = (y0 + y1) / 2; ctx.beginPath(); ctx.moveTo(cx - 5 * u, cy); ctx.lineTo(cx + 5 * u, cy); ctx.moveTo(cx, cy - 5 * u); ctx.lineTo(cx, cy + 5 * u); ctx.stroke();
+    ctx.restore();
   }
   // ---------- drawing ----------
   draw() {
@@ -287,12 +305,13 @@ export class DriveUI {
       ctx.drawImage(this.bg, 0, 172, BW, BH - 172, 0, 172 * u, W, (BH - 172) * u);
     } else ctx.drawImage(this.bg, 0, 0, W, H);
     this.road.ads(ctx, W, H, st);   // #055 giant screens of the brands
+    this.drawFinder(ctx, W, H);   // #095 the viewfinder
     if (this.ping) {   // #064 the tapped screen flashes and a ring goes out
       const p = this.ping, u = W / BW, sc = p.sc, k = Math.min(1, p.t / 0.9);
       p.t += 1 / 60;
-      ctx.save(); ctx.strokeStyle = `rgba(255,232,160,${1 - k})`; ctx.lineWidth = Math.max(2, 3 * u);
+      ctx.save(); ctx.strokeStyle = p.miss ? `rgba(255,110,130,${1 - k})` : `rgba(255,232,160,${1 - k})`; ctx.lineWidth = Math.max(2, 3 * u);
       const pad = 8 * u * (1 + k * 2); ctx.strokeRect(sc.x * u - pad, sc.y * u - pad, sc.w * u + 2 * pad, sc.h * u + 2 * pad);
-      ctx.fillStyle = `rgba(255,255,255,${0.35 * (1 - k)})`; ctx.fillRect(sc.x * u, sc.y * u, sc.w * u, sc.h * u); ctx.restore();
+      if (!p.miss) { ctx.fillStyle = `rgba(255,255,255,${0.35 * (1 - k)})`; ctx.fillRect(sc.x * u, sc.y * u, sc.w * u, sc.h * u); } ctx.restore();
       if (k >= 1) this.ping = null;
     }
     this.drawCast(ctx, W, S);
@@ -320,7 +339,7 @@ export class DriveUI {
       this.say && this.say.until > this.st.t ? el('div', { class: 'dv-say' }, icon('warning', 18), this.say.text) : null,
       el('div', { class: 'dv-bottom' },
         el('div', { class: 'dv-track' }, el('div', { class: 'dv-fill', style: `width:${total}%` }), ...dots, el('span', { class: 'dv-van', style: `left:${total}%` }, icon('vehicle', 16))),
-        this.phase === 'stop' ? null : hints([['ok', 'vorspulen (halten)'], ['back', 'überspringen'], ...(this.visibleAd() ? [['context', 'Billboard: Influencer']] : [])])));
+        this.phase === 'stop' ? null : hints([['ok', 'vorspulen (halten)'], ['back', 'überspringen'], ...(this.visibleAd() && !this.shotAt(this.visibleAd()) ? [['context', 'Foto: Billboard in die Mitte']] : [])])));
   }
   image(file) {
     if (!file) return null;

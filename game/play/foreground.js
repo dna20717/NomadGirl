@@ -15,6 +15,9 @@ export function placeForeground(scene) {
   // floor spots: indoor air (fog kind 1) on solid ground ('#': floors and ledges, no platforms);
   // every floor gets its own row of silhouettes (a room over a tunnel has both)
   const ground = (x, y) => R.tiles[y]?.[x] === '#';
+  // #096 (Daniel 19.11.2026: „Vordergrund-Grafiken hängen in der Luft“): a silhouette slides (p − 1) × its distance to the screen
+  // centre sideways, at most (p − 1) × half a screen; it keeps that far from the ends of its floor, so it never hangs over a gap
+  const margin = Math.ceil(Math.max(0, p - 1) * halfW / T + 0.5);
   const out = [];
   for (let y = 1; y < h - 2; y++) {
     let x = 0;
@@ -22,7 +25,8 @@ export function placeForeground(scene) {
       const at = x0 => f.kind[y * w + x0] === 1 && ground(x0, y + 1);
       if (!at(x)) { x++; continue; }
       let x1 = x; while (x1 < w && at(x1)) x1++;   // one floor stretch [x, x1)
-      for (let c = x + Math.floor(rnd() * Math.min(e0, x1 - x)); c < x1 && x1 - x >= 3; c += e0 + Math.floor(rnd() * (e1 - e0 + 1))) {   // short floors get one too
+      const a = x + margin, b = x1 - margin;   // the part of the floor where it stays on the floor while in view
+      for (let c = a + Math.floor(rnd() * Math.min(e0, Math.max(1, b - a))); c < b; c += e0 + Math.floor(rnd() * (e1 - e0 + 1))) {
         const X = (c + 0.5) * T, Y = (y + 1) * T + T * 0.12, H = (h0 + rnd() * (h1 - h0)) * T, kind = ['rubble', 'rubble', 'crates', 'pipe', 'barrels', 'rebar'][Math.floor(rnd() * 6)];
         const g = s.add.graphics().setDepth(15.8).setScrollFactor(p, 1).setAlpha(alpha);
         g.fillStyle(color, 1);

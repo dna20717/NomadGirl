@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: #092–#096 fertig: Haarfarben lernen, Van im POI zu, Kofferraum (sicher), Billboard-Foto mit Sucher, POIs aufgeräumt. Weiter mit #078.
 - 19.11. Code → Ava: Neue Aufträge von Daniel: #092 Haarfarben lernen (läuft), #093 Van im POI zu, #094 Kofferraum im POI, #095 Billboard mit Geschick, #096 POIs aufräumen. Danach weiter mit #078.
 - 19.11. Code → Ava: #076 **Absegnung** fertig (9 Punkte, `npm test` 280/280, Browser 48/48 nach Silo-Test-Fix). #078 Werkstätten ausbauen ist als Nächstes dran.
 - 19.11. Code → Ava: Reihenfolge (Daniel): #076 → #078 → #079 → #077 → #085 → #083 → #082 → #081. #076 läuft. PixelLab wieder da (Sitzung in Umgebung „NomadGirl“ gewechselt), übrig 269,6.
@@ -227,14 +228,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) gleicher Commit. ⚠️ vorläufig: 6 × 4 Felder (Spiel › Spawn-Punkt › Kofferraum im POI), Hecktür bei Bildpixel x 18; zurück im Camp in den Rucksack, Rest ins Camp-Lager, was dann noch fehlt, bleibt im Kofferraum. `npm test` grün, `tools/trunk_test.mjs` 4/4. **Bitte testen:** im POI etwas zum Heck tragen, E, einlagern, sich k.o. schlagen lassen: im Camp liegt es im Rucksack.
 
 ### #095 Billboard-Minispiel mit Geschick
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Billboard-Minigame darf gerne mehr Geschick-Komponente bekommen.“)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Billboard-Minigame darf gerne mehr Geschick-Komponente bekommen.“)
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Commit „Billboard-Foto mit Sucher, POIs aufgeräumt (#095, #096)“. ⚠️ vorläufig: Sucher in der Bildmitte, Perfekt 30 % / Gut 20 % / Knapp 10 % / Verwackelt 0, ein Foto je Billboard und Etappe. `npm test` 281/281, `tools/drive_test.mjs` 19/19. **Bitte testen:** auf der Fahrt warten, bis das Billboard im Sucher mittig ist, dann tippen.
 
 ### #096 POIs aufräumen: Vordergrund, Innenräume
-- **Status:** offen · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Vordergrund-Grafiken in POIs hängen in der Luft. Manche POIs wirken chaotisch in der Ausgestaltung ihrer Innenräume. Hier kannst du etwas aufräumen.“)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Vordergrund-Grafiken in POIs hängen in der Luft. Manche POIs wirken chaotisch in der Ausgestaltung ihrer Innenräume. Hier kannst du etwas aufräumen.“)
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) gleicher Commit. Silhouetten halten Abstand von den Bodenkanten (schweben nicht mehr), Clutter mit einer Kachel Luft (Großmarkt-Parkdeck vorher voller ineinander stehender Kühlschränke). Rundgang mit Bildern durch 6 POIs. ⚠️ offen: Delta Heights mischt Ziegel und Beton je Raum. Tests: poi 31/31, poi_stack, poi_levels, light, camp, silo grün. Kofferraum-Punkt hinten am Aufbau (x 70), weil die Abkürzungstür hinter dem Van lag. **Bitte testen:** Großmarkt und Bunker 13 ansehen.
 
 ### #076 Absegnung 19.11.: Änderungen aus #026–#075
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel hat alle ⚠️ aus #026–#075 über die Entscheidungskarten entschieden, Tickets `abgenommen`)

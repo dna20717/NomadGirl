@@ -48,3 +48,11 @@ Daniel, 18.11.2026 (aus der Verzahnungs-Prüfung): „Der POI wird dann zu einem
 - **Frieden brechen:** jeder Treffer auf einen von ihnen (`Enemy.hit` → `turf.attacked`) oder der Tresor: Ruf −**Frieden brechen kostet** (Standard 15), alle greifen an („Verrat!“); Kills kosten danach wie immer Ruf. Fällt der Ruf unter die Friedens-Stufe (z. B. durch Klauen), ist der Frieden auch vorbei.
 - **Freunde** (Ruf ≥ Freund): E neben einem von ihnen = **Reden**: **Handeln** (bis zu 4 Dinge aus der Beutetabelle des POIs, Preis Wert × 1,5 × Ruf-Preis, einmal gewürfelt je Run) und **Auftrag: Revier säubern** (alle Mutanten und Viecher im Level; Lohn 40 + 20 × Gefahr Δ und Ruf +**Auftrag: Ruf**, Standard 10). Geduldete bekommen nur ein Nicken.
 - Test: `tools/turf_test.mjs` (7 Prüfungen).
+
+## Aufgeräumt (#096)
+
+Daniel, 19.11.2026: „Vordergrund-Grafiken in POIs hängen in der Luft. Manche POIs wirken chaotisch in der Ausgestaltung ihrer Innenräume.“
+
+- **Vordergrund-Silhouetten** (`foreground.js`): eine Silhouette gleitet mit Parallaxe p um (p − 1) × Abstand zur Bildmitte seitwärts, höchstens (p − 1) × halber Bildschirm (bei 118 % gut 2½ Kacheln). Sie hält jetzt so viel Abstand von den Enden ihres Bodens; kurze Böden bekommen keine mehr. So schwebt keine über einer Kante oder einem Abgrund.
+- **Clutter mit Luft** (`art.js`): nach jedem Ding auf dem Boden bleibt eine Kachel frei, nach Marken-Clutter (Kühlschränke, Regale) und großem Clutter auch. Vorher standen Kühlschränke und Regale ineinander (Großmarkt › Parkdeck).
+- Rundgang mit Bildern aller POIs: Licht, Räume und Kachel-Sets passen sonst. ⚠️ offen: Delta Heights mischt Ziegel und Beton von Raum zu Raum (Kachel-Set je Raum, Daten), das wirkt unruhig; bei Bedarf ein Set für alle Hochhaus-Räume.
