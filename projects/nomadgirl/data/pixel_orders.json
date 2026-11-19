@@ -1,1 +1,12 @@
-{}
+{
+ "neu": {
+  "name": "Fennek",
+  "type": "animation",
+  "status": "open",
+  "size": [64, 64],
+  "brief": "Ein laufender Fennek, der im Hintergrund niedlich umher huschen kann ",
+  "frames": 8,
+  "view": "Seitlich",
+  "references": ["leyla_idle"]
+ }
+}
