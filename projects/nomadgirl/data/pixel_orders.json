@@ -9,7 +9,7 @@
   "view": "Seitlich",
   "references": ["leyla_idle"],
   "results": ["fennek_run"],
-  "answer": "Ein Fennek im Galopp, 8 Bilder, seitlich nach rechts (für links wird er gespiegelt). Riesige Ohren, die beim Laufen wippen, buschiger Schwanz mit dunkler Spitze. Er reicht Leyla bis zum Knie. Im Spiel huscht er noch nirgends herum, das wäre der nächste Schritt.",
+  "answer": "Überarbeitet (v2): spitzere, größere Fennek-Ohren, die beim Laufen mitschwingen (beim Absprung nach hinten, beim Landen hoch, das hintere Ohr hängt etwas nach). Mehr Details: Fellstruktur, die mit dem Körper mitläuft, Strähnen im Schwanz, Haarbüschel im Ohr, dunkle Pfoten, Schnurrhaare. Im Spiel huscht er noch nirgends herum.",
   "date": "19.11.2026"
  }
 }

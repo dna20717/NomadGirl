@@ -5762,7 +5762,7 @@
   "loop": true,
   "origin": [32, 61],
   "height": 64,
-  "description": "Ein Wüstenfuchs huscht seitlich nach rechts (Galopp, 8 Frames): Kleinvieh für den Hintergrund. Gegenrichtung per Spiegeln.",
+  "description": "Ein Wüstenfuchs huscht seitlich nach rechts (Galopp, 8 Frames): Kleinvieh für den Hintergrund. Die Ohren schwingen beim Laufen mit (beim Absprung nach hinten, beim Landen hoch). v2 mit mehr Fell-Details. Gegenrichtung per Spiegeln.",
   "source": "NomadPixel (Claude Code, Text-Pixel-Art, Palette AAP-64, .pix-Quelle run_source.pix)",
   "date": "19.11.2026"
  }

@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Fennek v2** (Daniel: „Detaillevel etwas erhöhen und die Ohren beim Laufen animieren“): spitzere Ohren, die beim Galopp mitschwingen, Fellstruktur ohne Flimmern, Schwanzsträhnen, Ohrbüschel, Pfoten, Schnurrhaare. Detailwert 0,34 → 0,46.
 - 19.11.2026: **Erster Pixel-Auftrag aus der Werkstatt erledigt**: Fennek im Galopp (`fennek_run`, 8 Frames à 64 px, NomadPixel). Noch nicht im Spiel eingesetzt.
 - 19.11.2026: **Erstes NomadPixel-Symbol**: Der Gefangene (#079) hat jetzt ein Bild im Inventar statt nur „⛓ Name“, selbst gezeichnet mit `/pixel` (64 px, AAP-64). Neues Raster `icons_misc2` mit 15 freien Feldern für weitere.
 - 19.11.2026: **Speichern ohne Verlust**: Konflikte mit Änderungen anderer an anderen Einträgen werden automatisch zusammengeführt; vor „Neu laden“ werden ungespeicherte Änderungen gesichert und danach angeboten; Pixel-Aufträge nie im Datenset. Test in `npm run web:test`.
