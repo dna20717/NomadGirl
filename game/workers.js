@@ -41,6 +41,15 @@ export function placesFor(D, save, g) {
     .map(b => { const own = !!t && [t.function, t.also].includes(b.def.function); return { ...b, own, effect: effectOf(C, t || g.talent, g.bits, own) }; })
     .sort((a, b) => Number(b.own) - Number(a.own));
 }
+// #076 (Daniel 19.11.2026: „Worker auch an der Werkbank einteilen“): who can work at this one bench → [{ g, own, effect, here, busy }]
+export function candidatesAt(D, save, ui, at) {
+  const b = rigBenches(D, save).find(x => x.ui === ui && x.at === at);
+  if (!b) return [];
+  return farmEntities(D, save).map(({ g }) => { const p = placesFor(D, save, g).find(x => x.ui === ui && x.at === at); return p ? { g, own: p.own, effect: p.effect, here: b.w.worker === g.id, busy: workplaceOf(D, save, g.id) } : null; })
+    .filter(Boolean).sort((a, b) => Number(b.here) - Number(a.here) || Number(b.own) - Number(a.own));
+}
+// the Entity at this bench (or null)
+export const workerAt = (D, save, ui, at) => { const id = rigBenches(D, save).find(x => x.ui === ui && x.at === at)?.w.worker; return id ? findG(D, save, id)?.g || null : null; };
 export const workplaceOf = (D, save, id) => rigBenches(D, save).find(b => b.w.worker === id) || null;
 export function assign(D, save, id, ui, at) {
   for (const b of rigBenches(D, save)) if (b.w.worker === id) delete b.w.worker;

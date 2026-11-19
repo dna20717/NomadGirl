@@ -462,6 +462,7 @@ export class PlayScene extends Phaser.Scene {
       leftover: (id, n, a = 'items', x = {}) => hud.scene.loot?.throwDown({ a, id, n, r: 0, ...x }),
       react: mood => hud.scene.drone?.react(mood),
       closed: () => hud.scene.craftClosed(),
+      workerItem: (id, place, back) => hud.scene.camp?.benchWorkerItem?.(id, place, back),   // #076
     });
     hud.craft.el.hidden = true;
     // the tech tree in the warroom (game/play/techtree_ui.js)

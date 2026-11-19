@@ -18,7 +18,7 @@ import { offers } from '../quests.js';
 import { legSky, cisternWater } from '../weather_fx.js';
 import { level as cisternLevelOf } from '../cistern.js';
 import { mod, modFactor, parts as modParts, modText } from '../mods.js';
-import { placesFor, workplaceOf, assign, unassign, flawOf, syncWorkers, farmEntities, befriend, bondOf, BOND_MAX, WORKING_STATS } from '../workers.js';
+import { placesFor, workplaceOf, assign, unassign, flawOf, syncWorkers, farmEntities, befriend, bondOf, BOND_MAX, WORKING_STATS, candidatesAt, workerAt } from '../workers.js';
 import { occupancy } from '../inventory.js';
 import { de, VERB, SOON, costLine } from './camp.js';
 
@@ -32,8 +32,8 @@ export class CampActions {
     if (def.function === 'sleep') return this.sleep(def, place);
     if (def.function === 'warroom') return this.warroom();
     if (def.function === 'jobs') return this.boardMenu();   // #033 the Auftragsbüro: the notice board as a room in the rig
-    if (def.function === 'vehicle') { s.hud.inv?.close(); return s.hud.craft?.open(id); }   // #033 Heavy-Duty: vehicle recipes (skill trees later)
-    if (['kitchen', 'craft', 'cyber', 'tank', 'foodtruck', 'power'].includes(def.function)) { s.hud.inv?.close(); return s.hud.craft?.open(id); }   // #013: foodtruck counter, regulator
+    if (def.function === 'vehicle') { s.hud.inv?.close(); if (s.hud.craft) s.hud.craft.place = place; return s.hud.craft?.open(id); }   // #033 Heavy-Duty: vehicle recipes (skill trees later)
+    if (['kitchen', 'craft', 'cyber', 'tank', 'foodtruck', 'power'].includes(def.function)) { s.hud.inv?.close(); if (s.hud.craft) s.hud.craft.place = place; return s.hud.craft?.open(id); }   // #076 place: the Worker button   // #013: foodtruck counter, regulator
     if (def.function === 'drone') {   // AvA's board (#013) or her rest (Werkstätten › Benutzen)
       s.hud.inv?.close();
       if (!def.rest?.verb) return s.hud.craft?.open(id);
@@ -79,7 +79,7 @@ export class CampActions {
           s.hud.toast(r.ok ? 'Gegossen' : 'Geht nicht', r.ok ? `Die Pflanzen wachsen ${de(r.hours)} h weiter` : r.why, r.ok ? 'good' : 'warn', 2800);
           if (r.ok) s.drone?.react('happy');
           this.benches?.list.forEach(b => { if (b.plants) b.plantSig = null; });
-        } } : null; })(), { label: 'Zurück', act: () => {} }].filter(Boolean) });
+        } } : null; })(), this.benchWorkerItem(id, place, () => this.garden(id, def, place)), { label: 'Zurück', act: () => {} }].filter(Boolean) });   // #076 Worker
   }
   // the cistern (game/cistern.js): how full it is, E fills bottles into the camp inventories
   cistern(id, def, place) {
@@ -121,7 +121,29 @@ export class CampActions {
         if (dock && s.drone) { s.drone.dock = { ...dock, until: s.time.now + 3200 }; s.drone.react('cleared'); s.time.delayedCall(3000, done); }
         else s.time.delayedCall(1400, done);
       } }, ...(def.function === 'chill' && farmEntities(this.D, save).length ? [{ label: 'Freundliches Duell', sub: 'mit einer Entity aus der Bit-Farm · Bindung', icon: 'heart', act: () => this.friendlyDuel() }] : []),
+      ...[this.benchWorkerItem(id, place, () => this.restMenu(id, def, place, who))].filter(Boolean),   // #076
       { label: 'Zurück', act: () => {} }] });
+  }
+  // ---------- #076 Worker right at the bench: one entry in the bench's own menu or window ----------
+  // → a menu item (or null without a Bit-Farm resident who could work here)
+  benchWorkerItem(id, place, back = null) {
+    const [ui, at] = String(place || '').split(':').map(Number);
+    if (!place || this.box.save.rig?.units?.[ui]?.workshops?.find(w => w.at === at)?.id !== id || !candidatesAt(this.D, this.box.save, ui, at).length) return null;
+    const g = workerAt(this.D, this.box.save, ui, at);
+    return { label: g ? `Worker: ${g.name}` : 'Worker einteilen', sub: g ? 'tauschen oder abziehen' : 'eine Entity aus der Bit-Farm arbeitet hier', icon: 'brain', act: () => this.benchWorkerMenu(id, place, back) };
+  }
+  benchWorkerMenu(id, place, back = null) {
+    const s = this.scene, D = this.D, save = this.box.save, [ui, at] = String(place).split(':').map(Number), def = D.workshops?.[id] || {};
+    const list = candidatesAt(D, save, ui, at), cur = workerAt(D, save, ui, at), done = () => { syncWorkers(D, save); this.box.persist?.(); this.drawRig?.(); back?.(); };
+    const items = list.map(c => {
+      const soon = c.effect.stat && !WORKING_STATS.includes(c.effect.stat) ? ' (wirkt bald)' : '';
+      return { label: `${c.g.name}${c.own ? ' · eigene Werkbank' : ''}`, sub: [c.effect.text || 'kein Effekt', soon.trim() || null, c.busy && !c.here ? `arbeitet gerade: ${c.busy.def.name || c.busy.w.id}` : null].filter(Boolean).join(' · '),
+        icon: c.here ? 'check' : 'brain', primary: c.own && !cur, disabled: c.here ? 'arbeitet schon hier' : null,
+        act: () => { assign(D, save, c.g.id, ui, at); s.hud.toast(`${c.g.name} arbeitet jetzt: ${def.name || id}`, [c.effect.text, cur ? `${cur.name} ist zurück in der Farm` : null].filter(Boolean).join(' · '), 'good', 3600); done(); } };
+    });
+    if (cur) items.unshift({ label: `${cur.name} abziehen`, sub: 'zurück in die Farm', icon: 'x', act: () => { unassign(D, save, cur.id); s.hud.toast(`${cur.name} hat frei`, '', 'info', 2400); done(); } });
+    items.push({ label: 'Zurück', icon: 'x', act: () => back?.() });
+    s.hud.menu({ title: `${def.name || id} · Worker`, sub: 'Entities aus der Bit-Farm. An ihrer eigenen Werkbank wirken sie voll, an fremden schwächer.', items });
   }
   // ---------- #060 Bit-Farm: Entities as workers, friendly duels in the Chill-Ecke ----------
   workerMenu(g) {

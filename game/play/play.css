@@ -352,6 +352,8 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .craft-box > header h2 { margin: 0; font: 40px/1 VT323, monospace; font-weight: normal; }
 .craft-box > header small { margin-left: auto; color: #ffd27a; font: 22px/1 VT323, monospace; }
 .craft-x { width: 32px; height: 32px; border: 0; border-radius: 6px; background: #2a2233; color: #f2eef7; font: 20px/1 var(--ui-font); cursor: pointer; }
+.craft-worker { display: inline-flex; gap: 6px; align-items: center; height: 32px; padding: 0 10px; border: 1px solid #4a3a5c; border-radius: 6px; background: #1f1729; color: #b8f3ff; font: 14px var(--ui-font); cursor: pointer; }
+.craft-worker:hover, .craft-worker:focus-visible { border-color: #7ff6ff; }
 .craft-cols { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; min-height: 0; }
 .craft-cols .inv-panel { min-height: 0; display: flex; flex-direction: column; }
 .craft-list { display: flex; flex-direction: column; gap: 8px; overflow: auto; max-height: 52vh; padding-right: 4px; }
