@@ -41,7 +41,7 @@ import { bonuses as treeBonuses } from '../game/techtree.js';
 import { brandSets } from '../game/brand_perks.js';
 function oldGear(s) {   // the sum scene.applyGear built before #076
   const g = { ...gearStats(D, s.inv?.wear, implantBoosts(D, s)) };
-  const b = treeBonuses(D, s); for (const k of ['health', 'damage']) if (b[k]) g[k] = (g[k] || 0) + b[k];
+  const b = treeBonuses(D, s); for (const k of GEAR_KEYS) if (b[k] && k !== 'tankDecay' && k !== 'droneBattery') g[k] = (g[k] || 0) + b[k];   // #110 every Leyla value from the tree
   const t = trophyBonuses(D, s); for (const k of GEAR_KEYS) if (t[k] && k !== 'tankDecay' && k !== 'droneBattery') g[k] = (g[k] || 0) + t[k];
   const m = brandSets(D, s).stats; for (const k of GEAR_KEYS) if (m[k]) g[k] = (g[k] || 0) + m[k];
   return g;
