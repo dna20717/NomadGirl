@@ -842,3 +842,12 @@ Sozialsystem „Die Karawane“ (eigene Ausbaustufen, siehe dort), Hacking, Auto
 - [ ] Was ist das „vielleicht noch Gefährlichere“ in den Wastelands?
 - [x] Gibt es eine übergeordnete Story oder ein Endziel? Ja: die Suche nach dem Heilmittel für AvA (12.11.2026, siehe „Progression, Techtree & die Suche“).
 - [ ] Techtree: erster Ast und Knoten-Kosten stehen (Tank-Ast, Platzhalter-Werte, 12.11.2026), Heilmittel = letzter Knoten mit Abspann (12.11.2026); offen: Wie verfällt der Tank genau, welche Ersatzteile? Was ist „Dunkelheit“ im Spiel (Licht-System?)
+
+## Dunkelheit und die Kopfgeldjäger (#080, Fragerunde Daniel 19.11.2026)
+
+- **Wo:** ein eigener Tab „Dunkelheit“ im Techtree des Warrooms, bezahlt mit Dunkelheit (aus Gefangenen, dunklen Geschäften). Der erste Punkt zeigt eine deutliche Warnung mit Bestätigen.
+- **Dunkle Skills**, drei Äste: **Kampf-Rausch** (Leben aus Kills, Raserei, Exekution gefesselter Gegner), **Angst** (Gegner fliehen und ergeben sich öfter, Schutzgeld, Frieden durch Furcht), **Glitch-Hunger** (Daniel: „wenn der Duell-Sieg zu eindeutig ist, wird die Entität ausgelöscht und Leyla erhält einen dicken Bonus“).
+- **Der Preis**, alles zugleich: Ruf sinkt bei allen Gangs, Gegner werden stärker, AvA leidet (Bindung, Tank), **kein Zurück** bis zum neuen Durchgang.
+- **Die Kopfgeldjäger:** cyberware-süchtig, ab dem ersten Punkt auf der Straße (werben, drohen, testen), später erscheint ihr Quartier als POI. Ihre Anführerin ist eine komplett wahnsinnige Entity, die in Leyla ihre **Nachfolgerin** sieht.
+- **Zwei Wege:** beitreten (Leyla übernimmt die Jäger) oder bekämpfen (Leyla stürzt die Anführerin). Beides führt zu einem **eigenen Ende** (#086).
+- **Umfang:** offen, kommt mit der Überarbeitung aller Skilltrees (#110, Daniel: 20+ Knoten je Ast).

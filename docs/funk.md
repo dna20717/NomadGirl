@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: **Entscheidungsrunde 2** (Artefakt „NomadGirl Entscheidungskarten“, Sammlung decisions_r2): #076–#096 abgenommen, neue Tickets #097–#110. Fragerunde #080 erledigt (Antworten im Ticket und in design.md), #080 wartet auf #110: Daniel will alle Skilltrees länger (20+ Knoten je Ast), Entwurf als Karte „NomadGirl Skilltrees“. #086 Story-Enden kommt nach der Dunkelheit.
 - 19.11. Code (NomadPixel) → Code: Neues Kachel-Set **`factory`** (Fabrik) mit Rastern `factory_terrain`/`factory_props`, jetzt in `rf_kesselhaus`, `rf_leitstand`, `rf_versteck` (Daniel: Kacheln + alter Clutter `industry3_*`). Bitte bei #096 (POIs aufräumen) nicht wundern.
 - 19.11. Code (NomadPixel) → Code: **NomadPixel-Skill aktualisiert** (`.claude/skills/nomadpixel/`). Für Figuren und Animationen gibt es jetzt `bewegung.md` (Schlüsselposen, Galopp-Tabelle, Gerüst mit `zeichnen.bein`), `kritik.md` (unabhängiger Kritiker als Subagent, Schwelle ⌀ ≥ 4) und `analyse.py profil/pruefe`. Lernbuch hat 4 neue Regeln vom Fennek-Test (Profil „figuren“ passt nicht zu Tieren, Charakterteile von Hand, Beine mit eigener Kontur). Fennek und Gefangener selbst unverändert.
 - 19.11. Code → Ava: **#087–#091 fertig** (Daniel: „#087–#091 Systeme bauen“, PixelLab später). Stand `main`, `npm test` 312/312, Browser-Tests der berührten Bereiche grün:
@@ -239,34 +240,34 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ```
 
 ### #092 Haarfarben im Inventar lernen
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat)
 - **Auftrag (Daniel, 19.11.2026):** „Haarfarbe sollen wie Rezepte funktionieren und benutzt werden können.“ Rückfrage: „dass man Farbe im Inventar ‚lernen‘ kann. Das braucht nicht automatisch passieren, kann aber unabhängig vom Spiegel sein.“ → Schnellaktion „Lernen“ an Färbemitteln (wie bei Zetteln), schaltet die Farbe frei, getragen wird am Spiegel.
 - **Rückfragen:**
 - **Ergebnis:** (Code) Commit „Haarfarben im Inventar lernen (#092)“. `npm test` 280/280, `tools/mirror_test.mjs` 11/11. PixelLab 0. **Bitte testen:** Färbemittel im Inventar → „Farbe lernen“, dann am Spiegel tragen.
 
 ### #093 Van im POI bleibt zu
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Van im POI soll nicht aufgehen.“)
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Van im POI soll nicht aufgehen.“)
 - **Rückfragen:**
 - **Ergebnis:** (Code) Commit „Van im POI bleibt zu, Kofferraum am Heck (#093, #094)“. Im Run ist die Tür aus. `tools/trunk_test.mjs` 4/4. PixelLab 0. **Bitte testen:** POI starten, am Van vorbei: die Tür bleibt zu.
 
 ### #094 Kofferraum am Van im POI
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat)
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat)
 - **Auftrag (Daniel, 19.11.2026):** „Van braucht Kofferraum-Segment für Beute aus POI (Beute dort wird behandelt wie Leylas Rucksack, sobald sie wieder im Camp sind).“ Rückfrage k.o.: **sicher** (bleibt erhalten).
 - **Rückfragen:**
 - **Ergebnis:** (Code) gleicher Commit. ⚠️ vorläufig: 6 × 4 Felder (Spiel › Spawn-Punkt › Kofferraum im POI), Hecktür bei Bildpixel x 18; zurück im Camp in den Rucksack, Rest ins Camp-Lager, was dann noch fehlt, bleibt im Kofferraum. `npm test` grün, `tools/trunk_test.mjs` 4/4. **Bitte testen:** im POI etwas zum Heck tragen, E, einlagern, sich k.o. schlagen lassen: im Camp liegt es im Rucksack.
 
 ### #095 Billboard-Minispiel mit Geschick
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Billboard-Minigame darf gerne mehr Geschick-Komponente bekommen.“)
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Billboard-Minigame darf gerne mehr Geschick-Komponente bekommen.“)
 - **Rückfragen:**
 - **Ergebnis:** (Code) Commit „Billboard-Foto mit Sucher, POIs aufgeräumt (#095, #096)“. ⚠️ vorläufig: Sucher in der Bildmitte, Perfekt 30 % / Gut 20 % / Knapp 10 % / Verwackelt 0, ein Foto je Billboard und Etappe. `npm test` 281/281, `tools/drive_test.mjs` 19/19. **Bitte testen:** auf der Fahrt warten, bis das Billboard im Sucher mittig ist, dann tippen.
 
 ### #096 POIs aufräumen: Vordergrund, Innenräume
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Vordergrund-Grafiken in POIs hängen in der Luft. Manche POIs wirken chaotisch in der Ausgestaltung ihrer Innenräume. Hier kannst du etwas aufräumen.“)
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Vordergrund-Grafiken in POIs hängen in der Luft. Manche POIs wirken chaotisch in der Ausgestaltung ihrer Innenräume. Hier kannst du etwas aufräumen.“)
 - **Rückfragen:**
 - **Ergebnis:** (Code) gleicher Commit. Silhouetten halten Abstand von den Bodenkanten (schweben nicht mehr), Clutter mit einer Kachel Luft (Großmarkt-Parkdeck vorher voller ineinander stehender Kühlschränke). Rundgang mit Bildern durch 6 POIs. ⚠️ offen: Delta Heights mischt Ziegel und Beton je Raum. Tests: poi 31/31, poi_stack, poi_levels, light, camp, silo grün. Kofferraum-Punkt hinten am Aufbau (x 70), weil die Abkürzungstür hinter dem Van lag. **Bitte testen:** Großmarkt und Bunker 13 ansehen.
 
 ### #076 Absegnung 19.11.: Änderungen aus #026–#075
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel hat alle ⚠️ aus #026–#075 über die Entscheidungskarten entschieden, Tickets `abgenommen`)
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniel hat alle ⚠️ aus #026–#075 über die Entscheidungskarten entschieden, Tickets `abgenommen`)
 - **Für:** Code
 - **Auftrag (Daniel, 19.11.2026, Entscheidungskarten):** Alles andere bleibt wie gebaut. Ändern:
   1. **Gegenpaare (#033):** manche Nachbar-Werkstätten stören sich (z. B. Generator neben Schlafkoje), in der Synergie-Vorschau sichtbar.
@@ -282,42 +283,42 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commits `9660feb`, Worker an der Werkbank, `9706d2d` Boni-Bus, `339c1f7` Van aus dem Tileset, `8614709` Läuferin (alle mit #076). `npm test` 280/280 (neu: Gegenpaare, Ausrüstung/Tank im Bus, `test/vehicle_kit.test.js`, Läuferin-Kette), Browser-Suite 47/48, rot nur `silo_test` (erwartete alten Titel und Titan 120), angepasst in `fde96e1`, danach 10/10 grün. Simulation Bit-Stapel: 9,6 → 7,8 Züge je Seite. Browser-Tests finden Inventar-Raster jetzt über `data-key` (das Start-Deck schob ein Raster dazwischen). PixelLab 0. **Bitte testen:** Neues Spiel: Bastler-Deck steckt; Generator neben die Schlafkoje bauen (rote Linie, „Buff −30 %“); Kochnische mit Bit-Farm-Entity: Knopf „Worker einteilen“ oben im Kochfenster; Duell in /duel ist kürzer; Läuferin ausliefern und weiterfahren.
 
 ### #077 Mega-Rigs: Hauptcontainer statt Lager am Boden
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte #029)
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte #029)
 - **Auftrag (Daniel, 19.11.2026):** „beide Rigs sollen kein Lager mehr am Boden haben, sondern das Lager sein. Das heißt, wir brauchen einen Hauptcontainer je Rig (zunächst nur mit Code-Grafiken), der das Lager ersetzt.“ Feuer, Kiste, Brett, Companions ziehen an Bord.
 - **Rückfragen:** (Code) ⚠️ vorläufig: der Hauptcontainer ist ein Raum im Rumpf (2 Plätze, Crawler unten vorne, Fatbird auf dem Deck vorne), gezeichnet wie die anderen Rumpf-Räume; das Camp-Lager selbst bleibt das gemeinsame Lager (Kofferraum + Regale, #041), nur der Lagerplatz zieht an Bord. Am Boden bleiben Schrottplatz und Wrack.
 - **Ergebnis:** (Code) Commit „Mega-Rigs: Hauptcontainer an Bord statt Lager am Boden (#077)“. `npm test` grün (mega 13/13), Browser mega 7/7, megarig 16/16, camp, salvage, build, cozy, decor grün. PixelLab 0. **Bitte testen:** Crawler oder Fatbird bergen, an Bord gehen: Feuer, Brett und Crew im Raum links unten im Rumpf.
 
 ### #078 Werkstätten ausbauen (Stufen mit Sternchen)
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Werkstatt-Bilder je Ausbaustufe“: als Nächstes)
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Werkstatt-Bilder je Ausbaustufe“: als Nächstes)
 - **Auftrag (Daniel, 19.11.2026):** „Bau bitte das ganze Fundament dafür und ermögliche den Ausbau von Werkstätten. Kennzeichne es dann mit Sternchen neben dem Titel der Werkstatt in der Rig-Ansicht und in der jeweiligen Werkstatt.“ Stufen in der Werkstatt (Schema), Kosten, Wirkung je Stufe, Bild je Stufe (Platzhalter, PixelLab später nach Freigabe).
 - **Rückfragen:** (Code) ⚠️ vorläufig: Stufen als Tabelle an der Werkstatt (Werte addieren sich), Ausbau kostet Δ + ein Teil + Arbeitszeit; Sterne am Namen im Rig, im Fenster und in den Menüs; Speziallager (Regale, Waffengalerie) ohne Ausbau, weil sie direkt ihr Lager öffnen.
 - **Ergebnis:** (Code) Commit „Werkstätten ausbauen mit Sternen (#078)“. Fundament `game/upgrades.js`, Werkstatt-Tabelle „Ausbau“, 12 Werkstätten mit 1–3 Stufen, Wirkung auf Tempo, Buff, Strom, Bild je Stufe; Stufe bleibt beim Umbauen und Einpacken. `npm test` 285/285, `tools/upgrade_test.mjs` 3/3. ⚠️ vorläufig: Preise und Werte, noch keine Bilder je Stufe. PixelLab 0. **Bitte testen:** Kochnische öffnen → „Ausbauen ★“.
 
 ### #079 Die Zelle: Gefangene
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Wirkung der Zelle“: als Nächstes)
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Wirkung der Zelle“: als Nächstes)
 - **Auftrag (Daniel, 19.11.2026):** „Ist zunächst die Grundlage, um Gefangene transportieren zu können. Also ein spezielles Inventar. Bau aber die Auftragsart direkt mit ein. Gefangene können in Auseinandersetzungen durch Events beschädigt werden oder auch in Dialogen als Ressource zum Einsatz kommen (mit Auswirkungen auf Ruf, produziert Dunkelheit).“
 - **Rückfragen:** (Code) ⚠️ vorläufig: Fesseln = Nahkampf-Sieg über Plünderer mit 35 % Chance (kein Boss, keine Mutanten); Gefangener als 2 × 2-Gegenstand mit Person; Zelle 4 × 2, Dunkelheit 1 je Tag und Gefangenem, draußen −15 % Gesundheit je Tag; Lösegeld +5 Ruf seiner Gang, verkaufen −15, laufen lassen +3; Kopfgeld-Aufträge erst mit Zelle; Dunkelheit als Zahl im Spielstand, sichtbar in der Effekt-Leiste.
 - **Ergebnis:** (Code) Commit „Die Zelle: Gefangene fesseln, transportieren, einsetzen, Kopfgeld (#079)“. `npm test` 290/290 (neu `test/prisoners.test.js`), Browser drive/camp/inventory/game/bench/turf/workshop/trunk grün. PixelLab 0 (Gefangener ohne Bild, zeigt ⛓ + Namen). **Bitte testen:** im POI Plünderer mit dem Messer erledigen, Gefangenen aufheben, Zelle bauen, reinlegen; auf der Fahrt „Ein Angebot am Funk“.
 
 ### #080 Dunkelheit als Skilltree, Kopfgeldjäger-Fraktion
-- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte A5) · **erst reden, dann bauen** (großes Feature)
+- **Status:** blockiert (wartet auf #110 Skilltrees) · Fragerunde 19.11. erledigt · angelegt 19.11. von Code (Daniel, Karte A5) · **erst reden, dann bauen** (großes Feature)
 - **Auftrag (Daniel, 19.11.2026):** „Dunkelheit ist ein eigener Skilltree, den man leveln KANN. Wenn man den ersten Punkt investiert, bekommt man eine Warnmeldung, dass das Spiel dadurch wirklich schwerer wird. Wenn man die akzeptiert, kann man dunkle Skills freischalten, die Leyla mächtiger machen, aber ihr Ruf leidet darunter, Gegner werden deutlich schwerer und eine neue Fraktion taucht im Spiel auf (eine Gruppe von cyberware-süchtigen Kopfgeldjägern, angeführt von einer komplett wahnsinnigen Entität, die Leyla rekrutieren wollen).“ Quellen der Ressource: u. a. Gefangene (#079).
-- **Rückfragen:**
+- **Rückfragen:** (Daniel, Fragerunde 19.11.) Eigener Tab im Techtree; Skills: Kampf-Rausch, Angst, Glitch-Hunger („wenn der Duell-Sieg zu eindeutig ist, wird die Entität ausgelöscht und Leyla erhält einen dicken Bonus“); Preis: Ruf sinkt überall, Gegner stärker, AvA leidet, kein Zurück; Kopfgeldjäger erst auf der Straße, später ihr Quartier; die Anführerin will Leyla als Nachfolgerin; beitreten oder bekämpfen, beides mit eigenem Ende. Stufen offen: „lass uns dazu noch einmal alle Skilltrees anschauen, ich habe das Gefühl, dass die insgesamt zu kurz sind“ → #110.
 - **Ergebnis:**
 
 ### #081 Balancing v1 (versioniert, simuliert)
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte A8)
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte A8)
 - **Auftrag (Daniel, 19.11.2026):** „Lass uns Balancing auch versionieren. Erarbeite bitte v1 durch einige Simulationen und identifiziere Choke Points, übermäßigen Grind und Imbalance.“ Vorschlag: Balancing als Datenset (#073) `balancing-v1`, Simulation per Fernsteuerung/ohne DOM, Bericht in `docs/balancing.md`.
 - **Rückfragen:** (Code) ⚠️ vorläufig: Ziel-Tempo Heilmittel um Tag 17–20 (Gefahr 4 ab Tag 13); v1 bleibt ein Datenset, bis Daniel es übernimmt; Tank und Mega-Rig-Preise erst in v2 (Daniels Gefühl für den Tank-Druck fehlt).
 - **Ergebnis:** (Code) Commit „Balancing v1: Simulation, Bericht, Datenset (#081)“. Simulator `tools/balance_sim.mjs` (echte Level, Beute, Ressourcen, Tank, Techtree; 60 Spieler × 40 Tage), Bericht `docs/balancing.md`, Datenset **Balancing v1** (`sets/balancing_v1`). Befunde: Choke Point **Bio** (Heilmittel erst Tag 29), Technik/Wissen im Überfluss (Baum bis Stasis in einer Woche), **Startgeld 40.000 Δ** macht Δ bedeutungslos, Tank kaum Druck, Mega-Rig-Ausbau ein langer Grind. v1: Heilmittel Tag 17, Stasis Tag 11, Startgeld 600 Δ. `npm test` grün, datasets/workshop grün. **Bitte testen:** Hauptmenü unten auf „Balancing v1“ wechseln, neues Spiel, ein paar Tage spielen; Bericht lesen und v1 absegnen oder ändern.
 
 ### #082 Licht: God Rays, Schatten, Stromausfall per Schalter
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)
 - **Rückfragen:** (Code) ⚠️ vorläufig: Strahlen nur unter Decken- und Röhrenlampen, Schatten nur für Figuren (keine Verdeckung durch Wände außer dem Raum-Zuschnitt); Sicherungskasten in 60 % der Level, Stromausfall halbiert fast die Sicht der Gegner; der Hausmeister-Boss fällt weg (gestrichen), daher ohne Boss-Kopplung.
 - **Ergebnis:** (Code) Commit „Licht: Lichtstrahlen, weiche Schatten, Stromausfall per Sicherungskasten (#082)“. `tools/light_test.mjs` 18/18, poi/poi_levels/silo/enemy grün. PixelLab 0. **Bitte testen:** Bunker 13 spielen, Sicherungskasten suchen, Strom aus, mit AvAs Scheinwerfer weiter.
 
 ### #083 Bilder hochladen in der Online-Werkstatt
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)
 - **Auftrag:** `cloud_store.js` kann Bilder als Commit speichern (Größe prüfen, Asset-Eintrag anlegen).
 - **Rückfragen:** (Code) ⚠️ vorläufig: jedes Bild ist ein eigener Commit (sofort, nicht erst beim Speichern), höchstens 2 MiB; neue Bilder landen in `assets/uploads/`; Animationen brauchen danach von Hand Frame-Größe und Frames.
 - **Ergebnis:** (Code) Commit „Bilder hochladen in der Online-Werkstatt (#083)“. Knopf im Asset-Inspektor, Worker `POST /api/upload` (eigener Commit, nur Bilder unter assets/, 2 MiB). `npm test` grün (cloud 8/8), `tools/workshop_cloud_test.mjs` grün. **Bitte testen:** online Werkstatt › Assets › ein Bild ersetzen, ein paar Minuten warten, im Spiel ansehen.
@@ -329,7 +330,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #085 Crew-Kern klein (aus #040)
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte #040: „Ja, erst klein“)
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte #040: „Ja, erst klein“)
 - **Auftrag:** #040 Teile 1, 3, 4: Bereich „Leute“, Aufnahme-Entscheidung, Werkstätten-Jobs (dazu ein schlichtes Crew-Fenster). Rig-Moral (Teil 2) danach.
 - **Rückfragen:** (Code) ⚠️ vorläufig: Siedler haben noch keine Figur im Camp (nur Menü + Effekt-Leiste), Eigenheiten zeigen ihre Wirkung erst mit der Moral; Fähigkeiten als Boni-Bus-Werte; Bewerber ab Tag 2 mit 20 %; Kernfiguren bleiben eigener Bereich.
 - **Ergebnis:** (Code) Commit „Crew-Kern klein: Leute, Bewerber, Aufnahme auf der Reise, Jobs (#085)“. `npm test` 294/294 (neu `test/crew.test.js`), `tools/crew_test.mjs` 3/3, camp/drive grün. PixelLab 0 (Siedler ohne Aussehen, nur im Menü). **Bitte testen:** ein paar Tage im Camp, am Feuer auf einen Bewerber warten, aufnehmen, an die Kochnische stellen.
@@ -340,32 +341,103 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:**
 - **Ergebnis:**
 
+### #097 Balancing v1 als Standard, Cheat-Menü für Daniel
+- **Status:** offen · angelegt 19.11. von Code (Runde 2: „übernehmen“, Startgeld 600 „aber ein Cheat-Menü nur für mich“)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #098 Mega-Rig: Ofen statt Lagerfeuer im Rumpf
+- **Status:** offen · angelegt 19.11. von Code (Runde 2, Notiz #077 „Kein Lagerfeuer IM Rig mehr“ → Fragerunde: „Ofen statt Feuer“)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #099 Speziallager ausbauen (mehr Platz je Stern)
+- **Status:** offen · angelegt 19.11. von Code (Runde 2, #078)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #100 Rig-Moral (#040 Teil 2)
+- **Status:** offen · angelegt 19.11. von Code (Runde 2, #085)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #101 Gang-Aufträge für alle 12 Gangs
+- **Status:** offen · angelegt 19.11. von Code (Runde 2, #088)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #102 Gangs kämpfen selbst um Orte
+- **Status:** offen · angelegt 19.11. von Code (Runde 2, #089: „Alle paar Tage wechselt ein Ort an einer Front den Besitzer“)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #103 Radio-DJs als Entities
+- **Status:** offen · angelegt 19.11. von Code (Runde 2, #090: „mit Porträt im Chip, später auch im Duell“)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #104 Werte als Abschnitt im Inventar, mit Grundwerten
+- **Status:** offen · angelegt 19.11. von Code (Runde 2, #091: „Das wäre als Abschnitt des Inventars sinnvoller. Bitte sauber dort aufbauen“, dazu Grundwerte + Boni = Endwert)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #105 Kofferraum im POI 8 × 4
+- **Status:** offen · angelegt 19.11. von Code (Runde 2, #094)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #106 Delta Heights einheitlich Beton
+- **Status:** offen · angelegt 19.11. von Code (Runde 2, #096)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #107 Fennek huscht durchs Camp
+- **Status:** offen · angelegt 19.11. von Code (Runde 2: Camp)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #108 Rattenschwarm und Wachdrohne streichen
+- **Status:** offen · angelegt 19.11. von Code (Runde 2: „Streichen“)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #109 Balancing v2 per Simulation (Tank-Druck, Mega-Rig-Preise)
+- **Status:** offen · angelegt 19.11. von Code (Runde 2: „Ava simuliert jetzt“; nach #110, weil die neuen Äste die Kurve ändern)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #110 Skilltrees: vier Äste à 20+ Knoten
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel: 20+ Knoten je Ast, nach Ressource, Inhalte: passive Boni, Rezepte & Werkstätten, Welt & Story; Entwurf als interaktive Karte)
+- **Auftrag:** Entwurf mit 88 Knoten im Artefakt „NomadGirl Skilltrees“ (https://claude.ai/artifact/EoWeffe9WL6p1esscmhz82), Daniel behält/ändert/streicht; danach bauen: neue Freischalt-Arten (Werkstatt, Rig-Teil, Merker, Fähigkeit, Camp-Boni), Warroom-Bildschirm für große Bäume, dunkler Tab (#080).
+- **Rückfragen:**
+- **Ergebnis:**
+
 ### #087 Wettervorhersage im Warroom
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Was als Nächstes“; 19.11.: „#087–#091 Systeme bauen“)
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Was als Nächstes“; 19.11.: „#087–#091 Systeme bauen“)
 - **Auftrag:** Navigator zeigt Regen, Sandsturm und Nebel der nächsten Etappen → Routenwahl (`docs/backlog.md` › Ideen).
 - **Rückfragen:** (Code) ⚠️ vorläufig: der Navigator ist (noch) keine eigene Entity, nur eine Zeile „Wetter · Navigator“ in der Reisekarte; die Vorhersage ist exakt (gleiche Würfel wie die Fahrt), nur Zeit durch Zwischenfälle kann sie verschieben; ohne Warroom keine Vorhersage (wie Gefahr/Beute); Ausblick 3 Tage.
 - **Ergebnis:** (Code) Commit „Wettervorhersage in der Reisekarte (#087)“. `test/forecast.test.js` 3/3, `npm test` 298/298, `tools/map_test.mjs` 16/16. PixelLab 0. **Bitte testen:** Warroom ins Rig bauen, Reisekarte öffnen, Ziele mit mehreren Etappen anwählen und aufs Wetter achten, dann hinfahren und schauen, ob der Sandsturm kommt.
 
 ### #088 Gangs als Auftraggeber
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code
 - **Auftrag:** Quests von Gangs (Bedingungs-Sprache + Revier-Camp), Lohn Ruf und Revier-Zugang.
 - **Rückfragen:** (Code) ⚠️ vorläufig: Gang-Aufträge gibt es erst ab **Geduldet** (darunter kein Frieden, also kein Gespräch; Ruf kommt über die Straße), Annehmen und Abgeben nur im Revier; „Revier-Zugang“ = Ruf als Lohn (als Freund Handel + Revier säubern), noch kein eigener Zugang zu Räumen; sieben Aufträge für sechs Gangs, die übrigen sechs Gangs noch ohne.
 - **Ergebnis:** (Code) Commit „Gangs als Auftraggeber (#088)“. `test/gang_quests.test.js` 3/3, `npm test` 301/301, `tools/turf_test.mjs` 9/9, camp/workshop/silo grün. PixelLab 0. **Bitte testen:** Ruf bei den Yellow Vultures über die Straße auf Geduldet bringen (oder Datenset), Tankstelle plündern, mit einem von ihnen reden, „Ratten im Markt“ annehmen, Großmarkt schaffen, zurück und abgeben.
 
 ### #089 Revierkrieg
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code
 - **Auftrag:** Ruf bei einer Gang senkt den bei ihren Rivalen; Reviere verschieben sich auf der Reisekarte, Fehden werden zu Fronten.
 - **Rückfragen:** (Code) ⚠️ vorläufig: Rivalen-Paare von Code gesetzt (Vultures ↔ Neon Rats + Crude Boys, Rust Guard ↔ Salt Dogs ↔ Tunnel Kings, Sky Wolves ↔ Level Five, Order Office ↔ Static Saints + Zero Hour, Crude Boys ↔ Sunny Side); Gegenruf 50 %; Übernahme nur bei geknacktem Tresor ohne Frieden mit Kill, durch den Rivalen mit dem besten Ruf; Fronten nur sichtbar mit Warroom; Gangs ziehen nicht von selbst weiter (nur durch Leyla).
 - **Ergebnis:** (Code) Commit „Revierkrieg: Rivalen, Gegenruf, Übernahmen, Fronten (#089)“. `test/turf_war.test.js` 4/4, `npm test` 305/305, turf 10/10, map 17/17, drive 19/19, poi 31/31, camp 34/34. PixelLab 0. **Bitte testen:** mit Warroom die Reisekarte ansehen (Bunker 13 ↔ Pit 6 ist von Anfang an eine Front), die Tankstelle mit Gewalt plündern (Tresor knacken) und schauen, wer danach einzieht.
 
 ### #090 Rig-Radio
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code
 - **Auftrag:** Sender mit Musik aus Code, Durchsagen aus BigCityDelta, Lore-Häppchen, Hinweise auf POIs, vielleicht eine DJ-Entity.
 - **Rückfragen:** (Code) ⚠️ vorläufig: DJs sind Namen im Radio-Bereich (noch keine Entities mit Porträt); der DJ spricht als Text im Chip (keine Stimme); Radio startet aus (N oder Pause-Menü), merkt sich der Browser; nur Camp + Fahrt, im POI still; vier Sender, Saint FM gehört den Static Saints (als Feind Rauschen); Controller über das Pause-Menü (keine eigene Taste).
 - **Ergebnis:** (Code) Commit „Rig-Radio: Sender, Musik aus Code, DJ-Durchsagen (#090)“. `test/radio.test.js` 4/4, `npm test` 309/309, `tools/radio_test.mjs` 11/11, drive/camp/workshop/pad/menu_nav grün. Nebenbei behoben: `pretty()` machte aus „104,2“ „104, 2“ (Kommas in Texten), Ton aus wurde verspätet erkannt, die Fahrt zeigte oben links „null“. PixelLab 0. **Bitte testen:** im Camp N drücken, durch die Sender schalten, einen DJ reden lassen (nach dem ersten Song), dann losfahren und weiterhören.
 
 ### #091 Werte-Bildschirm
-- **Status:** fertig (19.11.) · angelegt 19.11. von Code
+- **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code
 - **Auftrag:** Ein Bildschirm mit allen Werten und ihren Quellen über den Boni-Bus (baut auf #076 Punkt 7).
 - **Rückfragen:** (Code) ⚠️ vorläufig: Taste U (frei), dazu Pause-Menü; Leylas Grundwerte stehen nicht dabei, nur die Boni darauf; Ausbau/Synergie bleiben an der Werkstatt (gelten je Platz); Buffs im Camp als „nächster Run“.
 - **Ergebnis:** (Code) Commit „Werte-Bildschirm: jede Zahl mit ihren Quellen (#091)“. `test/stat_sheet.test.js` 3/3, `npm test` 312/312, `tools/stats_test.mjs` 6/6, pad/menu_nav/radio/workshop/inventory grün. PixelLab 0. **Bitte testen:** im Camp U drücken, Ausrüstung anziehen und wieder schauen, mit Q durch die Reiter.
