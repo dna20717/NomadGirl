@@ -24,7 +24,7 @@ let v = await ev(() => {
   return { mode: s.mode, van: s.van?.state(), trunk: !!s.box.save.inv.grids.trunk, size: [s.box.save.inv.grids.trunk?.w, s.box.save.inv.grids.trunk?.h] };
 });
 check('Im POI: Van steht da, Tür bleibt zu, obwohl Leyla daneben startet (#093)', v.mode === 'run' && v.van && v.van.frame === 0 && !v.van.open, v);
-check('Kofferraum-Raster da (6 × 4)', v.trunk && v.size.join() === '6,4', v);
+check('Kofferraum-Raster da (8 × 4, #105)', v.trunk && v.size.join() === '8,4', v);
 v = await ev(() => {
   const s = game.scene.getScene('play'), van = s.van, x = van.toWorld(van.S.trunk.x, 0).x;
   nomad.tp(x, s.leyla.feet); nomad.step(10); const prompt = s.vanPrompt;
