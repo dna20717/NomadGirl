@@ -141,6 +141,33 @@ await game2.goto(base + '/game');
 await game2.waitForFunction(() => window.game?.scene.getScene('play')?.leyla, null, { timeout: 30000 });
 check(await game2.evaluate(() => window.game.scene.getScene('play').p.data.leyla.movement.jumpSpeed) === 1234 && await game2.evaluate(() => window.__nomadData.set?.id) === 'sprungtest', 'Spiel lädt das Datenset über /api/files');
 
+
+// Pixel-Aufträge (Daniel, 19.11.2026: „jemand war schneller, dann ist der Auftrag weg“): auch mit aktivem Datenset im Standard,
+// ein gleichzeitiger Commit von jemand anderem an derselben Datei wird zusammengeführt statt verworfen; Rettung vor dem Neuladen
+{
+  const F = 'projects/nomadgirl/data/pixel_orders.json';
+  const w = await browser.newPage({ viewport: { width: 1180, height: 820 } });
+  await w.goto(base + '/workshop?autosave=600');
+  await w.evaluate(() => localStorage.setItem('nomadgirl-set', 'sprungtest')); await w.reload();
+  await w.waitForFunction(() => window.workshop?.p, null, { timeout: 20000 });
+  check(!!await w.evaluate(() => window.workshop.dataSet?.id), 'Pixel-Aufträge: Datenset ist aktiv (Test mit Set)');
+  await w.evaluate(() => window.workshop.go({ area: 'pixelOrders' }));
+  await w.click('.da-head button:has-text("Neu")'); await w.waitForTimeout(300);
+  await w.fill('.px-card input.ed-field', 'Angelzubehör'); await w.keyboard.press('Tab'); await w.waitForTimeout(200);
+  await g.pushOther(F, JSON.stringify({ von_code: { name: 'Von Claude Code', type: 'icons', status: 'open' } }) + '\n');
+  await w.keyboard.press('Control+s');
+  await w.waitForFunction(() => /Gespeichert/.test(document.querySelector('.ed-status')?.textContent || '') && !window.workshop.dirty.size, null, { timeout: 15000 });
+  const saved = JSON.parse(g.fileAt(F) || '{}');
+  check(saved.von_code && Object.values(saved).some(x => x.name === 'Angelzubehör') && !await w.locator('.ed-dialogue').count(), 'Pixel-Aufträge: Konflikt automatisch zusammengeführt, beide Aufträge im Repository');
+  check([...Object.keys(saved)].length === 2 && !g.fileAt('projects/nomadgirl/sets/sprungtest/data/pixel_orders.json'), 'Pixel-Aufträge landen im Standard, nie im Datenset');
+  await w.fill('.px-card input.ed-field', 'Angelzubehör 2'); await w.keyboard.press('Tab'); await w.waitForTimeout(200);
+  await w.evaluate(() => { window.workshop.rescue(); window.workshop.dirty.clear(); });
+  await w.reload(); await w.waitForSelector('.ed-dialogue button.main', { timeout: 20000 });
+  await w.click('.ed-dialogue button.main'); await w.waitForTimeout(300);
+  check(await w.evaluate(() => Object.values(window.workshop.p.data.pixelOrders).some(x => x.name === 'Angelzubehör 2') && window.workshop.dirty.size === 1), 'Ungespeicherte Änderungen nach dem Neuladen wiederhergestellt');
+  await w.close();
+}
+
 await browser.close(); server.close();
 console.log(failed ? `\n${failed} Fehler.` : '\nAlles grün.');
 process.exit(failed ? 1 : 0);

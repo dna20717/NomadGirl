@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Speichern ohne Verlust**: Konflikte mit Änderungen anderer an anderen Einträgen werden automatisch zusammengeführt; vor „Neu laden“ werden ungespeicherte Änderungen gesichert und danach angeboten; Pixel-Aufträge nie im Datenset. Test in `npm run web:test`.
 - 19.11.2026: **Werte-Bildschirm** (#091): U (oder Pause-Menü › Werte) zeigt jede Zahl mit ihren Quellen, in vier Reitern: Leyla (Ausrüstung, Implantate, Techtree, Trophäen, Markentreue, Buffs für den nächsten Run), Camp (Boni-Bus), Tank & AvA, Effekte. Gleiche Zahlen wie im Spiel, Malus rot.
 - 19.11.2026: **Rig-Radio** (#090): Vier Sender mit Musik aus Code (Synthwave, Wüsten-Folk, Glitch, Nachtsender), ein DJ redet zwischen den Songs: Werbung der Marken, Wetter vom Navigator, Frontberichte aus dem Revierkrieg, Gerüchte über Orte, Lore. Läuft im Camp und auf der Fahrt, im POI still. N schaltet weiter (nach dem letzten Sender aus), Pause-Menü › Radio. Saint FM gehört den Static Saints: als Feind nur Rauschen. Werkstatt › Welt › Radio. Nebenbei: `pretty()` lässt Kommas in Texten in Ruhe, Ton aus (M) wird sofort erkannt, die Fahrt zeigte manchmal „null“.
 - 19.11.2026: **Werkstatt am iPad**: ⓘ-Erklärungen zum Antippen (klappen unter dem Feld auf, überall in der Werkstatt), drei Spalten passen hochkant (≤ 980 px); Pixel-Aufträge mit eigener, übersichtlicher Ansicht in fünf Schritten.

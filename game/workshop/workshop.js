@@ -34,6 +34,8 @@ function cardGroup(c) {
   return 'Grundlage';
 }
 
+const RESCUE_KEY = 'nomadgirl-rescue';
+
 export class Workshop {
   constructor(root, basis) {
     this.root = root; this.basis = basis;
@@ -58,6 +60,7 @@ export class Workshop {
     try { const h = JSON.parse(decodeURIComponent(location.hash.slice(1)) || 'null'); if (h?.area) this.page = { ...this.page, ...h }; } catch { /* no saved place */ }
     this.constructUi();
     this.draw();
+    this.offerRescue();
     addEventListener('keydown', e => this.key(e));
     addEventListener('beforeunload', e => { if (this.dirty.size) { e.preventDefault(); e.returnValue = ''; } });
   }
@@ -84,18 +87,18 @@ export class Workshop {
   // #073 the set's list of files in sets/index.json, when it changed (a file got its first difference or lost its last) → a change or null
   setIndexChange() {
     if (!this.dataSet) return null;
-    const files = Object.entries(AREAS).filter(([a, A]) => diffArea(A.kind, this.base[a], this.p.data[a]) !== undefined).map(([a]) => this.p.paths[a]).sort();
+    const files = Object.entries(AREAS).filter(([a, A]) => !A.noSets && diffArea(A.kind, this.base[a], this.p.data[a]) !== undefined).map(([a]) => this.p.paths[a]).sort();
     const meta = this.sets.find(s => s.id === this.dataSet.id);
     if (!meta || JSON.stringify([...(meta.files || [])].sort()) === JSON.stringify(files)) return null;
     meta.files = files;
     return { file: SET_INDEX, content: this.sets };
   }
   // #073 saved into the standard (no set active): that is the new standard to compare with
-  savedStandard(file) { if (this.dataSet) return; const a = Object.keys(this.p.paths).find(k => this.p.paths[k] === file); if (a) this.base[a] = structuredClone(this.p.data[a]); }
+  savedStandard(file) { const a = Object.keys(this.p.paths).find(k => this.p.paths[k] === file); if (a && (!this.dataSet || AREAS[a].noSets)) this.base[a] = structuredClone(this.p.data[a]); }
   // #073 what goes where: in a set only the difference to the standard, in its folder (null = no difference, the file goes)
   target(file) {
-    if (!this.dataSet) return { file, content: this.content(file) };
     const a = Object.keys(this.p.paths).find(k => this.p.paths[k] === file);
+    if (!this.dataSet || AREAS[a]?.noSets) return { file, content: this.content(file) };   // e.g. pixel orders: always the standard
     return { file: setFile(this.dataSet.id, file), content: a ? diffArea(AREAS[a].kind, this.base[a], this.p.data[a]) ?? null : null };
   }
   async persist(opt = {}) {
@@ -104,7 +107,7 @@ export class Workshop {
     this.storeError = null;
     try {
       { const ix = this.setIndexChange(); if (ix) await this.store.persist(ix.file, ix.content); }
-      for (const d of [...this.dirty]) { const t = this.target(d); await this.store.persist(t.file, t.content); this.dirty.delete(d); this.state.set(t.file, t.content); this.savedStandard(d); }
+      for (const d of [...this.dirty]) { const t = this.target(d); await this.store.persist(t.file, t.content); this.dirty.delete(d); this.state.set(t.file, structuredClone(t.content)); this.savedStandard(d); }
       this.latestSaved = clockTime();
       this.hint(this.store.kind === 'artifact' ? 'Gespeichert. Ava übernimmt die Stände ins Repository.' : 'Gespeichert (in diesem Browser).');
     } catch (e) { this.storeError = e.message; this.hint('Speichern fehlgeschlagen: ' + e.message); }
@@ -120,18 +123,66 @@ export class Workshop {
     this.saving = true; this.storeError = null; this.statusShowing('saves');
     try {
       const r = await this.store.saveAll(changes, { force });
-      for (const d of files) { if (JSON.stringify(this.content(d)) === sent.get(d)) this.dirty.delete(d); const t = this.target(d); this.state.set(t.file, t.content); this.savedStandard(d); }
+      for (const d of files) { if (JSON.stringify(this.content(d)) === sent.get(d)) this.dirty.delete(d); const t = this.target(d); this.state.set(t.file, structuredClone(t.content)); this.savedStandard(d); }
       this.latestSaved = clockTime(); this.latestCommit = r.short;
       this.hint(r.unchanged ? 'Gespeichert (keine inhaltliche Änderung).' : `Gespeichert${auto ? ' (automatisch)' : ''} · Commit ${r.short} im Repository. Spiel neu laden zum Ausprobieren.`);
     } catch (e) {
-      if (e.status === 409 && e.conflicts?.length) this.conflict(e.conflicts);
+      if (e.status === 409 && e.conflicts?.length && !this.merged && await this.mergeConflicts(e.conflicts).catch(() => false)) { this.merged = true; this.saveAgain = true; }
+      else if (e.status === 409 && e.conflicts?.length) this.conflict(e.conflicts);
       else { this.storeError = e.message; this.hint('Speichern fehlgeschlagen: ' + e.message); }
     } finally {
       this.saving = false;
     }
     this.drawMenu();
     if (this.saveAgain) { this.saveAgain = false; this.persistCloud({ auto: true }); }
-    else this.planAutosave();
+    else { this.merged = false; this.planAutosave(); }
+  }
+  // Someone else changed a file I want to save (Daniel, 19.11.2026: "Jemand war schneller, dann ist der Auftrag weg"; Claude Code pushes
+  // all the time): take their current version and lay my changed entries (catalog) or fields (single) over it, then save again.
+  // Not for data sets and the set index (the dialog decides there). → true if every conflict could be merged
+  async mergeConflicts(files) {
+    const byFile = Object.fromEntries(Object.entries(this.p.paths).map(([a, f]) => [this.target(f).file, a]));
+    if (!files.every(f => byFile[f] && (!this.dataSet || AREAS[byFile[f]].noSets))) return false;
+    const latest = await this.store.all();   // also the new base versions for the next save
+    const same = (x, y) => JSON.stringify(x) === JSON.stringify(y);
+    const plan = [];
+    for (const f of files) {
+      const a = byFile[f], base = this.state.get(f) ?? {}, mine = this.p.data[a] ?? {}, theirs = structuredClone(latest.get(f) ?? {});
+      for (const k of new Set([...Object.keys(base), ...Object.keys(mine)])) {
+        if (same(base[k], mine[k])) continue;   // I didn't touch it: theirs stays
+        if (!same(base[k], theirs[k]) && !same(theirs[k], mine[k])) return false;   // both changed the same entry/field: the dialog decides
+        if (mine[k] === undefined) delete theirs[k]; else theirs[k] = structuredClone(mine[k]);
+      }
+      plan.push([a, f, theirs]);
+    }
+    for (const [a, f, merged] of plan) { this.p.data[a] = merged; this.base[a] = structuredClone(latest.get(f) ?? {}); this.dirty.add(f); }
+    this.state.clear(); for (const [k, v] of latest) this.state.set(k, v);   // in place: the loader keeps its reference
+    this.hint('Zusammengeführt mit den Änderungen von anderen. Speichere …');
+    this.draw();
+    return true;
+  }
+  // before a reload that would throw unsaved changes away: keep them in this browser and offer them again after loading
+  rescue() {
+    try { localStorage.setItem(RESCUE_KEY, JSON.stringify({ time: Date.now(), areas: Object.fromEntries([...this.dirty].map(f => [Object.keys(this.p.paths).find(k => this.p.paths[k] === f), null]).filter(([a]) => a).map(([a]) => [a, this.p.data[a]])) })); } catch { /* private mode */ }
+  }
+  offerRescue() {
+    let r = null;
+    try { r = JSON.parse(localStorage.getItem(RESCUE_KEY) || 'null'); } catch { /* none */ }
+    if (!r?.areas || Date.now() - r.time > 7 * 864e5) return;
+    const names = Object.keys(r.areas).filter(a => AREAS[a]).map(a => AREAS[a].name);
+    if (!names.length) return;
+    const drop = () => { try { localStorage.removeItem(RESCUE_KEY); } catch { /* */ } };
+    openDialogue({ title: 'Ungespeicherte Änderungen wiederherstellen?', icon: 'restart',
+      content: [el('p', {}, `Vor dem Neuladen wurden deine Änderungen hier gesichert: ${names.join(', ')}.`), el('p', { class: 'ed-small' }, 'Wiederherstellen legt deine Einträge über den aktuellen Stand; danach normal speichern.')],
+      left: [el('button', { class: 'ed-button wide', onclick: () => { drop(); document.querySelector('.ed-dialogue')?.remove(); } }, 'Verwerfen')],
+      main: { text: 'Wiederherstellen', icon: 'check', action: () => {
+        drop();
+        this.change(Object.keys(r.areas)[0], () => { for (const [a, mine] of Object.entries(r.areas)) if (AREAS[a] && mine) {
+          const cur = this.p.data[a] ?? {};
+          for (const [k, v] of Object.entries(mine)) if (JSON.stringify(cur[k]) !== JSON.stringify(v)) cur[k] = v;
+          this.p.data[a] = cur; this.dirty.add(this.p.paths[a]);
+        } });
+      } } });
   }
   conflict(files) {
     this.storeError = 'Konflikt beim Speichern';
@@ -139,9 +190,9 @@ export class Workshop {
       title: 'Jemand war schneller', icon: 'warning',
       content: [el('p', {}, `Diese ${files.length === 1 ? 'Datei wurde' : 'Dateien wurden'} inzwischen von jemand anderem geändert:`),
         el('ul', {}, ...files.map(f => el('li', {}, el('code', {}, f)))),
-        el('p', { class: 'ed-small' }, '„Neu laden“ holt den aktuellen Stand und verwirft deine ungespeicherten Änderungen. „Überschreiben“ speichert deinen Stand trotzdem, die Änderungen der anderen an diesen Dateien gehen dann verloren (im Git-Verlauf bleiben sie erhalten).')],
+        el('p', { class: 'ed-small' }, '„Neu laden“ holt den aktuellen Stand; deine ungespeicherten Änderungen werden vorher gesichert und danach zum Wiederherstellen angeboten. „Überschreiben“ speichert deinen Stand trotzdem, die Änderungen der anderen an diesen Dateien gehen dann verloren (im Git-Verlauf bleiben sie erhalten).')],
       left: [el('button', { class: 'ed-button wide red', onclick: () => { document.querySelector('.ed-dialogue')?.remove(); this.persistCloud({ force: true }); } }, 'Überschreiben')],
-      main: { text: 'Neu laden', icon: 'restart', action: () => { this.dirty.clear(); location.reload(); } },
+      main: { text: 'Neu laden', icon: 'restart', action: () => { this.rescue(); this.dirty.clear(); location.reload(); } },
     });
   }
   // Jump into the game: save first (the game reads the saved state), then open it in its own tab (reused on every click).

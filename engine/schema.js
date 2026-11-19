@@ -1150,7 +1150,7 @@ export const AREAS = {
     },
   },
   pixelOrders: {
-    name: 'Pixel-Aufträge', singular: 'Pixel-Auftrag', icon: 'brush', file: 'data/pixel_orders.json', kind: 'catalog', lookOptional: true, groupBy: { key: 'status', options: PIXEL_STATUS },
+    name: 'Pixel-Aufträge', singular: 'Pixel-Auftrag', icon: 'brush', file: 'data/pixel_orders.json', kind: 'catalog', lookOptional: true, noSets: true, groupBy: { key: 'status', options: PIXEL_STATUS },
     hint: 'Grafik-Wünsche an Claude (NomadPixel, Daniel 19.11.2026): rechts Schritt für Schritt ausfüllen, speichern, dann in Claude Code „/pixel Aufträge“. Die fertigen Grafiken erscheinen als Assets im Auftrag.',
     template: { name: 'Neuer Pixel-Auftrag', type: 'icons', status: 'open', size: [32, 32] },
     row: x => `${label(PIXEL_TYPES, x.type)} · ${label(PIXEL_STATUS, x.status)}${x.motifs?.length ? ` · ${x.motifs.length} Motive` : ''}`,

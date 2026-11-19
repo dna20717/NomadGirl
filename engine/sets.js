@@ -65,6 +65,7 @@ export async function applySet(project, loader, id) {
   const files = [];
   const only = Array.isArray(meta.files) ? new Set(meta.files) : null;   // the set says which files it has (no guessing, no 404s)
   for (const [a, A] of Object.entries(AREAS)) {
+    if (A.noSets) continue;   // e.g. pixel orders: always the standard
     const file = project.paths[a];
     if (only && !only.has(file)) continue;
     let over;
