@@ -1098,7 +1098,7 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .radio-chip kbd { font: 11px/1 var(--ui-font); padding: 2px 5px; border-radius: 4px; background: #2b2236; color: #8d7f9c; }
 .radio-chip.on { color: #c8bcd6; border-color: #5a4a6a; }
 .radio-chip.on svg { color: #20d6c7; }
-.radio-chip.talk { max-width: min(680px, calc(100vw - 40px)); border-color: #20d6c7; }
+.radio-chip.talk { max-width: min(620px, calc(50vw - 260px)); border-color: #20d6c7; }
 .radio-chip.talk span { white-space: normal; color: #f2eef7; text-align: left; }
 
 /* #091 Werte-Bildschirm */

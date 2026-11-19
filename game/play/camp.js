@@ -637,6 +637,13 @@ export class Camp {
     s.platforms.add(z);
     Object.assign(z.body.checkCollision, { down: false, left: false, right: false });
     this.rigObjs.push(z);
+    // the roof (Daniel 19.11.2026: „man soll wieder auf Container laufen können“): a platform like „=“ on every free container roof,
+    // from below you jump through, S + space drops down (Camp › Rig-Ansicht › Dächer begehbar)
+    if (this.C.rig?.roofWalk !== false && u.kind !== 'tractor' && u.def?.kind !== 'crate' && roofFree(this.box.save.rig, u.ui) && u.deckY != null) {
+      const r = s.add.zone(u.in0 + u.cell * u.places / 2, u.deckY + 8, u.cell * u.places + 16, 16);
+      s.platforms.add(r); Object.assign(r.body.checkCollision, { down: false, left: false, right: false });
+      this.rigObjs.push(r);
+    }
     // a stacked container has end walls: up there Leyla can walk from end to end without stepping off into the air (down = ladder)
     const balc = balconies(this.box.save.rig);   // #037: a balcony opens that end
     if (u.level) for (const [side, wx] of [[0, u.in0 - 8], [1, u.in0 + u.cell * u.places + 8]]) {

@@ -36,6 +36,8 @@ v = await ev(() => { SC().hud.pauseMenu(); const items = (SC().hud.menuItems || 
 await page.waitForTimeout(150);
 v = { ...v, ...(await ev(() => { const sub = (SC().hud.menuItems || []).map(x => x.label); nomad.choose('Dust Radio 88,1'); nomad.step(2); return { sub, st: R().state() }; })) };
 check('Pause-Menü: „Radio“ mit allen Sendern und Aus', v.items.includes('Radio: aus') && v.sub.includes('Saint FM 98,6') && v.sub.includes('Aus') && v.st.station === 'dust_radio' && v.st.playing, v);
+v = await ev(() => { SC().hud.inv.open(); R().tick(); const a = R().state().chip; SC().hud.inv.close(); R().tick(); return { a, b: R().state().chip }; });
+check('Fenster offen (Inventar): Chip tritt zur Seite, danach wieder da', !v.a && !!v.b, v);
 v = await ev(() => { SC().toggleMute(); R().tick(); const a = { ...R().state(), mute: SC().muted }; SC().toggleMute(); R().tick(); return { a, b: { ...R().state(), mute: SC().muted, mode: SC().mode } }; });
 check('Ton aus (M): Radio schweigt, Ton an: spielt wieder', !v.a.playing && v.b.playing, v);
 v = await ev(() => { nomad.save().rep = { 'Static Saints': -80 }; R().set(2); return R().state(); });

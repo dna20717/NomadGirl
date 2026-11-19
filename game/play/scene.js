@@ -626,6 +626,8 @@ export class PlayScene extends Phaser.Scene {
   onPlatform(x, feet) {
     const ty = Math.floor((feet + 4) / this.T);
     for (const dx of [-30, 0, 30]) if (this.platformTiles.has(Math.floor((x + dx) / this.T) + ',' + ty)) return true;
+    // platforms that are zones (camp: container floors and roofs, balconies, bridges) count too
+    for (const z of this.platforms?.getChildren?.() || []) { const b = z.body; if (b && Math.abs(b.top - feet) < 6 && x >= b.left - 20 && x <= b.right + 20) return true; }
     return false;
   }
   // ledge for the hands: in front of Leyla (dir) a ground tile (wall or platform) with free space above it,

@@ -40,7 +40,7 @@ export class RadioUI {
   switched() { this.seg = null; if (this.playing || this.on) this.synth.crackle(); this.synth.stop(0.15); this.tick(); this.paint(); }
   tick() {
     const want = this.on && this.allowed(), now = performance.now(), C = this.D ? this.C : null;
-    const sig = `${want}|${this.scene?.mode}|${!!this.D}`; if (sig !== this.sig) { this.sig = sig; this.paint(); }
+    const sig = `${want}|${this.scene?.mode}|${!!this.D}|${this.busy()}`; if (sig !== this.sig) { this.sig = sig; this.paint(); }
     if (!want) { if (this.playing) { this.synth.stop(0.6); this.seg = null; this.paint(); } return; }
     const st = this.station, save = this.scene.box?.save;
     const jam = jammed(this.D, save, st);
@@ -64,10 +64,15 @@ export class RadioUI {
   startSong(st, C) { this.song = song(this.D, st, this.seed++); this.synth.play(this.song, st.style, C.volume); }
   paint() {
     const st = this.station, on = this.on && this.allowed();
-    this.el.hidden = !this.D || !this.C.enabled || !this.C.stations.length || !this.scene?.box || this.scene.mode === 'run';
+    this.el.hidden = !this.D || !this.C.enabled || !this.C.stations.length || !this.scene?.box || this.scene.mode === 'run' || this.busy();
     this.el.classList.toggle('on', on); this.el.classList.toggle('talk', on && (this.seg?.kind === 'talk' || this.seg?.kind === 'jam'));
     const what = !this.on ? 'Radio aus' : !on ? `${st?.name || ''} · leise` : this.seg?.kind === 'talk' ? `${st.dj || st.name}: ${this.seg.text}` : this.seg?.kind === 'jam' ? this.seg.text : `♪ ${this.seg?.title || ''}`;
     this.el.replaceChildren(icon(this.on ? 'music' : 'loudspeaker', 14), el('b', {}, this.on && st ? `${st.name} ${st.freq || ''}` : 'Radio'), el('span', {}, what), el('kbd', {}, 'N'));
+  }
+  // a window, menu or the build mode is open: the chip steps aside so it never covers their tooltips (the music plays on)
+  busy() {
+    const h = this.scene?.hud; if (!h) return false;
+    return !!(h.modal || h.paused || h.inv?.isOpen || h.craft?.isOpen || h.tech?.isOpen || h.map?.isOpen || h.stats?.isOpen || h.quests?.isOpen || h.ach?.isOpen || h.sum?.isOpen || h.build?.active || h.megaBuild?.isOpen || h.duel?.isOpen || h.tut?.isOpen);
   }
   // pause menu: the stations and off
   menu(hud) {
