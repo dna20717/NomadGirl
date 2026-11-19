@@ -6087,5 +6087,74 @@
   "description": "Idle: setzt sich, kratzt sich hinterm Ohr, steht wieder auf.",
   "source": "KI (PixelLab: Create Image Pro Flash mit dem handgezeichneten Fennek als Stilbild, Animate Image), Palette AAP-64",
   "date": "19.11.2026"
+ },
+ "kit_chair": {
+  "name": "Camp-Baukasten · Campingstuhl",
+  "kind": "icons",
+  "file": "assets/camp/kit/chair.png",
+  "cell": [96, 112],
+  "grid": [2, 1],
+  "names": [
+   "Orange mit Zickzack-Decke",
+   "Orange mit Streifendecke"
+  ],
+  "source": "KI (PixelLab, Create Image Pro in Spielgröße 1:1, AAP-64, Referenzen: Leyla für Blickwinkel und Maßstab, TileSet00 Großer Clutter für den Stil) + Code (tools/camp_kit.py: Varianten zuschneiden, unten mittig)",
+  "date": "2026-11-19",
+  "description": "#111 Camp-Baukasten: Stahlrohr-Campingstuhl im Profil mit gestrickter Decke und Kissen, schaut nach rechts. Je Feld eine Variante (Kandidaten in assets/camp/kit/candidates/)."
+ },
+ "kit_pit": {
+  "name": "Camp-Baukasten · Feuerstelle",
+  "kind": "icons",
+  "file": "assets/camp/kit/pit.png",
+  "cell": [86, 31],
+  "grid": [3, 1],
+  "names": ["Glut", "Grau", "Sandstein"],
+  "source": "KI (PixelLab, Create Image Pro in Spielgröße 1:1, AAP-64, Referenzen: Leyla für Blickwinkel und Maßstab, TileSet00 Großer Clutter für den Stil) + Code (tools/camp_kit.py: Varianten zuschneiden, unten mittig)",
+  "date": "2026-11-19",
+  "description": "#111 Camp-Baukasten: Steinreihe mit gekreuzten Scheiten und Glut, ohne Flammen (die macht der Code). Je Feld eine Variante (Kandidaten in assets/camp/kit/candidates/)."
+ },
+ "kit_table": {
+  "name": "Camp-Baukasten · Kabeltrommel-Tisch",
+  "kind": "icons",
+  "file": "assets/camp/kit/table.png",
+  "cell": [76, 82],
+  "grid": [3, 1],
+  "names": ["Rot kariert", "Blau kariert", "Grün kariert"],
+  "source": "KI (PixelLab, Create Image Pro in Spielgröße 1:1, AAP-64, Referenzen: Leyla für Blickwinkel und Maßstab, TileSet00 Großer Clutter für den Stil) + Code (tools/camp_kit.py: Varianten zuschneiden, unten mittig)",
+  "date": "2026-11-19",
+  "description": "#111 Camp-Baukasten: Kabeltrommel als Tisch mit Tischdecke, Becher und Kerze. Tischplatte 63 px über dem Boden. Je Feld eine Variante (Kandidaten in assets/camp/kit/candidates/)."
+ },
+ "kit_lantern": {
+  "name": "Camp-Baukasten · Laternenpfosten",
+  "kind": "icons",
+  "file": "assets/camp/kit/lantern.png",
+  "cell": [62, 208],
+  "grid": [1, 1],
+  "names": ["Messinglaterne"],
+  "source": "KI (PixelLab, Create Image Pro in Spielgröße 1:1, AAP-64, Referenzen: Leyla für Blickwinkel und Maßstab, TileSet00 Großer Clutter für den Stil) + Code (tools/camp_kit.py: Varianten zuschneiden, unten mittig)",
+  "date": "2026-11-19",
+  "description": "#111 Camp-Baukasten: Rostiger Bewehrungsstab mit Haken, Öllaterne, Draht und Stoffstreifen. Je Feld eine Variante (Kandidaten in assets/camp/kit/candidates/)."
+ },
+ "kit_crate": {
+  "name": "Camp-Baukasten · Holzkiste",
+  "kind": "icons",
+  "file": "assets/camp/kit/crate.png",
+  "cell": [64, 56],
+  "grid": [10, 1],
+  "names": ["X", "03", "Kreuz", "Blech", "Schild", "Wüste", "Schlitze", "Stern", "Latten", "Gitter"],
+  "source": "KI (PixelLab, Create Image Pro in Spielgröße 1:1, AAP-64, Referenzen: Leyla für Blickwinkel und Maßstab, TileSet00 Großer Clutter für den Stil) + Code (tools/camp_kit.py: Varianten zuschneiden, unten mittig)",
+  "date": "2026-11-19",
+  "description": "#111 Camp-Baukasten: Stapelbare Vorratskiste, oben und unten flach. Je Feld eine Variante (Kandidaten in assets/camp/kit/candidates/)."
+ },
+ "kit_plant": {
+  "name": "Camp-Baukasten · Topfpflanze im Eimer",
+  "kind": "icons",
+  "file": "assets/camp/kit/plant.png",
+  "cell": [58, 67],
+  "grid": [9, 1],
+  "names": ["Türkis", "Farbe", "Blech", "Gestreift", "Creme", "Grün", "Blau", "Sand", "Fisch"],
+  "source": "KI (PixelLab, Create Image Pro in Spielgröße 1:1, AAP-64, Referenzen: Leyla für Blickwinkel und Maßstab, TileSet00 Großer Clutter für den Stil) + Code (tools/camp_kit.py: Varianten zuschneiden, unten mittig)",
+  "date": "2026-11-19",
+  "description": "#111 Camp-Baukasten: Grüne Pflanze mit gelben Blüten in alten Eimern, mit Schaufel. Je Feld eine Variante (Kandidaten in assets/camp/kit/candidates/)."
  }
 }

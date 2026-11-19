@@ -3,7 +3,7 @@
 // pieces stand on top; ground pieces on the campsite; span pieces hang between two anchors (container corners, the mast, poles).
 // Some move: neon flickers, banners and laundry sway, the windmill turns faster in gusts, the kettle steams, crows fly up when
 // Leyla comes near. Mixed into Camp like CampLife (logic: game/decor.js).
-import { decorDef, placeOf, plantStage, dstate } from '../decor.js';
+import { decorDef, placeOf, plantStage, dstate, tagsOf, freeWhy, canCarry } from '../decor.js';
 import { catenary } from '../string_lights.js';
 import { glowTexture } from './camp.js';
 import { advance, clockText } from '../save.js';
@@ -49,6 +49,7 @@ export class CampDecor {
   spanPoint(id) { return this.spanAnchors().find(a => a.id === id) || null; }
   // candidate places for a piece of this kind (build mode): [{ at, x, y, label }]
   decorSpots(id) {
+    if (placeOf(this.D, id) === 'free') return this.freeSpots(id);
     const D = this.D, kind = placeOf(D, id), T = this.scene.T, out = [], save = this.box.save, used = new Set((save.rig.decor || []).map(x => JSON.stringify({ ...x.at, day: undefined })));
     if (kind === 'ground') {
       const [a, b] = D.camp?.decor?.ground || [-4, 20], step = 0.5;
@@ -85,7 +86,9 @@ export class CampDecor {
     this.walkTops = [];
     this.decorAnim = [];
     this.crows?.forEach(c => c.o.destroy()); this.crows = [];
+    this.freeAt = []; this.decorBoxes = [];
     R.decor.forEach((x, i) => { try { this.drawPiece(x, i); } catch (e) { console.warn('Deko', x.id, e); } });
+    try { this.drawKitLights(); } catch (e) { console.warn('Deko-Lichterkette', e); }
     if (R.decor.some(x => decorDef(this.D, x.id)?.art === 'birdhouse')) this.spawnCrows();
     this.drawRainBits();
   }
@@ -104,6 +107,7 @@ export class CampDecor {
       return this[`art_${d.art}`]?.(p, q, d, seed, pick);
     }
     if (kind === 'side') { const b = this.balconyAt(at.ui, at.side, d); if (b) this.art_balcony(b, d, seed, at.side); return; }
+    if (kind === 'free') { const q = this.freePos(i); if (q) this.art_sprite(q, d, x, i); return; }
     let pos;
     if (kind === 'ground') pos = { x: this.groundX(at.x), y: this.ground };
     else if (kind === 'wall') pos = this.wallAt(at.ui, at.p);
@@ -116,6 +120,137 @@ export class CampDecor {
   }
   dG(depth) { return this.dAdd(this.scene.add.graphics().setDepth(depth)); }
   dR(g, x, y, w, h, c, a = 1) { g.fillStyle(col(c), a).fillRect(snap(x), snap(y), Math.max(PX, snap(w)), Math.max(PX, snap(h))); }
+
+
+  // ---------- #111 Camp-Baukasten: free pieces (ground, roof, on top of each other) ----------
+  // the base point of a free piece: { x, y, u?, level, roof } (y = where its feet stand)
+  freePos(i, seen = new Set()) {
+    if (this.freeAt?.[i]) return this.freeAt[i];
+    const L = this.box.save.rig.decor || [], o = L[i], T = this.scene.T;
+    if (!o || seen.has(i)) return null;
+    seen.add(i);
+    const at = o.at || {}, m = /^deco:(\d+)$/.exec(at.on || '');
+    let q = null;
+    if (m) { const j = Number(m[1]), b = this.freePos(j, seen), top = b && this.kitTop(j); if (b && top != null) q = { x: b.x + (at.dx || 0) * T, y: b.y - top, u: b.u, level: b.level + 1, roof: b.roof, on: j }; }
+    else if (at.ui != null && at.p != null) { const r = this.roofAt(at.ui, at.p); if (r) q = { x: r.x, y: r.y, u: r.u, level: 0, roof: true }; }
+    else if (Number.isFinite(at.x)) q = { x: this.groundX(at.x), y: this.ground, level: 0 };
+    if (q) (this.freeAt ??= [])[i] = q;
+    return q;
+  }
+  kitFrame(d, at) { const a = this.D.assets?.[d.look], n = a?.grid ? a.grid[0] * a.grid[1] : 1; return Math.max(0, Math.min(n - 1, at?.v ?? 0)); }
+  kitScale(d) { return (d.scale || 100) / 100; }
+  // height of the painted part of a frame (feet on the bottom row), cached per texture frame
+  kitContent(key, frame) {
+    const s = this.scene, k = `${key}:${frame}`, C = (CampDecor.content ??= new Map());
+    if (C.has(k)) return C.get(k);
+    const f = s.textures.getFrame(key, frame);
+    if (!f) return null;
+    let top = f.height;
+    for (let y = 0; y < f.height && top === f.height; y++) for (let x = 0; x < f.width; x += 2) if (s.textures.getPixelAlpha(x, y, key, frame) > 40) { top = y; break; }
+    const out = { h: f.height - top, w: f.width, fh: f.height };
+    C.set(k, out);
+    return out;
+  }
+  // where something stands on piece i: px above its feet, or null when nothing can stand on it
+  kitTop(i) {
+    const o = this.box.save.rig.decor?.[i], d = o && decorDef(this.D, o.id);
+    if (!d || !canCarry(d) || !this.scene.textures.exists(d.look)) return null;
+    const k = this.kitScale(d);
+    if (d.carry === 'fixed') return (d.top || 0) * k;
+    const c = this.kitContent(d.look, this.kitFrame(d, o.at));
+    return c ? c.h * k : null;
+  }
+  // which way the piece looks: toward the nearest piece with the „Dreht sich zu“ tag, else its rolled mirror
+  kitFlip(d, o, i, q) {
+    if (d.faces) {
+      const near = (this.D.camp?.decor?.near ?? 2.5) * 2 * this.scene.T, L = this.box.save.rig.decor || [];
+      let best = null;
+      L.forEach((p, j) => { if (j === i || !tagsOf(decorDef(this.D, p.id)).includes(d.faces)) return; const r = this.freePos(j); if (!r || Math.abs(r.y - q.y) > 40 && !(r.level || q.level)) return; const dist = Math.abs(r.x - q.x); if (dist <= near && (!best || dist < best.dist)) best = { dist, x: r.x }; });
+      if (best) return best.x < q.x;
+    }
+    return !!(d.flip && o.at?.f);
+  }
+  art_sprite(q, d, o, i) {
+    const s = this.scene;
+    if (!d.look || !s.textures.exists(d.look)) return;
+    s.textures.get(d.look).setFilter(Phaser.Textures.FilterMode.NEAREST);
+    const fr = this.kitFrame(d, o.at), k = this.kitScale(d), flip = this.kitFlip(d, o, i, q), f = s.textures.getFrame(d.look, fr);
+    const x = Math.round(q.x), y = Math.round(q.y), depth = -15.9 + q.level * 0.002 + i * 0.00001;
+    // a soft contact shadow under ground and roof pieces
+    if (!q.level) { const g = this.dG(depth - 0.0005); g.fillStyle(0x060608, 0.28).fillEllipse(x, y - 1, f.width * k * 0.8, 7); }
+    const img = this.dAdd(s.add.image(x, y + 1, d.look, fr).setOrigin(0.5, 1).setScale(k).setFlipX(flip).setDepth(depth));
+    const c = this.kitContent(d.look, fr) || { h: f.height, w: f.width };
+    (this.decorBoxes ??= [])[i] = { x0: x - f.width * k / 2, x1: x + f.width * k / 2, y0: y - c.h * k, y1: y, x, y };
+    // pop in when it was just placed (Tiny Glade: every click answers)
+    if (this.kitPop === i) { img.setScale(k * 0.6, k * 1.25); s.tweens.add({ targets: img, scaleX: k, scaleY: k, duration: 260, ease: 'Back.Out' }); this.kitPop = null; }
+    if (!d.extra || !d.hook) return;
+    const hx = x + ((flip ? f.width - d.hook[0] : d.hook[0]) - f.width / 2) * k, hy = y - (f.height - d.hook[1]) * k;
+    const seed = hash(i, x);
+    if (d.extra === 'light' || d.extra === 'candle') {
+      const big = d.extra === 'light', l = this.light(hx, hy, big ? 190 : 70, big ? '#ffd27a' : '#ffb347', big ? 0.75 : 0.6); l.rig = true;
+      this.decorAnim.push(time => l.setAlpha(l.base * this.lightK * (0.86 + 0.14 * Math.sin(time / (big ? 170 : 90) + seed * 7))));
+    }
+    if (d.extra === 'fire') {
+      const fl = this.dAdd(s.add.graphics().setDepth(depth + 0.0008)), bw = f.width * k * 0.5;
+      const l = this.light(hx, hy - 20, 260, '#ff8a2a', 0.85); l.rig = true;
+      this.decorAnim.push(time => {
+        fl.clear(); const t = time / 1000;
+        for (const [dx, base, ph] of [[-bw * 0.28, 26, 0], [bw * 0.25, 22, 2.1], [0, 40, 4.3], [-bw * 0.05, 30, 1.2]]) {
+          const top = base + Math.sin(t * 7 + ph + seed * 9) * 6;
+          for (let yy = 0; yy < top; yy += 4) { const wd = Math.max(2, Math.round((1 - yy / top) * 14 / 2) * 2), sw = Math.round(Math.sin(t * 5 + ph + yy / 9) * 2); fl.fillStyle(yy > top * 0.6 ? 0xdf3e23 : yy > top * 0.3 ? 0xfa6a0a : 0xffd541).fillRect(Math.round(hx + dx + sw - wd / 2), Math.round(hy - yy - 4), wd, 4); }
+        }
+        // sparks
+        for (let n = 0; n < 3; n++) { const ph = (t * 0.7 + n / 3 + seed) % 1, sx = hx + Math.sin(n * 2.4 + t * 2) * 10 * ph; fl.fillStyle(0xffd541, 1 - ph).fillRect(Math.round(sx), Math.round(hy - 30 - ph * 60), 2, 2); }
+        l.setAlpha(l.base * Math.max(0.35, this.lightK || 0) * (0.85 + 0.15 * Math.sin(t * 11 + seed)));
+      });
+    }
+  }
+  // posts with „Lichterkette zu Nachbarn“ close to each other string lights between their hooks (Townscaper: neighbours react)
+  drawKitLights() {
+    const D = this.D, L = this.box.save.rig.decor || [], T = this.scene.T, max = (D.camp?.decor?.linkMax ?? 8) * T;
+    const posts = L.map((o, i) => ({ o, i, d: decorDef(D, o.id) })).filter(p => p.d?.linkLights && p.d.hook && this.decorBoxes?.[p.i]).map(p => {
+      const b = this.decorBoxes[p.i], f = this.scene.textures.getFrame(p.d.look, this.kitFrame(p.d, p.o.at)), k = this.kitScale(p.d);
+      return { x: b.x, y: b.y - (f.height - p.d.hook[1] + 14) * k, top: b.y };
+    }).sort((a, b) => a.x - b.x);
+    const colors = ['#ffd27a', '#fa6a0a', '#f9a31b', '#e86a73', '#a6fcdb'];
+    for (let k = 1; k < posts.length; k++) {
+      const p = posts[k - 1], q = posts[k];
+      if (q.x - p.x > max || Math.abs(q.top - p.top) > 8) continue;
+      const cat = catenary({ x: p.x, y: p.y }, { x: q.x, y: q.y }, 20, 30), g = this.dG(-15.95);
+      g.lineStyle(2, 0x17111f, 0.95).beginPath(); cat.line.forEach((pt, n) => n ? g.lineTo(pt.x, pt.y) : g.moveTo(pt.x, pt.y)); g.strokePath();
+      cat.bulbs.forEach((b, j) => {
+        const c = colors[(j + k) % colors.length];
+        g.fillStyle(0x17111f).fillRect(Math.round(b.x) - 2, Math.round(b.y), 4, 3).fillStyle(col(c)).fillRect(Math.round(b.x) - 3, Math.round(b.y) + 3, 6, 6).fillStyle(0xffffff, 0.6).fillRect(Math.round(b.x) - 2, Math.round(b.y) + 4, 2, 2);
+        const l = this.light(b.x, b.y + 6, 40, c, 0.7); l.rig = true;
+        this.decorAnim.push(time => l.setAlpha(l.base * this.lightK * (0.8 + 0.2 * Math.sin(time / 600 + j * 1.7 + k))));
+      });
+    }
+  }
+  // candidate places for a free piece: on the ground, on roofs, on top of pieces that carry
+  freeSpots(id) {
+    const D = this.D, T = this.scene.T, save = this.box.save, out = [], L = save.rig.decor || [];
+    const [a, b] = D.camp?.decor?.ground || [-4, 20];
+    for (let x = a; x <= b; x += 0.25) {
+      const gx = this.groundX(x);
+      if (this.geo.shaft && gx < (this.geo.shaft.to + 1) * T) continue;
+      out.push({ at: { x }, x: gx, y: this.ground - 10, label: 'Hier hinstellen' });
+    }
+    if (!this.geo.mega) for (const u of this.geo.units || []) {
+      if (u.ui === 0 || (save.rig.units[u.ui + 1]?.level || 0) > (save.rig.units[u.ui]?.level || 0)) continue;
+      for (let p = -0.25; p <= (u.places || 0) - 0.75; p += 0.25) { const q = this.roofAt(u.ui, p); if (q) out.push({ at: { ui: u.ui, p }, x: q.x, y: q.y - 6, label: 'Aufs Dach' }); }
+    }
+    if (decorDef(D, id)?.stack) L.forEach((o, j) => {
+      const top = this.kitTop(j), q = this.freePos(j), box = this.decorBoxes?.[j];
+      if (top == null || !q || !box) return;
+      const wide = (box.x1 - box.x0) > T * 1.1;
+      for (const dx of wide ? [-0.3, 0, 0.3] : [0]) {
+        const at = { on: `deco:${j}`, dx };
+        if (freeWhy(D, save, id, at)) continue;
+        out.push({ at, x: q.x + dx * T, y: q.y - top - 4, label: `Auf ${decorDef(D, o.id)?.name || 'das Stück'}`, stack: true });
+      }
+    });
+    return out;
+  }
 
   // ---- wall ----
   art_neon(x, y, w, h, d, seed, pick) {

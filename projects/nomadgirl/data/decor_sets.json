@@ -1,0 +1,13 @@
+{
+ "lagerfeuer_ecke": {
+  "name": "Lagerfeuer-Ecke",
+  "within": 7,
+  "cozy": 5,
+  "needs": [{"tag": "feuer", "count": 1},{"tag": "sitz", "count": 2},{"tag": "licht", "count": 1}],
+  "description": "Feuer, zwei Stühle und Licht: der Ort für lange Abende."
+ },
+ "gemuetliche_runde": {"name": "Gemütliche Runde", "within": 4, "cozy": 3, "needs": [{"tag": "tisch", "count": 1},{"tag": "sitz", "count": 2}], "description": "Ein Tisch, zwei Stühle. Kaffee?"},
+ "vorratslager": {"name": "Vorratslager", "within": 3, "cozy": 2, "needs": [{"tag": "kiste", "count": 4}], "description": "Vier Kisten auf einem Fleck, gestapelt zählt auch."},
+ "kleiner_garten": {"name": "Kleiner Garten", "within": 4, "cozy": 3, "needs": [{"tag": "grün", "count": 3}], "description": "Drei Pflanzen zusammen."},
+ "laternenweg": {"name": "Laternenweg", "within": 12, "cozy": 3, "needs": [{"tag": "licht", "count": 3}], "description": "Drei Lichter in einer Reihe."}
+}

@@ -9,10 +9,13 @@
 //   save.rig.spare.decor = [id]          bought or taken down, waiting in the Lager
 // Gemütlichkeit (cozy): every piece adds its points; the sum makes sleeping and resting give stronger buffs (capped, Camp › Deko).
 
-export const DECOR_PLACES = [['ground', 'Auf dem Boden'], ['wall', 'An der Container-Wand'], ['roof', 'Auf dem Dach'], ['side', 'Am Container-Ende (Balkon)'], ['span', 'Zwischen zwei Punkten']];
+export const DECOR_PLACES = [['free', 'Frei (Boden, Dach, aufeinander)'], ['ground', 'Auf dem Boden'], ['wall', 'An der Container-Wand'], ['roof', 'Auf dem Dach'], ['side', 'Am Container-Ende (Balkon)'], ['span', 'Zwischen zwei Punkten']];
 export const DECOR_ARTS = [['addon', 'Ausschnitt eines Anbauteils'], ['neon', 'Neon-Schild'], ['banner', 'Banner'], ['graffiti', 'Graffiti'], ['line', 'Wäscheleine'],
   ['sail', 'Sonnensegel'], ['tent', 'Zelt'], ['pole', 'Zeltstange (Ankerpunkt)'], ['windmill', 'Windrad'], ['plant', 'Pflanze im Topf'], ['tripod', 'Dreibein mit Topf'],
-  ['birdhouse', 'Vogelhaus (Krähen)'], ['trophies', 'Kiste mit Fundstücken'], ['hammock', 'Hängematte'], ['lantern', 'Laterne'], ['mirror', 'Spiegel (Haare färben)'], ['pennants', 'Wimpelkette'], ['canopy', 'Fallschirm-Plane'], ['barrel', 'Feuertonne'], ['balcony', 'Balkon (begehbar)'], ['bridge', 'Brücke (begehbar)'], ['tower', 'Aussichtsturm (begehbar, Leiter)'], ['icon', 'Bild aus einem Symbol-Raster']];
+  ['birdhouse', 'Vogelhaus (Krähen)'], ['trophies', 'Kiste mit Fundstücken'], ['hammock', 'Hängematte'], ['lantern', 'Laterne'], ['mirror', 'Spiegel (Haare färben)'], ['pennants', 'Wimpelkette'], ['canopy', 'Fallschirm-Plane'], ['barrel', 'Feuertonne'], ['balcony', 'Balkon (begehbar)'], ['bridge', 'Brücke (begehbar)'], ['tower', 'Aussichtsturm (begehbar, Leiter)'], ['icon', 'Bild aus einem Symbol-Raster'], ['sprite', 'Bild mit Varianten (Baukasten)']];
+// #111 Camp-Baukasten: what can stand on a piece (Tragfläche)
+export const DECOR_CARRY = [['', 'Nichts'], ['content', 'Oberkante des Bilds'], ['fixed', 'In fester Höhe']];
+export const DECOR_EXTRAS = [['', 'Nichts'], ['fire', 'Flammen + Licht'], ['light', 'Licht'], ['candle', 'Kerzenlicht (klein)']];
 
 export const decorDef = (D, id) => D.decor?.[id] || null;
 export const placeOf = (D, id) => decorDef(D, id)?.place || 'ground';
@@ -39,15 +42,26 @@ export function put(D, save, id, at) {
   if (kind === 'side' && (at.ui == null || (at.side !== 0 && at.side !== 1))) return { ok: false, why: 'An ein Container-Ende' };
   if (kind === 'side' && R.decor.some(o => o.at?.ui === at.ui && o.at?.side === at.side)) return { ok: false, why: 'Da ist schon ein Balkon' };
   if (kind === 'ground' && !Number.isFinite(at.x)) return { ok: false, why: 'Auf den Boden' };
+  if (kind === 'free') { const why = freeWhy(D, save, id, at); if (why) return { ok: false, why }; }
   const max = D.camp?.decor?.max ?? 40;
   if (R.decor.length >= max) return { ok: false, why: `Mehr als ${max} Deko-Stücke hat das Camp nicht` };
-  R.decor.push({ id, at: { ...at, day: at.day ?? save.day ?? 1 } });
+  const n = variants(D, id), extra = {};
+  if (n > 1 && at.v == null) extra.v = Math.floor(Math.random() * n);
+  if (decorDef(D, id)?.flip && at.f == null) extra.f = Math.random() < 0.5 ? 1 : 0;
+  R.decor.push({ id, at: { ...at, ...extra, day: at.day ?? save.day ?? 1 } });
   return { ok: true, i: R.decor.length - 1 };
 }
 // take a placed piece back into the hand; spans that hung on it (a pole, a balcony, a tower) come down into the Lager
 export function lift(D, save, i) {
   const R = dstate(save), x = R.decor[i];
   if (!x) return null;
+  // #111: what stood on it comes down to where it stood (a stack sinks by one piece, Townscaper-like: nothing is lost)
+  for (const o of R.decor) if (o.at?.on === `deco:${i}`) {
+    const { v, f, day } = o.at, base = { ...x.at };
+    delete base.v; delete base.f; delete base.day;
+    if (base.on) base.dx = (base.dx || 0) + (o.at.dx || 0); else if (Number.isFinite(base.x)) base.x += o.at.dx || 0;
+    o.at = { ...base, ...(v != null ? { v } : {}), ...(f != null ? { f } : {}), day };
+  }
   compact(R, (o, k) => k === i, { spare: true, except: i });
   return x;
 }
@@ -59,7 +73,7 @@ export function sell(D, save, id) {
   return { ok: true, back: sellPrice(D, id) };
 }
 // Gemütlichkeit: the sum of the placed pieces, and what it gives (Camp › Deko › Gemütlichkeit wirkt bis)
-export const cozy = (D, save) => (save?.rig?.decor || []).reduce((n, x) => n + (decorDef(D, x.id)?.cozy || 0), 0);
+export const cozy = (D, save) => cozyParts(D, save).total;
 export const cozyBonus = (D, save) => Math.min(D.camp?.decor?.cozyMax ?? 25, cozy(D, save));
 
 // removes pieces from rig.decor and keeps the rest pointing at the right pieces (Aufräumen 16.11.2026: anchors are array indices,
@@ -67,10 +81,10 @@ export const cozyBonus = (D, save) => Math.min(D.camp?.decor?.cozyMax ?? 25, coz
 // drop(o, i) → true = remove; opts.spare = removed pieces go into the Lager (except index opts.except, the piece taken into the hand)
 export function compact(rig, drop, opts = {}) {
   const L = rig.decor || [], gone = new Set(L.map((o, i) => (drop(o, i) ? i : -1)).filter(i => i >= 0));
-  const ref = a => { const m = /^(pole|balc|tower):(\d+)$/.exec(a || ''); return m ? Number(m[2]) : null; };
+  const ref = a => { const m = /^(pole|balc|tower|deco):(\d+)$/.exec(a || ''); return m ? Number(m[2]) : null; };
   for (let changed = true; changed;) {
     changed = false;
-    L.forEach((o, i) => { if (gone.has(i) || o.at?.a == null) return; if ([o.at.a, o.at.b].some(a => { const r = ref(a); return r != null && (gone.has(r) || !L[r]); })) { gone.add(i); changed = true; } });
+    L.forEach((o, i) => { if (gone.has(i) || (o.at?.a == null && o.at?.on == null)) return; if ([o.at.a, o.at.b, o.at.on].some(a => { const r = ref(a); return r != null && (gone.has(r) || !L[r]); })) { gone.add(i); changed = true; } });
   }
   if (!gone.size) return [];
   const map = new Map(); let n = 0;
@@ -80,6 +94,7 @@ export function compact(rig, drop, opts = {}) {
   rig.decor = L.filter((o, i) => {
     if (gone.has(i)) { removed.push(o); if (opts.spare && i !== opts.except) ((rig.spare ??= { workshops: [], containers: [] }).decor ??= []).push(o.id); return false; }
     if (o.at?.a != null) { o.at.a = fix(o.at.a); o.at.b = fix(o.at.b); }
+    if (o.at?.on != null) o.at.on = fix(o.at.on);
     return true;
   });
   return removed;
@@ -102,3 +117,76 @@ export function remap(rig, move) {
 export const plantStage = (D, save, x) => Math.max(0, Math.min(3, Math.floor(((save.day ?? 1) - (x.at?.day ?? 1)) / Math.max(1, decorDef(D, x.id)?.growDays ?? 2))));
 // the balconies at a unit's ends (for the camp: no end wall where a balcony is): Set of 'ui:side'
 export const balconies = rig => new Set((rig?.decor || []).filter(o => o.at?.side != null).map(o => `${o.at.ui}:${o.at.side}`));
+
+// ---------- #111 Camp-Baukasten (Daniel 19.11.2026: „wie Townscaper oder Tiny Glade aus der Sidescroll-Perspektive“) ----------
+// Free pieces stand on the ground, on a container roof or on another piece (at.on = 'deco:<i>', at.dx tiles from its centre).
+// Every piece rolls a variant of its picture (at.v) and maybe a mirror (at.f). Neighbours and ensembles only ever add Gemütlichkeit
+// (Dorfromantik: what fits gives a bonus, what does not costs nothing).
+export const variants = (D, id) => { const d = decorDef(D, id), a = d?.look && D.assets?.[d.look]; return d?.art === 'sprite' && a?.grid ? Math.max(1, a.grid[0] * a.grid[1]) : 1; };
+export const tagsOf = d => String(d?.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+export const canCarry = d => !!d?.carry;
+const onIndex = at => { const m = /^deco:(\d+)$/.exec(at?.on || ''); return m ? Number(m[1]) : null; };
+// the ground or roof spot a piece finally rests on: { surf: 'g' | 'r<ui>', x (tiles), level (pieces below it) }
+export function restOf(D, save, i, seen = new Set()) {
+  const L = save?.rig?.decor || [], o = L[i];
+  if (!o || seen.has(i)) return null;
+  seen.add(i);
+  const j = onIndex(o.at);
+  if (j != null) { const b = restOf(D, save, j, seen); return b && { surf: b.surf, x: b.x + (o.at.dx || 0), level: b.level + 1 }; }
+  if (o.at?.ui != null && o.at?.p != null) return { surf: `r${o.at.ui}`, x: o.at.p * 2, level: 0 };
+  if (Number.isFinite(o.at?.x)) return { surf: 'g', x: o.at.x, level: 0 };
+  return null;
+}
+// may this free piece go there? → reason or ''
+export function freeWhy(D, save, id, at) {
+  if (at.on != null) {
+    const j = onIndex(at), L = save.rig.decor || [], b = L[j];
+    if (j == null || !b) return 'Worauf?';
+    if (!decorDef(D, id)?.stack) return 'Das lässt sich nicht draufstellen';
+    if (!canCarry(decorDef(D, b.id))) return 'Darauf hält nichts';
+    const r = restOf(D, save, j);
+    if (!r) return 'Worauf?';
+    if (r.level + 1 >= (D.camp?.decor?.stackMax ?? 4)) return 'Höher wird es zu wackelig';
+    return '';
+  }
+  if (at.ui != null && at.p != null) return '';
+  return Number.isFinite(at.x) ? '' : 'Kein Platz';
+}
+// the ensembles that stand in the camp: [{ id, name, cozy, members: [i] }]; a piece counts once per ensemble kind
+export function ensembles(D, save) {
+  const L = save?.rig?.decor || [], sets = D.decorSets || {}, out = [];
+  const pos = L.map((o, i) => ({ i, r: restOf(D, save, i), tags: tagsOf(decorDef(D, o.id)) })).filter(p => p.r);
+  for (const [id, e] of Object.entries(sets)) {
+    const needs = (e.needs || []).filter(n => n.tag && (n.count ?? 1) > 0), within = e.within ?? 6, used = new Set();
+    if (!needs.length) continue;
+    const surfs = [...new Set(pos.map(p => p.r.surf))];
+    for (const surf of surfs) {
+      const here = pos.filter(p => p.r.surf === surf).sort((a, b) => a.r.x - b.r.x);
+      for (const start of here) {
+        if (used.has(start.i)) continue;
+        const win = here.filter(p => !used.has(p.i) && p.r.x >= start.r.x && p.r.x <= start.r.x + within), take = [];
+        const ok = needs.every(n => { const got = win.filter(p => p.tags.includes(n.tag) && !take.includes(p.i)).slice(0, n.count ?? 1); take.push(...got.map(p => p.i)); return got.length >= (n.count ?? 1); });
+        if (!ok) continue;
+        take.forEach(k => used.add(k));
+        out.push({ id, name: e.name || id, cozy: e.cozy || 0, members: take, x: Math.min(...take.map(k => pos.find(p => p.i === k).r.x)), surf });
+      }
+    }
+  }
+  return out;
+}
+// neighbours: a piece that likes a tag gets its bonus when such a piece stands near it (once per row)
+export function neighbourBonus(D, save) {
+  const L = save?.rig?.decor || [], near = D.camp?.decor?.near ?? 2.5, out = [];
+  const pos = L.map((o, i) => ({ i, d: decorDef(D, o.id), r: restOf(D, save, i) }));
+  for (const p of pos) for (const like of p.d?.likes || []) {
+    if (!like?.tag || !p.r) continue;
+    if (pos.some(q => q.i !== p.i && q.r && q.r.surf === p.r.surf && Math.abs(q.r.x - p.r.x) <= near && tagsOf(q.d).includes(like.tag))) out.push({ i: p.i, tag: like.tag, cozy: like.cozy ?? 1 });
+  }
+  return out;
+}
+// the full sum: pieces + neighbours + ensembles (never below the plain sum)
+export function cozyParts(D, save) {
+  const base = (save?.rig?.decor || []).reduce((n, x) => n + (decorDef(D, x.id)?.cozy || 0), 0);
+  const nb = neighbourBonus(D, save), en = ensembles(D, save);
+  return { base, neighbours: nb.reduce((n, b) => n + b.cozy, 0), sets: en, total: base + nb.reduce((n, b) => n + b.cozy, 0) + en.reduce((n, e) => n + e.cozy, 0) };
+}

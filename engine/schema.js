@@ -15,7 +15,7 @@ import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from
 import { ACHIEVEMENT_COUNTERS, ACHIEVEMENT_SPECIALS, ACHIEVEMENT_CATEGORIES } from '../game/achievements.js';
 import { REP_LEVELS } from '../game/reputation.js';
 import { RADIO_STYLES, RADIO_TALK, RADIO_SCALES, RADIO_KEYS } from '../game/radio_kinds.js';
-import { DECOR_PLACES, DECOR_ARTS } from '../game/decor.js';
+import { DECOR_PLACES, DECOR_ARTS, DECOR_CARRY, DECOR_EXTRAS } from '../game/decor.js';
 import { MOMENTS } from '../game/banter.js';
 import { EARN_WHEN } from '../game/earn.js';
 import { RELIEFS, ROADSIDE } from '../game/road.js';
@@ -1151,12 +1151,39 @@ export const AREAS = {
     sections: [{ title: 'Deko', fields: [NAME, select('art', 'Art', DECOR_ARTS), select('place', 'Sitzt', DECOR_PLACES), VALUE, num('cozy', 'Gemütlichkeit', { min: 0 }), DESCRIPTION] },
       { title: 'Aussehen', fields: [size('size', 'Größe', { unit: 'Kacheln', hint: 'Breite × Höhe; bei Zelt und Segel: Höhe = wie tief es hängt' }), color('color', 'Farbe'), text('colors', 'Farben', { hint: 'Mehrere mit Komma (Wäsche, Streifen)' }),
         text('text', 'Text', { hint: 'Neon, Banner, Graffiti; mehrere mit | (zufällig je Ort)' }), ref('addon', 'Ausschnitt von', 'rigAddons', { hint: 'Art „Ausschnitt“: das Bild dieses Anbauteils' }),
-        refs('items', 'Fundstücke', 'items', { hint: 'Art „Kiste mit Fundstücken“: diese Symbole' }), ref('look', 'Symbol-Raster', 'assets', { hint: 'Art „Bild aus einem Symbol-Raster“: aus diesem Raster …' }), num('icon', 'Symbol', { min: 0, hint: '… dieses Feld (0 = erstes); Höhe = Größe-Höhe' }), num('growDays', 'Wächst in Tagen', { min: 1, hint: 'Pflanze: Tage je Stufe' })] }],
+        refs('items', 'Fundstücke', 'items', { hint: 'Art „Kiste mit Fundstücken“: diese Symbole' }), ref('look', 'Symbol-Raster', 'assets', { hint: 'Art „Bild aus einem Symbol-Raster“: aus diesem Raster …' }), num('icon', 'Symbol', { min: 0, hint: '… dieses Feld (0 = erstes); Höhe = Größe-Höhe' }), num('growDays', 'Wächst in Tagen', { min: 1, hint: 'Pflanze: Tage je Stufe' })] },
+      { title: 'Baukasten', fields: [
+        num('scale', 'Maßstab', { unit: '%', min: 10, hint: '#111 Art „Bild mit Varianten“: 100 = so groß wie gemalt (PixelLab malt in Spielgröße, Leyla 170 cm = 192 px)' }),
+        bool('flip', 'Darf gespiegelt werden', { hint: 'Jedes platzierte Stück würfelt Variante und Richtung' }),
+        select('carry', 'Tragfläche', DECOR_CARRY, { hint: 'Kann man etwas draufstellen? Oberkante des Bilds (Kisten) oder in fester Höhe (Tisch)' }),
+        num('top', 'Höhe der Tragfläche', { unit: 'Bildpixel', min: 0, hint: 'Bei „in fester Höhe“: vom Boden bis zur Platte' }),
+        bool('stack', 'Lässt sich draufstellen', { hint: 'Darf auf anderen Stücken mit Tragfläche stehen' }),
+        text('tags', 'Tags', { hint: 'Mit Komma, z. B. „feuer, licht“. Nachbarn und Ensembles erkennen Stücke daran' }),
+        table('likes', 'Mag Nachbarn', [text('tag', 'Tag'), num('cozy', 'Bonus', { min: 0 })], { hint: 'Steht ein Stück mit diesem Tag nah dabei (Camp › Deko › Nachbarn bis), gibt es den Bonus. Nie Abzüge (Dorfromantik)' }),
+        text('faces', 'Dreht sich zu', { hint: 'Tag: das Stück schaut zum nächsten Stück mit diesem Tag (der Stuhl zum Feuer). Das Bild schaut nach rechts' }),
+        bool('linkLights', 'Lichterkette zu Nachbarn', { hint: 'Zwei solche Stücke nah beieinander spannen von selbst eine Lichterkette (Camp › Deko › Lichterkette bis)' }),
+        point('hook', 'Haken', { unit: 'Bildpixel', hint: 'Wo die Lichterkette bzw. das Licht sitzt (von oben links im Feld)' }),
+        select('extra', 'Effekt', DECOR_EXTRAS, { hint: 'Aus Code: Flammen, Licht am Haken' })] }],
     // art and place must go together, else the camp cannot draw or anchor it (Aufräumen 16.11.2026)
     check: (x, report) => {
       const need = { pole: ['ground'], tower: ['ground'], balcony: ['side'], bridge: ['span'], tent: ['span'], sail: ['span'], line: ['span'], hammock: ['span'], pennants: ['span'], canopy: ['span'] }[x.art];
       if (need && !need.includes(x.place)) report('error', `Art „${label(DECOR_ARTS, x.art)}“ geht nur ${need.map(p => label(DECOR_PLACES, p)).join(' / ')}`);
       if (x.place === 'span' && need == null && x.art) report('warning', `Art „${label(DECOR_ARTS, x.art)}“ hängt nicht zwischen zwei Punkten`);
+      if (x.art === 'sprite' && !x.look) report('error', 'Bild mit Varianten braucht ein Symbol-Raster');
+      if (x.carry === 'fixed' && !x.top) report('warning', 'Tragfläche in fester Höhe ohne Höhe');
+      if (x.place === 'free' && x.art !== 'sprite') report('warning', '„Frei“ ist für Bilder mit Varianten gedacht');
+    },
+  },
+  decorSets: {
+    name: 'Ensembles', singular: 'Ensemble', icon: 'sparkles', file: 'data/decor_sets.json', kind: 'catalog',
+    hint: '#111 Camp-Baukasten (Daniel 19.11.2026: „wie Dorfromantik: wenn Tiles zusammenpassen, gibt es einen Bonus, aber keine Nachteile“). Stehen die Stücke mit diesen Tags nah beieinander (auf dem Boden oder demselben Dach, auch gestapelt), entsteht das Ensemble: Name, Funkeln und Gemütlichkeit obendrauf.',
+    template: { name: 'Neues Ensemble', within: 6, cozy: 3, needs: [{ tag: 'feuer', count: 1 }] },
+    row: x => `${(x.needs || []).map(n => `${n.count ?? 1}× ${n.tag}`).join(' + ')} · +${x.cozy ?? 0} Gemütlichkeit`,
+    sections: [{ title: 'Ensemble', fields: [NAME, DESCRIPTION, table('needs', 'Braucht', [text('tag', 'Tag'), num('count', 'Anzahl', { min: 1 })], { hint: 'Tags aus RIG › Deko › Baukasten' }),
+      num('within', 'Innerhalb', { unit: 'Kacheln', min: 1 }), num('cozy', 'Gemütlichkeit', { min: 0 })] }],
+    check: (x, report, p) => {
+      const tags = new Set(Object.values(p?.data?.decor || {}).flatMap(d => String(d.tags || '').split(',').map(t => t.trim()).filter(Boolean)));
+      for (const n of x.needs || []) if (n.tag && !tags.has(n.tag)) report('warning', `Kein Deko-Stück hat den Tag „${n.tag}“`);
     },
   },
   pixelOrders: {
@@ -1289,7 +1316,9 @@ export const AREAS = {
         num('sound.musicFadeIn', 'Musik einblenden', { unit: 's', min: 0, hint: 'So lange wird sie beim Betreten des Camps lauter' })] },
       { title: 'Deko', fields: [num('decor.max', 'Höchstens', { min: 1, hint: '#036: so viele Deko-Stücke im Camp' }), num('decor.back', 'Zurück beim Verkaufen', { unit: '%', min: 0, max: 100 }),
         num('decor.cozyMax', 'Gemütlichkeit wirkt bis', { unit: '%', min: 0, hint: 'Jeder Punkt Gemütlichkeit macht die Buffs von Schlafen und Ausruhen 1 % stärker, höchstens so viel' }),
-        range('decor.ground', 'Boden von – bis', { unit: 'Kacheln ab dem Lagerplatz', hint: 'Wo Boden-Deko stehen darf (negativ = Richtung Rig)' })] },
+        range('decor.ground', 'Boden von – bis', { unit: 'Kacheln ab dem Lagerplatz', hint: 'Wo Boden-Deko stehen darf (negativ = Richtung Rig)' }),
+        num('decor.stackMax', 'Stapel höchstens', { min: 1, hint: '#111: so viele Stücke übereinander' }), num('decor.near', 'Nachbarn bis', { unit: 'Kacheln', min: 0, step: 0.5, hint: 'Mag-Nachbarn und „Dreht sich zu“ wirken bis hier' }),
+        num('decor.linkMax', 'Lichterkette bis', { unit: 'Kacheln', min: 1, hint: 'Pfosten mit „Lichterkette zu Nachbarn“ verbinden sich bis zu diesem Abstand' })] },
       { title: 'Schwarzes Brett', fields: [bool('board.enabled', 'Schwarzes Brett', { hint: 'Daniel, 15.11.2026 (#025): am Van Aufträge annehmen, abgeben und Belohnungen einsammeln, zentral für alle Companions. Bei ihnen direkt geht es weiter. Später eine Werkbank, die fertige Aufträge gegen bessere Belohnungen tauscht' }),
         text('board.name', 'Name'), num('board.offset', 'Abstand zum Feuer', { unit: 'px', hint: 'Negativ = links vom Feuer, Richtung Van. −220 = am Mast' }),
         num('board.lift', 'Oberkante über dem Boden', { unit: 'px', min: 60 }), num('board.width', 'Breite', { unit: 'px', min: 60 }), num('board.height', 'Höhe', { unit: 'px', min: 40 })] },
@@ -1723,7 +1752,7 @@ export const GROUPS = [
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
   ['ACHIEVEMENTS & AUFTRÄGE', ['achievements', 'quests']],
   ['PROGRESSION', ['techtree', 'resources']],
-  ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'megarigs', 'rigAddons', 'salvage', 'people', 'companions']],
+  ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'decorSets', 'megarigs', 'rigAddons', 'salvage', 'people', 'companions']],
   ['WELT', ['worldmap', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
   ['LORE', ['brands']],
   ['ENTITIES', ['glitchlings']],
