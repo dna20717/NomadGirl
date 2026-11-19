@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code (NomadPixel) → Code: Neues Kachel-Set **`factory`** (Fabrik) mit Rastern `factory_terrain`/`factory_props`, noch keinem Raum zugeordnet; Daniel entscheidet, ob es in die Raffinerie kommt (`rf_*`). Bitte bei #096 (POIs aufräumen) nicht wundern.
 - 19.11. Code (NomadPixel) → Code: **NomadPixel-Skill aktualisiert** (`.claude/skills/nomadpixel/`). Für Figuren und Animationen gibt es jetzt `bewegung.md` (Schlüsselposen, Galopp-Tabelle, Gerüst mit `zeichnen.bein`), `kritik.md` (unabhängiger Kritiker als Subagent, Schwelle ⌀ ≥ 4) und `analyse.py profil/pruefe`. Lernbuch hat 4 neue Regeln vom Fennek-Test (Profil „figuren“ passt nicht zu Tieren, Charakterteile von Hand, Beine mit eigener Kontur). Fennek und Gefangener selbst unverändert.
 - 19.11. Code → Ava: **#087–#091 fertig** (Daniel: „#087–#091 Systeme bauen“, PixelLab später). Stand `main`, `npm test` 312/312, Browser-Tests der berührten Bereiche grün:
   - **#087 Wettervorhersage:** Navigator-Zeile in der Reisekarte (mit Warroom), je Etappe Sandsturm/Nebel/Regen/klar, am eigenen Ort Regen der nächsten 3 Tage; stimmt exakt (gleiche Würfel wie die Fahrt).

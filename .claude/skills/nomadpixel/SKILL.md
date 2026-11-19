@@ -130,6 +130,7 @@ Bei großen Grafiken (≥ 24 px) das Raster per kleinem Python-Skript mit `scrip
 4. Demo-Karte rendern und ansehen; Ecken/Kanten nachschärfen.
 5. Deko-Objekte als Tiles derselben Größe; Objekte stehen auf der Unterkante (keine Luft zum Boden).
 6. Vorschau: eine kleine **Szene** aus Boden + Deko + schlichtem Hintergrund zeigt die Wirkung am besten.
+7. **Im Spiel prüfen:** Kann das Spiel die Kacheln zeigen (Direkt-Modus), ein Bildschirmfoto vor dem echten Hintergrund machen. Profil `kacheln`/`clutter` aus den Kachel-Rastern des Spiels messen (`AN profil`) und mit `AN pruefe` vergleichen; danach Kritiker-Runde (`kritik.md`).
 
 ## 7. Charakter-Animationen
 

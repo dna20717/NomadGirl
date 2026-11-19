@@ -4,6 +4,9 @@ Was bei Grafiken für NomadGirl funktioniert und was nicht. **Vor jedem Auftrag 
 
 ## Regeln
 
+- 19.11.2026 (Kachel-Set Fabrik, 3 Kritiker-Runden 2,6 → 2,7 → 2,7): Code-Pixel-Art-Clutter wirkt neben dem gemalten PixelLab-Clutter (TileSet00) fremd: zu sauber, zu flach. Für Clutter, der neben dem Bestand steht, dichte gemalte Textur, kräftige Rost-Verläufe und echtes Volumen nötig; sonst lieber den vorhandenen Clutter nehmen oder PixelLab.
+- 19.11.2026 (Kachel-Set Fabrik): Kacheln immer im echten Spiel vor dem Himmel prüfen (Bildschirmfoto). Die Ziegelwand verschwand zuerst im Sonnenuntergang; Wand muss sich in der Helligkeit klar vom Hintergrund absetzen.
+- 19.11.2026 (Kachel-Set Fabrik): Akzentsteine (grau, sandig) höchstens ~10 % und zufällig je Stein, nie in Gruppen je Lage, sonst entstehen waagerechte Streifen im Kachelraster. Senkrechte Stahlstütze höchstens alle 4 Kacheln.
 - 19.11.2026 (Fennek-Test, 3 Kritiker-Runden): Das Profil „figuren“ misst gemalte, hochaufgelöste Figuren (Leyla, Raider). Für 64-px-Pixel-Art-Tiere nicht als Maßstab nehmen; ein Wüstentier bleibt sandig hell. Figuren dunkler ziehen hat den Fennek zur „Hyäne“ gemacht.
 - 19.11.2026 (Fennek-Test): Kopf, Ohren, Schwanz von Hand gestalten und am Bewegungsgerüst befestigen. Rein geometrische Köpfe verlieren den Charme.
 - 19.11.2026 (Fennek-Test): Beine je auf eigener Ebene mit eigener Kontur; ferne Beine nur eine Stufe dunkler (fast schwarz verklumpt sie).

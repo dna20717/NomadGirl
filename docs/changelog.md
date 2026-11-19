@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Kachel-Set Fabrik** (NomadPixel): Ziegelmauer mit Ruß und Stahlstützen, Riffelblech-Kante, 12 Fabrik-Objekte (Ölfass, Handrad, Förderband, Schaltkasten, Gasflaschen, Zahnrad, Werkzeugwagen, Raupenkettenglieder …), Einschlüsse und Decals. In der Werkstatt wählbar, noch keinem Raum zugeordnet.
 - 19.11.2026: **NomadPixel besser**: gemessene Farbrampen aus den Symbol-Rastern, Bibliothek und Lernbuch unter `.claude/`, Feinschliff-Werkzeuge; Pixel-Aufträge mit Entwürfen zur Wahl, Favorit und Rückmeldung (Passt / Nachbessern).
 - 19.11.2026: **Fennek v2** (Daniel: „Detaillevel etwas erhöhen und die Ohren beim Laufen animieren“): spitzere Ohren, die beim Galopp mitschwingen, Fellstruktur ohne Flimmern, Schwanzsträhnen, Ohrbüschel, Pfoten, Schnurrhaare. Detailwert 0,34 → 0,46.
 - 19.11.2026: **Erster Pixel-Auftrag aus der Werkstatt erledigt**: Fennek im Galopp (`fennek_run`, 8 Frames à 64 px, NomadPixel). Noch nicht im Spiel eingesetzt.

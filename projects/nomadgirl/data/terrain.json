@@ -540,5 +540,49 @@
   "sizeMax": 200,
   "atmosphere": "ministerium_kalt",
   "glows": [{"name": "ministry3_4", "color": "#ffd27a", "at": [30, 20], "size": [20, 16], "strength": 70, "light": 200, "behavior": "steady"}]
+ },
+ "factory": {
+  "name": "Fabrik",
+  "look": "factory_terrain",
+  "top": ["factory_top_0", "factory_top_1", "factory_top_2", "factory_top_3"],
+  "fill": ["factory_fill_a_0", "factory_fill_a_1", "factory_fill_a_2", "factory_fill_a_3"],
+  "edge": {"color": "#060608", "width": 2, "shade": 40, "shadeWidth": 3},
+  "clutterChance": 22,
+  "decalChance": 5,
+  "fill2": ["factory_fill_b_0", "factory_fill_b_1", "factory_fill_b_2", "factory_fill_b_3"],
+  "props": "factory_props",
+  "clutter": ["factory_0", "factory_1", "factory_2", "factory_3", "factory_4", "factory_5", "factory_6", "factory_7", "factory_8", "factory_9", "factory_10", "factory_11"],
+  "decals": ["decal_factory_0", "decal_factory_1", "decal_factory_2", "decal_factory_3"],
+  "description": "Alte Fabrikhalle: geflickte Ziegelmauer mit Ruß, Lauffläche aus Riffelblech auf Stahlträgern. Raffinerie, Werkhallen, Industrie-Ruinen.",
+  "back": {"terrain": "factory", "shade": 60},
+  "details": ["detail_factory_0", "detail_factory_1", "detail_factory_2", "detail_factory_3", "detail_factory_4", "detail_factory_5"],
+  "detailChance": 10,
+  "propsBig": "tileset00_props_big",
+  "bigClutter": ["big_industry_0", "big_industry_1", "big_industry_2", "big_industry_3"],
+  "bigChance": 30,
+  "sizes": [
+   {"name": "factory_0", "cm": 95},
+   {"name": "factory_1", "cm": 125},
+   {"name": "factory_2", "cm": 95},
+   {"name": "factory_3", "cm": 140},
+   {"name": "factory_4", "cm": 140},
+   {"name": "factory_5", "cm": 85},
+   {"name": "factory_6", "cm": 95},
+   {"name": "factory_7", "cm": 75},
+   {"name": "factory_8", "cm": 70},
+   {"name": "factory_9", "cm": 70},
+   {"name": "factory_10", "cm": 70},
+   {"name": "factory_11", "cm": 140},
+   {"name": "big_industry_0", "cm": 110},
+   {"name": "big_industry_1", "cm": 150},
+   {"name": "big_industry_2", "cm": 130},
+   {"name": "big_industry_3", "cm": 185}
+  ],
+  "sizeMax": 200,
+  "atmosphere": "metall_rost",
+  "glows": [
+   {"name": "big_industry_0", "color": "#ffb050", "at": [96, 66], "size": [26, 16], "strength": 90, "light": 140, "behavior": "pulse"},
+   {"name": "factory_11", "color": "#ffa040", "at": [32, 10], "size": [16, 14], "strength": 90, "light": 120, "behavior": "pulse"}
+  ]
  }
 }
