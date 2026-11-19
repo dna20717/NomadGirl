@@ -162,7 +162,8 @@ const kinds = await ev(() => {
   out.drop = { states: [...new Set(seen)], ceiling: !!b.onCeiling, feet: Math.round(b.feet), floor: A.FLOOR };
   // flyer: stays in the air, flies over to her and shoots
   A.reset();
-  const d = A.spawn('wachdrohne', 52, 6);
+  s.data_.enemies.testdrohne ??= {"name": "Wachdrohne", "family": "machine", "behavior": "flyer", "health": 20, "damage": 6, "speed": 300, "aggroRange": 600, "deltas": [2, 5], "countsForRanking": true, "description": "Fragt höflich nach dem Ausweis. Schießt dann.", "height": 80, "attack": {"windup": 600, "cooldown": 1700, "range": 460, "projectileSpeed": 760}, "move": {"flyHeight": 230, "patrol": 220}, "counter": {"dodge": 20}, "placeholderColor": "steel"};   // #108 the Wachdrohne is gone from the game; the flyer behaviour stays tested
+  const d = A.spawn('testdrohne', 52, 6);
   nomad.step(60); out.hover = { feet: Math.round(d.feet), kind: d.kind };
   A.stand(50 * T, 1, 0); let fired = 0;
   for (let i = 0; i < 360; i++) { nomad.step(1); fired = Math.max(fired, s.combat.shots.filter(p => !p.friendly).length); }

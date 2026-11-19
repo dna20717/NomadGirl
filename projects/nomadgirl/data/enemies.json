@@ -42,21 +42,6 @@
   "kitSkin": "hell",
   "kitGang": "Gelb"
  },
- "rattenschwarm": {
-  "name": "Rattenschwarm",
-  "family": "wildlife",
-  "behavior": "charger",
-  "health": 15,
-  "damage": 4,
-  "speed": 400,
-  "aggroRange": 440,
-  "deltas": [0, 1],
-  "countsForRanking": true,
-  "height": 70,
-  "placeholderShape": "blob",
-  "attack": {"windup": 300, "cooldown": 700, "range": 110},
-  "move": {"patrol": 260}
- },
  "schlaeger": {
   "name": "Plünderer-Schläger",
   "family": "raider",
@@ -101,24 +86,6 @@
   "kitGang": "Cyan",
   "dropWeapon": 20,
   "sense": {"shouts": "Da!|Eindringling!|Hier drüben!|Alarm!|Schnappt sie!"}
- },
- "wachdrohne": {
-  "name": "Wachdrohne",
-  "family": "machine",
-  "behavior": "flyer",
-  "health": 20,
-  "damage": 6,
-  "speed": 300,
-  "aggroRange": 600,
-  "loot": "drohnen_beute",
-  "deltas": [2, 5],
-  "countsForRanking": true,
-  "description": "Fragt höflich nach dem Ausweis. Schießt dann.",
-  "height": 80,
-  "attack": {"windup": 600, "cooldown": 1700, "range": 460, "projectileSpeed": 760},
-  "move": {"flyHeight": 230, "patrol": 220},
-  "counter": {"dodge": 20},
-  "placeholderColor": "steel"
  },
  "hausmeister": {
   "name": "Der Hausmeister",
