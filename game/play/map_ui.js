@@ -11,6 +11,7 @@ import { trackedGoal as questGoal } from '../quests.js';
 import { ensureMap, placeOf, neighbours, hops, mapConfig, threatOf } from '../worldmap.js';
 import { ensureSites } from '../salvage.js';
 import { drawMap } from '../map_render.js';
+import { forecastConfig, forecastRoute, rainOutlook } from '../weather_fx.js';
 import { ITEM_CATEGORIES, optionLabel as optLabel } from '../../engine/schema.js';
 
 const KIND_NAMES = { gasStation: 'Tankstelle', mall: 'Markt', bunker: 'Bunker', government: 'Behörde', highrise: 'Hochhaus', underground: 'Untergrund', factory: 'Fabrik', settlement: 'Siedlung', ruin: 'Ruine' };
@@ -136,16 +137,39 @@ export class MapUI {
       el('div', { class: 'wm-row' }, el('small', {}, 'Gefahr'), this.intel ? el('b', { class: 'wm-danger' }, '●'.repeat(n.danger || 1) + '○'.repeat(Math.max(0, 5 - (n.danger || 1)))) : el('b', { class: 'wm-unknown' }, '? ? ?')),
       this.intel && (n.danger || 1) > 1 ? (() => { const T = threatOf(this.host.D, n.danger); return el('p', { class: 'wm-threat' }, `Gegner +${Math.round(T.more * 100)} % · zäher +${Math.round((T.health - 1) * 100)} % · Beute +${Math.round(T.loot)} %`); })() : null,
       el('div', { class: 'wm-row' }, el('small', {}, 'Beute'), this.intel ? el('div', { class: 'wm-hints' }, ...(n.hints || []).map(h => el('span', { style: `--c:${HINT_COLORS[h] || '#c7b08b'}` }, optLabel(ITEM_CATEGORIES, h) || h))) : el('b', { class: 'wm-unknown' }, '? ? ?')),
-      this.intel ? null : el('p', { class: 'wm-intel' }, icon('research', 14), ' Was dort wartet, zeigt erst ein Warroom. Bau einen ins Rig (B), dann siehst du Gefahr und Beute.'),
+      this.intel ? null : el('p', { class: 'wm-intel' }, icon('research', 14), ' Was dort wartet, zeigt erst ein Warroom. Bau einen ins Rig (B), dann siehst du Gefahr, Beute und das Wetter.'),
       b ? el('p', { class: 'wm-brand' }, `${b.name}: „${b.slogan}“`) : null,
       P.gang?.name ? this.repRow(P.gang) : null,   // #055 whose turf, and Leyla's Ruf with them
       // the POI's own text only at the landmark itself; rolled places say what kind of place it is
       el('p', { class: 'wm-desc' }, n.landmark && P.description ? P.description : `Wie ${P.name || 'ein POI'}, nur ${n.danger > (P.danger || 1) ? 'weiter draußen und gefährlicher' : 'ein anderer Ort'}. Was genau dort liegt, weiß man erst drinnen.`),
       cost ? el('div', { class: 'wm-cost' }, ...[['Strecke', `${cost.km} km${(cost.legs?.length || 1) > 1 ? ` · ${cost.legs.length} Etappen` : ''}`], ['Fahrt', `${de(cost.hours)} h`], ['Sprit', `${de(cost.fuel)} l`, cost.fuel > save.fuel], ['Vorräte', de(cost.food), cost.food > save.food]]
-        .map(([k, v, bad]) => el('div', { class: bad ? 'bad' : '' }, el('small', {}, k), el('b', {}, v)))) : null,
+        .map(([k, v, bad]) => el('div', { class: bad ? 'bad' : '' }, el('small', {}, k), el('b', {}, v))), this.forecastBox(cost, false)) : null,
+      here ? this.forecastBox(null, true) : null,   // #087 the navigator: at home the rain of the next days
       here && a && !a.disabled ? this.readyBox() : null,
       a ? el('button', { class: 'inv-btn wm-go', disabled: !!a.disabled, title: a.disabled || '', onclick: () => this.act() }, a.icon ? icon(a.icon, 18) : null, ' ', a.disabled && a.cost ? a.disabled : a.label) : null,
       a?.disabled && !a.cost ? el('small', { class: 'wm-why' }, a.disabled) : null].filter(Boolean));   // replaceChildren would write "null"
+  }
+  // #087 Wettervorhersage: with a warroom the navigator tells the weather of every leg of the route, here the rain of the next days
+  forecast(cost) {
+    const D = this.D, save = this.save, F = forecastConfig(D);
+    if (!F.enabled || (F.warroom && !this.intel)) return null;
+    if (!cost) return { days: rainOutlook(D, save, F.days) };
+    const legs = cost.legs?.length ? cost.legs : [{ to: this.sel, hours: cost.hours }];
+    return { legs: forecastRoute(D, save, legs, id => this.map.nodes.find(x => x.id === id)?.region) };
+  }
+  forecastBox(cost, here) {
+    const F = this.forecast(here ? null : cost);
+    if (!F) return null;
+    const KI = { dust: 'wind', fog: 'fog', wet: 'rain' }, hh = h => String(Math.floor(((h % 24) + 24) % 24)).padStart(2, '0');
+    const dayName = d => d === this.save.day ? 'Heute' : d === this.save.day + 1 ? 'Morgen' : `Tag ${d}`;
+    const chip = (label, kinds, title, extra = '') => el('span', { class: 'wm-fc-chip' + (kinds.length ? ' wx' : ''), title }, label ? el('small', {}, label) : null,
+      ...(kinds.length ? kinds.map(k => icon(KI[k], 15)) : [icon('sun', 15)]), extra ? ' ' + extra : null);
+    const many = F.legs?.length > 1;
+    const chips = F.legs ? F.legs.map(L => chip(many ? String(L.i + 1) : '', L.kinds, `${many ? `Etappe ${L.i + 1} · ` : ''}${placeOf(this.D, this.save, L.to)?.name || L.to}: ${L.line || 'klar'}`, many ? '' : L.names.join(', ') || 'klar'))
+      : F.days.map(x => chip(dayName(x.day), x.rain ? ['wet'] : [], x.rain ? `Regen ${hh(x.rain.from)}–${hh(x.rain.to)} Uhr: füllt die Zisterne` : 'trocken', x.rain ? `${hh(x.rain.from)}–${hh(x.rain.to)}` : ''));
+    const bad = F.legs?.flatMap(L => L.kinds) || [];
+    const tip = bad.includes('dust') ? 'Sandsturm: Staubwände, Wracks, Viecher' : bad.includes('fog') ? 'Nebel: Fackeln und Sperren tauchen spät auf' : bad.includes('wet') ? 'Regen: mehr Pannen, Zisterne füllt sich' : '';
+    return el('div', { class: 'wm-fc' + (bad.length ? ' wx' : '') }, el('small', {}, icon('cloud', 12), ' Wetter · Navigator'), el('div', { class: 'wm-fc-chips' }, ...chips), tip ? el('p', {}, tip) : null);
   }
   // #055: the gang of the place with Leyla's Ruf (a bar from Feind to Freund) and its motto
   repRow(g) {
@@ -161,6 +185,6 @@ export class MapUI {
   }
   state() {
     const m = this.map;
-    return { open: this.isOpen, intel: this.intel, extras: (this.opts?.extras || []).map(x => x.label), here: this.save.location, sel: this.sel, nodes: m.nodes.length, edges: m.edges.length, near: neighbours(m, this.save.location), action: this.action()?.label || null, disabled: this.action()?.disabled || null, ready: this.sel === this.save.location ? (this.host.loadout?.() || []).map(r => r.label + (r.warn ? '!' : '')) : [] };
+    return { open: this.isOpen, intel: this.intel, extras: (this.opts?.extras || []).map(x => x.label), here: this.save.location, sel: this.sel, nodes: m.nodes.length, edges: m.edges.length, near: neighbours(m, this.save.location), action: this.action()?.label || null, disabled: this.action()?.disabled || null, forecast: (() => { const a = this.action(), F = this.forecast(this.sel === this.save.location ? null : a?.cost); return F ? (F.legs ? F.legs.map(L => L.kinds.join('+') || 'klar') : F.days.map(x => x.rain ? 'Regen' : 'trocken')) : null; })(), ready: this.sel === this.save.location ? (this.host.loadout?.() || []).map(r => r.label + (r.warn ? '!' : '')) : [] };
   }
 }

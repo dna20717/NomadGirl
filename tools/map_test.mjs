@@ -48,6 +48,12 @@ check('Steuerkreuz wandert zu Orten in der Richtung', moved.sel && moved.sel !==
 v = await ev(() => { const mp = SC().hud.map; const near = nomad.map().near[0]; mp.select(near); return { st: mp.state(), cost: mp.host.cost(near), text: document.querySelector('.wm-detail')?.textContent || '' }; });
 check('Detail: Hinfahren mit Strecke, Fahrt, Sprit, Gefahr, Beute', v.st.action === 'Hinfahren' && !v.st.disabled && /km/.test(v.text) && /Sprit/.test(v.text) && /Gefahr/.test(v.text) && /Beute/.test(v.text) && v.cost.km > 0, v);
 await shot('detail');
+// #087 Wettervorhersage: with a warroom the navigator shows the weather of every leg, here the rain of the next days
+v = await ev(() => { const mp = SC().hud.map; mp.intelWas = mp.host.intel; mp.host.intel = () => true; mp.detail(); const st = mp.state(), box = document.querySelector('.wm-fc'); return { intel: st.intel, fc: st.forecast, rows: box?.querySelectorAll('.wm-fc-chip').length || 0, text: box?.textContent || '' }; });
+check('Navigator: Wetter je Etappe der Route (mit Warroom)', v.intel && Array.isArray(v.fc) && v.fc.length >= 1 && v.rows === v.fc.length && /Navigator/.test(v.text), v);
+await shot('forecast');
+v = await ev(() => { const mp = SC().hud.map; mp.select(nomad.save().location); const st = mp.state(); const r = { intel: st.intel, fc: st.forecast, text: document.querySelector('.wm-fc')?.textContent || '' }; mp.host.intel = mp.intelWas; return r; });
+check('Navigator am eigenen Ort: Regen der nächsten 3 Tage', v.intel && (v.fc?.length === 3 && /Heute/.test(v.text) && /Morgen/.test(v.text)), v);
 await tap(1);
 check('B schließt die Karte', !(await ev(() => nomad.map())).open);
 

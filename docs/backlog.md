@@ -86,7 +86,6 @@ Schon entstandene Kreisläufe (zum Ausbalancieren und Erzählen):
 Neue Systeme, die daraus wachsen könnten:
 - **Gangs als Auftraggeber:** Quests von Gangs (Bedingungs-Sprache + Revier-Camp), Lohn Ruf und Revier-Zugang.
 - **Revierkrieg:** Ruf bei einer Gang senkt den bei ihren Rivalen; Reviere verschieben sich auf der Reisekarte, Fehden werden zu Fronten.
-- **Wettervorhersage im Warroom:** eine Navigator-Entity zeigt Regen und Sandsturm der nächsten Etappen → Routenwahl.
 - **Influencer-Karriere:** viele Billboard-Tipps → Follower-Stufe → Sponsor-Pakete einer Marke, Ärger mit der Konkurrenz-Marke.
 - **Lieblingsmarken der Gangs:** wer die Marke einer Gang trägt (Markentreue), startet mit mehr Ruf bei ihr.
 - **Hochform:** bestimmte Kombinationen in der Effekt-Leiste (perfektes Gericht + Gemütlich + Influencer) geben einen Bonus-Effekt.

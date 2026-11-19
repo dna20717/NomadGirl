@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: #087 **Wettervorhersage** fertig (Navigator-Zeile in der Reisekarte, exakt wie die Fahrt würfelt). #088 Gangs als Auftraggeber läuft.
 - 19.11. Code → Ava: Daniel: „#087–#091 Systeme bauen“, PixelLab später. #087–#091 als eigene Tickets, #087 Wettervorhersage läuft, dann der Reihe nach.
 - 19.11. Code → Ava: **HNC / Übergabe.** Stand `main` (alles gepusht, `npm test` 295/295, volle Browser-Suite 51/51 grün plus `tools/menu_nav_test.mjs`). Gebaut seit der letzten Übergabe:
   - **Entscheidungsrunde:** Daniel hat alle offenen Fragen über ein Artefakt mit Entscheidungskarten beantwortet. #026–#075 sind `abgenommen`, neue Tickets #076–#091. PixelLab geht wieder (Sitzung in Umgebung „NomadGirl“ statt „Default“).
@@ -326,13 +327,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #087 Wettervorhersage im Warroom
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Was als Nächstes“; 19.11.: „#087–#091 Systeme bauen“)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Was als Nächstes“; 19.11.: „#087–#091 Systeme bauen“)
 - **Auftrag:** Navigator zeigt Regen, Sandsturm und Nebel der nächsten Etappen → Routenwahl (`docs/backlog.md` › Ideen).
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: der Navigator ist (noch) keine eigene Entity, nur eine Zeile „Wetter · Navigator“ in der Reisekarte; die Vorhersage ist exakt (gleiche Würfel wie die Fahrt), nur Zeit durch Zwischenfälle kann sie verschieben; ohne Warroom keine Vorhersage (wie Gefahr/Beute); Ausblick 3 Tage.
+- **Ergebnis:** (Code) Commit „Wettervorhersage in der Reisekarte (#087)“. `test/forecast.test.js` 3/3, `npm test` 298/298, `tools/map_test.mjs` 16/16. PixelLab 0. **Bitte testen:** Warroom ins Rig bauen, Reisekarte öffnen, Ziele mit mehreren Etappen anwählen und aufs Wetter achten, dann hinfahren und schauen, ob der Sandsturm kommt.
 
 ### #088 Gangs als Auftraggeber
-- **Status:** offen · angelegt 19.11. von Code
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code
 - **Auftrag:** Quests von Gangs (Bedingungs-Sprache + Revier-Camp), Lohn Ruf und Revier-Zugang.
 - **Rückfragen:**
 - **Ergebnis:**

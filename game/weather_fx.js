@@ -5,7 +5,7 @@
 //                stands by the road)
 //   in a POI     rain: steps drown in the patter (enemies hear less); fog: they see less, and so does Leyla; dust: a little less sight
 import { legWeather } from './road.js';
-import { rainingAt, rainHours } from './rain.js';
+import { rainingAt, rainHours, rainOn } from './rain.js';
 import { clockHours } from './tank.js';
 
 // what the weather does to the situations on the road (× weight, by Lage › Am Straßenrand)
@@ -44,5 +44,28 @@ export function runSky(D, save, region) {
   const fog = w.fog > 0, dust = !fog && w.dust > 0;
   const out = { rain, fog, dust, hear: rain ? 0.6 : 1, sight: fog ? 0.7 : dust ? 0.85 : 1, fogSight: fog ? 0.75 : dust ? 0.9 : 1 };
   out.line = [rain && 'Regen: deine Schritte gehen im Prasseln unter, Gegner hören schlechter', fog && 'Nebel zieht in die Gänge: Gegner sehen schlechter, du auch', dust && 'Staub hängt in der Luft: die Sicht ist etwas kürzer'].filter(Boolean).join(' · ');
+  return out;
+}
+
+// Wettervorhersage (#087): the navigator in the warroom rolls the same dice as the drive (same seed, legs, regions, hours), so the
+// forecast of a route is what will come, as long as nothing on the way costs extra hours. Reisen › Vorhersage.
+export function forecastConfig(D) {
+  const F = D?.travel?.forecast || {};
+  return { enabled: F.enabled !== false, days: Math.max(1, Math.min(7, F.days ?? 3)), warroom: F.warroom !== false };
+}
+const ICON = { dust: 'Sandsturm', fog: 'Nebel', wet: 'Regen' };
+// the route: legs [{ to, hours }], regionOf(id) → region → [{ i, to, h0, h1, kinds, names, line }] (kinds empty = klar)
+export function forecastRoute(D, save, legs, regionOf, seed = ((save.map?.seed ?? 1) * 31 + (save.day || 1)) | 0) {
+  let h = clockHours(save);
+  return (legs || []).map((L, i) => {
+    const h0 = h, h1 = h + (L.hours || 0); h = h1;
+    const sky = legSky(D, save, seed, i, regionOf(L.to) || '', h0, h1);
+    return { i, to: L.to, h0, h1, kinds: sky.kinds, names: sky.kinds.map(k => ICON[k]), line: sky.line };
+  });
+}
+// the rain of the next days in the camp: [{ day, from, to }] (hours of the day, null = trocken)
+export function rainOutlook(D, save, days = forecastConfig(D).days) {
+  const d0 = save.day ?? 1, out = [];
+  for (let d = d0; d < d0 + days; d++) { const w = rainOn(D, save, d); out.push({ day: d, rain: w ? { from: w.from - d * 24, to: w.to - d * 24 } : null }); }
   return out;
 }

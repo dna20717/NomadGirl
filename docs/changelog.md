@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Wettervorhersage** (#087): Mit Warroom zeigt der Navigator in der Reisekarte das Wetter jeder Etappe (Sandsturm, Nebel, Regen, klar) und am eigenen Ort den Regen der nächsten 3 Tage. Er würfelt wie die Fahrt, die Vorhersage stimmt. Werkstatt › Reisen › Vorhersage.
 - 19.11.2026: **NomadPixel installiert**: Claude Code zeichnet Pixel-Art jetzt selbst (`/pixel`, Skill `.claude/skills/nomadpixel/`, Stilbibel AAP-64 mit den Küchen-/Ausrüstungs-Symbolen als Referenz, Prüfungen `palcheck`/`refcheck`); Wissen in `docs/features/art.md`.
 - 19.11.2026: **Übergabe (HNC)**: Stand nach der Entscheidungsrunde, #076, #092–#096 und dem Plan #078–#081; Tests 295, Browser 52 Dateien grün; PixelLab übrig 269,6; offen: Balancing v1 absegnen, #080 Dunkelheit, #084 PixelLab, #086 Story-Enden.
 - 19.11.2026: **Menüs mit Spalten**: Im Gespräch (Antworten nebeneinander) gehen jetzt ←/→ und ↑/↓ reihenweise, mit Tastatur und Controller.

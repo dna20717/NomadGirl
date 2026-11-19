@@ -198,5 +198,6 @@
    "fog": 10,
    "screens": 50
   }
- ]
+ ],
+ "forecast": {"enabled": true, "warroom": true, "days": 3}
 }
