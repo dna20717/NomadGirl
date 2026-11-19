@@ -110,6 +110,27 @@ check(infos.some(t => t.includes('live aus dem Repository')), 'Spiel lädt die D
 check(await game.evaluate(() => window.game.scene.getScene('play').p.data.leyla.movement.runSpeed) === 780, 'Spiel nutzt den gespeicherten Werkstatt-Stand');
 check(!errors.length, 'keine Fehler in der Browser-Konsole' + (errors.length ? ': ' + errors.join(' | ') : ''));
 
+// #073 Datensets online: „Speichern unter …“ writes sets/index.json and only the difference as a commit; the main menu and the game see it
+await game.close();
+await page.evaluate(() => { const w = window.workshop; w.change('leyla', () => { w.p.data.leyla.movement.jumpSpeed = 1234; }); });
+await page.click('.ng-setButton');
+await page.click('.ed-dialogue .ed-button.main');
+await page.waitForSelector('.ed-dialogue input.ed-field');
+await page.fill('.ed-dialogue input.ed-field', 'Sprungtest');
+await page.keyboard.press('Enter');
+await page.waitForFunction(() => window.workshop?.dataSet?.id === 'sprungtest', null, { timeout: 20000 });
+const setLeyla = 'projects/nomadgirl/sets/sprungtest/' + leylaFile.replace('projects/nomadgirl/', '');
+check(/"jumpSpeed": 1234/.test(g.fileAt(setLeyla) || '') && !/runSpeed/.test(g.fileAt(setLeyla) || ''), 'Datenset: nur der Unterschied liegt als Commit im Set-Ordner');
+check(/"sprungtest"/.test(g.fileAt('projects/nomadgirl/sets/index.json') || ''), 'Datenset: steht in sets/index.json');
+check(!/"jumpSpeed": 1234/.test(g.fileAt(leylaFile)), 'Datenset: der Standard bleibt, wie er ist');
+await page.goto(base + '/');
+await page.waitForFunction(() => window.dataSets, null, { timeout: 20000 });
+check(await page.evaluate(() => document.getElementById('dataset').textContent) === 'Datenset: Sprungtest', 'Hauptmenü zeigt das aktive Datenset unten');
+const game2 = page;
+await game2.goto(base + '/game');
+await game2.waitForFunction(() => window.game?.scene.getScene('play')?.leyla, null, { timeout: 30000 });
+check(await game2.evaluate(() => window.game.scene.getScene('play').p.data.leyla.movement.jumpSpeed) === 1234 && await game2.evaluate(() => window.__nomadData.set?.id) === 'sprungtest', 'Spiel lädt das Datenset über /api/files');
+
 await browser.close(); server.close();
 console.log(failed ? `\n${failed} Fehler.` : '\nAlles grün.');
 process.exit(failed ? 1 : 0);

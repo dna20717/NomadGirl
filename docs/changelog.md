@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Datensets** (#073): Varianten der Spieldaten (nur der Unterschied zum Standard) speichern, laden und löschen; das Hauptmenü zeigt unten das aktive Set und wechselt es per Klick.
 - 19.11.2026: **Werkstatt: breite Tabellen als Karten** (#072): Lagen, Antworten und Begabungen zeigen je Zeile eine Karte mit Kurzzeile, aufgeklappt ein Formular in Gruppen, dazu ein Suchfeld.
 - 18.11.2026: **Kleine Fehler** (#071): Macken wirken über ein eigenes Datenfeld, Wetter-Gewichte stehen in der Werkstatt, Welt-Merker haben einen Zugang; Ideenspeicher um Kreisläufe und neue Systeme ergänzt.
 - 18.11.2026: **Meldungs-Kanal und Logbuch** (#070): höchstens drei Meldungen auf einmal, Hinweise warten, Warnungen nie; alle Meldungen mit Uhrzeit im Logbuch (Menü).

@@ -167,3 +167,11 @@ body.ng { background: var(--ui-bg); color: var(--ui-text); font-family: var(--ui
 .ng-cardGrid { align-items: start; }
 .ng-cardField > :last-child { flex: 0 0 auto; align-self: stretch; }
 .ng-cardField input.ed-field.small { height: auto; }
+/* #073 Datensets */
+.ng-setButton.on { color: var(--ui-acc-line); border-color: var(--ui-acc-line); }
+.ng-sets { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.ng-setRow { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--ui-border); border-radius: 8px; background: var(--ui-panel); }
+.ng-setRow.on { border-color: var(--ui-acc-line); background: var(--ui-acc-soft); }
+.ng-setRow > span { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
+.ng-setRow small { color: var(--ui-text3); }
+.ng-setActive { color: var(--ui-acc-line) !important; font-weight: 600; }

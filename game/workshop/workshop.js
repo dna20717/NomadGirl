@@ -10,6 +10,7 @@ import { openCloudStore } from '../cloud_store.js';
 import { browserLoader } from '../browser_loader.js';
 import { AREAS, GROUPS, fields, loadProject, validateProject, usages, references, renameEntry, removeEntry, rowText, optionLabel, get, set, freeId } from '../../engine/project.js';
 import { SUMMARY } from './summaries.js';
+import { listSets, applySet, diffArea, setFile, slugSet, activeSetId, chooseSet, SET_INDEX } from '../../engine/sets.js';
 import { assetPreview, assetThumb, iconSheet } from './asset_preview.js';
 
 const THEMES = { gray: 'Grau', violet: 'Violett', brightness: 'Hell' };
@@ -43,7 +44,13 @@ export class Workshop {
     this.state = await this.store.all().catch(() => new Map());
     const repo = browserLoader(this.basis), state = this.state;
     const loader = { ...repo, json: async p => state.has(p) ? structuredClone(state.get(p)) : repo.json(p) };
-    this.p = await loadProject(loader);
+    const P = await loadProject(loader);
+    // #073 Datensets: the standard is kept to compare with; the active set of this device lies over it, saves go into its folder
+    this.base = structuredClone(P.data);
+    this.loader = loader;
+    this.sets = await listSets(loader);
+    this.dataSet = await applySet(P, loader, activeSetId());
+    this.p = P;   // only now: tests and tools wait for workshop.p
     try { const h = JSON.parse(decodeURIComponent(location.hash.slice(1)) || 'null'); if (h?.area) this.page = { ...this.page, ...h }; } catch { /* no saved place */ }
     this.constructUi();
     this.draw();
@@ -70,12 +77,30 @@ export class Workshop {
   }
   change(area, f) { this.begin(); const r = f(); this.changed(area); this.draw(); return r; }
   content(file) { const a = Object.keys(this.p.paths).find(k => this.p.paths[k] === file); return a ? this.p.data[a] : null; }
+  // #073 the set's list of files in sets/index.json, when it changed (a file got its first difference or lost its last) → a change or null
+  setIndexChange() {
+    if (!this.dataSet) return null;
+    const files = Object.entries(AREAS).filter(([a, A]) => diffArea(A.kind, this.base[a], this.p.data[a]) !== undefined).map(([a]) => this.p.paths[a]).sort();
+    const meta = this.sets.find(s => s.id === this.dataSet.id);
+    if (!meta || JSON.stringify([...(meta.files || [])].sort()) === JSON.stringify(files)) return null;
+    meta.files = files;
+    return { file: SET_INDEX, content: this.sets };
+  }
+  // #073 saved into the standard (no set active): that is the new standard to compare with
+  savedStandard(file) { if (this.dataSet) return; const a = Object.keys(this.p.paths).find(k => this.p.paths[k] === file); if (a) this.base[a] = structuredClone(this.p.data[a]); }
+  // #073 what goes where: in a set only the difference to the standard, in its folder (null = no difference, the file goes)
+  target(file) {
+    if (!this.dataSet) return { file, content: this.content(file) };
+    const a = Object.keys(this.p.paths).find(k => this.p.paths[k] === file);
+    return { file: setFile(this.dataSet.id, file), content: a ? diffArea(AREAS[a].kind, this.base[a], this.p.data[a]) ?? null : null };
+  }
   async persist(opt = {}) {
     if (this.store.saveAll) return this.persistCloud(opt);
     if (!this.dirty.size) { this.hint('Nichts zu speichern.'); return; }
     this.storeError = null;
     try {
-      for (const d of [...this.dirty]) { const x = this.content(d); await this.store.persist(d, x); this.dirty.delete(d); this.state.set(d, x); }
+      { const ix = this.setIndexChange(); if (ix) await this.store.persist(ix.file, ix.content); }
+      for (const d of [...this.dirty]) { const t = this.target(d); await this.store.persist(t.file, t.content); this.dirty.delete(d); this.state.set(t.file, t.content); this.savedStandard(d); }
       this.latestSaved = clockTime();
       this.hint(this.store.kind === 'artifact' ? 'Gespeichert. Ava übernimmt die Stände ins Repository.' : 'Gespeichert (in diesem Browser).');
     } catch (e) { this.storeError = e.message; this.hint('Speichern fehlgeschlagen: ' + e.message); }
@@ -87,11 +112,11 @@ export class Workshop {
     if (this.saving) { this.saveAgain = true; return; }
     if (!this.dirty.size) { if (!auto) this.hint('Nichts zu speichern.'); return; }
     const files = [...this.dirty], sent = new Map(files.map(d => [d, JSON.stringify(this.content(d))]));
-    const changes = files.map(d => ({ file: d, content: this.content(d) ?? null }));
+    const changes = [...files.map(d => this.target(d)).map(t => ({ file: t.file, content: t.content ?? null })), this.setIndexChange()].filter(Boolean);
     this.saving = true; this.storeError = null; this.statusShowing('saves');
     try {
       const r = await this.store.saveAll(changes, { force });
-      for (const d of files) { if (JSON.stringify(this.content(d)) === sent.get(d)) this.dirty.delete(d); this.state.set(d, this.content(d)); }
+      for (const d of files) { if (JSON.stringify(this.content(d)) === sent.get(d)) this.dirty.delete(d); const t = this.target(d); this.state.set(t.file, t.content); this.savedStandard(d); }
       this.latestSaved = clockTime(); this.latestCommit = r.short;
       this.hint(r.unchanged ? 'Gespeichert (keine inhaltliche Änderung).' : `Gespeichert${auto ? ' (automatisch)' : ''} · Commit ${r.short} im Repository. Spiel neu laden zum Ausprobieren.`);
     } catch (e) {
@@ -157,6 +182,52 @@ export class Workshop {
   }
 
   // ---------- Frame ----------
+  // ---------- #073 Datensets: speichern unter, laden, löschen ----------
+  setsDialog() {
+    const cur = this.dataSet?.id || '';
+    const row = (s, i) => el('div', { class: 'ng-setRow' + (s.id === cur ? ' on' : '') }, icon(i ? 'layers' : 'data', 16),
+      el('span', {}, el('b', {}, s.name), el('small', {}, s.id ? (s.description || `Variante · sets/${s.id}`) : 'Die Daten im Repository ohne Variante')),
+      s.id === cur ? el('small', { class: 'ng-setActive' }, 'aktiv') : el('button', { class: 'ed-button small', onclick: () => this.loadSet(s.id) }, icon('download', 14), ' Laden'));
+    const d = openDialogue({ title: 'Datensets', icon: 'layers', wide: true, content: [
+      el('p', { class: 'ed-small' }, 'Ein Datenset ist eine Variante der Spieldaten: es speichert nur, was vom Standard abweicht. Laden macht es auf diesem Gerät aktiv, für Werkstatt und Spiel; das Hauptmenü zeigt es unten an.'),
+      el('div', { class: 'ng-sets' }, ...[{ id: '', name: 'Standard' }, ...this.sets].map(row))],
+      left: cur ? [el('button', { class: 'ed-button wide red', onclick: () => { d.closeFn(); this.deleteSet(cur); } }, icon('delete', 16), ' Löschen')] : [],
+      main: { text: 'Speichern unter …', icon: 'save', action: () => { setTimeout(() => this.saveSetAs(), 0); } } });
+  }
+  async writeFiles(changes) {
+    if (this.store.saveAll) { const r = await this.store.saveAll(changes); this.latestSaved = clockTime(); this.latestCommit = r.short; return r; }
+    for (const c of changes) await this.store.persist(c.file, c.content);
+    return {};
+  }
+  async saveSetAs() {
+    const { askText } = await import('../ui.js');
+    const name = await askText('Speichern unter …', 'Name', this.dataSet ? `${this.dataSet.name} 2` : 'Mein Datenset', 'Die jetzigen Daten (auch Ungespeichertes) werden eine neue Variante; der Standard bleibt, wie er ist.');
+    if (!name) return;
+    let id = slugSet(name) || 'set'; for (let i = 2; this.sets.some(s => s.id === id); i++) id = `${slugSet(name)}_${i}`;
+    const files = Object.entries(AREAS).map(([a, A]) => ({ file: setFile(id, this.p.paths[a]), data: this.p.paths[a], content: diffArea(A.kind, this.base[a], this.p.data[a]) ?? null })).filter(c => c.content);
+    const index = [...this.sets, { id, name, files: files.map(c => c.data) }];
+    try {
+      await this.writeFiles([{ file: SET_INDEX, content: index }, ...files.map(({ file, content }) => ({ file, content }))]);
+      chooseSet(id); this.dirty.clear();
+      this.hint(`Datenset „${name}“ gespeichert (${files.length} Dateien weichen ab) und aktiv.`);
+      setTimeout(() => location.reload(), 900);
+    } catch (e) { this.hint('Speichern fehlgeschlagen: ' + e.message); }
+  }
+  async loadSet(id) {
+    if (this.dirty.size) await this.persist();
+    if (this.dirty.size) return;   // save failed: stay
+    chooseSet(id); location.reload();
+  }
+  async deleteSet(id) {
+    const s = this.sets.find(x => x.id === id);
+    if (!s) return;
+    openDialogue({ title: `„${s.name}“ löschen?`, icon: 'delete', content: [el('p', {}, 'Die Variante und ihre Dateien verschwinden aus dem Repository. Der Standard bleibt.')],
+      main: { text: 'Löschen', icon: 'delete', hazard: true, action: async () => {
+        const files = Object.values(this.p.paths).map(f => ({ file: setFile(id, f), content: null })).filter(c => this.state.has(c.file));
+        await this.writeFiles([{ file: SET_INDEX, content: this.sets.filter(x => x.id !== id) }, ...files]);
+        this.dirty.clear(); chooseSet(''); location.reload();
+      } } });
+  }
   constructUi() {
     document.body.classList.add('build', 'data-mode');
     this.ui = { menu: el('div', { class: 'ed-menu' }), data: el('div', { class: 'ed-data ng-data' }), hint: el('div', { class: 'ed-hint' }) };
@@ -198,6 +269,9 @@ export class Workshop {
       el('span', { class: 'ed-separator' }),
       el('button', { class: 'ed-button ng-checkButton' + (error ? ' red' : warn ? ' yellow' : ' green'), title: 'Prüfung (wie ng check)', onclick: () => this.go({ area: 'validation' }) },
         icon(error ? 'error' : warn ? 'warning' : 'verify', 16), error ? ` ${error} Fehler` : warn ? ` ${warn} Warnungen` : ' Alles stimmig'),
+      el('span', { class: 'ed-separator' }),
+      el('button', { class: 'ed-button ng-setButton' + (this.dataSet ? ' on' : ''), title: this.dataSet ? `Datenset „${this.dataSet.name}“: Änderungen gehen nur in diese Variante (#073)` : 'Standard-Daten · Varianten speichern und laden (#073)', onclick: () => this.setsDialog() },
+        icon('layers', 16), ` ${this.dataSet ? this.dataSet.name : 'Standard'}`),
       el('span', { class: 'ed-grow' }),
       this.store.kind === 'cloud' ? el('button', { class: 'ed-button ng-user', title: `Dein Name in den Commits · angemeldet als ${this.store.user.email} · speichert direkt in ${this.store.repo}`, onclick: () => this.showName() },
         icon('person', 16), ' ' + this.store.user.name) : null,

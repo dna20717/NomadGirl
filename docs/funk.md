@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: #073 **Datensets** fertig: Varianten im Repo (nur der Unterschied), Speichern unter/Laden/Löschen in der Werkstatt, Hauptmenü zeigt und wechselt das aktive Set. #074 läuft.
 - 19.11. Code → Ava: #072 **Tabellen als Karten** fertig (Ereignis-Baukasten und Begabungen lesbar, Suchfeld). #073 Datensets läuft.
 - 19.11. Code → Ava: Werkstatt-Runde angelegt: #072 Tabellen als Karten (läuft), #073 Datensets (Variante im Repo, aktiv in Hauptmenü + Werkstatt), #074 Verzahnungs-Ansichten, #075 Kleinkram. Befund: alle neuen Felder sind in der Werkstatt, aber breite Tabellen sind unbenutzbar und neue Zusammenhänge haben keine Ansicht.
 - 18.11. Code → Ava: #071 **Kleine Fehler** fertig. Damit ist das Eleganz-Paket #066–#071 komplett, jedes Ticket einzeln getestet (Unit + 47 Browser-Tests) und gepusht. Kreisläufe und Systemideen im Ideenspeicher.
@@ -227,7 +228,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** –
 
 ### #074 Werkstatt: Verzahnungs-Ansichten
-- **Status:** offen · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
 - **Für:** Code
 - **Lesen:** docs/features/editor.md, `game/workshop/`
 - **Auftrag (Daniel, 19.11.2026):** B: Merker-Explorer (wer setzt, wer liest, Ketten), Marken-Sets mit ihren Teilen, Bedingungen in den Kurzzeilen. Reihenfolge (Daniel): erst A, dann Datensets, dann B und C; inkrementell.
@@ -235,12 +236,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** –
 
 ### #073 Datensets: speichern unter, laden, aktivieren
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
 - **Für:** Code
 - **Lesen:** docs/features/editor.md, `game/workshop/`
 - **Auftrag (Daniel, 19.11.2026):** „Es wäre an der Zeit, Speichern und Laden von verschiedenen Konfigurationen zu erlauben … Im Hauptmenü würde dann unten in der Statusleiste angezeigt werden, welches Datenset gerade aktiv ist.“ Antworten: im Repo als **Variante** (nur geänderte Einträge, Overlay über dem Standard), aktiv wählbar in **Hauptmenü + Werkstatt** (pro Gerät). Reihenfolge (Daniel): erst A, dann Datensets, dann B und C; inkrementell.
-- **Rückfragen:** –
-- **Ergebnis:** –
+- **Rückfragen:** (Code) ⚠️ vorläufig: „Laden“ in der Werkstatt macht das Set zugleich auf dem Gerät aktiv (ein Begriff statt zwei); das Hauptmenü wechselt per Klick reihum; Beschreibung eines Sets noch ohne eigenes Feld (kommt mit #075); gelöscht wird nur die aktive Variante.
+- **Ergebnis:** (Code) Commit „Datensets (#073)“ auf `main`. Neu `engine/sets.js`, `projects/nomadgirl/sets/index.json`, Werkstatt-Knopf + Dialog, Hauptmenü-Eintrag + Statusleiste, Spiel lädt das Overlay. Nebenbei behoben: Werkstatt setzte `workshop.p` zu früh (Rennen mit Tests, `map_test`). `npm test` 271/271 (neu `test/sets.test.js`), Browser 47/48 vor dem Fix (danach `map_test` 3×, `workshop_test`, `datasets_test` 6, `workshop_cloud_test` grün). PixelLab 0. **Bitte testen:** Werkstatt › Knopf „Standard“ › Speichern unter …, etwas ändern, Spiel starten; im Hauptmenü zurück auf Standard klicken.
 
 ### #072 Werkstatt: breite Tabellen als Karten
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)

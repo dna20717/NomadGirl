@@ -47,7 +47,7 @@
     <p class="sub">Leyla lebt in den Wastelands rund um BigCityDelta in ihrem Rig. Sie plündert, was andere liegen lassen, und kocht erstaunlich gut.</p>
     <nav id="nav"></nav>
     <p class="pad-hint">Stick hoch/runter: wählen · A: los · Stick links/rechts: Kurve laufen</p>
-    <footer>GPL v3 oder später · <a href="https://github.com/dna20717/NomadGirl">Quelltext auf GitHub</a> · <span id="version" title="Version dieser Seite (Commit und Zeit des Builds)">…</span></footer>
+    <footer>GPL v3 oder später · <a href="https://github.com/dna20717/NomadGirl">Quelltext auf GitHub</a> · <span id="version" title="Version dieser Seite (Commit und Zeit des Builds)">…</span> · <span id="dataset" title="Welche Spieldaten dieses Gerät lädt (#073)">Datenset: Standard</span></footer>
   </div>
 </main>
 <script type="module">
@@ -73,6 +73,20 @@
   entry('game.html', 'target', 'Testraum', 'Parkour mit Slide, Leiter, Seil, Kanten und Van (Tastatur oder Controller)');
   entry('workshop.html', 'workbench', 'Werkstatt', 'Alle Aspekte des Spiels einstellen: Leyla, Waffen, Rezepte, Rig, Welt');
   entry('https://github.com/dna20717/NomadGirl/blob/main/docs/design.md', 'data', 'Design-Dokument', 'Pitch, Core Loop, Mechaniken, Fahrplan');
+  // #073 Datensets: which variant of the game data this device plays; A / click goes to the next one, the status bar says which
+  entry('#', 'layers', 'Datenset: Standard', 'Varianten der Spieldaten aus der Werkstatt · klicken zum Wechseln', 'dataset');
+  (async () => {
+    const { listSets, activeSetId, chooseSet } = await import('./engine/sets.js');
+    const { cloudFiles } = await import('./game/cloud_store.js');
+    const cloud = await cloudFiles().catch(() => null);
+    const drafts = cloud ? null : await (await import('./game/store.js')).openStore({ project: 'nomadgirl', withoutAssets: true }).then(st => st.all()).catch(() => null);   // local workshop: its sets are drafts
+    let sets = cloud?.files?.has('sets/index.json') ? cloud.files.get('sets/index.json') : drafts?.has('sets/index.json') ? drafts.get('sets/index.json') : await listSets({ json: async p => { const r = await fetch('projects/nomadgirl/' + p, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return r.json(); } });
+    sets = [{ id: '', name: 'Standard' }, ...(Array.isArray(sets) ? sets.filter(s => s?.id) : [])];
+    const link = nav.querySelector('a.dataset'), bar = document.getElementById('dataset');
+    const show = () => { const id = activeSetId(), s = sets.find(x => x.id === id) || sets[0]; link.querySelector('b').textContent = `Datenset: ${s.name}`; link.querySelector('small').textContent = sets.length > 1 ? `${sets.length} zur Wahl · klicken zum Wechseln${s.description ? ' · ' + s.description : ''}` : 'Noch keine Varianten · in der Werkstatt „Speichern unter …“'; bar.textContent = `Datenset: ${s.name}`; window.dataSets = { active: s.id, sets: sets.map(x => x.id) }; };
+    link.addEventListener('click', e => { e.preventDefault(); const i = sets.findIndex(x => x.id === activeSetId()); chooseSet(sets[(i + 1) % sets.length].id); show(); });
+    show();
+  })().catch(e => console.warn('Datensets:', e));
 
   // controller (Daniel, 11.11.2026): stick up/down chooses an entry, A opens it, stick sideways lets Leyla run a bend (game/splash/splash.js)
   const links = [...nav.querySelectorAll('a')];

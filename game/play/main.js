@@ -9,6 +9,7 @@ import { openStore, withDrafts } from '../store.js';
 import { cloudFiles } from '../cloud_store.js';
 import { browserLoader } from '../browser_loader.js';
 import { loadProject } from '../../engine/project.js';
+import { applySet, activeSetId } from '../../engine/sets.js';
 import { PlayScene } from './scene.js';
 import { Hud } from './hud.js';
 import { installControl } from './control.js';
@@ -18,7 +19,9 @@ export async function start(parent, hudRoot, loading, opts = {}) {
   const base = new URL('projects/nomadgirl/', location.href);
   const cloud = await cloudFiles();
   const drafts = cloud ? new Map() : await (await openStore({ project: 'nomadgirl', withoutAssets: true })).all().catch(() => new Map());
-  const project = await loadProject(withDrafts(browserLoader(base), cloud ? cloud.files : drafts));
+  const loader = withDrafts(browserLoader(base), cloud ? cloud.files : drafts);
+  const project = await loadProject(loader);
+  const dataSet = await applySet(project, loader, activeSetId());   // #073 the active Datenset of this device lies over the standard
   if (cloud) console.info(`Spieldaten live aus dem Repository (Commit ${cloud.commit.slice(0, 7)})`);
   loading?.data();
   const D = project.data, rooms = D.rooms || {};
@@ -27,10 +30,11 @@ export async function start(parent, hudRoot, loading, opts = {}) {
   if (!roomId) throw new Error('Kein Raum mit Layout gefunden (Werkstatt › Raum-Bausteine › Layout).');
   if (asked && asked !== roomId) console.warn(`Raum „${asked}“ hat kein Layout, spiele „${roomId}“`);
   const [width, height] = D.game?.resolution || [1920, 1080];
-  window.__nomadData = { commit: cloud?.commit || null, drafts: [...drafts.keys()] };   // where the data came from (diag.js, Menü › Optionen)
+  window.__nomadData = { commit: cloud?.commit || null, drafts: [...drafts.keys()], set: dataSet ? { id: dataSet.id, name: dataSet.name } : null };   // where the data came from (diag.js, Menü › Optionen)
   const hud = new Hud(hudRoot, { workshopDrafts: drafts.size, commit: cloud?.commit });
   // local workshop drafts change the game in this browser only (Daniel, 18.11.2026: the iPad played 640×360 with zoom 0.5 from an old
   // draft of game.json): say so right away, not only in the controls window; Menü › Optionen can throw them away
+  if (dataSet) setTimeout(() => hud.toast(`Datenset: ${dataSet.name}`, `${dataSet.files.length} Dateien weichen vom Standard ab · wechseln im Hauptmenü`, 'info', 6000), 2500);
   if (drafts.size) setTimeout(() => hud.toast('Lokaler Werkstatt-Stand aktiv', `${[...drafts.keys()].join(', ')} · nur in diesem Browser · Menü › Optionen › verwerfen`, 'warn', 9000), 7000);
   const game = new Phaser.Game({
     type: Phaser.AUTO, parent, width, height, backgroundColor: '#0d0a12',

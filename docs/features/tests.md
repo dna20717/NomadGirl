@@ -10,6 +10,7 @@ node tools/duel_test.mjs [--shots]         # Glitch-Duell-Demo (/duel): Bit-Stap
 node tools/splash_test.mjs [--shots]       # Startseite in drei Größen + Controller (Menü wählen, Kurve, A öffnet) (Server muss laufen)
 node tools/cyberware_test.mjs [--shots]     # Cyberware: 30 Implantate mit Symbol, Doppelsprung/Luft-Dash nur mit Implantat, Perk + Flaw in Werten und Tooltip, Belastung, Leben sickert nie unter 1, Reaktor-Herz am Tank, Ripperdoc-Liege stellt her (Werkbank nicht), Baupläne im Tresor, Stufen-Rahmen, Testraum frei (15 Prüfungen)
 node tools/map_test.mjs [--shots]          # Reisekarte: Karte im Spielstand, Van-Tür und Warroom öffnen sie, Orte gezeichnet + Papier/Logos, LB/RB + Steuerkreuz, Detail mit Kosten/Gefahr/Beute, Klick fährt hin, Hier plündern, neuer Durchgang = neue Karte, Werkstatt-Vorschau (12 Prüfungen)
+node tools/datasets_test.mjs               # Datensets (#073): Speichern unter, Spiel lädt das Set, Hauptmenü zeigt und wechselt, zurück zum Standard (6 Prüfungen)
 node tools/logbook_test.mjs                # Meldungs-Kanal (#070): drei stehen, Hinweise warten, Warnungen nie, Logbuch mit Uhrzeit (3 Prüfungen)
 node tools/bitfarm_test.mjs                # Bit-Farm (#060): nur Entities, Als Worker einsetzen, Bonus mit Macke, freundliches Duell in der Chill-Ecke (Bindung, fängt nichts) (5 Prüfungen)
 node tools/turf_test.mjs                   # Revier-Camp (#061): Hinweis, Frieden, Handel, Klauen unter Zeugen, Tresor nur mit Gewalt, Schlag bricht den Frieden, neutral = feindlich (7 Prüfungen)
