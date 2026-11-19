@@ -962,6 +962,8 @@ export const AREAS = {
         num('door.enter', 'Einsteigen bei', { unit: 'Bildpixel x', hint: '#056: mit Nischen steigt Leyla hier ein (Fahrertür): E öffnet die Karte; die Werkbänke in den Nischen haben eigene E-Punkte' }),
         table('door.bays', 'Nischen im Querschnitt', [range('x', 'von – bis', { unit: 'Bildpixel' }), range('y', 'oben – unten (Boden)', { unit: 'Bildpixel' }), num('place', 'Platz', { min: 0, max: 2 })],
           { hint: '#056 (Daniel, 18.11.2026: Van streng von der Seite, zu und im Querschnitt): je Nische eine Werkstatt, sie blendet mit dem Bild auf. Statt der Türöffnung oben' })] },
+      { title: 'Aus dem Tileset', fields: [ref('kit.asset', 'Tileset', 'assets', { hint: '#076: Zeile 1 zu, Zeile 2 Querschnitt, gleiche Spalten. Das Spiel setzt das Fahrzeug daraus zusammen: Heck, Nische 1, dann je weiterem Werkstatt-Platz Stütze + Nische 2, Fahrerhaus. Nischen, Tür und Einsteigen rechnet es selbst aus. Leer = das Aussehen so, wie es ist' }),
+        num('kit.rear', 'Heck bis', { unit: 'Bildpixel x', min: 1 }), num('kit.bay', 'Nische 1 bis', { unit: 'Bildpixel x', min: 1 }), num('kit.strut', 'Stütze bis', { unit: 'Bildpixel x', min: 1 }), num('kit.bay2', 'Nische 2 bis (danach Fahrerhaus)', { unit: 'Bildpixel x', min: 1 })] },
       { title: 'Slots', fields: [num('slots.engine', 'Motor', { min: 0 }), num('slots.armor', 'Panzerung', { min: 0 }), num('slots.weapon', 'Waffen', { min: 0 }),
         num('slots.roof', 'Dach', { min: 0, hint: 'Für Dachbox und Ähnliches' })] },
     ],

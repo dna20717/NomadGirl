@@ -110,6 +110,16 @@ check('Außerhalb des Bau-Modus: Dachbox sichtbar auf dem Van', await ev(() => g
 s = await ev(() => import('./game/crafting.js').then(C => { const sv = nomad.save(); sv.inv.grids.backpack.items.push({ a: 'items', id: 'schrottplatte', n: 3, x: 0, y: 2, r: 0 }); for (const k of Object.keys(sv.inv.grids)) if (k !== 'backpack') sv.inv.grids[k].items = sv.inv.grids[k].items.filter(e => e.id !== 'schrottplatte'); return { r: C.craft(game.scene.getScene('play').data_, sv, 'bleche_schweissen', 'werkbank'), parts: sv.rig.spare.parts }; }));
 check('Bleche an der Werkbank geschweißt: liegen auf dem Schrottplatz', s.r.ok && s.r.made.part && s.parts.includes('bleche'), s);
 
+// #076 the van is put together from its tileset (van_side_kit): two places = the old strip, pixel for pixel
+const kit = await ev(async () => {
+  const D = game.scene.getScene('play').data_, id = D.tractors.van.look, A = D.assets[id];
+  const load = src => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = src; });
+  const [a, b] = await Promise.all([load(A.file), load(new URL(D.assets.van_side.file, new URL('projects/nomadgirl/', location.href)).href)]);
+  const px = img => { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const g = c.getContext('2d'); g.drawImage(img, 0, 0); return g.getImageData(0, 0, img.width, img.height).data; };
+  const P = px(a), Q = px(b); let off = 0; for (let i = 0; i < P.length; i++) if (Math.abs(P[i] - Q[i]) > 2) off++;
+  return { id, kit: !!A.kit, size: [a.width, a.height], old: [b.width, b.height], off, spawn: D.game.spawn.look };
+});
+check('Van aus dem Tileset (#076): zwei Plätze ergeben das alte Bild (höchstens Rundung), Spawn nutzt es', kit.kit && kit.size.join() === kit.old.join() && kit.off < 200 && kit.spawn === kit.id, kit);
 await browser.close();
 for (const o of ok) console.log('✔', o);
 for (const e of errors) console.log('✖', e);

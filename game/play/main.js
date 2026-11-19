@@ -14,6 +14,7 @@ import { PlayScene } from './scene.js';
 import { Hud } from './hud.js';
 import { installControl } from './control.js';
 import { openSave, arrive } from '../save.js';
+import { composeKits } from '../vehicle_kit.js';
 
 export async function start(parent, hudRoot, loading, opts = {}) {
   const base = new URL('projects/nomadgirl/', location.href);
@@ -25,6 +26,7 @@ export async function start(parent, hudRoot, loading, opts = {}) {
   if (cloud) console.info(`Spieldaten live aus dem Repository (Commit ${cloud.commit.slice(0, 7)})`);
   loading?.data();
   const D = project.data, rooms = D.rooms || {};
+  await composeKits(D, base);   // #076 vehicles from a tileset (the van: rear, niches, strut, cab)
   const q = new URLSearchParams(location.search), asked = q.get('room');
   const roomId = [asked, D.game?.testRoom, ...Object.keys(rooms)].find(id => id && rooms[id]?.layout?.length);
   if (!roomId) throw new Error('Kein Raum mit Layout gefunden (Werkstatt › Raum-Bausteine › Layout).');
