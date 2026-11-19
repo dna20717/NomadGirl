@@ -358,7 +358,7 @@ export class InventoryUI {
     const art = !e.g && k && artOf(D, e.a, e.id, aw, e.r || 0, ah);
     if (e.g) { /* portrait above */ } else if (art) { wrap.classList.add('pic'); wrap.append(el('span', { class: 'inv-pic', style: `left:${(W - aw) / 2}px;top:${(H - ah) / 2}px;width:${aw}px;height:${ah}px` }, art)); }
     else wrap.append(el('span', { class: 'inv-glyph', style: `left:${lx * c}px;top:${ly * c}px;width:${c}px;height:${c}px` }, glyphOf(D, e.a, e.id)));
-    if (!art && !e.g && (b.w * c >= 80 || b.h > 1)) wrap.append(el('span', { class: 'inv-name' }, t.name || e.id));
+    if (!art && !e.g && (b.w * c >= 80 || b.h > 1)) wrap.append(el('span', { class: 'inv-name' }, e.p ? `⛓ ${e.p.name}` : t.name || e.id));   // #079 a prisoner shows his name
     if (e.n > 1) wrap.append(el('span', { class: 'inv-count' }, String(e.n)));
     if (e.q || e.mods) wrap.append(el('span', { class: 'inv-badge' + (e.q ? ' q' + e.q : ' mod') }, e.mods ? '⚙' : e.q === 2 ? '★★' : '★'));   // good dish / own weapon (#013)
     wrap.addEventListener('mousedown', ev => {
@@ -449,7 +449,8 @@ export class InventoryUI {
       el('small', {}, live ? 'Bonus aktiv: steht in der Schatzkammer' : 'Auf einen Trophäen-Ständer in der Schatzkammer stellen, dann wirkt der Bonus')) : null;
     const gl = e.g ? el('div', { class: 'inv-glitch' }, faceCanvas(e.g, SIZE * 2), el('div', {}, el('small', {}, `${e.g.talent}${e.g.unique ? ' · Unikat' : ''} · ${'▮'.repeat(e.g.bits)}${'▯'.repeat(5 - e.g.bits)}`),
       el('ul', { class: 'inv-perks' }, el('li', { class: 'perk' }, '▲ ' + e.g.effect), el('li', { class: 'flaw' }, '▼ ' + e.g.quirk)), e.g.wish ? el('small', { class: 'inv-wish' }, `„${e.g.wish}“`) : null)) : null;
-    this.tip.replaceChildren(...[brandPlate(D, e.g ? { brand: glitchBrand(D, e.g) } : t), el('b', {}, e.g?.name || t.name || e.id), gl, el('small', {}, facts.join(' · ')), trophy,
+    const pr = e.p ? el('small', {}, `${e.p.gang ? `${e.p.gang} · ` : ''}Gesundheit ${Math.round(e.p.hp ?? 100)} %${e.p.from ? ` · war ${e.p.from}` : ''}`) : null;   // #079
+    this.tip.replaceChildren(...[brandPlate(D, e.g ? { brand: glitchBrand(D, e.g) } : t), el('b', {}, e.g?.name || (e.p ? `Gefangener: ${e.p.name}` : null) || t.name || e.id), gl, pr, el('small', {}, facts.join(' · ')), trophy,
       parts.length ? el('ul', { class: 'inv-perks' }, ...parts.map(x => el('li', { class: x.good ? 'perk' : 'flaw' }, (x.good ? '▲ ' : '▼ ') + x.text))) : null,
       e.q ? el('small', { class: 'inv-quality q' + e.q }, `Qualität: ${e.q === 2 ? 'perfekt' : 'gut'}${t.buff ? ` · Buff +${qualityBonus(D, e.q)} %` : ''}`) : null,
       e.a === 'weapons' && e.mods ? el('div', { class: 'inv-mods' }, el('small', {}, 'Eigenbau: ' + (modsText(e.mods) || 'Grundwerte')),

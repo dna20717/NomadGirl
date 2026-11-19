@@ -5,6 +5,7 @@
 //   save.quests = { active: { <id>: { base, day } }, done: { <id>: { day } }, tracked: 'main' | <id> }
 //   D.quests[id] = { name, giver (companion), text, after (quest), minDay, counter + filter + target (like achievements) | item + count
 //                    (deliver), reward: { deltas, items: [{ item, count }] }, done (line of the giver when it is handed in) }
+import { PRISONER, addDark, prisonerConfig } from './prisoners.js';
 import { ok as condOk, setFlag } from './conditions.js';
 import { state as achState } from './achievements.js';
 import { stock, take } from './crafting.js';
@@ -52,6 +53,7 @@ export function claim(D, save, id) {
   const x = D.quests?.[id], Q = qstate(save);
   if (!x || !Q.active[id] || !progressOf(D, save, id).ready) return { ok: false };
   if (!x.counter && x.item) take(D, save, x.item, x.count || 1);
+  if (!x.counter && x.item === PRISONER) addDark(save, (x.count || 1) * prisonerConfig(D).useDark);   // #079 Kopfgeld: delivering people darkens Leyla
   if (!x.counter) for (const id of x.pieces || []) take(D, save, id, 1);
   const R = x.reward || {}, got = [];
   if (R.reveal) { const n = revealPlace(D, save, R.reveal); if (n) got.push(`Neuer Ort: ${n.name}`); }   // #057

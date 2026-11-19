@@ -2,6 +2,7 @@
 // Toast nirgends“): everything that is in force right now, from wherever it lives, as one list for the HUD. No DOM.
 //   activeEffects(D, save, ctx) → [{ id, label, sub, kind: 'good' | 'bad' | 'info', left (h) | null }]
 //   ctx: { run: true, sky (scene.weatherRun), turf (scene.turf.state()) } — what only the scene knows
+import { prisoners, prisonerLine, darkOf } from './prisoners.js';
 import { clockHours } from './tank.js';
 import { influencer } from './brand_perks.js';
 import { powerBoost } from './stations.js';
@@ -23,6 +24,9 @@ export function activeEffects(D, save, ctx = {}) {
   const p = powerBoost(save, now);
   if (p) out.push({ id: 'power', label: `Strom +${p} ⚡`, sub: `noch ${hoursText((save.powerBoost.until || now) - now)}`, kind: 'good', left: (save.powerBoost.until || now) - now });
   // #064 Markentreue
+  // #079 Gefangene an Bord, Dunkelheit (the hidden resource shows once there is some)
+  { const P = prisoners(save); if (P.length) out.push({ id: 'prisoners', label: `${P.length} ${P.length === 1 ? 'Gefangener' : 'Gefangene'}`, sub: P.map(x => prisonerLine(x.e.p)).join(' · '), kind: 'info', left: null }); }
+  if (darkOf(save) > 0) out.push({ id: 'dark', label: `Dunkelheit ${darkOf(save)}`, sub: 'aus Gefangenen und dunklen Geschäften', kind: 'bad', left: null });
   for (const x of brandSets(D, save).list.filter(x => x.on)) out.push({ id: `set:${x.brand}`, label: `Markentreue: ${x.name}`, sub: `${x.n} Teile`, kind: 'good', left: null });
   // #060 Entities at work (one entry, the details are in the Bit-Farm)
   const W = workers(D, save);

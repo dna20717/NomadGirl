@@ -2,6 +2,7 @@
 // legs (one road each); after every leg an encounter may happen (Reisen › Chance pro 10 km, more at night). An encounter
 // (Welt › Encounter) tells what happens and offers choices; a choice costs or gives time, fuel, food, Δ, health, things.
 // No DOM.
+import { usePrisoner, hurtAll, prisonerConfig, addDark } from './prisoners.js';
 import { advance } from './save.js';
 import { give, take, have } from './crafting.js';
 import { rollLoot } from './inventory.js';
@@ -86,6 +87,12 @@ export function choose(D, save, o, rnd = Math.random) {
   if (o.loot) for (const e of rollLoot(D, o.loot, rnd)) { if (e.a !== 'items') continue; const rest = give(D, save, e.id, e.n); things.push({ id: e.id, n: e.n - rest }); }
   for (const t of things) if (t.n > 0) lines.push(`+${t.n} ${D.items?.[t.id]?.name || t.id}`);
   if (o.health) { save.health = Math.max(1, Math.round((save.health ?? 100) - o.health)); lines.push(`−${o.health} Leben`); }
+  // #079 Gefangene: an answer uses one (Ruf for his gang, Dunkelheit), a failed fight or a riot hurts them all
+  const used = !failed && o.prisoner ? usePrisoner(D, save, o) : null;
+  if (used) { lines.push(`${used.name}${o.prisoner === 'free' ? ' ist frei' : ' ist weg'}`); if (used.rep?.n) lines.push(`Ruf ${used.rep.gang} ${used.rep.n > 0 ? '+' : '−'}${Math.abs(used.rep.n)}`); if (used.dark) lines.push(`+${used.dark} Dunkelheit`); }
+  if (!failed && o.dark && !o.prisoner) { addDark(save, o.dark); lines.push(`+${o.dark} Dunkelheit`); }
+  const hurt = (failed && o.health) || o.hurtPrisoners ? hurtAll(D, save, o.hurtPrisoners || prisonerConfig(D).hurt) : [];
+  for (const h of hurt) lines.push(h.died ? `${h.name} hat es nicht überlebt` : `${h.name} verletzt`);
   // #055: consequences that last: Ruf with the gang (also when it went wrong), Merker and buff (only when it worked), the story goes on or ends
   const rep = o.rep && o.gang ? addRep(D, save, o.gang, o.rep) : null;
   if (rep?.n) lines.push(`Ruf ${rep.gang} ${rep.n > 0 ? '+' : '−'}${Math.abs(rep.n)}`);

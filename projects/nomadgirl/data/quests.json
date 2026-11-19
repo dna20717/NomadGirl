@@ -100,5 +100,27 @@
   "count": 3,
   "text": "Ich hab gehört, was mit der Läuferin war. Ich sag nichts. Aber koch drei Eintöpfe, ich bring sie ihren Leuten. Manches kann man nicht zurückgeben, aber man kann es satt machen.",
   "done": "Sie haben gegessen. Keiner hat dich gelobt. Keiner hat dich verflucht. Das ist ein Anfang."
+ },
+ "kopfgeld_schraube": {
+  "name": "Kopfgeld",
+  "giver": "schraube",
+  "minDay": 3,
+  "item": "gefangener",
+  "count": 1,
+  "reward": {"deltas": 200, "items": [{"item": "technik", "count": 2}]},
+  "text": "Die Siedlung an der Kreuzung zahlt für Plünderer, die ihre Brunnen vergiftet haben. Lebend. Jetzt, wo du eine Zelle im Rig hast: Bring mir einen, gefesselt.",
+  "done": "Sie haben ihn abgeholt. Keiner hat gefragt, wie. Hier, dein Anteil.",
+  "needWorkshop": "cell"
+ },
+ "kopfgeld_sung": {
+  "name": "Zwei Namen auf der Liste",
+  "giver": "onkel_sung",
+  "minDay": 6,
+  "item": "gefangener",
+  "count": 2,
+  "reward": {"deltas": 380, "items": [{"item": "wissen", "count": 2}]},
+  "text": "Ich habe eine Liste. Nicht meine, ich trage sie nur. Zwei von denen da draußen sollen reden, nicht sterben. Bring sie mir.",
+  "done": "Sie reden. Ich höre zu. Leyla … pass auf, dass dich das nicht verändert.",
+  "needWorkshop": "cell"
  }
 }

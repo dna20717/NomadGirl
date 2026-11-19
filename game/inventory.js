@@ -84,23 +84,23 @@ export function untangle(D, grid) {
 // add n of a thing: first onto existing stacks, then into free spots. Returns how many did NOT fit.
 // q / mods (#013): only the same quality stacks; a weapon with its own values keeps them
 export const sameKind = (e, a, id, q = 0) => e.a === a && e.id === id && (e.q || 0) === (q || 0);
-export function add(D, grid, a, id, n = 1, { stackOnly = false, q = 0, mods = null, g = null } = {}) {
+export function add(D, grid, a, id, n = 1, { stackOnly = false, q = 0, mods = null, g = null, p = null } = {}) {   // p: a prisoner (#079)
   const max = stackMax(D, a, id);
   for (const e of grid.items) {
     if (!n) break;
-    if (sameKind(e, a, id, q) && e.n < max && !mods && !g && !e.g) { const k = Math.min(n, max - e.n); e.n += k; n -= k; }
+    if (sameKind(e, a, id, q) && e.n < max && !mods && !g && !e.g && !p && !e.p) { const k = Math.min(n, max - e.n); e.n += k; n -= k; }
   }
   while (n > 0 && !stackOnly) {
     const spot = findSpot(D, grid, a, id);
     if (!spot) break;
     const k = Math.min(n, max);
-    grid.items.push({ a, id, n: k, ...spot, ...(q ? { q } : {}), ...(mods ? { mods: { ...mods } } : {}), ...(g ? { g: { ...g } } : {}) });
+    grid.items.push({ a, id, n: k, ...spot, ...(q ? { q } : {}), ...(mods ? { mods: { ...mods } } : {}), ...(g ? { g: { ...g } } : {}), ...(p ? { p: { ...p } } : {}) });
     n -= k;
   }
   return n;
 }
 // an entry taken out of somewhere back into a grid, with its quality and values; → how many did NOT fit
-export const addEntry = (D, grid, e, n = e.n, opts = {}) => add(D, grid, e.a, e.id, n, { ...opts, q: e.q || 0, mods: e.mods || null, g: e.g || null });
+export const addEntry = (D, grid, e, n = e.n, opts = {}) => add(D, grid, e.a, e.id, n, { ...opts, q: e.q || 0, mods: e.mods || null, g: e.g || null, p: e.p || null });
 // the kind of a thing for colours, filters and „Einlagern bevorzugt“: weapons by their kind, items by their category
 export function kindOf(D, a, id) {
   const t = thing(D, a, id) || {};
@@ -127,7 +127,7 @@ export function drop(D, grid, e, x, y) {
   if (!hit.length) { grid.items.push(Object.assign(e, { x, y })); return { ok: true, held: null }; }
   if (hit.length === 1) {
     const o = hit[0], max = stackMax(D, e.a, e.id);
-    if (sameKind(o, e.a, e.id, e.q) && max > 1 && !e.mods && !o.mods && !e.g && !o.g) {
+    if (sameKind(o, e.a, e.id, e.q) && max > 1 && !e.mods && !o.mods && !e.g && !o.g && !e.p && !o.p) {
       const k = Math.min(e.n, max - o.n);
       if (k <= 0) return { ok: false, held: e };
       o.n += k; e.n -= k;

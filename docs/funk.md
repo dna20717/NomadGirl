@@ -255,7 +255,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commits `9660feb`, Worker an der Werkbank, `9706d2d` Boni-Bus, `339c1f7` Van aus dem Tileset, `8614709` Läuferin (alle mit #076). `npm test` 280/280 (neu: Gegenpaare, Ausrüstung/Tank im Bus, `test/vehicle_kit.test.js`, Läuferin-Kette), Browser-Suite 47/48, rot nur `silo_test` (erwartete alten Titel und Titan 120), angepasst in `fde96e1`, danach 10/10 grün. Simulation Bit-Stapel: 9,6 → 7,8 Züge je Seite. Browser-Tests finden Inventar-Raster jetzt über `data-key` (das Start-Deck schob ein Raster dazwischen). PixelLab 0. **Bitte testen:** Neues Spiel: Bastler-Deck steckt; Generator neben die Schlafkoje bauen (rote Linie, „Buff −30 %“); Kochnische mit Bit-Farm-Entity: Knopf „Worker einteilen“ oben im Kochfenster; Duell in /duel ist kürzer; Läuferin ausliefern und weiterfahren.
 
 ### #077 Mega-Rigs: Hauptcontainer statt Lager am Boden
-- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte #029)
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte #029)
 - **Auftrag (Daniel, 19.11.2026):** „beide Rigs sollen kein Lager mehr am Boden haben, sondern das Lager sein. Das heißt, wir brauchen einen Hauptcontainer je Rig (zunächst nur mit Code-Grafiken), der das Lager ersetzt.“ Feuer, Kiste, Brett, Companions ziehen an Bord.
 - **Rückfragen:**
 - **Ergebnis:**
@@ -267,10 +267,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Werkstätten ausbauen mit Sternen (#078)“. Fundament `game/upgrades.js`, Werkstatt-Tabelle „Ausbau“, 12 Werkstätten mit 1–3 Stufen, Wirkung auf Tempo, Buff, Strom, Bild je Stufe; Stufe bleibt beim Umbauen und Einpacken. `npm test` 285/285, `tools/upgrade_test.mjs` 3/3. ⚠️ vorläufig: Preise und Werte, noch keine Bilder je Stufe. PixelLab 0. **Bitte testen:** Kochnische öffnen → „Ausbauen ★“.
 
 ### #079 Die Zelle: Gefangene
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Wirkung der Zelle“: als Nächstes)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Wirkung der Zelle“: als Nächstes)
 - **Auftrag (Daniel, 19.11.2026):** „Ist zunächst die Grundlage, um Gefangene transportieren zu können. Also ein spezielles Inventar. Bau aber die Auftragsart direkt mit ein. Gefangene können in Auseinandersetzungen durch Events beschädigt werden oder auch in Dialogen als Ressource zum Einsatz kommen (mit Auswirkungen auf Ruf, produziert Dunkelheit).“
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: Fesseln = Nahkampf-Sieg über Plünderer mit 35 % Chance (kein Boss, keine Mutanten); Gefangener als 2 × 2-Gegenstand mit Person; Zelle 4 × 2, Dunkelheit 1 je Tag und Gefangenem, draußen −15 % Gesundheit je Tag; Lösegeld +5 Ruf seiner Gang, verkaufen −15, laufen lassen +3; Kopfgeld-Aufträge erst mit Zelle; Dunkelheit als Zahl im Spielstand, sichtbar in der Effekt-Leiste.
+- **Ergebnis:** (Code) Commit „Die Zelle: Gefangene fesseln, transportieren, einsetzen, Kopfgeld (#079)“. `npm test` 290/290 (neu `test/prisoners.test.js`), Browser drive/camp/inventory/game/bench/turf/workshop/trunk grün. PixelLab 0 (Gefangener ohne Bild, zeigt ⛓ + Namen). **Bitte testen:** im POI Plünderer mit dem Messer erledigen, Gefangenen aufheben, Zelle bauen, reinlegen; auf der Fahrt „Ein Angebot am Funk“.
 
 ### #080 Dunkelheit als Skilltree, Kopfgeldjäger-Fraktion
 - **Status:** offen · angelegt 19.11. von Code (Daniel, Karte A5) · **erst reden, dann bauen** (großes Feature)

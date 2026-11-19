@@ -553,6 +553,33 @@
    "shop": "brand",
    "text": "Ein Truck mit aufgeklappter Seite, Neonschrift, Musik aus Boxen: {brand} verkauft direkt vom Laster.|Ein Verkaufsstand im Logo-Look. Wer ein Billboard gesehen hat, kennt die Preise schon.",
    "answers": "weiterfahren"
+  },
+  {
+   "figures": "pistolero",
+   "time": "any",
+   "weight": 5,
+   "danger": 1,
+   "moods": "",
+   "id": "gefangenen_angebot",
+   "name": "Ein Angebot am Funk|Jemand will reden",
+   "roadside": "barrier",
+   "gang": "any",
+   "needPrisoner": true,
+   "text": "Über Funk meldet sich eine raue Stimme: Die {gang} wissen, wen du an Bord hast. Sie zahlen für ihre Leute. Andere zahlen mehr, aber nicht für sein Wohl.",
+   "answers": "loesegeld, verkaufen_rivalen, laufen_lassen, weiterfahren"
+  },
+  {
+   "figures": "",
+   "time": "any",
+   "weight": 4,
+   "danger": 1,
+   "moods": "",
+   "id": "unruhe_laderaum",
+   "name": "Unruhe im Laderaum",
+   "roadside": "flare",
+   "needPrisoner": true,
+   "text": "Hinten poltert es. Dein Gefangener hat die Fessel fast durchgescheuert und tritt gegen die Tür.",
+   "answers": "festhalten, ruhigstellen, laufen_lassen"
   }
  ],
  "moods": [
@@ -1223,7 +1250,37 @@
    "loot": "situation",
    "needWorkshop": "drone",
    "result": "Auf der Werkbank ergibt das Wrack doppelt so viele Teile."
-  }
+  },
+  {
+   "id": "loesegeld",
+   "label": "Gegen Lösegeld zurückgeben ({price} Δ)",
+   "when": "any",
+   "deltas": 120,
+   "prisoner": "ransom",
+   "rep": 5,
+   "result": "Ein Umschlag wechselt den Besitzer. Der Gefangene humpelt zu seinen Leuten."
+  },
+  {
+   "id": "verkaufen_rivalen",
+   "label": "An ihre Feinde verkaufen ({price} Δ)",
+   "when": "any",
+   "deltas": 220,
+   "prisoner": "sell",
+   "rep": -10,
+   "result": "Sie zahlen gut. Was sie mit ihm vorhaben, willst du nicht wissen."
+  },
+  {"id": "laufen_lassen", "label": "Laufen lassen", "when": "any", "prisoner": "free", "result": "Du schneidest die Fessel durch. Er rennt, ohne sich umzudrehen."},
+  {
+   "id": "festhalten",
+   "label": "Festhalten",
+   "when": "any",
+   "risk": 35,
+   "failHealth": 10,
+   "hours": 0.5,
+   "result": "Ein Griff, ein neuer Knoten. Ruhe im Laderaum.",
+   "failResult": "Sein Ellbogen trifft dich, bevor du ihn bändigst."
+  },
+  {"id": "ruhigstellen", "label": "Ruhigstellen", "when": "any", "hurtPrisoners": 30, "dark": 1, "result": "Danach ist es still. Zu still."}
  ],
  "words": {
   "group": "Rostkrähen|Asphaltwölfe|Neon-Saints|Schrottkönige|Staubtöchter|Kilometerfresser",
@@ -1242,5 +1299,13 @@
   {"kind": "wet", "roadside": "breakdown", "factor": 2.5},
   {"kind": "wet", "roadside": "truck", "factor": 1.5},
   {"kind": "wet", "roadside": "campfire", "factor": 0.4}
- ]
+ ],
+ "prisoners": {
+  "chance": 35,
+  "perDay": 1,
+  "outside": 15,
+  "useDark": 2,
+  "hurt": 25,
+  "names": ["Rattenzahn", "Kurbel", "Mo", "Funke", "Schnalle", "Grizzly", "Pfeife", "Lotte", "Bolzen", "Kiesel", "Tacker", "Nadel"]
+ }
 }

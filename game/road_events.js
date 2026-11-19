@@ -126,6 +126,9 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
     if (a.flag) o.flag = a.flag;
     if (a.buff) o.buff = a.buff;
     if (a.reveal) o.reveal = a.reveal;
+    if (a.prisoner) { o.prisoner = a.prisoner; o.needPrisoner = true; }   // #079 Lösegeld, verkaufen, laufen lassen
+    if (a.dark) o.dark = a.dark;
+    if (a.hurtPrisoners) o.hurtPrisoners = a.hurtPrisoners;
     if (S.once) o.once = S.id;
     if (inChain) { o.chain = { next: a.next || null, gang, rival, n: (chain?.n || 1) + (a.next ? 1 : 0) }; }
     const extra = { price: String(Math.abs(o.deltas || 0)) };

@@ -1,5 +1,7 @@
 // Events of the play scene (#017 split from scene.js): knock-out, waking up, the dropped backpack, notes and achievements, kills.
 // Mixed into PlayScene (game/play/scene.js): the methods keep their `this`, nothing else changes.
+import { catchUp, cellKeys } from '../prisoners.js';
+import { storeKeyOf } from '../save.js';
 import { rescue } from '../tank.js';
 import { addRep, repConfig, levelName } from '../reputation.js';
 import { Camp } from './camp.js';
@@ -135,6 +137,7 @@ export class SceneEvents {
   // in the camp: what was reached on the way (run end, a new Durchgang) and what is a state (string lights, recipes)
   campNews() {
     const D = this.data_, save = this.box?.save;
+    if (save) this.prisonerNews();   // #079
     if (!save || !D.achievements) return;
     this.learnNotes();
     const news = [...(save.achievements?.news || [])];
@@ -142,6 +145,15 @@ export class SceneEvents {
     const now = [...achieveLevel(D, save, 'lights', save.rig?.lights?.length || 0), ...achieveLevel(D, save, 'recipes', save.recipes?.length || 0), ...achieveCheck(D, save)];
     const info = id => { const a = D.achievements[id] || {}, rid = D.recipes?.[a.recipe] ? a.recipe : null; return { id, name: a.name || id, recipe: rid, recipeName: rid ? D.recipes[rid].name || rid : null }; };
     this.announce([...news.filter(id => D.achievements[id]).map(info), ...now]);
+  }
+  // #079 the days that passed: prisoners in the Zelle make Dunkelheit, those outside of it suffer (one toast)
+  prisonerNews() {
+    const D = this.data_, save = this.box.save, r = catchUp(D, save, cellKeys(D, save, storeKeyOf));
+    const dead = r.hurt.filter(h => h.died).map(h => h.name), sore = r.hurt.filter(h => !h.died).map(h => h.name);
+    if (dead.length) this.hud.toast(`${dead.join(', ')} hat es nicht überlebt`, 'Ohne Zelle halten Gefangene nicht lange durch', 'warn', 6000);
+    else if (sore.length) this.hud.toast(`${sore.join(', ')} geht es schlecht`, 'Gefangene gehören in die Zelle', 'warn', 5000);
+    if (r.dark > 0) this.hud.toast(`+${r.dark} Dunkelheit`, 'Die Zelle ist nicht leer', 'info', 4000);
+    if (dead.length || sore.length || r.dark) this.box.persist?.();
   }
   announce(list) {
     if (!list?.length) return;

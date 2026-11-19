@@ -1,6 +1,7 @@
 // Loot on the ground in a run: beaten enemies drop bundles (their loot table), each bundle is a small grid.
 // The ground inventory (like XCOM) shows the nearest bundle within reach (Leyla › Inventar › Boden-Reichweite);
 // stackable things Leyla already carries are picked up by walking past, as far as the stacks have room.
+import { capture, capturable } from '../prisoners.js';
 import { newGrid, add, rollLoot, thing, stackMax, addEntry } from '../inventory.js';
 import { earn } from '../earn.js';
 
@@ -42,7 +43,7 @@ export class Loot {
     let rest = things.map(t => ({ ...t }));
     for (let i = 0; rest.length && i < 6; i++) {
       const pile = this.make(x + (Math.random() - 0.5) * spread + i * 30, feet);
-      rest = rest.map(t => ({ ...t, n: add(this.scene.data_, pile.grid, t.a, t.id, t.n) })).filter(t => t.n > 0);
+      rest = rest.map(t => { const { a, id, n, ...x } = t; return { ...t, n: add(this.scene.data_, pile.grid, a, id, n, Object.keys(x).length ? x : undefined) }; }).filter(t => t.n > 0);   // extras (#079 the prisoner) ride along
       this.show(pile, x);
     }
   }
@@ -116,6 +117,8 @@ export class Loot {
     const paid = (this.scene.earnedKills ??= new Set()), key = `${e.id}@${e.spawnAt}`, first = !paid.has(key);
     paid.add(key);
     if (first) for (const r of earn(this.scene.data_, 'kill', { family: e.d.family, boss: e.d.behavior === 'boss' })) { const same = t.find(x => x.a === 'items' && x.id === r.id); if (same) same.n += r.n; else t.push(r); }
+    // #079 a raider beaten in melee may stay down tied up: a prisoner, picked up like loot
+    if (this.scene.box && capturable(this.scene.data_, e, e.lastHit)) t.push(capture(this.scene.data_, e, this.scene.gang?.()?.name || null));
     if (t.length) this.drop(e.x, e.feet, t);
   }
 

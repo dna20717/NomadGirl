@@ -6,8 +6,8 @@
 //   Zeit        minDay
 // check(D, save, c) → { ok, why (first missing, for a greyed button), parts: [{ ok, name, what }] (for labels) }
 const list = v => String(v || '').split(',').map(x => x.trim()).filter(Boolean);
-export const COND_KEYS = ['needsFlag', 'needs', 'notFlag', 'not', 'needCompanion', 'needWear', 'needItem', 'needRigSlot', 'needRigPart', 'needWorkshop', 'minDay'];
-export const CREW_KEYS = ['needCompanion', 'needWear', 'needItem', 'needRigSlot', 'needRigPart', 'needWorkshop'];
+export const COND_KEYS = ['needsFlag', 'needs', 'notFlag', 'not', 'needCompanion', 'needWear', 'needItem', 'needRigSlot', 'needRigPart', 'needWorkshop', 'needPrisoner', 'minDay'];
+export const CREW_KEYS = ['needCompanion', 'needWear', 'needItem', 'needRigSlot', 'needRigPart', 'needWorkshop', 'needPrisoner'];   // #079 a prisoner on board
 
 const WEAR_NAMES = { head: 'Kopf', armor: 'Rüstung', eyes: 'Augen-Implantat', nerves: 'Nerven-Implantat', arm: 'Cyberarm', heart: 'Herz-Implantat', legs: 'Bein-Implantat', skin: 'Haut-Implantat',
   bow: 'AvA-Bug', tail: 'AvA-Heck', core: 'AvA-Kern', module: 'AvA-Modul' };
@@ -35,6 +35,7 @@ export function crewParts(D, save, c) {
   else if (c.needWear) { const id = wear(save)[c.needWear]; out.push({ ok: !!id, name: id ? D.items?.[id]?.name || WEAR_NAMES[c.needWear] : WEAR_NAMES[c.needWear] || c.needWear, what: 'eingebaut' }); }
   if (c.needRigPart) out.push({ ok: rigParts(save).some(p => p.id === c.needRigPart), name: D.rigParts?.[c.needRigPart]?.name || c.needRigPart, what: 'am Rig' });
   else if (c.needRigSlot) { const p = rigParts(save).find(x => x.slot === c.needRigSlot); out.push({ ok: !!p, name: p ? D.rigParts?.[p.id]?.name || p.id : RIG_NAMES[c.needRigSlot] || c.needRigSlot, what: 'am Rig' }); }
+  if (c.needPrisoner) out.push({ ok: Object.values(save?.inv?.grids || {}).some(g => g?.items?.some(e => e.p)), name: 'Gefangener', what: 'an Bord' });   // #079
   if (c.needWorkshop) { const w = benches(D, save).find(x => x.function === c.needWorkshop); out.push({ ok: !!w, name: w?.name || FN_NAMES[c.needWorkshop] || c.needWorkshop, what: 'im Rig' }); }
   return out;
 }

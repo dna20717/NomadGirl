@@ -330,14 +330,18 @@
  "zelle": {
   "name": "Zelle",
   "function": "cell",
-  "stage": "2",
+  "stage": "1",
   "places": 1,
   "power": 0,
   "capacity": 1,
   "value": 200,
   "outside": "out_graffiti",
   "look": "ws_cell",
-  "synergy": {"effect": "quality", "chain": 10, "full": 40, "partners": [], "max": 0}
+  "synergy": {"effect": "quality", "chain": 10, "full": 40, "partners": [], "max": 0},
+  "grid": [4, 2],
+  "ownStorage": true,
+  "accept": ["prisoner"],
+  "description": "Gitter, Pritsche, ein Eimer. Hier sitzen Gefangene sicher; jeden Tag hier macht Leyla ein bisschen dunkler."
  },
  "reaktor": {
   "name": "Reaktor",

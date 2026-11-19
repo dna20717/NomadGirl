@@ -34,6 +34,17 @@ v = await ev(() => {
 });
 check('E am Heck: „Kofferraum · Beute sicher verstauen“ öffnet den Kofferraum (#094)', /Kofferraum/.test(v.prompt || '') && v.open && v.title === 'Kofferraum', v);
 if (shots) { fs.mkdirSync('output', { recursive: true }); await page.screenshot({ path: 'output/trunk_open.png' }); }
+// #079 a raider beaten in melee stays down as a prisoner: a pile with him, he goes into the trunk like loot, the tooltip names him
+v = await ev(async () => {
+  const s = game.scene.getScene('play'), D = s.data_; D.roadEvents.prisoners.chance = 100;
+  const e = s.enemies.find(x => x.d.family === 'raider') || { id: 'schlaeger', d: D.enemies.schlaeger, x: s.leyla.x + 80, feet: s.leyla.feet, spawnAt: 'test' };
+  const n0 = s.loot.piles.length; s.loot.fromEnemy({ ...e, x: s.leyla.x + 80, feet: s.leyla.feet, lastHit: { kind: 'melee' } });
+  const pile = s.loot.piles.slice(n0).find(p => p.grid.items.some(i => i.p)), pr = pile?.grid.items.find(i => i.p);
+  const I = await import('/game/inventory.js'); if (pr) I.addEntry(D, s.box.save.inv.grids.trunk, pr, 1);
+  const inTrunk = s.box.save.inv.grids.trunk.items.find(i => i.p);
+  return { pr: pr && { id: pr.id, name: pr.p.name, hp: pr.p.hp }, inTrunk: !!inTrunk, name: inTrunk?.p?.name };
+});
+check('Nahkampf-Sieg über einen Plünderer: er bleibt gefesselt liegen, lässt sich wie Beute in den Kofferraum legen (#079)', v.pr?.id === 'gefangener' && v.pr.hp === 100 && v.inTrunk && v.name === v.pr.name, v);
 v = await ev(async () => {
   const s = game.scene.getScene('play'), I = await import('/game/inventory.js'), save = s.box.save;
   I.add(s.data_, save.inv.grids.trunk, 'items', 'discokugel', 1); I.add(s.data_, save.inv.grids.backpack, 'items', 'kupferkabel', 2);
@@ -43,7 +54,7 @@ v = await ev(async () => {
   const sv = game.scene.getScene('play').box.save;
   return { bag: sv.inv.grids.backpack.items.map(e => e.id), trunk: sv.inv.grids.trunk.items.length };
 });
-check('k.o.: Rucksack-Beute weg, Kofferraum-Beute ist zu Hause im Rucksack', v.bag.includes('discokugel') && !v.bag.includes('kupferkabel') && v.trunk === 0, v);
+check('k.o.: Rucksack-Beute weg, Kofferraum-Beute (auch der Gefangene) ist zu Hause im Rucksack bzw. Camp-Lager', v.bag.includes('discokugel') && !v.bag.includes('kupferkabel') && v.trunk === 0, v);
 
 await browser.close();
 for (const o of ok) console.log('✔', o);

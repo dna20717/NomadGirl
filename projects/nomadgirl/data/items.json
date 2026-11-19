@@ -2346,5 +2346,14 @@
   "tags": ["trophy"],
   "look": "icons_trophies",
   "icon": 3
+ },
+ "gefangener": {
+  "name": "Gefangener",
+  "category": "prisoner",
+  "size": [2, 2],
+  "stack": 1,
+  "value": 0,
+  "glyph": "⛓",
+  "description": "Gefesselt, wütend, schwer. In der Zelle sicher, im Rucksack leidet er. Für Kopfgeld, Lösegeld oder dunkle Geschäfte."
  }
 }
