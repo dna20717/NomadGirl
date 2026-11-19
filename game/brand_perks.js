@@ -8,7 +8,7 @@ import { clockHours } from './tank.js';
 export function influencerConfig(D) {
   const I = D?.travel?.drive?.influencer || {};
   return { discount: Math.max(0, Math.min(90, I.discount ?? 20)), hours: Math.max(1, I.hours ?? 24),
-    perfect: I.perfect ?? 150, edge: I.edge ?? 50, frame: Math.max(0.3, (I.frame ?? 100) / 100) };
+    perfect: I.perfect ?? 150, edge: I.edge ?? 50, frame: Math.max(0.3, (I.frame ?? 100) / 100), scan: Math.max(0.3, I.scan ?? 1.4) };   // #115 Scan-Dauer
 }
 // #095 (Daniel 19.11.2026: „Billboard-Minigame darf gerne mehr Geschick-Komponente bekommen“): a snapshot through the viewfinder.
 // off = how far the billboard's middle is from the viewfinder's middle, in half viewfinder widths (0 = dead centre, 1 = at its edge)

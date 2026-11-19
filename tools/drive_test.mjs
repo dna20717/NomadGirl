@@ -98,13 +98,15 @@ await until(() => SC().hud.drive?.isOpen && SC().hud.drive.road?.screens?.length
 await page.waitForTimeout(1200); await shot('billboards');
 v = await ev(() => ({ screens: SC().hud.drive.road.screens.length, brand: SC().hud.drive.road.screens[0]?.brand?.name, lines: SC().hud.drive.road.screens[0]?.brand?.lines.length }));
 check('Riesen-Billboards mit Werbung der Marken stehen in der Landschaft', v.screens >= 1 && v.brand && v.lines >= 1, v);
-// #064 a billboard tapped during the drive: Influencer buff for its brand (a real click on the screen's place in the canvas)
-const at = await ev(() => { const d = SC().hud.drive, c = d.canvas, r = c.getBoundingClientRect(), u = c.width / 480, sc = d.visibleAd() || d.road.screens[0];
-  return { x: r.left + (sc.x + sc.w / 2) * u * r.width / c.width, y: r.top + (sc.y + sc.h / 2) * u * r.height / c.height, brand: sc.brand.id }; });
-await page.mouse.click(at.x, at.y);
-v = await ev(async () => { const B = await import('/game/brand_perks.js'), s = SC(); return { inf: B.influencer(s.data_, nomad.save()), fast: s.hud.drive.keys.has('ptr'), shot: s.hud.drive.shots?.size || 0 }; });
-// #095 the photo decides: centred = more, at the edge = less, outside the viewfinder = nothing (one try per billboard)
-check('Billboard angetippt: genau ein Foto, kein Vorspulen; im Sucher gibt es den Influencer-Buff (24 h), daneben nichts', v.shot === 1 && !v.fast && (v.inf ? v.inf.brand === at.brand && Math.round(v.inf.left) === 24 && [10, 20, 30].includes(v.inf.discount) : true), { v, at });
+// #115 AvA scans a billboard (Daniel: „nicht mehr fotografieren, sondern AvA scannen … Gummiband“): hold R, she pulls herself over it,
+// the ring fills, the Influencer buff comes; holding R does not hurry the drive
+await page.keyboard.down('r');
+const t0 = Date.now(); let fastWhile = false;
+while (Date.now() - t0 < 8000) { const q = await ev(() => ({ n: SC().hud.drive.shots?.size || 0, fast: [...SC().hud.drive.keys].some(k => k !== 'scan'), p: SC().hud.drive.ava?.p || 0 })); if (q.fast) fastWhile = true; if (q.n >= 1) break; await page.waitForTimeout(150); }
+await page.keyboard.up('r');
+v = await ev(async () => { const B = await import('/game/brand_perks.js'), s = SC(), d = s.hud.drive; return { inf: B.influencer(s.data_, nomad.save()), shot: d.shots?.size || 0, ava: d.ava ? [Math.round(d.ava.x), Math.round(d.ava.y)] : null }; });
+check('AvA scannt ein Billboard (R halten): ein Scan, Influencer-Buff (24 h), kein Vorspulen', v.shot === 1 && !fastWhile && v.inf && Math.round(v.inf.left) === 24 && [10, 20, 30].includes(v.inf.discount), { v, fastWhile });
+if (shots) await page.screenshot({ path: 'output/drive_scan.png' });
 v = await ev(async () => { const B = await import('/game/brand_perks.js'), D = SC().data_; return [0, 0.3, 0.8, 1.4].map(o => [B.shotGrade(D, o).grade, Math.round(20 * B.shotGrade(D, o).factor)]); });
 check('Sucher: Mitte perfekt (30 %), nah gut (20 %), Rand knapp (10 %), daneben verwackelt (0)', JSON.stringify(v) === JSON.stringify([['perfect', 30], ['good', 20], ['edge', 10], ['miss', 0]]), v);
 await until(() => SC().hud.modal, null, 40000);

@@ -29,6 +29,8 @@ export async function startSplash(canvas) {
   let fadeKey = '';
   const image = id => A[id]?.file ? load(new URL(A[id].file, BASE).href) : Promise.resolve(null);
   const layers = (await Promise.all((S.background || []).map(image))).filter(Boolean);
+  // #115 painted parallax layers in front of the picture (Startseite › Ebenen davor): mirrored repeat, they follow the mouse more
+  const front = (await Promise.all((S.front || []).map(async f => ({ f, img: await image(f.look) })))).filter(x => x.img);
   const droneImg = SD.show && DR.look ? await image(DR.look) : null, droneA = A[DR.look] || {};
   // modular drone (Daniel, 10.11.2026): face on the screen, glass above it, swinging cables below
   const faceImg = droneImg && DR.face?.look ? await image(DR.face.look) : null, faceA = A[DR.face?.look] || {};
@@ -260,6 +262,17 @@ export async function startSplash(canvas) {
       const depth = layers.length > 1 ? i / (layers.length - 1) : 0;
       const ox = -look.x * par * W * depth + shiftH, oy = -look.y * par * 0.4 * H * depth;
       ctx.drawImage(img, Math.round((W - bw * sc) / 2 + ox), Math.round(horizon - bh * sc + oy + par * 0.4 * H * depth), Math.round(bw * sc), Math.round(bh * sc));
+    });
+    front.forEach(({ f, img }, i) => {
+      const k = sc * (f.scale ?? 100) / 100, w = Math.round(img.width * k), h = Math.round(img.height * k), d = 1 + (i + 1) * 0.6;
+      const ox = -look.x * par * W * d + shiftH * (1 + (i + 1) * 0.3), oy = -look.y * par * 0.4 * H * d;
+      const y = Math.round(horizon - h + (f.bottom ?? 0) * sc / 4 + oy), x0 = ((Math.round(ox) % (w * 2)) - w * 2);
+      ctx.save(); ctx.globalAlpha = (f.alpha ?? 100) / 100;
+      for (let x = x0; x < W; x += w * 2) {
+        ctx.drawImage(img, x, y, w, h);
+        ctx.save(); ctx.translate(x + w * 2, y); ctx.scale(-1, 1); ctx.drawImage(img, 0, 0, w, h); ctx.restore();
+      }
+      ctx.restore();
     });
     ctx.fillStyle = G.base; ctx.fillRect(0, Math.round(horizon), W, H);
 

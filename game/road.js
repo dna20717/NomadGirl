@@ -29,7 +29,8 @@ export function driveConfig(D) {
   const R = D?.travel?.drive || {};
   return { enabled: R.enabled !== false, seconds: Math.max(3, R.seconds ?? 30), fast: Math.max(1, R.fast ?? 6), speed: R.speed ?? 120, stopAt: clamp((R.stopAt ?? 80) / 100, 0.3, 0.95),
     rigHeight: clamp((R.rigHeight ?? 34) / 100, 0.1, 0.7), rigX: clamp((R.rigX ?? 62) / 100, 0.3, 0.9), rays: (R.rays ?? 70) / 100, flare: (R.flare ?? 60) / 100,
-    headlights: (R.headlights ?? 80) / 100, grain: (R.grain ?? 10) / 100, haze: (R.haze ?? 60) / 100, bounce: R.bounce ?? 3 };
+    headlights: (R.headlights ?? 80) / 100, grain: (R.grain ?? 10) / 100, haze: (R.haze ?? 60) / 100, bounce: R.bounce ?? 3,
+    avaRope: R.avaRope ?? 46, avaSize: R.avaSize ?? 0.42, silhouettes: R.silhouettes !== false };   // #115
 }
 const LAND = { region: '', relief: 'mesas', far: '#8e5252', mid: '#a08662', ground: '#dba463', road: '#333941', plants: '#5a4e44', rock: '#71413b',
   ruins: 15, wrecks: 12, towers: 6, signs: 10, plantsN: 30, poles: 1, pylons: 0, city: 20, dust: 15, fog: 10 };
@@ -66,7 +67,7 @@ export function skyAt(hours) {
 export const adBrands = D => Object.entries(D?.brands || {}).filter(([, b]) => b.name && b.billboard !== false)
   .map(([id, b]) => ({ id, name: b.name, slogan: b.slogan || '', lines: String(b.ads || b.slogan || b.name).split('|').map(x => x.trim()).filter(Boolean), color: b.color || '#ffd27a', icon: b.icon ?? null }));
 
-export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList = null } = {}) {
+export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList = null, art = null } = {}) {
   const adList = adBrandList || adBrands(D);
   let screens = [];
   const sky = document.createElement('canvas'); sky.width = BW; sky.height = BH;
@@ -294,6 +295,35 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
       ctx.fillStyle = g; ctx.fillRect(x, top, 1, ROAD[1] - top);
     }
   }
+  // #115 the region's painted layers, half size in background pixels (the road is chunkier than the camp), mirrored repeat, toned like the
+  // code landscape: haze by depth, warm evening, dark night, rain, dust and fog veil them. → drawn?
+  const layerBuf = document.createElement('canvas');
+  function painted(ctx, st, S, L) {
+    const P = L.parallax && D.parallax?.[L.parallax];
+    if (!P || !art) return false;
+    const layers = (P.layers || []).filter(l => (l.speed ?? 5) <= 8).map(l => ({ l, img: art(l.look) })).filter(x => x.img?.complete && x.img.naturalWidth);
+    if (!layers.length) return false;
+    layers.forEach(({ l, img }, i) => {
+      const k = (l.scale ?? 300) / 100 * (D.travel?.drive?.layerScale ?? 11) / 100, w = Math.round(img.naturalWidth * k), h = Math.round(img.naturalHeight * k);
+      if (w < 4 || h < 4) return;
+      const depth = Math.max(0, 0.75 - i * 0.3), bottom = HORIZON + 1 + Math.round((l.bottom ?? 0) * k * 0.25), p = (l.speed ?? 5) / 100 * 0.6;
+      layerBuf.width = BW; layerBuf.height = h;
+      const b = layerBuf.getContext('2d'); b.imageSmoothingEnabled = false; b.clearRect(0, 0, BW, h);
+      const off = ((st.dist * p) % (w * 2) + w * 2) % (w * 2);
+      for (let x = -off; x < BW; x += w * 2) {
+        b.drawImage(img, Math.round(x), 0, w, h);
+        b.save(); b.translate(Math.round(x + w * 2), 0); b.scale(-1, 1); b.drawImage(img, 0, 0, w, h); b.restore();
+      }
+      b.globalCompositeOperation = 'source-atop';
+      const tint = tone('#808080', depth, S, st), base = [128, 128, 128];   // what the code landscape does to a grey: apply it as an overlay
+      b.fillStyle = css(S.hor, depth * 0.55); b.fillRect(0, 0, BW, h);
+      b.fillStyle = `rgba(${Math.round(tint[0] * 0.25)},${Math.round(tint[1] * 0.25)},${Math.round(tint[2] * 0.3)},${Math.min(0.9, S.dark * 0.85)})`; b.fillRect(0, 0, BW, h);
+      if (S.warm > 0) { b.fillStyle = `rgba(250,106,10,${S.warm * 0.12})`; b.fillRect(0, 0, BW, h); }
+      b.globalCompositeOperation = 'source-over';
+      ctx.drawImage(layerBuf, 0, bottom - h);
+    });
+    return true;
+  }
   function draw(ctx, st) {
     const S = skyAt(st.hour), t = st.t, [A, B, k] = st.land, L = k < 0.5 ? A : B;
     drawSky(S, st.wet || 0);
@@ -359,8 +389,11 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
       ctx.fillStyle = `rgba(240,235,255,${st.flash})`;
       let bx = bolt.x, by = 0; while (by < HORIZON - 6) { ctx.fillRect(bx, by, 1, 3); by += 3; bx += Math.round((hash(by, bolt.s) - 0.5) * 4); if (hash(by, bolt.s + 1) < 0.08) { let cx = bx, cy = by; for (let j = 0; j < 6; j++) { cx += hash(j, cy) < 0.5 ? -1 : 1; cy += 2; ctx.fillRect(cx, cy, 1, 2); } } }
     }
-    city(ctx, st, S, L, t);
-    drawLayer(ctx, st, S, { p: 0.03, base: HORIZON + 1, H: 46, depth: 0.85, s: seed + 11, color: 'far' });
+    // #115 painted parallax layers of the region (Welt › Parallax-Sets) instead of the city and the far relief from code
+    if (!painted(ctx, st, S, L)) {
+      city(ctx, st, S, L, t);
+      drawLayer(ctx, st, S, { p: 0.03, base: HORIZON + 1, H: 46, depth: 0.85, s: seed + 11, color: 'far' });
+    }
     // the plain between the hills and the road: dithered, lighter towards the horizon (salt flats shine)
     for (let y = HORIZON + 1; y < BH; y++) {
       const kk = (y - HORIZON) / (BH - HORIZON), c = tone(L.ground, 0.75 * (1 - kk) + 0.05, S, st), c2 = tone(L.ground, 0.75 * (1 - kk) + 0.12, S, st);

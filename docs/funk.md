@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: #115 fertig: Parallax-Sets je Region (Camp, POIs draußen, Fahrt, Startseite), schwarze Silhouetten vorne, AvA scannt Billboards am Gummiband; Windrad-Schweben behoben. PixelLab 320.
 - 19.11. Code → Ava: #114 fertig: Pinsel (Container + Stoffe), Innenkram, Fenster/Türen in Containerfarbe, Leitern und Klapptreppen frei. PixelLab 20.
 - 19.11. Code → Ava: **Alle Spielstände zurückgesetzt** (Daniel): `SAVE_VERSION` 2, jeder alte Stand startet beim nächsten Laden frisch.
 - 19.11. Code → Ava: #113 **Container ziehen und höher** fertig: ein Container zum Kaufen, am Griff 1–5 Plätze ohne Aufpreis, Werkbank hält dagegen und ploppt als Kiste raus (Pad vibriert), Container 30 % höher, Bilder zur Laufzeit aus den Kacheln.
@@ -243,10 +244,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #115 Parallax-Hintergründe, Vordergrund-Silhouetten, Billboard-Scan
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel: „Die Parallax-Hintergründe überall können bitte in hübsch umgesetzt werden. Modular. Auch ein paar schwarze Vordergrund-Formen wären spannend. Billboards nicht mehr fotografieren, sondern AvA scannen. Man kann sie bewegen (Gummiband)“)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel: „Die Parallax-Hintergründe überall können bitte in hübsch umgesetzt werden. Modular. Auch ein paar schwarze Vordergrund-Formen wären spannend. Billboards nicht mehr fotografieren, sondern AvA scannen. Man kann sie bewegen (Gummiband)“)
 - **Auftrag (Daniels Wahl):** PixelLab-Ebenen modular für Camp, Fahrt, POIs draußen, Startseite; gemalte schwarze Vordergrund-Formen für Fahrt und POIs draußen; Billboards: AvA am Gummiband ziehen, sie schnellt hin und scannt.
-- **Rückfragen:**
-- **Ergebnis:** Teil 1 (Code): Bereich Welt › Parallax-Sets, 12 Ebenen + 32 Silhouetten von PixelLab (295), Sets Wüste/BigCityDelta/Industrie/Canyon/Salzpfanne je Region (Reisen › Landschaften), Camp und POIs draußen. Offen: Fahrt, Startseite, Billboard-Scan.
+- **Rückfragen:** (Code) ⚠️ vorläufig: In POIs nur die fernen Ebenen (Tempo ≤ 8) mit 35 % Schleier, die nahen sähen wie begehbare Kulisse aus; Ebenen wiederholen sich gespiegelt (Naht bei Tafelbergen sichtbar, später breitere Bilder); Fahrt-Ebenen auf 11 % skaliert; R/X halten = AvA zieht sich selbst hin (Komfort ohne Maus); Wertung nach Abrutschern statt Treffpunkt; Halten spult nicht vor.
+- **Ergebnis:** (Code) Commits „Parallax-Sets … (#115)“ und „Fahrt, Startseite, AvA scannt Billboards (#115)“. `npm test` grün, Browser drive 19/19 (neu: Scan), map/camp/poi/poi_levels/light/splash/resize/paint/workshop/decor_kit/game/van grün. **PixelLab 320** (Test 25, 11 Ebenen à 25, 2 Silhouetten-Blätter à 10), übrig 2.625,6. Bild `output/drive_scan.png`. **Bitte testen:** Camp anschauen (Tag und Nacht); auf der Reisekarte losfahren, bei einem Billboard AvA mit der Maus greifen und drüberziehen oder R halten; einen POI draußen betreten (Silhouetten vorne); Startseite; Werkstatt › Welt › Parallax-Sets an Tempo und Maßstab drehen. Teil 1 (Code): Bereich Welt › Parallax-Sets, 12 Ebenen + 32 Silhouetten von PixelLab (295), Sets Wüste/BigCityDelta/Industrie/Canyon/Salzpfanne je Region (Reisen › Landschaften), Camp und POIs draußen. Offen: Fahrt, Startseite, Billboard-Scan.
 
 ### #114 Farbe, Innenräume, Wand-Module, Treppen & Wege
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel: „Nächste Stufe Deco und Ausbau“, Wahl: Innenräume einrichten, Farbe wie Townscaper, Wand-Module, Treppen & Wege frei)

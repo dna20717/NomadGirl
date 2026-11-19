@@ -11,6 +11,7 @@ import { hints } from './ui_nav.js';
 import { makeRoad, driveConfig, landscapeOf, legWeather, skyAt, BW, BH, WHEEL_Y } from '../road.js';
 import { mapBrands } from '../brands.js';
 import { becomeInfluencer, shotGrade, influencerConfig } from '../brand_perks.js';
+import { DriveScan } from './drive_scan.js';
 import { mapConfig } from '../worldmap.js';
 import { rainingAt } from '../rain.js';
 import { kitLook } from './enemy_kit.js';
@@ -31,15 +32,16 @@ export class DriveUI {
     this.keys = new Set();
     window.addEventListener('keydown', e => {
       if (!this.isOpen || this.host.scene()?.hud?.modal) return;
-      const a = { Escape: 'back', Enter: 'ok', ' ': 'ok', e: 'ok', E: 'ok', r: 'ad', R: 'ad' }[e.key];
+      const a = { Escape: 'back', Enter: 'ok', ' ': 'ok', e: 'ok', E: 'ok', r: 'scan', R: 'scan' }[e.key];
       if (!a) return;
       e.preventDefault(); e.stopPropagation();
-      if (a === 'ad') { if (!e.repeat) this.tapVisible(); return; }   // #064 keyboard: the billboard in view
+      if (a === 'scan') { this.keys.add('scan'); return; }   // #115 hold R: AvA pulls herself to the billboard in view
       if (a === 'ok') this.keys.add('ok'); else if (!e.repeat) this.skip();
     }, true);
-    window.addEventListener('keyup', e => { if (['Enter', ' ', 'e', 'E'].includes(e.key)) this.keys.delete('ok'); }, true);
-    this.canvas.addEventListener('pointerdown', e => { if (!this.tapAd(e)) this.keys.add('ptr'); });   // #064 a billboard tapped = Influencer, else hold = faster
-    window.addEventListener('pointerup', () => this.keys.delete('ptr'));
+    window.addEventListener('keyup', e => { if (['Enter', ' ', 'e', 'E'].includes(e.key)) this.keys.delete('ok'); if (e.key === 'r' || e.key === 'R') this.keys.delete('scan'); }, true);
+    this.canvas.addEventListener('pointerdown', e => { if (!this.scanGrab(e)) this.keys.add('ptr'); });   // #115 grab AvA (a billboard in view) and pull her over it, else hold = faster
+    window.addEventListener('pointermove', e => this.scanMove(e));
+    window.addEventListener('pointerup', () => { this.keys.delete('ptr'); this.scanRelease(); });
   }
   get isOpen() { return !this.el.hidden; }
 
@@ -49,7 +51,7 @@ export class DriveUI {
     this.D = D; this.C = driveConfig(D); this.rig = rig ? this.prepareRig(rig) : null;
     const M = mapConfig(D), logos = () => this.image(D.assets?.[M.logos]?.file);
     logos();
-    this.road = makeRoad(D, { seed, logos, brands: mapBrands(D) });
+    this.road = makeRoad(D, { seed, logos, brands: mapBrands(D), art: id => this.image(D.assets?.[id]?.file) });   // #115 painted parallax
     this.trip = { from, to, legs, seed };
     this.st = { dist: 0, t: 0, dt: 0, v: 0, hour: 12, land: [landscapeOf(D, ''), landscapeOf(D, ''), 0], wet: 0, dust: 0, fog: 0, flash: 0, stop: null };
     this.legInfo = null; this.phase = 'idle'; this.fade = 1; this.steam = 0; this.steamP = []; this.puffs = []; this.say = null; this.lastLeg = null; this.fading = -1.6; this.lit = null; this.litKey = '';
@@ -83,7 +85,7 @@ export class DriveUI {
     else if (L.stopT == null || L.stopped) L.time = L.T;
   }
   // pad (scene.padMenus): hold A to go faster, B skips
-  nav(u) { if (u.down('ok')) this.keys.add('pad'); else this.keys.delete('pad'); if (u.pressed('back')) this.skip(); if (u.pressed('context')) this.tapVisible(); }
+  nav(u) { if (u.down('ok')) this.keys.add('pad'); else this.keys.delete('pad'); if (u.pressed('back')) this.skip(); if (u.down('context')) this.keys.add('scan'); else this.keys.delete('scan'); }   // #115 hold X: AvA scans
   // #064 without a pointer (keyboard R, controller X): the giant screen most in view
   visibleAd() { const sc = (this.road?.screens || []).filter(x => x.x + x.w > 0 && x.x < BW); return sc.sort((a, b) => Math.abs(a.x + a.w / 2 - BW / 2) - Math.abs(b.x + b.w / 2 - BW / 2))[0] || null; }
   tapVisible() { const sc = this.phase === 'drive' && this.visibleAd(); return sc ? this.influence(sc) : false; }
@@ -104,7 +106,7 @@ export class DriveUI {
   }
   tick(dt) {
     const st = this.st, L = this.legInfo, C = this.C, hud = this.host.scene()?.hud;
-    const fast = this.keys.size > 0 && !hud?.modal ? C.fast : 1;
+    const fast = [...this.keys].some(k => k !== 'scan') && !hud?.modal ? C.fast : 1;   // #115 holding R / X scans, it does not hurry
     st.t += dt; st.dt = dt;
     if (this.fading < 0) { this.fade = Math.max(0, this.fade + this.fading * dt); if (this.fade <= 0) this.fading = 0; }
     if (this.phase === 'out') { this.fade = Math.min(1, this.fade + this.fading * dt); st.v *= 0.97; st.dist += st.v * dt; if (this.fade >= 1 && this.onOut) { const f = this.onOut; this.onOut = null; f(); } return; }
@@ -305,7 +307,7 @@ export class DriveUI {
       ctx.drawImage(this.bg, 0, 172, BW, BH - 172, 0, 172 * u, W, (BH - 172) * u);
     } else ctx.drawImage(this.bg, 0, 0, W, H);
     this.road.ads(ctx, W, H, st);   // #055 giant screens of the brands
-    this.drawFinder(ctx, W, H);   // #095 the viewfinder
+    this.scanStep(Math.min(0.05, this.st.dt || 0.016), W, H);   // #115 AvA's scan instead of the viewfinder
     if (this.ping) {   // #064 the tapped screen flashes and a ring goes out
       const p = this.ping, u = W / BW, sc = p.sc, k = Math.min(1, p.t / 0.9);
       p.t += 1 / 60;
@@ -317,9 +319,31 @@ export class DriveUI {
     this.drawCast(ctx, W, S);
     const lamps = this.drawRig(ctx, W, H, S);
     this.road.light(ctx, W, H, st, lamps);
+    this.drawAva(ctx, W, H, S);   // #115 AvA on her rubber band
+    this.drawSilhouettes(ctx, W, H, S);   // #115 black shapes rush by in front of the rig
     this.road.front(ctx, W, H, st);
     if (this.fade > 0) { ctx.fillStyle = `rgba(0,0,0,${this.fade})`; ctx.fillRect(0, 0, W, H); }
     this.drawHud(S);
+  }
+  // #115 (Daniel: „ein paar schwarze Vordergrund-Formen“): the region's painted silhouettes (Parallax-Set › Vordergrund) rush past in front
+  // of the rig, faster than the road, standing on the bottom edge; seeded by their place along the trip, so they come back the same
+  drawSilhouettes(ctx, W, H) {
+    const D = this.D, st = this.st, [A, B, kk] = st.land, L = kk < 0.5 ? A : B, F = L.parallax && D.parallax?.[L.parallax]?.fg, Asset = F && D.assets?.[F.look];
+    if (!F || !Asset?.grid || this.C.silhouettes === false) return;
+    const img = this.image(Asset.file); if (!img?.complete || !img.naturalWidth) return;
+    const [cw, ch] = Asset.cell || [64, 64], n = Asset.grid[0] * Asset.grid[1], cells = String(F.cells || '').split(',').map(t => Number(t.trim()) - 1).filter(v => v >= 0 && v < n);
+    const pool = cells.length ? cells : [...Array(n).keys()], u = W / BW, sp = (this.C.silhouetteSpeed ?? 220) / 100, gap = (this.C.silhouetteGap ?? 380) * u;
+    const h = (r => ((Math.sin(r * 127.1) * 43758.5453) % 1 + 1) % 1);
+    const shift = st.dist * sp * u, first = Math.floor(shift / gap) - 1;
+    ctx.save(); ctx.imageSmoothingEnabled = false;
+    for (let i = first; i < first + Math.ceil(W / gap) + 3; i++) {
+      if (h(i * 3.1 + 7) < (this.C.silhouetteSkip ?? 0.45)) continue;   // gaps between them
+      const fr = pool[Math.floor(h(i * 5.7) * pool.length)], k = (0.9 + h(i * 1.9) * 0.7) * u * (this.C.silhouetteSize ?? 100) / 100, x = i * gap - shift + h(i * 9.3) * gap * 0.6;
+      const fx = (fr % Asset.grid[0]) * cw, fy = Math.floor(fr / Asset.grid[0]) * ch;
+      ctx.save(); ctx.translate(Math.round(x), H + 8 * u); if (h(i * 4.4) < 0.5) ctx.scale(-1, 1);
+      ctx.drawImage(img, fx, fy, cw, ch, -cw * k / 2, -ch * k, cw * k, ch * k); ctx.restore();
+    }
+    ctx.restore();
   }
   drawHud() {
     const L = this.legInfo || this.lastLeg, T = this.trip;
@@ -339,7 +363,7 @@ export class DriveUI {
       this.say && this.say.until > this.st.t ? el('div', { class: 'dv-say' }, icon('warning', 18), this.say.text) : null,
       el('div', { class: 'dv-bottom' },
         el('div', { class: 'dv-track' }, el('div', { class: 'dv-fill', style: `width:${total}%` }), ...dots, el('span', { class: 'dv-van', style: `left:${total}%` }, icon('vehicle', 16))),
-        this.phase === 'stop' ? null : hints([['ok', 'vorspulen (halten)'], ['back', 'überspringen'], ...(this.visibleAd() && !this.shotAt(this.visibleAd()) ? [['context', 'Foto: Billboard in die Mitte']] : [])]))].filter(Boolean));
+        this.phase === 'stop' ? null : hints([['ok', 'vorspulen (halten)'], ['back', 'überspringen'], ...(this.visibleAd() && !this.shotAt(this.visibleAd()) ? [['context', 'halten: AvA scannt das Billboard (oder AvA ziehen)']] : [])]))].filter(Boolean));
   }
   image(file) {
     if (!file) return null;
@@ -348,3 +372,4 @@ export class DriveUI {
     const i = this.imgs[file]; return i.complete && i.naturalWidth ? i : null;
   }
 }
+for (const k of Object.getOwnPropertyNames(DriveScan.prototype)) if (k !== 'constructor') Object.defineProperty(DriveUI.prototype, k, Object.getOwnPropertyDescriptor(DriveScan.prototype, k));   // #115

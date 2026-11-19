@@ -214,6 +214,13 @@ Spielauflösung 1920×1080, Kacheln 64 px, Leyla 192 px hoch (Höhe im Spiel ihr
 - Neon-Implantat am Oberarm.
 - Palette: Neon-Cyan, Dunkelgrau, Mittelgrau, Haut, Hautschatten, Magenta (Haare), Pink (Akzent), Tiefviolett.
 
+## Parallax-Sets (#115)
+
+| Asset | Datei | Herkunft |
+|---|---|---|
+| `plx_desert_*`, `plx_city_*`, `plx_industry_*`, `plx_canyon_*`, `plx_mountain_far` (12 Ebenen fern/mitte/nah) | `projects/nomadgirl/assets/backgrounds/parallax/*.png` | KI (PixelLab, create_image_pro, AAP-64), 19.11.2026, Himmel freigestellt |
+| `plx_silhouettes` (8 x 4 Zellen zu 64 px, schwarze Vordergrund-Formen) | `projects/nomadgirl/assets/backgrounds/parallax/silhouettes.png`, Originale `source/fg_a.png`, `fg_b.png` | KI (PixelLab), 19.11.2026, mit Code zum Raster geschnitten |
+
 ## Pixel-Art
 
 Die Startseiten-Grafiken (Leyla von vorn, Wastelands-Hintergrund) sind Pixel-Art in kleiner Auflösung (Hintergrund 576 × 324) und werden scharf skaliert (`imageSmoothingEnabled = false`). Leyla im Spiel bleibt hochaufgelöst und geglättet.
