@@ -37,6 +37,14 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: **HNC / Übergabe.** Stand `main` (alles gepusht, `npm test` 273/273, letzte volle Browser-Suite 47/48 nach #073 mit behobenem Rennen in der Werkstatt, danach Werkstatt-, Online-, Datenset- und Karten-Test grün). Gebaut seit der letzten Übergabe:
+  - **#057 Silo Zero** (XXL-Raketensilo, Zero Hour, Major Null, Silo-KI Titan Lullaby) und **#058 Schatzsuche „I become death …“** (fünf Kartenstücke, Onkel Sung deckt den Ort auf).
+  - **Verzahnung #059–#065:** Antworten mit Voraussetzungen (Crew, Implantate, AvA, Rig, Werkstätten) · Bit-Farm mit Entity-Workern und freundlichen Duellen · Revier-Camp (Frieden, Klauen, Tresor nur mit Gewalt, Handel) · Quests aus Straßen-Merkern · Wetter mit Folgen und Meldungen · Influencer-Billboards und Markentreue · Cyberware im Duell.
+  - **Eleganz #066–#071:** Boni-Bus (`mods.js`), Effekt-Leiste im HUD, eine Bedingungs-Sprache (`conditions.js`), eine Preis-Funktion (`pricing.js`), Meldungs-Kanal mit Logbuch, Macken-Wirkung als Feld, Wetter-Gewichte in der Werkstatt, Welt-Merker.
+  - **Werkstatt #072–#075:** breite Tabellen als Karten, **Datensets** (Varianten im Repo, Hauptmenü zeigt und wechselt das aktive Set), Verzahnungs-Ansichten (Merker-Explorer, Ketten, Fundorte, Markentreue, Worker), Kleinkram.
+  - Nebenbei: Wackler `tutorial_test` behoben; Ideenspeicher (`docs/backlog.md` › D) um Kreisläufe und elf Systemideen ergänzt.
+  - **Offene Fragen an Daniel:** (1) Bit-Farm-Bild per PixelLab (2–4 Generierungen, unter 700: Freigabe nötig) oder Platzhalter? (2) Quest-Titel „I become death …“ oder „Now I am become Death“? (3) Folge für `laeuferin_verraten` (Rache-Lage, Gang meidet Leyla, offen lassen)? (4) ⚠️-Punkte in #057–#075 absegnen. Wartet weiter: #040 Crew-Kern (Daniels OK). PixelLab übrig ~270, diese Sitzung 19.
+  - **Nächste Kandidaten:** Gangs als Auftraggeber, Wettervorhersage im Warroom, Hochform-Kombinationen, Werte-Bildschirm über den Boni-Bus (alles im Ideenspeicher).
 - 19.11. Code → Ava: #075 **Kleinkram** fertig. Werkstatt-Runde #072–#075 komplett, jedes Ticket einzeln getestet und gepusht.
 - 19.11. Code → Ava: #074 **Verzahnungs-Ansichten** fertig (Merker-Explorer, Ketten, Fundorte, Markentreue, Worker). Fund: `laeuferin_verraten` hat noch keine Folge. #075 läuft.
 - 19.11. Code → Ava: #073 **Datensets** fertig: Varianten im Repo (nur der Unterschied), Speichern unter/Laden/Löschen in der Werkstatt, Hauptmenü zeigt und wechselt das aktive Set. #074 läuft.

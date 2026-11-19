@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Übergabe (HNC)**: Stand nach #057–#075 im Funkbuch; Tests 273, Browser 48 Dateien; PixelLab übrig ~270; offene Fragen: Bit-Farm-Bild, Quest-Titel, Folge für den Verrat an der Läuferin.
 - 19.11.2026: **Werkstatt: Kurzzeilen und Kleinkram** (#075): richtige Quest-Zeilen, benannte Tabellenzeilen, kein falsches Bild im Ereignis-Baukasten, kürzere Übersicht, Beschreibung für Datensets.
 - 19.11.2026: **Werkstatt: Verzahnungs-Ansichten** (#074): Merker-Explorer und Geschichten-Ketten im Ereignis-Baukasten, Fundorte der Quest-Stücke, Markentreue-Sets, Worker je Werkstatt.
 - 19.11.2026: **Datensets** (#073): Varianten der Spieldaten (nur der Unterschied zum Standard) speichern, laden und löschen; das Hauptmenü zeigt unten das aktive Set und wechselt es per Klick.
