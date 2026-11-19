@@ -12,15 +12,41 @@ PICK = {
   'lantern': [0],
   'crate':   [0, 1, 2, 5, 6, 7, 9, 11, 12, 14],
   'plant':   [0, 1, 2, 3, 4, 5, 6, 7, 8],
+  # second round (Daniel AFK: „arbeite das ganze Deko-System ab“)
+  'planter':    [0, 1, 2, 3],
+  'umbrella':   [0],
+  'lounger':    [0, 1, 2, 3],
+  'rainbarrel': [0, 1, 2],
+  'cat':        [10, 13, 1, 3, 7, 9, 0, 14],
+  'tripod':     [1, 0, 3],
+  'firebarrel': [0, 1, 2, 4, 7, 8],
+  'birdhouse':  [0],
+  'windmast':   [0],
+  'mirror':     [1, 0, 3],
+  'plant_grow':  [0, 1, 2, 3],
+  'cactus_grow': [0, 1, 2, 3],
+  # 4 x 4 sheets: the candidate is one picture, the numbers are its cells (row by row)
+  'table_items':  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+  'wall_items':   [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+  'ground_items': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
 }
+GRID = {'table_items': (4, 4), 'wall_items': (4, 4), 'ground_items': (4, 4), 'plant_grow': (4, 1), 'cactus_grow': (4, 1)}
+# baked size (hard pixels): the 4 x 4 sheets were painted bigger than life, tabletop things must fit on a table
+SCALE = {'table_items': 0.6}
 out = {}
 for name, pick in PICK.items():
     ims = []
     for i in pick:
-        im = Image.open(f'{K}/candidates/{name}_{i}.png').convert('RGBA')
+        if name in GRID:
+            src = Image.open(f'{K}/candidates/{name}_0.png').convert('RGBA'); gx, gy = GRID[name]; cw = src.width // gx; ch = src.height // gy
+            im = src.crop(((i % gx) * cw, (i // gx) * ch, (i % gx + 1) * cw, (i // gx + 1) * ch))
+        else:
+            im = Image.open(f'{K}/candidates/{name}_{i}.png').convert('RGBA')
         a = im.split()[3].point(lambda v: 255 if v > 40 else 0)
         im.putalpha(a)
-        ims.append(im.crop(a.getbbox()))
+        im = im.crop(a.getbbox())
+        if name in SCALE: im = im.resize((max(1, round(im.width * SCALE[name])), max(1, round(im.height * SCALE[name]))), Image.NEAREST)
+        ims.append(im)
     w = max(i.width for i in ims); h = max(i.height for i in ims)
     w += w % 2
     sheet = Image.new('RGBA', (w * len(ims), h), (0, 0, 0, 0))

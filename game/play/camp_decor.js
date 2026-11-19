@@ -3,7 +3,7 @@
 // pieces stand on top; ground pieces on the campsite; span pieces hang between two anchors (container corners, the mast, poles).
 // Some move: neon flickers, banners and laundry sway, the windmill turns faster in gusts, the kettle steams, crows fly up when
 // Leyla comes near. Mixed into Camp like CampLife (logic: game/decor.js).
-import { decorDef, placeOf, plantStage, dstate, tagsOf, freeWhy, canCarry } from '../decor.js';
+import { decorDef, placeOf, plantStage, dstate, tagsOf, freeWhy, canCarry, cozy } from '../decor.js';
 import { catenary } from '../string_lights.js';
 import { glowTexture } from './camp.js';
 import { advance, clockText } from '../save.js';
@@ -23,7 +23,7 @@ export class CampDecor {
   // ---------- where things go ----------
   decorUnit(ui) { return (this.geo.units || []).find(u => u.ui === ui) || null; }
   groundX(x) { return ((this.geo.campCol ?? 0) + x) * this.scene.T; }
-  wallAt(ui, p) { const u = this.decorUnit(ui); return u && { u, x: u.in0 + (p + 0.5) * u.cell, y: u.inTop + (u.floorY - u.inTop) * 0.4 }; }
+  wallAt(ui, p, row) { const u = this.decorUnit(ui); return u && { u, x: u.in0 + (p + 0.5) * u.cell, y: u.inTop + (u.floorY - u.inTop) * (row ?? 0.4) }; }
   roofAt(ui, p) { const u = this.decorUnit(ui); return u && { u, x: u.in0 + (p + 0.5) * u.cell, y: u.deckY ?? (u.inTop - 34) }; }
   // every point a span can hang on: container corners, the mast (string lights), and the tops of poles
   spanAnchors() {
@@ -50,7 +50,7 @@ export class CampDecor {
   // candidate places for a piece of this kind (build mode): [{ at, x, y, label }]
   decorSpots(id) {
     if (placeOf(this.D, id) === 'free') return this.freeSpots(id);
-    const D = this.D, kind = placeOf(D, id), T = this.scene.T, out = [], save = this.box.save, used = new Set((save.rig.decor || []).map(x => JSON.stringify({ ...x.at, day: undefined })));
+    const D = this.D, kind = placeOf(D, id), T = this.scene.T, out = [], save = this.box.save, used = new Set((save.rig.decor || []).map(x => { const { day, v, f, ...r } = x.at || {}; return JSON.stringify(r); }));
     if (kind === 'ground') {
       const [a, b] = D.camp?.decor?.ground || [-4, 20], step = 0.5;
       for (let x = a; x <= b; x += step) {
@@ -69,6 +69,16 @@ export class CampDecor {
       if (this.geo.mega) return out;
       for (const u of this.geo.units || []) {
         if (u.ui === 0) continue;
+        if (kind === 'wall' && decorDef(D, id)?.art === 'sprite') {   // #111: hung freely, half places, high or low
+          const st = (T * 0.5) / u.cell;
+          for (let p0 = -0.5 + st; p0 <= (u.places || 0) - 0.5 - st + 1e-6; p0 += st) for (const row of [0.3, 0.62]) {
+            const p = Math.round(p0 * 1000) / 1000, at = { ui: u.ui, p, row };
+            if (used.has(JSON.stringify(at))) continue;
+            const q = this.wallAt(u.ui, p, row);
+            out.push({ at, x: q.x, y: q.y, label: 'An die Wand' });
+          }
+          continue;
+        }
         for (let p = 0; p < (u.places || 0); p++) {
           if (used.has(JSON.stringify({ ui: u.ui, p }))) continue;
           if (kind === 'roof' && (save.rig.units[u.ui + 1]?.level || 0) > (save.rig.units[u.ui]?.level || 0)) continue;   // something stands on it
@@ -89,7 +99,8 @@ export class CampDecor {
     this.freeAt = []; this.decorBoxes = [];
     R.decor.forEach((x, i) => { try { this.drawPiece(x, i); } catch (e) { console.warn('Deko', x.id, e); } });
     try { this.drawKitLights(); } catch (e) { console.warn('Deko-Lichterkette', e); }
-    if (R.decor.some(x => decorDef(this.D, x.id)?.art === 'birdhouse')) this.spawnCrows();
+    try { this.drawKitDetails(); } catch (e) { console.warn('Deko-Details', e); }
+    if (R.decor.some(x => decorDef(this.D, x.id)?.art === 'birdhouse' || decorDef(this.D, x.id)?.crows)) this.spawnCrows();
     this.drawRainBits();
   }
   dAdd(o) { this.rigObjs.push(o); return o; }
@@ -110,11 +121,12 @@ export class CampDecor {
     if (kind === 'free') { const q = this.freePos(i); if (q) this.art_sprite(q, d, x, i); return; }
     let pos;
     if (kind === 'ground') pos = { x: this.groundX(at.x), y: this.ground };
-    else if (kind === 'wall') pos = this.wallAt(at.ui, at.p);
+    else if (kind === 'wall') pos = this.wallAt(at.ui, at.p, at.row);
     else pos = this.roofAt(at.ui, at.p);
     if (!pos) return;
     const before = new Set(s.children.list);
-    this[`art_${d.art}`]?.(pos.x, pos.y, w, h, d, seed, pick, x);
+    if (d.art === 'sprite') this.art_sprite({ x: pos.x, y: pos.y, u: pos.u, level: 0, wall: kind === 'wall' }, d, x, i);
+    else this[`art_${d.art}`]?.(pos.x, pos.y, w, h, d, seed, pick, x);
     // wall pieces belong to the container's skin: they fade when it opens (like the workshops' outside pictures)
     if (kind === 'wall' && pos.u) { const sh0 = this.shellOf(pos.u); if (sh0) for (const o of s.children.list) if (!before.has(o) && o.setAlpha) sh0.extras.push(o); }
   }
@@ -131,13 +143,19 @@ export class CampDecor {
     seen.add(i);
     const at = o.at || {}, m = /^deco:(\d+)$/.exec(at.on || '');
     let q = null;
+    const mb = /^balc:(\d+)$/.exec(at.on || '');
     if (m) { const j = Number(m[1]), b = this.freePos(j, seen), top = b && this.kitTop(j); if (b && top != null) q = { x: b.x + (at.dx || 0) * T, y: b.y - top, u: b.u, level: b.level + 1, roof: b.roof, on: j }; }
+    else if (mb) { const B = L[Number(mb[1])], bd = B && decorDef(this.D, B.id), b = bd && this.balconyAt(B.at.ui, B.at.side, bd); if (b) q = { x: (b.x0 + b.x1) / 2 + (at.dx || 0) * T, y: b.y, u: b.u, level: 0, balc: true }; }
     else if (at.ui != null && at.p != null) { const r = this.roofAt(at.ui, at.p); if (r) q = { x: r.x, y: r.y, u: r.u, level: 0, roof: true }; }
     else if (Number.isFinite(at.x)) q = { x: this.groundX(at.x), y: this.ground, level: 0 };
     if (q) (this.freeAt ??= [])[i] = q;
     return q;
   }
-  kitFrame(d, at) { const a = this.D.assets?.[d.look], n = a?.grid ? a.grid[0] * a.grid[1] : 1; return Math.max(0, Math.min(n - 1, at?.v ?? 0)); }
+  kitFrame(d, at) {
+    const a = this.D.assets?.[d.look], n = a?.grid ? a.grid[0] * a.grid[1] : 1;
+    if (d.growStages) return Math.max(0, Math.min(n - 1, Math.floor(((this.box.save.day ?? 1) - (at?.day ?? this.box.save.day ?? 1)) / Math.max(1, d.growDays ?? 2))));   // grows by the days
+    return Math.max(0, Math.min(n - 1, at?.v ?? 0));
+  }
   kitScale(d) { return (d.scale || 100) / 100; }
   // height of the painted part of a frame (feet on the bottom row), cached per texture frame
   kitContent(key, frame) {
@@ -175,17 +193,48 @@ export class CampDecor {
     if (!d.look || !s.textures.exists(d.look)) return;
     s.textures.get(d.look).setFilter(Phaser.Textures.FilterMode.NEAREST);
     const fr = this.kitFrame(d, o.at), k = this.kitScale(d), flip = this.kitFlip(d, o, i, q), f = s.textures.getFrame(d.look, fr);
-    const x = Math.round(q.x), y = Math.round(q.y), depth = -15.9 + q.level * 0.002 + i * 0.00001;
-    // a soft contact shadow under ground and roof pieces
-    if (!q.level) { const g = this.dG(depth - 0.0005); g.fillStyle(0x060608, 0.28).fillEllipse(x, y - 1, f.width * k * 0.8, 7); }
-    const img = this.dAdd(s.add.image(x, y + 1, d.look, fr).setOrigin(0.5, 1).setScale(k).setFlipX(flip).setDepth(depth));
+    const x = Math.round(q.x), depth = q.wall ? -16.2 + i * 0.00001 : -15.9 + q.level * 0.002 + i * 0.00001;
     const c = this.kitContent(d.look, fr) || { h: f.height, w: f.width };
+    // wall pieces hang by their middle (the painted part), the rest stand on their feet
+    const y = Math.round(q.wall ? q.y + (c.h * k) / 2 : q.y);
+    // a soft contact shadow under ground and roof pieces
+    if (!q.level && !q.wall && d.shadow !== false) { const g = this.dG(depth - 0.0005); g.fillStyle(0x060608, 0.28).fillEllipse(x, y - 1, f.width * k * 0.8, 7); }
+    const img = this.dAdd(s.add.image(x, y + (q.wall ? 0 : 1), d.look, fr).setOrigin(0.5, 1).setScale(k).setFlipX(flip).setDepth(depth));
     (this.decorBoxes ??= [])[i] = { x0: x - f.width * k / 2, x1: x + f.width * k / 2, y0: y - c.h * k, y1: y, x, y };
     // pop in when it was just placed (Tiny Glade: every click answers)
     if (this.kitPop === i) { img.setScale(k * 0.6, k * 1.25); s.tweens.add({ targets: img, scaleX: k, scaleY: k, duration: 260, ease: 'Back.Out' }); this.kitPop = null; }
+    // what the piece does when Leyla presses E at it (#111: the old code pieces keep their use)
+    const bw = Math.max(70, f.width * k);
+    if (d.use === 'mirror') this.hotspots.push({ rig: true, x, w: bw, name: d.name || 'Spiegel', hint: 'Haare färben', act: () => this.mirrorMenu(d) });
+    if (d.use === 'rest') this.hotspots.push({ rig: true, x, w: bw, top: q.level || q.roof || q.balc ? y - 10 : undefined, name: d.name || 'Liegestuhl', hint: d.useHint || 'Dösen', act: () => this.hammockRest(d) });
+    if (d.crows) (this.perches ??= []).push({ x, y: y - c.h * k + 4 });
     if (!d.extra || !d.hook) return;
-    const hx = x + ((flip ? f.width - d.hook[0] : d.hook[0]) - f.width / 2) * k, hy = y - (f.height - d.hook[1]) * k;
+    if (d.lightVariants != null && d.lightVariants !== '' && !String(d.lightVariants).split(',').map(t => Number(t.trim()) - 1).includes(fr)) return;   // only these variants (1 = first)
+    const hook = d.hooks?.[fr]?.at || d.hook;
+    const hx = x + ((flip ? f.width - hook[0] : hook[0]) - f.width / 2) * k, hy = y - (f.height - hook[1]) * k;
     const seed = hash(i, x);
+    if (d.extra === 'steam') {
+      const puffs = [];
+      for (let n = 0; n < 4; n++) puffs.push(this.dAdd(s.add.image(hx, hy, glowTexture(s)).setDisplaySize(22, 22).setTint(0xdae0ea).setAlpha(0).setDepth(depth + 0.0008)));
+      this.decorAnim.push(time => puffs.forEach((p, n) => { const t = ((time / 2400 + n / 4 + seed) % 1); p.setPosition(hx + Math.sin(t * 6 + n) * 8, hy - t * 90).setAlpha(0.32 * (1 - t)).setDisplaySize(14 + t * 34, 14 + t * 34); }));
+      return;
+    }
+    if (d.extra === 'rotor') {   // strictly from the side: the blades turn in a plane seen edge-on, so they grow and shrink
+      const g = this.dAdd(s.add.graphics().setDepth(depth + 0.0008)), L = (d.rotor || 34) * k;
+      let spin = seed * 6;
+      this.decorAnim.push((time, dt) => {
+        const gust = this.gustAt && this.gustAt - time < 1500 && this.gustAt > time ? 3 : 1;
+        spin += dt / 1000 * (2.2 + Math.sin(time / 4000 + seed * 9)) * gust;
+        g.clear();
+        for (let n = 0; n < 3; n++) {
+          const a = spin + n * 2.094, len = Math.round(Math.sin(a) * L), w = Math.abs(Math.cos(a)) > 0.7 ? 4 : 3;
+          g.fillStyle(0x141013).fillRect(Math.round(hx) - 1, Math.min(hy, hy - len) - 1, w + 2, Math.abs(len) + 2);
+          g.fillStyle(n ? 0xdae0ea : 0xb4202a).fillRect(Math.round(hx), Math.min(hy, hy - len), w, Math.abs(len));
+        }
+        g.fillStyle(0x141013).fillRect(Math.round(hx) - 2, Math.round(hy) - 3, 6, 6).fillStyle(0x8b93af).fillRect(Math.round(hx) - 1, Math.round(hy) - 2, 4, 4);
+      });
+      return;
+    }
     if (d.extra === 'light' || d.extra === 'candle') {
       const big = d.extra === 'light', l = this.light(hx, hy, big ? 190 : 70, big ? '#ffd27a' : '#ffb347', big ? 0.75 : 0.6); l.rig = true;
       this.decorAnim.push(time => l.setAlpha(l.base * this.lightK * (0.86 + 0.14 * Math.sin(time / (big ? 170 : 90) + seed * 7))));
@@ -226,6 +275,57 @@ export class CampDecor {
       });
     }
   }
+  // ---------- #111 Auto-Details: what grows by itself (Townscaper/Tiny Glade: the camp lives) ----------
+  // moss at the feet of pieces that stood long enough, ivy climbing crates next to plants, a cat that comes when the camp is cosy
+  drawKitDetails() {
+    const D = this.D, save = this.box.save, L = save.rig.decor || [], K = D.camp?.decor || {}, T = this.scene.T, day = save.day ?? 1;
+    const boxes = this.decorBoxes || [], g = this.dG(-15.85);
+    const near = (i, tag, dist) => L.some((o, j) => j !== i && boxes[j] && tagsOf(decorDef(D, o.id)).includes(tag) && Math.abs(boxes[j].x - boxes[i].x) <= dist * T && Math.abs(boxes[j].y - boxes[i].y) < 140);
+    const leaf = (x, y, c) => g.fillStyle(0x141013, 0.9).fillRect(x - 1, y - 1, 6, 5).fillStyle(c).fillRect(x, y, 4, 3);
+    L.forEach((o, i) => {
+      const d = decorDef(D, o.id), b = boxes[i];
+      if (!b || d?.art !== 'sprite' || d.place === 'wall') return;
+      const age = day - (o.at?.day ?? day), tags = tagsOf(d), seed = hash(i, b.x);
+      const q = this.freeAt?.[i];
+      // moss: tufts at the foot (not on fire, not stacked)
+      if (K.mossDays && age >= K.mossDays && !tags.includes('feuer') && !(q?.level)) {
+        const n = Math.min(4, 1 + Math.floor((age - K.mossDays) / 2));
+        for (let m = 0; m < n; m++) { const mx = Math.round(b.x0 + 4 + hash(seed, m) * (b.x1 - b.x0 - 12)); for (let t = 0; t < 3; t++) g.fillStyle([0x328464, 0x59c135, 0x23674e][t]).fillRect(mx + t * 3 - 3, Math.round(b.y1) - 3 - (t === 1 ? 2 : 0), 3, 3 + (t === 1 ? 2 : 0)); }
+      }
+      // ivy: up the side of pieces that carry (crates, tables) when a plant stands next to them, longer every day
+      if (K.ivyDays && age >= K.ivyDays && canCarry(d) && near(i, 'grün', 1.6)) {
+        const len = Math.min(b.y1 - b.y0 - 4, (age - K.ivyDays + 1) * 14), side = seed < 0.5 ? b.x0 + 3 : b.x1 - 5;
+        g.fillStyle(0x23674e).fillRect(Math.round(side), Math.round(b.y1 - len), 2, Math.round(len));
+        for (let yy = 4; yy < len; yy += 7) leaf(Math.round(side + ((yy / 7) % 2 ? 2 : -4)), Math.round(b.y1 - yy), (yy / 7) % 3 ? 0x59c135 : 0x9cdb43);
+        if (age - K.ivyDays >= 3) for (let xx = 4; xx < (b.x1 - b.x0) * 0.6; xx += 8) leaf(Math.round((side < b.x ? b.x0 + xx : b.x1 - xx - 4)), Math.round(b.y0 + 2 + (xx % 16 ? 2 : 0)), 0x59c135);   // over the top edge
+      }
+    });
+    this.drawCat();
+  }
+  // the camp cat: comes when Gemütlichkeit reaches Camp › Deko › Katze ab; sleeps on a free top (crate, table), else by the fire.
+  // One cat per save (its look stays), its place changes by the day; E: streicheln
+  drawCat() {
+    const s = this.scene, D = this.D, save = this.box.save, K = D.camp?.decor || {}, key = K.cat;
+    this.cat = null;
+    if (!key || !s.textures.exists(key) || cozy(D, save) < (K.catCozy ?? 8)) return;
+    const L = save.rig.decor || [], boxes = this.decorBoxes || [], T = s.T, day = save.day ?? 1;
+    const covered = new Set(L.map(o => /^deco:(\d+)$/.exec(o.at?.on || '')?.[1]).filter(Boolean).map(Number));
+    const spots = [];
+    L.forEach((o, i) => { const b = boxes[i], top = b && this.kitTop(i), q = this.freeAt?.[i]; if (b && top != null && q && !covered.has(i)) spots.push({ x: q.x, y: q.y - top + 1, i }); });
+    L.forEach((o, i) => { const b = boxes[i]; if (b && tagsOf(decorDef(D, o.id)).includes('feuer') && !this.freeAt?.[i]?.level) spots.push({ x: b.x + ((day % 2) ? -1 : 1) * 1.1 * T, y: b.y1, fire: true }); });
+    if (!spots.length) return;
+    const at = spots[Math.floor(hash(day, L.length) * spots.length) % spots.length], A = D.assets?.[key], n = A?.grid ? A.grid[0] * A.grid[1] : 1;
+    const v = Math.floor(hash(save.seed ?? 7, 3) * n) % n, flip = hash(day, 5) < 0.5;
+    s.textures.get(key).setFilter(Phaser.Textures.FilterMode.NEAREST);
+    const img = this.dAdd(s.add.image(Math.round(at.x), Math.round(at.y) + 1, key, v).setOrigin(0.5, 1).setFlipX(flip).setDepth(-15.85));
+    this.decorAnim.push(time => img.setScale(1, 1 + 0.035 * (0.5 + 0.5 * Math.sin(time / 900))));   // breathing
+    this.cat = { x: at.x, y: at.y, img };
+    this.hotspots.push({ rig: true, x: at.x, w: 70, top: at.y < this.ground - 40 ? at.y - 10 : undefined, name: K.catName || 'Katze', hint: 'Streicheln', act: () => {
+      s.hud.toast(K.catName || 'Katze', ['Schnurrt.', 'Blinzelt dich an.', 'Streckt eine Pfote. Bleibt liegen.', 'Rollt sich enger ein.'][Math.floor(Math.random() * 4)], 'ok', 2200);
+      for (let n = 0; n < 5; n++) s.time.delayedCall(n * 90, () => s.fx?.puff?.(at.x + (Math.random() - 0.5) * 30, at.y - 30 - n * 6, 0xe86a73));
+      img.setScale(1.08, 0.94); s.tweens.add({ targets: img, scaleX: 1, scaleY: 1, duration: 300, ease: 'Back.Out' });
+    } });
+  }
   // candidate places for a free piece: on the ground, on roofs, on top of pieces that carry
   freeSpots(id) {
     const D = this.D, T = this.scene.T, save = this.box.save, out = [], L = save.rig.decor || [];
@@ -237,8 +337,17 @@ export class CampDecor {
     }
     if (!this.geo.mega) for (const u of this.geo.units || []) {
       if (u.ui === 0 || (save.rig.units[u.ui + 1]?.level || 0) > (save.rig.units[u.ui]?.level || 0)) continue;
-      for (let p = -0.25; p <= (u.places || 0) - 0.75; p += 0.25) { const q = this.roofAt(u.ui, p); if (q) out.push({ at: { ui: u.ui, p }, x: q.x, y: q.y - 6, label: 'Aufs Dach' }); }
+      const st = (T * 0.5) / u.cell;   // half a tile
+      for (let p = -0.5 + st; p <= (u.places || 0) - 0.5 - st + 1e-6; p += st) { const pp = Math.round(p * 1000) / 1000, q = this.roofAt(u.ui, pp); if (q) out.push({ at: { ui: u.ui, p: pp }, x: q.x, y: q.y - 6, label: 'Aufs Dach' }); }
     }
+    if (!this.geo.mega) L.forEach((o, j) => {
+      const bd = decorDef(D, o.id);
+      if (bd?.art !== 'balcony') return;
+      const b = this.balconyAt(o.at.ui, o.at.side, bd);
+      if (!b) return;
+      const half = (b.x1 - b.x0) / 2 / T;
+      for (let dx = -half + 0.4; dx <= half - 0.4 + 1e-6; dx += 0.25) out.push({ at: { on: `balc:${j}`, dx: Math.round(dx * 100) / 100 }, x: (b.x0 + b.x1) / 2 + dx * T, y: b.y - 6, label: 'Auf den Balkon', balc: true });
+    });
     if (decorDef(D, id)?.stack) L.forEach((o, j) => {
       const top = this.kitTop(j), q = this.freePos(j), box = this.decorBoxes?.[j];
       if (top == null || !q || !box) return;

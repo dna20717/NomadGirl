@@ -70,6 +70,41 @@ r = await ev(() => {
 });
 check('Mittlere Kiste aufnehmen: die Pflanze rutscht nach unten', r.n1 === r.n0 - 1 && r.plant && r.spare.includes('kit_kiste'), r);
 
+// second round: R switches variants, wall pieces in two rows, roof garden, balconies, the cat, the ensemble list in the Deko tab
+r = await ev(() => {
+  const s = game.scene.getScene('play'), bm = s.hud.build, camp = s.camp, save = s.box.save, out = {};
+  s.openBuild();
+  bm.buyDecor('kit_tischkram'); const v0 = bm.decorHold.v; bm.cycleDecor(1); out.cycHold = bm.decorHold.v === (v0 + 1) % 16;
+  bm.dropDecorToSpare();
+  const k = save.rig.decor.findIndex(x => x.id === 'kit_kiste'), b = camp.decorBoxes[k], v1 = save.rig.decor[k].at.v;
+  bm.pointer = { x: b.x, y: b.y - 10 }; bm.cycleDecor(1); out.cycPlaced = save.rig.decor[k].at.v === (v1 + 1) % 10;
+  const W = camp.decorSpots('kit_wandschmuck'); out.wallRows = new Set(W.map(q => q.at.row)).size; out.wallN = W.length;
+  bm.buyDecor('kit_wandschmuck'); bm.placeDecor({ x: W[3].x, y: W[3].y }); out.wall = save.rig.decor.at(-1)?.id;
+  const R = camp.decorSpots('kit_pflanzkasten').filter(q => q.at.ui != null); out.roofN = R.length;
+  bm.buyDecor('kit_pflanzkasten'); bm.placeDecor({ x: R[2].x, y: R[2].y }); out.roof = save.rig.decor.at(-1)?.at.ui;
+  bm.shopOpen = true; bm.shopTab = 'decor'; bm.draw();
+  out.ensRows = [...document.querySelectorAll('.bm-shop .build-row b')].map(n => n.textContent).filter(t => /Lagerfeuer-Ecke|Dachterrasse|Feldküche/.test(t)).length;
+  bm.close();
+  out.cat = !!camp.cat; out.hot = camp.hotspots.some(h => h.hint === 'Streicheln');
+  return out;
+});
+check('R wechselt die Variante (in der Hand und platziert)', r.cycHold && r.cycPlaced, r);
+check('Wandschmuck: zwei Höhen, feine Schritte, hängt an der Wand', r.wallRows === 2 && r.wallN >= 16 && r.wall === 'kit_wandschmuck', r);
+check('Dach: Ziele in halben Kacheln, Pflanzkasten steht oben', r.roofN >= 8 && r.roof === 1, r);
+check('Deko-Tab listet die Ensembles mit dem, was sie brauchen', r.ensRows >= 3, r);
+check('Gemütlich genug: die Katze schläft im Camp, E streichelt', r.cat && r.hot, r);
+// a balcony is a surface too
+r = await ev(() => {
+  const s = game.scene.getScene('play'), camp = s.camp, save = s.box.save;
+  save.rig.decor.push({ id: 'balkon', at: { ui: 1, side: 1, day: 1 } });
+  camp.drawRig();
+  const B = camp.decorSpots('kit_pflanze').filter(q => q.balc);
+  if (B.length) { save.rig.decor.push({ id: 'kit_pflanze', at: { ...B[0].at, v: 0, day: 1 } }); camp.drawRig(); }
+  const i = save.rig.decor.length - 1, b = camp.decorBoxes[i], bal = camp.balconyAt(1, 1, s.data_.decor.balkon);
+  return { n: B.length, y: b && Math.round(b.y), by: bal && Math.round(bal.y) };
+});
+check('Balkon: Stücke lassen sich daraufstellen', r.n > 0 && Math.abs(r.y - r.by) <= 2, r);
+
 await browser.close();
 console.log(ok.map(n => '✓ ' + n).join('\n'));
 if (errors.length) { console.error('Fehler:\n' + errors.join('\n')); process.exit(1); }

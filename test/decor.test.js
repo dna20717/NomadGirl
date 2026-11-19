@@ -13,7 +13,8 @@ const fresh = () => { const s = newSave(D); s.deltas = 5000; return s; };
 test('Katalog: Beispiele aus allen Paketen, alle mit Preis und Art', () => {
   const ids = shopDecor(D);
   assert.ok(ids.length >= 15, ids.length);
-  for (const k of ['ground', 'wall', 'roof', 'span']) assert.ok(ids.some(id => D.decor[id].place === k), k);
+  // #111: roof pieces became free pieces (ground, roof, on top of each other)
+  for (const k of ['ground', 'wall', 'free', 'span']) assert.ok(ids.some(id => D.decor[id].place === k), k);
   assert.ok(ids.includes('zelt') && ids.includes('zeltstange'));
 });
 

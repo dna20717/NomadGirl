@@ -838,5 +838,16 @@
   "count": 1,
   "discovery": ["experiment", "found"],
   "hint": "Ein verkohlter Lappen in Öl."
+ },
+ "trophaee_schneekugel": {
+  "name": "Schneekugel „Dorfplatz“",
+  "station": "werkbank",
+  "ingredients": [{"item": "gluehbirne", "count": 1},{"item": "schrottplatte", "count": 1}],
+  "result": "schneekugel_dorfplatz",
+  "count": 1,
+  "time": 45,
+  "discovery": ["achievement"],
+  "once": true,
+  "hint": "Trophäe für „Dorfplatz“"
  }
 }

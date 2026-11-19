@@ -113,7 +113,8 @@ export class PlayScene extends Phaser.Scene {
       for (const V of Object.values(this.data_.megarigs || {})) for (const v of Object.values(V.skin || {})) if (typeof v === 'string') ids.add(v);   // mega rig wrecks wear their tile sets (#026)
       for (const t of Object.values(this.data_.tractors || {})) if (t.look) ids.add(t.look);   // the tractor in front (the salvaged LKW)
       for (const a of Object.values(this.data_.rigAddons || {})) if (a.look) ids.add(a.look);   // mega rig wrecks wear add-ons
-      for (const d of Object.values(this.data_.decor || {})) if ((d.art === 'icon' || d.art === 'sprite') && d.look) ids.add(d.look);   // Deko as a picture (NomadCola-Automat …)
+      for (const d of Object.values(this.data_.decor || {})) if ((d.art === 'icon' || d.art === 'sprite') && d.look) ids.add(d.look);   // Deko as a picture (NomadCola-Automat …, #111 Baukasten)
+      if (this.data_.camp?.decor?.cat) ids.add(this.data_.camp.decor.cat);   // #111 the camp cat
       // workshop pictures (and the empty shelf), the crate for packed workshops
       for (const w of Object.values(this.data_.workshops || {})) for (const id of [w.look, w.lookEmpty, w.garden?.plants, ...(w.upgrades || []).map(r => r?.look)]) if (id) ids.add(id);   // #078 pictures per step
       { const T = this.data_.tank || {}; for (const p of T.phases || []) for (const id of [p.look, p.anim, p.hand]) if (id) ids.add(id); if (T.deadLook) ids.add(T.deadLook); }   // the cryo tank in all its phases (tank_view.js)

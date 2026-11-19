@@ -132,7 +132,7 @@
  "solar": {"look": "rig_solar", "power": 1, "battery": 6, "day": [7, 19], "price": 220, "weight": 40},
  "rain": {"enabled": true, "chance": 30, "hours": [2, 6], "look": "abendglut_regen"},
  "board": {"enabled": true, "name": "Schwarzes Brett", "offset": -220, "lift": 210, "width": 132, "height": 96},
- "decor": {"max": 40, "back": 50, "cozyMax": 25, "ground": [-4, 20], "stackMax": 4, "near": 2.5, "linkMax": 8},
+ "decor": {"max": 40, "back": 50, "cozyMax": 25, "ground": [-4, 20], "stackMax": 4, "near": 2.5, "linkMax": 8, "mossDays": 3, "ivyDays": 2, "cat": "kit_cat", "catName": "Mieze", "catCozy": 8},
  "storage": {"name": "Camp-Lager", "width": 10},
  "critters": [{"look": "fennek_run", "every": [35, 80], "speed": 380, "night": 2, "idles": "fennek_look,fennek_sniff,fennek_scratch", "stopChance": 75}]
 }

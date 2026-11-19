@@ -15,7 +15,7 @@ import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from
 import { ACHIEVEMENT_COUNTERS, ACHIEVEMENT_SPECIALS, ACHIEVEMENT_CATEGORIES } from '../game/achievements.js';
 import { REP_LEVELS } from '../game/reputation.js';
 import { RADIO_STYLES, RADIO_TALK, RADIO_SCALES, RADIO_KEYS } from '../game/radio_kinds.js';
-import { DECOR_PLACES, DECOR_ARTS, DECOR_CARRY, DECOR_EXTRAS } from '../game/decor.js';
+import { DECOR_PLACES, DECOR_ARTS, DECOR_CARRY, DECOR_EXTRAS, DECOR_USES } from '../game/decor.js';
 import { MOMENTS } from '../game/banter.js';
 import { EARN_WHEN } from '../game/earn.js';
 import { RELIEFS, ROADSIDE } from '../game/road.js';
@@ -1155,6 +1155,7 @@ export const AREAS = {
       { title: 'Baukasten', fields: [
         num('scale', 'Maßstab', { unit: '%', min: 10, hint: '#111 Art „Bild mit Varianten“: 100 = so groß wie gemalt (PixelLab malt in Spielgröße, Leyla 170 cm = 192 px)' }),
         bool('flip', 'Darf gespiegelt werden', { hint: 'Jedes platzierte Stück würfelt Variante und Richtung' }),
+        bool('growStages', 'Wächst (Felder = Stufen)', { hint: 'Statt zu würfeln: Feld 1, 2, 3 … nach „Wächst in Tagen“' }),
         select('carry', 'Tragfläche', DECOR_CARRY, { hint: 'Kann man etwas draufstellen? Oberkante des Bilds (Kisten) oder in fester Höhe (Tisch)' }),
         num('top', 'Höhe der Tragfläche', { unit: 'Bildpixel', min: 0, hint: 'Bei „in fester Höhe“: vom Boden bis zur Platte' }),
         bool('stack', 'Lässt sich draufstellen', { hint: 'Darf auf anderen Stücken mit Tragfläche stehen' }),
@@ -1163,7 +1164,12 @@ export const AREAS = {
         text('faces', 'Dreht sich zu', { hint: 'Tag: das Stück schaut zum nächsten Stück mit diesem Tag (der Stuhl zum Feuer). Das Bild schaut nach rechts' }),
         bool('linkLights', 'Lichterkette zu Nachbarn', { hint: 'Zwei solche Stücke nah beieinander spannen von selbst eine Lichterkette (Camp › Deko › Lichterkette bis)' }),
         point('hook', 'Haken', { unit: 'Bildpixel', hint: 'Wo die Lichterkette bzw. das Licht sitzt (von oben links im Feld)' }),
-        select('extra', 'Effekt', DECOR_EXTRAS, { hint: 'Aus Code: Flammen, Licht am Haken' })] }],
+        select('extra', 'Effekt', DECOR_EXTRAS, { hint: 'Aus Code: Flammen, Licht, Dampf, Rotor am Haken' }),
+        text('lightVariants', 'Effekt nur bei Varianten', { hint: 'Mit Komma, 1 = erste (z. B. nur Kerze und Öllampe im Tischkram); leer = alle' }),
+        table('hooks', 'Haken je Variante', [point('at', 'Haken', { unit: 'Bildpixel' })], { hint: 'Zeile 1 = Variante 1 …; leer = der Haken oben' }),
+        num('rotor', 'Rotor-Länge', { unit: 'Bildpixel', min: 4 }),
+        select('use', 'Benutzen', DECOR_USES, { hint: 'E am Stück' }), text('useHint', 'Knopf-Text', { hint: 'Ausruhen: z. B. „Dösen“' }), num('heal', 'Heilt', { unit: '%', min: 0 }),
+        bool('crows', 'Lockt Krähen an', { hint: 'Wie das Vogelhaus: Krähen sitzen darauf und auf Ecken' }), bool('shadow', 'Schatten am Boden', { hint: 'Aus = kein Kontaktschatten (Standard: an)' })] }],
     // art and place must go together, else the camp cannot draw or anchor it (Aufräumen 16.11.2026)
     check: (x, report) => {
       const need = { pole: ['ground'], tower: ['ground'], balcony: ['side'], bridge: ['span'], tent: ['span'], sail: ['span'], line: ['span'], hammock: ['span'], pennants: ['span'], canopy: ['span'] }[x.art];
@@ -1175,7 +1181,7 @@ export const AREAS = {
     },
   },
   decorSets: {
-    name: 'Ensembles', singular: 'Ensemble', icon: 'sparkles', file: 'data/decor_sets.json', kind: 'catalog',
+    name: 'Ensembles', singular: 'Ensemble', icon: 'particles', file: 'data/decor_sets.json', kind: 'catalog',
     hint: '#111 Camp-Baukasten (Daniel 19.11.2026: „wie Dorfromantik: wenn Tiles zusammenpassen, gibt es einen Bonus, aber keine Nachteile“). Stehen die Stücke mit diesen Tags nah beieinander (auf dem Boden oder demselben Dach, auch gestapelt), entsteht das Ensemble: Name, Funkeln und Gemütlichkeit obendrauf.',
     template: { name: 'Neues Ensemble', within: 6, cozy: 3, needs: [{ tag: 'feuer', count: 1 }] },
     row: x => `${(x.needs || []).map(n => `${n.count ?? 1}× ${n.tag}`).join(' + ')} · +${x.cozy ?? 0} Gemütlichkeit`,
@@ -1318,7 +1324,11 @@ export const AREAS = {
         num('decor.cozyMax', 'Gemütlichkeit wirkt bis', { unit: '%', min: 0, hint: 'Jeder Punkt Gemütlichkeit macht die Buffs von Schlafen und Ausruhen 1 % stärker, höchstens so viel' }),
         range('decor.ground', 'Boden von – bis', { unit: 'Kacheln ab dem Lagerplatz', hint: 'Wo Boden-Deko stehen darf (negativ = Richtung Rig)' }),
         num('decor.stackMax', 'Stapel höchstens', { min: 1, hint: '#111: so viele Stücke übereinander' }), num('decor.near', 'Nachbarn bis', { unit: 'Kacheln', min: 0, step: 0.5, hint: 'Mag-Nachbarn und „Dreht sich zu“ wirken bis hier' }),
-        num('decor.linkMax', 'Lichterkette bis', { unit: 'Kacheln', min: 1, hint: 'Pfosten mit „Lichterkette zu Nachbarn“ verbinden sich bis zu diesem Abstand' })] },
+        num('decor.linkMax', 'Lichterkette bis', { unit: 'Kacheln', min: 1, hint: 'Pfosten mit „Lichterkette zu Nachbarn“ verbinden sich bis zu diesem Abstand' }),
+        num('decor.mossDays', 'Moos nach', { unit: 'Tagen', min: 0, hint: '#111 Auto-Details: Moos wächst am Fuß von Stücken, die so lange stehen (0 = nie)' }),
+        num('decor.ivyDays', 'Ranken nach', { unit: 'Tagen', min: 0, hint: 'Ranken klettern an Kisten und Tischen neben Pflanzen hoch, jeden Tag ein Stück' }),
+        ref('decor.cat', 'Katze', 'assets', { hint: 'Symbol-Raster mit Katzen; eine je Spielstand' }), text('decor.catName', 'Name der Katze'),
+        num('decor.catCozy', 'Katze ab Gemütlichkeit', { min: 0, hint: 'So gemütlich muss das Camp sein, damit sie kommt' })] },
       { title: 'Schwarzes Brett', fields: [bool('board.enabled', 'Schwarzes Brett', { hint: 'Daniel, 15.11.2026 (#025): am Van Aufträge annehmen, abgeben und Belohnungen einsammeln, zentral für alle Companions. Bei ihnen direkt geht es weiter. Später eine Werkbank, die fertige Aufträge gegen bessere Belohnungen tauscht' }),
         text('board.name', 'Name'), num('board.offset', 'Abstand zum Feuer', { unit: 'px', hint: 'Negativ = links vom Feuer, Richtung Van. −220 = am Mast' }),
         num('board.lift', 'Oberkante über dem Boden', { unit: 'px', min: 60 }), num('board.width', 'Breite', { unit: 'px', min: 60 }), num('board.height', 'Höhe', { unit: 'px', min: 40 })] },

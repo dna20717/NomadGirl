@@ -2357,5 +2357,17 @@
   "description": "Gefesselt, wütend, schwer. In der Zelle sicher, im Rucksack leidet er. Für Kopfgeld, Lösegeld oder dunkle Geschäfte.",
   "look": "icons_misc2",
   "icon": 0
+ },
+ "schneekugel_dorfplatz": {
+  "name": "Schneekugel „Dorfplatz“",
+  "category": "valuable",
+  "size": [1, 1],
+  "stack": 1,
+  "value": 0,
+  "glyph": "🔮",
+  "description": "Eine winzige Stadt unter Glas, in der es schneit. Für ein Camp, in dem alles zusammenpasst.",
+  "tags": ["trophy"],
+  "look": "kit_table_items",
+  "icon": 15
  }
 }

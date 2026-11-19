@@ -5,7 +5,7 @@
 // Mixed into BuildMode (build_mode.js).
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
-import { decorDef, placeOf, buy, put, lift, stow, fromSpare, sell, shopDecor, priceOf, sellPrice, dstate, cozy, cozyBonus, cozyParts, ensembles } from '../decor.js';
+import { variants, decorDef, placeOf, buy, put, lift, stow, fromSpare, sell, shopDecor, priceOf, sellPrice, dstate, cozy, cozyBonus, cozyParts, ensembles } from '../decor.js';
 import { snapshot } from '../rig.js';
 
 const de = n => Number(n || 0).toLocaleString('de-DE');
@@ -24,7 +24,15 @@ export class BuildDecor {
     }
     const cp = cozyParts(D, save);
     out.push(el('div', { class: 'build-sub', title: `Stücke ${cp.base} · Nachbarn +${cp.neighbours} · Ensembles +${cp.sets.reduce((n, e) => n + e.cozy, 0)}` }, icon('star', 14), ` Gemütlichkeit ${cozy(D, save)} · Buffs +${cozyBonus(D, save)} %`));
-    for (const e of cp.sets) out.push(el('div', { class: 'build-row' }, icon('sparkles', 16), el('span', {}, el('b', {}, e.name), el('small', {}, `Ensemble · +${e.cozy} Gemütlichkeit`))));
+    // #111 Ensembles (Dorfromantik): the ones standing glow, the others say what they need
+    const on = new Map(); for (const e of cp.sets) on.set(e.id, (on.get(e.id) || 0) + 1);
+    const all = Object.entries(D.decorSets || {});
+    if (all.length) out.push(el('div', { class: 'build-sub' }, icon('particles', 14), ` Ensembles ${on.size} von ${all.length}`));
+    for (const [id, e] of all) {
+      const n = on.get(id) || 0;
+      out.push(el('div', { class: 'build-row' + (n ? '' : ' dim'), title: e.description || '' }, icon(n ? 'particles' : 'lock', 16),
+        el('span', {}, el('b', {}, `${e.name || id}${n > 1 ? ` ×${n}` : ''}`), el('small', {}, n ? `steht · +${(e.cozy || 0) * n} Gemütlichkeit` : `braucht ${(e.needs || []).map(x => `${x.count ?? 1}× ${x.tag}`).join(', ')} · innerhalb ${e.within ?? 6} Kacheln · +${e.cozy || 0}`))));
+    }
     for (const id of shopDecor(D)) {
       const d = decorDef(D, id), price = priceOf(D, id), poor = price > save.deltas;
       out.push(el('div', { class: 'build-row', title: d.description || '' }, el('span', { class: 'build-dot', style: `--col:${d.color || (d.colors || '').split(',')[0] || '#ffd27a'}` }),
@@ -58,7 +66,9 @@ export class BuildDecor {
     this.shopOpen = false;
     const k = placeOf(this.D, id);
     if (k === 'ground' || k === 'span' || k === 'free') { const A = this.areas().find(a => a.key === 'camp'); if (A) { this.areaNow = A; this.frame(A); } }   // to the campsite
-    this.say(k === 'span' ? 'Erster Punkt: Container-Ecke, Mast oder Zeltstange' : k === 'free' ? 'Auf den Boden, ein Dach oder ein anderes Stück stellen' : k === 'ground' ? 'Auf den Boden am Lagerplatz stellen' : k === 'wall' ? 'An eine Container-Wand hängen' : k === 'side' ? 'An ein Container-Ende (Balkon)' : 'Auf ein Container-Dach stellen', 'idle');
+    const nv = variants(this.D, id);
+    if (nv > 1 && this.decorHold.v == null) this.decorHold.v = Math.floor(Math.random() * nv);
+    this.say(k === 'span' ? 'Erster Punkt: Container-Ecke, Mast oder Zeltstange' : k === 'free' ? `Auf den Boden, ein Dach, einen Balkon oder ein anderes Stück stellen${nv > 1 ? ` · R: Variante (${nv})` : ''}` : k === 'ground' ? 'Auf den Boden am Lagerplatz stellen' : k === 'wall' ? 'An eine Container-Wand hängen' : k === 'side' ? 'An ein Container-Ende (Balkon)' : 'Auf ein Container-Dach stellen', 'idle');
     this.draw();
   }
   // Esc / B: the piece in hand goes into the Lager
@@ -109,6 +119,7 @@ export class BuildDecor {
       for (const k of e.members) { const b = this.camp.decorBoxes?.[k]; if (b) for (let n = 0; n < 6; n++) this.scene.time.delayedCall(n * 70 + k * 30, () => this.scene.fx?.puff?.(b.x + (Math.random() - 0.5) * 50, b.y0 - 10 - Math.random() * 30, 0xffd541)); }
     } else this.say(`${decorDef(this.D, r.ok ? this.save.rig.decor[r.i].id : h.id)?.name || ''} steht`, 'ok');
     this.scene.achieveLevel?.('decor', this.save.rig.decor.length);
+    this.scene.achieveLevel?.('ensembles', new Set(now.map(e => e.id)).size);
   }
   // a placed piece under the pointer → { kind: 'decor', i }
   pickDecor(x, y) {
@@ -118,7 +129,7 @@ export class BuildDecor {
       if (!d) continue;
       const [sw, sh] = d.size || [1, 1], w = Math.max(sw * T, 50), h = Math.max(sh * T, 50), at = o.at || {};
       let box = null;
-      if (d.place === 'free') { const b = camp.decorBoxes?.[i]; if (b) box = { x0: b.x0, x1: b.x1, y0: Math.min(b.y0, b.y1 - 30), y1: b.y1 }; }
+      if (camp.decorBoxes?.[i]) { const b = camp.decorBoxes[i]; if (b) box = { x0: b.x0, x1: b.x1, y0: Math.min(b.y0, b.y1 - 30), y1: b.y1 }; }
       else if (d.place === 'ground') { const gx = camp.groundX(at.x); box = { x0: gx - w / 2, x1: gx + w / 2, y0: camp.ground - h, y1: camp.ground }; }
       else if (d.place === 'wall') { const q = camp.wallAt(at.ui, at.p); if (q) box = { x0: q.x - w / 2, x1: q.x + w / 2, y0: q.y - h / 2, y1: q.y + h / 2 }; }
       else if (d.place === 'side') { const b = camp.balconyAt(at.ui, at.side, d); if (b) box = { x0: b.x0, x1: b.x1, y0: b.y - T, y1: b.y + 20 }; }
@@ -154,15 +165,41 @@ export class BuildDecor {
     if (t) label(t.x, t.y - 40, decorDef(this.D, h.id)?.name || h.id, '#ffd27a');
     else if (w) label(w.x, w.y - 30, decorDef(this.D, h.id)?.name || h.id, '#f2eef7');
   }
+  // #111 Variante wählen (R / Controller: Kontext-Knopf): the piece in hand, else the placed piece under the pointer, shows its next variant
+  cycleDecor(dir = 1) {
+    const h = this.decorHold, D = this.D;
+    if (h) {
+      const n = variants(D, h.id);
+      if (n < 2) return false;
+      h.v = (((h.v ?? 0) + dir) % n + n) % n;
+      this.sfx.snap?.();
+      this.say(`Variante ${h.v + 1} von ${n}${this.variantName(h.id, h.v)}`, 'idle');
+      this.draw();
+      return true;
+    }
+    const w = this.ava?.on ? this.ava : this.pointer, hit = w && this.pickDecor(w.x, w.y), o = hit && this.save.rig.decor[hit.i];
+    const n = o ? variants(D, o.id) : 0;
+    if (n < 2) return false;
+    const before = snapshot(this.save);
+    o.at.v = (((o.at.v ?? 0) + dir) % n + n) % n;
+    this.undo.push({ snap: before, label: 'Variante gewechselt', job: null, at: null, done: false });
+    this.camp.kitPop = hit.i;
+    this.camp.drawRig();
+    this.sfx.snap?.();
+    this.say(`${decorDef(D, o.id)?.name || o.id}: Variante ${o.at.v + 1} von ${n}${this.variantName(o.id, o.at.v)}`, 'idle');
+    this.draw();
+    return true;
+  }
+  variantName(id, v) { const a = this.D.assets?.[decorDef(this.D, id)?.look], n = a?.names?.[v]; return n ? ` · ${n}` : ''; }
   // #111: the piece in hand shows where it would stand, half see-through (Tiny Glade: you see it before you click)
   drawDecorGhost(t, h) {
     const d = decorDef(this.D, h.id), s = this.scene;
     if (!d || d.art !== 'sprite' || !s.textures.exists(d.look)) { this.decorGhost?.setVisible(false); return; }
     const fr = this.camp.kitFrame(d, { v: h.v ?? 0 }), k = (d.scale || 100) / 100;
     if (!this.decorGhost || !this.decorGhost.scene) this.decorGhost = s.add.image(0, 0, d.look, fr).setOrigin(0.5, 1).setDepth(-15.8);
-    const y = t ? (t.stack ? t.y + 4 : t.at?.ui != null ? t.y + 6 : this.camp.ground) : null;
-    this.decorGhost.setTexture(d.look, fr).setScale(k).setFlipX(!!(d.flip && h.f)).setVisible(!!t).setAlpha(0.6 + 0.15 * Math.sin(this.scene.time.now / 160));
-    if (t) this.decorGhost.setPosition(Math.round(t.x), Math.round(y) + 1);
+    const wall = d.place === 'wall', y = t ? (wall ? t.y : t.stack || t.balc ? t.y + 4 : t.at?.ui != null ? t.y + 6 : this.camp.ground) : null;
+    this.decorGhost.setTexture(d.look, fr).setScale(k).setOrigin(0.5, wall ? 0.5 : 1).setFlipX(!!(d.flip && h.f)).setVisible(!!t).setAlpha(0.6 + 0.15 * Math.sin(this.scene.time.now / 160));
+    if (t) this.decorGhost.setPosition(Math.round(t.x), Math.round(y) + (wall ? 0 : 1));
   }
   // controller: AvA hops between the places of the piece in hand
   decorNavTargets() {

@@ -81,3 +81,28 @@ test('Gestapelte Kisten zählen fürs Vorratslager, auch auf einem Dach', () => 
   assert.equal(s.rig.decor.length, 0);
   assert.equal(dstate(s).spare.decor.length, 4);
 });
+
+test('Wand, Balkon und Ensembles der zweiten Runde', () => {
+  const s = fresh();
+  put(D, s, 'kit_wandschmuck', { ui: 1, p: 0, row: 0.3 });
+  put(D, s, 'kit_wandschmuck', { ui: 1, p: 0.17, row: 0.62 });
+  put(D, s, 'kit_wandschmuck', { ui: 1, p: 0.33, row: 0.3 });
+  assert.equal(restOf(D, s, 0).surf, 'w1');
+  assert.ok(ensembles(D, s).some(e => e.id === 'wohnwand'));
+  put(D, s, 'balkon', { ui: 1, side: 1 });
+  assert.ok(put(D, s, 'kit_liegestuhl', { on: 'balc:3', dx: 0 }).ok);
+  assert.equal(put(D, s, 'kit_liegestuhl', { on: 'balc:0', dx: 0 }).ok, false, 'Wandschmuck ist kein Balkon');
+  assert.equal(restOf(D, s, 4).surf, 'b3');
+  // taking the balcony away puts what stood on it into the Lager
+  lift(D, s, 3);
+  assert.ok(!s.rig.decor.some(x => x.id === 'kit_liegestuhl'));
+  assert.ok(dstate(s).spare.decor.includes('kit_liegestuhl'));
+});
+
+test('Alte Stücke als Bild: IDs bleiben, alte Spielstände (Boden, Dach) gelten weiter', () => {
+  for (const id of ['dreibein', 'feuertonne', 'vogelhaus', 'windrad', 'spiegel']) { assert.equal(D.decor[id].art, 'sprite', id); assert.equal(D.decor[id].place, 'free', id); }
+  const s = fresh();
+  s.rig.decor.push({ id: 'windrad', at: { ui: 1, p: 0, day: 1 } }, { id: 'feuertonne', at: { x: 3, day: 1 } });
+  assert.equal(restOf(D, s, 0).surf, 'r1');
+  assert.equal(restOf(D, s, 1).surf, 'g');
+});

@@ -159,5 +159,16 @@
   "hidden": false,
   "order": 10,
   "recipe": "trophaee_discokugel"
+ },
+ "dorfplatz": {
+  "name": "Dorfplatz",
+  "category": "cosy",
+  "counter": "ensembles",
+  "target": 5,
+  "bonus": [{"stat": "regen", "value": 1}],
+  "description": "Lass im Camp fünf verschiedene Ensembles entstehen.",
+  "hidden": false,
+  "order": 11,
+  "recipe": "trophaee_schneekugel"
  }
 }

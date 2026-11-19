@@ -1120,3 +1120,5 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .stats-intro { margin: 0 0 8px; color: #8d7f9c; font-size: 13px; }
 .stats-box header { padding-right: 48px; }
 .stats-box header .tut-tabs { margin-left: auto; }
+/* #111 Ensembles not standing yet: quieter */
+.build-row.dim { opacity: 0.62; }

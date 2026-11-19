@@ -39,6 +39,7 @@ export class BuildMode {
       if (!this.active) return;
       if (e.key === 'Escape') { if (this.decorHold) this.dropDecorToSpare(); else if (this.drag) this.cancelDrag(); else if (this.shopOpen) { this.shopOpen = false; this.draw(); } else this.close(); e.preventDefault(); e.stopPropagation(); }
       else if ((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey)) { this.undoLast(); e.preventDefault(); e.stopPropagation(); }
+      else if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey && this.cycleDecor(e.shiftKey ? -1 : 1)) { e.preventDefault(); e.stopPropagation(); }   // #111 Variante wählen
       else if (['e', 'E', 'Tab', 'i', 'I'].includes(e.key)) { e.preventDefault(); e.stopPropagation(); }
     }, true);
     // the window loses focus mid-drag (alt-tab, released outside): the part flies back
@@ -173,7 +174,7 @@ export class BuildMode {
     if (u.pressed('ok')) this.padPress();
     if (u.pressed('back')) { if (this.decorHold) this.dropDecorToSpare(); else if (this.drag) this.flyBack(null); else if (this.wire) { this.wire = null; this.draw(); } else return this.close(); }
     this.holdBtn(u, 'send', dt, () => this.sendTap(), () => this.sendHold());
-    this.holdBtn(u, 'context', dt, () => this.openCtx(), () => { this.undoLast(); this.buzz('nope'); });
+    this.holdBtn(u, 'context', dt, () => { if (!this.cycleDecor(1)) this.openCtx(); }, () => { this.undoLast(); this.buzz('nope'); });
     this.follow(dt);
   }
   // a window key tapped or held (Spiel › Controller › „Wegwerfen: rüber-Knopf halten“ is the hold time, like in the inventory)

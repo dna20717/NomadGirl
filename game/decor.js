@@ -15,7 +15,8 @@ export const DECOR_ARTS = [['addon', 'Ausschnitt eines Anbauteils'], ['neon', 'N
   ['birdhouse', 'Vogelhaus (Krähen)'], ['trophies', 'Kiste mit Fundstücken'], ['hammock', 'Hängematte'], ['lantern', 'Laterne'], ['mirror', 'Spiegel (Haare färben)'], ['pennants', 'Wimpelkette'], ['canopy', 'Fallschirm-Plane'], ['barrel', 'Feuertonne'], ['balcony', 'Balkon (begehbar)'], ['bridge', 'Brücke (begehbar)'], ['tower', 'Aussichtsturm (begehbar, Leiter)'], ['icon', 'Bild aus einem Symbol-Raster'], ['sprite', 'Bild mit Varianten (Baukasten)']];
 // #111 Camp-Baukasten: what can stand on a piece (Tragfläche)
 export const DECOR_CARRY = [['', 'Nichts'], ['content', 'Oberkante des Bilds'], ['fixed', 'In fester Höhe']];
-export const DECOR_EXTRAS = [['', 'Nichts'], ['fire', 'Flammen + Licht'], ['light', 'Licht'], ['candle', 'Kerzenlicht (klein)']];
+export const DECOR_EXTRAS = [['', 'Nichts'], ['fire', 'Flammen + Licht'], ['light', 'Licht'], ['candle', 'Kerzenlicht (klein)'], ['steam', 'Dampf'], ['rotor', 'Rotor (dreht, von der Seite)']];
+export const DECOR_USES = [['', 'Nichts'], ['mirror', 'Haare färben (Spiegel)'], ['rest', 'Ausruhen (eine Stunde, heilt)']];
 
 export const decorDef = (D, id) => D.decor?.[id] || null;
 export const placeOf = (D, id) => decorDef(D, id)?.place || 'ground';
@@ -122,7 +123,7 @@ export const balconies = rig => new Set((rig?.decor || []).filter(o => o.at?.sid
 // Free pieces stand on the ground, on a container roof or on another piece (at.on = 'deco:<i>', at.dx tiles from its centre).
 // Every piece rolls a variant of its picture (at.v) and maybe a mirror (at.f). Neighbours and ensembles only ever add Gemütlichkeit
 // (Dorfromantik: what fits gives a bonus, what does not costs nothing).
-export const variants = (D, id) => { const d = decorDef(D, id), a = d?.look && D.assets?.[d.look]; return d?.art === 'sprite' && a?.grid ? Math.max(1, a.grid[0] * a.grid[1]) : 1; };
+export const variants = (D, id) => { const d = decorDef(D, id), a = d?.look && D.assets?.[d.look]; return d?.art === 'sprite' && !d.growStages && a?.grid ? Math.max(1, a.grid[0] * a.grid[1]) : 1; };
 export const tagsOf = d => String(d?.tags || '').split(',').map(t => t.trim()).filter(Boolean);
 export const canCarry = d => !!d?.carry;
 const onIndex = at => { const m = /^deco:(\d+)$/.exec(at?.on || ''); return m ? Number(m[1]) : null; };
@@ -131,14 +132,17 @@ export function restOf(D, save, i, seen = new Set()) {
   const L = save?.rig?.decor || [], o = L[i];
   if (!o || seen.has(i)) return null;
   seen.add(i);
+  const mb = /^balc:(\d+)$/.exec(o.at?.on || '');
+  if (mb) return L[Number(mb[1])] ? { surf: `b${mb[1]}`, x: o.at.dx || 0, level: 0 } : null;
   const j = onIndex(o.at);
   if (j != null) { const b = restOf(D, save, j, seen); return b && { surf: b.surf, x: b.x + (o.at.dx || 0), level: b.level + 1 }; }
-  if (o.at?.ui != null && o.at?.p != null) return { surf: `r${o.at.ui}`, x: o.at.p * 2, level: 0 };
+  if (o.at?.ui != null && o.at?.p != null) return { surf: `${decorDef(D, o.id)?.place === 'wall' ? 'w' : 'r'}${o.at.ui}`, x: o.at.p * 6, level: 0 };   // a container place is about 6 tiles
   if (Number.isFinite(o.at?.x)) return { surf: 'g', x: o.at.x, level: 0 };
   return null;
 }
 // may this free piece go there? → reason or ''
 export function freeWhy(D, save, id, at) {
+  if (/^balc:\d+$/.test(at.on || '')) return decorDef(D, save.rig.decor?.[Number(at.on.slice(5))]?.id)?.art === 'balcony' ? '' : 'Kein Balkon';
   if (at.on != null) {
     const j = onIndex(at), L = save.rig.decor || [], b = L[j];
     if (j == null || !b) return 'Worauf?';
