@@ -133,5 +133,6 @@
  "rain": {"enabled": true, "chance": 30, "hours": [2, 6], "look": "abendglut_regen"},
  "board": {"enabled": true, "name": "Schwarzes Brett", "offset": -220, "lift": 210, "width": 132, "height": 96},
  "decor": {"max": 40, "back": 50, "cozyMax": 25, "ground": [-4, 20]},
- "storage": {"name": "Camp-Lager", "width": 10}
+ "storage": {"name": "Camp-Lager", "width": 10},
+ "critters": [{"look": "fennek_run", "every": [35, 80], "speed": 380, "night": 2}]
 }

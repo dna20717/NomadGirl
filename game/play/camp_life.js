@@ -36,6 +36,29 @@ export class CampLife {
     s.load.start();
   }
   cam() { return this.scene.cam || this.scene.cameras.main; }
+  // #107 Kleinvieh: now and then an animal (Camp › Kleinvieh, the fennec) runs across the camp ground, from one edge of the view to the
+  // other; in the evening more often. The animation looks to the right, to the left it is flipped.
+  updateCritters(time, dt) {
+    const s = this.scene, list = (this.C.critters || []).filter(c => c.look && s.textures.exists(c.look));
+    if (!list.length) return;
+    const night = this.lightK > 0.3;
+    if (!this.critter && time >= (this.critterAt ??= time + 4000)) {
+      const c = list[Math.floor(Math.random() * list.length)], info = s.assetInfo(c.look), v = this.cam().worldView;
+      if (info) {
+        const dir = Math.random() < 0.5 ? 1 : -1, x = dir > 0 ? v.x - 80 : v.right + 80;
+        const sp = s.add.sprite(x, this.campY, info.key).setOrigin(info.ox, info.oy).setScale(info.scale).setDepth(6).setFlipX(dir < 0);
+        if (info.anim) sp.play(info.anim);
+        this.critter = { sp, dir, speed: (c.speed || 380) * (0.85 + Math.random() * 0.3), until: dir > 0 ? v.right + 120 : v.x - 120 };
+      }
+      const [a, b] = Array.isArray(list[0].every) ? list[0].every : [40, 90], k = night ? Math.max(1, list[0].night || 2) : 1;
+      this.critterAt = time + (a + Math.random() * Math.max(0, b - a)) * 1000 / k;
+    }
+    const C = this.critter;
+    if (C) {
+      C.sp.x += C.dir * C.speed * dt / 1000;
+      if ((C.dir > 0 && C.sp.x > C.until) || (C.dir < 0 && C.sp.x < C.until)) { C.sp.destroy(); this.critter = null; }
+    }
+  }
   gustDelay() { const [a, b] = this.C.sound?.gustEvery || [9, 22]; return (a + Math.random() * (b - a)) * 1000; }
   updateSound(time) {
     const s = this.scene, S = this.C.sound || {}, l = s.leyla;

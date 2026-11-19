@@ -1032,6 +1032,7 @@ export class Camp {
       for (const d of this.doorLights) d.setAlpha(d.base * this.lightK * open).setVisible(this.lightK > 0 && open > 0.02);
     }
     this.updateSound(time);
+    this.updateCritters?.(time, dt);   // #107
     // the van's door: the workshop behind it shows only while the door is fully open
     for (const d of this.vanDoors || []) {
       // the benches fade in with the van's frames (#056: closed → cross-section), or as before after the door opened
