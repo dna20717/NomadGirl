@@ -136,5 +136,27 @@
  "storage": {"name": "Camp-Lager", "width": 10},
  "critters": [{"look": "fennek_run", "every": [35, 80], "speed": 380, "night": 2, "idles": "fennek_look,fennek_sniff,fennek_scratch", "stopChance": 75}],
  "null": "chassis.axles",
- "containers": {"height": 130, "tiles": "container_tiles", "ends": [81, 241], "step": 190, "rows": 228, "top": 153, "frame": 512, "band": [84, 96], "inner": 160}
+ "containers": {"height": 130, "tiles": "container_tiles", "ends": [81, 241], "step": 190, "rows": 228, "top": 153, "frame": 512, "band": [120, 132], "inner": 160},
+ "paint": {
+  "colors": [
+   "#b4202a",
+   "#df3e23",
+   "#fa6a0a",
+   "#f9a31b",
+   "#ffd541",
+   "#9cdb43",
+   "#14a02e",
+   "#5daf8d",
+   "#249fde",
+   "#285cc4",
+   "#bc4a9b",
+   "#e86a73",
+   "#f5a097",
+   "#dae0ea",
+   "#c7b08b",
+   "#71413b"
+  ],
+  "keepSat": 32,
+  "strength": 85
+ }
 }

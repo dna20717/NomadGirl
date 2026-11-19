@@ -1189,10 +1189,11 @@ export const AREAS = {
         table('hooks', 'Haken je Variante', [point('at', 'Haken', { unit: 'Bildpixel' })], { hint: 'Zeile 1 = Variante 1 …; leer = der Haken oben' }),
         num('rotor', 'Rotor-Länge', { unit: 'Bildpixel', min: 4 }),
         select('use', 'Benutzen', DECOR_USES, { hint: 'E am Stück' }), text('useHint', 'Knopf-Text', { hint: 'Ausruhen: z. B. „Dösen“' }), num('heal', 'Heilt', { unit: '%', min: 0 }),
+        bool('matchWall', 'Nimmt die Farbe des Containers an', { hint: '#114 Wand-Module: das Stück Wellblech im Bild wird wie der Container gestrichen' }), bool('foot', 'Steht unten an der Wand', { hint: 'Türen und Tore: auf dem Boden des Containers statt in zwei Höhen' }),
         bool('crows', 'Lockt Krähen an', { hint: 'Wie das Vogelhaus: Krähen sitzen darauf und auf Ecken' }), bool('shadow', 'Schatten am Boden', { hint: 'Aus = kein Kontaktschatten (Standard: an)' })] }],
     // art and place must go together, else the camp cannot draw or anchor it (Aufräumen 16.11.2026)
     check: (x, report) => {
-      const need = { pole: ['ground'], tower: ['ground'], balcony: ['side'], bridge: ['span'], tent: ['span'], sail: ['span'], line: ['span'], hammock: ['span'], pennants: ['span'], canopy: ['span'] }[x.art];
+      const need = { ladder: ['climb'], stairs: ['climb'], pole: ['ground'], tower: ['ground'], balcony: ['side'], bridge: ['span'], tent: ['span'], sail: ['span'], line: ['span'], hammock: ['span'], pennants: ['span'], canopy: ['span'] }[x.art];
       if (need && !need.includes(x.place)) report('error', `Art „${label(DECOR_ARTS, x.art)}“ geht nur ${need.map(p => label(DECOR_PLACES, p)).join(' / ')}`);
       if (x.place === 'span' && need == null && x.art) report('warning', `Art „${label(DECOR_ARTS, x.art)}“ hängt nicht zwischen zwei Punkten`);
       if (x.art === 'sprite' && !x.look) report('error', 'Bild mit Varianten braucht ein Symbol-Raster');
@@ -1340,6 +1341,8 @@ export const AREAS = {
         num('sound.fireMin', 'Feuer von weitem', { unit: '%', min: 0, max: 100 }), num('sound.fireRange', 'Hörweite', { unit: 'px', min: 50 }), num('sound.fireNear', 'Voll ab', { unit: 'px', min: 0, hint: 'Näher als das: volle Lautstärke' }),
         ref('sound.music', 'Musik', 'assets', { hint: 'Läuft leise im Hintergrund in Schleife (Leyla Theme). Lädt erst, wenn das Camp steht. M schaltet allen Ton aus' }), num('sound.musicVolume', 'Musik-Lautstärke', { unit: '%', min: 0, max: 100, hint: 'Dezent: um 15' }),
         num('sound.musicFadeIn', 'Musik einblenden', { unit: 's', min: 0, hint: 'So lange wird sie beim Betreten des Camps lauter' })] },
+      { title: 'Farben', fields: [lines('paint.colors', 'Farben', { hint: '#114 Farbe wie Townscaper: der Pinsel im Bau-Modus (P). Eine Farbe je Zeile (#rrggbb, am besten aus AAP-64)' }),
+        num('paint.keepSat', 'Bunt bleibt ab', { unit: '% Sättigung', min: 0, max: 100, hint: 'Pixel, die bunter sind (Warnstreifen, Rost, Schilder), behalten ihre Farbe' }), num('paint.strength', 'Deckkraft', { unit: '%', min: 0, max: 100 })] },
       { title: 'Container-Kacheln', fields: [ref('containers.tiles', 'Kacheln', 'assets', { hint: '#113: das Kachelbild (oben offen, unten zu): linkes Ende | ein Platz | rechtes Ende, je 4 px Abstand (tools/container_tiles.py)' }),
         size('containers.ends', 'Enden', { unit: 'px', hint: 'Breite linkes und rechtes Ende' }), num('containers.step', 'Ein Platz', { unit: 'px', min: 1 }), num('containers.rows', 'Zeilen je Kachel', { unit: 'px', min: 1 }),
         num('containers.top', 'Oberkante im Frame', { unit: 'px', min: 0 }), num('containers.frame', 'Frame-Höhe', { unit: 'px', min: 1 }),

@@ -363,6 +363,16 @@ export function resizeContainer(D, d, ui, n) {
   return { ok: true, popped: popped.map(w => w.id), from, to };
 }
 
+// #114 Farbe wie Townscaper: a container gets a colour (hex) or its original look (null); no Δ, no time
+export function paintUnit(D, d, ui, color) {
+  const u = d.rig.units[ui];
+  if (!u || u.kind !== 'container') return { ok: false, reason: 'Nur Container lassen sich streichen' };
+  if ((u.color || null) === (color || null)) return { ok: false, reason: 'Hat schon diese Farbe', same: true };
+  if (color) u.color = color; else delete u.color;
+  spend(D, d, 0, 0);
+  return { ok: true };
+}
+
 // ---------- building right away (Rig bauen 2.0): every action is a small draft that is applied at once ----------
 // act(D, save, d => op(...)) → { ok, reason, minutes, deltas }; nothing changes when the action fails or leaves problems
 export function act(D, save, fn) {
@@ -408,7 +418,7 @@ export function applyDraft(D, save, d) {
   if (bad.length) return { ok: false, reason: bad[0] };
   const old = save.inv.grids, grids = {};
   for (const [k, g] of Object.entries(old)) if (!rigGrid(k)) grids[k] = g;
-  const rig = { tractor: d.rig.tractor, units: d.rig.units.map(u => ({ kind: u.kind, id: u.id, ...(u.places != null && u.kind === 'container' ? { places: u.places } : {}), ...(u.level ? { level: u.level } : {}), ...(u.level && u.slot != null ? { slot: u.slot } : {}), ...(u.pos ? { pos: { place: u.pos.place, story: u.pos.story } } : {}), workshops: u.workshops.map(w => ({ id: w.id, at: w.at, ...(starsOf(w) ? { level: starsOf(w) } : {}) })) })),   // #078 the upgrade moves with the workshop
+  const rig = { tractor: d.rig.tractor, units: d.rig.units.map(u => ({ kind: u.kind, id: u.id, ...(u.places != null && u.kind === 'container' ? { places: u.places } : {}), ...(u.color ? { color: u.color } : {}), ...(u.level ? { level: u.level } : {}), ...(u.level && u.slot != null ? { slot: u.slot } : {}), ...(u.pos ? { pos: { place: u.pos.place, story: u.pos.story } } : {}), workshops: u.workshops.map(w => ({ id: w.id, at: w.at, ...(starsOf(w) ? { level: starsOf(w) } : {}) })) })),   // #078 the upgrade moves with the workshop
     spare: { workshops: d.rig.spare.workshops.map(w => w.id), containers: [...d.rig.spare.containers], parts: [...d.rig.spare.parts], ...(d.rig.spare.decor ? { decor: [...d.rig.spare.decor] } : {}) }, parts: clone(d.rig.parts || {}) };
   const spareLevels = d.rig.spare.workshops.filter(w => starsOf(w)).map(w => ({ id: w.id, level: starsOf(w) }));   // #078 packed on the scrapyard, the stars stay
   if (spareLevels.length) rig.spareLevels = spareLevels;

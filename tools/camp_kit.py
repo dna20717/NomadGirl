@@ -25,20 +25,26 @@ PICK = {
   'mirror':     [1, 0, 3],
   'plant_grow':  [0, 1, 2, 3],
   'cactus_grow': [0, 1, 2, 3],
+  # #114: one PixelLab sheet split into two pieces: (source sheet, cells)
+  'wall_windows': ('wall_modules', [0, 1, 2, 3, 7, 8, 9, 10, 12, 13, 14, 15]),
+  'wall_doors':   ('wall_modules', [4, 5, 6, 11]),
+  'inside_items': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
   # 4 x 4 sheets: the candidate is one picture, the numbers are its cells (row by row)
   'table_items':  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
   'wall_items':   [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
   'ground_items': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
 }
-GRID = {'table_items': (4, 4), 'wall_items': (4, 4), 'ground_items': (4, 4), 'plant_grow': (4, 1), 'cactus_grow': (4, 1)}
+GRID = {'wall_modules': (4, 4), 'inside_items': (4, 4), 'table_items': (4, 4), 'wall_items': (4, 4), 'ground_items': (4, 4), 'plant_grow': (4, 1), 'cactus_grow': (4, 1)}
 # baked size (hard pixels): the 4 x 4 sheets were painted bigger than life, tabletop things must fit on a table
 SCALE = {'table_items': 0.6}
 out = {}
 for name, pick in PICK.items():
     ims = []
+    srcname = name
+    if isinstance(pick, tuple): srcname, pick = pick
     for i in pick:
-        if name in GRID:
-            src = Image.open(f'{K}/candidates/{name}_0.png').convert('RGBA'); gx, gy = GRID[name]; cw = src.width // gx; ch = src.height // gy
+        if srcname in GRID:
+            src = Image.open(f'{K}/candidates/{srcname}_0.png').convert('RGBA'); gx, gy = GRID[srcname]; cw = src.width // gx; ch = src.height // gy
             im = src.crop(((i % gx) * cw, (i // gx) * ch, (i % gx + 1) * cw, (i // gx + 1) * ch))
         else:
             im = Image.open(f'{K}/candidates/{name}_{i}.png').convert('RGBA')

@@ -32,5 +32,13 @@
   "cozy": 2,
   "needs": [{"tag": "kram", "count": 3},{"tag": "kiste", "count": 1}],
   "description": "Kisten voller Kleinkram. Gemütliches Chaos."
- }
+ },
+ "fassade": {
+  "name": "Wohnliche Fassade",
+  "within": 6,
+  "cozy": 3,
+  "needs": [{"tag": "fenster", "count": 2},{"tag": "tür", "count": 1}],
+  "description": "Zwei Fenster und eine Tür an einem Container."
+ },
+ "gute_stube": {"name": "Gute Stube", "within": 5, "cozy": 3, "needs": [{"tag": "innen", "count": 3}], "description": "Drei Dinge drinnen in einem Container."}
 }

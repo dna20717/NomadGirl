@@ -1122,3 +1122,8 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .stats-box header .tut-tabs { margin-left: auto; }
 /* #111 Ensembles not standing yet: quieter */
 .build-row.dim { opacity: 0.62; }
+/* #114 the brush: a colour strip under the build bar */
+.bm-paint { display: flex; align-items: center; gap: 6px; flex-basis: 100%; padding: 6px 4px 2px; color: #ffd27a; }
+.bm-swatch { width: 30px; height: 26px; border-radius: 6px; border: 2px solid #3a2f45; background: var(--sw, #2b2233); color: #f2eef7; font: 600 10px Inter, sans-serif; cursor: pointer; }
+.bm-swatch:not([style]) { width: auto; padding: 0 8px; }
+.bm-swatch.on { border-color: #ffd27a; box-shadow: 0 0 0 2px #ffd27a55; }

@@ -6372,5 +6372,68 @@
   "source": "KI (PixelLab, Create Image Pro 256 × 80, vier Stufen nebeneinander, AAP-64, Referenzen Leyla + Pilot-Stücke) + Code (tools/camp_kit.py)",
   "date": "2026-11-19",
   "description": "#111: vier Wachstumsstufen des Kaktus in der Dose (Feld = Stufe)."
+ },
+ "kit_wall_windows": {
+  "name": "Camp-Baukasten · Fenster",
+  "kind": "icons",
+  "file": "assets/camp/kit/wall_windows.png",
+  "cell": [52, 52],
+  "grid": [12, 1],
+  "names": [
+   "Fenster",
+   "Bullauge",
+   "Schlitz",
+   "Fensterläden mit Blumen",
+   "Gitterfenster",
+   "Panoramafenster",
+   "Lüftung",
+   "Geklebtes Fenster",
+   "Neon OPEN",
+   "Katze am Fenster",
+   "Flaschenglas",
+   "Fenster mit Pflanze"
+  ],
+  "source": "KI (PixelLab, Create Image Pro 256 × 256, 4 × 4, AAP-64, Referenz Container bzw. Pilot-Stücke) + Code (tools/camp_kit.py)",
+  "date": "2026-11-19",
+  "description": "#114: Fenster in Containerwand-Stil (Pixeldichte der Container, im Spiel ×2)."
+ },
+ "kit_wall_doors": {
+  "name": "Camp-Baukasten · Türen & Tore",
+  "kind": "icons",
+  "file": "assets/camp/kit/wall_doors.png",
+  "cell": [52, 57],
+  "grid": [4, 1],
+  "names": ["Stahltür", "Tür mit Schild", "Rolltor", "Luke"],
+  "source": "KI (PixelLab, Create Image Pro 256 × 256, 4 × 4, AAP-64, Referenz Container bzw. Pilot-Stücke) + Code (tools/camp_kit.py)",
+  "date": "2026-11-19",
+  "description": "#114: Türen und Tore für die Containerwand."
+ },
+ "kit_inside_items": {
+  "name": "Camp-Baukasten · Innenkram",
+  "kind": "icons",
+  "file": "assets/camp/kit/inside_items.png",
+  "cell": [64, 58],
+  "grid": [16, 1],
+  "names": [
+   "Bücherregal",
+   "Hängelampe",
+   "Lichterkette",
+   "Karte",
+   "Kräuterbund",
+   "Gitarre",
+   "Dartscheibe",
+   "Kalender",
+   "Familienfotos",
+   "Gewürzregal",
+   "Wimpel",
+   "Hängeampel",
+   "Radio",
+   "Bandposter",
+   "Kuckucksuhr",
+   "Garderobe"
+  ],
+  "source": "KI (PixelLab, Create Image Pro 256 × 256, 4 × 4, AAP-64, Referenz Container bzw. Pilot-Stücke) + Code (tools/camp_kit.py)",
+  "date": "2026-11-19",
+  "description": "#114: Innen an die Rückwand oder an die Decke."
  }
 }

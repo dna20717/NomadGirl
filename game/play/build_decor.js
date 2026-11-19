@@ -65,10 +65,11 @@ export class BuildDecor {
     this.decorHold = { id, from, a: null };
     this.shopOpen = false;
     const k = placeOf(this.D, id);
+    if (k === 'inside') { const A = this.areas().find(a => a.key === 'rig'); if (A) { this.areaNow = A; this.frame(A); } if (!this.scene.hud.rigOpen) this.toggleOpen?.(); }   // #114 inside: the containers open
     if (k === 'ground' || k === 'span' || k === 'free') { const A = this.areas().find(a => a.key === 'camp'); if (A) { this.areaNow = A; this.frame(A); } }   // to the campsite
     const nv = variants(this.D, id);
     if (nv > 1 && this.decorHold.v == null) this.decorHold.v = Math.floor(Math.random() * nv);
-    this.say(k === 'span' ? 'Erster Punkt: Container-Ecke, Mast oder Zeltstange' : k === 'free' ? `Auf den Boden, ein Dach, einen Balkon oder ein anderes Stück stellen${nv > 1 ? ` · R: Variante (${nv})` : ''}` : k === 'ground' ? 'Auf den Boden am Lagerplatz stellen' : k === 'wall' ? 'An eine Container-Wand hängen' : k === 'side' ? 'An ein Container-Ende (Balkon)' : 'Auf ein Container-Dach stellen', 'idle');
+    this.say(k === 'span' ? 'Erster Punkt: Container-Ecke, Mast oder Zeltstange' : k === 'free' ? `Auf den Boden, ein Dach, einen Balkon oder ein anderes Stück stellen${nv > 1 ? ` · R: Variante (${nv})` : ''}` : k === 'inside' ? 'In einen Container: an die Decke oder innen an die Wand' : k === 'ground' ? 'Auf den Boden am Lagerplatz stellen' : k === 'wall' ? 'An eine Container-Wand hängen' : k === 'side' ? 'An ein Container-Ende (Balkon)' : 'Auf ein Container-Dach stellen', 'idle');
     this.draw();
   }
   // Esc / B: the piece in hand goes into the Lager
@@ -197,8 +198,9 @@ export class BuildDecor {
     if (!d || d.art !== 'sprite' || !s.textures.exists(d.look)) { this.decorGhost?.setVisible(false); return; }
     const fr = this.camp.kitFrame(d, { v: h.v ?? 0 }), k = (d.scale || 100) / 100;
     if (!this.decorGhost || !this.decorGhost.scene) this.decorGhost = s.add.image(0, 0, d.look, fr).setOrigin(0.5, 1).setDepth(-15.8);
-    const wall = d.place === 'wall', y = t ? (wall ? t.y : t.stack || t.balc ? t.y + 4 : t.at?.ui != null ? t.y + 6 : this.camp.ground) : null;
-    this.decorGhost.setTexture(d.look, fr).setScale(k).setOrigin(0.5, wall ? 0.5 : 1).setFlipX(!!(d.flip && h.f)).setVisible(!!t).setAlpha(0.6 + 0.15 * Math.sin(this.scene.time.now / 160));
+    const foot = d.place === 'wall' && d.foot, hang = t?.at?.row === 'top', wall = (d.place === 'wall' && !foot) || (d.place === 'inside' && !hang);
+    const y = t ? (hang ? t.y - 20 : wall ? t.y : t.stack || t.balc ? t.y + 4 : foot ? t.y : t.at?.ui != null ? t.y + 6 : this.camp.ground) : null;
+    this.decorGhost.setTexture(d.look, fr).setScale(k).setOrigin(0.5, hang ? 0 : wall ? 0.5 : 1).setFlipX(!!(d.flip && h.f)).setVisible(!!t).setAlpha(0.6 + 0.15 * Math.sin(this.scene.time.now / 160));
     if (t) this.decorGhost.setPosition(Math.round(t.x), Math.round(y) + (wall ? 0 : 1));
   }
   // controller: AvA hops between the places of the piece in hand
@@ -210,4 +212,4 @@ export class BuildDecor {
     return this.camp.decorSpots(h.id).filter((q, i) => k === 'free' ? (q.at.x == null || Math.abs(q.at.x % 1) < 0.01) && (q.at.p == null || Math.abs(q.at.p % 0.5) < 0.01) : i % 2 === 0 || k !== 'ground').map(q => ({ x: q.x, y: q.y - 10, label: q.label }));
   }
 }
-const placeName = p => ({ free: 'Boden, Dach, aufeinander', ground: 'Boden', wall: 'Wand', roof: 'Dach', side: 'Container-Ende', span: 'zwischen zwei Punkten' })[p] || '';
+const placeName = p => ({ inside: 'im Container', free: 'Boden, Dach, aufeinander', ground: 'Boden', wall: 'Wand', roof: 'Dach', side: 'Container-Ende', span: 'zwischen zwei Punkten' })[p] || '';

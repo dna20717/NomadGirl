@@ -9,13 +9,18 @@
 //   save.rig.spare.decor = [id]          bought or taken down, waiting in the Lager
 // Gemütlichkeit (cozy): every piece adds its points; the sum makes sleeping and resting give stronger buffs (capped, Camp › Deko).
 
-export const DECOR_PLACES = [['free', 'Frei (Boden, Dach, aufeinander)'], ['ground', 'Auf dem Boden'], ['wall', 'An der Container-Wand'], ['roof', 'Auf dem Dach'], ['side', 'Am Container-Ende (Balkon)'], ['span', 'Zwischen zwei Punkten']];
+export const DECOR_PLACES = [['free', 'Frei (Boden, Dach, aufeinander)'], ['inside', 'Im Container (Rückwand, Decke)'], ['climb', 'An der Container-Wand (Leiter, Treppe)'], ['ground', 'Auf dem Boden'], ['wall', 'An der Container-Wand'], ['roof', 'Auf dem Dach'], ['side', 'Am Container-Ende (Balkon)'], ['span', 'Zwischen zwei Punkten']];
 export const DECOR_ARTS = [['addon', 'Ausschnitt eines Anbauteils'], ['neon', 'Neon-Schild'], ['banner', 'Banner'], ['graffiti', 'Graffiti'], ['line', 'Wäscheleine'],
   ['sail', 'Sonnensegel'], ['tent', 'Zelt'], ['pole', 'Zeltstange (Ankerpunkt)'], ['windmill', 'Windrad'], ['plant', 'Pflanze im Topf'], ['tripod', 'Dreibein mit Topf'],
-  ['birdhouse', 'Vogelhaus (Krähen)'], ['trophies', 'Kiste mit Fundstücken'], ['hammock', 'Hängematte'], ['lantern', 'Laterne'], ['mirror', 'Spiegel (Haare färben)'], ['pennants', 'Wimpelkette'], ['canopy', 'Fallschirm-Plane'], ['barrel', 'Feuertonne'], ['balcony', 'Balkon (begehbar)'], ['bridge', 'Brücke (begehbar)'], ['tower', 'Aussichtsturm (begehbar, Leiter)'], ['icon', 'Bild aus einem Symbol-Raster'], ['sprite', 'Bild mit Varianten (Baukasten)']];
+  ['birdhouse', 'Vogelhaus (Krähen)'], ['trophies', 'Kiste mit Fundstücken'], ['hammock', 'Hängematte'], ['lantern', 'Laterne'], ['mirror', 'Spiegel (Haare färben)'], ['pennants', 'Wimpelkette'], ['canopy', 'Fallschirm-Plane'], ['barrel', 'Feuertonne'], ['balcony', 'Balkon (begehbar)'], ['bridge', 'Brücke (begehbar)'], ['tower', 'Aussichtsturm (begehbar, Leiter)'], ['icon', 'Bild aus einem Symbol-Raster'], ['sprite', 'Bild mit Varianten (Baukasten)'], ['ladder', 'Leiter aufs Dach (kletterbar)'], ['stairs', 'Treppe in den Container (kletterbar)']];
 // #111 Camp-Baukasten: what can stand on a piece (Tragfläche)
 export const DECOR_CARRY = [['', 'Nichts'], ['content', 'Oberkante des Bilds'], ['fixed', 'In fester Höhe']];
 export const DECOR_EXTRAS = [['', 'Nichts'], ['fire', 'Flammen + Licht'], ['light', 'Licht'], ['candle', 'Kerzenlicht (klein)'], ['steam', 'Dampf'], ['rotor', 'Rotor (dreht, von der Seite)']];
+// #114 Farbe wie Townscaper: arts that take a painted colour (cloth and light)
+export const PAINTABLE = new Set(['tent', 'sail', 'canopy', 'pennants', 'banner', 'line', 'hammock', 'neon']);
+export const lighten = (hex, k = 0.45) => { const n = parseInt(hex.slice(1), 16), f = c => Math.round(c + (255 - c) * k); return '#' + [f((n >> 16) & 255), f((n >> 8) & 255), f(n & 255)].map(v => v.toString(16).padStart(2, '0')).join(''); };
+// a piece's definition with its painted colour applied (at.paint)
+export const paintedDef = (d, at) => (at?.paint && d && PAINTABLE.has(d.art) ? { ...d, color: at.paint, colors: `${at.paint},${lighten(at.paint)}` } : d);
 export const DECOR_USES = [['', 'Nichts'], ['mirror', 'Haare färben (Spiegel)'], ['rest', 'Ausruhen (eine Stunde, heilt)']];
 
 export const decorDef = (D, id) => D.decor?.[id] || null;
@@ -39,7 +44,7 @@ export function put(D, save, id, at) {
   const kind = placeOf(D, id), R = dstate(save);
   if (!at) return { ok: false, why: 'Kein Platz' };
   if (kind === 'span' && (!at.a || !at.b || at.a === at.b)) return { ok: false, why: 'Zwei verschiedene Punkte wählen' };
-  if ((kind === 'wall' || kind === 'roof') && (at.ui == null || at.p == null)) return { ok: false, why: 'An einen Container' };
+  if ((kind === 'wall' || kind === 'roof' || kind === 'inside' || kind === 'climb') && (at.ui == null || at.p == null)) return { ok: false, why: 'An einen Container' };
   if (kind === 'side' && (at.ui == null || (at.side !== 0 && at.side !== 1))) return { ok: false, why: 'An ein Container-Ende' };
   if (kind === 'side' && R.decor.some(o => o.at?.ui === at.ui && o.at?.side === at.side)) return { ok: false, why: 'Da ist schon ein Balkon' };
   if (kind === 'ground' && !Number.isFinite(at.x)) return { ok: false, why: 'Auf den Boden' };
@@ -136,7 +141,7 @@ export function restOf(D, save, i, seen = new Set()) {
   if (mb) return L[Number(mb[1])] ? { surf: `b${mb[1]}`, x: o.at.dx || 0, level: 0 } : null;
   const j = onIndex(o.at);
   if (j != null) { const b = restOf(D, save, j, seen); return b && { surf: b.surf, x: b.x + (o.at.dx || 0), level: b.level + 1 }; }
-  if (o.at?.ui != null && o.at?.p != null) return { surf: `${decorDef(D, o.id)?.place === 'wall' ? 'w' : 'r'}${o.at.ui}`, x: o.at.p * 6, level: 0 };   // a container place is about 6 tiles
+  if (o.at?.ui != null && o.at?.p != null) return { surf: `${({ wall: 'w', inside: 'i' })[decorDef(D, o.id)?.place] || 'r'}${o.at.ui}`, x: o.at.p * 6, level: 0 };   // a container place is about 6 tiles
   if (Number.isFinite(o.at?.x)) return { surf: 'g', x: o.at.x, level: 0 };
   return null;
 }

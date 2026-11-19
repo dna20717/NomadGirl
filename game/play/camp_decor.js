@@ -3,9 +3,9 @@
 // pieces stand on top; ground pieces on the campsite; span pieces hang between two anchors (container corners, the mast, poles).
 // Some move: neon flickers, banners and laundry sway, the windmill turns faster in gusts, the kettle steams, crows fly up when
 // Leyla comes near. Mixed into Camp like CampLife (logic: game/decor.js).
-import { decorDef, placeOf, plantStage, dstate, tagsOf, freeWhy, canCarry, cozy } from '../decor.js';
+import { decorDef, placeOf, plantStage, dstate, tagsOf, freeWhy, canCarry, cozy, paintedDef } from '../decor.js';
 import { catenary } from '../string_lights.js';
-import { glowTexture } from './camp.js';
+import { glowTexture, paintPixels } from './camp.js';
 import { advance, clockText } from '../save.js';
 import { ladderArt } from './ladder_art.js';
 import { mirrorRows, dye, dyedUrl } from './signature.js';
@@ -24,6 +24,8 @@ export class CampDecor {
   decorUnit(ui) { return (this.geo.units || []).find(u => u.ui === ui) || null; }
   groundX(x) { return ((this.geo.campCol ?? 0) + x) * this.scene.T; }
   wallAt(ui, p, row) { const u = this.decorUnit(ui); return u && { u, x: u.in0 + (p + 0.5) * u.cell, y: u.inTop + (u.floorY - u.inTop) * (row ?? 0.4) }; }
+  // #114 inside a container: on its back wall (row = share of the interior height) or hanging from its ceiling (row 'top')
+  insideAt(ui, p, row) { const u = this.decorUnit(ui); return u && { u, x: u.in0 + (p + 0.5) * u.cell, y: row === 'top' ? u.inTop + 2 : u.inTop + (u.floorY - u.inTop) * (row ?? 0.25), hang: row === 'top' }; }
   roofAt(ui, p) { const u = this.decorUnit(ui); return u && { u, x: u.in0 + (p + 0.5) * u.cell, y: u.deckY ?? (u.inTop - 34) }; }
   // every point a span can hang on: container corners, the mast (string lights), and the tops of poles
   spanAnchors() {
@@ -50,6 +52,8 @@ export class CampDecor {
   // candidate places for a piece of this kind (build mode): [{ at, x, y, label }]
   decorSpots(id) {
     if (placeOf(this.D, id) === 'free') return this.freeSpots(id);
+    if (placeOf(this.D, id) === 'inside') return this.insideSpots(id);   // #114
+    if (placeOf(this.D, id) === 'climb') return this.climbSpots(id);   // #114
     const D = this.D, kind = placeOf(D, id), T = this.scene.T, out = [], save = this.box.save, used = new Set((save.rig.decor || []).map(x => { const { day, v, f, ...r } = x.at || {}; return JSON.stringify(r); }));
     if (kind === 'ground') {
       const [a, b] = D.camp?.decor?.ground || [-4, 20], step = 0.5;
@@ -71,7 +75,7 @@ export class CampDecor {
         if (u.ui === 0) continue;
         if (kind === 'wall' && decorDef(D, id)?.art === 'sprite') {   // #111: hung freely, half places, high or low
           const st = (T * 0.5) / u.cell;
-          for (let p0 = -0.5 + st; p0 <= (u.places || 0) - 0.5 - st + 1e-6; p0 += st) for (const row of [0.3, 0.62]) {
+          for (let p0 = -0.5 + st; p0 <= (u.places || 0) - 0.5 - st + 1e-6; p0 += st) for (const row of decorDef(D, id)?.foot ? [1] : [0.3, 0.62]) {   // #114 doors: on the floor
             const p = Math.round(p0 * 1000) / 1000, at = { ui: u.ui, p, row };
             if (used.has(JSON.stringify(at))) continue;
             const q = this.wallAt(u.ui, p, row);
@@ -106,7 +110,7 @@ export class CampDecor {
   dAdd(o) { this.rigObjs.push(o); return o; }
   shellOf(u) { return (this.shells || []).find(c => c.u === u) || null; }
   drawPiece(x, i) {
-    const s = this.scene, D = this.D, d = decorDef(D, x.id), T = s.T;
+    const s = this.scene, D = this.D, d = paintedDef(decorDef(D, x.id), x.at), T = s.T;   // #114 painted cloth
     if (!d) return;
     const kind = d.place || 'ground', [sw, sh] = d.size || [1, 1], w = sw * T, h = sh * T, at = x.at || {};
     const seed = hash(i, at.x ?? 0, at.ui ?? 0, at.p ?? 0);
@@ -119,13 +123,15 @@ export class CampDecor {
     }
     if (kind === 'side') { const b = this.balconyAt(at.ui, at.side, d); if (b) this.art_balcony(b, d, seed, at.side); return; }
     if (kind === 'free') { const q = this.freePos(i); if (q) this.art_sprite(q, d, x, i); return; }
+    if (kind === 'climb') { const c = this.climbAt(at.ui, at.p); if (c) this[`art_${d.art}`]?.(c, d, x, i); return; }   // #114
+    if (kind === 'inside') { const q = this.insideAt(at.ui, at.p, at.row); if (q) this.art_sprite({ ...q, level: 0, inside: true }, d, x, i); return; }   // #114
     let pos;
     if (kind === 'ground') pos = { x: this.groundX(at.x), y: this.ground };
-    else if (kind === 'wall') pos = this.wallAt(at.ui, at.p, at.row);
+    else if (kind === 'wall') { pos = this.wallAt(at.ui, at.p, at.row); if (pos && d.foot) pos = { ...pos, y: pos.u.floorY, foot: true }; }   // #114 doors stand on the container's floor
     else pos = this.roofAt(at.ui, at.p);
     if (!pos) return;
     const before = new Set(s.children.list);
-    if (d.art === 'sprite') this.art_sprite({ x: pos.x, y: pos.y, u: pos.u, level: 0, wall: kind === 'wall' }, d, x, i);
+    if (d.art === 'sprite') this.art_sprite({ x: pos.x, y: pos.y, u: pos.u, level: 0, wall: kind === 'wall' && !pos.foot, foot: pos.foot, shell: kind === 'wall' }, d, x, i);
     else this[`art_${d.art}`]?.(pos.x, pos.y, w, h, d, seed, pick, x);
     // wall pieces belong to the container's skin: they fade when it opens (like the workshops' outside pictures)
     if (kind === 'wall' && pos.u) { const sh0 = this.shellOf(pos.u); if (sh0) for (const o of s.children.list) if (!before.has(o) && o.setAlpha) sh0.extras.push(o); }
@@ -188,18 +194,37 @@ export class CampDecor {
     }
     return !!(d.flip && o.at?.f);
   }
+  // #114 a picture sheet in a container's colour (camp.js paintPixels), made once per colour
+  paintedSheet(key, hex) {
+    const s = this.scene, out = `${key}__p${hex.slice(1)}`;
+    if (s.textures.exists(out)) return out;
+    const src = s.textures.get(key).getSourceImage(), A = this.D.assets?.[key], [cw, ch] = Array.isArray(A?.cell) ? A.cell : [A?.cell || src.width, A?.cell || src.height];
+    const tex = s.textures.createCanvas(out, src.width, src.height), ctx = tex.getContext();
+    ctx.imageSmoothingEnabled = false; ctx.drawImage(src, 0, 0);
+    paintPixels(ctx, src.width, src.height, hex, this.D.camp?.paint);
+    tex.refresh();
+    for (let n = 0, gx = Math.floor(src.width / cw), gy = Math.floor(src.height / ch); n < gx * gy; n++) tex.add(n, 0, (n % gx) * cw, Math.floor(n / gx) * ch, cw, ch);
+    tex.setFilter(Phaser.Textures.FilterMode.NEAREST);
+    return out;
+  }
   art_sprite(q, d, o, i) {
     const s = this.scene;
     if (!d.look || !s.textures.exists(d.look)) return;
     s.textures.get(d.look).setFilter(Phaser.Textures.FilterMode.NEAREST);
-    const fr = this.kitFrame(d, o.at), k = this.kitScale(d), flip = this.kitFlip(d, o, i, q), f = s.textures.getFrame(d.look, fr);
-    const x = Math.round(q.x), depth = q.wall ? -16.2 + i * 0.00001 : -15.9 + q.level * 0.002 + i * 0.00001;
+    const unitColor = d.matchWall && q.u ? this.box.save.rig.units[q.u.ui]?.color : null, look = unitColor ? this.paintedSheet(d.look, unitColor) : d.look;   // #114 a window takes its container's colour
+    const fr = this.kitFrame(d, o.at), k = this.kitScale(d), flip = this.kitFlip(d, o, i, q), f = s.textures.getFrame(look, fr);
+    const x = Math.round(q.x), depth = q.shell || q.wall ? -16.2 + i * 0.00001 : -15.9 + q.level * 0.002 + i * 0.00001;
     const c = this.kitContent(d.look, fr) || { h: f.height, w: f.width };
-    // wall pieces hang by their middle (the painted part), the rest stand on their feet
-    const y = Math.round(q.wall ? q.y + (c.h * k) / 2 : q.y);
+    // wall pieces hang by their middle (the painted part), hanging ones by their top, the rest stand on their feet
+    const y = Math.round(q.hang ? q.y + c.h * k : q.wall ? q.y + (c.h * k) / 2 : q.y);
     // a soft contact shadow under ground and roof pieces
-    if (!q.level && !q.wall && d.shadow !== false) { const g = this.dG(depth - 0.0005); g.fillStyle(0x060608, 0.28).fillEllipse(x, y - 1, f.width * k * 0.8, 7); }
-    const img = this.dAdd(s.add.image(x, y + (q.wall ? 0 : 1), d.look, fr).setOrigin(0.5, 1).setScale(k).setFlipX(flip).setDepth(depth));
+    if (!q.level && !q.wall && !q.inside && !q.shell && d.shadow !== false) { const g = this.dG(depth - 0.0005); g.fillStyle(0x060608, 0.28).fillEllipse(x, y - 1, f.width * k * 0.8, 7); }
+    let img;
+    if (q.inside && q.u?.view) {   // #114 inside: on the container's back wall, behind its workshops (in the unit's view, right after its picture)
+      const v = q.u.view, mid = (q.u.x0 + q.u.x1) / 2, G = q.u.base ?? this.ground, si = v.list.findIndex(o2 => o2.texture?.key === q.u.sprite?.key);
+      img = s.add.image(x - mid, y - G, look, fr).setOrigin(0.5, 1).setScale(k).setFlipX(flip);
+      v.addAt(img, si + 1);
+    } else img = this.dAdd(s.add.image(x, y + (q.wall || q.shell ? 0 : 1), look, fr).setOrigin(0.5, 1).setScale(k).setFlipX(flip).setDepth(depth));
     (this.decorBoxes ??= [])[i] = { x0: x - f.width * k / 2, x1: x + f.width * k / 2, y0: y - c.h * k, y1: y, x, y };
     // pop in when it was just placed (Tiny Glade: every click answers)
     if (this.kitPop === i) { img.setScale(k * 0.6, k * 1.25); s.tweens.add({ targets: img, scaleX: k, scaleY: k, duration: 260, ease: 'Back.Out' }); this.kitPop = null; }
@@ -325,6 +350,65 @@ export class CampDecor {
       for (let n = 0; n < 5; n++) s.time.delayedCall(n * 90, () => s.fx?.puff?.(at.x + (Math.random() - 0.5) * 30, at.y - 30 - n * 6, 0xe86a73));
       img.setScale(1.08, 0.94); s.tweens.add({ targets: img, scaleX: 1, scaleY: 1, duration: 300, ease: 'Back.Out' });
     } });
+  }
+  // #114 inside: every container, half-tile steps, hanging from the ceiling or on the back wall (two heights)
+  insideSpots(id) {
+    const T = this.scene.T, out = [], used = new Set((this.box.save.rig.decor || []).map(x => { const { day, v, f, paint, ...r } = x.at || {}; return JSON.stringify(r); }));
+    if (this.geo.mega) return out;
+    for (const u of this.geo.units || []) {
+      if (u.ui === 0) continue;
+      const st = (T * 0.5) / u.cell;
+      for (let p0 = -0.5 + st; p0 <= (u.places || 0) - 0.5 - st + 1e-6; p0 += st) for (const row of ['top', 0.2, 0.42]) {
+        const p = Math.round(p0 * 1000) / 1000, at = { ui: u.ui, p, row };
+        if (used.has(JSON.stringify(at))) continue;
+        const q = this.insideAt(u.ui, p, row);
+        out.push({ at, x: q.x, y: q.y + (row === 'top' ? 20 : 0), label: row === 'top' ? 'An die Decke' : 'Innen an die Wand', inside: true });
+      }
+    }
+    return out;
+  }
+  // #114 Treppen & Wege frei: where a ladder or stair leans against a container (half-tile steps along it)
+  climbAt(ui, p) {
+    const u = this.decorUnit(ui); if (!u) return null;
+    const x = u.in0 + (p + 0.5) * u.cell, G = u.base ?? this.ground, U = this.box.save.rig.units;
+    // a container stacked right above that covers x: the ladder leads into it, else onto the roof
+    const above = (this.geo.units || []).find(o => o.ui > ui && (U[o.ui]?.level || 0) === (U[ui]?.level || 0) + 1 && x > o.in0 && x < o.in0 + o.cell * o.places && Math.abs((o.base ?? 0) - (u.deckY ?? u.inTop)) < 40);
+    return { u, x, bottom: G, roof: u.deckY ?? (u.inTop - 30), floor: u.floorY, into: above ? above.floorY : null };
+  }
+  climbSpots(id) {
+    const T = this.scene.T, out = [], used = new Set((this.box.save.rig.decor || []).filter(x => placeOf(this.D, x.id) === 'climb').map(x => `${x.at.ui}:${x.at.p}`));
+    if (this.geo.mega) return out;
+    for (const u of this.geo.units || []) {
+      if (u.ui === 0) continue;
+      const st = (T * 0.5) / u.cell;
+      for (let p0 = -0.5 + st; p0 <= (u.places || 0) - 0.5 - st + 1e-6; p0 += st) {
+        const p = Math.round(p0 * 1000) / 1000; if (used.has(`${u.ui}:${p}`)) continue;
+        const c = this.climbAt(u.ui, p);
+        out.push({ at: { ui: u.ui, p }, x: c.x, y: (c.bottom + c.floor) / 2, label: decorDef(this.D, id)?.art === 'stairs' ? 'Treppe hierhin' : 'Leiter hierhin' });
+      }
+    }
+    return out;
+  }
+  // a ladder up the container's wall onto its roof (or into the container stacked above): climbable like the rig's own
+  art_ladder(c, d, o, i) {
+    const s = this.scene, T = s.T, top = c.into ?? c.roof, bottom = c.bottom;
+    const art = ladderArt(s, c.x - T / 2, c.x + T / 2, top, bottom, { depth: -16.4, tint: d.color ? col(d.color) : undefined });
+    if (art) this.dAdd(art);
+    else { const g = this.dG(-16.4); this.dR(g, c.x - 22, top, 6, bottom - top, C.ink); this.dR(g, c.x + 16, top, 6, bottom - top, C.ink); for (let y = bottom - 20; y > top; y -= 28) this.dR(g, c.x - 16, y, 32, 4, C.steel); }
+    s.ladders.push({ cx: c.x, x0: c.x - T / 2, x1: c.x + T / 2, top, bottom, rig: true });
+    (this.decorBoxes ??= [])[i] = { x0: c.x - T / 2, x1: c.x + T / 2, y0: top, y1: bottom, x: c.x, y: bottom };
+  }
+  // a folding stair from the ground into the container (the Klapptreppe picture of Camp › Gemütlichkeit), freely along its side
+  art_stairs(c, d, o, i) {
+    const s = this.scene, T = s.T, top = c.floor, bottom = this.ground, info = this.C?.stairs?.look && s.assetInfo(this.C.stairs.look);
+    if (info) {
+      s.textures.get(info.key).setFilter(Phaser.Textures.FilterMode.NEAREST);
+      const src = s.textures.get(info.key).getSourceImage(), land = (this.C.stairs.landing ?? 26) / src.height, feet = (this.C.stairs.feet ?? 123) / src.height;
+      const k = Math.max(0.6, (bottom - top) / ((feet - land) * src.height)), ox = (this.C.stairs.at ?? 85) / src.width;
+      this.dAdd(s.add.image(c.x, bottom + (1 - feet) * src.height * k, info.key).setOrigin(ox, 1).setScale(k).setFlipX(!!o.at?.f).setDepth(-16.4));
+    } else this.art_ladder({ ...c, roof: top, into: null, bottom }, d, o, i);
+    s.ladders.push({ cx: c.x, x0: c.x - T / 2, x1: c.x + T / 2, top, bottom, rig: true, ground: true, stairs: !!info });
+    (this.decorBoxes ??= [])[i] = { x0: c.x - T / 2, x1: c.x + T / 2, y0: top, y1: bottom, x: c.x, y: bottom };
   }
   // candidate places for a free piece: on the ground, on roofs, on top of pieces that carry
   freeSpots(id) {

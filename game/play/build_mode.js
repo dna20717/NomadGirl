@@ -21,6 +21,7 @@ import { makeSfx } from './sfx.js';
 import { preview as synPreview, synergyText } from '../synergy.js';
 import { BuildDecor } from './build_decor.js';
 import { BuildResize } from './build_resize.js';
+import { BuildPaint } from './build_paint.js';
 
 const FN_COLORS = { storage: '#5c6b7a', cooling: '#4a7a9a', cell: '#5a4a4a', sleep: '#6a5a9a', chill: '#9a4a7a', drone: '#3a8a6a', warroom: '#7a6a3a', kitchen: '#a8642a', foodtruck: '#c0703a', craft: '#7a6235', engine: '#5a5a5a', power: '#a8862a' };
 const FN_NAMES = { storage: 'Lager', cooling: 'Kühlung', cell: 'Zelle', sleep: 'Schlafen', chill: 'Chillen', drone: 'Drohnen', warroom: 'Planung', kitchen: 'Kochen', foodtruck: 'Verkauf', craft: 'Herstellen', engine: 'Motor', power: 'Energie' };
@@ -39,6 +40,8 @@ export class BuildMode {
     document.addEventListener('keydown', e => {
       if (!this.active) return;
       if (e.key === 'Escape' && this.resizing) { this.endResize(); e.preventDefault(); e.stopPropagation(); }
+      else if (e.key === 'Escape' && this.painting != null) { this.togglePaint(false); e.preventDefault(); e.stopPropagation(); }   // #114
+      else if ((e.key === 'p' || e.key === 'P') && !e.ctrlKey && !e.metaKey) { this.togglePaint(); e.preventDefault(); e.stopPropagation(); }
       else if (e.key === 'Escape') { if (this.decorHold) this.dropDecorToSpare(); else if (this.drag) this.cancelDrag(); else if (this.shopOpen) { this.shopOpen = false; this.draw(); } else this.close(); e.preventDefault(); e.stopPropagation(); }
       else if ((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey)) { this.undoLast(); e.preventDefault(); e.stopPropagation(); }
       else if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey && this.cycleDecor(e.shiftKey ? -1 : 1)) { e.preventDefault(); e.stopPropagation(); }   // #111 Variante wählen
@@ -110,6 +113,7 @@ export class BuildMode {
     if (!this.active) return;
     if (this.decorHold) this.dropDecorToSpare();   // a piece in hand goes into the Lager instead of vanishing
     if (this.resizing) this.endResize();   // #113
+    this.painting = null;   // #114
     const s = this.scene, cam = s.cam, back = this.camBack;
     if (s.drone) s.drone.build = null;
     if (this.atFire && s.leyla.state === 'sit' && s.leyla.sit && !s.leyla.sit.up) s.leyla.sit.up = s.time.now;   // back to the player: she gets up
@@ -304,6 +308,7 @@ export class BuildMode {
   // A: pack what is under AvA's claw, or put the held thing down there
   padPress() {   // (not press(): this.press is the mouse press of pointerDown)
     const w = { x: this.ava.x, y: this.ava.y };
+    if (this.painting != null) return this.paintAt(w);   // #114
     if (this.decorHold) return this.placeDecor(w);
     if (this.drag) return this.drop();
     if (this.wire) return this.finishWire(w);
@@ -450,6 +455,7 @@ export class BuildMode {
           el('small', { class: 'bm-clock' }, clockText(save)),
           el('b', { class: 'build-deltas' }, `${de(save.deltas)} Δ`),
           el('button', { class: 'inv-btn bm-shopbtn' + (this.shopOpen ? ' on' : ''), onclick: () => { this.shopOpen = !this.shopOpen; this.draw(); } }, icon('shop', 15), ' Händler'),
+          el('button', { class: 'inv-btn ghost bm-brushbtn' + (this.painting != null ? ' on' : ''), title: 'Pinsel (P): Container und Stoffe umfärben', onclick: () => this.togglePaint() }, icon('brush', 15), ' Pinsel'),   // #114
           el('button', { class: 'inv-btn ghost bm-openbtn' + (this.scene.hud.rigOpen ? ' on' : ''), title: 'Rig offen: alle Container bleiben offen (auch außerhalb des Bau-Modus). Controller: Select', onclick: () => this.toggleOpen() }, icon(this.scene.hud.rigOpen ? 'door' : 'box', 15), this.scene.hud.rigOpen ? ' Rig offen' : ' Rig zu'),
           el('button', { class: 'inv-btn ghost bm-undo', disabled: !top || top.done, title: top && !top.done ? `Rückgängig: ${top.label} (Strg+Z)` : 'Nichts zum Rückgängigmachen (Leyla hat schon festgeschraubt)', onclick: () => this.undoLast() }, '↶ Rückgängig'),
           el('button', { class: 'inv-btn build-go', onclick: () => this.close() }, 'Fertig (B)')));
@@ -460,6 +466,7 @@ export class BuildMode {
       sh.shop.replaceChildren(panel);
       const nl = panel.querySelector('.build-list'); if (nl) nl.scrollTop = top0;
     } else sh.shop.replaceChildren();
+    { const ps = this.paintStrip(); sh.bar.querySelector('.bm-paint')?.remove(); if (ps) sh.bar.append(ps); }   // #114 the colour strip under the bar
     sh.msg.className = 'bm-msg ' + (this.msg?.kind || 'idle');
     sh.msg.textContent = msg;
     sh.msg.hidden = !msg;
@@ -613,7 +620,7 @@ export class BuildMode {
     // (Daniel, 08.11.2026: "bleibt man im drop-to-Händler-Modus hängen")
     if (this.drag && p.event && 'buttons' in p.event && !(p.event.buttons & 1)) { this.press = null; return this.flyBack('Losgelassen außerhalb: zurück an seinen Platz'); }
     if (this.resizing) return this.resizeMove(w);   // #113
-    if (this.press && !this.drag && Math.hypot(p.x - this.press.sx, p.y - this.press.sy) > 6) { if (this.press.hit.kind === 'resize') { this.startResize(this.press.hit, { x: this.press.x, y: this.press.y }); return this.resizeMove(w); } this.startDrag(this.press.hit, w); }
+    if (this.press && !this.drag && this.painting == null && Math.hypot(p.x - this.press.sx, p.y - this.press.sy) > 6) { if (this.press.hit.kind === 'resize') { this.startResize(this.press.hit, { x: this.press.x, y: this.press.y }); return this.resizeMove(w); } this.startDrag(this.press.hit, w); }
     if (this.drag) { this.drag.x = w.x; this.drag.y = w.y; }
     if (this.wire) { this.wire.x = w.x; this.wire.y = w.y; }
   }
@@ -622,6 +629,8 @@ export class BuildMode {
     const w = this.world(p), press = this.press;
     this.press = null;
     if (this.resizing) return this.endResize();   // #113
+    if (this.painting != null && press) return this.paintAt(w);   // #114 the brush
+    if (this.painting != null) return this.paintAt(w);
     if (this.decorHold) return this.placeDecor(w);
     if (press?.hit?.kind === 'decor') return this.liftDecor(press.hit.i);
     if (press?.hit?.kind === 'resize') return this.say('Am Griff ziehen: nach links länger, nach rechts kürzer', 'idle');
@@ -1158,4 +1167,5 @@ export class BuildMode {
 
 // #036 decoration in build mode
 for (const k of Object.getOwnPropertyNames(BuildDecor.prototype)) if (k !== 'constructor') Object.defineProperty(BuildMode.prototype, k, Object.getOwnPropertyDescriptor(BuildDecor.prototype, k));
+for (const k of Object.getOwnPropertyNames(BuildPaint.prototype)) if (k !== 'constructor') Object.defineProperty(BuildMode.prototype, k, Object.getOwnPropertyDescriptor(BuildPaint.prototype, k));   // #114
 for (const k of Object.getOwnPropertyNames(BuildResize.prototype)) if (k !== 'constructor') Object.defineProperty(BuildMode.prototype, k, Object.getOwnPropertyDescriptor(BuildResize.prototype, k));   // #113

@@ -85,8 +85,9 @@ export function containerDef(D, u) {
   if (!base.tiles || !K.tiles || !D.assets?.[K.tiles] || !A0?.frameSize || !base.inside) return n === base.places ? base : { ...base, places: n };
   const extra = Math.max(0, Math.round((K.inner ?? 160) * ((K.height ?? 100) - 100) / 100)), top = K.top ?? 153, cut = top + (K.band?.[1] ?? 96);
   const sh = y => (y >= cut ? y + extra : y), [L, R] = K.ends || [81, 241], step = K.step ?? 190, w = L + R + step * (n - 1), H = (K.frame ?? 512) + extra;
-  const k = (A0.height || A0.frameSize[1]) / A0.frameSize[1], oy = sh(A0.origin?.[1] ?? 372), key = kind => `ctiles_${kind}_${n}_${extra}`;
-  for (const kind of ['open', 'closed']) D.assets[key(kind)] ??= { kind: 'animation', frameSize: [w, H], frames: 1, origin: [w / 2, oy], height: k * H, virtual: { kind, n, extra } };
+  const color = /^#[0-9a-f]{6}$/i.test(u?.color || '') ? u.color.toLowerCase() : null;   // #114 painted
+  const k = (A0.height || A0.frameSize[1]) / A0.frameSize[1], oy = sh(A0.origin?.[1] ?? 372), key = kind => `ctiles_${kind}_${n}_${extra}${color ? '_' + color.slice(1) : ''}`;
+  for (const kind of ['open', 'closed']) D.assets[key(kind)] ??= { kind: 'animation', frameSize: [w, H], frames: 1, origin: [w / 2, oy], height: k * H, virtual: { kind, n, extra, color } };
   const x0 = base.inside.x[0], dv = base.divider;
   return { ...base, places: n, weight: containerWeight(D, u), look: key('open'), lookClosed: key('closed'),
     inside: { x: [x0, x0 + step * n], y: base.inside.y.map(sh) }, deck: base.deck != null ? sh(base.deck) : base.deck,
@@ -111,8 +112,24 @@ export function containerTexture(scene, D, key) {
   strip(0, b1, top);
   for (let e = 0; e < V.extra; e += b1 - b0) { const h = Math.min(b1 - b0, V.extra - e); strip(b0, b0 + h, top + b1 + e); }
   strip(b1, rows, top + b1 + V.extra);
+  if (V.color) paintPixels(ctx, w, H, V.color, D.camp?.paint);
   tex.refresh(); tex.setFilter(NEAREST());
   return true;
+}
+// #114 Farbe wie Townscaper: the steel takes the colour, keeping its light and shade; saturated bits (hazard stripes, rust, signs)
+// and the darkest outline stay as painted. Camp › Farben › Sättigung bis / Deckkraft
+export function paintPixels(ctx, w, h, hex, P = {}) {
+  const img = ctx.getImageData(0, 0, w, h), d = img.data, n = parseInt(hex.slice(1), 16), tr = (n >> 16) & 255, tg = (n >> 8) & 255, tb = n & 255;
+  const tl = 0.3 * tr + 0.59 * tg + 0.11 * tb || 1, satMax = (P.keepSat ?? 32) / 100, mix = (P.strength ?? 85) / 100;
+  for (let i = 0; i < d.length; i += 4) {
+    if (d[i + 3] < 8) continue;
+    const r = d[i], g = d[i + 1], b = d[i + 2], mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = 0.3 * r + 0.59 * g + 0.11 * b;
+    const sat = mx ? (mx - mn) / mx : 0;
+    if (sat > satMax || l < 22) continue;   // stripes, rust, signs, the outline
+    const k = Math.min(2.2, l / tl * 1.15);
+    d[i] = Math.round(r * (1 - mix) + Math.min(255, tr * k) * mix); d[i + 1] = Math.round(g * (1 - mix) + Math.min(255, tg * k) * mix); d[i + 2] = Math.round(b * (1 - mix) + Math.min(255, tb * k) * mix);
+  }
+  ctx.putImageData(img, 0, 0);
 }
 // all lengths of the pullable containers, so the rig, the scrapyard and build mode can draw them
 export function ensureContainerLooks(scene, D) {
@@ -121,6 +138,7 @@ export function ensureContainerLooks(scene, D) {
     const r = c.resize || [c.places || 1, c.places || 1];
     for (let n = r[0]; n <= r[1]; n++) { const d = containerDef(D, { id, places: n }); for (const k of [d.look, d.lookClosed]) if (k) containerTexture(scene, D, k); }
   }
+  for (const u of scene.box?.save?.rig?.units || []) if (u.color && D.containers?.[u.id]?.tiles) { const d = containerDef(D, u); for (const k of [d.look, d.lookClosed]) if (k) containerTexture(scene, D, k); }   // #114 painted
 }
 // one container as it stands in the camp, from its left end x (rear) to the right (front, towards the van):
 // a picture with an open side (Container › Aussehen + Innenraum) or a trailer from code: rear hitch, body on a chassis
