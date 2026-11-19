@@ -6575,5 +6575,112 @@
   "source": "KI (PixelLab, Create Image Pro 256 × 256, 4 × 4, Palette 4 dunkle Töne) + Code (zwei Blätter nebeneinander)",
   "date": "2026-11-19",
   "description": "#115: schwarze Formen ganz vorne (Fahrt, POIs draußen)."
+ },
+ "kit_neon_symbols": {
+  "name": "Camp-Baukasten · Neon-Symbole",
+  "kind": "icons",
+  "file": "assets/camp/kit/neon_symbols.png",
+  "cell": [52, 61],
+  "grid": [12, 1],
+  "names": ["Herz", "Pfeil", "Kaktus", "Cocktail", "Stern", "Mond", "Katze", "Blitz", "Chili", "Kaffee", "Alien", "Palme"],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz: Pilot-Stücke des Baukastens für den Stil) + Code (tools/camp_kit.py)",
+  "date": "2026-11-19",
+  "description": "Neon-Schilder ohne Schrift für die Container-Wand, leuchten nachts."
+ },
+ "kit_neon_frames": {
+  "name": "Camp-Baukasten · Neon-Rahmen",
+  "kind": "icons",
+  "file": "assets/camp/kit/neon_frames.png",
+  "cell": [58, 49],
+  "grid": [4, 1],
+  "names": ["Rechteck", "Pille", "Pfeil", "Oval"],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz: Pilot-Stücke des Baukastens für den Stil) + Code (tools/camp_kit.py)",
+  "date": "2026-11-19",
+  "description": "Leere Neon-Schilder; die Schrift (OPEN, BAR …) leuchtet aus Code darauf."
+ },
+ "kit_graffiti": {
+  "name": "Camp-Baukasten · Graffiti",
+  "kind": "icons",
+  "file": "assets/camp/kit/graffiti.png",
+  "cell": [62, 59],
+  "grid": [16, 1],
+  "names": ["Tag", "Sonne", "Katze", "Herz", "Krone", "Rakete", "Dreieck", "Pfeile", "Blume", "Totenkopf", "Funkeln", "Auge", "Welle", "Drohne", "Spirale", "Blitz"],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz: Pilot-Stücke des Baukastens für den Stil) + Code (tools/camp_kit.py)",
+  "date": "2026-11-19",
+  "description": "Gesprühte Bilder für die Container-Wand."
+ },
+ "kit_banners": {
+  "name": "Camp-Baukasten · Banner",
+  "kind": "icons",
+  "file": "assets/camp/kit/banners.png",
+  "cell": [52, 106],
+  "grid": [8, 1],
+  "names": ["Dreieck", "Totenkopf", "Sonne", "Katze", "Werkzeug", "Auge", "Welle", "Stern"],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz: Pilot-Stücke des Baukastens für den Stil) + Code (tools/camp_kit.py)",
+  "date": "2026-11-19",
+  "description": "Stoffbanner an einer Stange für die Container-Wand."
+ },
+ "kit_poles": {
+  "name": "Camp-Baukasten · Zeltstangen",
+  "kind": "icons",
+  "file": "assets/camp/kit/poles.png",
+  "cell": [64, 256],
+  "grid": [3, 1],
+  "names": [
+   "Holzpfosten mit Ring",
+   "Rohr mit Stoffstreifen",
+   "Bewehrungsbündel mit Fahne"
+  ],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz: Pilot-Stücke des Baukastens für den Stil) + Code (tools/camp_kit.py)",
+  "date": "2026-11-19",
+  "description": "Ankerpunkte für Zelte, Segel und Leinen (die Spitze ist der Anker)."
+ },
+ "kit_trophies": {
+  "name": "Camp-Baukasten · Fundstück-Kisten",
+  "kind": "icons",
+  "file": "assets/camp/kit/trophies.png",
+  "cell": [86, 72],
+  "grid": [3, 1],
+  "names": ["Holzkiste", "Munitionskiste", "Obstkiste"],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz: Pilot-Stücke des Baukastens für den Stil) + Code (tools/camp_kit.py)",
+  "date": "2026-11-19",
+  "description": "Kisten mit den schönsten Fundstücken."
+ },
+ "kit_tower": {
+  "name": "Camp-Baukasten · Aussichtsturm",
+  "kind": "icons",
+  "file": "assets/camp/kit/tower.png",
+  "cell": [110, 253],
+  "grid": [1, 1],
+  "names": ["Holzturm"],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz: Pilot-Stücke des Baukastens für den Stil) + Code (tools/camp_kit.py)",
+  "date": "2026-11-19",
+  "description": "Plattform bei 91 px von oben, Leiter bei x 73 (Deko › Aussichtsturm › Haken)."
+ },
+ "kit_balcony_a": {
+  "name": "Camp-Baukasten · Balkon",
+  "kind": "icons",
+  "file": "assets/camp/kit/balcony_a.png",
+  "cell": [132, 91],
+  "grid": [1, 1],
+  "names": [
+   "Stahlrost mit Pflanze"
+  ],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz: Pilot-Stücke des Baukastens für den Stil) + Code (tools/camp_kit.py)",
+  "date": "2026-11-19",
+  "description": "Wand links, Gitterboden bei 33 px von oben."
+ },
+ "kit_balcony_b": {
+  "name": "Camp-Baukasten · Breiter Balkon",
+  "kind": "icons",
+  "file": "assets/camp/kit/balcony_b.png",
+  "cell": [214, 93],
+  "grid": [1, 1],
+  "names": [
+   "Roter Rost mit Lichterkette"
+  ],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz: Pilot-Stücke des Baukastens für den Stil) + Code (tools/camp_kit.py)",
+  "date": "2026-11-19",
+  "description": "Wand links, Gitterboden bei 34 px von oben."
  }
 }

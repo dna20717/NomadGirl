@@ -160,7 +160,8 @@ export class CampDecor {
   kitFrame(d, at) {
     const a = this.D.assets?.[d.look], n = a?.grid ? a.grid[0] * a.grid[1] : 1;
     if (d.growStages) return Math.max(0, Math.min(n - 1, Math.floor(((this.box.save.day ?? 1) - (at?.day ?? this.box.save.day ?? 1)) / Math.max(1, d.growDays ?? 2))));   // grows by the days
-    return Math.max(0, Math.min(n - 1, at?.v ?? 0));
+    const v = (at?.v ?? 0) + (d.variant || 0);   // Start-Variante: two pieces can share one sheet (Banner mit Dreieck / Gang-Banner)
+    return ((v % n) + n) % n;
   }
   kitScale(d) { return (d.scale || 100) / 100; }
   // height of the painted part of a frame (feet on the bottom row), cached per texture frame
@@ -233,6 +234,7 @@ export class CampDecor {
     if (d.use === 'mirror') this.hotspots.push({ rig: true, x, w: bw, name: d.name || 'Spiegel', hint: 'Haare färben', act: () => this.mirrorMenu(d) });
     if (d.use === 'rest') this.hotspots.push({ rig: true, x, w: bw, top: q.level || q.roof || q.balc ? y - 10 : undefined, name: d.name || 'Liegestuhl', hint: d.useHint || 'Dösen', act: () => this.hammockRest(d) });
     if (d.crows) (this.perches ??= []).push({ x, y: y - c.h * k + 4 });
+    if (d.extra === 'neon') return this.neonGlow(img, look, fr, k, flip, x, y - c.h * k / 2, d, fr, hash(i, x));
     if (!d.extra || !d.hook) return;
     if (d.lightVariants != null && d.lightVariants !== '' && !String(d.lightVariants).split(',').map(t => Number(t.trim()) - 1).includes(fr)) return;   // only these variants (1 = first)
     const hook = d.hooks?.[fr]?.at || d.hook;
@@ -445,13 +447,29 @@ export class CampDecor {
     return out;
   }
 
+  // a painted neon sign shines at night: a glowing copy above the night shade, a coloured light, flickering now and then
+  neonGlow(img, look, fr, k, flip, x, cy, d, v, seed) {
+    const s = this.scene, c = String(d.colors || '').split(',').map(t => t.trim())[v] || d.color || '#ff7ac0';
+    const lit = this.dAdd(s.add.image(img.x, img.y, look, fr).setOrigin(0.5, 1).setScale(k).setFlipX(flip).setBlendMode(Phaser.BlendModes.ADD).setDepth(30.6).setAlpha(0));
+    const glow = this.dAdd(s.add.image(x, cy, glowTexture(s)).setDisplaySize(img.displayWidth * 1.8, img.displayHeight * 1.8).setTint(col(c)).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0).setDepth(-16.25));
+    const l = this.light(x, cy + img.displayHeight * 0.6, Math.max(120, img.displayWidth * 1.4), c, 0.45); l.rig = true;
+    this.decorAnim.push(time => { const off = Math.sin(time / 130 + seed * 40) > 0.985 || (seed > 0.6 && Math.sin(time / 47 + seed * 9) > 0.97), on = img.alpha > 0.01 ? 1 : 0; lit.setAlpha(on * (off ? 0.1 : 0.75) * (this.lightK || 0)); glow.setAlpha(on * (off ? 0.04 : 0.08 + 0.25 * (this.lightK || 0))); });
+  }
+
   // ---- wall ----
   art_neon(x, y, w, h, d, seed, pick) {
-    const s = this.scene, text = pick(d.text) || 'OPEN', c = d.color || '#ff7ac0', g = this.dG(-19.2), fs = Math.round(h * 0.82);
-    this.dR(g, x - w / 2 - PX, y - h / 2 - PX, w + 2 * PX, h + 2 * PX, C.ink);
-    this.dR(g, x - w / 2, y - h / 2, w, h, C.night);
-    for (const sx of [x - w / 2 + 2 * PX, x + w / 2 - 3 * PX]) this.dR(g, sx, y - h / 2 - 4 * PX, PX, 4 * PX, C.steel);   // wires up
-    const t = this.dAdd(s.add.text(x, y, text, { fontFamily: 'VT323, monospace', fontSize: `${fs}px`, color: c, stroke: '#ffffff', strokeThickness: 1 }).setOrigin(0.5).setDepth(-19.1));
+    const s = this.scene, text = pick(d.text) || 'OPEN', c = d.color || '#ff7ac0', fs = Math.round(h * (d.look ? 0.62 : 0.82));
+    if (d.look && s.textures.exists(d.look)) {   // the painted empty sign (Neon-Rahmen), stretched by its middle so the tube border stays crisp
+      s.textures.get(d.look).setFilter(Phaser.Textures.FilterMode.NEAREST);
+      const fr = d.icon ?? 0, f = s.textures.getFrame(d.look, fr), sl = Math.floor(Math.min(f.width, f.height) * 0.36);
+      this.dAdd(s.add.nineslice(x, y, d.look, fr, w + 12, h + 10, sl, sl, sl, sl).setDepth(-19.2));
+    } else {
+      const g = this.dG(-19.2);
+      this.dR(g, x - w / 2 - PX, y - h / 2 - PX, w + 2 * PX, h + 2 * PX, C.ink);
+      this.dR(g, x - w / 2, y - h / 2, w, h, C.night);
+      for (const sx of [x - w / 2 + 2 * PX, x + w / 2 - 3 * PX]) this.dR(g, sx, y - h / 2 - 4 * PX, PX, 4 * PX, C.steel);   // wires up
+    }
+    const t = this.dAdd(s.add.text(x, y, text, { fontFamily: 'VT323, monospace', fontSize: `${fs}px`, color: c, stroke: d.look ? '#141013' : '#ffffff', strokeThickness: d.look ? 4 : 1 }).setOrigin(0.5).setDepth(-19.1));
     t.setShadow(0, 0, c, 14, true, true);
     // at night the tubes shine through the dark (a glowing copy above the night shade, like the lights)
     const lit = this.dAdd(s.add.text(x, y, text, { fontFamily: 'VT323, monospace', fontSize: `${fs}px`, color: c }).setOrigin(0.5).setDepth(30.6).setBlendMode(Phaser.BlendModes.ADD));
@@ -558,7 +576,13 @@ export class CampDecor {
     const l = this.light(x, y - h + 7 * PX, 180, c, 0.75); l.rig = true;
     this.decorAnim.push(time => l.setAlpha(l.base * this.lightK * (0.88 + 0.12 * Math.sin(time / 170))));
   }
-  art_pole(x, y, w, h) {
+  art_pole(x, y, w, h, d, seed, pick, o) {
+    const s = this.scene;
+    if (d?.look && s.textures.exists(d.look)) {
+      s.textures.get(d.look).setFilter(Phaser.Textures.FilterMode.NEAREST);
+      const fr = this.kitFrame(d, o?.at), f = s.textures.getFrame(d.look, fr), c = this.kitContent(d.look, fr) || { h: f.height }, k = (h + 8) / c.h;
+      return this.dAdd(s.add.image(x, y + 2, d.look, fr).setOrigin(0.5, 1).setScale(k).setFlipX(!!o?.at?.f).setDepth(-16.2));
+    }
     const g = this.dG(-16.2);
     this.dR(g, x - 2 * PX, y - h, 4 * PX, h, C.ink); this.dR(g, x - PX, y - h, 2 * PX, h, C.woodL); this.dR(g, x - PX, y - h, PX, h, C.sand, 0.5);
     this.dR(g, x - 3 * PX, y - h - PX, 6 * PX, 3 * PX, C.steel);   // the ring on top
@@ -771,6 +795,13 @@ export class CampDecor {
   }
   // a balcony at a container's end: a steel grating on brackets, a railing at the outer end, a little plant pot
   art_balcony(b, d, seed, side) {
+    const s = this.scene;
+    if (d.look && s.textures.exists(d.look)) {
+      s.textures.get(d.look).setFilter(Phaser.Textures.FilterMode.NEAREST);
+      const f = s.textures.getFrame(d.look, 0), k = (b.x1 - b.x0) / f.width, floor = (d.hook?.[1] ?? 33) * k, wallLeft = !!side;
+      this.dAdd(s.add.image(wallLeft ? b.x0 : b.x1, b.y - floor, d.look, 0).setOrigin(wallLeft ? 0 : 1, 0).setScale(k).setFlipX(!wallLeft).setDepth(-17.5));
+      return this.walkZone(b.x0, b.x1, b.y);
+    }
     const g = this.dG(-17.5), T = this.scene.T, y = b.y, w = b.x1 - b.x0, rail = 1.1 * T, c = d.color || '#6d758d';
     this.dR(g, b.x0, y - PX, w, 4 * PX, C.ink); this.dR(g, b.x0, y - PX, w, PX, C.pale); this.dR(g, b.x0, y, w, 2 * PX, c);
     for (let x = b.x0 + 6; x < b.x1 - 4; x += 12) this.dR(g, x, y + PX, PX, PX, C.ink);
@@ -804,7 +835,17 @@ export class CampDecor {
   }
   // a lookout tower on the ground: a scaffold with a ladder up the side, a platform on top with a railing and a little roof
   art_tower(x, y, w, h, d, seed) {
-    const s = this.scene, T = s.T, g = this.dG(-16.6), top = y - h, pw = Math.max(w, 1.6 * T);
+    const s = this.scene, T = s.T;
+    if (d.look && s.textures.exists(d.look)) {
+      s.textures.get(d.look).setFilter(Phaser.Textures.FilterMode.NEAREST);
+      const f = s.textures.getFrame(d.look, 0), [hx, hy] = d.hook || [f.width / 2, f.height * 0.36], k = h / (f.height - hy), top = y - h, x0 = x - f.width * k / 2;
+      this.dAdd(s.add.image(x, y + 2, d.look, 0).setOrigin(0.5, 1).setScale(k).setDepth(-16.6));
+      this.walkZone(x0 + 6 * k, x0 + (f.width - 6) * k, top);
+      const lx = x0 + hx * k;
+      s.ladders.push({ cx: lx, x0: lx - T / 2, x1: lx + T / 2, top, bottom: y, rig: true });
+      return;
+    }
+    const g = this.dG(-16.6), top = y - h, pw = Math.max(w, 1.6 * T);
     for (const lx of [x - pw / 2 + 2 * PX, x + pw / 2 - 4 * PX]) { this.dR(g, lx - PX, top, 4 * PX, h, C.ink); this.dR(g, lx, top, 2 * PX, h, C.grey); }
     for (let yy = top + T; yy < y - T * 0.5; yy += T * 1.1) { g.lineStyle(PX, col(C.ink)).lineBetween(x - pw / 2 + 3 * PX, yy, x + pw / 2 - 3 * PX, yy + T * 1.1); g.lineStyle(PX, col(C.ink)).lineBetween(x + pw / 2 - 3 * PX, yy, x - pw / 2 + 3 * PX, yy + T * 1.1); }
     this.dR(g, x - pw / 2 - 2 * PX, top - PX, pw + 4 * PX, 4 * PX, C.ink); this.dR(g, x - pw / 2 - 2 * PX, top - PX, pw + 4 * PX, PX, C.pale); this.dR(g, x - pw / 2 - 2 * PX, top, pw + 4 * PX, 2 * PX, d.color || C.wood);

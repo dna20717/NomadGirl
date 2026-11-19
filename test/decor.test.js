@@ -20,16 +20,16 @@ test('Katalog: Beispiele aus allen Paketen, alle mit Preis und Art', () => {
 
 test('Kaufen, platzieren, aufnehmen, ins Lager, verkaufen', () => {
   const s = fresh(), d0 = s.deltas;
-  assert.ok(buy(D, s, 'laterne').ok);
-  assert.equal(s.deltas, d0 - D.decor.laterne.value);
-  assert.ok(put(D, s, 'laterne', { x: 3 }).ok);
+  assert.ok(buy(D, s, 'kit_laterne').ok);
+  assert.equal(s.deltas, d0 - D.decor.kit_laterne.value);
+  assert.ok(put(D, s, 'kit_laterne', { x: 3 }).ok);
   assert.equal(dstate(s).decor.length, 1);
   const o = lift(D, s, 0);
-  assert.equal(o.id, 'laterne');
+  assert.equal(o.id, 'kit_laterne');
   stow(s, o.id);
-  assert.deepEqual(dstate(s).spare.decor, ['laterne']);
-  const r = sell(D, s, 'laterne');
-  assert.ok(r.ok && r.back === Math.round(D.decor.laterne.value / 2));
+  assert.deepEqual(dstate(s).spare.decor, ['kit_laterne']);
+  const r = sell(D, s, 'kit_laterne');
+  assert.ok(r.ok && r.back === Math.round(D.decor.kit_laterne.value / 2));
   assert.equal(dstate(s).spare.decor.length, 0);
   s.deltas = 0;
   assert.equal(buy(D, s, 'zelt').ok, false);
@@ -49,7 +49,7 @@ test('Gemütlichkeit: Summe, Deckel', () => {
   const s = fresh();
   put(D, s, 'zelt', { a: 'mast:0', b: '1:0' }); put(D, s, 'haengematte', { a: 'mast:0', b: '1:1' });
   assert.equal(cozy(D, s), D.decor.zelt.cozy + D.decor.haengematte.cozy);
-  for (let i = 0; i < 20; i++) put(D, s, 'laterne', { x: i });
+  for (let i = 0; i < 20; i++) put(D, s, 'kit_laterne', { x: i });
   assert.equal(cozyBonus(D, s), D.camp.decor.cozyMax);
 });
 

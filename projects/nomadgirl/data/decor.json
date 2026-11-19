@@ -8,7 +8,9 @@
   "size": [2.4, 1],
   "color": "#ff7ac0",
   "text": "OPEN",
-  "description": "Pinkes Neon an der Container-Wand, flackert ab und zu."
+  "description": "Pinkes Neon an der Container-Wand, flackert ab und zu.",
+  "look": "kit_neon_frames",
+  "icon": 0
  },
  "neon_bar": {
   "name": "Neon „BAR“",
@@ -19,28 +21,35 @@
   "size": [2, 1],
   "color": "#20d6c7",
   "text": "BAR|NUDELN|24/7|LEYLA'S",
-  "description": "Cyan-Neon, Text je Stück zufällig aus einer Liste."
+  "description": "Cyan-Neon, Text je Stück zufällig aus einer Liste.",
+  "look": "kit_neon_frames",
+  "icon": 1
  },
  "banner_logo": {
   "name": "Banner mit Dreieck",
-  "art": "banner",
+  "art": "sprite",
   "place": "wall",
   "value": 40,
   "cozy": 1,
   "size": [1.6, 2.4],
   "color": "#b4202a",
-  "description": "Stoffbanner mit dem Dreieck der Spielwelt."
+  "description": "Stoffbanner mit dem Dreieck der Spielwelt.",
+  "look": "kit_banners",
+  "scale": 150,
+  "variant": 0
  },
  "banner_gang": {
   "name": "Gang-Banner",
-  "art": "banner",
+  "art": "sprite",
   "place": "wall",
   "value": 40,
   "cozy": 1,
   "size": [1.6, 2.4],
   "color": "#285cc4",
-  "text": "skull",
-  "description": "Blaues Banner mit Totenkopf, Trophäe aus dem Revier."
+  "description": "Blaues Banner mit Totenkopf, Trophäe aus dem Revier.",
+  "look": "kit_banners",
+  "scale": 150,
+  "variant": 1
  },
  "sonnensegel": {
   "name": "Sonnensegel",
@@ -76,13 +85,14 @@
  "warnschild": {"name": "Warnschild", "art": "addon", "place": "wall", "value": 10, "cozy": 0, "size": [1.1, 1.1], "addon": "warnschild"},
  "fundstuecke": {
   "name": "Kiste mit Fundstücken",
-  "art": "trophies",
-  "place": "ground",
+  "art": "sprite",
+  "place": "free",
   "value": 90,
   "cozy": 3,
   "size": [2, 1.2],
-  "items": ["winkekatze", "schallplatte", "kristallschaedel", "discokugel"],
-  "description": "Eine Kiste vor dem Feuer, darauf die schönsten Fundstücke."
+  "description": "Eine Kiste vor dem Feuer, darauf die schönsten Fundstücke.",
+  "look": "kit_trophies",
+  "flip": true
  },
  "waescheleine": {
   "name": "Wäscheleine",
@@ -154,14 +164,14 @@
  },
  "graffiti": {
   "name": "Graffiti",
-  "art": "graffiti",
+  "art": "sprite",
   "place": "wall",
   "value": 10,
   "cozy": 1,
   "size": [2.4, 1],
-  "colors": "#ff7ac0,#20d6c7,#ffd541,#9cdb43",
-  "text": "LEYLA|AvA <3|NO FUTURE|MILE 7|KEEP ROLLIN|NOMAD",
-  "description": "Gesprühter Tag in Neonfarben, Text und Farbe je Stelle anders."
+  "description": "Gesprühtes Bild in Neonfarben, 16 Motive (R wechselt).",
+  "look": "kit_graffiti",
+  "scale": 150
  },
  "dreibein": {
   "name": "Dreibein mit Kessel",
@@ -189,7 +199,6 @@
   "tags": "vögel",
   "flip": true
  },
- "laterne": {"name": "Laterne", "art": "lantern", "place": "ground", "value": 25, "cozy": 2, "size": [0.6, 1.8], "color": "#ffd27a", "description": "Leuchtet nachts warm."},
  "zeltstange": {
   "name": "Zeltstange",
   "art": "pole",
@@ -197,7 +206,9 @@
   "value": 10,
   "cozy": 0,
   "size": [0.4, 4],
-  "description": "Ein Ankerpunkt für Zelte, Segel und Leinen, frei auf dem Boden."
+  "description": "Ein Ankerpunkt für Zelte, Segel und Leinen, frei auf dem Boden.",
+  "look": "kit_poles",
+  "flip": true
  },
  "zelt": {
   "name": "Großes Zelt",
@@ -242,7 +253,19 @@
   "hook": [26, 3],
   "tags": "feuer,licht"
  },
- "neon_herz": {"name": "Neon-Herz", "art": "neon", "place": "wall", "value": 50, "cozy": 2, "size": [1.2, 1], "color": "#ff4b8b", "text": "<3", "description": "Ein kleines Herz in Pink."},
+ "neon_herz": {
+  "name": "Neon-Symbol",
+  "art": "sprite",
+  "place": "wall",
+  "value": 50,
+  "cozy": 2,
+  "size": [1.2, 1],
+  "color": "#ff4b8b",
+  "description": "Kleines Neon-Schild ohne Schrift: Herz, Pfeil, Kaktus, Cocktail … (R wechselt). Leuchtet nachts, flackert ab und zu.",
+  "look": "kit_neon_symbols",
+  "extra": "neon",
+  "colors": "#ff7ac0,#ffd541,#9cdb43,#20d6c7,#fa6a0a,#249fde,#ff7ac0,#ffd541,#df3e23,#20d6c7,#9cdb43,#ff7ac0"
+ },
  "neon_pfeil": {
   "name": "Neon-Pfeil",
   "art": "neon",
@@ -252,7 +275,9 @@
   "size": [2, 1],
   "color": "#ffd541",
   "text": ">>>|EINGANG|BAR >",
-  "description": "Zeigt, wo es langgeht."
+  "description": "Zeigt, wo es langgeht.",
+  "look": "kit_neon_frames",
+  "icon": 2
  },
  "zelt_militaer": {"name": "Armeezelt", "art": "tent", "place": "span", "value": 110, "cozy": 4, "colors": "#5a4e44,#796755", "description": "Olivgrün, geflickt, bombenfest."},
  "balkon": {
@@ -261,9 +286,11 @@
   "place": "side",
   "value": 60,
   "cozy": 2,
-  "size": [1.6, 0.3],
+  "size": [2.0625, 0.3],
   "color": "#6d758d",
-  "description": "Gitterrost am Container-Ende auf Höhe des Bodens, mit Geländer. Begehbar; bei gestapelten Containern öffnet er die Endwand. Sein äußeres Ende ist ein Ankerpunkt für Brücken."
+  "description": "Gitterrost am Container-Ende auf Höhe des Bodens, mit Geländer. Begehbar; bei gestapelten Containern öffnet er die Endwand. Sein äußeres Ende ist ein Ankerpunkt für Brücken.",
+  "look": "kit_balcony_a",
+  "hook": [0, 33]
  },
  "balkon_breit": {
   "name": "Breiter Balkon",
@@ -271,9 +298,11 @@
   "place": "side",
   "value": 90,
   "cozy": 3,
-  "size": [2.4, 0.3],
+  "size": [3.34, 0.3],
   "color": "#8e5252",
-  "description": "Wie der Balkon, nur mehr Platz für einen Stuhl und Pflanzen."
+  "description": "Wie der Balkon, nur mehr Platz für einen Stuhl und Pflanzen.",
+  "look": "kit_balcony_b",
+  "hook": [0, 34]
  },
  "haengebruecke": {
   "name": "Hängebrücke",
@@ -291,9 +320,11 @@
   "place": "ground",
   "value": 150,
   "cozy": 3,
-  "size": [1.6, 4.5],
+  "size": [1.6, 5.0625],
   "colors": "#71413b",
-  "description": "Gerüst mit Leiter und Plattform unterm Dach. Begehbar; oben ein Ankerpunkt für Brücken."
+  "description": "Gerüst mit Leiter und Plattform unterm Dach. Begehbar; oben ein Ankerpunkt für Brücken.",
+  "look": "kit_tower",
+  "hook": [73, 91]
  },
  "spiegel": {
   "name": "Spiegel",

@@ -15,7 +15,7 @@ export const DECOR_ARTS = [['addon', 'Ausschnitt eines Anbauteils'], ['neon', 'N
   ['birdhouse', 'Vogelhaus (Krähen)'], ['trophies', 'Kiste mit Fundstücken'], ['hammock', 'Hängematte'], ['lantern', 'Laterne'], ['mirror', 'Spiegel (Haare färben)'], ['pennants', 'Wimpelkette'], ['canopy', 'Fallschirm-Plane'], ['barrel', 'Feuertonne'], ['balcony', 'Balkon (begehbar)'], ['bridge', 'Brücke (begehbar)'], ['tower', 'Aussichtsturm (begehbar, Leiter)'], ['icon', 'Bild aus einem Symbol-Raster'], ['sprite', 'Bild mit Varianten (Baukasten)'], ['ladder', 'Leiter aufs Dach (kletterbar)'], ['stairs', 'Treppe in den Container (kletterbar)']];
 // #111 Camp-Baukasten: what can stand on a piece (Tragfläche)
 export const DECOR_CARRY = [['', 'Nichts'], ['content', 'Oberkante des Bilds'], ['fixed', 'In fester Höhe']];
-export const DECOR_EXTRAS = [['', 'Nichts'], ['fire', 'Flammen + Licht'], ['light', 'Licht'], ['candle', 'Kerzenlicht (klein)'], ['steam', 'Dampf'], ['rotor', 'Rotor (dreht, von der Seite)']];
+export const DECOR_EXTRAS = [['', 'Nichts'], ['fire', 'Flammen + Licht'], ['light', 'Licht'], ['candle', 'Kerzenlicht (klein)'], ['steam', 'Dampf'], ['rotor', 'Rotor (dreht, von der Seite)'], ['neon', 'Neon (leuchtet nachts, flackert)']];
 // #114 Farbe wie Townscaper: arts that take a painted colour (cloth and light)
 export const PAINTABLE = new Set(['tent', 'sail', 'canopy', 'pennants', 'banner', 'line', 'hammock', 'neon']);
 export const lighten = (hex, k = 0.45) => { const n = parseInt(hex.slice(1), 16), f = c => Math.round(c + (255 - c) * k); return '#' + [f((n >> 16) & 255), f((n >> 8) & 255), f(n & 255)].map(v => v.toString(16).padStart(2, '0')).join(''); };
@@ -128,7 +128,7 @@ export const balconies = rig => new Set((rig?.decor || []).filter(o => o.at?.sid
 // Free pieces stand on the ground, on a container roof or on another piece (at.on = 'deco:<i>', at.dx tiles from its centre).
 // Every piece rolls a variant of its picture (at.v) and maybe a mirror (at.f). Neighbours and ensembles only ever add Gemütlichkeit
 // (Dorfromantik: what fits gives a bonus, what does not costs nothing).
-export const variants = (D, id) => { const d = decorDef(D, id), a = d?.look && D.assets?.[d.look]; return d?.art === 'sprite' && !d.growStages && a?.grid ? Math.max(1, a.grid[0] * a.grid[1]) : 1; };
+export const variants = (D, id) => { const d = decorDef(D, id), a = d?.look && D.assets?.[d.look]; return (d?.art === 'sprite' || d?.art === 'pole') && !d.growStages && a?.grid ? Math.max(1, a.grid[0] * a.grid[1]) : 1; };
 export const tagsOf = d => String(d?.tags || '').split(',').map(t => t.trim()).filter(Boolean);
 export const canCarry = d => !!d?.carry;
 const onIndex = at => { const m = /^deco:(\d+)$/.exec(at?.on || ''); return m ? Number(m[1]) : null; };

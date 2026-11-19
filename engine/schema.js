@@ -1182,9 +1182,10 @@ export const AREAS = {
     sections: [{ title: 'Deko', fields: [NAME, select('art', 'Art', DECOR_ARTS), select('place', 'Sitzt', DECOR_PLACES), VALUE, num('cozy', 'Gemütlichkeit', { min: 0 }), DESCRIPTION] },
       { title: 'Aussehen', fields: [size('size', 'Größe', { unit: 'Kacheln', hint: 'Breite × Höhe; bei Zelt und Segel: Höhe = wie tief es hängt' }), color('color', 'Farbe'), text('colors', 'Farben', { hint: 'Mehrere mit Komma (Wäsche, Streifen)' }),
         text('text', 'Text', { hint: 'Neon, Banner, Graffiti; mehrere mit | (zufällig je Ort)' }), ref('addon', 'Ausschnitt von', 'rigAddons', { hint: 'Art „Ausschnitt“: das Bild dieses Anbauteils' }),
-        refs('items', 'Fundstücke', 'items', { hint: 'Art „Kiste mit Fundstücken“: diese Symbole' }), ref('look', 'Symbol-Raster', 'assets', { hint: 'Art „Bild aus einem Symbol-Raster“: aus diesem Raster …' }), num('icon', 'Symbol', { min: 0, hint: '… dieses Feld (0 = erstes); Höhe = Größe-Höhe' }), num('growDays', 'Wächst in Tagen', { min: 1, hint: 'Pflanze: Tage je Stufe' })] },
+        refs('items', 'Fundstücke', 'items', { hint: 'Art „Kiste mit Fundstücken“: diese Symbole' }), ref('look', 'Symbol-Raster', 'assets', { hint: 'Art „Bild aus einem Symbol-Raster“: aus diesem Raster … Auch für Neon (Rahmen, Feld = Symbol), Zeltstange (Varianten), Turm und Balkon (Bild; Haken = Plattform bzw. Boden, beim Turm x = Leiter)' }), num('icon', 'Symbol', { min: 0, hint: '… dieses Feld (0 = erstes); Höhe = Größe-Höhe' }), num('growDays', 'Wächst in Tagen', { min: 1, hint: 'Pflanze: Tage je Stufe' })] },
       { title: 'Baukasten', fields: [
         num('scale', 'Maßstab', { unit: '%', min: 10, hint: '#111 Art „Bild mit Varianten“: 100 = so groß wie gemalt (PixelLab malt in Spielgröße, Leyla 170 cm = 192 px)' }),
+        num('variant', 'Start-Variante', { min: 0, hint: 'Welches Feld zuerst kommt (0 = erstes); so teilen sich zwei Stücke ein Raster' }),
         bool('flip', 'Darf gespiegelt werden', { hint: 'Jedes platzierte Stück würfelt Variante und Richtung' }),
         bool('growStages', 'Wächst (Felder = Stufen)', { hint: 'Statt zu würfeln: Feld 1, 2, 3 … nach „Wächst in Tagen“' }),
         select('carry', 'Tragfläche', DECOR_CARRY, { hint: 'Kann man etwas draufstellen? Oberkante des Bilds (Kisten) oder in fester Höhe (Tisch)' }),

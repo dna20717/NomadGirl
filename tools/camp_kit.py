@@ -33,8 +33,19 @@ PICK = {
   'table_items':  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
   'wall_items':   [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
   'ground_items': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+  # 19.11.2026 (Daniel: „viele Deko-Elemente ohne Grafik“): the fixed code pieces get pictures
+  'neon_symbols': ('neon', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
+  'neon_frames':  ('neon', [12, 13, 14, 15]),
+  'graffiti':     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+  'banners':      ('banner', [0, 1, 2, 3, 4, 5, 6, 7]),
+  'poles':        [0, 1, 2],
+  'trophies':     [0, 1, 2],
+  'tower':        [0],
+  'balcony_a':    ('balcony', [0]),
+  'balcony_b':    ('balcony', [1]),
 }
-GRID = {'wall_modules': (4, 4), 'inside_items': (4, 4), 'table_items': (4, 4), 'wall_items': (4, 4), 'ground_items': (4, 4), 'plant_grow': (4, 1), 'cactus_grow': (4, 1)}
+GRID = {'wall_modules': (4, 4), 'inside_items': (4, 4), 'table_items': (4, 4), 'wall_items': (4, 4), 'ground_items': (4, 4), 'plant_grow': (4, 1), 'cactus_grow': (4, 1),
+        'neon': (4, 4), 'graffiti': (4, 4), 'banner': (4, 2), 'poles': (3, 1), 'trophies': (3, 1), 'balcony': (1, 2)}
 # baked size (hard pixels): the 4 x 4 sheets were painted bigger than life, tabletop things must fit on a table
 SCALE = {'table_items': 0.6}
 out = {}
