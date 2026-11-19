@@ -113,7 +113,7 @@ export class PlayScene extends Phaser.Scene {
       for (const a of Object.values(this.data_.rigAddons || {})) if (a.look) ids.add(a.look);   // mega rig wrecks wear add-ons
       for (const d of Object.values(this.data_.decor || {})) if (d.art === 'icon' && d.look) ids.add(d.look);   // Deko as a picture (NomadCola-Automat …)
       // workshop pictures (and the empty shelf), the crate for packed workshops
-      for (const w of Object.values(this.data_.workshops || {})) for (const id of [w.look, w.lookEmpty, w.garden?.plants]) if (id) ids.add(id);
+      for (const w of Object.values(this.data_.workshops || {})) for (const id of [w.look, w.lookEmpty, w.garden?.plants, ...(w.upgrades || []).map(r => r?.look)]) if (id) ids.add(id);   // #078 pictures per step
       { const T = this.data_.tank || {}; for (const p of T.phases || []) for (const id of [p.look, p.anim, p.hand]) if (id) ids.add(id); if (T.deadLook) ids.add(T.deadLook); }   // the cryo tank in all its phases (tank_view.js)
       // icon sheets of trophies: they stand on the stands of the treasury
       for (const a of ['items', 'weapons']) for (const t of Object.values(this.data_[a] || {})) if (t.tags?.includes('trophy') && t.look && A[t.look]?.kind === 'icons') ids.add(t.look);
@@ -462,6 +462,7 @@ export class PlayScene extends Phaser.Scene {
       react: mood => hud.scene.drone?.react(mood),
       closed: () => hud.scene.craftClosed(),
       workerItem: (id, place, back) => hud.scene.camp?.benchWorkerItem?.(id, place, back),   // #076
+      upgradeItem: (id, place, back) => hud.scene.camp?.upgradeItem?.(id, place, back), benchTitle: (id, place) => hud.scene.camp?.benchTitle?.(id, place),   // #078
     });
     hud.craft.el.hidden = true;
     // the tech tree in the warroom (game/play/techtree_ui.js)

@@ -14,6 +14,7 @@
 import { advance, fitContainers, campStore, CAMP, campName } from './save.js';
 import { canResize } from './inventory.js';
 import { synergyPower } from './synergy.js';
+import { upgradeOf, levelOf as starsOf } from './upgrades.js';
 import { remap as remapDecor } from './decor.js';
 
 const clone = x => JSON.parse(JSON.stringify(x));
@@ -143,6 +144,7 @@ export function budgets(D, rig) {
   let made = (T.power || 0) + solarPower(D, rig) + (rig.workerPower || 0), used = 0;   // #060 Ingenieur-Entities at work (workers.js syncWorkers)   // + solar panels (in the sun; at night from the battery, camp.js)
   for (const u of rig.units) for (const w of u.workshops) { const p = wsDef(D, w.id).power || 0; if (p > 0) made += p; else used -= p; }
   made += synergyPower(D, rig);   // #033: generators and reactors in good company
+  for (const u of rig.units) for (const w of u.workshops) { const p = upgradeOf(D, w).power; if (p > 0) made += p; else used -= p; }   // #078 upgrades: more power, or a hungrier bench
   const fuel = Math.round(((T.fuelUse ?? 12) + P.fuelUse) * (1 + (Tr.weightFuelFactor ?? 0) / 100 * weight / 1000) * 10) / 10;
   const places = rig.units.reduce((n, u) => n + placesOf(D, u), 0), filled = rig.units.reduce((n, u) => n + u.workshops.reduce((k, w) => k + (wsDef(D, w.id).places || 1), 0), 0);
   return { weight, pull, heavy: weight > pull, armor: P.armor, damage: P.damage, length: ground.length, maxLength: T.length ?? 0, stack: Math.max(1, T.stack ?? 1), height: Math.max(1, ...conts.map(u => levelOf(u) + 1)), power: { made, used, net: made - used }, fuel, places, filled };
@@ -159,6 +161,8 @@ export function startDraft(D, save) {
   rig.units.forEach((u, ui) => { u.key = `rig:${ui}`; });
   rig.units.forEach((u, ui) => u.workshops.forEach(w => { w.uid = ++uid; w.home = `${ui}:${w.at}`; if (wsDef(D, w.id).grid || wsDef(D, w.id).stands?.length) w.key = `store:${ui}:${w.at}`; }));
   rig.spare.workshops = rig.spare.workshops.map(w => typeof w === 'string' ? { id: w, uid: ++uid } : { ...w, uid: ++uid });
+  const SL = [...(rig.spareLevels || [])]; delete rig.spareLevels;   // #078 the packed ones get their stars back
+  for (const w of rig.spare.workshops) { const i = SL.findIndex(x => x.id === w.id); if (i >= 0) { w.level = SL[i].level; SL.splice(i, 1); } }
   return { rig, deltas: save.deltas, minutes: 0, uid, changes: 0, grids: save.inv?.grids || {} };
 }
 const spend = (D, d, n, minutes) => { d.deltas -= n; d.minutes += minutes ?? 0; d.changes++; };
@@ -376,8 +380,10 @@ export function applyDraft(D, save, d) {
   if (bad.length) return { ok: false, reason: bad[0] };
   const old = save.inv.grids, grids = {};
   for (const [k, g] of Object.entries(old)) if (!rigGrid(k)) grids[k] = g;
-  const rig = { tractor: d.rig.tractor, units: d.rig.units.map(u => ({ kind: u.kind, id: u.id, ...(u.level ? { level: u.level } : {}), ...(u.level && u.slot != null ? { slot: u.slot } : {}), ...(u.pos ? { pos: { place: u.pos.place, story: u.pos.story } } : {}), workshops: u.workshops.map(w => ({ id: w.id, at: w.at })) })),
+  const rig = { tractor: d.rig.tractor, units: d.rig.units.map(u => ({ kind: u.kind, id: u.id, ...(u.level ? { level: u.level } : {}), ...(u.level && u.slot != null ? { slot: u.slot } : {}), ...(u.pos ? { pos: { place: u.pos.place, story: u.pos.story } } : {}), workshops: u.workshops.map(w => ({ id: w.id, at: w.at, ...(starsOf(w) ? { level: starsOf(w) } : {}) })) })),   // #078 the upgrade moves with the workshop
     spare: { workshops: d.rig.spare.workshops.map(w => w.id), containers: [...d.rig.spare.containers], parts: [...d.rig.spare.parts], ...(d.rig.spare.decor ? { decor: [...d.rig.spare.decor] } : {}) }, parts: clone(d.rig.parts || {}) };
+  const spareLevels = d.rig.spare.workshops.filter(w => starsOf(w)).map(w => ({ id: w.id, level: starsOf(w) }));   // #078 packed on the scrapyard, the stars stay
+  if (spareLevels.length) rig.spareLevels = spareLevels;
   // string lights (#009) stay up: they hang on units by index, so they move with their unit (units keep their old key rig:<ui>),
   // the mast at the campfire (#014) stays where it is; a string whose unit left the rig comes down (Daniel, 13.11.2026: „Lichterketten verschwinden, wenn man eine Werkstatt platziert oder neu baut“)
   if (d.rig.lights?.length) {

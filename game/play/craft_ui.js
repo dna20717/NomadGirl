@@ -116,6 +116,12 @@ export class CraftUI {
     if (!it) return null;
     return el('button', { class: 'craft-worker', title: it.sub || '', onclick: () => { this.close(); it.act(); } }, icon('brain', 14), it.label);
   }
+  // #078 Ausbau: the next star as a button in the header
+  upgradeEl() {
+    const it = this.place && this.host.upgradeItem?.(this.ws, this.place, () => this.open(this.ws));
+    if (!it || it.disabled) return null;
+    return el('button', { class: 'craft-worker craft-up', title: it.sub || '', onclick: () => { this.close(); it.act(); } }, icon('star', 14), it.label);
+  }
   verb() { return VERBS[functionOf(this.D, this.ws)]?.[0] || 'Herstellen'; }
   // the action panel of a recipe at this workshop (#013); tank care and trophies stay plain
   panelFor(r) { const P = RECIPE_PANELS[functionOf(this.D, this.ws)]; return P && !r.tank && !r.part ? P : null; }
@@ -124,8 +130,8 @@ export class CraftUI {
     if (!this.isOpen) return;
     const D = this.D, save = this.save, def = D.workshops?.[this.ws] || {};
     this.el.replaceChildren(el('div', { class: 'craft-box ui-frame' },
-      el('header', {}, icon('workbench', 20), el('h2', {}, def.name || this.ws),
-        el('small', {}, clockText(save)), this.workerEl(), el('button', { class: 'craft-x', title: 'Schließen (Esc)', onclick: () => this.close() }, '×')),
+      el('header', {}, icon('workbench', 20), el('h2', {}, this.host.benchTitle?.(this.ws, this.place) || def.name || this.ws),
+        el('small', {}, clockText(save)), this.upgradeEl(), this.workerEl(), el('button', { class: 'craft-x', title: 'Schließen (Esc)', onclick: () => this.close() }, '×')),
       this.tankEl(),
       el('div', { class: 'craft-cols' + (this.only || this.stationOnly || this.mode === 'done' ? ' single' : '') }, this.only || this.stationOnly || this.mode === 'done' ? null : this.bookEl(),
         this.station ? this.station.el() : this.mode === 'done' ? this.doneEl() : this.mode === 'salvage' ? this.salvageEl() : this.potEl()),

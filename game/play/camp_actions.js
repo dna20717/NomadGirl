@@ -20,6 +20,7 @@ import { level as cisternLevelOf } from '../cistern.js';
 import { mod, modFactor, parts as modParts, modText } from '../mods.js';
 import { placesFor, workplaceOf, assign, unassign, flawOf, syncWorkers, farmEntities, befriend, bondOf, BOND_MAX, WORKING_STATS, candidatesAt, workerAt } from '../workers.js';
 import { occupancy } from '../inventory.js';
+import { benchAt, upgradeOf, titleOf, stars, blocked as upBlocked, costText, gainText, upgrade as doUpgrade } from '../upgrades.js';
 import { de, VERB, SOON, costLine } from './camp.js';
 
 export class CampActions {
@@ -50,8 +51,8 @@ export class CampActions {
     }
     const who = (this.box.save.companions || []).map(c => this.D.companions?.[c]).filter(c => c?.workshops?.includes(id)).map(c => c.name);
     if (def.rest?.verb) return this.restMenu(id, def, place, who);
-    s.hud.menu({ title: def.name || id, sub: [def.description, who.length ? `Betreut von ${who.join(' und ')}.` : null, SOON[def.function] || 'Funktion kommt später.'].filter(Boolean).join(' '),
-      items: [{ label: 'Zurück', act: () => {} }] });
+    s.hud.menu({ title: this.benchTitle(id, place), sub: [def.description, who.length ? `Betreut von ${who.join(' und ')}.` : null, SOON[def.function] || 'Funktion kommt später.'].filter(Boolean).join(' '),
+      items: [...[this.upgradeItem(id, place, () => this.use(id, place))].filter(Boolean), { label: 'Zurück', act: () => {} }] });
   }
   // hydroponics (game/garden.js): what grows, how long until ripe, E harvests the ripe pots into the camp inventories
   garden(id, def, place) {
@@ -79,7 +80,7 @@ export class CampActions {
           s.hud.toast(r.ok ? 'Gegossen' : 'Geht nicht', r.ok ? `Die Pflanzen wachsen ${de(r.hours)} h weiter` : r.why, r.ok ? 'good' : 'warn', 2800);
           if (r.ok) s.drone?.react('happy');
           this.benches?.list.forEach(b => { if (b.plants) b.plantSig = null; });
-        } } : null; })(), this.benchWorkerItem(id, place, () => this.garden(id, def, place)), { label: 'Zurück', act: () => {} }].filter(Boolean) });   // #076 Worker
+        } } : null; })(), this.benchWorkerItem(id, place, () => this.garden(id, def, place)), this.upgradeItem(id, place, () => this.garden(id, def, place)), { label: 'Zurück', act: () => {} }].filter(Boolean) });   // #076 Worker, #078 Ausbau
   }
   // the cistern (game/cistern.js): how full it is, E fills bottles into the camp inventories
   cistern(id, def, place) {
@@ -96,7 +97,8 @@ export class CampActions {
   // #033 synergy „quality“: the buff of this bench gets stronger (save.buffQ, like a good dish)
   synergyBuff(def, place) {
     const x = place && synergyAt(this.D, this.box.save, place), cz = cozyBonus(this.D, this.box.save);   // #036: Gemütlichkeit of the decoration on top
-    const add = (x?.effect === 'quality' ? x.bonus : 0) + cz + (def.function === 'chill' || def.function === 'guests' ? mod(this.D, this.box.save, 'rest') : 0);   // #060 Gastgeber: rest buffs stronger
+    const w = place && benchAt(this.box.save, place), up = w ? upgradeOf(this.D, w).quality : 0;   // #078 Ausbau: the better bed, the better rest
+    const add = (x?.effect === 'quality' ? x.bonus : 0) + cz + up + (def.function === 'chill' || def.function === 'guests' ? mod(this.D, this.box.save, 'rest') : 0);   // #060 Gastgeber: rest buffs stronger
     if (def.buff && add > 0) { const Q = (this.box.save.buffQ ??= {}); Q[def.buff] = Math.max(Q[def.buff] || 0, Math.round(add)); }
     else if (def.buff && add < 0) { const Q = (this.box.save.buffQ ??= {}); Q[def.buff] = Math.min(Q[def.buff] || 0, Math.round(add)); }   // #076 Gegenpaare: a noisy neighbour weakens it
   }
@@ -106,7 +108,7 @@ export class CampActions {
     const s = this.scene, save = this.box.save, R = def.rest, buff = def.buff && this.D.buffs?.[def.buff]?.name;
     const restBoost = modParts(this.D, save, 'rest');   // #066
     const facts = [R.hours ? `${de(R.hours)} h` : null, R.heal ? `heilt ${R.heal} %` : null, buff ? `danach ${buff}` : null, restBoost.length ? `Ruhe: ${modText(restBoost, 'rest')}` : null].filter(Boolean).join(' · ');
-    s.hud.menu({ title: def.name || id, sub: [def.description, who.length ? `Betreut von ${who.join(' und ')}.` : null, facts].filter(Boolean).join(' '),
+    s.hud.menu({ title: this.benchTitle(id, place), sub: [def.description, who.length ? `Betreut von ${who.join(' und ')}.` : null, facts].filter(Boolean).join(' '),
       items: [{ label: R.verb, primary: true, act: () => {
         const done = () => {
           this.resting = null;
@@ -121,8 +123,31 @@ export class CampActions {
         if (dock && s.drone) { s.drone.dock = { ...dock, until: s.time.now + 3200 }; s.drone.react('cleared'); s.time.delayedCall(3000, done); }
         else s.time.delayedCall(1400, done);
       } }, ...(def.function === 'chill' && farmEntities(this.D, save).length ? [{ label: 'Freundliches Duell', sub: 'mit einer Entity aus der Bit-Farm · Bindung', icon: 'heart', act: () => this.friendlyDuel() }] : []),
-      ...[this.benchWorkerItem(id, place, () => this.restMenu(id, def, place, who))].filter(Boolean),   // #076
+      ...[this.benchWorkerItem(id, place, () => this.restMenu(id, def, place, who)), this.upgradeItem(id, place, () => this.restMenu(id, def, place, who))].filter(Boolean),   // #076 Worker, #078 Ausbau
       { label: 'Zurück', act: () => {} }] });
+  }
+  // ---------- #078 Werkstätten ausbauen: one entry in the bench's menu or window, the stars in its title ----------
+  benchTitle(id, place) { const w = place && benchAt(this.box.save, place); return w && w.id === id ? titleOf(this.D, w) : this.D.workshops?.[id]?.name || id; }
+  // → a menu item (or null: no steps for this workshop, or not the bench at this place)
+  upgradeItem(id, place, back = null) {
+    const w = place && benchAt(this.box.save, place);
+    if (!w || w.id !== id) return null;
+    const U = upgradeOf(this.D, w);
+    if (!U.max) return null;
+    if (!U.next) return { label: `Voll ausgebaut ${stars(U.level)}`, sub: 'mehr geht nicht', icon: 'star_full', disabled: 'alle Stufen fertig', act: () => {} };
+    return { label: `Ausbauen ${stars(U.level + 1)}`, sub: `${U.next.name || 'nächste Stufe'} · ${costText(this.D, U.next)}`, icon: 'star', act: () => this.upgradeMenu(id, place, back) };
+  }
+  upgradeMenu(id, place, back = null) {
+    const s = this.scene, D = this.D, save = this.box.save, w = benchAt(save, place), U = upgradeOf(D, w), r = U.next, why = upBlocked(D, save, w);
+    if (!r) return back?.();
+    s.hud.menu({ title: `${titleOf(D, w)} → ${stars(U.level + 1)}`, sub: [r.name, r.description, `Kostet: ${costText(D, r)}.`, `Bringt: ${gainText(r)}.`].filter(Boolean).join(' '),
+      items: [{ label: `Ausbauen ${stars(U.level + 1)}`, sub: costText(D, r), primary: !why, disabled: why, icon: 'star', act: () => {
+        const x = doUpgrade(D, save, place);
+        if (!x.ok) { s.hud.toast('Geht nicht', x.why, 'warn', 2600); return; }
+        this.box.persist?.(); s.drone?.react('happy'); s.achieve?.('upgrades', 1);
+        s.hud.toast(`${titleOf(D, w)}`, `${r.name || 'Ausgebaut'} · ${gainText(r)}`, 'good', 4200);
+        s.goCamp({ banner: [`${titleOf(D, w)}`, `${clockText(save)} · ${r.name || 'ausgebaut'}`], fade: 600, keepPlace: true });
+      } }, { label: 'Zurück', icon: 'x', act: () => back?.() }] });
   }
   // ---------- #076 Worker right at the bench: one entry in the bench's own menu or window ----------
   // → a menu item (or null without a Bit-Farm resident who could work here)
@@ -200,7 +225,7 @@ export class CampActions {
     sleep(def, place = null) {
     const s = this.scene, box = this.box, save = box.save, C = this.C, max = s.leyla.maxHealth;
     const h = hoursUntil(save, C.clock?.wakeHour ?? 7);
-    s.hud.menu({ title: def.name || 'Schlafen', sub: `Schlafen bis ${String(C.clock?.wakeHour ?? 7).padStart(2, '0')}:00 (${h} h). Heilt ${C.heal?.sleep ?? 100} %${(b => b.length ? ` (${modText(b, 'sleepHeal')})` : '')(modParts(this.D, save, 'sleepHeal'))}.${def.buff ? ` Danach: ${this.D.buffs?.[def.buff]?.name || def.buff} für den nächsten Run.` : ''}`,
+    s.hud.menu({ title: (place && benchAt(save, place) ? titleOf(this.D, benchAt(save, place)) : def.name) || 'Schlafen', sub: `Schlafen bis ${String(C.clock?.wakeHour ?? 7).padStart(2, '0')}:00 (${h} h). Heilt ${C.heal?.sleep ?? 100} %${(b => b.length ? ` (${modText(b, 'sleepHeal')})` : '')(modParts(this.D, save, 'sleepHeal'))}.${def.buff ? ` Danach: ${this.D.buffs?.[def.buff]?.name || def.buff} für den nächsten Run.` : ''}`,
       items: [{ label: 'Schlafen', primary: true, act: () => {
         advance(save, h);
         save.health = Math.min(max, Math.max(save.health, s.leyla.health) + max * (C.heal?.sleep ?? 100) / 100 * modFactor(this.D, save, 'sleepHeal'));   // #060 Schläfer at work
@@ -209,7 +234,7 @@ export class CampActions {
         s.drone.react('sleep');
         s.achieveLater?.('sleeps');
         s.goCamp({ banner: ['Guten Morgen, Leyla', `${clockText(save)}${def.buff ? ' · ' + (this.D.buffs?.[def.buff]?.name || def.buff) : ''}`], fade: 900 });
-      } }, { label: 'Noch nicht', act: () => {} }] });
+      } }, ...[this.upgradeItem(benchAt(save, place)?.id, place, () => this.sleep(def, place))].filter(Boolean), { label: 'Noch nicht', act: () => {} }] });
   }
   // Leyla sits down next to the fire on the side she came from, facing the flames, and games (Camp › Am Feuer sitzen).
   // Standing up after a while: the time moves on and the fire heals; without a sit animation straight to that.

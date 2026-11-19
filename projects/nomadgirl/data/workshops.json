@@ -21,7 +21,19 @@
    {"kind": "screen", "x": 210, "y": 167, "w": 18, "h": 10, "color": "#3fe0d0", "size": 0, "rate": 1, "when": "always"}
   ],
   "outside": "out_sleep",
-  "synergy": {"partners": ["chill_area", "gaestekoje"], "effect": "quality", "max": 30, "foes": ["generator", "reaktor", "motorraum", "heavy_duty", "werkbank"]}
+  "synergy": {"partners": ["chill_area", "gaestekoje"], "effect": "quality", "max": 30, "foes": ["generator", "reaktor", "motorraum", "heavy_duty", "werkbank"]},
+  "upgrades": [
+   {"name": "Gute Matratze", "deltas": 80, "item": "stoffreste", "count": 6, "hours": 1, "quality": 15, "description": "Keine Feder mehr im Rücken."},
+   {
+    "name": "Verdunkelung & Ventilator",
+    "deltas": 250,
+    "item": "kupferkabel",
+    "count": 3,
+    "hours": 2,
+    "quality": 30,
+    "description": "Schlafen, auch wenn draußen die Sonne brennt."
+   }
+  ]
  },
  "kochnische": {
   "name": "Kochnische",
@@ -44,7 +56,20 @@
    {"kind": "smoke", "x": 124, "y": 26, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
   ],
   "outside": "out_kitchen",
-  "synergy": {"partners": ["kuehlraum", "zisterne", "hydrokultur", "kueche"], "effect": "speed", "max": 30, "foes": ["zelle", "heavy_duty"]}
+  "synergy": {"partners": ["kuehlraum", "zisterne", "hydrokultur", "kueche"], "effect": "speed", "max": 30, "foes": ["zelle", "heavy_duty"]},
+  "upgrades": [
+   {"name": "Zweiter Brenner", "deltas": 100, "item": "schrottplatte", "count": 2, "hours": 1, "speed": 15, "description": "Zwei Töpfe zugleich. Revolution."},
+   {
+    "name": "Dunstabzug & Gewürzregal",
+    "deltas": 300,
+    "item": "rohrbogen",
+    "count": 1,
+    "hours": 2,
+    "speed": 25,
+    "quality": 10,
+    "description": "Nichts riecht mehr nach Bohnen. Na gut, weniger."
+   }
+  ]
  },
  "werkbank": {
   "name": "Werkbank",
@@ -68,7 +93,37 @@
    {"kind": "twinkle", "x": 205, "y": 80, "w": 30, "h": 120, "size": 3, "rate": 1, "when": "always"}
   ],
   "outside": "out_craft",
-  "synergy": {"partners": ["generator", "reaktor", "motorraum", "waffenkammer", "heavy_duty"], "effect": "speed", "max": 30}
+  "synergy": {"partners": ["generator", "reaktor", "motorraum", "waffenkammer", "heavy_duty"], "effect": "speed", "max": 30},
+  "upgrades": [
+   {
+    "name": "Schraubstock & Lötstation",
+    "deltas": 150,
+    "item": "schrauben",
+    "count": 6,
+    "hours": 2,
+    "speed": 15,
+    "description": "Endlich fest einspannen statt mit dem Knie halten."
+   },
+   {
+    "name": "Werkstattkran",
+    "deltas": 450,
+    "item": "kabelbaum",
+    "count": 2,
+    "hours": 4,
+    "speed": 30,
+    "description": "Ein Flaschenzug unter der Decke. Motorblöcke wiegen plötzlich nichts mehr."
+   },
+   {
+    "name": "Neon-Arbeitsplatz",
+    "deltas": 900,
+    "item": "alte_platine",
+    "count": 3,
+    "hours": 6,
+    "speed": 45,
+    "power": -1,
+    "description": "Lupenlampe, Werkzeugwand, ein Bildschirm voller Schaltpläne."
+   }
+  ]
  },
  "generator": {
   "name": "Generator",
@@ -92,7 +147,11 @@
    {"kind": "twinkle", "x": 210, "y": 80, "w": 30, "h": 120, "size": 3, "rate": 1, "when": "always"}
   ],
   "outside": "out_ac",
-  "synergy": {"partners": ["motorraum", "reaktor"], "effect": "power", "max": 2, "chain": 1, "full": 3}
+  "synergy": {"partners": ["motorraum", "reaktor"], "effect": "power", "max": 2, "chain": 1, "full": 3},
+  "upgrades": [
+   {"name": "Neue Zündkerzen", "deltas": 200, "item": "schrauben", "count": 4, "hours": 1, "power": 1, "description": "Er stottert nicht mehr."},
+   {"name": "Turbolader", "deltas": 600, "item": "rohrbogen", "count": 2, "hours": 3, "power": 2, "description": "Lauter, heißer, stärker."}
+  ]
  },
  "waffenkammer": {
   "name": "Waffenwerkbank",
@@ -159,7 +218,11 @@
   ],
   "rest": {"verb": "Fernsehen und abhängen", "hours": 1, "heal": 20, "banner": "Flimmern, Sofa, Lavalampe"},
   "outside": "out_graffiti",
-  "synergy": {"partners": ["schlafkoje", "kochnische", "kueche", "hydrokultur"], "effect": "quality", "max": 25, "foes": ["generator", "heavy_duty", "zelle"]}
+  "synergy": {"partners": ["schlafkoje", "kochnische", "kueche", "hydrokultur"], "effect": "quality", "max": 25, "foes": ["generator", "heavy_duty", "zelle"]},
+  "upgrades": [
+   {"name": "Sofa mit Lichterkette", "deltas": 150, "item": "stoffreste", "count": 4, "hours": 1, "quality": 10, "description": "Weich, bunt, gemütlich."},
+   {"name": "Plattenspieler", "deltas": 400, "item": "kupferkabel", "count": 4, "hours": 2, "quality": 25, "description": "Knistern, Bass, Ruhe."}
+  ]
  },
  "drohnenwerkstatt": {
   "name": "Drohnenwerkstatt",
@@ -184,7 +247,8 @@
   ],
   "rest": {"verb": "AvA warten", "hours": 0.5, "heal": 0, "banner": "AvA glänzt wieder", "drone": true},
   "outside": "out_craft",
-  "synergy": {"partners": ["generator", "reaktor", "werkbank"], "effect": "speed", "max": 30}
+  "synergy": {"partners": ["generator", "reaktor", "werkbank"], "effect": "speed", "max": 30},
+  "upgrades": [{"name": "Präzisions-Lötkolben", "deltas": 300, "item": "alte_platine", "count": 2, "hours": 2, "speed": 20, "description": "AvA hält still. Fast."}]
  },
  "warroom": {
   "name": "Warroom",
@@ -232,7 +296,11 @@
    {"kind": "smoke", "x": 124, "y": 26, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
   ],
   "outside": "out_kitchen",
-  "synergy": {"partners": ["kuehlraum", "zisterne", "hydrokultur", "kochnische"], "effect": "speed", "max": 30, "foes": ["zelle", "heavy_duty"]}
+  "synergy": {"partners": ["kuehlraum", "zisterne", "hydrokultur", "kochnische"], "effect": "speed", "max": 30, "foes": ["zelle", "heavy_duty"]},
+  "upgrades": [
+   {"name": "Profi-Herd", "deltas": 400, "item": "schrottplatte", "count": 4, "hours": 3, "speed": 20, "description": "Sechs Flammen, ein Schalter für jede."},
+   {"name": "Kühltheke", "deltas": 900, "item": "kabelbaum", "count": 2, "hours": 4, "speed": 35, "quality": 15, "description": "Frisch bleibt frisch."}
+  ]
  },
  "foodtruck": {
   "name": "Foodtruck",
@@ -255,7 +323,8 @@
    {"kind": "smoke", "x": 124, "y": 26, "w": 16, "h": 4, "color": "#8a8496", "size": 10, "rate": 0.5, "when": "always"}
   ],
   "outside": "out_kitchen",
-  "synergy": {"partners": ["kuehlraum", "kueche", "kochnische"], "effect": "speed", "max": 30, "foes": ["zelle"]}
+  "synergy": {"partners": ["kuehlraum", "kueche", "kochnische"], "effect": "speed", "max": 30, "foes": ["zelle"]},
+  "upgrades": [{"name": "Neon-Schild", "deltas": 400, "item": "gluehbirne", "count": 3, "hours": 2, "speed": 20, "description": "Die Kundschaft sieht dich schon von der Straße."}]
  },
  "motorraum": {"name": "Motorraum", "function": "engine", "stage": "1", "places": 1, "power": 0, "value": 300, "outside": "out_ac", "look": "ws_engine_room"},
  "zelle": {
@@ -279,7 +348,8 @@
   "value": 3000,
   "outside": "out_ac",
   "look": "ws_reactor",
-  "synergy": {"partners": ["kuehlraum", "generator", "motorraum"], "effect": "power", "max": 4, "chain": 1, "full": 4}
+  "synergy": {"partners": ["kuehlraum", "generator", "motorraum"], "effect": "power", "max": 4, "chain": 1, "full": 4},
+  "upgrades": [{"name": "Kühlmantel", "deltas": 1500, "item": "kabelbaum", "count": 3, "hours": 6, "power": 3, "description": "Er glüht jetzt gleichmäßig."}]
  },
  "lagerregal": {
   "name": "Lagerregal",
@@ -399,7 +469,19 @@
    {"kind": "screen", "x": 219, "y": 116, "w": 13, "h": 7, "color": "#56e07a", "size": 0, "rate": 2, "when": "always"}
   ],
   "outside": "out_garden",
-  "synergy": {"partners": ["zisterne", "generator", "reaktor", "kuehlraum"], "effect": "speed", "max": 50, "chain": 15, "full": 60, "foes": ["heavy_duty"]}
+  "synergy": {"partners": ["zisterne", "generator", "reaktor", "kuehlraum"], "effect": "speed", "max": 50, "chain": 15, "full": 60, "foes": ["heavy_duty"]},
+  "upgrades": [
+   {"name": "Wachstumslampen", "deltas": 300, "item": "gluehbirne", "count": 4, "hours": 2, "speed": 20, "power": -1, "description": "Violettes Licht, grüne Blätter."},
+   {
+    "name": "Nährstoffkreislauf",
+    "deltas": 800,
+    "item": "rohrbogen",
+    "count": 2,
+    "hours": 4,
+    "speed": 40,
+    "description": "Das Wasser läuft im Kreis, die Pflanzen wachsen im Takt."
+   }
+  ]
  },
  "ripperdoc": {
   "name": "Ripperdoc-Liege",
@@ -421,7 +503,8 @@
    {"kind": "smoke", "x": 120, "y": 98, "w": 10, "h": 4, "color": "#c2b9cc", "size": 6, "rate": 2, "when": "use", "idle": 0}
   ],
   "outside": "out_ripper",
-  "synergy": {"partners": ["cryotank", "kuehlraum", "generator", "reaktor"], "effect": "speed", "max": 30, "foes": ["heavy_duty", "hydrokultur"]}
+  "synergy": {"partners": ["cryotank", "kuehlraum", "generator", "reaktor"], "effect": "speed", "max": 30, "foes": ["heavy_duty", "hydrokultur"]},
+  "upgrades": [{"name": "OP-Lampe", "deltas": 500, "item": "gluehbirne", "count": 6, "hours": 2, "speed": 20, "description": "Licht ohne Schatten. Weniger Zittern."}]
  },
  "zisterne": {
   "name": "Zisterne",
@@ -487,7 +570,8 @@
    {"kind": "sparks", "x": 36, "y": 150, "w": 12, "h": 8, "color": "#7ff6ff", "size": 2, "rate": 10, "when": "use", "idle": 20},
    {"kind": "light", "x": 100, "y": 40, "w": 60, "h": 10, "color": "#fff1c8", "size": 60, "rate": 5, "when": "always"}
   ],
-  "synergy": {"partners": ["motorraum", "reaktor", "generator", "werkbank"], "effect": "speed", "max": 40}
+  "synergy": {"partners": ["motorraum", "reaktor", "generator", "werkbank"], "effect": "speed", "max": 40},
+  "upgrades": [{"name": "Hebebühne", "deltas": 800, "item": "schrottplatte", "count": 6, "hours": 4, "speed": 25, "description": "Unter das Fahrzeug, ohne sich hinzulegen."}]
  },
  "auftragsbuero": {
   "name": "Auftragsbüro",

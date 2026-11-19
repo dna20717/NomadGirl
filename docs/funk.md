@@ -261,13 +261,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #078 Werkstätten ausbauen (Stufen mit Sternchen)
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Werkstatt-Bilder je Ausbaustufe“: als Nächstes)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Werkstatt-Bilder je Ausbaustufe“: als Nächstes)
 - **Auftrag (Daniel, 19.11.2026):** „Bau bitte das ganze Fundament dafür und ermögliche den Ausbau von Werkstätten. Kennzeichne es dann mit Sternchen neben dem Titel der Werkstatt in der Rig-Ansicht und in der jeweiligen Werkstatt.“ Stufen in der Werkstatt (Schema), Kosten, Wirkung je Stufe, Bild je Stufe (Platzhalter, PixelLab später nach Freigabe).
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: Stufen als Tabelle an der Werkstatt (Werte addieren sich), Ausbau kostet Δ + ein Teil + Arbeitszeit; Sterne am Namen im Rig, im Fenster und in den Menüs; Speziallager (Regale, Waffengalerie) ohne Ausbau, weil sie direkt ihr Lager öffnen.
+- **Ergebnis:** (Code) Commit „Werkstätten ausbauen mit Sternen (#078)“. Fundament `game/upgrades.js`, Werkstatt-Tabelle „Ausbau“, 12 Werkstätten mit 1–3 Stufen, Wirkung auf Tempo, Buff, Strom, Bild je Stufe; Stufe bleibt beim Umbauen und Einpacken. `npm test` 285/285, `tools/upgrade_test.mjs` 3/3. ⚠️ vorläufig: Preise und Werte, noch keine Bilder je Stufe. PixelLab 0. **Bitte testen:** Kochnische öffnen → „Ausbauen ★“.
 
 ### #079 Die Zelle: Gefangene
-- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte „Wirkung der Zelle“: als Nächstes)
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Wirkung der Zelle“: als Nächstes)
 - **Auftrag (Daniel, 19.11.2026):** „Ist zunächst die Grundlage, um Gefangene transportieren zu können. Also ein spezielles Inventar. Bau aber die Auftragsart direkt mit ein. Gefangene können in Auseinandersetzungen durch Events beschädigt werden oder auch in Dialogen als Ressource zum Einsatz kommen (mit Auswirkungen auf Ruf, produziert Dunkelheit).“
 - **Rückfragen:**
 - **Ergebnis:**

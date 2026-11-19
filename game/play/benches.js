@@ -4,6 +4,7 @@
 // sparks, flames, LEDs, fairy lights, bubbles, fish, a lava lamp, a 3D-printer head and a glint over the guns.
 // Every effect is placed in pixels of the picture and can wait for the evening, for Leyla coming close or for being used.
 // Also: the packed crates on the scrapyard and the workshop picture on its own (in the hand while building, in the van).
+import { benchAt, upgradeOf } from '../upgrades.js';
 import { displayed } from '../achievements.js';
 import { glowTexture } from './camp.js';
 import { stage } from '../garden.js';
@@ -165,7 +166,8 @@ export class Benches {
   // a workshop picture in a place: x0 = left end in the world, w = width of its places, floor = interior floor, h = interior height.
   // Returns false without a look (then the camp draws its code furniture).
   add({ id, place, x0, w, floor, h, view, mid, G, grid, clip, unitScale = 1 }) {
-    const s = this.scene, D = this.D, def = D.workshops?.[id] || {}, key = lookOf(s, D, def);
+    const s = this.scene, D = this.D, def = D.workshops?.[id] || {}, wsI = place && benchAt(s.box?.save, place), up = wsI?.id === id && upgradeOf(D, wsI).look;
+    const key = up && D.assets?.[up] && s.textures.exists(up) ? up : lookOf(s, D, def);   // #078 a picture per upgrade step (Werkstätten › Ausbau › Bild)
     if (!key) return false;
     const b = pictureBox(s, key), [fx, fy] = footOf(D, key, b);
     // one scale for all pictures (Camp › Rig-Ansicht › Maßstab der Werkstatt-Bilder), corrected per workshop (Maßstab %);

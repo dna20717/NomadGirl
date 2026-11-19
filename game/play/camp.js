@@ -20,6 +20,7 @@ import { ladderArt } from './ladder_art.js';
 import { activeMega, flies, travelSpeed } from '../mega.js';
 import { balconies } from '../decor.js';
 import { synergyAt, synergyText, links } from '../synergy.js';
+import { titleOf, upgradeOf } from '../upgrades.js';
 import { syncWorkers } from '../workers.js';
 import { mod } from '../mods.js';
 
@@ -701,7 +702,7 @@ export class Camp {
     this.hotspots.push({ rig: true, place: `${u.ui}:${w.at}`, x: cx + cw / 2, w: cw / 2, top: this.curTop, floor: u.floorY, name: def.name || w.id, hint: this.synHint(`${u.ui}:${w.at}`, store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen'), ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id, `${u.ui}:${w.at}`) });
     if (R.labels !== false && def.function !== 'tank') {   // the cryo tank has its own screen
       // subtle (#008): small, soft, a little see-through; they still say what stands where
-      const t = this.scene.add.text(cx + cw / 2, labelY, def.name || w.id, { fontFamily: 'VT323, monospace', fontSize: '20px', color: '#e9d8b4', stroke: '#0d0a12', strokeThickness: 4 }).setOrigin(0.5, 0).setDepth(-14).setAlpha(LABEL_ALPHA);
+      const t = this.scene.add.text(cx + cw / 2, labelY, titleOf(this.D, w), { fontFamily: 'VT323, monospace', fontSize: '20px', color: '#e9d8b4', stroke: '#0d0a12', strokeThickness: 4 }).setOrigin(0.5, 0).setDepth(-14).setAlpha(LABEL_ALPHA);
       t.unit = u.ui; this.rigObjs.push(t); (this.labels ||= []).push(t);   // fades with a closed shell
     }
   }

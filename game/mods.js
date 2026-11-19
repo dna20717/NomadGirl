@@ -11,6 +11,7 @@ import { bonuses as trophyBonuses } from './achievements.js';
 import { workers } from './workers.js';
 import { brandSets } from './brand_perks.js';
 import { synergyAt } from './synergy.js';
+import { benchAt, upgradeOf, stars } from './upgrades.js';
 import { bonusParts } from './techtree.js';
 import { gearStats, GEAR_KEYS } from './inventory.js';
 import { implantBoosts } from './stations.js';
@@ -25,6 +26,7 @@ export function parts(D, save, stat, ctx = {}) {
   const out = [], push = (source, label, value) => { if (value) out.push({ source, label, value: Math.round(value * 10) / 10 }); };
   push('trophy', 'Trophäen', trophyBonuses(D, save)[stat] || 0);
   if (ctx.place && ctx.synergy) { const s = synergyAt(D, save, ctx.place); if (s?.effect === ctx.synergy) push('synergy', 'Synergie', s.bonus); }
+  if (ctx.place && ctx.synergy) { const w = benchAt(save, ctx.place), U = w && upgradeOf(D, w); if (U?.level) push('upgrade', `Ausbau ${stars(U.level)}`, ctx.synergy === 'speed' ? U.speed : ctx.synergy === 'quality' ? U.quality : 0); }   // #078
   for (const k of workers(D, save)) if (k.stat === stat) push('worker', k.g.name, k.value);
   const b = brandSets(D, save); for (const x of b.list) if (x.on && x.stat === stat) push('brand', `Markentreue ${x.name}`, x.value);
   return out;

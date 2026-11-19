@@ -8,6 +8,7 @@
 // (and enough of each, or exactly as many with "Genaue Mengen") is a hit, everything else is curious junk.
 // Time: recipes take minutes (Rezepte › Dauer), the clock jumps on (Ereignis-Zeit).
 import { speedOf } from './synergy.js';
+import { speedOf as upgradeSpeed } from './upgrades.js';
 import { mod } from './mods.js';
 import { add, remove, count } from './inventory.js';
 import { containers, advance } from './save.js';
@@ -98,7 +99,7 @@ export function craft(D, save, id, ws, x = {}) {
   if (perfect > 0 && D.items?.[r.result]?.buff && (x.q || 0) < 2 && rnd() * 100 < perfect) x = { ...x, q: (x.q || 0) + 1, helped: true };
   const back = refund > 0 && (r.ingredients || []).length && rnd() * 100 < refund ? r.ingredients[Math.floor(rnd() * r.ingredients.length)] : null;
   if (back) give(D, save, back.item, 1);
-  const n = r.count || 1, minutes = Math.round((r.time ?? 10) * (1 - Math.min(90, speedOf(D, save, ws)) / 100));   // #033 synergy: faster
+  const n = r.count || 1, minutes = craftMinutes(D, save, r, ws);   // #033 synergy, #078 upgrade: faster
   advance(save, minutes / 60);
   markMade(D, save, id);
   for (const p of x.parts || []) take(D, save, p, 1);   // the weapon parts go into the weapon
@@ -269,4 +270,9 @@ export function learnNote(D, save, grid, e) {
 export function learnAll(D, save, grid) {
   if (!grid || D.crafting?.autoLearn === false) return [];
   return grid.items.filter(e => teaches(D, e.a, e.id)).map(e => learnNote(D, save, grid, e)).filter(Boolean);
+}
+
+// how long a recipe takes at this workshop: synergy (#033) and upgrade (#078) make it faster, at most 90 %
+export function craftMinutes(D, save, r, ws) {
+  return Math.round((r.time ?? 10) * (1 - Math.min(90, speedOf(D, save, ws) + upgradeSpeed(D, save, ws)) / 100));
 }

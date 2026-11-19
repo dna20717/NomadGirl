@@ -46,6 +46,17 @@ Werkstatt-Bilder mit Licht und Effekten, Füllstand, Benutzen, verpackte Werkst�
 - **Vorschau beim Platzieren** (#034, Dorfromantik): im Bau-Modus zeigt beim Ziehen einer Werkstatt jeder freie Platz seinen Bonus (cyan Fläche, „+40 %“ / „+2 ⚡“, gold bei vollem Container), der Hinweis unten nennt „Synergie 1/2 · Reihe ×2 · 40 % schneller“ (`preview` in `synergy.js`); im Bauplan an Bord stehen die Boni bei „einräumen“ und „kaufen“, Werkstätten mit Bonus leuchten im Raster.
 - **Gegenpaare** (#076, Daniel 19.11.2026: „Plus Gegenpaare“): Werkstätten › Synergie › **Stört sich mit**. Jeder angrenzende Platz mit so einer Werkstatt zählt gegen sie: Wertung = (Partner − Störer) / angrenzende Plätze, der Bonus kann ins **Minus** gehen (langsamer, weniger Strom, schwächerer Buff über `buffQ` < 0). Rote Verbindung im Camp, roter Platz mit „−30 %“ in der Bau-Vorschau, Hinweis „stört 2/2 · Buff −30 %“. ⚠️ vorläufig: Schlafkoje stört sich mit Generator, Reaktor, Motorraum, Heavy-Duty, Werkbank; Chill-Ecke mit Generator, Heavy-Duty, Zelle; Kochnische/Küche mit Zelle, Heavy-Duty; Foodtruck mit Zelle; Hydrokultur mit Heavy-Duty; Ripperdoc mit Heavy-Duty, Hydrokultur. Test `test/synergy.test.js`.
 
+## Werkstätten ausbauen (#078)
+
+Daniel, 19.11.2026: „Bau bitte das ganze Fundament dafür und ermögliche den Ausbau von Werkstätten. Kennzeichne es dann mit Sternchen neben dem Titel der Werkstatt in der Rig-Ansicht und in der jeweiligen Werkstatt.“
+
+- **Daten:** Werkstätten › **Ausbau** (Tabelle, eine Zeile je Stufe ★/★★/★★★): Name, Preis Δ, Teil + Anzahl, Arbeit (h), Schneller %, Buff stärker %, Strom ⚡ (negativ = braucht mehr), Bild ab dieser Stufe, Beschreibung. Die Werte zählen über die Stufen zusammen.
+- **Spielstand:** jede gebaute Werkstatt merkt ihre Stufe (`w.level` am Rig, 0 = wie gekauft). Sie bleibt beim Umbauen im Bau-Modus und beim Einpacken auf den Schrottplatz (`rig.spareLevels`).
+- **Wirkung:** Herstellen/Kochen schneller (`crafting.craftMinutes`: Synergie + Ausbau, höchstens 90 %), Wachstum der Hydrokultur (Boni-Bus, Quelle „Ausbau ★★“), Ruhe-/Schlaf-Buffs stärker (`synergyBuff`), Strom (`rig.budgets`), eigenes Bild je Stufe (`benches.add`).
+- **Bedienung:** im Werkstatt-Fenster oben der goldene Knopf **„Ausbauen ★“**, in Schlaf-, Ruhe-, Garten- und sonstigen Werkstatt-Menüs ein Eintrag; das Menü zeigt Stufe, Preis, Wirkung. Ausbauen zahlt, lässt die Zeit laufen und baut das Camp neu auf. Sterne stehen am Namen über der Werkstatt im Rig, im Fenster- und Menütitel (`upgrades.titleOf`).
+- **Startwerte (⚠️ vorläufig):** Werkbank 3 Stufen (15/30/45 % schneller), Kochnische, Küche, Schlafkoje, Chill-Ecke, Hydrokultur, Generator (+1/+2 ⚡) je 2, Reaktor, Drohnenwerkstatt, Ripperdoc, Heavy-Duty, Foodtruck je 1. Bilder je Stufe noch keine (PixelLab nach Freigabe).
+- Code: `game/upgrades.js` (ohne DOM). Geprüft: `test/upgrades.test.js`, `tools/upgrade_test.mjs`.
+
 ## Worker direkt an der Werkbank (#076)
 
 Daniel, 19.11.2026: „Worker auch an der Werkbank einteilen“. Zusätzlich zum Inventar: im Werkstatt-Fenster (Kochen, Herstellen, Ripperdoc, Heavy-Duty …) ein Knopf **„Worker einteilen“ / „Worker: Name“** oben, in Ruhe-Menüs (Chill-Ecke, Gästekoje mit Ruhe) und im Garten-Menü ein Eintrag. Er öffnet die Entities aus der Bit-Farm mit ihrem Effekt an genau dieser Werkbank (eigene zuerst), „Abziehen“, „Zurück“ führt zurück ins Fenster. `workers.js` › `candidatesAt`, `workerAt`; `camp_actions.js` › `benchWorkerItem`, `benchWorkerMenu`. Geprüft: `tools/bitfarm_test.mjs`.
