@@ -255,10 +255,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commits `9660feb`, Worker an der Werkbank, `9706d2d` Boni-Bus, `339c1f7` Van aus dem Tileset, `8614709` Läuferin (alle mit #076). `npm test` 280/280 (neu: Gegenpaare, Ausrüstung/Tank im Bus, `test/vehicle_kit.test.js`, Läuferin-Kette), Browser-Suite 47/48, rot nur `silo_test` (erwartete alten Titel und Titan 120), angepasst in `fde96e1`, danach 10/10 grün. Simulation Bit-Stapel: 9,6 → 7,8 Züge je Seite. Browser-Tests finden Inventar-Raster jetzt über `data-key` (das Start-Deck schob ein Raster dazwischen). PixelLab 0. **Bitte testen:** Neues Spiel: Bastler-Deck steckt; Generator neben die Schlafkoje bauen (rote Linie, „Buff −30 %“); Kochnische mit Bit-Farm-Entity: Knopf „Worker einteilen“ oben im Kochfenster; Duell in /duel ist kürzer; Läuferin ausliefern und weiterfahren.
 
 ### #077 Mega-Rigs: Hauptcontainer statt Lager am Boden
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte #029)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte #029)
 - **Auftrag (Daniel, 19.11.2026):** „beide Rigs sollen kein Lager mehr am Boden haben, sondern das Lager sein. Das heißt, wir brauchen einen Hauptcontainer je Rig (zunächst nur mit Code-Grafiken), der das Lager ersetzt.“ Feuer, Kiste, Brett, Companions ziehen an Bord.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: der Hauptcontainer ist ein Raum im Rumpf (2 Plätze, Crawler unten vorne, Fatbird auf dem Deck vorne), gezeichnet wie die anderen Rumpf-Räume; das Camp-Lager selbst bleibt das gemeinsame Lager (Kofferraum + Regale, #041), nur der Lagerplatz zieht an Bord. Am Boden bleiben Schrottplatz und Wrack.
+- **Ergebnis:** (Code) Commit „Mega-Rigs: Hauptcontainer an Bord statt Lager am Boden (#077)“. `npm test` grün (mega 13/13), Browser mega 7/7, megarig 16/16, camp, salvage, build, cozy, decor grün. PixelLab 0. **Bitte testen:** Crawler oder Fatbird bergen, an Bord gehen: Feuer, Brett und Crew im Raum links unten im Rumpf.
 
 ### #078 Werkstätten ausbauen (Stufen mit Sternchen)
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Werkstatt-Bilder je Ausbaustufe“: als Nächstes)
@@ -302,7 +302,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #085 Crew-Kern klein (aus #040)
-- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte #040: „Ja, erst klein“)
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte #040: „Ja, erst klein“)
 - **Auftrag:** #040 Teile 1, 3, 4: Bereich „Leute“, Aufnahme-Entscheidung, Werkstätten-Jobs (dazu ein schlichtes Crew-Fenster). Rig-Moral (Teil 2) danach.
 - **Rückfragen:**
 - **Ergebnis:**

@@ -7,7 +7,7 @@ import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { hints, closeX } from './ui_nav.js';
 import { act, budgets, buyContainer, buyWorkshop, place, fromSpare, lift, stow, fits, priceOf, snapshot, restore, wsDef, placesOf } from '../rig.js';
-import { activeMega, gridNow, cells, fitsGrid, putFromSpare, moveTo, storeUnit, nextStage, buyStage, mstate, hangLight, unhangLight, fixLights, stageOf } from '../mega.js';
+import { activeMega, gridNow, cells, fitsGrid, putFromSpare, moveTo, storeUnit, nextStage, buyStage, mstate, hangLight, unhangLight, fixLights, stageOf, hubOf } from '../mega.js';
 import { clockText, advance } from '../save.js';
 import { makeSfx } from './sfx.js';
 import { preview as synPreview, synergyText, synergies } from '../synergy.js';
@@ -34,7 +34,7 @@ export class MegaBuild {
   }
   // ---------- what stands where ----------
   unitAt(place, story) { return cells(this.D, this.save.rig).get(`${story}:${place}`) ?? null; }
-  sel() { const ui = this.unitAt(this.cur.place, this.cur.story); return ui == null ? null : ui; }
+  sel() { const ui = this.unitAt(this.cur.place, this.cur.story); return ui == null || ui === 'hub' ? null : ui; }
   // one action of the rig as a draft, with undo; the result goes into the message line
   run(fn, label) {
     const D = this.D, save = this.save, before = { snap: snapshot(save), lights: JSON.parse(JSON.stringify(mstate(save).lights)) };
@@ -128,6 +128,11 @@ export class MegaBuild {
       gridEl.append(el('div', { class: `mb-row ${zone}` }, s < g.frames ? 'Rahmen' : s < g.inside ? `Rumpf ${s + 1}` : `Stock ${s - g.inside + 1}`));
       for (let p = 0; p < g.places; p++) {
         const ui = taken.get(`${s}:${p}`), cur = this.cur.place === p && this.cur.story === s;
+        if (ui === 'hub') {   // #077 the Hauptcontainer: the campsite aboard, fixed
+          const hub = hubOf(D, rig);
+          if (p === hub.place) gridEl.append(el('div', { class: `mb-unit ${zone} hub`, style: `grid-column: span ${hub.places}`, title: 'Feuer, Brett und Crew wohnen hier; kein Container kann hierhin' }, el('b', {}, hub.name), el('div', { class: 'mb-slots' }, el('small', {}, 'Lagerplatz'))));
+          continue;
+        }
         if (ui != null) {
           const u = rig.units[ui];
           if (u.pos.place !== p) continue;   // the container spans its places

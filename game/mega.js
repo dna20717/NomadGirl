@@ -36,8 +36,15 @@ const width = (D, u) => cont(D, u).places || 1;
 export const shellAt = (g, story) => story < g.frames || story >= g.inside;
 
 // which unit stands on which cell: Map "story:place" → unit index
+// #077 (Daniel 19.11.2026: „beide Rigs sollen kein Lager mehr am Boden haben, sondern das Lager sein … ein Hauptcontainer je Rig“):
+// the campsite (fire, board, companions) lives in a room of the hull that no container may take (Mega-Rigs › Hauptcontainer)
+export function hubOf(D, rig) {
+  const H = D.megarigs?.[D.tractors?.[rig?.tractor]?.megarig]?.hub;
+  return H && H.enabled !== false ? { place: num(H.place, 0), story: num(H.story, 0), places: Math.max(1, num(H.places, 2)), name: H.name || 'Hauptcontainer' } : null;
+}
 export function cells(D, rig, skip = -1) {
-  const out = new Map();
+  const out = new Map(), hub = hubOf(D, rig);
+  if (hub) for (let k = 0; k < hub.places; k++) out.set(`${hub.story}:${hub.place + k}`, 'hub');
   rig.units.forEach((u, ui) => {
     if (ui === skip || u.kind !== 'container' || !u.pos) return;
     for (let k = 0; k < width(D, u); k++) out.set(`${u.pos.story}:${u.pos.place + k}`, ui);
@@ -177,15 +184,21 @@ export function modules(D, save, hide = null) {
     return { container: u.id, place: u.pos.place, story: u.pos.story, shell: shellAt(g, u.pos.story), name: cont(D, u).name, workshops: u.workshops.map(w => w.id), ui };
   }).slice(1);
 }
+// the Hauptcontainer as a module after all units (a room drawn from code: no picture, no skin)
+export const HUB = '_hub';
+function hubModule(D, save) { const h = hubOf(D, save.rig); return h ? { container: HUB, place: h.place, story: h.story, shell: false, name: h.name, workshops: [], hub: true } : null; }
 // the add-ons that belong to the vehicle itself (lights on the bow, at place -1), not to the example city
 export const hullAddons = (D, id) => (D.megarigs?.[id]?.addons || []).filter(a => num(a.place, 0) < 0);
 // the built vehicle of this savegame (geometry for the camp and the build mode)
 export function buildOwn(D, save, opts = {}) {
   const id = activeMega(D, save);
   if (!id) return null;
-  const data = { megarigs: D.megarigs, containers: { ...D.containers, _none: undefined }, rigAddons: D.rigAddons };
+  const hub = hubOf(D, save.rig), data = { megarigs: D.megarigs, containers: { ...D.containers, _none: undefined, ...(hub ? { [HUB]: { name: hub.name, places: hub.places } } : {}) }, rigAddons: D.rigAddons };
   const lights = (mstate(save).lights || []).map(l => ({ ...l, from: Number(l.from) + 0, to: Number(l.to) + 0 }));
-  const b = buildMegarig(data, id, stageOf(D, save, id), { modules: modules(D, save, opts.hide), addons: hullAddons(D, id), lights, margin: opts.margin, sky: opts.sky });
+  const mods = modules(D, save, opts.hide), hm = hubModule(D, save);
+  if (hm) mods.push(hm);   // #077 the last module: index = mods.length − 1 (b.hub below)
+  const b = buildMegarig(data, id, stageOf(D, save, id), { modules: mods, addons: hullAddons(D, id), lights, margin: opts.margin, sky: opts.sky });
+  if (b && hm) b.hub = b.pieces.find(p => p.module === mods.length - 1) || null;
   if (b) b.problems = b.problems.filter(([, t]) => !/„_none“/.test(t));   // the placeholders of empty unit numbers
   return b;
 }

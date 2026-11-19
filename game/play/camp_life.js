@@ -79,15 +79,15 @@ export class CampLife {
       const def = D.companions?.[id] || {}, x = ids.length > 1 ? a + (b - a) * i / (ids.length - 1) : (a + b) / 2;
       const info = def.look && s.assetInfo(def.look);
       const h = def.height ?? 170;
-      const sprite = info ? s.add.sprite(x, this.ground, info.key).setOrigin(info.ox, info.oy).setScale(info.scale) : s.add.image(x, this.ground, figureTexture(s, 'comp_' + id, def.color, def.role)).setOrigin(0.5, 1).setScale(h / 75);
+      const sprite = info ? s.add.sprite(x, (this.campY ?? this.ground), info.key).setOrigin(info.ox, info.oy).setScale(info.scale) : s.add.image(x, (this.campY ?? this.ground), figureTexture(s, 'comp_' + id, def.color, def.role)).setOrigin(0.5, 1).setScale(h / 75);
       if (info?.anim) sprite.play(info.anim);
       sprite.setDepth(-3).setFlipX(x > this.geo.fireX);
-      const bubble = s.add.text(x, this.ground - h - 16, '', { fontFamily: 'VT323, monospace', fontSize: '30px', color: '#17111f', backgroundColor: '#f2eef7', padding: { x: 10, y: 4 }, wordWrap: { width: 420 }, align: 'center' }).setOrigin(0.5, 1).setDepth(25).setAlpha(0);
+      const bubble = s.add.text(x, (this.campY ?? this.ground) - h - 16, '', { fontFamily: 'VT323, monospace', fontSize: '30px', color: '#17111f', backgroundColor: '#f2eef7', padding: { x: 10, y: 4 }, wordWrap: { width: 420 }, align: 'center' }).setOrigin(0.5, 1).setDepth(25).setAlpha(0);
       // #017: a mark over the head when they have a job for Leyla; #025: a little pinned note (gold pin = offer, green stamp = hand in)
-      const mark = s.add.image(x, this.ground - h - 14, noteTexture(s, 'offer')).setOrigin(0.5, 1).setDepth(24).setVisible(false);
+      const mark = s.add.image(x, (this.campY ?? this.ground) - h - 14, noteTexture(s, 'offer')).setOrigin(0.5, 1).setDepth(24).setVisible(false);
       s.tweens.add({ targets: mark, y: mark.y - 10, angle: { from: -6, to: 6 }, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
       const c = { id, def, x, sprite, bubble, mark, h, until: 0, last: -1 };
-      const spot = { x, w: 70, name: def.name || id, hint: 'Reden', act: () => this.talk(c) };
+      const spot = { x, w: 70, floor: this.geo.campFloor != null ? this.campY : undefined, name: def.name || id, hint: 'Reden', act: () => this.talk(c) };
       c.spot = spot;
       this.hotspots.push(spot);
       return c;

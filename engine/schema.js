@@ -1050,6 +1050,8 @@ export const AREAS = {
     row: x => `${label(MEGARIG_KINDS, x.kind)} · ${(x.stages || []).length} Ausbaustufen · ${(x.modules || []).length} Module`,
     check: (x, report, p, id) => { for (const [k, t] of megarigProblems(p.data, id)) report(k, t); },
     sections: [
+      { title: 'Hauptcontainer', fields: [bool('hub.enabled', 'Hauptcontainer', { hint: '#077 (Daniel 19.11.2026: „kein Lager mehr am Boden, sondern das Lager sein“): ein Raum im Rumpf, in dem Feuer, Schwarzes Brett und Crew wohnen; kein Container kann hierhin. Aus Code gezeichnet' }),
+        text('hub.name', 'Name'), num('hub.place', 'Platz', { min: 0, hint: '0 = erster Platz hinter dem Bug' }), num('hub.story', 'Stockwerk', { min: 0, hint: 'im Rumpf (unter „Stockwerke im Rumpf“)' }), num('hub.places', 'Breite', { unit: 'Plätze', min: 1, max: 4 })] },
       { title: 'Mega-Rig', fields: [NAME, select('kind', 'Art', MEGARIG_KINDS), ref('tractor', 'Zugmaschine', 'tractors', { hint: 'Werte (Zugkraft, Verbrauch, Slots) kommen von dieser Zugmaschine' }),
         text('brand', 'Hersteller', { hint: 'Marke der Spielwelt als Schriftzug am Rumpf (#025), z. B. Armadillo Heavy Industries. Leer = kein Schriftzug' }), DESCRIPTION] },
       { title: 'Raster', fields: [num('grid.place', 'Platz breit', { unit: 'Kacheln', min: 2, hint: 'Ein Werkstatt-Platz. 7 passt zu den Container-Bildern (gleicher Maßstab wie hoch)' }),

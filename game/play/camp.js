@@ -443,6 +443,7 @@ export class Camp {
     const D = scene.data_, C = D.camp || {}, T = scene.T, s = box.save;
     this.D = D; this.C = C;
     this.ground = geo.floor * T;
+    this.campY = geo.campFloor != null ? geo.campFloor * T : this.ground;   // #077 the campsite (fire, board, crew): the ground, or the Hauptcontainer aboard
     this.day = daytimeAt(C, s.hour);
     this.hotspots = [];
     this.lights = [];
@@ -840,7 +841,7 @@ export class Camp {
   anchors() {
     // the van has corners too: front and back of its roof
     const r = this.scene.van?.roof, van = r ? [{ ui: 0, x0: r.x0 - 8, x1: r.x1 + 8, inTop: r.y + 34 - 14 }] : [];   // the roof rails (Spiel › Van › Dach)
-    return lightAnchors([...van, ...this.geo.units.filter(u => u.ui !== 0)], mastAt(this.D, this.geo.fireX, this.ground));
+    return lightAnchors([...van, ...this.geo.units.filter(u => u.ui !== 0)], mastAt(this.D, this.geo.fireX, this.campY));
   }
   wire(i) {
     const pair = this.box.save.rig.lights?.[i], A = Object.fromEntries(this.anchors().map(a => [a.id, a])), L = lightsConfig(this.D);
@@ -880,7 +881,7 @@ export class Camp {
 
   // the mast at the campfire (#014): a weathered pole with a little crossbar and a hook on top, drawn from code
   drawMast() {
-    const s = this.scene, m = mastAt(this.D, this.geo.fireX, this.ground);
+    const s = this.scene, m = mastAt(this.D, this.geo.fireX, this.campY);
     if (!m) return;
     const g = s.add.graphics().setDepth(-17), x = Math.round(m.x), top = Math.round(m.top), h = m.y - top;
     g.fillStyle(0x17111f).fillRect(x - 9, top - 2, 18, h + 2);                                 // outline
@@ -904,7 +905,7 @@ export class Camp {
     const n = Math.round(M.fireflies ?? 0);
     if (n > 0 && k > 0.2) for (let i = 0; i < n; i++) {
       const f = s.add.image(0, 0, glowTexture(s)).setDisplaySize(16, 16).setTint(0xd8ff7a).setBlendMode(Phaser.BlendModes.ADD).setDepth(31);
-      this.flies.push({ f, x: this.geo.fireX + (Math.random() - 0.5) * 1300, y: this.ground - 40 - Math.random() * 240, p: Math.random() * 100, sp: 0.4 + Math.random() * 0.6 });
+      this.flies.push({ f, x: this.geo.fireX + (Math.random() - 0.5) * 1300, y: this.campY - 40 - Math.random() * 240, p: Math.random() * 100, sp: 0.4 + Math.random() * 0.6 });
     }
     this.puffAt = 0;
   }
@@ -953,7 +954,7 @@ export class Camp {
   drawFire() {
     const F = this.C.fire || {};
     if (F.enabled === false) return;
-    const s = this.scene, x = this.geo.fireX, y = this.ground;
+    const s = this.scene, x = this.geo.fireX, y = this.campY;
     const info = F.look && s.assetInfo(F.look);
     if (info) {   // Daniel's pixel-art fire, sharp at whole pixels
       s.textures.get(info.key).setFilter(NEAREST());
@@ -973,7 +974,7 @@ export class Camp {
       ...(F.pool ? [this.light(x, y + 6, F.pool, color, 0.5 * k, F.pool * 0.14)] : []),
     ];
     // #016: the campfire also opens the quest log (Daniel: „am Warroom / Lagerfeuer“)
-    this.hotspots.push({ x, w: 90, name: 'Lagerfeuer', hint: 'Hinsetzen · Questlog', act: () => this.fireMenu() });
+    this.hotspots.push({ x, w: 90, floor: this.geo.campFloor != null ? this.campY : undefined, name: 'Lagerfeuer', hint: 'Hinsetzen · Questlog', act: () => this.fireMenu() });
     // deco round the fire (Camp › Gemütlichkeit › Deko ums Feuer): rug, chairs, a corner with canisters
     for (const d of this.C.deco || []) {
       const info = d.look && s.assetInfo(d.look);
@@ -1008,7 +1009,7 @@ export class Camp {
     }
     // flames from code (without a look)
     if (this.flame) {
-      const x = this.geo.fireX, y = this.ground - 18, f = this.flame.clear(), t = time / 1000;
+      const x = this.geo.fireX, y = this.campY - 18, f = this.flame.clear(), t = time / 1000;
       // three tongues of pixel flame: rows of 6 px getting narrower, swaying; red outside, yellow core
       for (const [dx, base, ph] of [[-16, 58, 0], [14, 50, 2.1], [0, 78, 4.3]]) {
         const hgt = base * (0.8 + 0.2 * Math.sin(t * 6 + ph) + 0.08 * Math.sin(t * 17 + ph)), rows = Math.max(3, Math.round(hgt / 6));

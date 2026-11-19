@@ -15,7 +15,8 @@ export const BRIDGE_HELM = 3;
 export function campMegaLayout(D, save, T = 64) {
   const C = D.camp || {}, margin = C.margin ?? 6, Y = C.yard || {}, yardT = Y.enabled === false ? 0 : Math.max(4, Y.width ?? 9);
   const left = margin + yardT + 2, b = buildOwn(D, save, { margin: left });
-  const wr = wreckHere(D, save), campW = Math.max(8, C.campWidth ?? 20);
+  const hub = b.hub;   // #077 the Hauptcontainer: the campsite lives aboard, the ground beside the vehicle only keeps the wreck
+  const wr = wreckHere(D, save), campW = hub ? 4 : Math.max(8, C.campWidth ?? 20);
   const end = b.x0 + b.len + 3, campCol = end + 1, W = campCol + campW + (wr ? wr.width + 2 : 0) + 1, H = b.H, floor = b.G;
   const S = C.shaft || {}, shaft = S.enabled === false ? null : { from: Math.max(1, S.at ?? 1), to: Math.max(1, S.at ?? 1) + Math.max(1, S.width ?? 3) - 1 };
   const blocked = x => x === 0 || x === W - 1 || (shaft && x <= shaft.to);
@@ -29,16 +30,17 @@ export function campMegaLayout(D, save, T = 64) {
     }
     return row;
   });
-  const sx = campCol + 2;   // Leyla wakes up beside the vehicle, at the campsite
-  layout[floor - 1] = layout[floor - 1].slice(0, sx) + 'L' + layout[floor - 1].slice(sx + 1);
+  // Leyla wakes up at the campsite: beside the vehicle, or in the Hauptcontainer
+  const sx = hub ? hub.x + 2 : campCol + 2, sy = hub ? hub.floorRow - 1 : floor - 1;
+  layout[sy] = layout[sy].slice(0, sx) + 'L' + layout[sy].slice(sx + 1);
   const bridge = b.pieces.find(p => p.type === 'bridge'), x0 = b.x0 * T, x1 = (b.x0 + b.len) * T;
   // the bridge (crawler) or the nose (fatbird) is where the van door was: E there opens the map
   const doorX = bridge ? (bridge.x + BRIDGE_HELM / 2) * T : x0 + 4 * T, doorFloor = bridge ? bridge.floorRow * T : null;
   const tractor = save.rig.units.find(u => u.kind === 'tractor');
   return { layout, W, H, floor, vanCol: campCol, shaft, hidden: (x, y) => y < floor && blocked(x), doorX, doorFloor, vanLeft: x0, vanRight: x1, units: [], tractor,
     yard: yardT ? { x0: ((shaft ? shaft.to + 1 : 1) + 0.5) * T, x1: (margin + yardT) * T } : null, rigRoom: [x0, x0],
-    fireX: (campCol + (C.fire?.at ?? 9) + 0.5) * T, campCol,
-    companionX: [(campCol + (C.companions?.at?.[0] ?? 6) + 0.5) * T, (campCol + (C.companions?.at?.[1] ?? 13) + 0.5) * T],
+    ...(hub ? { fireX: (hub.x + hub.w * 0.55) * T, campCol, campFloor: hub.floorRow, companionX: [(hub.x + hub.w * 0.12) * T, (hub.x + hub.w * 0.9) * T] }
+      : { fireX: (campCol + (C.fire?.at ?? 9) + 0.5) * T, campCol, companionX: [(campCol + (C.companions?.at?.[0] ?? 6) + 0.5) * T, (campCol + (C.companions?.at?.[1] ?? 13) + 0.5) * T] }),
     wreck: wr ? { id: wr.id, x0: (campCol + campW + 1) * T, x1: (campCol + campW + 1 + wr.width) * T } : null,
     mega: { id: activeMega(D, save), b } };
 }

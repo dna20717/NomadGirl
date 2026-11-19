@@ -35,7 +35,7 @@ export class CampBoard {
     const s = this.scene, B = this.C.board || {};
     this.board = null;
     if (B.enabled === false) return;
-    const x = Math.round(this.geo.fireX + (B.offset ?? -220)), y = this.ground, w = B.width ?? 132, h = B.height ?? 96, top = y - (B.lift ?? 210);
+    const x = Math.round(this.geo.fireX + (B.offset ?? -220)), y = this.campY ?? this.ground, w = B.width ?? 132, h = B.height ?? 96, top = y - (B.lift ?? 210);
     const g = s.add.graphics().setDepth(-16);
     g.fillStyle(0x17111f).fillRect(x - w / 2 + 6, top + h - 4, 12, y - top - h + 4).fillRect(x + w / 2 - 18, top + h - 4, 12, y - top - h + 4);   // posts
     g.fillStyle(0x5d4037).fillRect(x - w / 2 + 8, top + h, 8, y - top - h).fillRect(x + w / 2 - 16, top + h, 8, y - top - h);
@@ -48,7 +48,7 @@ export class CampBoard {
     g.fillStyle(0xb4202a, 0.7).fillRect(x + w / 2 - 30, top - 12, 18, 4);                      // a rust streak
     const title = s.add.text(x, top - 8, 'AUFTRÄGE', { fontFamily: 'VT323, monospace', fontSize: '20px', color: '#17111f' }).setOrigin(0.5).setDepth(-15.9);
     this.board = { x, top, w, h, g, title, notes: [] };
-    this.hotspots.push({ x, w: 60, name: B.name || 'Schwarzes Brett', hint: () => this.boardHint(), act: () => this.boardMenu() });
+    this.hotspots.push({ x, w: 60, floor: this.geo.campFloor != null ? this.campY : undefined, name: B.name || 'Schwarzes Brett', hint: () => this.boardHint(), act: () => this.boardMenu() });
     this.boardNotes();
   }
   boardJobs() {

@@ -29,7 +29,8 @@ test('Umzug in den Crawler: Rig in die Ladebucht, Container auf dem Raster, kein
   assert.equal(wsCount(s), before);
   const b = buildOwn(D, s);
   assert.ok(b && b.kind === 'crawler');
-  assert.equal(b.pieces.filter(p => p.type === 'container' || p.type === 'room').length, s.rig.units.filter(u => u.pos).length);
+  assert.equal(b.pieces.filter(p => (p.type === 'container' || p.type === 'room') && p !== b.hub).length, s.rig.units.filter(u => u.pos).length);
+  assert.ok(b.hub && b.hub.type === 'room', '#077 der Hauptcontainer ist ein Raum im Rumpf');
 });
 
 test('Raster: belegt, außerhalb, oben braucht Unterbau; Räume im Rumpf', () => {
@@ -105,11 +106,15 @@ test('Bauen auf dem Raster: kaufen, setzen, Werkstatt einräumen, verschieben, i
   const s = fresh();
   activate(D, s, 'crawler');
   const n0 = s.rig.units.length;
-  let r = act(D, s, d => { buyContainer(D, d, 'container_20'); return putFromSpare(D, s, d, d.rig.spare.containers.length - 1, 2, 0); });
+  // a free cell on the hull floor (#077: places 0–1 are the Hauptcontainer)
+  const g = grid(D, 'crawler', stageOf(D, s, 'crawler')), taken = new Set(s.rig.units.filter(u => u.pos).flatMap(u => Array.from({ length: D.containers[u.id]?.places || 1 }, (_, k) => `${u.pos.story}:${u.pos.place + k}`)));
+  const fp = [...Array(g.places).keys()].find(p => p >= 2 && !taken.has(`0:${p}`));
+  let r = act(D, s, d => { buyContainer(D, d, 'container_20'); return putFromSpare(D, s, d, d.rig.spare.containers.length - 1, fp, 0); });
   assert.ok(r.ok, r.reason);
   const ui = s.rig.units.length - 1;
   assert.equal(s.rig.units.length, n0 + 1);
-  assert.deepEqual(s.rig.units[ui].pos, { place: 2, story: 0 });
+  assert.deepEqual(s.rig.units[ui].pos, { place: fp, story: 0 });
+  assert.match(act(D, s, d => moveTo(D, s, d, ui, 0, 0)).reason || '', /schon/, 'der Hauptcontainer ist belegt');
   r = act(D, s, d => { const b = buyWorkshop(D, d, 'werkbank'); return { ok: place(D, d, fromSpare(d, b.inst.uid), ui, 0) }; });
   assert.ok(r.ok);
   assert.equal(s.rig.units[ui].workshops[0].id, 'werkbank');

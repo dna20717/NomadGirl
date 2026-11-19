@@ -99,7 +99,8 @@
    {"from": 13, "fromCorner": "0", "to": 18, "toCorner": "0"},
    {"from": 17, "fromCorner": "1", "to": 20, "toCorner": "1"}
   ],
-  "tractor": "crawler"
+  "tractor": "crawler",
+  "hub": {"enabled": true, "name": "Hauptcontainer", "place": 0, "story": 0, "places": 2}
  },
  "fatbird": {
   "name": "Fatbird",
@@ -145,6 +146,7 @@
    "sternInset": 11,
    "sternGlow": 84
   },
-  "tractor": "fatbird"
+  "tractor": "fatbird",
+  "hub": {"enabled": true, "name": "Hauptcontainer", "place": 0, "story": 1, "places": 2}
  }
 }

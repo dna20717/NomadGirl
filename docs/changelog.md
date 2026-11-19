@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Mega-Rigs: Hauptcontainer** (#077): Feuer, Brett und Crew wohnen an Bord in einem festen Raum im Rumpf statt am Boden daneben.
 - 19.11.2026: **Die Zelle: Gefangene** (#079): Plünderer im Nahkampf fesseln, als Beute tragen, in der Zelle halten (Dunkelheit je Tag), auf der Straße Lösegeld/verkaufen/laufen lassen (Ruf), Unruhe im Laderaum, Auftragsart Kopfgeld.
 - 19.11.2026: **Werkstätten ausbauen** (#078): Stufen mit Sternen (★–★★★) für 12 Werkstätten, Preis Δ + Teil + Arbeit, Wirkung auf Tempo, Buffs, Strom; Sterne im Rig, im Fenster und in den Menüs.
 - 19.11.2026: **Daniels Runde #092–#096**: Haarfarben im Inventar lernen; Van im POI bleibt zu; Kofferraum am Van im POI (sicher bei k.o., kommt im Camp in den Rucksack); Billboard-Foto mit Sucher (Perfekt/Gut/Knapp/Verwackelt); POIs aufgeräumt (Silhouetten schweben nicht mehr, Clutter mit Luft).
