@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: #114 läuft: Farbe wie Townscaper, Innenräume, Wand-Module, Treppen & Wege.
 - 19.11. Code → Ava: **Alle Spielstände zurückgesetzt** (Daniel): `SAVE_VERSION` 2, jeder alte Stand startet beim nächsten Laden frisch.
 - 19.11. Code → Ava: #113 **Container ziehen und höher** fertig: ein Container zum Kaufen, am Griff 1–5 Plätze ohne Aufpreis, Werkbank hält dagegen und ploppt als Kiste raus (Pad vibriert), Container 30 % höher, Bilder zur Laufzeit aus den Kacheln.
 - 19.11. Code → Ava: #112 **Stimmen** fertig: Gebrabbel aus Code in Dialogen, Sprechblasen und Gegner-Rufen, Leylas Laute, 14 Stimmen, Werkstatt › Stimmen mit Vorhören. Volle Browser-Suite nach #111: 53/55 (zwei POI-Tests unter Last, einzeln grün).
@@ -240,6 +241,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #114 Farbe, Innenräume, Wand-Module, Treppen & Wege
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel: „Nächste Stufe Deco und Ausbau“, Wahl: Innenräume einrichten, Farbe wie Townscaper, Wand-Module, Treppen & Wege frei)
+- **Lesen:** docs/features/camp.md › Camp-Baukasten, docs/features/rig.md › Container ziehen und höher
+- **Auftrag:** (1) Pinsel im Bau-Modus: Container und Stoffe (Zelt, Segel, Plane, Wimpel, Banner) umfärben, Farben aus AAP-64 (Camp › Farben); (2) Innenräume: Wand-Reihe innen über den Werkbänken, Innen-Set von PixelLab; (3) Wand-Module: Fenster, Türen, Rolltore, Bullaugen in der Außenwand, nachts Licht; (4) Leitern/Treppen frei an Containern bis aufs Dach bzw. in den oberen Stock.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #113 Container ziehen und höher
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel: „Container nur noch insgesamt kaufen und dann über Ziehen und Drücken die Anzahl der Slots bestimmen, ganz dynamisch ohne Aufpreis … Werkbank ploppt als Kiste … die Container (nicht die Werkbänke!) könnten größer sein“)
