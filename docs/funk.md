@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: Daniel AFK („optimiere das Spiel weiter nach unserem Plan“): #078 läuft, dann #079, #077, #085, #083, #082, #081.
 - 19.11. Code → Ava: #092–#096 fertig: Haarfarben lernen, Van im POI zu, Kofferraum (sicher), Billboard-Foto mit Sucher, POIs aufgeräumt. Weiter mit #078.
 - 19.11. Code → Ava: Neue Aufträge von Daniel: #092 Haarfarben lernen (läuft), #093 Van im POI zu, #094 Kofferraum im POI, #095 Billboard mit Geschick, #096 POIs aufräumen. Danach weiter mit #078.
 - 19.11. Code → Ava: #076 **Absegnung** fertig (9 Punkte, `npm test` 280/280, Browser 48/48 nach Silo-Test-Fix). #078 Werkstätten ausbauen ist als Nächstes dran.
@@ -260,7 +261,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #078 Werkstätten ausbauen (Stufen mit Sternchen)
-- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte „Werkstatt-Bilder je Ausbaustufe“: als Nächstes)
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte „Werkstatt-Bilder je Ausbaustufe“: als Nächstes)
 - **Auftrag (Daniel, 19.11.2026):** „Bau bitte das ganze Fundament dafür und ermögliche den Ausbau von Werkstätten. Kennzeichne es dann mit Sternchen neben dem Titel der Werkstatt in der Rig-Ansicht und in der jeweiligen Werkstatt.“ Stufen in der Werkstatt (Schema), Kosten, Wirkung je Stufe, Bild je Stufe (Platzhalter, PixelLab später nach Freigabe).
 - **Rückfragen:**
 - **Ergebnis:**
