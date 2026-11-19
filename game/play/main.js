@@ -15,6 +15,7 @@ import { Hud } from './hud.js';
 import { installControl } from './control.js';
 import { openSave, arrive } from '../save.js';
 import { composeKits } from '../vehicle_kit.js';
+import { cheatsOn, watchCheatWord, runCheat } from '../cheats.js';
 
 export async function start(parent, hudRoot, loading, opts = {}) {
   const base = new URL('projects/nomadgirl/', location.href);
@@ -34,6 +35,12 @@ export async function start(parent, hudRoot, loading, opts = {}) {
   const [width, height] = D.game?.resolution || [1920, 1080];
   window.__nomadData = { commit: cloud?.commit || null, drafts: [...drafts.keys()], set: dataSet ? { id: dataSet.id, name: dataSet.name } : null };   // where the data came from (diag.js, Menü › Optionen)
   const hud = new Hud(hudRoot, { workshopDrafts: drafts.size, commit: cloud?.commit });
+  cheatsOn();   // #097: ?cheats=1 is remembered right away (the main menu's link has no query)
+  watchCheatWord(() => {   // typing „deltas“: cheats on, and +50.000 Δ into the running savegame
+    const sc = hud.scene, save = sc?.box?.save;
+    if (save) { runCheat(sc.data_, save, 'deltas50'); sc.box.persist?.(); hud.refresh?.(); }
+    hud.toast?.('Cheats freigeschaltet', save ? '+50.000 Δ · mehr im Pause-Menü › Cheats' : 'Pause-Menü › Cheats (im Spiel mit Camp)', 'good', 3600);
+  });
   // local workshop drafts change the game in this browser only (Daniel, 18.11.2026: the iPad played 640×360 with zoom 0.5 from an old
   // draft of game.json): say so right away, not only in the controls window; Menü › Optionen can throw them away
   if (dataSet) setTimeout(() => hud.toast(`Datenset: ${dataSet.name}`, `${dataSet.files.length} Dateien weichen vom Standard ab · wechseln im Hauptmenü`, 'info', 6000), 2500);

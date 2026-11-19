@@ -16,6 +16,7 @@ export function cheatsOn(search = globalThis.location?.search || '') {
 }
 // the cheats: [{ id, label, sub, act(D, save) → line }]
 export const CHEATS = [
+  { id: 'deltas50', label: '+50.000 Δ', sub: 'Viel Geld zum Testen', act: (D, save) => { save.deltas = (save.deltas || 0) + 50000; return '+50.000 Δ'; } },
   { id: 'deltas', label: '+1.000 Δ', sub: 'Geld', act: (D, save) => { save.deltas = (save.deltas || 0) + 1000; return '+1.000 Δ'; } },
   { id: 'res', label: '+10 jeder Ressource', sub: 'Technik, Wissen, Bio, Dunkelheit (ins Camp-Lager)', act: (D, save) => {
     const got = [];
@@ -29,3 +30,17 @@ export const CHEATS = [
   { id: 'time', label: 'Uhr +6 h', sub: 'Zeit vorspulen (Garten, Tank, Bewerber)', act: (D, save) => { advance(save, 6); return 'Uhr +6 h'; } },
 ];
 export function runCheat(D, save, id) { const c = CHEATS.find(x => x.id === id); return c && save ? c.act(D, save) : null; }
+
+// Daniel, 19.11.2026: „Geht nicht“ — the main menu opens the game as /game?camp, so ?cheats=1 was gone by the time the pause menu
+// asked. Now the game reads it at start, and typing the word „deltas“ anywhere in the game unlocks the cheats too (and gives
+// +50.000 Δ right away when a savegame is running). → stop()
+export function watchCheatWord(onWord, word = 'deltas') {
+  let buf = '';
+  const f = e => {
+    if (e.key?.length !== 1) return;
+    buf = (buf + e.key.toLowerCase()).slice(-word.length);
+    if (buf === word) { buf = ''; try { localStorage.setItem(KEY, '1'); } catch { /* private window */ } onWord?.(); }
+  };
+  globalThis.document?.addEventListener('keydown', f, true);
+  return () => globalThis.document?.removeEventListener('keydown', f, true);
+}
