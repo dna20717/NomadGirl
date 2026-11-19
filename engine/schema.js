@@ -1137,6 +1137,20 @@ export const AREAS = {
       if (x.place === 'span' && need == null && x.art) report('warning', `Art „${label(DECOR_ARTS, x.art)}“ hängt nicht zwischen zwei Punkten`);
     },
   },
+  people: {
+    name: 'Leute', icon: 'humans', file: 'data/people.json', kind: 'single',
+    hint: '#085 Crew-Kern (Die Karawane, design.md): Bausteine für gewürfelte Siedler, ihre Fähigkeiten (Jobs an Werkstätten) und Eigenheiten. Kernfiguren wie Schraube und Onkel Sung stehen unter Companions.',
+    sections: [
+      { title: 'Namen und Herkunft', fields: [lines('first', 'Vornamen', { hint: 'eine Zeile je Name' }), lines('nick', 'Beinamen', { hint: '„Rost“, „Doc“ … (60 % bekommen einen)' }), lines('origins', 'Herkunft', { hint: 'ein Satz je Zeile' })] },
+      { title: 'Fähigkeiten', fields: [table('skills', 'Fähigkeiten', [text('id', 'ID'), text('name', 'Name'), text('functions', 'Werkstatt-Funktionen', { hint: 'mit Komma, z. B. kitchen,foodtruck' }),
+        select('stat', 'Wirkt auf', [['perfect', 'Perfekt kochen %'], ['refund', 'Zutat zurück %'], ['sleepHeal', 'Schlaf heilt %'], ['rest', 'Ruhe %'], ['growth', 'Wachstum %'], ['power', 'Strom ⚡'], ['sell', 'Mehr Δ aus Runs %'], ['loot', 'Extra-Beute %'], ['fuel', 'Spritersparnis %']]),
+        num('perLevel', 'Je Stufe'), text('description', 'Beschreibung')], { hint: 'eine Person mit Job an einer Werkstatt dieser Funktion bringt Stufe × „Je Stufe“ in den Boni-Bus' }),
+        size('skillsPer', 'Fähigkeiten je Person', { hint: 'von – bis' })] },
+      { title: 'Eigenheiten', fields: [table('traits', 'Eigenheiten', [text('id', 'ID'), text('name', 'Name'), bool('hidden', 'Verborgen'), num('weight', 'Gewicht', { min: 0 }), text('effect', 'Wirkung'), text('description', 'Beschreibung')],
+        { hint: 'jede Person hat eine sichtbare und eine verborgene; die verborgene zeigt sich nach „Aufdecken nach“ Tagen. Wirkungen auf Moral kommen mit der Rig-Moral' })] },
+      { title: 'Aufnahme', fields: [num('fireChance', 'Bewerber am Feuer', { unit: '% je Ankunft', min: 0, max: 100 }), num('fireFromDay', 'Bewerber ab Tag', { min: 1, hint: 'der Ruf muss sich erst herumsprechen' }), num('revealDays', 'Verborgene Eigenheit nach', { unit: 'Tagen', min: 1 })] },
+    ],
+  },
   companions: {
     name: 'Companions', singular: 'Companion', icon: 'humans', file: 'data/companions.json', kind: 'catalog',
     hint: 'Leben im Rig, betreiben Werkstätten, geben Buffs und Rezept-Tipps. Eigene Quests kommen in Ausbaustufe 2.',
@@ -1484,7 +1498,7 @@ export const AREAS = {
         text('loot', 'Beute-Wurf', { hint: 'ID einer Beutetabelle oder „situation“ = die der Lage' }), num('risk', 'Risiko', { unit: '%', min: 0, max: 95 }), num('failHealth', 'Fehlschlag: Schaden', { unit: 'Leben', min: 0 }),
         num('failHours', 'Fehlschlag: Zeit', { unit: 'h', min: 0 }), text('result', 'Danach', { hint: 'Varianten mit |' }), text('failResult', 'Fehlschlag', { hint: 'Varianten mit |' }),
         num('rep', 'Ruf', { hint: '#055: −100 … 100, Änderung des Rufs bei der Gang der Lage (auch wenn es schiefgeht)' }), num('repRival', 'Ruf Rivalen', { hint: 'Änderung bei der rivalisierenden Gang ({rival}), z. B. in einer Fehde' }), text('flag', 'Merker', { hint: 'setzen; „-name“ löscht; mehrere mit Komma (nur wenn es klappt)' }),
-        ref('buff', 'Buff', 'buffs', { hint: 'wirkt im nächsten Run (nur wenn es klappt)' }), ref('reveal', 'Ort aufdecken', 'locations', { hint: '#057: ein versteckter Ort (Orte › Versteckt) kommt auf die Reisekarte (auch wenn es schiefgeht: gesehen ist gesehen)' }), select('prisoner', 'Gefangener', [['', '–'], ['ransom', 'gegen Lösegeld zu seiner Gang (Ruf +5)'], ['sell', 'an andere verkaufen (Ruf seiner Gang −15)'], ['free', 'laufen lassen (Ruf +3, keine Dunkelheit)']], { hint: '#079: die Antwort braucht einen Gefangenen an Bord und nimmt einen (den gesündesten, von der Gang der Lage, wenn es einen gibt)' }),
+        ref('buff', 'Buff', 'buffs', { hint: 'wirkt im nächsten Run (nur wenn es klappt)' }), ref('reveal', 'Ort aufdecken', 'locations', { hint: '#057: ein versteckter Ort (Orte › Versteckt) kommt auf die Reisekarte (auch wenn es schiefgeht: gesehen ist gesehen)' }), bool('recruit', 'Nimmt jemanden in die Crew auf', { hint: '#085: ein gewürfelter Siedler kommt in die Crew (nur wenn es klappt)' }), select('prisoner', 'Gefangener', [['', '–'], ['ransom', 'gegen Lösegeld zu seiner Gang (Ruf +5)'], ['sell', 'an andere verkaufen (Ruf seiner Gang −15)'], ['free', 'laufen lassen (Ruf +3, keine Dunkelheit)']], { hint: '#079: die Antwort braucht einen Gefangenen an Bord und nimmt einen (den gesündesten, von der Gang der Lage, wenn es einen gibt)' }),
         num('dark', 'Dunkelheit', { min: 0, hint: '#079: so viel Dunkelheit bringt die Antwort (leer = Gefangene › Je Einsatz)' }), num('hurtPrisoners', 'Gefangene verletzt', { unit: '%', min: 0, max: 100, hint: '#079: alle Gefangenen verlieren so viel Gesundheit (Unruhe, Beschuss)' }),
         ...CREW_NEEDS(), ref('brand', 'Marke', 'brands', { hint: '#064: Δ, die hier bezahlt werden, gehen an diese Marke (Influencer-Nachlass)' })])] },
       { title: 'Gefangene', fields: [num('prisoners.chance', 'Fesseln: Chance', { unit: '%', min: 0, max: 100, hint: '#079: ein Plünderer, im Nahkampf besiegt, bleibt gefesselt liegen und wird wie Beute aufgehoben (kein Boss)' }),
@@ -1642,7 +1656,7 @@ export const GROUPS = [
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
   ['ACHIEVEMENTS & AUFTRÄGE', ['achievements', 'quests']],
   ['PROGRESSION', ['techtree', 'resources']],
-  ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'megarigs', 'rigAddons', 'salvage', 'companions']],
+  ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'megarigs', 'rigAddons', 'salvage', 'people', 'companions']],
   ['WELT', ['worldmap', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel']],
   ['LORE', ['brands']],
   ['ENTITIES', ['glitchlings']],

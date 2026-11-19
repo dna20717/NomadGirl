@@ -126,6 +126,7 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
     if (a.flag) o.flag = a.flag;
     if (a.buff) o.buff = a.buff;
     if (a.reveal) o.reveal = a.reveal;
+    if (a.recruit) o.recruit = true;   // #085 someone joins the crew
     if (a.prisoner) { o.prisoner = a.prisoner; o.needPrisoner = true; }   // #079 Lösegeld, verkaufen, laufen lassen
     if (a.dark) o.dark = a.dark;
     if (a.hurtPrisoners) o.hurtPrisoners = a.hurtPrisoners;

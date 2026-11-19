@@ -9,6 +9,7 @@
 //   ctx: { place: '<unit>:<at>' } for the synergy of one workshop, { synergy: 'speed' | 'quality' } which kind counts for this stat
 import { bonuses as trophyBonuses } from './achievements.js';
 import { workers } from './workers.js';
+import { crewBonuses } from './crew.js';
 import { brandSets } from './brand_perks.js';
 import { synergyAt } from './synergy.js';
 import { benchAt, upgradeOf, stars } from './upgrades.js';
@@ -28,6 +29,7 @@ export function parts(D, save, stat, ctx = {}) {
   if (ctx.place && ctx.synergy) { const s = synergyAt(D, save, ctx.place); if (s?.effect === ctx.synergy) push('synergy', 'Synergie', s.bonus); }
   if (ctx.place && ctx.synergy) { const w = benchAt(save, ctx.place), U = w && upgradeOf(D, w); if (U?.level) push('upgrade', `Ausbau ${stars(U.level)}`, ctx.synergy === 'speed' ? U.speed : ctx.synergy === 'quality' ? U.quality : 0); }   // #078
   for (const k of workers(D, save)) if (k.stat === stat) push('worker', k.g.name, k.value);
+  for (const c of crewBonuses(D, save)) if (c.stat === stat) push('crew', c.name, c.value);   // #085 the crew at work
   const b = brandSets(D, save); for (const x of b.list) if (x.on && x.stat === stat) push('brand', `Markentreue ${x.name}`, x.value);
   return out;
 }

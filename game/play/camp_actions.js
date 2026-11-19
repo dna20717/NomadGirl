@@ -20,6 +20,7 @@ import { level as cisternLevelOf } from '../cistern.js';
 import { mod, modFactor, parts as modParts, modText } from '../mods.js';
 import { placesFor, workplaceOf, assign, unassign, flawOf, syncWorkers, farmEntities, befriend, bondOf, BOND_MAX, WORKING_STATS, candidatesAt, workerAt } from '../workers.js';
 import { occupancy } from '../inventory.js';
+import { known, skillText, admit, reject, dismiss, setJob, jobEffect, heads, headsText } from '../crew.js';
 import { benchAt, upgradeOf, titleOf, stars, blocked as upBlocked, costText, gainText, upgrade as doUpgrade } from '../upgrades.js';
 import { de, VERB, SOON, costLine } from './camp.js';
 
@@ -254,7 +255,41 @@ export class CampActions {
     s.hud.menu({ title: 'Lagerfeuer', sub: 'Knistern, Funken, Zeit zum Nachdenken.', items: [
       { label: 'Hinsetzen', sub: 'Die Zeit vergeht, das Feuer heilt', primary: true, act: () => this.sitDown() },
       { label: 'Questlog', sub: [ready ? `${ready} zum Abgeben` : null, n ? `${n} neue Angebote` : null].filter(Boolean).join(' · ') || 'Die Suche, AvAs Tank, Aufträge', act: () => s.hud.quests?.open(ready ? 'active' : n ? 'offers' : 'active') },
+      ...(this.box.save.applicant ? [{ label: `Bewerber: ${this.box.save.applicant.name}`, sub: 'wartet am Feuer und will mitfahren', icon: 'person', act: () => this.applicantMenu() }] : []),   // #085
+      ...((this.box.save.crew || []).length ? [{ label: `Crew (${this.box.save.crew.length})`, sub: 'Leute, Fähigkeiten, Jobs', icon: 'humans', act: () => this.crewMenu() }] : []),
       { label: 'Zurück', act: () => {} }] });
+  }
+  // ---------- #085 Crew-Kern: the applicant at the fire, the crew window, jobs at workshops ----------
+  personSub(p) { const k = known(this.D, p); return [p.origin, k.traits.map(t => `${t.name}${t.effect ? ` (${t.effect})` : ''}`).join(', '), k.hidden ? 'eine Eigenheit kennst du noch nicht' : null].filter(Boolean).join(' · '); }
+  applicantMenu() {
+    const s = this.scene, D = this.D, save = this.box.save, p = save.applicant;
+    if (!p) return;
+    const H = heads(D, save);
+    s.hud.menu({ title: `${p.name} will mitfahren`, sub: [`${skillText(D, p)}.`, this.personSub(p), `Rig: ${headsText(H)}${H.heads + 1 > H.beds && H.heads <= H.beds ? ' (mit ihr zu wenig)' : ''}.`].join(' '),
+      items: [{ label: 'Aufnehmen', primary: true, icon: 'check', act: () => { const q = admit(D, save, p); this.box.persist?.(); s.hud.toast(`${q.name} ist jetzt in der Crew`, 'Am Feuer › Crew teilst du ihr einen Job zu', 'good', 4200); this.crewPerson(q.id); } },
+        { label: 'Ablehnen', icon: 'x', act: () => { reject(save); this.box.persist?.(); s.hud.toast(`${p.name} zieht weiter`, '', 'info', 2600); } },
+        { label: 'Später', act: () => {} }] });
+  }
+  crewMenu() {
+    const s = this.scene, D = this.D, save = this.box.save, L = save.crew || [], H = heads(D, save);
+    s.hud.menu({ title: `Crew (${L.length})`, sub: `${headsText(H)}. Wer einen Job hat, bringt seine Fähigkeit an dieser Werkstatt ein.`,
+      items: [...L.map(p => { const e = p.job && jobEffect(D, save, p); return { label: p.name, sub: [skillText(D, p), p.job ? `Job: ${this.benchTitle(this.benchId(p.job), p.job)}${e ? ` · ${e.skill} +${e.value}` : ' · bringt hier nichts'}` : 'ohne Job'].join(' · '), icon: 'person', act: () => this.crewPerson(p.id) }; }),
+        { label: 'Zurück', icon: 'x', act: () => {} }] });
+  }
+  benchId(place) { const [ui, at] = String(place).split(':').map(Number); return this.box.save.rig.units[ui]?.workshops?.find(w => w.at === at)?.id || null; }
+  crewPerson(id) {
+    const s = this.scene, D = this.D, save = this.box.save, p = (save.crew || []).find(x => x.id === id);
+    if (!p) return this.crewMenu();
+    const benches = save.rig.units.flatMap((u, ui) => (u.workshops || []).map(w => ({ place: `${ui}:${w.at}`, w, def: D.workshops?.[w.id] || {} })))
+      .filter(b => b.def.function && !['storage', 'tank', 'bitfarm', 'cell'].includes(b.def.function))
+      .map(b => ({ ...b, e: jobEffect(D, save, p, b.place), who: (save.crew || []).find(q => q.job === b.place && q.id !== p.id) }))
+      .sort((a, b) => (b.e?.value || 0) - (a.e?.value || 0));
+    s.hud.menu({ title: `${p.name}`, sub: [`${skillText(D, p)}.`, this.personSub(p), p.day ? `In der Crew seit Tag ${p.day}.` : null].filter(Boolean).join(' '),
+      items: [...benches.map(b => ({ label: `${p.job === b.place ? '✓ ' : ''}${this.benchTitle(b.w.id, b.place)}`, sub: [b.e ? `${b.e.skill} +${b.e.value}` : 'bringt hier nichts', b.who ? `${b.who.name} arbeitet hier (tauscht)` : null].filter(Boolean).join(' · '),
+          primary: !!b.e && p.job !== b.place, disabled: p.job === b.place ? 'arbeitet schon hier' : null, icon: 'workbench', act: () => { setJob(save, p.id, b.place); this.box.persist?.(); s.hud.toast(`${p.name}: ${this.benchTitle(b.w.id, b.place)}`, b.e ? `${b.e.skill} +${b.e.value}` : 'bringt hier nichts', b.e ? 'good' : 'info', 3200); this.crewPerson(p.id); } })),
+        ...(p.job ? [{ label: 'Job beenden', icon: 'x', act: () => { setJob(save, p.id, null); this.box.persist?.(); this.crewPerson(p.id); } }] : []),
+        { label: 'Aus der Crew entlassen', icon: 'delete', act: () => s.hud.menu({ title: `${p.name} entlassen?`, sub: 'Sie packt ihre Sachen und geht. Das lässt sich nicht rückgängig machen.', items: [{ label: 'Entlassen', act: () => { dismiss(save, p.id); this.box.persist?.(); this.crewMenu(); } }, { label: 'Doch nicht', primary: true, act: () => this.crewPerson(p.id) }] }) },
+        { label: 'Zurück', icon: 'x', act: () => this.crewMenu() }] });
   }
   // Warroom: the travel map (#007) with the POI here, the places to drive to, and the techtree / Auswerten in its header
   warroom() {

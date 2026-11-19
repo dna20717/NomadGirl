@@ -1,0 +1,85 @@
+{
+ "first": [
+  "Ada",
+  "Bex",
+  "Cato",
+  "Dara",
+  "Emre",
+  "Fenna",
+  "Goran",
+  "Hira",
+  "Ilja",
+  "Juno",
+  "Kofi",
+  "Lenka",
+  "Milo",
+  "Nell",
+  "Oskar",
+  "Pia",
+  "Quinn",
+  "Rosa",
+  "Sami",
+  "Tilda",
+  "Ugo",
+  "Vesna",
+  "Wren",
+  "Yusuf",
+  "Zora"
+ ],
+ "nick": ["Rost", "Doc", "Funke", "Kralle", "Stille", "Brille", "Zwölf", "Kaffee", "Antenne", "Schaufel", "Glück", "Kabel"],
+ "origins": [
+  "Ist aus einer Siedlung an der Küste geflohen, als das Wasser kam.",
+  "Hat jahrelang Konvois begleitet, bis keiner mehr fuhr.",
+  "Kommt aus BigCityDelta und will nie wieder zurück.",
+  "Ist in einem Bunker aufgewachsen und hat den Himmel erst mit zwanzig gesehen.",
+  "War Mechanikerin bei einer Gang und hat die Seite gewechselt.",
+  "Hat auf einer Hydrofarm gearbeitet, bis Plünderer sie abbrannten.",
+  "Spricht nicht über die Zeit davor."
+ ],
+ "skills": [
+  {"id": "kochen", "name": "Kochen", "functions": "kitchen,foodtruck", "stat": "perfect", "perLevel": 6, "description": "Gerichte gelingen öfter perfekt."},
+  {
+   "id": "schrauben",
+   "name": "Schrauben",
+   "functions": "craft,vehicle,drone",
+   "stat": "refund",
+   "perLevel": 5,
+   "description": "Beim Herstellen kommt öfter ein Teil zurück."
+  },
+  {"id": "medizin", "name": "Medizin", "functions": "sleep,cyber,guests", "stat": "sleepHeal", "perLevel": 10, "description": "Schlaf heilt mehr."},
+  {"id": "gaertnern", "name": "Gärtnern", "functions": "garden,cistern", "stat": "growth", "perLevel": 10, "description": "Pflanzen wachsen schneller."},
+  {"id": "handeln", "name": "Handeln", "functions": "jobs,warroom,treasury", "stat": "sell", "perLevel": 4, "description": "Mehr Δ aus Runs."},
+  {"id": "spaehen", "name": "Spähen", "functions": "warroom,drone", "stat": "loot", "perLevel": 3, "description": "Mehr Beute im Run."},
+  {"id": "technik", "name": "Technik", "functions": "power,engine", "stat": "power", "perLevel": 1, "description": "Mehr Strom aus Generator und Motor."}
+ ],
+ "skillsPer": [1, 2],
+ "traits": [
+  {"id": "frohnatur", "name": "Frohnatur", "hidden": false, "weight": 3, "effect": "hebt die Stimmung aller", "description": "Lacht auch, wenn der Motor brennt."},
+  {"id": "feinschmecker", "name": "Feinschmecker", "hidden": false, "weight": 3, "effect": "Essen zählt doppelt", "description": "Rationen? Nur über ihre Leiche."},
+  {"id": "nachteule", "name": "Nachteule", "hidden": false, "weight": 2, "effect": "arbeitet nachts besser", "description": "Schläft, wenn die Sonne brennt."},
+  {"id": "angsthase", "name": "Angsthase", "hidden": false, "weight": 2, "effect": "Sicherheit zählt doppelt", "description": "Prüft jede Nacht dreimal die Türen."},
+  {"id": "einzelgaenger", "name": "Einzelgänger", "hidden": false, "weight": 2, "effect": "braucht Platz", "description": "Isst allein, redet wenig, arbeitet gut."},
+  {"id": "hamster", "name": "Hamster", "hidden": true, "weight": 2, "effect": "stiehlt Vorräte", "description": "Unter der Pritsche liegen Dosen. Viele Dosen."},
+  {"id": "spitzel", "name": "Spitzel", "hidden": true, "weight": 1, "effect": "meldet den Ort an eine Gang", "description": "Funkt nachts heimlich."},
+  {
+   "id": "sanitaeterin",
+   "name": "Sanitäterin",
+   "hidden": true,
+   "weight": 2,
+   "effect": "flickt Leyla nach einem k.o.",
+   "description": "War im Krieg. Erzählt nicht davon, näht aber wie ein Profi."
+  },
+  {
+   "id": "ex_raider",
+   "name": "Ex-Raider",
+   "hidden": true,
+   "weight": 2,
+   "effect": "hilft beim Verhandeln mit seiner alten Gang",
+   "description": "Die Tätowierung am Hals kennt jeder an der Kreuzung."
+  },
+  {"id": "treu", "name": "Treue Seele", "hidden": true, "weight": 3, "effect": "bleibt, auch wenn es hart wird", "description": "Hat sich entschieden. Für dich."}
+ ],
+ "fireChance": 20,
+ "revealDays": 3,
+ "fireFromDay": 2
+}

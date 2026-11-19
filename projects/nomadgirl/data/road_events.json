@@ -133,7 +133,7 @@
    "weight": 3,
    "danger": 1,
    "text": "Ein Pappschild: „{place}“. Darunter jemand, der seit Stunden hier steht.|Daumen raus, ein Rucksack mit {cargo}. „Nimmst du mich mit?“",
-   "answers": "fuer_alle_kochen, mitnehmen, essen_teilen, weiterfahren",
+   "answers": "fuer_alle_kochen, mitnehmen, aufnehmen, essen_teilen, weiterfahren",
    "moods": "freundlich, verzweifelt, misstrauisch",
    "loot": "kiste_tankstelle"
   },
@@ -1280,7 +1280,15 @@
    "result": "Ein Griff, ein neuer Knoten. Ruhe im Laderaum.",
    "failResult": "Sein Ellbogen trifft dich, bevor du ihn bändigst."
   },
-  {"id": "ruhigstellen", "label": "Ruhigstellen", "when": "any", "hurtPrisoners": 30, "dark": 1, "result": "Danach ist es still. Zu still."}
+  {"id": "ruhigstellen", "label": "Ruhigstellen", "when": "any", "hurtPrisoners": 30, "dark": 1, "result": "Danach ist es still. Zu still."},
+  {
+   "id": "aufnehmen",
+   "label": "Fragen, ob sie bleiben will",
+   "when": "friendly",
+   "food": 1,
+   "recruit": true,
+   "result": "Sie schaut lange auf das Rig. Dann wirft sie ihren Rucksack auf die Ladefläche."
+  }
  ],
  "words": {
   "group": "Rostkrähen|Asphaltwölfe|Neon-Saints|Schrottkönige|Staubtöchter|Kilometerfresser",

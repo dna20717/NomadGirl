@@ -2,6 +2,7 @@
 // legs (one road each); after every leg an encounter may happen (Reisen › Chance pro 10 km, more at night). An encounter
 // (Welt › Encounter) tells what happens and offers choices; a choice costs or gives time, fuel, food, Δ, health, things.
 // No DOM.
+import { admit, rollPerson, skillText } from './crew.js';
 import { usePrisoner, hurtAll, prisonerConfig, addDark } from './prisoners.js';
 import { advance } from './save.js';
 import { give, take, have } from './crafting.js';
@@ -90,6 +91,9 @@ export function choose(D, save, o, rnd = Math.random) {
   // #079 Gefangene: an answer uses one (Ruf for his gang, Dunkelheit), a failed fight or a riot hurts them all
   const used = !failed && o.prisoner ? usePrisoner(D, save, o) : null;
   if (used) { lines.push(`${used.name}${o.prisoner === 'free' ? ' ist frei' : ' ist weg'}`); if (used.rep?.n) lines.push(`Ruf ${used.rep.gang} ${used.rep.n > 0 ? '+' : '−'}${Math.abs(used.rep.n)}`); if (used.dark) lines.push(`+${used.dark} Dunkelheit`); }
+  // #085 Aufnahme auf der Reise: a settler from the building blocks joins the crew (Leyla chose this answer)
+  const joined = !failed && o.recruit ? admit(D, save, rollPerson(D, Math.floor(rnd() * 2 ** 31))) : null;
+  if (joined) lines.push(`${joined.name} ist jetzt in der Crew (${skillText(D, joined)})`);
   if (!failed && o.dark && !o.prisoner) { addDark(save, o.dark); lines.push(`+${o.dark} Dunkelheit`); }
   const hurt = (failed && o.health) || o.hurtPrisoners ? hurtAll(D, save, o.hurtPrisoners || prisonerConfig(D).hurt) : [];
   for (const h of hurt) lines.push(h.died ? `${h.name} hat es nicht überlebt` : `${h.name} verletzt`);
@@ -108,5 +112,5 @@ export function choose(D, save, o, rnd = Math.random) {
   if (revealed) lines.push(`Neuer Ort auf der Karte: ${revealed.name}`);
   if (o.chain) R.chain = o.chain.next ? { step: o.chain.next, gang: o.chain.gang, rival: o.chain.rival, n: o.chain.n } : null;
   if (o.once && !R.seen.includes(o.once)) R.seen.push(o.once);   // a situation that happens once per Durchgang
-  return { lines, things, text: o.result || '', failed, rep, rep2, revealed, story: R.chain ? 'weiter' : null };
+  return { lines, things, text: o.result || '', failed, rep, rep2, revealed, joined, story: R.chain ? 'weiter' : null };
 }

@@ -290,7 +290,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #083 Bilder hochladen in der Online-Werkstatt
-- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)
 - **Auftrag:** `cloud_store.js` kann Bilder als Commit speichern (Größe prüfen, Asset-Eintrag anlegen).
 - **Rückfragen:**
 - **Ergebnis:**
@@ -302,10 +302,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #085 Crew-Kern klein (aus #040)
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte #040: „Ja, erst klein“)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte #040: „Ja, erst klein“)
 - **Auftrag:** #040 Teile 1, 3, 4: Bereich „Leute“, Aufnahme-Entscheidung, Werkstätten-Jobs (dazu ein schlichtes Crew-Fenster). Rig-Moral (Teil 2) danach.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: Siedler haben noch keine Figur im Camp (nur Menü + Effekt-Leiste), Eigenheiten zeigen ihre Wirkung erst mit der Moral; Fähigkeiten als Boni-Bus-Werte; Bewerber ab Tag 2 mit 20 %; Kernfiguren bleiben eigener Bereich.
+- **Ergebnis:** (Code) Commit „Crew-Kern klein: Leute, Bewerber, Aufnahme auf der Reise, Jobs (#085)“. `npm test` 294/294 (neu `test/crew.test.js`), `tools/crew_test.mjs` 3/3, camp/drive grün. PixelLab 0 (Siedler ohne Aussehen, nur im Menü). **Bitte testen:** ein paar Tage im Camp, am Feuer auf einen Bewerber warten, aufnehmen, an die Kochnische stellen.
 
 ### #086 Story: mehrere Enden, Pixies geheimes Ende
 - **Status:** offen · angelegt 19.11. von Code (Daniel, Karten Ende + Pixie) · Design-Ticket, erst Text in `docs/design.md`, dann mit Daniel reden

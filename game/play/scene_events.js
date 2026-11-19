@@ -1,6 +1,7 @@
 // Events of the play scene (#017 split from scene.js): knock-out, waking up, the dropped backpack, notes and achievements, kills.
 // Mixed into PlayScene (game/play/scene.js): the methods keep their `this`, nothing else changes.
 import { catchUp, cellKeys } from '../prisoners.js';
+import { campArrival } from '../crew.js';
 import { storeKeyOf } from '../save.js';
 import { rescue } from '../tank.js';
 import { addRep, repConfig, levelName } from '../reputation.js';
@@ -138,6 +139,7 @@ export class SceneEvents {
   campNews() {
     const D = this.data_, save = this.box?.save;
     if (save) this.prisonerNews();   // #079
+    if (save) this.crewNews();   // #085
     if (!save || !D.achievements) return;
     this.learnNotes();
     const news = [...(save.achievements?.news || [])];
@@ -145,6 +147,13 @@ export class SceneEvents {
     const now = [...achieveLevel(D, save, 'lights', save.rig?.lights?.length || 0), ...achieveLevel(D, save, 'recipes', save.recipes?.length || 0), ...achieveCheck(D, save)];
     const info = id => { const a = D.achievements[id] || {}, rid = D.recipes?.[a.recipe] ? a.recipe : null; return { id, name: a.name || id, recipe: rid, recipeName: rid ? D.recipes[rid].name || rid : null }; };
     this.announce([...news.filter(id => D.achievements[id]).map(info), ...now]);
+  }
+  // #085 arriving: a hidden trait shows, someone may wait at the fire
+  crewNews() {
+    const r = campArrival(this.data_, this.box.save);
+    for (const x of r.revealed) this.hud.toast(`Du lernst ${x.name} besser kennen`, `${x.trait}`, 'info', 5200);
+    if (r.applicant) this.hud.toast(`${r.applicant.name} wartet am Feuer`, 'Will mitfahren · am Lagerfeuer entscheiden', 'info', 6000);
+    if (r.applicant || r.revealed.length) this.box.persist?.();
   }
   // #079 the days that passed: prisoners in the Zelle make Dunkelheit, those outside of it suffer (one toast)
   prisonerNews() {

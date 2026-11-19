@@ -79,7 +79,7 @@ s = await ev(() => { const m = c.use(); nomad.choose('Questlog'); const sc = gam
   const after = { ...nomad.quests(), deltas: sv.deltas - d0, done: !!sv.quests.done.kabelsalat, cable: c0 - cables() };
   sv.deltas = d0; Q.close(); nomad.step(2);   // the later checks count from the start money
   return { menu: m?.items.map(i => i.label), a, offers, taken, goal, ready: ready.rows, after }; });
-check('Lagerfeuer: Menü mit Hinsetzen und Questlog; neue Angebote zuerst, Aktiv beginnt mit der Hauptquest', s.menu?.join('|') === 'Hinsetzen|Questlog|Zurück' && s.a.first === 'offers' && s.a.open && s.a.rows[0] === 'main', s);
+check('Lagerfeuer: Menü mit Hinsetzen und Questlog; neue Angebote zuerst, Aktiv beginnt mit der Hauptquest', s.menu?.filter(l => !/^Bewerber: |^Crew \(/.test(l)).join('|') === 'Hinsetzen|Questlog|Zurück' && s.a.first === 'offers' && s.a.open && s.a.rows[0] === 'main', s);
 check('Questlog: Angebot annehmen, wird verfolgt und steht als Zielzeile im Bild', s.offers.includes('offer:kabelsalat') && s.taken.tab === 'active' && s.taken.tracked === 'kabelsalat' && /Kabelsalat/.test(s.goal), s);
 check('Questlog: Kupferkabel da → abgeben, Belohnung, Kabel weg, wieder Hauptquest verfolgt', s.ready.includes('side:kabelsalat!') && s.after.done && s.after.deltas === 60 && s.after.cable === 5 && s.after.tracked === 'main', s);
 // #017: companions talk jobs: „!“ over Schraube's head, the next job in the conversation (after Kabelsalat: Geier rupfen)
