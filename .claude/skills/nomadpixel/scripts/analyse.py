@@ -8,6 +8,12 @@
   bibliothek ORDNER [--out uebersicht.png]
           Übersichtsbogen aller Bausteine (.pix: part/icon/tile) eines Bibliotheks-Ordners mit Namen,
           dazu eine Liste „datei: baustein (BxH)“ zum Nachschlagen.
+  profil  NAME --ref PFAD[:BxH] [--ref …] --stil stil.json
+          Misst ein Stil-Profil einer Kategorie (z. B. symbole, figuren, kacheln) aus Referenzen
+          (bei Rastern/Streifen die Feld- bzw. Framegröße angeben) und speichert es in der Stilbibel.
+  pruefe  DATEI(.pix|.png[:BxH]) --profil NAME --stil stil.json
+          Vergleicht eine Grafik mit dem Profil: Helligkeit, Lichter/Schatten, Stufensprung (wie fein
+          schattiert), Sättigung, Einzelpixel, Farben – mit konkreten Hinweisen.
   grau    DATEI.pix [--scale 6] [--out grau.png]
           Helligkeits-Check: jede Grafik farbig | in Graustufen | 1:1, dazu Kontrastwerte. Eine gute
           Grafik ist auch ohne Farbe lesbar.
@@ -205,6 +211,109 @@ def bibliothek(ordner, out):
     return "\n".join(lines)
 
 
+# ---------------------------------------------------------------- Stil-Profile
+from collections import deque
+
+
+def kennzahlen(im):
+    a = np.asarray(im.convert("RGBA")).astype(float)
+    op = a[..., 3] > 0
+    pad = np.pad(op, 1)
+    edge = op & ~(pad[:-2, 1:-1] & pad[2:, 1:-1] & pad[1:-1, :-2] & pad[1:-1, 2:])
+    inner = op & ~edge
+    if inner.sum() < 10:
+        return None
+    L = 0.299 * a[..., 0] + 0.587 * a[..., 1] + 0.114 * a[..., 2]
+    v = L[inner]
+    dh = np.abs(L[:, 1:] - L[:, :-1])[inner[:, 1:] & inner[:, :-1]]
+    dv = np.abs(L[1:, :] - L[:-1, :])[inner[1:, :] & inner[:-1, :]]
+    d = np.concatenate([dh, dv]); d = d[d > 0]
+    mx, mn = a[..., :3].max(-1), a[..., :3].min(-1)
+    sat = ((mx - mn) / np.maximum(mx, 1))[inner]
+    key = (a[..., 0].astype(int) << 16) | (a[..., 1].astype(int) << 8) | a[..., 2].astype(int)
+    seen = np.zeros_like(inner); sizes = []
+    H, W = inner.shape
+    for y in range(H):
+        for x in range(W):
+            if inner[y, x] and not seen[y, x]:
+                k = key[y, x]; q = deque([(y, x)]); seen[y, x] = True; n = 0
+                while q:
+                    cy, cx = q.popleft(); n += 1
+                    for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                        ny, nx = cy + dy, cx + dx
+                        if 0 <= ny < H and 0 <= nx < W and inner[ny, nx] and not seen[ny, nx] and key[ny, nx] == k:
+                            seen[ny, nx] = True; q.append((ny, nx))
+                sizes.append(n)
+    s_ = np.array(sizes)
+    return {"helligkeit": float(np.median(v)), "schatten": float(np.percentile(v, 10)), "licht": float(np.percentile(v, 90)),
+            "stufensprung": float(np.median(d)) if d.size else 0.0, "saettigung": float(np.median(sat)),
+            "einzelpixel": float((s_ == 1).sum() / s_.sum()), "farben": int(len(np.unique(key[op])))}
+
+
+def zellen(spec):
+    path, _, size = spec.partition(":")
+    im = Image.open(path).convert("RGBA")
+    if not size:
+        return [im]
+    cw, ch = (int(v) for v in size.lower().split("x"))
+    out = []
+    for y in range(0, im.height - ch + 1, ch):
+        for x in range(0, im.width - cw + 1, cw):
+            c = im.crop((x, y, x + cw, y + ch))
+            if (np.asarray(c)[..., 3] > 0).sum() > 30:
+                out.append(c)
+    return out
+
+
+TEXTE = {"helligkeit": ("zu dunkel", "zu hell", "Grundtöne eine bis zwei Rampenstufen {r}"),
+         "schatten": ("Schatten zu tief", "Schatten zu flach", "dunkelste Stufen {r}"),
+         "licht": ("Lichter zu schwach", "Lichter zu grell", "hellste Stufen {r}"),
+         "stufensprung": ("Schattierung feiner als üblich", "Schattierung zu grob", "{r}"),
+         "saettigung": ("zu grau", "zu bunt", "Farben {r}"),
+         "einzelpixel": ("sehr glatt", "zu viel Pixelrauschen", "{r}"),
+         "farben": ("zu wenige Farbstufen", "zu viele Farben", "{r}")}
+RAT = {("helligkeit", 0): "heller wählen", ("helligkeit", 1): "dunkler wählen", ("schatten", 0): "anheben", ("schatten", 1): "tiefer ziehen",
+       ("licht", 0): "kräftiger setzen", ("licht", 1): "zurücknehmen", ("stufensprung", 0): "ruhig so lassen oder Kontrast erhöhen",
+       ("stufensprung", 1): "mehr Zwischenstufen (feine Rampe, zeichnen.rampe_fein) oder sanfteres Dithering",
+       ("saettigung", 0): "kräftiger", ("saettigung", 1): "entsättigter (Rampen der Referenz nehmen)", ("einzelpixel", 0): "Struktur ergänzen",
+       ("einzelpixel", 1): "Einzelpixel zu Clustern zusammenfassen, Flächen beruhigen", ("farben", 0): "mehr Zwischentöne", ("farben", 1): "Farben zusammenlegen"}
+
+
+def profil(refs):
+    K = [k for spec in refs for c in zellen(spec) if (k := kennzahlen(c))]
+    out = {"anzahl": len(K), "quellen": [os.path.basename(r.split(":")[0]) for r in refs]}
+    for m in TEXTE:
+        vals = np.array([k[m] for k in K], dtype=float)
+        out[m] = [round(float(np.percentile(vals, 25)), 3), round(float(np.median(vals)), 3), round(float(np.percentile(vals, 75)), 3)]
+    return out
+
+
+def pruefe(spec, prof):
+    if spec.endswith(".pix"):
+        from pixelart import Pix
+        p = Pix.load(spec)
+        items = [(e.name, p.image(e)) for e in p.elems if e.kind in ("icon", "tile", "frame", "part")]
+    else:
+        items = [(f"{os.path.basename(spec)}#{i}", c) for i, c in enumerate(zellen(spec))]
+    lines, schlecht = [], 0
+    for name, im in items:
+        k = kennzahlen(im)
+        if not k:
+            continue
+        hints = []
+        for m, (lo_t, hi_t, _) in TEXTE.items():
+            q1, med, q3 = prof[m]
+            spanne = max(q3 - q1, abs(med) * 0.15, 1e-6)
+            if k[m] < q1 - 0.5 * spanne:
+                hints.append(f"{lo_t} ({k[m]:.2f} statt ~{med:.2f}) → {RAT[(m, 0)]}")
+            elif k[m] > q3 + 0.5 * spanne:
+                hints.append(f"{hi_t} ({k[m]:.2f} statt ~{med:.2f}) → {RAT[(m, 1)]}")
+        schlecht += bool(hints)
+        lines.append(f"{name}: " + ("passt zum Profil" if not hints else "\n   - " + "\n   - ".join(hints)))
+    lines.append(f"\n{len(items) - schlecht} von {len(items)} passen zum Profil.")
+    return "\n".join(lines)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("cmd")
@@ -214,6 +323,7 @@ def main():
     ap.add_argument("--stil")
     ap.add_argument("--scale", type=int, default=6)
     ap.add_argument("--out")
+    ap.add_argument("--profil")
     a = ap.parse_args()
     if a.cmd == "rampen":
         if not a.ref:
@@ -227,6 +337,21 @@ def main():
             d["outlineFarbe"] = res["outline"]
             json.dump(d, open(a.stil, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
         print(json.dumps(res, ensure_ascii=False, indent=1))
+    elif a.cmd == "profil":
+        if not (a.datei and a.ref and a.stil):
+            sys.exit("profil NAME --ref PFAD[:BxH] … --stil stil.json")
+        pr = profil(a.ref)
+        d = json.load(open(a.stil, encoding="utf-8")) if os.path.exists(a.stil) else {}
+        d.setdefault("profile", {})[a.datei] = pr
+        json.dump(d, open(a.stil, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+        print(json.dumps(pr, ensure_ascii=False, indent=1))
+    elif a.cmd == "pruefe":
+        if not (a.datei and a.profil and a.stil):
+            sys.exit("pruefe DATEI --profil NAME --stil stil.json")
+        prof = json.load(open(a.stil, encoding="utf-8")).get("profile", {}).get(a.profil)
+        if not prof:
+            sys.exit(f"Profil '{a.profil}' fehlt in {a.stil} (erst: analyse.py profil {a.profil} --ref … --stil …)")
+        print(pruefe(a.datei, prof))
     elif a.cmd == "bibliothek":
         out = a.out or os.path.join(a.datei, "uebersicht.png")
         print(bibliothek(a.datei, out))

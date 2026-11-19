@@ -264,3 +264,109 @@ def stamp(c, pixfile, name, x=0, y=0, fx=False, fy=False, recolor=None):
             tx = x + (W - 1 - xx if fx else xx)
             ty = y + (H - 1 - yy if fy else yy)
             c.set(tx, ty, h)
+
+
+# ---------------------------------------------------------------- feine Schattierung (für Figuren ab ~48 px)
+def _lab(h):
+    import math
+    r, g, b = (int(h[i:i + 2], 16) / 255 for i in (1, 3, 5))
+    f = lambda v: ((v + 0.055) / 1.055) ** 2.4 if v > 0.04045 else v / 12.92
+    r, g, b = f(r), f(g), f(b)
+    x = (r * 0.4124 + g * 0.3576 + b * 0.1805) / 0.95047; y = r * 0.2126 + g * 0.7152 + b * 0.0722; z = (r * 0.0193 + g * 0.1192 + b * 0.9505) / 1.08883
+    t = lambda v: v ** (1 / 3) if v > 0.008856 else 7.787 * v + 16 / 116
+    return (116 * t(y) - 16, 500 * (t(x) - t(y)), 200 * (t(y) - t(z)))
+
+def rampe_fein(ramp, palette, max_abstand=14):
+    """Feinere Rampe: setzt Palettenfarben ein, die zwischen zwei Rampenstufen liegen (Helligkeit dazwischen,
+    nah an der Verbindungslinie im Farbraum). palette: Liste Hex-Farben (z. B. AAP-64). → längere Rampe"""
+    import math
+    L = {h: _lab(h) for h in set(palette) | set(ramp)}
+    out = [ramp[0]]
+    for a, b in zip(ramp, ramp[1:]):
+        A, B = L[a], L[b]
+        seg = [B[i] - A[i] for i in range(3)]; n2 = sum(v * v for v in seg) or 1
+        mid = []
+        for h in palette:
+            if h in ramp:
+                continue
+            P = L[h]
+            t = sum((P[i] - A[i]) * seg[i] for i in range(3)) / n2
+            if not 0.15 < t < 0.85:
+                continue
+            Q = [A[i] + t * seg[i] for i in range(3)]
+            if math.dist(P, Q) <= max_abstand:
+                mid.append((t, h))
+        out += [h for _, h in sorted(mid)][:2] + [b]
+    return out
+
+BAYER4 = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]
+
+def _shade_dither(self, mask, ramp, cx=None, cy=None, rx=None, ry=None, bias=0.0, light=(-0.7, -0.7), dither=False, tief=0.0):
+    """wie shade_mask; dither=True mischt benachbarte Stufen im Bayer-Muster (weicher Verlauf),
+    tief>0 zieht die Schattenseite zusätzlich nach unten (Figuren wirken plastischer)."""
+    import math
+    pts = [(x, y) for y in range(T) for x in range(T) if mask(x, y)]
+    if not pts:
+        return
+    xs = [p[0] for p in pts]; ys = [p[1] for p in pts]
+    cx = cx if cx is not None else (min(xs) + max(xs)) / 2; cy = cy if cy is not None else (min(ys) + max(ys)) / 2
+    rx = rx or max(1, (max(xs) - min(xs)) / 2 + 0.5); ry = ry or max(1, (max(ys) - min(ys)) / 2 + 0.5)
+    lx, ly = light; ln = math.hypot(lx, ly); lx, ly = lx / ln, ly / ln
+    for x, y in pts:
+        nx, ny = (x - cx) / rx, (y - cy) / ry
+        nz = math.sqrt(max(0, 1 - min(1, nx * nx + ny * ny)))
+        d = max(0, -(nx * lx + ny * ly) * 0.75 + nz * 0.55) + bias - tief * max(0, ny)
+        f = min(1, max(0, d / 1.15)) * (len(ramp) - 1)
+        i = int(f)
+        if dither and i < len(ramp) - 1 and (f - i) > (BAYER4[y % 4][x % 4] + 0.5) / 16:
+            i += 1
+        elif not dither:
+            i = int(round(f))
+        self.set(x, y, ramp[i])
+C.shade_mask = _shade_dither
+
+
+# ---------------------------------------------------------------- Bewegungsgerüst
+def kapsel(c, a, b, ra, rb, ramp, light=(-0.7, -0.7), dither=False):
+    """Glied von Gelenk a=(x,y) nach b, Radius ra → rb (verjüngt), rund schattiert (Licht oben links)."""
+    import math
+    (ax, ay), (bx, by) = a, b
+    vx, vy = bx - ax, by - ay; L2 = vx * vx + vy * vy or 1e-6
+    lx, ly = light; ln = math.hypot(lx, ly); lx, ly = lx / ln, ly / ln
+    for y in range(int(min(ay, by) - max(ra, rb) - 1), int(max(ay, by) + max(ra, rb) + 2)):
+        for x in range(int(min(ax, bx) - max(ra, rb) - 1), int(max(ax, bx) + max(ra, rb) + 2)):
+            t = max(0, min(1, ((x - ax) * vx + (y - ay) * vy) / L2))
+            px, py = ax + t * vx, ay + t * vy
+            r = ra + (rb - ra) * t
+            dx, dy = x - px, y - py
+            dist = math.hypot(dx, dy)
+            if dist > r + 0.35:
+                continue
+            nx, ny = (dx / r, dy / r) if r > 0 else (0, 0)
+            nz = math.sqrt(max(0, 1 - min(1, nx * nx + ny * ny)))
+            dval = max(0, -(nx * lx + ny * ly) * 0.75 + nz * 0.55)
+            f = min(1, dval / 1.15) * (len(ramp) - 1)
+            i = int(f)
+            if dither and i < len(ramp) - 1 and (f - i) > (BAYER4[y % 4][x % 4] + 0.5) / 16:
+                i += 1
+            elif not dither:
+                i = int(round(f))
+            c.set(x, y, ramp[i])
+
+def glied_kette(start, winkel, laengen):
+    """Vorwärtskinematik: Startgelenk, Winkel in Grad (0 = nach unten, positiv = nach vorn/rechts, jeder relativ
+    zum vorigen Glied), Längen → Liste der Gelenkpunkte [start, knie, fuß, …]."""
+    import math
+    pts = [start]; a = 0.0
+    for w, l in zip(winkel, laengen):
+        a += w
+        x, y = pts[-1]
+        pts.append((x + math.sin(math.radians(a)) * l, y + math.cos(math.radians(a)) * l))
+    return pts
+
+def bein(c, start, winkel, laengen, radien, ramp, dither=False):
+    """Bein/Arm aus Gelenkwinkeln zeichnen; radien je Gelenk (len(laengen)+1). → Gelenkpunkte"""
+    pts = glied_kette(start, winkel, laengen)
+    for i in range(len(pts) - 1):
+        kapsel(c, pts[i], pts[i + 1], radien[i], radien[i + 1], ramp, dither=dither)
+    return pts

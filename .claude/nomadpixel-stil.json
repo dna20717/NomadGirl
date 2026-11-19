@@ -115,5 +115,94 @@
   "outlineFarbe": "#060608",
   "rampenQuelle": "gemessen mit analyse.py rampen aus icons_kitchen, icons_gear, icons_misc (19.11.2026)",
   "bibliothek": ".claude/nomadpixel-bibliothek/",
-  "lernbuch": ".claude/nomadpixel-lernbuch.md"
+  "lernbuch": ".claude/nomadpixel-lernbuch.md",
+  "profile": {
+    "symbole": {
+      "anzahl": 187,
+      "quellen": [
+        "icons_kitchen.png",
+        "icons_gear.png",
+        "icons_misc.png"
+      ],
+      "helligkeit": [
+        60.738,
+        82.606,
+        106.33
+      ],
+      "schatten": [
+        17.538,
+        29.566,
+        44.751
+      ],
+      "licht": [
+        117.344,
+        147.8,
+        185.942
+      ],
+      "stufensprung": [
+        37.855,
+        48.133,
+        61.226
+      ],
+      "saettigung": [
+        0.235,
+        0.244,
+        0.25
+      ],
+      "einzelpixel": [
+        0.138,
+        0.229,
+        0.305
+      ],
+      "farben": [
+        12.5,
+        15.0,
+        19.0
+      ]
+    },
+    "figuren": {
+      "anzahl": 18,
+      "quellen": [
+        "run_side.png",
+        "light_attack.png",
+        "schraube_idle.png",
+        "onkel_sung_idle.png"
+      ],
+      "helligkeit": [
+        35.787,
+        50.35,
+        51.268
+      ],
+      "schatten": [
+        4.228,
+        4.228,
+        18.547
+      ],
+      "licht": [
+        134.418,
+        144.478,
+        144.478
+      ],
+      "stufensprung": [
+        13.695,
+        16.585,
+        25.039
+      ],
+      "saettigung": [
+        0.333,
+        0.37,
+        0.491
+      ],
+      "einzelpixel": [
+        0.136,
+        0.16,
+        0.191
+      ],
+      "farben": [
+        19.0,
+        56.5,
+        61.0
+      ]
+    }
+  }
 }

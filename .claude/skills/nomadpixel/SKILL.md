@@ -113,6 +113,8 @@ Bei großen Grafiken (≥ 24 px) das Raster per kleinem Python-Skript mit `scrip
 | `AN rampen --ref RASTER.png … [--stil stil.json] [--png tafel.png]` | Farbrampen messen, die die bestehenden Grafiken fürs Schattieren benutzen (`AN` = `python3 .claude/skills/nomadpixel/scripts/analyse.py`) |
 | `AN grau F.pix [--out grau.png]` | Helligkeits-Check: farbig, Graustufen, 1:1 nebeneinander + Kontrastwerte |
 | `AN bibliothek ORDNER` | Übersichtsbogen aller Bausteine einer Bibliothek |
+| `AN profil NAME --ref RASTER.png:BxH … --stil stil.json` | Stil-Profil einer Kategorie messen (Helligkeit, Schatten, Licht, Stufensprung, Sättigung, Einzelpixel, Farben) und in der Stilbibel unter `profile` speichern |
+| `AN pruefe F.png:BxH --profil NAME --stil stil.json` | Neue Grafik gegen das Profil prüfen, mit Hinweisen (zu hell, zu grob, zu bunt …) |
 | `PA palcheck F --pal-file PALETTE` | alle Farben aus der Projektpalette? (.hex, .png, .json oder `--palette "#hex,…"`) |
 | `PA outline F --char C [--name N] [--diagonal]` | automatische Outline |
 | `PA fromimg BILD --width 48 [...]` | Foto → `.pix` |
@@ -130,6 +132,13 @@ Bei großen Grafiken (≥ 24 px) das Raster per kleinem Python-Skript mit `scrip
 6. Vorschau: eine kleine **Szene** aus Boden + Deko + schlichtem Hintergrund zeigt die Wirkung am besten.
 
 ## 7. Charakter-Animationen
+
+**Vorher `bewegung.md` lesen** (Schlüsselposen und Timing für Gehen, Rennen, Galopp, Idle, Angriff). Ab 48 px:
+- **Gerüst für Rumpf und Gliedmaßen:** `zeichnen.bein(c, start, winkel, laengen, radien, rampe)` aus Gelenkwinkeln (Tabelle aus `bewegung.md`), Rumpf als Becken + Mitte + Brust, die sich je Frame strecken/stauchen und krümmen. Boden automatisch: tiefste Pfote auf die Bodenzeile, in Flugphasen 2–3 px höher.
+- **Charakterteile von Hand** (Kopf, Gesicht, Ohren, Haare, Schwanz): sorgfältig gestaltet, dann am Gerüst befestigt und mit 1–2 Frames Verzögerung geschwungen. Rein geometrisch gerechnete Köpfe verlieren den Charme (Fennek-Test 19.11.).
+- **Jedes Glied auf eigener Ebene mit eigener Kontur**, damit sich Beine nicht zu einem Klumpen verbinden; ferne Glieder nur eine Stufe dunkler.
+- **Struktur (Fellstriche, Flecken) in normierten Körperkoordinaten**, sonst springen sie, wenn der Rumpf sich streckt.
+- Danach die **Kritiker-Runde** (`kritik.md`).
 
 1. Teile (`[part]`): Kopf, Körper, Beine, Arme, Ausrüstung. Symmetrisches mit `mirror`, Licht danach asymmetrisch.
 2. Frames aus Teilen zusammensetzen (`@ teil x y`), Bewegung über Offsets und Teil-Varianten: Proportionen bleiben stabil.
@@ -158,7 +167,7 @@ Bei großen Grafiken (≥ 24 px) das Raster per kleinem Python-Skript mit `scrip
 
 Nach den Form- und Licht-Runden, wenn Silhouette und Schattierung sitzen. Ziel: die Feinstruktur der bestehenden Grafiken des Projekts erreichen, ohne Unruhe.
 
-1. **Messen:** Gibt es Referenzgrafiken im Spiel (Stilbibel `referenzen`), `PA refcheck <datei> --ref <raster.png>`. Ziel: Detaildichte im Referenzbereich (Spanne wird angezeigt). Ohne Referenz: 0,45–0,60 als Richtwert für 32 px.
+1. **Messen:** Gibt es ein passendes Stil-Profil (Stilbibel `profile`), `AN pruefe <datei>:BxH --profil <kategorie>`; sonst `PA refcheck <datei> --ref <raster.png>` (Detaildichte, Richtwert 0,45–0,60 bei 32 px). **Profil nur nehmen, wenn die Referenzen zur Grafik passen:** gleiche Art (Symbol, Figur, Tier, Kachel), ähnliche Auflösung und echte Pixel-Art. Hochaufgelöste, gemalte Figuren taugen nicht als Maßstab für 64-px-Pixel-Art, und ein sandfarbenes Tier wird nicht so dunkel wie eine Figur im Mantel. Passt kein Profil: nur die Hinweise zu Stufen und Rauschen ernst nehmen und das in der Antwort sagen.
 2. **Materialstruktur** je Material passend (`zeichnen.py`):
    - Holz/Fasern/Haare: `grain` entlang der Wuchsrichtung
    - Fleisch, Gestein, Pilzhaut, Rost: `speckle` (Dichte 0,15–0,25)
@@ -215,7 +224,8 @@ Vor jedem Auftrag, in dieser Reihenfolge:
 2. `AN grau <datei>`: Ist jede Grafik auch in Graustufen lesbar? **Nebeneinanderliegende Bauteile müssen sich in der Helligkeit unterscheiden**, nicht nur in der Farbe. Sonst Helligkeit eines Teils verschieben (Rampenstufe wechseln).
 3. **Drehen** (Waffen und Werkzeuge diagonal, Varianten): `zeichnen.rotate(c, grad)` statt neu zeichnen oder einfach drehen; danach `outline` + `clean`.
 4. **Varianten:** Wünscht der Auftrag mehrere (`variants`), je Motiv 2–3 Entwürfe mit **unterschiedlicher Silhouette** (Form, Haltung, Proportion), alle durch die volle Prüfung. Als eigene Ergebnis-Assets bzw. Dateien `<name>_a/_b/_c` abgeben; Daniel wählt den Favoriten.
-5. Pflicht-Prüfungen vor der Abgabe: `palcheck`, `refcheck`, `AN grau`, Vergleichsbild mit Referenzen (vergrößert und 1:1).
+5. Pflicht-Prüfungen vor der Abgabe: `palcheck`, `refcheck` bzw. `AN pruefe`, `AN grau`, Vergleichsbild mit Referenzen (vergrößert und 1:1).
+6. **Kritiker-Runde** (`kritik.md`) für Figuren, Animationen und Sets ab 8 Motiven: unabhängiger Prüfer (Subagent), Bewertungsbogen 1–5, Schwelle Durchschnitt ≥ 4, höchstens 3 Runden. Dem Kritiker **alle Frames** zeigen und zusätzlich das GIF-Verhalten beschreiben lassen (Nachschwingen sieht man nicht auf Einzelbildern). Kritiker streuen: im Zweifel zwei befragen und mitteln. Endnoten und offene Schwächen ehrlich berichten.
 
 ## 15. Nach der Abgabe: Bibliothek und Lernbuch pflegen
 
