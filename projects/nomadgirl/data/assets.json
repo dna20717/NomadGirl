@@ -5751,5 +5751,19 @@
   "description": "Neues Raster für Symbole, die Claude Code selbst zeichnet (NomadPixel, Text-Pixel-Art). Feld 1: Gefangener (#079). Die übrigen 15 Felder sind frei.",
   "source": "NomadPixel (Claude Code, Text-Pixel-Art, Palette AAP-64, .pix-Quelle)",
   "date": "19.11.2026"
+ },
+ "fennek_run": {
+  "name": "Fennek · Rennen",
+  "kind": "animation",
+  "file": "assets/fennek/run.png",
+  "frameSize": [64, 64],
+  "frames": 8,
+  "fps": 12,
+  "loop": true,
+  "origin": [32, 61],
+  "height": 64,
+  "description": "Ein Wüstenfuchs huscht seitlich nach rechts (Galopp, 8 Frames): Kleinvieh für den Hintergrund. Gegenrichtung per Spiegeln.",
+  "source": "NomadPixel (Claude Code, Text-Pixel-Art, Palette AAP-64, .pix-Quelle run_source.pix)",
+  "date": "19.11.2026"
  }
 }
