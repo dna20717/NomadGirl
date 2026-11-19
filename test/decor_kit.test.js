@@ -11,7 +11,7 @@ const fresh = () => { const s = newSave(D); s.deltas = 5000; dstate(s).decor = [
 
 test('Baukasten-Stücke: Varianten aus dem Symbol-Raster, Ensembles im Katalog', () => {
   assert.equal(variants(D, 'kit_kiste'), 10);
-  assert.equal(variants(D, 'kit_laterne'), 1);
+  assert.equal(variants(D, 'kit_laterne'), 3);   // #116 three painted lantern posts
   assert.ok(Object.keys(D.decorSets).length >= 5);
   const s = fresh();
   assert.ok(put(D, s, 'kit_kiste', { x: 2 }).ok);

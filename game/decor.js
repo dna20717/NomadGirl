@@ -15,6 +15,7 @@ export const DECOR_ARTS = [['addon', 'Ausschnitt eines Anbauteils'], ['neon', 'N
   ['birdhouse', 'Vogelhaus (Krähen)'], ['trophies', 'Kiste mit Fundstücken'], ['hammock', 'Hängematte'], ['lantern', 'Laterne'], ['mirror', 'Spiegel (Haare färben)'], ['pennants', 'Wimpelkette'], ['canopy', 'Fallschirm-Plane'], ['barrel', 'Feuertonne'], ['balcony', 'Balkon (begehbar)'], ['bridge', 'Brücke (begehbar)'], ['tower', 'Aussichtsturm (begehbar, Leiter)'], ['icon', 'Bild aus einem Symbol-Raster'], ['sprite', 'Bild mit Varianten (Baukasten)'], ['ladder', 'Leiter aufs Dach (kletterbar)'], ['stairs', 'Treppe in den Container (kletterbar)']];
 // #111 Camp-Baukasten: what can stand on a piece (Tragfläche)
 export const DECOR_CARRY = [['', 'Nichts'], ['content', 'Oberkante des Bilds'], ['fixed', 'In fester Höhe']];
+export const DECOR_GROW = [['', 'Nein'], ['up', 'Höhe (Kopf, Mittelstücke, Fuß)'], ['side', 'Breite (Enden, Abschnitte) und etwas Höhe'], ['stack', 'Stapel (mehr Stück übereinander)']];   // #116
 export const DECOR_EXTRAS = [['', 'Nichts'], ['fire', 'Flammen + Licht'], ['light', 'Licht'], ['candle', 'Kerzenlicht (klein)'], ['steam', 'Dampf'], ['rotor', 'Rotor (dreht, von der Seite)'], ['neon', 'Neon (leuchtet nachts, flackert)']];
 // #114 Farbe wie Townscaper: arts that take a painted colour (cloth and light)
 export const PAINTABLE = new Set(['tent', 'sail', 'canopy', 'pennants', 'banner', 'line', 'hammock', 'neon']);

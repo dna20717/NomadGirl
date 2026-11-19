@@ -16,7 +16,7 @@ import { ACHIEVEMENT_COUNTERS, ACHIEVEMENT_SPECIALS, ACHIEVEMENT_CATEGORIES } fr
 import { REP_LEVELS } from '../game/reputation.js';
 import { RADIO_STYLES, RADIO_TALK, RADIO_SCALES, RADIO_KEYS } from '../game/radio_kinds.js';
 import { VOICE_STYLES, VOICE_SOUNDS } from '../game/voice.js';
-import { DECOR_PLACES, DECOR_ARTS, DECOR_CARRY, DECOR_EXTRAS, DECOR_USES } from '../game/decor.js';
+import { DECOR_PLACES, DECOR_ARTS, DECOR_CARRY, DECOR_EXTRAS, DECOR_USES, DECOR_GROW } from '../game/decor.js';
 import { MOMENTS } from '../game/banter.js';
 import { EARN_WHEN } from '../game/earn.js';
 import { RELIEFS, ROADSIDE } from '../game/road.js';
@@ -1202,7 +1202,14 @@ export const AREAS = {
         num('rotor', 'Rotor-Länge', { unit: 'Bildpixel', min: 4 }),
         select('use', 'Benutzen', DECOR_USES, { hint: 'E am Stück' }), text('useHint', 'Knopf-Text', { hint: 'Ausruhen: z. B. „Dösen“' }), num('heal', 'Heilt', { unit: '%', min: 0 }),
         bool('matchWall', 'Nimmt die Farbe des Containers an', { hint: '#114 Wand-Module: das Stück Wellblech im Bild wird wie der Container gestrichen' }), bool('foot', 'Steht unten an der Wand', { hint: 'Türen und Tore: auf dem Boden des Containers statt in zwei Höhen' }),
-        bool('crows', 'Lockt Krähen an', { hint: 'Wie das Vogelhaus: Krähen sitzen darauf und auf Ecken' }), bool('shadow', 'Schatten am Boden', { hint: 'Aus = kein Kontaktschatten (Standard: an)' })] }],
+        bool('crows', 'Lockt Krähen an', { hint: 'Wie das Vogelhaus: Krähen sitzen darauf und auf Ecken' }), bool('shadow', 'Schatten am Boden', { hint: 'Aus = kein Kontaktschatten (Standard: an)' })] },
+      { title: 'Wachsen', fields: [   // #116 (Daniel: „Dinge wie Laterne so designen, dass man die Ziehen-Funktion benutzen kann“)
+        select('grow', 'Ziehen zum Wachsen', DECOR_GROW, { hint: 'Im Bau-Modus am goldenen Griff ziehen. Höhe: Kopf + Mittelstücke + Fuß; Breite: Enden + Abschnitte (und etwas Höhe); Stapel: mehr Stück übereinander' }),
+        range('growRange', 'Stufen', { hint: 'Wie viele Mittelstücke (bzw. Abschnitte, Kisten) mindestens und höchstens' }), num('growStart', 'Stufe beim Kaufen', { min: 0 }),
+        range('growRange2', 'Höhen-Stufen', { hint: 'Nur „Breite“: wie oft das Wand-Band (Mittelstück y) zusätzlich höher macht, 1 = wie gemalt' }), num('growStart2', 'Höhen-Stufe beim Kaufen', { min: 0 }),
+        table('slices', 'Mittelstück je Variante', [num('y0', 'Zeile ab'), num('y1', 'bis'), num('x0', 'Spalte ab'), num('x1', 'bis')], { hint: 'Bildpixel im Feld (tools/camp_modules.py schreibt sie). Zeile 1 = Variante 1; eine Zeile gilt für alle' }),
+        num('growLight', 'Licht je Stufe', { unit: '%', min: 0, hint: 'Ein höherer Pfosten leuchtet weiter' }),
+        num('growView', 'Weitblick je Stufe', { unit: '%', min: 0, hint: 'Turm: oben zoomt die Kamera je Etage so viel weiter raus' })] }],
     // art and place must go together, else the camp cannot draw or anchor it (Aufräumen 16.11.2026)
     check: (x, report) => {
       const need = { ladder: ['climb'], stairs: ['climb'], pole: ['ground'], tower: ['ground'], balcony: ['side'], bridge: ['span'], tent: ['span'], sail: ['span'], line: ['span'], hammock: ['span'], pennants: ['span'], canopy: ['span'] }[x.art];
@@ -1210,6 +1217,7 @@ export const AREAS = {
       if (x.place === 'span' && need == null && x.art) report('warning', `Art „${label(DECOR_ARTS, x.art)}“ hängt nicht zwischen zwei Punkten`);
       if (x.art === 'sprite' && !x.look) report('error', 'Bild mit Varianten braucht ein Symbol-Raster');
       if (x.carry === 'fixed' && !x.top) report('warning', 'Tragfläche in fester Höhe ohne Höhe');
+      if ((x.grow === 'up' || x.grow === 'side') && !x.slices?.length && x.art !== 'ladder') report('error', 'Wachsen braucht ein Mittelstück (Zeilen bzw. Spalten)');
       if (x.place === 'free' && x.art !== 'sprite') report('warning', '„Frei“ ist für Bilder mit Varianten gedacht');
     },
   },
@@ -1431,6 +1439,8 @@ export const AREAS = {
         num('view.snap', 'Ankuppeln ab', { unit: 'px', min: 40, hint: 'So nah muss ein Anhänger an eine Kupplung' }),
         num('view.shake', 'Wackeln beim Einrasten', { unit: '%', min: 0, max: 200 }), num('view.volume', 'Lautstärke der Bau-Töne', { unit: '%', min: 0, max: 100 }),
         num('view.cursorSpeed', 'Bau-Cursor: Tempo (Controller, Tastatur)', { unit: 'px/s', min: 100, max: 4000, hint: 'Gehalten ab 450 ms fast doppelt so schnell' }),
+        bool('grid.enabled', 'Bau-Raster um AvA', { hint: '#116 Scan-Raster wie die Boden-Leiste: zeigt, wo man bauen kann; aus = nur die Marken' }),
+        num('grid.cell', 'Bau-Raster: Zelle', { unit: '% einer Kachel', min: 10, max: 200 }), num('grid.radius', 'Bau-Raster: Reichweite', { unit: 'Kacheln', min: 1, max: 20 }), num('grid.alpha', 'Bau-Raster: Deckkraft', { unit: '%', min: 0, max: 100 }),
         bool('view.leylaFire', 'Leyla setzt sich ans Feuer', { hint: 'Daniel, 12.11.2026: „im Bau-Modus nur noch die Drohne steuern, Leyla setzt sich ans Feuer“. AvA erledigt dann auch das Werkeln' }),
         bool('view.droneBuilds', 'AvA trägt die Teile', { hint: 'Sie fliegt dem Zeiger bzw. Bau-Cursor nach, ein gepacktes Teil hängt unter ihr' }),
         num('view.droneAbove', 'AvA über dem Zeiger', { unit: 'px', min: 0 }), num('view.droneFollow', 'AvA folgt', { unit: '%', min: 1, max: 100, hint: 'Wie schnell sie dem Zeiger folgt' })] },

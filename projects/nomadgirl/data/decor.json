@@ -207,8 +207,12 @@
   "cozy": 0,
   "size": [0.4, 4],
   "description": "Ein Ankerpunkt für Zelte, Segel und Leinen, frei auf dem Boden.",
-  "look": "kit_poles",
-  "flip": true
+  "look": "kit_mod_poles",
+  "flip": true,
+  "slices": [{"y0": 264, "y1": 305},{"y0": 158, "y1": 209},{"y0": 300, "y1": 363}],
+  "grow": "up",
+  "growRange": [0, 4],
+  "growStart": 1
  },
  "zelt": {
   "name": "Großes Zelt",
@@ -323,8 +327,13 @@
   "size": [1.6, 5.0625],
   "colors": "#71413b",
   "description": "Gerüst mit Leiter und Plattform unterm Dach. Begehbar; oben ein Ankerpunkt für Brücken.",
-  "look": "kit_tower",
-  "hook": [73, 91]
+  "look": "kit_mod_tower",
+  "hook": [123, 124],
+  "slices": [{"y0": 165, "y1": 239}],
+  "grow": "up",
+  "growRange": [0, 4],
+  "growStart": 2,
+  "growView": 6
  },
  "spiegel": {
   "name": "Spiegel",
@@ -456,13 +465,19 @@
   "value": 30,
   "cozy": 2,
   "size": [2, 1],
-  "look": "kit_lantern",
+  "look": "kit_mod_lantern",
   "flip": true,
   "tags": "licht",
   "extra": "light",
-  "hook": [48, 49],
+  "hook": [70, 147],
   "linkLights": true,
-  "description": "Leuchtet nachts. Zwei Pfosten nah beieinander spannen eine Lichterkette."
+  "description": "Leuchtet nachts. Zwei Pfosten nah beieinander spannen eine Lichterkette.",
+  "hooks": [{"at": [70, 147]},{"at": [67, 173]},{"at": [76, 67]}],
+  "slices": [{"y0": 210, "y1": 261},{"y0": 222, "y1": 277},{"y0": 173, "y1": 213}],
+  "grow": "up",
+  "growRange": [0, 4],
+  "growStart": 1,
+  "growLight": 15
  },
  "kit_kiste": {
   "name": "Holzkiste",
@@ -476,7 +491,10 @@
   "tags": "kiste",
   "carry": "content",
   "stack": true,
-  "description": "Stapelbar, jede sieht anders aus. Auf Kisten kann alles stehen, was sich draufstellen lässt."
+  "description": "Stapelbar, jede sieht anders aus. Auf Kisten kann alles stehen, was sich draufstellen lässt.",
+  "grow": "stack",
+  "growRange": [1, 5],
+  "growStart": 1
  },
  "kit_pflanze": {
   "name": "Topfpflanze im Eimer",
@@ -647,7 +665,10 @@
   "cozy": 0,
   "size": [2, 1],
   "tags": "weg",
-  "description": "Lehnt an der Container-Wand: aufs Dach oder in den Container darüber. Kletterbar."
+  "description": "Lehnt an der Container-Wand: aufs Dach oder in den Container darüber. Kletterbar.",
+  "grow": "up",
+  "growRange": [0, 3],
+  "growStart": 0
  },
  "treppe": {
   "name": "Klapptreppe",
@@ -658,5 +679,43 @@
   "size": [2, 1],
   "tags": "weg",
   "description": "Vom Boden in den Container, frei an seiner Seite. Kletterbar."
+ },
+ "zelt_streifen": {
+  "name": "Streifenzelt",
+  "art": "sprite",
+  "place": "free",
+  "value": 120,
+  "cozy": 3,
+  "size": [4, 2],
+  "look": "kit_mod_tent_a",
+  "scale": 200,
+  "flip": true,
+  "tags": "zelt",
+  "grow": "side",
+  "growRange": [0, 6],
+  "growStart": 1,
+  "growRange2": [1, 4],
+  "growStart2": 1,
+  "slices": [{"y0": 76, "y1": 82, "x0": 106, "x1": 165}],
+  "description": "Langes Tunnelzelt mit Streifen. Am Griff rechts länger ziehen, oben etwas höher."
+ },
+ "zelt_armee": {
+  "name": "Langes Armeezelt",
+  "art": "sprite",
+  "place": "free",
+  "value": 140,
+  "cozy": 3,
+  "size": [4, 2],
+  "look": "kit_mod_tent_b",
+  "scale": 200,
+  "flip": true,
+  "tags": "zelt",
+  "grow": "side",
+  "growRange": [0, 6],
+  "growStart": 1,
+  "growRange2": [1, 4],
+  "growStart2": 1,
+  "slices": [{"y0": 58, "y1": 64, "x0": 119, "x1": 169}],
+  "description": "Olivgrünes Zelt mit Werkzeug und Kisten. Am Griff rechts länger ziehen, oben etwas höher."
  }
 }

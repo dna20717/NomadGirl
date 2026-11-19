@@ -32,8 +32,9 @@ export class CampDecor {
     const out = this.geo.mega ? [] : [...(this.anchors?.() || [])], T = this.scene.T;
     (this.box.save.rig.decor || []).forEach((x, i) => {
       const d = decorDef(this.D, x.id);
-      if (d?.art === 'pole') out.push({ id: `pole:${i}`, x: this.groundX(x.at.x), y: this.ground - (d.size?.[1] ?? 4) * T + 8 });
-      if (d?.art === 'tower') out.push({ id: `tower:${i}`, x: this.groundX(x.at.x), y: this.ground - (d.size?.[1] ?? 4.5) * T, walk: true });
+      const grown = d?.grow && d.look && this.scene.textures.exists(d.look);   // #116 the top of a grown pole, the deck of a grown tower
+      if (d?.art === 'pole') out.push({ id: `pole:${i}`, x: this.groundX(x.at.x), y: grown ? this.ground - this.modTop(d, x.at) + 10 : this.ground - (d.size?.[1] ?? 4) * T + 8 });
+      if (d?.art === 'tower') out.push({ id: `tower:${i}`, x: this.groundX(x.at.x), y: grown ? this.towerDeck(d, x.at, this.groundX(x.at.x)).y : this.ground - (d.size?.[1] ?? 4.5) * T, walk: true });
       if (d?.art === 'balcony') { const b = this.balconyAt(x.at.ui, x.at.side, d); if (b) out.push({ id: `balc:${i}`, x: b.tip, y: b.y, walk: true }); }
     });
     return out;
@@ -100,7 +101,7 @@ export class CampDecor {
     this.walkTops = [];
     this.decorAnim = [];
     this.crows?.forEach(c => c.o.destroy()); this.crows = [];
-    this.freeAt = []; this.decorBoxes = [];
+    this.freeAt = []; this.decorBoxes = []; this.towers = [];
     R.decor.forEach((x, i) => { try { this.drawPiece(x, i); } catch (e) { console.warn('Deko', x.id, e); } });
     try { this.drawKitLights(); } catch (e) { console.warn('Deko-Lichterkette', e); }
     try { this.drawKitDetails(); } catch (e) { console.warn('Deko-Details', e); }
@@ -132,7 +133,7 @@ export class CampDecor {
     if (!pos) return;
     const before = new Set(s.children.list);
     if (d.art === 'sprite') this.art_sprite({ x: pos.x, y: pos.y, u: pos.u, level: 0, wall: kind === 'wall' && !pos.foot, foot: pos.foot, shell: kind === 'wall' }, d, x, i);
-    else this[`art_${d.art}`]?.(pos.x, pos.y, w, h, d, seed, pick, x);
+    else this[`art_${d.art}`]?.(pos.x, pos.y, w, h, d, seed, pick, x, i);
     // wall pieces belong to the container's skin: they fade when it opens (like the workshops' outside pictures)
     if (kind === 'wall' && pos.u) { const sh0 = this.shellOf(pos.u); if (sh0) for (const o of s.children.list) if (!before.has(o) && o.setAlpha) sh0.extras.push(o); }
   }
@@ -164,6 +165,56 @@ export class CampDecor {
     return ((v % n) + n) % n;
   }
   kitScale(d) { return (d.scale || 100) / 100; }
+  // ---------- #116 Ziehen zum Wachsen (Daniel 19.11.2026): pieces from modules ----------
+  // Deko › Wachsen: 'up' = head + n middle sections + foot (posts, tower), 'side' = left end + n sections + right end and a
+  // little higher with m bands of its wall (tents), 'stack' = n crates on top of each other. n / m live in the placed piece (at.n, at.m).
+  growOf(d, at) {
+    if (!d?.grow) return null;
+    const lim = (r, v, def) => { const [lo, hi] = r || [0, 4]; return Math.max(lo, Math.min(hi, Math.round(v ?? def))); };
+    return { n: lim(d.growRange, at?.n, d.growStart ?? 1), m: lim(d.growRange2, at?.m, d.growStart2 ?? 1) };
+  }
+  // the middle sections of a variant (Deko › Wachsen › Mittelstück je Variante; one row = all variants)
+  growSlices(d, fr) { const S = d.slices || []; const r = S[fr] || S[0] || {}; return { y: r.y0 != null ? [r.y0, r.y1] : null, x: r.x0 != null ? [r.x0, r.x1] : null }; }
+  // geometry of a modular piece in picture pixels: total size and where a picture point lands
+  modGeo(d, at, fr) {
+    const s = this.scene, f = s.textures.getFrame(d.look, fr), g = this.growOf(d, at), sl = this.growSlices(d, fr);
+    const ny = d.grow === 'up' ? g.n : d.grow === 'side' ? g.m : 1, nx = d.grow === 'side' ? g.n : 1;
+    const py = sl.y ? sl.y[1] - sl.y[0] : 0, px = sl.x ? sl.x[1] - sl.x[0] : 0;
+    const W = f.width + (sl.x ? (nx - 1) * px : 0), H = f.height + (sl.y ? (ny - 1) * py : 0);
+    const map = (v, s2, n, p) => !s2 || v < s2[0] ? v : v >= s2[1] ? v + (n - 1) * p : v;
+    return { f, sl, nx, ny, px, py, W, H, mx: v => map(v, sl.x, nx, px), my: v => map(v, sl.y, ny, py) };
+  }
+  // draws it as crops of its cell into a container: bottom middle at (x, y); → { box, at(px, py) → world point, top }
+  drawModular(d, at, fr, x, y, k, flip, depth) {
+    const s = this.scene, G = this.modGeo(d, at, fr), tex = s.textures.get(d.look), F = G.f;
+    tex.setFilter(Phaser.Textures.FilterMode.NEAREST);
+    const segs = (len, sl, n) => { if (!sl) return [[0, len, 0]]; const out = [[0, sl[0], 0]], p = sl[1] - sl[0]; for (let j = 0; j < n; j++) out.push([sl[0], sl[1], sl[0] + j * p]); out.push([sl[1], len, sl[0] + n * p]); return out.filter(q => q[1] > q[0]); };
+    const box = this.dAdd(s.add.container(Math.round(x), Math.round(y)).setDepth(depth));
+    for (const [y0, y1, ty] of segs(F.height, G.sl.y, G.ny)) for (const [x0, x1, tx] of segs(F.width, G.sl.x, G.nx)) {
+      const name = `m:${fr}:${x0},${y0},${x1 - x0},${y1 - y0}`;
+      if (!tex.has(name)) tex.add(name, 0, F.cutX + x0, F.cutY + y0, x1 - x0, y1 - y0);
+      box.add(s.add.image(tx - G.W / 2, ty - G.H, d.look, name).setOrigin(0, 0));
+    }
+    box.setScale(flip ? -k : k, k);
+    const c = this.kitContent(d.look, fr) || { h: F.height, fh: F.height };
+    const top = (G.H - (c.fh - c.h)) * k;   // painted height (the cell may have air above the head)
+    return { box, G, top, w: G.W * k, at: (px, py) => ({ x: x + (flip ? -1 : 1) * (G.mx(px) - G.W / 2) * k, y: y - (G.H - G.my(py)) * k }) };
+  }
+  modTop(d, at) {
+    const fr = this.kitFrame(d, at), G = this.modGeo(d, at, fr), c = this.kitContent(d.look, fr) || { h: G.f.height, fh: G.f.height };
+    return (G.H - (c.fh - c.h)) * this.kitScale(d);
+  }
+  // a stack of crates: n pictures of the sheet on top of each other, every one another variant (Daniel: „Kiste ziehen macht einen Stapel“)
+  drawStack(d, at, fr, x, y, k, flip, depth, n) {
+    const s = this.scene, nv = Math.max(1, (this.D.assets?.[d.look]?.grid || [1, 1]).reduce((a, b) => a * b, 1)), out = [];
+    let yy = y, w = 0;
+    for (let j = 0; j < n; j++) {
+      const v = (fr + j * 3) % nv, c = this.kitContent(d.look, v), f = s.textures.getFrame(d.look, v), dx = j ? Math.round((hash(j, x) - 0.5) * 10) : 0;
+      out.push(this.dAdd(s.add.image(Math.round(x + dx), Math.round(yy), d.look, v).setOrigin(0.5, 1).setScale(k).setFlipX(j % 2 ? !flip : flip).setDepth(depth + j * 0.0001)));
+      yy -= (c?.h ?? f.height) * k - 2; w = Math.max(w, f.width * k);
+    }
+    return { imgs: out, top: y - yy, w };
+  }
   // height of the painted part of a frame (feet on the bottom row), cached per texture frame
   kitContent(key, frame) {
     const s = this.scene, k = `${key}:${frame}`, C = (CampDecor.content ??= new Map());
@@ -182,6 +233,11 @@ export class CampDecor {
     if (!d || !canCarry(d) || !this.scene.textures.exists(d.look)) return null;
     const k = this.kitScale(d);
     if (d.carry === 'fixed') return (d.top || 0) * k;
+    if (d.grow === 'stack') {   // #116 a stack of crates: all of them (as drawStack lays them)
+      const n = this.growOf(d, o.at).n, nv = Math.max(1, (this.D.assets?.[d.look]?.grid || [1, 1]).reduce((a, b) => a * b, 1)), fr = this.kitFrame(d, o.at);
+      let t = 0; for (let j = 0; j < n; j++) { const c = this.kitContent(d.look, (fr + j * 3) % nv); t += (c?.h ?? 0) * k - 2; }
+      return t + 2;
+    }
     const c = this.kitContent(d.look, this.kitFrame(d, o.at));
     return c ? c.h * k : null;
   }
@@ -220,13 +276,22 @@ export class CampDecor {
     const y = Math.round(q.hang ? q.y + c.h * k : q.wall ? q.y + (c.h * k) / 2 : q.y);
     // a soft contact shadow under ground and roof pieces
     if (!q.level && !q.wall && !q.inside && !q.shell && d.shadow !== false) { const g = this.dG(depth - 0.0005); g.fillStyle(0x060608, 0.28).fillEllipse(x, y - 1, f.width * k * 0.8, 7); }
-    let img;
-    if (q.inside && q.u?.view) {   // #114 inside: on the container's back wall, behind its workshops (in the unit's view, right after its picture)
+    let img, mod = null;
+    const grow = d.grow && this.growOf(d, o.at);
+    if (grow && (d.grow === 'up' || d.grow === 'side') && !q.inside) {   // #116
+      mod = this.drawModular(d, o.at, fr, x, y + (q.wall || q.shell ? 0 : 1), k, flip, depth);
+      img = mod.box;
+      (this.decorBoxes ??= [])[i] = { x0: x - mod.w / 2, x1: x + mod.w / 2, y0: y - mod.top, y1: y, x, y, top: mod.top };
+    } else if (grow && d.grow === 'stack' && !q.inside) {
+      const st = this.drawStack(d, o.at, fr, x, y + 1, k, flip, depth, grow.n);
+      img = st.imgs[st.imgs.length - 1];
+      (this.decorBoxes ??= [])[i] = { x0: x - st.w / 2, x1: x + st.w / 2, y0: y - st.top, y1: y, x, y, top: st.top };
+    } else if (q.inside && q.u?.view) {   // #114 inside: on the container's back wall, behind its workshops (in the unit's view, right after its picture)
       const v = q.u.view, mid = (q.u.x0 + q.u.x1) / 2, G = q.u.base ?? this.ground, si = v.list.findIndex(o2 => o2.texture?.key === q.u.sprite?.key);
       img = s.add.image(x - mid, y - G, look, fr).setOrigin(0.5, 1).setScale(k).setFlipX(flip);
       v.addAt(img, si + 1);
     } else img = this.dAdd(s.add.image(x, y + (q.wall || q.shell ? 0 : 1), look, fr).setOrigin(0.5, 1).setScale(k).setFlipX(flip).setDepth(depth));
-    (this.decorBoxes ??= [])[i] = { x0: x - f.width * k / 2, x1: x + f.width * k / 2, y0: y - c.h * k, y1: y, x, y };
+    if (!grow || q.inside) (this.decorBoxes ??= [])[i] = { x0: x - f.width * k / 2, x1: x + f.width * k / 2, y0: y - c.h * k, y1: y, x, y };
     // pop in when it was just placed (Tiny Glade: every click answers)
     if (this.kitPop === i) { img.setScale(k * 0.6, k * 1.25); s.tweens.add({ targets: img, scaleX: k, scaleY: k, duration: 260, ease: 'Back.Out' }); this.kitPop = null; }
     // what the piece does when Leyla presses E at it (#111: the old code pieces keep their use)
@@ -238,7 +303,10 @@ export class CampDecor {
     if (!d.extra || !d.hook) return;
     if (d.lightVariants != null && d.lightVariants !== '' && !String(d.lightVariants).split(',').map(t => Number(t.trim()) - 1).includes(fr)) return;   // only these variants (1 = first)
     const hook = d.hooks?.[fr]?.at || d.hook;
-    const hx = x + ((flip ? f.width - hook[0] : hook[0]) - f.width / 2) * k, hy = y - (f.height - hook[1]) * k;
+    let hx = x + ((flip ? f.width - hook[0] : hook[0]) - f.width / 2) * k, hy = y - (f.height - hook[1]) * k;
+    if (mod) ({ x: hx, y: hy } = mod.at(hook[0], hook[1]));
+    this.decorBoxes[i].hook = { x: hx, y: hy };
+    const growK = grow ? 1 + (d.growLight || 0) / 100 * (grow.n - (d.growStart ?? 1)) : 1;   // a taller post shines further
     const seed = hash(i, x);
     if (d.extra === 'steam') {
       const puffs = [];
@@ -263,7 +331,7 @@ export class CampDecor {
       return;
     }
     if (d.extra === 'light' || d.extra === 'candle') {
-      const big = d.extra === 'light', l = this.light(hx, hy, big ? 190 : 70, big ? '#ffd27a' : '#ffb347', big ? 0.75 : 0.6); l.rig = true;
+      const big = d.extra === 'light', l = this.light(hx, hy, (big ? 190 : 70) * growK, big ? '#ffd27a' : '#ffb347', big ? 0.75 : 0.6); l.rig = true;
       this.decorAnim.push(time => l.setAlpha(l.base * this.lightK * (0.86 + 0.14 * Math.sin(time / (big ? 170 : 90) + seed * 7))));
     }
     if (d.extra === 'fire') {
@@ -286,6 +354,7 @@ export class CampDecor {
     const D = this.D, L = this.box.save.rig.decor || [], T = this.scene.T, max = (D.camp?.decor?.linkMax ?? 8) * T;
     const posts = L.map((o, i) => ({ o, i, d: decorDef(D, o.id) })).filter(p => p.d?.linkLights && p.d.hook && this.decorBoxes?.[p.i]).map(p => {
       const b = this.decorBoxes[p.i], f = this.scene.textures.getFrame(p.d.look, this.kitFrame(p.d, p.o.at)), k = this.kitScale(p.d);
+      if (b.hook) return { x: b.hook.x, y: b.hook.y - 14 * k, top: b.y };   // #116 the hook of a grown post
       return { x: b.x, y: b.y - (f.height - p.d.hook[1] + 14) * k, top: b.y };
     }).sort((a, b) => a.x - b.x);
     const colors = ['#ffd27a', '#fa6a0a', '#f9a31b', '#e86a73', '#a6fcdb'];
@@ -393,7 +462,8 @@ export class CampDecor {
   }
   // a ladder up the container's wall onto its roof (or into the container stacked above): climbable like the rig's own
   art_ladder(c, d, o, i) {
-    const s = this.scene, T = s.T, top = c.into ?? c.roof, bottom = c.bottom;
+    const s = this.scene, T = s.T, bottom = c.bottom, g = d.grow && this.growOf(d, o?.at);
+    const top = (c.into ?? c.roof) - (g && c.into == null ? g.n * T : 0);   // #116 pulled longer: beyond the roof, a tile per step
     const art = ladderArt(s, c.x - T / 2, c.x + T / 2, top, bottom, { depth: -16.4, tint: d.color ? col(d.color) : undefined });
     if (art) this.dAdd(art);
     else { const g = this.dG(-16.4); this.dR(g, c.x - 22, top, 6, bottom - top, C.ink); this.dR(g, c.x + 16, top, 6, bottom - top, C.ink); for (let y = bottom - 20; y > top; y -= 28) this.dR(g, c.x - 16, y, 32, 4, C.steel); }
@@ -576,8 +646,13 @@ export class CampDecor {
     const l = this.light(x, y - h + 7 * PX, 180, c, 0.75); l.rig = true;
     this.decorAnim.push(time => l.setAlpha(l.base * this.lightK * (0.88 + 0.12 * Math.sin(time / 170))));
   }
-  art_pole(x, y, w, h, d, seed, pick, o) {
+  art_pole(x, y, w, h, d, seed, pick, o, i) {
     const s = this.scene;
+    if (d?.grow && d.look && s.textures.exists(d.look)) {   // #116 head + shaft sections + foot; the top is the anchor
+      const m = this.drawModular(d, o?.at, this.kitFrame(d, o?.at), x, y + 2, this.kitScale(d), !!o?.at?.f, -16.2);
+      (this.decorBoxes ??= [])[i] = { x0: x - Math.max(30, m.w / 2), x1: x + Math.max(30, m.w / 2), y0: y - m.top, y1: y, x, y, top: m.top };
+      return;
+    }
     if (d?.look && s.textures.exists(d.look)) {
       s.textures.get(d.look).setFilter(Phaser.Textures.FilterMode.NEAREST);
       const fr = this.kitFrame(d, o?.at), f = s.textures.getFrame(d.look, fr), c = this.kitContent(d.look, fr) || { h: f.height }, k = (h + 8) / c.h;
@@ -784,6 +859,18 @@ export class CampDecor {
     (this.walkTops ??= []).push({ x0, x1, y });
     return z;
   }
+  // #116 on top of a tower the camera zooms out: the higher, the further Leyla sees (Deko › Wachsen › Weitblick je Etage)
+  towerView(dt) {
+    const s = this.scene, l = s.leyla, cam = s.cam;
+    if (!cam || !l?.body || s.hud?.build?.active || cam.zoomEffect?.isRunning) return;
+    const base = s.data_.game?.camera?.zoom || 1, feet = l.body.bottom;
+    const t = (this.towers || []).find(w => l.x >= w.x0 && l.x <= w.x1 && Math.abs(feet - w.y) < 6 && l.body.blocked.down);
+    const want = t ? base / (1 + (t.view || 0) / 100 * (t.n + 1)) : base;
+    if (!t && !this.towerZoomed) return;
+    this.towerZoomed = !!t || Math.abs(cam.zoom - base) > 0.002;
+    cam.setZoom(cam.zoom + (want - cam.zoom) * Math.min(1, dt / 600));
+    if (!this.towerZoomed) cam.setZoom(base);
+  }
   // sloped walkways (bridges) are steps of one-way platforms: walking on them, Leyla steps up onto the next one when it is at most
   // a small step higher (Arcade physics would let her walk under it and fall through)
   stepUpDecor() {
@@ -834,8 +921,21 @@ export class CampDecor {
     for (let k = 0; k <= n; k += steel ? 2 : 3) { const pt = at(k / n); g.lineStyle(PX * 0.75, col(steel ? C.steel : C.sand), 0.9).lineBetween(pt.x, pt.y, pt.x, pt.y - rail + (steel ? 0 : sag * 0.6 * 4 * (k / n) * (1 - k / n))); }
   }
   // a lookout tower on the ground: a scaffold with a ladder up the side, a platform on top with a railing and a little roof
-  art_tower(x, y, w, h, d, seed) {
+  // the deck of a (grown) tower: where Leyla stands, and the painted ladder up to it
+  towerDeck(d, at, x) {
+    const fr = this.kitFrame(d, at), G = this.modGeo(d, at, fr), k = this.kitScale(d), [hx, hy] = d.hook || [G.f.width / 2, G.f.height * 0.36];
+    return { y: this.ground - (G.H - G.my(hy)) * k, lx: x + (G.mx(hx) - G.W / 2) * k, x0: x - G.W * k / 2, x1: x + G.W * k / 2, n: this.growOf(d, at).n };
+  }
+  art_tower(x, y, w, h, d, seed, pick, o, i) {
     const s = this.scene, T = s.T;
+    if (d.grow && d.look && s.textures.exists(d.look)) {   // #116 storeys: the deck and the ladder grow with them
+      const m = this.drawModular(d, o?.at, this.kitFrame(d, o?.at), x, y + 2, this.kitScale(d), false, -16.6), dk = this.towerDeck(d, o?.at, x);
+      this.walkZone(dk.x0 + 10, dk.x1 - 10, dk.y);
+      s.ladders.push({ cx: dk.lx, x0: dk.lx - T / 2, x1: dk.lx + T / 2, top: dk.y, bottom: y, rig: true });
+      (this.towers ??= []).push({ x0: dk.x0, x1: dk.x1, y: dk.y, n: dk.n, view: d.growView || 0, start: d.growStart ?? 1 });
+      (this.decorBoxes ??= [])[i] = { x0: dk.x0, x1: dk.x1, y0: y - m.top, y1: y, x, y, top: m.top };
+      return;
+    }
     if (d.look && s.textures.exists(d.look)) {
       s.textures.get(d.look).setFilter(Phaser.Textures.FilterMode.NEAREST);
       const f = s.textures.getFrame(d.look, 0), [hx, hy] = d.hook || [f.width / 2, f.height * 0.36], k = h / (f.height - hy), top = y - h, x0 = x - f.width * k / 2;
@@ -862,6 +962,7 @@ export class CampDecor {
 
   updateDecor(time, dt) {
     this.stepUpDecor();
+    this.towerView(dt);
     for (const f of this.decorAnim || []) f(time, dt);
     this.updateCrows(time);
   }

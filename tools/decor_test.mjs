@@ -87,7 +87,7 @@ r = await ev(() => {
   const s = game.scene.getScene('play'), save = s.box.save, c = s.camp;
   save.rig.tractor = 'lkw'; save.rig.units[0].id = 'lkw';
   save.rig.units = [save.rig.units[0], { kind: 'container', id: 'container_40', workshops: [] }, { kind: 'container', id: 'container_20', level: 1, workshops: [] }];
-  save.rig.decor = [{ id: 'balkon_breit', at: { ui: 2, side: 1 } }, { id: 'aussichtsturm', at: { x: 2 } }, { id: 'haengebruecke', at: { a: 'balc:0', b: 'tower:1' } }];
+  save.rig.decor = [{ id: 'balkon_breit', at: { ui: 2, side: 1 } }, { id: 'aussichtsturm', at: { x: 2, n: 3 } }, { id: 'haengebruecke', at: { a: 'balc:0', b: 'tower:1' } }];
   return true;
 });
 await ev(() => { nomad.release(); game.scene.getScene('play').goCamp({ fade: 0 }); });

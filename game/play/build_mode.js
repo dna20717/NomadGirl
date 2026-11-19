@@ -22,6 +22,7 @@ import { preview as synPreview, synergyText } from '../synergy.js';
 import { BuildDecor } from './build_decor.js';
 import { BuildResize } from './build_resize.js';
 import { BuildPaint } from './build_paint.js';
+import { BuildGrow } from './build_grow.js';
 
 const FN_COLORS = { storage: '#5c6b7a', cooling: '#4a7a9a', cell: '#5a4a4a', sleep: '#6a5a9a', chill: '#9a4a7a', drone: '#3a8a6a', warroom: '#7a6a3a', kitchen: '#a8642a', foodtruck: '#c0703a', craft: '#7a6235', engine: '#5a5a5a', power: '#a8862a' };
 const FN_NAMES = { storage: 'Lager', cooling: 'Kühlung', cell: 'Zelle', sleep: 'Schlafen', chill: 'Chillen', drone: 'Drohnen', warroom: 'Planung', kitchen: 'Kochen', foodtruck: 'Verkauf', craft: 'Herstellen', engine: 'Motor', power: 'Energie' };
@@ -40,6 +41,7 @@ export class BuildMode {
     document.addEventListener('keydown', e => {
       if (!this.active) return;
       if (e.key === 'Escape' && this.resizing) { this.endResize(); e.preventDefault(); e.stopPropagation(); }
+      else if (e.key === 'Escape' && this.growing) { this.endGrow(); e.preventDefault(); e.stopPropagation(); }   // #116
       else if (e.key === 'Escape' && this.painting != null) { this.togglePaint(false); e.preventDefault(); e.stopPropagation(); }   // #114
       else if ((e.key === 'p' || e.key === 'P') && !e.ctrlKey && !e.metaKey) { this.togglePaint(); e.preventDefault(); e.stopPropagation(); }
       else if (e.key === 'Escape') { if (this.decorHold) this.dropDecorToSpare(); else if (this.drag) this.cancelDrag(); else if (this.shopOpen) { this.shopOpen = false; this.draw(); } else this.close(); e.preventDefault(); e.stopPropagation(); }
@@ -113,6 +115,7 @@ export class BuildMode {
     if (!this.active) return;
     if (this.decorHold) this.dropDecorToSpare();   // a piece in hand goes into the Lager instead of vanishing
     if (this.resizing) this.endResize();   // #113
+    if (this.growing) this.endGrow();   // #116
     this.painting = null;   // #114
     const s = this.scene, cam = s.cam, back = this.camBack;
     if (s.drone) s.drone.build = null;
@@ -171,6 +174,12 @@ export class BuildMode {
       return;
     }
     this.shopCur?.hide();
+    if (this.growing?.pad) {   // #116 pulling a piece with the pad: ↑ / → a step more, ↓ / ← a step less, A / B done
+      if (u.pressed('up') || u.pressed('right')) this.growStep(1);
+      if (u.pressed('down') || u.pressed('left')) this.growStep(-1);
+      if (u.pressed('ok') || u.pressed('back')) this.endGrow();
+      return;
+    }
     if (this.resizing?.pad) {   // #113 pulling a container with the pad: ← longer, → shorter, A / B done
       if (u.pressed('left')) this.resizeStep(1);
       if (u.pressed('right')) this.resizeStep(-1);
@@ -258,6 +267,7 @@ export class BuildMode {
     for (const u of camp.geo.units) if (u.ui > 0) add((u.in0 + u.in0 + u.cell * u.places) / 2, u.inTop - 20);
     for (const so of this.sockets()) if (so.id) add(so.cx, so.cy);
     for (const q of this.resizeGrips()) add(q.x, (q.y0 + q.y1) / 2);   // #113
+    for (const q of this.growGrips()) add(q.x, q.y);   // #116
     for (const a of camp.anchors?.() || []) add(a.x, a.y);
     (this.save.rig.lights || []).forEach((_, i) => { const w = camp.wire?.(i); if (w) add(w.mid.x, w.mid.y); });
     if (dl) add(...mid(dl));
@@ -316,6 +326,7 @@ export class BuildMode {
     if (!hit) { this.sfx.nope?.(); this.buzz('edge'); return this.say('Hier ist nichts zum Packen', 'idle'); }
     if (hit.kind === 'dealer') { this.shopOpen = true; return this.draw(); }
     if (hit.kind === 'resize') return this.startResize(hit, w, true);   // #113
+    if (hit.kind === 'grow') return this.startGrow(hit, w, true);   // #116
     this.startDrag(hit, w);
     this.buzz('lift');
   }
@@ -585,6 +596,7 @@ export class BuildMode {
       for (const a of camp.anchors?.() || []) if (Math.hypot(x - a.x, y - a.y) < R) return { kind: 'anchor', a, item: box(a) };
       for (let i = 0; i < (this.save.rig.lights || []).length; i++) { const w = camp.wire(i); if (w && Math.hypot(x - w.mid.x, y - w.mid.y) < R) return { kind: 'lights', i, item: box(w.mid) }; }
     }
+    { const gr = this.pickGrow(x, y); if (gr) return gr; }   // #116 the grips of growing pieces, before the pieces themselves
     { const dh = this.pickDecor(x, y); if (dh) return dh; }
     { const gh = this.pickGrip(x, y); if (gh) return gh; }   // #113 the grip at a container's rear end
     for (const it of camp.yardItems || []) if (inside(it)) return { kind: it.kind === 'ws' ? 'ws' : it.kind === 'part' ? 'part' : 'container', from: 'yard', i: it.i, id: it.id, item: it };
@@ -620,7 +632,8 @@ export class BuildMode {
     // (Daniel, 08.11.2026: "bleibt man im drop-to-Händler-Modus hängen")
     if (this.drag && p.event && 'buttons' in p.event && !(p.event.buttons & 1)) { this.press = null; return this.flyBack('Losgelassen außerhalb: zurück an seinen Platz'); }
     if (this.resizing) return this.resizeMove(w);   // #113
-    if (this.press && !this.drag && this.painting == null && Math.hypot(p.x - this.press.sx, p.y - this.press.sy) > 6) { if (this.press.hit.kind === 'resize') { this.startResize(this.press.hit, { x: this.press.x, y: this.press.y }); return this.resizeMove(w); } this.startDrag(this.press.hit, w); }
+    if (this.growing) return this.growMove(w);   // #116
+    if (this.press && !this.drag && this.painting == null && Math.hypot(p.x - this.press.sx, p.y - this.press.sy) > 6) { if (this.press.hit.kind === 'grow') { this.startGrow(this.press.hit, { x: this.press.x, y: this.press.y }); return this.growMove(w); } if (this.press.hit.kind === 'resize') { this.startResize(this.press.hit, { x: this.press.x, y: this.press.y }); return this.resizeMove(w); } this.startDrag(this.press.hit, w); }
     if (this.drag) { this.drag.x = w.x; this.drag.y = w.y; }
     if (this.wire) { this.wire.x = w.x; this.wire.y = w.y; }
   }
@@ -629,11 +642,13 @@ export class BuildMode {
     const w = this.world(p), press = this.press;
     this.press = null;
     if (this.resizing) return this.endResize();   // #113
+    if (this.growing) return this.endGrow();   // #116
     if (this.painting != null && press) return this.paintAt(w);   // #114 the brush
     if (this.painting != null) return this.paintAt(w);
     if (this.decorHold) return this.placeDecor(w);
     if (press?.hit?.kind === 'decor') return this.liftDecor(press.hit.i);
     if (press?.hit?.kind === 'resize') return this.say('Am Griff ziehen: nach links länger, nach rechts kürzer', 'idle');
+    if (press?.hit?.kind === 'grow') return this.say(press.hit.grip.side === 'right' ? 'Am Griff ziehen: nach rechts länger' : 'Am Griff ziehen: nach oben höher', 'idle');
     if (this.drag) { this.drag.x = w.x; this.drag.y = w.y; return this.drop(); }
     if (this.wire) return this.finishWire(w);
     if (press?.hit?.kind === 'anchor') return this.startDrag(press.hit, w);   // click, click: from here … to there
@@ -649,6 +664,7 @@ export class BuildMode {
     if (h.kind === 'ws') { const d = wsDef(D, h.id), p = d.power || 0; return `${d.name || h.id} · ${FN_NAMES[d.function] || ''} · ${d.places || 1} ${d.places > 1 ? 'Plätze' : 'Platz'}${p ? ` · ${p > 0 ? '+' : ''}${p} ⚡` : ''} · ziehen zum Umstellen`; }
     if (h.kind === 'part') { const t = D.rigParts?.[h.id] || {}; return `${t.name || h.id} · ${PART_SLOTS[t.slot] || t.slot}${this.partFacts(t)} · ziehen ${h.from === 'yard' ? 'an den Van' : 'zum Ausbauen'}`; }
     if (h.kind === 'resize') return 'Griff: ziehen = Container länger oder kürzer (ohne Aufpreis)';
+    if (h.kind === 'grow') return `Griff: ziehen = ${h.grip.side === 'right' ? 'länger' : 'höher'} (ohne Aufpreis)`;
     if (h.kind === 'container') { const d = D.containers?.[h.id] || {}, u = this.save.rig.units[h.ui] || { id: h.id }, n = placesOf(D, u); return `${d.name || h.id} · ${n} ${n === 1 ? 'Platz' : 'Plätze'} · ${de(containerWeight(D, u))} kg · ziehen zum Umhängen${d.resize ? ' · am Griff hinten länger/kürzer' : ''}`; }
     return 'Händler: hier abstellen = verkaufen, anklicken = Katalog';
   }
@@ -1004,6 +1020,7 @@ export class BuildMode {
     this.labels = [];
     const label = (x, y, text, color = '#f2eef7', fixed = false) => this.labels.push(s.add.text(x, y, text, { fontFamily: 'VT323, monospace', fontSize: fixed ? '24px' : '26px', color, stroke: '#0d0a12', strokeThickness: 5 }).setOrigin(0.5, 1).setScale(fixed ? 1 : 1 / Math.max(0.4, z)).setDepth(36));
     const pulse = 0.55 + 0.35 * Math.sin(time / 160), lw = 3 / z;
+    this.drawBuildGrid(g, z, time);   // #116 the buildable space as a scan grid around AvA
     // the van's places (inside the van, painted over it while building)
     for (const sl of this.slots()) if (sl.van) {
       const w = wsAt(D, this.save.rig, sl.ui, sl.p);
@@ -1016,6 +1033,7 @@ export class BuildMode {
     }
     this.drawDecorHold(g, label, z, pulse);   // #036
     this.drawResizeGrips(g, label, z, pulse);   // #113
+    this.drawGrowGrips(g, label, z, pulse);   // #116
     // the sockets for rig parts on the van: empty = dashed frame with the slot's name, built in = the part
     const pslot = d?.kind === 'part' ? D.rigParts?.[d.id]?.slot : null, tt = d ? this.target() : null;
     for (const so of this.sockets()) {
@@ -1169,3 +1187,4 @@ export class BuildMode {
 for (const k of Object.getOwnPropertyNames(BuildDecor.prototype)) if (k !== 'constructor') Object.defineProperty(BuildMode.prototype, k, Object.getOwnPropertyDescriptor(BuildDecor.prototype, k));
 for (const k of Object.getOwnPropertyNames(BuildPaint.prototype)) if (k !== 'constructor') Object.defineProperty(BuildMode.prototype, k, Object.getOwnPropertyDescriptor(BuildPaint.prototype, k));   // #114
 for (const k of Object.getOwnPropertyNames(BuildResize.prototype)) if (k !== 'constructor') Object.defineProperty(BuildMode.prototype, k, Object.getOwnPropertyDescriptor(BuildResize.prototype, k));   // #113
+for (const k of Object.getOwnPropertyNames(BuildGrow.prototype)) if (k !== 'constructor') Object.defineProperty(BuildMode.prototype, k, Object.getOwnPropertyDescriptor(BuildGrow.prototype, k));   // #116

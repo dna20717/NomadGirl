@@ -6682,5 +6682,68 @@
   "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz: Pilot-Stücke des Baukastens für den Stil) + Code (tools/camp_kit.py)",
   "date": "2026-11-19",
   "description": "Wand links, Gitterboden bei 34 px von oben."
+ },
+ "kit_mod_lantern": {
+  "name": "Camp-Baukasten · Laternenpfosten (Module)",
+  "kind": "icons",
+  "file": "assets/camp/kit/mod_lantern.png",
+  "cell": [92, 339],
+  "grid": [3, 1],
+  "names": [
+   "Holzpfosten mit Glas-Laterne",
+   "Bewehrungsstab mit Messinglaterne",
+   "Rohr mit Eisenbahnlaterne"
+  ],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenzen: die bisherigen Stücke des Baukastens) + Code (tools/camp_modules.py: Varianten freistellen, Mittelstück mit passenden Nähten)",
+  "date": "2026-11-19",
+  "description": "#116: Kopf, ein Mittelstück, Fuß je Variante; das Mittelstück wiederholt sich beim Ziehen (Deko › Wachsen)."
+ },
+ "kit_mod_poles": {
+  "name": "Camp-Baukasten · Zeltstangen (Module)",
+  "kind": "icons",
+  "file": "assets/camp/kit/mod_poles.png",
+  "cell": [70, 429],
+  "grid": [3, 1],
+  "names": [
+   "Holzpflock mit Ring",
+   "Bewehrungsbündel mit Fahne",
+   "Rohr mit Stoffstreifen"
+  ],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenzen: die bisherigen Stücke des Baukastens) + Code (tools/camp_modules.py: Varianten freistellen, Mittelstück mit passenden Nähten)",
+  "date": "2026-11-19",
+  "description": "#116: wachsende Zeltstangen, die Spitze ist der Anker."
+ },
+ "kit_mod_tower": {
+  "name": "Camp-Baukasten · Aussichtsturm (Module)",
+  "kind": "icons",
+  "file": "assets/camp/kit/mod_tower.png",
+  "cell": [170, 333],
+  "grid": [1, 1],
+  "names": ["Holzturm"],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenzen: die bisherigen Stücke des Baukastens) + Code (tools/camp_modules.py: Varianten freistellen, Mittelstück mit passenden Nähten)",
+  "date": "2026-11-19",
+  "description": "#116: Dach mit Plattform, eine Etage (wiederholt sich), Fuß. Plattform bei y 124, Leiter bei x 123."
+ },
+ "kit_mod_tent_a": {
+  "name": "Camp-Baukasten · Streifenzelt (Module)",
+  "kind": "icons",
+  "file": "assets/camp/kit/mod_tent_a.png",
+  "cell": [280, 113],
+  "grid": [1, 1],
+  "names": ["Streifenzelt"],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenzen: die bisherigen Stücke des Baukastens) + Code (tools/camp_modules.py: Varianten freistellen, Mittelstück mit passenden Nähten)",
+  "date": "2026-11-19",
+  "description": "#116: linkes Ende, ein Abschnitt (wiederholt sich), rechtes Ende mit Tür; ein dünnes Wand-Band macht es höher."
+ },
+ "kit_mod_tent_b": {
+  "name": "Camp-Baukasten · Armeezelt (Module)",
+  "kind": "icons",
+  "file": "assets/camp/kit/mod_tent_b.png",
+  "cell": [264, 108],
+  "grid": [1, 1],
+  "names": ["Armeezelt"],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenzen: die bisherigen Stücke des Baukastens) + Code (tools/camp_modules.py: Varianten freistellen, Mittelstück mit passenden Nähten)",
+  "date": "2026-11-19",
+  "description": "#116: wie das Streifenzelt, olivgrün mit Werkzeug und Kisten."
  }
 }
