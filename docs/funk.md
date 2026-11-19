@@ -342,9 +342,9 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #097 Balancing v1 als Standard, Cheat-Menü für Daniel
-- **Status:** offen · angelegt 19.11. von Code (Runde 2: „übernehmen“, Startgeld 600 „aber ein Cheat-Menü nur für mich“)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Runde 2: „übernehmen“, Startgeld 600 „aber ein Cheat-Menü nur für mich“)
+- **Rückfragen:** (Code) ⚠️ vorläufig: „nur für mich“ = pro Gerät per `?cheats=1` freischalten (die Seite ist ohnehin hinter Daniels Login, keine E-Mail im Repo); Datenset balancing_v1 bleibt (jetzt gleich dem Standard), die alten Werte als „Vor Balancing v1“.
+- **Ergebnis:** (Code) Commit „Balancing v1 als Standard, Cheat-Menü (#097)“. `npm test` 315/315 (earn/techtree an v1 angepasst, `test/cheats.test.js` neu). PixelLab 0. **Bitte testen:** https://nomadgirl.dna20717.workers.dev/game?cheats=1 öffnen, Esc › Cheats.
 
 ### #098 Mega-Rig: Ofen statt Lagerfeuer im Rumpf
 - **Status:** offen · angelegt 19.11. von Code (Runde 2, Notiz #077 „Kein Lagerfeuer IM Rig mehr“ → Fragerunde: „Ofen statt Feuer“)

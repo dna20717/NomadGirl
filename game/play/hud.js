@@ -11,6 +11,7 @@ import { loadVersion } from '../version.js';
 import { clockText } from '../save.js';
 import { trackedGoal as questGoal } from '../quests.js';
 import { makeSfx } from './sfx.js';
+import { cheatsOn, CHEATS, runCheat } from '../cheats.js';
 
 // toast kinds: icon (Lucide) and sound (sfx.js); colours in play.css (.hud-toast.<kind>)
 const TOAST_KINDS = {
@@ -121,6 +122,7 @@ export class Hud {
       ...(sc.box ? [{ label: 'Werte', sub: 'Alle Boni mit ihren Quellen · U', act: () => setTimeout(() => this.stats?.open(), 0) }] : []),   // #091
       ...(this.radio && sc.box && sc.mode !== 'run' && this.radio.C.stations.length ? [{ label: `Radio: ${this.radio.on ? this.radio.station?.name : 'aus'}`, sub: 'Sender wählen · N', act: () => setTimeout(() => this.radio.menu(this), 0) }] : []),   // #090
       { label: 'Optionen', sub: 'Ton, Schießstil', act: () => setTimeout(() => this.optionsMenu(), 0) },
+      ...(sc.box && cheatsOn() ? [{ label: 'Cheats', sub: 'Nur auf diesem Gerät freigeschaltet', act: () => setTimeout(() => this.cheatMenu(), 0) }] : []),   // #097
       ...(this.modeName === 'test' ? [{ label: 'Raum neu starten', sub: 'Rücktaste', act: () => sc.level ? sc.restartAs({}) : sc.restartRoom() }] : []),
       { label: 'Werkstatt', act: () => { location.href = 'workshop.html'; } },
       { label: 'Startseite', act: () => { location.href = './'; } },
@@ -128,6 +130,13 @@ export class Hud {
     ] });
   }
 
+  // #097 Cheat-Menü: stays open, every press shows what it did; the scene reloads its view of the savegame on close
+  cheatMenu() {
+    const sc = this.scene; if (!sc?.box) return;
+    this.menu({ title: 'Cheats', sub: 'Nur für dich · gilt sofort für den Spielstand', items: [
+      ...CHEATS.map(c => ({ label: c.label, sub: c.sub, act: () => { const line = runCheat(sc.data_, sc.box.save, c.id); if (c.id === 'heal' && sc.leyla) { sc.leyla.health = sc.leyla.maxHealth; sc.box.save.health = sc.leyla.maxHealth; } sc.box.persist?.(); this.toast('Cheat', line || c.label, 'info', 2200); setTimeout(() => this.cheatMenu(), 0); } })),
+      { label: 'Fertig', icon: 'x', act: () => { this.campKey = null; } }] });
+  }
   // Menü › Optionen: sound and the shooting style (design.md: Klassisch | Cells-like); the style is kept in this browser
   optionsMenu() {
     const sc = this.scene;

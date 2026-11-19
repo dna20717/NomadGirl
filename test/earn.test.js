@@ -13,7 +13,7 @@ const sure = () => 0;   // every chance hits, the minimum count
 const ids = list => list.map(t => `${t.id}×${t.n}`).sort();
 
 test('Kisten, Kills nach Familie, Bosse, Secrets: die passenden Regeln würfeln', () => {
-  assert.deepEqual(ids(earn(D, 'chest', {}, sure)), ['technik×1', 'wissen×1']);
+  assert.deepEqual(ids(earn(D, 'chest', {}, sure)), ['bio×1', 'technik×1', 'wissen×1']);   // #097 Balancing v1: Bio auch aus Kisten
   assert.deepEqual(ids(earn(D, 'kill', { family: 'mutant' }, sure)), ['bio×1']);
   assert.deepEqual(ids(earn(D, 'kill', { family: 'raider' }, sure)), ['technik×1']);
   assert.deepEqual(ids(earn(D, 'kill', { family: 'raider', boss: true }, sure)), ['technik×3', 'wissen×3']);   // raider 1 + boss 2

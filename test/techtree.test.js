@@ -20,7 +20,7 @@ test('Freischalten kostet Ressourcen aus dem Camp, braucht Voraussetzungen, lern
   for (const g of Object.values(s.inv.grids)) g.items = [];
   assert.equal(status(D, s, 'wartungsklappe').state, 'open');
   assert.equal(status(D, s, 'thermohuelle').state, 'locked');
-  give(s, 'technik', 9); give(s, 'wissen', 1);
+  give(s, 'technik', 11); give(s, 'wissen', 3);   // #097 Balancing v1: Thermohülle 8 Technik + 3 Wissen
   const r = unlock(D, s, 'wartungsklappe');
   assert.ok(r.ok && r.learnt.includes('tank_dichtung') && s.recipes.includes('tank_dichtung'));
   assert.equal(status(D, s, 'wartungsklappe').state, 'owned');

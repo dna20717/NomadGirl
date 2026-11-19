@@ -4,5 +4,11 @@
   "name": "Balancing v1",
   "description": "Aus der Simulation (#081): Startgeld 600 Δ, Bio aus Mutanten und Kisten, Techtree teurer in der Mitte, Heilmittel um Tag 20. Bericht: docs/balancing.md",
   "files": ["data/economy.json", "data/ranking.json", "data/techtree.json"]
+ },
+ {
+  "id": "vor_balancing_v1",
+  "name": "Vor Balancing v1",
+  "description": "Die Werte vor #097 (Balancing v1 ist seit 19.11.2026 Standard): Startgeld 40.000 Δ, alte Techtree-Kosten und Ressourcen.",
+  "files": ["data/economy.json", "data/ranking.json", "data/techtree.json"]
  }
 ]

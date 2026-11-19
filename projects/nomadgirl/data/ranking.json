@@ -10,22 +10,23 @@
   {"grade": "S", "minPoints": 98, "bonus": 100}
  ],
  "earn": [
-  {"when": "chest", "item": "technik", "chance": 35, "min": 1, "max": 2},
+  {"when": "chest", "item": "technik", "chance": 25, "min": 1, "max": 2},
   {"when": "chest", "item": "wissen", "chance": 15, "min": 1, "max": 1},
-  {"when": "kill_mutant", "item": "bio", "chance": 35, "min": 1, "max": 1},
+  {"when": "kill_mutant", "item": "bio", "chance": 60, "min": 1, "max": 2},
   {"when": "kill_raider", "item": "technik", "chance": 20, "min": 1, "max": 1},
   {"when": "kill_machine", "item": "technik", "chance": 50, "min": 1, "max": 2},
   {"when": "boss", "item": "wissen", "chance": 100, "min": 3, "max": 4},
   {"when": "boss", "item": "technik", "chance": 100, "min": 2, "max": 3},
-  {"when": "secret", "item": "wissen", "chance": 100, "min": 1, "max": 2},
-  {"when": "rank", "item": "wissen", "chance": 100, "min": 1, "max": 1, "grade": "C"},
-  {"when": "rank", "item": "wissen", "chance": 100, "min": 1, "max": 2, "grade": "A"},
+  {"when": "secret", "item": "wissen", "chance": 100, "min": 1, "max": 1},
+  {"when": "rank", "item": "wissen", "chance": 50, "min": 1, "max": 1, "grade": "C"},
+  {"when": "rank", "item": "wissen", "chance": 50, "min": 1, "max": 2, "grade": "A"},
   {"when": "rank", "item": "technik", "chance": 100, "min": 2, "max": 2, "grade": "S"},
   {"when": "craft", "item": "technik", "chance": 100, "min": 1, "max": 1},
   {"when": "craft", "item": "bio", "chance": 100, "min": 1, "max": 1, "function": "kitchen"},
   {"when": "craft", "item": "bio", "chance": 100, "min": 1, "max": 1, "function": "garden"},
   {"when": "craft", "item": "wissen", "chance": 100, "min": 1, "max": 1, "function": "cyber"},
   {"when": "craft", "item": "wissen", "chance": 100, "min": 1, "max": 1, "function": "drone"},
-  {"when": "craft", "item": "wissen", "chance": 100, "min": 1, "max": 1, "function": "warroom"}
+  {"when": "craft", "item": "wissen", "chance": 100, "min": 1, "max": 1, "function": "warroom"},
+  {"when": "chest", "item": "bio", "chance": 15, "min": 1, "max": 1}
  ]
 }
