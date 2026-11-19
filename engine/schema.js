@@ -14,6 +14,7 @@ import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
 import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from './megarig.js';
 import { ACHIEVEMENT_COUNTERS, ACHIEVEMENT_SPECIALS, ACHIEVEMENT_CATEGORIES } from '../game/achievements.js';
 import { REP_LEVELS } from '../game/reputation.js';
+import { RADIO_STYLES, RADIO_TALK, RADIO_SCALES, RADIO_KEYS } from '../game/radio_kinds.js';
 import { DECOR_PLACES, DECOR_ARTS } from '../game/decor.js';
 import { MOMENTS } from '../game/banter.js';
 import { EARN_WHEN } from '../game/earn.js';
@@ -1652,6 +1653,23 @@ export const AREAS = {
       if (x.map?.on && !x.short) report('hint', 'Auf der Karte ohne Kurzname');
     },
   },
+  radio: {
+    name: 'Radio', icon: 'music', file: 'data/radio.json', kind: 'single',
+    hint: 'Rig-Radio (#090): Sender mit Musik aus Code und einem DJ, der zwischen den Songs redet: Werbung der Marken, Wetter vom Navigator, Frontberichte aus dem Revierkrieg, Gerüchte über Orte, Lore. Läuft im Camp und auf der Fahrt (N schaltet um, auch im Pause-Menü). Platzhalter: {station} {freq} {dj} {djLine} · Werbung {brand} {ad} {slogan} · Wetter {forecast} · Front {a} {b} {place} {place2} · Gerücht {place} {hint}',
+    sections: [
+      { title: 'Radio', fields: [bool('enabled', 'Radio im Spiel'), num('volume', 'Lautstärke', { unit: '%', min: 0, max: 100 }), range('song', 'Länge eines Songs', { unit: 's' }),
+        num('talkSeconds', 'DJ redet', { unit: 's', min: 3 }), num('talkEvery', 'Reden nach jedem n-ten Song', { min: 1 }),
+        text('jammed', 'Gestört (Feind der Gang)', { hint: 'Steht statt des Senders, wenn Leyla Feind der Gang ist, der er gehört. {gang}' })] },
+      { title: 'Sender', fields: [table('stations', 'Sender', [text('id', 'ID'), text('name', 'Name'), text('freq', 'Frequenz'), select('style', 'Stil', RADIO_STYLES), num('bpm', 'Tempo', { unit: 'bpm', min: 40, max: 200 }),
+        select('key', 'Tonart', [['', 'gewürfelt'], ...RADIO_KEYS]), select('scale', 'Tonleiter', [['', 'nach Stil'], ...RADIO_SCALES]), text('dj', 'DJ'), text('djLine', 'DJ-Spruch'), text('gang', 'Gang', { hint: 'gehört dieser Gang: als Feind nur Rauschen' })])] },
+      { title: 'Durchsagen', fields: [table('weights', 'Anteile', [select('kind', 'Art', RADIO_TALK), num('weight', 'Gewicht', { min: 0 })]),
+        lines('lines.ident', 'Senderkennung'), lines('lines.ad', 'Werbung', { hint: 'eine Zeile wird gewürfelt, {ad} ist ein Spruch der Marke (Lore › Marken › Werbung oder Slogan)' }), lines('lines.weather', 'Wetter'),
+        lines('lines.war', 'Frontbericht'), lines('lines.tip', 'Gerücht'), lines('lines.lore', 'Lore-Häppchen')] },
+      { title: 'Songtitel', fields: [lines('titleA', 'Erstes Wort'), lines('titleB', 'Zweites Wort')] },
+    ],
+    check: (x, report) => { const ids = (x.stations || []).map(s => s.id); if (new Set(ids).size !== ids.length) report('error', 'Zwei Sender mit derselben ID'); if (x.enabled !== false && !ids.length) report('warning', 'Radio an, aber kein Sender'); },
+  },
+
   travel: {
     name: 'Reisen', icon: 'world_icon', file: 'data/travel.json', kind: 'single',
     hint: 'Was das Fahren kostet: Sprit, Vorräte und Zeit. Nachts ist es gefährlicher.',
@@ -1691,7 +1709,7 @@ export const GROUPS = [
   ['ACHIEVEMENTS & AUFTRÄGE', ['achievements', 'quests']],
   ['PROGRESSION', ['techtree', 'resources']],
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'megarigs', 'rigAddons', 'salvage', 'people', 'companions']],
-  ['WELT', ['worldmap', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel']],
+  ['WELT', ['worldmap', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
   ['LORE', ['brands']],
   ['ENTITIES', ['glitchlings']],
 ];

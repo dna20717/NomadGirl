@@ -331,7 +331,7 @@ export class DriveUI {
     if (key === this.hudKey) return;
     this.hudKey = key;
     const dots = Array.from({ length: T.legs + 1 }, (_, i) => el('i', { class: 'dv-dot' + (i <= L.i ? ' done' : ''), style: `left:${(i / Math.max(1, T.legs)) * 100}%` }));
-    this.hud.replaceChildren(
+    this.hud.replaceChildren(...[   // replaceChildren would write "null" for an empty slot
       el('div', { class: 'dv-top' },
         el('div', { class: 'dv-where' }, icon('map', 18), el('b', {}, T.from), el('span', {}, ' → '), el('b', {}, T.to),
           T.legs > 1 ? el('small', {}, `Etappe ${L.i + 1} von ${T.legs} · kurz vor ${L.toName}`) : null),
@@ -339,7 +339,7 @@ export class DriveUI {
       this.say && this.say.until > this.st.t ? el('div', { class: 'dv-say' }, icon('warning', 18), this.say.text) : null,
       el('div', { class: 'dv-bottom' },
         el('div', { class: 'dv-track' }, el('div', { class: 'dv-fill', style: `width:${total}%` }), ...dots, el('span', { class: 'dv-van', style: `left:${total}%` }, icon('vehicle', 16))),
-        this.phase === 'stop' ? null : hints([['ok', 'vorspulen (halten)'], ['back', 'überspringen'], ...(this.visibleAd() && !this.shotAt(this.visibleAd()) ? [['context', 'Foto: Billboard in die Mitte']] : [])])));
+        this.phase === 'stop' ? null : hints([['ok', 'vorspulen (halten)'], ['back', 'überspringen'], ...(this.visibleAd() && !this.shotAt(this.visibleAd()) ? [['context', 'Foto: Billboard in die Mitte']] : [])]))].filter(Boolean));
   }
   image(file) {
     if (!file) return null;

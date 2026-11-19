@@ -28,6 +28,7 @@ import { Drone } from './drone.js';
 import { Van } from './van.js';
 import { DriveUI } from './drive_ui.js';
 import { Backdrop } from './backdrop.js';
+import { RadioUI } from './radio_ui.js';
 import { Camp, campLayout, daytimeAt, drawCampBackground, drawCampGround, travelCost } from './camp.js';
 import { raining, rainConfig } from '../rain.js';
 import { applyMods, droneBonuses } from '../stations.js';
@@ -56,7 +57,7 @@ const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'], hangOne: ['ha
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
   jump: ['SPACE'], walk: ['SHIFT'], dash: ['L', 'C'], melee: ['J', 'Y'], ranged: ['K', 'X'], grab: ['E'],
-  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], uiOk: ['ENTER'], uiSend: ['F'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'], build: ['B'], holster: ['Q'], swap: ['V'],
+  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], uiOk: ['ENTER'], uiSend: ['F'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'], build: ['B'], holster: ['Q'], swap: ['V'], radio: ['N'],
 };
 
 export class PlayScene extends Phaser.Scene {
@@ -248,7 +249,7 @@ export class PlayScene extends Phaser.Scene {
     if (this.args?.loading) this.events.once('postupdate', () => this.args.loading.done());
     this.camp = null; this.vanPrompt = null;   // the scene object is reused on restart (camp ↔ run)
     this.sound.stopAll(); this.sound.removeAll();   // camp sounds belong to one visit
-    try { this.sound.mute = localStorage.getItem('nomadgirl-mute') === '1'; } catch { /* private mode */ }
+    try { this.muted = localStorage.getItem('nomadgirl-mute') === '1'; this.sound.mute = this.muted; } catch { /* private mode */ }   // #090 own flag: Phaser's mute reads back late
     makeTextures(this);
     applySignature(this);   // Leylas Signaturfarbe (#044): her textures in the colour from the mirror
     this.pad ??= new Pad(this.data_.game?.gamepad);   // kept over restarts (camp ↔ run)
@@ -494,6 +495,7 @@ export class PlayScene extends Phaser.Scene {
     hud.map.close(); hud.map.el.hidden = true;
     // the drive between two places (#053, game/play/drive_ui.js): under the menu, so an incident's window lies over it
     hud.drive ??= new DriveUI(hud.root, { scene: () => hud.scene }, hud.menuEl);
+    hud.radio ??= new RadioUI(hud.root, { scene: () => hud.scene });   // #090 Rig-Radio
     if (hud.drive.isOpen && !hud.scene.camp?.driving) hud.drive.close();
     // building the rig right in the camp (game/play/build_mode.js): B in the camp or Warroom › Rig umbauen
     hud.build ??= new BuildMode(hud.root, { scene: () => hud.scene });
@@ -743,9 +745,10 @@ export class PlayScene extends Phaser.Scene {
   }
 
   toggleMute() {
-    this.sound.mute = !this.sound.mute;
-    try { localStorage.setItem('nomadgirl-mute', this.sound.mute ? '1' : '0'); } catch { /* private mode */ }
-    this.hud.banner(this.sound.mute ? 'Ton aus' : 'Ton an', 'M schaltet um', 1600);
+    this.muted = !(this.muted ?? this.sound.mute);   // #090 Phaser's sound.mute reads back only once the audio thread took it
+    this.sound.mute = this.muted;
+    try { localStorage.setItem('nomadgirl-mute', this.muted ? '1' : '0'); } catch { /* private mode */ }
+    this.hud.banner(this.muted ? 'Ton aus' : 'Ton an', 'M schaltet um', 1600);
   }
 
   update(time, delta) {
@@ -761,6 +764,7 @@ export class PlayScene extends Phaser.Scene {
     }
     if (input.controls?.pressed && !this.hud.modal) this.hud.toggleHelp();
     if (input.mute.pressed) this.toggleMute();
+    if (input.radio?.pressed && !this.hud.modal) this.hud.radio?.next();   // #090
     if (input.debug.pressed) { const w = this.physics.world; w.drawDebug = !w.drawDebug; if (!w.debugGraphic) w.createDebugGraphic(); w.debugGraphic.clear().setVisible(w.drawDebug); }
     if (input.restart.pressed && this.mode === 'test' && this.level) this.restartAs({});   // doors, chests, walls: fresh room
     else if (input.restart.pressed && this.mode !== 'camp' && !this.level) this.restartRoom();

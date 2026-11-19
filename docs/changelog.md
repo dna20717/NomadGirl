@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Rig-Radio** (#090): Vier Sender mit Musik aus Code (Synthwave, Wüsten-Folk, Glitch, Nachtsender), ein DJ redet zwischen den Songs: Werbung der Marken, Wetter vom Navigator, Frontberichte aus dem Revierkrieg, Gerüchte über Orte, Lore. Läuft im Camp und auf der Fahrt, im POI still. N schaltet weiter (nach dem letzten Sender aus), Pause-Menü › Radio. Saint FM gehört den Static Saints: als Feind nur Rauschen. Werkstatt › Welt › Radio. Nebenbei: `pretty()` lässt Kommas in Texten in Ruhe, Ton aus (M) wird sofort erkannt, die Fahrt zeigte manchmal „null“.
 - 19.11.2026: **Werkstatt am iPad**: ⓘ-Erklärungen zum Antippen (klappen unter dem Feld auf, überall in der Werkstatt), drei Spalten passen hochkant (≤ 980 px); Pixel-Aufträge mit eigener, übersichtlicher Ansicht in fünf Schritten.
 - 19.11.2026: **Revierkrieg** (#089): Jede Gang hat Rivalen (POI › Gang › Rivalen). Ruf bei einer Gang kostet die Hälfte bei ihren Rivalen (und umgekehrt). Kämpft Leyla sich durch einen Ort und knackt den Tresor, zieht die Rivalen-Gang ein, bei der sie am besten dasteht. Straßen zwischen Rivalen sind Fronten (rote Zickzack-Linie auf der Karte), dort gibt es öfter Gang-Ärger, die Fehden nehmen die echten Rivalen.
 - 19.11.2026: **Pixel-Aufträge in der Werkstatt**: neuer Bereich unter Assets; Grafik-Wünsche online anlegen (auch am iPad), Claude Code erledigt sie mit `/pixel Aufträge` und hängt die Ergebnisse als Assets an.

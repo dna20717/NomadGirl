@@ -69,7 +69,6 @@ Ideen ohne Auftrag. Wer eine angeht, macht daraus ein Ticket im Funkbuch und str
 - **Fahndungsstufe:** jede gefangene Entity macht die Kammerjäger aufmerksamer; ab einer Stufe jagen sie Leyla im Run (Duell oder echte Gegner).
 - **Bit-Stapel in der Kneipe:** NPCs spielen um Einsätze (Teile, Rezepte, Gerüchte über POIs).
 - **Entities mit Camp-Jobs:** Entities im Deck steuern Werkstätten, ihr Charakter färbt die Arbeit (die Diva schlampt, der Bürokrat sortiert).
-- **Rig-Radio:** Sender mit Musik aus Code, Durchsagen aus BigCityDelta, Lore-Häppchen, Hinweise auf POIs, vielleicht eine DJ-Entity mit Banter.
 - **Fotomodus:** AvA als Kamera, Rig und Camp festhalten und teilen.
 - **Täglicher Run:** ein Tages-Seed für alle mit Ranking.
 

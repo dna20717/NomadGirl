@@ -31,7 +31,7 @@ const CONTROLS = [
   { title: 'Machen', icon: 'hand', rows: [
     ['E / W', 'Benutzen: Kisten, Schalter, Werkstätten, Feuer, Van (W nur mit Hinweis)'], ['I / Tab', 'Inventar'], ['B', 'Rig bauen (im Camp; Pfeile + Leertaste/Enter ohne Maus)'], ['P', 'Yoga-Pose']] },
   { title: 'System', icon: 'settings', rows: [
-    ['Esc', 'Menü'], ['H', 'Diese Steuerung'], ['M', 'Ton an/aus'], ['Rücktaste', 'Raum neu starten'], ['G', 'Hitboxen']] },
+    ['Esc', 'Menü'], ['H', 'Diese Steuerung'], ['M', 'Ton an/aus'], ['N', 'Radio: nächster Sender'], ['Rücktaste', 'Raum neu starten'], ['G', 'Hitboxen']] },
 ];
 const caps = keys => keys.split(' / ').flatMap((k, i) => [...(i ? [el('i', {}, '/')] : []), ...k.split(' + ').flatMap((p, j) => [...(j ? [el('i', {}, '+')] : []), el('kbd', {}, p)])]);
 const section = g => el('section', {}, el('h3', {}, icon(g.icon, 16), g.title), el('dl', {}, ...g.rows.flatMap(([k, t]) => [el('dt', {}, ...caps(k)), el('dd', {}, t)])));
@@ -118,6 +118,7 @@ export class Hud {
       { label: 'Steuerung', sub: 'Tasten und Controller', act: () => this.toggleHelp(true) },
       { label: 'Feldhandbuch', sub: 'Alle Lektionen mit Clips', act: () => setTimeout(() => this.tut?.openGuide(), 0) },
       ...(sc.box ? [{ label: 'Achievements', sub: 'Erreicht, offen, Trophäen', act: () => setTimeout(() => this.ach?.open(), 0) }, { label: 'Logbuch', sub: 'Alle Meldungen mit Uhrzeit', act: () => setTimeout(() => this.logbook(), 0) }] : []),
+      ...(this.radio && sc.box && sc.mode !== 'run' && this.radio.C.stations.length ? [{ label: `Radio: ${this.radio.on ? this.radio.station?.name : 'aus'}`, sub: 'Sender wählen · N', act: () => setTimeout(() => this.radio.menu(this), 0) }] : []),   // #090
       { label: 'Optionen', sub: 'Ton, Schießstil', act: () => setTimeout(() => this.optionsMenu(), 0) },
       ...(this.modeName === 'test' ? [{ label: 'Raum neu starten', sub: 'Rücktaste', act: () => sc.level ? sc.restartAs({}) : sc.restartRoom() }] : []),
       { label: 'Werkstatt', act: () => { location.href = 'workshop.html'; } },
@@ -132,7 +133,7 @@ export class Hud {
     if (this.modal || !sc) return;
     const cells = sc.cellsLike();
     this.menu({ title: 'Optionen', items: [
-      { label: sc.sound.mute ? 'Ton an' : 'Ton aus', sub: 'M', act: () => sc.toggleMute() },
+      { label: (sc.muted ?? sc.sound.mute) ? 'Ton an' : 'Ton aus', sub: 'M', act: () => sc.toggleMute() },
       { label: `Vibration: ${hapticsOn() ? 'an' : 'aus'}`, sub: 'Glitch-Duell: Controller-Rumble und Handy-Vibration (gilt auch für /duel und /mobile)', act: () => { setHaptics(!hapticsOn()); this.banner(`Vibration ${hapticsOn() ? 'an' : 'aus'}`, '', 1400); } },
       { label: `Schießstil: ${cells ? 'Cells-like' : 'Klassisch'}`, sub: cells ? 'Schießen im Rennen mit Zielhilfe · umschalten auf Klassisch' : 'Zum Schießen stehen oder gehen · umschalten auf Cells-like',
         act: () => { try { localStorage.setItem('nomadgirl-shoot-style', cells ? 'classic' : 'cells'); } catch { /* private mode */ }

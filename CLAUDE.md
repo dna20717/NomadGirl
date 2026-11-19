@@ -136,6 +136,7 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 - `docs/features/worldmap.md`: Reisekarte (#007): Routen-Netz je Durchgang, Marken, Fenster am Warroom und an der Van-Tür; Fahrt in Szene (#053), Ereignis-Baukasten (#054).
 - `docs/features/lore.md`: Lore-Datenbank (#045): Marken, Spielwerte, Hersteller, Logos.
 - `docs/features/glitchlings.md`: Entities (#047–#052): Generator, Porträts, Hersteller, Cyberdeck, Bit-Stapel. **Jede Duell-Änderung gilt für /duel, /mobile und das Duell im Spiel** (Daniel, 18.11.2026).
+- `docs/features/radio.md`: Rig-Radio (#090): Sender, Musik aus Code, DJ-Durchsagen (Werbung, Wetter, Front, Gerüchte), N / Pause-Menü.
 - `docs/features/splash.md`: Startseite: Szene, Horizont-Dunst, AvA, Highway mit Textur-Boden, Überraschungen.
 - `docs/features/art.md`: Feld `look` an Entitäten, Asset-Vorschau, Symbol-Raster, Gegenrichtung beim Spiegeln.
 - `docs/features/editor.md`: Werkstatt-Editor: Spielen-Knopf, Scroll-Position.

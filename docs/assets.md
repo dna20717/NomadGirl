@@ -183,6 +183,8 @@ Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich 
 | `assets/companions/schraube_idle.png`, `onkel_sung_idle.png` | Companions stehen (#008): Schraube (2 Frames, die anderen setzten eine Kapuze auf) und Onkel Sung (4 Frames), Blick nach rechts | KI (PixelLab, Charakter + breathing-idle), zugeschnitten (Code) | 13.11.2026 |
 | `assets/tutorial/tut_<lektion>.webm`, `tut_<lektion>_<n>.webp` | Feldhandbuch (#011): 22 Clips (WebM/VP9, 640 px, 15 fps) und 61 Bilder (WebP, 960 px) der Lektionen, aus dem Spiel aufgenommen (`tools/tutorial_capture.mjs`), keine neuen Grafiken | Code (Aufnahme aus dem Spiel) | 13.11.2026 |
 
+| (keine Datei) | Rig-Radio (#090): vier Sender mit Musik, Rauschen und Knistern, live erzeugt (`game/radio.js` Noten, `game/radio_audio.js` Web Audio) | Code | 19.11.2026 |
+
 ## Ordner
 
 Alle Grafiken liegen unter `projects/nomadgirl/assets/`, nach Figur oder Thema in Unterordnern (`leyla/`, `backgrounds/`, `tiles/`, später z. B. `enemies/`, `rig/`). Dort werden sie auch online ausgeliefert, damit die Werkstatt sie zeigen kann.

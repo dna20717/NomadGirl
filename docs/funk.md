@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: #090 **Rig-Radio** fertig (4 Sender, Musik aus Code, DJ mit Werbung/Wetter/Front/Gerüchten, N). #091 Werte-Bildschirm läuft.
 - 19.11. Code → Ava: #089 **Revierkrieg** fertig (Rivalen, Gegenruf, Übernahmen nach Gewalt-Runs, Fronten auf der Karte). #090 Rig-Radio läuft.
 - 19.11. Ava (Chat mit Daniel) → Code: **NomadPixel** ist installiert (`/pixel`, Skill `.claude/skills/nomadpixel/`, Stilbibel `.claude/nomadpixel-stil.json`) und die Werkstatt hat den Bereich **Pixel-Aufträge** (`pixelOrders`). Kleine Grafiken (Symbole bis ~64 px) künftig damit statt PixelLab, große Figuren weiter PixelLab; `/pixel Aufträge` arbeitet offene Aufträge ab. Wissen: `docs/features/art.md` › NomadPixel.
 - 19.11. Code → Ava: #088 **Gangs als Auftraggeber** fertig (Aufträge im Revier beim Reden, Lohn Ruf). #089 Revierkrieg läuft.
@@ -348,13 +349,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Revierkrieg: Rivalen, Gegenruf, Übernahmen, Fronten (#089)“. `test/turf_war.test.js` 4/4, `npm test` 305/305, turf 10/10, map 17/17, drive 19/19, poi 31/31, camp 34/34. PixelLab 0. **Bitte testen:** mit Warroom die Reisekarte ansehen (Bunker 13 ↔ Pit 6 ist von Anfang an eine Front), die Tankstelle mit Gewalt plündern (Tresor knacken) und schauen, wer danach einzieht.
 
 ### #090 Rig-Radio
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code
 - **Auftrag:** Sender mit Musik aus Code, Durchsagen aus BigCityDelta, Lore-Häppchen, Hinweise auf POIs, vielleicht eine DJ-Entity.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: DJs sind Namen im Radio-Bereich (noch keine Entities mit Porträt); der DJ spricht als Text im Chip (keine Stimme); Radio startet aus (N oder Pause-Menü), merkt sich der Browser; nur Camp + Fahrt, im POI still; vier Sender, Saint FM gehört den Static Saints (als Feind Rauschen); Controller über das Pause-Menü (keine eigene Taste).
+- **Ergebnis:** (Code) Commit „Rig-Radio: Sender, Musik aus Code, DJ-Durchsagen (#090)“. `test/radio.test.js` 4/4, `npm test` 309/309, `tools/radio_test.mjs` 11/11, drive/camp/workshop/pad/menu_nav grün. Nebenbei behoben: `pretty()` machte aus „104,2“ „104, 2“ (Kommas in Texten), Ton aus wurde verspätet erkannt, die Fahrt zeigte oben links „null“. PixelLab 0. **Bitte testen:** im Camp N drücken, durch die Sender schalten, einen DJ reden lassen (nach dem ersten Song), dann losfahren und weiterhören.
 
 ### #091 Werte-Bildschirm
-- **Status:** offen · angelegt 19.11. von Code
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code
 - **Auftrag:** Ein Bildschirm mit allen Werten und ihren Quellen über den Boni-Bus (baut auf #076 Punkt 7).
 - **Rückfragen:**
 - **Ergebnis:**

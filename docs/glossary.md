@@ -10,6 +10,7 @@ Neuer Code nimmt die Wörter aus dieser Liste. Die Grundbegriffe (Werkstatt, Pr�
 | ActionMode (alles in den POIs) | run (`scene.mode === 'run'`) |
 | DuellMode (Duelle der Entities) | duel (`hud.duel`, `/duel`, `/mobile`) |
 | TravelMode (Reisen: Karte, Fahrt, Zwischenfälle) | travel (`hud.map`, `hud.drive`, `travel.js`) |
+| Rig-Radio, Sender, Durchsage, Revierkrieg, Rivale, Front, Übernahme, Wettervorhersage | radio, station, talk, turf war, rival, front, takeover, forecast |
 | Ruf (bei einer Gang) | rep |
 | Merker (Folgen von Ereignissen) | flag |
 | Kette (Ereignisse über mehrere Etappen) | chain |
