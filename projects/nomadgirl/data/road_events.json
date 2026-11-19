@@ -440,10 +440,37 @@
    "id": "laeuferin_rache",
    "name": "Die Läuferin ist zurück",
    "roadside": "barrier",
-   "needs": "laeuferin_bestohlen",
+   "needs": "laeuferin_feindin",
    "once": true,
    "text": "Sie hat dein Rig wiedererkannt. Diesmal hat sie Freunde mit Waffen dabei.",
    "answers": "zahlen, durchbrechen, umweg"
+  },
+  {
+   "figures": "streuner",
+   "time": "any",
+   "weight": 6,
+   "danger": 1,
+   "moods": "",
+   "id": "laeuferin_zweite_chance",
+   "name": "Eine Narbe mehr",
+   "roadside": "campfire",
+   "needs": "laeuferin_verraten",
+   "once": true,
+   "text": "Am Straßenrand sitzt die Läuferin, die du den {gang} ausgeliefert hast. Eine Narbe mehr, ein Blick weniger. „Ich bin raus. Ich kenne Wege, die keiner kennt. Aber Vertrauen kostet jetzt.“",
+   "answers": "zweite_chance_zahlen>laeuferin_bewaehrung, zweite_chance_ablehnen, weiterfahren"
+  },
+  {
+   "figures": "streuner",
+   "time": "any",
+   "weight": 2,
+   "danger": 1,
+   "moods": "",
+   "id": "laeuferin_bewaehrung",
+   "name": "Die Probefahrt",
+   "roadside": "campfire",
+   "only": true,
+   "text": "Sie wartet, wie versprochen, und steigt ein, bevor du fragen kannst. „Links, dann durchs Flussbett. Und Leyla: Wenn du mich noch mal verkaufst, war es das.“",
+   "answers": "bewaehrung_vertrauen, bewaehrung_absetzen"
   },
   {
    "figures": "",
@@ -958,7 +985,7 @@
    "label": "Alles nehmen und abhauen",
    "when": "any",
    "loot": "tresor",
-   "flag": "laeuferin_bestohlen",
+   "flag": "laeuferin_bestohlen, laeuferin_feindin",
    "risk": 20,
    "failHealth": 15,
    "result": "Sie schreit dir hinterher. Du drehst das Radio lauter.",
@@ -971,6 +998,30 @@
    "loot": "kiste_tankstelle",
    "deltas": 50,
    "result": "Darin: Δ, ein Foto von euch beiden am Schrein und etwas Brauchbares."
+  },
+  {"id": "zweite_chance_zahlen", "label": "150 Δ für eine zweite Chance", "when": "any", "deltas": -150, "result": "Sie zählt nach. Zweimal. „Morgen. Gleiche Straße.“"},
+  {
+   "id": "zweite_chance_ablehnen",
+   "label": "Ohne ein Wort weiterfahren",
+   "when": "any",
+   "flag": "laeuferin_feindin",
+   "result": "Im Rückspiegel steht sie noch lange da. Dann holt sie ihr Funkgerät raus."
+  },
+  {
+   "id": "bewaehrung_vertrauen",
+   "label": "Ihr den Weg zeigen lassen",
+   "when": "any",
+   "hours": 1,
+   "loot": "kiste_tankstelle",
+   "buff": "flink",
+   "flag": "laeuferin_freundin",
+   "result": "Ein Schleichweg, ein Versteck unter einer Brücke, ein halbes Lächeln. „Quitt.“"
+  },
+  {
+   "id": "bewaehrung_absetzen",
+   "label": "Sie an der nächsten Kreuzung absetzen",
+   "when": "any",
+   "result": "Sie steigt aus, ohne sich umzudrehen. Das Geld behält sie trotzdem."
   },
   {
    "id": "silo_peilen",
