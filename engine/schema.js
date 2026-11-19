@@ -864,7 +864,7 @@ export const AREAS = {
     name: 'Aufträge', singular: 'Auftrag', icon: 'list', file: 'data/quests.json', kind: 'catalog', groupBy: { key: 'giver' },
     hint: 'Nebenaufträge im Questlog (#016, Daniel 14.11.2026: „Wir brauchen eine Art Questlog!“). Ein Auftrag zählt ab dem Annehmen einen Zähler hoch (wie Achievements) oder will Dinge abgegeben haben. Die Hauptquest (Heilmittel) und AvAs Tank kommen aus Techtree und Cryo-Tank. Geöffnet am Warroom und am Lagerfeuer.',
     template: { name: 'Neuer Auftrag', counter: 'kills', target: 5, reward: { deltas: 50 } },
-    row: (x, p) => `${p?.data.companions?.[x.giver]?.name || 'ohne Auftraggeber'} · ${x.counter ? `${x.target || 1}× ${ACHIEVEMENT_COUNTERS.find(c => c[0] === x.counter)?.[1]?.replace(/ \(.*$/, '') || x.counter}${x.filter ? ' · ' + x.filter : ''}` : `${x.count || 1}× ${p?.data.items?.[x.item]?.name || x.item || '?'} abgeben`}`,
+    row: (x, p) => `${p?.data.companions?.[x.giver]?.name || 'ohne Auftraggeber'} · ${x.counter ? `${x.target || 1}× ${ACHIEVEMENT_COUNTERS.find(c => c[0] === x.counter)?.[1]?.replace(/ \(.*$/, '') || x.counter}${x.filter ? ' · ' + x.filter : ''}` : x.pieces?.length ? `${x.pieces.length} Stücke abgeben` : `${x.count || 1}× ${p?.data.items?.[x.item]?.name || x.item || '?'} abgeben`}${x.needsFlag ? ` · nach Merker ${x.needsFlag}` : ''}`,
     sections: [
       { title: 'Auftrag', fields: [NAME, ref('giver', 'Auftraggeber', 'companions'), area_('text', 'Text', { hint: 'Was der Auftraggeber sagt' }), area_('done', 'Beim Abgeben', { hint: 'Sein Satz, wenn Leyla den Auftrag abgibt' }),
         ref('after', 'Nach Auftrag', 'quests', { hint: 'Erst im Angebot, wenn dieser Auftrag erledigt ist' }), num('minDay', 'Ab Tag', { min: 1 })] },
@@ -1532,7 +1532,7 @@ export const AREAS = {
     hint: '#047 (Daniel, 16./17.11.2026: „Software gibt es nicht mehr, nur spezialisierte KIs mit Eigenarten und Macken“; „Namen wie Marble Sting“; „ein System, auf dessen Basis man diese passiven Companions generieren kann“). Bausteine für den Generator (game/glitchlings.js); jeder Durchgang würfelt seine eigenen. Design: design.md › Hacking v3.',
     sections: [
       { title: 'Generator', fields: [num('count', 'Je Durchgang', { min: 1, max: 40, hint: 'So viele Entities gibt es in einem Durchgang (die Unikate mit „immer“ zählen mit)' }),
-        table('bitWeights', 'Stärke', [num('w', 'Gewicht', { min: 0 })], { hint: 'Zeile 1 = 1 Bit … Zeile 5 = 5 Bits: wie oft jede Stärke gewürfelt wird' }),
+        table('bitWeights', 'Stärke', [num('w', 'Gewicht', { min: 0 })], { rowLabel: i => `${i + 1} ${i ? 'Bits' : 'Bit'}`, hint: 'Zeile 1 = 1 Bit … Zeile 5 = 5 Bits: wie oft jede Stärke gewürfelt wird' }),
         num('off', 'Fremde Werkbank', { unit: '%', min: 0, max: 100, hint: 'In einer Werkbank, die nicht zu ihrer Begabung passt, wirkt eine Entity nur so stark' })] },
       { title: 'Namen', fields: [area_('names.first', 'Erstes Wort', { hint: 'Material, Farbe, Stoff (Marble, Amber, Velvet …), mit Komma getrennt. Name = erstes + zweites Wort, jedes Wort je Durchgang nur einmal' }),
         area_('names.second', 'Zweites Wort', { hint: 'Kante, Geräusch, Tat (Sting, Slay, Hex …)' })] },

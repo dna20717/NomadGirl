@@ -28,3 +28,11 @@ Was die Systeme verbindet, sichtbar im Inspektor (`game/workshop/summaries.js`, 
 - **Marken › Markentreue:** Set-Bonus, wie viele Teile gleichzeitig tragbar sind (ein Teil je Platz, Waffen), Teile je Platz; Warnung, wenn der Bonus nicht erreichbar ist.
 - **Werkstätten › Worker:** welche Begabungen hier voll arbeiten (Werkbank oder „Auch“) und mit wie viel Prozent Fremde; die Bit-Farm erklärt sich.
 - Tests: `test/workshop_views.test.js`, `tools/workshop_test.mjs`.
+
+## Kleinkram (#075)
+
+- Quests mit Stücken heißen in der Liste „5 Stücke abgeben“, Merker-Quests sagen „nach Merker …“.
+- Tabellen können Zeilen benennen (`rowLabel` im Schema): Entities › Stärke zeigt „1 Bit … 5 Bits“.
+- „Aussehen“ zeigt kein Bild aus einer Tabellenzeile mehr, wenn der Bereich eine eigene Vorschau hat (Ereignis-Baukasten zeigte das Silo).
+- Übersichtskarten zeigen höchstens vier Zeilen Text, der ganze Text steht im Tooltip.
+- Datensets › Speichern unter …: Name und Beschreibung (steht in der Liste und im Hauptmenü).

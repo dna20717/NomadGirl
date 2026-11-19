@@ -182,3 +182,6 @@ body.ng { background: var(--ui-bg); color: var(--ui-text); font-family: var(--ui
 .ng-xrow.warn { border-color: var(--ui-red); }
 .ng-xtag { font-size: var(--ui-gr-xs); padding: 0 6px; border-radius: 6px; background: var(--ui-acc-soft); color: var(--ui-text); }
 .ng-xtag.warn { background: var(--ui-red-soft); }
+/* #075 Kleinkram */
+.ng-cardHint { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.ng-rowLabel { font-size: var(--ui-gr-xs); color: var(--ui-text2); }

@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 19.11.2026: **Werkstatt: Kurzzeilen und Kleinkram** (#075): richtige Quest-Zeilen, benannte Tabellenzeilen, kein falsches Bild im Ereignis-Baukasten, kürzere Übersicht, Beschreibung für Datensets.
 - 19.11.2026: **Werkstatt: Verzahnungs-Ansichten** (#074): Merker-Explorer und Geschichten-Ketten im Ereignis-Baukasten, Fundorte der Quest-Stücke, Markentreue-Sets, Worker je Werkstatt.
 - 19.11.2026: **Datensets** (#073): Varianten der Spieldaten (nur der Unterschied zum Standard) speichern, laden und löschen; das Hauptmenü zeigt unten das aktive Set und wechselt es per Klick.
 - 19.11.2026: **Werkstatt: breite Tabellen als Karten** (#072): Lagen, Antworten und Begabungen zeigen je Zeile eine Karte mit Kurzzeile, aufgeklappt ein Formular in Gruppen, dazu ein Suchfeld.

@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 19.11. Code → Ava: #075 **Kleinkram** fertig. Werkstatt-Runde #072–#075 komplett, jedes Ticket einzeln getestet und gepusht.
 - 19.11. Code → Ava: #074 **Verzahnungs-Ansichten** fertig (Merker-Explorer, Ketten, Fundorte, Markentreue, Worker). Fund: `laeuferin_verraten` hat noch keine Folge. #075 läuft.
 - 19.11. Code → Ava: #073 **Datensets** fertig: Varianten im Repo (nur der Unterschied), Speichern unter/Laden/Löschen in der Werkstatt, Hauptmenü zeigt und wechselt das aktive Set. #074 läuft.
 - 19.11. Code → Ava: #072 **Tabellen als Karten** fertig (Ereignis-Baukasten und Begabungen lesbar, Suchfeld). #073 Datensets läuft.
@@ -221,12 +222,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Markentreue und Influencer-Billboards (#064)“ auf `main`. Neu `game/brand_perks.js`, `road.hit`, Billboard-Tipp in `drive_ui.js`, Markenstand (Lage › Laden), Lore › Marken › Markentreue, Inventar-Zeile Markentreue. `npm test` 259/259 (neu `test/brand_perks.test.js`), Browser 46/46 (`drive_test` 18 mit echtem Klick). PixelLab 0. **Bitte testen:** während der Fahrt ein Billboard antippen, dann an der Karawane Sprit kaufen.
 
 ### #075 Werkstatt: Kurzzeilen und Kleinkram
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)
 - **Für:** Code
 - **Lesen:** docs/features/editor.md, `game/workshop/`
 - **Auftrag (Daniel, 19.11.2026):** C: Quest-Zeile mit Stücken, beschriftete Tabellen (Stärke-Gewichte), richtiges Bild im Ereignis-Baukasten, schlanke Übersicht. Reihenfolge (Daniel): erst A, dann Datensets, dann B und C; inkrementell.
 - **Rückfragen:** –
-- **Ergebnis:** –
+- **Ergebnis:** (Code) Commit „Werkstatt: Kurzzeilen und Kleinkram (#075)“ auf `main`. Quest-Kurzzeilen, `rowLabel`, Aussehen ohne Tabellenbilder, Karten-Text gekürzt, Datenset-Beschreibung. `npm test` 273/273, `workshop_test`, `workshop_cloud_test`, `datasets_test`, `map_test` grün. PixelLab 0.
 
 ### #074 Werkstatt: Verzahnungs-Ansichten
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniels Auftrag im Code-Chat: „Wie steht es um die Werkstatt? … Lass uns auch hier eine Eleganz-Runde drehen, das Interface untersuchen und das gute Stück weiter polieren.“)

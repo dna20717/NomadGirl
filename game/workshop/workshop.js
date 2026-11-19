@@ -200,12 +200,15 @@ export class Workshop {
     return {};
   }
   async saveSetAs() {
-    const { askText } = await import('../ui.js');
-    const name = await askText('Speichern unter …', 'Name', this.dataSet ? `${this.dataSet.name} 2` : 'Mein Datenset', 'Die jetzigen Daten (auch Ungespeichertes) werden eine neue Variante; der Standard bleibt, wie er ist.');
+    // #075 name and a short description (shown in the list and in the main menu)
+    const nameIn = el('input', { type: 'text', class: 'ed-field', value: this.dataSet ? `${this.dataSet.name} 2` : 'Mein Datenset' }), descIn = el('input', { type: 'text', class: 'ed-field', placeholder: 'z. B. weniger Leben, teurere Händler' });
+    const got = await new Promise(done => { let v = null; openDialogue({ title: 'Speichern unter …', icon: 'save', content: [el('label', { class: 'da-field' }, el('span', {}, 'Name'), nameIn), el('label', { class: 'da-field' }, el('span', {}, 'Beschreibung'), descIn),
+      el('p', { class: 'ed-small' }, 'Die jetzigen Daten (auch Ungespeichertes) werden eine neue Variante; der Standard bleibt, wie er ist.')], main: { text: 'Speichern', icon: 'save', action: () => { v = { name: nameIn.value.trim(), description: descIn.value.trim() }; } }, onDone: () => done(v) }); setTimeout(() => nameIn.select()); });
+    const name = got?.name;
     if (!name) return;
     let id = slugSet(name) || 'set'; for (let i = 2; this.sets.some(s => s.id === id); i++) id = `${slugSet(name)}_${i}`;
     const files = Object.entries(AREAS).map(([a, A]) => ({ file: setFile(id, this.p.paths[a]), data: this.p.paths[a], content: diffArea(A.kind, this.base[a], this.p.data[a]) ?? null })).filter(c => c.content);
-    const index = [...this.sets, { id, name, files: files.map(c => c.data) }];
+    const index = [...this.sets, { id, name, ...(got.description ? { description: got.description } : {}), files: files.map(c => c.data) }];
     try {
       await this.writeFiles([{ file: SET_INDEX, content: index }, ...files.map(({ file, content }) => ({ file, content }))]);
       chooseSet(id); this.dirty.clear();
@@ -361,7 +364,7 @@ export class Workshop {
       main.append(el('h3', {}, title), el('div', { class: 'ng-cards' }, ...list.map(a => {
         const A = AREAS[a], n = A.kind === 'catalog' ? Object.keys(this.p.data[a] || {}).length : null, bad = m.filter(x => x.place.area === a && x.kind !== 'hint').length;
         return el('button', { class: 'ng-card', onclick: () => this.go({ area: a }) }, el('span', { class: 'ng-card-head' }, icon(A.icon, 18), el('b', {}, A.name), n != null ? el('span', { class: 'ng-card-n' }, String(n)) : null),
-          el('span', { class: 'ed-small' }, A.hint), bad ? el('span', { class: 'ng-card-bad' }, icon('warning', 13), ` ${bad} zu prüfen`) : null);
+          el('span', { class: 'ed-small ng-cardHint', title: A.hint || '' }, A.hint), bad ? el('span', { class: 'ng-card-bad' }, icon('warning', 13), ` ${bad} zu prüfen`) : null);
       })));
     }
     insp.append(el('h3', {}, 'So funktioniert die Werkstatt'), ...[
@@ -442,7 +445,7 @@ export class Workshop {
   // ---------- Look: preview of the assets an entry points to (or of the asset itself) ----------
   lookBlock(a, x) {
     if (a === 'assets') return [el('h4', {}, 'Vorschau'), assetPreview(this, x)];
-    const A = this.p.data.assets || {}, refs = references(a, x).filter(r => r.area === 'assets' && A[r.value]);
+    const A = this.p.data.assets || {}, refs = references(a, x).filter(r => r.area === 'assets' && A[r.value] && !(SUMMARY[a] && r.path.includes(' › ')));   // #075 a picture in a table row is not the look of the whole area
     const hasLook = fields(a).some(f => f.area === 'assets');
     if (!refs.length) return hasLook ? el('p', { class: 'ed-small ng-noLook' }, icon('image', 14), ' Noch kein Aussehen. Unter „Aussehen“ ein Asset wählen.') : null;
     this.lookPick = this.lookPick || {};
@@ -516,9 +519,10 @@ export class Workshop {
     if (f.columns.length > CARD_COLUMNS) return this.cardTable(a, f, rows, put, cell, blank);   // #072 wide tables: one card per row
     // pairs (points, sizes) need room for two numbers
     const style = f.columns.some(c => PAIR[c.type]) ? `grid-template-columns:${f.columns.map((c, i) => PAIR[c.type] ? 'minmax(150px, 2fr)' : i === 0 ? 'minmax(120px, 2fr)' : 'minmax(52px, 1fr)').join(' ')} 28px` : `--cols:${f.columns.length}`;
+    const lab = f.rowLabel, st = lab ? `grid-template-columns:80px repeat(${f.columns.length}, minmax(52px, 1fr)) 28px` : style;   // #075 rows with a name (1 Bit … 5 Bits)
     return el('div', { class: 'ng-table' },
-      el('div', { class: 'ng-trow head', style }, ...f.columns.map(c => el('span', {}, c.label)), el('span')),
-      ...rows.map((row, i) => el('div', { class: 'ng-trow', style }, ...f.columns.map(c => cell(c, row, i)),
+      el('div', { class: 'ng-trow head', style: st }, ...(lab ? [el('span')] : []), ...f.columns.map(c => el('span', {}, c.label)), el('span')),
+      ...rows.map((row, i) => el('div', { class: 'ng-trow', style: st }, ...(lab ? [el('span', { class: 'ng-rowLabel' }, lab(i))] : []), ...f.columns.map(c => cell(c, row, i)),
         el('button', { class: 'ed-button small', title: 'Zeile entfernen', onclick: () => put(rows.filter((_, j) => j !== i)) }, icon('x', 12)))),
       el('button', { class: 'ed-button small ng-addRow', onclick: () => put([...rows, blank()]) }, icon('plus', 12), ' Zeile'));
   }
