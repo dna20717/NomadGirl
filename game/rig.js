@@ -15,7 +15,7 @@ import { advance, fitContainers, campStore, CAMP, campName } from './save.js';
 import { canResize } from './inventory.js';
 import { synergyPower } from './synergy.js';
 import { upgradeOf, levelOf as starsOf } from './upgrades.js';
-import { remap as remapDecor } from './decor.js';
+import { remap as remapDecor, compact as compactDecor } from './decor.js';
 
 const clone = x => JSON.parse(JSON.stringify(x));
 export const B = D => D.build || {};
@@ -356,11 +356,14 @@ export function resizeContainer(D, d, ui, n) {
   const popped = u.workshops.filter(w => w.at + (wsDef(D, w.id).places || 1) > to);
   for (const w of popped) { u.workshops.splice(u.workshops.indexOf(w), 1); toSpare(d, w); }
   u.places = to;
+  // decoration on this container's roof, walls, inside and ladders beyond the new end goes into the Lager (Daniel 19.11.2026:
+  // „Da schwebt ein Windrad, weil ich einen Container kürzer gemacht habe“); what stood on it comes along
+  const before = (d.rig.decor || []).length, gone = d.rig.decor?.length ? compactDecor(d.rig, o => o.at?.ui === ui && o.at?.p != null && o.at.side == null && o.at.p > to - 0.5 + 1e-6, { spare: true }) : [];
   const above = U[ui + 1];
   if (above && levelOf(above) === levelOf(u) + 1 && above.slot != null) { const max = stackSlots(D, u, above); above.slot = max ? Math.min(max, above.slot) : undefined; }
   if (levelOf(u) > 0 && u.slot != null) { const max = stackSlots(D, U[ui - 1], u); u.slot = max ? Math.min(max, u.slot) : undefined; }
   spend(D, d, 0, M(D, 'resize', 5));
-  return { ok: true, popped: popped.map(w => w.id), from, to };
+  return { ok: true, popped: popped.map(w => w.id), decor: gone.map(o => o.id), from, to };
 }
 
 // #114 Farbe wie Townscaper: a container gets a colour (hex) or its original look (null); no Δ, no time

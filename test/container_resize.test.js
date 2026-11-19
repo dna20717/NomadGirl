@@ -72,3 +72,12 @@ test('Alte Größen (10/40 Fuß) bleiben gültig und lassen sich auch ziehen', (
   assert.ok(act(D, s, d => resizeContainer(D, d, tank, 2)).ok);
   assert.ok(s.rig.units[tank].workshops.some(w => w.id === 'cryotank'), 'der Tank bleibt drin');
 });
+
+test('Kürzer: Deko auf Dach, Wand und innen hinter dem neuen Ende geht ins Lager (kein schwebendes Windrad)', () => {
+  const s = fresh(), ui = withContainer(s, 3);
+  s.rig.decor = [{ id: 'windrad', at: { ui, p: 2.2, day: 1 } }, { id: 'kit_pflanze', at: { ui, p: 0.5, day: 1 } }, { id: 'fenster', at: { ui, p: 1.4, row: 0.3, day: 1 } }];
+  const r = act(D, s, d => resizeContainer(D, d, ui, 2));
+  assert.ok(r.ok); assert.deepEqual(r.decor, ['windrad']);
+  assert.deepEqual(s.rig.decor.map(x => x.id), ['kit_pflanze', 'fenster']);
+  assert.ok(s.rig.spare.decor.includes('windrad'));
+});

@@ -73,7 +73,8 @@ export class BuildResize {
     // a workshop pops out: it flies as a crate onto the scrapyard
     for (const p of popAt) this.popCrate(p);
     const add = r.minutes ? ` · +${r.minutes} min` : '';
-    this.say(`${D.containers?.[this.save.rig.units[R.ui]?.id]?.name || 'Container'}: ${r.to} ${r.to === 1 ? 'Platz' : 'Plätze'}${popAt.length ? ` · ${popAt.map(p => wsDef(D, p.id).name || p.id).join(', ')} ploppt auf den Schrottplatz` : ''}${add}`, popAt.length ? 'idle' : 'ok');
+    const deco = (r.decor || []).map(id => D.decor?.[id]?.name || id);
+    this.say(`${D.containers?.[this.save.rig.units[R.ui]?.id]?.name || 'Container'}: ${r.to} ${r.to === 1 ? 'Platz' : 'Plätze'}${popAt.length ? ` · ${popAt.map(p => wsDef(D, p.id).name || p.id).join(', ')} ploppt auf den Schrottplatz` : ''}${deco.length ? ` · ${deco.join(', ')} ins Lager (Händler › Deko)` : ''}${add}`, popAt.length || deco.length ? 'idle' : 'ok');
     this.draw();
   }
   popCrate(p) {
