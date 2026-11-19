@@ -74,6 +74,7 @@ export class PoiLevel {
       if (!sprite) this.drawChest(c);
       return c;
     });
+    this.fuses = this.placeFuse();   // #082 Stromausfall per Schalter
     this.goals = (R.marks.Z || []).map(([x, y]) => ({ x: (x + 0.5) * T, feet: (y + 1) * T, art: s.add.graphics().setDepth(-4), glow: null }));
     for (const z of this.goals) this.drawGoal(z);
     // #057 the KI-Terminal (@): the POI's Terminal-KI, a unique Entity, optional and very hard; one try per run; caught = the terminal is quiet
@@ -185,6 +186,41 @@ export class PoiLevel {
       return { x: c.x, w: Math.max(T * 0.6, w), top: c.feet - h, feet: c.feet };
     });
   }
+  // #082 the fuse box: in a room after the first (seeded per level, Atmosphäre › Sicherungskasten % je Level), on a wall next to a floor;
+  // E switches every lamp in the POI off (only the red emergency lights stay) and back on
+  placeFuse() {
+    const s = this.scene, R = s.room, T = s.T, LI = s.levelInfo, B = s.data_.game?.atmosphere?.blackout || {}, rooms = LI?.rooms || [];
+    if (s.data_.game?.atmosphere?.enabled === false || rooms.length < 2) return [];
+    let seed = ((s.box?.save?.run?.seed ?? s.args?.seed ?? LI.seed ?? 1) * 7919 + 13) % 2147483647 || 1; const rnd = () => (seed = seed * 16807 % 2147483647) / 2147483647;
+    if (rnd() * 100 >= (B.chance ?? 60)) return [];
+    const solid = (x, y) => '#'.includes(R.tiles[y]?.[x] ?? '#');
+    for (let n = 0; n < 6; n++) {
+      const r = rooms[1 + Math.floor(rnd() * (rooms.length - 1))];
+      const spots = [];
+      for (let y = r.y + 1; y < r.y + r.h; y++) for (let x = r.x + 1; x < r.x + r.w - 1; x++)
+        if (R.tiles[y]?.[x] === '.' && R.tiles[y - 1]?.[x] === '.' && solid(x, y + 1) && (solid(x - 1, y) || solid(x + 1, y))) spots.push([x, y, solid(x - 1, y) ? -1 : 1]);
+      if (!spots.length) continue;
+      const [x, y, side] = spots[Math.floor(rnd() * spots.length)];
+      const f = { x: (x + 0.5) * T, feet: (y + 1) * T, side, on: true, art: s.add.graphics().setDepth(-8) };
+      this.drawFuse(f);
+      return [f];
+    }
+    return [];
+  }
+  drawFuse(f) {
+    const g = f.art.clear(), x = f.x + f.side * 14, y = f.feet - 118;
+    g.fillStyle(0x1a1c22).fillRect(x - 22, y - 2, 44, 58).fillStyle(0x4a5058).fillRect(x - 20, y, 40, 54).fillStyle(0xd8b430).fillTriangle(x - 7, y + 12, x + 7, y + 12, x, y + 2);
+    g.fillStyle(0x0d0a12).fillRect(x - 1, y + 5, 2, 5).fillStyle(0x2a2e36).fillRect(x - 12, y + 20, 24, 28);
+    g.fillStyle(f.on ? 0x7dff9a : 0xff4a5c).fillRect(x - 8, f.on ? y + 22 : y + 36, 16, 8);   // the lever: up = on
+    g.lineStyle(2, 0x0d0a12).lineBetween(x, y + 54, x, f.feet - 4);
+  }
+  toggleFuse(f) {
+    const s = this.scene;
+    f.on = !f.on; this.drawFuse(f);
+    s.atmo?.setBlackout(!f.on);
+    s.sfx?.('switch'); s.cam?.shake?.(120, 0.003);
+    s.hud.toast(f.on ? 'Strom ist wieder da' : 'Stromausfall', f.on ? 'Die Lampen flackern an' : 'Nur noch Notlicht. Die Gegner sehen schlechter, AvAs Scheinwerfer wird wichtig', f.on ? 'info' : 'warn', 3600);
+  }
   drawChest(c) {
     const g = c.art.clear(), x = c.x, f = c.feet;
     g.fillStyle(0x6b5030).fillRect(x - 40, f - 54, 80, 54);
@@ -213,6 +249,7 @@ export class PoiLevel {
     for (const z of this.goals) if (close(z)) return this.done ? { text: `Geknackt · Abkürzung zum Van: ${this.shortcutWay()}` } : T?.active ? { text: `Tresor der ${T.gang} · nur mit Gewalt`, act: () => T.vault(() => this.finish()) } : { text: 'Tresor knacken · POI abschließen', act: () => this.finish() };
     for (const c of this.chests) if (!c.open && close(c)) return { text: T?.active ? `Kiste der ${T.gang} öffnen` : 'Kiste öffnen', act: () => this.openChest(c) };
     const talk = T?.near(); if (talk) return talk;   // #061
+    for (const f of this.fuses || []) if (close(f)) return { text: f.on ? 'Sicherungskasten · Strom aus' : 'Sicherungskasten · Strom an', act: () => this.toggleFuse(f) };   // #082
     for (const sw of this.switches) if (close(sw)) return sw.on ? { text: 'Schalter ist umgelegt' } : sw.dueled ? { text: 'Schalter umlegen', act: () => this.pull(sw) } : { text: 'Schalter hacken · Glitch-Duell', act: () => this.duelAt(sw, 'Schalter', `sw${this.switches.indexOf(sw)}`) };
     for (const t of this.terminals || []) if (close(t)) return t.done ? { text: 'Das Terminal ist still' } : t.tried ? { text: `${t.ai} schweigt · nächster Run` } : { text: `${t.ai} anzapfen · Glitch-Duell (sehr schwer)`, act: () => this.terminalDuel(t) };   // #057
     // KIs in machines (Marken-Clutter marked „KI“, e.g. NomadCola-Automaten): once per run

@@ -279,15 +279,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #081 Balancing v1 (versioniert, simuliert)
-- **Status:** offen · angelegt 19.11. von Code (Daniel, Karte A8)
+- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte A8)
 - **Auftrag (Daniel, 19.11.2026):** „Lass uns Balancing auch versionieren. Erarbeite bitte v1 durch einige Simulationen und identifiziere Choke Points, übermäßigen Grind und Imbalance.“ Vorschlag: Balancing als Datenset (#073) `balancing-v1`, Simulation per Fernsteuerung/ohne DOM, Bericht in `docs/balancing.md`.
 - **Rückfragen:**
 - **Ergebnis:**
 
 ### #082 Licht: God Rays, Schatten, Stromausfall per Schalter
-- **Status:** läuft (19.11.) · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)
+- **Rückfragen:** (Code) ⚠️ vorläufig: Strahlen nur unter Decken- und Röhrenlampen, Schatten nur für Figuren (keine Verdeckung durch Wände außer dem Raum-Zuschnitt); Sicherungskasten in 60 % der Level, Stromausfall halbiert fast die Sicht der Gegner; der Hausmeister-Boss fällt weg (gestrichen), daher ohne Boss-Kopplung.
+- **Ergebnis:** (Code) Commit „Licht: Lichtstrahlen, weiche Schatten, Stromausfall per Sicherungskasten (#082)“. `tools/light_test.mjs` 18/18, poi/poi_levels/silo/enemy grün. PixelLab 0. **Bitte testen:** Bunker 13 spielen, Sicherungskasten suchen, Strom aus, mit AvAs Scheinwerfer weiter.
 
 ### #083 Bilder hochladen in der Online-Werkstatt
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte: als Nächstes)

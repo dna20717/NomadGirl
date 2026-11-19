@@ -62,6 +62,8 @@ export class Atmosphere {
     this.flashes = [];
     // dust, sparks (additive, above the lightmap), drips and fog (below, lit by it)
     this.top = s.add.graphics().setDepth(this.depth + 0.6).setBlendMode(Phaser.BlendModes.ADD);
+    this.rays = s.add.graphics().setDepth(this.depth + 0.4).setBlendMode(Phaser.BlendModes.ADD);   // #082 God Rays
+    this.blackout = false;
     this.low = s.add.graphics().setDepth(this.depth - 1);
     this.dust = []; this.sparks = []; this.drips = []; this.fog = [];
     this.vig = 0; this.cur = null; this.time = 0;
@@ -154,12 +156,14 @@ export class Atmosphere {
     this.vig = lerp(this.vig, mood.vignette, Math.min(1, dt / 600));
     for (const L of this.lights) {
       L.f = s.fog?.hiddenAt?.(L.x, L.y + 8) ? 0 : behave(L.behavior, this.time, L.seed);   // a lamp inside an undiscovered secret stays dark
+      if (this.blackout) L.f = L.kind === 'emergency' ? 0.55 + 0.45 * Math.max(0, Math.sin(this.time / 380)) : L.lamp ? 0 : L.f;   // #082 Stromausfall: only the emergency lights, pulsing
       L.halo.setAlpha(L.haloA * L.f);
       if (L.behavior === 'broken' && L.f > 0.6 && (L.was ?? 0) < 0.3 && Math.random() < 0.5) this.burst(L.x, L.y, '#ffd27a', 7);   // catches: sparks
       L.was = L.f;
     }
     this.flashes = this.flashes.filter(f => (f.t += dt) < f.life);
     this.lastSpot = this.spot();
+    this.drawRays(s.cam.worldView);
     this.particles(mood, dt, s.cam.worldView);
     this.critters.update(mood, dt, s.cam.worldView);
   }
@@ -175,6 +179,7 @@ export class Atmosphere {
     ctx.globalCompositeOperation = 'copy';
     ctx.imageSmoothingEnabled = true;
     ctx.drawImage(this.amb, x0 / T, y0 / T, W / T, H / T, 0, 0, this.lw, this.lh);
+    if (this.blackout) { ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgb(70,58,64)'; ctx.fillRect(0, 0, this.lw, this.lh); }   // #082 Stromausfall
     ctx.globalCompositeOperation = 'lighter';
     // lamps and glowing things
     for (const L of this.lights) {
@@ -198,6 +203,7 @@ export class Atmosphere {
     if (sp) { cone(ctx, X(sp.x), Y(sp.y), sp.dir, sp.half, sp.range / k, sp.c, sp.strength); blob(ctx, X(sp.x), Y(sp.y), 60 / k, sp.c, sp.strength * 0.8); }
     this.spotGlow.setVisible(!!sp);
     if (sp) this.spotGlow.setPosition(sp.x, sp.y).setTint(Phaser.Display.Color.GetColor(...sp.c)).setDisplaySize(70, 70).setAlpha(0.6 * sp.glow);
+    this.shadows(ctx, X, Y, k);   // #082 soft shadows under Leyla and the enemies
     // vignette around the middle of the view
     if (this.vig > 0.005) {
       ctx.globalCompositeOperation = 'multiply';
@@ -209,6 +215,54 @@ export class Atmosphere {
     ctx.globalCompositeOperation = 'source-over';
     this.tex.refresh();
     this.image.setPosition(x0, y0);
+  }
+
+  // ---------- #082 God Rays: a visible cone of light under ceiling lamps and tubes, down to the floor, flickering a little ----------
+  drawRays(vw) {
+    const g = this.rays.clear(), A = (this.G.rays ?? 22) / 100, s = this.scene, T = this.T;
+    if (A <= 0) return;
+    for (const L of this.lights) {
+      if (!L.lamp || (L.kind !== 'ceiling' && L.kind !== 'tube') || L.f < 0.05) continue;
+      if (L.x < vw.x - 300 || L.x > vw.right + 300 || L.y > vw.bottom || L.y < vw.y - L.radius) continue;
+      L.floor ??= (() => { for (let y = L.y + 8; y < L.y + L.radius; y += T / 2) if (s.pointSolid(L.x, y)) return y; return L.y + L.radius * 0.8; })();   // where the beam ends
+      const h = Math.min(L.floor, L.clip ? L.clip.y1 : L.floor) - L.y, top = L.kind === 'tube' ? 48 : 16, spread = Math.tan(L.kind === 'tube' ? 0.55 : 0.42) * h;
+      const bottom = top + spread, shimmer = 0.85 + 0.15 * Math.sin(this.time / 700 + L.seed), col = Phaser.Display.Color.GetColor(...L.c);
+      const x0 = L.clip ? L.clip.x0 : -1e9, x1 = L.clip ? L.clip.x1 : 1e9, cl = x => Math.max(x0, Math.min(x1, x));
+      for (let i = 0; i < 4; i++) {   // nested cones: soft edges, brighter core
+        const k = 1 - i * 0.22, a = A * L.f * L.strength * shimmer * 0.09 * (i + 1) / 2.5;
+        g.fillStyle(col, a).fillPoints([{ x: cl(L.x - top * k), y: L.y }, { x: cl(L.x + top * k), y: L.y }, { x: cl(L.x + bottom * k), y: L.y + h }, { x: cl(L.x - bottom * k), y: L.y + h }], true);
+      }
+    }
+  }
+  // soft shadows: under every figure an oval on the floor, pushed away from the strongest lamp above it (multiplied into the lightmap)
+  shadows(ctx, X, Y, k) {
+    const S = (this.G.shadows ?? 55) / 100, s = this.scene;
+    if (S <= 0) return;
+    const who = [s.leyla, ...(s.enemies || []).filter(e => e.alive && e.sprite?.visible !== false)].filter(Boolean);
+    ctx.globalCompositeOperation = 'multiply';
+    for (const f of who) {
+      const fx = f.x, fy = f.feet ?? f.body?.bottom;
+      if (fy == null) continue;
+      let best = null, bv = 0;
+      for (const L of this.lights) {
+        if (!L.lamp || L.f < 0.05 || L.y > fy) continue;
+        const d = Math.hypot(fx - L.x, fy - L.y); if (d > L.radius) continue;
+        const v = L.strength * L.f * (1 - d / L.radius); if (v > bv) { bv = v; best = L; }
+      }
+      const dark = Math.min(0.75, S * (0.35 + bv)), off = best ? Math.max(-90, Math.min(90, (fx - best.x) * 0.35)) : 0, w = (f.w || 60) * (1.3 + Math.abs(off) / 90 * 0.8);
+      const cx = X(fx + off), cy = Y(fy), rx = w / k, ry = 10 / k, v = Math.round(255 * (1 - dark));
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rx);
+      g.addColorStop(0, `rgb(${v},${v},${v})`); g.addColorStop(1, 'rgb(255,255,255)');
+      ctx.save(); ctx.translate(cx, cy); ctx.scale(1, ry / rx); ctx.translate(-cx, -cy); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, rx, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    }
+    ctx.globalCompositeOperation = 'lighter';
+  }
+  // ---------- #082 Stromausfall: the fuse box in the POI (poi_level.js) switches every lamp off; enemies see less ----------
+  setBlackout(on) {
+    if (!this.on || this.blackout === on) return;
+    this.blackout = on;
+    const k = Math.max(0.05, (this.G.blackout?.sight ?? 55) / 100);
+    for (const e of this.scene.enemies || []) if (e.S?.sight) e.S.sight = on ? e.S.sight * k : e.S.sight / k;
   }
 
   // ---------- dust, sparks, drips, fog ----------

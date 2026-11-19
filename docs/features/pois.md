@@ -56,3 +56,11 @@ Daniel, 19.11.2026: „Vordergrund-Grafiken in POIs hängen in der Luft. Manche 
 - **Vordergrund-Silhouetten** (`foreground.js`): eine Silhouette gleitet mit Parallaxe p um (p − 1) × Abstand zur Bildmitte seitwärts, höchstens (p − 1) × halber Bildschirm (bei 118 % gut 2½ Kacheln). Sie hält jetzt so viel Abstand von den Enden ihres Bodens; kurze Böden bekommen keine mehr. So schwebt keine über einer Kante oder einem Abgrund.
 - **Clutter mit Luft** (`art.js`): nach jedem Ding auf dem Boden bleibt eine Kachel frei, nach Marken-Clutter (Kühlschränke, Regale) und großem Clutter auch. Vorher standen Kühlschränke und Regale ineinander (Großmarkt › Parkdeck).
 - Rundgang mit Bildern aller POIs: Licht, Räume und Kachel-Sets passen sonst. ⚠️ offen: Delta Heights mischt Ziegel und Beton von Raum zu Raum (Kachel-Set je Raum, Daten), das wirkt unruhig; bei Bedarf ein Set für alle Hochhaus-Räume.
+
+## Licht: Strahlen, Schatten, Stromausfall (#082)
+
+Daniel, 19.11.2026 (Karte „Licht: God Rays, Schatten, Stromausfall per Schalter: als Nächstes“). Alles aus Code, Werte unter Spiel › Atmosphäre.
+- **Lichtstrahlen (God Rays):** unter jeder Decken- und Röhrenlampe ein sichtbarer Kegel bis zum Boden (vier geschachtelte Kegel für weiche Kanten, leichtes Flimmern, im Raum der Lampe abgeschnitten), additiv über der Lichtkarte (`atmosphere.drawRays`). Stärke **Lichtstrahlen** (22 %, 0 = aus).
+- **Schatten:** unter Leyla und jedem lebenden Gegner ein weicher Schatten auf dem Boden, vom stärksten Licht darüber weggeschoben und länger, je seitlicher es steht (in die Lichtkarte multipliziert, `atmosphere.shadows`). Stärke **Schatten** (55 %).
+- **Stromausfall per Schalter:** mit **Sicherungskasten** (60 % je Level, fest je Seed) hängt in einem Raum nach dem ersten ein Kasten an einer Wand (Hebel oben grün = Strom an). E schaltet alle Lampen im POI aus, nur das **Notlicht** pulsiert rot, die Räume werden dunkel, **Gegner sehen schlechter** (Sichtweite × 55 %, „Gegner sehen im Dunkeln“); AvAs Scheinwerfer wird wichtig. Noch einmal E: Strom wieder an (`poi_level.placeFuse/toggleFuse`, `atmosphere.setBlackout`).
+- Geprüft: `tools/light_test.mjs` (18).

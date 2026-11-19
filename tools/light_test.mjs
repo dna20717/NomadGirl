@@ -78,6 +78,33 @@ await shot('tunnel');
 s = await ev(() => { nomad.light(false); const v = game.scene.getScene('play').atmo.image.visible; nomad.light(true); return { v, after: game.scene.getScene('play').atmo.image.visible }; });
 check('Aus und wieder an (Vergleichsbilder)', s.v === false && s.after === true, s);
 
+// #082 God Rays, shadows, the fuse box (Stromausfall): find a level with a fuse box, switch it, lamps off, emergency red, enemies see less
+await page.goto(base + '?poi=bunker_13&seed=3');
+await page.waitForFunction(() => window.nomad && window.game?.scene.getScene('play')?.atmo, null, { timeout: 30000 });
+s = await ev(() => {
+  nomad.take(); nomad.calm(); nomad.step(10);
+  let sc = game.scene.getScene('play');
+  const rays = sc.atmo.rays.commandBuffer.length;
+  for (let seed = 3; seed < 40 && !sc.level?.fuses?.length; seed++) { sc.scene.restart({ ...sc.args, poi: 'bunker_13', seed }); return { restart: seed }; }
+  return { rays, fuses: sc.level.fuses.length };
+});
+for (let seed = 4; s.restart && seed < 40; seed++) {
+  await page.goto(base + `?poi=bunker_13&seed=${seed}`);
+  await page.waitForFunction(() => window.nomad && window.game?.scene.getScene('play')?.atmo, null, { timeout: 30000 });
+  s = await ev(() => { nomad.take(); nomad.calm(); nomad.step(10); const sc = game.scene.getScene('play'); return sc.level?.fuses?.length ? { rays: sc.atmo.rays.commandBuffer.length, fuses: sc.level.fuses.length } : { restart: true }; });
+}
+check('Lichtstrahlen unter den Lampen, ein Sicherungskasten im Level', s.fuses === 1, s);
+s = await ev(() => {
+  const sc = game.scene.getScene('play'), f = sc.level.fuses[0], e = sc.enemies[0], sight0 = e?.S.sight;
+  nomad.tp(f.x, f.feet); nomad.step(5); const text = sc.level.nearest()?.text;
+  sc.level.nearest().act(); nomad.step(20);
+  const lamps = sc.atmo.lights.filter(L => L.lamp), lit = lamps.filter(L => L.f > 0.05 && L.kind !== 'emergency').length, sight1 = e?.S.sight;
+  sc.level.nearest().act(); nomad.step(20);
+  return { text, black: true, lit, lamps: lamps.length, sight0, sight1, sight2: e?.S.sight, back: !sc.atmo.blackout };
+});
+check('Sicherungskasten: E schaltet den Strom aus (alle Lampen dunkel außer Notlicht, Gegner sehen schlechter) und wieder an', /Sicherungskasten · Strom aus/.test(s.text || '') && s.lit === 0 && (!s.sight0 || s.sight1 < s.sight0) && s.back && (!s.sight0 || Math.abs(s.sight2 - s.sight0) < 0.01), s);
+if (shots) { await ev(() => { const sc = game.scene.getScene('play'); sc.level.nearest()?.act(); nomad.step(10); }); await page.waitForTimeout(400); await page.screenshot({ path: 'output/light_blackout.png' }); }
+
 // the camp keeps its own day and night
 await page.goto(base + '?camp&new');
 await page.waitForFunction(() => window.nomad && window.game?.scene.getScene('play')?.camp, null, { timeout: 20000 });
