@@ -48,12 +48,24 @@ export class CampLife {
         const dir = Math.random() < 0.5 ? 1 : -1, x = dir > 0 ? v.x - 80 : v.right + 80;
         const sp = s.add.sprite(x, this.campY, info.key).setOrigin(info.ox, info.oy).setScale(info.scale).setDepth(6).setFlipX(dir < 0);
         if (info.anim) sp.play(info.anim);
-        this.critter = { sp, dir, speed: (c.speed || 380) * (0.85 + Math.random() * 0.3), until: dir > 0 ? v.right + 120 : v.x - 120 };
+        // with idles (Camp › Kleinvieh › Idles): stop once somewhere in the middle third of the view, play one, run on
+        const idles = String(c.idles || '').split(',').map(x => x.trim()).filter(id => s.textures.exists(id));
+        const stopAt = idles.length && Math.random() < (c.stopChance ?? 75) / 100 ? v.x + v.width * (0.3 + Math.random() * 0.4) : null;
+        this.critter = { sp, dir, info, idles, stopAt, run: info.anim, speed: (c.speed || 380) * (0.85 + Math.random() * 0.3), until: dir > 0 ? v.right + 120 : v.x - 120 };
       }
       const [a, b] = Array.isArray(list[0].every) ? list[0].every : [40, 90], k = night ? Math.max(1, list[0].night || 2) : 1;
       this.critterAt = time + (a + Math.random() * Math.max(0, b - a)) * 1000 / k;
     }
     const C = this.critter;
+    if (C?.idleUntil) {   // #107 standing still: one idle animation (or twice), then on
+      if (time < C.idleUntil) return;
+      C.idleUntil = null; C.sp.setTexture(C.info.key).setOrigin(C.info.ox, C.info.oy).setScale(C.info.scale); if (C.run) C.sp.play(C.run);
+    }
+    if (C && C.stopAt != null && ((C.dir > 0 && C.sp.x >= C.stopAt) || (C.dir < 0 && C.sp.x <= C.stopAt))) {
+      C.stopAt = null;
+      const id = C.idles[Math.floor(Math.random() * C.idles.length)], I = s.assetInfo(id), A = this.D.assets[id];
+      if (I?.anim) { C.sp.setTexture(I.key).setOrigin(I.ox, I.oy).setScale(I.scale); C.sp.play(I.anim); const loops = 1 + Math.floor(Math.random() * 2); C.idleUntil = time + loops * 1000 * (A.frames || 8) / (A.fps || 8); return; }
+    }
     if (C) {
       C.sp.x += C.dir * C.speed * dt / 1000;
       if ((C.dir > 0 && C.sp.x > C.until) || (C.dir < 0 && C.sp.x < C.until)) { C.sp.destroy(); this.critter = null; }

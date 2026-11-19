@@ -125,7 +125,7 @@ export class PlayScene extends Phaser.Scene {
       // #008 cosy camp: stairs, deco around the fire, solar panels, exterior clutter on the container walls, string lights
       { const C = this.data_.camp || {}; for (const id of [C.stairs?.look, C.solar?.look, ...(C.deco || []).map(d => d.look)]) if (id) ids.add(id); }
       for (const w of Object.values(this.data_.workshops || {})) if (w.outside) ids.add(w.outside);
-      for (const c of this.data_.camp?.critters || []) if (c.look) ids.add(c.look);   // #107 Kleinvieh im Camp
+      for (const c of this.data_.camp?.critters || []) for (const id of [c.look, ...String(c.idles || '').split(',').map(x => x.trim())]) if (id) ids.add(id);   // #107 Kleinvieh im Camp (+ Idles)
       const S = this.data_.camp?.sound || {};
       for (const id of [S.wind, S.fire, ...(S.gusts || []), ...(this.data_.camp?.fire?.sit?.sounds || [])]) if (id) ids.add(id);
     }
