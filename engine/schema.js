@@ -38,7 +38,7 @@ const NAME = text('name', 'Name', { required: true });
 const DESCRIPTION = area_('description', 'Beschreibung');
 const VALUE = num('value', 'Wert', { unit: 'Δ', min: 0, hint: 'Verkaufswert in Deltas' });
 // what a trophy can give (Achievements › Bonus): Leyla's gear values (game/inventory.js › GEAR_STATS) plus the tank
-const TROPHY_GEAR = [['defense', 'Abwehr %'], ['health', 'Leben'], ['damage', 'Schaden %'], ['melee', 'Nahkampf %'], ['ranged', 'Fernkampf %'], ['crit', 'Krit-Chance %'], ['speed', 'Tempo %'],
+export const TROPHY_GEAR = [['defense', 'Abwehr %'], ['health', 'Leben'], ['damage', 'Schaden %'], ['melee', 'Nahkampf %'], ['ranged', 'Fernkampf %'], ['crit', 'Krit-Chance %'], ['speed', 'Tempo %'],
   ['jump', 'Sprungkraft %'], ['dashCooldown', 'Dash-Abklingzeit %'], ['regen', 'Heilt sich (LP/10 s)'], ['heal', 'Heilung %'], ['droneBattery', 'AvA-Akku %'], ['tankDecay', 'Tank: Verfall %'], ['hack', 'Duell-Integrität']];
 export const TECH_BONUS = [['tankDecay', 'Tank: Verfall %'], ['tankRescue', 'Tank: Rettung kostet %'], ['tankAccel', 'Tank: Beschleunigung %'],
   ['tankStatus', 'Tank-Anzeige im Run (1 = an)'], ['droneBattery', 'AvA: Akku %'], ['health', 'Leyla: Leben'], ['damage', 'Leyla: Schaden %']];

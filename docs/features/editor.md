@@ -18,3 +18,13 @@ Daniel, 19.11.2026: „Es wäre an der Zeit, Speichern und Laden von verschieden
 - **Werkstatt:** Knopf mit dem Namen des Sets in der Kopfleiste (gold, wenn eine Variante aktiv ist) → Dialog **Datensets**: Liste (Standard + Varianten), **Laden** (speichert vorher, macht es aktiv, lädt neu), **Speichern unter …** (die jetzigen Daten, auch Ungespeichertes, werden eine neue Variante; der Standard bleibt), **Löschen** (nur die aktive Variante). Mit aktiver Variante speichert die Werkstatt nur den Unterschied in deren Ordner und hält `files` im Index aktuell; online wie immer als Commit auf `main`.
 - **Hauptmenü:** Eintrag **Datenset: …** (Klick oder Controller-A: nächstes Set) und unten in der Statusleiste „Datenset: …“. Liest online `/api/files`, lokal die Werkstatt-Entwürfe, sonst `sets/index.json`.
 - Tests: `tools/datasets_test.mjs` (lokal: Speichern unter, Spiel, Hauptmenü, zurück zum Standard), `tools/workshop_cloud_test.mjs` (online: nur der Unterschied als Commit, Index, Hauptmenü, Spiel über `/api/files`).
+
+## Verzahnungs-Ansichten (#074)
+
+Was die Systeme verbindet, sichtbar im Inspektor (`game/workshop/summaries.js`, nur lesend):
+- **Ereignis-Baukasten › Merker (n):** jeder Welt-Merker mit „setzt“ (Antworten, Quests beim Annehmen), „löscht“, „braucht“ und „nicht mit“ (Lagen, Quests); rot, wenn ihn niemand setzt oder niemand liest (`flagGraph`). Erster Fund: `laeuferin_verraten` wird gesetzt, aber nirgends gelesen.
+- **Ereignis-Baukasten › Geschichten-Ketten (n):** jede Kette vom Anfang an, „Lage —Antwort→ Lage“ (`chainEdges`).
+- **Quests › Wann und wo:** Bedingungen (Merker, Tag, Vorgänger, Crew & Rig, setzt Merker) und bei Stücken, wo jedes liegt (POI-Fundstücke mit Kiste/Tresor und Chance, Antworten unterwegs mit Preis); rot, wenn ein Stück nirgends zu finden ist.
+- **Marken › Markentreue:** Set-Bonus, wie viele Teile gleichzeitig tragbar sind (ein Teil je Platz, Waffen), Teile je Platz; Warnung, wenn der Bonus nicht erreichbar ist.
+- **Werkstätten › Worker:** welche Begabungen hier voll arbeiten (Werkbank oder „Auch“) und mit wie viel Prozent Fremde; die Bit-Farm erklärt sich.
+- Tests: `test/workshop_views.test.js`, `tools/workshop_test.mjs`.

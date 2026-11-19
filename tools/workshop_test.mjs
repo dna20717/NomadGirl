@@ -100,6 +100,16 @@ await page.locator('.ng-cardFilter').first().fill('silo');
 const filtered = await page.evaluate(() => document.querySelectorAll('.ng-rowcards')[0].querySelectorAll('.ng-rowcard').length);
 if (!(filtered >= 3 && filtered <= 6)) errors.push(`Filter „silo“ zeigt ${filtered} Lagen`);
 await shot('cards');
+// #074 Verzahnungs-Ansichten: Merker and chains in the Ereignis-Baukasten, quest pieces with their places, brand set parts
+const h4 = () => page.evaluate(() => [...document.querySelectorAll('h4')].map(h => h.textContent));
+let heads = await h4();
+if (!heads.some(t => /^Merker \(\d+\)/.test(t)) || !heads.some(t => /^Geschichten-Ketten/.test(t))) errors.push(`Ereignis-Baukasten ohne Merker/Ketten: ${heads}`);
+await go({ area: 'quests', choice: 'silo_schatz' });
+const where = await page.evaluate(() => document.querySelectorAll('.ng-xrow').length);
+if (where < 5) errors.push(`Quest ohne Fundorte der Stücke (${where})`);
+await go({ area: 'brands', choice: 'vulkan' });
+heads = await h4();
+if (!heads.includes('Markentreue')) errors.push('Marke ohne Markentreue-Ansicht');
 
 await browser.close();
 if (errors.length) { console.error('Fehler:\n' + errors.join('\n')); process.exit(1); }

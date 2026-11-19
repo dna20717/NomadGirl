@@ -175,3 +175,10 @@ body.ng { background: var(--ui-bg); color: var(--ui-text); font-family: var(--ui
 .ng-setRow > span { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
 .ng-setRow small { color: var(--ui-text3); }
 .ng-setActive { color: var(--ui-acc-line) !important; font-weight: 600; }
+/* #074 Verzahnungs-Ansichten */
+.ng-xlist { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.ng-xrow { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; padding: 5px 8px; border-radius: 6px; background: var(--ui-panel); border: 1px solid var(--ui-border); }
+.ng-xrow small { color: var(--ui-text2); flex: 1 1 100%; }
+.ng-xrow.warn { border-color: var(--ui-red); }
+.ng-xtag { font-size: var(--ui-gr-xs); padding: 0 6px; border-radius: 6px; background: var(--ui-acc-soft); color: var(--ui-text); }
+.ng-xtag.warn { background: var(--ui-red-soft); }

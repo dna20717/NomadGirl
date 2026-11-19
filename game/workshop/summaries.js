@@ -1,6 +1,7 @@
 // Extra views per area for the workshop inspector: derived values and small previews.
 // SUMMARY[area](w, x, id) → { title, body } | null. Only reads, never changes data.
 import { el } from '../ui.js';
+import { WEAR_SLOTS, TROPHY_GEAR } from '../../engine/schema.js';
 import { ROOM_TAGS } from '../../engine/project.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
 import { parseRoom } from '../../engine/room.js';
@@ -34,6 +35,25 @@ const roomLegend = () => el('div', { class: 'ng-legend' }, ...ROOM_LEGEND.map(([
 
 const f1 = n => (Math.round(n * 10) / 10).toLocaleString('de-DE');
 const facts = rows => el('div', { class: 'ng-facts' }, ...rows.filter(Boolean).map(([k, v]) => el('div', {}, el('span', {}, k), el('b', {}, v))));
+
+// #074 Verzahnungs-Ansichten: who sets a Merker, who reads it (answers, quests → situations, quests, answers)
+const listOf = v => String(v || '').split(',').map(t => t.trim()).filter(Boolean);
+export function flagGraph(D) {
+  const G = new Map(), at = f => { if (!G.has(f)) G.set(f, { set: [], clear: [], read: [], not: [] }); return G.get(f); };
+  const E = D.roadEvents || {};
+  for (const a of E.answers || []) for (const f of listOf(a.flag)) (f.startsWith('-') ? at(f.slice(1)).clear : at(f).set).push(`Antwort „${a.id}“`);
+  for (const [id, q] of Object.entries(D.quests || {})) if (q.flag) at(q.flag).set.push(`Quest „${q.name || id}“ (beim Annehmen)`);
+  for (const s of E.situations || []) { for (const f of [...listOf(s.needs), ...listOf(s.needsFlag)]) at(f).read.push(`Lage „${s.id}“`); for (const f of [...listOf(s.not), ...listOf(s.notFlag)]) at(f).not.push(`Lage „${s.id}“`); }
+  for (const [id, q] of Object.entries(D.quests || {})) { for (const f of listOf(q.needsFlag)) at(f).read.push(`Quest „${q.name || id}“`); for (const f of listOf(q.notFlag)) at(f).not.push(`Quest „${q.name || id}“`); }
+  return G;
+}
+// story chains: situation —answer→ next situation
+export function chainEdges(D) {
+  const out = [];
+  for (const s of D.roadEvents?.situations || []) for (const r of listOf(s.answers)) { const [a, next] = r.split('>').map(t => t.trim()); if (next) out.push({ from: s.id, answer: a, to: next }); }
+  return out;
+}
+const tag = (t, cls = '') => el('span', { class: 'ng-xtag ' + cls }, t);
 
 // Backpack-style grid: w × h fields, optionally with a highlighted block
 function grid(w, h, block = null, cell = 16) {
@@ -197,6 +217,37 @@ export const SUMMARY = {
       ais.length ? el('p', { class: 'ed-small' }, `Baut KIs (Entities): ${ais.join(', ')}`) : null,
       kids.length ? el('p', { class: 'ed-small' }, `Töchter: ${kids.join(', ')}`) : null) };
   },
+  // #074 Markentreue: what of this brand can be worn at once (one per place, weapons per slot) and what the set gives
+  brandSet(w, x, id) {
+    const D = w.p.data, S = x.set, wear = Object.entries(D.items || {}).filter(([, t]) => t.brand === id && t.wear), arms = Object.entries(D.weapons || {}).filter(([, t]) => t.brand === id);
+    const places = new Map(); for (const [k, t] of wear) { if (!places.has(t.wear)) places.set(t.wear, []); places.get(t.wear).push(t.name || k); }
+    const slots = places.size + new Set(arms.map(([, t]) => t.kind || 'ranged')).size, need = Math.max(2, S?.count ?? 3);
+    if (!S?.stat && !wear.length && !arms.length) return null;
+    return { title: 'Markentreue', body: el('div', {},
+      facts([['Set-Bonus', S?.stat ? `${TROPHY_GEAR.find(g => g[0] === S.stat)?.[1] || S.stat} ${S.value > 0 ? '+' : ''}${S.value} ab ${need} Teilen` : '–'], ['Gleichzeitig tragbar', `${slots} Teile`], S?.stat && slots < need ? ['Achtung', 'Der Bonus ist nicht erreichbar'] : null]),
+      el('div', { class: 'ng-xlist' }, ...[...places].map(([pl, names]) => el('div', { class: 'ng-xrow' }, el('b', {}, WEAR_SLOTS.find(s => s[0] === pl)?.[1] || pl), el('small', {}, names.join(', ')))),
+        arms.length ? el('div', { class: 'ng-xrow' }, el('b', {}, 'Waffen'), el('small', {}, arms.map(([k, t]) => t.name || k).join(', '))) : null)) };
+  },
+  // #074 a quest: when it is offered (one condition language #068) and where its pieces lie (#057)
+  quests(w, x) {
+    const D = w.p.data, c = [['Erst mit Merker', x.needsFlag], ['Nicht mit Merker', x.notFlag], ['Ab Tag', x.minDay], ['Nach Auftrag', x.after && (D.quests?.[x.after]?.name || x.after)], ['Erst wenn ein Stück da ist', x.whenHas ? 'ja' : ''],
+      ['Companion an Bord', x.needCompanion && (D.companions?.[x.needCompanion]?.name || x.needCompanion)], ['Werkstatt im Rig', x.needWorkshop], ['Rig-Teil', x.needRigPart || x.needRigSlot], ['Implantat', x.needItem || x.needWear], ['Setzt Merker', x.flag]].filter(([, v]) => v);
+    const where = id => [
+      ...Object.entries(D.pois || {}).flatMap(([pid, P]) => (P.treasure || []).filter(t => t.item === id).map(t => `${P.name || pid} (${t.where === 'chest' ? 'Kiste' : 'Tresor'}${t.chance != null && t.chance < 100 ? `, ${t.chance} %` : ''})`)),
+      ...(D.roadEvents?.answers || []).filter(a => a.item === id).map(a => `unterwegs: ${a.id}${a.deltas < 0 ? ` (${-a.deltas} Δ)` : ''}`)];
+    const pieces = (x.pieces || []).map(id => el('div', { class: 'ng-xrow' + (where(id).length ? '' : ' warn') }, el('b', {}, D.items?.[id]?.name || id), el('small', {}, where(id).join(' · ') || 'nirgends zu finden')));
+    if (!c.length && !pieces.length) return null;
+    return { title: 'Wann und wo', body: el('div', {}, c.length ? facts(c) : el('p', { class: 'ed-small' }, 'Immer im Angebot.'), pieces.length ? el('div', { class: 'ng-xlist' }, ...pieces) : null) };
+  },
+  // #074 which Entities would work here (Begabung › Werkbank / Auch), at full strength or as a stranger
+  workshops(w, x) {
+    const D = w.p.data, fn = x.function, T = D.glitchlings?.talents || [], off = D.glitchlings?.off ?? 35;
+    if (fn === 'bitfarm') return { title: 'Bit-Farm', body: el('p', { class: 'ed-small' }, 'Hier wohnen gefangene Entities. Im Spiel: Inventar › Entity in der Farm › „Als Worker einsetzen“ an eine Werkstatt im Rig (#060).') };
+    const own = T.filter(t => t.function === fn || t.also === fn);
+    if (!fn || ['storage', 'tank'].includes(fn)) return null;
+    return { title: 'Worker', body: el('div', {}, own.length ? el('div', { class: 'ng-xlist' }, ...own.map(t => el('div', { class: 'ng-xrow' }, el('b', {}, t.name), el('small', {}, `${String(t.effect || '').replace('{n}', `${t.perBit} je Bit`)}${t.function === fn ? '' : ' (Auch)'}`))))
+      : el('p', { class: 'ed-small' }, 'Keine Begabung gehört hierher.'), el('p', { class: 'ed-small' }, `Fremde Entities arbeiten hier mit ${off} % ihrer Stärke.`)) };
+  },
   // the travel map (#007): one rolled map with the current values, „Neu würfeln“ rolls another (the game rolls one per Durchgang)
   worldmap(w, x) {
     const D = w.p.data, c = el('canvas', { class: 'ng-worldmap', width: 960, height: 540, style: 'width:100%;border-radius:6px' });
@@ -277,7 +328,19 @@ export const SUMMARY = {
     const opt = (v, n, on) => { const o = el('option', { value: v }, n); if (on) o.selected = true; return o; };
     const gang = el('select', { class: 'ed-input', onchange: e => { P.gang = e.target.value; paint(); } }, opt('', 'Ziel ohne Gang', !P.gang), ...gangs(D).map(g => opt(g.name, `Ziel: ${g.name}`, g.name === P.gang)));
     const rep = el('select', { class: 'ed-input', onchange: e => { P.rep = +e.target.value; paint(); } }, ...[[-90, 'Feind'], [-40, 'Unbeliebt'], [0, 'Neutral'], [40, 'Geduldet'], [90, 'Freund']].map(([v, n]) => opt(v, `Ruf: ${n}`, v === P.rep)));
-    return { title: 'Gewürfelte Zwischenfälle', body: el('div', {}, el('div', { style: 'display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:8px' }, danger, night, gang, rep, again), box, info) };
+    const rolled = { title: 'Gewürfelte Zwischenfälle', body: el('div', {}, el('div', { style: 'display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:8px' }, danger, night, gang, rep, again), box, info) };
+    // #074 Merker and chains: who sets a Merker, who reads it; a Merker nobody reads (or nobody sets) is marked
+    const G = flagGraph(D), rows = [...G].sort(([a], [b]) => a.localeCompare(b)).map(([f, x]) => {
+      const lonely = !x.set.length ? 'Liest jemand, setzt niemand' : !x.read.length && !x.not.length ? 'Setzt jemand, liest niemand' : '';
+      return el('div', { class: 'ng-xrow' + (lonely ? ' warn' : '') }, el('b', {}, f), lonely ? tag(lonely, 'warn') : null,
+        el('small', {}, [x.set.length ? `setzt: ${x.set.join(', ')}` : null, x.clear.length ? `löscht: ${x.clear.join(', ')}` : null, x.read.length ? `braucht: ${x.read.join(', ')}` : null, x.not.length ? `nicht mit: ${x.not.join(', ')}` : null].filter(Boolean).join(' · ')));
+    });
+    const flags = { title: `Merker (${G.size})`, body: el('div', { class: 'ng-xlist' }, el('p', { class: 'ed-small' }, 'Welt-Merker: Antworten und Quests setzen sie, Lagen und Quests fragen sie ab (#062, #068).'), ...rows) };
+    const E = chainEdges(D), byFrom = new Map(); for (const e of E) { if (!byFrom.has(e.from)) byFrom.set(e.from, []); byFrom.get(e.from).push(e); }
+    const starts = [...byFrom.keys()].filter(id => !E.some(e => e.to === id));
+    const walk = (id, seen = new Set()) => seen.has(id) ? [] : (seen.add(id), (byFrom.get(id) || []).flatMap(e => { const more = walk(e.to, new Set(seen)); return more.length ? more.map(m => [`${id} —${e.answer}→`, ...m]) : [[`${id} —${e.answer}→`, e.to]]; }));
+    const chains = { title: `Geschichten-Ketten (${starts.length})`, body: el('div', { class: 'ng-xlist' }, ...starts.map(st => el('div', { class: 'ng-xrow' }, el('b', {}, st), el('small', {}, walk(st).map(p => p.join(' ')).join(' · ')))) ) };
+    return [rolled, flags, chains];
   },
 
   locations(w, x, id) {
@@ -292,3 +355,5 @@ export const SUMMARY = {
     return { title: 'Oberwelt', body: el('div', {}, svg, el('p', { class: 'ed-small' }, `Region: ${x.region || '–'} · POI: ${w.p.data.pois?.[x.poi]?.name || x.poi || '–'}`)) };
   },
 };
+// #074 the brand shows its sign and its Markentreue
+{ const sign = SUMMARY.brands, set = SUMMARY.brandSet; delete SUMMARY.brandSet; SUMMARY.brands = (w, x, id) => [sign(w, x, id), set(w, x, id)]; }
