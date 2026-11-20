@@ -625,7 +625,7 @@
   "grid": [6, 2],
   "ownStorage": true,
   "accept": ["glitchling"],
-  "look": "ws_generator_bench_v2",
+  "look": "ws_bitfarm",
   "description": "Racks voller summender Platinen: hier wohnen gefangene Entities. Wer hier wohnt, kann an einer Werkstatt im Rig arbeiten (Inventar: Entity anklicken › Als Worker einsetzen).",
   "fx": [
    {"kind": "screen", "x": 200, "y": 96, "w": 18, "h": 12, "color": "#56e07a", "size": 0, "rate": 2, "when": "always"},

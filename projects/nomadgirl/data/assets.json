@@ -7170,5 +7170,14 @@
   "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
   "date": "2026-11-20",
   "description": "#124 Clutter fürs Cockpit"
+ },
+ "ws_bitfarm": {
+  "name": "Werkstatt · Bit-Farm",
+  "kind": "image",
+  "file": "assets/workshops/bitfarm.png",
+  "origin": [128, 229],
+  "source": "KI (PixelLab, Create Image Pro, Referenz Zelle + Kühlraum, Palette AAP-64, streng frontal)",
+  "date": "20.11.2026",
+  "description": "#084: drei Server-Schränke mit Glitch-Gesichtern, alter Röhrenmonitor auf einem Tischchen, Kabelbündel, Lüfter. 10 Generierungen, 1 Kandidat. Original in source/."
  }
 }
