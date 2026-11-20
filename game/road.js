@@ -30,7 +30,8 @@ export function driveConfig(D) {
   return { enabled: R.enabled !== false, seconds: Math.max(3, R.seconds ?? 30), fast: Math.max(1, R.fast ?? 6), speed: R.speed ?? 120, stopAt: clamp((R.stopAt ?? 80) / 100, 0.3, 0.95),
     rigHeight: clamp((R.rigHeight ?? 34) / 100, 0.1, 0.7), rigX: clamp((R.rigX ?? 62) / 100, 0.3, 0.9), rays: (R.rays ?? 70) / 100, flare: (R.flare ?? 60) / 100,
     headlights: (R.headlights ?? 80) / 100, grain: (R.grain ?? 10) / 100, haze: (R.haze ?? 60) / 100, bounce: R.bounce ?? 3,
-    avaRope: R.avaRope ?? 46, avaSize: R.avaSize ?? 0.42, silhouettes: R.silhouettes !== false };   // #115
+    avaRope: R.avaRope ?? 46, avaSize: R.avaSize ?? 0.42, silhouettes: R.silhouettes !== false,
+    music: Array.isArray(R.music) ? R.music : [], musicVolume: R.musicVolume ?? 40 };   // #117 the fast passages of Daniel's intro music   // #115
 }
 const LAND = { region: '', relief: 'mesas', far: '#8e5252', mid: '#a08662', ground: '#dba463', road: '#333941', plants: '#5a4e44', rock: '#71413b',
   ruins: 15, wrecks: 12, towers: 6, signs: 10, plantsN: 30, poles: 1, pylons: 0, city: 20, dust: 15, fog: 10 };

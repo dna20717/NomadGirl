@@ -106,6 +106,8 @@ while (Date.now() - t0 < 8000) { const q = await ev(() => ({ n: SC().hud.drive.s
 await page.keyboard.up('r');
 v = await ev(async () => { const B = await import('/game/brand_perks.js'), s = SC(), d = s.hud.drive; return { inf: B.influencer(s.data_, nomad.save()), shot: d.shots?.size || 0, ava: d.ava ? [Math.round(d.ava.x), Math.round(d.ava.y)] : null }; });
 check('AvA scannt ein Billboard (R halten): ein Scan, Influencer-Buff (24 h), kein Vorspulen', v.shot === 1 && !fastWhile && v.inf && Math.round(v.inf.left) === 24 && [10, 20, 30].includes(v.inf.discount), { v, fastWhile });
+{ const v = await ev(() => { const d = SC().hud.drive; return { on: d.musicOn, key: d.music?.key || null, playing: !!d.music?.isPlaying, camp: SC().camp?.radioK }; });
+check('Fahrt-Musik läuft (#117, schnelle Passage aus dem Intro), das Camp-Thema tritt zurück', v.on && /^drive_[ab]$/.test(v.key) && v.playing, v); }
 if (shots) await page.screenshot({ path: 'output/drive_scan.png' });
 v = await ev(async () => { const B = await import('/game/brand_perks.js'), D = SC().data_; return [0, 0.3, 0.8, 1.4].map(o => [B.shotGrade(D, o).grade, Math.round(20 * B.shotGrade(D, o).factor)]); });
 check('Sucher: Mitte perfekt (30 %), nah gut (20 %), Rand knapp (10 %), daneben verwackelt (0)', JSON.stringify(v) === JSON.stringify([['perfect', 30], ['good', 20], ['edge', 10], ['miss', 0]]), v);

@@ -76,7 +76,7 @@ export class CampLife {
     const s = this.scene, S = this.C.sound || {}, l = s.leyla;
     if (this.music) {
       const k = Math.min(1, (time - this.musicAt) / Math.max(1, (S.musicFadeIn ?? 4) * 1000));
-      this.radioK = Math.max(0, Math.min(1, (this.radioK ?? 1) + (s.hud.radio?.playing ? -0.02 : 0.01)));   // #090 the radio takes over, the theme fades
+      this.radioK = Math.max(0, Math.min(1, (this.radioK ?? 1) + (s.hud.radio?.playing || s.hud.drive?.musicOn ? -0.02 : 0.01)));   // #090 the radio takes over, the theme fades
       this.music.setVolume(this.musicTarget * k * k * this.radioK);
     }
     if (this.fireSound) {

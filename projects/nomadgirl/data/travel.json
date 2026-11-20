@@ -7,7 +7,23 @@
  "nightDanger": 50,
  "encounterChance": 15,
  "encounterLook": "travel_road",
- "drive": {"enabled": true, "seconds": 30, "fast": 6, "speed": 120, "stopAt": 80, "rigHeight": 34, "rigX": 62, "bounce": 3, "rays": 70, "flare": 60, "headlights": 80, "haze": 60, "grain": 10},
+ "drive": {
+  "enabled": true,
+  "seconds": 30,
+  "fast": 6,
+  "speed": 120,
+  "stopAt": 80,
+  "rigHeight": 34,
+  "rigX": 62,
+  "bounce": 3,
+  "rays": 70,
+  "flare": 60,
+  "headlights": 80,
+  "haze": 60,
+  "grain": 10,
+  "music": ["drive_a", "drive_b"],
+  "musicVolume": 40
+ },
  "landscapes": [
   {
    "region": "",

@@ -60,6 +60,32 @@ export class DriveUI {
     s.hud?.banner?.(null);   // an old „Angekommen“ does not ride along
     this.last = performance.now();
     cancelAnimationFrame(this.raf); this.raf = requestAnimationFrame(t => this.frame(t));
+    this.musicStart(seed);
+  }
+  // #117 (Daniel: „die schnelleren Passagen für die Reise-Screens nutzen“): a loop from Reisen › Fahrt › Musik, one per trip in turn;
+  // not while the radio plays; the camp's theme steps back meanwhile (camp_life.js › updateSound)
+  musicStart(seed = 1) {
+    const s = this.host.scene(), C = this.C, list = (C.music || []).filter(id => this.D.assets?.[id]?.file);
+    if (!s?.sound || !list.length || !C.musicVolume || s.hud?.radio?.playing) return;
+    const id = list[Math.abs(seed) % list.length], A = this.D.assets[id], vol = C.musicVolume / 100 * (A.volume ?? 100) / 100;
+    this.musicOn = true;
+    const play = () => {
+      if (!this.musicOn || this.music || !s.cache.audio.exists(id)) return;
+      this.music = s.sound.add(id, { loop: true, volume: 0 });
+      this.music.play({ loop: true, volume: 0 });
+      s.tweens.add({ targets: this.music, volume: vol, duration: 1500 });
+    };
+    if (s.cache.audio.exists(id)) return play();
+    const base = s.base || location.href;
+    s.load.audio(id, [new URL(A.file, base).href, ...(A.alt ? [new URL(A.alt, base).href] : [])]);
+    s.load.once('filecomplete-audio-' + id, play);
+    s.load.start();
+  }
+  musicStop(ms = 1200) {
+    this.musicOn = false;
+    const m = this.music, s = this.host.scene(); this.music = null;
+    if (!m) return;
+    if (s?.tweens) s.tweens.add({ targets: m, volume: 0, duration: ms, onComplete: () => { m.stop(); m.destroy(); } }); else { m.stop(); m.destroy(); }
   }
   // one leg: info { i, n, h0, h1, fuel0, fuel1, km, fromName, toName, region0, region1, stop: { kind, name } | null }
   leg(info, cb) {
@@ -76,8 +102,8 @@ export class DriveUI {
   resume(extra = 0) { const L = this.legInfo; if (!L) return; if (extra > 0) L.shift = (L.shift || 0) + extra; L.stopped = true; L.resumeAt = L.time; this.phase = 'drive'; }
   clock() { const h = this.st.hour, hh = Math.floor(h % 24), mm = Math.floor((h % 1) * 60); return `Tag ${Math.floor(h / 24)} · ${two(hh)}:${two(mm)}`; }
   // the last leg is done: fade to black, then the camp at the new place
-  finish(done) { this.phase = 'out'; this.fading = 1.4; this.onOut = done; }
-  close() { cancelAnimationFrame(this.raf); this.el.hidden = true; this.el.parentNode?.classList.remove('dv-on'); this.legInfo = null; this.phase = 'idle'; this.keys.clear(); this.host.scene()?.cameras?.main?.setVisible(true); }
+  finish(done) { this.phase = 'out'; this.fading = 1.4; this.onOut = done; this.musicStop(1400); }
+  close() { this.musicStop(600); cancelAnimationFrame(this.raf); this.el.hidden = true; this.el.parentNode?.classList.remove('dv-on'); this.legInfo = null; this.phase = 'idle'; this.keys.clear(); this.host.scene()?.cameras?.main?.setVisible(true); }
   // back: straight to the next stop (the incident) or the end of the leg
   skip() {
     const L = this.legInfo; if (!L || this.phase !== 'drive') return;
