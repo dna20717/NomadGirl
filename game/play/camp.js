@@ -322,6 +322,7 @@ export function drawCampBackground(scene, C) {
 // ground of the camp from the tileset (Camp › Platz › Boden-Kacheln, frames: 0 top, 1 fill, 2 top with wall left, 3 pillar,
 // 4 wall left, 5 wall right, 6/7 grassy tops), with the shaft on the left. Returns false without tiles (then art.js draws earth).
 export function drawCampGround(scene, D, geo, T) {
+  if (drawGroundStrip(scene, D, geo, T)) return true;
   const C = D.camp || {}, id = C.ground?.tiles, A = D.assets?.[id];
   if (!id || !scene.textures.exists(id) || !A?.frameSize) return false;
   scene.textures.get(id).setFilter(NEAREST());
@@ -338,6 +339,33 @@ export function drawCampGround(scene, D, geo, T) {
     scene.add.image(x * T, y * T - over, id, f).setOrigin(0).setScale(k).setDepth(-10);
   }
   if (sh) drawShaft(scene, C.shaft || {}, sh, geo, T);
+  return true;
+}
+
+// #084: one fine strip (PixelLab) repeated sideways, 1 art px = 1 world px like the containers; the shaft cuts a gap with code walls
+function drawGroundStrip(scene, D, geo, T) {
+  const C = D.camp || {}, id = C.ground?.strip, A = D.assets?.[id];
+  if (!id || !scene.textures.exists(id)) return false;
+  const src = scene.textures.get(id).getSourceImage(), w = src.width, h = src.height, surf = A?.origin?.[1] ?? 64;
+  const ext = (C.edge?.ground ?? 60) * T, sh = geo.shaft, y0 = geo.floor * T - surf, bottom = geo.H * T;
+  const spans = sh ? [[-ext, sh.from * T], [(sh.to + 1) * T, geo.W * T + ext]] : [[-ext, geo.W * T + ext]];
+  const deep = col(C.ground?.deep || '#141013');
+  for (const [a, b] of spans) {
+    for (let x = Math.floor(a / w) * w; x < b; x += w) {
+      const l = Math.max(a, x), r = Math.min(b, x + w);
+      if (r > l) scene.add.image(x, y0, id).setOrigin(0).setCrop(l - x, 0, r - l, h).setDepth(-10);
+    }
+    if (y0 + h < bottom) scene.add.rectangle(a, y0 + h, b - a, bottom - y0 - h, deep).setOrigin(0).setDepth(-10);   // deeper than the strip: dark rock
+  }
+  if (sh) {   // shaft walls: a dark lip and a crumbly edge facing the hole
+    const g = scene.add.graphics().setDepth(-9.5), top = geo.floor * T, xs = [[sh.from * T, -1], [(sh.to + 1) * T, 1]];
+    for (const [x, dir] of xs) for (let y = top - 2; y < bottom; y += 4) {
+      const d = 10 + ((y * 7919) % 5) - 2;   // a slightly ragged lip on the ground side of the hole
+      g.fillStyle(0x221c1a).fillRect(dir < 0 ? x - d : x, y, d, 4);
+      g.fillStyle(0x060608, 0.55).fillRect(dir < 0 ? x - 4 : x, y, 4, 4);
+    }
+    drawShaft(scene, C.shaft || {}, sh, geo, T);
+  }
   return true;
 }
 

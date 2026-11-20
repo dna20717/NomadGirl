@@ -97,7 +97,7 @@ export class PlayScene extends Phaser.Scene {
     // mega rig prototype (#022, megarig.html): the raw vehicle, add-ons, all container pictures, the camp ground
     if (this.args.megarig) {
       const V = this.data_.megarigs?.[this.args.megarig.id] || {};
-      for (const id of [V.hull?.look, ...Object.values(V.skin || {}).filter(v => typeof v === 'string'), this.data_.camp?.chassis?.look, this.data_.camp?.ground?.tiles, ...Object.values(this.data_.rigAddons || {}).map(a => a.look)]) if (id) ids.add(id);
+      for (const id of [V.hull?.look, ...Object.values(V.skin || {}).filter(v => typeof v === 'string'), this.data_.camp?.chassis?.look, this.data_.camp?.ground?.tiles, this.data_.camp?.ground?.strip, ...Object.values(this.data_.rigAddons || {}).map(a => a.look)]) if (id) ids.add(id);
       for (const c of Object.values(this.data_.containers || {})) for (const k of [c.look, c.lookClosed]) if (k) ids.add(k);
       if (this.data_.camp?.containers?.tiles) ids.add(this.data_.camp.containers.tiles);   // #113 containers of any length
       for (const m of V.modules || []) for (const w of m.workshops || []) if (this.data_.workshops?.[w]?.look) ids.add(this.data_.workshops[w].look);   // #028 workshops on board
@@ -124,7 +124,7 @@ export class PlayScene extends Phaser.Scene {
       for (const a of ['items', 'weapons']) for (const t of Object.values(this.data_[a] || {})) if (t.tags?.includes('trophy') && t.look && A[t.look]?.kind === 'icons') ids.add(t.look);
       if (this.data_.camp?.yard?.crate?.look) ids.add(this.data_.camp.yard.crate.look);
       if (this.data_.camp?.chassis?.look) ids.add(this.data_.camp.chassis.look);   // modular trailer pieces
-      if (this.data_.camp?.ground?.tiles) ids.add(this.data_.camp.ground.tiles);
+      for (const id of [this.data_.camp?.ground?.tiles, this.data_.camp?.ground?.strip]) if (id) ids.add(id);
       if (this.data_.camp?.edge?.egg) ids.add(this.data_.camp.edge.egg);   // #117
       // #008 cosy camp: stairs, deco around the fire, solar panels, exterior clutter on the container walls, string lights
       { const C = this.data_.camp || {}; for (const id of [C.stairs?.look, C.solar?.look, ...(C.deco || []).map(d => d.look)]) if (id) ids.add(id); }

@@ -24,7 +24,6 @@ Alle Punkte aus A1–A8 sind entschieden (12.11. und 19.11.2026): A1 erledigt (#
 - **design.md, offene Fragen:** Ranking-Bonus pro Rang, das „vielleicht noch Gefährlichere“, Feinschliff nach dem ersten Anspielen.
 - **Grafiken für weiterentwickelte Werkstätten** (Daniel 15.11., #034): je Ausbaustufe ein eigenes Bild (PixelLab, streng frontal, gleiche Box).
 - **Camp-Grafik aus Code** (Daniel 19.11.: „streichen wir das für jetzt“): Rest-Stücke ohne Bild; mit #111 sind viele hybrid neu gemalt, siehe `docs/features/camp.md` › Camp-Baukasten.
-- **Fahrgestell `trailer_chassis` und Camp-Boden** noch grob (gehört zu Ticket #084).
 
 Erledigt bzw. gestrichen seit dem 16.11.: Foodtruck-Theke mit Kunden (#013), Rattenschwarm und Wachdrohne gestrichen (#108), Zelle (#079), Licht (#082), Bild-Upload (#083), Werkstatt-Stufen (#078).
 

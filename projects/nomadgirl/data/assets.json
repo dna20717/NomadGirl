@@ -7188,5 +7188,23 @@
   "derivedFrom": "trailer_chassis",
   "date": "20.11.2026",
   "description": "#084: das Fahrgestell doppelt so fein wie vorher, passend zu den Containern aus #042 (Camp › Fahrgestell › Auflösung 2). Teile nebeneinander: Deichsel 2–70, Rahmen 70–208, Mittelstück 220–289, Tandemachse 295–466, Heck 467–510; Zeilen 37–124, Kupplung y 55. 15 Generierungen. Original in source/."
+ },
+ "camp_ground_fine": {
+  "name": "Camp-Boden (fein)",
+  "kind": "image",
+  "file": "assets/tiles/camp_ground_fine.png",
+  "origin": [0, 64],
+  "source": "KI (PixelLab, Create Image Pro 512 × 256, Stil: Container-Original, Palette AAP-64, streng seitlich); Löcher vom Freistellen und nahtlose Naht (Min-Cut, 48 px Überlappung) aus Code",
+  "derivedFrom": "camp_ground_fine_source",
+  "date": "20.11.2026",
+  "description": "#084: Boden im Camp und Mega-Rig, waagrecht nahtlos (464 px breit), ×1 scharf wie die Container. Lauffläche Zeile 64, darunter Sand, Lehm, Fels, dunkle Tiefe. 25 Generierungen."
+ },
+ "camp_ground_fine_source": {
+  "name": "Camp-Boden (fein, Original)",
+  "kind": "source",
+  "file": "assets/tiles/source/camp_ground_fine_source.png",
+  "source": "KI (PixelLab, Create Image Pro)",
+  "date": "20.11.2026",
+  "description": "Rohbild von PixelLab, 512 × 256, mit Löchern vom Freistellen."
  }
 }
