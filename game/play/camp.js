@@ -45,31 +45,36 @@ export function daytimeAt(C, hour) {
 export function chassisPlan(D, def) {
   const C = D.camp?.chassis, A = D.assets?.[def.look];
   if (!def.chassis || !C?.look || !D.assets?.[C.look] || !A?.frameSize || !def.inside?.x) return null;
-  const w = r => Math.max(0, (r?.[1] ?? 0) - (r?.[0] ?? 0)), pad = C.pad ?? 9;
-  const bed = Math.abs(def.inside.x[1] - def.inside.x[0]) + 2 * pad, axles = Math.max(1, C.axles?.[def.places || 1] ?? 1);
+  // #084 Camp › Fahrgestell › Auflösung: the art may be finer than the container art (2 = twice as many pixels); all ranges
+  // below are art pixels, the plan's width, rows and coupling come out in container pixels
+  const r = Math.max(1, Number(C.res) || 1);
+  const w = rg => Math.max(0, (rg?.[1] ?? 0) - (rg?.[0] ?? 0)), pad = C.pad ?? 9;
+  const bed = (Math.abs(def.inside.x[1] - def.inside.x[0]) + 2 * pad) * r, axles = Math.max(1, C.axles?.[def.places || 1] ?? 1);
   const segs = [C.drawbar], mids = n => { const out = []; for (let left = n; left > 0; left -= w(C.middle)) out.push([C.middle[0], C.middle[0] + Math.min(w(C.middle), left)]); return out; };
   let rest = Math.max(0, bed - w(C.rear) - axles * w(C.axle));
-  const front = Math.min(w(C.beam), axles > 1 ? Math.min(rest, C.frontMin ?? 12) : rest);
+  const front = Math.min(w(C.beam), axles > 1 ? Math.min(rest, (C.frontMin ?? 12) * r) : rest);
   if (front > 0) segs.push([C.beam[0], C.beam[0] + front]);
   rest -= front;
   if (axles === 1) segs.push(...mids(rest), C.axle);
   else { const gap = rest / (axles - 1); for (let i = 0; i < axles; i++) { segs.push(C.axle); if (i < axles - 1) segs.push(...mids(Math.round(gap * (i + 1)) - Math.round(gap * i))); } }
   segs.push(C.rear);
-  const width = segs.reduce((n, r) => n + w(r), 0), drawbar = w(C.drawbar);
-  return { segs, width, drawbar, bed: width - drawbar, pad, rows: C.rows || [163, 204], couple: C.couple ?? 172, look: C.look, middle: C.middle, beam: C.beamRows ?? 15, key: `chassis_${segs.map(r => r.join('-')).join('_')}_b${C.beamRows ?? 15}` };
+  const art = segs.reduce((n, rg) => n + w(rg), 0), rows = C.rows || [163, 204], couple = C.couple ?? 172;
+  return { segs, res: r, artWidth: art, artRows: rows, width: art / r, drawbar: w(C.drawbar) / r, bed: (art - w(C.drawbar)) / r, pad,
+    rows: [rows[0] / r, rows[1] / r], couple: couple / r, look: C.look, middle: C.middle, beam: C.beamRows ?? 15, key: `chassis_${C.look}_${segs.map(rg => rg.join('-')).join('_')}_b${C.beamRows ?? 15}` };
 }
 // the chassis as a texture: the pieces side by side, mirrored so the drawbar points to the van (right)
 export function chassisTexture(scene, plan) {
   if (scene.textures.exists(plan.key)) return plan.key;
   if (!scene.textures.exists(plan.look)) return null;
-  const src = scene.textures.get(plan.look).getSourceImage(), [y0, y1] = plan.rows, h = y1 - y0;
-  const tex = scene.textures.createCanvas(plan.key, plan.width, h), ctx = tex.getContext();
+  const src = scene.textures.get(plan.look).getSourceImage(), [y0, y1] = plan.artRows || plan.rows, h = y1 - y0, W = plan.artWidth ?? plan.width;
+  const tex = scene.textures.createCanvas(plan.key, W, h), ctx = tex.getContext();   // in art pixels (show it at k / plan.res)
   ctx.imageSmoothingEnabled = false;
-  ctx.translate(plan.width, 0); ctx.scale(-1, 1);
+  ctx.translate(W, 0); ctx.scale(-1, 1);
   // behind everything: the long beam of the middle piece, all the way from the drawbar to the rear, so no gap shows where the
   // pieces meet (fender corners, rear) – Daniel, 09.11.2026: „Lücken zwischen den Tiles … Tiles hinter die Lücken legen“
   const [m0, m1] = plan.middle, bh = Math.min(h, plan.beam || 15);
-  for (let bx = plan.drawbar; bx < plan.width; bx += m1 - m0) { const w = Math.min(m1 - m0, plan.width - bx); ctx.drawImage(src, m0, y0, w, bh, bx, 0, w, bh); }
+  const db = plan.drawbar * (plan.res || 1);
+  for (let bx = db; bx < W; bx += m1 - m0) { const w = Math.min(m1 - m0, W - bx); ctx.drawImage(src, m0, y0, w, bh, bx, 0, w, bh); }
   let x = 0;
   for (const [a, b] of plan.segs) { ctx.drawImage(src, a, y0, b - a, h, x, 0, b - a, h); x += b - a; }
   tex.refresh(); tex.setFilter(NEAREST());
@@ -631,7 +636,7 @@ export class Camp {
     const add = o => { view.add(o); return o; };
     if (u.chassis) {
       const key = chassisTexture(s, u.chassis.plan);
-      if (key) add(s.add.image(u.x0 - mid, 0, key).setOrigin(0, 1).setScale(u.chassis.k));
+      if (key) add(s.add.image(u.x0 - mid, 0, key).setOrigin(0, 1).setScale(u.chassis.k / (u.chassis.plan.res || 1)));
     }
     if (u.sprite) {
       if (s.textures.exists(u.sprite.key)) {

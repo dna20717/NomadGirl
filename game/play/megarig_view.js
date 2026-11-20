@@ -309,7 +309,7 @@ export class MegarigView {
       if (!key) continue;
       const k = (p.h + 1) * T / (BOX.bottom - BOX.roof), n = p.places || def.places || 1, cxImg = BOX.left + (BOX.one + (n - 1) * BOX.more) / 2;
       const bedLeft = (p.x + p.w / 2) * T - (cxImg - BOX.left) * k, hgt = (plan.rows[1] - plan.rows[0]) * k;
-      s.add.image(bedLeft - plan.drawbar * k, ground, key).setOrigin(0, 1).setScale(k).setFlipX(true).setDepth(-5.2);
+      s.add.image(bedLeft - plan.drawbar * k, ground, key).setOrigin(0, 1).setScale(k / (plan.res || 1)).setFlipX(true).setDepth(-5.2);
       if (!ground0.length) this.r(this.g, bedLeft, ground - hgt - PX, plan.bed * k, PX, C.ink, 0);   // nothing on it: the bed alone
     }
     // the cab: the truck picture from PixelLab, strict side view

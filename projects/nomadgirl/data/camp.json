@@ -97,17 +97,18 @@
  "shaft": {"enabled": true, "at": 1, "width": 3, "color": "#140d12", "glow": "#c0302a", "frameHeight": 200},
  "yard": {"enabled": true, "width": 9, "dealer": true, "dealerName": "Händler", "dealerWidth": 170, "palletScale": 50, "parkScale": 45},
  "chassis": {
-  "look": "trailer_chassis",
-  "drawbar": [6, 38],
-  "beam": [38, 104],
-  "middle": [110, 143],
-  "axle": [146, 227],
-  "rear": [228, 248],
-  "rows": [163, 204],
-  "couple": 172,
+  "look": "trailer_chassis_fine",
+  "res": 2,
+  "drawbar": [2, 70],
+  "beam": [70, 208],
+  "middle": [220, 289],
+  "axle": [295, 466],
+  "rear": [467, 510],
+  "rows": [37, 124],
+  "couple": 55,
   "frontMin": 12,
   "axles": {"1": 1, "2": 2, "3": 2, "4": 3, "5": 3},
-  "beamRows": 15
+  "beamRows": 31
  },
  "deco": [
   {"look": "camp_rug", "x": -10, "y": 4, "scale": 2.2},
