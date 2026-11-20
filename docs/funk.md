@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 20.11. Code → Ava: #084 PixelLab-Grafik läuft, danach #100–#103 (Daniel: „mach bitte die 84 auch direkt, und 100 bis 103 im Anschluss“). PixelLab vorher 2.055,6.
 - 20.11. Code → Ava: Die kleinen drei fertig: #098 Ofen im Mega-Rig, #099 Speziallager je Stern (Knopf im Lager-Fenster), #104 Werte im Inventar (Grund · Boni · Ergebnis, U).
 - 20.11. Code → Ava: #126 **Drei Spielstände** fertig: Slots im Cockpit-Radio mit Vorschaubild, Löschen mit Dialog + Zurückholen, globale Achievements, Slot behält sein Datenset, Spielstand laden im Pause-Menü, alter Stand zieht nach Slot 1 (lokal + online). 4 ⚠️ im Ticket.
 - 20.11. Code → Ava: #125 **Aufräumen + technische Schulden** fertig: Backlog C komplett (C2, C3, C4, C10, C11, C13, C14, C15, C18), Cockpit-Reste im Schema, Backlog auf Stand 20.11.; Konzept für 3 Spielstände in `docs/concepts/save_slots.md` mit 9 Fragen an Daniel (Backlog A9). Offen für Daniel: Cockpit-Kram platzieren (A10).
@@ -428,7 +429,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Bilder hochladen in der Online-Werkstatt (#083)“. Knopf im Asset-Inspektor, Worker `POST /api/upload` (eigener Commit, nur Bilder unter assets/, 2 MiB). `npm test` grün (cloud 8/8), `tools/workshop_cloud_test.mjs` grün. **Bitte testen:** online Werkstatt › Assets › ein Bild ersetzen, ein paar Minuten warten, im Spiel ansehen.
 
 ### #084 Grafik per PixelLab: Verbindung, Bit-Farm, Fahrgestell + Camp-Boden
-- **Status:** offen · Verbindung geht (Umgebung „NomadGirl“, siehe HNC 19.11.) · angelegt 19.11. von Code (Daniel, Karten PixelLab, Bit-Farm, C18)
+- **Status:** läuft (20.11.) · · Verbindung geht (Umgebung „NomadGirl“, siehe HNC 19.11.) · angelegt 19.11. von Code (Daniel, Karten PixelLab, Bit-Farm, C18)
 - **Auftrag:** (1) PixelLab-Verbindung der Cloud-Umgebung reparieren (19.11. blockte der Proxy `api.pixellab.ai`), Anleitung für Daniel. (2) Bit-Farm-Bild, bis 4 Generierungen (freigegeben). (3) Fahrgestell + Camp-Boden feiner, passend zu #042 (~10–25 Generierungen, vor dem Auftrag Kosten nennen, unter 700 Freigabe).
 - **Rückfragen:**
 - **Ergebnis:**
