@@ -1,6 +1,20 @@
 # Konzept: Spielstände mit drei Slots
 
-Stand 20.11.2026, nur Konzept (noch kein Code). Ziel: Leyla kann in **bis zu drei Spielständen** leben, z. B. ein „ernster“ Stand, ein Test-Stand mit Cheats und einer für einen zweiten Menschen am selben Login oder Gerät.
+Stand 20.11.2026, nur Konzept (noch kein Code), Fragen von Daniel beantwortet. Ziel: Leyla kann in **bis zu drei Spielständen** leben, z. B. ein „ernster“ Stand, ein Test-Stand mit Cheats und einer für einen zweiten Menschen am selben Login oder Gerät.
+
+## Entscheidungen (Daniel, 20.11.2026)
+
+| Frage | Entscheidung | Folgen fürs Konzept |
+|---|---|---|
+| A Achievements | **über alle Spielstände hinweg** | Achievements, Trophäen und ihre Zähler wandern aus dem Stand in einen eigenen Speicher (lokal `nomadgirl-achievements`, online `ach:<hash>`); Boni und gelernte Rezepte daraus gelten in jedem Slot. Beim ersten Start werden die Achievements aller vorhandenen Stände vereinigt (höchster Zähler gewinnt). Die Cockpit-Sticker lesen diesen Speicher. |
+| B Feldhandbuch | pro Gerät | wie heute |
+| C Namen | „Leyla 1–3“ automatisch, Umbenennen per Tastatur, am Controller aus einer Namensliste | wie Abschnitt 5 |
+| D Löschen | **Dialog**, und der zuletzt gelöschte **oder überschriebene** Stand bleibt in einem Vor-Lösch-Zustand | Papierkorb mit genau einem Eintrag; gefüllt beim Löschen, bei „Neues Spiel“ auf einem belegten Slot und beim Kopieren auf einen belegten Slot. Wiederherstellen im Slot-Menü („Zuletzt gelöscht: Leyla 2, Tag 12 · wiederherstellen“) auf einen freien Slot oder mit erneutem Dialog auf einen belegten. Kein Ablaufdatum ⚠️ vorläufig. |
+| E Datensets | Ein Stand kann mit jedem Datenset **begonnen** werden, wird danach aber **nur mit Iterationen dieses Sets** gespielt | Der Stand merkt sich `set` (ID des Datensets, `''` = Standard) beim Anlegen. Laden schaltet das Gerät auf dieses Set um (wie `?set=`); spätere Änderungen am Set („Iterationen“) gelten automatisch. Gibt es das Set nicht mehr, sagt das Slot-Menü „Datenset fehlt“ und lädt nicht ⚠️ vorläufig (Alternative: auf Standard umziehen, Daniel fragen). Kopieren behält das Set. |
+| F Vorschaubild | **gleich mit** | Schnappschuss beim automatischen Speichern im Camp (kleines WebP, ~6 KB, ohne HUD), lokal im Index, online als eigener KV-Eintrag `shot:<hash>:<n>` (KV-Metadaten sind zu klein). Gehört in Etappe 3/4. |
+| G Wechseln | Es gibt kein „Wechseln“: **Man darf überall einen anderen Spielstand laden; gespeichert wird im Camp automatisch** | Pause-Menü überall: „Spielstand laden“. Weil nur im Camp gespeichert wird, verwirft Laden im Run den laufenden Run, der verlassene Stand steht beim nächsten Laden wieder im Camp, ohne k.o.-Strafe ⚠️ vorläufig. Heute schreibt das Spiel auch Run-Stände (`save.run`, abgebrochener Run = k.o.); das entfällt mit dieser Regel. |
+| H Schlüssel | **sauber neu** `nomadgirl-save:1..3` | Einmaliger Umzug lokal: `nomadgirl-save` → `nomadgirl-save:1` kopieren, zurücklesen und vergleichen, erst dann den alten Schlüssel löschen. Online analog `save:<hash>` → `save:<hash>:1` im Worker beim ersten Zugriff. Tests, die `nomadgirl-save` lesen, ziehen um. |
+| I Export/Import | später | eigenes Ticket nach den Slots |
 
 ## 1. Ist-Zustand
 
@@ -163,43 +177,4 @@ Zusammen etwa **3–3½ Tage**. Nach jeder Etappe `npm test`, `npm run test:brow
 
 ## 8. Offene Fragen an Daniel
 
-**A. Achievements bei drei Slots?**
-1. pro Slot, Cockpit-Sticker zeigen alle Slots zusammen ⭐ Empfehlung
-2. pro Slot, Sticker nur vom aktiven Slot
-3. global für alle Slots (dann wirken Boni auch im Test-Stand)
-
-**B. Feldhandbuch „schon gesehen“?**
-1. pro Gerät, wie heute ⭐ Empfehlung
-2. pro Slot (jeder neue Stand zeigt alle Lektionen wieder)
-
-**C. Slot-Namen?**
-1. automatisch „Leyla 1–3“, Umbenennen per Tastatur, mit Controller aus einer Namensliste ⭐ Empfehlung
-2. nur automatisch, kein Umbenennen
-3. Bildschirmtastatur für den Controller
-
-**D. Löschen absichern?**
-1. zweiter Druck + 10 s „Rückgängig“, Papierkorb hält den letzten gelöschten Stand 7 Tage ⭐ Empfehlung
-2. nur Bestätigungsdialog
-3. Bestätigen durch Halten von A (1 s)
-
-**E. Slot mit anderem Datenset gespielt?**
-1. Gerät behält sein Set, beim Laden Warnung mit „Trotzdem laden / Set wechseln“ ⭐ Empfehlung
-2. Slot schaltet das Set automatisch um
-3. keine Warnung
-
-**F. Vorschaubild je Slot?**
-1. später (Etappe 5), bis dahin Ort + Tageszeit als Symbol ⭐ Empfehlung
-2. gleich mit (Schnappschuss beim Speichern im Camp, ~6 KB)
-3. nie
-
-**G. Spielstand wechseln mitten im Run?**
-1. nur im Camp ⭐ Empfehlung
-2. überall, der Run zählt dann als k.o.
-
-**H. Lokaler Schlüssel für Slot 1?**
-1. `nomadgirl-save` bleibt Slot 1, keine Migration ⭐ Empfehlung
-2. sauber `nomadgirl-save:1..3` mit einmaligem Umzug
-
-**I. Stand zwischen lokal und online tauschen (Export/Import als Datei)?**
-1. später ⭐ Empfehlung
-2. gleich mit in Etappe 4
+Alle beantwortet am 20.11.2026, siehe **Entscheidungen** oben. Wo die Abschnitte 3–7 davon abweichen, gelten die Entscheidungen.
