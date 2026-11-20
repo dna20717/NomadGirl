@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NomadGirl · Cockpit (Mockup)</title>
+<link rel="stylesheet" href="game/ui.css">
+<style>
+  /* #123 Mockup: das Hauptmenü aus dem Van-Cockpit (Daniel 20.11.2026). Szene = Startseite im Fahrmodus, Cockpit aus Code (game/splash/cockpit.js) */
+  html, body { height: 100%; margin: 0; overflow: hidden; background: #141013; }
+  #scene, #cockpit { position: fixed; inset: 0; width: 100vw; height: 100vh; image-rendering: pixelated; }
+  #cockpit { object-fit: cover; pointer-events: none; z-index: 2; }
+  h1.logo { position: fixed; left: 7vw; top: 10vh; margin: 0; z-index: 1; line-height: 0; width: min(38vw, 680px); }
+  h1.logo img, h1.logo .logo-canvas { width: 100%; height: auto; image-rendering: pixelated; filter: drop-shadow(0 6px 18px rgba(0,0,0,.45)); }
+  #lcd { position: fixed; z-index: 3; box-sizing: border-box; overflow: hidden; font-family: VT323, monospace; color: #9cdb43; text-shadow: 0 0 6px rgba(156,219,67,.55); display: grid; align-content: start; }
+  #lcd .hd { display: flex; justify-content: space-between; color: #59c135; white-space: nowrap; overflow: hidden; }
+  #lcd .hd { font-size: .72em; gap: .8em; } #lcd .hd #np { flex: 1; overflow: hidden; } #lcd .hd #np i { display: inline-block; font-style: normal; padding-left: 100%; animation: np-run 9s linear infinite; }
+  @keyframes np-run { to { transform: translateX(-100%); } }
+  #lcd a { display: flex; justify-content: space-between; align-items: baseline; color: inherit; text-decoration: none; padding: 0 .3em; white-space: nowrap; cursor: pointer; }
+  #lcd a small { opacity: .65; font-size: .7em; }
+  #lcd a.on { background: #9cdb43; color: #0b1a12; text-shadow: none; }
+  #lcd a[hidden] { display: none; }
+  #lcd a.on span::before { content: '▶ '; }
+  .hint { position: fixed; right: 1.5vw; top: 1.5vh; z-index: 3; font: 18px VT323, monospace; color: #e4d2aa; text-shadow: 0 2px 0 #060608; text-align: right; }
+  .hint a { color: #ffd541; }
+</style>
+</head>
+<body>
+<canvas id="scene" aria-label="Die Straße durch die Wastelands, gesehen aus dem Van"></canvas>
+<h1 class="logo"><img src="projects/nomadgirl/assets/ui/logo/logo.png" alt="NomadGirl"></h1>
+<canvas id="cockpit" aria-hidden="true"></canvas>
+<nav id="lcd" aria-label="Hauptmenü"><div class="hd"><span>88.6 FM</span><span id="np"><i>▶ Leylas Run – BombT · Rig-Radio · Wetter: Abendglut, 31 °C</i></span></div></nav>
+<div class="hint">Mockup aus Code · ← → lenken · ↑ ↓ wählen · Enter los<br><a href="index.html">zur echten Startseite</a></div>
+<script type="module">
+  import { startSplash } from './game/splash/splash.js';
+  import { startCockpit, PW, PH } from './game/splash/cockpit.js';
+  const ITEMS = [['game.html?camp', 'Spiel', 'Camp & Runs'], ['intro.html', 'Intro', 'Wie alles anfing'], ['game.html', 'Testraum', 'Parkour'], ['workshop.html', 'Werkstatt', 'Alles einstellen'], ['https://github.com/dna20717/NomadGirl/blob/main/docs/design.md', 'Design-Dok', 'Fahrplan']];
+  const lcd = document.getElementById('lcd');
+  const links = ITEMS.map(([href, t, s]) => { const a = document.createElement('a'); a.href = href; a.innerHTML = `<span>${t}</span><small>${s}</small>`; lcd.append(a); return a; });
+  let sel = 0, top = 0;
+  const VIS = 4;
+  const show = () => { top = Math.max(0, Math.min(links.length - VIS, sel - 1)); links.forEach((a, i) => { a.classList.toggle('on', i === sel); a.hidden = i < top || i >= top + VIS; }); };
+  links.forEach((a, i) => a.addEventListener('mouseenter', () => { sel = i; show(); }));
+  show();
+  let splash = null;
+  startSplash(document.getElementById('scene'), { drive: true, runner: false, nowPlaying: false, data: { horizon: 46, drone: { at: [62, 30], height: 11 } } }).then(x => { splash = x; window.splash = x; });
+  const cp = startCockpit(document.getElementById('cockpit'), { steerValue: () => splash?.curve?.() ?? 0, speed: () => 1 });
+  addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown' || e.key === 's') { sel = (sel + 1) % links.length; show(); e.preventDefault(); }
+    if (e.key === 'ArrowUp' || e.key === 'w') { sel = (sel - 1 + links.length) % links.length; show(); e.preventDefault(); }
+    if (e.key === 'Enter' || e.key === ' ') links[sel].click();
+  });
+  // controller: stick up/down chooses, sideways steers, A opens
+  let held = 0, next = 0, wasA = true;
+  const poll = now => {
+    const g = navigator.getGamepads ? [...navigator.getGamepads()].find(p => p && p.connected) : null;
+    if (g) {
+      const b = i => !!g.buttons[i] && (g.buttons[i].pressed || g.buttons[i].value > 0.5), ax = g.axes[0] || 0, ay = g.axes[1] || 0;
+      const dir = ay < -0.5 || b(12) ? -1 : ay > 0.5 || b(13) ? 1 : 0;
+      if (dir && (dir !== held || now >= next)) { sel = (sel + dir + links.length) % links.length; show(); next = now + (dir !== held ? 380 : 160); }
+      held = dir;
+      splash?.steer?.(Math.abs(ax) > 0.25 ? Math.sign(ax) * Math.min(1, (Math.abs(ax) - 0.25) / 0.65) : b(14) ? -1 : b(15) ? 1 : 0);
+      const a = b(0); if (a && !wasA) links[sel].click(); wasA = a;
+    }
+    // the LCD text follows the pixels (cover scaling, lean, bumps)
+    const k = Math.max(innerWidth / PW, innerHeight / PH), ox = (innerWidth - PW * k) / 2, oy = (innerHeight - PH * k) / 2, L = cp.lcd();
+    Object.assign(lcd.style, { left: `${ox + (L.x + 2) * k}px`, top: `${oy + (L.y + 1) * k}px`, width: `${(L.w - 4) * k}px`, height: `${(L.h - 2) * k}px`, fontSize: `${Math.round(L.h * k / 5.6)}px`, lineHeight: '1.02' });
+    requestAnimationFrame(poll);
+  };
+  requestAnimationFrame(poll);
+  window.cockpitMenu = { selected: () => sel, items: () => links.map(a => a.textContent) };
+</script>
+</body>
+</html>

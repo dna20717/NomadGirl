@@ -13,10 +13,13 @@ import { startLogo } from './logo.js';
 const BASE = new URL('../../projects/nomadgirl/', import.meta.url);
 const Z_NEAR = 0.6, Z_FAR = 40;   // depth range of the ground (m)
 
-export async function startSplash(canvas) {
+export async function startSplash(canvas, opts = {}) {
+  // #123 cockpit mockup: opts.runner false = no Leyla (the van drives), opts.drive = the world comes towards us instead of receding
+  const DIR = opts.drive ? -1 : 1, RUNNER = opts.runner !== false;   // opts.data: overrides for Startseite fields
   const cloud = await cloudFiles();
   const json = async f => cloud?.files.has(f) ? cloud.files.get(f) : (await fetch(new URL(f, BASE), { cache: 'no-store' })).json();
   const [S, A, WX, DR] = await Promise.all([json('data/splash.json'), json('data/assets.json'), json('data/weather.json').catch(() => ({})), json('data/drone.json').catch(() => ({}))]);
+  if (opts.data) for (const [k, v] of Object.entries(opts.data)) S[k] = v && typeof v === 'object' && !Array.isArray(v) ? { ...(S[k] || {}), ...v } : v;   // #123 page-specific overrides (cockpit: horizon higher)
   // AvA hovers next to Leyla and shows random moods (face frame + kaomoji bubble)
   const SD = { show: true, at: [57, 44], height: 15, every: [3, 7], bob: 1.2, moods: 'kill, cleared, curious, scan, alert, bored, sleep, dash', ...(S.drone || {}) };
   const droneMoods = (DR.moods || []).filter(m => String(SD.moods).split(',').map(x => x.trim()).includes(m.mood));
@@ -116,7 +119,7 @@ export async function startSplash(canvas) {
     let shown = false;
     const start = () => { if (!el.paused) return; el.volume = 0; el.play().then(() => {
       const t0 = performance.now(), f = setInterval(() => { const k = Math.min(1, (performance.now() - t0) / 1500); el.volume = vol * k; if (k >= 1) clearInterval(f); }, 40);
-      if (!shown) { shown = true; nowPlayingFor(A, S.music, BASE); }
+      if (!shown) { shown = true; if (opts.nowPlaying !== false) nowPlayingFor(A, S.music, BASE); }
     }).catch(() => {}); };
     start();
     for (const ev of ['keydown', 'pointerdown', 'touchstart']) addEventListener(ev, start, { capture: true });
@@ -330,7 +333,7 @@ export async function startSplash(canvas) {
     // the bend: zero under Leyla's feet, at the horizon as far as the background panned (screen x = metres × W·Z_NEAR / z)
     bendZ = K / Math.max(1, H * (S.runnerFeet ?? 94) / 100 - top);
     bendA = shiftH / (W * Z_NEAR / Z_FAR) / Math.max(1, (Z_FAR - bendZ) ** 2);
-    if (tex) { if (!still) roll += G.speed * pace * dt; drawGround(horizon, top, K, px); }
+    if (tex) { if (!still) roll += DIR * G.speed * pace * dt; drawGround(horizon, top, K, px); }
     if (HZ.enabled) haze(t, horizon, sc);
     const project = (x, z) => [W / 2 + (x + bend(z)) * W * (Z_NEAR / z), top + K / z];
 
@@ -350,8 +353,8 @@ export async function startSplash(canvas) {
 
     // move the world
     if (!still) {
-      for (const s of specks) { s.z += G.speed * pace * dt * (s.z / 6 + 0.35); if (s.z > Z_FAR) Object.assign(s, speck(Z_NEAR)); }
-      if (f !== lastFrame && G.dust && (f % Math.max(1, Math.round(n / 2)) === 0)) for (let i = 0; i < 3; i++)
+      for (const s of specks) { s.z += DIR * G.speed * pace * dt * (s.z / 6 + 0.35); if (s.z > Z_FAR) Object.assign(s, speck(Z_NEAR)); else if (s.z < Z_NEAR) Object.assign(s, speck(Z_FAR)); }
+      if (RUNNER && f !== lastFrame && G.dust && (f % Math.max(1, Math.round(n / 2)) === 0)) for (let i = 0; i < 3; i++)
         dust.push({ x: (cx - W / 2) / W / (Z_NEAR / zFeet) + rnd(-0.03, 0.03), z: zFeet + rnd(0, 0.15), up: 0, vy: rnd(0.4, 0.9), r: rnd(1.5, 3), life: 1 });
       lastFrame = f;
       for (const d of dust) { d.z += G.speed * pace * dt * (d.z / 6 + 0.35); d.up += d.vy * dt; d.life -= dt * 0.9; }
@@ -368,7 +371,7 @@ export async function startSplash(canvas) {
       ctx.globalAlpha = 1;
     };
     drawSpecks(false);
-    if (!still && now >= nextTumble && !tumble) { const d = Math.random() < 0.5 ? -1 : 1; tumble = { x: -d * 2.6, z: zFeet + 0.6 + Math.random() * 1.6, d, a: 0, h: 0, vh: 0 }; nextTumble = now + 22000 + Math.random() * 30000; }
+    if (!still && now >= nextTumble && !tumble) { const d = Math.random() < 0.5 ? -1 : 1; tumble = { x: -d * 2.6, z: DIR < 0 ? 7 + Math.random() * 5 : zFeet + 0.6 + Math.random() * 1.6, d, a: 0, h: 0, vh: 0 }; nextTumble = now + 22000 + Math.random() * 30000; }
     const drawTumble = front => {
       if (!tumble || (tumble.z < zFeet) !== front) return;
       const T = tumble, [x, y] = project(T.x, T.z), m = Math.max(1, Math.round(px * (Z_NEAR * 13) / T.z) / 2), size = 18 * m;
@@ -378,9 +381,9 @@ export async function startSplash(canvas) {
     };
     if (tumble && !still) {   // it rolls sideways, hops, and the ground carries it away like everything else
       const T = tumble;
-      T.x += T.d * 1.5 * dt; T.z += G.speed * pace * dt * (T.z / 6 + 0.35); T.a += T.d * dt * 7;
+      T.x += T.d * 1.5 * dt; T.z += DIR * G.speed * pace * dt * (T.z / 6 + 0.35); T.a += T.d * dt * 7;
       T.vh -= 9 * dt; T.h = Math.max(0, T.h + T.vh * dt); if (!T.h) T.vh = 1.6 + Math.random() * 1.4;
-      if (Math.abs(T.x) > 3.2 || T.z > Z_FAR * 0.6) tumble = null;
+      if (Math.abs(T.x) > 3.2 || T.z > Z_FAR * 0.6 || T.z < Z_NEAR) tumble = null;
     }
     drawTumble(false);
     for (const d of dust) {   // little clouds of ground colour, lighter
@@ -389,13 +392,13 @@ export async function startSplash(canvas) {
       for (let i = -r; i <= r; i++) ctx.fillRect(Math.round((x + i * m) / m) * m, Math.round((y - d.up * m * 6 - (r - Math.abs(i)) * m * 0.6) / m) * m, m, Math.max(1, r - Math.abs(i)) * m);
     }
     ctx.globalAlpha = 1;
-    if (G.shadow) {   // flat pixel shadow, breathes with the steps
+    if (G.shadow && RUNNER) {   // flat pixel shadow, breathes with the steps
       const sw = fw * k * (0.5 + 0.06 * Math.sin(t * fps * Math.PI)), m = Math.max(1, Math.round(k * dpr) / dpr);
       ctx.fillStyle = 'rgba(0,0,0,.35)';
       for (let i = 0; i < 3; i++) { const w = sw * (1 - i * 0.22); ctx.fillRect(Math.round(cx - w / 2), Math.round(feet - m * (1 - i)), Math.round(w), Math.round(m * 2)); }
     }
     if (droneImg) drawDrone(t, now);   // behind Leyla
-    if (runImg) ctx.drawImage(runImg, f * fw, 0, fw, fh, Math.round(cx - ax * k), Math.round(feet - ay * k), Math.round(fw * k), Math.round(fh * k));
+    if (runImg && RUNNER) ctx.drawImage(runImg, f * fw, 0, fw, fh, Math.round(cx - ax * k), Math.round(feet - ay * k), Math.round(fw * k), Math.round(fh * k));
     drawSpecks(true);
     drawTumble(true);
     if (weather?.rain) {   // rain in front of everything

@@ -40,7 +40,7 @@ if (check === '1' && built) {
 
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
-for (const f of ['index.html', 'workshop.html', 'game.html', 'intro.html', 'megarig.html', 'duel.html', 'mobile.html', 'LICENSE']) fs.copyFileSync(path.join(repo, f), path.join(out, f));
+for (const f of ['index.html', 'workshop.html', 'game.html', 'intro.html', 'megarig.html', 'duel.html', 'mobile.html', 'cockpit.html', 'LICENSE']) fs.copyFileSync(path.join(repo, f), path.join(out, f));
 for (const dir of ['game', 'engine', 'projects/nomadgirl']) fs.cpSync(path.join(repo, dir), path.join(out, dir), { recursive: true });
 // which build is this (shown on the start page and in the game): on Cloudflare Workers Builds the commit comes from the environment
 const sha = process.env.WORKERS_CI_COMMIT_SHA || (() => { try { return execSync('git rev-parse HEAD', { cwd: repo }).toString().trim(); } catch { return 'unbekannt'; } })();
