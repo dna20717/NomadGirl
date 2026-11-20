@@ -23,6 +23,8 @@ export class CampDecor {
   // ---------- where things go ----------
   decorUnit(ui) { return (this.geo.units || []).find(u => u.ui === ui) || null; }
   groundX(x) { return ((this.geo.campCol ?? 0) + x) * this.scene.T; }
+  // #117 the rear end of the rig: the last container's back (or the van's, without trailers)
+  rigRear() { const U = (this.geo.units || []).filter(u => u.ui > 0 && !u.level); return U.length ? Math.min(...U.map(u => u.x0)) : (this.geo.vanLeft ?? 0); }
   wallAt(ui, p, row) { const u = this.decorUnit(ui); return u && { u, x: u.in0 + (p + 0.5) * u.cell, y: u.inTop + (u.floorY - u.inTop) * (row ?? 0.4) }; }
   // #114 inside a container: on its back wall (row = share of the interior height) or hanging from its ceiling (row 'top')
   insideAt(ui, p, row) { const u = this.decorUnit(ui); return u && { u, x: u.in0 + (p + 0.5) * u.cell, y: row === 'top' ? u.inTop + 2 : u.inTop + (u.floorY - u.inTop) * (row ?? 0.25), hang: row === 'top' }; }
@@ -155,6 +157,7 @@ export class CampDecor {
     else if (mb) { const B = L[Number(mb[1])], bd = B && decorDef(this.D, B.id), b = bd && this.balconyAt(B.at.ui, B.at.side, bd); if (b) q = { x: (b.x0 + b.x1) / 2 + (at.dx || 0) * T, y: b.y, u: b.u, level: 0, balc: true }; }
     else if (at.ui != null && at.p != null) { const r = this.roofAt(at.ui, at.p); if (r) q = { x: r.x, y: r.y, u: r.u, level: 0, roof: true }; }
     else if (Number.isFinite(at.x)) q = { x: this.groundX(at.x), y: this.ground, level: 0 };
+    else if (Number.isFinite(at.rear)) q = { x: this.rigRear() - at.rear * T, y: this.ground, level: 0 };   // #117 behind the rig
     if (q) (this.freeAt ??= [])[i] = q;
     return q;
   }
@@ -514,6 +517,9 @@ export class CampDecor {
         out.push({ at, x: q.x + dx * T, y: q.y - top - 4, label: `Auf ${decorDef(D, o.id)?.name || 'das Stück'}`, stack: true });
       }
     });
+    // #117 behind the rig (Daniel: „das Platzieren von Deko muss auch hinter den Containern möglich sein; ein neuer Container verschiebt
+    // alles nach hinten“): tiles behind the last container's rear end, they move along when the rig gets longer (Camp › Deko › Hinter dem Rig)
+    if (!this.geo.mega) { const n = D.camp?.decor?.rear ?? 8, rear = this.rigRear(); for (let r = 0.5; r <= n + 1e-6; r += 0.25) { const gx = rear - r * T; if (this.geo.yard && gx < this.geo.yard.x1 + T * 0.5) break; out.push({ at: { rear: r }, x: gx, y: this.ground - 10, label: 'Hinter das Rig' }); } }
     return out;
   }
 

@@ -203,7 +203,8 @@ export function campLayout(D, save, T = 64) {
   const longest = Math.max(T * 4, ...Object.entries(D.containers || {}).map(([id, c]) => unitWidth(D, c.resize ? containerDef(D, { id, places: c.resize[1] }) : c, T)));   // #113 pulled to full length
   const pull = Math.max(1, D.tractors?.[save.rig.tractor]?.length ?? 1);
   const rigRoom = pull * longest + (pull - 1) * gap;
-  const vanCol = Math.ceil((margin * T + yardW + rigRoom + vanLeft) / T - 0.5), doorX = (vanCol + 0.5) * T;
+  const rearRoom = (C.decor?.rear ?? 8) * T;   // #117 room for decoration behind the rig, even at its full length: the camp is longer
+  const vanCol = Math.ceil((margin * T + yardW + rearRoom + rigRoom + vanLeft) / T - 0.5), doorX = (vanCol + 0.5) * T;
   // salvage (#023): a wreck found here stands at the end of the camp, the camp grows by its width
   const wr = wreckHere(D, save), campW = Math.max(8, C.campWidth ?? 20);
   // a tractor wider than the van (the LKW) pushes the campsite to the right by the difference

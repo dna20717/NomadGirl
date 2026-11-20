@@ -1378,6 +1378,7 @@ export const AREAS = {
       { title: 'Deko', fields: [num('decor.max', 'Höchstens', { min: 1, hint: '#036: so viele Deko-Stücke im Camp' }), num('decor.back', 'Zurück beim Verkaufen', { unit: '%', min: 0, max: 100 }),
         num('decor.cozyMax', 'Gemütlichkeit wirkt bis', { unit: '%', min: 0, hint: 'Jeder Punkt Gemütlichkeit macht die Buffs von Schlafen und Ausruhen 1 % stärker, höchstens so viel' }),
         range('decor.ground', 'Boden von – bis', { unit: 'Kacheln ab dem Lagerplatz', hint: 'Wo Boden-Deko stehen darf (negativ = Richtung Rig)' }),
+        num('decor.rear', 'Hinter dem Rig', { unit: 'Kacheln', min: 0, hint: '#117 Platz für Deko hinter dem letzten Container; sie wandert mit, wenn das Rig länger wird (das Camp ist so viel länger)' }),
         num('decor.stackMax', 'Stapel höchstens', { min: 1, hint: '#111: so viele Stücke übereinander' }), num('decor.near', 'Nachbarn bis', { unit: 'Kacheln', min: 0, step: 0.5, hint: 'Mag-Nachbarn und „Dreht sich zu“ wirken bis hier' }),
         num('decor.linkMax', 'Lichterkette bis', { unit: 'Kacheln', min: 1, hint: 'Pfosten mit „Lichterkette zu Nachbarn“ verbinden sich bis zu diesem Abstand' }),
         num('decor.mossDays', 'Moos nach', { unit: 'Tagen', min: 0, hint: '#111 Auto-Details: Moos wächst am Fuß von Stücken, die so lange stehen (0 = nie)' }),

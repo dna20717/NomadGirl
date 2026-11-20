@@ -144,6 +144,7 @@ export function restOf(D, save, i, seen = new Set()) {
   if (j != null) { const b = restOf(D, save, j, seen); return b && { surf: b.surf, x: b.x + (o.at.dx || 0), level: b.level + 1 }; }
   if (o.at?.ui != null && o.at?.p != null) return { surf: `${({ wall: 'w', inside: 'i' })[decorDef(D, o.id)?.place] || 'r'}${o.at.ui}`, x: o.at.p * 6, level: 0 };   // a container place is about 6 tiles
   if (Number.isFinite(o.at?.x)) return { surf: 'g', x: o.at.x, level: 0 };
+  if (Number.isFinite(o.at?.rear)) return { surf: 'h', x: -o.at.rear, level: 0 };   // #117 behind the rig
   return null;
 }
 // may this free piece go there? → reason or ''
@@ -160,7 +161,7 @@ export function freeWhy(D, save, id, at) {
     return '';
   }
   if (at.ui != null && at.p != null) return '';
-  return Number.isFinite(at.x) ? '' : 'Kein Platz';
+  return Number.isFinite(at.x) || Number.isFinite(at.rear) ? '' : 'Kein Platz';
 }
 // the ensembles that stand in the camp: [{ id, name, cozy, members: [i] }]; a piece counts once per ensemble kind
 export function ensembles(D, save) {
