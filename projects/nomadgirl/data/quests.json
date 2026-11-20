@@ -199,5 +199,106 @@
   "count": 3,
   "text": "Wir senden, aber keiner empfängt. Drei Antennen, dann hört dich ganz BigCityDelta, wenn du was zu sagen hast.",
   "done": "Hörst du das Rauschen? Das ist die Stadt. Sie kennt jetzt deinen Namen."
+ },
+ "office_nummer": {
+  "name": "Bitte ziehen Sie eine Nummer",
+  "counter": "kills",
+  "target": 8,
+  "reward": {"deltas": 90, "rep": 12},
+  "filter": "raider",
+  "gang": "Order Office",
+  "text": "Antrag 7/B: Entfernung ungenehmigter Personen im Umland. Acht Stück, gestempelt. Formular liegt bei. Es gibt kein Formular.",
+  "done": "Vorgang abgeschlossen. Ihre Akte wurde um einen lobenden Vermerk ergänzt. Behalten Sie die Nummer."
+ },
+ "office_akten": {
+  "name": "Verlorene Akten",
+  "counter": "secrets",
+  "target": 1,
+  "reward": {"deltas": 160, "rep": 15, "items": [{"item": "wissen", "count": 2}]},
+  "filter": "ministerium",
+  "gang": "Order Office",
+  "after": "office_nummer",
+  "minRep": "freund",
+  "text": "Im Archiv des Ministeriums liegt ein Raum, den es offiziell nicht gibt. Finden Sie ihn. Offiziell waren Sie nie dort.",
+  "done": "Ah. Der Raum existiert also doch. Wir werden das ordnungsgemäß vergessen. Danke, Bürgerin."
+ },
+ "levelfive_parkschein": {
+  "name": "Parkschein abgelaufen",
+  "counter": "pois",
+  "target": 1,
+  "reward": {"deltas": 70, "rep": 15},
+  "filter": "parkhaus_sued",
+  "gang": "Level Five",
+  "text": "Auf Deck drei parken Leute, die nicht zahlen. Räum das Parkhaus auf, Ebene für Ebene. Wer nicht zahlt, wird abgeschleppt. Von dir.",
+  "done": "Deck drei ist frei. Du darfst ab jetzt umsonst parken. Atmen kostet weiter extra."
+ },
+ "saltdogs_salz": {
+  "name": "Salz in die Wunde",
+  "counter": "kills",
+  "target": 6,
+  "reward": {"deltas": 80, "rep": 12, "items": [{"item": "gewuerzmischung", "count": 2}]},
+  "filter": "mutant",
+  "gang": "Salt Dogs",
+  "item": "verband",
+  "count": 3,
+  "text": "Die Grube frisst unsere Leute, und die Mutanten den Rest. Bring Verbände, und mach unten ein bisschen Platz. Sechs.",
+  "done": "Das brennt. Gut so. Salz und Verband, so überlebt man in Pit 6."
+ },
+ "saltdogs_verrat": {
+  "name": "Rache an den Gleisen",
+  "counter": "pois",
+  "target": 1,
+  "reward": {"deltas": 140, "rep": 15},
+  "filter": "metro_line4",
+  "gang": "Salt Dogs",
+  "after": "saltdogs_salz",
+  "minRep": "freund",
+  "text": "Die Tunnel Kings sagen, wir hätten ihre Gleise verkauft. Fahr zur Metro, zeig ihnen, dass Salz auch in Tunneln wirkt.",
+  "done": "Die Kings jammern über Salz in den Weichen. Musik in unseren Ohren. Du gehörst zum Rudel."
+ },
+ "crude_rohoel": {
+  "name": "Raffiniert",
+  "counter": "pois",
+  "target": 1,
+  "reward": {"deltas": 100, "rep": 12},
+  "filter": "delta_crude",
+  "gang": "Crude Boys",
+  "item": "dieselkanister",
+  "count": 1,
+  "text": "Der Brenner frisst Diesel wie Wasser. Bring einen Kanister und räum die Raffinerie von den Typen frei, die unsere Rohre anzapfen.",
+  "done": "Das Ding brennt wieder. Riechst du das? Fortschritt. Und ein bisschen Haar, aber egal."
+ },
+ "sunny_laecheln": {
+  "name": "Lächeln, bitte!",
+  "counter": "kills",
+  "target": 5,
+  "reward": {"deltas": 60, "rep": 12, "items": [{"item": "kaffee", "count": 2}]},
+  "gang": "Sunny Side",
+  "item": "schallplatte",
+  "count": 1,
+  "text": "Sunny Acres braucht gute Laune! Eine Schallplatte für das Gemeindefest, und fünf Miesepeter weniger an der Straße. Lächeln!",
+  "done": "Die Platte läuft, alle lächeln! Die, die nicht lächeln, haben wir … überzeugt. Du bist ein Sonnenschein!"
+ },
+ "sunny_fest": {
+  "name": "Das große Fest",
+  "counter": "cooked",
+  "target": 3,
+  "reward": {"deltas": 120, "rep": 15},
+  "gang": "Sunny Side",
+  "after": "sunny_laecheln",
+  "minRep": "freund",
+  "text": "Zum Fest gehört ein Festmahl! Koch drei Gerichte für Sunny Acres. Wer nicht mitisst, wird nachgeholfen.",
+  "done": "Satt, glücklich, ein bisschen bedrohlich. So soll ein Fest sein. Komm wieder, Nachbarin!"
+ },
+ "zerohour_countdown": {
+  "name": "T minus zehn",
+  "counter": "kills",
+  "target": 10,
+  "reward": {"deltas": 130, "rep": 15, "items": [{"item": "technik", "count": 2}]},
+  "gang": "Zero Hour",
+  "item": "notstrom",
+  "count": 1,
+  "text": "Der Countdown im Silo darf nicht stehen bleiben. Bring Notstrom, und schalte zehn von denen aus, die am Schaltpult rumfummeln.",
+  "done": "Die Uhr läuft wieder. Keiner weiß, was bei null passiert. Genau so mögen wir es."
  }
 }

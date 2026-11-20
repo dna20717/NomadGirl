@@ -41,3 +41,14 @@ test('Annehmen, Zähler, Abgeben: Δ und Ruf, Folge-Auftrag erst als Freund', ()
   addRep(D, save, V, 30);
   assert.deepEqual(gangJobs(D, save, V).offers, ['vultures_kanister']);
 });
+
+test('#101 Jede Gang mit Revier hat mindestens einen Auftrag, Folgeaufträge zeigen auf einen der eigenen', async () => {
+  const { loadProject } = await import('../engine/project.js');
+  const { nodeLoader } = await import('../tools/loader.js');
+  const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
+  const gangs = new Set(Object.values(D.pois).map(p => p.gang?.name).filter(Boolean));
+  const Q = Object.entries(D.quests).filter(([, q]) => q.gang);
+  for (const g of gangs) assert.ok(Q.some(([, q]) => q.gang === g), `${g} hat keinen Auftrag`);
+  assert.equal(gangs.size, 12);
+  for (const [id, q] of Q) if (q.after) assert.equal(D.quests[q.after]?.gang, q.gang, `${id}: Vorgänger gehört zur selben Gang`);
+});
