@@ -65,6 +65,7 @@ Alle Assets entstehen im Projekt selbst, mit KI oder Code. Nichts Externes. Jede
 | `assets/camp/chest.png` | Kiste im Camp: 5 Frames à 46 × 45 (zu → offen), im Spiel 90 px (`chest`) | aus dem Original zugeschnitten (Code) | 07.11.2026 |
 | `assets/sound/campfire.m4a`, `.ogg` | Lagerfeuer knistert, 29 s Schleife (`sound_campfire`) | von Daniel (WAV), mit ffmpeg umgewandelt | 07.11.2026 |
 | `assets/sound/wind.m4a`, `wind2`, `wind3` (+ `.ogg`) | Wind als leise Schleife und zwei Böen (`sound_wind`, `sound_wind2`, `sound_wind3`) | von Daniel | 07.11.2026 |
+| `assets/camp/egg/bunker.png` (+ `bunker_alt_1..3.png`) | Easter Egg unter dem Camp (#117): vergessener Bunker mit Skelett am Monitor | KI (PixelLab, Create Image Pro, AAP-64, 10 Generierungen, 4 Kandidaten) | 20.11.2026 |
 | `assets/music/intro_theme.m4a`, `.ogg` | **Intro-Musik** (#117), 120 s, 138 BPM (`intro_theme`) | KI-Musik von Daniel (eigenes lokales Modell auf eigener GPU, frei nutzbar), nach .m4a/.ogg gewandelt (ffmpeg) | 20.11.2026 |
 | `assets/music/drive_a.m4a`, `drive_b.m4a`, `.ogg` | **Fahrt-Loops** (#117): die schnellen Passagen der Intro-Musik, 10 Takte ab 61,3 s und 12 Takte ab 85,7 s, nahtlos | aus `intro_theme` geschnitten (Code, ffmpeg, Takt aus 138 BPM) | 20.11.2026 |
 | `assets/intro/panel_6.png` (Original `raw/panel_6_mit_kegeln.png`) | Panel 6 ohne gemalte Lichtkegel, die Kegel kommen jetzt animiert aus Code | KI (PixelLab Inpaint, 2 Durchgänge, 50 Generierungen) | 20.11.2026 |

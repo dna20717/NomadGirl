@@ -6777,5 +6777,13 @@
   "source": "KI-Musik von Daniel (eigenes lokales Modell auf eigener GPU, frei nutzbar); zugeschnitten mit Code (ffmpeg)",
   "date": "2026-11-20",
   "description": "#117 Schnelle Passage aus der Intro-Musik: 12 Takte ab 85,7 s, nahtlos als Loop."
+ },
+ "camp_bunker": {
+  "name": "Camp · Vergessener Bunker (Easter Egg)",
+  "kind": "image",
+  "file": "assets/camp/egg/bunker.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64; 4 Kandidaten, die anderen als bunker_alt_*.png)",
+  "date": "2026-11-20",
+  "description": "#117 Tief unter dem Camp, kaum zu sehen: ein Skelett am grünen Monitor. Spielt nie eine Rolle."
  }
 }

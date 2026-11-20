@@ -158,5 +158,6 @@
   ],
   "keepSat": 32,
   "strength": 85
- }
+ },
+ "edge": {"ground": 60, "fade": 520, "egg": "camp_bunker", "eggAt": -9, "eggScale": 200, "eggAlpha": 55}
 }

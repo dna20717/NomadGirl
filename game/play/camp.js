@@ -322,7 +322,9 @@ export function drawCampGround(scene, D, geo, T) {
   const [fw, fh] = A.frameSize, k = T / fw, over = (fh - fw) * k, sh = geo.shaft;
   const r = (seed => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296))(7);
   const hole = x => sh && x >= sh.from && x <= sh.to;
-  for (let y = geo.floor; y < geo.H; y++) for (let x = 0; x < geo.W; x++) {
+  // #117 (Daniel: „das Camp soll nach links und rechts nicht im Nichts enden“): the ground runs on beyond both edges of the world
+  const ext = C.edge?.ground ?? 60;
+  for (let y = geo.floor; y < geo.H; y++) for (let x = -ext; x < geo.W + ext; x++) {
     if (hole(x)) continue;
     const top = y === geo.floor, leftRim = sh && x === sh.from - 1, rightRim = sh && x === sh.to + 1;
     let f = top ? (leftRim ? 3 : rightRim ? 2 : r() < 0.35 ? (r() < 0.5 ? 6 : 7) : 0) : (leftRim ? 5 : rightRim ? 4 : 1);
@@ -536,10 +538,8 @@ export class Camp {
     // the van's own storage (Kofferraum): E at the rear door
     const T0 = D.tractors?.[geo.tractor?.id] || {};
     if (T0.storage?.[0]) this.storeHotspot(CAMP, geo.vanLeft + (geo.vanRight - geo.vanLeft) * (C.rig?.trunkAt ?? 12) / 100, T0.storageName || 'Kofferraum', false);   // #041: opens the Camp-Lager
-    // earth below the bottom of the world: visible when the camera zooms out to build
-    scene.add.rectangle(-4000, geo.H * T, geo.W * T + 8000, 4000, col(C.ground?.color || '#4a3628')).setOrigin(0).setDepth(-9);
-    scene.add.rectangle(-4000, geo.floor * T, 4000, geo.H * T, col(C.ground?.color || '#4a3628')).setOrigin(0).setDepth(-9);
-    scene.add.rectangle(geo.W * T, geo.floor * T, 4000, geo.H * T, col(C.ground?.color || '#4a3628')).setOrigin(0).setDepth(-9);
+    // #117 below the ground the darkness of the POIs (Daniel: „nach unten kommt die Dunkelheit aus den POIs“), with an easter egg
+    this.drawDeep(geo, T);
     // night over the world, lights shine through it
     const shade = (this.day.shade ?? 0) / 100;
     this.night = scene.add.rectangle(-4000, -4000, geo.W * T + 8000, geo.H * T + 8000, 0x0a0820, shade).setOrigin(0).setDepth(30);
@@ -547,6 +547,39 @@ export class Camp {
     for (const l of this.lights) l.setAlpha(l.base * this.lightK).setVisible(this.lightK > 0);
     this.setMood();
     this.prompt = null; this.barkAt = scene.time.now + 2500;
+  }
+
+  // under the camp: earth fading into black within a few tiles (Camp › Rand: Dunkelheit), a few stones and roots, and far down, barely
+  // visible, a forgotten bunker room (Daniel: „ein witziges Easter Egg, das der Spieler sieht, das aber niemals eine Rolle spielt“)
+  drawDeep(geo, T) {
+    const s = this.scene, E = this.C.edge || {}, ext = (E.ground ?? 60) * T, x0 = -ext - 4000, w = geo.W * T + 2 * ext + 8000, top = geo.H * T, fade = E.fade ?? 520;
+    const key = 'camp_deep';
+    if (!s.textures.exists(key)) {
+      const t = s.textures.createCanvas(key, 4, 256), ctx = t.getContext(), g = ctx.createLinearGradient(0, 0, 0, 256);
+      g.addColorStop(0, this.C.ground?.color || '#4a3628'); g.addColorStop(0.35, '#1d1418'); g.addColorStop(1, '#060608');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, 4, 256); t.refresh();
+    }
+    s.add.image(x0, top, key).setOrigin(0).setDisplaySize(w, fade).setDepth(-9);
+    s.add.rectangle(x0, top + fade - 1, w, 6000, 0x060608).setOrigin(0).setDepth(-9);
+    // stones and roots in the upper earth, fading with it
+    const g = s.add.graphics().setDepth(-8.9), r = (seed => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296))(31);
+    for (let i = 0; i < Math.round(w / 90); i++) {
+      const x = x0 + r() * w, d = r(), y = top + 10 + d * fade * 0.7, a = 0.35 * (1 - d), c = r() < 0.6 ? 0x2a2026 : 0x3b2a22;
+      if (r() < 0.75) g.fillStyle(c, a).fillRect(Math.round(x / 4) * 4, Math.round(y / 4) * 4, 8 + Math.round(r() * 3) * 4, 4 + Math.round(r() * 2) * 4);
+      else { g.lineStyle(3, 0x241812, a); g.beginPath(); g.moveTo(x, top); let yy = top; for (let k = 0; k < 6; k++) { yy += 10 + r() * 18; g.lineTo(x + (r() - 0.5) * 22, yy); } g.strokePath(); }
+    }
+    this.drawBunker(geo, T, fade);
+  }
+  drawBunker(geo, T, fade) {
+    const s = this.scene, E = this.C.edge || {}, id = E.egg, A = id && this.D.assets?.[id];
+    if (!A || !s.textures.exists(id)) return;
+    s.textures.get(id).setFilter(NEAREST());
+    const k = (E.eggScale ?? 200) / 100, x = this.groundX(E.eggAt ?? -9), y = geo.H * T + fade * 0.55;
+    const img = s.add.image(x, y, id).setOrigin(0.5, 0).setScale(k).setDepth(-8.8).setAlpha((E.eggAlpha ?? 55) / 100);
+    // the bulb and the screen still have a little power: a weak glow that flickers now and then
+    const glow = s.add.image(x, y + img.displayHeight * 0.45, glowTexture(s)).setDisplaySize(img.displayWidth * 1.4, img.displayHeight * 1.2).setTint(0x9cdb43).setBlendMode(Phaser.BlendModes.ADD).setDepth(-8.7).setAlpha(0.12);
+    s.tweens.addCounter({ from: 0, to: 1, duration: 6000, repeat: -1, onUpdate: tw => { const v = tw.getValue(), off = (v > 0.71 && v < 0.73) || (v > 0.76 && v < 0.77); img.setAlpha(((E.eggAlpha ?? 55) / 100) * (off ? 0.55 : 1)); glow.setAlpha(off ? 0.03 : 0.1 + 0.03 * Math.sin(v * 40)); } });
+    this.egg = { x, y, w: img.displayWidth, h: img.displayHeight };
   }
 
   // ---------- the rig as a dollhouse ----------

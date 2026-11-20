@@ -1291,6 +1291,11 @@ export const AREAS = {
       { title: 'Platz', fields: [NAME, num('campWidth', 'Camp rechts vom Van', { unit: 'Kacheln', min: 8, hint: 'Freifläche mit Lagerfeuer und Companions' }), num('margin', 'Rand links vom Rig', { unit: 'Kacheln', min: 2 }),
         num('height', 'Höhe', { unit: 'Kacheln', min: 8 }), ref('ground.tiles', 'Boden-Kacheln', 'assets', { hint: 'Asset der Art Kacheln, Frames: 0 Oberfläche, 1 Füllung, 2 Kante mit Wand links, 3 Säule, 4 Wand links, 5 Wand rechts, 6 und 7 Oberfläche mit Gras. Leer = Erde aus Code' }),
         color('ground.color', 'Boden'), color('ground.top', 'Bodenkante'), color('ground.far', 'Ebene in der Ferne'), num('horizon', 'Horizont', { unit: '%', min: 20, max: 95, hint: 'Vom oberen Bildschirmrand' }), DESCRIPTION] },
+      { title: 'Rand', fields: [   // #117 (Daniel: „das Camp soll nach unten, links und rechts nicht im Nichts enden“)
+        num('edge.ground', 'Boden über den Rand', { unit: 'Kacheln', min: 0, hint: 'So weit laufen die Boden-Kacheln links und rechts über die Welt hinaus' }),
+        num('edge.fade', 'Dunkelheit unten', { unit: 'px', min: 50, hint: 'Unter dem Boden: Erde, die in dieser Tiefe schwarz wird (wie in den POIs)' }),
+        ref('edge.egg', 'Easter Egg', 'assets', { hint: 'Ein Bild tief unter dem Camp, kaum zu sehen; spielt nie eine Rolle' }), num('edge.eggAt', 'Easter Egg bei', { unit: 'Kacheln ab dem Lagerplatz' }),
+        num('edge.eggScale', 'Easter Egg: Maßstab', { unit: '%', min: 10 }), num('edge.eggAlpha', 'Easter Egg: Sichtbarkeit', { unit: '%', min: 0, max: 100 })] },
       { title: 'Schrottplatz', fields: [bool('yard.enabled', 'Zeigen', { hint: 'Daniel: Lager beim Bauen = Schrottplatz links beim Schacht. Ausgebaute Werkstätten stehen auf Paletten, abgehängte Anhänger parken dahinter' }),
         num('yard.width', 'Breite', { unit: 'Kacheln', min: 4 }), bool('yard.dealer', 'Händler-Platz', { hint: 'Hier abstellen = verkaufen; Gekauftes wird hier geliefert' }), text('yard.dealerName', 'Name am Schild'),
         num('yard.dealerWidth', 'Breite Händler-Platz', { unit: 'px', min: 80 }), num('yard.palletScale', 'Werkstätten auf Paletten', { unit: '% Größe', min: 20, max: 100, hint: 'Noch ohne Wirkung: verpackte Werkstätten stehen als Kisten auf dem Schrottplatz' }), num('yard.partScale', 'Rig-Teile im Regal', { unit: '% Größe', min: 20, max: 200 }),

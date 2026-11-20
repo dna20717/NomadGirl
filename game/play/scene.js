@@ -126,6 +126,7 @@ export class PlayScene extends Phaser.Scene {
       if (this.data_.camp?.yard?.crate?.look) ids.add(this.data_.camp.yard.crate.look);
       if (this.data_.camp?.chassis?.look) ids.add(this.data_.camp.chassis.look);   // modular trailer pieces
       if (this.data_.camp?.ground?.tiles) ids.add(this.data_.camp.ground.tiles);
+      if (this.data_.camp?.edge?.egg) ids.add(this.data_.camp.edge.egg);   // #117
       // #008 cosy camp: stairs, deco around the fire, solar panels, exterior clutter on the container walls, string lights
       { const C = this.data_.camp || {}; for (const id of [C.stairs?.look, C.solar?.look, ...(C.deco || []).map(d => d.look)]) if (id) ids.add(id); }
       for (const P of Object.values(this.data_.parallax || {})) for (const id of [...(P.layers || []).map(l => l.look), P.fg?.look]) if (id) ids.add(id);   // #115 painted parallax
