@@ -53,6 +53,7 @@ node tools/decor_kit_test.mjs [--shots]   # Camp-Baukasten (#111): frei platzier
 node tools/voice_test.mjs                # Stimmen (#112): Companion brabbelt im Dialog, Leyla antwortet mit Laut, Sprechblase, Raider ruft, aus = still (5)
 node tools/grow_test.mjs [--shots]       # Ziehen zum Wachsen (#116): Griffe, Laterne höher (Licht wandert mit), Kistenstapel, Zelt länger und höher, Grenzen, Rückgängig, Stange hebt den Anker, Turm per Controller, Leyla klettert hoch, Kamera zoomt raus (9)
 node tools/select_test.mjs [--shots]    # Bau-Modus neu (#117): Zelle / Fahrgestell, Menü mit Farben, Streichen + Rückgängig, Werkbank in eine Zelle, Markierung weg, Zoom in drei Stufen, Rig zu im Bau-Modus, AvAs Funkreichweite + kein Camp-Ende, ein Rig-Schalter für Leyla und Bau-Modus (9)
+node tools/cockpit_test.mjs              # Cockpit-Hauptmenü /cockpit (#124): Menü im Radio, Sticker, Lenken, Billboard, AvA (7)
 node tools/rear_test.mjs                 # Deko hinter dem Rig (#117): Plätze hinter dem letzten Container, die Kiste wandert mit, wenn das Rig länger wird (2)
 node tools/resize_test.mjs [--shots]     # Container ziehen (#113): Griff, länger/kürzer, Werkbank hält dagegen und ploppt raus, Rückgängig, Controller (7)
 node tools/paint_test.mjs [--shots]      # #114: Pinsel (Container, Rückgängig, Zelt), Fenster + Tür in Containerfarbe, Innenkram hinter den Werkstätten, Leiter aufs Dach und Leyla klettert (6)

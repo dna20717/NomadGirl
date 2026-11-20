@@ -351,6 +351,20 @@ export const AREAS = {
         num('haze.fade', 'Übergang', { unit: 'Bildpixel', min: 0, hint: 'So hoch reicht der Boden mit Raster ins Bild' }), num('haze.band', 'Flimmer-Höhe', { unit: 'Bildpixel', min: 0 }),
         num('haze.shimmer', 'Flimmern', { unit: 'Bildpixel', min: 0, step: 0.5, hint: 'Wie weit die Zeilen seitlich zittern' }), num('haze.speed', 'Flimmer-Tempo', { min: 0, step: 0.1 }),
         num('haze.glow', 'Dunst', { unit: '%', min: 0, max: 100 }), color('haze.color', 'Dunst-Farbe', { hint: 'Leer = Horizont-Farbe des Wetters' })] },
+      { title: 'Cockpit (Hauptmenü aus dem Van, #124)', fields: [
+        ref('cockpit.shell', 'Hülle', 'assets', { hint: 'Daniel 20.11.2026: „Blick aus dem Cockpit des Vans“. Dach, Säulen, Armaturenbrett; die Scheibe ist durchsichtig. Alle Punkte unten in Pixeln dieses Bildes (384 × 216)' }),
+        ref('cockpit.wheel.look', 'Lenkrad', 'assets'), point('cockpit.wheel.at', 'Lenkrad: Mitte', { unit: 'px' }), num('cockpit.wheel.turn', 'Lenkrad: Einschlag', { unit: '°', min: 0, max: 360, hint: 'So weit dreht es bei vollem Lenken' }), num('cockpit.wheel.scale', 'Lenkrad: Maßstab', { unit: '%', min: 10, max: 400 }),
+        ref('cockpit.cluster.look', 'Instrumente', 'assets'), point('cockpit.cluster.at', 'Instrumente: Mitte', { unit: 'px' }), num('cockpit.cluster.scale', 'Instrumente: Maßstab', { unit: '%', min: 10, max: 400 }),
+        table('cockpit.cluster.needles', 'Zeiger', [point('at', 'Achse', { unit: 'px im Instrumenten-Bild' }), num('length', 'Länge', { unit: 'px', min: 1 }), select('kind', 'Zeigt', [['speed', 'Tempo'], ['rpm', 'Drehzahl'], ['fuel', 'Tank']])], { hint: 'Aus Code gezeichnet: zittern mit der Straße, springen bei Schlaglöchern' }),
+        ref('cockpit.radio.look', 'Radio', 'assets'), point('cockpit.radio.at', 'Radio: Mitte', { unit: 'px' }), num('cockpit.radio.scale', 'Radio: Maßstab', { unit: '%', min: 10, max: 400 }), point('cockpit.radio.lcd', 'Radio: Display oben links', { unit: 'px im Radio-Bild', hint: 'Dort läuft das Menü' }), size('cockpit.radio.lcdSize', 'Radio: Display-Größe', { unit: 'px' }),
+        ref('cockpit.mirror.look', 'Rückspiegel', 'assets'), point('cockpit.mirror.at', 'Rückspiegel: Mitte', { unit: 'px' }), num('cockpit.mirror.scale', 'Rückspiegel: Maßstab', { unit: '%', min: 10, max: 400 }),
+        ref('cockpit.visor.look', 'Sonnenblende Fahrer', 'assets'), point('cockpit.visor.at', 'Sonnenblende: Mitte', { unit: 'px', hint: 'Leer = hochgeklappt (nicht zu sehen)' }), num('cockpit.visor.scale', 'Sonnenblende: Maßstab', { unit: '%', min: 10, max: 400 }),
+        table('cockpit.hang', 'Hängt am Spiegel', [ref('look', 'Bild', 'assets'), point('from', 'Aufhängung', { unit: 'px' }), num('length', 'Schnur', { unit: 'px', min: 0 }), num('scale', 'Maßstab', { unit: '%', min: 10, max: 400 })], { hint: 'Pendeln mit Lenken und Schlaglöchern' }),
+        table('cockpit.clutter', 'Kram (Clutter)', [ref('look', 'Bild', 'assets'), point('at', 'Steht bei', { unit: 'px, Mitte unten' }), num('scale', 'Maßstab', { unit: '%', min: 10, max: 400 }), num('depth', 'Ebene', { hint: '0 = auf dem Armaturenbrett, 1 = vor dem Lenkrad' }), bool('wobble', 'Wackelt')], { hint: 'Daniel: „so, dass wir es später um Clutter ergänzen können“. Jede Zeile ein Stück; Ebene 0 liegt hinter dem Lenkrad' }),
+        table('cockpit.stickers', 'Aufkleber-Plätze', [point('at', 'Mitte', { unit: 'px' }), num('size', 'Größe', { unit: 'px', min: 6 }), num('turn', 'Drehung', { unit: '°' })], { hint: 'Erreichte Achievements kleben hier als Sticker (Bild der Trophäe mit weißem Rand); der Reihe nach' }),
+        ref('cockpit.billboard', 'Billboard', 'assets'), point('cockpit.board', 'Billboard: Werbefläche oben links', { unit: 'px im Billboard-Bild' }), size('cockpit.boardSize', 'Billboard: Werbefläche', { unit: 'px' }),
+        ref('cockpit.poster', 'Anzeige: Bild', 'assets'), text('cockpit.tagline', 'Anzeige: Untertitel'),
+        ref('cockpit.road', 'Straße', 'assets', { hint: 'Boden-Textur fürs Cockpit (16 m breit, rechte Spur)' })] },
     ],
     check: (x, report, p) => {
       const A = p.data.assets || {};

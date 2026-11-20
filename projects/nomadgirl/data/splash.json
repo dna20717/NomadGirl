@@ -71,5 +71,46 @@
   {"at": [688, 226]}
  ],
  "music": "intro_theme",
- "musicVolume": 50
+ "musicVolume": 50,
+ "cockpit": {
+  "shell": "ck_shell",
+  "wheel": {"look": "ck_wheel", "at": [102, 206], "turn": 120, "scale": 100},
+  "cluster": {"look": "ck_cluster", "at": [108, 154], "scale": 90, "needles": [{"at": [32, 32], "length": 10, "kind": "speed"},{"at": [88, 32], "length": 10, "kind": "rpm"}]},
+  "radio": {"look": "ck_radio", "at": [214, 176], "scale": 90, "lcd": [16, 12], "lcdSize": [75, 30]},
+  "mirror": {"look": "ck_mirror", "at": [192, 24], "scale": 55},
+  "visor": {"look": "ck_visor", "scale": 70},
+  "hang": [{"look": "ck_freshener", "from": [180, 44], "length": 8, "scale": 45},{"look": "ck_dice", "from": [200, 44], "length": 5, "scale": 40}],
+  "clutter": [
+   {"look": "ck_cactus", "at": [44, 140], "scale": 50, "depth": 0, "wobble": false},
+   {"look": "ck_hula", "at": [262, 134], "scale": 50, "depth": 0, "wobble": true},
+   {"look": "ck_toy_drone", "at": [160, 133], "scale": 34, "depth": 0, "wobble": false},
+   {"look": "ck_mug", "at": [300, 135], "scale": 40, "depth": 0, "wobble": false},
+   {"look": "ck_compass", "at": [326, 136], "scale": 30, "depth": 0, "wobble": false},
+   {"look": "ck_plush_fox", "at": [352, 139], "scale": 50, "depth": 0, "wobble": true}
+  ],
+  "stickers": [
+   {"at": [262, 38], "size": 13, "turn": -8},
+   {"at": [284, 40], "size": 12, "turn": 6},
+   {"at": [306, 38], "size": 13, "turn": -4},
+   {"at": [328, 40], "size": 12, "turn": 9},
+   {"at": [296, 168], "size": 14, "turn": -6},
+   {"at": [318, 172], "size": 13, "turn": 5},
+   {"at": [340, 168], "size": 14, "turn": -10},
+   {"at": [306, 190], "size": 13, "turn": 8},
+   {"at": [328, 192], "size": 12, "turn": -3},
+   {"at": [350, 190], "size": 13, "turn": 4},
+   {"at": [30, 178], "size": 12, "turn": -12},
+   {"at": [22, 196], "size": 12, "turn": 7},
+   {"at": [284, 58], "size": 11, "turn": -2},
+   {"at": [306, 58], "size": 11, "turn": 10},
+   {"at": [362, 170], "size": 11, "turn": -5},
+   {"at": [44, 190], "size": 11, "turn": 3}
+  ],
+  "billboard": "ck_billboard",
+  "board": [22, 26],
+  "boardSize": [196, 62],
+  "poster": "ck_poster",
+  "tagline": "A Game about finding everything by leaving all behind",
+  "road": "ck_road"
+ }
 }

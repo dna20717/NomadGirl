@@ -6954,5 +6954,221 @@
   "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz drone_hull; 16 Kandidaten in candidates/)",
   "date": "2026-11-20",
   "description": "#120 AvA von oben mit leuchtenden Rotoren."
+ },
+ "ck_shell": {
+  "name": "Cockpit · Hülle",
+  "kind": "image",
+  "file": "assets/splash/cockpit/shell.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64); Layout-Skizze aus Code als Referenz",
+  "date": "2026-11-20",
+  "description": "#124 Dach, A-Säulen, Sonnenblende, Armaturenbrett mit leeren Fächern; Scheibe durchsichtig, 384 × 216"
+ },
+ "ck_wheel": {
+  "name": "Cockpit · Lenkrad",
+  "kind": "image",
+  "file": "assets/splash/cockpit/wheel.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Von vorn, rund; der Code dreht es mit der Lenkung (Varianten in src/)"
+ },
+ "ck_cluster": {
+  "name": "Cockpit · Instrumente",
+  "kind": "image",
+  "file": "assets/splash/cockpit/cluster.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Tacho und Drehzahl ohne Zeiger (Zeiger aus Code)"
+ },
+ "ck_radio": {
+  "name": "Cockpit · Radio",
+  "kind": "image",
+  "file": "assets/splash/cockpit/radio.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Kassettenradio mit leerem LCD (Menü als Text darüber)"
+ },
+ "ck_mirror": {
+  "name": "Cockpit · Rückspiegel",
+  "kind": "image",
+  "file": "assets/splash/cockpit/mirror.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124"
+ },
+ "ck_visor": {
+  "name": "Cockpit · Sonnenblende",
+  "kind": "image",
+  "file": "assets/splash/cockpit/visor.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Fahrerseite, heruntergeklappt (noch nicht platziert)"
+ },
+ "ck_billboard": {
+  "name": "Billboard am Straßenrand",
+  "kind": "image",
+  "file": "assets/splash/cockpit/billboard.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Rostiges Gerüst mit Lampen, Laufsteg, Graffiti; die Werbefläche (x 22, y 26, 196 × 62) bekommt die Anzeige aus Code"
+ },
+ "ck_poster": {
+  "name": "Billboard · Anzeige",
+  "kind": "image",
+  "file": "assets/splash/cockpit/poster.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Hintergrund der Werbung: Leyla, Van, AvA, Sonne über dem Highway"
+ },
+ "ck_road": {
+  "name": "Cockpit · Straße",
+  "kind": "image",
+  "file": "assets/splash/cockpit/road.png",
+  "source": "Code (tools/cockpit_road.py) aus den PixelLab-Kacheln ck_asphalt und ck_desert",
+  "date": "2026-11-20",
+  "description": "#124 16 m breit, US-Zweispurig, wir fahren rechts"
+ },
+ "ck_asphalt": {
+  "name": "Kachel · Asphalt",
+  "kind": "image",
+  "file": "assets/splash/cockpit/asphalt_tile.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64), nahtlos per Code",
+  "date": "2026-11-20",
+  "description": "#124 62 px"
+ },
+ "ck_desert": {
+  "name": "Kachel · Wüste",
+  "kind": "image",
+  "file": "assets/splash/cockpit/desert_tile.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64), nahtlos per Code",
+  "date": "2026-11-20",
+  "description": "#124 62 px, rissiger Lehm"
+ },
+ "ck_freshener": {
+  "name": "Cockpit-Kram · Wunderbaum",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/freshener.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
+ },
+ "ck_dice": {
+  "name": "Cockpit-Kram · Würfel",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/dice.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
+ },
+ "ck_cassette": {
+  "name": "Cockpit-Kram · Kassette",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/cassette.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
+ },
+ "ck_hula": {
+  "name": "Cockpit-Kram · Hula-Wackelfigur",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/hula.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
+ },
+ "ck_mug": {
+  "name": "Cockpit-Kram · Kaffeebecher",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/mug.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
+ },
+ "ck_polaroid": {
+  "name": "Cockpit-Kram · Polaroid",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/polaroid.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
+ },
+ "ck_cactus": {
+  "name": "Cockpit-Kram · Kaktus-Dose",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/cactus.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
+ },
+ "ck_map": {
+  "name": "Cockpit-Kram · Karte",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/map.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
+ },
+ "ck_toy_drone": {
+  "name": "Cockpit-Kram · Drohnen-Spielzeug",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/toy_drone.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
+ },
+ "ck_bottlecap_rosary": {
+  "name": "Cockpit-Kram · Kronkorken-Kette",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/bottlecap_rosary.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
+ },
+ "ck_chips": {
+  "name": "Cockpit-Kram · Chipstüte",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/chips.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
+ },
+ "ck_sunglasses": {
+  "name": "Cockpit-Kram · Sonnenbrille",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/sunglasses.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
+ },
+ "ck_compass": {
+  "name": "Cockpit-Kram · Kompass",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/compass.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
+ },
+ "ck_plush_fox": {
+  "name": "Cockpit-Kram · Plüsch-Fennek",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/plush_fox.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
+ },
+ "ck_rabbit_foot": {
+  "name": "Cockpit-Kram · Hasenpfote",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/rabbit_foot.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
+ },
+ "ck_spark_plug": {
+  "name": "Cockpit-Kram · Zündkerze",
+  "kind": "image",
+  "file": "assets/splash/cockpit/clutter/spark_plug.png",
+  "source": "KI (PixelLab, 1-Direction-Objekt, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#124 Clutter fürs Cockpit"
  }
 }

@@ -164,6 +164,9 @@ export async function startSplash(canvas, opts = {}) {
   }
 
   function drawDrone(t, now) {
+    const brain = opts.droneBrain?.({ t, now, W, H, still });   // #124 the page steers AvA: { x, y (0..1 of the screen), scale, rot, mood, bubble }
+    if (brain?.mood) { const m = (DR.moods || []).find(q => q.mood === brain.mood); if (m) Object.assign(drone, { frame: m.frame ?? 0, until: now + 200, next: now + 4000, bubble: brain.bubble ?? m.kaomoji ?? '', bubbleUntil: now + 200 }); }
+    else if (brain?.bubble) Object.assign(drone, { bubble: brain.bubble, bubbleUntil: now + 200, next: now + 4000 });
     if (!still && now > drone.next) {   // next random mood
       const m = droneMoods[Math.floor(Math.random() * droneMoods.length)];
       if (m) {
@@ -174,10 +177,12 @@ export async function startSplash(canvas, opts = {}) {
     }
     if (now > drone.until) drone.frame = 0;
     const [fw, fh] = droneA.frameSize || [droneImg.width, droneImg.height], [ox, oy] = droneA.origin || [fw / 2, fh / 2];
-    const wide = W / H > 1.15, k = H * SD.height / 100 / fh * (wide ? 1 : 0.75);
+    const wide = W / H > 1.15, k = H * SD.height / 100 / fh * (wide ? 1 : 0.75) * (brain?.scale ?? 1);
     const drift = Math.sin(t * 0.37) * 0.018 * W, bob = Math.sin(t * 2.1) * SD.bob / 100 * H;
-    const x = W * (wide ? SD.at[0] : Math.max(20, 50 - (68 - SD.at[0]) * 2.6)) / 100 + drift - look.x * W * 0.008, y = H * (SD.at[1] + (wide ? 0 : 7)) / 100 + bob - look.y * H * 0.006;
-    const rot = Math.cos(t * 0.37) * 0.06 + Math.cos(t * 2.1) * 0.03, px = Math.round(x), py = Math.round(y);
+    let x = W * (wide ? SD.at[0] : Math.max(20, 50 - (68 - SD.at[0]) * 2.6)) / 100 + drift - look.x * W * 0.008, y = H * (SD.at[1] + (wide ? 0 : 7)) / 100 + bob - look.y * H * 0.006;
+    if (brain) { x = brain.x * W; y = brain.y * H + bob * 0.5; }
+    const rot = Math.cos(t * 0.37) * 0.06 + Math.cos(t * 2.1) * 0.03 + (brain?.rot ?? 0), px = Math.round(x), py = Math.round(y);
+    opts.onDrone?.({ ctx, x: px, y: py, k, W, H, t, behind: true });
     if (cables.list.length) {   // behind the hull, in screen pixels
       const dtc = lastDrone ? Math.min(50, now - lastDrone) : 16; lastDrone = now;
       cables.step(dtc, hullPoint(px, py, rot, 1, k, ox, oy), k);
@@ -206,6 +211,7 @@ export async function startSplash(canvas, opts = {}) {
     }
     part(true);
     ctx.restore(); ctx.imageSmoothingEnabled = false;
+    opts.onDrone?.({ ctx, x: px, y: py, k, W, H, t, behind: false });
     if (drone.bubble && now < drone.bubbleUntil) {
       const B = DR.bubble || {}, size = Math.round(Math.max(14, H * 0.028)), fade = Math.min(1, (drone.bubbleUntil - now) / 300);
       ctx.font = `${size}px VT323, monospace`; const tw = ctx.measureText(drone.bubble).width, pad = size * 0.4;
