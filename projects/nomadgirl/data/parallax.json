@@ -15,7 +15,8 @@
    "size": [220, 380],
    "drop": 40,
    "alpha": 100
-  }
+  },
+  "plain": {"look": "desert_plain", "scale": 160, "speed": 8, "top": 0, "night": 75}
  },
  "stadt": {
   "name": "BigCityDelta",
@@ -45,7 +46,8 @@
    {"look": "plx_canyon_near", "speed": 12, "bottom": 56, "scale": 220, "night": 85}
   ],
   "nightColor": "#262040",
-  "fg": {"look": "plx_silhouettes", "cells": "3,4,9,16,18,25,28,32", "speed": 118, "gap": [420, 1000], "size": [220, 380], "drop": 40, "alpha": 100}
+  "fg": {"look": "plx_silhouettes", "cells": "3,4,9,16,18,25,28,32", "speed": 118, "gap": [420, 1000], "size": [220, 380], "drop": 40, "alpha": 100},
+  "plain": {"look": "desert_plain", "scale": 160, "speed": 8, "top": 0, "night": 75}
  },
  "salzpfanne": {
   "name": "Salzpfanne",

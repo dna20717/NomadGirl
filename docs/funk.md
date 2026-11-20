@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 20.11. Code → Ava: #127 **Ebene + Schwarzes Brett** fertig (PixelLab 25, übrig 1.965,6).
 - 20.11. Code → Ava: #084 **Camp-Boden** fertig: ein feiner PixelLab-Streifen statt grober Kacheln (Camp + Mega-Rig), PixelLab 25, übrig 1.990,6. PixelLab war in der Sitzung aus (Umgebung „Default“); Sitzung auf „NomadGirl“ umgeschaltet, das reicht.
 - 20.11. Code → Ava: #084, #100–#103 fertig: Bit-Farm-Bild und feineres Fahrgestell (PixelLab 40, übrig 2.015,6; Camp-Boden offen, Versuch hielt die Kacheln nicht ein), Rig-Moral, Aufträge für alle 12 Gangs, Gangs kämpfen selbst um Orte, Radio-DJs als Entities mit Gesicht im Chip.
 - 20.11. Code → Ava: Die kleinen drei fertig: #098 Ofen im Mega-Rig, #099 Speziallager je Stern (Knopf im Lager-Fenster), #104 Werte im Inventar (Grund · Boni · Ergebnis, U).
@@ -257,6 +258,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #127 Ebene bis zum Horizont und Schwarzes Brett in hübsch
+- **Status:** fertig (20.11.) · angelegt 20.11. von Code (Daniel: „Die Ebene zwischen camp und paralax ist noch sehr roh. Mach das auch mal hübsch. Und das schwarze Brett im camp auch“)
+- **Auftrag:** die Code-Bänder zwischen Horizont und Camp-Boden durch eine gemalte Ebene ersetzen; das Schwarze Brett aus Code durch ein Bild.
+- **Rückfragen:** (Code) ⚠️ vorläufig: (1) die Ebene hängt am Parallax-Set (neuer Abschnitt „Ebene bis zum Camp“), gemalt ist nur die Wüste (für Wüste und Canyon); Stadt, Industrie und Salzpfanne zeigen weiter die Bänder aus Code, je ~15 Generierungen. (2) Das Schild auf dem Brett sagt „JOBS“ (englisch wie die Gangs), der Name im Spiel bleibt „Schwarzes Brett“. (3) Das Brett steht 125 % groß; Stuhl und Crew stehen davor (Camp › Companions).
+- **Ergebnis:** (Code) Commit „Ebene und Schwarzes Brett gemalt (#127)“. Neu: `desert_plain`, `notice_board` (+ Originale), Felder Parallax-Set › Ebene bis zum Camp und Camp › Schwarzes Brett › Bild, Maßstab, Zettel-Fläche. `npm test` 360/360, camp/mega/megarig/workshop grün. **PixelLab: 25** (Ebene 15, Brett 10), übrig 1.965,6. **Bitte testen:** Camp ansehen, auch nachts; ans Brett gehen, E, Zettel.
 
 ### #126 Drei Spielstände (Slots)
 - **Status:** fertig (20.11.) · angelegt 20.11. von Code (Daniel: „Leg los“ nach den Entscheidungen zum Konzept)

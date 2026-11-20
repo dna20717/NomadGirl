@@ -11,7 +11,7 @@ import { level as cisternLevel, tap as cisternTap } from '../cistern.js';
 import { anchors as lightAnchors, catenary, lightsConfig, mastAt } from '../string_lights.js';
 import { clockText, advance, hoursUntil, solarState, storeKeyOf, CAMP } from '../save.js';
 import { budgets, partSlots, passengers, roofFree, containerPlaces, containerWeight } from '../rig.js';
-import { parallaxLayers, setFor } from './parallax.js';
+import { parallaxLayers, setFor, mixTint } from './parallax.js';
 import { occupancy } from '../inventory.js';
 import { offers, accept, claim, progressOf, qstate } from '../quests.js';
 import { Benches, benchTexture, crateTexture } from './benches.js';
@@ -305,7 +305,16 @@ export function drawCampBackground(scene, C) {
     ctx.globalAlpha = 1;
   })).setOrigin(0).setScrollFactor(0.035, 0).setDepth(-98.2).setAlpha(haze(0.5));
   if (coded) ridge('camp_ridge_near', -97.6, 0.05, 6, 16, E.nearRidge || '#1d1626', E.nearRim || '#3a2b3d', 23, 0.8);
-  // 4 · the plain: bands getting lighter towards us, dunes
+  // 4 · the plain: painted (Parallax-Set › Ebene bis zum Camp, #084), else bands getting lighter towards us, dunes
+  const PL = D.parallax?.[plx]?.plain;
+  if (PL?.look && scene.textures.exists(PL.look)) {
+    const src = scene.textures.get(PL.look).getSourceImage(), ks = (PL.scale ?? 240) / 100, sf = (PL.speed ?? 8) / 100, top = hy + (PL.top ?? 0);
+    const worldW = scene.physics?.world?.bounds?.width || W * 4;
+    const ts = scene.add.tileSprite(-src.width * ks * 0.25, top, W * 1.5 + worldW * sf + src.width * ks, Math.max(src.height * ks, H - top), PL.look).setOrigin(0).setTileScale(ks).setScrollFactor(sf, 0).setDepth(-97);
+    const n = Math.min(1, night * (PL.night ?? 75) / 100);
+    if (n > 0) ts.setTint(mixTint(0xffffff, col(D.parallax[plx].nightColor || '#262040'), n));
+    return ts;
+  }
   const g = scene.make.graphics({}, false), far = C.ground?.far || '#6b4a36';
   for (let i = 0; i < 6; i++) g.fillStyle(shadeOf(far, 0.62 + i * 0.09)).fillRect(0, hy + Math.round((H - hy) * Math.pow(i / 6, 1.6) / k) * k, W * 1.5, H);
   for (let d = 0; d < 3; d++) {

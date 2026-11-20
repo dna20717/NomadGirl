@@ -22,7 +22,7 @@ export function mirroredTexture(scene, key) {
   t.refresh(); t.setFilter(Phaser.Textures.FilterMode.NEAREST);
   return out;
 }
-const mixTint = (a, b, k) => { const c = (x, s) => (x >> s) & 255, m = s => Math.round(c(a, s) + (c(b, s) - c(a, s)) * k); return (m(16) << 16) | (m(8) << 8) | m(0); };
+export const mixTint = (a, b, k) => { const c = (x, s) => (x >> s) & 255, m = s => Math.round(c(a, s) + (c(b, s) - c(a, s)) * k); return (m(16) << 16) | (m(8) << 8) | m(0); };
 
 // the layers of a set on the background camera: each a tile sprite as wide as it needs to be for the world at its speed
 export function parallaxLayers(scene, D, setId, { horizon, depth = -98.8, night = 0, worldW = 0, alpha = 1, maxSpeed = 100, veil = 0, veilColor = 0x6b4a6a } = {}) {

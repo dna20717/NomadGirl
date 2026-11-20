@@ -93,11 +93,11 @@ export class PlayScene extends Phaser.Scene {
     for (const id of [SP?.look, SP?.dish?.look, SP?.roof?.front, this.data_.rooms?.[this.roomId]?.backdrop?.image]) if (id) ids.add(id);
     if (this.data_.camp?.chest?.look) ids.add(this.data_.camp.chest.look);   // chests in POIs too
     if (this.mode === 'run') for (const r of Object.values(this.data_.rooms || {})) if (r.backdrop?.image) ids.add(r.backdrop.image);
-    for (const P of Object.values(this.data_.parallax || {})) for (const id of [...(P.layers || []).map(l => l.look), P.fg?.look]) if (id) ids.add(id);   // #115 painted parallax (POIs, camp)   // a level wears its entrance's backdrop
+    for (const P of Object.values(this.data_.parallax || {})) for (const id of [...(P.layers || []).map(l => l.look), P.fg?.look, P.plain?.look]) if (id) ids.add(id);   // #115 painted parallax (POIs, camp)   // a level wears its entrance's backdrop
     // mega rig prototype (#022, megarig.html): the raw vehicle, add-ons, all container pictures, the camp ground
     if (this.args.megarig) {
       const V = this.data_.megarigs?.[this.args.megarig.id] || {};
-      for (const id of [V.hull?.look, ...Object.values(V.skin || {}).filter(v => typeof v === 'string'), this.data_.camp?.chassis?.look, this.data_.camp?.ground?.tiles, this.data_.camp?.ground?.strip, ...Object.values(this.data_.rigAddons || {}).map(a => a.look)]) if (id) ids.add(id);
+      for (const id of [V.hull?.look, ...Object.values(V.skin || {}).filter(v => typeof v === 'string'), this.data_.camp?.chassis?.look, this.data_.camp?.ground?.tiles, this.data_.camp?.ground?.strip, this.data_.camp?.board?.look, ...Object.values(this.data_.rigAddons || {}).map(a => a.look)]) if (id) ids.add(id);
       for (const c of Object.values(this.data_.containers || {})) for (const k of [c.look, c.lookClosed]) if (k) ids.add(k);
       if (this.data_.camp?.containers?.tiles) ids.add(this.data_.camp.containers.tiles);   // #113 containers of any length
       for (const m of V.modules || []) for (const w of m.workshops || []) if (this.data_.workshops?.[w]?.look) ids.add(this.data_.workshops[w].look);   // #028 workshops on board
@@ -124,11 +124,11 @@ export class PlayScene extends Phaser.Scene {
       for (const a of ['items', 'weapons']) for (const t of Object.values(this.data_[a] || {})) if (t.tags?.includes('trophy') && t.look && A[t.look]?.kind === 'icons') ids.add(t.look);
       if (this.data_.camp?.yard?.crate?.look) ids.add(this.data_.camp.yard.crate.look);
       if (this.data_.camp?.chassis?.look) ids.add(this.data_.camp.chassis.look);   // modular trailer pieces
-      for (const id of [this.data_.camp?.ground?.tiles, this.data_.camp?.ground?.strip]) if (id) ids.add(id);
+      for (const id of [this.data_.camp?.ground?.tiles, this.data_.camp?.ground?.strip, this.data_.camp?.board?.look]) if (id) ids.add(id);
       if (this.data_.camp?.edge?.egg) ids.add(this.data_.camp.edge.egg);   // #117
       // #008 cosy camp: stairs, deco around the fire, solar panels, exterior clutter on the container walls, string lights
       { const C = this.data_.camp || {}; for (const id of [C.stairs?.look, C.solar?.look, ...(C.deco || []).map(d => d.look)]) if (id) ids.add(id); }
-      for (const P of Object.values(this.data_.parallax || {})) for (const id of [...(P.layers || []).map(l => l.look), P.fg?.look]) if (id) ids.add(id);   // #115 painted parallax
+      for (const P of Object.values(this.data_.parallax || {})) for (const id of [...(P.layers || []).map(l => l.look), P.fg?.look, P.plain?.look]) if (id) ids.add(id);   // #115 painted parallax
       for (const w of Object.values(this.data_.workshops || {})) if (w.outside) ids.add(w.outside);
       for (const c of this.data_.camp?.critters || []) for (const id of [c.look, ...String(c.idles || '').split(',').map(x => x.trim())]) if (id) ids.add(id);   // #107 Kleinvieh im Camp (+ Idles)
       const S = this.data_.camp?.sound || {};

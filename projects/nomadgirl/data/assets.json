@@ -7206,5 +7206,40 @@
   "source": "KI (PixelLab, Create Image Pro)",
   "date": "20.11.2026",
   "description": "Rohbild von PixelLab, 512 × 256, mit Löchern vom Freistellen."
+ },
+ "notice_board_source": {
+  "name": "Schwarzes Brett (Original)",
+  "kind": "source",
+  "file": "assets/camp/source/notice_board_source.png",
+  "source": "KI (PixelLab, Create Image Pro)",
+  "date": "20.11.2026",
+  "description": "Rohbild 192 × 256 mit Erdhaufen unten."
+ },
+ "notice_board": {
+  "name": "Schwarzes Brett",
+  "kind": "image",
+  "file": "assets/camp/notice_board.png",
+  "origin": [96, 208],
+  "source": "KI (PixelLab, Create Image Pro 192 × 256, Stil: Camp-Boden fein, Palette AAP-64, streng seitlich); unten auf die Pfosten zugeschnitten",
+  "derivedFrom": "notice_board_source",
+  "date": "20.11.2026",
+  "description": "#084: Brett aus Planken mit Blechdach, Schild JOBS und Lampe, zwei Pfosten. Zettel-Fläche x 18–172, y 68–156 (Camp › Schwarzes Brett). 10 Generierungen."
+ },
+ "desert_plain_source": {
+  "name": "Ebene Wüste (Original)",
+  "kind": "source",
+  "file": "assets/backgrounds/parallax/source/desert_plain_source.png",
+  "source": "KI (PixelLab, Create Image Pro)",
+  "date": "20.11.2026",
+  "description": "Rohbild 512 × 160 mit Himmelsstreifen oben."
+ },
+ "desert_plain": {
+  "name": "Ebene Wüste",
+  "kind": "image",
+  "file": "assets/backgrounds/parallax/desert_plain.png",
+  "source": "KI (PixelLab, Create Image Pro 512 × 160, Stil: Parallax Canyon nah, Palette AAP-64); Himmel oben freigestellt, nahtlos per Min-Cut aus Code",
+  "derivedFrom": "desert_plain_source",
+  "date": "20.11.2026",
+  "description": "#084: die Ebene zwischen Horizont und Camp-Boden: Dunst, Dünen, Büsche, ein Autowrack und ein Mast in der Ferne, vorne Felsen. 464 × 160, waagrecht nahtlos. 15 Generierungen."
  }
 }
