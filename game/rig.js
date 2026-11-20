@@ -15,7 +15,7 @@ import { advance, fitContainers, campStore, CAMP, campName } from './save.js';
 import { canResize } from './inventory.js';
 import { synergyPower } from './synergy.js';
 import { upgradeOf, levelOf as starsOf } from './upgrades.js';
-import { remap as remapDecor, compact as compactDecor } from './decor.js';
+import { remap as remapDecor, compact as compactDecor, placeOf as decorPlace } from './decor.js';
 
 const clone = x => JSON.parse(JSON.stringify(x));
 export const B = D => D.build || {};
@@ -396,6 +396,14 @@ export function restore(save, snap) {
   return save;
 }
 
+// #125 (Backlog C14): is place p (container places, halves allowed) of unit ui's roof under the container stacked on it?
+export function roofCovered(D, rig, ui, p) {
+  const u = rig.units?.[ui], top = rig.units?.[ui + 1];
+  if (!u || !top || (top.level || 0) <= (u.level || 0)) return false;
+  const n = placesOf(D, u), k = placesOf(D, top), free = Math.max(0, n - k);
+  const off = top.slot != null ? Math.max(0, Math.min(free, top.slot)) : Math.floor(free / 2);
+  return p > off - 0.5 && p < off + k - 0.5 + 1e-6;
+}
 // panels whose roof is gone (stacked over, container sold) go onto the scrapyard
 export function dropHomeless(D, rig) {
   const list = rig.parts?.solar;
@@ -436,6 +444,8 @@ export function applyDraft(D, save, d) {
     const now = Object.fromEntries(d.rig.units.map((u, ui) => [u.key ?? `new:${ui}`, ui]));
     rig.decor = clone(d.rig.decor);
     remapDecor(rig, ui => now[`rig:${ui}`] ?? null);
+    // #125 (Backlog C14): what stood on a roof that now carries a container would sit inside it: into the Lager
+    compactDecor(rig, o => o.at?.ui != null && o.at?.p != null && o.at.side == null && ['roof', 'free'].includes(decorPlace(D, o.id)) && roofCovered(D, rig, o.at.ui, o.at.p), { spare: true });
   }
   d.rig.units.forEach((u, ui) => u.workshops.forEach(w => {
     if (!w.key) return;

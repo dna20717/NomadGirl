@@ -139,10 +139,14 @@ export function activate(D, save, id) {
   if (!m.active) { m.bay = { tractor: save.rig.tractor, parts: clone(save.rig.parts || {}) }; save.rig.parts = {}; }   // the old tractor's parts stay with it in the bay
   m.active = id;
   m.stage[id] ??= 0;
-  delete save.rig.lights;   // the camp's strings hang on trailer corners; aboard they hang on the grid (mega.lights)
+  // the camp's strings hang on trailer corners; aboard they hang on the grid (mega.lights). #125 (Backlog C15): they come down
+  // like with „Abhängen“ (the same Δ back) instead of vanishing
+  const strings = save.rig.lights?.length || 0, refund = strings * Math.round((D.camp?.lights?.price ?? 10) * (D.camp?.lights?.back ?? 50) / 100);
+  delete save.rig.lights;
+  save.deltas = (save.deltas || 0) + refund;
   swapTractor(D, save, T);
   const lost = settle(D, save);
-  return { ok: true, lost };
+  return { ok: true, lost, ...(strings ? { strings, refund } : {}) };
 }
 // back into the old rig from the loading bay: the containers line up behind it again and stack as far as it may (Aufräumen 16.11.:
 // the tank's container always comes along, the rest in their order; what does not fit goes into the Lager, its storages rehomed)

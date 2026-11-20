@@ -811,10 +811,16 @@ export class Camp {
     const inv = () => this.scene.hud.inv, isOpen = () => inv()?.isOpen && inv().other?.key === key;
     this.hotspots.push({ rig, x, w: 50, top: this.curTop, name, hint: () => isOpen() ? 'Schließen' : 'Öffnen', store: key, act: () => { if (isOpen()) inv().close(); else this.scene.openContainer(key); } });
   }
+  // one workshop's E-Punkt, in the rig and on board a mega rig (camp_mega.js); #125 (Backlog C15): one place instead of two copies
+  benchSpot(ui, w, def, cx, cw, floor, { top, minW = 0, verb = 'Ansehen' } = {}) {
+    const store = def.grid && storeKeyOf(this.D, this.box.save, ui, w.at);   // a Speziallager its own, a shelf the Camp-Lager (#041)
+    this.hotspots.push({ rig: true, place: `${ui}:${w.at}`, x: cx + cw / 2, w: Math.max(minW, cw / 2), ...(top != null ? { top } : {}), floor, name: def.name || w.id,
+      hint: this.synHint(`${ui}:${w.at}`, store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || verb), ws: w.id,
+      act: () => store ? this.scene.openContainer(store) : this.use(w.id, `${ui}:${w.at}`) });
+  }
   workshopHotspot(u, w, def, cx, cw, labelY) {
     const R = this.C.rig || {};
-    const store = def.grid && storeKeyOf(this.D, this.scene.box.save, u.ui, w.at);   // a Speziallager its own, a shelf the Camp-Lager (#041)
-    this.hotspots.push({ rig: true, place: `${u.ui}:${w.at}`, x: cx + cw / 2, w: cw / 2, top: this.curTop, floor: u.floorY, name: def.name || w.id, hint: this.synHint(`${u.ui}:${w.at}`, store ? 'Öffnen' : this.noPower && def.power < 0 ? 'Kein Strom' : VERB[def.function] || 'Ansehen'), ws: w.id, act: () => store ? this.scene.openContainer(store) : this.use(w.id, `${u.ui}:${w.at}`) });
+    this.benchSpot(u.ui, w, def, cx, cw, u.floorY, { top: this.curTop });
     if (R.labels !== false && def.function !== 'tank') {   // the cryo tank has its own screen
       // subtle (#008): small, soft, a little see-through; they still say what stands where
       const t = this.scene.add.text(cx + cw / 2, labelY, titleOf(this.D, w), { fontFamily: 'VT323, monospace', fontSize: '20px', color: '#e9d8b4', stroke: '#0d0a12', strokeThickness: 4 }).setOrigin(0.5, 0).setDepth(-14).setAlpha(LABEL_ALPHA);

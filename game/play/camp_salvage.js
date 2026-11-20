@@ -141,7 +141,7 @@ CampSalvage.prototype.moveAboard = function (id, title = null) {
     const r = activate(D, save, id);
     if (!r.ok) return s.hud.toast('Umzug geht nicht', r.why, 'warn');
     s.box.persist?.(true);
-    s.goCamp({ banner: [`Willkommen an Bord: ${V.name || id}`, r.lost ? `${r.lost} Container passen noch nicht, sie warten im Lager` : `Dein ${bay} parkt in der Ladebucht`, 'trophy'], fade: 900 });
+    s.goCamp({ banner: [`Willkommen an Bord: ${V.name || id}`, r.lost ? `${r.lost} Container passen noch nicht, sie warten im Lager` : r.strings ? `Lichterketten abgehängt: +${r.refund} Δ` : `Dein ${bay} parkt in der Ladebucht`, 'trophy'], fade: 900 });
   };
   s.hud.menu({ title: title || `Umziehen: ${V.name || id}`, sub: `Ziehst du in ${V.name || id} um? Dein ${bay} fährt in die Ladebucht, alle Container und Werkstätten kommen mit an Bord. Zurück geht es jederzeit über die Ladebucht.`,
     items: [{ label: 'An Bord gehen', primary: true, act: go }, { label: 'Später (über die Karte)', act: () => s.goCamp({ fade: 600, keepPlace: true }) }],

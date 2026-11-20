@@ -22,18 +22,20 @@ export function cells(D, rig, mega = false) {
   if (mega) U.forEach((u, ui) => { if (u.kind === 'container' && u.pos) for (let k = 0; k < placesOf(D, u); k++) put(u.pos.place + k, u.pos.story, ui, k); });
   else {
     // the chain: ground units from the van to the left (screen order: place 0 on the left of each box), stacks on top of their base
-    let right = 0, base = null;
+    // #125 (Backlog C14): every level rests on the one right below it, so stacks of 3 and more line up too
+    let right = 0, bases = [];
     U.forEach((u, ui) => {
       if (u.kind !== 'container') return;
-      const n = placesOf(D, u);
+      const n = placesOf(D, u), base = u.level ? bases[u.level - 1] : null;
       if (u.level && base) {
         const free = base.n - n, off = u.slot != null ? Math.max(0, Math.min(free, u.slot)) : Math.floor(free / 2);
         for (let k = 0; k < n; k++) put(base.x + off + k, u.level, ui, k);
+        bases[u.level] = { x: base.x + off, n };
         return;
       }
       const x = right - n;
       for (let k = 0; k < n; k++) put(x + k, 0, ui, k);
-      base = { x, n }; right = x;
+      bases = [{ x, n }]; right = x;
     });
   }
   for (const c of out.values()) {

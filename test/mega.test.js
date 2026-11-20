@@ -182,3 +182,13 @@ test('Zugmaschinen-Bergung an Bord: die neue wartet in der Ladebucht', () => {
   assert.equal(s.rig.tractor, 'crawler');
   assert.equal(s.mega.bay.tractor, D.salvage[id].tractor);
 });
+
+test('#125 (C15): Lichterketten des Camps kommen beim Einsteigen zurück wie beim Abhängen', () => {
+  const s = fresh(), back = Math.round((D.camp?.lights?.price ?? 10) * (D.camp?.lights?.back ?? 50) / 100);
+  s.rig.lights = [['1:0', '1:1'], ['0:1', '1:0']];
+  const before = s.deltas, r = activate(D, s, 'crawler');
+  assert.ok(r.ok);
+  assert.equal(r.strings, 2);
+  assert.equal(s.deltas, before + 2 * back);
+  assert.equal(s.rig.lights, undefined);
+});

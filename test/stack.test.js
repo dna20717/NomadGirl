@@ -82,3 +82,15 @@ test('Container-Slots: kurzer Container links, Mitte oder rechts auf einem lange
   assert.equal(act(D, s, d => stackOn(D, d, { ui: 2 }, 1, 9)).ok, true);   // clamped to the right
   assert.equal(s.rig.units[2].slot, 2);
 });
+
+test('#125 (C14): Dach-Deko unter einem aufgestapelten Container kommt ins Lager, der freie Teil des Dachs bleibt', () => {
+  const s = fresh();
+  s.rig.units.splice(1); s.rig.tractor = s.rig.units[0].id = 'lkw';
+  act(D, s, d => buyContainer(D, d, 'container_40'));
+  act(D, s, d => buyContainer(D, d, 'container_10'));
+  assert.equal(act(D, s, d => attachAt(D, d, s.rig.spare.containers.indexOf('container_40'), 1)).ok, true);
+  s.rig.decor = [{ id: 'pflanze', at: { ui: 1, p: 0 } }, { id: 'kaktus', at: { ui: 1, p: 2 } }];
+  assert.equal(act(D, s, d => stackOn(D, d, { spare: 0 }, 1, 2)).ok, true);   // the short one on the right end
+  assert.deepEqual(s.rig.decor.map(o => o.id), ['pflanze']);
+  assert.ok(s.rig.spare.decor.includes('kaktus'));
+});
