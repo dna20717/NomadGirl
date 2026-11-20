@@ -15,6 +15,37 @@ import { hints, NavCursor } from './ui_nav.js';
 const de = n => Number(n).toLocaleString('de-DE');
 
 export class BuildSelect {
+  // Klickpunkte (Daniel 20.11.2026: „vielleicht sollte man Containern im Baumodus eine Art Klickpunkt geben, anstatt es so kompliziert zu
+  // machen. Ein Container kann einen haben, eine Zelle kann einen haben“): a gold point on every container's chassis (the whole
+  // container) and a small one in every empty place (that cell). Only the points mark; workshops are still packed directly.
+  selPoints() {
+    const out = [], camp = this.camp, U = this.save.rig.units;
+    if (camp.geo.mega) return out;
+    for (const u of camp.geo.units || []) {
+      if (u.ui <= 0) continue;
+      const base = u.base ?? camp.ground;
+      out.push({ kind: 'container', ui: u.ui, id: u.id, unit: u, x: (u.x0 + u.x1) / 2, y: Math.min(base - 18, u.floorY + (base - u.floorY) * 0.45) });
+      for (let p = 0; p < (u.places || 0); p++) if (!(U[u.ui]?.workshops || []).some(w => p >= w.at && p < w.at + (wsDef(this.D, w.id).places || 1)))
+        out.push({ kind: 'cell', ui: u.ui, p, id: u.id, unit: u, x: u.in0 + (p + 0.5) * u.cell, y: (u.inTop + u.floorY) / 2 + 10 });
+    }
+    return out;
+  }
+  pickPoint(x, y) {
+    const z = Math.max(0.3, this.scene.cam.zoom), R = 24 / z;
+    for (const q of this.selPoints()) if (Math.hypot(x - q.x, y - q.y) < (q.kind === 'container' ? R * 1.2 : R)) return { kind: q.kind, from: 'rig', ui: q.ui, p: q.p, id: q.id, unit: q.unit, point: true, chassis: q.kind === 'container', item: { x0: q.x - R, x1: q.x + R, y0: q.y - R, y1: q.y + R } };
+    return null;
+  }
+  drawPoints(g, z, pulse) {
+    if (this.drag || this.decorHold || this.wire || this.painting != null || this.resizing || this.growing) return;
+    const w = this.ava?.on ? this.ava : this.pointer, hot = w && this.pickPoint(w.x, w.y);
+    for (const q of this.selPoints()) {
+      const big = q.kind === 'container', sel = this.sel && this.sel.kind === q.kind && this.sel.ui === q.ui && (!big ? this.sel.p === q.p : true);
+      const on = sel || (hot && hot.kind === q.kind && hot.ui === q.ui && hot.p === q.p), r = (big ? 13 : 8) / z * (on ? 1.25 : 1);
+      g.fillStyle(0x141013, 0.75).fillCircle(q.x, q.y, r + 3 / z);
+      g.fillStyle(big ? 0xffd27a : 0x3fe0d0, sel ? 1 : on ? 0.95 : 0.55 + 0.25 * pulse).fillCircle(q.x, q.y, r);
+      if (big) { g.fillStyle(0x141013, 0.9).fillRect(q.x - 6 / z, q.y - 3 / z, 12 / z, 6 / z); g.fillRect(q.x - 4 / z, q.y + 3 / z, 3 / z, 3 / z).fillRect(q.x + 1 / z, q.y + 3 / z, 3 / z, 3 / z); }   // a tiny trailer
+    }
+  }
   // the place of a container under x (inside its body), or null
   cellOf(u, x, y) {
     if (!u || u.ui <= 0 || !u.places || y < u.inTop || y > u.floorY - 2) return null;

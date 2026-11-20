@@ -281,6 +281,7 @@ export class BuildMode {
     for (const so of this.sockets()) if (so.id) add(so.cx, so.cy);
     for (const q of this.resizeGrips()) add(q.x, (q.y0 + q.y1) / 2);   // #113
     for (const q of this.growGrips()) add(q.x, q.y);   // #116
+    for (const q of this.selPoints()) add(q.x, q.y);   // #117 Klickpunkte
     for (const a of camp.anchors?.() || []) add(a.x, a.y);
     (this.save.rig.lights || []).forEach((_, i) => { const w = camp.wire?.(i); if (w) add(w.mid.x, w.mid.y); });
     if (dl) add(...mid(dl));
@@ -341,7 +342,7 @@ export class BuildMode {
     if (hit.kind === 'dealer') { this.shopOpen = true; return this.draw(); }
     if (hit.kind === 'resize') return this.startResize(hit, w, true);   // #113
     if (hit.kind === 'grow') return this.startGrow(hit, w, true);   // #116
-    if (hit.kind === 'cell' || (hit.kind === 'container' && hit.from === 'rig')) return this.select(hit, w);   // #117 A marks, a second A opens the menu
+    if (hit.point) return this.select(hit, w);   // #117 A on a Klickpunkt marks, a second A opens the menu
     this.startDrag(hit, w);
     this.buzz('lift');
   }
@@ -616,6 +617,7 @@ export class BuildMode {
       for (const a of camp.anchors?.() || []) if (Math.hypot(x - a.x, y - a.y) < R) return { kind: 'anchor', a, item: box(a) };
       for (let i = 0; i < (this.save.rig.lights || []).length; i++) { const w = camp.wire(i); if (w && Math.hypot(x - w.mid.x, y - w.mid.y) < R) return { kind: 'lights', i, item: box(w.mid) }; }
     }
+    { const pt = this.pickPoint(x, y); if (pt) return pt; }   // #117 Klickpunkte: container and cell
     { const gr = this.pickGrow(x, y); if (gr) return gr; }   // #116 the grips of growing pieces, before the pieces themselves
     { const dh = this.pickDecor(x, y); if (dh) return dh; }
     { const gh = this.pickGrip(x, y); if (gh) return gh; }   // #113 the grip at a container's rear end
@@ -629,9 +631,7 @@ export class BuildMode {
     }
     for (const u of [...camp.geo.units].sort((a, b) => levelOf(b) - levelOf(a))) if (x >= u.x0 && x <= u.x1 && y >= u.inTop - 40 && y <= (u.base ?? camp.ground) + 10) {
       if (U[u.ui]?.workshops?.some(w => D.workshops?.[w.id]?.fixed)) { if (!quiet) this.say('Dieser Container trägt etwas, das bleiben muss.'); return null; }
-      const cp = this.cellOf(u, x, y);   // #117 the body: one place of it; the chassis and the roof: the whole container
-      if (cp != null) return { kind: 'cell', from: 'rig', ui: u.ui, p: cp, id: u.id, unit: u, item: { x0: u.in0 + cp * u.cell, x1: u.in0 + (cp + 1) * u.cell, y0: u.inTop, y1: u.floorY } };
-      return { kind: 'container', from: 'rig', ui: u.ui, id: u.id, unit: u, chassis: true };
+      return { kind: 'container', from: 'rig', ui: u.ui, id: u.id, unit: u };
     }
     if (camp.dealer && inside(camp.dealer)) return { kind: 'dealer' };
     return null;
@@ -645,7 +645,7 @@ export class BuildMode {
     if (!this.active) return;
     if (p.button === 2) {   // #117 right click: the menu of what is under the pointer (marks a container or a cell first)
       const w = this.world(p), hit = this.drag || this.decorHold ? null : this.pick(w.x, w.y, true);
-      if (hit && (hit.kind === 'cell' || (hit.kind === 'container' && hit.from === 'rig'))) return this.select(hit, w, { menu: true });
+      if (hit && (hit.point || (hit.kind === 'container' && hit.from === 'rig'))) return this.select(hit, w, { menu: true });
       return this.sel ? this.openSelMenu(w) : this.openCtx(w);
     }
     if (p.button !== 0) return;
@@ -661,7 +661,7 @@ export class BuildMode {
     if (this.drag && p.event && 'buttons' in p.event && !(p.event.buttons & 1)) { this.press = null; return this.flyBack('Losgelassen außerhalb: zurück an seinen Platz'); }
     if (this.resizing) return this.resizeMove(w);   // #113
     if (this.growing) return this.growMove(w);   // #116
-    if (this.press?.hit?.kind === 'cell') { /* a cell is marked, not dragged (#117) */ }
+    if (this.press?.hit?.kind === 'cell') { /* a cell point marks, it is not dragged (#117) */ }
     else if (this.press && !this.drag && this.painting == null && Math.hypot(p.x - this.press.sx, p.y - this.press.sy) > 6) { if (this.press.hit.kind === 'grow') { this.startGrow(this.press.hit, { x: this.press.x, y: this.press.y }); return this.growMove(w); } if (this.press.hit.kind === 'resize') { this.startResize(this.press.hit, { x: this.press.x, y: this.press.y }); return this.resizeMove(w); } this.startDrag(this.press.hit, w); }
     if (this.drag) { this.drag.x = w.x; this.drag.y = w.y; }
     if (this.wire) { this.wire.x = w.x; this.wire.y = w.y; }
@@ -683,7 +683,7 @@ export class BuildMode {
     if (press?.hit?.kind === 'anchor') return this.startDrag(press.hit, w);   // click, click: from here … to there
     if (press?.hit?.kind === 'lights') return this.takeDown(press.hit.i);
     if (press?.hit?.kind === 'dealer') { this.shopOpen = !this.shopOpen; return this.draw(); }
-    if (press?.hit && (press.hit.kind === 'cell' || (press.hit.kind === 'container' && press.hit.from === 'rig'))) return this.select(press.hit, w, { menu: true });   // #117 click: mark + menu
+    if (press?.hit?.point) return this.select(press.hit, w, { menu: true });   // #117 click on a Klickpunkt: mark + menu
     if (press?.hit) { this.msg = null; this.hoverText = this.describe(press.hit); this.draw(); }
   }
   describe(h) {
@@ -694,7 +694,8 @@ export class BuildMode {
     if (h.kind === 'ws') { const d = wsDef(D, h.id), p = d.power || 0; return `${d.name || h.id} · ${FN_NAMES[d.function] || ''} · ${d.places || 1} ${d.places > 1 ? 'Plätze' : 'Platz'}${p ? ` · ${p > 0 ? '+' : ''}${p} ⚡` : ''} · ziehen zum Umstellen`; }
     if (h.kind === 'part') { const t = D.rigParts?.[h.id] || {}; return `${t.name || h.id} · ${PART_SLOTS[t.slot] || t.slot}${this.partFacts(t)} · ziehen ${h.from === 'yard' ? 'an den Van' : 'zum Ausbauen'}`; }
     if (h.kind === 'resize') return 'Griff: ziehen = Container länger oder kürzer (ohne Aufpreis)';
-    if (h.kind === 'cell') return `${D.containers?.[h.id]?.name || 'Container'} · Platz ${h.p + 1} · anklicken: markieren und Menü`;
+    if (h.kind === 'cell') return `${D.containers?.[h.id]?.name || 'Container'} · Platz ${h.p + 1} · Klickpunkt: markieren und Menü`;
+    if (h.point) return `${D.containers?.[h.id]?.name || 'Container'} · Klickpunkt: markieren, Farbe und mehr`;
     if (h.kind === 'grow') return `Griff: ziehen = ${h.grip.side === 'right' ? 'länger' : 'höher'} (ohne Aufpreis)`;
     if (h.kind === 'container') { const d = D.containers?.[h.id] || {}, u = this.save.rig.units[h.ui] || { id: h.id }, n = placesOf(D, u); return `${d.name || h.id} · ${n} ${n === 1 ? 'Platz' : 'Plätze'} · ${de(containerWeight(D, u))} kg · ziehen zum Umhängen${d.resize ? ' · am Griff hinten länger/kürzer' : ''}`; }
     return 'Händler: hier abstellen = verkaufen, anklicken = Katalog';
@@ -1066,6 +1067,7 @@ export class BuildMode {
     this.drawResizeGrips(g, label, z, pulse);   // #113
     this.drawGrowGrips(g, label, z, pulse);   // #116
     this.drawSel(g, z, pulse);   // #117
+    this.drawPoints(g, z, pulse);
     // the sockets for rig parts on the van: empty = dashed frame with the slot's name, built in = the part
     const pslot = d?.kind === 'part' ? D.rigParts?.[d.id]?.slot : null, tt = d ? this.target() : null;
     for (const so of this.sockets()) {
