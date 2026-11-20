@@ -89,7 +89,7 @@ check(new URL(page.url()).pathname === '/', `zweites Esc führt ins Hauptmenü (
 }
 
 // main menu: the intro is there to choose (Daniel: only on purpose)
-await page.waitForFunction(() => window.menu, null, { timeout: 15000 });
+await page.waitForFunction(() => window.menu || window.cockpitMenu, null, { timeout: 15000 });   // #125: since #124 the main menu is the van cockpit
 const links = await ev(() => [...document.querySelectorAll('nav a')].map(a => a.getAttribute('href')));
 check(links.includes('intro.html'), 'Hauptmenü hat den Eintrag „Intro“');
 check(!errors.length, `keine Fehler${errors.length ? ': ' + errors.join(' | ') : ''}`);
