@@ -245,6 +245,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 ## Tickets
 
+### #118 Innen-Deko: Wohnzellen, Möbel, Lampen, Lichterketten, wachsende Pinnwand, Trophäen-Ständer
+- **Status:** läuft (20.11.) · angelegt 20.11. von Code (Daniels Abnahme der Innen-Deko-Kandidaten)
+- **Auftrag (Daniel):** Sets A Hängelampen, B Rückwand, C Boden-Möbel einbauen; Regale streng orthogonal neu malen (sie waren leicht gedreht); mehr Sachen, die zur Welt passen; ein flexibler Trophäen-Ständer; Skalieren ist cool (z. B. kleine Karte mit roten Schnüren → mittel → riesig mit vielen Fotos und Schnüren); muss auch vor bzw. hinter vorhandenen Werkbänken gut aussehen. Zellen-Typ „Wohnen“ + Rückwand-Deko hinter Werkstätten (außer Lampen). Lichterketten auch innen.
+- **Rückfragen:**
+- **Ergebnis:**
+
 ### #117 Bau-Modus neu, Camp ohne Rand, Intro mit Musik
 - **Status:** fertig (20.11.) · angelegt 20.11. von Code (Daniel per Sprachnachricht)
 - **Auftrag (Daniels Wahl):** (1) Camp endet nicht im Nichts: links/rechts endlos, unten die Dunkelheit aus den POIs, ein Easter Egg (Knochen, kleiner Bunkerraum), das nie eine Rolle spielt. (2) Deko auch hinter den Containern; ein neuer Container schiebt alles nach hinten (Camp wird länger). (3) Konvention: Container berühren = Zelle markiert, Rand = schrumpfen/strecken, Fahrgestell = ganzer Container; dann Farbe im Kontextmenü (statt Pinsel). (4) Zoom im Bau-Modus in Stufen, UI komplett für Controller (erst wählen, dann Menü). (5) Camp-Eigenschaften im Bau-Modus mit Icons. (6) Lichtkegel im Intro animiert, huschen am Himmel. (7) Intro-Musik (Daniels eigene KI-Musik, lokales Modell, frei nutzbar); schnellere Passagen für die Reise.

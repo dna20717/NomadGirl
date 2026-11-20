@@ -6757,8 +6757,8 @@
   "source": "KI-Musik von Daniel (eigenes lokales Modell auf eigener GPU, frei nutzbar); zugeschnitten mit Code (ffmpeg)",
   "date": "2026-11-20",
   "description": "#117 Daniels Intro-Musik (120 s, 138 BPM). Läuft im Intro-Comic.",
-  "title": "Wastelands Overture",
-  "artist": "Daniel"
+  "title": "Leyla Runs",
+  "artist": "BombT"
  },
  "drive_a": {
   "name": "Musik · Fahrt A",
@@ -6770,8 +6770,8 @@
   "source": "KI-Musik von Daniel (eigenes lokales Modell auf eigener GPU, frei nutzbar); zugeschnitten mit Code (ffmpeg)",
   "date": "2026-11-20",
   "description": "#117 Schnelle Passage aus der Intro-Musik: 10 Takte ab 61,3 s, nahtlos als Loop.",
-  "title": "Highway Run · Teil A",
-  "artist": "Daniel"
+  "title": "Leyla Runs · Fahrt A",
+  "artist": "BombT"
  },
  "drive_b": {
   "name": "Musik · Fahrt B",
@@ -6783,8 +6783,8 @@
   "source": "KI-Musik von Daniel (eigenes lokales Modell auf eigener GPU, frei nutzbar); zugeschnitten mit Code (ffmpeg)",
   "date": "2026-11-20",
   "description": "#117 Schnelle Passage aus der Intro-Musik: 12 Takte ab 85,7 s, nahtlos als Loop.",
-  "title": "Highway Run · Teil B",
-  "artist": "Daniel"
+  "title": "Leyla Runs · Fahrt B",
+  "artist": "BombT"
  },
  "camp_bunker": {
   "name": "Camp · Vergessener Bunker (Easter Egg)",
