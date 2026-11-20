@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 20.11. Code → Ava: #084 Camp-Boden läuft. PixelLab war in der Sitzung aus (Umgebung „Default“), Sitzung auf „NomadGirl“ umgeschaltet, geht wieder (übrig 2.015,6).
 - 20.11. Code → Ava: #084, #100–#103 fertig: Bit-Farm-Bild und feineres Fahrgestell (PixelLab 40, übrig 2.015,6; Camp-Boden offen, Versuch hielt die Kacheln nicht ein), Rig-Moral, Aufträge für alle 12 Gangs, Gangs kämpfen selbst um Orte, Radio-DJs als Entities mit Gesicht im Chip.
 - 20.11. Code → Ava: Die kleinen drei fertig: #098 Ofen im Mega-Rig, #099 Speziallager je Stern (Knopf im Lager-Fenster), #104 Werte im Inventar (Grund · Boni · Ergebnis, U).
 - 20.11. Code → Ava: #126 **Drei Spielstände** fertig: Slots im Cockpit-Radio mit Vorschaubild, Löschen mit Dialog + Zurückholen, globale Achievements, Slot behält sein Datenset, Spielstand laden im Pause-Menü, alter Stand zieht nach Slot 1 (lokal + online). 4 ⚠️ im Ticket.
@@ -429,7 +430,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Bilder hochladen in der Online-Werkstatt (#083)“. Knopf im Asset-Inspektor, Worker `POST /api/upload` (eigener Commit, nur Bilder unter assets/, 2 MiB). `npm test` grün (cloud 8/8), `tools/workshop_cloud_test.mjs` grün. **Bitte testen:** online Werkstatt › Assets › ein Bild ersetzen, ein paar Minuten warten, im Spiel ansehen.
 
 ### #084 Grafik per PixelLab: Verbindung, Bit-Farm, Fahrgestell + Camp-Boden
-- **Status:** fertig (20.11., Camp-Boden offen) · · Verbindung geht (Umgebung „NomadGirl“, siehe HNC 19.11.) · angelegt 19.11. von Code (Daniel, Karten PixelLab, Bit-Farm, C18)
+- **Status:** läuft (20.11., Camp-Boden, Daniel: „E“ = PixelLab reparieren, dann Camp-Boden) · Verbindung geht (Umgebung „NomadGirl“, siehe HNC 19.11.) · angelegt 19.11. von Code (Daniel, Karten PixelLab, Bit-Farm, C18)
 - **Auftrag:** (1) PixelLab-Verbindung der Cloud-Umgebung reparieren (19.11. blockte der Proxy `api.pixellab.ai`), Anleitung für Daniel. (2) Bit-Farm-Bild, bis 4 Generierungen (freigegeben). (3) Fahrgestell + Camp-Boden feiner, passend zu #042 (~10–25 Generierungen, vor dem Auftrag Kosten nennen, unter 700 Freigabe).
 - **Rückfragen:** (Code) (1) Verbindung steht (Umgebung „NomadGirl“). (2) PixelLab hat die Preise geändert: die Bit-Farm in 256 × 256 kostet 10 statt bis 4. (3) ⚠️ **Camp-Boden offen:** der Versuch (15 Generierungen) hielt die Kachel-Aufteilung nicht ein (Oberfläche/Füllung vertauscht, Wände falsch), und `create_sidescroller_tileset` malt höchstens 32-px-Kacheln, also so grob wie heute. Der alte Boden bleibt; Frage an Daniel, ob ein Boden aus Code-Kacheln oder ein weiterer PixelLab-Versuch.
 - **Ergebnis:** (Code) Commits „Bit-Farm bekommt ihr eigenes Bild …“, „Fahrgestell doppelt so fein …“. Bit-Farm `ws_bitfarm` (drei Server-Schränke mit Glitch-Gesichtern), Fahrgestell `trailer_chassis_fine` doppelt so fein (Camp › Fahrgestell › Auflösung 2, Code rechnet um, auch in der Mega-Rig-Ansicht). camp/container/stack/megarig grün. **PixelLab: 40** (Bit-Farm 10, Fahrgestell 15, Boden-Versuch 15), übrig 2.015,6. **Bitte testen:** Neues Spiel, das Fahrgestell unter dem Tank-Container ansehen; Bit-Farm kaufen und einbauen.
