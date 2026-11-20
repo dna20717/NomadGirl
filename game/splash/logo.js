@@ -11,9 +11,9 @@ export async function startLogo(host, { A, base, cfg = {} }) {
   const [word, road, van, drone] = await Promise.all([cfg.word || 'ui_logo_word', cfg.road || 'ui_logo_road', cfg.van || 'ui_logo_van', cfg.drone || 'ui_logo_drone'].map(load));
   if (!word) return null;
   const K = 2;                                   // drawing scale: whole pixels stay square when the picture is tilted
-  const ang = (cfg.angle ?? -10) * Math.PI / 180, RK = cfg.roadScale ?? 2;
-  const line = cfg.line ?? 80, roadLine = cfg.roadLine ?? 31.5, cut = cfg.roadFrom ?? 128;   // the yellow line in the word / in the road; where the road piece starts
-  const rw = road ? (road.width - cut) * RK : 0, W = word.width + rw - 6, H = word.height;
+  const ang = (cfg.angle ?? -10) * Math.PI / 180, RK = cfg.roadScale ?? 1;   // #122 the road at the word's own pixel size: the same asphalt
+  const line = cfg.line ?? 80, roadLine = cfg.roadLine ?? 80, cut = cfg.roadFrom ?? 0;   // the yellow line in the word / in the road; where the road piece starts
+  const join = cfg.roadJoin ?? 498, rw = road ? (road.width - cut) * RK : 0, W = Math.max(word.width, join + rw), H = word.height;   // #122 the road comes out from behind the L (same rows as its stem)
   const pad = Math.ceil(Math.abs(Math.sin(ang)) * W / 2) + 40;
   const cv = document.createElement('canvas'); cv.width = (W + 80) * K; cv.height = (H + pad * 2) * K;
   cv.className = 'logo-canvas'; cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', 'NomadGirl');
@@ -22,7 +22,7 @@ export async function startLogo(host, { A, base, cfg = {} }) {
   const puffs = [], rnd = Math.random;
   let last = performance.now(), rev = 0, lap = -1, nextLap = performance.now() + 7000, raf = 0, alive = true;
   host.addEventListener('pointerenter', () => { rev = 1; });
-  const roadY = line - roadLine * RK, x0 = word.width - 6;   // road piece: its yellow line on the word's
+  const roadY = line - roadLine * RK, x0 = join;   // road piece: its yellow line on the word's
   const VS = cfg.vanScale ?? 1.5, DS = cfg.droneScale ?? 1.5, vanW = van ? van.width * VS : 0, vanH = van ? van.height * VS : 0, dw = drone ? drone.width * DS : 0, dh = drone ? drone.height * DS : 0;
   const frame = now => {
     if (!alive) return;
@@ -33,9 +33,9 @@ export async function startLogo(host, { A, base, cfg = {} }) {
     ctx.setTransform(K, 0, 0, K, 0, 0);
     ctx.translate((W + 80) / 2, H / 2 + pad); ctx.rotate(ang); ctx.translate(-W / 2, -H / 2);
     // the sunset rim breathes: a soft warm glow behind the letters
-    ctx.save(); ctx.globalAlpha = 0.25 + 0.12 * Math.sin(t * 1.3); ctx.filter = 'blur(10px)'; ctx.drawImage(word, 0, 0); ctx.restore();
-    if (road) ctx.drawImage(road, cut, 0, road.width - cut, road.height, x0, roadY, rw, road.height * RK);
-    ctx.drawImage(word, 0, 0);
+    const paint = () => { if (road) ctx.drawImage(road, cut, 0, road.width - cut, road.height, x0, roadY, rw, road.height * RK); ctx.drawImage(word, 0, 0); };
+    ctx.save(); ctx.globalAlpha = 0.25 + 0.12 * Math.sin(t * 1.3); ctx.filter = 'blur(10px)'; paint(); ctx.restore();
+    paint();
     // the van creeps along the road and back, rocks on the potholes; revving pushes it forward
     const vx = x0 + (rw - vanW) * (0.25 + 0.2 * Math.sin(t * 0.35) + 0.25 * rev), vy = line - vanH / 2 + Math.sin(t * 9) * 0.6 * (1 + rev * 2) + (Math.sin(t * 2.3) > 0.97 ? -1 : 0);
     // dust: puffs from the rear wheels drift back over the letters, grow and fade

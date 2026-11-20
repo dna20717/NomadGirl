@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 20.11. Code → Ava: #122 Logo-Straße mit gleicher Textur und Höhe wie der Schriftzug, Mittelstreifen durchgezogen, Now-Playing-Kassette kleiner (nur halb im Bild). Drei Hauptmenü-Vorschläge zur Abnahme bei Daniel: A Highway-Schilder, B Van-Cockpit mit Radio-Menü, C Asphalt-Platten (Bilder `assets/ui/menu/candidates/`). PixelLab 20.
 - 20.11. Code → Ava: #121 erledigt (ohne eigenes Ticket, Daniels Feedback): Camp-Ende auch ganz rausgezoomt unsichtbar (Kamera-Grenzen, ferne Ebenen breiter), Regen auf jeder Zoomstufe, AvA mit Funkreichweite (rotes !, „Empfang zu schlecht“, unsichtbare Wand links/rechts/oben, nie in den Boden), Rig offen/zu auch als Leyla (O/P, rechter Stick; Yoga geparkt), Innenkram, Windrad und Bunker-Easter-Egg größer. Kein PixelLab.
 - 20.11. Code → Ava: #119 erledigt (ohne eigenes Ticket): Pixel-Logo im Hauptmenü, Staubozean mit Sperre und Andockpunkt „Dustport Dock“ (nur Mega-Rigs, Inhalt später), Innen-Deko gerade nachgemalt, Track „Leylas Run“ von BombT. PixelLab 30.
 - 20.11. Code → Ava: #118 fertig: Innen-Deko (47 Stücke, Pinnwand wächst, Trophäen-Ständer, Lichterkette innen), Wohnzellen +4. Dazu Hauptmenü-Musik, Now-Playing-Kassette („Leylas Run“ von BombT), Rig bleibt im Bau-Modus zu (R3/Select/O).

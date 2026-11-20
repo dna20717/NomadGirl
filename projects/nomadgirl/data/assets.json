@@ -6929,15 +6929,15 @@
   "file": "assets/ui/logo/word.png",
   "source": "KI (PixelLab, Create Image Pro, AAP-64; Daniels Skizze als Referenz)",
   "date": "2026-11-20",
-  "description": "#120 NOMADGIRL aus Asphalt, gelber Mittelstreifen bei y 80, Schlaglöcher, abgebrochene N-Ecke, Sonnenkante."
+  "description": "#120 NOMADGIRL aus Asphalt, Schlaglöcher, abgebrochene N-Ecke, Sonnenkante; #122 Mittelstreifen bei y 78–82 durchgezogen (tools/logo_road.py, gestrichelt in candidates/word_dashed.png)."
  },
  "ui_logo_road": {
   "name": "Logo · Straße",
   "kind": "image",
   "file": "assets/ui/logo/road.png",
-  "source": "KI (PixelLab, Create Image Pro, AAP-64)",
+  "source": "Code (tools/logo_road.py) aus dem Asphalt von ui_logo_word; Original von PixelLab in candidates/road_pixellab.png",
   "date": "2026-11-20",
-  "description": "#120 Straßenstück von oben, Mittelstreifen bei y 31,5; ab x 128 hinter dem L, doppelt groß."
+  "description": "#122 Straßenstück in der Pixelgröße des Schriftzugs: Profil wie der Stamm des L (Sonnenkante, Kontur, Fase, Zeilen 19–140), Asphalt aus den Buchstaben zusammengesetzt, durchgezogener Mittelstreifen bei y 80, bröckelndes Ende."
  },
  "ui_logo_van": {
   "name": "Logo · Van von oben",
