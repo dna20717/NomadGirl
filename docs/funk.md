@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 20.11. Code → Ava: Die kleinen drei laufen (Daniel): #098 Ofen im Mega-Rig, #099 Speziallager je Stern, #104 Werte im Inventar.
 - 20.11. Code → Ava: #126 **Drei Spielstände** fertig: Slots im Cockpit-Radio mit Vorschaubild, Löschen mit Dialog + Zurückholen, globale Achievements, Slot behält sein Datenset, Spielstand laden im Pause-Menü, alter Stand zieht nach Slot 1 (lokal + online). 4 ⚠️ im Ticket.
 - 20.11. Code → Ava: #125 **Aufräumen + technische Schulden** fertig: Backlog C komplett (C2, C3, C4, C10, C11, C13, C14, C15, C18), Cockpit-Reste im Schema, Backlog auf Stand 20.11.; Konzept für 3 Spielstände in `docs/concepts/save_slots.md` mit 9 Fragen an Daniel (Backlog A9). Offen für Daniel: Cockpit-Kram platzieren (A10).
 - 20.11. Code → Ava: **HNC (Übergabe)**. Stand `main` nach #121–#124. Neu seit der letzten Übergabe: #121 Camp ohne sichtbares Ende + AvAs Funkreichweite + Rig offen/zu als Leyla (O/P/R3, Yoga geparkt); #122 Logo-Straße aus einem Guss, Kassette kleiner; #123/#124 **Startseite ist jetzt das Van-Cockpit** (/; alte unter /classic): PixelLab-Teile modular in Startseite › Cockpit (Hülle, Lenkrad, Instrumente, Radio mit Menü im LCD, Spiegel, 16 Stücke Kram als Tabelle), Achievement-Sticker, eigene Straße (rechte Spur), Billboard mit Anzeige + Untertitel „A Game about finding everything by leaving all behind“, AvA-Verhalten (scannen, fotografieren, Rolle, anklopfen, voraus rasen, dösen, Käfer jagen), dreifache Auflösung, Fahrer lenkt sanft, Scheibe mit Schmutz. PixelLab Sitzung 1125, übrig 2055. Offen/⚠️: Billboard steht links (rechts verdeckt die Sonnenblende); `cockpit.glass` noch nicht im Schema; Werkstatt-Vorschau der Startseite zeigt noch die klassische Seite; Fahrer-Sonnenblende `ck_visor` und 10 Kram-Stücke liegen bereit, unplatziert; Billboard-Werbung für Lore-Marken als Idee.
@@ -450,12 +451,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Balancing v1 als Standard, Cheat-Menü (#097)“. `npm test` 315/315 (earn/techtree an v1 angepasst, `test/cheats.test.js` neu). PixelLab 0. **Bitte testen:** https://nomadgirl.dna20717.workers.dev/game?cheats=1 öffnen, Esc › Cheats.
 
 ### #098 Mega-Rig: Ofen statt Lagerfeuer im Rumpf
-- **Status:** offen · angelegt 19.11. von Code (Runde 2, Notiz #077 „Kein Lagerfeuer IM Rig mehr“ → Fragerunde: „Ofen statt Feuer“)
+- **Status:** läuft (20.11.) · · angelegt 19.11. von Code (Runde 2, Notiz #077 „Kein Lagerfeuer IM Rig mehr“ → Fragerunde: „Ofen statt Feuer“)
 - **Rückfragen:**
 - **Ergebnis:**
 
 ### #099 Speziallager ausbauen (mehr Platz je Stern)
-- **Status:** offen · angelegt 19.11. von Code (Runde 2, #078)
+- **Status:** läuft (20.11.) · · angelegt 19.11. von Code (Runde 2, #078)
 - **Rückfragen:**
 - **Ergebnis:**
 
@@ -480,7 +481,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #104 Werte als Abschnitt im Inventar, mit Grundwerten
-- **Status:** offen · angelegt 19.11. von Code (Runde 2, #091: „Das wäre als Abschnitt des Inventars sinnvoller. Bitte sauber dort aufbauen“, dazu Grundwerte + Boni = Endwert)
+- **Status:** läuft (20.11.) · · angelegt 19.11. von Code (Runde 2, #091: „Das wäre als Abschnitt des Inventars sinnvoller. Bitte sauber dort aufbauen“, dazu Grundwerte + Boni = Endwert)
 - **Rückfragen:**
 - **Ergebnis:**
 
