@@ -4792,20 +4792,20 @@
   "description": "Bild 2 der Lektion „Schlafen“ (960 px, WebP)."
  },
  "tut_kiste_1": {
-  "name": "Feldhandbuch · Die Kiste 1",
+  "name": "Feldhandbuch · Das Camp-Lager 1",
   "kind": "image",
   "file": "assets/tutorial/tut_kiste_1.webp",
   "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
   "date": "13.11.2026",
-  "description": "Bild 1 der Lektion „Die Kiste“ (960 px, WebP)."
+  "description": "Bild 1 der Lektion „Das Camp-Lager“ (960 px, WebP)."
  },
  "tut_kiste_2": {
-  "name": "Feldhandbuch · Die Kiste 2",
+  "name": "Feldhandbuch · Das Camp-Lager 2",
   "kind": "image",
   "file": "assets/tutorial/tut_kiste_2.webp",
   "source": "Code (Screenshot aus dem Spiel, tools/tutorial_capture.mjs)",
   "date": "13.11.2026",
-  "description": "Bild 2 der Lektion „Die Kiste“ (960 px, WebP)."
+  "description": "Bild 2 der Lektion „Das Camp-Lager“ (960 px, WebP)."
  },
  "tut_kochen_1": {
   "name": "Feldhandbuch · Kochen 1",

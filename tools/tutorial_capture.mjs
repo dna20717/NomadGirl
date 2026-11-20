@@ -49,7 +49,8 @@ const R = {
   async zoom(z) { await ev(z => { const c = SC().cam; c.setZoom(c.zoom * z); nomad.step(2); }, z); },
   // hide the HUD for clips (the prompt stays), show it for windows
   async hud(on) {
-    await page.addStyleTag({ content: on ? '.hud-top,.hud-foot,.hud-camp,.hud-buildbtn,.hud-openbtn{visibility:visible}' : '.hud-top,.hud-foot,.hud-camp,.hud-buildbtn,.hud-openbtn,.hud-toasts{visibility:hidden}' });
+    // #125: the Now-Playing cassette and the toasts (e.g. the tool's own „Lokaler Werkstatt-Stand aktiv“) never belong in a lesson
+    await page.addStyleTag({ content: (on ? '.hud-top,.hud-foot,.hud-camp,.hud-buildbtn,.hud-openbtn{visibility:visible}' : '.hud-top,.hud-foot,.hud-camp,.hud-buildbtn,.hud-openbtn{visibility:hidden}') + '.hud-toasts,.np-card{visibility:hidden!important}' });
   },
   frames: [],
   async grab() {
@@ -159,7 +160,7 @@ const P = {
   boden: [async () => { await camp({ hud: true }); await W(() => { for (const id of ['verband', 'schrottplatte']) SC().loot?.throwDown?.({ a: 'items', id, n: 2, r: 0 }); nomad.step(30); SC().openFloor?.() ?? nomad.step(1, [], ['inventory']); nomad.step(12); }); }, async () => { await W(() => { SC().hud.inv.close?.(); for (let i = 0; i < 2; i++) { nomad.step(40, ['right']); SC().loot?.throwDown?.({ a: 'items', id: 'kabelbaum', n: 1, r: 0 }); } nomad.step(30, ['left']); nomad.step(1, [], ['inventory']); nomad.step(12); }); }],
   implantate: [async () => { await camp({ hud: true }); await R.step(1, [], ['inventory']); await R.step(10); await page.locator('.inv-tab', { hasText: 'Implantate' }).first().click(); await R.step(4); }, async () => { await W(() => { const U = a => ({ now: new Set([a]), down: x => x === a, pressed: x => x === a }), inv = SC().hud.inv, t = () => SC().now; inv.padNav(U('right'), t()); nomad.step(2); }); }],
   schlafen: [async () => { await camp({ hud: true, hour: 22 }); await W(() => { nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(4); }); }, async () => { await W(() => { SC().hud.closeMenu(); const s = nomad.save(); s.hour = 7.2; SC().goCamp({}); nomad.step(60); }); }],
-  kiste: [async () => { await camp({ hud: true }); await W(() => { const h = nomad.state().camp.hotspots.find(x => x.name === 'Kiste'); nomad.walkTo(h.x); nomad.step(10); }); }, async () => { await R.step(1, [], ['grab']); await R.step(12); }],
+  kiste: [async () => { await camp({ hud: true }); await W(() => { const h = nomad.state().camp.hotspots.find(x => ['Kofferraum', 'Lagerregal', 'Kiste'].includes(x.name)); nomad.walkTo(h.x); nomad.step(10); }); }, async () => { await R.step(1, [], ['grab']); await R.step(12); }],
   kochen: [async () => { await camp({ hud: true }); await W(() => { SC().camp.use('kochnische'); nomad.step(10); }); }, async () => { await page.locator('.craft-supply').nth(0).click(); await page.locator('.craft-supply').nth(1).click(); await R.step(4); }],
   experimentieren: [async () => { await camp({ hud: true }); await W(() => { SC().camp.use('kochnische'); nomad.step(10); }); for (const k of [0, 2, 4]) await page.locator('.craft-supply').nth(k).click(); await R.step(4); }, async () => { await page.locator('button', { hasText: 'Ausprobieren' }).first().click(); await R.step(30); }],
   werkbank: [async () => { await camp({ hud: true }); await W(() => { SC().camp.use('werkbank'); nomad.step(10); }); }, async () => { await page.locator('button', { hasText: 'Herstellen' }).first().click(); await R.step(30); }],
