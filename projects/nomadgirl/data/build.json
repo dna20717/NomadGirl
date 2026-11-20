@@ -15,7 +15,8 @@
   "leylaFire": true,
   "droneBuilds": true,
   "droneAbove": 60,
-  "droneFollow": 30
+  "droneFollow": 30,
+  "zoomSteps": [60, 110]
  },
  "work": {"seconds": 1.2, "perHour": 0.6, "enabled": false},
  "sockets": {"engine": [86, 32], "armor": [66, 20], "weapon": [62, 80], "roof": [34, 80], "size": [120, 80], "visible": ["armor", "weapon", "roof"]},

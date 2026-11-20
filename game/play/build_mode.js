@@ -23,6 +23,7 @@ import { BuildDecor } from './build_decor.js';
 import { BuildResize } from './build_resize.js';
 import { BuildPaint } from './build_paint.js';
 import { BuildGrow } from './build_grow.js';
+import { BuildSelect } from './build_select.js';
 
 const FN_COLORS = { storage: '#5c6b7a', cooling: '#4a7a9a', cell: '#5a4a4a', sleep: '#6a5a9a', chill: '#9a4a7a', drone: '#3a8a6a', warroom: '#7a6a3a', kitchen: '#a8642a', foodtruck: '#c0703a', craft: '#7a6235', engine: '#5a5a5a', power: '#a8862a' };
 const FN_NAMES = { storage: 'Lager', cooling: 'Kühlung', cell: 'Zelle', sleep: 'Schlafen', chill: 'Chillen', drone: 'Drohnen', warroom: 'Planung', kitchen: 'Kochen', foodtruck: 'Verkauf', craft: 'Herstellen', engine: 'Motor', power: 'Energie' };
@@ -42,6 +43,9 @@ export class BuildMode {
       if (!this.active) return;
       if (e.key === 'Escape' && this.resizing) { this.endResize(); e.preventDefault(); e.stopPropagation(); }
       else if (e.key === 'Escape' && this.growing) { this.endGrow(); e.preventDefault(); e.stopPropagation(); }   // #116
+      else if (e.key === 'Escape' && this.ctx) { this.closeCtx(); e.preventDefault(); e.stopPropagation(); }   // #117
+      else if (e.key === 'Escape' && this.sel && !this.drag && !this.decorHold) { this.clearSel(); e.preventDefault(); e.stopPropagation(); }
+      else if (['+', '=', '-', '_'].includes(e.key) && !e.ctrlKey && !e.metaKey) { this.zoomStep(e.key === '+' || e.key === '=' ? 1 : -1, this.ava?.on ? this.ava : this.pointer); e.preventDefault(); e.stopPropagation(); }
       else if (e.key === 'Escape' && this.painting != null) { this.togglePaint(false); e.preventDefault(); e.stopPropagation(); }   // #114
       else if ((e.key === 'p' || e.key === 'P') && !e.ctrlKey && !e.metaKey) { this.togglePaint(); e.preventDefault(); e.stopPropagation(); }
       else if (e.key === 'Escape') { if (this.decorHold) this.dropDecorToSpare(); else if (this.drag) this.cancelDrag(); else if (this.shopOpen) { this.shopOpen = false; this.draw(); } else this.close(); e.preventDefault(); e.stopPropagation(); }
@@ -89,6 +93,9 @@ export class BuildMode {
     this.camp.drawRig();   // parts on the van are shown by the sockets now
     this.onDown = p => this.pointerDown(p); this.onMove = p => this.pointerMove(p); this.onUp = p => this.pointerUp(p);
     s.input.on('pointerdown', this.onDown); s.input.on('pointermove', this.onMove); s.input.on('pointerup', this.onUp); s.input.on('pointerupoutside', this.onUp);
+    // #117 zoom in steps with the wheel (towards the pointer), the browser menu off for right clicks
+    this.onWheel = (p, o, dx, dy) => { if (!this.active || Math.abs(dy) < 1 || this.scene.time.now - (this.wheelAt || 0) < 220) return; this.wheelAt = this.scene.time.now; this.zoomStep(dy < 0 ? 1 : -1, this.world(p)); };
+    s.input.on('wheel', this.onWheel); s.input.mouse?.disableContextMenu();
     this.draw();
   }
   // Leyla goes to the campfire and sits down (no time passes, no healing: she just waits there); a dust puff where she was
@@ -128,7 +135,8 @@ export class BuildMode {
     this.active = false; this.el.hidden = true; this.shell = null;
     this.ava = null; this.areaNow = null; this.closeCtx(); if (this.tipEl) this.tipEl.hidden = true; this.shopCur?.hide();
     delete this.el.parentElement.dataset.building;
-    s.input.off('pointerdown', this.onDown); s.input.off('pointermove', this.onMove); s.input.off('pointerup', this.onUp); s.input.off('pointerupoutside', this.onUp);
+    s.input.off('pointerdown', this.onDown); s.input.off('pointermove', this.onMove); s.input.off('pointerup', this.onUp); s.input.off('pointerupoutside', this.onUp); s.input.off('wheel', this.onWheel);
+    this.sel = null;
     this.gfx?.destroy(); for (const t of this.labels || []) t.destroy(); this.labels = [];
     this.camp.drawRig();
     s.game.canvas.style.cursor = '';
@@ -186,6 +194,11 @@ export class BuildMode {
       if (u.pressed('ok') || u.pressed('back')) this.endResize();
       return;
     }
+    if (g) {   // #117 LT / RT: zoom a step out / in, towards AvA
+      const lt = !!(g.buttons[6]?.pressed || g.buttons[6]?.value > 0.5), rt = !!(g.buttons[7]?.pressed || g.buttons[7]?.value > 0.5);
+      if (lt && !this.ltWas) this.zoomStep(-1, this.ava); if (rt && !this.rtWas) this.zoomStep(1, this.ava);
+      this.ltWas = lt; this.rtWas = rt;
+    }
     for (const [d, dx, dy] of [['left', -1, 0], ['right', 1, 0], ['up', 0, -1], ['down', 0, 1]]) {
       if (u.pressed(d)) { this.rep = { d, at: now + 360 }; this.hop(dx, dy); }
       else if (u.down(d) && this.rep?.d === d && now > this.rep.at) { this.rep.at = now + 150; this.hop(dx, dy); }
@@ -194,9 +207,9 @@ export class BuildMode {
     if (u.pressed('next')) this.area(1);
     if (u.pressed('prev')) this.area(-1);
     if (u.pressed('ok')) this.padPress();
-    if (u.pressed('back')) { if (this.decorHold) this.dropDecorToSpare(); else if (this.drag) this.flyBack(null); else if (this.wire) { this.wire = null; this.draw(); } else return this.close(); }
+    if (u.pressed('back')) { if (this.decorHold) this.dropDecorToSpare(); else if (this.drag) this.flyBack(null); else if (this.sel) this.clearSel(); else if (this.wire) { this.wire = null; this.draw(); } else return this.close(); }
     this.holdBtn(u, 'send', dt, () => this.sendTap(), () => this.sendHold());
-    this.holdBtn(u, 'context', dt, () => { if (!this.cycleDecor(1)) this.openCtx(); }, () => { this.undoLast(); this.buzz('nope'); });
+    this.holdBtn(u, 'context', dt, () => { if (this.sel) this.openSelMenu({ x: this.ava.x, y: this.ava.y }); else if (!this.cycleDecor(1)) this.openCtx(); }, () => { this.undoLast(); this.buzz('nope'); });
     this.follow(dt);
   }
   // a window key tapped or held (Spiel › Controller › „Wegwerfen: rüber-Knopf halten“ is the hold time, like in the inventory)
@@ -301,6 +314,7 @@ export class BuildMode {
     const z = clamp(s.scale.width * 0.92 / (a.x1 - a.x0), (V.minZoom ?? 30) / 100, base * 1.15);
     const cy = this.camp.ground - (((V.groundAt ?? 80) / 100) - 0.5) * s.scale.height / z, ms = s.script ? 1 : 420;
     this.view = { x: (a.x0 + a.x1) / 2, y: cy, zoom: z };
+    if (this.zoomSteps) { const Z = this.zoomSteps(); this.zoomLevel = Z.reduce((b, q, j) => Math.abs(q - z) < Math.abs(Z[b] - z) ? j : b, 0); }   // #117 the zoom label follows
     cam.pan(this.view.x, cy, ms, 'Sine.easeInOut', true);
     cam.zoomTo(z, ms, 'Sine.easeInOut', true);
   }
@@ -327,6 +341,7 @@ export class BuildMode {
     if (hit.kind === 'dealer') { this.shopOpen = true; return this.draw(); }
     if (hit.kind === 'resize') return this.startResize(hit, w, true);   // #113
     if (hit.kind === 'grow') return this.startGrow(hit, w, true);   // #116
+    if (hit.kind === 'cell' || (hit.kind === 'container' && hit.from === 'rig')) return this.select(hit, w);   // #117 A marks, a second A opens the menu
     this.startDrag(hit, w);
     this.buzz('lift');
   }
@@ -356,9 +371,9 @@ export class BuildMode {
   }
 
   // ---------- context menu (X): what can happen with the thing under AvA ----------
-  openCtx() {
+  openCtx(at = null) {
     if (this.drag || this.wire) return;
-    const D = this.D, w = { x: this.ava.x, y: this.ava.y }, hit = this.pick(w.x, w.y), L = lightsConfig(D), items = [];
+    const D = this.D, w = at || (this.ava ? { x: this.ava.x, y: this.ava.y } : this.pointer || { x: 0, y: 0 }), hit = this.pick(w.x, w.y), L = lightsConfig(D), items = [];
     const name = hit && (hit.kind === 'ws' ? wsDef(D, hit.id).name : hit.kind === 'part' ? D.rigParts?.[hit.id]?.name : hit.kind === 'container' ? D.containers?.[hit.id]?.name : null) || hit?.id;
     const grab = (then) => () => { this.closeCtx(); this.startDrag(hit, w); this.buzz('lift'); then?.(); };
     if (hit && ['ws', 'part', 'container'].includes(hit.kind)) {
@@ -445,14 +460,16 @@ export class BuildMode {
     }
     const sh = this.shell;
     // the hint line follows what is going on (#010): empty-handed, holding, pulling a string, the catalogue
-    const hs = this.shopOpen && !this.drag ? 'shop' : this.wire ? 'wire' : this.drag ? 'hold' : 'free';
+    const hs = this.shopOpen && !this.drag ? 'shop' : this.wire ? 'wire' : this.drag ? 'hold' : this.sel ? 'sel' : 'free';
     if (hs !== this.hintState) {
       this.hintState = hs;
-      const H = { free: [['move', 'AvA zum nächsten Ziel'], ['ok', 'packen'], ['send', 'Händler'], ['context', 'mehr (halten: rückgängig)'], ['tabs', 'Bereich'], ['back', 'fertig']],
+      // #117 few entries, depending on what is going on (Daniel: „UI komplett für Controller optimieren“)
+      const H = { free: [['move', 'AvA'], ['ok', 'wählen / packen'], ['context', 'Menü'], ['zoom', 'Zoom'], ['tabs', 'Bereich'], ['back', 'fertig']],
+        sel: [['ok', 'Menü'], ['move', 'weiter'], ['zoom', 'Zoom'], ['back', 'Markierung weg']],
         hold: [['move', 'wohin damit'], ['ok', 'ablegen'], ['send', 'Schrottplatz (halten: verkaufen)'], ['back', 'zurücklegen']],
         wire: [['move', 'zum nächsten Andockpunkt'], ['ok', 'einhängen'], ['back', 'loslassen']],
         shop: [['move', 'wählen'], ['ok', 'kaufen (aufs Pad)'], ['tabs', 'Werkstätten · Anhänger · Rig-Teile · Deko'], ['back', 'zu']] }[hs];
-      const nh = hints(H, 'Maus: Teile packen und ziehen · Strg+Z rückgängig · B fertig · rechter Stick: AvA frei fliegen');
+      const nh = hints(H, 'Maus: anklicken = markieren + Menü · ziehen = umsetzen · Rechtsklick: Menü · Rad: Zoom · Strg+Z rückgängig');
       nh.classList.add('bm-hints'); sh.hint.replaceWith(nh); sh.hint = nh;
     }
     sh.bar.replaceChildren(
@@ -468,7 +485,8 @@ export class BuildMode {
           el('small', { class: 'bm-clock' }, clockText(save)),
           el('b', { class: 'build-deltas' }, `${de(save.deltas)} Δ`),
           el('button', { class: 'inv-btn bm-shopbtn' + (this.shopOpen ? ' on' : ''), onclick: () => { this.shopOpen = !this.shopOpen; this.draw(); } }, icon('shop', 15), ' Händler'),
-          el('button', { class: 'inv-btn ghost bm-brushbtn' + (this.painting != null ? ' on' : ''), title: 'Pinsel (P): Container und Stoffe umfärben', onclick: () => this.togglePaint() }, icon('brush', 15), ' Pinsel'),   // #114
+          ...(this.painting != null ? [el('button', { class: 'inv-btn ghost bm-brushbtn on', title: 'Pinsel aus (P)', onclick: () => this.togglePaint(false) }, icon('brush', 15), ' Pinsel')] : []),   // #117 the colour lives in the menu now; P still brushes cloth
+          el('div', { class: 'bm-zoom' }, el('button', { class: 'inv-btn ghost', title: 'Raus (− / LT / Mausrad)', onclick: () => this.zoomStep(-1) }, '−'), el('small', {}, ['Übersicht', 'Rig', 'Detail', 'Nah'][this.zoomLevel ?? 0] || 'Zoom'), el('button', { class: 'inv-btn ghost', title: 'Rein (+ / RT / Mausrad)', onclick: () => this.zoomStep(1) }, '+')),
           el('button', { class: 'inv-btn ghost bm-openbtn' + (this.scene.hud.rigOpen ? ' on' : ''), title: 'Rig offen: alle Container bleiben offen (auch außerhalb des Bau-Modus). Controller: Select', onclick: () => this.toggleOpen() }, icon(this.scene.hud.rigOpen ? 'door' : 'box', 15), this.scene.hud.rigOpen ? ' Rig offen' : ' Rig zu'),
           el('button', { class: 'inv-btn ghost bm-undo', disabled: !top || top.done, title: top && !top.done ? `Rückgängig: ${top.label} (Strg+Z)` : 'Nichts zum Rückgängigmachen (Leyla hat schon festgeschraubt)', onclick: () => this.undoLast() }, '↶ Rückgängig'),
           el('button', { class: 'inv-btn build-go', onclick: () => this.close() }, 'Fertig (B)')));
@@ -611,7 +629,9 @@ export class BuildMode {
     }
     for (const u of [...camp.geo.units].sort((a, b) => levelOf(b) - levelOf(a))) if (x >= u.x0 && x <= u.x1 && y >= u.inTop - 40 && y <= (u.base ?? camp.ground) + 10) {
       if (U[u.ui]?.workshops?.some(w => D.workshops?.[w.id]?.fixed)) { if (!quiet) this.say('Dieser Container trägt etwas, das bleiben muss.'); return null; }
-      return { kind: 'container', from: 'rig', ui: u.ui, id: u.id, unit: u };
+      const cp = this.cellOf(u, x, y);   // #117 the body: one place of it; the chassis and the roof: the whole container
+      if (cp != null) return { kind: 'cell', from: 'rig', ui: u.ui, p: cp, id: u.id, unit: u, item: { x0: u.in0 + cp * u.cell, x1: u.in0 + (cp + 1) * u.cell, y0: u.inTop, y1: u.floorY } };
+      return { kind: 'container', from: 'rig', ui: u.ui, id: u.id, unit: u, chassis: true };
     }
     if (camp.dealer && inside(camp.dealer)) return { kind: 'dealer' };
     return null;
@@ -622,7 +642,13 @@ export class BuildMode {
 
   // ---------- pointer ----------
   pointerDown(p) {
-    if (!this.active || p.button !== 0) return;
+    if (!this.active) return;
+    if (p.button === 2) {   // #117 right click: the menu of what is under the pointer (marks a container or a cell first)
+      const w = this.world(p), hit = this.drag || this.decorHold ? null : this.pick(w.x, w.y, true);
+      if (hit && (hit.kind === 'cell' || (hit.kind === 'container' && hit.from === 'rig'))) return this.select(hit, w, { menu: true });
+      return this.sel ? this.openSelMenu(w) : this.openCtx(w);
+    }
+    if (p.button !== 0) return;
     const w = this.world(p), hit = this.decorHold ? null : this.pick(w.x, w.y);
     this.press = hit ? { hit, x: w.x, y: w.y, sx: p.x, sy: p.y } : null;
   }
@@ -635,7 +661,8 @@ export class BuildMode {
     if (this.drag && p.event && 'buttons' in p.event && !(p.event.buttons & 1)) { this.press = null; return this.flyBack('Losgelassen außerhalb: zurück an seinen Platz'); }
     if (this.resizing) return this.resizeMove(w);   // #113
     if (this.growing) return this.growMove(w);   // #116
-    if (this.press && !this.drag && this.painting == null && Math.hypot(p.x - this.press.sx, p.y - this.press.sy) > 6) { if (this.press.hit.kind === 'grow') { this.startGrow(this.press.hit, { x: this.press.x, y: this.press.y }); return this.growMove(w); } if (this.press.hit.kind === 'resize') { this.startResize(this.press.hit, { x: this.press.x, y: this.press.y }); return this.resizeMove(w); } this.startDrag(this.press.hit, w); }
+    if (this.press?.hit?.kind === 'cell') { /* a cell is marked, not dragged (#117) */ }
+    else if (this.press && !this.drag && this.painting == null && Math.hypot(p.x - this.press.sx, p.y - this.press.sy) > 6) { if (this.press.hit.kind === 'grow') { this.startGrow(this.press.hit, { x: this.press.x, y: this.press.y }); return this.growMove(w); } if (this.press.hit.kind === 'resize') { this.startResize(this.press.hit, { x: this.press.x, y: this.press.y }); return this.resizeMove(w); } this.startDrag(this.press.hit, w); }
     if (this.drag) { this.drag.x = w.x; this.drag.y = w.y; }
     if (this.wire) { this.wire.x = w.x; this.wire.y = w.y; }
   }
@@ -656,6 +683,7 @@ export class BuildMode {
     if (press?.hit?.kind === 'anchor') return this.startDrag(press.hit, w);   // click, click: from here … to there
     if (press?.hit?.kind === 'lights') return this.takeDown(press.hit.i);
     if (press?.hit?.kind === 'dealer') { this.shopOpen = !this.shopOpen; return this.draw(); }
+    if (press?.hit && (press.hit.kind === 'cell' || (press.hit.kind === 'container' && press.hit.from === 'rig'))) return this.select(press.hit, w, { menu: true });   // #117 click: mark + menu
     if (press?.hit) { this.msg = null; this.hoverText = this.describe(press.hit); this.draw(); }
   }
   describe(h) {
@@ -666,6 +694,7 @@ export class BuildMode {
     if (h.kind === 'ws') { const d = wsDef(D, h.id), p = d.power || 0; return `${d.name || h.id} · ${FN_NAMES[d.function] || ''} · ${d.places || 1} ${d.places > 1 ? 'Plätze' : 'Platz'}${p ? ` · ${p > 0 ? '+' : ''}${p} ⚡` : ''} · ziehen zum Umstellen`; }
     if (h.kind === 'part') { const t = D.rigParts?.[h.id] || {}; return `${t.name || h.id} · ${PART_SLOTS[t.slot] || t.slot}${this.partFacts(t)} · ziehen ${h.from === 'yard' ? 'an den Van' : 'zum Ausbauen'}`; }
     if (h.kind === 'resize') return 'Griff: ziehen = Container länger oder kürzer (ohne Aufpreis)';
+    if (h.kind === 'cell') return `${D.containers?.[h.id]?.name || 'Container'} · Platz ${h.p + 1} · anklicken: markieren und Menü`;
     if (h.kind === 'grow') return `Griff: ziehen = ${h.grip.side === 'right' ? 'länger' : 'höher'} (ohne Aufpreis)`;
     if (h.kind === 'container') { const d = D.containers?.[h.id] || {}, u = this.save.rig.units[h.ui] || { id: h.id }, n = placesOf(D, u); return `${d.name || h.id} · ${n} ${n === 1 ? 'Platz' : 'Plätze'} · ${de(containerWeight(D, u))} kg · ziehen zum Umhängen${d.resize ? ' · am Griff hinten länger/kürzer' : ''}`; }
     return 'Händler: hier abstellen = verkaufen, anklicken = Katalog';
@@ -1036,6 +1065,7 @@ export class BuildMode {
     this.drawDecorHold(g, label, z, pulse);   // #036
     this.drawResizeGrips(g, label, z, pulse);   // #113
     this.drawGrowGrips(g, label, z, pulse);   // #116
+    this.drawSel(g, z, pulse);   // #117
     // the sockets for rig parts on the van: empty = dashed frame with the slot's name, built in = the part
     const pslot = d?.kind === 'part' ? D.rigParts?.[d.id]?.slot : null, tt = d ? this.target() : null;
     for (const so of this.sockets()) {
@@ -1190,3 +1220,4 @@ for (const k of Object.getOwnPropertyNames(BuildDecor.prototype)) if (k !== 'con
 for (const k of Object.getOwnPropertyNames(BuildPaint.prototype)) if (k !== 'constructor') Object.defineProperty(BuildMode.prototype, k, Object.getOwnPropertyDescriptor(BuildPaint.prototype, k));   // #114
 for (const k of Object.getOwnPropertyNames(BuildResize.prototype)) if (k !== 'constructor') Object.defineProperty(BuildMode.prototype, k, Object.getOwnPropertyDescriptor(BuildResize.prototype, k));   // #113
 for (const k of Object.getOwnPropertyNames(BuildGrow.prototype)) if (k !== 'constructor') Object.defineProperty(BuildMode.prototype, k, Object.getOwnPropertyDescriptor(BuildGrow.prototype, k));   // #116
+for (const k of Object.getOwnPropertyNames(BuildSelect.prototype)) if (k !== 'constructor') Object.defineProperty(BuildMode.prototype, k, Object.getOwnPropertyDescriptor(BuildSelect.prototype, k));   // #117

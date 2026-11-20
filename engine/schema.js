@@ -1447,6 +1447,7 @@ export const AREAS = {
         num('view.snap', 'Ankuppeln ab', { unit: 'px', min: 40, hint: 'So nah muss ein Anhänger an eine Kupplung' }),
         num('view.shake', 'Wackeln beim Einrasten', { unit: '%', min: 0, max: 200 }), num('view.volume', 'Lautstärke der Bau-Töne', { unit: '%', min: 0, max: 100 }),
         num('view.cursorSpeed', 'Bau-Cursor: Tempo (Controller, Tastatur)', { unit: 'px/s', min: 100, max: 4000, hint: 'Gehalten ab 450 ms fast doppelt so schnell' }),
+        range('view.zoomSteps', 'Zoom-Stufen: Rig / Detail', { unit: '% des Spiel-Zooms', hint: '#117 Dazu die Übersicht (alles im Bild). Mausrad, LT / RT, + / −' }),
         bool('grid.enabled', 'Bau-Raster um AvA', { hint: '#116 Scan-Raster wie die Boden-Leiste: zeigt, wo man bauen kann; aus = nur die Marken' }),
         num('grid.cell', 'Bau-Raster: Zelle', { unit: '% einer Kachel', min: 10, max: 200 }), num('grid.radius', 'Bau-Raster: Reichweite', { unit: 'Kacheln', min: 1, max: 20 }), num('grid.alpha', 'Bau-Raster: Deckkraft', { unit: '%', min: 0, max: 100 }),
         bool('view.leylaFire', 'Leyla setzt sich ans Feuer', { hint: 'Daniel, 12.11.2026: „im Bau-Modus nur noch die Drohne steuern, Leyla setzt sich ans Feuer“. AvA erledigt dann auch das Werkeln' }),

@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 20.11. Code → Ava: #117 fertig: Intro-Musik + Suchscheinwerfer, Fahrt-Musik, Camp ohne Rand mit Bunker-Easter-Egg, Deko hinter dem Rig, Bau-Modus mit Zelle/Fahrgestell/Menü/Farben/Zoom-Stufen und Icon-Leiste. PixelLab 60.
 - 19.11. Code → Ava: #116 fertig: Ziehen zum Wachsen (Laterne, Stangen, Turm, Leitern, Kistenstapel, lange Zelte) aus gemalten Modulen, Bau-Raster um AvA. PixelLab 150.
 - 19.11. Code → Ava: #115 fertig: Parallax-Sets je Region (Camp, POIs draußen, Fahrt, Startseite), schwarze Silhouetten vorne, AvA scannt Billboards am Gummiband; Windrad-Schweben behoben. PixelLab 320.
 - 19.11. Code → Ava: #114 fertig: Pinsel (Container + Stoffe), Innenkram, Fenster/Türen in Containerfarbe, Leitern und Klapptreppen frei. PixelLab 20.
@@ -245,10 +246,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #117 Bau-Modus neu, Camp ohne Rand, Intro mit Musik
-- **Status:** läuft (20.11.) · angelegt 20.11. von Code (Daniel per Sprachnachricht)
+- **Status:** fertig (20.11.) · angelegt 20.11. von Code (Daniel per Sprachnachricht)
 - **Auftrag (Daniels Wahl):** (1) Camp endet nicht im Nichts: links/rechts endlos, unten die Dunkelheit aus den POIs, ein Easter Egg (Knochen, kleiner Bunkerraum), das nie eine Rolle spielt. (2) Deko auch hinter den Containern; ein neuer Container schiebt alles nach hinten (Camp wird länger). (3) Konvention: Container berühren = Zelle markiert, Rand = schrumpfen/strecken, Fahrgestell = ganzer Container; dann Farbe im Kontextmenü (statt Pinsel). (4) Zoom im Bau-Modus in Stufen, UI komplett für Controller (erst wählen, dann Menü). (5) Camp-Eigenschaften im Bau-Modus mit Icons. (6) Lichtkegel im Intro animiert, huschen am Himmel. (7) Intro-Musik (Daniels eigene KI-Musik, lokales Modell, frei nutzbar); schnellere Passagen für die Reise.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: A auf Werkstatt, Rig-Teil oder Deko packt weiter sofort (nur Container und Zellen: erst wählen, dann Menü); Maus-Klick auf Container markiert und öffnet gleich das Menü; Pinsel-Knopf weg, P bleibt für Stoffe; Zoom-Stufen Übersicht / 60 % / 110 %; Fahrt-Musik nicht, solange das Radio läuft; Deko hinter dem Rig 8 Kacheln; Bunker 200 %, 55 % sichtbar, unter dem Lagerplatz −9.
+- **Ergebnis:** (Code) Commits „Intro …“, „Fahrt-Musik …“, „Bau-Modus: Camp-Eigenschaften …“, „Camp ohne Rand …“, „Deko hinter dem Rig …“, „Bau-Modus neu …“ (#117). `npm test` 337/337; Browser neu `select_test` 6/6, `rear_test` 2/2, intro (Musik), drive 20/20 (Musik); build/build_pad/grow/decor/decor_kit/stack/paint/resize/container/camp/game/cozy/mega/megarig/workshop/menu_nav grün. **PixelLab 60** (Panel 6 Inpaint 2 × 25, Bunker 10), übrig 2.345,6. Bilder `output/select_menu.png`, `output/intro_kegel_*.png`, `output/edge_b_2.png`. **Bitte testen:** /intro (Ton an); eine Fahrt; im Bau-Modus Fahrgestell anklicken → Farbe, in einen Container klicken → Zelle, Mausrad / LT / RT; ganz rauszoomen und nach unten schauen; Deko hinter den letzten Container stellen und den Container länger ziehen.
 
 ### #116 Ziehen zum Wachsen: Laterne, Stangen, Turm, Leitern, Kistenstapel, Zelte
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel: „Dinge wie Laterne so designen, dass man die Ziehen-zum-Vergrößern-Funktion benutzen kann, wie Laterne, Pfosten oder Wachturm“)

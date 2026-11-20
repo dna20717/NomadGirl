@@ -1130,3 +1130,16 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .bm-swatch { width: 30px; height: 26px; border-radius: 6px; border: 2px solid #3a2f45; background: var(--sw, #2b2233); color: #f2eef7; font: 600 10px Inter, sans-serif; cursor: pointer; }
 .bm-swatch:not([style]) { width: auto; padding: 0 8px; }
 .bm-swatch.on { border-color: #ffd27a; box-shadow: 0 0 0 2px #ffd27a55; }
+
+/* #117 build mode: zoom steps in the bar, colours in the menu, the close button out of the way of the budgets */
+.bm-zoom { display: flex; align-items: center; gap: 4px; }
+.bm-zoom button { min-width: 30px; padding: 4px 8px; font-size: 16px; }
+.bm-zoom small { min-width: 64px; text-align: center; font-family: VT323, monospace; font-size: 18px; color: #ffd27a; }
+.bm-ctx-colors { display: grid; gap: 4px; padding: 4px 2px 8px; }
+.bm-ctx-colors > small { color: #8a7d99; font-size: 11px; display: flex; align-items: center; gap: 4px; }
+.bm-ctx-colors > div { display: grid; grid-template-columns: repeat(6, 32px); gap: 4px; }
+.bm-ctx .bm-swatch { width: 32px; height: 32px; padding: 0; border-radius: 6px; background: var(--sw, #3a2f45); border: 2px solid #141013; font-size: 9px; }
+.bm-ctx .bm-swatch.on { outline: 2px solid #ffd27a; outline-offset: 1px; }
+.bm > .ui-x { top: 18px; right: 20px; }
+.bm-bar { padding-right: 52px; }
+.bm-ctx .bm-swatch:not([style]) { width: auto; grid-column: span 2; }

@@ -32,7 +32,7 @@ export class BuildPaint {
       return this.painted(w, `${dd.name || o.id} ${c ? 'gestrichen' : 'wieder im Original'}`);
     }
     const hit = this.pick(w.x, w.y, true);
-    const ui = hit?.kind === 'container' && hit.from === 'rig' ? hit.ui : hit?.kind === 'ws' && hit.from === 'rig' ? hit.ui : hit?.kind === 'resize' ? hit.ui : null;
+    const ui = (hit?.kind === 'container' || hit?.kind === 'cell') && hit.from === 'rig' ? hit.ui : hit?.kind === 'ws' && hit.from === 'rig' ? hit.ui : hit?.kind === 'resize' ? hit.ui : null;
     if (ui == null) { this.sfx.nope?.(); return this.say('Nur Container und Stoffe (Zelt, Segel, Plane, Wimpel, Banner, Neon) lassen sich streichen', 'idle'); }
     if (!D.containers?.[save.rig.units[ui]?.id]?.tiles) { this.sfx.nope?.(); return this.say('Dieser Anhänger lässt sich nicht streichen', 'idle'); }
     const before = snapshot(save), r = act(D, save, d => paintUnit(D, d, ui, c));
