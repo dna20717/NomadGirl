@@ -43,6 +43,7 @@ export async function startCockpit(canvas, { cfg = {}, A = {}, base = location.h
   const put = (img, at, scale = 1, flip = false) => { if (!img) return; const q = v => Math.round(v * RES) / RES, w = q(img.width * scale), h = q(img.height * scale); ctx.save(); ctx.translate(Math.round(at[0]), Math.round(at[1])); if (flip) ctx.scale(-1, 1); ctx.drawImage(img, -q(w / 2), -q(h / 2), w, h); ctx.restore(); };
   const box = (img, at, scale = 1) => img ? { x: Math.round(at[0] - img.width * scale / 2), y: Math.round(at[1] - img.height * scale / 2), k: scale } : null;
 
+  const glass = dirtyGlass(cfg.glass || {});
   let shift = [0, 0], last = performance.now(), bumpY = 0, bumpV = 0, nextBump = 0, lean = 0, raf = 0, alive = true;
   const needleV = {};
   const lcdBox = () => { const R = C.radio || {}, b = box(radio, R.at || [0, 0], (R.scale ?? 100) / 100); if (!b) return { x: 0, y: 0, w: 0, h: 0 }; const [lx, ly] = R.lcd || [0, 0], [lw, lh] = R.lcdSize || [radio.width, radio.height]; return { x: b.x + lx * b.k, y: b.y + ly * b.k, w: lw * b.k, h: lh * b.k }; };
@@ -56,6 +57,13 @@ export async function startCockpit(canvas, { cfg = {}, A = {}, base = location.h
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.setTransform(RES, 0, 0, RES, 0, 0); ctx.imageSmoothingEnabled = false;
     const ox = Math.round(lean), oy = Math.round(bumpY + Math.sin(t * 31) * 0.3 * sp); shift = [ox, oy];   // one offset for the pixels and the menu text
     ctx.save(); ctx.translate(ox, oy);
+    ctx.fillStyle = '#141013'; ctx.fillRect(-12, -12, 12, PH + 24); ctx.fillRect(PW, -12, 12, PH + 24); ctx.fillRect(-12, -12, PW + 24, 12);   // closed edges when leaning
+    // the glass: dust, wiper arcs, a stone chip with cracks, bug splats, dried drops, a drifting glare (Daniel: „damit man sehen kann, dass es eine Scheibe ist“)
+    ctx.drawImage(glass, 0, 0, PW, PH);
+    ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.07; ctx.fillStyle = '#fef3c0'; const gx = 150 + Math.sin(t * 0.13) * 30 - lean * 6;
+    ctx.beginPath(); ctx.moveTo(gx, 20); ctx.lineTo(gx + 26, 20); ctx.lineTo(gx - 44, 140); ctx.lineTo(gx - 70, 140); ctx.closePath(); ctx.fill(); ctx.globalAlpha = 0.04; ctx.beginPath(); ctx.moveTo(gx + 40, 20); ctx.lineTo(gx + 48, 20); ctx.lineTo(gx - 22, 140); ctx.lineTo(gx - 30, 140); ctx.closePath(); ctx.fill(); ctx.restore();
+    if (shell) ctx.drawImage(shell, 0, 0, PW, PH);
+    if (C.mirror) put(mirror, C.mirror.at, (C.mirror.scale ?? 100) / 100);   // #124 in front of the headliner: it hangs inside the van (Daniel: „wirkt, als würde er außerhalb hängen“)
     // things hanging from the mirror: pendulums (steering pushes them sideways, bumps make them jump)
     for (const h of hang) {
       const L = Math.max(4, h.length || 10) + (h.img.height * (h.scale ?? 50) / 100) / 2;
@@ -65,9 +73,6 @@ export async function startCockpit(canvas, { cfg = {}, A = {}, base = location.h
       ctx.fillStyle = '#b3b9d1'; const n = Math.ceil((h.length || 10) * RES); for (let i = 0; i <= n; i++) ctx.fillRect(Math.round((h.from[0] + (ex - h.from[0]) * i / n) * RES) / RES, Math.round((h.from[1] + (ey - h.from[1]) * i / n) * RES) / RES, 1 / RES, 1 / RES);   // a fine string
       const s = (h.scale ?? 50) / 100; ctx.save(); ctx.translate(Math.round(ex), Math.round(ey)); ctx.rotate(-h.a * 0.6); ctx.drawImage(h.img, -h.img.width * s / 2, 0, h.img.width * s, h.img.height * s); ctx.restore();
     }
-    if (C.mirror) put(mirror, C.mirror.at, (C.mirror.scale ?? 100) / 100);
-    ctx.fillStyle = '#141013'; ctx.fillRect(-12, -12, 12, PH + 24); ctx.fillRect(PW, -12, 12, PH + 24); ctx.fillRect(-12, -12, PW + 24, 12);   // closed edges when leaning
-    if (shell) ctx.drawImage(shell, 0, 0, PW, PH);
     if (C.visor?.at) put(visor, C.visor.at, (C.visor.scale ?? 100) / 100);
     for (const s of stick) { ctx.save(); ctx.translate(s.at[0], s.at[1]); ctx.rotate(s.turn); ctx.globalAlpha = 0.35; ctx.fillStyle = '#060608'; ctx.fillRect(-s.c.width / 2 / RES + 1, -s.c.height / 2 / RES + 1, s.c.width / RES, s.c.height / RES); ctx.globalAlpha = 1; ctx.drawImage(s.c, -s.c.width / 2 / RES, -s.c.height / 2 / RES, s.c.width / RES, s.c.height / RES); ctx.restore(); }
     const drawClutter = layer => { for (const c of clutter) if ((c.depth || 0) === layer) {
@@ -106,6 +111,43 @@ export async function startCockpit(canvas, { cfg = {}, A = {}, base = location.h
   };
   raf = requestAnimationFrame(frame);
   return { lcd: () => { const L = lcdBox(); return { ...L, x: L.x + shift[0], y: L.y + shift[1] }; }, bump: () => { bumpV -= 40; }, stop: () => { alive = false; cancelAnimationFrame(raf); } };
+}
+
+// the windshield's dirt, drawn once at RES (it lies under the shell: only the glass shows it)
+function dirtyGlass(G = {}) {
+  const c = document.createElement('canvas'); c.width = PW * RES; c.height = PH * RES;
+  const g = c.getContext('2d'), r = (s => () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296))(G.seed ?? 124), R = RES;
+  const dot = (x, y, col, a, sz = 1) => { g.globalAlpha = a; g.fillStyle = col; g.fillRect(Math.round(x * R), Math.round(y * R), sz, sz); };
+  // dust: a thin veil, thicker towards the bottom and the edges, in the colours of the desert
+  const veil = g.createLinearGradient(0, 20 * R, 0, 150 * R); veil.addColorStop(0, 'rgba(219,164,99,.06)'); veil.addColorStop(1, 'rgba(219,164,99,.26)');
+  g.fillStyle = veil; g.fillRect(0, 0, c.width, c.height);
+  for (let i = 0; i < (G.specks ?? 9000); i++) {
+    const x = r() * PW, y = 18 + r() * 125, edge = Math.max(0, 1 - Math.min(x, PW - x) / 60) + Math.max(0, (y - 95) / 50);
+    if (r() < 0.25 + edge * 0.6) dot(x, y, r() < 0.6 ? '#c7b08b' : r() < 0.5 ? '#a08662' : '#e4d2aa', 0.18 + r() * 0.35 * (0.4 + edge), r() < 0.85 ? 1 : 2);
+  }
+  // the wipers swept two arcs clean; dust gathers at their outer edge
+  for (const [px, py] of G.wipers || [[118, 150], [252, 150]]) {
+    g.save(); g.globalCompositeOperation = 'destination-out'; g.globalAlpha = 0.8; g.beginPath();
+    g.arc(px * R, py * R, 112 * R, Math.PI * 1.08, Math.PI * 1.92); g.arc(px * R, py * R, 34 * R, Math.PI * 1.92, Math.PI * 1.08, true); g.closePath(); g.fill(); g.restore();
+    g.globalAlpha = 0.28; g.strokeStyle = '#c7b08b'; g.lineWidth = 2; g.beginPath(); g.arc(px * R, py * R, 113 * R, Math.PI * 1.08, Math.PI * 1.92); g.stroke();
+    g.globalAlpha = 0.9; g.strokeStyle = '#141013'; g.lineWidth = 2 * R; g.beginPath(); g.moveTo((px - 6) * R, (py - 14) * R); g.lineTo((px + 70) * R, (py - 17) * R); g.stroke();   // the blade resting at the bottom
+  }
+  // a stone chip with a star of cracks
+  const [cx, cy] = G.chip || [304, 74];
+  for (let i = 0; i < 11; i++) { const a = i / 11 * Math.PI * 2 + r() * 0.4, L = 10 + r() * 46; let x = cx, y = cy;
+    for (let s = 0; s < L * R; s++) { x += (Math.cos(a) + (r() - 0.5) * 0.9) / R; y += (Math.sin(a) + (r() - 0.5) * 0.9) / R; dot(x, y, '#e3e6ff', 0.55 * (1 - s / (L * R)) + 0.1); } }
+  g.globalAlpha = 0.35; g.strokeStyle = '#e3e6ff'; g.lineWidth = 1; g.beginPath(); g.arc(cx * R, cy * R, 5 * R, 0, Math.PI * 2); g.stroke();
+  dot(cx - 1, cy - 1, '#141013', 0.7, 2 * R); dot(cx - 0.6, cy - 0.6, '#e3e6ff', 0.8, R);
+  // bug splats with a little smear to the side
+  for (let i = 0; i < (G.bugs ?? 7); i++) { const x = 40 + r() * 300, y = 30 + r() * 80, col = r() < 0.7 ? '#796755' : '#5a4e44';
+    for (let k = 0; k < 14; k++) dot(x + (r() - 0.5) * 3, y + (r() - 0.5) * 2, col, 0.35 + r() * 0.25, R); dot(x, y, '#9cdb43', 0.25, 1);
+    for (let k = 0; k < 10; k++) dot(x + 2 + k * 0.8, y + (r() - 0.5), col, 0.3 * (1 - k / 10), 1); }
+  // dried drops: short faint runs down the glass
+  for (let i = 0; i < (G.drops ?? 22); i++) { const x = 30 + r() * 320, y = 24 + r() * 60, L = 4 + r() * 14;
+    for (let k = 0; k < L * R; k++) dot(x + Math.sin(k * 0.07) * 0.3, y + k / R, '#e4d2aa', 0.14 * (1 - k / (L * R)), 1);
+    dot(x - 0.3, y + L, '#e4d2aa', 0.3, R); }
+  g.globalAlpha = 1;
+  return c;
 }
 
 // reached achievements → sticker sources (trophy picture of each: achievement › recipe › item › icon sheet cell)
