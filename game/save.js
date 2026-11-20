@@ -1,6 +1,6 @@
 // Savegame: everything that lasts between runs (clock, place, rig, Δ, health, buffs, run in progress).
-// Online (Cloudflare worker) one savegame per login in KV (/api/save), the same on every device;
-// without the worker (local, tests) in this browser (localStorage). Shape:
+// Online (Cloudflare worker) in KV per login (/api/save?slot=n), the same on every device; without the worker (local, tests) in this
+// browser (localStorage). #126: three slots, global achievements, the Vor-Lösch-Zustand: game/slots.js. Shape:
 //   { version, day, hour, location, fuel, food, deltas, health, buffs: [id], rig: { tractor, units: [{ kind, id, workshops: [{ id, at }] }], spare: { workshops: [id], containers: [id] } } (game/rig.js),
 //     companions: [id], recipes: [id] (recipe book), run: null | { poi, room, location }, log: [text],
 //     inv: { backpack: id, slots: { melee, ranged, cyberdeck }, wear: { head, armor, eyes … module }, grids: { backpack, drone (rescue pocket), camp (Camp-Lager, #041), 'store:<unit>:<place>': grid (Speziallager + trophy stands) } } }   (grids: game/inventory.js)
@@ -8,7 +8,8 @@
 //   camp = the Kofferraum (plus rows from a Dachbox) and every Lagerregal as ONE grid; older 'chest' and 'rig:<unit>' grids move into it on load
 // Times are hours (18.5 = 18:30). "Ereignis-Zeit": the clock only moves on actions (sleeping, runs, sitting at the fire).
 
-import { keepThrough } from './achievements.js';
+import { keepThrough, recipeOf } from './achievements.js';
+import { openStorage, activeSlot, slotMeta, withGlobal, mergeAchievements } from './slots.js';
 import { renameMap } from '../engine/renames.js';
 import { ensureMap } from './worldmap.js';
 import { generate } from './glitchlings.js';
@@ -18,7 +19,6 @@ import { rehome, removeUnits } from './reindex.js';
 import { ensureTank } from './tank.js';
 import { newGrid, add, fits, startWear, wearOf, WEAR_KEYS, addEntry, untangle, kindOf, thing, remove } from './inventory.js';
 
-const LOCAL_KEY = 'nomadgirl-save';
 export const SAVE_VERSION = 2;   // 2: Daniel, 19.11.2026 „alle Spielstände reset“ (after #111–#113): every older savegame starts fresh
 
 // rig layout from a tractor, containers and workshops: the tractor's own places first, then the containers in order
@@ -437,24 +437,28 @@ export function arrive(save, D) {
 }
 export function hoursUntil(save, hour) { const d = (hour - save.hour + 24) % 24; return d === 0 ? 24 : d; }
 
-export async function openSave(D, base = '') {
-  let where = 'local', stored = null, time = null;
-  try {
-    const r = await fetch(`${base}/api/save`, { headers: { accept: 'application/json' }, cache: 'no-store' });
-    if (r.ok && (r.headers.get('content-type') || '').includes('json')) { const d = await r.json(); where = 'cloud'; stored = d.save; time = d.time; }
-  } catch { /* no worker */ }
-  if (where === 'local') try { stored = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null'); } catch { stored = null; }
+// opens the savegame of a slot (#126). opts: slot (else this device's, game/slots.js › activeSlot), set (the Datenset a new slot
+// begins with), be (a storage, else the worker or this browser). Achievements are global: they come in on loading and go out on saving.
+export async function openSave(D, base = '', opts = {}) {
+  const be = opts.be || await openStorage(base), n = opts.slot || activeSlot();
+  let stored = null, time = null, G = null;
+  try { ({ save: stored, time } = await be.get(n)); } catch (e) { console.warn('Spielstand nicht geladen:', e.message); }
+  try { G = await be.blob('achievements'); } catch { G = null; }
+  const learnt = s => {   // the global achievements into this slot, with the recipes they teach
+    withGlobal(s, G);
+    for (const id of Object.keys(s.achievements?.done || {})) { const rid = recipeOf(D, id); if (rid && Array.isArray(s.recipes) && !s.recipes.includes(rid)) s.recipes.push(rid); }
+    return s;
+  };
+  const fresh = s => { s.set = opts.set ?? ''; s.name ??= `Leyla ${n}`; return s; };
+  let clock = Date.now();
   const box = {
-    where, time,
-    save: repairSave(stored, D),
+    where: be.where, time, slot: n, be,
+    save: learnt(stored ? repairSave(stored, D) : fresh(repairSave(null, D))),
     fresh: !stored,
     error: null,
     seen: stored?.savedAt || 0,   // the newest stamp this tab knows (loaded or written itself)
     // what is stored right now (another tab or device may have written it) → raw save or null
-    async stored() {
-      if (where === 'cloud') { const r = await fetch(`${base}/api/save`, { headers: { accept: 'application/json' }, cache: 'no-store' }); return r.ok ? (await r.json()).save : null; }
-      return JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null');
-    },
+    async stored() { return (await be.get(n)).save; },
     // a newer savegame from another tab or device wins over this (stale) tab: it is taken over instead of being overwritten
     // (Daniel, 13.11.2026: „die Lichterketten verschwinden weiterhin“; a second game tab, e.g. from the workshop's Spielen button,
     // still held the rig without them and wrote it back). → true when the stored one was taken over
@@ -462,27 +466,34 @@ export async function openSave(D, base = '') {
       let st = null;
       try { st = await box.stored(); } catch { return false; }
       if (!st?.savedAt || st.savedAt <= box.seen) return false;
-      box.save = repairSave(st, D); box.seen = st.savedAt;
+      box.save = learnt(repairSave(st, D)); box.seen = st.savedAt;
       box.onAdopt?.(box.save);
       return true;
     },
     // write the savegame (online: KV per login, otherwise this browser); errors are kept, the game goes on
     async persist(force = false) {
       if (!force && await box.adoptNewer()) return box;
-      box.save.savedAt = box.seen = Math.max(Date.now(), box.seen + 1);
-      const body = JSON.stringify({ save: box.save });
+      const now = Date.now();
+      box.save.playMs = (box.save.playMs || 0) + Math.min(10 * 60000, Math.max(0, now - clock)); clock = now;   // play time (an idle tab counts at most 10 min)
+      box.save.savedAt = box.seen = Math.max(now, box.seen + 1);
       try {
-        if (where === 'cloud') {
-          const r = await fetch(`${base}/api/save`, { method: 'PUT', headers: { 'content-type': 'application/json' }, body });
-          if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `Fehler ${r.status}`);
-          box.time = (await r.json()).time;
-        } else { localStorage.setItem(LOCAL_KEY, JSON.stringify(box.save)); box.time = new Date().toISOString(); }
+        box.time = await be.put(n, box.save, slotMeta(D, box.save, n));
+        const merged = mergeAchievements(G, box.save.achievements);
+        if (JSON.stringify(merged) !== JSON.stringify(G)) { await be.setBlob('achievements', merged); G = merged; }
         box.error = null;
       } catch (e) { box.error = e.message; console.warn('Spielstand nicht gespeichert:', e.message); }
       return box;
     },
-    async reset() { box.save = newSave(D); box.fresh = true; return box.persist(true); },
-    async cycle() { box.save = newCycle(D, box.save); box.fresh = true; return box.persist(true); },
+    // the slot's preview picture (#126, Frage F: a snapshot when the camp saves)
+    async shot(dataUrl) { try { if (dataUrl) await be.setBlob(`shot${n}`, dataUrl); } catch (e) { console.warn('Vorschaubild nicht gespeichert:', e.message); } },
+    // Neues Spiel on an occupied slot: the old one goes into the Vor-Lösch-Zustand first (Daniel 20.11.2026)
+    async reset() {
+      const { save: old } = await be.get(n).catch(() => ({ save: null }));
+      if (old) await be.setBlob('trash', { slot: n, save: old, meta: slotMeta(D, old, n), why: 'überschrieben', at: Date.now() }).catch(() => {});
+      box.save = learnt(fresh(newSave(D))); if (old?.name) box.save.name = old.name; if (old) box.save.set = old.set ?? box.save.set;
+      box.fresh = true; return box.persist(true);
+    },
+    async cycle() { const keep = { name: box.save.name, set: box.save.set, playMs: box.save.playMs }; box.save = learnt(Object.assign(newCycle(D, box.save), keep)); box.fresh = true; return box.persist(true); },
   };
   return box;
 }

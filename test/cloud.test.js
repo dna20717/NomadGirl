@@ -114,10 +114,18 @@ test('Gleicher Inhalt erzeugt keinen leeren Commit, ungültige Pfade werden abge
   assert.equal((await call('/api/access-info', { email: null })).data.login, false);
 });
 
+// a Cloudflare KV in memory: values, metadata, list by prefix
+const fakeKV = (kv, meta = new Map()) => ({
+  get: async (k, t) => kv.has(k) ? (t === 'json' ? JSON.parse(kv.get(k)) : kv.get(k)) : null,
+  put: async (k, v, o) => { kv.set(k, v); if (o?.metadata) meta.set(k, o.metadata); else meta.delete(k); },
+  delete: async k => { kv.delete(k); meta.delete(k); },
+  list: async ({ prefix }) => ({ keys: [...kv.keys()].filter(k => k.startsWith(prefix)).map(name => ({ name, metadata: meta.get(name) })) }),
+});
+
 test('Spielstand pro Login im KV', async () => {
   const { call, env } = await setup();
   const kv = new Map();
-  env.SAVES = { get: async (k, t) => kv.has(k) ? (t === 'json' ? JSON.parse(kv.get(k)) : kv.get(k)) : null, put: async (k, v) => { kv.set(k, v); }, delete: async k => { kv.delete(k); } };
+  env.SAVES = fakeKV(kv);
   assert.deepEqual((await call('/api/save')).data, { save: null, time: null });
   assert.equal((await call('/api/save', { method: 'PUT', body: { save: { day: 2, deltas: 30 } } })).status, 200);
   assert.equal((await call('/api/save')).data.save.deltas, 30);
@@ -131,8 +139,30 @@ test('Spielstand pro Login im KV', async () => {
   assert.equal((await call('/api/save')).status, 503);
 });
 
+test('#126 Drei Slots: alter Stand zieht nach Slot 1, Liste aus Metadaten, Achievements und Vor-Lösch-Zustand als Blob', async () => {
+  const { call, env } = await setup();
+  const kv = new Map();
+  env.SAVES = fakeKV(kv);
+  const base = await saveKey('daniel.nomad@example.com');
+  kv.set(base, JSON.stringify({ save: { day: 9, deltas: 70, achievements: { counts: { kills: 5 }, done: { a1: { day: 2 } } } }, time: 't' }));
+  const list = (await call('/api/saves')).data.slots;
+  assert.equal(list[1].day, 9); assert.equal(list[2], null); assert.equal(list[3], null);
+  assert.ok(!kv.has(base) && kv.has(`${base}:1`));   // moved, the old key is gone
+  assert.equal((await call('/api/save?slot=1')).data.save.deltas, 70);
+  assert.deepEqual((await call('/api/blob?name=achievements')).data.value.done, { a1: { day: 2 } });   // seeded from the old save
+  assert.equal((await call('/api/save?slot=2', { method: 'PUT', body: { save: { day: 1, name: 'Testlauf' }, meta: { name: 'Testlauf', day: 1, set: 'schnell' } } })).status, 200);
+  assert.equal((await call('/api/saves')).data.slots[2].set, 'schnell');
+  assert.equal((await call('/api/save?slot=1')).data.save.deltas, 70);   // slots are apart
+  for (const bad of ['0', '4', 'x']) assert.equal((await call(`/api/save?slot=${bad}`)).status, 400);
+  assert.equal((await call('/api/blob?name=trash', { method: 'PUT', body: { value: { slot: 2, save: { day: 1 } } } })).status, 200);
+  assert.equal((await call('/api/blob?name=trash')).data.value.slot, 2);
+  assert.equal((await call('/api/blob?name=secret')).status, 400);
+  assert.equal((await call('/api/saves', { email: 'anna@example.com' })).data.slots[1], null);   // someone else sees nothing
+  assert.equal((await call('/api/blob?name=trash', { email: 'anna@example.com' })).data.value, null);
+});
+
 // #083 Bilder hochladen: a picture becomes its own commit under the project's assets/, only pictures, not too big
-import { validUpload, UPLOAD_MAX } from '../worker/index.js';
+import { validUpload, UPLOAD_MAX, saveKey } from '../worker/index.js';
 test('Bild hochladen: eigener Commit unter assets/, nur Bilder, Größe begrenzt, Autor ohne E-Mail', async () => {
   const { g, call } = await setup();
   const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 1, 2, 3, 4]).toString('base64');

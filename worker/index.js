@@ -29,7 +29,9 @@ export async function handle(request, env, fetchFn) {
     const user = await accessUser(request, env, fetchFn);
     if (!user) return failure(401, 'Nicht angemeldet.');
     if (url.pathname === '/api/session') return json({ user, repo: env.GITHUB_REPO, branch: branch(env) });
-    if (url.pathname === '/api/save') return await savegame(request, env, user);
+    if (url.pathname === '/api/save') return await savegame(request, env, user, url);
+    if (url.pathname === '/api/saves') return await saveList(request, env, user);   // #126 the three slots
+    if (url.pathname === '/api/blob') return await saveBlob(request, env, user, url);   // #126 achievements, Vor-Lösch-Zustand, previews
     if (!env.GITHUB_TOKEN) return failure(503, 'GitHub-Schlüssel fehlt (GITHUB_TOKEN).');
     const gh = github(env, fetchFn);
     if (url.pathname === '/api/files' && request.method === 'GET') return json(await readFiles(gh, env));
@@ -60,17 +62,34 @@ export function authorName(n) {
   return t && t.length <= 40 ? t : null;
 }
 
-// ---------- savegame (Cloudflare KV, one per login) ----------
-// GET /api/save → { save | null, time }   PUT /api/save { save } → { time }   DELETE /api/save → new game
-// The key is a hash of the login e-mail, so the e-mail is not stored in clear.
-const SAVE_MAX = 256 * 1024;
+// ---------- savegame (Cloudflare KV per login) ----------
+// #126 three slots: GET /api/save?slot=n → { save | null, time }   PUT /api/save?slot=n { save, meta } → { time }   DELETE → empty slot
+// (no slot = 1). GET /api/saves → { slots: { 1: meta | null, 2: …, 3: … } } from the KV metadata, without loading the savegames.
+// GET|PUT|DELETE /api/blob?name=achievements|trash|shot1..3 → { value }: the global achievements, the Vor-Lösch-Zustand, previews.
+// The key is a hash of the login e-mail, so the e-mail is not stored in clear. The old single save (save:<hash>) moves to slot 1 once.
+const SAVE_MAX = 256 * 1024, META_MAX = 1000, SLOTS = 3, BLOBS = /^(achievements|trash|shot[1-3])$/;
 export async function saveKey(email) {
   const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(email).trim().toLowerCase()));
   return 'save:' + [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
-async function savegame(request, env, user) {
+const slotOf = url => { const v = url.searchParams.get('slot'); if (v == null) return 1; const n = Number(v); return Number.isInteger(n) && n >= 1 && n <= SLOTS ? n : null; };
+// a meta the client did not send (the old save): the few things the list shows
+const metaOf = (save, slot) => ({ slot, name: typeof save?.name === 'string' && save.name ? save.name.slice(0, 40) : `Leyla ${slot}`, day: save?.day || 1, hour: save?.hour ?? 0, cycle: save?.cycle || 1, deltas: save?.deltas || 0, savedAt: save?.savedAt || 0, set: save?.set ?? '' });
+const cleanMeta = (m, save, slot) => { const t = m && typeof m === 'object' && !Array.isArray(m) ? JSON.stringify({ ...m, slot }) : ''; return t && t.length <= META_MAX ? JSON.parse(t) : metaOf(save, slot); };
+async function migrate(env, base) {
+  const old = await env.SAVES.get(base, 'json');
+  if (!old) return;
+  if (!(await env.SAVES.get(`${base}:1`))) await env.SAVES.put(`${base}:1`, JSON.stringify(old), { metadata: metaOf(old.save, 1) });
+  if (await env.SAVES.get(`${base}:1`)) await env.SAVES.delete(base);   // read back first, then the old key goes
+  const ach = old.save?.achievements;
+  if (ach && !(await env.SAVES.get(`ach:${base}`))) await env.SAVES.put(`ach:${base}`, JSON.stringify({ value: { counts: ach.counts || {}, done: ach.done || {} } }));
+}
+async function savegame(request, env, user, url) {
   if (!env.SAVES) return failure(503, 'Spielstand-Speicher fehlt (KV-Binding SAVES).');
-  const key = await saveKey(user.email);
+  const slot = slotOf(url);
+  if (!slot) return failure(400, `Slot 1 bis ${SLOTS}.`);
+  const base = await saveKey(user.email), key = `${base}:${slot}`;
+  await migrate(env, base);
   if (request.method === 'GET') {
     const v = await env.SAVES.get(key, 'json');
     return json({ save: v?.save ?? null, time: v?.time ?? null });
@@ -78,14 +97,43 @@ async function savegame(request, env, user) {
   if (request.method === 'PUT') {
     const body = await request.text();
     if (body.length > SAVE_MAX) return failure(413, 'Spielstand zu groß.');
-    let save;
-    try { save = JSON.parse(body)?.save; } catch { return failure(400, 'Spielstand nicht lesbar.'); }
+    let save, meta;
+    try { ({ save, meta } = JSON.parse(body) || {}); } catch { return failure(400, 'Spielstand nicht lesbar.'); }
     if (!save || typeof save !== 'object' || Array.isArray(save)) return failure(400, 'Spielstand fehlt.');
     const time = new Date().toISOString();
-    await env.SAVES.put(key, JSON.stringify({ save, time }));
+    await env.SAVES.put(key, JSON.stringify({ save, time }), { metadata: cleanMeta(meta, save, slot) });
     return json({ time });
   }
   if (request.method === 'DELETE') { await env.SAVES.delete(key); return json({ time: null }); }
+  return failure(405, 'Nur GET, PUT oder DELETE.');
+}
+async function saveList(request, env, user) {
+  if (!env.SAVES) return failure(503, 'Spielstand-Speicher fehlt (KV-Binding SAVES).');
+  if (request.method !== 'GET') return failure(405, 'Nur GET.');
+  const base = await saveKey(user.email);
+  await migrate(env, base);
+  const slots = {};
+  for (let n = 1; n <= SLOTS; n++) slots[n] = null;
+  const L = await env.SAVES.list({ prefix: `${base}:` });
+  for (const k of L.keys || []) { const n = Number(k.name.slice(base.length + 1)); if (slots[n] === null) slots[n] = k.metadata || { slot: n, name: `Leyla ${n}` }; }
+  return json({ slots });
+}
+async function saveBlob(request, env, user, url) {
+  if (!env.SAVES) return failure(503, 'Spielstand-Speicher fehlt (KV-Binding SAVES).');
+  const name = url.searchParams.get('name') || '';
+  if (!BLOBS.test(name)) return failure(400, 'Unbekannter Speicher.');
+  const base = await saveKey(user.email), key = `${name === 'achievements' ? 'ach' : name}:${base}`;
+  if (request.method === 'GET') { const v = await env.SAVES.get(key, 'json'); return json({ value: v?.value ?? null }); }
+  if (request.method === 'PUT') {
+    const body = await request.text();
+    if (body.length > SAVE_MAX) return failure(413, 'Zu groß.');
+    let value;
+    try { ({ value } = JSON.parse(body) || {}); } catch { return failure(400, 'Nicht lesbar.'); }
+    if (value === undefined) return failure(400, 'Wert fehlt.');
+    await env.SAVES.put(key, JSON.stringify({ value }));
+    return json({ ok: true });
+  }
+  if (request.method === 'DELETE') { await env.SAVES.delete(key); return json({ ok: true }); }
   return failure(405, 'Nur GET, PUT oder DELETE.');
 }
 
