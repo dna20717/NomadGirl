@@ -116,3 +116,4 @@ Daniel, 15.11.2026 (AFK): „Bau bitte den gesamten Themenbereich inklusive Ques
 - Crawler/Fatbird haben seit #026 Kachel-Sets. Offen: Pixelgrößen der Teile weichen etwas voneinander ab (Bug ≈ 5,9, Mitte 4, Heck 7 Spielpixel je Bildpixel); weitere Mittelstück-Varianten gegen Wiederholung.
 - Mega-Rigs im Spiel fahren (Bau-Modus, Budgets, Crew, Ladebucht), Fahrzeug-Skilltrees und Heavy-Duty-Werkbank: noch nicht. Freigeschaltete Mega-Rigs stehen nur in `save.megarigs`.
 - ⚠️ Der Van als Basis ist nur vermerkt (Karte „BASIS“), am Fundort steht er noch nicht sichtbar.
+- **Ofen statt Lagerfeuer** (#098, Daniel 19.11.2026: „Kein Lagerfeuer IM Rig mehr“ → „Ofen statt Feuer“): im Hauptcontainer steht ein gusseiserner Ofen aus Code (glühende Klappe, Rohr nach oben), E wie am Feuer (Hinsetzen, Questlog), Licht 60 % des Feuers. Camp › Ofen im Mega-Rig: eigenes Bild, Lichtradius, Rohrlänge. Test: `mega_test`.

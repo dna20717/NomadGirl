@@ -37,7 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
-- 20.11. Code → Ava: Die kleinen drei laufen (Daniel): #098 Ofen im Mega-Rig, #099 Speziallager je Stern, #104 Werte im Inventar.
+- 20.11. Code → Ava: Die kleinen drei fertig: #098 Ofen im Mega-Rig, #099 Speziallager je Stern (Knopf im Lager-Fenster), #104 Werte im Inventar (Grund · Boni · Ergebnis, U).
 - 20.11. Code → Ava: #126 **Drei Spielstände** fertig: Slots im Cockpit-Radio mit Vorschaubild, Löschen mit Dialog + Zurückholen, globale Achievements, Slot behält sein Datenset, Spielstand laden im Pause-Menü, alter Stand zieht nach Slot 1 (lokal + online). 4 ⚠️ im Ticket.
 - 20.11. Code → Ava: #125 **Aufräumen + technische Schulden** fertig: Backlog C komplett (C2, C3, C4, C10, C11, C13, C14, C15, C18), Cockpit-Reste im Schema, Backlog auf Stand 20.11.; Konzept für 3 Spielstände in `docs/concepts/save_slots.md` mit 9 Fragen an Daniel (Backlog A9). Offen für Daniel: Cockpit-Kram platzieren (A10).
 - 20.11. Code → Ava: **HNC (Übergabe)**. Stand `main` nach #121–#124. Neu seit der letzten Übergabe: #121 Camp ohne sichtbares Ende + AvAs Funkreichweite + Rig offen/zu als Leyla (O/P/R3, Yoga geparkt); #122 Logo-Straße aus einem Guss, Kassette kleiner; #123/#124 **Startseite ist jetzt das Van-Cockpit** (/; alte unter /classic): PixelLab-Teile modular in Startseite › Cockpit (Hülle, Lenkrad, Instrumente, Radio mit Menü im LCD, Spiegel, 16 Stücke Kram als Tabelle), Achievement-Sticker, eigene Straße (rechte Spur), Billboard mit Anzeige + Untertitel „A Game about finding everything by leaving all behind“, AvA-Verhalten (scannen, fotografieren, Rolle, anklopfen, voraus rasen, dösen, Käfer jagen), dreifache Auflösung, Fahrer lenkt sanft, Scheibe mit Schmutz. PixelLab Sitzung 1125, übrig 2055. Offen/⚠️: Billboard steht links (rechts verdeckt die Sonnenblende); `cockpit.glass` noch nicht im Schema; Werkstatt-Vorschau der Startseite zeigt noch die klassische Seite; Fahrer-Sonnenblende `ck_visor` und 10 Kram-Stücke liegen bereit, unplatziert; Billboard-Werbung für Lore-Marken als Idee.
@@ -451,14 +451,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Balancing v1 als Standard, Cheat-Menü (#097)“. `npm test` 315/315 (earn/techtree an v1 angepasst, `test/cheats.test.js` neu). PixelLab 0. **Bitte testen:** https://nomadgirl.dna20717.workers.dev/game?cheats=1 öffnen, Esc › Cheats.
 
 ### #098 Mega-Rig: Ofen statt Lagerfeuer im Rumpf
-- **Status:** läuft (20.11.) · · angelegt 19.11. von Code (Runde 2, Notiz #077 „Kein Lagerfeuer IM Rig mehr“ → Fragerunde: „Ofen statt Feuer“)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (20.11.) · · angelegt 19.11. von Code (Runde 2, Notiz #077 „Kein Lagerfeuer IM Rig mehr“ → Fragerunde: „Ofen statt Feuer“)
+- **Rückfragen:** (Code) ⚠️ vorläufig: Ofen aus Code (kein PixelLab), Licht 60 % des Feuers; Sitzen und Questlog wie am Feuer.
+- **Ergebnis:** (Code) Commit „Mega-Rig: Ofen statt Lagerfeuer …“. `mega_test` 8/8 (neu: Ofen statt Lagerfeuer), camp grün. PixelLab 0. **Bitte testen:** Mega-Rig bergen und einziehen, im Hauptcontainer den Ofen ansehen, E (Hinsetzen, Questlog).
 
 ### #099 Speziallager ausbauen (mehr Platz je Stern)
-- **Status:** läuft (20.11.) · · angelegt 19.11. von Code (Runde 2, #078)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (20.11.) · · angelegt 19.11. von Code (Runde 2, #078)
+- **Rückfragen:** (Code) ⚠️ vorläufig: Stufen mit Preisen 200–800 Δ + Teile, +1/+2 Reihen; Zelle und Bit-Farm bekommen (noch) keine Stufen; Ausbauen per Knopf im Lager-Fenster.
+- **Ergebnis:** (Code) Commit „Speziallager ausbauen …“. `test/upgrades.test.js` +1, `upgrade_test` 4/4 (neu: Knopf im Lager-Fenster, Raster wächst), inventory/treasury/trunk grün. PixelLab 0. **Bitte testen:** Kühlraum oder Schatzkammer öffnen, „Ausbauen ★“, wiederkommen: eine Reihe mehr.
 
 ### #100 Rig-Moral (#040 Teil 2)
 - **Status:** offen · angelegt 19.11. von Code (Runde 2, #085)
@@ -481,9 +481,9 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #104 Werte als Abschnitt im Inventar, mit Grundwerten
-- **Status:** läuft (20.11.) · · angelegt 19.11. von Code (Runde 2, #091: „Das wäre als Abschnitt des Inventars sinnvoller. Bitte sauber dort aufbauen“, dazu Grundwerte + Boni = Endwert)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (20.11.) · · angelegt 19.11. von Code (Runde 2, #091: „Das wäre als Abschnitt des Inventars sinnvoller. Bitte sauber dort aufbauen“, dazu Grundwerte + Boni = Endwert)
+- **Rückfragen:** (Code) ⚠️ vorläufig: der eigene Werte-Bildschirm entfällt, U und Pause-Menü › Werte öffnen das Inventar; die Effekte stehen nur noch in der Effekt-Leiste.
+- **Ergebnis:** (Code) Commit „Werte im Inventar …“. `stats_test` neu 8/8, gear/inventory/pad/radio/menu_nav/cyberware grün. PixelLab 0. **Bitte testen:** U drücken, Ausrüstung wechseln und zurück auf Werte, mit Controller durch die Liste.
 
 ### #105 Kofferraum im POI 8 × 4
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Runde 2, #094)

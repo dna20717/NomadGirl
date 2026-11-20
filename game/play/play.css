@@ -1133,25 +1133,6 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .radio-chip.talk { max-width: min(620px, calc(50vw - 260px)); border-color: var(--ng-teal); }
 .radio-chip.talk span { white-space: normal; color: var(--ng-text); text-align: left; }
 
-/* #091 Werte-Bildschirm */
-.stats-list { list-style: none; margin: 0; padding: 0 4px 0 0; display: grid; gap: 8px; overflow: auto; max-height: 62vh; }
-.stats-row { padding: 10px 12px; border-radius: 8px; background: var(--ng-panel4); border: 1px solid var(--ng-line); }
-.stats-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-.stats-head b { color: var(--ng-text); font-size: 15px; }
-.stats-total { font: 28px/1 VT323, monospace; color: var(--ng-green); }
-.stats-row.bad .stats-total { color: var(--ng-red); }
-.stats-total.small { font-size: 16px; color: var(--ng-muted2); }
-.stats-parts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-.stats-part { display: inline-flex; align-items: baseline; gap: 4px; padding: 3px 8px; border-radius: 999px; background: var(--ng-panel3); border: 1px solid var(--ng-line); color: var(--ng-text3); font-size: 13px; }
-.stats-part small { color: var(--ng-muted2); font-size: 11px; text-transform: uppercase; }
-.stats-part b { color: var(--ng-green); font-weight: 600; }
-.stats-part.neg b { color: var(--ng-red); }
-.stats-row.fx small { color: var(--ng-lilac2); }
-.stats-row.fx.bad { border-color: #6b2f3a; }
-.stats-empty { color: var(--ng-muted2); }
-.stats-intro { margin: 0 0 8px; color: var(--ng-muted2); font-size: 13px; }
-.stats-box header { padding-right: 48px; }
-.stats-box header .tut-tabs { margin-left: auto; }
 /* #111 Ensembles not standing yet: quieter */
 .build-row.dim { opacity: 0.62; }
 /* #114 the brush: a colour strip under the build bar */
@@ -1172,3 +1153,19 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .bm > .ui-x { top: 18px; right: 20px; }
 .bm-bar { padding-right: 52px; }
 .bm-ctx .bm-swatch:not([style]) { width: auto; grid-column: span 2; }
+/* #104 Werte im Inventar: Grundwert + Boni = Ergebnis, die Quellen darunter */
+.inv-panel.values { display: flex; flex-direction: column; min-height: 0; }
+.inv-values { display: grid; gap: 4px; overflow: auto; max-height: 470px; padding: 2px 4px 2px 0; margin-top: 8px; }
+.inv-val-cols, .inv-val { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 2px 10px; }
+.inv-val-cols { grid-template-columns: 1fr 52px 52px 64px; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--ng-muted2); padding: 0 10px; }
+.inv-val-cols span + span { text-align: right; }
+.inv-btn.inv-val { text-align: left; padding: 6px 10px; border-radius: 6px; background: var(--ng-panel4); border: 1px solid var(--ng-line-dim); color: var(--ng-text2); font-weight: 400; cursor: default; }
+.inv-val-name { font-size: 13px; color: var(--ng-text); }
+.inv-val-calc { display: grid; grid-template-columns: 52px 52px 64px; text-align: right; font-family: VT323, monospace; font-size: 18px; line-height: 1; }
+.inv-val-calc small { color: var(--ng-muted2); font-size: 16px; }
+.inv-val-calc b { color: var(--ng-text); font-weight: 400; }
+.inv-val.up .inv-val-calc b { color: var(--ng-green); } .inv-val.down .inv-val-calc b { color: var(--ng-red); }
+.inv-val-parts { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px; }
+.inv-val-src { font-size: 11px; padding: 1px 6px; border-radius: 999px; background: var(--ng-panel2); color: var(--ng-lilac); }
+.inv-val-src.neg { color: var(--ng-red); }
+.inv-val-head { margin: 8px 0 2px; font: 18px/1 VT323, monospace; color: var(--ng-gold); letter-spacing: .04em; }

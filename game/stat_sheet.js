@@ -27,3 +27,25 @@ export function statSheet(D, save) {
 }
 // „+12 %“, „−15 %“, „+2“, „+30 LP“
 export const valueText = (v, unit = '') => `${v > 0 ? '+' : v < 0 ? '−' : '±'}${String(Math.abs(v)).replace('.', ',')}${unit === '%' ? ' %' : unit}`;
+
+// #104 (Daniel 19.11.2026: „Das wäre als Abschnitt des Inventars sinnvoller. Bitte sauber dort aufbauen“, dazu Grundwerte + Boni = Endwert):
+// Leyla's values from the start: what she has without anything (Leyla › Leben, Ausdauer, Sprünge), plus the boni (gear, implants,
+// techtree, trophies, brands, buffs for the next run) = what counts. mult: a % on 100 %, add: % points from 0, flat: plain numbers.
+const BASES = [
+  ['health', 'flat', D => D.leyla?.health ?? 100], ['stamina', 'flat', D => D.leyla?.stamina?.max ?? 100], ['defense', 'add', () => 0], ['damage', 'mult'], ['melee', 'mult'], ['ranged', 'mult'],
+  ['crit', 'add', () => 0], ['speed', 'mult'], ['jump', 'mult'], ['dashCooldown', 'mult'], ['staminaRegen', 'mult'], ['regen', 'flat', () => 0], ['heal', 'mult'],
+  ['airJumps', 'flat', D => (D.leyla?.abilities?.gated !== false ? 0 : D.leyla?.movement?.airJumps ?? 0)], ['airDash', 'flat', () => 0], ['hack', 'flat', null],
+];
+const num = v => String(Math.round(v * 10) / 10).replace('.', ',');
+export function leylaValues(D, save) {
+  const rows = Object.fromEntries((statSheet(D, save).leyla || []).map(r => [r.stat, r]));
+  return BASES.map(([stat, kind, base]) => {
+    const def = GEAR_STATS.find(s => s[0] === stat); if (!def) return null;
+    const [, name, unit, dir] = def, r = rows[stat], total = r?.total || 0, parts = r?.parts || [];
+    if (!base && kind === 'flat' && !parts.length) return null;   // no base and no bonus: nothing to say
+    const b = kind === 'mult' ? 100 : base ? base(D) : 0, final = kind === 'mult' ? 100 + total : b + total;
+    const fmt = v => stat === 'airDash' ? (v > 0 ? 'ja' : 'nein') : kind === 'flat' ? `${num(v)}${unit === '%' ? ' %' : unit}` : `${num(v)} %`;
+    return { stat, name, kind, base: b, total, final, baseText: base === null ? '—' : fmt(b), bonusText: parts.length ? valueText(total, kind === 'flat' ? unit : '%') : '±0', finalText: fmt(final), parts,
+      good: total * (dir || 1) >= 0, changed: !!parts.length };
+  }).filter(Boolean);
+}

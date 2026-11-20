@@ -3,6 +3,7 @@
 // Mouse: click picks a thing up (it follows the pointer), click on a cell puts it down (stacks or swaps), right click turns it,
 // double click moves it to the other side, a click outside the panels puts it back. Placeholders until things have a look:
 // coloured cells by category with a short glyph, the name and the count.
+import { statSheet, leylaValues, valueText, SOURCE_NAMES } from '../stat_sheet.js';
 import { DECK, deckSize, fitDeck } from '../save.js';
 import { farmKeys, workplaceOf } from '../workers.js';
 import { brandSets } from '../brand_perks.js';
@@ -152,9 +153,9 @@ export class InventoryUI {
     this.ghost.style.transform = this.zoom < 1 ? `scale(${this.zoom})` : '';
   }
   tabsEl() {
-    const D = this.D, camp = this.host.inCamp?.() && this.vanStore(), t = this.vanTab ? 'van' : this.view === 'implants' ? 'implants' : 'gear';
+    const D = this.D, camp = this.host.inCamp?.() && this.vanStore(), t = this.vanTab ? 'van' : this.view === 'implants' ? 'implants' : this.view === 'stats' ? 'stats' : 'gear';
     const tab = (id, ic, name, go) => el('button', { class: 'inv-tab' + (t === id ? ' on' : ''), 'data-tab': id, onmousedown: ev => { ev.stopPropagation(); go(); } }, icon(ic, 14), name);
-    return el('div', { class: 'inv-tabs' }, tab('gear', 'person', 'Ausrüstung', () => { this.view = 'gear'; this.setTab('leyla'); }), tab('implants', 'brain', 'Implantate', () => { this.view = 'implants'; this.setTab('leyla'); }),
+    return el('div', { class: 'inv-tabs' }, tab('gear', 'person', 'Ausrüstung', () => { this.view = 'gear'; this.setTab('leyla'); }), tab('implants', 'brain', 'Implantate', () => { this.view = 'implants'; this.setTab('leyla'); }), tab('stats', 'scale', 'Werte', () => { this.view = 'stats'; this.setTab('leyla'); }),   // #104
       camp ? tab('van', 'vehicle', D.tractors?.[this.host.save().rig.tractor]?.name || 'Van', () => this.setTab('van')) : null);
   }
   bagEl() {
@@ -228,7 +229,25 @@ export class InventoryUI {
     const body = el('div', { class: 'inv-doll' + (swap ? ' swap' : '') + (implants ? ' implants' : '') }, col(left),
       el('div', { class: 'inv-center' }, figure, implants ? el('p', { class: 'inv-note' }, this.host.inCamp?.() ? 'Im Camp ein- und ausbauen' : 'Nur im Camp tauschbar') : this.useEl()), col(right));
     this.dollEl = body; this.figEl = figure;
+    if (this.view === 'stats') return el('section', { class: 'inv-panel leyla values' }, el('header', {}, icon('person', 16), el('b', {}, 'Leyla'), el('small', {}, `${this.host.save().deltas ?? 0} Δ`)), this.tabsEl(), this.valuesEl());
     return el('section', { class: 'inv-panel leyla' }, el('header', {}, icon('person', 16), el('b', {}, 'Leyla'), el('small', {}, `${this.host.save().deltas ?? 0} Δ`)), this.tabsEl(), body, stats);
+  }
+  // #104 Werte as a part of the inventory: Leyla's values (Grundwert + Boni = Endwert), then the camp and the tank, every source named.
+  // Every row is a button, so the controller's cursor reaches it and the list scrolls along.
+  valuesEl() {
+    const D = this.D, save = this.host.save(), S = statSheet(D, save), V = leylaValues(D, save);
+    const src = p => el('span', { class: 'inv-val-src ' + (p.value < 0 ? 'neg' : 'pos') }, `${SOURCE_NAMES[p.source] || p.source}: ${p.label} ${valueText(p.value, '')}`);
+    const leyla = r => el('button', { class: 'inv-btn inv-val' + (r.changed ? r.good ? ' up' : ' down' : ''), 'data-tab': 'val:' + r.stat },
+      el('span', { class: 'inv-val-name' }, r.name), el('span', { class: 'inv-val-calc' }, el('small', {}, r.baseText), el('small', {}, r.bonusText), el('b', {}, r.finalText)),
+      r.parts.length ? el('span', { class: 'inv-val-parts' }, ...r.parts.map(src)) : null);
+    const other = r => el('button', { class: 'inv-btn inv-val' + (r.good ? '' : ' down'), 'data-tab': 'val:' + r.stat },
+      el('span', { class: 'inv-val-name' }, r.name), el('span', { class: 'inv-val-calc' }, el('b', {}, valueText(r.total, r.unit))), el('span', { class: 'inv-val-parts' }, ...r.parts.map(src)));
+    const head = t => el('h4', { class: 'inv-val-head' }, t);
+    return el('div', { class: 'inv-values' },
+      el('div', { class: 'inv-val-cols' }, el('span', {}, 'Wert'), el('span', {}, 'Grund'), el('span', {}, 'Boni'), el('span', {}, 'Ergebnis')),
+      ...V.map(leyla),
+      S.camp.length ? head('Camp') : null, ...S.camp.map(other),
+      S.tank.length ? head('Tank & AvA') : null, ...S.tank.map(other));
   }
   // dashed lines from each implant place to its point on Leyla's body (measured after layout, the zoom taken out)
   wires(rows, k) {
@@ -585,7 +604,8 @@ export class InventoryUI {
   }
   padShow() {
     if (!this.padOn || !this.isOpen) { this.cursor.hidden = true; return; }
-    const f = this.padFocus();
+    let f = this.padFocus();
+    if (f?.node?.closest?.('.inv-values')) { f.node.scrollIntoView({ block: 'nearest' }); f = this.padFocus(); }   // #104 the list scrolls with the cursor
     if (!f) return;
     this.cursor.hidden = false;
     const box = this.cursorShape(f);

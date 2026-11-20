@@ -72,7 +72,7 @@ export class RadioUI {
   // a window, menu or the build mode is open: the chip steps aside so it never covers their tooltips (the music plays on)
   busy() {
     const h = this.scene?.hud; if (!h) return false;
-    return !!(h.modal || h.paused || h.inv?.isOpen || h.craft?.isOpen || h.tech?.isOpen || h.map?.isOpen || h.stats?.isOpen || h.quests?.isOpen || h.ach?.isOpen || h.sum?.isOpen || h.build?.active || h.megaBuild?.isOpen || h.duel?.isOpen || h.tut?.isOpen);
+    return !!(h.modal || h.paused || h.inv?.isOpen || h.craft?.isOpen || h.tech?.isOpen || h.map?.isOpen || h.quests?.isOpen || h.ach?.isOpen || h.sum?.isOpen || h.build?.active || h.megaBuild?.isOpen || h.duel?.isOpen || h.tut?.isOpen);
   }
   // pause menu: the stations and off
   menu(hud) {

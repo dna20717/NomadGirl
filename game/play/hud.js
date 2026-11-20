@@ -111,6 +111,8 @@ export class Hud {
         { label: 'Neuer Durchgang', sub: 'Techtree bleibt, alles andere fängt neu an', act: () => { location.href = `game.html?camp&slot=${n}&cycle`; } },
         { label: 'Alles zurücksetzen', sub: 'Auch der Techtree ist weg. Der alte Stand lässt sich im Hauptmenü noch einmal zurückholen', act: () => { location.href = `game.html?camp&slot=${n}&new`; } }] });
   }
+  // #104 the Werte live in the inventory (Leyla › Werte)
+  openValues() { const inv = this.inv; if (!inv) return; inv.view = 'stats'; if (inv.isOpen) inv.setTab('leyla'); else inv.open(null, { tab: 'leyla' }); }
   // #126 the slot in words: „Slot 2 · Testlauf“
   slotLabel() { const b = this.saveBox; return b ? `Slot ${b.slot} · ${b.save?.name || 'Leyla ' + b.slot}` : 'Spielstand'; }
   // #126 Spielstand laden (Daniel 20.11.2026: „Man darf überall einen anderen Spielstand laden und gespeichert wird im Camp automatisch“)
@@ -137,7 +139,7 @@ export class Hud {
       { label: 'Steuerung', sub: 'Tasten und Controller', act: () => this.toggleHelp(true) },
       { label: 'Feldhandbuch', sub: 'Alle Lektionen mit Clips', act: () => setTimeout(() => this.tut?.openGuide(), 0) },
       ...(sc.box ? [{ label: 'Achievements', sub: 'Erreicht, offen, Trophäen', act: () => setTimeout(() => this.ach?.open(), 0) }, { label: 'Logbuch', sub: 'Alle Meldungen mit Uhrzeit', act: () => setTimeout(() => this.logbook(), 0) }] : []),
-      ...(sc.box ? [{ label: 'Werte', sub: 'Alle Boni mit ihren Quellen · U', act: () => setTimeout(() => this.stats?.open(), 0) }] : []),   // #091
+      ...(sc.box ? [{ label: 'Werte', sub: 'Grundwerte, Boni und ihre Quellen · U', act: () => setTimeout(() => this.openValues(), 0) }] : []),   // #091 → #104 im Inventar
       ...(this.radio && sc.box && sc.mode !== 'run' && this.radio.C.stations.length ? [{ label: `Radio: ${this.radio.on ? this.radio.station?.name : 'aus'}`, sub: 'Sender wählen · N', act: () => setTimeout(() => this.radio.menu(this), 0) }] : []),   // #090
       { label: 'Optionen', sub: 'Ton, Schießstil', act: () => setTimeout(() => this.optionsMenu(), 0) },
       ...(sc.box && cheatsOn() ? [{ label: 'Cheats', sub: 'Nur auf diesem Gerät freigeschaltet', act: () => setTimeout(() => this.cheatMenu(), 0) }] : []),   // #097
