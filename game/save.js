@@ -9,6 +9,7 @@
 // Times are hours (18.5 = 18:30). "Ereignis-Zeit": the clock only moves on actions (sleeping, runs, sitting at the fire).
 
 import { keepThrough } from './achievements.js';
+import { renameMap } from '../engine/renames.js';
 import { ensureMap } from './worldmap.js';
 import { generate } from './glitchlings.js';
 import { settle as settleMega, fixLights as fixMegaLights, deactivate as deactivateMega } from './mega.js';
@@ -318,9 +319,36 @@ function refit(D, s) {
     rehome(D, s, g);
   }
 }
+// Backlog C10 (#125): ids renamed in the workshop (Grundlagen › Umbenennungen) follow in the savegame instead of being dropped below.
+// Inventory entries ({ a: area, id }) map by their area; any other string or key maps when its old id is gone from every area and
+// only one rename leads away from it (ids are plain words, so a match is that id). Returns how many places changed.
+export function followRenames(D, save) {
+  const byArea = renameMap(D), any = new Map(), clash = new Set();
+  const exists = id => Object.values(D).some(o => o && typeof o === 'object' && !Array.isArray(o) && Object.hasOwn(o, id) && o[id] && typeof o[id] === 'object');
+  for (const m of Object.values(byArea)) for (const [from, to] of Object.entries(m)) {
+    if (any.has(from) && any.get(from) !== to) clash.add(from); else any.set(from, to);
+  }
+  for (const id of [...any.keys()]) if (clash.has(id) || exists(id)) any.delete(id);
+  if (!any.size && !Object.keys(byArea).length) return 0;
+  let n = 0;
+  const walk = o => {
+    if (Array.isArray(o)) { o.forEach((v, i) => { if (typeof v === 'string' && any.has(v)) { o[i] = any.get(v); n++; } else if (v && typeof v === 'object') walk(v); }); return; }
+    if (typeof o.a === 'string' && typeof o.id === 'string' && byArea[o.a]?.[o.id]) { o.id = byArea[o.a][o.id]; n++; }
+    for (const k of Object.keys(o)) {
+      const v = o[k];
+      if (typeof v === 'string' && any.has(v) && !(k === 'id' && typeof o.a === 'string')) { o[k] = any.get(v); n++; }
+      else if (v && typeof v === 'object') walk(v);
+      if (any.has(k) && !Object.hasOwn(o, any.get(k))) { o[any.get(k)] = o[k]; delete o[k]; n++; }
+    }
+  };
+  walk(save);
+  return n;
+}
+
 export function repairSave(save, D) {
   const fresh = newSave(D);
   if (!save || typeof save !== 'object' || save.version !== SAVE_VERSION) return fresh;
+  followRenames(D, save);
   const s = { ...fresh, ...save, gifts: save.gifts || [] };   // a savegame from before a gift gets it (#048)
   if (!D.locations?.[s.location] && !s.map?.nodes?.some(n => n.id === s.location)) s.location = fresh.location;
   ensureMap(D, s);   // older savegames get their map here (#007)

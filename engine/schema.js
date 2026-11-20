@@ -420,6 +420,19 @@ export const AREAS = {
       { title: 'Foodtruck (noch ohne Wirkung: kommt mit dem Verkauf)', fields: [num('foodtruck.priceFactor', 'Preisfaktor', { step: 0.05, min: 0, hint: 'Verkaufspreis = Wert × Faktor' }), num('foodtruck.maxPerStop', 'Max. Verkäufe pro Halt', { min: 0 })] },
     ],
   },
+  renames: {
+    name: 'Umbenennungen', icon: 'history', file: 'data/renames.json', kind: 'single', noSets: true,
+    hint: 'Backlog C10 (#125): Jedes Umbenennen in der Werkstatt oder mit „ng rename“ landet hier. Beim Laden eines Spielstands zieht das Spiel alte IDs auf die neuen nach (Gegenstände, Rezepte, Buffs, Quests, Werkstätten …), damit nichts still verschwindet. Zeilen löschen = alte Spielstände verlieren diese ID wieder.',
+    sections: [
+      { title: 'Protokoll', fields: [table('log', 'Umbenennungen', [text('area', 'Bereich'), text('from', 'Alte ID'), text('to', 'Neue ID'), text('date', 'Datum')], { hint: 'Älteste oben; Ketten (a → b → c) werden in Reihenfolge angewandt' })] },
+    ],
+    check: (x, report, p) => {
+      for (const r of x.log || []) {
+        if (!AREAS[r.area]) report('warning', `Umbenennung ${r.from} → ${r.to}: Bereich „${r.area}“ gibt es nicht`);
+        else if (!r.from || !r.to) report('warning', `Umbenennung im Bereich ${r.area} ohne alte oder neue ID`);
+      }
+    },
+  },
   ranking: {
     name: 'Ranking', icon: 'star', file: 'data/ranking.json', kind: 'single',
     hint: 'Nach einem abgeschlossenen POI gibt jede Kategorie Punkte. Die Summe ergibt den Rang, der Rang einen Deltas-Bonus auf das sichere Basisgeld. Wer stirbt, bekommt kein Ranking.',
@@ -1841,7 +1854,7 @@ export const AREAS = {
 // Navigation: groups of areas in the order of the design document
 export const GROUPS = [
   ['ASSETS', ['assets', 'pixelOrders', 'voices']],
-  ['GRUNDLAGEN', ['game', 'splash', 'intro', 'tutorial', 'weather', 'economy', 'ranking']],
+  ['GRUNDLAGEN', ['game', 'splash', 'intro', 'tutorial', 'weather', 'economy', 'ranking', 'renames']],
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'kits', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],

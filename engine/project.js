@@ -1,5 +1,6 @@
 // NomadGirl – project: load, validate, find usages, rename. Runs identically in the browser and in Node.
 // Everything is driven by engine/schema.js.
+import { renameMap } from './renames.js';
 import { AREAS, fields, optionLabel } from './schema.js';
 
 export * from './schema.js';
@@ -108,8 +109,18 @@ export function renameEntry(p, area, old, new_) {
   p.data[area] = copy;
   for (const a of Object.keys(AREAS)) for (const [, x] of entries(p, a)) for (const r of references(a, x))
     if (r.area === area && r.value === old) { if (r.field.type === 'refs') r.holder[r.key] = new_; else set(r.holder, r.key, new_); changed.add(a); }
+  if (AREAS.renames && area !== 'renames') { logRename(p, area, old, new_); changed.add('renames'); }
   return [...changed];
 }
+
+// Backlog C10 (#125): every rename is logged (data/renames.json) so savegames can follow (game/save.js › followRenames).
+// The new id exists again, so older lines that led away from it are dropped (renaming back undoes a line).
+export function logRename(p, area, from, to, date = new Date().toISOString().slice(0, 10)) {
+  const R = p.data.renames ||= {};
+  R.log = (R.log || []).filter(r => !(r.area === area && r.from === to));
+  R.log.push({ area, from, to, date });
+}
+
 
 // Remove an entry; references are cleared (refs lists shrink, table rows keep their row but lose the value). Returns changed areas.
 export function removeEntry(p, area, id) {
@@ -119,6 +130,8 @@ export function removeEntry(p, area, id) {
     if (r.area === area && r.value === id) { if (r.field.type === 'refs') r.holder.splice(r.key, 1); else set(r.holder, r.key, undefined); changed.add(a); }
   return [...changed];
 }
+
+export { renameMap };
 
 // Short text for an entry in lists
 export function rowText(p, a, x) { try { return AREAS[a].row?.(x, p) ?? ''; } catch { return ''; } }

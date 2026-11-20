@@ -38,3 +38,7 @@ Was die Systeme verbindet, sichtbar im Inspektor (`game/workshop/summaries.js`, 
 - Datensets › Speichern unter …: Name und Beschreibung (steht in der Liste und im Hauptmenü).
 
 - **Erklärungen antippen** (Daniel, 19.11.2026: Tooltips gehen am iPad nicht): das ⓘ an einem Feld ist ein Knopf und klappt die Erklärung unter dem Feld auf (`hintToggle` in `workshop.js`); mit Maus zeigt Überfahren sie weiter als Tooltip. Bis 980 px Breite (iPad hochkant) werden die drei Spalten schmaler (`workshop.css`).
+
+## Umbenennen zieht Spielstände mit (#125, Backlog C10)
+
+Jedes Umbenennen (Werkstatt oder `ng rename`) schreibt eine Zeile in **Grundlagen › Umbenennungen** (`data/renames.json`, `engine/renames.js`). Beim Laden (`repairSave` → `followRenames` in `game/save.js`) bekommen alte Spielstände die neuen IDs: Inventar-Einträge nach ihrem Bereich, alle übrigen Stellen (Buffs, Rezepte, Quests, Werkstätten, Companions, Schlüssel) dort, wo die alte ID in keinem Bereich mehr vorkommt und nur eine Umbenennung von ihr wegführt. Ketten (a → b → c) landen bei c; zurück umbenennen (b → a) lässt Spielstände mit b wieder auf a zeigen. Löschen (`removeEntry`) protokolliert nichts: gelöschte IDs fallen beim Laden weiter still heraus. Test: `test/renames.test.js`.
