@@ -65,7 +65,7 @@ export class BuildDecor {
     this.decorHold = { id, from, a: null };
     this.shopOpen = false;
     const k = placeOf(this.D, id);
-    if (k === 'inside') { const A = this.areas().find(a => a.key === 'rig'); if (A) { this.areaNow = A; this.frame(A); } if (!this.scene.hud.rigOpen) this.toggleOpen?.(); }   // #114 inside: the containers open
+    if (k === 'inside') { const A = this.areas().find(a => a.key === 'rig'); if (A) { this.areaNow = A; this.frame(A); } this.showInside = true; }   // #114 inside: the containers open
     if (k === 'ground' || k === 'span' || k === 'free') { const A = this.areas().find(a => a.key === 'camp'); if (A) { this.areaNow = A; this.frame(A); } }   // to the campsite
     const nv = variants(this.D, id);
     if (nv > 1 && this.decorHold.v == null) this.decorHold.v = Math.floor(Math.random() * nv);

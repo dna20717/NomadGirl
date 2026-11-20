@@ -45,6 +45,7 @@ export class BuildMode {
       else if (e.key === 'Escape' && this.growing) { this.endGrow(); e.preventDefault(); e.stopPropagation(); }   // #116
       else if (e.key === 'Escape' && this.ctx) { this.closeCtx(); e.preventDefault(); e.stopPropagation(); }   // #117
       else if (e.key === 'Escape' && this.sel && !this.drag && !this.decorHold) { this.clearSel(); e.preventDefault(); e.stopPropagation(); }
+      else if ((e.key === 'o' || e.key === 'O') && !e.ctrlKey && !e.metaKey) { this.toggleOpen(); e.preventDefault(); e.stopPropagation(); }   // #117
       else if (['+', '=', '-', '_'].includes(e.key) && !e.ctrlKey && !e.metaKey) { this.zoomStep(e.key === '+' || e.key === '=' ? 1 : -1, this.ava?.on ? this.ava : this.pointer); e.preventDefault(); e.stopPropagation(); }
       else if (e.key === 'Escape' && this.painting != null) { this.togglePaint(false); e.preventDefault(); e.stopPropagation(); }   // #114
       else if ((e.key === 'p' || e.key === 'P') && !e.ctrlKey && !e.metaKey) { this.togglePaint(); e.preventDefault(); e.stopPropagation(); }
@@ -71,6 +72,7 @@ export class BuildMode {
     const s = this.scene, cam = s.cam, geo = this.camp.geo, V = this.B.view || {};
     if (this.active) return;
     this.reset();
+    this.showInside = false;   // #117 the rig starts closed: decorate outside first
     this.active = true; this.el.hidden = false; this.msg = null;
     this.el.parentElement.dataset.building = '1';
     this.sfx = makeSfx(s, (V.volume ?? 50) / 100);
@@ -150,7 +152,9 @@ export class BuildMode {
     s.buildClosed();
   }
 
-  toggleOpen() { const h = this.scene.hud; h.setRigOpen(!h.rigOpen); this.draw(); }
+  toggleOpen() { this.showInside = !this.showInside; this.sfx.klack?.(); this.buzz?.('snap'); this.say(this.showInside ? 'Rig offen: innen bauen' : 'Rig zu: außen dekorieren', 'idle'); this.draw(); }   // #117 in build mode: the view, not the HUD setting
+  // #117 the containers are open while building only when asked (toggle) or needed: a workshop in hand, inside decoration, a marked cell
+  insideView() { return !!this.showInside || this.drag?.kind === 'ws' || this.decorHold?.inside || this.sel?.kind === 'cell' || (this.decorHold && this.D.decor?.[this.decorHold.id]?.place === 'inside'); }
 
   // ---------- controller and keyboard (#010, Daniel, 13.11.2026: „vollständig mit dem Controller bedienbar und soll Spaß machen“,
   // „linker Stick springt, rechter frei, aber die Drohne ist der Zeiger“). AvA IS the pointer: her claw point (`this.ava`) is where
@@ -198,6 +202,7 @@ export class BuildMode {
       const lt = !!(g.buttons[6]?.pressed || g.buttons[6]?.value > 0.5), rt = !!(g.buttons[7]?.pressed || g.buttons[7]?.value > 0.5);
       if (lt && !this.ltWas) this.zoomStep(-1, this.ava); if (rt && !this.rtWas) this.zoomStep(1, this.ava);
       this.ltWas = lt; this.rtWas = rt;
+      const r3 = !!g.buttons[11]?.pressed; if (r3 && !this.r3Was) this.toggleOpen(); this.r3Was = r3;   // #117 right stick pressed: rig open / closed
     }
     for (const [d, dx, dy] of [['left', -1, 0], ['right', 1, 0], ['up', 0, -1], ['down', 0, 1]]) {
       if (u.pressed(d)) { this.rep = { d, at: now + 360 }; this.hop(dx, dy); }
@@ -387,7 +392,7 @@ export class BuildMode {
     items.push({ label: 'Händler', icon: 'shop', act: () => { this.closeCtx(); this.shopOpen = true; this.draw(); } });
     const top = this.undo[this.undo.length - 1];
     if (top && !top.done) items.push({ label: `Rückgängig: ${top.label}`, icon: 'undo', act: () => { this.closeCtx(); this.undoLast(); } });
-    items.push({ label: this.scene.hud.rigOpen ? 'Rig zu' : 'Rig offen', icon: 'box', act: () => { this.closeCtx(); this.toggleOpen(); } });
+    items.push({ label: this.showInside ? 'Rig zu (außen dekorieren)' : 'Rig offen (innen bauen)', icon: 'box', act: () => { this.closeCtx(); this.toggleOpen(); } });
     items.push({ label: 'Fertig', icon: 'check', act: () => { this.closeCtx(); this.close(); } });
     const box = el('div', { class: 'bm-ctx ui-frame' }, el('header', {}, el('b', {}, name || 'Rig bauen'), hit ? el('small', {}, KIND_NAMES[hit.kind] || '') : null),
       ...items.map(x => el('button', { class: 'inv-btn ghost', onclick: x.act }, icon(x.icon, 15), ' ', x.label)),
@@ -488,7 +493,7 @@ export class BuildMode {
           el('button', { class: 'inv-btn bm-shopbtn' + (this.shopOpen ? ' on' : ''), onclick: () => { this.shopOpen = !this.shopOpen; this.draw(); } }, icon('shop', 15), ' Händler'),
           ...(this.painting != null ? [el('button', { class: 'inv-btn ghost bm-brushbtn on', title: 'Pinsel aus (P)', onclick: () => this.togglePaint(false) }, icon('brush', 15), ' Pinsel')] : []),   // #117 the colour lives in the menu now; P still brushes cloth
           el('div', { class: 'bm-zoom' }, el('button', { class: 'inv-btn ghost', title: 'Raus (− / LT / Mausrad)', onclick: () => this.zoomStep(-1) }, '−'), el('small', {}, ['Übersicht', 'Rig', 'Detail', 'Nah'][this.zoomLevel ?? 0] || 'Zoom'), el('button', { class: 'inv-btn ghost', title: 'Rein (+ / RT / Mausrad)', onclick: () => this.zoomStep(1) }, '+')),
-          el('button', { class: 'inv-btn ghost bm-openbtn' + (this.scene.hud.rigOpen ? ' on' : ''), title: 'Rig offen: alle Container bleiben offen (auch außerhalb des Bau-Modus). Controller: Select', onclick: () => this.toggleOpen() }, icon(this.scene.hud.rigOpen ? 'door' : 'box', 15), this.scene.hud.rigOpen ? ' Rig offen' : ' Rig zu'),
+          el('button', { class: 'inv-btn ghost bm-openbtn' + (this.showInside ? ' on' : ''), title: 'Rig zu = außen dekorieren, offen = innen bauen. Taste O, Controller: rechten Stick drücken (oder Select)', onclick: () => this.toggleOpen() }, icon(this.showInside ? 'door' : 'box', 15), this.showInside ? ' Rig offen' : ' Rig zu'),
           el('button', { class: 'inv-btn ghost bm-undo', disabled: !top || top.done, title: top && !top.done ? `Rückgängig: ${top.label} (Strg+Z)` : 'Nichts zum Rückgängigmachen (Leyla hat schon festgeschraubt)', onclick: () => this.undoLast() }, '↶ Rückgängig'),
           el('button', { class: 'inv-btn build-go', onclick: () => this.close() }, 'Fertig (B)')));
     if (this.shopOpen) {

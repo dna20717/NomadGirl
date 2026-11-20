@@ -59,6 +59,15 @@ r = await ev(() => {
   return out;
 });
 check('Zoom in drei Stufen (Übersicht, Rig, Detail), am Ende ist Schluss', r.steps.length === 3 && r.steps[0] < r.steps[1] && r.steps[1] < r.steps[2] && JSON.stringify(r.levels) === '[1,2,2,1,0,0]', r);
+r = await ev(() => {
+  const s = game.scene.getScene('play'), bm = s.hud.build, c = s.camp, ui = s.box.save.rig.units.length - 1, u = c.geo.units.find(x => x.ui === ui);
+  bm.clearSel(); bm.showInside = false; s.leyla.x = (u.x0 + u.x1) / 2; nomad.step(90);
+  const shut = c.shells.find(x => x.u.ui === ui)?.a;
+  bm.toggleOpen(); nomad.step(90); const open = c.shells.find(x => x.u.ui === ui)?.a;
+  bm.toggleOpen(); nomad.step(90);
+  return { shut, open, back: c.shells.find(x => x.u.ui === ui)?.a };
+});
+check('Bau-Modus: Rig bleibt zu, auch wenn Leyla davor steht; O / R3 öffnet und schließt', r.shut > 0.95 && r.open < 0.05 && r.back > 0.95, r);
 if (shots) {
   fs.mkdirSync('output', { recursive: true });
   await ev(() => { const s = game.scene.getScene('play'), bm = s.hud.build, ui = s.box.save.rig.units.length - 1, u = s.camp.geo.units.find(x => x.ui === ui); const A = bm.areas().find(a => a.key === 'rig'); bm.areaNow = A; bm.frame(A); const pu = bm.selPoints().find(q => q.ui === ui && q.kind === 'container'); bm.select(bm.pick(pu.x, pu.y), { x: u.x0 + 60, y: u.floorY }, { menu: true }); bm.closeCtx(); bm.pointer = { x: pu.x, y: pu.y, t: 0 }; });

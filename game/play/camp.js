@@ -1051,10 +1051,13 @@ export class Camp {
   updateShells(dt) {
     if (!this.shells?.length) return;
     const s = this.scene, l = s.leyla, O = this.C.rig?.open || {}, near = O.near ?? 160, fade = Math.max(1, O.fade ?? 350), leak = (O.lights ?? 15) / 100;
-    const all = !!s.hud.build?.active || !!s.hud.rigOpen;
+    // #117 (Daniel 20.11.2026: „damit man das Rig von außen dekorieren kann, muss es zu bleiben, auch wenn man mit Leyla oder AvA in der
+    // Nähe ist; der Toggle sollte einfach sein“): while building the rig stays closed unless the inside is shown (R3 / Select / O, the
+    // button) or needed (a workshop or inside decoration in hand, a marked cell)
+    const B = s.hud.build, building = !!B?.active, all = building ? !!B.insideView?.() : !!s.hud.rigOpen;
     for (const c of this.shells) {
       const u = c.u, top = u.inTop - 40, bottom = (u.base ?? this.ground) + 30;   // its own storey: from under its ceiling to its bottom rail
-      const here = l && l.x > u.x0 - near && l.x < u.x1 + near && l.feet > top && l.feet < bottom;
+      const here = !building && l && l.x > u.x0 - near && l.x < u.x1 + near && l.feet > top && l.feet < bottom;
       const target = all || here ? 0 : 1;
       if (c.a !== target) c.a = target > c.a ? Math.min(1, c.a + dt / fade) : Math.max(0, c.a - dt / fade);
       c.img.setAlpha(c.a).setVisible(c.a > 0.001);
