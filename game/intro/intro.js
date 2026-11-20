@@ -64,7 +64,20 @@ export async function startIntro(canvas, { onEnd = () => {}, startAt = null } = 
     idx--; cap = Math.max(0, captions(P()).length - 1); capAt = -1e9;
     if (P().page !== page) { pageAt = t; for (const p of panels) if (p.page === P().page && panels.indexOf(p) <= idx) shownAt.set(p.id, t - 1e5); }
   }
-  function finish() { if (left) return; left = true; onEnd(); }
+  // #117 Daniel's intro music (Startseite › Intro › Musik): starts with the intro, or with the first key / click when the browser
+  // blocks sound until then; fades out when the intro is left
+  const music = (() => {
+    const a = A[C.music]; if (!a?.file) return null;
+    const el = new Audio(), ogg = a.alt && /\.ogg$/i.test(a.alt) && el.canPlayType('audio/ogg; codecs="vorbis"');
+    el.src = new URL(ogg ? a.alt : a.file, BASE).href; el.preload = 'auto';
+    const vol = clamp((C.musicVolume ?? 70) / 100 * (a.volume ?? 100) / 100);
+    let fade = null;
+    const ramp = (to, ms, then) => { clearInterval(fade); const from = el.volume, t0 = now(); fade = setInterval(() => { const k = clamp((now() - t0) / ms); el.volume = from + (to - from) * k; if (k >= 1) { clearInterval(fade); then?.(); } }, 30); };
+    const start = () => { if (!el.paused || left) return; el.volume = 0; el.play().then(() => ramp(vol, 1200)).catch(() => {}); };
+    return { el, start, stop: () => ramp(0, 900, () => el.pause()), playing: () => !el.paused };
+  })();
+  if (music) { music.start(); for (const ev of ['keydown', 'pointerdown']) addEventListener(ev, () => music.start(), { capture: true }); }
+  function finish() { if (left) return; left = true; music?.stop(); onEnd(); }
   const skip = () => { if (!ended) { ended = true; endAt = now() - 600; } else finish(); };
 
   // ---------- input: keyboard, mouse/touch, controller ----------
@@ -137,6 +150,7 @@ export async function startIntro(canvas, { onEnd = () => {}, startAt = null } = 
     const w = iw * cover, h = ih * cover;
     ctx.imageSmoothingEnabled = cover < 2.2;   // big pixel art stays crisp, gentle moves stay smooth
     ctx.drawImage(p.img, -(w - r.w) * px, -(h - r.h) * py, w, h);
+    p.pic = { x: -(w - r.w) * px, y: -(h - r.h) * py, w, h };   // where the picture is now: effects that sit on painted things follow the camera
   }
 
   function drawEffect(p, r, t) {
@@ -175,18 +189,40 @@ export async function startIntro(canvas, { onEnd = () => {}, startAt = null } = 
         ctx.fillRect(x, y, s, s);
       }
     } else if (p.effect === 'searchlight') {
+      // #117 (Daniel: „die Lichtkegel im Intro sollen animiert sein und im Himmel herum huschen“): beams from the painted lamps
+      // (Intro › Scheinwerfer, % of the picture) sweep the sky; now and then one darts somewhere else, like a guard who saw something
+      const pic = p.pic || { x: 0, y: 0, w: r.w, h: r.h }, lamps = p.beams?.length ? p.beams.map(b => b.at) : [p.effectAt || [50, 10]];
       ctx.globalCompositeOperation = 'lighter';
-      for (const [bx, by, phase] of [[0.36, 0.3, 0], [0.62, 0.24, 2.1]]) {
-        const ang = Math.PI / 2 + Math.sin(t * 0.55 + phase) * 0.75, len = r.h * 1.3, spread = 0.11;
-        const x0 = bx * r.w, y0 = by * r.h;
-        const g = ctx.createRadialGradient(x0, y0, 0, x0, y0, len);
-        g.addColorStop(0, 'rgba(255,252,220,.42)'); g.addColorStop(1, 'rgba(255,252,220,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.moveTo(x0, y0);
-        ctx.lineTo(x0 + Math.cos(ang - spread) * len, y0 + Math.sin(ang - spread) * len);
-        ctx.lineTo(x0 + Math.cos(ang + spread) * len, y0 + Math.sin(ang + spread) * len);
-        ctx.closePath(); ctx.fill();
-      }
+      lamps.forEach((at, i) => {
+        if (!at) return;
+        const x0 = pic.x + at[0] / 100 * pic.w, y0 = pic.y + at[1] / 100 * pic.h, ph = i * 2.7 + 0.6;
+        const step = Math.floor(t / 2.4 + ph), k = clamp((t / 2.4 + ph - step) * 7), sm = k * k * (3 - 2 * k);
+        const dart = (n) => (hash(n * 3.1 + i * 11) - 0.5) * 1.5;
+        const base = Math.atan2(r.h * 0.02 - y0, r.w * 0.5 - x0);   // roughly towards the top middle, then sweeping around the sky
+        const ang0 = base + 0.6 * Math.sin(t * 0.42 + ph) + 0.16 * Math.sin(t * 1.9 + ph * 2) + dart(step - 1) * 0.6 + (dart(step) - dart(step - 1)) * 0.6 * sm;
+        let ang = ang0;
+        if (Math.sin(ang) > 0.2) ang = Math.atan2(0.2, Math.cos(ang) >= 0 ? Math.sqrt(1 - 0.04) : -Math.sqrt(1 - 0.04));   // never down into the scene
+        const len = Math.hypot(r.w, r.h) * 1.1;
+        for (const [spread, alpha] of [[0.12, 0.15], [0.06, 0.22], [0.025, 0.34]]) {
+          const g = ctx.createLinearGradient(x0, y0, x0 + Math.cos(ang) * len, y0 + Math.sin(ang) * len);
+          g.addColorStop(0, `rgba(255,248,214,${alpha})`); g.addColorStop(0.55, `rgba(255,236,200,${alpha * 0.45})`); g.addColorStop(1, 'rgba(255,230,200,0)');
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.moveTo(x0, y0);
+          ctx.lineTo(x0 + Math.cos(ang - spread) * len, y0 + Math.sin(ang - spread) * len);
+          ctx.lineTo(x0 + Math.cos(ang + spread) * len, y0 + Math.sin(ang + spread) * len);
+          ctx.closePath(); ctx.fill();
+        }
+        // dust drifting through the beam, and the hot lamp
+        for (let n = 0; n < 14; n++) {
+          const d = ((hash(n + i * 30) + t * 0.05 * (0.5 + hash(n + 9))) % 1) * len * 0.8, off = (hash(n + 40) - 0.5) * 0.08;
+          ctx.globalAlpha = 0.5 * (1 - d / len) * (0.5 + 0.5 * Math.sin(t * 3 + n));
+          ctx.fillStyle = '#fff4d0'; ctx.fillRect(x0 + Math.cos(ang + off) * d, y0 + Math.sin(ang + off) * d, 2 * u, 2 * u);
+        }
+        ctx.globalAlpha = 1;
+        const h = ctx.createRadialGradient(x0, y0, 0, x0, y0, 26 * u);
+        h.addColorStop(0, 'rgba(255,250,230,.9)'); h.addColorStop(1, 'rgba(255,250,230,0)');
+        ctx.fillStyle = h; ctx.fillRect(x0 - 26 * u, y0 - 26 * u, 52 * u, 52 * u);
+      });
     } else if (p.effect === 'glitch') {
       // waking up: dark with flicker and torn rows, then the cyan eye glows steadily
       const wake = clamp((t - 0.3) / 1.6);
@@ -362,6 +398,7 @@ export async function startIntro(canvas, { onEnd = () => {}, startAt = null } = 
     images: panels.filter(p => p.img).length,
     ava: !!ava?.hull && !!ava.face,   // AvA from the area Drohne (hull + face) for panels with Intro › AvA
     next, back, skip,
+    music: () => music ? { src: music.el.src.split('/').pop(), playing: music.playing(), volume: Math.round(music.el.volume * 100) } : null,
     state: () => ({ index: idx, panel: P()?.id, page: P()?.page, caption: cap, captions: captions(P()).length, typing: !capDone(now()), ended, left, shown: [...shownAt.keys()] }),
   };
 }

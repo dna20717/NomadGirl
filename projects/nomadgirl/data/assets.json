@@ -6745,5 +6745,37 @@
   "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenzen: die bisherigen Stücke des Baukastens) + Code (tools/camp_modules.py: Varianten freistellen, Mittelstück mit passenden Nähten)",
   "date": "2026-11-19",
   "description": "#116: wie das Streifenzelt, olivgrün mit Werkzeug und Kisten."
+ },
+ "intro_theme": {
+  "name": "Musik · Intro",
+  "kind": "sound",
+  "file": "assets/music/intro_theme.m4a",
+  "alt": "assets/music/intro_theme.ogg",
+  "volume": 100,
+  "source": "KI-Musik von Daniel (eigenes lokales Modell auf eigener GPU, frei nutzbar); zugeschnitten mit Code (ffmpeg)",
+  "date": "2026-11-20",
+  "description": "#117 Daniels Intro-Musik (120 s, 138 BPM). Läuft im Intro-Comic."
+ },
+ "drive_a": {
+  "name": "Musik · Fahrt A",
+  "kind": "sound",
+  "file": "assets/music/drive_a.m4a",
+  "alt": "assets/music/drive_a.ogg",
+  "volume": 100,
+  "derivedFrom": "intro_theme",
+  "source": "KI-Musik von Daniel (eigenes lokales Modell auf eigener GPU, frei nutzbar); zugeschnitten mit Code (ffmpeg)",
+  "date": "2026-11-20",
+  "description": "#117 Schnelle Passage aus der Intro-Musik: 10 Takte ab 61,3 s, nahtlos als Loop."
+ },
+ "drive_b": {
+  "name": "Musik · Fahrt B",
+  "kind": "sound",
+  "file": "assets/music/drive_b.m4a",
+  "alt": "assets/music/drive_b.ogg",
+  "volume": 100,
+  "derivedFrom": "intro_theme",
+  "source": "KI-Musik von Daniel (eigenes lokales Modell auf eigener GPU, frei nutzbar); zugeschnitten mit Code (ffmpeg)",
+  "date": "2026-11-20",
+  "description": "#117 Schnelle Passage aus der Intro-Musik: 12 Takte ab 85,7 s, nahtlos als Loop."
  }
 }

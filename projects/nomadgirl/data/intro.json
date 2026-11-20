@@ -88,10 +88,11 @@
   "at": [3, 3],
   "size": [94, 94],
   "camera": "in",
-  "effect": "dust",
+  "effect": "searchlight",
   "hold": 0,
   "captions": [{"speaker": "", "text": "Die Besitzer sind wach. Der Akku ist leer.", "at": "bl"},{"speaker": "Leyla", "text": "Dann eben jetzt.", "at": "br"}],
-  "display": {"text": "00", "sub": "TAGE", "bar": 0, "at": [76, 17], "size": 17, "style": "alarm"}
+  "display": {"text": "00", "sub": "TAGE", "bar": 0, "at": [76, 17], "size": 17, "style": "alarm"},
+  "beams": [{"at": [9.8, 3.6]},{"at": [94.4, 17.4]}]
  },
  "panel_7": {
   "name": "AvA erwacht",
