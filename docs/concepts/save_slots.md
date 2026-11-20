@@ -165,15 +165,15 @@ Unter „Spiel“ drei kleine Knöpfe „1 · 2 · 3“ mit Kurzzeile, Verwaltun
 
 ## 7. Umsetzung in Etappen
 
-| # | Inhalt | Aufwand | Tests |
+| # | Inhalt | Anteil | Tests |
 |---|---|---|---|
-| 1 | **Kern** `game/save.js`: `slotKey(slot)`, `openSave(D, base, slot)`, `slotMeta`, Index, `listSlots`, `copySlot`, `deleteSlot`/`restoreSlot` (lokal), `name`/`playMs` in `repairSave`, `activeSlot()`/`chooseSlot()` wie in `engine/sets.js` | ½ Tag | `test/save_slots.test.js`: Meta aus Stand, Slot 1 = alter Schlüssel, Index neu bauen, Kopieren, Löschen + Rückgängig, Slot 4 abgelehnt (localStorage-Attrappe in Node) |
-| 2 | **Worker**: `?slot`, `/api/saves` mit KV-Metadaten, `copy`, `restore`, Papierkorb mit TTL; 409 bei `base` | ½ Tag | `test/cloud.test.js` erweitern: alter Weg = Slot 1, Slots getrennt, Liste ohne Stände, 400 für Slot 0/4, 409 bei altem `base`, fremder Login sieht nichts; Fake-KV um `list` und `metadata` ergänzen |
-| 3 | **Spiel**: `main.js` liest `?slot`, Spielzeit zählen, Pause-Menü „Spielstand wechseln“, `confirmNew` je Slot, Kopfzeile | ½ Tag | `tools/slots_test.mjs` (neu): Slot 2 neu anlegen, Slot 1 unberührt, wechseln über Pause-Menü, `adoptNewer` mischt keine Slots |
-| 4 | **Cockpit-LCD**: zweite/dritte Ebene, Karten-Zeilen, Löschen rot + Rückgängig, Kopieren, Umbenennen, Controller, Sticker-Vereinigung; `classic.html` | 1 Tag | `tools/slots_test.mjs`: Menü mit Tastatur und Fake-Gamepad (wie `splash_test`), Rückgängig nach Löschen, Name erscheint; `splash_test` weiter grün |
-| 5 | **Online-Feinschliff**: Offline-Puffer, Datenset-Warnung, ggf. Vorschaubild | ½–1 Tag | `tools/workshop_cloud_test.mjs` (lokaler Worker): zwei Slots online, 409-Übernahme, Offline → Hochladen |
+| 1 | **Kern** `game/save.js`: `slotKey(slot)`, `openSave(D, base, slot)`, `slotMeta`, Index, `listSlots`, `copySlot`, `deleteSlot`/`restoreSlot` (lokal), `name`/`playMs` in `repairSave`, `activeSlot()`/`chooseSlot()` wie in `engine/sets.js` | klein | `test/save_slots.test.js`: Meta aus Stand, Slot 1 = alter Schlüssel, Index neu bauen, Kopieren, Löschen + Rückgängig, Slot 4 abgelehnt (localStorage-Attrappe in Node) |
+| 2 | **Worker**: `?slot`, `/api/saves` mit KV-Metadaten, `copy`, `restore`, Papierkorb mit TTL; 409 bei `base` | klein | `test/cloud.test.js` erweitern: alter Weg = Slot 1, Slots getrennt, Liste ohne Stände, 400 für Slot 0/4, 409 bei altem `base`, fremder Login sieht nichts; Fake-KV um `list` und `metadata` ergänzen |
+| 3 | **Spiel**: `main.js` liest `?slot`, Spielzeit zählen, Pause-Menü „Spielstand wechseln“, `confirmNew` je Slot, Kopfzeile | klein | `tools/slots_test.mjs` (neu): Slot 2 neu anlegen, Slot 1 unberührt, wechseln über Pause-Menü, `adoptNewer` mischt keine Slots |
+| 4 | **Cockpit-LCD**: zweite/dritte Ebene, Karten-Zeilen, Löschen rot + Rückgängig, Kopieren, Umbenennen, Controller, Sticker-Vereinigung; `classic.html` | groß | `tools/slots_test.mjs`: Menü mit Tastatur und Fake-Gamepad (wie `splash_test`), Rückgängig nach Löschen, Name erscheint; `splash_test` weiter grün |
+| 5 | **Online-Feinschliff**: Offline-Puffer, Datenset-Warnung, ggf. Vorschaubild | mittel | `tools/workshop_cloud_test.mjs` (lokaler Worker): zwei Slots online, 409-Übernahme, Offline → Hochladen |
 
-Zusammen etwa **3–3½ Tage**. Nach jeder Etappe `npm test`, `npm run test:browser`, Doku in `docs/features/online.md` (Spielstand online) und `docs/features/ui.md` (Pause-Menü), Changelog-Eintrag.
+Zusammen etwa **1–2 Sitzungen** mit Claude Code (Stand 20.11., mit globalen Achievements und Vorschaubild); am längsten dauern die Browser-Tests und Daniels Blick aufs Slot-Menü. Nach jeder Etappe `npm test`, `npm run test:browser`, Doku in `docs/features/online.md` (Spielstand online) und `docs/features/ui.md` (Pause-Menü), Changelog-Eintrag.
 
 ## 8. Offene Fragen an Daniel
 

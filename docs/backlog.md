@@ -10,7 +10,7 @@ Alle Punkte aus A1–A8 sind entschieden (12.11. und 19.11.2026): A1 erledigt (#
 
 | # | Thema | Worum es geht | Vorschlag Ava |
 |---|---|---|---|
-| A9 | **Spielstand-Plätze** | Konzept für bis zu 3 Spielstände: `docs/concepts/save_slots.md`, alle Fragen am 20.11. entschieden | Ticket anlegen und bauen (etwa 3½–4 Tage mit globalen Achievements und Vorschaubild) |
+| A9 | **Spielstand-Plätze** | Konzept für bis zu 3 Spielstände: `docs/concepts/save_slots.md`, alle Fragen am 20.11. entschieden | Ticket anlegen und bauen (etwa 1–2 Sitzungen) |
 | A10 | **Cockpit-Reste** (#123/#124) | Fahrer-Sonnenblende `ck_visor` und 10 Kram-Stücke liegen fertig im Bereich Assets, sind aber nicht platziert; das Billboard steht links, weil die Sonnenblende rechts verdeckt | Daniel platziert nach Geschmack in Startseite › Cockpit (Vorschau zeigt jetzt das Cockpit) oder sagt „Ava, setz sie“ |
 | A11 | **Billboard-Werbung für Lore-Marken** im Cockpit | Idee aus #124 | in den Ideenspeicher oder Ticket |
 
