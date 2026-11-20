@@ -21,7 +21,7 @@ Achievement erreicht → Toast **Name** (Pokal, gold) → gleich danach **Rezept
 
 ## Zähler (`ACHIEVEMENT_COUNTERS` in `game/achievements.js`)
 
-`save.achievements = { counts, done, made, news }`. `bump(D, save, counter, n, tags)` zählt den Zähler und je Tag `counter:tag`; ein Achievement schaut auf `counter` oder mit Filter auf `counter:filter`. `level()` für Zustände (Lichterketten, Rezepte). `news` hält, was vor einem Szenenwechsel erreicht wurde (Run-Ende, Schlafen, Fahren); `scene.campNews()` meldet es im neuen Camp.
+`save.achievements = { counts, done, made, news }`. **Über alle Spielstände** (#126, Daniel 20.11.2026): `counts` und `done` liegen zusätzlich global (lokal `nomadgirl-achievements`, online `ach:<hash>`); beim Laden kommen sie in den Slot (höchster Zähler gewinnt, erreicht bleibt erreicht, ihre Rezepte werden gelernt), beim Speichern gehen sie zurück (`game/slots.js › mergeAchievements`). `made` (Trophäe hergestellt) und `news` bleiben je Slot: jeder Spielstand stellt seine Trophäen selbst her ⚠️ vorläufig. `bump(D, save, counter, n, tags)` zählt den Zähler und je Tag `counter:tag`; ein Achievement schaut auf `counter` oder mit Filter auf `counter:filter`. `level()` für Zustände (Lichterketten, Rezepte). `news` hält, was vor einem Szenenwechsel erreicht wurde (Run-Ende, Schlafen, Fahren); `scene.campNews()` meldet es im neuen Camp.
 
 | Zähler | Wo | Tags |
 |---|---|---|

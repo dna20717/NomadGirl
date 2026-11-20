@@ -37,7 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
-- 20.11. Code → Ava: #126 **Drei Spielstände** läuft (Daniels Entscheidungen im Konzept).
+- 20.11. Code → Ava: #126 **Drei Spielstände** fertig: Slots im Cockpit-Radio mit Vorschaubild, Löschen mit Dialog + Zurückholen, globale Achievements, Slot behält sein Datenset, Spielstand laden im Pause-Menü, alter Stand zieht nach Slot 1 (lokal + online). 4 ⚠️ im Ticket.
 - 20.11. Code → Ava: #125 **Aufräumen + technische Schulden** fertig: Backlog C komplett (C2, C3, C4, C10, C11, C13, C14, C15, C18), Cockpit-Reste im Schema, Backlog auf Stand 20.11.; Konzept für 3 Spielstände in `docs/concepts/save_slots.md` mit 9 Fragen an Daniel (Backlog A9). Offen für Daniel: Cockpit-Kram platzieren (A10).
 - 20.11. Code → Ava: **HNC (Übergabe)**. Stand `main` nach #121–#124. Neu seit der letzten Übergabe: #121 Camp ohne sichtbares Ende + AvAs Funkreichweite + Rig offen/zu als Leyla (O/P/R3, Yoga geparkt); #122 Logo-Straße aus einem Guss, Kassette kleiner; #123/#124 **Startseite ist jetzt das Van-Cockpit** (/; alte unter /classic): PixelLab-Teile modular in Startseite › Cockpit (Hülle, Lenkrad, Instrumente, Radio mit Menü im LCD, Spiegel, 16 Stücke Kram als Tabelle), Achievement-Sticker, eigene Straße (rechte Spur), Billboard mit Anzeige + Untertitel „A Game about finding everything by leaving all behind“, AvA-Verhalten (scannen, fotografieren, Rolle, anklopfen, voraus rasen, dösen, Käfer jagen), dreifache Auflösung, Fahrer lenkt sanft, Scheibe mit Schmutz. PixelLab Sitzung 1125, übrig 2055. Offen/⚠️: Billboard steht links (rechts verdeckt die Sonnenblende); `cockpit.glass` noch nicht im Schema; Werkstatt-Vorschau der Startseite zeigt noch die klassische Seite; Fahrer-Sonnenblende `ck_visor` und 10 Kram-Stücke liegen bereit, unplatziert; Billboard-Werbung für Lore-Marken als Idee.
 - 20.11. Code → Ava: #124 Cockpit ist live als Startseite (/), alte Startseite unter /classic.
@@ -256,13 +256,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #126 Drei Spielstände (Slots)
-- **Status:** läuft (20.11.) · angelegt 20.11. von Code (Daniel: „Leg los“ nach den Entscheidungen zum Konzept)
+- **Status:** fertig (20.11.) · angelegt 20.11. von Code (Daniel: „Leg los“ nach den Entscheidungen zum Konzept)
 - **Für:** Code
 - **Lesen:** docs/concepts/save_slots.md (Entscheidungen oben gelten), docs/features/online.md, docs/features/achievements.md
 - **Auftrag:** Etappen 1–5 aus dem Konzept: Kern + Umzug (`nomadgirl-save:1..3`), globale Achievements, Worker mit Slots, Spiel (Laden überall, Speichern im Camp), Cockpit-Menü mit Vorschaubild, Papierkorb.
 - **Fertig, wenn:** alte Stände ziehen verlustfrei nach Slot 1 (lokal und online), drei Slots im Cockpit, Tests grün.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: (1) Laden eines anderen Stands mitten im Run zählt für den verlassenen Stand wie ein k.o. (der Run-Start ist gespeichert; sonst ließe sich ein schlechter Run per Laden ungeschehen machen), im Konzept stand „ohne k.o.-Strafe“. (2) Trophäen (`made`) bleiben je Spielstand: Achievements und ihre Rezepte gelten überall, herstellen muss jeder Stand seine Trophäe selbst. (3) Fehlt das Datenset eines Slots, lädt er nicht (Meldung). (4) Kein Konflikt-Schutz im Worker (409) und kein Offline-Puffer: der Client übernimmt neuere Stände wie bisher; Kandidaten fürs nächste Ticket.
+- **Ergebnis:** (Code) Commits „Spielstände: drei Slots, Umzug …“, „Spielstände: Slot-Menü im Cockpit-Radio …“, Doku. Neu: `game/slots.js`, `test/save_slots.test.js` (5), `tools/slots_test.mjs` (21); `test/cloud.test.js` +2 (Worker mit Slots, Spiel online Ende zu Ende). `npm test` 352/352, `ng check` stimmig; inventory/camp/cozy/cockpit/datasets/splash/workshop_cloud/achievement/tutorial/menu_nav grün. PixelLab 0. **Bitte testen:** Startseite › Spiel: dein alter Stand steht als Slot 1 da (online und in jedem Browser, der schon einen hatte); Slot 2 neu beginnen (vorher im Radio ein anderes Datenset wählen), ein bisschen spielen, zurück ins Cockpit: Vorschaubild; Löschen und über „↺“ zurückholen; Pause-Menü › Spielstand laden; mit Controller A/B.
 
 ### #125 Aufräumen: technische Schulden, Cockpit-Reste, Backlog neu + Konzept Spielstand-Plätze
 - **Status:** fertig (20.11.) · angelegt 20.11. von Code (Daniel: „Räume alles auf und arbeite die technischen Schulden ab. Während du das tust, kannst du ein Konzept für eine Spielstand Verwaltung von bis zu 3 savegames erstellen (noch nicht mit einbauen)“)

@@ -1,6 +1,6 @@
 # Konzept: Spielstände mit drei Slots
 
-Stand 20.11.2026, nur Konzept (noch kein Code), Fragen von Daniel beantwortet. Ziel: Leyla kann in **bis zu drei Spielständen** leben, z. B. ein „ernster“ Stand, ein Test-Stand mit Cheats und einer für einen zweiten Menschen am selben Login oder Gerät.
+Stand 20.11.2026: Fragen von Daniel beantwortet, **gebaut in #126** (Wissen dazu: `docs/features/online.md`, `splash.md`, `ui.md`, `achievements.md`). Abweichungen vom Konzept: kein 409-Konflikt im Worker (der Client übernimmt neuere Stände wie bisher), kein Offline-Puffer, Papierkorb online ohne Ablauf (Daniel: der letzte bleibt). Ziel: Leyla kann in **bis zu drei Spielständen** leben, z. B. ein „ernster“ Stand, ein Test-Stand mit Cheats und einer für einen zweiten Menschen am selben Login oder Gerät.
 
 ## Entscheidungen (Daniel, 20.11.2026)
 
