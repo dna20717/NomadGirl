@@ -107,3 +107,9 @@ test('salvage: every item says how it breaks down, crafting then salvaging never
   assert.ok(farm(q => { q.data.items.schrott.salvage = [{ item: 'schrottplatte', count: 1 }]; }, /Kreis/), 'Kreislauf');
   for (const [id, w] of Object.entries(p.data.weapons)) assert.ok(w.salvage?.length, `Waffe ${id} zerlegbar`);
 });
+
+test('#125 (C13): Herstellen + Zerlegen als Endlos-Quelle wird gemeldet', async () => {
+  const p = await loadProject(nodeLoader('projects/nomadgirl'));
+  p.data.items.schrottplatte.salvage = [{ item: 'schrott', count: 3 }];
+  assert.ok(validateProject(p).some(m => m.kind === 'warning' && m.place.id === 'schrottplatte' && /endlos/.test(m.text)));
+});

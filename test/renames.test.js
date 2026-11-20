@@ -16,7 +16,7 @@ test('Umbenennen schreibt ins Protokoll, Zurück-Umbenennen zeigt wieder auf die
   assert.deepEqual(renameMap(p.data).items, { kupferkabel: 'kabel_kupfer' });
   renameEntry(p, 'items', 'kabel_kupfer', 'kupferkabel');
   assert.deepEqual(renameMap(p.data).items, { kabel_kupfer: 'kupferkabel' });   // back where it was: only a savegame from in between follows
-  assert.ok(!validateProject(p).some(m => m.level === 'error'));
+  assert.ok(!validateProject(p).some(m => m.kind === 'error'));
 });
 
 test('Ketten a → b → c landen bei c', async () => {

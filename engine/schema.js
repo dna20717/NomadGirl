@@ -912,8 +912,12 @@ export const AREAS = {
       { title: 'Entdecken', fields: [multi('discovery', 'Wie man es lernt', DISCOVERY), area_('hint', 'Hinweis', { hint: 'Was Companions oder Notizzettel andeuten' }),
         bool('once', 'Einmalig', { hint: 'Lässt sich nur ein einziges Mal herstellen (Trophäen der Achievements); danach steht es im Rezeptbuch als „hergestellt“' })] },
     ],
-    check: (x, report) => {
+    check: (x, report, p) => {
       if (!(x.ingredients || []).length) report('error', 'Rezept ohne Zutaten');
+      // #125 (Backlog C13): Herstellen gibt eine Ressource nebenbei; gibt Zerlegen des Ergebnisses alle Zutaten zurück, wird daraus eine Endlos-Quelle
+      const made = x.weapon ? p?.data.weapons?.[x.weapon] : x.result ? p?.data.items?.[x.result] : null, back = {};
+      for (const g of made?.salvage || []) if (g?.item) back[g.item] = (back[g.item] || 0) + (Number(g.count) || 1) * (x.weapon ? 1 : x.count || 1);
+      if (made?.salvage?.length && (x.ingredients || []).length && x.ingredients.every(i => (back[i.item] || 0) >= (i.count || 1))) report('warning', 'Herstellen und wieder Zerlegen gibt alle Zutaten zurück: endlos Ressourcen nebenbei');
       if (!x.result && !x.part && !x.tank && !x.weapon) report('warning', 'Rezept ohne Ergebnis (Gegenstand, Waffe, Rig-Teil oder Tank-Wartung)');
       if (x.result && x.part) report('warning', 'Gegenstand und Rig-Teil: das Rig-Teil gewinnt');
       if ((x.ingredients || []).some(i => i.item === x.result)) report('warning', 'Ergebnis ist auch Zutat');
