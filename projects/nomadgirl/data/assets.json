@@ -6922,5 +6922,37 @@
   "source": "KI (PixelLab, Create Image Pro, AAP-64, 4 Kandidaten, 10 Generierungen; die anderen emblem_0..2)",
   "date": "2026-11-20",
   "description": "#119 Rundes Emblem (Leyla, Sonne, AvA), für Logo-Varianten und Icons."
+ },
+ "ui_logo_word": {
+  "name": "Logo · Schriftzug Asphalt",
+  "kind": "image",
+  "file": "assets/ui/logo/word.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64; Daniels Skizze als Referenz)",
+  "date": "2026-11-20",
+  "description": "#120 NOMADGIRL aus Asphalt, gelber Mittelstreifen bei y 80, Schlaglöcher, abgebrochene N-Ecke, Sonnenkante."
+ },
+ "ui_logo_road": {
+  "name": "Logo · Straße",
+  "kind": "image",
+  "file": "assets/ui/logo/road.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64)",
+  "date": "2026-11-20",
+  "description": "#120 Straßenstück von oben, Mittelstreifen bei y 31,5; ab x 128 hinter dem L, doppelt groß."
+ },
+ "ui_logo_van": {
+  "name": "Logo · Van von oben",
+  "kind": "image",
+  "file": "assets/ui/logo/van_top.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz van_side; 4 Kandidaten, die anderen van_top_alt_*)",
+  "date": "2026-11-20",
+  "description": "#120 Der Van von oben, fährt nach rechts."
+ },
+ "ui_logo_drone": {
+  "name": "Logo · AvA von oben",
+  "kind": "image",
+  "file": "assets/ui/logo/drone_top.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenz drone_hull; 16 Kandidaten in candidates/)",
+  "date": "2026-11-20",
+  "description": "#120 AvA von oben mit leuchtenden Rotoren."
  }
 }

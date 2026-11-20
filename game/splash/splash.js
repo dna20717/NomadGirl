@@ -8,6 +8,7 @@ import { cloudFiles } from '../cloud_store.js';
 import { makeWeather } from '../weather.js';
 import { Cables, hullPoint } from '../drone_cables.js';
 import { nowPlayingFor } from '../now_playing.js';
+import { startLogo } from './logo.js';
 
 const BASE = new URL('../../projects/nomadgirl/', import.meta.url);
 const Z_NEAR = 0.6, Z_FAR = 40;   // depth range of the ground (m)
@@ -102,6 +103,9 @@ export async function startSplash(canvas) {
   let tumble = null, star = null, nextTumble = performance.now() + 9000 + Math.random() * 9000, nextStar = performance.now() + 5000 + Math.random() * 12000;
   const surprise = () => { nextTumble = nextStar = 0; };
   canvas.addEventListener('click', e => { if (e.clientY < innerHeight * (S.horizon ?? 60) / 100) nextStar = 0; });
+  // #120 the animated logo in the main menu (Startseite › Logo); the picture in the page stays when it cannot start
+  const logoHost = document.querySelector('h1.logo');
+  const logo = logoHost && S.logo?.enabled !== false ? await startLogo(logoHost, { A, base: BASE, cfg: S.logo || {} }).catch(e => { console.warn('Logo', e); return null; }) : null;
   // #117 (Daniel: „unser neuer Track soll auch im Hauptmenü spielen“): Startseite › Musik as a loop; browsers allow sound only after the
   // first key / click / button, then it starts and the Now-Playing cassette shows
   const music = (() => {
@@ -404,7 +408,7 @@ export async function startSplash(canvas) {
     if (!still) requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  return { music: () => music ? { src: music.el.src.split('/').pop(), playing: music.playing() } : null, surprise, tumble: () => !!tumble, star: () => !!star, steer: v => { steer.aim = v; }, curve: () => +steer.v.toFixed(3), still, weather: S.weather || null, drone: !!droneImg, droneFrame: () => drone.frame, layers: layers.length, runner: !!runImg, gaits: gaits.length, gait: () => run?.name, commit: cloud?.commit || null };
+  return { logo: () => !!logo, music: () => music ? { src: music.el.src.split('/').pop(), playing: music.playing() } : null, surprise, tumble: () => !!tumble, star: () => !!star, steer: v => { steer.aim = v; }, curve: () => +steer.v.toFixed(3), still, weather: S.weather || null, drone: !!droneImg, droneFrame: () => drone.frame, layers: layers.length, runner: !!runImg, gaits: gaits.length, gait: () => run?.name, commit: cloud?.commit || null };
 }
 
 function load(src) {

@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 20.11.2026: **Asphalt-Logo, animiert** (#120): NOMADGIRL aus Asphalt mit gelbem Mittelstreifen, Schlaglöchern und abgebrochener Ecke; der Van fährt von oben gesehen aus dem L heraus, Staub wirbelt, AvA schwebt mit und fliegt Runden; Maus drauf = Gas. Vier PixelLab-Teile, einzeln austauschbar. PixelLab 45.
 - 20.11.2026: **Pixel-Logo, Staubozean, Deko gerade** (#119): Hauptmenü mit PixelLab-Logo „NOMADGIRL“; auf der Reisekarte der Staubozean mit harter Sperre („Zu gefährlich für unsere kleinen Fahrzeuge“) und dem Andockpunkt Dustport Dock für Mega-Rigs (Inhalt später); sieben Innen-Stücke streng orthogonal nachgemalt; der Track heißt „Leylas Run“ von BombT. PixelLab 30.
 - 20.11.2026: **Innen-Deko und Wohnzellen** (#118): 47 Innen-Stücke (Lampen, Regale, Wandschmuck, Möbel), wachsende Verschwörungs-Pinnwand, Trophäen-Ständer mit Etagen, Lichterkette innen; Decke und Boden in freien Plätzen, Rückwand auch hinter Werkstätten; ein freier Platz mit 3 Stücken wird zur Wohnzelle (+4 Gemütlichkeit). Kassette: „Leylas Run“ von BombT. PixelLab 50.
 - 20.11.2026: **Musik im Hauptmenü, Now-Playing-Kassette, Rig bleibt zu** (#117, Daniel): Daniels Track läuft im Hauptmenü; wechselt die Musik (Hauptmenü, Intro, Fahrt, Camp), gleitet eine PixelLab-Kassette mit dem Titel herein; im Bau-Modus bleibt das Rig zu (außen dekorieren), R3 / Select / O öffnet. Innen-Deko (24 Stücke in 3 Sets) gemalt, wartet auf Daniels Abnahme. PixelLab 45.
