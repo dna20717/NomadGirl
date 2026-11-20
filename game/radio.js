@@ -84,6 +84,8 @@ export function talkPool(D, save, station, r = Math.random) {
     out.weather = linesOf(C, 'weather').map(t => fill(t, { ...v, forecast: when }));
     const F = fronts(D, save);
     out.war = F.length ? F.map(f => fill(pick(r, linesOf(C, 'war').length ? linesOf(C, 'war') : ['{a} gegen {b}.']), { ...v, a: f.ga, b: f.gb, place: placeOf(D, save, f.a)?.name || '', place2: placeOf(D, save, f.b)?.name || '' })) : [];
+    // #102 what changed hands lately (the gangs fight on their own)
+    for (const x of (save.turfWar?.log || []).filter(x => (save.day || 1) - x.day <= 3)) out.war.push(`Eilmeldung von der Front: ${x.to} haben ${x.place} übernommen. ${x.from} lecken ihre Wunden.`);
     const m = save.map, seen = new Set(m?.visited || []);
     const rumours = (m?.nodes || []).filter(n => !seen.has(n.id) && (n.hints || []).length && placeOf(D, save, n.id)?.name);
     out.tip = rumours.map(n => fill(pick(r, linesOf(C, 'tip').length ? linesOf(C, 'tip') : ['In {place} soll {hint} liegen.']), { ...v, place: placeOf(D, save, n.id).name, hint: optionLabel(ITEM_CATEGORIES, pick(r, n.hints)) || 'was liegen' }));

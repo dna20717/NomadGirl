@@ -48,3 +48,25 @@ test('Fronten: Straßen zwischen Orten rivalisierender Gangs; Zwischenfall dort 
     const E = generateEncounter(D, rnd, { save, front: F, danger: 3 }); if (E?.gang && ['Sky Wolves', 'Level Five'].includes(E.gang)) { hit++; assert.equal(E.rival, E.gang === 'Sky Wolves' ? 'Level Five' : 'Sky Wolves'); } }
   assert.ok(hit > 0, 'Fehden an der Front');
 });
+
+test('#102 Gangs kämpfen selbst: alle paar Tage wechselt ein Ort an einer Front, Leylas Ort bleibt', async () => {
+  const { gangWar } = await import('../game/turf_war.js');
+  const save = newSave(D); ensureMap(D, save);
+  let F = fronts(D, save);
+  if (!F.length) {   // make a front: a rival gang moves into a neighbour of some place
+    const [a, b] = save.map.edges[0], ga = gangOfPlace(D, save, a) || 'Yellow Vultures';
+    save.turfs = { [a]: ga, [b]: rivalsOf(D, ga)[0] };
+    F = fronts(D, save);
+  }
+  assert.ok(F.length > 0);
+  assert.deepEqual(gangWar(D, save, () => 0), [], 'gleich nach dem Start nichts');
+  save.day += 2; assert.deepEqual(gangWar(D, save, () => 0), [], 'zwei Tage: noch nichts');
+  save.day += 1;
+  const before = JSON.stringify(save.turfs || {}), r = gangWar(D, save, () => 0);
+  assert.equal(r.length, 1);
+  assert.notEqual(JSON.stringify(save.turfs || {}), before);
+  assert.equal(gangOfPlace(D, save, r[0].node), r[0].to);
+  assert.ok(r[0].node !== save.location);
+  assert.equal(save.turfWar.log.at(-1).to, r[0].to);
+  save.day += 30; assert.ok(gangWar(D, save, () => 0.99).length === 0, 'Pech beim Würfeln: nichts');
+});

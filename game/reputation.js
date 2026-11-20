@@ -9,7 +9,8 @@ export function repConfig(D) {
   const R = D?.roadEvents?.rep || {};
   return { enemy: R.enemy ?? -60, disliked: R.disliked ?? -20, tolerated: R.tolerated ?? 20, friend: R.friend ?? 60, price: (R.price ?? 30) / 100, kill: R.kill ?? 1,
     peace: R.peace || 'geduldet', breakPeace: R.breakPeace ?? 15, theft: R.theft ?? 8, job: R.job ?? 10,   // #061 Revier-Camp
-    rivalShare: (R.rivalShare ?? 50) / 100, takeover: R.takeover !== false };   // #089 Revierkrieg
+    rivalShare: (R.rivalShare ?? 50) / 100, takeover: R.takeover !== false,   // #089 Revierkrieg
+    warEvery: Math.max(0, R.warEvery ?? 3), warChance: R.warChance ?? 60 };   // #102 Gangs kämpfen selbst: every few days, a chance per check
 }
 // every gang of the world: name, colour (kit gang colour), motto, its POIs
 export function gangs(D) {

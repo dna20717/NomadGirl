@@ -1,5 +1,6 @@
 // Events of the play scene (#017 split from scene.js): knock-out, waking up, the dropped backpack, notes and achievements, kills.
 // Mixed into PlayScene (game/play/scene.js): the methods keep their `this`, nothing else changes.
+import { gangWar } from '../turf_war.js';
 import { tickMorale } from '../morale.js';
 import { catchUp, cellKeys } from '../prisoners.js';
 import { campArrival } from '../crew.js';
@@ -151,6 +152,10 @@ export class SceneEvents {
   }
   // #085 arriving: a hidden trait shows, someone may wait at the fire
   crewNews() {
+    // #102 Gangs kämpfen selbst: what changed hands at the fronts while Leyla was away
+    const war = gangWar(this.data_, this.box.save);
+    for (const x of war) this.hud.toast(`${x.to} übernehmen ${x.place}`, `${x.from} sind raus · Funk vom Tag ${x.day}`, 'info', 6000);
+    if (war.length) this.box.persist?.();
     // #100 Rig-Moral: the time that passed moves it; a new level and anyone who left get a message
     const m = tickMorale(this.data_, this.box.save);
     if (m?.left?.length) this.hud.toast(`${m.left.join(', ')} ${m.left.length === 1 ? 'hat' : 'haben'} das Rig verlassen`, 'Die Stimmung war am Boden (Krise)', 'warn', 6500);
