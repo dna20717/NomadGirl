@@ -412,11 +412,11 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 /* building the rig in the camp (game/play/build_mode.js): a bar on top, a message at the bottom, the dealer's catalogue; the camp stays visible */
 .bm { position: fixed; inset: 0; pointer-events: none; z-index: 20; user-select: none; }
 .bm[hidden] { display: none; }
-.bm-bar { pointer-events: auto; position: absolute; top: 10px; left: 12px; right: 12px; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; background: rgba(23, 17, 31, .92); border: 1px solid #3a2f45; box-shadow: 0 10px 34px rgba(0, 0, 0, .45); animation: bm-in .35s ease-out; }
+.bm-bar { pointer-events: auto; position: absolute; top: 10px; left: 12px; right: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 8px 10px; border-radius: 12px; background: rgba(23, 17, 31, .92); border: 1px solid #3a2f45; box-shadow: 0 10px 34px rgba(0, 0, 0, .45); animation: bm-in .35s ease-out; }
 @keyframes bm-in { from { transform: translateY(-120%); } to { transform: none; } }
 .bm-title { display: flex; align-items: center; gap: 6px; color: #ff7ac0; white-space: nowrap; }
 .bm-title b { font: 30px/1 VT323, monospace; font-weight: normal; }
-.bm-budgets { flex: 1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.bm-budgets { order: 3; flex-basis: 100%; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }   /* #117 own row: icons and values readable */
 .bm-side { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .bm-clock { color: #b9a2c8; font: 20px/1 VT323, monospace; }
 .bm-shopbtn.on { background: #ffd27a; color: #17111f; }
@@ -434,10 +434,13 @@ html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; }
 .bm-shop header small { color: #8a7d99; }
 .bm-shop header .craft-x { margin-left: auto; }
 .build-deltas { padding: 4px 10px; border-radius: 6px; background: #241c0e; color: #ffd27a; font: 26px/1 VT323, monospace; font-weight: normal; }
-.build-budget { position: relative; display: flex; align-items: center; gap: 8px; padding: 6px 8px 9px; border-radius: 8px; background: #120d18; border: 1px solid #2a2233; color: #9fe8a8; overflow: hidden; min-width: 0; }
+.build-budget { position: relative; display: flex; align-items: center; gap: 8px; padding: 5px 8px 8px; border-radius: 8px; background: #120d18; border: 1px solid #2a2233; color: #9fe8a8; overflow: hidden; min-width: 0; }
 .build-budget span { display: grid; gap: 1px; min-width: 0; }
-.build-budget small { font-size: 10px; letter-spacing: .5px; text-transform: uppercase; color: #8a7d99; }
-.build-budget b { font-size: 12px; color: #f2eef7; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.build-budget small { font-size: 10px; letter-spacing: .4px; text-transform: uppercase; color: #8a7d99; white-space: nowrap; }
+.build-budget em { flex: 0 0 auto; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: color-mix(in srgb, var(--tint, #9fe8a8) 18%, transparent); color: var(--tint, #9fe8a8); }
+.build-budget em svg { width: 22px; height: 22px; flex: 0 0 auto; }
+.build-budget.over em { background: rgba(224, 80, 58, .2); color: #ff8a7a; }
+.build-budget b { font-family: VT323, monospace; font-size: 22px; line-height: 1; color: #f2eef7; font-weight: 400; white-space: nowrap; }
 .build-budget i { position: absolute; left: 0; bottom: 0; height: 4px; width: calc(var(--k) * 100%); background: #3fae6a; }
 .build-budget.over { border-color: #7a2f2f; color: #ff8a7a; }
 .build-budget.over i { background: #e0503a; width: 100%; }

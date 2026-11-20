@@ -427,8 +427,10 @@ export class BuildMode {
     if (!this.active) return;
     if (!this.shopOpen) this.peek(null);
     const D = this.D, save = this.save, b = budgets(D, save.rig), top = this.undo[this.undo.length - 1];
-    const bar = (label, val, max, text, over, ic) => el('div', { class: 'build-budget' + (over ? ' over' : '') }, icon(ic, 16),
-      el('span', {}, el('small', {}, label), el('b', {}, text)), max != null ? el('i', { style: `--k:${Math.min(1, max ? val / max : 1)}` }) : null);
+    // #117 (Daniel: „die Camp-Eigenschaften im Bau-Modus sind nicht nachvollziehbar, sie brauchen Icons“): a big coloured icon, a short value,
+    // one word below; what it means in the tooltip
+    const bar = (label, val, max, text, over, ic, short, tip, tint) => el('div', { class: 'build-budget' + (over ? ' over' : ''), title: `${label}: ${text}${tip ? `\n${tip}` : ''}`, style: `--tint:${tint}` },
+      el('em', {}, icon(ic, 22)), el('span', {}, el('b', {}, short ?? text), el('small', {}, label)), max != null ? el('i', { style: `--k:${Math.min(1, max ? val / max : 1)}` }) : null);
     // only real news: a message, what the held thing would do, what is under the mouse; nothing idle (the hint line says how it works),
     // and while AvA steers her tooltip says it already
     const msg = this.msg?.text || (this.ava?.on ? '' : this.decorHold ? '' : this.drag ? this.dragHint() : this.hoverText || '');
@@ -457,11 +459,11 @@ export class BuildMode {
         el('div', { class: 'bm-title' }, icon('build', 18), el('b', {}, 'Rig bauen')),
         el('div', { class: 'bm-areas' }, ...keyGlyph('tabs').slice(0, 1), ...this.areas().map(a => el('button', { class: 'bm-area' + ((this.areaNow?.key || 'all') === a.key ? ' on' : ''), onclick: () => { this.areaNow = a; this.frame(a); this.draw(); } }, a.name)), ...keyGlyph('tabs').slice(1)),
         el('div', { class: 'bm-budgets' },
-          bar('Gewicht', b.weight, b.pull, `${de(b.weight)} / ${de(b.pull)} kg`, b.heavy, 'scale'),
-          bar('Anhänger', b.length, b.maxLength, `${b.length} / ${b.maxLength}${b.stack > 1 ? ` · ${b.height} / ${b.stack} hoch` : ''}`, b.length > b.maxLength, 'box'),
-          bar('Energie', b.power.used, b.power.made, `${b.power.net >= 0 ? '+' : ''}${b.power.net} ⚡ (${b.power.made} da, ${b.power.used} gebraucht)`, b.power.net < 0, 'flash'),
-          bar('Verbrauch', 0, null, `${String(b.fuel).replace('.', ',')} l / 100 km`, false, 'drop'),
-          bar('Plätze', b.filled, b.places, `${b.filled} / ${b.places} belegt`, false, 'grid')),
+          bar('Gewicht', b.weight, b.pull, `${de(b.weight)} / ${de(b.pull)} kg`, b.heavy, 'scale', `${(b.weight / 1000).toFixed(1).replace('.', ',')} / ${(b.pull / 1000).toFixed(1).replace('.', ',')} t`, 'So viel wiegt das Rig; mehr als die Zugkraft und es wird langsam und durstig', '#f9a31b'),
+          bar('Anhänger', b.length, b.maxLength, `${b.length} / ${b.maxLength}${b.stack > 1 ? ` · ${b.height} / ${b.stack} hoch` : ''}`, b.length > b.maxLength, 'vehicle', `${b.length} / ${b.maxLength}`, 'Anhänger hinter dem Van; die Kupplungen bestimmen, wie viele', '#8b93af'),
+          bar('Strom', b.power.used, b.power.made, `${b.power.net >= 0 ? '+' : ''}${b.power.net} ⚡ (${b.power.made} da, ${b.power.used} gebraucht)`, b.power.net < 0, 'flash', `${b.power.net >= 0 ? '+' : ''}${b.power.net}`, 'Was Generatoren und Panele machen, minus was die Werkstätten brauchen', '#ffd541'),
+          bar('Sprit', 0, null, `${String(b.fuel).replace('.', ',')} l / 100 km`, false, 'drop', `${String(b.fuel).replace('.', ',')} l`, 'Verbrauch je 100 km, wächst mit dem Gewicht', '#249fde'),
+          bar('Plätze', b.filled, b.places, `${b.filled} / ${b.places} belegt`, false, 'grid', `${b.filled} / ${b.places}`, 'Belegte Werkstatt-Plätze in Van und Containern', '#9cdb43')),
         el('div', { class: 'bm-side' },
           el('small', { class: 'bm-clock' }, clockText(save)),
           el('b', { class: 'build-deltas' }, `${de(save.deltas)} Δ`),
