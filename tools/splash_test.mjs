@@ -23,6 +23,18 @@ for (const [name, width, height] of [['desktop', 1440, 900], ['ipad', 820, 1180]
   if (shots) await page.screenshot({ path: path.join(repo, `output/splash_${name}.png`) });
   await page.close();
 }
+// #117 Daniel's track in the main menu: starts with the first key, the Now-Playing cassette shows its title
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  await page.goto('http://localhost:8766/index.html');
+  await page.waitForFunction(() => window.splash, null, { timeout: 15000 });
+  await page.keyboard.press('Shift'); await page.waitForTimeout(1200);
+  const m = await page.evaluate(() => ({ music: window.splash.music?.(), card: document.querySelector('.np-card .np-label')?.textContent || null }));
+  const ok = m.music?.playing && /^intro_theme\./.test(m.music.src) && !!m.card;
+  console.log(`  ${ok ? 'ok  ' : 'FEHLER'} Hauptmenü-Musik + Now-Playing-Kassette: ${JSON.stringify(m)}`);
+  if (!ok) failed++;
+  await page.close();
+}
 // controller in the main menu (Daniel, 11.11.2026): stick up/down chooses, sideways bends the road, A opens
 {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });

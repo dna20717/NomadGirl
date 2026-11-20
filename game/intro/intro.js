@@ -3,6 +3,7 @@
 // Everything comes from the area "Intro" (data/intro.json, one entry per panel) and Startseite › Intro (data/splash.json).
 // Started only from the main menu (intro.html, online /intro). Next: Enter, Space, →, click, A/RB; back: ←, LB; skip: Esc, B, Start.
 import { cloudFiles } from '../cloud_store.js';
+import { nowPlayingFor } from '../now_playing.js';
 
 const BASE = new URL('../../projects/nomadgirl/', import.meta.url);
 const PW = 1920, PH = 1080;   // a comic page in logical pixels (16:9)
@@ -73,7 +74,8 @@ export async function startIntro(canvas, { onEnd = () => {}, startAt = null } = 
     const vol = clamp((C.musicVolume ?? 70) / 100 * (a.volume ?? 100) / 100);
     let fade = null;
     const ramp = (to, ms, then) => { clearInterval(fade); const from = el.volume, t0 = now(); fade = setInterval(() => { const k = clamp((now() - t0) / ms); el.volume = from + (to - from) * k; if (k >= 1) { clearInterval(fade); then?.(); } }, 30); };
-    const start = () => { if (!el.paused || left) return; el.volume = 0; el.play().then(() => ramp(vol, 1200)).catch(() => {}); };
+    let shown = false;
+    const start = () => { if (!el.paused || left) return; el.volume = 0; el.play().then(() => { ramp(vol, 1200); if (!shown) { shown = true; nowPlayingFor(A, C.music, BASE); } }).catch(() => {}); };
     return { el, start, stop: () => ramp(0, 900, () => el.pause()), playing: () => !el.paused };
   })();
   if (music) { music.start(); for (const ev of ['keydown', 'pointerdown']) addEventListener(ev, () => music.start(), { capture: true }); }

@@ -7,6 +7,7 @@
 import { cloudFiles } from '../cloud_store.js';
 import { makeWeather } from '../weather.js';
 import { Cables, hullPoint } from '../drone_cables.js';
+import { nowPlayingFor } from '../now_playing.js';
 
 const BASE = new URL('../../projects/nomadgirl/', import.meta.url);
 const Z_NEAR = 0.6, Z_FAR = 40;   // depth range of the ground (m)
@@ -101,6 +102,23 @@ export async function startSplash(canvas) {
   let tumble = null, star = null, nextTumble = performance.now() + 9000 + Math.random() * 9000, nextStar = performance.now() + 5000 + Math.random() * 12000;
   const surprise = () => { nextTumble = nextStar = 0; };
   canvas.addEventListener('click', e => { if (e.clientY < innerHeight * (S.horizon ?? 60) / 100) nextStar = 0; });
+  // #117 (Daniel: „unser neuer Track soll auch im Hauptmenü spielen“): Startseite › Musik as a loop; browsers allow sound only after the
+  // first key / click / button, then it starts and the Now-Playing cassette shows
+  const music = (() => {
+    const a = A[S.music]; if (!a?.file || !(S.musicVolume ?? 50)) return null;
+    const el = new Audio(), ogg = a.alt && /\.ogg$/i.test(a.alt) && el.canPlayType('audio/ogg; codecs="vorbis"');
+    el.src = new URL(ogg ? a.alt : a.file, BASE).href; el.loop = true; el.preload = 'auto';
+    const vol = Math.min(1, (S.musicVolume ?? 50) / 100 * (a.volume ?? 100) / 100);
+    let shown = false;
+    const start = () => { if (!el.paused) return; el.volume = 0; el.play().then(() => {
+      const t0 = performance.now(), f = setInterval(() => { const k = Math.min(1, (performance.now() - t0) / 1500); el.volume = vol * k; if (k >= 1) clearInterval(f); }, 40);
+      if (!shown) { shown = true; nowPlayingFor(A, S.music, BASE); }
+    }).catch(() => {}); };
+    start();
+    for (const ev of ['keydown', 'pointerdown', 'touchstart']) addEventListener(ev, start, { capture: true });
+    const poll = setInterval(() => { if (!el.paused) return clearInterval(poll); const g = navigator.getGamepads?.() || []; if ([...g].some(p => p?.buttons?.some(b => b.pressed))) start(); }, 250);
+    return { el, playing: () => !el.paused };
+  })();
 
   function haze(t, horizon, sc) {
     const hy = Math.round(horizon), p = Math.max(1, Math.round(sc));
@@ -386,7 +404,7 @@ export async function startSplash(canvas) {
     if (!still) requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  return { surprise, tumble: () => !!tumble, star: () => !!star, steer: v => { steer.aim = v; }, curve: () => +steer.v.toFixed(3), still, weather: S.weather || null, drone: !!droneImg, droneFrame: () => drone.frame, layers: layers.length, runner: !!runImg, gaits: gaits.length, gait: () => run?.name, commit: cloud?.commit || null };
+  return { music: () => music ? { src: music.el.src.split('/').pop(), playing: music.playing() } : null, surprise, tumble: () => !!tumble, star: () => !!star, steer: v => { steer.aim = v; }, curve: () => +steer.v.toFixed(3), still, weather: S.weather || null, drone: !!droneImg, droneFrame: () => drone.frame, layers: layers.length, runner: !!runImg, gaits: gaits.length, gait: () => run?.name, commit: cloud?.commit || null };
 }
 
 function load(src) {

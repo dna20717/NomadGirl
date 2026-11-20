@@ -168,7 +168,9 @@ export const AREAS = {
         table('layers', 'Je Frame', [num('frame', 'Frame', { min: 1 }), point('grip', 'Griff', { unit: 'px' }), num('angle', 'Winkel', { unit: '°' }), bool('back', 'Waffe hinten'), point('head', 'Kopf', { unit: 'px' }), num('headAngle', 'Kopf gedreht', { unit: '°' })],
           { hint: 'Gemessen am grünen Platzhalter: Griff und Richtung (Griff → Spitze); Kopf = Versatz gegenüber der Grundpose' })] },
       { title: 'Ton', when: x => x.kind === 'sound', fields: [text('alt', 'Ersatzdatei', { hint: 'Gleicher Ton in einem zweiten Format (z. B. .ogg zur .m4a); das Spiel nimmt, was der Browser kann' }),
-        num('volume', 'Grundlautstärke', { unit: '%', min: 0, max: 200, hint: 'Gleicht laute und leise Aufnahmen aus' })] },
+        num('volume', 'Grundlautstärke', { unit: '%', min: 0, max: 200, hint: 'Gleicht laute und leise Aufnahmen aus' }),
+        text('title', 'Titel', { hint: '#117 Steht auf der Now-Playing-Kassette, wenn die Musik wechselt (leer = Name)' }), text('artist', 'Künstler')] },
+      { title: 'Kassette (Now Playing)', when: x => !!x.reels, fields: [size('size', 'Bildgröße', { unit: 'px' }), text('label', 'Etikett x, y, b, h', { hint: 'Bildpixel' }), num('reelSize', 'Spulen-Größe', { unit: 'px', min: 2 })] },
       { title: 'Herkunft', fields: [text('source', 'Erzeugt mit', { hint: 'KI-Werkzeug oder Code' }), ref('derivedFrom', 'Abgeleitet von', 'assets', { hint: 'z. B. Streifen aus einem Original-GIF' }), text('date', 'Datum')] },
     ],
     check: (x, report, p) => {
@@ -313,6 +315,7 @@ export const AREAS = {
     sections: [
       { title: 'Hintergrund', fields: [refs('background', 'Ebenen', 'assets', { hint: 'Von hinten nach vorn. Alle gleich groß; mit Wetter darf auch die erste transparent sein' }),
         table('front', 'Ebenen davor', [ref('look', 'Bild', 'assets'), num('scale', 'Maßstab', { unit: '% der Hintergrund-Pixel', min: 10 }), num('bottom', 'Unterkante', { unit: 'Bildpixel unter dem Horizont' }), num('alpha', 'Deckkraft', { unit: '%', min: 0, max: 100 })], { hint: '#115: gemalte Parallax-Ebenen (Welt › Parallax-Sets) vor dem Bild, nahtlos gespiegelt, folgen der Maus stärker' }),
+        ref('music', 'Musik', 'assets', { hint: '#117 Läuft im Hauptmenü als Schleife (ab der ersten Taste / dem ersten Klick, so wollen es die Browser)' }), num('musicVolume', 'Musik-Lautstärke', { unit: '%', min: 0, max: 100 }),
         table('beams', 'Suchscheinwerfer', [point('at', 'Ansatz', { unit: 'Bildpixel' }), num('angle', 'Richtung', { unit: '° von senkrecht' }), num('swing', 'Schwenk', { unit: '°', min: 0 }), num('length', 'Länge', { unit: 'Bildpixel', min: 10 }), num('alpha', 'Helligkeit', { unit: '%', min: 0, max: 100 })], { hint: '#117: Lichtkegel aus der Skyline, schwenken über den Himmel und rucken ab und zu' }),
         table('skyline', 'Skyline', [point('at', 'Punkt', { unit: 'Bildpixel' })], { hint: '#117: Linienzug über den Dächern von links nach rechts; die Suchscheinwerfer leuchten nur darüber (hinter den Gebäuden)' }), ref('weather', 'Wetter', 'weather', { hint: 'Himmel hinter den Ebenen, Regen davor' }),
         num('horizon', 'Horizont', { unit: '% der Höhe', min: 30, max: 100, hint: 'Hier endet der Hintergrund unten; darunter zeichnet die Startseite den Boden, auf dem Leyla rennt' }),

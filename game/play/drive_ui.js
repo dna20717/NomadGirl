@@ -5,6 +5,7 @@
 // the rig slows down and stops next to it, then the incident's window opens (camp_actions.js); after the choice the rig drives on.
 //   hold ok (E / A): faster (Reisen › Fahrt › Vorspulen) · back (Esc / B): straight to the next stop or the end of the leg
 //   hud.drive.open({ rig, from, to, legs, seed }) · leg(info, { atStop, end }) · resume() · finish(done) · close()
+import { nowPlayingFor } from '../now_playing.js';
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { hints } from './ui_nav.js';
@@ -74,6 +75,7 @@ export class DriveUI {
       this.music = s.sound.add(id, { loop: true, volume: 0 });
       this.music.play({ loop: true, volume: 0 });
       s.tweens.add({ targets: this.music, volume: vol, duration: 1500 });
+      nowPlayingFor(this.D.assets, id, s.base || location.href);   // #117 the cassette
     };
     if (s.cache.audio.exists(id)) return play();
     const base = s.base || location.href;

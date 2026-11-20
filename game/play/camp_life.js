@@ -1,5 +1,6 @@
 // The camp's life (#017 split from camp.js): wind and fire sound, the companions, their jobs (Questlog).
 // Mixed into Camp (game/play/camp.js): the methods keep their `this`, nothing else changes.
+import { nowPlayingFor } from '../now_playing.js';
 import { offers, accept, claim, progressOf, qstate } from '../quests.js';
 import { figureTexture } from './camp.js';
 import { noteTexture } from './camp_board.js';
@@ -28,6 +29,7 @@ export class CampLife {
       this.music = s.sound.add(id, { loop: true, volume: 0 });
       this.music.play({ loop: true, volume: 0 });
       this.music.setVolume(0);   // fades in through updateSound
+      nowPlayingFor(this.D.assets, id, s.base || location.href);   // #117 the cassette
     };
     if (s.cache.audio.exists(id)) return play();
     const base = s.base || location.href;
