@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 20.11.2026: **Übergabe (HNC)**: Stand nach #121–#124, Startseite = Van-Cockpit (/), klassische Startseite unter /classic; offene Punkte im Funkbuch.
 - 20.11.2026: **Cockpit: Spiegel innen, Scheibe mit Schmutz** (#124, Daniel): Der Rückspiegel hängt sichtbar am Dachhimmel; die Windschutzscheibe hat Staub, Wischerbögen, einen Steinschlag mit Sternriss, Insekten-Spritzer, Tropfenspuren und einen wandernden Glanzstreifen.
 - 20.11.2026: **Cockpit-Feinschliff** (#124, Daniel): Teile in dreifacher Auflösung, Lenkrad dreht sich (der Fahrer lenkt sanft mit), Logo auf dem Plakat mit Kontur, Radio-Text klebt beim Lenken und in Schlaglöchern im Display.
 - 20.11.2026: **Cockpit ist die Startseite** (#124, Daniel: „Bring es auf Prod“): / zeigt das Van-Cockpit, die alte Startseite liegt unter /classic; Datenset-Wahl im Radio-Menü, Version unten.
