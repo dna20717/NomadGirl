@@ -333,6 +333,7 @@ export class Leyla {
     // (after a jump the last air frame stays for a moment too, so a quick hop again does not flash a standing frame)
     const air = name === 'jump' || name === 'fall' || name === 'airJump';
     if (st === 'normal' && (name === 'walk' || name === 'run' || air)) { this.movedAt = time; this.movedLook = name; this.movedAir = air; }
+    else if (st === 'dash') { this.movedAt = time; this.movedLook = onGround ? 'run' : 'fall'; this.movedAir = !onGround; }   // #125 (Backlog C4): a dash into a wall does not flash a standing frame either
     else if (name === 'idle' && st === 'normal' && time - (this.movedAt ?? -1e9) < (this.movedAir ? (this.d.transition?.idleAfterAir ?? 60) : (this.d.transition?.idleAfter ?? 90))) name = this.movedLook;
     this.idleNow = name === 'idle' && this.armed === 'off';
     if (name === 'idle' && this.idleVariant === 'idleAlt' && this.d.look?.idleAlt) name = 'idleAlt';
