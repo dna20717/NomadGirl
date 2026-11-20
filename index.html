@@ -4,9 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NomadGirl</title>
-<script>try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme') || 'gray'; } catch (e) { document.documentElement.dataset.theme = 'gray'; }</script>
+<script>if (new URLSearchParams(location.search).has('preview')) document.documentElement.classList.add('preview');   // #125 workshop preview: no hint line
+try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme') || 'gray'; } catch (e) { document.documentElement.dataset.theme = 'gray'; }</script>
 <link rel="stylesheet" href="game/ui.css">
 <style>
+  .preview .hint { display: none; }
   /* Startseite (online unter /): #123/#124 das Hauptmenü aus dem Van-Cockpit (Daniel 20.11.2026: „Bring es auf Prod“; die alte Startseite liegt unter /classic). Szene = Startseite im Fahrmodus, Cockpit aus PixelLab-Teilen
      (game/splash/cockpit.js, Startseite › Cockpit), Billboard mit der Werbung, AvA fliegt vor dem Van. */
   html, body { height: 100%; margin: 0; overflow: hidden; background: #141013; }

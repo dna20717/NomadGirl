@@ -311,7 +311,7 @@ export const AREAS = {
   },
   splash: {
     name: 'Startseite', icon: 'image', file: 'data/splash.json', kind: 'single',
-    hint: 'Die Startseite (online unter /): Hintergrund aus Ebenen, Leyla rennt endlos auf uns zu, der Boden fliegt unter ihr durch. Pixel-Art wird scharf skaliert.',
+    hint: 'Die Startseite (online unter /) ist seit #123/#124 der Blick aus dem Van-Cockpit (Abschnitt Cockpit), die alte Szene mit Leyla, die endlos auf uns zurennt, läuft unter /classic weiter. Hintergrund aus Ebenen gilt für beide. Pixel-Art wird scharf skaliert.',
     sections: [
       { title: 'Hintergrund', fields: [refs('background', 'Ebenen', 'assets', { hint: 'Von hinten nach vorn. Alle gleich groß; mit Wetter darf auch die erste transparent sein' }),
         table('front', 'Ebenen davor', [ref('look', 'Bild', 'assets'), num('scale', 'Maßstab', { unit: '% der Hintergrund-Pixel', min: 10 }), num('bottom', 'Unterkante', { unit: 'Bildpixel unter dem Horizont' }), num('alpha', 'Deckkraft', { unit: '%', min: 0, max: 100 })], { hint: '#115: gemalte Parallax-Ebenen (Welt › Parallax-Sets) vor dem Bild, nahtlos gespiegelt, folgen der Maus stärker' }),
@@ -364,7 +364,9 @@ export const AREAS = {
         table('cockpit.stickers', 'Aufkleber-Plätze', [point('at', 'Mitte', { unit: 'px' }), num('size', 'Größe', { unit: 'px', min: 6 }), num('turn', 'Drehung', { unit: '°' })], { hint: 'Erreichte Achievements kleben hier als Sticker (Bild der Trophäe mit weißem Rand); der Reihe nach' }),
         ref('cockpit.billboard', 'Billboard', 'assets'), point('cockpit.board', 'Billboard: Werbefläche oben links', { unit: 'px im Billboard-Bild' }), size('cockpit.boardSize', 'Billboard: Werbefläche', { unit: 'px' }),
         ref('cockpit.poster', 'Anzeige: Bild', 'assets'), text('cockpit.tagline', 'Anzeige: Untertitel'),
-        ref('cockpit.road', 'Straße', 'assets', { hint: 'Boden-Textur fürs Cockpit (16 m breit, rechte Spur)' })] },
+        ref('cockpit.road', 'Straße', 'assets', { hint: 'Boden-Textur fürs Cockpit (16 m breit, rechte Spur)' }),
+        num('cockpit.glass.specks', 'Scheibe: Staubkörner', { min: 0, max: 40000, hint: '#125: Schmutz auf der Windschutzscheibe aus Code (leer = 9000)' }), num('cockpit.glass.drops', 'Scheibe: Tropfenspuren', { min: 0, max: 200, hint: 'Leer = 22' }),
+        num('cockpit.glass.bugs', 'Scheibe: Insekten', { min: 0, max: 60, hint: 'Leer = 7' }), num('cockpit.glass.seed', 'Scheibe: Zufall', { min: 0, hint: 'Andere Zahl = anders verteilter Schmutz (leer = 124)' })] },
     ],
     check: (x, report, p) => {
       const A = p.data.assets || {};

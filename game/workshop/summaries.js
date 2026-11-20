@@ -117,10 +117,15 @@ export const SUMMARY = {
   },
 
   splash(w, x) {
-    const url = new URL('../../classic.html?preview', import.meta.url).href;
-    const frame = el('iframe', { src: url, class: 'ng-splash', title: 'Startseite', loading: 'lazy' });
-    const reload = el('button', { class: 'ed-button wide', title: 'Speichert und lädt die Vorschau neu', onclick: async () => { if (w.dirty.size) await w.persist(); frame.src = url + '#' + Date.now(); } }, 'Speichern und neu laden');
-    return { title: 'Vorschau', body: el('div', {}, frame, el('p', { class: 'ed-small' }, 'Zeigt den gespeicherten Stand. Maus über die Vorschau bewegen = Tiefe der Ebenen.'), reload) };
+    // #125: the start page is the van cockpit (#123/#124); the old one stays under /classic
+    const pages = [['index.html', 'Cockpit'], ['classic.html', 'Klassisch']];
+    let page = pages[0][0];
+    const url = () => new URL(`../../${page}?preview`, import.meta.url).href;
+    const frame = el('iframe', { src: url(), class: 'ng-splash', title: 'Startseite', loading: 'lazy' });
+    const tabs = el('span', { class: 'ed-segment' }, ...pages.map(([p, label]) => el('button', { class: p === page ? 'on' : '', onclick: e => {
+      page = p; frame.src = url(); for (const b of e.currentTarget.parentNode.children) b.classList.toggle('on', b === e.currentTarget); } }, label)));
+    const reload = el('button', { class: 'ed-button wide', title: 'Speichert und lädt die Vorschau neu', onclick: async () => { if (w.dirty.size) await w.persist(); frame.src = url() + '#' + Date.now(); } }, 'Speichern und neu laden');
+    return { title: 'Vorschau', body: el('div', {}, tabs, frame, el('p', { class: 'ed-small' }, 'Zeigt den gespeicherten Stand. Cockpit: ← → lenken, ↑ ↓ im Radio wählen. Klassisch: Maus über die Vorschau = Tiefe der Ebenen.'), reload) };
   },
 
   ranking(w, x) {
