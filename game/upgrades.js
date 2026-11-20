@@ -5,7 +5,7 @@
 // (faster %, stronger buff %, power ⚡) and optionally its own picture. Every built workshop remembers its step on the rig
 // (`w.level`, 0 = as bought). The values add up over the steps.
 import { stock, take } from './crafting.js';
-import { advance } from './save.js';
+import { advance, fitContainers } from './save.js';
 
 export const STAR = '★';
 export const stepsOf = (D, id) => (D.workshops?.[id]?.upgrades || []).filter(r => r && (r.name || r.deltas || r.item));
@@ -21,8 +21,8 @@ export function benchAt(save, place) {
 }
 // what the steps up to now add → { level, max, speed, quality, power, look, next }
 export function upgradeOf(D, w) {
-  const S = stepsOf(D, w?.id), level = Math.min(levelOf(w), S.length), out = { level, max: S.length, speed: 0, quality: 0, power: 0, look: null, next: S[level] || null };
-  for (const r of S.slice(0, level)) { out.speed += Number(r.speed) || 0; out.quality += Number(r.quality) || 0; out.power += Number(r.power) || 0; if (r.look) out.look = r.look; }
+  const S = stepsOf(D, w?.id), level = Math.min(levelOf(w), S.length), out = { level, max: S.length, speed: 0, quality: 0, power: 0, rows: 0, look: null, next: S[level] || null };
+  for (const r of S.slice(0, level)) { out.speed += Number(r.speed) || 0; out.quality += Number(r.quality) || 0; out.power += Number(r.power) || 0; out.rows += Number(r.rows) || 0; if (r.look) out.look = r.look; }
   return out;
 }
 // the best speed of all built workshops with this id (crafting does not know which of two benches is used, like synergy.speedOf)
@@ -49,7 +49,7 @@ export function costText(D, r) {
 }
 export function gainText(r) {
   if (!r) return '';
-  return [r.speed ? `+${r.speed} % schneller` : null, r.quality ? `Buff +${r.quality} %` : null, r.power ? `+${r.power} ⚡` : null].filter(Boolean).join(' · ') || 'neues Aussehen';
+  return [r.speed ? `+${r.speed} % schneller` : null, r.quality ? `Buff +${r.quality} %` : null, r.power ? `${r.power > 0 ? '+' : ''}${r.power} ⚡` : null, r.rows ? `+${r.rows} ${r.rows === 1 ? 'Reihe' : 'Reihen'} Lager` : null].filter(Boolean).join(' · ') || 'neues Aussehen';
 }
 // do it: pay, the time passes, one star more → { ok, level, step } or { ok: false, why }
 export function upgrade(D, save, place) {
@@ -62,5 +62,6 @@ export function upgrade(D, save, place) {
   if (r.item) take(D, save, r.item, Number(r.count) || 1);
   if (r.hours) advance(save, Number(r.hours));
   w.level = levelOf(w) + 1;
+  if (r.rows) fitContainers(D, save);   // #099 the Speziallager grows right away
   return { ok: true, level: w.level, step: r };
 }

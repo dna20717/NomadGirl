@@ -576,7 +576,9 @@ export class PlayScene extends Phaser.Scene {
     // the treasury: its trophy stands open with it, each one an inventory of its own
     const all = containers(this.data_, this.box.save), g = k => this.box.save.inv.grids[k];
     const extra = all.filter(x => x.parent === key && g(x.key)).map(x => ({ key: x.key, title: x.name.split(' · ').pop(), grid: g(x.key), accept: x.accept }));
-    this.hud.inv.open({ key, title: c.name, grid: g(key), kind: 'container', x: this.leyla.x, accept: c.accept, extra });
+    // #099 a Speziallager can be built up from its own window (its stars in the title)
+    const m = /^store:(\d+):(\d+)$/.exec(key), place = m && `${m[1]}:${m[2]}`, upgrade = place ? this.camp?.upgradeItem?.(c.workshop, place, () => this.openContainer(key)) : null;
+    this.hud.inv.open({ key, title: place ? this.camp?.benchTitle?.(c.workshop, place) || c.name : c.name, grid: g(key), kind: 'container', x: this.leyla.x, accept: c.accept, extra, upgrade });
   }
   inventoryUpdate(input) {
     const inv = this.hud.inv;

@@ -56,3 +56,21 @@ test('Der Ausbau bleibt beim Umbauen erhalten', () => {
   assert.ok(r.ok !== false, r.reason);
   assert.equal(benchAt(s, p).level, 1);
 });
+
+test('#099 Speziallager ausbauen: mehr Reihen je Stern, der Inhalt bleibt', async () => {
+  const { containers, fitContainers } = await import('../game/save.js');
+  const s = newSave(D); s.deltas = 5000;
+  s.rig.units.push({ kind: 'container', id: 'container_40', workshops: [{ id: 'kuehlraum', at: 0 }] });
+  add(D, s.inv.grids.camp, 'items', 'kupferkabel', 6); add(D, s.inv.grids.camp, 'items', 'kabelbaum', 4);
+  fitContainers(D, s);
+  const key = `store:${s.rig.units.length - 1}:0`, size = () => containers(D, s).find(c => c.key === key).size;
+  const [w, h] = D.workshops.kuehlraum.grid;
+  assert.deepEqual(size(), [w, h]);
+  add(D, s.inv.grids[key], 'items', 'kupferkabel', 1);
+  assert.equal(upgrade(D, s, `${s.rig.units.length - 1}:0`).ok, true);
+  assert.deepEqual(size(), [w, h + 1]);
+  assert.equal(s.inv.grids[key].h, h + 1, 'das Raster wächst sofort');
+  assert.ok(s.inv.grids[key].items.some(e => e.id === 'kupferkabel'), 'Inhalt bleibt');
+  assert.equal(upgrade(D, s, `${s.rig.units.length - 1}:0`).ok, true);
+  assert.equal(s.inv.grids[key].h, h + 3);
+});

@@ -178,7 +178,11 @@
   "description": "Werkbank und Lager für Waffen: Teile, Munition, Ersatzläufe. Ausgestellt wird in der Waffenkammer (#033).",
   "synergy": {"partners": ["waffengalerie", "werkbank", "generator"], "effect": "speed", "max": 30},
   "ownStorage": true,
-  "prefers": ["melee", "ranged", "cyberdeck", "weaponpart"]
+  "prefers": ["melee", "ranged", "cyberdeck", "weaponpart"],
+  "upgrades": [
+   {"name": "Wandhaken", "deltas": 200, "item": "schrauben", "count": 6, "hours": 2, "rows": 1, "description": "Noch eine Reihe Haken für Teile und Läufe."},
+   {"name": "Ausziehregal", "deltas": 500, "item": "schrottplatte", "count": 4, "hours": 3, "rows": 2, "description": "Ein schweres Regal auf Schienen, zwei Reihen mehr."}
+  ]
  },
  "kuehlraum": {
   "name": "Kühlraum",
@@ -192,7 +196,11 @@
   "outside": "out_tank",
   "look": "ws_cold_room",
   "ownStorage": true,
-  "prefers": ["food", "ingredient"]
+  "prefers": ["food", "ingredient"],
+  "upgrades": [
+   {"name": "Zweites Kühlfach", "deltas": 250, "item": "kupferkabel", "count": 3, "hours": 2, "rows": 1, "description": "Ein zweites Fach, eine Reihe mehr."},
+   {"name": "Tiefkühltruhe", "deltas": 600, "item": "kabelbaum", "count": 2, "hours": 4, "rows": 2, "power": -1, "description": "Zwei Reihen mehr, braucht aber Strom."}
+  ]
  },
  "chill_area": {
   "name": "Chill Area",
@@ -415,7 +423,19 @@
   "scale": 78,
   "outside": "out_treasury",
   "ownStorage": true,
-  "prefers": ["valuable"]
+  "prefers": ["valuable"],
+  "upgrades": [
+   {
+    "name": "Doppelter Boden",
+    "deltas": 300,
+    "item": "schrottplatte",
+    "count": 3,
+    "hours": 2,
+    "rows": 1,
+    "description": "Unter dem Boden ist noch Platz für eine Reihe Wertsachen."
+   },
+   {"name": "Tresorwand", "deltas": 800, "item": "rohrbogen", "count": 2, "hours": 4, "rows": 1, "description": "Eine Wand voller Schließfächer."}
+  ]
  },
  "cryotank": {
   "name": "Cryo-Tank",
@@ -559,7 +579,11 @@
    {"kind": "screen", "x": 80, "y": 40, "w": 96, "h": 18, "color": "#ff7ac0", "size": 0, "rate": 3, "when": "always"}
   ],
   "scale": 78,
-  "ownStorage": true
+  "ownStorage": true,
+  "upgrades": [
+   {"name": "Lochwand", "deltas": 200, "item": "schrauben", "count": 4, "hours": 2, "rows": 1, "description": "Eine Reihe mehr für Waffenteile."},
+   {"name": "Drehständer", "deltas": 500, "item": "schrottplatte", "count": 3, "hours": 3, "rows": 2, "description": "Zwei Reihen mehr, und es sieht nach Laden aus."}
+  ]
  },
  "heavy_duty": {
   "name": "Heavy-Duty-Werkbank",

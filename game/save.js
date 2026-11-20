@@ -82,12 +82,14 @@ export function containers(D, save) {
   save.rig.units.forEach((u, ui) => u.workshops.forEach(w => {
     const def = D.workshops[w.id], g = def?.grid;
     if (!def) return;
-    if (g && def.ownStorage) out.push({ key: `store:${ui}:${w.at}`, name: def.name || w.id, size: g, workshop: w.id, own: true, ...(def.accept?.length ? { accept: { categories: def.accept } } : {}) });
+    if (g && def.ownStorage) out.push({ key: `store:${ui}:${w.at}`, name: def.name || w.id, size: [g[0], g[1] + extraRows(def, w)], workshop: w.id, own: true, ...(def.accept?.length ? { accept: { categories: def.accept } } : {}) });
     // trophy stands (Werkstätten › Schatzkammer & Trophäen): every stand is an inventory of its own, only things tagged "trophy"
     (def.stands || []).forEach((st, i) => { if (st.grid?.[0] && st.grid?.[1]) out.push({ key: `store:${ui}:${w.at}:s${i}`, name: `${def.name || w.id} · ${st.name || 'Ständer ' + (i + 1)}`, size: st.grid, workshop: w.id, stand: i, parent: `store:${ui}:${w.at}`, accept: st.accept ? { categories: String(st.accept).split(',').map(x => x.trim()).filter(Boolean) } : { tag: 'trophy' } }); });
   }));
   return out;
 }
+// #099 Speziallager ausbauen: every step (Werkstätten › Ausbau › + Reihen Lager) adds rows to the own grid
+export const extraRows = (def, w) => (def?.upgrades || []).filter(r => r && (r.name || r.deltas || r.item)).slice(0, Math.max(0, Math.floor(Number(w?.level) || 0))).reduce((n, r) => n + (Number(r.rows) || 0), 0);
 // the key of the inventory a workshop opens: its own (Speziallager) or the Camp-Lager; null = it has none
 export function storeKeyOf(D, save, ui, at) {
   const own = `store:${ui}:${at}`, all = containers(D, save);

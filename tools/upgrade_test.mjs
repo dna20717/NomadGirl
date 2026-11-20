@@ -46,6 +46,23 @@ v = await ev(async () => {
 check('Ausgebaut: Stufe 1, 100 Δ bezahlt, im Fenster „Kochnische ★“ und der nächste Knopf „Ausbauen ★★“', v.level === 1 && v.paid === 100 && v.h2 === 'Kochnische ★' && /Ausbauen ★★/.test(v.btn), v);
 if (shots) { fs.mkdirSync('output', { recursive: true }); await page.screenshot({ path: 'output/upgrade_camp.png' }); }
 
+// #099 a Speziallager: „Ausbauen ★“ in its own window, the grid grows
+v = await ev(async () => {
+  const s = game.scene.getScene('play'), save = s.box.save, C = await import('/game/crafting.js'), S = await import('/game/save.js');
+  save.deltas = 3000; C.give(s.data_, save, 'kupferkabel', 3);
+  save.rig.units.push({ kind: 'container', id: 'container_40', workshops: [{ id: 'kuehlraum', at: 0 }] }); S.fitContainers(s.data_, save);
+  const key = `store:${save.rig.units.length - 1}:0`; window.__k = key;
+  s.openContainer(key); nomad.step(2);
+  const btn = document.querySelector('.inv-upgrade'), label = btn?.textContent || '', h0 = save.inv.grids[key].h;
+  btn?.click(); nomad.step(2);
+  const menu = (s.hud.menuItems || []).map(x => x.label);
+  nomad.choose('Ausbauen ★'); nomad.step(5);
+  for (let i = 0; i < 30 && !game.scene.getScene('play')?.camp; i++) { nomad.step(10); await new Promise(r => setTimeout(r, 50)); }
+  const save2 = game.scene.getScene('play').box.save;
+  return { label, menu, h0, h1: save2.inv.grids[key]?.h };
+});
+check('#099 Speziallager: „Ausbauen ★“ im Lager-Fenster, eine Reihe mehr', /Ausbauen ★/.test(v.label) && v.menu.includes('Ausbauen ★') && v.h1 === v.h0 + 1, v);
+
 await browser.close();
 for (const o of ok) console.log('✔', o);
 for (const e of errors) console.log('✖', e);
