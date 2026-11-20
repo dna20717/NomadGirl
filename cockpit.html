@@ -10,7 +10,7 @@
   html, body { height: 100%; margin: 0; overflow: hidden; background: #141013; }
   #scene, #cockpit { position: fixed; inset: 0; width: 100vw; height: 100vh; image-rendering: pixelated; }
   #cockpit { object-fit: cover; pointer-events: none; z-index: 2; }
-  h1.logo { position: fixed; left: 7vw; top: 10vh; margin: 0; z-index: 1; line-height: 0; width: min(38vw, 680px); }
+  h1.logo { position: fixed; left: -6000px; top: 0; margin: 0; line-height: 0; width: 760px; }   /* the animated logo runs off-screen and is painted onto the billboard */
   h1.logo img, h1.logo .logo-canvas { width: 100%; height: auto; image-rendering: pixelated; filter: drop-shadow(0 6px 18px rgba(0,0,0,.45)); }
   #lcd { position: fixed; z-index: 3; box-sizing: border-box; overflow: hidden; font-family: VT323, monospace; color: #9cdb43; text-shadow: 0 0 6px rgba(156,219,67,.55); display: grid; align-content: start; }
   #lcd .hd { display: flex; justify-content: space-between; color: #59c135; white-space: nowrap; overflow: hidden; }
@@ -43,7 +43,41 @@
   links.forEach((a, i) => a.addEventListener('mouseenter', () => { sel = i; show(); }));
   show();
   let splash = null;
-  startSplash(document.getElementById('scene'), { drive: true, runner: false, nowPlaying: false, data: { horizon: 46, drone: { at: [62, 30], height: 11 } } }).then(x => { splash = x; window.splash = x; });
+  // #123 Daniel: „Billboard in der Szene“. A billboard at the right side of the road with the animated logo on it: we drive towards it,
+  // it rushes past, the next one rises at the horizon. Drawn in metres through the scene's projection, pixel-snapped (1 art pixel = 2 cm).
+  const BB = { z: 8.5, x: 1.85, w: 2.3, h: 1.05, lift: 0.6, speed: 0.38, gap: 0 };   // prominent for ~20 s per board
+  const billboard = ({ ctx, project, scale, dt, t, Z_FAR }) => {
+    if (BB.gap > 0) { BB.gap -= dt; if (BB.gap <= 0) BB.z = 18; return; }
+    BB.z -= BB.speed * dt * (1 + 1.5 / BB.z);
+    if (BB.z < 1.1) { BB.gap = 2.5; return; }
+    const z = BB.z, k = scale(z), u = Math.max(1, Math.round(k * 0.02)), snap = v => Math.round(v / u) * u;
+    const [gx, gy] = project(BB.x, z), R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(snap(x), snap(y), Math.max(u, snap(w)), Math.max(u, snap(h))); };
+    ctx.save(); ctx.globalAlpha = Math.max(0, Math.min(1, (Z_FAR * 0.7 - z) / 5)); ctx.imageSmoothingEnabled = false;
+    const bw = BB.w * k, bh = BB.h * k, bx = gx - bw / 2, by = gy - (BB.lift + BB.h) * k;
+    ctx.fillStyle = 'rgba(6,6,8,.35)'; ctx.beginPath(); ctx.ellipse(gx, gy, bw * 0.45, Math.max(2, k * 0.05), 0, 0, Math.PI * 2); ctx.fill();   // shadow
+    for (const side of [-0.32, 0.32]) {   // two rusty I-beams and a brace
+      const px0 = gx + side * bw - 0.05 * k;
+      R(px0, by + bh, 0.1 * k, BB.lift * k, '#322b28'); R(px0, by + bh, 0.03 * k, BB.lift * k, '#71413b'); R(px0 + 0.07 * k, by + bh, 0.03 * k, BB.lift * k, '#141013');
+    }
+    for (let i = 0; i < 6; i++) R(gx - bw * 0.32 + i * bw * 0.64 / 6, by + bh + BB.lift * k * (0.35 + (i % 2) * 0.25), bw * 0.64 / 6 + 0.02 * k, 0.03 * k, '#423934');
+    R(bx - 0.04 * k, by + bh, bw + 0.08 * k, 0.06 * k, '#4a5462'); R(bx - 0.04 * k, by + bh - 0.12 * k, 0.02 * k, 0.14 * k, '#4a5462'); R(bx + bw + 0.02 * k, by + bh - 0.12 * k, 0.02 * k, 0.14 * k, '#4a5462');   // catwalk + railing posts
+    R(bx - 0.06 * k, by - 0.06 * k, bw + 0.12 * k, bh + 0.12 * k, '#060608');   // frame
+    const g = ctx.createLinearGradient(0, by, 0, by + bh); g.addColorStop(0, '#3b1725'); g.addColorStop(0.6, '#73172d'); g.addColorStop(1, '#df3e23');
+    ctx.fillStyle = g; ctx.fillRect(snap(bx), snap(by), snap(bw), snap(bh));
+    ctx.globalAlpha *= 0.25; for (let y = 0; y < 14; y++) for (let x = 0; x < 30; x++) if ((x + y) % 2) R(bx + (x + 0.5) * bw / 30, by + bh * 0.55 + y * bh * 0.03, u, u, '#fa6a0a');   // halftone sunset
+    ctx.globalAlpha = Math.max(0, Math.min(1, (Z_FAR * 0.7 - z) / 5));
+    const logo = document.querySelector('h1.logo canvas');
+    if (logo) { const s = Math.min(bw * 1.12 / logo.width, bh * 1.5 / logo.height); ctx.save(); ctx.beginPath(); ctx.rect(bx, by - bh * 0.4, bw, bh * 1.4); ctx.clip(); ctx.drawImage(logo, gx - logo.width * s / 2, by + bh / 2 - logo.height * s / 2, logo.width * s, logo.height * s); ctx.restore(); }   // AvA may fly out over the top
+    R(bx + bw * 0.78, by, bw * 0.22, bh * 0.16, '#5a4e44'); R(bx + bw * 0.78, by + bh * 0.16, bw * 0.12, bh * 0.05, '#423934');   // a torn corner
+    // three lamps on arms, their light falls onto the board (flickers now and then)
+    for (let i = 0; i < 3; i++) {
+      const lx = bx + bw * (0.2 + i * 0.3), on = !(i === 2 && Math.sin(t * 9) > 0.93);
+      R(lx, by - 0.22 * k, 0.03 * k, 0.18 * k, '#333941'); R(lx - 0.07 * k, by - 0.26 * k, 0.16 * k, 0.06 * k, '#4a5462');
+      if (on) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha *= 0.22; const lg = ctx.createRadialGradient(lx, by, 0, lx, by + bh * 0.3, bh * 0.9); lg.addColorStop(0, '#fef3c0'); lg.addColorStop(1, 'rgba(254,243,192,0)'); ctx.fillStyle = lg; ctx.fillRect(lx - bw * 0.2, by, bw * 0.4, bh); ctx.restore(); R(lx - 0.05 * k, by - 0.2 * k, 0.12 * k, 0.03 * k, '#ffd541'); }
+    }
+    ctx.restore();
+  };
+  startSplash(document.getElementById('scene'), { drive: true, runner: false, nowPlaying: false, onGround: billboard, data: { horizon: 46, drone: { at: [62, 30], height: 11 } } }).then(x => { splash = x; window.splash = x; });
   const cp = startCockpit(document.getElementById('cockpit'), { steerValue: () => splash?.curve?.() ?? 0, speed: () => 1 });
   addEventListener('keydown', e => {
     if (e.key === 'ArrowDown' || e.key === 's') { sel = (sel + 1) % links.length; show(); e.preventDefault(); }

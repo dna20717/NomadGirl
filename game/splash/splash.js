@@ -371,6 +371,7 @@ export async function startSplash(canvas, opts = {}) {
       ctx.globalAlpha = 1;
     };
     drawSpecks(false);
+    opts.onGround?.({ ctx, project, W, H, dpr, horizon, px, t, dt: still ? 0 : dt, Z_NEAR, Z_FAR, scale: z => W * Z_NEAR / z });   // #123 the page can put things on the road (cockpit: the logo billboard)
     if (!still && now >= nextTumble && !tumble) { const d = Math.random() < 0.5 ? -1 : 1; tumble = { x: -d * 2.6, z: DIR < 0 ? 7 + Math.random() * 5 : zFeet + 0.6 + Math.random() * 1.6, d, a: 0, h: 0, vh: 0 }; nextTumble = now + 22000 + Math.random() * 30000; }
     const drawTumble = front => {
       if (!tumble || (tumble.z < zFeet) !== front) return;
