@@ -42,6 +42,7 @@ await camp();
 r = await ev(() => { const s = game.scene.getScene('play'); return { tractor: s.box.save.rig.tractor, bay: s.box.save.mega?.bay?.tractor, hot: s.camp.hotspots.map(h => h.name), van: !!s.van, units: s.box.save.rig.units.filter(u => u.pos).length }; });
 check('Umzug: Crawler ist die Zugmaschine, Van in der Ladebucht, Container auf dem Raster', r.tractor === 'crawler' && r.bay === 'van' && !r.van && r.units >= 1 && r.hot.includes('Kommandobrücke') && r.hot.some(h => /^Ladebucht/.test(h)), r);
 await shot('camp');
+check('#098 An Bord: Ofen statt Lagerfeuer im Hauptcontainer', r.hot.includes('Ofen') && !r.hot.includes('Lagerfeuer') && await ev(() => game.scene.getScene('play').camp.stove), r.hot);
 
 // a workshop aboard on its own floor, the bridge opens the map
 r = await ev(() => {

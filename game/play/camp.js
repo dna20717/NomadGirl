@@ -1078,8 +1078,12 @@ export class Camp {
     const F = this.C.fire || {};
     if (F.enabled === false) return;
     const s = this.scene, x = this.geo.fireX, y = this.campY;
-    const info = F.look && s.assetInfo(F.look);
-    if (info) {   // Daniel's pixel-art fire, sharp at whole pixels
+    // #098 (Daniel 19.11.2026: „Kein Lagerfeuer IM Rig mehr“ → „Ofen statt Feuer“): in a mega rig's Hauptcontainer a stove
+    const stove = !!this.geo.mega && this.geo.campFloor != null, St = F.stove || {};
+    const info = stove ? St.look && s.assetInfo(St.look) : F.look && s.assetInfo(F.look);
+    this.stove = stove;
+    if (stove && !info) this.drawStove(x, y, St);
+    else if (info) {   // Daniel's pixel-art fire, sharp at whole pixels
       s.textures.get(info.key).setFilter(NEAREST());
       this.fireSprite = s.add.sprite(x, y, info.key).setOrigin(info.ox, info.oy).setScale(info.scale).setDepth(-4);
       if (info.anim) this.fireSprite.play(info.anim);
@@ -1090,14 +1094,14 @@ export class Camp {
       this.flame = s.add.graphics().setDepth(-4);
     }
     // light: a big soft glow round the flames, a hot core and a warm pool on the ground (evening and night)
-    const k = (F.strength ?? 100) / 100, lift = F.lift ?? 80, color = F.color || '#ff9a3a';
+    const k = (F.strength ?? 100) / 100, lift = stove ? 50 : F.lift ?? 80, color = F.color || '#ff9a3a', R = stove ? St.radius ?? (F.radius ?? 420) * 0.6 : F.radius ?? 420;
     this.fireLights = [
-      this.light(x, y - lift, F.radius ?? 420, color, 0.6 * k),
-      this.light(x, y - lift, (F.radius ?? 420) * 0.35, '#ffd27a', 0.45 * k),
-      ...(F.pool ? [this.light(x, y + 6, F.pool, color, 0.5 * k, F.pool * 0.14)] : []),
+      this.light(x, y - lift, R, color, 0.6 * k),
+      this.light(x, y - lift, R * 0.35, '#ffd27a', 0.45 * k),
+      ...(F.pool ? [this.light(x, y + 6, stove ? F.pool * 0.6 : F.pool, color, 0.5 * k, F.pool * 0.14)] : []),
     ];
     // #016: the campfire also opens the quest log (Daniel: „am Warroom / Lagerfeuer“)
-    this.hotspots.push({ x, w: 90, floor: this.geo.campFloor != null ? this.campY : undefined, name: 'Lagerfeuer', hint: 'Hinsetzen · Questlog', act: () => this.fireMenu() });
+    this.hotspots.push({ x, w: 90, floor: this.geo.campFloor != null ? this.campY : undefined, name: stove ? 'Ofen' : 'Lagerfeuer', hint: 'Hinsetzen · Questlog', act: () => this.fireMenu() });
     // deco round the fire (Camp › Gemütlichkeit › Deko ums Feuer): rug, chairs, a corner with canisters
     for (const d of this.C.deco || []) {
       const info = d.look && s.assetInfo(d.look);
@@ -1105,6 +1109,20 @@ export class Camp {
       s.textures.get(info.key).setFilter(NEAREST());
       s.add.image(x + (d.x || 0), y + (d.y || 0), info.key).setOrigin(0.5, 1).setScale(d.scale || 2).setFlipX(!!d.flip).setDepth(d.front ? 5 : d.look.includes('rug') ? -6 : -5);
     }
+  }
+
+  // #098 the stove from code: a squat cast-iron box on legs, a door with a glowing window, a pipe up to the ceiling
+  drawStove(x, y, St = {}) {
+    const s = this.scene, g = s.add.graphics().setDepth(-4), P = 6, pipe = St.pipe ?? 260;
+    const box = (c, bx, by, w, h) => g.fillStyle(c).fillRect(x + bx * P, y - by * P - h * P, w * P, h * P);
+    box(0x1b1520, -6, 0, 2, 2); box(0x1b1520, 4, 0, 2, 2);   // legs
+    box(0x2a2230, -7, 2, 14, 12); box(0x3a3046, -7, 13, 14, 1); box(0x4a3e58, -8, 14, 16, 1);   // body, rim, top plate
+    box(0x1b1520, -5, 4, 10, 7); box(0x5a4a2a, -4, 5, 8, 5);   // door frame and window
+    box(0x2a2230, -1, 15, 3, 1); box(0x3a3046, -1, 16, 3, Math.round(pipe / P));   // collar and the pipe
+    for (let i = 0; i < Math.round(pipe / P); i += 7) box(0x4a3e58, -2, 16 + i, 5, 1);   // pipe rings
+    box(0xc28d29, 4, 7, 1, 2);   // handle
+    this.stoveGlow = s.add.graphics().setDepth(-3.9);
+    this.stoveAt = { x, y, P };
   }
 
   // ---------- van: at night warm light pours out of the open sliding door ----------
@@ -1129,6 +1147,14 @@ export class Camp {
       const t = time / 1000, fl = (this.C.fire?.flicker ?? 25) / 100;
       const wob = 1 - fl * (0.5 + 0.5 * Math.sin(t * 9.1) * Math.sin(t * 5.3 + 1)) - fl * 0.3 * Math.random();
       for (const l of this.fireLights) l.setAlpha(l.base * this.lightK * wob);
+    }
+    // #098 the stove's window: embers that breathe
+    if (this.stoveGlow) {
+      const { x, y, P } = this.stoveAt, t = time / 1000, g = this.stoveGlow.clear();
+      for (let i = 0; i < 8; i++) for (let j = 0; j < 5; j++) {
+        const heat = 0.55 + 0.45 * Math.sin(t * 3.1 + i * 1.7 + j * 2.3) * Math.sin(t * 1.3 + i), hot = j < 2 + Math.sin(t * 2 + i) * 1.2;
+        g.fillStyle(hot ? 0xffd27a : heat > 0.6 ? 0xff8a2a : 0xd8341a, 0.55 + 0.45 * heat).fillRect(x + (-4 + i) * P, y - (5 + j) * P - P, P, P);
+      }
     }
     // flames from code (without a look)
     if (this.flame) {
