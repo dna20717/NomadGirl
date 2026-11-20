@@ -68,6 +68,23 @@ r = await ev(() => {
   return { shut, open, back: c.shells.find(x => x.u.ui === ui)?.a };
 });
 check('Bau-Modus: Rig bleibt zu, auch wenn Leyla davor steht; O / R3 öffnet und schließt', r.shut > 0.95 && r.open < 0.05 && r.back > 0.95, r);
+r = await ev(() => {
+  const s = game.scene.getScene('play'), bm = s.hud.build, g = s.camp.ground; if (!bm.active) s.openBuild(); nomad.step(5); bm.takeAva();
+  bm.aim({ x: -99999, y: g - 300 }); const left = { x: Math.round(bm.ava.x), warn: bm.signalNow.warn, hit: bm.signalNow.hit };
+  bm.aim({ x: 99999, y: -99999 }); const far = { x: Math.round(bm.ava.x), y: Math.round(bm.ava.y), hit: bm.signalNow.hit };
+  bm.aim({ x: 600, y: g + 3000 }); const down = Math.round(bm.ava.y);
+  const L = bm.limits(), Z = bm.zoomSteps(); s.cam.setZoom(Z[0]); s.cam.centerOn(-99999, -99999); const v = s.cam.worldView;
+  const view = [Math.round(v.x), Math.round(v.y)], inside = v.x >= L.x0 - 1 && v.y >= L.y0 - 1;
+  bm.aim({ x: 600, y: g - 300 });
+  return { left, far, down, ground: g, view, inside, L };
+});
+check('AvA: Empfang reißt links/rechts/oben ab (rotes !, unsichtbare Wand), nicht in den Boden; ganz rausgezoomt kein Camp-Ende', r.left.hit && r.left.warn >= 0.99 && r.left.x > -5000 && r.far.hit && r.far.y > -4000 && r.down < r.ground && r.inside, r);
+r = await ev(() => {
+  const s = game.scene.getScene('play'), bm = s.hud.build; const was = !!s.hud.rigOpen; bm.toggleOpen(); const synced = s.hud.rigOpen === bm.showInside; bm.toggleOpen(); bm.close(); nomad.step(20);
+  const a = !!s.hud.rigOpen; nomad.step(1, [], ['pose']); nomad.step(5); const b = !!s.hud.rigOpen; nomad.step(1, [], ['pose']); nomad.step(5);
+  return { was, synced, a, b, c: !!s.hud.rigOpen, state: s.leyla.state };
+});
+check('Rig offen / zu: ein Schalter für Bau-Modus und Leyla (O / P / rechter Stick), keine Yoga-Pose mehr', r.synced && r.a !== r.b && r.c === r.a && r.state !== 'pose', r);
 if (shots) {
   fs.mkdirSync('output', { recursive: true });
   await ev(() => { const s = game.scene.getScene('play'), bm = s.hud.build, ui = s.box.save.rig.units.length - 1, u = s.camp.geo.units.find(x => x.ui === ui); const A = bm.areas().find(a => a.key === 'rig'); bm.areaNow = A; bm.frame(A); const pu = bm.selPoints().find(q => q.ui === ui && q.kind === 'container'); bm.select(bm.pick(pu.x, pu.y), { x: u.x0 + 60, y: u.floorY }, { menu: true }); bm.closeCtx(); bm.pointer = { x: pu.x, y: pu.y, t: 0 }; });

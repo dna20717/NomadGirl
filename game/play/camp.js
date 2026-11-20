@@ -265,7 +265,7 @@ export function drawCampBackground(scene, C) {
   const ridge = (key, depth, sf, base, amp, col, rim, seed, near) => {
     const w = W * 1.4, rr = (s => () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296))(seed);
     const f = [rr() * 9, rr() * 9, rr() * 9];
-    scene.add.image(0, 0, tex(key, w, hy + k, ctx => {
+    scene.add.image(-W * 0.1, 0, tex(key, w, hy + k, ctx => {
       let mesa = 0, mh = 0;
       for (let x = 0; x < w; x += k) {
         if (mesa <= 0 && rr() < (E.mesas ?? 0)) { mesa = (10 + rr() * 30) * k; mh = amp * (0.7 + rr() * 0.5); }
@@ -302,16 +302,16 @@ export function drawCampBackground(scene, C) {
   if (coded) ridge('camp_ridge_near', -97.6, 0.05, 6, 16, E.nearRidge || '#1d1626', E.nearRim || '#3a2b3d', 23, 0.8);
   // 4 · the plain: bands getting lighter towards us, dunes
   const g = scene.make.graphics({}, false), far = C.ground?.far || '#6b4a36';
-  for (let i = 0; i < 6; i++) g.fillStyle(shadeOf(far, 0.62 + i * 0.09)).fillRect(0, hy + Math.round((H - hy) * Math.pow(i / 6, 1.6) / k) * k, W * 1.3, H);
+  for (let i = 0; i < 6; i++) g.fillStyle(shadeOf(far, 0.62 + i * 0.09)).fillRect(0, hy + Math.round((H - hy) * Math.pow(i / 6, 1.6) / k) * k, W * 1.5, H);
   for (let d = 0; d < 3; d++) {
     g.fillStyle(shadeOf(far, 0.7 + d * 0.12));
     const y0 = hy + (6 + d * 14) * k, amp = (3 + d * 3) * k, len = 120 + d * 70;
-    for (let x = 0; x < W * 1.3; x += k) g.fillRect(x, y0 - Math.round(Math.max(0, Math.sin(x / len + d * 2) * amp) / k) * k, k, H);
+    for (let x = 0; x < W * 1.5; x += k) g.fillRect(x, y0 - Math.round(Math.max(0, Math.sin(x / len + d * 2) * amp) / k) * k, k, H);
   }
   const key = 'camp_far';
   if (scene.textures.exists(key)) scene.textures.remove(key);
-  g.generateTexture(key, Math.ceil(W * 1.3), H); g.destroy();
-  return scene.add.image(0, 0, key).setOrigin(0).setScrollFactor(0.05, 0).setDepth(-97);
+  g.generateTexture(key, Math.ceil(W * 1.5), H); g.destroy();
+  return scene.add.image(-W * 0.15, 0, key).setOrigin(0).setScrollFactor(0.05, 0).setDepth(-97);
 }
 
 // ground of the camp from the tileset (Camp › Platz › Boden-Kacheln, frames: 0 top, 1 fill, 2 top with wall left, 3 pillar,

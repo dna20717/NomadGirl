@@ -180,10 +180,8 @@ check('Zwei Idles im Wechsel', v.some(k => k?.startsWith('leyla_idle_side')) && 
 v = await page.evaluate(() => { const n = nomad, sp = game.scene.getScene('play').leyla.sprite, out = []; P.tp(20, 18); n.step(60); out.push(sp.texture.key);
   n.step(2, [], ['ranged']); n.step(8); out.push(sp.texture.key); n.step(40); n.step(2, [], ['ranged']); n.step(6); out.push(sp.texture.key); n.step(2, [], ['holster']); n.step(6); out.push(sp.texture.key); n.step(40); out.push(sp.texture.key); return out; });
 check('Waffe: friedlich ohne Waffe, Quick Draw (Abzug zieht und schießt im selben Zug), schießt, Q steckt weg (Ziehen rückwärts)', !/draw|aim|shoot/.test(v[0]) && /aim|shoot/.test(v[1]) && v[2] === 'leyla_shoot_side' && v[3] === 'leyla_draw_side' && !/draw|aim|shoot/.test(v[4]), v);
-v = await page.evaluate(() => { const n = nomad, l = game.scene.getScene('play').leyla, sp = l.sprite, f = () => +sp.frame.name; P.tp(20, 18); n.step(60);
-  const x0 = Math.round(sp.x), y0 = Math.round(sp.y); n.step(1, [], ['pose']); n.step(150); const held = [l.state, f(), Math.round(sp.x) === x0 && Math.round(sp.y) === y0, n.state().drone?.mood ?? game.scene.getScene('play').drone?.mood];
-  n.step(1, [], ['pose']); n.step(30); const back = f(); n.step(120); return { held, back, after: l.state }; });
-check('Yoga: P hält die Pose, Drohne zen, nochmal P löst rückwärts auf', v.held[0] === 'pose' && v.held[1] === 11 && v.held[2] && v.held[3] === 'zen' && v.back < 11 && v.after === 'normal', v);
+v = await page.evaluate(() => { const n = nomad, l = game.scene.getScene('play').leyla; P.tp(20, 18); n.step(60); n.step(1, [], ['pose']); n.step(30); return l.state; });
+check('Yoga geparkt (#121): P/O schaltet im Camp das Rig, im Testraum bleibt Leyla normal', v === 'normal', v);
 // hard landing only after a deep fall (or a long jump), a small hop lands normally
 v = await page.evaluate(() => {
   const n = nomad, seen = new Set(); P.tp(13, 9);

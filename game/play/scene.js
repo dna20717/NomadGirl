@@ -58,7 +58,7 @@ const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'], hangOne: ['ha
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
   jump: ['SPACE'], walk: ['SHIFT'], dash: ['L', 'C'], melee: ['J', 'Y'], ranged: ['K', 'X'], grab: ['E'],
-  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], uiOk: ['ENTER'], uiSend: ['F'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['P'], build: ['B'], holster: ['Q'], swap: ['V'], radio: ['N'], stats: ['U'],
+  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], uiOk: ['ENTER'], uiSend: ['F'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['O', 'P'], build: ['B'], holster: ['Q'], swap: ['V'], radio: ['N'], stats: ['U'],
 };
 
 export class PlayScene extends Phaser.Scene {
@@ -784,6 +784,10 @@ export class PlayScene extends Phaser.Scene {
     else if (input.restart.pressed && this.mode !== 'camp' && !this.level) this.restartRoom();
     const building = this.hud.build?.active;
     if (input.swap?.pressed && !building && !this.hud.modal && !this.hud.paused && !this.hud.inv?.isOpen && !this.hud.craft?.isOpen && !(this.hud.tech?.isOpen || this.hud.map?.isOpen) && this.leyla.alive) this.swapRanged();
+    // #121 Rig offen / zu as Leyla too (Daniel, 20.11.2026: „rig offen und zu toggle soll auch als Leyla gehen (yoga pose kann erstmal weg)“): O / P, right stick
+    if (input.pose?.pressed && !building && this.mode === 'camp' && !this.hud.modal && !this.hud.paused && !this.hud.inv?.isOpen && !this.hud.craft?.isOpen && !this.hud.drive?.isOpen && !(this.hud.tech?.isOpen || this.hud.map?.isOpen)) {
+      this.hud.setRigOpen(!this.hud.rigOpen); (this.sfxUi ??= makeSfx(this, 0.25)).klack?.(); this.hud.toast?.(this.hud.rigOpen ? 'Rig offen' : 'Rig zu', this.hud.rigOpen ? 'Alle Container bleiben offen' : 'Container öffnen sich, wenn Leyla in der Nähe ist', 'info', 1600);
+    }
     if (input.build?.pressed && building) this.hud.build.close();
     else if (input.build?.pressed && this.mode === 'camp' && !this.hud.modal && !this.hud.paused && !this.leaving && !this.hud.drive?.isOpen && !this.hud.craft?.isOpen && !(this.hud.tech?.isOpen || this.hud.map?.isOpen)) this.openBuild();
     // every window pauses the game (Daniel, 12.11.2026: „Fenster pausieren immer, auch im Run“): menus, controls, cooking and the inventory

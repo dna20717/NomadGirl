@@ -31,7 +31,7 @@ const CONTROLS = [
   { title: 'Kampf', icon: 'weapon', rows: [
     ['J / Y', 'Nahkampf: tippen = Kombo · 1 s halten: schwerer Hieb'], ['K / X', 'Schießen (am Boden): zieht und schießt im selben Zug'], ['K halten', 'Waffe wegstecken'], ['R', 'Nachladen (leer abdrücken lädt auch)'], ['Q', 'Waffe ziehen / wegstecken'], ['V', 'Fernkampfwaffe wechseln (aus dem Rucksack)']] },
   { title: 'Machen', icon: 'hand', rows: [
-    ['E / W', 'Benutzen: Kisten, Schalter, Werkstätten, Feuer, Van (W nur mit Hinweis)'], ['I / Tab', 'Inventar'], ['B', 'Rig bauen (im Camp; Pfeile + Leertaste/Enter ohne Maus)'], ['P', 'Yoga-Pose']] },
+    ['E / W', 'Benutzen: Kisten, Schalter, Werkstätten, Feuer, Van (W nur mit Hinweis)'], ['I / Tab', 'Inventar'], ['B', 'Rig bauen (im Camp; Pfeile + Leertaste/Enter ohne Maus)'], ['O / P', 'Rig offen / zu (im Camp, auch im Bau-Modus; Controller: rechten Stick drücken)']] },
   { title: 'System', icon: 'settings', rows: [
     ['Esc', 'Menü'], ['H', 'Diese Steuerung'], ['M', 'Ton an/aus'], ['N', 'Radio: nächster Sender'], ['U', 'Werte (alle Boni mit Quellen)'], ['Rücktaste', 'Raum neu starten'], ['G', 'Hitboxen']] },
 ];

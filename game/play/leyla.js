@@ -198,7 +198,8 @@ export class Leyla {
 
   normal(time, s, input, dir, grounded) {
     const b = this.body, m = this.m;
-    if (input.pose?.pressed && grounded && !dir && Math.abs(b.velocity.x) <= 20 && this.d.look?.yoga && !this.attack && !this.charging) { this.startPose(time); return; }
+    // #121 yoga is parked (the pose key toggles the rig now); startPose stays for later
+    if (false && input.pose?.pressed && grounded && !dir && Math.abs(b.velocity.x) <= 20 && this.d.look?.yoga && !this.attack && !this.charging) { this.startPose(time); return; }
     if (dir && time > this.attackPose) this.facing = dir;
     const gunRun = !input.walk.down && this.armed === 'on' && this.gunRunning(b.velocity, true) ? (this.scene.shootRules().runSpeed ?? 85) / 100 : 1;   // Cells-like: a bit slower with the gun out
     const speed = (input.walk.down ? (m.walkSpeed ?? 240) : (m.runSpeed ?? 440) * gunRun) * (1 + (this.scene.mods?.speed || 0) / 100);   // gear, implants, buffs

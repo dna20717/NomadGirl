@@ -12,7 +12,7 @@ export const PAD_BUTTONS = [['0', 'Unten (A / ✕)'], ['1', 'Rechts (B / ○)'],
 
 // actions of the game (scene.js KEYS) that a controller can trigger
 export const PAD_ACTIONS = [['jump', 'Springen'], ['dash', 'Dash'], ['melee', 'Nahkampf'], ['ranged', 'Schießen · halten: wegstecken'], ['reload', 'Nachladen'],
-  ['grab', 'Benutzen (mit Hinweis)'], ['walk', 'Gehen'], ['inventory', 'Inventar'], ['help', 'Menü / Pause'], ['pose', 'Yoga'], ['holster', 'Waffe ziehen / wegstecken (Schalter)'], ['swap', 'Fernkampfwaffe wechseln'], ['down', 'Ducken / Slide (zusätzlich zum Stick)']];
+  ['grab', 'Benutzen (mit Hinweis)'], ['walk', 'Gehen'], ['inventory', 'Inventar'], ['help', 'Menü / Pause'], ['pose', 'Rig offen / zu (im Camp)'], ['holster', 'Waffe ziehen / wegstecken (Schalter)'], ['swap', 'Fernkampfwaffe wechseln'], ['down', 'Ducken / Slide (zusätzlich zum Stick)']];
 
 export const PAD_DEFAULTS = { enabled: true, deadzone: 30, walkTilt: 65,
   useTilt: 70,

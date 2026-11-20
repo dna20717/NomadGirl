@@ -80,6 +80,10 @@ export class Backdrop {
       this.sky.refresh();
     }
     if (this.rain) {
+      // #121 (Daniel: „der Regen muss auch rausgezogen überall sein“): the rain layer is fixed to the screen; a zoomed-out camera would
+      // shrink it around the middle, so it grows by the zoom and stays on the whole picture
+      const cam = this.scene.cam || this.scene.cameras.main, z = Math.max(0.05, cam?.zoom || 1), W = this.scene.scale.width, H = this.scene.scale.height;
+      this.rainImg.setScale(this.k / z).setPosition(W / 2 * (1 - 1 / z), H / 2 * (1 - 1 / z));
       const c = this.rain.getContext(); c.clearRect(0, 0, this.cw, this.ch);
       this.weather.front(c, this.cw, this.ch, t, dt / 1000);
       this.rain.refresh();

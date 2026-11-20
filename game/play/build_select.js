@@ -141,7 +141,8 @@ export class BuildSelect {
   // the steps: overview (the whole camp), the rig, detail (Rig-Bau › Bau-Modus › Zoom-Stufen, % of the game's zoom; 0 = fit all)
   zoomSteps() {
     const s = this.scene, base = s.data_.game?.camera?.zoom || 1, V = this.B.view || {}, all = this.areas()[0];
-    const fit = Math.max((V.minZoom ?? 30) / 100, Math.min(base, s.scale.width * 0.92 / (all.x1 - all.x0)));
+    const L = this.limits?.(), least = L ? Math.max(s.scale.width / (L.x1 - L.x0), s.scale.height / (L.y1 - L.y0)) : 0;   // #121 never further out than the camp goes
+    const fit = Math.max((V.minZoom ?? 30) / 100, least, Math.min(base, s.scale.width * 0.92 / (all.x1 - all.x0)));
     return [fit, ...(V.zoomSteps || [60, 110]).map(z => base * z / 100)].sort((a, b) => a - b);
   }
   zoomStep(dir, at) {

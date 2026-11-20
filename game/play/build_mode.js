@@ -72,7 +72,7 @@ export class BuildMode {
     const s = this.scene, cam = s.cam, geo = this.camp.geo, V = this.B.view || {};
     if (this.active) return;
     this.reset();
-    this.showInside = false;   // #117 the rig starts closed: decorate outside first
+    this.showInside = !!this.scene.hud.rigOpen;   // #121 one switch for Leyla and build mode (#117: closed = decorate outside)
     this.active = true; this.el.hidden = false; this.msg = null;
     this.el.parentElement.dataset.building = '1';
     this.sfx = makeSfx(s, (V.volume ?? 50) / 100);
@@ -83,10 +83,14 @@ export class BuildMode {
     this.atFire = V.leylaFire !== false && this.sitAtFire();
     // camera: from the yard to the van's nose, the ground low in the picture
     const x0 = (geo.yard?.x0 ?? geo.rigRoom[0]) - 80, x1 = geo.vanRight + 120, base = s.data_.game?.camera?.zoom || 1;
-    const z = clamp(s.scale.width * 0.96 / (x1 - x0), (V.minZoom ?? 30) / 100, base);
+    const L0 = this.limits(), z = clamp(s.scale.width * 0.96 / (x1 - x0), Math.max((V.minZoom ?? 30) / 100, s.scale.width / (L0.x1 - L0.x0), s.scale.height / (L0.y1 - L0.y0)), base);
     const ground = this.camp.ground, cy = ground - (((V.groundAt ?? 80) / 100) - 0.5) * s.scale.height / z;
     this.camBack = { zoom: cam.zoom, bounds: Phaser.Geom.Rectangle.Clone(cam._bounds), useBounds: cam.useBounds };
-    cam.stopFollow(); cam.useBounds = false;
+    cam.stopFollow();
+    // #121 (Daniel: „selbst auf der höchsten Zoomstufe darf man nie das Ende des Camps sehen“): the camera stays inside the camp's
+    // ground that runs on beyond the world (Camp › Rand) and above the deep darkness; the overview never zooms out further than that
+    const L = this.limits();
+    cam.setBounds(L.x0, L.y0, L.x1 - L.x0, L.y1 - L.y0); cam.useBounds = true;
     this.view = { x: (x0 + x1) / 2, y: cy, zoom: z };
     const ms = s.script ? 1 : V.zoomTime ?? 650;
     cam.pan(this.view.x, this.view.y, ms, 'Sine.easeInOut', true);
@@ -152,7 +156,7 @@ export class BuildMode {
     s.buildClosed();
   }
 
-  toggleOpen() { this.showInside = !this.showInside; this.sfx.klack?.(); this.buzz?.('snap'); this.say(this.showInside ? 'Rig offen: innen bauen' : 'Rig zu: außen dekorieren', 'idle'); this.draw(); }   // #117 in build mode: the view, not the HUD setting
+  toggleOpen() { this.showInside = !this.showInside; this.scene.hud.setRigOpen?.(this.showInside); this.sfx.klack?.(); this.buzz?.('snap'); this.say(this.showInside ? 'Rig offen: innen bauen' : 'Rig zu: außen dekorieren', 'idle'); this.draw(); }   // #117 in build mode: the view, not the HUD setting
   // #117 the containers are open while building only when asked (toggle) or needed: a workshop in hand, inside decoration, a marked cell
   insideView() { return !!this.showInside || this.drag?.kind === 'ws' || this.decorHold?.inside || this.sel?.kind === 'cell' || (this.decorHold && this.D.decor?.[this.decorHold.id]?.place === 'inside'); }
 
@@ -239,8 +243,25 @@ export class BuildMode {
     this.draw();
   }
   // AvA's claw goes to a world point: hover, drag and string follow; snapped = a target was chosen (click, buzz)
+  // #121 how far the camera may look, and AvA may fly: the ground beyond the world (Camp › Rand), a margin before its end; above as high
+  // as Rig-Bau › Bau-Modus › Empfang reaches; never into the ground
+  limits() {
+    const s = this.scene, T = s.T, geo = this.camp.geo, E = (this.D.camp?.edge?.ground ?? 60) * T, ground = this.camp.ground;
+    return { x0: -E * 0.8, x1: geo.W * T + E * 0.8, y0: ground - (this.B.view?.signalUp ?? 2600) - 1400, y1: ground + (this.D.camp?.edge?.fade ?? 520) + 1600 };
+  }
+  // AvA's radio range over the camp (Daniel: „wenn AvA sich zu weit vom Camp entfernt links, rechts, oben, kommt ein rotes ! und der
+  // Empfang ist zu schlecht, und es kommt zu einer unsichtbaren Wand“): → { x, y } clamped, and how close to the wall (0 … 1)
+  signal(w) {
+    const geo = this.camp.geo, T = this.scene.T, V = this.B.view || {}, side = V.signalSide ?? 900, up = V.signalUp ?? 2600, warn = V.signalWarn ?? 260;
+    const xa = (geo.yard?.x0 ?? geo.rigRoom[0]) - side, xb = ((geo.campCol ?? 0) + (this.D.camp?.decor?.ground?.[1] ?? 20)) * T + side, ya = this.camp.ground - up, yb = this.camp.ground - 4;
+    const x = Math.max(xa, Math.min(xb, w.x)), y = Math.max(ya, Math.min(yb, w.y));
+    const edge = Math.min(x - xa, xb - x, y - ya);
+    return { x, y, warn: Math.max(0, Math.min(1, 1 - edge / warn)), hit: x !== w.x || (y !== w.y && w.y < ya) };
+  }
   aim(w, snapped = false) {
-    this.ava.x = w.x; this.ava.y = w.y;
+    const sg = this.signal(w); w = { x: sg.x, y: sg.y }; this.signalNow = sg;
+    if (sg.hit && this.scene.time.now - (this.wallAt || 0) > 900) { this.wallAt = this.scene.time.now; this.buzz?.('edge'); this.say('Empfang zu schlecht: AvA kommt nicht weiter', 'bad'); }
+    if (this.ava) { this.ava.x = w.x; this.ava.y = w.y; }
     this.pointer = { x: w.x, y: w.y, t: this.scene.time.now };
     if (this.drag) { this.drag.x = w.x; this.drag.y = w.y; }
     if (this.wire) { this.wire.x = w.x; this.wire.y = w.y; }
@@ -317,7 +338,8 @@ export class BuildMode {
   // the camera frames an area: zoom so it fits, the ground low in the picture (Rig-Bau › Bau-Modus)
   frame(a) {
     const s = this.scene, cam = s.cam, V = this.B.view || {}, base = s.data_.game?.camera?.zoom || 1;
-    const z = clamp(s.scale.width * 0.92 / (a.x1 - a.x0), (V.minZoom ?? 30) / 100, base * 1.15);
+    const L = this.limits(), least = Math.max(s.scale.width / (L.x1 - L.x0), s.scale.height / (L.y1 - L.y0));
+    const z = clamp(s.scale.width * 0.92 / (a.x1 - a.x0), Math.max((V.minZoom ?? 30) / 100, least), base * 1.15);   // #121 never past the camp's end
     const cy = this.camp.ground - (((V.groundAt ?? 80) / 100) - 0.5) * s.scale.height / z, ms = s.script ? 1 : 420;
     this.view = { x: (a.x0 + a.x1) / 2, y: cy, zoom: z };
     if (this.zoomSteps) { const Z = this.zoomSteps(); this.zoomLevel = Z.reduce((b, q, j) => Math.abs(q - z) < Math.abs(Z[b] - z) ? j : b, 0); }   // #117 the zoom label follows
@@ -659,7 +681,8 @@ export class BuildMode {
   }
   pointerMove(p) {
     if (!this.active) return;
-    const w = this.world(p);
+    const w0 = this.world(p), sg = this.signal(w0), w = { x: sg.x, y: sg.y };   // #121 AvA follows the mouse only within her radio range
+    this.signalNow = sg;
     this.pointer = { x: w.x, y: w.y, t: this.scene.time.now };
     // the button came up where the game could not see it (outside the window): nothing happens, the part flies back
     // (Daniel, 08.11.2026: "bleibt man im drop-to-Händler-Modus hängen")
@@ -1072,6 +1095,10 @@ export class BuildMode {
     this.drawResizeGrips(g, label, z, pulse);   // #113
     this.drawGrowGrips(g, label, z, pulse);   // #116
     this.drawSel(g, z, pulse);   // #117
+    { // #121 a red „!“ over AvA near the edge of her radio range
+      const w = this.ava?.on ? this.ava : this.pointer, sg = w && this.signal(w);
+      if (sg?.warn > 0.05) { const a = Math.min(1, sg.warn * 1.3); g.fillStyle(0xb4202a, 0.9 * a).fillCircle(w.x, w.y - 70 / z, 18 / z); g.lineStyle(3 / z, 0xffffff, a).strokeCircle(w.x, w.y - 70 / z, 18 / z); label(w.x, w.y - 70 / z + 12 / Math.max(0.4, z), '!', '#ffffff'); if (sg.warn > 0.6) label(w.x, w.y - 110 / z, 'Empfang zu schlecht', '#ff8a7a'); }
+    }
     this.drawPoints(g, z, pulse);
     this.drawHomes(g, label, z);   // #118
     // the sockets for rig parts on the van: empty = dashed frame with the slot's name, built in = the part

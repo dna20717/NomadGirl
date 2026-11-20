@@ -327,7 +327,7 @@ export class CampDecor {
         spin += dt / 1000 * (2.2 + Math.sin(time / 4000 + seed * 9)) * gust;
         g.clear();
         for (let n = 0; n < 3; n++) {
-          const a = spin + n * 2.094, len = Math.round(Math.sin(a) * L), w = Math.abs(Math.cos(a)) > 0.7 ? 4 : 3;
+          const a = spin + n * 2.094, len = Math.round(Math.sin(a) * L), w = (Math.abs(Math.cos(a)) > 0.7 ? 4 : 3) * Math.max(1, k * 0.8);
           g.fillStyle(0x141013).fillRect(Math.round(hx) - 1, Math.min(hy, hy - len) - 1, w + 2, Math.abs(len) + 2);
           g.fillStyle(n ? 0xdae0ea : 0xb4202a).fillRect(Math.round(hx), Math.min(hy, hy - len), w, Math.abs(len));
         }
