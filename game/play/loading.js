@@ -105,7 +105,7 @@ async function outline(asset, base, height, color, dpr) {
   const frames = [];
   for (let k = 0; k < n; k++) {
     const src = document.createElement('canvas'); src.width = w; src.height = h;
-    const sc = src.getContext('2d'); sc.imageSmoothingEnabled = true;
+    const sc = src.getContext('2d', { willReadFrequently: true }); sc.imageSmoothingEnabled = true;   // #125 (C3): read once, on the CPU
     sc.drawImage(img, (k * fw) % img.naturalWidth, Math.floor((k * fw) / img.naturalWidth) * fh, fw, fh, 0, 0, w, h);
     const a = sc.getImageData(0, 0, w, h).data, solid = (x, y) => x >= 0 && y >= 0 && x < w && y < h && a[(y * w + x) * 4 + 3] > 90;
     const out = sc.createImageData(w, h), o = out.data;

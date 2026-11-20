@@ -171,7 +171,7 @@ function heldSprite(scene, w, kit) {
   const src = tex.getSourceImage(), cw = fr.cutWidth, ch = fr.cutHeight;
   // the drawn part of the cell (trimmed box) gives the length
   const c = document.createElement('canvas'); c.width = cw; c.height = ch;
-  const x = c.getContext('2d'); x.drawImage(src, fr.cutX, fr.cutY, cw, ch, 0, 0, cw, ch);
+  const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(src, fr.cutX, fr.cutY, cw, ch, 0, 0, cw, ch);
   const d = x.getImageData(0, 0, cw, ch).data;
   let x0 = cw, x1 = 0;
   for (let yy = 0; yy < ch; yy++) for (let xx = 0; xx < cw; xx++) if (d[(yy * cw + xx) * 4 + 3]) { x0 = Math.min(x0, xx); x1 = Math.max(x1, xx); }

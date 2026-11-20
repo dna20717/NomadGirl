@@ -14,7 +14,7 @@ const EPX = new Map();
 export function epx(img) {
   const w = img.width, h = img.height, src = document.createElement('canvas');
   src.width = w; src.height = h;
-  const sc = src.getContext('2d'); sc.drawImage(img, 0, 0);
+  const sc = src.getContext('2d', { willReadFrequently: true }); sc.drawImage(img, 0, 0);   // #125 (C3)
   const a = new Uint32Array(sc.getImageData(0, 0, w, h).data.buffer), out = document.createElement('canvas');
   out.width = w * 2; out.height = h * 2;
   const oc = out.getContext('2d'), od = oc.createImageData(w * 2, h * 2), o = new Uint32Array(od.data.buffer);

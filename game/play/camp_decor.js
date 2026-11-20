@@ -225,8 +225,18 @@ export class CampDecor {
     if (C.has(k)) return C.get(k);
     const f = s.textures.getFrame(key, frame);
     if (!f) return null;
+    // #125 (Backlog C3): one read of the whole frame (getPixelAlpha read the GPU back once per pixel: „GPU stall due to ReadPixels“)
     let top = f.height;
-    for (let y = 0; y < f.height && top === f.height; y++) for (let x = 0; x < f.width; x += 2) if (s.textures.getPixelAlpha(x, y, key, frame) > 40) { top = y; break; }
+    const W = Math.max(1, f.cutWidth), H = Math.max(1, f.cutHeight), img = f.source?.image;
+    let a = null;
+    try {
+      const c = document.createElement('canvas'); c.width = W; c.height = H;
+      const g = c.getContext('2d', { willReadFrequently: true });
+      g.drawImage(img, f.cutX, f.cutY, W, H, 0, 0, W, H);
+      a = g.getImageData(0, 0, W, H).data;
+    } catch { a = null; }
+    for (let y = 0; y < f.height && top === f.height; y++) for (let x = 0; x < f.width; x += 2)
+      if ((a ? (x < W && y < H ? a[(y * W + x) * 4 + 3] : 0) : s.textures.getPixelAlpha(x, y, key, frame)) > 40) { top = y; break; }
     const out = { h: f.height - top, w: f.width, fh: f.height };
     C.set(k, out);
     return out;
