@@ -9,6 +9,7 @@ import { hints, setUiDevice, closeX } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { loadVersion } from '../version.js';
 import { clockText } from '../save.js';
+import { SLOTS, metaLine } from '../slots.js';
 import { trackedGoal as questGoal } from '../quests.js';
 import { voices } from './voices.js';
 import { makeSfx } from './sfx.js';
@@ -104,10 +105,26 @@ export class Hud {
   confirmNew() {
     if (this.paused) this.toggleHelp(false);
     this.closeMenu();
-    this.menu({ title: 'Neues Spiel?', sub: 'Ein neuer Durchgang beginnt klein: Rig, Inventar, Δ, Tank und Uhr. Der Techtree bleibt, es sei denn, du setzt ausdrücklich alles zurück.',
+    const n = this.saveBox?.slot || 1;
+    this.menu({ title: 'Neues Spiel?', sub: `${this.slotLabel()}: Ein neuer Durchgang beginnt klein: Rig, Inventar, Δ, Tank und Uhr. Der Techtree bleibt, es sei denn, du setzt ausdrücklich alles zurück.`,
       items: [{ label: 'Abbrechen', sub: 'Weiterspielen', act: () => {} },
-        { label: 'Neuer Durchgang', sub: 'Techtree bleibt, alles andere fängt neu an', act: () => { location.href = 'game.html?camp&cycle'; } },
-        { label: 'Alles zurücksetzen', sub: 'Auch der Techtree ist weg. Lässt sich nicht rückgängig machen', act: () => { location.href = 'game.html?camp&new'; } }] });
+        { label: 'Neuer Durchgang', sub: 'Techtree bleibt, alles andere fängt neu an', act: () => { location.href = `game.html?camp&slot=${n}&cycle`; } },
+        { label: 'Alles zurücksetzen', sub: 'Auch der Techtree ist weg. Der alte Stand lässt sich im Hauptmenü noch einmal zurückholen', act: () => { location.href = `game.html?camp&slot=${n}&new`; } }] });
+  }
+  // #126 the slot in words: „Slot 2 · Testlauf“
+  slotLabel() { const b = this.saveBox; return b ? `Slot ${b.slot} · ${b.save?.name || 'Leyla ' + b.slot}` : 'Spielstand'; }
+  // #126 Spielstand laden (Daniel 20.11.2026: „Man darf überall einen anderen Spielstand laden und gespeichert wird im Camp automatisch“)
+  async loadMenu() {
+    const b = this.saveBox, run = this.scene?.mode === 'run';
+    let L = {};
+    try { L = await b.be.list(); } catch (e) { return this.toast('Spielstände nicht lesbar', e.message, 'warn'); }
+    const go = (n, fresh) => { location.href = `game.html?camp&slot=${n}${fresh ? '&new' : ''}`; };
+    this.menu({ title: 'Spielstand laden', sub: run ? 'Gespeichert wird im Camp. Der laufende Run endet, als wärst du k.o. gegangen.' : 'Gespeichert wird im Camp automatisch.',
+      items: [...Array.from({ length: SLOTS }, (_, i) => i + 1).map(n => {
+        const m = L[n], here = n === b.slot;
+        return { label: `${n} · ${m?.name || (here ? b.save?.name : '') || (m ? 'Leyla ' + n : 'Leer')}${here ? ' (gerade)' : ''}`, sub: m ? metaLine(m) : 'Neues Spiel beginnen', primary: !here && !!m,
+          act: () => { if (here) return; go(n, !m); } };
+      }), { label: 'Zurück', icon: 'x', act: () => {} }] });
   }
   // pause menu (Esc, Start on the controller, button at the bottom): the controls live here now
   pauseMenu() {
@@ -127,7 +144,8 @@ export class Hud {
       ...(this.modeName === 'test' ? [{ label: 'Raum neu starten', sub: 'Rücktaste', act: () => sc.level ? sc.restartAs({}) : sc.restartRoom() }] : []),
       { label: 'Werkstatt', act: () => { location.href = 'workshop.html'; } },
       { label: 'Startseite', act: () => { location.href = './'; } },
-      ...(camp ? [{ label: 'Neues Spiel', sub: 'Spielstand löschen', act: () => this.confirmNew() }] : []),
+      ...(sc.box && this.saveBox?.be ? [{ label: 'Spielstand laden', sub: `Gerade: ${this.slotLabel()}`, act: () => setTimeout(() => this.loadMenu(), 0) }] : []),   // #126
+      ...(camp ? [{ label: 'Neues Spiel', sub: `${this.slotLabel()} neu beginnen`, act: () => this.confirmNew() }] : []),
     ] });
   }
 

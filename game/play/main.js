@@ -5,6 +5,7 @@
 //   game.html?poi=<id>[&seed=<n>]   plays a POI as a generated level (test mode, no savegame); without seed a new one every load
 //   megarig.html?id=<id>&stage=<n>   mega rig prototype (#022): Leyla walks a vehicle from the area „Mega-Rigs“, no savegame
 //   game.html?camp        the game: camp ↔ runs with a savegame (online per login, otherwise in this browser); ?camp&new starts over
+//                         #126 &slot=<n> plays slot 1–3 (else this device's slot); a slot is played with the Datenset it began with
 import { openStore, withDrafts } from '../store.js';
 import { cloudFiles } from '../cloud_store.js';
 import { browserLoader } from '../browser_loader.js';
@@ -14,6 +15,7 @@ import { PlayScene } from './scene.js';
 import { Hud } from './hud.js';
 import { installControl } from './control.js';
 import { openSave, arrive } from '../save.js';
+import { openStorage, activeSlot, chooseSlot } from '../slots.js';
 import { composeKits } from '../vehicle_kit.js';
 import { cheatsOn, watchCheatWord, runCheat } from '../cheats.js';
 
@@ -23,7 +25,14 @@ export async function start(parent, hudRoot, loading, opts = {}) {
   const drafts = cloud ? new Map() : await (await openStore({ project: 'nomadgirl', withoutAssets: true })).all().catch(() => new Map());
   const loader = withDrafts(browserLoader(base), cloud ? cloud.files : drafts);
   const project = await loadProject(loader);
-  const dataSet = await applySet(project, loader, activeSetId());   // #073 the active Datenset of this device lies over the standard
+  // #126 a slot keeps the Datenset it was begun with (Daniel 20.11.2026: „nur mit Iterationen von diesem Datenset“); a new slot takes
+  // this device's set (#073). Without the camp (test room, POI) the device's set as before.
+  const q0 = new URLSearchParams(location.search), camp = q0.has('camp');
+  const storage = camp ? await openStorage() : null, slot = camp ? activeSlot() : null;
+  const slotSet = camp && !q0.has('new') ? (await storage.list().catch(() => ({})))[slot]?.set : undefined;
+  const setId = slotSet ?? activeSetId();
+  const dataSet = await applySet(project, loader, setId);   // #073 the Datenset lies over the standard
+  if (setId && !dataSet) throw new Error(`Datenset „${setId}“ fehlt: ${camp ? `Spielstand ${slot} wurde damit begonnen und lässt sich ohne es nicht laden.` : 'im Hauptmenü ein anderes wählen.'}`);
   if (cloud) console.info(`Spieldaten live aus dem Repository (Commit ${cloud.commit.slice(0, 7)})`);
   loading?.data();
   const D = project.data, rooms = D.rooms || {};
@@ -33,7 +42,7 @@ export async function start(parent, hudRoot, loading, opts = {}) {
   if (!roomId) throw new Error('Kein Raum mit Layout gefunden (Werkstatt › Raum-Bausteine › Layout).');
   if (asked && asked !== roomId) console.warn(`Raum „${asked}“ hat kein Layout, spiele „${roomId}“`);
   const [width, height] = D.game?.resolution || [1920, 1080];
-  window.__nomadData = { commit: cloud?.commit || null, drafts: [...drafts.keys()], set: dataSet ? { id: dataSet.id, name: dataSet.name } : null };   // where the data came from (diag.js, Menü › Optionen)
+  window.__nomadData = { commit: cloud?.commit || null, drafts: [...drafts.keys()], set: dataSet ? { id: dataSet.id, name: dataSet.name } : null, slot };   // where the data came from (diag.js, Menü › Optionen)
   const hud = new Hud(hudRoot, { workshopDrafts: drafts.size, commit: cloud?.commit });
   cheatsOn();   // #097: ?cheats=1 is remembered right away (the main menu's link has no query)
   watchCheatWord(() => {   // typing „deltas“: cheats on, and +50.000 Δ into the running savegame
@@ -59,7 +68,22 @@ export async function start(parent, hudRoot, loading, opts = {}) {
   if (opts.megarig && D.megarigs?.[opts.megarig.id]) args = { ...args, megarig: opts.megarig };
   if (q.get('poi') && D.pois?.[q.get('poi')]) args = { ...args, poi: q.get('poi'), seed: Number(q.get('seed')) || 1 + Math.floor(Math.random() * 2 ** 31) };
   if (q.has('camp') && D.camp) {
-    const box = await openSave(D);
+    const box = await openSave(D, '', { be: storage, slot, set: setId });
+    chooseSlot(slot);   // this device goes on with this slot
+    // #126 Frage F: the slot's preview, a small snapshot of the camp when it saves (at most once a minute, without the HUD: that is DOM)
+    const persist0 = box.persist.bind(box);
+    let shotAt = 0;
+    box.persist = async force => {
+      const r = await persist0(force), sc = game.scene.getScene('play');
+      const cam = sc?.cameras?.main, settled = cam && !cam.fadeEffect?.isRunning && cam.fadeEffect?.alpha !== 1 && sc.time.now > 4000;   // not while the camp fades in
+      if (sc?.mode === 'camp' && settled && !box.error && Date.now() - shotAt > 60000 && game.renderer?.snapshot) {
+        shotAt = Date.now();
+        game.renderer.snapshot(img => {
+          try { const c = document.createElement('canvas'); c.width = 320; c.height = 180; c.getContext('2d').drawImage(img, 0, 0, 320, 180); box.shot(c.toDataURL('image/webp', 0.7)); } catch { /* no picture this time */ }
+        });
+      }
+      return r;
+    };
     if (q.has('new')) await box.reset();   // Neues Spiel › Alles zurücksetzen
     else if (q.has('cycle')) await box.cycle();   // Neues Spiel › Neuer Durchgang: the tech tree stays
     console.info(`Spielstand ${box.where === 'cloud' ? 'online (pro Login)' : 'in diesem Browser'}${box.fresh ? ', neu' : ''}`);

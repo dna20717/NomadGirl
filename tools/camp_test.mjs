@@ -146,7 +146,7 @@ s = await ev(() => { c.to('Van'); c.use(); nomad.choose('Planen'); c.pick('Plün
 check('Abwehr-Buff lässt das Leben gleich', s.hp === 100, s.hp);
 check('k.o.: AvA bringt sie ins Camp, Beute weg (Δ bleiben beim Startgeld), 30 % Leben, Buffs verbraucht', s.mode === 'camp' && s.health === 30 && s.camp.deltas === (await ev(() => game.scene.getScene('play').data_.economy?.startDeltas ?? 0)) && !s.camp.buffs.length && /AvA/.test(s.banner), { mode: s.mode, health: s.health, camp: s.camp });
 
-const saved = await ev(() => JSON.parse(localStorage.getItem('nomadgirl-save')));
+const saved = await ev(() => JSON.parse(localStorage.getItem('nomadgirl-save:1')));
 check('Spielstand gespeichert (dieser Browser)', saved?.location === drove && saved.health === 30 && saved.run === null, saved);
 // reload: the savegame comes back
 await page.goto(url.replace('&new', ''));

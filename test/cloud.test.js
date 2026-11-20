@@ -179,3 +179,29 @@ test('Bild hochladen: eigener Commit unter assets/, nur Bilder, Größe begrenzt
   assert.equal((await call('/api/upload', { method: 'POST', body: { path: 'assets/x.png', data: png }, email: null })).status, 401);
   assert.ok(validUpload('assets/leyla/run.png') && !validUpload('assets/a/../b.png'));
 });
+
+// #126 end to end: the game's own storage (game/slots.js › openStorage) and openSave against this worker
+test('#126 Spiel online: Slots, globale Achievements und Vor-Lösch-Zustand über den Worker', async () => {
+  const { access, env, fetchFn } = await setup();
+  env.SAVES = fakeKV(new Map());
+  const { openStorage, deleteSlot, trashInfo } = await import('../game/slots.js');
+  const { openSave } = await import('../game/save.js');
+  const { loadProject } = await import('../engine/project.js');
+  const { nodeLoader } = await import('../tools/loader.js');
+  const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
+  const token = await access.token('daniel.nomad@example.com');
+  const gameFetch = (url, o = {}) => handle(new Request('https://ng.example.workers.dev' + url, { method: o.method || 'GET', headers: { ...(o.headers || {}), 'cf-access-jwt-assertion': token }, body: o.body }), env, fetchFn);
+  const be = await openStorage('', { fetchFn: gameFetch, ls: null });
+  assert.equal(be.where, 'cloud');
+  const a = await openSave(D, '', { be, slot: 2, set: 'balancing_v1' });
+  a.save.deltas = 4242; a.save.achievements = { counts: { kills: 3 }, done: {}, made: [] };
+  await a.persist(true);
+  assert.equal(a.error, null);
+  const L = await be.list();
+  assert.equal(L[2].set, 'balancing_v1'); assert.equal(L[1], null);
+  assert.equal((await openSave(D, '', { be, slot: 2 })).save.deltas, 4242);
+  assert.equal((await openSave(D, '', { be, slot: 3 })).save.achievements.counts.kills, 3);   // global
+  assert.equal(await deleteSlot(be, 2), true);
+  assert.equal((await trashInfo(be)).meta.name, 'Leyla 2');
+  assert.equal((await be.list())[2], null);
+});

@@ -490,7 +490,7 @@ export async function openSave(D, base = '', opts = {}) {
     async reset() {
       const { save: old } = await be.get(n).catch(() => ({ save: null }));
       if (old) await be.setBlob('trash', { slot: n, save: old, meta: slotMeta(D, old, n), why: 'überschrieben', at: Date.now() }).catch(() => {});
-      box.save = learnt(fresh(newSave(D))); if (old?.name) box.save.name = old.name; if (old) box.save.set = old.set ?? box.save.set;
+      box.save = learnt(fresh(newSave(D))); if (old?.name) box.save.name = old.name;   // a new game begins with this device's Datenset
       box.fresh = true; return box.persist(true);
     },
     async cycle() { const keep = { name: box.save.name, set: box.save.set, playMs: box.save.playMs }; box.save = learnt(Object.assign(newCycle(D, box.save), keep)); box.fresh = true; return box.persist(true); },

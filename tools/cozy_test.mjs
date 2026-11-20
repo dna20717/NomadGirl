@@ -104,7 +104,7 @@ const want = await page2.evaluate(() => JSON.stringify(game.scene.getScene('play
 await page2.close();
 await ev(async () => { await SC().box.persist(); });
 await page.waitForTimeout(800); await ev(() => nomad.step(60));
-v = await ev(() => ({ lights: JSON.stringify(nomad.save().rig.lights), stored: JSON.stringify(JSON.parse(localStorage.getItem('nomadgirl-save')).rig.lights) }));
+v = await ev(() => ({ lights: JSON.stringify(nomad.save().rig.lights), stored: JSON.stringify(JSON.parse(localStorage.getItem('nomadgirl-save:1')).rig.lights) }));
 check('Zweiter Tab: der alte Tab übernimmt den neueren Spielstand, die Kette bleibt', v.lights === want && v.stored === want, { ...v, want });
 
 // the Tankstelle: a raider from the kit instead of the code-drawn crawler

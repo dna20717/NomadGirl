@@ -111,7 +111,7 @@ await click(1, free.x, free.y);
 s = await inv();
 check('Schulranzen ins Camp-Lager', !s.held && has(s.other.grid, 'schulranzen'), s);
 await shot('shelf');
-const saved = await ev(() => new Promise(r => setTimeout(() => r(JSON.parse(localStorage.getItem('nomadgirl-save'))), 1500)));
+const saved = await ev(() => new Promise(r => setTimeout(() => r(JSON.parse(localStorage.getItem('nomadgirl-save:1'))), 1500)));
 check('Spielstand merkt sich das Inventar', saved.inv.backpack === 'wanderrucksack' && saved.inv.slots.melee === 'machete', saved.inv.slots);
 
 // throw something on the ground in the camp: a new bundle, it stays after reloading

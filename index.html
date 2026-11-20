@@ -21,6 +21,13 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
   @keyframes np-run { to { transform: translateX(-100%); } }
   #lcd a { display: flex; justify-content: space-between; align-items: baseline; color: inherit; text-decoration: none; padding: 0 .3em; white-space: nowrap; cursor: pointer; }
   #lcd a[hidden] { display: none; }
+  #lcd a.danger { color: #ff6b6b; text-shadow: 0 0 6px rgba(255,80,80,.5); } #lcd a.danger.on { background: #ff6b6b; color: #1a0b0b; }
+  #lcd a.q { pointer-events: none; color: #ffd541; } #lcd a.q.on { background: none; color: #ffd541; }
+  #lcd input.name { font: inherit; color: inherit; background: rgba(156,219,67,.12); border: 0; border-bottom: 1px solid currentColor; width: 70%; outline: none; padding: 0; }
+  #slotshot { position: fixed; z-index: 3; margin: 0; padding: 6px; background: rgba(8,10,8,.86); border: 2px solid #59c135; border-radius: 6px; box-shadow: 0 0 18px rgba(89,193,53,.35); font-family: VT323, monospace; color: #9cdb43; }
+  #slotshot img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; image-rendering: auto; border-radius: 3px; }
+  #slotshot figcaption { display: flex; flex-direction: column; padding-top: 4px; line-height: 1.05; } #slotshot b { font-weight: normal; font-size: 1.15em; } #slotshot small { opacity: .75; }
+  #slotshot[hidden] { display: none; }
   #lcd a small { opacity: .65; font-size: .7em; }
   #lcd a.on { background: #9cdb43; color: #0b1a12; text-shadow: none; }
   #lcd a.on span::before { content: '▶ '; }
@@ -33,9 +40,10 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
 <canvas id="scene" aria-label="Die Straße durch die Wastelands, gesehen aus dem Van"></canvas>
 <h1 class="logo"><img src="projects/nomadgirl/assets/ui/logo/logo.png" alt="NomadGirl"></h1>
 <canvas id="cockpit" aria-hidden="true"></canvas>
+<figure id="slotshot" hidden><img alt=""><figcaption><b></b><small></small></figcaption></figure>
 <nav id="lcd" aria-label="Hauptmenü"><div class="hd"><span>88.6 FM</span><span id="np"><i>▶ Leylas Run – BombT · Rig-Radio · A Game about finding everything by leaving all behind</i></span></div></nav>
 <div id="flash"></div>
-<div class="hint">← → lenken · ↑ ↓ wählen · Enter los · <a href="classic.html">Klassisch</a> · <a href="?stickers=all">alle Sticker</a> · <span id="dataset" title="Datenset (Varianten der Spieldaten aus der Werkstatt)"></span> · GPL v3 · <span id="version" title="Version dieser Seite (Commit und Zeit des Builds)">…</span></div>
+<div class="hint">← → lenken · ↑ ↓ wählen · Enter los · Esc zurück · <a href="classic.html">Klassisch</a> · <a href="?stickers=all">alle Sticker</a> · <span id="dataset" title="Datenset (Varianten der Spieldaten aus der Werkstatt)"></span> · GPL v3 · <span id="version" title="Version dieser Seite (Commit und Zeit des Builds)">…</span></div>
 <script type="module">
   import { startSplash } from './game/splash/splash.js';
   import { startCockpit, achievementStickers, PW, PH } from './game/splash/cockpit.js';
@@ -48,10 +56,23 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
 
   // ---------- menu in the radio ----------
   const ITEMS = [['game.html?camp', 'Spiel', 'Camp & Runs'], ['intro.html', 'Intro', 'Wie alles anfing'], ['game.html', 'Testraum', 'Parkour'], ['workshop.html', 'Werkstatt', 'Alles einstellen'], ['https://github.com/dna20717/NomadGirl/blob/main/docs/design.md', 'Design-Dok', 'Fahrplan']];
-  const lcd = document.getElementById('lcd');
-  const links = ITEMS.map(([href, t, s]) => { const a = document.createElement('a'); a.href = href; a.innerHTML = `<span>${t}</span><small>${s}</small>`; lcd.append(a); return a; });
-  // #073 Datensets: which variant of the game data this device plays; Enter / click goes to the next one (as on the classic page)
-  const dsLink = document.createElement('a'); dsLink.href = '#'; dsLink.className = 'dataset'; dsLink.innerHTML = '<span>Datenset</span><small>Standard</small>'; lcd.append(dsLink); links.push(dsLink);
+  const lcd = document.getElementById('lcd'), shotEl = document.getElementById('slotshot');
+  const row = (t, s2, act, cls = '') => { const a = document.createElement('a'); a.href = '#'; a.innerHTML = `<span></span><small></small>`; a.querySelector('span').textContent = t; a.querySelector('small').textContent = s2 || ''; if (cls) a.className = cls; a.addEventListener('click', e => { e.preventDefault(); act?.(); }); return a; };
+  // the LCD has levels (#126): the main menu, the slots, a slot's actions, dialogs; ← Esc / B goes back
+  let links = [], sel = 0, levels = [];
+  const VIS = 4;
+  const show = () => { const top = Math.max(0, Math.min(links.length - VIS, sel - 1)); links.forEach((a, i) => { a.classList.toggle('on', i === sel); a.hidden = i < top || i >= top + VIS; }); links[sel]?.dispatchEvent(new Event('focusrow')); };
+  const render = () => {
+    const L = levels.at(-1);
+    for (const a of links) a.remove();
+    links = L.rows; for (const a of links) { lcd.append(a); a.addEventListener('mouseenter', () => { sel = links.indexOf(a); show(); }); }
+    sel = Math.min(L.sel ?? 0, links.length - 1); show();
+    if (!L.shot) shotEl.hidden = true;
+  };
+  const open = (rows, o = {}) => { if (levels.length) levels.at(-1).sel = sel; levels.push({ rows, ...o }); render(); };
+  const back = () => { if (levels.length > 1) { levels.pop(); render(); } };
+  const mainRows = ITEMS.map(([href, t, s2]) => href === 'game.html?camp' ? row(t, s2, () => slotMenu()) : (() => { const a = row(t, s2, () => { location.href = href; }); a.href = href; return a; })());
+  const dsLink = document.createElement('a'); dsLink.href = '#'; dsLink.className = 'dataset'; dsLink.innerHTML = '<span>Datenset</span><small>Standard</small>'; mainRows.push(dsLink);
   (async () => {
     const { listSets, activeSetId, chooseSet } = await import('./engine/sets.js');
     const { cloudFiles } = await import('./game/cloud_store.js');
@@ -64,10 +85,52 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
     showSet();
   })().catch(e => console.warn('Datensets:', e));
   import('./game/version.js').then(({ loadVersion }) => loadVersion()).then(v => { const e = document.getElementById('version'); e.textContent = v.text; if (v.commit) e.title += ': ' + v.commit; window.version = v; }).catch(() => {});
-  let sel = 0;
-  const VIS = 4, show = () => { const top = Math.max(0, Math.min(links.length - VIS, sel - 1)); links.forEach((a, i) => { a.classList.toggle('on', i === sel); a.hidden = i < top || i >= top + VIS; }); };
-  links.forEach((a, i) => a.addEventListener('mouseenter', () => { sel = i; show(); }));
-  show();
+  open(mainRows);
+
+  // ---------- Spielstände (#126, docs/concepts/save_slots.md): three slots, Vor-Lösch-Zustand, preview, controller ----------
+  const SL = await import('./game/slots.js');
+  const store = await SL.openStorage().catch(() => SL.localStorageBackend());
+  const go = (n, extra = '') => { SL.chooseSlot(n); location.href = `game.html?camp&slot=${n}${extra}`; };
+  const shots = {};
+  const showShot = async (n, meta) => {
+    shotEl.hidden = !meta; if (!meta) return;
+    if (!(n in shots)) shots[n] = await store.blob(`shot${n}`).catch(() => null);
+    shotEl.querySelector('img').src = shots[n] || ''; shotEl.querySelector('img').hidden = !shots[n];
+    shotEl.querySelector('b').textContent = meta.name || `Leyla ${n}`; shotEl.querySelector('small').textContent = SL.metaLine(meta) + (meta.set ? ` · Datenset ${meta.set}` : '');
+  };
+  const confirm = (question, yes, act) => open([row(question, '', null, 'q'), row(yes, 'A / Enter', act, 'danger'), row('Nein', 'zurück', back)], { sel: 2 });
+  async function slotMenu() {
+    const L = await store.list().catch(() => ({})), trash = await SL.trashInfo(store).catch(() => null), active = SL.activeSlot();
+    const rows = [1, 2, 3].map(n => { const m = L[n], a = row(`${n} · ${m ? m.name || 'Leyla ' + n : 'Leer'}${n === active && m ? ' ◂' : ''}`, m ? SL.metaLine(m) : 'Neues Spiel', () => m ? slotActions(n, m) : go(n, '&new'));
+      a.addEventListener('focusrow', () => showShot(n, m)); return a; });
+    if (trash) rows.push(row(`↺ ${trash.meta?.name || 'Spielstand'}`, `zuletzt ${trash.why}`, () => restoreMenu(trash, L)));
+    rows.push(row('‹ Zurück', '', back));
+    open(rows, { shot: true, sel: Math.max(0, active - 1) });
+  }
+  function slotActions(n, m) {
+    const others = [1, 2, 3].filter(k => k !== n);
+    open([row('Weiter', `${m.name} · ${SL.metaLine(m)}`, () => go(n)),
+      row('Umbenennen', m.name, () => renameMenu(n, m)),
+      row('Kopieren nach …', 'in einen anderen Slot', () => open([...others.map(k => row(`Slot ${k}`, '', async () => {
+        const L = await store.list(); const doIt = async () => { await SL.copySlot(store, n, k); levels.length = 1; await slotMenu(); };
+        if (L[k]) confirm(`Slot ${k} überschreiben?`, 'Ja, überschreiben', doIt); else doIt(); })), row('‹ Zurück', '', back)])),
+      row('Neues Spiel hier', 'der alte Stand bleibt zurückholbar', () => confirm(`Slot ${n} neu beginnen?`, 'Ja, neu beginnen', () => go(n, '&new'))),
+      row('Löschen', 'bleibt bis zum nächsten Löschen zurückholbar', () => confirm(`${m.name} löschen?`, 'Ja, löschen', async () => { await SL.deleteSlot(store, n); delete shots[n]; levels.length = 1; await slotMenu(); }), 'danger'),
+      row('‹ Zurück', '', back)]);
+  }
+  function renameMenu(n, m) {
+    const done = async name => { await SL.renameSlot(store, n, name); levels.length = 1; await slotMenu(); };
+    const input = document.createElement('input'); input.value = m.name || ''; input.maxLength = 24; input.className = 'name';
+    const typed = row('', '', () => input.focus()); typed.querySelector('span').replaceWith(input); typed.querySelector('small').textContent = 'Enter';
+    input.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') done(input.value); if (e.key === 'Escape') back(); });
+    open([typed, ...SL.NAMES.map(t => row(t, '', () => done(t))), row('‹ Zurück', '', back)]);
+    if (!navigator.getGamepads?.()?.some?.(g => g?.connected)) setTimeout(() => input.focus(), 0);
+  }
+  function restoreMenu(trash, L) {
+    open([...[1, 2, 3].map(k => row(`Nach Slot ${k}`, L[k] ? `tauscht mit ${L[k].name}` : 'frei', async () => {
+      const doIt = async () => { await SL.restoreTrash(store, k); delete shots[k]; levels.length = 1; await slotMenu(); };
+      if (L[k]) confirm(`Mit ${L[k].name} tauschen?`, 'Ja, tauschen', doIt); else doIt(); })), row('‹ Zurück', '', back)]);
+  }
 
   // ---------- the road: our own texture, US two-lane highway, we drive on the RIGHT lane (#124) ----------
   // ck_road is 16 m wide with the road centre at 8 m; shift −2 puts the camera at 10 m = middle of the right lane
@@ -170,13 +233,14 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
   // stickers: reached achievements from the savegame (online, else this browser); ?stickers=all shows every one
   const all = new URLSearchParams(location.search).get('stickers') === 'all';
   let done = {};
-  try { const r = await fetch('/api/save', { headers: { accept: 'application/json' }, cache: 'no-store' }); if (r.ok && (r.headers.get('content-type') || '').includes('json')) done = (await r.json()).save?.achievements?.done || {}; } catch { }
-  if (!Object.keys(done).length) try { done = JSON.parse(localStorage.getItem('nomadgirl-save') || 'null')?.achievements?.done || {}; } catch { }
+  try { done = (await store.blob('achievements'))?.done || {}; } catch { }   // #126 achievements count over all savegames
   if (all) done = Object.fromEntries(Object.keys(ACH).map(k => [k, true]));
   const stickers = await achievementStickers({ achievements: ACH, recipes: REC, items: IT, assets: A }, done, BASE);
   // the menu text follows the LCD in the cockpit's own animation frame (same offset as the pixels: leaning, potholes)
   const placeLcd = L => { const k = Math.max(innerWidth / PW, innerHeight / PH), ox = (innerWidth - PW * k) / 2, oy = (innerHeight - PH * k) / 2;
-    lcd.style.cssText = `left:${ox + (L.x + 1) * k}px;top:${oy + (L.y + 1) * k}px;width:${(L.w - 2) * k}px;height:${(L.h - 2) * k}px;font-size:${Math.round(L.h * k / 5.4)}px;line-height:1.02`; };
+    lcd.style.cssText = `left:${ox + (L.x + 1) * k}px;top:${oy + (L.y + 1) * k}px;width:${(L.w - 2) * k}px;height:${(L.h - 2) * k}px;font-size:${Math.round(L.h * k / 5.4)}px;line-height:1.02`;
+    const sw = Math.max(200, Math.min(360, L.w * k * 1.1));   // #126 the slot's preview stands above the radio
+    shotEl.style.cssText = `left:${ox + (L.x + L.w / 2) * k - sw / 2}px;bottom:${innerHeight - (oy + L.y * k) + 10}px;width:${sw}px;font-size:${Math.round(sw / 15)}px`; };
   cockpit = await startCockpit(document.getElementById('cockpit'), { cfg: CK, A, base: BASE, stickers, steerValue: () => splash?.curve?.() ?? 0, speed: () => 1, onFrame: placeLcd });
 
   const keys = new Set();
@@ -185,9 +249,10 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
     keys.add(e.key);
     if (e.key === 'ArrowDown' || e.key === 's') { sel = (sel + 1) % links.length; show(); e.preventDefault(); }
     if (e.key === 'ArrowUp' || e.key === 'w') { sel = (sel - 1 + links.length) % links.length; show(); e.preventDefault(); }
-    if (e.key === 'Enter' || e.key === ' ') links[sel].click();
+    if (e.key === 'Enter' || e.key === ' ') { links[sel].click(); e.preventDefault(); }
+    if (e.key === 'Escape' || e.key === 'Backspace') { back(); e.preventDefault(); }
   });
-  let held = 0, next = 0, wasA = true;
+  let held = 0, next = 0, wasA = true, wasB = true;
   const poll = now => {
     const g = navigator.getGamepads ? [...navigator.getGamepads()].find(p => p && p.connected) : null;
     // Daniel: „das Lenkrad könnte sich drehen“: the driver corrects all the time and follows gentle bends; arrows / stick take over
@@ -201,11 +266,12 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
       held = dir;
       if (steered) splash?.steer?.(Math.abs(ax) > 0.25 ? Math.sign(ax) * Math.min(1, (Math.abs(ax) - 0.25) / 0.65) : b(14) ? -1 : b(15) ? 1 : 0);
       const a = b(0); if (a && !wasA) links[sel].click(); wasA = a;
+      const bb = b(1); if (bb && !wasB) back(); wasB = bb;
     }
     requestAnimationFrame(poll);
   };
   requestAnimationFrame(poll);
-  window.cockpitMenu = { selected: () => sel, items: () => links.map(a => a.textContent), ava: () => ava.act, avaAt: () => ava.screen, stickers: () => stickers.length, billboard: () => BB.z, ad: () => ad.toDataURL(),
+  window.cockpitMenu = { selected: () => sel, items: () => links.map(a => a.textContent), level: () => levels.length, back, slots: () => store.list(), store, ava: () => ava.act, avaAt: () => ava.screen, stickers: () => stickers.length, billboard: () => BB.z, ad: () => ad.toDataURL(),
     lcdDrift: () => { const L = cockpit.lcd(), k = Math.max(innerWidth / PW, innerHeight / PH), ox = (innerWidth - PW * k) / 2, oy = (innerHeight - PH * k) / 2; return Math.abs(parseFloat(lcd.style.left) - (ox + (L.x + 1) * k)) + Math.abs(parseFloat(lcd.style.top) - (oy + (L.y + 1) * k)); }, bump: () => cockpit.bump() };
 </script>
 </body>
