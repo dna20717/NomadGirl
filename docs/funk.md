@@ -244,6 +244,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 ## Tickets
 
+### #117 Bau-Modus neu, Camp ohne Rand, Intro mit Musik
+- **Status:** läuft (20.11.) · angelegt 20.11. von Code (Daniel per Sprachnachricht)
+- **Auftrag (Daniels Wahl):** (1) Camp endet nicht im Nichts: links/rechts endlos, unten die Dunkelheit aus den POIs, ein Easter Egg (Knochen, kleiner Bunkerraum), das nie eine Rolle spielt. (2) Deko auch hinter den Containern; ein neuer Container schiebt alles nach hinten (Camp wird länger). (3) Konvention: Container berühren = Zelle markiert, Rand = schrumpfen/strecken, Fahrgestell = ganzer Container; dann Farbe im Kontextmenü (statt Pinsel). (4) Zoom im Bau-Modus in Stufen, UI komplett für Controller (erst wählen, dann Menü). (5) Camp-Eigenschaften im Bau-Modus mit Icons. (6) Lichtkegel im Intro animiert, huschen am Himmel. (7) Intro-Musik (Daniels eigene KI-Musik, lokales Modell, frei nutzbar); schnellere Passagen für die Reise.
+- **Rückfragen:**
+- **Ergebnis:**
+
 ### #116 Ziehen zum Wachsen: Laterne, Stangen, Turm, Leitern, Kistenstapel, Zelte
 - **Status:** fertig (19.11.) · angelegt 19.11. von Code (Daniel: „Dinge wie Laterne so designen, dass man die Ziehen-zum-Vergrößern-Funktion benutzen kann, wie Laterne, Pfosten oder Wachturm“)
 - **Lesen:** docs/features/camp.md › Camp-Baukasten, docs/features/rig.md › Container ziehen und höher
