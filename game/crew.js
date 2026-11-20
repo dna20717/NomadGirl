@@ -7,6 +7,7 @@
 // save.applicant = a person waiting at the fire (Bewerber), or null
 //   job = '<unit>:<at>' a workshop in the rig; the person works there: her skill for that workshop's function adds to the Boni-Bus.
 
+import { jobFactor } from './morale.js';
 const rng = seed => () => { seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 const lines = v => (Array.isArray(v) ? v : String(v || '').split('\n')).map(x => String(x).trim()).filter(Boolean);
 const pickW = (rnd, list) => { const sum = list.reduce((n, x) => n + Math.max(0, x.weight ?? 1), 0); let r = rnd() * sum; for (const x of list) { r -= Math.max(0, x.weight ?? 1); if (r <= 0) return x; } return list[list.length - 1]; };
@@ -85,7 +86,8 @@ export function jobEffect(D, save, p, place = p.job) {
 }
 // for the Boni-Bus (mods.js): every person at work → [{ name, stat, value }]; a job at a workshop that is gone counts nothing
 export function crewBonuses(D, save) {
-  return crew(save).filter(p => p.job).map(p => ({ p, e: jobEffect(D, save, p) })).filter(x => x.e?.stat && x.e.value).map(x => ({ name: x.p.name, stat: x.e.stat, value: x.e.value }));
+  const k = jobFactor(D, save);   // #100 Rig-Moral: Hochstimmung stronger, angespannt weaker, Krise nothing
+  return crew(save).filter(p => p.job).map(p => ({ p, e: jobEffect(D, save, p) })).filter(x => x.e?.stat && x.e.value && k > 0).map(x => ({ name: x.p.name, stat: x.e.stat, value: Math.round(x.e.value * k * 10) / 10 }));
 }
 // beds: sleeping places in the rig (Schlafkoje 1, Gästekoje its capacity) against heads (Leyla + crew): over is allowed (#040), shown
 export function heads(D, save) {

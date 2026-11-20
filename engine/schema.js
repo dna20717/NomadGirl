@@ -1306,6 +1306,15 @@ export const AREAS = {
       { title: 'Eigenheiten', fields: [table('traits', 'Eigenheiten', [text('id', 'ID'), text('name', 'Name'), bool('hidden', 'Verborgen'), num('weight', 'Gewicht', { min: 0 }), text('effect', 'Wirkung'), text('description', 'Beschreibung')],
         { hint: 'jede Person hat eine sichtbare und eine verborgene; die verborgene zeigt sich nach „Aufdecken nach“ Tagen. Wirkungen auf Moral kommen mit der Rig-Moral' })] },
       { title: 'Aufnahme', fields: [num('fireChance', 'Bewerber am Feuer', { unit: '% je Ankunft', min: 0, max: 100 }), num('fireFromDay', 'Bewerber ab Tag', { min: 1, hint: 'der Ruf muss sich erst herumsprechen' }), num('revealDays', 'Verborgene Eigenheit nach', { unit: 'Tagen', min: 1 })] },
+      { title: 'Moral', fields: [   // #100 Rig-Moral (design.md › Rig-Moral + Eigenheiten), leer = Standardwert
+        num('morale.base', 'Grundstimmung', { min: 0, max: 100, hint: 'Leer = 50. Darauf kommen die Quellen; die Moral wandert pro Tag Ereignis-Zeit zum Ergebnis' }), num('morale.drift', 'Wandert je Tag', { min: 1, max: 100, hint: 'Leer = 15 Punkte' }),
+        num('morale.bed', 'Ein Bett für jeden', { hint: 'Leer = +10' }), num('morale.noBed', 'Je fehlendes Bett', { hint: 'Leer = −12' }),
+        num('morale.food', 'Vorräte reichen', { hint: 'Leer = +8 (Feinschmecker zählen doppelt)' }), num('morale.hunger', 'Vorräte knapp', { hint: 'Leer = −15' }), num('morale.foodPer', 'Reicht ab Rationen je Kopf', { min: 0, hint: 'Leer = 2' }),
+        num('morale.water', 'Zisterne', { hint: 'Leer = +5' }), num('morale.fun', 'Chill-Ecke', { hint: 'Leer = +10' }), num('morale.cheer', 'Je Frohnatur', { hint: 'Leer = +5' }),
+        num('morale.safe', 'Bewaffnet', { hint: 'Leer = +8 (Waffenkammer oder Rig-Waffe; Angsthasen zählen doppelt)' }), num('morale.danger', 'Je Gefahrenstufe am Ort über 1', { hint: 'Leer = −4' }),
+        num('morale.crowd', 'Je Kopf mehr als Werkstatt-Plätze', { hint: 'Leer = −5 (Einzelgänger zählen doppelt)' }), num('morale.thief', 'Je Hamster (verborgen)', { hint: 'Leer = −5' }),
+        num('morale.high', 'Hochstimmung ab', { min: 0, max: 100, hint: 'Leer = 75' }), num('morale.tense', 'Stabil ab', { min: 0, max: 100, hint: 'Leer = 40, darunter angespannt' }), num('morale.crisis', 'Angespannt ab', { min: 0, max: 100, hint: 'Leer = 20, darunter Krise' }),
+        num('morale.jobHigh', 'Jobs in Hochstimmung', { unit: '%', hint: 'Leer = +25' }), num('morale.jobTense', 'Jobs angespannt', { unit: '%', hint: 'Leer = −25 (in der Krise bringen Jobs nichts)' }), num('morale.leave', 'Krise: jemand geht', { unit: '% je Tag', min: 0, max: 100, hint: 'Leer = 30' })] },
     ],
   },
   companions: {

@@ -1,5 +1,6 @@
 // Events of the play scene (#017 split from scene.js): knock-out, waking up, the dropped backpack, notes and achievements, kills.
 // Mixed into PlayScene (game/play/scene.js): the methods keep their `this`, nothing else changes.
+import { tickMorale } from '../morale.js';
 import { catchUp, cellKeys } from '../prisoners.js';
 import { campArrival } from '../crew.js';
 import { storeKeyOf } from '../save.js';
@@ -150,6 +151,11 @@ export class SceneEvents {
   }
   // #085 arriving: a hidden trait shows, someone may wait at the fire
   crewNews() {
+    // #100 Rig-Moral: the time that passed moves it; a new level and anyone who left get a message
+    const m = tickMorale(this.data_, this.box.save);
+    if (m?.left?.length) this.hud.toast(`${m.left.join(', ')} ${m.left.length === 1 ? 'hat' : 'haben'} das Rig verlassen`, 'Die Stimmung war am Boden (Krise)', 'warn', 6500);
+    else if (m?.changed) this.hud.toast(`Stimmung: ${m.level.name}`, `Moral ${m.value} · Crew-Menü zeigt, woran es liegt`, m.level.id === 'high' ? 'good' : m.level.id === 'stable' ? 'info' : 'warn', 5200);
+    if (m?.changed || m?.left?.length) this.box.persist?.();
     const r = campArrival(this.data_, this.box.save);
     for (const x of r.revealed) this.hud.toast(`Du lernst ${x.name} besser kennen`, `${x.trait}`, 'info', 5200);
     if (r.applicant) this.hud.toast(`${r.applicant.name} wartet am Feuer`, 'Will mitfahren · am Lagerfeuer entscheiden', 'info', 6000);

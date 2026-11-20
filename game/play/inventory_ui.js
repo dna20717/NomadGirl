@@ -3,6 +3,7 @@
 // Mouse: click picks a thing up (it follows the pointer), click on a cell puts it down (stacks or swaps), right click turns it,
 // double click moves it to the other side, a click outside the panels puts it back. Placeholders until things have a look:
 // coloured cells by category with a short glyph, the name and the count.
+import { morale } from '../morale.js';
 import { statSheet, leylaValues, valueText, SOURCE_NAMES } from '../stat_sheet.js';
 import { DECK, deckSize, fitDeck } from '../save.js';
 import { farmKeys, workplaceOf } from '../workers.js';
@@ -246,6 +247,9 @@ export class InventoryUI {
     return el('div', { class: 'inv-values' },
       el('div', { class: 'inv-val-cols' }, el('span', {}, 'Wert'), el('span', {}, 'Grund'), el('span', {}, 'Boni'), el('span', {}, 'Ergebnis')),
       ...V.map(leyla),
+      ...(M => M ? [head('Crew'), el('button', { class: 'inv-btn inv-val' + (M.level.id === 'high' ? ' up' : M.level.id === 'stable' ? '' : ' down'), 'data-tab': 'val:morale' },
+        el('span', { class: 'inv-val-name' }, `Moral · ${M.level.name}`), el('span', { class: 'inv-val-calc' }, el('small', {}, ''), el('small', {}, M.target !== M.value ? `→ ${M.target}` : ''), el('b', {}, String(M.value))),
+        el('span', { class: 'inv-val-parts' }, ...M.parts.map(p => el('span', { class: 'inv-val-src ' + (p.value < 0 ? 'neg' : 'pos') }, `${p.label} ${valueText(p.value, '')}`))))] : [])(morale(D, save)),   // #100
       S.camp.length ? head('Camp') : null, ...S.camp.map(other),
       S.tank.length ? head('Tank & AvA') : null, ...S.tank.map(other));
   }

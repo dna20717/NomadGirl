@@ -22,6 +22,7 @@ import { mod, modFactor, parts as modParts, modText } from '../mods.js';
 import { placesFor, workplaceOf, assign, unassign, flawOf, syncWorkers, farmEntities, befriend, bondOf, BOND_MAX, WORKING_STATS, candidatesAt, workerAt } from '../workers.js';
 import { occupancy } from '../inventory.js';
 import { known, skillText, admit, reject, dismiss, setJob, jobEffect, heads, headsText } from '../crew.js';
+import { morale } from '../morale.js';
 import { benchAt, upgradeOf, titleOf, stars, blocked as upBlocked, costText, gainText, upgrade as doUpgrade } from '../upgrades.js';
 import { de, VERB, SOON, costLine } from './camp.js';
 
@@ -273,9 +274,20 @@ export class CampActions {
   }
   crewMenu() {
     const s = this.scene, D = this.D, save = this.box.save, L = save.crew || [], H = heads(D, save);
-    s.hud.menu({ title: `Crew (${L.length})`, sub: `${headsText(H)}. Wer einen Job hat, bringt seine Fähigkeit an dieser Werkstatt ein.`,
+    const M = morale(D, save);   // #100
+    s.hud.menu({ title: `Crew (${L.length})`, sub: `${headsText(H)}.${M ? ` Moral ${M.value} · ${M.level.name}${M.target !== M.value ? ` (wandert zu ${M.target})` : ''}.` : ''} Wer einen Job hat, bringt seine Fähigkeit an dieser Werkstatt ein.`,
       items: [...L.map(p => { const e = p.job && jobEffect(D, save, p); return { label: p.name, sub: [skillText(D, p), p.job ? `Job: ${this.benchTitle(this.benchId(p.job), p.job)}${e ? ` · ${e.skill} +${e.value}` : ' · bringt hier nichts'}` : 'ohne Job'].join(' · '), icon: 'person', act: () => this.crewPerson(p.id) }; }),
+        ...(M ? [{ label: `Moral: ${M.value} · ${M.level.name}`, sub: 'woran es liegt', icon: 'heart', act: () => this.moraleMenu() }] : []),
         { label: 'Zurück', icon: 'x', act: () => {} }] });
+  }
+  // #100 Rig-Moral: every source with its points, what the level does
+  moraleMenu() {
+    const s = this.scene, M = morale(this.D, this.box.save);
+    if (!M) return this.crewMenu();
+    const does = { high: 'Jobs bringen mehr', stable: 'Jobs wie gewohnt', tense: 'Jobs bringen weniger, die Stimmung ist gereizt', crisis: 'Jobs bringen nichts, jeden Tag kann jemand gehen' }[M.level.id];
+    s.hud.menu({ title: `Moral ${M.value} · ${M.level.name}`, sub: `Ziel ${M.target}: die Moral wandert jeden Tag ein Stück dorthin. ${does}.`,
+      items: [...M.parts.map(p => ({ label: `${p.value > 0 ? '+' : '−'}${Math.abs(p.value)}  ${p.label}`, icon: p.value >= 0 ? 'up' : 'down', disabled: ' ', act: () => {} })),
+        { label: 'Zurück', icon: 'x', act: () => this.crewMenu() }] });
   }
   benchId(place) { const [ui, at] = String(place).split(':').map(Number); return this.box.save.rig.units[ui]?.workshops?.find(w => w.at === at)?.id || null; }
   crewPerson(id) {
