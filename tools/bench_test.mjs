@@ -129,8 +129,12 @@ const peek = await ev(() => { const p = document.querySelector('.bm-peek'); retu
 check('Hover zeigt die große Vorschau (Regal leer → voll)', peek?.name === 'Lagerregal' && peek.imgs === 2 && peek.fills, peek);
 await shot('shop');
 // dragging a crate: the workshop itself hangs from the pointer, the preview goes away
-const sp = await ev(() => nomad.buildSpots());
-const crate = sp.yard.find(y => y.kind === 'ws' && y.id === 'chill_area');
+// #125: since #117/#121 the scrapyard may lie off screen (the camp has no visible end): jump there first
+let crate = (await ev(() => nomad.buildSpots())).yard.find(y => y.kind === 'ws' && y.id === 'chill_area');
+if (crate && (crate.x < 80 || crate.x > 1200)) {   // like a player: the jump button „Schrottplatz“ at the top
+  await page.locator('button', { hasText: /^Schrottplatz$/ }).first().click(); await ev(() => nomad.step(60));
+  crate = (await ev(() => nomad.buildSpots())).yard.find(y => y.kind === 'ws' && y.id === 'chill_area');
+}
 await page.mouse.move(crate.x, crate.y); await page.mouse.down(); await ev(() => nomad.step(2));
 for (let i = 1; i <= 6; i++) { await page.mouse.move(crate.x + i * 30, crate.y - i * 30); await ev(() => nomad.step(2)); }
 const hold = await ev(s => { const d = eval(s).hud.build.drag; return d && { kind: d.kind, id: d.id, key: d.holder.list[1]?.texture?.key }; }, scene);

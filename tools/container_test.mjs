@@ -60,7 +60,7 @@ check('Knopf nochmal: wieder zu', (await shells())[0].closed === 1 && label.incl
 
 await page.click('.hud-buildbtn');
 await ev(() => nomad.step(40));
-check('Bau-Modus: Container offen', (await shells())[0].closed === 0, await shells());
+check('Bau-Modus folgt dem Schalter: zu bleibt zu (#121, Rig von außen dekorieren)', (await shells())[0].closed === 1, await shells());   // #125: was „Container offen“ before #117/#121
 await shot('build');
 await ev(() => game.scene.getScene('play').hud.build.close());
 await ev(() => nomad.step(60));

@@ -1,63 +1,63 @@
 # Backlog: offene Punkte, technische Schulden, Relikte
 
-Stand: 12.11.2026 abends (Durchsicht von Ava). Kleinigkeiten sind schon behoben (unten „Erledigt bei der Durchsicht“), der Rest wartet auf Daniels Entscheidung.
+Stand: 20.11.2026 (Aufräumen #125). Frühere Durchsichten: 12.11. und 16.11. (unten). Offene Aufträge stehen als Tickets im Funkbuch (`docs/funk.md`), hier nur, was (noch) kein Ticket hat.
 
-## A. Entscheidungen, die Daniel treffen muss
+## A. Entscheidungen
 
-**Entschieden 12.11.2026 abends (Daniel):** A1 machen (Funkbuch #002) · A2, A3 erstmal so lassen · A4 Abspann, danach offenes Spiel mit AvA als spielbarer Figur (design.md) · A6 ja, 2.400 kg bleiben · A7 keine der beiden Fassungen: ein **Trophäenraum im Cyberpunk-Stil** (Funkbuch #003). Offen: A5, A8.
+Alle Punkte aus A1–A8 sind entschieden (12.11. und 19.11.2026): A1 erledigt (#002), A2/A3 bleiben so, A4 Abspann + offenes Spiel, A5 → Skilltree Dunkelheit (#080), A6 2.400 kg, A7 Trophäenraum (#003), A8 Balancing versioniert (#081/#097, v2 = #109).
 
-**Entschieden 19.11.2026 (Daniel, Entscheidungskarten):** A5 Dunkelheit wird ein eigener Skilltree mit Warnung, dunklen Skills und einer Kopfgeldjäger-Fraktion (Funkbuch #080) · A8 Balancing wird versioniert, v1 per Simulation (#081). Aus B: Hausmeister-Boss und Gewehr in Kletter-Animationen **gestrichen**; Licht (#082), Bild-Upload (#083), Werkstatt-Stufen (#078), Zelle (#079), Fahrgestell/Camp-Boden (#084) als Nächstes; Companions-Aussehen und Tier-/Drohnen-Bausatz später.
+**Neu offen (20.11.2026):**
 
 | # | Thema | Worum es geht | Vorschlag Ava |
 |---|---|---|---|
-| A1 | **CLAUDE.md ist 184 KB groß** | Jede Sitzung lädt die ganze Datei (grob 50.000 Tokens), bevor die Arbeit beginnt. Der Großteil ist Feature-Beschreibung und Verlauf („Stand“). | Aufteilen: CLAUDE.md behält Regeln, Ordner, Tests und Kurzregeln (≈ 15 KB); die Feature-Abschnitte ziehen nach `docs/features/*.md` (Leyla, Kampf, Camp, Rig, POIs, Inventar, Progression …), der Verlauf nach `docs/changelog.md`. |
-| A2 | **17 Assets ohne Verwendung** (≈ 2,7 MB) | Alte Fassungen, die wir bewusst behalten haben: `leyla_idle` (hochaufgelöste Idle), `wasteland_sky/far/ledge/near` (alte Startseite), `drone_moods` (alte Drohne), `van_v1`, `leyla_flip_side` (alter Salto), `container_stack`, `ws_warroom_table`, `ws_metal_bench`, `ws_chill_area`, `ws_food_kitchen`, `ws_drone_bench`, `ws_sleep_bunk`, `ws_generator_bench`, `ws_treasury_v1`. | (a) in einen Ordner `assets/_archiv/` verschieben und in der Werkstatt als Art „Original“ führen, (b) löschen (Git behält sie in der Geschichte), (c) so lassen. Ava empfiehlt (b). |
-| A3 | **Rohmaterial im Repo** (≈ 2,4 MB) | Rohframes von PixelLab: `workshops/cryotank/source/` (59 Dateien, 2,1 MB), `tiles/tileset00/candidates/`, `leyla/*_source.png`, `techtree/source/`. Gebraucht nur, wenn wir die Streifen neu schneiden. | Behalten (Skripte brauchen sie). Falls das Repo zu groß wird: auslagern. |
-| A4 | **Heilmittel-Knoten** | Steht im Techtree (30 Bio, 20 Wissen, 20 Technik), hat aber keine Wirkung. | Endziel mit kleinem Abspann, danach geht das Spiel weiter. |
-| A5 | **„Dunkelheit“** | Ressource ist angelegt (versteckt, „Mehr je Stufe“ 50 %), ohne Wirkung. | Als Schwierigkeitsstufe beim Plündern wählbar machen. |
-| A6 | **Van-Zugkraft 2.400 kg** | Wegen des Tank-Containers erhöht (vorher 1.500), sonst war der Start „zu schwer“. | Bestätigen oder den Tank-Container leichter machen. |
-| A7 | **Schatzkammer-Fassung** | Neu: Palette mit Tasche voller Scheine. Alternative `ws_treasury_alt` (festgezurrte Palette). | Daniel wählt. |
-| A8 | **Kosten im Techtree, Tank-Tempo** | Alles Platzhalter-Werte (Tank ohne Pflege ≈ 10 Tage). Erst nach dem Anspielen sinnvoll. | Anspielen, dann justieren. |
+| A9 | **Spielstand-Plätze** | Konzept für bis zu 3 Spielstände: `docs/concepts/save_slots.md`, mit 9 Multiple-Choice-Fragen (A–I) | Fragen beantworten, dann Ticket; etwa 3–3½ Tage in 5 Etappen |
+| A10 | **Cockpit-Reste** (#123/#124) | Fahrer-Sonnenblende `ck_visor` und 10 Kram-Stücke liegen fertig im Bereich Assets, sind aber nicht platziert; das Billboard steht links, weil die Sonnenblende rechts verdeckt | Daniel platziert nach Geschmack in Startseite › Cockpit (Vorschau zeigt jetzt das Cockpit) oder sagt „Ava, setz sie“ |
+| A11 | **Billboard-Werbung für Lore-Marken** im Cockpit | Idee aus #124 | in den Ideenspeicher oder Ticket |
 
-## B. Offene Features (aus CLAUDE.md und design.md gesammelt)
+## B. Offene Features ohne Ticket
 
-- **Foodtruck:** „Verkaufen kommt später“ (Werkstatt ohne Funktion).
-- **Zugmaschine tauschen** im Bau-Modus fehlt (Van ↔ LKW).
-- **Gegner:** (Hausmeister-Boss gestrichen, Daniel 19.11.2026; Gruppen-Alarm erledigt #039.) (Grafiken: erledigt mit dem Raider-Bausatz #004/#015, 13 von 15 Gegnern; `rattenschwarm` und `wachdrohne` sind noch aus Code und gesperrt, bräuchten einen eigenen Bausatz für Tiere/Drohnen.)
-- **Companions** sind noch Figuren aus Code ohne Aussehen.
-- **AvA:** Akku aus einem Drohnenteil (Kern), wie man Anbauteile freischaltet. (Keine Tastatur-Steuerung fürs Gummiband: Daniel 16.11.2026, primäre Eingabe ist der Controller.)
+- **Zugmaschine tauschen** im Bau-Modus (Van ↔ LKW) fehlt; heute wechselt die Zugmaschine nur über Bergung und Mega-Rig (`swapTractor`).
+- **Companions** sind noch Figuren aus Code ohne Aussehen (Daniel 19.11.: später).
+- **AvA:** Akku aus einem Drohnenteil (Kern), wie man Anbauteile freischaltet.
 - **Kachel-Sets:** Vorschau eines Sets in der Werkstatt, großer Clutter für Wüste und Ruine.
-- **Waffen:** weitere Langwaffen per „Posen von“. (Gewehr in Kletter-Animationen gestrichen, Daniel 19.11.2026.)
-- **design.md, offene Fragen:** Ranking-Bonus pro Rang, was macht die Zelle im Rig, das „vielleicht noch Gefährlichere“, Feinschliff nach dem ersten Anspielen.
+- **Waffen:** weitere Langwaffen per „Posen von“.
+- **design.md, offene Fragen:** Ranking-Bonus pro Rang, das „vielleicht noch Gefährlichere“, Feinschliff nach dem ersten Anspielen.
+- **Grafiken für weiterentwickelte Werkstätten** (Daniel 15.11., #034): je Ausbaustufe ein eigenes Bild (PixelLab, streng frontal, gleiche Box).
+- **Camp-Grafik aus Code** (Daniel 19.11.: „streichen wir das für jetzt“): Rest-Stücke ohne Bild; mit #111 sind viele hybrid neu gemalt, siehe `docs/features/camp.md` › Camp-Baukasten.
+- **Fahrgestell `trailer_chassis` und Camp-Boden** noch grob (gehört zu Ticket #084).
 
-- **Grafiken für weiterentwickelte Werkstätten** (Daniel, 15.11.2026, #034): jede Werkstatt mit Stufen (Techtree, Ausbau) bekommt je Stufe ein eigenes Bild (PixelLab, streng frontal, gleiche Box), damit man den Fortschritt im Rig sieht.
-
-- **Camp-Grafik aus Code** (Bestand 19.11.2026, Daniel: „streichen wir das für jetzt“): 33 von 39 Deko-Stücken, 5 Rig-Teile (V8, Bleche, Stachelgitter, Dachgeschütz, Dachbox), 8 von 25 Mega-Rig-Anbauteilen ohne Bild. Für PixelLab lohnen sich die ca. 18 festen Stücke (Pflanze, Kaktus, Vogelhaus, Laterne, Feuertonne, Dreibein, Windrad, Zelte, Turm, Spiegel, Hängematte, Schrott, Seesäcke, Warnschild, Fundstücke, Fallschirm) + Rig-Teile, ca. 30 Generierungen; Dehnbares (Neon, Banner, Brücken …) bleibt aus Code.
+Erledigt bzw. gestrichen seit dem 16.11.: Foodtruck-Theke mit Kunden (#013), Rattenschwarm und Wachdrohne gestrichen (#108), Zelle (#079), Licht (#082), Bild-Upload (#083), Werkstatt-Stufen (#078).
 
 ## C. Technische Schulden
 
-| # | Stelle | Problem | Aufwand |
-|---|---|---|---|
-| C1 | CLAUDE.md | siehe A1 | mittel |
-| C2 | `tools/pad_test.mjs` Gummiband | Bei halbem Stick landet AvA manchmal bei 187 px statt ≈ 290 px. Ursache nicht gefunden; die Prüfung ist gelockert (> 40 % der Reichweite). Im Spiel nicht aufgefallen. | klein bis mittel |
-| C3 | Camp im kopflosen Browser | Chrome meldet einmal „GPU stall due to ReadPixels“. Eine Leselücke ist behoben (`backdrop.js`); die Meldung kommt wohl von einer Stelle, die eine WebGL-Textur zurückliest. Nur Leistung, kein Fehler. | klein |
-| C4 | `anim_audit.mjs` | Ein Fall bleibt: Dash um Dash gegen eine Wand lässt kurz „Stehen“ aufblitzen. | klein |
-| C5 | Container-Stauraum im Code | Deichselkästen sind raus, der Code (E-Punkt, Umzug der Raster `rig:<n>`) bleibt, falls Stauraum an Containern zurückkommt. `test/stack.test.js` gibt dem 20-Fuß-Container dafür im Test Stauraum. | – (bewusst) |
-| C6 | Gemeinsamer Kern | `game/ui.js` (`showMenu`, `askText`, `uiColor`), `icons.js` (`ICON_NAMES`), `browser_loader.js` (`asCanvas`) haben unbenutzte Exporte: Kopie aus NomadTactics, bewusst gleich gehalten. | – |
-| C7 | ~~Unbenutzte Exporte~~ | erledigt bei der Durchsicht 16.11.2026 (bis auf `nextRipe` in garden.js: fertiger Helfer für eine Reife-Anzeige im Hydrokultur-Menü, bewusst behalten). | – |
-| C8 | ~~Große Dateien~~ erledigt (#017): `camp.js` 1.437 → 1.100 (+ `camp_life.js`, `camp_actions.js`), `scene.js` 1.088 → 752 (+ `scene_runs.js`, `scene_events.js`), `leyla.js` 1.057 → 539 (+ `leyla_moves.js`, `leyla_combat.js`); Methoden-Bündel werden in die Klasse eingehängt (Ende der Hauptdatei), Code unverändert. Altes Problem: | `camp.js` und `leyla.js` je ≈ 1.000 sehr lange Zeilen, `scene.js` ≈ 850. Lesbar, aber Kandidaten zum Aufteilen (Camp: Zeichnen/Hotspots/Menüs; Leyla: Bewegung/Kampf/Aussehen). | mittel |
-| C9 | Test-Fixtures | Rig-Tests spielen mit einer festen alten Aufstellung (`classicRig`, `furnishedStart`, Tank aus). Gut für stabile Tests, prüft aber nicht Daniels aktuellen Start. | – (bewusst) |
-| C10 | Umbenennen/Löschen in der Werkstatt ↔ Spielstände | `rename`/`remove` (engine/project.js) ändern nur die Daten. Im Spielstand werden unbekannte IDs still entfernt: Werkstätten (Inhalt wird seit 16.11. gerettet), Gegenstände, Buffs, Companions, Rezepte, Quests (eine umbenannte Quest kommt neu), AvAs Chips, `save.waiting`. Vorschlag: Umbenennungen im Projekt protokollieren (`project.json › renames`) und beim Laden anwenden. | mittel |
-| C11 | Farben in `play.css` | 505 feste Hex-Farben statt `--ui-*`-Tokens (Oberflächen-Regel aus NomadTactics). Umbau nur mit Bildvergleich, sonst verrutscht der Look. | mittel |
-| C12 | Sechs Zufallsfunktionen (`rng`/`hash` in weather, salvage, worldmap, art, megarig_view, poi, rain, camp_decor, ladder_art, intro, atmosphere) | Bewusst lassen: eine gemeinsame Funktion würde alle gewürfelten Level, Karten, Wracks und Deko-Varianten verändern. | – |
-| C13 | Herstellen → Zerlegen | Mit „jedes Herstellen gibt eine Ressource“ (Daniel 16.11.) wird z. B. Schrott über Rohrpistole/Machete zu Technik (2 Technik je Runde für 1 Schrott + 1 Kabel). Gewollter Tausch, aber ohne Prüfung in der Werkstatt; beobachten, ggf. kein Nebenergebnis für zerlegbare Ergebnisse. | klein |
-| C14 | Kleinigkeiten Deko/Synergie | Wand- und Dach-Deko teilen sich die Plätze eines Containers; Dach-Deko bleibt, wenn etwas daraufgestapelt wird (steckt dann im oberen Container); Synergie-Nachbarn für Stapel ab Höhe 3 (heute max. 2). | klein |
-| C15 | Mega-Rig Kleinigkeiten | Lichterketten des Camps verschwinden beim Einsteigen ohne Δ zurück (an Bord eigene Ketten); `megaSpot` (camp_mega.js) dupliziert `workshopHotspot` (camp.js) mit leicht anderem Verhalten. | klein |
-| C16 | Toter Spielstand | `save.log`, `save.dreams`, `save.base`, `tank.diedOn`, `run.location` werden geschrieben, aber (außer in Tests) nie gelesen. Harmlos; `dreams`/`base` sind für später gedacht. | – |
-| C17 | ~~Neuer Durchgang~~ | erledigt 16.11.2026: Mega-Rig-Ausbaustufen beginnen neu, nur das Rig bleibt (Daniel: „nur das Rig selbst“); Nachreichen gibt es nur einmal pro Spielstand, auch über Durchgänge hinweg (Daniel: „A“, `newSave(D, handed)`). | – |
-| C18 | Alte Bilder nach #041/#042 | Feldhandbuch-Lektion „Das Camp-Lager“ zeigt noch Bilder der alten Kiste (`tut_kiste_1/2`): mit dem Aufnahme-Tool neu aufnehmen. Fahrgestell (`trailer_chassis`) und Camp-Boden sind noch so grob wie die alten Container (#042 hat nur die Container neu gemalt). |
-| C19 | ~~Wackeliger Test~~ | erledigt 17.11.2026: `map_test` vergleicht jetzt die Leben derselben Gegnerart (Gefahr 4 > 1,15 × Gefahr 1) statt des Mittels über eine zufällige Mischung. Vorher: | `map_test` „Gefahr wirkt“ vergleicht zufällig gewürfelte Gegnermischungen (Leben Gefahr 4 > 1,3 × Gefahr 1); fiel am 16.11. einmal knapp durch (101 gegen 117), danach dreimal grün. Mit festem Seed oder Mittel über mehrere Würfe prüfen. |
+**Abgearbeitet am 20.11.2026 (#125):**
 
+| # | Stelle | Wie gelöst |
+|---|---|---|
+| C2 | Gummiband im `pad_test` | Kein Fehler im Spiel: die Totzone lässt von halbem Stick ≈ 0,4 übrig, und AvAs Ruheplatz hinter Leyla mischt sich mit (1 − Neigung) ein, daher 187 px. Ausreißer beim vollen Stick kamen vom freien Herumfliegen im Camp (bis 3.500 px weit weg). Test rechnet jetzt das exakte Ziel und startet AvA nah: wieder streng. |
+| C3 | „GPU stall due to ReadPixels“ | Deko-Höhe liest ein Bild in einem Zug statt pixelweise; Ladebild, Mega-Rig-Ansicht und Gegner-Bausatz lesen auf der CPU. Die übrigen Meldungen stammen aus Phaser, das Canvas-Texturen (Schrift, Kacheln) in die Software-Grafik des kopflosen Browsers lädt; im echten Browser mit GPU nicht relevant. |
+| C4 | `anim_audit` Dash gegen Wand | Ein Dash zählt jetzt als Bewegung für „Stehen erst nach“; Audit sauber. |
+| C10 | Umbenennen ↔ Spielstände | Protokoll in **Grundlagen › Umbenennungen** (`data/renames.json`), Spielstände ziehen beim Laden mit (`followRenames`), Test `test/renames.test.js`; `docs/features/editor.md`. |
+| C11 | Farben in `play.css` | 578 feste Farben laufen über 27 Tokens `--ng-*` (eigene Spielpalette, getrennt von den `--ui-*`-Themes der Werkstatt). Rückwärts eingesetzt ergibt sich exakt die alte Datei. Seltene Farben (196 verschiedene, je 1–4× benutzt, zusammen 321 Stellen) bleiben direkt: eigene Tokens lohnen sich dafür nicht. |
+| C13 | Herstellen → Zerlegen | Werkstatt warnt, wenn Zerlegen eines Ergebnisses alle Zutaten zurückgibt (Endlos-Quelle); heute kein Fall. Tausch-Wege (Schrott → Technik) bleiben gewollt. |
+| C14 | Deko/Synergie | Dach-Deko unter einem aufgestapelten Container geht ins Lager (nur der überbaute Teil, `roofCovered`); Synergie-Nachbarn stimmen auch für Stapel ab Höhe 3. |
+| C15 | Mega-Rig | Lichterketten des Camps kommen beim Einsteigen mit Δ zurück (wie Abhängen); ein E-Punkt `benchSpot` für Rig und Mega-Rig. |
+| C18 | Alte Bilder | Lektion „Das Camp-Lager“ neu aufgenommen (Kofferraum); Aufnahmen ohne Kassette und Meldungen. Fahrgestell/Camp-Boden → #084. |
+| – | Cockpit | `cockpit.glass` im Schema (Startseite › Cockpit › Scheibe), Werkstatt-Vorschau zeigt Cockpit und Klassisch. |
+| – | `ng check` | „Entity“-Hülle zählt nicht mehr als ungenutzter Gegenstand: „Alles stimmig“. |
+
+**Bewusst so gelassen:**
+
+| # | Stelle | Warum |
+|---|---|---|
+| C5 | Container-Stauraum im Code | bleibt, falls Stauraum an Containern zurückkommt |
+| C6 | Gemeinsamer Kern | unbenutzte Exporte aus NomadTactics, bewusst gleich gehalten |
+| C9 | Test-Fixtures | feste alte Aufstellung für stabile Tests |
+| C12 | Zufallsfunktionen | eine gemeinsame würde alle gewürfelten Level, Karten, Wracks verändern |
+| C16 | Toter Spielstand (`save.log`, `dreams`, `base` …) | harmlos, `dreams`/`base` für später |
+| A2/A3 | 17 alte Assets, Rohmaterial | Daniel 12.11.: erstmal so lassen |
+
+Früher erledigt: C1 (#002), C7, C8 (#017), C17, C19.
 
 ## D. Ideenspeicher (Daniel, 18.11.2026: „Alle deine Vorschläge kommen in den Ideenspeicher“)
 

@@ -81,7 +81,8 @@ function usageChecks(p, m) {
   for (const a of Object.keys(AREAS)) for (const [, x] of entries(p, a)) for (const r of references(a, x)) used.add(r.area + ':' + r.value);
   for (const [id, x] of Object.entries(p.data.items || {})) {
     const inRecipe = Object.values(p.data.recipes || {}).some(r => r.result === id || (r.ingredients || []).some(i => i.item === id));
-    if (!used.has('items:' + id) && !inRecipe) m.push({ kind: 'hint', text: `Gegenstand „${x.name || id}“ kommt nirgends vor (keine Beute, kein Rezept)`, place: { area: 'items', id } });
+    if (!used.has('items:' + id) && !inRecipe && x.category !== 'glitchling')   // #125: the Entity shell comes from duels, never as loot
+      m.push({ kind: 'hint', text: `Gegenstand „${x.name || id}“ kommt nirgends vor (keine Beute, kein Rezept)`, place: { area: 'items', id } });
   }
   // no enemies drawn from code in the game (Daniel, 14.11.2026: „stell sicher, dass die nicht mehr auftauchen“): whoever spawns must come from a kit
   for (const a of ['pois', 'rooms', 'encounters']) for (const [eid, x] of entries(p, a)) for (const r of references(a, x)) {
