@@ -37,7 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
-- 20.11. Code → Ava: #125 **Aufräumen + technische Schulden** läuft, nebenbei Konzept für 3 Spielstand-Plätze.
+- 20.11. Code → Ava: #125 **Aufräumen + technische Schulden** fertig: Backlog C komplett (C2, C3, C4, C10, C11, C13, C14, C15, C18), Cockpit-Reste im Schema, Backlog auf Stand 20.11.; Konzept für 3 Spielstände in `docs/concepts/save_slots.md` mit 9 Fragen an Daniel (Backlog A9). Offen für Daniel: Cockpit-Kram platzieren (A10).
 - 20.11. Code → Ava: **HNC (Übergabe)**. Stand `main` nach #121–#124. Neu seit der letzten Übergabe: #121 Camp ohne sichtbares Ende + AvAs Funkreichweite + Rig offen/zu als Leyla (O/P/R3, Yoga geparkt); #122 Logo-Straße aus einem Guss, Kassette kleiner; #123/#124 **Startseite ist jetzt das Van-Cockpit** (/; alte unter /classic): PixelLab-Teile modular in Startseite › Cockpit (Hülle, Lenkrad, Instrumente, Radio mit Menü im LCD, Spiegel, 16 Stücke Kram als Tabelle), Achievement-Sticker, eigene Straße (rechte Spur), Billboard mit Anzeige + Untertitel „A Game about finding everything by leaving all behind“, AvA-Verhalten (scannen, fotografieren, Rolle, anklopfen, voraus rasen, dösen, Käfer jagen), dreifache Auflösung, Fahrer lenkt sanft, Scheibe mit Schmutz. PixelLab Sitzung 1125, übrig 2055. Offen/⚠️: Billboard steht links (rechts verdeckt die Sonnenblende); `cockpit.glass` noch nicht im Schema; Werkstatt-Vorschau der Startseite zeigt noch die klassische Seite; Fahrer-Sonnenblende `ck_visor` und 10 Kram-Stücke liegen bereit, unplatziert; Billboard-Werbung für Lore-Marken als Idee.
 - 20.11. Code → Ava: #124 Cockpit ist live als Startseite (/), alte Startseite unter /classic.
 - 20.11. Code → Ava: #124 Cockpit in hübsch unter /cockpit (PixelLab-Teile modular, Clutter-Tabelle, Achievement-Sticker, neue Straße rechts, Billboard mit Anzeige + Untertitel, AvA-Verhalten). PixelLab 85. Offen: ob das Cockpit die Startseite ersetzt; Billboard rechts wäre hinter der Sonnenblende, ⚠️ vorläufig links.
@@ -255,13 +255,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #125 Aufräumen: technische Schulden, Cockpit-Reste, Backlog neu + Konzept Spielstand-Plätze
-- **Status:** läuft (20.11.) · angelegt 20.11. von Code (Daniel: „Räume alles auf und arbeite die technischen Schulden ab. Während du das tust, kannst du ein Konzept für eine Spielstand Verwaltung von bis zu 3 savegames erstellen (noch nicht mit einbauen)“)
+- **Status:** fertig (20.11.) · angelegt 20.11. von Code (Daniel: „Räume alles auf und arbeite die technischen Schulden ab. Während du das tust, kannst du ein Konzept für eine Spielstand Verwaltung von bis zu 3 savegames erstellen (noch nicht mit einbauen)“)
 - **Für:** Code
 - **Lesen:** docs/backlog.md › C, docs/features/online.md › Spielstand, docs/features/splash.md
 - **Auftrag:** Backlog C abarbeiten (C10 Umbenennungen im Spielstand nachziehen zuerst), lose Enden aus #123/#124 (Schema `cockpit.glass`, Werkstatt-Vorschau), Backlog auf Stand 20.11. bringen; Konzept für bis zu 3 Spielstände als Doku (nicht bauen).
 - **Fertig, wenn:** Tests grün, `ng check` stimmig, Backlog aktuell, Konzept in `docs/`.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: Umbenennungen werden protokolliert, Löschen nicht (gelöschte IDs fallen weiter still aus Spielständen); HUD-Farben bekommen eigene `--ng-*`-Tokens statt `--ui-*` (die `--ui-*` wechseln mit dem Werkstatt-Theme, der HUD-Look soll fest bleiben); Cockpit-Sonnenblende und 10 Kram-Stücke nicht platziert (Geschmack, Backlog A10).
+- **Ergebnis:** (Code) Commits „Umbenennen zieht Spielstände mit …“ (C10), „HUD-Farben als Tokens …“ (C11), „Aufräumen: ein E-Punkt …“ (C14/C15), „Werkstatt meldet Rezepte …“ (C13), „Dash gegen die Wand …“ (C4), „Gummiband-Test wieder streng …“ (C2), „Weniger GPU-Rücklesen …“ (C3), „Cockpit: Scheiben-Schmutz …“, „Feldhandbuch: Camp-Lager neu aufgenommen …“ (C18), „Backlog auf Stand 20.11. …“. `npm test` 345/345 (neu `test/renames.test.js` 4, je 1 in mega/stack/project), `ng check` „Alles stimmig“, `anim_audit` sauber. Zwei Browser-Tests waren schon vor #125 rot und passen jetzt zum neuen Bau-Modus (`bench_test` springt zum Schrottplatz, `container_test`: Bau-Modus folgt dem Schalter Rig offen/zu). Konzept 3 Spielstände: `docs/concepts/save_slots.md` (9 Fragen an Daniel). PixelLab 0. **Bitte testen:** Werkstatt › Grundlagen › Umbenennungen (einen Gegenstand umbenennen, der im Rucksack liegt, Spiel neu laden: er ist noch da); Startseite › Vorschau Cockpit/Klassisch und Scheibe-Felder; Mega-Rig einsteigen mit Lichterketten im Camp (+Δ); Feldhandbuch „Das Camp-Lager“.
 
 ### #118 Innen-Deko: Wohnzellen, Möbel, Lampen, Lichterketten, wachsende Pinnwand, Trophäen-Ständer
 - **Status:** fertig (20.11.) · angelegt 20.11. von Code (Daniels Abnahme der Innen-Deko-Kandidaten)
