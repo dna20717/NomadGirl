@@ -263,6 +263,33 @@ export async function startSplash(canvas) {
       const ox = -look.x * par * W * depth + shiftH, oy = -look.y * par * 0.4 * H * depth;
       ctx.drawImage(img, Math.round((W - bw * sc) / 2 + ox), Math.round(horizon - bh * sc + oy + par * 0.4 * H * depth), Math.round(bw * sc), Math.round(bh * sc));
     });
+    // #117 (Daniel: „die Lichtkegel im Hauptmenü auch animieren“): searchlights from the skyline (Startseite › Suchscheinwerfer, in
+    // pixels of the picture), sweeping the sky around their angle, now and then darting somewhere else; they move with the picture
+    if (layers[0] && S.beams?.length) {
+      const ox = shiftH, x0 = (W - bw * sc) / 2 + ox, y0 = horizon - bh * sc;
+      ctx.save();
+      if (S.skyline?.length > 2) {   // the beams stay behind the buildings: only the sky above the skyline (Startseite › Skyline)
+        ctx.beginPath(); ctx.moveTo(x0, y0 - H);
+        for (const q of S.skyline) if (q.at) ctx.lineTo(x0 + q.at[0] * sc, y0 + q.at[1] * sc);
+        ctx.lineTo(x0 + bw * sc, y0 - H); ctx.closePath(); ctx.clip();
+      }
+      ctx.globalCompositeOperation = 'lighter';
+      S.beams.forEach((b, i) => {
+        if (!b.at) return;
+        const bx = x0 + b.at[0] * sc, by = y0 + b.at[1] * sc, ph = i * 2.3 + 0.4, sw = (b.swing ?? 22) * Math.PI / 180;
+        const step = Math.floor(t / 2.8 + ph), k = Math.min(1, (t / 2.8 + ph - step) * 6), sm = k * k * (3 - 2 * k), dart = n => (Math.sin(n * 91.7 + i * 13.1) * 43758.5453 % 1) * 0.8;
+        const ang = (-90 + (b.angle ?? 0)) * Math.PI / 180 + sw * Math.sin(t * (0.35 + i * 0.07) + ph) + (dart(step - 1) + (dart(step) - dart(step - 1)) * sm) * sw * 0.6;
+        const len = (b.length ?? 140) * sc, a = (b.alpha ?? 30) / 100;
+        for (const [spread, al] of [[0.07, 0.45], [0.035, 0.7], [0.014, 1]]) {
+          const g = ctx.createLinearGradient(bx, by, bx + Math.cos(ang) * len, by + Math.sin(ang) * len);
+          g.addColorStop(0, `rgba(226,222,255,${a * al})`); g.addColorStop(0.6, `rgba(210,206,250,${a * al * 0.45})`); g.addColorStop(1, 'rgba(200,200,255,0)');
+          ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(bx, by);
+          ctx.lineTo(bx + Math.cos(ang - spread) * len, by + Math.sin(ang - spread) * len); ctx.lineTo(bx + Math.cos(ang + spread) * len, by + Math.sin(ang + spread) * len);
+          ctx.closePath(); ctx.fill();
+        }
+      });
+      ctx.restore();
+    }
     front.forEach(({ f, img }, i) => {
       const k = sc * (f.scale ?? 100) / 100, w = Math.round(img.width * k), h = Math.round(img.height * k), d = 1 + (i + 1) * 0.6;
       const ox = -look.x * par * W * d + shiftH * (1 + (i + 1) * 0.3), oy = -look.y * par * 0.4 * H * d;
