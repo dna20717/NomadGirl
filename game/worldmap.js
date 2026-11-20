@@ -35,6 +35,8 @@ export function mapConfig(D) {
     dangerStep: M.dangerStep ?? 30, reveal: M.reveal ?? 2, signs: M.signs ?? 6, detour: M.detour ?? 15,
     kinds: (M.kinds || []).filter(k => D.pois?.[k.poi]), regions: words(M.regions), brands: mapBrands(D),   // Lore › Marken (#045)
     fill: { word: words(M.words), office: words(M.offices) },
+    sea: M.sea?.enabled === false ? null : { name: M.sea?.name || 'The Dust Sea', at: M.sea?.at || [-108, 6], size: M.sea?.size || [40, 34], warn: M.sea?.warn || 'Zu gefährlich für unsere kleinen Fahrzeuge',
+      dock: M.sea?.dock || 'Dustport Dock', dockAngle: M.sea?.dockAngle ?? 15 },   // #119 the dried-out ocean, only for Mega-Rigs
     title: M.title || 'Straßenkarte BigCityDelta & Umland', edition: M.edition || 'Ausgabe 1962', paper: M.paper, logos: M.logos,
   };
 }
@@ -56,6 +58,35 @@ export function lootHints(D, poiId) {
   return Object.entries(sum).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k]) => k);
 }
 
+// #119 (Daniel 20.11.2026: „einen Bereich wie einen ausgetrockneten Ozean, den man nur mit einem Mega-Rig überqueren kann; da muss eine
+// harte Sperre hin, die man von Anfang an sieht; es geht nur um den Andockpunkt“): Reisekarte › Staubozean. No place is rolled into it,
+// no road crosses it; on its shore the dock (id 'dock'), known from the start, where Mega-Rigs will cast off (content later).
+export const inSea = (C, p, m = 1.12) => !!C.sea && ((p[0] - C.sea.at[0]) / C.sea.size[0]) ** 2 + ((p[1] - C.sea.at[1]) / C.sea.size[1]) ** 2 < m * m;
+const crossesSea = (C, a, b) => { for (let k = 1; k < 16; k++) { const t = k / 16; if (inSea(C, [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t], 1)) return true; } return false; };
+export function addSea(D, map) {
+  const C = mapConfig(D);
+  if (!C.sea || !map?.nodes) return map;
+  map.edges = map.edges.filter(([a, b]) => { const A = map.nodes.find(n => n.id === a), B = map.nodes.find(n => n.id === b); return !(A && B && crossesSea(C, A.pos, B.pos)); });
+  // every place keeps at least two roads (around the sea instead of across it)
+  for (const a of map.nodes) {
+    if (a.dock) continue;
+    const deg = () => map.edges.filter(e => e.includes(a.id)).length;
+    for (const b of map.nodes.filter(b => b !== a && !b.dock && !crossesSea(C, a.pos, b.pos)).sort((p, q) => dist(a.pos, p.pos) - dist(a.pos, q.pos))) {
+      if (deg() >= 2) break;
+      if (!map.edges.some(([x, y]) => (x === a.id && y === b.id) || (x === b.id && y === a.id))) map.edges.push([a.id, b.id]);
+    }
+  }
+  if (!map.nodes.some(n => n.id === 'dock')) {
+    const a = C.sea.dockAngle * Math.PI / 180, pos = [Math.round((C.sea.at[0] + Math.cos(a) * C.sea.size[0] * 1.12) * 10) / 10, Math.round((C.sea.at[1] + Math.sin(a) * C.sea.size[1] * 1.12) * 10) / 10];
+    const dock = { id: 'dock', name: C.sea.dock, poi: null, pos, region: '', danger: 5, hints: [], brand: null, landmark: true, dock: true };
+    const near = map.nodes.filter(n => !crossesSea(C, n.pos, pos)).sort((p, q) => dist(p.pos, pos) - dist(q.pos, pos))[0];
+    map.nodes.push(dock);
+    if (near) map.edges.push([near.id, 'dock']);
+  }
+  if (!(map.revealed ??= []).includes('dock')) map.revealed.push('dock');
+  map.sea = true;
+  return map;
+}
 export function generateMap(D, seed, cycle = 1) {
   const C = mapConfig(D), r = rng(seed), nodes = [];
   const regionAt = p => { if (!C.regions.length) return ''; const a = (Math.atan2(p[1] - C.city[1], p[0] - C.city[0]) + Math.PI) / (2 * Math.PI); return C.regions[Math.floor(a * C.regions.length) % C.regions.length]; };
@@ -72,7 +103,7 @@ export function generateMap(D, seed, cycle = 1) {
   const [lo, hi] = C.count, n = lo + Math.floor(r() * (Math.max(lo, hi) - lo + 1));
   for (let i = 0, tries = 0; i < n && tries < n * 60; tries++) {
     const a = r() * Math.PI * 2, d = C.cityRadius + 6 + Math.sqrt(r()) * (C.radius - C.cityRadius - 6), pos = [Math.round((C.city[0] + Math.cos(a) * d) * 10) / 10, Math.round((C.city[1] + Math.sin(a) * d * 0.62) * 10) / 10];
-    if (nodes.some(x => dist(x.pos, pos) < C.gap)) continue;
+    if (nodes.some(x => dist(x.pos, pos) < C.gap) || inSea(C, pos)) continue;   // #119 nothing in the dust sea
     const kind = C.kinds.length ? pickW(r, C.kinds) : null, poi = kind?.poi || Object.keys(D.pois || {})[0], P = D.pois?.[poi] || {};
     const region = regionAt(pos), brand = brandFor(P.kind), ring = Math.floor(dist(pos, start) / Math.max(1, C.dangerStep));
     const tpl = words(kind?.names || '').filter(Boolean);
@@ -96,7 +127,7 @@ export function generateMap(D, seed, cycle = 1) {
     const [a, b] = edges[Math.floor(r() * edges.length)].map(id => nodes.find(x => x.id === id).pos), t = 0.3 + r() * 0.4;
     signs.push({ brand: pickW(r, C.brands).id, pos: [a[0] + (b[0] - a[0]) * t + (r() - 0.5) * 6, a[1] + (b[1] - a[1]) * t + (r() - 0.5) * 6], rot: (r() - 0.5) * 0.35 });
   }
-  return { v: MAP_VERSION, names: NAMES_VERSION, seed, cycle, start: nodes[0]?.id || null, nodes, edges, visited: nodes[0] ? [nodes[0].id] : [], signs };
+  return addSea(D, { v: MAP_VERSION, names: NAMES_VERSION, seed, cycle, start: nodes[0]?.id || null, nodes, edges, visited: nodes[0] ? [nodes[0].id] : [], signs });
 }
 
 // the savegame's map: rolled once per Durchgang (save.cycle), kept from then on; Leyla's place must be on it
@@ -107,6 +138,7 @@ export function ensureMap(D, save) {
     if (!save.map.nodes.some(n => n.id === save.location)) save.location = save.map.start;
   }
   if (save.map.names !== NAMES_VERSION) renameMap(D, save.map);
+  if (!save.map.sea && mapConfig(D).sea) addSea(D, save.map);   // #119 older maps get the dust sea and its dock
   if (!save.map.nodes.some(n => n.id === save.location)) save.location = save.map.start;
   if (!save.map.visited.includes(save.location)) save.map.visited.push(save.location);
   return save.map;

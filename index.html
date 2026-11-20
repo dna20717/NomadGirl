@@ -15,6 +15,8 @@
   main { position: relative; z-index: 1; box-sizing: border-box; width: min(460px, 92vw); margin: 0 0 0 max(4vw, 24px); min-height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 32px 0; }
   .card { padding: 24px; border-radius: var(--ui-r-pane); background: color-mix(in srgb, var(--ui-bg) 72%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid color-mix(in srgb, var(--ui-border) 70%, transparent); box-shadow: var(--ui-shadow); }
   h1 { font-family: var(--ui-pixel); font-weight: normal; font-size: 64px; line-height: .9; margin: 0; letter-spacing: 1px; }
+  h1.logo { margin: -14px 0 -6px -10px; line-height: 0; }   /* #119 the pixel logo (PixelLab), scaled sharp */
+  h1.logo img { width: min(100%, 420px); height: auto; image-rendering: pixelated; filter: drop-shadow(0 0 14px rgba(232, 106, 115, .35)); }
   .sub { color: var(--ui-text2); margin: 8px 0 22px; line-height: 1.5; }
   nav { display: grid; gap: 10px; }
   a, .soon { display: flex; align-items: center; gap: 14px; padding: 13px 16px; border-radius: var(--ui-r-pane); border: 1px solid var(--ui-border); background: var(--ui-panel); color: var(--ui-text); text-decoration: none; }
@@ -43,7 +45,7 @@
 <canvas id="scene" aria-label="Leyla rennt durch die Wastelands auf uns zu"></canvas>
 <main>
   <div class="card">
-    <h1>NomadGirl</h1>
+    <h1 class="logo"><img src="projects/nomadgirl/assets/ui/logo/logo.png" alt="NomadGirl" width="256" height="128"></h1>
     <p class="sub">Leyla lebt in den Wastelands rund um BigCityDelta in ihrem Rig. Sie plündert, was andere liegen lassen, und kocht erstaunlich gut.</p>
     <nav id="nav"></nav>
     <p class="pad-hint">Stick hoch/runter: wählen · A: los · Stick links/rechts: Kurve laufen</p>

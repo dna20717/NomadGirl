@@ -30,6 +30,14 @@ check('Neues Spiel: Karte im Spielstand, Start = Tankstelle Kilometer 7', v.n >=
 // the van door: Karte · Reisen
 v = await ev(() => { nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(5); return { map: nomad.map(), ready: document.querySelectorAll('.wm-ready-row').length }; });
 check('Van-Tür öffnet direkt die Reisekarte, hier gewählt, mit „Bereit?“-Check (#016)', v.map?.open && v.map.sel === v.map.here && v.map.action === 'Hier plündern' && v.ready >= 4, v);
+// #119 the dust sea: no place inside it, no road across it, the dock on its shore known from the start and closed for small vehicles
+v = await ev(async () => { const { mapConfig, inSea } = await import('/game/worldmap.js'); const s = SC(), m = nomad.save().map, C = mapConfig(s.data_), N = id => m.nodes.find(n => n.id === id);
+  const across = m.edges.filter(([a, b]) => { const A = N(a), B = N(b); for (let k = 1; k < 16; k++) { const t = k / 16; if (inSea(C, [A.pos[0] + (B.pos[0] - A.pos[0]) * t, A.pos[1] + (B.pos[1] - A.pos[1]) * t], 1)) return true; } return false; }).length;
+  const mp = s.hud.map; mp.select('dock'); mp.paint?.();
+  return { dock: !!N('dock'), known: m.revealed?.includes('dock'), inside: m.nodes.filter(n => n.id !== 'dock' && inSea(C, n.pos)).length, across, action: mp.action(), text: document.querySelector('.wm-detail')?.textContent || '' }; });
+check('Staubozean: kein Ort darin, keine Straße hinüber, Andockpunkt von Anfang an bekannt und für kleine Fahrzeuge gesperrt (#119)', v.dock && v.known && v.inside === 0 && v.across === 0 && v.action?.disabled && /kleinen Fahrzeuge/.test(v.action.disabled), v);
+if (shots) { await page.waitForTimeout(600); await page.screenshot({ path: 'output/map_staubozean.png' }); }
+await ev(() => SC().hud.map.select(nomad.save().location));
 await page.waitForTimeout(800);
 v = await ev(() => { const mp = SC().hud.map; return { places: Object.keys(mp.places).length, known: Object.values(mp.places).filter(p => p.known).length, near: Object.values(mp.places).filter(p => p.near).length, canvas: mp.canvas.width, paper: !!mp.image(mp.D.worldmap.paper), logos: !!mp.image(mp.D.worldmap.logos) }; });
 check('Karte gezeichnet: alle Orte, Nachbarn im Rotstift, Papier und Logos geladen', v.places >= 12 && v.near >= 2 && v.known > v.near && v.known < v.places && v.canvas > 400 && v.paper && v.logos, v);

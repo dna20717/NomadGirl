@@ -13,7 +13,7 @@ const hashOf = s => { let h = 2166136261; for (const c of String(s)) h = Math.im
 
 // world km → canvas px, fitted into the paper with a margin (the map is wider than tall)
 export function mapView(D, map, W, H) {
-  const C = mapConfig(D), pts = [...map.nodes.map(n => n.pos), C.city];
+  const C = mapConfig(D), S = C.sea, pts = [...map.nodes.map(n => n.pos), C.city, ...(S ? [[S.at[0] - S.size[0] * 0.75, S.at[1] - S.size[1] * 0.8], [S.at[0] - S.size[0] * 0.75, S.at[1] + S.size[1] * 0.8]] : [])];   // #119 the dust sea is on the map
   const x0 = Math.min(...pts.map(p => p[0])), x1 = Math.max(...pts.map(p => p[0])), y0 = Math.min(...pts.map(p => p[1])), y1 = Math.max(...pts.map(p => p[1]));
   const mx = W * 0.13, my = H * 0.17, k = Math.min((W - 2 * mx) / Math.max(1, x1 - x0), (H - 2 * my) / Math.max(1, y1 - y0));
   const ox = (W - (x1 - x0) * k) / 2 - x0 * k, oy = (H - (y1 - y0) * k) / 2 - y0 * k + H * 0.03;
@@ -40,6 +40,7 @@ export function drawMap(ctx, W, H, D, map, opt = {}) {
   ctx.restore();
   label(ctx, C.cityName.toUpperCase(), cx, cy - cr * 0.62 - 6 * u, { size: 30 * u, color: RED, weight: 'bold', spacing: 3 * u });
   label(ctx, 'Sperrgebiet', cx, cy + cr * 0.62 + 16 * u, { size: 17 * u, color: RED, italic: true });
+  if (C.sea) drawSea(ctx, C, V, u, t);   // #119
   // roads: a gentle curve per road, dark rim + cream core like an old road map; roads into the unknown dotted
   const P = id => map.nodes.find(n => n.id === id);
   const curve = (a, b) => { const [ax, ay] = V.at(a.pos), [bx, by] = V.at(b.pos), h = hashOf(a.id + b.id) - 0.5, nx = -(by - ay), ny = bx - ax; return [ax, ay, (ax + bx) / 2 + nx * h * 0.25, (ay + by) / 2 + ny * h * 0.25, bx, by]; };
@@ -76,7 +77,7 @@ export function drawMap(ctx, W, H, D, map, opt = {}) {
   const out = {}, taken = [];
   const free = (x, y, w, h) => !taken.some(b => x < b.x + b.w && x + w > b.x && y < b.y + b.h && y + h > b.y);
   for (const n of map.nodes) {
-    const [x, y] = V.at(n.pos), k = KIND[D.pois?.[n.poi]?.kind] || { color: INK }, isKnown = known(n), r = 10 * u;
+    const [x, y] = V.at(n.pos), k = n.dock ? { color: '#285cc4', glyph: 'crane' } : KIND[D.pois?.[n.poi]?.kind] || { color: INK }, isKnown = known(n), r = 10 * u;
     out[n.id] = { x, y, r: r * 2.2, known: isKnown, near: near.has(n.id) };
     if (!isKnown) { ctx.fillStyle = 'rgba(50,43,40,.35)'; circle(ctx, x, y, r * 0.8); label(ctx, '?', x, y + 5 * u, { size: 18 * u, color: '#fef3c0' }); continue; }
     // red pencil ring around where she can drive (wobbly, hand drawn)
@@ -93,7 +94,8 @@ export function drawMap(ctx, W, H, D, map, opt = {}) {
     for (const dy of [0, -(2 * r + 54 * u), 22 * u, -(2 * r + 76 * u), 44 * u]) if (free(x - tw / 2, y + r + 4 * u + dy, tw, 40 * u)) { ly = y + r + 22 * u + dy; break; }
     taken.push({ x: x - tw / 2, y: ly - 20 * u, w: tw, h: 40 * u });
     label(ctx, n.name, x, ly, { size: (n.landmark ? 26 : 23) * u, color: INK, weight: n.landmark ? 'bold' : 'normal', halo: true });
-    if (!opt.hideDanger) label(ctx, '●'.repeat(n.danger || 1), x, ly + 19 * u, { size: 15 * u, color: RED, halo: true });
+    if (n.dock) label(ctx, 'Andockpunkt · nur Mega-Rigs', x, ly + 19 * u, { size: 15 * u, color: '#285cc4', italic: true, halo: true });
+    else if (!opt.hideDanger) label(ctx, '●'.repeat(n.danger || 1), x, ly + 19 * u, { size: 15 * u, color: RED, halo: true });
     if (n.id === opt.sel) { ctx.strokeStyle = '#ffd541'; ctx.lineWidth = 3 * u; ctx.setLineDash([6 * u, 4 * u]); ctx.lineDashOffset = t * 20; ctx.beginPath(); ctx.arc(x, y, r * 2.7, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); }
   }
   // billboards along the roads: logo on a post, slogan underneath
@@ -152,6 +154,7 @@ function glyph(ctx, kind, x, y, r) {
   ctx.save(); ctx.fillStyle = '#fef3c0'; ctx.strokeStyle = '#fef3c0'; ctx.lineWidth = Math.max(1, r * 0.16);
   const s = r * 0.55;
   if (kind === 'pump') { ctx.fillRect(x - s * 0.6, y - s, s * 0.9, s * 1.8); ctx.beginPath(); ctx.moveTo(x + s * 0.3, y - s * 0.5); ctx.lineTo(x + s * 0.8, y - s * 0.2); ctx.lineTo(x + s * 0.8, y + s * 0.6); ctx.stroke(); }
+  else if (kind === 'crane') { ctx.fillRect(x - s * 0.15, y - s, s * 0.3, s * 1.9); ctx.fillRect(x - s, y - s, s * 1.8, s * 0.3); ctx.beginPath(); ctx.moveTo(x + s * 0.7, y - s * 0.7); ctx.lineTo(x + s * 0.7, y + s * 0.2); ctx.stroke(); ctx.fillRect(x + s * 0.45, y + s * 0.2, s * 0.5, s * 0.35); ctx.fillRect(x - s * 0.7, y + s * 0.7, s * 1.4, s * 0.3); }   // #119 the dock
   else if (kind === 'cart') { ctx.beginPath(); ctx.moveTo(x - s, y - s * 0.6); ctx.lineTo(x - s * 0.6, y + s * 0.4); ctx.lineTo(x + s, y + s * 0.4); ctx.lineTo(x + s * 0.9, y - s * 0.4); ctx.closePath(); ctx.fill(); ctx.fillRect(x - s * 0.5, y + s * 0.6, s * 0.3, s * 0.3); ctx.fillRect(x + s * 0.4, y + s * 0.6, s * 0.3, s * 0.3); }
   else if (kind === 'hatch') { ctx.beginPath(); ctx.moveTo(x - s, y + s * 0.7); ctx.lineTo(x, y - s); ctx.lineTo(x + s, y + s * 0.7); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#4a5462'; ctx.fillRect(x - s * 0.3, y, s * 0.6, s * 0.7); }
   else if (kind === 'columns') { ctx.fillRect(x - s, y - s, s * 2, s * 0.35); for (const dx of [-0.7, 0, 0.7]) ctx.fillRect(x + dx * s - s * 0.15, y - s * 0.6, s * 0.3, s * 1.2); ctx.fillRect(x - s, y + s * 0.65, s * 2, s * 0.3); }
@@ -190,4 +193,49 @@ function compass(ctx, x, y, r) {
   ctx.strokeStyle = INK; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(0, 0, r * 0.45, 0, Math.PI * 2); ctx.stroke();
   ctx.restore();
   label(ctx, 'N', x, y - r - 6, { size: r * 0.55, color: INK, weight: 'bold' });
+}
+
+// #119 the dust sea: a dried-out ocean bed (pale, cracked, salt rims, a wreck or two), a red barrier along its shore with warning
+// triangles, its name and the warning in red (Reisekarte › Staubozean)
+function drawSea(ctx, C, V, u, t) {
+  const S = C.sea, [cx, cy] = V.at(S.at), rx = S.size[0] * V.k, ry = S.size[1] * V.k, rim = i => 0.92 + 0.14 * hashOf('sea' + i);
+  const pt = (a, k = 1) => [cx + Math.cos(a) * rx * k * rim(Math.round(a / (Math.PI * 2) * 40) % 40), cy + Math.sin(a) * ry * k * rim(Math.round(a / (Math.PI * 2) * 40) % 40)];
+  ctx.save();
+  const shape = (k = 1) => { ctx.beginPath(); for (let i = 0; i <= 40; i++) { const [x, y] = pt(i / 40 * Math.PI * 2, k); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); };
+  // the bed: pale sand to grey towards the deep middle
+  const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(rx, ry));
+  g.addColorStop(0, 'rgba(139,147,175,.55)'); g.addColorStop(0.7, 'rgba(228,210,170,.75)'); g.addColorStop(1, 'rgba(244,210,156,.6)');
+  shape(); ctx.fillStyle = g; ctx.fill();
+  ctx.strokeStyle = 'rgba(113,65,59,.6)'; ctx.lineWidth = 2 * u; ctx.stroke();
+  // old shore lines (where the water stood) and cracks
+  ctx.setLineDash([3 * u, 5 * u]); ctx.strokeStyle = 'rgba(113,65,59,.35)'; for (const k of [0.8, 0.6]) { shape(k); ctx.stroke(); } ctx.setLineDash([]);
+  shape(); ctx.clip();
+  ctx.strokeStyle = 'rgba(66,57,52,.45)'; ctx.lineWidth = 1.2 * u;
+  for (let i = 0; i < 46; i++) {
+    let x = cx + (hashOf('cx' + i) - 0.5) * rx * 2, y = cy + (hashOf('cy' + i) - 0.5) * ry * 2;
+    ctx.beginPath(); ctx.moveTo(x, y);
+    for (let s2 = 0; s2 < 4; s2++) { x += (hashOf(`k${i}${s2}`) - 0.5) * 34 * u; y += (hashOf(`l${i}${s2}`) - 0.5) * 22 * u; ctx.lineTo(x, y); }
+    ctx.stroke();
+  }
+  // wrecks: a ship's hull lying on its side, a sunken tanker's bow
+  for (const [i, wx, wy, s] of [[0, -0.35, 0.15, 1], [1, 0.25, -0.3, 0.8]]) {
+    const x = cx + wx * rx, y = cy + wy * ry, w = 30 * u * s, h = 9 * u * s;
+    ctx.fillStyle = 'rgba(66,57,52,.7)'; ctx.beginPath(); ctx.moveTo(x - w, y); ctx.lineTo(x + w * 0.8, y); ctx.lineTo(x + w, y - h); ctx.lineTo(x - w * 0.7, y - h * 0.6); ctx.closePath(); ctx.fill();
+    ctx.fillRect(x - w * 0.2, y - h * 2, 3 * u * s, h * 1.4);
+    if (i === 0) { ctx.fillRect(x + w * 0.2, y - h * 1.7, 2 * u * s, h * 1.1); }
+  }
+  ctx.restore();
+  // the hard barrier: a red dashed line just off the shore, warning triangles along it
+  ctx.save(); ctx.strokeStyle = RED; ctx.lineWidth = 3 * u; ctx.setLineDash([10 * u, 6 * u]); ctx.lineDashOffset = -t * 6;
+  ctx.beginPath(); for (let i = 0; i <= 40; i++) { const [x, y] = pt(i / 40 * Math.PI * 2, 1.06); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); ctx.stroke(); ctx.setLineDash([]);
+  for (const a of [-1.1, -0.35, 0.45, 1.2]) {
+    const [x, y] = pt(a, 1.06), s = 9 * u;
+    ctx.fillStyle = '#fef3c0'; ctx.strokeStyle = RED; ctx.lineWidth = 2.5 * u;
+    ctx.beginPath(); ctx.moveTo(x, y - s); ctx.lineTo(x + s, y + s * 0.8); ctx.lineTo(x - s, y + s * 0.8); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = RED; ctx.fillRect(x - 1 * u, y - s * 0.35, 2 * u, s * 0.6); ctx.fillRect(x - 1 * u, y + s * 0.4, 2 * u, 2 * u);
+  }
+  ctx.restore();
+  label(ctx, S.name.toUpperCase(), cx, cy - ry * 0.1, { size: 28 * u, color: '#4a5462', weight: 'bold', spacing: 4 * u, italic: true });
+  label(ctx, S.warn, cx, cy + ry * 0.12, { size: 18 * u, color: RED, italic: true, halo: true });
+  label(ctx, 'Sperrgebiet für kleine Fahrzeuge', cx, cy + ry * 0.12 + 20 * u, { size: 14 * u, color: RED, halo: true });
 }

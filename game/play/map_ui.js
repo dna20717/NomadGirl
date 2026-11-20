@@ -2,6 +2,7 @@
 // Zielen, die zur Wahl stehen“). Opens at the warroom and at the van door. Left the map (game/map_render.js), right the chosen place:
 // kind, danger, loot hints, cost of the drive, and the action (Hinfahren, Hier plündern). One UI grammar (ui_nav.js):
 // stick / arrows pick a place in that direction, ok = the action, back = close; mouse: hover / click a place, click the button.
+import { activeMega } from '../mega.js';
 import { repOf, levelOf, levelName, gangOfPlace, gangInfo, rivalsOf } from '../reputation.js';
 import { fronts } from '../turf_war.js';
 import { el } from '../ui.js';
@@ -84,6 +85,8 @@ export class MapUI {
   action() {
     const save = this.save, id = this.sel, n = placeOf(this.D, save, id);
     if (!n) return null;
+    // #119 the dock at the dust sea: a hard barrier for small vehicles; with a Mega-Rig the crossing comes later
+    if (n.dock) return { label: 'Andockpunkt', disabled: activeMega(this.D, save) ? 'Mega-Rig: die Überfahrt kommt bald' : 'Zu gefährlich für unsere kleinen Fahrzeuge · nur mit einem Mega-Rig' };
     if (id === save.location) return n.poi && this.D.pois?.[n.poi] ? { label: 'Hier plündern', icon: 'target', act: () => { this.close(); this.host.plunder(); } } : null;
     // #014: also further away, over several legs along known roads (Zwischenfälle unterwegs)
     const cost = this.host.cost(id);
@@ -127,6 +130,14 @@ export class MapUI {
   detail() {
     const D = this.D, save = this.save, n = placeOf(D, save, this.sel), C = mapConfig(D);
     if (!n) { this.aside.replaceChildren(el('p', {}, 'Wähle einen Ort.')); return; }
+    if (n.dock) {   // #119 the dock at the dust sea: what it is, why it is closed (content comes later)
+      const a = this.action(), S = C.sea || {};
+      this.aside.replaceChildren(el('div', { class: 'wm-head' }, el('div', {}, el('h3', {}, n.name), el('small', {}, `Andockpunkt · ${S.name || 'Staubozean'}`))),
+        el('p', {}, `Ein ausgetrockneter Ozean, so weit das Auge reicht: Salzkrusten, Risse, Wracks im Staub. Hier legen die Mega-Rigs ab, um ihn zu überqueren.`),
+        el('p', { class: 'wm-why' }, icon('warning', 14), ' ', S.warn || 'Zu gefährlich für unsere kleinen Fahrzeuge', '.'),
+        a ? el('button', { class: 'inv-btn wm-go', disabled: true, title: a.disabled || '' }, icon('lock', 18), ' ', a.disabled || a.label) : null);
+      return;
+    }
     const P = D.pois?.[n.poi] || {}, b = C.brands.find(x => x.id === n.brand), here = n.id === save.location, a = this.action();
     const logo = b && this.D.assets?.[C.logos]?.file ? el('span', { class: 'wm-logo', style: `background-image:url("${new URL(D.assets[C.logos].file, this.host.base).href}");background-position:${(b.icon % 4) * -64}px ${Math.floor(b.icon / 4) * -64}px` }) : null;
     const cost = a?.cost;

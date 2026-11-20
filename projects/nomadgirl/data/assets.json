@@ -6757,7 +6757,7 @@
   "source": "KI-Musik von Daniel (eigenes lokales Modell auf eigener GPU, frei nutzbar); zugeschnitten mit Code (ffmpeg)",
   "date": "2026-11-20",
   "description": "#117 Daniels Intro-Musik (120 s, 138 BPM). Läuft im Intro-Comic.",
-  "title": "Leyla Runs",
+  "title": "Leylas Run",
   "artist": "BombT"
  },
  "drive_a": {
@@ -6770,7 +6770,7 @@
   "source": "KI-Musik von Daniel (eigenes lokales Modell auf eigener GPU, frei nutzbar); zugeschnitten mit Code (ffmpeg)",
   "date": "2026-11-20",
   "description": "#117 Schnelle Passage aus der Intro-Musik: 10 Takte ab 61,3 s, nahtlos als Loop.",
-  "title": "Leyla Runs · Fahrt A",
+  "title": "Leylas Run · Fahrt A",
   "artist": "BombT"
  },
  "drive_b": {
@@ -6783,7 +6783,7 @@
   "source": "KI-Musik von Daniel (eigenes lokales Modell auf eigener GPU, frei nutzbar); zugeschnitten mit Code (ffmpeg)",
   "date": "2026-11-20",
   "description": "#117 Schnelle Passage aus der Intro-Musik: 12 Takte ab 85,7 s, nahtlos als Loop.",
-  "title": "Leyla Runs · Fahrt B",
+  "title": "Leylas Run · Fahrt B",
   "artist": "BombT"
  },
  "camp_bunker": {
@@ -6833,7 +6833,7 @@
   "kind": "icons",
   "file": "assets/camp/kit/inside_wall.png",
   "cell": [86, 108],
-  "grid": [15, 1],
+  "grid": [16, 1],
   "names": [
    "Lochwand Küche",
    "Film-Poster",
@@ -6849,7 +6849,8 @@
    "AvAs Ladestation",
    "Wasteland-Karte",
    "Kabel-Traumfänger",
-   "Foto von Leyla und AvA"
+   "Foto von Leyla und AvA",
+   "Radkappen-Uhr"
   ],
   "source": "KI (PixelLab, Create Image Pro, AAP-64; Daniels Abnahme 20.11.2026) + Code (tools/camp_inside.py: nach zusammenhängenden Pixeln geschnitten)",
   "date": "2026-11-20",
@@ -6859,7 +6860,7 @@
   "name": "Innen · Möbel",
   "kind": "icons",
   "file": "assets/camp/kit/inside_furniture.png",
-  "cell": [76, 98],
+  "cell": [62, 98],
   "grid": [13, 1],
   "names": [
    "Sitzsack",
@@ -6905,5 +6906,21 @@
   "source": "KI (PixelLab, Create Image Pro, AAP-64) + Code (tools/camp_modules.py)",
   "date": "2026-11-20",
   "description": "#118 Fuß, eine Etage (wiederholt sich), Krone."
+ },
+ "ui_logo": {
+  "name": "UI · Logo NomadGirl",
+  "kind": "image",
+  "file": "assets/ui/logo/logo.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, 10 Generierungen)",
+  "date": "2026-11-20",
+  "description": "#119 Pixel-Logo fürs Hauptmenü (Daniel: „ein gepixeltes NomadGirl-Logo“)."
+ },
+ "ui_emblem": {
+  "name": "UI · Emblem Leyla",
+  "kind": "image",
+  "file": "assets/ui/logo/emblem.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, 4 Kandidaten, 10 Generierungen; die anderen emblem_0..2)",
+  "date": "2026-11-20",
+  "description": "#119 Rundes Emblem (Leyla, Sonne, AvA), für Logo-Varianten und Icons."
  }
 }

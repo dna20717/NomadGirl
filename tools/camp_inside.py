@@ -8,10 +8,13 @@ import numpy as np, json
 K = 'projects/nomadgirl/assets/camp/kit'
 # sheet: [(source, [item numbers in reading order, 1 = first])]  (Daniel's Abnahme 20.11.2026: shelves only from the new, straight sheet)
 PICK = {
-    'inside_lamps':     [('inside_lights_0', [1, 2, 3, 4, 5, 6, 7, 8])],
+    'inside_lamps':     [('inside_lights_0', [1, 2]), ('inside_fix_0', [3]), ('inside_lights_0', [4, 5, 6, 7, 8])],
     'inside_shelves':   [('inside_shelves_0', [1, 2, 3, 4, 5, 6, 7, 8])],
-    'inside_wall':      [('inside_wall_0', [2, 3, 4, 5, 6, 7, 8]), ('inside_world_0', [1, 2, 3, 4, 5, 6, 7, 8])],
-    'inside_furniture': [('inside_floor_0', [1, 3, 4, 5, 6]), ('inside_furniture_0', [1, 2, 3, 4, 5, 6, 7, 8])],
+    # Daniel 20.11.2026: „Denk bei der Deko an die orthogonale Perspektive!“ → TV, record rack, headlight, beanbag, monstera, table and
+    # cushions from the straight sheet inside_fix_0
+    'inside_wall':      [('inside_wall_0', [2, 3, 4]), ('inside_fix_0', [1]), ('inside_wall_0', [6]), ('inside_fix_0', [2]), ('inside_wall_0', [8]),
+                         ('inside_world_0', [1, 2, 3, 4, 5, 6, 7, 8]), ('inside_fix_0', [4])],
+    'inside_furniture': [('inside_fix_0', [5]), ('inside_floor_0', [3]), ('inside_fix_0', [6, 7, 8]), ('inside_furniture_0', [1, 2, 3, 4, 5, 6, 7, 8])],
     'inside_pinboard':  [('inside_pinboard_0', [1, 2, 3])],
 }
 

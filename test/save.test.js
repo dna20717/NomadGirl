@@ -58,7 +58,7 @@ test('Reisekarte: jeder Durchgang würfelt eine Karte, Wahrzeichen bleiben, jede
   assert.deepEqual(a, again);   // same seed, same map
   assert.notDeepEqual(a.nodes.map(n => n.name), b.nodes.map(n => n.name));
   for (const [id, L] of Object.entries(D.locations)) assert.equal(a.nodes.some(n => n.id === id && n.landmark), !L.hidden, id);   // #057: hidden places only after an event
-  for (const n of a.nodes) { assert.ok(neighbours(a, n.id).length >= 2, n.id); assert.ok(n.danger >= 1 && n.danger <= 5); }
+  for (const n of a.nodes) { assert.ok(neighbours(a, n.id).length >= (n.dock ? 1 : 2), n.id); assert.ok(n.danger >= 1 && n.danger <= 5); }   // #119 the dock at the dust sea is a dead end
   assert.equal(Object.keys(hops(a, a.start)).length, a.nodes.length);   // every place can be reached
   const s = newSave(D); assert.equal(s.location, Object.keys(D.locations)[0]); assert.ok(s.map.nodes.length > Object.keys(D.locations).filter(k => !D.locations[k].hidden).length);
   const old = { ...s }; delete old.map; const r = repairSave(old, D); assert.ok(r.map?.nodes.length);   // older savegames get a map

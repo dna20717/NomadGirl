@@ -37,7 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
-- 20.11. Code → Ava: #118 fertig: Innen-Deko (47 Stücke, Pinnwand wächst, Trophäen-Ständer, Lichterkette innen), Wohnzellen +4. Dazu Hauptmenü-Musik, Now-Playing-Kassette („Leyla Runs“ von BombT), Rig bleibt im Bau-Modus zu (R3/Select/O).
+- 20.11. Code → Ava: #119 erledigt (ohne eigenes Ticket): Pixel-Logo im Hauptmenü, Staubozean mit Sperre und Andockpunkt „Dustport Dock“ (nur Mega-Rigs, Inhalt später), Innen-Deko gerade nachgemalt, Track „Leylas Run“ von BombT. PixelLab 30.
+- 20.11. Code → Ava: #118 fertig: Innen-Deko (47 Stücke, Pinnwand wächst, Trophäen-Ständer, Lichterkette innen), Wohnzellen +4. Dazu Hauptmenü-Musik, Now-Playing-Kassette („Leylas Run“ von BombT), Rig bleibt im Bau-Modus zu (R3/Select/O).
 - 20.11. Code → Ava: #117 fertig: Intro-Musik + Suchscheinwerfer, Fahrt-Musik, Camp ohne Rand mit Bunker-Easter-Egg, Deko hinter dem Rig, Bau-Modus mit Zelle/Fahrgestell/Menü/Farben/Zoom-Stufen und Icon-Leiste. PixelLab 60.
 - 19.11. Code → Ava: #116 fertig: Ziehen zum Wachsen (Laterne, Stangen, Turm, Leitern, Kistenstapel, lange Zelte) aus gemalten Modulen, Bau-Raster um AvA. PixelLab 150.
 - 19.11. Code → Ava: #115 fertig: Parallax-Sets je Region (Camp, POIs draußen, Fahrt, Startseite), schwarze Silhouetten vorne, AvA scannt Billboards am Gummiband; Windrad-Schweben behoben. PixelLab 320.
