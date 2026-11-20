@@ -37,7 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
-- 20.11. Code → Ava: #084 PixelLab-Grafik läuft, danach #100–#103 (Daniel: „mach bitte die 84 auch direkt, und 100 bis 103 im Anschluss“). PixelLab vorher 2.055,6.
+- 20.11. Code → Ava: #084, #100–#103 fertig: Bit-Farm-Bild und feineres Fahrgestell (PixelLab 40, übrig 2.015,6; Camp-Boden offen, Versuch hielt die Kacheln nicht ein), Rig-Moral, Aufträge für alle 12 Gangs, Gangs kämpfen selbst um Orte, Radio-DJs als Entities mit Gesicht im Chip.
 - 20.11. Code → Ava: Die kleinen drei fertig: #098 Ofen im Mega-Rig, #099 Speziallager je Stern (Knopf im Lager-Fenster), #104 Werte im Inventar (Grund · Boni · Ergebnis, U).
 - 20.11. Code → Ava: #126 **Drei Spielstände** fertig: Slots im Cockpit-Radio mit Vorschaubild, Löschen mit Dialog + Zurückholen, globale Achievements, Slot behält sein Datenset, Spielstand laden im Pause-Menü, alter Stand zieht nach Slot 1 (lokal + online). 4 ⚠️ im Ticket.
 - 20.11. Code → Ava: #125 **Aufräumen + technische Schulden** fertig: Backlog C komplett (C2, C3, C4, C10, C11, C13, C14, C15, C18), Cockpit-Reste im Schema, Backlog auf Stand 20.11.; Konzept für 3 Spielstände in `docs/concepts/save_slots.md` mit 9 Fragen an Daniel (Backlog A9). Offen für Daniel: Cockpit-Kram platzieren (A10).
@@ -429,10 +429,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Bilder hochladen in der Online-Werkstatt (#083)“. Knopf im Asset-Inspektor, Worker `POST /api/upload` (eigener Commit, nur Bilder unter assets/, 2 MiB). `npm test` grün (cloud 8/8), `tools/workshop_cloud_test.mjs` grün. **Bitte testen:** online Werkstatt › Assets › ein Bild ersetzen, ein paar Minuten warten, im Spiel ansehen.
 
 ### #084 Grafik per PixelLab: Verbindung, Bit-Farm, Fahrgestell + Camp-Boden
-- **Status:** läuft (20.11.) · · Verbindung geht (Umgebung „NomadGirl“, siehe HNC 19.11.) · angelegt 19.11. von Code (Daniel, Karten PixelLab, Bit-Farm, C18)
+- **Status:** fertig (20.11., Camp-Boden offen) · · Verbindung geht (Umgebung „NomadGirl“, siehe HNC 19.11.) · angelegt 19.11. von Code (Daniel, Karten PixelLab, Bit-Farm, C18)
 - **Auftrag:** (1) PixelLab-Verbindung der Cloud-Umgebung reparieren (19.11. blockte der Proxy `api.pixellab.ai`), Anleitung für Daniel. (2) Bit-Farm-Bild, bis 4 Generierungen (freigegeben). (3) Fahrgestell + Camp-Boden feiner, passend zu #042 (~10–25 Generierungen, vor dem Auftrag Kosten nennen, unter 700 Freigabe).
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) (1) Verbindung steht (Umgebung „NomadGirl“). (2) PixelLab hat die Preise geändert: die Bit-Farm in 256 × 256 kostet 10 statt bis 4. (3) ⚠️ **Camp-Boden offen:** der Versuch (15 Generierungen) hielt die Kachel-Aufteilung nicht ein (Oberfläche/Füllung vertauscht, Wände falsch), und `create_sidescroller_tileset` malt höchstens 32-px-Kacheln, also so grob wie heute. Der alte Boden bleibt; Frage an Daniel, ob ein Boden aus Code-Kacheln oder ein weiterer PixelLab-Versuch.
+- **Ergebnis:** (Code) Commits „Bit-Farm bekommt ihr eigenes Bild …“, „Fahrgestell doppelt so fein …“. Bit-Farm `ws_bitfarm` (drei Server-Schränke mit Glitch-Gesichtern), Fahrgestell `trailer_chassis_fine` doppelt so fein (Camp › Fahrgestell › Auflösung 2, Code rechnet um, auch in der Mega-Rig-Ansicht). camp/container/stack/megarig grün. **PixelLab: 40** (Bit-Farm 10, Fahrgestell 15, Boden-Versuch 15), übrig 2.015,6. **Bitte testen:** Neues Spiel, das Fahrgestell unter dem Tank-Container ansehen; Bit-Farm kaufen und einbauen.
 
 ### #085 Crew-Kern klein (aus #040)
 - **Status:** abgenommen (19.11., Runde 2) · fertig (19.11.) · angelegt 19.11. von Code (Daniel, Karte #040: „Ja, erst klein“)
@@ -462,24 +462,24 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Commit „Speziallager ausbauen …“. `test/upgrades.test.js` +1, `upgrade_test` 4/4 (neu: Knopf im Lager-Fenster, Raster wächst), inventory/treasury/trunk grün. PixelLab 0. **Bitte testen:** Kühlraum oder Schatzkammer öffnen, „Ausbauen ★“, wiederkommen: eine Reihe mehr.
 
 ### #100 Rig-Moral (#040 Teil 2)
-- **Status:** offen · angelegt 19.11. von Code (Runde 2, #085)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (20.11.) · angelegt 19.11. von Code (Runde 2, #085)
+- **Rückfragen:** (Code) ⚠️ vorläufig alle Zahlen (Werkstatt › Leute › Moral); Moral-Fundstücke und Streit-Ereignisse am Feuer noch nicht; in der Krise geht je Tag mit 30 % jemand.
+- **Ergebnis:** (Code) Commit „Rig-Moral …“. `game/morale.js`, `test/morale.test.js` (4), `crew_test` 5/5 (neu: Moral im Crew-Menü, Meldung beim Stufenwechsel). PixelLab 0. **Bitte testen:** jemanden aufnehmen, Crew-Menü › Moral (Quellen), ein paar Tage mit wenig Vorräten schlafen, Inventar › Werte › Crew.
 
 ### #101 Gang-Aufträge für alle 12 Gangs
-- **Status:** offen · angelegt 19.11. von Code (Runde 2, #088)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (20.11.) · angelegt 19.11. von Code (Runde 2, #088)
+- **Rückfragen:** (Code) ⚠️ vorläufig: Texte und Lohn von Ava, im Ton der Gang-Mottos.
+- **Ergebnis:** (Code) Commit „Gang-Aufträge für alle 12 Gangs …“: neun neue (je einer für Order Office, Level Five, Salt Dogs, Crude Boys, Sunny Side, Zero Hour, dazu drei Folgeaufträge ab Freund). `test/gang_quests.test.js` +1, turf grün. PixelLab 0. **Bitte testen:** bei Sunny Side Geduldet werden, „Lächeln, bitte!“ annehmen.
 
 ### #102 Gangs kämpfen selbst um Orte
-- **Status:** offen · angelegt 19.11. von Code (Runde 2, #089: „Alle paar Tage wechselt ein Ort an einer Front den Besitzer“)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (20.11.) · angelegt 19.11. von Code (Runde 2, #089: „Alle paar Tage wechselt ein Ort an einer Front den Besitzer“)
+- **Rückfragen:** (Code) ⚠️ vorläufig: alle 3 Tage mit 60 % kippt eine Front, wer mehr Orte hält gewinnt eher; Leylas Ort bleibt.
+- **Ergebnis:** (Code) Commit „Gangs kämpfen selbst …“: `turf_war.js › gangWar` bei jeder Ankunft im Camp, Funk-Toast, Eilmeldung im Radio. `test/turf_war.test.js` +1, turf/map grün. PixelLab 0. **Bitte testen:** ein paar Tage reisen und schlafen, auf die Funk-Meldungen und die Reisekarte achten.
 
 ### #103 Radio-DJs als Entities
-- **Status:** offen · angelegt 19.11. von Code (Runde 2, #090: „mit Porträt im Chip, später auch im Duell“)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (20.11.) · angelegt 19.11. von Code (Runde 2, #090: „mit Porträt im Chip, später auch im Duell“)
+- **Rückfragen:** (Code) ⚠️ vorläufig: Begabung nach Stil, 3 Bits; ins Duell kommen sie noch nicht (Entity liegt bereit).
+- **Ergebnis:** (Code) Commit „Radio-DJs als Entities …“: `radio.js › djOf`, Gesicht im Radio-Chip. `test/radio.test.js` +1, `radio_test` 13/13. PixelLab 0. **Bitte testen:** Radio an (N), auf das kleine Gesicht im Chip achten.
 
 ### #104 Werte als Abschnitt im Inventar, mit Grundwerten
 - **Status:** fertig (20.11.) · · angelegt 19.11. von Code (Runde 2, #091: „Das wäre als Abschnitt des Inventars sinnvoller. Bitte sauber dort aufbauen“, dazu Grundwerte + Boni = Endwert)
