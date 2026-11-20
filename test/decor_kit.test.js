@@ -106,3 +106,16 @@ test('Alte Stücke als Bild: IDs bleiben, alte Spielstände (Boden, Dach) gelten
   assert.equal(restOf(D, s, 0).surf, 'r1');
   assert.equal(restOf(D, s, 1).surf, 'g');
 });
+
+test('#118 Wohnzelle: freier Platz mit 3 Innen-Stücken gibt Gemütlichkeit, Werkstatt-Platz nicht', async () => {
+  const { homes, cozyParts } = await import('../game/decor.js');
+  const s = fresh();
+  s.rig.units.push({ kind: 'container', id: 'container_20', places: 3, workshops: [{ id: 'werkbank', at: 2 }] });
+  const ui = s.rig.units.length - 1, at = (p, row) => ({ ui, p, row });
+  const c0 = cozyParts(D, s).total;
+  dstate(s).decor.push({ id: 'in_lampe', at: at(0, 'top') }, { id: 'in_moebel', at: at(0, 'floor') }, { id: 'in_regal', at: at(0.25, 0.2) });
+  dstate(s).decor.push({ id: 'in_regal', at: at(2, 0.2) }, { id: 'in_wand', at: at(2, 0.42) }, { id: 'in_pinnwand', at: at(2, 0.2) });
+  const h = homes(D, s);
+  assert.deepEqual(h.map(x => `${x.ui}:${x.p}`), [`${ui}:0`]);
+  assert.ok(cozyParts(D, s).total >= c0 + (D.camp.decor.homeCozy ?? 4));
+});

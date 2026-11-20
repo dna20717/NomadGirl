@@ -145,7 +145,9 @@
   "cat": "kit_cat",
   "catName": "Mieze",
   "catCozy": 8,
-  "rear": 8
+  "rear": 8,
+  "homeMin": 3,
+  "homeCozy": 4
  },
  "storage": {"name": "Camp-Lager", "width": 10},
  "critters": [{"look": "fennek_run", "every": [35, 80], "speed": 380, "night": 2, "idles": "fennek_look,fennek_sniff,fennek_scratch", "stopChance": 75}],

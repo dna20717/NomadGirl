@@ -10,12 +10,13 @@
 // Gemütlichkeit (cozy): every piece adds its points; the sum makes sleeping and resting give stronger buffs (capped, Camp › Deko).
 
 export const DECOR_PLACES = [['free', 'Frei (Boden, Dach, aufeinander)'], ['inside', 'Im Container (Rückwand, Decke)'], ['climb', 'An der Container-Wand (Leiter, Treppe)'], ['ground', 'Auf dem Boden'], ['wall', 'An der Container-Wand'], ['roof', 'Auf dem Dach'], ['side', 'Am Container-Ende (Balkon)'], ['span', 'Zwischen zwei Punkten']];
-export const DECOR_ARTS = [['addon', 'Ausschnitt eines Anbauteils'], ['neon', 'Neon-Schild'], ['banner', 'Banner'], ['graffiti', 'Graffiti'], ['line', 'Wäscheleine'],
+export const DECOR_ARTS = [['stringlights', 'Lichterkette innen (#118)'], ['addon', 'Ausschnitt eines Anbauteils'], ['neon', 'Neon-Schild'], ['banner', 'Banner'], ['graffiti', 'Graffiti'], ['line', 'Wäscheleine'],
   ['sail', 'Sonnensegel'], ['tent', 'Zelt'], ['pole', 'Zeltstange (Ankerpunkt)'], ['windmill', 'Windrad'], ['plant', 'Pflanze im Topf'], ['tripod', 'Dreibein mit Topf'],
   ['birdhouse', 'Vogelhaus (Krähen)'], ['trophies', 'Kiste mit Fundstücken'], ['hammock', 'Hängematte'], ['lantern', 'Laterne'], ['mirror', 'Spiegel (Haare färben)'], ['pennants', 'Wimpelkette'], ['canopy', 'Fallschirm-Plane'], ['barrel', 'Feuertonne'], ['balcony', 'Balkon (begehbar)'], ['bridge', 'Brücke (begehbar)'], ['tower', 'Aussichtsturm (begehbar, Leiter)'], ['icon', 'Bild aus einem Symbol-Raster'], ['sprite', 'Bild mit Varianten (Baukasten)'], ['ladder', 'Leiter aufs Dach (kletterbar)'], ['stairs', 'Treppe in den Container (kletterbar)']];
 // #111 Camp-Baukasten: what can stand on a piece (Tragfläche)
 export const DECOR_CARRY = [['', 'Nichts'], ['content', 'Oberkante des Bilds'], ['fixed', 'In fester Höhe']];
-export const DECOR_GROW = [['', 'Nein'], ['up', 'Höhe (Kopf, Mittelstücke, Fuß)'], ['side', 'Breite (Enden, Abschnitte) und etwas Höhe'], ['stack', 'Stapel (mehr Stück übereinander)']];   // #116
+export const DECOR_GROW = [['', 'Nein'], ['up', 'Höhe (Kopf, Mittelstücke, Fuß)'], ['side', 'Breite (Enden, Abschnitte) und etwas Höhe'], ['stack', 'Stapel (mehr Stück übereinander)'], ['steps', 'Größe (je Stufe das nächste Feld: klein, mittel, riesig)']];   // #116, #118
+export const DECOR_INSIDE_ROWS = [['', 'Überall (Decke, Rückwand)'], ['top', 'Decke (nur freie Plätze)'], ['wall', 'Rückwand (auch hinter Werkstätten)'], ['floor', 'Boden (nur freie Plätze)']];   // #118
 export const DECOR_EXTRAS = [['', 'Nichts'], ['fire', 'Flammen + Licht'], ['light', 'Licht'], ['candle', 'Kerzenlicht (klein)'], ['steam', 'Dampf'], ['rotor', 'Rotor (dreht, von der Seite)'], ['neon', 'Neon (leuchtet nachts, flackert)']];
 // #114 Farbe wie Townscaper: arts that take a painted colour (cloth and light)
 export const PAINTABLE = new Set(['tent', 'sail', 'canopy', 'pennants', 'banner', 'line', 'hammock', 'neon']);
@@ -129,7 +130,7 @@ export const balconies = rig => new Set((rig?.decor || []).filter(o => o.at?.sid
 // Free pieces stand on the ground, on a container roof or on another piece (at.on = 'deco:<i>', at.dx tiles from its centre).
 // Every piece rolls a variant of its picture (at.v) and maybe a mirror (at.f). Neighbours and ensembles only ever add Gemütlichkeit
 // (Dorfromantik: what fits gives a bonus, what does not costs nothing).
-export const variants = (D, id) => { const d = decorDef(D, id), a = d?.look && D.assets?.[d.look]; return (d?.art === 'sprite' || d?.art === 'pole') && !d.growStages && a?.grid ? Math.max(1, a.grid[0] * a.grid[1]) : 1; };
+export const variants = (D, id) => { const d = decorDef(D, id), a = d?.look && D.assets?.[d.look]; return (d?.art === 'sprite' || d?.art === 'pole') && !d.growStages && d.grow !== 'steps' && a?.grid ? Math.max(1, a.grid[0] * a.grid[1]) : 1; };
 export const tagsOf = d => String(d?.tags || '').split(',').map(t => t.trim()).filter(Boolean);
 export const canCarry = d => !!d?.carry;
 const onIndex = at => { const m = /^deco:(\d+)$/.exec(at?.on || ''); return m ? Number(m[1]) : null; };
@@ -198,6 +199,22 @@ export function neighbourBonus(D, save) {
 // the full sum: pieces + neighbours + ensembles (never below the plain sum)
 export function cozyParts(D, save) {
   const base = (save?.rig?.decor || []).reduce((n, x) => n + (decorDef(D, x.id)?.cozy || 0), 0);
-  const nb = neighbourBonus(D, save), en = ensembles(D, save);
-  return { base, neighbours: nb.reduce((n, b) => n + b.cozy, 0), sets: en, total: base + nb.reduce((n, b) => n + b.cozy, 0) + en.reduce((n, e) => n + e.cozy, 0) };
+  const nb = neighbourBonus(D, save), en = ensembles(D, save), hm = homes(D, save), hb = hm.length * (D.camp?.decor?.homeCozy ?? 4);
+  return { base, neighbours: nb.reduce((n, b) => n + b.cozy, 0), sets: en, homes: hm, total: base + nb.reduce((n, b) => n + b.cozy, 0) + en.reduce((n, e) => n + e.cozy, 0) + hb };
+}
+// #118 Wohnzellen (Daniel: „Zellen-Typ Wohnen“): a free place of a container (no workshop) with at least Camp › Deko › Wohnen ab pieces of
+// inside decoration is lived in and gives Camp › Deko › Wohnen: Bonus on top → [{ ui, p, n }]
+export function homes(D, save) {
+  const U = save?.rig?.units || [], need = D.camp?.decor?.homeMin ?? 3, count = new Map();
+  for (const o of save?.rig?.decor || []) {
+    if (decorDef(D, o.id)?.place !== 'inside' || o.at?.ui == null || o.at?.p == null) continue;
+    const k = `${o.at.ui}:${Math.round(o.at.p)}`; count.set(k, (count.get(k) || 0) + 1);
+  }
+  const out = [];
+  for (const [k, n] of count) {
+    const [ui, p] = k.split(':').map(Number), u = U[ui];
+    if (!u || n < need || (u.workshops || []).some(w => p >= w.at && p < w.at + (D.workshops?.[w.id]?.places || 1))) continue;
+    out.push({ ui, p, n });
+  }
+  return out;
 }

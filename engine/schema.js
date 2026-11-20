@@ -16,7 +16,7 @@ import { ACHIEVEMENT_COUNTERS, ACHIEVEMENT_SPECIALS, ACHIEVEMENT_CATEGORIES } fr
 import { REP_LEVELS } from '../game/reputation.js';
 import { RADIO_STYLES, RADIO_TALK, RADIO_SCALES, RADIO_KEYS } from '../game/radio_kinds.js';
 import { VOICE_STYLES, VOICE_SOUNDS } from '../game/voice.js';
-import { DECOR_PLACES, DECOR_ARTS, DECOR_CARRY, DECOR_EXTRAS, DECOR_USES, DECOR_GROW } from '../game/decor.js';
+import { DECOR_PLACES, DECOR_ARTS, DECOR_CARRY, DECOR_EXTRAS, DECOR_USES, DECOR_GROW, DECOR_INSIDE_ROWS } from '../game/decor.js';
 import { MOMENTS } from '../game/banter.js';
 import { EARN_WHEN } from '../game/earn.js';
 import { RELIEFS, ROADSIDE } from '../game/road.js';
@@ -1211,6 +1211,7 @@ export const AREAS = {
         bool('matchWall', 'Nimmt die Farbe des Containers an', { hint: '#114 Wand-Module: das Stück Wellblech im Bild wird wie der Container gestrichen' }), bool('foot', 'Steht unten an der Wand', { hint: 'Türen und Tore: auf dem Boden des Containers statt in zwei Höhen' }),
         bool('crows', 'Lockt Krähen an', { hint: 'Wie das Vogelhaus: Krähen sitzen darauf und auf Ecken' }), bool('shadow', 'Schatten am Boden', { hint: 'Aus = kein Kontaktschatten (Standard: an)' })] },
       { title: 'Wachsen', fields: [   // #116 (Daniel: „Dinge wie Laterne so designen, dass man die Ziehen-Funktion benutzen kann“)
+        select('insideRow', 'Innen: Reihe', DECOR_INSIDE_ROWS, { hint: '#118 Nur bei „Im Container“: Decke und Boden nur in freien Plätzen, Rückwand auch hinter Werkstätten' }),
         select('grow', 'Ziehen zum Wachsen', DECOR_GROW, { hint: 'Im Bau-Modus am goldenen Griff ziehen. Höhe: Kopf + Mittelstücke + Fuß; Breite: Enden + Abschnitte (und etwas Höhe); Stapel: mehr Stück übereinander' }),
         range('growRange', 'Stufen', { hint: 'Wie viele Mittelstücke (bzw. Abschnitte, Kisten) mindestens und höchstens' }), num('growStart', 'Stufe beim Kaufen', { min: 0 }),
         range('growRange2', 'Höhen-Stufen', { hint: 'Nur „Breite“: wie oft das Wand-Band (Mittelstück y) zusätzlich höher macht, 1 = wie gemalt' }), num('growStart2', 'Höhen-Stufe beim Kaufen', { min: 0 }),
@@ -1383,6 +1384,7 @@ export const AREAS = {
       { title: 'Deko', fields: [num('decor.max', 'Höchstens', { min: 1, hint: '#036: so viele Deko-Stücke im Camp' }), num('decor.back', 'Zurück beim Verkaufen', { unit: '%', min: 0, max: 100 }),
         num('decor.cozyMax', 'Gemütlichkeit wirkt bis', { unit: '%', min: 0, hint: 'Jeder Punkt Gemütlichkeit macht die Buffs von Schlafen und Ausruhen 1 % stärker, höchstens so viel' }),
         range('decor.ground', 'Boden von – bis', { unit: 'Kacheln ab dem Lagerplatz', hint: 'Wo Boden-Deko stehen darf (negativ = Richtung Rig)' }),
+        num('decor.homeMin', 'Wohnen ab', { unit: 'Innen-Stücke', min: 1, hint: '#118 So viele Innen-Deko-Stücke machen einen freien Platz zur Wohnzelle' }), num('decor.homeCozy', 'Wohnen: Bonus', { unit: 'Gemütlichkeit', min: 0 }),
         num('decor.rear', 'Hinter dem Rig', { unit: 'Kacheln', min: 0, hint: '#117 Platz für Deko hinter dem letzten Container; sie wandert mit, wenn das Rig länger wird (das Camp ist so viel länger)' }),
         num('decor.stackMax', 'Stapel höchstens', { min: 1, hint: '#111: so viele Stücke übereinander' }), num('decor.near', 'Nachbarn bis', { unit: 'Kacheln', min: 0, step: 0.5, hint: 'Mag-Nachbarn und „Dreht sich zu“ wirken bis hier' }),
         num('decor.linkMax', 'Lichterkette bis', { unit: 'Kacheln', min: 1, hint: 'Pfosten mit „Lichterkette zu Nachbarn“ verbinden sich bis zu diesem Abstand' }),

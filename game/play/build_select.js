@@ -11,6 +11,7 @@ import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { act, snapshot, paintUnit, wsDef, sizeRange } from '../rig.js';
 import { hints, NavCursor } from './ui_nav.js';
+import { homes } from '../decor.js';
 
 const de = n => Number(n).toLocaleString('de-DE');
 
@@ -34,6 +35,16 @@ export class BuildSelect {
     const z = Math.max(0.3, this.scene.cam.zoom), R = 24 / z;
     for (const q of this.selPoints()) if (Math.hypot(x - q.x, y - q.y) < (q.kind === 'container' ? R * 1.2 : R)) return { kind: q.kind, from: 'rig', ui: q.ui, p: q.p, id: q.id, unit: q.unit, point: true, chassis: q.kind === 'container', item: { x0: q.x - R, x1: q.x + R, y0: q.y - R, y1: q.y + R } };
     return null;
+  }
+  // #118 lived-in places: a soft warm frame and „Wohnen +4“ over each
+  drawHomes(g, label, z) {
+    const D = this.D, bonus = D.camp?.decor?.homeCozy ?? 4;
+    for (const h of homes(D, this.save)) {
+      const u = this.camp.geo.units.find(x => x.ui === h.ui); if (!u) continue;
+      const x0 = u.in0 + h.p * u.cell;
+      g.lineStyle(3 / z, 0xffb347, 0.55).strokeRect(x0 + 4 / z, u.inTop + 4 / z, u.cell - 8 / z, u.floorY - u.inTop - 8 / z);
+      label(x0 + u.cell / 2, u.inTop + 22, `Wohnen +${bonus}`, '#ffb347');
+    }
   }
   drawPoints(g, z, pulse) {
     if (this.drag || this.decorHold || this.wire || this.painting != null || this.resizing || this.growing) return;

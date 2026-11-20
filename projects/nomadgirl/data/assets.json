@@ -6805,5 +6805,105 @@
   "source": "KI (PixelLab, Create Image Pro, AAP-64, 4 Kandidaten; die anderen als cassette_alt_*.png)",
   "date": "2026-11-20",
   "description": "#117 Wird eingeblendet, wenn die Musik wechselt: Titel auf dem Etikett, die Spulen drehen sich (game/now_playing.js)."
+ },
+ "kit_inside_lamps": {
+  "name": "Innen · Hängelampen",
+  "kind": "icons",
+  "file": "assets/camp/kit/inside_lamps.png",
+  "cell": [62, 108],
+  "grid": [8, 1],
+  "names": ["Käfig-Birne", "Papierlaterne", "Scheinwerfer", "Lichterglas", "Sieb-Lampe", "Besteck-Lüster", "Neon-Ring", "Flaschen-Leuchte"],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64; Daniels Abnahme 20.11.2026) + Code (tools/camp_inside.py: nach zusammenhängenden Pixeln geschnitten)",
+  "date": "2026-11-20",
+  "description": "#118 Für die Decke freier Plätze."
+ },
+ "kit_inside_shelves": {
+  "name": "Innen · Wandregale",
+  "kind": "icons",
+  "file": "assets/camp/kit/inside_shelves.png",
+  "cell": [104, 51],
+  "grid": [8, 1],
+  "names": ["Bücherbrett", "Gewürzregal", "Werkzeugbrett", "Kräuterbrett", "Kamera und Laterne", "Vorräte", "Stoßstangen-Regal", "Tassenleiste"],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64; Daniels Abnahme 20.11.2026) + Code (tools/camp_inside.py: nach zusammenhängenden Pixeln geschnitten)",
+  "date": "2026-11-20",
+  "description": "#118 Streng von vorn (Daniel: die ersten waren leicht gedreht)."
+ },
+ "kit_inside_wall": {
+  "name": "Innen · Rückwand",
+  "kind": "icons",
+  "file": "assets/camp/kit/inside_wall.png",
+  "cell": [86, 108],
+  "grid": [15, 1],
+  "names": [
+   "Lochwand Küche",
+   "Film-Poster",
+   "Pinnwand",
+   "Röhren-TV",
+   "Makramee",
+   "Platten-Regal",
+   "Kuckucksuhr",
+   "Gasmaske",
+   "Fraktions-Fahne",
+   "Steckbrief",
+   "Waffen-Halter",
+   "AvAs Ladestation",
+   "Wasteland-Karte",
+   "Kabel-Traumfänger",
+   "Foto von Leyla und AvA"
+  ],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64; Daniels Abnahme 20.11.2026) + Code (tools/camp_inside.py: nach zusammenhängenden Pixeln geschnitten)",
+  "date": "2026-11-20",
+  "description": "#118 Für die Rückwand innen, auch hinter Werkstätten."
+ },
+ "kit_inside_furniture": {
+  "name": "Innen · Möbel",
+  "kind": "icons",
+  "file": "assets/camp/kit/inside_furniture.png",
+  "cell": [76, 98],
+  "grid": [13, 1],
+  "names": [
+   "Sitzsack",
+   "Rohr-Stehlampe",
+   "Monstera",
+   "Kabeltrommel-Tisch",
+   "Kissenberg",
+   "Kisten-Regal",
+   "Kommode mit Radio",
+   "Sessel",
+   "Kühlschrank",
+   "Campingkocher",
+   "Wasserfilter",
+   "Etagenbett",
+   "Schreibtisch"
+  ],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64; Daniels Abnahme 20.11.2026) + Code (tools/camp_inside.py: nach zusammenhängenden Pixeln geschnitten)",
+  "date": "2026-11-20",
+  "description": "#118 Stehen auf dem Boden freier Plätze."
+ },
+ "kit_inside_pinboard": {
+  "name": "Innen · Verschwörungs-Pinnwand",
+  "kind": "icons",
+  "file": "assets/camp/kit/inside_pinboard.png",
+  "cell": [110, 110],
+  "grid": [3, 1],
+  "names": [
+   "Klein: Karte mit roten Schnüren",
+   "Mittel: Fotos und Schnüre",
+   "Riesig: alles voller Fotos und Schnüre"
+  ],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64; Daniels Abnahme 20.11.2026) + Code (tools/camp_inside.py: nach zusammenhängenden Pixeln geschnitten)",
+  "date": "2026-11-20",
+  "description": "#118 Wächst beim Ziehen (Daniel: Skalieren ist cool)."
+ },
+ "kit_mod_trophies": {
+  "name": "Innen · Trophäen-Ständer (Module)",
+  "kind": "icons",
+  "file": "assets/camp/kit/mod_trophies.png",
+  "cell": [70, 230],
+  "grid": [1, 1],
+  "names": ["Trophäen-Ständer"],
+  "source": "KI (PixelLab, Create Image Pro, AAP-64) + Code (tools/camp_modules.py)",
+  "date": "2026-11-20",
+  "description": "#118 Fuß, eine Etage (wiederholt sich), Krone."
  }
 }

@@ -27,7 +27,7 @@ export class CampDecor {
   rigRear() { const U = (this.geo.units || []).filter(u => u.ui > 0 && !u.level); return U.length ? Math.min(...U.map(u => u.x0)) : (this.geo.vanLeft ?? 0); }
   wallAt(ui, p, row) { const u = this.decorUnit(ui); return u && { u, x: u.in0 + (p + 0.5) * u.cell, y: u.inTop + (u.floorY - u.inTop) * (row ?? 0.4) }; }
   // #114 inside a container: on its back wall (row = share of the interior height) or hanging from its ceiling (row 'top')
-  insideAt(ui, p, row) { const u = this.decorUnit(ui); return u && { u, x: u.in0 + (p + 0.5) * u.cell, y: row === 'top' ? u.inTop + 2 : u.inTop + (u.floorY - u.inTop) * (row ?? 0.25), hang: row === 'top' }; }
+  insideAt(ui, p, row) { const u = this.decorUnit(ui); return u && { u, x: u.in0 + (p + 0.5) * u.cell, y: row === 'top' ? u.inTop + 2 : row === 'floor' ? u.floorY : u.inTop + (u.floorY - u.inTop) * (row ?? 0.25), hang: row !== 'floor', floor: row === 'floor', row }; }   // #118 everything on the back wall hangs by its top (a bigger pin board grows downwards)
   roofAt(ui, p) { const u = this.decorUnit(ui); return u && { u, x: u.in0 + (p + 0.5) * u.cell, y: u.deckY ?? (u.inTop - 34) }; }
   // every point a span can hang on: container corners, the mast (string lights), and the tops of poles
   spanAnchors() {
@@ -103,7 +103,7 @@ export class CampDecor {
     this.walkTops = [];
     this.decorAnim = [];
     this.crows?.forEach(c => c.o.destroy()); this.crows = [];
-    this.freeAt = []; this.decorBoxes = []; this.towers = [];
+    this.freeAt = []; this.decorBoxes = []; this.towers = []; this.insideCount = new Map();
     R.decor.forEach((x, i) => { try { this.drawPiece(x, i); } catch (e) { console.warn('Deko', x.id, e); } });
     try { this.drawKitLights(); } catch (e) { console.warn('Deko-Lichterkette', e); }
     try { this.drawKitDetails(); } catch (e) { console.warn('Deko-Details', e); }
@@ -127,7 +127,7 @@ export class CampDecor {
     if (kind === 'side') { const b = this.balconyAt(at.ui, at.side, d); if (b) this.art_balcony(b, d, seed, at.side); return; }
     if (kind === 'free') { const q = this.freePos(i); if (q) this.art_sprite(q, d, x, i); return; }
     if (kind === 'climb') { const c = this.climbAt(at.ui, at.p); if (c) this[`art_${d.art}`]?.(c, d, x, i); return; }   // #114
-    if (kind === 'inside') { const q = this.insideAt(at.ui, at.p, at.row); if (q) this.art_sprite({ ...q, level: 0, inside: true }, d, x, i); return; }   // #114
+    if (kind === 'inside') { const q = this.insideAt(at.ui, at.p, at.row); if (q) { if (d.art === 'stringlights') this.art_inlights(q, d, x, i); else this.art_sprite({ ...q, level: 0, inside: true }, d, x, i); } return; }   // #114, #118 string lights inside
     let pos;
     if (kind === 'ground') pos = { x: this.groundX(at.x), y: this.ground };
     else if (kind === 'wall') { pos = this.wallAt(at.ui, at.p, at.row); if (pos && d.foot) pos = { ...pos, y: pos.u.floorY, foot: true }; }   // #114 doors stand on the container's floor
@@ -164,6 +164,7 @@ export class CampDecor {
   kitFrame(d, at) {
     const a = this.D.assets?.[d.look], n = a?.grid ? a.grid[0] * a.grid[1] : 1;
     if (d.growStages) return Math.max(0, Math.min(n - 1, Math.floor(((this.box.save.day ?? 1) - (at?.day ?? this.box.save.day ?? 1)) / Math.max(1, d.growDays ?? 2))));   // grows by the days
+    if (d.grow === 'steps') return Math.max(0, Math.min(n - 1, this.growOf(d, at).n));   // #118 a bigger picture per step (the pin board)
     const v = (at?.v ?? 0) + (d.variant || 0);   // Start-Variante: two pieces can share one sheet (Banner mit Dreieck / Gang-Banner)
     return ((v % n) + n) % n;
   }
@@ -281,9 +282,10 @@ export class CampDecor {
     if (!q.level && !q.wall && !q.inside && !q.shell && d.shadow !== false) { const g = this.dG(depth - 0.0005); g.fillStyle(0x060608, 0.28).fillEllipse(x, y - 1, f.width * k * 0.8, 7); }
     let img, mod = null;
     const grow = d.grow && this.growOf(d, o.at);
-    if (grow && (d.grow === 'up' || d.grow === 'side') && !q.inside) {   // #116
+    if (grow && (d.grow === 'up' || d.grow === 'side')) {   // #116 (#118 also inside a container, in its view behind the workshops)
       mod = this.drawModular(d, o.at, fr, x, y + (q.wall || q.shell ? 0 : 1), k, flip, depth);
       img = mod.box;
+      if (q.inside && q.u?.view) { const v = q.u.view, mid = (q.u.x0 + q.u.x1) / 2, G = q.u.base ?? this.ground, si = v.list.findIndex(o2 => o2.texture?.key === q.u.sprite?.key); s.children.remove(img); img.setPosition(img.x - mid, img.y - G); v.addAt(img, this.insideSlot(v, si, q)); }
       (this.decorBoxes ??= [])[i] = { x0: x - mod.w / 2, x1: x + mod.w / 2, y0: y - mod.top, y1: y, x, y, top: mod.top };
     } else if (grow && d.grow === 'stack' && !q.inside) {
       const st = this.drawStack(d, o.at, fr, x, y + 1, k, flip, depth, grow.n);
@@ -292,7 +294,7 @@ export class CampDecor {
     } else if (q.inside && q.u?.view) {   // #114 inside: on the container's back wall, behind its workshops (in the unit's view, right after its picture)
       const v = q.u.view, mid = (q.u.x0 + q.u.x1) / 2, G = q.u.base ?? this.ground, si = v.list.findIndex(o2 => o2.texture?.key === q.u.sprite?.key);
       img = s.add.image(x - mid, y - G, look, fr).setOrigin(0.5, 1).setScale(k).setFlipX(flip);
-      v.addAt(img, si + 1);
+      v.addAt(img, this.insideSlot(v, si, q));
     } else img = this.dAdd(s.add.image(x, y + (q.wall || q.shell ? 0 : 1), look, fr).setOrigin(0.5, 1).setScale(k).setFlipX(flip).setDepth(depth));
     if (!grow || q.inside) (this.decorBoxes ??= [])[i] = { x0: x - f.width * k / 2, x1: x + f.width * k / 2, y0: y - c.h * k, y1: y, x, y };
     // pop in when it was just placed (Tiny Glade: every click answers)
@@ -426,17 +428,31 @@ export class CampDecor {
     } });
   }
   // #114 inside: every container, half-tile steps, hanging from the ceiling or on the back wall (two heights)
+  // #118 the order inside a container, back to front: its picture, the back wall, then floor furniture, lamps and string lights; all behind
+  // the workshops (which come after)
+  insideSlot(v, si, q) {
+    const C = (this.insideCount ??= new Map()), c = C.get(v) || { wall: 0, front: 0 };
+    C.set(v, c);
+    if (q.floor || q.row === 'top' || q.lights) { c.front++; return si + 1 + c.wall + c.front - 1; }
+    c.wall++; return si + 1;
+  }
+  // is a place of a container taken by a workshop?
+  placeTakenAt(ui, p) { return (this.box.save.rig.units[ui]?.workshops || []).some(w => p >= w.at && p < w.at + (this.D.workshops?.[w.id]?.places || 1)); }
   insideSpots(id) {
     const T = this.scene.T, out = [], used = new Set((this.box.save.rig.decor || []).map(x => { const { day, v, f, paint, ...r } = x.at || {}; return JSON.stringify(r); }));
     if (this.geo.mega) return out;
     for (const u of this.geo.units || []) {
       if (u.ui === 0) continue;
       const st = (T * 0.5) / u.cell;
-      for (let p0 = -0.5 + st; p0 <= (u.places || 0) - 0.5 - st + 1e-6; p0 += st) for (const row of ['top', 0.2, 0.42]) {
+      // #118 (Daniel: „Zellen-Typ Wohnen + hinter Werkstätten außer bei Lampen“): ceiling and floor only in free places, the back wall also
+      // behind workshops (Deko › Innen: Reihe)
+      const R = decorDef(this.D, id)?.insideRow, rows = R === 'top' ? ['top'] : R === 'floor' ? ['floor'] : R === 'wall' ? [0.2, 0.42] : ['top', 0.2, 0.42];
+      for (let p0 = -0.5 + st; p0 <= (u.places || 0) - 0.5 - st + 1e-6; p0 += st) for (const row of rows) {
         const p = Math.round(p0 * 1000) / 1000, at = { ui: u.ui, p, row };
         if (used.has(JSON.stringify(at))) continue;
+        if ((row === 'top' || row === 'floor') && R && this.placeTakenAt(u.ui, Math.round(p))) continue;
         const q = this.insideAt(u.ui, p, row);
-        out.push({ at, x: q.x, y: q.y + (row === 'top' ? 20 : 0), label: row === 'top' ? 'An die Decke' : 'Innen an die Wand', inside: true });
+        out.push({ at, x: q.x, y: q.y + (row === 'top' ? 20 : row === 'floor' ? -10 : 0), label: row === 'top' ? 'An die Decke' : row === 'floor' ? 'Auf den Boden' : 'Innen an die Wand', inside: true });
       }
     }
     return out;
@@ -530,6 +546,21 @@ export class CampDecor {
     const glow = this.dAdd(s.add.image(x, cy, glowTexture(s)).setDisplaySize(img.displayWidth * 1.8, img.displayHeight * 1.8).setTint(col(c)).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0).setDepth(-16.25));
     const l = this.light(x, cy + img.displayHeight * 0.6, Math.max(120, img.displayWidth * 1.4), c, 0.45); l.rig = true;
     this.decorAnim.push(time => { const off = Math.sin(time / 130 + seed * 40) > 0.985 || (seed > 0.6 && Math.sin(time / 47 + seed * 9) > 0.97), on = img.alpha > 0.01 ? 1 : 0; lit.setAlpha(on * (off ? 0.1 : 0.75) * (this.lightK || 0)); glow.setAlpha(on * (off ? 0.04 : 0.08 + 0.25 * (this.lightK || 0))); });
+  }
+
+  // #118 (Daniel: „Lichterketten auch innen“): a string of bulbs under the ceiling across the place (Deko › Größe: Breite in Plätzen)
+  art_inlights(q, d, o, i) {
+    const s = this.scene, u = q.u, n = Math.max(1, d.size?.[0] ?? 1), x0 = q.x - u.cell * n / 2 + 8, x1 = q.x + u.cell * n / 2 - 8, y = u.inTop + 10;
+    const cat = catenary({ x: x0, y }, { x: x1, y }, 18 + 6 * n, Math.max(4, Math.round(5 * n))), g = this.dG(-16.3);
+    g.lineStyle(2, 0x17111f, 0.95).beginPath(); cat.line.forEach((pt, k) => k ? g.lineTo(pt.x, pt.y) : g.moveTo(pt.x, pt.y)); g.strokePath();
+    const colors = String(d.colors || '#ffd27a,#fa6a0a,#e86a73,#a6fcdb').split(',').map(t => t.trim());
+    cat.bulbs.forEach((b, j) => {
+      const c = colors[j % colors.length];
+      g.fillStyle(0x17111f).fillRect(Math.round(b.x) - 2, Math.round(b.y), 4, 3).fillStyle(col(c)).fillRect(Math.round(b.x) - 3, Math.round(b.y) + 3, 6, 6).fillStyle(0xffffff, 0.6).fillRect(Math.round(b.x) - 2, Math.round(b.y) + 4, 2, 2);
+      if (j % 2 === 0) { const l = this.light(b.x, b.y + 6, 40, c, 0.32); l.rig = true; l.unit = u.ui; }
+    });
+    if (u.view) { const mid = (u.x0 + u.x1) / 2, G = u.base ?? this.ground, si = u.view.list.findIndex(o2 => o2.texture?.key === u.sprite?.key); s.children.remove(g); g.setPosition(-mid, -G); u.view.addAt(g, this.insideSlot(u.view, si, { floor: true })); }
+    (this.decorBoxes ??= [])[i] = { x0, x1, y0: y - 10, y1: y + 30, x: q.x, y: y + 30 };
   }
 
   // ---- wall ----

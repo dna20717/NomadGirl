@@ -14,6 +14,7 @@ export class BuildGrow {
       const d = decorDef(D, o.id), b = camp.decorBoxes?.[i];
       if (!d?.grow || !b) return;
       const k = camp.kitScale(d), fr = camp.kitFrame(d, o.at), T = this.scene.T;
+      if (d.grow === 'steps') { out.push({ i, axis: 'n', side: 'top', x: (b.x0 + b.x1) / 2, y: b.y0, step: 36 }); return; }   // #118 a bigger picture per step
       if (d.grow === 'stack') { const c = camp.kitContent(d.look, fr); out.push({ i, axis: 'n', side: 'top', x: (b.x0 + b.x1) / 2, y: b.y0, step: Math.max(20, (c?.h ?? 60) * k - 2) }); return; }
       if (d.art === 'ladder') { out.push({ i, axis: 'n', side: 'top', x: (b.x0 + b.x1) / 2, y: b.y0, step: T }); return; }
       const sl = camp.growSlices(d, fr);

@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 20.11. Code → Ava: #118 fertig: Innen-Deko (47 Stücke, Pinnwand wächst, Trophäen-Ständer, Lichterkette innen), Wohnzellen +4. Dazu Hauptmenü-Musik, Now-Playing-Kassette („Leyla Runs“ von BombT), Rig bleibt im Bau-Modus zu (R3/Select/O).
 - 20.11. Code → Ava: #117 fertig: Intro-Musik + Suchscheinwerfer, Fahrt-Musik, Camp ohne Rand mit Bunker-Easter-Egg, Deko hinter dem Rig, Bau-Modus mit Zelle/Fahrgestell/Menü/Farben/Zoom-Stufen und Icon-Leiste. PixelLab 60.
 - 19.11. Code → Ava: #116 fertig: Ziehen zum Wachsen (Laterne, Stangen, Turm, Leitern, Kistenstapel, lange Zelte) aus gemalten Modulen, Bau-Raster um AvA. PixelLab 150.
 - 19.11. Code → Ava: #115 fertig: Parallax-Sets je Region (Camp, POIs draußen, Fahrt, Startseite), schwarze Silhouetten vorne, AvA scannt Billboards am Gummiband; Windrad-Schweben behoben. PixelLab 320.
@@ -246,10 +247,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #118 Innen-Deko: Wohnzellen, Möbel, Lampen, Lichterketten, wachsende Pinnwand, Trophäen-Ständer
-- **Status:** läuft (20.11.) · angelegt 20.11. von Code (Daniels Abnahme der Innen-Deko-Kandidaten)
+- **Status:** fertig (20.11.) · angelegt 20.11. von Code (Daniels Abnahme der Innen-Deko-Kandidaten)
 - **Auftrag (Daniel):** Sets A Hängelampen, B Rückwand, C Boden-Möbel einbauen; Regale streng orthogonal neu malen (sie waren leicht gedreht); mehr Sachen, die zur Welt passen; ein flexibler Trophäen-Ständer; Skalieren ist cool (z. B. kleine Karte mit roten Schnüren → mittel → riesig mit vielen Fotos und Schnüren); muss auch vor bzw. hinter vorhandenen Werkbänken gut aussehen. Zellen-Typ „Wohnen“ + Rückwand-Deko hinter Werkstätten (außer Lampen). Lichterketten auch innen.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** (Code) ⚠️ vorläufig: Lampen und Möbel nur in freien Plätzen, Rückwand überall; Wohnzelle ab 3 Stücken, +4; Maßstab 200 % (Trophäen 150 %, 0–2 Etagen, damit er unter die Decke passt); Pinnwand 3 Größen; die alte Innenkram-Deko bleibt.
+- **Ergebnis:** (Code) Commit „Innen-Deko und Wohnzellen (#118)“. `npm test` 338/338 (neu: Wohnzelle), Browser decor_kit/decor/paint/grow/select/build/build_pad/camp/cozy/workshop grün. **PixelLab 50** (+ 30 für die Abnahme-Kandidaten), übrig 2.235,6. Bild `output/innen_14.png`, `output/innen_21.png`. **Bitte testen:** Händler › Deko › Hängelampe, Wandregal, Wandschmuck innen, Möbel, Pinnwand, Trophäen-Ständer, Lichterkette innen; R für Varianten; drei Stücke in einen freien Platz → „Wohnen +4“; Pinnwand und Ständer am Griff ziehen; nachts anschauen.
 
 ### #117 Bau-Modus neu, Camp ohne Rand, Intro mit Musik
 - **Status:** fertig (20.11.) · angelegt 20.11. von Code (Daniel per Sprachnachricht)

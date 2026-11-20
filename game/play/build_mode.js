@@ -1073,6 +1073,7 @@ export class BuildMode {
     this.drawGrowGrips(g, label, z, pulse);   // #116
     this.drawSel(g, z, pulse);   // #117
     this.drawPoints(g, z, pulse);
+    this.drawHomes(g, label, z);   // #118
     // the sockets for rig parts on the van: empty = dashed frame with the slot's name, built in = the part
     const pslot = d?.kind === 'part' ? D.rigParts?.[d.id]?.slot : null, tt = d ? this.target() : null;
     for (const so of this.sockets()) {

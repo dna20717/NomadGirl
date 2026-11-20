@@ -15,6 +15,7 @@ PIECES = {
     'mod_lantern': ('up', [('mod_lantern_b', (40, 135), None), ('mod_lantern_b', (149, 240), None), ('mod_lantern_a', (60, 135), None)], (40, 72)),
     'mod_poles':   ('up', [('mod_poles_b', (40, 80), None), ('mod_poles_b', (172, 240), None), ('mod_poles_a', (62, 130), None)], (40, 72)),
     'mod_tower':   ('up', [('mod_tower', (0, 192), None)], (70, 74)),
+    'mod_trophies': ('up', [('mod_trophies', (0, 128), None)], (36, 70)),   # #118 trophy stand: identical tiers
     'mod_tent_a':  ('side', [('mod_tents', (0, 512), (0, 128))], (55, 60)),
     'mod_tent_b':  ('side', [('mod_tents', (0, 512), (128, 256))], (48, 53)),
 }
