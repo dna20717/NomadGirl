@@ -189,10 +189,15 @@ check('Neues Spiel: B bricht ab', !s, s);
 // right stick pulls AvA like on a rubber band (Daniel, 12.11.2026): full stick goes far, half stick more than half as far (it gets heavier outside), release = back
 s = await ev(() => { const sc = game.scene.getScene('play'), d = sc.drone, l = sc.leyla, off = () => Math.round(d.x - l.x);
   nomad.step(3, ['right']); nomad.step(30); l.facing = 1; d.side = 1; d.turnAt = 0;   // facing right (after building she got up from the fire), AvA on the same side
+  d.x = l.x - 110; d.y = l.feet - 210; d.roamTo = null; d.roamAt = 1e12;   // #125 (C2): she roams the camp and may start 3000 px away
   setPad({ axes: [0, 0, 1, 0] }); nomad.step(150); const full = off(), aim = d.aim;
-  setPad({ axes: [0, 0, 0.5, 0] }); nomad.step(150); const half = off();
-  setPad(); nomad.step(60); const leashed = d.leashed; nomad.step(60); return { full, half, aim, leashed, aimAfter: d.aim, reach: d.d.leash?.reach }; });
-check('Rechter Stick zieht AvA am Gummiband, Licht folgt, Loslassen = zurück', s.full > s.reach * 0.7 && s.half > s.reach * 0.4 && s.half < s.full && Math.abs(s.aim) < 0.05 && !s.leashed && s.aimAfter == null, s);
+  setPad({ axes: [0, 0, 0.5, 0] }); nomad.step(150); const half = off(), m = Math.hypot(...(sc.pad?.right || [0, 0]));
+  setPad(); nomad.step(60); const leashed = d.leashed; nomad.step(60);
+  // #125 (C2): no bug behind the old 187 px: the stick's dead zone leaves m ≈ 0.4 of a half tilt, and her resting spot behind Leyla
+  // (Drohne › Folgen › Versatz) blends in by (1 − m); so the exact target is computed from what arrives
+  const G = d.d.leash || {}, k = G.stiffness ?? 2.4, pull = (G.reach ?? 380) * (1 - Math.exp(-k * m)) / (1 - Math.exp(-k)), halfWant = Math.round((d.f.offset || [-110])[0] * d.side * (1 - m) + pull);
+  return { full, half, halfWant, m: +m.toFixed(3), aim, leashed, aimAfter: d.aim, reach: G.reach }; });
+check('Rechter Stick zieht AvA am Gummiband, Licht folgt, Loslassen = zurück', s.full > s.reach * 0.7 && Math.abs(s.half - s.halfWant) < 12 && s.half < s.full && Math.abs(s.aim) < 0.05 && !s.leashed && s.aimAfter == null, s);
 // standing on AvA the right stick lets both hover a little, at three times the battery cost (Daniel, 12.11.2026)
 s = await ev(() => { const s = game.scene.getScene('play'), d = s.drone, l = s.leyla; nomad.step(400);
   const top = l.feet - 120, y = top + d.half - (d.d.platform?.inset ?? 14); d.x = l.x; d.y = y; d.parkAt = [l.x, y]; d.parkUntil = s.time.now + 1e7; nomad.step(3);
