@@ -13,7 +13,7 @@ for (const [name, width, height] of [['desktop', 1440, 900], ['ipad', 820, 1180]
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   page.on('console', m => { if (m.type() === 'error' && !/\/api\/|version\.json/.test(m.location()?.url || '')) errors.push(m.text()); });
-  await page.goto('http://localhost:8766/index.html');
+  await page.goto('http://localhost:8766/classic.html');
   await page.waitForFunction(() => window.splash, null, { timeout: 15000 });
   const s = await page.evaluate(() => window.splash);
   await page.waitForTimeout(1500);
@@ -27,7 +27,7 @@ for (const [name, width, height] of [['desktop', 1440, 900], ['ipad', 820, 1180]
 // #117 Daniel's track in the main menu: starts with the first key, the Now-Playing cassette shows its title
 {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-  await page.goto('http://localhost:8766/index.html');
+  await page.goto('http://localhost:8766/classic.html');
   await page.waitForFunction(() => window.splash, null, { timeout: 15000 });
   await page.keyboard.press('Shift'); await page.waitForTimeout(1200);
   const m = await page.evaluate(() => ({ music: window.splash.music?.(), card: document.querySelector('.np-card .np-label')?.textContent || null }));
@@ -46,7 +46,7 @@ for (const [name, width, height] of [['desktop', 1440, 900], ['ipad', 820, 1180]
     window.setPad = ({ press = [], axes = [0, 0] } = {}) => { pad.buttons.forEach((b, i) => { b.pressed = press.includes(i); b.value = b.pressed ? 1 : 0; }); pad.axes = [...axes, 0, 0]; };
     navigator.getGamepads = () => [pad, null, null, null];
   });
-  await page.goto('http://localhost:8766/index.html');
+  await page.goto('http://localhost:8766/classic.html');
   await page.waitForFunction(() => window.splash && window.menu, null, { timeout: 15000 });
   const ev = f => page.evaluate(f);
   await ev(() => setPad({ axes: [0, 1] })); await page.waitForTimeout(120); await ev(() => setPad()); await page.waitForTimeout(100);

@@ -117,7 +117,7 @@ export const SUMMARY = {
   },
 
   splash(w, x) {
-    const url = new URL('../../index.html?preview', import.meta.url).href;
+    const url = new URL('../../classic.html?preview', import.meta.url).href;
     const frame = el('iframe', { src: url, class: 'ng-splash', title: 'Startseite', loading: 'lazy' });
     const reload = el('button', { class: 'ed-button wide', title: 'Speichert und lädt die Vorschau neu', onclick: async () => { if (w.dirty.size) await w.persist(); frame.src = url + '#' + Date.now(); } }, 'Speichern und neu laden');
     return { title: 'Vorschau', body: el('div', {}, frame, el('p', { class: 'ed-small' }, 'Zeigt den gespeicherten Stand. Maus über die Vorschau bewegen = Tiefe der Ebenen.'), reload) };

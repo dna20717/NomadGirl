@@ -3,118 +3,191 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="NomadGirl">
 <title>NomadGirl</title>
 <script>try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme') || 'gray'; } catch (e) { document.documentElement.dataset.theme = 'gray'; }</script>
 <link rel="stylesheet" href="game/ui.css">
 <style>
-  html, body { height: 100%; }
-  body { margin: 0; overflow: hidden; background: #292330; color: var(--ui-text); font-family: var(--ui-font); }
-  #scene { position: fixed; inset: 0; width: 100vw; height: 100vh; image-rendering: pixelated; image-rendering: crisp-edges; }
-  main { position: relative; z-index: 1; box-sizing: border-box; width: min(460px, 92vw); margin: 0 0 0 max(4vw, 24px); min-height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 32px 0; }
-  .card { padding: 24px; border-radius: var(--ui-r-pane); background: color-mix(in srgb, var(--ui-bg) 72%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid color-mix(in srgb, var(--ui-border) 70%, transparent); box-shadow: var(--ui-shadow); }
-  h1 { font-family: var(--ui-pixel); font-weight: normal; font-size: 64px; line-height: .9; margin: 0; letter-spacing: 1px; }
-  h1.logo { margin: -14px 0 -6px -10px; line-height: 0; }   /* #119 the pixel logo (PixelLab), scaled sharp */
-  h1.logo img { width: min(100%, 420px); height: auto; image-rendering: pixelated; filter: drop-shadow(0 0 14px rgba(232, 106, 115, .35)); }
-  h1.logo .logo-canvas { width: min(760px, 94vw); height: auto; margin: -34px 0 -44px -46px; image-rendering: pixelated; filter: drop-shadow(0 6px 18px rgba(0,0,0,.45)); }   /* #120 animated, wider than the card */
-  .sub { color: var(--ui-text2); margin: 8px 0 22px; line-height: 1.5; }
-  nav { display: grid; gap: 10px; }
-  a, .soon { display: flex; align-items: center; gap: 14px; padding: 13px 16px; border-radius: var(--ui-r-pane); border: 1px solid var(--ui-border); background: var(--ui-panel); color: var(--ui-text); text-decoration: none; }
-  a:hover { border-color: var(--ui-acc-line); }
-  nav a.pad-focus { border-color: var(--ui-acc-line); box-shadow: 0 0 0 2px var(--ui-acc-line), 0 0 18px color-mix(in srgb, var(--ui-acc-line) 60%, transparent); transform: translateX(4px); }
-  nav a { transition: transform 120ms ease-out, box-shadow 120ms; }
-  .pad-hint { display: none; margin-top: 12px; font-size: 12px; color: var(--ui-text3); }
-  .pad .pad-hint { display: block; }
-  a.main { background: var(--ui-acc-soft); border-color: var(--ui-acc-line); }
-  b { display: block; font-weight: 600; }
-  small { color: var(--ui-text3); }
-  .soon { opacity: .5; }
-  footer { margin-top: 18px; font-size: 12px; color: var(--ui-text3); }
-  footer a { display: inline; padding: 0; border: 0; background: none; color: var(--ui-text2); text-decoration: underline; }
-  .preview main { display: none; }
-  @media (max-width: 760px), (max-aspect-ratio: 23/20) {
-    main { margin: 0 auto; justify-content: flex-start; min-height: 0; }
-    .card { padding: 18px; }
-    h1 { font-size: 48px; }
-    .sub { display: none; }
-    a small { display: none; }
-  }
+  /* Startseite (online unter /): #123/#124 das Hauptmenü aus dem Van-Cockpit (Daniel 20.11.2026: „Bring es auf Prod“; die alte Startseite liegt unter /classic). Szene = Startseite im Fahrmodus, Cockpit aus PixelLab-Teilen
+     (game/splash/cockpit.js, Startseite › Cockpit), Billboard mit der Werbung, AvA fliegt vor dem Van. */
+  html, body { height: 100%; margin: 0; overflow: hidden; background: #141013; }
+  #scene, #cockpit { position: fixed; inset: 0; width: 100vw; height: 100vh; image-rendering: pixelated; }
+  #cockpit { object-fit: cover; pointer-events: none; z-index: 2; }
+  h1.logo { position: fixed; left: -6000px; top: 0; margin: 0; line-height: 0; width: 760px; }   /* the animated logo runs off-screen and is painted onto the billboard */
+  #lcd { position: fixed; z-index: 3; box-sizing: border-box; overflow: hidden; font-family: VT323, monospace; color: #9cdb43; text-shadow: 0 0 6px rgba(156,219,67,.55); display: grid; align-content: start; }
+  #lcd .hd { display: flex; justify-content: space-between; color: #59c135; white-space: nowrap; overflow: hidden; font-size: .72em; gap: .8em; }
+  #lcd .hd #np { flex: 1; overflow: hidden; } #lcd .hd #np i { display: inline-block; font-style: normal; padding-left: 100%; animation: np-run 11s linear infinite; }
+  @keyframes np-run { to { transform: translateX(-100%); } }
+  #lcd a { display: flex; justify-content: space-between; align-items: baseline; color: inherit; text-decoration: none; padding: 0 .3em; white-space: nowrap; cursor: pointer; }
+  #lcd a[hidden] { display: none; }
+  #lcd a small { opacity: .65; font-size: .7em; }
+  #lcd a.on { background: #9cdb43; color: #0b1a12; text-shadow: none; }
+  #lcd a.on span::before { content: '▶ '; }
+  #flash { position: fixed; inset: 0; z-index: 4; background: #fff; opacity: 0; pointer-events: none; transition: opacity .35s; }
+  .hint { position: fixed; right: 1.5vw; bottom: 1.2vh; z-index: 3; font: 16px VT323, monospace; color: #e4d2aa; text-shadow: 0 2px 0 #060608; text-align: right; opacity: .8; }
+  .hint a { color: #ffd541; }
 </style>
 </head>
 <body>
-<canvas id="scene" aria-label="Leyla rennt durch die Wastelands auf uns zu"></canvas>
-<main>
-  <div class="card">
-    <h1 class="logo"><img src="projects/nomadgirl/assets/ui/logo/logo.png" alt="NomadGirl" width="256" height="128"></h1>
-    <p class="sub">Leyla lebt in den Wastelands rund um BigCityDelta in ihrem Rig. Sie plündert, was andere liegen lassen, und kocht erstaunlich gut.</p>
-    <nav id="nav"></nav>
-    <p class="pad-hint">Stick hoch/runter: wählen · A: los · Stick links/rechts: Kurve laufen</p>
-    <footer>GPL v3 oder später · <a href="https://github.com/dna20717/NomadGirl">Quelltext auf GitHub</a> · <span id="version" title="Version dieser Seite (Commit und Zeit des Builds)">…</span> · <span id="dataset" title="Welche Spieldaten dieses Gerät lädt (#073)">Datenset: Standard</span></footer>
-  </div>
-</main>
+<canvas id="scene" aria-label="Die Straße durch die Wastelands, gesehen aus dem Van"></canvas>
+<h1 class="logo"><img src="projects/nomadgirl/assets/ui/logo/logo.png" alt="NomadGirl"></h1>
+<canvas id="cockpit" aria-hidden="true"></canvas>
+<nav id="lcd" aria-label="Hauptmenü"><div class="hd"><span>88.6 FM</span><span id="np"><i>▶ Leylas Run – BombT · Rig-Radio · A Game about finding everything by leaving all behind</i></span></div></nav>
+<div id="flash"></div>
+<div class="hint">← → lenken · ↑ ↓ wählen · Enter los · <a href="classic.html">Klassisch</a> · <a href="?stickers=all">alle Sticker</a> · <span id="dataset" title="Datenset (Varianten der Spieldaten aus der Werkstatt)"></span> · GPL v3 · <span id="version" title="Version dieser Seite (Commit und Zeit des Builds)">…</span></div>
 <script type="module">
-  import { icon } from './game/icons.js';
-  if (new URLSearchParams(location.search).has('preview')) document.documentElement.classList.add('preview');   // workshop preview: scene only
   import { startSplash } from './game/splash/splash.js';
-  import { loadVersion } from './game/version.js';
-  loadVersion().then(v => { const e = document.getElementById('version'); e.textContent = v.text; if (v.commit) e.title += ': ' + v.commit; window.version = v; });
-  startSplash(document.getElementById('scene')).then(x => { window.splash = x; }).catch(e => console.warn('Startseite ohne Szene:', e));
-  const nav = document.getElementById('nav');
-  const entry = (href, ic, title, text, cls = '') => {
-    const e = document.createElement(href ? 'a' : 'div');
-    if (href) e.href = href;
-    e.className = cls || (href ? '' : 'soon');
-    e.append(icon(ic, 26));
-    const t = document.createElement('span');
-    t.innerHTML = `<b>${title}</b><small>${text}</small>`;
-    e.append(t);
-    nav.append(e);
-  };
-  entry('game.html?camp', 'play', 'Spiel', 'Camp mit Rig, Lagerfeuer und Companions, Warroom, Runs mit Spielstand (Tastatur oder Controller)', 'main');
-  entry('intro.html', 'image', 'Intro', 'Wie alles anfing: Leyla, der Cryo-Tank und drei Tage Notstrom. Ein Comic zum Durchblättern');
-  entry('game.html', 'target', 'Testraum', 'Parkour mit Slide, Leiter, Seil, Kanten und Van (Tastatur oder Controller)');
-  entry('workshop.html', 'workbench', 'Werkstatt', 'Alle Aspekte des Spiels einstellen: Leyla, Waffen, Rezepte, Rig, Welt');
-  entry('https://github.com/dna20717/NomadGirl/blob/main/docs/design.md', 'data', 'Design-Dokument', 'Pitch, Core Loop, Mechaniken, Fahrplan');
-  // #073 Datensets: which variant of the game data this device plays; A / click goes to the next one, the status bar says which
-  entry('#', 'layers', 'Datenset: Standard', 'Varianten der Spieldaten aus der Werkstatt · klicken zum Wechseln', 'dataset');
+  import { startCockpit, achievementStickers, PW, PH } from './game/splash/cockpit.js';
+  const BASE = new URL('projects/nomadgirl/', location.href);
+  const json = f => fetch(new URL('data/' + f, BASE), { cache: 'no-store' }).then(r => r.json()).catch(() => ({}));
+  const [S, A, ACH, REC, IT] = await Promise.all(['splash.json', 'assets.json', 'achievements.json', 'recipes.json', 'items.json'].map(json));
+  const CK = S.cockpit || {};
+  const load = id => new Promise(res => { const f = A[id]?.file; if (!f) return res(null); const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = new URL(f, BASE).href; });
+  const [bbImg, posterImg] = await Promise.all([load(CK.billboard), load(CK.poster)]);
+
+  // ---------- menu in the radio ----------
+  const ITEMS = [['game.html?camp', 'Spiel', 'Camp & Runs'], ['intro.html', 'Intro', 'Wie alles anfing'], ['game.html', 'Testraum', 'Parkour'], ['workshop.html', 'Werkstatt', 'Alles einstellen'], ['https://github.com/dna20717/NomadGirl/blob/main/docs/design.md', 'Design-Dok', 'Fahrplan']];
+  const lcd = document.getElementById('lcd');
+  const links = ITEMS.map(([href, t, s]) => { const a = document.createElement('a'); a.href = href; a.innerHTML = `<span>${t}</span><small>${s}</small>`; lcd.append(a); return a; });
+  // #073 Datensets: which variant of the game data this device plays; Enter / click goes to the next one (as on the classic page)
+  const dsLink = document.createElement('a'); dsLink.href = '#'; dsLink.className = 'dataset'; dsLink.innerHTML = '<span>Datenset</span><small>Standard</small>'; lcd.append(dsLink); links.push(dsLink);
   (async () => {
     const { listSets, activeSetId, chooseSet } = await import('./engine/sets.js');
     const { cloudFiles } = await import('./game/cloud_store.js');
     const cloud = await cloudFiles().catch(() => null);
-    const drafts = cloud ? null : await (await import('./game/store.js')).openStore({ project: 'nomadgirl', withoutAssets: true }).then(st => st.all()).catch(() => null);   // local workshop: its sets are drafts
-    let sets = cloud?.files?.has('sets/index.json') ? cloud.files.get('sets/index.json') : drafts?.has('sets/index.json') ? drafts.get('sets/index.json') : await listSets({ json: async p => { const r = await fetch('projects/nomadgirl/' + p, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return r.json(); } });
-    sets = [{ id: '', name: 'Standard' }, ...(Array.isArray(sets) ? sets.filter(s => s?.id) : [])];
-    const link = nav.querySelector('a.dataset'), bar = document.getElementById('dataset');
-    const show = () => { const id = activeSetId(), s = sets.find(x => x.id === id) || sets[0]; link.querySelector('b').textContent = `Datenset: ${s.name}`; link.querySelector('small').textContent = sets.length > 1 ? `${sets.length} zur Wahl · klicken zum Wechseln${s.description ? ' · ' + s.description : ''}` : 'Noch keine Varianten · in der Werkstatt „Speichern unter …“'; bar.textContent = `Datenset: ${s.name}`; window.dataSets = { active: s.id, sets: sets.map(x => x.id) }; };
-    link.addEventListener('click', e => { e.preventDefault(); const i = sets.findIndex(x => x.id === activeSetId()); chooseSet(sets[(i + 1) % sets.length].id); show(); });
-    show();
+    let sets = cloud?.files?.has('sets/index.json') ? cloud.files.get('sets/index.json') : await listSets({ json: async p => { const r = await fetch('projects/nomadgirl/' + p, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return r.json(); } }).catch(() => []);
+    sets = [{ id: '', name: 'Standard' }, ...(Array.isArray(sets) ? sets.filter(x => x?.id) : [])];
+    const bar = document.getElementById('dataset');
+    const showSet = () => { const id = activeSetId(), x = sets.find(q => q.id === id) || sets[0]; dsLink.querySelector('small').textContent = x.name; bar.textContent = `Datenset: ${x.name}`; window.dataSets = { active: x.id, sets: sets.map(q => q.id) }; };
+    dsLink.addEventListener('click', e => { e.preventDefault(); const i = sets.findIndex(q => q.id === activeSetId()); chooseSet(sets[(i + 1) % sets.length].id); showSet(); });
+    showSet();
   })().catch(e => console.warn('Datensets:', e));
+  import('./game/version.js').then(({ loadVersion }) => loadVersion()).then(v => { const e = document.getElementById('version'); e.textContent = v.text; if (v.commit) e.title += ': ' + v.commit; window.version = v; }).catch(() => {});
+  let sel = 0;
+  const VIS = 4, show = () => { const top = Math.max(0, Math.min(links.length - VIS, sel - 1)); links.forEach((a, i) => { a.classList.toggle('on', i === sel); a.hidden = i < top || i >= top + VIS; }); };
+  links.forEach((a, i) => a.addEventListener('mouseenter', () => { sel = i; show(); }));
+  show();
 
-  // controller (Daniel, 11.11.2026): stick up/down chooses an entry, A opens it, stick sideways lets Leyla run a bend (game/splash/splash.js)
-  const links = [...nav.querySelectorAll('a')];
-  let sel = -1, held = 0, next = 0, wasA = true;
-  const focus = i => { sel = (i + links.length) % links.length; links.forEach((a, k) => a.classList.toggle('pad-focus', k === sel)); links[sel].focus({ preventScroll: true }); };
-  addEventListener('mousemove', () => { if (sel >= 0) { links.forEach(a => a.classList.remove('pad-focus')); sel = -1; document.documentElement.classList.remove('pad'); } });
+  // ---------- the road: our own texture, US two-lane highway, we drive on the RIGHT lane (#124) ----------
+  // ck_road is 16 m wide with the road centre at 8 m; shift −2 puts the camera at 10 m = middle of the right lane
+  const ROAD = { texture: CK.road || 'ck_road', width: 16, edge: 62, shift: -2, speed: 8, specks: 0, dust: false, shadow: false, base: '#2a1530', fog: '#5e2a36', fogFrom: 10 };
+
+  // ---------- the billboard: rusty frame (PixelLab), the ad drawn into its board each frame ----------
+  // the board is 4.2 m wide (196 px); it stands left of the oncoming lane (the right side is hidden by the sun visor), we drive towards it, it rushes past, the next one comes
+  const [bx0, by0] = CK.board || [22, 26], [bw0, bh0] = CK.boardSize || [196, 62], PXM = bw0 / 4.2;
+  const BB = { z: 22, x: -8.5, speed: 1.3, gap: 0, screen: null };   // ~16 s from far to past
+  const ad = document.createElement('canvas'); ad.width = bw0 * 2; ad.height = bh0 * 2;
+  const drawAd = t => {   // a real advertisement: key art, the logo, the tagline, a badge; then the board's own grime over it
+    const g = ad.getContext('2d'), W = ad.width, H = ad.height; g.imageSmoothingEnabled = false;
+    g.fillStyle = '#3b1725'; g.fillRect(0, 0, W, H);
+    if (posterImg) { const k = W / posterImg.width; g.save(); g.translate(W, 0); g.scale(-1, 1); g.drawImage(posterImg, 0, H - posterImg.height * k + 6, W, posterImg.height * k); g.restore(); }   // mirrored: Leyla and the van on the right
+    const shade = g.createLinearGradient(0, 0, W * 0.75, 0); shade.addColorStop(0, 'rgba(20,16,19,.75)'); shade.addColorStop(1, 'rgba(20,16,19,0)'); g.fillStyle = shade; g.fillRect(0, 0, W, H - 22);
+    const logo = document.querySelector('h1.logo canvas');
+    if (logo) { const k = W * 0.74 / logo.width; g.drawImage(logo, -W * 0.05, -H * 0.2, logo.width * k, logo.height * k); }
+    g.fillStyle = 'rgba(6,6,8,.82)'; g.fillRect(0, H - 22, W, 22); g.fillStyle = '#fa6a0a'; g.fillRect(0, H - 23, W, 2);
+    g.font = '18px VT323, monospace'; g.textBaseline = 'middle'; g.textAlign = 'center'; g.fillStyle = '#ffd541';
+    g.fillText(CK.tagline || '', W / 2, H - 11);
+    g.save(); g.translate(W * 0.6, 26); g.rotate(0.18 + Math.sin(t * 2) * 0.02);   // badge
+    g.fillStyle = '#df3e23'; g.beginPath(); for (let i = 0; i < 24; i++) { const r = i % 2 ? 17 : 21, a = i / 24 * Math.PI * 2; g.lineTo(Math.cos(a) * r, Math.sin(a) * r); } g.fill();
+    g.fillStyle = '#fef3c0'; g.font = '11px VT323, monospace'; g.fillText('NOW ON', 0, -5); g.fillText('THE ROAD', 0, 6); g.restore();
+    if (bbImg) { g.globalCompositeOperation = 'multiply'; g.globalAlpha = 0.35; g.drawImage(bbImg, bx0, by0, bw0, bh0, 0, 0, W, H); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; }   // rust and seams of the board
+  };
+  const billboard = ({ ctx, project, scale, dt, t, Z_FAR }) => {
+    if (BB.gap > 0) { BB.gap -= dt; if (BB.gap <= 0) BB.z = 38; BB.screen = null; return; }
+    BB.z -= BB.speed * dt;
+    if (BB.z < 2.5) { BB.gap = 3; BB.screen = null; return; }
+    if (!bbImg) return;
+    const k = scale(BB.z) / PXM, [gx, gy] = project(BB.x, BB.z), w = bbImg.width * k, h = bbImg.height * k, x = gx - w / 2, y = gy - h;
+    ctx.save(); ctx.globalAlpha = Math.max(0, Math.min(1, (Z_FAR * 0.95 - BB.z) / 6)); ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = 'rgba(6,6,8,.3)'; ctx.beginPath(); ctx.ellipse(gx, gy, w * 0.4, Math.max(2, h * 0.03), 0, 0, Math.PI * 2); ctx.fill();
+    ctx.drawImage(bbImg, Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+    drawAd(t); ctx.drawImage(ad, Math.round(x + bx0 * k), Math.round(y + by0 * k), Math.round(bw0 * k), Math.round(bh0 * k));
+    ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha *= 0.16 + (Math.sin(t * 13) > 0.96 ? -0.1 : 0);   // the three lamps light the board
+    const lg = ctx.createLinearGradient(0, y + by0 * k, 0, y + (by0 + bh0) * k); lg.addColorStop(0, '#fef3c0'); lg.addColorStop(1, 'rgba(254,243,192,0)');
+    ctx.fillStyle = lg; ctx.fillRect(x + bx0 * k, y + by0 * k, bw0 * k, bh0 * k);
+    ctx.restore();
+    BB.screen = { x: gx, y: y + (by0 + bh0 / 2) * k, w: bw0 * k, z: BB.z };
+  };
+
+  // ---------- AvA flies ahead of the van: cruises, scans, photographs the billboard, rolls, peeks in, races ahead, naps, hunts a bug ----------
+  const flash = document.getElementById('flash'), scr = document.getElementById('scene');
+  let cockpit = null;
+  const ava = { x: 0.55, y: 0.3, s: 1, rot: 0, act: null, until: 0, t0: 0, did: false, scan: 0 };
+  const ACTS = {
+    cruise: { ms: [5000, 8000], go: (q, t) => ({ x: 0.5 + Math.sin(t * 0.5) * 0.14, y: 0.27 + Math.sin(t * 0.8) * 0.02, s: 1 }) },
+    scan: { ms: [4500, 6000], mood: 'scan', go: (q, t) => ({ x: 0.42 + Math.sin(t * 0.3) * 0.05, y: 0.29, s: 0.95, scan: 1 }) },
+    billboard: { ms: [5000, 5000], mood: 'curious', ok: () => BB.screen && BB.screen.z < 24 && BB.screen.z > 9, go: (q, t, p) => {
+      const S = BB.screen; if (!S) return { x: 0.6, y: 0.27, s: 1 };
+      if (p > 0.55 && !q.did) { q.did = true; flash.style.transition = 'none'; flash.style.opacity = 0.55; requestAnimationFrame(() => { flash.style.transition = 'opacity .5s'; flash.style.opacity = 0; }); }
+      return { x: (S.x - S.w * 0.25) / scr.width, y: S.y / scr.height - 0.08, s: 0.7, bubble: p > 0.55 ? '*klick*' : undefined }; } },
+    roll: { ms: [1600, 1600], mood: 'dash', go: (q, t, p) => ({ x: 0.52 + p * 0.1, y: 0.25, s: 1, rot: p * Math.PI * 2 }) },
+    peek: { ms: [3800, 3800], mood: 'curious', go: (q, t, p) => {
+      if (p > 0.6 && !q.did) { q.did = true; cockpit?.bump(); }
+      return { x: 0.47, y: 0.37, s: 2.3, bubble: p > 0.6 ? '*tock tock*' : '(o_o)?' }; } },
+    race: { ms: [4200, 4200], mood: 'dash', go: (q, t, p) => ({ x: 0.5 + Math.sin(p * Math.PI) * 0.04, y: 0.27 - Math.sin(p * Math.PI) * 0.06, s: 1 - Math.sin(p * Math.PI) * 0.65 }) },
+    nap: { ms: [6000, 7000], mood: 'sleep', go: (q, t, p) => ({ x: 0.58, y: 0.31 + p * 0.03, s: 0.95, rot: Math.sin(t) * 0.1 }) },
+    bug: { ms: [3500, 3500], mood: 'kill', go: (q, t, p) => ({ x: 0.5 + Math.sin(t * 7) * 0.1, y: 0.27 + Math.sin(t * 11) * 0.04, s: 1, bubble: 'BZZT!' }) },
+  };
+  const pick = () => {
+    if (ACTS.billboard.ok() && ava.act !== 'billboard' && Math.random() < 0.7) return ['billboard', ACTS.billboard];
+    const pool = Object.entries(ACTS).filter(([n, a]) => n !== ava.act && n !== 'billboard').flatMap(o => o[0] === 'cruise' || o[0] === 'scan' ? [o, o] : [o]);
+    return pool[Math.floor(Math.random() * pool.length)];
+  };
+  const droneBrain = ({ t, now }) => {
+    if (!ava.act || now > ava.until) { const [n, a] = pick(); Object.assign(ava, { act: n, t0: now, until: now + a.ms[0] + Math.random() * (a.ms[1] - a.ms[0]), did: false }); }
+    const a = ACTS[ava.act], p = Math.min(1, (now - ava.t0) / (ava.until - ava.t0)), want = a.go(ava, t, p), st = splash?.curve?.() ?? 0;
+    const f = ava.act === 'roll' ? 1 : 0.06;
+    const wx = Math.max(0.12, Math.min(0.88, want.x - st * 0.06)), wy = Math.max(0.14, Math.min(0.46, want.y));   // she stays in the windshield
+    ava.x += (wx - ava.x) * f; ava.y += (wy - ava.y) * f; ava.s += ((want.s ?? 1) - ava.s) * 0.06; ava.rot = want.rot ?? ava.rot * 0.9; ava.scan += ((want.scan ?? 0) - ava.scan) * 0.08;
+    return { x: ava.x, y: ava.y, scale: ava.s, rot: ava.rot, mood: a.mood, bubble: want.bubble };
+  };
+  const onDrone = ({ ctx, x, y, k, W, H, t, behind }) => { if (behind) ava.screen = { x, y };   // the scan: a teal cone sweeping the road, a scanline, a readout
+    if (!behind || ava.scan < 0.05) return;
+    const a = ava.scan, sweep = Math.sin(t * 1.6) * W * 0.12, gx = x + sweep, gy = H * 0.5, half = W * 0.09;
+    ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.22 * a;
+    const g = ctx.createLinearGradient(0, y, 0, gy); g.addColorStop(0, '#20d6c7'); g.addColorStop(1, 'rgba(32,214,199,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(x, y + 10 * k); ctx.lineTo(gx - half, gy); ctx.lineTo(gx + half, gy); ctx.closePath(); ctx.fill();
+    const f = (t * 0.9) % 1, ly = y + (gy - y) * f, cx = x + (gx - x) * f;
+    ctx.globalAlpha = 0.6 * a; ctx.fillStyle = '#a6fcdb'; ctx.fillRect(Math.round(cx - half * f), Math.round(ly), Math.round(half * 2 * f), Math.max(1, Math.round(H * 0.003)));
+    ctx.restore();
+    ctx.globalAlpha = a; ctx.font = `${Math.round(H * 0.022)}px VT323, monospace`; ctx.fillStyle = '#a6fcdb'; ctx.textAlign = 'left';
+    ctx.fillText(`SCAN ${String(Math.floor((t * 37) % 100)).padStart(2, '0')}% · ${['SCHROTT', 'WASSER?', 'NICHTS', 'KAKTUS', 'BEUTE!'][Math.floor(t / 1.3) % 5]}`, gx + half * 1.1, gy - H * 0.02); ctx.globalAlpha = 1;
+  };
+
+  // ---------- start ----------
+  let splash = null;
+  startSplash(document.getElementById('scene'), { drive: true, runner: false, nowPlaying: false, onGround: billboard, droneBrain, onDrone,
+    data: { horizon: 44, ground: ROAD, curve: { pan: 7 } } }).then(x => { splash = x; window.splash = x; });
+  // stickers: reached achievements from the savegame (online, else this browser); ?stickers=all shows every one
+  const all = new URLSearchParams(location.search).get('stickers') === 'all';
+  let done = {};
+  try { const r = await fetch('/api/save', { headers: { accept: 'application/json' }, cache: 'no-store' }); if (r.ok && (r.headers.get('content-type') || '').includes('json')) done = (await r.json()).save?.achievements?.done || {}; } catch { }
+  if (!Object.keys(done).length) try { done = JSON.parse(localStorage.getItem('nomadgirl-save') || 'null')?.achievements?.done || {}; } catch { }
+  if (all) done = Object.fromEntries(Object.keys(ACH).map(k => [k, true]));
+  const stickers = await achievementStickers({ achievements: ACH, recipes: REC, items: IT, assets: A }, done, BASE);
+  cockpit = await startCockpit(document.getElementById('cockpit'), { cfg: CK, A, base: BASE, stickers, steerValue: () => splash?.curve?.() ?? 0, speed: () => 1 });
+
+  addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown' || e.key === 's') { sel = (sel + 1) % links.length; show(); e.preventDefault(); }
+    if (e.key === 'ArrowUp' || e.key === 'w') { sel = (sel - 1 + links.length) % links.length; show(); e.preventDefault(); }
+    if (e.key === 'Enter' || e.key === ' ') links[sel].click();
+  });
+  let held = 0, next = 0, wasA = true;
   const poll = now => {
     const g = navigator.getGamepads ? [...navigator.getGamepads()].find(p => p && p.connected) : null;
     if (g) {
       const b = i => !!g.buttons[i] && (g.buttons[i].pressed || g.buttons[i].value > 0.5), ax = g.axes[0] || 0, ay = g.axes[1] || 0;
       const dir = ay < -0.5 || b(12) ? -1 : ay > 0.5 || b(13) ? 1 : 0;
-      const any = dir || b(0) || Math.abs(ax) > 0.3;
-      if (any) document.documentElement.classList.add('pad');
-      if (dir && (dir !== held || now >= next)) { focus(sel < 0 ? (dir > 0 ? 0 : links.length - 1) : sel + dir); next = now + (dir !== held ? 380 : 160); }
+      if (dir && (dir !== held || now >= next)) { sel = (sel + dir + links.length) % links.length; show(); next = now + (dir !== held ? 380 : 160); }
       held = dir;
-      const steer = Math.abs(ax) > 0.25 ? Math.sign(ax) * Math.min(1, (Math.abs(ax) - 0.25) / 0.65) : b(14) ? -1 : b(15) ? 1 : 0;
-      window.splash?.steer?.(steer);
-      const a = b(0);
-      if (a && !wasA) { if (sel < 0) focus(0); else links[sel].click(); }
-      wasA = a;
+      splash?.steer?.(Math.abs(ax) > 0.25 ? Math.sign(ax) * Math.min(1, (Math.abs(ax) - 0.25) / 0.65) : b(14) ? -1 : b(15) ? 1 : 0);
+      const a = b(0); if (a && !wasA) links[sel].click(); wasA = a;
     }
+    const k = Math.max(innerWidth / PW, innerHeight / PH), ox = (innerWidth - PW * k) / 2, oy = (innerHeight - PH * k) / 2, L = cockpit.lcd();
+    Object.assign(lcd.style, { left: `${ox + (L.x + 1) * k}px`, top: `${oy + (L.y + 1) * k}px`, width: `${(L.w - 2) * k}px`, height: `${(L.h - 2) * k}px`, fontSize: `${Math.round(L.h * k / 5.4)}px`, lineHeight: '1.02' });
     requestAnimationFrame(poll);
   };
   requestAnimationFrame(poll);
-  window.menu = { focus, selected: () => sel, links: () => links.map(a => a.textContent) };
+  window.cockpitMenu = { selected: () => sel, items: () => links.map(a => a.textContent), ava: () => ava.act, avaAt: () => ava.screen, stickers: () => stickers.length, billboard: () => BB.z };
 </script>
 </body>
 </html>

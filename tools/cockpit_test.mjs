@@ -1,4 +1,4 @@
-// #124 Cockpit-Hauptmenü (/cockpit): Teile geladen, Menü im Radio, Lenken dreht Lenkrad und Straße, Sticker, Billboard, AvA.
+// #124 Cockpit-Hauptmenü (Startseite /): Teile geladen, Menü im Radio, Lenken dreht Lenkrad und Straße, Sticker, Billboard, AvA.
 // Run: node tools/cockpit_test.mjs   (server on :8766, e.g. npm run serve; or via npm run test:browser)
 import { chromium } from 'playwright';
 
@@ -8,7 +8,7 @@ const page = await browser.newPage({ viewport: { width: 1600, height: 900 } });
 const errors = [], ok = [], pageErrors = [];
 page.on('pageerror', e => pageErrors.push(e.message));
 const check = (name, cond, info) => { if (cond) ok.push(name); else errors.push(`${name}: ${JSON.stringify(info)}`); };
-await page.goto(base + 'cockpit.html?stickers=all');
+await page.goto(base + 'index.html?stickers=all');
 await page.waitForFunction(() => window.cockpitMenu && window.splash, null, { timeout: 30000 });
 await page.waitForTimeout(1500);
 let r = await page.evaluate(() => { const l = document.getElementById('lcd'), b = l.getBoundingClientRect(); return { items: cockpitMenu.items(), vis: l.querySelectorAll('a:not([hidden])').length, box: [b.x, b.y, b.width, b.height], stickers: cockpitMenu.stickers() }; });

@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 20.11. Code → Ava: #124 Cockpit ist live als Startseite (/), alte Startseite unter /classic.
 - 20.11. Code → Ava: #124 Cockpit in hübsch unter /cockpit (PixelLab-Teile modular, Clutter-Tabelle, Achievement-Sticker, neue Straße rechts, Billboard mit Anzeige + Untertitel, AvA-Verhalten). PixelLab 85. Offen: ob das Cockpit die Startseite ersetzt; Billboard rechts wäre hinter der Sonnenblende, ⚠️ vorläufig links.
 - 20.11. Code → Ava: #123 Cockpit-Mockup aus Code unter /cockpit (Daniel wählte den Van-Cockpit-Blick). Nächster Schritt nach Daniels Abnahme: Cockpit-Grafiken mit PixelLab, dann ersetzt es die Startseite.
 - 20.11. Code → Ava: #122 Logo-Straße mit gleicher Textur und Höhe wie der Schriftzug, Mittelstreifen durchgezogen, Now-Playing-Kassette kleiner (nur halb im Bild). Drei Hauptmenü-Vorschläge zur Abnahme bei Daniel: A Highway-Schilder, B Van-Cockpit mit Radio-Menü, C Asphalt-Platten (Bilder `assets/ui/menu/candidates/`). PixelLab 20.

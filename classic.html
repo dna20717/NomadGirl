@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NomadGirl">
+<title>NomadGirl</title>
+<script>try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme') || 'gray'; } catch (e) { document.documentElement.dataset.theme = 'gray'; }</script>
+<link rel="stylesheet" href="game/ui.css">
+<style>
+  html, body { height: 100%; }
+  body { margin: 0; overflow: hidden; background: #292330; color: var(--ui-text); font-family: var(--ui-font); }
+  #scene { position: fixed; inset: 0; width: 100vw; height: 100vh; image-rendering: pixelated; image-rendering: crisp-edges; }
+  main { position: relative; z-index: 1; box-sizing: border-box; width: min(460px, 92vw); margin: 0 0 0 max(4vw, 24px); min-height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 32px 0; }
+  .card { padding: 24px; border-radius: var(--ui-r-pane); background: color-mix(in srgb, var(--ui-bg) 72%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid color-mix(in srgb, var(--ui-border) 70%, transparent); box-shadow: var(--ui-shadow); }
+  h1 { font-family: var(--ui-pixel); font-weight: normal; font-size: 64px; line-height: .9; margin: 0; letter-spacing: 1px; }
+  h1.logo { margin: -14px 0 -6px -10px; line-height: 0; }   /* #119 the pixel logo (PixelLab), scaled sharp */
+  h1.logo img { width: min(100%, 420px); height: auto; image-rendering: pixelated; filter: drop-shadow(0 0 14px rgba(232, 106, 115, .35)); }
+  h1.logo .logo-canvas { width: min(760px, 94vw); height: auto; margin: -34px 0 -44px -46px; image-rendering: pixelated; filter: drop-shadow(0 6px 18px rgba(0,0,0,.45)); }   /* #120 animated, wider than the card */
+  .sub { color: var(--ui-text2); margin: 8px 0 22px; line-height: 1.5; }
+  nav { display: grid; gap: 10px; }
+  a, .soon { display: flex; align-items: center; gap: 14px; padding: 13px 16px; border-radius: var(--ui-r-pane); border: 1px solid var(--ui-border); background: var(--ui-panel); color: var(--ui-text); text-decoration: none; }
+  a:hover { border-color: var(--ui-acc-line); }
+  nav a.pad-focus { border-color: var(--ui-acc-line); box-shadow: 0 0 0 2px var(--ui-acc-line), 0 0 18px color-mix(in srgb, var(--ui-acc-line) 60%, transparent); transform: translateX(4px); }
+  nav a { transition: transform 120ms ease-out, box-shadow 120ms; }
+  .pad-hint { display: none; margin-top: 12px; font-size: 12px; color: var(--ui-text3); }
+  .pad .pad-hint { display: block; }
+  a.main { background: var(--ui-acc-soft); border-color: var(--ui-acc-line); }
+  b { display: block; font-weight: 600; }
+  small { color: var(--ui-text3); }
+  .soon { opacity: .5; }
+  footer { margin-top: 18px; font-size: 12px; color: var(--ui-text3); }
+  footer a { display: inline; padding: 0; border: 0; background: none; color: var(--ui-text2); text-decoration: underline; }
+  .preview main { display: none; }
+  @media (max-width: 760px), (max-aspect-ratio: 23/20) {
+    main { margin: 0 auto; justify-content: flex-start; min-height: 0; }
+    .card { padding: 18px; }
+    h1 { font-size: 48px; }
+    .sub { display: none; }
+    a small { display: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="scene" aria-label="Leyla rennt durch die Wastelands auf uns zu"></canvas>
+<main>
+  <div class="card">
+    <h1 class="logo"><img src="projects/nomadgirl/assets/ui/logo/logo.png" alt="NomadGirl" width="256" height="128"></h1>
+    <p class="sub">Leyla lebt in den Wastelands rund um BigCityDelta in ihrem Rig. Sie plündert, was andere liegen lassen, und kocht erstaunlich gut.</p>
+    <nav id="nav"></nav>
+    <p class="pad-hint">Stick hoch/runter: wählen · A: los · Stick links/rechts: Kurve laufen</p>
+    <footer>GPL v3 oder später · <a href="https://github.com/dna20717/NomadGirl">Quelltext auf GitHub</a> · <span id="version" title="Version dieser Seite (Commit und Zeit des Builds)">…</span> · <span id="dataset" title="Welche Spieldaten dieses Gerät lädt (#073)">Datenset: Standard</span></footer>
+  </div>
+</main>
+<script type="module">
+  import { icon } from './game/icons.js';
+  if (new URLSearchParams(location.search).has('preview')) document.documentElement.classList.add('preview');   // workshop preview: scene only
+  import { startSplash } from './game/splash/splash.js';
+  import { loadVersion } from './game/version.js';
+  loadVersion().then(v => { const e = document.getElementById('version'); e.textContent = v.text; if (v.commit) e.title += ': ' + v.commit; window.version = v; });
+  startSplash(document.getElementById('scene')).then(x => { window.splash = x; }).catch(e => console.warn('Startseite ohne Szene:', e));
+  const nav = document.getElementById('nav');
+  const entry = (href, ic, title, text, cls = '') => {
+    const e = document.createElement(href ? 'a' : 'div');
+    if (href) e.href = href;
+    e.className = cls || (href ? '' : 'soon');
+    e.append(icon(ic, 26));
+    const t = document.createElement('span');
+    t.innerHTML = `<b>${title}</b><small>${text}</small>`;
+    e.append(t);
+    nav.append(e);
+  };
+  entry('game.html?camp', 'play', 'Spiel', 'Camp mit Rig, Lagerfeuer und Companions, Warroom, Runs mit Spielstand (Tastatur oder Controller)', 'main');
+  entry('intro.html', 'image', 'Intro', 'Wie alles anfing: Leyla, der Cryo-Tank und drei Tage Notstrom. Ein Comic zum Durchblättern');
+  entry('game.html', 'target', 'Testraum', 'Parkour mit Slide, Leiter, Seil, Kanten und Van (Tastatur oder Controller)');
+  entry('workshop.html', 'workbench', 'Werkstatt', 'Alle Aspekte des Spiels einstellen: Leyla, Waffen, Rezepte, Rig, Welt');
+  entry('https://github.com/dna20717/NomadGirl/blob/main/docs/design.md', 'data', 'Design-Dokument', 'Pitch, Core Loop, Mechaniken, Fahrplan');
+  // #073 Datensets: which variant of the game data this device plays; A / click goes to the next one, the status bar says which
+  entry('#', 'layers', 'Datenset: Standard', 'Varianten der Spieldaten aus der Werkstatt · klicken zum Wechseln', 'dataset');
+  (async () => {
+    const { listSets, activeSetId, chooseSet } = await import('./engine/sets.js');
+    const { cloudFiles } = await import('./game/cloud_store.js');
+    const cloud = await cloudFiles().catch(() => null);
+    const drafts = cloud ? null : await (await import('./game/store.js')).openStore({ project: 'nomadgirl', withoutAssets: true }).then(st => st.all()).catch(() => null);   // local workshop: its sets are drafts
+    let sets = cloud?.files?.has('sets/index.json') ? cloud.files.get('sets/index.json') : drafts?.has('sets/index.json') ? drafts.get('sets/index.json') : await listSets({ json: async p => { const r = await fetch('projects/nomadgirl/' + p, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return r.json(); } });
+    sets = [{ id: '', name: 'Standard' }, ...(Array.isArray(sets) ? sets.filter(s => s?.id) : [])];
+    const link = nav.querySelector('a.dataset'), bar = document.getElementById('dataset');
+    const show = () => { const id = activeSetId(), s = sets.find(x => x.id === id) || sets[0]; link.querySelector('b').textContent = `Datenset: ${s.name}`; link.querySelector('small').textContent = sets.length > 1 ? `${sets.length} zur Wahl · klicken zum Wechseln${s.description ? ' · ' + s.description : ''}` : 'Noch keine Varianten · in der Werkstatt „Speichern unter …“'; bar.textContent = `Datenset: ${s.name}`; window.dataSets = { active: s.id, sets: sets.map(x => x.id) }; };
+    link.addEventListener('click', e => { e.preventDefault(); const i = sets.findIndex(x => x.id === activeSetId()); chooseSet(sets[(i + 1) % sets.length].id); show(); });
+    show();
+  })().catch(e => console.warn('Datensets:', e));
+
+  // controller (Daniel, 11.11.2026): stick up/down chooses an entry, A opens it, stick sideways lets Leyla run a bend (game/splash/splash.js)
+  const links = [...nav.querySelectorAll('a')];
+  let sel = -1, held = 0, next = 0, wasA = true;
+  const focus = i => { sel = (i + links.length) % links.length; links.forEach((a, k) => a.classList.toggle('pad-focus', k === sel)); links[sel].focus({ preventScroll: true }); };
+  addEventListener('mousemove', () => { if (sel >= 0) { links.forEach(a => a.classList.remove('pad-focus')); sel = -1; document.documentElement.classList.remove('pad'); } });
+  const poll = now => {
+    const g = navigator.getGamepads ? [...navigator.getGamepads()].find(p => p && p.connected) : null;
+    if (g) {
+      const b = i => !!g.buttons[i] && (g.buttons[i].pressed || g.buttons[i].value > 0.5), ax = g.axes[0] || 0, ay = g.axes[1] || 0;
+      const dir = ay < -0.5 || b(12) ? -1 : ay > 0.5 || b(13) ? 1 : 0;
+      const any = dir || b(0) || Math.abs(ax) > 0.3;
+      if (any) document.documentElement.classList.add('pad');
+      if (dir && (dir !== held || now >= next)) { focus(sel < 0 ? (dir > 0 ? 0 : links.length - 1) : sel + dir); next = now + (dir !== held ? 380 : 160); }
+      held = dir;
+      const steer = Math.abs(ax) > 0.25 ? Math.sign(ax) * Math.min(1, (Math.abs(ax) - 0.25) / 0.65) : b(14) ? -1 : b(15) ? 1 : 0;
+      window.splash?.steer?.(steer);
+      const a = b(0);
+      if (a && !wasA) { if (sel < 0) focus(0); else links[sel].click(); }
+      wasA = a;
+    }
+    requestAnimationFrame(poll);
+  };
+  requestAnimationFrame(poll);
+  window.menu = { focus, selected: () => sel, links: () => links.map(a => a.textContent) };
+</script>
+</body>
+</html>

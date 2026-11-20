@@ -32,7 +32,7 @@ await page.goto(B + 'game.html?camp&new'); await page.waitForFunction(() => wind
 v = await page.evaluate(() => ({ set: window.__nomadData?.set, run: game.scene.getScene('play').data_.leyla.movement.runSpeed }));
 check('Spiel: lädt das aktive Datenset', v.set?.id === 'schnelle_leyla' && v.run === 777, v);
 // main menu: status bar and switching
-await page.goto(B + 'index.html'); await page.waitForFunction(() => window.dataSets, null, { timeout: 20000 });
+await page.goto(B + 'classic.html'); await page.waitForFunction(() => window.dataSets, null, { timeout: 20000 });
 v = await page.evaluate(() => ({ bar: document.getElementById('dataset').textContent, entry: document.querySelector('nav a.dataset b').textContent }));
 check('Hauptmenü: Statusleiste und Eintrag zeigen das aktive Set', v.bar === 'Datenset: Schnelle Leyla' && v.entry === 'Datenset: Schnelle Leyla', v);
 await page.click('nav a.dataset');
