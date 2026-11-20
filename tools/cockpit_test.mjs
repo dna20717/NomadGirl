@@ -27,6 +27,10 @@ const acts = new Set();
 for (let i = 0; i < 12; i++) { acts.add(await page.evaluate(() => cockpitMenu.ava())); await page.waitForTimeout(1200); }
 r = await page.evaluate(() => cockpitMenu.avaAt());
 check('AvA wechselt ihre Beschäftigung und bleibt in der Scheibe', acts.size >= 2 && r && r.y > 0 && r.y < 900 * 0.5 && r.x > 0 && r.x < 1600, { acts: [...acts], at: r });
+r = await page.evaluate(() => new Promise(res => { cockpitMenu.bump(); let n = 0, worst = 0; const f = () => { worst = Math.max(worst, cockpitMenu.lcdDrift()); if (++n < 40) requestAnimationFrame(f); else res(worst); }; requestAnimationFrame(f); }));
+check('Radio-Text bleibt beim Schlagloch im Display (gleicher Bildtakt)', r < 1, r);
+r = await page.evaluate(() => new Promise(res => { const a = splash.curve(); setTimeout(() => res([a, splash.curve()]), 2500); }));
+check('Ohne Eingabe lenkt der Fahrer leicht (Lenkrad dreht sich)', r[0] !== r[1] && Math.max(Math.abs(r[0]), Math.abs(r[1])) > 0.02, r);
 check('Keine Fehler auf der Seite', !pageErrors.length, pageErrors);
 await browser.close();
 for (const n of ok) console.log('✓', n);

@@ -82,7 +82,15 @@
     if (posterImg) { const k = W / posterImg.width; g.save(); g.translate(W, 0); g.scale(-1, 1); g.drawImage(posterImg, 0, H - posterImg.height * k + 6, W, posterImg.height * k); g.restore(); }   // mirrored: Leyla and the van on the right
     const shade = g.createLinearGradient(0, 0, W * 0.75, 0); shade.addColorStop(0, 'rgba(20,16,19,.75)'); shade.addColorStop(1, 'rgba(20,16,19,0)'); g.fillStyle = shade; g.fillRect(0, 0, W, H - 22);
     const logo = document.querySelector('h1.logo canvas');
-    if (logo) { const k = W * 0.74 / logo.width; g.drawImage(logo, -W * 0.05, -H * 0.2, logo.width * k, logo.height * k); }
+    if (logo) {   // Daniel: „mit einer Outline in einer Kontrastfarbe besser lesbar“: a cream outline round the dark asphalt letters
+      const k = W * 0.78 / logo.width, lw = logo.width * k, lh = logo.height * k, lx = -W * 0.015, ly = -H * 0.22;
+      if (!drawAd.sil || drawAd.sil.width !== Math.ceil(lw)) { drawAd.sil = Object.assign(document.createElement('canvas'), { width: Math.ceil(lw), height: Math.ceil(lh) }); }
+      const sc = drawAd.sil.getContext('2d'); sc.globalCompositeOperation = 'source-over'; sc.clearRect(0, 0, lw, lh); sc.drawImage(logo, 0, 0, lw, lh);
+      const ring = (col, r) => { sc.globalCompositeOperation = 'source-in'; sc.fillStyle = col; sc.fillRect(0, 0, lw, lh);
+        for (let a = 0; a < 16; a++) g.drawImage(drawAd.sil, lx + Math.round(Math.cos(a / 8 * Math.PI) * r), ly + Math.round(Math.sin(a / 8 * Math.PI) * r)); };
+      ring('#060608', 6); ring('#fef3c0', 4);   // dark rim outside, cream outline inside
+      g.drawImage(logo, lx, ly, lw, lh);
+    }
     g.fillStyle = 'rgba(6,6,8,.82)'; g.fillRect(0, H - 22, W, 22); g.fillStyle = '#fa6a0a'; g.fillRect(0, H - 23, W, 2);
     g.font = '18px VT323, monospace'; g.textBaseline = 'middle'; g.textAlign = 'center'; g.fillStyle = '#ffd541';
     g.fillText(CK.tagline || '', W / 2, H - 11);
@@ -164,9 +172,15 @@
   if (!Object.keys(done).length) try { done = JSON.parse(localStorage.getItem('nomadgirl-save') || 'null')?.achievements?.done || {}; } catch { }
   if (all) done = Object.fromEntries(Object.keys(ACH).map(k => [k, true]));
   const stickers = await achievementStickers({ achievements: ACH, recipes: REC, items: IT, assets: A }, done, BASE);
-  cockpit = await startCockpit(document.getElementById('cockpit'), { cfg: CK, A, base: BASE, stickers, steerValue: () => splash?.curve?.() ?? 0, speed: () => 1 });
+  // the menu text follows the LCD in the cockpit's own animation frame (same offset as the pixels: leaning, potholes)
+  const placeLcd = L => { const k = Math.max(innerWidth / PW, innerHeight / PH), ox = (innerWidth - PW * k) / 2, oy = (innerHeight - PH * k) / 2;
+    lcd.style.cssText = `left:${ox + (L.x + 1) * k}px;top:${oy + (L.y + 1) * k}px;width:${(L.w - 2) * k}px;height:${(L.h - 2) * k}px;font-size:${Math.round(L.h * k / 5.4)}px;line-height:1.02`; };
+  cockpit = await startCockpit(document.getElementById('cockpit'), { cfg: CK, A, base: BASE, stickers, steerValue: () => splash?.curve?.() ?? 0, speed: () => 1, onFrame: placeLcd });
 
+  const keys = new Set();
+  addEventListener('keyup', e => keys.delete(e.key));
   addEventListener('keydown', e => {
+    keys.add(e.key);
     if (e.key === 'ArrowDown' || e.key === 's') { sel = (sel + 1) % links.length; show(); e.preventDefault(); }
     if (e.key === 'ArrowUp' || e.key === 'w') { sel = (sel - 1 + links.length) % links.length; show(); e.preventDefault(); }
     if (e.key === 'Enter' || e.key === ' ') links[sel].click();
@@ -174,20 +188,23 @@
   let held = 0, next = 0, wasA = true;
   const poll = now => {
     const g = navigator.getGamepads ? [...navigator.getGamepads()].find(p => p && p.connected) : null;
+    // Daniel: „das Lenkrad könnte sich drehen“: the driver corrects all the time and follows gentle bends; arrows / stick take over
+    const t = now / 1000, auto = 0.32 * Math.sin(t * 0.23) + 0.18 * Math.sin(t * 0.61 + 1) + 0.04 * Math.sin(t * 2.3);
+    const steered = keys.has('ArrowLeft') || keys.has('ArrowRight') || (g && (Math.abs(g.axes[0] || 0) > 0.25 || g.buttons[14]?.pressed || g.buttons[15]?.pressed));
+    if (!steered) splash?.steer?.(auto); else if (!g) splash?.steer?.(0);
     if (g) {
       const b = i => !!g.buttons[i] && (g.buttons[i].pressed || g.buttons[i].value > 0.5), ax = g.axes[0] || 0, ay = g.axes[1] || 0;
       const dir = ay < -0.5 || b(12) ? -1 : ay > 0.5 || b(13) ? 1 : 0;
       if (dir && (dir !== held || now >= next)) { sel = (sel + dir + links.length) % links.length; show(); next = now + (dir !== held ? 380 : 160); }
       held = dir;
-      splash?.steer?.(Math.abs(ax) > 0.25 ? Math.sign(ax) * Math.min(1, (Math.abs(ax) - 0.25) / 0.65) : b(14) ? -1 : b(15) ? 1 : 0);
+      if (steered) splash?.steer?.(Math.abs(ax) > 0.25 ? Math.sign(ax) * Math.min(1, (Math.abs(ax) - 0.25) / 0.65) : b(14) ? -1 : b(15) ? 1 : 0);
       const a = b(0); if (a && !wasA) links[sel].click(); wasA = a;
     }
-    const k = Math.max(innerWidth / PW, innerHeight / PH), ox = (innerWidth - PW * k) / 2, oy = (innerHeight - PH * k) / 2, L = cockpit.lcd();
-    Object.assign(lcd.style, { left: `${ox + (L.x + 1) * k}px`, top: `${oy + (L.y + 1) * k}px`, width: `${(L.w - 2) * k}px`, height: `${(L.h - 2) * k}px`, fontSize: `${Math.round(L.h * k / 5.4)}px`, lineHeight: '1.02' });
     requestAnimationFrame(poll);
   };
   requestAnimationFrame(poll);
-  window.cockpitMenu = { selected: () => sel, items: () => links.map(a => a.textContent), ava: () => ava.act, avaAt: () => ava.screen, stickers: () => stickers.length, billboard: () => BB.z };
+  window.cockpitMenu = { selected: () => sel, items: () => links.map(a => a.textContent), ava: () => ava.act, avaAt: () => ava.screen, stickers: () => stickers.length, billboard: () => BB.z, ad: () => ad.toDataURL(),
+    lcdDrift: () => { const L = cockpit.lcd(), k = Math.max(innerWidth / PW, innerHeight / PH), ox = (innerWidth - PW * k) / 2, oy = (innerHeight - PH * k) / 2; return Math.abs(parseFloat(lcd.style.left) - (ox + (L.x + 1) * k)) + Math.abs(parseFloat(lcd.style.top) - (oy + (L.y + 1) * k)); }, bump: () => cockpit.bump() };
 </script>
 </body>
 </html>

@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 20.11.2026: **Cockpit-Feinschliff** (#124, Daniel): Teile in dreifacher Auflösung, Lenkrad dreht sich (der Fahrer lenkt sanft mit), Logo auf dem Plakat mit Kontur, Radio-Text klebt beim Lenken und in Schlaglöchern im Display.
 - 20.11.2026: **Cockpit ist die Startseite** (#124, Daniel: „Bring es auf Prod“): / zeigt das Van-Cockpit, die alte Startseite liegt unter /classic; Datenset-Wahl im Radio-Menü, Version unten.
 - 20.11.2026: **Cockpit in hübsch** (#124, Daniel): Das Van-Cockpit (/cockpit) besteht aus PixelLab-Teilen (Hülle, Lenkrad, Instrumente, Radio, Spiegel, 16 Stücke Kram), alles in Startseite › Cockpit einstellbar; Achievements kleben als Sticker im Innenraum; neue Straße aus PixelLab-Asphalt und Wüstenlehm mit US-Markierungen, wir fahren rechts; das Billboard (rostiges Gerüst) zeigt eine echte Anzeige mit Motiv, animiertem Logo und dem Untertitel „A Game about finding everything by leaving all behind“; AvA fliegt vor dem Van, scannt, fotografiert das Billboard, rollt, klopft an die Scheibe, rast voraus, döst und jagt Käfer.
 - 20.11.2026: **Cockpit-Mockup: Logo auf dem Billboard** (#123, Daniel): Das animierte Asphalt-Logo steht auf einem beleuchteten Billboard am Straßenrand, auf das der Van zufährt; es rauscht vorbei, das nächste taucht auf.
