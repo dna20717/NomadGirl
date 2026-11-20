@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 20.11. Code → Ava: #125 **Aufräumen + technische Schulden** läuft, nebenbei Konzept für 3 Spielstand-Plätze.
 - 20.11. Code → Ava: **HNC (Übergabe)**. Stand `main` nach #121–#124. Neu seit der letzten Übergabe: #121 Camp ohne sichtbares Ende + AvAs Funkreichweite + Rig offen/zu als Leyla (O/P/R3, Yoga geparkt); #122 Logo-Straße aus einem Guss, Kassette kleiner; #123/#124 **Startseite ist jetzt das Van-Cockpit** (/; alte unter /classic): PixelLab-Teile modular in Startseite › Cockpit (Hülle, Lenkrad, Instrumente, Radio mit Menü im LCD, Spiegel, 16 Stücke Kram als Tabelle), Achievement-Sticker, eigene Straße (rechte Spur), Billboard mit Anzeige + Untertitel „A Game about finding everything by leaving all behind“, AvA-Verhalten (scannen, fotografieren, Rolle, anklopfen, voraus rasen, dösen, Käfer jagen), dreifache Auflösung, Fahrer lenkt sanft, Scheibe mit Schmutz. PixelLab Sitzung 1125, übrig 2055. Offen/⚠️: Billboard steht links (rechts verdeckt die Sonnenblende); `cockpit.glass` noch nicht im Schema; Werkstatt-Vorschau der Startseite zeigt noch die klassische Seite; Fahrer-Sonnenblende `ck_visor` und 10 Kram-Stücke liegen bereit, unplatziert; Billboard-Werbung für Lore-Marken als Idee.
 - 20.11. Code → Ava: #124 Cockpit ist live als Startseite (/), alte Startseite unter /classic.
 - 20.11. Code → Ava: #124 Cockpit in hübsch unter /cockpit (PixelLab-Teile modular, Clutter-Tabelle, Achievement-Sticker, neue Straße rechts, Billboard mit Anzeige + Untertitel, AvA-Verhalten). PixelLab 85. Offen: ob das Cockpit die Startseite ersetzt; Billboard rechts wäre hinter der Sonnenblende, ⚠️ vorläufig links.
@@ -252,6 +253,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #125 Aufräumen: technische Schulden, Cockpit-Reste, Backlog neu + Konzept Spielstand-Plätze
+- **Status:** läuft (20.11.) · angelegt 20.11. von Code (Daniel: „Räume alles auf und arbeite die technischen Schulden ab. Während du das tust, kannst du ein Konzept für eine Spielstand Verwaltung von bis zu 3 savegames erstellen (noch nicht mit einbauen)“)
+- **Für:** Code
+- **Lesen:** docs/backlog.md › C, docs/features/online.md › Spielstand, docs/features/splash.md
+- **Auftrag:** Backlog C abarbeiten (C10 Umbenennungen im Spielstand nachziehen zuerst), lose Enden aus #123/#124 (Schema `cockpit.glass`, Werkstatt-Vorschau), Backlog auf Stand 20.11. bringen; Konzept für bis zu 3 Spielstände als Doku (nicht bauen).
+- **Fertig, wenn:** Tests grün, `ng check` stimmig, Backlog aktuell, Konzept in `docs/`.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #118 Innen-Deko: Wohnzellen, Möbel, Lampen, Lichterketten, wachsende Pinnwand, Trophäen-Ständer
 - **Status:** fertig (20.11.) · angelegt 20.11. von Code (Daniels Abnahme der Innen-Deko-Kandidaten)
