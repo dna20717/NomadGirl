@@ -33,6 +33,8 @@ const make = (C, o) => {
   return { id: slug(o.name), name: o.name, unique: !!o.unique, talent: t.name || '', function: t.function || null, also: t.also || null, brand: o.brand || t.brand || null, character: o.character || null, bits: o.bits,
     effect: e.text, stat: e.stat, value: e.value, quirk: o.quirk || '', quirkKind: o.quirkKind || null, quirkEffect: o.quirkEffect || C.quirks.find(q => q.text === o.quirk)?.effect || null, wish: o.wish || '', home: o.home || '', description: o.description || '', ...(o.duelHp ? { duelHp: o.duelHp } : {}), ...(o.duelNoise != null ? { duelNoise: o.duelNoise / 100 } : {}) };
 };
+// #103 an Entity from given parts (a radio DJ): same shape as a rolled one, so face, card and later the duel know it
+export function entityFrom(D, o) { return make(config(D), o); }
 // #057: one of the hand-made unique Entities as a full Entity (the Silo-KI lives in its terminal, not in the Durchgang's set)
 export function uniqueEntity(D, name) { const C = config(D), u = C.unique.find(x => x.name === name); return u ? make(C, { ...u, unique: true }) : null; }
 

@@ -3,6 +3,7 @@
 // game/radio_audio.js), and what the DJ says between the songs. The talk knows the game: brand ads (Lore › Marken › Werbung), the
 // navigator's rain (#087), the fronts of the turf war (#089), rumours about places on the travel map, lines from the workshop.
 // Everything from the area „Radio“ (data/radio.json).
+import { entityFrom } from './glitchlings.js';
 import { rainOutlook } from './weather_fx.js';
 import { fronts } from './turf_war.js';
 import { repOf, levelOf } from './reputation.js';
@@ -27,6 +28,15 @@ export function radioConfig(D) {
     lines: R.lines || {}, words: { a: R.titleA || [], b: R.titleB || [] }, stations: st, jammed: R.jammed || 'Rauschen. {gang} senden nicht für Leute wie dich.' };
 }
 
+// #103 Radio-DJs als Entities (Daniel 19.11.2026: „mit Porträt im Chip, später auch im Duell“): every station's DJ is a full Entity
+// (Radio › Sender › DJ-Begabung, DJ-Bits), its face from its name, its quirk the DJ line. → Entity or null without a DJ
+export function djOf(D, st) {
+  if (!st?.dj) return null;
+  const T = (D?.glitchlings?.talents || []).filter(t => t?.name), byStyle = { synth: 0, dust: 1, glitch: 2, ambient: 3 }[st.style] ?? 0;
+  const talent = st.djTalent && T.some(t => t.name === st.djTalent) ? st.djTalent : T.length ? T[byStyle % T.length].name : '';
+  const g = entityFrom(D, { name: st.dj, talent, bits: Math.max(1, Math.min(5, Number(st.djBits) || 3)), quirk: st.djLine || '', home: st.name, character: 'DJ' });
+  return { ...g, id: `dj_${st.id}`, dj: st.id, ...(st.gang ? { gang: st.gang } : {}) };
+}
 // a tiny seeded random (mulberry32), so a song with the same seed is the same song
 export function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 const pick = (r, list) => list[Math.floor(r() * list.length)];

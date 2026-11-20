@@ -1832,7 +1832,7 @@ export const AREAS = {
         num('talkSeconds', 'DJ redet', { unit: 's', min: 3 }), num('talkEvery', 'Reden nach jedem n-ten Song', { min: 1 }),
         text('jammed', 'Gestört (Feind der Gang)', { hint: 'Steht statt des Senders, wenn Leyla Feind der Gang ist, der er gehört. {gang}' })] },
       { title: 'Sender', fields: [table('stations', 'Sender', [text('id', 'ID'), text('name', 'Name'), text('freq', 'Frequenz'), select('style', 'Stil', RADIO_STYLES), num('bpm', 'Tempo', { unit: 'bpm', min: 40, max: 200 }),
-        select('key', 'Tonart', [['', 'gewürfelt'], ...RADIO_KEYS]), select('scale', 'Tonleiter', [['', 'nach Stil'], ...RADIO_SCALES]), text('dj', 'DJ'), text('djLine', 'DJ-Spruch'), text('gang', 'Gang', { hint: 'gehört dieser Gang: als Feind nur Rauschen' })])] },
+        select('key', 'Tonart', [['', 'gewürfelt'], ...RADIO_KEYS]), select('scale', 'Tonleiter', [['', 'nach Stil'], ...RADIO_SCALES]), text('dj', 'DJ'), text('djLine', 'DJ-Spruch'), text('djTalent', 'DJ-Begabung', { hint: '#103 der DJ ist eine Entity: Begabung aus Entities › Begabungen (Name), leer = nach Stil' }), num('djBits', 'DJ-Bits', { min: 1, max: 5, hint: 'Stärke der DJ-Entity, leer = 3' }), text('gang', 'Gang', { hint: 'gehört dieser Gang: als Feind nur Rauschen' })])] },
       { title: 'Durchsagen', fields: [table('weights', 'Anteile', [select('kind', 'Art', RADIO_TALK), num('weight', 'Gewicht', { min: 0 })]),
         lines('lines.ident', 'Senderkennung'), lines('lines.ad', 'Werbung', { hint: 'eine Zeile wird gewürfelt, {ad} ist ein Spruch der Marke (Lore › Marken › Werbung oder Slogan)' }), lines('lines.weather', 'Wetter'),
         lines('lines.war', 'Frontbericht'), lines('lines.tip', 'Gerücht'), lines('lines.lore', 'Lore-Häppchen')] },

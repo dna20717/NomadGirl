@@ -1169,3 +1169,4 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .inv-val-src { font-size: 11px; padding: 1px 6px; border-radius: 999px; background: var(--ng-panel2); color: var(--ng-lilac); }
 .inv-val-src.neg { color: var(--ng-red); }
 .inv-val-head { margin: 8px 0 2px; font: 18px/1 VT323, monospace; color: var(--ng-gold); letter-spacing: .04em; }
+.radio-chip .radio-dj { width: 28px; height: 28px; margin: -4px 0 -4px -4px; border-radius: 6px; flex: none; }   /* #103 */

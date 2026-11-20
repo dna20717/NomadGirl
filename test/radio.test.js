@@ -42,3 +42,17 @@ test('Gang-Sender: als Feind nur Rauschen', () => {
   addRep(D, save, 'Static Saints', -80);
   assert.match(jammed(D, save, saint), /Static Saints/);
 });
+
+test('#103 Radio-DJs sind Entities: Name, Begabung, Spruch als Eigenheit, gleich bei jedem Aufruf', async () => {
+  const { djOf } = await import('../game/radio.js');
+  const { loadProject } = await import('../engine/project.js');
+  const { nodeLoader } = await import('../tools/loader.js');
+  const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
+  for (const st of D.radio.stations) {
+    const g = djOf(D, st);
+    assert.equal(g.name, st.dj); assert.equal(g.id, `dj_${st.id}`); assert.ok(g.talent && g.bits >= 1);
+    assert.equal(g.quirk, st.djLine || '');
+    assert.deepEqual(djOf(D, st), g);
+  }
+  assert.equal(djOf(D, { id: 'x', name: 'Ohne DJ' }), null);
+});

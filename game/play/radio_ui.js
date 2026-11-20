@@ -1,9 +1,10 @@
 // Rig-Radio (#090): the chip at the bottom right, the station loop (song → DJ → song …), N for the next station (after the last one: off),
 // the pause menu entry. Plays in the camp and on the drive (TravelMode), never in a POI (the radio is in the rig) and not when muted.
 // What it says comes from game/radio.js, the music from game/radio_audio.js. On/off and the station are kept in this browser.
+import { faceCanvas } from '../glitch_face.js';
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
-import { radioConfig, song, talk, jammed, rng } from '../radio.js';
+import { radioConfig, song, talk, jammed, rng, djOf } from '../radio.js';
 import { RadioSynth } from '../radio_audio.js';
 
 const KEY = 'nomadgirl-radio';
@@ -67,7 +68,10 @@ export class RadioUI {
     this.el.hidden = !this.D || !this.C.enabled || !this.C.stations.length || !this.scene?.box || this.scene.mode === 'run' || this.busy();
     this.el.classList.toggle('on', on); this.el.classList.toggle('talk', on && (this.seg?.kind === 'talk' || this.seg?.kind === 'jam'));
     const what = !this.on ? 'Radio aus' : !on ? `${st?.name || ''} · leise` : this.seg?.kind === 'talk' ? `${st.dj || st.name}: ${this.seg.text}` : this.seg?.kind === 'jam' ? this.seg.text : `♪ ${this.seg?.title || ''}`;
-    this.el.replaceChildren(icon(this.on ? 'music' : 'loudspeaker', 14), el('b', {}, this.on && st ? `${st.name} ${st.freq || ''}` : 'Radio'), el('span', {}, what), el('kbd', {}, 'N'));
+    // #103 the DJ's face in the chip (an Entity), made once per station and kept, so it keeps moving
+    const dj = this.on && st ? djOf(this.D, st) : null;
+    if (dj && this.djFace?.id !== dj.id) { this.djFace = { id: dj.id, el: faceCanvas(dj, 28) }; this.djFace.el.classList.add('radio-dj'); this.djFace.el.title = `${dj.name} · ${dj.talent}`; }
+    this.el.replaceChildren(dj ? this.djFace.el : icon(this.on ? 'music' : 'loudspeaker', 14), el('b', {}, this.on && st ? `${st.name} ${st.freq || ''}` : 'Radio'), el('span', {}, what), el('kbd', {}, 'N'));
   }
   // a window, menu or the build mode is open: the chip steps aside so it never covers their tooltips (the music plays on)
   busy() {

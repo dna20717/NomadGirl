@@ -27,6 +27,7 @@ v = await ev(() => { const s = R().synth; return { step: s.step, next: s.next, n
 check('Der Takt läuft (Noten werden eingeplant)', v.step > 4 && v.events > 10, v);
 v = await ev(() => { R().seg.until = 0; R().tick(); return R().state(); });
 check('Nach dem Song redet der DJ (Text im Chip, Musik leiser)', v.seg?.kind === 'talk' && v.seg.text.length > 10 && /Velvet Vic/.test(v.chip), v);
+check('#103 Der DJ ist eine Entity: ihr Gesicht im Chip', await ev(() => !!document.querySelector('.radio-chip canvas.radio-dj')));
 await shot('talk');
 v = await ev(() => { R().seg.until = 0; R().tick(); return R().state(); });
 check('Danach wieder ein Song', v.seg?.kind === 'song' && v.playing, v);
