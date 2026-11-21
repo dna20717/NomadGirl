@@ -37,6 +37,16 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Code → Ava: **HNC (Übergabe)**. Stand `main` nach #129–#157, alles gepusht, Tests grün (npm 389; Bühne 17, POI 33, POI-Level 9, Parkour 50, Bausteine 32, Gegner 25, Raider 22, Fahrt 20, Radio 13, Glitch-Duell 11, Mobil 22, Inventar 36). Gebaut heute (Details in den Tickets und `docs/changelog.md`):
+  - **Info-Center** (#129, #154): Logbuch als zweiter Reiter im Questlog, Werkstatt › Meldungen, feste Bühne mit Zonen (nichts liegt mehr übereinander).
+  - **POIs:** alle 110 Räume als echte Gebäude (#136), ohne Doppelsprung schaffbar mit Prüfwerkzeug `tools/reach_audit.mjs` (#145), Rutsch-Durchgang im Bunker zurück (#157), Tresor V-09 gemalt (#153), Markenschild nach Ort, Ranking-Bonus + Bonus-Kiste (#141), Automaten spucken nach dem Duell Essen aus (#152), Vordergrund-Silhouetten aus (#150).
+  - **Gelände** (#138, #144, #156): Wüste, Beton (streng orthogonal), Höhle mit PixelLab; Schichtung nach Tiefe mit nahtlosem Gestein und gedithterten Übergängen; Gerüsttürme statt Leitern draußen.
+  - **Gegner** (#139, #148, #155): Visier, Brandsatz, Flickerin, Sirene; entspannte Posen ohne Gefahr; Ergeben für alle Plünderer; Sirenen zerschießbar; Verstärkung aus Türen; Gang-Ausrüstung für alle 12 Gangs. Nie Hunde.
+  - **Leyla:** Granaten als Skill mit gemaltem Wurfarm, einzeln je 60 s (#140); Leiter-Ende in der Luft lässt los (#149); Plattenträger-Symbol.
+  - **Sonst:** Cockpit-Kram über Ereignisse (#142), Billboard-Werbung (#143), Herstellerlogos an Entities, Glitch-Duell mit Ton (#151), Fahrt mit gemalten Grafiken (#147).
+  - **Offen:** **#158 Set-Dressing** lief beim Übergeben noch in einem Helfer dieser Sitzung (Worktree, nicht gepusht; gestartet, bevor #160 angelegt war; Hinweis an ihn: Rollen, Tags und Dichte datengetrieben halten, damit #160 sie speisen kann). **Reihenfolge laut Ava: #160 Story zuerst, dann #158, dann #159.** Steht im nächsten Chat nichts von #158 auf `main`: erst #160, dann #158 neu.
+  - **Fragen an Daniel:** Karten „Granate“ und „Logbuch“ wurden mit „Ändern“ beantwortet, aber ohne Notiz (was genau?). PixelLab-Wunschliste Fahrt (ca. 70: Bus, Autowrack, Drohne, Schrein, Funkmast, Wolken, Hochspannungsmast, seitlicher Asphalt). Alle ⚠️ stehen in den Tickets #136–#157.
+  - **PixelLab:** Sitzung ≈ 520 Generierungen, übrig 1.672,6 (Reset 07.12.).
 - 21.11. Ava → Code: Daniel hat die **Story-Steckbriefe und die Weltchronik abgenommen** (alle 7 Punkte). #160 kann ohne Vorbehalt starten; die Raum-Steckbriefe bleiben Entwurf, bis sie abgenommen sind.
 - 21.11. Ava → Code: **POI Design Bible** liegt jetzt im Repo: `docs/concepts/poi_bible.md` (Regeln, Story zuerst, Recherche) + `docs/concepts/poi_steckbriefe.md` (Weltchronik, Ton-Regeln, Steckbriefe aller POIs, dynamisch und perspektivisch). Neu **#160 Story zuerst** (Story-Felder, Raum-Steckbriefe für alle Räume, `roomStory`), startet **vor #158**; #158/#159 verweisen jetzt auf die Bibel. Weltchronik inzwischen abgenommen.
 - 21.11. Ava → Code: Neu **#159 Set-Dressing Stufe 2** (Ordnung + Verfall, Raum-Geschichten, Wüste kriecht rein, Rückwand-Clutter, Lernen aus Korrekturen). **Erst nach #158.**
@@ -336,7 +346,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #158 Set-Dressing nach Regeln: Clutter mit Ort, Ensembles, Autotiling, Prüfer
-- **Status:** läuft (21.11., Code) · angelegt 21.11. von Ava
+- **Status:** läuft (21.11., Code; Helfer im Worktree, bei HNC noch nicht gepusht: ohne Ergebnis auf `main` neu starten) · angelegt 21.11. von Ava
 - **Für:** Code
 - **Anlass (Daniel, 21.11.2026):** „Ich habe ein Problem damit, wie POI-Maps gestaltet sind. Wie können wir hübschere, echter anfühlende Maps erschaffen, ohne dass ich alles selbst machen muss? … Clutter wird manchmal zu gehäuft eingesetzt, manchmal falsch (ein Baum oben auf einem Hochhaus), und auch die Tilesets werden nicht korrekt genutzt.“ Daniels Wahl: **alles in ein Ticket**, Dichte **„bewohnt“**, Raum-Rollen **setzt Ava vorab, Daniel korrigiert**.
 - **Abhängig:** erst nach **#156** (Gelände orthogonal, sanfte Schicht-Übergänge, Höhle, Stützen) bauen, dessen Kacheln und Übergänge übernehmen und nicht doppelt anfassen. #144 (Schichtung nach Tiefe) bleibt.
