@@ -284,3 +284,7 @@ Jeder POI hat einen Wow-Raum (POIs › Wow). **Seit #165 gemalt** (PixelLab, AAP
 | Silo Zero | `rs_raketenblick` | Rakete über die Schachthöhe, Anzeige „00:00:01“ rot | Rakete, Startrampe |
 
 Landmarken (POIs › Level-Design › Landmarke: Bild) nutzen dieselben Silhouetten; dazu wünschenswert: Wasserturm mit Lächel-Gesicht, Förderturm, Funkmast-Spitze, Neon-Schild „Penthouse“, Anzeigetafel „Zug fällt aus“.
+
+## Schlüssel-Requisiten (#168, Wunschliste)
+
+Die Schlüssel und Schlösser des Zyklus-Graphs zeichnet Code (`game/play/poi_level.js` › `drawKeyShape`, `drawLock`; keine KI-Grafik). Wünschenswert, später gemalt (AAP-64, ≈ 48 px hoch, Seitenansicht): Toilettenschlüssel am Radkappen-Anhänger, Keycard, Genehmigungsstempel, Ventilrad, Sicherung 30 A, Code-Zettel, Parkschein, Grubenmarke; Schlösser: Tür mit Schlüsselplatte, rot-weiße Schranke, Gittertor, Schott mit Handrad, Sicherungskasten, Luke mit Warnstreifen (offen/zu).
