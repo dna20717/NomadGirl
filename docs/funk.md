@@ -369,10 +369,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Spiel › Vordergrund › Parallaxe = 100 (drinnen still). **Bitte testen:** Delta Heights Büroetagen beim Springen und Laufen.
 
 ### #147 Reise-Bildschirm mit echten Grafiken
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Auf dem Reise-Bildschirm sind viele Code-Grafiken, dabei haben wir doch jetzt inzwischen eine Menge cooler Grafiken und Tiles dafür.“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Auf dem Reise-Bildschirm sind viele Code-Grafiken, dabei haben wir doch jetzt inzwischen eine Menge cooler Grafiken und Tiles dafür.“)
 - **Auftrag:** Code-Grafiken der Fahrt (TravelMode) durch vorhandene Assets ersetzen (Parallax-Sets, Kacheln, Props, Fahrzeuge, Billboards).
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: die nahen Parallax-Ebenen ersetzen die Code-Dinge in der Mitte (kleine Marken-Plakate entfallen, Riesen-Billboards bleiben); Straße = gedrehte Cockpit-Draufsicht; LKW in voller Größe. Wunschliste PixelLab (ca. 70): Zwischenfälle Bus, Autowrack, Drohne, Schrein, Funkmast; Wolken; Hochspannungsmast; seitlicher Asphalt.
+- **Ergebnis:** (Code, per Helfer) Reisen › Fahrt · Grafiken: Straße, Boden (Camp-Streifen), Ebene, nahe Parallax-Ebenen, Billboards im gemalten Gerüst, Strommasten, Steppenläufer, Straßenrand-Kram aus TileSet00, Zwischenfälle aus gemalten Teilen mit Code-Effekten (Straßensperre, LKW, Lagerfeuer, Geröll, Händler, Anhalterin); gleicher Maßstab wie der Van; schärfer und schneller (7,7 statt 13 ms). Nebenbei: R halten zum Scannen ging mit Tastatur nie (behoben), Fahrt-Musik-Fehler behoben. Tests drive 20, radio 13. **Bitte testen:** eine Fahrt bei Tag und bei Nacht.
 
 ### #148 Gegner entspannt, solange keine Gefahr
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Fast alle Gegner laufen mit gezogener Waffe durch die Gegend. Lass sie idle sein, wenn keine Gefahr im Verzug ist.“)
