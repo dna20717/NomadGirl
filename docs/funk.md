@@ -281,6 +281,16 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 ## Tickets
 
+### #161 Granate: generierte Wurf-Animation mit Waffe
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Granate – die Animation ist schlecht. Lass sie bitte generieren (mit aktiver Kurz- oder Langwaffe und dynamischer)“)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #162 Fahrt: Wunschliste Grafiken
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Wunschliste freigegeben“: Zwischenfälle Bus, Autowrack, abgestürzte Drohne, Schrein, Funkmast; Wolken; Hochspannungsmast; seitlicher Asphalt, ca. 70 PixelLab)
+- **Rückfragen:**
+- **Ergebnis:**
+
 ### #149 Leiter: Rutschen endet am Leiterende
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Wenn Leyla eine Leiter runterrutscht, kann sie weiter rutschen, obwohl die Leiter zu Ende ist.“)
 - **Rückfragen:**
