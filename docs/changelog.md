@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 21.11.2026: **Daniels Liste vom Abend** (#145, #149–#157): jeder POI ohne Doppelsprung schaffbar (Prüfwerkzeug, 14 Räume nachgebessert); Leiter-Ende in der Luft lässt los; keine Vordergrund-Silhouetten mehr; Glitch-Duell mit Ton; Automaten spucken nach dem Duell Essen aus; Tresor V-09 gemalt, zu und geknackt; feste Bühne für alle Einblendungen; alle Plünderer können sich ergeben, Sirenen lassen sich zerschießen, Verstärkung kommt aus Türen, jede Gang hat ihre Ausrüstung; Granaten einzeln; Beton streng orthogonal, sanfte Schicht-Übergänge, Höhle, Gerüsttürme draußen, Markenschild nach Ort; Rutsch-Durchgang im Bunker zurück.
 - 21.11.2026: **Daniels Rückmeldung am Abend** (#144, #146, #148): Kachel-Schichten wie echtes Gestein (Kruste, eine Schicht, darunter nahtloser Fels); Vordergrund in Gebäuden steht still; Gegner gehen auf Patrouille entspannt mit gesenkter Waffe und ziehen erst bei Gefahr.
 - 21.11.2026: **Herstellerlogos an Entities** (Daniel): Im Inventar trägt jede Entity das Logo ihres Herstellers als Plakette; der Tooltip nennt Bits und Hersteller.
 - 21.11.2026: **Markenschild am POI** (Daniel: „Die Firmenlogos werden in den POI nicht angezeigt“): Am Eingang jedes POI steht die Marke des Orts von der Reisekarte als Schild auf einem Mast, mit Logo, Name und Slogan.

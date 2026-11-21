@@ -202,7 +202,8 @@ export const AREAS = {
     name: 'Spiel', icon: 'settings', file: 'data/game.json', kind: 'single',
     hint: 'Grundwerte für das ganze Spiel: Maßstab, Physik, Auflösung und womit Leyla startet.',
     sections: [
-      { title: 'Leitern', fields: [ref('ladder.look', 'Leiter-Bild', 'assets', { hint: '#034 (Daniel: „hübsche Leitern mit Anfang, Ende, kaputtem Segment, einfärbbar“): ein senkrechter Streifen, Teile per Zeilen. Leer = Leitern aus Code' }),
+      { title: 'Leitern', fields: [ref('ladder.scaffold', 'Draußen als Gerüst', 'assets', { hint: '#156 (Daniel 21.11.2026: Stützen und Gerüste mit eigener Grafik): Leitern in Außenräumen tragen oft Plattformen; dort zeigt das Spiel diesen senkrecht kachelbaren Gerüstturm (kletterbar wie eine Leiter). Leer = überall Leitern' }),
+        ref('ladder.look', 'Leiter-Bild', 'assets', { hint: '#034 (Daniel: „hübsche Leitern mit Anfang, Ende, kaputtem Segment, einfärbbar“): ein senkrechter Streifen, Teile per Zeilen. Leer = Leitern aus Code' }),
         range('ladder.top', 'Anfang', { unit: 'Bildzeilen' }), range('ladder.mid', 'Mitte (wiederholt)', { unit: 'Bildzeilen' }), range('ladder.broken', 'Kaputtes Stück', { unit: 'Bildzeilen' }), range('ladder.bottom', 'Ende', { unit: 'Bildzeilen' }),
         num('ladder.width', 'Breite', { unit: '% einer Kachel', min: 30, max: 200 }), num('ladder.brokenChance', 'Kaputt', { unit: '% je Leiter', min: 0, max: 100, hint: 'So viele Leitern (ab 3 Kacheln) haben irgendwo ein kaputtes Stück' }),
         color('ladder.tint', 'Färbung', { hint: 'Grundfarbe (Bild ist grau, wird eingefärbt). Leer = grau' }), color('ladder.ropeTint', 'Färbung Seilwinde', { hint: 'Fatbird: die Leiter zum Boden' })] },

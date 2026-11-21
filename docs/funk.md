@@ -295,9 +295,9 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Tresor „V-09“ (PixelLab 39: drei Entwürfe, einer geknackt): streng von vorn, 2,3 m hoch, Rundtür mit radialen Riegeln um einen Cyan-Kern; geknackt schwingt die Tür auf, drinnen Gold, Münzen, Datenchips, Kristall, der Schein wird golden. Spiel › Tresor. **Bitte testen:** einen POI bis zum Tresor spielen und knacken.
 
 ### #154 Info-Center: Bühne mit Zonen
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel (Karte „Als Nächstes“ c): feste Plätze für alle Einblendungen (Konzept docs/concepts/info_center.md, Etappe 2/3).)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel (Karte „Als Nächstes“ c): feste Plätze für alle Einblendungen (Konzept docs/concepts/info_center.md, Etappe 2/3).)
+- **Rückfragen:** ⚠️ vorläufig: bei offenem Fenster ist der Status ausgeblendet; im Bau-Modus stehen Meldungen links unter der Leiste; bei offenem Fenster nur eine Meldung oben Mitte.
+- **Ergebnis:** (Code, per Helfer) `game/play/stage.js`: feste Zonen (A oben links Vitals, B oben Mitte Raumtitel/Meldung bei Fenster, C oben rechts Status, D Meldungen mit der großen Ansage oben, E unten Mitte E-Hinweis, F unten links Tipp + Menü, G unten rechts Kassette + Radio); nichts liegt mehr übereinander (geprüft in vier Lagen, 1600 × 900 und 1280 × 720). Werkstatt › Meldungen › Zonen. `stage_test` 17. **Bitte testen:** Camp-Start, Bau-Modus, Inventar, Run.
 
 ### #155 Gegner: Ergeben für alle, Sirene zerschießbar, Verstärkung aus Türen, Gang-Ausrüstung
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniels Karten 21.11. abends: Ergeben a (alle Plünderer mit kleiner Chance), Sirene a (zerschießbar, Hacken später), Verstärkung a (aus Türen), Gang-Ausrüstung a (so bauen wie erklärt).)
@@ -305,14 +305,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code, per Helfer) Alle Plünderer ergeben sich mit 15 % unter 25 % Leben (Spiel › Kampf); Sirenen haben 30 Leben, Schüsse, Hiebe und Explosionen zerstören sie (Funken, „Sirene kaputt“), Hacken-Haken vorbereitet; Verstärkung kommt aus der Tür nahe der Sirene, die Leyla nicht sieht (Tür fährt kurz hoch); POIs › Gang: Bausteine, Ausrüstung (Gegner, Waffe, Kopf, Baustein, Chance), Wurfgegenstand, für alle 12 Gangs ausgefüllt. Tests npm 385, Bausteine 32, Gegner 25, Raider 22, Alarm 4, POI 33. **Bitte testen:** Bunker 13 (Rust Guard: Helme, Sirenen zerschießen), Tankstelle (Yellow Vultures: Schrotflinten, Molotows).
 
 ### #156 Granate einzeln, Gelände orthogonal mit sanften Übergängen, Höhle, Stützen, Markenschild nach Ort
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniels Karten: Granate b (einzeln, je Ladung 60 s), Gelände b („Die Perspektive ist nicht orthogonal genug, ein wenig mehr drauf achten. Außerdem brauchen die Tilesets sanftere Übergänge zwischen den Schichten“), Höhlen-Set a, Stützen/Gerüste eigene Grafik b, Markenschild b (passend zum Ort), alte Generatoren löschen a.)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniels Karten: Granate b (einzeln, je Ladung 60 s), Gelände b („Die Perspektive ist nicht orthogonal genug, ein wenig mehr drauf achten. Außerdem brauchen die Tilesets sanftere Übergänge zwischen den Schichten“), Höhlen-Set a, Stützen/Gerüste eigene Grafik b, Markenschild b (passend zum Ort), alte Generatoren löschen a.)
+- **Rückfragen:** ⚠️ vorläufig: alle Leitern in Außenräumen erscheinen als Gerüst (auch reine Kletterleitern draußen); Höhle nur in den drei natürlichen Mine-Räumen.
+- **Ergebnis:** (Code) Granaten einzeln (je Ladung 60 s); Beton neu als reiner Querschnitt (dünne Linoleum-Kante), sanfte Übergänge per Dithering (Wüste, Beton, Höhle); Kachel-Set **Höhle** (Kaverne, Tiefste Sohle, Kristallgrotte); Gerüsttürme statt Leitern draußen; Markenschild nach Ort (Ministerium Bureau of Order, Raffinerie Delta Petrol, kein Schild an Bunker, Funkmast, Metro, Kanal, Mine, Sunny Acres, Silo); alte Raum-Generatoren gelöscht. PixelLab 70. **Bitte testen:** Mile 7 Vorplatz (Gerüst), Verkaufsraum (Beton), Pit 6 Kaverne (Höhle).
 
 ### #157 Räume: Rutsch-Durchgang zurück, Parkour-Testraum ohne Schweben
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniels Karten: Rutsch-Durchgang a, Testraum b. Läuft im Helfer von #145 mit.)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniels Karten: Rutsch-Durchgang a, Testraum b. Läuft im Helfer von #145 mit.)
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code, per Helfer) Bunker-Schleuse: Durchgang unter dem Rohrblock 2 Kacheln hoch, nur rutschend (jetzt Teil des Hauptwegs); Testraum: freie Plattformen stehen auf Gerüsten. `parcours_test` 50, Prüfwerkzeug grün.
 
 ### #158 Set-Dressing nach Regeln: Clutter mit Ort, Ensembles, Autotiling, Prüfer
 - **Status:** offen · angelegt 21.11. von Ava
@@ -358,10 +358,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Kachel-Sets › Schichtung „nach Tiefe“ (Wüste, Beton): Kruste, einmal die erste Schicht, darunter nahtloses Gestein (PixelLab 20, zwei Texturen 96 × 96, in beiden Richtungen nahtlos zugeschnitten). Säulen und Wände zeigen kein Zebramuster mehr. **Bitte testen:** Mile 7 Vorplatz (Säulen), Verkaufsraum (Wände).
 
 ### #145 POIs ohne Doppelsprung schaffbar
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Es gibt POI-Situationen, wo Leyla ein Hindernis nicht passieren kann, weil sie Doublejumpen können müsste. Das geht nicht.“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Es gibt POI-Situationen, wo Leyla ein Hindernis nicht passieren kann, weil sie Doublejumpen können müsste. Das geht nicht.“)
 - **Auftrag:** Jeder Weg in jedem POI mit einfachem Sprung (Doppelsprung kommt erst mit Cyberware); Prüfwerkzeug mit Leylas echter Sprunghöhe, Räume nachbessern.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: das Prüfwerkzeug rechnet eine Spalte vorsichtiger als gemessen; wo Plattformen übereinander lagen, kam eine Leiter dazu.
+- **Ergebnis:** (Code, per Helfer) Gemessen ohne Doppelsprung: Sprung 2,6 Kacheln, Stufe bis 4 mit Kante greifen (5 geht nicht), Lücke flach 5. Prüfwerkzeug `tools/reach_audit.mjs` (alle POIs × 40 Seeds, Bild für Bild mit echten Werten): 78 Befunde vorher, 0 nachher; 14 Räume nachgebessert (Kisten/Stufen, Leitern, zwei schwebende Kisten auf den Boden). Tests npm 389, poi 33, poi_levels 9, parcours 50. **Bitte testen:** Ministerium Treppe bis zur versteckten Kammer, Raffinerie Kesselhaus.
 
 ### #146 Vordergrund in Gebäuden ohne senkrechtes Parallax
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Vordergrundobjekte IN Gebäuden können kein vertikales Parallax haben. Das sieht komisch aus.“)

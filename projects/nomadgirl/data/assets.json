@@ -7686,5 +7686,13 @@
   "source": "KI (PixelLab) + Code (tools/terrain_polish.py px)",
   "derivedFrom": "cave_px_source",
   "date": "2026-11-21"
+ },
+ "scaffold": {
+  "name": "Gerüst-Segment (Stützen draußen)",
+  "kind": "image",
+  "file": "assets/tiles/scaffold/scaffold.png",
+  "source": "KI (PixelLab, create_image_pro 64 × 128, Stil props_big)",
+  "date": "2026-11-21",
+  "description": "Zwei Stahlrohre mit X-Streben, rostig, senkrecht kachelbar (#156)."
  }
 }

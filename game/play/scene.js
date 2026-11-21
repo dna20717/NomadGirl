@@ -84,6 +84,7 @@ export class PlayScene extends Phaser.Scene {
     for (const [key, file] of kitted.extra) if (!this.textures.exists(key)) this.load.image(key, new URL(file, this.base).href);
     for (const [k, id] of Object.entries(this.data_.game?.tiles || {})) if (k !== 'terrain') ids.add(id);
     if (this.data_.game?.ladder?.look) ids.add(this.data_.game.ladder.look);   // #034 ladders
+    if (this.data_.game?.ladder?.scaffold) ids.add(this.data_.game.ladder.scaffold);   // #156 scaffold towers outdoors
     for (const t of Object.values(this.data_.terrain || {})) for (const id of [t.look, t.props, t.propsBig]) if (id) ids.add(id);   // Kachel-Sets (TileSet00)
     for (const P of Object.values(this.data_.pois || {})) for (const b of P.brandProps || []) if (b.look) ids.add(b.look);   // Marken-Clutter (NomadCola-Automaten …)
     if (this.data_.worldmap?.logos) ids.add(this.data_.worldmap.logos);
@@ -333,7 +334,15 @@ export class PlayScene extends Phaser.Scene {
       this.ladders.push({ cx: (x + 0.5) * T, x0: x * T, x1: (x + 1) * T, top: y * T, bottom: (y1 + 1) * T, tx: x, ty: y });
     }
     // #034 ladders from the picture (Spiel › Leitern); the mega rig view draws its own
-    if (!this.megarig) for (const l of this.ladders) ladderArt(this, l.x0, l.x1, l.top, l.bottom, { depth: -9.5 });
+    // #156 outdoors a ladder mostly holds up a platform: it is drawn as a scaffold tower (Spiel › Leitern › Draußen als Gerüst)
+    const scaf = this.data_.game?.ladder?.scaffold, LIr = this.levelInfo?.rooms || [], RD = this.data_.rooms || {};
+    const outdoorAt = (tx, ty) => { const r = LIr.find(q => tx >= q.x && tx < q.x + q.w && ty >= q.y && ty < q.y + q.h), d = RD[r ? r.id : this.roomId] || {}; return !(d.indoor ?? !(d.backdrop?.image || d.backdrop?.weather)); };
+    if (!this.megarig) for (const l of this.ladders) {
+      if (scaf && this.textures.exists(scaf) && outdoorAt(l.tx, l.ty)) {
+        const src = this.textures.get(scaf).getSourceImage(), k = T / src.width, h = l.bottom - l.top;
+        this.add.tileSprite(l.x0, l.top, T, h, scaf).setOrigin(0, 0).setTileScale(k, k).setDepth(-9.5);
+      } else ladderArt(this, l.x0, l.x1, l.top, l.bottom, { depth: -9.5 });
+    }
     this.platformTiles = new Set([...R.platforms.map(([x, y]) => x + ',' + y), ...this.ladders.map(l => l.tx + ',' + l.ty)]);
     this.platforms = this.physics.add.staticGroup();
     for (const key of this.platformTiles) {
