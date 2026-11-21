@@ -1,3 +1,5 @@
+import { placeTypes, fits, roleConfig, roleWeight, pickWeighted, planDressing, hullMap, tileCase } from '../../engine/dressing.js';
+import { autoTile, autotileOf, innerCorner } from './autotile.js';
 const WALLS = new Set(['#', 'A', '^', 'v']);   // drawn as wall (doors and brittle walls: game/play/poi_level.js)
 const CAMO = new Set(['%', '$']);   // fake walls and camouflaged brittle walls: drawn like the wall, on their own layer above Leyla
 // Code-drawn art for the MVP: sky and skyline of BigCityDelta, tiles, placeholder raiders, projectiles, particles.
@@ -198,6 +200,9 @@ export function terrainKits(scene, D) {
       for (const r of t.sizes || []) {
         for (const [k, asset] of [[t.props, p], [t.propsBig, b]]) { const i = (asset?.names || []).indexOf(r.name); if (i >= 0 && r.cm > 0) kit.sizes.set(k + '#' + i, r.cm); }
       }
+      // #158 Clutter-Regeln: place types, tags and roles per clutter name (no rows = the old dice everywhere)
+      kit.rules = new Map((t.dressing || []).filter(r => r.name).map(r => [r.name, r]));
+      kit.nameOf = (key, frame) => A[key]?.names?.[frame];
       const L = A[D.leyla?.look?.idle];
       kit.pxPerCm = (L?.height || 192) / (D.game?.tiles?.leylaCm || 170);
       kit.maxScale = (t.sizeMax || 200) / 100;
@@ -258,7 +263,7 @@ function brandKit(scene) {
   const D = scene.data_, rows = (D?.pois?.[scene.levelPoi]?.brandProps || []).filter(b => b.look && scene.textures.exists(b.look));
   if (!rows.length) return null;
   const A = D.assets || {}, L = A[D.leyla?.look?.idle], sizes = new Map(), list = [];
-  for (const b of rows) { const i = (A[b.look]?.names || []).indexOf(b.name); if (i < 0) continue; scene.textures.get(b.look).setFilter(1); if (b.cm > 0) sizes.set(b.look + '#' + i, b.cm); list.push({ key: b.look, frame: i, cm: b.cm || 100, chance: b.chance ?? 5, ai: !!b.ai }); }
+  for (const b of rows) { const i = (A[b.look]?.names || []).indexOf(b.name); if (i < 0) continue; scene.textures.get(b.look).setFilter(1); if (b.cm > 0) sizes.set(b.look + '#' + i, b.cm); list.push({ key: b.look, frame: i, cm: b.cm || 100, chance: b.chance ?? 5, ai: !!b.ai, place: b.place, tags: b.tags, roles: b.roles }); }
   return list.length ? { def: {}, sizes, pxPerCm: (L?.height || 192) / (D.game?.tiles?.leylaCm || 170), maxScale: 5, list } : null;
 }
 // which fill a tile below the surface gets (#144, Daniel 21.11.2026: „Die Schichten machen so keinen Sinn, wie du sie einsetzt“):
@@ -289,8 +294,29 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
     }
     camo.push(grp);
   }
+  // #158 Set je Gebäude-Hülle (Spiel › Kacheln): a wall tile wears the set of the nearest room air, not of the room in its column
+  const hull = !style && terrain?.reg && terrain.kits && scene.data_?.game?.tiles?.hull !== false ? hullMap(room, terrain.reg) : null;
+  const kitAt = (x, y) => hull ? terrain.kits(hull(x, y)) || terrain.at(x, y) : terrain?.at(x, y);
   const edges0 = scene.make.graphics({}, false), decals0 = [], clutter = [], details0 = [], back = [], backShade = scene.make.graphics({}, false), taken = new Set(), edgeTiles = [], coverTiles = [];
   const r = rng(99);
+  // #158 Ort-Typen of this room: a thing only stands where its Clutter-Regeln allow it (no tree on a roof, no wreck inside)
+  const spots = !style && terrain?.reg ? placeTypes(room, terrain.reg) : null;
+  if (spots && room === scene.room) scene.places_ = spots;
+  const allowed = (rules, place, xs, y) => !rules || !spots || xs.every(xx => { const sp = spots.at(xx, y); return sp && fits(place, sp); });
+  const ruleOf = (kit, key, f) => kit.rules?.size ? kit.rules.get(kit.nameOf(key, f)) || {} : null;
+  // #158 the plan (engine/dressing.js planDressing): POI-Ensembles first, then single things up to the room's density (Spiel ›
+  // Set-Dressing), ways and fighting spots free, deterministic per seed. Rooms whose set has no Clutter-Regeln keep the old dice.
+  const plan = spots && scene.data_?.game?.dressing?.enabled !== false ? planDressing({ D: scene.data_, room, reg: terrain.reg, spots, poiId: scene.levelPoi, seed: scene.levelSeed || 0, T }) : null;
+  const planOcc = new Set();
+  if (plan) for (const s of spots.list) if (plan.planned(s.x, s.y)) planOcc.add(s.x + ',' + s.y);
+  // #158 Raum-Rollen weight the choice (Raum-Bausteine › Rolle, Spiel › Set-Dressing › Rollen)
+  const roleCfg = roleConfig(scene.data_), roleAt = (x, y) => terrain?.reg?.roleAt?.(x, y) || 'general';
+  const pickOf = (kit, key, frames, xs, y, h) => {
+    const ok = frames.filter(f => { const rl = ruleOf(kit, key, f); return allowed(rl, rl?.place, xs, y); });
+    if (!kit.rules?.size) return ok.length ? ok[Math.floor(h * ok.length)] : null;
+    const role = roleAt(xs[0], y - 1);
+    return pickWeighted(ok, f => roleWeight(ruleOf(kit, key, f), role, roleCfg), h);
+  };
   // clutter stamp + where it stands, by name (game/play/atmosphere.js finds glowing things)
   const placed = (kit, key, frame, cx, ground) => {
     const st = propStamp(scene, kit, key, frame, cx, ground), f = scene.textures.getFrame(key, frame);
@@ -299,7 +325,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
   for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
     const t0 = room.tiles[y][x], t = WALLS.has(t0) || CAMO.has(t0) ? '#' : t0, px = x * T, py = y * T;
     const cg = camoAt.get(x + ',' + y), g = cg ? cg.g : g0, edges = cg ? cg.edges : edges0, stamps = cg ? cg.stamps : stamps0, details = cg ? cg.stamps : details0, decals = cg ? cg.stamps : decals0;
-    const kit = t === '#' && !style ? terrain?.at(x, y) : null;
+    const kit = t === '#' && !style ? kitAt(x, y) : null;
     if ((t !== '#' || cg) && !style) {   // camouflaged tiles get the back wall behind them (seen once a fake wall fades)
       const bk = terrain?.back?.(x, y);
       if (bk) {
@@ -311,7 +337,17 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
     if (cg && t === '#') continue;   // camouflaged: drawn in the cover pass below
     if (kit) {
       const top = !solid(x, y - 1), D = kit.def, seed = D.seed || 0, list = top ? kit.top : fillOf(kit, x, y, solid);
-      stamps.push({ key: kit.key, frame: list[x % list.length], x: px, y: py - kit.over });
+      // #158 autotiling: caps, undersides, roof covers and seams between sets derived from the set's own tiles (game/play/autotile.js)
+      let key = kit.key, frame = list[x % list.length];
+      if (autotileOf(kit).on && !cg && scene.textures.createCanvas) {
+        const C = tileCase(solid, x, y), roof = top && spots?.at(x, y)?.type === 'roof';
+        const seamOf = dx => { const n = solid(x + dx, y) && !camoAt.has((x + dx) + ',' + y) ? kitAt(x + dx, y) : null; if (!n || n === kit || n.key === kit.key && n.def === kit.def || n.over !== kit.over) return null; const l = !solid(x + dx, y - 1) ? n.top : fillOf(n, x + dx, y, solid); return { key: n.key, frame: l[(x + dx) % l.length] }; };
+        const v = { capL: C.capL, capR: C.capR, under: C.under, roof, crust: kit.top[x % kit.top.length], seamL: seamOf(-1), seamR: seamOf(1) };
+        if (v.capL || v.capR || v.under || v.roof || v.seamL || v.seamR) ({ key, frame } = autoTile(scene, kit, roof ? kit.fill[x % kit.fill.length] : frame, v));
+        if (C.innerL) innerCorner(edges, px, py, T, true);
+        if (C.innerR) innerCorner(edges, px, py, T, false);
+      }
+      stamps.push({ key, frame, x: px, y: py - kit.over });
       // embedded details (stones, pipes, patches) break up the repeating fill
       if (!top && kit.details.length && hash(x, y, seed + 5) * 100 < (D.detailChance ?? 0))
         details.push({ key: kit.props, frame: kit.details[Math.floor(hash(x, y, seed + 6) * kit.details.length)], x: px + (T - kit.pcell[0]) / 2, y: py + (T - kit.pcell[1]) / 2 });
@@ -321,19 +357,24 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       const air = room.tiles[y - 1]?.[x] === '.';
       // large clutter: two surface tiles with air two tiles high above both, walls on the outside
       const free = (xx) => solid(xx, y) && !solid(xx, y - 1) && room.tiles[y - 1]?.[xx] === '.' && room.tiles[y - 2]?.[xx] === '.';
-      if (top && !cg && kit.big && !taken.has(x) && free(x) && free(x + 1) && solid(x - 1, y) && solid(x + 2, y) && terrain?.at(x + 1, y) === kit && hash(x, y, seed + 7) * 100 < (D.bigChance ?? 0)) {
-        const B = kit.big;
-        clutter.push(placed(kit, B.key, B.list[Math.floor(hash(x, y, seed + 8) * B.list.length)], px + T, py + 4));
-        taken.add(x); taken.add(x + 1); taken.add(x + 2);   // #096 a gap after it: nothing leans into it
+      if (top && !cg && kit.big && !taken.has(x) && !planOcc.has(x + ',' + y) && !planOcc.has((x + 1) + ',' + y) && free(x) && free(x + 1) && solid(x - 1, y) && solid(x + 2, y) && kitAt(x + 1, y) === kit && hash(x, y, seed + 7) * 100 < (D.bigChance ?? 0)) {
+        const B = kit.big, f = pickOf(kit, B.key, B.list, [x, x + 1], y, hash(x, y, seed + 8));
+        if (f != null) {
+          clutter.push(placed(kit, B.key, f, px + T, py + 4));
+          taken.add(x); taken.add(x + 1); taken.add(x + 2);   // #096 a gap after it: nothing leans into it
+        }
       }
-      if (top && air && !cg && brands && !taken.has(x) && solid(x - 1, y) && solid(x + 1, y)) {   // Marken-Clutter (brandKit)
-        const B = brands.list[Math.floor(hash(x, y, 31) * brands.list.length)], tall = Math.ceil(B.cm * brands.pxPerCm / T);
+      if (top && air && !cg && brands && !taken.has(x) && !planOcc.has(x + ',' + y) && solid(x - 1, y) && solid(x + 1, y)) {   // Marken-Clutter (brandKit)
+        const fit = brands.list.filter(b => allowed(b.place != null, b.place, [x], y)), B = pickWeighted(fit, b => roleWeight(b, roleAt(x, y - 1), roleCfg), hash(x, y, 31)) || brands.list[0], tall = fit.length ? Math.ceil(B.cm * brands.pxPerCm / T) : 99;
         let room_ = true; for (let k = 1; k <= tall; k++) if (room.tiles[y - k]?.[x] !== '.') room_ = false;
         if (room_ && hash(x, y, 37) * 100 < B.chance) { clutter.push({ ...placed(brands, B.key, B.frame, px + T / 2, py + 4), ai: B.ai }); taken.add(x); taken.add(x + 1); }   // #096 (Daniel: „chaotisch“): fridges and shelves no longer stand inside each other   // ai: a KI lives in it (poi_level.js hosts, #052)
       }
-      if (top && air && !cg && !taken.has(x) && kit.clutter.length && solid(x - 1, y) && solid(x + 1, y) && hash(x, y, seed + 3) * 100 < (D.clutterChance ?? 0)) {
-        clutter.push(placed(kit, kit.props, kit.clutter[Math.floor(hash(x, y, seed + 4) * kit.clutter.length)], px + T / 2, py + 4));
-        taken.add(x + 1);   // #096 one tile of air between two things on the floor
+      if (top && air && !cg && !taken.has(x) && !planOcc.has(x + ',' + y) && kit.clutter.length && solid(x - 1, y) && solid(x + 1, y) && hash(x, y, seed + 3) * 100 < (D.clutterChance ?? 0)) {
+        const f = pickOf(kit, kit.props, kit.clutter, [x], y, hash(x, y, seed + 4));
+        if (f != null) {
+          clutter.push(placed(kit, kit.props, f, px + T / 2, py + 4));
+          taken.add(x + 1);   // #096 one tile of air between two things on the floor
+        }
       }
       // edges from code: outline, light rim left and on top, soft shade right and below (the top tile brings its own crust)
       edgeTiles.push({ x, y, kit, g: edges });
@@ -370,6 +411,18 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       g.fillStyle(0xe45aa8, 0.6).fillCircle(px + T / 2, py + T / 2, 5);
     }
   }
+  // #158 the planned things: standing on the floor, hanging under a ceiling, on the back wall
+  if (plan) {
+    const A = scene.data_.assets || {};
+    for (const it of plan.items) {
+      const kit = it.brand ? brands : terrain.kits?.(it.set), frame = A[it.key]?.names?.indexOf(it.name) ?? -1;
+      if (!kit || frame < 0 || !scene.textures.exists(it.key)) continue;
+      const cx = (it.x + it.w / 2) * T;
+      if (it.hang === 'stand') { clutter.push({ ...placed(kit, it.key, frame, cx, it.y * T + 4), ai: it.ai, ens: it.ens }); continue; }
+      const st = placed(kit, it.key, frame, cx, 0), hh = -st.y, dy = it.hang === 'ceiling' ? it.y * T - 2 + hh : it.y * T + T / 2 + hh / 2;
+      clutter.push({ ...st, y: st.y + dy, ay: st.ay != null ? st.ay + dy : st.ay, hang: it.hang });
+    }
+  }
   // cover: a camouflaged patch also hides the secret behind it (air reachable only through it) plus the ring of wall around,
   // all drawn as solid wall on the patch's layer until it is found or broken (Daniel: „hinter Tiles versteckt“, 4A)
   if (camo.length && !style) {
@@ -392,7 +445,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       c.cover = [...cover].map(k => k.split(',').map(Number));
       const cs = (x, y) => solid(x, y) || cover.has(x + ',' + y);
       for (const [x, y] of c.cover) {
-        const px = x * T, py = y * T, kit = terrain?.at(x, y);
+        const px = x * T, py = y * T, kit = kitAt(x, y);
         if (kit) {
           const top = !cs(x, y - 1), list = top ? kit.top : fillOf(kit, x, y, cs);
           c.stamps.push({ key: kit.key, frame: list[x % list.length], x: px, y: py - kit.over });
@@ -446,7 +499,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
         if (vsolid(x, y) || terrain?.back?.(x, y)) continue;
         if (room.tiles[y][x] === '=') for (let i = 0; i < 3; i++) g0.fillStyle(0x07050c, a * 0.8 * (1 - i / 3)).fillRect(x * T + 6, y * T + 18 + i * 6, T, 6);
-        const L = solid(x - 1, y) && terrain?.at(x - 1, y), U = solid(x, y - 1) && terrain?.at(x, y - 1), px = x * T, py = y * T;
+        const L = solid(x - 1, y) && kitAt(x - 1, y), U = solid(x, y - 1) && kitAt(x, y - 1), px = x * T, py = y * T;
         for (let i = 0; i < n; i++) {
           const k = a * (1 - i / n);
           if (L) g0.fillStyle(0x07050c, k).fillRect(px + i * sz, py + (U ? 0 : 6), sz, T - (U ? 0 : 6));
@@ -456,6 +509,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
     }
     // clutter stands on the floor: a soft contact shadow under it
     for (const c of clutter) {
+      if (c.hang) continue;   // hanging and wall things cast no shadow on the floor
       const P = depthOf(c.kit), w = c.scale ? 2 * (c.ax - c.x) : c.cw, cx = c.scale ? c.ax : c.x + c.cw / 2, gy = c.scale ? c.ay : c.y + c.ch, a = P.prop / 100;
       edges0.fillStyle(0x07050c, a * 0.55).fillEllipse(cx + 3, gy - 1, w * 0.95, 12);
       edges0.fillStyle(0x07050c, a).fillEllipse(cx + 2, gy - 1, w * 0.7, 7);

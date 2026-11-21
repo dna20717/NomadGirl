@@ -51,7 +51,25 @@
   ],
   "sizeMax": 200,
   "atmosphere": "wueste_draussen",
-  "fillMode": "depth"
+  "fillMode": "depth",
+  "dressing": [
+   {"name": "desert3_0", "place": "floor_out", "tags": "knochen", "roles": "outdoor"},
+   {"name": "desert3_1", "place": "floor_out", "tags": "schild, straße", "roles": "outdoor"},
+   {"name": "desert3_2", "place": "floor_out", "tags": "grün", "roles": "outdoor"},
+   {"name": "desert3_3", "place": "floor_out", "tags": "grün", "roles": "outdoor"},
+   {"name": "desert3_4", "place": "floor_out", "tags": "wrack, schrott", "roles": "outdoor"},
+   {"name": "desert3_5", "place": "floor_out", "tags": "knochen", "roles": "outdoor"},
+   {"name": "desert3_6", "place": "floor_in, floor_out, roof", "tags": "fass"},
+   {"name": "desert3_7", "place": "floor_in, floor_out, ledge", "tags": "technik, musik", "roles": "living, outdoor"},
+   {"name": "desert3_8", "place": "floor_out", "tags": "stein", "roles": "outdoor, cave"},
+   {"name": "desert3_9", "place": "floor_in, floor_out", "tags": "müll"},
+   {"name": "desert3_10", "place": "floor_out", "tags": "licht, straße", "roles": "outdoor"},
+   {"name": "desert3_11", "place": "floor_out", "tags": "grün", "roles": "outdoor"},
+   {"name": "desert3_12", "place": "floor_in, floor_out, corner", "tags": "kanister", "roles": "hall, storage, outdoor"},
+   {"name": "desert3_13", "place": "floor_in, floor_out", "tags": "kabel, technik", "roles": "tech, hall"},
+   {"name": "desert3_14", "place": "floor_in, floor_out", "tags": "militär, müll", "roles": "combat"},
+   {"name": "desert3_15", "place": "floor_out", "tags": "stein", "roles": "outdoor, cave"}
+  ]
  },
  "concrete": {
   "name": "Beton · Linoleum",
@@ -163,7 +181,30 @@
    {"name": "big_station_0", "color": "#a8f0ff", "at": [53, 52], "size": [62, 84], "strength": 70, "light": 260, "behavior": "flicker"},
    {"name": "big_station_3", "color": "#dff6ff", "at": [63, 62], "size": [60, 74], "strength": 80, "light": 320, "behavior": "steady"}
   ],
-  "fillMode": "depth"
+  "fillMode": "depth",
+  "dressing": [
+   {"name": "station3_0", "place": "floor_in, floor_out, corner", "tags": "kiste, müll", "roles": "storage, shop"},
+   {"name": "station3_1", "place": "floor_in, floor_out", "tags": "sitz", "roles": "living, office, shop, outdoor"},
+   {"name": "station3_2", "place": "floor_in, ledge", "tags": "laden, vorrat", "roles": "shop, storage"},
+   {"name": "station3_3", "place": "floor_in", "tags": "laden", "roles": "shop"},
+   {"name": "station3_4", "place": "ledge", "tags": "kasse, laden", "roles": "shop"},
+   {"name": "station3_5", "place": "floor_in, floor_out, ledge", "tags": "kiste, vorrat", "roles": "shop, storage, living"},
+   {"name": "station3_6", "place": "floor_in, corner", "tags": "papier, müll", "roles": "shop, office"},
+   {"name": "station3_7", "place": "floor_in, corner", "tags": "putz", "roles": "shop, corridor, hall"},
+   {"name": "station3_8", "place": "floor_in, floor_out, corner", "tags": "müll"},
+   {"name": "station3_9", "place": "wall", "tags": "schild, licht", "roles": "shop"},
+   {"name": "station3_10", "place": "floor_in, floor_out, corner", "tags": "reifen", "roles": "storage, hall, outdoor"},
+   {"name": "station3_11", "place": "ledge", "tags": "küche, technik", "roles": "shop, office, living"},
+   {"name": "station3_12", "place": "floor_in, corner", "tags": "technik, sicherheit"},
+   {"name": "station3_13", "place": "floor_in", "tags": "putz, schild", "roles": "shop, corridor"},
+   {"name": "station3_14", "place": "floor_in, ledge", "tags": "papier", "roles": "shop, office, living"},
+   {"name": "station3_15", "place": "floor_in, corner", "tags": "grün", "roles": "office, shop, living"},
+   {"name": "big_station_0", "place": "floor_in", "tags": "automat, laden", "roles": "shop, corridor"},
+   {"name": "big_station_1", "place": "floor_in, corner", "tags": "regal, laden", "roles": "shop, storage"},
+   {"name": "big_station_2", "place": "floor_in", "tags": "laden, küche", "roles": "shop"},
+   {"name": "big_station_3", "place": "floor_in, corner", "tags": "automat, laden", "roles": "shop, living"}
+  ],
+  "autotile": {"roof": "gravel"}
  },
  "concrete_wall": {
   "name": "Beton · glatte Wand",
@@ -262,7 +303,30 @@
   ],
   "sizeMax": 200,
   "atmosphere": "metall_rost",
-  "glows": [{"name": "big_industry_0", "color": "#ffb050", "at": [96, 66], "size": [26, 16], "strength": 90, "light": 140, "behavior": "pulse"}]
+  "glows": [{"name": "big_industry_0", "color": "#ffb050", "at": [96, 66], "size": [26, 16], "strength": 90, "light": 140, "behavior": "pulse"}],
+  "dressing": [
+   {"name": "industry3_0", "place": "floor_in, floor_out, roof", "tags": "kabel, technik", "roles": "hall, tech, storage"},
+   {"name": "industry3_1", "place": "floor_in, ledge", "tags": "werkzeug", "roles": "hall, tech"},
+   {"name": "industry3_2", "place": "floor_in, floor_out, roof, corner", "tags": "technik, gefahr", "roles": "hall, tech"},
+   {"name": "industry3_3", "place": "floor_in, roof, corner", "tags": "technik, rohr", "roles": "tech, hall"},
+   {"name": "industry3_4", "place": "floor_in, floor_out", "tags": "lager, schrott", "roles": "storage, hall"},
+   {"name": "industry3_5", "place": "floor_in, floor_out", "tags": "schild, sperre", "roles": "hall, combat, corridor"},
+   {"name": "industry3_6", "place": "floor_in, roof, wall", "tags": "technik", "roles": "tech, hall"},
+   {"name": "industry3_7", "place": "floor_in", "tags": "schrott, werkzeug", "roles": "hall, storage"},
+   {"name": "industry3_8", "place": "floor_in, floor_out", "tags": "schrott", "roles": "hall"},
+   {"name": "industry3_9", "place": "floor_in, floor_out, roof, corner", "tags": "fass"},
+   {"name": "industry3_10", "place": "floor_in, floor_out, corner", "tags": "kiste", "roles": "storage, hall, combat"},
+   {"name": "industry3_11", "place": "floor_in, floor_out", "tags": "sperre", "roles": "combat, corridor"},
+   {"name": "industry3_12", "place": "floor_in, ledge", "tags": "technik", "roles": "tech, hall"},
+   {"name": "industry3_13", "place": "floor_in, floor_out, corner", "tags": "kanister", "roles": "hall, storage"},
+   {"name": "industry3_14", "place": "floor_in, ledge", "tags": "werkzeug", "roles": "hall, tech"},
+   {"name": "industry3_15", "place": "floor_in, floor_out, corner", "tags": "putz, müll"},
+   {"name": "big_industry_0", "place": "floor_in, floor_out, roof", "tags": "technik", "roles": "tech, hall"},
+   {"name": "big_industry_1", "place": "floor_in, corner", "tags": "werkbank, tisch", "roles": "hall, tech"},
+   {"name": "big_industry_2", "place": "floor_in, floor_out, corner", "tags": "kiste, palette", "roles": "storage, hall"},
+   {"name": "big_industry_3", "place": "floor_in, corner", "tags": "spind", "roles": "living, storage"}
+  ],
+  "autotile": {"roof": "metal"}
  },
  "ruins": {
   "name": "Ruine · Ziegel",
@@ -332,7 +396,26 @@
    {"name": "ruins3_15", "cm": 110}
   ],
   "sizeMax": 200,
-  "atmosphere": "ruine_staub"
+  "atmosphere": "ruine_staub",
+  "dressing": [
+   {"name": "ruins3_0", "place": "floor_in, floor_out", "tags": "schutt"},
+   {"name": "ruins3_1", "place": "floor_in, floor_out", "tags": "schutt, stein"},
+   {"name": "ruins3_2", "place": "floor_out", "tags": "grün", "roles": "outdoor"},
+   {"name": "ruins3_3", "place": "floor_in, floor_out", "tags": "werkzeug", "roles": "hall, storage"},
+   {"name": "ruins3_4", "place": "floor_in, floor_out", "tags": "technik, müll", "roles": "living"},
+   {"name": "ruins3_5", "place": "floor_in, floor_out", "tags": "schrott"},
+   {"name": "ruins3_6", "place": "floor_out", "tags": "grün, stein", "roles": "outdoor, cave"},
+   {"name": "ruins3_7", "place": "floor_in, floor_out", "tags": "schutt"},
+   {"name": "ruins3_8", "place": "floor_in, floor_out", "tags": "schutt"},
+   {"name": "ruins3_9", "place": "floor_in, floor_out", "tags": "straße, sperre", "roles": "outdoor, corridor"},
+   {"name": "ruins3_10", "place": "floor_in, floor_out", "tags": "reifen"},
+   {"name": "ruins3_11", "place": "floor_in, floor_out", "tags": "laden", "roles": "shop, outdoor"},
+   {"name": "ruins3_12", "place": "floor_in, floor_out, roof", "tags": "schrott, rohr"},
+   {"name": "ruins3_13", "place": "floor_out", "tags": "schutt, grün", "roles": "outdoor"},
+   {"name": "ruins3_14", "place": "floor_out", "tags": "sperre", "roles": "outdoor, combat"},
+   {"name": "ruins3_15", "place": "floor_out", "tags": "straße", "roles": "outdoor"}
+  ],
+  "autotile": {"under": "crust", "roof": "tar"}
  },
  "mall": {
   "name": "Großmarkt · Fliesen",
@@ -416,6 +499,24 @@
   "glows": [
    {"name": "mall3_6", "color": "#ff6a8a", "at": [32, 26], "size": [22, 22], "strength": 45, "light": 120, "behavior": "steady"},
    {"name": "mall3_13", "color": "#7ff6ff", "at": [32, 22], "size": [26, 30], "strength": 55, "light": 170, "behavior": "flicker"}
+  ],
+  "dressing": [
+   {"name": "mall3_0", "place": "floor_in, floor_out", "tags": "laden", "roles": "shop"},
+   {"name": "mall3_1", "place": "floor_in", "tags": "laden, deko", "roles": "shop"},
+   {"name": "mall3_2", "place": "floor_in, corner", "tags": "grün", "roles": "shop, office"},
+   {"name": "mall3_3", "place": "floor_in, floor_out", "tags": "sitz, bank", "roles": "shop, corridor, outdoor"},
+   {"name": "mall3_4", "place": "floor_in, floor_out, corner", "tags": "müll"},
+   {"name": "mall3_5", "place": "floor_in", "tags": "deko", "roles": "shop, hall"},
+   {"name": "mall3_6", "place": "floor_in", "tags": "laden, automat", "roles": "shop"},
+   {"name": "mall3_7", "place": "floor_in", "tags": "kind, laden", "roles": "shop"},
+   {"name": "mall3_8", "place": "floor_in, corner", "tags": "kiste", "roles": "storage, shop"},
+   {"name": "mall3_9", "place": "floor_in", "tags": "laden, regal", "roles": "shop"},
+   {"name": "mall3_10", "place": "floor_in", "tags": "kasse, laden", "roles": "shop"},
+   {"name": "mall3_11", "place": "floor_in, ledge", "tags": "technik, müll", "roles": "office, shop"},
+   {"name": "mall3_12", "place": "floor_in", "tags": "putz, schild", "roles": "shop, corridor"},
+   {"name": "mall3_13", "place": "floor_in", "tags": "automat, laden", "roles": "shop"},
+   {"name": "mall3_14", "place": "floor_in", "tags": "schild, laden", "roles": "shop"},
+   {"name": "mall3_15", "place": "floor_in, corner", "tags": "putz, müll"}
   ]
  },
  "bunker": {
@@ -504,7 +605,26 @@
   "glows": [
    {"name": "bunker3_13", "color": "#7dff9a", "at": [30, 30], "size": [26, 20], "strength": 60, "light": 180, "behavior": "flicker"},
    {"name": "bunker3_3", "color": "#ff9a3a", "at": [34, 30], "size": [10, 10], "strength": 50, "light": 90, "behavior": "pulse"}
-  ]
+  ],
+  "dressing": [
+   {"name": "bunker3_0", "place": "floor_in, corner", "tags": "kiste, militär", "roles": "storage, combat"},
+   {"name": "bunker3_1", "place": "floor_in, corner", "tags": "regal, lager", "roles": "storage"},
+   {"name": "bunker3_2", "place": "floor_in", "tags": "militär", "roles": "living, storage"},
+   {"name": "bunker3_3", "place": "floor_in, ledge", "tags": "technik", "roles": "tech, office"},
+   {"name": "bunker3_4", "place": "floor_in, floor_out", "tags": "sandsack, sperre", "roles": "combat"},
+   {"name": "bunker3_5", "place": "floor_in, corner", "tags": "fass, gefahr", "roles": "storage, tech"},
+   {"name": "bunker3_6", "place": "floor_in, corner", "tags": "spind", "roles": "living"},
+   {"name": "bunker3_7", "place": "floor_in", "tags": "bett", "roles": "living"},
+   {"name": "bunker3_8", "place": "wall", "tags": "medizin", "roles": "living, storage, tech, corridor"},
+   {"name": "bunker3_9", "place": "floor_in, corner", "tags": "papier, büro", "roles": "office, storage"},
+   {"name": "bunker3_10", "place": "floor_in, corner", "tags": "technik, rohr", "roles": "tech"},
+   {"name": "bunker3_11", "place": "ceiling", "tags": "schild"},
+   {"name": "bunker3_12", "place": "floor_in, ledge", "tags": "vorrat, küche", "roles": "storage, living"},
+   {"name": "bunker3_13", "place": "floor_in, ledge", "tags": "technik, büro", "roles": "office, tech"},
+   {"name": "bunker3_14", "place": "floor_in, corner", "tags": "kanister", "roles": "storage, tech"},
+   {"name": "bunker3_15", "place": "floor_in, ledge", "tags": "technik", "roles": "living, office, tech"}
+  ],
+  "autotile": {"roof": "tar"}
  },
  "marble": {
   "name": "Ministerium · Marmor",
@@ -557,7 +677,25 @@
   ],
   "sizeMax": 200,
   "atmosphere": "ministerium_kalt",
-  "glows": [{"name": "ministry3_4", "color": "#ffd27a", "at": [30, 20], "size": [20, 16], "strength": 70, "light": 200, "behavior": "steady"}]
+  "glows": [{"name": "ministry3_4", "color": "#ffd27a", "at": [30, 20], "size": [20, 16], "strength": 70, "light": 200, "behavior": "steady"}],
+  "dressing": [
+   {"name": "ministry3_0", "place": "floor_in, ledge, corner", "tags": "papier, büro", "roles": "office, storage"},
+   {"name": "ministry3_1", "place": "floor_in", "tags": "tisch, büro", "roles": "office"},
+   {"name": "ministry3_2", "place": "floor_in, corner", "tags": "regal, büro", "roles": "office, storage"},
+   {"name": "ministry3_3", "place": "floor_in, corner", "tags": "deko", "roles": "office, hall"},
+   {"name": "ministry3_4", "place": "floor_in", "tags": "tisch, licht, büro", "roles": "office"},
+   {"name": "ministry3_5", "place": "floor_in, corner", "tags": "grün", "roles": "office, hall, corridor"},
+   {"name": "ministry3_6", "place": "floor_in", "tags": "sitz, büro", "roles": "office"},
+   {"name": "ministry3_7", "place": "floor_in", "tags": "büro, tisch", "roles": "office"},
+   {"name": "ministry3_8", "place": "floor_in, corner", "tags": "deko", "roles": "hall, office"},
+   {"name": "ministry3_9", "place": "floor_in, corner", "tags": "büro, küche", "roles": "office, corridor"},
+   {"name": "ministry3_10", "place": "floor_in", "tags": "sperre, deko", "roles": "hall"},
+   {"name": "ministry3_11", "place": "wall", "tags": "bild, deko"},
+   {"name": "ministry3_12", "place": "floor_in, corner", "tags": "büro, müll", "roles": "office"},
+   {"name": "ministry3_13", "place": "floor_in", "tags": "sitz, bank", "roles": "corridor, office, hall"},
+   {"name": "ministry3_14", "place": "floor_in, corner", "tags": "deko", "roles": "office, corridor, living"},
+   {"name": "ministry3_15", "place": "floor_in", "tags": "deko, militär", "roles": "hall"}
+  ]
  },
  "factory": {
   "name": "Fabrik",
@@ -619,7 +757,30 @@
   ],
   "sizeMax": 200,
   "atmosphere": "metall_rost",
-  "glows": [{"name": "big_industry_0", "color": "#ffb050", "at": [96, 66], "size": [26, 16], "strength": 90, "light": 140, "behavior": "pulse"}]
+  "glows": [{"name": "big_industry_0", "color": "#ffb050", "at": [96, 66], "size": [26, 16], "strength": 90, "light": 140, "behavior": "pulse"}],
+  "dressing": [
+   {"name": "industry3_0", "place": "floor_in, floor_out, roof", "tags": "kabel, technik", "roles": "hall, tech, storage"},
+   {"name": "industry3_1", "place": "floor_in, ledge", "tags": "werkzeug", "roles": "hall, tech"},
+   {"name": "industry3_2", "place": "floor_in, floor_out, roof, corner", "tags": "technik, gefahr", "roles": "hall, tech"},
+   {"name": "industry3_3", "place": "floor_in, roof, corner", "tags": "technik, rohr", "roles": "tech, hall"},
+   {"name": "industry3_4", "place": "floor_in, floor_out", "tags": "lager, schrott", "roles": "storage, hall"},
+   {"name": "industry3_5", "place": "floor_in, floor_out", "tags": "schild, sperre", "roles": "hall, combat, corridor"},
+   {"name": "industry3_6", "place": "floor_in, roof, wall", "tags": "technik", "roles": "tech, hall"},
+   {"name": "industry3_7", "place": "floor_in", "tags": "schrott, werkzeug", "roles": "hall, storage"},
+   {"name": "industry3_8", "place": "floor_in, floor_out", "tags": "schrott", "roles": "hall"},
+   {"name": "industry3_9", "place": "floor_in, floor_out, roof, corner", "tags": "fass"},
+   {"name": "industry3_10", "place": "floor_in, floor_out, corner", "tags": "kiste", "roles": "storage, hall, combat"},
+   {"name": "industry3_11", "place": "floor_in, floor_out", "tags": "sperre", "roles": "combat, corridor"},
+   {"name": "industry3_12", "place": "floor_in, ledge", "tags": "technik", "roles": "tech, hall"},
+   {"name": "industry3_13", "place": "floor_in, floor_out, corner", "tags": "kanister", "roles": "hall, storage"},
+   {"name": "industry3_14", "place": "floor_in, ledge", "tags": "werkzeug", "roles": "hall, tech"},
+   {"name": "industry3_15", "place": "floor_in, floor_out, corner", "tags": "putz, müll"},
+   {"name": "big_industry_0", "place": "floor_in, floor_out, roof", "tags": "technik", "roles": "tech, hall"},
+   {"name": "big_industry_1", "place": "floor_in, corner", "tags": "werkbank, tisch", "roles": "hall, tech"},
+   {"name": "big_industry_2", "place": "floor_in, floor_out, corner", "tags": "kiste, palette", "roles": "storage, hall"},
+   {"name": "big_industry_3", "place": "floor_in, corner", "tags": "spind", "roles": "living, storage"}
+  ],
+  "autotile": {"roof": "metal"}
  },
  "cave": {
   "name": "Höhle",
@@ -651,6 +812,25 @@
    "desert3_14",
    "desert3_15"
   ],
-  "decals": ["decal_9", "decal_10", "decal_14", "decal_15", "decal_0"]
+  "decals": ["decal_9", "decal_10", "decal_14", "decal_15", "decal_0"],
+  "dressing": [
+   {"name": "desert3_0", "place": "floor_in, floor_out", "tags": "knochen", "roles": "cave, outdoor"},
+   {"name": "desert3_1", "place": "floor_out", "tags": "schild, straße", "roles": "outdoor"},
+   {"name": "desert3_2", "place": "floor_out", "tags": "grün", "roles": "outdoor"},
+   {"name": "desert3_3", "place": "floor_out", "tags": "grün", "roles": "outdoor"},
+   {"name": "desert3_4", "place": "floor_out", "tags": "wrack, schrott", "roles": "outdoor"},
+   {"name": "desert3_5", "place": "floor_in, floor_out", "tags": "knochen", "roles": "cave, outdoor"},
+   {"name": "desert3_6", "place": "floor_in, floor_out, roof", "tags": "fass"},
+   {"name": "desert3_7", "place": "floor_in, floor_out, ledge", "tags": "technik, musik", "roles": "living, outdoor"},
+   {"name": "desert3_8", "place": "floor_in, floor_out", "tags": "stein", "roles": "cave, outdoor"},
+   {"name": "desert3_9", "place": "floor_in, floor_out", "tags": "müll"},
+   {"name": "desert3_10", "place": "floor_out", "tags": "licht, straße", "roles": "outdoor"},
+   {"name": "desert3_11", "place": "floor_out", "tags": "grün", "roles": "outdoor"},
+   {"name": "desert3_12", "place": "floor_in, floor_out, corner", "tags": "kanister", "roles": "hall, storage, outdoor"},
+   {"name": "desert3_13", "place": "floor_in, floor_out", "tags": "kabel, technik", "roles": "tech, hall"},
+   {"name": "desert3_14", "place": "floor_in, floor_out", "tags": "militär, müll", "roles": "combat"},
+   {"name": "desert3_15", "place": "floor_in, floor_out", "tags": "stein", "roles": "cave, outdoor"}
+  ],
+  "autotile": {"under": "crust", "roof": "none"}
  }
 }

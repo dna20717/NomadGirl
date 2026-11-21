@@ -132,5 +132,21 @@
  "roomTitle": {"enabled": true, "ms": 2600},
  "voice": {"enabled": true, "volume": 70, "bubbles": 60, "max": 4, "leyla": true, "barks": true, "barkGap": 4, "barkChance": 35},
  "sfx": {"enabled": true, "volume": 60, "ui": true, "footsteps": true, "stride": 150, "strideWalk": 115, "burst": 10},
- "vault": {"look": "vault_closed", "open": "vault_open", "cm": 230}
+ "vault": {"look": "vault_closed", "open": "vault_open", "cm": 230},
+ "dressing": {
+  "density": 3,
+  "roles": [
+   {"role": "general", "density": 3, "prefer": "", "avoid": ""},
+   {"role": "shop", "density": 3.5, "prefer": "laden, kasse, regal, automat, vorrat", "avoid": "militär, werkbank"},
+   {"role": "storage", "density": 4, "prefer": "kiste, regal, fass, vorrat, kanister, palette", "avoid": "sitz, bett"},
+   {"role": "office", "density": 3, "prefer": "büro, papier, sitz, tisch, grün", "avoid": "reifen, fass, schrott"},
+   {"role": "hall", "density": 2.5, "prefer": "technik, werkbank, fass, kiste, werkzeug", "avoid": "bett, laden"},
+   {"role": "living", "density": 3.5, "prefer": "bett, sitz, tisch, küche, spind, vorrat", "avoid": "gefahr, schrott"},
+   {"role": "tech", "density": 2.5, "prefer": "technik, kabel, rohr, werkzeug", "avoid": "laden, grün"},
+   {"role": "corridor", "density": 1.2, "prefer": "müll, schild, putz, sitz", "avoid": "bett, tisch"},
+   {"role": "outdoor", "density": 2, "prefer": "grün, stein, wrack, schild, straße, knochen", "avoid": "büro, bett"},
+   {"role": "combat", "density": 2, "prefer": "sperre, sandsack, kiste, fass", "avoid": "bett, grün"},
+   {"role": "cave", "density": 1.5, "prefer": "stein, knochen, kabel", "avoid": "laden, büro"}
+  ]
+ }
 }
