@@ -46,7 +46,7 @@ const results = [];
 for (const t of tests) {
   const t0 = Date.now();
   const r = await new Promise(ok => {
-    const p = spawn(process.execPath, [path.join('tools', t)], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, ...(PORT !== 8766 && !process.env.GAME_URL ? { GAME_URL: `http://localhost:${PORT}/game.html` } : {}) } });
+    const p = spawn(process.execPath, [path.join('tools', t)], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, ...(PORT !== 8766 && !process.env.GAME_URL ? { GAME_URL: `http://localhost:${PORT}/game.html`, WORKSHOP_URL: process.env.WORKSHOP_URL || `http://localhost:${PORT}/workshop.html` } : {}) } });
     let out = '';
     p.stdout.on('data', d => { out += d; }); p.stderr.on('data', d => { out += d; });
     const kill = setTimeout(() => { p.kill('SIGKILL'); out += '\nZeitüberschreitung'; }, TIMEOUT);
