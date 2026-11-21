@@ -70,7 +70,7 @@ Je Baustein: Felder · Code · Grafik · Wert. Größen gegen Leyla 192 px; stre
 - **Wert:** hoch, fast kostenlos.
 
 ### 3.4 Alarmgeber `alarm` ⭐
-- **Verhalten:** sieht er Leyla, läuft er zu einem **Alarmpunkt** (Raum-Zeichen, Sirene an der Wand) oder bläst ins Horn. Nach `alarm.time` heult die Sirene: alle im POI sind alarmiert, aus Türen kommen `alarm.adds` Gegner. Wer ihn vorher erwischt, hat Ruhe. Die Sirene ist zerschießbar/hackbar (Hacking-Konzept `docs/design.md`).
+- **Verhalten:** sieht er Leyla, läuft er zu einem **Alarmpunkt** (Raum-Zeichen, Sirene an der Wand) oder bläst ins Horn. Nach `alarm.time` heult die Sirene: alle im POI sind alarmiert, aus Türen kommen `alarm.adds` Gegner. Wer ihn vorher erwischt, hat Ruhe. Die Sirene ist zerschießbar/hackbar (Hacking-Konzept `docs/design.md`). **Gebaut** (#139/#155): Verstärkung aus der nächsten Tür außer Sicht, Sirene zerschießbar (Spiel › Kampf › Sirene: Leben), Hacken später.
 - **Felder:** `alarm.time` ms (2500), `alarm.adds` (2), `alarm.radius` (ganzer POI), `alarm.flee` checkbox (rennt weg statt zu kämpfen).
 - **Code:** ~90 Zeilen + ein Zeichen in der Raum-Legende (`engine/room.js`) für den Alarmpunkt.
 - **Grafik:** Bausatz Pistole/Rennen (vorhanden), Sirene als Code-Grafik oder ein kleines PixelLab-Objekt; Rundumlicht aus Code (rotes Drehen über `atmosphere`).
@@ -209,6 +209,27 @@ Reihenfolge: Etappe 1 Haken + Register + `sniper` · Etappe 2 `medic` + `alarm` 
 ## 12. Antworten Daniel 21.11.2026
 
 1 a (Scheibe Visier, Brandsatz, Flickerin, Sirene) · 2 c (nie Hunde, Drohnen gern) · 3 a (Ergeben ja) · 4: nichts bauen, erst klären, was Gang-Ausrüstung ist · 5: Granaten gleich mit, als Skill mit Abklingzeit (#140).
+
+**21.11.2026 abends (#155):** Ergeben a (alle Plünderer mit kleiner Chance: 15 % unter 25 % Leben, Spiel › Kampf, je Gegner überschreibbar) · Sirene a (zerschießbar durch Schüsse, Hiebe, Explosionen; Hacken später, Haken `hackSiren`) · Verstärkung a (aus der nächsten Tür außer Sicht, sonst Rand, sonst neben der Sirene) · Gang-Ausrüstung a („Ja, so bauen“: `gang.traits`, `gang.loadout`, dazu `gang.throwItem`; ⚠️ `gang.mod` erst mit den Gegner-Zusätzen).
+
+**Gebaut (#155), nur mit vorhandenen Bausteinen, Waffen und Köpfen** (Waffe/Kopf/Baustein mit Chance je Gegner):
+
+| Gang | Bausteine für alle | Ausrüstung |
+|---|---|---|
+| Yellow Vultures | – | Schütze Schrotflinte 50 %, Pistolero Schrotflinte 30 %, Streuner Werfer 25 % (Molotow), Irokese 40 % |
+| Neon Rats | Feigling | Kapuze 40 %, Schrotflinter Nagelpistole 30 %, Gewehrschütze Rohrpistole 25 % |
+| Rust Guard | – | Stachelhelm 60 %, Schütze Alarmgeber 25 %, Pistolero Sanitäter 15 %, Schläger Rohrhammer 25 % |
+| Order Office | – | Gewehrschütze Scharfschütze 30 %, Schütze Alarmgeber 30 %, Gasmaske 35 % |
+| Sky Wolves | – | Gewehrschütze Scharfschütze 40 %, Schrotflinter Sturmgewehr 30 %, Dreads 40 % |
+| Level Five | Feigling | Dutt 50 %, Pistolero Nagelpistole 30 %, Keulenschwinger Machete 30 % |
+| Static Saints | – | Schütze Alarmgeber 40 %, Gasmaske 50 %, Pistolero Nagelpistole 30 % |
+| Tunnel Kings | – | Schläger Nagelkeule 40 %, Kapuze 60 %, Pistolero Feigling 30 % |
+| Salt Dogs | – | Schläger Rohrhammer 30 %, Irokese 60 %, Gewehrschütze Schrotflinte 30 % |
+| Crude Boys | – | Schläger Werfer 25 %, Pistolero Werfer 20 % (Molotow), Gasmaske 50 % |
+| Sunny Side | Ergibt sich (30 %/50 %) | Pistolero Sanitäter 25 %, Kapuze 50 %, Keulenschwinger Machete 30 % |
+| Zero Hour | – | Schütze Alarmgeber 25 %, Gewehrschütze Scharfschütze 15 %, Keulenschwinger Rohrhammer 30 %, Stachelhelm 70 % |
+
+Was aus der Tabelle oben noch fehlt (Schwarm, Geschütz, Lauerer, Schildwall, Berserker, Blutung, Rammer, Bomber, Anführer, Zusätze wie Brennend, Flink, Gepanzert, Schattig, Explosiv), kommt mit den Bausteinen bzw. dem Katalog Gegner-Zusätze.
 
 ## 12a. Ursprüngliche Fragen
 
