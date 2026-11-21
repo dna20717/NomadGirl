@@ -1,0 +1,983 @@
+{
+ "zettel_rationierung": {
+  "name": "Rationierung",
+  "channel": "note",
+  "text": "HEUTE MAX. 10 LITER PRO FAHRZEUG. KEINE DISKUSSION. Darunter, kleiner, mit anderem Stift: Diskussion trotzdem. Kasse kaputt. Bin weg. R.",
+  "title": "Zettel an der Kasse",
+  "pois": ["tankstelle_km7"],
+  "archetype": true,
+  "weight": 10,
+  "roles": ["shop"]
+ },
+ "zettel_kalender": {
+  "name": "Kalender der Familie",
+  "channel": "note",
+  "text": "Der Monat, in dem sie gingen. Im Kästchen vom 14. steht in Kinderschrift: Mama Geburtstag!!! Die Tage danach sind leer.",
+  "title": "Kalenderblatt",
+  "pois": ["tankstelle_km7"],
+  "archetype": false,
+  "weight": 10,
+  "ava": "Die Tage danach sind leer. Genau so fühlt sich das an.",
+  "important": true,
+  "roles": ["office", "shop"]
+ },
+ "durchsage_kaffee": {
+  "name": "Kaffee frisch",
+  "channel": "announce",
+  "text": "Band aus dem Verkaufsraum: Willkommen bei Delta Petrol. Heute im Angebot: Kaffee, frisch gebrüht. Die Maschine gurgelt dazu.",
+  "pois": ["tankstelle_km7"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "geruecht_tankstelle_km7": {
+  "name": "Gerücht tankstelle_km7",
+  "channel": "rumor",
+  "text": "Bei {place} läuft die Kaffeemaschine noch. Wer sie abschaltet, kriegt Ärger mit {gang}.",
+  "pois": ["tankstelle_km7"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "splitter_tankstelle_km7": {
+  "name": "Splitter tankstelle_km7",
+  "channel": "splinter",
+  "text": "Im Handschuhfach eines Fernlasters, zwischen Lieferscheinen an den Klinikturm, liegt etwas Warmes. Ein Splitter, der leise summt.",
+  "pois": ["tankstelle_km7"],
+  "archetype": true,
+  "title": "Ein Splitter",
+  "important": true,
+  "weight": 10
+ },
+ "zettel_abholzettel": {
+  "name": "Abholzettel",
+  "channel": "note",
+  "text": "Name: Kevin. Abholung bis 18 Uhr. Wer holt ab: Papa. Ankreuzen, wenn abgeholt: ☐",
+  "title": "Abholzettel vom Kinderparadies",
+  "pois": ["grossmarkt"],
+  "archetype": true,
+  "weight": 10,
+  "ava": "Das Kästchen ist leer. Ich mag keine leeren Kästchen.",
+  "important": true
+ },
+ "zettel_inventur": {
+  "name": "Inventur Spielwaren",
+  "channel": "note",
+  "text": "Abteilung Spielwaren, letzte Zeile: Teddys 40 → 0. Daneben mit Kuli: Alle mitgenommen. Gut so.",
+  "title": "Inventurliste",
+  "pois": ["grossmarkt"],
+  "archetype": true,
+  "weight": 10,
+  "roles": ["shop", "storage"]
+ },
+ "durchsage_kevin": {
+  "name": "Kevin am Info-Stand",
+  "channel": "announce",
+  "text": "Gong. Der kleine Kevin möchte am Info-Stand abgeholt werden. Gong.",
+  "pois": ["grossmarkt"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "geruecht_grossmarkt": {
+  "name": "Gerücht grossmarkt",
+  "channel": "rumor",
+  "text": "Im Großmarkt bei {place} sollen unter den Rolltreppen noch Konserven liegen. {gang} sagen, sie hätten sie gezählt.",
+  "pois": ["grossmarkt"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "splitter_grossmarkt": {
+  "name": "Splitter grossmarkt",
+  "channel": "splinter",
+  "text": "In der Fundsachen-Kiste am Info-Stand, zwischen einem Schnuller und drei Lesebrillen: ein Splitter mit einem Kessler-Etikett.",
+  "pois": ["grossmarkt"],
+  "archetype": true,
+  "title": "Ein Splitter",
+  "important": true,
+  "weight": 10
+ },
+ "zettel_himmel": {
+  "name": "Kinderzeichnung",
+  "channel": "note",
+  "text": "Ein blauer Streifen oben, ein gelber Kreis darin. Darunter in Druckbuchstaben: SO SIEHT DER HIMMEL AUS SAGT PAPA.",
+  "title": "Kinderzeichnung",
+  "pois": ["bunker_13"],
+  "archetype": true,
+  "weight": 10,
+  "ava": "Ich hab den Himmel auch zuerst nur gemalt bekommen.",
+  "important": true,
+  "roles": ["living"]
+ },
+ "zettel_dienstplan": {
+  "name": "Dienstplan Rust Guard",
+  "channel": "note",
+  "text": "Die alten Namen sind überklebt. Darüber, in Rust-Guard-Schrift: Bolt, Mira, Krätze, Bolt. Bolt hat sich zweimal eingetragen.",
+  "title": "Dienstplan Woche 31",
+  "pois": ["bunker_13"],
+  "archetype": false,
+  "weight": 10,
+  "roles": ["office"],
+  "when": [{"when": "owner", "value": "home"}]
+ },
+ "funk_sektor_c": {
+  "name": "Lüftung Sektor C",
+  "channel": "radio",
+  "text": "Kanal 13, ganz leise: Lüftung Sektor C ausgefallen. Wiederhole: Sektor C. Wir brauchen … Rauschen. Die Meldung läuft in Schleife.",
+  "pois": ["bunker_13"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "geruecht_bunker_13": {
+  "name": "Gerücht bunker_13",
+  "channel": "rumor",
+  "text": "In {place} brennt rotes Notlicht, Tag und Nacht. {gang} sagen, der Reaktor hält. Sie sagen es oft.",
+  "pois": ["bunker_13"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "splitter_bunker_13": {
+  "name": "Splitter bunker_13",
+  "channel": "splinter",
+  "text": "Im Archiv, Ordner „Aufnahme Zivilisten“, zwischen zwei Fotos: ein Splitter, abgeheftet wie ein Dokument.",
+  "pois": ["bunker_13"],
+  "archetype": true,
+  "title": "Ein Splitter",
+  "important": true,
+  "weight": 10
+ },
+ "zettel_wartenummer": {
+  "name": "Wartenummer",
+  "channel": "note",
+  "text": "Auf der Rückseite, mit Bleistift: Ich warte seit Dienstag. Heute ist wieder Dienstag.",
+  "title": "Wartenummer 4.117",
+  "pois": ["ministerium"],
+  "archetype": true,
+  "weight": 10,
+  "roles": ["hall", "corridor"]
+ },
+ "zettel_akte": {
+  "name": "Akte Einreise",
+  "channel": "note",
+  "text": "ANTRAG AUF EINREISE: abgelehnt. Begründung: Kapazität erschöpft. Angeheftet ein Passfoto, ein Mädchen mit Zahnlücke.",
+  "title": "Aktendeckel",
+  "pois": ["ministerium"],
+  "archetype": true,
+  "weight": 10,
+  "ava": "Kapazität erschöpft. Den Satz kenne ich von irgendwoher.",
+  "important": true,
+  "roles": ["office"]
+ },
+ "durchsage_nummer": {
+  "name": "Nummernanzeige",
+  "channel": "announce",
+  "text": "Ding. Nummer 4.118 bitte an Schalter 3. Ding. Nummer 4.119 bitte an Schalter 3. Niemand steht auf.",
+  "pois": ["ministerium"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "geruecht_ministerium": {
+  "name": "Gerücht ministerium",
+  "channel": "rumor",
+  "text": "Im Amt bei {place} putzt jemand jede Nacht. {gang} schießen auf jeden, der keine Nummer zieht.",
+  "pois": ["ministerium"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "splitter_ministerium": {
+  "name": "Splitter ministerium",
+  "channel": "splinter",
+  "text": "In der Asservatenkammer, Tüte 40-117, Aktenzeichen ordentlich beschriftet: ein Splitter, beschlagnahmt wie Schmuggelware.",
+  "pois": ["ministerium"],
+  "archetype": true,
+  "title": "Ein Splitter",
+  "important": true,
+  "weight": 10
+ },
+ "zettel_koffer": {
+  "name": "Gepäckanhänger",
+  "channel": "note",
+  "text": "Am Landeplatz, an einem Koffer: Max. 1 Gepäckstück pro Person. Ausnahmen nur für den Vorstand. Ein zweiter Anhänger, „Vorstand“, ist durchgestrichen.",
+  "title": "Gepäckanhänger",
+  "pois": ["delta_heights"],
+  "archetype": true,
+  "weight": 10
+ },
+ "zettel_bauplan": {
+  "name": "Bauplan",
+  "channel": "note",
+  "text": "Stempel: Bauabschnitt 2 folgt. Jemand hat mit Lippenstift ein Fragezeichen dahinter gemalt.",
+  "title": "Bauplan Etagen 31 bis 34",
+  "pois": ["delta_heights"],
+  "archetype": true,
+  "weight": 10,
+  "roles": ["office"]
+ },
+ "durchsage_aufzug": {
+  "name": "Aufzug",
+  "channel": "announce",
+  "text": "Pling. Eine Aufzugstimme: Etage 40. Türen öffnen sich. Wind kommt herein.",
+  "pois": ["delta_heights"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "geruecht_delta_heights": {
+  "name": "Gerücht delta_heights",
+  "channel": "rumor",
+  "text": "Oben in {place} sitzen {gang} mit Zielfernrohren. Im Chefzimmer soll ein Safe stehen, den keiner aufkriegt.",
+  "pois": ["delta_heights"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "splitter_delta_heights": {
+  "name": "Splitter delta_heights",
+  "channel": "splinter",
+  "text": "Im Laptop eines Kessler-Managers, der Bildschirm gesprungen, steckt statt einer Festplatte ein Splitter.",
+  "pois": ["delta_heights"],
+  "archetype": true,
+  "title": "Ein Splitter",
+  "important": true,
+  "weight": 10
+ },
+ "zettel_parkschein": {
+  "name": "Parkschein",
+  "channel": "note",
+  "text": "Einfahrt 07:42. Ausfahrt: –. Zu zahlen: Der Automat rechnet noch.",
+  "title": "Parkschein",
+  "pois": ["parkhaus_sued"],
+  "archetype": true,
+  "weight": 10
+ },
+ "zettel_scheibenwischer": {
+  "name": "Unter dem Scheibenwischer",
+  "channel": "note",
+  "text": "Bin gleich zurück, hol nur den Kleinen ab. Nicht abschleppen!!",
+  "title": "Zettel unterm Scheibenwischer",
+  "pois": ["parkhaus_sued"],
+  "archetype": true,
+  "weight": 10,
+  "ava": "Er wollte nur kurz weg. Alle wollten nur kurz weg.",
+  "important": true
+ },
+ "durchsage_shuttle": {
+  "name": "Letzter Shuttle",
+  "channel": "announce",
+  "text": "Lautsprecher, verzerrt: Der letzte Shuttle in die Stadt fährt in fünf Minuten. In fünf Minuten. In fünf Minuten.",
+  "pois": ["parkhaus_sued"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "geruecht_parkhaus_sued": {
+  "name": "Gerücht parkhaus_sued",
+  "channel": "rumor",
+  "text": "In {place} sollen noch volle Tanks in den Autos stecken. {gang} verlangen Parkgebühr, auch fürs Atmen.",
+  "pois": ["parkhaus_sued"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "splitter_parkhaus_sued": {
+  "name": "Splitter parkhaus_sued",
+  "channel": "splinter",
+  "text": "In einem Wagen mit Kessler-Parkausweis, im Becherhalter, wo der Kaffee stehen sollte: ein Splitter.",
+  "pois": ["parkhaus_sued"],
+  "archetype": true,
+  "title": "Ein Splitter",
+  "important": true,
+  "weight": 10
+ },
+ "zettel_hilferuf": {
+  "name": "Hilferuf",
+  "channel": "note",
+  "text": "Frau, zwei Kinder, Auto liegen geblieben bei KM 40. Wasser für einen Tag. Darunter, sauber: Weitergeleitet. Darunter, krakelig: An wen?",
+  "title": "Notiert 03:12, Kanal 9",
+  "pois": ["funkmast_km31"],
+  "archetype": true,
+  "weight": 10,
+  "ava": "Er hat alles aufgeschrieben. Mehr konnte er nicht tun. Mehr hat er nicht getan.",
+  "important": true
+ },
+ "zettel_klettern": {
+  "name": "Klettern erlaubt",
+  "channel": "note",
+  "text": "Mit Reißzwecke über dem Behördenschild: Wir senden. Du empfängst. Klettern erlaubt.",
+  "title": "Zettel am Schild",
+  "pois": ["funkmast_km31"],
+  "archetype": false,
+  "weight": 10,
+  "when": [{"when": "owner", "value": "home"}]
+ },
+ "funk_schleife": {
+  "name": "Schleife",
+  "channel": "radio",
+  "text": "Rauschen, dann eine Bandschleife: Bleiben Sie zu Hause. Hilfe ist unterwegs. Bleiben Sie zu Hause. Hilfe ist unterwegs.",
+  "pois": ["funkmast_km31"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "geruecht_funkmast_km31": {
+  "name": "Gerücht funkmast_km31",
+  "channel": "rumor",
+  "text": "Am Mast bei {place} predigen {gang} auf allen Frequenzen. Wer oben in die Kabine kommt, hört angeblich alles.",
+  "pois": ["funkmast_km31"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "splitter_funkmast_km31": {
+  "name": "Splitter funkmast_km31",
+  "channel": "splinter",
+  "text": "Auf einem Tonband in der Kabine, Etikett „Signal, unbekannt“: Der Splitter steckt im Gehäuse und summt mit dem Band.",
+  "pois": ["funkmast_km31"],
+  "archetype": true,
+  "title": "Ein Splitter",
+  "important": true,
+  "weight": 10
+ },
+ "zettel_foto_gitter": {
+  "name": "Foto am Gitter",
+  "channel": "note",
+  "text": "Zwei Leute vor dem Delta Ring, lachend. Hinten drauf: Wir sehen uns drüben.",
+  "title": "Foto, am Gitter eingeklemmt",
+  "pois": ["metro_line4"],
+  "archetype": true,
+  "weight": 10,
+  "ava": "Drüben. Die Hälfte von mir ist auch drüben.",
+  "important": true
+ },
+ "zettel_kiosk": {
+  "name": "Kiosk-Liste",
+  "channel": "note",
+  "text": "Zeitung 1 Δ. Kaugummi 0,5 Δ. Fahrschein Zone 1: ausverkauft.",
+  "title": "Preisliste am Kiosk",
+  "pois": ["metro_line4"],
+  "archetype": true,
+  "weight": 10,
+  "roles": ["shop"]
+ },
+ "durchsage_zug": {
+  "name": "Zug fällt aus",
+  "channel": "announce",
+  "text": "Durchsage, verzerrt: Ihr Zug fällt aus. Wir bitten um Ihr Verständnis. Ihr Zug fällt aus.",
+  "pois": ["metro_line4"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "geruecht_metro_line4": {
+  "name": "Gerücht metro_line4",
+  "channel": "rumor",
+  "text": "Unter {place} soll es einen Weg in die Stadt geben. {gang} lassen keinen durch, der ihn sucht.",
+  "pois": ["metro_line4"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "splitter_metro_line4": {
+  "name": "Splitter metro_line4",
+  "channel": "splinter",
+  "text": "In einer Kurier-Tasche im stehen gebliebenen Zug, Empfänger: Kessler Cybernetics, Ebene 40. Darin ein Splitter.",
+  "pois": ["metro_line4"],
+  "archetype": true,
+  "title": "Ein Splitter",
+  "important": true,
+  "weight": 10
+ },
+ "zettel_pegelbuch": {
+  "name": "Pegelbuch",
+  "channel": "note",
+  "text": "0 cm. 0 cm. 0 cm. Letzter Eintrag: Etwas hat das Messgerät mitgenommen.",
+  "title": "Wartungsbuch, Pegel",
+  "pois": ["storm_drain9"],
+  "archetype": true,
+  "weight": 10
+ },
+ "zettel_kinderschuh": {
+  "name": "Kinderschuh",
+  "channel": "note",
+  "text": "Größe 26. Mit Edding: BEN.",
+  "title": "Etikett in einem kleinen Schuh",
+  "pois": ["storm_drain9"],
+  "archetype": true,
+  "weight": 10,
+  "ava": "Es hat ihn ordentlich hingelegt. Als würde es auf jemanden warten.",
+  "important": true
+ },
+ "ava_glanz": {
+  "name": "AvA im Kanal",
+  "channel": "ava",
+  "text": "Hier unten glänzt was. Ich mag nicht, wie es glänzt.",
+  "pois": ["storm_drain9"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "geruecht_storm_drain9": {
+  "name": "Gerücht storm_drain9",
+  "channel": "rumor",
+  "text": "In {place} hortet etwas alles, was glänzt. Wer seine Uhr verloren hat, findet sie dort. Vielleicht.",
+  "pois": ["storm_drain9"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "splitter_storm_drain9": {
+  "name": "Splitter storm_drain9",
+  "channel": "splinter",
+  "text": "Im Nest, zwischen Kronkorken, Brillen und einer Taschenuhr: ein Splitter. Er glänzt, also liegt er hier.",
+  "pois": ["storm_drain9"],
+  "archetype": true,
+  "title": "Ein Splitter",
+  "important": true,
+  "weight": 10
+ },
+ "zettel_unfalltafel": {
+  "name": "Unfalltafel",
+  "channel": "note",
+  "text": "Tage ohne Unfall: 0. Bitte nicht mehr umdrehen. Der Steiger.",
+  "title": "Zettel an der Tafel",
+  "pois": ["pit6"],
+  "archetype": true,
+  "weight": 10
+ },
+ "zettel_schichtbuch": {
+  "name": "Schichtbuch Sohle 6",
+  "channel": "note",
+  "text": "Licht unten, grünlich. Mehmet sagt, es summt. Mehmet ist krank. Morgen versiegeln sie.",
+  "title": "Schichtbuch Sohle 6",
+  "pois": ["pit6"],
+  "archetype": true,
+  "weight": 10,
+  "ava": "Grünes Licht und ein Summen. Mir wird schlecht, und ich hab keinen Magen.",
+  "important": true
+ },
+ "durchsage_seilfahrt": {
+  "name": "Seilfahrt",
+  "channel": "announce",
+  "text": "Durchsage über den Förderturm: Seilfahrt eingestellt. Seilfahrt eingestellt. Dann, sehr leise, ein Lied der Bergleute.",
+  "pois": ["pit6"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "geruecht_pit6": {
+  "name": "Gerücht pit6",
+  "channel": "rumor",
+  "text": "In {place} graben {gang} tiefer als je einer war. Unten soll das Salz leuchten.",
+  "pois": ["pit6"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "splitter_pit6": {
+  "name": "Splitter pit6",
+  "channel": "splinter",
+  "text": "In der Kristallgrotte, mitten zwischen den leuchtenden Kristallen, als hätte ihn jemand verloren: ein Splitter, der anders leuchtet.",
+  "pois": ["pit6"],
+  "archetype": true,
+  "title": "Ein Splitter",
+  "important": true,
+  "weight": 10
+ },
+ "zettel_schichtliste": {
+  "name": "Schichtliste Leitstand",
+  "channel": "note",
+  "text": "Ablösung 22 Uhr: –. Ablösung 6 Uhr: –. Unter jeder Zeile eine Unterschrift, immer dieselbe.",
+  "title": "Schichtliste Leitstand",
+  "pois": ["delta_crude"],
+  "archetype": true,
+  "weight": 10,
+  "ava": "Er hat auf seine Ablösung gewartet. Ich glaube, er wartet noch.",
+  "important": true,
+  "roles": ["tech", "office"]
+ },
+ "zettel_brandsatz": {
+  "name": "Rezept auf Pappe",
+  "channel": "note",
+  "text": "3 Teile Diesel, 1 Teil Zucker, Lappen, Flasche. Darunter: Nicht trinken, Kev.",
+  "title": "Rezept auf Pappe",
+  "pois": ["delta_crude"],
+  "archetype": false,
+  "weight": 10,
+  "when": [{"when": "owner", "value": "home"}]
+ },
+ "durchsage_tank4": {
+  "name": "Druckabfall",
+  "channel": "announce",
+  "text": "Alarmband, uralt: Achtung, Druckabfall in Tank 4. Bitte Anlage räumen. Bitte Anlage räumen.",
+  "pois": ["delta_crude"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "geruecht_delta_crude": {
+  "name": "Gerücht delta_crude",
+  "channel": "rumor",
+  "text": "Über {place} brennt die Fackel noch. {gang} brennen Sprit in Fässern. Und alles andere auch.",
+  "pois": ["delta_crude"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "splitter_delta_crude": {
+  "name": "Splitter delta_crude",
+  "channel": "splinter",
+  "text": "Im Leitstand, in einer Lieferkiste an den Klinikturm, zwischen Chemie-Kanistern: ein Splitter in Watte.",
+  "pois": ["delta_crude"],
+  "archetype": true,
+  "title": "Ein Splitter",
+  "important": true,
+  "weight": 10
+ },
+ "zettel_postkarte": {
+  "name": "Postkarte",
+  "channel": "note",
+  "text": "Liebe Oma, wir kommen bald! Ostern bestimmt. Das Datum ist ausgeblichen.",
+  "title": "Postkarte von der Pinnwand",
+  "pois": ["sunny_acres"],
+  "archetype": true,
+  "weight": 10,
+  "ava": "Ostern bestimmt. So was haben wir auch gesagt.",
+  "important": true
+ },
+ "zettel_hausordnung": {
+  "name": "Hausordnung",
+  "channel": "note",
+  "text": "Ruhezeit 13 bis 15 Uhr. Verstöße werden geahndet. Neuer Zusatz in Rot: mit Munition.",
+  "title": "Hausordnung, ergänzt",
+  "pois": ["sunny_acres"],
+  "archetype": true,
+  "weight": 10
+ },
+ "durchsage_bingo": {
+  "name": "Bingo",
+  "channel": "announce",
+  "text": "Lautsprecher am Pool: Bingo heute um 16 Uhr! Erster Preis: ein Kanister Wasser. Bitte lächeln.",
+  "pois": ["sunny_acres"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "geruecht_sunny_acres": {
+  "name": "Gerücht sunny_acres",
+  "channel": "rumor",
+  "text": "In {place} sitzen Bewaffnete mit Sonnenhut am leeren Pool. {gang} tauschen Medizin, wenn man freundlich ist.",
+  "pois": ["sunny_acres"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "splitter_sunny_acres": {
+  "name": "Splitter sunny_acres",
+  "channel": "splinter",
+  "text": "In einer Pralinenschachtel im Büro, statt der Kirschpraline: ein Splitter. Getauscht gegen Medizin, steht auf dem Deckel.",
+  "pois": ["sunny_acres"],
+  "archetype": true,
+  "title": "Ein Splitter",
+  "important": true,
+  "weight": 10
+ },
+ "zettel_tag_danach": {
+  "name": "Der Tag danach",
+  "channel": "note",
+  "text": "06:00 Wecken. 06:30 Lagebesprechung. 07:00 Ernte (?). Das Fragezeichen ist dreimal nachgezogen.",
+  "title": "Dienstplan für den Tag danach",
+  "pois": ["raketensilo"],
+  "archetype": false,
+  "weight": 10,
+  "roles": ["living", "office"]
+ },
+ "zettel_kryoschild": {
+  "name": "Namensschild",
+  "channel": "note",
+  "text": "Lt. Harrow, Reserve. Auf der Rückseite, eingeritzt: Weckt mich, wenn es vorbei ist.",
+  "title": "Namensschild eines Kryotanks",
+  "pois": ["raketensilo"],
+  "archetype": false,
+  "weight": 10,
+  "ava": "Kryo. Wie bei mir. Er schläft noch, oder? Sag, dass er noch schläft.",
+  "important": true
+ },
+ "funk_countdown": {
+  "name": "Countdown",
+  "channel": "radio",
+  "text": "Funk aus dem Kontrollraum, sehr ruhig: Countdown angehalten bei einer Sekunde. Erwarte Befehl. Erwarte Befehl.",
+  "pois": ["raketensilo"],
+  "archetype": true,
+  "repeat": true,
+  "weight": 10
+ },
+ "splitter_raketensilo": {
+  "name": "Splitter raketensilo",
+  "channel": "splinter",
+  "text": "Im Terminal an der Startrampe flüstert die KI: „Ich weiß, wer sie ist.“ Dann spuckt der Kartenschlitz einen Splitter aus.",
+  "pois": ["raketensilo"],
+  "archetype": true,
+  "title": "Ein Splitter",
+  "important": true,
+  "weight": 10
+ },
+ "schicht_salzschuerfer": {
+  "name": "Abrechnung",
+  "channel": "note",
+  "text": "14 Säcke. 2 Tote. 1 Esel verkauft. Gut gelaufen.",
+  "title": "Abrechnung der Salzschürfer",
+  "when": [{"when": "layer", "value": "salzschuerfer"}],
+  "weight": 14
+ },
+ "schicht_letzter_tropfen": {
+  "name": "Gebetszettel",
+  "channel": "note",
+  "text": "Wer durstig ist, der bleibe. Wer bleibt, der teile. Wer teilt, wird durstig.",
+  "title": "Gebetszettel, an die Wand genagelt",
+  "when": [{"when": "layer", "value": "letzter_tropfen"}],
+  "weight": 14
+ },
+ "schicht_karawane": {
+  "name": "Frachtbrief",
+  "channel": "note",
+  "text": "Ziel: Osten. Ladung: Batterien, Salz, ein Klavier. Das Klavier ist durchgestrichen.",
+  "title": "Frachtbrief einer Karawane",
+  "when": [{"when": "layer", "value": "karawane"}],
+  "weight": 14
+ },
+ "schicht_vorortfamilien": {
+  "name": "Schlafplätze",
+  "channel": "note",
+  "text": "Namen und Matratzen, mit Kreide an die Wand. Hinter drei Namen ein Kreuz, hinter einem ein Herz.",
+  "title": "Liste der Schlafplätze",
+  "when": [{"when": "layer", "value": "vorortfamilien"}],
+  "weight": 14
+ },
+ "schicht_versprengte": {
+  "name": "Lagebericht",
+  "channel": "note",
+  "text": "Position gehalten. Kein Kontakt zum Kommando. Moral: ausreichend. Darunter, mit der Hand: gelogen.",
+  "title": "Lagebericht",
+  "when": [{"when": "layer", "value": "versprengte"}],
+  "weight": 14
+ },
+ "schicht_mann_mit_hund": {
+  "name": "Am Napf",
+  "channel": "note",
+  "text": "Bin Wasser holen. Hund nicht füttern, er lügt.",
+  "title": "Zettel am Futternapf",
+  "when": [{"when": "layer", "value": "mann_mit_hund"}],
+  "weight": 14
+ },
+ "schicht_kupferdiebe": {
+  "name": "Kabelskizze",
+  "channel": "note",
+  "text": "Jeder Schacht im Haus ist eingezeichnet. Am Rand: Rest morgen.",
+  "title": "Skizze, alle Kabel rot",
+  "when": [{"when": "layer", "value": "kupferdiebe"}],
+  "weight": 14
+ },
+ "schicht_kronkorken_tauscher": {
+  "name": "Preisliste",
+  "channel": "note",
+  "text": "Wasser 3. Batterie 5. Auskunft 1. Schweigen 10.",
+  "title": "Preisliste in Kronkorken",
+  "when": [{"when": "layer", "value": "kronkorken_tauscher"}],
+  "weight": 14
+ },
+ "schicht_stille_brueder": {
+  "name": "Striche",
+  "channel": "note",
+  "text": "Keine Worte, nur Striche, Hunderte, in Fünferbündeln. Jemand hat Tage gezählt, ohne ein Wort zu sagen.",
+  "title": "Ein Blatt voller Striche",
+  "when": [{"when": "layer", "value": "stille_brueder"}],
+  "weight": 14
+ },
+ "schicht_sanitaeterin": {
+  "name": "Behandlungsbuch",
+  "channel": "note",
+  "text": "Fieber. Fieber. Bein ab. Fieber. Geburt (Mädchen!). Fieber.",
+  "title": "Behandlungsbuch",
+  "when": [{"when": "layer", "value": "sanitaeterin"}],
+  "weight": 14
+ },
+ "zettel_aufgebrochen": {
+  "name": "Wer war das",
+  "channel": "note",
+  "text": "An einer aufgebrochenen Kiste: Wer das war, soll sich melden. Dann reden wir über Bezahlung.",
+  "title": "Zettel an einer Kiste",
+  "when": [{"when": "trace", "value": "chest"}],
+  "weight": 30
+ },
+ "zettel_kreidekreis": {
+  "name": "Kreidekreis",
+  "channel": "note",
+  "text": "Ein Kreidekreis um einen dunklen Fleck. Daneben: Für den Boss. Wir vergessen das Gesicht nicht.",
+  "title": "Kreide am Boden",
+  "when": [{"when": "trace", "value": "boss"}],
+  "weight": 30
+ },
+ "zettel_neue_ordnung": {
+  "name": "Neue Ordnung",
+  "channel": "note",
+  "text": "Frisch an der Tür: Hier wohnen jetzt wir. Offene Kisten sind keine Einladung mehr.",
+  "title": "Zettel an der Tür",
+  "when": [{"when": "cleaned", "value": ""}],
+  "weight": 30,
+  "repeat": true
+ },
+ "zettel_uebernahme": {
+  "name": "Übernahme",
+  "channel": "note",
+  "text": "Hastig, mit Kohle: {home} sind raus. Wer noch zu ihnen hält, geht jetzt auch.",
+  "title": "Kohle an der Wand",
+  "when": [{"when": "war", "value": ""},{"when": "owner", "value": "other"}],
+  "weight": 30
+ },
+ "ava_kisten_offen": {
+  "name": "AvA: Kisten offen",
+  "channel": "ava",
+  "text": "Die Kisten von neulich stehen noch offen. Seitdem war keiner hier.",
+  "when": [{"when": "trace", "value": "chest"}],
+  "repeat": true,
+  "weight": 20
+ },
+ "ava_sirene": {
+  "name": "AvA: Sirene",
+  "channel": "ava",
+  "text": "Die Sirene hängt noch so schief, wie du sie gelassen hast.",
+  "when": [{"when": "trace", "value": "siren"}],
+  "repeat": true,
+  "weight": 25
+ },
+ "ava_boss": {
+  "name": "AvA: Boss",
+  "channel": "ava",
+  "text": "Da hinten ist noch der Fleck von ihrem Boss. Ich hab mir den Abend gemerkt.",
+  "when": [{"when": "trace", "value": "boss"}],
+  "repeat": true,
+  "weight": 40
+ },
+ "ava_aufgeraeumt": {
+  "name": "AvA: aufgeräumt",
+  "channel": "ava",
+  "text": "Jemand hat aufgeräumt. Unsere Spuren sind weg. Gruselig ordentlich.",
+  "when": [{"when": "cleaned", "value": ""}],
+  "important": true,
+  "weight": 50
+ },
+ "ava_revierkrieg": {
+  "name": "AvA: Revierkrieg",
+  "channel": "ava",
+  "text": "{gang} haben den Ort genommen. Die Farben an der Wand sind noch feucht.",
+  "when": [{"when": "war", "value": ""},{"when": "owner", "value": "other"}],
+  "important": true,
+  "weight": 45
+ },
+ "ava_stammgast": {
+  "name": "AvA: Stammgast",
+  "channel": "ava",
+  "text": "Wir kommen ganz schön oft hierher. Ich kenne schon die Ecken.",
+  "when": [{"when": "visits", "value": "3"}],
+  "weight": 8
+ },
+ "ort_revierkrieg": {
+  "name": "Ort: übernommen",
+  "channel": "place",
+  "text": "Gehört jetzt {gang}. Die alten Farben sind übermalt.",
+  "when": [{"when": "war", "value": ""}],
+  "repeat": true,
+  "weight": 30
+ },
+ "ort_aufgeraeumt": {
+  "name": "Ort: aufgeräumt",
+  "channel": "place",
+  "text": "Leylas Spuren sind weg. Die Neuen haben umgebaut.",
+  "when": [{"when": "cleaned", "value": ""}],
+  "repeat": true,
+  "weight": 25
+ },
+ "ort_spuren": {
+  "name": "Ort: Spuren frisch",
+  "channel": "place",
+  "text": "Die Kisten, die Leyla aufgemacht hat, stehen noch offen.",
+  "when": [{"when": "trace", "value": "chest"}],
+  "repeat": true,
+  "weight": 20
+ },
+ "trope_letzte_stellung": {
+  "name": "Letzte Stellung",
+  "channel": "note",
+  "text": "Munition gezählt, auf dem Sandsack: 12. Dann 7. Dann 2. Die 2 ist nicht durchgestrichen.",
+  "title": "Zahlen auf einem Sandsack",
+  "weight": 0
+ },
+ "trope_letzte_pose": {
+  "name": "Letzte Pose",
+  "channel": "note",
+  "text": "An einer halb leeren Wasserflasche: Für wen auch immer. Ich brauch sie nicht mehr.",
+  "title": "Zettel an einer Flasche",
+  "weight": 0
+ },
+ "trope_letztes_logbuch": {
+  "name": "Das letzte Logbuch",
+  "channel": "note",
+  "text": "Tag 212. Wasser für vier Tage. Ich schreibe trotzdem jeden Tag, damit einer weiß, dass hier einer war. Tag 213.",
+  "title": "Das letzte Logbuch",
+  "ava": "Tag 213, dann nichts mehr. Ich les es trotzdem noch einmal.",
+  "important": true,
+  "weight": 0
+ },
+ "trope_eingefroren": {
+  "name": "Eingefrorener Moment",
+  "channel": "note",
+  "text": "Im Formular in der Maschine, mitten im Wort: Hiermit beantrage ich die Verläng",
+  "title": "Formular in der Schreibmaschine",
+  "weight": 0
+ },
+ "trope_unter_decke": {
+  "name": "Unter der Decke",
+  "channel": "note",
+  "text": "Mit Kreide neben der Decke: Sie hieß Tessa. Nicht anfassen.",
+  "title": "Kreide am Boden",
+  "ava": "Jemand hat sie zugedeckt. Das war lieb.",
+  "important": true,
+  "weight": 0
+ },
+ "trope_schrein": {"name": "Schrein", "channel": "note", "text": "Ein Foto am Schrein: drei Leute vor einem Van. Darunter: Kommt heim.", "title": "Foto am Schrein", "weight": 0},
+ "trope_automat": {"name": "Das Haus läuft weiter", "channel": "note", "text": "Am Automaten: Bitte nicht treten. Er merkt sich das.", "title": "Zettel am Automaten", "weight": 0},
+ "faden_01": {
+  "name": "Faden 1",
+  "channel": "memory",
+  "text": "Ein weißer Flur. Klaviermusik aus der Decke. Ich zähle die Lampen, bis die Schwester sagt, ich soll aufhören.",
+  "title": "Erinnerung 1",
+  "ava": "Das war ich. Ich zähle immer noch Lampen. Steck ihn ein, Leyla.",
+  "important": true,
+  "weight": 10
+ },
+ "faden_02": {
+  "name": "Faden 2",
+  "channel": "memory",
+  "text": "Ein Armband mit Nummer: K-40-117. Es kratzt am Handgelenk.",
+  "title": "Erinnerung 2",
+  "ava": "Einhundertsiebzehn. So haben sie mich gerufen. Nicht weitersagen.",
+  "important": true,
+  "weight": 10,
+  "after": "faden_01"
+ },
+ "faden_03": {
+  "name": "Faden 3",
+  "channel": "memory",
+  "text": "Hinter der Scheibe ein Kind in einem Tank. Es winkt nicht zurück.",
+  "title": "Erinnerung 3",
+  "ava": "Ich hab jeden Tag gewinkt. Irgendwann hab ich aufgehört.",
+  "important": true,
+  "weight": 10,
+  "after": "faden_02"
+ },
+ "faden_04": {
+  "name": "Faden 4",
+  "channel": "memory",
+  "text": "Eine Frau in Weiß liest von einem Zettel ab: Herz, Typ A, Lieferung Donnerstag. Dabei sieht sie mich an.",
+  "title": "Erinnerung 4",
+  "ava": "Donnerstag. Ich hab Donnerstage gehasst, bevor ich wusste, warum.",
+  "important": true,
+  "weight": 10,
+  "after": "faden_03"
+ },
+ "faden_05": {
+  "name": "Faden 5",
+  "channel": "memory",
+  "text": "Ebene 38 riecht nach Puder. Die Damen von oben kommen zum Anprobieren und lachen viel.",
+  "title": "Erinnerung 5",
+  "ava": "Ebene 38. Merk dir die Zahl für mich.",
+  "important": true,
+  "weight": 10,
+  "after": "faden_04"
+ },
+ "faden_06": {
+  "name": "Faden 6",
+  "channel": "memory",
+  "text": "Im Lieferausgang steht jemand mit deinem Lachen, in einer Kessler-Jacke, die nicht passt.",
+  "title": "Erinnerung 6",
+  "ava": "Das warst du. Oder? Du hast so gelacht, als hättest du Angst.",
+  "important": true,
+  "weight": 10,
+  "after": "faden_05"
+ },
+ "faden_07": {
+  "name": "Faden 7",
+  "channel": "memory",
+  "text": "Ein Wäschewagen. Unter den Laken ist es dunkel und warm, und jemand schiebt sehr schnell.",
+  "title": "Erinnerung 7",
+  "ava": "Du hast mich rausgeschoben. Unter den Laken. Jetzt weiß ich es wieder.",
+  "important": true,
+  "weight": 10,
+  "after": "faden_06"
+ },
+ "faden_08": {
+  "name": "Faden 8",
+  "channel": "memory",
+  "text": "Scheinwerfer hinter dem Van. Eine höfliche Stimme: Bitte halten Sie an. Sie transportieren Eigentum.",
+  "title": "Erinnerung 8",
+  "ava": "Eigentum. Fahr schneller. Ich weiß, das ist lange her. Fahr trotzdem schneller.",
+  "important": true,
+  "weight": 10,
+  "after": "faden_07"
+ },
+ "faden_09": {
+  "name": "Faden 9",
+  "channel": "memory",
+  "text": "Eine Garage am Delta Ring, ein Doktor ohne Namen. Er sagt: Der Körper muss in den Tank, der Kopf passt woanders hin.",
+  "title": "Erinnerung 9",
+  "ava": "Deshalb fliege ich. Jetzt weißt du es auch.",
+  "important": true,
+  "weight": 10,
+  "after": "faden_08"
+ },
+ "faden_10": {
+  "name": "Faden 10",
+  "channel": "memory",
+  "text": "Drei Rotoren, ein Scheinwerfer und eine Stimme, die nach mir klingt. Die erste Wand kommt schnell.",
+  "title": "Erinnerung 10",
+  "ava": "Die ersten Tage bin ich nur gegen Wände geflogen. Lach nicht.",
+  "important": true,
+  "weight": 10,
+  "after": "faden_09"
+ },
+ "faden_11": {
+  "name": "Faden 11",
+  "channel": "memory",
+  "text": "Eine Akte: Rückholung K-40-117, Priorität niedrig. Wert der Ware: gering. Krankheit: unheilbar.",
+  "title": "Erinnerung 11",
+  "ava": "Gering. Na gut. Dann sucht mich wenigstens keiner mehr.",
+  "important": true,
+  "weight": 10,
+  "after": "faden_10"
+ },
+ "faden_12": {
+  "name": "Faden 12",
+  "channel": "memory",
+  "text": "Über eine Schulter gelesen, halb: Rezept, Ebene 40, Ersatzteillager, Fach 117.",
+  "title": "Erinnerung 12",
+  "ava": "Ebene 40. Da liegt das Rezept. Und der Rest von mir.",
+  "important": true,
+  "weight": 10,
+  "after": "faden_11"
+ },
+ "faden_13": {
+  "name": "Faden 13",
+  "channel": "memory",
+  "text": "Ganz klein: Leyla schläft im Van am Feuer. Ich passe auf und summe, obwohl ich keinen Mund mehr habe.",
+  "title": "Erinnerung 13",
+  "ava": "Den wollte ich behalten. Danke, dass du ihn mir zurückgebracht hast.",
+  "important": true,
+  "weight": 10,
+  "after": "faden_12"
+ }
+}

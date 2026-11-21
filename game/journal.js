@@ -9,14 +9,14 @@ import { clockText } from './save.js';
 export const CATS = [
   ['quest', 'Quest', 'flag'], ['loot', 'Beute', 'bags'], ['trade', 'Handel', 'coins'], ['fight', 'Kampf', 'skull'],
   ['crew', 'Crew', 'humans'], ['travel', 'Reise', 'map'], ['camp', 'Camp', 'moon'], ['progress', 'Fortschritt', 'trophy'],
-  ['radio', 'Radio', 'music'], ['system', 'System', 'settings'],
+  ['radio', 'Radio', 'music'], ['story', 'Story', 'pen'], ['system', 'System', 'settings'],
 ];
 export const CAT_IDS = CATS.map(c => c[0]);
 export const KEEP = 400;
 // in the build mode only successes go into the Logbuch (Daniel 21.11.: „Nur Erfolge: gekauft, eingebaut, Ensemble“)
 const SUCCESS = new Set(['good', 'trophy', 'loot', 'secret', 'recipe', 'keepsake']);
 
-const BY_KIND = { trophy: 'progress', recipe: 'progress', loot: 'loot', secret: 'loot', travel: 'travel', camp: 'camp', drama: 'fight', heal: 'fight' };
+const BY_KIND = { story: 'story', ava: 'story', trophy: 'progress', recipe: 'progress', loot: 'loot', secret: 'loot', travel: 'travel', camp: 'camp', drama: 'fight', heal: 'fight' };
 const RULES = [
   [/auftrag|quest|abgeben|erledigt:|bergung/i, 'quest'],
   [/gekauft|verkauft|Δ|handel|preis|bezahlt/i, 'trade'],

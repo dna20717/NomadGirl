@@ -7925,5 +7925,78 @@
   "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
   "date": "2026-11-21",
   "description": "Hängende Abfahrtstafel mit Bernstein-Zeilen, eine rot „DELAYED“, Uhr daneben (Metro Line 4) (#165)."
+ },
+ "trope_last_stand": {
+  "name": "Trope · Letzte Stellung",
+  "kind": "image",
+  "file": "assets/pois/tropes/trope_last_stand.png",
+  "source": "KI (PixelLab, create_image_pro 160 × 144 / 144 × 160 / 136 × 136, AAP-64, Stil: Wow-Zettelkabine), beste von 4 Kandidaten, Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Toter Soldat hinter Sandsäcken, Helm über dem Gesicht, Gewehr auf dem Schoß, Hülsen, Munitionskiste (#167)."
+ },
+ "trope_desk": {
+  "name": "Trope · Eingefrorener Moment",
+  "kind": "image",
+  "file": "assets/pois/tropes/trope_desk.png",
+  "source": "KI (PixelLab, create_image_pro 160 × 144 / 144 × 160 / 136 × 136, AAP-64, Stil: Wow-Zettelkabine), beste von 4 Kandidaten, Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Toter Beamter über dem Schreibtisch zusammengesunken, Schreibmaschine, Lampe, Papiere (#167)."
+ },
+ "trope_blanket": {
+  "name": "Trope · Unter der Decke",
+  "kind": "image",
+  "file": "assets/pois/tropes/trope_blanket.png",
+  "source": "KI (PixelLab, create_image_pro 160 × 144 / 144 × 160 / 136 × 136, AAP-64, Stil: Wow-Zettelkabine), beste von 4 Kandidaten, Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Zugedeckter Toter, nur die Stiefel schauen heraus, kleiner Blutfleck, Brille und Becher daneben (#167)."
+ },
+ "trope_shrine": {
+  "name": "Trope · Der Schrein",
+  "kind": "image",
+  "file": "assets/pois/tropes/trope_shrine.png",
+  "source": "KI (PixelLab, create_image_pro 160 × 144 / 144 × 160 / 136 × 136, AAP-64, Stil: Wow-Zettelkabine), beste von 4 Kandidaten, Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Kiste als Altar, Kerzen, Fotos, Helm auf einem Stock, Blume (#167)."
+ },
+ "trope_warning": {
+  "name": "Trope · Warnung an der Wand",
+  "kind": "image",
+  "file": "assets/pois/tropes/trope_warning.png",
+  "source": "KI (PixelLab, create_image_pro 160 × 144 / 144 × 160 / 136 × 136, AAP-64, Stil: Wow-Zettelkabine), beste von 4 Kandidaten, Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Decal: roter Totenkopf mit Kreuzen und Pfeil nach unten, Farbe läuft (#167)."
+ },
+ "trope_handprints": {
+  "name": "Trope · Handabdrücke",
+  "kind": "image",
+  "file": "assets/pois/tropes/trope_handprints.png",
+  "source": "KI (PixelLab, create_image_pro 160 × 144 / 144 × 160 / 136 × 136, AAP-64, Stil: Wow-Zettelkabine), beste von 4 Kandidaten, Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Decal: dunkle Handabdrücke an der Wand entlang, Kreidestriche (#167)."
+ },
+ "trope_logbook": {
+  "name": "Trope · Das letzte Logbuch",
+  "kind": "image",
+  "file": "assets/pois/tropes/trope_logbook.png",
+  "source": "KI (PixelLab, create_image_pro 160 × 144 / 144 × 160 / 136 × 136, AAP-64, Stil: Wow-Zettelkabine), beste von 4 Kandidaten, Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Kiste als Tisch, offenes Tagebuch, Laterne, Becher, Brille (#167)."
+ },
+ "trope_last_pose": {
+  "name": "Trope · Letzte Pose",
+  "kind": "image",
+  "file": "assets/pois/tropes/trope_last_pose.png",
+  "source": "KI (PixelLab, create_image_pro 160 × 144 / 144 × 160 / 136 × 136, AAP-64, Stil: Wow-Zettelkabine), beste von 4 Kandidaten, Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Toter Plünderer an die Wand gelehnt, Kapuze, Rucksack, leere Flasche, Blutfleck (#167)."
+ },
+ "trope_kids": {
+  "name": "Trope · Kinderspuren",
+  "kind": "image",
+  "file": "assets/pois/tropes/trope_kids.png",
+  "source": "KI (PixelLab, create_image_pro 160 × 144 / 144 × 160 / 136 × 136, AAP-64, Stil: Wow-Zettelkabine), beste von 4 Kandidaten, Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Teddy mit einem Auge, Blechauto, Himmelszeichnung, rote Gummistiefel auf einem Stück Boden (#167).",
+  "origin": [60, 84]
  }
 }

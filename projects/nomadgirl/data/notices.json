@@ -21,7 +21,9 @@
   {"id": "travel", "name": "Reise", "icon": "map", "sound": "ping", "waitsWindow": true, "waitsFull": true, "buildLog": false, "cat": "travel"},
   {"id": "camp", "name": "Camp", "icon": "moon", "sound": "ping", "waitsWindow": true, "waitsFull": false, "buildLog": false, "cat": "camp"},
   {"id": "loot", "name": "Beute", "icon": "bags", "sound": "good", "waitsWindow": false, "waitsFull": false, "buildLog": true, "cat": "loot"},
-  {"id": "keepsake", "name": "Fürs Cockpit", "icon": "gift", "sound": "chime", "waitsWindow": false, "waitsFull": false, "buildLog": true, "cat": "progress"}
+  {"id": "keepsake", "name": "Fürs Cockpit", "icon": "gift", "sound": "chime", "waitsWindow": false, "waitsFull": false, "buildLog": true, "cat": "progress"},
+  {"id": "story", "name": "Fund (Zettel, Durchsage, Splitter)", "icon": "pen", "sound": "chime", "waitsWindow": true, "waitsFull": false, "buildLog": true, "cat": "story"},
+  {"id": "ava", "name": "AvA kommentiert", "icon": "air", "sound": "ping", "waitsWindow": true, "waitsFull": false, "buildLog": true, "cat": "story"}
  ],
  "log": {"keep": 400}
 }

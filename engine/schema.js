@@ -15,6 +15,9 @@ import { ROOM_TYPES, WOW_AT, MOTIFS, GUIDE_KINDS, STINGERS, LEVEL } from './leve
 import { ORDER, DECAY, RULE_REASONS } from './dressing_story.js';
 import { RESIDENTS } from './story.js';
 import { DECALS } from './dressing_story.js';
+import { CHANNELS, CONDITIONS } from './storylets.js';
+import { OCCUPANT_KINDS } from './history.js';
+import { TROPE_PLACES } from './tropes.js';
 import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
 import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
 import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from './megarig.js';
@@ -488,7 +491,7 @@ export const AREAS = {
         { hint: '#154 Bühne mit festen Plätzen (game/play/stage.js): jede Einblendung hängt in genau einer Zone, nichts liegt übereinander' })] },
       { title: 'Arten', fields: [table('kinds', 'Arten', [text('id', 'ID'), text('name', 'Name'), text('icon', 'Icon', { hint: 'Lucide-Name aus game/icons.js' }), select('sound', 'Ton', [['', '– keiner –'], ['ping', 'Ping'], ['good', 'Gut'], ['nope', 'Nein'], ['fanfare', 'Fanfare'], ['chime', 'Glöckchen'], ['sparkle', 'Glitzern'], ['low', 'Tief']]),
           bool('waitsWindow', 'Wartet bei offenem Fenster'), bool('waitsFull', 'Wartet, wenn voll'), bool('buildLog', 'Im Bau-Modus ins Logbuch'),
-          select('cat', 'Logbuch-Kategorie', [['', '– nach Stichwort –'], ['quest', 'Quest'], ['loot', 'Beute'], ['trade', 'Handel'], ['fight', 'Kampf'], ['crew', 'Crew'], ['travel', 'Reise'], ['camp', 'Camp'], ['progress', 'Fortschritt'], ['radio', 'Radio'], ['system', 'System']])],
+          select('cat', 'Logbuch-Kategorie', [['', '– nach Stichwort –'], ['quest', 'Quest'], ['loot', 'Beute'], ['trade', 'Handel'], ['fight', 'Kampf'], ['crew', 'Crew'], ['travel', 'Reise'], ['camp', 'Camp'], ['progress', 'Fortschritt'], ['radio', 'Radio'], ['story', 'Story (#167)'], ['system', 'System']])],
         { hint: 'Jede Meldung des Spiels hat eine Art (info, good, warn, trophy …). Warnungen, Belohnungen und Beute warten nie (Daniel 21.11.: „Nur Erfolge“ im Bau-Modus)' })] },
       { title: 'Logbuch', fields: [num('log.keep', 'Einträge behalten', { min: 50, max: 2000, hint: 'Die neuesten; jeder Durchgang beginnt leer. Leer = 400' })] },
     ],
@@ -1862,6 +1865,72 @@ export const AREAS = {
       num('light', 'Licht dunkler', { unit: '%', min: 0, max: 90 }), ref('loot', 'Beute', 'lootTables', { hint: 'Kisten in diesem Raum nehmen diese Tabelle. Leer = Beute des POI' }),
       area_('note', 'Logbuch-Zettel', { hint: 'Optional: ein Satz, den Leyla hier findet (erscheint beim ersten Betreten)' })] }],
   },
+  storylets: {
+    name: 'Storylets', singular: 'Storylet', icon: 'pen', file: 'data/storylets.json', kind: 'catalog', groupBy: { key: 'channel', options: CHANNELS },
+    hint: '#167 G1 Erzählschicht (Daniel 21.11.2026: „Storylets erscheinen in der Welt (Zettel, Durchsagen, Funk), wandern ins Logbuch, und AvA kommentiert wichtige Funde kurz“). Ein Katalog für Zettel, Durchsagen, Funk, AvAs Worte, Radio-Gerüchte, Ortsfenster, Splitter und den Faden (AvAs Erinnerungen als Kette über „Nach“). Bedingungen lesen Story, Besitzer, Zeitschichten und Leylas Spuren. Platzhalter: {place} {gang} {home} {layer} {first} {day} {region}. Grundsätze: ziehen statt drücken, übersehbar, kein anonymes Detail. Texte ⚠️ Entwurf (Code), Daniel segnet ab.',
+    template: { name: 'Neues Storylet', channel: 'note', text: '', weight: 10, pois: [], kinds: [], when: [] },
+    row: x => `${label(CHANNELS, x.channel)}${x.pois?.length ? ' · ' + x.pois.join(', ') : x.kinds?.length ? ' · ' + x.kinds.join(', ') : ''}${x.important ? ' · AvA' : ''}${x.after ? ' · nach ' + x.after : ''}`,
+    sections: [
+      { title: 'Storylet', fields: [NAME, select('channel', 'Wo', CHANNELS, { required: true }), text('title', 'Titel', { hint: 'Überschrift im Bild und im Logbuch. Leer = nach Kanal (Ein Zettel, Durchsage, Funk)' }),
+        area_('text', 'Text', { required: true, hint: 'Zeigen, nie erklären. Ton der Steckbriefe: ein Witz, eine Wunde' }),
+        area_('ava', 'AvA kommentiert', { hint: 'Kurz, nur bei wichtigen Funden (Splitter, Ereignis). Erscheint gut eine Sekunde nach dem Fund, mit Gesicht an der Drohne' }),
+        bool('important', 'Wichtig', { hint: 'AvA kommentiert (wenn Text da)' })] },
+      { title: 'Wo und wann', fields: [refs('pois', 'POIs', 'pois', { hint: 'Nur in diesen POIs (am Wahrzeichen selbst). Leer = überall, wo die POI-Arten passen' }),
+        bool('archetype', 'Auch gewürfelte Orte', { hint: 'Gilt auch an gewürfelten Orten dieser POIs (Archetyp). Nur, wenn der Text keinen Namen des Wahrzeichens nennt' }),
+        multi('kinds', 'POI-Arten', POI_KINDS, { hint: 'An allen Orten dieser Art. Leer = jede Art' }),
+        ref('after', 'Nach', 'storylets', { hint: 'Erst, wenn dieses Storylet gefunden ist (Kette, z. B. der Faden)' }),
+        table('when', 'Bedingungen', [select('when', 'Wenn', CONDITIONS), text('value', 'Wert', { hint: 'Komma = eines davon' }), bool('not', 'nicht')]),
+        num('weight', 'Gewicht', { min: 0, hint: 'Standard 10; ein Storylet, das diesen POI nennt, zählt doppelt' }), bool('repeat', 'Wiederholt sich', { hint: 'Auch nach dem Fund wieder möglich (Durchsagen, Gerüchte)' }),
+        multi('roles', 'Liegt in Räumen', ROOM_ROLES, { hint: 'Zettel: in Räumen dieser Rolle. Leer = irgendwo' }), bool('off', 'Aus')] }],
+    check: (x, report, p) => {
+      const S = p?.data?.storylets || {}, occ = new Set((p?.data?.history?.occupants || []).map(o => o.id)), vals = c => String(c.value || '').split(',').map(s => s.trim()).filter(Boolean);
+      for (const c of x.when || []) {
+        if (c.when === 'seen') for (const v of vals(c)) if (!S[v]) report('warning', `Bedingung „gefunden“: Storylet „${v}“ gibt es nicht`);
+        if (c.when === 'layer') for (const v of vals(c)) if (!occ.has(v)) report('warning', `Bedingung „Zeitschicht“: Besetzer „${v}“ gibt es nicht (Zeitschichten › Besetzer)`);
+      }
+      if (x.after) { let k = x.after, n = 0; const seen = new Set(); while (k && n++ < 99) { if (seen.has(k)) { report('error', 'Die Kette über „Nach“ ist ein Kreis'); break; } seen.add(k); k = S[k]?.after; } }
+      if (x.channel === 'memory' && !x.ava) report('hint', 'Faden ohne AvA-Kommentar');
+    },
+  },
+  tropes: {
+    name: 'Tropes', singular: 'Trope', icon: 'skull', file: 'data/tropes.json', kind: 'catalog',
+    hint: '#167 Tropes als Spuren-Bausteine (docs/concepts/poi_next_gen.md › Bewährte Tropes): eine kleine Szene in einem Raum, gemalt (Bild) oder aus Code (Spuren, Art aus Code), optional mit Zettel daneben. Bedingungen wie bei Storylets. Tote ehrlich, moderater Gore (Daniel: „Nicht Overdrive, sondern moderat“), keine Erklärtexte, keine Skelett-Witze am Fließband.',
+    template: { name: 'Neuer Trope', place: 'floor', tiles: 3, chance: 50, weight: 10, gore: 0, roles: [], events: [], when: [] },
+    row: x => `${label(TROPE_PLACES, x.place || 'floor')} · ${x.chance ?? 60} %${x.image ? ' · Bild' : x.art ? ' · Code' : ''}${x.gore ? ' · Gore ' + x.gore : ''}`,
+    sections: [
+      { title: 'Trope', fields: [NAME, DESCRIPTION, ref('image', 'Bild', 'assets', { hint: 'Gemaltes Bild (PixelLab, AAP-64). Leer = Art aus Code und Spuren' }), num('cm', 'Höhe im Spiel', { unit: 'cm', min: 10, hint: 'Leyla ist 170 cm' }),
+        select('art', 'Art aus Code', [['', '–'], ['ad', 'Werbung gegen Wirklichkeit (Plakat mit Slogan einer Marke)'], ['machine', 'Das Haus läuft weiter (Maschine blinkt, dampft)'], ['order', 'Neue Ordnung (Kisten in Gang-Farbe)']]),
+        multi('decals', 'Spuren dazu', DECALS), select('place', 'Wo', TROPE_PLACES), num('tiles', 'Breite', { unit: 'Kacheln', min: 1, max: 6 }),
+        num('gore', 'Gore', { min: 0, max: 2, hint: '0 keiner, 1 Blutfleck, 2 moderat (Tote sichtbar). Zeitschichten › Gore höchstens schaltet ab' }), ref('note', 'Zettel daneben', 'storylets', { hint: 'Ein Zettel (Storylet) liegt dabei; er wandert beim Lesen ins Logbuch' })] },
+      { title: 'Bedingungen', fields: [multi('roles', 'Rollen', ROOM_ROLES, { hint: 'In Räumen mit dieser Rolle. Leer = überall' }),
+        multi('events', 'Passt zu', [...EVENT_KINDS.filter(([k]) => k), ...RESIDENTS], { hint: 'Ereignis des POI oder wer heute dort ist. Leer = zu allem' }),
+        refs('pois', 'Nur in POIs', 'pois'), table('when', 'Bedingungen', [select('when', 'Wenn', CONDITIONS), text('value', 'Wert'), bool('not', 'nicht')]),
+        num('chance', 'Chance je Level', { unit: '%', min: 0, max: 100 }), num('weight', 'Gewicht', { min: 0 }), bool('wow', 'Auch im Wow-Raum'), bool('off', 'Aus')] }],
+    check: (x, report, p) => {
+      if (!x.image && !x.art && !(x.decals || []).length) report('warning', 'Weder Bild noch Code-Art noch Spuren: nichts zu sehen');
+      if (x.note && p?.data?.storylets?.[x.note] && p.data.storylets[x.note].channel !== 'note') report('warning', 'Zettel daneben sollte ein Storylet mit Wo = Zettel sein');
+    },
+  },
+  history: {
+    name: 'Zeitschichten', icon: 'hourglass', file: 'data/history.json', kind: 'single',
+    hint: '#167 Zeitschichten je Ort (Daniel 21.11.2026: „1–3 Zwischenbesitzer, hinterher begründet per Ersetzungs-Grammatik wie Caves of Qud“): je Durchgang und Ort gewürfelt, dann erklärt: wie eine Schicht endet, sagt die nächste (Grammatik › ending.<Art>). Revierkrieg, Leylas Übernahmen und das Aufräumen nach Leylas Spuren schreiben neue Schichten in den Spielstand. Dazu: Leylas Spuren verblassen und werden aufgeräumt, Zettel je Besuch, Gore-Grenze.',
+    sections: [
+      { title: 'Schichten', fields: [num('layers.min', 'Zwischenbesitzer mindestens', { min: 0, max: 3 }), num('layers.max', 'Zwischenbesitzer höchstens', { min: 0, max: 3, hint: 'Versiegelte und ordentlich geschlossene Orte: höchstens 1' }),
+        table('occupants', 'Besetzer', [text('id', 'ID'), text('name', 'Name'), select('kind', 'Art', OCCUPANT_KINDS), text('kinds', 'POI-Arten', { hint: 'Komma, leer = alle' }), text('never', 'Nie in', { hint: 'POI-IDs, Komma' }),
+          text('arrive', 'Kamen', { hint: '„|“ = eine davon, z. B. „zogen ein, weil das Dach noch hielt“' }), text('leave', 'Gingen')]),
+        table('grammar', 'Grammatik', [text('symbol', 'Symbol', { hint: 'layer, when.first, when.next, ending.<Art>, today.<Art>, by.war, by.leyla, by.cleanup' }), text('text', 'Alternativen', { hint: '„|“ trennt; #symbol# setzt ein anderes Symbol ein, {name} {next} {arrive} {leave} {when} {ending} {place} {from} {day}' })])] },
+      { title: 'Leylas Spuren', fields: [num('traces.cleanupDays', 'Aufräumen nach', { unit: 'Tagen', min: 1, hint: 'So lange bleiben geöffnete Kisten offen, kaputte Sirenen kaputt, der Fleck des Bosses liegen; dann räumen neue Bewohner auf (neue Zeitschicht). Standard 4' }),
+        num('traces.fadeTo', 'Verblasst bis', { unit: '%', min: 0, max: 100, hint: 'Deckkraft der Spuren kurz vor dem Aufräumen (Standard 35)' })] },
+      { title: 'Erzählen', fields: [range('notes.perVisit', 'Zettel je Besuch', { hint: 'Standard 1–2 (plus die Zettel der Tropes)' }), num('notes.announce', 'Durchsage-Chance', { unit: '%', min: 0, max: 100 }), num('notes.radio', 'Funk-Chance', { unit: '%', min: 0, max: 100 }),
+        num('notes.radioAfter', 'Funk nach', { unit: 's', min: 5 }), num('notes.splinter', 'Splitter-Chance', { unit: '%', min: 0, max: 100, hint: 'Je Besuch, solange der Splitter dieses Ortes nicht gefunden ist' }), num('ava.delay', 'AvA kommentiert nach', { unit: 'ms', min: 0 }),
+        num('tropesPerLevel', 'Tropes je Level', { min: 0, max: 8 }), num('gore', 'Gore höchstens', { min: 0, max: 2, hint: '0 keiner, 1 Blutflecken, 2 moderat (Tote sichtbar, Standard)' })] }],
+    check: (x, report) => {
+      const ids = new Set(), G = new Set((x.grammar || []).map(g => g.symbol));
+      for (const o of x.occupants || []) { if (ids.has(o.id)) report('error', `Besetzer „${o.id}“ doppelt`); ids.add(o.id); if (!o.arrive) report('warning', `Besetzer „${o.id}“: Kamen fehlt`); }
+      for (const s of ['layer', 'when.first', 'when.next', 'by.war', 'by.leyla', 'by.cleanup']) if (!G.has(s)) report('warning', `Grammatik: Symbol „${s}“ fehlt`);
+      for (const [k] of OCCUPANT_KINDS) if (!G.has(`ending.${k}`) && (k === 'gang' || k === 'nest' || k === 'empty' || (x.occupants || []).some(o => o.kind === k))) report('warning', `Grammatik: „ending.${k}“ fehlt`);
+    },
+  },
   dressingRules: {
     name: 'Korrekturen', singular: 'Korrektur', icon: 'rules', file: 'data/dressing_rules.json', kind: 'catalog',
     hint: '#159 Lernen aus Korrekturen (Bibel › Qualitätssicherung): im Spiel im Entwickler-Modus K drücken und ein Ding anklicken, Grund wählen; daraus wird hier eine Regel, die für alle Seeds gilt. Löschen = vergessen.',
@@ -2185,7 +2254,7 @@ export const GROUPS = [
   ['ACHIEVEMENTS & AUFTRÄGE', ['achievements', 'quests']],
   ['PROGRESSION', ['techtree', 'resources']],
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'decorSets', 'megarigs', 'rigAddons', 'salvage', 'people', 'companions']],
-  ['WELT', ['worldmap', 'parallax', 'pois', 'rooms', 'terrain', 'poiSets', 'roomStories', 'dressingRules', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
+  ['WELT', ['worldmap', 'parallax', 'pois', 'rooms', 'terrain', 'poiSets', 'roomStories', 'storylets', 'tropes', 'history', 'dressingRules', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
   ['LORE', ['brands', 'chronicle']],
   ['ENTITIES', ['glitchlings']],
 ];

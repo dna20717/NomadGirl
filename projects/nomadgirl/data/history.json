@@ -1,0 +1,138 @@
+{
+ "layers": {"min": 1, "max": 3},
+ "occupants": [
+  {
+   "id": "salzschuerfer",
+   "name": "Salzschürfer",
+   "kind": "scavengers",
+   "kinds": "",
+   "never": "",
+   "arrive": "zogen mit drei Lastkarren ein|kamen wegen der Keller und blieben wegen der Mauern|schliefen hier, wenn draußen der Sturm ging",
+   "leave": "zogen weiter, als die Karren leer waren"
+  },
+  {
+   "id": "letzter_tropfen",
+   "name": "die Kirche des letzten Tropfens",
+   "kind": "sect",
+   "kinds": "",
+   "never": "",
+   "arrive": "hängten Gebetszettel an jede Wand|bauten einen Altar aus Kanistern|sangen jeden Abend gegen den Wind an",
+   "leave": "gingen singend in die Salzebene"
+  },
+  {
+   "id": "karawane",
+   "name": "eine Händlerkarawane aus dem Osten",
+   "kind": "traders",
+   "kinds": "gasStation, mall, settlement, factory, highrise",
+   "never": "",
+   "arrive": "machte hier Station, einen Winter lang|schlug ihre Stände im Erdgeschoss auf|lagerte Salz und Batterien in den hinteren Räumen",
+   "leave": "zog nach Osten weiter"
+  },
+  {
+   "id": "vorortfamilien",
+   "name": "Familien aus den Vororten",
+   "kind": "refugees",
+   "kinds": "",
+   "never": "raketensilo",
+   "arrive": "suchten hier Schatten und fanden ihn|teilten die Räume mit Bettlaken in Zimmer|zählten jeden Abend die Kinder",
+   "leave": "gingen, als das Wasser ausblieb"
+  },
+  {
+   "id": "versprengte",
+   "name": "Versprengte der Ordnungspolizei",
+   "kind": "military",
+   "kinds": "",
+   "never": "",
+   "arrive": "hielten die Stellung, für wen auch immer|bauten Sandsäcke vor jede Tür|schrieben jeden Tag einen Lagebericht, den niemand abholte",
+   "leave": "verschwanden eines Nachts mitsamt den Waffen"
+  },
+  {
+   "id": "mann_mit_hund",
+   "name": "ein Mann mit einem Hund",
+   "kind": "hermit",
+   "kinds": "",
+   "never": "",
+   "arrive": "wohnte in einem einzigen Raum und hielt ihn sauber|redete mit dem Hund, und der Hund hörte zu|pflanzte Tomaten in Farbeimern",
+   "leave": "ging eines Morgens los, der Hund vorneweg"
+  },
+  {
+   "id": "kupferdiebe",
+   "name": "Kupferdiebe",
+   "kind": "scavengers",
+   "kinds": "factory, highrise, government, underground, bunker, ruin",
+   "never": "",
+   "arrive": "rissen die Kabel aus den Wänden, Meter für Meter|kamen nachts mit Stirnlampen|zeichneten jeden Kabelschacht auf eine Skizze",
+   "leave": "verschwanden mit dem letzten Kupfer"
+  },
+  {
+   "id": "kronkorken_tauscher",
+   "name": "Kronkorken-Tauscher",
+   "kind": "traders",
+   "kinds": "gasStation, mall, settlement",
+   "never": "",
+   "arrive": "tauschten Wasser gegen Kronkorken und Auskunft gegen mehr|führten Buch über jeden Handel|stellten ein Schild auf: Hier wird getauscht, nicht geschossen",
+   "leave": "packten zusammen, als die Kronkorken nichts mehr galten"
+  },
+  {
+   "id": "stille_brueder",
+   "name": "die Stillen Brüder",
+   "kind": "sect",
+   "kinds": "",
+   "never": "",
+   "arrive": "sprachen kein Wort und zählten die Tage mit Strichen|stellten Kerzen in jeden Gang|schwiegen so laut, dass die Plünderer einen Bogen machten",
+   "leave": "gingen, ohne Bescheid zu sagen"
+  },
+  {
+   "id": "sanitaeterin",
+   "name": "eine Sanitäterin mit ihren Kranken",
+   "kind": "refugees",
+   "kinds": "",
+   "never": "",
+   "arrive": "machte aus dem größten Raum ein Lazarett|kochte Verbände in Kanistern aus|führte ein Behandlungsbuch, Seite für Seite",
+   "leave": "zog mit den Gesunden weiter"
+  },
+  {
+   "id": "kriecher",
+   "name": "Kriecher",
+   "kind": "nest",
+   "kinds": "underground, bunker, factory, ruin",
+   "never": "",
+   "arrive": "kamen von unten und nisteten in den Schächten|legten ihre Gelege in die warmen Ecken",
+   "leave": "zogen tiefer"
+  }
+ ],
+ "grammar": [
+  {"symbol": "layer", "text": "{when}: {name} {arrive}, {ending}.|{when}: {name} {arrive}. Das ging gut, {ending}."},
+  {"symbol": "when.first", "text": "Die ersten Jahre danach|Als es still geworden war|Nach dem Ereignis, ein paar Winter lang"},
+  {"symbol": "when.next", "text": "Danach|Später|Ein paar Jahre darauf"},
+  {"symbol": "ending.gang", "text": "bis {next} kamen und nicht lange fragten|bis eines Morgens {next} vor dem Tor standen|bis {next} die Ketten ans Tor hängten"},
+  {"symbol": "ending.nest", "text": "bis von unten etwas lauter wurde als sie|bis die Viecher kamen und blieben"},
+  {"symbol": "ending.empty", "text": "bis niemand mehr blieb|bis der Sand den Rest erledigte"},
+  {"symbol": "ending.scavengers", "text": "bis {next} kamen und ausräumten, was noch übrig war|bis {next} mehr waren"},
+  {
+   "symbol": "ending.sect",
+   "text": "bis {next} mit Kerzen einzogen und das Licht anders machten|bis {next} kamen und Fragen stellten, die keiner beantworten wollte"
+  },
+  {"symbol": "ending.traders", "text": "bis {next} einen besseren Preis boten|bis {next} mit Waren kamen, die man brauchte"},
+  {"symbol": "ending.refugees", "text": "bis {next} kamen, mit Kindern und ohne Wasser|bis {next} vor der Tür standen und man nicht nein sagen konnte"},
+  {"symbol": "ending.hermit", "text": "bis {next} kam und blieb, als alle anderen gingen|bis nur noch {next} übrig war"},
+  {"symbol": "ending.military", "text": "bis {next} die Türen eintraten|bis {next} mit Befehlen kamen, die keiner mehr gab"},
+  {"symbol": "today.gang", "text": "Heute halten {name} den Ort.|Heute: {name}."},
+  {"symbol": "today.nest", "text": "Heute lebt da unten {name}."},
+  {"symbol": "today.empty", "text": "Heute: niemand. Noch nicht."},
+  {
+   "symbol": "by.war",
+   "text": "Tag {day}: {name} nehmen den Ort im Revierkrieg. {from} lecken ihre Wunden.|Tag {day}: {name} übernehmen. Die Farben von {from} werden übermalt."
+  },
+  {"symbol": "by.leyla", "text": "Tag {day}: Nach Leylas Besuch ziehen {name} ein. {from} hatten den Ort nicht halten können."},
+  {
+   "symbol": "by.cleanup",
+   "text": "Tag {day}: Jemand hat aufgeräumt. Die offenen Kisten sind weg, die Flecken geschrubbt, an der Tür ein neues Schloss.|Tag {day}: Die Neuen haben umgebaut. Wo Leyla durchkam, steht jetzt eine Barrikade."
+  }
+ ],
+ "traces": {"cleanupDays": 4, "fadeTo": 35},
+ "notes": {"perVisit": [1, 2], "announce": 70, "radio": 50, "radioAfter": 45, "splinter": 100},
+ "ava": {"delay": 1400},
+ "tropesPerLevel": 3,
+ "gore": 2
+}
