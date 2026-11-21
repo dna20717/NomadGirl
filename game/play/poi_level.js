@@ -120,7 +120,9 @@ export class PoiLevel {
   // Firmenlogos werden in den POI nicht angezeigt“): a pylon sign at the entrance like a real roadside station, logo + name + slogan
   brandOf() {
     const s = this.scene, D = s.data_, save = s.box?.save, at = save?.run?.location ?? save?.location;
-    const id = s.args?.brand || save?.map?.nodes?.find(n => n.id === at)?.brand || this.P.brand;
+    // Daniel 21.11.2026 (Karte Markenschild b: „Marken passend zum Ort“): a POI's own brand wins (Ministerium: the Bureau of Order),
+    // POIs › Markenschild aus = no sign (bunker, silo, mine …); else the brand the map put next to the place
+    const id = s.args?.brand || this.P.brand || save?.map?.nodes?.find(n => n.id === at)?.brand;
     return id && D.brands?.[id] ? { id, ...D.brands[id] } : null;
   }
   drawBrandSign() {

@@ -1,5 +1,5 @@
 // Merges generated room blocks (a JSON object { id: room }) into projects/nomadgirl/data/rooms.json, written with pretty().
-// Usage: node tools/merge_rooms.mjs /tmp/new.json   (the generators: tools/poi_rooms_038.py and friends)
+// Usage: node tools/merge_rooms.mjs /tmp/new.json   (the old generators tools/poi_rooms*.py were deleted on 21.11.2026: rooms.json is the source now)
 import { readFileSync, writeFileSync } from 'node:fs';
 import { pretty } from './json.js';
 const file = new URL('../projects/nomadgirl/data/rooms.json', import.meta.url);

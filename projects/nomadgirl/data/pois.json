@@ -81,7 +81,8 @@
   "branchChance": 70,
   "curve": "40, 85, 30, 90, 35, 100",
   "gang": {"name": "Rust Guard", "color": "Orange", "motto": "Der Bunker hält. Wir halten den Bunker.", "rivals": "Salt Dogs"},
-  "treasure": [{"item": "silo_karte_1", "where": "vault", "chance": 100}]
+  "treasure": [{"item": "silo_karte_1", "where": "vault", "chance": 100}],
+  "brandSign": false
  },
  "ministerium": {
   "name": "Ministry of Order",
@@ -100,7 +101,8 @@
   "branchChance": 65,
   "curve": "30, 70, 25, 85, 40, 100",
   "gang": {"name": "Order Office", "color": "Cyan", "motto": "Bitte ziehen Sie eine Nummer. Sie werden erschossen."},
-  "treasure": [{"item": "silo_karte_3", "where": "vault", "chance": 100}]
+  "treasure": [{"item": "silo_karte_3", "where": "vault", "chance": 100}],
+  "brand": "ordnungsamt"
  },
  "delta_heights": {
   "name": "Delta Heights",
@@ -162,7 +164,8 @@
   "branchChance": 50,
   "curve": "30, 60, 100",
   "gang": {"name": "Static Saints", "color": "Gelb", "motto": "Wir senden. Du empfängst.", "rivals": "Order Office"},
-  "description": "Ein Sendemast mitten in der Ebene. Wer hinaufklettert, findet Elektronik und schlechte Gesellschaft."
+  "description": "Ein Sendemast mitten in der Ebene. Wer hinaufklettert, findet Elektronik und schlechte Gesellschaft.",
+  "brandSign": false
  },
  "metro_line4": {
   "name": "Metro Line 4",
@@ -186,7 +189,8 @@
    {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 2, "ai": true},
    {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 2, "ai": true},
    {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2}
-  ]
+  ],
+  "brandSign": false
  },
  "storm_drain9": {
   "name": "Storm Drain 9",
@@ -204,7 +208,8 @@
   "tunnelAtmosphere": "tunnel_blau",
   "branchChance": 60,
   "curve": "40, 70, 100",
-  "description": "Ein Regenwasser-Sammler. Seit Jahren kein Regen, aber etwas lebt da unten und sammelt."
+  "description": "Ein Regenwasser-Sammler. Seit Jahren kein Regen, aber etwas lebt da unten und sammelt.",
+  "brandSign": false
  },
  "pit6": {
   "name": "Pit 6",
@@ -223,7 +228,8 @@
   "branchChance": 65,
   "curve": "30, 70, 40, 80, 35, 90, 100",
   "gang": {"name": "Salt Dogs", "color": "Blutrot", "motto": "Salz in jede Wunde."},
-  "description": "Ein Salzbergwerk in der Salt Flats. Die Salt Dogs graben weiter, tiefer als jemals jemand war. Was unten leuchtet, will jeder haben."
+  "description": "Ein Salzbergwerk in der Salt Flats. Die Salt Dogs graben weiter, tiefer als jemals jemand war. Was unten leuchtet, will jeder haben.",
+  "brandSign": false
  },
  "delta_crude": {
   "name": "Delta Crude Refinery",
@@ -246,7 +252,8 @@
    {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 1, "ai": true},
    {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 1, "ai": true},
    {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2}
-  ]
+  ],
+  "brand": "delta_petrol"
  },
  "sunny_acres": {
   "name": "Sunny Acres",
@@ -269,7 +276,8 @@
    {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 2, "ai": true},
    {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 2, "ai": true},
    {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2}
-  ]
+  ],
+  "brandSign": false
  },
  "raketensilo": {
   "name": "Silo Zero",
@@ -319,6 +327,7 @@
   "shortcut": true,
   "tunnelTerrain": "metal",
   "tunnelAtmosphere": "metall_rost",
-  "terminalAi": "Titan Lullaby"
+  "terminalAi": "Titan Lullaby",
+  "brandSign": false
  }
 }
