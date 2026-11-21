@@ -266,10 +266,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #138 Gelände mit PixelLab neu + keine schwebenden Plattformen draußen
-- **Status:** offen · angelegt 21.11. von Code (Daniel: Karte „Gelände“ c: „Beides mit PixelLab neu malen“; Notiz: „Es soll keine schwebenden Plattformen außerhalb von Gebäuden geben. Bitte mach dort immer einen Hintergrund hin. Generiere zur Not ein Set ‚Höhle‘, wenn du es brauchst“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: Karte „Gelände“ c: „Beides mit PixelLab neu malen“; Notiz: „Es soll keine schwebenden Plattformen außerhalb von Gebäuden geben. Bitte mach dort immer einen Hintergrund hin. Generiere zur Not ein Set ‚Höhle‘, wenn du es brauchst“)
 - **Auftrag:** Kachel-Sets Wüste und Beton/Linoleum mit PixelLab (ca. 15 je Set), orthogonal, AAP-64. Draußen jede Plattform mit Hintergrund (Fels, Höhle, Gerüst); falls nötig Kachel-Set „Höhle“.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: Höhlen-Set nicht gebaut, weil keine Plattform draußen mehr schwebt (#136); optional später für Kaverne, Tiefste Sohle, Kristallgrotte.
+- **Ergebnis:** (Code) Wüste und Beton mit PixelLab neu (je ein Querschnitt 512 × 256, 50 Generierungen, `tools/terrain_polish.py px`), Sets `desert`/`concrete` zeigen auf `tileset_desert_px`/`tileset_concrete_px`; schwebende Plattformen draußen im Umbau #136 abgestützt. **Bitte testen:** Mile 7 Vorplatz und Verkaufsraum.
 
 ### #139 Gegner-Scheibe 1: Visier, Brandsatz, Flickerin, Sirene + Ergeben
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: Karten „Gegner zuerst“ a, „Ergeben“ a; Notiz: „Keine Hunde als Gegner. Niemals! Gerne Drohnen, aber keine Hunde.“)
@@ -307,10 +307,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Jeder Effekt-Bereich wird auf den Platz zugeschnitten (`effect()` in `benches.js`), Leuchten und Dampf/Rauch bekommen eine Maske in Form des Platzes (`bench.mask`). ⚠️ vorläufig: auch die großen Raumlichter bleiben im aufgeschnittenen Container. Prüfung in `bench_ui_test` (24). `npm test` 367/367; camp, container, stack, mega, megarig, tank, cozy, stage grün. **Bitte testen:** Chill Area (Aquarium) in einen Container mit mehreren Plätzen, nachts ansehen; Küche (Dampf) und Werkbank (Funken).
 
 ### #136 Räume wie echte Gebäude (alle POIs)
-- **Status:** läuft (21.11.; Daniel: Pilot abgenommen, „Ja, aber Hallen hoch lassen“: Werkstatt, Kantine, Lobby bleiben hoch und bekommen Galerien) · angelegt 21.11. von Code (aus #131, Pilot `lager`)
+- **Status:** fertig (21.11.) (21.11.; Daniel: Pilot abgenommen, „Ja, aber Hallen hoch lassen“: Werkstatt, Kantine, Lobby bleiben hoch und bekommen Galerien) · angelegt 21.11. von Code (aus #131, Pilot `lager`)
 - **Auftrag:** die übrigen Räume nach den Faustregeln in `docs/features/pois.md` › Architektur umbauen (Geschosse 5–6 Kacheln, Hallen mit Galerie), Prüfliste `node tools/rooms_audit.mjs`. Vorher mit Daniel: Pilot `lager` abnehmen, dann POI für POI.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: Leitern (`H`) stehen draußen auch für Gerüst- und Stützpfeiler; die alten Raum-Generatoren (`tools/poi_rooms*.py`, `room_blocks_017.py`) würden die alten Layouts zurückbringen (Doku sagt „nicht mehr laufen lassen“); Testräume (`testraum`, `kampfraum`, `gegner_arena`) unverändert; die Rutsch-Passage in der Bunker-Schleuse ist jetzt 4 hoch. **Fragen an Daniel:** alte Generatoren löschen? Eigene Grafik für Stützen/Gerüste? Parkour-Testraum auch ohne schwebende Plattformen? Rutsch-Passage zurück?
+- **Ergebnis:** (Code, per Helfer) Alle 110 Räume der 12 POIs: kleine Räume ein Geschoss (6 Kacheln Luft), mittlere 2–3 Geschosse mit Treppenhaus oder Durchbruch, Hallen hoch mit Galerien und Leitern; Durchgänge an den Nähten 4 hoch; alle Merkmale (Kisten, Schalter, Secrets, Türen, Haken, Gegner) bleiben. Draußen steht jede Plattform auf etwas (Wand, Stütze, Schutthaufen, Containerstapel) (#138); kein Höhlen-Set nötig. Prüfliste `tools/rooms_audit.mjs` verbessert (Geschosse, Galerien, schwebende Plattformen draußen): 47 → 1 Befund (`testraum`). Tests: npm 382, poi 33, poi_levels 9, poi_stack 8, alarm 4, silo 10, light 18, Bausteine 26. **Bitte testen:** Mile 7 (Verkaufsraum zweistöckig, Werkstatthalle mit Galerien, Zapfinseln), Delta Heights (Büro-Etagen), Bunker 13 (Quartiere).
 
 ### #129 Info-Center: Einblendungen ordnen + Spieler-Log
 - **Status:** läuft (21.11., Etappe Ruhe fertig; Daniels Antworten 21.11.: Ansage oben rechts als großer Toast, Logbuch als zweiter Reiter im Questlog, je Durchgang leer, Radio-Titel im Bau-Modus ins Logbuch, Bau-Meldungen nur Erfolge) · angelegt 21.11. von Code (Daniel: „Einblendungen ordnen: lass uns ein Information Center konzipieren, um das auch in Zukunft zu vermeiden. In diesem Rahmen können wir auch ein Log für den Spieler aufbereiten, in dem er alle Schritte nachvollziehen kann und ggf. historische Meldungen anschauen kann.“)

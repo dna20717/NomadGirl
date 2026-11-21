@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 21.11.2026: **POIs wie echte Gebäude, neues Gelände** (#136, #138, #140): alle 110 Räume mit echten Geschossen (6 Kacheln Luft), Treppenhäusern und Durchbrüchen; Hallen bleiben hoch und bekommen Galerien; draußen schwebt keine Plattform mehr. Wüste und Beton neu gemalt. Leylas Wurfarm für Granaten gemalt; der Plattenträger hat ein eigenes Westen-Symbol.
 - 21.11.2026: **Neue Gegner und Granaten** (#139, #140): Scharfschützin Visier (Laser), Werfer Brandsatz (Molotow), Sanitäterin Flickerin (holt Gefallene zurück, ergibt sich), Alarmposten Sirene (läuft zur Sirene, holt Verstärkung). Gegner können sich ergeben: gefangen nehmen, laufen lassen oder erledigen, mit Folgen für den Ruf. Leyla wirft Granaten mit T: drei Ladungen, dann drei Minuten Pause.
 - 21.11.2026: **Cockpit lebt** (#142, #143, Daniels Karten): Sonnenblende, Karte, Sonnenbrille, Polaroid, Kassette, Zündkerze, Chips, Kronkorken-Kette und Hasenpfote kommen nach und nach ins Cockpit, jeweils nach einem Ereignis im Spiel mit kleiner Meldung („Fürs Cockpit: …“); die Billboards werben im Wechsel für die Marken der Lore.
 - 21.11.2026: **Ranking zahlt sich aus** (#141): Δ-Bonus je Rang (S +50 %, A +25 %, B +10 %) und ab Rang B eine goldene Bonus-Kiste neben dem Tresor.
