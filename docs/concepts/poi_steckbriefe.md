@@ -1,12 +1,12 @@
 # Story-Steckbriefe aller POIs
 
-Stand 21.11.2026 · Entwürfe von Ava zum Absegnen. Kopie des Docs „NomadGirl – POI Design Bible“ (claude.ai, Reiter „Steckbriefe“). Regeln und Felder: [`poi_bible.md`](poi_bible.md) › Story zuerst. Bauauftrag: Funkbuch #160.
+Stand 21.11.2026 · Entwürfe von Ava, **von Daniel abgenommen am 21.11.2026**. Kopie des Docs „NomadGirl – POI Design Bible“ (claude.ai, Reiter „Steckbriefe“). Regeln und Felder: [`poi_bible.md`](poi_bible.md) › Story zuerst. Bauauftrag: Funkbuch #160.
 
 Jeder POI hängt an derselben Weltchronik und folgt denselben Ton-Regeln.
 
 ## Weltchronik und Ton
 
-Jedes Ereignis eines POI fällt in eine von fünf Epochen; so erzählen alle Orte zusammen eine Geschichte. Die Epochen sind ein Vorschlag von Ava und bauen auf dem auf, was im Spiel schon steht („der Krieg, der nie kam“, „seit Jahren kein Regen“, das Sperrgebiet auf der Karte, der Klinikturm).
+Jedes Ereignis eines POI fällt in eine von fünf Epochen; so erzählen alle Orte zusammen eine Geschichte. Die Epochen (Vorschlag von Ava, abgenommen 21.11.2026) bauen auf dem auf, was im Spiel schon steht („der Krieg, der nie kam“, „seit Jahren kein Regen“, das Sperrgebiet auf der Karte, der Klinikturm).
 
 | Epoche | Was geschah | Spuren in POIs |
 | --- | --- | --- |
@@ -329,7 +329,7 @@ Die Reisekarte würfelt je Durchgang 10–14 Orte aus 12 POI-Arten (z. B. „Sal
 
 ## Perspektivische POIs
 
-Orte, die im Design schon angelegt sind, aber noch nicht im Spiel stehen. Namen und Inhalte sind Vorschläge.
+Orte, die im Design schon angelegt sind, aber noch nicht im Spiel stehen. Namen und Inhalte sind abgenommen; gebaut werden sie mit den jeweiligen Features.
 
 ### Vulkan Heavy Works (Fabrik, Fundort des Crawlers)
 
@@ -341,7 +341,7 @@ Crow Valley, Nordosten (nahe dem Bunkerwerk Nordost von Vulkan) · Fabrik · Gef
 | Menschen | Tausende Arbeiter in Schichten, Werkschutz, Ingenieure |
 | Ereignis (4) | Am Tag der Schließung sperrte Vulkan die Belegschaft aus, mitten in der Endmontage des letzten Crawlers |
 | Zeit, Verfall | lange her · Verfall 2, Hallen hoch und leer |
-| Heute | offen (Vorschlag: niemand wagt sich hinein, weil der halbfertige Crawler „bewacht“ wird) |
+| Heute | Niemand wagt sich hinein, weil der halbfertige Crawler „bewacht“ wird |
 | Ziel | der Crawler als Bergungsprojekt; Segmente, Raupen, Bohrturm |
 | Ton | Hallen-Echo, Kettenklirren, Wind durch Oberlichter, Sirene im Takt |
 | Witz | Die Stempeluhr am Tor stempelt noch jeden, der hereinkommt, auch Leyla |
@@ -395,7 +395,7 @@ The Outskirts, Süden · Fabrik · Gefahr 2–3
 | Menschen | Schichtarbeiter, Werbeteam, Werksführungen für Schulklassen |
 | Ereignis (3) | Im Großen Durst hatte das Werk als letztes noch Wasser; die Menge stürmte es. Die Anlage hat das nie bemerkt |
 | Zeit, Verfall | lange her · Verfall 3 außen, Anlage 1 |
-| Heute | offen (Vorschlag: eine Siedlung um den Brunnen, die Wasser gegen Kronkorken tauscht) |
+| Heute | Eine Siedlung um den Brunnen, die Wasser gegen Kronkorken tauscht |
 | Ziel | NomadCola, Wasser, Pumpen, Ersatzteile für den Generator |
 | Ton | Flaschen klirren im Takt, Werbejingle aus kaputten Lautsprechern |
 | Witz | Das Band füllt bis heute leere Flaschen mit nichts und verschließt sie sorgfältig (eine Entity im Steuerpult) |
@@ -434,16 +434,16 @@ unter den Salt Flats · Tiefe · Gefahr 4–5 · entsteht durch das Bohren des C
 | Schlüsselbild | Ein Bohrloch des Crawlers öffnet sich in eine leuchtende Salzkathedrale |
 | Splitter | keiner; dafür Hinweise, warum Kessler Chemie aus der Raffinerie bezog |
 
-## Zum Absegnen
+## Abgenommen (Daniel, 21.11.2026)
 
-Aus dem Spiel übernommen sind Namen, Regionen, Gangs mit Mottos, Gegner, Raumlisten, Marken und die bisherigen Beschreibungen. Alles andere hat Ava erfunden:
+Aus dem Spiel übernommen sind Namen, Regionen, Gangs mit Mottos, Gegner, Raumlisten, Marken und die bisherigen Beschreibungen. Alles andere hat Ava erfunden; Daniel hat alle Punkte abgenommen:
 
-- [ ] **Weltchronik** mit fünf Epochen (Boomjahre, alter Krieg, Großer Durst, Schließung, heute); greift in die Lore ein, darum zuerst
-- [ ] **Ton-Regeln** (ein Witz und eine Wunde, eingefrorener Moment, drei Zeitschichten, Maschinen erinnern sich, roter Faden zu AvA)
-- [ ] **Ereignisse** der 13 POIs, besonders: Bunker 13 (Lüftung beim Mittagessen), Pit 6 (etwas Leuchtendes, Schacht versiegelt), Silo Zero (Countdown bei einer Sekunde angehalten)
-- [ ] **Regionen** für Funkmast, Parkhaus, Metro, Storm Drain, Raffinerie und Sunny Acres (bisher ohne feste Lage)
-- [ ] **Erinnerungs-Splitter** in jedem POI mit Versteck; Kessler bezog Chemie aus der Raffinerie
-- [ ] **Perspektivische POIs:** Namen, Lage, wer heute dort ist (Fabrik und Abfüllwerk offen), Salt Lake Motel als neutraler Ort
-- [ ] **Klinikturm ohne Verfall** als Endgame-Gegenbild
+- [x] **Weltchronik** mit fünf Epochen (Boomjahre, alter Krieg, Großer Durst, Schließung, heute); greift in die Lore ein, darum zuerst
+- [x] **Ton-Regeln** (ein Witz und eine Wunde, eingefrorener Moment, drei Zeitschichten, Maschinen erinnern sich, roter Faden zu AvA)
+- [x] **Ereignisse** der 13 POIs, besonders: Bunker 13 (Lüftung beim Mittagessen), Pit 6 (etwas Leuchtendes, Schacht versiegelt), Silo Zero (Countdown bei einer Sekunde angehalten)
+- [x] **Regionen** für Funkmast, Parkhaus, Metro, Storm Drain, Raffinerie und Sunny Acres (bisher ohne feste Lage)
+- [x] **Erinnerungs-Splitter** in jedem POI mit Versteck; Kessler bezog Chemie aus der Raffinerie
+- [x] **Perspektivische POIs:** Namen, Lage, wer heute dort ist (Fabrik und Abfüllwerk offen), Salt Lake Motel als neutraler Ort
+- [x] **Klinikturm ohne Verfall** als Endgame-Gegenbild
 
 Danach folgen die Raum-Steckbriefe (Funktion früher, Moment, heute, Schlüsselbild, Pflicht-Dinge, Verboten) für alle 110+ Räume, POI für POI (#160).

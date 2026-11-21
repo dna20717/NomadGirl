@@ -284,7 +284,7 @@ Zuerst entstehen die Story-Steckbriefe aller POIs und Räume (Ava schreibt, Dani
 
 - [x] Verfall-Werte je POI so lassen (Ministerium 1, Großmarkt 2, Bunker 2, Tankstelle 3)? → ja
 - [ ] Taste `K` für Korrekturen nur im Debug-Modus oder auch im normalen Spiel?
-- [x] Story-Steckbriefe für alle POIs (Ava schreibt, Daniel segnet ab) → geschrieben, Absegnen offen (`poi_steckbriefe.md` › Zum Absegnen)
+- [x] Story-Steckbriefe für alle POIs (Ava schreibt, Daniel segnet ab) → geschrieben und abgenommen (21.11.2026)
 - [x] Selbst nachstellender Kritiker später dazu? → ja
 
 ## Quellen

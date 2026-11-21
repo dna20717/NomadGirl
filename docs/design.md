@@ -74,7 +74,7 @@ Im POI spielt sich NomadGirl wie Dead Cells: schnelle Bewegung, harter Kampf, un
 ### POI-Gestaltung: Story zuerst (Daniel, 21.11.2026)
 
 - **Vor dem ersten Design steht die Story** des POI und jedes Raums fest (Daniel: „vor dem ersten Design die Story des POI oder des Raumes feststeht und von dort aus gestaltet wird“). Jeder POI hat eine **feste Story, pro Run variieren nur Räume, Spuren und Positionen**. Steckbriefe schreibt Ava, Daniel segnet ab.
-- Regeln für Clutter, Kacheln, Dichte („bewohnt“), Verfall (Ministerium 1, Großmarkt 2, Bunker 2, Tankstelle 3) und Prüfung: **`docs/concepts/poi_bible.md`**. Steckbriefe aller POIs mit Weltchronik und Ton-Regeln: **`docs/concepts/poi_steckbriefe.md`** (Weltchronik noch zum Absegnen). Tickets #160, #158, #159.
+- Regeln für Clutter, Kacheln, Dichte („bewohnt“), Verfall (Ministerium 1, Großmarkt 2, Bunker 2, Tankstelle 3) und Prüfung: **`docs/concepts/poi_bible.md`**. Steckbriefe aller POIs mit Weltchronik und Ton-Regeln: **`docs/concepts/poi_steckbriefe.md`** (**alles abgenommen 21.11.2026**, auch die Weltchronik mit fünf Epochen: Boomjahre, alter Krieg, Großer Durst, Schließung, heute). Tickets #160, #158, #159.
 
 ### Tod und AvA
 
