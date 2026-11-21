@@ -184,3 +184,56 @@ export function wowInLevel(D, poiId, L) {
   const x = r.flip ? r.x + r.w - 1 - px : r.x + px;
   return { index: i, room: r, x, y: r.y + py, motif: W.motif, W };
 }
+
+// Fair fights (#163 step 5), after welding: nothing spawns within `seam` tiles of a gate (the seam between two rooms, the ladder through
+// a hook); such an enemy moves inwards along its row (onto ground, away from every gate) or is dropped. A shooter (behavior shooter)
+// stays only where he sees the way in of his room and is at least `shooterMin` away, else he becomes a fighter of the POI (melee).
+// tiles: rows of chars (mutated) · gates: [[x, y]] · entries: [{ x, y, w, h, at: [x, y] }] (room rect + its way in) · spawns: [{ symbol, enemy }]
+// letterOf(enemy) → symbol · melee: enemy ids to swap in → { moved, dropped, swapped }
+export function fairFights({ D, tiles, gates, entries, spawns, letterOf, melee = [], cfg = LEVEL, rnd = Math.random }) {
+  const sym = new Map(spawns.map(s => [s.symbol, s.enemy])), H = tiles.length, W = tiles[0]?.length || 0, out = { moved: 0, dropped: 0, swapped: 0 };
+  const near = (x, y) => gates.some(([gx, gy]) => Math.abs(gx - x) <= cfg.seam && Math.abs(gy - y) <= cfg.seam + 1);
+  const ground = (x, y) => { const b = tiles[y + 1]?.[x]; return b === '#' || b === '=' || b === 'A'; };
+  const roomOf = (x, y) => entries.find(r => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const c = tiles[y][x]; if (!sym.has(c) || D.enemies?.[sym.get(c)]?.behavior === 'boss' || !near(x, y)) continue;
+    const r = roomOf(x, y);
+    let to = null;
+    if (r) for (let d = 1; d < r.w && to == null; d++) for (const s of [1, -1]) {
+      const xx = x + s * d;
+      if (to != null || xx < r.x || xx >= r.x + r.w) continue;
+      if (tiles[y][xx] === '.' && tiles[y - 1]?.[xx] === '.' && ground(xx, y) && !near(xx, y)) to = xx;
+    }
+    tiles[y][x] = '.';
+    if (to != null) { tiles[y][to] = c; out.moved++; } else out.dropped++;
+  }
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const c = tiles[y][x], E = D.enemies?.[sym.get(c)];
+    if (!E || E.behavior !== 'shooter') continue;
+    const r = roomOf(x, y); if (!r?.at) continue;
+    if (sees(tiles, [x, y], r.at) && Math.hypot(x - r.at[0], y - r.at[1]) >= cfg.shooterMin) continue;
+    const m = melee.length ? melee[Math.floor(rnd() * melee.length)] : null;
+    if (!m) continue;
+    tiles[y][x] = letterOf(m); out.swapped++;
+  }
+  return out;
+}
+// shooters that keep their place: sight of the way in, far enough (same test as fairFights, for the audit)
+export function shooterFair(D, tiles, sym, entries, cfg = LEVEL) {
+  const bad = [];
+  for (let y = 0; y < tiles.length; y++) for (let x = 0; x < tiles[y].length; x++) {
+    const E = D.enemies?.[sym.get(tiles[y][x])]; if (E?.behavior !== 'shooter') continue;
+    const r = entries.find(r => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h);
+    if (r?.at && !(sees(tiles, [x, y], r.at) && Math.hypot(x - r.at[0], y - r.at[1]) >= cfg.shooterMin)) bad.push([x, y]);
+  }
+  return bad;
+}
+
+// a chest for an Atempause without one: the free floor tile nearest the middle of the room (not at its edges) → [x, y] or null
+export function restChestSpot(r) {
+  const at = (x, y) => r.tiles[y]?.[x];
+  const ok = (x, y) => at(x, y) === '.' && at(x, y - 1) === '.' && (at(x, y + 1) === '#' || at(x, y + 1) === '=');
+  const cx = Math.floor(r.w / 2);
+  for (let d = 0; d < r.w / 2 - 3; d++) for (const x of [cx - d, cx + d]) for (let y = r.h - 2; y > 0; y--) if (ok(x, y)) return [x, y];
+  return null;
+}

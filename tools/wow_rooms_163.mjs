@@ -41,17 +41,6 @@ function hall(W, H, o = {}) {
   set(mx + 2, F, 'C');
   for (const x of [Math.round(W * 0.62), Math.round(W * 0.8)]) set(x, F, '1');
   set(Math.round(W * 0.78), F - 4, '1');
-  if (o.start) {   // threshold: the van, the shortcut behind a door with its switch (as in the Vorplatz)
-    for (let y = F - 3; y <= F; y++) set(0, y, '#');
-    for (let y = 1; y <= F - 4; y++) for (let x = 1; x <= pass; x++) set(x, y, '.');
-    for (let y = F - 3; y <= F; y++) set(5, y, 'D');
-    for (let x = 1; x <= 5; x++) set(x, F - 4, '#');
-    set(3, F, 'S'); set(2, H - 1, '^'); set(12, F, 'L');
-    for (const x of [Math.round(W * 0.62), Math.round(W * 0.8)]) set(x, F, '.');
-    set(Math.round(W * 0.78), F - 4, '.');
-    // the forecourt: a narrow canopy over the van (the frame of the first look), then wide open
-    for (let x = 7; x <= 16; x++) set(x, F - 5, '#');
-  }
   if (o.pool) {   // the empty pool: a basin between two rims (2 rows), its floor at the hall floor, the loungers drawn by the motif
     const a = Math.round(W * 0.5), b = Math.round(W * 0.84);
     for (const x of [a, b]) { set(x, F, '#'); set(x, F - 1, '#'); }
@@ -71,7 +60,7 @@ function shaft(W, H, o = {}) {
   set(4, H - 1, 'A'); set(W - 5, 0, 'A');
   // platforms: rows F-3, F-7 … alternate sides, a ladder up from each level to the next
   const levels = [];
-  for (let y = F - 3; y >= (o.deep ? 7 : 3); y -= 4) levels.push(y);
+  for (let y = F - 3; y >= (o.deep ? 7 : 4); y -= 4) levels.push(y);   // the top level leaves room for her body under the ceiling
   levels.forEach((y, k) => {
     const left = k % 2 === 0, a = left ? L + 1 : Math.round(W * 0.5), b = left ? Math.round(W * 0.62) : W - 2;
     for (let x = a; x <= b; x++) set(x, y, '=');
@@ -99,9 +88,9 @@ function shaft(W, H, o = {}) {
 
 // the 13 Wow rooms (Bibel › Wow-Räume je POI)
 const WOW = {
-  tankstelle_km7: { id: 'km7_preistafel', name: 'Vorplatz mit Preistafel', make: () => hall(48, 20, { start: true, motifX: 32 }), terrain: 'desert', atmosphere: 'wueste_draussen', backdrop: { weather: 'abendglut', shade: 15 }, role: 'outdoor', tags: ['start'],
-    wow: { at: 'start', motif: 'priceboard', point: [32, 18], text: '9,99', light: '#f9c22b', particles: 'flicker', stinger: 'neon', moment: 'Die Preistafel springt flackernd an, als Leyla den Vorplatz betritt; Zapfinseln im Sonnenuntergang', wish: 'Preistafel, Tankstellendach' },
-    story: ['Großer Vorplatz der Tankstelle mit Preistafel am Highway', 'Der letzte Preis blieb stehen, als der Strom ging', 'Die Tafel springt an, wenn jemand kommt; die Vultures halten Abstand', 'Preistafel mit dem absurden letzten Preis über leeren Zapfsäulen, Abendsonne', 'schild, straße, fass', 'bett, büro'] },
+  // the threshold of the game: the existing Vorplatz is the Wow room (largest room of Mile 7, the van stands there; layout unchanged)
+  tankstelle_km7: { id: 'vorplatz', keep: true,
+    wow: { at: 'start', motif: 'priceboard', point: [29, 15], text: '9,99', light: '#f9c22b', particles: 'flicker', stinger: 'neon', moment: 'Die Preistafel springt flackernd an, als Leyla den Vorplatz betritt; Zapfinseln im Sonnenuntergang', wish: 'Preistafel, Tankstellendach' } },
   sunny_acres: { id: 'tp_poolparty', name: 'Trailerpark · Poolparty', make: () => hall(48, 20, { pool: true, motifX: 30 }), terrain: 'desert', atmosphere: 'wueste_draussen', backdrop: { weather: 'abendglut', shade: 15 }, role: 'outdoor', tags: ['combat'],
     wow: { at: 'peak', motif: 'pool', point: [32, 18], light: '#fbff86', particles: 'dust', stinger: 'chord', moment: 'Leerer Pool voller Liegestühle, darin Bewaffnete, Schlager aus dem Radio', wish: 'Pool-Set, Liegestühle' },
     story: ['Der große Pool mit Liegewiese', 'Hier tranken sie das letzte Wasser, gemeinsam und geordnet', 'Sunny Side liegen bewaffnet im leeren Becken', 'Leerer Pool voller Liegestühle, darin Bewaffnete mit Sonnenhut', 'grün, musik, fass', 'büro, militär'] },
@@ -141,7 +130,9 @@ const WOW = {
 };
 
 const R = rd('rooms.json'), P = rd('pois.json');
+delete R.km7_preistafel; P.tankstelle_km7.rooms = P.tankstelle_km7.rooms.filter(r => r !== 'km7_preistafel');   // first draft (a new entrance) replaced by the Vorplatz
 for (const [poi, w] of Object.entries(WOW)) {
+  if (w.keep) { R[w.id].type = 'wow'; P[poi].wow = { room: w.id, ...w.wow, lightStrength: 220, music: 35 }; continue; }
   const layout = w.make(), [fn, moment, today, keyImage, must, never, decay] = w.story;
   R[w.id] = { name: w.name, tags: w.tags, weight: 0, type: 'wow', role: w.role, terrain: w.terrain, atmosphere: w.atmosphere, ...(w.backdrop ? { backdrop: w.backdrop } : {}),
     description: `Wow-Raum (#163): ${w.wow.moment}.`, size: [layout[0].length, layout.length], layout,
@@ -149,7 +140,7 @@ for (const [poi, w] of Object.entries(WOW)) {
   if (!P[poi].rooms.includes(w.id)) P[poi].rooms.push(w.id);
   P[poi].wow = { room: w.id, ...w.wow, lightStrength: 220, music: 35 };
 }
-if (dry) { for (const w of Object.values(WOW)) console.log(w.id + '\n' + R[w.id].layout.join('\n')); process.exit(0); }
+if (dry) { for (const w of Object.values(WOW).filter(w => !w.keep)) console.log(w.id + '\n' + R[w.id].layout.join('\n')); process.exit(0); }
 fs.writeFileSync(path.join(dir, 'rooms.json'), pretty(R) + '\n');
 fs.writeFileSync(path.join(dir, 'pois.json'), pretty(P) + '\n');
 console.log('Wow-Räume geschrieben:', Object.values(WOW).map(w => w.id).join(', '));

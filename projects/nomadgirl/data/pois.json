@@ -5,7 +5,7 @@
   "size": "S",
   "danger": 1,
   "roomCount": [4, 5],
-  "rooms": ["vorplatz", "verkaufsraum", "lager", "waschstrasse", "zapfinseln", "reifenlager", "werkstatthalle", "km7_preistafel"],
+  "rooms": ["vorplatz", "verkaufsraum", "lager", "waschstrasse", "zapfinseln", "reifenlager", "werkstatthalle"],
   "enemies": ["streuner", "schuetze", "keulenschwinger", "pistolero", "brandsatz"],
   "loot": "kiste_tankstelle",
   "parTime": 90,
@@ -110,10 +110,10 @@
    "shard": "im Handschuhfach eines Fernlasters, der Ware aus der Stadt fuhr"
   },
   "wow": {
-   "room": "km7_preistafel",
+   "room": "vorplatz",
    "at": "start",
    "motif": "priceboard",
-   "point": [32, 18],
+   "point": [29, 15],
    "text": "9,99",
    "light": "#f9c22b",
    "particles": "flicker",

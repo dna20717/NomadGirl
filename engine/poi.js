@@ -14,6 +14,7 @@
 //
 // Runs in the browser (game) and in Node (validation, tests). Same POI + same seed = same level.
 import { parseRoom } from './room.js';
+import { levelConfig, wowOf, roomType, calmAfterPeaks, fairFights, restChestSpot } from './level_design.js';
 
 export const TUNNEL_HEIGHT = 4;   // free rows in the shortcut tunnel (Leyla is 168 px = 2.6 tiles)
 
@@ -63,7 +64,10 @@ export function buildPoi(D, poiId, seed = 1) {
   const hook = (id, y) => parsed[id].marks.A.filter(([, hy]) => hy === (y === 'floor' ? parsed[id].h - 1 : 0));
   const needs = (id, ...ys) => ys.every(y => hook(id, y).length);
   const ready = all;
-  const start = pick(ready.filter(id => tagged(R, id, 'start') && (!stack || needs(id, stack === 'tower' ? 'ceil' : 'floor'))), rnd, R);
+  // #163 the Wow room of the POI comes in every run (POIs › Wow); as the entrance when its place in the arc is the threshold
+  const LD = levelConfig(D), W0 = wowOf(D, poiId), wowId = W0 && parsed[W0.room] && (P.rooms || []).includes(W0.room) ? W0.room : null;
+  const wowStart = !!wowId && W0.at === 'start' && tagged(R, wowId, 'start') && (!stack || needs(wowId, stack === 'tower' ? 'ceil' : 'floor'));
+  const start = wowStart ? wowId : pick(ready.filter(id => tagged(R, id, 'start') && id !== wowId && (!stack || needs(id, stack === 'tower' ? 'ceil' : 'floor'))), rnd, R);
   const exit = pick(ready.filter(id => tagged(R, id, 'exit') && id !== start && !tagged(R, id, 'start') && (!stack || needs(id, stack === 'tower' ? 'floor' : 'ceil'))), rnd, R);
   if (!start || !exit) return { def: null, rooms: [], shortcut: false, branches: 0, problems: [stack ? `Stapel (${stack}): Eingang/Ausgang ohne passende Haken (A)` : poiReady(D, poiId).why] };
   // main path: entrance, middle rooms, exit (roomCount = length of the main path)
@@ -75,9 +79,23 @@ export function buildPoi(D, poiId, seed = 1) {
     const pool = middlePool.length > 1 ? middlePool.filter(id => id !== main.at(-1)) : middlePool;
     main.push(pick(pool, rnd, R));
   }
+  if (wowId && !wowStart && (!stack || needs(wowId, 'floor', 'ceil'))) {
+    const at = W0.at === 'mid' ? Math.max(1, Math.floor(main.length / 2)) : main.length - 1;
+    if (main.length > 1) main[at] = wowId; else main.push(wowId);
+  }
   main.push(exit);
   const enemyKit = makeEnemies(D, P, R, rnd);
-  if (stack) return buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, stack, hook, enemyKit, problems });
+  // #163 rhythm: after a peak (≥ 85 %) a calm room (< 40 %), preferably an Atempause; not right before the exit (it lies near the climax)
+  const curve = enemyKit.curve, intens = main.map((_, i) => curve ? curveAt(curve, main.length > 1 ? i / (main.length - 1) : 1) : 1);
+  const restPool = middlePool.filter(id => roomType(R[id]) === 'rest');
+  for (const c of curve ? calmAfterPeaks(intens, LD) : []) {
+    if (main[c.at] === wowId) continue;
+    const pool = restPool.filter(id => id !== main[c.at - 1] && id !== main[c.at + 1]);
+    if (pool.length && roomType(R[main[c.at]]) !== 'rest') main[c.at] = pick(pool, rnd, R);
+  }
+  const flags = id => ({ rest: roomType(R[id]) === 'rest', wow: id === wowId });
+  Object.assign(enemyKit, { LD, stack });
+  if (stack) return buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, stack, hook, enemyKit, problems, intens, flags });
 
   // branches: side rooms with a floor hook A over main rooms with a ceiling hook A
   const branchPool = ready.filter(id => tagged(R, id, 'loot', 'secret') && parsed[id].marks.A.some(([, y]) => y === parsed[id].h - 1));
@@ -86,7 +104,7 @@ export function buildPoi(D, poiId, seed = 1) {
   const W = main.reduce((s, id) => s + parsed[id].w, 0) + 2;
   const placedMain = [];
   let x = 1;
-  for (const id of main) { placedMain.push({ id, band: 'main', x, w: parsed[id].w, h: parsed[id].h }); x += parsed[id].w; }
+  for (const id of main) { placedMain.push({ id, band: 'main', x, w: parsed[id].w, h: parsed[id].h, ...flags(id) }); x += parsed[id].w; }
   const branches = [];
   for (const m of placedMain) {
     const hooks = parsed[m.id].marks.A.filter(([, y]) => y === 0);
@@ -107,8 +125,7 @@ export function buildPoi(D, poiId, seed = 1) {
   const top = BH, H = BH + MH + (shortcut ? TUNNEL_HEIGHT + 1 : 0);
   const tiles = Array.from({ length: H }, () => new Array(W).fill('#'));
 
-  const curve = enemyKit.curve;
-  placedMain.forEach((m, i) => { m.intensity = curve ? curveAt(curve, placedMain.length > 1 ? i / (placedMain.length - 1) : 1) : 1; });
+  placedMain.forEach((m, i) => { m.intensity = intens[i]; });
   for (const b of branches) b.intensity = curve ? (b.main.intensity ?? 1) * 0.5 : 1;
   const stamp = (place, y0) => stampRoom({ R, parsed, tiles, start, exit, enemyKit, keep: { '^': place.id === start && shortcut, v: place.id === exit && shortcut } }, place, y0);
   for (const m of placedMain) stamp(m, top + MH - m.h);
@@ -147,10 +164,17 @@ export function buildPoi(D, poiId, seed = 1) {
     }
     ends.floor = t0 + TUNNEL_HEIGHT;
   }
+  // #163 fair fights: no spawn at a seam (between main rooms, at a side room's ladder), shooters only with sight of the way in
+  {
+    const gates = [...placedMain.slice(1).map(b => [b.x, floorY - 1]), ...placedMain.slice(0, -1).map(a => [a.x + a.w - 1, floorY - 1]), ...branches.map(b => [b.hookX, top - 1])];
+    const Lx = (() => { for (let y = 0; y < H; y++) { const x = tiles[y].indexOf('L'); if (x >= 0) return [x, y]; } return null; })();
+    const entries = [...placedMain.map((m, i) => ({ x: m.x, y: m.y, w: m.w, h: m.h, at: i ? [m.x, floorY - 1] : Lx })), ...branches.map(b => ({ x: b.x, y: b.y, w: b.w, h: b.h, at: [b.hookX, top - 2] }))];
+    fairFights({ D, tiles, gates, entries, spawns: enemyKit.spawns, letterOf: enemyKit.letterOf, melee: enemyKit.melee, cfg: LD, rnd });
+  }
   const layout = tiles.map(r => r.join(''));
   const S = R[start];
   const def = { name: P.name || poiId, size: [W, H], layout, spawns: enemyKit.spawns, tags: ['poi'], backdrop: S.backdrop };
-  const rooms = [...placedMain, ...branches].map(({ id, band, x, y, w, h, intensity }) => ({ id, band, x, y, w, h, intensity: Math.round((intensity ?? 1) * 100) }));
+  const rooms = [...placedMain, ...branches].map(({ id, band, x, y, w, h, intensity, rest, wow }) => ({ id, band, x, y, w, h, intensity: Math.round((intensity ?? 1) * 100), ...(rest ? { rest: true } : {}), ...(wow ? { wow: true } : {}) }));
   return { def, rooms, shortcut: ends, branches: branches.length, problems, start, exit };
 }
 
@@ -172,14 +196,20 @@ function makeEnemies(D, P, R, rnd) {
     const pool = !curve ? byHealth : k < 0.5 ? byHealth.slice(0, half) : k >= 0.85 ? byHealth.slice(byHealth.length - half) : byHealth;
     return pool[Math.floor(rnd() * pool.length)];
   };
-  return { D, rnd, spawns, letterOf, pickEnemy, curve };
+  const melee = byHealth.filter(e => D.enemies[e].behavior !== 'shooter' && D.enemies[e].behavior !== 'flyer');
+  return { D, rnd, spawns, letterOf, pickEnemy, curve, melee };
 }
 // one room into the level's tiles at (place.x, y0): L only in the entrance, Z only in the exit, ^ v only where keep says, 1 by the curve
+// #163 an Atempause has no enemies (and a chest), the Wow room keeps its first part calm (from the way in: left, the bottom of a tower,
+// the top of a deep POI)
 function stampRoom({ R, parsed, tiles, start, exit, enemyKit: K, keep }, place, y0) {
   const r = place.p || parsed[place.id], table = Object.fromEntries((R[place.id].spawns || []).map(s => [s.symbol, s.enemy]));
+  const calm = (K.LD?.wowCalm ?? 45) / 100, st = K.stack;
+  const quiet = (x, y) => place.rest || (place.wow && (st === 'tower' ? y > r.h * (1 - calm) : st === 'deep' ? y < r.h * calm : x < r.w * calm));
   place.y = y0;
   for (let y = 0; y < r.h; y++) for (let x = 0; x < r.w; x++) {
     let c = r.tiles[y][x];
+    if ((c === '1' || table[c]) && quiet(x, y) && K.D.enemies?.[table[c]]?.behavior !== 'boss') c = '.';
     if (c === 'L' && place.id !== start) c = '.';
     else if (c === '^' && !keep['^']) c = '#';
     else if (c === 'v' && !keep.v) c = '#';
@@ -188,17 +218,18 @@ function stampRoom({ R, parsed, tiles, start, exit, enemyKit: K, keep }, place, 
     else if (table[c]) c = K.D.enemies?.[table[c]] ? K.letterOf(table[c]) : '.';
     tiles[y0 + y][place.x + x] = c;
   }
+  if (place.rest && !r.marks.C.length) { const p = restChestSpot(r); if (p) tiles[y0 + p[1]][place.x + p[0]] = 'C'; }
 }
 
 // stacked POIs (tower / deep), see the top of this file
-function buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, stack, hook, enemyKit, problems }) {
+function buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, stack, hook, enemyKit, problems, intens, flags }) {
   const curve = enemyKit.curve;
   // rooms may be mirrored (a mirrored room is just as valid): every lower room takes the side that keeps the stack close above its
   // first room, so towers stay upright and mines do not wander off diagonally; when both are about as good, chance decides
   const mirrored = {};
   const look = (id, flip) => !flip ? parsed[id] : (mirrored[id] ??= parseRoom({ ...R[id], layout: parsed[id].tiles.map(r => [...r].reverse().join('')) }));
   const hooksOf = (p, y) => p.marks.A.filter(([, hy]) => hy === (y === 'floor' ? p.h - 1 : 0)).map(([hx]) => hx);
-  const placed = main.map((id, i) => ({ id, band: 'main', w: parsed[id].w, h: parsed[id].h, intensity: curve ? curveAt(curve, main.length > 1 ? i / (main.length - 1) : 1) : 1 }));
+  const placed = main.map((id, i) => ({ id, band: 'main', w: parsed[id].w, h: parsed[id].h, intensity: intens[i], ...flags(id) }));
   const order = stack === 'tower' ? [...placed].reverse() : placed;   // top to bottom
   // x: every lower room hangs under the upper one so that the upper floor hook sits over the lower ceiling hook; y: one under the other
   const joints = [];
@@ -270,8 +301,20 @@ function buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, sta
     // up = the entrance's end of the shortcut, down = the exit's end (as with the tunnel)
     ends = { up: [ladderX, stack === 'tower' ? fb : ft], down: [ladderX, stack === 'tower' ? ft : fb], floor: fb, door: [dx, fb - 1], shaft: [s0, ft - 3, SW, fb - ft + 3], kind: 'shaft' };
   }
+  // #163 fair fights: gates are the ladders through the hooks (both sides) and the seams of the side rooms
+  {
+    const gates = [...joints.flatMap(j => [[j.x, j.y - 1], [j.x, j.y + 2]]), ...branches.map(b => [side > 0 ? b.x + b.w - 1 : b.x, b.y + b.h - 2])];
+    const Lx = (() => { for (let y = 0; y < H; y++) { const x = tiles[y].indexOf('L'); if (x >= 0) return [x, y]; } return null; })();
+    // the way in of a main room: the entrance at L; a tower comes in through the floor (joint below), a deep POI through the ceiling
+    const entries = [...placed.map((m, i) => {
+      if (!i) return { x: m.x, y: m.y, w: m.w, h: m.h, at: Lx };
+      const oi = order.indexOf(m), j = stack === 'tower' ? joints[oi] : joints[oi - 1];
+      return { x: m.x, y: m.y, w: m.w, h: m.h, at: j ? (stack === 'tower' ? [j.x, j.y - 1] : [j.x, j.y + 2]) : null };
+    }), ...branches.map(b => ({ x: b.x, y: b.y, w: b.w, h: b.h, at: [side > 0 ? b.x + b.w - 1 : b.x, b.y + b.h - 2] }))];
+    fairFights({ D, tiles, gates, entries, spawns: enemyKit.spawns, letterOf: enemyKit.letterOf, melee: enemyKit.melee, cfg: enemyKit.LD, rnd });
+  }
   const def = { name: P.name || poiId, size: [W, H], layout: tiles.map(r => r.join('')), spawns: enemyKit.spawns, tags: ['poi'], backdrop: R[start].backdrop || all.map(o => R[o.id].backdrop).find(Boolean) };
-  const rooms = [...placed, ...branches].map(({ id, band, x, y, w, h, intensity, flip }) => ({ id, band, x, y, w, h, intensity: Math.round((intensity ?? 1) * 100), ...(flip ? { flip: true } : {}) }));   // entrance first, like the band
+  const rooms = [...placed, ...branches].map(({ id, band, x, y, w, h, intensity, flip, rest, wow }) => ({ id, band, x, y, w, h, intensity: Math.round((intensity ?? 1) * 100), ...(flip ? { flip: true } : {}), ...(rest ? { rest: true } : {}), ...(wow ? { wow: true } : {}) }));   // entrance first, like the band
   return { def, rooms, shortcut: ends, branches: branches.length, problems, start, exit, stack };
 }
 // is the seam (the three rows above the floor) open on that side (-1 left, 1 right)?
