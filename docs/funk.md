@@ -284,10 +284,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #141 Ranking-Bonus: Δ je Rang + Bonus-Kiste
-- **Status:** offen · angelegt 21.11. von Code (Daniel: Karte „Ranking-Bonus“: „A und B“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: Karte „Ranking-Bonus“: „A und B“)
 - **Auftrag:** Δ-Bonus je Rang (S +50 %, A +25 %, B +10 %, einstellbar) und eine Bonus-Kiste am Ausgang mit besserem Beute-Wurf; danach Balancing v2 (#109).
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: (1) Werte S 50 / A 25 / B 10 / C–F 0 ersetzen die alten höheren (vorher bis S 100 %): Run-Geld nach 40 Tagen im Median 4.828 statt 6.214 Δ, dafür ~31 Bonus-Kisten je Spielerin (`docs/balancing.md`); (2) die alten Extra-Würfe am Tresor sind durch die Bonus-Kiste ersetzt; (3) „bessere Seltenheit“ = „Wählerisch“ (beste von N Ziehungen nach Wert); (4) die Kiste steht neben dem Tresor im Ausgangsraum.
+- **Ergebnis:** (Code, per Helfer) `rankBonus`/`rankCrate` in `engine/poi.js`, Ranking › Bonus-Kiste (an/aus, ab Rang B, eigene Beute) und je Rang Würfe/Wählerisch (B 2, A 3 beste aus 2, S 4 beste aus 3); goldene Kiste mit Glühen neben dem Tresor, Zeile „☆ Rang-Bonus“ und Kisten-Zeile in der Beute-Bilanz. Tests `test/poi.test.js`, `tools/poi_test.mjs` (33). **Bitte testen:** einen POI mit Rang B oder besser abschließen, Kiste neben dem Tresor öffnen.
 
 ### #142 Cockpit-Kram über Ereignisse freischalten
 - **Status:** offen · angelegt 21.11. von Code (Daniel: „Ava setzt sie, aber basierend auf Ereignissen im Spiel (wie Achievements, aber weniger ‚groß‘, mit einer kleinen Unlock-Meldung)“)
