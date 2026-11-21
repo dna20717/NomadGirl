@@ -131,7 +131,8 @@
    "guide": "Schläuche der Zapfsäulen",
    "guideKind": "pipe",
    "guideColor": "#3d3d3d"
-  }
+  },
+  "dressing": {"desert": 80}
  },
  "grossmarkt": {
   "name": "Delta South Megamall",
@@ -227,7 +228,8 @@
    "guide": "stillstehende Rolltreppen",
    "guideKind": "strip",
    "guideColor": "#c7dcd0"
-  }
+  },
+  "dressing": {"desert": 55}
  },
  "bunker_13": {
   "name": "Deadlock Bunker 13",
@@ -308,7 +310,8 @@
    "guide": "Notlicht-Streifen am Boden",
    "guideKind": "strip",
    "guideColor": "#1ebc73"
-  }
+  },
+  "dressing": {"desert": 5}
  },
  "ministerium": {
   "name": "Ministry of Order",
@@ -382,7 +385,8 @@
    "guide": "roter Teppich",
    "guideKind": "carpet",
    "guideColor": "#b33831"
-  }
+  },
+  "dressing": {"desert": 20}
  },
  "delta_heights": {
   "name": "Delta Heights",
@@ -444,7 +448,8 @@
    "guide": "Aufzugsseile im Schacht",
    "guideKind": "cable",
    "guideColor": "#45293f"
-  }
+  },
+  "dressing": {"desert": 60}
  },
  "parkhaus_sued": {
   "name": "P+R Delta Süd",
@@ -530,7 +535,8 @@
    "guide": "Fahrbahnpfeile auf dem Boden",
    "guideKind": "arrows",
    "guideColor": "#f9c22b"
-  }
+  },
+  "dressing": {"desert": 55}
  },
  "funkmast_km31": {
   "name": "Funkmast KM 31",
@@ -593,7 +599,8 @@
    "guide": "Kabelstränge am Gitter",
    "guideKind": "cable",
    "guideColor": "#2e222f"
-  }
+  },
+  "dressing": {"desert": 70}
  },
  "metro_line4": {
   "name": "Metro Line 4",
@@ -680,7 +687,8 @@
    "guide": "Gleise",
    "guideKind": "rail",
    "guideColor": "#7f708a"
-  }
+  },
+  "dressing": {"desert": 20}
  },
  "storm_drain9": {
   "name": "Storm Drain 9",
@@ -736,7 +744,8 @@
    "guide": "Rinnsal aus Schlamm",
    "guideKind": "mud",
    "guideColor": "#4c3e24"
-  }
+  },
+  "dressing": {"desert": 30}
  },
  "pit6": {
   "name": "Pit 6",
@@ -798,7 +807,8 @@
    "guide": "Grubenbahn-Schienen",
    "guideKind": "rail",
    "guideColor": "#7f708a"
-  }
+  },
+  "dressing": {"desert": 25}
  },
  "delta_crude": {
   "name": "Delta Crude Refinery",
@@ -875,7 +885,8 @@
    "lightStrength": 220,
    "music": 35
   },
-  "level": {"landmark": "Fackel", "landmarkMotif": "flare", "landmarkColor": "#ff8a3d", "rest": "rf_leitstand", "guide": "Rohrbrücke", "guideKind": "pipe", "guideColor": "#5d5d5d"}
+  "level": {"landmark": "Fackel", "landmarkMotif": "flare", "landmarkColor": "#ff8a3d", "rest": "rf_leitstand", "guide": "Rohrbrücke", "guideKind": "pipe", "guideColor": "#5d5d5d"},
+  "dressing": {"desert": 50}
  },
  "sunny_acres": {
   "name": "Sunny Acres",
@@ -961,7 +972,8 @@
    "guide": "Lichterkette zwischen den Wohnwagen",
    "guideKind": "lights",
    "guideColor": "#f9c22b"
-  }
+  },
+  "dressing": {"desert": 70}
  },
  "raketensilo": {
   "name": "Silo Zero",
@@ -1062,6 +1074,7 @@
    "guide": "Kabelbäume zur Startrampe",
    "guideKind": "cable",
    "guideColor": "#e83b3b"
-  }
+  },
+  "dressing": {"desert": 3}
  }
 }

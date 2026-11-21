@@ -1,0 +1,78 @@
+{
+ "pluenderer_lager": {
+  "name": "Lager eines Plünderers",
+  "description": "Jemand hat hier ein paar Nächte geschlafen: Schlafsack, Dosen, eine Feuerstelle, Ruß an der Wand.",
+  "roles": ["storage", "living", "office", "general", "hall"],
+  "events": ["gang", "abandoned"],
+  "chance": 50,
+  "tags": "vorrat, müll, kanister",
+  "sets": ["schlafplatz", "muellecke"],
+  "decals": ["camp", "sleep", "soot"],
+  "light": 15,
+  "loot": "pluenderer_beute",
+  "note": "Drei Nächte Ruhe. Dann kamen sie doch."
+ },
+ "schiesserei": {
+  "name": "Schießerei",
+  "description": "Umgekippter Tisch als Deckung, Hülsen, Einschusslöcher, ein Blutfleck.",
+  "roles": [],
+  "events": ["fight", "gang"],
+  "chance": 45,
+  "tags": "sperre, militär, sandsack",
+  "sets": ["sandsack"],
+  "decals": ["holes", "shells", "blood"],
+  "light": 0,
+  "loot": "pluenderer_beute",
+  "note": ""
+ },
+ "gepluendert": {
+  "name": "Geplündert",
+  "description": "Offene Schränke, verstreute Kartons, wenig Beute.",
+  "roles": ["shop", "storage", "office", "living"],
+  "events": ["flight", "fight", "abandoned"],
+  "chance": 55,
+  "tags": "müll, kiste, papier",
+  "sets": ["muellecke"],
+  "decals": ["cartons"],
+  "light": 0,
+  "note": ""
+ },
+ "verbarrikadiert": {
+  "name": "Verbarrikadiert",
+  "description": "Bretter und Möbel vor der Tür, dahinter Vorräte und eine Waffe.",
+  "roles": ["storage", "living", "office", "shop"],
+  "events": ["sealed", "orderly", "flight"],
+  "chance": 40,
+  "tags": "kiste, vorrat, sperre",
+  "sets": ["kistenstapel"],
+  "decals": ["boards"],
+  "light": 20,
+  "loot": "pluenderer_beute",
+  "note": "Nicht aufmachen. Wir sind vollzählig."
+ },
+ "ueberflutet": {
+  "name": "Überflutet",
+  "description": "Pfützen, Tropfen, Algen; die Elektronik ist hin.",
+  "roles": ["tech", "corridor", "hall", "storage", "cave"],
+  "events": ["flood", "abandoned"],
+  "chance": 30,
+  "tags": "rohr, putz",
+  "sets": [],
+  "decals": ["puddle", "drip", "algae"],
+  "light": 10,
+  "note": ""
+ },
+ "nest": {
+  "name": "Nest",
+  "description": "Kleinvieh gehäuft, Knochen, alles was glänzt.",
+  "roles": [],
+  "events": ["nest"],
+  "chance": 45,
+  "tags": "müll, knochen",
+  "sets": [],
+  "decals": ["bones"],
+  "light": 25,
+  "loot": "mutanten_beute",
+  "note": ""
+ }
+}

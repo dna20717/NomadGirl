@@ -6,6 +6,7 @@
 //   placeTypes(room, reg)  place types from the tiles: floor_in, floor_out, roof, ledge (+ corner), ceiling, wall
 
 import { roomStory } from './story.js';
+import { rulesOf, orderConfig, decayConfig, ageItems, roomTale, hash as hash2 } from './dressing_story.js';
 
 // Ort-Typen: where a thing can be (Kachel-Sets › Clutter-Regeln › Ort, POI-Ensembles › Ort)
 export const PLACE_TYPES = [['floor_in', 'Boden drinnen'], ['floor_out', 'Boden draußen'], ['roof', 'Dach'], ['ledge', 'Steg / Sims / Theke'],
@@ -219,6 +220,7 @@ export function keepClear(room, spots, reg = {}) {
 // Deterministic: the same level and seed give the same plan.
 export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 64, singles = true }) {
   const cfg = dressingConfig(D), rc = roleConfig(D), ch = (x, y) => room.tiles[y]?.[x];
+  const rules = rulesOf(D), ocfg = orderConfig(D), dcfg = decayConfig(D);   // #159 corrections, order rows, decay
   const pools = new Map(), poolOf = id => { if (!pools.has(id)) pools.set(id, setPool(D, id, T)); return pools.get(id); };
   const brands = brandPool(D, poiId, T), sets = Object.keys(D.terrain || {});
   const { keep, wallKeep } = keepClear(room, spots, reg);
@@ -241,7 +243,7 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
   const fitsAt = (c, x, y) => {
     for (let i = 0; i < c.w; i++) {
       const s = spots.at(x + i, y);
-      if (!s || !STANDING.has(s.type) || !fits(c.rule.place, s) || s.air < c.h || keep.has((x + i) + ',' + y) || !free(x + i, y)) return false;
+      if (!s || !STANDING.has(s.type) || !fits(c.rule.place, s) || s.air < c.h || keep.has((x + i) + ',' + y) || !free(x + i, y) || rules.forbids(c.name, null, s.type)) return false;
     }
     return true;
   };
@@ -256,25 +258,57 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
   const cands = (R, extra = false) => [...poolOf(R.set), ...brands, ...(extra ? sets.filter(id => id !== R.set).flatMap(id => poolOf(id).map(c => ({ ...c, borrowed: true }))) : [])];
   // per POI and per room (#160 hooks): density, preferred and avoided tags, which ensembles (dressingOverrides)
   let ov = null;
-  const weight = (c, role) => { let w = roleWeight(c.rule, role, rc) * (c.borrowed ? 0.3 : 1); const t = tagsOf(c); if (ov?.forbid.length && (ov.forbid.includes(c.name) || t.some(x => ov.forbid.includes(x)))) return 0; if (ov?.prefer.length && t.some(x => ov.prefer.includes(x))) w *= 2; if (ov?.avoid.length && t.some(x => ov.avoid.includes(x))) w *= 0.25; return w; };
+  const weight = (c, role) => { let w = roleWeight(c.rule, role, rc) * (c.borrowed ? 0.3 : 1); const t = tagsOf(c); if (ov?.forbid.length && (ov.forbid.includes(c.name) || t.some(x => ov.forbid.includes(x)))) return 0; if (rules.forbids(c.name, role, null)) return 0; if (tale?.tags.length && t.some(x => tale.tags.includes(x))) w *= 3; if (ov?.prefer.length && t.some(x => ov.prefer.includes(x))) w *= 2; if (ov?.avoid.length && t.some(x => ov.avoid.includes(x))) w *= 0.25; return w; };
   const hangOnly = c => { const P = list(c.rule.place); return P.length > 0 && P.every(p => p === 'wall' || p === 'ceiling'); };
-  let ri = 0;
+  let ri = 0, tale = null;
   for (const R of regions.values()) {
     ri++;
     R.spots = R.stand.length;
     ov = dressingOverrides(D, poiId, R.room);
-    R.budget = Math.round(R.spots * (ov.density ?? cfg.densityOf(R.role)) * ov.scale / 10);
+    // #159 the room's story (Raum-Geschichten): its tags come thrice as often, a third more things; decay from the story (room over POI)
+    const rr = R.key !== 'room' ? R.key.split('@')[1].split(',').map(Number) : null;
+    R.tale = R.room && rr && poiId ? roomTale(D, poiId, { id: R.room, x: rr[0], y: rr[1] }, rr[0] * 1000 + rr[1], seed) : null;
+    const TT = R.tale ? D.roomStories?.[R.tale] : null;
+    tale = TT ? { tags: list(TT.tags), sets: TT.sets || [] } : null;
+    R.decay = Math.max(0, Math.min(3, ov.decay ?? 0)); R.scale = ov.scale;
+    R.budget = Math.round(R.spots * (ov.density ?? cfg.densityOf(R.role)) * ov.scale * rules.density(R.role) * (tale ? 1.3 : 1) / 10);
     const order = [...R.stand].sort((a, b) => score(b) - score(a));
     const same = c => items.filter(it => it.room === R.key && it.name === c.name).length;   // no room full of the same thing
+    // 0. #159 order first (Originalzustand): a row of the same thing at a fixed beat, centred in the longest free stretch of floor inside
+    const oc = singles && R.budget >= 2 ? ocfg(R.role) : null;
+    if (oc) {
+      const runs = [];
+      for (const s of [...R.stand].sort((a, b) => a.y - b.y || a.x - b.x)) {
+        if (s.type !== 'floor_in' || keep.has(s.x + ',' + s.y) || !free(s.x, s.y)) continue;
+        const last = runs.at(-1);
+        if (last && last.y === s.y && last.x1 === s.x - 1) last.x1 = s.x; else runs.push({ y: s.y, x0: s.x, x1: s.x });
+      }
+      const run = runs.filter(r => r.x1 - r.x0 + 1 >= 6).sort((a, b) => (b.x1 - b.x0) - (a.x1 - a.x0))[0];
+      if (run) {
+        const len = run.x1 - run.x0 + 1, pool = cands(R).filter(c => !hangOnly(c) && !c.ai && matchesTag(c, oc.tags) && fitsAt(c, run.x0, run.y));
+        const c = pickWeighted(pool, c => weight(c, R.role), hash(run.x0, run.y, s0 + 17));
+        if (c) {
+          const step = c.w + oc.gap;
+          // the longest row that fits completely (every place free), centred: keeps the beat
+          for (let n = Math.min(Math.floor((len + oc.gap) / step), Math.max(2, Math.round(R.budget * oc.share / 100))); n >= 2; n--) {
+            const x0 = run.x0 + Math.floor((len - (n * step - oc.gap)) / 2), xs = [...Array(n).keys()].map(i => x0 + i * step);
+            if (!xs.every(x => fitsAt(c, x, run.y))) continue;
+            for (const x of xs) put(c, x, run.y, 'stand', spots.at(x, run.y).type, null, R).ord = true;
+            break;
+          }
+        }
+      }
+    }
     // 1. ensembles (POI-Ensembles): the core on a good spot, companions to its left and right
     const ensBudget = Math.floor(R.budget * cfg.ensembles / 100);
-    const ensList = Object.entries(D.poiSets || {}).filter(([id, e]) => (e.weight ?? 1) > 0 && (e.members || []).length && (!e.roles?.length || e.roles.includes(R.role)) && (!ov.sets.length || ov.sets.includes(id)));
+    const ensList = Object.entries(D.poiSets || {}).filter(([id, e]) => (e.weight ?? 1) > 0 && (e.members || []).length && (!e.roles?.length || e.roles.includes(R.role)) && (!ov.sets.length || ov.sets.includes(id)))
+      .sort(([a], [b]) => (tale?.sets.includes(b) ? 1 : 0) - (tale?.sets.includes(a) ? 1 : 0));
     const pool = cands(R, true).filter(c => !hangOnly(c));
     let ensPlaced = 0;
     for (let k = 0; k < 6 && ensList.length && ensPlaced < ensBudget; k++) {
       const open = ensList.filter(([id]) => !items.some(it => it.room === R.key && it.ens === id));   // each ensemble once per room
       if (!open.length) break;
-      const [eid, E] = pickWeighted(open, ([, e]) => (e.weight ?? 1) * (e.roles?.length ? 2 : 1), hash(k, ri, s0 + 21));
+      const [eid, E] = pickWeighted(open, ([id, e]) => (e.weight ?? 1) * (e.roles?.length ? 2 : 1) * (tale?.sets.includes(id) ? 6 : 1), hash(k, ri, s0 + 21));
       const places = E.place?.length ? E.place : ['floor_in'];
       const at = (c, x, y) => fitsAt(c, x, y) && places.includes(spots.at(x, y).type);
       for (const a of order.filter(s => places.includes(s.type) && (!E.corner || s.corner || k > 2)).slice(0, 40)) {
@@ -326,7 +360,20 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
       if (c) { put(c, s.x, s.y, s.type, s.type, null, R); hung++; }
     }
   }
-  return { items, regions: [...regions.values()].map(({ stand, hang, ...r }) => r), planned: (x, y) => poolOf(idAt(x, y - 1)).length > 0, keep };
+  // #159 then decay: per region (its story's decay) things tip over, slide, leave gaps; debris lies about on free floor
+  let kept = items;
+  ri = 0;
+  for (const R of regions.values()) {
+    ri++;
+    if (!R.decay) continue;
+    const mine = items.filter(it => it.room === R.key);
+    R.aged = ageItems(mine, R.decay, s0 + ri, dcfg);
+    const n = Math.round(dcfg.debris * R.decay * R.stand.length * (R.scale ?? 1) / 10);
+    for (const s of R.stand.filter(s => !keep.has(s.x + ',' + s.y) && free(s.x, s.y) && (s.type === 'floor_in' || s.type === 'floor_out')).sort((a, b) => hash2(a.x, a.y, s0 + 7) - hash2(b.x, b.y, s0 + 7)).slice(0, n))
+      items.push({ x: s.x, y: s.y, w: 1, h: 1, hang: 'stand', type: s.type, debris: true, room: R.key, seed: hash2(s.x, s.y, s0) });
+  }
+  kept = items.filter(it => !it.gone);
+  return { items: kept, regions: [...regions.values()].map(({ stand, hang, ...r }) => r), planned: (x, y) => poolOf(idAt(x, y - 1)).length > 0, keep };
 }
 
 // ---------- autotiling (#158 step 6) ----------

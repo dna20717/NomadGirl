@@ -7,6 +7,8 @@
 // (POIs › Atmosphäre im Tunnel, else the tunnel's Kachel-Set).
 import { WALL } from './room.js';
 import { levelConfig, lightTheWay, wowInLevel } from './level_design.js';
+import { roomTale, decayConfig } from './dressing_story.js';
+import { roomStory } from './story.js';
 
 export const LAMP_KINDS = [['ceiling', 'Deckenlampe'], ['tube', 'Neonröhre'], ['emergency', 'Notlicht'], ['bulb', 'Glühbirne']];
 export const LIGHT_BEHAVIORS = [['steady', 'Ruhig'], ['flicker', 'Flackert'], ['pulse', 'Pulsiert'], ['broken', 'Kaputt (Aussetzer, Funken)'], ['stutter', 'Springt an (Neonröhre stottert)'], ['alarm', 'Alarm (Rundumlicht)'], ['buzz', 'Brummt (leises Zittern)']];
@@ -75,6 +77,15 @@ export function planLights(D, room, regionAt, opts = {}) {
     }
   }
   if (opts.level?.rooms?.length) {
+    // #159 decay breaks lamps (POIs › Story › Verfall, Spiel › Set-Dressing Stufe 2 › Lampen kaputt), a room's story can dim them
+    const dc = decayConfig(D), P = D.pois?.[opts.poiId] || {};
+    for (const l of lamps) {
+      const r = l.region?.room ? opts.level.rooms.find(o => o.id === l.region.room && l.x >= o.x && l.x < o.x + o.w && l.y >= o.y && l.y < o.y + o.h) : null;
+      if (!r) continue;
+      const decay = roomStory(P, D.rooms?.[r.id] || {}).decay, tale = D.roomStories?.[roomTale(D, opts.poiId, r, r.x * 1000 + r.y, opts.seed || 0)];
+      if (!l.fixed && hash(l.x, l.y, 913) * 100 < dc.broken * decay) l.behavior = 'broken';
+      if (tale?.light) l.strength = Math.round(l.strength * (1 - tale.light / 100));
+    }
     const cfg = levelConfig(D);
     lightTheWay(lamps, opts.level, room, cfg, (x, y) => { const reg = regionAt(x, y), L = M[reg.mood]?.lamps?.[0] || { kind: 'bulb' }; return (M[reg.mood]?.light?.ambient ?? 100) >= 90 ? null : lamp(L, x, y, reg, true); });   // daylight needs no lamp
     const W = wowInLevel(D, opts.poiId, opts.level);

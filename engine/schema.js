@@ -12,6 +12,9 @@ import { buildPoi, poiReady } from './poi.js';
 import { PLACE_TYPES, ROOM_ROLES, splitList } from './dressing.js';
 import { EVENT_KINDS, storyTags } from './story.js';
 import { ROOM_TYPES, WOW_AT, MOTIFS, GUIDE_KINDS, STINGERS, LEVEL } from './level_design.js';
+import { ORDER, DECAY, RULE_REASONS } from './dressing_story.js';
+import { RESIDENTS } from './story.js';
+import { DECALS } from './dressing_story.js';
 import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
 import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
 import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from './megarig.js';
@@ -294,6 +297,17 @@ export const AREAS = {
         num('dressing.sameMax', 'Gleiches je Raum', { min: 1, hint: 'Ein Einzelstück höchstens so oft je Raum (Ensembles zählen nicht). Leer = 2' }), num('dressing.aiMax', 'Automaten mit KI je Raum', { min: 0, hint: 'Höchstens so viele Marken-Dinge mit KI (Glitch-Duell) je Raum. Leer = 1' }),
         table('dressing.roles', 'Rollen', [select('role', 'Rolle', ROOM_ROLES), num('density', 'Dichte', { min: 0, max: 10, step: 0.1 }), text('prefer', 'Bevorzugt Tags'), text('avoid', 'Meidet Tags')],
           { hint: 'Je Raum-Rolle: Dichte (Dinge je 10 Bodenkacheln, leer = Dichte oben); Clutter mit den bevorzugten Tags (Komma) kommt doppelt so oft, gemiedene viermal seltener. Dazu zählen die Rollen in den Clutter-Regeln: passt die Rolle, dreimal so oft; nennt ein Stück andere Rollen, viermal seltener. Der Abkürzungs-Tunnel unter dem Level zählt als Gang' })] },
+      { title: 'Set-Dressing Stufe 2', fields: [
+        table('dressing.order', 'Ordnung', [select('role', 'Rolle', ROOM_ROLES), text('tags', 'Reihe aus Tags'), num('gap', 'Abstand', { unit: 'Kacheln', min: 0 }), num('share', 'Anteil', { unit: '%', min: 0, max: 100 })],
+          { hint: `#159 Erst Ordnung, dann Verfall (Bibel): je Rolle eine Reihe gleicher Dinge im Takt, mittig im längsten freien Bodenstück (Symmetrie). Tags mit | (regal|kasse). Leer = ${ORDER.map(o => o.role).join(', ')} wie vorgegeben` }),
+        num('dressing.decay.tilt', 'Verfall: kippen', { unit: '% je Stufe', min: 0, max: 33, hint: `Chance je Ding und Verfall-Stufe (POIs › Story › Verfall), dass es lehnt oder umgekippt liegt. Leer = ${DECAY.tilt}` }),
+        num('dressing.decay.slide', 'Verfall: verschoben', { unit: '% je Stufe', min: 0, max: 33, hint: `Leer = ${DECAY.slide}` }), num('dressing.decay.gap', 'Verfall: Lücken', { unit: '% je Stufe', min: 0, max: 33, hint: `Ein Ding aus einer Reihe fehlt. Leer = ${DECAY.gap}` }),
+        num('dressing.decay.debris', 'Verfall: Schutt', { unit: 'je 10 Bodenkacheln und Stufe', min: 0, max: 5, step: 0.1, hint: `Schutt, Scherben, Papier am Boden (aus Code). Leer = ${DECAY.debris}` }),
+        num('dressing.decay.broken', 'Verfall: Lampen kaputt', { unit: '% je Stufe', min: 0, max: 33, hint: `Leer = ${DECAY.broken}` }),
+        num('dressing.storyShare', 'Raum-Geschichten', { unit: '% der Räume', min: 0, max: 100, hint: 'So viele Räume zeigen Spuren einer Raum-Geschichte (Katalog Raum-Geschichten), höchstens eine je Raum. Leer = 40' }),
+        num('dressing.backDim', 'Rückwand-Clutter dunkler', { unit: '%', min: 35, max: 50, hint: 'Rohre, Kabelkanäle, Regale, Poster, Türen ohne Funktion auf der Rückwand: so viel dunkler als die Spielebene (Bibel: 35–50 %). Leer = 42' }),
+        num('dressing.backEvery', 'Rückwand-Clutter: Abstand', { unit: 'Wandplätze', min: 1, max: 30, hint: 'Etwa eins je so viele freie Wandplätze. Leer = 7' }),
+        bool('dressing.learn', 'Entwickler-Modus: Korrekturen (K)', { hint: '#159 (Daniel 21.11.2026: nur im Entwickler-Modus): K im POI schaltet Korrekturen an, ein Klick auf ein Ding fragt nach dem Grund, daraus wird eine Regel (Katalog Korrekturen) für alle Seeds. Auch mit ?dev in der Adresse' })] },
       { title: 'Level-Design', fields: [num('levelDesign.peak', 'Spitze ab', { unit: '%', min: 0, max: 150, hint: `#163 Rhythmus (Bibel › Level-Design): nach einem Hauptraum ab dieser Intensität folgt einer unter „Ruhe unter“ (nicht vor dem Ausgang). Leer = ${LEVEL.peak}` }),
         num('levelDesign.calm', 'Ruhe unter', { unit: '%', min: 0, max: 100, hint: `Leer = ${LEVEL.calm}` }), num('levelDesign.rest', 'Ruhe-Raum', { unit: '%', min: 0, max: 100, hint: `So laut wird der Raum nach der Spitze; bevorzugt ein Raum vom Typ Atempause (ohne Gegner, mit Kiste). Leer = ${LEVEL.rest}` }),
         num('levelDesign.seam', 'Kein Spawn an Nähten', { unit: 'Kacheln', min: 0, max: 8, hint: `Faire Kämpfe: so weit von jeder Naht zwischen zwei Räumen spawnt nichts (Gegner rücken nach innen). Leer = ${LEVEL.seam}` }),
@@ -1715,7 +1729,9 @@ export const AREAS = {
       { title: 'Markenschild', fields: [bool('brandSign', 'Schild am Eingang', { hint: 'Daniel 21.11.2026: „Die Firmenlogos werden in den POI nicht angezeigt“. Die Marke des Orts von der Reisekarte (Logo, Name, Slogan) steht auf einem Mast im ersten Außenraum. Leer = an' }), ref('machineLoot', 'Automat nach dem Duell', 'lootTables', { hint: '#152 (Daniel 21.11.2026): ist die Entity im Automaten besiegt, fällt diese Beute heraus (Essen, NomadCola). Leer = automat_beute' }), ref('brand', 'Marke ohne Karte', 'brands', { hint: 'Geht vor der Marke der Karte (Daniel 21.11.2026: „Marken passend zum Ort“, z. B. Ministerium = Bureau of Order). Leer = Marke von der Karte' }), num('brandSignHeight', 'Höhe des Schilds', { unit: 'Kacheln', min: 2, max: 8, step: 0.1, hint: 'Oberkante über dem Boden. Leer = 4,6' })] },
       { title: 'Set-Dressing', fields: [num('dressing.density', 'Dichte', { unit: '%', min: 0, max: 300, hint: '#158: alle Räume dieses POI so viel dichter oder leerer eingerichtet (100 = wie die Rollen sagen). Leer = 100' }),
         text('dressing.prefer', 'Bevorzugt Tags', { hint: 'Clutter mit diesen Tags (Komma) kommt in diesem POI doppelt so oft' }), text('dressing.avoid', 'Meidet Tags', { hint: 'Viermal seltener' }),
-        refs('dressing.sets', 'Nur diese Ensembles', 'poiSets', { hint: 'Leer = alle passenden POI-Ensembles. Raum-Bausteine können es je Raum überschreiben' })] },
+        refs('dressing.sets', 'Nur diese Ensembles', 'poiSets', { hint: 'Leer = alle passenden POI-Ensembles. Raum-Bausteine können es je Raum überschreiben' }),
+        num('dressing.desert', 'Wüste kriecht rein', { unit: '%', min: 0, max: 100, hint: '#159: Sand in Ecken und am Wandfuß, Grün in Ritzen, Licht durch Öffnungen, von jedem Eingang und Fenster nach innen abnehmend. Leer = 60 (Bunker fast nichts)' }),
+        num('dressing.desertReach', 'Wüste: Reichweite', { unit: 'Kacheln', min: 1, max: 60, hint: 'So weit kriecht sie hinein. Leer = 14' })] },
       { title: 'Marken-Clutter', wide: true, fields: [table('brandProps', 'Marken-Clutter', [ref('look', 'Symbol-Raster', 'assets'), text('name', 'Symbol'), num('cm', 'Höhe', { unit: 'cm', min: 1 }), num('chance', 'Chance', { unit: '%', min: 0, max: 100 }), bool('ai', 'KI'), text('place', 'Ort'), text('tags', 'Tags'), text('roles', 'Rollen')], { hint: 'Daniel, 17.11.2026: Dinge einer Marke, die in diesem POI auf freiem Boden stehen (z. B. NomadCola-Automaten an Tankstellen). Symbol = Name im Raster, Höhe in echten cm, Chance je freier Bodenkachel (mit Set-Dressing: Gewicht beim Auswählen). KI = darin wohnt eine Entity: E / ↑ davor startet ein Glitch-Duell (#052). Ort, Tags, Rollen wie Kachel-Sets › Clutter-Regeln (#158)' })] },
       { title: 'Ranking', fields: [num('parTime', 'Bestzeit', { unit: 's', min: 0 }), num('secrets', 'Secrets', { min: 0, hint: 'Im Level zählen die brüchigen Wände (B); diese Zahl gilt nur für POIs ohne Level' })] },
       { title: 'Leben (noch ohne Wirkung)', fields: [bool('npcs', 'NPCs vor Ort'), bool('foodtruck', 'Foodtruck-Verkauf möglich'), bool('shop', 'Händler')] },
@@ -1823,6 +1839,27 @@ export const AREAS = {
       for (const r of Object.values(p?.data?.pois || {}).flatMap(P => P.brandProps || [])) for (const t of splitList(r.tags)) tags.add(t);
       for (const m of ms) for (const t of String(m.tag || '').split('|').map(v => v.trim()).filter(Boolean)) if (!tags.has(t)) report('warning', `Kein Clutter hat den Tag „${t}“ (Kachel-Sets › Clutter-Regeln)`);
     },
+  },
+  roomStories: {
+    name: 'Raum-Geschichten', singular: 'Raum-Geschichte', icon: 'flag', file: 'data/room_stories.json', kind: 'catalog',
+    hint: '#159 Spuren aus der Story (Bibel › Geschichte und Zeit): ein Raum zeigt das Ergebnis eines Ereignisses und erklärt nichts. Welche Geschichten passen, legen Ereignis und Heute des POI fest (Passt zu), gewürfelt wird nur, welcher Raum und die Details. Etwa 40 % der Räume (Spiel › Set-Dressing Stufe 2).',
+    template: { name: 'Neue Raum-Geschichte', chance: 50, roles: [], events: [], tags: '', decals: [] },
+    row: x => `${x.chance ?? 50} %${x.events?.length ? ' · ' + x.events.join(', ') : ''}${x.loot ? ' · eigene Beute' : ''}`,
+    sections: [{ title: 'Geschichte', fields: [NAME, DESCRIPTION, multi('roles', 'Rollen', ROOM_ROLES, { hint: 'In Räumen mit dieser Rolle. Leer = überall' }),
+      multi('events', 'Passt zu', [...EVENT_KINDS.filter(([k]) => k), ...RESIDENTS], { hint: 'Ereignis des POI (POIs › Story) oder wer heute dort ist. Passt es, viermal so oft; leer = zu allem' }),
+      num('chance', 'Gewicht', { min: 0 }), text('tags', 'Clutter-Tags', { hint: 'Diese Tags (Komma) kommen dreimal so oft, ein Drittel mehr Dinge' }), refs('sets', 'Ensembles', 'poiSets', { hint: 'Diese POI-Ensembles zuerst' }),
+      multi('decals', 'Spuren', DECALS),
+      num('light', 'Licht dunkler', { unit: '%', min: 0, max: 90 }), ref('loot', 'Beute', 'lootTables', { hint: 'Kisten in diesem Raum nehmen diese Tabelle. Leer = Beute des POI' }),
+      area_('note', 'Logbuch-Zettel', { hint: 'Optional: ein Satz, den Leyla hier findet (erscheint beim ersten Betreten)' })] }],
+  },
+  dressingRules: {
+    name: 'Korrekturen', singular: 'Korrektur', icon: 'rules', file: 'data/dressing_rules.json', kind: 'catalog',
+    hint: '#159 Lernen aus Korrekturen (Bibel › Qualitätssicherung): im Spiel im Entwickler-Modus K drücken und ein Ding anklicken, Grund wählen; daraus wird hier eine Regel, die für alle Seeds gilt. Löschen = vergessen.',
+    template: { name: 'Neue Korrektur', reason: 'remove', thing: '' },
+    row: x => `${label(RULE_REASONS, x.reason)}${x.date ? ' · ' + x.date : ''}`,
+    sections: [{ title: 'Regel', fields: [NAME, select('reason', 'Grund', RULE_REASONS), text('thing', 'Ding', { hint: 'Name im Symbol-Raster (Clutter-Regeln › Name), z. B. desert3_2' }),
+      select('role', 'Rolle', [['', '–'], ...ROOM_ROLES]), select('place', 'Ort', [['', '–'], ...PLACE_TYPES]), num('factor', 'Faktor', { min: 0.1, max: 3, step: 0.05, hint: 'Zu viel: Dichte der Rolle mal Faktor; falsche Größe: Ding mal Faktor. Leer = 0,8' }),
+      bool('off', 'Aus'), ref('poi', 'Gefunden in', 'pois'), ref('room', 'Raum', 'rooms'), text('date', 'Datum')] }],
   },
   atmosphere: {
     name: 'Atmosphäre', singular: 'Atmosphäre', icon: 'light', file: 'data/atmosphere.json', kind: 'catalog',
@@ -2138,7 +2175,7 @@ export const GROUPS = [
   ['ACHIEVEMENTS & AUFTRÄGE', ['achievements', 'quests']],
   ['PROGRESSION', ['techtree', 'resources']],
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'decorSets', 'megarigs', 'rigAddons', 'salvage', 'people', 'companions']],
-  ['WELT', ['worldmap', 'parallax', 'pois', 'rooms', 'terrain', 'poiSets', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
+  ['WELT', ['worldmap', 'parallax', 'pois', 'rooms', 'terrain', 'poiSets', 'roomStories', 'dressingRules', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
   ['LORE', ['brands', 'chronicle']],
   ['ENTITIES', ['glitchlings']],
 ];
