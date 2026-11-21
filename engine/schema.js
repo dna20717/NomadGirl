@@ -22,6 +22,7 @@ import { EARN_WHEN } from '../game/earn.js';
 import { RELIEFS, ROADSIDE } from '../game/road.js';
 import { ANSWER_WHEN, GANG_FROM, eventProblems } from '../game/road_events.js';
 import { SFX_RECIPES, SFX_LEGACY } from '../game/play/sfx.js';
+import { TRAIT_OPTIONS, THROW_ITEMS } from '../game/play/traits/ids.js';
 
 const text = (key, label, o = {}) => ({ key, label, type: 'text', ...o });
 const area_ = (key, label, o = {}) => ({ key, label, type: 'textarea', ...o });
@@ -673,6 +674,18 @@ export const AREAS = {
         bool('abilities.gated', 'Doppelsprung und Luft-Dash nur mit Implantat', { hint: 'Cyberware (#006, Daniel, 13.11.2026): im Spiel mit Spielstand schalten Implantate (Beine, Nerven) Doppelsprung und Luft-Dash frei; im Testraum geht immer alles. Aus = wie früher' }),
         table('inventory.implants', 'Implantat-Plätze', [select('slot', 'Platz', WEAR_SLOTS.filter(w => IMPLANT_SLOTS.includes(w[0]))), text('name', 'Name'), point('at', 'Am Körper', { unit: 'Bildpixel', hint: 'Punkt im Bild „Leyla im Inventar“' }), select('side', 'Seite', [['left', 'Links'], ['right', 'Rechts']])],
           { hint: 'Ansicht „Implantate“: je Platz ein Feld links oder rechts neben Leyla mit Linie zum Punkt am Körper' })] },
+      // #140 (Daniel, 21.11.2026: „Granaten sind nicht numerisch vorhanden, sondern ein extra Skill mit einem Cooldown“)
+      { title: 'Granate (Skill)', fields: [bool('grenade.enabled', 'Granate an', { hint: 'Leer = an. Taste T, Controller: rechten Stick drücken (Spiel › Controller)' }),
+        num('grenade.charges', 'Ladungen', { min: 1, hint: 'So viele hintereinander. Leer = 3' }),
+        num('grenade.cooldown', 'Abklingzeit', { unit: 's', min: 0, hint: 'Leer = 180' }),
+        select('grenade.refill', 'Auffüllen', [['all', 'alle zusammen, Abklingzeit ab dem ersten Wurf'], ['each', 'einzeln, je Ladung eine Abklingzeit']], { hint: 'Leer = alle zusammen' }),
+        select('grenade.item', 'Wirft', THROW_ITEMS, { hint: 'Derselbe Code wie beim Werfer (game/play/throwables.js). Leer = Granate' }),
+        num('grenade.fuse', 'Zündzeit', { unit: 'ms', min: 0, hint: 'Ab dem ersten Aufkommen. Leer = 900' }), num('grenade.radius', 'Radius', { unit: 'px', min: 10, hint: 'Leer = 160' }),
+        num('grenade.damage', 'Schaden', { min: 0, hint: 'In der Mitte, am Rand die Hälfte. Leer = 40' }), num('grenade.burn', 'Brennt', { unit: 's', min: 0, hint: 'Molotow, Säure. Leer = 3' }),
+        point('grenade.velocity', 'Wurf', { unit: 'px/s', hint: 'Abwurf nach vorn und oben. Leer = [620, -900]; mit ↑ gehalten höher, mit ↓ flach' }),
+        num('grenade.throwTime', 'Wurf dauert', { unit: 'ms', min: 0, hint: 'Ausholen bis Loslassen. Leer = 220' }),
+        point('grenade.hand', 'Wurfhand', { unit: 'px', hint: 'Über den Füßen, nach vorn (bei 192 px Leyla). Leer = [30, 170]' }),
+        ref('grenade.look', 'Wurf-Oberkörper', 'assets', { hint: 'Animation nur mit Oberkörper (Beine durchsichtig), wird über Stehen, Gehen, Rennen und Springen gelegt. Leer = Platzhalter aus Code' })] },
     ],
     check: (x, report, p) => {
       const W = p.data.weapons || {};
@@ -783,6 +796,31 @@ export const AREAS = {
       { title: 'Boss', when: x => x.behavior === 'boss', fields: [table('boss.phases', 'Phasen', [num('at', 'ab Leben', { unit: '%', min: 0, max: 100 }), text('say', 'Ruft'), num('speed', 'schneller', { unit: '%' }), num('windup', 'kürzer ausholen', { unit: '%', min: 0, max: 90 }), num('adds', 'Verstärkung', { min: 0 }), bool('wave', 'Bodenwelle')],
           { hint: '#016: fällt sein Leben unter „ab Leben“, brüllt er, wird schneller, holt kürzer aus, ruft Verstärkung (schwächere Gegner des POIs, in Gang-Farbe) und schlägt ab dann nach jedem Hieb eine Bodenwelle in beide Richtungen, über die Leyla springen muss' }),
         num('boss.waveSpeed', 'Bodenwelle Tempo', { unit: 'px/s', min: 0, hint: 'Leer = 620' }), num('boss.waveDamage', 'Bodenwelle Schaden', { unit: '%', min: 0, hint: 'Anteil seines Schadens. Leer = 60' })] },
+      // #139 Bausteine (docs/concepts/enemy_kit.md › 2): each picked trait shows its own section below (game/play/traits/<id>.js)
+      { title: 'Bausteine', fields: [multi('traits', 'Bausteine', TRAIT_OPTIONS, { hint: '#139: Verhalten aus Bausteinen, zusätzlich zum Verhalten oben. Jeder Baustein bringt unten seinen eigenen Abschnitt mit' })] },
+      { title: 'Scharfschütze', when: x => (x.traits || []).includes('sniper'), fields: [num('sniper.lock', 'Aufschalten', { unit: 'ms', min: 0, hint: 'So lange muss der Laser auf Leyla liegen, dann fällt der Schuss. Leer = 1400' }),
+        num('sniper.track', 'Laser folgt mit', { unit: '°/s', min: 1, hint: 'Wie schnell der Laser ihr nachschwenkt (die Verzögerung). Leer = 90' }),
+        num('sniper.damage', 'Schuss-Schaden', { unit: '%', min: 0, hint: 'Anteil seines Schadens für den einen harten Schuss. Leer = 250' }),
+        num('sniper.speed', 'Geschosstempo', { unit: 'px/s', min: 1, hint: 'Leer = 2600' }), color('sniper.color', 'Laserfarbe'),
+        bool('sniper.breakOnHit', 'Treffer bricht das Aufschalten', { hint: 'Leer = an. Deckung (Wand, Kiste) dazwischen bricht es immer' })] },
+      { title: 'Werfer', when: x => (x.traits || []).includes('grenadier'), fields: [select('throw.item', 'Wirft', THROW_ITEMS, { hint: 'Granate prallt ab und platzt nach der Zündzeit; Molotow und Säure zerspringen und lassen eine Fläche zurück' }),
+        num('throw.fuse', 'Zündzeit', { unit: 'ms', min: 0, hint: 'Granate: ab dem ersten Aufkommen. Leer = 900' }), num('throw.radius', 'Radius', { unit: 'px', min: 10, hint: 'Wände und Kisten halten die Explosion auf. Leer = 140' }),
+        num('throw.damage', 'Schaden', { unit: '%', min: 0, hint: 'Anteil seines Schadens in der Mitte (am Rand die Hälfte). Leer = 100' }),
+        num('throw.count', 'Je Wurf', { min: 1, hint: 'So viele auf einmal, nebeneinander. Leer = 1' }), num('throw.burn', 'Brennt', { unit: 's', min: 0, hint: 'Molotow und Säure: so lange bleibt die Fläche. Leer = 3' })] },
+      { title: 'Sanitäter', when: x => (x.traits || []).includes('medic'), fields: [num('medic.heal', 'Heilt', { unit: 'LP/s', min: 0, hint: 'Verbündete in Reichweite. Leer = 2' }), num('medic.range', 'Reichweite', { unit: 'px', min: 0, hint: 'Leer = 420' }),
+        num('medic.reviveTime', 'Zurückholen dauert', { unit: 'ms', min: 0, hint: 'So lange kniet er am Gefallenen; ein Treffer bricht es ab. Leer = 2200' }),
+        num('medic.reviveHp', 'Steht auf mit', { unit: '%', min: 1, max: 100, hint: 'Leer = 40' }),
+        num('medic.bodyTime', 'Gefallene liegen', { unit: 's', min: 0, hint: 'So lange kann er sie holen; der Kill zählt erst danach. Leer = 8' }),
+        num('medic.max', 'Holt höchstens', { min: 0, hint: 'So oft je Sanitäter. Leer = 2' })] },
+      { title: 'Alarmgeber', when: x => (x.traits || []).includes('alarm'), fields: [num('alarm.time', 'Auslösen dauert', { unit: 'ms', min: 0, hint: 'So lange kurbelt er an der Sirene (Raum-Zeichen !), ohne Sirene bläst er ins Horn. Leer = 2500' }),
+        num('alarm.adds', 'Verstärkung', { min: 0, hint: 'So viele Gegner kommen dazu. Leer = 2' }),
+        ref('alarm.addEnemy', 'Verstärkung durch', 'enemies', { hint: 'Leer = die schwächsten Bausatz-Gegner des POIs' }),
+        num('alarm.radius', 'Reichweite', { unit: 'px', min: 0, hint: '0 = der ganze POI. Leer = 0' }), bool('alarm.flee', 'Rennt danach weg', { hint: 'Nach dem Alarm flieht er (mit Baustein Feigling: wie ein Feigling)' })] },
+      { title: 'Feigling', when: x => (x.traits || []).includes('coward'), fields: [num('flee.at', 'Flieht ab', { unit: '% Leben', min: 0, max: 100, hint: 'Leer = 35. Nach einem Alarm mit „Rennt danach weg“ sofort' }),
+        num('flee.drop', 'Lässt Beute fallen', { unit: '%', min: 0, max: 100, hint: 'Chance, dass er beim Losrennen seine Beute fallen lässt. Leer = 50' })] },
+      { title: 'Ergibt sich', when: x => (x.traits || []).includes('surrender'), fields: [num('surrender.at', 'Ergibt sich ab', { unit: '% Leben', min: 1, max: 100, hint: 'Einmal gewürfelt, wenn sein Leben darunter fällt. Leer = 30' }),
+        num('surrender.chance', 'Chance', { unit: '%', min: 0, max: 100, hint: 'Leer = 50. Dann wirft er die Waffe weg und kniet; E: gefangen nehmen, laufen lassen, erledigen' }),
+        num('surrender.repFree', 'Ruf fürs Laufenlassen', { min: 0, hint: 'Bei der Gang des POIs. Leer = 3' }), num('surrender.repKill', 'Ruf fürs Erledigen', { min: 0, hint: 'Abzug bei der Gang, zusätzlich zum Kill. Leer = 5' })] },
       { title: 'Beute', fields: [ref('loot', 'Beutetabelle', 'lootTables'), range('deltas', 'Deltas', { unit: 'Δ' }), bool('countsForRanking', 'Zählt für Kills %'),
         num('dropWeapon', 'Lässt seine Waffe fallen', { unit: '%', min: 0, max: 100, hint: '#004: Chance, dass seine Waffe (Werte › Waffe) mit der Beute liegt, damit Leyla sie benutzen kann. Leer = 0' })] },
     ],

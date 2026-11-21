@@ -62,7 +62,7 @@ export function installControl(game) {
     restart() { scene().restartRoom(); return api.step(5); },
     // nomad.spawn('schildtraeger', col, row) → one more enemy standing on top of tile row+1 (feet at the bottom of row)
     spawn(id, col, row) { const e = scene().addEnemy(id, col, row); return e ? e.state_() : null; },
-    calmOne(e) { e.state = 'dead'; e.body.enable = false; e.sprite.setVisible(false); e.warn.setVisible(false); e.bar.clear(); e.aim.clear(); e.gear?.clear(); },
+    calmOne(e) { e.state = 'dead'; e.body.enable = false; e.sprite.setVisible(false); e.warn.setVisible(false); e.bar.clear(); e.aim.clear(); e.gear?.clear(); e.tg?.clear(); e.pendingKill = false; },
     freeze() { const s = scene(); s.hud.paused = true; s.tweens.pauseAll(); s.time.paused = true; game.loop.wake(); },
     thaw() { const s = scene(); if (active) game.loop.sleep(); s.hud.paused = false; s.tweens.resumeAll(); s.time.paused = false; },
     menu() { return scene().hud.menuState(); },
@@ -131,6 +131,7 @@ export function installControl(game) {
         light: s.atmo?.state() || null,
         mode: s.mode, prompt: s.hud.promptText, menu: s.hud.menuState(), banner: s.hud.bannerText(),
         camp: s.camp?.state(), health: Math.round(s.leyla.health), maxHealth: s.leyla.maxHealth,
+        grenade: l.grenade?.state() || null, throwables: s.throwables?.state() || null, siren: s.lastSiren || null,   // #139/#140
       };
     },
   };

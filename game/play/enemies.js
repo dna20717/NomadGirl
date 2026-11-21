@@ -11,6 +11,7 @@
 // Every attack is telegraphed (windup: blinking + "!", the shooter shows his aim line, cut at the first wall).
 
 import { kitLook, kitShow, kitMuzzle } from './enemy_kit.js';
+import { traitsOf, fire } from './traits/index.js';
 
 const KINDS = { patrol: 'melee', charger: 'lunge', shooter: 'shot', ambusher: 'drop', flyer: 'dive', boss: 'lunge' };
 const SHAPES = { flyer: 'drone', ambusher: 'blob' };
@@ -60,7 +61,11 @@ export class Enemy {
     this.senseAt = 0; this.dodgeReady = 0; this.dodged = new WeakSet(); this.turnAt = 0; this.until = 0;
     if (this.kind === 'flyer') { this.body.allowGravity = false; this.body.setMaxVelocity(900, 900); }
     if (this.kind === 'ambusher') this.toCeiling();
+    // Bausteine (#139, game/play/traits/): each picked trait gets its section's values (this.tc[id]) and may set itself up
+    this.traits = traitsOf(this);
+    for (const t of this.traits) t.init?.call(t, this, this.tc[t.id]);
   }
+  fire(name, ...args) { return this.traits.length ? fire(this, name, ...args) : undefined; }
 
   get x() { return this.body.center.x; }
   get feet() { return this.body.bottom; }
@@ -68,7 +73,7 @@ export class Enemy {
   get eyeY() { return this.body.top + this.body.height * 0.2; }
   get alive() { return this.state !== 'dead'; }
   get behavior() { return this.kind; }
-  get busy() { return ['windup', 'strike', 'recover', 'dodge', 'stagger', 'drop', 'duck', 'cover'].includes(this.state); }
+  get busy() { return ['windup', 'strike', 'recover', 'dodge', 'stagger', 'drop', 'duck', 'cover', 'rise', 'revive', 'surrender', 'leaving'].includes(this.state); }
 
   // ---------- senses ----------
   // sight: in range, inside the cone in facing direction (or very close behind), free line from the eyes to her chest or head
@@ -131,7 +136,7 @@ export class Enemy {
 
   // ---------- update ----------
   update(time, dt, leyla) {
-    if (!this.alive) { if (this.look.anims?.death) kitShow(this, time); return; }
+    if (!this.alive) { if (this.pendingKill) this.bodyTick(time); if (this.look.anims?.death) kitShow(this, time); return; }
     const b = this.body, l = leyla;
     if (time >= this.senseAt) {   // a few looks a second are enough
       this.senseAt = time + 90;
@@ -143,6 +148,7 @@ export class Enemy {
     this.warn.setVisible(this.state === 'windup');
     this.aim.clear();
     if (time < this.stunUntil && this.state !== 'stagger') { b.setVelocityX(b.velocity.x * 0.9); if (this.kind === 'flyer') b.setVelocityY(b.velocity.y * 0.9); return this.draw(time); }
+    if (this.traits.length && this.fire('think', time, dt, l)) return this.draw(time);   // a trait drives this frame (#139)
     this.watchDodge(time, l);
     this.watchDuck(time);
     const dx = l.x - this.x, dist = Math.abs(dx);
@@ -154,7 +160,7 @@ export class Enemy {
         break;
       }
       case 'patrol': {
-        if (this.seeing) { this.state = 'alert'; this.until = time + this.S.react; this.heard = false; this.say('?!', '#ffd27a'); break; }
+        if (this.seeing) { this.state = 'alert'; this.until = time + this.S.react; this.heard = false; this.say('?!', '#ffd27a'); this.fire('onSee', time, l); break; }
         this.patrol(time);
         break;
       }
@@ -162,7 +168,7 @@ export class Enemy {
         this.stop();
         if (this.lastKnown) this.face(time, this.lastKnown.x - this.x, true);
         if (time >= this.until) {
-          if (this.seeing) { this.state = 'engage'; this.callOthers(time); }
+          if (this.seeing) { this.state = 'engage'; this.callOthers(time); this.fire('onAlarm', time); }
           else if (this.lastKnown) { this.state = 'search'; this.searchStart = time; }
           else this.state = 'patrol';
         }
@@ -176,7 +182,7 @@ export class Enemy {
         break;
       }
       case 'search': {   // go to where she was last seen or heard, look around, then give up
-        if (this.seeing) { this.state = 'engage'; this.say('!', '#ff4060'); this.callOthers(time); break; }
+        if (this.seeing) { this.state = 'engage'; this.say('!', '#ff4060'); this.callOthers(time); this.fire('onAlarm', time); break; }
         const k = this.lastKnown;
         const there = !k || (this.kind === 'flyer' ? Math.hypot(k.x - this.x, k.y - this.chest) < 60 : Math.abs(k.x - this.x) < 40);
         if (!there && !this.stuck) this.moveTo(time, k.x, k.y - (this.kind === 'flyer' ? 40 : 0), (this.d.speed ?? 120) * 0.7);
@@ -219,6 +225,11 @@ export class Enemy {
         this.stop();
         this.face(time, dx, true);
         if (!this.coverOk(l) || time >= this.until) { this.standUp(time); this.popUntil = time + (this.a.windup ?? 450) + 900; if (!this.coverOk(l)) this.cover = null; }
+        break;
+      }
+      case 'rise': {   // brought back by a medic (#139): the death animation backwards, then he fights on
+        this.stop();
+        if (time >= this.until) { this.state = this.seeing ? 'engage' : 'search'; this.searchStart = time; }
         break;
       }
       case 'stagger': {   // shield knocked aside: open for a moment
@@ -507,6 +518,7 @@ export class Enemy {
       }
     }
     if (this.peaceful) this.scene.turf.attacked(this);   // #061: a hit breaks the peace
+    if (this.traits.length) { const v = this.fire('onHit', time, damage, info); if (typeof v === 'number') damage = v; }   // #139
     this.hp -= damage;
     this.barUntil = time + 2500;
     this.sprite.setTintFill(crit ? 0xffd27a : 0xffffff);
@@ -522,6 +534,7 @@ export class Enemy {
     if (!this.C.shield || this.guardOpen) this.facing = -dir || this.facing;
     if (this.hp <= 0) this.die(time, dir);
     else this.scene.hud?.voice?.()?.bark(this, 'hurt');   // #112
+    if (this.hp > 0) this.fire('onHurt', time, info);   // #139 e.g. surrender
     if (this.hp > 0) while (this.phase < this.phases.length && this.hp / this.maxHp * 100 <= (this.phases[this.phase].at ?? 0)) this.enterPhase(time, this.phases[this.phase++]);
   }
 
@@ -586,13 +599,47 @@ export class Enemy {
     if (!machine && this.shape !== 'drone' && this.kind !== 'flyer') this.scene.time.delayedCall(450, () => this.scene.fx.pool(this.x - dir * this.h * 0.25, this.feet, this.h / 180));
     this.diedAt = time;
     this.sprite.clearTint();   // a crit tints yellow for 70 ms; dying in it kept the colour
+    // #139 a medic around can bring him back: he lies there (Sanitäter › Liegen) and only counts once nobody can fetch him any more
+    const medic = this.look.anims?.death && this.kind !== 'boss' && !this.spared && this.medicFor();
     if (this.look.anims?.death) {   // the kit falls on its back, lies a moment, then fades
       this.facing = dir < 0 ? 1 : -1;
       this.sprite.setFlipX(this.facing < 0);
       kitShow(this, time);
-      this.scene.tweens.add({ targets: this.sprite, alpha: 0, delay: 1800, duration: 700 });
+      if (!medic) this.fade = this.scene.tweens.add({ targets: this.sprite, alpha: 0, delay: 1800, duration: 700 });
     } else this.scene.tweens.add({ targets: this.sprite, rotation: dir * 1.4, alpha: 0, y: this.sprite.y + 10, duration: 650, ease: 'Cubic.easeIn' });
+    this.kneel = false; this.tg?.clear();
+    this.fire('onDeath', time);
+    for (const o of this.scene.enemies) if (o !== this && o.alive && o.traits?.length) o.fire('onAllyDeath', this, time);
+    if (medic) { this.pendingKill = true; this.bodyUntil = time + medic.tc.medic.bodyTime * 1000; this.reviver = null; }
+    else this.scene.onKill(this);
+  }
+  // the medic who could still fetch him (alive, revives left), the one who lets the fallen lie longest
+  medicFor() {
+    let best = null;
+    for (const m of this.scene.enemies) if (m !== this && m.alive && m.tc?.medic && m.medicLeft > 0 && (!best || m.tc.medic.bodyTime > best.tc.medic.bodyTime)) best = m;
+    return best;
+  }
+  // a fallen one waiting for a medic: once the time is up (or no medic is left) the kill counts and he fades
+  bodyTick(time) {
+    if (this.reviver?.alive && this.reviver.state === 'revive') return;
+    if (time >= this.bodyUntil || !this.medicFor()) this.finalDeath();
+  }
+  finalDeath() {
+    this.pendingKill = false; this.reviver = null;
+    this.fade = this.scene.tweens.add({ targets: this.sprite, alpha: 0, duration: 700 });
     this.scene.onKill(this);
+  }
+  // back on his feet with pct % of his life (Sanitäter › Steht auf mit)
+  revive(time, pct = 40) {
+    if (!this.pendingKill) return false;
+    this.pendingKill = false; this.reviver = null; this.fade?.stop(); this.sprite.setAlpha(1);
+    this.hp = Math.max(1, Math.round(this.maxHp * pct / 100)); this.barUntil = time + 2500;
+    this.body.enable = true; this.body.setVelocity(0, 0);
+    this.state = 'rise'; this.riseAt = time; this.until = time + 900; this.stunUntil = 0; this.readyAt = time + 1200;
+    this.revived = (this.revived || 0) + 1;
+    this.scene.fx.gather?.(this.x, this.chest, 0x7fe08a, 90);
+    this.scene.fx.text(this.x, this.body.top - 30, 'zurück!', { color: '#7fe08a', size: 44, rise: 40 });
+    return true;
   }
 
   // ---------- look ----------
@@ -628,6 +675,7 @@ export class Enemy {
       g.lineStyle(2, 0x2a3138, 1).strokeRoundedRect(this.x - this.w * 0.55, b.top + b.height * 0.22, this.w * 1.1, b.height * 0.3, 6);
       for (let i = 0; i < this.plates; i++) g.fillStyle(0xe8eef4, 1).fillCircle(this.x - (this.plates - 1) * 7 + i * 14, b.top + b.height * 0.37, 4);
     }
+    if (this.traits.length) { this.tg ??= this.scene.add.graphics().setDepth(14); this.tg.clear(); this.fire('draw', time, this.tg); }   // #139 laser, marker, armband
     this.bar.clear();
     if (time < this.barUntil) {
       const w = Math.round(Math.max(60, this.h * 0.46)), x = this.x - w / 2, y = (this.onCeiling ? b.bottom + 20 : b.top - 30), f = Math.max(0, this.hp / (this.d.health || 1));
@@ -638,8 +686,9 @@ export class Enemy {
   state_() {
     return { id: this.id, state: this.state, kind: this.kind, attack: this.attackKind, x: Math.round(this.x), feet: Math.round(this.feet), hp: this.hp, facing: this.facing,
       look: this.look.anims ? this.kitState : undefined, frame: this.look.anims ? Number(this.sprite.frame?.name) || 0 : undefined, h: Math.round(this.body.height),
-      seeing: this.seeing, lastKnown: this.lastKnown && { x: Math.round(this.lastKnown.x), y: Math.round(this.lastKnown.y) }, plates: this.plates, guardOpen: !!this.guardOpen, ceiling: !!this.onCeiling };
+      seeing: this.seeing, lastKnown: this.lastKnown && { x: Math.round(this.lastKnown.x), y: Math.round(this.lastKnown.y) }, plates: this.plates, guardOpen: !!this.guardOpen, ceiling: !!this.onCeiling,
+      ...(this.traits.length ? { traits: Object.fromEntries(this.traits.map(t => [t.id, t.state?.(this) ?? true])) } : {}), pending: !!this.pendingKill, revived: this.revived || 0 };
   }
 
-  destroy() { for (const o of [this.box, this.sprite, this.bar, this.warn, this.aim, this.gear]) o.destroy(); }
+  destroy() { for (const o of [this.box, this.sprite, this.bar, this.warn, this.aim, this.gear, this.tg]) o?.destroy(); }
 }

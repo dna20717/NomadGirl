@@ -12,6 +12,7 @@ import { Turf } from './turf.js';
 import { runSky } from '../weather_fx.js';
 import { PoiLevel } from './poi_level.js';
 import { Pad, PAD_ACTIONS } from './pad.js';
+import { surrenderUse, sceneTick as traitsTick } from './traits/index.js';
 import { Fog } from './fog.js';
 import { placeForeground } from './foreground.js';
 import { applySignature } from './signature.js';
@@ -57,7 +58,7 @@ const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'], hangOne: ['ha
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
   jump: ['SPACE'], walk: ['SHIFT'], dash: ['L', 'C'], melee: ['J', 'Y'], ranged: ['K', 'X'], grab: ['E'],
-  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], uiOk: ['ENTER'], uiSend: ['F'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['O', 'P'], build: ['B'], holster: ['Q'], swap: ['V'], radio: ['N'], stats: ['U'],
+  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], uiOk: ['ENTER'], uiSend: ['F'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['O', 'P'], build: ['B'], holster: ['Q'], swap: ['V'], radio: ['N'], stats: ['U'], grenade: ['T'],
 };
 
 export class PlayScene extends Phaser.Scene {
@@ -827,11 +828,13 @@ export class PlayScene extends Phaser.Scene {
     this.drone.update(time, dt);
     this.van?.update(dt);
     if (this.camp) this.camp.update(time, dt, input);
+    else if (surrenderUse(this, input)) { /* #139 a kneeling enemy in reach owns the E prompt */ }
     else if (this.mode === 'run' || this.level) this.runUpdate(input);
     this.loot?.update(time);
     this.hud.floor?.update(this);
     if (!invDone) this.inventoryUpdate(input);   // (closed this frame already: do not open it again with the same key)
     for (const e of this.enemies) e.update(time, dt, this.leyla);
+    traitsTick(this, time, dt);   // #139 sirens; #140 Leyla's grenade (HUD, throw pose)
     this.combat.update(time, dt);
 
     // rope while swinging

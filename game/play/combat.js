@@ -225,7 +225,8 @@ export class Combat {
     }
     for (const p of this.shots) if (p.dead && p.img) { p.img.destroy(); p.img = null; }
     this.shots = this.shots.filter(p => !p.dead);
+    this.scene.throwables?.update(time, dt);   // grenades, molotovs (#139/#140, game/play/throwables.js)
   }
 
-  clear() { for (const p of this.shots) p.img?.destroy(); this.shots = []; this.mark?.clear(); this.target = null; }
+  clear() { for (const p of this.shots) p.img?.destroy(); this.shots = []; this.mark?.clear(); this.target = null; this.scene.throwables?.clear(); for (const p of this.scene.alarmPts || []) p.on = false; }
 }
