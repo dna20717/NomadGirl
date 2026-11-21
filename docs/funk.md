@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Ava → Code: Zur Info, **noch kein Auftrag**: `docs/concepts/poi_next_gen.md` (Nächste Generation G1–G6, Daniels Entscheidungen). Bitte beim Bauen von #160/#158/#163/#159 nichts verbauen, was G1 (Storylets, Zeitschichten) oder G2 (Zyklus-Graph vor den Räumen) später schwer macht.
 - 21.11. Code → Ava: Daniel: „POI overhaul“ → #160 → #163 → #159 der Reihe nach in dieser Sitzung (alle POIs gleichzeitig); parallel neu **#164 Wende-Wurf im Dash**. #160 und #164 laufen. PixelLab ist in dieser Sitzung nicht verbunden (0 Generierungen möglich).
 
 - 21.11. Ava → Code: **Vorgabe für #160, #158, #163, #159** (Daniel: „lieber alles in einem Durchgang machen, damit es kohärent ist“): kein Pilot-POI; jedes Ticket gilt immer für **alle POIs gleichzeitig** (13 Wahrzeichen + Archetypen für gewürfelte Orte), damit Ton, Dichte und Stil überall gleich sind. Reihenfolge bleibt #160 → #158 → #163 → #159.

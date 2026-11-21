@@ -75,6 +75,7 @@ Im POI spielt sich NomadGirl wie Dead Cells: schnelle Bewegung, harter Kampf, un
 
 - **Vor dem ersten Design steht die Story** des POI und jedes Raums fest (Daniel: „vor dem ersten Design die Story des POI oder des Raumes feststeht und von dort aus gestaltet wird“). Jeder POI hat eine **feste Story, pro Run variieren nur Räume, Spuren und Positionen**. Steckbriefe schreibt Ava, Daniel segnet ab.
 - Regeln für Clutter, Kacheln, Dichte („bewohnt“), Verfall (Ministerium 1, Großmarkt 2, Bunker 2, Tankstelle 3) und Prüfung: **`docs/concepts/poi_bible.md`**. Steckbriefe aller POIs mit Weltchronik und Ton-Regeln: **`docs/concepts/poi_steckbriefe.md`** (**alles abgenommen 21.11.2026**, auch die Weltchronik mit fünf Epochen: Boomjahre, alter Krieg, Großer Durst, Schließung, heute). Tickets #160, #158, #163, #159.
+- **Nächste Generation** (Recherche + Entscheidungen 21.11.2026): `docs/concepts/poi_next_gen.md`. Nach #160/#158/#163/#159: G1 Erzählschicht (Storylets, Tropes, Zeitschichten) → G2 Zyklen (7 Räume je Kreis) → G3 Leben (Ökosystem **auch zwischen Besuchen**, Regie) → G4 Hüllen → G5 Kuratieren → G6 Mitbauen. Leylas Spuren verblassen langsam.
 - **Alle POIs in einem Durchgang** (Daniel, 21.11.2026: „lieber alles in einem Durchgang machen, damit es kohärent ist“): kein Pilot-POI, jedes Ticket gilt für alle POIs zugleich.
 
 ### Tod und AvA
