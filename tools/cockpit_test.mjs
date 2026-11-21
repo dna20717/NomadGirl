@@ -36,6 +36,11 @@ r = await page.evaluate(() => new Promise(res => { cockpitMenu.bump(); let n = 0
 check('Radio-Text bleibt beim Schlagloch im Display (gleicher Bildtakt)', r < 1, r);
 r = await page.evaluate(() => new Promise(res => { const a = splash.curve(); setTimeout(() => res([a, splash.curve()]), 2500); }));
 check('Ohne Eingabe lenkt der Fahrer leicht (Lenkrad dreht sich)', r[0] !== r[1] && Math.max(Math.abs(r[0]), Math.abs(r[1])) > 0.02, r);
+// #143 the billboards advertise the brands of the lore, the game's own ad comes back every n-th time
+r = await page.evaluate(() => { const seen = []; for (let i = 0; i < 1; i++) { cockpitMenu.nextAd('nomadcola'); seen.push(cockpitMenu.brandAd()); } return seen; });
+await page.waitForTimeout(500);
+const adUrl = await page.evaluate(() => cockpitMenu.ad());
+check('Billboard: Werbung für eine Marke (NomadCola) wird gemalt', r[0] === 'nomadcola' && adUrl.length > 2000, { r, len: adUrl.length });
 check('Keine Fehler auf der Seite', !pageErrors.length, pageErrors);
 await browser.close();
 for (const n of ok) console.log('✓', n);

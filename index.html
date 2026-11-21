@@ -58,10 +58,10 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
   import { cockpitFor } from './game/keepsakes.js';
   const BASE = new URL('projects/nomadgirl/', location.href);
   const json = f => fetch(new URL('data/' + f, BASE), { cache: 'no-store' }).then(r => r.json()).catch(() => ({}));
-  const [S, A, ACH, REC, IT] = await Promise.all(['splash.json', 'assets.json', 'achievements.json', 'recipes.json', 'items.json'].map(json));
+  const [S, A, ACH, REC, IT, BR] = await Promise.all(['splash.json', 'assets.json', 'achievements.json', 'recipes.json', 'items.json', 'brands.json'].map(json));
   const CK = S.cockpit || {};
   const load = id => new Promise(res => { const f = A[id]?.file; if (!f) return res(null); const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = new URL(f, BASE).href; });
-  const [bbImg, posterImg] = await Promise.all([load(CK.billboard), load(CK.poster)]);
+  const [bbImg, posterImg, logosImg] = await Promise.all([load(CK.billboard), load(CK.poster), load(CK.adLogos || 'map_logos')]);
 
   // ---------- menu in the radio ----------
   const ITEMS = [['game.html?camp', 'Spiel', 'Camp & Runs'], ['intro.html', 'Intro', 'Wie alles anfing'], ['game.html', 'Testraum', 'Parkour'], ['workshop.html', 'Werkstatt', 'Alles einstellen'], ['https://github.com/dna20717/NomadGirl/blob/main/docs/design.md', 'Design-Dok', 'Fahrplan']];
@@ -150,6 +150,27 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
   const [bx0, by0] = CK.board || [22, 26], [bw0, bh0] = CK.boardSize || [196, 62], PXM = bw0 / 4.2;
   const BB = { z: 22, x: -8.5, speed: 1.3, gap: 0, screen: null };   // ~16 s from far to past
   const ad = document.createElement('canvas'); ad.width = bw0 * 2; ad.height = bh0 * 2;
+  // #143 (Daniel 21.11.: Billboard-Werbung für Lore-Marken): every billboard after the first advertises a brand of the lore (logo, name in
+  // its colour, slogan); every n-th one is the game's own ad again (Startseite › Cockpit › Werbung)
+  const BRANDS = CK.ads === false ? [] : Object.entries(BR || {}).filter(([, b]) => b.name && b.slogan && b.icon != null).map(([id, b]) => ({ id, ...b }));
+  let adCount = 0;
+  const nextAd = () => { adCount++; const every = Math.max(1, CK.adEvery ?? 3); BB.brand = !BRANDS.length || adCount % every === 0 ? null : BRANDS[Math.floor(Math.random() * BRANDS.length)]; };
+  const drawBrandAd = (b, t) => {
+    const g = ad.getContext('2d'), W = ad.width, H = ad.height; g.imageSmoothingEnabled = false;
+    const bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, '#0d0a12'); bg.addColorStop(1, b.color || '#3b1725'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    g.globalAlpha = 0.12; g.fillStyle = '#fef3c0'; for (let x = -H; x < W; x += 18) { g.beginPath(); g.moveTo(x, H); g.lineTo(x + H, 0); g.lineTo(x + H + 6, 0); g.lineTo(x + 6, H); g.fill(); } g.globalAlpha = 1;   // sun rays of an old print
+    const L = A[CK.adLogos || 'map_logos'] || {}, [cw, ch] = L.cell || [64, 64], cols = (L.grid || [4])[0];
+    const sz = H * 0.78, lx = W * 0.05, ly = (H - 22 - sz) / 2 + 2;
+    if (logosImg) { g.fillStyle = 'rgba(6,6,8,.55)'; g.beginPath(); g.arc(lx + sz / 2, ly + sz / 2 + 3, sz * 0.52, 0, Math.PI * 2); g.fill(); g.drawImage(logosImg, (b.icon % cols) * cw, Math.floor(b.icon / cols) * ch, cw, ch, lx, ly, sz, sz); }
+    const tx = lx + sz + W * 0.04, tw = W - tx - W * 0.04;
+    let fs = 40; g.font = `${fs}px VT323, monospace`; while (g.measureText(b.name).width > tw && fs > 18) g.font = `${--fs}px VT323, monospace`;
+    g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillStyle = '#060608'; g.fillText(b.name, tx + 3, H * 0.42 + 3); g.fillStyle = b.color || '#fa6a0a'; for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) g.fillText(b.name, tx + dx * 2, H * 0.42 + dy * 2); g.fillStyle = '#fef3c0'; g.fillText(b.name, tx, H * 0.42);   // cream letters with a rim in the brand's colour: readable on every background
+    g.font = '20px VT323, monospace'; g.fillStyle = '#fef3c0'; g.fillText(b.slogan, tx, H * 0.42 + 24);
+    g.fillStyle = 'rgba(6,6,8,.82)'; g.fillRect(0, H - 22, W, 22); g.fillStyle = b.color || '#fa6a0a'; g.fillRect(0, H - 23, W, 2);
+    g.font = '15px VT323, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#ffd541';
+    g.fillText(b.parent && BR[b.parent] ? `${b.name.toUpperCase()} · A ${BR[b.parent].name.toUpperCase()} COMPANY` : (b.ad || 'AVAILABLE ALL OVER THE DELTA'), W / 2, H - 11);
+    if (bbImg) { g.globalCompositeOperation = 'multiply'; g.globalAlpha = 0.35; g.drawImage(bbImg, bx0, by0, bw0, bh0, 0, 0, W, H); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; }
+  };
   const drawAd = t => {   // a real advertisement: key art, the logo, the tagline, a badge; then the board's own grime over it
     const g = ad.getContext('2d'), W = ad.width, H = ad.height; g.imageSmoothingEnabled = false;
     g.fillStyle = '#3b1725'; g.fillRect(0, 0, W, H);
@@ -174,7 +195,7 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
     if (bbImg) { g.globalCompositeOperation = 'multiply'; g.globalAlpha = 0.35; g.drawImage(bbImg, bx0, by0, bw0, bh0, 0, 0, W, H); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; }   // rust and seams of the board
   };
   const billboard = ({ ctx, project, scale, dt, t, Z_FAR }) => {
-    if (BB.gap > 0) { BB.gap -= dt; if (BB.gap <= 0) BB.z = 38; BB.screen = null; return; }
+    if (BB.gap > 0) { BB.gap -= dt; if (BB.gap <= 0) { BB.z = 38; nextAd(); } BB.screen = null; return; }
     BB.z -= BB.speed * dt;
     if (BB.z < 2.5) { BB.gap = 3; BB.screen = null; return; }
     if (!bbImg) return;
@@ -182,7 +203,7 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
     ctx.save(); ctx.globalAlpha = Math.max(0, Math.min(1, (Z_FAR * 0.95 - BB.z) / 6)); ctx.imageSmoothingEnabled = false;
     ctx.fillStyle = 'rgba(6,6,8,.3)'; ctx.beginPath(); ctx.ellipse(gx, gy, w * 0.4, Math.max(2, h * 0.03), 0, 0, Math.PI * 2); ctx.fill();
     ctx.drawImage(bbImg, Math.round(x), Math.round(y), Math.round(w), Math.round(h));
-    drawAd(t); ctx.drawImage(ad, Math.round(x + bx0 * k), Math.round(y + by0 * k), Math.round(bw0 * k), Math.round(bh0 * k));
+    if (BB.brand) drawBrandAd(BB.brand, t); else drawAd(t); ctx.drawImage(ad, Math.round(x + bx0 * k), Math.round(y + by0 * k), Math.round(bw0 * k), Math.round(bh0 * k));
     ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha *= 0.16 + (Math.sin(t * 13) > 0.96 ? -0.1 : 0);   // the three lamps light the board
     const lg = ctx.createLinearGradient(0, y + by0 * k, 0, y + (by0 + bh0) * k); lg.addColorStop(0, '#fef3c0'); lg.addColorStop(1, 'rgba(254,243,192,0)');
     ctx.fillStyle = lg; ctx.fillRect(x + bx0 * k, y + by0 * k, bw0 * k, bh0 * k);
@@ -284,7 +305,7 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
     requestAnimationFrame(poll);
   };
   requestAnimationFrame(poll);
-  window.cockpitMenu = { selected: () => sel, items: () => links.map(a => a.textContent), level: () => levels.length, back, slots: () => store.list(), store, ava: () => ava.act, avaAt: () => ava.screen, stickers: () => stickers.length, billboard: () => BB.z, ad: () => ad.toDataURL(),
+  window.cockpitMenu = { selected: () => sel, items: () => links.map(a => a.textContent), level: () => levels.length, back, slots: () => store.list(), store, ava: () => ava.act, avaAt: () => ava.screen, stickers: () => stickers.length, billboard: () => BB.z, ad: () => ad.toDataURL(), brandAd: () => BB.brand?.id || null, nextAd: b => { BB.brand = b ? BRANDS.find(x => x.id === b) || null : null; BB.z = 14; BB.gap = 0; },
     lcdDrift: () => { const L = cockpit.lcd(), k = Math.max(innerWidth / PW, innerHeight / PH), ox = (innerWidth - PW * k) / 2, oy = (innerHeight - PH * k) / 2; return Math.abs(parseFloat(lcd.style.left) - (ox + (L.x + 1) * k)) + Math.abs(parseFloat(lcd.style.top) - (oy + (L.y + 1) * k)); }, bump: () => cockpit.bump() };
 </script>
 </body>

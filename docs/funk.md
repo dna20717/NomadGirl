@@ -296,10 +296,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) `game/keepsakes.js`: Kram, Spiegel-Anhänger und Sonnenblende können einen Achievement-Zähler nennen (Startseite › Cockpit: Spalten „Freischalten: Zähler“, Filter, Ziel, Meldung); das Hauptmenü zeigt nur, was die Zähler über alle Spielstände erreicht haben (`?stickers=all` zeigt alles), das Spiel meldet ein neues Stück einmal klein („Fürs Cockpit: Sonnenbrille“, Art `keepsake`, im Logbuch unter Fortschritt). Tests `test/keepsakes.test.js` (3), `tools/stage_test.mjs` (8). **Bitte testen:** Hauptmenü mit `?stickers=all` (alles), dann drei Fahrten machen und die Meldung abwarten.
 
 ### #143 Billboard-Werbung für Lore-Marken
-- **Status:** offen · angelegt 21.11. von Code (Daniel: Karte A11 a „Als Ticket bauen“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: Karte A11 a „Als Ticket bauen“)
 - **Auftrag:** Das Billboard im Cockpit zeigt wechselnd Werbung der Lore-Marken (#045, Logos), Startseite und Fahrt.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: das erste Billboard ist immer die Spiel-Anzeige, danach Marken zufällig, jedes dritte wieder das Spiel; Fußzeile „AVAILABLE ALL OVER THE DELTA“ bzw. bei Töchtern „A … COMPANY“ (Feld `ad` an der Marke wäre der Platz für eigene Zeilen); nur im Hauptmenü, nicht auf der Fahrt im Spiel.
+- **Ergebnis:** (Code) Startseite › Cockpit: „Werbung der Marken“, „Eigene Anzeige jedes n-te Billboard“ (3), „Logos“ (map_logos). Anzeige aus Code: Logo der Marke im Kreis, Name hell mit Rand in Markenfarbe, Slogan, Verlauf in Markenfarbe, Rost des Billboards darüber. Test `tools/cockpit_test.mjs` (11). **Bitte testen:** Hauptmenü eine Minute laufen lassen.
 
 ### #137 Werkstatt-Effekte bleiben im Container
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Manche Effekte von Werkstätten glitchen aus den Containern raus. Z. B. Aquarium“)

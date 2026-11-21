@@ -2,6 +2,8 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 21.11.2026: **Cockpit lebt** (#142, #143, Daniels Karten): Sonnenblende, Karte, Sonnenbrille, Polaroid, Kassette, Zündkerze, Chips, Kronkorken-Kette und Hasenpfote kommen nach und nach ins Cockpit, jeweils nach einem Ereignis im Spiel mit kleiner Meldung („Fürs Cockpit: …“); die Billboards werben im Wechsel für die Marken der Lore.
+- 21.11.2026: **Ranking zahlt sich aus** (#141): Δ-Bonus je Rang (S +50 %, A +25 %, B +10 %) und ab Rang B eine goldene Bonus-Kiste neben dem Tresor.
 - 21.11.2026: **Logbuch im Questlog** (#129, Daniels Karten): Alle Meldungen mit Uhrzeit, nach Tagen, mit Kategorien und Suche als zweiter Reiter im Questlog; jeder Durchgang beginnt leer; Radio-Titel landen auch dort, im Bau-Modus nur Erfolge. Die große Ansage wartet, solange ein Fenster offen ist.
 - 21.11.2026: **Effekte bleiben im Container** (#137, Daniel): Fische, Blasen, Leuchten, Dampf und Rauch der Werkstätten bleiben in ihrem Platz, auch wenn das Bild am Rand beschnitten ist (Aquarium der Chill Area).
 - 21.11.2026: **Info-Center, erste Etappe** (#129): Solange ein Fenster offen ist, warten Hinweise und kommen danach; die Kassette tritt zur Seite; im Bau-Modus liegen Meldungen unter der Leiste; im Camp kommt die Kassette erst nach dem Willkommen. Konzepte für Info-Center/Logbuch und Gegner-Baukasten liegen in `docs/concepts/`.
