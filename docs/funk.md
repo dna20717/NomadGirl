@@ -377,7 +377,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #158 Set-Dressing nach Regeln: Clutter mit Ort, Ensembles, Autotiling, Prüfer
-- **Status:** läuft (21.11., Code; Helfer im Worktree, bei HNC noch nicht gepusht: ohne Ergebnis auf `main` neu starten) · angelegt 21.11. von Ava
+- **Status:** fertig (21.11., Code per Helfer; vor #160 gebaut, Haken für #160 vorhanden)
 - **Für:** Code
 - **Anlass (Daniel, 21.11.2026):** „Ich habe ein Problem damit, wie POI-Maps gestaltet sind. Wie können wir hübschere, echter anfühlende Maps erschaffen, ohne dass ich alles selbst machen muss? … Clutter wird manchmal zu gehäuft eingesetzt, manchmal falsch (ein Baum oben auf einem Hochhaus), und auch die Tilesets werden nicht korrekt genutzt.“ Daniels Wahl: **alles in ein Ticket**, Dichte **„bewohnt“**, Raum-Rollen **setzt Ava vorab, Daniel korrigiert**.
 - **Abhängig:** erst nach **#156** (Gelände orthogonal, sanfte Schicht-Übergänge, Höhle, Stützen) bauen, dessen Kacheln und Übergänge übernehmen und nicht doppelt anfassen. #144 (Schichtung nach Tiefe) bleibt.
@@ -393,8 +393,8 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   7. **Prüfer** `test/dressing.test.js` (wie die Erreichbarkeit, alle POIs × 8 Seeds): nichts schwebt, nichts überlappt, kein `floor_out`-Ding drinnen und umgekehrt, nichts auf `roof`/`ledge` ohne passendes `place`, Dichte je Raum im Rahmen, Laufwege frei. Dazu `tools/dressing_shots.mjs <tag>` (je POI 3 Stellen, Vorher/Nachher) + Kritiker-Runde auf den Bildern.
 - **Grenzen:** Raum-Layouts nicht anfassen (nur Dressing + Kacheln). Erreichbarkeit (#145) darf nicht schlechter werden. Spielstände bleiben gültig. Alles in der Werkstatt einstellbar (Ort-Typen-Overlay, Tags, Rollen, Ensembles, Dichte, Abstände, Autotiling an/aus je Set).
 - **Fertig, wenn:** kein Baum, Wrack oder Straßenschild mehr auf Dächern oder drinnen; Räume wirken eingerichtet (Ensembles an Wänden und Ecken, freie Wege); Dächer, Decken, Ecken und Stege mit passenden Kacheln; `dressing.test.js` + `poi.test.js` grün; Vorher/Nachher-Bilder im Ergebnis; Build grün.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: Ort/Tags/Rollen aller Clutter- und Marken-Einträge, Rollen aller 123 Räume (z. B. min_saal = Halle, markt_kino = Wohnen), 8 Start-Ensembles, Dichte je Rolle (bewohnt 3; Laden 3,5, Lager 4, Gang/Tunnel 1,2, Draußen 2, Höhle 1,5), Marken-Anteil 15 %, ein KI-Automat je Raum, Dach-Belag je Set. Noch offen: Kaufhaus mit vielen OPEN-Schildern und Puppen; wenig Höhlen-Clutter. PixelLab-Wunschliste ≈ 40 (Dachkram, Hängendes, gemalte Kappen/Dachkanten/Tropfsteine, Höhlen-Clutter).
+- **Ergebnis:** (Code, per Helfer) `engine/dressing.js` (Ort-Typen floor_in/floor_out/roof/ledge/corner/ceiling/wall, `nomad.places()` + Overlay), Clutter-Regeln (Ort, Tags, Rollen) in Kachel-Sets und Marken-Clutter, Raum-Rolle (11), Katalog POI-Ensembles (`poiSets`, 8), Budget statt Würfeln (Dichte je Rolle, Ecken und Lampen zuerst, Wege frei, deterministisch), Autotiling aus Code (Kappen, Unterseiten, Innenecken, Dach-Belag statt Wüstenkruste, gedithterter Übergang zwischen Sets), ein Set je Gebäudehülle; Überschreiben je POI/Raum (`dressingOverrides`, Haken für #160). Dinge je POI z. B. KM7 54 → 122, Ministerium 174 → 319. Tests npm 400 (neu `test/dressing.test.js` 11), reach_audit 0, poi 33, poi_levels 9, poi_stack 8, light 18. **Bitte testen:** Delta Heights Penthouse (Dach frei), Großmarkt Kaufhaus, Ministerium.
 
 ### #159 Set-Dressing Stufe 2: Ordnung + Verfall, Raum-Geschichten, Wüste kriecht rein, Rückwand, Lernen aus Korrekturen
 - **Status:** offen · angelegt 21.11. von Ava
