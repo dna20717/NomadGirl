@@ -76,6 +76,109 @@ Das Schlüsselbild ist der Maßstab für Galerie und Kritiker: Ein Seed ist gut,
 
 **Gewürfelt** wird nur die Variante: welche Raum-Bausteine (passend zur Story), welche Ensembles und Positionen, welche Spuren im Detail. **Nie gewürfelt** werden Ereignis, Rolle eines Raums, Pflicht-Dinge und Verbote.
 
+## Level-Design
+
+Ein POI führt Leyla ohne Pfeile: Licht, Landmarken und Spuren der Story zeigen den Weg, der Rhythmus wechselt zwischen Druck und Atempause, und Geheimnisse werden gesät statt versteckt. Die Raum-Layouts bleiben handgebaut; diese Regeln gelten für neue Räume, für Umbauten und für das Zusammensetzen der POIs. (Ergänzt 21.11.2026, Daniel: „Können wir die Bible noch einmal upgraden?“ → Level-Design-Regeln.)
+
+### Metriken (gemessen in #145, ohne Doppelsprung)
+
+| Maß | Wert | Regel |
+| --- | --- | --- |
+| Kachel | 64 px | Bild 1920 × 1080 zeigt etwa 30 × 17 Kacheln |
+| Leyla | 3 Kacheln hoch, rutschend 2 | Durchgänge an Nähten 4 hoch, Kriechgänge genau 2 |
+| Stufe | bis 4 mit Kante greifen, 5 unmöglich | Hauptweg höchstens 3, eine 4 nur als bewusste Hürde |
+| Lücke flach | bis 5 | Hauptweg höchstens 3, 4–5 nur für Abzweige und Geheimnisse |
+| Doppelsprung | erst mit Cyberware | nie für den Hauptweg, gern für Geheimnisse („später wiederkommen“) |
+
+Was Leyla gerade noch schafft, fühlt sich wie ein Fehler an. Darum hat der Hauptweg immer eine Kachel Luft unter dem Maximum.
+
+### Wegführung ohne Pfeile
+
+Licht ist eines der wirksamsten Werkzeuge: Level-Designer heben damit Ausgänge, Wege, interessante Punkte und den ersten Auftritt eines neuen Gegners hervor ([Unity](https://unity.com/blog/level-design-basics)). Bei uns gilt:
+
+1. **Licht am Ausgang.** Jeder Raum hat am Weiterweg die hellste Lampe oder einen Lichteinfall; Sackgassen bleiben dümmer. Die Lampen-Planung (`planLights`) bekommt dafür eine Vorgabe „Ausgang hell“.
+2. **Spuren als Brotkrumen.** Die Spuren der Story zeigen zum Weiterweg: Fluchtspuren im Bunker (fallen gelassene Tabletts, Schuhe), Schleifspuren im Lager, Hülsen der Schießerei, Blut der Gang. Sie erzählen und führen zugleich.
+3. **Leitlinien.** Kabel, Rohre, Geländer und Warnstreifen laufen zum Ausgang oder zur Leiter, nie ins Leere.
+4. **Öffnungen ziehen an.** Durchgänge sind dunkle Rahmen mit Licht dahinter; ein Durchbruch in der Wand lässt den nächsten Raum ahnen.
+5. **Feste Farbsprache.** Gelb-schwarz = kletterbar oder Griff; Gang-Farbe an Wänden = Revier, hier wird gekämpft; Rot = Gefahr, nicht hier lang. Einmal gelernt, gilt die Regel im ganzen Spiel.
+
+### Landmarken
+
+Jeder POI hat **eine Landmarke**, die von möglichst vielen Räumen aus zu sehen ist, durch Fenster, Galerien oder im Hintergrund. Sie wird abwechselnd verdeckt und wieder gezeigt, damit Leyla immer weiß, wo sie ist und wohin sie will. Meist ist sie zugleich das Schlüsselbild des POI.
+
+| POI | Landmarke | Atempause | Leitlinie |
+| --- | --- | --- | --- |
+| Mile 7 Gas & Go | leuchtende Preistafel | Verkaufsraum mit Kaffeemaschine | Schläuche der Zapfsäulen |
+| Sunny Acres | Wasserturm mit Lächel-Gesicht | Pool-Rand | Lichterkette zwischen den Wohnwagen |
+| Funkmast KM 31 | blinkende Spitze des Masts | Kabine | Kabelstränge am Gitter |
+| Delta South Megamall | Glaskuppel über der Passage | Food-Court | stillstehende Rolltreppen |
+| Delta Heights | Neon des Penthouse | Archiv | Aufzugsseile im Schacht |
+| P+R Delta Süd | Kassenhaus auf dem Dach | dunkles Deck | Fahrbahnpfeile auf dem Boden |
+| Metro Line 4 | Anzeigetafel „Zug fällt aus“ | Kiosk | Gleise |
+| Storm Drain 9 | Lichtschacht des Gullys | Überlauf | Rinnsal aus Schlamm |
+| Deadlock Bunker 13 | grünes Glühen des Reaktors | Kantine | Notlicht-Streifen am Boden |
+| Pit 6 | Förderturm, unten das Leuchten der Kristalle | Kaue | Grubenbahn-Schienen |
+| Ministry of Order | große Uhr im Festsaal | Wartesaal | roter Teppich |
+| Delta Crude Refinery | Fackel | Leitstand | Rohrbrücke |
+| Silo Zero | die Rakete im Schacht | Offiziersmesse | Kabelbäume zur Startrampe |
+
+### Rhythmus: Druck und Atempause
+
+Wer eine Steigerung spüren soll, braucht vorher eine Pause: von 5 auf 11 ist ein großer Sprung, von 10 auf 11 kaum zu merken ([Game Developer](https://www.gamedeveloper.com/design/trinity-part-6-intensity-ramps)). Die Spannungskurve je POI gibt es schon (#016). Neu dazu:
+
+- **Nach jeder Spitze ab 85 % folgt ein Raum unter 40 %.** Der Prüfer meldet Verstöße.
+- **Jeder POI folgt einem Bogen:** Ankommen (sicher, Blick auf die Landmarke) → Kennenlernen (erste Gegner einzeln) → Steigern → **Atempause** → Höhepunkt → Belohnung und Ausgang.
+- **Die Atempause ist ein Story-Raum:** hell, ohne Gegner, mit Kiste, Zettel oder Splitter, oft das Schlüsselbild. Hier liest man, was passiert ist.
+- **Jeder Kampfraum hat seinen eigenen kleinen Bogen:** sehen → erster Kontakt → Welle oder Verstärkung → Ruhe mit Beute.
+
+### Raumtypen
+
+| Typ | Zweck | Regeln |
+| --- | --- | --- |
+| Schwelle | Ankommen, Ton setzen | sicher, Landmarke sichtbar, Rahmen um den ersten Blick |
+| Gang | Druck, Tempo | schmal, ein Ausgang sichtbar, höchstens kleine Gruppe |
+| Arena | Kampf | mindestens zwei Höhen, Deckung aus dem Layout, Rückzugsweg, Gegner sichtbar vor dem ersten Schuss |
+| Vertikale | Klettern, Überblick | Galerien als Rast, Blick nach unten auf den Weg, den man kam |
+| Atempause | Story, Erholung | hell, keine Gegner, Kiste oder Zettel |
+| Abzweig | Neugier, Beute | ein Zeichen am Eingang, Belohnung immer größer als der Umweg |
+| Boss | Höhepunkt | eigener Raum, Landmarke im Bild, Ausgang erst danach offen |
+
+Die Raum-Rolle aus der Story (Laden, Lager, Büro …) beschreibt, was der Raum früher war; der Raumtyp beschreibt, was er im Spiel tut. Beide stehen am Raum-Baustein.
+
+### Kampfräume fair bauen
+
+- **Erst sehen, dann getroffen werden.** Schützen stehen so, dass Leyla sie sieht, bevor sie schießen können; Scharfschützen kündigen sich an (Laserlinie, Glanz).
+- **Deckung kommt aus dem Layout** (Theken, Mauerreste, Kistenstapel als Wand), weil Clutter keine Kollision hat.
+- **Höhe ist Vorteil:** Wer oben steht, sieht mehr; jeder Arena-Raum bietet Leyla mindestens einen erreichbaren Hochpunkt.
+- **Kein Gegner im Durchgang:** an der Naht zwischen zwei Räumen spawnt nichts, damit Leyla beim Betreten nicht sofort getroffen wird.
+
+### Geheimnisse säen
+
+Geheimnisse belohnen, wer genau hinsieht; die Moon Studios setzten in Ori auf viele kleine Geheimnisse und auf die Kamera, um Hindernisse zu zeigen, ohne die Lösung zu verraten ([Game Design Skills](https://gamedesignskills.com/game-design/2d-game-levels/)).
+
+- **Jede Schein- und brüchige Wand hat ein Zeichen:** ein Riss, ein Luftzug (Papierfetzen aus dem Kleinvieh treiben dorthin), Licht durch einen Spalt, eine Spur, die an der Wand endet.
+- **Erst deutlich, dann leise.** Das erste Geheimnis eines POI ist klar angedeutet, spätere werden subtiler.
+- **Jedes Geheimnis hat einen Grund in der Story:** das Versteck des Platzwarts, die Umkleide der Verkäuferinnen, der Vorratsraum der Rust Guard.
+
+### Abkürzungen und Rückwege
+
+- **Die Abkürzung ist vorher zu sehen:** Leyla geht an der verschlossenen Tür vorbei, bevor sie den Schalter von innen findet. Das Öffnen schließt dann einen Kreis.
+- **Der Ausgang liegt nah am Höhepunkt**, damit nach dem Boss kein langer Leerweg folgt.
+- **Vertikale Räume zeigen den Weg zurück:** Von oben sieht Leyla, woher sie kam.
+
+### Prüfung
+
+Der Erreichbarkeits-Prüfer (`tools/reach_audit.mjs`) bleibt. Dazu kommt ein **Level-Prüfer** (alle POIs × 8 Seeds):
+
+- Hauptweg ohne Stufe 4 und ohne Lücke über 3, außer als markierte Hürde
+- nach jeder Spitze ab 85 % ein Raum unter 40 %
+- Landmarke aus mindestens einem Drittel der Haupträume sichtbar
+- Weiterweg in jedem Raum heller als Sackgassen
+- jede Schein- oder brüchige Wand mit einem Zeichen in 3 Kacheln Umkreis
+- kein Spawn an einer Naht, jeder Schütze mit Sichtlinie zu Leylas Eintrittspunkt
+
+Eine Spielprobe mit `tools/play.mjs` zeigt zusätzlich, wo Leyla zögert oder umkehrt: Dort fehlt Führung.
+
 ## Befund: warum es heute hakt
 
 Alle drei Probleme haben eine Wurzel: `drawRoom` in `game/play/art.js` kennt nur „Kachel mit Luft darüber“ und würfelt dann je Kachel.
@@ -276,6 +379,7 @@ Zuerst entstehen die Story-Steckbriefe aller POIs und Räume (Ava schreibt, Dani
 | --- | --- | --- |
 | #160 Story zuerst | Story-Felder in den Daten, Raum-Steckbriefe, Dressing liest die Story | – |
 | #158 Set-Dressing nach Regeln | Ort-Typen, Tags, Raum-Rollen, Ensembles, Budget, Autotiling, Prüfer | Marker-Zeichen, Ablageflächen, Kosten je Ding, Abstände 6/3, Autotiling 47 aus 6, Reparatur-Durchgang |
+| #163 Level-Design | Raumtypen, Landmarken, Rhythmus, Licht am Ausgang, faire Kampfräume, Geheimnisse säen, Level-Prüfer | Brotkrumen aus Spuren zusammen mit #159 |
 | #159 Stufe 2 | Ordnung + Verfall, Spuren aus der Story, Wüste kriecht rein, Rückwand-Clutter, Lernen aus Korrekturen | austauschbare Chunks, Dressing-Galerie, Lesbarkeit (Clutter gedämpft) |
 
 **Grenzen für alle:** Raum-Layouts bleiben (außer Marker-Zeichen), Erreichbarkeit (#145) wird nicht schlechter, Spielstände bleiben gültig, alles in der Werkstatt einstellbar. PixelLab sparsam: #158 höchstens ~40, #159 höchstens ~60.
@@ -299,3 +403,6 @@ Zuerst entstehen die Story-Steckbriefe aller POIs und Räume (Ava schreibt, Dani
 - [Environmental Storytelling – Game Developer](https://gamedeveloper.com/design/environmental-storytelling)
 - [Autotiling – Red Blob Games](https://www.redblobgames.com/articles/autotile/claude/)
 - [AutoBlob](https://violetpixel13.itch.io/autoblob)
+- [Level design basics: Guiding players without telling them – Unity](https://unity.com/blog/level-design-basics)
+- [Trinity, Part 6: Intensity Ramps – Game Developer](https://www.gamedeveloper.com/design/trinity-part-6-intensity-ramps)
+- [2D Game Levels – Game Design Skills (Moon Studios)](https://gamedesignskills.com/game-design/2d-game-levels/)

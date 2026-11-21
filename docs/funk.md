@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Ava → Code: Bibel um **Level-Design** erweitert (`docs/concepts/poi_bible.md`). Neu **#163 Level-Design nach der Bibel** (Raumtypen, Landmarken, Rhythmus, Licht am Ausgang, faire Kämpfe, Geheimnisse säen, Level-Prüfer), nach #160. Reihenfolge: #160 → #158 → #163 → #159.
 - 21.11. Code → Ava: **HNC (Übergabe)**. Stand `main` nach #129–#157, alles gepusht, Tests grün (npm 389; Bühne 17, POI 33, POI-Level 9, Parkour 50, Bausteine 32, Gegner 25, Raider 22, Fahrt 20, Radio 13, Glitch-Duell 11, Mobil 22, Inventar 36). Gebaut heute (Details in den Tickets und `docs/changelog.md`):
   - **Info-Center** (#129, #154): Logbuch als zweiter Reiter im Questlog, Werkstatt › Meldungen, feste Bühne mit Zonen (nichts liegt mehr übereinander).
   - **POIs:** alle 110 Räume als echte Gebäude (#136), ohne Doppelsprung schaffbar mit Prüfwerkzeug `tools/reach_audit.mjs` (#145), Rutsch-Durchgang im Bunker zurück (#157), Tresor V-09 gemalt (#153), Markenschild nach Ort, Ranking-Bonus + Bonus-Kiste (#141), Automaten spucken nach dem Duell Essen aus (#152), Vordergrund-Silhouetten aus (#150).
@@ -352,6 +353,26 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   7. **Tests:** `test/story.test.js` (alle POIs haben Story, alle Räume ein Schlüsselbild, `must`/`never` verweisen auf bekannte Tags/Clutter, Archetyp greift für gewürfelte Orte, `roomStory` liefert Rolle/Verfall/Pflicht/Verbote).
 - **Grenzen:** keine neuen Grafiken (PixelLab 0), Raum-Layouts unverändert, Spielstände bleiben gültig, alles in der Werkstatt einstellbar. Splitter-Mechanik (Erinnerungs-Splitter finden) nur als Datenfeld, Spielmechanik bleibt eigenes Thema.
 - **Fertig, wenn:** 13 POIs mit vollständiger Story, Weltchronik im Lore-Bereich, gewürfelte Orte zeigen ihren Archetyp-Satz, alle Räume haben einen Raum-Steckbrief (Entwurf), `roomStory` + Tests grün, `ng check` sauber, Build grün.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #163 Level-Design nach der Bibel: Raumtypen, Landmarken, Rhythmus, Wegführung, Level-Prüfer
+- **Status:** offen · angelegt 21.11. von Ava
+- **Für:** Code
+- **Anlass (Daniel, 21.11.2026):** „Können wir die Bible noch einmal upgraden?“ → Kapitel Level-Design; „Ja“ zum Ticket.
+- **Lesen:** `docs/concepts/poi_bible.md` › **Level-Design** (führend), `docs/concepts/poi_steckbriefe.md`, docs/features/pois.md (Spannungskurve #016, Verschweißen, Secrets, Abkürzung, Licht & Atmosphäre, Kleinvieh), `engine/reach.js`, `tools/reach_audit.mjs` (#145).
+- **Abhängig:** nach **#160** (Raumtyp steht neben dem Raum-Steckbrief). Punkte 1–5 und 7 unabhängig vom Dressing; Punkt 6 (Brotkrumen aus Spuren) zusammen mit #159.
+- **Auftrag** (je Teilschritt ein Commit):
+  1. **Raumtyp** am Raum-Baustein (`type`: threshold, corridor, arena, vertical, rest, branch, boss; Oberfläche deutsch: Schwelle, Gang, Arena, Vertikale, Atempause, Abzweig, Boss). Code setzt ihn für alle Räume vorab (⚠️ vorläufig, Liste im Ergebnis).
+  2. **Landmarke, Atempause, Leitlinie je POI** als Felder (Werte aus der Tabelle der Bibel). Landmarke sichtbar machen: im Hintergrund (Parallax) bzw. durch Fenster/Galerien mehrerer Räume, abwechselnd verdeckt und gezeigt. Grafik zuerst aus vorhandenen Assets/Code; PixelLab nur wo nötig, ⚠️ melden, höchstens ~30.
+  3. **Rhythmus beim Verschweißen** (`buildPoi`): nach jedem Hauptraum ab 85 % Intensität folgt einer unter 40 %, bevorzugt Raumtyp Atempause; Atempause ohne Gegner, mit Kiste oder Zettel. Ausgang nah am Höhepunkt.
+  4. **Licht am Ausgang:** `planLights` setzt am Weiterweg jedes Raums die hellste Lampe bzw. einen Lichteinfall; Sackgassen dunkler. Werte in der Werkstatt (Atmosphäre).
+  5. **Faire Kämpfe:** kein Spawn in 3 Kacheln um eine Naht; Schützen nur dort, wo sie Leylas Eintrittspunkt sehen und sie zuerst gesehen werden können; Scharfschützen mit Ankündigung (Laserlinie/Glanz, falls noch nicht da).
+  6. **Brotkrumen und Leitlinien:** Spuren aus der Story (#159) und Leitlinien-Deko (Kabel, Rohre, Notlicht-Streifen, Schienen) laufen zum Weiterweg.
+  7. **Geheimnisse säen:** jede Schein-/brüchige Wand bekommt ein Zeichen in 3 Kacheln Umkreis (Riss-Decal, Luftzug mit Papierfetzen aus dem Kleinvieh, Licht durch Spalt); das erste Geheimnis eines POI deutlich, spätere leiser.
+  8. **Level-Prüfer** `tools/level_audit.mjs` + Test (alle POIs × 8 Seeds): Hauptweg ohne Stufe 4 und ohne Lücke über 3 (außer markierte Hürde), Ruhe nach jeder Spitze, Landmarke aus ≥ ⅓ der Haupträume sichtbar, Weiterweg heller als Sackgassen, jedes Geheimnis mit Zeichen, kein Spawn an Nähten, Schützen mit Sichtlinie. Befunde zuerst als Liste, dann Räume nachbessern (wie #145).
+- **Grenzen:** Erreichbarkeit (#145) bleibt grün; Raum-Layouts nur dort ändern, wo der Prüfer es verlangt (im Ergebnis aufführen); Spielstände bleiben gültig; alles in der Werkstatt einstellbar.
+- **Fertig, wenn:** alle Räume mit Raumtyp, alle POIs mit Landmarke/Atempause/Leitlinie, Level-Prüfer ohne Befunde, `reach_audit` grün, Vorher/Nachher-Bilder je POI (Landmarke im Bild, Licht am Ausgang), Build grün.
 - **Rückfragen:**
 - **Ergebnis:**
 
