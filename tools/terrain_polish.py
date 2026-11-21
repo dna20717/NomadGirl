@@ -117,7 +117,23 @@ def tile2d(src_name, size=T, roll=(0, 0)):
     return im.crop((0, 0, size, size))
 
 
-def from_strip(src_name, out_name, prefix, fill_a, fill_b, shift_b=3, n=7, rust=False, deep=None, deep_a=False):
+BAYER = np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]) / 16.0
+
+
+def dither_into(a, b, start=0.25, end=1.0):
+    """#156 (Daniel 21.11.2026: „sanftere Übergänge zwischen den Schichten“): picture a fades into b from top to bottom with an
+    ordered (Bayer) dither, pixel-art style: rows above `start` stay a, from `end` on everything is b"""
+    A_, B_ = np.array(a.convert('RGBA')), np.array(b.convert('RGBA'))
+    H, W = A_.shape[:2]
+    out = A_.copy()
+    for y in range(H):
+        w = min(1.0, max(0.0, (y / (H - 1) - start) / max(1e-6, end - start)))
+        for x in range(W):
+            if BAYER[y % 4, x % 4] < w: out[y, x] = B_[y, x]
+    return Image.fromarray(out)
+
+
+def from_strip(src_name, out_name, prefix, fill_a, fill_b, shift_b=3, n=7, rust=False, deep=None, deep_a=False, soft=False, soft_top=False):
     """#138 (Daniel 21.11.2026: „Beides mit PixelLab neu malen“): a PixelLab cross-section strip (512 x 256, walking line at y=64) cut into
     a Kachel-Set: seamless at n tiles, tops = rows 48-128, fill a / fill b = 64 rows from fill_a / fill_b (fill b shifted by shift_b tiles)"""
     src = fill_holes(Image.open(A / 'tiles/source' / src_name))
@@ -125,13 +141,20 @@ def from_strip(src_name, out_name, prefix, fill_a, fill_b, shift_b=3, n=7, rust=
     sheet = Image.new('RGBA', (n * T, 3 * (T + OVER)))
     for i in range(n):
         x = i * T
-        sheet.paste(strip.crop((x, SURF - OVER, x + T, SURF + T)), (x, 0))
+        top = strip.crop((x, SURF - OVER, x + T, SURF + T))
+        if soft_top and deep:   # #156 the slab under the floor melts into the wall texture in its lower half
+            tex0 = tile2d(deep, roll=[(0, 0), (40, 24), (20, 56)][i % 3])
+            body = dither_into(top.crop((0, OVER, T, OVER + T)), tex0, 0.45, 1.0)
+            top.paste(body, (0, OVER))
+        sheet.paste(top, (x, 0))
         sheet.paste(strip.crop((x, fill_a, x + T, fill_a + T)), (x, (T + OVER) + OVER))
         x2 = (x + shift_b * T) % (n * T)
         if deep:   # #144 the rock below: one texture that repeats without seams in both directions (concrete: 3 panels mixed)
             tex = tile2d(deep, roll=[(0, 0), (40, 24), (20, 56)][i % 3] if deep_a else (0, 0))
             sheet.paste(tex, (x, 2 * (T + OVER) + OVER))
             if deep_a: sheet.paste(tex, (x, (T + OVER) + OVER))
+            elif soft:   # #156 the layer under the crust melts into the rock below instead of ending in a hard line
+                sheet.paste(dither_into(strip.crop((x, fill_a, x + T, fill_a + T)), tex, 0.2, 0.95), (x, (T + OVER) + OVER))
         else:
             sheet.paste(strip.crop((x2, fill_b, x2 + T, fill_b + T)), (x, 2 * (T + OVER) + OVER))
     if rust:   # bright red rebar read as glitches: rust brown from the same palette (AAP-64)
@@ -149,8 +172,9 @@ if __name__ == '__main__':
     if 'px' in sys.argv:
         # #144 (Daniel 21.11.2026: „Die Schichten machen so keinen Sinn“): surface from the strip, right under it the strip's first layer
         # once (fill a, desert), deeper the seamless rock (fill b); concrete walls are the seamless concrete all the way
-        print('desert_px', from_strip('desert_px_source.png', 'desert_px.png', 'desert_px', 128, 192, 0, deep='sandstone_tex_source.png'))
-        print('concrete_px', from_strip('concrete_px_source.png', 'concrete_px.png', 'concrete_px', 102, 102, 3, rust=True, deep='concrete_tex_source.png', deep_a=True))
+        print('desert_px', from_strip('desert_px_source.png', 'desert_px.png', 'desert_px', 128, 192, 0, deep='sandstone_tex_source.png', soft=True))
+        print('concrete_px', from_strip('concrete_px_source.png', 'concrete_px.png', 'concrete_px', 102, 102, 3, rust=True, deep='concrete_tex_source.png', deep_a=True, soft_top=True))
+        print('cave_px', from_strip('cave_px_source.png', 'cave_px.png', 'cave_px', 128, 192, 0, deep='cave_tex_source.png', soft=True))
         sys.exit(0)
     print('desert_fine', desert())
     print('concrete_worn', concrete())

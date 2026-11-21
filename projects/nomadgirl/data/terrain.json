@@ -620,5 +620,37 @@
   "sizeMax": 200,
   "atmosphere": "metall_rost",
   "glows": [{"name": "big_industry_0", "color": "#ffb050", "at": [96, 66], "size": [26, 16], "strength": 90, "light": 140, "behavior": "pulse"}]
+ },
+ "cave": {
+  "name": "Höhle",
+  "look": "tileset_cave_px",
+  "top": ["cave_px_top_0", "cave_px_top_1", "cave_px_top_2", "cave_px_top_3", "cave_px_top_4", "cave_px_top_5", "cave_px_top_6"],
+  "fill": ["cave_px_fill_a_0", "cave_px_fill_a_1", "cave_px_fill_a_2", "cave_px_fill_a_3", "cave_px_fill_a_4", "cave_px_fill_a_5", "cave_px_fill_a_6"],
+  "edge": {"color": "#060608", "width": 2, "shade": 40, "shadeWidth": 3},
+  "clutterChance": 12,
+  "decalChance": 3,
+  "description": "Natürlicher Fels unter der Erde: Kies und Moos oben, dunkler Kalkstein mit Adern (#156, Daniel: Höhlen-Set ja).",
+  "fill2": ["cave_px_fill_b_0", "cave_px_fill_b_1", "cave_px_fill_b_2", "cave_px_fill_b_3", "cave_px_fill_b_4", "cave_px_fill_b_5", "cave_px_fill_b_6"],
+  "fillMode": "depth",
+  "props": "tileset00_props",
+  "clutter": [
+   "desert3_0",
+   "desert3_1",
+   "desert3_2",
+   "desert3_3",
+   "desert3_4",
+   "desert3_5",
+   "desert3_6",
+   "desert3_7",
+   "desert3_8",
+   "desert3_9",
+   "desert3_10",
+   "desert3_11",
+   "desert3_12",
+   "desert3_13",
+   "desert3_14",
+   "desert3_15"
+  ],
+  "decals": ["decal_9", "decal_10", "decal_14", "decal_15", "decal_0"]
  }
 }

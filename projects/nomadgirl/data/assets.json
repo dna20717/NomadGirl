@@ -7639,5 +7639,52 @@
   "derivedFrom": "vault_closed",
   "date": "2026-11-21",
   "description": "Tür offen, Gold, Münzen, Datenchips, Kristall (#153)."
+ },
+ "cave_px_source": {
+  "name": "Quelle: Höhlen-Querschnitt",
+  "kind": "source",
+  "file": "assets/tiles/source/cave_px_source.png",
+  "source": "KI (PixelLab, create_image_pro 512 × 256, AAP-64)",
+  "date": "2026-11-21"
+ },
+ "cave_tex_source": {
+  "name": "Quelle: Höhlen-Fels-Textur",
+  "kind": "source",
+  "file": "assets/tiles/source/cave_tex_source.png",
+  "source": "KI (PixelLab, create_image_pro 96 × 96)",
+  "date": "2026-11-21"
+ },
+ "tileset_cave_px": {
+  "name": "Kachel-Set Höhle (PixelLab)",
+  "kind": "icons",
+  "file": "assets/tiles/tileset00/cave_px.png",
+  "cell": [64, 80],
+  "grid": [7, 3],
+  "names": [
+   "cave_px_top_0",
+   "cave_px_top_1",
+   "cave_px_top_2",
+   "cave_px_top_3",
+   "cave_px_top_4",
+   "cave_px_top_5",
+   "cave_px_top_6",
+   "cave_px_fill_a_0",
+   "cave_px_fill_a_1",
+   "cave_px_fill_a_2",
+   "cave_px_fill_a_3",
+   "cave_px_fill_a_4",
+   "cave_px_fill_a_5",
+   "cave_px_fill_a_6",
+   "cave_px_fill_b_0",
+   "cave_px_fill_b_1",
+   "cave_px_fill_b_2",
+   "cave_px_fill_b_3",
+   "cave_px_fill_b_4",
+   "cave_px_fill_b_5",
+   "cave_px_fill_b_6"
+  ],
+  "source": "KI (PixelLab) + Code (tools/terrain_polish.py px)",
+  "derivedFrom": "cave_px_source",
+  "date": "2026-11-21"
  }
 }
