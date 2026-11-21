@@ -50,7 +50,7 @@ const R = {
   // hide the HUD for clips (the prompt stays), show it for windows
   async hud(on) {
     // #125: the Now-Playing cassette and the toasts (e.g. the tool's own „Lokaler Werkstatt-Stand aktiv“) never belong in a lesson
-    await page.addStyleTag({ content: (on ? '.hud-top,.hud-foot,.hud-camp,.hud-buildbtn,.hud-openbtn{visibility:visible}' : '.hud-top,.hud-foot,.hud-camp,.hud-buildbtn,.hud-openbtn{visibility:hidden}') + '.hud-toasts,.np-card{visibility:hidden!important}' });
+    await page.addStyleTag({ content: (on ? '.hud-left,.hud-right,.hud-foot,.hud-camp,.hud-buildbtn,.hud-openbtn{visibility:visible}' : '.hud-left,.hud-right,.hud-foot,.hud-camp,.hud-buildbtn,.hud-openbtn{visibility:hidden}') + '.hud-toasts,.np-card{visibility:hidden!important}' });
   },
   frames: [],
   async grab() {

@@ -20,16 +20,20 @@ body.ng-quiet .np-card { transform: translateX(120%); opacity: 0; }   /* #129 a 
 .np-text b { color: #f2eef7; font-family: VT323, monospace; font-weight: 400; font-size: 30px; line-height: 1; white-space: nowrap; }
 .np-text span { color: #ffd27a; font-family: VT323, monospace; font-size: 22px; line-height: 1; white-space: nowrap; }
 .np-peek { overflow: hidden; flex: 0 0 auto; }
+/* #154 in the game the tape lives in zone G of the stage (game/play/stage.js): above the radio chip, flush with the right edge */
+.np-card.hosted { position: relative; right: auto; bottom: auto; z-index: 35; align-self: flex-end; margin-right: -20px; }
 @media (max-width: 600px) { .np-text b { font-size: 24px; } .np-text span { font-size: 18px; } }`;
 
-let card = null, hideT = 0;
+let card = null, hideT = 0, host = null;
+// #154 Info-Center: the game hands its zone G here (game/play/stage.js); start page and intro have none and keep the fixed corner
+export function setNowPlayingHost(elm) { host = elm || null; }
 export function nowPlaying({ title, artist = '', cassette = null, base = location.href, scale = 1.25, peek = 0.55, ms = 5200 } = {}) {   // #122 smaller; only part of the tape shows (peek), title and artist count
   if (!title || typeof document === 'undefined') return null;
   window.dispatchEvent?.(new CustomEvent('ng-journal', { detail: { title: `♪ ${title}`, sub: artist, cat: 'radio' } }));   // #129 every title into the Logbuch (also while the build mode hides the tape)
   if (!document.getElementById('np-css')) { const st = document.createElement('style'); st.id = 'np-css'; st.textContent = CSS; document.head.append(st); }
   card?.remove(); clearTimeout(hideT);
   const C = cassette || {}, [cw, ch] = C.size || [160, 104], k = scale;
-  card = document.createElement('div'); card.className = 'np-card';
+  card = document.createElement('div'); card.className = 'np-card' + (host?.isConnected ? ' hosted' : '');
   const tape = document.createElement('div'); tape.className = 'np-tape'; tape.style.width = `${cw * k}px`; tape.style.height = `${ch * k}px`;
   if (C.file) { const img = document.createElement('img'); img.src = new URL(C.file, base).href; img.alt = ''; tape.append(img); }
   for (const [x, y] of C.reels || []) { const r = document.createElement('i'); r.className = 'np-reel'; const d = (C.reelSize ?? 12) * k; Object.assign(r.style, { left: `${x * k - d / 2}px`, top: `${y * k - d / 2}px`, width: `${d}px`, height: `${d}px` }); tape.append(r); }
@@ -42,7 +46,7 @@ export function nowPlaying({ title, artist = '', cassette = null, base = locatio
   if (artist) { const a = document.createElement('span'); a.textContent = artist; txt.append(a); }
   const win = document.createElement('div'); win.className = 'np-peek'; win.style.width = `${Math.round(cw * k * peek)}px`; win.append(tape);
   card.append(txt, win);
-  document.body.append(card);
+  if (host?.isConnected) host.prepend(card); else document.body.append(card);
   requestAnimationFrame(() => requestAnimationFrame(() => card?.classList.add('on')));
   const mine = card;
   hideT = setTimeout(() => { mine.classList.remove('on'); setTimeout(() => mine.remove(), 700); if (card === mine) card = null; }, ms);

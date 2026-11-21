@@ -15,6 +15,7 @@ import { trackedGoal as questGoal } from '../quests.js';
 import { voices } from './voices.js';
 import { makeSfx } from './sfx.js';
 import { cheatsOn, CHEATS, runCheat } from '../cheats.js';
+import { Stage, zoneRules } from './stage.js';
 
 // toast kinds: icon (Lucide) and sound (sfx.js); colours in play.css (.hud-toast.<kind>)
 const TOAST_KINDS = {
@@ -52,7 +53,8 @@ export function noticeRules(D) {
     for (const [set, v] of [[quiet, r.waitsWindow], [full, r.waitsFull], [success, r.buildLog]]) if (v != null) v ? set.add(r.id) : set.delete(r.id);
     if (r.cat) cat[r.id] = r.cat;
   }
-  return { kinds: K, quiet, full, success, cat, max: N.stage?.toastMax ?? TOAST_MAX, stack: N.stage?.stack ?? 5, keep: N.log?.keep ?? 400 };
+  const zoneD = (N.zones || []).find(z => z.id === 'D')?.max;   // #154 Werkstatt › Meldungen › Zonen: D's max = notes visible at most
+  return { kinds: K, quiet, full, success, cat, max: N.stage?.toastMax ?? TOAST_MAX, stack: zoneD || N.stage?.stack || zoneRules(null).D.max, keep: N.log?.keep ?? 400 };
 }
 
 export class Hud {
@@ -87,22 +89,23 @@ export class Hud {
         workshopDrafts ? el('b', {}, ` Dein gespeicherter Werkstatt-Stand ist aktiv (${workshopDrafts} ${workshopDrafts === 1 ? 'Datei' : 'Dateien'}).`) : null),
       hints([['ok', 'weiter'], ['back', 'zurück']]),
       this.goBtn = el('button', { class: 'hud-go', onclick: () => this.toggleHelp(false) }, 'Weiter')));
+    // #154 Info-Center: the pieces hang in the zones of the stage (game/play/stage.js), see sync() there
     root.append(
-      el('div', { class: 'hud-top' },
-        el('div', { class: 'hud-left' },
-          this.vitalsEl = el('div', { class: 'hud-vitals' },
-            this.hpRow = el('div', { class: 'hud-gauge hp' }, el('span', { class: 'hud-tag' }, 'LEBEN'), el('span', { class: 'hud-meter' }, this.healthGhost, this.healthBar, el('s'), this.ekg = el('canvas', { class: 'hud-ekg', width: 320, height: 22 })), this.healthText),
-            this.stRow = el('div', { class: 'hud-gauge st' }, el('span', { class: 'hud-tag' }, 'AUSDAUER'), this.stMeter = el('span', { class: 'hud-meter' }, this.stBar, el('s')), this.stText)),
-          el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'NÄGEL'), this.ammo, this.dash)),
-        el('div', { class: 'hud-right' },
-          el('div', { class: 'hud-row' }, this.roomName),
-          el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'ZEIT'), this.time, el('span', { class: 'hud-label' }, 'KILLS'), this.kills, el('span', { class: 'hud-label' }, 'Δ'), this.deltas))),
+      this.leftEl = el('div', { class: 'hud-left' },
+        this.vitalsEl = el('div', { class: 'hud-vitals' },
+          this.hpRow = el('div', { class: 'hud-gauge hp' }, el('span', { class: 'hud-tag' }, 'LEBEN'), el('span', { class: 'hud-meter' }, this.healthGhost, this.healthBar, el('s'), this.ekg = el('canvas', { class: 'hud-ekg', width: 320, height: 22 })), this.healthText),
+          this.stRow = el('div', { class: 'hud-gauge st' }, el('span', { class: 'hud-tag' }, 'AUSDAUER'), this.stMeter = el('span', { class: 'hud-meter' }, this.stBar, el('s')), this.stText)),
+        el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'NÄGEL'), this.ammo, this.dash)),
+      this.rightEl = el('div', { class: 'hud-right' },
+        el('div', { class: 'hud-row' }, this.roomName),
+        el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'ZEIT'), this.time, el('span', { class: 'hud-label' }, 'KILLS'), this.kills, el('span', { class: 'hud-label' }, 'Δ'), this.deltas)),
       this.campEl, this.buildBtn, this.openBtn, this.toastsEl, this.promptEl, this.menuEl, this.help,
-      el('div', { class: 'hud-foot' }, // tidy (#008, Daniel: „HUD aufräumen“): only the menu button and the version; Werkstatt, Startseite and Neues Spiel live in the menu
+      this.footEl = el('div', { class: 'hud-foot' }, // tidy (#008, Daniel: „HUD aufräumen“): only the menu button and the version; Werkstatt, Startseite and Neues Spiel live in the menu
         el('button', { class: 'hud-menubtn', title: 'Menü (Esc)', onclick: e => { e.currentTarget.blur(); this.pauseMenu(); } }, icon('menu', 14), 'Menü'),
         this.versionEl = el('span', { class: 'hud-version' })));
     loadVersion().then(v => { this.versionEl.textContent = ' · ' + v.text + (workshopDrafts ? ` · Werkstatt-Entwurf aktiv (${workshopDrafts})` : ''); if (workshopDrafts) this.versionEl.style.color = '#fa6a0a'; this.versionEl.title = 'Version dieses Spiels' + (v.commit ? ': ' + v.commit : ''); this.version = v; });
     this.root = root;
+    this.stage = new Stage(root); this.stage.sync(this, null);
     this.paused = false;   // the controls wait in the menu (Esc › Steuerung, or H)
   }
 
@@ -373,7 +376,7 @@ export class Hud {
   roomTitle(name, ms = 2600) {
     this.titleEl?.remove();
     const t = this.titleEl = el('div', { class: 'room-title' }, el('b', {}, name), el('i'));
-    this.root.append(t);
+    this.stage.zone('B').append(t);   // #154 zone B (Ansage), never across the notes
     requestAnimationFrame(() => t.classList.add('on'));
     clearTimeout(this.titleTimer);
     this.titleTimer = setTimeout(() => { t.classList.remove('on'); setTimeout(() => t.remove(), 700); }, ms);
@@ -431,9 +434,10 @@ export class Hud {
     const t = el('div', { class: `hud-toast ${kind}${banner ? ' banner' : ''}` }, icon(K.icon, 22), el('div', {}, el('b', {}, title), sub ? el('small', {}, sub) : null));
     t._title = title; t._sub = sub;
     if (ms <= 0) t.append(closeX(() => this.dismiss(t)));
-    this.toastsEl.append(t);
+    if (banner) this.toastsEl.prepend(t); else this.toastsEl.append(t);   // #154 the announcement stands first, big
+    this.stage.sync(this, this.scene?.data_);
     const live = [...this.toastsEl.children].filter(x => !x.classList.contains('out'));
-    for (const x of live.slice(0, Math.max(0, live.length - R.stack))) this.dismiss(x);
+    for (const x of live.filter(x => x !== t && !x.classList.contains('banner')).slice(0, Math.max(0, live.length - R.stack))) this.dismiss(x);   // the oldest go, the announcement stays
     if (ms > 0) t._timer = setTimeout(() => this.dismiss(t), ms);
     (this.toastLog ??= []).push({ title, sub, kind });
     if (sound) this.toastSound(K.sound);
@@ -458,11 +462,11 @@ export class Hud {
     const windowed = !!(this.inv?.isOpen || this.craft?.isOpen || this.tech?.isOpen || this.map?.isOpen || this.quests?.isOpen || this.ach?.isOpen || this.tut?.isOpen || this.build?.active);
     this.root.classList.toggle('hud-windowed', windowed);
     this.root.classList.toggle('hud-building', !!this.build?.active);   // #129 notes below the build bar, not on it
-    if (this.build?.active) { const b = document.querySelector('.bm-bar')?.getBoundingClientRect(); if (b && b.bottom > 0) this.root.style.setProperty('--build-top', `${Math.round(b.bottom + 10)}px`); }
     // #129 Info-Center, context „window“: hints wait, the cassette steps aside; on closing, what waited comes one by one
     const quiet = windowed || !!this.modal || !!this.megaBuild?.isOpen || !!this.duel?.isOpen;   // #129 also the Glitch-Duell (DuellMode): hints wait until it is over
     if (quiet !== this.quiet) { this.quiet = quiet; document.body.classList.toggle('ng-quiet', quiet); if (!quiet) [0, 700, 1400].forEach(ms => setTimeout(() => this.nextQueued(), ms)); }   // #017: toasts move to the top centre, over the free middle of the window header, never over its buttons
     if (this.promptEl.hidden !== hideP) this.promptEl.hidden = hideP;
+    this.stage.sync(this, scene.data_);   // #154 everything in its zone for the context of the moment
     const hp = Math.max(0, Math.min(1, l.health / max));
     this.healthBar.style.width = `${hp * 100}%`;
     this.ghostP = Math.max(hp, (this.ghostP ?? hp) - 0.006);   // the ghost catches up slowly
@@ -520,8 +524,6 @@ export class Hud {
           ...(vit ? [el('div', { class: 'hud-row hud-vital' + (vit.index >= 4 || vit.dead ? ' bad' : '') }, el('span', { class: 'hud-label' }, '♥ AvA'), el('b', {}, vit.dead ? 'kein Signal' : `${Math.round(sv.tank.cond)} % · ${vit.name}`))] : []),
           ...(fx.length ? [el('div', { class: 'hud-row hud-buffs hud-fx' }, el('span', { class: 'hud-label' }, 'EFFEKTE'), ...fx.map(e => el('span', { class: `hud-fxchip ${e.kind}`, title: e.sub || null }, e.label, e.left != null ? el('small', {}, ` ${Math.ceil(e.left)} h`) : null)))] : []),
           ...(G ? [goalEl(G, run)] : []));
-        // #017: in the camp the toasts start below this column (they covered the goal line)
-        requestAnimationFrame(() => { const r = !run && !this.campEl.hidden ? this.campEl.getBoundingClientRect() : null; this.toastsEl.style.setProperty('--toast-top', `${r && r.height ? Math.round(r.bottom + 10) : 110}px`); });
       }
     }
   }

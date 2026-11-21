@@ -434,7 +434,10 @@ export const AREAS = {
     hint: '#129 Info-Center (Daniel 21.11.2026: „lass uns ein Information Center konzipieren, um das auch in Zukunft zu vermeiden“): wie Meldungen erscheinen, warten und ins Logbuch gehen. Konzept docs/concepts/info_center.md.',
     sections: [
       { title: 'Bühne', fields: [num('stage.toastMax', 'Hinweise gleichzeitig', { min: 1, max: 8, hint: 'Ab so vielen warten Arten mit „wartet, wenn voll“ in der Schlange. Leer = 3' }),
-        num('stage.stack', 'Meldungen höchstens sichtbar', { min: 1, max: 10, hint: 'Ältere gehen dann. Leer = 5' })] },
+        num('stage.stack', 'Meldungen höchstens sichtbar', { min: 1, max: 10, hint: 'Ältere gehen dann. Leer = 5; Zone D in der Tabelle geht vor' }),
+        table('zones', 'Zonen', [select('id', 'Zone', [['A', 'A · Vitals (oben links; im Bau-Modus die Meldungen)'], ['B', 'B · Ansage (oben Mitte: Raumtitel; bei offenem Fenster die Meldungen)'], ['C', 'C · Status (oben rechts)'], ['D', 'D · Meldungen (rechts unter dem Status)'], ['E', 'E · Aktion (unten Mitte: E-Hinweis, Bau-Meldung)'], ['F', 'F · Lehre (unten links: Lektions-Tipp)'], ['G', 'G · Medien (unten rechts: Kassette, Radio)']]),
+          text('name', 'Name'), num('max', 'Höchstens', { min: 0, max: 10, hint: '0 = ohne Grenze. D: Meldungen sichtbar; E: E-Hinweis oder Bau-Meldung; G: eine Karte' }), bool('compact', 'Kompakt', { hint: 'Meldungen in dieser Zone klein' })],
+        { hint: '#154 Bühne mit festen Plätzen (game/play/stage.js): jede Einblendung hängt in genau einer Zone, nichts liegt übereinander' })] },
       { title: 'Arten', fields: [table('kinds', 'Arten', [text('id', 'ID'), text('name', 'Name'), text('icon', 'Icon', { hint: 'Lucide-Name aus game/icons.js' }), select('sound', 'Ton', [['', '– keiner –'], ['ping', 'Ping'], ['good', 'Gut'], ['nope', 'Nein'], ['fanfare', 'Fanfare'], ['chime', 'Glöckchen'], ['sparkle', 'Glitzern'], ['low', 'Tief']]),
           bool('waitsWindow', 'Wartet bei offenem Fenster'), bool('waitsFull', 'Wartet, wenn voll'), bool('buildLog', 'Im Bau-Modus ins Logbuch'),
           select('cat', 'Logbuch-Kategorie', [['', '– nach Stichwort –'], ['quest', 'Quest'], ['loot', 'Beute'], ['trade', 'Handel'], ['fight', 'Kampf'], ['crew', 'Crew'], ['travel', 'Reise'], ['camp', 'Camp'], ['progress', 'Fortschritt'], ['radio', 'Radio'], ['system', 'System']])],
