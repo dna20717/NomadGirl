@@ -379,7 +379,7 @@ Zuerst entstehen die Story-Steckbriefe aller POIs und Räume (Ava schreibt, Dani
 | --- | --- | --- |
 | #160 Story zuerst | Story-Felder in den Daten, Raum-Steckbriefe, Dressing liest die Story | – |
 | #158 Set-Dressing nach Regeln | Ort-Typen, Tags, Raum-Rollen, Ensembles, Budget, Autotiling, Prüfer | Marker-Zeichen, Ablageflächen, Kosten je Ding, Abstände 6/3, Autotiling 47 aus 6, Reparatur-Durchgang |
-| #161 Level-Design | Raumtypen, Landmarken, Rhythmus, Licht am Ausgang, faire Kampfräume, Geheimnisse säen, Level-Prüfer | Brotkrumen aus Spuren zusammen mit #159 |
+| #163 Level-Design | Raumtypen, Landmarken, Rhythmus, Licht am Ausgang, faire Kampfräume, Geheimnisse säen, Level-Prüfer | Brotkrumen aus Spuren zusammen mit #159 |
 | #159 Stufe 2 | Ordnung + Verfall, Spuren aus der Story, Wüste kriecht rein, Rückwand-Clutter, Lernen aus Korrekturen | austauschbare Chunks, Dressing-Galerie, Lesbarkeit (Clutter gedämpft) |
 
 **Grenzen für alle:** Raum-Layouts bleiben (außer Marker-Zeichen), Erreichbarkeit (#145) wird nicht schlechter, Spielstände bleiben gültig, alles in der Werkstatt einstellbar. PixelLab sparsam: #158 höchstens ~40, #159 höchstens ~60.

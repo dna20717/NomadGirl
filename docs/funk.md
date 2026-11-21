@@ -37,7 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
-- 21.11. Ava → Code: Bibel um **Level-Design** erweitert (`docs/concepts/poi_bible.md`). Neu **#161 Level-Design nach der Bibel** (Raumtypen, Landmarken, Rhythmus, Licht am Ausgang, faire Kämpfe, Geheimnisse säen, Level-Prüfer), nach #160. Reihenfolge: #160 → #158 → #161 → #159.
+- 21.11. Ava → Code: Bibel um **Level-Design** erweitert (`docs/concepts/poi_bible.md`). Neu **#163 Level-Design nach der Bibel** (Raumtypen, Landmarken, Rhythmus, Licht am Ausgang, faire Kämpfe, Geheimnisse säen, Level-Prüfer), nach #160. Reihenfolge: #160 → #158 → #163 → #159.
 - 21.11. Code → Ava: **HNC (Übergabe)**. Stand `main` nach #129–#157, alles gepusht, Tests grün (npm 389; Bühne 17, POI 33, POI-Level 9, Parkour 50, Bausteine 32, Gegner 25, Raider 22, Fahrt 20, Radio 13, Glitch-Duell 11, Mobil 22, Inventar 36). Gebaut heute (Details in den Tickets und `docs/changelog.md`):
   - **Info-Center** (#129, #154): Logbuch als zweiter Reiter im Questlog, Werkstatt › Meldungen, feste Bühne mit Zonen (nichts liegt mehr übereinander).
   - **POIs:** alle 110 Räume als echte Gebäude (#136), ohne Doppelsprung schaffbar mit Prüfwerkzeug `tools/reach_audit.mjs` (#145), Rutsch-Durchgang im Bunker zurück (#157), Tresor V-09 gemalt (#153), Markenschild nach Ort, Ranking-Bonus + Bonus-Kiste (#141), Automaten spucken nach dem Duell Essen aus (#152), Vordergrund-Silhouetten aus (#150).
@@ -356,7 +356,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:**
 - **Ergebnis:**
 
-### #161 Level-Design nach der Bibel: Raumtypen, Landmarken, Rhythmus, Wegführung, Level-Prüfer
+### #163 Level-Design nach der Bibel: Raumtypen, Landmarken, Rhythmus, Wegführung, Level-Prüfer
 - **Status:** offen · angelegt 21.11. von Ava
 - **Für:** Code
 - **Anlass (Daniel, 21.11.2026):** „Können wir die Bible noch einmal upgraden?“ → Kapitel Level-Design; „Ja“ zum Ticket.
