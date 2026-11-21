@@ -710,7 +710,11 @@ export class PlayScene extends Phaser.Scene {
 
   // ---------- loop ----------
   readInput() {
-    const J = Phaser.Input.Keyboard.JustDown, i = this.script ? this.script() : {};   // remote control (game/play/control.js)
+    // a tap shorter than one frame (down and up in the same frame) clears Phaser's JustDown again: a new timeDown counts as pressed, too
+    // (#166: U sometimes did nothing at low frame rates)
+    const J = k => { const fresh = Phaser.Input.Keyboard.JustDown(k), quick = !!k.timeDown && k.timeDown !== k.seenDown; k.seenDown = k.timeDown; return fresh || quick; };
+    const i = this.script ? this.script() : {};   // remote control (game/play/control.js)
+    if (this.script) for (const keys of Object.values(this.keys)) for (const k of keys) k.seenDown = k.timeDown;   // taps under remote control do not wait for later
     if (!this.script) for (const [name, keys] of Object.entries(this.keys)) {
       let pressed = false;
       for (const k of keys) if (J(k)) pressed = true;   // every key once per frame
