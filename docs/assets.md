@@ -260,3 +260,25 @@ Spielauflösung 1920×1080, Kacheln 64 px, Leyla 192 px hoch (Höhe im Spiel ihr
 ## Pixel-Art
 
 Die Startseiten-Grafiken (Leyla von vorn, Wastelands-Hintergrund) sind Pixel-Art in kleiner Auflösung (Hintergrund 576 × 324) und werden scharf skaliert (`imageSmoothingEnabled = false`). Leyla im Spiel bleibt hochaufgelöst und geglättet.
+
+## Wow-Platzhalter (#163)
+
+Jeder POI hat einen Wow-Raum (POIs › Wow); bis gemalte Assets da sind, zeichnet Code das Motiv als Silhouette in AAP-64 mit Glühen und VT323-Schrift (`game/play/level_fx.js` › `drawMotif`), dazu die Landmarke im Himmel und in den Fenstern. Wunschliste für später (PixelLab, sobald verfügbar; Raum, Ablauf und Daten bleiben gleich, nur das Motiv wird getauscht):
+
+| POI | Wow-Raum | Platzhalter (Code) | Später gemalt |
+| --- | --- | --- | --- |
+| Mile 7 Gas & Go | `vorplatz` | Preistafel auf zwei Pfosten, „DIESEL 9,99“, flackert | Preistafel, Tankstellendach |
+| Sunny Acres | `tp_poolparty` | Becken zwischen zwei Rändern, Liegestühle als Linien, Sonnenschirm | Pool-Set, Liegestühle |
+| Funkmast KM 31 | `fm_zettelkabine` | Kabine mit 26 Zetteln, Kopfhörer, Papierfetzen im Wind | Kabine, Zettelwand |
+| Delta South Megamall | `markt_kuppel` | Glaskuppel aus Rippen, Lichtkegel, Rolltreppen-Keil, Banner „SALE −70 %“ | Kuppel, Rolltreppe |
+| Delta Heights | `hh_bruchkante` | Bruchkante mit Schreibtischen, Stahlträger, Papier weht hinaus | Bruchkante, Stahlträger |
+| P+R Delta Süd | `ph_nachtdach` | Kassenhaus im Neon, Skyline, zwei ausgebrannte Autos | Kassenhaus, Autowracks |
+| Metro Line 4 | `mt_gittertor` | Gittertor mit Licht dahinter, „BigCityDelta“, Schlafsäcke | Gittertor, Zug |
+| Storm Drain 9 | `kn_glanzberg` | Haufen mit 30 glänzenden Punkten, Glitzern | Nest |
+| Deadlock Bunker 13 | `bunker_reaktorkern` | Reaktorblock mit grünen Ringen, Dampf | Reaktor |
+| Pit 6 | `sm_kristalldom` | sieben Kristall-Dreiecke mit Glanzkante, Glitzern | Kristalle |
+| Ministry of Order | `min_uhrensaal` | große Uhr mit laufendem Sekundenzeiger, Kronleuchter | Uhr, Kronleuchter |
+| Delta Crude Refinery | `rf_fackelnacht` | Fackelturm mit Flamme, Funkenregen, Fässer der Destille | Fackelturm |
+| Silo Zero | `rs_raketenblick` | Rakete über die Schachthöhe, Anzeige „00:00:01“ rot | Rakete, Startrampe |
+
+Landmarken (POIs › Level-Design › Landmarke: Bild) nutzen dieselben Silhouetten; dazu wünschenswert: Wasserturm mit Lächel-Gesicht, Förderturm, Funkmast-Spitze, Neon-Schild „Penthouse“, Anzeigetafel „Zug fällt aus“.
