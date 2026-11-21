@@ -8,6 +8,9 @@ Stand 21.11.2026 · Recherche und Vorschlag von Ava, Grundsatzfragen von Daniel 
 - **Simulation in G3:** auch zwischen Besuchen. Gruppen wandern, Nester wachsen, Lager ziehen um, während Leyla weg ist (wie Rain World).
 - **Leylas Spuren** (geöffnete Kisten, zerstörte Sirenen, gefallene Bosse): verblassen langsam; einige Tage im Durchgang, dann räumen neue Bewohner auf und bauen um.
 - **Größe mit Zyklen:** Richtwert 7 Räume je Kreis; große POIs wie Silo Zero dürfen mehrere Kreise haben.
+- **Tote und Gore:** ehrlich, moderat, nicht im Overdrive (Daniel: „Gerne ehrlich mit Gore. Nicht Overdrive, sondern moderat“).
+- **Storylets erscheinen** in der Welt (Zettel, Durchsagen, Funk), wandern ins Logbuch, und **AvA kommentiert** wichtige Funde kurz (Splitter, Ereignis).
+- **Gangs zwischen Besuchen:** Eroberungen laufen über den Revierkrieg (#102); das Ökosystem füllt die Details (Verluste, Umzüge, Nester).
 
 ## Neun Schichten
 
@@ -26,7 +29,7 @@ Welt (Weltchronik, Revierkrieg #102) → POI-Geschichte (Steckbrief + Zeitschich
 
 ## Bewährte Tropes (Spuren-Bausteine für G1)
 
-Letzte Pose · Das letzte Logbuch · Indizienkette (2–3 Dinge ergeben einen Hergang) · Der eingefrorene Moment · Die letzte Stellung · Warnung an der Wand · Der Schrein · Die Natur (bei uns: die Wüste) holt es zurück · Werbung gegen Wirklichkeit · Das Haus läuft weiter (Entity-Gewohnheit) · Neue Ordnung im alten Raum · Kinderspuren (sparsam). Grundsätze nach Smith/Worch („What Happened Here?“, GDC 2010): ziehen statt drücken, man muss etwas übersehen können, kein anonymes Detail, am Kern der Welt festmachen, Requisiten mit zwei Ebenen. Wir meiden Gore um seiner selbst willen, Skelett-Witze am Fließband, Erklärtexte und austauschbare Endzeit-Kulisse. Beispiele und Dosierung je Trope: Doc-Fassung.
+Letzte Pose · Das letzte Logbuch · Indizienkette (2–3 Dinge ergeben einen Hergang) · Der eingefrorene Moment · Die letzte Stellung · Warnung an der Wand · Der Schrein · Die Natur (bei uns: die Wüste) holt es zurück · Werbung gegen Wirklichkeit · Das Haus läuft weiter (Entity-Gewohnheit) · Neue Ordnung im alten Raum · Kinderspuren (sparsam). Grundsätze nach Smith/Worch („What Happened Here?“, GDC 2010): ziehen statt drücken, man muss etwas übersehen können, kein anonymes Detail, am Kern der Welt festmachen, Requisiten mit zwei Ebenen. Tote dürfen ehrlich zu sehen sein, mit moderatem Gore; wir meiden Gore im Overdrive, Skelett-Witze am Fließband, Erklärtexte und austauschbare Endzeit-Kulisse. Beispiele und Dosierung je Trope: Doc-Fassung.
 
 ## Wo KI hilft und wo nicht
 

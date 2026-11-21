@@ -223,7 +223,7 @@ Code baut jeden Wow-Raum **ohne neue Grafik** vollständig spielbar:
 | Delta Crude Refinery | Nachts über dem Tankfeld: die Fackel brüllt, Funken regnen | Höhepunkt | Fackel aus Funken- und Feuer-Partikeln, oranges Licht, Fabrik-Set | Fackelturm |
 | Silo Zero | Die Rakete im Schacht, an der Startrampe leuchtet 00:00:01 | Finale | Rakete als Code-Silhouette über die Schachthöhe, Anzeige in VT323 rot, grünes Monitorlicht | Rakete, Startrampe |
 
-Gewürfelte Orte erben den Wow-Raum ihrer POI-Art; die Region färbt ihn (Salz, Glas, Krähen …).
+**Alle 13 Wow-Momente einzeln von Daniel abgenommen (21.11.2026); Landmarken und Atempausen gelten wie vorgeschlagen.** Gewürfelte Orte erben den Wow-Raum ihrer POI-Art; die Region färbt ihn (Salz, Glas, Krähen …).
 
 ### Prüfung
 
@@ -418,7 +418,7 @@ Die Maschine findet und repariert Fehler selbst; Daniel urteilt nur noch über B
 2. **Reparatur-Durchgang** am Ende der Generierung: behebt Schweben, Überlappen und 1-Kachel-Lücken selbst. Die Edgar-Doku zum Dead-Cells-Nachbau schlägt für kaputte Übergänge genau so einen nachgeschalteten Schritt vor ([Edgar](https://ondrejnepozitek.github.io/Edgar-Unity-DocsArchive/docs/2.0.0-alpha.8/examples/dead-cells)).
 3. **Vorher/Nachher-Bilder** `tools/dressing_shots.mjs <tag>`: je POI 3 Stellen, je Verfall 0 und 3, dazu eine Kritiker-Runde.
 4. **Dressing-Galerie** als Abnahme-Artefakt mit Datenbank: jeder Raum mit 6 Seeds nebeneinander, gemessen am Schlüsselbild; Daniel gibt Daumen hoch oder runter, Code macht daraus Regeln.
-5. **Lernen aus Korrekturen** im Spiel: Taste `K` (vorläufig) auf ein Ding, Grund wählen („passt nicht in diesen Raum“, „passt nicht an diesen Ort“, „zu viel hier“, „falsche Größe“, „weg damit“). Daraus wird eine Regel in `data/dressing_rules.json` für alle Seeds, sichtbar und löschbar in der Werkstatt-Liste „Korrekturen“.
+5. **Lernen aus Korrekturen** im Spiel: Taste `K` (nur im Entwickler-Modus) auf ein Ding, Grund wählen („passt nicht in diesen Raum“, „passt nicht an diesen Ort“, „zu viel hier“, „falsche Größe“, „weg damit“). Daraus wird eine Regel in `data/dressing_rules.json` für alle Seeds, sichtbar und löschbar in der Werkstatt-Liste „Korrekturen“.
 6. **Selbst nachstellender Kritiker** (später, Daniel 21.11.2026: ja): Code rendert, bewertet gegen Schlüsselbild und Referenzen und dreht Dichte, Abstände und Verfall selbst; Daniel wählt aus den besten drei.
 
 ## Umsetzung
@@ -439,7 +439,7 @@ Zuerst entstehen die Story-Steckbriefe aller POIs und Räume (Ava schreibt, Dani
 ### Offene Fragen
 
 - [x] Verfall-Werte je POI so lassen (Ministerium 1, Großmarkt 2, Bunker 2, Tankstelle 3)? → ja
-- [ ] Taste `K` für Korrekturen nur im Debug-Modus oder auch im normalen Spiel?
+- [x] Taste `K` für Korrekturen nur im Debug-Modus oder auch im normalen Spiel? → nur im Entwickler-Modus (Daniel, 21.11.2026)
 - [x] Story-Steckbriefe für alle POIs (Ava schreibt, Daniel segnet ab) → geschrieben und abgenommen (21.11.2026)
 - [x] Selbst nachstellender Kritiker später dazu? → ja
 
