@@ -7694,5 +7694,70 @@
   "source": "KI (PixelLab, create_image_pro 64 × 128, Stil props_big)",
   "date": "2026-11-21",
   "description": "Zwei Stahlrohre mit X-Streben, rostig, senkrecht kachelbar (#156)."
+ },
+ "drive_bus": {
+  "name": "Fahrt · Verlassener Bus",
+  "kind": "image",
+  "file": "assets/drive/bus.png",
+  "source": "KI (PixelLab, create_image_pro, Stil props_big), Freigabe Daniel 21.11.2026 (#162)",
+  "date": "2026-11-21",
+  "height": 380
+ },
+ "drive_wreck": {
+  "name": "Fahrt · Autowrack auf dem Dach",
+  "kind": "image",
+  "file": "assets/drive/wreck.png",
+  "source": "KI (PixelLab, create_image_pro, Stil props_big), Freigabe Daniel 21.11.2026 (#162)",
+  "date": "2026-11-21",
+  "height": 150
+ },
+ "drive_drone": {
+  "name": "Fahrt · Abgestürzte Kurierdrohne",
+  "kind": "image",
+  "file": "assets/drive/drone.png",
+  "source": "KI (PixelLab, create_image_pro, Stil props_big), Freigabe Daniel 21.11.2026 (#162)",
+  "date": "2026-11-21",
+  "height": 140
+ },
+ "drive_shrine": {
+  "name": "Fahrt · Schrein am Kilometerstein",
+  "kind": "image",
+  "file": "assets/drive/shrine.png",
+  "source": "KI (PixelLab, create_image_pro, Stil props_big), Freigabe Daniel 21.11.2026 (#162)",
+  "date": "2026-11-21",
+  "height": 190
+ },
+ "drive_mast": {
+  "name": "Fahrt · Funkmast",
+  "kind": "image",
+  "file": "assets/drive/mast.png",
+  "source": "KI (PixelLab, create_image_pro, Stil props_big), Freigabe Daniel 21.11.2026 (#162)",
+  "date": "2026-11-21",
+  "height": 900
+ },
+ "drive_pylon": {
+  "name": "Fahrt · Hochspannungsmast",
+  "kind": "image",
+  "file": "assets/drive/pylon.png",
+  "source": "KI (PixelLab, create_image_pro, Stil props_big), Freigabe Daniel 21.11.2026 (#162)",
+  "date": "2026-11-21",
+  "height": 800
+ },
+ "drive_asphalt": {
+  "name": "Fahrt · Asphalt seitlich (nahtlos)",
+  "kind": "image",
+  "file": "assets/drive/asphalt.png",
+  "source": "KI (PixelLab, create_image_pro, Stil props_big), Freigabe Daniel 21.11.2026 (#162)",
+  "date": "2026-11-21"
+ },
+ "drive_clouds": {
+  "name": "Fahrt · Wolken",
+  "kind": "icons",
+  "file": "assets/drive/clouds.png",
+  "cell": [42, 36],
+  "grid": [6, 1],
+  "names": ["wolke_1", "wolke_2", "wolke_3", "wolke_4", "wolke_5", "wolke_6"],
+  "source": "KI (PixelLab, create_image_pro, Stil props_big), Freigabe Daniel 21.11.2026 (#162)",
+  "date": "2026-11-21"
  }
 }

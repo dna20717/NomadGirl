@@ -41,7 +41,8 @@ export function driveArt(D) {
   return { road: A.road || null, roadTurn: A.roadTurn !== false, roadSquash: clamp((A.roadSquash ?? 33) / 100, 0.05, 1), ground: A.ground || null, plain: A.plain || null,
     billboard: A.billboard || null, screenAt: A.screenAt || [22, 26], screenSize: A.screenSize || [196, 62], billboardSize: (A.billboardSize ?? 150) / 100,
     pole: A.pole || null, poleCell: A.poleCell || '1', weed: A.weed || null, weedCell: A.weedCell || '1', propGap: Math.max(16, A.propGap ?? 260),
-    props: Array.isArray(A.props) ? A.props.filter(p => p?.look) : [], incidents: Array.isArray(A.incidents) ? A.incidents.filter(p => p?.kind && p.look) : [] };
+    props: Array.isArray(A.props) ? A.props.filter(p => p?.look) : [], incidents: Array.isArray(A.incidents) ? A.incidents.filter(p => p?.kind && p.look) : [],
+    clouds: A.clouds || null, cloudSize: (A.cloudSize ?? 100) / 100, pylon: A.pylon || null };   // #162 painted clouds and pylons
 }
 const LAND = { region: '', relief: 'mesas', far: '#8e5252', mid: '#a08662', ground: '#dba463', road: '#333941', plants: '#5a4e44', rock: '#71413b',
   ruins: 15, wrecks: 12, towers: 6, signs: 10, plantsN: 30, poles: 1, pylons: 0, city: 20, dust: 15, fog: 10 };
@@ -95,7 +96,7 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
   let n = 1;
   const imgOf = id => { if (!id || !art) return null; const i = art(id); return i && i.complete !== false && (i.naturalWidth || i.width) ? i : null; };
   // load everything once up front, so the code look shows only for a moment
-  if (art) for (const id of [ART.road, ART.ground, ART.plain, ART.billboard, ART.pole, ART.weed, ...ART.props.map(p => p.look), ...ART.incidents.map(p => p.look)]) imgOf(id);
+  if (art) for (const id of [ART.road, ART.ground, ART.plain, ART.billboard, ART.pole, ART.weed, ART.clouds, ART.pylon, ...ART.props.map(p => p.look), ...ART.incidents.map(p => p.look)]) imgOf(id);
   const cellsOf = s => String(s ?? '').split(',').map(x => x.trim()).filter(Boolean);
   // one picture of an asset: a cell of a symbol grid (number from 1 or its name), a frame of an animation, or the whole image;
   // h = its height in the world (the asset's „Höhe im Spiel“, else its pixels)
@@ -533,9 +534,14 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
     }
     // clouds: dark bodies, lit from below by a low sun, slowly drifting against the drive
     const cDark = mix(mix(S.top, S.mid, 0.5), [30, 20, 40], 0.4), cLight = S.warm > 0.1 ? mix(S.sun.col, hex('#f5a097'), 0.4) : mix([255, 255, 255], S.hor, 0.3);
-    for (const c of clouds) {
+    const cloudCells = ART.clouds ? (D.assets?.[ART.clouds]?.grid || [1, 1]).reduce((a, b) => a * b, 1) : 0;
+    for (const [ci, c] of clouds.entries()) {
       const x = Math.round(((c.x * (BW + 160) - st.dist * 0.03 * c.v - t * 1.5 * c.v) % (BW + 160) + (BW + 160)) % (BW + 160) - 80), y = Math.round(c.y);
       const day = 1 - S.dark;
+      if (cloudCells) {   // #162 painted clouds (Fahrt › Grafiken › Wolken), toned by the hour like everything painted
+        const sp = sprite(ART.clouds, 1 + ci % cloudCells, t);
+        if (sp) { const w = c.w * 0.9 * ART.cloudSize, h = w * sp.sh / sp.sw; ctx.save(); ctx.globalAlpha = 0.92 * (1 - S.dark * 0.5); put(ctx, sp, x, y + h * 0.6, w, h, 0.6, S, st, ci % 2 === 1); ctx.restore(); continue; }
+      }
       ctx.fillStyle = css(mix(cDark, mix([235, 235, 245], S.hor, 0.3), day * 0.7 * (1 - S.warm * 0.6)), 0.9); ctx.fillRect(x, y, Math.round(c.w), c.h);
       ctx.fillRect(x + 6, y - 1, Math.round(c.w * 0.5), 1);
       ctx.fillStyle = css(cLight, (0.25 + 0.6 * S.warm) * (1 - S.dark * 0.8)); ctx.fillRect(x + 3, y + c.h, Math.round(c.w * 0.75), 1);
@@ -629,8 +635,10 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
     if ((L.pylons ?? 0) > 0) {
       const off = st.dist * 0.45, gap = 96, c = tone('#333941', 0.3, S, st), ys = [];
       ctx.fillStyle = css(c);
+      const psp = ART.pylon ? sprite(ART.pylon, 1, t) : null;
       for (let i = Math.floor((off - gap) / gap); i * gap - off < BW + gap; i++) {
         const x = Math.round(i * gap - off); ys.push(x);
+        if (psp) { const h = 40, w = psp.sw * h / psp.sh; put(ctx, psp, x - w / 2, 205, w, h, 0.45, S, st); continue; }   // #162 the painted pylon, wires stay code
         ctx.fillRect(x, 168, 1, 36); ctx.fillRect(x - 3, 170, 7, 1); ctx.fillRect(x - 2, 175, 5, 1); ctx.fillRect(x - 1, 180, 1, 24); ctx.fillRect(x + 1, 180, 1, 24);
       }
       ctx.strokeStyle = css(c, 0.8); ctx.lineWidth = 1; ctx.beginPath();

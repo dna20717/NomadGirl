@@ -24,9 +24,9 @@
   "music": ["drive_a", "drive_b"],
   "musicVolume": 40,
   "art": {
-   "road": "ck_road",
-   "roadTurn": true,
-   "roadSquash": 33,
+   "road": "drive_asphalt",
+   "roadTurn": false,
+   "roadSquash": 100,
    "ground": "camp_ground_fine",
    "plain": "desert_plain",
    "billboard": "ck_billboard",
@@ -83,8 +83,16 @@
     {"kind": "trader", "look": "kit_crate", "cell": "2", "size": 100, "dx": 200},
     {"kind": "trader", "look": "kit_lantern", "size": 100, "dx": 270, "fx": "lamp"},
     {"kind": "hitchhiker", "look": "kit_ground_items", "cell": "Wegweiser", "size": 120, "dx": 0},
-    {"kind": "hitchhiker", "look": "kit_ground_items", "cell": "Seesack", "size": 100, "dx": -70}
-   ]
+    {"kind": "hitchhiker", "look": "kit_ground_items", "cell": "Seesack", "size": 100, "dx": -70},
+    {"kind": "bus", "look": "drive_bus", "size": 100, "dx": 0, "fx": "lamp"},
+    {"kind": "wreck", "look": "drive_wreck", "size": 140, "dx": 0, "fx": "smoke"},
+    {"kind": "drone", "look": "drive_drone", "size": 140, "dx": 0, "fx": "blink, smoke"},
+    {"kind": "shrine", "look": "drive_shrine", "size": 140, "dx": 0, "fx": "glow"},
+    {"kind": "tower", "look": "drive_mast", "size": 100, "dx": 0, "fx": "blink"}
+   ],
+   "clouds": "drive_clouds",
+   "cloudSize": 65,
+   "pylon": "drive_pylon"
   },
   "nearScale": 70
  },

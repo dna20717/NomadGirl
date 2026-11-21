@@ -287,9 +287,9 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #162 Fahrt: Wunschliste Grafiken
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Wunschliste freigegeben“: Zwischenfälle Bus, Autowrack, abgestürzte Drohne, Schrein, Funkmast; Wolken; Hochspannungsmast; seitlicher Asphalt, ca. 70 PixelLab)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Wunschliste freigegeben“: Zwischenfälle Bus, Autowrack, abgestürzte Drohne, Schrein, Funkmast; Wolken; Hochspannungsmast; seitlicher Asphalt, ca. 70 PixelLab)
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Bus, Autowrack, Drohne, Schrein, Funkmast, Hochspannungsmast, 6 Wolken und seitlicher Asphalt gemalt (PixelLab ≈ 80) und eingebaut (Fahrt › Grafiken: Wolken, Wolken-Größe, Hochspannungsmast; Zwischenfälle-Tabelle). Test `drive_test` 20. **Bitte testen:** Fahrten bei Tag und Nacht, durch die Salzpfanne (Hochspannung).
 
 ### #149 Leiter: Rutschen endet am Leiterende
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Wenn Leyla eine Leiter runterrutscht, kann sie weiter rutschen, obwohl die Leiter zu Ende ist.“)
