@@ -250,7 +250,9 @@ const lg = await ev(() => {
   out.empty = G.state();
   out.thrown = G.thrown;
   G.refillAt = s.now; nomad.step(2);
-  out.refilled = G.state().charges;
+  out.refilled = G.state().charges; out.mode = G.c.refill;   // #156 Daniel: einzeln, je Ladung 60 s
+  for (let i = 0; i < 3; i++) { G.refillAt = s.now; nomad.step(2); }
+  out.full = G.state().charges;
   // while running: she keeps running, the grenade flies
   nomad.step(20, ['right']);
   const n = G.thrown;
@@ -260,8 +262,8 @@ const lg = await ev(() => {
   return out;
 });
 check('Granate: T wirft (Wurf-Schicht), sie fliegt und trifft', lg.pose && lg.flying === 1 && lg.dmg > 0, lg);
-check('Granate: Ladungen zählen runter, Abklingzeit läuft', lg.after1.charges === 2 && lg.after1.refillIn > 170000 && lg.empty.charges === 0 && lg.thrown === 3, lg);
-check('Granate: nach der Abklingzeit wieder voll', lg.refilled === 3, lg);
+check('Granate: Ladungen zählen runter, Abklingzeit läuft', lg.after1.charges === 2 && lg.after1.refillIn > 50000 && lg.empty.charges === 0 && lg.thrown === 3, lg);
+check('Granate: einzeln, je Abklingzeit eine Ladung, dann voll (#156)', (lg.mode === 'each' ? lg.refilled === 1 : lg.refilled === 3) && lg.full === 3, lg);
 check('Granate: Wurf im Rennen, sie rennt weiter', lg.run.thrown === 1 && lg.run.vx > 200 && lg.run.state === 'normal', lg);
 
 await browser.close();
