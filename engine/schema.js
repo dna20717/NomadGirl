@@ -283,8 +283,14 @@ export const AREAS = {
         ref('tiles.terrain', 'Kachel-Set', 'terrain', { hint: 'Wände und Böden in allen Räumen ohne eigenes Kachel-Set. Leer = aus Code gezeichnet' }),
         bool('tiles.depth', 'Tiefe aus Code', { hint: 'Licht, Schatten und Masse für alle Kachel-Sets (Kachel-Sets › Tiefe); aus = flach wie früher' }), num('tiles.leylaCm', 'Leyla ist groß', { unit: 'cm', min: 50, hint: 'Maßstab für Clutter-Größen: Leylas Höhe im Spiel (Asset Stehen) entspricht so vielen Zentimetern. Leer = 170' })] },
       { title: 'Set-Dressing', fields: [bool('dressing.overlay', 'Ort-Typen zeigen', { hint: '#158 (Daniel 21.11.2026: „ein Baum oben auf einem Hochhaus“): im Spiel liegt über jedem Raum eine farbige Markierung, wo was hin darf: Boden drinnen (türkis), Boden draußen (gelb), Dach (pink), Steg / Sims / Theke (violett), Ecke am Wandfuß (orange), Decke (grün), Wand (grau). Zum Nachsehen; aus = normal spielen. Fernsteuerung: nomad.places(true)' }),
-        table('dressing.roles', 'Rollen', [select('role', 'Rolle', ROOM_ROLES), text('prefer', 'Bevorzugt Tags'), text('avoid', 'Meidet Tags')],
-          { hint: 'Je Raum-Rolle: Clutter mit diesen Tags (Komma) kommt doppelt so oft, gemiedene viermal seltener. Dazu zählen die Rollen in den Clutter-Regeln: passt die Rolle, dreimal so oft; nennt ein Stück andere Rollen, viermal seltener' })] },
+        bool('dressing.enabled', 'Nach Regeln einrichten', { hint: '#158: Räume, deren Kachel-Set Clutter-Regeln hat, werden nach Plan eingerichtet (POI-Ensembles zuerst, dann Einzelstücke bis zur Dichte, Wege frei). Aus = überall wie früher würfeln (Clutter-Chance je Kachel). Leer = an' }),
+        num('dressing.density', 'Dichte', { unit: 'Dinge je 10 Bodenkacheln', min: 0, max: 10, step: 0.1, hint: 'Daniels Wahl „bewohnt“ ≈ 3. Gilt für Rollen ohne eigene Dichte (Tabelle unten)' }),
+        num('dressing.minGap', 'Abstand', { unit: 'Kacheln', min: 0, max: 4, hint: 'Freie Kacheln zwischen zwei Dingen bzw. Gruppen am Boden (#096: nichts lehnt ineinander). Leer = 1' }),
+        num('dressing.ensembles', 'Anteil Ensembles', { unit: '% der Dichte', min: 0, max: 100, hint: 'So viel vom Budget eines Raums dürfen POI-Ensembles belegen, der Rest sind Einzelstücke. Leer = 50' }),
+        num('dressing.wall', 'Anteil Wand & Decke', { unit: '% der Dichte', min: 0, max: 100, hint: 'Schilder, Bilder, Schränke an der Rückwand und Hängendes unter der Decke, zusätzlich zum Boden. Leer = 12' }),
+        num('dressing.brandWeight', 'Marken-Gewicht', { unit: '%', min: 0, hint: 'Marken-Clutter (POIs › Marken-Clutter) zählt mit seiner Chance × diesem Wert gegen ein Clutter-Stück (Gewicht 1). Leer = 40' }),
+        table('dressing.roles', 'Rollen', [select('role', 'Rolle', ROOM_ROLES), num('density', 'Dichte', { min: 0, max: 10, step: 0.1 }), text('prefer', 'Bevorzugt Tags'), text('avoid', 'Meidet Tags')],
+          { hint: 'Je Raum-Rolle: Dichte (Dinge je 10 Bodenkacheln, leer = Dichte oben); Clutter mit den bevorzugten Tags (Komma) kommt doppelt so oft, gemiedene viermal seltener. Dazu zählen die Rollen in den Clutter-Regeln: passt die Rolle, dreimal so oft; nennt ein Stück andere Rollen, viermal seltener. Der Abkürzungs-Tunnel unter dem Level zählt als Gang' })] },
       { title: 'Atmosphäre', fields: [bool('atmosphere.enabled', 'Licht & Atmosphäre', { hint: 'Dunkelheit mit Lampen, Glühen, Farbstimmung, Staub, Funken, Tropfen und Bodennebel (Bereich Atmosphäre). Aus = alles gleich hell wie früher. Nicht im Camp' }),
         ref('atmosphere.default', 'Standard', 'atmosphere', { hint: 'Für Räume, deren Raum-Baustein und Kachel-Set keine Atmosphäre nennen. Leer = keine' }),
         num('atmosphere.scale', 'Lichtkarte grob', { unit: '×', min: 1, max: 16, hint: 'Die Lichtkarte wird in 1/n der Auflösung gerechnet und weich hochskaliert. Größer = schneller und weicher. Leer = 4' }),
@@ -1741,6 +1747,25 @@ export const AREAS = {
       if (tagged.size) for (const n of [...new Set([...(x.clutter || []), ...(x.bigClutter || [])])]) if (!tagged.has(n)) report('hint', `Clutter-Regeln: „${n}“ hat keine Zeile (steht dann auf jedem Boden)`);
     },
   },
+  poiSets: {
+    name: 'POI-Ensembles', singular: 'POI-Ensemble', icon: 'particles', file: 'data/poi_sets.json', kind: 'catalog',
+    hint: '#158 Set-Dressing (Daniel 21.11.2026: „Wie können wir hübschere, echter anfühlende Maps erschaffen, ohne dass ich alles selbst machen muss?“): Baupläne für Gruppen, die in POI-Räumen zusammen stehen (wie die Camp-Ensembles, nur umgedreht: das Spiel stellt sie auf). Kern zuerst, Begleiter links oder rechts daneben, je mit Tag aus Kachel-Sets › Clutter-Regeln (mehrere mit |). Einzelstücke füllen danach auf.',
+    template: { name: 'Neues POI-Ensemble', place: ['floor_in'], weight: 1, members: [{ tag: 'tisch', side: 'core' }, { tag: 'sitz', side: 'left', gap: 0 }] },
+    row: x => `${(x.members || []).map(m => m.tag).join(' + ')}${x.roles?.length ? ' · ' + x.roles.map(r => label(ROOM_ROLES, r)).join(', ') : ''}`,
+    sections: [{ title: 'Ensemble', fields: [NAME, DESCRIPTION, multi('roles', 'Rollen', ROOM_ROLES, { hint: 'In Räumen mit dieser Rolle (Raum-Bausteine › Rolle). Leer = überall' }),
+      multi('place', 'Steht auf', PLACE_TYPES.filter(([k]) => ['floor_in', 'floor_out', 'roof', 'ledge'].includes(k)), { hint: 'Ort-Typen für die ganze Gruppe. Leer = Boden drinnen' }),
+      bool('corner', 'Am liebsten in der Ecke', { hint: 'Sucht zuerst einen Platz am Wandfuß' }), num('weight', 'Häufigkeit', { min: 0, hint: 'Gegenüber den anderen passenden Ensembles. Leer = 1' })] },
+    { title: 'Bauplan', wide: true, fields: [table('members', 'Stücke', [text('tag', 'Tag'), select('side', 'Seite', [['core', 'Kern'], ['left', 'links'], ['right', 'rechts']]), num('gap', 'Abstand', { unit: 'Kacheln', min: 0 }), bool('optional', 'Darf fehlen')],
+      { hint: 'Erste Zeile = Kern. Links/rechts reihen sich nach außen an (Abstand = freie Kacheln zum Nachbarn, leer = 0). Tag aus den Clutter-Regeln, mehrere mit | (kiste|fass). Fehlt ein Pflicht-Stück, sucht das Ensemble einen anderen Platz' })] }],
+    check: (x, report, p) => {
+      const ms = x.members || [];
+      if (!ms.length) report('warning', 'Bauplan ohne Stücke');
+      if (ms.length && ms[0].side && ms[0].side !== 'core') report('warning', 'Die erste Zeile sollte der Kern sein');
+      const tags = new Set(Object.values(p?.data?.terrain || {}).flatMap(t => (t.dressing || []).flatMap(r => splitList(r.tags))));
+      for (const r of Object.values(p?.data?.pois || {}).flatMap(P => P.brandProps || [])) for (const t of splitList(r.tags)) tags.add(t);
+      for (const m of ms) for (const t of String(m.tag || '').split('|').map(v => v.trim()).filter(Boolean)) if (!tags.has(t)) report('warning', `Kein Clutter hat den Tag „${t}“ (Kachel-Sets › Clutter-Regeln)`);
+    },
+  },
   atmosphere: {
     name: 'Atmosphäre', singular: 'Atmosphäre', icon: 'light', file: 'data/atmosphere.json', kind: 'catalog',
     hint: 'Licht und Stimmung in Räumen und POI-Levels (Daniel, 11.11.2026: „Atmosphäre und Beleuchtung, damit alles nicht so blank wirkt“): Dunkelheit, Lampen an der Decke, Farbstimmung, Vignette, Staub, Funken, Tropfen, Bodennebel. Kachel-Sets und Raum-Bausteine wählen ihre Atmosphäre. Alles aus Code.',
@@ -2016,7 +2041,7 @@ export const GROUPS = [
   ['ACHIEVEMENTS & AUFTRÄGE', ['achievements', 'quests']],
   ['PROGRESSION', ['techtree', 'resources']],
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'decorSets', 'megarigs', 'rigAddons', 'salvage', 'people', 'companions']],
-  ['WELT', ['worldmap', 'parallax', 'pois', 'rooms', 'terrain', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
+  ['WELT', ['worldmap', 'parallax', 'pois', 'rooms', 'terrain', 'poiSets', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
   ['LORE', ['brands']],
   ['ENTITIES', ['glitchlings']],
 ];

@@ -139,3 +139,171 @@ export function pickWeighted(items, weightOf, r) {
   for (let i = 0; i < items.length; i++) { t -= ws[i]; if (t < 0) return items[i]; }
   return items.at(-1);
 }
+
+// ---------- the plan (#158 steps 4 + 5): ensembles first, then single things up to a budget, ways kept free ----------
+// Spiel › Set-Dressing: density = things per 10 floor tiles („bewohnt“ ≈ 3), per role in the table Rollen; minGap = free tiles between
+// two things (Poisson along the floor); ensembles = share of the budget for ensembles (%); wall = share for wall and ceiling things (%)
+export const DRESSING = { density: 3, minGap: 1, ensembles: 50, wall: 12, brandWeight: 40 };
+export function dressingConfig(D) {
+  const g = D?.game?.dressing || {}, dens = new Map((g.roles || []).filter(r => r.role && r.density != null).map(r => [r.role, r.density]));
+  return { ...DRESSING, ...Object.fromEntries(Object.entries(g).filter(([k, v]) => k in DRESSING && v != null)), densityOf: role => dens.get(role) ?? g.density ?? DRESSING.density };
+}
+const hash = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + s * 2246822519) >>> 0; h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+const FIXED = new Set('.#=HoLCSDBZA^v*%$@!'.split(''));
+const pxPerCm = D => (D.assets?.[D.leyla?.look?.idle]?.height || 192) / (D.game?.tiles?.leylaCm || 170);
+const cellH = (D, key) => { const c = D.assets?.[key]?.cell; return Array.isArray(c) ? c[1] : c || 64; };
+// everything a Kachel-Set can put down: clutter (a name twice = twice as often) and large clutter (two tiles wide), with its rule.
+// → [{ set, key, name, w, h (tiles high), rule }]; a set without Clutter-Regeln gives [] (it keeps the old dice in art.js)
+export function setPool(D, id, T = 64) {
+  const t = D.terrain?.[id];
+  if (!t?.dressing?.length) return [];
+  const rules = new Map(t.dressing.filter(r => r.name).map(r => [r.name, r])), cm = new Map((t.sizes || []).map(r => [r.name, r.cm])), k = pxPerCm(D);
+  const tall = (key, n) => Math.max(1, Math.ceil((cm.get(n) ? cm.get(n) * k : cellH(D, key)) / T - 0.15));
+  const out = [];
+  for (const n of t.clutter || []) if (t.props) out.push({ set: id, key: t.props, name: n, w: 1, h: tall(t.props, n), rule: rules.get(n) || {} });
+  for (const n of t.bigClutter || []) if (t.propsBig) out.push({ set: id, key: t.propsBig, name: n, w: 2, h: tall(t.propsBig, n), rule: rules.get(n) || {} });
+  return out;
+}
+// Marken-Clutter of a POI as candidates: their chance becomes their weight (Spiel › Set-Dressing › Marken-Gewicht)
+export function brandPool(D, poiId, T = 64) {
+  const k = pxPerCm(D), w = dressingConfig(D).brandWeight / 100;
+  return (D.pois?.[poiId]?.brandProps || []).filter(b => b.look && b.name).map(b => ({ set: null, brand: true, key: b.look, name: b.name, w: 1, h: Math.max(1, Math.ceil((b.cm || 100) * k / T - 0.15)), ai: !!b.ai,
+    rule: { ...b, weight: (b.chance ?? 5) * w } }));
+}
+const tagsOf = c => list(c.rule?.tags);
+export const matchesTag = (c, tag) => String(tag || '').split('|').map(s => s.trim()).filter(Boolean).some(t => tagsOf(c).includes(t));
+
+// Ways and fighting spots stay free (#158 step 5): Leyla's start, doors, ladders (foot and top), switches, chests, the goal, terminals,
+// alarms, spawns, brittle and fake walls, shortcut ends, jump edges (the last floor tile before a drop) and the openings between rooms
+export function keepClear(room, spots, reg = {}) {
+  const { w, h, tiles } = room, ch = (x, y) => tiles[y]?.[x], keep = new Set(), wallKeep = new Set();
+  const carries = (x, y) => { const c = ch(x, y); return c == null || '#A^v%$='.includes(c); };
+  const mark = (x, y, r) => { for (let dx = -r; dx <= r; dx++) keep.add((x + dx) + ',' + y); };
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const c = ch(x, y);
+    if (c === '.' || c === '#' || c === '=' || c === '*') continue;
+    const r = c === 'L' || c === 'Z' || c === 'D' ? 2 : 1;
+    if ('LSCZ@!1'.includes(c) || !FIXED.has(c)) mark(x, y + 1, r);
+    if ('DB%$'.includes(c)) { mark(x, y + 1, 2); mark(x, y, 1); }
+    if (c === 'H') { if (ch(x, y + 1) !== 'H') mark(x, y + 1, 1); if (ch(x, y - 1) !== 'H') { mark(x, y, 1); mark(x, y + 1, 1); } }
+    if ('^vA'.includes(c)) mark(x, y, 1);
+    if ('HDSC@!Z%$B'.includes(c) || !FIXED.has(c)) for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) wallKeep.add((x + dx) + ',' + (y + dy));
+  }
+  for (const s of spots.list) {
+    if (!STANDING.has(s.type)) continue;
+    if ((s.x === s.run[0] && !s.corner && !carries(s.x - 1, s.y)) || (s.x === s.run[1] && !carries(s.x + 1, s.y))) keep.add(s.x + ',' + s.y);   // jump edge
+    if (reg.roomAt) for (let dx = -2; dx <= 2; dx++) if (dx && ch(s.x + dx, s.y - 1) === '.' && reg.roomAt(s.x + dx, s.y - 1) !== reg.roomAt(s.x, s.y - 1)) keep.add(s.x + ',' + s.y);   // opening between rooms
+  }
+  return { keep, wallKeep };
+}
+
+// The plan for a room or level: → { items, regions, planned(x, y), keep }
+//   items: [{ x, y, w, h, hang: 'stand' | 'ceiling' | 'wall', type (place type), set, key, name, brand, ai, ens (ensemble id) }]
+//     stand: tiles x … x+w-1 carry it in row y, it stands on top; ceiling: hangs under the wall above tile (x, y); wall: on the back wall at (x, y)
+//   regions: [{ key, role, set, spots, budget, placed }]
+// Only rooms whose Kachel-Set has Clutter-Regeln are planned; planned(x, y) tells art.js which floor tiles are left for the old dice.
+// Deterministic: the same level and seed give the same plan.
+export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 64, singles = true }) {
+  const cfg = dressingConfig(D), rc = roleConfig(D), ch = (x, y) => room.tiles[y]?.[x];
+  const pools = new Map(), poolOf = id => { if (!pools.has(id)) pools.set(id, setPool(D, id, T)); return pools.get(id); };
+  const brands = brandPool(D, poiId, T), sets = Object.keys(D.terrain || {});
+  const { keep, wallKeep } = keepClear(room, spots, reg);
+  const idAt = reg.idAt || (() => null), roleAt = reg.roleAt || (() => 'general'), roomAt = reg.roomAt || (() => null);
+  const keyOf = r => r ? `${r.id}@${r.x},${r.y}` : 'room';
+  const taken = new Map(), items = [], s0 = (seed >>> 0) % 100003;
+  const free = (x, y) => !taken.has(x + ',' + y);
+  const lampAbove = (x, y) => { for (let k = 1; k <= 8; k++) { const c = ch(x, y - k); if (c === '*') return true; if (c !== '.' && c != null) return false; } return false; };
+  const score = s => (s.corner ? 3 : 0) + (lampAbove(s.x, s.y) ? 1 : 0) + hash(s.x, s.y, s0 + 11) * 1.5;
+  // regions: spots grouped by the room they belong to (the air above them)
+  const regions = new Map();
+  for (const s of spots.list) {
+    const air = STANDING.has(s.type) ? [s.x, s.y - 1] : [s.x, s.y];
+    const set = idAt(...air);
+    if (!poolOf(set).length) continue;
+    const r = roomAt(...air), key = keyOf(r);
+    if (!regions.has(key)) regions.set(key, { key, role: roleAt(...air), set, stand: [], hang: [], placed: 0 });
+    regions.get(key)[STANDING.has(s.type) ? 'stand' : 'hang'].push(s);
+  }
+  const fitsAt = (c, x, y) => {
+    for (let i = 0; i < c.w; i++) {
+      const s = spots.at(x + i, y);
+      if (!s || !STANDING.has(s.type) || !fits(c.rule.place, s) || s.air < c.h || keep.has((x + i) + ',' + y) || !free(x + i, y)) return false;
+    }
+    return true;
+  };
+  const gapFree = (x0, x1, y, g) => { for (let x = x0 - g; x < x0; x++) if (!free(x, y)) return false; for (let x = x1 + 1; x <= x1 + g; x++) if (!free(x, y)) return false; return true; };
+  const put = (c, x, y, hang, type, ens, R) => {
+    const it = { x, y, w: c.w, h: c.h, hang, type, set: c.set, key: c.key, name: c.name, brand: !!c.brand, ai: !!c.ai, ens: ens || null, room: R.key };
+    items.push(it);
+    if (hang === 'stand') for (let i = 0; i < c.w; i++) taken.set((x + i) + ',' + y, it);
+    R.placed++;
+    return it;
+  };
+  const cands = (R, extra = false) => [...poolOf(R.set), ...brands, ...(extra ? sets.filter(id => id !== R.set).flatMap(id => poolOf(id).map(c => ({ ...c, borrowed: true }))) : [])];
+  const weight = (c, role) => roleWeight(c.rule, role, rc) * (c.borrowed ? 0.3 : 1);
+  const hangOnly = c => { const P = list(c.rule.place); return P.length > 0 && P.every(p => p === 'wall' || p === 'ceiling'); };
+  let ri = 0;
+  for (const R of regions.values()) {
+    ri++;
+    R.spots = R.stand.length;
+    R.budget = Math.round(R.spots * cfg.densityOf(R.role) / 10);
+    const order = [...R.stand].sort((a, b) => score(b) - score(a));
+    // 1. ensembles (POI-Ensembles): the core on a good spot, companions to its left and right
+    const ensBudget = Math.floor(R.budget * cfg.ensembles / 100);
+    const ensList = Object.entries(D.poiSets || {}).filter(([, e]) => (e.weight ?? 1) > 0 && (e.members || []).length && (!e.roles?.length || e.roles.includes(R.role)));
+    const pool = cands(R, true).filter(c => !hangOnly(c));
+    let ensPlaced = 0;
+    for (let k = 0; k < 6 && ensList.length && ensPlaced < ensBudget; k++) {
+      const [eid, E] = pickWeighted(ensList, ([, e]) => (e.weight ?? 1) * (e.roles?.length ? 2 : 1), hash(k, ri, s0 + 21));
+      const places = E.place?.length ? E.place : ['floor_in'];
+      const at = (c, x, y) => fitsAt(c, x, y) && places.includes(spots.at(x, y).type);
+      for (const a of order.filter(s => places.includes(s.type) && (!E.corner || s.corner || k > 2)).slice(0, 40)) {
+        if (!free(a.x, a.y) || keep.has(a.x + ',' + a.y)) continue;
+        const ms = E.members, plan = [], used = new Set();
+        // the same thing twice only where the plan repeats the core (a row of benches, registers, sandbags)
+        const coreTags = String(ms[0].tag || '').split('|').map(t => t.trim()), repeats = m => String(m.tag || '').split('|').some(t => coreTags.includes(t.trim()));
+        const c0 = pickWeighted(pool.filter(c => matchesTag(c, ms[0].tag) && at(c, c.w === 2 && a.corner === 'r' ? a.x - 1 : a.x, a.y)), c => weight(c, R.role), hash(a.x, a.y, s0 + 31 + k));
+        if (!c0) continue;
+        const cx = c0.w === 2 && a.corner === 'r' ? a.x - 1 : a.x;   // a wide core at a right-hand wall leans away from it
+        plan.push([c0, cx]); for (let i = 0; i < c0.w; i++) used.add(cx + i);
+        let L = cx - 1, Rr = cx + c0.w, fail = false;
+        for (const m of ms.slice(1)) {
+          const left = m.side === 'left', x0 = left ? L - (m.gap || 0) : Rr + (m.gap || 0);
+          const xsOf = c => left ? x0 - c.w + 1 : x0;
+          const c = pickWeighted(pool.filter(c => matchesTag(c, m.tag) && (repeats(m) || !plan.some(([o]) => o.name === c.name)) && ![...Array(c.w).keys()].some(i => used.has(xsOf(c) + i)) && at(c, xsOf(c), a.y)), c => weight(c, R.role), hash(x0, a.y, s0 + 41 + k));
+          if (!c) { if (!m.optional) { fail = true; break; } continue; }
+          const xs = xsOf(c);
+          plan.push([c, xs]); for (let i = 0; i < c.w; i++) used.add(xs + i);
+          if (left) L = xs - 1; else Rr = xs + c.w;
+        }
+        if (fail || plan.length < 2 || !gapFree(L + 1, Rr - 1, a.y, cfg.minGap)) continue;
+        for (const [c, x] of plan) put(c, x, a.y, 'stand', spots.at(x, a.y).type, eid, R);
+        ensPlaced += plan.length;
+        break;
+      }
+    }
+    // 2. single things up to the budget, a free tile between neighbours, corners and spots under lamps first
+    if (!singles) continue;
+    const single = cands(R).filter(c => !hangOnly(c));
+    for (const s of order) {
+      if (R.placed >= R.budget) break;
+      if (!free(s.x, s.y) || keep.has(s.x + ',' + s.y)) continue;
+      const fit = single.filter(c => fitsAt(c, s.x, s.y) && gapFree(s.x, s.x + c.w - 1, s.y, cfg.minGap));
+      const c = pickWeighted(fit, c => weight(c, R.role), hash(s.x, s.y, s0 + 51));
+      if (c) put(c, s.x, s.y, 'stand', s.type, null, R);
+    }
+    // 3. on the back wall and under the ceiling: a small share of the budget, far apart, away from ladders and doors
+    const wallBudget = Math.round(R.budget * cfg.wall / 100), hangPool = cands(R, true).filter(c => list(c.rule.place).some(p => p === 'wall' || p === 'ceiling'));
+    let hung = 0;
+    const hangOrder = [...R.hang].sort((a, b) => ((b.side ? 1 : 0) + hash(b.x, b.y, s0 + 61)) - ((a.side ? 1 : 0) + hash(a.x, a.y, s0 + 61)));
+    for (const s of hangOrder) {
+      if (hung >= wallBudget) break;
+      if (wallKeep.has(s.x + ',' + s.y) || items.some(it => it.hang !== 'stand' && Math.abs(it.x - s.x) < 5 && Math.abs(it.y - s.y) < 3)) continue;
+      if (s.type === 'ceiling') { let ld = false; for (let k = 0; k < s.drop; k++) for (const dx of [-1, 0, 1]) if (ch(s.x + dx, s.y + k) === 'H') ld = true; if (ld) continue; }
+      const fit = hangPool.filter(c => list(c.rule.place).includes(s.type) && c.w === 1 && (s.type !== 'ceiling' || s.drop >= c.h + 3));
+      const c = pickWeighted(fit, c => weight(c, R.role), hash(s.x, s.y, s0 + 71));
+      if (c) { put(c, s.x, s.y, s.type, s.type, null, R); hung++; }
+    }
+  }
+  return { items, regions: [...regions.values()].map(({ stand, hang, ...r }) => r), planned: (x, y) => poolOf(idAt(x, y - 1)).length > 0, keep };
+}

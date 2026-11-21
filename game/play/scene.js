@@ -164,7 +164,7 @@ export class PlayScene extends Phaser.Scene {
     const D = this.data_, kits = terrainKits(this, D), LI = this.levelInfo;
     const reg = regionMap(D, LI?.def ? { rooms: LI.rooms, poiId: this.levelPoi } : { roomId: this.roomId });
     const backOf = id => { const t = D.terrain?.[id], k = kits(t?.back?.terrain); return k ? { ...k, shade: t.back.shade } : null; };
-    return { reg, idAt: reg.idAt, inside: reg.inside, at: (x, y) => kits(reg.idAt(x, y)), back: (x, y) => reg.inside(x, y) ? backOf(reg.idAt(x, y)) : null };
+    return { reg, kits, idAt: reg.idAt, inside: reg.inside, at: (x, y) => kits(reg.idAt(x, y)), back: (x, y) => reg.inside(x, y) ? backOf(reg.idAt(x, y)) : null };
   }
   // Ort-Typen of the room or level (#158, engine/dressing.js placeTypes), once per room
   placeMap() { return this.places_ ??= placeTypes(this.room, this.terrain?.reg || regionMap(this.data_, { roomId: this.roomId })); }
@@ -289,6 +289,7 @@ export class PlayScene extends Phaser.Scene {
     const run = this.mode === 'run' ? this.box.save.run : this.mode === 'test' && this.args.poi ? { poi: this.args.poi, seed: this.args.seed } : null;
     this.levelInfo = run?.seed ? buildPoi(this.data_, run.poi, run.seed) : null;
     this.levelPoi = run?.poi || null;   // Marken-Clutter of the POI (art.js brandKit)
+    this.levelSeed = run?.seed || 0;   // #158 the set dressing of a level follows its seed
     if (this.levelInfo?.def) def = this.levelInfo.def;
     // mega rig prototype (#022): the vehicle as a walkable room, evening sky and the camp ground
     this.megarig = this.args.megarig ? buildMegarig(this.data_, this.args.megarig.id, this.args.megarig.stage) : null;
