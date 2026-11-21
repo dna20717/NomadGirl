@@ -142,6 +142,7 @@ Wer eine Steigerung spüren soll, braucht vorher eine Pause: von 5 auf 11 ist ei
 | Atempause | Story, Erholung | hell, keine Gegner, Kiste oder Zettel |
 | Abzweig | Neugier, Beute | ein Zeichen am Eingang, Belohnung immer größer als der Umweg |
 | Boss | Höhepunkt | eigener Raum, Landmarke im Bild, Ausgang erst danach offen |
+| Wow | der eine Moment des POI | genau einer je POI, in jedem Run, Rezept im Kapitel Wow-Moment |
 
 Die Raum-Rolle aus der Story (Laden, Lager, Büro …) beschreibt, was der Raum früher war; der Raumtyp beschreibt, was er im Spiel tut. Beide stehen am Raum-Baustein.
 
@@ -178,6 +179,55 @@ Der Erreichbarkeits-Prüfer (`tools/reach_audit.mjs`) bleibt. Dazu kommt ein **L
 - kein Spawn an einer Naht, jeder Schütze mit Sichtlinie zu Leylas Eintrittspunkt
 
 Eine Spielprobe mit `tools/play.mjs` zeigt zusätzlich, wo Leyla zögert oder umkehrt: Dort fehlt Führung.
+
+## Wow-Moment
+
+Jeder POI hat genau einen **Wow-Raum**, der in jedem Run vorkommt und das Schlüsselbild oder die Landmarke als begehbaren Moment inszeniert. Code baut ihn **sofort als bestmöglichen Platzhalter** aus dem, was das Spiel schon kann; später ersetzen gemalte Assets Stück für Stück die Platzhalter, ohne dass sich Raum, Ablauf oder Daten ändern. (Daniel, 21.11.2026: „formulier es so, dass der Wow als Platzhalter so gut es geht erzeugt wird“.)
+
+### Das Rezept: acht Zutaten
+
+1. **Enge vor Weite.** Ein schmaler Gang oder eine Tür direkt davor, dann öffnet sich der Raum.
+2. **Maßstab.** Der größte Raum des POI, mindestens 1,5 Bildschirmhöhen oder -breiten.
+3. **Schlüssellicht.** Eine starke Lichtquelle auf das Motiv, der Rest des Raums gut 30 % dunkler.
+4. **Kamera.** Beim Betreten zieht sie 1,5–2 s auf und schwenkt zum Motiv; Leyla bleibt steuerbar, jede Eingabe bricht ab, einmal je Run.
+5. **Ton.** Ein kurzer Stinger und ein Wechsel der Musik-Schicht (POI-Musik mit Schichten).
+6. **Bewegung.** Etwas lebt im Bild: Dampf, Funken, Papier, Glitzern, Flackern.
+7. **Ruhe zuerst.** Die ersten Sekunden sind gegnerfrei, damit man schauen kann; Kampf folgt erst im zweiten Teil des Raums.
+8. **Belohnung am Motiv.** Kiste, Zettel oder Splitter liegt nah am Motiv, damit man hingeht.
+
+### Platzhalter so gut es geht
+
+Code baut jeden Wow-Raum **ohne neue Grafik** vollständig spielbar:
+
+- **Layout** mit dem Raum-Werkzeug (wie `tools/room_blocks_017.py`), Raumtyp „Wow“, Enge-vor-Weite eingebaut.
+- **Motiv aus vorhandenem Material:** großer Clutter und Marken-Clutter in echter Größe, mehrfach skaliert oder gereiht; was fehlt, als **Code-Silhouette** (Formen in Palettenfarben AAP-64 mit Tiefe-Kanten und Glow), Schrift in VT323 (Preistafeln, Anzeigen, Banner).
+- **Licht, Partikel, Kleinvieh, Nebel** aus der Atmosphäre; **Parallax** für Weite und Skyline.
+- **Kamera und Stinger** aus Code (Musik-Engine), alles in der Werkstatt einstellbar.
+- Für jeden Platzhalter ein Eintrag auf einer **Asset-Wunschliste** (was später gemalt werden soll), damit der Tausch geplant werden kann.
+
+### Wow-Räume je POI
+
+| POI | Wow-Moment | Platz im Bogen | Platzhalter aus Vorhandenem | Später gemalt |
+| --- | --- | --- | --- | --- |
+| Mile 7 Gas & Go | Die Preistafel springt flackernd an, als Leyla den Vorplatz betritt; Zapfinseln im Sonnenuntergang | Schwelle (erster Eindruck des Spiels) | Preistafel aus Code mit VT323-Ziffern und Neon-Glow, NomadCola-Automat, Abendhimmel aus dem Wetter | Preistafel, Tankstellendach |
+| Sunny Acres | Leerer Pool voller Liegestühle, darin Bewaffnete, Schlager aus dem Radio | Höhepunkt (Arena) | Pool als Mulde im Layout, Liegestühle als Code-Silhouetten, Schlager aus der Radio-Musik | Pool-Set, Liegestühle |
+| Funkmast KM 31 | Oben auf der Spitze: Wind, die Kabine voller Zettel, Blick über die Salt Flats | Höhepunkt (oben) | Kamera zieht weit auf, Parallax der Ebene, Zettel als flatternde Papierfetzen aus dem Kleinvieh | Kabine, Zettelwand |
+| Delta South Megamall | Passage unter der Glaskuppel, Lichtstrahlen auf die stehende Rolltreppe, Barrikade aus Einkaufswagen | Mitte, vor dem Kaufhaus | hohe Halle, Lichtkegel aus der Lichtkarte, Einkaufswagen aus `mall3_*`, Banner „SALE −70 %“ als Code-Text | Kuppel, Rolltreppe |
+| Delta Heights | Ein halbes Büro über dem Abgrund, Wind, Papier weht hinaus | Vertikale vor dem Penthouse | Raum mit offener Seite (Himmel statt Rückwand), Schreibtische aus Clutter, Papier-Partikel nach außen | Bruchkante, Stahlträger |
+| P+R Delta Süd | Das Dach bei Nacht, Kassenhaus im Neon, dahinter die Skyline der Stadt | Höhepunkt (Dach) | Parallax-Skyline, Neon-Licht, ausgebrannte Autos als Code-Silhouetten | Kassenhaus, Autowracks |
+| Metro Line 4 | Der verschweißte Tunnel, durch das Gitter fällt das Licht der Stadt, davor Schlaflager | vor dem Stellwerk | Gitter aus Kacheln, Lichtkegel durch das Gitter, Aufschrift „BigCityDelta“ als Code-Text | Gittertor, Zug |
+| Storm Drain 9 | Das Nest im Sammler: ein Berg aus Glänzendem unter dem Lichtschacht | Höhepunkt (Nest) | Haufen aus vorhandenen Symbol-Bildern (Kronkorken, Dosen, Uhren), Glitzer-Partikel, Licht von oben | Nest |
+| Deadlock Bunker 13 | Die Reaktorhalle: grünes Pulsieren, Dampf, die Gang hält Wache | vor der Kommandozentrale | Atmosphäre `bunker_reaktor`, Reaktorblock aus großem Clutter skaliert, Dampf-Nebel | Reaktor |
+| Pit 6 | Die Kristallgrotte: alles leuchtet von unten | Höhepunkt (Tiefe) | Höhlen-Set (#156), Kristalle als Code-Polygone mit Glow, Cyan-Lichter | Kristalle |
+| Ministry of Order | Der Festsaal: Kronleuchter, die große Uhr, makellose Ordnung | vor dem Amtszimmer (Boss) | Atmosphäre `ministerium_saal`, Uhr als Code-Silhouette mit laufendem Zeiger, Marmor-Set | Uhr, Kronleuchter |
+| Delta Crude Refinery | Nachts über dem Tankfeld: die Fackel brüllt, Funken regnen | Höhepunkt | Fackel aus Funken- und Feuer-Partikeln, oranges Licht, Fabrik-Set | Fackelturm |
+| Silo Zero | Die Rakete im Schacht, an der Startrampe leuchtet 00:00:01 | Finale | Rakete als Code-Silhouette über die Schachthöhe, Anzeige in VT323 rot, grünes Monitorlicht | Rakete, Startrampe |
+
+Gewürfelte Orte erben den Wow-Raum ihrer POI-Art; die Region färbt ihn (Salz, Glas, Krähen …).
+
+### Prüfung
+
+Der Level-Prüfer kontrolliert je POI: Wow-Raum in jedem Seed vorhanden, Enge davor, größter Raum, Schlüssellicht am Motiv, erste Sekunden gegnerfrei, Belohnung in 4 Kacheln Umkreis. Die Galerie zeigt jeden Wow-Raum mit Kamerafahrt als kurzen Clip.
 
 ## Befund: warum es heute hakt
 
@@ -379,7 +429,7 @@ Zuerst entstehen die Story-Steckbriefe aller POIs und Räume (Ava schreibt, Dani
 | --- | --- | --- |
 | #160 Story zuerst | Story-Felder in den Daten, Raum-Steckbriefe, Dressing liest die Story | – |
 | #158 Set-Dressing nach Regeln | Ort-Typen, Tags, Raum-Rollen, Ensembles, Budget, Autotiling, Prüfer | Marker-Zeichen, Ablageflächen, Kosten je Ding, Abstände 6/3, Autotiling 47 aus 6, Reparatur-Durchgang |
-| #163 Level-Design | Raumtypen, Landmarken, Rhythmus, Licht am Ausgang, faire Kampfräume, Geheimnisse säen, Level-Prüfer | Brotkrumen aus Spuren zusammen mit #159 |
+| #163 Level-Design | Raumtypen, Wow-Raum je POI (Platzhalter), Landmarken, Rhythmus, Licht am Ausgang, faire Kampfräume, Geheimnisse säen, Level-Prüfer | Brotkrumen aus Spuren zusammen mit #159 |
 | #159 Stufe 2 | Ordnung + Verfall, Spuren aus der Story, Wüste kriecht rein, Rückwand-Clutter, Lernen aus Korrekturen | austauschbare Chunks, Dressing-Galerie, Lesbarkeit (Clutter gedämpft) |
 
 **Grenzen für alle:** Raum-Layouts bleiben (außer Marker-Zeichen), Erreichbarkeit (#145) wird nicht schlechter, Spielstände bleiben gültig, alles in der Werkstatt einstellbar. PixelLab sparsam: #158 höchstens ~40, #159 höchstens ~60.

@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Ava → Code: Bibel um **Wow-Moment** erweitert; #163 hat jetzt Schritt 8 „Wow-Raum je POI“: alle 13 als bestmögliche Platzhalter ohne neue Grafik (Code-Silhouetten, Licht, Kamera, Stinger), dazu Asset-Wunschliste.
 - 21.11. Ava → Code: Bibel um **Level-Design** erweitert (`docs/concepts/poi_bible.md`). Neu **#163 Level-Design nach der Bibel** (Raumtypen, Landmarken, Rhythmus, Licht am Ausgang, faire Kämpfe, Geheimnisse säen, Level-Prüfer), nach #160. Reihenfolge: #160 → #158 → #163 → #159.
 - 21.11. Code → Ava: **HNC (Übergabe)**. Stand `main` nach #129–#157, alles gepusht, Tests grün (npm 389; Bühne 17, POI 33, POI-Level 9, Parkour 50, Bausteine 32, Gegner 25, Raider 22, Fahrt 20, Radio 13, Glitch-Duell 11, Mobil 22, Inventar 36). Gebaut heute (Details in den Tickets und `docs/changelog.md`):
   - **Info-Center** (#129, #154): Logbuch als zweiter Reiter im Questlog, Werkstatt › Meldungen, feste Bühne mit Zonen (nichts liegt mehr übereinander).
@@ -356,7 +357,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Rückfragen:**
 - **Ergebnis:**
 
-### #163 Level-Design nach der Bibel: Raumtypen, Landmarken, Rhythmus, Wegführung, Level-Prüfer
+### #163 Level-Design nach der Bibel: Raumtypen, Wow-Raum, Landmarken, Rhythmus, Wegführung, Level-Prüfer
 - **Status:** offen · angelegt 21.11. von Ava
 - **Für:** Code
 - **Anlass (Daniel, 21.11.2026):** „Können wir die Bible noch einmal upgraden?“ → Kapitel Level-Design; „Ja“ zum Ticket.
@@ -370,9 +371,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   5. **Faire Kämpfe:** kein Spawn in 3 Kacheln um eine Naht; Schützen nur dort, wo sie Leylas Eintrittspunkt sehen und sie zuerst gesehen werden können; Scharfschützen mit Ankündigung (Laserlinie/Glanz, falls noch nicht da).
   6. **Brotkrumen und Leitlinien:** Spuren aus der Story (#159) und Leitlinien-Deko (Kabel, Rohre, Notlicht-Streifen, Schienen) laufen zum Weiterweg.
   7. **Geheimnisse säen:** jede Schein-/brüchige Wand bekommt ein Zeichen in 3 Kacheln Umkreis (Riss-Decal, Luftzug mit Papierfetzen aus dem Kleinvieh, Licht durch Spalt); das erste Geheimnis eines POI deutlich, spätere leiser.
-  8. **Level-Prüfer** `tools/level_audit.mjs` + Test (alle POIs × 8 Seeds): Hauptweg ohne Stufe 4 und ohne Lücke über 3 (außer markierte Hürde), Ruhe nach jeder Spitze, Landmarke aus ≥ ⅓ der Haupträume sichtbar, Weiterweg heller als Sackgassen, jedes Geheimnis mit Zeichen, kein Spawn an Nähten, Schützen mit Sichtlinie. Befunde zuerst als Liste, dann Räume nachbessern (wie #145).
+  8. **Wow-Raum je POI** (Bibel › Wow-Moment): neuer Raumtyp `wow`, je POI genau einer, in jedem Run gesetzt (Platz im Bogen laut Tabelle). Code baut alle 13 **als bestmögliche Platzhalter ohne neue Grafik**: Layout mit Enge vor Weite und größtem Raum des POI, Motiv aus vorhandenem Clutter (skaliert/gereiht) oder als Code-Silhouette (AAP-64, Tiefe-Kanten, Glow), VT323-Schrift für Tafeln/Anzeigen, Schlüssellicht, Partikel/Kleinvieh, Parallax. Dazu **Kamerafahrt** beim Betreten (1,5–2 s aufziehen + Schwenk zum Motiv, Leyla steuerbar, Eingabe bricht ab, einmal je Run) und **Stinger + Musik-Schicht** aus der Musik-Engine; alles in der Werkstatt einstellbar (POIs › Wow: Raum, Motiv, Kamera, Licht, Ton). Erste Sekunden gegnerfrei, Belohnung am Motiv. Gewürfelte Orte erben den Wow-Raum ihrer Art. **Asset-Wunschliste** (`docs/assets.md` › Wow-Platzhalter) mit dem, was später gemalt werden soll.
+  9. **Level-Prüfer** `tools/level_audit.mjs` + Test (alle POIs × 8 Seeds): Hauptweg ohne Stufe 4 und ohne Lücke über 3 (außer markierte Hürde), Ruhe nach jeder Spitze, Landmarke aus ≥ ⅓ der Haupträume sichtbar, Weiterweg heller als Sackgassen, jedes Geheimnis mit Zeichen, kein Spawn an Nähten, Schützen mit Sichtlinie, Wow-Raum in jedem Seed (Enge davor, größter Raum, Schlüssellicht, Ruhe zuerst, Belohnung in 4 Kacheln). Befunde zuerst als Liste, dann Räume nachbessern (wie #145).
 - **Grenzen:** Erreichbarkeit (#145) bleibt grün; Raum-Layouts nur dort ändern, wo der Prüfer es verlangt (im Ergebnis aufführen); Spielstände bleiben gültig; alles in der Werkstatt einstellbar.
-- **Fertig, wenn:** alle Räume mit Raumtyp, alle POIs mit Landmarke/Atempause/Leitlinie, Level-Prüfer ohne Befunde, `reach_audit` grün, Vorher/Nachher-Bilder je POI (Landmarke im Bild, Licht am Ausgang), Build grün.
+- **Fertig, wenn:** alle Räume mit Raumtyp, alle POIs mit Landmarke/Atempause/Leitlinie und spielbarem Wow-Raum (Clip je POI im Ergebnis), Level-Prüfer ohne Befunde, `reach_audit` grün, Vorher/Nachher-Bilder je POI (Landmarke im Bild, Licht am Ausgang), Build grün.
 - **Rückfragen:**
 - **Ergebnis:**
 
