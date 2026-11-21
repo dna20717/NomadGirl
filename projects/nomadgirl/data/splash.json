@@ -78,15 +78,94 @@
   "cluster": {"look": "ck_cluster", "at": [108, 154], "scale": 90, "needles": [{"at": [32, 32], "length": 10, "kind": "speed"},{"at": [88, 32], "length": 10, "kind": "rpm"}]},
   "radio": {"look": "ck_radio", "at": [214, 176], "scale": 90, "lcd": [16, 12], "lcdSize": [75, 30]},
   "mirror": {"look": "ck_mirror", "at": [192, 24], "scale": 55},
-  "visor": {"look": "ck_visor", "scale": 70},
-  "hang": [{"look": "ck_freshener", "from": [180, 44], "length": 8, "scale": 45},{"look": "ck_dice", "from": [200, 44], "length": 5, "scale": 40}],
+  "visor": {
+   "look": "ck_visor",
+   "scale": 60,
+   "at": [70, 26],
+   "counter": "trips",
+   "target": 10,
+   "note": "Zehn Fahrten: die Sonne steht immer falsch. Die Sonnenblende bleibt jetzt unten."
+  },
+  "hang": [
+   {"look": "ck_freshener", "from": [180, 44], "length": 8, "scale": 45},
+   {"look": "ck_dice", "from": [200, 44], "length": 5, "scale": 40},
+   {
+    "look": "ck_bottlecap_rosary",
+    "from": [160, 44],
+    "length": 6,
+    "scale": 40,
+    "counter": "kills",
+    "target": 25,
+    "note": "25 Gegner: ein Rosenkranz aus Kronkorken am Spiegel."
+   },
+   {
+    "look": "ck_rabbit_foot",
+    "from": [214, 44],
+    "length": 9,
+    "scale": 40,
+    "counter": "knockouts",
+    "target": 1,
+    "note": "Erstes k.o.: AvA hängt dir eine Hasenpfote an den Spiegel."
+   }
+  ],
   "clutter": [
    {"look": "ck_cactus", "at": [44, 140], "scale": 50, "depth": 0, "wobble": false},
    {"look": "ck_hula", "at": [262, 134], "scale": 50, "depth": 0, "wobble": true},
    {"look": "ck_toy_drone", "at": [160, 133], "scale": 34, "depth": 0, "wobble": false},
    {"look": "ck_mug", "at": [300, 135], "scale": 40, "depth": 0, "wobble": false},
    {"look": "ck_compass", "at": [326, 136], "scale": 30, "depth": 0, "wobble": false},
-   {"look": "ck_plush_fox", "at": [352, 139], "scale": 50, "depth": 0, "wobble": true}
+   {"look": "ck_plush_fox", "at": [352, 139], "scale": 50, "depth": 0, "wobble": true},
+   {
+    "look": "ck_map",
+    "at": [208, 135],
+    "scale": 32,
+    "depth": 0,
+    "wobble": false,
+    "counter": "pois",
+    "target": 1,
+    "note": "Erster POI geschafft: die Karte liegt jetzt auf dem Armaturenbrett."
+   },
+   {
+    "look": "ck_sunglasses",
+    "at": [234, 133],
+    "scale": 38,
+    "depth": 0,
+    "wobble": false,
+    "counter": "trips",
+    "target": 3,
+    "note": "Drei Fahrten: Leyla lässt ihre Sonnenbrille im Cockpit."
+   },
+   {
+    "look": "ck_spark_plug",
+    "at": [182, 135],
+    "scale": 30,
+    "depth": 0,
+    "wobble": true,
+    "counter": "salvaged",
+    "target": 10,
+    "note": "Zehn Dinge zerlegt: eine Zündkerze als Glücksbringer."
+   },
+   {
+    "look": "ck_cassette",
+    "at": [132, 134],
+    "scale": 34,
+    "depth": 0,
+    "wobble": false,
+    "counter": "sleeps",
+    "target": 3,
+    "note": "Drei Nächte im Camp: eine Kassette fürs Radio."
+   },
+   {
+    "look": "ck_polaroid",
+    "at": [78, 137],
+    "scale": 34,
+    "depth": 0,
+    "wobble": false,
+    "counter": "secrets",
+    "target": 1,
+    "note": "Erstes Secret: ein Polaroid klemmt jetzt am Armaturenbrett."
+   },
+   {"look": "ck_chips", "at": [284, 136], "scale": 32, "depth": 0, "wobble": true, "counter": "deltas", "target": 500, "note": "500 Δ aus Runs: Chips für die nächste Fahrt."}
   ],
   "stickers": [
    {"at": [262, 38], "size": 13, "turn": -8},

@@ -55,6 +55,7 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
 <script type="module">
   import { startSplash } from './game/splash/splash.js';
   import { startCockpit, achievementStickers, PW, PH } from './game/splash/cockpit.js';
+  import { cockpitFor } from './game/keepsakes.js';
   const BASE = new URL('projects/nomadgirl/', location.href);
   const json = f => fetch(new URL('data/' + f, BASE), { cache: 'no-store' }).then(r => r.json()).catch(() => ({}));
   const [S, A, ACH, REC, IT] = await Promise.all(['splash.json', 'assets.json', 'achievements.json', 'recipes.json', 'items.json'].map(json));
@@ -241,8 +242,8 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
     data: { horizon: 44, ground: ROAD, curve: { pan: 7 } } }).then(x => { splash = x; window.splash = x; }).catch(e => console.warn('Szene', e));
   // stickers: reached achievements from the savegame (online, else this browser); ?stickers=all shows every one
   const all = new URLSearchParams(location.search).get('stickers') === 'all';
-  let done = {};
-  try { done = (await store.blob('achievements'))?.done || {}; } catch { }   // #126 achievements count over all savegames
+  let done = {}, counts = {};
+  try { const G = await store.blob('achievements'); done = G?.done || {}; counts = G?.counts || {}; } catch { }   // #126 achievements count over all savegames
   if (all) done = Object.fromEntries(Object.keys(ACH).map(k => [k, true]));
   const stickers = await achievementStickers({ achievements: ACH, recipes: REC, items: IT, assets: A }, done, BASE);
   // the menu text follows the LCD in the cockpit's own animation frame (same offset as the pixels: leaning, potholes)
@@ -250,7 +251,8 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
     lcd.style.cssText = `left:${ox + (L.x + 1) * k}px;top:${oy + (L.y + 1) * k}px;width:${(L.w - 2) * k}px;height:${(L.h - 2) * k}px;font-size:${Math.round(L.h * k / 5.4)}px;line-height:1.02`;
     const sw = Math.max(200, Math.min(360, L.w * k * 1.1));   // #126 the slot's preview stands above the radio
     shotEl.style.cssText = `left:${ox + (L.x + L.w / 2) * k - sw / 2}px;bottom:${innerHeight - (oy + L.y * k) + 10}px;width:${sw}px;font-size:${Math.round(sw / 15)}px`; };
-  cockpit = await startCockpit(document.getElementById('cockpit'), { cfg: CK, A, base: BASE, stickers, steerValue: () => splash?.curve?.() ?? 0, speed: () => 1, onFrame: placeLcd });
+  cockpit = await startCockpit(document.getElementById('cockpit'), { cfg: cockpitFor(CK, counts, all),   // #142 keepsakes after events in the game
+    A, base: BASE, stickers, steerValue: () => splash?.curve?.() ?? 0, speed: () => 1, onFrame: placeLcd });
   // everything stands: the first frames are drawn behind the veil, then it lifts in one piece
   Promise.all([splashReady, document.fonts?.ready]).then(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))).then(bootDone, bootDone);
 

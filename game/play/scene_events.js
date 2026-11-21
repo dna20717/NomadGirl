@@ -13,6 +13,7 @@ import { add, rollLoot, remove } from '../inventory.js';
 import { colorOfItem, knowsColor, learnColor } from './signature.js';
 import { learnAll, learnNote } from '../crafting.js';
 import { bump, level as achieveLevel, check as achieveCheck } from '../achievements.js';
+import { newKeepsakes } from '../keepsakes.js';
 import { mod } from '../mods.js';
 import { sfxOf } from './sfx.js';
 
@@ -180,6 +181,7 @@ export class SceneEvents {
     if (dead.length || sore.length || r.dark) this.box.persist?.();
   }
   announce(list) {
+    this.keepsakeNews();
     if (!list?.length) return;
     const D = this.data_;
     list.forEach((a, i) => this.time.delayedCall(i * 900, () => {
@@ -192,6 +194,13 @@ export class SceneEvents {
     this.saveTimer = setTimeout(() => this.box?.persist(), 800);
   }
 
+  // #142 a keepsake for the cockpit (main menu): a small note once, smaller than an achievement
+  keepsakeNews() {
+    if (!this.box?.save) return;
+    const got = newKeepsakes(this.data_, this.box.save);
+    got.forEach((k, i) => this.time.delayedCall(1200 + i * 900, () => this.hud.toast(`Fürs Cockpit: ${k.name}`, k.note || 'Liegt jetzt im Hauptmenü auf dem Armaturenbrett', 'keepsake', 4200, { cat: 'progress' })));
+    if (got.length) { clearTimeout(this.saveTimer); this.saveTimer = setTimeout(() => this.box?.persist(), 800); }
+  }
   onKill(e) {
     this.kills++;
     const slots = this.box?.save.inv?.slots || {}, h = e.lastHit || {};

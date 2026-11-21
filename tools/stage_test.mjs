@@ -38,6 +38,10 @@ await ev(() => nomad.step(2));
 v = await ev(() => ({ t: [...document.querySelectorAll('.hud-toast.banner:not(.out)')].map(x => x._title), text: SC().hud.bannerText() }));
 check('Fenster zu: die Ansage kommt als großer Toast', v.t.includes('Stage-Ansage') && /Stage-Ansage/.test(v.text || ''), v);
 
+// #142 a keepsake for the cockpit: a small note once
+v = await ev(() => { const s = SC(); ((s.box.save.achievements ??= {}).counts ??= {}).trips = 3; s.keepsakeNews(); nomad.step(120); const a = [...document.querySelectorAll('.hud-toast.keepsake')].map(x => x._title); s.keepsakeNews(); nomad.step(120); return { a, b: [...document.querySelectorAll('.hud-toast.keepsake')].length, seen: s.box.save.achievements.keepsakes }; });
+check('Cockpit-Kram: kleine Meldung einmal (Sonnenbrille nach drei Fahrten)', v.a.includes('Fürs Cockpit: Sonnenbrille') && v.b === 1 && v.seen.includes('ck_sunglasses'), v);
+
 // build mode: notes below the build bar
 await ev(() => { SC().box.save.deltas = 500; SC().openBuild(); nomad.step(20); SC().hud.toast('Stage-Bau', 'unter der Leiste', 'warn'); nomad.step(2); });
 await page.waitForTimeout(300);

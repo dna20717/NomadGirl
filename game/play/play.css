@@ -93,6 +93,7 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .hud-toast.secret { border-color: #e45aa8; box-shadow: 0 0 18px rgba(228, 90, 168, .25); } .hud-toast.secret svg, .hud-toast.secret b { color: #ff9ad2; }
 .hud-toast.drama { border-color: #5a2a4a; background: rgba(8, 4, 10, .94); } .hud-toast.drama svg { color: var(--ng-red); } .hud-toast.drama b { color: #ffb3c0; }
 .hud-toast.travel svg, .hud-toast.camp svg { color: var(--ng-gold); }
+.hud-toast.keepsake { min-width: 0; padding: 7px 12px; border-color: var(--ng-brass); } .hud-toast.keepsake b { font-size: 22px; color: var(--ng-gold); } .hud-toast.keepsake svg { color: var(--ng-gold); }   /* #142 smaller than an achievement */
 .hud-toast.banner { min-width: 340px; padding: 14px 18px; } .hud-toast.banner b { font-size: 34px; }
 .hud-toast .ui-x { position: static; flex: none; margin-left: auto; width: 24px; height: 24px; font-size: 16px; pointer-events: auto; }
 .hud-toast.nod { animation: hud-toast-nod .3s ease-out; }

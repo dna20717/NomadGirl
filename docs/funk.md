@@ -290,10 +290,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code, per Helfer) `rankBonus`/`rankCrate` in `engine/poi.js`, Ranking › Bonus-Kiste (an/aus, ab Rang B, eigene Beute) und je Rang Würfe/Wählerisch (B 2, A 3 beste aus 2, S 4 beste aus 3); goldene Kiste mit Glühen neben dem Tresor, Zeile „☆ Rang-Bonus“ und Kisten-Zeile in der Beute-Bilanz. Tests `test/poi.test.js`, `tools/poi_test.mjs` (33). **Bitte testen:** einen POI mit Rang B oder besser abschließen, Kiste neben dem Tresor öffnen.
 
 ### #142 Cockpit-Kram über Ereignisse freischalten
-- **Status:** offen · angelegt 21.11. von Code (Daniel: „Ava setzt sie, aber basierend auf Ereignissen im Spiel (wie Achievements, aber weniger ‚groß‘, mit einer kleinen Unlock-Meldung)“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Ava setzt sie, aber basierend auf Ereignissen im Spiel (wie Achievements, aber weniger ‚groß‘, mit einer kleinen Unlock-Meldung)“)
 - **Auftrag:** Sonnenblende `ck_visor` und die 10 Kram-Stücke im Cockpit platzieren; jedes Stück erscheint erst nach einem Ereignis (erster Run, erste Gang, …) mit kleiner Meldung.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: die sechs Stücke von vorher (Kaktus, Hula, Drohne, Tasse, Kompass, Fuchs) und Duftbaum + Würfel bleiben immer da; Ereignisse: Sonnenbrille 3 Fahrten, Sonnenblende 10 Fahrten, Karte erster POI, Polaroid erstes Secret, Kassette 3 Nächte, Zündkerze 10× zerlegt, Chips 500 Δ aus Runs, Kronkorken-Kette 25 Gegner, Hasenpfote erstes k.o.
+- **Ergebnis:** (Code) `game/keepsakes.js`: Kram, Spiegel-Anhänger und Sonnenblende können einen Achievement-Zähler nennen (Startseite › Cockpit: Spalten „Freischalten: Zähler“, Filter, Ziel, Meldung); das Hauptmenü zeigt nur, was die Zähler über alle Spielstände erreicht haben (`?stickers=all` zeigt alles), das Spiel meldet ein neues Stück einmal klein („Fürs Cockpit: Sonnenbrille“, Art `keepsake`, im Logbuch unter Fortschritt). Tests `test/keepsakes.test.js` (3), `tools/stage_test.mjs` (8). **Bitte testen:** Hauptmenü mit `?stickers=all` (alles), dann drei Fahrten machen und die Meldung abwarten.
 
 ### #143 Billboard-Werbung für Lore-Marken
 - **Status:** offen · angelegt 21.11. von Code (Daniel: Karte A11 a „Als Ticket bauen“)

@@ -22,6 +22,7 @@ const TOAST_KINDS = {
   trophy: { icon: 'trophy', sound: 'fanfare' }, recipe: { icon: 'list', sound: 'chime' }, secret: { icon: 'star', sound: 'sparkle' },
   heal: { icon: 'heart', sound: 'good' }, drama: { icon: 'skull', sound: 'low' }, travel: { icon: 'map', sound: 'ping' },
   camp: { icon: 'moon', sound: 'ping' }, loot: { icon: 'bags', sound: 'good' },
+  keepsake: { icon: 'gift', sound: 'chime' },   // #142 a piece for the cockpit: small, friendly
 };
 
 // the controls panel (H or Menü › Steuerung), two columns: keys as keycaps, " / " splits alternatives
