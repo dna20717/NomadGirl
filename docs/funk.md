@@ -266,6 +266,34 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 ## Tickets
 
+### #144 Kachel-Schichten nach Tiefe
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Du musst die Tilesets anders verwenden. Die Schichten machen so keinen Sinn, wie du sie einsetzt“)
+- **Auftrag:** Füllungen nicht zeilenweise im Wechsel, sondern nach Tiefe unter der Oberfläche (oben Füllung a, tief Füllung b); dünne Wände und Säulen bleiben Füllung a.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #145 POIs ohne Doppelsprung schaffbar
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Es gibt POI-Situationen, wo Leyla ein Hindernis nicht passieren kann, weil sie Doublejumpen können müsste. Das geht nicht.“)
+- **Auftrag:** Jeder Weg in jedem POI mit einfachem Sprung (Doppelsprung kommt erst mit Cyberware); Prüfwerkzeug mit Leylas echter Sprunghöhe, Räume nachbessern.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #146 Vordergrund in Gebäuden ohne senkrechtes Parallax
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Vordergrundobjekte IN Gebäuden können kein vertikales Parallax haben. Das sieht komisch aus.“)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #147 Reise-Bildschirm mit echten Grafiken
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Auf dem Reise-Bildschirm sind viele Code-Grafiken, dabei haben wir doch jetzt inzwischen eine Menge cooler Grafiken und Tiles dafür.“)
+- **Auftrag:** Code-Grafiken der Fahrt (TravelMode) durch vorhandene Assets ersetzen (Parallax-Sets, Kacheln, Props, Fahrzeuge, Billboards).
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #148 Gegner entspannt, solange keine Gefahr
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Fast alle Gegner laufen mit gezogener Waffe durch die Gegend. Lass sie idle sein, wenn keine Gefahr im Verzug ist.“)
+- **Rückfragen:**
+- **Ergebnis:**
+
 ### #138 Gelände mit PixelLab neu + keine schwebenden Plattformen draußen
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: Karte „Gelände“ c: „Beides mit PixelLab neu malen“; Notiz: „Es soll keine schwebenden Plattformen außerhalb von Gebäuden geben. Bitte mach dort immer einen Hintergrund hin. Generiere zur Not ein Set ‚Höhle‘, wenn du es brauchst“)
 - **Auftrag:** Kachel-Sets Wüste und Beton/Linoleum mit PixelLab (ca. 15 je Set), orthogonal, AAP-64. Draußen jede Plattform mit Hintergrund (Fels, Höhle, Gerüst); falls nötig Kachel-Set „Höhle“.
