@@ -121,7 +121,13 @@
    "moment": "Die Preistafel springt flackernd an, als Leyla den Vorplatz betritt; Zapfinseln im Sonnenuntergang",
    "wish": "Preistafel, Tankstellendach",
    "lightStrength": 220,
-   "music": 35
+   "music": 35,
+   "image": "wow_priceboard",
+   "imageTiles": 9,
+   "imageCore": [69, 66],
+   "dark": 0,
+   "fill": 0,
+   "lightRadius": 700
   },
   "level": {
    "landmark": "leuchtende Preistafel",
@@ -130,7 +136,8 @@
    "rest": "verkaufsraum",
    "guide": "Schläuche der Zapfsäulen",
    "guideKind": "pipe",
-   "guideColor": "#3d3d3d"
+   "guideColor": "#3d3d3d",
+   "landmarkImage": "wow_priceboard"
   },
   "dressing": {"desert": 80}
  },
@@ -218,7 +225,15 @@
    "moment": "Passage unter der Glaskuppel, Lichtstrahlen auf die stehende Rolltreppe, Barrikade aus Einkaufswagen",
    "wish": "Kuppel, Rolltreppe",
    "lightStrength": 220,
-   "music": 35
+   "music": 35,
+   "image": "wow_dome",
+   "imageTiles": 8,
+   "imageHang": true,
+   "imageCore": [166, 90],
+   "dark": 10,
+   "ambient": 60,
+   "fill": 50,
+   "lightRadius": 1000
   },
   "level": {
    "landmark": "Glaskuppel über der Passage",
@@ -227,7 +242,8 @@
    "rest": "markt_foodcourt",
    "guide": "stillstehende Rolltreppen",
    "guideKind": "strip",
-   "guideColor": "#c7dcd0"
+   "guideColor": "#c7dcd0",
+   "landmarkImage": "wow_dome"
   },
   "dressing": {"desert": 55}
  },
@@ -299,8 +315,15 @@
    "stinger": "drone",
    "moment": "Die Reaktorhalle: grünes Pulsieren, Dampf, die Gang hält Wache",
    "wish": "Reaktor",
-   "lightStrength": 220,
-   "music": 35
+   "lightStrength": 260,
+   "music": 35,
+   "image": "wow_reactor",
+   "imageTiles": 10,
+   "imageCore": [127, 108],
+   "dark": 10,
+   "ambient": 65,
+   "fill": 45,
+   "lightRadius": 950
   },
   "level": {
    "landmark": "grünes Glühen des Reaktors",
@@ -309,7 +332,8 @@
    "rest": "bunker_kantine",
    "guide": "Notlicht-Streifen am Boden",
    "guideKind": "strip",
-   "guideColor": "#1ebc73"
+   "guideColor": "#1ebc73",
+   "landmarkImage": "wow_reactor"
   },
   "dressing": {"desert": 5}
  },
@@ -375,7 +399,14 @@
    "moment": "Der Festsaal: Kronleuchter, die große Uhr, makellose Ordnung",
    "wish": "Uhr, Kronleuchter",
    "lightStrength": 220,
-   "music": 35
+   "music": 35,
+   "image": "wow_clock",
+   "imageTiles": 9,
+   "imageCore": [115, 127],
+   "dark": 5,
+   "ambient": 60,
+   "fill": 50,
+   "lightRadius": 950
   },
   "level": {
    "landmark": "große Uhr im Festsaal",
@@ -384,7 +415,8 @@
    "rest": "min_wartesaal",
    "guide": "roter Teppich",
    "guideKind": "carpet",
-   "guideColor": "#b33831"
+   "guideColor": "#b33831",
+   "landmarkImage": "wow_clock"
   },
   "dressing": {"desert": 20}
  },
@@ -438,7 +470,14 @@
    "moment": "Ein halbes Büro über dem Abgrund, Wind, Papier weht hinaus",
    "wish": "Bruchkante, Stahlträger",
    "lightStrength": 220,
-   "music": 35
+   "music": 35,
+   "image": "wow_brokenoffice",
+   "imageTiles": 8,
+   "imageCore": [240, 70],
+   "dark": 10,
+   "ambient": 60,
+   "fill": 40,
+   "lightRadius": 900
   },
   "level": {
    "landmark": "Neon des Penthouse",
@@ -447,7 +486,8 @@
    "rest": "hh_archiv",
    "guide": "Aufzugsseile im Schacht",
    "guideKind": "cable",
-   "guideColor": "#45293f"
+   "guideColor": "#45293f",
+   "landmarkImage": "landmark_penthouse"
   },
   "dressing": {"desert": 60}
  },
@@ -525,7 +565,14 @@
    "moment": "Das Dach bei Nacht, Kassenhaus im Neon, dahinter die Skyline der Stadt",
    "wish": "Kassenhaus, Autowracks",
    "lightStrength": 220,
-   "music": 35
+   "music": 35,
+   "image": "wow_kiosk",
+   "imageTiles": 6,
+   "imageCore": [174, 64],
+   "dark": 10,
+   "ambient": 60,
+   "fill": 45,
+   "lightRadius": 900
   },
   "level": {
    "landmark": "Kassenhaus auf dem Dach",
@@ -534,7 +581,8 @@
    "rest": "ph_deck_dunkel",
    "guide": "Fahrbahnpfeile auf dem Boden",
    "guideKind": "arrows",
-   "guideColor": "#f9c22b"
+   "guideColor": "#f9c22b",
+   "landmarkImage": "wow_kiosk"
   },
   "dressing": {"desert": 55}
  },
@@ -589,7 +637,14 @@
    "moment": "Oben auf der Spitze: Wind, die Kabine voller Zettel, Blick über die Salt Flats",
    "wish": "Kabine, Zettelwand",
    "lightStrength": 220,
-   "music": 35
+   "music": 35,
+   "image": "wow_cabin",
+   "imageTiles": 14,
+   "imageCore": [81, 88],
+   "dark": 10,
+   "ambient": 60,
+   "fill": 45,
+   "lightRadius": 1000
   },
   "level": {
    "landmark": "blinkende Spitze des Masts",
@@ -677,7 +732,15 @@
    "moment": "Der verschweißte Tunnel, durch das Gitter fällt das Licht der Stadt, davor Schlaflager",
    "wish": "Gittertor, Zug",
    "lightStrength": 220,
-   "music": 35
+   "music": 35,
+   "image": "wow_grate",
+   "imageTiles": 12,
+   "imageCore": [128, 150],
+   "imageText": [128, 42],
+   "dark": 5,
+   "ambient": 65,
+   "fill": 50,
+   "lightRadius": 1000
   },
   "level": {
    "landmark": "Anzeigetafel „Zug fällt aus“",
@@ -686,7 +749,8 @@
    "rest": "mt_kiosk",
    "guide": "Gleise",
    "guideKind": "rail",
-   "guideColor": "#7f708a"
+   "guideColor": "#7f708a",
+   "landmarkImage": "landmark_board"
   },
   "dressing": {"desert": 20}
  },
@@ -733,8 +797,15 @@
    "stinger": "bell",
    "moment": "Das Nest im Sammler: ein Berg aus Glänzendem unter dem Lichtschacht",
    "wish": "Nest",
-   "lightStrength": 220,
-   "music": 35
+   "lightStrength": 260,
+   "music": 35,
+   "image": "wow_nest",
+   "imageTiles": 6,
+   "imageCore": [148, 60],
+   "dark": 5,
+   "ambient": 65,
+   "fill": 50,
+   "lightRadius": 950
   },
   "level": {
    "landmark": "Lichtschacht des Gullys",
@@ -796,8 +867,15 @@
    "stinger": "bell",
    "moment": "Die Kristallgrotte: alles leuchtet von unten",
    "wish": "Kristalle",
-   "lightStrength": 220,
-   "music": 35
+   "lightStrength": 260,
+   "music": 35,
+   "image": "wow_crystals",
+   "imageTiles": 9,
+   "imageCore": [165, 83],
+   "dark": 10,
+   "ambient": 65,
+   "fill": 45,
+   "lightRadius": 1000
   },
   "level": {
    "landmark": "Förderturm, unten das Leuchten der Kristalle",
@@ -806,7 +884,8 @@
    "rest": "sm_kaue",
    "guide": "Grubenbahn-Schienen",
    "guideKind": "rail",
-   "guideColor": "#7f708a"
+   "guideColor": "#7f708a",
+   "landmarkImage": "landmark_headframe"
   },
   "dressing": {"desert": 25}
  },
@@ -883,9 +962,25 @@
    "moment": "Nachts über dem Tankfeld: die Fackel brüllt, Funken regnen",
    "wish": "Fackelturm",
    "lightStrength": 220,
-   "music": 35
+   "music": 35,
+   "image": "wow_flare",
+   "imageTiles": 18,
+   "imageCore": [98, 27],
+   "dark": 10,
+   "ambient": 60,
+   "fill": 40,
+   "lightRadius": 1000
   },
-  "level": {"landmark": "Fackel", "landmarkMotif": "flare", "landmarkColor": "#ff8a3d", "rest": "rf_leitstand", "guide": "Rohrbrücke", "guideKind": "pipe", "guideColor": "#5d5d5d"},
+  "level": {
+   "landmark": "Fackel",
+   "landmarkMotif": "flare",
+   "landmarkColor": "#ff8a3d",
+   "rest": "rf_leitstand",
+   "guide": "Rohrbrücke",
+   "guideKind": "pipe",
+   "guideColor": "#5d5d5d",
+   "landmarkImage": "wow_flare"
+  },
   "dressing": {"desert": 50}
  },
  "sunny_acres": {
@@ -962,7 +1057,13 @@
    "moment": "Leerer Pool voller Liegestühle, darin Bewaffnete, Schlager aus dem Radio",
    "wish": "Pool-Set, Liegestühle",
    "lightStrength": 220,
-   "music": 35
+   "music": 35,
+   "image": "wow_pool",
+   "imageTiles": 6,
+   "imageCore": [172, 100],
+   "dark": 0,
+   "fill": 0,
+   "lightRadius": 800
   },
   "level": {
    "landmark": "Wasserturm mit Lächel-Gesicht",
@@ -971,7 +1072,8 @@
    "rest": "tp_pool",
    "guide": "Lichterkette zwischen den Wohnwagen",
    "guideKind": "lights",
-   "guideColor": "#f9c22b"
+   "guideColor": "#f9c22b",
+   "landmarkImage": "landmark_watertower"
   },
   "dressing": {"desert": 70}
  },
@@ -1063,8 +1165,15 @@
    "stinger": "drone",
    "moment": "Die Rakete im Schacht, an der Startrampe leuchtet 00:00:01",
    "wish": "Rakete, Startrampe",
-   "lightStrength": 220,
-   "music": 35
+   "lightStrength": 260,
+   "music": 35,
+   "image": "wow_rocket",
+   "imageTiles": 24,
+   "imageCore": [140, 200],
+   "dark": 5,
+   "ambient": 65,
+   "fill": 50,
+   "lightRadius": 1100
   },
   "level": {
    "landmark": "die Rakete im Schacht",
@@ -1073,7 +1182,8 @@
    "rest": "rs_offiziersmesse",
    "guide": "Kabelbäume zur Startrampe",
    "guideKind": "cable",
-   "guideColor": "#e83b3b"
+   "guideColor": "#e83b3b",
+   "landmarkImage": "wow_rocket"
   },
   "dressing": {"desert": 3}
  }

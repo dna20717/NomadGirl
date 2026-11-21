@@ -92,6 +92,7 @@ export class PlayScene extends Phaser.Scene {
     if (this.data_.game?.ladder?.scaffold) ids.add(this.data_.game.ladder.scaffold);   // #156 scaffold towers outdoors
     for (const t of Object.values(this.data_.terrain || {})) for (const id of [t.look, t.props, t.propsBig]) if (id) ids.add(id);   // Kachel-Sets (TileSet00)
     for (const P of Object.values(this.data_.pois || {})) for (const b of P.brandProps || []) if (b.look) ids.add(b.look);   // Marken-Clutter (NomadCola-Automaten …)
+    for (const P of Object.values(this.data_.pois || {})) for (const id of [P.wow?.image, P.level?.landmarkImage]) if (id) ids.add(id);   // #165 painted Wow motifs and landmarks
     if (this.data_.worldmap?.logos) ids.add(this.data_.worldmap.logos);
     for (const k of ['look', 'open']) if (this.data_.game?.vault?.[k]) ids.add(this.data_.game.vault[k]);   // #153 the painted vault   // the brand sign at a POI's entrance
     const DR = this.data_.drone || {};

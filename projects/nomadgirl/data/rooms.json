@@ -34,7 +34,8 @@
    "must": "schild, straße, fass",
    "never": "bett, büro"
   },
-  "type": "wow"
+  "type": "wow",
+  "dressing": {"density": 2.5, "prefer": "schild, fass, kanister, wrack"}
  },
  "eingangshalle": {
   "name": "Eingangshalle",
@@ -4071,7 +4072,8 @@
    "keyImage": "Leerer Pool voller Liegestühle, darin Bewaffnete mit Sonnenhut",
    "must": "grün, musik, fass",
    "never": "büro, militär"
-  }
+  },
+  "dressing": {"density": 3, "prefer": "musik, grün, fass"}
  },
  "fm_zettelkabine": {
   "name": "Funkmast · Kabine im Wind",
@@ -4121,7 +4123,8 @@
    "keyImage": "Die Kabine oben im Wind, Wände voller Zettel, Kopfhörer am Haken",
    "must": "technik, kabel, kiste",
    "never": "grün, laden"
-  }
+  },
+  "dressing": {"density": 3.5, "prefer": "technik, kabel, werkzeug"}
  },
  "markt_kuppel": {
   "name": "Markt · Passage unter der Kuppel",
@@ -4164,7 +4167,8 @@
    "keyImage": "Stillstehende Rolltreppe unter SALE-Bannern, Licht von oben",
    "must": "laden, bank, deko",
    "never": "wrack, bett"
-  }
+  },
+  "dressing": {"density": 4, "prefer": "laden, kasse, regal, automat, bank"}
  },
  "hh_bruchkante": {
   "name": "Hochhaus · Bruchkante",
@@ -4214,7 +4218,8 @@
    "keyImage": "Ein halbes Büro hängt über dem Abgrund, Schreibtische an der Bruchkante",
    "must": "papier, technik, sitz",
    "never": "wrack, reifen"
-  }
+  },
+  "dressing": {"density": 3.5, "prefer": "papier, büro, sitz, technik"}
  },
  "ph_nachtdach": {
   "name": "Parkhaus · Nachtdeck",
@@ -4262,7 +4267,8 @@
    "keyImage": "Das Kassenhaus im Neon, dahinter die Skyline der Stadt",
    "must": "reifen, kiste, müll",
    "never": "grün, bett"
-  }
+  },
+  "dressing": {"density": 3, "prefer": "reifen, schild, müll, licht"}
  },
  "mt_gittertor": {
   "name": "Metro · Das Gittertor",
@@ -4311,7 +4317,8 @@
    "keyImage": "Bahnsteig voller Schlaflager vor dem verschweißten Tunnel mit der Aufschrift BigCityDelta",
    "must": "sitz, müll, schild",
    "never": "grün, wrack"
-  }
+  },
+  "dressing": {"density": 3.5, "prefer": "sitz, müll, schild, licht"}
  },
  "kn_glanzberg": {
   "name": "Kanal · Der Glanzberg",
@@ -4360,7 +4367,8 @@
    "keyImage": "Ein Berg aus Glänzendem unter dem Lichtschacht",
    "must": "müll, kiste, putz",
    "never": "büro, sitz"
-  }
+  },
+  "dressing": {"density": 3.5, "prefer": "müll, kiste, putz, licht"}
  },
  "bunker_reaktorkern": {
   "name": "Bunker · Reaktorkern",
@@ -4403,7 +4411,8 @@
    "keyImage": "Der Reaktorblock in grünem Pulsieren, Dampf zwischen den Stegen",
    "must": "technik, rohr, gefahr",
    "never": "grün, bett"
-  }
+  },
+  "dressing": {"density": 3.5, "prefer": "technik, rohr, gefahr, sandsack"}
  },
  "sm_kristalldom": {
   "name": "Mine · Kristalldom",
@@ -4453,7 +4462,8 @@
    "must": "stein, licht",
    "never": "laden, müll, sitz",
    "decay": 0
-  }
+  },
+  "dressing": {"density": 2.5, "prefer": "stein, licht, kabel"}
  },
  "min_uhrensaal": {
   "name": "Ministerium · Uhrensaal",
@@ -4496,7 +4506,8 @@
    "keyImage": "Die große Uhr über schnurgeraden Stuhlreihen",
    "must": "deko, sitz, bild",
    "never": "müll, wrack"
-  }
+  },
+  "dressing": {"density": 3.5, "prefer": "deko, sitz, bild, bank"}
  },
  "rf_fackelnacht": {
   "name": "Raffinerie · Fackel bei Nacht",
@@ -4540,7 +4551,8 @@
    "keyImage": "Die Fackel brennt über dem Tankfeld, Funken regnen",
    "must": "fass, kanister, technik",
    "never": "bett, büro"
-  }
+  },
+  "dressing": {"density": 3, "prefer": "fass, kanister, rohr, gefahr"}
  },
  "rs_raketenblick": {
   "name": "Silo · Die Rakete",
@@ -4591,6 +4603,7 @@
    "keyImage": "Die Rakete im Schacht, die Anzeige 00:00:01",
    "must": "technik, kabel, gefahr",
    "never": "grün, laden"
-  }
+  },
+  "dressing": {"density": 3.5, "prefer": "technik, kabel, gefahr, rohr"}
  }
 }

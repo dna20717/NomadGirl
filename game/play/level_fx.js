@@ -37,8 +37,15 @@ export class LevelFx {
     const g = s.add.graphics().setDepth(-60).setScrollFactor(sf), col = aap(L.landmarkColor || '#ffd541');
     // where the camera is around the middle of the level, the landmark stands right of the middle of the view, its foot near the horizon
     const cx = (W / 2 - vw / 2) * sf + vw * 0.62, foot = (H * 0.6 - vh / 2) * sf + vh * 0.72;
-    drawMotif(g, L.landmarkMotif || 'neon', cx, foot, vh * 0.42 / (5 * 64), col, { far: true, text: L.landmark.length < 14 ? L.landmark : '' });
-    this.landmark = g;
+    const pic = L.landmarkImage && s.textures.exists(L.landmarkImage) ? L.landmarkImage : null;   // #165 the painted landmark
+    if (pic) {
+      const src = s.textures.get(pic).getSourceImage(), k = vh * 0.42 / src.height;
+      this.landmark = s.add.image(cx, foot, pic).setOrigin(0.5, 1).setScale(k).setScrollFactor(sf).setDepth(-60).setTint(0xb0a8c0);
+      g.fillStyle(col, 0.08).fillCircle(cx, foot - src.height * k * 0.6, src.height * k * 0.55);
+    } else {
+      drawMotif(g, L.landmarkMotif || 'neon', cx, foot, vh * 0.42 / (5 * 64), col, { far: true, text: L.landmark.length < 14 ? L.landmark : '' });
+      this.landmark = g;
+    }
     // windows: the view outside (dusk sky, the far city, the landmark small) and a frame with mullions on the back wall around every hole
     const fr = s.add.graphics().setDepth(-10.8), view = s.add.graphics().setDepth(-10.9);
     const wowX = this.scene.levelInfo.rooms.find(r => r.wow)?.x ?? s.room.w;
@@ -47,7 +54,12 @@ export class LevelFx {
       view.fillGradientStyle(0x285cc4, 0x285cc4, 0xf5a097, 0xf5a097, 1).fillRect(X, Y, WW, HH);
       view.fillStyle(0x403353, 1); for (let i = 0; i < 9; i++) { const bh = (0.18 + ((i * 7 + x) % 5) * 0.07) * HH; view.fillRect(X + i * WW / 9, Y + HH - bh, WW / 9 - 2, bh); }
       const side = wowX > x ? 0.72 : 0.28;
-      drawMotif(view, L.landmarkMotif || 'neon', X + WW * side, Y + HH * 0.98, HH * 0.8 / (5 * 64), col, { far: true });
+      if (pic) {   // #165 the painted landmark in the window, cropped to the hole
+        const src = s.textures.get(pic).getSourceImage(), k = HH * 0.8 / src.height, ix = X + WW * side, iy = Y + HH * 0.98;
+        const left = ix - src.width * k / 2, top = iy - src.height * k;
+        const c0 = Math.max(0, (X - left) / k), c1 = Math.min(src.width, (X + WW - left) / k), r0 = Math.max(0, (Y - top) / k);
+        if (c1 > c0) s.add.image(left, top, pic).setOrigin(0).setScale(k).setDepth(-10.85).setTint(0xc8c0d0).setCrop(c0, r0, c1 - c0, src.height - r0);
+      } else drawMotif(view, L.landmarkMotif || 'neon', X + WW * side, Y + HH * 0.98, HH * 0.8 / (5 * 64), col, { far: true });
       fr.lineStyle(10, INK, 1).strokeRect(x * T - 4, y * T - 4, w * T + 8, h * T + 8);
       fr.lineStyle(5, STEEL, 1).lineBetween((x + w / 2) * T, y * T, (x + w / 2) * T, (y + h) * T).lineBetween(x * T, (y + h / 2) * T, (x + w) * T, (y + h / 2) * T);
       fr.fillStyle(DARK, 0.9).fillRect(x * T - 8, (y + h) * T + 4, w * T + 16, 10);   // sill
@@ -102,12 +114,50 @@ export class LevelFx {
     const s = this.scene, T = this.T, w = this.wow, W = w.W, r = w.room;
     const g = s.add.graphics().setDepth(-10.6), col = aap(W.light || '#ffd541');
     const bx = (w.x + 0.5) * T, by = (w.y + 1) * T, k = (W.scale ?? 150) / 100;
-    drawMotif(g, w.motif, bx, by, k, col, { text: W.text || '', room: { x: r.x * T, y: r.y * T, w: r.w * T, h: r.h * T }, T });
-    this.wowG = g;
+    const pic = W.image && s.textures.exists(W.image) ? this.drawWowImage(g, bx, by, k, col) : null;   // #165 the painted motif
+    if (!pic) drawMotif(g, w.motif, bx, by, k, col, { text: W.text || '', room: { x: r.x * T, y: r.y * T, w: r.w * T, h: r.h * T }, T });   // fallback: code silhouette
+    this.wowG = g; this.wowPic = pic;
+    const gx = pic ? pic.core.x : bx, gy = pic ? pic.core.y : by - 2.5 * T * k, R = pic ? Math.max(pic.w, pic.h) * 0.42 : 3.2 * T * k;
     this.wowGlow = s.add.graphics().setDepth(-10.55).setBlendMode(Phaser.BlendModes.ADD);
-    this.wowGlow.fillStyle(col, 0.12).fillCircle(bx, by - 2.5 * T * k, 3.2 * T * k).fillStyle(col, 0.1).fillCircle(bx, by - 2.5 * T * k, 1.6 * T * k);
+    this.wowGlow.fillStyle(col, 0.12).fillCircle(gx, gy, R).fillStyle(col, 0.1).fillCircle(gx, gy, R / 2);
     this.wowFx = s.add.graphics().setDepth(-9.6).setBlendMode(Phaser.BlendModes.ADD);
-    this.wowBox = { x: r.x * T, y: r.y * T, w: r.w * T, h: r.h * T, bx, by, top: by - 5 * T * k };
+    this.wowBox = { x: r.x * T, y: r.y * T, w: r.w * T, h: r.h * T, bx, by: pic && !W.imageHang ? pic.bottom : by, top: pic ? pic.top : by - 5 * T * k, core: pic?.core, half: pic ? pic.w / 2 : 3 * T };
+  }
+  // #165 the painted motif (POIs › Wow › Motiv: gemaltes Bild): foot on the motif point (or hung under the ceiling), with what moves on it
+  // from code: the second hand of the clock, the counter beside the rocket, text, a pulsing core, light cones under a dome, the chandelier
+  drawWowImage(g, bx, by, k, col) {
+    const s = this.scene, T = this.T, w = this.wow, W = w.W, r = w.room;
+    const src = s.textures.get(W.image).getSourceImage(), H = (W.imageTiles || 5 * k) * T, sc = H / src.height, Wd = src.width * sc;
+    const top = W.imageHang ? (r.y + 1) * T : by - H;
+    const img = s.add.image(bx, top, W.image).setOrigin(0.5, 0).setScale(sc).setDepth(-10.6);
+    const at = p => ({ x: bx + (p[0] - src.width / 2) * sc, y: top + p[1] * sc });
+    const core = at(W.imageCore || [src.width / 2, src.height / 2]);
+    const pic = { img, top, bottom: top + H, w: Wd, h: H, core, sc };
+    if (W.imageText && W.text) vtext(s, at(W.imageText).x, at(W.imageText).y, W.text, Math.max(18, H * 0.07), col, -10.58);
+    if (w.motif === 'clock') {
+      const R = H * 0.2, hand = s.add.graphics().setDepth(-10.58);
+      hand.lineStyle(Math.max(3, H * 0.008), 0xb4202a, 1).lineBetween(0, R * 0.15, 0, -R).fillStyle(0xb4202a, 1).fillCircle(0, 0, Math.max(4, H * 0.012));
+      hand.setPosition(core.x, core.y); s.tweens.add({ targets: hand, angle: 360, duration: 60000, repeat: -1 });
+      const cy = (r.y + 1) * T + 0.2 * T;   // the chandelier under the ceiling
+      if (top - cy > 3 * T) for (const dx of [-Wd * 0.9, Wd * 0.9]) {
+        const x = bx + dx; g.lineStyle(4, 0xa08662, 1).lineBetween(x, cy - 0.2 * T, x, cy + 1.2 * T);
+        g.fillStyle(0xa08662, 1).fillTriangle(x - 1.2 * T, cy + 1.5 * T, x + 1.2 * T, cy + 1.5 * T, x, cy + 1.1 * T);
+        g.fillStyle(0xf4d29c, 1); for (let i = -4; i <= 4; i++) g.fillCircle(x + i * 0.28 * T, cy + 1.55 * T + Math.abs(i) * 0.06 * T, 7);
+        this.chandeliers = [...(this.chandeliers || []), { x, y: cy + 1.5 * T }];
+      }
+    }
+    if (w.motif === 'rocket') {   // the counter on the launch console beside the rocket
+      const x = bx + Wd / 2 + 0.4 * T, y = pic.bottom - 2.4 * T;
+      g.fillStyle(DARK, 1).fillRect(x, y, 3.4 * T, 1.2 * T).lineStyle(4, 0x4a5462, 1).strokeRect(x, y, 3.4 * T, 1.2 * T).fillRect(x + 1.5 * T, y + 1.2 * T, 0.3 * T, pic.bottom - y - 1.2 * T);
+      vtext(s, x + 1.7 * T, y + 0.6 * T, W.text || '00:00:01', 0.9 * T, 0xe83b3b, -10.58);
+    }
+    if (W.imageHang) {   // light falls from the dome to the floor
+      const L = s.add.graphics().setDepth(-10.5).setBlendMode(Phaser.BlendModes.ADD), y0 = pic.bottom - H * 0.25;
+      L.fillStyle(col, 0.06).fillTriangle(bx - Wd * 0.3, y0, bx + Wd * 0.3, y0, bx + Wd * 0.55, by).fillTriangle(bx - Wd * 0.3, y0, bx - Wd * 0.55, by, bx + Wd * 0.55, by);
+      L.fillStyle(col, 0.05).fillTriangle(bx - Wd * 0.12, y0, bx + Wd * 0.12, y0, bx, by);
+    }
+    this.wowPulse = s.add.graphics().setDepth(-10.55).setBlendMode(Phaser.BlendModes.ADD);
+    return pic;
   }
   // the room Leyla is in changed (scene_events.js runUpdate): the Wow moment on the first entry
   enterRoom(here) {
@@ -186,7 +236,15 @@ export class LevelFx {
           fx.fillStyle(p.c, a).fillCircle(p.x, p.y, p.r * (kind === 'glitter' ? 0.5 + 0.5 * Math.abs(Math.sin(p.t / 120)) : 1));
         }
       }
-      if (kind === 'flicker' && this.wowG) this.wowG.alpha = Math.random() < 0.04 ? 0.55 : 1;
+      if (kind === 'flicker' && this.wowG) { const a = Math.random() < 0.04 ? 0.55 : 1; this.wowG.alpha = a; if (this.wowPic) this.wowPic.img.alpha = 0.75 + 0.25 * a; }
+      // #165 the core of the painted motif breathes: the reactor pulses, the flame flickers, crystals and treasure shimmer
+      if (this.wowPulse && near) {
+        const c = this.wowPic.core, m = this.wow.motif, col = aap(this.wow.W.light || '#ffd541'), R = Math.max(this.wowPic.w, this.wowPic.h);
+        const a = m === 'flare' ? 0.55 + 0.45 * Math.random() : m === 'reactor' ? 0.5 + 0.5 * Math.sin(time / 520) : 0.6 + 0.4 * Math.sin(time / 1300);
+        const big = { reactor: 0.22, flare: 0.16, crystals: 0.3, nest: 0.25, grate: 0.35, dome: 0.3 }[m] ?? 0.14;
+        this.wowPulse.clear().fillStyle(col, 0.16 * a).fillCircle(c.x, c.y, R * big).fillStyle(col, 0.14 * a).fillCircle(c.x, c.y, R * big * 0.45);
+        for (const ch of this.chandeliers || []) this.wowPulse.fillStyle(0xf4d29c, 0.12 + 0.04 * Math.sin(time / 700)).fillCircle(ch.x, ch.y, 1.6 * T);
+      }
     }
     // paper scraps drift towards a draft (sign kind draft), more of them at the first secret
     if (this.signs?.length && this.signG) {
@@ -206,12 +264,19 @@ export class LevelFx {
 }
 
 function spawn(kind, B, T) {
-  const rx = () => B.bx + (Math.random() - 0.5) * 6 * T;
-  if (kind === 'sparks') return { x: B.bx + (Math.random() - 0.5) * T, y: B.top, vx: (Math.random() - 0.5) * 220, vy: -120 - Math.random() * 160, g: 420, r: 3, c: aap(Math.random() < 0.5 ? 0xffd541 : 0xfa6a0a), a: 1, t: 0, life: 1400 };
+  const rx = () => B.bx + (Math.random() - 0.5) * Math.max(6 * T, (B.half || 0) * 1.6);
+  if (kind === 'sparks') return { x: (B.core?.x ?? B.bx) + (Math.random() - 0.5) * T, y: B.core?.y ?? B.top, vx: (Math.random() - 0.5) * 220, vy: -120 - Math.random() * 160, g: 420, r: 3, c: aap(Math.random() < 0.5 ? 0xffd541 : 0xfa6a0a), a: 1, t: 0, life: 1400 };
   if (kind === 'steam') return { x: rx(), y: B.by - T, vx: (Math.random() - 0.5) * 20, vy: -40 - Math.random() * 30, r: 10 + Math.random() * 16, c: 0xb3b9d1, a: 0.12, t: 0, life: 3200 };
   if (kind === 'paper') return { x: rx(), y: B.top + Math.random() * 3 * T, vx: 90 + Math.random() * 80, vy: 10 - Math.random() * 30, r: 4, c: 0xdae0ea, a: 0.7, t: 0, life: 3000 };
   if (kind === 'glitter') return { x: rx(), y: B.by - Math.random() * 3 * T, vx: 0, vy: -6, r: 4, c: 0xfef3c0, a: 0.9, t: 0, life: 1600 };
   return { x: rx(), y: B.by - Math.random() * 5 * T, vx: 8, vy: -4, r: 2.5, c: 0xf4d29c, a: 0.35, t: 0, life: 4000 };   // dust, flicker
+}
+
+// VT323 text with a soft additive halo (on painted motifs, #165)
+function vtext(scene, x, y, str, size, c, depth) {
+  const st = { fontFamily: 'VT323, monospace', fontSize: `${Math.round(size)}px`, color: hex(c) };
+  scene.add.text(x, y, str, st).setOrigin(0.5).setDepth(depth + 0.005).setAlpha(0.35).setScale(1.08).setBlendMode(Phaser.BlendModes.ADD);
+  return scene.add.text(x, y, str, st).setOrigin(0.5).setDepth(depth + 0.01);
 }
 
 // A motif as a code silhouette, foot at (bx, by), k = scale (1 = about 5 tiles high), col = glow colour (AAP-64).

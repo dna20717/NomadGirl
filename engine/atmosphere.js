@@ -90,9 +90,14 @@ export function planLights(D, room, regionAt, opts = {}) {
     lightTheWay(lamps, opts.level, room, cfg, (x, y) => { const reg = regionAt(x, y), L = M[reg.mood]?.lamps?.[0] || { kind: 'bulb' }; return (M[reg.mood]?.light?.ambient ?? 100) >= 90 ? null : lamp(L, x, y, reg, true); });   // daylight needs no lamp
     const W = wowInLevel(D, opts.poiId, opts.level);
     if (W) {
-      let y = W.y - 2; while (y > W.room.y && !solid(W.x, y - 1)) y--;
-      const L = { kind: 'ceiling', color: W.W.light || '#ffe2a8', radius: 560, strength: W.W.lightStrength ?? 220, behavior: W.W.particles === 'flicker' ? 'stutter' : 'steady' };
-      lamps.push({ ...lamp(L, W.x, y, regionAt(W.x, y), true), key: true });
+      const top = x => { let y = W.y - 2; while (y > W.room.y && !solid(x, y - 1)) y--; return y; };
+      const L = { kind: 'ceiling', color: W.W.light || '#ffe2a8', radius: W.W.lightRadius || 560, strength: W.W.lightStrength ?? 220, behavior: W.W.particles === 'flicker' ? 'stutter' : 'steady' };
+      lamps.push({ ...lamp(L, W.x, top(W.x), regionAt(W.x, top(W.x)), true), key: true });
+      // #165 Fülllicht: two softer lamps left and right of the motif, a quarter of the room away, so the room does not drown
+      if (W.W.fill > 0) for (const d of [-1, 1]) {
+        const x = Math.max(W.room.x + 1, Math.min(W.room.x + W.room.w - 2, W.x + d * Math.round(W.room.w / 4))), y = top(x);
+        lamps.push(lamp({ ...L, kind: 'ceiling', behavior: 'steady', radius: Math.round(L.radius * 0.9), strength: Math.round(L.strength * W.W.fill / 100) }, x, y, regionAt(x, y), true));
+      }
     }
   }
   return { lamps, ceilings, faces };

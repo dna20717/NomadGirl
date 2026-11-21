@@ -7789,5 +7789,141 @@
   "source": "KI (PixelLab: Schlüsselposen Ausholen/Loslassen mit Edit Pro Flash, Übergänge mit Animate Image) + Code (Streifen)",
   "date": "2026-11-21",
   "description": "4× Ausholen (Ausfallschritt, Arm hinter den Kopf), 4× Wurf (Bild 8 = loslassen), 3× zurück ins Zielen; die Waffe bleibt in der vorderen Hand (#161)."
+ },
+ "wow_priceboard": {
+  "name": "Wow · Preistafel Mile 7",
+  "kind": "image",
+  "file": "assets/pois/wow/wow_priceboard.png",
+  "source": "KI (PixelLab, create_image_pro 192 × 344, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Preistafel auf zwei Pfosten mit Sonnen-Logo, Regular/Plus/Diesel in LED-Ziffern, Rost und Aufkleber (#165)."
+ },
+ "wow_dome": {
+  "name": "Wow · Glaskuppel Megamall",
+  "kind": "image",
+  "file": "assets/pois/wow/wow_dome.png",
+  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Glaskuppel von innen, Eisenrippen, einzelne Scheiben fehlen, zerrissenes Banner „SALE“; hängt unter der Decke (#165)."
+ },
+ "wow_reactor": {
+  "name": "Wow · Reaktorkern Bunker 13",
+  "kind": "image",
+  "file": "assets/pois/wow/wow_reactor.png",
+  "source": "KI (PixelLab, create_image_pro 256 × 320, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Genieteter Reaktorzylinder mit grünen Ringen und grünem Sichtfenster, Rohre, Warnstreifen (#165)."
+ },
+ "wow_clock": {
+  "name": "Wow · Große Uhr Ministerium",
+  "kind": "image",
+  "file": "assets/pois/wow/wow_clock.png",
+  "source": "KI (PixelLab, create_image_pro 256 × 256, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Uhr im Messing-Marmor-Gehäuse mit Adler der Ordnung, römische Ziffern, ohne Sekundenzeiger (der kommt aus Code) (#165)."
+ },
+ "wow_brokenoffice": {
+  "name": "Wow · Bruchkante Delta Heights",
+  "kind": "image",
+  "file": "assets/pois/wow/wow_brokenoffice.png",
+  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Abgebrochene Bürodecke mit Bewehrung, zwei Schreibtische mit Röhrenmonitoren, Papier fliegt hinaus (#165)."
+ },
+ "wow_kiosk": {
+  "name": "Wow · Kassenhaus P+R",
+  "kind": "image",
+  "file": "assets/pois/wow/wow_kiosk.png",
+  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Kassenhaus auf dem Dach mit Neon „PAY HERE“, Schranke, Kassenautomat, ausgebranntes Auto (#165)."
+ },
+ "wow_cabin": {
+  "name": "Wow · Zettelkabine Funkmast",
+  "kind": "image",
+  "file": "assets/pois/wow/wow_cabin.png",
+  "source": "KI (PixelLab, create_image_pro 256 × 256, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Funkerkabine auf dem Gittermast, offen, die Wand voller Zettel, Funkgerät, Kopfhörer, Hocker (#165)."
+ },
+ "wow_grate": {
+  "name": "Wow · Gittertor Metro",
+  "kind": "image",
+  "file": "assets/pois/wow/wow_grate.png",
+  "source": "KI (PixelLab, create_image_pro 256 × 256, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Verschweißtes Tunneltor im Bogen, Kette mit Schloss, Licht durch die Ritzen, Schlafsäcke davor, leeres Schild (#165)."
+ },
+ "wow_nest": {
+  "name": "Wow · Glanzberg-Nest Kanal",
+  "kind": "image",
+  "file": "assets/pois/wow/wow_nest.png",
+  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Hort aus Radkappen, Dosen, CDs, Münzen, Schmuck und Discokugel auf Zweigen, Lumpen und Kabeln (#165)."
+ },
+ "wow_crystals": {
+  "name": "Wow · Kristalle Pit 6",
+  "kind": "image",
+  "file": "assets/pois/wow/wow_crystals.png",
+  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Große leuchtende Cyan-Kristalle auf Fels, kleine Splitter, Grubenlampe (#165)."
+ },
+ "wow_flare": {
+  "name": "Wow · Fackelturm Delta Crude",
+  "kind": "image",
+  "file": "assets/pois/wow/wow_flare.png",
+  "source": "KI (PixelLab, create_image_pro 192 × 344, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Fackelturm aus Stahlgitter mit Leitern und Bühne, Flamme oben, Fässer am Fuß (#165)."
+ },
+ "wow_pool": {
+  "name": "Wow · Pool-Set Sunny Acres",
+  "kind": "image",
+  "file": "assets/pois/wow/wow_pool.png",
+  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Rettungsschwimmer-Hochsitz, Stapel Liegestühle, Sonnenschirm, Flamingo-Schwimmring, Poolleiter, Kühlbox, Radio (#165)."
+ },
+ "wow_rocket": {
+  "name": "Wow · Rakete Silo Zero",
+  "kind": "image",
+  "file": "assets/pois/wow/wow_rocket.png",
+  "source": "KI (PixelLab, create_image_pro 192 × 344, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Weiß-rote Rakete am Startturm im Silo, Versorgungsarme, Flammengraben (#165)."
+ },
+ "landmark_watertower": {
+  "name": "Landmarke · Wasserturm mit Lächeln",
+  "kind": "image",
+  "file": "assets/pois/wow/landmark_watertower.png",
+  "source": "KI (PixelLab, create_image_pro 192 × 344, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Wasserturm auf vier Beinen, gelber Tank mit Lächel-Gesicht (Sunny Acres) (#165)."
+ },
+ "landmark_headframe": {
+  "name": "Landmarke · Förderturm Pit 6",
+  "kind": "image",
+  "file": "assets/pois/wow/landmark_headframe.png",
+  "source": "KI (PixelLab, create_image_pro 192 × 344, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Förderturm mit Seilscheibe, Maschinenhaus, Cyan-Leuchten aus dem Schacht (#165)."
+ },
+ "landmark_penthouse": {
+  "name": "Landmarke · Neon „Penthouse“",
+  "kind": "image",
+  "file": "assets/pois/wow/landmark_penthouse.png",
+  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Neon-Schrift PENTHOUSE auf Stahlgerüst, einzelne Buchstaben dunkel (Delta Heights) (#165)."
+ },
+ "landmark_board": {
+  "name": "Landmarke · Anzeigetafel Metro",
+  "kind": "image",
+  "file": "assets/pois/wow/landmark_board.png",
+  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Hängende Abfahrtstafel mit Bernstein-Zeilen, eine rot „DELAYED“, Uhr daneben (Metro Line 4) (#165)."
  }
 }

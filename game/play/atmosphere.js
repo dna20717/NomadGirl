@@ -39,10 +39,13 @@ export class Atmosphere {
     const ac = this.amb.getContext('2d'), img = ac.createImageData(R.w, R.h);
     this.ambLum = new Float32Array(R.w * R.h);
     // #163 the Wow room: the rest of the room darker, so the key light on the motif stands out
-    const wowRoom = s.levelInfo?.rooms?.find(r => r.wow), dark = 1 - (D.game?.levelDesign?.wowDark ?? 30) / 100;
+    // #165 per POI: POIs › Wow › Dunkel-Abzug hier (else Spiel › Level-Design) and a floor (Grundhelligkeit mindestens)
+    const wowRoom = s.levelInfo?.rooms?.find(r => r.wow), WW = D.pois?.[s.levelPoi]?.wow || {};
+    const dark = 1 - (WW.dark ?? D.game?.levelDesign?.wowDark ?? 30) / 100, floor = (WW.ambient ?? 0) / 100;
     for (let y = 0; y < R.h; y++) for (let x = 0; x < R.w; x++) {
       const m = this.moodAt(x, y), c = rgb(m.color), i = (y * R.w + x) * 4;
-      const a = m.ambient * (wowRoom && x >= wowRoom.x && x < wowRoom.x + wowRoom.w && y >= wowRoom.y && y < wowRoom.y + wowRoom.h ? dark : 1);
+      const inWow = wowRoom && x >= wowRoom.x && x < wowRoom.x + wowRoom.w && y >= wowRoom.y && y < wowRoom.y + wowRoom.h;
+      const a = inWow ? Math.max(floor, m.ambient * dark) : m.ambient;
       img.data[i] = c[0] * a; img.data[i + 1] = c[1] * a; img.data[i + 2] = c[2] * a; img.data[i + 3] = 255;
       this.ambLum[y * R.w + x] = (c[0] + c[1] + c[2]) / 765 * a;
     }
@@ -174,8 +177,15 @@ export class Atmosphere {
   // ---------- lightmap ----------
   render() {
     if (!this.on || this.hidden || !this.scene.leyla) return;
-    const s = this.scene, cam = s.cam, k = this.k, m = this.margin, T = this.T, ctx = this.ctx;
-    const vw = cam.worldView, x0 = vw.x - m, y0 = vw.y - m, W = this.lw * k, H = this.lh * k, l = s.leyla;
+    const s = this.scene, cam = s.cam, k = this.k, m = this.margin, T = this.T;
+    // #165 the camera zoomed out (Wow camera move to 70 %, pictures of whole rooms): grow the lightmap so it still covers the view
+    const needW = Math.ceil((cam.worldView.width + m * 2) / k), needH = Math.ceil((cam.worldView.height + m * 2) / k);
+    if (needW > this.lw || needH > this.lh) {
+      this.lw = Math.max(this.lw, needW); this.lh = Math.max(this.lh, needH);
+      s.textures.remove('atmo_light'); this.tex = s.textures.createCanvas('atmo_light', this.lw, this.lh); this.ctx = this.tex.getContext();
+      this.image.setTexture('atmo_light').setDisplaySize(this.lw * k, this.lh * k);
+    }
+    const ctx = this.ctx, vw = cam.worldView, x0 = vw.x - m, y0 = vw.y - m, W = this.lw * k, H = this.lh * k, l = s.leyla;
     const X = wx => (wx - x0) / k, Y = wy => (wy - y0) / k;
 
     // ambient of the rooms
