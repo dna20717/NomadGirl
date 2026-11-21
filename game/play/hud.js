@@ -40,6 +40,7 @@ const caps = keys => keys.split(' / ').flatMap((k, i) => [...(i ? [el('i', {}, '
 const section = g => el('section', {}, el('h3', {}, icon(g.icon, 16), g.title), el('dl', {}, ...g.rows.flatMap(([k, t]) => [el('dt', {}, ...caps(k)), el('dd', {}, t)])));
 
 const TOAST_MAX = 3, WAITS = new Set(['info', 'travel']);   // #070 Meldungs-Kanal
+const QUIET_WAITS = new Set(['info', 'travel', 'camp', 'recipe']);   // #129 Info-Center: while a window is open these wait (warnings, rewards, loot never)
 
 export class Hud {
   constructor(root, { workshopDrafts = 0, commit = null } = {}) {
@@ -379,6 +380,7 @@ export class Hud {
   nextQueued() {
     const q = this.toastQueue;
     if (!q?.length || this.liveToasts() >= TOAST_MAX) return;
+    if (this.quiet && QUIET_WAITS.has(q[0][2])) return;   // #129 still a window open
     const [title, sub, kind, ms, o] = q.shift();
     this.toast(title, sub, kind, ms, { ...o, queued: true });
   }
@@ -401,6 +403,7 @@ export class Hud {
   toast(title, sub = '', kind = 'info', ms = 4200, { banner = false, sound = true, queued = false } = {}) {
     const K = TOAST_KINDS[kind] || TOAST_KINDS.info;
     if (!queued) this.journal(title, sub, kind);   // #070 everything goes into the Logbuch
+    if (!queued && !banner && this.quiet && QUIET_WAITS.has(kind)) { (this.toastQueue ??= []).push([title, sub, kind, ms, { banner, sound }]); return null; }   // #129 a window is open: later
     if (!queued && !banner && WAITS.has(kind) && this.liveToasts() >= TOAST_MAX) { (this.toastQueue ??= []).push([title, sub, kind, ms, { banner, sound }]); return null; }
     const same = [...this.toastsEl.children].find(x => !x.classList.contains('out') && x._title === title && x._sub === sub);
     if (same) {
@@ -435,7 +438,13 @@ export class Hud {
     const l = scene.leyla, max = l.maxHealth;
     // windows on top: the E prompt of the world waits (its key means „ok“ in the window)
     const hideP = !this.promptText || this.modal || !!this.inv?.isOpen || !!this.craft?.isOpen || !!this.tech?.isOpen || !!this.map?.isOpen;
-    this.root.classList.toggle('hud-windowed', !!(this.inv?.isOpen || this.craft?.isOpen || this.tech?.isOpen || this.map?.isOpen || this.quests?.isOpen || this.ach?.isOpen || this.tut?.isOpen || this.build?.active));   // #017: toasts move to the top centre, over the free middle of the window header, never over its buttons
+    const windowed = !!(this.inv?.isOpen || this.craft?.isOpen || this.tech?.isOpen || this.map?.isOpen || this.quests?.isOpen || this.ach?.isOpen || this.tut?.isOpen || this.build?.active);
+    this.root.classList.toggle('hud-windowed', windowed);
+    this.root.classList.toggle('hud-building', !!this.build?.active);   // #129 notes below the build bar, not on it
+    if (this.build?.active) { const b = document.querySelector('.bm-bar')?.getBoundingClientRect(); if (b && b.bottom > 0) this.root.style.setProperty('--build-top', `${Math.round(b.bottom + 10)}px`); }
+    // #129 Info-Center, context „window“: hints wait, the cassette steps aside; on closing, what waited comes one by one
+    const quiet = windowed || !!this.modal || !!this.megaBuild?.isOpen;
+    if (quiet !== this.quiet) { this.quiet = quiet; document.body.classList.toggle('ng-quiet', quiet); if (!quiet) [0, 700, 1400].forEach(ms => setTimeout(() => this.nextQueued(), ms)); }   // #017: toasts move to the top centre, over the free middle of the window header, never over its buttons
     if (this.promptEl.hidden !== hideP) this.promptEl.hidden = hideP;
     const hp = Math.max(0, Math.min(1, l.health / max));
     this.healthBar.style.width = `${hp * 100}%`;

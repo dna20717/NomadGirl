@@ -29,7 +29,8 @@ export class CampLife {
       this.music = s.sound.add(id, { loop: true, volume: 0 });
       this.music.play({ loop: true, volume: 0 });
       this.music.setVolume(0);   // fades in through updateSound
-      nowPlayingFor(this.D.assets, id, s.base || location.href);   // #117 the cassette
+      // #117 the cassette; #129 after the welcome (the arrival belongs to the camp, the music comes a breath later)
+      s.time.delayedCall(S.cassetteDelay ?? 4500, () => { if (s.camp === this && this.music) nowPlayingFor(this.D.assets, id, s.base || location.href); });
     };
     if (s.cache.audio.exists(id)) return play();
     const base = s.base || location.href;

@@ -75,6 +75,7 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .hud-toast { display: flex; align-items: center; gap: 12px; padding: 10px 16px; min-width: 260px; max-width: 460px; border-radius: 10px; background: rgba(13, 10, 18, .9); border: 1px solid var(--ng-line); color: var(--ng-text2); animation: hud-toast-in .35s ease-out; transition: opacity .4s, transform .4s; }
 .hud-toast.out { opacity: 0; transform: translateX(30px); }
 .hud-windowed .hud-toasts { top: 10px; right: auto; left: 50%; transform: translateX(-50%); align-items: center; z-index: 60; }
+.hud-building .hud-toasts { top: var(--build-top, 130px); }   /* #129 below the build bar, never over its tabs */
 .hud-windowed .hud-toast { min-width: 0; max-width: 420px; padding: 6px 12px; gap: 8px; box-shadow: 0 6px 20px rgba(0, 0, 0, .6); }
 .hud-windowed .hud-toast b { font-size: 22px; }
 .hud-windowed .hud-toast small { font-size: 12px; }

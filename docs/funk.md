@@ -269,10 +269,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #129 Info-Center: Einblendungen ordnen + Spieler-Log
-- **Status:** offen · angelegt 21.11. von Code (Daniel: „Einblendungen ordnen: lass uns ein Information Center konzipieren, um das auch in Zukunft zu vermeiden. In diesem Rahmen können wir auch ein Log für den Spieler aufbereiten, in dem er alle Schritte nachvollziehen kann und ggf. historische Meldungen anschauen kann.“)
+- **Status:** läuft (21.11., Etappe Ruhe fertig) · angelegt 21.11. von Code (Daniel: „Einblendungen ordnen: lass uns ein Information Center konzipieren, um das auch in Zukunft zu vermeiden. In diesem Rahmen können wir auch ein Log für den Spieler aufbereiten, in dem er alle Schritte nachvollziehen kann und ggf. historische Meldungen anschauen kann.“)
 - **Auftrag:** Konzept in `docs/concepts/info_center.md` (baut auf #070 Meldungs-Kanal + Logbuch auf), dann Kern bauen: feste Bühne mit Plätzen und Vorrang, nichts liegt übereinander; Log-Fenster mit Verlauf und Filtern.
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Konzept `docs/concepts/info_center.md` (Bestandsliste aller 17 Einblendungen, Bühne mit Zonen, 5 Stufen, Kontexte, Logbuch mit 10 Kategorien, 6 Etappen, 5 Fragen an Daniel). Gebaut: Kontext „Fenster“ (Hinweise warten, Kassette weg), Bau-Modus-Meldungen unter der Leiste, Kassette nach dem Willkommen. Test `tools/stage_test.mjs` (4). **Offen:** Etappen 2–6 (Zonen-Raster, weitere Kontexte, Logbuch-Fenster mit Filtern); vorher Daniels Antworten auf die 5 Fragen im Konzept.
 
 ### #130 Ton: stimmungsvolle Platzhalter + Ton-Liste
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Ton bitte mit stimmungsvollen Platzhaltern besetzen und eine Liste erzeugen, in der Art des Tones und Status (Code vs. produziert) aufgelistet ist, die wir dann abarbeiten können.“)

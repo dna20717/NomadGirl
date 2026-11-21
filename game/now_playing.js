@@ -7,6 +7,7 @@ const CSS = `
   padding: 8px 0 8px 16px; border-radius: 12px 0 0 12px; border-right: 0 !important; background: rgba(20, 16, 26, .97); border: 1px solid #3a2f45; box-shadow: 0 10px 34px rgba(0,0,0,.5);
   transform: translateX(120%); transition: transform .55s cubic-bezier(.2,.9,.25,1.15), opacity .4s; opacity: 0; font-family: Inter, sans-serif; }
 .np-card.on { transform: none; opacity: 1; }
+body.ng-quiet .np-card { transform: translateX(120%); opacity: 0; }   /* #129 a window, a menu or the build mode is open: the tape steps aside */
 .np-tape { position: relative; image-rendering: pixelated; flex: 0 0 auto; }
 .np-tape img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
 .np-label { position: absolute; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden;
