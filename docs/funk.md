@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Code → Ava: **Daniels Entscheidungen 21.11.** (21 Karten, Artefakt „NomadGirl Entscheidungen 21.11.“): #136 alle Räume umbauen, Hallen bleiben hoch mit Galerien · Gelände (#131) mit PixelLab neu malen (Wüste + Linoleum); **keine schwebenden Plattformen draußen**, dort immer ein Hintergrund (zur Not Kachel-Set „Höhle“) · Erde unter dem Boden bleibt · große Ansage oben rechts als großer Toast · Logbuch als zweiter Reiter im Questlog, beginnt je Durchgang leer · Bau-Modus: Kassette aus, Titel ins Logbuch · Bau-Meldungen nur Erfolge · Werkstatt-Licht bleibt im Container · Brett verkaufbar · Cockpit-Kram setzt Ava, **freigeschaltet über Ereignisse im Spiel** (kleine Meldung, kleiner als Achievements) · Billboard-Werbung als Ticket · erste Gegner-Scheibe Visier, Brandsatz, Flickerin, Sirene · **niemals Hunde als Gegner** (Drohnen gern) · Ergeben ja · **Granaten für Leyla jetzt**: Skill mit Ladungen + Abklingzeit (z. B. 3, dann 180 s), eigene Animationen, die mit Gehen/Rennen/Springen zusammenpassen · Gang-Ausrüstung: nichts bauen, erst klären, was das ist · Ranking: Δ-Bonus **und** Bonus-Kiste · Laden im Run zählt als k.o. · Ladezeit so lassen · als Nächstes: Info-Center fertig **und** Räume umbauen. Neue Tickets #138–#143.
 - 21.11. Code → Ava: Daniel unterwegs am Handy: 21 Entscheidungen als Karten mit Screenshots im Artefakt „NomadGirl Entscheidungen 21.11.“ (https://claude.ai/artifact/1Y7krDtikbEx63VnMNBnQK). Antworten liegen in dessen Datenbank (Sammlung `answers`, je Karte `choice` + `note`); nächste Sitzung dort auslesen und umsetzen.
 - 21.11. Code → Ava: #137 fertig: Werkstatt-Effekte (Aquarium, Leuchten, Dampf) bleiben in ihrem Container-Platz.
 - 21.11. Code → Ava: #130–#135 fertig (Ton-Platzhalter + Liste, POI-Gelände ohne PixelLab + Architektur-Pilot, Erde statt Schwarz, Glitches, Hauptmenü in einem Stück, Konzepte Info-Center + Gegner). #129 Info-Center wird gebaut, #136 Räume umbauen wartet auf Daniels Abnahme des Piloten.
@@ -264,19 +265,55 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 ## Tickets
 
+### #138 Gelände mit PixelLab neu + keine schwebenden Plattformen draußen
+- **Status:** offen · angelegt 21.11. von Code (Daniel: Karte „Gelände“ c: „Beides mit PixelLab neu malen“; Notiz: „Es soll keine schwebenden Plattformen außerhalb von Gebäuden geben. Bitte mach dort immer einen Hintergrund hin. Generiere zur Not ein Set ‚Höhle‘, wenn du es brauchst“)
+- **Auftrag:** Kachel-Sets Wüste und Beton/Linoleum mit PixelLab (ca. 15 je Set), orthogonal, AAP-64. Draußen jede Plattform mit Hintergrund (Fels, Höhle, Gerüst); falls nötig Kachel-Set „Höhle“.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #139 Gegner-Scheibe 1: Visier, Brandsatz, Flickerin, Sirene + Ergeben
+- **Status:** offen · angelegt 21.11. von Code (Daniel: Karten „Gegner zuerst“ a, „Ergeben“ a; Notiz: „Keine Hunde als Gegner. Niemals! Gerne Drohnen, aber keine Hunde.“)
+- **Auftrag:** Konzept `docs/concepts/enemy_kit.md` › 10: Trait-Haken + Register, `sniper`, `medic`, `alarm` (+`coward`), `grenadier`, `surrender` (Gefangen nehmen / laufen lassen / erledigen mit Ruf). Hund gestrichen.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #140 Granaten für Leyla
+- **Status:** offen · angelegt 21.11. von Code (Daniel: „Gleich mit, aber mach ein paar ordentliche Animationen, die kompatibel mit Gehen, Rennen und Springen sind. Granaten sind nicht numerisch vorhanden, sondern ein extra Skill mit einem Cooldown (z. B. 3 Stück und dann 180 Sekunden warten oder so)“)
+- **Auftrag:** Wurf als Skill (Ladungen, Abklingzeit, einstellbar), Wurf-Animation als Oberkörper-Schicht oder je Bewegungszustand, Explosion teilt sich den Code mit dem Werfer (#139).
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #141 Ranking-Bonus: Δ je Rang + Bonus-Kiste
+- **Status:** offen · angelegt 21.11. von Code (Daniel: Karte „Ranking-Bonus“: „A und B“)
+- **Auftrag:** Δ-Bonus je Rang (S +50 %, A +25 %, B +10 %, einstellbar) und eine Bonus-Kiste am Ausgang mit besserem Beute-Wurf; danach Balancing v2 (#109).
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #142 Cockpit-Kram über Ereignisse freischalten
+- **Status:** offen · angelegt 21.11. von Code (Daniel: „Ava setzt sie, aber basierend auf Ereignissen im Spiel (wie Achievements, aber weniger ‚groß‘, mit einer kleinen Unlock-Meldung)“)
+- **Auftrag:** Sonnenblende `ck_visor` und die 10 Kram-Stücke im Cockpit platzieren; jedes Stück erscheint erst nach einem Ereignis (erster Run, erste Gang, …) mit kleiner Meldung.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #143 Billboard-Werbung für Lore-Marken
+- **Status:** offen · angelegt 21.11. von Code (Daniel: Karte A11 a „Als Ticket bauen“)
+- **Auftrag:** Das Billboard im Cockpit zeigt wechselnd Werbung der Lore-Marken (#045, Logos), Startseite und Fahrt.
+- **Rückfragen:**
+- **Ergebnis:**
+
 ### #137 Werkstatt-Effekte bleiben im Container
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Manche Effekte von Werkstätten glitchen aus den Containern raus. Z. B. Aquarium“)
 - **Ursache:** Werkstatt-Bilder werden am Rand ihres Platzes beschnitten, die Effekte (Fische, Blasen, Leuchten, Dampf) wurden nur an ihrer Mitte geprüft und in Welt-Koordinaten gezeichnet: die Chill Area im zweiten Platz eines 20'-Containers ließ ihre Fische 17 px über die Trennwand schwimmen.
 - **Ergebnis:** (Code) Jeder Effekt-Bereich wird auf den Platz zugeschnitten (`effect()` in `benches.js`), Leuchten und Dampf/Rauch bekommen eine Maske in Form des Platzes (`bench.mask`). ⚠️ vorläufig: auch die großen Raumlichter bleiben im aufgeschnittenen Container. Prüfung in `bench_ui_test` (24). `npm test` 367/367; camp, container, stack, mega, megarig, tank, cozy, stage grün. **Bitte testen:** Chill Area (Aquarium) in einen Container mit mehreren Plätzen, nachts ansehen; Küche (Dampf) und Werkbank (Funken).
 
 ### #136 Räume wie echte Gebäude (alle POIs)
-- **Status:** offen · angelegt 21.11. von Code (aus #131, Pilot `lager`)
+- **Status:** läuft (21.11.; Daniel: Pilot abgenommen, „Ja, aber Hallen hoch lassen“: Werkstatt, Kantine, Lobby bleiben hoch und bekommen Galerien) · angelegt 21.11. von Code (aus #131, Pilot `lager`)
 - **Auftrag:** die übrigen Räume nach den Faustregeln in `docs/features/pois.md` › Architektur umbauen (Geschosse 5–6 Kacheln, Hallen mit Galerie), Prüfliste `node tools/rooms_audit.mjs`. Vorher mit Daniel: Pilot `lager` abnehmen, dann POI für POI.
 - **Rückfragen:**
 - **Ergebnis:**
 
 ### #129 Info-Center: Einblendungen ordnen + Spieler-Log
-- **Status:** läuft (21.11., Etappe Ruhe fertig) · angelegt 21.11. von Code (Daniel: „Einblendungen ordnen: lass uns ein Information Center konzipieren, um das auch in Zukunft zu vermeiden. In diesem Rahmen können wir auch ein Log für den Spieler aufbereiten, in dem er alle Schritte nachvollziehen kann und ggf. historische Meldungen anschauen kann.“)
+- **Status:** läuft (21.11., Etappe Ruhe fertig; Daniels Antworten 21.11.: Ansage oben rechts als großer Toast, Logbuch als zweiter Reiter im Questlog, je Durchgang leer, Radio-Titel im Bau-Modus ins Logbuch, Bau-Meldungen nur Erfolge) · angelegt 21.11. von Code (Daniel: „Einblendungen ordnen: lass uns ein Information Center konzipieren, um das auch in Zukunft zu vermeiden. In diesem Rahmen können wir auch ein Log für den Spieler aufbereiten, in dem er alle Schritte nachvollziehen kann und ggf. historische Meldungen anschauen kann.“)
 - **Auftrag:** Konzept in `docs/concepts/info_center.md` (baut auf #070 Meldungs-Kanal + Logbuch auf), dann Kern bauen: feste Bühne mit Plätzen und Vorrang, nichts liegt übereinander; Log-Fenster mit Verlauf und Filtern.
 - **Rückfragen:**
 - **Ergebnis:** (Code) Konzept `docs/concepts/info_center.md` (Bestandsliste aller 17 Einblendungen, Bühne mit Zonen, 5 Stufen, Kontexte, Logbuch mit 10 Kategorien, 6 Etappen, 5 Fragen an Daniel). Gebaut: Kontext „Fenster“ (Hinweise warten, Kassette weg), Bau-Modus-Meldungen unter der Leiste, Kassette nach dem Willkommen. Test `tools/stage_test.mjs` (4). **Offen:** Etappen 2–6 (Zonen-Raster, weitere Kontexte, Logbuch-Fenster mit Filtern); vorher Daniels Antworten auf die 5 Fragen im Konzept.

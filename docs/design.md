@@ -767,6 +767,12 @@ Daniel: „Man soll die Möglichkeit haben, AvA zu einem Glitchling zu machen (d
 - Wie viele Entities zum Start (Vorschlag: 12 handgemacht, später gewürfelte aus Bausteinen wie bei der Crew)?
 - ~~Grafik~~: entschieden (Daniel, 17.11.2026): animierte Code-Porträts, gebaut (#048).
 
+## Grundregeln aus der Entscheidungsrunde 21.11.2026
+
+- **Niemals Hunde als Gegner** (Daniel: „Keine Hunde als Gegner. Niemals! Gerne Drohnen, aber keine Hunde.“). Tiere als Gegner gibt es nicht; Drohnen ja.
+- **Keine schwebenden Plattformen draußen** (Daniel: „Es soll keine schwebenden Plattformen außerhalb von Gebäuden geben. Bitte mach dort immer einen Hintergrund hin.“): Jede Plattform im Freien steht auf etwas (Fels, Gerüst, Ruine, Höhle) oder hat einen Hintergrund dahinter.
+- **Granaten sind ein Skill**, kein Vorrat: Ladungen mit Abklingzeit (z. B. 3, dann 180 s).
+
 ## Look & Feel
 
 ![Leyla – Character Sheet](../projects/nomadgirl/assets/leyla/character_sheet.png)

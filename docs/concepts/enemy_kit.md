@@ -76,7 +76,7 @@ Je Baustein: Felder · Code · Grafik · Wert. Größen gegen Leyla 192 px; stre
 - **Grafik:** Bausatz Pistole/Rennen (vorhanden), Sirene als Code-Grafik oder ein kleines PixelLab-Objekt; Rundumlicht aus Code (rotes Drehen über `atmosphere`).
 - **Wert:** hoch, belohnt Schleichen und Prioritäten.
 
-### 3.5 Hund `hound`
+### 3.5 ~~Hund `hound`~~ (gestrichen, Daniel 21.11.: „Keine Hunde als Gegner. Niemals!“)
 - **Verhalten:** im Rudel, sehr schnell, springt Leyla in Bögen an, umkreist, weicht nach einem Biss zurück, flieht bei wenig Leben. Kommt mit einem Hundeführer (`leader`): stirbt der Führer, werden die Hunde wild oder laufen weg.
 - **Felder:** `pack.size`, `pack.leap` px, `pack.circle` px, `pack.flee` %.
 - **Code:** ~110 Zeilen; Körperbox liegend breit (neue Form `beast`).
@@ -138,10 +138,10 @@ Neue Felder an **POIs › Gang**: `gang.loadout` (Tabelle: `enemy` ref, `weapon`
 | Rust Guard (Bunker 13) | Mauer aus Schilden | Schildwall, Gepanzert, Alarmgeber |
 | Order Office (Ministerium) | Bürokratie mit Zielfernrohr | Scharfschütze, Alarmgeber („Nummer ziehen“), Geschütz |
 | Sky Wolves (Delta Heights) | von oben | Scharfschütze, Flanke über Plattformen |
-| Level Five (Parkhaus Süd) | Hunde im Parkdeck | Hund + Hundeführer, Feigling |
+| Level Five (Parkhaus Süd) | Drohnen im Parkdeck | Schwarm + Anführer, Feigling |
 | Static Saints (Funkmast) | Drohnen, Störfunk | Schwarm, Geschütz, Störsender (AvA aus) ⚠️ |
 | Tunnel Kings (Metro) | Dunkelheit | Lauerer Tür, Schattig |
-| Salt Dogs (Pit 6) | Salz in die Wunde | Hund, Berserker, Blutung |
+| Salt Dogs (Pit 6) | Salz in die Wunde | Berserker, Blutung, Rammer |
 | Crude Boys (Delta Crude) | Öl und Feuer | Werfer, Bomber, Explosiv |
 | Sunny Side (Sunny Acres) | lächelnde Sekte | Sanitäter, Ergeben, Anführer |
 | Zero Hour (Raketensilo) | Elite | Rufer, Explosiv, Gepanzert, Major Null |
@@ -185,7 +185,7 @@ Ein Boss ist ein Gegner mit Bausteinen; seine Phasen schalten **Züge** und **Ar
 | 10 | Rammer, Schildwall, Lauerer 2, Berserker, Feigling | mittel | je S | keine |
 | 11 | Geschütz | mittel | M | 1 Objekt |
 | 12 | Schwarm | mittel | M | klein |
-| 13 | Hund | mittel–hoch | L | 6 Animationen |
+| 13 | ~~Hund~~ | gestrichen | | |
 
 ## 10. Erste Scheibe: vier Gegner aus vorhandener Grafik
 
@@ -206,7 +206,11 @@ Reihenfolge: Etappe 1 Haken + Register + `sniper` · Etappe 2 `medic` + `alarm` 
 - Elite: Gepanzert hat 2 Platten, Werte gegen `enemyDef` gerechnet. Node-Test `test/enemy_mods.test.js` für die Rechnung ohne Browser.
 - Boss: Phasenwechsel schaltet Züge um, Countdown-Druckwelle trifft ohne Deckung, nicht mit.
 
-## 12. Offene Fragen an Daniel
+## 12. Antworten Daniel 21.11.2026
+
+1 a (Scheibe Visier, Brandsatz, Flickerin, Sirene) · 2 c (nie Hunde, Drohnen gern) · 3 a (Ergeben ja) · 4: nichts bauen, erst klären, was Gang-Ausrüstung ist · 5: Granaten gleich mit, als Skill mit Abklingzeit (#140).
+
+## 12a. Ursprüngliche Fragen
 
 1. **Erste Scheibe:** a) Scharfschütze, Werfer, Sanitäter, Alarmgeber (Vorschlag) · b) lieber gleich Elite-Zusätze für alle · c) erst die Boss-Skripte.
 2. **Hund (neue Grafik, ~6 Animationen):** a) jetzt bestellen · b) nach der ersten Scheibe · c) gar nicht, Mutanten bleiben menschlich.

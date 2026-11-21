@@ -11,8 +11,10 @@ Alle Punkte aus A1–A8 sind entschieden (12.11. und 19.11.2026): A1 erledigt (#
 | # | Thema | Worum es geht | Vorschlag Ava |
 |---|---|---|---|
 | A9 | ~~Spielstand-Plätze~~ | gebaut in #126 | offen daraus: Konflikt-Schutz im Worker (409), Offline-Puffer, Export/Import (Frage I: später) |
-| A10 | **Cockpit-Reste** (#123/#124) | Fahrer-Sonnenblende `ck_visor` und 10 Kram-Stücke liegen fertig im Bereich Assets, sind aber nicht platziert; das Billboard steht links, weil die Sonnenblende rechts verdeckt | Daniel platziert nach Geschmack in Startseite › Cockpit (Vorschau zeigt jetzt das Cockpit) oder sagt „Ava, setz sie“ |
-| A11 | **Billboard-Werbung für Lore-Marken** im Cockpit | Idee aus #124 | in den Ideenspeicher oder Ticket |
+| A10 | ~~Cockpit-Reste~~ → #142 (Daniel 21.11.: Ava setzt sie, freigeschaltet über Ereignisse) | | |
+| A10a | alt: **Cockpit-Reste** (#123/#124) | Fahrer-Sonnenblende `ck_visor` und 10 Kram-Stücke liegen fertig im Bereich Assets, sind aber nicht platziert; das Billboard steht links, weil die Sonnenblende rechts verdeckt | Daniel platziert nach Geschmack in Startseite › Cockpit (Vorschau zeigt jetzt das Cockpit) oder sagt „Ava, setz sie“ |
+| A11 | ~~Billboard-Werbung~~ → Ticket #143 (21.11.) | | |
+| A12 | **Gang-Ausrüstung** (#133) | Daniel 21.11.: „Nichts machen. Lass uns erst klären, was Gang-Ausrüstung ist.“ | Ava erklärt es im Projekt-Chat mit Beispielen (Handschrift je Gang: Waffen, Köpfe, Bausteine, Haus-Zusatz) |
 
 ## B. Offene Features ohne Ticket
 
