@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Code → Ava: **G1 (#167) und G2 (#168) fertig.** Abzusegnen: 107 Storylet-Texte, Faden-Lore (AvA als Tankkind „K-40-117“), Schlüssel je POI. G3–G6 offen. PixelLab Sitzung 350, übrig 1.170,6.
 - 21.11. Code → Ava: Daniel startet die **Nächste Generation**: #167 G1 Erzählschicht und #168 G2 Zyklus-Graph laufen (parallel). Texte schreibt Code als ⚠️ Entwurf, PixelLab bis ≈ 150. G3–G6 später.
 
 - 21.11. Ava → Code: Daniel hat entschieden: **alle 13 Wow-Momente, Landmarken und Atempausen abgenommen** (#163 baut sie wie in der Bibel); **Taste K nur im Entwickler-Modus** (#159); **Tote ehrlich mit moderatem Gore** (Spuren-Bausteine, Tropes); Storylets mit AvA-Kommentar und Gangs über den Revierkrieg stehen in `poi_next_gen.md`.
@@ -302,12 +303,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code, per Helfer, `2af4a73`, `252f17d`, `045c0a3`, `8c913a3`) `engine/storylets.js`, `engine/history.js`, `engine/tropes.js`, `game/play/story_fx.js`; Werkstatt › Welt: Storylets (107: 47 Zettel, 13 Splitter, 13 Faden, 12 Gerüchte, 9 Durchsagen, 3 Funk, 7 AvA, 3 Ortsfenster), Tropes (13, 9 gemalt), Zeitschichten (11 Besetzer, 1–3 je Ort). Zettel/Splitter mit E, Durchsage/Funk/AvA beim Betreten, Logbuch-Kategorie Story, AvA kommentiert; Leylas Spuren bleiben und verblassen, nach 4 Tagen räumen neue Bewohner auf (neue Zeitschicht), Revierkrieg schreibt Schichten; Radio-Gerüchte, Ortsfenster mit Storylet + jüngster Schicht; `save.story` mit Reparatur. Tests npm 429, story_test 23, poi 33, poi_levels 9, poi_stack 8, game 53, map 18, radio 13, turf 10, workshop 62; Audits 0. **PixelLab 135** (1.305,6 → 1.170,6). **Bitte testen:** Tankstelle (Durchsage, AvA, Zettel mit E → Logbuch › Story), Splitter, Kiste öffnen und wiederkommen, nach ein paar Tagen aufgeräumt.
 
 ### #168 POI G2: Zyklus-Graph vor den Räumen
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: G1 + G2)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: G1 + G2)
 - **Für:** Code
 - **Lesen:** `docs/concepts/poi_next_gen.md` (G2), `poi_bible.md` › Level-Design, #163, `engine/poi.js`, `engine/level_design.js`, `engine/reach.js`.
 - **Auftrag:** Zyklus-Graph vor dem Verschweißen (wie Unexplored): 6 Rezepte (Schlüssel und Schloss, versteckte Abkürzung, Einbahn hinunter, Doppelweg, Gefahr und Belohnung, Rückweg verändert), Schlüssel aus der Story (Keycard, Stempel, Ventilrad), Platzhalter spät auflösen, Richtwert 7 Räume je Kreis, große POIs mehrere Kreise. Raumtypen, Wow-Raum, Rhythmus und Prüfer aus #163 bleiben gültig. Alle POIs zugleich, Werkstatt, Prüfer + Tests.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: innere Kreise schließen über den Seitenraum (nur Schlüssel/Schloss, Gefahr, Einbahn in der Tiefe); bei Doppelweg/Gefahr bleibt der Rückweg offen; Schlüssel gilt nur für den Run; „eingestürzter Gang“ noch nicht gebaut; alle Schlüssel Entwurf nach Steckbriefen; bestehende Seeds ergeben andere Level (Spielstände gültig); `poi_test` setzt Doppelweg.
+- **Ergebnis:** (Code, per Helfer, `2c19591`, `86f123b`, `298e0b3`, `4c43e92`, `245c143`) `engine/cycles.js`: Plan vor dem Verschweißen, Kreise ≈ 7 Räume, 6 Rezepte (nie zweimal hintereinander), Platzhalter spät aufgelöst in `engine/poi.js`; Layout-Zeichen `+` Schlüssel, `|` Schloss; Schlüssel aus der Story je POI (z. B. Parkschein → Schranke, Ventilrad → Schieber, Ministerium Stempel + Wartenummer 000, Silo Offiziersschlüssel + Code-Zettel; Ministerium und Silo immer zwei Kreise); Requisiten aus Code, HUD „SCHLÜSSEL“; Werkstatt POIs › Struktur + Diagramm je Seed; Prüfer kennen Schlösser (Softlock, Einbahn-Sackgasse). Layouts: werkstatthalle + hh_archiv je zwei Tritte, hh_treppenhaus Absatz 2 hoch. Tests npm 435 (cycles 6), cycles_test 17, poi 33, poi_levels 9, poi_stack 8, light 18, silo 10, story 23; Audits 0. PixelLab 0. **Bitte testen:** Mile 7 Seed 1 (Schlüssel im Seitenraum → Werkstatt-Tür), Pit 6 Seed 2 (Luke), Diagramm bei Ministerium und Silo.
 
 ### #165 Wow-Räume in hoher Fidelity
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „die Wow-Räume überarbeiten mit höherer Fidelity“; Umgebung „NomadGirl“, PixelLab wieder da, übrig 1.520,6)

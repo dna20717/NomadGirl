@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 21.11.2026: **POI Nächste Generation G1 + G2** (#167, #168): Erzählschicht mit 107 Storylets (Zettel, Durchsagen, Funk, Gerüchte, Splitter-Faden zu AvA, AvA kommentiert), 13 Tropes (9 gemalt), Zeitschichten und Leylas Spuren, die verblassen; Zyklus-Graph vor den Räumen mit 6 Rezepten und Schlüsseln aus der Story, Werkstatt-Diagramm, Prüfer gegen Softlocks.
 - 21.11.2026: **Wow-Räume gemalt** (#165): alle 13 Wow-Motive und vier Landmarken mit PixelLab (Reaktor, Kristalle, Uhr, Rakete, Kuppel, Pool …), Räume heller mit Fülllicht und Dressing ums Motiv; rote Browser-Tests repariert (#166, Brett-Geschenk frei vom Motor-Sockel).
 - 21.11.2026: **POI-Overhaul** (#160, #163, #159): Jeder POI hat eine Story (Weltchronik, Steckbrief, Raum-Steckbriefe), gewürfelte Orte erben sie mit Region und Besitzer. Level-Design nach der Bibel: Raumtypen, Rhythmus aus Spitze und Atempause, Landmarke am Himmel und in Fenstern, Licht am Ausgang, faire Spawns, Zeichen an Geheimnissen, ein Wow-Raum je POI mit Kamerafahrt und Stinger, Level-Prüfer. Dressing Stufe 2: erst Ordnung, dann Verfall, Raum-Geschichten, Wüste kriecht rein, Rückwand-Ebene, Korrekturen mit K (`?dev`).
 - 21.11.2026: **Wende-Wurf im Dash** (#164, Daniel): Im Dash Gegenrichtung + Granate: Leyla wirbelt herum, wirft die Granate flach nach hinten auf Verfolger und rutscht rückwärts aus, mit kurzer Zeitlupe; kostet eine Ladung und 30 Ausdauer, alles unter Leyla › Wende-Wurf.
