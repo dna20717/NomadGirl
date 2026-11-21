@@ -143,7 +143,7 @@ export function pickWeighted(items, weightOf, r) {
 // ---------- the plan (#158 steps 4 + 5): ensembles first, then single things up to a budget, ways kept free ----------
 // Spiel › Set-Dressing: density = things per 10 floor tiles („bewohnt“ ≈ 3), per role in the table Rollen; minGap = free tiles between
 // two things (Poisson along the floor); ensembles = share of the budget for ensembles (%); wall = share for wall and ceiling things (%)
-export const DRESSING = { density: 3, minGap: 1, ensembles: 50, wall: 12, brandWeight: 40 };
+export const DRESSING = { density: 3, minGap: 1, ensembles: 50, wall: 12, brandWeight: 15, aiMax: 1 };
 export function dressingConfig(D) {
   const g = D?.game?.dressing || {}, dens = new Map((g.roles || []).filter(r => r.role && r.density != null).map(r => [r.role, r.density]));
   return { ...DRESSING, ...Object.fromEntries(Object.entries(g).filter(([k, v]) => k in DRESSING && v != null)), densityOf: role => dens.get(role) ?? g.density ?? DRESSING.density };
@@ -262,7 +262,7 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
         const ms = E.members, plan = [], used = new Set();
         // the same thing twice only where the plan repeats the core (a row of benches, registers, sandbags)
         const coreTags = String(ms[0].tag || '').split('|').map(t => t.trim()), repeats = m => String(m.tag || '').split('|').some(t => coreTags.includes(t.trim()));
-        const c0 = pickWeighted(pool.filter(c => matchesTag(c, ms[0].tag) && at(c, c.w === 2 && a.corner === 'r' ? a.x - 1 : a.x, a.y)), c => weight(c, R.role), hash(a.x, a.y, s0 + 31 + k));
+        const c0 = pickWeighted(pool.filter(c => !c.borrowed && matchesTag(c, ms[0].tag) && at(c, c.w === 2 && a.corner === 'r' ? a.x - 1 : a.x, a.y)), c => weight(c, R.role), hash(a.x, a.y, s0 + 31 + k));
         if (!c0) continue;
         const cx = c0.w === 2 && a.corner === 'r' ? a.x - 1 : a.x;   // a wide core at a right-hand wall leans away from it
         plan.push([c0, cx]); for (let i = 0; i < c0.w; i++) used.add(cx + i);
@@ -284,11 +284,11 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
     }
     // 2. single things up to the budget, a free tile between neighbours, corners and spots under lamps first
     if (!singles) continue;
-    const single = cands(R).filter(c => !hangOnly(c));
+    const single = cands(R).filter(c => !hangOnly(c)), ais = () => items.filter(it => it.ai && it.room === R.key).length;
     for (const s of order) {
       if (R.placed >= R.budget) break;
       if (!free(s.x, s.y) || keep.has(s.x + ',' + s.y)) continue;
-      const fit = single.filter(c => fitsAt(c, s.x, s.y) && gapFree(s.x, s.x + c.w - 1, s.y, cfg.minGap));
+      const fit = single.filter(c => (!c.ai || ais() < cfg.aiMax) && fitsAt(c, s.x, s.y) && gapFree(s.x, s.x + c.w - 1, s.y, cfg.minGap));
       const c = pickWeighted(fit, c => weight(c, R.role), hash(s.x, s.y, s0 + 51));
       if (c) put(c, s.x, s.y, 'stand', s.type, null, R);
     }

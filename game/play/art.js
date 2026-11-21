@@ -300,10 +300,11 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
   if (spots && room === scene.room) scene.places_ = spots;
   const allowed = (rules, place, xs, y) => !rules || !spots || xs.every(xx => { const sp = spots.at(xx, y); return sp && fits(place, sp); });
   const ruleOf = (kit, key, f) => kit.rules?.size ? kit.rules.get(kit.nameOf(key, f)) || {} : null;
-  // #158 the plan: POI-Ensembles first (engine/dressing.js planDressing); floor tiles of planned rooms skip the old dice
-  const plan = spots && scene.data_?.game?.dressing?.enabled !== false ? planDressing({ D: scene.data_, room, reg: terrain.reg, spots, poiId: scene.levelPoi, seed: scene.levelSeed || 0, T, singles: false }) : null;
+  // #158 the plan (engine/dressing.js planDressing): POI-Ensembles first, then single things up to the room's density (Spiel ›
+  // Set-Dressing), ways and fighting spots free, deterministic per seed. Rooms whose set has no Clutter-Regeln keep the old dice.
+  const plan = spots && scene.data_?.game?.dressing?.enabled !== false ? planDressing({ D: scene.data_, room, reg: terrain.reg, spots, poiId: scene.levelPoi, seed: scene.levelSeed || 0, T }) : null;
   const planOcc = new Set();
-  for (const it of plan?.items || []) if (it.hang === 'stand') for (let i = -1; i <= it.w; i++) planOcc.add((it.x + i) + ',' + it.y);
+  if (plan) for (const s of spots.list) if (plan.planned(s.x, s.y)) planOcc.add(s.x + ',' + s.y);
   // #158 Raum-Rollen weight the choice (Raum-Bausteine › Rolle, Spiel › Set-Dressing › Rollen)
   const roleCfg = roleConfig(scene.data_), roleAt = (x, y) => terrain?.reg?.roleAt?.(x, y) || 'general';
   const pickOf = (kit, key, frames, xs, y, h) => {
