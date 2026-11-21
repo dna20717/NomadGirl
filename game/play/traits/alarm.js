@@ -83,6 +83,24 @@ function openBriefly(s, o, time) {
   if (d?.art && !d.open && !s.tweens.isTweening(d.art)) s.tweens.add({ targets: d.art, y: -(d.y1 - d.y0) * T * 0.8, duration: 260, hold: 900, yoyo: true, ease: 'Sine.easeOut' });
   s.sfx?.('door_open', { x: (o.col + 0.5) * T });
 }
+// help arrives (#155, used by the siren and by the director's waves #169): out of the door nearest to `from` that Leyla does not see
+// (else an open edge, else beside `from` on the side away from her) → { adds: [ids], exit }
+export function reinforce(s, from, ids, k, time, tag = 'alarm') {
+  const T = s.T, l = s.leyla, adds = [], exit = ids.length ? bestExit(s, from) : null;
+  if (exit) openBriefly(s, exit, time);
+  ids.forEach((id, i) => {
+    const away = Math.sign(from.x - l.x) || 1, side = i % 2 ? -away : away;
+    let col, row;
+    if (exit) { const step = exit.dir || (i % 2 ? -1 : 1), kk = Math.ceil(i / (exit.dir ? 1 : 2)); col = exit.col + step * kk; row = exit.row; if (s.room.solid(col, row) || !s.room.solid(col, row + 1)) col = exit.col; }
+    else { const x = from.x + side * (220 + 90 * Math.floor(i / 2)); col = Math.max(1, Math.min(s.room.w - 2, Math.round(x / T - 0.5))); row = Math.round(from.feet / T) - 1; }
+    const en = s.addEnemy(id, col, row);
+    if (!en) return;
+    en.state = 'search'; en.searchStart = time; en.lastKnown = { ...k }; en.sirenAt = time; en.added = tag;
+    s.fx.puff?.(en.x, en.feet, 0xc0a080);
+    adds.push(id);
+  });
+  return { adds, exit };
+}
 export function tickAlarms(scene, time) {
   const pts = alarmPoints(scene), g = scene.alarmG;
   if (!g) return;
@@ -187,20 +205,13 @@ export default {
     }
     // help (#155): out of the door nearest to the siren that Leyla does not see (else an open edge, else beside the siren on the side
     // away from her); the POI's weakest kit enemies or „Verstärkung“
-    const pool = c.addEnemy ? [c.addEnemy] : poiPool(s, 'alarm'), from = A.point || e, adds = [], exit = c.adds > 0 && pool.length ? bestExit(s, from) : null;
-    if (exit) openBriefly(s, exit, time);
-    for (let i = 0; i < c.adds && pool.length; i++) {
-      const away = Math.sign(from.x - l.x) || 1, side = i % 2 ? -away : away, id = pool[i % pool.length];
-      let col, row;
-      if (exit) { const step = exit.dir || (i % 2 ? -1 : 1), k = Math.ceil(i / (exit.dir ? 1 : 2)); col = exit.col + step * k; row = exit.row; if (s.room.solid(col, row) || !s.room.solid(col, row + 1)) col = exit.col; }
-      else { const x = from.x + side * (220 + 90 * Math.floor(i / 2)); col = Math.max(1, Math.min(s.room.w - 2, Math.round(x / T - 0.5))); row = Math.round(from.feet / T) - 1; }
-      const en = s.addEnemy(id, col, row);
-      if (!en) continue;
-      en.state = 'search'; en.searchStart = time; en.lastKnown = { ...k }; en.sirenAt = time; en.added = 'alarm';
-      s.fx.puff?.(en.x, en.feet, 0xc0a080);
-      adds.push(id);
-    }
-    s.lastSiren = { by: e.id, at: time, called, adds, point: A.point ? A.point.i : null, from: exit ? (exit.edge ? 'edge' : 'door') : 'siren', exit: exit && { col: exit.col, row: exit.row, seen: exit.seen } };
+    // #169 the director: no help in a calm phase, an Atempause or the first seconds of the Wow room (the siren still howls)
+    const held = s.director?.on && !s.director.allowHelp(), n = held ? 0 : c.adds;
+    const pool = c.addEnemy ? [c.addEnemy] : poiPool(s, 'alarm'), from = A.point || e;
+    const r = n > 0 && pool.length ? reinforce(s, from, Array.from({ length: n }, (_, i) => pool[i % pool.length]), k, time, 'alarm') : { adds: [], exit: null };
+    const exit = r.exit;
+    s.lastSiren = { by: e.id, at: time, called, adds: r.adds, point: A.point ? A.point.i : null, from: exit ? (exit.edge ? 'edge' : 'door') : 'siren', exit: exit && { col: exit.col, row: exit.row, seen: exit.seen }, ...(held ? { held: true } : {}) };
+    s.director?.siren?.(time);
   },
 
   onDeath(e) { if (e.al.phase !== 'done') e.al.phase = 'dead'; },

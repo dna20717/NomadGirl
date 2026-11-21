@@ -7998,5 +7998,29 @@
   "date": "2026-11-21",
   "description": "Teddy mit einem Auge, Blechauto, Himmelszeichnung, rote Gummistiefel auf einem Stück Boden (#167).",
   "origin": [60, 84]
+ },
+ "life_campfire": {
+  "name": "Lager · Feuerstelle mit Schlafsäcken",
+  "kind": "image",
+  "file": "assets/pois/life/life_campfire.png",
+  "source": "KI (PixelLab, create_image_pro 160 × 144, AAP-64), beste von 4 Kandidaten, Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Gang-Lager (#169): Steinring mit Feuer, Kochtopf am Dreibein, zwei Schlafsäcke, Isomatte, Flaschen."
+ },
+ "life_stash": {
+  "name": "Lager · Vorräte",
+  "kind": "image",
+  "file": "assets/pois/life/life_stash.png",
+  "source": "KI (PixelLab, create_image_pro 160 × 144, AAP-64), beste von 4 Kandidaten, Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Gang-Lager (#169): gestapelte Kisten mit Plane, Fass, Kanister, Dosen."
+ },
+ "life_nest": {
+  "name": "Lager · Nest",
+  "kind": "image",
+  "file": "assets/pois/life/life_nest.png",
+  "source": "KI (PixelLab, create_image_pro 160 × 144, AAP-64), beste von 4 Kandidaten, Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "Mutanten-Nest (#169): Hügel aus Ranken, Kabeln und Schleim mit grün leuchtenden Eiersäcken."
  }
 }

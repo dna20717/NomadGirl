@@ -202,6 +202,8 @@ export class SceneEvents {
     if (got.length) { clearTimeout(this.saveTimer); this.saveTimer = setTimeout(() => this.box?.persist(), 800); }
   }
   onKill(e) {
+    this.life?.died(e);   // #169 the camp lost one
+    if (e.feudKill != null) { if (e.spared !== 'freed') this.loot?.fromEnemy(e); return; }   // #169 the others got him: no kill, no Ruf, but his things lie there
     this.kills++;
     const slots = this.box?.save.inv?.slots || {}, h = e.lastHit || {};
     this.achieve('kills', 1, [e.id, e.d.family, h.kind === 'shot' ? slots.ranged : h.kind === 'melee' ? slots.melee : null, h.crit ? 'crit' : null]);

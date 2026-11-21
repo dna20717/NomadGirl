@@ -55,7 +55,7 @@
   "peakMax": 25,
   "relax": 18,
   "wowGrace": 8,
-  "lull": 30,
+  "lull": 45,
   "maxWaves": 2,
   "waveSize": 2,
   "notice": 50,
@@ -70,5 +70,6 @@
   {"kind": "visit", "text": "⚠️ Entwurf: Funkverkehr auf einer fremden Frequenz. Ein Spähtrupp der {gang} ist im Haus."},
   {"kind": "settle", "text": "⚠️ Entwurf: Jemand hat sich hier neu eingerichtet. Frische Feuerstelle."},
   {"kind": "raided", "text": "⚠️ Entwurf: Sie lecken noch ihre Wunden vom letzten Mal."}
- ]
+ ],
+ "images": {"fire": "life_campfire", "stash": "life_stash", "nest": "life_nest"}
 }

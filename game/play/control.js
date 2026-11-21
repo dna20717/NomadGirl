@@ -15,6 +15,7 @@
 //   nomad.state().van                 van door frame, open, roof platform
 //   nomad.places(show?)               #158 place types (floor_in, floor_out, roof, ledge, corner, ceiling, wall): counts + spots, true = coloured overlay
 //   nomad.state().light               light & atmosphere: lamps, glowing clutter, mood at Leyla, searchlight, brightness at Leyla / ahead
+//   nomad.state().life / .director    #169 camps, rounds, feuds, the place's state; director phase, tension, music layer
 //   nomad.state().level               POI level: chests, switches, doors, brittle walls, goal, secrets, ranking (done)
 //   nomad.state().turnThrow          #164 Wende-Wurf: count, active, denied (charges/stamina), last throw, stamina, slow motion (active, factor, count, shift)
 //   nomad.state().camp                camp (game.html?camp): clock, place, Δ, prompt, hotspots, rig; .menu = open menu
@@ -140,7 +141,7 @@ export function installControl(game) {
         light: s.atmo?.state() || null,
         mode: s.mode, prompt: s.hud.promptText, menu: s.hud.menuState(), banner: s.hud.bannerText(),
         camp: s.camp?.state(), health: Math.round(s.leyla.health), maxHealth: s.leyla.maxHealth,
-        grenade: l.grenade?.state() || null, throwables: s.throwables?.state() || null, siren: s.lastSiren || null,   // #139/#140
+        grenade: l.grenade?.state() || null, throwables: s.throwables?.state() || null, siren: s.lastSiren || null, life: s.life?.state?.() || null, director: s.director?.state?.() || null,   // #139/#140, #169
         turnThrow: { count: l.turnThrows || 0, active: l.state === 'turnThrow', denied: l.turnDenied || null, last: l.lastTurnThrow || null, stamina: Math.round(l.stamina ?? l.maxStamina),
           slow: { active: !!s.slowmo, factor: s.slowmo?.factor ?? 1, count: s.slowCount || 0, shift: Math.round(s.clockShift || 0) } },   // #164 Wende-Wurf + slow motion
       };

@@ -31,7 +31,7 @@ export class Turf {
   rep() { return repOf(this.scene.box?.save, this.gang); }
   get active() { return this.peace && !this.broken; }
   // is this enemy one of the gang's people, held by the truce?
-  member(e) { return !!e && (GANG_FAMILIES.includes(e.d.family) || e.d.behavior === 'boss'); }
+  member(e) { return !!e && (GANG_FAMILIES.includes(e.d.family) || e.d.behavior === 'boss') && !(e.life?.gang && e.life.gang !== this.gang); }   // #169 a rival patrol is not held by this gang's truce
   calm(e) { return this.active && this.member(e) && e.alive; }
 
   // the card at the start: whose turf, how they stand to Leyla, what it means

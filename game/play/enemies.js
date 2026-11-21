@@ -7,7 +7,7 @@
 //   attacks   melee (short hit), lunge (charge), shot (aim line, projectile), dive (flyer swoops), drop (ambusher falls)
 //   counters  shield in front (blocks shots + light hits, a heavy hit breaks the guard, turns slowly), dodge (hops away from shots
 //             and strikes), armour plates (light hits only scratch, heavy hits crack a plate)
-//   states    patrol · alert · engage · search · windup · strike · recover · dodge · stagger · lurk · drop · dead
+//   states    patrol · alert · engage · search · windup · strike · recover · dodge · stagger · lurk · drop · dead · feud (#169, game/play/life.js)
 // Every attack is telegraphed (windup: blinking + "!", the shooter shows his aim line, cut at the first wall).
 
 import { kitLook, kitShow, kitMuzzle } from './enemy_kit.js';
@@ -142,13 +142,14 @@ export class Enemy {
       this.senseAt = time + 90;
       this.seeing = this.sees(l);
       // #061 Revier-Camp: the gang's people see her, nod once and leave her be
-      if (this.peaceful) { if (this.seeing && !this.greeted) { this.greeted = true; this.say(['Na?', 'Hey.', '*nickt*', 'Benimm dich.'][this.id % 4 || 0] || 'Na?', '#9fe0a0'); } this.seeing = false; if (this.state !== 'patrol') this.state = 'patrol'; }
+      if (this.peaceful) { if (this.seeing && !this.greeted) { this.greeted = true; this.say(['Na?', 'Hey.', '*nickt*', 'Benimm dich.'][this.id % 4 || 0] || 'Na?', '#9fe0a0'); } this.seeing = false; if (this.state !== 'patrol' && this.state !== 'feud') this.state = 'patrol'; }
       if (this.seeing) { this.lastSeen = time; this.lastKnown = { x: l.x, y: l.chest, at: time }; }
     }
     this.warn.setVisible(this.state === 'windup');
     this.aim.clear();
     if (time < this.stunUntil && this.state !== 'stagger') { b.setVelocityX(b.velocity.x * 0.9); if (this.kind === 'flyer') b.setVelocityY(b.velocity.y * 0.9); return this.draw(time); }
     if (this.traits.length && this.fire('think', time, dt, l)) return this.draw(time);   // a trait drives this frame (#139)
+    if (this.life && this.scene.life?.think(this, time, dt, l)) return this.draw(time);   // #169 feuds between factions, rounds through the POI
     this.watchDodge(time, l);
     this.watchDuck(time);
     const dx = l.x - this.x, dist = Math.abs(dx);
@@ -530,6 +531,7 @@ export class Enemy {
     if (this.state === 'duck' || this.state === 'cover') this.standUp(time);
     // hit from somewhere: it knows where she is now, turns round and fights
     this.lastSeen = time; this.lastKnown = { x: s.leyla.x, y: s.leyla.chest, at: time };
+    if (this.state === 'feud') { this.foe = null; this.state = 'patrol'; }   // #169 Leyla's hit ends a feud
     if (['windup', 'patrol', 'alert', 'search'].includes(this.state)) { this.state = 'engage'; this.readyAt = Math.max(this.readyAt, time + 350); this.callOthers(time); }
     if (!this.C.shield || this.guardOpen) this.facing = -dir || this.facing;
     if (this.hp <= 0) this.die(time, dir);

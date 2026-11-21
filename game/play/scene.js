@@ -30,6 +30,8 @@ import { Atmosphere } from './atmosphere.js';
 import { LevelFx } from './level_fx.js';
 import { DressingFx } from './dressing_fx.js';
 import { StoryFx } from './story_fx.js';
+import { Life, prepareLife } from './life.js';
+import { Director } from './director.js';
 import { landmarkViews } from '../../engine/level_design.js';
 import { Drone } from './drone.js';
 import { Van } from './van.js';
@@ -94,6 +96,7 @@ export class PlayScene extends Phaser.Scene {
     for (const t of Object.values(this.data_.terrain || {})) for (const id of [t.look, t.props, t.propsBig]) if (id) ids.add(id);   // Kachel-Sets (TileSet00)
     for (const P of Object.values(this.data_.pois || {})) for (const b of P.brandProps || []) if (b.look) ids.add(b.look);   // Marken-Clutter (NomadCola-Automaten …)
     for (const P of Object.values(this.data_.pois || {})) for (const id of [P.wow?.image, P.level?.landmarkImage]) if (id) ids.add(id);
+    for (const id of Object.values(this.data_.life?.images || {})) if (id) ids.add(id);   // #169 painted camp props
     for (const t of Object.values(this.data_.tropes || {})) if (t.image) ids.add(t.image);   // #167 painted tropes   // #165 painted Wow motifs and landmarks
     if (this.data_.worldmap?.logos) ids.add(this.data_.worldmap.logos);
     for (const k of ['look', 'open']) if (this.data_.game?.vault?.[k]) ids.add(this.data_.game.vault[k]);   // #153 the painted vault   // the brand sign at a POI's entrance
@@ -301,6 +304,9 @@ export class PlayScene extends Phaser.Scene {
     this.levelPoi = run?.poi || null;   // Marken-Clutter of the POI (art.js brandKit)
     this.levelSeed = run?.seed || 0;   // #158 the set dressing of a level follows its seed
     if (this.levelInfo?.def) def = this.levelInfo.def;
+    // #169 Leben G3: the camps of the place (simulated to today) take the place of the level's spawns
+    this.lifePrep = prepareLife(this, run); this.lifePlan = this.lifePrep?.plan || null;
+    if (this.lifePlan && def) def = { ...def, layout: this.lifePlan.layout };
     // mega rig prototype (#022): the vehicle as a walkable room, evening sky and the camp ground
     this.megarig = this.args.megarig ? buildMegarig(this.data_, this.args.megarig.id, this.args.megarig.stage) : null;
     if (this.megarig) def = { name: `${this.data_.megarigs[this.args.megarig.id].name} · ${this.megarig.stageName}`, layout: this.megarig.layout, backdrop: { weather: this.args.megarig.weather || Object.keys(this.data_.weather || {})[0], shade: 0 } };
@@ -438,6 +444,8 @@ export class PlayScene extends Phaser.Scene {
     this.levelFx = new LevelFx(this);   // #163 landmark, guide lines, signs at secrets, the Wow room
     this.dressingFx = new DressingFx(this);   // #159 decay debris, room stories, the desert, the back wall layer, corrections (K)
     this.storyFx = new StoryFx(this);   // #167 tropes, notes, the Splitter, announcements, AvA, Leyla's traces
+    this.life = new Life(this, this.lifePrep);   // #169 camps, rounds, feuds between factions, what changed while she was away
+    this.director = new Director(this);   // #169 the director: build-up → peak → relax, help only when it fits, music layers
 
     this.keys = {};
     for (const [name, list] of Object.entries(KEYS)) this.keys[name] = list.map(k => this.input.keyboard.addKey(k));
@@ -865,6 +873,7 @@ export class PlayScene extends Phaser.Scene {
     this.hud.floor?.update(this);
     if (!invDone) this.inventoryUpdate(input);   // (closed this frame already: do not open it again with the same key)
     for (const e of this.enemies) e.update(time, dt, this.leyla);
+    this.life?.update(time); this.director?.update(time, dt);   // #169
     traitsTick(this, time, dt);   // #139 sirens; #140 Leyla's grenade (HUD, throw pose)
     this.combat.update(time, dt);
 

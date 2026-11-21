@@ -67,6 +67,7 @@ export class SceneRuns {
       items: [{ label: 'Hierbleiben', sub: 'Weiter plündern', primary: true, act: () => {} }, { label: 'Zurückreisen', sub: 'Ins Camp', act: () => this.endRun(false) }] });
   }
   endRun(ko) {
+    this.life?.commit();   // #169 the run's losses go into the place's state (save.life)
     const save = this.box.save, C = this.data_.camp || {}, base = this.data_.leyla?.health ?? 100;
     advance(save, C.clock?.runHours ?? 3);
     if (ko) { save.health = Math.round(base * (C.heal?.afterKo ?? 30) / 100); save.inv.grids.backpack.items = []; }   // AvA only brings Leyla: the backpack stays behind
@@ -134,6 +135,11 @@ export class SceneRuns {
       this.physics.add.collider(e.box, this.platforms, null, (box, plat) => e.body.velocity.y >= 0 && e.body.prev.y + e.body.height <= plat.body.top + 2);
       this.enemies.push(e);
     }
+    // #169 Leben G3: the camps bring their own people (engine/ecosystem.js planLife); a rival patrol wears its own gang's colours
+    for (const c of this.lifePlan?.camps || []) for (const m of c.members) {
+      const e = this.addEnemy(m.enemy, m.x, m.y, m.gang && m.gang !== this.gang()?.name ? m.gang : undefined);
+      if (e) e.life = { camp: c.id, faction: m.faction, gang: m.gang, role: m.role, route: c.route, cx: c.cx, y: c.y };
+    }
   }
 
   // cover (#014): the chests of the POI level, plus test boxes (nomad / tests) → [{ x, w, top, feet }]
@@ -147,12 +153,12 @@ export class SceneRuns {
   // one more enemy at a tile (tests, nomad.spawn)
   // an enemy as it fights here: danger of the place (#014) and the POI's gang colour (#016: plunderers from the kit wear it, not
   // mutants, not the boss)
-  enemyDef(id) {
+  enemyDef(id, gang) {
     let def = this.data_.enemies?.[id];
     if (!def) return null;
     const Th = this.threat();
     if (Th && (Th.health !== 1 || Th.damage !== 1)) def = { ...def, health: Math.round((def.health ?? 30) * Th.health), damage: Math.round((def.damage ?? 10) * Th.damage) };
-    const G = this.gang();
+    const G = gang ? gangInfo(this.data_, gang) : this.gang();   // #169 another gang's patrol
     if (G?.color && def.kit && def.family === 'raider' && def.behavior !== 'boss') def = { ...def, kitGang: G.color };
     return gangDef(this.data_, id, def, G);   // #155 Gang-Ausrüstung (traits, loadout) and Ergeben for all plunderers
   }
@@ -162,8 +168,8 @@ export class SceneRuns {
     const moved = this.mode === 'run' && save?.turfs?.[save.run?.location ?? save.location];   // #089 a rival moved in
     return moved ? gangInfo(this.data_, moved) : this.data_.pois?.[poi]?.gang || null;
   }
-  addEnemy(id, col, row) {
-    const def = this.enemyDef(id), T = this.T;
+  addEnemy(id, col, row, gang) {
+    const def = this.enemyDef(id, gang), T = this.T;
     if (!def) return null;
     const e = new Enemy(this, id, def, [(col + 0.5) * T, (row + 1) * T]);
     this.physics.add.collider(e.box, this.solids);

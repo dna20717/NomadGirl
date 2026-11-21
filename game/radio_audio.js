@@ -47,6 +47,7 @@ export class RadioSynth {
     }
   }
   voice(c, e, t) {
+    if (this.voices && !this.voices.has(e.voice)) return;   // #169 music layers: only the voices of the layer play
     const V = VOICES[this.style], bus = this.out.bus, len = e.len * this.dur;
     const env = (g, a, peak, d) => { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(0.0002, peak), t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + d); };
     const osc = (type, f, peak, a, d, cut) => {
@@ -67,6 +68,8 @@ export class RadioSynth {
       case 'noise': noiseHit('bandpass', 900 + Math.random() * 2000, 0.12 * v, len); break;
     }
   }
+  // #169 music layers (POI director): which voices play from now on (null = all)
+  setVoices(list) { this.voices = list ? new Set(list) : null; }
   // the DJ talks: music down, back up after
   duck(on) { const c = this.getCtx(); if (!c || !this.out) return; const g = this.out.duck.gain; g.cancelScheduledValues(c.currentTime); g.setTargetAtTime(on ? 0.22 : 1, c.currentTime, 0.25); }
   setVolume(v) { const c = this.getCtx(); this.vol = v; if (!c || !this.out) return; this.out.master.gain.setTargetAtTime(Math.max(0.0002, v), c.currentTime, 0.2); }
