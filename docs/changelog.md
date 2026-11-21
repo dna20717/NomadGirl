@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 21.11.2026: **Herstellerlogos an Entities** (Daniel): Im Inventar trägt jede Entity das Logo ihres Herstellers als Plakette; der Tooltip nennt Bits und Hersteller.
 - 21.11.2026: **Markenschild am POI** (Daniel: „Die Firmenlogos werden in den POI nicht angezeigt“): Am Eingang jedes POI steht die Marke des Orts von der Reisekarte als Schild auf einem Mast, mit Logo, Name und Slogan.
 - 21.11.2026: **POIs wie echte Gebäude, neues Gelände** (#136, #138, #140): alle 110 Räume mit echten Geschossen (6 Kacheln Luft), Treppenhäusern und Durchbrüchen; Hallen bleiben hoch und bekommen Galerien; draußen schwebt keine Plattform mehr. Wüste und Beton neu gemalt. Leylas Wurfarm für Granaten gemalt; der Plattenträger hat ein eigenes Westen-Symbol.
 - 21.11.2026: **Neue Gegner und Granaten** (#139, #140): Scharfschützin Visier (Laser), Werfer Brandsatz (Molotow), Sanitäterin Flickerin (holt Gefallene zurück, ergibt sich), Alarmposten Sirene (läuft zur Sirene, holt Verstärkung). Gegner können sich ergeben: gefangen nehmen, laufen lassen oder erledigen, mit Folgen für den Ruf. Leyla wirft Granaten mit T: drei Ladungen, dann drei Minuten Pause.

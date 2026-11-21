@@ -947,6 +947,9 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .ql-box > header { padding-right: 44px; }
 .ql-dot { margin-left: 6px; padding: 0 6px; border-radius: 99px; background: var(--ng-gold); color: var(--ng-night); font: 600 11px/16px var(--ui-font); font-style: normal; }
 .ql-list li { align-items: flex-start; }
+/* the maker's logo on an Entity in the grid: a round badge bottom right */
+.inv-maker { position: absolute; right: 1px; bottom: 1px; border-radius: 50%; background: #0d0a12; box-shadow: 0 0 0 2px var(--brand), 0 2px 6px rgba(0, 0, 0, .6); overflow: hidden; pointer-events: none; display: grid; place-items: center; }
+.inv-maker .inv-art { width: 100% !important; height: 100% !important; }
 /* #129 Logbuch as the second tab of the Questlog */
 .lb-head { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 0 0 10px; }
 .lb-cats { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-width: 0; }

@@ -381,7 +381,11 @@ export class InventoryUI {
     // an Entity (#048): its code portrait, moving (it is the item picture)
     if (e.g) { const s = Math.floor(Math.min(W, H) * 0.92 / SIZE) * SIZE || Math.min(W, H); wrap.classList.add('pic'); wrap.append(el('span', { class: 'inv-pic', style: `left:${(W - s) / 2}px;top:${(H - s) / 2}px;width:${s}px;height:${s}px` }, faceCanvas(e.g, s))); }
     const art = !e.g && k && artOf(D, e.a, e.id, aw, e.r || 0, ah);
-    if (e.g) { /* portrait above */ } else if (art) { wrap.classList.add('pic'); wrap.append(el('span', { class: 'inv-pic', style: `left:${(W - aw) / 2}px;top:${(H - ah) / 2}px;width:${aw}px;height:${ah}px` }, art)); }
+    if (e.g) {   // the maker's logo as a small badge in the corner (Daniel 21.11.2026: „Entitäten haben keine Herstellerlogos im Inventar“)
+      const br = D.brands?.[glitchBrand(D, e.g)], ls = Math.max(14, Math.round(Math.min(W, H) * 0.42));
+      const logo = br?.icon != null ? artOf(D, null, null, ls, 0, null, { look: D.worldmap?.logos, icon: br.icon }) : null;
+      if (logo) wrap.append(el('span', { class: 'inv-maker', title: br.name, style: `width:${ls}px;height:${ls}px;--brand:${br.color || '#ffd27a'}` }, logo));
+    } else if (art) { wrap.classList.add('pic'); wrap.append(el('span', { class: 'inv-pic', style: `left:${(W - aw) / 2}px;top:${(H - ah) / 2}px;width:${aw}px;height:${ah}px` }, art)); }
     else wrap.append(el('span', { class: 'inv-glyph', style: `left:${lx * c}px;top:${ly * c}px;width:${c}px;height:${c}px` }, glyphOf(D, e.a, e.id)));
     if (!art && !e.g && (b.w * c >= 80 || b.h > 1)) wrap.append(el('span', { class: 'inv-name' }, e.p ? `⛓ ${e.p.name}` : t.name || e.id));   // #079 a prisoner shows his name
     if (e.n > 1) wrap.append(el('span', { class: 'inv-count' }, String(e.n)));
@@ -457,7 +461,7 @@ export class InventoryUI {
   showTip(e, key = null) {
     if (this.menuOn) return;   // the right-click menu stays until it is used or closed
     const D = this.D, t = thing(D, e.a, e.id) || {}, k = kindOf(D, e.a, e.id);
-    const facts = [CATEGORY_NAMES[k], e.a === 'rigParts' ? `Slot: ${PART_SLOT_NAMES[t.slot] || t.slot}` : null, e.a === 'rigParts' && t.pull ? `+${t.pull} kg Zugkraft` : null,
+    const facts = e.g ? ['Entity', `${e.g.bits} Bits`, D.brands?.[glitchBrand(D, e.g)]?.short ? `von ${D.brands[glitchBrand(D, e.g)].short}` : null].filter(Boolean) : [CATEGORY_NAMES[k], e.a === 'rigParts' ? `Slot: ${PART_SLOT_NAMES[t.slot] || t.slot}` : null, e.a === 'rigParts' && t.pull ? `+${t.pull} kg Zugkraft` : null,
       e.a === 'rigParts' && t.armor ? `+${t.armor} Panzerung` : null, e.a === 'rigParts' && t.storageRows ? `+${t.storageRows} Reihen Stauraum` : null,
       (e.a === 'weapons' || e.a === 'rigParts') && t.damage ? `${(e.a === 'weapons' ? brandWeapon(D, t) : t).damage} Schaden` : null, e.a === 'backpacks' && t.size ? `Raster ${t.size.join(' × ')}` : null,
       t.wear ? `${DRONE_WEAR.includes(t.wear) ? 'AvA: ' : 'Platz: '}${WEAR_NAMES[t.wear] || t.wear}` : null, t.strain ? `Belastung ${t.strain}` : null,
@@ -505,7 +509,7 @@ export class InventoryUI {
       out.push({ id: 'send', k: 'send', label: to === 'drone' ? 'Drohne geben' : key === 'drone' ? 'In den Rucksack' : to === 'backpack' ? 'In den Rucksack' : `Rüber: ${this.other?.title || 'Kiste'}` });
     if (to !== 'drone' && key !== 'drone' && this.inv.grids.drone && this.hasRoom('drone', e)) out.push({ id: 'drone', k: null, label: 'Drohne geben' });
     if (e.g && key !== DECK && this.inv.grids[DECK] && this.hasRoom(DECK, e)) out.unshift({ id: 'deck', k: null, label: 'Ins Cyberdeck' });   // #049
-    if (key === DECK && this.inv.grids.backpack && this.hasRoom('backpack', e)) out.unshift({ id: 'bag', k: null, label: 'In den Rucksack' });
+    if (key === DECK && this.inv.grids.backpack && this.hasRoom('backpack', e) && !out.some(x => x.id === 'send' && to === 'backpack')) out.unshift({ id: 'bag', k: null, label: 'In den Rucksack' });
     if (e.g && camp && this.host.worker && farmKeys(D, this.host.save()).includes(key)) {   // #060 a resident of the Bit-Farm can work in the rig
       const wp = workplaceOf(D, this.host.save(), e.g.id);
       out.unshift({ id: 'worker', k: null, label: wp ? `Worker: ${wp.def.name || wp.w.id}` : 'Als Worker einsetzen' });
