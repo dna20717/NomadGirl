@@ -14,7 +14,7 @@ export class LeylaGrenade {
   get c() {
     const G = this.l.d.grenade || {};
     return { enabled: G.enabled !== false, charges: Math.max(1, G.charges ?? 3), cooldown: (G.cooldown ?? 180) * 1000, refill: G.refill || 'all', item: G.item || 'granate',
-      fuse: G.fuse ?? 900, radius: G.radius ?? 160, damage: G.damage ?? 40, burn: G.burn ?? 3, velocity: G.velocity || [620, -900], throwTime: G.throwTime ?? 220, hand: G.hand || [30, 170], look: G.look || '', arm: G.arm || '', shoulder: (G.shoulder ?? 69) / 100 };
+      fuse: G.fuse ?? 900, radius: G.radius ?? 160, damage: G.damage ?? 40, burn: G.burn ?? 3, velocity: G.velocity || [620, -900], throwTime: G.throwTime ?? 220, releaseFrame: G.releaseFrame, hand: G.hand || [30, 170], look: G.look || '', arm: G.arm || '', shoulder: (G.shoulder ?? 69) / 100 };
   }
   now() { return this.l.scene.now ?? this.l.scene.time.now; }
   reset() { this.pose = null; }
@@ -33,10 +33,16 @@ export class LeylaGrenade {
     if (this.pose && time >= this.pose.end) this.pose = null;
     if (!input.grenade?.pressed || !c.enabled || s.mode === 'camp' || !l.alive || BLOCKED.has(l.state) || this.pose) return;
     if (this.charges <= 0) { s.staminaDenied?.('grenade'); this.denied = time; return; }
-    this.pose = { at: time, release: time + c.throwTime, end: time + c.throwTime + 260, up: !!input.up?.down, down: !!input.down?.down, done: false };
+    // #161 a painted throw (Leyla › Granate › Wurf, the rifle brings its own in Waffen › Posen › throw): its length and release frame set the timing
+    const T = this.throwLook(), A = T && s.data_.assets?.[T];
+    const dur = A?.frames ? A.frames / (A.fps || 22) * 1000 : 0, rel = A?.frames ? (c.releaseFrame ?? Math.round(A.frames * 0.72)) / (A.fps || 22) * 1000 : 0;
+    this.pose = dur ? { at: time, release: time + rel, end: time + dur, look: T, up: !!input.up?.down, down: !!input.down?.down, done: false }
+      : { at: time, release: time + c.throwTime, end: time + c.throwTime + 260, up: !!input.up?.down, down: !!input.down?.down, done: false };
     l.fightTrigger?.(time);
   }
 
+  // the painted throw for the weapon in hand: Waffen › Posen › throw (Sturmgewehr), else Leyla › Granate › Wurf (with a pistol)
+  throwLook() { const k = this.l.d?.look?.throw || this.c.look; return k && this.l.scene.textures.exists(k) ? k : null; }
   hand() {
     const l = this.l, c = this.c, k = l.size.h / 168;   // the hand values are for the 192 px Leyla (box 168 high)
     return { x: l.x + l.facing * c.hand[0] * k, y: l.feet - c.hand[1] * k };
@@ -59,8 +65,22 @@ export class LeylaGrenade {
     this.g ??= s.add.graphics().setDepth(10.6);
     this.g.clear();
     const sp = l.sprite, A = c.look && s.data_.assets?.[c.look];
-    if (!P) { this.over?.setVisible(false); this.arm?.setVisible(false); return; }
-    const p = Math.min(1, (time - P.at) / (P.end - P.at));
+    if (!P) { if (this.hidBody) { sp.setVisible(true); this.hidBody = false; } if (this.cutBody) { sp.setCrop(); this.cutBody = false; } this.over?.setVisible(false); this.arm?.setVisible(false); return; }
+    const p = Math.min(1, (time - P.at) / (P.end - P.at)), key = P.look, TA = key && s.data_.assets?.[key];
+    if (TA) {   // #161 the painted throw: standing = the whole body (lunge), moving or in the air = only the upper body over her legs
+      this.over ??= s.add.sprite(sp.x, sp.y, key).setDepth(10.5);
+      const n = TA.frames || 1, [fw, fh] = TA.frameSize || [sp.width, sp.height], o = TA.origin || [fw / 2, fh];
+      const still = l.body.blocked.down && Math.abs(l.body.velocity.x) < 40 && l.state === 'normal';
+      this.over.setVisible(true).setTexture(key, Math.min(n - 1, Math.floor(p * n))).setOrigin(o[0] / fw, o[1] / fh)
+        .setPosition(l.x, l.feet).setScale((TA.height || l.height) / fh).setFlipX(l.facing < 0);
+      const waist = TA.waist ?? Math.round(fh * 0.5);
+      if (still) this.over.setCrop(); else this.over.setCrop(0, 0, fw, waist);
+      sp.setVisible(!still); this.hidBody = still;
+      // moving: her own upper body (gun arm of the run) would show under the throw, so it is cut off at the same waist line
+      if (!still && sp.frame) { const bo = sp.displayOriginY ?? sp.frame.height, cut = Math.max(0, bo - (o[1] - waist)); sp.setCrop(0, cut, sp.frame.width, sp.frame.height - cut); this.cutBody = true; }
+      else if (this.cutBody) { sp.setCrop(); this.cutBody = false; }
+      return;
+    }
     if (A && s.textures.exists(c.look)) {   // painted upper body: same box, anchor and flip as the body under it
       this.over ??= s.add.sprite(sp.x, sp.y, c.look).setDepth(10.5);
       const n = A.frames || 1, [fw, fh] = A.frameSize || [sp.width, sp.height], o = A.origin || [fw / 2, fh];

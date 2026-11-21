@@ -285,9 +285,9 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #161 Granate: generierte Wurf-Animation mit Waffe
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Granate – die Animation ist schlecht. Lass sie bitte generieren (mit aktiver Kurz- oder Langwaffe und dynamischer)“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Granate – die Animation ist schlecht. Lass sie bitte generieren (mit aktiver Kurz- oder Langwaffe und dynamischer)“)
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Wurf je Waffe mit PixelLab generiert (≈ 70: drei Schlüsselposen je Waffe, drei Übergänge): Pistole bzw. Sturmgewehr bleibt in der vorderen Hand, Ausfallschritt, Arm hinter den Kopf, schnellt nach vorn, zurück ins Zielen. Im Stand ganzer Körper, beim Laufen/Springen nur Oberkörper über den laufenden Beinen. Tests Bausteine 32, Parkour 50, npm 400. **Bitte testen:** T im Stand und im Rennen, einmal mit Pistole, einmal mit Sturmgewehr.
 
 ### #162 Fahrt: Wunschliste Grafiken
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Wunschliste freigegeben“: Zwischenfälle Bus, Autowrack, abgestürzte Drohne, Schrein, Funkmast; Wolken; Hochspannungsmast; seitlicher Asphalt, ca. 70 PixelLab)

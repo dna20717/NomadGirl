@@ -7759,5 +7759,35 @@
   "names": ["wolke_1", "wolke_2", "wolke_3", "wolke_4", "wolke_5", "wolke_6"],
   "source": "KI (PixelLab, create_image_pro, Stil props_big), Freigabe Daniel 21.11.2026 (#162)",
   "date": "2026-11-21"
+ },
+ "leyla_throw_pistol": {
+  "name": "Leyla · Granate werfen (Pistole)",
+  "kind": "animation",
+  "file": "assets/leyla/grenade/throw_pistol.png",
+  "frameSize": [256, 256],
+  "frames": 11,
+  "fps": 22,
+  "loop": false,
+  "origin": [128, 252],
+  "height": 203,
+  "waist": 126,
+  "source": "KI (PixelLab: Schlüsselposen Ausholen/Loslassen mit Edit Pro Flash, Übergänge mit Animate Image) + Code (Streifen)",
+  "date": "2026-11-21",
+  "description": "4× Ausholen (Ausfallschritt, Arm hinter den Kopf), 4× Wurf (Bild 8 = loslassen), 3× zurück ins Zielen; die Waffe bleibt in der vorderen Hand (#161)."
+ },
+ "leyla_throw_rifle": {
+  "name": "Leyla · Granate werfen (Sturmgewehr)",
+  "kind": "animation",
+  "file": "assets/leyla/grenade/throw_rifle.png",
+  "frameSize": [256, 256],
+  "frames": 11,
+  "fps": 22,
+  "loop": false,
+  "origin": [128, 252],
+  "height": 203,
+  "waist": 126,
+  "source": "KI (PixelLab: Schlüsselposen Ausholen/Loslassen mit Edit Pro Flash, Übergänge mit Animate Image) + Code (Streifen)",
+  "date": "2026-11-21",
+  "description": "4× Ausholen (Ausfallschritt, Arm hinter den Kopf), 4× Wurf (Bild 8 = loslassen), 3× zurück ins Zielen; die Waffe bleibt in der vorderen Hand (#161)."
  }
 }

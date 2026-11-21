@@ -204,7 +204,8 @@
    "runReload": "leyla_rifle_run_ready_side",
    "runReload2": "leyla_rifle_run_ready_side",
    "muzzle": [76, 157],
-   "muzzleRun": [80, 141]
+   "muzzleRun": [80, 141],
+   "throw": "leyla_throw_rifle"
   },
   "look": "icons_longguns",
   "icon": 0,
