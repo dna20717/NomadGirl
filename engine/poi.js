@@ -67,7 +67,8 @@ export function buildPoi(D, poiId, seed = 1) {
   // #163 the Wow room of the POI comes in every run (POIs › Wow); as the entrance when its place in the arc is the threshold
   const LD = levelConfig(D), W0 = wowOf(D, poiId), wowId = W0 && parsed[W0.room] && (P.rooms || []).includes(W0.room) ? W0.room : null;
   const wowStart = !!wowId && W0.at === 'start' && tagged(R, wowId, 'start') && (!stack || needs(wowId, stack === 'tower' ? 'ceil' : 'floor'));
-  const start = wowStart ? wowId : pick(ready.filter(id => tagged(R, id, 'start') && id !== wowId && (!stack || needs(id, stack === 'tower' ? 'ceil' : 'floor'))), rnd, R);
+  const picked = pick(ready.filter(id => tagged(R, id, 'start') && (!stack || needs(id, stack === 'tower' ? 'ceil' : 'floor'))), rnd, R);   // always rolled: same seed, same level as before
+  const start = wowStart ? wowId : picked;
   const exit = pick(ready.filter(id => tagged(R, id, 'exit') && id !== start && !tagged(R, id, 'start') && (!stack || needs(id, stack === 'tower' ? 'floor' : 'ceil'))), rnd, R);
   if (!start || !exit) return { def: null, rooms: [], shortcut: false, branches: 0, problems: [stack ? `Stapel (${stack}): Eingang/Ausgang ohne passende Haken (A)` : poiReady(D, poiId).why] };
   // main path: entrance, middle rooms, exit (roomCount = length of the main path)
@@ -303,13 +304,14 @@ function buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, sta
   }
   // #163 fair fights: gates are the ladders through the hooks (both sides) and the seams of the side rooms
   {
-    const gates = [...joints.flatMap(j => [[j.x, j.y - 1], [j.x, j.y + 2]]), ...branches.map(b => [side > 0 ? b.x + b.w - 1 : b.x, b.y + b.h - 2])];
+    const foot = j => { let y = j.y + 1; while (tiles[y + 1]?.[j.x] === 'H') y++; return [j.x, y]; };   // where the ladder through a hook ends below
+    const gates = [...joints.flatMap(j => [[j.x, j.y - 1], [j.x, j.y + 2], foot(j)]), ...branches.map(b => [side > 0 ? b.x + b.w - 1 : b.x, b.y + b.h - 2])];
     const Lx = (() => { for (let y = 0; y < H; y++) { const x = tiles[y].indexOf('L'); if (x >= 0) return [x, y]; } return null; })();
     // the way in of a main room: the entrance at L; a tower comes in through the floor (joint below), a deep POI through the ceiling
     const entries = [...placed.map((m, i) => {
       if (!i) return { x: m.x, y: m.y, w: m.w, h: m.h, at: Lx };
       const oi = order.indexOf(m), j = stack === 'tower' ? joints[oi] : joints[oi - 1];
-      return { x: m.x, y: m.y, w: m.w, h: m.h, at: j ? (stack === 'tower' ? [j.x, j.y - 1] : [j.x, j.y + 2]) : null };
+      return { x: m.x, y: m.y, w: m.w, h: m.h, at: j ? (stack === 'tower' ? [j.x, j.y - 1] : foot(j)) : null };
     }), ...branches.map(b => ({ x: b.x, y: b.y, w: b.w, h: b.h, at: [side > 0 ? b.x + b.w - 1 : b.x, b.y + b.h - 2] }))];
     fairFights({ D, tiles, gates, entries, spawns: enemyKit.spawns, letterOf: enemyKit.letterOf, melee: enemyKit.melee, cfg: enemyKit.LD, rnd });
   }

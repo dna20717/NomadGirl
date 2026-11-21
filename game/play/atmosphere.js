@@ -26,7 +26,7 @@ export class Atmosphere {
     this.regionAt = atmoRegions(D, R, { level: s.levelInfo, roomId: s.roomId, poiId: s.levelPoi });
     this.moods = new Map();
     this.moodAt = (tx, ty) => { const id = this.regionAt(Math.max(0, Math.min(R.w - 1, tx)), Math.max(0, Math.min(R.h - 1, ty))).mood; if (!this.moods.has(id)) this.moods.set(id, moodOf(D, id)); return this.moods.get(id); };
-    const plan = planLights(D, R, this.regionAt);
+    const plan = planLights(D, R, this.regionAt, { level: s.levelInfo, poiId: s.levelPoi });   // #163 light at the way on, the Wow key light
     this.ceilings = plan.ceilings; this.faces = plan.faces;
     // nothing to do at all (every room bright, no lamps, nothing moving): stay out of the way
     const any = [...new Set([...Array(R.w).keys()].flatMap(x => [0, Math.floor(R.h / 2), R.h - 1].map(y => this.regionAt(x, y).mood)))].map(id => moodOf(D, id))
@@ -38,10 +38,13 @@ export class Atmosphere {
     this.amb = document.createElement('canvas'); this.amb.width = R.w; this.amb.height = R.h;
     const ac = this.amb.getContext('2d'), img = ac.createImageData(R.w, R.h);
     this.ambLum = new Float32Array(R.w * R.h);
+    // #163 the Wow room: the rest of the room darker, so the key light on the motif stands out
+    const wowRoom = s.levelInfo?.rooms?.find(r => r.wow), dark = 1 - (D.game?.levelDesign?.wowDark ?? 30) / 100;
     for (let y = 0; y < R.h; y++) for (let x = 0; x < R.w; x++) {
       const m = this.moodAt(x, y), c = rgb(m.color), i = (y * R.w + x) * 4;
-      img.data[i] = c[0] * m.ambient; img.data[i + 1] = c[1] * m.ambient; img.data[i + 2] = c[2] * m.ambient; img.data[i + 3] = 255;
-      this.ambLum[y * R.w + x] = (c[0] + c[1] + c[2]) / 765 * m.ambient;
+      const a = m.ambient * (wowRoom && x >= wowRoom.x && x < wowRoom.x + wowRoom.w && y >= wowRoom.y && y < wowRoom.y + wowRoom.h ? dark : 1);
+      img.data[i] = c[0] * a; img.data[i + 1] = c[1] * a; img.data[i + 2] = c[2] * a; img.data[i + 3] = 255;
+      this.ambLum[y * R.w + x] = (c[0] + c[1] + c[2]) / 765 * a;
     }
     ac.putImageData(img, 0, 0);
 

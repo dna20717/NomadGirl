@@ -27,6 +27,8 @@ import { Combat } from './combat.js';
 import { Fx } from './fx.js';
 import { slowClock } from './slowmo.js';
 import { Atmosphere } from './atmosphere.js';
+import { LevelFx } from './level_fx.js';
+import { landmarkViews } from '../../engine/level_design.js';
 import { Drone } from './drone.js';
 import { Van } from './van.js';
 import { DriveUI } from './drive_ui.js';
@@ -165,7 +167,10 @@ export class PlayScene extends Phaser.Scene {
     const D = this.data_, kits = terrainKits(this, D), LI = this.levelInfo;
     const reg = regionMap(D, LI?.def ? { rooms: LI.rooms, poiId: this.levelPoi } : { roomId: this.roomId });
     const backOf = id => { const t = D.terrain?.[id], k = kits(t?.back?.terrain); return k ? { ...k, shade: t.back.shade } : null; };
-    return { reg, kits, idAt: reg.idAt, inside: reg.inside, at: (x, y) => kits(reg.idAt(x, y)), back: (x, y) => reg.inside(x, y) ? backOf(reg.idAt(x, y)) : null };
+    // #163 windows to the landmark: holes in the back wall (engine/level_design.js landmarkViews)
+    const holes = new Set();
+    if (LI?.def && this.mode !== 'camp') for (const v of landmarkViews(D, this.levelPoi, LI)) if (v.win) for (let y = v.win.y; y < v.win.y + v.win.h; y++) for (let x = v.win.x; x < v.win.x + v.win.w; x++) holes.add(x + ',' + y);
+    return { reg, kits, idAt: reg.idAt, inside: reg.inside, at: (x, y) => kits(reg.idAt(x, y)), back: (x, y) => reg.inside(x, y) && !holes.has(x + ',' + y) ? backOf(reg.idAt(x, y)) : null };
   }
   // Ort-Typen of the room or level (#158, engine/dressing.js placeTypes), once per room
   placeMap() { return this.places_ ??= placeTypes(this.room, this.terrain?.reg || regionMap(this.data_, { roomId: this.roomId })); }
@@ -425,6 +430,7 @@ export class PlayScene extends Phaser.Scene {
     cam.fadeIn(400, 13, 10, 18);
     // light & atmosphere (game/play/atmosphere.js): darkness with lamps, glow, colour mood, dust, sparks, drips, fog
     this.atmo = new Atmosphere(this, this.props);
+    this.levelFx = new LevelFx(this);   // #163 landmark, guide lines, signs at secrets, the Wow room
 
     this.keys = {};
     for (const [name, list] of Object.entries(KEYS)) this.keys[name] = list.map(k => this.input.keyboard.addKey(k));
@@ -864,6 +870,7 @@ export class PlayScene extends Phaser.Scene {
     this.bgCam.setScroll(cam.worldView.x, cam.worldView.y);   // parallax follows the world camera
     this.backdrop?.update(time, dt);
     this.atmo?.update(time, dt);
+    this.levelFx?.update(time, dt);
     this.hud.build?.update(time, dt);
     this.hud.update(this, time);
   }

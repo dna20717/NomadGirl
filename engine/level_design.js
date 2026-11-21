@@ -69,9 +69,10 @@ export function roomGates(L) {
     if (!L.stack) return { in: [r.x, floorAt(r.x, r.y, r.y + r.h - 2)], out: [r.x + r.w - 1, floorAt(r.x + r.w - 1, r.y, r.y + r.h - 2)] };
     // tower: in through the floor (from below), out through the ceiling; deep: the other way round
     const up = L.stack === 'tower', fx = ladderIn(r, r.y + r.h - 1), cx = ladderIn(r, r.y);
-    const inX = up ? fx : cx, outX = up ? cx : fx;
     const g = x => x == null ? null : [x, floorAt(x, r.y, r.y + r.h - 2)];
-    return { in: g(inX ?? r.x + 1), out: g(outX ?? r.x + r.w - 2), first: i === 0, last: i === mains.length - 1 };
+    const foot = x => { if (x == null) return null; let y = r.y; while (at(x, y + 1) === 'H') y++; return [x, y]; };   // the ladder from the ceiling hook ends here
+    const fl = g(fx ?? (up ? r.x + 1 : r.x + r.w - 2)), ce = cx != null ? foot(cx) : g(up ? r.x + r.w - 2 : r.x + 1);
+    return { in: up ? fl : ce, out: up ? ce : fl, first: i === 0, last: i === mains.length - 1 };
   });
 }
 

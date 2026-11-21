@@ -6,6 +6,7 @@
 // In a POI level each tile belongs to the room in its column (like the Kachel-Sets); below all rooms lies the tunnel
 // (POIs › Atmosphäre im Tunnel, else the tunnel's Kachel-Set).
 import { WALL } from './room.js';
+import { levelConfig, lightTheWay, wowInLevel } from './level_design.js';
 
 export const LAMP_KINDS = [['ceiling', 'Deckenlampe'], ['tube', 'Neonröhre'], ['emergency', 'Notlicht'], ['bulb', 'Glühbirne']];
 export const LIGHT_BEHAVIORS = [['steady', 'Ruhig'], ['flicker', 'Flackert'], ['pulse', 'Pulsiert'], ['broken', 'Kaputt (Aussetzer, Funken)'], ['stutter', 'Springt an (Neonröhre stottert)'], ['alarm', 'Alarm (Rundumlicht)'], ['buzz', 'Brummt (leises Zittern)']];
@@ -44,7 +45,9 @@ export function atmoRegions(D, room, { level = null, roomId = null, poiId = null
 // from the mood's table Lampen (chance per spot). Fixed: * in the layout hangs the mood's first lamp there.
 // → { lamps: [{ x, y (tile of the fixture: ceiling bottom = y * T), kind, color, radius, strength, behavior, seed, region, fixed }],
 //     ceilings: [[x, y]] every ceiling tile (drips), faces: [[x, y]] wall tiles next to air (sparks) }
-export function planLights(D, room, regionAt) {
+// #163 opts = { level (buildPoi result), poiId }: light at the way on (the lamp at every main room's exit brightest, dead ends dimmer) and
+// the Wow room's key light on its motif (POIs › Wow › Schlüssellicht)
+export function planLights(D, room, regionAt, opts = {}) {
   const M = D.atmosphere || {}, solid = (x, y) => x < 0 || y < 0 || x >= room.w || y >= room.h || WALL.has(room.tiles[y][x]);
   const air = (x, y) => !solid(x, y) && room.tiles[y]?.[x] !== 'H' && room.tiles[y]?.[x] !== '=';
   const lamps = [], ceilings = [], faces = [], taken = new Set();
@@ -69,6 +72,16 @@ export function planLights(D, room, regionAt) {
       if (hash(x, y, 31 + i) * 100 >= (L.chance ?? 100)) continue;
       lamps.push(lamp(L, x, y, reg, false));
       taken.add(x + ',' + y);
+    }
+  }
+  if (opts.level?.rooms?.length) {
+    const cfg = levelConfig(D);
+    lightTheWay(lamps, opts.level, room, cfg, (x, y) => { const reg = regionAt(x, y), L = M[reg.mood]?.lamps?.[0] || { kind: 'bulb' }; return (M[reg.mood]?.light?.ambient ?? 100) >= 90 ? null : lamp(L, x, y, reg, true); });   // daylight needs no lamp
+    const W = wowInLevel(D, opts.poiId, opts.level);
+    if (W) {
+      let y = W.y - 2; while (y > W.room.y && !solid(W.x, y - 1)) y--;
+      const L = { kind: 'ceiling', color: W.W.light || '#ffe2a8', radius: 560, strength: W.W.lightStrength ?? 220, behavior: W.W.particles === 'flicker' ? 'stutter' : 'steady' };
+      lamps.push({ ...lamp(L, W.x, y, regionAt(W.x, y), true), key: true });
     }
   }
   return { lamps, ceilings, faces };
