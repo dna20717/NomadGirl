@@ -10,6 +10,7 @@
 import { parseRoom, TILE_LEGEND } from './room.js';
 import { buildPoi, poiReady } from './poi.js';
 import { PLACE_TYPES, ROOM_ROLES, splitList } from './dressing.js';
+import { EVENT_KINDS, storyTags } from './story.js';
 import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
 import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
 import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from './megarig.js';
@@ -1650,6 +1651,14 @@ export const AREAS = {
     row: x => `${label(POI_KINDS, x.kind)} · ${x.size} · Gefahr ${'●'.repeat(x.danger || 0)}`,
     sections: [
       { title: 'POI', fields: [NAME, LOOK, select('kind', 'Art', POI_KINDS), select('size', 'Größe', POI_SIZES), num('danger', 'Gefahr', { min: 1, max: 5 }), DESCRIPTION] },
+      { title: 'Story', fields: [area_('story.before', 'Früher', { hint: '#160 Story zuerst (Daniel 21.11.2026: „Ich möchte, dass vor dem ersten Design die Story des POI oder des Raumes feststeht“): Was war das, wer betrieb es? Steckbriefe: docs/concepts/poi_steckbriefe.md' }),
+        area_('story.people', 'Menschen', { hint: 'Wer war hier, wie sah der Alltag aus?' }), area_('story.event', 'Ereignis', { hint: 'Was ist passiert, und wann genau? Der eingefrorene Moment' }),
+        ref('story.era', 'Epoche', 'chronicle', { hint: 'Wann in der Weltchronik (Lore › Weltchronik)' }), select('story.eventKind', 'Art des Ereignisses', EVENT_KINDS, { hint: 'Steuert die Spuren in den Räumen (#159): Flucht = stehen gelassen, Kampf = Deckung und Hülsen, Feuer = Ruß, Flut = Pfützen. Leer = aus dem Text' }),
+        num('story.decay', 'Verfall', { min: 0, max: 3, hint: '0 = wie gestern verlassen, 3 = Ruine. Raum-Bausteine › Story › Verfall überschreibt je Raum. Gewürfelte Orte: weiter draußen älter' }),
+        area_('story.today', 'Heute', { hint: 'Wer ist jetzt hier? Die Gang kommt aus Gang › Name; gewürfelte Orte nehmen den Besitzer aus dem Revierkrieg' }), area_('story.goal', 'Ziel', { hint: 'Was sucht Leyla hier?' }),
+        area_('story.tone', 'Ton', { hint: 'Licht, Klang, Musikfärbung' }), area_('story.joke', 'Witz', { hint: 'Ton-Regel 1: ein Witz, eine Wunde' }), area_('story.wound', 'Wunde'),
+        area_('story.keyImage', 'Schlüsselbild', { hint: 'Das eine Bild, das Spieler mitnehmen; Maßstab für Galerie und Kritiker' }), area_('story.shard', 'Splitter', { hint: 'Ton-Regel 7: wo ein Erinnerungs-Splitter aus dem Klinikturm liegt und wie er dorthin kam (nur Daten, die Mechanik kommt später)' }),
+        text('story.line', 'Satz für gewürfelte Orte', { hint: 'Ein Satz im Ort-Fenster der Reisekarte für gewürfelte Orte dieser Art (Archetyp). Leer = Witz oder Früher, ohne Namen des Wahrzeichens' })] },
       { title: 'Aufbau', fields: [range('roomCount', 'Räume', { hint: 'Wie viele Räume zusammengesetzt werden' }), refs('rooms', 'Raum-Bausteine', 'rooms'), refs('enemies', 'Gegner', 'enemies', { hint: 'Für das Zeichen 1 im Layout: ein zufälliger dieser Gegner' }), ref('loot', 'Kisten-Beute', 'lootTables', { hint: 'Für Kisten (C) in den Räumen' }), ref('vault', 'Tresor-Beute', 'lootTables', { hint: 'Liegt im Tresor am Ziel (Z), ein guter Rang stellt die Bonus-Kiste daneben (Ranking › Bonus-Kiste, #141). Leer = Tabelle „tresor“' })] },
       { title: 'Gang', fields: [text('gang.name', 'Name', { hint: '#016: Wem dieser Ort gehört. Steht beim Betreten als Toast („Revier der …“)' }), text('gang.color', 'Gang-Farbe', { hint: 'Name einer Gang-Farbe aus dem Gegner-Bausatz (Magenta, Cyan, Orange, Gelb, Blutrot). Alle Plünderer aus dem Bausatz tragen hier diese Farbe (nicht Mutanten, nicht der Boss)' }), area_('gang.motto', 'Spruch'), text('gang.rivals', 'Rivalen', { hint: '#089 Revierkrieg: Namen anderer Gangs (Komma), gilt in beide Richtungen. Ruf bei der einen kostet Ruf bei der anderen; Straßen zwischen ihren Orten werden Fronten' }),
         multi('gang.traits', 'Bausteine', TRAIT_OPTIONS, { hint: '#155 Gang-Ausrüstung: diese Bausteine (Gegner › Bausteine) bekommen alle ihre Plünderer (Bausatz, kein Boss), mit den Werten des Gegners bzw. den Vorgaben. Gilt auch, wo die Gang ein Revier übernommen hat' }),
@@ -1684,6 +1693,8 @@ export const AREAS = {
         if (r.weapon && W?.[r.weapon] && !W[r.weapon].held) report('warning', `Ausrüstung: ${W[r.weapon].name || r.weapon} hat keine Grafik in der Hand der Gegner (Waffen › In der Hand)`);
       }
       dressingRowsCheck(x.brandProps, report, 'Marken-Clutter', () => true);
+      if (!x.story?.keyImage) report('warning', 'Story: kein Schlüsselbild (#160)');   // #160
+      if (!x.story?.event) report('hint', 'Story: kein Ereignis');
       const R = p.data.rooms || {};
       if (!(x.rooms || []).some(r => R[r]?.tags?.includes('start'))) report('warning', 'Kein Raum mit Eingang');
       if (!(x.rooms || []).some(r => R[r]?.tags?.includes('exit'))) report('warning', 'Kein Raum mit Ausgang');
@@ -1814,6 +1825,12 @@ export const AREAS = {
         refs('dressing.sets', 'Nur diese Ensembles', 'poiSets', { hint: 'Leer = alle POI-Ensembles, die zur Rolle passen' }),
         bool('indoor', 'Innenraum', { hint: 'Im POI-Level: Rückwand statt Himmel. Leer = Innenraum, wenn der Raum keinen eigenen Hintergrund hat' }),
         ref('atmosphere', 'Atmosphäre', 'atmosphere', { hint: 'Licht und Stimmung dieses Raums (z. B. Lager dunkler). Leer = Atmosphäre des Kachel-Sets' }), DESCRIPTION] },
+      { title: 'Story', fields: [area_('story.function', 'Funktion früher', { hint: '#160 Raum-Steckbrief: wofür war der Raum da? Ohne Rolle ergibt sich die Rolle daraus' }),
+        area_('story.moment', 'Moment des Ereignisses', { hint: 'Was geschah hier, als das Leben stehen blieb?' }), area_('story.today', 'Heute', { hint: 'Was hat sich seitdem verändert, wer ist da?' }),
+        area_('story.keyImage', 'Schlüsselbild', { hint: 'Das eine Bild dieses Raums. Ein Seed ist gut, wenn man es auf den ersten Blick erkennt' }),
+        text('story.must', 'Pflicht-Dinge', { hint: '2–4 Dinge, die immer da sind: Tags oder Clutter-Namen aus Kachel-Sets › Clutter-Regeln bzw. POIs › Marken-Clutter (Komma)' }),
+        text('story.never', 'Verboten', { hint: 'Tags oder Clutter-Namen, die hier nie stehen (Komma)' }),
+        num('story.decay', 'Verfall hier', { min: 0, max: 3, hint: 'Überschreibt POIs › Story › Verfall für diesen Raum (z. B. Penthouse 1 im eingestürzten Turm). Leer = wie der POI' })] },
       { title: 'Hintergrund', fields: [ref('backdrop.parallax', 'Parallax-Set', 'parallax', { hint: '#115: gemalte Ebenen statt Bild; leer = Bild bzw. das Set der Region (draußen)' }), bool('backdrop.parallaxNear', 'Auch die nahe Ebene', { hint: 'Sonst in POIs nur ferne Ebenen (die nahe sieht neben Requisiten aus wie Spielwelt)' }), num('backdrop.veil', 'Dunst', { unit: '%', min: 0, max: 100, hint: 'Schleier über den Ebenen (Standard 35)' }), num('backdrop.horizon', 'Horizont', { unit: '% der Bildhöhe' }), select('backdrop.outdoor', 'Draußen', [['', 'nach dem Bild'], ['yes', 'ja: Set der Region + Vordergrund'], ['no', 'nein']], { hint: 'Draußen-Räume bekommen das Set ihrer Region und schwarze Vordergrund-Silhouetten' }), ref('backdrop.image', 'Bild', 'assets', { hint: 'Pixel-Art mit transparentem Himmel, scharf auf ganze Pixel skaliert; leer = Stadt-Silhouette aus Code' }),
         ref('backdrop.weather', 'Wetter', 'weather', { hint: 'Himmel dahinter, Regen davor' }), num('backdrop.pixel', 'Pixelgröße', { unit: 'px', min: 1, hint: 'Leer = passend zur Bildhöhe' }),
         num('backdrop.bottom', 'Unterkante', { unit: '%', hint: 'Wo die Unterkante des Bilds sitzt, wenn die Kamera ganz unten ist (100 = Bildschirmrand)' }), num('backdrop.scroll', 'Mitbewegen', { unit: '%', min: 0, hint: 'Parallaxe mit der Kamera' }),
@@ -1821,7 +1838,14 @@ export const AREAS = {
       { title: 'Layout', fields: [lines('layout', 'Kacheln', { hint: 'Ein Zeichen pro Kachel: ' + TILE_LEGEND.map(([c, n]) => `${c} ${n}`).join(' · ') + ' · andere Buchstaben = Spawns aus der Tabelle' }),
         table('spawns', 'Spawns', [text('symbol', 'Zeichen'), ref('enemy', 'Gegner', 'enemies')], { hint: 'Welcher Gegner zu welchem Buchstaben im Layout gehört' })] },
     ],
-    check: (x, report) => { for (const [kind, text] of parseRoom(x).problems) report(kind, text); },
+    check: (x, report, p) => {
+      for (const [kind, text] of parseRoom(x).problems) report(kind, text);
+      if (!x.story?.keyImage) report('warning', 'Story: kein Schlüsselbild (#160)');   // #160 Raum-Steckbrief
+      const known = storyTags(p?.data);
+      for (const k of ['must', 'never']) for (const t of splitList(x.story?.[k])) if (!known.has(t)) report('warning', `Story: ${k === 'must' ? 'Pflicht-Ding' : 'Verbot'} „${t}“ kennt kein Clutter (Tag oder Name aus Kachel-Sets › Clutter-Regeln)`);
+      const m = splitList(x.story?.must).length;
+      if (x.story && m && (m < 2 || m > 4)) report('hint', `Story: ${m} Pflicht-Dinge (Bibel: 2–4)`);
+    },
   },
   locations: {
     name: 'Oberwelt-Orte', singular: 'Ort', icon: 'map', file: 'data/locations.json', kind: 'catalog',
@@ -1925,7 +1949,9 @@ export const AREAS = {
       { title: 'Orte', fields: [table('kinds', 'POI-Arten', [ref('poi', 'POI', 'pois'), num('weight', 'Gewicht', { min: 0 }), text('names', 'Namen')],
           { hint: 'Namen mit | getrennt, Platzhalter: {km} Entfernung zur Stadt, {nr} Nummer, {word} Ortswort, {office} Amt, {region}, {brand} Kurzname der Marke' }),
         text('words', 'Ortswörter', { hint: 'Mit Komma getrennt, für {word}' }), text('offices', 'Ämter', { hint: 'Für {office}' }),
-        text('regions', 'Regionen', { hint: 'Mit Komma getrennt, im Kreis um die Stadt verteilt (beginnend im Westen, gegen den Uhrzeigersinn über Norden)' })] },
+        text('regions', 'Regionen', { hint: 'Mit Komma getrennt, im Kreis um die Stadt verteilt (beginnend im Westen, gegen den Uhrzeigersinn über Norden)' }),
+        table('regionStory', 'Regionen färben die Story', [text('region', 'Region'), text('tint', 'Färbung'), num('decay', 'Verfall', { min: -3, max: 3 })],
+          { hint: '#160: Gewürfelte Orte erben die Story ihrer POI-Art (Archetyp = das Wahrzeichen); die Region legt das hier dazu, Verfall = so viel älter (+) oder gepflegter (−). Das Ort-Fenster zeigt einen Satz aus der Story' })] },
       { title: 'Plakate', fields: [num('signs', 'Plakate', { min: 0, max: 30, hint: 'Marken-Plakate an den Straßen. Die Marken selbst stehen seit #045 in Lore › Marken (dort „Auf der Karte“)' })] },
       { title: 'Aussehen', fields: [ref('paper', 'Papier', 'assets'), ref('logos', 'Logos', 'assets', { hint: 'Symbol-Raster mit den Marken-Logos' }), text('title', 'Titel'), text('edition', 'Ausgabe')] },
     ],
@@ -1997,6 +2023,16 @@ export const AREAS = {
       if (x.map?.on && !x.short) report('hint', 'Auf der Karte ohne Kurzname');
     },
   },
+  chronicle: {
+    name: 'Weltchronik', singular: 'Epoche', icon: 'hourglass', file: 'data/chronicle.json', kind: 'catalog',
+    hint: '#160 (Daniel 21.11.2026, abgenommen): Jedes Ereignis eines POI fällt in eine von fünf Epochen; so erzählen alle Orte zusammen eine Geschichte (POIs › Story › Epoche). Quelle: docs/concepts/poi_steckbriefe.md › Weltchronik und Ton.',
+    template: { name: 'Neue Epoche', number: 6 },
+    row: x => `Epoche ${x.number ?? '?'}${x.traces ? ' · ' + x.traces : ''}`,
+    sections: [{ title: 'Epoche', fields: [NAME, num('number', 'Nummer', { min: 1, hint: 'Reihenfolge in der Chronik (1 = am längsten her)' }), area_('description', 'Was geschah'), area_('traces', 'Spuren in POIs', { hint: 'Was man davon heute in den Orten sieht' })] }],
+    check: (x, report, p) => {
+      if (Object.entries(p?.data?.chronicle || {}).some(([, o]) => o !== x && o.number === x.number)) report('warning', `Nummer ${x.number} gibt es zweimal`);
+    },
+  },
   radio: {
     name: 'Radio', icon: 'music', file: 'data/radio.json', kind: 'single',
     hint: 'Rig-Radio (#090): Sender mit Musik aus Code und einem DJ, der zwischen den Songs redet: Werbung der Marken, Wetter vom Navigator, Frontberichte aus dem Revierkrieg, Gerüchte über Orte, Lore. Läuft im Camp und auf der Fahrt (N schaltet um, auch im Pause-Menü). Platzhalter: {station} {freq} {dj} {djLine} · Werbung {brand} {ad} {slogan} · Wetter {forecast} · Front {a} {b} {place} {place2} · Gerücht {place} {hint}',
@@ -2063,7 +2099,7 @@ export const GROUPS = [
   ['PROGRESSION', ['techtree', 'resources']],
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'decorSets', 'megarigs', 'rigAddons', 'salvage', 'people', 'companions']],
   ['WELT', ['worldmap', 'parallax', 'pois', 'rooms', 'terrain', 'poiSets', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
-  ['LORE', ['brands']],
+  ['LORE', ['brands', 'chronicle']],
   ['ENTITIES', ['glitchlings']],
 ];
 

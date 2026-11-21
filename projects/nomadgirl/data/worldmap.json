@@ -31,5 +31,15 @@
  "title": "Straßenkarte BigCityDelta & Umland",
  "edition": "Ausgabe 1962 · überreicht von Delta Petrol",
  "threat": {"enemies": 25, "health": 15, "damage": 10, "loot": 20},
- "sea": {"enabled": true, "name": "The Dust Sea", "at": [-108, 6], "size": [40, 34], "warn": "Zu gefährlich für unsere kleinen Fahrzeuge", "dock": "Dustport Dock", "dockAngle": 15}
+ "sea": {"enabled": true, "name": "The Dust Sea", "at": [-108, 6], "size": [40, 34], "warn": "Zu gefährlich für unsere kleinen Fahrzeuge", "dock": "Dustport Dock", "dockAngle": 15},
+ "regionStory": [
+  {"region": "Glass Dunes", "tint": "Sand mit Glasscherben, blendendes Licht, Fenster blind vom Sand", "decay": 0},
+  {"region": "South Badlands", "tint": "Fels, rote Erde, Hitze, Geier", "decay": 0},
+  {"region": "Salt Flats", "tint": "Salzkrusten auf allem, weißes Gleißen, knackender Boden", "decay": 0},
+  {"region": "Scrap Desert", "tint": "Schrotthaufen, Crow-&-Sons-Spuren, gestapelte Wracks", "decay": 1},
+  {"region": "Crow Valley", "tint": "Krähen, verdorrte Bäume, Vogelscheuchen", "decay": 0},
+  {"region": "East Bend", "tint": "Fluss ohne Wasser, Brücken, Schlamm-Risse", "decay": 0},
+  {"region": "Delta Ring", "tint": "Stadtnähe: sauberer, mehr Behörde, Mauer am Horizont", "decay": -1},
+  {"region": "The Outskirts", "tint": "Vororte, Reklame, die Skyline der Stadt im Hintergrund", "decay": 0}
+ ]
 }

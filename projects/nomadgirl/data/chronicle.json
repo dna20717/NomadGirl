@@ -1,0 +1,32 @@
+{
+ "boomjahre": {
+  "name": "Die Boomjahre",
+  "number": 1,
+  "description": "BigCityDelta wächst ins Umland: Highway, Vororte, Megamalls, Konzerne (Delta Petrol, Kessler, NomadCola)",
+  "traces": "Werbung, Markenlogos, Konsumtempel, Pendler-Infrastruktur"
+ },
+ "alter_krieg": {
+  "name": "Der alte Krieg",
+  "number": 2,
+  "description": "Aufrüstung (Vulkan Defense), Bunker und Silos; hier draußen schlug nie etwas ein",
+  "traces": "Bunker, Silo, Notfallschilder, Vorräte für einen Tag X"
+ },
+ "grosser_durst": {
+  "name": "Der Große Durst",
+  "number": 3,
+  "description": "Der Regen bleibt aus, der Salzsee wird zu den Salt Flats, Sand frisst die Vororte",
+  "traces": "trockene Pools und Kanäle, Rationierung, Wasserzähler, Sandverwehungen"
+ },
+ "schliessung": {
+  "name": "Die Schließung",
+  "number": 4,
+  "description": "BigCityDelta zieht sich hinter den Delta Ring zurück; draußen werden Strom, Wasser, Bahn und Polizei abgeschaltet",
+  "traces": "zugeschweißte Tore, letzte Durchsagen, liegen gelassene Arbeit, gestoppte Uhren"
+ },
+ "heute": {
+  "name": "Heute",
+  "number": 5,
+  "description": "Wastelands, Gangs mit Revieren, Entities in Maschinen; die Elite lebt oben im Klinikturm",
+  "traces": "Gang-Farben und Mottos, Lager, Fallen, Graffiti, Maschinen mit alten Gewohnheiten"
+ }
+}

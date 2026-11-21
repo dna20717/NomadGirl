@@ -93,7 +93,22 @@
     "roles": "shop, corridor"
    },
    {"look": "icons_nomadcola", "name": "Kistenstapel", "cm": 80, "chance": 3, "place": "floor_in, corner", "tags": "kiste", "roles": "storage, shop"}
-  ]
+  ],
+  "story": {
+   "before": "Letzte Delta-Petrol-Tankstelle vor der Salzebene, Familienbetrieb mit Waschstraße, Reifenlager und Werkstatthalle",
+   "people": "Pächterfamilie, ein Mechaniker, Fernfahrer auf Durchreise",
+   "event": "Als die Lieferungen ausblieben, rationierte der Pächter Benzin; die Schlange an den Zapfinseln wurde zur Schlägerei, danach zog jeder weiter",
+   "era": "schliessung",
+   "eventKind": "fight",
+   "decay": 3,
+   "today": "Yellow Vultures kassieren Wegzoll. Dazu Händler und Foodtruck",
+   "goal": "Sprit, Werkzeug, Ersatzteile für den Van",
+   "tone": "tiefe Abendsonne, Wind, quietschendes Schild, Slide-Gitarre",
+   "joke": "Die Kaffeemaschine läuft noch. Der Kaffee ist furchtbar",
+   "wound": "Im Verkaufsraum hängt der Kalender der Familie, aufgeschlagen beim Monat, in dem sie gingen",
+   "keyImage": "Preistafel mit dem absurden letzten Preis über leeren Zapfsäulen, daneben leuchtet ein NomadCola-Automat",
+   "shard": "im Handschuhfach eines Fernlasters, der Ware aus der Stadt fuhr"
+  }
  },
  "grossmarkt": {
   "name": "Delta South Megamall",
@@ -140,7 +155,22 @@
     "roles": "shop, corridor, outdoor"
    },
    {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2, "place": "floor_in, floor_out", "tags": "küche, vorrat", "roles": "shop, living, outdoor"}
-  ]
+  ],
+  "story": {
+   "before": "Konsumtempel der Boomjahre: Passage mit Galerie, Food-Court, Kaufhaus über zwei Etagen, Kino, Spielhalle, Parkdeck",
+   "people": "Tausende Kunden am Wochenende, Verkäuferinnen, Wachdienst, die Leitung im Büro oben",
+   "event": "Am Tag der Schließung lief der größte Ausverkauf aller Zeiten: „Alles muss raus“. Die Menge stürmte, ein Flügel stürzte ein",
+   "era": "schliessung",
+   "eventKind": "fight",
+   "decay": 2,
+   "today": "Neon Rats, feige und gierig. Dazu Kakerlaken und Schleimbeißer",
+   "goal": "Kleidung, Kosmetik (CHROMA//KILL, DeltaTint), Konserven, Spielzeug zum Tauschen",
+   "tone": "kaputte Kaufhaus-Muzak, riesiger Hallen-Hall, Lautsprecher-Gong",
+   "joke": "Eine Durchsage in Schleife: „Der kleine Kevin möchte am Info-Stand abgeholt werden.“",
+   "wound": "Am Kinderparadies hängen noch Abholzettel mit Namen",
+   "keyImage": "Stillstehende Rolltreppe unter „SALE −70 %“-Bannern, oben eine Barrikade aus Einkaufswagen",
+   "shard": "in der Fundsachen-Kiste am Info-Stand"
+  }
  },
  "bunker_13": {
   "name": "Deadlock Bunker 13",
@@ -182,7 +212,23 @@
    ]
   },
   "treasure": [{"item": "silo_karte_1", "where": "vault", "chance": 100}],
-  "brandSign": false
+  "brandSign": false,
+  "story": {
+   "before": "Schutzbunker Zone 13 aus dem alten Krieg, 200 Plätze, Reaktor, Kantine, Archiv, Kommandozentrale; gebaut für den Krieg, der nie kam",
+   "people": "Erst nur Wachpersonal und Techniker im Schichtdienst; im Großen Durst wurden Familien aus der Umgebung aufgenommen",
+   "event": "Der überfüllte Bunker hielt Jahre durch, bis die Lüftung ausfiel; beim Mittagessen brach Panik aus, alle flohen nach draußen",
+   "era": "grosser_durst",
+   "eventKind": "flight",
+   "decay": 2,
+   "today": "Rust Guard halten die Notbeleuchtung am Laufen. Rivalen der Salt Dogs",
+   "goal": "Medizin aus der Krankenstation, Militärausrüstung (Vulkan), Reaktorteile",
+   "tone": "rotes Notlicht, Lüftungsbrummen, Geigerzähler-Knistern, Morse-Piepen",
+   "joke": "Die Rust Guard führen den alten Dienstplan weiter, mit ihren eigenen Namen in den Kästchen",
+   "wound": "In den Quartieren Kinderzeichnungen vom Himmel, gemalt von Kindern, die ihn nie gesehen hatten",
+   "keyImage": "Kantine mit langer Tischreihe, Tabletts halb leer gegessen, dazwischen die Schlafsäcke der Rust Guard",
+   "shard": "im Archiv, abgelegt unter „Aufnahme Zivilisten“",
+   "line": "Der Bunker hielt Jahre durch, bis die Lüftung ausfiel. Die Tabletts stehen noch auf den Tischen"
+  }
  },
  "ministerium": {
   "name": "Ministry of Order",
@@ -207,7 +253,22 @@
    "loadout": [{"enemy": "gewehrschuetze", "trait": "sniper", "chance": 30},{"enemy": "schuetze", "trait": "alarm", "chance": 30},{"head": "gasmask", "chance": 35}]
   },
   "treasure": [{"item": "silo_karte_3", "where": "vault", "chance": 100}],
-  "brand": "ordnungsamt"
+  "brand": "ordnungsamt",
+  "story": {
+   "before": "Sitz des Delta Bureau of Order („Order is safety.“): Flur, Großraumbüro, Wartesaal mit Nummernautomat, Registratur, Archiv, Asservatenkammer, Festsaal, Amtszimmer",
+   "people": "Beamte, Wartende mit Nummer, ein Hausmeister",
+   "event": "Das Amt schloss am Tag der Schließung ordnungsgemäß: Akten abgelegt, Stühle gerade gestellt, Licht aus. Niemand kam zurück, nur der Hausmeister blieb",
+   "era": "schliessung",
+   "eventKind": "orderly",
+   "decay": 1,
+   "today": "Order Office. Ganz oben im Amtszimmer der Hausmeister (Boss). Tadellos sauber, weil jemand putzt",
+   "goal": "Akten, Ausweise, Wissen; beschlagnahmte Ware aus der Asservatenkammer",
+   "tone": "Uhrwerk-Ticken, Schreibmaschinen-Rhythmus, kalte Orgel und Chor im Stein-Hall",
+   "joke": "Die Nummernanzeige ruft weiter Nummern auf, die niemand mehr hat",
+   "wound": "Im Archiv liegt eine Akte für jeden, der nicht in die Stadt durfte",
+   "keyImage": "Wartesaal mit schnurgeraden Stuhlreihen, nirgends Staub, auf jedem Stuhl liegt eine Wartenummer",
+   "shard": "in der Asservatenkammer, beschlagnahmt, mit Aktenzeichen"
+  }
  },
  "delta_heights": {
   "name": "Delta Heights",
@@ -232,7 +293,22 @@
    "rivals": "Level Five",
    "loadout": [{"enemy": "gewehrschuetze", "trait": "sniper", "chance": 40},{"enemy": "schrotflinter", "weapon": "sturmgewehr", "chance": 30},{"head": "dreads", "chance": 40}]
   },
-  "description": "Ein Wohn- und Bürotum am Rand von BigCityDelta, halb eingestürzt. Ganz oben hat sich eine Gang ein Penthouse eingerichtet. Rauf geht es Etage für Etage, runter schneller: durch den Lastenschacht."
+  "description": "Ein Wohn- und Bürotum am Rand von BigCityDelta, halb eingestürzt. Ganz oben hat sich eine Gang ein Penthouse eingerichtet. Rauf geht es Etage für Etage, runter schneller: durch den Lastenschacht.",
+  "story": {
+   "before": "Wohn- und Büroturm: unten Firmen, oben Luxus, ganz oben das Penthouse des Bauherrn; die obersten Etagen nie fertig gebaut",
+   "people": "Büroleute, Mieter, der Bauherr und seine Gäste",
+   "event": "Bei der Schließung holten Hubschrauber die Oberen vom Dach; unten blieben alle zurück. Im nächsten Sandsturm brach eine Seite weg",
+   "era": "schliessung",
+   "eventKind": "flight",
+   "decay": 3,
+   "today": "Sky Wolves im Penthouse, mit Scharfschützen. Rivalen von Level Five",
+   "goal": "Elektronik aus dem Serverraum, Akten, der Safe im Chefzimmer",
+   "tone": "Wind durch offene Etagen, ein Aufzug klingelt ins Leere",
+   "joke": "Im Treppenhaus hängt: „Bitte benutzen Sie im Notfall die Treppe.“ Es gibt nur noch die Treppe",
+   "wound": "Am Hubschrauber-Landeplatz liegen Koffer, die nicht mehr mitdurften",
+   "keyImage": "Ein halbes Büro hängt über dem Abgrund, Schreibtische an der Bruchkante",
+   "shard": "im Laptop eines Kessler-Managers im Chefzimmer"
+  }
  },
  "parkhaus_sued": {
   "name": "P+R Delta Süd",
@@ -280,7 +356,22 @@
     "roles": "shop, corridor, outdoor"
    },
    {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2, "place": "floor_in, floor_out", "tags": "küche, vorrat", "roles": "shop, living, outdoor"}
-  ]
+  ],
+  "story": {
+   "before": "Pendler-Parkhaus am Stadtrand, Shuttle in die Stadt, Kassenhaus auf dem Dach",
+   "people": "Pendler, ein Kassierer, Shuttle-Fahrer",
+   "event": "Am Tag der Schließung fuhr der letzte Shuttle in die Stadt; wer sein Auto hier stehen ließ, kam nie zurück. In den Unruhen danach brannten die Ebenen aus",
+   "era": "schliessung",
+   "eventKind": "fire",
+   "decay": 3,
+   "today": "Level Five, jede Ebene ein Revier. Feige",
+   "goal": "Autoteile, Reifen, Restsprit aus Tanks (wichtig für die LKW-Bergung)",
+   "tone": "flackerndes Neon, Tropfen, dumpfer Beton-Hall",
+   "joke": "Der Parkscheinautomat nimmt noch Deltas; die Gebühr läuft seit Jahren",
+   "wound": "Kindersitze in ausgebrannten Autos",
+   "keyImage": "Reihen ausgebrannter Autos, hinter jeder Scheibe noch ein Parkschein",
+   "shard": "in einem Wagen mit Kessler-Parkausweis"
+  }
  },
  "funkmast_km31": {
   "name": "Funkmast KM 31",
@@ -306,7 +397,22 @@
    "loadout": [{"enemy": "schuetze", "trait": "alarm", "chance": 40},{"head": "gasmask", "chance": 50},{"enemy": "pistolero", "weapon": "nagelpistole", "chance": 30}]
   },
   "description": "Ein Sendemast mitten in der Ebene. Wer hinaufklettert, findet Elektronik und schlechte Gesellschaft.",
-  "brandSign": false
+  "brandSign": false,
+  "story": {
+   "before": "Relaisstation des Delta Bureau of Order für Notfunk und Radio, Solarzellen, Wartungskabine ganz oben",
+   "people": "zwei Techniker im Wechsel, sonst niemand",
+   "event": "Nach der Schließung sendete der Mast wochenlang eine Schleife: „Bleiben Sie zu Hause. Hilfe ist unterwegs.“ Dann kam ein Sandsturm",
+   "era": "schliessung",
+   "eventKind": "abandoned",
+   "decay": 3,
+   "today": "Static Saints, eine Funk-Sekte, predigen auf allen Frequenzen. Rivalen des Order Office",
+   "goal": "Elektronik, Funkteile, Antennen",
+   "tone": "Wind am Stahl, Rauschen, Morse-Piepen, weiter Himmel",
+   "joke": "Am Fuß des Masts steht ein Schild: „Klettern verboten. Behörde für Ordnung“",
+   "wound": "In der Kabine kleben hunderte Zettel mit empfangenen Hilferufen, sorgfältig notiert, nie beantwortet",
+   "keyImage": "Die Kabine oben im Wind, Wände voller Zettel, Kopfhörer am Haken",
+   "shard": "als Funksignal empfangen und auf Band gespeichert"
+  }
  },
  "metro_line4": {
   "name": "Metro Line 4",
@@ -355,7 +461,22 @@
    },
    {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2, "place": "floor_in, floor_out", "tags": "küche, vorrat", "roles": "shop, living, outdoor"}
   ],
-  "brandSign": false
+  "brandSign": false,
+  "story": {
+   "before": "U-Bahn-Station unter der Stadtgrenze, letzte Haltestelle vor dem Delta Ring, mit Kiosk und Stellwerk",
+   "people": "Pendler, Kioskbesitzer, Stellwerker",
+   "event": "Bei der Schließung wurde die Linie gekappt und der Tunnel zur Stadt zugeschweißt; ein Zug blieb im Geisterbahnhof stehen",
+   "era": "schliessung",
+   "eventKind": "sealed",
+   "decay": 2,
+   "today": "Tunnel Kings, unten im Stellwerk. Rivalen der Salt Dogs",
+   "goal": "Elektronik, Kiosk-Vorräte, Gerüchte über einen Weg in die Stadt",
+   "tone": "fernes Rumpeln, verzerrte Durchsagen, Neon an gekachelten Wänden",
+   "joke": "Die Anzeigetafel meldet seit Jahren: „Zug fällt aus“",
+   "wound": "Am zugeschweißten Gitter kleben Fotos von Menschen auf der anderen Seite",
+   "keyImage": "Bahnsteig voller Schlaflager vor dem verschweißten Tunnel mit der Aufschrift „BigCityDelta“",
+   "shard": "in einer Kurier-Tasche im stehen gebliebenen Zug"
+  }
  },
  "storm_drain9": {
   "name": "Storm Drain 9",
@@ -374,7 +495,22 @@
   "branchChance": 60,
   "curve": "40, 70, 100",
   "description": "Ein Regenwasser-Sammler. Seit Jahren kein Regen, aber etwas lebt da unten und sammelt.",
-  "brandSign": false
+  "brandSign": false,
+  "story": {
+   "before": "Regenwasser-Sammler der Vororte: Gully, Kanal, Überlauf, Sammelbecken",
+   "people": "niemand, nur Wartungstrupps",
+   "event": "Seit dem Großen Durst kommt kein Wasser mehr, nur Dinge, die hinunterfallen",
+   "era": "grosser_durst",
+   "eventKind": "abandoned",
+   "decay": 2,
+   "today": "Etwas lebt da unten und sammelt: Kriecher, Streuner, Schleimbeißer. Kein Mensch bleibt lange",
+   "goal": "verlorene Dinge, Schrott, Bio-Proben für den Weg zum Heilmittel",
+   "tone": "Tropfen, Echo, Kratzen im Dunkeln",
+   "joke": "Ein Pegelschild: „Bei Hochwasser Lebensgefahr“",
+   "wound": "Ein Kinderschuh, ordentlich ins Nest gelegt",
+   "keyImage": "Im Sammler ein Nest aus Gehortetem: Kronkorken, Uhren, Brillen, alles was glänzt",
+   "shard": "glänzt, also liegt er im Nest"
+  }
  },
  "pit6": {
   "name": "Pit 6",
@@ -399,7 +535,22 @@
    "loadout": [{"enemy": "schlaeger", "weapon": "rohrhammer", "chance": 30},{"head": "mohawk", "chance": 60},{"enemy": "gewehrschuetze", "weapon": "schrotflinte", "chance": 30}]
   },
   "description": "Ein Salzbergwerk in der Salt Flats. Die Salt Dogs graben weiter, tiefer als jemals jemand war. Was unten leuchtet, will jeder haben.",
-  "brandSign": false
+  "brandSign": false,
+  "story": {
+   "before": "Salzbergwerk am Ufer des alten Sees: Förderturm, Kaue, Sohlen, Stollen, Wetterschacht",
+   "people": "Bergleute in Schichten, ein Steiger, ihre Familien in der Siedlung nebenan",
+   "event": "Als der See verschwand, gruben sie tiefer und stießen auf etwas, das im Dunkeln leuchtet; wer zu lange unten war, wurde krank. Die Firma versiegelte den Schacht",
+   "era": "grosser_durst",
+   "eventKind": "sealed",
+   "decay": 2,
+   "today": "Salt Dogs graben weiter, tiefer als je jemand war",
+   "goal": "die leuchtenden Kristalle (Kristallgrotte), Erz, Werkzeug",
+   "tone": "knackendes Salz, Grubenlampen, tiefer Hall, ein Lied der Bergleute als Echo",
+   "joke": "Am Förderturm zählt eine Tafel „Tage ohne Unfall“. Sie steht auf 0",
+   "wound": "In der Kaue hängen die Kleider der alten Schicht noch an den Ketten unter der Decke",
+   "keyImage": "Die Kaue mit Kleidern an Ketten unter der Decke, darunter die frische Kluft der Salt Dogs",
+   "shard": "in der Kristallgrotte, als hätte ihn jemand dort verloren"
+  }
  },
  "delta_crude": {
   "name": "Delta Crude Refinery",
@@ -447,7 +598,22 @@
    },
    {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2, "place": "floor_in, floor_out", "tags": "küche, vorrat", "roles": "shop, living, outdoor"}
   ],
-  "brand": "delta_petrol"
+  "brand": "delta_petrol",
+  "story": {
+   "before": "Raffinerie von Delta Petrol („Fill up. Zone out.“), versorgte Stadt und Highway: Tankfeld, Rohrbrücke, Kesselhaus, Destille, Leitstand",
+   "people": "Schichtarbeiter, Ingenieure im Leitstand",
+   "event": "Beim Abschalten hat niemand die Anlage geleert; man ließ sie einfach stehen. Die Tanks tropfen bis heute",
+   "era": "schliessung",
+   "eventKind": "abandoned",
+   "decay": 3,
+   "today": "Crude Boys zapfen ab und brennen in Fass-Destillen Sprit und Fusel. Brandsätze und Molotows",
+   "goal": "Sprit, Chemie, Brandsatz-Zutaten",
+   "tone": "Zischen, Tropfen, Rost-Ächzen, die Fackel brüllt",
+   "joke": "Ein Schild zählt „Unfallfreie Tage: 2.847“. Es wurde einfach weitergezählt",
+   "wound": "Im Leitstand liegt eine Liste mit Schichten, die nie abgelöst wurden",
+   "keyImage": "Die Fackel brennt noch über dem Tankfeld, darunter eine Destille aus Fässern und Schläuchen",
+   "shard": "im Leitstand, in einer Lieferung an den Klinikturm (Kessler bezog hier Chemie)"
+  }
  },
  "sunny_acres": {
   "name": "Sunny Acres",
@@ -496,7 +662,22 @@
    },
    {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2, "place": "floor_in, floor_out", "tags": "küche, vorrat", "roles": "shop, living, outdoor"}
   ],
-  "brandSign": false
+  "brandSign": false,
+  "story": {
+   "before": "Rentner-Trailerpark am Highway mit Pool, Büro und Dachterrasse, Bingo am Donnerstag",
+   "people": "Rentnerpaare, ein strenger Platzwart",
+   "event": "Im Großen Durst tranken die Bewohner zuerst den Pool leer, gemeinsam und geordnet; die Enkel kamen nie, um sie zu holen",
+   "era": "grosser_durst",
+   "eventKind": "abandoned",
+   "decay": 2,
+   "today": "Sunny Side, lächelnd mit Gewehren auf Liegestühlen. Sie ergeben sich schnell und haben Sanitäter",
+   "goal": "Vorräte, Medizin, Handel",
+   "tone": "grelle Mittagssonne, Windspiele, Schlager aus einem Transistorradio",
+   "joke": "Die Hausordnung gilt noch: Ruhezeit 13 bis 15 Uhr, jetzt mit Waffengewalt",
+   "wound": "Pinnwand im Büro voller Postkarten von Enkeln, die letzte vor vielen Jahren",
+   "keyImage": "Leerer Pool voller Liegestühle, darin Bewaffnete mit Sonnenhut",
+   "shard": "in einer Pralinenschachtel, eingetauscht gegen Medizin"
+  }
  },
  "raketensilo": {
   "name": "Silo Zero",
@@ -558,6 +739,21 @@
   "tunnelTerrain": "metal",
   "tunnelAtmosphere": "metall_rost",
   "terminalAi": "Titan Lullaby",
-  "brandSign": false
+  "brandSign": false,
+  "story": {
+   "before": "Raketensilo des alten Krieges, 26 Räume rund um den Schacht: Kaserne, Krankenstation, Labor, Kontrollraum, Kryokammer, Offiziersmesse, Startrampe",
+   "people": "eine Besatzung unter Verschluss, ein Offizier mit dem Schlüssel",
+   "event": "Im alten Krieg lief der Countdown bis eine Sekunde vor dem Start; dann wurde er angehalten. Die Besatzung wartete auf den Befehl, der weder zum Start noch zum Abbruch je kam",
+   "era": "alter_krieg",
+   "eventKind": "sealed",
+   "decay": 1,
+   "today": "Zero Hour unter Major Null. Rivalen des Order Office. Im Terminal an der Startrampe flüstert eine KI, die sich an jede Sekunde erinnert",
+   "goal": "Endgame-Technik, Kryo-Technik (verwandt mit AvAs Tank), Wissen aus dem Labor",
+   "tone": "grünes Monitorlicht, ein eingefrorenes Ticken, ferner Wind im Schacht",
+   "joke": "In der Offiziersmesse hängt der Dienstplan für „den Tag danach“",
+   "wound": "In der Kryokammer stehen leere Tanks mit Namensschildern",
+   "keyImage": "Die Rakete im Schacht, an der Startrampe die Anzeige: 00:00:01",
+   "shard": "im Terminal der KI; sie weiß, wer AvA ist, und sagt es nur stückweise"
+  }
  }
 }
