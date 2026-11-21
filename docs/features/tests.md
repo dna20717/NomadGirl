@@ -57,7 +57,7 @@ node tools/slots_test.mjs               # #126 drei Spielstände: Umzug nach Slo
 node tools/cockpit_test.mjs              # Cockpit-Hauptmenü = Startseite / (#124): Menü im Radio, Sticker, Lenken, Billboard, AvA, Radio-Text klebt am Display, Fahrer lenkt, Hauptmenü in einem Stück hinter dem Schleier (#135) (10)
 node tools/stage_test.mjs                # Info-Center-Bühne (#129): Hinweis wartet bei offenem Fenster, Warnung sofort, Kassette tritt zur Seite, Meldungen im Bau-Modus unter der Leiste (4)
 node tools/sfx_test.mjs                  # Ton-Ereignisse (#130): alle Ereignisse spielen, Hooks im Spiel, stumm = still, Menü-Töne (10)
-node tools/rooms_audit.mjs [--all]       # Architektur der Raum-Bausteine (#131): lichte Höhe über jedem Boden, zu niedrige Durchgänge, Hallen (kein Test, ein Bericht)
+node tools/rooms_audit.mjs [--all] [datei] # Architektur der Raum-Bausteine (#131/#136): lichte Höhe über jedem Geschossboden, zu niedrige Durchgänge, Hallen ohne Galerie, draußen schwebende Plattformen (kein Test, ein Bericht)
 node tools/rear_test.mjs                 # Deko hinter dem Rig (#117): Plätze hinter dem letzten Container, die Kiste wandert mit, wenn das Rig länger wird (2)
 node tools/resize_test.mjs [--shots]     # Container ziehen (#113): Griff, länger/kürzer, Werkbank hält dagegen und ploppt raus, Rückgängig, Controller (7)
 node tools/paint_test.mjs [--shots]      # #114: Pinsel (Container, Rückgängig, Zelt), Fenster + Tür in Containerfarbe, Innenkram hinter den Werkstätten, Leiter aufs Dach und Leyla klettert (6)
