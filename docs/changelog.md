@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 21.11.2026: **POI-Overhaul** (#160, #163, #159): Jeder POI hat eine Story (Weltchronik, Steckbrief, Raum-Steckbriefe), gewürfelte Orte erben sie mit Region und Besitzer. Level-Design nach der Bibel: Raumtypen, Rhythmus aus Spitze und Atempause, Landmarke am Himmel und in Fenstern, Licht am Ausgang, faire Spawns, Zeichen an Geheimnissen, ein Wow-Raum je POI mit Kamerafahrt und Stinger, Level-Prüfer. Dressing Stufe 2: erst Ordnung, dann Verfall, Raum-Geschichten, Wüste kriecht rein, Rückwand-Ebene, Korrekturen mit K (`?dev`).
 - 21.11.2026: **Wende-Wurf im Dash** (#164, Daniel): Im Dash Gegenrichtung + Granate: Leyla wirbelt herum, wirft die Granate flach nach hinten auf Verfolger und rutscht rückwärts aus, mit kurzer Zeitlupe; kostet eine Ladung und 30 Ausdauer, alles unter Leyla › Wende-Wurf.
 - 21.11.2026: **Fahrt mit gemalten Grafiken** (#147): Straße, Boden, Ebenen, Billboards, Masten, Straßenrand und Zwischenfälle kommen aus den gemalten Assets statt aus Code.
 - 21.11.2026: **Set-Dressing nach Regeln** (#158): POI-Räume werden eingerichtet statt bewürfelt: Ort-Typen aus den Kacheln (drinnen, draußen, Dach, Steg, Ecke, Decke, Wand), Clutter-Regeln je Stück, Raum-Rollen, POI-Ensembles (Schreibtisch, Kassenreihe, Sandsäcke …), Dichte „bewohnt“ mit freien Wegen; kein Baum mehr auf dem Hochhaus. Kacheln mit Kappen, Unterseiten, Dachbelag und weichen Übergängen zwischen Sets.
