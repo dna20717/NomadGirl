@@ -3,6 +3,7 @@
 //   B brittle walls (a melee hit breaks the whole wall, counts as a secret)   Z goal (E: POI done, time stops, ranking)
 //   $ camouflaged brittle walls (look like the wall, break the same)   % fake walls (look like the wall, Leyla walks through, they fade; secrets too)
 // After the goal the run is finished; E at the van pays the base money plus the rank bonus (k.o. on the way back = everything gone).
+import { roomTale } from '../../engine/dressing_story.js';
 import { rollLoot } from '../inventory.js';
 import { chestPart } from '../salvage.js';
 import { bonuses as trophyBonuses } from '../achievements.js';
@@ -356,7 +357,11 @@ export class PoiLevel {
     if (c.sprite) { let f = 0; s.time.addEvent({ delay: 70, repeat: c.frames - 1, callback: () => c.sprite.setFrame(Math.min(c.frames - 1, ++f)) }); }
     else this.drawChest(c);
     if (c.bonus) return this.openBonus(c);
-    const things = s.lootRoll ? s.lootRoll(this.lootTable) : rollLoot(s.data_, this.lootTable);
+    // #159 a room's story brings its own loot (Raum-Geschichten › Beute)
+    const LI = s.levelInfo, tx = c.x / s.T, ty = c.feet / s.T - 0.5, ri = LI?.rooms?.findIndex(r => tx >= r.x && tx < r.x + r.w && ty >= r.y && ty < r.y + r.h) ?? -1;
+    const tale = ri >= 0 && this.poi ? roomTale(s.data_, this.poi, LI.rooms[ri], LI.rooms[ri].x * 1000 + LI.rooms[ri].y, s.levelSeed || 0) : null, own = s.data_.roomStories?.[tale]?.loot;
+    const table = own && s.data_.lootTables?.[own] ? own : this.lootTable;
+    const things = s.lootRoll ? s.lootRoll(table) : rollLoot(s.data_, table);
     for (const r of earn(s.data_, 'chest')) { const same = things.find(x => x.a === 'items' && x.id === r.id); if (same) same.n += r.n; else things.push(r); }   // #039
     this.salvagePart(things);
     this.treasureFind(things, 'chest');   // #057

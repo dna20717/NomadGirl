@@ -242,6 +242,7 @@ export class SceneEvents {
         if (here && RT.enabled !== false && !seen.has(here.id) && this.elapsed > 400) { seen.add(here.id); this.hud.roomTitle?.(name, RT.ms ?? 2600); }
         else if (here) seen.add(here.id);
         this.levelFx?.enterRoom(here);   // #163 the Wow moment on the first entry
+        this.dressingFx?.enterRoom(here);   // #159 the note of a room story
       }
     }
     // #094 the trunk at the van's rear: loot put there is safe (also from a knock-out)

@@ -1,4 +1,5 @@
 import { placeTypes, fits, roleConfig, roleWeight, pickWeighted, planDressing, hullMap, tileCase } from '../../engine/dressing.js';
+import { rulesOf } from '../../engine/dressing_story.js';
 import { autoTile, autotileOf, innerCorner } from './autotile.js';
 const WALLS = new Set(['#', 'A', '^', 'v']);   // drawn as wall (doors and brittle walls: game/play/poi_level.js)
 const CAMO = new Set(['%', '$']);   // fake walls and camouflaged brittle walls: drawn like the wall, on their own layer above Leyla
@@ -28,11 +29,13 @@ function bake(scene, g, x0, y0, w, h, { depth = 0, scroll = null, stamps = [], o
       // in order: plain frames go in one batch, a scaled one (clutter at real size) ends the batch and is drawn on its own
       let open = false;
       for (const st of mine) {
-        if (!st.scale) { if (!open) { rt.beginDraw(); open = true; } rt.batchDrawFrame(st.key, st.frame, st.x - x0 - cx, st.y - y0 - cy); continue; }
+        if (!st.scale && !st.angle && !st.flipX && st.tint == null) { if (!open) { rt.beginDraw(); open = true; } rt.batchDrawFrame(st.key, st.frame, st.x - x0 - cx, st.y - y0 - cy); continue; }
         if (open) { rt.endDraw(); open = false; }
         stamp ||= scene.make.image({ key: st.key }, false);
-        stamp.setTexture(st.key, st.frame).setOrigin(st.ox, st.oy).setScale(st.scale);
-        rt.draw(stamp, st.ax - x0 - cx, st.ay - y0 - cy);
+        // #159 decay tips things over (angle about the foot), flips them; back wall things are darker (tint)
+        stamp.setTexture(st.key, st.frame).setOrigin(st.ox ?? 0, st.oy ?? 0).setScale(st.scale || 1).setAngle(st.angle || 0).setFlipX(!!st.flipX);
+        if (st.tint != null) stamp.setTint(st.tint); else stamp.clearTint();
+        rt.draw(stamp, (st.ax ?? st.x) - x0 - cx, (st.ay ?? st.y) - y0 - cy);
       }
       if (open) rt.endDraw();
     }
@@ -413,14 +416,21 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
   }
   // #158 the planned things: standing on the floor, hanging under a ceiling, on the back wall
   if (plan) {
-    const A = scene.data_.assets || {};
+    const A = scene.data_.assets || {}, sizeRule = rulesOf(scene.data_).size, dim = 1 - (scene.data_.game?.dressing?.backDim ?? 42) / 100;
+    const backTint = (Math.round(255 * dim) << 16) | (Math.round(255 * dim) << 8) | Math.round(255 * dim);   // #159 back wall things darker
+    scene.dressingPlan = plan;
     for (const it of plan.items) {
       const kit = it.brand ? brands : terrain.kits?.(it.set), frame = A[it.key]?.names?.indexOf(it.name) ?? -1;
       if (!kit || frame < 0 || !scene.textures.exists(it.key)) continue;
-      const cx = (it.x + it.w / 2) * T;
-      if (it.hang === 'stand') { clutter.push({ ...placed(kit, it.key, frame, cx, it.y * T + 4), ai: it.ai, ens: it.ens }); continue; }
+      const cx = (it.x + it.w / 2) * T + (it.dx || 0), k = sizeRule(it.name);
+      if (it.hang === 'stand') {
+        const st = placed(kit, it.key, frame, cx, it.y * T + 4);
+        if (k !== 1 && st.scale) st.scale *= k;
+        if (it.tilt || it.flip) { const f = scene.textures.getFrame(it.key, frame); Object.assign(st, { angle: it.tilt || 0, flipX: !!it.flip, scale: st.scale || 1, ox: st.ox ?? 0.5, oy: st.oy ?? 1, ax: st.ax ?? cx, ay: st.ay ?? it.y * T + 4 }); if (Math.abs(it.tilt) >= 80) st.ay += f.cutWidth * (st.scale || 1) * 0.15; }
+        clutter.push({ ...st, ai: it.ai, ens: it.ens, plan: it }); continue;
+      }
       const st = placed(kit, it.key, frame, cx, 0), hh = -st.y, dy = it.hang === 'ceiling' ? it.y * T - 2 + hh : it.y * T + T / 2 + hh / 2;
-      clutter.push({ ...st, y: st.y + dy, ay: st.ay != null ? st.ay + dy : st.ay, hang: it.hang });
+      clutter.push({ ...st, y: st.y + dy, ay: st.ay != null ? st.ay + dy : st.ay, hang: it.hang, plan: it, ...(it.hang === 'wall' ? { tint: backTint } : {}) });
     }
   }
   // cover: a camouflaged patch also hides the secret behind it (air reachable only through it) plus the ring of wall around,

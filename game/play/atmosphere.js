@@ -26,7 +26,7 @@ export class Atmosphere {
     this.regionAt = atmoRegions(D, R, { level: s.levelInfo, roomId: s.roomId, poiId: s.levelPoi });
     this.moods = new Map();
     this.moodAt = (tx, ty) => { const id = this.regionAt(Math.max(0, Math.min(R.w - 1, tx)), Math.max(0, Math.min(R.h - 1, ty))).mood; if (!this.moods.has(id)) this.moods.set(id, moodOf(D, id)); return this.moods.get(id); };
-    const plan = planLights(D, R, this.regionAt, { level: s.levelInfo, poiId: s.levelPoi });   // #163 light at the way on, the Wow key light
+    const plan = planLights(D, R, this.regionAt, { level: s.levelInfo, poiId: s.levelPoi, seed: s.levelSeed });   // #163 light at the way on, the Wow key light
     this.ceilings = plan.ceilings; this.faces = plan.faces;
     // nothing to do at all (every room bright, no lamps, nothing moving): stay out of the way
     const any = [...new Set([...Array(R.w).keys()].flatMap(x => [0, Math.floor(R.h / 2), R.h - 1].map(y => this.regionAt(x, y).mood)))].map(id => moodOf(D, id))

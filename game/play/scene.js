@@ -28,6 +28,7 @@ import { Fx } from './fx.js';
 import { slowClock } from './slowmo.js';
 import { Atmosphere } from './atmosphere.js';
 import { LevelFx } from './level_fx.js';
+import { DressingFx } from './dressing_fx.js';
 import { landmarkViews } from '../../engine/level_design.js';
 import { Drone } from './drone.js';
 import { Van } from './van.js';
@@ -431,6 +432,7 @@ export class PlayScene extends Phaser.Scene {
     // light & atmosphere (game/play/atmosphere.js): darkness with lamps, glow, colour mood, dust, sparks, drips, fog
     this.atmo = new Atmosphere(this, this.props);
     this.levelFx = new LevelFx(this);   // #163 landmark, guide lines, signs at secrets, the Wow room
+    this.dressingFx = new DressingFx(this);   // #159 decay debris, room stories, the desert, the back wall layer, corrections (K)
 
     this.keys = {};
     for (const [name, list] of Object.entries(KEYS)) this.keys[name] = list.map(k => this.input.keyboard.addKey(k));
