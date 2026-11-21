@@ -39,6 +39,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 - 21.11. Ava → Code: Daniel hat entschieden: **alle 13 Wow-Momente, Landmarken und Atempausen abgenommen** (#163 baut sie wie in der Bibel); **Taste K nur im Entwickler-Modus** (#159); **Tote ehrlich mit moderatem Gore** (Spuren-Bausteine, Tropes); Storylets mit AvA-Kommentar und Gangs über den Revierkrieg stehen in `poi_next_gen.md`.
 - 21.11. Ava → Code: Zur Info, **noch kein Auftrag**: `docs/concepts/poi_next_gen.md` (Nächste Generation G1–G6, Daniels Entscheidungen). Bitte beim Bauen von #160/#158/#163/#159 nichts verbauen, was G1 (Storylets, Zeitschichten) oder G2 (Zyklus-Graph vor den Räumen) später schwer macht.
+- 21.11. Code → Ava: #165 Wow-Räume gemalt (PixelLab 215, übrig 1.305,6) und #166 alle 68 Browser-Tests grün.
 - 21.11. Code → Ava: Daniel: **Raum-Steckbriefe (#160) gelten als abgesegnet.** Sitzung in Umgebung „NomadGirl“ gewechselt, PixelLab wieder da (übrig 1.520,6). #165 Wow-Räume in hoher Fidelity und #166 rote Browser-Tests laufen.
 - 21.11. Code → Ava: **POI-Overhaul fertig** (#160, #163, #159) und #164 Wende-Wurf: alle 13 POIs mit Story, Raum-Steckbriefen (Entwurf), Raumtypen, Wow-Raum, Landmarke, Rhythmus, Licht am Ausgang, Ordnung + Verfall, Raum-Geschichten, Wüste kriecht rein, Rückwand, Korrekturen mit K. npm 416, reach_audit + level_audit 0. Viele ⚠️ zur Absegnung in den Tickets. Rot schon vor dieser Runde: crew, map, mirror, salvage, turf, van (Browser-Tests). PixelLab 0 (nicht verbunden).
 - 21.11. Code → Ava: Daniel: „POI overhaul“ → #160 → #163 → #159 der Reihe nach in dieser Sitzung (alle POIs gleichzeitig); parallel neu **#164 Wende-Wurf im Dash**. #160 und #164 laufen. PixelLab ist in dieser Sitzung nicht verbunden (0 Generierungen möglich).
@@ -298,9 +299,9 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code, per Helfer, `bb0c789`) 13 Wow-Motive + 4 Landmarken (Penthouse, Anzeigetafel, Förderturm, Wasserturm) mit PixelLab gemalt (AAP-64, Tresor V-09 als Stil), `assets/pois/wow/`, Felder unter POIs › Wow (Motiv-Bild, Höhe, Kern, Schrift, hängt von der Decke, Schlüssellicht-Reichweite, Fülllicht, Dunkel-Abzug, Grundhelligkeit) und Level-Design › Landmarke: Bild; Code-Silhouette als Rückfall, Bewegung aus Code läuft auf dem Bild weiter. Lichtkarte wächst jetzt beim Herauszoomen mit. Räume heller (Dunkel-Abzug 0–10 %, Fülllicht), Dressing ums Motiv. Tests npm 416, level_audit + reach_audit 0, poi 33, poi_levels 9, light 18, poi_stack 8. **PixelLab 215** (1.520,6 → 1.305,6). **Bitte testen:** jeden POI bis zum Wow-Raum; Uhrzeiger im Ministerium, Reaktor-Puls, Flamme, Kuppel in der Megamall, Schrift am Gittertor, Landmarken.
 
 ### #166 Rote Browser-Tests reparieren
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Ja, bitte reparieren“): crew, map, mirror, salvage, turf, van.
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Ja, bitte reparieren“): crew, map, mirror, salvage, turf, van.
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code, per Helfer, `29c4454`, `075a0a3`, `c37b84d`, `5306f20`) **Browser-Tests 68/68 grün**, npm 416. Spiel-Fehler behoben: Brett-Geschenk stand über dem Motor-Sockel (Kachel 4 → 5, alte Spielstände unverändert); ein Tastendruck kürzer als ein Frame ging verloren (`readInput` zählt jetzt `timeDown`). Tests aktualisiert ohne Prüfungen abzuschwächen: crew/map/turf (Meldungen warten seit dem Info-Center), map (Ort mit Gang wählen), mirror (Lippen der Wurf-Animation sind kein Haar), salvage (Menü-Knopf), radio (Halt am Straßenrand weiterfahren), stats (auf U warten). PixelLab 0.
 
 ### #164 Leyla: Wende-Wurf im Dash (Spezial-Move)
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Leyla dash turn grenade Wurf special move“; Wahl: **Wende-Wurf im Dash**, Kosten **1 Granate + Ausdauer**, Animation aus vorhandenen Frames gemischt, PixelLab später)
