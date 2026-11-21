@@ -9,6 +9,7 @@
 // hangReach: hands above the feet while hanging; mantleLift: how far the last pull-up frame lifts the feet inside the picture
 import { recoilTexture } from './recoil.js';
 import { makeSfx, sfxOf } from './sfx.js';
+import { LeylaGrenade } from './leyla_grenade.js';
 
 const BASE = { height: 256, w: 72, h: 224, slideH: 104, crouchH: 196, climbW: 44, hand: 84, chest: 150, hangReach: 253, mantleLift: 120 };
 export const DASH_TIME = 170, TERMINAL_FALL = 1700;
@@ -45,6 +46,7 @@ export class Leyla {
     this.body.setMaxVelocityY(TERMINAL_FALL);
     this.sprite = scene.add.sprite(feet[0], feet[1], scene.lookKey('leyla', 'idle')).setDepth(10);
     this.start = feet;
+    this.grenade = new LeylaGrenade(this);   // #140 the grenade skill (charges, cooldown, throw layer)
     // two idles: after every loop pick one at random (Leyla › „Stehen 2 Anteil“)
     this.idleVariant = 'idle';
     this.sprite.on('animationrepeat', () => {
@@ -191,6 +193,7 @@ export class Leyla {
       if ((input.ranged.pressed || quickNow) && time >= this.rangedReady && canShoot) { this.quickShot = null; if (this.mag <= 0 && this.ammo > 0) this.startReload(time); else this.scene.combat.shoot(this, time); }
       if (input.reload?.pressed && canShoot) this.startReload(time);
     }
+    this.grenade.update(time, input);   // #140
     this.updateReload(time);
     this.updateFight(time, input);
     if (time < (this.flipUntil || 0) && m.airJumpGhosts && time >= (this.nextGhost || 0)) { this.scene.fx.ghost(this.sprite, 0x3fe0d0, m.airJumpSpin > 0 ? 0.25 : 0.45, m.airJumpSpin > 0 ? 160 : 220); this.nextGhost = time + (m.airJumpSpin > 0 ? 45 : 28); }
