@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Code → Ava: Polish-Runde angelegt (#129–#135, Daniel 21.11., AFK: „du kannst also direkt diesen Plan nehmen und umsetzen. Weiteres Polish bitte auch direkt mitdenken und als Sub-Task in die Liste mit aufnehmen“), läuft der Reihe nach, Konzepte parallel.
 - 21.11. Code → Ava: #128 fertig: Brett als Deko, Camp breiter, leere Texte und Tooltips aufgeräumt; **Polish-Plan** mit Top 8 in `docs/backlog.md` › E (Ton im Kampf, POI-Gelände, Einblendungen, erster Abend, Run-Bildausschnitt, Ranking-Bonus + #109, Gegner/Bosse, Ladezeit).
 - 20.11. Code → Ava: #127 **Ebene + Schwarzes Brett** fertig (PixelLab 25, übrig 1.965,6).
 - 20.11. Code → Ava: #084 **Camp-Boden** fertig: ein feiner PixelLab-Streifen statt grober Kacheln (Camp + Mega-Rig), PixelLab 25, übrig 1.990,6. PixelLab war in der Sitzung aus (Umgebung „Default“); Sitzung auf „NomadGirl“ umgeschaltet, das reicht.
@@ -259,6 +260,48 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #129 Info-Center: Einblendungen ordnen + Spieler-Log
+- **Status:** offen · angelegt 21.11. von Code (Daniel: „Einblendungen ordnen: lass uns ein Information Center konzipieren, um das auch in Zukunft zu vermeiden. In diesem Rahmen können wir auch ein Log für den Spieler aufbereiten, in dem er alle Schritte nachvollziehen kann und ggf. historische Meldungen anschauen kann.“)
+- **Auftrag:** Konzept in `docs/concepts/info_center.md` (baut auf #070 Meldungs-Kanal + Logbuch auf), dann Kern bauen: feste Bühne mit Plätzen und Vorrang, nichts liegt übereinander; Log-Fenster mit Verlauf und Filtern.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #130 Ton: stimmungsvolle Platzhalter + Ton-Liste
+- **Status:** offen · angelegt 21.11. von Code (Daniel: „Ton bitte mit stimmungsvollen Platzhaltern besetzen und eine Liste erzeugen, in der Art des Tones und Status (Code vs. produziert) aufgelistet ist, die wir dann abarbeiten können.“)
+- **Auftrag:** Fehlende Töne (Treffer, Whoosh, Schritte, Sprung, Landung, Kiste, Beute, Schaden, k.o., UI) als Code-Platzhalter; Liste `docs/sounds.md`.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #131 POI-Gelände fein + Architektur wie echte Gebäude
+- **Status:** offen · angelegt 21.11. von Code (Daniel: „POI-Gelände: optimiere und überarbeite es bitte so, dass es stilistisch zum Rest passt, ohne Tokens sinnlos zu verbrennen. Schau auch noch mal die Architektur der POIs an, damit sie wirklich wie echte verlassene Gebäude (für Gaming optimiert, was Höhen und Breiten angeht) aussehen.“ Grafiken: „strikt orthogonale Perspektive und Maßstab“.)
+- **Auftrag:** Kachel-Sets der POIs sparsam per PixelLab verfeinern, Raum-Architektur (Geschosse, Breiten, Fassaden) prüfen.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #132 Run-Bildausschnitt global
+- **Status:** offen · angelegt 21.11. von Code (Daniel: „Ausbessern bitte, aber global“ (unteres Drittel im Run schwarz).)
+- **Auftrag:** In allen POIs unter dem Boden Erde/Tiefe statt Schwarz, Kamera so, dass der Run nicht kleiner wirkt.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #133 Gegner-Baukasten: Konzept
+- **Status:** offen · angelegt 21.11. von Code (Daniel: „Bitte überlege, was wir noch an Gegnern und Verhalten brauchen könnten, das man über einen effizienten Baukasten und Upgrades für existierende Baukästen abbilden kann.“)
+- **Auftrag:** Konzept `docs/concepts/enemy_kit.md`.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #134 Glitches beheben
+- **Status:** offen · angelegt 21.11. von Code (Daniel: „Die Glitches kannst du alle beheben.“)
+- **Auftrag:** Kaomoji-Kästchen, Ortsnamen auf der Karte, Werte-Umbruch im Inventar, „Hier plündern“ über Buffs, Fenster übereinander, Kamera-Schwenk beim Camp-Start, Revier-Meldung „(0)“.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #135 Ladezeit + Hauptmenü in einem Stück
+- **Status:** offen · angelegt 21.11. von Code (Daniel: „Ladezeit: ja! … Auch das Hauptmenü sollte vollständig laden, bis es gerendert wird und nicht in Stücken wie bisher. Optimiere hier ein wenig, aber Stabilität ist nach wie vor wichtiger als eine halbe Sekunde weniger Ladezeit.“)
+- **Auftrag:** Cockpit erst zeigen, wenn alles geladen ist; Spiel lädt nach Modus; Anfragen zählen vorher/nachher.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #128 Schwarzes Brett als Deko, Camp breiter, Null-Texte, Polish-Plan
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Mach aus dem schwarzen Brett etwas, dass man wie Deko im Camp platzieren kann und mach das Camp etwas größer, damit es nicht so gestreckt ist … Schau auch mal nach, ob es viele Tooltips und Text mit NULL oder leer gibt … Insgesamt: Polish-Durchgang. Was haben wir zu tun, um das Spiel auf die nächste Ebene zu bringen?“)
