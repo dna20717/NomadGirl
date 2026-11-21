@@ -43,7 +43,8 @@ v = await ev(() => {
   const s = game.scene.getScene('play'), items = (s.hud.menuItems || []).map(x => x.label), sub = s.hud.menuSub || document.querySelector('.hud-menu p, .ui-menu p')?.textContent || '';
   nomad.choose('Moral'); nomad.step(2);
   const parts = (s.hud.menuItems || []).map(x => x.label), title = s.hud.menuTitle;
-  s.hud.closeMenu?.(); s.box.save.morale = { value: 5, at: (s.box.save.day || 1) * 24 + (s.box.save.hour || 0) - 24 * 6 }; s.box.save.food = 50;
+  s.hud.closeMenu?.(); nomad.step(2);   // #129 the window must be shut, or the Info-Center holds the news back
+  s.box.save.morale = { value: 5, at: (s.box.save.day || 1) * 24 + (s.box.save.hour || 0) - 24 * 6 }; s.box.save.food = 50;
   const toasts0 = document.querySelectorAll('.hud-toast').length; s.crewNews(); nomad.step(2);
   const toasts = [...document.querySelectorAll('.hud-toast')].map(t => t.textContent).slice(toasts0);
   return { items, parts, title, value: s.box.save.morale.value, toasts };

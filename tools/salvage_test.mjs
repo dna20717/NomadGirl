@@ -41,7 +41,7 @@ await page.waitForTimeout(400);
 await shot('wrack');
 
 // E: the salvage list; nothing to build without parts
-r = await ev(() => { const s = game.scene.getScene('play'); s.camp.wreckSpot.act(); const m = s.hud.menuState?.() || null; const t = document.querySelector('.menu, .hud-menu, [class*=menu]')?.innerText || ''; return { modal: s.hud.modal, text: t.slice(0, 300) }; });
+r = await ev(() => { const s = game.scene.getScene('play'); s.camp.wreckSpot.act(); const m = s.hud.menuState?.() || null; const t = document.querySelector('.hud-menu:not([hidden])')?.innerText || ''; return { modal: s.hud.modal, text: t.slice(0, 300) }; });
 check('E am Wrack öffnet die Bergungsliste', r.modal && /Freilegen/.test(r.text), r);
 await shot('liste');
 await ev(() => game.scene.getScene('play').hud.closeMenu());

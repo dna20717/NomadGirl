@@ -63,7 +63,8 @@ await shot('forecast');
 v = await ev(() => { const mp = SC().hud.map; mp.select(nomad.save().location); const st = mp.state(); const r = { intel: st.intel, fc: st.forecast, text: document.querySelector('.wm-fc')?.textContent || '' }; mp.host.intel = mp.intelWas; return r; });
 check('Navigator am eigenen Ort: Regen der nächsten 3 Tage', v.intel && (v.fc?.length === 3 && /Heute/.test(v.text) && /Morgen/.test(v.text)), v);
 // #089 Revierkrieg: a road between places of rival gangs is a front on the map, the place panel names who moved in
-v = await ev(() => { const mp = SC().hud.map, here = nomad.save().location, near = nomad.map().near[0]; nomad.save().turfs = { [here]: 'Sky Wolves', [near]: 'Level Five' }; mp.host.intel = () => true; mp.select(near); mp.detail(); mp.paint();
+// the neighbour must have a gang of its own (the map is rolled per new game; a culvert without a gang has no „vorher“)
+v = await ev(async () => { const R = await import('/game/reputation.js'), mp = SC().hud.map, here = nomad.save().location, near = nomad.map().near.find(id => R.gangOfPlace(mp.D, nomad.save(), id)); if (!near) return { noGang: nomad.map().near }; nomad.save().turfs = { [here]: 'Sky Wolves', [near]: 'Level Five' }; mp.host.intel = () => true; mp.select(near); mp.detail(); mp.paint();
   const st = mp.state(), text = document.querySelector('.wm-detail')?.textContent || ''; return { fronts: st.fronts, text }; });
 check('Revierkrieg: Front auf der Karte, Ort zeigt die neue Gang und die alte', v.fronts >= 1 && /Level Five/.test(v.text) && /vorher/.test(v.text) && /Rivalen: Sky Wolves/.test(v.text), v);
 await shot('front');
@@ -75,6 +76,8 @@ check('B schließt die Karte', !(await ev(() => nomad.map())).open);
 v = await ev(() => { const fuel = nomad.save().fuel, day = nomad.save().day; nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(2); nomad.choose('Karte'); nomad.step(3);
   const mp = SC().hud.map, to = nomad.map().near[0], cost = mp.host.cost(to); mp.select(to); document.querySelector('.wm-go').click(); nomad.step(60);
   return { to, here: nomad.save().location, fuel, after: nomad.save().fuel, cost, visited: nomad.save().map.visited, banner: nomad.state().banner }; });
+// #129/#154 the map was still open when the camp came back: the Info-Center holds the arrival banner until the window is gone, then it comes
+v.banner = await page.waitForFunction(() => { const b = nomad.state().banner; return /Angekommen/.test(b || '') && b; }, null, { timeout: 5000, polling: 100 }).then(h => h.jsonValue()).catch(() => v.banner);
 check('Klick auf „Hinfahren“: Leyla ist am Nachbarort, Sprit weg, als besucht markiert', v.here === v.to && Math.abs(v.fuel - v.cost.fuel - v.after) < 0.11 && v.visited.includes(v.to) && /Angekommen/.test(v.banner || ''), v);
 // #014: further away over several legs, an incident on the road (forced: Panne), the choice costs time, then arrival
 v = await ev(() => { nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(2); nomad.choose('Karte'); nomad.step(3);

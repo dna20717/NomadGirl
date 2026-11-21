@@ -11,7 +11,7 @@ const check = (name, cond, info) => (cond ? ok : errors).push(cond ? name : `${n
 const ev = (fn, a) => page.evaluate(fn, a);
 
 async function run(rep, moved = null) {
-  await page.goto('http://localhost:8766/game.html?camp&new');
+  await page.goto((process.env.GAME_URL || 'http://localhost:8766/game.html') + '?camp&new');
   await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.camp, null, { timeout: 60000 });
   await ev(([rep, moved]) => { nomad.take(); nomad.step(10); window.SC = () => game.scene.getScene('play'); nomad.save().rep = moved ? { [moved]: rep } : { 'Yellow Vultures': rep }; nomad.save().deltas = 2000;
     if (moved) nomad.save().turfs = { [nomad.save().location]: moved };   // #089
@@ -19,7 +19,7 @@ async function run(rep, moved = null) {
     nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.step(4); if (TU?.state?.().open) TU.close(); nomad.choose('Plündern'); nomad.release(); }, [rep, moved]);
   await page.waitForFunction(() => { const s = game.scene.getScene('play'); return s?.mode === 'run' && s.leyla && s.level; }, null, { timeout: 60000 });
   await page.waitForTimeout(600);
-  return ev(() => { nomad.take(); nomad.step(120); const s = SC(); return { turf: s.turf?.state(), toast: [...document.querySelectorAll('.hud-toast b, .hud-toast strong, .hud-toasts *')].map(e => e.textContent).join(' | ').slice(0, 400), members: s.enemies.filter(e => s.turf?.member(e)).length }; });
+  return ev(() => { nomad.take(); nomad.step(120); const s = SC(); return { turf: s.turf?.state(), toast: [...document.querySelectorAll('.hud-toast')].map(t => [t.querySelector('b')?.textContent, t.querySelector('small')?.textContent].filter(Boolean).join(' · ')).join(' | ').slice(0, 600), members: s.enemies.filter(e => s.turf?.member(e)).length }; });
 }
 
 // a friend of the Yellow Vultures

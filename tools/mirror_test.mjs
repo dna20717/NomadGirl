@@ -73,7 +73,9 @@ await shot('green');
 r = await ev(() => {
   const s = game.scene.getScene('play'), l = s.leyla, seen = [];
   nomad.take(); for (let i = 0; i < 30; i++) { nomad.step(2, ['right']); seen.push(l.sprite.anims.currentFrame?.index ?? null); }
-  const pinkIn = id => { if (!s.textures.exists(id)) return -1; const src = s.textures.get(id).getSourceImage(), cv = document.createElement('canvas'); cv.width = src.width; cv.height = src.height; const c = cv.getContext('2d'); c.drawImage(src, 0, 0); const d = c.getImageData(0, 0, cv.width, cv.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i + 3] && d[i] > 180 && d[i + 2] > 120 && d[i + 1] < 120) n++; return n; };
+  // pink = the signature's hue range (Leyla › Signaturfarbe); a skin or lip shade like 187,117,122 (hue 356, #164 throw) is not hair
+  const [h0, h1] = s.data_.leyla.signature?.hue || [290, 350], hue = (r, g, b) => { const mx = Math.max(r, g, b), mn = Math.min(r, g, b), dd = mx - mn; if (!dd) return 0; const h = mx === r ? ((g - b) / dd + 6) % 6 : mx === g ? (b - r) / dd + 2 : (r - g) / dd + 4; return h * 60; };
+  const pinkIn = id => { if (!s.textures.exists(id)) return -1; const src = s.textures.get(id).getSourceImage(), cv = document.createElement('canvas'); cv.width = src.width; cv.height = src.height; const c = cv.getContext('2d'); c.drawImage(src, 0, 0); const d = c.getImageData(0, 0, cv.width, cv.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i + 3] && d[i] > 180 && d[i + 2] > 120 && d[i + 1] < 120 && hue(d[i], d[i + 1], d[i + 2]) >= h0 && hue(d[i], d[i + 1], d[i + 2]) <= h1) n++; return n; };
   const ids = Object.keys(s.data_.assets).filter(k => k.startsWith('leyla_') && s.data_.assets[k].kind === 'animation' && s.textures.exists(k));
   return { frames: [...new Set(seen)].length, missing: seen.filter(f => f == null).length, pinky: ids.filter(id => pinkIn(id) > 20), total: ids.length };
 });
