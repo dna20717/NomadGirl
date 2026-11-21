@@ -27,6 +27,8 @@ for (const name of ['iPhone 13', 'iPhone SE', 'Pixel 5']) {
   await page.waitForFunction(() => duelDemo.view.canAct() || duelDemo.view.duel.winner, null, { timeout: 20000 });
   r = await page.evaluate(() => ({ kinds: duelDemo.S.buzzed, raw: window.__buzz.length }));
   check(`${name}: Vibration bei Antippen und Schicken (und beim Gegner-Zug, wenn er trifft)`, r.kinds[0] === 'pick' && /send|wipe/.test(r.kinds[1]) && r.raw >= 2, r);
+  r = await page.evaluate(() => ({ sounds: [...duelDemo.S.sounds], on: duelDemo.S.soundOn, btn: !!document.querySelector('.mb-sound') }));
+  check(`${name}: Ton bei Antippen und Schicken, Schalter da (#151)`, r.on && r.btn && r.sounds.includes('pick') && r.sounds.some(k => /send|wipe/.test(k)), r);
   // swipe up on a pipeline with room: sends at once
   const col = await page.evaluate(() => [2, 1, 0].find(i => duelDemo.view.duel.sides.player.cols[i].length < 3));
   const box = await page.locator(`.sb-pipe.player[data-col="${col}"]`).boundingBox();

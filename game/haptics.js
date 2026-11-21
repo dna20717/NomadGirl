@@ -3,6 +3,7 @@
 //   phone: the vibrate API (Android); iOS has none, there a user's own tap gives the system switch tick (Safari 18+)
 //   controller: the gamepad's rumble (vibrationActuator), e.g. in the game with a pad
 // One switch for all: localStorage „nomad.haptics“ (the phone's toggle, the game's Optionen › Vibration).
+import { play } from './duel_sound.js';
 export const BUZZ = { pick: 8, send: 14, wipe: [12, 40, 22], hit: 35, heavy: [60, 40, 60], overflow: [10, 30, 10, 30, 10], win: [20, 60, 20, 60, 90], lose: [220] };
 const KEY = 'nomad.haptics';
 const log = [];   // what was buzzed (tests)
@@ -30,6 +31,7 @@ function rumble(pattern) {
 // one moment → the phone buzzes and the pad rumbles; user = it came from the player's own tap (iOS can only tick then)
 export function buzz(kind, { user = false } = {}) {
   log.push(kind);
+  play(kind);   // #151 every moment has a sound too (duel_sound.js, its own switch)
   if (!hapticsOn() || !BUZZ[kind]) return;
   if (canVibrate()) navigator.vibrate(BUZZ[kind]); else if (user) iosTick();
   rumble(BUZZ[kind]);

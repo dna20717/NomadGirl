@@ -11,6 +11,7 @@ import { generate } from './glitchlings.js';
 import { duelConfig } from './duel.js';
 import { StackView } from './stack_view.js';
 import { hapticsOn, setHaptics, buzzLog } from './haptics.js';
+import { duelSoundOn, setDuelSound, duelSoundLog } from './duel_sound.js';
 
 const TEMPO = { langsam: 1.6, normal: 1, schnell: 0.5 };
 const rngOf = seed => () => { seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
@@ -18,7 +19,7 @@ const rngOf = seed => () => { seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(
 export async function startMobile(root) {
   const project = await loadProject(browserLoader(new URL('projects/nomadgirl/', location.href)));
   const D = project.data, C = duelConfig(D), q = new URLSearchParams(location.search);
-  const S = { foe: q.get('foe') || 'wild', seed: +(q.get('seed') || (1 + Math.floor(Math.random() * 99999))), core: 0, tempo: q.get('tempo') || 'normal', wins: 0, losses: 0, get buzzOn() { return hapticsOn(); }, get buzzed() { return buzzLog(); } };
+  const S = { foe: q.get('foe') || 'wild', seed: +(q.get('seed') || (1 + Math.floor(Math.random() * 99999))), core: 0, tempo: q.get('tempo') || 'normal', wins: 0, losses: 0, get buzzOn() { return hapticsOn(); }, get buzzed() { return buzzLog(); }, get soundOn() { return duelSoundOn(); }, get sounds() { return duelSoundLog(); } };
   // haptics come from the board itself (haptics.js), the same in the game; the phone only has the switch
   const view = new StackView(D, { confirmTap: true, redraw: () => draw(), tempo: () => TEMPO[S.tempo] ?? 1, 
     onEnd: d => { if (S.counted !== d) { S.counted = d; if (d.winner === 'player') S.wins++; else S.losses++; } },
@@ -44,7 +45,8 @@ export async function startMobile(root) {
     const sel = (value, opts, on) => { const s = el('select', { onchange: e => on(e.target.value) }, ...opts.map(([v, n]) => { const o = el('option', { value: v }, n); if (String(value) === String(v)) o.selected = true; return o; })); return s; };
     root.replaceChildren(
       el('div', { class: 'mb-top' }, el('b', {}, 'BIT-STAPEL'), el('small', {}, `Siege ${S.wins} · Niederlagen ${S.losses}`),
-        el('button', { class: 'mb-buzz' + (S.buzzOn ? ' on' : ''), title: 'Vibration an/aus', 'aria-pressed': String(S.buzzOn), onclick: () => { setHaptics(!hapticsOn()); draw(); } }, icon(S.buzzOn ? 'wave' : 'muted', 18))),
+        el('button', { class: 'mb-buzz' + (S.buzzOn ? ' on' : ''), title: 'Vibration an/aus', 'aria-pressed': String(S.buzzOn), onclick: () => { setHaptics(!hapticsOn()); draw(); } }, icon(S.buzzOn ? 'wave' : 'muted', 18)),
+        el('button', { class: 'mb-buzz mb-sound' + (S.soundOn ? ' on' : ''), title: 'Ton an/aus', 'aria-pressed': String(S.soundOn), onclick: () => { setDuelSound(!duelSoundOn()); draw(); } }, icon(S.soundOn ? 'loudspeaker' : 'muted', 18))),   // #151
       el('div', { class: 'mb-main mob' }, el('div', { style: 'width:100%' }, view.board(), el('div', { class: 'mb-hint' }, hint))),
       el('div', { class: 'mb-bar' },
         sel(S.core, deck.map((g, i) => [i, `Core: ${g.name}`]), v => { S.core = Number(v); newGame(); }),

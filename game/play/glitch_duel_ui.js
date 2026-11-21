@@ -12,6 +12,7 @@ import { implantBoosts } from '../stations.js';
 import { StackView } from '../stack_view.js';
 import { faceCanvas } from '../glitch_face.js';
 import { cores, catchGlitchling } from '../glitch_world.js';
+import { play as duelSound, setDuelMuted, setDuelVolume } from '../duel_sound.js';
 
 export class GlitchDuelUI {
   // host: { scene() }
@@ -30,6 +31,7 @@ export class GlitchDuelUI {
   }
   get isOpen() { return !this.el.hidden; }
   open({ foe, title = 'Glitch-Duell', sub = '', onDone = null }) {
+    { const sc = this.host.scene?.(); setDuelMuted(!!sc?.muted); setDuelVolume(((sc?.data_?.build?.view?.volume ?? 50) / 100) * 0.9); duelSound('start'); }   // #151 the game's sound switch (M) and volume
     const s = this.host.scene(), D = s.data_, save = s.box?.save;
     this.D = D; this.foe = foe; this.title = title; this.sub = sub; this.onDone = onDone; this.result = null;
     this.cores = cores(save); this.pick = 0;

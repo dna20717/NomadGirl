@@ -279,9 +279,9 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Daten) Spiel › Vordergrund › Silhouetten aus (drinnen und draußen). `poi_test` prüft: keine Silhouetten.
 
 ### #151 Glitch-Duell mit Ton
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Das Entitäten-Duell braucht ein wenig Sound.“ Gilt für /duel, /mobile und das Duell im Spiel.)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Das Entitäten-Duell braucht ein wenig Sound.“ Gilt für /duel, /mobile und das Duell im Spiel.)
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Glitch-Chip-Töne aus Code für jeden Moment (wählen, schicken, löschen, Treffer, Überlauf, Sieg, Niederlage, Start), über dieselbe Stelle wie die Vibration, also in /duel, /mobile und im Spiel; Schalter in /mobile, im Spiel Ton-Schalter M. **Bitte testen:** /mobile mit Ton, ein Duell im Spiel.
 
 ### #152 Automaten mit besiegter Entity geben Nahrung
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Automaten mit besiegten Entitäten droppen Nahrungsloot“)
