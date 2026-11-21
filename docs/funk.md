@@ -291,11 +291,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #165 Wow-Räume in hoher Fidelity
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „die Wow-Räume überarbeiten mit höherer Fidelity“; Umgebung „NomadGirl“, PixelLab wieder da, übrig 1.520,6)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „die Wow-Räume überarbeiten mit höherer Fidelity“; Umgebung „NomadGirl“, PixelLab wieder da, übrig 1.520,6)
 - **Für:** Code
 - **Auftrag:** Alle 13 Wow-Motive (Wunschliste `docs/assets.md` › Wow-Platzhalter) mit PixelLab malen (AAP-64, orthogonal von vorn wie Tresor V-09), dazu Licht, Glow, Bewegung und Räume heller und voller, damit jeder Wow-Raum auf den ersten Blick trägt. Code-Silhouetten bleiben als Rückfall. Budget ≈ 250 Generierungen.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: Preistafel zeigt die gemalten Preise 4.89/6.29/6.49, Kassenhaus „PAY HERE RK“ (Code-Texte nur noch bei Silhouette); Funkmast-Spitze und Lichtschacht bleiben Code-Landmarken, Kronleuchter/Zug/Startrampe nicht gemalt; Grundhelligkeit 60–65 % je Wow-Raum; in Schacht-Räumen steht das Motiv hinter den Plattformen. Megamall-Kuppel sitzt im Spielzoom sehr weit oben (im Bild kaum zu sehen), prüfen.
+- **Ergebnis:** (Code, per Helfer, `bb0c789`) 13 Wow-Motive + 4 Landmarken (Penthouse, Anzeigetafel, Förderturm, Wasserturm) mit PixelLab gemalt (AAP-64, Tresor V-09 als Stil), `assets/pois/wow/`, Felder unter POIs › Wow (Motiv-Bild, Höhe, Kern, Schrift, hängt von der Decke, Schlüssellicht-Reichweite, Fülllicht, Dunkel-Abzug, Grundhelligkeit) und Level-Design › Landmarke: Bild; Code-Silhouette als Rückfall, Bewegung aus Code läuft auf dem Bild weiter. Lichtkarte wächst jetzt beim Herauszoomen mit. Räume heller (Dunkel-Abzug 0–10 %, Fülllicht), Dressing ums Motiv. Tests npm 416, level_audit + reach_audit 0, poi 33, poi_levels 9, light 18, poi_stack 8. **PixelLab 215** (1.520,6 → 1.305,6). **Bitte testen:** jeden POI bis zum Wow-Raum; Uhrzeiger im Ministerium, Reaktor-Puls, Flamme, Kuppel in der Megamall, Schrift am Gittertor, Landmarken.
 
 ### #166 Rote Browser-Tests reparieren
 - **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Ja, bitte reparieren“): crew, map, mirror, salvage, turf, van.
