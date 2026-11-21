@@ -66,7 +66,7 @@ export async function start(parent, hudRoot, loading, opts = {}) {
   });
   let args = { project, roomId, base, hud, loading };
   if (opts.megarig && D.megarigs?.[opts.megarig.id]) args = { ...args, megarig: opts.megarig };
-  if (q.get('poi') && D.pois?.[q.get('poi')]) args = { ...args, poi: q.get('poi'), seed: Number(q.get('seed')) || 1 + Math.floor(Math.random() * 2 ** 31) };
+  if (q.get('poi') && D.pois?.[q.get('poi')]) args = { ...args, poi: q.get('poi'), seed: Number(q.get('seed')) || 1 + Math.floor(Math.random() * 2 ** 31), brand: q.get('brand') || null };   // ?brand=delta_petrol: the sign at the entrance
   if (q.has('camp') && D.camp) {
     const box = await openSave(D, '', { be: storage, slot, set: setId });
     chooseSlot(slot);   // this device goes on with this slot

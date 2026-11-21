@@ -86,6 +86,7 @@ export class PlayScene extends Phaser.Scene {
     if (this.data_.game?.ladder?.look) ids.add(this.data_.game.ladder.look);   // #034 ladders
     for (const t of Object.values(this.data_.terrain || {})) for (const id of [t.look, t.props, t.propsBig]) if (id) ids.add(id);   // Kachel-Sets (TileSet00)
     for (const P of Object.values(this.data_.pois || {})) for (const b of P.brandProps || []) if (b.look) ids.add(b.look);   // Marken-Clutter (NomadCola-Automaten …)
+    if (this.data_.worldmap?.logos) ids.add(this.data_.worldmap.logos);   // the brand sign at a POI's entrance
     const DR = this.data_.drone || {};
     for (const id of [DR.look, DR.face?.look, DR.face?.glass, ...(DR.parts || []).filter(r => r.on).map(r => r.look)]) if (id) ids.add(id);
     for (const r of this.data_.leyla?.idles || []) if (r.look) ids.add(r.look);

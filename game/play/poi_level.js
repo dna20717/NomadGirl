@@ -41,6 +41,7 @@ export class PoiLevel {
     this.secrets = 0; this.done = null; this.chestsOpened = 0;
     this.killsMax = s.enemies.filter(e => e.d.countsForRanking !== false).length;
     this.drawBackWall();
+    this.drawBrandSign();
     // doors and brittle walls: solid zones in the scene's solids until opened
     const solidGroup = (g, kind) => {
       const b = box(g), zone = s.add.zone((b.x0 + b.x1) / 2 * T, (b.y0 + b.y1) / 2 * T, (b.x1 - b.x0) * T, (b.y1 - b.y0) * T);
@@ -114,6 +115,47 @@ export class PoiLevel {
       if (x % 4 === 0) g.fillStyle(0x1a1821).fillRect(px, py, 3, T);
       if (rnd() < 0.04) g.fillStyle(0x221f2a).fillRect(px + 10, py + 20, 30, 18);   // a poster, a vent
     }
+  }
+  // the brand of the place (Reisekarte: the logo next to the place, e.g. Delta Petrol at the gas station; Daniel 21.11.2026: „Die
+  // Firmenlogos werden in den POI nicht angezeigt“): a pylon sign at the entrance like a real roadside station, logo + name + slogan
+  brandOf() {
+    const s = this.scene, D = s.data_, save = s.box?.save, at = save?.run?.location ?? save?.location;
+    const id = s.args?.brand || save?.map?.nodes?.find(n => n.id === at)?.brand || this.P.brand;
+    return id && D.brands?.[id] ? { id, ...D.brands[id] } : null;
+  }
+  drawBrandSign() {
+    const s = this.scene, D = s.data_, LI = s.levelInfo, R = s.room, T = s.T, b = this.brandOf();
+    if (!b || !LI?.rooms?.length || this.P.brandSign === false) return;
+    const free = (x, y) => R.tiles[y]?.[x] === '.' || R.tiles[y]?.[x] === ' ', solidAt = (x, y) => R.tiles[y]?.[x] === '#';
+    // a floor in the first outdoor room (else the entrance room) with 5 tiles of air above, near its left side
+    const room = LI.rooms.find(r => !this.indoor(r.id)) || LI.rooms[0];
+    let spot = null;
+    for (let x = room.x + 4; x < room.x + room.w - 4 && !spot; x++) for (let y = room.y + 5; y < room.y + room.h; y++) {
+      if ([0, 1, 2].every(d => solidAt(x - 1 + d, y)) && [1, 2, 3, 4, 5, 6].every(k => [0, 1, 2].every(d => free(x - 1 + d, y - k)))) { spot = [x, y]; break; }
+    }
+    if (!spot) return;
+    const H = this.P.brandSignHeight ?? 4.6, cx = (spot[0] + 1) * T, floor = spot[1] * T, pw = 4 * T, ph = 1.8 * T, top = floor - H * T;
+    const col = Phaser.Display.Color.HexStringToColor(b.color || '#fa6a0a').color, g = s.add.graphics().setDepth(-9.5);
+    // two steel posts, foot plates, a rusty frame with a neon edge in the brand's colour
+    for (const dx of [-0.9, 0.9]) { g.fillStyle(0x23262e).fillRect(cx + dx * T - 7, top + ph, 14, floor - top - ph); g.fillStyle(0x3a3f48).fillRect(cx + dx * T - 7, top + ph, 4, floor - top - ph); g.fillStyle(0x15171c).fillRect(cx + dx * T - 14, floor - 8, 28, 8); }
+    g.fillStyle(0x15171c).fillRect(cx - pw / 2 - 8, top - 8, pw + 16, ph + 16);
+    g.fillStyle(0x0d0a12).fillRect(cx - pw / 2, top, pw, ph);
+    g.lineStyle(4, col, 0.95).strokeRect(cx - pw / 2 + 3, top + 3, pw - 6, ph - 6);
+    g.fillStyle(0x6b4a3a, 0.5).fillRect(cx - pw / 2 - 8, top + ph + 4, 18, 4).fillRect(cx + pw / 2 - 30, top - 8, 22, 3);   // rust
+    const glow = s.add.ellipse(cx, top + ph / 2, pw * 1.25, ph * 1.9, col, 0.07).setDepth(-9.6).setBlendMode(Phaser.BlendModes.ADD);
+    s.tweens.add({ targets: glow, alpha: 0.6, duration: 120, yoyo: true, repeat: -1, repeatDelay: 2600 + Math.random() * 3000 });   // the neon stutters now and then
+    const logos = D.worldmap?.logos, L = D.assets?.[logos];
+    let tx = cx - pw / 2 + 18;
+    if (logos && s.textures.exists(logos) && b.icon != null) {
+      const size = ph - 22, img = s.add.image(cx - pw / 2 + 12 + size / 2, top + ph / 2, logos, b.icon).setDepth(-9.4);
+      img.setScale(size / (Array.isArray(L?.cell) ? L.cell[1] : L?.cell || 64));
+      tx = cx - pw / 2 + 24 + size;
+    }
+    const maxW = cx + pw / 2 - 14 - tx;
+    const name = s.add.text(tx, top + ph * 0.44, b.short || b.name, { fontFamily: 'VT323, monospace', fontSize: '44px', color: '#fef3c0', stroke: b.color || '#fa6a0a', strokeThickness: 5 }).setOrigin(0, 0.5).setDepth(-9.4);
+    if (name.width > maxW) name.setScale(maxW / name.width);
+    if (b.slogan) { const sl = s.add.text(tx, top + ph * 0.78, b.slogan, { fontFamily: 'VT323, monospace', fontSize: '28px', color: '#ffd541', stroke: '#0d0a12', strokeThickness: 3 }).setOrigin(0, 0.5).setDepth(-9.4); if (sl.width > maxW) sl.setScale(maxW / sl.width); }
+    this.sign = { brand: b.id, x: cx, y: top, w: pw, h: ph };
   }
   indoor(id) { const r = this.scene.data_.rooms?.[id] || {}; return r.indoor ?? !(r.backdrop?.image || r.backdrop?.weather); }
   drawDoor(d) {
