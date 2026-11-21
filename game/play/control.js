@@ -13,6 +13,7 @@
 //   nomad.drone('kill')               show a drone mood
 //   nomad.screenOf(x, y)              world position → page position
 //   nomad.state().van                 van door frame, open, roof platform
+//   nomad.places(show?)               #158 place types (floor_in, floor_out, roof, ledge, corner, ceiling, wall): counts + spots, true = coloured overlay
 //   nomad.state().light               light & atmosphere: lamps, glowing clutter, mood at Leyla, searchlight, brightness at Leyla / ahead
 //   nomad.state().level               POI level: chests, switches, doors, brittle walls, goal, secrets, ranking (done)
 //   nomad.state().camp                camp (game.html?camp): clock, place, Δ, prompt, hotspots, rig; .menu = open menu
@@ -110,6 +111,13 @@ export function installControl(game) {
     inv() { return scene().hud.inv?.state() || null; },   // open inventory: grids, slots, held thing
     loot() { return scene().loot?.state() || null; },     // bundles on the ground (run)
     drone(mood) { scene().drone.react(mood); return scene().drone.mood; },
+    // #158 Ort-Typen: counts per type and the spots; places(true/false) lays the coloured overlay over the room
+    places(show) {
+      const s = scene(), pm = s.placeMap?.();
+      if (show !== undefined) s.showPlaces?.(!!show);
+      const count = {}; for (const e of pm?.list || []) { count[e.type] = (count[e.type] || 0) + 1; if (e.corner) count.corner = (count.corner || 0) + 1; }
+      return { count, list: (pm?.list || []).map(({ x, y, type, corner }) => ({ x, y, type, corner })) };
+    },
     light(on) { const a = scene().atmo; if (on !== undefined) a?.show(on); return a?.state() || null; },   // light & atmosphere: state, light(false) = all off (comparison), light(true) = on   // show a drone mood (tests, pictures)
     screenOf(x, y) {   // world position → page position (close-up pictures, mouse)
       const c = scene().cam, r = game.canvas.getBoundingClientRect(), kx = r.width / game.scale.width, ky = r.height / game.scale.height;

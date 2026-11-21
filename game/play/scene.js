@@ -18,6 +18,7 @@ import { placeForeground } from './foreground.js';
 import { applySignature } from './signature.js';
 import { qualityOf, brandWeapon } from '../brands.js';
 import { makeTextures, drawBackground, drawRoom, terrainKits, PLACEHOLDER_COLORS } from './art.js';
+import { regionMap, placeTypes, PLACE_COLORS } from '../../engine/dressing.js';
 import { Leyla } from './leyla.js';
 import { Enemy } from './enemies.js';
 import { kitAssets } from './enemy_kit.js';
@@ -160,30 +161,26 @@ export class PlayScene extends Phaser.Scene {
   // below all rooms lies the tunnel (POIs › Kachel-Set im Tunnel). back(x, y): back wall of indoor rooms and the tunnel.
   // → { at(x, y), back(x, y), idAt(x, y) }
   terrainMap() {
-    const D = this.data_, kits = terrainKits(this, D), dflt = D.game?.tiles?.terrain, LI = this.levelInfo;
-    const roomSet = id => D.rooms?.[id]?.terrain || dflt;
-    const indoor = id => { const r = D.rooms?.[id] || {}; return r.indoor ?? !(r.backdrop?.image || r.backdrop?.weather); };
+    const D = this.data_, kits = terrainKits(this, D), LI = this.levelInfo;
+    const reg = regionMap(D, LI?.def ? { rooms: LI.rooms, poiId: this.levelPoi } : { roomId: this.roomId });
     const backOf = id => { const t = D.terrain?.[id], k = kits(t?.back?.terrain); return k ? { ...k, shade: t.back.shade } : null; };
-    let idAt, inside;
-    if (LI?.def) {
-      const P = D.pois?.[this.levelPoi] || {}, tunnel = P.tunnelTerrain || roomSet(LI.rooms[0]?.id), cache = new Map();
-      const roomAt = (x, y) => {
-        const k = x + ',' + y;
-        if (cache.has(k)) return cache.get(k);
-        const col = LI.rooms.filter(r => x >= r.x && x < r.x + r.w);
-        let r = col.find(r => y >= r.y && y < r.y + r.h) || null;
-        if (!r && col.length && y < Math.max(...col.map(c => c.y + c.h))) r = col.reduce((a, b) => Math.abs(b.y - y) < Math.abs(a.y - y) ? b : a);
-        cache.set(k, r);
-        return r;
-      };
-      idAt = (x, y) => { const r = roomAt(x, y); return r ? roomSet(r.id) : tunnel; };
-      inside = (x, y) => { const r = roomAt(x, y); return r ? indoor(r.id) : true; };
-    } else {
-      const own = roomSet(this.roomId);
-      idAt = () => own;
-      inside = () => !!D.rooms?.[this.roomId]?.indoor;
+    return { reg, idAt: reg.idAt, inside: reg.inside, at: (x, y) => kits(reg.idAt(x, y)), back: (x, y) => reg.inside(x, y) ? backOf(reg.idAt(x, y)) : null };
+  }
+  // Ort-Typen of the room or level (#158, engine/dressing.js placeTypes), once per room
+  placeMap() { return this.places_ ??= placeTypes(this.room, this.terrain?.reg || regionMap(this.data_, { roomId: this.roomId })); }
+  // overlay of the place types (nomad.places(true), Spiel › Set-Dressing › Ort-Typen zeigen): a coloured bar per spot
+  showPlaces(on = true) {
+    this.placeOverlay?.destroy(); this.placeOverlay = null;
+    if (!on) return;
+    const g = this.placeOverlay = this.add.graphics().setDepth(60), T = this.T, col = t => parseInt(PLACE_COLORS[t].slice(1), 16);
+    for (const e of this.placeMap().list) {
+      if (e.type === 'ceiling') g.fillStyle(col('ceiling'), 0.55).fillRect(e.x * T + 4, e.y * T, T - 8, 8);
+      else if (e.type === 'wall') g.fillStyle(col('wall'), 0.3).fillRect(e.x * T + 20, e.y * T + 20, T - 40, T - 40);
+      else {
+        g.fillStyle(col(e.type), 0.75).fillRect(e.x * T + 2, e.y * T - 10, T - 4, 10);
+        if (e.corner) g.fillStyle(col('corner'), 0.9).fillRect(e.x * T + (e.corner === 'l' ? 2 : T - 14), e.y * T - 22, 12, 12);
+      }
     }
-    return { idAt, inside, at: (x, y) => kits(idAt(x, y)), back: (x, y) => inside(x, y) ? backOf(idAt(x, y)) : null };
   }
   assetInfo(id) {
     const a = this.data_.assets?.[id];
@@ -317,6 +314,7 @@ export class PlayScene extends Phaser.Scene {
     if (!this.onAdded) { this.onAdded = o => this.bgCam.ignore(o); this.events.on(Phaser.Scenes.Events.ADDED_TO_SCENE, this.onAdded); }   // once: the scene object is reused on restart
     const tiles = Object.fromEntries(Object.entries(this.data_.game?.tiles || {}).filter(([k]) => k !== 'terrain').map(([k, id]) => [k, this.textures.exists(id) ? id : null]));
     this.terrain = this.terrainMap();
+    this.places_ = null; this.placeOverlay = null;
     const CG = this.data_.camp?.ground;
     let drawn = null;
     if (this.megarig) { if (!drawCampGround(this, this.data_, { floor: this.megarig.G, W: R.w, H: R.h }, T)) drawn = drawRoom(this, { ...R, tiles: R.tiles.map((r, y) => y >= this.megarig.G ? r : r.map(() => '.')) }, T, tiles, null, this.terrain); }
@@ -407,6 +405,7 @@ export class PlayScene extends Phaser.Scene {
       if (sky.line) this.time.delayedCall(3200, () => this.hud.toast(sky.rain ? 'Regen über dem POI' : sky.fog ? 'Nebel im POI' : 'Staub im POI', sky.line, 'info', 6000));
     }
     this.props = drawn?.props || [];
+    if (this.data_.game?.dressing?.overlay && this.mode !== 'camp' && !this.megarig) this.showPlaces(true);   // #158 Ort-Typen zeigen
     this.fog = new Fog(this);   // darkness like The Looter indoors (#043, Spiel › Nebel)
     if (this.weatherRun && this.fog?.F && this.weatherRun.fogSight !== 1) this.fog.F = { ...this.fog.F, sight: (this.fog.F.sight ?? 11) * this.weatherRun.fogSight };   // #063 fog and dust: Leyla sees less too
 
