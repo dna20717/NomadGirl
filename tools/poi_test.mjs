@@ -84,7 +84,7 @@ s = await ev(() => {
   return out;
 });
 check('Dunkelheit: draußen klar, ungesehener Tunnel schwarz, hinter dem Secret schwarz (#043)', s.on && s.outdoor === 0 && s.tunnel >= 0.95 && s.secret >= 0.95, s);
-check('Raumname beim ersten Betreten (#043) und Silhouetten im Vordergrund', s.titles.length >= 2 && !!s.titleEl && s.fg > 0, { titles: s.titles, el: s.titleEl, fg: s.fg });
+check('Raumname beim ersten Betreten (#043), keine Silhouetten im Vordergrund (#150)', s.titles.length >= 2 && !!s.titleEl && s.fg === 0, { titles: s.titles, el: s.titleEl, fg: s.fg });
 check('Scheinwand: sieht aus wie Wand und deckt den Raum dahinter ab', s.coverBefore === 1 && s.stillHidden >= 0.95, s);
 check('Scheinwand: Leyla läuft hindurch, die Wand blendet aus, zählt als Secret', s.found && s.alpha === 0 && s.secrets === 2 && s.inRoom, s);
 check('Nebel: der geheime Raum klart auf, wenn sie drin ist', s.secretAfter === 0, s);

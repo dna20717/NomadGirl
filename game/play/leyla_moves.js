@@ -99,6 +99,9 @@ export class LeylaMoves {
     if (input.jump.pressed) { this.leaveClimb(); b.setVelocity(dir * (m.walkSpeed ?? 240), -(m.jumpVelocity ?? 1100) * 0.6); this.cut = true; return; }
     if (v < 0 && this.feet <= L.top) { this.body.reset(L.cx, L.top - this.size.h / 2); this.leaveClimb(); return; }
     if (this.feet >= L.bottom && grounded && v >= 0) { this.leaveClimb(); return; }
+    // #149 (Daniel 21.11.2026: „kann sie weiter rutschen, obwohl die Leiter zu Ende ist“): a ladder ending in the air lets go at its
+    // last rung, she falls on with gravity (no endless slide below it)
+    if (v > 0 && this.feet >= L.bottom) { this.leaveClimb(); b.setVelocity(0, Math.min(v, m.ladderSlide ?? 560)); return; }
     if (dir && grounded) this.leaveClimb();
   }
   leaveClimb() { this.state = 'normal'; this.body.allowGravity = true; this.ladder = null; this.setStanding(); }

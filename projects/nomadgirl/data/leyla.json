@@ -219,5 +219,5 @@
  },
  "null": "voice",
  "voice": "leyla",
- "grenade": {"arm": "leyla_throw_arm"}
+ "grenade": {"arm": "leyla_throw_arm", "refill": "each", "cooldown": 60}
 }

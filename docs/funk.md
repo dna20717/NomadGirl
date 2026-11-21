@@ -269,14 +269,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #149 Leiter: Rutschen endet am Leiterende
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Wenn Leyla eine Leiter runterrutscht, kann sie weiter rutschen, obwohl die Leiter zu Ende ist.“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Wenn Leyla eine Leiter runterrutscht, kann sie weiter rutschen, obwohl die Leiter zu Ende ist.“)
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Endet eine Leiter in der Luft, lässt Leyla beim Runterrutschen oder -klettern am letzten Sprossen los und fällt mit Schwerkraft weiter (`leyla_moves.js`). Test `parcours_test` (50). **Bitte testen:** eine Leiter, die über einem Abgrund endet, runterrutschen.
 
 ### #150 Vordergrund-Silhouetten in POIs entfernen
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Entferne die Vordergrund-Gegenstände in den POIs“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Entferne die Vordergrund-Gegenstände in den POIs“)
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Daten) Spiel › Vordergrund › Silhouetten aus (drinnen und draußen). `poi_test` prüft: keine Silhouetten.
 
 ### #151 Glitch-Duell mit Ton
 - **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Das Entitäten-Duell braucht ein wenig Sound.“ Gilt für /duel, /mobile und das Duell im Spiel.)

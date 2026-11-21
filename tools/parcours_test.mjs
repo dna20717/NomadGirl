@@ -238,6 +238,13 @@ check('Kurz antippen bremst nicht', br.st === 'normal', br);
 br = await page.evaluate(() => { const L = game.scene.getScene('play').leyla; nomad.step(36, ['left']); nomad.step(3); const a = L.state; nomad.step(4, ['right']); return { a, b: L.state }; });
 check('Gegenrichtung bricht das Bremsen sofort ab', br.a === 'brake' && br.b === 'normal', br);
 
+// #149 a ladder that ends in the air: sliding down lets go at its last rung, she falls with gravity instead of sliding on
+v = await page.evaluate(() => { const n = window.nomad, l = game.scene.getScene('play').leyla; n.tpTile(27, 15); n.step(20);
+  const top = l.feet - 640, bottom = l.feet - 256; l.body.reset(l.x, top + 64 - l.body.height / 2); l.startClimb({ cx: l.x, top, bottom });
+  const log = []; for (let i = 0; i < 80; i++) { n.step(1, ['down']); log.push([Math.round(l.feet - bottom), l.state]); }
+  const after = log.filter(([d]) => d > 12 && d < 120);
+  return { after: after.slice(0, 4), climbing: after.filter(([, st]) => st === 'climb').length, landed: l.body.blocked.down }; });
+check('Leiter endet in der Luft: ↓ lässt am Ende los und fällt (#149)', v.after.length > 0 && v.climbing === 0 && v.landed, v);
 await browser.close();
 console.log(ok.map(n => '✓ ' + n).join('\n'));
 if (errors.length) { console.error('Fehler:\n' + errors.join('\n')); process.exit(1); }
