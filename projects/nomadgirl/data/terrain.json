@@ -50,7 +50,8 @@
    {"name": "desert3_15", "cm": 50}
   ],
   "sizeMax": 200,
-  "atmosphere": "wueste_draussen"
+  "atmosphere": "wueste_draussen",
+  "fillMode": "depth"
  },
  "concrete": {
   "name": "Beton · Linoleum",
@@ -161,7 +162,8 @@
   "glows": [
    {"name": "big_station_0", "color": "#a8f0ff", "at": [53, 52], "size": [62, 84], "strength": 70, "light": 260, "behavior": "flicker"},
    {"name": "big_station_3", "color": "#dff6ff", "at": [63, 62], "size": [60, 74], "strength": 80, "light": 320, "behavior": "steady"}
-  ]
+  ],
+  "fillMode": "depth"
  },
  "concrete_wall": {
   "name": "Beton · glatte Wand",

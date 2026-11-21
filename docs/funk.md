@@ -267,10 +267,10 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #144 Kachel-Schichten nach Tiefe
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Du musst die Tilesets anders verwenden. Die Schichten machen so keinen Sinn, wie du sie einsetzt“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Du musst die Tilesets anders verwenden. Die Schichten machen so keinen Sinn, wie du sie einsetzt“)
 - **Auftrag:** Füllungen nicht zeilenweise im Wechsel, sondern nach Tiefe unter der Oberfläche (oben Füllung a, tief Füllung b); dünne Wände und Säulen bleiben Füllung a.
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Kachel-Sets › Schichtung „nach Tiefe“ (Wüste, Beton): Kruste, einmal die erste Schicht, darunter nahtloses Gestein (PixelLab 20, zwei Texturen 96 × 96, in beiden Richtungen nahtlos zugeschnitten). Säulen und Wände zeigen kein Zebramuster mehr. **Bitte testen:** Mile 7 Vorplatz (Säulen), Verkaufsraum (Wände).
 
 ### #145 POIs ohne Doppelsprung schaffbar
 - **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Es gibt POI-Situationen, wo Leyla ein Hindernis nicht passieren kann, weil sie Doublejumpen können müsste. Das geht nicht.“)
@@ -279,9 +279,9 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #146 Vordergrund in Gebäuden ohne senkrechtes Parallax
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Vordergrundobjekte IN Gebäuden können kein vertikales Parallax haben. Das sieht komisch aus.“)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Vordergrundobjekte IN Gebäuden können kein vertikales Parallax haben. Das sieht komisch aus.“)
+- **Rückfragen:** ⚠️ vorläufig: gemessen bewegten sich die Silhouetten senkrecht schon mit der Welt; drinnen gleiten sie jetzt auch seitlich nicht mehr (Parallaxe 100), draußen weiter.
+- **Ergebnis:** (Code) Spiel › Vordergrund › Parallaxe = 100 (drinnen still). **Bitte testen:** Delta Heights Büroetagen beim Springen und Laufen.
 
 ### #147 Reise-Bildschirm mit echten Grafiken
 - **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Auf dem Reise-Bildschirm sind viele Code-Grafiken, dabei haben wir doch jetzt inzwischen eine Menge cooler Grafiken und Tiles dafür.“)

@@ -10,7 +10,9 @@ export function placeForeground(scene) {
   const s = scene, G = s.data_.game?.foreground || {}, f = s.fog;
   if (G.enabled === false || s.mode === 'camp' || !f?.on) return out;
   const R = s.room, T = s.T, w = R.w, h = R.h, rnd = rng((s.levelInfo?.seed ?? s.box?.save?.run?.seed ?? 7) * 977 + 13);
-  const [e0, e1] = G.every || [5, 11], [h0, h1] = G.height || [0.4, 1.2], p = (G.parallax ?? 118) / 100;
+  // #146 (Daniel 21.11.2026: „Vordergrundobjekte IN Gebäuden können kein vertikales Parallax haben. Das sieht komisch aus.“): indoors they
+  // stand still with the world (no parallax at all); Spiel › Vordergrund › Parallaxe (100 = still) can bring the old sideways drift back
+  const [e0, e1] = G.every || [5, 11], [h0, h1] = G.height || [0.4, 1.2], p = (G.parallax ?? 100) / 100;
   const color = parseInt(String(G.color || '#060508').slice(1), 16), alpha = (G.alpha ?? 96) / 100;
   const cam = s.cam || s.cameras.main, zoom = cam.zoom || 1, halfW = cam.width / zoom / 2;
   // floor spots: indoor air (fog kind 1) on solid ground ('#': floors and ledges, no platforms);

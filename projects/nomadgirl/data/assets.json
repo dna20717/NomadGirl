@@ -7408,5 +7408,19 @@
   "source": "KI (PixelLab, create_image_pro, Stil icons_gear)",
   "date": "2026-11-21",
   "description": "Plattenträger-Weste von vorn (Daniel 21.11.: das alte Symbol sah aus wie ein Ziellaser)."
+ },
+ "sandstone_tex_source": {
+  "name": "Quelle: Sandstein-Textur",
+  "kind": "source",
+  "file": "assets/tiles/source/sandstone_tex_source.png",
+  "source": "KI (PixelLab, create_image_pro 96 × 96, Stil desert_px_source)",
+  "date": "2026-11-21"
+ },
+ "concrete_tex_source": {
+  "name": "Quelle: Beton-Textur",
+  "kind": "source",
+  "file": "assets/tiles/source/concrete_tex_source.png",
+  "source": "KI (PixelLab, create_image_pro 96 × 96, Stil concrete_px_source)",
+  "date": "2026-11-21"
  }
 }

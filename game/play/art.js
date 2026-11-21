@@ -261,6 +261,16 @@ function brandKit(scene) {
   for (const b of rows) { const i = (A[b.look]?.names || []).indexOf(b.name); if (i < 0) continue; scene.textures.get(b.look).setFilter(1); if (b.cm > 0) sizes.set(b.look + '#' + i, b.cm); list.push({ key: b.look, frame: i, cm: b.cm || 100, chance: b.chance ?? 5, ai: !!b.ai }); }
   return list.length ? { def: {}, sizes, pxPerCm: (L?.height || 192) / (D.game?.tiles?.leylaCm || 170), maxScale: 5, list } : null;
 }
+// which fill a tile below the surface gets (#144, Daniel 21.11.2026: „Die Schichten machen so keinen Sinn, wie du sie einsetzt“):
+// „rows“ = fill and fill2 take turns row by row (old sets, brick courses); „depth“ = like real ground: the first row(s) under the surface
+// are fill (the layer right under the crust), everything deeper is fill2 (seamless rock) (Kachel-Sets › Füllung darunter ab Tiefe)
+function fillOf(kit, x, y, solid) {
+  if (!kit.fill2.length) return kit.fill;
+  if ((kit.def.fillMode || 'rows') === 'rows') return y % 2 ? kit.fill2 : kit.fill;
+  const from = kit.def.fill2Depth ?? 2;
+  let d = 0; while (d < from && solid(x, y - d - 1)) d++;
+  return d >= from ? kit.fill2 : kit.fill;
+}
 export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = null) {
   const brands = !style ? brandKit(scene) : null;
   const g0 = scene.make.graphics({}, false), solid = (x, y) => x < 0 || y < 0 || x >= room.w || y >= room.h || WALLS.has(room.tiles[y][x]) || CAMO.has(room.tiles[y][x]), stamps0 = [];
@@ -300,7 +310,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
     }
     if (cg && t === '#') continue;   // camouflaged: drawn in the cover pass below
     if (kit) {
-      const top = !solid(x, y - 1), D = kit.def, seed = D.seed || 0, list = top ? kit.top : y % 2 && kit.fill2.length ? kit.fill2 : kit.fill;
+      const top = !solid(x, y - 1), D = kit.def, seed = D.seed || 0, list = top ? kit.top : fillOf(kit, x, y, solid);
       stamps.push({ key: kit.key, frame: list[x % list.length], x: px, y: py - kit.over });
       // embedded details (stones, pipes, patches) break up the repeating fill
       if (!top && kit.details.length && hash(x, y, seed + 5) * 100 < (D.detailChance ?? 0))
@@ -384,7 +394,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       for (const [x, y] of c.cover) {
         const px = x * T, py = y * T, kit = terrain?.at(x, y);
         if (kit) {
-          const top = !cs(x, y - 1), list = top ? kit.top : y % 2 && kit.fill2.length ? kit.fill2 : kit.fill;
+          const top = !cs(x, y - 1), list = top ? kit.top : fillOf(kit, x, y, cs);
           c.stamps.push({ key: kit.key, frame: list[x % list.length], x: px, y: py - kit.over });
           coverTiles.push({ x, y, kit, g: c.edges, cs });
         } else {

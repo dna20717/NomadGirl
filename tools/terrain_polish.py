@@ -107,7 +107,17 @@ def concrete():
     return [f'concrete_worn_top_{i}' for i in range(4)] + [f'concrete_worn_fill_a_{i}' for i in range(4)] + [f'concrete_worn_fill_b_{i}' for i in range(4)]
 
 
-def from_strip(src_name, out_name, prefix, fill_a, fill_b, shift_b=3, n=7, rust=False):
+def tile2d(src_name, size=T, roll=(0, 0)):
+    """#144: a texture made seamless in both directions (min cut sideways, then on the transposed picture) → size x size;
+    roll shifts the source first (another variant of the same texture)"""
+    im = Image.open(A / 'tiles/source' / src_name).convert('RGBA')
+    if roll != (0, 0): im = Image.fromarray(np.roll(np.roll(np.array(im), roll[1], 0), roll[0], 1))
+    im = seamless(im, size)
+    im = seamless(im.transpose(Image.Transpose.TRANSPOSE), size).transpose(Image.Transpose.TRANSPOSE)
+    return im.crop((0, 0, size, size))
+
+
+def from_strip(src_name, out_name, prefix, fill_a, fill_b, shift_b=3, n=7, rust=False, deep=None, deep_a=False):
     """#138 (Daniel 21.11.2026: „Beides mit PixelLab neu malen“): a PixelLab cross-section strip (512 x 256, walking line at y=64) cut into
     a Kachel-Set: seamless at n tiles, tops = rows 48-128, fill a / fill b = 64 rows from fill_a / fill_b (fill b shifted by shift_b tiles)"""
     src = fill_holes(Image.open(A / 'tiles/source' / src_name))
@@ -118,7 +128,12 @@ def from_strip(src_name, out_name, prefix, fill_a, fill_b, shift_b=3, n=7, rust=
         sheet.paste(strip.crop((x, SURF - OVER, x + T, SURF + T)), (x, 0))
         sheet.paste(strip.crop((x, fill_a, x + T, fill_a + T)), (x, (T + OVER) + OVER))
         x2 = (x + shift_b * T) % (n * T)
-        sheet.paste(strip.crop((x2, fill_b, x2 + T, fill_b + T)), (x, 2 * (T + OVER) + OVER))
+        if deep:   # #144 the rock below: one texture that repeats without seams in both directions (concrete: 3 panels mixed)
+            tex = tile2d(deep, roll=[(0, 0), (40, 24), (20, 56)][i % 3] if deep_a else (0, 0))
+            sheet.paste(tex, (x, 2 * (T + OVER) + OVER))
+            if deep_a: sheet.paste(tex, (x, (T + OVER) + OVER))
+        else:
+            sheet.paste(strip.crop((x2, fill_b, x2 + T, fill_b + T)), (x, 2 * (T + OVER) + OVER))
     if rust:   # bright red rebar read as glitches: rust brown from the same palette (AAP-64)
         a = np.array(sheet)
         for src_c, dst in (((180, 32, 42), (113, 65, 59)), ((223, 62, 35), (142, 82, 82))):
@@ -132,8 +147,10 @@ def from_strip(src_name, out_name, prefix, fill_a, fill_b, shift_b=3, n=7, rust=
 if __name__ == '__main__':
     import sys
     if 'px' in sys.argv:
-        print('desert_px', from_strip('desert_px_source.png', 'desert_px.png', 'desert_px', 128, 192, 0))
-        print('concrete_px', from_strip('concrete_px_source.png', 'concrete_px.png', 'concrete_px', 102, 102, 3, rust=True))
+        # #144 (Daniel 21.11.2026: „Die Schichten machen so keinen Sinn“): surface from the strip, right under it the strip's first layer
+        # once (fill a, desert), deeper the seamless rock (fill b); concrete walls are the seamless concrete all the way
+        print('desert_px', from_strip('desert_px_source.png', 'desert_px.png', 'desert_px', 128, 192, 0, deep='sandstone_tex_source.png'))
+        print('concrete_px', from_strip('concrete_px_source.png', 'concrete_px.png', 'concrete_px', 102, 102, 3, rust=True, deep='concrete_tex_source.png', deep_a=True))
         sys.exit(0)
     print('desert_fine', desert())
     print('concrete_worn', concrete())
