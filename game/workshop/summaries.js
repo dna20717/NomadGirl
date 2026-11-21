@@ -5,6 +5,7 @@ import { WEAR_SLOTS, TROPHY_GEAR } from '../../engine/schema.js';
 import { ROOM_TAGS } from '../../engine/project.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
 import { recipeName, keyKindName } from '../../engine/cycles.js';
+import { initLife, stepDay, planLife, lifeConfig, campType, LIFE_EVENTS } from '../../engine/ecosystem.js';
 import { parseRoom } from '../../engine/room.js';
 import { generateMap, neighbours } from '../worldmap.js';
 import { makeRoad, landscapeOf, ROADSIDE, BW, BH } from '../road.js';
@@ -429,4 +430,38 @@ export const SUMMARY = {
   },
 };
 // #074 the brand shows its sign and its Markentreue
+// #169 Ökosystem je POI: the place's state after N days (simulated like between Leyla's visits), its camps in a level of this seed, a small
+// diagram of each camp's strength day by day, and what happened (the log). Read only.
+export function ecosystemView(w, x, id) {
+  const D = w.p.data, C = lifeConfig(D);
+  if (!poiReady(D, id).ok || x.life?.off) return null;
+  const box = el('div', {}), COLORS = { gang_camp: '#f9a31b', patrol: '#e45aa8', nest: '#9cdb43', raider_camp: '#b3b9d1' };
+  let days = w.lifeDays ?? 10, seed = w.lifeSeed ?? (x.seed || 1);
+  const ev = k => LIFE_EVENTS.find(([e]) => e === k)?.[1] || k;
+  const draw = () => {
+    const S = initLife(D, id, { seed }), hist = [S.camps.map(c => ({ id: c.id, type: c.type, s: c.strength }))];
+    for (let d = 0; d < Math.max(days, 1); d++) { if (d < days) stepDay(D, id, S); hist.push(S.camps.map(c => ({ id: c.id, type: c.type, s: c.strength }))); }
+    const L = buildPoi(D, id, seed), plan = planLife(D, id, L, S, seed), R = D.rooms || {};
+    // the diagram: one line per camp, strength (0 … max) over the days
+    const W = 320, H = 110, max = Math.max(C.sim.maxStrength, C.sim.nestMax), cv = el('canvas', { width: W, height: H, style: 'display:block;margin:6px 0;background:#141013;border-radius:6px' }), g = cv.getContext('2d');
+    g.strokeStyle = '#333941'; g.beginPath(); g.moveTo(0, H - 100 / max * (H - 10) - 5); g.lineTo(W, H - 100 / max * (H - 10) - 5); g.stroke();
+    const ids = [...new Set(hist.flat().map(c => c.id))], xAt = i => 6 + i * (W - 12) / Math.max(1, hist.length - 1), yAt = v => H - 5 - v / max * (H - 10);
+    for (const cid of ids) {
+      g.strokeStyle = COLORS[hist.flat().find(c => c.id === cid).type] || '#dae0ea'; g.lineWidth = 2; g.beginPath(); let on = false;
+      hist.forEach((row, i) => { const c = row.find(o => o.id === cid); if (!c) { on = false; return; } if (on) g.lineTo(xAt(i), yAt(c.s)); else { g.moveTo(xAt(i), yAt(c.s)); on = true; } });
+      g.stroke();
+    }
+    const rows = S.camps.map(c => { const p = plan.camps.find(o => o.id === c.id), T = campType(C, c.type); return [`${c.id} · ${T.name}`, `${c.gang || (T.faction === 'mutants' ? 'Mutanten' : 'ohne Gang')} · Stärke ${c.strength} % · ${p ? `${R[p.room]?.name || p.room}, ${p.members.length} Leute` : 'kein Platz in diesem Seed'}${c.ttl ? ` · zieht in ${c.ttl} T ab` : ''}`]; });
+    box.replaceChildren(
+      el('div', { style: 'display:flex;gap:6px;flex-wrap:wrap;align-items:center' }, ...[0, 3, 10, 30].map(n => el('button', { class: 'ed-button' + (n === days ? ' wide' : ''), onclick: () => { days = w.lifeDays = n; draw(); } }, `${n} Tage`)),
+        el('button', { class: 'ed-button', onclick: () => { seed = w.lifeSeed = 1 + Math.floor(Math.random() * 1e6); draw(); } }, 'Neu würfeln')),
+      el('p', { class: 'ed-small' }, `Seed ${seed} · nach ${days} Tagen · Besitzer: ${S.owner || 'niemand'} · ${S.camps.length} Lager`),
+      cv, el('div', { class: 'ed-small', style: 'display:flex;gap:10px;flex-wrap:wrap' }, ...Object.entries(COLORS).map(([k, c]) => el('span', {}, el('b', { style: `color:${c}` }, '━ '), campType(C, k)?.name || k))),
+      facts([...rows, ['Wachen · ersetzte Spawns', `${plan.sentries.length} · ${plan.removed}`]]),
+      el('div', { class: 'ed-small' }, S.log.length ? S.log.map(l => `Tag ${l.day}: ${ev(l.kind)}${l.gang ? ` (${l.gang})` : ''}`).join(' · ') : 'Noch nichts passiert.'));
+  };
+  draw();
+  return { title: 'Ökosystem', body: el('div', { class: 'ng-eco' }, box) };
+}
+{ const level = SUMMARY.pois; SUMMARY.pois = (w, x, id) => [level(w, x, id), ecosystemView(w, x, id)]; }
 { const sign = SUMMARY.brands, set = SUMMARY.brandSet; delete SUMMARY.brandSet; SUMMARY.brands = (w, x, id) => [sign(w, x, id), set(w, x, id)]; }

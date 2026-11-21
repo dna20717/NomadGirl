@@ -116,6 +116,28 @@ const shot = async (page, name, x, feet) => {
   await a.page.close(); await b.page.close();
 }
 
+// ---------- the workshop: Leben and the Ökosystem view of a POI ----------
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } }), errs = [];
+  page.on('pageerror', e => errs.push(e.message));
+  page.on('console', m => { if (m.type() === 'error' && !/\/api\/|version\.json/.test(m.location()?.url || '')) errs.push(m.text()); });
+  await page.goto(base.replace('game.html', 'workshop.html'));
+  await page.waitForFunction(() => window.workshop?.p && !document.querySelector('#load.loading-on'), null, { timeout: 30000 });
+  await page.evaluate(() => window.workshop.go({ area: 'life' }));
+  const life = await page.evaluate(() => document.body.innerText);
+  check('Werkstatt › Leben: Beziehungen, Lager-Typen, Simulation, Regie', ['Beziehungen', 'Lager-Typen', 'Simulation', 'Regie'].every(t => life.includes(t)), life.slice(0, 300));
+  await page.evaluate(() => window.workshop.go({ area: 'pois', choice: 'bunker_13' }));
+  const eco = async () => page.evaluate(() => { const h = [...document.querySelectorAll('h4')].find(x => x.textContent === 'Ökosystem'); const box = h?.nextElementSibling; return { has: !!h, text: box?.innerText || '', canvas: !!box?.querySelector('canvas') }; });
+  let e = await eco();
+  check('Werkstatt › POI: Ökosystem mit Diagramm', e.has && e.canvas && /nach 10 Tagen/.test(e.text), e);
+  await page.evaluate(() => { const h = [...document.querySelectorAll('h4')].find(x => x.textContent === 'Ökosystem'); [...h.nextElementSibling.querySelectorAll('button')].find(b => b.textContent === '30 Tage').click(); });
+  const e30 = await eco();
+  check('Werkstatt › Ökosystem: 30 Tage simulieren ändert den Zustand', /nach 30 Tagen/.test(e30.text) && e30.text !== e.text, e30.text.slice(0, 200));
+  if (shots) { fs.mkdirSync('output', { recursive: true }); await page.evaluate(() => [...document.querySelectorAll('h4')].find(x => x.textContent === 'Ökosystem').scrollIntoView()); await page.waitForTimeout(300); await page.screenshot({ path: 'output/life_workshop.png' }); }
+  check('Werkstatt: ohne Fehler', !errs.length, errs);
+  await page.close();
+}
+
 await browser.close();
 console.log(`life_test: ${ok.length} ok, ${errors.length} Fehler`);
 for (const e of errors) console.log('  ✗ ' + e);
