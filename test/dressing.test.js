@@ -136,5 +136,9 @@ test('je POI und Raum überschreibbar (Dichte, Tags, Ensembles; Haken für #160 
   const D2 = { ...D, pois: { ...D.pois, [poi]: { ...D.pois[poi], dressing: { sets: ['sandsack'] } } } };
   const ens = new Set(planDressing({ D: D2, room: l.room, reg: l.reg, spots: l.spots, poiId: poi, seed: l.seed }).items.map(i => i.ens).filter(Boolean));
   assert.ok([...ens].every(e => e === 'sandsack'), [...ens].join());
-  assert.deepEqual(dressingOverrides({ rooms: { r: { dressing: { density: 5, prefer: 'kiste' } } } }, null, 'r'), { scale: 1, density: 5, prefer: ['kiste'], avoid: [], sets: [] });
+  const o = dressingOverrides({ rooms: { r: { dressing: { density: 5, prefer: 'kiste' } } } }, null, 'r');
+  assert.deepEqual({ scale: o.scale, density: o.density, prefer: o.prefer, avoid: o.avoid, sets: o.sets }, { scale: 1, density: 5, prefer: ['kiste'], avoid: [], sets: [] });
+  // #160: the room brief steers it (must → preferred, never → forbidden, decay room over POI)
+  const s = dressingOverrides({ pois: { p: { story: { decay: 3 } } }, rooms: { r: { story: { must: 'tisch, büro', never: 'grün', decay: 1 } } } }, 'p', 'r');
+  assert.deepEqual([s.prefer, s.forbid, s.decay], [['tisch', 'büro'], ['grün'], 1]);
 });

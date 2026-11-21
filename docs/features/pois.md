@@ -97,3 +97,14 @@ Daniel 21.11.2026: „Wie können wir hübschere, echter anfühlende Maps erscha
 - **Überschreibbar je POI und Raum** (Haken für #160 „Story zuerst“): POIs › Set-Dressing (Dichte %, bevorzugte/gemiedene Tags, nur diese Ensembles), Raum-Bausteine › Dichte hier, Tags, Ensembles; Code `dressingOverrides(D, poi, room)`.
 - **Prüfer**: `test/dressing.test.js` (alle POIs × 8 Seeds: nichts schwebt, nichts überlappt, Ort passt, kein Baum/Wrack/Straßenschild drinnen oder auf Dächern, Dichte im Rahmen, Laufwege frei, gleicher Seed = gleiche Einrichtung, Gebäude-Hülle). Bilder: `node tools/dressing_shots.mjs <tag> [--poi id] [--places]` → `output/dressing_<poi>_<n>_<tag>.png` (Eingang, größter Raum, Ausgang).
 
+
+## Story zuerst (#160)
+
+Daniel 21.11.2026: „Ich möchte, dass vor dem ersten Design die Story des POI oder des Raumes feststeht und von dort aus gestaltet wird.“ Feste Story je POI, Varianten je Run. Führend: `docs/concepts/poi_bible.md` (Story zuerst) und `docs/concepts/poi_steckbriefe.md` (abgenommen). Code: `engine/story.js` (ohne DOM).
+
+- **POIs › Story**: Früher, Menschen, Ereignis, Epoche (Verweis auf Lore › Weltchronik), Art des Ereignisses (Flucht, Kampf, Feuer, Flut, versiegelt, ordentlich geschlossen, stehen gelassen; leer = aus dem Text), Verfall 0–3, Heute, Ziel, Ton, Witz, Wunde, Schlüsselbild, Splitter (nur Datenfeld), Satz für gewürfelte Orte. Alle 13 POIs aus den Steckbriefen; Verfall Ministerium 1, Großmarkt 2, Bunker 2, Tankstelle 3, Sunny Acres 2, Funkmast 3, Delta Heights 3, P+R 3, Metro 2, Storm Drain 2, Pit 6 2, Raffinerie 3, Silo 1.
+- **Lore › Weltchronik** (`data/chronicle.json`): fünf Epochen (Boomjahre, alter Krieg, Großer Durst, Schließung, Heute) mit Nummer, Was geschah, Spuren.
+- **Gewürfelte Orte** erben die Story ihrer POI-Art (Archetyp = das Wahrzeichen der Art, `placeStory(D, node, save, owner)`): Reisekarte › Regionen färben die Story (Färbung + Verfall ±), der Besitzer aus dem Revierkrieg setzt „Heute“, jede Gefahrstufe über dem Wahrzeichen +1 Verfall (höchstens 3). Das Ort-Fenster zeigt einen Satz (Witz oder Früher, nie mit Namen des Wahrzeichens) und die Färbung der Region.
+- **Raum-Bausteine › Story**: Funktion früher, Moment des Ereignisses, Heute, Schlüsselbild, Pflicht-Dinge (2–4 Tags oder Clutter-Namen), Verboten, Verfall hier. ⚠️ Alle 123 Räume als Entwurf von Code (Penthouse Verfall 1, Silo-Kaserne 2, Pit 6 tiefste Sohle und Kristallgrotte 0).
+- **`roomStory(poi, room, { owner })`** → Rolle (Raum-Rolle, sonst aus „Funktion früher“), Verfall (Raum vor POI), Pflicht, Verbote, Bewohner (Gang-Lager, Nest, leer), Ereignis-Art, Epoche. `dressingOverrides` reicht es ans Set-Dressing: Pflicht-Dinge kommen doppelt so oft, Verbotenes nie.
+- **Prüfung**: Warnung bei fehlendem Schlüsselbild (POI, Raum) und bei Pflicht-Ding oder Verbot, das kein Clutter kennt; Hinweis außerhalb von 2–4 Pflicht-Dingen. Test: `test/story.test.js`.

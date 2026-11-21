@@ -8,6 +8,7 @@ import { fronts } from '../turf_war.js';
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { hints } from './ui_nav.js';
+import { placeStory } from '../../engine/story.js';
 import { goalEl } from './hud.js';
 import { trackedGoal as questGoal } from '../quests.js';
 import { ensureMap, placeOf, neighbours, hops, mapConfig, threatOf } from '../worldmap.js';
@@ -153,7 +154,8 @@ export class MapUI {
       b ? el('p', { class: 'wm-brand' }, `${b.name}: „${b.slogan}“`) : null,
       gangOfPlace(D, save, n.id) ? this.repRow(gangInfo(D, gangOfPlace(D, save, n.id)), save.turfs?.[n.id] ? P.gang?.name : null) : null,   // #055 whose turf, and Leyla's Ruf with them; #089 who moved in
       // the POI's own text only at the landmark itself; rolled places say what kind of place it is
-      el('p', { class: 'wm-desc' }, n.landmark && P.description ? P.description : `Wie ${P.name || 'ein POI'}, nur ${n.danger > (P.danger || 1) ? 'weiter draußen und gefährlicher' : 'ein anderer Ort'}. Was genau dort liegt, weiß man erst drinnen.`),
+      // #160: rolled places say one sentence of their archetype's story (joke or past), tinted by the region; the landmark keeps its own text
+      el('p', { class: 'wm-desc' }, n.landmark && P.description ? P.description : (() => { const S = placeStory(D, n, save, gangOfPlace(D, save, n.id) || null); return S.line ? [S.line, S.tint ? `${S.tint}.` : ''].filter(Boolean).join(' ') : `Wie ${P.name || 'ein POI'}, nur ${n.danger > (P.danger || 1) ? 'weiter draußen und gefährlicher' : 'ein anderer Ort'}. Was genau dort liegt, weiß man erst drinnen.`; })()),
       cost ? el('div', { class: 'wm-cost' }, ...[['Strecke', `${cost.km} km${(cost.legs?.length || 1) > 1 ? ` · ${cost.legs.length} Etappen` : ''}`], ['Fahrt', `${de(cost.hours)} h`], ['Sprit', `${de(cost.fuel)} l`, cost.fuel > save.fuel], ['Vorräte', de(cost.food), cost.food > save.food]]
         .map(([k, v, bad]) => el('div', { class: bad ? 'bad' : '' }, el('small', {}, k), el('b', {}, v))), this.forecastBox(cost, false)) : null,
       here ? this.forecastBox(null, true) : null,   // #087 the navigator: at home the rain of the next days

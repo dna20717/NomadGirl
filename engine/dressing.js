@@ -5,6 +5,8 @@
 //   regionMap(D, …)        which room, Kachel-Set, inside/outside and room role every tile of a level belongs to
 //   placeTypes(room, reg)  place types from the tiles: floor_in, floor_out, roof, ledge (+ corner), ceiling, wall
 
+import { roomStory } from './story.js';
+
 // Ort-Typen: where a thing can be (Kachel-Sets › Clutter-Regeln › Ort, POI-Ensembles › Ort)
 export const PLACE_TYPES = [['floor_in', 'Boden drinnen'], ['floor_out', 'Boden draußen'], ['roof', 'Dach'], ['ledge', 'Steg / Sims / Theke'],
   ['corner', 'Ecke am Wandfuß'], ['ceiling', 'Decke (hängt)'], ['wall', 'Wand (Rückwand, Augenhöhe)']];
@@ -143,10 +145,13 @@ export function pickWeighted(items, weightOf, r) {
 // Overrides per POI and room (POIs › Set-Dressing, Raum-Bausteine › Set-Dressing). Hook points for #160 „Story zuerst“: a POI's
 // story (decay, tone …) or a room brief can fill these same fields (or be mapped onto them here) without touching the planner.
 // → { scale (POI density in %, as factor), density (room: things per 10 floor tiles, else null = role), prefer, avoid (tags), sets (ensemble ids, [] = all) }
+// #160 Dressing liest die Story: the room brief's must-things are preferred, its never-things are forbidden (tag or clutter name), decay
+// comes from the story (room over POI) → also { must, forbid, decay, story (roomStory) }
 export function dressingOverrides(D, poiId, roomId) {
   const P = D?.pois?.[poiId]?.dressing || {}, R = D?.rooms?.[roomId]?.dressing || {};
-  return { scale: (P.density ?? 100) / 100, density: R.density ?? null, prefer: [...list(P.prefer), ...list(R.prefer)], avoid: [...list(P.avoid), ...list(R.avoid)],
-    sets: R.sets?.length ? R.sets : P.sets?.length ? P.sets : [] };
+  const S = roomId && D?.rooms?.[roomId] ? roomStory(D?.pois?.[poiId] || {}, D.rooms[roomId]) : null;
+  return { scale: (P.density ?? 100) / 100, density: R.density ?? null, prefer: [...list(P.prefer), ...list(R.prefer), ...(S?.must || [])], avoid: [...list(P.avoid), ...list(R.avoid)],
+    sets: R.sets?.length ? R.sets : P.sets?.length ? P.sets : [], must: S?.must || [], forbid: S?.never || [], decay: S?.decay ?? D?.pois?.[poiId]?.story?.decay ?? null, story: S };
 }
 
 // ---------- the plan (#158 steps 4 + 5): ensembles first, then single things up to a budget, ways kept free ----------
@@ -251,7 +256,7 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
   const cands = (R, extra = false) => [...poolOf(R.set), ...brands, ...(extra ? sets.filter(id => id !== R.set).flatMap(id => poolOf(id).map(c => ({ ...c, borrowed: true }))) : [])];
   // per POI and per room (#160 hooks): density, preferred and avoided tags, which ensembles (dressingOverrides)
   let ov = null;
-  const weight = (c, role) => { let w = roleWeight(c.rule, role, rc) * (c.borrowed ? 0.3 : 1); const t = tagsOf(c); if (ov?.prefer.length && t.some(x => ov.prefer.includes(x))) w *= 2; if (ov?.avoid.length && t.some(x => ov.avoid.includes(x))) w *= 0.25; return w; };
+  const weight = (c, role) => { let w = roleWeight(c.rule, role, rc) * (c.borrowed ? 0.3 : 1); const t = tagsOf(c); if (ov?.forbid.length && (ov.forbid.includes(c.name) || t.some(x => ov.forbid.includes(x)))) return 0; if (ov?.prefer.length && t.some(x => ov.prefer.includes(x))) w *= 2; if (ov?.avoid.length && t.some(x => ov.avoid.includes(x))) w *= 0.25; return w; };
   const hangOnly = c => { const P = list(c.rule.place); return P.length > 0 && P.every(p => p === 'wall' || p === 'ceiling'); };
   let ri = 0;
   for (const R of regions.values()) {

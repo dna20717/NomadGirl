@@ -34,7 +34,7 @@ export function eventKind(story) {
 }
 
 // Raum-Rolle from „Funktion früher“ when the room has no role of its own (Bibel: Funktion früher → Raum-Rolle)
-const ROLE_WORDS = [['shop', /Laden|Verkauf|Kasse|Kiosk|Kaufhaus|Spielhalle|Food|Imbiss|Markt/i], ['storage', /Lager|Vorrat|Asservat|Waffenkammer|Depot|Reifen/i],
+const ROLE_WORDS = [['storage', /^\S*(Lager|Vorrat|Asservat|Waffenkammer|Depot|Reifen)/i], ['shop', /Laden|Verkauf|Kasse|Kiosk|Kaufhaus|Spielhalle|Food|Imbiss|Markt/i], ['storage', /Lager|Vorrat|Asservat|Waffenkammer|Depot/i],
   ['office', /Büro|Amt|Archiv|Registratur|Verwaltung|Akten|Kommando/i], ['tech', /Technik|Leitstand|Stellwerk|Reaktor|Server|Generator|Funk|Lüftung|Labor|Kontroll|Kabine/i],
   ['living', /Wohn|Schlaf|Kantine|Quartier|Kaserne|Messe|Kaue|Kino|Penthouse|Kranken/i], ['hall', /Halle|Saal|Werkstatt|Kessel|Sammler|Schacht/i],
   ['corridor', /Gang|Flur|Treppe|Schleuse|Rampe|Rolltreppe|Galerie|Steg|Stollen|Kanal/i], ['cave', /Höhle|Grotte|Kaverne|Sohle/i]];
