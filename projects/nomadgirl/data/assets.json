@@ -7381,5 +7381,21 @@
   "source": "KI (PixelLab) + Code (tools/terrain_polish.py px)",
   "derivedFrom": "concrete_px_source",
   "date": "2026-11-21"
- }
+ },
+ "leyla_throw_arm": {
+  "name": "Leyla · Wurfarm (Granate)",
+  "kind": "animation",
+  "file": "assets/leyla/grenade/throw_arm.png",
+  "frameSize": [128, 64],
+  "frames": 2,
+  "fps": 1,
+  "loop": false,
+  "origin": [12, 32],
+  "height": 64,
+  "source": "KI (PixelLab, create_image_pro mit Leyla als Vorlage) + Code (zugeschnitten, an der Schulter ausgerichtet)",
+  "derivedFrom": "leyla_throw_arm_source",
+  "date": "2026-11-21",
+  "description": "Bild 1: Arm mit Granate, Bild 2: offene Hand; waagerecht nach rechts, Schulter = Ankerpunkt. Der Code dreht ihn beim Wurf (#140)."
+ },
+ "leyla_throw_arm_source": {"name": "Leyla · Wurfarm Quelle", "kind": "source", "file": "assets/leyla/grenade/arm_grip_source.png", "source": "KI (PixelLab)", "date": "2026-11-21"}
 }

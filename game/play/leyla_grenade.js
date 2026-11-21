@@ -14,7 +14,7 @@ export class LeylaGrenade {
   get c() {
     const G = this.l.d.grenade || {};
     return { enabled: G.enabled !== false, charges: Math.max(1, G.charges ?? 3), cooldown: (G.cooldown ?? 180) * 1000, refill: G.refill || 'all', item: G.item || 'granate',
-      fuse: G.fuse ?? 900, radius: G.radius ?? 160, damage: G.damage ?? 40, burn: G.burn ?? 3, velocity: G.velocity || [620, -900], throwTime: G.throwTime ?? 220, hand: G.hand || [30, 170], look: G.look || '' };
+      fuse: G.fuse ?? 900, radius: G.radius ?? 160, damage: G.damage ?? 40, burn: G.burn ?? 3, velocity: G.velocity || [620, -900], throwTime: G.throwTime ?? 220, hand: G.hand || [30, 170], look: G.look || '', arm: G.arm || '', shoulder: (G.shoulder ?? 69) / 100 };
   }
   now() { return this.l.scene.now ?? this.l.scene.time.now; }
   reset() { this.pose = null; }
@@ -59,7 +59,7 @@ export class LeylaGrenade {
     this.g ??= s.add.graphics().setDepth(10.6);
     this.g.clear();
     const sp = l.sprite, A = c.look && s.data_.assets?.[c.look];
-    if (!P) { this.over?.setVisible(false); return; }
+    if (!P) { this.over?.setVisible(false); this.arm?.setVisible(false); return; }
     const p = Math.min(1, (time - P.at) / (P.end - P.at));
     if (A && s.textures.exists(c.look)) {   // painted upper body: same box, anchor and flip as the body under it
       this.over ??= s.add.sprite(sp.x, sp.y, c.look).setDepth(10.5);
@@ -68,10 +68,19 @@ export class LeylaGrenade {
         .setPosition(sp.x, sp.y).setScale((A.height || l.height) / fh).setFlipX(l.facing < 0);
       return;
     }
-    // placeholder from code: the arm swings from behind the head over the top and forward, the grenade leaves at „release“
-    const f = l.facing, sx = l.x - f * 6, sy = l.feet - l.height * 0.88, len = l.height * 0.32;
-    const wind = Math.min(1, (time - P.at) / Math.max(1, P.release - P.at));
+    // the arm swings from behind the head over the top and forward, the grenade leaves at „release“
+    const f = l.facing, wind = Math.min(1, (time - P.at) / Math.max(1, P.release - P.at));
     const ang = P.done ? -0.2 + Math.min(1, (time - P.release) / 200) * 0.9 : -2.6 + wind * 2.4;   // radians from forward, negative = up/back
+    const B = c.arm && s.data_.assets?.[c.arm];
+    if (B && s.textures.exists(c.arm)) {   // #140 the painted arm (PixelLab), turned at the shoulder: fits standing, walking, running, jumping
+      const [fw, fh] = B.frameSize || [128, 64], o = B.origin || [12, 32], k = l.height / (s.data_.assets?.leyla_idle_side?.frameSize?.[1] || 242);   // the same pixel size as Leyla's own pictures
+      this.arm ??= s.add.sprite(0, 0, c.arm, 0).setDepth(10.55);
+      this.arm.setVisible(true).setFrame(P.done ? 1 : 0).setOrigin(o[0] / fw, o[1] / fh).setScale(k).setFlipX(f < 0)
+        .setPosition(l.x - f * l.height * 0.03, l.feet - l.height * c.shoulder).setRotation(f > 0 ? ang : -ang);
+      if (P.done && (time - P.release) > 260) this.arm.setAlpha(Math.max(0, 1 - (time - P.release - 260) / 120)); else this.arm.setAlpha(1);
+      return;
+    }
+    const sx = l.x - f * 6, sy = l.feet - l.height * 0.88, len = l.height * 0.32;
     const ex = sx + f * Math.cos(ang) * len, ey = sy + Math.sin(ang) * len;
     this.g.lineStyle(12, 0x0d0a12, 0.9).lineBetween(sx, sy, ex, ey);
     this.g.lineStyle(7, 0xe8b89a, 1).lineBetween(sx, sy, ex, ey);

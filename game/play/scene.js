@@ -89,6 +89,7 @@ export class PlayScene extends Phaser.Scene {
     const DR = this.data_.drone || {};
     for (const id of [DR.look, DR.face?.look, DR.face?.glass, ...(DR.parts || []).filter(r => r.on).map(r => r.look)]) if (id) ids.add(id);
     for (const r of this.data_.leyla?.idles || []) if (r.look) ids.add(r.look);
+    for (const k of ['look', 'arm']) if (this.data_.leyla?.grenade?.[k]) ids.add(this.data_.leyla.grenade[k]);   // #140 the throw
     { const C = this.data_.leyla?.combo || {}; for (const r of C.hits || []) for (const id of [r.look, r.walk]) if (id) ids.add(id); if (C.finisher) ids.add(C.finisher); }   // melee combo (Leyla › Kombo)
     for (const w of Object.values(this.data_.weapons || {})) for (const id of [w.sound, ...Object.values(w.poses || {}).filter(v => typeof v === 'string')]) if (id) ids.add(id);   // Waffen › Posen
     const SP = this.data_.game?.spawn;

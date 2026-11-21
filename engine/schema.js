@@ -685,7 +685,9 @@ export const AREAS = {
         point('grenade.velocity', 'Wurf', { unit: 'px/s', hint: 'Abwurf nach vorn und oben. Leer = [620, -900]; mit ↑ gehalten höher, mit ↓ flach' }),
         num('grenade.throwTime', 'Wurf dauert', { unit: 'ms', min: 0, hint: 'Ausholen bis Loslassen. Leer = 220' }),
         point('grenade.hand', 'Wurfhand', { unit: 'px', hint: 'Über den Füßen, nach vorn (bei 192 px Leyla). Leer = [30, 170]' }),
-        ref('grenade.look', 'Wurf-Oberkörper', 'assets', { hint: 'Animation nur mit Oberkörper (Beine durchsichtig), wird über Stehen, Gehen, Rennen und Springen gelegt. Leer = Platzhalter aus Code' })] },
+        ref('grenade.look', 'Wurf-Oberkörper', 'assets', { hint: 'Animation nur mit Oberkörper (Beine durchsichtig), wird über Stehen, Gehen, Rennen und Springen gelegt. Leer = Wurfarm' }),
+        ref('grenade.arm', 'Wurfarm', 'assets', { hint: '#140 (Daniel: „ordentliche Animationen, die kompatibel mit Gehen, Rennen und Springen sind“): ein gemalter Arm (Bild 1 mit Granate, Bild 2 offene Hand, waagerecht nach rechts, Schulter = Ankerpunkt), der Code dreht ihn an der Schulter von hinten über den Kopf nach vorn. Passt so zu jeder Bewegung. Leer = Platzhalter aus Code' }),
+        num('grenade.shoulder', 'Schulter', { unit: '% der Höhe', min: 0, max: 100, hint: 'Drehpunkt über den Füßen. Leer = 69' })] },
     ],
     check: (x, report, p) => {
       const W = p.data.weapons || {};

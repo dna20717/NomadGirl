@@ -218,5 +218,6 @@
   ]
  },
  "null": "voice",
- "voice": "leyla"
+ "voice": "leyla",
+ "grenade": {"arm": "leyla_throw_arm"}
 }
