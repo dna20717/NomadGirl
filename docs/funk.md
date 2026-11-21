@@ -299,9 +299,9 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #155 Gegner: Ergeben für alle, Sirene zerschießbar, Verstärkung aus Türen, Gang-Ausrüstung
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniels Karten 21.11. abends: Ergeben a (alle Plünderer mit kleiner Chance), Sirene a (zerschießbar, Hacken später), Verstärkung a (aus Türen), Gang-Ausrüstung a (so bauen wie erklärt).)
-- **Rückfragen:**
-- **Ergebnis:**
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniels Karten 21.11. abends: Ergeben a (alle Plünderer mit kleiner Chance), Sirene a (zerschießbar, Hacken später), Verstärkung a (aus Türen), Gang-Ausrüstung a (so bauen wie erklärt).)
+- **Rückfragen:** ⚠️ vorläufig: Haus-Zusatz der Gangs wartet auf den Katalog „Gegner-Zusätze“ (stattdessen Baustein-Spalte und Wurfgegenstand); Ausrüstung wird je Spawn gewürfelt; kaputte Sirenen bleiben nach einem k.o. kaputt; ohne funktionierende Sirene kein Alarm.
+- **Ergebnis:** (Code, per Helfer) Alle Plünderer ergeben sich mit 15 % unter 25 % Leben (Spiel › Kampf); Sirenen haben 30 Leben, Schüsse, Hiebe und Explosionen zerstören sie (Funken, „Sirene kaputt“), Hacken-Haken vorbereitet; Verstärkung kommt aus der Tür nahe der Sirene, die Leyla nicht sieht (Tür fährt kurz hoch); POIs › Gang: Bausteine, Ausrüstung (Gegner, Waffe, Kopf, Baustein, Chance), Wurfgegenstand, für alle 12 Gangs ausgefüllt. Tests npm 385, Bausteine 32, Gegner 25, Raider 22, Alarm 4, POI 33. **Bitte testen:** Bunker 13 (Rust Guard: Helme, Sirenen zerschießen), Tankstelle (Yellow Vultures: Schrotflinten, Molotows).
 
 ### #156 Granate einzeln, Gelände orthogonal mit sanften Übergängen, Höhle, Stützen, Markenschild nach Ort
 - **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniels Karten: Granate b (einzeln, je Ladung 60 s), Gelände b („Die Perspektive ist nicht orthogonal genug, ein wenig mehr drauf achten. Außerdem brauchen die Tilesets sanftere Übergänge zwischen den Schichten“), Höhlen-Set a, Stützen/Gerüste eigene Grafik b, Markenschild b (passend zum Ort), alte Generatoren löschen a.)
