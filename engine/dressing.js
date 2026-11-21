@@ -140,6 +140,15 @@ export function pickWeighted(items, weightOf, r) {
   return items.at(-1);
 }
 
+// Overrides per POI and room (POIs › Set-Dressing, Raum-Bausteine › Set-Dressing). Hook points for #160 „Story zuerst“: a POI's
+// story (decay, tone …) or a room brief can fill these same fields (or be mapped onto them here) without touching the planner.
+// → { scale (POI density in %, as factor), density (room: things per 10 floor tiles, else null = role), prefer, avoid (tags), sets (ensemble ids, [] = all) }
+export function dressingOverrides(D, poiId, roomId) {
+  const P = D?.pois?.[poiId]?.dressing || {}, R = D?.rooms?.[roomId]?.dressing || {};
+  return { scale: (P.density ?? 100) / 100, density: R.density ?? null, prefer: [...list(P.prefer), ...list(R.prefer)], avoid: [...list(P.avoid), ...list(R.avoid)],
+    sets: R.sets?.length ? R.sets : P.sets?.length ? P.sets : [] };
+}
+
 // ---------- the plan (#158 steps 4 + 5): ensembles first, then single things up to a budget, ways kept free ----------
 // Spiel › Set-Dressing: density = things per 10 floor tiles („bewohnt“ ≈ 3), per role in the table Rollen; minGap = free tiles between
 // two things (Poisson along the floor); ensembles = share of the budget for ensembles (%); wall = share for wall and ceiling things (%)
@@ -221,7 +230,7 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
     const set = idAt(...air);
     if (!poolOf(set).length) continue;
     const r = roomAt(...air), key = keyOf(r);
-    if (!regions.has(key)) regions.set(key, { key, role: roleAt(...air), set, stand: [], hang: [], placed: 0 });
+    if (!regions.has(key)) regions.set(key, { key, room: r?.id || null, role: roleAt(...air), set, stand: [], hang: [], placed: 0 });
     regions.get(key)[STANDING.has(s.type) ? 'stand' : 'hang'].push(s);
   }
   const fitsAt = (c, x, y) => {
@@ -240,21 +249,27 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
     return it;
   };
   const cands = (R, extra = false) => [...poolOf(R.set), ...brands, ...(extra ? sets.filter(id => id !== R.set).flatMap(id => poolOf(id).map(c => ({ ...c, borrowed: true }))) : [])];
-  const weight = (c, role) => roleWeight(c.rule, role, rc) * (c.borrowed ? 0.3 : 1);
+  // per POI and per room (#160 hooks): density, preferred and avoided tags, which ensembles (dressingOverrides)
+  let ov = null;
+  const weight = (c, role) => { let w = roleWeight(c.rule, role, rc) * (c.borrowed ? 0.3 : 1); const t = tagsOf(c); if (ov?.prefer.length && t.some(x => ov.prefer.includes(x))) w *= 2; if (ov?.avoid.length && t.some(x => ov.avoid.includes(x))) w *= 0.25; return w; };
   const hangOnly = c => { const P = list(c.rule.place); return P.length > 0 && P.every(p => p === 'wall' || p === 'ceiling'); };
   let ri = 0;
   for (const R of regions.values()) {
     ri++;
     R.spots = R.stand.length;
-    R.budget = Math.round(R.spots * cfg.densityOf(R.role) / 10);
+    ov = dressingOverrides(D, poiId, R.room);
+    R.budget = Math.round(R.spots * (ov.density ?? cfg.densityOf(R.role)) * ov.scale / 10);
     const order = [...R.stand].sort((a, b) => score(b) - score(a));
+    const same = c => items.filter(it => it.room === R.key && it.name === c.name).length;   // no room full of the same thing
     // 1. ensembles (POI-Ensembles): the core on a good spot, companions to its left and right
     const ensBudget = Math.floor(R.budget * cfg.ensembles / 100);
-    const ensList = Object.entries(D.poiSets || {}).filter(([, e]) => (e.weight ?? 1) > 0 && (e.members || []).length && (!e.roles?.length || e.roles.includes(R.role)));
+    const ensList = Object.entries(D.poiSets || {}).filter(([id, e]) => (e.weight ?? 1) > 0 && (e.members || []).length && (!e.roles?.length || e.roles.includes(R.role)) && (!ov.sets.length || ov.sets.includes(id)));
     const pool = cands(R, true).filter(c => !hangOnly(c));
     let ensPlaced = 0;
     for (let k = 0; k < 6 && ensList.length && ensPlaced < ensBudget; k++) {
-      const [eid, E] = pickWeighted(ensList, ([, e]) => (e.weight ?? 1) * (e.roles?.length ? 2 : 1), hash(k, ri, s0 + 21));
+      const open = ensList.filter(([id]) => !items.some(it => it.room === R.key && it.ens === id));   // each ensemble once per room
+      if (!open.length) break;
+      const [eid, E] = pickWeighted(open, ([, e]) => (e.weight ?? 1) * (e.roles?.length ? 2 : 1), hash(k, ri, s0 + 21));
       const places = E.place?.length ? E.place : ['floor_in'];
       const at = (c, x, y) => fitsAt(c, x, y) && places.includes(spots.at(x, y).type);
       for (const a of order.filter(s => places.includes(s.type) && (!E.corner || s.corner || k > 2)).slice(0, 40)) {
@@ -285,7 +300,6 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
     // 2. single things up to the budget, a free tile between neighbours, corners and spots under lamps first
     if (!singles) continue;
     const single = cands(R).filter(c => !hangOnly(c)), ais = () => items.filter(it => it.ai && it.room === R.key).length;
-    const same = c => items.filter(it => it.room === R.key && it.name === c.name && !it.ens).length;   // no room full of the same thing
     for (const s of order) {
       if (R.placed >= R.budget) break;
       if (!free(s.x, s.y) || keep.has(s.x + ',' + s.y)) continue;
@@ -302,7 +316,7 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
       if (hung >= wallBudget) break;
       if (wallKeep.has(s.x + ',' + s.y) || items.some(it => it.hang !== 'stand' && Math.abs(it.x - s.x) < 5 && Math.abs(it.y - s.y) < 3)) continue;
       if (s.type === 'ceiling') { let ld = false; for (let k = 0; k < s.drop; k++) for (const dx of [-1, 0, 1]) if (ch(s.x + dx, s.y + k) === 'H') ld = true; if (ld) continue; }
-      const fit = hangPool.filter(c => list(c.rule.place).includes(s.type) && c.w === 1 && (s.type !== 'ceiling' || s.drop >= c.h + 3));
+      const fit = hangPool.filter(c => list(c.rule.place).includes(s.type) && c.w === 1 && same(c) < cfg.sameMax && (s.type !== 'ceiling' || s.drop >= c.h + 3));
       const c = pickWeighted(fit, c => weight(c, R.role), hash(s.x, s.y, s0 + 71));
       if (c) { put(c, s.x, s.y, s.type, s.type, null, R); hung++; }
     }
