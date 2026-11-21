@@ -23,8 +23,8 @@ from scipy.spatial import Delaunay
 ROOT = 'projects/nomadgirl/assets/raider/'
 SRC = ROOT + 'source/'
 CANVAS = 256
-FPS = {'walk': 10, 'run': 12, 'alert': 6, 'crouch': 14, 'attack': 12, 'hit': 14, 'death': 10}
-LOOP = {'walk': True, 'run': True, 'alert': True, 'crouch': False, 'attack': False, 'hit': False, 'death': False}
+FPS = {'idle': 4, 'patrol': 8, 'walk': 10, 'run': 12, 'alert': 6, 'crouch': 14, 'attack': 12, 'hit': 14, 'death': 10}
+LOOP = {'idle': True, 'patrol': True, 'walk': True, 'run': True, 'alert': True, 'crouch': False, 'attack': False, 'hit': False, 'death': False}
 
 def rgba(path):
     return np.array(Image.open(path).convert('RGBA')).astype(np.int32)
@@ -189,11 +189,14 @@ def main():
     for d in anims:
         name = os.path.basename(os.path.dirname(d))
         cls = name.split('_')[0]
-        if cls not in keys:
-            kp = SRC + f'pose_{cls}.png'
+        # #148 the relaxed states (idle, patrol) start from their own key pose (weapon lowered)
+        kname = cls + ('_relaxed' if name.split('_', 1)[-1] in ('idle', 'patrol') and os.path.exists(SRC + f'pose_{cls}_relaxed.png') else '')
+        if kname not in keys:
+            kp = SRC + f'pose_{kname}.png'
             k = rgba(kp) if os.path.exists(kp) else base
             k = k.copy(); k[green(k)] = 0
-            keys[cls] = k
+            keys[kname] = k
+        cls = kname
         files = sorted(glob.glob(d + '*.png'))
         fr = [no_flash(rgba(f)) for f in files]
         f0 = fr[0].copy(); f0[green(f0)] = 0
@@ -249,7 +252,7 @@ def main():
             diffs = [abs((r[0]['angle'] - raw[j][0]['angle'] + 180) % 360 - 180) for j in js]
             if diffs and all(d > (110 if state == 'attack' else 70) for d in diffs): raw[i] = (None, r[1], 'gone')
         # loops (alert, walk, run) hold the weapon roughly the same way: far off the circular mean = measured wrong
-        if state in ('alert', 'walk', 'run'):
+        if state in ('alert', 'walk', 'run', 'idle', 'patrol'):
             ok_ = [r[0]['angle'] for r in raw if r[2] == 'ok']
             if ok_:
                 ref = np.degrees(np.arctan2(np.mean(np.sin(np.radians(ok_))), np.mean(np.cos(np.radians(ok_)))))

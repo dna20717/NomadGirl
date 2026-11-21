@@ -290,9 +290,9 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #148 Gegner entspannt, solange keine Gefahr
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Fast alle Gegner laufen mit gezogener Waffe durch die Gegend. Lass sie idle sein, wenn keine Gefahr im Verzug ist.“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Fast alle Gegner laufen mit gezogener Waffe durch die Gegend. Lass sie idle sein, wenn keine Gefahr im Verzug ist.“)
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Entspannte Posen je Waffenklasse (Stehen + Gehen, PixelLab 84): auf Patrouille und friedlich mit gesenkter Waffe, Hammer auf der Schulter; bei Alarm wie bisher. Test `raider_test` (22). **Bitte testen:** einen POI betreten und die Gegner beobachten, bevor sie Leyla sehen.
 
 ### #138 Gelände mit PixelLab neu + keine schwebenden Plattformen draußen
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: Karte „Gelände“ c: „Beides mit PixelLab neu malen“; Notiz: „Es soll keine schwebenden Plattformen außerhalb von Gebäuden geben. Bitte mach dort immer einen Hintergrund hin. Generiere zur Not ein Set ‚Höhle‘, wenn du es brauchst“)

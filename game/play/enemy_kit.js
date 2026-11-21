@@ -223,7 +223,9 @@ export function kitShow(e, time) {
   else if (!melee && e.shotAt && A.attack && time - e.shotAt < A.attack.frames / A.attack.fps * 1000) { st = 'attack'; t0 = e.shotAt; }
   else {
     const v = Math.abs(b.velocity.x), run = (e.d.speed ?? 120) * 0.65;
-    st = !b.blocked.down && e.kind !== 'flyer' ? 'alert' : v > run ? 'run' : v > 10 ? 'walk' : 'alert';
+    // #148 (Daniel 21.11.2026: „Lass sie idle sein, wenn keine Gefahr im Verzug ist“): on patrol or peaceful the weapon stays lowered
+    const calm = (e.state === 'patrol' || e.peaceful) && !e.shotAt;
+    st = !b.blocked.down && e.kind !== 'flyer' ? 'alert' : v > run ? 'run' : v > 10 ? (calm && A.patrol ? 'patrol' : 'walk') : calm && A.idle ? 'idle' : 'alert';
   }
   // windup: the first frames of the attack, spread over the warning
   if (st === 'windup') {
@@ -236,10 +238,10 @@ export function kitShow(e, time) {
   }
   if (!A[st]) st = st === 'run' && A.walk ? 'walk' : st === 'crouch' || st === 'death' || st === 'hit' ? (A.alert ? 'alert' : Object.keys(A)[0]) : A.alert ? 'alert' : Object.keys(A)[0];
   const a = A[st];
-  if (st === 'alert' || st === 'walk' || st === 'run') {
+  if (st === 'alert' || st === 'walk' || st === 'run' || st === 'idle' || st === 'patrol') {
     e.kitState = st;
     if (sp.anims.currentAnim?.key !== a.key || !sp.anims.isPlaying) sp.play(a.key, true);
-    sp.anims.timeScale = st === 'alert' ? 1 : Math.max(0.5, Math.min(1.6, Math.abs(b.velocity.x) / ((e.d.speed ?? 120) * (st === 'run' ? 1 : 0.4))));
+    sp.anims.timeScale = st === 'alert' || st === 'idle' ? 1 : Math.max(0.5, Math.min(1.6, Math.abs(b.velocity.x) / ((e.d.speed ?? 120) * (st === 'run' ? 1 : 0.4))));
     return;
   }
   const f = from + Math.floor(Math.max(0, time - (t0 || time)) / 1000 * a.fps);

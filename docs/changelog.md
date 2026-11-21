@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 21.11.2026: **Daniels Rückmeldung am Abend** (#144, #146, #148): Kachel-Schichten wie echtes Gestein (Kruste, eine Schicht, darunter nahtloser Fels); Vordergrund in Gebäuden steht still; Gegner gehen auf Patrouille entspannt mit gesenkter Waffe und ziehen erst bei Gefahr.
 - 21.11.2026: **Herstellerlogos an Entities** (Daniel): Im Inventar trägt jede Entity das Logo ihres Herstellers als Plakette; der Tooltip nennt Bits und Hersteller.
 - 21.11.2026: **Markenschild am POI** (Daniel: „Die Firmenlogos werden in den POI nicht angezeigt“): Am Eingang jedes POI steht die Marke des Orts von der Reisekarte als Schild auf einem Mast, mit Logo, Name und Slogan.
 - 21.11.2026: **POIs wie echte Gebäude, neues Gelände** (#136, #138, #140): alle 110 Räume mit echten Geschossen (6 Kacheln Luft), Treppenhäusern und Durchbrüchen; Hallen bleiben hoch und bekommen Galerien; draußen schwebt keine Plattform mehr. Wüste und Beton neu gemalt. Leylas Wurfarm für Granaten gemalt; der Plattenträger hat ein eigenes Westen-Symbol.

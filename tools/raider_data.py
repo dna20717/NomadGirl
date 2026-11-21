@@ -9,7 +9,7 @@ DATA = 'projects/nomadgirl/data/'
 S = json.load(open('projects/nomadgirl/assets/raider/source/strips.json'))
 A = json.load(open(DATA + 'assets.json'))
 K = json.load(open(DATA + 'kits.json'))
-NAMES = {'alert': 'Alarm', 'walk': 'Gehen', 'run': 'Rennen', 'crouch': 'Ducken', 'attack': 'Angriff', 'hit': 'Treffer', 'death': 'Tod'}
+NAMES = {'idle': 'Stehen (entspannt)', 'patrol': 'Gehen (entspannt)', 'alert': 'Alarm', 'walk': 'Gehen', 'run': 'Rennen', 'crouch': 'Ducken', 'attack': 'Angriff', 'hit': 'Treffer', 'death': 'Tod'}
 CLS = {'light': 'leicht', 'heavy': 'beidhändig', 'pistol': 'Pistole', 'long': 'Langwaffe', 'none': 'ohne Waffe'}
 HN = {'mohawk': 'Irokese', 'gasmask': 'Gasmaske', 'topknot': 'Haarknoten + Cyberauge', 'dreads': 'Dreadlocks', 'hood': 'Kapuze mit Visier', 'helmet': 'Stachelhelm'}
 

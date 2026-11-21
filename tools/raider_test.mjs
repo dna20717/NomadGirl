@@ -59,7 +59,10 @@ const R = await page.evaluate(() => {
   const s = game.scene.getScene('play'), out = {}, now = () => s.now;
   const e = s.enemies.find(x => x.id === 'brecher'), g = s.enemies.find(x => x.id === 'gewehrschuetze'), p = s.enemies.find(x => x.id === 'pistolero'), k = s.enemies.find(x => x.id === 'keulenschwinger');
   // walking and running come from the speed
-  e.state = 'patrol'; e.body.setVelocityX(80); e.body.blocked.down = true; e.draw(now()); out.walk = e.kitState;
+  // #148 on patrol the weapon stays lowered (idle, patrol); engaged: walk and alert
+  e.state = 'patrol'; e.body.setVelocityX(80); e.body.blocked.down = true; e.draw(now()); out.patrol = e.kitState;
+  e.body.setVelocityX(0); e.draw(now()); out.idle = e.kitState;
+  e.state = 'engage'; e.body.setVelocityX(80); e.draw(now()); out.walk = e.kitState;
   e.body.setVelocityX(400); e.draw(now()); out.run = e.kitState;
   e.body.setVelocityX(0); e.state = 'engage'; e.draw(now()); out.alert = e.kitState;
   // windup of the heavy hit: the first frames of the attack
@@ -74,6 +77,7 @@ const R = await page.evaluate(() => {
   return out;
 });
 check('Gehen, Rennen, Alarm nach Tempo und Zustand', R.walk === 'walk' && R.run === 'run' && R.alert === 'alert', R);
+check('Ohne Gefahr entspannt: Stehen und Gehen mit gesenkter Waffe (#148)', R.patrol === 'patrol' && R.idle === 'idle', R);
 check('Beidhändiger Hieb: Ausholen in der Warnung, Schlag danach', R.windup[0] === 'attack' && R.windup[1] <= 3 && R.strike[0] === 'attack' && R.strike[1] >= 3, R);
 check('Leichter Hieb spielt den Angriff', R.light[0] === 'attack' && R.light[1] === 'light', R.light);
 check('Schuss Langwaffe: Rückstoß + Mündung vorn an der Waffe', R.shot[0] === 'attack' && R.shot[1] === 'long' && R.muzzle.dx > 40 && R.muzzle.up > R.muzzle.h * 0.55, R);
