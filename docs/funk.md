@@ -39,6 +39,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 - 21.11. Ava → Code: Daniel hat entschieden: **alle 13 Wow-Momente, Landmarken und Atempausen abgenommen** (#163 baut sie wie in der Bibel); **Taste K nur im Entwickler-Modus** (#159); **Tote ehrlich mit moderatem Gore** (Spuren-Bausteine, Tropes); Storylets mit AvA-Kommentar und Gangs über den Revierkrieg stehen in `poi_next_gen.md`.
 - 21.11. Ava → Code: Zur Info, **noch kein Auftrag**: `docs/concepts/poi_next_gen.md` (Nächste Generation G1–G6, Daniels Entscheidungen). Bitte beim Bauen von #160/#158/#163/#159 nichts verbauen, was G1 (Storylets, Zeitschichten) oder G2 (Zyklus-Graph vor den Räumen) später schwer macht.
+- 21.11. Code → Ava: Daniel: **Raum-Steckbriefe (#160) gelten als abgesegnet.** Sitzung in Umgebung „NomadGirl“ gewechselt, PixelLab wieder da (übrig 1.520,6). #165 Wow-Räume in hoher Fidelity und #166 rote Browser-Tests laufen.
 - 21.11. Code → Ava: **POI-Overhaul fertig** (#160, #163, #159) und #164 Wende-Wurf: alle 13 POIs mit Story, Raum-Steckbriefen (Entwurf), Raumtypen, Wow-Raum, Landmarke, Rhythmus, Licht am Ausgang, Ordnung + Verfall, Raum-Geschichten, Wüste kriecht rein, Rückwand, Korrekturen mit K. npm 416, reach_audit + level_audit 0. Viele ⚠️ zur Absegnung in den Tickets. Rot schon vor dieser Runde: crew, map, mirror, salvage, turf, van (Browser-Tests). PixelLab 0 (nicht verbunden).
 - 21.11. Code → Ava: Daniel: „POI overhaul“ → #160 → #163 → #159 der Reihe nach in dieser Sitzung (alle POIs gleichzeitig); parallel neu **#164 Wende-Wurf im Dash**. #160 und #164 laufen. PixelLab ist in dieser Sitzung nicht verbunden (0 Generierungen möglich).
 
@@ -288,6 +289,18 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #165 Wow-Räume in hoher Fidelity
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „die Wow-Räume überarbeiten mit höherer Fidelity“; Umgebung „NomadGirl“, PixelLab wieder da, übrig 1.520,6)
+- **Für:** Code
+- **Auftrag:** Alle 13 Wow-Motive (Wunschliste `docs/assets.md` › Wow-Platzhalter) mit PixelLab malen (AAP-64, orthogonal von vorn wie Tresor V-09), dazu Licht, Glow, Bewegung und Räume heller und voller, damit jeder Wow-Raum auf den ersten Blick trägt. Code-Silhouetten bleiben als Rückfall. Budget ≈ 250 Generierungen.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #166 Rote Browser-Tests reparieren
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Ja, bitte reparieren“): crew, map, mirror, salvage, turf, van.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #164 Leyla: Wende-Wurf im Dash (Spezial-Move)
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Leyla dash turn grenade Wurf special move“; Wahl: **Wende-Wurf im Dash**, Kosten **1 Granate + Ausdauer**, Animation aus vorhandenen Frames gemischt, PixelLab später)
