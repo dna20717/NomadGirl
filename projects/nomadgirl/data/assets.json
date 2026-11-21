@@ -7397,5 +7397,16 @@
   "date": "2026-11-21",
   "description": "Bild 1: Arm mit Granate, Bild 2: offene Hand; waagerecht nach rechts, Schulter = Ankerpunkt. Der Code dreht ihn beim Wurf (#140)."
  },
- "leyla_throw_arm_source": {"name": "Leyla · Wurfarm Quelle", "kind": "source", "file": "assets/leyla/grenade/arm_grip_source.png", "source": "KI (PixelLab)", "date": "2026-11-21"}
+ "leyla_throw_arm_source": {"name": "Leyla · Wurfarm Quelle", "kind": "source", "file": "assets/leyla/grenade/arm_grip_source.png", "source": "KI (PixelLab)", "date": "2026-11-21"},
+ "icons_armor": {
+  "name": "Symbole: Rüstung",
+  "kind": "icons",
+  "file": "assets/items/icons_armor.png",
+  "cell": [64, 96],
+  "grid": [1, 1],
+  "names": ["Plattenträger"],
+  "source": "KI (PixelLab, create_image_pro, Stil icons_gear)",
+  "date": "2026-11-21",
+  "description": "Plattenträger-Weste von vorn (Daniel 21.11.: das alte Symbol sah aus wie ein Ziellaser)."
+ }
 }
