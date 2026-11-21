@@ -397,7 +397,9 @@ export class PlayScene extends Phaser.Scene {
     // room lower than the view (zoomed out): floor stays at the bottom edge, sky above
     const viewH = this.scale.height / (C.zoom || 1);
     cam.setBounds(0, Math.min(0, H - viewH), W, Math.max(H, viewH));
-    cam.startFollow(this.leyla.box, false, C.follow ?? 0.12, C.follow ?? 0.12);
+    // #134 (Glitch: the camera started at the container and swung over to Leyla): the first frames snap to her, then the soft follow
+    cam.startFollow(this.leyla.box, false, 1, 1);
+    { let n = 0; const soft = () => { if (++n < 3) return; cam.setLerp(C.follow ?? 0.12, C.follow ?? 0.12); this.events.off('postupdate', soft); }; this.events.on('postupdate', soft); }
     cam.fadeIn(400, 13, 10, 18);
     // light & atmosphere (game/play/atmosphere.js): darkness with lamps, glow, colour mood, dust, sparks, drips, fog
     this.atmo = new Atmosphere(this, this.props);
@@ -513,7 +515,8 @@ export class PlayScene extends Phaser.Scene {
   }
   openBuild() {
     if (this.mode !== 'camp' || !this.box || this.hud.build.active) return;
-    this.hud.inv?.close();
+    // #134 (Glitch: Karte und Bau-Modus übereinander): every other window closes first
+    for (const w of [this.hud.inv, this.hud.craft, this.hud.tech, this.hud.map, this.hud.quests, this.hud.ach, this.hud.tut]) if (w?.isOpen) w.close?.();
     this.hud.closeMenu?.();
     if (this.campGeo?.mega) { if (!this.hud.megaBuild.isOpen) this.hud.megaBuild.open(); return; }
     this.hud.build.open();

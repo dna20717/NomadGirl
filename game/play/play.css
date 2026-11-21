@@ -346,8 +346,9 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .inv-dot { position: absolute; width: 10px; height: 10px; box-sizing: border-box; border-radius: 50%; border: 2px solid #5a4c6b; background: var(--ng-deep); z-index: 3; pointer-events: none; }
 .inv-dot.on { border-color: var(--ng-cyan-light); background: var(--ng-cyan-light); box-shadow: 0 0 8px var(--ng-cyan-light); }
 .inv-note { margin: 6px 0 0; font-size: 11.5px; color: #9a8db0; text-align: center; }
-.inv-stats { display: flex; justify-content: space-around; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--ng-line); }
-.inv-stat { display: grid; justify-items: center; gap: 2px; }
+.inv-stats { display: flex; flex-wrap: wrap; justify-content: space-around; gap: 8px 14px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--ng-line); }
+.inv-stat { display: grid; justify-items: center; gap: 2px; min-width: 0; }
+.inv-stat small, .inv-stat b { white-space: nowrap; }   /* #134 „100 %“ and „In der Luft“ never break into pieces */
 .inv-stat small { font-size: 9.5px; letter-spacing: 1px; text-transform: uppercase; color: #9a8db0; }
 .inv-stat b { font: 24px/1 VT323, monospace; font-weight: normal; color: var(--ng-text); }
 .inv-stat.up b { color: #5fd38d; } .inv-stat.down b { color: #ff8080; } .inv-stat.cyan b { color: var(--ng-cyan-light); } .inv-stat.warn b { color: var(--ng-gold); }

@@ -19,7 +19,7 @@
   {"mood": "kill", "frame": 2, "kaomoji": "(^▽^)", "duration": 1200},
   {"mood": "cleared", "frame": 3, "kaomoji": "ヽ(°〇°)ﾉ", "duration": 2400},
   {"mood": "bored", "frame": 4, "kaomoji": "(￣～￣;)", "duration": 0},
-  {"mood": "alert", "frame": 5, "kaomoji": "(ﾟДﾟ)!", "duration": 1000},
+  {"mood": "alert", "frame": 5, "kaomoji": "(°Д°)!", "duration": 1000},
   {"mood": "curious", "frame": 6, "kaomoji": "(・・?)", "duration": 1400},
   {"mood": "hit", "frame": 7, "kaomoji": "(╬ಠ益ಠ)", "duration": 1100},
   {"mood": "sleep", "frame": 8, "kaomoji": "(－.－)zzZ", "duration": 0},

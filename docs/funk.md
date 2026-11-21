@@ -292,7 +292,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #134 Glitches beheben
-- **Status:** offen · angelegt 21.11. von Code (Daniel: „Die Glitches kannst du alle beheben.“)
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Die Glitches kannst du alle beheben.“)
 - **Auftrag:** Kaomoji-Kästchen, Ortsnamen auf der Karte, Werte-Umbruch im Inventar, „Hier plündern“ über Buffs, Fenster übereinander, Kamera-Schwenk beim Camp-Start, Revier-Meldung „(0)“.
 - **Rückfragen:**
 - **Ergebnis:**

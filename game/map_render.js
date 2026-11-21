@@ -40,7 +40,7 @@ export function drawMap(ctx, W, H, D, map, opt = {}) {
   ctx.restore();
   label(ctx, C.cityName.toUpperCase(), cx, cy - cr * 0.62 - 6 * u, { size: 30 * u, color: RED, weight: 'bold', spacing: 3 * u });
   label(ctx, 'Sperrgebiet', cx, cy + cr * 0.62 + 16 * u, { size: 17 * u, color: RED, italic: true });
-  if (C.sea) drawSea(ctx, C, V, u, t);   // #119
+  const seaBoxes = C.sea ? drawSea(ctx, C, V, u, t) : [];   // #119
   // roads: a gentle curve per road, dark rim + cream core like an old road map; roads into the unknown dotted
   const P = id => map.nodes.find(n => n.id === id);
   const curve = (a, b) => { const [ax, ay] = V.at(a.pos), [bx, by] = V.at(b.pos), h = hashOf(a.id + b.id) - 0.5, nx = -(by - ay), ny = bx - ax; return [ax, ay, (ax + bx) / 2 + nx * h * 0.25, (ay + by) / 2 + ny * h * 0.25, bx, by]; };
@@ -74,8 +74,14 @@ export function drawMap(ctx, W, H, D, map, opt = {}) {
     ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo(qx, qy, bx, by); ctx.stroke(); ctx.restore();
   }
   // places (labels step aside when they would cover another one)
-  const out = {}, taken = [];
-  const free = (x, y, w, h) => !taken.some(b => x < b.x + b.w && x + w > b.x && y < b.y + b.h && y + h > b.y);
+  // #134 (Glitch: Namen auf BIGCITYDELTA und dem Staubozean): everything already drawn or still to come blocks a label: the city's
+  // name, the sea's lettering, every place marker; a label tries below, above, right, left, further out, else the least overlap
+  const out = {}, taken = [...seaBoxes];
+  const cw = (C.cityName.length * 17 + 30) * u;
+  taken.push({ x: cx - cw / 2, y: cy - cr * 0.62 - 34 * u, w: cw, h: 34 * u }, { x: cx - 60 * u, y: cy + cr * 0.62, w: 120 * u, h: 22 * u });
+  for (const n of map.nodes) { const [x, y] = V.at(n.pos), r = 10 * u; taken.push({ x: x - r * 1.6, y: y - r * 1.6, w: r * 3.2, h: r * 3.2, node: n.id }); }
+  for (const id of Object.keys(map.wrecks || {})) { const nd = map.nodes.find(q => q.id === id); if (nd) { const [x, y] = V.at(nd.pos); taken.push({ x: x + 2 * u, y: y - 40 * u, w: 42 * u, h: 52 * u }); } }   // wreck tags come later
+  const overlap = (x, y, w, h, self) => taken.reduce((a, b) => b.node === self ? a : a + Math.max(0, Math.min(x + w, b.x + b.w) - Math.max(x, b.x)) * Math.max(0, Math.min(y + h, b.y + b.h) - Math.max(y, b.y)), 0);
   for (const n of map.nodes) {
     const [x, y] = V.at(n.pos), k = n.dock ? { color: '#285cc4', glyph: 'crane' } : KIND[D.pois?.[n.poi]?.kind] || { color: INK }, isKnown = known(n), r = 10 * u;
     out[n.id] = { x, y, r: r * 2.2, known: isKnown, near: near.has(n.id) };
@@ -90,12 +96,15 @@ export function drawMap(ctx, W, H, D, map, opt = {}) {
       for (const [col, lw] of [['#fef3c0', 9 * u], [INK, 6.5 * u], [RED, 3.5 * u]]) { ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.beginPath(); ctx.moveTo(x - q, y - q); ctx.lineTo(x + q, y + q); ctx.moveTo(x + q, y - q); ctx.lineTo(x - q, y + q); ctx.stroke(); }
       ctx.restore(); }
     ctx.save(); ctx.font = `${n.landmark ? 'bold' : 'normal'} ${Math.round((n.landmark ? 26 : 23) * u)}px VT323, monospace`; const tw = ctx.measureText(n.name).width; ctx.restore();
-    let ly = y + r + 22 * u;
-    for (const dy of [0, -(2 * r + 54 * u), 22 * u, -(2 * r + 76 * u), 44 * u]) if (free(x - tw / 2, y + r + 4 * u + dy, tw, 40 * u)) { ly = y + r + 22 * u + dy; break; }
-    taken.push({ x: x - tw / 2, y: ly - 20 * u, w: tw, h: 40 * u });
-    label(ctx, n.name, x, ly, { size: (n.landmark ? 26 : 23) * u, color: INK, weight: n.landmark ? 'bold' : 'normal', halo: true });
-    if (n.dock) label(ctx, 'Andockpunkt · nur Mega-Rigs', x, ly + 19 * u, { size: 15 * u, color: '#285cc4', italic: true, halo: true });
-    else if (!opt.hideDanger) label(ctx, '●'.repeat(n.danger || 1), x, ly + 19 * u, { size: 15 * u, color: RED, halo: true });
+    const side = tw / 2 + r * 1.8 + 6 * u, spots = [[0, 0], [0, -(2 * r + 54 * u)], [side, -(r + 22 * u)], [-side, -(r + 22 * u)], [0, 22 * u], [0, -(2 * r + 76 * u)], [side, -(r + 2 * u)], [-side, -(r + 2 * u)], [0, 44 * u]];
+    let best = null;
+    for (const [dx, dy] of spots) { const lx = x + dx, ly0 = y + r + 22 * u + dy, sub = n.dock ? Math.max(tw, 190 * u) : tw, o = overlap(lx - sub / 2, ly0 - 20 * u, sub, 52 * u, n.id); if (!best || o < best.o) best = { lx, ly: ly0, o }; if (!o) break; }
+    const lx = best.lx, ly = best.ly;
+    const sub = n.dock ? Math.max(tw, 190 * u) : tw;
+    taken.push({ x: lx - sub / 2, y: ly - 20 * u, w: sub, h: 52 * u });
+    label(ctx, n.name, lx, ly, { size: (n.landmark ? 26 : 23) * u, color: INK, weight: n.landmark ? 'bold' : 'normal', halo: true });
+    if (n.dock) label(ctx, 'Andockpunkt · nur Mega-Rigs', lx, ly + 19 * u, { size: 15 * u, color: '#285cc4', italic: true, halo: true });
+    else if (!opt.hideDanger) label(ctx, '●'.repeat(n.danger || 1), lx, ly + 19 * u, { size: 15 * u, color: RED, halo: true });
     if (n.id === opt.sel) { ctx.strokeStyle = '#ffd541'; ctx.lineWidth = 3 * u; ctx.setLineDash([6 * u, 4 * u]); ctx.lineDashOffset = t * 20; ctx.beginPath(); ctx.arc(x, y, r * 2.7, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); }
   }
   // billboards along the roads: logo on a post, slogan underneath
@@ -103,7 +112,7 @@ export function drawMap(ctx, W, H, D, map, opt = {}) {
     const b = brand(s.brand); if (!b) continue;
     const [x, y] = V.at(s.pos), z = 30 * u;
     ctx.save(); ctx.font = `italic ${Math.round(13 * u)}px VT323, monospace`; const sw = Math.max(z, ctx.measureText(b.slogan || b.name).width * 1.3); ctx.restore();
-    if (!free(x - sw / 2, y - z, sw, z + 30 * u) || Object.values(out).some(p => Math.hypot(p.x - x, p.y - y) < 34 * u)) continue;   // never over a place or a name
+    if (overlap(x - sw / 2, y - z, sw, z + 30 * u) || Object.values(out).some(p => Math.hypot(p.x - x, p.y - y) < 34 * u)) continue;   // never over a place or a name
     taken.push({ x: x - sw / 2, y: y - z, w: sw, h: z + 30 * u });
     ctx.save(); ctx.translate(x, y); ctx.rotate(s.rot || 0);
     ctx.fillStyle = INK; ctx.fillRect(-1.5 * u, 0, 3 * u, 14 * u);
@@ -238,4 +247,6 @@ function drawSea(ctx, C, V, u, t) {
   label(ctx, S.name.toUpperCase(), cx, cy - ry * 0.1, { size: 28 * u, color: '#4a5462', weight: 'bold', spacing: 4 * u, italic: true });
   label(ctx, S.warn, cx, cy + ry * 0.12, { size: 18 * u, color: RED, italic: true, halo: true });
   label(ctx, 'Sperrgebiet für kleine Fahrzeuge', cx, cy + ry * 0.12 + 20 * u, { size: 14 * u, color: RED, halo: true });
+  const w = Math.max(S.name.length * 18, String(S.warn || '').length * 9, 260) * u;
+  return [{ x: cx - w / 2, y: cy - ry * 0.1 - 30 * u, w, h: ry * 0.22 + 60 * u }];
 }

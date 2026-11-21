@@ -10,6 +10,30 @@ import { Cables, hullPoint } from '../drone_cables.js';
 
 const STATES = ['down', 'lowHealth', 'alert', 'zen', 'sleep', 'bored'];   // lasting moods, most important first
 
+// #134 (Glitch: „(▯Д°)!“): a kaomoji needs CJK fonts the device may lack. Each character is tested once on a canvas against a
+// surely missing one (same pixels = tofu); a face with a missing glyph shows its Fallback (Drohne › Stimmungen) or an ASCII fold.
+const glyphCache = new Map();
+function glyphOk(ch, font) {
+  const key = font + ch;
+  if (glyphCache.has(key)) return glyphCache.get(key);
+  let ok = true;
+  try {
+    const c = document.createElement('canvas'); c.width = c.height = 40;
+    const g = c.getContext('2d', { willReadFrequently: true }), draw = t => { g.clearRect(0, 0, 40, 40); g.font = `28px ${font}`; g.fillText(t, 4, 30); return g.getImageData(0, 0, 40, 40).data.join(); };
+    const tofu = draw('\u{10FFFD}'), me = draw(ch);
+    ok = me !== tofu && /[^0,]/.test(me);
+  } catch { ok = true; }
+  glyphCache.set(key, ok);
+  return ok;
+}
+const FOLD = { 'ﾟ': '°', 'ﾉ': '/', 'ヽ': '\\', '〇': 'O', '￣': '-', '～': '~', '－': '-', '；': ';', '﹏': '_', '・': '.', 'ᴗ': '_', 'و': 'b', 'ಠ': 'o', '益': '皿', '人': 'A', '╬': '#', '‿': '_', '▽': 'v', 'Д': 'D' };
+export function safeKaomoji(m, font = 'sans-serif') {
+  const t = String(m.kaomoji || ''), chars = [...t.normalize('NFC')].filter(ch => ch.codePointAt(0) > 0xff && !/\p{M}/u.test(ch));
+  if (chars.every(ch => glyphOk(ch, font))) return t;
+  if (m.fallback) return m.fallback;
+  return [...t].filter(ch => !/\p{M}/u.test(ch)).map(ch => ch.codePointAt(0) <= 0xff || glyphOk(ch, font) ? ch : FOLD[ch] && [...FOLD[ch]].every(x => x.codePointAt(0) <= 0xff || glyphOk(x, font)) ? FOLD[ch] : '').join('');
+}
+
 export class Drone {
   constructor(scene, data) {
     this.scene = scene; this.d = data.drone || {};
@@ -109,7 +133,7 @@ export class Drone {
     const pop = this.face ? this.scene.tweens.add({ targets: this.face, scaleX: 1.15, scaleY: 1.15, duration: 90, yoyo: true })
       : this.scene.tweens.add({ targets: this.sprite, scaleY: this.scale * 1.12, duration: 90, yoyo: true });
     if (m.kaomoji && this.d.bubble?.show !== false) {
-      this.bubble.setText(m.kaomoji).setAlpha(1);
+      this.bubble.setText(safeKaomoji(m, this.bubble.style.fontFamily)).setAlpha(1);
       this.bubbleUntil = time + Math.max(1200, m.duration && m.duration < Infinity ? m.duration : 2200);
     } else this.bubbleUntil = 0;
     return pop;

@@ -41,7 +41,7 @@ export class Turf {
       ? (this.friend ? 'Freunde: sie lassen dich in Ruhe, handeln mit dir und haben einen Auftrag. Ihre Kisten gehören ihnen: wer dich beim Öffnen sieht, nimmt es dir übel. Der Tresor nur mit Gewalt.'
         : 'Waffenstillstand: sie lassen dich in Ruhe, solange du friedlich bleibst. Kisten öffnen unter Zeugen kostet Ruf. Der Tresor nur mit Gewalt.')
       : lvl === 'feind' ? 'Feinde: sie schießen, sobald sie dich sehen, und rufen Verstärkung.' : 'Sie kennen dich nicht. Wer ihr Revier betritt, wird angegriffen. Jeder Kill kostet Ruf.';
-    this.scene.hud.toast(`Revier der ${this.gang} · ${levelName(lvl)} (${sign}${n})`, what, this.active ? 'good' : 'warn', 7000);
+    this.scene.hud.toast(`Revier der ${this.gang}`, `${levelName(lvl)} · Ruf ${sign}${n}. ${what}`, this.active ? 'good' : 'warn', 7000);
   }
 
   // who of them sees Leyla right now

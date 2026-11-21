@@ -520,7 +520,7 @@ export const AREAS = {
         num('spot.tilt', 'Nach unten', { unit: '°', hint: 'Neigung des Kegels unter die Waagrechte, in Blickrichtung' }), num('spot.strength', 'Stärke', { unit: '%', min: 0, max: 200 }), color('spot.color', 'Farbe'),
         num('spot.glow', 'Schein an der Linse', { unit: '%', min: 0, max: 200 })] },
       { title: 'Rettungsfach', fields: [text('rescue.name', 'Name'), size('rescue.size', 'Größe', { unit: 'Felder', hint: 'Daniel, 10.11.2026: was hier liegt, übersteht ein k.o., AvA bringt es heim' })] },
-      { title: 'Stimmungen', fields: [table('moods', 'Stimmungen', [select('mood', 'Anlass', DRONE_MOODS), num('frame', 'Gesicht', { min: 0 }), text('kaomoji', 'Kaomoji'), num('duration', 'Dauer ms', { min: 0 })],
+      { title: 'Stimmungen', fields: [table('moods', 'Stimmungen', [select('mood', 'Anlass', DRONE_MOODS), num('frame', 'Gesicht', { min: 0 }), text('kaomoji', 'Kaomoji'), text('fallback', 'Ersatz ohne Sonderzeichen', { hint: '#134: zeigt AvA, wenn dem Gerät eine Schrift für das Kaomoji fehlt; leer = automatisch' }), num('duration', 'Dauer ms', { min: 0 })],
         { hint: 'Gesicht = Frame der Gesichter (ab 0). Ohne Kaomoji nur das Gesicht. Dauer 0 = solange der Anlass gilt' })] },
       { title: 'Verhalten', fields: [num('idle.boredAfter', 'Langeweile nach', { unit: 's', min: 0, hint: 'Leyla steht still' }), num('idle.sleepAfter', 'Einschlafen nach', { unit: 's', min: 0 }), num('idle.zenAfter', 'Zen nach', { unit: 's', min: 0, hint: 'So lange hält Leyla die Yoga-Pose, dann macht die Drohne mit' }),
         range('idle.randomEvery', 'Zufällige Stimmung alle', { unit: 's', hint: 'Neugierig oder Scannen, während Leyla unterwegs ist' }), num('alertRange', 'Gegner bemerken ab', { unit: 'px', min: 0 }),
