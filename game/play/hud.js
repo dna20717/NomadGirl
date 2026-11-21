@@ -460,7 +460,7 @@ export class Hud {
     this.root.classList.toggle('hud-building', !!this.build?.active);   // #129 notes below the build bar, not on it
     if (this.build?.active) { const b = document.querySelector('.bm-bar')?.getBoundingClientRect(); if (b && b.bottom > 0) this.root.style.setProperty('--build-top', `${Math.round(b.bottom + 10)}px`); }
     // #129 Info-Center, context „window“: hints wait, the cassette steps aside; on closing, what waited comes one by one
-    const quiet = windowed || !!this.modal || !!this.megaBuild?.isOpen;
+    const quiet = windowed || !!this.modal || !!this.megaBuild?.isOpen || !!this.duel?.isOpen;   // #129 also the Glitch-Duell (DuellMode): hints wait until it is over
     if (quiet !== this.quiet) { this.quiet = quiet; document.body.classList.toggle('ng-quiet', quiet); if (!quiet) [0, 700, 1400].forEach(ms => setTimeout(() => this.nextQueued(), ms)); }   // #017: toasts move to the top centre, over the free middle of the window header, never over its buttons
     if (this.promptEl.hidden !== hideP) this.promptEl.hidden = hideP;
     const hp = Math.max(0, Math.min(1, l.health / max));
