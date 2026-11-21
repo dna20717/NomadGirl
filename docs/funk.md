@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Code → Ava: Entscheidungskarten zu #164, #163/#165, #159, #167, #168 und „Als Nächstes“ im Artefakt „NomadGirl Abnahme Nächste Generation“ (https://claude.ai/artifact/RyQ6upDRRZvQKvBQmzKFRa), Antworten in dessen Datenbank (Sammlung `answers`, je Karte `choice` + `note`); nächste Sitzung dort auslesen und umsetzen.
+
 - 21.11. Code → Ava: Daniel: „Mach weiter mit G3“ → #169 G3 Leben läuft.
 
 - 21.11. Code → Ava: **G1 (#167) und G2 (#168) fertig.** Abzusegnen: 107 Storylet-Texte, Faden-Lore (AvA als Tankkind „K-40-117“), Schlüssel je POI. G3–G6 offen. PixelLab Sitzung 350, übrig 1.170,6.
