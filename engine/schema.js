@@ -423,6 +423,19 @@ export const AREAS = {
       else if (ax + w > 100.5 || ay + h > 100.5) report('warning', 'Panel ragt über die Seite');
     },
   },
+  notices: {
+    name: 'Meldungen', icon: 'speechBubble', file: 'data/notices.json', kind: 'single',
+    hint: '#129 Info-Center (Daniel 21.11.2026: „lass uns ein Information Center konzipieren, um das auch in Zukunft zu vermeiden“): wie Meldungen erscheinen, warten und ins Logbuch gehen. Konzept docs/concepts/info_center.md.',
+    sections: [
+      { title: 'Bühne', fields: [num('stage.toastMax', 'Hinweise gleichzeitig', { min: 1, max: 8, hint: 'Ab so vielen warten Arten mit „wartet, wenn voll“ in der Schlange. Leer = 3' }),
+        num('stage.stack', 'Meldungen höchstens sichtbar', { min: 1, max: 10, hint: 'Ältere gehen dann. Leer = 5' })] },
+      { title: 'Arten', fields: [table('kinds', 'Arten', [text('id', 'ID'), text('name', 'Name'), text('icon', 'Icon', { hint: 'Lucide-Name aus game/icons.js' }), select('sound', 'Ton', [['', '– keiner –'], ['ping', 'Ping'], ['good', 'Gut'], ['nope', 'Nein'], ['fanfare', 'Fanfare'], ['chime', 'Glöckchen'], ['sparkle', 'Glitzern'], ['low', 'Tief']]),
+          bool('waitsWindow', 'Wartet bei offenem Fenster'), bool('waitsFull', 'Wartet, wenn voll'), bool('buildLog', 'Im Bau-Modus ins Logbuch'),
+          select('cat', 'Logbuch-Kategorie', [['', '– nach Stichwort –'], ['quest', 'Quest'], ['loot', 'Beute'], ['trade', 'Handel'], ['fight', 'Kampf'], ['crew', 'Crew'], ['travel', 'Reise'], ['camp', 'Camp'], ['progress', 'Fortschritt'], ['radio', 'Radio'], ['system', 'System']])],
+        { hint: 'Jede Meldung des Spiels hat eine Art (info, good, warn, trophy …). Warnungen, Belohnungen und Beute warten nie (Daniel 21.11.: „Nur Erfolge“ im Bau-Modus)' })] },
+      { title: 'Logbuch', fields: [num('log.keep', 'Einträge behalten', { min: 50, max: 2000, hint: 'Die neuesten; jeder Durchgang beginnt leer. Leer = 400' })] },
+    ],
+  },
   economy: {
     name: 'Wirtschaft', icon: 'coins', file: 'data/economy.json', kind: 'single',
     hint: 'Währung, Startgeld und was beim Tod passiert.',
@@ -1952,7 +1965,7 @@ export const AREAS = {
 // Navigation: groups of areas in the order of the design document
 export const GROUPS = [
   ['ASSETS', ['assets', 'pixelOrders', 'voices', 'sounds']],
-  ['GRUNDLAGEN', ['game', 'splash', 'intro', 'tutorial', 'weather', 'economy', 'ranking', 'renames']],
+  ['GRUNDLAGEN', ['game', 'splash', 'intro', 'tutorial', 'notices', 'weather', 'economy', 'ranking', 'renames']],
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'kits', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],

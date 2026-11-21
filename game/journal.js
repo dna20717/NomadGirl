@@ -14,7 +14,7 @@ export const CATS = [
 export const CAT_IDS = CATS.map(c => c[0]);
 export const KEEP = 400;
 // in the build mode only successes go into the Logbuch (Daniel 21.11.: „Nur Erfolge: gekauft, eingebaut, Ensemble“)
-const SUCCESS = new Set(['good', 'trophy', 'loot', 'secret', 'recipe']);
+const SUCCESS = new Set(['good', 'trophy', 'loot', 'secret', 'recipe', 'keepsake']);
 
 const BY_KIND = { trophy: 'progress', recipe: 'progress', loot: 'loot', secret: 'loot', travel: 'travel', camp: 'camp', drama: 'fight', heal: 'fight' };
 const RULES = [
@@ -38,14 +38,14 @@ export function catOf(kind, title = '', sub = '') {
 }
 
 // one note into the Logbuch; the same note again right after only counts up. → the entry, or null when it does not belong in
-export function record(save, title, sub = '', kind = 'info', { cat = null, building = false, run = save?.run?.poi ?? null } = {}) {
+export function record(save, title, sub = '', kind = 'info', { cat = null, building = false, run = save?.run?.poi ?? null, success = SUCCESS, keep = KEEP } = {}) {
   if (!save || !title) return null;
-  if (building && !SUCCESS.has(kind)) return null;
+  if (building && !success.has(kind)) return null;
   const J = (save.journal ??= []), last = J[J.length - 1];
   if (last && last.title === title && (last.sub || '') === (sub || '')) { last.n = (last.n || 1) + 1; last.at = clockText(save); return last; }
   const e = { at: clockText(save), day: save.day ?? 1, title, sub: sub || '', kind, cat: CAT_IDS.includes(cat) ? cat : catOf(kind, title, sub), run: run || null };
   J.push(e);
-  if (J.length > KEEP) J.splice(0, J.length - KEEP);
+  if (J.length > keep) J.splice(0, J.length - keep);
   return e;
 }
 

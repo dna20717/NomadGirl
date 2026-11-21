@@ -43,6 +43,17 @@ const section = g => el('section', {}, el('h3', {}, icon(g.icon, 16), g.title), 
 
 const TOAST_MAX = 3, WAITS = new Set(['info', 'travel']);   // #070 Meldungs-Kanal
 const QUIET_WAITS = new Set(['info', 'travel', 'camp', 'recipe']);   // #129 Info-Center: while a window is open these wait (warnings, rewards, loot never)
+// #129 Werkstatt › Meldungen (data/notices.json): the kinds, the waiting rules and the stage numbers; the constants above are the defaults
+export function noticeRules(D) {
+  const N = D?.notices || {}, K = { ...TOAST_KINDS }, quiet = new Set(QUIET_WAITS), full = new Set(WAITS), success = new Set(['good', 'trophy', 'loot', 'secret', 'recipe', 'keepsake']), cat = {};
+  for (const r of N.kinds || []) {
+    if (!r.id) continue;
+    K[r.id] = { icon: r.icon || K[r.id]?.icon || 'info', sound: r.sound ?? K[r.id]?.sound ?? 'ping' };
+    for (const [set, v] of [[quiet, r.waitsWindow], [full, r.waitsFull], [success, r.buildLog]]) if (v != null) v ? set.add(r.id) : set.delete(r.id);
+    if (r.cat) cat[r.id] = r.cat;
+  }
+  return { kinds: K, quiet, full, success, cat, max: N.stage?.toastMax ?? TOAST_MAX, stack: N.stage?.stack ?? 5, keep: N.log?.keep ?? 400 };
+}
 
 export class Hud {
   constructor(root, { workshopDrafts = 0, commit = null } = {}) {
@@ -387,8 +398,9 @@ export class Hud {
   // #070 Meldungs-Kanal: hints and travel news wait in line while three notes are up; warnings, rewards and loot never wait
   nextQueued() {
     const q = this.toastQueue;
-    if (!q?.length || this.liveToasts() >= TOAST_MAX) return;
-    if (this.quiet && QUIET_WAITS.has(q[0][2])) return;   // #129 still a window open
+    const R = this.rules();
+    if (!q?.length || this.liveToasts() >= R.max) return;
+    if (this.quiet && R.quiet.has(q[0][2])) return;   // #129 still a window open
     const [title, sub, kind, ms, o] = q.shift();
     if (o?.banner) this.banner(title, sub, ms, kind, true); else this.toast(title, sub, kind, ms, { ...o, queued: true });
   }
@@ -396,17 +408,20 @@ export class Hud {
   // #070 Logbuch, #129: every message with the game clock and a category, kept in the savegame (game/journal.js). In the build mode only
   // successes (Daniel 21.11.)
   journal(title, sub, kind, cat = null) {
-    journalRecord(this.scene?.box?.save, title, sub, kind, { cat, building: !!this.build?.active });
+    const R = this.rules();
+    journalRecord(this.scene?.box?.save, title, sub, kind, { cat, building: !!this.build?.active, success: R.success, keep: R.keep });
   }
+  // the rules from Werkstatt › Meldungen, cached per data object
+  rules() { const D = this.scene?.data_; if (this.rulesFor !== D || !this.rulesCache) { this.rulesFor = D; this.rulesCache = noticeRules(D); } return this.rulesCache; }
   // #129 the Logbuch lives in the Questlog as its second tab (Daniel 21.11.)
   logbook() { this.quests?.open('log'); }
   // every message of the game: a note top right that stacks and goes by itself, with its own icon, colour and sound.
   // The same title twice in a row does not stack: the toast already there starts its time again (and nods). → the element
   toast(title, sub = '', kind = 'info', ms = 4200, { banner = false, sound = true, queued = false, cat = null } = {}) {
-    const K = TOAST_KINDS[kind] || TOAST_KINDS.info;
-    if (!queued) this.journal(title, sub, kind, cat);   // #070 everything goes into the Logbuch
-    if (!queued && this.quiet && QUIET_WAITS.has(kind)) { (this.toastQueue ??= []).push([title, sub, kind, ms, { banner, sound }]); return null; }   // #129 a window is open: later
-    if (!queued && !banner && WAITS.has(kind) && this.liveToasts() >= TOAST_MAX) { (this.toastQueue ??= []).push([title, sub, kind, ms, { banner, sound }]); return null; }
+    const R = this.rules(), K = R.kinds[kind] || R.kinds.info;
+    if (!queued) this.journal(title, sub, kind, cat ?? R.cat[kind] ?? null);   // #070 everything goes into the Logbuch
+    if (!queued && this.quiet && R.quiet.has(kind)) { (this.toastQueue ??= []).push([title, sub, kind, ms, { banner, sound }]); return null; }   // #129 a window is open: later
+    if (!queued && !banner && R.full.has(kind) && this.liveToasts() >= R.max) { (this.toastQueue ??= []).push([title, sub, kind, ms, { banner, sound }]); return null; }
     const same = [...this.toastsEl.children].find(x => !x.classList.contains('out') && x._title === title && x._sub === sub);
     if (same) {
       clearTimeout(same._timer); same.classList.remove('nod'); void same.offsetWidth; same.classList.add('nod');
@@ -418,7 +433,7 @@ export class Hud {
     if (ms <= 0) t.append(closeX(() => this.dismiss(t)));
     this.toastsEl.append(t);
     const live = [...this.toastsEl.children].filter(x => !x.classList.contains('out'));
-    for (const x of live.slice(0, Math.max(0, live.length - 5))) this.dismiss(x);
+    for (const x of live.slice(0, Math.max(0, live.length - R.stack))) this.dismiss(x);
     if (ms > 0) t._timer = setTimeout(() => this.dismiss(t), ms);
     (this.toastLog ??= []).push({ title, sub, kind });
     if (sound) this.toastSound(K.sound);
