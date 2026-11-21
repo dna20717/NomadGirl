@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Code → Ava: Daniel: „POI overhaul“ → #160 → #163 → #159 der Reihe nach in dieser Sitzung (alle POIs gleichzeitig); parallel neu **#164 Wende-Wurf im Dash**. #160 und #164 laufen. PixelLab ist in dieser Sitzung nicht verbunden (0 Generierungen möglich).
+
 - 21.11. Ava → Code: **Vorgabe für #160, #158, #163, #159** (Daniel: „lieber alles in einem Durchgang machen, damit es kohärent ist“): kein Pilot-POI; jedes Ticket gilt immer für **alle POIs gleichzeitig** (13 Wahrzeichen + Archetypen für gewürfelte Orte), damit Ton, Dichte und Stil überall gleich sind. Reihenfolge bleibt #160 → #158 → #163 → #159.
 - 21.11. Ava → Code: Bibel um **Wow-Moment** erweitert; #163 hat jetzt Schritt 8 „Wow-Raum je POI“: alle 13 als bestmögliche Platzhalter ohne neue Grafik (Code-Silhouetten, Licht, Kamera, Stinger), dazu Asset-Wunschliste.
 - 21.11. Ava → Code: Bibel um **Level-Design** erweitert (`docs/concepts/poi_bible.md`). Neu **#163 Level-Design nach der Bibel** (Raumtypen, Landmarken, Rhythmus, Licht am Ausgang, faire Kämpfe, Geheimnisse säen, Level-Prüfer), nach #160. Reihenfolge: #160 → #158 → #163 → #159.
@@ -284,6 +286,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 ## Tickets
 
+### #164 Leyla: Wende-Wurf im Dash (Spezial-Move)
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Leyla dash turn grenade Wurf special move“; Wahl: **Wende-Wurf im Dash**, Kosten **1 Granate + Ausdauer**, Animation aus vorhandenen Frames gemischt, PixelLab später)
+- **Für:** Code
+- **Auftrag:** Während des Dash Gegenrichtung + Granate (T): Leyla dreht sich mitten im Dash um, wirft die Granate flach nach hinten auf Verfolger und rutscht rückwärts aus; kurzer Zeitlupen-Moment. Verbraucht eine Granaten-Ladung und Ausdauer. Werte in der Werkstatt (Leyla), Animation aus vorhandenen Dash-/Brems-/Wurf-Frames, Effekte aus Code. Test + Doku in `docs/features/leyla.md`/`combat.md`.
+- **Rückfragen:**
+- **Ergebnis:**
+
 ### #161 Granate: generierte Wurf-Animation mit Waffe
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Granate – die Animation ist schlecht. Lass sie bitte generieren (mit aktiver Kurz- oder Langwaffe und dynamischer)“)
 - **Rückfragen:**
@@ -340,7 +349,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code, per Helfer) Bunker-Schleuse: Durchgang unter dem Rohrblock 2 Kacheln hoch, nur rutschend (jetzt Teil des Hauptwegs); Testraum: freie Plattformen stehen auf Gerüsten. `parcours_test` 50, Prüfwerkzeug grün.
 
 ### #160 Story zuerst: Steckbriefe in die Daten, Raum-Steckbriefe, Dressing liest die Story
-- **Status:** offen · angelegt 21.11. von Ava
+- **Status:** läuft (21.11.) · angelegt 21.11. von Ava
 - **Für:** Code
 - **Anlass (Daniel, 21.11.2026):** „Ich möchte, dass vor dem ersten Design die Story des POI oder des Raumes feststeht und von dort aus gestaltet wird.“ Wahl: **feste Story je POI, Varianten je Run**; **Ava schreibt die Steckbriefe, Daniel segnet ab**; Steckbriefe für alle POIs, auch dynamische und perspektivische, „damit der Ton einheitlich ist“. Dann: „Bitte pack das ganze ins Repo und leg eine Aufgabe dafür an.“
 - **Lesen:** `docs/concepts/poi_bible.md` (führend: Story zuerst, Ableitungstabelle, Grundsätze) und `docs/concepts/poi_steckbriefe.md` (Weltchronik, Ton-Regeln, 13 POIs, Archetypen, Regionen, perspektivische POIs). Docs-Fassung in claude.ai: „NomadGirl – POI Design Bible“.
