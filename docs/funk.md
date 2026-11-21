@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Code → Ava: #128 fertig: Brett als Deko, Camp breiter, leere Texte und Tooltips aufgeräumt; **Polish-Plan** mit Top 8 in `docs/backlog.md` › E (Ton im Kampf, POI-Gelände, Einblendungen, erster Abend, Run-Bildausschnitt, Ranking-Bonus + #109, Gegner/Bosse, Ladezeit).
 - 20.11. Code → Ava: #127 **Ebene + Schwarzes Brett** fertig (PixelLab 25, übrig 1.965,6).
 - 20.11. Code → Ava: #084 **Camp-Boden** fertig: ein feiner PixelLab-Streifen statt grober Kacheln (Camp + Mega-Rig), PixelLab 25, übrig 1.990,6. PixelLab war in der Sitzung aus (Umgebung „Default“); Sitzung auf „NomadGirl“ umgeschaltet, das reicht.
 - 20.11. Code → Ava: #084, #100–#103 fertig: Bit-Farm-Bild und feineres Fahrgestell (PixelLab 40, übrig 2.015,6; Camp-Boden offen, Versuch hielt die Kacheln nicht ein), Rig-Moral, Aufträge für alle 12 Gangs, Gangs kämpfen selbst um Orte, Radio-DJs als Entities mit Gesicht im Chip.
@@ -260,9 +261,9 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #128 Schwarzes Brett als Deko, Camp breiter, Null-Texte, Polish-Plan
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Mach aus dem schwarzen Brett etwas, dass man wie Deko im Camp platzieren kann und mach das Camp etwas größer, damit es nicht so gestreckt ist … Schau auch mal nach, ob es viele Tooltips und Text mit NULL oder leer gibt … Insgesamt: Polish-Durchgang. Was haben wir zu tun, um das Spiel auf die nächste Ebene zu bringen?“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Mach aus dem schwarzen Brett etwas, dass man wie Deko im Camp platzieren kann und mach das Camp etwas größer, damit es nicht so gestreckt ist … Schau auch mal nach, ob es viele Tooltips und Text mit NULL oder leer gibt … Insgesamt: Polish-Durchgang. Was haben wir zu tun, um das Spiel auf die nächste Ebene zu bringen?“)
 - **Rückfragen:** (Code) ⚠️ vorläufig: (1) Das Brett lässt sich auch verkaufen; dann hängen die Aufträge nur noch bei den Companions, bis man im Deko-Katalog ein neues kauft (40 Δ). (2) Das Feuer bleibt bei Kachel 9, das Camp wächst nach rechts (Feuer weiter rechts lag unter der Now-Playing-Kassette).
-- **Ergebnis:**
+- **Ergebnis:** (Code) Commits „Schwarzes Brett als Deko, Camp breiter“, „Tooltips und Texte ohne leere Teile …“, „Restliche leere Texte …“. **Null-Texte:** Suche statisch + im Browser (Camp, alle Fenster, 572 Inventar-Tooltips, ganze Werkstatt, alle Seiten): kein echtes NULL/undefined/NaN; behoben: 10 Werkstatt-Arten ohne Funktionsnamen im Bau-Modus („· 1 Platz“), Techtree „undefined ()“, Raumname „ · Testraum“, Achievement-Toast, Radio-Chip, Duell-Karte, ~770 leere `title=""` (unterdrückten Tooltips außen herum), Deko-Händler, „ steht“, Orte-Zeile in der Werkstatt, Bit-Farm-Hinweis. **Polish-Plan:** `docs/backlog.md` › E. `npm test` 361/361; camp, cozy, decor (+ Brett-Prüfung), build, build_pad, stack, container, mega, megarig, achievement, tutorial, workshop, techtree, map grün. PixelLab 0. **Bitte testen:** Neues Spiel: Brett vor dem Van, B › Brett anfassen und umsetzen, E am Brett; alter Spielstand bekommt sein Brett.
 
 ### #127 Ebene bis zum Horizont und Schwarzes Brett in hübsch
 - **Status:** fertig (20.11.) · angelegt 20.11. von Code (Daniel: „Die Ebene zwischen camp und paralax ist noch sehr roh. Mach das auch mal hübsch. Und das schwarze Brett im camp auch“)

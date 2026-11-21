@@ -111,3 +111,22 @@ Automatische Prüfungen (Exporte, Mixin-Kollisionen, Felder ohne Wirkung, Daten 
 - CLAUDE.md: veraltete Stellen korrigiert (Deichselkasten, Staufach, Goldhaufen, „Neues Spiel“, Tod im Run, Kiste „vorerst leer“, Test-Zahlen von craft/poi/tank/techtree, Controller-Belegung vom 10.11.).
 - design.md: Progression als gebaut markiert, Leyla-Animationen abgehakt, Techtree-Frage präzisiert.
 - Konsolen-Durchlauf (Camp, Run, Testraum, Kampfraum, Bunker, Ministerium, Werkstatt, Startseite): keine Fehler.
+
+## E. Polish-Plan: die nächste Ebene (21.11.2026, #128)
+
+Daniel: „Insgesamt: Polish-Durchgang. Was haben wir zu tun, um das Spiel auf die nächste Ebene zu bringen?“ Durchsicht mit Screenshots (Camp, Run, Karte, Inventar, Cockpit, Werkstatt). Avas Rat: ein, zwei Wochen Tiefe statt Breite, keine neuen Systeme.
+
+| # | Was | Warum | Größe | PixelLab |
+|---|---|---|---|---|
+| E1 | **Ton im Kampf und in der Bewegung**: Treffer, Whoosh, Schritte, Sprung/Landung, Kiste, Beute, Schaden, Tod | heute klingen nur Schüsse (`combat.js`), Hitstop und Wackeln laufen stumm; `sfx.js` nutzt nur der Bau-Modus | M | nein |
+| E2 | **POI-Gelände fein** (Sandstein-Säulen/Böden flach orange, Innenböden Schachbrett) | größter Stilbruch neben Leyla und Van; Weg wie Camp-Boden #084 | L | ja |
+| E3 | **Einblendungen ordnen**: ein Kanal mit Vorrang (Willkommen, Quest-Karte, Kassette, Blase, E-Hinweis) | erste Minuten unruhig; die Kassette verdeckt rechts sogar Bau-Ziele | M | nein |
+| E4 | **Geführter erster Abend**: Brett → Van → erster Run → Zerlegen → Heilmittel-Schritt | Quest und Karte nennen gleichzeitig verschiedene Ziele | M | nein |
+| E5 | **Unteres Drittel im Run nicht schwarz** (Bildausschnitt, Erde/Tiefe/Vordergrund) | Run wirkt kleiner als das Camp | S–M | nein |
+| E6 | **Ranking-Bonus je Rang** (Entscheidung Daniel) + Balancing v2 (#109) | ohne Belohnung kein Grund, einen POI besser zu spielen | S + M | nein |
+| E7 | **Gegner-Archetypen und Bosse** (Lauerer, Stürmer, Hausmeister-Boss offen) | 14 Gegner sind fast nur Nahkampf/Schützen | L | ja |
+| E8 | **Ladezeit**: Atlanten, Laden nach Modus | 784 Anfragen bis das Camp steht, 57 MB Assets | M | nein |
+| E9 | Kleinkram: Kaomoji mit „ﾟ“ zeigt Kästchen (`drone.json`), Ortsnamen überlappen auf der Karte, Werte im Inventar brechen um, „Hier plündern“ verdeckt Buffs, Fenster übereinander, Kamera-Schwenk beim Camp-Start | sichtbare Glitches | S | nein |
+| E10 | Technik: große Dateien teilen (`camp.js`, `build_mode.js`, `camp_decor.js`, `inventory_ui.js`), Konflikt-Schutz 409 + Offline-Puffer für Spielstände (A9) | Tempo und Datensicherheit | M | nein |
+
+Blockierende Entscheidungen: Ranking-Bonus, #080 Dunkelheit, #086 Enden, Boss-Konzept, Gelände-Stil für POIs (vor PixelLab festlegen), Cockpit-Reste A10.

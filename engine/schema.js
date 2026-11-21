@@ -1660,7 +1660,7 @@ export const AREAS = {
     name: 'Oberwelt-Orte', singular: 'Ort', icon: 'map', file: 'data/locations.json', kind: 'catalog',
     hint: 'Punkte auf der Oberweltkarte rund um BigCityDelta. Jeder Ort zeigt auf einen POI.',
     template: { name: 'Neuer Ort', poi: '', position: [0, 0], region: '' },
-    row: (x, p) => `${p?.data.pois?.[x.poi]?.name || x.poi || '–'} · ${x.region || ''}`,
+    row: (x, p) => [p?.data.pois?.[x.poi]?.name || x.poi || '–', x.region].filter(Boolean).join(' · '),
     sections: [{ title: 'Ort', fields: [NAME, LOOK, ref('poi', 'POI', 'pois', { required: true }), point('position', 'Position', { unit: 'km' }), text('region', 'Region'), DESCRIPTION,
       bool('hidden', 'Versteckt', { hint: '#057: nicht auf der Reisekarte, bis ein Ereignis ihn verrät (Ereignis-Baukasten › Antworten › Ort aufdecken); dann mit Straßen zum nächsten Ort und dorthin, wo Leyla gerade ist. Nie der erste Ort (Start)' })] }],
   },

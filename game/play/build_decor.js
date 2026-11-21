@@ -30,12 +30,12 @@ export class BuildDecor {
     if (all.length) out.push(el('div', { class: 'build-sub' }, icon('particles', 14), ` Ensembles ${on.size} von ${all.length}`));
     for (const [id, e] of all) {
       const n = on.get(id) || 0;
-      out.push(el('div', { class: 'build-row' + (n ? '' : ' dim'), title: e.description || '' }, icon(n ? 'particles' : 'lock', 16),
+      out.push(el('div', { class: 'build-row' + (n ? '' : ' dim'), title: e.description || null }, icon(n ? 'particles' : 'lock', 16),
         el('span', {}, el('b', {}, `${e.name || id}${n > 1 ? ` ×${n}` : ''}`), el('small', {}, n ? `steht · +${(e.cozy || 0) * n} Gemütlichkeit` : `braucht ${(e.needs || []).map(x => `${x.count ?? 1}× ${x.tag}`).join(', ')} · innerhalb ${e.within ?? 6} Kacheln · +${e.cozy || 0}`))));
     }
     for (const id of shopDecor(D)) {
       const d = decorDef(D, id), price = priceOf(D, id), poor = price > save.deltas;
-      out.push(el('div', { class: 'build-row', title: d.description || '' }, el('span', { class: 'build-dot', style: `--col:${d.color || (d.colors || '').split(',')[0] || '#ffd27a'}` }),
+      out.push(el('div', { class: 'build-row', title: d.description || null }, el('span', { class: 'build-dot', style: `--col:${d.color || (d.colors || '').split(',')[0] || '#ffd27a'}` }),
         el('span', {}, el('b', {}, d.name || id), el('small', {}, `${placeName(d.place)}${d.cozy ? ` · +${d.cozy} Gemütlichkeit` : ''}`)),
         el('button', { class: 'inv-btn', disabled: poor, title: poor ? 'Zu wenig Δ' : 'Kaufen und gleich platzieren', onclick: () => this.buyDecor(id) }, `${de(price)} Δ`)));
     }
@@ -118,7 +118,7 @@ export class BuildDecor {
       this.say(`✨ ${e.name}! +${e.cozy} Gemütlichkeit`, 'ok');
       this.sfx.chime?.() ?? this.sfx.coins?.();
       for (const k of e.members) { const b = this.camp.decorBoxes?.[k]; if (b) for (let n = 0; n < 6; n++) this.scene.time.delayedCall(n * 70 + k * 30, () => this.scene.fx?.puff?.(b.x + (Math.random() - 0.5) * 50, b.y0 - 10 - Math.random() * 30, 0xffd541)); }
-    } else this.say(`${decorDef(this.D, r.ok ? this.save.rig.decor[r.i].id : h.id)?.name || ''} steht`, 'ok');
+    } else this.say(`${decorDef(this.D, r.ok ? this.save.rig.decor[r.i].id : h.id)?.name || 'Das Stück'} steht`, 'ok');
     this.scene.achieveLevel?.('decor', this.save.rig.decor.length);
     this.scene.achieveLevel?.('ensembles', new Set(now.map(e => e.id)).size);
   }
