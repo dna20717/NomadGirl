@@ -2,6 +2,7 @@
 //   C chests (E: lid opens, the POI's loot lies in front as a bundle)   S switches (E: the nearest door D opens, for good)
 //   B brittle walls (a melee hit breaks the whole wall, counts as a secret)   Z goal (E: POI done, time stops, ranking)
 //   $ camouflaged brittle walls (look like the wall, break the same)   % fake walls (look like the wall, Leyla walks through, they fade; secrets too)
+//   + keys (#168: a prop of the POI's story, E picks it up, the HUD lists it)   | locks (#168: door, gate, valve, hatch: E with its key opens them)
 // After the goal the run is finished; E at the van pays the base money plus the rank bonus (k.o. on the way back = everything gone).
 import { roomTale } from '../../engine/dressing_story.js';
 import { rollLoot } from '../inventory.js';
@@ -12,6 +13,8 @@ import { earn, earnText } from '../earn.js';
 import { foeFor, glitchState } from '../glitch_world.js';
 import { uniqueEntity } from '../glitchlings.js';
 import { stock } from '../crafting.js';
+import { ladderArt } from './ladder_art.js';
+import { keyKindName } from '../../engine/cycles.js';
 
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
 
@@ -33,6 +36,24 @@ function groups(room, kind) {
 }
 const box = g => { const xs = g.map(p => p[0]), ys = g.map(p => p[1]); return { x0: Math.min(...xs), x1: Math.max(...xs) + 1, y0: Math.min(...ys), y1: Math.max(...ys) + 1 }; };
 
+// #168 the props of the cycle graph's keys from code (no painted asset yet, docs/assets.md › Wunschliste): a key, a keycard, a stamp,
+// a valve wheel, a fuse, a code note, a ticket, a tag; (x, y) = centre, k = scale, col = the metal or paper colour
+export function drawKeyShape(g, kind, x, y, k = 1, col = 0xffd27a) {
+  const r = n => n * k, dark = 0x15141a;
+  switch (kind) {
+    case 'keycard': g.fillStyle(0xe8e8e8).fillRect(x - r(18), y - r(12), r(36), r(24)); g.fillStyle(0x20d6c7).fillRect(x - r(18), y - r(6), r(36), r(5)); g.fillStyle(col).fillRect(x - r(14), y + r(3), r(8), r(6)); break;
+    case 'stamp': g.fillStyle(0x8a6a44).fillRect(x - r(4), y - r(18), r(8), r(16)); g.fillStyle(col).fillRect(x - r(12), y - r(3), r(24), r(8)); g.fillStyle(0xd0303a).fillRect(x - r(14), y + r(5), r(28), r(5)); break;
+    case 'valve': g.lineStyle(Math.max(2, r(5)), 0xd0303a).strokeCircle(x, y, r(15)); g.lineStyle(Math.max(1, r(3)), 0xd0303a); for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + 0.4; g.lineBetween(x, y, x + Math.cos(a) * r(15), y + Math.sin(a) * r(15)); } g.fillStyle(dark).fillCircle(x, y, r(4)); break;
+    case 'fuse': g.fillStyle(0xe8d8a0).fillRect(x - r(14), y - r(7), r(28), r(14)); g.fillStyle(0xb9c0c9).fillRect(x - r(20), y - r(6), r(6), r(12)).fillRect(x + r(14), y - r(6), r(6), r(12)); g.fillStyle(0xd0303a).fillRect(x - r(3), y - r(7), r(6), r(14)); break;
+    case 'note': g.fillStyle(0xf2ead0).fillRect(x - r(13), y - r(16), r(26), r(32)); g.fillStyle(0x4a5462); for (let i = 0; i < 4; i++) g.fillRect(x - r(9), y - r(10) + i * r(7), r(18 - (i % 2) * 6), Math.max(1, r(2))); break;
+    case 'ticket': g.fillStyle(0xf2ead0).fillRect(x - r(18), y - r(9), r(36), r(18)); g.fillStyle(0x20d6c7).fillRect(x + r(8), y - r(9), r(4), r(18)); g.fillStyle(dark).fillRect(x - r(13), y - r(3), r(16), Math.max(1, r(3))); break;
+    case 'tag': g.fillStyle(col).fillCircle(x, y, r(14)); g.fillStyle(dark).fillCircle(x, y - r(9), r(3)); g.fillStyle(0x8a6a44).fillRect(x - r(5), y - r(2), r(10), r(8)); break;
+    default:   // a plain key on a ring
+      g.lineStyle(Math.max(2, r(4)), col).strokeCircle(x - r(11), y, r(8));
+      g.fillStyle(col).fillRect(x - r(4), y - r(3), r(24), r(6)).fillRect(x + r(12), y + r(3), r(4), r(7)).fillRect(x + r(18), y + r(3), r(4), r(5));
+  }
+}
+
 export class PoiLevel {
   // poi: id of the POI (run) or null (a single room in the test mode: chests take the first loot table)
   constructor(scene, poi) {
@@ -53,15 +74,40 @@ export class PoiLevel {
     this.walls = groups(R, 'B').map(g => solidGroup(g, 'B'));
     for (const d of this.doors) this.drawDoor(d);
     for (const w of this.walls) this.drawWall(w);
+    // #168 locks and keys of the cycle graph (L.cycles): a lock knows its key by name, a key the lock it opens
+    const C = s.levelInfo?.cycles || {}, lockAt = new Map((C.locks || []).flatMap(l => l.tiles.map(([x, y]) => [x + ',' + y, l])));
+    this.locks = groups(R, '|').map(g => {
+      const info = lockAt.get(g[0].join(',')) || { kind: 'door', name: 'Schloss', key: 'Schlüssel', keyKind: 'key' };
+      const o = { ...solidGroup(g, '|'), info, hatch: !!info.hatch };
+      this.drawLock(o);
+      // a red lamp that glows through the dark until the key opens it (then cyan)
+      o.glow = s.add.image((o.x0 + o.x1) / 2 * T, o.hatch ? o.y0 * T + 20 : o.y1 * T - 10, s.textures.exists('fx_glow') ? 'fx_glow' : '__WHITE').setBlendMode(Phaser.BlendModes.ADD).setDepth(-4).setScale(0.9).setAlpha(0.7).setTint(0xff4060);
+      return o;
+    });
+    const keyAt = new Map((C.keys || []).map(k => [k.x + ',' + k.y, k]));
+    this.keys = (R.marks['+'] || []).map(([x, y]) => {
+      const info = keyAt.get(x + ',' + y) || { name: 'Schlüssel', kind: 'key', lock: 'Schloss' };
+      const k = { x: (x + 0.5) * T, feet: (y + 1) * T, tx: x, ty: y, info, taken: false, art: s.add.graphics().setDepth(-3) };
+      this.drawKey(k);
+      k.glow = s.add.image(k.x, k.feet - 34, s.textures.exists('fx_glow') ? 'fx_glow' : '__WHITE').setBlendMode(Phaser.BlendModes.ADD).setDepth(-4).setScale(1.3).setAlpha(0.55).setTint(0xffd27a);
+      s.tweens.add({ targets: [k.art], y: -6, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      s.tweens.add({ targets: k.glow, alpha: 0.2, duration: 900, yoyo: true, repeat: -1 });
+      return k;
+    });
+    this.held = [];
+    s.hud.setKeys?.([]);
     // camouflaged tiles (art.js drawRoom bakes them like the wall around, on a layer above Leyla)
     for (const c of s.camo || []) {
       if (c.kind === '$') this.walls.push({ ...solidGroup(c.tiles, '$'), rts: c.rts });
       else (this.fakes ??= []).push({ tiles: c.tiles, ...box(c.tiles), rts: c.rts, found: false, set: new Set(c.tiles.map(([x, y]) => x + ',' + y)) });
     }
     this.fakes ??= [];
+    // #168 a link of the cycle graph pairs a switch with its door; the other switches take the nearest door nobody claimed
+    const doorAt = (x, y) => this.doors.find(d => d.tiles.some(([a, b]) => a === x && b === y)) || null;
+    const linked = new Map((C.links || []).map(k => [k.switch.join(','), doorAt(...k.door)])), claimed = new Set([...linked.values()].filter(Boolean));
     this.switches = (R.marks.S || []).map(([x, y]) => {
       const cx = (x + 0.5) * T, cy = (y + 1) * T;
-      const door = this.doors.slice().sort((a, b) => Math.hypot((a.x0 + a.x1) / 2 * T - cx, (a.y0 + a.y1) / 2 * T - cy) - Math.hypot((b.x0 + b.x1) / 2 * T - cx, (b.y0 + b.y1) / 2 * T - cy))[0] || null;
+      const door = linked.get(x + ',' + y) || this.doors.filter(d => !claimed.has(d)).sort((a, b) => Math.hypot((a.x0 + a.x1) / 2 * T - cx, (a.y0 + a.y1) / 2 * T - cy) - Math.hypot((b.x0 + b.x1) / 2 * T - cx, (b.y0 + b.y1) / 2 * T - cy))[0] || null;
       const sw = { x: cx, feet: cy, door, on: false, art: s.add.graphics().setDepth(-8) };
       this.drawSwitch(sw);
       return sw;
@@ -168,6 +214,37 @@ export class PoiLevel {
     g.fillStyle(0xd4a72c); for (let yy = y + 6; yy < y + h; yy += 44) g.fillRect(x + 2, yy, w - 4, 4);   // warning stripes
     g.fillStyle(0xff4060).fillRect(x + w / 2 - 5, y + h - 30, 10, 10);   // lamp: red = shut
   }
+  // #168 a lock from code by its kind (Struktur › Schlüssel › Schloss): door/gate/grate stand in a seam, valve and fuse box are a
+  // door with a fitting; a hatch lies in a ladder. A red lamp until its key opens it, the key's symbol on a plate
+  drawLock(o) {
+    const T = this.scene.T, g = o.art.clear(), x = o.x0 * T, y = o.y0 * T, w = (o.x1 - o.x0) * T, h = (o.y1 - o.y0) * T, k = o.info.kind;
+    if (o.hatch) {
+      g.fillStyle(0x24272e).fillRect(x - 6, y + 4, w + 12, h - 8);
+      g.fillStyle(0x4a5058).fillRect(x - 2, y + 8, w + 4, h - 16);
+      g.fillStyle(0xd4a72c); for (let i = 0; i < 4; i++) g.fillRect(x + i * w / 4, y + 8, w / 8, 6);   // warning stripes
+      g.fillStyle(0x15171c); for (const dx of [6, w - 10]) g.fillCircle(x + dx, y + h - 14, 3);   // rivets
+      g.fillStyle(0xff4060).fillCircle(x + w - 8, y + 20, 5);
+      drawKeyShape(g, o.info.keyKind, x + w / 2, y + h / 2 + 4, 0.55, 0xb9c0c9);
+      return;
+    }
+    if (k === 'gate' || k === 'grate') {
+      g.fillStyle(0x24272e).fillRect(x + w / 2 - 10, y, 20, h);
+      for (let yy = y + 8; yy < y + h - 4; yy += 30) { g.fillStyle(k === 'gate' ? 0xe8e8e8 : 0x6d758d).fillRect(x + 2, yy, w - 4, 12); if (k === 'gate') g.fillStyle(0xd0303a).fillRect(x + 2 + (w - 4) / 2, yy, (w - 4) / 2, 12); }
+      if (k === 'grate') { g.fillStyle(0x3a3f48); for (let xx = x + 6; xx < x + w; xx += 14) g.fillRect(xx, y, 5, h); }
+    } else {
+      g.fillStyle(0x15141a).fillRect(x - 4, y, w + 8, h);
+      g.fillStyle(0x5b6170).fillRect(x, y, w, h);
+      g.fillStyle(0x3a3f48); for (let yy = y + 10; yy < y + h; yy += 22) g.fillRect(x + 4, yy, w - 8, 8);
+      g.fillStyle(0xd4a72c); for (let yy = y + 6; yy < y + h; yy += 66) g.fillRect(x + 2, yy, w - 4, 5);   // warning stripes
+      if (k === 'valve') { g.lineStyle(6, 0x8a6a44).strokeCircle(x + w / 2, y + h - 90, 20); g.fillStyle(0x15141a).fillCircle(x + w / 2, y + h - 90, 6); }
+      if (k === 'fusebox') { g.fillStyle(0x1a1c22).fillRect(x + 8, y + h - 120, w - 16, 54); g.fillStyle(0x0d0a12).fillRect(x + w / 2 - 6, y + h - 108, 12, 30); }
+    }
+    const py = y + h - 46;
+    g.fillStyle(0x15141a).fillRect(x + w / 2 - 22, py - 22, 44, 40);
+    drawKeyShape(g, o.info.keyKind, x + w / 2, py - 2, 0.6, 0xb9c0c9);
+    g.fillStyle(0xff4060).fillRect(x + w / 2 - 5, y + h - 14, 10, 8);   // lamp: red = shut
+  }
+  drawKey(k) { const g = k.art.clear(); drawKeyShape(g, k.info.kind, k.x, k.feet - 34, 1, 0xffd27a); }
   drawWall(wl) {
     const T = this.scene.T, g = wl.art.clear();
     for (const [tx, ty] of wl.tiles) {
@@ -307,6 +384,10 @@ export class PoiLevel {
     if (bc && (!zg || Math.abs(bc.x - l.x) < Math.abs(zg.x - l.x))) return { text: `Bonus-Kiste öffnen · Rang ${bc.bonus.grade}`, act: () => this.openChest(bc) };
     for (const z of this.goals) if (close(z)) return this.done ? { text: `Geknackt · Abkürzung zum Van: ${this.shortcutWay()}` } : T?.active ? { text: `Tresor der ${T.gang} · nur mit Gewalt`, act: () => T.vault(() => this.finish()) } : { text: 'Tresor knacken · POI abschließen', act: () => this.finish() };
     for (const c of this.chests) if (!c.open && close(c)) return { text: T?.active ? `Kiste der ${T.gang} öffnen` : 'Kiste öffnen', act: () => this.openChest(c) };
+    // #168 keys and locks of the cycle graph
+    for (const k of this.keys) if (!k.taken && close(k)) return { text: `${k.info.name} aufheben`, act: () => this.takeKey(k) };
+    for (const o of this.locks) if (!o.open && this.nearLock(o))
+      return this.held.includes(o.info.key) ? { text: `${o.info.name} öffnen · ${o.info.key}`, act: () => this.openLock(o) } : { text: `${o.info.name} · verschlossen, braucht: ${o.info.key}` };
     const talk = T?.near(); if (talk) return talk;   // #061
     for (const f of this.fuses || []) if (close(f)) return { text: f.on ? 'Sicherungskasten · Strom aus' : 'Sicherungskasten · Strom an', act: () => this.toggleFuse(f) };   // #082
     for (const sw of this.switches) if (close(sw)) return sw.on ? { text: 'Schalter ist umgelegt' } : sw.dueled ? { text: 'Schalter umlegen', act: () => this.pull(sw) } : { text: 'Schalter hacken · Glitch-Duell', act: () => this.duelAt(sw, 'Schalter', `sw${this.switches.indexOf(sw)}`) };
@@ -345,8 +426,10 @@ export class PoiLevel {
 
   // where the way back is (#038: stacked POIs have a shaft beside the rooms instead of the tunnel underneath)
   shortcutWay() {
-    const st = this.scene.levelInfo?.stack;
-    return st === 'tower' ? 'der Schacht neben dem Turm, ganz nach unten' : st === 'deep' ? 'durch die Tür am Schacht, die Leiter hoch' : 'unten durch den Tunnel';
+    const st = this.scene.levelInfo?.stack, sc = this.scene.levelInfo?.shortcut || {};   // #168 the outer circle's recipe shapes it
+    if (st === 'tower') return sc.oneWay ? 'in den Schacht neben dem Turm springen, unten der Schalter' : sc.hidden ? 'hinter der getarnten Wand in den Schacht, ganz nach unten' : 'der Schacht neben dem Turm, ganz nach unten';
+    if (st === 'deep') return sc.hidden ? 'durch die Tür am Schacht, die Leiter hoch, oben durch die getarnte Wand' : sc.open ? 'die Leiter im Schacht hoch' : 'durch die Tür am Schacht, die Leiter hoch';
+    return sc.oneWay ? 'durch die Bodenplatte runter in den Tunnel' : sc.hidden ? 'durch die Falltür im Boden, unten durch den Tunnel' : sc.door ? 'unten durch den Tunnel, der Schalter öffnet die Tür am Eingang' : 'unten durch den Tunnel';
   }
 
   openChest(c) {
@@ -411,6 +494,56 @@ export class PoiLevel {
     s.cam.shake(260, 0.004);
     s.tweens.add({ targets: d.art, y: -(d.y1 - d.y0) * s.T + 12, duration: 900, ease: 'Sine.easeInOut' });
     s.hud.toast('Abkürzung offen!', 'Ein Schalter hat eine Tür geöffnet', 'good', 3000);
+  }
+  // #168 a lock is in reach: beside it (door, gate) or above / below it (a hatch in a ladder)
+  nearLock(o) {
+    const l = this.scene.leyla, T = this.scene.T, range = this.scene.data_.camp?.interactRange ?? 130;
+    const dx = Math.max(o.x0 * T - l.x, 0, l.x - o.x1 * T), top = l.feet - (l.size?.h || 170);
+    return dx < range * 0.8 && l.feet > o.y0 * T - T * (o.hatch ? 1.2 : 0.5) && top < o.y1 * T + T * (o.hatch ? 1.2 : 0);
+  }
+  takeKey(k) {
+    const s = this.scene;
+    k.taken = true;
+    s.tweens.killTweensOf(k.art); s.tweens.killTweensOf(k.glow);
+    s.tweens.add({ targets: [k.art, k.glow], y: '-=60', alpha: 0, duration: 420, onComplete: () => { k.art.destroy(); k.glow.destroy(); } });
+    s.fx.sparks(k.x, k.feet - 34, 0xffd27a, 12);
+    s.sfx?.('switch', { x: k.x });
+    this.held.push(k.info.name);
+    s.hud.setKeys?.(this.held);
+    s.drone?.react?.('curious');
+    s.hud.toast(`Gefunden: ${k.info.name}`, `${keyKindName(k.info.kind)} · öffnet: ${k.info.lock}`, 'loot', 4200);
+  }
+  openLock(o) {
+    const s = this.scene, T = s.T;
+    this.openSolid(o);
+    this.held.splice(this.held.indexOf(o.info.key), 1);
+    s.hud.setKeys?.(this.held);
+    o.glow?.setTint(0x3fe0d0);
+    if (o.glow) s.tweens.add({ targets: o.glow, alpha: 0, delay: 1200, duration: 800 });
+    if (o.hatch) { for (const [x, y] of o.tiles) { s.room.tiles[y][x] = 'H'; this.hatchLadder(x, y); } s.tweens.add({ targets: o.art, alpha: 0, duration: 500 }); }
+    else s.tweens.add({ targets: o.art, y: -(o.y1 - o.y0) * T + 12, duration: 900, ease: 'Sine.easeInOut' });
+    s.sfx?.('door_open', { x: (o.x0 + o.x1) / 2 * T });
+    s.cam.shake(220, 0.004);
+    s.fx.sparks((o.x0 + o.x1) / 2 * T, (o.y0 + o.y1) / 2 * T, 0x3fe0d0, 10);
+    s.hud.toast(`${o.info.name} offen`, `${o.info.key} passt`, 'good', 3000);
+  }
+  // an opened hatch becomes a rung: the ladders above and below join into one, the top tile carries like a platform
+  hatchLadder(x, y) {
+    const s = this.scene, T = s.T, L = s.ladders || [];
+    const above = L.find(l => l.tx === x && l.bottom === y * T), below = L.find(l => l.tx === x && l.top === (y + 1) * T);
+    const top = above ? above.top : y * T, ty = above ? above.ty : y, bottom = below ? below.bottom : (y + 1) * T;
+    s.ladders = L.filter(l => l !== above && l !== below);
+    s.ladders.push({ cx: (x + 0.5) * T, x0: x * T, x1: (x + 1) * T, top, bottom, tx: x, ty });
+    if (below) {   // the old top of the ladder below no longer carries
+      s.platformTiles?.delete(x + ',' + (y + 1));
+      for (const z of s.platforms?.getChildren?.() || []) if (Math.abs(z.x - (x + 0.5) * T) < 1 && Math.abs(z.y - ((y + 1) * T + 8)) < 1) { s.platforms.remove(z, true, true); break; }
+    }
+    if (!above) {
+      s.platformTiles?.add(x + ',' + y);
+      const z = s.add.zone((x + 0.5) * T, y * T + 8, T, 16); s.platforms?.add(z);
+      Object.assign(z.body.checkCollision, { down: false, left: false, right: false });
+    }
+    ladderArt(s, x * T, (x + 1) * T, y * T, (y + 1) * T, { depth: -9.5 });
   }
   openSolid(o) {
     o.open = true;
@@ -525,6 +658,9 @@ export class PoiLevel {
       walls: this.walls.map(w => ({ x0: w.x0, x1: w.x1, y0: w.y0, y1: w.y1, open: w.open, kind: w.kind })),
       fakes: this.fakes.map(f => ({ x0: f.x0, x1: f.x1, y0: f.y0, y1: f.y1, found: f.found, alpha: +(f.rts[0]?.alpha ?? 1).toFixed(2) })),
       goals: this.goals.map(z => ({ x: Math.round(z.x), feet: z.feet })),
+      keys: this.keys.map(k => ({ x: Math.round(k.x), feet: k.feet, tx: k.tx, ty: k.ty, name: k.info.name, taken: k.taken })),   // #168
+      locks: this.locks.map(o => ({ x0: o.x0, x1: o.x1, y0: o.y0, y1: o.y1, open: o.open, name: o.info.name, key: o.info.key, hatch: o.hatch })),
+      held: [...this.held],
     };
   }
 }

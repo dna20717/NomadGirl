@@ -29,8 +29,9 @@ export class Fog {
     this.on = F.enabled !== false && s.mode !== 'camp' && !!R?.start;
     if (!this.on) return;
     const w = R.w, h = R.h, inside = (x, y) => s.terrain?.inside?.(x, y) ?? false;
-    const solid = (x, y) => { const t = R.tiles[y]?.[x]; return t == null || (SOLID_TILES.has(t) && t !== 'D') || t === '%'; };
-    const pass = (x, y) => { const t = R.tiles[y]?.[x]; return t != null && (!SOLID_TILES.has(t) || t === 'D') && t !== '%'; };
+    const shut = t => t === 'D' || t === '|';   // doors and locks (#168) open later: what lies behind is the level, no secret
+    const solid = (x, y) => { const t = R.tiles[y]?.[x]; return t == null || (SOLID_TILES.has(t) && !shut(t)) || t === '%'; };
+    const pass = (x, y) => { const t = R.tiles[y]?.[x]; return t != null && (!SOLID_TILES.has(t) || shut(t)) && t !== '%'; };
     // reachable without secrets, then with them
     const flood = (seeds, ok) => { const set = new Set(seeds.map(([x, y]) => x + ',' + y)), q = [...seeds]; while (q.length) { const [x, y] = q.pop(); for (const [nx, ny] of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]) { const k = nx + ',' + ny; if (!set.has(k) && ok(nx, ny)) { set.add(k); q.push([nx, ny]); } } } return set; };
     const normal = flood([R.start], pass);

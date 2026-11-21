@@ -54,6 +54,8 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .hud-right { justify-items: end; }
 .hud-row { display: flex; align-items: baseline; gap: 8px; font: 26px/1 VT323, monospace; text-shadow: 0 2px 0 var(--ng-night); }
 .hud-row b { font-weight: normal; color: #fff; margin-right: 10px; }
+.hud-carry[hidden] { display: none; }   /* #168 the keys row only while Leyla carries one */
+.hud-carry b { color: #ffd27a; }
 .hud-label { color: var(--ng-lilac); font-size: 18px; letter-spacing: 1px; }
 .hud-room { color: var(--ng-cyan); font-size: 22px; letter-spacing: 1px; }
 /* #020 vitals: slanted neon meters with segments, scanlines and a ghost bar (Daniel, 14.11.2026: „passendes Cyberpunk-Design“) */

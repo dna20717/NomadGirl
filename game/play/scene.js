@@ -404,6 +404,7 @@ export class PlayScene extends Phaser.Scene {
     // chests, switches + doors, brittle walls, goal (game/play/poi_level.js): in POI levels and in single rooms that have them
     const M = R.marks || {};
     this.camo = drawn?.camo || [];
+    this.hud.setKeys?.([]);   // #168 keys belong to one POI run
     this.level = this.mode !== 'camp' && (this.levelInfo?.def || ['C', 'S', 'D', 'B', 'Z', '%', '$'].some(k => M[k]?.length)) ? new PoiLevel(this, run?.poi || null) : null;
     this.turf = Turf.make(this);   // #061 Revier-Camp: the gang's mood towards Leyla
     if (this.turf) this.time.delayedCall(1500, () => this.turf?.hint());

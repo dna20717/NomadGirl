@@ -18,6 +18,8 @@ const pois = JSON.parse(fs.readFileSync(new URL('../projects/nomadgirl/data/pois
 pois.tankstelle_km7.seed = 7;
 // #017: the classic four rooms (the checks know their layout; new rooms are checked by the reach test in test/poi.test.js)
 Object.assign(pois.tankstelle_km7, { rooms: ['vorplatz', 'verkaufsraum', 'lager', 'werkstatthalle'], roomCount: [3, 4] });
+// #168 the classic tunnel, open at both ends (Struktur › Rezepte: only Doppelweg); the other recipes: tools/cycles_test.mjs
+pois.tankstelle_km7.cycles = { ...pois.tankstelle_km7.cycles, recipes: [{ recipe: 'doublePath', weight: 1 }] };
 await page.addInitScript(p => localStorage.setItem('nomadgirl-drafts:data/pois.json', JSON.stringify(p)), pois);
 // #141: every rank gets a Δ bonus and the bonus crate (the test run's rank depends on kills and secrets)
 const ranking = JSON.parse(fs.readFileSync(new URL('../projects/nomadgirl/data/ranking.json', import.meta.url), 'utf8'));

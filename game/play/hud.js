@@ -98,7 +98,8 @@ export class Hud {
         el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'NÄGEL'), this.ammo, this.dash)),
       this.rightEl = el('div', { class: 'hud-right' },
         el('div', { class: 'hud-row' }, this.roomName),
-        el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'ZEIT'), this.time, el('span', { class: 'hud-label' }, 'KILLS'), this.kills, el('span', { class: 'hud-label' }, 'Δ'), this.deltas)),
+        el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'ZEIT'), this.time, el('span', { class: 'hud-label' }, 'KILLS'), this.kills, el('span', { class: 'hud-label' }, 'Δ'), this.deltas),
+        this.keysRow = el('div', { class: 'hud-row hud-carry', hidden: true }, el('span', { class: 'hud-label' }, 'SCHLÜSSEL'), this.keysText = el('b', {}))),
       this.campEl, this.buildBtn, this.openBtn, this.toastsEl, this.promptEl, this.menuEl, this.help,
       this.footEl = el('div', { class: 'hud-foot' }, // tidy (#008, Daniel: „HUD aufräumen“): only the menu button and the version; Werkstatt, Startseite and Neues Spiel live in the menu
         el('button', { class: 'hud-menubtn', title: 'Menü (Esc)', onclick: e => { e.currentTarget.blur(); this.pauseMenu(); } }, icon('menu', 14), 'Menü'),
@@ -418,6 +419,12 @@ export class Hud {
   rules() { const D = this.scene?.data_; if (this.rulesFor !== D || !this.rulesCache) { this.rulesFor = D; this.rulesCache = noticeRules(D); } return this.rulesCache; }
   // #129 the Logbuch lives in the Questlog as its second tab (Daniel 21.11.)
   logbook() { this.quests?.open('log'); }
+  // #168 the keys Leyla carries in this POI (a row under the time; hidden while she has none)
+  setKeys(names = []) {
+    if (!this.keysRow) return;
+    this.keysRow.hidden = !names.length;
+    this.keysText.textContent = names.join(' · ');
+  }
   // every message of the game: a note top right that stacks and goes by itself, with its own icon, colour and sound.
   // The same title twice in a row does not stack: the toast already there starts its time again (and nods). → the element
   toast(title, sub = '', kind = 'info', ms = 4200, { banner = false, sound = true, queued = false, cat = null } = {}) {
