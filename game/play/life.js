@@ -143,8 +143,8 @@ export class Life {
     if (time >= (e.feudAt ?? 0)) {
       e.feudAt = time + (e.a.cooldown ?? 1300) + 400;
       const dmg = Math.max(1, Math.round((e.d.damage ?? 10) * this.R.feudDamage / 100));
-      if (shot) { const g = this.scene.add.graphics().setDepth(9); g.lineStyle(3, 0xffd27a, 0.9).lineBetween(e.x + dir * 30, e.chest, o.x, o.chest); this.scene.time.delayedCall(70, () => g.destroy()); this.scene.sfx?.('gun_enemy', { x: e.x }); }
-      else this.scene.fx.text(e.x + dir * 40, e.chest - 30, '✕', { color: '#ffd27a', size: 36, rise: 20 });
+      if (shot) { const g = this.scene.add.graphics().setDepth(9); g.lineStyle(3, 0xffd27a, 0.9).lineBetween(e.x + dir * 30, e.chest, o.x, o.chest); this.scene.time.delayedCall(70, () => g.destroy()); this.scene.sfx?.('enemy_shot', { x: e.x }); }
+      else { this.scene.fx.text(e.x + dir * 40, e.chest - 30, '✕', { color: '#ffd27a', size: 36, rise: 20 }); this.scene.sfx?.('enemy_swing', { x: e.x }); }
       this.scene.time.delayedCall(shot ? 60 : 160, () => this.hurt(o, dmg, e, dir));
     }
     return true;

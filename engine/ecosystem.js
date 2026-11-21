@@ -41,7 +41,7 @@ export const LIFE = {
     { id: 'raider_camp', name: 'Plünderer-Lager', faction: 'raiders', members: [2, 3], width: 5, props: 'fire,stash', round: true, story: 'raider_camp' },
   ],
   sim: { recover: 12, nestGrowth: 15, nestMax: 160, nestSplit: 140, maxNests: 2, dissolveBelow: 25, dissolveDays: 2, moveChance: 50, wander: 5,
-    visitChance: 15, visitDays: 2, refillDays: 3, settleStrength: 50, takeover: 60, nestChance: 4, maxCamps: 4, sentries: 35, roundReach: 36, maxStrength: 130 },
+    visitChance: 15, visitDays: 2, refillDays: 3, settleStrength: 50, takeover: 60, nestChance: 4, maxCamps: 4, sentries: 35, roundReach: 36, maxStrength: 115 },
   director: { peak: 70, calm: 25, decay: 6, perEngaged: 5, perHurt: 0.8, perKill: 6, siren: 45, peakMin: 6, peakMax: 25, relax: 18, wowGrace: 8,
     lull: 45, maxWaves: 2, waveSize: 2, notice: 50, feudDamage: 60, music: 30 },
   lines: [
