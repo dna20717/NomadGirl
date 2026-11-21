@@ -1,5 +1,14 @@
 {
  "stage": {"toastMax": 3, "stack": 5},
+ "zones": [
+  {"id": "A", "name": "Vitals", "max": 0, "compact": true},
+  {"id": "B", "name": "Ansage", "max": 1, "compact": true},
+  {"id": "C", "name": "Status", "max": 0, "compact": false},
+  {"id": "D", "name": "Meldungen", "max": 5, "compact": false},
+  {"id": "E", "name": "Aktion", "max": 1, "compact": false},
+  {"id": "F", "name": "Lehre", "max": 1, "compact": false},
+  {"id": "G", "name": "Medien", "max": 1, "compact": false}
+ ],
  "kinds": [
   {"id": "info", "name": "Hinweis", "icon": "info", "sound": "ping", "waitsWindow": true, "waitsFull": true, "buildLog": false, "cat": ""},
   {"id": "good", "name": "Erfolg", "icon": "check", "sound": "good", "waitsWindow": false, "waitsFull": false, "buildLog": true, "cat": ""},

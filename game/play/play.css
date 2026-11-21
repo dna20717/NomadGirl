@@ -32,7 +32,24 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 #game { position: fixed; inset: 0; }
 #hud { position: fixed; inset: 0; pointer-events: none; font-family: var(--ui-font); color: var(--ng-text); }
 #hud a, #hud button { pointer-events: auto; }
-.hud-top { display: flex; justify-content: space-between; padding: 16px 20px; gap: 16px; }
+/* #154 Info-Center, Bühne (game/play/stage.js): fixed zones in three columns, every overlay hangs in one zone; nothing places itself */
+#stage { position: absolute; inset: 0; display: grid; grid-template-columns: minmax(min-content, 1fr) minmax(0, 1fr) minmax(min-content, 1fr); gap: 24px; padding: 16px 20px 12px; box-sizing: border-box; pointer-events: none; }
+.stage-col { display: flex; flex-direction: column; gap: 10px; min-height: 0; min-width: 0; }
+.stage-col.left { align-items: flex-start; } .stage-col.mid { align-items: center; } .stage-col.right { align-items: flex-end; }
+.stage-gap { flex: 1 1 0; min-height: 0; }
+.stage-zone { display: flex; flex-direction: column; gap: 8px; align-items: inherit; flex: 0 0 auto; min-height: 0; max-width: 100%; }
+.stage-zone:empty { display: none; }
+.zone-b, .zone-d, #stage[data-ctx="build"] .zone-a { flex-shrink: 1; overflow: clip; overflow-clip-margin: 24px; }   /* the notes never grow into the next zone */
+.zone-b { width: 100%; }
+.zone-g { margin-right: -20px; padding-right: 20px; }   /* the tape is flush with the right edge */
+.zone-e { margin-bottom: calc(3vh - 12px); }
+.stage-over { display: none !important; }
+#stage .hud-toast { box-sizing: border-box; min-width: min(260px, 100%); max-width: min(460px, 100%); } #stage .hud-toast.banner { min-width: min(340px, 100%); }   /* Werkstatt › Meldungen › Zonen: more entries than the zone allows */
+#hud[data-building] #stage { padding-top: var(--build-top, 130px); padding-bottom: var(--build-bottom, 64px); }   /* below the build bar, above its hint line */
+#hud[data-building] #stage .hud-left, #hud[data-building] #stage .hud-right, #hud[data-building] #stage .hud-camp { display: none; }
+#stage:not([data-ctx="play"]) .tut-tip { display: none; }
+#stage[data-ctx="window"] .zone-c, #stage[data-ctx="window"] .zone-r { visibility: hidden; }   /* ⚠️ a window open: it has the stage, the status waits (it peeked out under the frame) */   /* Konzept › 4: the tip only on a calm stage */
+.zone-g:has(.np-card.on:not(.stage-over)) .radio-chip > :not(svg):not(canvas) { display: none; }   /* the tape is the one card: the chip shrinks to its icon */
 .hud-left, .hud-right { display: grid; gap: 8px; align-content: start; }
 .hud-right { justify-items: end; }
 .hud-row { display: flex; align-items: baseline; gap: 8px; font: 26px/1 VT323, monospace; text-shadow: 0 2px 0 var(--ng-night); }
@@ -71,15 +88,15 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .hud-reloading { position: relative; padding-left: 26px; color: var(--ng-gold); }
 .hud-reloading::before { content: ""; position: absolute; left: 2px; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; background: conic-gradient(var(--ng-gold) var(--p, 0%), var(--ng-line) 0); -webkit-mask: radial-gradient(circle, transparent 4px, #000 5px); mask: radial-gradient(circle, transparent 4px, #000 5px); }
 .hud-reloading.hud-paused { opacity: 0.55; }
-.hud-toasts { position: fixed; right: 24px; top: var(--toast-top, 110px); display: flex; flex-direction: column; gap: 8px; align-items: flex-end; pointer-events: none; z-index: 40; }
+.hud-toasts { position: relative; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; pointer-events: none; z-index: 40; }
 .hud-toast { display: flex; align-items: center; gap: 12px; padding: 10px 16px; min-width: 260px; max-width: 460px; border-radius: 10px; background: rgba(13, 10, 18, .9); border: 1px solid var(--ng-line); color: var(--ng-text2); animation: hud-toast-in .35s ease-out; transition: opacity .4s, transform .4s; }
 .hud-toast.out { opacity: 0; transform: translateX(30px); }
-.hud-windowed .hud-toasts { top: 10px; right: auto; left: 50%; transform: translateX(-50%); align-items: center; z-index: 60; }
-.hud-building .hud-toasts { top: var(--build-top, 130px); }   /* #129 below the build bar, never over its tabs */
-.hud-windowed .hud-toast { min-width: 0; max-width: 420px; padding: 6px 12px; gap: 8px; box-shadow: 0 6px 20px rgba(0, 0, 0, .6); }
-.hud-windowed .hud-toast b { font-size: 22px; }
-.hud-windowed .hud-toast small { font-size: 12px; }
-.hud-windowed .hud-toast.out { transform: translateY(-16px); }
+#stage[data-ctx="window"] .hud-toasts { align-items: center; z-index: 60; }   /* #017 a window open: compact at the top centre (zone B) */
+#stage[data-ctx="build"] .hud-toasts { align-items: flex-start; }   /* #129/#154 build mode: compact on the left below the bar, never over its tabs or the dealer */
+.stage-zone.compact .hud-toast { min-width: 0; max-width: 420px; padding: 6px 12px; gap: 8px; box-shadow: 0 6px 20px rgba(0, 0, 0, .6); }
+.stage-zone.compact .hud-toast b { font-size: 22px; }
+.stage-zone.compact .hud-toast small { font-size: 12px; }
+.stage-zone.compact .hud-toast.out { transform: translateY(-16px); }
 .hud-toast b { display: block; font: 28px/1 VT323, monospace; font-weight: normal; color: var(--ng-text); }
 .hud-toast small { display: block; margin-top: 3px; font-size: 13px; color: var(--ng-lilac); }
 .hud-toast.trophy { border-color: var(--ng-brass); box-shadow: 0 0 18px rgba(255, 210, 122, .25); } .hud-toast.trophy svg, .hud-toast.trophy b { color: var(--ng-gold); }
@@ -132,7 +149,7 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .hud-menubtn svg { width: 14px; height: 14px; }
 @media (max-width: 760px) { .hud-keyhelp, .hud-cols { grid-template-columns: 1fr; } }
 .hud-go { display: block; margin: 4px 0 0 auto; padding: 10px 26px; box-shadow: 0 0 18px rgba(255, 210, 122, .35); border: 0; border-radius: 8px; background: var(--ng-gold); color: var(--ng-night); font: 600 15px var(--ui-font); cursor: pointer; }
-.hud-foot { position: fixed; left: 20px; bottom: 12px; font-size: 12px; color: var(--ng-muted); opacity: .55; transition: opacity .2s; }
+.hud-foot { font-size: 12px; color: var(--ng-muted); opacity: .55; transition: opacity .2s; }
 .hud-foot:hover { opacity: 1; }
 .hud-foot a { color: var(--ng-lilac); }
 #hud.hud-hurt::after { content: ''; position: fixed; inset: 0; box-shadow: inset 0 0 120px rgba(255, 47, 90, .55); animation: hurt .35s ease-out forwards; }
@@ -140,8 +157,7 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 
 /* camp: status panel, E prompt, menus */
 #hud[data-mode="camp"] .hud-right, #hud[data-mode="camp"] .hud-left .hud-row { display: none; }
-.hud-camp { position: fixed; top: 16px; right: 20px; display: grid; gap: 8px; justify-items: end; }
-#hud[data-mode="run"] .hud-camp { top: auto; bottom: 34px; }
+.hud-camp { display: grid; gap: 8px; justify-items: end; }
 .hud-camp[hidden] { display: none; }
 .hud-goal { display: grid; gap: 3px; justify-items: end; max-width: 420px; padding: 6px 10px 7px; border-radius: 8px; background: rgba(13, 10, 18, .55); border: 1px solid rgba(255, 210, 122, .25); text-align: right; }
 .hud-goal-text { display: flex; gap: 6px; align-items: baseline; font: 20px/1 VT323, monospace; color: var(--ng-gold); }
@@ -152,8 +168,8 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .hud-goal.tank { border-color: rgba(250, 106, 10, .5); } .hud-goal.tank .hud-goal-text, .hud-goal.tank i { color: var(--ng-orange); }
 .hud-goal.lost .hud-goal-text, .hud-goal.lost i { color: var(--ng-muted); }
 .hud-goal.compact { padding: 4px 8px 5px; background: rgba(13, 10, 18, .4); } .hud-goal.compact .hud-goal-text { font-size: 17px; }
-.hud-buildbtn { position: fixed; left: 20px; top: 62px; display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 7px; border-radius: 9px; border: 1px solid var(--ng-line); background: rgba(23, 17, 31, .82); color: var(--ng-gold); font: 22px/1 VT323, monospace; cursor: pointer; pointer-events: auto; }
-.hud-openbtn { position: fixed; left: 20px; top: 106px; display: flex; align-items: center; gap: 7px; padding: 6px 12px 6px 10px; border-radius: 9px; border: 1px solid var(--ng-line); background: rgba(23, 17, 31, .82); color: #c9c2d6; font: 22px/1 VT323, monospace; cursor: pointer; pointer-events: auto; }
+.hud-buildbtn { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 7px; border-radius: 9px; border: 1px solid var(--ng-line); background: rgba(23, 17, 31, .82); color: var(--ng-gold); font: 22px/1 VT323, monospace; cursor: pointer; pointer-events: auto; }
+.hud-openbtn { display: flex; align-items: center; gap: 7px; padding: 6px 12px 6px 10px; border-radius: 9px; border: 1px solid var(--ng-line); background: rgba(23, 17, 31, .82); color: #c9c2d6; font: 22px/1 VT323, monospace; cursor: pointer; pointer-events: auto; }
 .hud-openbtn:hover { border-color: var(--ng-gold); background: rgba(43, 32, 52, .92); }
 .hud-openbtn[hidden] { display: none; }
 .hud-openbtn.on { color: var(--ng-gold); border-color: #6b5530; }
@@ -167,7 +183,7 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .hud-fxchip.info { color: #9fd8ff; }
 .hud-fxchip.bad { color: #ff7a7a; border-color: #5a2a33; }
 .hud-fxchip small { color: var(--ng-text3); font: inherit; }
-.hud-prompt { position: fixed; left: 50%; bottom: 3%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 8px 16px; border-radius: 8px; background: rgba(13, 10, 18, .8); border: 1px solid var(--ng-line); font: 26px/1 VT323, monospace; color: var(--ng-text); }
+.hud-prompt { display: flex; align-items: center; gap: 10px; padding: 8px 16px; border-radius: 8px; background: rgba(13, 10, 18, .8); border: 1px solid var(--ng-line); font: 26px/1 VT323, monospace; color: var(--ng-text); }
 .hud-prompt[hidden], .hud-menu[hidden] { display: none; }
 .hud-prompt kbd, .hud-item kbd { display: inline-grid; place-items: center; min-width: 26px; height: 26px; border-radius: 5px; background: var(--ng-gold); color: var(--ng-night); font: 22px/1 VT323, monospace; }
 .hud-menu { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(13, 10, 18, .45); pointer-events: auto; }
@@ -506,7 +522,8 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .bm-peek-text p.hint { color: var(--ng-mint); }
 .build-go { font-size: 14px; padding: 9px 16px; }
 @media (max-width: 1100px) { .bm-bar { flex-wrap: wrap; } .bm-budgets { order: 3; flex-basis: 100%; } }
-#hud[data-building] .hud-camp, #hud[data-building] .hud-top { visibility: hidden; }
+#hud[data-building] .hud-camp, #hud[data-building] .hud-left, #hud[data-building] .hud-right { visibility: hidden; }
+#stage .bm-msg { position: relative; left: auto; bottom: auto; transform: none; max-width: 100%; }   /* #154 the build note stands in zone E */
 .hud-padhelp[hidden] { display: none; }
 .pad-ico { display: inline-block; vertical-align: middle; background-repeat: no-repeat; image-rendering: pixelated; }
 .hud-prompt kbd.pad { background: none; border: 0; box-shadow: none; padding: 0; min-width: 0; }
@@ -853,7 +870,7 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .tut-list li.on { background: var(--ng-line-dim); color: var(--ng-gold); border-color: var(--ng-gold); box-shadow: 0 0 10px rgba(255, 210, 122, .25); }
 .tut-list li.fresh::after { content: ''; margin-left: auto; width: 7px; height: 7px; border-radius: 50%; background: var(--ng-cyan); }
 @media (max-width: 760px) { .tut-body, .tut-main { grid-template-columns: 1fr; } .tut-list { max-height: 140px; } }
-.tut-tip { position: fixed; left: 20px; bottom: 64px; z-index: 30; display: flex; gap: 10px; width: min(460px, calc(100vw - 40px)); padding: 10px; border-radius: 12px; background: rgba(23, 17, 31, .9); border: 1px solid var(--ng-line); box-shadow: 0 10px 30px rgba(0, 0, 0, .5); color: var(--ng-text); overflow: hidden; animation: tut-tip-in .35s cubic-bezier(.2, .9, .3, 1.2); pointer-events: auto; }
+.tut-tip { position: relative; z-index: 30; display: flex; gap: 10px; width: min(460px, 100%); box-sizing: border-box; padding: 10px; border-radius: 12px; background: rgba(23, 17, 31, .9); border: 1px solid var(--ng-line); box-shadow: 0 10px 30px rgba(0, 0, 0, .5); color: var(--ng-text); overflow: hidden; animation: tut-tip-in .35s cubic-bezier(.2, .9, .3, 1.2); pointer-events: auto; }
 .tut-tip[hidden] { display: none; }
 @keyframes tut-tip-in { from { transform: translateX(-30px); opacity: 0; } to { transform: none; opacity: 1; } }
 .tut-tip-pic { flex: 0 0 150px; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: var(--ng-night); border: 1px solid var(--ng-line); }
@@ -1073,7 +1090,7 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .build-sub { display: flex; align-items: center; gap: 6px; margin: 8px 2px 2px; color: var(--ng-gold); font: 18px VT323, monospace; }
 
 /* room name over the scene (#043, like The Looter) */
-.room-title { position: absolute; left: 0; right: 0; top: 24%; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 26px 0 22px; pointer-events: none;
+.room-title { position: relative; width: 100%; margin-top: 12vh; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 26px 0 22px; pointer-events: none;
   background: linear-gradient(180deg, transparent, rgba(6, 5, 8, .78) 30%, rgba(6, 5, 8, .78) 70%, transparent); opacity: 0; transform: translateY(-6px); transition: opacity .6s, transform .6s; z-index: 5; }
 .room-title.on { opacity: 1; transform: none; }
 .room-title b { font: 54px/1 VT323, monospace; font-weight: normal; color: #efe6f4; letter-spacing: .04em; text-shadow: 0 2px 0 #060508; }
@@ -1140,7 +1157,7 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .wm-rivals { color: var(--ng-muted2); }
 
 /* #090 Rig-Radio: a chip bottom right, opens wide while the DJ talks */
-.radio-chip { position: fixed; right: 20px; bottom: 12px; z-index: 30; display: flex; align-items: center; gap: 8px; max-width: 220px; padding: 6px 10px; border-radius: 999px;
+.radio-chip { position: relative; z-index: 30; display: flex; align-items: center; gap: 8px; max-width: 220px; padding: 6px 10px; border-radius: 999px;
   background: rgba(27,20,36,.82); border: 1px solid var(--ng-line); color: var(--ng-muted2); font: 12px/1.2 var(--ui-font); cursor: pointer; transition: max-width .4s ease, border-color .3s; }
 .radio-chip[hidden] { display: none; }
 .radio-chip b { color: var(--ng-text3); font-weight: 600; white-space: nowrap; }
@@ -1148,7 +1165,7 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .radio-chip kbd { font: 11px/1 var(--ui-font); padding: 2px 5px; border-radius: 4px; background: #2b2236; color: var(--ng-muted2); }
 .radio-chip.on { color: var(--ng-text3); border-color: #5a4a6a; }
 .radio-chip.on svg { color: var(--ng-teal); }
-.radio-chip.talk { max-width: min(620px, calc(50vw - 260px)); border-color: var(--ng-teal); }
+.radio-chip.talk { max-width: min(620px, 100%); border-color: var(--ng-teal); }
 .radio-chip.talk span { white-space: normal; color: var(--ng-text); text-align: left; }
 
 /* #111 Ensembles not standing yet: quieter */
