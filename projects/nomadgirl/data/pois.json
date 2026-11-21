@@ -139,7 +139,28 @@
    "guideColor": "#3d3d3d",
    "landmarkImage": "wow_priceboard"
   },
-  "dressing": {"desert": 80}
+  "dressing": {"desert": 80},
+  "cycles": {
+   "enabled": true,
+   "rooms": 7,
+   "recipes": [
+    {"recipe": "lockKey", "weight": 4},
+    {"recipe": "changedReturn", "weight": 2},
+    {"recipe": "hiddenShortcut", "weight": 2},
+    {"recipe": "oneWayDown", "weight": 1},
+    {"recipe": "doublePath", "weight": 1},
+    {"recipe": "dangerReward", "weight": 2}
+   ],
+   "keys": [
+    {
+     "name": "Toilettenschlüssel am Radkappen-Anhänger",
+     "kind": "key",
+     "lock": "door",
+     "lockName": "Tür zur Werkstatt",
+     "story": "Der Pächter gab ihn nur gegen Tankquittung raus; er hängt noch am Haken hinterm Tresen"
+    }
+   ]
+  }
  },
  "grossmarkt": {
   "name": "Delta South Megamall",
@@ -245,7 +266,28 @@
    "guideColor": "#c7dcd0",
    "landmarkImage": "wow_dome"
   },
-  "dressing": {"desert": 55}
+  "dressing": {"desert": 55},
+  "cycles": {
+   "enabled": true,
+   "rooms": 7,
+   "recipes": [
+    {"recipe": "lockKey", "weight": 4},
+    {"recipe": "changedReturn", "weight": 2},
+    {"recipe": "hiddenShortcut", "weight": 2},
+    {"recipe": "oneWayDown", "weight": 2},
+    {"recipe": "doublePath", "weight": 2},
+    {"recipe": "dangerReward", "weight": 2}
+   ],
+   "keys": [
+    {
+     "name": "Personal-Keycard „Info-Stand“",
+     "kind": "keycard",
+     "lock": "gate",
+     "lockName": "Rolltor Personal",
+     "story": "Die Aufsicht vom Info-Stand ließ sie beim Ausruf für den kleinen Kevin liegen"
+    }
+   ]
+  }
  },
  "bunker_13": {
   "name": "Deadlock Bunker 13",
@@ -335,7 +377,28 @@
    "guideColor": "#1ebc73",
    "landmarkImage": "wow_reactor"
   },
-  "dressing": {"desert": 5}
+  "dressing": {"desert": 5},
+  "cycles": {
+   "enabled": true,
+   "rooms": 7,
+   "recipes": [
+    {"recipe": "lockKey", "weight": 5},
+    {"recipe": "changedReturn", "weight": 2},
+    {"recipe": "hiddenShortcut", "weight": 2},
+    {"recipe": "oneWayDown", "weight": 2},
+    {"recipe": "doublePath", "weight": 0},
+    {"recipe": "dangerReward", "weight": 2}
+   ],
+   "keys": [
+    {
+     "name": "Ventilrad",
+     "kind": "valve",
+     "lock": "valve",
+     "lockName": "Schott mit Handrad",
+     "story": "Die Rust Guard schrauben die Räder ab, damit keiner ohne Dienstplan durchgeht"
+    }
+   ]
+  }
  },
  "ministerium": {
   "name": "Ministry of Order",
@@ -418,7 +481,23 @@
    "guideColor": "#b33831",
    "landmarkImage": "wow_clock"
   },
-  "dressing": {"desert": 20}
+  "dressing": {"desert": 20},
+  "cycles": {
+   "enabled": true,
+   "rooms": 7,
+   "recipes": [
+    {"recipe": "lockKey", "weight": 5},
+    {"recipe": "changedReturn", "weight": 3},
+    {"recipe": "hiddenShortcut", "weight": 2},
+    {"recipe": "oneWayDown", "weight": 1},
+    {"recipe": "doublePath", "weight": 1},
+    {"recipe": "dangerReward", "weight": 2}
+   ],
+   "keys": [
+    {"name": "Genehmigungsstempel", "kind": "stamp", "lock": "gate", "lockName": "Schranke am Schalter", "story": "Ohne Stempel kein Durchgang: Order is safety"},
+    {"name": "Wartenummer 000", "kind": "ticket", "lock": "door", "lockName": "Tür zum Amtsleiter", "story": "Die Anzeige ruft sie seit Jahren auf, niemand hatte sie"}
+   ]
+  }
  },
  "delta_heights": {
   "name": "Delta Heights",
@@ -489,7 +568,28 @@
    "guideColor": "#45293f",
    "landmarkImage": "landmark_penthouse"
   },
-  "dressing": {"desert": 60}
+  "dressing": {"desert": 60},
+  "cycles": {
+   "enabled": true,
+   "rooms": 7,
+   "recipes": [
+    {"recipe": "lockKey", "weight": 4},
+    {"recipe": "changedReturn", "weight": 2},
+    {"recipe": "hiddenShortcut", "weight": 2},
+    {"recipe": "oneWayDown", "weight": 3},
+    {"recipe": "doublePath", "weight": 1},
+    {"recipe": "dangerReward", "weight": 2}
+   ],
+   "keys": [
+    {
+     "name": "Penthouse-Keycard",
+     "kind": "keycard",
+     "lock": "hatch",
+     "lockName": "Wartungsluke",
+     "story": "Der Bauherr flog mit dem Hubschrauber, die Karte fiel aus dem Jackett"
+    }
+   ]
+  }
  },
  "parkhaus_sued": {
   "name": "P+R Delta Süd",
@@ -584,7 +684,28 @@
    "guideColor": "#f9c22b",
    "landmarkImage": "wow_kiosk"
   },
-  "dressing": {"desert": 55}
+  "dressing": {"desert": 55},
+  "cycles": {
+   "enabled": true,
+   "rooms": 7,
+   "recipes": [
+    {"recipe": "lockKey", "weight": 4},
+    {"recipe": "changedReturn", "weight": 2},
+    {"recipe": "hiddenShortcut", "weight": 2},
+    {"recipe": "oneWayDown", "weight": 2},
+    {"recipe": "doublePath", "weight": 2},
+    {"recipe": "dangerReward", "weight": 2}
+   ],
+   "keys": [
+    {
+     "name": "Parkschein",
+     "kind": "ticket",
+     "lock": "hatch",
+     "lockName": "Schranke zur Rampe",
+     "story": "Die Gebühr läuft seit Jahren; der Schein öffnet die Schranke trotzdem"
+    }
+   ]
+  }
  },
  "funkmast_km31": {
   "name": "Funkmast KM 31",
@@ -655,7 +776,28 @@
    "guideKind": "cable",
    "guideColor": "#2e222f"
   },
-  "dressing": {"desert": 70}
+  "dressing": {"desert": 70},
+  "cycles": {
+   "enabled": true,
+   "rooms": 7,
+   "recipes": [
+    {"recipe": "lockKey", "weight": 4},
+    {"recipe": "changedReturn", "weight": 2},
+    {"recipe": "hiddenShortcut", "weight": 2},
+    {"recipe": "oneWayDown", "weight": 3},
+    {"recipe": "doublePath", "weight": 1},
+    {"recipe": "dangerReward", "weight": 2}
+   ],
+   "keys": [
+    {
+     "name": "Sicherung 30 A",
+     "kind": "fuse",
+     "lock": "hatch",
+     "lockName": "Luke am Sicherungskasten",
+     "story": "Der Funker drehte sie raus, damit niemand den Mast abschaltet"
+    }
+   ]
+  }
  },
  "metro_line4": {
   "name": "Metro Line 4",
@@ -752,7 +894,20 @@
    "guideColor": "#7f708a",
    "landmarkImage": "landmark_board"
   },
-  "dressing": {"desert": 20}
+  "dressing": {"desert": 20},
+  "cycles": {
+   "enabled": true,
+   "rooms": 7,
+   "recipes": [
+    {"recipe": "lockKey", "weight": 4},
+    {"recipe": "changedReturn", "weight": 2},
+    {"recipe": "hiddenShortcut", "weight": 2},
+    {"recipe": "oneWayDown", "weight": 3},
+    {"recipe": "doublePath", "weight": 1},
+    {"recipe": "dangerReward", "weight": 2}
+   ],
+   "keys": [{"name": "Vierkantschlüssel", "kind": "key", "lock": "hatch", "lockName": "Gitterluke", "story": "Jeder Schaffner hatte einen; einer liegt noch im Kiosk"}]
+  }
  },
  "storm_drain9": {
   "name": "Storm Drain 9",
@@ -816,7 +971,20 @@
    "guideKind": "mud",
    "guideColor": "#4c3e24"
   },
-  "dressing": {"desert": 30}
+  "dressing": {"desert": 30},
+  "cycles": {
+   "enabled": true,
+   "rooms": 7,
+   "recipes": [
+    {"recipe": "lockKey", "weight": 3},
+    {"recipe": "changedReturn", "weight": 2},
+    {"recipe": "hiddenShortcut", "weight": 2},
+    {"recipe": "oneWayDown", "weight": 4},
+    {"recipe": "doublePath", "weight": 1},
+    {"recipe": "dangerReward", "weight": 2}
+   ],
+   "keys": [{"name": "Ventilrad", "kind": "valve", "lock": "hatch", "lockName": "Schieber", "story": "Vom Pegelhäuschen, damit der Schieber bei Hochwasser zu bleibt"}]
+  }
  },
  "pit6": {
   "name": "Pit 6",
@@ -887,7 +1055,28 @@
    "guideColor": "#7f708a",
    "landmarkImage": "landmark_headframe"
   },
-  "dressing": {"desert": 25}
+  "dressing": {"desert": 25},
+  "cycles": {
+   "enabled": true,
+   "rooms": 7,
+   "recipes": [
+    {"recipe": "lockKey", "weight": 4},
+    {"recipe": "changedReturn", "weight": 2},
+    {"recipe": "hiddenShortcut", "weight": 2},
+    {"recipe": "oneWayDown", "weight": 4},
+    {"recipe": "doublePath", "weight": 1},
+    {"recipe": "dangerReward", "weight": 2}
+   ],
+   "keys": [
+    {
+     "name": "Grubenmarke 6",
+     "kind": "tag",
+     "lock": "hatch",
+     "lockName": "Förderkorb-Luke",
+     "story": "Wer einfährt, hängt seine Marke ab; diese hängt seit dem letzten Tag nicht am Brett"
+    }
+   ]
+  }
  },
  "delta_crude": {
   "name": "Delta Crude Refinery",
@@ -981,7 +1170,28 @@
    "guideColor": "#5d5d5d",
    "landmarkImage": "wow_flare"
   },
-  "dressing": {"desert": 50}
+  "dressing": {"desert": 50},
+  "cycles": {
+   "enabled": true,
+   "rooms": 7,
+   "recipes": [
+    {"recipe": "lockKey", "weight": 4},
+    {"recipe": "changedReturn", "weight": 2},
+    {"recipe": "hiddenShortcut", "weight": 2},
+    {"recipe": "oneWayDown", "weight": 2},
+    {"recipe": "doublePath", "weight": 1},
+    {"recipe": "dangerReward", "weight": 3}
+   ],
+   "keys": [
+    {
+     "name": "Ventilrad",
+     "kind": "valve",
+     "lock": "valve",
+     "lockName": "Absperrventil",
+     "story": "Beim Abschalten nahm der Schichtleiter die Räder mit; eins vergaß er auf der Brücke"
+    }
+   ]
+  }
  },
  "sunny_acres": {
   "name": "Sunny Acres",
@@ -1075,7 +1285,28 @@
    "guideColor": "#f9c22b",
    "landmarkImage": "landmark_watertower"
   },
-  "dressing": {"desert": 70}
+  "dressing": {"desert": 70},
+  "cycles": {
+   "enabled": true,
+   "rooms": 7,
+   "recipes": [
+    {"recipe": "lockKey", "weight": 4},
+    {"recipe": "changedReturn", "weight": 2},
+    {"recipe": "hiddenShortcut", "weight": 2},
+    {"recipe": "oneWayDown", "weight": 2},
+    {"recipe": "doublePath", "weight": 2},
+    {"recipe": "dangerReward", "weight": 3}
+   ],
+   "keys": [
+    {
+     "name": "Hausmeisterschlüssel",
+     "kind": "key",
+     "lock": "gate",
+     "lockName": "Pooltor",
+     "story": "Ruhezeit 13 bis 15 Uhr: das Tor bleibt zu, der Schlüssel hängt im Büro"
+    }
+   ]
+  }
  },
  "raketensilo": {
   "name": "Silo Zero",
@@ -1185,6 +1416,28 @@
    "guideColor": "#e83b3b",
    "landmarkImage": "wow_rocket"
   },
-  "dressing": {"desert": 3}
+  "dressing": {"desert": 3},
+  "cycles": {
+   "enabled": true,
+   "rooms": 7,
+   "recipes": [
+    {"recipe": "lockKey", "weight": 6},
+    {"recipe": "changedReturn", "weight": 2},
+    {"recipe": "hiddenShortcut", "weight": 2},
+    {"recipe": "oneWayDown", "weight": 3},
+    {"recipe": "doublePath", "weight": 0},
+    {"recipe": "dangerReward", "weight": 2}
+   ],
+   "keys": [
+    {"name": "Offiziersschlüssel", "kind": "key", "lock": "hatch", "lockName": "Druckschott", "story": "Ein Offizier mit dem Schlüssel: er trug ihn bis zum Schluss"},
+    {
+     "name": "Code-Zettel",
+     "kind": "note",
+     "lock": "hatch",
+     "lockName": "Zahlenschloss-Luke",
+     "story": "Der Code für den Tag danach, mit Bleistift auf den Dienstplan gekritzelt"
+    }
+   ]
+  }
  }
 }

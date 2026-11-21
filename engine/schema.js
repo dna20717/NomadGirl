@@ -12,6 +12,7 @@ import { buildPoi, poiReady } from './poi.js';
 import { PLACE_TYPES, ROOM_ROLES, splitList } from './dressing.js';
 import { EVENT_KINDS, storyTags } from './story.js';
 import { ROOM_TYPES, WOW_AT, MOTIFS, GUIDE_KINDS, STINGERS, LEVEL } from './level_design.js';
+import { RECIPES, KEY_KINDS, LOCK_KINDS, CYCLES } from './cycles.js';
 import { ORDER, DECAY, RULE_REASONS } from './dressing_story.js';
 import { RESIDENTS } from './story.js';
 import { DECALS } from './dressing_story.js';
@@ -1739,6 +1740,13 @@ export const AREAS = {
         ref('tunnelTerrain', 'Kachel-Set im Tunnel', 'terrain', { hint: 'Wände und Rückwand der Abkürzung. Leer = Kachel-Set des Eingangs' }),
         ref('tunnelAtmosphere', 'Atmosphäre im Tunnel', 'atmosphere', { hint: 'Licht und Stimmung der Abkürzung. Leer = Atmosphäre des Kachel-Sets im Tunnel' }),
         num('seed', 'Fester Seed', { min: 0, hint: 'Zum Testen: immer dasselbe Level. Leer/0 = jeder Run neu gewürfelt' })] },
+      { title: 'Struktur', fields: [bool('cycles.enabled', 'Zyklus-Graph', { hint: '#168 G2 (wie Unexplored): vor den Räumen ein Plan aus Kreisen, je Kreis ein Rezept. Der letzte Kreis schließt über die Abkürzung zum Van. Leer = an' }),
+        num('cycles.rooms', 'Räume je Kreis', { min: 2, max: 30, hint: `Richtwert ${CYCLES.rooms} (Daniel 21.11.2026); große POIs wie Silo Zero bekommen so mehrere Kreise. Leer = ${CYCLES.rooms}` }),
+        num('cycles.count', 'Kreise', { min: 0, max: 6, hint: 'Fest so viele Kreise (höchstens einer je 3 Räume). 0/leer = aus den Räumen je Kreis' }),
+        table('cycles.recipes', 'Rezepte', [select('recipe', 'Rezept', RECIPES), num('weight', 'Gewicht', { min: 0, hint: '0 = nie' })],
+          { hint: 'Erlaubte Rezepte mit Gewicht, je Kreis eins (nie zweimal hintereinander, solange es eine Wahl gibt). Leer = alle sechs. Schlüssel und Schloss: Schloss am Weiterweg, Schlüssel im Seitenraum oder oben davor. Versteckte Abkürzung: der Rückweg beginnt hinter einer Falltür bzw. getarnten Wand. Einbahn hinunter: ein Sprung ohne Weg zurück (Tiefe: eine Leiter fehlt). Doppelweg: der Rückweg ist an beiden Enden offen. Gefahr und Belohnung: lauter Seitenraum bzw. Rückweg mit Kiste. Rückweg verändert: die Tür am Anfang geht nur von der anderen Seite auf' }),
+        table('cycles.keys', 'Schlüssel', [text('name', 'Requisit'), select('kind', 'Art', KEY_KINDS), select('lock', 'Schloss', LOCK_KINDS), text('lockName', 'Schloss heißt'), text('story', 'Warum hier')],
+          { hint: 'Schlüssel aus der Story (Steckbrief): je Kreis mit Schlüssel und Schloss die nächste Zeile. Im Turm und in der Tiefe sitzt das Schloss als Luke in der Leiter. Leer = Schlüssel und Tür' })] },
       { title: 'Markenschild', fields: [bool('brandSign', 'Schild am Eingang', { hint: 'Daniel 21.11.2026: „Die Firmenlogos werden in den POI nicht angezeigt“. Die Marke des Orts von der Reisekarte (Logo, Name, Slogan) steht auf einem Mast im ersten Außenraum. Leer = an' }), ref('machineLoot', 'Automat nach dem Duell', 'lootTables', { hint: '#152 (Daniel 21.11.2026): ist die Entity im Automaten besiegt, fällt diese Beute heraus (Essen, NomadCola). Leer = automat_beute' }), ref('brand', 'Marke ohne Karte', 'brands', { hint: 'Geht vor der Marke der Karte (Daniel 21.11.2026: „Marken passend zum Ort“, z. B. Ministerium = Bureau of Order). Leer = Marke von der Karte' }), num('brandSignHeight', 'Höhe des Schilds', { unit: 'Kacheln', min: 2, max: 8, step: 0.1, hint: 'Oberkante über dem Boden. Leer = 4,6' })] },
       { title: 'Set-Dressing', fields: [num('dressing.density', 'Dichte', { unit: '%', min: 0, max: 300, hint: '#158: alle Räume dieses POI so viel dichter oder leerer eingerichtet (100 = wie die Rollen sagen). Leer = 100' }),
         text('dressing.prefer', 'Bevorzugt Tags', { hint: 'Clutter mit diesen Tags (Komma) kommt in diesem POI doppelt so oft' }), text('dressing.avoid', 'Meidet Tags', { hint: 'Viermal seltener' }),
@@ -1761,6 +1769,8 @@ export const AREAS = {
       }
       dressingRowsCheck(x.brandProps, report, 'Marken-Clutter', () => true);
       if (!x.story?.keyImage) report('warning', 'Story: kein Schlüsselbild (#160)');   // #160
+      if ((x.cycles?.recipes || []).length && !(x.cycles.recipes || []).some(r => (r.weight ?? 1) > 0)) report('warning', 'Struktur: alle Rezepte mit Gewicht 0 (#168)');
+      if (x.cycles?.enabled !== false && !(x.cycles?.keys || []).length) report('hint', 'Struktur: kein Schlüssel aus der Story (Schlüssel und Schloss nimmt dann einen schlichten Schlüssel)');
       if (!x.story?.event) report('hint', 'Story: kein Ereignis');
       const R = p.data.rooms || {};
       if (!(x.rooms || []).some(r => R[r]?.tags?.includes('start'))) report('warning', 'Kein Raum mit Eingang');

@@ -1,15 +1,15 @@
 // Can Leyla get everywhere? A rough movement model over a room layout (Browser + Node), used by the tests for generated POI levels.
 // Leyla is 3 tiles tall standing (2.6), 1–2 tiles sliding/crouching. Moves: walk, fall, jump/double jump (up to `up` tiles high,
 // `side` tiles wide), climb ladders, slide through 2-high gaps. Doors, fake walls (%) and brittle walls (B, $) count as passable
-// (switches open doors, a hit breaks walls); ropes are ignored (extra routes only).
+// (switches open doors, a hit breaks walls), locks (|, #168) too unless `locked` (their key is somewhere else); ropes are ignored.
 // → { reached: Set('x,y'), can(x, y) — can she stand at or touch this tile }
 const SOLID = new Set(['#', 'A', '^', 'v']);
 const PLATFORM = new Set(['=']);
 
-export function reach(layout, { up = 5, side = 4, start } = {}) {
+export function reach(layout, { up = 5, side = 4, start, locked = false } = {}) {
   const H = layout.length, W = layout[0].length;
   const at = (x, y) => (y < 0 || y >= H || x < 0 || x >= W ? '#' : layout[y][x]);
-  const solid = (x, y) => SOLID.has(at(x, y));
+  const solid = (x, y) => SOLID.has(at(x, y)) || (locked && at(x, y) === '|');
   const free = (x, y) => !solid(x, y);
   const ladder = (x, y) => at(x, y) === 'H';
   const body = (x, y, h = 3) => { for (let k = 0; k < h; k++) if (!free(x, y - k)) return false; return true; };

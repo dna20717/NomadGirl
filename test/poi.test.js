@@ -65,8 +65,8 @@ test('Level: Eingang zuerst, Ausgang zuletzt, ein Start, Ziel, Abkürzung, alle 
     assert.equal(r.marks.Z.length, 1);
     assert.equal(r.marks.A.length + r.marks['^'].length + r.marks.v.length, 0, 'Haken und Abkürzungs-Zeichen sind aufgelöst');
     assert.ok(L.shortcut && L.shortcut.down[0] > L.shortcut.up[0]);
-    // the tunnel is open from one ladder to the other
-    for (let x = L.shortcut.up[0]; x <= L.shortcut.down[0]; x++) assert.ok(!r.solid(x, L.shortcut.floor - 1), `Tunnel bei ${x}`);
+    // the tunnel is open from one ladder to the other (#168: or shut by the door of its recipe, which a switch behind it opens)
+    for (let x = L.shortcut.up[0]; x <= L.shortcut.down[0]; x++) assert.ok(!r.solid(x, L.shortcut.floor - 1) || (L.shortcut.door?.[0] === x && r.tiles[L.shortcut.floor - 1][x] === 'D'), `Tunnel bei ${x}`);
     // every enemy symbol is in the spawn table
     for (const s of r.spawns) assert.ok(D.enemies[s.enemy]);
     assert.ok(solidRects(r).length > 0);
@@ -169,13 +169,17 @@ test('Stapel (#038): Turm geht nach oben, Tiefe nach unten, Leitern verbinden di
     // between two stacked rooms a ladder goes through floor and ceiling
     for (let i = 1; i < main.length; i++) {
       const [up, lo] = dir === 'tower' ? [main[i], main[i - 1]] : [main[i - 1], main[i]], fy = up.y + up.h - 1;
-      assert.ok([...lay[fy]].some((c, x) => c === 'H' && lay[fy + 1][x] === 'H' && x >= lo.x && x < lo.x + lo.w), `${p} ${seed}: Leiter ${up.id} ↔ ${lo.id}`);
+      // #168: a locked hatch (|) sits in the ladder until its key comes, a cut joint (Einbahn hinunter) is a hole to drop through
+      const cut = x => L.cycles.oneWays.some(o => o.from[0] === x && o.from[1] === fy - 1);
+      assert.ok([...lay[fy]].some((c, x) => (c === 'H' && lay[fy + 1][x] === 'H' || c === '|' && lay[fy + 1][x] === 'H' || c === '.' && cut(x)) && x >= lo.x && x < lo.x + lo.w), `${p} ${seed}: Leiter ${up.id} ↔ ${lo.id}`);
     }
     // the shaft: a ladder from the top room's floor to the bottom room's floor, a door at the bottom, a switch on the far side
+    // #168: the outer circle's recipe may take the ladder (Einbahn hinunter in a tower) or the door (Doppelweg, Gefahr und Belohnung)
     const sc = L.shortcut, [lx, top] = dir === 'tower' ? sc.down : sc.up, bottom = sc.floor;
-    for (let y = top; y < bottom; y++) assert.equal(lay[y][lx], 'H', `${p} ${seed}: Schacht-Leiter ${lx},${y}`);
-    assert.equal(lay[sc.door[1]][sc.door[0]], 'D');
-    assert.ok(lay.some(r => r.includes('S')));
+    if (!sc.oneWay) for (let y = top; y < bottom; y++) assert.equal(lay[y][lx], 'H', `${p} ${seed}: Schacht-Leiter ${lx},${y}`);
+    else for (let y = top; y < bottom; y++) assert.notEqual(lay[y][lx], '#', `${p} ${seed}: Schacht offen ${lx},${y}`);
+    if (sc.door) { assert.equal(lay[sc.door[1]][sc.door[0]], 'D'); assert.ok(lay.some(r => r.includes('S'))); }
+    else assert.ok(sc.open && ['doublePath', 'dangerReward'].includes(L.graph.circles.at(-1).recipe), `${p} ${seed}: Schacht ohne Tür nur bei offenem Rückweg`);
     // compact: the stack stays roughly above its first room
     assert.ok(L.def.size[0] < 100, `${p} ${seed}: ${L.def.size[0]} breit`);
   }

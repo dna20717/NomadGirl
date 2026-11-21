@@ -24,7 +24,7 @@ export const SEEDS = [1, 2, 3, 5, 8, 13, 21, 34];
 
 // the easiest way from L to Z: hard moves (step ≥ 4 rows up, gap ≥ 4 columns without a place to stand) cost a lot
 export function mainPath(L, D) {
-  const lay = L.def.layout, m = reachMap(lay, { rules: rulesFrom(D) });
+  const lay = L.def.layout, m = reachMap(lay, { rules: rulesFrom(D), locks: L.cycles?.locks || [], links: L.cycles?.links || [] });
   let z = null; for (let y = 0; y < lay.length && !z; y++) { const x = lay[y].indexOf('Z'); if (x >= 0) z = [x, y]; }
   if (!z) return { hard: [], ok: false };
   const goal = [-1, 0, 1].map(d => (z[0] + d) + ',' + z[1]).find(k => m.nodes.has(k));
@@ -33,6 +33,8 @@ export function mainPath(L, D) {
   const P = k => k.split(',').map(Number), hardOf = (a, b) => {
     const [ax, ay] = P(a), [bx, by] = P(b), up = ay - by;
     let gap = 0; for (let x = Math.min(ax, bx) + 1; x < Math.max(ax, bx); x++) if (!m.nodes.has(x + ',' + ay) && !m.nodes.has(x + ',' + by)) gap++;
+    // sliding under a low ceiling (a crawl along a floor) is no gap: the floor goes on under her (#168: seen once the tunnel stopped being the easy way)
+    if (gap && ay === by) { let floor = true; for (let x = Math.min(ax, bx) + 1; x < Math.max(ax, bx) && floor; x++) if (!'#='.includes(lay[ay + 1]?.[x] ?? '.')) floor = false; if (floor) gap = 0; }
     return up >= 4 || gap >= 4 ? { up, gap } : null;
   };
   // Dijkstra (small graphs: a bucket queue on cost)

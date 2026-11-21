@@ -64,13 +64,14 @@ export function roomGates(L) {
   const tiles = L.def.layout, mains = L.rooms.filter(r => r.band === 'main');
   const at = (x, y) => tiles[y]?.[x];
   const floorAt = (x, y0, y1) => { for (let y = y1; y >= y0; y--) if (!isWall(at(x, y)) && (isWall(at(x, y + 1)) || at(x, y + 1) === '=' || at(x, y + 1) === 'H')) return y; return y1; };
-  const ladderIn = (r, row) => { for (let x = r.x; x < r.x + r.w; x++) if (at(x, row) === 'H') return x; return null; };
+  // a joint: its ladder, a locked hatch (|, #168) or the hole of a cut joint (Einbahn hinunter: '.' in a stacked room's floor/ceiling)
+  const ladderIn = (r, row) => { for (let x = r.x; x < r.x + r.w; x++) if (at(x, row) === 'H' || at(x, row) === '|') return x; if (L.stack) for (let x = r.x + 1; x < r.x + r.w - 1; x++) if (at(x, row) === '.' && !isWall(at(x, row === r.y ? row - 1 : row + 1)) && isWall(at(x - 1, row)) && isWall(at(x + 1, row))) return x; return null; };
   return mains.map((r, i) => {
     if (!L.stack) return { in: [r.x, floorAt(r.x, r.y, r.y + r.h - 2)], out: [r.x + r.w - 1, floorAt(r.x + r.w - 1, r.y, r.y + r.h - 2)] };
     // tower: in through the floor (from below), out through the ceiling; deep: the other way round
     const up = L.stack === 'tower', fx = ladderIn(r, r.y + r.h - 1), cx = ladderIn(r, r.y);
     const g = x => x == null ? null : [x, floorAt(x, r.y, r.y + r.h - 2)];
-    const foot = x => { if (x == null) return null; let y = r.y; while (at(x, y + 1) === 'H') y++; return [x, y]; };   // the ladder from the ceiling hook ends here
+    const foot = x => { if (x == null) return null; let y = r.y; while (at(x, y + 1) === 'H' || at(x, y + 1) === '.') y++; return [x, y]; };   // the ladder (or the drop) from the ceiling hook ends here
     const fl = g(fx ?? (up ? r.x + 1 : r.x + r.w - 2)), ce = cx != null ? foot(cx) : g(up ? r.x + r.w - 2 : r.x + 1);
     return { in: up ? fl : ce, out: up ? ce : fl, first: i === 0, last: i === mains.length - 1 };
   });

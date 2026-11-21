@@ -15,6 +15,7 @@
 // Runs in the browser (game) and in Node (validation, tests). Same POI + same seed = same level.
 import { parseRoom } from './room.js';
 import { levelConfig, wowOf, roomType, calmAfterPeaks, fairFights, restChestSpot } from './level_design.js';
+import { planCycles, keySpot, seamLock, standSpots } from './cycles.js';
 
 export const TUNNEL_HEIGHT = 4;   // free rows in the shortcut tunnel (Leyla is 168 px = 2.6 tiles)
 
@@ -94,9 +95,12 @@ export function buildPoi(D, poiId, seed = 1) {
     const pool = restPool.filter(id => id !== main[c.at - 1] && id !== main[c.at + 1]);
     if (pool.length && roomType(R[main[c.at]]) !== 'rest') main[c.at] = pick(pool, rnd, R);
   }
+  // #168 the cycle graph: circles of about 7 rooms, one recipe each; its placeholders are resolved with the rooms picked above
+  const graph = planCycles(D, poiId, seed, { count: main.length, stack, shortcut: P.shortcut !== false, wowSlot: main.indexOf(wowId) });
+  resolveSlots({ graph, main, R, parsed, middlePool, stack, wowId, seed });
   const flags = id => ({ rest: roomType(R[id]) === 'rest', wow: id === wowId });
   Object.assign(enemyKit, { LD, stack });
-  if (stack) return buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, stack, hook, enemyKit, problems, intens, flags });
+  if (stack) return buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, stack, hook, enemyKit, problems, intens, flags, graph });
 
   // branches: side rooms with a floor hook A over main rooms with a ceiling hook A
   const branchPool = ready.filter(id => tagged(R, id, 'loot', 'secret') && parsed[id].marks.A.some(([, y]) => y === parsed[id].h - 1));
@@ -106,17 +110,19 @@ export function buildPoi(D, poiId, seed = 1) {
   const placedMain = [];
   let x = 1;
   for (const id of main) { placedMain.push({ id, band: 'main', x, w: parsed[id].w, h: parsed[id].h, ...flags(id) }); x += parsed[id].w; }
-  const branches = [];
-  for (const m of placedMain) {
+  const branches = [], hosts = hostSlots(graph);
+  placedMain.forEach((m, slot) => {
     const hooks = parsed[m.id].marks.A.filter(([, y]) => y === 0);
     for (const [hx] of hooks) {
-      if (!branchPool.length || rnd() >= chance) continue;
+      // #168 a key or a reward needs a side room over its host: the roll still happens (same seed, same level elsewhere)
+      const force = hosts.has(slot) && !branches.some(o => o.main === m);
+      if (!branchPool.length || (rnd() >= chance && !force)) continue;
       const id = pick(branchPool, rnd, R), b = parsed[id], [bx] = b.marks.A.find(([, y]) => y === b.h - 1);
       const left = m.x + hx - bx;
       if (left < 1 || left + b.w > W - 1 || branches.some(o => left < o.x + o.w + 1 && o.x < left + b.w + 1)) continue;
-      branches.push({ id, band: 'branch', x: left, w: b.w, h: b.h, hookX: m.x + hx, main: m });
+      branches.push({ id, band: 'branch', x: left, w: b.w, h: b.h, hookX: m.x + hx, main: m, ...(hosts.get(slot) === 'danger' ? { danger: true } : {}) });
     }
-  }
+  });
   const BH = branches.length ? Math.max(...branches.map(b => b.h)) : 0;
   const pS = parsed[start], pE = parsed[exit];
   const up = pS.marks['^'].find(([, y]) => y === pS.h - 1), down = pE.marks.v.find(([, y]) => y === pE.h - 1);
@@ -127,7 +133,7 @@ export function buildPoi(D, poiId, seed = 1) {
   const tiles = Array.from({ length: H }, () => new Array(W).fill('#'));
 
   placedMain.forEach((m, i) => { m.intensity = intens[i]; });
-  for (const b of branches) b.intensity = curve ? (b.main.intensity ?? 1) * 0.5 : 1;
+  for (const b of branches) b.intensity = b.danger ? 1 : curve ? (b.main.intensity ?? 1) * 0.5 : 1;
   const stamp = (place, y0) => stampRoom({ R, parsed, tiles, start, exit, enemyKit, keep: { '^': place.id === start && shortcut, v: place.id === exit && shortcut } }, place, y0);
   for (const m of placedMain) stamp(m, top + MH - m.h);
   for (const b of branches) stamp(b, top - b.h);
@@ -165,6 +171,7 @@ export function buildPoi(D, poiId, seed = 1) {
     }
     ends.floor = t0 + TUNNEL_HEIGHT;
   }
+  const cycles = weldBand({ graph, tiles, placedMain, branches, ends, floorY, top, enemyKit, seed });
   // #163 fair fights: no spawn at a seam (between main rooms, at a side room's ladder), shooters only with sight of the way in
   {
     const gates = [...placedMain.slice(1).map(b => [b.x, floorY - 1]), ...placedMain.slice(0, -1).map(a => [a.x + a.w - 1, floorY - 1]), ...branches.map(b => [b.hookX, top - 1])];
@@ -176,7 +183,7 @@ export function buildPoi(D, poiId, seed = 1) {
   const S = R[start];
   const def = { name: P.name || poiId, size: [W, H], layout, spawns: enemyKit.spawns, tags: ['poi'], backdrop: S.backdrop };
   const rooms = [...placedMain, ...branches].map(({ id, band, x, y, w, h, intensity, rest, wow }) => ({ id, band, x, y, w, h, intensity: Math.round((intensity ?? 1) * 100), ...(rest ? { rest: true } : {}), ...(wow ? { wow: true } : {}) }));
-  return { def, rooms, shortcut: ends, branches: branches.length, problems, start, exit };
+  return { def, rooms, shortcut: ends, branches: branches.length, problems, start, exit, graph, cycles };
 }
 
 // enemy symbols: every enemy gets one global letter, rooms keep their own tables
@@ -220,10 +227,17 @@ function stampRoom({ R, parsed, tiles, start, exit, enemyKit: K, keep }, place, 
     tiles[y0 + y][place.x + x] = c;
   }
   if (place.rest && !r.marks.C.length) { const p = restChestSpot(r); if (p) tiles[y0 + p[1]][place.x + p[0]] = 'C'; }
+  // #168 Gefahr und Belohnung: a loud side room with an extra chest and two more of the POI's tougher enemies
+  if (place.danger) {
+    const p = restChestSpot({ ...r, tiles: r.tiles.map((row, y) => row.map((c, x) => tiles[y0 + y][place.x + x] === '.' ? c : '#')) });
+    if (p) tiles[y0 + p[1]][place.x + p[0]] = 'C';
+    const spots = standSpots(tiles, { x: place.x, y: y0, w: r.w, h: r.h }).filter(([x]) => Math.abs(x - (place.hookX ?? -99)) > 3);
+    for (let i = 0; i < 2 && spots.length; i++) { const e = K.pickEnemy(1); if (!e) break; const [x, y] = spots.splice(Math.floor(K.rnd() * spots.length), 1)[0]; tiles[y][x] = K.letterOf(e); }
+  }
 }
 
 // stacked POIs (tower / deep), see the top of this file
-function buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, stack, hook, enemyKit, problems, intens, flags }) {
+function buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, stack, hook, enemyKit, problems, intens, flags, graph }) {
   const curve = enemyKit.curve;
   // rooms may be mirrored (a mirrored room is just as valid): every lower room takes the side that keeps the stack close above its
   // first room, so towers stay upright and mines do not wander off diagonally; when both are about as good, chance decides
@@ -249,13 +263,15 @@ function buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, sta
   // side rooms: next to a main room (not the bottom one: the shaft's door is there), floor on the same row, through the open seams
   const side = rnd() < 0.5 ? -1 : 1;   // the shaft's side; side rooms go to the other one
   const pool = ready.filter(id => tagged(R, id, 'loot', 'secret') && seamOpen(parsed[id], side));
-  const chance = (P.branchChance ?? 60) / 100, branches = [];
+  const chance = (P.branchChance ?? 60) / 100, branches = [], hosts = hostSlots(graph);
   const free = (x, y, w, h) => y >= 0 && ![...order, ...branches].some(o => x < o.x + o.w && o.x < x + w && y < o.y + o.h && o.y < y + h);   // y < 0: taller than the top room
   for (const m of order.slice(0, -1)) {
-    if (!pool.length || rnd() >= chance || !seamOpen(m.p, -side)) continue;
+    const slot = placed.indexOf(m), force = hosts.has(slot);   // #168 a key or a reward wants a side room here
+    if (!pool.length || (rnd() >= chance && !force) || !seamOpen(m.p, -side)) continue;
     const id = pick(pool, rnd, R), b = parsed[id], x = side > 0 ? m.x - b.w : m.x + m.w, y = m.y + m.h - b.h;
     if (!free(x, y, b.w, b.h)) continue;
-    branches.push({ id, band: 'branch', x, y, w: b.w, h: b.h, main: m, intensity: curve ? m.intensity * 0.5 : 1 });
+    const danger = hosts.get(slot) === 'danger';
+    branches.push({ id, band: 'branch', x, y, w: b.w, h: b.h, main: m, intensity: danger ? 1 : curve ? m.intensity * 0.5 : 1, ...(danger ? { danger: true } : {}) });
   }
   // the shaft: 3 wide, 2 tiles away from everything on its side, from the top room's floor down to the bottom room's floor
   const top = order[0], bot = order.at(-1), shortcut = P.shortcut !== false;
@@ -291,7 +307,7 @@ function buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, sta
     for (let y = ft; y < fb; y++) tiles[y][ladderX] = 'H';
     // corridors from the rooms' open seams to the shaft (3 high, just above the floor)
     const corridor = (o, f) => { const a = side > 0 ? o.x + o.w : s0 + SW, b = side > 0 ? s0 : o.x; for (let y = f - 3; y < f; y++) for (let x = a; x < b; x++) tiles[y][x] = '.'; return side > 0 ? a : b - 1; };
-    corridor(top, ft);
+    const topX = corridor(top, ft);
     const dx = corridor(bot, fb);
     for (let y = fb - 3; y < fb; y++) tiles[y][dx] = 'D';
     // the switch on the far side of the door: in the shaft for a tower (you come down from the top), in the exit room for a deep POI
@@ -300,11 +316,13 @@ function buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, sta
     else if (tiles[fb - 1][swX] === '.') tiles[fb - 1][swX] = 'S';
     else problems.push(`${bot.id}: kein Platz für den Schalter am Schacht`);
     // up = the entrance's end of the shortcut, down = the exit's end (as with the tunnel)
-    ends = { up: [ladderX, stack === 'tower' ? fb : ft], down: [ladderX, stack === 'tower' ? ft : fb], floor: fb, door: [dx, fb - 1], shaft: [s0, ft - 3, SW, fb - ft + 3], kind: 'shaft' };
+    ends = { up: [ladderX, stack === 'tower' ? fb : ft], down: [ladderX, stack === 'tower' ? ft : fb], floor: fb, door: [dx, fb - 1], shaft: [s0, ft - 3, SW, fb - ft + 3], kind: 'shaft',
+      sw: tiles[fb - 1][swX] === 'S' ? [swX, fb - 1] : null, topX, ladderX, walkX: sx, ft };
   }
+  const cycles = weldStack({ graph, tiles, placed, branches, joints, stack, ends, enemyKit, seed: graph.seed });
   // #163 fair fights: gates are the ladders through the hooks (both sides) and the seams of the side rooms
   {
-    const foot = j => { let y = j.y + 1; while (tiles[y + 1]?.[j.x] === 'H') y++; return [j.x, y]; };   // where the ladder through a hook ends below
+    const foot = j => { let y = j.y + 1; while (tiles[y + 1]?.[j.x] === 'H' || (tiles[j.y][j.x] === '.' && tiles[y + 1]?.[j.x] === '.')) y++; return [j.x, y]; };   // where the ladder (or the drop, #168) through a hook ends below
     const gates = [...joints.flatMap(j => [[j.x, j.y - 1], [j.x, j.y + 2], foot(j)]), ...branches.map(b => [side > 0 ? b.x + b.w - 1 : b.x, b.y + b.h - 2])];
     const Lx = (() => { for (let y = 0; y < H; y++) { const x = tiles[y].indexOf('L'); if (x >= 0) return [x, y]; } return null; })();
     // the way in of a main room: the entrance at L; a tower comes in through the floor (joint below), a deep POI through the ceiling
@@ -317,8 +335,139 @@ function buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, sta
   }
   const def = { name: P.name || poiId, size: [W, H], layout: tiles.map(r => r.join('')), spawns: enemyKit.spawns, tags: ['poi'], backdrop: R[start].backdrop || all.map(o => R[o.id].backdrop).find(Boolean) };
   const rooms = [...placed, ...branches].map(({ id, band, x, y, w, h, intensity, flip, rest, wow }) => ({ id, band, x, y, w, h, intensity: Math.round((intensity ?? 1) * 100), ...(flip ? { flip: true } : {}), ...(rest ? { rest: true } : {}), ...(wow ? { wow: true } : {}) }));   // entrance first, like the band
-  return { def, rooms, shortcut: ends, branches: branches.length, problems, start, exit, stack };
+  return { def, rooms, shortcut: ends, branches: branches.length, problems, start, exit, stack, graph, cycles };
 }
+// ---------- #168 the cycle graph in the welded level (engine/cycles.js plans it) ----------
+// slots that want a side room: Map slot → 'key' | 'danger'
+function hostSlots(graph) {
+  const m = new Map();
+  for (const c of graph?.circles || []) if (c.host != null) m.set(c.host, c.recipe === 'lockKey' ? 'key' : 'danger');
+  return m;
+}
+// placeholders resolved late: a host slot needs a room a side room can hang from (band: a ceiling hook A). Swap in a fitting room
+// from the pool, else move the host to another room of the circle. Then every slot learns its room.
+function resolveSlots({ graph, main, R, parsed, middlePool, stack, wowId, seed }) {
+  const rr = rng(Math.imul(seed | 0, 40503) + 168), canHost = id => !!stack || parsed[id].marks.A.some(([, y]) => y === 0);
+  for (const c of graph.circles) {
+    if (c.host == null || canHost(main[c.host])) continue;
+    const s = c.host, last = c.recipe === 'lockKey' ? c.to - 1 : c.to;
+    const pool = middlePool.filter(id => canHost(id) && roomType(R[id]) !== 'rest' && id !== main[s - 1] && id !== main[s + 1]);
+    if (s > 0 && s < main.length - 1 && main[s] !== wowId && roomType(R[main[s]]) !== 'rest' && pool.length) { main[s] = pick(pool, rr, R); graph.slots[s].resolved = 'getauscht'; continue; }
+    const other = [...Array(last - c.from + 1).keys()].map(k => c.from + k).find(k => canHost(main[k]));
+    if (other == null) continue;
+    delete graph.slots[s].needs.keyHost; delete graph.slots[s].needs.dangerHost;
+    c.host = other; graph.slots[other].needs[c.recipe === 'lockKey' ? 'keyHost' : 'dangerHost'] = true;
+    for (const e of graph.extras) if (e.circle === c.i) e.host = c.host;
+    for (const e of graph.edges) if (e.circle === c.i && (e.kind === 'detour' || e.kind === 'danger') && typeof e.from === 'number') e.from = c.host;
+  }
+  main.forEach((id, s) => { if (graph.slots[s]) graph.slots[s].room = id; });
+}
+const cyclesOut = () => ({ locks: [], keys: [], links: [], oneWays: [], notes: [] });
+// the key of a lock circle, from its side rooms or the main rooms before the lock; no place → the lock goes again (noted)
+function placeKey(out, c, tiles, regions, rnd) {
+  const lock = out.locks.find(l => l.circle === c.i);
+  if (!lock) return;
+  const p = keySpot(tiles, out.locks, c.i, regions, rnd);
+  if (!p) {
+    for (const [x, y] of lock.tiles) tiles[y][x] = lock.hatch ? 'H' : '.';
+    out.locks.splice(out.locks.indexOf(lock), 1); c.fallback = 'kein Platz für den Schlüssel: Schloss entfällt'; out.notes.push(`Kreis ${c.i + 1}: ${c.fallback}`);
+    return;
+  }
+  tiles[p[1]][p[0]] = '+';
+  out.keys.push({ circle: c.i, x: p[0], y: p[1], name: c.key.name, kind: c.key.kind, lock: c.key.lockName });
+  lock.keyAt = p;
+}
+// where the key of circle c may lie: side rooms of its rooms before the lock (the host's first), then those rooms (host first)
+function regionsOf(c, mains, branches) {
+  const last = c.lockSlot != null ? c.lockSlot - 1 : c.to, slot = m => mains.indexOf(m), inside = m => slot(m) >= c.from && slot(m) <= last;
+  const side = branches.filter(b => inside(b.main)).sort((a, b) => (slot(b.main) === c.host) - (slot(a.main) === c.host)).map(b => ({ ...b, branch: true }));
+  const rooms = mains.filter(inside).sort((a, b) => (slot(b) === c.host) - (slot(a) === c.host) || slot(b) - slot(a));
+  return [...side, ...rooms];
+}
+// one of the tougher half of the POI's enemies at a spot (Gefahr und Belohnung on the way back)
+const foe = (K, tiles, x, y) => { const e = K.pickEnemy(1); if (e && tiles[y][x] === '.') tiles[y][x] = K.letterOf(e); };
+
+// side by side: locks across seams, the tunnel shaped by the outer circle's recipe
+function weldBand({ graph, tiles, placedMain, branches, ends, floorY, enemyKit: K, seed }) {
+  const out = cyclesOut(), rnd = rng(Math.imul(seed | 0, 69069) + 1680);
+  for (const c of graph.circles) {
+    if (c.recipe !== 'lockKey') continue;
+    const col = seamLock(tiles, placedMain[c.lockSlot], floorY);
+    if (!col) { c.fallback = 'keine freie Naht für das Schloss'; out.notes.push(`Kreis ${c.i + 1}: ${c.fallback}`); continue; }
+    for (const [x, y] of col) tiles[y][x] = '|';
+    out.locks.push({ circle: c.i, tiles: col, kind: c.key.lock, name: c.key.lockName, key: c.key.name, keyKind: c.key.kind, hatch: false });
+  }
+  const outer = graph.circles.at(-1);
+  if (ends && outer) {
+    const [ux] = ends.up, [dx, dy] = ends.down, F = ends.floor, t0 = F - TUNNEL_HEIGHT, r = outer.recipe;
+    if (r === 'lockKey' || r === 'changedReturn' || r === 'hiddenShortcut') {
+      // the door just past the entrance's ladder: Leyla sees it before she finds the switch from the other side
+      if (dx - ux > 6) {
+        for (let y = t0; y < F; y++) tiles[y][ux + 2] = 'D';
+        tiles[F - 1][ux + 4] = 'S';
+        out.links.push({ switch: [ux + 4, F - 1], door: [ux + 2, F - 1] });
+        ends.door = [ux + 2, F - 1];
+      }
+      if (r === 'hiddenShortcut') { tiles[dy][dx] = '%'; ends.hidden = [dx, dy]; }   // a fake floor over the ladder: a trapdoor
+    } else if (r === 'oneWayDown') {
+      tiles[dy][dx] = '=';
+      for (let y = dy + 1; y < F; y++) tiles[y][dx] = '.';
+      out.oneWays.push({ circle: outer.i, from: [dx, dy - 1], land: [dx, F - 1] });
+      ends.oneWay = true;
+    } else if (r === 'dangerReward') {
+      const mid = Math.round((ux + dx) / 2);
+      tiles[F - 1][mid] = 'C';
+      for (const x of [Math.round(ux + (dx - ux) / 3), Math.round(ux + (dx - ux) * 2 / 3)]) if (Math.abs(x - mid) > 2) foe(K, tiles, x, F - 1);
+      ends.danger = [mid, F - 1];
+    }
+  }
+  for (const c of graph.circles) if (c.recipe === 'lockKey') placeKey(out, c, tiles, regionsOf(c, placedMain, branches), rnd);
+  return out;
+}
+
+// stacked: locks are hatches in the joint ladders, a cut joint is a drop, the shaft is shaped by the outer circle's recipe
+function weldStack({ graph, tiles, placed, branches, joints, stack, ends, enemyKit: K, seed }) {
+  const out = cyclesOut(), rnd = rng(Math.imul(seed | 0, 69069) + 1681), n = placed.length;
+  const joint = s => joints[stack === 'tower' ? n - 2 - s : s];   // the joint between slot s and s + 1
+  for (const c of graph.circles) {
+    if (c.recipe === 'lockKey') {
+      const j = joint(c.lockSlot - 1);
+      if (!j || tiles[j.y][j.x] !== 'H') { c.fallback = 'keine Leiter für die Luke'; out.notes.push(`Kreis ${c.i + 1}: ${c.fallback}`); continue; }
+      tiles[j.y][j.x] = '|';
+      out.locks.push({ circle: c.i, tiles: [[j.x, j.y]], kind: c.key.lock, name: c.key.lockName, key: c.key.name, keyKind: c.key.kind, hatch: true, up: stack === 'tower' });
+    } else if (c.recipe === 'oneWayDown' && stack === 'deep' && c.drop != null) {
+      const j = joint(c.drop - 1);
+      if (!j) continue;
+      let y = j.y; while (tiles[y][j.x] === 'H') tiles[y++][j.x] = '.';
+      y--; while (tiles[y + 1]?.[j.x] === '.') y++;
+      out.oneWays.push({ circle: c.i, from: [j.x, j.y - 1], land: [j.x, y] });
+    }
+  }
+  const outer = graph.circles.at(-1);
+  if (ends && outer) {
+    const r = outer.recipe, { ft, floor: fb, ladderX, walkX, topX } = ends;
+    if (r === 'hiddenShortcut') { for (let y = ft - 3; y < ft; y++) tiles[y][topX] = '$'; ends.hidden = [topX, ft - 1]; }
+    else if (r === 'oneWayDown' && stack === 'tower') {
+      for (let y = ft; y < fb; y++) if (tiles[y][ladderX] === 'H') tiles[y][ladderX] = '.';
+      out.oneWays.push({ circle: outer.i, from: [walkX, ft - 1], land: [ladderX, fb - 1] });
+      ends.oneWay = true;
+    } else if (r === 'doublePath' || r === 'dangerReward') {
+      const [dx] = ends.door;
+      for (let y = fb - 3; y < fb; y++) if (tiles[y][dx] === 'D') tiles[y][dx] = '.';
+      if (ends.sw) tiles[ends.sw[1]][ends.sw[0]] = '.';
+      ends.door = null; ends.sw = null; ends.open = true;
+      if (r === 'dangerReward') {
+        if (tiles[fb - 1][walkX] === '.') tiles[fb - 1][walkX] = 'C';
+        const cx = Math.round((walkX + dx) / 2);
+        if (Math.abs(cx - walkX) > 1) foe(K, tiles, cx, fb - 1);
+        ends.danger = [walkX, fb - 1];
+      }
+    }
+  }
+  for (const c of graph.circles) if (c.recipe === 'lockKey') placeKey(out, c, tiles, regionsOf(c, placed, branches), rnd);
+  return out;
+}
+
 // is the seam (the three rows above the floor) open on that side (-1 left, 1 right)?
 function seamOpen(r, side) {
   const x = side > 0 ? r.w - 1 : 0;
