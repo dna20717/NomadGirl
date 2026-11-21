@@ -96,7 +96,9 @@
   "bulletSpeed": 2200,
   "marker": true,
   "markerColor": "#ff3fa4",
-  "blood": {"enabled": true, "amount": 100, "decals": true, "stay": 20, "max": 160, "color": "#a01828"}
+  "blood": {"enabled": true, "amount": 100, "decals": true, "stay": 20, "max": 160, "color": "#a01828"},
+  "surrender": {"chance": 15, "at": 25},
+  "sirenHp": 30
  },
  "fog": {
   "enabled": true,

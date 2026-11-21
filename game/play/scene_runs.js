@@ -6,6 +6,7 @@ import { takeover } from '../turf_war.js';
 import { update as tankUpdate, phase as tankPhase } from '../tank.js';
 import { poiReady } from '../../engine/poi.js';
 import { Enemy } from './enemies.js';
+import { gangDef } from './enemy_gang.js';
 import { Van } from './van.js';
 import { unloadTrunk } from '../save.js';
 import { Camp } from './camp.js';
@@ -153,7 +154,7 @@ export class SceneRuns {
     if (Th && (Th.health !== 1 || Th.damage !== 1)) def = { ...def, health: Math.round((def.health ?? 30) * Th.health), damage: Math.round((def.damage ?? 10) * Th.damage) };
     const G = this.gang();
     if (G?.color && def.kit && def.family === 'raider' && def.behavior !== 'boss') def = { ...def, kitGang: G.color };
-    return def;
+    return gangDef(this.data_, id, def, G);   // #155 Gang-Ausrüstung (traits, loadout) and Ergeben for all plunderers
   }
   gang() {
     const save = this.box?.save, poi = (this.mode === 'run' && save?.run?.poi) || this.level?.poi;

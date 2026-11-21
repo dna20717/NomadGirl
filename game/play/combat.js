@@ -1,5 +1,6 @@
 // Combat: Leyla's melee and ranged attacks, enemy shots, projectiles, hitstop.
 // Weapon values from the game data (area "Waffen"): damage, cooldown, range, knockback, critChance, ammo, projectileSpeed.
+import { damageSirens } from './traits/alarm.js';
 
 export class Combat {
   constructor(scene) {
@@ -65,6 +66,7 @@ export class Combat {
       const r = e.hit(time, Math.round((w.damage ?? 10) * (power?.damage || 1) * this.boost('melee') * (crit ? 2 : 1)), (w.knockback ?? 200) + (power?.knockback || 0), f, crit, { kind: 'melee', heavy: !!power?.heavy });
       if (r === 'blocked') blocked++; else hits++;
     }
+    damageSirens(s, z, Math.round((w.damage ?? 10) * (power?.damage || 1) * this.boost('melee')), time);   // #155 a siren on the wall breaks
     // brittle walls in POI levels: only where the strike really reaches the wall
     const walls = z.filter(r => r.wall != null);
     for (const r of walls) s.level?.meleeHit(r.wall - 4, r.wall + 4, r.y - 4, r.y + 4);
@@ -202,6 +204,7 @@ export class Combat {
         if (s.pointSolid(p.x, p.y)) { p.dead = true; s.fx.sparks(p.x - Math.sign(p.vx) * 6, p.y, 0xffd27a, 6); break; }
         if (covers.some(c => p.x > c.x - c.w / 2 && p.x < c.x + c.w / 2 && p.y > c.top && p.y < c.feet)) { p.dead = true; s.fx.sparks(p.x - Math.sign(p.vx) * 6, p.y, 0xc7b08b, 6); break; }   // a chest is cover (#014)
         if (p.friendly) {
+          if (damageSirens(s, [{ x0: p.x - 4, x1: p.x + 4, y0: p.y - 4, y1: p.y + 4 }], p.damage, time)) { p.dead = true; break; }   // #155
           for (const e of s.enemies) {
             if (!e.alive) continue;
             const b = e.body;
