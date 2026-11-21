@@ -196,6 +196,10 @@ export const AREAS = {
         num('volume', 'Grundlautstärke', { unit: '%', min: 0, max: 200, hint: 'Gleicht laute und leise Aufnahmen aus' }),
         text('title', 'Titel', { hint: '#117 Steht auf der Now-Playing-Kassette, wenn die Musik wechselt (leer = Name)' }), text('artist', 'Künstler')] },
       { title: 'Kassette (Now Playing)', when: x => !!x.reels, fields: [size('size', 'Bildgröße', { unit: 'px' }), text('label', 'Etikett x, y, b, h', { hint: 'Bildpixel' }), num('reelSize', 'Spulen-Größe', { unit: 'px', min: 2 })] },
+      { title: 'Schrift aus Code', when: x => x.kind === 'image' || x.kind === 'icons' || !!x.labels, fields: [table('labels', 'Schrift', [text('text', 'Text', { hint: '\\n = neue Zeile' }), point('at', 'Mitte bei', { unit: 'px im Bild' }),
+          num('size', 'Größe', { unit: 'px im Bild', min: 4, max: 200 }), color('color', 'Farbe'), select('align', 'Ausrichtung', [['', 'Mitte'], ['left', 'links (ab „Mitte bei“)'], ['right', 'rechts (bis „Mitte bei“)']]),
+          bool('glow', 'Leuchtet (Neon)'), num('width', 'Höchstens breit', { unit: 'px im Bild', min: 1, hint: 'Längere Texte werden schmaler gestaucht. Leer = frei' })],
+          { hint: '#170 (Daniel, 21.11.2026: „Texte sollen niemals in der Grafik sein“): Schilder, Preise, Anzeigen kommen in VT323 aus den Daten auf das Bild (game/labels.js), im Spiel, in der Fahrt und in der Vorschau. Gebackener Text wird aus dem Bild entfernt (tools/detext.py), das Original bleibt als Quelle' })] },
       { title: 'Herkunft', fields: [text('source', 'Erzeugt mit', { hint: 'KI-Werkzeug oder Code' }), ref('derivedFrom', 'Abgeleitet von', 'assets', { hint: 'z. B. Streifen aus einem Original-GIF' }), text('date', 'Datum')] },
     ],
     check: (x, report, p) => {
@@ -205,6 +209,7 @@ export const AREAS = {
       if (x.kind === 'sound' && x.file && !/\.(m4a|mp3|ogg|wav)$/i.test(x.file)) report('warning', 'Töne sind .m4a, .mp3, .ogg oder .wav');
       if (x.kind === 'tiles' && (!x.frameSize || !x.frames)) report('error', 'Kacheln ohne Frame-Größe oder Frames');
       if (x.kind === 'icons' && (!x.cell || !x.grid)) report('error', 'Symbol-Raster ohne Feldgröße oder Raster');
+      for (const [i, L] of (x.labels || []).entries()) if (L?.text && !Array.isArray(L.at)) report('warning', `Schrift ${i + 1} „${L.text}“ ohne Platz im Bild`);
       if (x.kind === 'icons' && x.names?.length && x.grid && x.names.length > x.grid[0] * x.grid[1]) report('warning', 'Mehr Namen als Felder im Raster');
       if (x.kind === 'animation') {
         if (x.file && !/\.(png|webp)$/i.test(x.file)) report('warning', 'Animationen sind PNG-Streifen');
@@ -1718,6 +1723,7 @@ export const AREAS = {
         point('wow.imageCore', 'Bild: Kern', { unit: 'px im Bild', hint: 'Wo es glüht (Sichtfenster, Flamme, Kristall), Drehpunkt des Sekundenzeigers bei der Uhr, Quelle der Funken. Leer = Bildmitte' }),
         point('wow.imageText', 'Bild: Schrift bei', { unit: 'px im Bild', hint: 'Mitte der VT323-Schrift auf dem Bild (Preis, Kasse). Leer = keine Schrift auf dem Bild (die Rakete zeigt ihre Anzeige daneben)' }),
         bool('wow.imageHang', 'Bild hängt von der Decke', { hint: 'Oberkante unter der Decke des Raums statt auf dem Boden (Glaskuppel, Anzeigetafel)' }),
+        num('wow.imageDrop', 'Hängt tiefer', { unit: 'Kacheln unter der Decke', min: 0, max: 30, step: 0.5, hint: '#170 (Daniel: „Kuppel tiefer hängen“): so weit unter der Decke hängt das Bild an Stahlseilen, damit es im Spielzoom zu sehen ist. Die Kamerafahrt rahmt Bild und Boden. Leer = direkt unter der Decke' }),
         text('wow.text', 'Schrift', { hint: 'VT323-Text am Motiv (Preise, Anzeige, Banner)' }), color('wow.light', 'Schlüssellicht'), num('wow.lightStrength', 'Schlüssellicht: Stärke', { unit: '%', min: 0, max: 400 }),
         num('wow.lightRadius', 'Schlüssellicht: Reichweite', { unit: 'px', min: 100, max: 2000, hint: 'Leer = 560' }),
         num('wow.fill', 'Fülllicht', { unit: '% vom Schlüssellicht', min: 0, max: 100, hint: '#165: zwei weichere Lampen links und rechts vom Motiv (bei einem Viertel der Raumbreite), damit der Raum nicht absäuft. 0/leer = aus' }),
@@ -1914,7 +1920,10 @@ export const AREAS = {
       { title: 'Trope', fields: [NAME, DESCRIPTION, ref('image', 'Bild', 'assets', { hint: 'Gemaltes Bild (PixelLab, AAP-64). Leer = Art aus Code und Spuren' }), num('cm', 'Höhe im Spiel', { unit: 'cm', min: 10, hint: 'Leyla ist 170 cm' }),
         select('art', 'Art aus Code', [['', '–'], ['ad', 'Werbung gegen Wirklichkeit (Plakat mit Slogan einer Marke)'], ['machine', 'Das Haus läuft weiter (Maschine blinkt, dampft)'], ['order', 'Neue Ordnung (Kisten in Gang-Farbe)']]),
         multi('decals', 'Spuren dazu', DECALS), select('place', 'Wo', TROPE_PLACES), num('tiles', 'Breite', { unit: 'Kacheln', min: 1, max: 6 }),
-        num('gore', 'Gore', { min: 0, max: 2, hint: '0 keiner, 1 Blutfleck, 2 moderat (Tote sichtbar). Zeitschichten › Gore höchstens schaltet ab' }), ref('note', 'Zettel daneben', 'storylets', { hint: 'Ein Zettel (Storylet) liegt dabei; er wandert beim Lesen ins Logbuch' })] },
+        num('gore', 'Gore', { min: 0, max: 3, hint: '0 keiner, 1 Blutfleck, 2 moderat (Tote sichtbar), 3 etwas ehrlicher (frischere Wunden, Knochen; Daniel 21.11.2026: Grenze 3, moderat bleibt die Richtung). Zeitschichten › Gore höchstens schaltet ab' }), ref('note', 'Zettel daneben', 'storylets', { hint: 'Ein Zettel (Storylet) liegt dabei; er wandert beim Lesen ins Logbuch' })] },
+      { title: 'Licht', fields: [color('light', 'Schlüssellicht', { hint: '#170 (Tropes sichtbarer): ein dezentes eigenes Licht von oben auf die Szene. Leer = Zeitschichten › Erzählen › Trope-Licht' }),
+        num('lightStrength', 'Stärke', { unit: '%', min: 0, max: 300, hint: '0 = kein eigenes Licht. Leer = Standard' }), num('lightRadius', 'Reichweite', { unit: 'px', min: 60, max: 1200, hint: 'Leer = 2,4 × Bildhöhe, mindestens 260' }),
+        select('lightBehavior', 'Verhalten', [['', 'ruhig'], ['flicker', 'flackert'], ['pulse', 'pulsiert'], ['stutter', 'stottert']])] },
       { title: 'Bedingungen', fields: [multi('roles', 'Rollen', ROOM_ROLES, { hint: 'In Räumen mit dieser Rolle. Leer = überall' }),
         multi('events', 'Passt zu', [...EVENT_KINDS.filter(([k]) => k), ...RESIDENTS], { hint: 'Ereignis des POI oder wer heute dort ist. Leer = zu allem' }),
         refs('pois', 'Nur in POIs', 'pois'), table('when', 'Bedingungen', [select('when', 'Wenn', CONDITIONS), text('value', 'Wert'), bool('not', 'nicht')]),
@@ -1936,7 +1945,9 @@ export const AREAS = {
         num('traces.fadeTo', 'Verblasst bis', { unit: '%', min: 0, max: 100, hint: 'Deckkraft der Spuren kurz vor dem Aufräumen (Standard 35)' })] },
       { title: 'Erzählen', fields: [range('notes.perVisit', 'Zettel je Besuch', { hint: 'Standard 1–2 (plus die Zettel der Tropes)' }), num('notes.announce', 'Durchsage-Chance', { unit: '%', min: 0, max: 100 }), num('notes.radio', 'Funk-Chance', { unit: '%', min: 0, max: 100 }),
         num('notes.radioAfter', 'Funk nach', { unit: 's', min: 5 }), num('notes.splinter', 'Splitter-Chance', { unit: '%', min: 0, max: 100, hint: 'Je Besuch, solange der Splitter dieses Ortes nicht gefunden ist' }), num('ava.delay', 'AvA kommentiert nach', { unit: 'ms', min: 0 }),
-        num('tropesPerLevel', 'Tropes je Level', { min: 0, max: 8 }), num('gore', 'Gore höchstens', { min: 0, max: 2, hint: '0 keiner, 1 Blutflecken, 2 moderat (Tote sichtbar, Standard)' })] }],
+        num('tropesPerLevel', 'Tropes je Level', { min: 0, max: 8 }), num('gore', 'Gore höchstens', { min: 0, max: 3, hint: '0 keiner, 1 Blutflecken, 2 moderat (Tote sichtbar), 3 etwas ehrlicher (Daniel 21.11.2026: „Gore etwas ehrlicher (Grenze 3)“)' })] },
+      { title: 'Trope-Licht', fields: [color('tropeLight.color', 'Farbe', { hint: '#170: Standard-Schlüssellicht der Tropes (Tropes › Licht überschreibt)' }), num('tropeLight.strength', 'Stärke', { unit: '%', min: 0, max: 300, hint: '0 = Tropes ohne eigenes Licht. Leer = 45' }),
+        num('tropeLight.radius', 'Reichweite', { unit: 'px', min: 60, max: 1200, hint: 'Leer = 2,4 × Bildhöhe, mindestens 260' }), num('tropeLight.above', 'Über der Szene', { unit: 'px', min: 0, max: 400, hint: 'So hoch über der Oberkante sitzt das Licht. Leer = 70' })] }],
     check: (x, report) => {
       const ids = new Set(), G = new Set((x.grammar || []).map(g => g.symbol));
       for (const o of x.occupants || []) { if (ids.has(o.id)) report('error', `Besetzer „${o.id}“ doppelt`); ids.add(o.id); if (!o.arrive) report('warning', `Besetzer „${o.id}“: Kamen fehlt`); }

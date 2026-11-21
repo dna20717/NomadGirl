@@ -141,5 +141,6 @@
  "notes": {"perVisit": [1, 2], "announce": 70, "radio": 50, "radioAfter": 45, "splinter": 100},
  "ava": {"delay": 1400},
  "tropesPerLevel": 3,
- "gore": 2
+ "gore": 3,
+ "tropeLight": {"color": "#ffd9a0", "strength": 45, "above": 70}
 }

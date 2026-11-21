@@ -16,6 +16,7 @@ import { DriveScan } from './drive_scan.js';
 import { mapConfig } from '../worldmap.js';
 import { rainingAt } from '../rain.js';
 import { kitLook } from './enemy_kit.js';
+import { hasLabels, labeledCanvas, fontReady, loadFont, RAW } from '../labels.js';
 
 const ease = k => k * k * (3 - 2 * k);
 // fade a sound's volume through a plain value: a tween straight on the sound read the volume of a destroyed one (null gain) and threw
@@ -412,7 +413,12 @@ export class DriveUI {
     if (!file) return null;
     this.imgs ||= {};
     if (!this.imgs[file]) { const i = new Image(); i.src = new URL(file, this.host.scene().base).href; this.imgs[file] = i; }
-    const i = this.imgs[file]; return i.complete && i.naturalWidth ? i : null;
+    const i = this.imgs[file]; if (!(i.complete && i.naturalWidth)) return null;
+    // #170 text from data (Assets › Schrift aus Code) onto the picture, once it is there
+    const A = Object.values(this.D.assets || {}).find(a => a.file === file);
+    if (!hasLabels(A)) return i;
+    if (!fontReady()) { loadFont(); return i; }   // VT323 still on its way: the bare picture for a moment
+    return (this.imgs[file + RAW] ||= labeledCanvas(i, A.labels));
   }
 }
 for (const k of Object.getOwnPropertyNames(DriveScan.prototype)) if (k !== 'constructor') Object.defineProperty(DriveUI.prototype, k, Object.getOwnPropertyDescriptor(DriveScan.prototype, k));   // #115

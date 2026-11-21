@@ -65,9 +65,24 @@ export class StoryFx {
         if (wall) item.art.setTint(0xc8c0c8).setAlpha(0.92);
         if (this.r() < 0.5 && !wall) item.art.setFlipX(true);
       } else this.drawArt(t, item);
+      this.tropeLight(t, item, p);
       if (p.note && D.storylets?.[p.note] && fits(D, this.ctx, { ...D.storylets[p.note], id: p.note, weight: 1 })) this.addNote(p.note, cx + (p.w / 2 + 0.4) * T, feet);
       this.tropes.push(item);
     }
+  }
+  // #170 (Tropes sichtbarer): a soft key light of its own from above, so the scene reads in a dark room.
+  // Tropes › Licht (else Zeitschichten › Erzählen › Trope-Licht); strength 0 = none
+  tropeLight(t, item, p) {
+    const s = this.scene, A = s.atmo, H = this.D.history?.tropeLight || {};
+    if (!A?.on || !A.lights) return;
+    const strength = t.lightStrength ?? H.strength ?? 45;
+    if (!(strength > 0)) return;
+    const h = item.art ? item.art.displayHeight : this.T * 1.4, base = p.place === 'wall' ? item.feet - this.T * 0.55 : item.feet;
+    const hex = String(t.light || H.color || '#ffd9a0').replace('#', ''), c = [0, 2, 4].map(i => parseInt(hex.slice(i, i + 2), 16) || 0);
+    const x = item.x, y = base - h - (H.above ?? 70), radius = t.lightRadius || H.radius || Math.max(260, h * 2.4);
+    const halo = s.add.image(x, y, s.fx.glowKey()).setVisible(false);
+    item.light = { kind: 'ceiling', x, y, c, radius, strength: strength / 100, behavior: t.lightBehavior || 'steady', seed: ((x * 13 + y * 7) % 1000) / 1000, clip: null, halo, haloA: 0, f: 1, trope: t.name || item.id };
+    A.lights.push(item.light);
   }
   // tropes without a picture: an advert against reality, a machine that runs on, the new order of a gang
   drawArt(t, it) {
@@ -208,7 +223,7 @@ export class StoryFx {
   }
   state() {
     return { on: this.on, node: this.node, visits: this.visits || 0, layers: this.ctx?.layers?.map(l => l.text) || [],
-      notes: this.notes.map(n => ({ id: n.id, x: Math.round(n.x), feet: n.feet, read: n.read })), tropes: this.tropes.map(t => ({ id: t.id, x: Math.round(t.x), feet: t.feet, room: t.room, image: !!t.art })),
+      notes: this.notes.map(n => ({ id: n.id, x: Math.round(n.x), feet: n.feet, read: n.read })), tropes: this.tropes.map(t => ({ id: t.id, x: Math.round(t.x), feet: t.feet, room: t.room, image: !!t.art, h: t.art ? Math.round(t.art.displayHeight) : 0, light: t.light ? Math.round(t.light.strength * 100) : 0 })),
       splinter: this.splinter ? { id: this.splinter.id, x: Math.round(this.splinter.x), feet: this.splinter.feet, taken: this.splinter.taken, memory: this.splinter.memory || null } : null,
       old: (this.old || []).map(t => ({ kind: t.kind, room: t.room, fade: +t.fade.toFixed(2) })), stains: this.stains || [], said: this.said, heard: this.heard || [] };
   }

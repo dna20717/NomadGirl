@@ -4,6 +4,7 @@
 // drawn like the game will: with pixelArt the sprite is scaled without smoothing). Settings live in w.spriteView and survive redraws.
 import { el, openDialogue } from '../ui.js';
 import { icon } from '../icons.js';
+import { hasLabels, labeledCanvas, loadFont } from '../labels.js';
 
 const VIEWS = [['near', 'Nah'], ['native', '1:1'], ['game', 'Im Spiel']];
 const BACKS = [['check', 'Karo'], ['dark', 'Dunkel'], ['light', 'Hell']];
@@ -25,6 +26,14 @@ function objectUrl(w, file) {
   if (!w.urls.has(file)) w.urls.set(file, blob(w, file).then(b => URL.createObjectURL(b)));
   return w.urls.get(file);
 }
+// #170 the picture as the game shows it: with its text from data (Assets › Schrift aus Code), else the file itself
+function shownUrl(w, a) {
+  if (!hasLabels(a)) return objectUrl(w, a.file);
+  w.labeled = w.labeled || new Map();
+  const key = a.file + JSON.stringify(a.labels);
+  if (!w.labeled.has(key)) w.labeled.set(key, Promise.all([image(w, a.file), loadFont()]).then(([img]) => labeledCanvas(img, a.labels).toDataURL()));
+  return w.labeled.get(key);
+}
 const failed = (file, e) => el('p', { class: 'ng-inline error' }, icon('error', 14), ` ${file} lässt sich nicht laden (${e.message})`);
 
 // Preview of any asset: animation → player, everything else → picture
@@ -44,7 +53,7 @@ export function iconSheet(w, a, pick) {
   if (!a.file || !fw || !c || !r) { box.append(el('p', { class: 'ed-small' }, 'Datei, Feldgröße und Raster eintragen, dann erscheint hier das Raster.')); return wrap; }
   const name = i => a.names?.[i] || `Feld ${i}`;
   info.textContent = pick ? (pick.value !== undefined ? `Symbol ${pick.value}: ${name(pick.value)}` : 'Symbol anklicken') : `${c} × ${r} Symbole à ${fw} × ${fh} px`;
-  objectUrl(w, a.file).then(src => {
+  shownUrl(w, a).then(src => {
     const grid = el('div', { class: 'ng-icons' + (pick ? ' pick' : ''), style: `--c:${c};--r:${r};aspect-ratio:${c * fw} / ${r * fh}` }, el('img', { src, alt: a.name || a.file }));
     for (let i = 0; i < c * r; i++) {
       const cell = el(pick ? 'button' : 'span', { class: 'ng-icon' + (pick?.value === i ? ' picked' : ''), title: `${i} · ${name(i)}`, style: `left:${(i % c) / c * 100}%;top:${Math.floor(i / c) / r * 100}%` });
@@ -92,7 +101,7 @@ export function picturePreview(w, a) {
   const info = el('span', { class: 'ng-sprite-info' });
   const wrap = el('div', { class: 'ng-sprite' }, el('div', { class: 'ng-sprite-bar' }, info, el('span', { class: 'ed-grow' }), seg), box);
   if (!a?.file) { box.append(el('p', { class: 'ed-small' }, 'Datei eintragen, dann erscheint hier die Vorschau.')); return wrap; }
-  objectUrl(w, a.file).then(src => {
+  shownUrl(w, a).then(src => {
     const img = el('img', { src, alt: a.name || a.file, class: 'ng-picture', title: 'Antippen: Originalgröße' });
     img.addEventListener('load', () => { info.textContent = `${img.naturalWidth} × ${img.naturalHeight} px · antippen für Originalgröße`; });
     img.addEventListener('click', () => openDialogue({ title: a.name || a.file, icon: 'image', wide: true, class: 'ng-lightbox', content: [el('div', { class: 'ng-lightbox-box back-' + v.back }, el('img', { src, alt: a.name || a.file }))] }));
@@ -119,7 +128,7 @@ export function assetThumb(w, a, size = 28, cell) {
       ctx.drawImage(img, sx, sy, fw, fh, 0, 0, c.width, c.height);
       box.append(el('img', { src: c.toDataURL(), alt: '' }));   // as <img> so it scales like the other thumbnails
     }).catch(() => box.classList.add('broken'));
-  } else objectUrl(w, a.file).then(src => box.append(el('img', { src, alt: '' }))).catch(() => box.classList.add('broken'));
+  } else shownUrl(w, a).then(src => box.append(el('img', { src, alt: '' }))).catch(() => box.classList.add('broken'));
   return box;
 }
 

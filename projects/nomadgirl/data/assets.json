@@ -2535,6 +2535,15 @@
   "source": "KI (PixelLab, Create Image Pro, AAP-64, Stilvorlage Leyla)",
   "date": "11.11.2026"
  },
+ "tileset00_props_big_text": {
+  "name": "TileSet00 · Großer Clutter (Original mit Text)",
+  "kind": "source",
+  "file": "assets/tiles/tileset00/source/props_big_text.png",
+  "derivedFrom": "tileset00_source",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Stilvorlage Leyla)",
+  "date": "11.11.2026",
+  "description": "#170: das Bild, wie es gemalt wurde, mit gebackenem Text (SNACKS). Im Spiel steht die Fassung ohne Text, die Schrift kommt aus den Daten."
+ },
  "tileset00_props_big": {
   "name": "TileSet00 · Großer Clutter",
   "kind": "icons",
@@ -2543,9 +2552,10 @@
   "grid": [4, 2],
   "names": ["big_station_0", "big_station_1", "big_station_2", "big_station_3", "big_industry_0", "big_industry_1", "big_industry_2", "big_industry_3"],
   "description": "Möbel und Maschinen über zwei Kacheln, streng orthogonal von der Seite: Laden (Snackautomat, Regal, Kühltruhe, Getränkekühlschrank), Halle (Generator, Werkbank, Kistenstapel, Spind).",
-  "derivedFrom": "tileset00_source",
-  "source": "KI (PixelLab, Create Image Pro, AAP-64, Stilvorlage Leyla)",
-  "date": "11.11.2026"
+  "derivedFrom": "tileset00_props_big_text",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Stilvorlage Leyla); #170 Text entfernt (Code, tools/detext.py)",
+  "date": "11.11.2026",
+  "labels": [{"text": "SNACKS", "at": [56, 14], "size": 11, "color": "#5a4e44", "width": 64}]
  },
  "leyla_run_gun_side": {
   "name": "Leyla · Rennen mit Waffe",
@@ -5197,25 +5207,45 @@
   "title": "Leyla Theme · Camp",
   "artist": "Ava (aus Code)"
  },
+ "ws_treasury_hall_empty_text": {
+  "name": "Werkstatt · Hall of Loot leer (Original mit Text)",
+  "kind": "source",
+  "file": "assets/workshops/source/treasury_hall_empty_text.png",
+  "derivedFrom": "ws_treasury_cyber_candidate_2",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Seed 302)",
+  "date": "13.11.2026",
+  "description": "#170: das Bild, wie es gemalt wurde, mit gebackenem Text (HALL OF LOOT). Im Spiel steht die Fassung ohne Text, die Schrift kommt aus den Daten."
+ },
  "ws_treasury_hall_empty": {
   "name": "Werkstatt · Hall of Loot leer",
   "kind": "image",
   "file": "assets/workshops/treasury_hall_empty.png",
   "origin": [128, 225],
-  "source": "KI (PixelLab, Create Image Pro, AAP-64, Seed 302)",
-  "derivedFrom": "ws_treasury_cyber_candidate_2",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Seed 302); #170 Text entfernt (Code, tools/detext.py)",
+  "derivedFrom": "ws_treasury_hall_empty_text",
   "date": "13.11.2026",
-  "description": "Daniel, 13.11.2026: Kandidat 2 „Hall of Loot“ (#003/#014). Regale mit Neon, Laser-Vitrine mit Hologramm, Sockel im Lichtkegel."
+  "description": "Daniel, 13.11.2026: Kandidat 2 „Hall of Loot“ (#003/#014). Regale mit Neon, Laser-Vitrine mit Hologramm, Sockel im Lichtkegel.",
+  "labels": [{"text": "SCHATZ\\nKAMMER", "at": [128, 84], "size": 11, "color": "#a6fcdb", "glow": true, "width": 52}]
+ },
+ "ws_treasury_hall_text": {
+  "name": "Werkstatt · Hall of Loot voll (Original mit Text)",
+  "kind": "source",
+  "file": "assets/workshops/source/treasury_hall_text.png",
+  "derivedFrom": "ws_treasury_hall_empty",
+  "source": "Code (Beutehaufen aus ws_treasury_cyber ausgeschnitten, verkleinert, auf AAP-64 eingerastet, links vor die Server gesetzt)",
+  "date": "13.11.2026",
+  "description": "#170: das Bild, wie es gemalt wurde, mit gebackenem Text (HALL OF LOOT). Im Spiel steht die Fassung ohne Text, die Schrift kommt aus den Daten."
  },
  "ws_treasury_hall": {
   "name": "Werkstatt · Hall of Loot voll",
   "kind": "image",
   "file": "assets/workshops/treasury_hall.png",
   "origin": [128, 225],
-  "source": "Code (Beutehaufen aus ws_treasury_cyber ausgeschnitten, verkleinert, auf AAP-64 eingerastet, links vor die Server gesetzt)",
-  "derivedFrom": "ws_treasury_hall_empty",
+  "source": "Code (Beutehaufen aus ws_treasury_cyber ausgeschnitten, verkleinert, auf AAP-64 eingerastet, links vor die Server gesetzt); #170 Text entfernt (Code, tools/detext.py)",
+  "derivedFrom": "ws_treasury_hall_text",
   "date": "13.11.2026",
-  "description": "Leere Fassung plus Beutehaufen links vorne. Wächst mit dem Füllstand von unten."
+  "description": "Leere Fassung plus Beutehaufen links vorne. Wächst mit dem Füllstand von unten.",
+  "labels": [{"text": "SCHATZ\\nKAMMER", "at": [128, 84], "size": 11, "color": "#a6fcdb", "glow": true, "width": 52}]
  },
  "icons_misc": {
   "name": "Symbole: Kleinkram & Nachzügler",
@@ -5456,14 +5486,24 @@
   "date": "15.11.2026",
   "description": "#033: Auftragsbüro: Brett voller Zettel, Karte mit roten Fäden, Schreibtisch mit Stempel und Funkgerät, Neon-!. Original in source/."
  },
+ "ws_armory_text": {
+  "name": "Werkstatt · Waffenkammer (Original mit Text)",
+  "kind": "source",
+  "file": "assets/workshops/source/armory_text.png",
+  "source": "KI (PixelLab, Create Image Pro, Referenz Hydrokultur + Ripperdoc bzw. Halle der Beute, Palette AAP-64, streng frontal)",
+  "date": "15.11.2026",
+  "description": "#170: das Bild, wie es gemalt wurde, mit gebackenem Text (ARMORY). Im Spiel steht die Fassung ohne Text, die Schrift kommt aus den Daten."
+ },
  "ws_armory": {
   "name": "Werkstatt · Waffenkammer",
   "kind": "image",
   "file": "assets/workshops/armory.png",
   "origin": [128, 252],
-  "source": "KI (PixelLab, Create Image Pro, Referenz Hydrokultur + Ripperdoc bzw. Halle der Beute, Palette AAP-64, streng frontal)",
+  "source": "KI (PixelLab, Create Image Pro, Referenz Hydrokultur + Ripperdoc bzw. Halle der Beute, Palette AAP-64, streng frontal); #170 Text entfernt (Code, tools/detext.py)",
   "date": "15.11.2026",
-  "description": "#033: Waffenkammer: Raum wie die Halle der Beute, drei leere Display-Boards mit Neonrahmen, Vitrine, Spot, Neon ARMORY. Original in source/."
+  "description": "#033: Waffenkammer: Raum wie die Halle der Beute, drei leere Display-Boards mit Neonrahmen, Vitrine, Spot, Neon ARMORY. Original in source/.",
+  "labels": [{"text": "WAFFEN", "at": [129, 55], "size": 15, "color": "#e3e6ff", "glow": true, "width": 56}],
+  "derivedFrom": "ws_armory_text"
  },
  "ws_cold_room": {
   "name": "Werkstatt · Kühlraum",
@@ -6737,6 +6777,14 @@
   "date": "2026-11-19",
   "description": "#116: linkes Ende, ein Abschnitt (wiederholt sich), rechtes Ende mit Tür; ein dünnes Wand-Band macht es höher."
  },
+ "kit_mod_tent_b_text": {
+  "name": "Camp-Baukasten · Armeezelt (Module) (Original mit Text)",
+  "kind": "source",
+  "file": "assets/camp/kit/source/mod_tent_b_text.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenzen: die bisherigen Stücke des Baukastens) + Code (tools/camp_modules.py: Varianten freistellen, Mittelstück mit passenden Nähten)",
+  "date": "2026-11-19",
+  "description": "#170: das Bild, wie es gemalt wurde, mit gebackenem Text (732). Im Spiel steht die Fassung ohne Text, die Schrift kommt aus den Daten."
+ },
  "kit_mod_tent_b": {
   "name": "Camp-Baukasten · Armeezelt (Module)",
   "kind": "icons",
@@ -6744,9 +6792,10 @@
   "cell": [264, 108],
   "grid": [1, 1],
   "names": ["Armeezelt"],
-  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenzen: die bisherigen Stücke des Baukastens) + Code (tools/camp_modules.py: Varianten freistellen, Mittelstück mit passenden Nähten)",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenzen: die bisherigen Stücke des Baukastens) + Code (tools/camp_modules.py: Varianten freistellen, Mittelstück mit passenden Nähten); #170 Text entfernt (Code, tools/detext.py)",
   "date": "2026-11-19",
-  "description": "#116: wie das Streifenzelt, olivgrün mit Werkzeug und Kisten."
+  "description": "#116: wie das Streifenzelt, olivgrün mit Werkzeug und Kisten.",
+  "derivedFrom": "kit_mod_tent_b_text"
  },
  "intro_theme": {
   "name": "Musik · Intro",
@@ -7215,16 +7264,26 @@
   "date": "20.11.2026",
   "description": "Rohbild 192 × 256 mit Erdhaufen unten."
  },
+ "notice_board_text": {
+  "name": "Schwarzes Brett (Original mit Text)",
+  "kind": "source",
+  "file": "assets/camp/source/notice_board_text.png",
+  "derivedFrom": "notice_board_source",
+  "source": "KI (PixelLab, Create Image Pro 192 × 256, Stil: Camp-Boden fein, Palette AAP-64, streng seitlich); unten auf die Pfosten zugeschnitten",
+  "date": "20.11.2026",
+  "description": "#170: das Bild, wie es gemalt wurde, mit gebackenem Text (JOBS). Im Spiel steht die Fassung ohne Text, die Schrift kommt aus den Daten."
+ },
  "notice_board": {
   "name": "Schwarzes Brett",
   "kind": "icons",
   "file": "assets/camp/notice_board.png",
-  "source": "KI (PixelLab, Create Image Pro 192 × 256, Stil: Camp-Boden fein, Palette AAP-64, streng seitlich); unten auf die Pfosten zugeschnitten",
-  "derivedFrom": "notice_board_source",
+  "source": "KI (PixelLab, Create Image Pro 192 × 256, Stil: Camp-Boden fein, Palette AAP-64, streng seitlich); unten auf die Pfosten zugeschnitten; #170 Text entfernt (Code, tools/detext.py)",
+  "derivedFrom": "notice_board_text",
   "date": "20.11.2026",
   "description": "#084: Brett aus Planken mit Blechdach, Schild JOBS und Lampe, zwei Pfosten. Zettel-Fläche x 18–172, y 68–156 (Camp › Schwarzes Brett). 10 Generierungen.",
   "cell": [192, 208],
-  "grid": [1, 1]
+  "grid": [1, 1],
+  "labels": [{"text": "AUFTRÄGE", "at": [98, 9], "size": 14, "color": "#5b3138", "width": 58}]
  },
  "desert_plain_source": {
   "name": "Ebene Wüste (Original)",
@@ -7623,22 +7682,42 @@
   "derivedFrom": "raider_base",
   "description": "Bausatz-Animation (#004): Körper ohne Waffe, grüner Platzhalter vermessen (Ebenen je Frame), Finger davor im Streifen „Hände davor“."
  },
+ "vault_closed_text": {
+  "name": "Tresor V-09 (zu) (Original mit Text)",
+  "kind": "source",
+  "file": "assets/props/vault/source/vault_closed_text.png",
+  "source": "KI (PixelLab, create_image_pro 192 × 256, AAP-64, Stil props_big)",
+  "date": "2026-11-21",
+  "description": "#170: das Bild, wie es gemalt wurde, mit gebackenem Text (V-09, CAUTION, SECURE). Im Spiel steht die Fassung ohne Text, die Schrift kommt aus den Daten."
+ },
  "vault_closed": {
   "name": "Tresor V-09 (zu)",
   "kind": "image",
   "file": "assets/props/vault/vault_closed.png",
-  "source": "KI (PixelLab, create_image_pro 192 × 256, AAP-64, Stil props_big)",
+  "source": "KI (PixelLab, create_image_pro 192 × 256, AAP-64, Stil props_big); #170 Text entfernt (Code, tools/detext.py)",
   "date": "2026-11-21",
-  "description": "Streng von vorn: Rundtür mit radialen Riegeln um einen Cyan-Kern (#153)."
+  "description": "Streng von vorn: Rundtür mit radialen Riegeln um einen Cyan-Kern (#153).",
+  "labels": [{"text": "V-09", "at": [49, 48], "size": 20, "color": "#8b93af", "width": 36},{"text": "VORSICHT", "at": [143, 60], "size": 10, "color": "#a08662", "width": 42}],
+  "derivedFrom": "vault_closed_text"
+ },
+ "vault_open_text": {
+  "name": "Tresor V-09 (geknackt) (Original mit Text)",
+  "kind": "source",
+  "file": "assets/props/vault/source/vault_open_text.png",
+  "derivedFrom": "vault_closed",
+  "source": "KI (PixelLab, Edit Pro Flash von vault_closed)",
+  "date": "2026-11-21",
+  "description": "#170: das Bild, wie es gemalt wurde, mit gebackenem Text (V-09, CAUTION, SECURE). Im Spiel steht die Fassung ohne Text, die Schrift kommt aus den Daten."
  },
  "vault_open": {
   "name": "Tresor V-09 (geknackt)",
   "kind": "image",
   "file": "assets/props/vault/vault_open.png",
-  "source": "KI (PixelLab, Edit Pro Flash von vault_closed)",
-  "derivedFrom": "vault_closed",
+  "source": "KI (PixelLab, Edit Pro Flash von vault_closed); #170 Text entfernt (Code, tools/detext.py)",
+  "derivedFrom": "vault_open_text",
   "date": "2026-11-21",
-  "description": "Tür offen, Gold, Münzen, Datenchips, Kristall (#153)."
+  "description": "Tür offen, Gold, Münzen, Datenchips, Kristall (#153).",
+  "labels": [{"text": "V-09", "at": [49, 48], "size": 20, "color": "#8b93af", "width": 36},{"text": "VORSICHT", "at": [143, 60], "size": 10, "color": "#a08662", "width": 42}]
  },
  "cave_px_source": {
   "name": "Quelle: Höhlen-Querschnitt",
@@ -7695,13 +7774,22 @@
   "date": "2026-11-21",
   "description": "Zwei Stahlrohre mit X-Streben, rostig, senkrecht kachelbar (#156)."
  },
+ "drive_bus_text": {
+  "name": "Fahrt · Verlassener Bus (Original mit Text)",
+  "kind": "source",
+  "file": "assets/drive/source/bus_text.png",
+  "source": "KI (PixelLab, create_image_pro, Stil props_big), Freigabe Daniel 21.11.2026 (#162)",
+  "date": "2026-11-21",
+  "description": "#170: das Bild, wie es gemalt wurde, mit gebackenem Text (Zielanzeige). Im Spiel steht die Fassung ohne Text, die Schrift kommt aus den Daten."
+ },
  "drive_bus": {
   "name": "Fahrt · Verlassener Bus",
   "kind": "image",
   "file": "assets/drive/bus.png",
-  "source": "KI (PixelLab, create_image_pro, Stil props_big), Freigabe Daniel 21.11.2026 (#162)",
+  "source": "KI (PixelLab, create_image_pro, Stil props_big), Freigabe Daniel 21.11.2026 (#162); #170 Text entfernt (Code, tools/detext.py)",
   "date": "2026-11-21",
-  "height": 380
+  "height": 380,
+  "derivedFrom": "drive_bus_text"
  },
  "drive_wreck": {
   "name": "Fahrt · Autowrack auf dem Dach",
@@ -7719,13 +7807,23 @@
   "date": "2026-11-21",
   "height": 140
  },
+ "drive_shrine_text": {
+  "name": "Fahrt · Schrein am Kilometerstein (Original mit Text)",
+  "kind": "source",
+  "file": "assets/drive/source/shrine_text.png",
+  "source": "KI (PixelLab, create_image_pro, Stil props_big), Freigabe Daniel 21.11.2026 (#162)",
+  "date": "2026-11-21",
+  "description": "#170: das Bild, wie es gemalt wurde, mit gebackenem Text (KM 14). Im Spiel steht die Fassung ohne Text, die Schrift kommt aus den Daten."
+ },
  "drive_shrine": {
   "name": "Fahrt · Schrein am Kilometerstein",
   "kind": "image",
   "file": "assets/drive/shrine.png",
-  "source": "KI (PixelLab, create_image_pro, Stil props_big), Freigabe Daniel 21.11.2026 (#162)",
+  "source": "KI (PixelLab, create_image_pro, Stil props_big), Freigabe Daniel 21.11.2026 (#162); #170 Text entfernt (Code, tools/detext.py)",
   "date": "2026-11-21",
-  "height": 190
+  "height": 190,
+  "labels": [{"text": "KM\\n14", "at": [32, 59], "size": 14, "color": "#5a4e44", "width": 24}],
+  "derivedFrom": "drive_shrine_text"
  },
  "drive_mast": {
   "name": "Fahrt · Funkmast",
@@ -7790,21 +7888,48 @@
   "date": "2026-11-21",
   "description": "4× Ausholen (Ausfallschritt, Arm hinter den Kopf), 4× Wurf (Bild 8 = loslassen), 3× zurück ins Zielen; die Waffe bleibt in der vorderen Hand (#161)."
  },
+ "wow_priceboard_text": {
+  "name": "Wow · Preistafel Mile 7 (Original mit Text)",
+  "kind": "source",
+  "file": "assets/pois/wow/source/wow_priceboard_text.png",
+  "source": "KI (PixelLab, create_image_pro 192 × 344, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "#170: das Bild, wie es gemalt wurde, mit gebackenem Text (SUN, REGULAR/PLUS/DIESEL, 4.89/6.29/6.49, Seitenschild). Im Spiel steht die Fassung ohne Text, die Schrift kommt aus den Daten."
+ },
  "wow_priceboard": {
   "name": "Wow · Preistafel Mile 7",
   "kind": "image",
   "file": "assets/pois/wow/wow_priceboard.png",
-  "source": "KI (PixelLab, create_image_pro 192 × 344, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "source": "KI (PixelLab, create_image_pro 192 × 344, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code); #170 Text entfernt (Code, tools/detext.py)",
   "date": "2026-11-21",
-  "description": "Preistafel auf zwei Pfosten mit Sonnen-Logo, Regular/Plus/Diesel in LED-Ziffern, Rost und Aufkleber (#165)."
+  "description": "Preistafel auf zwei Pfosten mit Sonnen-Logo, Regular/Plus/Diesel in LED-Ziffern, Rost und Aufkleber (#165).",
+  "labels": [
+   {"text": "SUPER", "at": [42, 132], "size": 14, "color": "#dae0ea", "width": 44},
+   {"text": "PLUS", "at": [42, 159], "size": 14, "color": "#dae0ea", "width": 44},
+   {"text": "DIESEL", "at": [42, 185], "size": 14, "color": "#dae0ea", "width": 44},
+   {"text": "4,89", "at": [91, 132], "size": 20, "color": "#f9a31b", "glow": true, "width": 34},
+   {"text": "6,29", "at": [91, 159], "size": 20, "color": "#f9a31b", "glow": true, "width": 34},
+   {"text": "6,49", "at": [91, 186], "size": 20, "color": "#f9a31b", "glow": true, "width": 34}
+  ],
+  "derivedFrom": "wow_priceboard_text"
+ },
+ "wow_dome_text": {
+  "name": "Wow · Glaskuppel Megamall (Original mit Text)",
+  "kind": "source",
+  "file": "assets/pois/wow/source/wow_dome_text.png",
+  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "#170: das Bild, wie es gemalt wurde, mit gebackenem Text (SALE). Im Spiel steht die Fassung ohne Text, die Schrift kommt aus den Daten."
  },
  "wow_dome": {
   "name": "Wow · Glaskuppel Megamall",
   "kind": "image",
   "file": "assets/pois/wow/wow_dome.png",
-  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code); #170 Text entfernt (Code, tools/detext.py)",
   "date": "2026-11-21",
-  "description": "Glaskuppel von innen, Eisenrippen, einzelne Scheiben fehlen, zerrissenes Banner „SALE“; hängt unter der Decke (#165)."
+  "description": "Glaskuppel von innen, Eisenrippen, einzelne Scheiben fehlen, zerrissenes Banner „SALE“; hängt unter der Decke (#165).",
+  "labels": [{"text": "ALLES", "at": [166, 135], "size": 14, "color": "#f4d29c", "width": 58},{"text": "−70 %", "at": [166, 149], "size": 15, "color": "#f4d29c", "width": 58}],
+  "derivedFrom": "wow_dome_text"
  },
  "wow_reactor": {
   "name": "Wow · Reaktorkern Bunker 13",
@@ -7830,13 +7955,23 @@
   "date": "2026-11-21",
   "description": "Abgebrochene Bürodecke mit Bewehrung, zwei Schreibtische mit Röhrenmonitoren, Papier fliegt hinaus (#165)."
  },
+ "wow_kiosk_text": {
+  "name": "Wow · Kassenhaus P+R (Original mit Text)",
+  "kind": "source",
+  "file": "assets/pois/wow/source/wow_kiosk_text.png",
+  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "#170: das Bild, wie es gemalt wurde, mit gebackenem Text (PAY HERE RK). Im Spiel steht die Fassung ohne Text, die Schrift kommt aus den Daten."
+ },
  "wow_kiosk": {
   "name": "Wow · Kassenhaus P+R",
   "kind": "image",
   "file": "assets/pois/wow/wow_kiosk.png",
-  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code); #170 Text entfernt (Code, tools/detext.py)",
   "date": "2026-11-21",
-  "description": "Kassenhaus auf dem Dach mit Neon „PAY HERE“, Schranke, Kassenautomat, ausgebranntes Auto (#165)."
+  "description": "Kassenhaus auf dem Dach mit Neon „PAY HERE“, Schranke, Kassenautomat, ausgebranntes Auto (#165).",
+  "labels": [{"text": "KASSE", "at": [201, 15], "size": 16, "color": "#f5a097", "glow": true, "width": 40}],
+  "derivedFrom": "wow_kiosk_text"
  },
  "wow_cabin": {
   "name": "Wow · Zettelkabine Funkmast",
@@ -7910,21 +8045,50 @@
   "date": "2026-11-21",
   "description": "Förderturm mit Seilscheibe, Maschinenhaus, Cyan-Leuchten aus dem Schacht (#165)."
  },
+ "landmark_penthouse_text": {
+  "name": "Landmarke · Neon „Penthouse“ (Original mit Text)",
+  "kind": "source",
+  "file": "assets/pois/wow/source/landmark_penthouse_text.png",
+  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "date": "2026-11-21",
+  "description": "#170: das Bild, wie es gemalt wurde, mit gebackenem Text (PENTHOUSE (Neon-Buchstaben)). Im Spiel steht die Fassung ohne Text, die Schrift kommt aus den Daten."
+ },
  "landmark_penthouse": {
   "name": "Landmarke · Neon „Penthouse“",
   "kind": "image",
   "file": "assets/pois/wow/landmark_penthouse.png",
+  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code); #170 Text entfernt (Code, tools/detext.py)",
+  "date": "2026-11-21",
+  "description": "Neon-Schrift PENTHOUSE auf Stahlgerüst, einzelne Buchstaben dunkel (Delta Heights) (#165).",
+  "labels": [{"text": "PENTHOUSE", "at": [144, 42], "size": 46, "color": "#e86a73", "glow": true, "width": 250}],
+  "derivedFrom": "landmark_penthouse_text"
+ },
+ "landmark_board_text": {
+  "name": "Landmarke · Anzeigetafel Metro (Original mit Text)",
+  "kind": "source",
+  "file": "assets/pois/wow/source/landmark_board_text.png",
   "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
   "date": "2026-11-21",
-  "description": "Neon-Schrift PENTHOUSE auf Stahlgerüst, einzelne Buchstaben dunkel (Delta Heights) (#165)."
+  "description": "#170: das Bild, wie es gemalt wurde, mit gebackenem Text (vier Abfahrtszeilen (SECTOR 9 … ON TIME/DELAYED), Plaketten V-07, DANGER). Im Spiel steht die Fassung ohne Text, die Schrift kommt aus den Daten."
  },
  "landmark_board": {
   "name": "Landmarke · Anzeigetafel Metro",
   "kind": "image",
   "file": "assets/pois/wow/landmark_board.png",
-  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code)",
+  "source": "KI (PixelLab, create_image_pro 344 × 192, AAP-64, Stil: Tresor V-09), Ränder beschnitten (Code); #170 Text entfernt (Code, tools/detext.py)",
   "date": "2026-11-21",
-  "description": "Hängende Abfahrtstafel mit Bernstein-Zeilen, eine rot „DELAYED“, Uhr daneben (Metro Line 4) (#165)."
+  "description": "Hängende Abfahrtstafel mit Bernstein-Zeilen, eine rot „DELAYED“, Uhr daneben (Metro Line 4) (#165).",
+  "labels": [
+   {"text": "15:18 SEKTOR 9", "at": [34, 76], "size": 14, "color": "#ffd541", "align": "left", "glow": true, "width": 140},
+   {"text": "PÜNKTLICH", "at": [241, 76], "size": 14, "color": "#ffd541", "align": "right", "glow": true, "width": 64},
+   {"text": "15:25 UNTERGRUND", "at": [34, 93], "size": 14, "color": "#ffd541", "align": "left", "glow": true, "width": 140},
+   {"text": "PÜNKTLICH", "at": [241, 93], "size": 14, "color": "#ffd541", "align": "right", "glow": true, "width": 64},
+   {"text": "15:33 AUSSENKUPPEL", "at": [34, 110], "size": 14, "color": "#fa6a0a", "align": "left", "glow": true, "width": 140},
+   {"text": "VERSPÄTET", "at": [241, 110], "size": 14, "color": "#fa6a0a", "align": "right", "glow": true, "width": 64},
+   {"text": "15:45 IND.-ZONE", "at": [34, 127], "size": 14, "color": "#ffd541", "align": "left", "glow": true, "width": 140},
+   {"text": "PÜNKTLICH", "at": [241, 127], "size": 14, "color": "#ffd541", "align": "right", "glow": true, "width": 64}
+  ],
+  "derivedFrom": "landmark_board_text"
  },
  "trope_last_stand": {
   "name": "Trope · Letzte Stellung",

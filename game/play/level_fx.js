@@ -121,14 +121,19 @@ export class LevelFx {
     this.wowGlow = s.add.graphics().setDepth(-10.55).setBlendMode(Phaser.BlendModes.ADD);
     this.wowGlow.fillStyle(col, 0.12).fillCircle(gx, gy, R).fillStyle(col, 0.1).fillCircle(gx, gy, R / 2);
     this.wowFx = s.add.graphics().setDepth(-9.6).setBlendMode(Phaser.BlendModes.ADD);
-    this.wowBox = { x: r.x * T, y: r.y * T, w: r.w * T, h: r.h * T, bx, by: pic && !W.imageHang ? pic.bottom : by, top: pic ? pic.top : by - 5 * T * k, core: pic?.core, half: pic ? pic.w / 2 : 3 * T };
+    this.wowBox = { x: r.x * T, y: r.y * T, w: r.w * T, h: r.h * T, bx, by: pic && !W.imageHang ? pic.bottom : by, top: pic ? pic.top : by - 5 * T * k, bottom: pic?.bottom, core: pic?.core, half: pic ? pic.w / 2 : 3 * T };
   }
   // #165 the painted motif (POIs › Wow › Motiv: gemaltes Bild): foot on the motif point (or hung under the ceiling), with what moves on it
   // from code: the second hand of the clock, the counter beside the rocket, text, a pulsing core, light cones under a dome, the chandelier
   drawWowImage(g, bx, by, k, col) {
     const s = this.scene, T = this.T, w = this.wow, W = w.W, r = w.room;
     const src = s.textures.get(W.image).getSourceImage(), H = (W.imageTiles || 5 * k) * T, sc = H / src.height, Wd = src.width * sc;
-    const top = W.imageHang ? (r.y + 1) * T : by - H;
+    const drop = W.imageHang ? Math.max(0, +W.imageDrop || 0) * T : 0;   // #170 hangs lower: in the game's zoom the dome must be seen
+    const top = W.imageHang ? (r.y + 1) * T + drop : by - H;
+    if (drop) {   // steel cables and two girders carry it from the ceiling
+      for (const f of [-0.42, -0.14, 0.14, 0.42]) g.lineStyle(f === -0.14 || f === 0.14 ? 3 : 6, f === -0.14 || f === 0.14 ? 0x4a5462 : 0x333941, 1).lineBetween(bx + Wd * f, (r.y + 1) * T, bx + Wd * f * 0.96, top + H * 0.08);
+      g.fillStyle(0x333941, 1); for (const f of [-0.42, 0.42]) g.fillRect(bx + Wd * f - 8, (r.y + 1) * T, 16, 10);
+    }
     const img = s.add.image(bx, top, W.image).setOrigin(0.5, 0).setScale(sc).setDepth(-10.6);
     const at = p => ({ x: bx + (p[0] - src.width / 2) * sc, y: top + p[1] * sc });
     const core = at(W.imageCore || [src.width / 2, src.height / 2]);
@@ -174,7 +179,7 @@ export class LevelFx {
     if (this.wowDone || W.camera === false || !s.cam) return;
     this.wowDone = true;
     const cam = s.cam, base = cam.zoom, ms = C.wowMs, z = base * C.wowZoom / 100, B = this.wowBox;
-    const tx = B.bx, ty = Math.max(B.top + 2 * this.T, B.by - 3 * this.T);
+    const tx = B.bx, ty = W.imageHang && B.bottom ? (B.top + B.by) / 2 : Math.max(B.top + 2 * this.T, B.by - 3 * this.T);   // #170 a hanging motif: frame it and the floor
     this.wowCam = { base, at: s.time.now, until: s.time.now + ms + C.wowHold, back: false };
     cam.stopFollow();
     cam.pan(tx, ty, ms, 'Sine.easeInOut', true);

@@ -239,7 +239,7 @@
    "at": "mid",
    "motif": "dome",
    "point": [26, 20],
-   "text": "SALE −70 %",
+   "text": "ALLES −70 %",
    "light": "#c6eaff",
    "particles": "dust",
    "stinger": "swell",
@@ -248,13 +248,14 @@
    "lightStrength": 220,
    "music": 35,
    "image": "wow_dome",
-   "imageTiles": 8,
+   "imageTiles": 9,
    "imageHang": true,
    "imageCore": [166, 90],
    "dark": 10,
    "ambient": 60,
    "fill": 50,
-   "lightRadius": 1000
+   "lightRadius": 1000,
+   "imageDrop": 5
   },
   "level": {
    "landmark": "Glaskuppel über der Passage",

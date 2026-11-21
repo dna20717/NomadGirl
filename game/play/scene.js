@@ -33,6 +33,7 @@ import { StoryFx } from './story_fx.js';
 import { Life, prepareLife } from './life.js';
 import { Director } from './director.js';
 import { landmarkViews } from '../../engine/level_design.js';
+import { hasLabels, applyLabels, loadFont, RAW } from '../labels.js';
 import { Drone } from './drone.js';
 import { Van } from './van.js';
 import { DriveUI } from './drive_ui.js';
@@ -83,6 +84,7 @@ export class PlayScene extends Phaser.Scene {
 
   // ---------- assets ----------
   preload() {
+    loadFont();   // #170 VT323 for the text on pictures (game/labels.js)
     if (this.args?.loading) this.load.on('progress', p => this.args.loading.progress(p));   // Spiel › Ladebalken
     const A = this.data_.assets || {}, ids = new Set(Object.values(this.data_.leyla?.look || {}));
     const foes = Object.values(this.data_.enemies || {});   // #135 tried: loading enemies only for runs; the extra wait at the start of a run cost stability, so all stay
@@ -161,6 +163,7 @@ export class PlayScene extends Phaser.Scene {
       const a = A[id];
       if (!a?.file || this.textures.exists(id)) continue;
       const url = new URL(a.file, this.base).href;
+      if (hasLabels(a) && (a.kind === 'image' || a.kind === 'icons')) { if (!this.textures.exists(id + RAW)) this.load.image(id + RAW, url); continue; }   // #170 text from data, applyLabels in create()
       if ((a.kind === 'animation' || a.kind === 'tiles') && a.frameSize) this.load.spritesheet(id, url, { frameWidth: a.frameSize[0], frameHeight: a.frameSize[1] });
       else if (a.kind === 'icons' && a.cell) { const [cw, ch] = Array.isArray(a.cell) ? a.cell : [a.cell, a.cell]; this.load.spritesheet(id, url, { frameWidth: cw, frameHeight: ch }); }
       else if (a.kind === 'image') this.load.image(id, url);
@@ -278,6 +281,7 @@ export class PlayScene extends Phaser.Scene {
     this.camp = null; this.vanPrompt = null;   // the scene object is reused on restart (camp ↔ run)
     this.sound.stopAll(); this.sound.removeAll();   // camp sounds belong to one visit
     try { this.muted = localStorage.getItem('nomadgirl-mute') === '1'; this.sound.mute = this.muted; } catch { /* private mode */ }   // #090 own flag: Phaser's mute reads back late
+    applyLabels(this, this.data_.assets);   // #170 Assets › Schrift aus Code: text onto the pictures before anything uses them
     makeTextures(this);
     applySignature(this);   // Leylas Signaturfarbe (#044): her textures in the colour from the mirror
     this.pad ??= new Pad(this.data_.game?.gamepad);   // kept over restarts (camp ↔ run)
