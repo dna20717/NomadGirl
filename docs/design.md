@@ -71,6 +71,11 @@ Im POI spielt sich NomadGirl wie Dead Cells: schnelle Bewegung, harter Kampf, un
 - **Inventar:** Slots für Nahkampf, Fernkampf, Cyberdeck und Rucksack. Der Rucksack ist ein Raster im Diablo-Stil; Gegenstände belegen Rechtecke und lassen sich drehen (Daniel, 14.11.2026: „mit dem Tetris-Quatsch aufhören und auf Rechtecke beschränken“), die Kapazität wächst mit der Qualität des Rucksacks. Bedienung nur mit der Maus, das Spiel läuft dabei weiter. Beute liegt als Bündel am Boden (Boden-Inventar wie bei XCOM); Stapelbares, das Leyla schon trägt, sammelt sie im Vorbeilaufen ein. Kisten und Lagerplätze im Rig sind ebenfalls Inventare.
 - **Geld:** Deltas durch Kills, Kisten und Co.
 
+### POI-Gestaltung: Story zuerst (Daniel, 21.11.2026)
+
+- **Vor dem ersten Design steht die Story** des POI und jedes Raums fest (Daniel: „vor dem ersten Design die Story des POI oder des Raumes feststeht und von dort aus gestaltet wird“). Jeder POI hat eine **feste Story, pro Run variieren nur Räume, Spuren und Positionen**. Steckbriefe schreibt Ava, Daniel segnet ab.
+- Regeln für Clutter, Kacheln, Dichte („bewohnt“), Verfall (Ministerium 1, Großmarkt 2, Bunker 2, Tankstelle 3) und Prüfung: **`docs/concepts/poi_bible.md`**. Steckbriefe aller POIs mit Weltchronik und Ton-Regeln: **`docs/concepts/poi_steckbriefe.md`** (Weltchronik noch zum Absegnen). Tickets #160, #158, #159.
+
 ### Tod und AvA
 
 Stirbt Leyla, ist die Beute aus dem aktuellen Run verloren. AvA, ihre Drohne, rettet sie und bringt sie zurück zum Rig. Alles andere bleibt erhalten: Rig, Upgrades, Rezepte und Deltas auf dem Konto. Später kann AvA über Drohnen-Upgrades einen Teil der Beute mitretten. **Neu (12.11.2026):** jede Rettung kostet Zustand am Cryo-Tank, siehe „Die Suche“.
