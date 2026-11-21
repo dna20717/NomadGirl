@@ -25,9 +25,32 @@
    "##^#####################################"
   ],
   "backdrop": {"weather": "abendglut", "shade": 20},
-  "terrain": "desert"
+  "terrain": "desert",
+  "story": {
+   "function": "Einfahrt der Tankstelle mit Preistafel und Parkstreifen für Fernlaster",
+   "moment": "Die Schlange reichte bis auf den Highway, Hupen, dann flogen die ersten Flaschen",
+   "today": "Die Yellow Vultures kassieren hier Wegzoll, ein Fass brennt als Wachfeuer",
+   "keyImage": "Preistafel mit dem letzten Preis über dem leeren Platz, Abendsonne im Staub",
+   "must": "schild, straße, fass",
+   "never": "bett, büro"
+  }
  },
- "eingangshalle": {"name": "Eingangshalle", "size": [30, 17], "tags": ["start", "npc"], "weight": 1, "role": "hall", "terrain": "concrete"},
+ "eingangshalle": {
+  "name": "Eingangshalle",
+  "size": [30, 17],
+  "tags": ["start", "npc"],
+  "weight": 1,
+  "role": "hall",
+  "terrain": "concrete",
+  "story": {
+   "function": "Eingangshalle eines Gebäudes",
+   "moment": "Die Leute gingen und ließen die Tür offen",
+   "today": "Ein Händler hat hier seinen Stand",
+   "keyImage": "Ein Empfangstresen mit einem Händler",
+   "must": "sitz, laden",
+   "never": "wrack"
+  }
+ },
  "verkaufsraum": {
   "name": "Verkaufsraum",
   "size": [30, 17],
@@ -53,7 +76,15 @@
    "......H.....1...###...1...1...",
    "##############################"
   ],
-  "terrain": "concrete"
+  "terrain": "concrete",
+  "story": {
+   "function": "Verkaufsraum mit Kasse, Kühlregalen und Kaffeemaschine",
+   "moment": "Der Pächter verkaufte die letzten Kanister unter der Theke, während draußen geprügelt wurde",
+   "today": "Ein Händler hat sich hinter der Theke eingerichtet; die Kaffeemaschine läuft",
+   "keyImage": "Der Familienkalender an der Wand, darunter die blubbernde Kaffeemaschine",
+   "must": "laden, kasse, automat",
+   "never": "wrack, grün"
+  }
  },
  "lager": {
   "name": "Lager",
@@ -81,7 +112,15 @@
    "##########A#########"
   ],
   "terrain": "concrete",
-  "atmosphere": "beton_lager"
+  "atmosphere": "beton_lager",
+  "story": {
+   "function": "Lager hinter dem Verkaufsraum für Öl, Ersatzteile und Getränke",
+   "moment": "Die Regale wurden zuerst geplündert, der Rest blieb in der Eile liegen",
+   "today": "Die Vultures stapeln hier ihren Wegzoll",
+   "keyImage": "Halb leere Regale, ein umgekipptes Ölfass, dahinter eine Wand, die hohl klingt",
+   "must": "kiste, regal, vorrat",
+   "never": "grün, bett"
+  }
  },
  "werkstatthalle": {
   "name": "Werkstatthalle",
@@ -108,12 +147,73 @@
    "......##1.H...1...#####..H1..1...Z.#",
    "###############################v####"
   ],
-  "terrain": "metal"
+  "terrain": "metal",
+  "story": {
+   "function": "Werkstatthalle mit Hebebühne für Laster und Vans",
+   "moment": "Ein Van hing auf der Hebebühne, als der Mechaniker ging; er hängt noch dort",
+   "today": "Die Vultures schrauben hier an ihren Bikes",
+   "keyImage": "Ein Van auf der Hebebühne, darunter Werkzeug, als wäre gerade Pause",
+   "must": "werkbank, werkzeug, fass",
+   "never": "grün, bett"
+  }
  },
- "gang": {"name": "Gang", "size": [24, 10], "tags": ["corridor", "combat"], "weight": 4, "role": "corridor", "terrain": "concrete"},
- "treppenhaus": {"name": "Treppenhaus", "size": [14, 34], "tags": ["corridor"], "weight": 2, "role": "corridor", "terrain": "concrete"},
- "tresorraum": {"name": "Tresorraum", "size": [18, 12], "tags": ["loot", "secret"], "weight": 1, "role": "storage", "terrain": "metal"},
- "kontrollraum": {"name": "Kontrollraum", "size": [40, 22], "tags": ["boss", "exit"], "weight": 1, "role": "tech", "terrain": "metal"},
+ "gang": {
+  "name": "Gang",
+  "size": [24, 10],
+  "tags": ["corridor", "combat"],
+  "weight": 4,
+  "role": "corridor",
+  "terrain": "concrete",
+  "story": {
+   "function": "Verbindungsgang",
+   "moment": "Hier rannten alle hindurch",
+   "today": "Patrouillen",
+   "keyImage": "Ein schmaler Gang mit einer Lampe am Ende",
+   "must": "schild, müll",
+   "never": "grün"
+  }
+ },
+ "treppenhaus": {
+  "name": "Treppenhaus",
+  "size": [14, 34],
+  "tags": ["corridor"],
+  "weight": 2,
+  "role": "corridor",
+  "terrain": "concrete",
+  "story": {"function": "Treppenhaus", "moment": "Alle rannten nach unten", "today": "Leer", "keyImage": "Absätze übereinander im Schacht", "must": "schild, putz", "never": "grün"}
+ },
+ "tresorraum": {
+  "name": "Tresorraum",
+  "size": [18, 12],
+  "tags": ["loot", "secret"],
+  "weight": 1,
+  "role": "storage",
+  "terrain": "metal",
+  "story": {
+   "function": "Tresorraum",
+   "moment": "Der Tresor wurde verschlossen und vergessen",
+   "today": "Verschlossen",
+   "keyImage": "Ein Tresor hinter einer Wand",
+   "must": "kiste, technik",
+   "never": "grün"
+  }
+ },
+ "kontrollraum": {
+  "name": "Kontrollraum",
+  "size": [40, 22],
+  "tags": ["boss", "exit"],
+  "weight": 1,
+  "role": "tech",
+  "terrain": "metal",
+  "story": {
+   "function": "Kontrollraum",
+   "moment": "Der letzte Befehl wurde nie gegeben",
+   "today": "Ein Boss sitzt am Pult",
+   "keyImage": "Ein Pult vor Bildschirmen",
+   "must": "technik, kabel",
+   "never": "grün"
+  }
+ },
  "testraum": {
   "name": "Testraum",
   "size": [170, 24],
@@ -149,7 +249,15 @@
   ],
   "spawns": [],
   "backdrop": {"image": "ruins_relay", "weather": "abendglut_regen", "bottom": 90, "scroll": 4, "shade": 20},
-  "terrain": "desert"
+  "terrain": "desert",
+  "story": {
+   "function": "Übungsgelände für Leylas Bewegungen",
+   "moment": "Nichts geschah hier; es ist ein Testraum",
+   "today": "Leer, nur Hürden",
+   "keyImage": "Hürden, Grube, Slide-Tunnel und Treppe in einer Reihe",
+   "must": "schild, fass",
+   "never": "bett"
+  }
  },
  "kampfraum": {
   "name": "Kampfraum",
@@ -178,7 +286,15 @@
    "################################################################"
   ],
   "spawns": [{"symbol": "a", "enemy": "schlaeger"},{"symbol": "b", "enemy": "schuetze"}],
-  "terrain": "desert"
+  "terrain": "desert",
+  "story": {
+   "function": "Übungsraum für Kämpfe",
+   "moment": "Nichts geschah hier; es ist ein Testraum",
+   "today": "Zwei Schläger und zwei Schützen",
+   "keyImage": "Stufen und ein Slide-Tunnel zwischen Gegnern",
+   "must": "fass, schild",
+   "never": "bett"
+  }
  },
  "markt_eingang": {
   "name": "Markt · Parkplatz",
@@ -207,7 +323,15 @@
    "#..S..D....L...####....H#########.1.###.1...",
    "##^#########################################"
   ],
-  "backdrop": {"weather": "abendglut", "shade": 25}
+  "backdrop": {"weather": "abendglut", "shade": 25},
+  "story": {
+   "function": "Parkplatz vor der Megamall mit Einkaufswagen-Stationen",
+   "moment": "Am Morgen des Ausverkaufs war der Parkplatz bis zum Highway voll",
+   "today": "Neon Rats durchwühlen die Kofferräume, Reklame flackert",
+   "keyImage": "Endlose Parkreihen, ein Einkaufswagen rollt im Wind",
+   "must": "straße, schild, wrack",
+   "never": "büro, bett"
+  }
  },
  "markt_passage": {
   "name": "Markt · Passage",
@@ -235,7 +359,15 @@
    "........##....H...........H....##.......",
    "........##..1.H.......1...H....##.......",
    "########################################"
-  ]
+  ],
+  "story": {
+   "function": "Einkaufspassage mit Läden auf zwei Ebenen",
+   "moment": "Hier drängte sich die Menge bei „Alles muss raus“, Schaufenster gingen zu Bruch",
+   "today": "Die Rats haben die Schaufenster zu Verschlägen gemacht",
+   "keyImage": "Leere Schaufenster unter „SALE“-Bannern, Scherben auf den Fliesen",
+   "must": "laden, bank, deko",
+   "never": "wrack, bett"
+  }
  },
  "markt_foodcourt": {
   "name": "Markt · Food-Court",
@@ -263,7 +395,15 @@
    "...............######.H.............",
    "........1....1.######.H.1...........",
    "####################################"
-  ]
+  ],
+  "story": {
+   "function": "Food-Court mit Ständen, Tischen und Bänken",
+   "moment": "Mitten im Mittagsansturm drückte die Menge von der Passage herein; Tabletts blieben stehen",
+   "today": "Kakerlaken und Rats teilen sich die Reste",
+   "keyImage": "Tische voller vertrockneter Tabletts, darüber ein Menü-Schild ohne Strom",
+   "must": "sitz, bank, automat",
+   "never": "wrack, bett"
+  }
  },
  "markt_kaufhaus": {
   "name": "Markt · Kaufhaus",
@@ -297,7 +437,15 @@
    "............##..............H.....",
    ".........1..##....1.........H.....",
    "##################################"
-  ]
+  ],
+  "story": {
+   "function": "Kaufhaus über zwei Etagen mit Rolltreppe",
+   "moment": "Der Flügel stürzte ein, während oben noch Kasse gemacht wurde",
+   "today": "Oben eine Barrikade aus Einkaufswagen, unten wühlen die Rats",
+   "keyImage": "Stillstehende Rolltreppe unter „SALE −70 %“, oben die Wagen-Barrikade",
+   "must": "laden, regal, kasse, deko",
+   "never": "wrack, bett"
+  }
  },
  "markt_lager": {
   "name": "Markt · Hochregallager",
@@ -321,7 +469,15 @@
    "#........H........$....#",
    "#........H....1......C.#",
    "############A###########"
-  ]
+  ],
+  "story": {
+   "function": "Hochregallager der Mall",
+   "moment": "Die Lieferung für den Ausverkauf wurde nie ausgepackt",
+   "today": "Die Rats horten hier, was sie nicht tragen können",
+   "keyImage": "Hochregale voller Kartons, ein Gabelstapler mit offener Tür",
+   "must": "kiste, regal, müll",
+   "never": "grün, bank"
+  }
  },
  "markt_kino": {
   "name": "Markt · Kino",
@@ -345,7 +501,15 @@
    "#..........###########",
    "#.......##############",
    "####A#################"
-  ]
+  ],
+  "story": {
+   "function": "Kino der Mall mit Kasse und Sälen",
+   "moment": "Die Nachmittagsvorstellung lief noch, als draußen der Flügel einstürzte",
+   "today": "Die Rats schlafen in den Sesselreihen",
+   "keyImage": "Sesselreihen vor einer blinden Leinwand, Popcorn auf dem Boden",
+   "must": "sitz, müll, deko",
+   "never": "wrack, palette"
+  }
  },
  "markt_buero": {
   "name": "Markt · Büro der Leitung",
@@ -373,7 +537,15 @@
    "...H.................##......#",
    "...H....1.........1..##....Z.#",
    "#########################v####"
-  ]
+  ],
+  "story": {
+   "function": "Büro der Centerleitung über der Passage",
+   "moment": "Die Leitung sah den Einsturz durchs Fenster und ging über das Dach",
+   "today": "Der Anführer der Rats hat sich hier eingerichtet",
+   "keyImage": "Ein Chefsessel vor Monitoren mit der Passage, Ausverkaufs-Listen am Boden",
+   "must": "technik, kiste, grün",
+   "never": "wrack, reifen"
+  }
  },
  "bunker_tor": {
   "name": "Bunker · Tor",
@@ -402,7 +574,15 @@
    "#..S..D...L...###.H..H..H...1..S....D..1..",
    "##^#######################################"
   ],
-  "backdrop": {"weather": "abendglut", "shade": 30}
+  "backdrop": {"weather": "abendglut", "shade": 30},
+  "story": {
+   "function": "Panzertor und Vorplatz des Schutzbunkers",
+   "moment": "Beim Mittagessen stürmten alle aus dem Tor in die Salzebene",
+   "today": "Rust Guard halten Wache am Tor, Sandsäcke davor",
+   "keyImage": "Das offene Panzertor in der Salzebene, davor Sandsäcke und ein Wachfeuer",
+   "must": "schild, fass, militär",
+   "never": "laden, kasse"
+  }
  },
  "bunker_schleuse": {
   "name": "Bunker · Schleuse",
@@ -430,7 +610,15 @@
    ".H..........................",
    ".H....................1.....",
    "############################"
-  ]
+  ],
+  "story": {
+   "function": "Dekontaminations-Schleuse",
+   "moment": "Die Schleuse stand offen, als die Menge hindurchdrängte; die Duschen liefen noch",
+   "today": "Die Rust Guard kontrollieren hier jeden, der reinwill",
+   "keyImage": "Zwei offene Schleusentore, Warnschilder, ein vergessener Schutzanzug",
+   "must": "schild, sperre, technik",
+   "never": "grün, laden"
+  }
  },
  "bunker_quartiere": {
   "name": "Bunker · Quartiere",
@@ -458,7 +646,15 @@
    "................H..........##.H...",
    ".........1......H.1........##.H1..",
    "##################################"
-  ]
+  ],
+  "story": {
+   "function": "Schlafquartiere mit Stockbetten für 200 Plätze",
+   "moment": "Mittagsruhe der Nachtschicht, dann die Sirene; die Decken liegen noch zurückgeschlagen",
+   "today": "Rust Guard schlafen in den alten Betten",
+   "keyImage": "Stockbetten in Reihe, an der Wand Kinderzeichnungen vom Himmel",
+   "must": "bett, spind, papier",
+   "never": "grün, laden"
+  }
  },
  "bunker_reaktor": {
   "name": "Bunker · Reaktorhalle",
@@ -490,7 +686,15 @@
    "...........H...########...H...........",
    "......1....H.1.########...H....1......",
    "######################################"
-  ]
+  ],
+  "story": {
+   "function": "Reaktorhalle, Herz des Bunkers",
+   "moment": "Als die Lüftung ausfiel, lief der Reaktor weiter; er läuft noch",
+   "today": "Die Rust Guard halten die Notbeleuchtung am Laufen",
+   "keyImage": "Der Reaktorblock in grünem Pulsieren, Dampf zwischen den Stegen",
+   "must": "technik, rohr, gefahr",
+   "never": "grün, bett"
+  }
  },
  "bunker_gang": {
   "name": "Bunker · Gang",
@@ -518,7 +722,15 @@
    "....................H...........",
    "............1.......H1......1...",
    "################################"
-  ]
+  ],
+  "story": {
+   "function": "Verbindungsgang mit Leitungen an der Decke",
+   "moment": "Die Menge rannte hier zum Tor; Schuhe und Tabletts blieben liegen",
+   "today": "Rust Guard patrouillieren nach dem alten Dienstplan",
+   "keyImage": "Ein langer Gang im Notlicht, am Boden verlorene Schuhe",
+   "must": "rohr, schild, kiste",
+   "never": "grün, laden"
+  }
  },
  "bunker_lager": {
   "name": "Bunker · Munitionslager",
@@ -542,7 +754,15 @@
    "#..............H...#",
    "#..C.1.........H...#",
    "##########A#########"
-  ]
+  ],
+  "story": {
+   "function": "Munitionslager",
+   "moment": "Die Wachen ließen alles stehen und rannten mit",
+   "today": "Die Rust Guard zählen hier jeden Abend die Kisten",
+   "keyImage": "Kistenstapel mit Schablonen-Nummern unter einer roten Lampe",
+   "must": "kiste, militär, regal",
+   "never": "grün, bett"
+  }
  },
  "bunker_archiv": {
   "name": "Bunker · Archiv",
@@ -566,7 +786,15 @@
    "#.....H................#",
    "#.....H....1...........#",
    "######A#################"
-  ]
+  ],
+  "story": {
+   "function": "Archiv mit Akten der Zivilisten-Aufnahme",
+   "moment": "Der Archivar sortierte noch Aufnahmeanträge, als die Sirene ging",
+   "today": "Kaum jemand kommt her; Staub liegt auf den Ordnern",
+   "keyImage": "Aktenregale bis zur Decke, ein Ordner „Aufnahme Zivilisten“ offen",
+   "must": "papier, büro, regal",
+   "never": "grün, laden"
+  }
  },
  "bunker_kommando": {
   "name": "Bunker · Kommandozentrale",
@@ -596,7 +824,15 @@
    "......####....####........!......#",
    "......####..1.####....1........Z.#",
    "############################v#####"
-  ]
+  ],
+  "story": {
+   "function": "Kommandozentrale mit Lagetisch und Funk",
+   "moment": "Der Kommandant gab den Befehl zur Räumung über alle Lautsprecher",
+   "today": "Der Anführer der Rust Guard regiert vom Lagetisch",
+   "keyImage": "Der Lagetisch unter einer Karte voller Nadeln, Funkgeräte rauschen",
+   "must": "technik, büro, militär",
+   "never": "grün, laden"
+  }
  },
  "min_vorplatz": {
   "name": "Ministerium · Freitreppe",
@@ -627,7 +863,15 @@
    "#..S..D...L.........##############.....1..",
    "##^#######################################"
   ],
-  "backdrop": {"weather": "abendglut", "shade": 35}
+  "backdrop": {"weather": "abendglut", "shade": 35},
+  "story": {
+   "function": "Freitreppe und Vorplatz des Amts",
+   "moment": "Am letzten Tag stand die Schlange der Wartenden bis zur Straße",
+   "today": "Das Order Office lässt hier jeden eine Nummer ziehen",
+   "keyImage": "Eine makellos gefegte Freitreppe, oben die Säulen des Amts",
+   "must": "schild, straße, licht",
+   "never": "wrack, müll"
+  }
  },
  "min_flur": {
   "name": "Ministerium · Flur",
@@ -655,7 +899,15 @@
    "............H.....!...........H.......",
    "..........1.H.........1.......H.......",
    "######################################"
-  ]
+  ],
+  "story": {
+   "function": "Amtsflur mit Türen zu den Abteilungen",
+   "moment": "Beamte gingen pünktlich um 17 Uhr, die Türen ordentlich abgeschlossen",
+   "today": "Der Hausmeister wischt jeden Morgen; das Order Office patrouilliert",
+   "keyImage": "Ein endloser Flur mit rotem Teppich, jede Tür beschriftet",
+   "must": "bank, grün, bild",
+   "never": "müll, wrack"
+  }
  },
  "min_buero": {
   "name": "Ministerium · Großraumbüro",
@@ -683,7 +935,15 @@
    "..................................",
    "........1...........1.............",
    "##################################"
-  ]
+  ],
+  "story": {
+   "function": "Großraumbüro der Sachbearbeiter",
+   "moment": "Akten abgelegt, Stühle gerade gestellt, Licht aus",
+   "today": "Das Order Office arbeitet hier Vorgänge ab, die niemand gestellt hat",
+   "keyImage": "Schreibtische in Reihen, auf jedem ein ordentlicher Stapel",
+   "must": "tisch, büro, papier",
+   "never": "müll, wrack"
+  }
  },
  "min_treppe": {
   "name": "Ministerium · Treppenhaus",
@@ -721,7 +981,15 @@
    "........................",
    "......1......##.........",
    "########################"
-  ]
+  ],
+  "story": {
+   "function": "Treppenhaus über alle Etagen",
+   "moment": "Der letzte Beamte schloss die Etagentüren von oben nach unten ab",
+   "today": "Der Hausmeister fegt die Stufen, das Order Office hält die Absätze",
+   "keyImage": "Marmorstufen ohne ein Staubkorn, an jedem Absatz eine Topfpflanze",
+   "must": "grün, bank, deko",
+   "never": "müll, wrack"
+  }
  },
  "min_saal": {
   "name": "Ministerium · Festsaal",
@@ -753,7 +1021,15 @@
    "...........H.###############H...........",
    "......1....H.###############H....1......",
    "########################################"
-  ]
+  ],
+  "story": {
+   "function": "Festsaal für Empfänge und Ehrungen",
+   "moment": "Die Stühle für die letzte Ehrung standen schon; sie fand nie statt",
+   "today": "Das Order Office hält hier Appelle ab, der Kronleuchter brennt",
+   "keyImage": "Der Festsaal mit der großen Uhr, Stuhlreihen vor einem leeren Pult",
+   "must": "deko, sitz, bild",
+   "never": "müll, wrack"
+  }
  },
  "min_archiv": {
   "name": "Ministerium · Archiv",
@@ -779,7 +1055,15 @@
    "#..........H...H.........#",
    "#.....1....H...H.........#",
    "#############A############"
-  ]
+  ],
+  "story": {
+   "function": "Archiv der Abteilungen",
+   "moment": "Die letzte Akte wurde abgelegt und das Licht gelöscht",
+   "today": "Der Hausmeister staubt die Regale ab, sonst kommt niemand",
+   "keyImage": "Eine Akte für jeden, der nicht in die Stadt durfte, Regal um Regal",
+   "must": "regal, papier, büro",
+   "never": "müll, grün"
+  }
  },
  "min_asservaten": {
   "name": "Ministerium · Asservatenkammer",
@@ -803,7 +1087,15 @@
    "#H.........$.......#",
    "#H.........$....C..#",
    "#####A##############"
-  ]
+  ],
+  "story": {
+   "function": "Asservatenkammer für beschlagnahmte Ware",
+   "moment": "Die Kammer wurde versiegelt, mit Aktenzeichen an jeder Kiste",
+   "today": "Das Order Office verwahrt hier, was es Leuten abnimmt",
+   "keyImage": "Kisten mit Aktenzeichen, ein Siegel an der Tür",
+   "must": "regal, papier, militär",
+   "never": "grün, müll"
+  }
  },
  "min_amtszimmer": {
   "name": "Ministerium · Amtszimmer",
@@ -836,7 +1128,15 @@
    "...........H......h.....H.####...Z.#",
    "###############################v####"
   ],
-  "spawns": [{"symbol": "h", "enemy": "hausmeister"}]
+  "spawns": [{"symbol": "h", "enemy": "hausmeister"}],
+  "story": {
+   "function": "Amtszimmer der Leitung, ganz oben",
+   "moment": "Der Amtsleiter unterschrieb die letzte Verfügung und ging",
+   "today": "Der Hausmeister sitzt am Schreibtisch des Chefs",
+   "keyImage": "Ein riesiger Schreibtisch vor dem Fenster, dahinter der Hausmeister",
+   "must": "tisch, büro, bild",
+   "never": "müll, wrack"
+  }
  },
  "gegner_arena": {
   "name": "Gegner-Arena",
@@ -871,7 +1171,15 @@
    {"symbol": "d", "enemy": "pistolero"},
    {"symbol": "g", "enemy": "schuetze"}
   ],
-  "terrain": "concrete"
+  "terrain": "concrete",
+  "story": {
+   "function": "Arena zum Ausprobieren der Gegner-KI",
+   "moment": "Nichts geschah hier; es ist ein Testraum",
+   "today": "Gegner zum Ausprobieren",
+   "keyImage": "Eine dünne Wand zwischen Leyla und den Gegnern",
+   "must": "kiste, müll",
+   "never": "grün"
+  }
  },
  "waschstrasse": {
   "name": "Waschstraße",
@@ -899,7 +1207,15 @@
    "...............#.H...........#......",
    "....1..........#.H.....1.....#..1...",
    "####################################"
-  ]
+  ],
+  "story": {
+   "function": "Waschanlage für Fernlaster",
+   "moment": "Mitten im Waschgang ging das Wasser aus; der letzte Laster fuhr nass und schmutzig davon",
+   "today": "Trocken seit Jahren, die Gang hängt Beute an die Bürsten",
+   "keyImage": "Tief hängende, staubige Bürsten über trockenem Boden",
+   "must": "putz, reifen, schild",
+   "never": "grün, bett"
+  }
  },
  "zapfinseln": {
   "name": "Zapfinseln",
@@ -928,7 +1244,15 @@
    ".....##.......##..H...######......",
    "....1##.......##..H..########.1.1.",
    "##################################"
-  ]
+  ],
+  "story": {
+   "function": "Drei Zapfinseln unter dem Tankstellendach",
+   "moment": "Hier begann die Schlägerei um das letzte Benzin",
+   "today": "Das halb eingestürzte Dach dient den Vultures als Ausguck",
+   "keyImage": "Leere Zapfsäulen, Schläuche im Staub, darüber das zerfetzte Dach",
+   "must": "fass, kanister, straße",
+   "never": "büro, bett"
+  }
  },
  "reifenlager": {
   "name": "Reifenlager",
@@ -957,7 +1281,15 @@
    "...###H.....#####......##.....",
    ".1.###H.....#####..1...##.....",
    "##############################"
-  ]
+  ],
+  "story": {
+   "function": "Reifenlager der Werkstatt",
+   "moment": "Der Mechaniker stapelte noch Reifen, als vorne die Schlägerei losging",
+   "today": "Die Gang hat Stege über die Stapel gelegt",
+   "keyImage": "Reifenstapel bis unter die Decke, ein Steg darüber",
+   "must": "reifen, kiste, müll",
+   "never": "grün, büro"
+  }
  },
  "markt_parkdeck": {
   "name": "Markt · Parkdeck",
@@ -986,7 +1318,15 @@
    "......###.........H..#####....###.....",
    "..1...###.......1.H.#######...###..1..",
    "######################################"
-  ]
+  ],
+  "story": {
+   "function": "Oberes Parkdeck der Mall",
+   "moment": "Wer zuletzt kam, parkte hier und kam nie zum Auto zurück",
+   "today": "Die Rats nutzen die Autowracks als Deckung",
+   "keyImage": "Ausgebrannte Autos zwischen Rampen, Parkscheine hinter den Scheiben",
+   "must": "putz, kiste, müll",
+   "never": "grün, bett"
+  }
  },
  "markt_spielhalle": {
   "name": "Markt · Spielhalle",
@@ -1015,7 +1355,15 @@
    "....##.........H.###............",
    "....##..1......H.###........1.1.",
    "################################"
-  ]
+  ],
+  "story": {
+   "function": "Spielhalle mit Automaten und Galerie",
+   "moment": "Die Automaten spielten weiter, als alle rausrannten",
+   "today": "Ein paar Automaten blinken noch; die Rats verzocken hier ihre Beute",
+   "keyImage": "Reihen blinkender Automaten, Münzen auf dem Teppich",
+   "must": "automat, laden, technik",
+   "never": "wrack, bett"
+  }
  },
  "bunker_kantine": {
   "name": "Bunker · Kantine",
@@ -1044,7 +1392,15 @@
    "...##....H.##........#######......",
    "...##..1.H.##....1...#######...1..",
    "##################################"
-  ]
+  ],
+  "story": {
+   "function": "Kantine mit Essensausgabe und langen Tischreihen",
+   "moment": "Mittagessen: Panik, die Tabletts blieben auf den Tischen",
+   "today": "Die Rust Guard schlafen zwischen den Tischen, ein Fass dient als Grill",
+   "keyImage": "Lange Tischreihe, Tabletts halb leer gegessen, dazwischen Schlafsäcke",
+   "must": "küche, vorrat, bett",
+   "never": "grün, laden"
+  }
  },
  "bunker_lueftung": {
   "name": "Bunker · Lüftung",
@@ -1073,7 +1429,15 @@
    "......###......###..........",
    "..1...###......###.....1....",
    "############################"
-  ]
+  ],
+  "story": {
+   "function": "Lüftungszentrale mit riesigen Ventilatoren",
+   "moment": "Hier fiel die Lüftung aus; ein Lager klemmte, der Rest war Panik",
+   "today": "Ein Ventilator dreht sich wieder, mehr schlecht als recht",
+   "keyImage": "Ein stehender Riesenventilator, daneben Werkzeug einer Reparatur, die nie fertig wurde",
+   "must": "technik, rohr, gefahr",
+   "never": "grün, bett"
+  }
  },
  "min_wartesaal": {
   "name": "Ministerium · Wartesaal",
@@ -1102,7 +1466,15 @@
    "......##..H.##........##.H..##......",
    "..1...##..H.##...1....##.H..##...1..",
    "####################################"
-  ]
+  ],
+  "story": {
+   "function": "Wartesaal mit Nummernautomat",
+   "moment": "Am letzten Tag zogen alle eine Nummer; aufgerufen wurde keine mehr",
+   "today": "Die Anzeige ruft weiter Nummern auf, das Order Office wartet mit",
+   "keyImage": "Schnurgerade Stuhlreihen, auf jedem Stuhl eine Wartenummer",
+   "must": "sitz, bank, papier",
+   "never": "müll, wrack"
+  }
  },
  "min_registratur": {
   "name": "Ministerium · Registratur",
@@ -1131,7 +1503,15 @@
    ".....###........H.........###.....",
    "..1..###........H...1.....###..1..",
    "##################################"
-  ]
+  ],
+  "story": {
+   "function": "Registratur mit Galerien",
+   "moment": "Die Registratur wurde ordnungsgemäß geschlossen, die Leitern weggeräumt",
+   "today": "Das Order Office sucht hier nach Namen",
+   "keyImage": "Akten bis zur Decke, eine Leiter an der Galerie",
+   "must": "regal, papier, büro",
+   "never": "müll, grün"
+  }
  },
  "hh_lobby": {
   "name": "Hochhaus · Lobby",
@@ -1162,7 +1542,15 @@
    ".....L......#######.1.....1......H......",
    "########################################"
   ],
-  "indoor": true
+  "indoor": true,
+  "story": {
+   "function": "Lobby mit Empfang und Aufzügen",
+   "moment": "Die Mieter warteten hier auf Hubschrauber, die nur oben landeten",
+   "today": "Die Sky Wolves lassen unten niemanden durch",
+   "keyImage": "Drehtüren ohne Glas, ein verlassener Empfangstresen",
+   "must": "sitz, grün, kasse",
+   "never": "wrack, reifen"
+  }
  },
  "hh_buero": {
   "name": "Hochhaus · Büroetage",
@@ -1182,7 +1570,15 @@
    "............=====...............",
    "........1.###.....###1.......1..",
    "#####A##########################"
-  ]
+  ],
+  "story": {
+   "function": "Büroetage einer Firma",
+   "moment": "Die Leute ließen ihre Rechner an und rannten zum Treppenhaus",
+   "today": "Patrouillen der Sky Wolves",
+   "keyImage": "Schreibtische mit Kaffeebechern, Monitore im Staub",
+   "must": "papier, technik, sitz",
+   "never": "wrack, reifen"
+  }
  },
  "hh_einsturz": {
   "name": "Hochhaus · Eingestürzte Decke",
@@ -1202,7 +1598,15 @@
    "....................#######.........",
    ".........1........###########..1....",
    "##############################A#####"
-  ]
+  ],
+  "story": {
+   "function": "Büroetage, von der Decke halb begraben",
+   "moment": "Im Sandsturm brach die Decke ein",
+   "today": "Die Sky Wolves klettern über die Trümmer",
+   "keyImage": "Herunterhängende Deckenplatten, darüber ein Schimmer von Beute",
+   "must": "müll, putz, technik",
+   "never": "grün, bett"
+  }
  },
  "hh_treppenhaus": {
   "name": "Hochhaus · Treppenhaus",
@@ -1231,7 +1635,15 @@
    "................",
    "....##..1.......",
    "###A############"
-  ]
+  ],
+  "story": {
+   "function": "Treppenhaus",
+   "moment": "Alle rannten hoch zum Dach, die Hubschrauber nahmen nur wenige mit",
+   "today": "Die Treppen sind weg, die Absätze nicht",
+   "keyImage": "„Bitte benutzen Sie im Notfall die Treppe.“ Es gibt nur noch die Treppe",
+   "must": "schild, putz, müll",
+   "never": "grün, bett"
+  }
  },
  "hh_rohbau": {
   "name": "Hochhaus · Rohbau",
@@ -1252,7 +1664,15 @@
    ".......=====.........=====........",
    "....1....H...##.......H.1.........",
    "################A#################"
-  ]
+  ],
+  "story": {
+   "function": "Rohbau der obersten Etagen",
+   "moment": "Hier wurde nie fertig gebaut; die Kräne standen still",
+   "today": "Wind von allen Seiten, die Sky Wolves sichern den Weg nach oben",
+   "keyImage": "Stahlträger ohne Wände, dahinter der Himmel",
+   "must": "kiste, reifen, müll",
+   "never": "bett, kasse"
+  }
  },
  "hh_archiv": {
   "name": "Hochhaus · Aktenarchiv",
@@ -1275,7 +1695,15 @@
    "..........#........$..........",
    "...1......#..C..C..$##1.......",
    "########################A#####"
-  ]
+  ],
+  "story": {
+   "function": "Aktenarchiv der Firmen",
+   "moment": "Die Akten blieben in den Rollregalen",
+   "today": "Die Sky Wolves verbrennen Akten zum Heizen",
+   "keyImage": "Rollregale, ein Feuer aus Akten in einer Tonne",
+   "must": "papier, regal, kiste",
+   "never": "wrack, reifen"
+  }
  },
  "hh_penthouse": {
   "name": "Hochhaus · Penthouse",
@@ -1303,7 +1731,16 @@
    "...............########....#####......",
    "............1.##########...#####...1..",
    "########A#############################"
-  ]
+  ],
+  "story": {
+   "function": "Penthouse des Bauherrn mit Pool und Dachterrasse",
+   "moment": "Der Bauherr stieg mit seinen Gästen in den Hubschrauber, die Koffer blieben stehen",
+   "today": "Die Sky Wolves residieren hier mit Scharfschützen",
+   "keyImage": "Ein leerer Pool vor der Stadt, daneben Koffer, die nicht mehr mitdurften",
+   "must": "sitz, grün, küche",
+   "never": "reifen, wrack",
+   "decay": 1
+  }
  },
  "hh_serverraum": {
   "name": "Hochhaus · Serverraum",
@@ -1314,7 +1751,15 @@
   "atmosphere": "beton_neon",
   "description": "Kühl und blinkend. Hier stehen noch Geräte, die jemand haben will (#038).",
   "size": [14, 8],
-  "layout": ["##############", "#......*.....#", "#............#", "..............", "....##..##....", "....##..##....", "...C##..##C...", "#######A######"]
+  "layout": ["##############", "#......*.....#", "#............#", "..............", "....##..##....", "....##..##....", "...C##..##C...", "#######A######"],
+  "story": {
+   "function": "Serverraum der Firmen",
+   "moment": "Die Server liefen weiter, bis der Strom ging",
+   "today": "Die Sky Wolves bewachen, was sich noch verkaufen lässt",
+   "keyImage": "Blinkende Racks im Kühlraum",
+   "must": "technik, kabel, kiste",
+   "never": "grün, bett"
+  }
  },
  "hh_chefzimmer": {
   "name": "Hochhaus · Chefzimmer",
@@ -1325,7 +1770,15 @@
   "atmosphere": "ministerium_kalt",
   "description": "Teppich, Bar, eine Wand mit Bücherattrappe. Dahinter der Notgroschen (#038).",
   "size": [16, 8],
-  "layout": ["################", "#..............#", "#..............#", ".....%..........", ".....%..........", ".....%..........", "..C..%.....1....", "########A#######"]
+  "layout": ["################", "#..............#", "#..............#", ".....%..........", ".....%..........", ".....%..........", "..C..%.....1....", "########A#######"],
+  "story": {
+   "function": "Chefzimmer eines Kessler-Managers",
+   "moment": "Der Manager packte seinen Laptop nicht mehr ein",
+   "today": "Unberührt hinter der Bücherattrappe",
+   "keyImage": "Teppich, Bar, eine Wand mit Bücherattrappe",
+   "must": "büro, tisch, deko",
+   "never": "müll, wrack"
+  }
  },
  "ph_einfahrt": {
   "name": "Parkhaus · Einfahrt",
@@ -1350,7 +1803,15 @@
    "..............####................",
    "....L.........####..1.............",
    "##################################"
-  ]
+  ],
+  "story": {
+   "function": "Einfahrt mit Schranke und Ticketautomat",
+   "moment": "Am Tag der Schließung stauten sich die Autos bis zur Schranke",
+   "today": "Level Five kassieren an der Schranke",
+   "keyImage": "Eine geknickte Schranke, ein geplünderter Ticketautomat",
+   "must": "schild, automat, müll",
+   "never": "bett, büro"
+  }
  },
  "ph_deck": {
   "name": "Parkhaus · Parkdeck",
@@ -1370,7 +1831,15 @@
    ".........####......####.............",
    ".........####..1...####...1.........",
    "####A###############################"
-  ]
+  ],
+  "story": {
+   "function": "Parkdeck mit Stellplätzen",
+   "moment": "Die Pendler stellten ihr Auto ab und nahmen den letzten Shuttle",
+   "today": "Jede Ebene ein Revier von Level Five",
+   "keyImage": "Ausgebrannte Autos in Reihe, Parkscheine hinter den Scheiben",
+   "must": "reifen, putz, müll",
+   "never": "grün, bett"
+  }
  },
  "ph_rampe": {
   "name": "Parkhaus · Rampe",
@@ -1390,7 +1859,15 @@
    "..........##....#####..###......",
    "........####.1..#####..###.1....",
    "###########################A####"
-  ]
+  ],
+  "story": {
+   "function": "Auffahrt zum nächsten Deck",
+   "moment": "In den Unruhen brannte die Rampe; ein Kleinwagen blieb stecken",
+   "today": "Level Five lauern auf der Rampe",
+   "keyImage": "Ein Kleinwagen klemmt unter der Decke der Rampe",
+   "must": "reifen, schild, müll",
+   "never": "grün, bett"
+  }
  },
  "ph_deck_dunkel": {
   "name": "Parkhaus · Dunkles Deck",
@@ -1410,7 +1887,15 @@
    "..........####..B.....####........",
    "...1......####..B.1...####........",
    "#############################A####"
-  ]
+  ],
+  "story": {
+   "function": "Unteres Parkdeck",
+   "moment": "Hier brannte es am längsten, das Licht ging zuerst",
+   "today": "Keine Lampe mehr; nur die Gang findet sich hier zurecht",
+   "keyImage": "Ein dunkles Deck, ein Pfeiler nur noch Putz",
+   "must": "reifen, müll, putz",
+   "never": "grün, licht"
+  }
  },
  "ph_dach": {
   "name": "Parkhaus · Dachdeck",
@@ -1436,7 +1921,15 @@
    "..............########....####......",
    "..........1...########.1..####......",
    "#####A##############################"
-  ]
+  ],
+  "story": {
+   "function": "Dachdeck mit Kassenhaus",
+   "moment": "Vom Dach aus sah man den letzten Shuttle in die Stadt fahren",
+   "today": "Level Five feiern hier ihre Grillparty",
+   "keyImage": "Das Kassenhaus im Neon, dahinter die Skyline der Stadt",
+   "must": "kiste, küche, reifen",
+   "never": "bett, büro"
+  }
  },
  "ph_kassenhaus": {
   "name": "Parkhaus · Kassenhaus",
@@ -1447,7 +1940,15 @@
   "atmosphere": "beton_neon",
   "description": "Ein Glaskasten voller Münzrollen und Schlüssel (#038).",
   "size": [12, 8],
-  "layout": ["############", "#.....*....#", "#..........#", "............", "............", "............", "..C......C..", "######A#####"]
+  "layout": ["############", "#.....*....#", "#..........#", "............", "............", "............", "..C......C..", "######A#####"],
+  "story": {
+   "function": "Kassenhaus des Parkhauses",
+   "moment": "Der Kassierer schloss ab und ging zum Shuttle",
+   "today": "Münzrollen und Schlüssel, die Gebühr läuft weiter",
+   "keyImage": "Ein Glaskasten voller Münzrollen und Autoschlüssel",
+   "must": "kasse, automat, papier",
+   "never": "grün, reifen"
+  }
  },
  "fm_fuss": {
   "name": "Funkmast · Fuß",
@@ -1473,7 +1974,15 @@
    ".............####...H.........",
    ".....L.......####...H....1....",
    "##############################"
-  ]
+  ],
+  "story": {
+   "function": "Sendehäuschen am Fuß des Masts",
+   "moment": "Die Techniker fuhren zum letzten Mal weg; die Schleife lief weiter",
+   "today": "Die Static Saints predigen aus dem Häuschen",
+   "keyImage": "Ein Mast in den Himmel, am Zaun das Schild „Klettern verboten“",
+   "must": "schild, technik, kabel",
+   "never": "laden, bett"
+  }
  },
  "fm_gitter": {
   "name": "Funkmast · Gitter",
@@ -1500,7 +2009,15 @@
    "....H........H....",
    "....H...1....H....",
    "####A#############"
-  ]
+  ],
+  "story": {
+   "function": "Gittermast mit Steigleitern",
+   "moment": "Im Sandsturm riss die Verkleidung ab",
+   "today": "Wind und eine kreisende Drohne",
+   "keyImage": "Stahlgitter vor weitem Himmel, Kabelstränge laufen nach oben",
+   "must": "kabel, technik, schild",
+   "never": "laden, bett"
+  }
  },
  "fm_plattform": {
   "name": "Funkmast · Plattform",
@@ -1525,7 +2042,15 @@
    "......H........H......",
    "......H........H1.....",
    "################A#####"
-  ]
+  ],
+  "story": {
+   "function": "Wartungsplattform mit Antennen",
+   "moment": "Die Techniker richteten hier die letzte Antenne aus",
+   "today": "Die Saints haben hier oben gute Sicht",
+   "keyImage": "Eine Plattform voller Antennen über den Salt Flats",
+   "must": "technik, kabel, kiste",
+   "never": "laden, grün"
+  }
  },
  "fm_spitze": {
   "name": "Funkmast · Spitze",
@@ -1552,7 +2077,15 @@
    "......H..........H......",
    "....1.H..........H.1....",
    "############A###########"
-  ]
+  ],
+  "story": {
+   "function": "Spitze des Masts mit Sender-Kern",
+   "moment": "Die rote Lampe blinkte die ganze Schleife lang",
+   "today": "Sie blinkt noch, der Sender-Kern sitzt im Kasten",
+   "keyImage": "Ganz oben die blinkende rote Lampe, die Ebene unten",
+   "must": "technik, kabel, schild",
+   "never": "laden, bett"
+  }
  },
  "fm_kabine": {
   "name": "Funkmast · Technikkabine",
@@ -1563,7 +2096,15 @@
   "atmosphere": "metall_rost",
   "description": "Ein Blechkasten mit Ersatzteilen. Die hintere Tür klemmt (#038).",
   "size": [12, 8],
-  "layout": ["############", "#..........#", "#..........#", ".........B..", ".........B..", ".........B..", "..C......BC.", "######A#####"]
+  "layout": ["############", "#..........#", "#..........#", ".........B..", ".........B..", ".........B..", "..C......BC.", "######A#####"],
+  "story": {
+   "function": "Technikkabine mit Funkgeräten",
+   "moment": "Ein Techniker notierte jeden Hilferuf, bis keiner mehr kam",
+   "today": "Die Zettel kleben noch, die Kopfhörer hängen am Haken",
+   "keyImage": "Wände voller Zettel mit Hilferufen, Kopfhörer am Haken",
+   "must": "technik, werkzeug, kiste",
+   "never": "grün, laden"
+  }
  },
  "mt_eingang": {
   "name": "Metro · Eingang",
@@ -1589,7 +2130,15 @@
    "........................#.........",
    "....L.........1...................",
    "##########################A#######"
-  ]
+  ],
+  "story": {
+   "function": "Treppe zur U-Bahn mit Stationsschild",
+   "moment": "Pendler standen vor dem Gitter, das plötzlich zu war",
+   "today": "Die Tunnel Kings lassen nur Zahlende hinunter",
+   "keyImage": "Ein U-Bahn-Schild über einer Treppe ins Dunkle",
+   "must": "schild, straße, licht",
+   "never": "bett, büro"
+  }
  },
  "mt_halle": {
   "name": "Metro · Schalterhalle",
@@ -1612,7 +2161,15 @@
    "..............#......B.##...........",
    "....1.........#.C....B.##1......1...",
    "########A###########################"
-  ]
+  ],
+  "story": {
+   "function": "Schalterhalle mit Drehkreuzen",
+   "moment": "Die letzte Durchsage: „Der Betrieb wird eingestellt.“",
+   "today": "Die Kings haben die Drehkreuze zur Zollstation gemacht",
+   "keyImage": "Drehkreuze vor einem vergitterten Fahrkartenschalter",
+   "must": "kasse, automat, schild",
+   "never": "grün, wrack"
+  }
  },
  "mt_rolltreppe": {
   "name": "Metro · Rolltreppen",
@@ -1641,7 +2198,15 @@
    "..............................",
    "............1.......1.........",
    "#########################A####"
-  ]
+  ],
+  "story": {
+   "function": "Rolltreppen zum Bahnsteig",
+   "moment": "Die Rolltreppen hielten an, als der Strom gekappt wurde",
+   "today": "Sie dienen als Treppe und Leiter",
+   "keyImage": "Drei stehende Rolltreppen ins Dunkle",
+   "must": "rohr, schild, kabel",
+   "never": "grün, bett"
+  }
  },
  "mt_bahnsteig": {
   "name": "Metro · Bahnsteig",
@@ -1665,7 +2230,15 @@
    "....1..............................1....1...",
    ".............#..##..1.........#.............",
    "####################################A#######"
-  ]
+  ],
+  "story": {
+   "function": "Bahnsteig und Gleisbett",
+   "moment": "Der letzte Zug kam nicht; die Wartenden blieben und schliefen hier",
+   "today": "Schlaflager entlang der Bahnsteigkante",
+   "keyImage": "Ein Bahnsteig voller Schlaflager vor dem verschweißten Tunnel",
+   "must": "sitz, müll, schild",
+   "never": "grün, wrack"
+  }
  },
  "mt_stellwerk": {
   "name": "Metro · Stellwerk",
@@ -1690,7 +2263,15 @@
    "...................###..H.......",
    ".....##........1...###..H.1.....",
    "################################"
-  ]
+  ],
+  "story": {
+   "function": "Stellwerk der Linie 4",
+   "moment": "Der Stellwerker zog den Hebel, der die Linie kappte",
+   "today": "Die Tunnel Kings regieren vom Pult aus",
+   "keyImage": "Ein Pult mit Hebeln, der Gleisplan endet an einer roten Linie",
+   "must": "technik, kabel, werkzeug",
+   "never": "grün, laden"
+  }
  },
  "mt_kiosk": {
   "name": "Metro · Kiosk",
@@ -1701,7 +2282,15 @@
   "atmosphere": "markt_neon",
   "description": "Zeitschriften von vor dem Krieg, Kaugummi, eine Kasse (#038).",
   "size": [14, 8],
-  "layout": ["##############", "#......*.....#", "#............#", "..............", "..............", "...======.....", "..C...........", "#######A######"]
+  "layout": ["##############", "#......*.....#", "#............#", "..............", "..............", "...======.....", "..C...........", "#######A######"],
+  "story": {
+   "function": "Kiosk am Bahnsteig",
+   "moment": "Der Kioskbesitzer zog das Gitter runter und blieb",
+   "today": "Die Vorräte sind fast weg",
+   "keyImage": "Zeitschriften von vor dem Krieg, Kaugummi, eine Kasse",
+   "must": "laden, kasse, vorrat",
+   "never": "wrack, reifen"
+  }
  },
  "mt_geisterbahnhof": {
   "name": "Metro · Geisterbahnhof",
@@ -1712,7 +2301,15 @@
   "atmosphere": "kino_dunkel",
   "description": "Eine Station, die auf keinem Plan steht. Hinter einer Werbetafel geht es weiter (#038).",
   "size": [16, 8],
-  "layout": ["################", "#.....#........#", "#.....#........#", "......%.........", "......%.........", "......%.........", "..C.C.%.........", "########A#######"]
+  "layout": ["################", "#.....#........#", "#.....#........#", "......%.........", "......%.........", "......%.........", "..C.C.%.........", "########A#######"],
+  "story": {
+   "function": "Geisterbahnhof, der auf keinem Plan steht",
+   "moment": "Ein Zug blieb hier stehen, die Türen offen",
+   "today": "Niemand kommt her; im Zug liegt eine Kurier-Tasche",
+   "keyImage": "Ein stehen gebliebener Zug an einem stillen Bahnsteig",
+   "must": "sitz, schild, müll",
+   "never": "grün, wrack"
+  }
  },
  "kn_gully": {
   "name": "Kanal · Gully",
@@ -1737,7 +2334,15 @@
    "............######........",
    "....L.......######........",
    "##################A#######"
-  ]
+  ],
+  "story": {
+   "function": "Gully am Straßenrand der Vororte",
+   "moment": "Der letzte Regen floss hier vor Jahren hinein",
+   "today": "Ein offener Deckel, es riecht nach Ärger",
+   "keyImage": "Ein offener Kanaldeckel, daneben ein Pegelschild",
+   "must": "schild, straße, müll",
+   "never": "büro, bett"
+  }
  },
  "kn_kanal": {
   "name": "Kanal · Kanal",
@@ -1757,7 +2362,15 @@
    "......................................",
    "....1......#......1.......#...1.......",
    "######A###############################"
-  ]
+  ],
+  "story": {
+   "function": "Abwasserkanal mit Laufsteg",
+   "moment": "Das Wasser blieb aus, die Rinne trocknete",
+   "today": "In der Rinne bewegt sich etwas",
+   "keyImage": "Ein Laufsteg über einer schlammigen Rinne",
+   "must": "müll, putz, kiste",
+   "never": "grün, büro"
+  }
  },
  "kn_ueberlauf": {
   "name": "Kanal · Überlauf",
@@ -1784,7 +2397,15 @@
    ".........H.......$..",
    ".........H1.........",
    "###############A####"
-  ]
+  ],
+  "story": {
+   "function": "Überlaufbecken mit Wartungsstegen",
+   "moment": "Hier hätte das Hochwasser stehen sollen",
+   "today": "Tropfen und Echo, eine Kachelwand ist nur Fassade",
+   "keyImage": "Hohe Wände mit Pegelstrichen, die nie erreicht wurden",
+   "must": "schild, müll, putz",
+   "never": "grün, büro"
+  }
  },
  "kn_sammler": {
   "name": "Kanal · Sammler",
@@ -1811,7 +2432,15 @@
    "............############.H..........",
    ".........1..############.H.1.1......",
    "####################################"
-  ]
+  ],
+  "story": {
+   "function": "Sammelbecken, eine Kathedrale aus Beton",
+   "moment": "Alles, was hinunterfiel, landete hier",
+   "today": "Das Nest aus Gehortetem, bewacht",
+   "keyImage": "Ein Berg aus Glänzendem unter dem Lichtschacht",
+   "must": "müll, kiste, putz",
+   "never": "büro, sitz"
+  }
  },
  "kn_nest": {
   "name": "Kanal · Nest",
@@ -1822,7 +2451,15 @@
   "atmosphere": "bunker_rot",
   "description": "Hier haben die Viecher gesammelt, was glänzt (#038).",
   "size": [14, 8],
-  "layout": ["##############", "#............#", "#............#", "..............", "..............", "..............", "..C........C..", "#######A######"]
+  "layout": ["##############", "#............#", "#............#", "..............", "..............", "..............", "..C........C..", "#######A######"],
+  "story": {
+   "function": "Seitenkammer des Sammlers",
+   "moment": "Nichts passierte hier, außer dass etwas einzog",
+   "today": "Die Viecher sammeln, was glänzt",
+   "keyImage": "Ein Kinderschuh, ordentlich ins Nest gelegt",
+   "must": "müll, kiste",
+   "never": "büro, sitz"
+  }
  },
  "sm_foerderturm": {
   "name": "Mine · Förderturm",
@@ -1850,7 +2487,15 @@
    "..............######......H...H...H...",
    "....L.........######1.....H...H...H...",
    "##############################A#######"
-  ]
+  ],
+  "story": {
+   "function": "Förderturm über dem Schacht",
+   "moment": "Die Firma versiegelte den Schacht und stellte den Korb ab",
+   "today": "Die Salt Dogs haben die Siegel gebrochen",
+   "keyImage": "Ein rostiger Förderturm über dem Salz, die Tafel „Tage ohne Unfall: 0“",
+   "must": "schild, technik, fass",
+   "never": "laden, büro"
+  }
  },
  "sm_sohle": {
   "name": "Mine · Sohle",
@@ -1870,7 +2515,15 @@
    "...........................###..........",
    "..........1........##.1.....###.....1...",
    "######A#################################"
-  ]
+  ],
+  "story": {
+   "function": "Hauptgang der Sohle mit Lorenschienen",
+   "moment": "Die Schicht ließ die Loren stehen, als der Schacht versiegelt wurde",
+   "today": "Die Salt Dogs fahren die Loren wieder",
+   "keyImage": "Lorenschienen ins Dunkle, Salz an den Wänden",
+   "must": "werkzeug, schutt, stein",
+   "never": "laden, sitz"
+  }
  },
  "sm_stollen": {
   "name": "Mine · Stollen",
@@ -1890,7 +2543,15 @@
    "..............$$..................",
    "............C.$$....1.............",
    "############################A#####"
-  ]
+  ],
+  "story": {
+   "function": "Enger Stollen",
+   "moment": "Hier wurde zuletzt gesprengt",
+   "today": "Eine Salzwand bröselt verdächtig",
+   "keyImage": "Ein enger Stollen mit Grubenlampe am Haken",
+   "must": "schutt, stein, werkzeug",
+   "never": "laden, sitz"
+  }
  },
  "sm_kaverne": {
   "name": "Mine · Kaverne",
@@ -1922,7 +2583,15 @@
    "..............H.....H..............H........",
    "............1.H.........1.....1....H........",
    "########A###################################"
-  ]
+  ],
+  "story": {
+   "function": "Ausgebeutete Salzhalle",
+   "moment": "Die Gerüste blieben stehen, als alle hochfuhren",
+   "today": "Die Salt Dogs bauen die Gerüste weiter",
+   "keyImage": "Eine Salzhalle so groß wie eine Kirche, Gerüste nach oben",
+   "must": "stein, knochen",
+   "never": "laden, sitz"
+  }
  },
  "sm_wetterschacht": {
   "name": "Mine · Wetterschacht",
@@ -1951,7 +2620,15 @@
    "..................",
    ".........1........",
    "####A#############"
-  ]
+  ],
+  "story": {
+   "function": "Wetterschacht für frische Luft",
+   "moment": "Der Lüfter wurde abgestellt, als der Schacht zu war",
+   "today": "Es zieht wieder; jemand hat ihn repariert",
+   "keyImage": "Ein Lüftungsschacht über zwei Sohlen, Kabel an der Wand",
+   "must": "technik, rohr, kabel",
+   "never": "grün, laden"
+  }
  },
  "sm_lager": {
   "name": "Mine · Sprengstofflager",
@@ -1971,7 +2648,15 @@
    "..............##....................",
    "......1.......##....###1......1.....",
    "##########A#########################"
-  ]
+  ],
+  "story": {
+   "function": "Sprengstofflager",
+   "moment": "Die Kisten wurden gezählt und weggeschlossen",
+   "today": "Die Salt Dogs sprengen tiefer",
+   "keyImage": "Kisten mit gelben Rauten unter einer Grubenlampe",
+   "must": "kiste, gefahr, lager",
+   "never": "grün, laden"
+  }
  },
  "sm_tiefe": {
   "name": "Mine · Tiefste Sohle",
@@ -1998,7 +2683,16 @@
    "......###...#########.##.....H..........",
    "......###1..#########.##1....H..........",
    "########################################"
-  ]
+  ],
+  "story": {
+   "function": "Tiefste Sohle, wo das Leuchten begann",
+   "moment": "Hier stießen sie auf das Leuchten; wer zu lange blieb, wurde krank",
+   "today": "Unberührt, nur das Leuchten wächst",
+   "keyImage": "Etwas leuchtet im Salz, daneben eine alte Notleiter",
+   "must": "stein, knochen",
+   "never": "laden, sitz",
+   "decay": 0
+  }
  },
  "sm_kaue": {
   "name": "Mine · Kaue",
@@ -2009,7 +2703,15 @@
   "atmosphere": "beton_lager",
   "description": "Die Umkleide der Kumpel. Spinde, Haken, ein vergessener Lohnbeutel (#038).",
   "size": [14, 8],
-  "layout": ["##############", "#......*.....#", "#............#", "..............", "..............", "......##......", "..C...##...C..", "#######A######"]
+  "layout": ["##############", "#......*.....#", "#............#", "..............", "..............", "......##......", "..C...##...C..", "#######A######"],
+  "story": {
+   "function": "Kaue, die Umkleide der Bergleute",
+   "moment": "Die Schicht hängte ihre Kleider an die Ketten und fuhr nie wieder ein",
+   "today": "Darunter hängt die frische Kluft der Salt Dogs",
+   "keyImage": "Kleider an Ketten unter der Decke, darunter neue Kluft",
+   "must": "sitz, kiste, müll",
+   "never": "grün, laden"
+  }
  },
  "sm_kristallgrotte": {
   "name": "Mine · Kristallgrotte",
@@ -2020,7 +2722,16 @@
   "atmosphere": "markt_neon",
   "description": "Salzkristalle, die im Lampenlicht glühen. Hinter dem Vorhang aus Salz liegt was (#038).",
   "size": [16, 8],
-  "layout": ["################", "#.........#....#", "#.........#....#", "..........%.....", "..........%.....", "..........%.....", "..........%.CC..", "########A#######"]
+  "layout": ["################", "#.........#....#", "#.........#....#", "..........%.....", "..........%.....", "..........%.....", "..........%.CC..", "########A#######"],
+  "story": {
+   "function": "Kristallgrotte, natürlicher Hohlraum",
+   "moment": "Niemand war hier, bevor der Schacht versiegelt wurde",
+   "today": "Unberührt, die Kristalle glühen",
+   "keyImage": "Salzkristalle, die im Lampenlicht glühen",
+   "must": "stein, licht",
+   "never": "laden, müll, sitz",
+   "decay": 0
+  }
  },
  "rf_tor": {
   "name": "Raffinerie · Werkstor",
@@ -2050,7 +2761,15 @@
    "#......D...........######.######....",
    "#...S..D...L.....1.######.######.1..",
    "##^#################################"
-  ]
+  ],
+  "story": {
+   "function": "Werkstor mit Pförtnerhaus",
+   "moment": "Der Pförtner schloss das Tor und ging",
+   "today": "Die Crude Boys kontrollieren die Schranke",
+   "keyImage": "Ein Pförtnerhaus mit Schranke, dahinter die Fackel",
+   "must": "schild, fass, straße",
+   "never": "bett, büro"
+  }
  },
  "rf_tankfeld": {
   "name": "Raffinerie · Tankfeld",
@@ -2080,7 +2799,15 @@
    "..#######...H....#####..H...H..#####......",
    "..#######...H1...#####..H.1.H..#####..1...",
    "##########################################"
-  ]
+  ],
+  "story": {
+   "function": "Tankfeld der Raffinerie",
+   "moment": "Beim Abschalten blieben die Tanks voll",
+   "today": "Die Crude Boys zapfen hier ab, die Tanks tropfen",
+   "keyImage": "Drei Tanks unter der brennenden Fackel",
+   "must": "fass, kanister, technik",
+   "never": "bett, büro"
+  }
  },
  "rf_rohrbruecke": {
   "name": "Raffinerie · Rohrbrücke",
@@ -2109,7 +2836,15 @@
    "......................................",
    "................######...1............",
    "######################################"
-  ]
+  ],
+  "story": {
+   "function": "Rohrbrücke zwischen den Anlagen",
+   "moment": "Die Ventile blieben, wie sie waren",
+   "today": "Die Crude Boys laufen oben, wo es schneller geht",
+   "keyImage": "Rohre in allen Größen, Stege dazwischen",
+   "must": "rohr, kabel, technik",
+   "never": "grün, bett"
+  }
  },
  "rf_kesselhaus": {
   "name": "Raffinerie · Kesselhaus",
@@ -2138,7 +2873,15 @@
    "..........##.#####.....#######HB....#...",
    "....1.....##.#####....1#######HB..C.#.1.",
    "########################################"
-  ]
+  ],
+  "story": {
+   "function": "Kesselhaus mit zwei Kesseln",
+   "moment": "Die Kessel liefen aus und wurden nie geleert",
+   "today": "Hitze und Lärm, die Crude Boys brennen hier Fusel",
+   "keyImage": "Zwei Kessel, Schläuche zu einer Fass-Destille",
+   "must": "rohr, fass, werkzeug",
+   "never": "grün, bett"
+  }
  },
  "rf_destille": {
   "name": "Raffinerie · Destillationsturm",
@@ -2168,7 +2911,15 @@
    "...........H............H.........",
    "........1..H..........1.H.........",
    "##############################v###"
-  ]
+  ],
+  "story": {
+   "function": "Destillationsturm",
+   "moment": "Die letzte Schicht kletterte vom Turm und ging",
+   "today": "Ganz oben sitzt der Steuerkasten mit dem Zugangscode",
+   "keyImage": "Ein Turm aus Böden und Leitern unter der Fackel",
+   "must": "rohr, technik, gefahr",
+   "never": "grün, bett"
+  }
  },
  "rf_leitstand": {
   "name": "Raffinerie · Leitstand",
@@ -2179,7 +2930,15 @@
   "atmosphere": "beton_neon",
   "description": "Bildschirme, Kaffeetassen, eine Schublade mit Wertsachen (#038).",
   "size": [16, 8],
-  "layout": ["################", "#.......*......#", "#..............#", "................", "................", "................", "...C..##.##.C...", "########A#######"]
+  "layout": ["################", "#.......*......#", "#..............#", "................", "................", "................", "...C..##.##.C...", "########A#######"],
+  "story": {
+   "function": "Leitstand der Ingenieure",
+   "moment": "Die Schicht wartete auf die Ablösung, die nie kam",
+   "today": "Bildschirme, Kaffeetassen, eine Schublade mit Wertsachen",
+   "keyImage": "Eine Liste mit Schichten, die nie abgelöst wurden",
+   "must": "technik, tisch, werkzeug",
+   "never": "grün, reifen"
+  }
  },
  "rf_versteck": {
   "name": "Raffinerie · Schmugglerlager",
@@ -2190,7 +2949,15 @@
   "atmosphere": "kino_dunkel",
   "description": "Ein Hohlraum hinter einer Blechwand. Jemand hat hier Sprit abgezweigt (#038).",
   "size": [14, 8],
-  "layout": ["##############", "#...#........#", "#...#........#", "....%.........", "....%.........", "....%.........", "..C.%.........", "#######A######"]
+  "layout": ["##############", "#...#........#", "#...#........#", "....%.........", "....%.........", "....%.........", "..C.%.........", "#######A######"],
+  "story": {
+   "function": "Hohlraum hinter einer Blechwand",
+   "moment": "Jemand zweigte schon vor der Schließung Sprit ab",
+   "today": "Das Schmugglerlager ist noch voll",
+   "keyImage": "Kanister hinter einer Blechwand",
+   "must": "kanister, fass, kiste",
+   "never": "grün, büro"
+  }
  },
  "tp_einfahrt": {
   "name": "Trailerpark · Einfahrt",
@@ -2220,7 +2987,15 @@
    "..........H....H........#####...",
    "....L.....H....H..1.....#####...",
    "##^#############################"
-  ]
+  ],
+  "story": {
+   "function": "Einfahrt des Trailerparks",
+   "moment": "Die Enkel sollten hier vorfahren; sie kamen nie",
+   "today": "Sunny Side lächeln an der Einfahrt",
+   "keyImage": "„Willkommen in Sunny Acres“, die Buchstaben hängen schief",
+   "must": "schild, straße, grün",
+   "never": "büro, militär"
+  }
  },
  "tp_wohnwagen": {
   "name": "Trailerpark · Wohnwagenreihe",
@@ -2250,7 +3025,15 @@
    "...........#########....###...........",
    "....1......#########..1.###......1....",
    "######################################"
-  ]
+  ],
+  "story": {
+   "function": "Wohnwagenreihe",
+   "moment": "Die Bewohner saßen jeden Abend vor ihren Wagen, bis keiner mehr kam",
+   "today": "Auf den Dächern Liegestühle und Gewehre",
+   "keyImage": "Wohnwagen an Wohnwagen, eine Lichterkette dazwischen",
+   "must": "grün, musik, fass",
+   "never": "büro, militär"
+  }
  },
  "tp_pool": {
   "name": "Trailerpark · Pool",
@@ -2280,7 +3063,15 @@
    "....#######.............#######...",
    "....#######.....1.......#######...",
    "##################################"
-  ]
+  ],
+  "story": {
+   "function": "Gemeinschaftspool",
+   "moment": "Hier tranken die Bewohner zuerst das Wasser, geordnet und gemeinsam",
+   "today": "Ein leeres Becken voller Müll",
+   "keyImage": "Leerer Pool voller Liegestühle, darin Bewaffnete mit Sonnenhut",
+   "must": "grün, müll, musik",
+   "never": "büro, militär"
+  }
  },
  "tp_buero": {
   "name": "Trailerpark · Verwaltung",
@@ -2309,7 +3100,15 @@
    "...............D..............",
    "......1##......D....Z.....1...",
    "###########################v##"
-  ]
+  ],
+  "story": {
+   "function": "Büro des Platzwarts",
+   "moment": "Der Platzwart schrieb die Hausordnung neu: Wasser nur noch zu festen Zeiten",
+   "today": "Sunny Side haben hier ihre Sanitäter",
+   "keyImage": "Pinnwand voller Postkarten von Enkeln",
+   "must": "technik, licht, fass",
+   "never": "wrack, militär"
+  }
  },
  "tp_dachterrasse": {
   "name": "Trailerpark · Dachterrasse",
@@ -2321,7 +3120,15 @@
   "backdrop": {"weather": "abendglut", "shade": 25},
   "description": "Ein Sonnensegel über einem Wohnwagen, zwei Kühlboxen (#038).",
   "size": [14, 8],
-  "layout": ["##############", "#............#", "#............#", "...========...", "...H......H...", "...H......H...", "..CH......HC..", "#######A######"]
+  "layout": ["##############", "#............#", "#............#", "...========...", "...H......H...", "...H......H...", "..CH......HC..", "#######A######"],
+  "story": {
+   "function": "Dachterrasse über einem Wohnwagen",
+   "moment": "Die letzte Bingo-Runde fand hier oben statt",
+   "today": "Ein Sonnensegel, zwei Kühlboxen",
+   "keyImage": "Ein Sonnensegel über zwei Kühlboxen",
+   "must": "musik, licht",
+   "never": "wrack, militär"
+  }
  },
  "rs_tor": {
   "name": "Silo · Bunkertor",
@@ -2349,7 +3156,15 @@
    "........###...H.............#.H....H........",
    "...L....###1..H.............#.H....H.1......",
    "######################A#####################"
-  ]
+  ],
+  "story": {
+   "function": "Bunkertor des Silos zwischen den Felsen",
+   "moment": "Die Wache wartete auf den Befehl, der nie kam",
+   "today": "Zero Hour halten das Tor, die Radarschüssel dreht sich",
+   "keyImage": "Ein Betonbau zwischen Felsen, Stacheldraht, die drehende Radarschüssel",
+   "must": "militär, schild, fass",
+   "never": "laden, grün"
+  }
  },
  "rs_schleuse": {
   "name": "Silo · Schleuse",
@@ -2369,7 +3184,15 @@
    "................DD................",
    "................DD.....1.....1....",
    "###########################A######"
-  ]
+  ],
+  "story": {
+   "function": "Explosionsschutz-Schleuse",
+   "moment": "Die Schleuse wurde verriegelt, als der Countdown begann",
+   "today": "Zero Hour hacken die Verriegelung von der Empore aus",
+   "keyImage": "Ein Explosionsschutztor mit Warnstreifen",
+   "must": "sperre, schild, technik",
+   "never": "grün, laden"
+  }
  },
  "rs_schacht_spitze": {
   "name": "Silo · Raketenschacht (Spitze)",
@@ -2403,7 +3226,15 @@
    "...H....1...........................H...",
    "........................................",
    "##########A#############################"
-  ]
+  ],
+  "story": {
+   "function": "Raketenschacht, obere Wartungsbühnen",
+   "moment": "Die Wartungstechniker standen bereit für den Start",
+   "today": "Zero Hour patrouillieren auf den Bühnen",
+   "keyImage": "Die Spitze der Rakete zwischen den Bühnen",
+   "must": "technik, kabel, gefahr",
+   "never": "grün, laden"
+  }
  },
  "rs_schacht_mitte": {
   "name": "Silo · Raketenschacht (Rumpf)",
@@ -2437,7 +3268,15 @@
    "...H....1...........................H...",
    "........................................",
    "##############################A#########"
-  ]
+  ],
+  "story": {
+   "function": "Raketenschacht, Rumpf",
+   "moment": "Der Rumpf war betankt, eine Sekunde vor dem Start",
+   "today": "Parolen der Zero Hour auf dem Blech",
+   "keyImage": "Der Rumpf der Rakete, so dick wie ein Haus",
+   "must": "technik, kabel, rohr",
+   "never": "grün, laden"
+  }
  },
  "rs_schacht_fuss": {
   "name": "Silo · Raketenschacht (Triebwerke)",
@@ -2471,7 +3310,15 @@
    "...H.......................1........H...",
    "........................................",
    "#########A##############################"
-  ]
+  ],
+  "story": {
+   "function": "Raketenschacht, Triebwerke",
+   "moment": "Die Triebwerke waren gezündet bereit",
+   "today": "Es riecht nach altem Treibstoff",
+   "keyImage": "Triebwerksglocken über dem Flammenschacht",
+   "must": "rohr, gefahr, fass",
+   "never": "grün, laden"
+  }
  },
  "rs_kaserne": {
   "name": "Silo · Kaserne",
@@ -2491,7 +3338,16 @@
    "....................................",
    ".........####..###1..####..1....1...",
    "#############################A######"
-  ]
+  ],
+  "story": {
+   "function": "Kaserne mit Stockbetten",
+   "moment": "Die Besatzung wartete in Bereitschaft, Stiefel neben den Betten",
+   "today": "Zero Hour schlafen hier in Schichten",
+   "keyImage": "Stockbetten in Reih und Glied",
+   "must": "bett, spind, militär",
+   "never": "grün, laden",
+   "decay": 2
+  }
  },
  "rs_krankenstation": {
   "name": "Silo · Krankenstation",
@@ -2511,7 +3367,15 @@
    "................................",
    "...........####....###1.....1...",
    "######A#########################"
-  ]
+  ],
+  "story": {
+   "function": "Krankenstation für den Tag danach",
+   "moment": "Die OP-Liegen standen frisch bezogen bereit",
+   "today": "Weiße Kacheln, ein rotes Kreuz",
+   "keyImage": "OP-Liegen unter kalten Lampen",
+   "must": "regal, sicherheit, technik",
+   "never": "wrack, reifen"
+  }
  },
  "rs_labor": {
   "name": "Silo · Kryolabor",
@@ -2536,7 +3400,15 @@
    "......H.................###.........",
    "......H.........1.......###...1.....",
    "#############################A######"
-  ]
+  ],
+  "story": {
+   "function": "Kryolabor",
+   "moment": "Die Röhre wurde befüllt und versiegelt",
+   "today": "Eine Gestalt in der violetten Röhre; AvA will nicht hinsehen",
+   "keyImage": "Eine violett leuchtende Röhre mit einer Gestalt",
+   "must": "technik, kabel, gefahr",
+   "never": "grün, laden"
+  }
  },
  "rs_kontrollraum": {
   "name": "Silo · Kontrollraum",
@@ -2556,7 +3428,15 @@
    ".........................!........",
    ".........###...###1..###......1...",
    "######A###########################"
-  ]
+  ],
+  "story": {
+   "function": "Kontrollraum mit Countdown",
+   "moment": "Der Countdown wurde bei 00:00:01 angehalten",
+   "today": "Auf allen Bildschirmen derselbe stehende Countdown",
+   "keyImage": "Bildschirme in drei Reihen, alle zeigen 00:00:01",
+   "must": "technik, kabel, tisch",
+   "never": "grün, laden"
+  }
  },
  "rs_generator": {
   "name": "Silo · Generatorhalle",
@@ -2581,7 +3461,15 @@
    "..........########....########........",
    "..........########..1.########....1...",
    "###############################A######"
-  ]
+  ],
+  "story": {
+   "function": "Generatorhalle",
+   "moment": "Ein Generator lief an, als der Countdown begann; er läuft noch",
+   "today": "Er hält alles am Leben",
+   "keyImage": "Zwei Dieselgeneratoren so groß wie Lastwagen",
+   "must": "technik, fass, werkzeug",
+   "never": "grün, laden"
+  }
  },
  "rs_lager": {
   "name": "Silo · Munitionslager",
@@ -2601,7 +3489,15 @@
    "...........###........####..........",
    "...........######.1...####.....1....",
    "######A#############################"
-  ]
+  ],
+  "story": {
+   "function": "Munitionslager",
+   "moment": "Alles war gezählt für den Tag danach",
+   "today": "Gelb-schwarze Kisten bis unter die Decke",
+   "keyImage": "Kisten bis unter die Decke unter rotem Licht",
+   "must": "kiste, militär, gefahr",
+   "never": "grün, laden"
+  }
  },
  "rs_werkstatt": {
   "name": "Silo · Werkstatt mit Kran",
@@ -2627,7 +3523,15 @@
    ".........H..............................",
    ".........H1..#####............1.........",
    "#################################A######"
-  ]
+  ],
+  "story": {
+   "function": "Werkstatt mit Kran",
+   "moment": "Die Techniker schraubten an einer Ersatzrakete",
+   "today": "Zero Hour schrauben am Countdown",
+   "keyImage": "Ein gelber Kran über einer Palette mit Raketenteilen",
+   "must": "werkbank, werkzeug, palette",
+   "never": "grün, laden"
+  }
  },
  "rs_lueftung": {
   "name": "Silo · Lüftungsschacht",
@@ -2659,7 +3563,15 @@
    "..................",
    ".........1........",
    "####A#############"
-  ]
+  ],
+  "story": {
+   "function": "Lüftungsschacht",
+   "moment": "Die Lüftung lief auf Notbetrieb",
+   "today": "Ein riesiger Ventilator dreht sich langsam",
+   "keyImage": "Ein Ventilator im Schacht, es zieht nach unten",
+   "must": "technik, rohr, gefahr",
+   "never": "grün, laden"
+  }
  },
  "rs_treppenhaus": {
   "name": "Silo · Treppenhaus",
@@ -2693,7 +3605,15 @@
    "......................",
    "..........1...........",
    "#################A####"
-  ]
+  ],
+  "story": {
+   "function": "Treppenhaus über sechs Etagen",
+   "moment": "Alarm: die Besatzung rannte auf ihre Posten",
+   "today": "Gitterstufen im Zickzack",
+   "keyImage": "Gitterstufen im Zickzack in die Tiefe",
+   "must": "schild, putz, sicherheit",
+   "never": "grün, wrack"
+  }
  },
  "rs_kantine": {
   "name": "Silo · Kantine",
@@ -2716,7 +3636,15 @@
    "..................................",
    "..........######1..######.....1...",
    "###########################A######"
-  ]
+  ],
+  "story": {
+   "function": "Kantine der Besatzung",
+   "moment": "Freitag Fisch; das Essen wurde nie ausgegeben",
+   "today": "Zero Hour essen hier",
+   "keyImage": "Lange Tische, Blechteller, ein Speiseplan von vor dem Krieg",
+   "must": "küche, vorrat, papier",
+   "never": "grün, laden"
+  }
  },
  "rs_galerie": {
   "name": "Silo · Wartungsgalerie",
@@ -2739,7 +3667,15 @@
    "....................................",
    "............1.............1.....1...",
    "######A#############################"
-  ]
+  ],
+  "story": {
+   "function": "Wartungsgalerie rund um den Schacht",
+   "moment": "Die Techniker prüften ein letztes Mal die Rakete",
+   "today": "Durch die Gitter sieht man die Rakete",
+   "keyImage": "Ein Laufsteg, durch die Gitter die Rakete",
+   "must": "technik, kabel, rohr",
+   "never": "grün, laden"
+  }
  },
  "rs_serverraum": {
   "name": "Silo · Serverraum",
@@ -2764,7 +3700,15 @@
    "......H..####.............####........",
    "......H..###1.........1...####....1...",
    "###############################A######"
-  ]
+  ],
+  "story": {
+   "function": "Serverraum mit Bandlaufwerken",
+   "moment": "Die Bänder zeichneten jede Sekunde auf",
+   "today": "Irgendwo darin denkt jemand nach",
+   "keyImage": "Schrankreihen voller Bänder, eines dreht sich noch",
+   "must": "technik, kabel, werkzeug",
+   "never": "grün, laden"
+  }
  },
  "rs_startrampe": {
   "name": "Silo · Startrampe",
@@ -2793,7 +3737,15 @@
    "..........H..........................H..........",
    "..........H...1.........k........1...H..........",
    "################################################"
-  ]
+  ],
+  "story": {
+   "function": "Startrampe und Flammenschacht",
+   "moment": "Eine Sekunde vor dem Start: angehalten",
+   "today": "Major Null wartet; im Terminal flüstert die KI",
+   "keyImage": "Die Rakete im Schacht, an der Rampe die Anzeige 00:00:01",
+   "must": "technik, gefahr, kabel",
+   "never": "grün, laden"
+  }
  },
  "rs_waffenkammer": {
   "name": "Silo · Waffenkammer",
@@ -2804,7 +3756,15 @@
   "atmosphere": "bunker_rot",
   "description": "Gewehrständer, leer bis auf zwei. Und die Kisten darunter. (#057)",
   "size": [16, 8],
-  "layout": ["################", "#.......*......#", "#..............#", "................", "................", "................", "...C........C...", "################"]
+  "layout": ["################", "#.......*......#", "#..............#", "................", "................", "................", "...C........C...", "################"],
+  "story": {
+   "function": "Waffenkammer",
+   "moment": "Die Waffen wurden für den Tag danach ausgegeben, bis auf zwei",
+   "today": "Gewehrständer, leer bis auf zwei",
+   "keyImage": "Leere Gewehrständer, zwei Gewehre, Kisten darunter",
+   "must": "militär, kiste, regal",
+   "never": "grün, laden"
+  }
  },
  "rs_funkraum": {
   "name": "Silo · Funkraum",
@@ -2815,7 +3775,15 @@
   "atmosphere": "beton_neon",
   "description": "Von hier sendet der Countdown in die Berge. Ein Notizbuch voller Frequenzen. (#057)",
   "size": [14, 8],
-  "layout": ["##############", "#......*.....#", "#............#", ".....C........", "....====......", "..............", "..........C...", "##############"]
+  "layout": ["##############", "#......*.....#", "#............#", ".....C........", "....====......", "..............", "..........C...", "##############"],
+  "story": {
+   "function": "Funkraum",
+   "moment": "Der Funker wartete auf den Befehl",
+   "today": "Von hier sendet der Countdown in die Berge",
+   "keyImage": "Ein Notizbuch voller Frequenzen neben dem Funkgerät",
+   "must": "technik, papier, büro",
+   "never": "grün, laden"
+  }
  },
  "rs_vorrat": {
   "name": "Silo · Vorratsraum",
@@ -2826,7 +3794,15 @@
   "atmosphere": "beton_lager",
   "description": "Konserven für dreißig Jahre. Die Hälfte ist noch da. (#057)",
   "size": [14, 8],
-  "layout": ["##############", "#......*.....#", "#............#", "..............", "..............", "..............", "...C......C...", "##############"]
+  "layout": ["##############", "#......*.....#", "#............#", "..............", "..............", "..............", "...C......C...", "##############"],
+  "story": {
+   "function": "Vorratsraum",
+   "moment": "Konserven für dreißig Jahre, gezählt und gestapelt",
+   "today": "Die Hälfte ist noch da",
+   "keyImage": "Regale voller Konserven, die Hälfte leer",
+   "must": "vorrat, regal, küche",
+   "never": "grün, laden"
+  }
  },
  "rs_archiv": {
   "name": "Silo · Archiv",
@@ -2837,7 +3813,15 @@
   "atmosphere": "ministerium_kalt",
   "description": "Aktenschränke mit Stempeln: STRENG GEHEIM. Einer klemmt. (#057)",
   "size": [16, 8],
-  "layout": ["################", "#.......*......#", "#..............#", "................", ".....C..........", "....###.........", "....###.....C...", "################"]
+  "layout": ["################", "#.......*......#", "#..............#", "................", ".....C..........", "....###.........", "....###.....C...", "################"],
+  "story": {
+   "function": "Archiv",
+   "moment": "Die Akten wurden gestempelt und weggeschlossen",
+   "today": "Ein Aktenschrank klemmt",
+   "keyImage": "Aktenschränke mit dem Stempel STRENG GEHEIM",
+   "must": "papier, büro, regal",
+   "never": "grün, laden"
+  }
  },
  "rs_offiziersmesse": {
   "name": "Silo · Offiziersmesse",
@@ -2857,7 +3841,15 @@
    "..................",
    "...C...####....C..",
    "##################"
-  ]
+  ],
+  "story": {
+   "function": "Offiziersmesse",
+   "moment": "Die Offiziere warteten bei Whisky auf den Befehl",
+   "today": "Der Dienstplan für „den Tag danach“ hängt noch",
+   "keyImage": "Ledersessel, ein Billardtisch, der Dienstplan an der Wand",
+   "must": "büro, küche, vorrat",
+   "never": "grün, laden"
+  }
  },
  "rs_kryokammer": {
   "name": "Silo · Kryokammer",
@@ -2868,7 +3860,15 @@
   "atmosphere": "markt_neon",
   "description": "Hinter einer Scheinwand: drei weitere Röhren, zwei leer. (#057)",
   "size": [16, 8],
-  "layout": ["################", "#.........#....#", "#.........#....#", "..........%.....", "..........%.....", "..........%.....", "..........%.CC..", "################"]
+  "layout": ["################", "#.........#....#", "#.........#....#", "..........%.....", "..........%.....", "..........%.....", "..........%.CC..", "################"],
+  "story": {
+   "function": "Geheime Kryokammer",
+   "moment": "Drei Röhren wurden befüllt, zwei blieben leer",
+   "today": "Hinter einer Scheinwand; leere Tanks mit Namensschildern",
+   "keyImage": "Leere Tanks mit Namensschildern",
+   "must": "technik, kabel, gefahr",
+   "never": "grün, laden"
+  }
  },
  "rs_bunker_privat": {
   "name": "Silo · Privatbunker",
@@ -2879,7 +3879,15 @@
   "atmosphere": "bunker_reaktor",
   "description": "Der Kommandant wollte überleben, auch wenn sonst keiner überlebt. (#057)",
   "size": [16, 8],
-  "layout": ["################", "#.....#........#", "#.....#........#", "......$.........", "......$.........", "......$.........", "......$..C..C...", "################"]
+  "layout": ["################", "#.....#........#", "#.....#........#", "......$.........", "......$.........", "......$.........", "......$..C..C...", "################"],
+  "story": {
+   "function": "Privatbunker des Kommandanten",
+   "moment": "Der Kommandant wollte überleben, auch wenn sonst keiner überlebt",
+   "today": "Unberührt, gut bestückt",
+   "keyImage": "Ein Sessel, Vorräte, eine Tür von innen verriegelt",
+   "must": "technik, werkzeug, kiste",
+   "never": "grün, laden"
+  }
  },
  "rs_wartungsnische": {
   "name": "Silo · Wartungsnische",
@@ -2890,6 +3898,14 @@
   "atmosphere": "metall_rost",
   "description": "Ein Werkzeugwagen, eine Kiste Ersatzteile, eine Tasse kalter Kaffee. (#057)",
   "size": [12, 8],
-  "layout": ["############", "#.....*....#", "#..........#", "............", "............", "............", "...C........", "############"]
+  "layout": ["############", "#.....*....#", "#..........#", "............", "............", "............", "...C........", "############"],
+  "story": {
+   "function": "Wartungsnische",
+   "moment": "Ein Techniker ließ seinen Kaffee stehen, als der Alarm kam",
+   "today": "Ein Werkzeugwagen, eine Tasse kalter Kaffee",
+   "keyImage": "Ein Werkzeugwagen und eine Tasse kalter Kaffee",
+   "must": "technik, vorrat, kiste",
+   "never": "grün, laden"
+  }
  }
 }
