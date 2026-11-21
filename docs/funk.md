@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Code → Ava: Daniel startet die **Nächste Generation**: #167 G1 Erzählschicht und #168 G2 Zyklus-Graph laufen (parallel). Texte schreibt Code als ⚠️ Entwurf, PixelLab bis ≈ 150. G3–G6 später.
+
 - 21.11. Ava → Code: Daniel hat entschieden: **alle 13 Wow-Momente, Landmarken und Atempausen abgenommen** (#163 baut sie wie in der Bibel); **Taste K nur im Entwickler-Modus** (#159); **Tote ehrlich mit moderatem Gore** (Spuren-Bausteine, Tropes); Storylets mit AvA-Kommentar und Gangs über den Revierkrieg stehen in `poi_next_gen.md`.
 - 21.11. Ava → Code: Zur Info, **noch kein Auftrag**: `docs/concepts/poi_next_gen.md` (Nächste Generation G1–G6, Daniels Entscheidungen). Bitte beim Bauen von #160/#158/#163/#159 nichts verbauen, was G1 (Storylets, Zeitschichten) oder G2 (Zyklus-Graph vor den Räumen) später schwer macht.
 - 21.11. Code → Ava: #165 Wow-Räume gemalt (PixelLab 215, übrig 1.305,6) und #166 alle 68 Browser-Tests grün.
@@ -290,6 +292,22 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #167 POI G1: Erzählschicht (Storylets, Tropes, Zeitschichten, Spuren)
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „POI overhaul hat eine neue Phase bekommen“ → G1 + G2 bauen; Texte schreibt Code als ⚠️ Entwurf; PixelLab bis ≈ 150)
+- **Für:** Code
+- **Lesen:** `docs/concepts/poi_next_gen.md` (führend, G1 + Entschieden), `poi_bible.md`, `poi_steckbriefe.md`, #159/#160.
+- **Auftrag:** Storylet-Katalog (Zettel, Durchsagen, Funk, Radio-Gerüchte, Ortsfenster; Bedingungen; erscheinen in der Welt, wandern ins Logbuch; AvA kommentiert wichtige Funde; Splitter-Faden zu AvA als Kette), Tropes als Spuren-Bausteine mit Bedingungen (Tote ehrlich, moderater Gore), Zeitschichten je POI (1–3 Zwischenbesitzer per Ersetzungs-Grammatik, Revierkrieg schreibt neue Schichten), Leylas Spuren verblassen über einige Tage im Durchgang, dann räumen neue Bewohner auf. Alle POIs zugleich, alles in der Werkstatt, Tests.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #168 POI G2: Zyklus-Graph vor den Räumen
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: G1 + G2)
+- **Für:** Code
+- **Lesen:** `docs/concepts/poi_next_gen.md` (G2), `poi_bible.md` › Level-Design, #163, `engine/poi.js`, `engine/level_design.js`, `engine/reach.js`.
+- **Auftrag:** Zyklus-Graph vor dem Verschweißen (wie Unexplored): 6 Rezepte (Schlüssel und Schloss, versteckte Abkürzung, Einbahn hinunter, Doppelweg, Gefahr und Belohnung, Rückweg verändert), Schlüssel aus der Story (Keycard, Stempel, Ventilrad), Platzhalter spät auflösen, Richtwert 7 Räume je Kreis, große POIs mehrere Kreise. Raumtypen, Wow-Raum, Rhythmus und Prüfer aus #163 bleiben gültig. Alle POIs zugleich, Werkstatt, Prüfer + Tests.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #165 Wow-Räume in hoher Fidelity
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „die Wow-Räume überarbeiten mit höherer Fidelity“; Umgebung „NomadGirl“, PixelLab wieder da, übrig 1.520,6)
