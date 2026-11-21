@@ -946,6 +946,17 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .ql-box > header { padding-right: 44px; }
 .ql-dot { margin-left: 6px; padding: 0 6px; border-radius: 99px; background: var(--ng-gold); color: var(--ng-night); font: 600 11px/16px var(--ui-font); font-style: normal; }
 .ql-list li { align-items: flex-start; }
+/* #129 Logbuch as the second tab of the Questlog */
+.lb-head { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 0 0 10px; }
+.lb-cats { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-width: 0; }
+.lb-cat { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 99px; border: 1px solid var(--ng-line); background: rgba(255, 255, 255, .03); color: var(--ng-text2); font: 500 12px/18px var(--ui-font); cursor: pointer; }
+.lb-cat.on { border-color: var(--ng-gold); color: var(--ng-gold); background: rgba(255, 210, 122, .08); }
+.lb-cat i { font-style: normal; color: var(--ng-muted); font-size: 11px; }
+.lb-search { width: 180px; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--ng-line); background: rgba(0, 0, 0, .35); color: var(--ng-text); font: 13px var(--ui-font); }
+.lb-list li.lb-day { display: block; padding: 8px 4px 2px; color: var(--ng-gold); font: 18px/1 VT323, monospace; background: none; border: 0; pointer-events: none; }
+.lb-n { font-style: normal; color: var(--ng-gold); font-weight: 400; }
+.lb-list li.lb-fight svg { color: #ff8a9a; } .lb-list li.lb-loot svg { color: #9be8d8; } .lb-list li.lb-progress svg { color: var(--ng-gold); }
+.lb-list li.lb-quest svg { color: var(--ng-teal); } .lb-list li.lb-radio svg { color: var(--ng-lilac); }
 .ql-row { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ql-row b { font-weight: 600; color: inherit; }
 .ql-row small { color: var(--ng-muted); font-size: 12px; }

@@ -9,6 +9,7 @@ import { hints, setUiDevice, closeX } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { loadVersion } from '../version.js';
 import { clockText } from '../save.js';
+import { record as journalRecord } from '../journal.js';
 import { SLOTS, metaLine } from '../slots.js';
 import { trackedGoal as questGoal } from '../quests.js';
 import { voices } from './voices.js';
@@ -44,6 +45,8 @@ const QUIET_WAITS = new Set(['info', 'travel', 'camp', 'recipe']);   // #129 Inf
 
 export class Hud {
   constructor(root, { workshopDrafts = 0, commit = null } = {}) {
+    // #129 radio titles go into the Logbuch (the tape is hidden in the build mode, the title stays findable)
+    window.addEventListener('ng-journal', e => { const d = e.detail || {}; journalRecord(this.scene?.box?.save, d.title, d.sub, d.kind || 'info', { cat: d.cat }); });
     // #020 vitals in cyberpunk style (Daniel, 14.11.2026): slanted neon bars with segments and scanlines; health with a ghost bar that
     // trails behind damage, stamina below it with notches every dash, a shimmer while it refills and a red flash when it is not enough
     this.healthBar = el('i', { class: 'fill' }); this.healthGhost = el('i', { class: 'ghost' }); this.healthText = el('b');
@@ -367,11 +370,15 @@ export class Hud {
   // the next one replaced it, so „Wieder auf den Beinen“ never left (Daniel, 12.11.2026)
   // Since #014 (Daniel, 13.11.2026: „Toast und Sound, aber stell sicher, dass alle diese Hinweise auf diese Art dargestellt
   // werden“) a banner is a toast too: it replaces the previous banner toast, ms 0 = stays until ✕ or the next banner.
-  banner(title, sub = '', ms = 3500, kind = 'info') {
+  // #129 (Daniel 21.11.: „oben rechts wie heute, als großer Toast“): an announcement waits like a hint while a window is open, so the
+  // welcome never lies over the map
+  banner(title, sub = '', ms = 3500, kind = 'info', queued = false) {
     const old = this.bannerToast; this.bannerToast = null;
     if (old?.isConnected) this.dismiss(old);
     if (!title) return null;
-    return (this.bannerToast = this.toast(title, sub, kind, ms, { banner: true }));
+    const t = this.toast(title, sub, kind, ms, { banner: true, queued });
+    if (t) this.bannerToast = t;
+    return t;
   }
   // the text of the banner toast still on screen (for the remote control and the tests)
   bannerText() { const t = this.bannerToast; return t?.isConnected && !t.classList.contains('out') ? t.textContent : null; }
@@ -382,28 +389,22 @@ export class Hud {
     if (!q?.length || this.liveToasts() >= TOAST_MAX) return;
     if (this.quiet && QUIET_WAITS.has(q[0][2])) return;   // #129 still a window open
     const [title, sub, kind, ms, o] = q.shift();
-    this.toast(title, sub, kind, ms, { ...o, queued: true });
+    if (o?.banner) this.banner(title, sub, ms, kind, true); else this.toast(title, sub, kind, ms, { ...o, queued: true });
   }
   liveToasts() { return [...this.toastsEl.children].filter(x => !x.classList.contains('out') && !x.classList.contains('banner')).length; }
-  // #070 Logbuch: every message with the game clock, kept in the savegame (the newest 150)
-  journal(title, sub, kind) {
-    const sv = this.scene?.box?.save;
-    if (!sv) return;
-    const J = (sv.journal ??= []);
-    J.push({ at: clockText(sv), title, sub, kind });
-    if (J.length > 150) J.splice(0, J.length - 150);
+  // #070 Logbuch, #129: every message with the game clock and a category, kept in the savegame (game/journal.js). In the build mode only
+  // successes (Daniel 21.11.)
+  journal(title, sub, kind, cat = null) {
+    journalRecord(this.scene?.box?.save, title, sub, kind, { cat, building: !!this.build?.active });
   }
-  logbook() {
-    const sv = this.scene?.box?.save, J = (sv?.journal || []).slice(-40).reverse();
-    this.menu({ title: 'Logbuch', sub: J.length ? `Die letzten ${J.length} Meldungen, neueste zuerst` : 'Noch keine Meldungen', items: [...J.map(e => ({ label: e.title, sub: [e.at, e.sub].filter(Boolean).join(' · '), icon: (TOAST_KINDS[e.kind] || TOAST_KINDS.info).icon, act: () => setTimeout(() => this.logbook(), 0) })),
-      { label: 'Zurück', icon: 'x', act: () => setTimeout(() => this.pauseMenu(), 0) }] });
-  }
+  // #129 the Logbuch lives in the Questlog as its second tab (Daniel 21.11.)
+  logbook() { this.quests?.open('log'); }
   // every message of the game: a note top right that stacks and goes by itself, with its own icon, colour and sound.
   // The same title twice in a row does not stack: the toast already there starts its time again (and nods). → the element
-  toast(title, sub = '', kind = 'info', ms = 4200, { banner = false, sound = true, queued = false } = {}) {
+  toast(title, sub = '', kind = 'info', ms = 4200, { banner = false, sound = true, queued = false, cat = null } = {}) {
     const K = TOAST_KINDS[kind] || TOAST_KINDS.info;
-    if (!queued) this.journal(title, sub, kind);   // #070 everything goes into the Logbuch
-    if (!queued && !banner && this.quiet && QUIET_WAITS.has(kind)) { (this.toastQueue ??= []).push([title, sub, kind, ms, { banner, sound }]); return null; }   // #129 a window is open: later
+    if (!queued) this.journal(title, sub, kind, cat);   // #070 everything goes into the Logbuch
+    if (!queued && this.quiet && QUIET_WAITS.has(kind)) { (this.toastQueue ??= []).push([title, sub, kind, ms, { banner, sound }]); return null; }   // #129 a window is open: later
     if (!queued && !banner && WAITS.has(kind) && this.liveToasts() >= TOAST_MAX) { (this.toastQueue ??= []).push([title, sub, kind, ms, { banner, sound }]); return null; }
     const same = [...this.toastsEl.children].find(x => !x.classList.contains('out') && x._title === title && x._sub === sub);
     if (same) {

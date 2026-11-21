@@ -57,6 +57,7 @@ export class RadioUI {
         this.startSong(st, C);
         const [a, b] = C.song, len = a + Math.random() * Math.max(0, b - a);
         this.seg = { kind: 'song', title: this.song.title, until: now + len * 1000 }; this.songs++;
+        if (this.song.title) window.dispatchEvent(new CustomEvent('ng-journal', { detail: { title: `♪ ${this.song.title}`, sub: st?.name || 'Rig-Radio', cat: 'radio' } }));   // #129 into the Logbuch
         this.synth.duck(false);
       }
       this.paint();

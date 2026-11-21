@@ -27,11 +27,24 @@ t = await toasts();
 v = await ev(() => document.body.classList.contains('ng-quiet'));
 check('Fenster zu: der wartende Hinweis kommt, Kassette darf wieder', t.includes('Stage-Hinweis') && !v, { t, quiet: v });
 
+// #129 the announcement (banner) waits too while a window is open: the welcome never lies over the map
+await ev(() => { nomad.step(1, [], ['inventory']); nomad.step(6); SC().hud.banner('Stage-Ansage', 'groß oben rechts'); nomad.step(2); });
+t = await toasts();
+v = await ev(() => !!SC().hud.inv?.isOpen);
+check('Fenster offen: die große Ansage wartet', v && !t.includes('Stage-Ansage'), { v, t });
+await ev(() => { SC().hud.inv.close(); nomad.step(4); });
+await page.waitForTimeout(1600);
+await ev(() => nomad.step(2));
+v = await ev(() => ({ t: [...document.querySelectorAll('.hud-toast.banner:not(.out)')].map(x => x._title), text: SC().hud.bannerText() }));
+check('Fenster zu: die Ansage kommt als großer Toast', v.t.includes('Stage-Ansage') && /Stage-Ansage/.test(v.text || ''), v);
+
 // build mode: notes below the build bar
 await ev(() => { SC().box.save.deltas = 500; SC().openBuild(); nomad.step(20); SC().hud.toast('Stage-Bau', 'unter der Leiste', 'warn'); nomad.step(2); });
 await page.waitForTimeout(300);
 v = await ev(() => { const bar = document.querySelector('.bm-bar')?.getBoundingClientRect(), all = [...document.querySelectorAll('.hud-toast:not(.out)')].map(x => x.getBoundingClientRect()), n = all.length ? { top: Math.min(...all.map(r => r.top)), bottom: Math.max(...all.map(r => r.bottom)) } : null; return { bar: bar && [bar.top, bar.bottom], note: n && [n.top, n.bottom], count: all.length, quiet: document.body.classList.contains('ng-quiet') }; });
 check('Bau-Modus: alle Meldungen unter der Bau-Leiste, Kassette weg', v.bar && v.note && v.note[0] >= v.bar[1] - 1 && v.quiet, v);
+v = await ev(() => { const h = SC().hud, sv = SC().box.save, n0 = sv.journal.length; h.toast('Stage-Kein-Platz', '', 'warn'); h.toast('Stage-Eingebaut', '', 'good'); window.dispatchEvent(new CustomEvent('ng-journal', { detail: { title: '♪ Baulied', cat: 'radio' } })); return sv.journal.slice(n0).map(e => e.title); });
+check('Bau-Modus: nur Erfolge und Radio-Titel ins Logbuch', v.join() === 'Stage-Eingebaut,♪ Baulied', v);
 await page.screenshot({ path: 'output/stage_build.png' });
 
 check('Keine Fehler auf der Seite', !pageErrors.length, pageErrors);

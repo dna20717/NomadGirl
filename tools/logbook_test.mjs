@@ -23,9 +23,15 @@ check('Drei Hinweise stehen, zwei warten, die Warnung kommt sofort; alle sechs i
 await page.waitForTimeout(3500);
 v = await ev(() => { const h = game.scene.getScene('play').hud; return { queue: (h.toastQueue || []).length, seen: (h.toastLog || []).map(t => t.title).filter(t => /Hinweis [45]/.test(t)) }; });
 check('Die wartenden kommen danach der Reihe nach', v.queue === 0 && v.seen.length >= 2, v);
-v = await ev(() => { const h = game.scene.getScene('play').hud; h.logbook(); nomad.step(2); const items = (h.menuItems || []).map(x => x.label + ' | ' + (x.sub || '')); h.closeMenu?.(); return { items }; });
-check('Menü › Logbuch: neueste zuerst, mit Uhrzeit', /^Achtung \| Tag \d+ · \d\d:\d\d · eine Warnung/.test(v.items[0] || '') && v.items.some(x => x.startsWith('Hinweis 1')), v);
-
+// #129 the Logbuch is the second tab of the Questlog: newest first with the time, categories, search, radio titles
+v = await ev(() => { const h = game.scene.getScene('play').hud; window.dispatchEvent(new CustomEvent('ng-journal', { detail: { title: '♪ Testlied', sub: 'Rig-Radio', cat: 'radio' } }));
+  h.logbook(); nomad.step(2); const q = h.quests, st = q.state(), first = document.querySelector('.lb-list li:not(.lb-day) b')?.textContent, time = document.querySelector('.lb-list li:not(.lb-day) small')?.textContent;
+  return { open: q.isOpen, tab: st.tab, first, time, tabs: [...document.querySelectorAll('.ql .tut-tab')].map(b => b.textContent) }; });
+check('Logbuch als zweiter Reiter im Questlog, neueste zuerst, mit Uhrzeit', v.open && v.tab === 'log' && v.tabs[1]?.startsWith('Logbuch') && v.first === '♪ Testlied' && /^\d\d:\d\d · Rig-Radio/.test(v.time || ''), v);
+v = await ev(() => { const q = game.scene.getScene('play').hud.quests; q.act('context'); const a = q.state().logCat; while (q.state().logCat !== 'radio') q.act('context'); const rows = q.state().rows; q.logCat = 'all'; q.logQ = 'Warnung'; q.draw(); const found = q.state().rows; return { a, rows, found }; });
+check('R schaltet die Kategorie, Radio zeigt nur Titel, Suche findet Untertitel', v.a === 'quest' && v.rows.length >= 1 && v.rows.every(r => r.startsWith('log:radio:')) && v.found.length >= 1 && v.found.every(r => r.includes('Achtung')), v);
+await page.screenshot({ path: 'output/logbook.png' });
+v = await ev(() => { const h = game.scene.getScene('play').hud; h.quests.logQ = ''; h.quests.logCat = 'all'; h.quests.close(); return true; });
 console.log(ok.map(x => '✔ ' + x).join('\n'));
 if (errors.length) { console.log(errors.map(x => '✖ ' + x).join('\n')); await browser.close(); process.exit(1); }
 console.log(`Logbuch: ${ok.length} Prüfungen grün`);

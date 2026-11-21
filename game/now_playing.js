@@ -25,6 +25,7 @@ body.ng-quiet .np-card { transform: translateX(120%); opacity: 0; }   /* #129 a 
 let card = null, hideT = 0;
 export function nowPlaying({ title, artist = '', cassette = null, base = location.href, scale = 1.25, peek = 0.55, ms = 5200 } = {}) {   // #122 smaller; only part of the tape shows (peek), title and artist count
   if (!title || typeof document === 'undefined') return null;
+  window.dispatchEvent?.(new CustomEvent('ng-journal', { detail: { title: `♪ ${title}`, sub: artist, cat: 'radio' } }));   // #129 every title into the Logbuch (also while the build mode hides the tape)
   if (!document.getElementById('np-css')) { const st = document.createElement('style'); st.id = 'np-css'; st.textContent = CSS; document.head.append(st); }
   card?.remove(); clearTimeout(hideT);
   const C = cassette || {}, [cw, ch] = C.size || [160, 104], k = scale;
