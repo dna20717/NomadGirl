@@ -1,4 +1,5 @@
-import { placeTypes, fits, roleConfig, roleWeight, pickWeighted, planDressing } from '../../engine/dressing.js';
+import { placeTypes, fits, roleConfig, roleWeight, pickWeighted, planDressing, hullMap, tileCase } from '../../engine/dressing.js';
+import { autoTile, autotileOf, innerCorner } from './autotile.js';
 const WALLS = new Set(['#', 'A', '^', 'v']);   // drawn as wall (doors and brittle walls: game/play/poi_level.js)
 const CAMO = new Set(['%', '$']);   // fake walls and camouflaged brittle walls: drawn like the wall, on their own layer above Leyla
 // Code-drawn art for the MVP: sky and skyline of BigCityDelta, tiles, placeholder raiders, projectiles, particles.
@@ -293,6 +294,9 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
     }
     camo.push(grp);
   }
+  // #158 Set je Gebäude-Hülle (Spiel › Kacheln): a wall tile wears the set of the nearest room air, not of the room in its column
+  const hull = !style && terrain?.reg && terrain.kits && scene.data_?.game?.tiles?.hull !== false ? hullMap(room, terrain.reg) : null;
+  const kitAt = (x, y) => hull ? terrain.kits(hull(x, y)) || terrain.at(x, y) : terrain?.at(x, y);
   const edges0 = scene.make.graphics({}, false), decals0 = [], clutter = [], details0 = [], back = [], backShade = scene.make.graphics({}, false), taken = new Set(), edgeTiles = [], coverTiles = [];
   const r = rng(99);
   // #158 Ort-Typen of this room: a thing only stands where its Clutter-Regeln allow it (no tree on a roof, no wreck inside)
@@ -321,7 +325,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
   for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
     const t0 = room.tiles[y][x], t = WALLS.has(t0) || CAMO.has(t0) ? '#' : t0, px = x * T, py = y * T;
     const cg = camoAt.get(x + ',' + y), g = cg ? cg.g : g0, edges = cg ? cg.edges : edges0, stamps = cg ? cg.stamps : stamps0, details = cg ? cg.stamps : details0, decals = cg ? cg.stamps : decals0;
-    const kit = t === '#' && !style ? terrain?.at(x, y) : null;
+    const kit = t === '#' && !style ? kitAt(x, y) : null;
     if ((t !== '#' || cg) && !style) {   // camouflaged tiles get the back wall behind them (seen once a fake wall fades)
       const bk = terrain?.back?.(x, y);
       if (bk) {
@@ -333,7 +337,17 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
     if (cg && t === '#') continue;   // camouflaged: drawn in the cover pass below
     if (kit) {
       const top = !solid(x, y - 1), D = kit.def, seed = D.seed || 0, list = top ? kit.top : fillOf(kit, x, y, solid);
-      stamps.push({ key: kit.key, frame: list[x % list.length], x: px, y: py - kit.over });
+      // #158 autotiling: caps, undersides, roof covers and seams between sets derived from the set's own tiles (game/play/autotile.js)
+      let key = kit.key, frame = list[x % list.length];
+      if (autotileOf(kit).on && !cg && scene.textures.createCanvas) {
+        const C = tileCase(solid, x, y), roof = top && spots?.at(x, y)?.type === 'roof';
+        const seamOf = dx => { const n = solid(x + dx, y) && !camoAt.has((x + dx) + ',' + y) ? kitAt(x + dx, y) : null; if (!n || n === kit || n.key === kit.key && n.def === kit.def || n.over !== kit.over) return null; const l = !solid(x + dx, y - 1) ? n.top : fillOf(n, x + dx, y, solid); return { key: n.key, frame: l[(x + dx) % l.length] }; };
+        const v = { capL: C.capL, capR: C.capR, under: C.under, roof, crust: kit.top[x % kit.top.length], seamL: seamOf(-1), seamR: seamOf(1) };
+        if (v.capL || v.capR || v.under || v.roof || v.seamL || v.seamR) ({ key, frame } = autoTile(scene, kit, roof ? kit.fill[x % kit.fill.length] : frame, v));
+        if (C.innerL) innerCorner(edges, px, py, T, true);
+        if (C.innerR) innerCorner(edges, px, py, T, false);
+      }
+      stamps.push({ key, frame, x: px, y: py - kit.over });
       // embedded details (stones, pipes, patches) break up the repeating fill
       if (!top && kit.details.length && hash(x, y, seed + 5) * 100 < (D.detailChance ?? 0))
         details.push({ key: kit.props, frame: kit.details[Math.floor(hash(x, y, seed + 6) * kit.details.length)], x: px + (T - kit.pcell[0]) / 2, y: py + (T - kit.pcell[1]) / 2 });
@@ -343,7 +357,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       const air = room.tiles[y - 1]?.[x] === '.';
       // large clutter: two surface tiles with air two tiles high above both, walls on the outside
       const free = (xx) => solid(xx, y) && !solid(xx, y - 1) && room.tiles[y - 1]?.[xx] === '.' && room.tiles[y - 2]?.[xx] === '.';
-      if (top && !cg && kit.big && !taken.has(x) && !planOcc.has(x + ',' + y) && !planOcc.has((x + 1) + ',' + y) && free(x) && free(x + 1) && solid(x - 1, y) && solid(x + 2, y) && terrain?.at(x + 1, y) === kit && hash(x, y, seed + 7) * 100 < (D.bigChance ?? 0)) {
+      if (top && !cg && kit.big && !taken.has(x) && !planOcc.has(x + ',' + y) && !planOcc.has((x + 1) + ',' + y) && free(x) && free(x + 1) && solid(x - 1, y) && solid(x + 2, y) && kitAt(x + 1, y) === kit && hash(x, y, seed + 7) * 100 < (D.bigChance ?? 0)) {
         const B = kit.big, f = pickOf(kit, B.key, B.list, [x, x + 1], y, hash(x, y, seed + 8));
         if (f != null) {
           clutter.push(placed(kit, B.key, f, px + T, py + 4));
@@ -431,7 +445,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       c.cover = [...cover].map(k => k.split(',').map(Number));
       const cs = (x, y) => solid(x, y) || cover.has(x + ',' + y);
       for (const [x, y] of c.cover) {
-        const px = x * T, py = y * T, kit = terrain?.at(x, y);
+        const px = x * T, py = y * T, kit = kitAt(x, y);
         if (kit) {
           const top = !cs(x, y - 1), list = top ? kit.top : fillOf(kit, x, y, cs);
           c.stamps.push({ key: kit.key, frame: list[x % list.length], x: px, y: py - kit.over });
@@ -485,7 +499,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
         if (vsolid(x, y) || terrain?.back?.(x, y)) continue;
         if (room.tiles[y][x] === '=') for (let i = 0; i < 3; i++) g0.fillStyle(0x07050c, a * 0.8 * (1 - i / 3)).fillRect(x * T + 6, y * T + 18 + i * 6, T, 6);
-        const L = solid(x - 1, y) && terrain?.at(x - 1, y), U = solid(x, y - 1) && terrain?.at(x, y - 1), px = x * T, py = y * T;
+        const L = solid(x - 1, y) && kitAt(x - 1, y), U = solid(x, y - 1) && kitAt(x, y - 1), px = x * T, py = y * T;
         for (let i = 0; i < n; i++) {
           const k = a * (1 - i / n);
           if (L) g0.fillStyle(0x07050c, k).fillRect(px + i * sz, py + (U ? 0 : 6), sz, T - (U ? 0 : 6));

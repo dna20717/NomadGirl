@@ -203,7 +203,8 @@
    {"name": "big_station_1", "place": "floor_in, corner", "tags": "regal, laden", "roles": "shop, storage"},
    {"name": "big_station_2", "place": "floor_in", "tags": "laden, küche", "roles": "shop"},
    {"name": "big_station_3", "place": "floor_in, corner", "tags": "automat, laden", "roles": "shop, living"}
-  ]
+  ],
+  "autotile": {"roof": "gravel"}
  },
  "concrete_wall": {
   "name": "Beton · glatte Wand",
@@ -324,7 +325,8 @@
    {"name": "big_industry_1", "place": "floor_in, corner", "tags": "werkbank, tisch", "roles": "hall, tech"},
    {"name": "big_industry_2", "place": "floor_in, floor_out, corner", "tags": "kiste, palette", "roles": "storage, hall"},
    {"name": "big_industry_3", "place": "floor_in, corner", "tags": "spind", "roles": "living, storage"}
-  ]
+  ],
+  "autotile": {"roof": "metal"}
  },
  "ruins": {
   "name": "Ruine · Ziegel",
@@ -412,7 +414,8 @@
    {"name": "ruins3_13", "place": "floor_out", "tags": "schutt, grün", "roles": "outdoor"},
    {"name": "ruins3_14", "place": "floor_out", "tags": "sperre", "roles": "outdoor, combat"},
    {"name": "ruins3_15", "place": "floor_out", "tags": "straße", "roles": "outdoor"}
-  ]
+  ],
+  "autotile": {"under": "crust", "roof": "tar"}
  },
  "mall": {
   "name": "Großmarkt · Fliesen",
@@ -612,7 +615,7 @@
    {"name": "bunker3_5", "place": "floor_in, corner", "tags": "fass, gefahr", "roles": "storage, tech"},
    {"name": "bunker3_6", "place": "floor_in, corner", "tags": "spind", "roles": "living"},
    {"name": "bunker3_7", "place": "floor_in", "tags": "bett", "roles": "living"},
-   {"name": "bunker3_8", "place": "wall", "tags": "medizin"},
+   {"name": "bunker3_8", "place": "wall", "tags": "medizin", "roles": "living, storage, tech, corridor"},
    {"name": "bunker3_9", "place": "floor_in, corner", "tags": "papier, büro", "roles": "office, storage"},
    {"name": "bunker3_10", "place": "floor_in, corner", "tags": "technik, rohr", "roles": "tech"},
    {"name": "bunker3_11", "place": "ceiling", "tags": "schild"},
@@ -620,7 +623,8 @@
    {"name": "bunker3_13", "place": "floor_in, ledge", "tags": "technik, büro", "roles": "office, tech"},
    {"name": "bunker3_14", "place": "floor_in, corner", "tags": "kanister", "roles": "storage, tech"},
    {"name": "bunker3_15", "place": "floor_in, ledge", "tags": "technik", "roles": "living, office, tech"}
-  ]
+  ],
+  "autotile": {"roof": "tar"}
  },
  "marble": {
   "name": "Ministerium · Marmor",
@@ -775,7 +779,8 @@
    {"name": "big_industry_1", "place": "floor_in, corner", "tags": "werkbank, tisch", "roles": "hall, tech"},
    {"name": "big_industry_2", "place": "floor_in, floor_out, corner", "tags": "kiste, palette", "roles": "storage, hall"},
    {"name": "big_industry_3", "place": "floor_in, corner", "tags": "spind", "roles": "living, storage"}
-  ]
+  ],
+  "autotile": {"roof": "metal"}
  },
  "cave": {
   "name": "Höhle",
@@ -825,6 +830,7 @@
    {"name": "desert3_13", "place": "floor_in, floor_out", "tags": "kabel, technik", "roles": "tech, hall"},
    {"name": "desert3_14", "place": "floor_in, floor_out", "tags": "militär, müll", "roles": "combat"},
    {"name": "desert3_15", "place": "floor_in, floor_out", "tags": "stein", "roles": "cave, outdoor"}
-  ]
+  ],
+  "autotile": {"under": "crust", "roof": "none"}
  }
 }

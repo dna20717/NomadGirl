@@ -97,7 +97,7 @@ export function placeTypes(room, reg = {}) {
   }
   for (let y = 1; y < h; y++) for (let x = 0; x < w; x++) {
     if (!open(x, y)) continue;
-    if (solid(x, y - 1) && !open(x, y - 2)) {   // the underside of a wall: something can hang here
+    if (inside(x, y) && solid(x, y - 1) && !open(x, y - 2)) {   // the underside of a wall inside: something can hang here (outside the top is the sky's edge)
       let drop = 0; while (drop < 12 && open(x, y + drop)) drop++;
       if (drop >= 3) add({ x, y, type: 'ceiling', drop });
     }
@@ -143,7 +143,7 @@ export function pickWeighted(items, weightOf, r) {
 // ---------- the plan (#158 steps 4 + 5): ensembles first, then single things up to a budget, ways kept free ----------
 // Spiel › Set-Dressing: density = things per 10 floor tiles („bewohnt“ ≈ 3), per role in the table Rollen; minGap = free tiles between
 // two things (Poisson along the floor); ensembles = share of the budget for ensembles (%); wall = share for wall and ceiling things (%)
-export const DRESSING = { density: 3, minGap: 1, ensembles: 50, wall: 12, brandWeight: 15, aiMax: 1 };
+export const DRESSING = { density: 3, minGap: 1, ensembles: 50, wall: 12, brandWeight: 15, aiMax: 1, sameMax: 2 };
 export function dressingConfig(D) {
   const g = D?.game?.dressing || {}, dens = new Map((g.roles || []).filter(r => r.role && r.density != null).map(r => [r.role, r.density]));
   return { ...DRESSING, ...Object.fromEntries(Object.entries(g).filter(([k, v]) => k in DRESSING && v != null)), densityOf: role => dens.get(role) ?? g.density ?? DRESSING.density };
@@ -285,15 +285,17 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
     // 2. single things up to the budget, a free tile between neighbours, corners and spots under lamps first
     if (!singles) continue;
     const single = cands(R).filter(c => !hangOnly(c)), ais = () => items.filter(it => it.ai && it.room === R.key).length;
+    const same = c => items.filter(it => it.room === R.key && it.name === c.name && !it.ens).length;   // no room full of the same thing
     for (const s of order) {
       if (R.placed >= R.budget) break;
       if (!free(s.x, s.y) || keep.has(s.x + ',' + s.y)) continue;
-      const fit = single.filter(c => (!c.ai || ais() < cfg.aiMax) && fitsAt(c, s.x, s.y) && gapFree(s.x, s.x + c.w - 1, s.y, cfg.minGap));
+      const fit = single.filter(c => (!c.ai || ais() < cfg.aiMax) && same(c) < cfg.sameMax && fitsAt(c, s.x, s.y) && gapFree(s.x, s.x + c.w - 1, s.y, cfg.minGap));
       const c = pickWeighted(fit, c => weight(c, R.role), hash(s.x, s.y, s0 + 51));
       if (c) put(c, s.x, s.y, 'stand', s.type, null, R);
     }
     // 3. on the back wall and under the ceiling: a small share of the budget, far apart, away from ladders and doors
-    const wallBudget = Math.round(R.budget * cfg.wall / 100), hangPool = cands(R, true).filter(c => list(c.rule.place).some(p => p === 'wall' || p === 'ceiling'));
+    // borrowed from another set only when its rule names this room's role (a ZONE 13 sign stays in the bunker)
+    const wallBudget = Math.round(R.budget * cfg.wall / 100), hangPool = cands(R, true).filter(c => list(c.rule.place).some(p => p === 'wall' || p === 'ceiling') && (!c.borrowed || list(c.rule.roles).includes(R.role)));
     let hung = 0;
     const hangOrder = [...R.hang].sort((a, b) => ((b.side ? 1 : 0) + hash(b.x, b.y, s0 + 61)) - ((a.side ? 1 : 0) + hash(a.x, a.y, s0 + 61)));
     for (const s of hangOrder) {
@@ -306,4 +308,36 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
     }
   }
   return { items, regions: [...regions.values()].map(({ stand, hang, ...r }) => r), planned: (x, y) => poolOf(idAt(x, y - 1)).length > 0, keep };
+}
+
+// ---------- autotiling (#158 step 6) ----------
+// Set je Gebäude-Hülle: a wall tile takes the Kachel-Set of the room whose air is nearest to it (straight up, left, right, down, up
+// to `reach` tiles; on a tie the air above wins, its floor), instead of the room in its column. So the seam between a building and the
+// desert next to it runs through the middle of the wall, not along the room's edge. Deep rock without air near keeps idAt.
+export function hullMap(room, reg, reach = 6) {
+  const { w, h, tiles } = room, cache = new Map(), idAt = reg.idAt || (() => null);
+  const wall = (x, y) => x < 0 || y < 0 || x >= w || y >= h || WALLISH.has(tiles[y][x]) || tiles[y][x] === 'D' || tiles[y][x] === 'B';
+  return (x, y) => {
+    const k = x + ',' + y;
+    if (cache.has(k)) return cache.get(k);
+    let best = null;
+    // cost: up = distance, sideways + 0.5, down + 3 (a floor belongs to the room standing on it, not to the tunnel under it)
+    for (const [dx, dy, extra] of [[0, -1, 0], [-1, 0, 0.5], [1, 0, 0.5], [0, 1, 3]]) {
+      for (let d = 1; d <= reach; d++) {
+        const ax = x + dx * d, ay = y + dy * d;
+        if (ax < 0 || ay < 0 || ax >= w || ay >= h) break;
+        if (!wall(ax, ay)) { if (!best || d + extra < best.d) best = { d: d + extra, id: idAt(ax, ay) }; break; }
+      }
+    }
+    const id = best ? best.id : idAt(x, y);
+    cache.set(k, id);
+    return id;
+  };
+}
+// which edge case a wall tile is (16 cases of its four neighbours + the inner corners): → { top, capL, capR, under, innerL, innerR }
+//   top = air above (surface), capL/capR = a surface tile whose side is open (a run ends: cap, outer corner, pillar), under = air
+//   below (ceiling underside, the lower face of a ledge), innerL/innerR = a surface tile at the foot of a wall going up (inner corner)
+export function tileCase(solid, x, y) {
+  const top = !solid(x, y - 1), under = !solid(x, y + 1);
+  return { top, under, capL: top && !solid(x - 1, y), capR: top && !solid(x + 1, y), innerL: top && solid(x - 1, y - 1), innerR: top && solid(x + 1, y - 1) };
 }
