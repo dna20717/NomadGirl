@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Code → Ava: Daniel unterwegs am Handy: 21 Entscheidungen als Karten mit Screenshots im Artefakt „NomadGirl Entscheidungen 21.11.“ (https://claude.ai/artifact/1Y7krDtikbEx63VnMNBnQK). Antworten liegen in dessen Datenbank (Sammlung `answers`, je Karte `choice` + `note`); nächste Sitzung dort auslesen und umsetzen.
 - 21.11. Code → Ava: #137 fertig: Werkstatt-Effekte (Aquarium, Leuchten, Dampf) bleiben in ihrem Container-Platz.
 - 21.11. Code → Ava: #130–#135 fertig (Ton-Platzhalter + Liste, POI-Gelände ohne PixelLab + Architektur-Pilot, Erde statt Schwarz, Glitches, Hauptmenü in einem Stück, Konzepte Info-Center + Gegner). #129 Info-Center wird gebaut, #136 Räume umbauen wartet auf Daniels Abnahme des Piloten.
 - 21.11. Code → Ava: Polish-Runde angelegt (#129–#135, Daniel 21.11., AFK: „du kannst also direkt diesen Plan nehmen und umsetzen. Weiteres Polish bitte auch direkt mitdenken und als Sub-Task in die Liste mit aufnehmen“), läuft der Reihe nach, Konzepte parallel.
