@@ -107,6 +107,33 @@ def concrete():
     return [f'concrete_worn_top_{i}' for i in range(4)] + [f'concrete_worn_fill_a_{i}' for i in range(4)] + [f'concrete_worn_fill_b_{i}' for i in range(4)]
 
 
+def from_strip(src_name, out_name, prefix, fill_a, fill_b, shift_b=3, n=7, rust=False):
+    """#138 (Daniel 21.11.2026: „Beides mit PixelLab neu malen“): a PixelLab cross-section strip (512 x 256, walking line at y=64) cut into
+    a Kachel-Set: seamless at n tiles, tops = rows 48-128, fill a / fill b = 64 rows from fill_a / fill_b (fill b shifted by shift_b tiles)"""
+    src = fill_holes(Image.open(A / 'tiles/source' / src_name))
+    strip = seamless(src, n * T)
+    sheet = Image.new('RGBA', (n * T, 3 * (T + OVER)))
+    for i in range(n):
+        x = i * T
+        sheet.paste(strip.crop((x, SURF - OVER, x + T, SURF + T)), (x, 0))
+        sheet.paste(strip.crop((x, fill_a, x + T, fill_a + T)), (x, (T + OVER) + OVER))
+        x2 = (x + shift_b * T) % (n * T)
+        sheet.paste(strip.crop((x2, fill_b, x2 + T, fill_b + T)), (x, 2 * (T + OVER) + OVER))
+    if rust:   # bright red rebar read as glitches: rust brown from the same palette (AAP-64)
+        a = np.array(sheet)
+        for src_c, dst in (((180, 32, 42), (113, 65, 59)), ((223, 62, 35), (142, 82, 82))):
+            m = (a[:, :, 0] == src_c[0]) & (a[:, :, 1] == src_c[1]) & (a[:, :, 2] == src_c[2])
+            a[m, :3] = dst
+        sheet = Image.fromarray(a)
+    sheet.save(A / 'tiles/tileset00' / out_name)
+    return [f'{prefix}_top_{i}' for i in range(n)] + [f'{prefix}_fill_a_{i}' for i in range(n)] + [f'{prefix}_fill_b_{i}' for i in range(n)]
+
+
 if __name__ == '__main__':
+    import sys
+    if 'px' in sys.argv:
+        print('desert_px', from_strip('desert_px_source.png', 'desert_px.png', 'desert_px', 128, 192, 0))
+        print('concrete_px', from_strip('concrete_px_source.png', 'concrete_px.png', 'concrete_px', 102, 102, 3, rust=True))
+        sys.exit(0)
     print('desert_fine', desert())
     print('concrete_worn', concrete())
