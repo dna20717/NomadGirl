@@ -1,3 +1,4 @@
+import { placeTypes, fits } from '../../engine/dressing.js';
 const WALLS = new Set(['#', 'A', '^', 'v']);   // drawn as wall (doors and brittle walls: game/play/poi_level.js)
 const CAMO = new Set(['%', '$']);   // fake walls and camouflaged brittle walls: drawn like the wall, on their own layer above Leyla
 // Code-drawn art for the MVP: sky and skyline of BigCityDelta, tiles, placeholder raiders, projectiles, particles.
@@ -198,6 +199,9 @@ export function terrainKits(scene, D) {
       for (const r of t.sizes || []) {
         for (const [k, asset] of [[t.props, p], [t.propsBig, b]]) { const i = (asset?.names || []).indexOf(r.name); if (i >= 0 && r.cm > 0) kit.sizes.set(k + '#' + i, r.cm); }
       }
+      // #158 Clutter-Regeln: place types, tags and roles per clutter name (no rows = the old dice everywhere)
+      kit.rules = new Map((t.dressing || []).filter(r => r.name).map(r => [r.name, r]));
+      kit.nameOf = (key, frame) => A[key]?.names?.[frame];
       const L = A[D.leyla?.look?.idle];
       kit.pxPerCm = (L?.height || 192) / (D.game?.tiles?.leylaCm || 170);
       kit.maxScale = (t.sizeMax || 200) / 100;
@@ -258,7 +262,7 @@ function brandKit(scene) {
   const D = scene.data_, rows = (D?.pois?.[scene.levelPoi]?.brandProps || []).filter(b => b.look && scene.textures.exists(b.look));
   if (!rows.length) return null;
   const A = D.assets || {}, L = A[D.leyla?.look?.idle], sizes = new Map(), list = [];
-  for (const b of rows) { const i = (A[b.look]?.names || []).indexOf(b.name); if (i < 0) continue; scene.textures.get(b.look).setFilter(1); if (b.cm > 0) sizes.set(b.look + '#' + i, b.cm); list.push({ key: b.look, frame: i, cm: b.cm || 100, chance: b.chance ?? 5, ai: !!b.ai }); }
+  for (const b of rows) { const i = (A[b.look]?.names || []).indexOf(b.name); if (i < 0) continue; scene.textures.get(b.look).setFilter(1); if (b.cm > 0) sizes.set(b.look + '#' + i, b.cm); list.push({ key: b.look, frame: i, cm: b.cm || 100, chance: b.chance ?? 5, ai: !!b.ai, place: b.place, tags: b.tags, roles: b.roles }); }
   return list.length ? { def: {}, sizes, pxPerCm: (L?.height || 192) / (D.game?.tiles?.leylaCm || 170), maxScale: 5, list } : null;
 }
 // which fill a tile below the surface gets (#144, Daniel 21.11.2026: „Die Schichten machen so keinen Sinn, wie du sie einsetzt“):
@@ -291,6 +295,12 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
   }
   const edges0 = scene.make.graphics({}, false), decals0 = [], clutter = [], details0 = [], back = [], backShade = scene.make.graphics({}, false), taken = new Set(), edgeTiles = [], coverTiles = [];
   const r = rng(99);
+  // #158 Ort-Typen of this room: a thing only stands where its Clutter-Regeln allow it (no tree on a roof, no wreck inside)
+  const spots = !style && terrain?.reg ? placeTypes(room, terrain.reg) : null;
+  if (spots && room === scene.room) scene.places_ = spots;
+  const allowed = (rules, place, xs, y) => !rules || !spots || xs.every(xx => { const sp = spots.at(xx, y); return sp && fits(place, sp); });
+  const ruleOf = (kit, key, f) => kit.rules?.size ? kit.rules.get(kit.nameOf(key, f)) || {} : null;
+  const pickOf = (kit, key, frames, xs, y, h) => { const ok = frames.filter(f => { const rl = ruleOf(kit, key, f); return allowed(rl, rl?.place, xs, y); }); return ok.length ? ok[Math.floor(h * ok.length)] : null; };
   // clutter stamp + where it stands, by name (game/play/atmosphere.js finds glowing things)
   const placed = (kit, key, frame, cx, ground) => {
     const st = propStamp(scene, kit, key, frame, cx, ground), f = scene.textures.getFrame(key, frame);
@@ -322,18 +332,23 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       // large clutter: two surface tiles with air two tiles high above both, walls on the outside
       const free = (xx) => solid(xx, y) && !solid(xx, y - 1) && room.tiles[y - 1]?.[xx] === '.' && room.tiles[y - 2]?.[xx] === '.';
       if (top && !cg && kit.big && !taken.has(x) && free(x) && free(x + 1) && solid(x - 1, y) && solid(x + 2, y) && terrain?.at(x + 1, y) === kit && hash(x, y, seed + 7) * 100 < (D.bigChance ?? 0)) {
-        const B = kit.big;
-        clutter.push(placed(kit, B.key, B.list[Math.floor(hash(x, y, seed + 8) * B.list.length)], px + T, py + 4));
-        taken.add(x); taken.add(x + 1); taken.add(x + 2);   // #096 a gap after it: nothing leans into it
+        const B = kit.big, f = pickOf(kit, B.key, B.list, [x, x + 1], y, hash(x, y, seed + 8));
+        if (f != null) {
+          clutter.push(placed(kit, B.key, f, px + T, py + 4));
+          taken.add(x); taken.add(x + 1); taken.add(x + 2);   // #096 a gap after it: nothing leans into it
+        }
       }
       if (top && air && !cg && brands && !taken.has(x) && solid(x - 1, y) && solid(x + 1, y)) {   // Marken-Clutter (brandKit)
-        const B = brands.list[Math.floor(hash(x, y, 31) * brands.list.length)], tall = Math.ceil(B.cm * brands.pxPerCm / T);
+        const fit = brands.list.filter(b => allowed(b.place != null, b.place, [x], y)), B = fit[Math.floor(hash(x, y, 31) * fit.length)] || brands.list[0], tall = fit.length ? Math.ceil(B.cm * brands.pxPerCm / T) : 99;
         let room_ = true; for (let k = 1; k <= tall; k++) if (room.tiles[y - k]?.[x] !== '.') room_ = false;
         if (room_ && hash(x, y, 37) * 100 < B.chance) { clutter.push({ ...placed(brands, B.key, B.frame, px + T / 2, py + 4), ai: B.ai }); taken.add(x); taken.add(x + 1); }   // #096 (Daniel: „chaotisch“): fridges and shelves no longer stand inside each other   // ai: a KI lives in it (poi_level.js hosts, #052)
       }
       if (top && air && !cg && !taken.has(x) && kit.clutter.length && solid(x - 1, y) && solid(x + 1, y) && hash(x, y, seed + 3) * 100 < (D.clutterChance ?? 0)) {
-        clutter.push(placed(kit, kit.props, kit.clutter[Math.floor(hash(x, y, seed + 4) * kit.clutter.length)], px + T / 2, py + 4));
-        taken.add(x + 1);   // #096 one tile of air between two things on the floor
+        const f = pickOf(kit, kit.props, kit.clutter, [x], y, hash(x, y, seed + 4));
+        if (f != null) {
+          clutter.push(placed(kit, kit.props, f, px + T / 2, py + 4));
+          taken.add(x + 1);   // #096 one tile of air between two things on the floor
+        }
       }
       // edges from code: outline, light rim left and on top, soft shade right and below (the top tile brings its own crust)
       edgeTiles.push({ x, y, kit, g: edges });

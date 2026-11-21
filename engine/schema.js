@@ -9,6 +9,7 @@
 //          lines (list of text rows, edited as monospaced text: room layouts)
 import { parseRoom, TILE_LEGEND } from './room.js';
 import { buildPoi, poiReady } from './poi.js';
+import { PLACE_TYPES, ROOM_ROLES, splitList } from './dressing.js';
 import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
 import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
 import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from './megarig.js';
@@ -151,6 +152,15 @@ export function salvageProblems(p, id, area = 'items') {
   return out;
 }
 
+// #158 Ort, Tags, Rollen of a clutter row (Kachel-Sets › Clutter-Regeln, POIs › Marken-Clutter): known place types and roles, known names
+function dressingRowsCheck(rows, report, what, known) {
+  const places = new Set(PLACE_TYPES.map(([k]) => k)), roles = new Set(ROOM_ROLES.map(([k]) => k));
+  for (const r of rows || []) {
+    if (r.name && !known(r.name)) report('warning', `${what}: „${r.name}“ gibt es in keinem Raster`);
+    for (const t of splitList(r.place)) if (!places.has(t)) report('error', `${what} „${r.name}“: unbekannter Ort „${t}“ (${[...places].join(', ')})`);
+    for (const t of splitList(r.roles)) if (!roles.has(t)) report('error', `${what} „${r.name}“: unbekannte Rolle „${t}“ (${[...roles].join(', ')})`);
+  }
+}
 export const AREAS = {
   assets: {
     name: 'Assets', singular: 'Asset', icon: 'image', file: 'data/assets.json', kind: 'catalog', gallery: true, groupBy: { key: 'kind', options: ASSET_KINDS },
@@ -1646,7 +1656,7 @@ export const AREAS = {
         ref('tunnelAtmosphere', 'Atmosphäre im Tunnel', 'atmosphere', { hint: 'Licht und Stimmung der Abkürzung. Leer = Atmosphäre des Kachel-Sets im Tunnel' }),
         num('seed', 'Fester Seed', { min: 0, hint: 'Zum Testen: immer dasselbe Level. Leer/0 = jeder Run neu gewürfelt' })] },
       { title: 'Markenschild', fields: [bool('brandSign', 'Schild am Eingang', { hint: 'Daniel 21.11.2026: „Die Firmenlogos werden in den POI nicht angezeigt“. Die Marke des Orts von der Reisekarte (Logo, Name, Slogan) steht auf einem Mast im ersten Außenraum. Leer = an' }), ref('machineLoot', 'Automat nach dem Duell', 'lootTables', { hint: '#152 (Daniel 21.11.2026): ist die Entity im Automaten besiegt, fällt diese Beute heraus (Essen, NomadCola). Leer = automat_beute' }), ref('brand', 'Marke ohne Karte', 'brands', { hint: 'Geht vor der Marke der Karte (Daniel 21.11.2026: „Marken passend zum Ort“, z. B. Ministerium = Bureau of Order). Leer = Marke von der Karte' }), num('brandSignHeight', 'Höhe des Schilds', { unit: 'Kacheln', min: 2, max: 8, step: 0.1, hint: 'Oberkante über dem Boden. Leer = 4,6' })] },
-      { title: 'Marken-Clutter', wide: true, fields: [table('brandProps', 'Marken-Clutter', [ref('look', 'Symbol-Raster', 'assets'), text('name', 'Symbol'), num('cm', 'Höhe', { unit: 'cm', min: 1 }), num('chance', 'Chance', { unit: '%', min: 0, max: 100 }), bool('ai', 'KI')], { hint: 'Daniel, 17.11.2026: Dinge einer Marke, die in diesem POI auf freiem Boden stehen (z. B. NomadCola-Automaten an Tankstellen). Symbol = Name im Raster, Höhe in echten cm, Chance je freier Bodenkachel. KI = darin wohnt eine Entity: E / ↑ davor startet ein Glitch-Duell (#052)' })] },
+      { title: 'Marken-Clutter', wide: true, fields: [table('brandProps', 'Marken-Clutter', [ref('look', 'Symbol-Raster', 'assets'), text('name', 'Symbol'), num('cm', 'Höhe', { unit: 'cm', min: 1 }), num('chance', 'Chance', { unit: '%', min: 0, max: 100 }), bool('ai', 'KI'), text('place', 'Ort'), text('tags', 'Tags'), text('roles', 'Rollen')], { hint: 'Daniel, 17.11.2026: Dinge einer Marke, die in diesem POI auf freiem Boden stehen (z. B. NomadCola-Automaten an Tankstellen). Symbol = Name im Raster, Höhe in echten cm, Chance je freier Bodenkachel (mit Set-Dressing: Gewicht beim Auswählen). KI = darin wohnt eine Entity: E / ↑ davor startet ein Glitch-Duell (#052). Ort, Tags, Rollen wie Kachel-Sets › Clutter-Regeln (#158)' })] },
       { title: 'Ranking', fields: [num('parTime', 'Bestzeit', { unit: 's', min: 0 }), num('secrets', 'Secrets', { min: 0, hint: 'Im Level zählen die brüchigen Wände (B); diese Zahl gilt nur für POIs ohne Level' })] },
       { title: 'Leben (noch ohne Wirkung)', fields: [bool('npcs', 'NPCs vor Ort'), bool('foodtruck', 'Foodtruck-Verkauf möglich'), bool('shop', 'Händler')] },
     ],
@@ -1660,6 +1670,7 @@ export const AREAS = {
         if (E?.weapon && r.weapon && W?.[r.weapon]?.kind !== W?.[E.weapon]?.kind) report('warning', `Ausrüstung: ${W?.[r.weapon]?.name || r.weapon} passt nicht zu ${E.name || r.enemy} (andere Waffenart)`);
         if (r.weapon && W?.[r.weapon] && !W[r.weapon].held) report('warning', `Ausrüstung: ${W[r.weapon].name || r.weapon} hat keine Grafik in der Hand der Gegner (Waffen › In der Hand)`);
       }
+      dressingRowsCheck(x.brandProps, report, 'Marken-Clutter', () => true);
       const R = p.data.rooms || {};
       if (!(x.rooms || []).some(r => R[r]?.tags?.includes('start'))) report('warning', 'Kein Raum mit Eingang');
       if (!(x.rooms || []).some(r => R[r]?.tags?.includes('exit'))) report('warning', 'Kein Raum mit Ausgang');
@@ -1703,6 +1714,8 @@ export const AREAS = {
         table('sizes', 'Größen', [text('name', 'Name'), num('cm', 'Höhe', { unit: 'cm', min: 1 })], { hint: 'Echte Höhe je Clutter (Name aus einem der Raster); das Spiel skaliert pixelscharf, Leyla = Spiel › Kacheln › Leyla ist groß. Ohne Zeile: so groß wie im Raster gemalt' }),
         num('sizeMax', 'Höchstens vergrößern', { unit: '%', min: 100, max: 400, hint: 'Deckel für das Vergrößern, damit Pixel nicht zu klobig werden. Leer = 200' }),
         num('seed', 'Zufall', { min: 0, hint: 'Andere Zahl = andere Verteilung (gleich bleibt gleich)' })] },
+      { title: 'Clutter-Regeln', wide: true, fields: [table('dressing', 'Clutter-Regeln', [text('name', 'Name'), text('place', 'Ort'), text('tags', 'Tags'), text('roles', 'Rollen')],
+        { hint: `#158 (Daniel 21.11.2026: „ein Baum oben auf einem Hochhaus“): je Clutter (und großem Clutter) wo es stehen darf und wozu es passt, je mit Komma. Ort: ${PLACE_TYPES.map(([k, n]) => `${k} = ${n}`).join(', ')}; leer = Boden drinnen und draußen. Ecke allein = nur am Wandfuß. Tags wie bei der Camp-Deko (sitz, tisch, licht, kiste, grün, technik, müll …): Ensembles und Raum-Rollen suchen danach. Rollen: ${ROOM_ROLES.map(([k, n]) => `${k} = ${n}`).join(', ')}; leer = überall. Ohne Zeilen würfelt das Set wie früher (Chancen oben)` })] },
       { title: 'Licht', fields: [ref('atmosphere', 'Atmosphäre', 'atmosphere', { hint: 'Licht und Stimmung in Räumen mit diesem Set (Raum-Bausteine können sie überschreiben). Leer = Spiel › Atmosphäre › Standard' }),
         table('glows', 'Leuchtet', [text('name', 'Name'), color('color', 'Farbe'), point('at', 'Mitte', { unit: 'px', hint: 'Im Feld des Rasters, von oben links' }), size('size', 'Größe', { unit: 'px' }),
           num('strength', 'Stärke', { unit: '%', min: 0, max: 200 }), num('light', 'Licht', { unit: 'px', min: 0, hint: 'Radius des Lichts in die Umgebung, 0 = nur Schein' }), select('behavior', 'Verhalten', LIGHT_BEHAVIORS)],
@@ -1721,6 +1734,9 @@ export const AREAS = {
       for (const n of x.bigClutter || []) if (B && !B.has(n)) report('error', `„${n}“ gibt es im Großer-Clutter-Raster nicht`);
       for (const r of x.sizes || []) if (!(P?.has(r.name) || B?.has(r.name))) report('warning', `Größe für „${r.name}“: gibt es in keinem Raster`);
       for (const r of x.glows || []) if (!(P?.has(r.name) || B?.has(r.name))) report('warning', `Leuchtet: „${r.name}“ gibt es in keinem Raster`);
+      dressingRowsCheck(x.dressing, report, 'Clutter-Regeln', n => P?.has(n) || B?.has(n));
+      const tagged = new Set((x.dressing || []).map(r => r.name));
+      if (tagged.size) for (const n of [...new Set([...(x.clutter || []), ...(x.bigClutter || [])])]) if (!tagged.has(n)) report('hint', `Clutter-Regeln: „${n}“ hat keine Zeile (steht dann auf jedem Boden)`);
     },
   },
   atmosphere: {

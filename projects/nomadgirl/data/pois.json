@@ -31,15 +31,68 @@
    "throwItem": "molotow"
   },
   "brandProps": [
-   {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 6, "ai": true},
-   {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 4, "ai": true},
-   {"look": "icons_nomadcola", "name": "Automat (Creme)", "cm": 175, "chance": 2, "ai": true},
-   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 4},
-   {"look": "icons_nomadcola", "name": "Kiste mit Flaschen (Holz)", "cm": 40, "chance": 4},
-   {"look": "icons_nomadcola", "name": "Sechserpack Dosen", "cm": 20, "chance": 3},
-   {"look": "icons_nomadcola", "name": "Automat (vernagelt)", "cm": 180, "chance": 3, "ai": true},
-   {"look": "icons_nomadcola", "name": "Automat (Neon)", "cm": 180, "chance": 2, "ai": true},
-   {"look": "icons_nomadcola", "name": "Kistenstapel", "cm": 80, "chance": 3}
+   {
+    "look": "icons_nomadcola",
+    "name": "Automat (Rot)",
+    "cm": 180,
+    "chance": 6,
+    "ai": true,
+    "place": "floor_in, floor_out, corner",
+    "tags": "automat, laden",
+    "roles": "shop, corridor"
+   },
+   {
+    "look": "icons_nomadcola",
+    "name": "Rostiger Automat",
+    "cm": 180,
+    "chance": 4,
+    "ai": true,
+    "place": "floor_in, floor_out, corner",
+    "tags": "automat, laden",
+    "roles": "shop, corridor, outdoor"
+   },
+   {
+    "look": "icons_nomadcola",
+    "name": "Automat (Creme)",
+    "cm": 175,
+    "chance": 2,
+    "ai": true,
+    "place": "floor_in, floor_out, corner",
+    "tags": "automat, laden",
+    "roles": "shop, corridor"
+   },
+   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 4, "place": "floor_in, floor_out", "tags": "küche, vorrat", "roles": "shop, living, outdoor"},
+   {
+    "look": "icons_nomadcola",
+    "name": "Kiste mit Flaschen (Holz)",
+    "cm": 40,
+    "chance": 4,
+    "place": "floor_in, floor_out, ledge",
+    "tags": "kiste, vorrat",
+    "roles": "shop, storage"
+   },
+   {"look": "icons_nomadcola", "name": "Sechserpack Dosen", "cm": 20, "chance": 3, "place": "floor_in, ledge", "tags": "vorrat, müll", "roles": "shop, living"},
+   {
+    "look": "icons_nomadcola",
+    "name": "Automat (vernagelt)",
+    "cm": 180,
+    "chance": 3,
+    "ai": true,
+    "place": "floor_in, floor_out, corner",
+    "tags": "automat, laden",
+    "roles": "shop, corridor, outdoor"
+   },
+   {
+    "look": "icons_nomadcola",
+    "name": "Automat (Neon)",
+    "cm": 180,
+    "chance": 2,
+    "ai": true,
+    "place": "floor_in, corner",
+    "tags": "automat, laden, licht",
+    "roles": "shop, corridor"
+   },
+   {"look": "icons_nomadcola", "name": "Kistenstapel", "cm": 80, "chance": 3, "place": "floor_in, corner", "tags": "kiste", "roles": "storage, shop"}
   ]
  },
  "grossmarkt": {
@@ -66,9 +119,27 @@
    "loadout": [{"head": "hood", "chance": 40},{"enemy": "schrotflinter", "weapon": "nagelpistole", "chance": 30},{"enemy": "gewehrschuetze", "weapon": "rohrpistole", "chance": 25}]
   },
   "brandProps": [
-   {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 3, "ai": true},
-   {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 3, "ai": true},
-   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2}
+   {
+    "look": "icons_nomadcola",
+    "name": "Automat (Rot)",
+    "cm": 180,
+    "chance": 3,
+    "ai": true,
+    "place": "floor_in, floor_out, corner",
+    "tags": "automat, laden",
+    "roles": "shop, corridor"
+   },
+   {
+    "look": "icons_nomadcola",
+    "name": "Rostiger Automat",
+    "cm": 180,
+    "chance": 3,
+    "ai": true,
+    "place": "floor_in, floor_out, corner",
+    "tags": "automat, laden",
+    "roles": "shop, corridor, outdoor"
+   },
+   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2, "place": "floor_in, floor_out", "tags": "küche, vorrat", "roles": "shop, living, outdoor"}
   ]
  },
  "bunker_13": {
@@ -188,9 +259,27 @@
   },
   "description": "Ein Parkhaus voller ausgebrannter Autos. Jede Ebene ein Revier, oben auf dem Dach die Kasse.",
   "brandProps": [
-   {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 2, "ai": true},
-   {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 2, "ai": true},
-   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2}
+   {
+    "look": "icons_nomadcola",
+    "name": "Automat (Rot)",
+    "cm": 180,
+    "chance": 2,
+    "ai": true,
+    "place": "floor_in, floor_out, corner",
+    "tags": "automat, laden",
+    "roles": "shop, corridor"
+   },
+   {
+    "look": "icons_nomadcola",
+    "name": "Rostiger Automat",
+    "cm": 180,
+    "chance": 2,
+    "ai": true,
+    "place": "floor_in, floor_out, corner",
+    "tags": "automat, laden",
+    "roles": "shop, corridor, outdoor"
+   },
+   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2, "place": "floor_in, floor_out", "tags": "küche, vorrat", "roles": "shop, living, outdoor"}
   ]
  },
  "funkmast_km31": {
@@ -244,9 +333,27 @@
   },
   "description": "Eine U-Bahn-Station unter der Stadtgrenze. Unten im Stellwerk sitzt, wer die Linie 4 kontrolliert.",
   "brandProps": [
-   {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 2, "ai": true},
-   {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 2, "ai": true},
-   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2}
+   {
+    "look": "icons_nomadcola",
+    "name": "Automat (Rot)",
+    "cm": 180,
+    "chance": 2,
+    "ai": true,
+    "place": "floor_in, floor_out, corner",
+    "tags": "automat, laden",
+    "roles": "shop, corridor"
+   },
+   {
+    "look": "icons_nomadcola",
+    "name": "Rostiger Automat",
+    "cm": 180,
+    "chance": 2,
+    "ai": true,
+    "place": "floor_in, floor_out, corner",
+    "tags": "automat, laden",
+    "roles": "shop, corridor, outdoor"
+   },
+   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2, "place": "floor_in, floor_out", "tags": "küche, vorrat", "roles": "shop, living, outdoor"}
   ],
   "brandSign": false
  },
@@ -318,9 +425,27 @@
   },
   "description": "Eine Raffinerie, die noch tropft. Die Crude Boys zapfen ab, was die Tanks hergeben.",
   "brandProps": [
-   {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 1, "ai": true},
-   {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 1, "ai": true},
-   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2}
+   {
+    "look": "icons_nomadcola",
+    "name": "Automat (Rot)",
+    "cm": 180,
+    "chance": 1,
+    "ai": true,
+    "place": "floor_in, floor_out, corner",
+    "tags": "automat, laden",
+    "roles": "shop, corridor"
+   },
+   {
+    "look": "icons_nomadcola",
+    "name": "Rostiger Automat",
+    "cm": 180,
+    "chance": 1,
+    "ai": true,
+    "place": "floor_in, floor_out, corner",
+    "tags": "automat, laden",
+    "roles": "shop, corridor, outdoor"
+   },
+   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2, "place": "floor_in, floor_out", "tags": "küche, vorrat", "roles": "shop, living, outdoor"}
   ],
   "brand": "delta_petrol"
  },
@@ -349,9 +474,27 @@
   },
   "description": "Ein Trailerpark am Highway. Früher Rentner, heute Leute mit Gewehren auf Liegestühlen.",
   "brandProps": [
-   {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 2, "ai": true},
-   {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 2, "ai": true},
-   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2}
+   {
+    "look": "icons_nomadcola",
+    "name": "Automat (Rot)",
+    "cm": 180,
+    "chance": 2,
+    "ai": true,
+    "place": "floor_in, floor_out, corner",
+    "tags": "automat, laden",
+    "roles": "shop, corridor"
+   },
+   {
+    "look": "icons_nomadcola",
+    "name": "Rostiger Automat",
+    "cm": 180,
+    "chance": 2,
+    "ai": true,
+    "place": "floor_in, floor_out, corner",
+    "tags": "automat, laden",
+    "roles": "shop, corridor, outdoor"
+   },
+   {"look": "icons_nomadcola", "name": "Kühlbox", "cm": 50, "chance": 2, "place": "floor_in, floor_out", "tags": "küche, vorrat", "roles": "shop, living, outdoor"}
   ],
   "brandSign": false
  },
