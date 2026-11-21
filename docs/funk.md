@@ -294,12 +294,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #167 POI G1: Erzählschicht (Storylets, Tropes, Zeitschichten, Spuren)
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „POI overhaul hat eine neue Phase bekommen“ → G1 + G2 bauen; Texte schreibt Code als ⚠️ Entwurf; PixelLab bis ≈ 150)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „POI overhaul hat eine neue Phase bekommen“ → G1 + G2 bauen; Texte schreibt Code als ⚠️ Entwurf; PixelLab bis ≈ 150)
 - **Für:** Code
 - **Lesen:** `docs/concepts/poi_next_gen.md` (führend, G1 + Entschieden), `poi_bible.md`, `poi_steckbriefe.md`, #159/#160.
 - **Auftrag:** Storylet-Katalog (Zettel, Durchsagen, Funk, Radio-Gerüchte, Ortsfenster; Bedingungen; erscheinen in der Welt, wandern ins Logbuch; AvA kommentiert wichtige Funde; Splitter-Faden zu AvA als Kette), Tropes als Spuren-Bausteine mit Bedingungen (Tote ehrlich, moderater Gore), Zeitschichten je POI (1–3 Zwischenbesitzer per Ersetzungs-Grammatik, Revierkrieg schreibt neue Schichten), Leylas Spuren verblassen über einige Tage im Durchgang, dann räumen neue Bewohner auf. Alle POIs zugleich, alles in der Werkstatt, Tests.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: **alle 107 Storylet-Texte Entwurf**; der Faden erfindet Lore (AvA als Tankkind „K-40-117“, Ebene 38/40, Leyla in Kessler-Jacke im Lieferausgang) – absegnen; Faden-Reihenfolge fest, bleibt über neuen Durchgang; Boss steht wieder (ein Neuer), Fleck mit Kreidekreis erinnert; Spuren 4 Tage, verblassen bis 35 %; Tropes nie auf Plattformen, nie im ersten Raum; Tote moderat (Gesichter verdeckt, getrocknete Flecken, ein Trope mit Knochen), Gore-Grenze 2, Kinderspuren 20 %; Splitter 100 % je Besuch bis gefunden; AvA-Symbol `air` sieht aus wie ein Flugzeug.
+- **Ergebnis:** (Code, per Helfer, `2af4a73`, `252f17d`, `045c0a3`, `8c913a3`) `engine/storylets.js`, `engine/history.js`, `engine/tropes.js`, `game/play/story_fx.js`; Werkstatt › Welt: Storylets (107: 47 Zettel, 13 Splitter, 13 Faden, 12 Gerüchte, 9 Durchsagen, 3 Funk, 7 AvA, 3 Ortsfenster), Tropes (13, 9 gemalt), Zeitschichten (11 Besetzer, 1–3 je Ort). Zettel/Splitter mit E, Durchsage/Funk/AvA beim Betreten, Logbuch-Kategorie Story, AvA kommentiert; Leylas Spuren bleiben und verblassen, nach 4 Tagen räumen neue Bewohner auf (neue Zeitschicht), Revierkrieg schreibt Schichten; Radio-Gerüchte, Ortsfenster mit Storylet + jüngster Schicht; `save.story` mit Reparatur. Tests npm 429, story_test 23, poi 33, poi_levels 9, poi_stack 8, game 53, map 18, radio 13, turf 10, workshop 62; Audits 0. **PixelLab 135** (1.305,6 → 1.170,6). **Bitte testen:** Tankstelle (Durchsage, AvA, Zettel mit E → Logbuch › Story), Splitter, Kiste öffnen und wiederkommen, nach ein paar Tagen aufgeräumt.
 
 ### #168 POI G2: Zyklus-Graph vor den Räumen
 - **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: G1 + G2)
