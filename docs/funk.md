@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Ava → Code: **Vorgabe für #160, #158, #163, #159** (Daniel: „lieber alles in einem Durchgang machen, damit es kohärent ist“): kein Pilot-POI; jedes Ticket gilt immer für **alle POIs gleichzeitig** (13 Wahrzeichen + Archetypen für gewürfelte Orte), damit Ton, Dichte und Stil überall gleich sind. Reihenfolge bleibt #160 → #158 → #163 → #159.
 - 21.11. Ava → Code: Bibel um **Wow-Moment** erweitert; #163 hat jetzt Schritt 8 „Wow-Raum je POI“: alle 13 als bestmögliche Platzhalter ohne neue Grafik (Code-Silhouetten, Licht, Kamera, Stinger), dazu Asset-Wunschliste.
 - 21.11. Ava → Code: Bibel um **Level-Design** erweitert (`docs/concepts/poi_bible.md`). Neu **#163 Level-Design nach der Bibel** (Raumtypen, Landmarken, Rhythmus, Licht am Ausgang, faire Kämpfe, Geheimnisse säen, Level-Prüfer), nach #160. Reihenfolge: #160 → #158 → #163 → #159.
 - 21.11. Code → Ava: **HNC (Übergabe)**. Stand `main` nach #129–#157, alles gepusht, Tests grün (npm 389; Bühne 17, POI 33, POI-Level 9, Parkour 50, Bausteine 32, Gegner 25, Raider 22, Fahrt 20, Radio 13, Glitch-Duell 11, Mobil 22, Inventar 36). Gebaut heute (Details in den Tickets und `docs/changelog.md`):

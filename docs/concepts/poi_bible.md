@@ -432,6 +432,8 @@ Zuerst entstehen die Story-Steckbriefe aller POIs und Räume (Ava schreibt, Dani
 | #163 Level-Design | Raumtypen, Wow-Raum je POI (Platzhalter), Landmarken, Rhythmus, Licht am Ausgang, faire Kampfräume, Geheimnisse säen, Level-Prüfer | Brotkrumen aus Spuren zusammen mit #159 |
 | #159 Stufe 2 | Ordnung + Verfall, Spuren aus der Story, Wüste kriecht rein, Rückwand-Clutter, Lernen aus Korrekturen | austauschbare Chunks, Dressing-Galerie, Lesbarkeit (Clutter gedämpft) |
 
+**Alle POIs in einem Durchgang** (Daniel, 21.11.2026): kein Pilot-POI, jedes Ticket gilt für alle POIs zugleich, damit alles kohärent bleibt.
+
 **Grenzen für alle:** Raum-Layouts bleiben (außer Marker-Zeichen), Erreichbarkeit (#145) wird nicht schlechter, Spielstände bleiben gültig, alles in der Werkstatt einstellbar. PixelLab sparsam: #158 höchstens ~40, #159 höchstens ~60.
 
 ### Offene Fragen
