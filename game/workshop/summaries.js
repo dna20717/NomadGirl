@@ -289,11 +289,12 @@ export const SUMMARY = {
 
   // the drive (#053): the landscape of a region at an hour and in a weather, moving; the rig is the game's own (here only its lights)
   travel(w, x) {
-    const D = w.p.data, c = el('canvas', { width: 960, height: 540, style: 'width:100%;border-radius:6px;background:#060508' }), bg = Object.assign(document.createElement('canvas'), { width: BW, height: BH });
+    const D = w.p.data, c = el('canvas', { width: 960, height: 540, style: 'width:100%;border-radius:6px;background:#060508' }), bg = Object.assign(document.createElement('canvas'), { width: BW * 2, height: BH * 2 });
     const base = new URL('../../projects/nomadgirl/', import.meta.url), L = D.assets?.[D.worldmap?.logos];
     let logos = null; if (L?.file) { const i = new Image(); i.onload = () => { logos = i; }; i.src = new URL(L.file, base).href; }
     const P = w.drivePreview ??= { region: '', hour: 18.4, weather: 'clear', stop: '' };
-    const road = makeRoad(D, { seed: 7, logos: () => logos, brands: mapBrands(D) });
+    const imgs = {}, art = id => { const f = D.assets?.[id]?.file; if (!f) return null; if (!imgs[f]) { imgs[f] = new Image(); imgs[f].src = new URL(f, base).href; } return imgs[f].complete && imgs[f].naturalWidth ? imgs[f] : null; };   // #147 painted pieces
+    const road = makeRoad(D, { seed: 7, logos: () => logos, brands: mapBrands(D), art });
     const regions = ['', ...(x.landscapes || []).map(r => r.region).filter(Boolean)];
     const sel = (key, opts) => { const s = el('select', { class: 'ed-input', onchange: e => { P[key] = e.target.value; } }, ...opts.map(([v, n]) => { const o = el('option', { value: v }, n); if (String(P[key]) === String(v)) o.selected = true; return o; })); return s; };
     const hour = el('input', { type: 'range', min: 0, max: 24, step: 0.1, value: P.hour, oninput: e => { P.hour = +e.target.value; } }), clock = el('span', { class: 'ed-small' });
@@ -307,7 +308,7 @@ export const SUMMARY = {
       const k = Math.min(1, dt * 2); st.wet += ((P.weather === 'rain') - st.wet) * k; st.dust += ((P.weather === 'dust') * 0.8 - st.dust) * k; st.fog += ((P.weather === 'fog') * 0.8 - st.fog) * k;
       st.flash = Math.max(0, st.flash - dt * 4); if (st.wet > 0.6 && Math.random() < dt * 0.15) { st.flash = 1; road.strike(); }
       if (P.stop) { st.stop ??= { kind: P.stop, x: BW * 0.75 }; st.stop.kind = P.stop; st.stop.x = BW * 0.75; } else st.stop = null;
-      road.draw(bg.getContext('2d'), st);
+      st.ws = 0.15; road.draw(bg.getContext('2d'), st, 2);
       const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false; ctx.drawImage(bg, 0, 0, c.width, c.height); road.ads(ctx, c.width, c.height, st);
       road.light(ctx, c.width, c.height, st, { front: c.width * 0.62, lampY: c.height * 0.78, back: c.width * 0.3, tailY: c.height * 0.8 });
       road.front(ctx, c.width, c.height, st);
@@ -319,7 +320,7 @@ export const SUMMARY = {
       el('div', { style: 'display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px' },
         sel('region', regions.map(r => [r, r || 'Andere Regionen'])), sel('weather', [['clear', 'Klar'], ['rain', 'Regen'], ['dust', 'Staub'], ['fog', 'Nebel']]),
         sel('stop', ROADSIDE.map(([v, n]) => [v, v ? n : 'Kein Zwischenfall'])), hour, clock),
-      el('p', { class: 'ed-small' }, 'Landschaft, Licht und Wetter aus Code. Im Spiel fährt davor das echte Rig, die Figuren am Rand sind die Gegner-Bausätze.')) };
+      el('p', { class: 'ed-small' }, 'Gemalte Ebenen, Straße, Boden und Zwischenfälle aus Reisen › Fahrt · Grafiken, Licht und Wetter aus Code. Im Spiel fährt davor das echte Rig, die Figuren am Rand sind die Gegner-Bausätze.')) };
   },
 
   // the Ereignis-Baukasten (#054): six incidents rolled from the parts, with danger and night; „Neu würfeln“ rolls six others

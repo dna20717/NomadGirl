@@ -19,7 +19,7 @@ await page.addInitScript(() => {
   window.setPad = (press = []) => pad.buttons.forEach((b, i) => { b.pressed = press.includes(i); b.value = b.pressed ? 1 : 0; });
   navigator.getGamepads = () => [pad, null, null, null];
 });
-await page.goto('http://localhost:8766/game.html?camp&new');
+await page.goto((process.env.GAME_URL || 'http://localhost:8766/game.html') + '?camp&new');
 await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.camp, null, { timeout: 40000 });
 await ev(() => { nomad.take(); nomad.step(20); window.SC = () => game.scene.getScene('play'); });
 const tap = async b => { await ev(x => { setPad([x]); nomad.step(2); setPad(); nomad.step(2); }, b); };
@@ -110,7 +110,7 @@ v = await ev(async () => { const { newCycle } = await import('/game/save.js'); c
 check('Neuer Durchgang: neue Karte, wieder an der Tankstelle', !v.same && v.mapCycle === v.cycle && v.here === 'tankstelle_km7', v);
 
 // the workshop: Reisekarte with a preview and „Neu würfeln“
-await page.goto('http://localhost:8766/workshop.html');
+await page.goto((process.env.GAME_URL || 'http://localhost:8766/game.html').replace('game.html', 'workshop.html'));
 await page.waitForFunction(() => window.workshop?.p?.data, null, { timeout: 20000 });
 await ev(() => workshop.go({ area: 'worldmap' }));
 await page.waitForTimeout(1200);

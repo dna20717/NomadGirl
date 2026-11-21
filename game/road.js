@@ -33,6 +33,16 @@ export function driveConfig(D) {
     avaRope: R.avaRope ?? 46, avaSize: R.avaSize ?? 0.42, silhouettes: R.silhouettes !== false,
     music: Array.isArray(R.music) ? R.music : [], musicVolume: R.musicVolume ?? 40 };   // #117 the fast passages of Daniel's intro music   // #115
 }
+// #147 (Daniel 21.11.2026: „Auf dem Reise-Bildschirm sind viele Code-Grafiken, dabei haben wir doch jetzt inzwischen eine Menge cooler
+// Grafiken und Tiles dafür“): painted pieces of the drive (Reisen › Fahrt › Grafiken). Empty = drawn by code as before.
+export const INCIDENT_FX = 'fire = Feuer oben, glow = Lichtschein + Funken, lamp = Laterne oben rechts, blink = Warnblinker, smoke = Rauch';
+export function driveArt(D) {
+  const A = D?.travel?.drive?.art || {};
+  return { road: A.road || null, roadTurn: A.roadTurn !== false, roadSquash: clamp((A.roadSquash ?? 33) / 100, 0.05, 1), ground: A.ground || null, plain: A.plain || null,
+    billboard: A.billboard || null, screenAt: A.screenAt || [22, 26], screenSize: A.screenSize || [196, 62], billboardSize: (A.billboardSize ?? 150) / 100,
+    pole: A.pole || null, poleCell: A.poleCell || '1', weed: A.weed || null, weedCell: A.weedCell || '1', propGap: Math.max(16, A.propGap ?? 260),
+    props: Array.isArray(A.props) ? A.props.filter(p => p?.look) : [], incidents: Array.isArray(A.incidents) ? A.incidents.filter(p => p?.kind && p.look) : [] };
+}
 const LAND = { region: '', relief: 'mesas', far: '#8e5252', mid: '#a08662', ground: '#dba463', road: '#333941', plants: '#5a4e44', rock: '#71413b',
   ruins: 15, wrecks: 12, towers: 6, signs: 10, plantsN: 30, poles: 1, pylons: 0, city: 20, dust: 15, fog: 10 };
 export function landscapeOf(D, region) {
@@ -78,6 +88,167 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
   const clouds = Array.from({ length: 16 }, (_, i) => ({ x: hash(i, seed + 3), y: 14 + hash(i, seed + 4) * 70, w: 24 + hash(i, 7) * 80, h: 2 + Math.floor(hash(i, 8) * 3), v: 0.4 + hash(i, 10) }));
   const drops = [], motes = [], weeds = [];
   let bolt = null;
+
+  // ---------- #147 painted pieces (Reisen › Fahrt › Grafiken) ----------
+  // draw() paints into a canvas n device pixels per background pixel: the code's pixels stay chunky, the painted art is drawn finer
+  const ART = driveArt(D);
+  let n = 1;
+  const imgOf = id => { if (!id || !art) return null; const i = art(id); return i && i.complete !== false && (i.naturalWidth || i.width) ? i : null; };
+  // load everything once up front, so the code look shows only for a moment
+  if (art) for (const id of [ART.road, ART.ground, ART.plain, ART.billboard, ART.pole, ART.weed, ...ART.props.map(p => p.look), ...ART.incidents.map(p => p.look)]) imgOf(id);
+  const cellsOf = s => String(s ?? '').split(',').map(x => x.trim()).filter(Boolean);
+  // one picture of an asset: a cell of a symbol grid (number from 1 or its name), a frame of an animation, or the whole image;
+  // h = its height in the world (the asset's „Höhe im Spiel“, else its pixels)
+  function sprite(id, cell = 1, t = 0) {
+    const A = D.assets?.[id], img = imgOf(id);
+    if (!A || !img) return null;
+    if (A.grid && A.cell) {
+      const N = A.grid[0] * A.grid[1], byName = (A.names || []).indexOf(String(cell)), i = byName >= 0 ? byName : clamp(Math.round(Number(cell) || 1) - 1, 0, N - 1);
+      return { img, sx: (i % A.grid[0]) * A.cell[0], sy: Math.floor(i / A.grid[0]) * A.cell[1], sw: A.cell[0], sh: A.cell[1], h: A.cell[1] };
+    }
+    if (A.frameSize) { const f = A.frames > 1 ? Math.floor(t * (A.fps || 8)) % A.frames : 0; return { img, sx: f * A.frameSize[0], sy: 0, sw: A.frameSize[0], sh: A.frameSize[1], h: A.height || A.frameSize[1] }; }
+    return { img, sx: 0, sy: 0, sw: img.naturalWidth, sh: img.naturalHeight, h: A.height || img.naturalHeight };
+  }
+  // the light of the hour on painted pixels, as tone() does to the code's colours: haze by depth, night, warm evening, rain, dust, fog
+  function shade(b, w, h, depth, S, st) {
+    b.globalCompositeOperation = 'source-atop';
+    if (depth > 0) { b.fillStyle = css(S.hor, depth * 0.55); b.fillRect(0, 0, w, h); }
+    const tint = tone('#808080', depth, S, st);
+    b.fillStyle = `rgba(${Math.round(tint[0] * 0.25)},${Math.round(tint[1] * 0.25)},${Math.round(tint[2] * 0.3)},${Math.min(0.9, S.dark * (1 - depth * 0.2))})`; b.fillRect(0, 0, w, h);   // near things darker at night than the far haze
+    if (S.warm > 0) { b.fillStyle = `rgba(250,106,10,${S.warm * 0.12})`; b.fillRect(0, 0, w, h); }
+    if (st.wet) { b.fillStyle = `rgba(58,60,80,${st.wet * 0.22})`; b.fillRect(0, 0, w, h); }
+    if (st.dust) { b.fillStyle = css(mix(hex('#c7b08b'), S.hor, 0.3).map(v => v * (1 - S.dark * 0.7)), st.dust * (0.15 + depth * 0.5)); b.fillRect(0, 0, w, h); }
+    if (st.fog) { b.fillStyle = css(mix([200, 205, 215], S.hor, 0.4).map(v => v * (1 - S.dark * 0.6)), st.fog * (0.1 + depth * 0.6)); b.fillRect(0, 0, w, h); }
+    b.globalCompositeOperation = 'source-over';
+  }
+  const lightKey = (S, st) => [S.h.toFixed(1), Math.round((st.wet || 0) * 5), Math.round((st.dust || 0) * 5), Math.round((st.fog || 0) * 5), Math.round((st.flash || 0) * 2), n].join();
+  // a sprite in the light of the hour, w × h background pixels standing on `bottom`; cached while the light stays the same
+  const spriteBuf = new Map(); let spriteKey = '';
+  function put(ctx, sp, x, bottom, w, h, depth, S, st, flip = false) {
+    if (!sp || w < 0.5 || h < 0.5) return;
+    const lk = lightKey(S, st);
+    if (lk !== spriteKey) { spriteBuf.clear(); spriteKey = lk; }
+    const pw = Math.max(1, Math.round(w * n)), ph = Math.max(1, Math.round(h * n)), key = [sp.img.src || sp.img.width, sp.sx, sp.sy, pw, ph, depth].join();
+    let b = spriteBuf.get(key);
+    if (!b) {
+      b = document.createElement('canvas'); b.width = pw; b.height = ph;
+      const c = b.getContext('2d'); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+      c.drawImage(sp.img, sp.sx, sp.sy, sp.sw, sp.sh, 0, 0, pw, ph); shade(c, pw, ph, depth, S, st);
+      if (spriteBuf.size > 400) spriteBuf.clear();
+      spriteBuf.set(key, b);
+    }
+    ctx.save(); ctx.imageSmoothingEnabled = false;
+    if (flip) { ctx.translate(x * 2 + w, 0); ctx.scale(-1, 1); }
+    ctx.drawImage(b, x, bottom - h, w, h); ctx.restore();
+  }
+  // a painted strip repeated sideways across the picture (mirrored every other time unless it is seamless), w × h background pixels a
+  // piece, bottom at `bottom`, passing at speed p; the shaded piece is cached while the light stays the same
+  const stripCache = new Map(), sids = new WeakMap(); let stripKey = '', sidN = 0;
+  const sid = o => { if (!sids.has(o)) sids.set(o, ++sidN); return sids.get(o); };
+  function strip(ctx, src, { sx = 0, sy = 0, sw = src.naturalWidth || src.width, sh = src.naturalHeight || src.height, w, h, bottom, p, depth, S, st, mirror = true }) {
+    const pw = Math.round(w * n), ph = Math.ceil(h * n);
+    if (pw < 2 || ph < 2) return;
+    const lk = lightKey(S, st);
+    if (lk !== stripKey) { stripCache.clear(); stripKey = lk; }
+    const key = [sid(src), sx, sy, sw, sh, pw, ph, depth, mirror].join();
+    let b = stripCache.get(key);
+    if (!b) {
+      b = document.createElement('canvas'); b.width = mirror ? pw * 2 : pw; b.height = ph;
+      const c = b.getContext('2d'); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+      c.drawImage(src, sx, sy, sw, sh, 0, 0, pw, ph);
+      if (mirror) { c.save(); c.translate(pw * 2, 0); c.scale(-1, 1); c.drawImage(src, sx, sy, sw, sh, 0, 0, pw, ph); c.restore(); }
+      shade(c, b.width, ph, depth, S, st);
+      stripCache.set(key, b);
+    }
+    const period = b.width, off = ((Math.round(st.dist * p * n) % period) + period) % period;
+    ctx.save(); ctx.imageSmoothingEnabled = false;
+    for (let x = -off; x < BW * n; x += period) ctx.drawImage(b, x / n, bottom - h, period / n, ph / n);
+    ctx.restore();
+  }
+  const glowAt = (ctx, gx, gy, r, col, a) => { const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, r); g.addColorStop(0, `rgba(${col},${a})`); g.addColorStop(1, `rgba(${col},0)`); ctx.fillStyle = g; ctx.fillRect(gx - r, gy - r, r * 2, r * 2); };
+  // the plain between the horizon and the road: the region's Parallax-Set › Ebene, else Fahrt › Grafiken › Ebene
+  function paintedPlain(ctx, st, S, L) {
+    const P = L.parallax && D.parallax?.[L.parallax], img = imgOf(P?.plain?.look || ART.plain);
+    if (!img) return false;
+    const top = HORIZON - 4, bottom = ROAD[0] + 2, h = bottom - top, w = img.naturalWidth * h / img.naturalHeight;
+    strip(ctx, img, { w, h, bottom, p: 0.22, depth: 0.22, S, st });
+    return true;
+  }
+  // the road: a strip seen from above (the cockpit's), turned along the drive and foreshortened into the band
+  let roadRot = null, roadSrc = null;
+  function paintedRoad(ctx, st, S) {
+    const img = imgOf(ART.road);
+    if (!img) return false;
+    let src = img;
+    if (ART.roadTurn) {
+      if (roadSrc !== img) { roadRot = document.createElement('canvas'); roadRot.width = img.naturalHeight; roadRot.height = img.naturalWidth; const c = roadRot.getContext('2d'); c.translate(roadRot.width, 0); c.rotate(Math.PI / 2); c.drawImage(img, 0, 0); roadSrc = img; }
+      src = roadRot;
+    }
+    const h = ROAD[1] - ROAD[0], sw = src.naturalWidth || src.width, sh = src.naturalHeight || src.height;
+    strip(ctx, src, { w: sw * (h / sh) / ART.roadSquash, h, bottom: ROAD[1], p: 1, depth: 0, S, st, mirror: false });
+    return true;
+  }
+  // the ground in front of the road: the camp's cut through the earth (surface row = its anchor), darker rock below it
+  function paintedGround(ctx, st, S, L, ws) {
+    const A = D.assets?.[ART.ground], img = imgOf(ART.ground);
+    if (!img) return false;
+    const top = Math.min(img.naturalHeight - 4, A?.origin?.[1] ?? 0), sh = img.naturalHeight - top, h = sh * ws;
+    ctx.fillStyle = css(tone(D.camp?.ground?.deep || '#141013', 0, S, st)); ctx.fillRect(0, ROAD[1], BW, BH - ROAD[1]);
+    strip(ctx, img, { sy: top, sh, w: img.naturalWidth * ws, h, bottom: ROAD[1] + h, p: 1, depth: 0, S, st, mirror: false });
+    return true;
+  }
+  // things on the far shoulder (Fahrt › Grafiken › Am Straßenrand): one slot every „Abstand“ world pixels, the row by its chance among the
+  // rows of the region's Parallax-Set; a slot keeps its pick while it passes
+  const picks = new Map();
+  function roadside(ctx, st, S, ws) {
+    if (!ART.props.length) return;
+    const gap = ART.propGap * ws, off = st.dist, first = Math.floor((off - 60) / gap);
+    for (const k of picks.keys()) if (k < first - 4) picks.delete(k);
+    for (let i = first; i * gap - off < BW + 60; i++) {
+      if (!picks.has(i)) {
+        const [A, B, kk] = st.land, Lc = hash(i, seed + 77) < kk ? B : A, rows = ART.props.filter(r => !r.parallax || r.parallax === Lc.parallax);
+        const sum = rows.reduce((a, r) => a + (r.chance ?? 30), 0);
+        let roll = hash(i, seed + 81) * Math.max(100, sum);
+        const r = sum ? rows.find(r => (roll -= (r.chance ?? 30)) < 0) : null, cells = r ? cellsOf(r.cells) : [];
+        picks.set(i, r ? { r, cell: cells.length ? cells[Math.floor(hash(i, seed + 82) * cells.length)] : 1, flip: hash(i, seed + 83) < 0.5, dx: hash(i, seed + 80) * gap * 0.6 } : null);
+      }
+      const pk = picks.get(i); if (!pk) continue;
+      const sp = sprite(pk.r.look, pk.cell, st.t); if (!sp) continue;
+      const k = ws * (pk.r.size ?? 100) / 100, h = sp.h * k, w = sp.sw * h / sp.sh;
+      put(ctx, sp, i * gap - off + pk.dx, ROAD[0] + 2, w, h, 0.04, S, st, pk.flip);
+    }
+  }
+  // an incident drawn from Fahrt › Grafiken › Zwischenfälle (one row = one picture, at the world's scale), its effects from code
+  function incidentPainted(ctx, kind, x0, S, st, ws) {
+    const rows = ART.incidents.filter(r => r.kind === kind), t = st.t, y = ROAD[0] + 9;
+    const parts = rows.map(r => ({ r, sp: sprite(r.look, r.cell ?? 1, t) }));
+    if (!parts.length || parts.some(p => !p.sp)) return false;
+    for (const { r, sp } of parts) {
+      const k = ws * (r.size ?? 100) / 100, h = sp.h * k, w = sp.sw * h / sp.sh, x = x0 + (r.dx ?? 0) * ws;
+      put(ctx, sp, x, y, w, h, 0, S, st, !!r.flip);
+      for (const fx of cellsOf(r.fx)) incidentFx(ctx, fx, x, y - h, w, h, S, t);
+    }
+    return true;
+  }
+  function incidentFx(ctx, fx, x, top, w, h, S, t) {
+    const cx = x + w / 2;
+    if (fx === 'fire') {   // flames out of a barrel, a pool of light
+      const f = 0.7 + 0.3 * Math.sin(t * 23) * Math.sin(t * 7);
+      glowAt(ctx, cx, top, 10 + w * 1.6, '255,140,40', 0.35 * f);
+      for (let j = 0; j < 4; j++) { const fw = Math.max(1, Math.round(w * 0.5 - j * 1.2)); ctx.fillStyle = j < 2 ? `rgb(255,${130 + 60 * f},40)` : `rgb(255,${200 + 40 * f},90)`; ctx.fillRect(Math.round(cx - fw / 2 + Math.sin(t * 9 + j) * 0.6), Math.round(top - 1 - j * 1.5 - f), fw, 2); }
+    } else if (fx === 'glow') {   // a campfire's warm light and sparks
+      const f = 0.7 + 0.3 * Math.sin(t * 19) * Math.sin(t * 6.3);
+      glowAt(ctx, cx, top + h * 0.7, 20 + w * 1.5, '255,150,60', 0.4 * f);
+      for (let i = 0; i < 6; i++) { const life = (t * 0.7 + i / 6) % 1; ctx.fillStyle = `rgba(255,200,90,${1 - life})`; ctx.fillRect(Math.round(cx + Math.sin(t * 2 + i * 4) * 3 * life), Math.round(top - life * 20), 1, 1); }
+    } else if (fx === 'lamp') {   // a lantern up on its pole
+      const f = 0.8 + 0.2 * Math.sin(t * 5 + x), lx = x + w * 0.63, ly = top + h * 0.2;
+      glowAt(ctx, lx, ly, 6 + w * 0.6, '255,190,80', 0.35 * f * (0.4 + S.dark));
+    } else if (fx === 'blink') {   // hazard lights at both ends
+      if (Math.sin(t * 6) > 0) for (const bx of [x + 1, x + w - 2]) { glowAt(ctx, bx, top + h * 0.62, 9, '255,170,40', 0.6); ctx.fillStyle = 'rgb(255,190,60)'; ctx.fillRect(Math.round(bx), Math.round(top + h * 0.62), 1, 1); }
+    } else if (fx === 'smoke') {   // smoke rising from the top
+      for (let i = 0; i < 8; i++) { const life = (t * 0.3 + i / 8) % 1, r = 1 + life * 4; ctx.fillStyle = `rgba(70,64,72,${0.4 * (1 - life)})`; ctx.beginPath(); ctx.arc(cx + w * 0.2 + life * 8 + Math.sin(t + i) * 1.5, top - life * 26, r, 0, Math.PI * 2); ctx.fill(); }
+    }
+  }
 
   function drawSky(S, wet) {
     const key = [S.h.toFixed(2), Math.round(wet * 10)].join();
@@ -298,35 +469,30 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
   }
   // #115 the region's painted layers, half size in background pixels (the road is chunkier than the camp), mirrored repeat, toned like the
   // code landscape: haze by depth, warm evening, dark night, rain, dust and fog veil them. → drawn?
-  const layerBuf = document.createElement('canvas');
-  function painted(ctx, st, S, L) {
+  // near = the layers faster than 8 % (#147): they stand along the far side of the road instead of the code's hills and things
+  function painted(ctx, st, S, L, near = false) {
     const P = L.parallax && D.parallax?.[L.parallax];
     if (!P || !art) return false;
-    const layers = (P.layers || []).filter(l => (l.speed ?? 5) <= 8).map(l => ({ l, img: art(l.look) })).filter(x => x.img?.complete && x.img.naturalWidth);
+    const layers = (P.layers || []).filter(l => near ? (l.speed ?? 5) > 8 : (l.speed ?? 5) <= 8).map(l => ({ l, img: imgOf(l.look) })).filter(x => x.img);
     if (!layers.length) return false;
     layers.forEach(({ l, img }, i) => {
-      const k = (l.scale ?? 300) / 100 * (D.travel?.drive?.layerScale ?? 11) / 100, w = Math.round(img.naturalWidth * k), h = Math.round(img.naturalHeight * k);
+      const k = (l.scale ?? 300) / 100 * (D.travel?.drive?.layerScale ?? 11) / 100 * (near ? (D.travel?.drive?.nearScale ?? 70) / 100 : 1), w = img.naturalWidth * k, h = img.naturalHeight * k;
       if (w < 4 || h < 4) return;
-      const depth = Math.max(0, 0.75 - i * 0.3), bottom = HORIZON + 1 + Math.round((l.bottom ?? 0) * k * 0.25), p = (l.speed ?? 5) / 100 * 0.6;
-      layerBuf.width = BW; layerBuf.height = h;
-      const b = layerBuf.getContext('2d'); b.imageSmoothingEnabled = false; b.clearRect(0, 0, BW, h);
-      const off = ((st.dist * p) % (w * 2) + w * 2) % (w * 2);
-      for (let x = -off; x < BW; x += w * 2) {
-        b.drawImage(img, Math.round(x), 0, w, h);
-        b.save(); b.translate(Math.round(x + w * 2), 0); b.scale(-1, 1); b.drawImage(img, 0, 0, w, h); b.restore();
-      }
-      b.globalCompositeOperation = 'source-atop';
-      const tint = tone('#808080', depth, S, st), base = [128, 128, 128];   // what the code landscape does to a grey: apply it as an overlay
-      b.fillStyle = css(S.hor, depth * 0.55); b.fillRect(0, 0, BW, h);
-      b.fillStyle = `rgba(${Math.round(tint[0] * 0.25)},${Math.round(tint[1] * 0.25)},${Math.round(tint[2] * 0.3)},${Math.min(0.9, S.dark * 0.85)})`; b.fillRect(0, 0, BW, h);
-      if (S.warm > 0) { b.fillStyle = `rgba(250,106,10,${S.warm * 0.12})`; b.fillRect(0, 0, BW, h); }
-      b.globalCompositeOperation = 'source-over';
-      ctx.drawImage(layerBuf, 0, bottom - h);
+      const depth = near ? 0.06 : Math.max(0, 0.75 - i * 0.3), bottom = near ? ROAD[0] + 3 : HORIZON + 1 + Math.round((l.bottom ?? 0) * k * 0.25), p = near ? 0.55 : (l.speed ?? 5) / 100 * 0.6;
+      strip(ctx, img, { w, h, bottom, p, depth, S, st });
     });
     return true;
   }
-  function draw(ctx, st) {
-    const S = skyAt(st.hour), t = st.t, [A, B, k] = st.land, L = k < 0.5 ? A : B;
+  // st.ws: background pixels per world pixel (the rig's scale on screen, so props and people match Leyla and the van)
+  // n: device pixels per background pixel of ctx (the caller's canvas is BW·n × BH·n)
+  function draw(ctx, st, scale = 1) {
+    n = Math.max(1, scale);
+    ctx.save(); ctx.setTransform(n, 0, 0, n, 0, 0);
+    drawScene(ctx, st);
+    ctx.restore();
+  }
+  function drawScene(ctx, st) {
+    const S = skyAt(st.hour), t = st.t, [A, B, k] = st.land, L = k < 0.5 ? A : B, ws = st.ws || 0.15;
     drawSky(S, st.wet || 0);
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(sky, 0, 0);
@@ -395,11 +561,13 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
       city(ctx, st, S, L, t);
       drawLayer(ctx, st, S, { p: 0.03, base: HORIZON + 1, H: 46, depth: 0.85, s: seed + 11, color: 'far' });
     }
-    // the plain between the hills and the road: dithered, lighter towards the horizon (salt flats shine)
+    // the plain between the hills and the road: dithered, lighter towards the horizon (salt flats shine); #147 painted over it when there is art
+    const plain = !!art && !!(imgOf(L.parallax && D.parallax?.[L.parallax]?.plain?.look) || imgOf(ART.plain));
     for (let y = HORIZON + 1; y < BH; y++) {
       const kk = (y - HORIZON) / (BH - HORIZON), c = tone(L.ground, 0.75 * (1 - kk) + 0.05, S, st), c2 = tone(L.ground, 0.75 * (1 - kk) + 0.12, S, st);
+      if (plain) { ctx.fillStyle = css(c); ctx.fillRect(0, y, BW, 1); continue; }   // #147 under the painted plain: no dither, no pebbles
       for (let x = 0; x < BW; x += 4) { ctx.fillStyle = css(BAYER[(y & 3) * 4 + ((x >> 2) & 3)] < 6 ? c2 : c); ctx.fillRect(x, y, 4, 1); }
-      if (y < ROAD[0]) {   // pebbles and scrub on the plain: every row passes at its own speed, slow far away, fast near the road
+      if (y < ROAD[0] && !plain) {   // pebbles and scrub on the plain: every row passes at its own speed, slow far away, fast near the road
         const pp = 0.03 + 0.9 * Math.pow(kk / ((ROAD[0] - HORIZON) / (BH - HORIZON)), 1.6), o = st.dist * pp, dot = tone(L.plants, 0.75 * (1 - kk), S, st);
         ctx.fillStyle = css(dot, 0.7);
         for (let x = 0; x < BW; x++) if (hash(Math.floor(x + o), y * 131 + seed) < 0.012 + kk * 0.02) ctx.fillRect(x, y, kk > 0.3 ? 2 : 1, 1);
@@ -409,7 +577,10 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
       for (let y = 0; y < 6; y++) { const off = Math.round(Math.sin(t * 3 + y) * 2); ctx.globalAlpha = 0.35 * (1 - y / 6) * (1 - S.dark); ctx.drawImage(sky, 0, HORIZON - 4 - y, BW, 1, off, HORIZON + 2 + y, BW, 1); }
       ctx.globalAlpha = 1;
     }
-    drawLayer(ctx, st, S, { p: 0.14, base: 176, H: 24, depth: 0.45, s: seed + 12, color: 'mid', kind: L.relief === 'flat' ? 'flat' : L.relief === 'jagged' ? 'jagged' : 'hills' });
+    if (plain) paintedPlain(ctx, st, S, L);
+    // #147 the region's near painted layers stand in for the code's hills and the things in the middle distance
+    const nearArt = !!art && !!(L.parallax && (D.parallax?.[L.parallax]?.layers || []).some(l => (l.speed ?? 5) > 8 && imgOf(l.look)));
+    if (!nearArt) drawLayer(ctx, st, S, { p: 0.14, base: 176, H: 24, depth: 0.45, s: seed + 12, color: 'mid', kind: L.relief === 'flat' ? 'flat' : L.relief === 'jagged' ? 'jagged' : 'hills' });
     // giant digital billboards of the brands (#055, Daniel: „riesige digitale Billboards für unsere ganzen Brands … lass dort Werbung laufen“):
     // a steel frame on two masts towering over the plain; the picture on the screen is drawn sharp by ads() over the scaled background
     screens = [];
@@ -419,6 +590,15 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
         const x = Math.round(ci * cw - off + hash(ci, seed + 71) * 60), Lc = landAt(st, x / 0.1 + st.dist);
         if (hash(ci, seed + 70) * 100 >= (Lc.screens ?? 25)) continue;
         const w = 64 + Math.floor(hash(ci, seed + 72) * 3) * 8, h = Math.round(w * 0.55), y = 66 + Math.floor(hash(ci, seed + 73) * 14), base = 180;
+        const board = imgOf(ART.billboard);
+        if (board) {   // #147 the painted billboard (the cockpit's): the screen rect of the art gets the ads
+          const B = adList[Math.floor(hash(ci, seed + 74) * adList.length)], [ax, ay] = ART.screenAt, [aw, ah] = ART.screenSize;
+          const sw = w * ART.billboardSize, s = sw / aw, bw = board.naturalWidth * s, bh = board.naturalHeight * s, foot = base + 2, sy = foot - bh + ay * s;
+          put(ctx, { img: board, sx: 0, sy: 0, sw: board.naturalWidth, sh: board.naturalHeight }, x - ax * s, foot, bw, bh, 0.3, S, st);
+          if (S.dark > 0.2) { const g = ctx.createRadialGradient(x + sw / 2, foot, 2, x + sw / 2, foot, sw * 0.7); g.addColorStop(0, css(hex(B.color), 0.22 * S.dark)); g.addColorStop(1, css(hex(B.color), 0)); ctx.fillStyle = g; ctx.fillRect(x - sw, foot - sw, sw * 3, sw * 1.4); }
+          screens.push({ x, y: sy, w: sw, h: ah * s, brand: B, ph: hash(ci, seed + 75) * 20, ci });
+          continue;
+        }
         const steel = tone('#242234', 0.4, S, st), lit = tone('#4a5462', 0.35, S, st), B = adList[Math.floor(hash(ci, seed + 74) * adList.length)];
         ctx.fillStyle = css(steel);
         for (const mx of [x + Math.round(w * 0.25), x + Math.round(w * 0.75)]) { ctx.fillRect(mx - 1, y + h, 3, base - y - h); for (let yy = y + h + 6; yy < base; yy += 8) { ctx.fillRect(mx - 3, yy, 7, 1); } }
@@ -433,7 +613,8 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
     // things in the middle distance (p 0.35)
     const midOff = st.dist * 0.35, cw = 46;
     const brandsOn = brands.filter(b => b.icon != null);
-    for (let ci = Math.floor((midOff - 60) / cw); ci * cw - midOff < BW + 20; ci++) {
+    if (nearArt) painted(ctx, st, S, L, true);
+    else for (let ci = Math.floor((midOff - 60) / cw); ci * cw - midOff < BW + 20; ci++) {
       const x = Math.round(ci * cw - midOff + hash(ci, seed + 20) * 20), Lc = landAt(st, x / 0.35 + st.dist), r = hash(ci, seed + 21) * 100, y = 196;
       const c = tone(Lc.rock, 0.3, S, st), lit = S.dark;
       let acc = 0;
@@ -462,7 +643,12 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
       for (const w of weeds) {
         w.x -= ((st.v || 0) * 0.7 + w.v * (1 + (st.dust || 0) * 2)) * (st.dt || 0);   // rolls against the drive, faster in the wind
         if (w.x < -20) { w.x = BW + 20 + Math.random() * 400; w.v = 10 + Math.random() * 20; }
-        const y = 210 - Math.abs(Math.sin(t * 4 + w.ph)) * 4;
+        const y = 210 - Math.abs(Math.sin(t * 4 + w.ph)) * 4, sp = sprite(ART.weed, ART.weedCell);
+        if (sp) {   // #147 the painted tumbleweed, rolling
+          const hh = sp.h * ws, ww = sp.sw * hh / sp.sh;
+          ctx.save(); ctx.translate(w.x, y - hh * 0.4); ctx.rotate(-t * 5 - w.ph); put(ctx, sp, -ww / 2, hh / 2, ww, hh, 0.05, S, st); ctx.restore();
+          continue;
+        }
         ctx.fillStyle = css(tone('#796755', 0.1, S, st));
         for (let i = 0; i < 12; i++) { const a = i * 0.55 - t * 6; ctx.fillRect(Math.round(w.x + Math.cos(a) * 3), Math.round(y - 3 + Math.sin(a) * 3), 1, 1); }
         ctx.fillRect(Math.round(w.x) - 1, Math.round(y) - 4, 2, 2);
@@ -470,17 +656,23 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
     }
     // telegraph poles with two wires right by the road (p 0.8)
     if ((L.poles ?? 1) > 0) {
-      const off = st.dist * 0.8, gap = 70, c = tone('#423934', 0.08, S, st), xs = [];
+      const off = st.dist * 0.8, gap = 70, c = tone('#423934', 0.08, S, st), xs = [], sp = sprite(ART.pole, ART.poleCell);
+      // #147 a painted pole (the black silhouette of a power pole): the wires hang from its cross arm
+      const ph = 44, pw = sp ? sp.sw * ph / sp.sh : 0, arm = sp ? [Math.round(pw * 0.3), 172 + Math.round(ph * 0.1)] : [4, 174];
       for (let i = Math.floor((off - gap) / gap); i * gap - off < BW + gap; i++) {
         const x = Math.round(i * gap - off); xs.push(x);
+        if (sp) { put(ctx, sp, x - pw / 2, 172 + ph, pw, ph, 0.08, S, st); continue; }
         ctx.fillStyle = css(c); ctx.fillRect(x, 172, 2, 41); ctx.fillRect(x - 4, 175, 10, 1); ctx.fillRect(x - 4, 174, 1, 1); ctx.fillRect(x + 5, 174, 1, 1);
       }
-      ctx.strokeStyle = css(c, 0.9); ctx.beginPath();
-      for (let j = 0; j + 1 < xs.length; j++) for (const dx of [-4, 5]) { ctx.moveTo(xs[j] + dx + 0.5, 174.5); ctx.quadraticCurveTo((xs[j] + xs[j + 1]) / 2, 183, xs[j + 1] + dx + 0.5, 174.5); }
-      ctx.stroke();
+      ctx.strokeStyle = css(c, 0.9); ctx.lineWidth = sp ? 0.5 : 1; ctx.beginPath();
+      for (let j = 0; j + 1 < xs.length; j++) for (const dx of sp ? [-arm[0], arm[0]] : [-4, 5]) { ctx.moveTo(xs[j] + dx + 0.5, arm[1] + 0.5); ctx.quadraticCurveTo((xs[j] + xs[j + 1]) / 2, arm[1] + 9, xs[j + 1] + dx + 0.5, arm[1] + 0.5); }
+      ctx.stroke(); ctx.lineWidth = 1;
     }
+    roadside(ctx, st, S, ws);   // #147 painted things on the far shoulder
     // the road: shoulder, asphalt with grain and patches, the dashed middle line (p 1)
     const roff = st.dist, asphalt = tone(L.road, 0, S, st), dash = tone('#ffd541', 0, S, st), edge = tone('#c7b08b', 0.02, S, st);
+    const roadArt = paintedRoad(ctx, st, S);
+    if (!roadArt) {
     ctx.fillStyle = css(edge); ctx.fillRect(0, ROAD[0], BW, 2);
     ctx.fillStyle = css(asphalt); ctx.fillRect(0, ROAD[0] + 2, BW, ROAD[1] - ROAD[0] - 4);
     for (let x = 0; x < BW; x++) {
@@ -489,17 +681,19 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
       if (noise(wx / 30, seed + 42) > 0.9) { ctx.fillStyle = css(mix(asphalt, [10, 10, 14], 0.3)); ctx.fillRect(x, ROAD[0] + 6 + Math.floor(noise(wx / 13, 43) * 10), 1, 2); }
       if (((wx % 24) + 24) % 24 < 12) { ctx.fillStyle = css(dash, 1 - S.dark * 0.5); ctx.fillRect(x, 225, 1, 1); }
     }
+    }
     if (st.wet > 0.1) {   // wet asphalt mirrors the sky
       ctx.globalAlpha = 0.18 * st.wet; ctx.drawImage(sky, 0, HORIZON - 30, BW, 22, 0, ROAD[0] + 3, BW, ROAD[1] - ROAD[0] - 6); ctx.globalAlpha = 1;
     }
-    ctx.fillStyle = css(mix(asphalt, edge, 0.5)); ctx.fillRect(0, ROAD[1] - 2, BW, 2);
+    if (!roadArt) { ctx.fillStyle = css(mix(asphalt, edge, 0.5)); ctx.fillRect(0, ROAD[1] - 2, BW, 2); }
     // the incident stands on the road's far lane (over the asphalt); a dust storm is a wall rolling in from the right
     if (st.stop?.kind === 'storm' && st.stop.x != null) dustWall(ctx, st.stop.x, S, st, t);
-    else if (st.stop?.kind && st.stop.x != null) incident(ctx, st.stop.kind, Math.round(st.stop.x), S, t);
-    // the near ground below the road and tufts in front (p 1.5, dark)
+    else if (st.stop?.kind && st.stop.x != null && !incidentPainted(ctx, st.stop.kind, Math.round(st.stop.x), S, st, ws)) incident(ctx, st.stop.kind, Math.round(st.stop.x), S, t);
+    // the near ground below the road and tufts in front (p 1.5, dark); #147 the camp's painted ground instead
     const fo = st.dist * 1.5, fc = tone(L.ground, 0, S, st).map(v => Math.round(v * 0.62)), tuft = tone(L.plants, 0, S, st).map(v => Math.round(v * 0.55));
-    ctx.fillStyle = css(fc); ctx.fillRect(0, ROAD[1], BW, BH - ROAD[1]);
-    for (let x = -8; x < BW + 8; x++) {
+    const groundArt = paintedGround(ctx, st, S, L, ws);
+    if (!groundArt) { ctx.fillStyle = css(fc); ctx.fillRect(0, ROAD[1], BW, BH - ROAD[1]); }
+    if (!groundArt) for (let x = -8; x < BW + 8; x++) {
       const wx = Math.floor(x + fo);
       if (hash(wx, seed + 44) < 0.02) {   // a tuft of grass: blades fanning out
         ctx.fillStyle = css(tuft); const hh = 6 + Math.floor(hash(wx, 46) * 9);
@@ -557,7 +751,7 @@ export function makeRoad(D, { seed = 1, logos = null, brands = [], adBrandList =
       // the glow round the screen, stronger at night
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
       const gl = ctx.createRadialGradient(x + w / 2, y + h / 2, h * 0.3, x + w / 2, y + h / 2, w * 0.9); gl.addColorStop(0, css(col, 0.1 + 0.22 * S.dark)); gl.addColorStop(1, css(col, 0));
-      ctx.fillStyle = gl; ctx.fillRect(x - w * 0.5, y - h, w * 2, h * 3); ctx.restore();
+      ctx.fillStyle = gl; ctx.fillRect(x + w / 2 - w * 0.9, y + h / 2 - w * 0.9, w * 1.8, w * 1.8); ctx.restore();   // the whole circle (#147: flatter screens)
     }
   }
 
