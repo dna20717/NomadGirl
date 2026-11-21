@@ -52,7 +52,8 @@ await page.waitForTimeout(800);
 v = await ev(() => { R().tick(); const e = document.querySelector('.radio-chip'), r = e.getBoundingClientRect(), top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2); return { ...R().state(), over: !!top?.closest('.radio-chip') }; });
 check('Auf der Fahrt: Radio läuft weiter, Chip liegt über der Fahrt', v.allowed && v.playing && v.chip && v.over, v);
 await shot('drive');
-await page.waitForFunction(() => { const s = game.scene.getScene('play'); return s?.mode === 'camp' && !s.hud.drive?.isOpen && s.camp; }, null, { timeout: 60000 });
+// the drive started after release(): a roadside stop (#054 random incident) may hold it, then drive on with its fallback answer
+await page.waitForFunction(() => { const s = game.scene.getScene('play'); if (s?.hud.drive?.isOpen && s.hud.modal) s.hud.closeMenu(); return s?.mode === 'camp' && !s.hud.drive?.isOpen && s.camp; }, null, { timeout: 60000, polling: 250 });
 await page.waitForTimeout(800);
 await ev(() => { nomad.take(); nomad.step(5); SC().showDrive = false; SC().hud.sum?.close?.(); SC().hud.closeMenu?.(); });
 // a POI run: the radio stays in the rig
