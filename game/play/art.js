@@ -1,4 +1,4 @@
-import { placeTypes, fits } from '../../engine/dressing.js';
+import { placeTypes, fits, roleConfig, roleWeight, pickWeighted } from '../../engine/dressing.js';
 const WALLS = new Set(['#', 'A', '^', 'v']);   // drawn as wall (doors and brittle walls: game/play/poi_level.js)
 const CAMO = new Set(['%', '$']);   // fake walls and camouflaged brittle walls: drawn like the wall, on their own layer above Leyla
 // Code-drawn art for the MVP: sky and skyline of BigCityDelta, tiles, placeholder raiders, projectiles, particles.
@@ -300,7 +300,14 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
   if (spots && room === scene.room) scene.places_ = spots;
   const allowed = (rules, place, xs, y) => !rules || !spots || xs.every(xx => { const sp = spots.at(xx, y); return sp && fits(place, sp); });
   const ruleOf = (kit, key, f) => kit.rules?.size ? kit.rules.get(kit.nameOf(key, f)) || {} : null;
-  const pickOf = (kit, key, frames, xs, y, h) => { const ok = frames.filter(f => { const rl = ruleOf(kit, key, f); return allowed(rl, rl?.place, xs, y); }); return ok.length ? ok[Math.floor(h * ok.length)] : null; };
+  // #158 Raum-Rollen weight the choice (Raum-Bausteine › Rolle, Spiel › Set-Dressing › Rollen)
+  const roleCfg = roleConfig(scene.data_), roleAt = (x, y) => terrain?.reg?.roleAt?.(x, y) || 'general';
+  const pickOf = (kit, key, frames, xs, y, h) => {
+    const ok = frames.filter(f => { const rl = ruleOf(kit, key, f); return allowed(rl, rl?.place, xs, y); });
+    if (!kit.rules?.size) return ok.length ? ok[Math.floor(h * ok.length)] : null;
+    const role = roleAt(xs[0], y - 1);
+    return pickWeighted(ok, f => roleWeight(ruleOf(kit, key, f), role, roleCfg), h);
+  };
   // clutter stamp + where it stands, by name (game/play/atmosphere.js finds glowing things)
   const placed = (kit, key, frame, cx, ground) => {
     const st = propStamp(scene, kit, key, frame, cx, ground), f = scene.textures.getFrame(key, frame);
@@ -339,7 +346,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
         }
       }
       if (top && air && !cg && brands && !taken.has(x) && solid(x - 1, y) && solid(x + 1, y)) {   // Marken-Clutter (brandKit)
-        const fit = brands.list.filter(b => allowed(b.place != null, b.place, [x], y)), B = fit[Math.floor(hash(x, y, 31) * fit.length)] || brands.list[0], tall = fit.length ? Math.ceil(B.cm * brands.pxPerCm / T) : 99;
+        const fit = brands.list.filter(b => allowed(b.place != null, b.place, [x], y)), B = pickWeighted(fit, b => roleWeight(b, roleAt(x, y - 1), roleCfg), hash(x, y, 31)) || brands.list[0], tall = fit.length ? Math.ceil(B.cm * brands.pxPerCm / T) : 99;
         let room_ = true; for (let k = 1; k <= tall; k++) if (room.tiles[y - k]?.[x] !== '.') room_ = false;
         if (room_ && hash(x, y, 37) * 100 < B.chance) { clutter.push({ ...placed(brands, B.key, B.frame, px + T / 2, py + 4), ai: B.ai }); taken.add(x); taken.add(x + 1); }   // #096 (Daniel: „chaotisch“): fridges and shelves no longer stand inside each other   // ai: a KI lives in it (poi_level.js hosts, #052)
       }

@@ -115,3 +115,27 @@ export function fits(place, spot) {
   if (!P.includes(spot.type)) return P.includes('corner') && !!spot.corner && !P.some(p => STANDING.has(p)) && (spot.type === 'floor_in' || spot.type === 'floor_out');
   return true;
 }
+
+// Raum-Rollen (#158 step 3): how much a thing fits a room. Its own roles: 3× when the room's role is among them, ¼ when it names
+// others; the role's preferred tags (Spiel › Set-Dressing › Rollen) 2×, avoided tags ¼. → weight ≥ 0
+export function roleConfig(D) {
+  const m = new Map();
+  for (const r of D?.game?.dressing?.roles || []) if (r.role) m.set(r.role, { prefer: list(r.prefer), avoid: list(r.avoid) });
+  return role => m.get(role) || { prefer: [], avoid: [] };
+}
+export function roleWeight(rule, role, cfg) {
+  let w = rule?.weight ?? 1;
+  const roles = list(rule?.roles), tags = list(rule?.tags), c = cfg ? cfg(role) : { prefer: [], avoid: [] };
+  if (roles.length) w *= roles.includes(role) ? 3 : 0.25;
+  if (tags.some(t => c.prefer.includes(t))) w *= 2;
+  if (tags.some(t => c.avoid.includes(t))) w *= 0.25;
+  return w;
+}
+// pick by weight with a number r in [0, 1)
+export function pickWeighted(items, weightOf, r) {
+  const ws = items.map(weightOf), sum = ws.reduce((a, b) => a + b, 0);
+  if (!(sum > 0)) return null;
+  let t = r * sum;
+  for (let i = 0; i < items.length; i++) { t -= ws[i]; if (t < 0) return items[i]; }
+  return items.at(-1);
+}

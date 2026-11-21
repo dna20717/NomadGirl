@@ -132,5 +132,19 @@
  "roomTitle": {"enabled": true, "ms": 2600},
  "voice": {"enabled": true, "volume": 70, "bubbles": 60, "max": 4, "leyla": true, "barks": true, "barkGap": 4, "barkChance": 35},
  "sfx": {"enabled": true, "volume": 60, "ui": true, "footsteps": true, "stride": 150, "strideWalk": 115, "burst": 10},
- "vault": {"look": "vault_closed", "open": "vault_open", "cm": 230}
+ "vault": {"look": "vault_closed", "open": "vault_open", "cm": 230},
+ "dressing": {
+  "roles": [
+   {"role": "shop", "prefer": "laden, kasse, regal, automat, vorrat", "avoid": "militär, werkbank"},
+   {"role": "storage", "prefer": "kiste, regal, fass, vorrat, kanister, palette", "avoid": "sitz, bett"},
+   {"role": "office", "prefer": "büro, papier, sitz, tisch, grün", "avoid": "reifen, fass, schrott"},
+   {"role": "hall", "prefer": "technik, werkbank, fass, kiste, werkzeug", "avoid": "bett, laden"},
+   {"role": "living", "prefer": "bett, sitz, tisch, küche, spind, vorrat", "avoid": "gefahr, schrott"},
+   {"role": "tech", "prefer": "technik, kabel, rohr, werkzeug", "avoid": "laden, grün"},
+   {"role": "corridor", "prefer": "müll, schild, putz, sitz", "avoid": "bett, tisch"},
+   {"role": "outdoor", "prefer": "grün, stein, wrack, schild, straße, knochen", "avoid": "büro, bett"},
+   {"role": "combat", "prefer": "sperre, sandsack, kiste, fass", "avoid": "bett, grün"},
+   {"role": "cave", "prefer": "stein, knochen, kabel", "avoid": "laden, büro"}
+  ]
+ }
 }
