@@ -315,7 +315,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code, per Helfer) Bunker-Schleuse: Durchgang unter dem Rohrblock 2 Kacheln hoch, nur rutschend (jetzt Teil des Hauptwegs); Testraum: freie Plattformen stehen auf Gerüsten. `parcours_test` 50, Prüfwerkzeug grün.
 
 ### #158 Set-Dressing nach Regeln: Clutter mit Ort, Ensembles, Autotiling, Prüfer
-- **Status:** offen · angelegt 21.11. von Ava
+- **Status:** läuft (21.11., Code) · angelegt 21.11. von Ava
 - **Für:** Code
 - **Anlass (Daniel, 21.11.2026):** „Ich habe ein Problem damit, wie POI-Maps gestaltet sind. Wie können wir hübschere, echter anfühlende Maps erschaffen, ohne dass ich alles selbst machen muss? … Clutter wird manchmal zu gehäuft eingesetzt, manchmal falsch (ein Baum oben auf einem Hochhaus), und auch die Tilesets werden nicht korrekt genutzt.“ Daniels Wahl: **alles in ein Ticket**, Dichte **„bewohnt“**, Raum-Rollen **setzt Ava vorab, Daniel korrigiert**.
 - **Abhängig:** erst nach **#156** (Gelände orthogonal, sanfte Schicht-Übergänge, Höhle, Stützen) bauen, dessen Kacheln und Übergänge übernehmen und nicht doppelt anfassen. #144 (Schichtung nach Tiefe) bleibt.
