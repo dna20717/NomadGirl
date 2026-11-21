@@ -29,6 +29,7 @@ import { slowClock } from './slowmo.js';
 import { Atmosphere } from './atmosphere.js';
 import { LevelFx } from './level_fx.js';
 import { DressingFx } from './dressing_fx.js';
+import { StoryFx } from './story_fx.js';
 import { landmarkViews } from '../../engine/level_design.js';
 import { Drone } from './drone.js';
 import { Van } from './van.js';
@@ -92,7 +93,8 @@ export class PlayScene extends Phaser.Scene {
     if (this.data_.game?.ladder?.scaffold) ids.add(this.data_.game.ladder.scaffold);   // #156 scaffold towers outdoors
     for (const t of Object.values(this.data_.terrain || {})) for (const id of [t.look, t.props, t.propsBig]) if (id) ids.add(id);   // Kachel-Sets (TileSet00)
     for (const P of Object.values(this.data_.pois || {})) for (const b of P.brandProps || []) if (b.look) ids.add(b.look);   // Marken-Clutter (NomadCola-Automaten …)
-    for (const P of Object.values(this.data_.pois || {})) for (const id of [P.wow?.image, P.level?.landmarkImage]) if (id) ids.add(id);   // #165 painted Wow motifs and landmarks
+    for (const P of Object.values(this.data_.pois || {})) for (const id of [P.wow?.image, P.level?.landmarkImage]) if (id) ids.add(id);
+    for (const t of Object.values(this.data_.tropes || {})) if (t.image) ids.add(t.image);   // #167 painted tropes   // #165 painted Wow motifs and landmarks
     if (this.data_.worldmap?.logos) ids.add(this.data_.worldmap.logos);
     for (const k of ['look', 'open']) if (this.data_.game?.vault?.[k]) ids.add(this.data_.game.vault[k]);   // #153 the painted vault   // the brand sign at a POI's entrance
     const DR = this.data_.drone || {};
@@ -434,6 +436,7 @@ export class PlayScene extends Phaser.Scene {
     this.atmo = new Atmosphere(this, this.props);
     this.levelFx = new LevelFx(this);   // #163 landmark, guide lines, signs at secrets, the Wow room
     this.dressingFx = new DressingFx(this);   // #159 decay debris, room stories, the desert, the back wall layer, corrections (K)
+    this.storyFx = new StoryFx(this);   // #167 tropes, notes, the Splitter, announcements, AvA, Leyla's traces
 
     this.keys = {};
     for (const [name, list] of Object.entries(KEYS)) this.keys[name] = list.map(k => this.input.keyboard.addKey(k));

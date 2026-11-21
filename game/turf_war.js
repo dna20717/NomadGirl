@@ -6,6 +6,7 @@
 //                place falling back to them clears the entry.
 //   Fronten      a road between two places of rival gangs; drawn on the travel map, a feud on the road there is likelier
 import { rivalsOf, repOf, repConfig, gangOfPlace } from './reputation.js';
+import { writeLayer } from '../engine/history.js';
 
 // who moves in after Leyla cleared `node` of `gang` → { node, from, to } or null (nothing changes when the gang has no rivals)
 export function takeover(D, save, node, gang) {
@@ -17,6 +18,7 @@ export function takeover(D, save, node, gang) {
   T[node] = to;
   const home = (() => { const n = save.map?.nodes?.find(x => x.id === node), poi = n?.poi || D.locations?.[node]?.poi; return D.pois?.[poi]?.gang?.name || null; })();
   if (home === to) delete T[node];
+  writeLayer(save, node, { by: 'leyla', gang: to, from: gang });   // #167 a new time layer: after Leyla's visit the rival moved in
   return { node, from: gang, to };
 }
 // the roads between rival gangs: [{ a, b, ga, gb }]
@@ -51,6 +53,7 @@ export function gangWar(D, save, rnd = Math.random) {
     if (home === winner) delete T[node]; else T[node] = winner;
     const x = { day: Math.floor(W.at / 24), node, place: n?.name || D.locations?.[node]?.name || node, from: loser, to: winner };
     out.push(x); W.log = [...(W.log || []), x].slice(-12);
+    writeLayer(save, node, { by: 'war', gang: winner, from: loser, day: x.day });   // #167 the turf war writes a new time layer
   }
   return out;
 }

@@ -207,6 +207,7 @@ export class SceneEvents {
     this.achieve('kills', 1, [e.id, e.d.family, h.kind === 'shot' ? slots.ranged : h.kind === 'melee' ? slots.melee : null, h.crit ? 'crit' : null]);
     if (e.spared !== 'freed') this.loot?.fromEnemy(e);   // #139 let go: he takes his things with him
     this.drone.react('kill');
+    if (e.d?.behavior === 'boss') this.storyFx?.trace('boss', e.x, e.feet);   // #167 the fallen boss stays a trace for some days
     // #055: a kill on a gang's turf costs Ruf with that gang (Ereignis-Baukasten › Ruf › je Kill im Revier)
     const G = this.mode === 'run' && this.box?.save ? this.gang?.() : null;
     if (G?.name && !e.spared) { const r = addRep(this.data_, this.box.save, G.name, -repConfig(this.data_).kill); if (r?.changed) this.hud.toast(`${G.name}: ${levelName(r.level)}`, 'Dein Ruf bei ihnen sinkt', 'warn', 3600); }

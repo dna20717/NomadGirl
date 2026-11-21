@@ -315,7 +315,7 @@ export class PoiLevel {
     for (const h of this.hosts()) if (!h.done && close(h)) return { text: `${h.name} anzapfen · Glitch-Duell`, act: () => this.duelAt(h, h.name, `host${this.hosts().indexOf(h)}`) };
     for (const d of this.doors) if (!d.open && Math.abs((d.x0 + d.x1) / 2 * this.scene.T - l.x) < range * 0.8 && l.feet > d.y0 * this.scene.T && l.feet <= d.y1 * this.scene.T + 4)
       return { text: 'Die Tür geht von dieser Seite nicht auf' };
-    return null;
+    return this.scene.storyFx?.nearest(close) || null;   // #167 notes, the Splitter
   }
 
   // the machines with a KI in them: clutter of the POI's Marken-Clutter rows marked „KI“ (art.js brandKit)
@@ -357,6 +357,7 @@ export class PoiLevel {
     if (c.sprite) { let f = 0; s.time.addEvent({ delay: 70, repeat: c.frames - 1, callback: () => c.sprite.setFrame(Math.min(c.frames - 1, ++f)) }); }
     else this.drawChest(c);
     if (c.bonus) return this.openBonus(c);
+    s.storyFx?.trace('chest', c.x, c.feet);   // #167 Leyla's trace: stays open until the new residents clear it
     // #159 a room's story brings its own loot (Raum-Geschichten › Beute)
     const LI = s.levelInfo, tx = c.x / s.T, ty = c.feet / s.T - 0.5, ri = LI?.rooms?.findIndex(r => tx >= r.x && tx < r.x + r.w && ty >= r.y && ty < r.y + r.h) ?? -1;
     const tale = ri >= 0 && this.poi ? roomTale(s.data_, this.poi, LI.rooms[ri], LI.rooms[ri].x * 1000 + LI.rooms[ri].y, s.levelSeed || 0) : null, own = s.data_.roomStories?.[tale]?.loot;

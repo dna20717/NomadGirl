@@ -8,6 +8,7 @@
 //   camp = the Kofferraum (plus rows from a Dachbox) and every Lagerregal as ONE grid; older 'chest' and 'rig:<unit>' grids move into it on load
 // Times are hours (18.5 = 18:30). "Ereignis-Zeit": the clock only moves on actions (sleeping, runs, sitting at the fire).
 
+import { storyState } from '../engine/storylets.js';
 import { keepThrough, recipeOf } from './achievements.js';
 import { openStorage, activeSlot, slotMeta, withGlobal, mergeAchievements } from './slots.js';
 import { renameMap } from '../engine/renames.js';
@@ -215,6 +216,8 @@ export function newCycle(D, old) {
   if (old.look) s.look = { color: old.look.color ?? 0, unlocked: [...(old.look.unlocked || [])] };   // #044: the hair colour is Leyla's, not the dream's
   if (old.gifts) s.gifts = [...old.gifts];   // a gift (#048) comes once per savegame, not per dream
   for (const [id, x] of Object.entries(D.salvage || {})) if (s.salvage?.done?.[id] && x.tractor && D.tractors?.[x.tractor]) swapTractor(D, s, x.tractor);
+  // #167 the Faden of AvA's memories stays (Leyla remembers); notes, traces and time layers belong to the old map
+  if (old.story?.chain?.length) s.story = { chain: [...old.story.chain], seen: Object.fromEntries(old.story.chain.map(id => [id, old.story.seen?.[id] ?? 1])) };
   s.dreams = [...(old.dreams || []), { day: old.day, hour: old.hour, rescues: old.tank?.rescues || 0, cause: old.tank?.cause || null }];
   for (const id of s.nodes) for (const r of D.techtree[id].recipes || []) if (!s.recipes.includes(r)) s.recipes.push(r);
   // Achievements (#012): they, their recipes and the trophies stay; ⚠️ vorläufig the trophies wait in a memory chest at the fire
@@ -386,6 +389,7 @@ export function repairSave(save, D) {
   s.companions = (s.companions || []).filter(c => D.companions?.[c]);
   if (s.run && !D.pois?.[s.run.poi]) s.run = null;
   s.recipes = Array.isArray(save.recipes) ? [...new Set([...save.recipes.filter(r => D.recipes?.[r]), ...startRecipes(D)])] : fresh.recipes;
+  storyState(s);   // #167 notes found, the Faden, Leyla's traces, time layers, visits: older savegames get an empty story
   if (save.inv === undefined) delete s.inv;   // older savegame: inventory from the start values
   if (!save.tank) delete s.tank;   // older savegame: the tank starts full at today's clock
   ensureTankInRig(D, s);

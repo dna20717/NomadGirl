@@ -9,6 +9,7 @@ import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { hints } from './ui_nav.js';
 import { placeStory } from '../../engine/story.js';
+import { storyContext, pickStorylets, fill as storyFill } from '../../engine/storylets.js';
 import { goalEl } from './hud.js';
 import { trackedGoal as questGoal } from '../quests.js';
 import { ensureMap, placeOf, neighbours, hops, mapConfig, threatOf } from '../worldmap.js';
@@ -156,12 +157,23 @@ export class MapUI {
       // the POI's own text only at the landmark itself; rolled places say what kind of place it is
       // #160: rolled places say one sentence of their archetype's story (joke or past), tinted by the region; the landmark keeps its own text
       el('p', { class: 'wm-desc' }, n.landmark && P.description ? P.description : (() => { const S = placeStory(D, n, save, gangOfPlace(D, save, n.id) || null); return S.line ? [S.line, S.tint ? `${S.tint}.` : ''].filter(Boolean).join(' ') : `Wie ${P.name || 'ein POI'}, nur ${n.danger > (P.danger || 1) ? 'weiter draußen und gefährlicher' : 'ein anderer Ort'}. Was genau dort liegt, weiß man erst drinnen.`; })()),
+      this.storyLine(n),   // #167 what the place window knows of its story: a storylet (Ortsfenster) and the last time layer
       cost ? el('div', { class: 'wm-cost' }, ...[['Strecke', `${cost.km} km${(cost.legs?.length || 1) > 1 ? ` · ${cost.legs.length} Etappen` : ''}`], ['Fahrt', `${de(cost.hours)} h`], ['Sprit', `${de(cost.fuel)} l`, cost.fuel > save.fuel], ['Vorräte', de(cost.food), cost.food > save.food]]
         .map(([k, v, bad]) => el('div', { class: bad ? 'bad' : '' }, el('small', {}, k), el('b', {}, v))), this.forecastBox(cost, false)) : null,
       here ? this.forecastBox(null, true) : null,   // #087 the navigator: at home the rain of the next days
       here && a && !a.disabled ? this.readyBox() : null,
       a ? el('button', { class: 'inv-btn wm-go', disabled: !!a.disabled, title: a.disabled || null, onclick: () => this.act() }, a.icon ? icon(a.icon, 18) : null, ' ', a.disabled && a.cost ? a.disabled : a.label) : null,
       a?.disabled && !a.cost ? el('small', { class: 'wm-why' }, a.disabled) : null].filter(Boolean));   // replaceChildren would write "null"
+  }
+  // #167 Storylets › Ortsfenster and the latest time layer (Zeitschichten), only for places she has seen
+  storyLine(n) {
+    const D = this.D, save = this.save;
+    if (!save?.map?.visited?.includes(n.id)) return null;
+    try {
+      const ctx = storyContext(D, save, n), [hit] = pickStorylets(D, ctx, 'place', 1, save.map.seed || 0), L = ctx.layers.filter(l => l.by !== 'home');
+      const parts = [hit ? storyFill(D, ctx, hit[1].text) : null, L.length ? L[L.length - 1].text : null].filter(Boolean);
+      return parts.length ? el('p', { class: 'wm-desc wm-story' }, icon('hourglass', 14), ' ', parts.join(' ')) : null;
+    } catch { return null; }
   }
   // #087 Wettervorhersage: with a warroom the navigator tells the weather of every leg of the route, here the rain of the next days
   forecast(cost) {

@@ -47,6 +47,7 @@ export function blastSirens(scene, x, y, r, dmg, time) {
 export function breakSiren(scene, p, time = scene.now ?? 0) {
   if (p.broken) return;
   p.broken = true; p.on = false; p.hp = 0; p.brokeAt = time;
+  scene.storyFx?.trace?.('siren', p.x, p.feet);   // #167 Leyla's trace
   scene.fx.sparks(p.x, p.y, 0xffd27a, 22); scene.fx.sparks(p.x, p.y - 18, 0xff4060, 10); scene.fx.puff?.(p.x, p.y, 0x5d6670);
   scene.fx.light?.(p.x, p.y, { radius: 260, color: 0xffd27a, alpha: 0.8, life: 160 });
   scene.fx.text?.(p.x, p.y - 50, 'Sirene kaputt', { color: '#ffd27a', size: 40, rise: 40 });

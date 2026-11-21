@@ -3,6 +3,7 @@
 // game/radio_audio.js), and what the DJ says between the songs. The talk knows the game: brand ads (Lore › Marken › Werbung), the
 // navigator's rain (#087), the fronts of the turf war (#089), rumours about places on the travel map, lines from the workshop.
 // Everything from the area „Radio“ (data/radio.json).
+import { storyContext, eligible, fill as storyFill } from '../engine/storylets.js';
 import { entityFrom } from './glitchlings.js';
 import { rainOutlook } from './weather_fx.js';
 import { fronts } from './turf_war.js';
@@ -99,6 +100,8 @@ export function talkPool(D, save, station, r = Math.random) {
     const m = save.map, seen = new Set(m?.visited || []);
     const rumours = (m?.nodes || []).filter(n => !seen.has(n.id) && (n.hints || []).length && placeOf(D, save, n.id)?.name);
     out.tip = rumours.map(n => fill(pick(r, linesOf(C, 'tip').length ? linesOf(C, 'tip') : ['In {place} soll {hint} liegen.']), { ...v, place: placeOf(D, save, n.id).name, hint: optionLabel(ITEM_CATEGORIES, pick(r, n.hints)) || 'was liegen' }));
+    // #167 Storylets › Radio-Gerücht: places she has not seen yet, with their story (who holds them, what happened there)
+    for (const n of (m?.nodes || []).filter(n => !seen.has(n.id) && n.poi)) { const ctx = storyContext(D, save, n), [hit] = eligible(D, ctx, 'rumor'); if (hit) out.tip.push(storyFill(D, ctx, hit[1].text)); }
   }
   out.lore = linesOf(C, 'lore').map(t => fill(t, v));
   return out;
