@@ -219,5 +219,21 @@
  },
  "null": "voice",
  "voice": "leyla",
- "grenade": {"arm": "leyla_throw_arm", "refill": "each", "cooldown": 60, "look": "leyla_throw_pistol", "releaseFrame": 7}
+ "grenade": {"arm": "leyla_throw_arm", "refill": "each", "cooldown": 60, "look": "leyla_throw_pistol", "releaseFrame": 7},
+ "turnThrow": {
+  "enabled": true,
+  "stamina": 30,
+  "buffer": 120,
+  "turnTime": 70,
+  "throwTime": 320,
+  "fromFrame": 4,
+  "speed": 1350,
+  "angle": 12,
+  "slide": 900,
+  "friction": 2200,
+  "slowTime": 200,
+  "slowFactor": 35,
+  "look": "leyla_brake_side",
+  "frames": [2, 5]
+ }
 }

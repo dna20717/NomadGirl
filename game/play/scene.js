@@ -25,6 +25,7 @@ import { kitAssets } from './enemy_kit.js';
 import { uiInput } from './ui_nav.js';
 import { Combat } from './combat.js';
 import { Fx } from './fx.js';
+import { slowClock } from './slowmo.js';
 import { Atmosphere } from './atmosphere.js';
 import { Drone } from './drone.js';
 import { Van } from './van.js';
@@ -788,6 +789,7 @@ export class PlayScene extends Phaser.Scene {
   }
 
   update(time, delta) {
+    ({ time, delta } = slowClock(this, time, delta));   // #164 slow motion: the game clock (real time minus what slow motion held back)
     this.now = time;   // the loop's clock (hits, shots and Leyla run on it; scene.time.now is another clock)
     let input = this.readInput();
     this.padMenus(input, Math.min(delta, 50));

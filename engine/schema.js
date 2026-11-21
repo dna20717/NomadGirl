@@ -733,6 +733,21 @@ export const AREAS = {
         num('grenade.releaseFrame', 'Wurf: Loslassen bei Bild', { min: 0, hint: 'Ab 0. Leer = nach 72 % der Animation' }),
         ref('grenade.arm', 'Wurfarm', 'assets', { hint: '#140 (Daniel: „ordentliche Animationen, die kompatibel mit Gehen, Rennen und Springen sind“): ein gemalter Arm (Bild 1 mit Granate, Bild 2 offene Hand, waagerecht nach rechts, Schulter = Ankerpunkt), der Code dreht ihn an der Schulter von hinten über den Kopf nach vorn. Passt so zu jeder Bewegung. Leer = Platzhalter aus Code' }),
         num('grenade.shoulder', 'Schulter', { unit: '% der Höhe', min: 0, max: 100, hint: 'Drehpunkt über den Füßen. Leer = 69' })] },
+      // #164 (Daniel, 21.11.2026: Spezial-Move „Wende-Wurf im Dash“)
+      { title: 'Wende-Wurf', fields: [bool('turnThrow.enabled', 'Wende-Wurf an', { hint: 'Im Dash Gegenrichtung + Granate (T, Controller: Granaten-Taste): Leyla dreht sich um, wirft die Granate flach nach hinten und rutscht rückwärts aus. Kostet eine Granaten-Ladung und Ausdauer. Leer = an' }),
+        num('turnThrow.stamina', 'Ausdauer', { min: 0, hint: 'Ohne genug Ausdauer oder ohne Ladung läuft der Dash normal weiter. Leer = 30' }),
+        num('turnThrow.buffer', 'Puffer nach dem Dash', { unit: 'ms', min: 0, hint: 'So lange nach dem Dash-Ende zählt der Druck noch. Leer = 120' }),
+        num('turnThrow.turnTime', 'Umdrehen', { unit: 'ms', min: 0, hint: 'Füße stemmen (Bremsen-Bilder), danach dreht sie sich zum Wurf. Leer = 70' }),
+        num('turnThrow.throwTime', 'Wurf dauert', { unit: 'ms', min: 60, hint: 'Die Wurf-Animation (Leyla › Granate › Wurf) ab „Wurf ab Bild“ bis zum Ende; die Granate fliegt bei „Loslassen bei Bild“. Leer = 320' }),
+        num('turnThrow.fromFrame', 'Wurf ab Bild', { min: 1, hint: 'Ab 1. Leer = 4 (Ausholen)' }),
+        num('turnThrow.speed', 'Wurf-Geschwindigkeit', { unit: 'px/s', min: 0, hint: 'Flach und schnell, ohne ihr eigenes Tempo. Leer = 1350' }),
+        num('turnThrow.angle', 'Wurf-Winkel', { unit: '°', min: -30, max: 80, hint: 'Über der Waagrechten. Leer = 12' }),
+        num('turnThrow.slide', 'Rutschen: Schwung', { unit: 'px/s', min: 0, hint: 'Restschwung des Dash, mit dem sie rückwärts ausrutscht. Leer = 900' }),
+        num('turnThrow.friction', 'Rutsch-Reibung', { unit: 'px/s²', min: 0, hint: 'So schnell bremst das Rutschen ab (in der Luft ein Drittel). Leer = 2200' }),
+        num('turnThrow.slowTime', 'Zeitlupe: Dauer', { unit: 'ms', min: 0, hint: 'Beim Loslassen, in echter Zeit. 0 = keine Zeitlupe. Leer = 200' }),
+        num('turnThrow.slowFactor', 'Zeitlupe: Tempo', { unit: '%', min: 5, max: 100, hint: 'So schnell läuft das Spiel in der Zeitlupe. Leer = 35' }),
+        ref('turnThrow.look', 'Aussehen: Umdrehen', 'assets', { hint: 'Bilder beim Umdrehen und Rutschen (unter dem Wurf). Leer = Leyla › Aussehen › Bremsen' }),
+        range('turnThrow.frames', 'Aussehen: Bilder', { hint: 'Von–bis (ab 1): die erste Hälfte beim Umdrehen, der Rest beim Rutschen. Leer = 2–5' })] },
     ],
     check: (x, report, p) => {
       const W = p.data.weapons || {};

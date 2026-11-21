@@ -7,7 +7,7 @@ export class LeylaMoves {
   startDash(time, dir) {
     if (dir) this.facing = dir;
     this.scene.drone?.react('dash');
-    this.state = 'dash'; this.flipUntil = 0; this.dashEnd = time + DASH_TIME;   // a dash ends the somersault (no flip after the dash)
+    this.state = 'dash'; this.flipUntil = 0; this.dashEnd = time + DASH_TIME; this.dashDir = this.facing;   // #164 the Wende-Wurf turns against it   // a dash ends the somersault (no flip after the dash)
     this.dashReady = time + DASH_TIME + (this.m.dashCooldown ?? 600) * Math.max(0.1, 1 + (this.scene.mods?.dashCooldown || 0) / 100);
     if (!this.body.blocked.down) this.airDash = false;
     this.body.allowGravity = false;
@@ -21,7 +21,7 @@ export class LeylaMoves {
     this.body.setVelocity(this.facing * (this.m.dashDistance ?? 280) / (DASH_TIME / 1000), 0);
     if (time >= this.nextGhost) { this.scene.fx.ghost(this.sprite); this.nextGhost = time + 28; }
     if (input.jump.pressed && (this.body.blocked.down || time - this.lastGround < 120)) { this.endDash(); this.jump(1); return; }
-    if (time >= this.dashEnd || this.body.blocked.left || this.body.blocked.right) this.endDash();
+    if (time >= this.dashEnd || this.body.blocked.left || this.body.blocked.right) { this.dashEndAt = time; this.endDash(); }   // #164 the Wende-Wurf still takes a late press (Puffer)
   }
   endDash() {
     this.state = 'normal'; this.body.allowGravity = true;

@@ -23,6 +23,7 @@ const report = await page.evaluate(() => {
   start(); go('jump', 70, [], ['jump']); go('jump-run', 70, ['right', 'jump'], ['jump']);
   start(); go('dbl', 15, ['jump'], ['jump']); go('dbl2', 60, ['jump'], ['jump']);
   start(); go('run-dash', 20, ['right']); go('dash', 40, ['right'], ['dash']);
+  start(); l.stamina = l.maxStamina; go('run-dash2', 20, ['right']); go('dash2', 4, ['right'], ['dash']); go('turnThrow', 30, ['left'], ['grenade']); go('turnThrow-out', 40);   // #164 Wende-Wurf
   start(); go('slide', 20, ['right']); go('slide2', 50, ['right', 'down'], ['down']); go('slide3', 30);
   start(); go('crouch', 40, ['down']); go('crouch-up', 40);
   start(); go('melee', 40, [], ['melee']); go('melee-walk', 40, ['right', 'walk'], ['melee']);

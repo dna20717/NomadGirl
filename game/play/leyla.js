@@ -1,7 +1,7 @@
 // Leyla: controller (states, physics feel) and look (sprite + code effects).
 // All numbers come from the game data (area "Leyla"); only feel constants that are not game design live here.
 //
-// States: normal (ground/air) · dash · slide · climb · swing · hang (ledge) · mantle (pull up) · crouch (also standing up) · land (hard landing) · brake (stopping from a run) · dead
+// States: normal (ground/air) · dash · turnThrow (#164 Wende-Wurf) · slide · climb · swing · hang (ledge) · mantle (pull up) · crouch (also standing up) · land (hard landing) · brake (stopping from a run) · dead
 // Look: per state the asset from leyla.look.<state>, otherwise look.idle. Missing animations are covered by
 // code effects (squash & stretch, lean, afterimages, blinking), new animations plug in without code changes.
 
@@ -67,7 +67,7 @@ export class Leyla {
     this.airJumps = this.maxAirJumps;
     this.airDash = this.canAirDash;
     this.lastGround = -1e9; this.jumpAt = -1e9; this.dashReady = 0; this.dropUntil = 0; this.noGrabUntil = 0;
-    this.ledge = null; this.body.checkCollision.none = false;
+    this.ledge = null; this.body.checkCollision.none = false; this.tt = null; this.dashDir = 0; this.dashEndAt = -1e9;
     this.meleeReady = 0; this.rangedReady = 0; this.invulnerableUntil = 0; this.attackPose = 0;
     this.squash = { x: 1, y: 1 };
     this.fight = { on: false, manual: null, last: -1e9, seen: false, check: 0 };   // combat mode (Leyla › Kampfmodus)
@@ -83,7 +83,8 @@ export class Leyla {
   get S() { return this.d.stamina || {}; }
   get staminaOn() { return this.S.enabled !== false; }
   get maxStamina() { return Math.max(1, (this.S.max ?? 100) + (this.scene.mods?.stamina || 0)); }
-  staminaCost(kind) { return this.staminaOn ? Math.max(0, this.S.costs?.[kind] ?? { dash: 25, slide: 20, airJump: 25, melee: 12, heavy: 28 }[kind] ?? 0) : 0; }
+  staminaCost(kind) { if (kind === 'turnThrow') return this.staminaOn ? this.TT.stamina : 0;   // #164 Leyla › Wende-Wurf › Ausdauer
+    return this.staminaOn ? Math.max(0, this.S.costs?.[kind] ?? { dash: 25, slide: 20, airJump: 25, melee: 12, heavy: 28 }[kind] ?? 0) : 0; }
   canSpend(kind) { return (this.stamina ?? this.maxStamina) >= this.staminaCost(kind) - 1e-6; }
   spend(kind, time) {
     const cost = this.staminaCost(kind);
@@ -152,9 +153,11 @@ export class Leyla {
       const h = this.hitAnim, p = (time - h.at) / h.dur;
       if (p >= 1 || this.state !== 'normal' || (p >= (this.d.hit?.cancelAfter ?? 50) / 100 && (dir || input.jump.pressed || input.dash.pressed || input.melee.pressed || input.ranged.pressed))) this.hitAnim = null;
     }
+    this.turnThrowTry(time, input, dir);   // #164 Wende-Wurf: opposite direction + grenade in (or right after) the dash
     switch (this.state) {
       case 'normal': this.normal(time, s, input, dir, grounded); break;
       case 'dash': this.dash(time, input); break;
+      case 'turnThrow': this.turnThrow(time, s, input, grounded); break;
       case 'slide': this.slide(time, input, grounded); break;
       case 'climb': this.climb(time, input, dir, grounded); break;
       case 'swing': this.swing(time, s, input, dir); break;
@@ -200,6 +203,7 @@ export class Leyla {
     this.wasGrounded = grounded;
     this.lastVy = b.velocity.y;
     this.look(time, dt, grounded);
+    this.turnThrowFx(time);   // #164
   }
 
   normal(time, s, input, dir, grounded) {
@@ -308,6 +312,7 @@ export class Leyla {
     if (this.state === 'dash') this.endDash();
     if (this.state === 'hang' || this.state === 'mantle') { this.body.checkCollision.none = false; this.setStanding(); this.leaveHang(time); }
     if (this.state === 'crouch') this.endCrouch();
+    if (this.state === 'turnThrow') this.endTurnThrow();   // #164 (the grenade still leaves her hand)
     if (this.state === 'land' || this.state === 'brake') this.state = 'normal';
     const away = Math.sign(this.x - fromX) || -this.facing;
     // the damage sets how hard it hits (Leyla › Treffer › „Volle Wucht bei“): 0.5 (a scratch) … 1.5 (a big hit)
@@ -330,6 +335,7 @@ export class Leyla {
   die() {
     if (this.state === 'slide' || this.state === 'crouch') this.setStanding();
     this.body.checkCollision.none = false;
+    if (this.state === 'turnThrow') this.endTurnThrow();
     this.state = 'dead'; this.body.allowGravity = true;
     this.scene.onLeylaDown();
   }
@@ -352,7 +358,7 @@ export class Leyla {
     // (after a jump the last air frame stays for a moment too, so a quick hop again does not flash a standing frame)
     const air = name === 'jump' || name === 'fall' || name === 'airJump';
     if (st === 'normal' && (name === 'walk' || name === 'run' || air)) { this.movedAt = time; this.movedLook = name; this.movedAir = air; }
-    else if (st === 'dash') { this.movedAt = time; this.movedLook = onGround ? 'run' : 'fall'; this.movedAir = !onGround; }   // #125 (Backlog C4): a dash into a wall does not flash a standing frame either
+    else if (st === 'dash' || st === 'turnThrow') { this.movedAt = time; this.movedLook = onGround ? 'run' : 'fall'; this.movedAir = !onGround; }   // #125 (Backlog C4): a dash into a wall does not flash a standing frame either
     else if (name === 'idle' && st === 'normal' && time - (this.movedAt ?? -1e9) < (this.movedAir ? (this.d.transition?.idleAfterAir ?? 60) : (this.d.transition?.idleAfter ?? 90))) name = this.movedLook;
     this.idleNow = name === 'idle' && this.armed === 'off';
     if (name === 'idle' && this.idleVariant === 'idleAlt' && this.d.look?.idleAlt) name = 'idleAlt';
@@ -403,6 +409,8 @@ export class Leyla {
       else { name = '@' + (L.aim || L.idle); armedFrame = 1; }
       if (shot && !running && !this.gunWall && this.shotSeen !== this.shotAt) { this.shotSeen = this.shotAt; this.restartLook = true; }
     }
+    // #164 Wende-Wurf: the turn (Bremsen frames), underneath the painted throw while she skids
+    if (st === 'turnThrow') { const q = this.turnThrowLook(time); if (q) { name = '@' + q.look; armedFrame = q.p; armedFrom = q.from; } }
     // melee: the attack runs over its time (frames from "ab Frame"), charging holds the crouch loop of the heavy attack
     let pin = null;
     if (this.attack && st === 'normal') { const a = this.attack; name = '@' + a.look; armedFrame = Math.min(1, (time - a.at) / a.dur); armedFrom = a.from; }
@@ -588,4 +596,5 @@ export class Leyla {
 // Split (#017, backlog C8): special moves and fighting live in their own files
 import { LeylaMoves } from './leyla_moves.js';
 import { LeylaCombat } from './leyla_combat.js';
-for (const M of [LeylaMoves, LeylaCombat]) for (const k of Object.getOwnPropertyNames(M.prototype)) if (k !== 'constructor') Object.defineProperty(Leyla.prototype, k, Object.getOwnPropertyDescriptor(M.prototype, k));
+import { LeylaTurnThrow } from './leyla_turnthrow.js';
+for (const M of [LeylaMoves, LeylaCombat, LeylaTurnThrow]) for (const k of Object.getOwnPropertyNames(M.prototype)) if (k !== 'constructor') Object.defineProperty(Leyla.prototype, k, Object.getOwnPropertyDescriptor(M.prototype, k));

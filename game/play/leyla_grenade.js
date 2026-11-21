@@ -7,7 +7,7 @@
 // Until that exists a placeholder from code swings the arm. HUD: charges and cooldown next to DASH.
 import { Throwables } from './throwables.js';
 
-const BLOCKED = new Set(['climb', 'hang', 'mantle', 'swing', 'slide', 'dead', 'sit', 'pose', 'dash']);
+const BLOCKED = new Set(['climb', 'hang', 'mantle', 'swing', 'slide', 'dead', 'sit', 'pose', 'dash', 'turnThrow']);
 
 export class LeylaGrenade {
   constructor(leyla) { this.l = leyla; this.charges = null; this.refillAt = null; this.pose = null; this.thrown = 0; }
@@ -31,6 +31,7 @@ export class LeylaGrenade {
     }
     if (this.pose && time >= this.pose.release && !this.pose.done) this.release(time, input);
     if (this.pose && time >= this.pose.end) this.pose = null;
+    if (this.skip === time) return;   // #164 the press went to the Wende-Wurf (or was turned down there)
     if (!input.grenade?.pressed || !c.enabled || s.mode === 'camp' || !l.alive || BLOCKED.has(l.state) || this.pose) return;
     if (this.charges <= 0) { s.staminaDenied?.('grenade'); this.denied = time; return; }
     // #161 a painted throw (Leyla › Granate › Wurf, the rifle brings its own in Waffen › Posen › throw): its length and release frame set the timing
@@ -39,6 +40,18 @@ export class LeylaGrenade {
     this.pose = dur ? { at: time, release: time + rel, end: time + dur, look: T, up: !!input.up?.down, down: !!input.down?.down, done: false }
       : { at: time, release: time + c.throwTime, end: time + c.throwTime + 260, up: !!input.up?.down, down: !!input.down?.down, done: false };
     l.fightTrigger?.(time);
+  }
+
+  // #164 Wende-Wurf: the painted throw starts after the turn (Leyla › Wende-Wurf › Umdrehen) from the wind-up frame, whole body,
+  // faster than the normal throw; the grenade leaves flat and fast backwards (release() reads P.turn)
+  turn(time, T) {
+    const s = this.l.scene, K = this.throwLook(), A = K && s.data_.assets?.[K], n = A?.frames || 0, c = this.c;
+    const at = time + T.turn, dur = Math.max(60, T.throwTime);
+    const f0 = n ? Math.min(n - 1, Math.max(0, T.fromFrame - 1)) : 0, rf = n ? Math.min(n - 1, c.releaseFrame ?? Math.round(n * 0.72)) : 0;
+    const rel = n ? at + Math.max(0, (rf - f0) / Math.max(1, n - f0)) * dur : at + dur * 0.45;
+    const a = T.angle * Math.PI / 180;
+    this.pose = { at, release: rel, end: at + dur, look: K, f0: n ? f0 : 0, full: true, done: false, turn: { vx: T.speed * Math.cos(a), vy: -T.speed * Math.sin(a) } };
+    this.skip = time;
   }
 
   // the painted throw for the weapon in hand: Waffen › Posen › throw (Sturmgewehr), else Leyla › Granate › Wurf (with a pistol)
@@ -51,9 +64,12 @@ export class LeylaGrenade {
     const c = this.c, l = this.l, s = l.scene, P = this.pose, h = this.hand();
     P.done = true;
     let [vx, vy] = c.velocity;
-    if (P.up || input.up?.down) { vx *= 0.7; vy *= 1.25; } else if (P.down || input.down?.down) { vx *= 1.1; vy *= 0.45; }
-    Throwables.of(s).throw({ x: h.x, y: h.y, vx: l.facing * vx + l.body.velocity.x * 0.5, vy: vy + Math.min(0, l.body.velocity.y * 0.3), item: c.item, fuse: c.fuse,
-      radius: c.radius, damage: c.damage, burn: c.burn, friendly: true, from: l, time });
+    if (P.turn) [vx, vy] = [P.turn.vx, P.turn.vy];   // #164 flat and fast, without her own speed (she slides the other way)
+    else if (P.up || input.up?.down) { vx *= 0.7; vy *= 1.25; } else if (P.down || input.down?.down) { vx *= 1.1; vy *= 0.45; }
+    const carry = P.turn ? 0 : 1;
+    Throwables.of(s).throw({ x: h.x, y: h.y, vx: l.facing * vx + l.body.velocity.x * 0.5 * carry, vy: vy + Math.min(0, l.body.velocity.y * 0.3) * carry, item: c.item, fuse: c.fuse,
+      radius: c.radius, damage: c.damage, burn: c.burn, friendly: true, from: l, time, turn: !!P.turn });
+    if (P.turn) l.turnRelease?.(time, h);
     const now = this.now();
     if (this.charges === c.charges || this.refillAt == null) this.refillAt = this.refillAt ?? now + c.cooldown;
     this.charges--; this.thrown++;
@@ -66,12 +82,17 @@ export class LeylaGrenade {
     this.g.clear();
     const sp = l.sprite, A = c.look && s.data_.assets?.[c.look];
     if (!P) { if (this.hidBody) { sp.setVisible(true); this.hidBody = false; } if (this.cutBody) { sp.setCrop(); this.cutBody = false; } this.over?.setVisible(false); this.arm?.setVisible(false); return; }
+    if (time < P.at) {   // #164 Wende-Wurf: still turning (her own picture), the throw comes after
+      if (this.hidBody) { sp.setVisible(true); this.hidBody = false; } if (this.cutBody) { sp.setCrop(); this.cutBody = false; }
+      this.over?.setVisible(false); this.arm?.setVisible(false); return;
+    }
     const p = Math.min(1, (time - P.at) / (P.end - P.at)), key = P.look, TA = key && s.data_.assets?.[key];
     if (TA) {   // #161 the painted throw: standing = the whole body (lunge), moving or in the air = only the upper body over her legs
       this.over ??= s.add.sprite(sp.x, sp.y, key).setDepth(10.5);
       const n = TA.frames || 1, [fw, fh] = TA.frameSize || [sp.width, sp.height], o = TA.origin || [fw / 2, fh];
-      const still = l.body.blocked.down && Math.abs(l.body.velocity.x) < 40 && l.state === 'normal';
-      this.over.setVisible(true).setTexture(key, Math.min(n - 1, Math.floor(p * n))).setOrigin(o[0] / fw, o[1] / fh)
+      const still = P.full || (l.body.blocked.down && Math.abs(l.body.velocity.x) < 40 && l.state === 'normal');   // #164 the Wende-Wurf: always the whole body (lunge while she skids)
+      const f0 = P.f0 || 0;
+      this.over.setVisible(true).setTexture(key, Math.min(n - 1, f0 + Math.floor(p * (n - f0)))).setOrigin(o[0] / fw, o[1] / fh)
         .setPosition(l.x, l.feet).setScale((TA.height || l.height) / fh).setFlipX(l.facing < 0);
       const waist = TA.waist ?? Math.round(fh * 0.5);
       if (still) this.over.setCrop(); else this.over.setCrop(0, 0, fw, waist);

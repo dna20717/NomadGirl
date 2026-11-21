@@ -33,7 +33,7 @@ const CONTROLS = [
     ['L / C', 'Dash, auch in der Luft'], ['S / ↓', 'Beim Rennen: Slide · im Stand: Ducken'], ['S + Leertaste', 'Von der Plattform fallen'],
     ['→', 'Im Sprung zur Wand: Kante greifen · W hochziehen · S loslassen'], ['W / ↑', 'Leiter klettern, Seil greifen'], ['Leertaste', 'Am Seil: loslassen mit Schwung']] },
   { title: 'Kampf', icon: 'weapon', rows: [
-    ['J / Y', 'Nahkampf: tippen = Kombo · 1 s halten: schwerer Hieb'], ['K / X', 'Schießen (am Boden): zieht und schießt im selben Zug'], ['K halten', 'Waffe wegstecken'], ['R', 'Nachladen (leer abdrücken lädt auch)'], ['Q', 'Waffe ziehen / wegstecken'], ['V', 'Fernkampfwaffe wechseln (aus dem Rucksack)'], ['T', 'Granate werfen (Ladungen, dann Abklingzeit)']] },
+    ['J / Y', 'Nahkampf: tippen = Kombo · 1 s halten: schwerer Hieb'], ['K / X', 'Schießen (am Boden): zieht und schießt im selben Zug'], ['K halten', 'Waffe wegstecken'], ['R', 'Nachladen (leer abdrücken lädt auch)'], ['Q', 'Waffe ziehen / wegstecken'], ['V', 'Fernkampfwaffe wechseln (aus dem Rucksack)'], ['T', 'Granate werfen (Ladungen, dann Abklingzeit)'], ['L + Gegenrichtung + T', 'Wende-Wurf: im Dash Gegenrichtung + Granate, wirft flach nach hinten (Ladung + Ausdauer)']] },
   { title: 'Machen', icon: 'hand', rows: [
     ['E / W', 'Benutzen: Kisten, Schalter, Werkstätten, Feuer, Van (W nur mit Hinweis)'], ['I / Tab', 'Inventar'], ['B', 'Rig bauen (im Camp; Pfeile + Leertaste/Enter ohne Maus)'], ['O / P', 'Rig offen / zu (im Camp, auch im Bau-Modus; Controller: rechten Stick drücken)']] },
   { title: 'System', icon: 'settings', rows: [
