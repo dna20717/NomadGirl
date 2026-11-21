@@ -135,7 +135,7 @@ export class MapUI {
       this.aside.replaceChildren(el('div', { class: 'wm-head' }, el('div', {}, el('h3', {}, n.name), el('small', {}, `Andockpunkt · ${S.name || 'Staubozean'}`))),
         el('p', {}, `Ein ausgetrockneter Ozean, so weit das Auge reicht: Salzkrusten, Risse, Wracks im Staub. Hier legen die Mega-Rigs ab, um ihn zu überqueren.`),
         el('p', { class: 'wm-why' }, icon('warning', 14), ' ', S.warn || 'Zu gefährlich für unsere kleinen Fahrzeuge', '.'),
-        a ? el('button', { class: 'inv-btn wm-go', disabled: true, title: a.disabled || '' }, icon('lock', 18), ' ', a.disabled || a.label) : null);
+        a ? el('button', { class: 'inv-btn wm-go', disabled: true, title: a.disabled || null }, icon('lock', 18), ' ', a.disabled || a.label) : null);
       return;
     }
     const P = D.pois?.[n.poi] || {}, b = C.brands.find(x => x.id === n.brand), here = n.id === save.location, a = this.action();
@@ -158,7 +158,7 @@ export class MapUI {
         .map(([k, v, bad]) => el('div', { class: bad ? 'bad' : '' }, el('small', {}, k), el('b', {}, v))), this.forecastBox(cost, false)) : null,
       here ? this.forecastBox(null, true) : null,   // #087 the navigator: at home the rain of the next days
       here && a && !a.disabled ? this.readyBox() : null,
-      a ? el('button', { class: 'inv-btn wm-go', disabled: !!a.disabled, title: a.disabled || '', onclick: () => this.act() }, a.icon ? icon(a.icon, 18) : null, ' ', a.disabled && a.cost ? a.disabled : a.label) : null,
+      a ? el('button', { class: 'inv-btn wm-go', disabled: !!a.disabled, title: a.disabled || null, onclick: () => this.act() }, a.icon ? icon(a.icon, 18) : null, ' ', a.disabled && a.cost ? a.disabled : a.label) : null,
       a?.disabled && !a.cost ? el('small', { class: 'wm-why' }, a.disabled) : null].filter(Boolean));   // replaceChildren would write "null"
   }
   // #087 Wettervorhersage: with a warroom the navigator tells the weather of every leg of the route, here the rain of the next days

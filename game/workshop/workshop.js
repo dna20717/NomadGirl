@@ -419,7 +419,7 @@ export class Workshop {
       main.append(el('h3', {}, title), el('div', { class: 'ng-cards' }, ...list.map(a => {
         const A = AREAS[a], n = A.kind === 'catalog' ? Object.keys(this.p.data[a] || {}).length : null, bad = m.filter(x => x.place.area === a && x.kind !== 'hint').length;
         return el('button', { class: 'ng-card', onclick: () => this.go({ area: a }) }, el('span', { class: 'ng-card-head' }, icon(A.icon, 18), el('b', {}, A.name), n != null ? el('span', { class: 'ng-card-n' }, String(n)) : null),
-          el('span', { class: 'ed-small ng-cardHint', title: A.hint || '' }, A.hint), bad ? el('span', { class: 'ng-card-bad' }, icon('warning', 13), ` ${bad} zu prüfen`) : null);
+          el('span', { class: 'ed-small ng-cardHint', title: A.hint || null }, A.hint), bad ? el('span', { class: 'ng-card-bad' }, icon('warning', 13), ` ${bad} zu prüfen`) : null);
       })));
     }
     insp.append(el('h3', {}, 'So funktioniert die Werkstatt'), ...[
@@ -623,7 +623,7 @@ export class Workshop {
       const G = new Map();
       for (const c of f.columns) { const g = cardGroup(c); if (!G.has(g)) G.set(g, []); G.get(g).push(c); }
       return [...G].map(([g, cs]) => el('div', { class: 'ng-cardGroup' }, el('h5', {}, g), el('div', { class: 'ng-cardGrid' },
-        ...cs.map(c => el('label', { class: 'ng-cardField' + (c.type === 'text' && /text|result|label|name|answers|moods|figures/.test(c.key) ? ' wide' : ''), title: c.hint || '' }, el('span', {}, c.label, c.hint ? el('i', { class: 'ng-hintMark' }, ' ⓘ') : null), cell(c, row, rows.indexOf(row)))))));
+        ...cs.map(c => el('label', { class: 'ng-cardField' + (c.type === 'text' && /text|result|label|name|answers|moods|figures/.test(c.key) ? ' wide' : ''), title: c.hint || null }, el('span', {}, c.label, c.hint ? el('i', { class: 'ng-hintMark' }, ' ⓘ') : null), cell(c, row, rows.indexOf(row)))))));
     };
     const filter = el('input', { class: 'ed-field ng-cardFilter', placeholder: `Suchen in ${rows.length} Zeilen …`, value: q });
     filter.addEventListener('input', () => { this.cardFilter[key] = filter.value; const pos = filter.selectionStart; this.draw(); const n = document.querySelector(`.ng-cardFilter[data-key="${CSS.escape(key)}"]`); if (n) { n.focus(); n.setSelectionRange(pos, pos); } });
@@ -659,13 +659,13 @@ export class Workshop {
     let last = type === 'checkbox' ? !!stat : String(stat);
     inp.addEventListener('change', () => { const v = type === 'checkbox' ? inp.checked : inp.value; if (v === last) return; last = v; opt.set(type === 'number' ? (v === '' ? undefined : +v) : v); });
     const [mark, text] = this.hintToggle(opt.hint);
-    const name = el('span', { title: opt.hint || '' }, label, mark);
+    const name = el('span', { title: opt.hint || null }, label, mark);
     if (type === 'number' && opt.live) draggable(name, inp, { start: () => this.begin(), live: v => opt.live(v), end: () => this.draw(), min: opt.min, max: opt.max });
     return el('label', { class: 'da-field' + (type === 'checkbox' ? ' across' : '') }, name, inp, text);
   }
   labeled(label, content, hint, extra = '') {
     const [mark, text] = this.hintToggle(hint);
-    return el('div', { class: 'da-field ' + extra }, el('span', { title: hint || '' }, label, mark), content, text);
+    return el('div', { class: 'da-field ' + extra }, el('span', { title: hint || null }, label, mark), content, text);
   }
   // ⓘ to tap (Daniel, 19.11.2026: tooltips don't work on the iPad): shows the explanation below the field; hover still shows it as before
   hintToggle(hint) {

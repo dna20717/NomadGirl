@@ -179,7 +179,7 @@ export class SceneEvents {
     if (!list?.length) return;
     const D = this.data_;
     list.forEach((a, i) => this.time.delayedCall(i * 900, () => {
-      this.hud.toast(a.name, `Achievement erreicht · ${D.achievements?.[a.id]?.description || ''}`, 'trophy', 5200);
+      this.hud.toast(a.name, ['Achievement erreicht', D.achievements?.[a.id]?.description].filter(Boolean).join(' · '), 'trophy', 5200);
       this.sfxAchieve?.();
       if (a.recipe) this.time.delayedCall(700, () => this.hud.toast(`Rezept gelernt: ${a.recipeName}`, `Einmal herstellen an: ${D.workshops?.[D.recipes?.[a.recipe]?.station]?.name || 'Werkbank'} · dann in die Schatzkammer stellen`, 'recipe', 5200));
     }));

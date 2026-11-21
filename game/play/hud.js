@@ -491,7 +491,7 @@ export class Hud {
             el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'Δ'), el('b', {}, String(sv.deltas)), el('span', { class: 'hud-label' }, 'SPRIT'), el('b', {}, `${Math.round(sv.fuel)} l`),
               el('span', { class: 'hud-label' }, 'VORRÄTE'), el('b', {}, (Math.round(sv.food * 10) / 10).toLocaleString('de-DE')))]),
           ...(vit ? [el('div', { class: 'hud-row hud-vital' + (vit.index >= 4 || vit.dead ? ' bad' : '') }, el('span', { class: 'hud-label' }, '♥ AvA'), el('b', {}, vit.dead ? 'kein Signal' : `${Math.round(sv.tank.cond)} % · ${vit.name}`))] : []),
-          ...(fx.length ? [el('div', { class: 'hud-row hud-buffs hud-fx' }, el('span', { class: 'hud-label' }, 'EFFEKTE'), ...fx.map(e => el('span', { class: `hud-fxchip ${e.kind}`, title: e.sub || '' }, e.label, e.left != null ? el('small', {}, ` ${Math.ceil(e.left)} h`) : null)))] : []),
+          ...(fx.length ? [el('div', { class: 'hud-row hud-buffs hud-fx' }, el('span', { class: 'hud-label' }, 'EFFEKTE'), ...fx.map(e => el('span', { class: `hud-fxchip ${e.kind}`, title: e.sub || null }, e.label, e.left != null ? el('small', {}, ` ${Math.ceil(e.left)} h`) : null)))] : []),
           ...(G ? [goalEl(G, run)] : []));
         // #017: in the camp the toasts start below this column (they covered the goal line)
         requestAnimationFrame(() => { const r = !run && !this.campEl.hidden ? this.campEl.getBoundingClientRect() : null; this.toastsEl.style.setProperty('--toast-top', `${r && r.height ? Math.round(r.bottom + 10) : 110}px`); });

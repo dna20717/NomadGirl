@@ -82,7 +82,7 @@ const norm = s => String(s ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ
 export function suchChoice(opt) {
   const list = [...(opt.empty != null ? [{ stat: '', name: opt.empty, empty: true }] : []), ...opt.options];
   const current = list.find(o => String(o.stat) === String(opt.stat ?? ''));
-  const button = el('button', { type: 'button', class: 'ed-choice ed-searchPick' + (opt.full ? ' full' : '') + (current?.empty || !current ? ' empty' : ''), title: opt.title || '' },
+  const button = el('button', { type: 'button', class: 'ed-choice ed-searchPick' + (opt.full ? ' full' : '') + (current?.empty || !current ? ' empty' : ''), title: opt.title || null },
     el('span', { class: 'ed-searchPick-text' }, current ? current.name : (opt.stat ? `${opt.stat} (fehlt)` : opt.empty ?? '—')), icon('down', 14));
   button.addEventListener('click', ev => {
     const search = el('input', { type: 'search', class: 'ed-field', placeholder: 'Suchen …', autocomplete: 'off' });

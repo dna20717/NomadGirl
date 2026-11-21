@@ -100,7 +100,7 @@ export async function startDuel(root, switchTo = null) {
       el('div', { class: 'dl-face' }, face(f)),
       el('b', { class: 'dl-name' }, f.name),
       el('small', { class: 'dl-maker', style: b?.color ? `color:${b.color}` : '' }, b?.name || (f.kind === 'hunter' ? 'Kammerjäger' : '—')),
-      el('div', { class: 'dl-kind' }, f.kind === 'hunter' ? 'Kammerjäger' : `${f.g?.talent || ''} · ${'▮'.repeat(f.g?.bits || 0)}`),
+      el('div', { class: 'dl-kind' }, f.kind === 'hunter' ? 'Kammerjäger' : [f.g?.talent, '▮'.repeat(f.g?.bits || 0)].filter(Boolean).join(' · ')),
       el('div', { class: 'dl-stats' },
         el('span', { title: 'Trifft bei einem Würfel ab diesem Wert' }, icon('target', 13), `trifft ${f.quality}+`),
         el('span', { title: 'Wehrt einen Treffer ab bei einem Würfel ab diesem Wert' }, icon('armor', 13), `hält ${f.defense}+`)),

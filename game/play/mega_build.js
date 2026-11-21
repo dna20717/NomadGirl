@@ -152,7 +152,7 @@ export class MegaBuild {
     const ui = this.sel(), u = ui != null ? rig.units[ui] : null;
     const side = el('aside', { class: 'mb-side' }, el('h3', {}, this.mode === 'move' ? 'Verschieben' : this.mode === 'light' ? 'Lichterkette' : u ? (D.containers[u.id]?.name || u.id) : `Platz ${this.cur.place + 1} · ${this.cur.story < g.inside ? 'Rumpf' : 'oben'}`),
       this.msg ? el('p', { class: 'mb-msg' }, this.msg) : null,
-      el('div', { class: 'mb-acts' }, ...this.acts.map((a, i) => el('button', { class: 'mb-act' + (i === this.pick ? ' focus' : '') + (a.primary ? ' primary' : '') + (a.danger ? ' danger' : ''), disabled: !!a.disabled, title: a.disabled || '', onclick: () => a.do(), onmouseenter: () => { this.pick = i; this.markPick(); } },
+      el('div', { class: 'mb-acts' }, ...this.acts.map((a, i) => el('button', { class: 'mb-act' + (i === this.pick ? ' focus' : '') + (a.primary ? ' primary' : '') + (a.danger ? ' danger' : ''), disabled: !!a.disabled, title: a.disabled || null, onclick: () => a.do(), onmouseenter: () => { this.pick = i; this.markPick(); } },
         icon(a.icon || 'chevron_right', 16), el('span', {}, el('b', {}, a.label), a.sub || a.disabled ? el('small', {}, [a.sub, a.disabled].filter(Boolean).join(' · ')) : null)))));
     const lager = el('footer', {}, el('span', { class: 'mb-lagerT' }, icon('box', 14), 'Lager'),
       ...rig.spare.containers.map(id => el('span', { class: 'mb-chip' }, D.containers[id]?.name || id)), ...rig.spare.workshops.map(id => el('span', { class: 'mb-chip ws' }, wsDef(D, id).name || id)),

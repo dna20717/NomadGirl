@@ -410,7 +410,7 @@ export class PlayScene extends Phaser.Scene {
     this.startTime = 0; this.earnedKills = new Set(); this.kills = 0; this.deltas = 0; this.cleared = false; this.hitstopUntil = 0;
     this.hud.room(def?.name || this.roomId, this.enemies.length);
     this.hud.mode(this.mode, this.box?.save, this.data_);
-    if (this.mode === 'run') this.hud.room(`${this.data_.pois?.[this.box.save.run?.poi]?.name || ''} · ${def?.name || this.roomId}`, this.enemies.length);
+    if (this.mode === 'run') this.hud.room([this.data_.pois?.[this.box.save.run?.poi]?.name, def?.name || this.roomId].filter(Boolean).join(' · '), this.enemies.length);
     if (this.args.summary && this.mode === 'camp') { const S = this.args.summary; this.args.summary = null; this.time.delayedCall(450, () => this.hud.sum?.open(S)); }
     if (this.args.banner) { const [t, sub, kind] = this.args.banner; this.hud.banner(t, sub, 4200, kind || (this.mode === 'camp' ? 'camp' : 'travel')); }
     if (this.mode === 'camp' && this.rain && !this.hud.toldRain && !/regnet/.test(this.args.banner?.[0] || '')) this.hud.toast('Es regnet', 'Die Zisterne füllt sich schneller', 'camp', 3600);

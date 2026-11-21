@@ -102,13 +102,13 @@ export class TechtreeUI {
         path.setAttribute('class', 'tt-line ' + (owned(save, r) ? (owned(save, n.id) ? 'done' : 'live') : 'dead'));
         svg.append(path);
       }
-      const away = (n.requires || []).filter(r => !L.some(x => x.id === r)).map(r => D.techtree?.[r]);
+      const away = (n.requires || []).filter(r => !L.some(x => x.id === r)).map(r => ({ id: r, ...D.techtree?.[r] }));
       return el('button', { class: `tt-node ${st}` + (n.id === this.sel ? ' sel' : '') + (n.id === this.flash ? ' flash' : '') + (n.id === this.shake ? ' shake' : ''), 'data-node': n.id,
         style: `left:${p.x}px;top:${p.y}px;width:${BOX}px;height:${BOX}px`,
         onmouseenter: () => { if (this.sel !== n.id) { this.sel = n.id; this.draw(); } }, onclick: () => this.buy(n.id) },
         this.pic(n, BOX - 16), st === 'owned' ? el('span', { class: 'tt-check' }, icon('check', 18)) : st === 'locked' ? el('span', { class: 'tt-check lock' }, icon('lock', 16)) : null,
         el('span', { class: 'tt-name' }, n.name || n.id),
-        away.length ? el('span', { class: 'tt-away' }, '↳ ' + away.map(x => `${x?.name} (${D.resources?.[x?.tab]?.name || ''})`).join(', ')) : null);
+        away.length ? el('span', { class: 'tt-away' }, '↳ ' + away.map(x => { const t = D.resources?.[x.tab]?.name; return `${x.name || x.id}${t ? ` (${t})` : ''}`; }).join(', ')) : null);
     });
     this.flash = null; this.shake = null;
     const tree = el('div', { class: 'tt-tree', style: `width:${W}px;height:${H}px` }, svg, ...nodes);
@@ -140,7 +140,7 @@ export class TechtreeUI {
       fx.length ? el('ul', { class: 'tt-fx' }, ...fx.map(t => el('li', {}, t))) : el('ul', { class: 'tt-fx' }, el('li', {}, '???')),
       (n.requires || []).length ? el('small', { class: 'tt-req' }, 'Braucht: ' + n.requires.map(r => (owned(save, r) ? '✓ ' : '· ') + (D.techtree?.[r]?.name || r)).join('  ')) : null,
       el('div', { class: 'tt-costs' }, ...cost),
-      st.state === 'owned' ? null : el('button', { class: 'inv-btn tt-buy', disabled: st.state !== 'ready', title: st.reason || '', onclick: () => this.buy(this.sel) }, st.state === 'ready' ? 'Freischalten' : st.reason || 'Gesperrt'));
+      st.state === 'owned' ? null : el('button', { class: 'inv-btn tt-buy', disabled: st.state !== 'ready', title: st.reason || null, onclick: () => this.buy(this.sel) }, st.state === 'ready' ? 'Freischalten' : st.reason || 'Gesperrt'));
   }
 
   state() {

@@ -11,6 +11,7 @@
 // Logic in game/rig.js (act, snapshot/restore), drawing in game/play/camp.js (drawRig, drawYard), values in "Rig-Bau".
 import { hang, unhang, canHang, lightsConfig } from '../string_lights.js';
 import { el } from '../ui.js';
+import { WORKSHOP_FUNCTIONS } from '../../engine/schema.js';
 import { hints, NavCursor, closeX, keyGlyph } from './ui_nav.js';
 import { icon } from '../icons.js';
 import { techLock } from '../techtree.js';
@@ -26,7 +27,7 @@ import { BuildGrow } from './build_grow.js';
 import { BuildSelect } from './build_select.js';
 
 const FN_COLORS = { storage: '#5c6b7a', cooling: '#4a7a9a', cell: '#5a4a4a', sleep: '#6a5a9a', chill: '#9a4a7a', drone: '#3a8a6a', warroom: '#7a6a3a', kitchen: '#a8642a', foodtruck: '#c0703a', craft: '#7a6235', engine: '#5a5a5a', power: '#a8862a' };
-const FN_NAMES = { storage: 'Lager', cooling: 'Kühlung', cell: 'Zelle', sleep: 'Schlafen', chill: 'Chillen', drone: 'Drohnen', warroom: 'Planung', kitchen: 'Kochen', foodtruck: 'Verkauf', craft: 'Herstellen', engine: 'Motor', power: 'Energie' };
+const FN_NAMES = { ...Object.fromEntries(WORKSHOP_FUNCTIONS), guests: 'Gäste', treasury: 'Schatzkammer', tank: 'Cryo-Tank', garden: 'Hydrokultur', cyber: 'Cyberware', cistern: 'Zisterne', armory: 'Waffenkammer', vehicle: 'Fahrzeuge', jobs: 'Aufträge', bitfarm: 'Bit-Farm', storage: 'Lager', cooling: 'Kühlung', cell: 'Zelle', sleep: 'Schlafen', chill: 'Chillen', drone: 'Drohnen', warroom: 'Planung', kitchen: 'Kochen', foodtruck: 'Verkauf', craft: 'Herstellen', engine: 'Motor', power: 'Energie' };
 const de = n => Number(n).toLocaleString('de-DE');
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const SHOP_TABS = [['workshops', 'Werkstätten'], ['containers', 'Anhänger'], ['rigParts', 'Rig-Teile'], ['decor', 'Deko']];
@@ -537,13 +538,13 @@ export class BuildMode {
     this.shopTab ??= 'workshops';
     const row = (area, id) => {
       const x = D[area][id], price = priceOf(D, area, id), lock = techLock(D, save, area, id), poor = price > save.deltas || !!lock;   // #110 Techtree
-      const sub = area === 'workshops' ? `${FN_NAMES[x.function] || ''} · ${x.places || 1} ${x.places > 1 ? 'Plätze' : 'Platz'} · ${x.power > 0 ? '+' : ''}${x.power || 0} ⚡`
+      const sub = area === 'workshops' ? [FN_NAMES[x.function], `${x.places || 1} ${x.places > 1 ? 'Plätze' : 'Platz'}`, `${x.power > 0 ? '+' : ''}${x.power || 0} ⚡`].filter(Boolean).join(' · ')
         : area === 'rigParts' ? [PART_SLOTS[x.slot] || x.slot, x.pull ? `+${de(x.pull)} kg` : null, x.armor ? `+${x.armor} Panzerung` : null, x.damage ? `${x.damage} Schaden` : null, x.storageRows ? `+${x.storageRows} Reihen Stauraum` : null].filter(Boolean).join(' · ')
         : `${x.places || 1} Plätze · ${de(x.weight || 0)} kg`;
       const pic = (area === 'workshops' || area === 'rigParts') && this.picture(x.look);   // rig parts with a picture (solar panel) like workshops
       const lead = pic ? el('span', { class: 'bm-thumb', style: `--col:${FN_COLORS[x.function] || '#555'}` }, el('img', { src: pic, alt: '', draggable: 'false' }))
         : area === 'workshops' ? el('span', { class: 'build-dot', style: `--col:${FN_COLORS[x.function] || '#555'}` }) : icon(area === 'rigParts' ? 'settings' : 'box', 16);
-      return el('div', { class: 'build-row' + (pic ? ' has-pic' : ''), title: pic ? '' : x.description || '', onmouseenter: ev => area === 'workshops' && this.peek(id, ev.currentTarget), onmouseleave: () => this.peek(null) }, lead,
+      return el('div', { class: 'build-row' + (pic ? ' has-pic' : ''), title: pic ? null : x.description || null, onmouseenter: ev => area === 'workshops' && this.peek(id, ev.currentTarget), onmouseleave: () => this.peek(null) }, lead,
         el('span', {}, el('b', {}, x.name || id), el('small', {}, sub)),
         el('button', { class: 'inv-btn', disabled: poor, title: lock ? `Erst im Techtree: ${lock}` : poor ? 'Zu wenig Δ' : 'Wird auf den Händler-Platz geliefert', onclick: () => this.buy(area, id) }, lock ? `🔒 ${lock}` : `${de(price)} Δ`));
     };
@@ -719,7 +720,7 @@ export class BuildMode {
     if (h.kind === 'anchor') return this.wire ? 'Hier einhängen' : `Andockpunkt · zu einem anderen ziehen: Lichterkette (${L.price} Δ)`;
     if (h.kind === 'lights') return `Lichterkette · anklicken zum Abnehmen (+${Math.floor(L.price / 2)} Δ)`;
     if (h.kind === 'decor') return `${D.decor?.[h.id]?.name || h.id} · anklicken zum Umsetzen (Esc: ins Lager)`;
-    if (h.kind === 'ws') { const d = wsDef(D, h.id), p = d.power || 0; return `${d.name || h.id} · ${FN_NAMES[d.function] || ''} · ${d.places || 1} ${d.places > 1 ? 'Plätze' : 'Platz'}${p ? ` · ${p > 0 ? '+' : ''}${p} ⚡` : ''} · ziehen zum Umstellen`; }
+    if (h.kind === 'ws') { const d = wsDef(D, h.id), p = d.power || 0; return `${d.name || h.id}${FN_NAMES[d.function] ? ` · ${FN_NAMES[d.function]}` : ''} · ${d.places || 1} ${d.places > 1 ? 'Plätze' : 'Platz'}${p ? ` · ${p > 0 ? '+' : ''}${p} ⚡` : ''} · ziehen zum Umstellen`; }
     if (h.kind === 'part') { const t = D.rigParts?.[h.id] || {}; return `${t.name || h.id} · ${PART_SLOTS[t.slot] || t.slot}${this.partFacts(t)} · ziehen ${h.from === 'yard' ? 'an den Van' : 'zum Ausbauen'}`; }
     if (h.kind === 'resize') return 'Griff: ziehen = Container länger oder kürzer (ohne Aufpreis)';
     if (h.kind === 'cell') return `${D.containers?.[h.id]?.name || 'Container'} · Platz ${h.p + 1} · Klickpunkt: markieren und Menü`;

@@ -190,7 +190,7 @@ export class InventoryUI {
         el('button', { class: 'inv-btn', onclick: () => this.storeAll() }, 'Alles einlagern'),
         camp ? el('button', { class: 'inv-btn ghost', title: 'Stapel zusammenlegen, nach Art ordnen', onclick: () => this.sortCamp() }, 'Sortieren') : null,
         el('button', { class: 'inv-btn ghost', onclick: () => this.takeAll() }, 'Alles nehmen'),
-        o.upgrade ? el('button', { class: 'inv-btn ghost inv-upgrade', title: o.upgrade.sub || '', disabled: !!o.upgrade.disabled, onclick: () => { const u = o.upgrade; this.close(); u.act(); } }, icon('star', 14), o.upgrade.label) : null) :
+        o.upgrade ? el('button', { class: 'inv-btn ghost inv-upgrade', title: o.upgrade.sub || null, disabled: !!o.upgrade.disabled, onclick: () => { const u = o.upgrade; this.close(); u.act(); } }, icon('star', 14), o.upgrade.label) : null) :
         el('div', { class: 'inv-actions' }, el('button', { class: 'inv-btn', onclick: () => this.takeAll() }, 'Alles aufheben')));
   }
   // Leyla from the front with her slots around her; tab "Implantate" shows her as a scan with a line from each implant to its place on the body

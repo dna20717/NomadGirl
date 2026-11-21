@@ -114,13 +114,13 @@ export class CraftUI {
   workerEl() {
     const it = this.place && this.host.workerItem?.(this.ws, this.place, () => this.open(this.ws));
     if (!it) return null;
-    return el('button', { class: 'craft-worker', title: it.sub || '', onclick: () => { this.close(); it.act(); } }, icon('brain', 14), it.label);
+    return el('button', { class: 'craft-worker', title: it.sub || null, onclick: () => { this.close(); it.act(); } }, icon('brain', 14), it.label);
   }
   // #078 Ausbau: the next star as a button in the header
   upgradeEl() {
     const it = this.place && this.host.upgradeItem?.(this.ws, this.place, () => this.open(this.ws));
     if (!it || it.disabled) return null;
-    return el('button', { class: 'craft-worker craft-up', title: it.sub || '', onclick: () => { this.close(); it.act(); } }, icon('star', 14), it.label);
+    return el('button', { class: 'craft-worker craft-up', title: it.sub || null, onclick: () => { this.close(); it.act(); } }, icon('star', 14), it.label);
   }
   verb() { return VERBS[functionOf(this.D, this.ws)]?.[0] || 'Herstellen'; }
   // the action panel of a recipe at this workshop (#013); tank care and trophies stay plain
@@ -158,7 +158,7 @@ export class CraftUI {
           const off = !!miss.length || (r.tank && !canMaintain(D, save, r).ok), why = miss.length ? 'Es fehlen: ' + miss.map(m => `${m.need - m.have}× ${D.items?.[m.item]?.name || m.item}`).join(', ') : r.tank ? canMaintain(D, save, r).reason || '' : '';
           const P = this.panelFor(r), needsParts = (r.slots || []).some(x => x.required);
           return el('div', { class: 'craft-btns' },
-            el('button', { class: 'inv-btn', disabled: off, title: why, onclick: () => P ? this.startStation(new P(this, r), r) : this.make(r.id) }, P ? verb : verb === 'Bauen' ? 'Herstellen' : verb),
+            el('button', { class: 'inv-btn', disabled: off, title: why || null, onclick: () => P ? this.startStation(new P(this, r), r) : this.make(r.id) }, P ? verb : verb === 'Bauen' ? 'Herstellen' : verb),
             P && !needsParts ? el('button', { class: 'inv-btn ghost craft-quick', disabled: off, title: 'Ohne Handgriffe, normales Ergebnis', onclick: () => this.make(r.id) }, 'Schnell') : null);
         })());
     });

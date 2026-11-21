@@ -67,7 +67,7 @@ export class RadioUI {
     const st = this.station, on = this.on && this.allowed();
     this.el.hidden = !this.D || !this.C.enabled || !this.C.stations.length || !this.scene?.box || this.scene.mode === 'run' || this.busy();
     this.el.classList.toggle('on', on); this.el.classList.toggle('talk', on && (this.seg?.kind === 'talk' || this.seg?.kind === 'jam'));
-    const what = !this.on ? 'Radio aus' : !on ? `${st?.name || ''} · leise` : this.seg?.kind === 'talk' ? `${st.dj || st.name}: ${this.seg.text}` : this.seg?.kind === 'jam' ? this.seg.text : `♪ ${this.seg?.title || ''}`;
+    const what = !this.on ? 'Radio aus' : !on ? (st?.name ? `${st.name} · leise` : 'leise') : this.seg?.kind === 'talk' ? `${st.dj || st.name}: ${this.seg.text}` : this.seg?.kind === 'jam' ? this.seg.text : `♪ ${this.seg?.title || st?.name || 'Musik'}`;
     // #103 the DJ's face in the chip (an Entity), made once per station and kept, so it keeps moving
     const dj = this.on && st ? djOf(this.D, st) : null;
     if (dj && this.djFace?.id !== dj.id) { this.djFace = { id: dj.id, el: faceCanvas(dj, 28) }; this.djFace.el.classList.add('radio-dj'); this.djFace.el.title = `${dj.name} · ${dj.talent}`; }
