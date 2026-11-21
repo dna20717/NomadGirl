@@ -287,11 +287,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #164 Leyla: Wende-Wurf im Dash (Spezial-Move)
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Leyla dash turn grenade Wurf special move“; Wahl: **Wende-Wurf im Dash**, Kosten **1 Granate + Ausdauer**, Animation aus vorhandenen Frames gemischt, PixelLab später)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Leyla dash turn grenade Wurf special move“; Wahl: **Wende-Wurf im Dash**, Kosten **1 Granate + Ausdauer**, Animation aus vorhandenen Frames gemischt, PixelLab später)
 - **Für:** Code
 - **Auftrag:** Während des Dash Gegenrichtung + Granate (T): Leyla dreht sich mitten im Dash um, wirft die Granate flach nach hinten auf Verfolger und rutscht rückwärts aus; kurzer Zeitlupen-Moment. Verbraucht eine Granaten-Ladung und Ausdauer. Werte in der Werkstatt (Leyla), Animation aus vorhandenen Dash-/Brems-/Wurf-Frames, Effekte aus Code. Test + Doku in `docs/features/leyla.md`/`combat.md`.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: Puffer 120 ms nach Dash-Ende (nicht nach Sprung aus dem Dash); Ausdauer 30 zusätzlich zum Dash; Ladung geht beim Loslassen weg; kein neuer Streifen (Bremsen-Bilder 2–3 + gemalter Wurf ab Bild 4 als ganzer Körper); Spieluhr läuft je Wende-Wurf ≈ 130 ms hinter der Echtzeit; Nahkampf-Druck im Move löst den schnellen Hieb aus.
+- **Ergebnis:** (Code, per Helfer, `7208863`) Zustand `turnThrow` (`leyla_turnthrow.js`): 70 ms Füße stemmen, 320 ms Wurf mit gemaltem Wurf (Pistole/Sturmgewehr), Granate flach nach hinten (1350 px/s, 12°), rückwärts ausrutschen (900 px/s, Reibung 2200), Sprung bricht ab. Zeitlupe 200 ms bei 35 % über eine Spieluhr (`slowmo.js`, `nomad.step` bleibt deterministisch). Effekte aus Code (Nachbilder, Wirbel-Ring, Speedlines, Funken, Kamera-Punch). Werkstatt: Leyla › Wende-Wurf; Steuerungs-Übersicht › Kampf. Tests: `turn_throw_test` 10, npm 406, enemy_traits 32, game 53, parcours 50, anim_audit sauber. Hinweis: `test_all` 61/68, rot schon vor #164: crew, map, mirror, salvage, turf, van. PixelLab 0. **Bitte testen:** Dash weg vom Gegner, dann Gegenrichtung + T (Controller: Stick zurück + rechter Stick); einmal ohne Ladung, einmal mit Sturmgewehr.
 
 ### #161 Granate: generierte Wurf-Animation mit Waffe
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Granate – die Animation ist schlecht. Lass sie bitte generieren (mit aktiver Kurz- oder Langwaffe und dynamischer)“)
