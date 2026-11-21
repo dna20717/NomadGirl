@@ -23,7 +23,7 @@ export const PAINTABLE = new Set(['tent', 'sail', 'canopy', 'pennants', 'banner'
 export const lighten = (hex, k = 0.45) => { const n = parseInt(hex.slice(1), 16), f = c => Math.round(c + (255 - c) * k); return '#' + [f((n >> 16) & 255), f((n >> 8) & 255), f(n & 255)].map(v => v.toString(16).padStart(2, '0')).join(''); };
 // a piece's definition with its painted colour applied (at.paint)
 export const paintedDef = (d, at) => (at?.paint && d && PAINTABLE.has(d.art) ? { ...d, color: at.paint, colors: `${at.paint},${lighten(at.paint)}` } : d);
-export const DECOR_USES = [['', 'Nichts'], ['mirror', 'Haare färben (Spiegel)'], ['rest', 'Ausruhen (eine Stunde, heilt)']];
+export const DECOR_USES = [['', 'Nichts'], ['mirror', 'Haare färben (Spiegel)'], ['rest', 'Ausruhen (eine Stunde, heilt)'], ['board', 'Schwarzes Brett (Aufträge)']];
 
 export const decorDef = (D, id) => D.decor?.[id] || null;
 export const placeOf = (D, id) => decorDef(D, id)?.place || 'ground';

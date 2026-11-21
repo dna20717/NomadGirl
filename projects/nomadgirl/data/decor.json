@@ -818,5 +818,21 @@
   "colors": "#ffd27a,#fa6a0a,#e86a73,#a6fcdb",
   "tags": "licht, innen",
   "description": "Bunte Birnen unter der Decke eines freien Platzes."
+ },
+ "schwarzes_brett": {
+  "name": "Schwarzes Brett",
+  "art": "sprite",
+  "place": "free",
+  "value": 40,
+  "cozy": 1,
+  "size": [3, 3.4],
+  "description": "Brett mit Blechdach und Lampe. Hier hängen die Aufträge aller Companions: E = annehmen, abgeben, Belohnung holen. Jeder Spielstand bekommt eins geschenkt.",
+  "look": "notice_board",
+  "scale": 125,
+  "use": "board",
+  "useHint": "Aufträge",
+  "areaAt": [18, 68],
+  "areaSize": [154, 88],
+  "tags": "brett,arbeit"
  }
 }

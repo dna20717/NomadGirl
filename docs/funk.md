@@ -259,6 +259,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 ## Tickets
 
+### #128 Schwarzes Brett als Deko, Camp breiter, Null-Texte, Polish-Plan
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Mach aus dem schwarzen Brett etwas, dass man wie Deko im Camp platzieren kann und mach das Camp etwas größer, damit es nicht so gestreckt ist … Schau auch mal nach, ob es viele Tooltips und Text mit NULL oder leer gibt … Insgesamt: Polish-Durchgang. Was haben wir zu tun, um das Spiel auf die nächste Ebene zu bringen?“)
+- **Rückfragen:** (Code) ⚠️ vorläufig: (1) Das Brett lässt sich auch verkaufen; dann hängen die Aufträge nur noch bei den Companions, bis man im Deko-Katalog ein neues kauft (40 Δ). (2) Das Feuer bleibt bei Kachel 9, das Camp wächst nach rechts (Feuer weiter rechts lag unter der Now-Playing-Kassette).
+- **Ergebnis:**
+
 ### #127 Ebene bis zum Horizont und Schwarzes Brett in hübsch
 - **Status:** fertig (20.11.) · angelegt 20.11. von Code (Daniel: „Die Ebene zwischen camp und paralax ist noch sehr roh. Mach das auch mal hübsch. Und das schwarze Brett im camp auch“)
 - **Auftrag:** die Code-Bänder zwischen Horizont und Camp-Boden durch eine gemalte Ebene ersetzen; das Schwarze Brett aus Code durch ein Bild.

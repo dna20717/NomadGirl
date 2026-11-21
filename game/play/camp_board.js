@@ -33,6 +33,7 @@ export class CampBoard {
   // the board itself: from code, two posts, a dark board with a tin roof, notes pinned on it (redrawn when jobs change)
   placeBoard() {
     const s = this.scene, B = this.C.board || {};
+    if (B.decor && this.D.decor?.[B.decor]) return;   // #128 the board is a placed piece (Deko), drawn with the rig
     this.board = null;
     if (B.enabled === false) return;
     const x = Math.round(this.geo.fireX + (B.offset ?? -220)), y = this.campY ?? this.ground;

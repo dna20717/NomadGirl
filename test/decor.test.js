@@ -8,7 +8,7 @@ import { act, buyContainer, attach } from '../game/rig.js';
 import { buy, put, lift, stow, fromSpare, sell, cozy, cozyBonus, shopDecor, plantStage, dstate } from '../game/decor.js';
 
 const D = (await loadProject(nodeLoader('projects/nomadgirl'))).data;
-const fresh = () => { const s = newSave(D); s.deltas = 5000; return s; };
+const fresh = () => { const s = newSave(D); s.deltas = 5000; s.rig.decor = []; return s; };   // without the gifted notice board (#128), the indices below count from 0
 
 test('Katalog: Beispiele aus allen Paketen, alle mit Preis und Art', () => {
   const ids = shopDecor(D);
@@ -98,4 +98,18 @@ test('Deko-Anker: Aufnehmen und Umbauen nummerieren Zeltstangen um, Spannen ohne
   remap(save.rig, ui => (ui === 2 ? null : ui));
   assert.deepEqual(save.rig.decor.map(o => o.id), ['zeltstange']);
   assert.deepEqual(save.rig.spare.decor, ['zelt', 'zelt']);
+});
+
+test('Schwarzes Brett als Deko (#128): jeder Stand bekommt es einmal, umgesetzt oder verkauft bleibt es so', () => {
+  const s = newSave(D), id = D.camp.board.decor;
+  assert.ok(id && D.decor[id], 'Camp › Schwarzes Brett › Als Deko');
+  assert.equal(s.rig.decor.filter(o => o.id === id).length, 1, 'neuer Stand: ein Brett vor dem Feuer');
+  assert.equal(s.rig.decor.find(o => o.id === id).at.x, D.camp.board.at);
+  const old = JSON.parse(JSON.stringify(s)); old.gifts = old.gifts.filter(g => g !== 'board'); old.rig.decor = [];
+  const r = repairSave(old, D);
+  assert.equal(r.rig.decor.filter(o => o.id === id).length, 1, 'alter Stand ohne Brett bekommt eins');
+  r.rig.decor = []; r.rig.spare.decor = [];
+  assert.equal(repairSave(JSON.parse(JSON.stringify(r)), D).rig.decor.length, 0, 'verkauft bleibt verkauft');
+  const st = JSON.parse(JSON.stringify(old)); st.rig.spare.decor = [id];
+  assert.equal(repairSave(st, D).rig.decor.length, 0, 'im Lager: kein zweites');
 });

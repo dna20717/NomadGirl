@@ -7217,13 +7217,14 @@
  },
  "notice_board": {
   "name": "Schwarzes Brett",
-  "kind": "image",
+  "kind": "icons",
   "file": "assets/camp/notice_board.png",
-  "origin": [96, 208],
   "source": "KI (PixelLab, Create Image Pro 192 × 256, Stil: Camp-Boden fein, Palette AAP-64, streng seitlich); unten auf die Pfosten zugeschnitten",
   "derivedFrom": "notice_board_source",
   "date": "20.11.2026",
-  "description": "#084: Brett aus Planken mit Blechdach, Schild JOBS und Lampe, zwei Pfosten. Zettel-Fläche x 18–172, y 68–156 (Camp › Schwarzes Brett). 10 Generierungen."
+  "description": "#084: Brett aus Planken mit Blechdach, Schild JOBS und Lampe, zwei Pfosten. Zettel-Fläche x 18–172, y 68–156 (Camp › Schwarzes Brett). 10 Generierungen.",
+  "cell": [192, 208],
+  "grid": [1, 1]
  },
  "desert_plain_source": {
   "name": "Ebene Wüste (Original)",

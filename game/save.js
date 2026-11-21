@@ -179,7 +179,7 @@ function newInventory(D, save) {
 
 // handed: what Spiel › Start › Nachreichen already gave (a new Durchgang keeps it, Daniel 16.11.2026: „A“, only once per savegame)
 export function newSave(D, handed = []) {
-  return withMap(D, newSaveCore(D, handed));
+  return giftBoard(D, withMap(D, newSaveCore(D, handed)));
 }
 // the travel map (#007): rolled for every new game and every Durchgang (game/worldmap.js)
 function withMap(D, s) { ensureMap(D, s); return s; }
@@ -389,7 +389,18 @@ export function repairSave(save, D) {
   if (save.inv === undefined) delete s.inv;   // older savegame: inventory from the start values
   if (!save.tank) delete s.tank;   // older savegame: the tank starts full at today's clock
   ensureTankInRig(D, s);
-  return giftDeck(D, giftGlitchling(D, withInventory(D, s)));
+  return giftBoard(D, giftDeck(D, giftGlitchling(D, withInventory(D, s))));
+}
+
+// #128 (Daniel: „Mach aus dem schwarzen Brett etwas, dass man wie Deko im Camp platzieren kann“): every savegame gets the notice board
+// once as a placed piece (Camp › Schwarzes Brett › Als Deko, at „Geschenktes Brett bei“); moved, stowed or sold, it stays the player's business
+export function giftBoard(D, s) {
+  const B = D.camp?.board || {}, id = B.decor;
+  if (!id || !D.decor?.[id] || B.enabled === false || (s.gifts || []).includes('board')) return s;
+  s.gifts = [...(s.gifts || []), 'board'];
+  const has = (s.rig?.decor || []).some(o => o.id === id) || (s.rig?.spare?.decor || []).includes(id);
+  if (!has && s.rig) s.rig.decor = [...(s.rig.decor || []), { id, at: { x: B.at ?? 5 } }];
+  return s;
 }
 
 // Daniel, 17.11.2026: „Kannst du mir einen Glitchling ins Inventar legen?“ (#048): once per savegame, Amber Slay (his unique one, the

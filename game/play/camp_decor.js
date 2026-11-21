@@ -104,6 +104,7 @@ export class CampDecor {
     this.decorAnim = [];
     this.crows?.forEach(c => c.o.destroy()); this.crows = [];
     this.freeAt = []; this.decorBoxes = []; this.towers = []; this.insideCount = new Map();
+    if (this.board?.decor) { for (const n of this.board.notes) n.destroy(); this.board = null; }   // #128 the notice board as a placed piece is drawn anew
     R.decor.forEach((x, i) => { try { this.drawPiece(x, i); } catch (e) { console.warn('Deko', x.id, e); } });
     try { this.drawKitLights(); } catch (e) { console.warn('Deko-Lichterkette', e); }
     try { this.drawKitDetails(); } catch (e) { console.warn('Deko-Details', e); }
@@ -111,6 +112,15 @@ export class CampDecor {
     this.drawRainBits();
   }
   dAdd(o) { this.rigObjs.push(o); return o; }
+  // #128 (Daniel: „Mach aus dem schwarzen Brett etwas, das man wie Deko im Camp platzieren kann“): the notes go on the plank area of the picture
+  // (Deko › Zettel-Fläche, in Bildpixeln), E opens the jobs like the old fixed board
+  decorBoard(d, img, x, y, k, flip) {
+    const fw = img.width, fh = img.height, [ax, ay] = d.areaAt || [0, 0], [aw, ah] = d.areaSize || [fw, fh / 2];
+    const left = x + ((flip ? fw - ax - aw : ax) - fw / 2) * k, top = y - (fh - ay) * k;
+    this.board = { decor: true, x: left + aw * k / 2, top, w: aw * k, h: ah * k, g: img, notes: [] };
+    this.hotspots.push({ rig: true, x, w: Math.max(80, aw * k), floor: this.geo.campFloor != null ? this.campY : undefined, name: d.name || this.C.board?.name || 'Schwarzes Brett', hint: () => this.boardHint(), act: () => this.boardMenu() });
+    this.boardNotes();
+  }
   shellOf(u) { return (this.shells || []).find(c => c.u === u) || null; }
   drawPiece(x, i) {
     const s = this.scene, D = this.D, d = paintedDef(decorDef(D, x.id), x.at), T = s.T;   // #114 painted cloth
@@ -312,6 +322,7 @@ export class CampDecor {
     // what the piece does when Leyla presses E at it (#111: the old code pieces keep their use)
     const bw = Math.max(70, f.width * k);
     if (d.use === 'mirror') this.hotspots.push({ rig: true, x, w: bw, name: d.name || 'Spiegel', hint: 'Haare färben', act: () => this.mirrorMenu(d) });
+    if (d.use === 'board' && !this.board && !q.inside) this.decorBoard(d, img, x, y, k, flip);   // #128 the first placed board holds the jobs
     if (d.use === 'rest') this.hotspots.push({ rig: true, x, w: bw, top: q.level || q.roof || q.balc ? y - 10 : undefined, name: d.name || 'Liegestuhl', hint: d.useHint || 'Dösen', act: () => this.hammockRest(d) });
     if (d.crows) (this.perches ??= []).push({ x, y: y - c.h * k + 4 });
     if (d.extra === 'neon') return this.neonGlow(img, look, fr, k, flip, x, y - c.h * k / 2, d, fr, hash(i, x));

@@ -1243,6 +1243,7 @@ export const AREAS = {
         table('hooks', 'Haken je Variante', [point('at', 'Haken', { unit: 'Bildpixel' })], { hint: 'Zeile 1 = Variante 1 …; leer = der Haken oben' }),
         num('rotor', 'Rotor-Länge', { unit: 'Bildpixel', min: 4 }),
         select('use', 'Benutzen', DECOR_USES, { hint: 'E am Stück' }), text('useHint', 'Knopf-Text', { hint: 'Ausruhen: z. B. „Dösen“' }), num('heal', 'Heilt', { unit: '%', min: 0 }),
+        point('areaAt', 'Zettel-Fläche oben links', { unit: 'Bildpixel', hint: 'Schwarzes Brett (#128): wo die Auftrags-Zettel hängen' }), size('areaSize', 'Zettel-Fläche Größe', { unit: 'Bildpixel' }),
         bool('matchWall', 'Nimmt die Farbe des Containers an', { hint: '#114 Wand-Module: das Stück Wellblech im Bild wird wie der Container gestrichen' }), bool('foot', 'Steht unten an der Wand', { hint: 'Türen und Tore: auf dem Boden des Containers statt in zwei Höhen' }),
         bool('crows', 'Lockt Krähen an', { hint: 'Wie das Vogelhaus: Krähen sitzen darauf und auf Ecken' }), bool('shadow', 'Schatten am Boden', { hint: 'Aus = kein Kontaktschatten (Standard: an)' })] },
       { title: 'Wachsen', fields: [   // #116 (Daniel: „Dinge wie Laterne so designen, dass man die Ziehen-Funktion benutzen kann“)
@@ -1442,6 +1443,7 @@ export const AREAS = {
       { title: 'Schwarzes Brett', fields: [bool('board.enabled', 'Schwarzes Brett', { hint: 'Daniel, 15.11.2026 (#025): am Van Aufträge annehmen, abgeben und Belohnungen einsammeln, zentral für alle Companions. Bei ihnen direkt geht es weiter. Später eine Werkbank, die fertige Aufträge gegen bessere Belohnungen tauscht' }),
         text('board.name', 'Name'), num('board.offset', 'Abstand zum Feuer', { unit: 'px', hint: 'Negativ = links vom Feuer, Richtung Van. −220 = am Mast' }),
         num('board.lift', 'Oberkante über dem Boden', { unit: 'px', min: 60 }), num('board.width', 'Breite', { unit: 'px', min: 60 }), num('board.height', 'Höhe', { unit: 'px', min: 40 }),
+        ref('board.decor', 'Als Deko', 'decor', { hint: '#128: das Brett ist ein Deko-Stück, das man im Bau-Modus umsetzt; jeder Spielstand bekommt einmal eins geschenkt (vor dem Feuer). Leer = festes Brett' }), num('board.at', 'Geschenktes Brett bei', { unit: 'Kacheln ab dem Lagerplatz' }),
         ref('board.look', 'Bild', 'assets', { hint: '#084: gemaltes Brett, Füße auf dem Ankerpunkt. Leer = Brett aus Code (dann gelten Oberkante, Breite, Höhe)' }), num('board.scale', 'Maßstab', { unit: '%', min: 10 }),
         point('board.areaAt', 'Zettel-Fläche oben links', { unit: 'Bildpixel' }), size('board.areaSize', 'Zettel-Fläche Größe', { unit: 'Bildpixel' })] },
       { title: 'Companions', fields: [range('companions.at', 'Stehen von – bis', { unit: 'Kacheln vom Van' }), range('companions.barkEvery', 'Sprüche alle', { unit: 's' }), num('companions.barkTime', 'Bläschen zeigen', { unit: 's', min: 1 })] },

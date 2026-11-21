@@ -16,7 +16,11 @@ const ev = f => page.evaluate(f);
 await page.goto(url);
 await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene?.('play')?.camp, null, { timeout: 30000 });
 
-await ev(() => { const s = game.scene.getScene('play'); s.box.save.deltas = 5000; s.openBuild(); });
+// #128 the notice board is a placed piece: there from the start, notes and E on it, moved it still works
+{ const b = await ev(() => { const s = game.scene.getScene('play'), c = s.camp, at = () => c.board && { x: Math.round(c.board.x), n: c.board.notes.length, decor: !!c.board.decor, hs: c.hotspots.filter(h => h.name === 'Schwarzes Brett').length };
+  const a = at(); s.box.save.rig.decor.find(o => o.id === 'schwarzes_brett').at.x += 3; c.drawRig(); return { a, b: at() }; });
+  check('Schwarzes Brett als Deko (#128): steht da, Zettel, E-Punkt; umgesetzt geht es weiter', b.a?.decor && b.a.n > 0 && b.a.hs === 1 && b.b?.decor && b.b.x - b.a.x === 192 && b.b.n === b.a.n && b.b.hs === 1, b); }
+await ev(() => { const s = game.scene.getScene('play'); s.box.save.deltas = 5000; s.box.save.rig.decor = []; s.camp.drawRig(); s.openBuild(); });   // without the gifted notice board (#128): the checks count from piece 0
 await page.waitForTimeout(1500);
 let r = await ev(() => {
   const s = game.scene.getScene('play'), bm = s.hud.build, camp = s.camp, save = s.box.save, out = {};
