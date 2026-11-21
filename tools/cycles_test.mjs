@@ -78,7 +78,8 @@ const keyRow = page => page.evaluate(() => { const r = document.querySelector('.
   check('Luke: sagt, was fehlt, und trägt', /verschlossen, braucht: Grubenmarke/.test(s.p || '') && s.feet <= s.top + 4, s);
   await shot(page, 'hatch_shut');
   s = await ev(() => {
-    const k = nomad.state().level.keys[0]; nomad.tp(k.x - 40, k.feet); nomad.step(8); nomad.step(1, [], ['grab']); nomad.step(20);
+    // calm frames first: ↓ held on the hatch would still drop her through a platform under the key
+    nomad.step(40); const k = nomad.state().level.keys[0]; nomad.tp(k.x - 40, k.feet); nomad.step(8); nomad.step(1, [], ['grab']); nomad.step(20);
     const o = nomad.state().level.locks[0]; nomad.tp((o.x0 + 0.5) * T, o.y0 * T); nomad.step(20);
     const p = nomad.state().prompt; nomad.step(1, [], ['grab']); nomad.step(30);
     const open = nomad.state().level.locks[0].open;
