@@ -319,12 +319,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #169 POI G3: Leben (Lager, Beziehungen, Regie, Simulation zwischen Besuchen)
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Mach weiter mit G3“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Mach weiter mit G3“)
 - **Für:** Code
 - **Lesen:** `docs/concepts/poi_next_gen.md` (G3 + Entschieden: Simulation auch zwischen Besuchen wie Rain World; Gangs über den Revierkrieg #102, Ökosystem füllt Details), #155 (Verstärkung, Sirenen), #163 (Rhythmus, Atempausen), #167 (Zeitschichten, Spuren).
 - **Auftrag:** Beziehungstabelle (Gangs, Rivalen, Kleinvieh, Jäger/Beute), Lager statt Spawn-Punkte, Runden durch den POI, Simulation zwischen Besuchen (Gruppen wandern, Nester wachsen, Lager ziehen um, Verluste bleiben), Regie Aufbau → Spitze → Ruhe mit Verstärkung, Sirenen und Musik-Schichten, nie Verstärkung in Atempausen. Alle POIs zugleich, Werkstatt, Prüfer + Tests.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: alle Zahlen Startwerte, AvA-Texte und Zeitschichten Entwurf; Lager-Requisiten können sich mit Dressing überlappen; Runden nur auf demselben Boden (ohne Leitern); Spähtrupp = Lager mit Ablaufdatum (echtes Wandern über die Reisekarte fehlt); Musik-Schichten noch ohne Stil je POI; Regie-Wellen nach 45 s Flaute, höchstens 2 je Run; Vorräte-Bild trägt ein Sprüh-Symbol (gegen Regel „keine Texte“ prüfen, #170). `silo_test` hat Port 8766 fest eingebaut.
+- **Ergebnis:** (Code, per Helfer, `dbdaa13`, `7ec983d`, `e951083`, `84dcfc3`, `616b8c7`) `engine/ecosystem.js`, `game/play/life.js`, `game/play/director.js`; Werkstatt › Welt › Leben (Beziehungen kämpfen/meiden/fliehen/ignorieren, Lager-Typen Gang-Lager/Spähtrupp/Nest/Plünderer, Simulation, Regie), POIs › Ökosystem-Ansicht (0/3/10/30 Tage), `?days=N`. Fraktionen kämpfen untereinander (60 % Schaden, Leyla erst ab 50 % Sichtweite bemerkt, Fremd-Kills ohne Ruf); Lager mit Wachen und Runden; Simulation je Tag (Erholung, Nester wachsen/teilen, Umzug, Auflösung, Spähtrupps, Mutanten, nie leer, Revierkrieg setzt Besitzer), AvA erzählt beim Betreten, Zeitschichten; Regie Aufbau → Spitze → Ruhe, keine Verstärkung in Ruhe/Atempause/Wow-Start, Musik-Schichten. Tests npm 446, life_test 26, poi 33, poi_levels 9, poi_stack 8, enemy_traits 32, game 53, story 23, cycles 17, radio 13, map 18, turf 10; Audits 0. **PixelLab 45** (1.170,6 → 1.125,6). **Bitte testen:** Bunker 13 (Lager, Runden), nach ein paar Tagen wiederkommen, Werkstatt › Bunker › Ökosystem 30 Tage, Sirene in Ruhe-Phase.
 
 ### #167 POI G1: Erzählschicht (Storylets, Tropes, Zeitschichten, Spuren)
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „POI overhaul hat eine neue Phase bekommen“ → G1 + G2 bauen; Texte schreibt Code als ⚠️ Entwurf; PixelLab bis ≈ 150)
