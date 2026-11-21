@@ -5,7 +5,7 @@
   "size": "S",
   "danger": 1,
   "roomCount": [4, 5],
-  "rooms": ["vorplatz", "verkaufsraum", "lager", "waschstrasse", "zapfinseln", "reifenlager", "werkstatthalle"],
+  "rooms": ["vorplatz", "verkaufsraum", "lager", "waschstrasse", "zapfinseln", "reifenlager", "werkstatthalle", "km7_preistafel"],
   "enemies": ["streuner", "schuetze", "keulenschwinger", "pistolero", "brandsatz"],
   "loot": "kiste_tankstelle",
   "parTime": 90,
@@ -108,6 +108,29 @@
    "wound": "Im Verkaufsraum hängt der Kalender der Familie, aufgeschlagen beim Monat, in dem sie gingen",
    "keyImage": "Preistafel mit dem absurden letzten Preis über leeren Zapfsäulen, daneben leuchtet ein NomadCola-Automat",
    "shard": "im Handschuhfach eines Fernlasters, der Ware aus der Stadt fuhr"
+  },
+  "wow": {
+   "room": "km7_preistafel",
+   "at": "start",
+   "motif": "priceboard",
+   "point": [32, 18],
+   "text": "9,99",
+   "light": "#f9c22b",
+   "particles": "flicker",
+   "stinger": "neon",
+   "moment": "Die Preistafel springt flackernd an, als Leyla den Vorplatz betritt; Zapfinseln im Sonnenuntergang",
+   "wish": "Preistafel, Tankstellendach",
+   "lightStrength": 220,
+   "music": 35
+  },
+  "level": {
+   "landmark": "leuchtende Preistafel",
+   "landmarkMotif": "priceboard",
+   "landmarkColor": "#f9c22b",
+   "rest": "verkaufsraum",
+   "guide": "Schläuche der Zapfsäulen",
+   "guideKind": "pipe",
+   "guideColor": "#3d3d3d"
   }
  },
  "grossmarkt": {
@@ -116,7 +139,18 @@
   "size": "M",
   "danger": 2,
   "roomCount": [5, 7],
-  "rooms": ["markt_eingang", "markt_passage", "markt_foodcourt", "markt_kaufhaus", "markt_lager", "markt_kino", "markt_parkdeck", "markt_spielhalle", "markt_buero"],
+  "rooms": [
+   "markt_eingang",
+   "markt_passage",
+   "markt_foodcourt",
+   "markt_kaufhaus",
+   "markt_lager",
+   "markt_kino",
+   "markt_parkdeck",
+   "markt_spielhalle",
+   "markt_buero",
+   "markt_kuppel"
+  ],
   "enemies": ["kriecher", "schleimbeisser", "schlaeger", "schildtraeger", "brecher", "gewehrschuetze", "schrotflinter"],
   "loot": "kiste_tankstelle",
   "parTime": 180,
@@ -170,6 +204,29 @@
    "wound": "Am Kinderparadies hängen noch Abholzettel mit Namen",
    "keyImage": "Stillstehende Rolltreppe unter „SALE −70 %“-Bannern, oben eine Barrikade aus Einkaufswagen",
    "shard": "in der Fundsachen-Kiste am Info-Stand"
+  },
+  "wow": {
+   "room": "markt_kuppel",
+   "at": "mid",
+   "motif": "dome",
+   "point": [26, 20],
+   "text": "SALE −70 %",
+   "light": "#c6eaff",
+   "particles": "dust",
+   "stinger": "swell",
+   "moment": "Passage unter der Glaskuppel, Lichtstrahlen auf die stehende Rolltreppe, Barrikade aus Einkaufswagen",
+   "wish": "Kuppel, Rolltreppe",
+   "lightStrength": 220,
+   "music": 35
+  },
+  "level": {
+   "landmark": "Glaskuppel über der Passage",
+   "landmarkMotif": "dome",
+   "landmarkColor": "#c6eaff",
+   "rest": "markt_foodcourt",
+   "guide": "stillstehende Rolltreppen",
+   "guideKind": "strip",
+   "guideColor": "#c7dcd0"
   }
  },
  "bunker_13": {
@@ -188,7 +245,8 @@
    "bunker_archiv",
    "bunker_kantine",
    "bunker_lueftung",
-   "bunker_kommando"
+   "bunker_kommando",
+   "bunker_reaktorkern"
   ],
   "enemies": ["pistolero", "schuetze", "schlaeger", "panzerwache", "schildtraeger", "gewehrschuetze", "brecher", "flickerin", "sirene"],
   "loot": "pluenderer_beute",
@@ -228,6 +286,28 @@
    "keyImage": "Kantine mit langer Tischreihe, Tabletts halb leer gegessen, dazwischen die Schlafsäcke der Rust Guard",
    "shard": "im Archiv, abgelegt unter „Aufnahme Zivilisten“",
    "line": "Der Bunker hielt Jahre durch, bis die Lüftung ausfiel. Die Tabletts stehen noch auf den Tischen"
+  },
+  "wow": {
+   "room": "bunker_reaktorkern",
+   "at": "peak",
+   "motif": "reactor",
+   "point": [25, 20],
+   "light": "#5ef08a",
+   "particles": "steam",
+   "stinger": "drone",
+   "moment": "Die Reaktorhalle: grünes Pulsieren, Dampf, die Gang hält Wache",
+   "wish": "Reaktor",
+   "lightStrength": 220,
+   "music": 35
+  },
+  "level": {
+   "landmark": "grünes Glühen des Reaktors",
+   "landmarkMotif": "reactor",
+   "landmarkColor": "#5ef08a",
+   "rest": "bunker_kantine",
+   "guide": "Notlicht-Streifen am Boden",
+   "guideKind": "strip",
+   "guideColor": "#1ebc73"
   }
  },
  "ministerium": {
@@ -236,7 +316,19 @@
   "size": "XL",
   "danger": 5,
   "roomCount": [12, 16],
-  "rooms": ["min_vorplatz", "min_flur", "min_buero", "min_treppe", "min_saal", "min_archiv", "min_asservaten", "min_wartesaal", "min_registratur", "min_amtszimmer"],
+  "rooms": [
+   "min_vorplatz",
+   "min_flur",
+   "min_buero",
+   "min_treppe",
+   "min_saal",
+   "min_archiv",
+   "min_asservaten",
+   "min_wartesaal",
+   "min_registratur",
+   "min_amtszimmer",
+   "min_uhrensaal"
+  ],
   "enemies": ["gewehrschuetze", "schuetze", "panzerwache", "schleimbeisser", "hausmeister", "visier", "sirene"],
   "loot": "boss_beute",
   "parTime": 600,
@@ -268,6 +360,28 @@
    "wound": "Im Archiv liegt eine Akte für jeden, der nicht in die Stadt durfte",
    "keyImage": "Wartesaal mit schnurgeraden Stuhlreihen, nirgends Staub, auf jedem Stuhl liegt eine Wartenummer",
    "shard": "in der Asservatenkammer, beschlagnahmt, mit Aktenzeichen"
+  },
+  "wow": {
+   "room": "min_uhrensaal",
+   "at": "peak",
+   "motif": "clock",
+   "point": [25, 20],
+   "light": "#ffe9b0",
+   "particles": "dust",
+   "stinger": "bell",
+   "moment": "Der Festsaal: Kronleuchter, die große Uhr, makellose Ordnung",
+   "wish": "Uhr, Kronleuchter",
+   "lightStrength": 220,
+   "music": 35
+  },
+  "level": {
+   "landmark": "große Uhr im Festsaal",
+   "landmarkMotif": "clock",
+   "landmarkColor": "#ffe9b0",
+   "rest": "min_wartesaal",
+   "guide": "roter Teppich",
+   "guideKind": "carpet",
+   "guideColor": "#b33831"
   }
  },
  "delta_heights": {
@@ -277,7 +391,7 @@
   "danger": 3,
   "roomCount": [5, 7],
   "stack": "tower",
-  "rooms": ["hh_lobby", "hh_buero", "hh_einsturz", "hh_treppenhaus", "hh_rohbau", "hh_archiv", "hh_penthouse", "hh_serverraum", "hh_chefzimmer"],
+  "rooms": ["hh_lobby", "hh_buero", "hh_einsturz", "hh_treppenhaus", "hh_rohbau", "hh_archiv", "hh_penthouse", "hh_serverraum", "hh_chefzimmer", "hh_bruchkante"],
   "enemies": ["pistolero", "schuetze", "schlaeger", "schrotflinter", "gewehrschuetze", "schildtraeger", "visier"],
   "loot": "pluenderer_beute",
   "parTime": 260,
@@ -308,6 +422,28 @@
    "wound": "Am Hubschrauber-Landeplatz liegen Koffer, die nicht mehr mitdurften",
    "keyImage": "Ein halbes Büro hängt über dem Abgrund, Schreibtische an der Bruchkante",
    "shard": "im Laptop eines Kessler-Managers im Chefzimmer"
+  },
+  "wow": {
+   "room": "hh_bruchkante",
+   "at": "peak",
+   "motif": "brokenoffice",
+   "point": [16, 26],
+   "light": "#ffd28a",
+   "particles": "paper",
+   "stinger": "drone",
+   "moment": "Ein halbes Büro über dem Abgrund, Wind, Papier weht hinaus",
+   "wish": "Bruchkante, Stahlträger",
+   "lightStrength": 220,
+   "music": 35
+  },
+  "level": {
+   "landmark": "Neon des Penthouse",
+   "landmarkMotif": "neon",
+   "landmarkColor": "#ff5ab4",
+   "rest": "hh_archiv",
+   "guide": "Aufzugsseile im Schacht",
+   "guideKind": "cable",
+   "guideColor": "#45293f"
   }
  },
  "parkhaus_sued": {
@@ -317,7 +453,7 @@
   "danger": 2,
   "roomCount": [4, 5],
   "stack": "tower",
-  "rooms": ["ph_einfahrt", "ph_deck", "ph_rampe", "ph_deck_dunkel", "ph_dach", "ph_kassenhaus"],
+  "rooms": ["ph_einfahrt", "ph_deck", "ph_rampe", "ph_deck_dunkel", "ph_dach", "ph_kassenhaus", "ph_nachtdach"],
   "enemies": ["streuner", "pistolero", "keulenschwinger", "schlaeger", "schrotflinter"],
   "loot": "kiste_tankstelle",
   "parTime": 170,
@@ -371,6 +507,29 @@
    "wound": "Kindersitze in ausgebrannten Autos",
    "keyImage": "Reihen ausgebrannter Autos, hinter jeder Scheibe noch ein Parkschein",
    "shard": "in einem Wagen mit Kessler-Parkausweis"
+  },
+  "wow": {
+   "room": "ph_nachtdach",
+   "at": "peak",
+   "motif": "kiosk",
+   "point": [18, 24],
+   "text": "KASSE",
+   "light": "#ff5ab4",
+   "particles": "flicker",
+   "stinger": "neon",
+   "moment": "Das Dach bei Nacht, Kassenhaus im Neon, dahinter die Skyline der Stadt",
+   "wish": "Kassenhaus, Autowracks",
+   "lightStrength": 220,
+   "music": 35
+  },
+  "level": {
+   "landmark": "Kassenhaus auf dem Dach",
+   "landmarkMotif": "kiosk",
+   "landmarkColor": "#ff5ab4",
+   "rest": "ph_deck_dunkel",
+   "guide": "Fahrbahnpfeile auf dem Boden",
+   "guideKind": "arrows",
+   "guideColor": "#f9c22b"
   }
  },
  "funkmast_km31": {
@@ -380,7 +539,7 @@
   "danger": 1,
   "roomCount": [3, 4],
   "stack": "tower",
-  "rooms": ["fm_fuss", "fm_gitter", "fm_plattform", "fm_spitze", "fm_kabine"],
+  "rooms": ["fm_fuss", "fm_gitter", "fm_plattform", "fm_spitze", "fm_kabine", "fm_zettelkabine"],
   "enemies": ["streuner", "schuetze", "pistolero"],
   "loot": "drohnen_beute",
   "parTime": 110,
@@ -412,6 +571,28 @@
    "wound": "In der Kabine kleben hunderte Zettel mit empfangenen Hilferufen, sorgfältig notiert, nie beantwortet",
    "keyImage": "Die Kabine oben im Wind, Wände voller Zettel, Kopfhörer am Haken",
    "shard": "als Funksignal empfangen und auf Band gespeichert"
+  },
+  "wow": {
+   "room": "fm_zettelkabine",
+   "at": "peak",
+   "motif": "cabin",
+   "point": [15, 26],
+   "light": "#7bd5ff",
+   "particles": "paper",
+   "stinger": "drone",
+   "moment": "Oben auf der Spitze: Wind, die Kabine voller Zettel, Blick über die Salt Flats",
+   "wish": "Kabine, Zettelwand",
+   "lightStrength": 220,
+   "music": 35
+  },
+  "level": {
+   "landmark": "blinkende Spitze des Masts",
+   "landmarkMotif": "mast",
+   "landmarkColor": "#e83b3b",
+   "rest": "fm_kabine",
+   "guide": "Kabelstränge am Gitter",
+   "guideKind": "cable",
+   "guideColor": "#2e222f"
   }
  },
  "metro_line4": {
@@ -421,7 +602,7 @@
   "danger": 3,
   "roomCount": [4, 6],
   "stack": "deep",
-  "rooms": ["mt_eingang", "mt_halle", "mt_rolltreppe", "mt_bahnsteig", "mt_stellwerk", "mt_kiosk", "mt_geisterbahnhof"],
+  "rooms": ["mt_eingang", "mt_halle", "mt_rolltreppe", "mt_bahnsteig", "mt_stellwerk", "mt_kiosk", "mt_geisterbahnhof", "mt_gittertor"],
   "enemies": ["kriecher", "pistolero", "schuetze", "schleimbeisser", "schlaeger"],
   "loot": "pluenderer_beute",
   "parTime": 220,
@@ -476,6 +657,29 @@
    "wound": "Am zugeschweißten Gitter kleben Fotos von Menschen auf der anderen Seite",
    "keyImage": "Bahnsteig voller Schlaflager vor dem verschweißten Tunnel mit der Aufschrift „BigCityDelta“",
    "shard": "in einer Kurier-Tasche im stehen gebliebenen Zug"
+  },
+  "wow": {
+   "room": "mt_gittertor",
+   "at": "peak",
+   "motif": "grate",
+   "point": [16, 26],
+   "text": "BigCityDelta",
+   "light": "#fff6d6",
+   "particles": "dust",
+   "stinger": "swell",
+   "moment": "Der verschweißte Tunnel, durch das Gitter fällt das Licht der Stadt, davor Schlaflager",
+   "wish": "Gittertor, Zug",
+   "lightStrength": 220,
+   "music": 35
+  },
+  "level": {
+   "landmark": "Anzeigetafel „Zug fällt aus“",
+   "landmarkMotif": "board",
+   "landmarkColor": "#f79617",
+   "rest": "mt_kiosk",
+   "guide": "Gleise",
+   "guideKind": "rail",
+   "guideColor": "#7f708a"
   }
  },
  "storm_drain9": {
@@ -485,7 +689,7 @@
   "danger": 2,
   "roomCount": [3, 4],
   "stack": "deep",
-  "rooms": ["kn_gully", "kn_kanal", "kn_ueberlauf", "kn_sammler", "kn_nest"],
+  "rooms": ["kn_gully", "kn_kanal", "kn_ueberlauf", "kn_sammler", "kn_nest", "kn_glanzberg"],
   "enemies": ["kriecher", "streuner", "schleimbeisser"],
   "loot": "mutanten_beute",
   "parTime": 140,
@@ -510,6 +714,28 @@
    "wound": "Ein Kinderschuh, ordentlich ins Nest gelegt",
    "keyImage": "Im Sammler ein Nest aus Gehortetem: Kronkorken, Uhren, Brillen, alles was glänzt",
    "shard": "glänzt, also liegt er im Nest"
+  },
+  "wow": {
+   "room": "kn_glanzberg",
+   "at": "peak",
+   "motif": "nest",
+   "point": [16, 26],
+   "light": "#f9e17a",
+   "particles": "glitter",
+   "stinger": "bell",
+   "moment": "Das Nest im Sammler: ein Berg aus Glänzendem unter dem Lichtschacht",
+   "wish": "Nest",
+   "lightStrength": 220,
+   "music": 35
+  },
+  "level": {
+   "landmark": "Lichtschacht des Gullys",
+   "landmarkMotif": "shaft",
+   "landmarkColor": "#fff6d6",
+   "rest": "kn_ueberlauf",
+   "guide": "Rinnsal aus Schlamm",
+   "guideKind": "mud",
+   "guideColor": "#4c3e24"
   }
  },
  "pit6": {
@@ -519,7 +745,7 @@
   "danger": 4,
   "roomCount": [7, 10],
   "stack": "deep",
-  "rooms": ["sm_foerderturm", "sm_sohle", "sm_stollen", "sm_kaverne", "sm_wetterschacht", "sm_lager", "sm_tiefe", "sm_kaue", "sm_kristallgrotte"],
+  "rooms": ["sm_foerderturm", "sm_sohle", "sm_stollen", "sm_kaverne", "sm_wetterschacht", "sm_lager", "sm_tiefe", "sm_kaue", "sm_kristallgrotte", "sm_kristalldom"],
   "enemies": ["kriecher", "schuetze", "schlaeger", "gewehrschuetze", "schildtraeger", "panzerwache", "brecher"],
   "loot": "pluenderer_beute",
   "parTime": 380,
@@ -550,6 +776,28 @@
    "wound": "In der Kaue hängen die Kleider der alten Schicht noch an den Ketten unter der Decke",
    "keyImage": "Die Kaue mit Kleidern an Ketten unter der Decke, darunter die frische Kluft der Salt Dogs",
    "shard": "in der Kristallgrotte, als hätte ihn jemand dort verloren"
+  },
+  "wow": {
+   "room": "sm_kristalldom",
+   "at": "peak",
+   "motif": "crystals",
+   "point": [17, 26],
+   "light": "#5be6ff",
+   "particles": "glitter",
+   "stinger": "bell",
+   "moment": "Die Kristallgrotte: alles leuchtet von unten",
+   "wish": "Kristalle",
+   "lightStrength": 220,
+   "music": 35
+  },
+  "level": {
+   "landmark": "Förderturm, unten das Leuchten der Kristalle",
+   "landmarkMotif": "headframe",
+   "landmarkColor": "#5be6ff",
+   "rest": "sm_kaue",
+   "guide": "Grubenbahn-Schienen",
+   "guideKind": "rail",
+   "guideColor": "#7f708a"
   }
  },
  "delta_crude": {
@@ -558,7 +806,7 @@
   "size": "L",
   "danger": 3,
   "roomCount": [5, 7],
-  "rooms": ["rf_tor", "rf_tankfeld", "rf_rohrbruecke", "rf_kesselhaus", "rf_destille", "rf_leitstand", "rf_versteck"],
+  "rooms": ["rf_tor", "rf_tankfeld", "rf_rohrbruecke", "rf_kesselhaus", "rf_destille", "rf_leitstand", "rf_versteck", "rf_fackelnacht"],
   "enemies": ["pistolero", "schlaeger", "gewehrschuetze", "schrotflinter", "schildtraeger", "brecher", "brandsatz"],
   "loot": "pluenderer_beute",
   "parTime": 260,
@@ -613,7 +861,21 @@
    "wound": "Im Leitstand liegt eine Liste mit Schichten, die nie abgelöst wurden",
    "keyImage": "Die Fackel brennt noch über dem Tankfeld, darunter eine Destille aus Fässern und Schläuchen",
    "shard": "im Leitstand, in einer Lieferung an den Klinikturm (Kessler bezog hier Chemie)"
-  }
+  },
+  "wow": {
+   "room": "rf_fackelnacht",
+   "at": "peak",
+   "motif": "flare",
+   "point": [25, 20],
+   "light": "#ff8a3d",
+   "particles": "sparks",
+   "stinger": "swell",
+   "moment": "Nachts über dem Tankfeld: die Fackel brüllt, Funken regnen",
+   "wish": "Fackelturm",
+   "lightStrength": 220,
+   "music": 35
+  },
+  "level": {"landmark": "Fackel", "landmarkMotif": "flare", "landmarkColor": "#ff8a3d", "rest": "rf_leitstand", "guide": "Rohrbrücke", "guideKind": "pipe", "guideColor": "#5d5d5d"}
  },
  "sunny_acres": {
   "name": "Sunny Acres",
@@ -621,7 +883,7 @@
   "size": "S",
   "danger": 1,
   "roomCount": [3, 4],
-  "rooms": ["tp_einfahrt", "tp_wohnwagen", "tp_pool", "tp_buero", "tp_dachterrasse"],
+  "rooms": ["tp_einfahrt", "tp_wohnwagen", "tp_pool", "tp_buero", "tp_dachterrasse", "tp_poolparty"],
   "enemies": ["streuner", "keulenschwinger", "pistolero", "flickerin"],
   "loot": "kiste_tankstelle",
   "parTime": 120,
@@ -677,6 +939,28 @@
    "wound": "Pinnwand im Büro voller Postkarten von Enkeln, die letzte vor vielen Jahren",
    "keyImage": "Leerer Pool voller Liegestühle, darin Bewaffnete mit Sonnenhut",
    "shard": "in einer Pralinenschachtel, eingetauscht gegen Medizin"
+  },
+  "wow": {
+   "room": "tp_poolparty",
+   "at": "peak",
+   "motif": "pool",
+   "point": [32, 18],
+   "light": "#fbff86",
+   "particles": "dust",
+   "stinger": "chord",
+   "moment": "Leerer Pool voller Liegestühle, darin Bewaffnete, Schlager aus dem Radio",
+   "wish": "Pool-Set, Liegestühle",
+   "lightStrength": 220,
+   "music": 35
+  },
+  "level": {
+   "landmark": "Wasserturm mit Lächel-Gesicht",
+   "landmarkMotif": "watertower",
+   "landmarkColor": "#fbff86",
+   "rest": "tp_pool",
+   "guide": "Lichterkette zwischen den Wohnwagen",
+   "guideKind": "lights",
+   "guideColor": "#f9c22b"
   }
  },
  "raketensilo": {
@@ -710,7 +994,8 @@
    "rs_offiziersmesse",
    "rs_kryokammer",
    "rs_bunker_privat",
-   "rs_wartungsnische"
+   "rs_wartungsnische",
+   "rs_raketenblick"
   ],
   "enemies": ["schlaeger", "schuetze", "gewehrschuetze", "schildtraeger", "panzerwache", "schrotflinter", "pistolero", "brecher", "keulenschwinger", "sirene"],
   "parTime": 1200,
@@ -754,6 +1039,29 @@
    "wound": "In der Kryokammer stehen leere Tanks mit Namensschildern",
    "keyImage": "Die Rakete im Schacht, an der Startrampe die Anzeige: 00:00:01",
    "shard": "im Terminal der KI; sie weiß, wer AvA ist, und sagt es nur stückweise"
+  },
+  "wow": {
+   "room": "rs_raketenblick",
+   "at": "peak",
+   "motif": "rocket",
+   "point": [18, 28],
+   "text": "00:00:01",
+   "light": "#5ef08a",
+   "particles": "steam",
+   "stinger": "drone",
+   "moment": "Die Rakete im Schacht, an der Startrampe leuchtet 00:00:01",
+   "wish": "Rakete, Startrampe",
+   "lightStrength": 220,
+   "music": 35
+  },
+  "level": {
+   "landmark": "die Rakete im Schacht",
+   "landmarkMotif": "rocket",
+   "landmarkColor": "#5ef08a",
+   "rest": "rs_offiziersmesse",
+   "guide": "Kabelbäume zur Startrampe",
+   "guideKind": "cable",
+   "guideColor": "#e83b3b"
   }
  }
 }

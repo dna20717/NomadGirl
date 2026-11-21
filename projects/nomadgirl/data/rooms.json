@@ -33,7 +33,8 @@
    "keyImage": "Preistafel mit dem letzten Preis über dem leeren Platz, Abendsonne im Staub",
    "must": "schild, straße, fass",
    "never": "bett, büro"
-  }
+  },
+  "type": "threshold"
  },
  "eingangshalle": {
   "name": "Eingangshalle",
@@ -49,7 +50,8 @@
    "keyImage": "Ein Empfangstresen mit einem Händler",
    "must": "sitz, laden",
    "never": "wrack"
-  }
+  },
+  "type": "threshold"
  },
  "verkaufsraum": {
   "name": "Verkaufsraum",
@@ -84,7 +86,8 @@
    "keyImage": "Der Familienkalender an der Wand, darunter die blubbernde Kaffeemaschine",
    "must": "laden, kasse, automat",
    "never": "wrack, grün"
-  }
+  },
+  "type": "rest"
  },
  "lager": {
   "name": "Lager",
@@ -120,7 +123,8 @@
    "keyImage": "Halb leere Regale, ein umgekipptes Ölfass, dahinter eine Wand, die hohl klingt",
    "must": "kiste, regal, vorrat",
    "never": "grün, bett"
-  }
+  },
+  "type": "branch"
  },
  "werkstatthalle": {
   "name": "Werkstatthalle",
@@ -155,7 +159,8 @@
    "keyImage": "Ein Van auf der Hebebühne, darunter Werkzeug, als wäre gerade Pause",
    "must": "werkbank, werkzeug, fass",
    "never": "grün, bett"
-  }
+  },
+  "type": "arena"
  },
  "gang": {
   "name": "Gang",
@@ -171,7 +176,8 @@
    "keyImage": "Ein schmaler Gang mit einer Lampe am Ende",
    "must": "schild, müll",
    "never": "grün"
-  }
+  },
+  "type": "arena"
  },
  "treppenhaus": {
   "name": "Treppenhaus",
@@ -180,7 +186,8 @@
   "weight": 2,
   "role": "corridor",
   "terrain": "concrete",
-  "story": {"function": "Treppenhaus", "moment": "Alle rannten nach unten", "today": "Leer", "keyImage": "Absätze übereinander im Schacht", "must": "schild, putz", "never": "grün"}
+  "story": {"function": "Treppenhaus", "moment": "Alle rannten nach unten", "today": "Leer", "keyImage": "Absätze übereinander im Schacht", "must": "schild, putz", "never": "grün"},
+  "type": "vertical"
  },
  "tresorraum": {
   "name": "Tresorraum",
@@ -196,7 +203,8 @@
    "keyImage": "Ein Tresor hinter einer Wand",
    "must": "kiste, technik",
    "never": "grün"
-  }
+  },
+  "type": "branch"
  },
  "kontrollraum": {
   "name": "Kontrollraum",
@@ -212,7 +220,8 @@
    "keyImage": "Ein Pult vor Bildschirmen",
    "must": "technik, kabel",
    "never": "grün"
-  }
+  },
+  "type": "boss"
  },
  "testraum": {
   "name": "Testraum",
@@ -257,7 +266,8 @@
    "keyImage": "Hürden, Grube, Slide-Tunnel und Treppe in einer Reihe",
    "must": "schild, fass",
    "never": "bett"
-  }
+  },
+  "type": "corridor"
  },
  "kampfraum": {
   "name": "Kampfraum",
@@ -294,7 +304,8 @@
    "keyImage": "Stufen und ein Slide-Tunnel zwischen Gegnern",
    "must": "fass, schild",
    "never": "bett"
-  }
+  },
+  "type": "arena"
  },
  "markt_eingang": {
   "name": "Markt · Parkplatz",
@@ -331,7 +342,8 @@
    "keyImage": "Endlose Parkreihen, ein Einkaufswagen rollt im Wind",
    "must": "straße, schild, wrack",
    "never": "büro, bett"
-  }
+  },
+  "type": "threshold"
  },
  "markt_passage": {
   "name": "Markt · Passage",
@@ -367,7 +379,8 @@
    "keyImage": "Leere Schaufenster unter „SALE“-Bannern, Scherben auf den Fliesen",
    "must": "laden, bank, deko",
    "never": "wrack, bett"
-  }
+  },
+  "type": "arena"
  },
  "markt_foodcourt": {
   "name": "Markt · Food-Court",
@@ -403,7 +416,8 @@
    "keyImage": "Tische voller vertrockneter Tabletts, darüber ein Menü-Schild ohne Strom",
    "must": "sitz, bank, automat",
    "never": "wrack, bett"
-  }
+  },
+  "type": "rest"
  },
  "markt_kaufhaus": {
   "name": "Markt · Kaufhaus",
@@ -445,7 +459,8 @@
    "keyImage": "Stillstehende Rolltreppe unter „SALE −70 %“, oben die Wagen-Barrikade",
    "must": "laden, regal, kasse, deko",
    "never": "wrack, bett"
-  }
+  },
+  "type": "arena"
  },
  "markt_lager": {
   "name": "Markt · Hochregallager",
@@ -477,7 +492,8 @@
    "keyImage": "Hochregale voller Kartons, ein Gabelstapler mit offener Tür",
    "must": "kiste, regal, müll",
    "never": "grün, bank"
-  }
+  },
+  "type": "branch"
  },
  "markt_kino": {
   "name": "Markt · Kino",
@@ -509,7 +525,8 @@
    "keyImage": "Sesselreihen vor einer blinden Leinwand, Popcorn auf dem Boden",
    "must": "sitz, müll, deko",
    "never": "wrack, palette"
-  }
+  },
+  "type": "branch"
  },
  "markt_buero": {
   "name": "Markt · Büro der Leitung",
@@ -545,7 +562,8 @@
    "keyImage": "Ein Chefsessel vor Monitoren mit der Passage, Ausverkaufs-Listen am Boden",
    "must": "technik, kiste, grün",
    "never": "wrack, reifen"
-  }
+  },
+  "type": "arena"
  },
  "bunker_tor": {
   "name": "Bunker · Tor",
@@ -582,7 +600,8 @@
    "keyImage": "Das offene Panzertor in der Salzebene, davor Sandsäcke und ein Wachfeuer",
    "must": "schild, fass, militär",
    "never": "laden, kasse"
-  }
+  },
+  "type": "threshold"
  },
  "bunker_schleuse": {
   "name": "Bunker · Schleuse",
@@ -618,7 +637,8 @@
    "keyImage": "Zwei offene Schleusentore, Warnschilder, ein vergessener Schutzanzug",
    "must": "schild, sperre, technik",
    "never": "grün, laden"
-  }
+  },
+  "type": "corridor"
  },
  "bunker_quartiere": {
   "name": "Bunker · Quartiere",
@@ -654,7 +674,8 @@
    "keyImage": "Stockbetten in Reihe, an der Wand Kinderzeichnungen vom Himmel",
    "must": "bett, spind, papier",
    "never": "grün, laden"
-  }
+  },
+  "type": "arena"
  },
  "bunker_reaktor": {
   "name": "Bunker · Reaktorhalle",
@@ -694,7 +715,8 @@
    "keyImage": "Der Reaktorblock in grünem Pulsieren, Dampf zwischen den Stegen",
    "must": "technik, rohr, gefahr",
    "never": "grün, bett"
-  }
+  },
+  "type": "arena"
  },
  "bunker_gang": {
   "name": "Bunker · Gang",
@@ -730,7 +752,8 @@
    "keyImage": "Ein langer Gang im Notlicht, am Boden verlorene Schuhe",
    "must": "rohr, schild, kiste",
    "never": "grün, laden"
-  }
+  },
+  "type": "arena"
  },
  "bunker_lager": {
   "name": "Bunker · Munitionslager",
@@ -762,7 +785,8 @@
    "keyImage": "Kistenstapel mit Schablonen-Nummern unter einer roten Lampe",
    "must": "kiste, militär, regal",
    "never": "grün, bett"
-  }
+  },
+  "type": "branch"
  },
  "bunker_archiv": {
   "name": "Bunker · Archiv",
@@ -794,7 +818,8 @@
    "keyImage": "Aktenregale bis zur Decke, ein Ordner „Aufnahme Zivilisten“ offen",
    "must": "papier, büro, regal",
    "never": "grün, laden"
-  }
+  },
+  "type": "branch"
  },
  "bunker_kommando": {
   "name": "Bunker · Kommandozentrale",
@@ -832,7 +857,8 @@
    "keyImage": "Der Lagetisch unter einer Karte voller Nadeln, Funkgeräte rauschen",
    "must": "technik, büro, militär",
    "never": "grün, laden"
-  }
+  },
+  "type": "arena"
  },
  "min_vorplatz": {
   "name": "Ministerium · Freitreppe",
@@ -871,7 +897,8 @@
    "keyImage": "Eine makellos gefegte Freitreppe, oben die Säulen des Amts",
    "must": "schild, straße, licht",
    "never": "wrack, müll"
-  }
+  },
+  "type": "threshold"
  },
  "min_flur": {
   "name": "Ministerium · Flur",
@@ -907,7 +934,8 @@
    "keyImage": "Ein endloser Flur mit rotem Teppich, jede Tür beschriftet",
    "must": "bank, grün, bild",
    "never": "müll, wrack"
-  }
+  },
+  "type": "arena"
  },
  "min_buero": {
   "name": "Ministerium · Großraumbüro",
@@ -943,7 +971,8 @@
    "keyImage": "Schreibtische in Reihen, auf jedem ein ordentlicher Stapel",
    "must": "tisch, büro, papier",
    "never": "müll, wrack"
-  }
+  },
+  "type": "arena"
  },
  "min_treppe": {
   "name": "Ministerium · Treppenhaus",
@@ -989,7 +1018,8 @@
    "keyImage": "Marmorstufen ohne ein Staubkorn, an jedem Absatz eine Topfpflanze",
    "must": "grün, bank, deko",
    "never": "müll, wrack"
-  }
+  },
+  "type": "vertical"
  },
  "min_saal": {
   "name": "Ministerium · Festsaal",
@@ -1029,7 +1059,8 @@
    "keyImage": "Der Festsaal mit der großen Uhr, Stuhlreihen vor einem leeren Pult",
    "must": "deko, sitz, bild",
    "never": "müll, wrack"
-  }
+  },
+  "type": "arena"
  },
  "min_archiv": {
   "name": "Ministerium · Archiv",
@@ -1063,7 +1094,8 @@
    "keyImage": "Eine Akte für jeden, der nicht in die Stadt durfte, Regal um Regal",
    "must": "regal, papier, büro",
    "never": "müll, grün"
-  }
+  },
+  "type": "branch"
  },
  "min_asservaten": {
   "name": "Ministerium · Asservatenkammer",
@@ -1095,7 +1127,8 @@
    "keyImage": "Kisten mit Aktenzeichen, ein Siegel an der Tür",
    "must": "regal, papier, militär",
    "never": "grün, müll"
-  }
+  },
+  "type": "branch"
  },
  "min_amtszimmer": {
   "name": "Ministerium · Amtszimmer",
@@ -1136,7 +1169,8 @@
    "keyImage": "Ein riesiger Schreibtisch vor dem Fenster, dahinter der Hausmeister",
    "must": "tisch, büro, bild",
    "never": "müll, wrack"
-  }
+  },
+  "type": "boss"
  },
  "gegner_arena": {
   "name": "Gegner-Arena",
@@ -1179,7 +1213,8 @@
    "keyImage": "Eine dünne Wand zwischen Leyla und den Gegnern",
    "must": "kiste, müll",
    "never": "grün"
-  }
+  },
+  "type": "arena"
  },
  "waschstrasse": {
   "name": "Waschstraße",
@@ -1215,7 +1250,8 @@
    "keyImage": "Tief hängende, staubige Bürsten über trockenem Boden",
    "must": "putz, reifen, schild",
    "never": "grün, bett"
-  }
+  },
+  "type": "arena"
  },
  "zapfinseln": {
   "name": "Zapfinseln",
@@ -1252,7 +1288,8 @@
    "keyImage": "Leere Zapfsäulen, Schläuche im Staub, darüber das zerfetzte Dach",
    "must": "fass, kanister, straße",
    "never": "büro, bett"
-  }
+  },
+  "type": "arena"
  },
  "reifenlager": {
   "name": "Reifenlager",
@@ -1289,7 +1326,8 @@
    "keyImage": "Reifenstapel bis unter die Decke, ein Steg darüber",
    "must": "reifen, kiste, müll",
    "never": "grün, büro"
-  }
+  },
+  "type": "corridor"
  },
  "markt_parkdeck": {
   "name": "Markt · Parkdeck",
@@ -1326,7 +1364,8 @@
    "keyImage": "Ausgebrannte Autos zwischen Rampen, Parkscheine hinter den Scheiben",
    "must": "putz, kiste, müll",
    "never": "grün, bett"
-  }
+  },
+  "type": "arena"
  },
  "markt_spielhalle": {
   "name": "Markt · Spielhalle",
@@ -1363,7 +1402,8 @@
    "keyImage": "Reihen blinkender Automaten, Münzen auf dem Teppich",
    "must": "automat, laden, technik",
    "never": "wrack, bett"
-  }
+  },
+  "type": "arena"
  },
  "bunker_kantine": {
   "name": "Bunker · Kantine",
@@ -1400,7 +1440,8 @@
    "keyImage": "Lange Tischreihe, Tabletts halb leer gegessen, dazwischen Schlafsäcke",
    "must": "küche, vorrat, bett",
    "never": "grün, laden"
-  }
+  },
+  "type": "rest"
  },
  "bunker_lueftung": {
   "name": "Bunker · Lüftung",
@@ -1437,7 +1478,8 @@
    "keyImage": "Ein stehender Riesenventilator, daneben Werkzeug einer Reparatur, die nie fertig wurde",
    "must": "technik, rohr, gefahr",
    "never": "grün, bett"
-  }
+  },
+  "type": "corridor"
  },
  "min_wartesaal": {
   "name": "Ministerium · Wartesaal",
@@ -1474,7 +1516,8 @@
    "keyImage": "Schnurgerade Stuhlreihen, auf jedem Stuhl eine Wartenummer",
    "must": "sitz, bank, papier",
    "never": "müll, wrack"
-  }
+  },
+  "type": "rest"
  },
  "min_registratur": {
   "name": "Ministerium · Registratur",
@@ -1511,7 +1554,8 @@
    "keyImage": "Akten bis zur Decke, eine Leiter an der Galerie",
    "must": "regal, papier, büro",
    "never": "müll, grün"
-  }
+  },
+  "type": "arena"
  },
  "hh_lobby": {
   "name": "Hochhaus · Lobby",
@@ -1550,7 +1594,8 @@
    "keyImage": "Drehtüren ohne Glas, ein verlassener Empfangstresen",
    "must": "sitz, grün, kasse",
    "never": "wrack, reifen"
-  }
+  },
+  "type": "threshold"
  },
  "hh_buero": {
   "name": "Hochhaus · Büroetage",
@@ -1578,7 +1623,8 @@
    "keyImage": "Schreibtische mit Kaffeebechern, Monitore im Staub",
    "must": "papier, technik, sitz",
    "never": "wrack, reifen"
-  }
+  },
+  "type": "arena"
  },
  "hh_einsturz": {
   "name": "Hochhaus · Eingestürzte Decke",
@@ -1606,7 +1652,8 @@
    "keyImage": "Herunterhängende Deckenplatten, darüber ein Schimmer von Beute",
    "must": "müll, putz, technik",
    "never": "grün, bett"
-  }
+  },
+  "type": "arena"
  },
  "hh_treppenhaus": {
   "name": "Hochhaus · Treppenhaus",
@@ -1643,7 +1690,8 @@
    "keyImage": "„Bitte benutzen Sie im Notfall die Treppe.“ Es gibt nur noch die Treppe",
    "must": "schild, putz, müll",
    "never": "grün, bett"
-  }
+  },
+  "type": "vertical"
  },
  "hh_rohbau": {
   "name": "Hochhaus · Rohbau",
@@ -1672,7 +1720,8 @@
    "keyImage": "Stahlträger ohne Wände, dahinter der Himmel",
    "must": "kiste, reifen, müll",
    "never": "bett, kasse"
-  }
+  },
+  "type": "arena"
  },
  "hh_archiv": {
   "name": "Hochhaus · Aktenarchiv",
@@ -1703,7 +1752,8 @@
    "keyImage": "Rollregale, ein Feuer aus Akten in einer Tonne",
    "must": "papier, regal, kiste",
    "never": "wrack, reifen"
-  }
+  },
+  "type": "rest"
  },
  "hh_penthouse": {
   "name": "Hochhaus · Penthouse",
@@ -1740,7 +1790,8 @@
    "must": "sitz, grün, küche",
    "never": "reifen, wrack",
    "decay": 1
-  }
+  },
+  "type": "arena"
  },
  "hh_serverraum": {
   "name": "Hochhaus · Serverraum",
@@ -1759,7 +1810,8 @@
    "keyImage": "Blinkende Racks im Kühlraum",
    "must": "technik, kabel, kiste",
    "never": "grün, bett"
-  }
+  },
+  "type": "branch"
  },
  "hh_chefzimmer": {
   "name": "Hochhaus · Chefzimmer",
@@ -1778,7 +1830,8 @@
    "keyImage": "Teppich, Bar, eine Wand mit Bücherattrappe",
    "must": "büro, tisch, deko",
    "never": "müll, wrack"
-  }
+  },
+  "type": "branch"
  },
  "ph_einfahrt": {
   "name": "Parkhaus · Einfahrt",
@@ -1811,7 +1864,8 @@
    "keyImage": "Eine geknickte Schranke, ein geplünderter Ticketautomat",
    "must": "schild, automat, müll",
    "never": "bett, büro"
-  }
+  },
+  "type": "threshold"
  },
  "ph_deck": {
   "name": "Parkhaus · Parkdeck",
@@ -1839,7 +1893,8 @@
    "keyImage": "Ausgebrannte Autos in Reihe, Parkscheine hinter den Scheiben",
    "must": "reifen, putz, müll",
    "never": "grün, bett"
-  }
+  },
+  "type": "arena"
  },
  "ph_rampe": {
   "name": "Parkhaus · Rampe",
@@ -1867,7 +1922,8 @@
    "keyImage": "Ein Kleinwagen klemmt unter der Decke der Rampe",
    "must": "reifen, schild, müll",
    "never": "grün, bett"
-  }
+  },
+  "type": "corridor"
  },
  "ph_deck_dunkel": {
   "name": "Parkhaus · Dunkles Deck",
@@ -1895,7 +1951,8 @@
    "keyImage": "Ein dunkles Deck, ein Pfeiler nur noch Putz",
    "must": "reifen, müll, putz",
    "never": "grün, licht"
-  }
+  },
+  "type": "rest"
  },
  "ph_dach": {
   "name": "Parkhaus · Dachdeck",
@@ -1929,7 +1986,8 @@
    "keyImage": "Das Kassenhaus im Neon, dahinter die Skyline der Stadt",
    "must": "kiste, küche, reifen",
    "never": "bett, büro"
-  }
+  },
+  "type": "arena"
  },
  "ph_kassenhaus": {
   "name": "Parkhaus · Kassenhaus",
@@ -1948,7 +2006,8 @@
    "keyImage": "Ein Glaskasten voller Münzrollen und Autoschlüssel",
    "must": "kasse, automat, papier",
    "never": "grün, reifen"
-  }
+  },
+  "type": "branch"
  },
  "fm_fuss": {
   "name": "Funkmast · Fuß",
@@ -1982,7 +2041,8 @@
    "keyImage": "Ein Mast in den Himmel, am Zaun das Schild „Klettern verboten“",
    "must": "schild, technik, kabel",
    "never": "laden, bett"
-  }
+  },
+  "type": "threshold"
  },
  "fm_gitter": {
   "name": "Funkmast · Gitter",
@@ -2017,7 +2077,8 @@
    "keyImage": "Stahlgitter vor weitem Himmel, Kabelstränge laufen nach oben",
    "must": "kabel, technik, schild",
    "never": "laden, bett"
-  }
+  },
+  "type": "corridor"
  },
  "fm_plattform": {
   "name": "Funkmast · Plattform",
@@ -2050,7 +2111,8 @@
    "keyImage": "Eine Plattform voller Antennen über den Salt Flats",
    "must": "technik, kabel, kiste",
    "never": "laden, grün"
-  }
+  },
+  "type": "arena"
  },
  "fm_spitze": {
   "name": "Funkmast · Spitze",
@@ -2085,7 +2147,8 @@
    "keyImage": "Ganz oben die blinkende rote Lampe, die Ebene unten",
    "must": "technik, kabel, schild",
    "never": "laden, bett"
-  }
+  },
+  "type": "arena"
  },
  "fm_kabine": {
   "name": "Funkmast · Technikkabine",
@@ -2104,7 +2167,8 @@
    "keyImage": "Wände voller Zettel mit Hilferufen, Kopfhörer am Haken",
    "must": "technik, werkzeug, kiste",
    "never": "grün, laden"
-  }
+  },
+  "type": "rest"
  },
  "mt_eingang": {
   "name": "Metro · Eingang",
@@ -2138,7 +2202,8 @@
    "keyImage": "Ein U-Bahn-Schild über einer Treppe ins Dunkle",
    "must": "schild, straße, licht",
    "never": "bett, büro"
-  }
+  },
+  "type": "threshold"
  },
  "mt_halle": {
   "name": "Metro · Schalterhalle",
@@ -2169,7 +2234,8 @@
    "keyImage": "Drehkreuze vor einem vergitterten Fahrkartenschalter",
    "must": "kasse, automat, schild",
    "never": "grün, wrack"
-  }
+  },
+  "type": "arena"
  },
  "mt_rolltreppe": {
   "name": "Metro · Rolltreppen",
@@ -2206,7 +2272,8 @@
    "keyImage": "Drei stehende Rolltreppen ins Dunkle",
    "must": "rohr, schild, kabel",
    "never": "grün, bett"
-  }
+  },
+  "type": "corridor"
  },
  "mt_bahnsteig": {
   "name": "Metro · Bahnsteig",
@@ -2238,7 +2305,8 @@
    "keyImage": "Ein Bahnsteig voller Schlaflager vor dem verschweißten Tunnel",
    "must": "sitz, müll, schild",
    "never": "grün, wrack"
-  }
+  },
+  "type": "arena"
  },
  "mt_stellwerk": {
   "name": "Metro · Stellwerk",
@@ -2271,7 +2339,8 @@
    "keyImage": "Ein Pult mit Hebeln, der Gleisplan endet an einer roten Linie",
    "must": "technik, kabel, werkzeug",
    "never": "grün, laden"
-  }
+  },
+  "type": "arena"
  },
  "mt_kiosk": {
   "name": "Metro · Kiosk",
@@ -2290,7 +2359,8 @@
    "keyImage": "Zeitschriften von vor dem Krieg, Kaugummi, eine Kasse",
    "must": "laden, kasse, vorrat",
    "never": "wrack, reifen"
-  }
+  },
+  "type": "rest"
  },
  "mt_geisterbahnhof": {
   "name": "Metro · Geisterbahnhof",
@@ -2309,7 +2379,8 @@
    "keyImage": "Ein stehen gebliebener Zug an einem stillen Bahnsteig",
    "must": "sitz, schild, müll",
    "never": "grün, wrack"
-  }
+  },
+  "type": "branch"
  },
  "kn_gully": {
   "name": "Kanal · Gully",
@@ -2342,7 +2413,8 @@
    "keyImage": "Ein offener Kanaldeckel, daneben ein Pegelschild",
    "must": "schild, straße, müll",
    "never": "büro, bett"
-  }
+  },
+  "type": "threshold"
  },
  "kn_kanal": {
   "name": "Kanal · Kanal",
@@ -2370,7 +2442,8 @@
    "keyImage": "Ein Laufsteg über einer schlammigen Rinne",
    "must": "müll, putz, kiste",
    "never": "grün, büro"
-  }
+  },
+  "type": "arena"
  },
  "kn_ueberlauf": {
   "name": "Kanal · Überlauf",
@@ -2405,7 +2478,8 @@
    "keyImage": "Hohe Wände mit Pegelstrichen, die nie erreicht wurden",
    "must": "schild, müll, putz",
    "never": "grün, büro"
-  }
+  },
+  "type": "rest"
  },
  "kn_sammler": {
   "name": "Kanal · Sammler",
@@ -2440,7 +2514,8 @@
    "keyImage": "Ein Berg aus Glänzendem unter dem Lichtschacht",
    "must": "müll, kiste, putz",
    "never": "büro, sitz"
-  }
+  },
+  "type": "arena"
  },
  "kn_nest": {
   "name": "Kanal · Nest",
@@ -2459,7 +2534,8 @@
    "keyImage": "Ein Kinderschuh, ordentlich ins Nest gelegt",
    "must": "müll, kiste",
    "never": "büro, sitz"
-  }
+  },
+  "type": "branch"
  },
  "sm_foerderturm": {
   "name": "Mine · Förderturm",
@@ -2495,7 +2571,8 @@
    "keyImage": "Ein rostiger Förderturm über dem Salz, die Tafel „Tage ohne Unfall: 0“",
    "must": "schild, technik, fass",
    "never": "laden, büro"
-  }
+  },
+  "type": "threshold"
  },
  "sm_sohle": {
   "name": "Mine · Sohle",
@@ -2523,7 +2600,8 @@
    "keyImage": "Lorenschienen ins Dunkle, Salz an den Wänden",
    "must": "werkzeug, schutt, stein",
    "never": "laden, sitz"
-  }
+  },
+  "type": "arena"
  },
  "sm_stollen": {
   "name": "Mine · Stollen",
@@ -2551,7 +2629,8 @@
    "keyImage": "Ein enger Stollen mit Grubenlampe am Haken",
    "must": "schutt, stein, werkzeug",
    "never": "laden, sitz"
-  }
+  },
+  "type": "corridor"
  },
  "sm_kaverne": {
   "name": "Mine · Kaverne",
@@ -2591,7 +2670,8 @@
    "keyImage": "Eine Salzhalle so groß wie eine Kirche, Gerüste nach oben",
    "must": "stein, knochen",
    "never": "laden, sitz"
-  }
+  },
+  "type": "arena"
  },
  "sm_wetterschacht": {
   "name": "Mine · Wetterschacht",
@@ -2628,7 +2708,8 @@
    "keyImage": "Ein Lüftungsschacht über zwei Sohlen, Kabel an der Wand",
    "must": "technik, rohr, kabel",
    "never": "grün, laden"
-  }
+  },
+  "type": "vertical"
  },
  "sm_lager": {
   "name": "Mine · Sprengstofflager",
@@ -2656,7 +2737,8 @@
    "keyImage": "Kisten mit gelben Rauten unter einer Grubenlampe",
    "must": "kiste, gefahr, lager",
    "never": "grün, laden"
-  }
+  },
+  "type": "arena"
  },
  "sm_tiefe": {
   "name": "Mine · Tiefste Sohle",
@@ -2692,7 +2774,8 @@
    "must": "stein, knochen",
    "never": "laden, sitz",
    "decay": 0
-  }
+  },
+  "type": "arena"
  },
  "sm_kaue": {
   "name": "Mine · Kaue",
@@ -2711,7 +2794,8 @@
    "keyImage": "Kleider an Ketten unter der Decke, darunter neue Kluft",
    "must": "sitz, kiste, müll",
    "never": "grün, laden"
-  }
+  },
+  "type": "rest"
  },
  "sm_kristallgrotte": {
   "name": "Mine · Kristallgrotte",
@@ -2731,7 +2815,8 @@
    "must": "stein, licht",
    "never": "laden, müll, sitz",
    "decay": 0
-  }
+  },
+  "type": "branch"
  },
  "rf_tor": {
   "name": "Raffinerie · Werkstor",
@@ -2769,7 +2854,8 @@
    "keyImage": "Ein Pförtnerhaus mit Schranke, dahinter die Fackel",
    "must": "schild, fass, straße",
    "never": "bett, büro"
-  }
+  },
+  "type": "threshold"
  },
  "rf_tankfeld": {
   "name": "Raffinerie · Tankfeld",
@@ -2807,7 +2893,8 @@
    "keyImage": "Drei Tanks unter der brennenden Fackel",
    "must": "fass, kanister, technik",
    "never": "bett, büro"
-  }
+  },
+  "type": "arena"
  },
  "rf_rohrbruecke": {
   "name": "Raffinerie · Rohrbrücke",
@@ -2844,7 +2931,8 @@
    "keyImage": "Rohre in allen Größen, Stege dazwischen",
    "must": "rohr, kabel, technik",
    "never": "grün, bett"
-  }
+  },
+  "type": "corridor"
  },
  "rf_kesselhaus": {
   "name": "Raffinerie · Kesselhaus",
@@ -2881,7 +2969,8 @@
    "keyImage": "Zwei Kessel, Schläuche zu einer Fass-Destille",
    "must": "rohr, fass, werkzeug",
    "never": "grün, bett"
-  }
+  },
+  "type": "arena"
  },
  "rf_destille": {
   "name": "Raffinerie · Destillationsturm",
@@ -2919,7 +3008,8 @@
    "keyImage": "Ein Turm aus Böden und Leitern unter der Fackel",
    "must": "rohr, technik, gefahr",
    "never": "grün, bett"
-  }
+  },
+  "type": "arena"
  },
  "rf_leitstand": {
   "name": "Raffinerie · Leitstand",
@@ -2938,7 +3028,8 @@
    "keyImage": "Eine Liste mit Schichten, die nie abgelöst wurden",
    "must": "technik, tisch, werkzeug",
    "never": "grün, reifen"
-  }
+  },
+  "type": "rest"
  },
  "rf_versteck": {
   "name": "Raffinerie · Schmugglerlager",
@@ -2957,7 +3048,8 @@
    "keyImage": "Kanister hinter einer Blechwand",
    "must": "kanister, fass, kiste",
    "never": "grün, büro"
-  }
+  },
+  "type": "branch"
  },
  "tp_einfahrt": {
   "name": "Trailerpark · Einfahrt",
@@ -2995,7 +3087,8 @@
    "keyImage": "„Willkommen in Sunny Acres“, die Buchstaben hängen schief",
    "must": "schild, straße, grün",
    "never": "büro, militär"
-  }
+  },
+  "type": "threshold"
  },
  "tp_wohnwagen": {
   "name": "Trailerpark · Wohnwagenreihe",
@@ -3033,7 +3126,8 @@
    "keyImage": "Wohnwagen an Wohnwagen, eine Lichterkette dazwischen",
    "must": "grün, musik, fass",
    "never": "büro, militär"
-  }
+  },
+  "type": "arena"
  },
  "tp_pool": {
   "name": "Trailerpark · Pool",
@@ -3071,7 +3165,8 @@
    "keyImage": "Leerer Pool voller Liegestühle, darin Bewaffnete mit Sonnenhut",
    "must": "grün, müll, musik",
    "never": "büro, militär"
-  }
+  },
+  "type": "rest"
  },
  "tp_buero": {
   "name": "Trailerpark · Verwaltung",
@@ -3108,7 +3203,8 @@
    "keyImage": "Pinnwand voller Postkarten von Enkeln",
    "must": "technik, licht, fass",
    "never": "wrack, militär"
-  }
+  },
+  "type": "arena"
  },
  "tp_dachterrasse": {
   "name": "Trailerpark · Dachterrasse",
@@ -3128,7 +3224,8 @@
    "keyImage": "Ein Sonnensegel über zwei Kühlboxen",
    "must": "musik, licht",
    "never": "wrack, militär"
-  }
+  },
+  "type": "branch"
  },
  "rs_tor": {
   "name": "Silo · Bunkertor",
@@ -3164,7 +3261,8 @@
    "keyImage": "Ein Betonbau zwischen Felsen, Stacheldraht, die drehende Radarschüssel",
    "must": "militär, schild, fass",
    "never": "laden, grün"
-  }
+  },
+  "type": "threshold"
  },
  "rs_schleuse": {
   "name": "Silo · Schleuse",
@@ -3192,7 +3290,8 @@
    "keyImage": "Ein Explosionsschutztor mit Warnstreifen",
    "must": "sperre, schild, technik",
    "never": "grün, laden"
-  }
+  },
+  "type": "corridor"
  },
  "rs_schacht_spitze": {
   "name": "Silo · Raketenschacht (Spitze)",
@@ -3234,7 +3333,8 @@
    "keyImage": "Die Spitze der Rakete zwischen den Bühnen",
    "must": "technik, kabel, gefahr",
    "never": "grün, laden"
-  }
+  },
+  "type": "arena"
  },
  "rs_schacht_mitte": {
   "name": "Silo · Raketenschacht (Rumpf)",
@@ -3276,7 +3376,8 @@
    "keyImage": "Der Rumpf der Rakete, so dick wie ein Haus",
    "must": "technik, kabel, rohr",
    "never": "grün, laden"
-  }
+  },
+  "type": "arena"
  },
  "rs_schacht_fuss": {
   "name": "Silo · Raketenschacht (Triebwerke)",
@@ -3318,7 +3419,8 @@
    "keyImage": "Triebwerksglocken über dem Flammenschacht",
    "must": "rohr, gefahr, fass",
    "never": "grün, laden"
-  }
+  },
+  "type": "arena"
  },
  "rs_kaserne": {
   "name": "Silo · Kaserne",
@@ -3347,7 +3449,8 @@
    "must": "bett, spind, militär",
    "never": "grün, laden",
    "decay": 2
-  }
+  },
+  "type": "arena"
  },
  "rs_krankenstation": {
   "name": "Silo · Krankenstation",
@@ -3375,7 +3478,8 @@
    "keyImage": "OP-Liegen unter kalten Lampen",
    "must": "regal, sicherheit, technik",
    "never": "wrack, reifen"
-  }
+  },
+  "type": "arena"
  },
  "rs_labor": {
   "name": "Silo · Kryolabor",
@@ -3408,7 +3512,8 @@
    "keyImage": "Eine violett leuchtende Röhre mit einer Gestalt",
    "must": "technik, kabel, gefahr",
    "never": "grün, laden"
-  }
+  },
+  "type": "arena"
  },
  "rs_kontrollraum": {
   "name": "Silo · Kontrollraum",
@@ -3436,7 +3541,8 @@
    "keyImage": "Bildschirme in drei Reihen, alle zeigen 00:00:01",
    "must": "technik, kabel, tisch",
    "never": "grün, laden"
-  }
+  },
+  "type": "corridor"
  },
  "rs_generator": {
   "name": "Silo · Generatorhalle",
@@ -3469,7 +3575,8 @@
    "keyImage": "Zwei Dieselgeneratoren so groß wie Lastwagen",
    "must": "technik, fass, werkzeug",
    "never": "grün, laden"
-  }
+  },
+  "type": "arena"
  },
  "rs_lager": {
   "name": "Silo · Munitionslager",
@@ -3497,7 +3604,8 @@
    "keyImage": "Kisten bis unter die Decke unter rotem Licht",
    "must": "kiste, militär, gefahr",
    "never": "grün, laden"
-  }
+  },
+  "type": "arena"
  },
  "rs_werkstatt": {
   "name": "Silo · Werkstatt mit Kran",
@@ -3531,7 +3639,8 @@
    "keyImage": "Ein gelber Kran über einer Palette mit Raketenteilen",
    "must": "werkbank, werkzeug, palette",
    "never": "grün, laden"
-  }
+  },
+  "type": "arena"
  },
  "rs_lueftung": {
   "name": "Silo · Lüftungsschacht",
@@ -3571,7 +3680,8 @@
    "keyImage": "Ein Ventilator im Schacht, es zieht nach unten",
    "must": "technik, rohr, gefahr",
    "never": "grün, laden"
-  }
+  },
+  "type": "vertical"
  },
  "rs_treppenhaus": {
   "name": "Silo · Treppenhaus",
@@ -3613,7 +3723,8 @@
    "keyImage": "Gitterstufen im Zickzack in die Tiefe",
    "must": "schild, putz, sicherheit",
    "never": "grün, wrack"
-  }
+  },
+  "type": "vertical"
  },
  "rs_kantine": {
   "name": "Silo · Kantine",
@@ -3644,7 +3755,8 @@
    "keyImage": "Lange Tische, Blechteller, ein Speiseplan von vor dem Krieg",
    "must": "küche, vorrat, papier",
    "never": "grün, laden"
-  }
+  },
+  "type": "arena"
  },
  "rs_galerie": {
   "name": "Silo · Wartungsgalerie",
@@ -3675,7 +3787,8 @@
    "keyImage": "Ein Laufsteg, durch die Gitter die Rakete",
    "must": "technik, kabel, rohr",
    "never": "grün, laden"
-  }
+  },
+  "type": "corridor"
  },
  "rs_serverraum": {
   "name": "Silo · Serverraum",
@@ -3708,7 +3821,8 @@
    "keyImage": "Schrankreihen voller Bänder, eines dreht sich noch",
    "must": "technik, kabel, werkzeug",
    "never": "grün, laden"
-  }
+  },
+  "type": "arena"
  },
  "rs_startrampe": {
   "name": "Silo · Startrampe",
@@ -3745,7 +3859,8 @@
    "keyImage": "Die Rakete im Schacht, an der Rampe die Anzeige 00:00:01",
    "must": "technik, gefahr, kabel",
    "never": "grün, laden"
-  }
+  },
+  "type": "boss"
  },
  "rs_waffenkammer": {
   "name": "Silo · Waffenkammer",
@@ -3764,7 +3879,8 @@
    "keyImage": "Leere Gewehrständer, zwei Gewehre, Kisten darunter",
    "must": "militär, kiste, regal",
    "never": "grün, laden"
-  }
+  },
+  "type": "branch"
  },
  "rs_funkraum": {
   "name": "Silo · Funkraum",
@@ -3783,7 +3899,8 @@
    "keyImage": "Ein Notizbuch voller Frequenzen neben dem Funkgerät",
    "must": "technik, papier, büro",
    "never": "grün, laden"
-  }
+  },
+  "type": "branch"
  },
  "rs_vorrat": {
   "name": "Silo · Vorratsraum",
@@ -3802,7 +3919,8 @@
    "keyImage": "Regale voller Konserven, die Hälfte leer",
    "must": "vorrat, regal, küche",
    "never": "grün, laden"
-  }
+  },
+  "type": "branch"
  },
  "rs_archiv": {
   "name": "Silo · Archiv",
@@ -3821,7 +3939,8 @@
    "keyImage": "Aktenschränke mit dem Stempel STRENG GEHEIM",
    "must": "papier, büro, regal",
    "never": "grün, laden"
-  }
+  },
+  "type": "branch"
  },
  "rs_offiziersmesse": {
   "name": "Silo · Offiziersmesse",
@@ -3849,7 +3968,8 @@
    "keyImage": "Ledersessel, ein Billardtisch, der Dienstplan an der Wand",
    "must": "büro, küche, vorrat",
    "never": "grün, laden"
-  }
+  },
+  "type": "rest"
  },
  "rs_kryokammer": {
   "name": "Silo · Kryokammer",
@@ -3868,7 +3988,8 @@
    "keyImage": "Leere Tanks mit Namensschildern",
    "must": "technik, kabel, gefahr",
    "never": "grün, laden"
-  }
+  },
+  "type": "branch"
  },
  "rs_bunker_privat": {
   "name": "Silo · Privatbunker",
@@ -3887,7 +4008,8 @@
    "keyImage": "Ein Sessel, Vorräte, eine Tür von innen verriegelt",
    "must": "technik, werkzeug, kiste",
    "never": "grün, laden"
-  }
+  },
+  "type": "branch"
  },
  "rs_wartungsnische": {
   "name": "Silo · Wartungsnische",
@@ -3905,6 +4027,611 @@
    "today": "Ein Werkzeugwagen, eine Tasse kalter Kaffee",
    "keyImage": "Ein Werkzeugwagen und eine Tasse kalter Kaffee",
    "must": "technik, vorrat, kiste",
+   "never": "grün, laden"
+  },
+  "type": "branch"
+ },
+ "km7_preistafel": {
+  "name": "Vorplatz mit Preistafel",
+  "tags": ["start"],
+  "weight": 0,
+  "type": "wow",
+  "role": "outdoor",
+  "terrain": "desert",
+  "atmosphere": "wueste_draussen",
+  "backdrop": {"weather": "abendglut", "shade": 15},
+  "description": "Wow-Raum (#163): Die Preistafel springt flackernd an, als Leyla den Vorplatz betritt; Zapfinseln im Sonnenuntergang.",
+  "size": [48, 20],
+  "layout": [
+   "################################################",
+   "#..........*........*........*..*.....*........#",
+   "#..............................................#",
+   "#..............................................#",
+   "#..............................................#",
+   "#..............................................#",
+   "#..............................................#",
+   "#..............................................#",
+   "#..............................................#",
+   "#..............................................#",
+   "#..............................................#",
+   "#.................................==H=========.#",
+   "#...................................H..........#",
+   "#......##########...................H..........#",
+   "######..............................H..........#",
+   "#.*..D*..................=================......",
+   "#....D..........................................",
+   "#....D..................#.......................",
+   "#..S.D......L..........##.........C.............",
+   "##^#############################################"
+  ],
+  "story": {
+   "function": "Großer Vorplatz der Tankstelle mit Preistafel am Highway",
+   "moment": "Der letzte Preis blieb stehen, als der Strom ging",
+   "today": "Die Tafel springt an, wenn jemand kommt; die Vultures halten Abstand",
+   "keyImage": "Preistafel mit dem absurden letzten Preis über leeren Zapfsäulen, Abendsonne",
+   "must": "schild, straße, fass",
+   "never": "bett, büro"
+  }
+ },
+ "tp_poolparty": {
+  "name": "Trailerpark · Poolparty",
+  "tags": ["combat"],
+  "weight": 0,
+  "type": "wow",
+  "role": "outdoor",
+  "terrain": "desert",
+  "atmosphere": "wueste_draussen",
+  "backdrop": {"weather": "abendglut", "shade": 15},
+  "description": "Wow-Raum (#163): Leerer Pool voller Liegestühle, darin Bewaffnete, Schlager aus dem Radio.",
+  "size": [48, 20],
+  "layout": [
+   "################################################",
+   "########...*........*........**.......*........#",
+   "########.......................................#",
+   "########.......................................#",
+   "########.......................................#",
+   "########.......................................#",
+   "########.......................................#",
+   "########.......................................#",
+   "########.......................................#",
+   "########.......................................#",
+   "########.......................................#",
+   "########..........................==H=========.#",
+   "########............................H..........#",
+   "########............................H..........#",
+   "########............................H1.........#",
+   "..*...*..................=================......",
+   "................................................",
+   "........................#...............#.......",
+   ".......................##.....1.C.....1.#.......",
+   "################################################"
+  ],
+  "story": {
+   "function": "Der große Pool mit Liegewiese",
+   "moment": "Hier tranken sie das letzte Wasser, gemeinsam und geordnet",
+   "today": "Sunny Side liegen bewaffnet im leeren Becken",
+   "keyImage": "Leerer Pool voller Liegestühle, darin Bewaffnete mit Sonnenhut",
+   "must": "grün, musik, fass",
+   "never": "büro, militär"
+  }
+ },
+ "fm_zettelkabine": {
+  "name": "Funkmast · Kabine im Wind",
+  "tags": ["combat"],
+  "weight": 0,
+  "type": "wow",
+  "role": "tech",
+  "terrain": "metal",
+  "atmosphere": "metall_rost",
+  "backdrop": {"weather": "abendglut", "shade": 15},
+  "description": "Wow-Raum (#163): Oben auf der Spitze: Wind, die Kabine voller Zettel, Blick über die Salt Flats.",
+  "size": [34, 28],
+  "layout": [
+   "#############################A####",
+   "#########..*.......*.......*.....#",
+   "#########...............1........#",
+   "#########........=H==============#",
+   "#########.........H..............#",
+   "#########.........H..............#",
+   "#########.........H..............#",
+   "#########.==========H=...........#",
+   "#########...........H............#",
+   "#########...........H............#",
+   "#########...........H............#",
+   "#########........=H==============#",
+   "#########.........H..............#",
+   "#########.........H..............#",
+   "#########.........H..............#",
+   "#########.==========H=...........#",
+   "#########...........H............#",
+   "#########...........H............#",
+   "#########...........H............#",
+   "#########........=H==============#",
+   "#########.........H..............#",
+   "#########.........H..............#",
+   "#########.........H..............#",
+   "#.........=H==========...........#",
+   "#..........H...*.................#",
+   "#..........H.....................#",
+   "#..........H.....C...............#",
+   "####A#############################"
+  ],
+  "story": {
+   "function": "Wartungskabine hoch oben im Mast",
+   "moment": "Ein Techniker notierte hier jeden Hilferuf, bis keiner mehr kam",
+   "today": "Die Saints predigen von hier oben; die Zettel flattern im Wind",
+   "keyImage": "Die Kabine oben im Wind, Wände voller Zettel, Kopfhörer am Haken",
+   "must": "technik, kabel, kiste",
+   "never": "grün, laden"
+  }
+ },
+ "markt_kuppel": {
+  "name": "Markt · Passage unter der Kuppel",
+  "tags": ["combat"],
+  "weight": 0,
+  "type": "wow",
+  "role": "shop",
+  "terrain": "mall",
+  "atmosphere": "markt_neon",
+  "description": "Wow-Raum (#163): Passage unter der Glaskuppel, Lichtstrahlen auf die stehende Rolltreppe, Barrikade aus Einkaufswagen.",
+  "size": [50, 22],
+  "layout": [
+   "##################################################",
+   "########...*........*.....*..*........*........*.#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########...........................==H==========.#",
+   "########.............................H...........#",
+   "########.............................H...........#",
+   "########.............................H.1.........#",
+   "..*...*...................==================......",
+   "..................................................",
+   ".........................#........................",
+   "........................##..C..1........1.........",
+   "##################################################"
+  ],
+  "story": {
+   "function": "Zentrale Passage unter der Glaskuppel",
+   "moment": "Hier stand die Menge beim Ausverkauf, bis der Flügel einstürzte",
+   "today": "Oben die Wagen-Barrikade der Rats, Licht fällt durch die Kuppel",
+   "keyImage": "Stillstehende Rolltreppe unter SALE-Bannern, Licht von oben",
+   "must": "laden, bank, deko",
+   "never": "wrack, bett"
+  }
+ },
+ "hh_bruchkante": {
+  "name": "Hochhaus · Bruchkante",
+  "tags": ["combat"],
+  "weight": 0,
+  "type": "wow",
+  "role": "office",
+  "terrain": "concrete",
+  "atmosphere": "ruine_staub",
+  "backdrop": {"weather": "abendglut", "shade": 15},
+  "description": "Wow-Raum (#163): Ein halbes Büro über dem Abgrund, Wind, Papier weht hinaus.",
+  "size": [36, 28],
+  "layout": [
+   "###############################A####",
+   "#########..*.......*.......*.......#",
+   "#########................1.........#",
+   "#########.........=H===============#",
+   "#########..........H...............#",
+   "#########..........H...............#",
+   "#########..........H.1.............#",
+   "#########.============H............#",
+   "#########.............H............#",
+   "#########.............H............#",
+   "#########.............H............#",
+   "#########.........=H===============#",
+   "#########..........H...............#",
+   "#########..........H...............#",
+   "#########..........H...............#",
+   "#########.============H............#",
+   "#########.............H............#",
+   "#########.............H............#",
+   "#########.............H............#",
+   "#########.........=H===============#",
+   "#########..........H...............#",
+   "#########..........H...............#",
+   "#########..........H...............#",
+   "#.........=H===========............#",
+   "#..........H....*..................#",
+   "#..........H.......................#",
+   "#..........H......C................#",
+   "####A###############################"
+  ],
+  "story": {
+   "function": "Büroetagen, die im Sandsturm halb wegbrachen",
+   "moment": "Die Seite brach weg; die Schreibtische blieben an der Kante",
+   "today": "Wind und Papier, die Sky Wolves sichern den Aufstieg",
+   "keyImage": "Ein halbes Büro hängt über dem Abgrund, Schreibtische an der Bruchkante",
+   "must": "papier, technik, sitz",
+   "never": "wrack, reifen"
+  }
+ },
+ "ph_nachtdach": {
+  "name": "Parkhaus · Nachtdeck",
+  "tags": ["combat"],
+  "weight": 0,
+  "type": "wow",
+  "role": "outdoor",
+  "terrain": "concrete",
+  "atmosphere": "beton_neon",
+  "backdrop": {"weather": "abendglut", "shade": 15},
+  "description": "Wow-Raum (#163): Das Dach bei Nacht, Kassenhaus im Neon, dahinter die Skyline der Stadt.",
+  "size": [38, 26],
+  "layout": [
+   "#################################A####",
+   "#########..*.......*.......*.......*.#",
+   "#########............................#",
+   "#########............................#",
+   "#########..................1.........#",
+   "#########.=============H=============#",
+   "#########..............H.............#",
+   "#########..............H.............#",
+   "#########.............1H.............#",
+   "#########..........=H================#",
+   "#########...........H................#",
+   "#########...........H................#",
+   "#########......1....H................#",
+   "#########.=============H=............#",
+   "#########..............H.............#",
+   "#########..............H.............#",
+   "#########..............H.............#",
+   "#########..........=H================#",
+   "#########...........H................#",
+   "#########...........H................#",
+   "#########...........H................#",
+   "#.........=H=============............#",
+   "#..........H......*..................#",
+   "#..........H.........................#",
+   "#..........H........C................#",
+   "####A#################################"
+  ],
+  "story": {
+   "function": "Oberstes Deck unter freiem Himmel",
+   "moment": "Vom Dach sah man den letzten Shuttle in die Stadt fahren",
+   "today": "Level Five feiern hier, das Kassenhaus leuchtet",
+   "keyImage": "Das Kassenhaus im Neon, dahinter die Skyline der Stadt",
+   "must": "reifen, kiste, müll",
+   "never": "grün, bett"
+  }
+ },
+ "mt_gittertor": {
+  "name": "Metro · Das Gittertor",
+  "tags": ["combat"],
+  "weight": 0,
+  "type": "wow",
+  "role": "corridor",
+  "terrain": "concrete",
+  "atmosphere": "tunnel_blau",
+  "description": "Wow-Raum (#163): Der verschweißte Tunnel, durch das Gitter fällt das Licht der Stadt, davor Schlaflager.",
+  "size": [36, 28],
+  "layout": [
+   "###############################A####",
+   "#########..*.......*.......####H####",
+   "#########..................####H####",
+   "#########..................####H####",
+   "#########..................####H####",
+   "#########..................####H####",
+   "#########......................H...#",
+   "#########.============H============#",
+   "#########.............H............#",
+   "#########.............H............#",
+   "#########.............H............#",
+   "#########.........=H===============#",
+   "#########..........H...............#",
+   "#########..........H...............#",
+   "#########..........H...............#",
+   "#########.============H............#",
+   "#########.............H............#",
+   "#########.............H............#",
+   "#########............1H............#",
+   "#########.........=H===============#",
+   "#########..........H...............#",
+   "#########..........H...............#",
+   "#########.....1....H...............#",
+   "#.........=H===========............#",
+   "#..........H....*..................#",
+   "#..........H.......................#",
+   "#..........H......C......1.........#",
+   "####A###############################"
+  ],
+  "story": {
+   "function": "Tunnelmund vor dem Delta Ring",
+   "moment": "Die Linie wurde gekappt, das Gitter zugeschweißt",
+   "today": "Schlaflager davor, Fotos am Gitter",
+   "keyImage": "Bahnsteig voller Schlaflager vor dem verschweißten Tunnel mit der Aufschrift BigCityDelta",
+   "must": "sitz, müll, schild",
+   "never": "grün, wrack"
+  }
+ },
+ "kn_glanzberg": {
+  "name": "Kanal · Der Glanzberg",
+  "tags": ["combat"],
+  "weight": 0,
+  "type": "wow",
+  "role": "hall",
+  "terrain": "concrete",
+  "atmosphere": "tunnel_blau",
+  "description": "Wow-Raum (#163): Das Nest im Sammler: ein Berg aus Glänzendem unter dem Lichtschacht.",
+  "size": [36, 28],
+  "layout": [
+   "###############################A####",
+   "#########..*.......*.......####H####",
+   "#########..................####H####",
+   "#########..................####H####",
+   "#########..................####H####",
+   "#########..................####H####",
+   "#########......................H...#",
+   "#########.============H============#",
+   "#########.............H............#",
+   "#########.............H............#",
+   "#########.............H............#",
+   "#########.........=H===============#",
+   "#########..........H...............#",
+   "#########..........H...............#",
+   "#########..........H...............#",
+   "#########.============H............#",
+   "#########.............H............#",
+   "#########.............H............#",
+   "#########............1H............#",
+   "#########.........=H===============#",
+   "#########..........H...............#",
+   "#########..........H...............#",
+   "#########.....1....H...............#",
+   "#.........=H===========............#",
+   "#..........H....*..................#",
+   "#..........H.......................#",
+   "#..........H......C......1.........#",
+   "####A###############################"
+  ],
+  "story": {
+   "function": "Tiefes Sammelbecken unter dem Gully",
+   "moment": "Alles, was hinunterfiel, landete hier",
+   "today": "Ein Berg aus Glänzendem, bewacht",
+   "keyImage": "Ein Berg aus Glänzendem unter dem Lichtschacht",
+   "must": "müll, kiste, putz",
+   "never": "büro, sitz"
+  }
+ },
+ "bunker_reaktorkern": {
+  "name": "Bunker · Reaktorkern",
+  "tags": ["combat"],
+  "weight": 0,
+  "type": "wow",
+  "role": "tech",
+  "terrain": "bunker",
+  "atmosphere": "bunker_reaktor",
+  "description": "Wow-Raum (#163): Die Reaktorhalle: grünes Pulsieren, Dampf, die Gang hält Wache.",
+  "size": [50, 22],
+  "layout": [
+   "##################################################",
+   "########...*........*....*...*........*........*.#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########...........................==H==========.#",
+   "########.............................H...........#",
+   "########.............................H...........#",
+   "########.............................H.1.........#",
+   "..*...*...................==================......",
+   "..................................................",
+   ".........................#........................",
+   "........................##.C...1........1.........",
+   "##################################################"
+  ],
+  "story": {
+   "function": "Reaktorhalle, Herz des Bunkers",
+   "moment": "Als die Lüftung ausfiel, lief der Reaktor weiter",
+   "today": "Die Rust Guard halten Wache am Kern",
+   "keyImage": "Der Reaktorblock in grünem Pulsieren, Dampf zwischen den Stegen",
+   "must": "technik, rohr, gefahr",
+   "never": "grün, bett"
+  }
+ },
+ "sm_kristalldom": {
+  "name": "Mine · Kristalldom",
+  "tags": ["combat"],
+  "weight": 0,
+  "type": "wow",
+  "role": "cave",
+  "terrain": "cave",
+  "atmosphere": "metall_rost",
+  "description": "Wow-Raum (#163): Die Kristallgrotte: alles leuchtet von unten.",
+  "size": [38, 28],
+  "layout": [
+   "#################################A####",
+   "#########..*.......*.......*.####H####",
+   "#########....................####H####",
+   "#########....................####H####",
+   "#########....................####H####",
+   "#########....................####H####",
+   "#########........................H...#",
+   "#########.=============H=============#",
+   "#########..............H.............#",
+   "#########..............H.............#",
+   "#########..............H.............#",
+   "#########..........=H================#",
+   "#########...........H................#",
+   "#########...........H................#",
+   "#########...........H................#",
+   "#########.=============H=............#",
+   "#########..............H.............#",
+   "#########..............H.............#",
+   "#########.............1H.............#",
+   "#########..........=H================#",
+   "#########...........H................#",
+   "#########...........H................#",
+   "#########......1....H................#",
+   "#.........=H=============............#",
+   "#..........H.....*...................#",
+   "#..........H.........................#",
+   "#..........H.......C.......1.........#",
+   "####A#################################"
+  ],
+  "story": {
+   "function": "Natürlicher Salzdom unter den Stollen",
+   "moment": "Hier stießen sie auf das Leuchten",
+   "today": "Unberührt, nur das Leuchten wächst",
+   "keyImage": "Kristalle, die von unten leuchten",
+   "must": "stein, licht",
+   "never": "laden, müll, sitz",
+   "decay": 0
+  }
+ },
+ "min_uhrensaal": {
+  "name": "Ministerium · Uhrensaal",
+  "tags": ["combat"],
+  "weight": 0,
+  "type": "wow",
+  "role": "hall",
+  "terrain": "marble",
+  "atmosphere": "ministerium_saal",
+  "description": "Wow-Raum (#163): Der Festsaal: Kronleuchter, die große Uhr, makellose Ordnung.",
+  "size": [50, 22],
+  "layout": [
+   "##################################################",
+   "########...*........*....*...*........*........*.#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########...........................==H==========.#",
+   "########.............................H...........#",
+   "########.............................H...........#",
+   "########.............................H.1.........#",
+   "..*...*...................==================......",
+   "..................................................",
+   ".........................#........................",
+   "........................##.C...1........1.........",
+   "##################################################"
+  ],
+  "story": {
+   "function": "Großer Saal mit der Uhr des Amts",
+   "moment": "Die Uhr lief weiter, als das Amt ordnungsgemäß schloss",
+   "today": "Der Hausmeister zieht sie jeden Tag auf",
+   "keyImage": "Die große Uhr über schnurgeraden Stuhlreihen",
+   "must": "deko, sitz, bild",
+   "never": "müll, wrack"
+  }
+ },
+ "rf_fackelnacht": {
+  "name": "Raffinerie · Fackel bei Nacht",
+  "tags": ["combat"],
+  "weight": 0,
+  "type": "wow",
+  "role": "outdoor",
+  "terrain": "metal",
+  "atmosphere": "metall_rost",
+  "backdrop": {"weather": "abendglut", "shade": 15},
+  "description": "Wow-Raum (#163): Nachts über dem Tankfeld: die Fackel brüllt, Funken regnen.",
+  "size": [50, 22],
+  "layout": [
+   "##################################################",
+   "########...*........*....*...*........*........*.#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########.........................................#",
+   "########...........................==H==========.#",
+   "########.............................H...........#",
+   "########.............................H...........#",
+   "########.............................H.1.........#",
+   "..*...*...................==================......",
+   "..................................................",
+   ".........................#........................",
+   "........................##.C...1........1.........",
+   "##################################################"
+  ],
+  "story": {
+   "function": "Fackelturm über dem Tankfeld",
+   "moment": "Die Fackel blieb an, als man die Anlage stehen ließ",
+   "today": "Die Crude Boys brennen darunter Fusel",
+   "keyImage": "Die Fackel brennt über dem Tankfeld, Funken regnen",
+   "must": "fass, kanister, technik",
+   "never": "bett, büro"
+  }
+ },
+ "rs_raketenblick": {
+  "name": "Silo · Die Rakete",
+  "tags": ["combat"],
+  "weight": 0,
+  "type": "wow",
+  "role": "hall",
+  "terrain": "metal",
+  "atmosphere": "bunker_reaktor",
+  "description": "Wow-Raum (#163): Die Rakete im Schacht, an der Startrampe leuchtet 00:00:01.",
+  "size": [40, 30],
+  "layout": [
+   "###################################A####",
+   "#########..*.......*.......*...####H####",
+   "#########......................####H####",
+   "#########......................####H####",
+   "#########......................####H####",
+   "#########......................####H####",
+   "#########......................####H####",
+   "#########......................####H####",
+   "#########..........................H...#",
+   "#########.==============H==============#",
+   "#########...............H..............#",
+   "#########...............H..............#",
+   "#########...............H..............#",
+   "#########...........=H=================#",
+   "#########............H.................#",
+   "#########............H.................#",
+   "#########............H.................#",
+   "#########.==============H=.............#",
+   "#########...............H..............#",
+   "#########...............H..............#",
+   "#########..............1H..............#",
+   "#########...........=H=================#",
+   "#########............H.................#",
+   "#########............H.................#",
+   "#########.......1....H.................#",
+   "#.........=H==============.............#",
+   "#..........H......*....................#",
+   "#..........H...........................#",
+   "#..........H........C.......1..........#",
+   "####A###################################"
+  ],
+  "story": {
+   "function": "Der Raketenschacht in voller Höhe",
+   "moment": "Eine Sekunde vor dem Start: angehalten",
+   "today": "Zero Hour patrouillieren auf den Bühnen",
+   "keyImage": "Die Rakete im Schacht, die Anzeige 00:00:01",
+   "must": "technik, kabel, gefahr",
    "never": "grün, laden"
   }
  }
