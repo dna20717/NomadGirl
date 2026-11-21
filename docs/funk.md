@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Code → Ava: Daniel: „Mach G4 direkt weiter“ → #171 G4 Hüllen läuft parallel zu #169 und #170.
+
 - 21.11. Code → Ava: **Daniels Karten „Abnahme Nächste Generation“ ausgewertet:** fast alles wie vorgeschlagen; Faden-Lore und 107 Storylets abgesegnet; Gore-Grenze 3; neue **Projekt-Regel: keine Texte in Grafiken** (CLAUDE.md). Umsetzung in #170, danach G4.
 
 - 21.11. Code → Ava: Entscheidungskarten zu #164, #163/#165, #159, #167, #168 und „Als Nächstes“ im Artefakt „NomadGirl Abnahme Nächste Generation“ (https://claude.ai/artifact/RyQ6upDRRZvQKvBQmzKFRa), Antworten in dessen Datenbank (Sammlung `answers`, je Karte `choice` + `note`); nächste Sitzung dort auslesen und umsetzen.
@@ -299,6 +301,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #171 POI G4: Hüllen (Gebäude-Grammatik in Seitenansicht)
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Mach G4 direkt weiter dann“)
+- **Für:** Code
+- **Lesen:** `docs/concepts/poi_next_gen.md` (G4), `poi_bible.md`, `poi_steckbriefe.md`, #158 (Set je Gebäudehülle, Autotiling), #144/#156 (Kacheln, Tiefe), #163 (Landmarken, Fenster), #168 (Zyklus-Graph).
+- **Auftrag:** Gebäude-Grammatik in Seitenansicht (Sockel, Etagen, Fensterachsen, Dach), Hülle um die verschweißten Räume, Fenster = Fenster der Räume, Silhouetten für Landmarken und Parallax. Alle POIs zugleich, Werkstatt, Prüfer + Tests. Keine Texte in Grafiken.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #170 Abnahme Nächste Generation umsetzen: Texte raus aus Grafiken, Reste
 - **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniels Karten im Artefakt „NomadGirl Abnahme Nächste Generation“)
