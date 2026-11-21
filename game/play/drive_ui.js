@@ -18,6 +18,15 @@ import { rainingAt } from '../rain.js';
 import { kitLook } from './enemy_kit.js';
 
 const ease = k => k * k * (3 - 2 * k);
+// fade a sound's volume through a plain value: a tween straight on the sound read the volume of a destroyed one (null gain) and threw
+const alive = m => !!m && !m.pendingRemove && m.volumeNode !== null && !!m.manager;
+const fadeSound = (s, m, to, ms, done = null) => {
+  if (!alive(m)) return done?.();
+  let v0 = 0; try { v0 = m.volume ?? 0; } catch { return done?.(); }
+  const o = { v: v0 };
+  m._fade?.stop?.();
+  m._fade = s.tweens.add({ targets: o, v: to, duration: ms, onUpdate: () => { if (!alive(m)) return; try { m.setVolume(o.v); } catch { /* destroyed meanwhile */ } }, onComplete: () => done?.() });
+};
 const two = n => String(n).padStart(2, '0');
 
 export class DriveUI {
@@ -74,7 +83,7 @@ export class DriveUI {
       if (!this.musicOn || this.music || !s.cache.audio.exists(id)) return;
       this.music = s.sound.add(id, { loop: true, volume: 0 });
       this.music.play({ loop: true, volume: 0 });
-      s.tweens.add({ targets: this.music, volume: vol, duration: 1500 });
+      fadeSound(s, this.music, vol, 1500);
       nowPlayingFor(this.D.assets, id, s.base || location.href);   // #117 the cassette
     };
     if (s.cache.audio.exists(id)) return play();
@@ -87,7 +96,8 @@ export class DriveUI {
     this.musicOn = false;
     const m = this.music, s = this.host.scene(); this.music = null;
     if (!m) return;
-    if (s?.tweens) s.tweens.add({ targets: m, volume: 0, duration: ms, onComplete: () => { m.stop(); m.destroy(); } }); else { m.stop(); m.destroy(); }
+    const end = () => { if (alive(m)) { m.stop(); m.destroy(); } };
+    if (s?.tweens) fadeSound(s, m, 0, ms, end); else end();
   }
   // one leg: info { i, n, h0, h1, fuel0, fuel1, km, fromName, toName, region0, region1, stop: { kind, name } | null }
   leg(info, cb) {
@@ -113,7 +123,7 @@ export class DriveUI {
     else if (L.stopT == null || L.stopped) L.time = L.T;
   }
   // pad (scene.padMenus): hold A to go faster, B skips
-  nav(u) { if (u.down('ok')) this.keys.add('pad'); else this.keys.delete('pad'); if (u.pressed('back')) this.skip(); if (u.down('context')) this.keys.add('scan'); else this.keys.delete('scan'); }   // #115 hold X: AvA scans
+  nav(u) { if (u.down('ok')) this.keys.add('pad'); else this.keys.delete('pad'); if (u.pressed('back')) this.skip(); if (u.down('context')) this.keys.add('padscan'); else this.keys.delete('padscan'); }   // #115 hold X: AvA scans (#147: its own key, else every frame undid the keyboard's R)
   // #064 without a pointer (keyboard R, controller X): the giant screen most in view
   visibleAd() { const sc = (this.road?.screens || []).filter(x => x.x + x.w > 0 && x.x < BW); return sc.sort((a, b) => Math.abs(a.x + a.w / 2 - BW / 2) - Math.abs(b.x + b.w / 2 - BW / 2))[0] || null; }
   tapVisible() { const sc = this.phase === 'drive' && this.visibleAd(); return sc ? this.influence(sc) : false; }
@@ -134,7 +144,7 @@ export class DriveUI {
   }
   tick(dt) {
     const st = this.st, L = this.legInfo, C = this.C, hud = this.host.scene()?.hud;
-    const fast = [...this.keys].some(k => k !== 'scan') && !hud?.modal ? C.fast : 1;   // #115 holding R / X scans, it does not hurry
+    const fast = [...this.keys].some(k => k !== 'scan' && k !== 'padscan') && !hud?.modal ? C.fast : 1;   // #115 holding R / X scans, it does not hurry
     st.t += dt; st.dt = dt;
     if (this.fading < 0) { this.fade = Math.max(0, this.fade + this.fading * dt); if (this.fade <= 0) this.fading = 0; }
     if (this.phase === 'out') { this.fade = Math.min(1, this.fade + this.fading * dt); st.v *= 0.97; st.dist += st.v * dt; if (this.fade >= 1 && this.onOut) { const f = this.onOut; this.onOut = null; f(); } return; }
@@ -324,15 +334,20 @@ export class DriveUI {
     const c = this.canvas, box = c.getBoundingClientRect(), dpr = Math.min(3, devicePixelRatio || 1), W = Math.min(3840, Math.round((box.width || innerWidth) * dpr)), H = Math.round(W * 9 / 16);
     if (c.width !== W || c.height !== H) { c.width = W; c.height = H; }
     const ctx = c.getContext('2d'), st = this.st, S = skyAt(st.hour);
-    this.road.draw(this.bg.getContext('2d'), st);
+    // #147 the background at n device pixels per background pixel: the code's pixels stay chunky, the painted art is drawn finer;
+    // st.ws = background pixels per world pixel, the rig's scale, so painted props and people match the van
+    const n = Math.max(1, Math.ceil(W / BW)), rb = this.rigBox(W, H);
+    if (this.bg.width !== BW * n) { this.bg.width = BW * n; this.bg.height = BH * n; }
+    st.ws = rb ? rb.k / rb.u : 0.15;
+    this.road.draw(this.bg.getContext('2d'), st, n);
     ctx.imageSmoothingEnabled = false;
     // heat haze at noon: the rows just over the horizon wobble a little (Reisen › Fahrt › Hitzeflimmern)
     const haze = this.C.haze * Math.max(0, Math.sin(Math.PI * ((st.hour % 24) - 9) / 8)) * (1 - st.wet) * (S.dark < 0.1 ? 1 : 0);
     if (haze > 0.05) {
       const u = W / BW;
-      ctx.drawImage(this.bg, 0, 0, BW, 120, 0, 0, W, 120 * u);
-      for (let y = 120; y < 172; y++) { const o = Math.sin(st.t * 6 + y * 0.9) * haze * 1.2 * (1 - Math.abs(y - 150) / 26); ctx.drawImage(this.bg, 0, y, BW, 1, Math.round(o * u), y * u, W, Math.ceil(u)); }
-      ctx.drawImage(this.bg, 0, 172, BW, BH - 172, 0, 172 * u, W, (BH - 172) * u);
+      ctx.drawImage(this.bg, 0, 0, BW * n, 120 * n, 0, 0, W, 120 * u);
+      for (let y = 120; y < 172; y++) { const o = Math.sin(st.t * 6 + y * 0.9) * haze * 1.2 * (1 - Math.abs(y - 150) / 26); ctx.drawImage(this.bg, 0, y * n, BW * n, n, Math.round(o * u), y * u, W, Math.ceil(u)); }
+      ctx.drawImage(this.bg, 0, 172 * n, BW * n, (BH - 172) * n, 0, 172 * u, W, (BH - 172) * u);
     } else ctx.drawImage(this.bg, 0, 0, W, H);
     this.road.ads(ctx, W, H, st);   // #055 giant screens of the brands
     this.scanStep(Math.min(0.05, this.st.dt || 0.016), W, H);   // #115 AvA's scan instead of the viewfinder

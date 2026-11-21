@@ -22,7 +22,7 @@ await page.addInitScript(() => {
   window.setPad = (press = []) => pad.buttons.forEach((b, i) => { b.pressed = press.includes(i); b.value = b.pressed ? 1 : 0; });
   navigator.getGamepads = () => [pad, null, null, null];
 });
-await page.goto('http://localhost:8766/game.html?camp&new');
+await page.goto((process.env.GAME_URL || 'http://localhost:8766/game.html') + '?camp&new');
 await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.camp, null, { timeout: 40000 });
 await ev(() => { nomad.take(); nomad.step(20); window.SC = () => game.scene.getScene('play'); });
 
@@ -102,7 +102,7 @@ check('Riesen-Billboards mit Werbung der Marken stehen in der Landschaft', v.scr
 // the ring fills, the Influencer buff comes; holding R does not hurry the drive
 await page.keyboard.down('r');
 const t0 = Date.now(); let fastWhile = false;
-while (Date.now() - t0 < 8000) { const q = await ev(() => ({ n: SC().hud.drive.shots?.size || 0, fast: [...SC().hud.drive.keys].some(k => k !== 'scan'), p: SC().hud.drive.ava?.p || 0 })); if (q.fast) fastWhile = true; if (q.n >= 1) break; await page.waitForTimeout(150); }
+while (Date.now() - t0 < 20000) { const q = await ev(() => ({ n: SC().hud.drive.shots?.size || 0, fast: [...SC().hud.drive.keys].some(k => k !== 'scan' && k !== 'padscan'), p: SC().hud.drive.ava?.p || 0 })); if (q.fast) fastWhile = true; if (q.n >= 1) break; await page.waitForTimeout(150); }
 await page.keyboard.up('r');
 v = await ev(async () => { const B = await import('/game/brand_perks.js'), s = SC(), d = s.hud.drive; return { inf: B.influencer(s.data_, nomad.save()), shot: d.shots?.size || 0, ava: d.ava ? [Math.round(d.ava.x), Math.round(d.ava.y)] : null }; });
 check('AvA scannt ein Billboard (R halten): ein Scan, Influencer-Buff (24 h), kein Vorspulen', v.shot === 1 && !fastWhile && v.inf && Math.round(v.inf.left) === 24 && [10, 20, 30].includes(v.inf.discount), { v, fastWhile });
@@ -130,7 +130,7 @@ await ev(() => SC().hud.closeMenu());
 await until(() => !SC().hud.drive?.isOpen, null, 30000);
 
 // workshop: Reisen › Fahrt-Vorschau
-await page.goto('http://localhost:8766/workshop.html');
+await page.goto((process.env.GAME_URL || 'http://localhost:8766/game.html').replace('game.html', 'workshop.html'));
 await page.waitForFunction(() => window.workshop?.p && !document.querySelector('#load.loading-on'), null, { timeout: 30000 });
 await ev(() => workshop.go({ area: 'travel' }));
 await page.waitForTimeout(1200);

@@ -18,7 +18,7 @@ export class DriveScan {
     // where she wants to be: the pointer while held, the billboard while R / X is held, else home
     let tx = home.x, ty = home.y;
     if (A.held && A.ptr) { tx = A.ptr.x; ty = A.ptr.y; }
-    else if (this.keys.has('scan') && open) { tx = (sc.x + sc.w / 2) * u + Math.sin(this.st.t * 2.3) * sc.w * u * 0.32; ty = (sc.y + sc.h / 2) * u; }
+    else if ((this.keys.has('scan') || this.keys.has('padscan')) && open) { tx = (sc.x + sc.w / 2) * u + Math.sin(this.st.t * 2.3) * sc.w * u * 0.32; ty = (sc.y + sc.h / 2) * u; }
     // the rubber band: beyond its length it pulls back hard
     const dx = tx - home.x, dy = ty - home.y, d = Math.hypot(dx, dy);
     if (d > rope) { tx = home.x + dx / d * rope; ty = home.y + dy / d * rope; }

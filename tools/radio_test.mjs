@@ -14,7 +14,7 @@ const ev = (fn, a) => page.evaluate(fn, a);
 const shot = async n => { if (!shots) return; fs.mkdirSync('output', { recursive: true }); await page.waitForTimeout(500); await page.screenshot({ path: `output/radio_${n}.png` }); };
 
 await page.addInitScript(() => { try { localStorage.removeItem('nomadgirl-radio'); localStorage.removeItem('nomadgirl-mute'); } catch { /* */ } });
-await page.goto('http://localhost:8766/game.html?camp&new');
+await page.goto((process.env.GAME_URL || 'http://localhost:8766/game.html') + '?camp&new');
 await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.camp && game.scene.getScene('play').hud.radio, null, { timeout: 60000 });
 await ev(() => { nomad.take(); nomad.step(10); window.SC = () => game.scene.getScene('play'); window.R = () => SC().hud.radio; SC().hud.tutorial?.setSessionOff?.(true); });
 

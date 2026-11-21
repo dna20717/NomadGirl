@@ -22,7 +22,71 @@
   "haze": 60,
   "grain": 10,
   "music": ["drive_a", "drive_b"],
-  "musicVolume": 40
+  "musicVolume": 40,
+  "art": {
+   "road": "ck_road",
+   "roadTurn": true,
+   "roadSquash": 33,
+   "ground": "camp_ground_fine",
+   "plain": "desert_plain",
+   "billboard": "ck_billboard",
+   "screenAt": [22, 26],
+   "screenSize": [196, 62],
+   "billboardSize": 110,
+   "pole": "plx_silhouettes",
+   "poleCell": "1",
+   "weed": "tileset00_props",
+   "weedCell": "desert3_2",
+   "propGap": 260,
+   "props": [
+    {
+     "look": "tileset00_props",
+     "cells": "desert3_0, desert3_1, desert3_3, desert3_5, desert3_8, desert3_11, desert3_15",
+     "parallax": "wueste",
+     "chance": 45,
+     "size": 100
+    },
+    {"look": "tileset00_props", "cells": "desert3_8, desert3_15, desert3_0, desert3_11, ruins3_6", "parallax": "canyon", "chance": 45, "size": 110},
+    {"look": "tileset00_props", "cells": "desert3_5, desert3_0, desert3_15, desert3_1", "parallax": "salzpfanne", "chance": 30, "size": 100},
+    {
+     "look": "tileset00_props",
+     "cells": "industry3_0, industry3_2, industry3_4, industry3_5, industry3_9, industry3_10, ruins3_9, ruins3_10",
+     "parallax": "industrie",
+     "chance": 50,
+     "size": 100
+    },
+    {
+     "look": "tileset00_props",
+     "cells": "ruins3_0, ruins3_1, ruins3_3, ruins3_4, ruins3_9, ruins3_10, ruins3_11, ruins3_15",
+     "parallax": "stadt",
+     "chance": 50,
+     "size": 100
+    },
+    {"look": "kit_ground_items", "cells": "Wegweiser, Palette, Kanister, Reifen mit Blumen", "chance": 6, "size": 100}
+   ],
+   "incidents": [
+    {"kind": "barrier", "look": "tileset00_props", "cell": "ruins3_9", "size": 100, "dx": -60},
+    {"kind": "barrier", "look": "tileset00_props", "cell": "industry3_11", "size": 130, "dx": 0},
+    {"kind": "barrier", "look": "tileset00_props", "cell": "industry3_11", "size": 130, "dx": 80},
+    {"kind": "barrier", "look": "tileset00_props", "cell": "industry3_11", "size": 130, "dx": 160},
+    {"kind": "barrier", "look": "kit_firebarrel", "cell": "1", "size": 100, "dx": 250, "fx": "fire"},
+    {"kind": "truck", "look": "truck", "size": 100, "dx": 0, "fx": "blink, smoke"},
+    {"kind": "campfire", "look": "kit_crate", "cell": "6", "size": 90, "dx": -90},
+    {"kind": "campfire", "look": "campfire_side", "size": 100, "dx": 0, "fx": "glow"},
+    {"kind": "campfire", "look": "kit_ground_items", "cell": "Brennholz", "size": 100, "dx": 100},
+    {"kind": "rocks", "look": "tileset00_props", "cell": "desert3_8", "size": 260, "dx": 0},
+    {"kind": "rocks", "look": "tileset00_props", "cell": "desert3_15", "size": 180, "dx": 140, "flip": true},
+    {"kind": "rocks", "look": "tileset00_props", "cell": "ruins3_1", "size": 220, "dx": 230},
+    {"kind": "rocks", "look": "tileset00_props", "cell": "desert3_8", "size": 170, "dx": 360, "flip": true},
+    {"kind": "trader", "look": "kit_umbrella", "size": 100, "dx": 0},
+    {"kind": "trader", "look": "kit_table", "cell": "1", "size": 100, "dx": 110},
+    {"kind": "trader", "look": "kit_crate", "cell": "2", "size": 100, "dx": 200},
+    {"kind": "trader", "look": "kit_lantern", "size": 100, "dx": 270, "fx": "lamp"},
+    {"kind": "hitchhiker", "look": "kit_ground_items", "cell": "Wegweiser", "size": 120, "dx": 0},
+    {"kind": "hitchhiker", "look": "kit_ground_items", "cell": "Seesack", "size": 100, "dx": -70}
+   ]
+  },
+  "nearScale": 70
  },
  "landscapes": [
   {
