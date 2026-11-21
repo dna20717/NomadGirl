@@ -42,6 +42,7 @@ const shot = async (page, name) => {
     const sc = game.scene.getScene('play'), L = sc.levelInfo, T = sc.T, lobby = L.rooms[0], lay = L.def.layout;
     const x = [...lay[lobby.y]].findIndex((c, i) => c === 'H' && i >= lobby.x && i < lobby.x + lobby.w);
     nomad.tp((x + 0.5) * T, (lobby.y + lobby.h - 1) * T - 2); nomad.step(5);
+    nomad.step(30); nomad.step(1, [], ['up']);   // #169 the landing after the teleport ends first, then a clean press (before, a hit from a nearby enemy happened to lift her onto the ladder)
     nomad.until(st => st.leyla.state === 'climb', 60, ['up'], ['up']);
     const st = nomad.until(st => st.leyla.state === 'normal' && st.leyla.feet < lobby.y * T - 10, 900, ['up']);
     nomad.step(20);

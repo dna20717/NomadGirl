@@ -136,9 +136,15 @@ export class SceneRuns {
       this.enemies.push(e);
     }
     // #169 Leben G3: the camps bring their own people (engine/ecosystem.js planLife); a rival patrol wears its own gang's colours
-    for (const c of this.lifePlan?.camps || []) for (const m of c.members) {
-      const e = this.addEnemy(m.enemy, m.x, m.y, m.gang && m.gang !== this.gang()?.name ? m.gang : undefined);
-      if (e) e.life = { camp: c.id, faction: m.faction, gang: m.gang, role: m.role, route: c.route, cx: c.cx, y: c.y };
+    // the danger of the place (#014) gives the camps more people too (same seed, same extras)
+    let lr = ((this.box?.save?.run?.seed || 1) ^ 0x51f1) >>> 0; const lrnd = () => ((lr = (lr * 1664525 + 1013904223) >>> 0) / 4294967296);
+    for (const c of this.lifePlan?.camps || []) {
+      const extra = Th?.more > 0 ? Math.floor(c.members.length * Th.more) + (lrnd() < (c.members.length * Th.more) % 1 ? 1 : 0) : 0;
+      const list = [...c.members, ...Array.from({ length: extra }, (_, i) => ({ ...c.members[i % c.members.length], role: 'guard', x: Math.max(c.x0, Math.min(c.x1, c.members[i % c.members.length].x + (i % 2 ? -1 : 1))) }))];
+      for (const m of list) {
+        const e = this.addEnemy(m.enemy, m.x, m.y, m.gang && m.gang !== this.gang()?.name ? m.gang : undefined);
+        if (e) e.life = { camp: c.id, faction: m.faction, gang: m.gang, role: m.role, route: c.route, cx: c.cx, y: c.y };
+      }
     }
   }
 
