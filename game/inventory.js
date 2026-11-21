@@ -150,15 +150,20 @@ export function moveAll(D, from, to) {
 }
 
 // roll a loot table → [{ a: 'items', id, n }]
-export function rollLoot(D, tableId, rnd = Math.random) {
+export function rollLoot(D, tableId, rnd = Math.random, opt = {}) {
   const T = D.lootTables?.[tableId];
   if (!T?.entries?.length) return [];
   // the maker's „In der Beute“ (#045) scales the weight of its products
   const w = e => (e.weight || 0) * (e.weapon ? lootOf(D, D.weapons?.[e.weapon]) : e.item ? lootOf(D, D.items?.[e.item]) : 1);
-  const [r0, r1] = T.rolls || [1, 1], rolls = r0 + Math.floor(rnd() * (r1 - r0 + 1)), total = T.entries.reduce((s, e) => s + w(e), 0), out = [];
+  const [r0, r1] = opt.rolls ? [opt.rolls, opt.rolls] : T.rolls || [1, 1], rolls = r0 + Math.floor(rnd() * (r1 - r0 + 1)), total = T.entries.reduce((s, e) => s + w(e), 0), out = [];
   for (let i = 0; i < rolls && total > 0; i++) {
-    let k = rnd() * total;
-    const e = T.entries.find(x => (k -= w(x)) < 0) || T.entries[0];
+    // #141 „Wählerisch“ (opt.pick): draw that many entries and keep the most valuable one (the bonus crate of a good rank)
+    let e = null, best = -1;
+    for (let p = 0; p < Math.max(1, opt.pick || 1); p++) {
+      let k = rnd() * total;
+      const c = T.entries.find(x => (k -= w(x)) < 0) || T.entries[0], v = valueOf(D, c.weapon ? D.weapons?.[c.weapon] : D.items?.[c.item]);
+      if (v > best) { e = c; best = v; }
+    }
     // an entry is a thing (Gegenstand) or a weapon (Waffe, #004: raider weapons can lie in the loot)
     const a = e.weapon && D.weapons?.[e.weapon] ? 'weapons' : 'items', id = a === 'weapons' ? e.weapon : e.item;
     if (!D[a]?.[id]) continue;

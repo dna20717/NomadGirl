@@ -37,6 +37,16 @@ POI-Level aus Raum-Bausteinen (Tankstelle KM7, Großmarkt, Bunker 13, Ministeriu
     - **Quest** `silo_schatz` bei Onkel Sung (Quests › Ziel: **Abgeben: alle diese**, **Erst wenn eins davon da ist**, **Merker beim Annehmen**; Belohnung › **Ort aufdecken**): erscheint, sobald ein Stück im Lager, in der Kiste oder im Rucksack liegt; Fortschritt zählt Stücke, Onkel nennt die fehlenden, der Questlog hakt sie ab; Abgeben deckt Silo Zero auf (+150 Δ). Onkel fährt als Gast: ohne Gästekoje bleibt er am alten Ort.
   - Tests: `test/silo.test.js` (3), `tools/silo_test.mjs` (8).
 
+## Ranking-Bonus: Δ je Rang + Bonus-Kiste (#141)
+
+Daniel, 21.11.2026 (Karte „Ranking-Bonus“: „A und B“).
+
+- **Δ je Rang:** Ranking › Ränge › **Bonus %** kommt aufs Run-Geld, ausgezahlt am Van (`rankBonus(deltas, bonus)` in `engine/poi.js` → `{ paid, extra }`, `level.payout`). Standard ⚠️ vorläufig nach Daniels Karte: **S +50 %, A +25 %, B +10 %, C/D/F 0** (vorher S +100, A +75, B +50, C +25, D +10).
+- **Bonus-Kiste:** Ranking › **Bonus-Kiste** (an/aus, **ab Rang** Standard B, **Beutetabelle**, leer = die Tresor-Beute des POIs) und je Rang **Bonus-Kiste: Würfe** und **Wählerisch** (je Wurf so viele Einträge ziehen und den wertvollsten nach Wert mit Hersteller-Preis behalten; `rollLoot(D, table, rnd, { rolls, pick })`). Standard: B 2 Würfe, A 3 (beste von 2), S 4 (beste von 3). `rankCrate(rank, grade)` → `{ grade, rolls, pick, loot }` oder `null`.
+- **Im Spiel:** Beim Knacken des Tresors (`finish`) steht die Kiste 3 Kacheln neben dem Tresor (die Seite mit Boden und Platz, `bonusCrate`): Bild der Camp-Kiste golden getönt, pulsierender Goldschein, Funken. E „Bonus-Kiste öffnen · Rang S“ (gilt, wenn sie näher ist als der Tresor), die Beute fällt als Bündel davor, Toast „Bonus-Kiste · Rang S“. Das Ranking-Fenster nennt sie als eigene Zeile. ⚠️ Die frühere Extra-Beute im Tresor (ein Wurf je 10 % Bonus) ist dafür weg: der Tresor würfelt nur noch seine Tabelle.
+- **Beute-Bilanz:** unter der Δ-Zeile eine eigene Zeile „☆ Rang-Bonus S +50 % · +62 Δ“, in „Neu“ „Bonus-Kiste (Rang S): 5 Dinge“ bzw. „nicht geöffnet“. Fernsteuerung: `level.done.crate` (`opened`, `haul`), `chests[i].bonus`, `hud.sum.state().bonus/crate`.
+- Tests: `test/poi.test.js` (Rechnung, Kiste, Wählerisch), `tools/poi_test.mjs` (Bonus-Kiste neben dem Tresor, Bilanz-Zeile; Bild `output/poi_summary_bonus.png`). Wirkung auf die Wirtschaft: `docs/balancing.md`.
+
 ## Revier-Camp (#061)
 
 Daniel, 18.11.2026 (aus der Verzahnungs-Prüfung): „Der POI wird dann zu einem Camp mit dem Hinweis zu Beginn, dass das Revier der Gang XY ist und man mit ihnen in welcher Beziehung steht. ABER man kann immer auch kämpfen und töten. Was im Zweifel den Ruf beschädigt.“ Beute: „Klauen kostet Ruf“.

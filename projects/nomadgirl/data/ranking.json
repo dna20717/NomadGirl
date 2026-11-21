@@ -3,11 +3,11 @@
  "timeFalloff": 5,
  "grades": [
   {"grade": "F", "minPoints": 0, "bonus": 0},
-  {"grade": "D", "minPoints": 30, "bonus": 10},
-  {"grade": "C", "minPoints": 50, "bonus": 25},
-  {"grade": "B", "minPoints": 70, "bonus": 50},
-  {"grade": "A", "minPoints": 85, "bonus": 75},
-  {"grade": "S", "minPoints": 98, "bonus": 100}
+  {"grade": "D", "minPoints": 30, "bonus": 0},
+  {"grade": "C", "minPoints": 50, "bonus": 0},
+  {"grade": "B", "minPoints": 70, "bonus": 10, "crateRolls": 2, "cratePick": 1},
+  {"grade": "A", "minPoints": 85, "bonus": 25, "crateRolls": 3, "cratePick": 2},
+  {"grade": "S", "minPoints": 98, "bonus": 50, "crateRolls": 4, "cratePick": 3}
  ],
  "earn": [
   {"when": "chest", "item": "technik", "chance": 25, "min": 1, "max": 2},
@@ -28,5 +28,6 @@
   {"when": "craft", "item": "wissen", "chance": 100, "min": 1, "max": 1, "function": "drone"},
   {"when": "craft", "item": "wissen", "chance": 100, "min": 1, "max": 1, "function": "warroom"},
   {"when": "chest", "item": "bio", "chance": 15, "min": 1, "max": 1}
- ]
+ ],
+ "bonusCrate": {"enabled": true, "minGrade": "B", "loot": ""}
 }

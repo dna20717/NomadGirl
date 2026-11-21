@@ -291,3 +291,15 @@ export function rankRun(rank = {}, { seconds, par, kills, killsMax, secrets, sec
   const g = [...(rank.grades || [])].reverse().find(x => points >= (x.minPoints ?? 0)) || { grade: 'F', bonus: 0 };
   return { points, grade: g.grade, bonus: g.bonus || 0, parts: { time: Math.round(time), kills: Math.round(k), secrets: Math.round(s) } };
 }
+// #141 the rank's Δ bonus on the run money: deltas × (1 + bonus %), rounded → { paid, extra }
+export function rankBonus(deltas, bonus = 0) {
+  const paid = Math.round((deltas || 0) * (1 + (bonus || 0) / 100));
+  return { paid, extra: paid - Math.round(deltas || 0) };
+}
+// #141 the bonus crate at the exit: from Ranking › Bonus-Kiste „ab Rang“ on, the grade's rolls and „Wählerisch“ → { grade, rolls, pick, loot } | null
+export function rankCrate(rank = {}, grade) {
+  const G = rank.grades || [], C = rank.bonusCrate || {}, at = G.findIndex(g => g.grade === grade), from = G.findIndex(g => g.grade === C.minGrade);
+  if (C.enabled === false || at < 0 || from < 0 || at < from) return null;
+  const g = G[at], rolls = Math.max(0, Math.round(g.crateRolls ?? 0));
+  return rolls ? { grade, rolls, pick: Math.max(1, Math.round(g.cratePick ?? 1)), loot: C.loot || null } : null;
+}

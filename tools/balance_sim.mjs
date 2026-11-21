@@ -10,11 +10,12 @@
 import { loadProject } from '../engine/project.js';
 import { nodeLoader } from './loader.js';
 import { applySet } from '../engine/sets.js';
-import { buildPoi, rankRun } from '../engine/poi.js';
+import { buildPoi, rankRun, rankBonus, rankCrate } from '../engine/poi.js';
 import { parseRoom } from '../engine/room.js';
 import { newSave } from '../game/save.js';
 import { rollLoot } from '../game/inventory.js';
 import { earn } from '../game/earn.js';
+import { valueOf } from '../game/brands.js';
 import { update as tankUpdate, rescue, maintain, canMaintain } from '../game/tank.js';
 import { bonuses } from '../game/techtree.js';
 
@@ -45,7 +46,7 @@ function simulate(seed) {
   const rnd = mulberry(seed), save = newSave(D);
   save.tank ??= { cond: D.tank?.start ?? 100, at: (save.day ?? 1) * 24 + save.hour, dead: false, rescues: 0, since: 1 };
   const stock = {}, got = {}, add = (id, n) => { stock[id] = (stock[id] || 0) + n; got[id] = (got[id] || 0) + n; };
-  const out = { nodes: {}, deltas: [], tankMin: 100, tankDead: null, kos: 0, maint: 0, perDay: [], resPerDay: {} };
+  const out = { nodes: {}, deltas: [], tankMin: 100, tankDead: null, kos: 0, maint: 0, perDay: [], resPerDay: {}, grades: {}, rankDeltas: 0, runDeltas: 0, crates: 0, crateValue: 0 };
   const path = ['lebenszeichen', 'wartungsklappe', 'thermohuelle', 'notreserve', 'kuehlkreislauf', 'stasis', 'heilmittel'].filter(id => D.techtree?.[id]);
   const others = Object.keys(D.techtree || {}).filter(id => !path.includes(id));
   const have = res => stock[D.resources?.[res]?.item] || 0;
@@ -74,9 +75,17 @@ function simulate(seed) {
       for (let i = 0; i < L.secrets; i++) if (rnd() < P.secretShare) { secrets++; for (const t of earn(D, 'secret', {}, rnd)) put(t.id, t.n); }
       const grade = rankRun(D.ranking, { seconds: 300, par: 300, kills, killsMax: L.spawns.length + extra, secrets, secretsMax: L.secrets })?.grade || 'C';
       for (const t of earn(D, 'rank', { grade }, rnd)) put(t.id, t.n);
+      // #141 the bonus crate beside the vault (its value counts as sellable loot, its resources go to the stock)
+      const crate = rankCrate(D.ranking, grade), crateLoot = crate ? rollLoot(D, crate.loot || D.pois[poi.id].vault || 'tresor', rnd, { rolls: crate.rolls, pick: crate.pick }) : [];
+      for (const t of crateLoot) if (t.a === 'items') put(t.id, t.n);
       save.hour += P.runHours;
       if (rnd() < P.koByDanger[poi.danger] ?? 0.3) { out.kos++; tankUpdate(D, save); rescue(D, save); }   // the backpack is gone
-      else { for (const [id, n] of Object.entries(runStock)) add(id, n); const bonus = (D.ranking?.grades || []).find(g => g.grade === grade)?.bonus || 0; save.deltas += Math.round(deltas * (1 + bonus / 100)); }
+      else {
+        for (const [id, n] of Object.entries(runStock)) add(id, n);
+        const B = rankBonus(deltas, (D.ranking?.grades || []).find(g => g.grade === grade)?.bonus || 0);
+        save.deltas += B.paid; out.runDeltas += deltas; out.rankDeltas += B.extra; out.grades[grade] = (out.grades[grade] || 0) + 1;
+        if (crate) { out.crates++; out.crateValue += crateLoot.reduce((v, t) => v + valueOf(D, D[t.a]?.[t.id]) * t.n, 0); }
+      }
     }
     // crafting: the by-products (Werkbank: Technik, Küche: Bio)
     for (let i = 0; i < P.craftsPerDay; i++) for (const t of earn(D, 'craft', { function: i % 2 ? 'kitchen' : 'craft' }, rnd)) add(t.id, t.n);
@@ -114,6 +123,8 @@ const report = {
   kos: med(runs.map(r => r.kos)),
   deltas: { start: D.economy?.startDeltas ?? 0, day10: med(runs.map(r => r.deltas[9])), day20: med(runs.map(r => r.deltas[19])), end: med(runs.map(r => r.deltas[DAYS - 1])) },
   resPerDay: Object.fromEntries(Object.entries(runs[0].resPerDay).map(([k]) => [k, Math.round(runs.reduce((n, r) => n + r.resPerDay[k].reduce((a, b) => a + b, 0), 0) / RUNS / DAYS * 10) / 10])),
+  rank: { grades: runs.reduce((m, r) => { for (const [g, n] of Object.entries(r.grades)) m[g] = (m[g] || 0) + n; return m; }, {}), bonusShare: runs.reduce((n, r) => n + r.rankDeltas, 0) / Math.max(1, runs.reduce((n, r) => n + r.runDeltas, 0)),
+    crates: runs.reduce((n, r) => n + r.crates, 0) / RUNS, crateValue: Math.round(runs.reduce((n, r) => n + r.crateValue, 0) / Math.max(1, runs.reduce((n, r) => n + r.crates, 0))) },   // #141
   heilmittelCost: Object.fromEntries((D.techtree.heilmittel?.cost || []).map(c => [c.resource, c.count])),
   treeCost: nodes.reduce((m, n) => { for (const c of D.techtree[n].cost || []) m[c.resource] = (m[c.resource] || 0) + (c.count || 0); return m; }, {}),
 };
@@ -124,5 +135,7 @@ else {
   for (const [n, x] of Object.entries(report.nodes)) console.log(`  ${n.padEnd(16)} ${String(x.median ?? '–').padStart(3)} / ${String(x.p90 ?? '–').padStart(3)}  ${Math.round(x.reached * 100)} %`);
   console.log(`Ressourcen je Tag: ${Object.entries(report.resPerDay).map(([k, v]) => `${k} ${v}`).join(' · ')}   ganzer Baum kostet: ${Object.entries(report.treeCost).map(([k, v]) => `${k} ${v}`).join(' · ')}`);
   console.log(`Tank: tot in ${Math.round(report.tank.deadShare * 100)} % (Median Tag ${report.tank.deadMedian ?? '–'}), tiefster Stand ${Math.round(report.tank.minMedian)} %, Pflege ${report.tank.maintPerRun}×`);
+  const G = report.rank.grades, all = Object.values(G).reduce((a, b) => a + b, 0) || 1;
+  console.log(`Ränge: ${Object.entries(G).sort().map(([g, n]) => `${g} ${Math.round(n / all * 100)} %`).join(' · ')} · Rang-Bonus +${Math.round(report.rank.bonusShare * 100)} % aufs Run-Geld · Bonus-Kisten ${report.rank.crates.toFixed(1)} je Spieler, Wert ${report.rank.crateValue} Δ je Kiste`);
   console.log(`k.o. je Spieler: ${report.kos} · Δ Start ${report.deltas.start}, Tag 10 ${report.deltas.day10}, Tag 20 ${report.deltas.day20}, Ende ${report.deltas.end}`);
 }

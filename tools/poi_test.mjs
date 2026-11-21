@@ -19,10 +19,16 @@ pois.tankstelle_km7.seed = 7;
 // #017: the classic four rooms (the checks know their layout; new rooms are checked by the reach test in test/poi.test.js)
 Object.assign(pois.tankstelle_km7, { rooms: ['vorplatz', 'verkaufsraum', 'lager', 'werkstatthalle'], roomCount: [3, 4] });
 await page.addInitScript(p => localStorage.setItem('nomadgirl-drafts:data/pois.json', JSON.stringify(p)), pois);
+// #141: every rank gets a Δ bonus and the bonus crate (the test run's rank depends on kills and secrets)
+const ranking = JSON.parse(fs.readFileSync(new URL('../projects/nomadgirl/data/ranking.json', import.meta.url), 'utf8'));
+ranking.grades = ranking.grades.map(g => ({ ...g, bonus: Math.max(10, g.bonus || 0), crateRolls: Math.max(2, g.crateRolls || 0), cratePick: g.cratePick || 2 }));
+ranking.bonusCrate = { ...ranking.bonusCrate, enabled: true, minGrade: ranking.grades[0].grade };
+await page.addInitScript(r => localStorage.setItem('nomadgirl-drafts:data/ranking.json', JSON.stringify(r)), ranking);
 await page.goto(url);
 await page.waitForFunction(() => window.nomad && window.game?.scene.getScene('play')?.camp, null, { timeout: 20000 });
 const ev = f => page.evaluate(f);
 const check = (name, cond, info) => (cond ? ok : errors).push(cond ? name : `${name}: ${JSON.stringify(info)}`);
+fs.mkdirSync('output', { recursive: true });
 const shot = async n => { if (!shots) return; fs.mkdirSync('output', { recursive: true }); await ev(() => nomad.freeze()); await page.waitForTimeout(250); await page.screenshot({ path: `output/poi_${n}.png` }); await ev(() => nomad.thaw()); };
 
 let s = await ev(() => {
@@ -99,11 +105,20 @@ await shot('branch');
 s = await ev(() => { const z = nomad.state().level.goals[0]; nomad.tp(z.x - 90, z.feet); nomad.step(5); const p = nomad.state().prompt; nomad.step(1, [], ['grab']); nomad.step(3); return { p, menu: nomad.menu(), lv: nomad.state().level }; });
 check('Ziel: E-Hinweis', s.p === 'Tresor knacken · POI abschließen', s.p);
 check('Tresor ist voll: mindestens 6 Dinge liegen davor', s.lv.done?.haul?.length >= 3 && /^Tresor: (\d+) Dinge/.test(s.menu.items[3].label) && Number(s.menu.items[3].label.match(/\d+/)[0]) >= 6, { haul: s.lv.done?.haul, item: s.menu?.items?.[3] });
-check('Ziel: Ranking mit Rang, Zeit, Kills, Secrets', /^Rang [FDCBAS]$/.test(s.menu?.title) && s.menu.items.length === 5 && /Secrets 2\//.test(s.menu.items[2].label) && s.lv.done?.grade, s.menu);
+check('Ziel: Ranking mit Rang, Zeit, Kills, Secrets', /^Rang [FDCBAS]$/.test(s.menu?.title) && s.menu.items.length === 6 && /^Bonus-Kiste für Rang/.test(s.menu.items[4].label) && /Secrets 2\//.test(s.menu.items[2].label) && s.lv.done?.grade, s.menu);
 await shot('rank');
 s = await ev(() => { nomad.choose('Weiter'); const t0 = nomad.state().time; nomad.step(120); return { t0, t1: nomad.state().time, p: nomad.state().prompt }; });
 check('Ziel: Uhr steht', s.t0 === s.t1, s);
 check('Ziel: Hinweis auf die Abkürzung', /Abkürzung zum Van/.test(s.p), s.p);
+// #141 the bonus crate beside the vault: glowing, E opens it, a better roll lies in front
+s = await ev(() => {
+  const c = nomad.state().level.chests.find(c => c.bonus), z = nomad.state().level.goals[0];
+  if (!c) return { c };
+  nomad.tp(c.x, c.feet); nomad.step(5); const p = nomad.state().prompt; nomad.step(1, [], ['grab']); nomad.step(30);
+  return { c, z, p, crate: nomad.state().level.done.crate, open: nomad.state().level.chests.find(c => c.bonus).open };
+});
+check('Bonus-Kiste (#141): steht neben dem Tresor, E öffnet, bessere Beute', s.c && Math.abs(s.c.x - s.z.x) < 5 * 64 && /^Bonus-Kiste öffnen · Rang/.test(s.p) && s.open && s.crate?.opened && s.crate.haul.length > 0, s);
+await shot('bonus_crate');
 
 // the shortcut: down the ladder in the workshop hall, through the tunnel, up into the closet, pull the switch
 s = await ev(() => {
@@ -138,10 +153,13 @@ s = await ev(() => {
   nomad.until(st => st.prompt?.startsWith('Zurück ins Camp'), 600, ['right']);
   const p = nomad.state().prompt, before = nomad.save().deltas, grade = nomad.state().level.done;
   nomad.step(1, [], ['grab']); nomad.step(3); nomad.choose('Zurückreisen'); nomad.step(40);
-  const H = game.scene.getScene('play').hud, sum = { ...H.sum.state(), title: H.sum.S?.title }; H.sum.close(); nomad.step(2);
-  return { p, before, after: nomad.save().deltas, grade, st: nomad.state(), sum };
+  const H = game.scene.getScene('play').hud, sum = { ...H.sum.state(), title: H.sum.S?.title }, sumText = document.querySelector('.sum-card')?.textContent || '';
+  return { p, before, after: nomad.save().deltas, grade, st: nomad.state(), sum, sumText };
 });
+await page.waitForTimeout(300); await page.screenshot({ path: 'output/poi_summary_bonus.png' });   // #141 the Beute-Bilanz with the rank bonus (always)
+await ev(() => { game.scene.getScene('play').hud.sum.close(); nomad.step(2); });
 check('Durch die Tür zum Van, Hinweis mit Rang', /^Zurück ins Camp · Rang [FDCBAS]$/.test(s.p), s.p);
+check('Beute-Bilanz: Zeile „Rang-Bonus“ und Bonus-Kiste (#141)', s.sum.bonus?.pct === s.grade.bonus && s.sum.bonus.deltas === Math.round(100 * (1 + s.grade.bonus / 100)) - 100 && s.sum.crate?.opened && s.sumText.includes(`Rang-Bonus ${s.grade.grade} +${s.grade.bonus} %`) && s.sumText.includes('Bonus-Kiste'), { sum: s.sum, text: s.sumText });
 check('Am Van: Run-Geld plus Rang-Bonus, Beute-Bilanz mit Rang (#017)', s.st.mode === 'camp' && s.after - s.before === Math.round(100 * (1 + s.grade.bonus / 100)) && s.sum.open && s.sum.grade === s.grade.grade && /Rang/.test(s.sum.title), { d: s.after - s.before, grade: s.grade, sum: s.sum });
 
 console.log(ok.map(o => '✔ ' + o).join('\n'));

@@ -56,7 +56,8 @@ export class SummaryUI {
     const head = el('div', { class: 'sum-head' },
       S.grade ? el('div', { class: `sum-grade g${S.grade}` }, S.grade) : el('div', { class: 'sum-grade none' }, S.ko ? icon('heart', 34) : '–'),
       el('div', { class: 'sum-title' }, el('small', {}, S.poi || ''), el('h2', {}, S.title),
-        el('p', {}, [S.paid != null && !S.ko ? `+${S.paid} Δ${S.grade ? ` (${S.base} + ${S.bonus} %)` : ''}` : null, S.killsMax != null ? `${S.kills}/${S.killsMax} Kills` : `${S.kills || 0} Kills`, S.secretsMax ? `${S.secrets}/${S.secretsMax} Secrets` : null, S.time || null].filter(Boolean).join(' · '))),
+        el('p', {}, [S.paid != null && !S.ko ? `+${S.paid} Δ${S.grade ? ` (${S.base} + ${S.bonus} %)` : ''}` : null, S.killsMax != null ? `${S.kills}/${S.killsMax} Kills` : `${S.kills || 0} Kills`, S.secretsMax ? `${S.secrets}/${S.secretsMax} Secrets` : null, S.time || null].filter(Boolean).join(' · ')),
+        S.grade && !S.ko && S.bonus ? el('p', { class: 'sum-bonus' }, icon('star', 14), ` Rang-Bonus ${S.grade} +${S.bonus} %`, S.bonusDeltas ? el('b', {}, ` · +${S.bonusDeltas} Δ`) : null) : null),   // #141
       S.parts ? el('div', { class: 'sum-parts' }, part('Zeit', S.parts.time, P.time), part('Kills', S.parts.kills, P.kills), part('Secrets', S.parts.secrets, P.secrets)) : null);
     const thing = x => el('li', { class: x.resource ? 'res' : '' }, markOf(D, 'items', x.id, 28) || icon('box', 16), el('span', {}, x.name), el('b', {}, `×${x.n}`));
     const home = S.ko ? el('div', { class: 'sum-col' }, el('h3', {}, icon('warning', 14), ' Verloren'), S.lost.length ? el('ul', { class: 'sum-things lost' }, ...S.lost.slice(0, 8).map(thing)) : el('p', {}, 'Nichts. Der Rucksack war leer.'))
@@ -65,6 +66,7 @@ export class SummaryUI {
       ...S.recipes.map(r => el('li', {}, icon('item', 14), el('span', {}, 'Rezept gelernt: ', el('b', {}, r)))),
       ...S.ready.map(n => el('li', { class: 'gold' }, icon('tree', 14), el('span', {}, 'Techtree: ', el('b', {}, n), ' jetzt bezahlbar'))),
       ...S.quests.map(q => el('li', { class: q.ready ? 'gold' : '' }, icon('list', 14), el('span', {}, el('b', {}, q.name), q.ready ? ' · erledigt, abgeben' : ` · ${q.from} → ${q.to} / ${q.target}`))),
+      ...(S.crate ? [el('li', { class: 'gold' }, icon('box', 14), el('span', {}, `Bonus-Kiste (Rang ${S.crate.grade}): `, el('b', {}, S.crate.opened ? `${S.crate.haul.reduce((n, h) => n + (+h.split('×')[1] || 0), 0)} Dinge` : 'nicht geöffnet')))] : []),   // #141
       ...(S.turf ? [el('li', { class: 'warn' }, icon('flag', 14), el('span', {}, 'Revierkrieg: ', el('b', {}, S.turf)))] : []),   // #089
       ...(S.tank ? [el('li', { class: S.tank.to < 45 ? 'warn' : '' }, icon('heart', 14), el('span', {}, `AvAs Tank: ${S.tank.from} % → `, el('b', {}, `${S.tank.to} %`)))] : []),
     ];
@@ -78,5 +80,5 @@ export class SummaryUI {
     this.el.replaceChildren(el('div', { class: 'tut-card sum-card ui-frame' }, head, el('div', { class: 'sum-cols' }, home, newCol), btns,
       hints([...(B.length > 1 ? [['move', 'wählen']] : []), ['ok', 'weiter'], ['back', 'schließen']]), closeX(() => this.close())));
   }
-  state() { const S = this.S; return { open: this.isOpen, grade: S?.grade || null, ko: !!S?.ko, gained: (S?.gained || []).map(x => `${x.id}×${x.n}`), lost: (S?.lost || []).map(x => `${x.id}×${x.n}`), recipes: S?.recipes || [], ready: S?.ready || [], quests: (S?.quests || []).map(q => q.id + (q.ready ? '!' : '')), next: S?.next || null, btn: this.btn, buttons: this.S ? this.buttons() : [], stowed: this.stowed || null }; }
+  state() { const S = this.S; return { open: this.isOpen, grade: S?.grade || null, ko: !!S?.ko, gained: (S?.gained || []).map(x => `${x.id}×${x.n}`), lost: (S?.lost || []).map(x => `${x.id}×${x.n}`), recipes: S?.recipes || [], ready: S?.ready || [], bonus: S?.grade && !S?.ko && S?.bonus ? { pct: S.bonus, deltas: S.bonusDeltas || 0 } : null, crate: S?.crate || null, quests: (S?.quests || []).map(q => q.id + (q.ready ? '!' : '')), next: S?.next || null, btn: this.btn, buttons: this.S ? this.buttons() : [], stowed: this.stowed || null }; }
 }

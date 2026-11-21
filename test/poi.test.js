@@ -6,7 +6,9 @@ import { fileURLToPath } from 'node:url';
 import { nodeLoader } from '../tools/loader.js';
 import { loadProject } from '../engine/project.js';
 import { parseRoom, solidRects } from '../engine/room.js';
-import { buildPoi, poiReady, rankRun, parseCurve, curveAt } from '../engine/poi.js';
+import { buildPoi, poiReady, rankRun, rankBonus, rankCrate, parseCurve, curveAt } from '../engine/poi.js';
+import { rollLoot } from '../game/inventory.js';
+import { valueOf } from '../game/brands.js';
 import { reach } from '../engine/reach.js';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '../projects/nomadgirl');
@@ -95,6 +97,30 @@ test('Ranking: Bestzeit, Kills, Secrets → Rang und Bonus', () => {
   assert.equal(late.parts.time, Math.round(R.points.time * (1 - R.timeFalloff / 100 * 10)));
   assert.equal(late.grade, 'F');
   assert.equal(late.bonus, 0);
+});
+
+// #141 Ranking-Bonus: Δ je Rang aufs Run-Geld, Bonus-Kiste ab einem Rang mit mehr Würfen und „Wählerisch“
+test('Ranking-Bonus: Δ je Rang und Bonus-Kiste (#141)', () => {
+  const R = { grades: [{ grade: 'F', minPoints: 0, bonus: 0 }, { grade: 'C', minPoints: 50, bonus: 0 }, { grade: 'B', minPoints: 70, bonus: 10, crateRolls: 2 }, { grade: 'A', minPoints: 85, bonus: 25, crateRolls: 3, cratePick: 2 }, { grade: 'S', minPoints: 98, bonus: 50, crateRolls: 4, cratePick: 3 }], bonusCrate: { minGrade: 'B', loot: 'tresor' } };
+  assert.deepEqual(rankBonus(200, 50), { paid: 300, extra: 100 });
+  assert.deepEqual(rankBonus(133, 25), { paid: 166, extra: 33 });
+  assert.deepEqual(rankBonus(80, 0), { paid: 80, extra: 0 });
+  assert.equal(rankCrate(R, 'C'), null);
+  assert.deepEqual(rankCrate(R, 'B'), { grade: 'B', rolls: 2, pick: 1, loot: 'tresor' });
+  assert.deepEqual(rankCrate(R, 'S'), { grade: 'S', rolls: 4, pick: 3, loot: 'tresor' });
+  assert.equal(rankCrate({ ...R, bonusCrate: { ...R.bonusCrate, enabled: false } }, 'S'), null);
+  assert.equal(rankCrate({ ...R, bonusCrate: { minGrade: 'S' } }, 'A'), null);
+  // the project's data: S pays more than A pays more than B, the crate starts at the configured grade
+  const G = Object.fromEntries(D.ranking.grades.map(g => [g.grade, g]));
+  assert.ok(G.S.bonus > G.A.bonus && G.A.bonus > G.B.bonus);
+  assert.ok(rankCrate(D.ranking, 'S')?.rolls >= rankCrate(D.ranking, D.ranking.bonusCrate.minGrade)?.rolls);
+  // „Wählerisch“: the best of several draws is worth more on average; fixed rolls
+  let seed = 7; const rnd = () => (seed = seed * 16807 % 2147483647) / 2147483647;
+  const worth = list => list.reduce((v, t) => v + valueOf(D, D[t.a]?.[t.id]), 0);
+  let one = 0, three = 0;
+  for (let i = 0; i < 300; i++) { one += worth(rollLoot(D, 'tresor', rnd, { rolls: 1 })); three += worth(rollLoot(D, 'tresor', rnd, { rolls: 1, pick: 3 })); }
+  assert.ok(three > one * 1.2, `${three} > ${one}`);
+  assert.ok(rollLoot(D, 'tresor', rnd, { rolls: 4 }).reduce((n, t) => n + 1, 0) <= 4);
 });
 
 // Spannungskurve (#016): quiet entrance, the loudest room at the exit, no boss from the random 1, curve off = every 1 an enemy

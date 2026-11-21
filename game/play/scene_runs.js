@@ -94,7 +94,7 @@ export class SceneRuns {
     try {
       const R = this.level?.done, P = this.data_.pois?.[save.run?.poi] || {}, sec = R?.seconds ?? Math.round((this.elapsed || 0) / 1000);
       summary = runCompare(this.data_, save, save.run?.before || {}, { ko, poi: P.name || save.run?.poi || '', title: ko ? 'AvA hat dich heimgebracht' : rank ? `Tresor geknackt · Rang ${rank.grade}` : 'Zurück im Camp',
-        grade: rank?.grade || null, parts: rank?.parts || null, paid, base: this.deltas, bonus: rank?.bonus || 0, kills: this.kills, killsMax: this.level?.killsMax ?? null,
+        grade: rank?.grade || null, parts: rank?.parts || null, paid, base: this.deltas, bonus: rank?.bonus || 0, bonusDeltas: rank ? this.level.payout(this.deltas) - this.deltas : 0, crate: rank?.crate || null, kills: this.kills, killsMax: this.level?.killsMax ?? null,
         secrets: this.level?.secrets ?? 0, secretsMax: this.level?.secretsMax ?? 0, turf: movedLine, time: `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}` });
     } catch (e) { console.warn('Bilanz', e); }
     save.run = null;

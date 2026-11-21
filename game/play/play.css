@@ -992,6 +992,7 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .sum-title small { color: var(--ng-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
 .sum-title h2 { margin: 2px 0 6px; font: 36px/1 VT323, monospace; color: var(--ng-gold); }
 .sum-title p { margin: 0; color: var(--ng-text2); font-size: 14px; }
+.sum-title p.sum-bonus { margin-top: 4px; color: var(--ng-gold); display: flex; align-items: center; gap: 4px; }   /* #141 */
 .sum-parts { display: flex; flex-direction: column; gap: 6px; }
 .sum-part small { color: var(--ng-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .8px; }
 .sum-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

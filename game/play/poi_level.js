@@ -6,7 +6,7 @@
 import { rollLoot } from '../inventory.js';
 import { chestPart } from '../salvage.js';
 import { bonuses as trophyBonuses } from '../achievements.js';
-import { rankRun } from '../../engine/poi.js';
+import { rankRun, rankBonus, rankCrate } from '../../engine/poi.js';
 import { earn, earnText } from '../earn.js';
 import { foeFor, glitchState } from '../glitch_world.js';
 import { uniqueEntity } from '../glitchlings.js';
@@ -246,6 +246,8 @@ export class PoiLevel {
     const l = this.scene.leyla, range = this.scene.data_.camp?.interactRange ?? 130;
     const close = o => Math.abs(o.x - l.x) < range && Math.abs(o.feet - l.feet) < 60;
     const T = this.scene.turf;
+    const bc = this.chests.find(c => c.bonus && !c.open && close(c)), zg = this.goals.find(close);   // #141 the bonus crate beside the vault: whichever is nearer
+    if (bc && (!zg || Math.abs(bc.x - l.x) < Math.abs(zg.x - l.x))) return { text: `Bonus-Kiste öffnen · Rang ${bc.bonus.grade}`, act: () => this.openChest(bc) };
     for (const z of this.goals) if (close(z)) return this.done ? { text: `Geknackt · Abkürzung zum Van: ${this.shortcutWay()}` } : T?.active ? { text: `Tresor der ${T.gang} · nur mit Gewalt`, act: () => T.vault(() => this.finish()) } : { text: 'Tresor knacken · POI abschließen', act: () => this.finish() };
     for (const c of this.chests) if (!c.open && close(c)) return { text: T?.active ? `Kiste der ${T.gang} öffnen` : 'Kiste öffnen', act: () => this.openChest(c) };
     const talk = T?.near(); if (talk) return talk;   // #061
@@ -289,6 +291,7 @@ export class PoiLevel {
     s.turf?.chestOpened(c);   // #061 seen = theft
     if (c.sprite) { let f = 0; s.time.addEvent({ delay: 70, repeat: c.frames - 1, callback: () => c.sprite.setFrame(Math.min(c.frames - 1, ++f)) }); }
     else this.drawChest(c);
+    if (c.bonus) return this.openBonus(c);
     const things = s.lootRoll ? s.lootRoll(this.lootTable) : rollLoot(s.data_, this.lootTable);
     for (const r of earn(s.data_, 'chest')) { const same = things.find(x => x.a === 'items' && x.id === r.id); if (same) same.n += r.n; else things.push(r); }   // #039
     this.salvagePart(things);
@@ -296,6 +299,15 @@ export class PoiLevel {
     s.fx.sparks(c.x, c.feet - 50, 0xffd27a, 14);
     if (things.length) s.loot?.drop(c.x, c.feet, things, 140);
     else s.hud.toast('Leer …', 'Hier hat schon jemand geplündert', 'info', 2400);
+  }
+  // #141 the bonus crate opens: the grade's rolls from its table, the glow fades, the Beute-Bilanz names it
+  openBonus(c) {
+    const s = this.scene, B = c.bonus, things = rollLoot(s.data_, B.table, Math.random, { rolls: B.rolls, pick: B.pick });
+    c.pulse?.stop(); s.tweens.add({ targets: c.glow, alpha: 0, duration: 600, onComplete: () => c.glow.destroy() });
+    s.fx.sparks(c.x, c.feet - 50, 0xffd27a, 30);
+    if (this.done?.crate) { this.done.crate.opened = true; this.done.crate.haul = things.map(t => `${t.id}×${t.n}`); }
+    if (things.length) s.loot?.drop(c.x, c.feet, things, 160);
+    s.hud.toast(`Bonus-Kiste · Rang ${B.grade}`, `${things.reduce((n, t) => n + t.n, 0)} Dinge${B.pick > 1 ? `, je der beste von ${B.pick}` : ''}`, 'loot', 3200);
   }
   // salvage (#023): a part a wreck still needs, if it lies in this POI (Bergungsprojekte › Fundorte)
   // #057 POI › Fundstücke: a certain thing lies here (a map piece), once per Durchgang and only while Leyla does not have it
@@ -364,9 +376,9 @@ export class PoiLevel {
     const r = rankRun(D.ranking, { seconds, par: this.P.parTime, kills, killsMax: this.killsMax, secrets: this.secrets, secretsMax: this.secretsMax });
     this.done = { ...r, seconds, kills, secrets: this.secrets };
     s.cleared = true;   // the clock stops
-    // the vault is full (design.md › Ausbaustufe Progression): POIs › Tresor-Beute, plus one extra roll per 10 % rank bonus
-    const table = this.P.vault || (D.lootTables?.tresor ? 'tresor' : this.lootTable), extra = Math.floor((r.bonus || 0) / 10), haul = [];
-    const things = [...(s.lootRoll ? s.lootRoll(table) : rollLoot(D, table)), ...Array.from({ length: extra }, () => rollLoot(D, table)[0]).filter(Boolean)];
+    // the vault is full (design.md › Ausbaustufe Progression): POIs › Tresor-Beute; a good rank adds the bonus crate beside it (#141)
+    const table = this.P.vault || (D.lootTables?.tresor ? 'tresor' : this.lootTable), haul = [];
+    const things = [...(s.lootRoll ? s.lootRoll(table) : rollLoot(D, table))];
     this.salvagePart(things, true);   // the vault holds one missing salvage part for sure, if this POI is a Fundort
     this.treasureFind(things, 'vault');   // #057 a map piece of the treasure hunt
     const earned = earn(D, 'rank', { grade: r.grade });   // #039: a good rank gives Wissen extra
@@ -376,6 +388,7 @@ export class PoiLevel {
     const z = this.goals[0];
     if (z && haul.length) { s.loot?.drop(z.x, z.feet, haul, 200); s.fx.sparks(z.x, z.feet - 60, 0xffd27a, 28); }
     for (const z of this.goals) this.drawGoal(z);
+    const crate = this.bonusCrate(r.grade, table);
     s.drone.react('cleared');
     s.cam.flash(300, 255, 210, 122);
     const mm = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`, par = this.P.parTime || 0;
@@ -386,7 +399,8 @@ export class PoiLevel {
         { label: `Zeit ${mm}`, sub: `Bestzeit ${Math.floor(par / 60)}:${String(par % 60).padStart(2, '0')} · ${r.parts.time} Punkte` },
         { label: `Kills ${kills}/${this.killsMax}`, sub: `${r.parts.kills} Punkte` },
         { label: `Secrets ${this.secrets}/${this.secretsMax}`, sub: `${r.parts.secrets} Punkte` },
-        { label: `Tresor: ${haul.reduce((n, t) => n + t.n, 0)} Dinge`, sub: haul.slice(0, 6).map(t => D.items?.[t.id]?.name || t.id).join(', ') + (haul.length > 6 ? ' …' : '') + (extra ? ` · +${extra} für den Rang` : '') + (earned.length ? ` · Rang: ${earnText(D, earned)}` : '') },
+        { label: `Tresor: ${haul.reduce((n, t) => n + t.n, 0)} Dinge`, sub: haul.slice(0, 6).map(t => D.items?.[t.id]?.name || t.id).join(', ') + (haul.length > 6 ? ' …' : '') + (earned.length ? ` · Rang: ${earnText(D, earned)}` : '') },
+        ...(crate ? [{ label: `Bonus-Kiste für Rang ${r.grade}`, sub: `Steht leuchtend neben dem Tresor · ${crate.rolls} Würfe${crate.pick > 1 ? `, je der beste von ${crate.pick}` : ''}` }] : []),
         { label: 'Weiter', primary: true, sub: `Zurück zum Van: ${this.shortcutWay()}`, act: () => {} },
       ].map(i => ({ ...i, act: i.act || (() => {}) })),
     });
@@ -408,12 +422,33 @@ export class PoiLevel {
   // tiles that still hide what is behind them (fog sight lines): closed doors, brittle walls, fake walls not found yet
   hides(x, y) { return this.fakes.some(f => !f.found && f.set.has(x + ',' + y)); }
   // money for the van: run Δ plus rank bonus
-  payout(deltas) { return this.done ? Math.round(deltas * (1 + this.done.bonus / 100)) : deltas; }
+  payout(deltas) { return this.done ? rankBonus(deltas, this.done.bonus).paid : deltas; }
+
+  // #141 the bonus crate: from Ranking › Bonus-Kiste „ab Rang“ on, a glowing chest beside the vault with a better roll (the grade's rolls,
+  // „Wählerisch“ keeps the most valuable of several draws) → the crate's plan or null
+  bonusCrate(grade, vault) {
+    const s = this.scene, D = s.data_, plan = rankCrate(D.ranking, grade), z = this.goals[0], T = s.T;
+    if (!plan || !z) return null;
+    const table = plan.loot && D.lootTables?.[plan.loot] ? plan.loot : vault;
+    // beside the vault: the side with floor under it and room above it
+    const tx = Math.floor(z.x / T), ty = Math.floor(z.feet / T) - 1, free = x => s.room.tiles[ty]?.[x] === '.' && s.room.tiles[ty - 1]?.[x] === '.' && '#'.includes(s.room.tiles[ty + 1]?.[x] ?? '#');
+    const dx = [3, -3, 4, -4, 2, -2].find(d => free(tx + d)) ?? 3, cx = (tx + dx + 0.5) * T, feet = z.feet;
+    const K = D.camp?.chest || {}, info = K.look && s.assetInfo(K.look), frames = D.assets?.[K.look]?.frames || 1;
+    const sprite = info ? s.add.sprite(cx, feet, info.key, 0).setOrigin(info.ox, info.oy).setScale(info.scale).setDepth(-3).setTint(0xffe6a0) : null;
+    const c = { x: cx, feet, sprite, frames, open: false, art: sprite ? null : s.add.graphics().setDepth(-3), bonus: { ...plan, table } };
+    if (!sprite) this.drawChest(c);
+    c.glow = s.add.image(cx, feet - 40, s.textures.exists('fx_glow') ? 'fx_glow' : '__WHITE').setBlendMode(Phaser.BlendModes.ADD).setDepth(-4).setScale(2.4).setAlpha(0.65).setTint(0xffd27a);
+    c.pulse = s.tweens.add({ targets: c.glow, alpha: 0.25, scale: 2.0, duration: 700, yoyo: true, repeat: -1 });
+    s.fx.sparks(cx, feet - 50, 0xffd27a, 20);
+    this.chests.push(c);
+    this.done.crate = { grade, rolls: plan.rolls, pick: plan.pick, opened: false, haul: [] };
+    return plan;
+  }
 
   state() {
     return {
       poi: this.poi, done: this.done, secrets: this.secrets, secretsMax: this.secretsMax, killsMax: this.killsMax,
-      chests: this.chests.map(c => ({ x: Math.round(c.x), feet: c.feet, open: c.open })),
+      chests: this.chests.map(c => ({ x: Math.round(c.x), feet: c.feet, open: c.open, ...(c.bonus ? { bonus: c.bonus.grade } : {}) })),
       switches: this.switches.map(sw => ({ x: Math.round(sw.x), feet: sw.feet, on: sw.on })),
       terminals: (this.terminals || []).map(t => ({ x: Math.round(t.x), feet: t.feet, ai: t.ai, done: t.done, tried: t.tried })),   // #057
       doors: this.doors.map(d => ({ x0: d.x0, x1: d.x1, y0: d.y0, y1: d.y1, open: d.open })),

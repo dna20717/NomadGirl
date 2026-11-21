@@ -84,8 +84,21 @@ Ressourcen je Tag: Technik 6,5 · Wissen 5 · Bio 2,9. Alle drei werden ungefäh
 Δ: 600 → rund 1.200 (Tag 10) → 2.700 (Tag 20) → 6.200 (Tag 40). Werkstätten werden so zu echten Entscheidungen: Ripperdoc (900) um Tag 10, Reaktor (3.000) um Tag 20.
 Tank: wie im Standard (5 % tot nach Rettungen).
 
+## Ranking-Bonus (#141, 21.11.2026)
+
+Die Simulation rechnet jetzt Rang-Bonus und Bonus-Kiste mit (`rankBonus`, `rankCrate`) und zählt die Ränge. Mit dem Modell (Zeit = Par, 85 % Kills, 40 % Secrets) kommen **B 66 % · A 21 % · S 7 % · C 6 %** heraus.
+
+| | vorher (S 100 / A 75 / B 50 / C 25 / D 10 %) | **#141** (S 50 / A 25 / B 10 %, Kiste ab B) |
+|---|---|---|
+| Rang-Bonus aufs Run-Geld | +53 % | **+13 %** |
+| Δ nach 40 Tagen (Median, 60 Spieler) | 6.214 | **4.828** |
+| Bonus-Kisten | – | 31 je Spieler, im Schnitt **157 Δ** Warenwert je Kiste |
+
+Bargeld sinkt um gut ein Fünftel, dafür kommt ungefähr derselbe Wert als Beute (Verkauf, Zerlegen, Ressourcen aus der Tresor-Tabelle). Wer gut spielt, wird stärker belohnt (S-Kiste 4 Würfe, je der beste von 3). Techtree und Tank ändern sich kaum (Ressourcen je Tag ±0,2). ⚠️ Der Mega-Rig-Ausbau rückt beim Bargeld weiter weg, das gehört zu v2.
+
 ## Für v2 (offen, ⚠️)
 
 - **Tank als Druck:** Verfall oder Alterung etwas höher (Tank › Rate 0,2 → 0,3), damit Pflege spürbar wird. Vorher prüfen, wie Daniel den Tank spüren will.
 - **Mega-Rig-Ausbau:** 6.000 / 14.000 Δ gegen etwa 150 Δ je Tag. Entweder günstiger (4.000 / 9.000) oder mehr Δ-Quellen (Aufträge, Kopfgeld, Revier-Handel) mitrechnen.
+- **Ranking-Bonus (#141):** Bonus-% und Kisten-Würfe gegen den Mega-Rig-Ausbau abstimmen; Verkaufen der Kisten-Beute ins Modell nehmen.
 - **Simulation erweitern:** Aufträge, Straße, Gefangene, Sprit und Vorräte mitrechnen, die Rucksack-Grenze beachten.
