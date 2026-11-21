@@ -9,6 +9,7 @@
 // Times are hours (18.5 = 18:30). "Ereignis-Zeit": the clock only moves on actions (sleeping, runs, sitting at the fire).
 
 import { storyState } from '../engine/storylets.js';
+import { repairLife } from '../engine/ecosystem.js';
 import { keepThrough, recipeOf } from './achievements.js';
 import { openStorage, activeSlot, slotMeta, withGlobal, mergeAchievements } from './slots.js';
 import { renameMap } from '../engine/renames.js';
@@ -389,6 +390,7 @@ export function repairSave(save, D) {
   s.companions = (s.companions || []).filter(c => D.companions?.[c]);
   if (s.run && !D.pois?.[s.run.poi]) s.run = null;
   s.recipes = Array.isArray(save.recipes) ? [...new Set([...save.recipes.filter(r => D.recipes?.[r]), ...startRecipes(D)])] : fresh.recipes;
+  repairLife(s);   // #169 the camps of the places (save.life): older savegames start empty, broken places start fresh
   storyState(s);   // #167 notes found, the Faden, Leyla's traces, time layers, visits: older savegames get an empty story
   if (save.inv === undefined) delete s.inv;   // older savegame: inventory from the start values
   if (!save.tank) delete s.tank;   // older savegame: the tank starts full at today's clock

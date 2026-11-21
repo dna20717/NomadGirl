@@ -128,7 +128,14 @@
   {
    "symbol": "by.cleanup",
    "text": "Tag {day}: Jemand hat aufgeräumt. Die offenen Kisten sind weg, die Flecken geschrubbt, an der Tür ein neues Schloss.|Tag {day}: Die Neuen haben umgebaut. Wo Leyla durchkam, steht jetzt eine Barrikade."
-  }
+  },
+  {
+   "symbol": "by.moved",
+   "text": "Tag {day}: {name} schlugen ihr Lager woanders auf. Die alte Feuerstelle ist kalt.|Tag {day}: {name} zogen ein Stockwerk weiter, nachdem jemand bei ihnen aufgeräumt hatte."
+  },
+  {"symbol": "by.gone", "text": "Tag {day}: von {name} blieb nur ein Haufen kalter Asche.|Tag {day}: {name} gaben den Ort auf."},
+  {"symbol": "by.nest", "text": "Tag {day}: in den dunklen Ecken wuchs etwas, das sammelt.|Tag {day}: das Nest teilte sich."},
+  {"symbol": "by.settle", "text": "Tag {day}: {name} richteten sich neu ein, mit frischer Feuerstelle.|Tag {day}: nach ein paar stillen Tagen kamen {name}."}
  ],
  "traces": {"cleanupDays": 4, "fadeTo": 35},
  "notes": {"perVisit": [1, 2], "announce": 70, "radio": 50, "radioAfter": 45, "splinter": 100},

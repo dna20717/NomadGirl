@@ -9,6 +9,8 @@
 //   · no spawn at a seam, every shooter with sight of the way in of his room
 //   · the Wow room in every seed: narrow before wide, the largest room of the POI, a key light on the motif, calm first, a reward
 //     within 4 tiles of the motif
+//   · #169 the camps (fresh state and after 10 days): never in an Atempause, the Wow room, the entrance, never at a seam; members on
+//     their floor, rounds on walkable floor
 // Usage: node tools/level_audit.mjs [--seeds 8] [--poi <id>] [--verbose]   Exit 1 on findings.
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,6 +21,7 @@ import { parseRoom } from '../engine/room.js';
 import { atmoRegions, planLights } from '../engine/atmosphere.js';
 import { levelConfig, roomGates, landmarkViews, secretSigns, wowInLevel, wowOf, shooterFair, roomType } from '../engine/level_design.js';
 import { reachMap, rulesFrom } from './reach_audit.mjs';
+import { initLife, simulate, planLife } from '../engine/ecosystem.js';
 
 export const SEEDS = [1, 2, 3, 5, 8, 13, 21, 34];
 
@@ -115,6 +118,31 @@ export function auditPoi(D, poiId, seed) {
     }
     if (!reward) add('Wow', `keine Belohnung in ${cfg.rewardReach} Kacheln um das Motiv`, r.id);
     if (roomType(R) !== 'wow') add('Wow', 'Raumtyp ist nicht Wow', r.id);
+  }
+  // 8. #169 camps
+  for (const f of auditLife(D, poiId, L, seed)) add('Lager', f.text, f.room);
+  return out;
+}
+export function auditLife(D, poiId, L, seed) {
+  const out = [], cfg = levelConfig(D), gates = roomGates(L), mains = L.rooms.filter(r => r.band === 'main'), tiles = L.def.layout;
+  const gatePts = gates.flatMap((g, i) => [i ? g.in : null, i < gates.length - 1 ? g.out : null]).filter(Boolean);
+  const fresh = initLife(D, poiId, { seed }), later = simulate(D, poiId, initLife(D, poiId, { seed }), 11);
+  for (const S of [fresh, later]) {
+    const plan = planLife(D, poiId, L, S, seed);
+    for (const c of plan.camps) {
+      const r = L.rooms.find(o => o.id === c.room && c.x0 >= o.x && c.x0 < o.x + o.w && c.y >= o.y && c.y < o.y + o.h);
+      if (!r) { out.push({ text: `${c.id} liegt in keinem Raum`, room: c.room }); continue; }
+      const t = roomType(D.rooms[r.id]);
+      if (r.rest || t === 'rest') out.push({ text: `${c.name} in einer Atempause`, room: r.id });
+      if (r.wow || t === 'wow') out.push({ text: `${c.name} im Wow-Raum`, room: r.id });
+      if (r === mains[0]) out.push({ text: `${c.name} im Eingang`, room: r.id });
+      for (const m of c.members) {
+        if (gatePts.some(([gx, gy]) => Math.abs(gx - m.x) <= cfg.seam && Math.abs(gy - m.y) <= cfg.seam + 1)) out.push({ text: `${c.name}: ${m.enemy} an einer Naht (${m.x},${m.y})`, room: r.id });
+        if (tiles[m.y + 1]?.[m.x] !== '#' || '#='.includes(tiles[m.y]?.[m.x])) out.push({ text: `${c.name}: ${m.enemy} ohne Boden (${m.x},${m.y})`, room: r.id });
+      }
+      const [a, b] = c.route;
+      for (let x = a; x <= b; x++) if (!'#='.includes(tiles[c.y + 1]?.[x] ?? '.')) { out.push({ text: `${c.name}: Runde über Luft (${x},${c.y})`, room: r.id }); break; }
+    }
   }
   return out;
 }

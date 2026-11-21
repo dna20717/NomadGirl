@@ -18,6 +18,7 @@ import { RESIDENTS } from './story.js';
 import { DECALS } from './dressing_story.js';
 import { CHANNELS, CONDITIONS } from './storylets.js';
 import { OCCUPANT_KINDS } from './history.js';
+import { FACTIONS, ATTITUDES, CAMP_FACTIONS, LIFE_EVENTS, LIFE } from './ecosystem.js';
 import { TROPE_PLACES } from './tropes.js';
 import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
 import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
@@ -1755,6 +1756,8 @@ export const AREAS = {
         num('dressing.desertReach', 'Wüste: Reichweite', { unit: 'Kacheln', min: 1, max: 60, hint: 'So weit kriecht sie hinein. Leer = 14' })] },
       { title: 'Marken-Clutter', wide: true, fields: [table('brandProps', 'Marken-Clutter', [ref('look', 'Symbol-Raster', 'assets'), text('name', 'Symbol'), num('cm', 'Höhe', { unit: 'cm', min: 1 }), num('chance', 'Chance', { unit: '%', min: 0, max: 100 }), bool('ai', 'KI'), text('place', 'Ort'), text('tags', 'Tags'), text('roles', 'Rollen')], { hint: 'Daniel, 17.11.2026: Dinge einer Marke, die in diesem POI auf freiem Boden stehen (z. B. NomadCola-Automaten an Tankstellen). Symbol = Name im Raster, Höhe in echten cm, Chance je freier Bodenkachel (mit Set-Dressing: Gewicht beim Auswählen). KI = darin wohnt eine Entity: E / ↑ davor startet ein Glitch-Duell (#052). Ort, Tags, Rollen wie Kachel-Sets › Clutter-Regeln (#158)' })] },
       { title: 'Ranking', fields: [num('parTime', 'Bestzeit', { unit: 's', min: 0 }), num('secrets', 'Secrets', { min: 0, hint: 'Im Level zählen die brüchigen Wände (B); diese Zahl gilt nur für POIs ohne Level' })] },
+      { title: 'Leben G3', fields: [bool('life.off', 'Ohne Lager', { hint: '#169: Gegner stehen an ihren Spawn-Punkten wie früher, keine Simulation' }), num('life.camps', 'Lager', { min: 1, max: 8, hint: 'So viele Lager zum Start eines Durchgangs. Leer = nach Größe (S 1, M 2, L 2, XL 3, XXL 4)' }),
+        bool('life.nest', 'Mit Nest', { hint: 'Leer = wenn der POI Mutanten hat. Ansicht: Ökosystem (unten) simuliert N Tage' })] },
       { title: 'Leben (noch ohne Wirkung)', fields: [bool('npcs', 'NPCs vor Ort'), bool('foodtruck', 'Foodtruck-Verkauf möglich'), bool('shop', 'Händler')] },
     ],
     check: (x, report, p, id) => {
@@ -1939,6 +1942,37 @@ export const AREAS = {
       for (const o of x.occupants || []) { if (ids.has(o.id)) report('error', `Besetzer „${o.id}“ doppelt`); ids.add(o.id); if (!o.arrive) report('warning', `Besetzer „${o.id}“: Kamen fehlt`); }
       for (const s of ['layer', 'when.first', 'when.next', 'by.war', 'by.leyla', 'by.cleanup']) if (!G.has(s)) report('warning', `Grammatik: Symbol „${s}“ fehlt`);
       for (const [k] of OCCUPANT_KINDS) if (!G.has(`ending.${k}`) && (k === 'gang' || k === 'nest' || k === 'empty' || (x.occupants || []).some(o => o.kind === k))) report('warning', `Grammatik: „ending.${k}“ fehlt`);
+    },
+  },
+  life: {
+    name: 'Leben', icon: 'tree', file: 'data/life.json', kind: 'single',
+    hint: '#169 G3 Leben (Daniel 21.11.2026: „Simulation auch zwischen Besuchen … wie Rain World“; Gangs über den Revierkrieg, das Ökosystem füllt die Details): Gegner verschiedener Fraktionen reagieren aufeinander, Gegner gehören zu Lagern und machen Runden, die Lager leben zwischen Leylas Besuchen weiter (Verluste, Umzüge, Nester), und eine Regie baut je Run Spannung auf, lässt sie platzen und gönnt Ruhe. Ansicht je POI: POIs › Ökosystem.',
+    sections: [
+      { title: 'Leben', fields: [bool('enabled', 'An', { hint: 'Leer = an. Aus: Gegner stehen wie früher an ihren Spawn-Punkten, keine Regie' }), ref('nestEnemy', 'Gegner im Nest', 'enemies', { hint: 'Wenn ein POI keine eigenen Mutanten hat und trotzdem ein Nest bekommt. Leer = kriecher' })] },
+      { title: 'Beziehungen', wide: true, fields: [table('relations', 'Beziehungen', [select('from', 'Wer', FACTIONS), select('to', 'sieht', FACTIONS), select('attitude', 'und will', ATTITUDES), text('note', 'Warum')],
+        { hint: 'Wer wen sieht und was dann passiert, aus Sicht des Orts: Besitzer (Gang, die den Ort hält, Revierkrieg), Rivalen (POI › Gang › Rivalen), andere Gang, Plünderer ohne Gang, Mutanten, Maschinen, Kleinvieh. Die erste passende Zeile gilt, „alle“ passt immer. Moderat: wer kämpft, merkt Leyla erst spät (Regie › Bemerkt Leyla im Streit)' })] },
+      { title: 'Lager-Typen', wide: true, fields: [table('campTypes', 'Lager-Typen', [text('id', 'ID'), text('name', 'Name'), select('faction', 'Leute', CAMP_FACTIONS), range('members', 'Leute'), num('width', 'Breite', { unit: 'Kacheln', min: 3, max: 20 }),
+        text('props', 'Requisiten', { hint: 'fire, bags, stash, nest (Komma)' }), bool('round', 'Runden'), text('story', 'Raum-Geschichte')],
+        { hint: 'Lager statt Spawn-Punkte: Anzahl der Leute aus dem Typ × Stärke des Lagers, Requisiten (Feuerstelle, Schlafsäcke, Vorräte, Nest; gemalt oder aus Code), einer macht Runden durch die Nachbarräume auf demselben Boden. Lager stehen nie in einer Atempause, im Wow-Raum, im Eingang oder an einer Naht' })] },
+      { title: 'Simulation', fields: [num('sim.recover', 'Erholt sich', { unit: '% je Tag', min: 0, max: 100 }), num('sim.maxStrength', 'Stärke höchstens', { unit: '%', min: 50, max: 300 }),
+        num('sim.nestGrowth', 'Nest wächst', { unit: '% je Tag', min: 0, max: 100 }), num('sim.nestMax', 'Nest höchstens', { unit: '%', min: 50, max: 400 }), num('sim.nestSplit', 'Nest teilt sich ab', { unit: '%', min: 50, max: 400 }), num('sim.maxNests', 'Nester höchstens', { min: 0, max: 6 }),
+        num('sim.dissolveBelow', 'Löst sich auf unter', { unit: '%', min: 0, max: 100 }), num('sim.dissolveDays', '… nach', { unit: 'Tagen', min: 1, max: 30 }), num('sim.moveChance', 'Zieht nach Verlusten um', { unit: '%', min: 0, max: 100 }), num('sim.wander', 'Zieht einfach so um', { unit: '% je Tag', min: 0, max: 100 }),
+        num('sim.visitChance', 'Spähtrupp der Rivalen', { unit: '% je Tag', min: 0, max: 100 }), num('sim.visitDays', 'Spähtrupp bleibt', { unit: 'Tage', min: 1, max: 30 }), num('sim.nestChance', 'Neues Nest im schwachen Ort', { unit: '% je Tag', min: 0, max: 100 }),
+        num('sim.refillDays', 'Nie leer: neue Bewohner nach', { unit: 'Tagen', min: 1, max: 30 }), num('sim.settleStrength', 'Neue Bewohner mit', { unit: '%', min: 10, max: 200 }), num('sim.takeover', 'Nach Revierkrieg-Eroberung', { unit: '%', min: 10, max: 200 }),
+        num('sim.maxCamps', 'Lager je Ort höchstens', { min: 1, max: 8 }), num('sim.sentries', 'Wachen', { unit: '% der übrigen Spawns', min: 0, max: 100, hint: 'So viele der früheren Zufallsgegner bleiben als Wachen stehen; der Rest lebt in den Lagern' }), num('sim.roundReach', 'Runde reicht', { unit: 'Kacheln', min: 0, max: 120 })] },
+      { title: 'Regie', fields: [num('director.peak', 'Spitze ab', { unit: 'Spannung', min: 10, max: 100 }), num('director.calm', 'Ruhig unter', { unit: 'Spannung', min: 0, max: 90 }), num('director.decay', 'Klingt ab', { unit: 'je s', min: 0, max: 50 }),
+        num('director.perEngaged', 'Je kämpfender Gegner', { unit: 'je s', min: 0, max: 50 }), num('director.perHurt', 'Je verlorenem Leben', { min: 0, max: 10, step: 0.1 }), num('director.perKill', 'Je Kill', { min: 0, max: 50 }), num('director.siren', 'Sirene', { min: 0, max: 100 }),
+        num('director.peakMin', 'Spitze mindestens', { unit: 's', min: 0, max: 120 }), num('director.peakMax', 'Spitze höchstens', { unit: 's', min: 1, max: 300 }), num('director.relax', 'Ruhe mindestens', { unit: 's', min: 0, max: 300 }),
+        num('director.wowGrace', 'Wow-Raum: keine Verstärkung in den ersten', { unit: 's', min: 0, max: 60 }), num('director.lull', 'Welle nach Flaute von', { unit: 's', min: 5, max: 600 }), num('director.maxWaves', 'Wellen je Run', { min: 0, max: 10 }), num('director.waveSize', 'Gegner je Welle', { min: 1, max: 6 }),
+        num('director.notice', 'Bemerkt Leyla im Streit', { unit: '% der Sicht', min: 0, max: 100 }), num('director.feudDamage', 'Schaden untereinander', { unit: '%', min: 0, max: 200 }), num('director.music', 'Musik-Schichten', { unit: '% Lautstärke', min: 0, max: 100, hint: 'Ruhe / Anspannung / Kampf aus der Radio-Musik-Engine; 0 = aus' })] },
+      { title: 'Texte', fields: [table('lines', 'AvA erzählt', [select('kind', 'Ereignis', LIFE_EVENTS), text('text', 'Text', { hint: '{gang} {place}' })], { hint: '⚠️ Entwurf: was AvA beim Betreten sagt, wenn sich seit dem letzten Besuch etwas getan hat' })] }],
+    check: (x, report, p) => {
+      const ids = new Set();
+      for (const c of x.campTypes || []) { if (ids.has(c.id)) report('error', `Lager-Typ „${c.id}“ doppelt`); ids.add(c.id); }
+      for (const k of ['gang_camp', 'patrol', 'nest', 'raider_camp']) if ((x.campTypes || []).length && !ids.has(k)) report('warning', `Lager-Typ „${k}“ fehlt (die Simulation braucht ihn)`);
+      if (x.nestEnemy && p?.data?.enemies?.[x.nestEnemy]?.family !== 'mutant') report('warning', 'Gegner im Nest ist kein Mutant');
+      if ((x.sim?.nestSplit ?? LIFE.sim.nestSplit) > (x.sim?.nestMax ?? LIFE.sim.nestMax)) report('warning', 'Nest teilt sich ab über „Nest höchstens“: es teilt sich nie');
+      if ((x.director?.calm ?? LIFE.director.calm) >= (x.director?.peak ?? LIFE.director.peak)) report('error', 'Regie: „Ruhig unter“ muss unter „Spitze ab“ liegen');
     },
   },
   dressingRules: {
@@ -2264,7 +2298,7 @@ export const GROUPS = [
   ['ACHIEVEMENTS & AUFTRÄGE', ['achievements', 'quests']],
   ['PROGRESSION', ['techtree', 'resources']],
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'decorSets', 'megarigs', 'rigAddons', 'salvage', 'people', 'companions']],
-  ['WELT', ['worldmap', 'parallax', 'pois', 'rooms', 'terrain', 'poiSets', 'roomStories', 'storylets', 'tropes', 'history', 'dressingRules', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
+  ['WELT', ['worldmap', 'parallax', 'pois', 'rooms', 'terrain', 'poiSets', 'roomStories', 'storylets', 'tropes', 'history', 'life', 'dressingRules', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
   ['LORE', ['brands', 'chronicle']],
   ['ENTITIES', ['glitchlings']],
 ];

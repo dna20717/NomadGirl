@@ -28,7 +28,7 @@ const pick = (r, a) => a.length ? a[Math.floor(r() * a.length)] : '';
 export const OCCUPANT_KINDS = [['gang', 'Gang'], ['sect', 'Sekte'], ['refugees', 'Flüchtlinge'], ['traders', 'Händler'], ['scavengers', 'Plünderer'],
   ['hermit', 'Einsiedler'], ['military', 'Versprengte Soldaten'], ['nest', 'Viecher (Nest)'], ['empty', 'niemand']];
 export const TRACE_KINDS = [['chest', 'geöffnete Kiste'], ['siren', 'zerstörte Sirene'], ['boss', 'gefallener Boss']];
-export const LAYER_BY = [['roll', 'gewürfelt'], ['home', 'heute (Heimat-Gang)'], ['war', 'Revierkrieg'], ['leyla', 'Leyla hat freigekämpft'], ['cleanup', 'aufgeräumt']];
+export const LAYER_BY = [['roll', 'gewürfelt'], ['home', 'heute (Heimat-Gang)'], ['war', 'Revierkrieg'], ['leyla', 'Leyla hat freigekämpft'], ['cleanup', 'aufgeräumt'], ['moved', 'Lager umgezogen (#169)'], ['gone', 'Lager aufgelöst (#169)'], ['nest', 'Nest gewachsen (#169)'], ['settle', 'neue Bewohner (#169)']];
 
 export const traceConfig = D => ({ cleanupDays: Math.max(1, D?.history?.traces?.cleanupDays ?? 4), fadeTo: Math.max(0, Math.min(100, D?.history?.traces?.fadeTo ?? 35)) / 100 });
 
