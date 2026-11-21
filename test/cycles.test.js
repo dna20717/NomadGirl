@@ -103,3 +103,30 @@ test('Einbahn hinunter: kein Weg zurück nach oben, unten geht es weiter', () =>
   }
   assert.ok(n >= 5, `${n} Einbahnen geprüft`);
 });
+
+test('#170 Rückweg verändert · eingestürzter Gang: offen auf dem Hinweg, Schutt hinter dem Ziel, Weg heim über die Abkürzung', () => {
+  const only = { ...D, pois: Object.fromEntries(Object.entries(D.pois).map(([k, P]) => [k, { ...P, cycles: { ...P.cycles, collapse: 100, recipes: [{ recipe: 'changedReturn', weight: 1 }, { recipe: 'lockKey', weight: 1 }] } }])) };
+  let n = 0, cut = 0;
+  for (const p of POIS) for (const s of SEEDS) {
+    const L = buildPoi(only, p, s), C = L.cycles, lay = L.def.layout, outer = L.graph.circles.at(-1), at = `${p} Seed ${s}`;
+    if (outer.recipe !== 'changedReturn' || !C.collapses.length) continue;
+    const c = C.collapses[0], goal = L.rooms.filter(r => r.band === 'main').at(-1);
+    assert.deepEqual(c.trigger, { x: goal.x, y: goal.y, w: goal.w, h: goal.h }, `${at}: ausgelöst im Zielraum`);
+    for (const [x, y] of c.tiles) {
+      assert.ok(lay[y][x] === '.' || lay[y][x] === 'H', `${at}: Gang ist auf dem Hinweg offen`);
+      assert.ok(!(x >= goal.x && x < goal.x + goal.w && y >= goal.y && y < goal.y + goal.h), `${at}: Schutt liegt hinter dem Zielraum`);
+    }
+    assert.ok(L.graph.edges.some(e => e.kind === 'collapse'), `${at}: Kante im Plan`);
+    // with the rubble, the van no longer reaches the goal the way in (the shortcut's door opens only from the far side)
+    const shut = lay.map((r, y) => [...r].map((t, x) => c.tiles.some(([a, b]) => a === x && b === y) ? '#' : t).join(''));
+    if (!find(lay, 'Z').some(z => reachMap(shut, { locks: C.locks, links: C.links, keysHeld: C.locks.map((_, i) => i) }).near(...z))) cut++;
+    // the audit (no softlock): after the collapse the way home from the goal room exists
+    assert.deepEqual(auditLevel(L).map(f => `${f.kind} ${f.room}`), [], at);
+    n++;
+  }
+  assert.ok(n >= 10, `${n} eingestürzte Gänge geprüft`);
+  assert.ok(cut >= n * 0.8, `Schutt sperrt den Hinweg: ${cut} von ${n}`);
+  // POIs › Struktur › Einsturz 0: never
+  const never = { ...only, pois: Object.fromEntries(Object.entries(only.pois).map(([k, P]) => [k, { ...P, cycles: { ...P.cycles, collapse: 0 } }])) };
+  for (const p of POIS) for (const s of SEEDS) assert.equal(buildPoi(never, p, s).cycles.collapses.length, 0);
+});

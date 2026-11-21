@@ -96,6 +96,8 @@ export class PoiLevel {
     });
     this.held = [];
     s.hud.setKeys?.([]);
+    // #170 Rückweg verändert · eingestürzter Gang: open now, rubble once Leyla first stands in the goal room
+    this.collapses = (C.collapses || []).map(c => ({ ...c, done: false }));
     // camouflaged tiles (art.js drawRoom bakes them like the wall around, on a layer above Leyla)
     for (const c of s.camo || []) {
       if (c.kind === '$') this.walls.push({ ...solidGroup(c.tiles, '$'), rts: c.rts });
@@ -611,6 +613,10 @@ export class PoiLevel {
   // fake walls: as soon as Leyla stands in one, it fades out (Daniel, 11.11.2026: „Leyla läuft einfach hindurch, die Wand blendet weich aus“)
   update(dt = 16) {
     const s = this.scene, l = s.leyla, T = s.T, b = l.body, ms = s.data_.game?.fog?.fakeFade ?? 450;
+    for (const c of this.collapses) if (!c.done && l.alive !== false) {
+      const t = c.trigger, tx = l.x / T, ty = l.feet / T - 0.5;
+      if (tx >= t.x && tx < t.x + t.w && ty >= t.y && ty < t.y + t.h) this.collapse(c);
+    }
     for (const f of this.fakes) if (f.found && f.fade < 1) { f.fade = Math.min(1, f.fade + dt / Math.max(1, ms)); for (const rt of f.rts) rt.setAlpha(1 - f.fade * f.fade * (3 - 2 * f.fade)); }
     for (const f of this.fakes) {
       if (f.found || b.right < f.x0 * T || b.left > f.x1 * T || b.bottom < f.y0 * T || b.top > f.y1 * T) continue;
@@ -621,6 +627,36 @@ export class PoiLevel {
       this.secretReward((f.x0 + f.x1) / 2 * T, f.y1 * T);
       s.fog?.reveal(true);
     }
+  }
+  // #170 the passage behind her caves in: rubble from code (concrete, rebar, dust), solid like a wall, a rumble, the camera shakes,
+  // dust falls in the room she stands in; the way home is the changed one (the shortcut)
+  collapse(c) {
+    const s = this.scene, T = s.T, b = box(c.tiles);
+    c.done = true;
+    for (const [x, y] of c.tiles) if (s.room.tiles[y]?.[x] === 'H') s.room.tiles[y][x] = '.';
+    c.zone = s.add.zone((b.x0 + b.x1) / 2 * T, (b.y0 + b.y1) / 2 * T, (b.x1 - b.x0) * T, (b.y1 - b.y0) * T);
+    s.solids.add(c.zone);
+    // push anyone standing in it out of the way (an enemy in the seam lands on the near side)
+    for (const e of s.enemies || []) if (e.alive !== false && e.x > b.x0 * T - 8 && e.x < b.x1 * T + 8 && e.feet > b.y0 * T && e.feet <= b.y1 * T + 4) e.x = b.x0 * T - 24;
+    const g = c.art = s.add.graphics().setDepth(-2.6), r = (i, k) => ((Math.sin((i + 1) * 12.9898 + k * 78.233) * 43758.5453) % 1 + 1) % 1;
+    const X0 = b.x0 * T, X1 = b.x1 * T, Y0 = b.y0 * T, Y1 = b.y1 * T, w = X1 - X0;
+    g.fillStyle(0x322b28, 1).fillRect(X0 - 10, Y0, w + 20, Y1 - Y0);
+    for (let i = 0; i < Math.ceil((Y1 - Y0) / 26) * 3; i++) {   // slabs and chunks, bigger at the bottom
+      const y = Y0 + r(i, 1) * (Y1 - Y0), sz = 14 + r(i, 2) * 26 * (0.6 + (y - Y0) / (Y1 - Y0 + 1)), x = X0 - 14 + r(i, 3) * (w + 28 - sz);
+      g.fillStyle([0x6d758d, 0x5a4e44, 0x4a5462, 0x796755, 0x8b93af][Math.floor(r(i, 4) * 5)], 1).fillRect(x, y, sz, sz * (0.5 + r(i, 5) * 0.5));
+      g.fillStyle(0x221c1a, 0.5).fillRect(x, y + sz * 0.45, sz, 3);
+    }
+    g.lineStyle(3, 0x71413b, 1); for (let i = 0; i < 4; i++) { const x = X0 + r(i, 7) * w, y = Y0 + r(i, 8) * (Y1 - Y0); g.lineBetween(x - 18, y - 10, x + 20, y + 14); }   // rebar
+    g.fillStyle(0x796755, 1); for (let i = 0; i < 9; i++) { const x = X0 - 40 + r(i, 9) * (w + 80); g.fillRect(x, Y1 - 6 - r(i, 10) * 8, 8 + r(i, 11) * 10, 6 + r(i, 10) * 8); }   // scree at its foot
+    g.setAlpha(0); s.tweens.add({ targets: g, alpha: 1, duration: 260 });
+    for (const [x, y] of c.tiles) { s.fx.puff((x + 0.5) * T, (y + 1) * T, 0xa08662); s.fx.sparks?.((x + 0.5) * T, (y + 0.5) * T, 0x8b93af, 6); }
+    // dust trickles where Leyla stands, a deep rumble
+    const l = s.leyla;
+    for (let i = 0; i < 6; i++) s.time.delayedCall(120 * i, () => s.fx.puff(l.x + (r(i, 12) - 0.5) * 600, l.feet - 360 - r(i, 13) * 120, 0xc7b08b));
+    s.cam.shake(700, 0.007);
+    s.sfx?.('land_hard', { x: (X0 + X1) / 2 }); s.sfx?.('melee_wall', { x: (X0 + X1) / 2 });
+    s.drone?.react?.('alert');
+    s.hud.toast('Hinter dir stürzt der Gang ein', 'Der Weg zurück ist verschüttet · nimm die Abkürzung zum Van', 'warn', 4200);
   }
   // tiles that still hide what is behind them (fog sight lines): closed doors, brittle walls, fake walls not found yet
   hides(x, y) { return this.fakes.some(f => !f.found && f.set.has(x + ',' + y)); }
@@ -661,6 +697,7 @@ export class PoiLevel {
       keys: this.keys.map(k => ({ x: Math.round(k.x), feet: k.feet, tx: k.tx, ty: k.ty, name: k.info.name, taken: k.taken })),   // #168
       locks: this.locks.map(o => ({ x0: o.x0, x1: o.x1, y0: o.y0, y1: o.y1, open: o.open, name: o.info.name, key: o.info.key, hatch: o.hatch })),
       held: [...this.held],
+      collapses: this.collapses.map(c => ({ tiles: c.tiles, done: c.done, trigger: c.trigger })),   // #170
     };
   }
 }

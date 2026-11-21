@@ -11,7 +11,9 @@
 //                   ladder, deep: a joint ladder cut, Leyla falls into the next room)
 //   doublePath      Doppelweg: the way back is open at both ends, a second way through the POI
 //   dangerReward    Gefahr und Belohnung: a loud side room (or the way back) with a chest
-//   changedReturn   Rückweg verändert: the way back opens from the other side (a door Leyla passes first, the switch behind it)
+//   changedReturn   Rückweg verändert: the way back opens from the other side (a door Leyla passes first, the switch behind it);
+//                   variant „eingestürzter Gang“ (#170): when Leyla enters the goal room, a passage of the main path behind her
+//                   caves in (rubble, dust, the camera shakes), so the way home is the changed one (POIs › Struktur › Einsturz)
 // The last circle is the outer one: its way back is the POI's shortcut (tunnel under the rooms, shaft beside the stack). Inner
 // circles (big POIs like Silo Zero) close over their side room: lockKey, dangerReward, in deep POIs oneWayDown.
 // Placeholder slots carry needs (role, a side room for the key, the lock) that buildPoi resolves with fitting room blocks.
@@ -23,7 +25,7 @@ export const KEY_KINDS = [['key', 'Schlüssel'], ['keycard', 'Keycard'], ['stamp
   ['ticket', 'Parkschein'], ['tag', 'Marke']];
 export const LOCK_KINDS = [['door', 'Tür'], ['gate', 'Schranke'], ['valve', 'Ventil'], ['fusebox', 'Sicherungskasten'], ['hatch', 'Luke'], ['grate', 'Gittertor']];
 // POIs › Struktur: the defaults (all editable per POI)
-export const CYCLES = { rooms: 7, weights: { lockKey: 4, changedReturn: 2, hiddenShortcut: 2, oneWayDown: 2, doublePath: 1, dangerReward: 2 } };
+export const CYCLES = { collapse: 50, rooms: 7, weights: { lockKey: 4, changedReturn: 2, hiddenShortcut: 2, oneWayDown: 2, doublePath: 1, dangerReward: 2 } };
 const ROUTE = new Set(['hiddenShortcut', 'doublePath', 'changedReturn']);   // only with a way back (the POI's shortcut)
 // how the way back of the outer circle behaves (edge kind in the graph)
 export const RETURN_KIND = { lockKey: 'gated', changedReturn: 'gated', hiddenShortcut: 'hidden', oneWayDown: 'oneway', doublePath: 'open', dangerReward: 'danger' };
@@ -44,7 +46,8 @@ export function cycleConfig(D, poiId) {
   // a table with rows = only these recipes (weight 0 = off); empty = all with the defaults
   const weights = listed.length ? Object.fromEntries(Object.keys(CYCLES.weights).map(k => [k, 0])) : { ...CYCLES.weights };
   for (const r of listed) weights[r.recipe] = Math.max(0, Number(r.weight ?? 1) || 0);
-  return { enabled: C.enabled !== false, rooms: Math.max(2, C.rooms || CYCLES.rooms), count: Math.max(0, C.count || 0), weights, keys: (C.keys || []).filter(k => k?.name) };
+  return { enabled: C.enabled !== false, rooms: Math.max(2, C.rooms || CYCLES.rooms), count: Math.max(0, C.count || 0), weights, keys: (C.keys || []).filter(k => k?.name),
+    collapse: Math.max(0, Math.min(100, C.collapse ?? CYCLES.collapse)) };
 }
 // the key of circle i: POIs › Struktur › Schlüssel (row i, repeated), else a plain key for a door (stacks: a hatch)
 export function keyOf(D, poiId, i, stack) {
@@ -97,6 +100,18 @@ export function planCycles(D, poiId, seed, { count, stack = null, shortcut = tru
   }
   // the outer circle closes with the POI's way back (goal → start)
   const outer = graph.circles.at(-1);
+  // #170 Rückweg verändert, variant „eingestürzter Gang“: a passage between two main rooms behind the goal caves in once Leyla enters
+  // the goal room (its own dice, so the plan of every other circle stays as it was)
+  if (shortcut && outer.recipe === 'changedReturn' && count >= 3) {
+    const dice = rng(Math.imul(seed | 0, 2246822519) ^ hash(poiId + ':collapse'));
+    if (dice() * 100 < cfg.collapse) {
+      const lo = Math.max(1, outer.from), hi = count - 2;   // the passage into slot s (from s − 1), never into the goal room itself
+      if (hi >= lo) {
+        outer.collapse = lo + Math.floor(dice() * (hi - lo + 1)); outer.name = `${outer.name} · eingestürzter Gang`;
+        const e = graph.edges.find(e => e.to === outer.collapse && e.kind === 'path'); if (e) e.kind = 'collapse';
+      }
+    }
+  }
   if (shortcut) {
     const kind = outer.recipe === 'oneWayDown' && stack === 'deep' ? 'gated' : RETURN_KIND[outer.recipe] || 'gated';
     graph.edges.push({ from: count - 1, to: 0, kind, circle: outer.i, route: stack ? 'shaft' : 'tunnel' });

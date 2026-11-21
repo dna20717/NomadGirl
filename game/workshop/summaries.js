@@ -53,6 +53,7 @@ function graphMap(L, R, width = 320) {
     g.strokeStyle = '#4a5462'; g.lineWidth = 2; g.setLineDash([]); g.beginPath(); g.moveTo(X(e.from) + 7, Y); g.lineTo(X(e.to) - 7, Y); g.stroke();
     const mx = (X(e.from) + X(e.to)) / 2;
     if (e.kind === 'locked') { g.fillStyle = '#ffd27a'; g.fillRect(mx - 3, Y - 9, 6, 18); }
+    if (e.kind === 'collapse') { g.fillStyle = '#a08662'; for (const [dx, dy, r] of [[-4, 3, 4], [3, 2, 5], [0, -3, 4]]) { g.beginPath(); g.arc(mx + dx, Y + dy, r, 0, 7); g.fill(); } }   // #170 rubble once the goal is reached
     if (e.kind === 'oneway') { g.fillStyle = '#5fb4d9'; g.beginPath(); g.moveTo(mx - 6, Y - 6); g.lineTo(mx + 6, Y - 6); g.lineTo(mx, Y + 6); g.fill(); }
   }
   // the way back of the outer circle: an arc over everything

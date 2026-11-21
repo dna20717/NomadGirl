@@ -289,3 +289,40 @@ Landmarken (POIs › Level-Design › Landmarke: Bild) nutzen dieselben Silhouet
 ## Schlüssel-Requisiten (#168, Wunschliste)
 
 Die Schlüssel und Schlösser des Zyklus-Graphs zeichnet Code (`game/play/poi_level.js` › `drawKeyShape`, `drawLock`; keine KI-Grafik). Wünschenswert, später gemalt (AAP-64, ≈ 48 px hoch, Seitenansicht): Toilettenschlüssel am Radkappen-Anhänger, Keycard, Genehmigungsstempel, Ventilrad, Sicherung 30 A, Code-Zettel, Parkschein, Grubenmarke; Schlösser: Tür mit Schlüsselplatte, rot-weiße Schranke, Gittertor, Schott mit Handrad, Sicherungskasten, Luke mit Warnstreifen (offen/zu).
+
+## Text entfernt (#170)
+
+Daniel, 21.11.2026: „Texte sollen niemals in der Grafik sein.“ Alle Bilder in `data/assets.json` durchgesehen (Kontaktbögen, Leyla- und Raider-Streifen als Figuren ohne Schrift ausgenommen), dazu `assets/pois/life/` (#169). Entfernt mit Code (`tools/detext.py`, PixelLab 0), das Original bleibt als Quelle `…/source/<name>_text.png` (Asset `<id>_text`, Art Original); die Schrift kommt aus Assets › Schrift aus Code (`game/labels.js`).
+
+| Asset | Gebackener Text | Jetzt aus Code |
+| --- | --- | --- |
+| `wow_priceboard` | SUN, REGULAR/PLUS/DIESEL, 4.89/6.29/6.49, Seitenschild | SUPER/PLUS/DIESEL, 4,89/6,29/6,49 (Sonne ohne Wortmarke) |
+| `landmark_board` | 15:18 SECTOR 9 ON TIME … DELAYED, Plaketten V-07, DANGER | vier Zeilen deutsch (SEKTOR 9, UNTERGRUND, AUSSENKUPPEL VERSPÄTET, IND.-ZONE) |
+| `landmark_penthouse` | PENTHOUSE (Neon-Buchstaben) | leeres Schild, PENTHOUSE in Neon |
+| `wow_dome` | SALE (Banner) | ALLES −70 % |
+| `wow_kiosk` | PAY HERE RK | KASSE (Neon) |
+| `vault_closed`, `vault_open` | V-09, CAUTION, SECURE | V-09, VORSICHT |
+| `notice_board` | JOBS | AUFTRÄGE |
+| `ws_treasury_hall`, `ws_treasury_hall_empty` | HALL OF LOOT (Neon) | SCHATZ/KAMMER |
+| `ws_armory` | ARMORY (Neon) | WAFFEN |
+| `drive_shrine` | KM 14 (Kilometerstein) | KM/14 |
+| `tileset00_props_big` | SNACKS (Automat) | SNACKS |
+| `kit_mod_tent_b` | 732 (aufs Zelt gesprüht) | – (Deko ohne Text) |
+| `drive_bus` | Zielanzeige | – (Anzeige aus) |
+
+Bewusst gelassen (⚠️, Daniel entscheidet):
+
+| Asset | Text | Grund |
+| --- | --- | --- |
+| `ui_logo`, `ui_logo_word` | NOMADGIRL | Spiel-Logo, Wortmarke ist das Bild |
+| `map_logos` | NOMADCOLA auf einem Abzeichen | Lore-Marke (Wortmarke im Logo) |
+| `icons_nomadcola` | „Nomad“ auf Kisten/Sixpacks | Lore-Marke NomadCola (Wortmarke) |
+| `icons_treasure` | OPEN (Neon-Schild als Gegenstand) | Der Gegenstand ist das Schild; Text weg = leerer Rahmen |
+| `tt_nodes_2/3/7`, `tt_nodes_4` | MK II, TRADERS MARKET mit Preisen, WANTED/BOUNTY, Graffiti | Techtree-Illustrationen in Feldern, klein; neu malen statt flicken |
+| `wow_clock` | römische Ziffern | Zifferblatt, Instrument |
+| `ck_cluster`, `ck_compass`, `pad_icons`, `pad_icons_v1` | Skalen, N/E/S/W, Tasten A/B/X/Y/LB … | Instrumente bzw. Controller-Symbole |
+| `ck_freshener`, `ck_cassette` | unleserliche Pseudo-Schrift | kein lesbarer Text |
+| `wow_kiosk`, `drive_bus`, `intro_panel_3` | Graffiti, Leuchtreklame-Gekritzel | unleserlich, Bildsprache |
+| `tut_*` (61) | Spiel-Oberfläche | Bildschirmfotos des Spiels (Aufnahme-Tool), die Schrift kommt dort aus Code |
+| `ws_treasury_cyber_candidate_2`, `intro_panel_5_source` | HALL OF LOOT, „5“ | Kandidat/Original, nicht im Spiel |
+| `life_stash` (#169) | oranges Sprüh-Zeichen | Gang-Symbol, keine Schrift |

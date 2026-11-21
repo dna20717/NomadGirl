@@ -362,7 +362,15 @@ function resolveSlots({ graph, main, R, parsed, middlePool, stack, wowId, seed }
   }
   main.forEach((id, s) => { if (graph.slots[s]) graph.slots[s].room = id; });
 }
-const cyclesOut = () => ({ locks: [], keys: [], links: [], oneWays: [], notes: [] });
+const cyclesOut = () => ({ locks: [], keys: [], links: [], oneWays: [], collapses: [], notes: [] });
+// #170 Rückweg verändert · eingestürzter Gang: the passage into slot c.collapse stays open in the layout and caves in during the run
+// (game/play/poi_level.js) when Leyla first stands in the goal room → { circle, tiles, trigger: { x, y, w, h } }
+// no place for it: the plain variant (the door from the other side) stays, the plan says so
+function placeCollapse(out, c, col, goal, graph) {
+  if (col?.length) { out.collapses.push({ circle: c.i, tiles: col, trigger: { x: goal.x, y: goal.y, w: goal.w, h: goal.h } }); return; }
+  const e = graph.edges.find(e => e.kind === 'collapse'); if (e) e.kind = 'path';
+  c.name = c.name.replace(' · eingestürzter Gang', ''); delete c.collapse;
+}
 // the key of a lock circle, from its side rooms or the main rooms before the lock; no place → the lock goes again (noted)
 function placeKey(out, c, tiles, regions, rnd) {
   const lock = out.locks.find(l => l.circle === c.i);
@@ -421,6 +429,9 @@ function weldBand({ graph, tiles, placedMain, branches, ends, floorY, enemyKit: 
       ends.danger = [mid, F - 1];
     }
   }
+  if (outer?.collapse != null) {   // the column of the seam into the collapsing room, top to floor (like a lock, but open until then)
+    placeCollapse(out, outer, seamLock(tiles, placedMain[outer.collapse], floorY), placedMain.at(-1), graph);
+  }
   for (const c of graph.circles) if (c.recipe === 'lockKey') placeKey(out, c, tiles, regionsOf(c, placedMain, branches), rnd);
   return out;
 }
@@ -463,6 +474,10 @@ function weldStack({ graph, tiles, placed, branches, joints, stack, ends, enemyK
         ends.danger = [walkX, fb - 1];
       }
     }
+  }
+  if (outer?.collapse != null) {   // the joint ladder into the collapsing room: rubble fills the hole in the floor
+    const j = joint(outer.collapse - 1);
+    placeCollapse(out, outer, j && tiles[j.y][j.x] === 'H' ? [[j.x, j.y]] : null, placed[n - 1], graph);
   }
   for (const c of graph.circles) if (c.recipe === 'lockKey') placeKey(out, c, tiles, regionsOf(c, placed, branches), rnd);
   return out;

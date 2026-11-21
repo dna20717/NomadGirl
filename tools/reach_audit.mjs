@@ -220,6 +220,17 @@ export function auditLevel(L, { traps = false } = {}) {
     for (let y = 0; y < lay.length; y++) for (let x = 0; x < lay[y].length; x++) { if (lay[y][x] === 'Z') goal.push([x, y]); if (lay[y][x] === 'L') van.push([x, y]); }
     if (!goal.some(p => from.near(...p)) && !van.some(p => from.near(...p))) note('Einbahn in die Sackgasse', ...o.land);
   }
+  // #170 eingestürzter Gang: once the passage is rubble (Leyla stands in the goal room), the way home still exists (the changed one)
+  for (const c of cyc.collapses || []) {
+    const shut = lay.map((r, y) => [...r].map((t, x) => c.tiles.some(([a, b]) => a === x && b === y) ? '#' : t).join(''));
+    const t = c.trigger, inGoal = [];
+    for (let y = t.y; y < t.y + t.h; y++) for (let x = t.x; x < t.x + t.w; x++) if (lay[y]?.[x] === 'Z' || (M.nodes.has(x + ',' + y) && !inGoal.length)) inGoal.push([x, y]);
+    const from = inGoal.find(([x, y]) => lay[y][x] === 'Z') || inGoal[0];
+    if (!from) { note('Einsturz ohne Zielraum', ...c.tiles[0]); continue; }
+    const after = reachMap(shut, { ...opts, start: from, keysHeld: opts.locks.map((_, i) => i) });
+    const van = []; for (let y = 0; y < lay.length; y++) for (let x = 0; x < lay[y].length; x++) if (lay[y][x] === 'L') van.push([x, y]);
+    if (!van.some(p => after.near(...p))) note('Einsturz: kein Weg zum Van', ...c.tiles[0]);
+  }
   const sc = L.shortcut;
   if (sc) for (const [name, p] of [['Abkürzung (Ausgang)', sc.oneWay ? (cyc.oneWays || []).at(-1)?.from || sc.down : sc.down], ['Abkürzung (Eingang)', sc.up]]) {
     const [x, y] = p, hit = [-1, 0, 1, 2, 3].some(dy => [-1, 0, 1].some(dx => M.nodes.has((x + dx) + ',' + (y - 1 + dy))));
