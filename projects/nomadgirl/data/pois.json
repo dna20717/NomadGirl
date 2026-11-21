@@ -17,7 +17,19 @@
   "tunnelTerrain": "metal",
   "tunnelAtmosphere": "tunnel_blau",
   "curve": "30, 75, 20, 90, 100",
-  "gang": {"name": "Yellow Vultures", "color": "Gelb", "motto": "Wer tankt, zahlt. Wer nicht zahlt, tankt Blei.", "rivals": "Neon Rats, Crude Boys"},
+  "gang": {
+   "name": "Yellow Vultures",
+   "color": "Gelb",
+   "motto": "Wer tankt, zahlt. Wer nicht zahlt, tankt Blei.",
+   "rivals": "Neon Rats, Crude Boys",
+   "loadout": [
+    {"enemy": "schuetze", "weapon": "schrotflinte", "chance": 50},
+    {"enemy": "pistolero", "weapon": "schrotflinte", "chance": 30},
+    {"enemy": "streuner", "trait": "grenadier", "chance": 25},
+    {"head": "mohawk", "chance": 40}
+   ],
+   "throwItem": "molotow"
+  },
   "brandProps": [
    {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 6, "ai": true},
    {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 4, "ai": true},
@@ -46,7 +58,13 @@
   "description": "Ein Konsumtempel am Stadtrand, halb eingestürzt. Die Rolltreppen laufen nicht mehr, die Kakerlaken schon.",
   "branchChance": 70,
   "curve": "35, 80, 25, 70, 30, 95, 100",
-  "gang": {"name": "Neon Rats", "color": "Magenta", "motto": "Alles muss raus. Du zuerst."},
+  "gang": {
+   "name": "Neon Rats",
+   "color": "Magenta",
+   "motto": "Alles muss raus. Du zuerst.",
+   "traits": ["coward"],
+   "loadout": [{"head": "hood", "chance": 40},{"enemy": "schrotflinter", "weapon": "nagelpistole", "chance": 30},{"enemy": "gewehrschuetze", "weapon": "rohrpistole", "chance": 25}]
+  },
   "brandProps": [
    {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 3, "ai": true},
    {"look": "icons_nomadcola", "name": "Rostiger Automat", "cm": 180, "chance": 3, "ai": true},
@@ -80,7 +98,18 @@
   "description": "Zone 13. Gebaut für den Krieg, der nie kam. Irgendwer hält die Notbeleuchtung am Laufen.",
   "branchChance": 70,
   "curve": "40, 85, 30, 90, 35, 100",
-  "gang": {"name": "Rust Guard", "color": "Orange", "motto": "Der Bunker hält. Wir halten den Bunker.", "rivals": "Salt Dogs"},
+  "gang": {
+   "name": "Rust Guard",
+   "color": "Orange",
+   "motto": "Der Bunker hält. Wir halten den Bunker.",
+   "rivals": "Salt Dogs",
+   "loadout": [
+    {"head": "helmet", "chance": 60},
+    {"enemy": "schuetze", "trait": "alarm", "chance": 25},
+    {"enemy": "pistolero", "trait": "medic", "chance": 15},
+    {"enemy": "schlaeger", "weapon": "rohrhammer", "chance": 25}
+   ]
+  },
   "treasure": [{"item": "silo_karte_1", "where": "vault", "chance": 100}]
  },
  "ministerium": {
@@ -99,7 +128,12 @@
   "tunnelAtmosphere": "ministerium_kalt",
   "branchChance": 65,
   "curve": "30, 70, 25, 85, 40, 100",
-  "gang": {"name": "Order Office", "color": "Cyan", "motto": "Bitte ziehen Sie eine Nummer. Sie werden erschossen."},
+  "gang": {
+   "name": "Order Office",
+   "color": "Cyan",
+   "motto": "Bitte ziehen Sie eine Nummer. Sie werden erschossen.",
+   "loadout": [{"enemy": "gewehrschuetze", "trait": "sniper", "chance": 30},{"enemy": "schuetze", "trait": "alarm", "chance": 30},{"head": "gasmask", "chance": 35}]
+  },
   "treasure": [{"item": "silo_karte_3", "where": "vault", "chance": 100}]
  },
  "delta_heights": {
@@ -118,7 +152,13 @@
   "tunnelAtmosphere": "beton_lager",
   "branchChance": 55,
   "curve": "30, 70, 40, 85, 50, 100",
-  "gang": {"name": "Sky Wolves", "color": "Cyan", "motto": "Je höher, desto weiter fällst du.", "rivals": "Level Five"},
+  "gang": {
+   "name": "Sky Wolves",
+   "color": "Cyan",
+   "motto": "Je höher, desto weiter fällst du.",
+   "rivals": "Level Five",
+   "loadout": [{"enemy": "gewehrschuetze", "trait": "sniper", "chance": 40},{"enemy": "schrotflinter", "weapon": "sturmgewehr", "chance": 30},{"head": "dreads", "chance": 40}]
+  },
   "description": "Ein Wohn- und Bürotum am Rand von BigCityDelta, halb eingestürzt. Ganz oben hat sich eine Gang ein Penthouse eingerichtet. Rauf geht es Etage für Etage, runter schneller: durch den Lastenschacht."
  },
  "parkhaus_sued": {
@@ -137,7 +177,13 @@
   "tunnelAtmosphere": "beton_lager",
   "branchChance": 50,
   "curve": "35, 75, 45, 100",
-  "gang": {"name": "Level Five", "color": "Magenta", "motto": "Parken verboten. Atmen auch."},
+  "gang": {
+   "name": "Level Five",
+   "color": "Magenta",
+   "motto": "Parken verboten. Atmen auch.",
+   "traits": ["coward"],
+   "loadout": [{"head": "topknot", "chance": 50},{"enemy": "pistolero", "weapon": "nagelpistole", "chance": 30},{"enemy": "keulenschwinger", "weapon": "machete", "chance": 30}]
+  },
   "description": "Ein Parkhaus voller ausgebrannter Autos. Jede Ebene ein Revier, oben auf dem Dach die Kasse.",
   "brandProps": [
    {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 2, "ai": true},
@@ -161,7 +207,13 @@
   "tunnelAtmosphere": "metall_rost",
   "branchChance": 50,
   "curve": "30, 60, 100",
-  "gang": {"name": "Static Saints", "color": "Gelb", "motto": "Wir senden. Du empfängst.", "rivals": "Order Office"},
+  "gang": {
+   "name": "Static Saints",
+   "color": "Gelb",
+   "motto": "Wir senden. Du empfängst.",
+   "rivals": "Order Office",
+   "loadout": [{"enemy": "schuetze", "trait": "alarm", "chance": 40},{"head": "gasmask", "chance": 50},{"enemy": "pistolero", "weapon": "nagelpistole", "chance": 30}]
+  },
   "description": "Ein Sendemast mitten in der Ebene. Wer hinaufklettert, findet Elektronik und schlechte Gesellschaft."
  },
  "metro_line4": {
@@ -180,7 +232,13 @@
   "tunnelAtmosphere": "tunnel_blau",
   "branchChance": 60,
   "curve": "25, 60, 40, 85, 100",
-  "gang": {"name": "Tunnel Kings", "color": "Gelb", "motto": "Nächster Halt: Endstation.", "rivals": "Salt Dogs"},
+  "gang": {
+   "name": "Tunnel Kings",
+   "color": "Gelb",
+   "motto": "Nächster Halt: Endstation.",
+   "rivals": "Salt Dogs",
+   "loadout": [{"enemy": "schlaeger", "weapon": "nagelkeule", "chance": 40},{"head": "hood", "chance": 60},{"enemy": "pistolero", "trait": "coward", "chance": 30}]
+  },
   "description": "Eine U-Bahn-Station unter der Stadtgrenze. Unten im Stellwerk sitzt, wer die Linie 4 kontrolliert.",
   "brandProps": [
    {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 2, "ai": true},
@@ -222,7 +280,12 @@
   "tunnelAtmosphere": "metall_rost",
   "branchChance": 65,
   "curve": "30, 70, 40, 80, 35, 90, 100",
-  "gang": {"name": "Salt Dogs", "color": "Blutrot", "motto": "Salz in jede Wunde."},
+  "gang": {
+   "name": "Salt Dogs",
+   "color": "Blutrot",
+   "motto": "Salz in jede Wunde.",
+   "loadout": [{"enemy": "schlaeger", "weapon": "rohrhammer", "chance": 30},{"head": "mohawk", "chance": 60},{"enemy": "gewehrschuetze", "weapon": "schrotflinte", "chance": 30}]
+  },
   "description": "Ein Salzbergwerk in der Salt Flats. Die Salt Dogs graben weiter, tiefer als jemals jemand war. Was unten leuchtet, will jeder haben."
  },
  "delta_crude": {
@@ -240,7 +303,13 @@
   "tunnelAtmosphere": "tunnel_blau",
   "branchChance": 60,
   "curve": "30, 75, 40, 85, 100",
-  "gang": {"name": "Crude Boys", "color": "Orange", "motto": "Wir raffinieren alles. Auch dich."},
+  "gang": {
+   "name": "Crude Boys",
+   "color": "Orange",
+   "motto": "Wir raffinieren alles. Auch dich.",
+   "loadout": [{"enemy": "schlaeger", "trait": "grenadier", "chance": 25},{"enemy": "pistolero", "trait": "grenadier", "chance": 20},{"head": "gasmask", "chance": 50}],
+   "throwItem": "molotow"
+  },
   "description": "Eine Raffinerie, die noch tropft. Die Crude Boys zapfen ab, was die Tanks hergeben.",
   "brandProps": [
    {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 1, "ai": true},
@@ -263,7 +332,14 @@
   "tunnelAtmosphere": "beton_lager",
   "branchChance": 60,
   "curve": "30, 70, 100",
-  "gang": {"name": "Sunny Side", "color": "Magenta", "motto": "Lächeln! Oder wir helfen nach.", "rivals": "Crude Boys"},
+  "gang": {
+   "name": "Sunny Side",
+   "color": "Magenta",
+   "motto": "Lächeln! Oder wir helfen nach.",
+   "rivals": "Crude Boys",
+   "traits": ["surrender"],
+   "loadout": [{"enemy": "pistolero", "trait": "medic", "chance": 25},{"head": "hood", "chance": 50},{"enemy": "keulenschwinger", "weapon": "machete", "chance": 30}]
+  },
   "description": "Ein Trailerpark am Highway. Früher Rentner, heute Leute mit Gewehren auf Liegestühlen.",
   "brandProps": [
    {"look": "icons_nomadcola", "name": "Automat (Rot)", "cm": 180, "chance": 2, "ai": true},
@@ -312,7 +388,18 @@
   "roomCount": [15, 17],
   "loot": "pluenderer_beute",
   "vault": "tresor",
-  "gang": {"name": "Zero Hour", "color": "Giftgrün", "motto": "Der Countdown läuft. Für dich zuerst.", "rivals": "Order Office"},
+  "gang": {
+   "name": "Zero Hour",
+   "color": "Giftgrün",
+   "motto": "Der Countdown läuft. Für dich zuerst.",
+   "rivals": "Order Office",
+   "loadout": [
+    {"enemy": "schuetze", "trait": "alarm", "chance": 25},
+    {"enemy": "gewehrschuetze", "trait": "sniper", "chance": 15},
+    {"enemy": "keulenschwinger", "weapon": "rohrhammer", "chance": 30},
+    {"head": "helmet", "chance": 70}
+   ]
+  },
   "curve": "30, 55, 70, 45, 75, 85, 50, 80, 90, 60, 85, 95, 100",
   "branchChance": 95,
   "stack": "deep",

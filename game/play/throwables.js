@@ -10,6 +10,7 @@
 //   T.blast(x, y, { radius, damage, friendly, knockback, from }, time) → names of what it hit
 //
 // friendly = Leyla threw it: it hurts enemies, not her. Enemy throws hurt Leyla, not other enemies (⚠️ no friendly fire).
+import { blastSirens } from './traits/alarm.js';
 
 export const THROW_GRAVITY = 2200;   // px/s², a little softer than the world, so lobs read well
 const SHATTER = new Set(['molotow', 'saeure']);
@@ -145,6 +146,7 @@ export class Throwables {
     this.rings.push({ x: p.x, y, r: p.radius, at: time, life: 320 });
     boom(s, p.radius);
     this.blast(p.x, y, p, time);
+    blastSirens(s, p.x, y, p.radius, p.damage ?? 20, time);   // #155
     // ⚠️ explosions open brittle walls in reach (concept 3.2)
     const r = p.radius * 0.6;
     s.level?.meleeHit?.(p.x - r, p.x + r, y - r, y + r);

@@ -46,6 +46,7 @@ await ev(() => {
       nomad.step(2);
     },
     spawn(id, col, o = {}) { nomad.spawn(id, col, 14); const e = s.enemies.at(-1); e.S.hearing = 0; e.M.patrol = 0; Object.assign(e, o); return e; },
+    Th() { return A.Throwables.of(s); },
     stand(col, dir = 1) { const l = s.leyla; nomad.tp((col + 0.5) * T, FLOOR); l.facing = dir; nomad.step(2); },
   };
 });
@@ -159,6 +160,85 @@ check('Alarm: Feigling rennt danach weg', al.flee.fleeing && al.flee.moved > 40,
 check('Alarm: vorher erwischt = keine Sirene', al.caught.siren === null && al.caught.alive === 0 && al.caught.phase === 'dead', al);
 await shot('alarm', () => { const { s } = A; A.reset(); s.alarmRoom = null; s.room.marks['!'] = [[40, 13]]; A.stand(33, 1); const e = A.spawn('sirene', 37, { facing: -1 }); e.tc.alarm.addEnemy = 'pistolero';
   nomad.until(() => e.al.phase === 'done', 500); nomad.step(20); nomad.freeze(); });
+
+// ---------- #155 siren destroyed, help out of a door ----------
+await ev(async () => { A.Throwables = (await import(new URL('game/play/throwables.js', location.href).href)).Throwables; A.alarm = await import(new URL('game/play/traits/alarm.js', location.href).href); });
+const sd = await ev(() => {
+  const { s, T, FLOOR } = A, l = s.leyla, out = {};
+  A.reset(); s.alarmRoom = null; s.room.marks['!'] = [[27, 13]];
+  A.stand(23, 1);
+  const p = s.alarmPts?.[0] || (nomad.step(1), s.alarmPts[0]);
+  // Leyla shoots it (real shots at chest height), else strikes it
+  const n00 = s.enemies.length;
+  for (let i = 0; i < 40 && !p.broken; i++) { s.combat.shoot(l, s.now); nomad.step(6); }
+  out.shot = { broken: p.broken, hp: p.hp, muzzle: s.combat.muzzleOf?.(l, true), siren: { x: p.x, y: p.y } };
+  if (!p.broken) { A.stand(26, 1); for (let i = 0; i < 20 && !p.broken; i++) { l.meleeReady = 0; l.attack = null; nomad.step(1, [], ['melee']); nomad.step(20); } }
+  out.broken = p.broken;
+  // a destroyed siren cannot be cranked: no alarm, no help
+  A.stand(22, 1);
+  const n0 = s.enemies.filter(x => x.alive).length;
+  const e = A.spawn('sirene', 31, { facing: -1 }); e.tc.alarm.addEnemy = 'pistolero';
+  nomad.until(() => e.al.phase === 'done', 300); nomad.step(200);
+  out.after = { phase: e.al.phase, broken: e.al.broken, siren: s.lastSiren, alive: s.enemies.filter(x => x.alive).length - n0, on: p.on };
+  // a grenade breaks one too
+  A.reset(); s.alarmRoom = null; s.room.marks['!'] = [[27, 13]]; A.stand(22, 1); nomad.step(1);
+  const q = s.alarmPts[0];
+  A.Th().explode({ x: q.x + 40, y: q.feet - 10, radius: 160, damage: 40, friendly: true, item: 'granate' }, s.now);
+  out.grenade = q.broken;
+  // help out of the door nearest to the siren that Leyla does not see (a near door in view, a far one out of view)
+  A.reset(); s.alarmRoom = null; s.room.marks['!'] = [[27, 13]];
+  const door = (x0) => { const art = s.add.graphics().setDepth(-9); art.fillStyle(0x3a3f46, 1).fillRect(x0 * T, 12 * T, T, 3 * T); art.lineStyle(4, 0x1b1f24, 1).strokeRect(x0 * T + 4, 12 * T + 4, T - 8, 3 * T - 8); return { x0, x1: x0 + 1, y0: 12, y1: 15, open: false, art }; };
+  s.testDoors = [door(24), door(52)];
+  A.stand(22, 1); nomad.step(30);
+  const g = A.spawn('sirene', 30, { facing: -1 }); g.tc.alarm.addEnemy = 'pistolero';
+  const n1 = s.enemies.length;
+  nomad.until(() => g.al.phase === 'done', 400);
+  const adds = s.enemies.slice(n1).filter(x => x.added === 'alarm'), v = s.cameras.main.worldView;
+  out.view = [Math.round(v.x / T), Math.round(v.right / T)];
+  out.door = { from: s.lastSiren?.from, exit: s.lastSiren?.exit, adds: adds.map(x => Math.round(x.x / T - 0.5)), lifted: s.testDoors[1].art.y < 0 || s.tweens.isTweening(s.testDoors[1].art) };
+  for (const d of s.testDoors) d.art.destroy();
+  s.testDoors = [];
+  for (const e of s.enemies.splice(n00)) e.destroy();   // the next checks start without them
+  A.Th().log.length = 0;
+  return out;
+});
+check('Sirene: Leylas Schüsse/Hiebe machen sie kaputt', sd.broken, sd);
+check('Sirene: kaputt = kein Alarm, keine Verstärkung', sd.after.phase === 'done' && sd.after.broken && sd.after.siren === null && sd.after.alive === 1 && !sd.after.on, sd);
+check('Sirene: Granate macht sie kaputt', sd.grenade, sd);
+check('Alarm: Verstärkung aus der Tür, die Leyla nicht sieht', sd.door.from === 'door' && sd.door.exit && !sd.door.exit.seen && sd.door.adds.length === 2 && sd.door.adds.every(c => Math.abs(c - 51) <= 2) && sd.door.lifted, sd);
+await shot('siren_broken', () => { const { s } = A; A.reset(); s.cameras.main.setLerp(1, 1); s.alarmRoom = null; s.room.marks['!'] = [[27, 13]]; A.stand(23, 1); nomad.step(1);
+  const p = s.alarmPts[0]; A.alarm.damageSirens(s, [{ x0: p.x - 2, x1: p.x + 2, y0: p.y - 2, y1: p.y + 2 }], 99, s.now); nomad.step(50); nomad.freeze(); });
+await shot('alarm_door', () => { const { s, T } = A; A.reset(); s.cameras.main.setLerp(1, 1); s.alarmRoom = null; s.room.marks['!'] = [[27, 13]];
+  const art = s.add.graphics().setDepth(-1); art.fillStyle(0x3a3f46, 1).fillRect(44 * T, 12 * T, T, 3 * T); art.lineStyle(4, 0x1b1f24, 1).strokeRect(44 * T + 4, 12 * T + 4, T - 8, 3 * T - 8);
+  s.testDoors = [{ x0: 44, x1: 45, y0: 12, y1: 15, open: false, art }];
+  A.stand(20, 1); const e = A.spawn('sirene', 25, { facing: -1 }); e.tc.alarm.addEnemy = 'pistolero';
+  nomad.until(() => e.al.phase === 'crank', 500); A.stand(33, 1); nomad.until(() => e.al.phase === 'done', 500); nomad.step(8);
+  s.tweens.pauseAll(); nomad.freeze(); s.testDoors = []; });
+
+// ---------- #155 Ergeben für alle, Gang-Ausrüstung ----------
+const ga = await ev(() => {
+  const { s } = A, D = s.data_, out = {};
+  A.reset(); A.stand(22, 1);
+  const p = A.spawn('schlaeger', 26, { facing: -1 }); p.S.sight = 0; p.readyAt = 1e12;
+  out.rules = { traits: p.traits.map(t => t.id), chance: p.tc.surrender?.chance, at: p.tc.surrender?.at };
+  const mut = A.spawn('kriecher', 30); out.mutant = mut.traits.map(t => t.id);
+  p.tc.surrender.chance = 100; p.hit(s.now, Math.ceil(p.maxHp * 0.8), 0, 1, false, { kind: 'shot' }); nomad.step(3);
+  out.kneel = p.state;
+  // the same with the normal 15 %: of 200 plunderers about 30 give up
+  let n = 0; for (let i = 0; i < 200; i++) { const e = { alive: true, hp: 1, maxHp: 10, state: 'engage', sr: { rolled: false }, tc: { surrender: { at: 25, chance: 15 } } }; const t = p.traits.find(x => x.id === 'surrender'); const give = t.give; t.give = () => n++; t.onHurt(e, s.now); t.give = give; }
+  out.rate = n;
+  // gang: the POI's gang hands out traits and its loadout
+  const gang = s.gang; s.gang = () => D.pois.grossmarkt.gang;
+  const r = A.spawn('schlaeger', 34); out.rats = r.traits.map(t => t.id);
+  const V = D.pois.tankstelle_km7.gang; s.gang = () => ({ ...V, loadout: V.loadout.map(r => ({ ...r, chance: 100 })) });   // every row hits
+  const v = A.spawn('streuner', 38), w = A.spawn('schuetze', 40);
+  out.vultures = { traits: v.traits.map(t => t.id), item: v.tc.grenadier?.item, head: v.d.kitHead, weapon: w.d.weapon, gangKit: w.d.gangKit, color: w.d.kitGang };
+  s.gang = gang;
+  for (const e of s.enemies.splice(s.enemies.indexOf(p))) e.destroy();
+  return out;
+});
+check('Ergeben: jeder Plünderer mit 15 % unter 25 %, nicht Mutanten', ga.rules.traits.includes('surrender') && ga.rules.chance === 15 && ga.rules.at === 25 && !ga.mutant.includes('surrender') && ga.kneel === 'surrender' && ga.rate > 12 && ga.rate < 50, ga);
+check('Gang-Ausrüstung: Bausteine der Gang für alle, Waffe, Kopf, Wurf', ga.rats.includes('coward') && ga.vultures.traits.includes('grenadier') && ga.vultures.item === 'molotow' && ga.vultures.head === 'mohawk' && ga.vultures.weapon === 'schrotflinte' && ga.vultures.gangKit?.gang === 'Yellow Vultures' && ga.vultures.color === 'Gelb', ga);
 
 // ---------- grenadier + throwables ----------
 const gr = await ev(() => {
