@@ -9,6 +9,8 @@ import { loadProject } from '../engine/project.js';
 import { buildPoi } from '../engine/poi.js';
 import { parseRoom } from '../engine/room.js';
 import { regionMap, placeTypes, planDressing, dressingOverrides, fits, setPool, hullMap, tileCase, dressingConfig, splitList, STANDING } from '../engine/dressing.js';
+import { levelTales, desertField, planBackWall, ageItems, rulesOf, ruleFrom, orderConfig } from '../engine/dressing_story.js';
+import { roomStory } from '../engine/story.js';
 
 const p = await loadProject(nodeLoader(new URL('../projects/nomadgirl', import.meta.url).pathname));
 const D = p.data, SEEDS = [1, 2, 3, 5, 8, 13, 21, 34];
@@ -47,12 +49,12 @@ test('nichts überlappt, zwischen Einzelstücken bleibt eine Kachel Luft', () =>
   const gap = dressingConfig(D).minGap;
   for (const l of levels) {
     const at = new Map();
-    for (const it of l.plan.items.filter(i => i.hang === 'stand')) for (let i = 0; i < it.w; i++) {
+    for (const it of l.plan.items.filter(i => i.hang === 'stand' && !i.debris)) for (let i = 0; i < it.w; i++) {   // debris (#159) is drawn flat on the floor
       const k = (it.x + i) + ',' + it.y;
       assert.ok(!at.has(k), `${where(l, it)} steht in ${at.get(k)?.name}`);
       at.set(k, it);
     }
-    for (const it of l.plan.items.filter(i => i.hang === 'stand' && !i.ens)) for (let d = 1; d <= gap; d++)
+    for (const it of l.plan.items.filter(i => i.hang === 'stand' && !i.ens && !i.debris)) for (let d = 1; d <= gap; d++)
       for (const x of [it.x - d, it.x + it.w - 1 + d]) { const o = at.get(x + ',' + it.y); assert.ok(!o || o === it, `${where(l, it)} lehnt an ${o?.name}`); }
   }
 });
@@ -82,7 +84,7 @@ test('kein Baum, Wrack oder Straßenschild auf Dächern oder drinnen', () => {
 test('Dichte je Raum im Rahmen („bewohnt“: Budget aus Rolle und Bodenkacheln)', () => {
   for (const l of levels) {
     for (const r of l.plan.regions) {
-      const things = l.plan.items.filter(it => it.room === r.key && it.hang === 'stand').length;
+      const things = l.plan.items.filter(it => it.room === r.key && it.hang === 'stand' && !it.debris).length;
       assert.ok(things <= r.budget + 3, `${l.poi} #${l.seed} ${r.key}: ${things} Dinge, Budget ${r.budget}`);
     }
     const stand = l.plan.items.filter(i => i.hang === 'stand').length, floor = l.spots.list.filter(s => STANDING.has(s.type)).length;
@@ -141,4 +143,77 @@ test('je POI und Raum überschreibbar (Dichte, Tags, Ensembles; Haken für #160 
   // #160: the room brief steers it (must → preferred, never → forbidden, decay room over POI)
   const s = dressingOverrides({ pois: { p: { story: { decay: 3 } } }, rooms: { r: { story: { must: 'tisch, büro', never: 'grün', decay: 1 } } } }, 'p', 'r');
   assert.deepEqual([s.prefer, s.forbid, s.decay], [['tisch', 'büro'], ['grün'], 1]);
+});
+
+// ---------- #159 Stufe 2: Ordnung + Verfall, Raum-Geschichten, Wüste, Rückwand, Korrekturen ----------
+const roomStoryRole = (poi, id) => roomStory(D.pois[poi], D.rooms[id]).role;
+
+test('Ordnung: Läden, Büros und Lager zeigen Reihen im Takt; Verfall 3 stört sie, Verfall 0 nicht', () => {
+  const D0 = { ...D, pois: Object.fromEntries(Object.entries(D.pois).map(([k, P]) => [k, { ...P, story: { ...P.story, decay: 0 } }])), rooms: Object.fromEntries(Object.entries(D.rooms).map(([k, r]) => [k, { ...r, story: { ...r.story, decay: undefined } }])) };
+  const D3 = { ...D0, pois: Object.fromEntries(Object.entries(D0.pois).map(([k, P]) => [k, { ...P, story: { ...P.story, decay: 3 } }])) };
+  let rows = 0, still = 0, aged = 0;
+  for (const l of levels) {
+    const p0 = planDressing({ D: D0, room: l.room, reg: l.reg, spots: l.spots, poiId: l.poi, seed: l.seed });
+    const ord = p0.items.filter(i => i.ord);
+    rows += ord.length;
+    still += p0.items.filter(i => i.tilt || i.dx || i.debris).length;
+    const p3 = planDressing({ D: D3, room: l.room, reg: l.reg, spots: l.spots, poiId: l.poi, seed: l.seed });
+    aged += p3.items.filter(i => i.tilt || i.dx || i.debris).length + (ord.length - p3.items.filter(i => i.ord).length);
+    // a row keeps its beat: the same thing, the same step
+    const byRoom = new Map(); for (const it of ord) byRoom.set(it.room, [...(byRoom.get(it.room) || []), it]);
+    for (const [k, r] of byRoom) { const xs = r.map(i => i.x).sort((a, b) => a - b), d = xs.slice(1).map((x, i) => x - xs[i]); assert.ok(new Set(r.map(i => i.name)).size === 1 && new Set(d).size <= 1, `${l.poi} ${k}: Reihe ohne Takt ${d}`); }
+  }
+  assert.ok(rows > 100, `nur ${rows} Dinge in Reihen`);
+  assert.equal(still, 0, 'Verfall 0 kippt nichts');
+  assert.ok(aged > rows * 0.3, `Verfall 3 stört zu wenig (${aged} von ${rows})`);
+  const it = [{ x: 1, y: 1, w: 1, h: 1, hang: 'stand', ord: true }];
+  ageItems(it, 0, 1); assert.ok(!it[0].tilt && !it[0].gone);
+});
+
+test('Raum-Geschichten: etwa 40 % der Räume, passend zu Rolle, nie der Wow-Raum', () => {
+  let n = 0, all = 0;
+  for (const l of levels) {
+    const t = levelTales(D, l.poi, l.L, l.seed); n += t.size; all += l.L.rooms.length;
+    for (const [i, id] of t) { const r = l.L.rooms[i], T = D.roomStories[id]; assert.ok(!r.wow && T, `${l.poi}: ${id} im Wow-Raum`); assert.ok(!T.roles?.length || T.roles.includes(roomStoryRole(l.poi, r.id)), `${l.poi} ${r.id}: ${id} passt nicht zur Rolle`); }
+  }
+  assert.ok(n / all > 0.2 && n / all < 0.55, `Quote ${Math.round(n / all * 100)} %`);
+});
+
+test('Die Wüste kriecht rein: Sand nimmt von den Eingängen nach innen ab, im Bunker fast nichts', () => {
+  for (const l of levels.filter(l => l.seed === 1)) {
+    const f = desertField(D, l.poi, l.L), tiles = l.L.def.layout;
+    for (let y = 1; y < tiles.length - 1; y++) for (let x = 1; x < tiles[0].length - 1; x++) {
+      const v = f.at(x, y); if (!v || v >= f.amp - 1e-6) continue;
+      assert.ok([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => f.at(x + dx, y + dy) > v), `${l.poi}: Sand bei ${x},${y} ohne Weg nach draußen`);
+    }
+  }
+  assert.ok(desertField(D, 'bunker_13', levels.find(l => l.poi === 'bunker_13').L).amp <= 0.05);
+});
+
+test('Rückwand-Ebene: ohne Kollision, nicht auf Leitern, Türen, Schaltern, Kisten; dunkler als die Spielebene', () => {
+  for (const l of levels) {
+    const items = planBackWall(D, l.room, l.reg, l.spots, l.seed), ch = (x, y) => l.room.tiles[y]?.[x];
+    for (const b of items) for (let dy = 0; dy < b.h; dy++) for (let dx = 0; dx < b.w; dx++) {
+      const c = ch(b.x + dx, b.y + dy);
+      assert.equal(c, '.', `${l.poi} #${l.seed}: ${b.kind} bei ${b.x + dx},${b.y + dy} auf „${c}“`);
+      assert.ok(l.reg.inside(b.x + dx, b.y + dy), `${l.poi}: ${b.kind} draußen`);
+    }
+  }
+  assert.ok(levels.reduce((n, l) => n + planBackWall(D, l.room, l.reg, l.spots, l.seed).length, 0) > 100, 'zu wenig Rückwand-Clutter');
+  const dim = D.game?.dressing?.backDim ?? 42;
+  assert.ok(dim >= 35 && dim <= 50, `Rückwand ${dim} % dunkler (Bibel 35–50)`);
+});
+
+test('Korrektur wirkt in allen Seeds: verboten in der Rolle, weg damit, zu viel hier', () => {
+  const l = levels.find(l => l.poi === 'grossmarkt'), it = l.plan.items.find(i => i.hang === 'stand' && !i.debris && i.name);
+  const role = l.plan.regions.find(r => r.key === it.room).role;
+  const Dr = { ...D, dressingRules: { r1: ruleFrom('room', { thing: it.name, role }) } };
+  for (const L2 of levels.filter(x => x.poi === 'grossmarkt')) {
+    const p = planDressing({ D: Dr, room: L2.room, reg: L2.reg, spots: L2.spots, poiId: 'grossmarkt', seed: L2.seed });
+    assert.ok(!p.items.some(i => i.name === it.name && p.regions.find(r => r.key === i.room)?.role === role), `Seed ${L2.seed}: ${it.name} steht noch in ${role}`);
+  }
+  const Dx = { ...D, dressingRules: { r1: ruleFrom('remove', { thing: it.name }) } };
+  assert.ok(!planDressing({ D: Dx, room: l.room, reg: l.reg, spots: l.spots, poiId: 'grossmarkt', seed: l.seed }).items.some(i => i.name === it.name));
+  assert.equal(rulesOf({ dressingRules: { a: ruleFrom('much', { role: 'shop' }) } }).density('shop'), 0.8);
+  assert.ok(orderConfig(D)('shop'));
 });
