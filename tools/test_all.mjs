@@ -10,7 +10,7 @@ import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PORT = 8766, TIMEOUT = 400_000;
+const PORT = Number(process.env.TEST_PORT) || 8766, TIMEOUT = 400_000;   // #167 TEST_PORT: an own server beside one on :8766 (other worktree); tests read GAME_URL
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.css': 'text/css', '.png': 'image/png',
   '.webp': 'image/webp', '.webm': 'video/webm', '.gif': 'image/gif', '.svg': 'image/svg+xml', '.ttf': 'font/ttf', '.woff2': 'font/woff2', '.woff': 'font/woff',
   '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg', '.wav': 'audio/wav', '.txt': 'text/plain', '.hex': 'text/plain' };
@@ -46,7 +46,7 @@ const results = [];
 for (const t of tests) {
   const t0 = Date.now();
   const r = await new Promise(ok => {
-    const p = spawn(process.execPath, [path.join('tools', t)], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
+    const p = spawn(process.execPath, [path.join('tools', t)], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, ...(PORT !== 8766 && !process.env.GAME_URL ? { GAME_URL: `http://localhost:${PORT}/game.html` } : {}) } });
     let out = '';
     p.stdout.on('data', d => { out += d; }); p.stderr.on('data', d => { out += d; });
     const kill = setTimeout(() => { p.kill('SIGKILL'); out += '\nZeitüberschreitung'; }, TIMEOUT);
@@ -58,6 +58,7 @@ for (const t of tests) {
   results.push({ t, ok, last, fails });
   console.log(`${ok ? '✔' : '✖'} ${t.replace('.mjs', '').padEnd(22)} ${String(Math.round((Date.now() - t0) / 1000)).padStart(3)} s  ${last.slice(0, 110)}`);
   if (!ok) for (const l of fails.slice(0, 6)) console.log('      ' + l.slice(0, 300));
+  if ((!ok && process.env.TEST_VERBOSE) || process.env.TEST_VERBOSE === 'all') console.log(r.out);   // #167 the whole output of a red test
 }
 server?.close();
 const bad = results.filter(r => !r.ok);
