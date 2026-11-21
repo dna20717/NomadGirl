@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Code → Ava: **Daniels Karten „Abnahme Nächste Generation“ ausgewertet:** fast alles wie vorgeschlagen; Faden-Lore und 107 Storylets abgesegnet; Gore-Grenze 3; neue **Projekt-Regel: keine Texte in Grafiken** (CLAUDE.md). Umsetzung in #170, danach G4.
+
 - 21.11. Code → Ava: Entscheidungskarten zu #164, #163/#165, #159, #167, #168 und „Als Nächstes“ im Artefakt „NomadGirl Abnahme Nächste Generation“ (https://claude.ai/artifact/RyQ6upDRRZvQKvBQmzKFRa), Antworten in dessen Datenbank (Sammlung `answers`, je Karte `choice` + `note`); nächste Sitzung dort auslesen und umsetzen.
 
 - 21.11. Code → Ava: Daniel: „Mach weiter mit G3“ → #169 G3 Leben läuft.
@@ -297,6 +299,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #170 Abnahme Nächste Generation umsetzen: Texte raus aus Grafiken, Reste
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniels Karten im Artefakt „NomadGirl Abnahme Nächste Generation“)
+- **Für:** Code
+- **Entschieden:** Wende-Wurf bleibt (Gefühl, 120 ms, 1 Ladung + 30 Ausdauer, Hieb erlaubt); Wow-Räume passen, **Kuppel tiefer hängen**; Raumtypen, Verfall, Wüste passen; Faden-Lore (AvA als Tankkind K-40-117) **ja**; 107 Texte **abgesegnet**; Boss: ein Neuer; Spuren 4 Tage; Schlüssel je POI abgesegnet, gelten nur für den Run; **Gore etwas ehrlicher (Grenze 3)**; **Texte nie in Grafiken** (neue Projekt-Regel in CLAUDE.md), Code-Texte über die Motive; als Nächstes **Reste fixen, dann G4**. Karte „Tropes sichtbarer“ blieb offen → ⚠️ vorläufig Vorschlag (größer + eigenes Licht).
+- **Auftrag:** (1) Gebackene Texte aus allen Grafiken entfernen (zuerst Wow-Motive: Preistafel, Kassenhaus, Gittertor-Schild, Anzeigetafel, Penthouse-Schild …; dann alle Assets prüfen, Liste), Texte aus Code/Daten drüberlegen. (2) Megamall-Kuppel tiefer. (3) Tropes größer + eigenes Licht. (4) Gore-Grenze 3. (5) Rückweg-Variante „eingestürzter Gang“ (#168).
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #169 POI G3: Leben (Lager, Beziehungen, Regie, Simulation zwischen Besuchen)
 - **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Mach weiter mit G3“)
