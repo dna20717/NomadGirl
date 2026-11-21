@@ -7622,5 +7622,22 @@
   "height": 182,
   "derivedFrom": "raider_base",
   "description": "Bausatz-Animation (#004): Körper ohne Waffe, grüner Platzhalter vermessen (Ebenen je Frame), Finger davor im Streifen „Hände davor“."
+ },
+ "vault_closed": {
+  "name": "Tresor V-09 (zu)",
+  "kind": "image",
+  "file": "assets/props/vault/vault_closed.png",
+  "source": "KI (PixelLab, create_image_pro 192 × 256, AAP-64, Stil props_big)",
+  "date": "2026-11-21",
+  "description": "Streng von vorn: Rundtür mit radialen Riegeln um einen Cyan-Kern (#153)."
+ },
+ "vault_open": {
+  "name": "Tresor V-09 (geknackt)",
+  "kind": "image",
+  "file": "assets/props/vault/vault_open.png",
+  "source": "KI (PixelLab, Edit Pro Flash von vault_closed)",
+  "derivedFrom": "vault_closed",
+  "date": "2026-11-21",
+  "description": "Tür offen, Gold, Münzen, Datenchips, Kristall (#153)."
  }
 }

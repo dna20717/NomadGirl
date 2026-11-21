@@ -273,6 +273,18 @@ export class PoiLevel {
   }
   drawGoal(z) {
     const s = this.scene, g = z.art.clear(), x = z.x, f = z.feet, done = !!this.done;
+    // #153 the painted vault (Spiel › Tresor): closed with a cyan core, cracked open with gold pouring out
+    const V = s.data_.game?.vault || {}, key = done && V.open && s.textures.exists(V.open) ? V.open : V.look && s.textures.exists(V.look) ? V.look : null;
+    if (key) {
+      const A = s.data_.assets || {}, pxPerCm = (A[s.data_.leyla?.look?.idle]?.height || 192) / (s.data_.game?.tiles?.leylaCm || 170);
+      const src = s.textures.get(key).getSourceImage(), k = (V.cm ?? 230) * pxPerCm / src.height, [cx, cy] = V.core || [src.width / 2, src.height / 2];
+      if (!z.pic) z.pic = s.add.image(x, f + 2, key).setOrigin(0.5, 1).setDepth(-6);
+      z.pic.setTexture(key).setScale(k).setPosition(x, f + 2);
+      const gx = x + (cx - src.width / 2) * k, gy = f + 2 - (src.height - cy) * k, tint = done ? 0xffd27a : 0x3fe0d0;
+      if (!z.glow) { z.glow = s.add.image(gx, gy, s.textures.exists('fx_glow') ? 'fx_glow' : '__WHITE').setBlendMode(Phaser.BlendModes.ADD).setDepth(-5).setScale(3).setAlpha(0.5); s.tweens.add({ targets: z.glow, alpha: 0.2, duration: 900, yoyo: true, repeat: -1 }); }
+      z.glow.setPosition(gx, gy).setTint(tint).setScale(done ? 5 : 3);
+      return;
+    }
     // the station's safe: a heavy box with a dial, glowing until it is cracked
     g.fillStyle(0x2f333b).fillRect(x - 60, f - 150, 120, 150);
     g.fillStyle(0x4a505a).fillRect(x - 52, f - 142, 104, 134);

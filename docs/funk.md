@@ -289,9 +289,9 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:** (Code) Gewinnt Leyla das Glitch-Duell an einem Automaten, fällt Beute aus der Tabelle „Automat (besiegte Entity)“ heraus (1–3: NomadCola, Neon-Ramen, Kaffee, Dumplings, MRE, selten Bento), mit Meldung „Der Automat spuckt aus“. POIs › Markenschild › Automat nach dem Duell (eigene Tabelle je POI). POI-Testläufe (`?poi=`) haben jetzt Bodenbeute. Test `glitch_duel_test` (11). **Bitte testen:** Tankstelle, Automat mit KI anzapfen und gewinnen.
 
 ### #153 Tresor: orthogonale, richtig geile Grafik
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Der Tresor braucht endlich eine orthogonale tolle Grafik. Sie muss richtig geil sein, denn das ist ja das, worauf die Spieler hinarbeiten :-)“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Der Tresor braucht endlich eine orthogonale tolle Grafik. Sie muss richtig geil sein, denn das ist ja das, worauf die Spieler hinarbeiten :-)“)
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Tresor „V-09“ (PixelLab 39: drei Entwürfe, einer geknackt): streng von vorn, 2,3 m hoch, Rundtür mit radialen Riegeln um einen Cyan-Kern; geknackt schwingt die Tür auf, drinnen Gold, Münzen, Datenchips, Kristall, der Schein wird golden. Spiel › Tresor. **Bitte testen:** einen POI bis zum Tresor spielen und knacken.
 
 ### #154 Info-Center: Bühne mit Zonen
 - **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel (Karte „Als Nächstes“ c): feste Plätze für alle Einblendungen (Konzept docs/concepts/info_center.md, Etappe 2/3).)
