@@ -272,16 +272,16 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #139 Gegner-Scheibe 1: Visier, Brandsatz, Flickerin, Sirene + Ergeben
-- **Status:** offen · angelegt 21.11. von Code (Daniel: Karten „Gegner zuerst“ a, „Ergeben“ a; Notiz: „Keine Hunde als Gegner. Niemals! Gerne Drohnen, aber keine Hunde.“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: Karten „Gegner zuerst“ a, „Ergeben“ a; Notiz: „Keine Hunde als Gegner. Niemals! Gerne Drohnen, aber keine Hunde.“)
 - **Auftrag:** Konzept `docs/concepts/enemy_kit.md` › 10: Trait-Haken + Register, `sniper`, `medic`, `alarm` (+`coward`), `grenadier`, `surrender` (Gefangen nehmen / laufen lassen / erledigen mit Ruf). Hund gestrichen.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: Verstärkung beim Alarm kommt neben dem Alarmpunkt auf der von Leyla abgewandten Seite (noch keine Türen); Sirene noch nicht zerschießbar/hackbar; Ergeben hat vorerst nur Flickerin (Sunny Side); Laufen lassen und Gefangen nehmen zählen fürs Ranking als besiegt; kein Eigenbeschuss (Gegner-Würfe treffen keine Gegner); Kisten halten Explosionen auf wie Wände; Explosionen öffnen brüchige Wände im halben Radius; Sanitäter holt nur Gefallene auf derselben Ebene. **Fragen an Daniel:** Sirene zerschießbar/hackbar? Verstärkung durch Türen? Ergeben auch für andere Gegner?
+- **Ergebnis:** (Code, per Helfer) Bausteine (`game/play/traits/`: Register, Haken in `Enemy`, Feld `traits` mit Abschnitten je Baustein): Scharfschütze (Laser folgt, Kisten/Treffer brechen das Aufschalten), Werfer (Bogen, Landemarke, Granate/Molotow/Säure, `game/play/throwables.js`), Sanitäter (heilt, holt Gefallene zurück), Alarm + Feigling (Raum-Zeichen `!` = Sirene, alle im POI alarmiert, 2 Verstärkungen), Ergeben (E: gefangen nehmen, laufen lassen +Ruf, erledigen −Ruf). Gegner Visier, Brandsatz, Flickerin, Sirene in den Gang-POIs; Sirenen in Bunker 13, Ministerium, Raketensilo. Keine Hunde. Tests `test/enemy_traits.test.js` (6), `tools/enemy_traits_test.mjs` (26), enemy/raider/poi/game grün. **Bitte testen:** Bunker 13 (Sirene, Flickerin), Tankstelle (Brandsatz), Ministerium (Visier).
 
 ### #140 Granaten für Leyla
-- **Status:** offen · angelegt 21.11. von Code (Daniel: „Gleich mit, aber mach ein paar ordentliche Animationen, die kompatibel mit Gehen, Rennen und Springen sind. Granaten sind nicht numerisch vorhanden, sondern ein extra Skill mit einem Cooldown (z. B. 3 Stück und dann 180 Sekunden warten oder so)“)
+- **Status:** läuft (21.11., Logik fertig, Animation offen) · angelegt 21.11. von Code (Daniel: „Gleich mit, aber mach ein paar ordentliche Animationen, die kompatibel mit Gehen, Rennen und Springen sind. Granaten sind nicht numerisch vorhanden, sondern ein extra Skill mit einem Cooldown (z. B. 3 Stück und dann 180 Sekunden warten oder so)“)
 - **Auftrag:** Wurf als Skill (Ladungen, Abklingzeit, einstellbar), Wurf-Animation als Oberkörper-Schicht oder je Bewegungszustand, Explosion teilt sich den Code mit dem Werfer (#139).
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: alle Ladungen kommen zusammen zurück, 180 s ab dem ersten Wurf einer Serie (Modus „einzeln“ einstellbar); Taste T, Controller rechter Stick (im Camp ist das Rig offen/zu, Granaten gibt es dort nicht); Zünder zählt ab dem ersten Bodenkontakt; Leylas Granate trifft sie selbst nicht.
+- **Ergebnis:** (Code, per Helfer) Leyla › Granate (Skill): Ladungen 3, Abklingzeit 180 s, Radius, Schaden, Wurf; Wurf als Oberkörper-Schicht im Gehen, Rennen und Springen (Arm vorerst aus Code, Feld `grenade.look` für die gemalte Animation); Anzeige „GRANATE ●●○ 2:41“ neben DASH. **Offen:** die gemalte Wurf-Animation (PixelLab).
 
 ### #141 Ranking-Bonus: Δ je Rang + Bonus-Kiste
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: Karte „Ranking-Bonus“: „A und B“)
