@@ -275,7 +275,7 @@ export class Hud {
   }
   // natural = the line finished typing (the babble may end on its own); else the player skipped it: the babble stops too
   stopType(natural = false) { if (!natural) this.voiceObj?.stop(0.06); const T = this.typing; if (!T) return false; clearInterval(T.timer); T.elm.textContent = T.text; this.typing = null; return true; }
-  focus(i) { this.menuIndex = i; this.menuButtons?.forEach((b, k) => b.classList.toggle('focus', k === i)); this.menuItems?.[i]?.onFocus?.(); }
+  focus(i) { if (i !== this.menuIndex) this.scene?.sfx?.('ui_hover'); this.menuIndex = i; this.menuButtons?.forEach((b, k) => b.classList.toggle('focus', k === i)); this.menuItems?.[i]?.onFocus?.(); }
   closeMenu(chosen = false) {
     this.stopType();
     const f = this.menuOnClose; this.menuOnClose = null;
@@ -284,7 +284,8 @@ export class Hud {
   }
   choose(i) {
     const it = this.menuItems?.[i];
-    if (!it || it.disabled) return false;
+    if (!it || it.disabled) { if (it) this.scene?.sfx?.('ui_deny'); return false; }
+    this.scene?.sfx?.('ui_confirm');   // #130
     const talking = !!this.speaker;
     this.closeMenu(true);
     if (talking) this.voice()?.leyla(it.label);   // #112: Leyla answers with a short noise
@@ -476,7 +477,7 @@ export class Hud {
         try { this.goal = questGoal(D, sv); } catch { this.goal = null; }
         try { scene.camp?.questMarks?.(); scene.camp?.boardNotes?.(); } catch { /* camp not ready */ }   // #017: „!“ / „✓“ over the companions stay true (a job done while cooking)
         // progress on the way (#016): a node on the way was unlocked → a gold toast with how far the search is
-        if (before && this.goal && before.quest && before.quest === this.goal.quest && this.goal.kind === 'ready' && before.kind !== 'ready') this.toast(`Auftrag erledigt: ${this.goal.text.replace(/ · erledigt$/, '')}`, 'Abgeben im Questlog (Lagerfeuer, Warroom)', 'good');
+        if (before && this.goal && before.quest && before.quest === this.goal.quest && this.goal.kind === 'ready' && before.kind !== 'ready') this.scene?.sfx?.('jingle_quest'), this.toast(`Auftrag erledigt: ${this.goal.text.replace(/ · erledigt$/, '')}`, 'Abgeben im Questlog (Lagerfeuer, Warroom)', 'good');
         else if (before && this.goal && !before.quest && !this.goal.quest && this.goal.progress > before.progress + 1e-6) this.toast('Ein Schritt näher an AvA', `${Math.round(this.goal.progress * 100)} % des Weges · nächster: ${this.goal.text.replace(/^[^:]*:\s*/, '')}`, 'good');
       }
       const G = this.goal, run = this.modeName === 'run';

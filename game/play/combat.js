@@ -56,6 +56,7 @@ export class Combat {
     leyla.attackPose = time + 160;
     const reach = (w.range ?? 70) + 40 + (power?.range || 0), f = leyla.facing, b = leyla.body, H = leyla.height;
     if (!leyla.attack || leyla.attack.trail) s.fx.slash(leyla.x + f * 24, b.bottom - H * 0.58, f, w.range ?? 70, leyla.attack?.trail ? 0xbff8ff : undefined, !!leyla.attack?.trailUp);   // the attack animations bring their own slash
+    s.sfx?.(power?.heavy ? 'melee_whoosh_heavy' : 'melee_whoosh', { x: leyla.x });   // #130
     const z = this.meleeZone(leyla, reach);
     let hits = 0, blocked = 0;
     for (const e of s.enemies) {
@@ -67,6 +68,7 @@ export class Combat {
     // brittle walls in POI levels: only where the strike really reaches the wall
     const walls = z.filter(r => r.wall != null);
     for (const r of walls) s.level?.meleeHit(r.wall - 4, r.wall + 4, r.y - 4, r.y + 4);
+    if (walls.length && !hits && !blocked) s.sfx?.('melee_wall', { x: leyla.x });
     if (walls.length && !hits && !blocked) s.fx.sparks(walls[Math.floor(walls.length / 2)].wall - f * 6, walls[Math.floor(walls.length / 2)].y, 0xb8b0a0, 4);
     if (blocked && !hits) { leyla.body.setVelocityX(-f * 260); s.fx.text(leyla.x + f * 80, b.bottom - H - 10, 'Block', { color: '#8fb3c9', size: 38, rise: 26 }); }
     if (hits || blocked || walls.length) s.noise?.(leyla.x, leyla.chest, s.shootRules().noiseMelee ?? 380);
@@ -97,7 +99,7 @@ export class Combat {
     const s = this.scene, w = s.weapon('ranged');
     if (!w) return;
     leyla.rangedReady = time + (w.cooldown ?? 300);
-    if (leyla.mag <= 0) { s.fx.text(leyla.x, leyla.feet - leyla.height - 20, 'leer', { color: '#8b949e', size: 36, rise: 30 }); return; }
+    if (leyla.mag <= 0) { s.sfx?.('dry_fire', { x: leyla.x }); s.fx.text(leyla.x, leyla.feet - leyla.height - 20, 'leer', { color: '#8b949e', size: 36, rise: 30 }); return; }
     leyla.mag--;
     leyla.attackPose = time + 120;
     // from the chest-high ready pose the arms first stretch out (Leyla › Waffe ziehen › Ausstrecken), the shot itself leaves right away
@@ -175,6 +177,7 @@ export class Combat {
   enemyShot(enemy, from, dir) {
     const speed = enemy.a.projectileSpeed ?? 900;
     this.scene.fx.flash(from.x, from.y, 0xffb070, 20);
+    this.scene.sfx?.('enemy_shot', { x: from.x });   // #130
     const wall = this.blockedAt(enemy.x, from.y, from.x, from.y);
     if (wall) { this.scene.fx.sparks(wall.x, wall.y, 0xffd27a, 6); return; }
     this.spawn({ key: 'nail_enemy', x: from.x, y: from.y, vx: dir.x * speed, vy: dir.y * speed, life: 2400, friendly: false, damage: enemy.d.damage ?? 8, knockback: 0, time: this.scene.time.now, from: enemy });

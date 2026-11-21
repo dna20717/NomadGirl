@@ -8,7 +8,7 @@
 // collider at 256 px look height; everything scales with the height of look.idle (Assets › „Höhe im Spiel“)
 // hangReach: hands above the feet while hanging; mantleLift: how far the last pull-up frame lifts the feet inside the picture
 import { recoilTexture } from './recoil.js';
-import { makeSfx } from './sfx.js';
+import { makeSfx, sfxOf } from './sfx.js';
 
 const BASE = { height: 256, w: 72, h: 224, slideH: 104, crouchH: 196, climbW: 44, hand: 84, chest: 150, hangReach: 253, mantleLift: 120 };
 export const DASH_TIME = 170, TERMINAL_FALL = 1700;
@@ -33,6 +33,7 @@ export class Leyla {
   }
   constructor(scene, data, feet) {
     this.scene = scene;
+    try { sfxOf(scene); } catch { /* no audio */ }   // #130 the sound bank of the scene (preloads produced samples, menu sounds)
     this.base = data.leyla;
     this.m = data.leyla.movement || {};
     const k = (data.assets?.[data.leyla.look?.idle]?.height || BASE.height) / BASE.height;
@@ -135,6 +136,7 @@ export class Leyla {
         const drop = this.feet - this.air.peak, dist = Math.abs(this.x - this.air.x);
         if (this.d.look?.land && (drop >= (m.landMinDrop ?? 384) || dist >= (m.landMinDistance ?? 640))) this.startLand(time);
         else if (this.lastVy > 500) this.land(this.lastVy);
+        else if (this.lastVy > 260) this.scene.sfx?.('land_soft', { x: this.x, k: 0.35 });   // #130 a small hop lands quietly
       }
       this.air = null;
       this.lastGround = time; this.airJumps = this.maxAirJumps; this.airDash = this.canAirDash; this.flipUntil = 0;
@@ -142,6 +144,7 @@ export class Leyla {
     if (input.jump.pressed) this.jumpAt = time;
     const dir = (input.right.down ? 1 : 0) - (input.left.down ? 1 : 0);
     this.dirHeld = dir; this.walkHeld = !!input.walk.down;   // for the look: running intent, pushing against a wall
+    this.stepSound(s, grounded);   // #130
 
     if (this.hitAnim) {   // the hit reaction runs out, or running / jumping / dash breaks it off after "Abbrechen ab"
       const h = this.hitAnim, p = (time - h.at) / h.dur;
@@ -266,14 +269,27 @@ export class Leyla {
   }
 
   jump(f) {
+    this.scene.sfx?.(f < 1 ? 'jump_double' : 'jump', { x: this.x });   // #130
     this.body.setVelocityY(-(this.m.jumpVelocity ?? 1100) * f * (1 + (this.scene.mods?.jump || 0) / 100));   // Sprungkraft from implants
     this.jumpAt = -1e9; this.cut = true; this.leapAt = this.scene.now ?? 0;
     this.squash = { x: 0.86, y: 1.14 };
   }
   land(vy) {
     const k = Math.min(1, vy / 1600);
+    this.scene.sfx?.('land_soft', { x: this.x, k: 0.4 + k });   // #130
     this.squash = { x: 1 + 0.2 * k, y: 1 - 0.2 * k };
     this.scene.fx.dust(this.x, this.feet, 6 + 8 * k);
+  }
+
+  // #130 footsteps (Spiel › Effekte › Schritte): one every stride on the ground, the surface picks the sound
+  stepSound(s, grounded) {
+    const S = this.scene.data_?.game?.sfx || {}, vx = Math.abs(this.body.velocity.x), run = vx > 300;
+    const stride = run ? S.stride ?? 150 : S.strideWalk ?? 115;
+    if (S.footsteps === false || !grounded || this.state !== 'normal' || vx < 60) { this.stepDist = stride * 0.65; return; }
+    this.stepDist = (this.stepDist ?? 0) + vx * s;
+    if (this.stepDist < stride) return;
+    this.stepDist = 0;
+    try { sfxOf(this.scene)?.step(this.x, this.feet, run); } catch { /* no audio */ }
   }
 
   // ---------- damage ----------

@@ -21,6 +21,7 @@ import { MOMENTS } from '../game/banter.js';
 import { EARN_WHEN } from '../game/earn.js';
 import { RELIEFS, ROADSIDE } from '../game/road.js';
 import { ANSWER_WHEN, GANG_FROM, eventProblems } from '../game/road_events.js';
+import { SFX_RECIPES, SFX_LEGACY } from '../game/play/sfx.js';
 
 const text = (key, label, o = {}) => ({ key, label, type: 'text', ...o });
 const area_ = (key, label, o = {}) => ({ key, label, type: 'textarea', ...o });
@@ -105,6 +106,9 @@ export const POI_SIZES = [['S', 'S'], ['M', 'M'], ['L', 'L'], ['XL', 'XL'], ['XX
 export const ROOM_TAGS = [['start', 'Eingang'], ['exit', 'Ausgang'], ['combat', 'Kampf'], ['loot', 'Beute'], ['secret', 'Geheimnis'], ['npc', 'NPCs'], ['boss', 'Boss'], ['corridor', 'Gang']];
 export const PIXEL_TYPES = [['icons', 'Symbole (Raster)'], ['image', 'Einzelbild / Objekt'], ['tiles', 'Kacheln'], ['animation', 'Animation'], ['photo', 'Foto → Pixel'], ['edit', 'Überarbeiten']];
 export const PIXEL_STATUS = [['open', 'Offen'], ['working', 'In Arbeit'], ['done', 'Fertig'], ['question', 'Rückfrage']];
+// #130 Ton-Ereignisse: what kind of sound, and the order for production
+export const SOUND_KINDS = [['combat', 'Kampf'], ['move', 'Bewegung'], ['loot', 'Beute & Dinge'], ['world', 'Umgebung'], ['ui', 'UI'], ['jingle', 'Jingle'], ['build', 'Bauen']];
+export const SOUND_PRIORITIES = [['a', 'A · zuerst'], ['b', 'B · bald'], ['c', 'C · später']];
 export const ASSET_KINDS = [['animation', 'Animation'], ['tiles', 'Kacheln'], ['image', 'Bild'], ['video', 'Clip (Video)'], ['sound', 'Ton'], ['icons', 'Symbole'], ['reference', 'Referenz'], ['source', 'Original']];
 // tutorial (#011): chapters of the field guide and what makes a lesson show up the first time
 export const TUT_CHAPTERS = [['move', 'Bewegung'], ['fight', 'Kampf'], ['ava', 'AvA'], ['inventory', 'Inventar'], ['camp', 'Camp'], ['build', 'Rig bauen'], ['travel', 'Reisen'], ['poi', 'Im POI'], ['progress', 'Fortschritt']];
@@ -209,6 +213,10 @@ export const AREAS = {
         num('voice.volume', 'Lautstärke', { unit: '%', min: 0, max: 200 }), num('voice.bubbles', 'Sprechblasen', { unit: '% der Lautstärke', min: 0, max: 200, hint: 'Im Camp leiser, je weiter Leyla weg ist' }),
         num('voice.max', 'Höchstens', { unit: 's je Zeile', min: 1, hint: 'Lange Zeilen brabbeln nur so lange' }), bool('voice.leyla', 'Leyla macht Laute', { hint: 'Beim Antworten im Dialog ein kurzes Hm, Ha!, Mhm …' }),
         bool('voice.barks', 'Gegner rufen', { hint: 'Raider rufen, wenn sie Leyla entdecken, getroffen werden oder fallen' }), num('voice.barkGap', 'Rufe höchstens alle', { unit: 's je Gegner', min: 0 }), num('voice.barkChance', 'Ruft bei Treffer', { unit: '%', min: 0, max: 100 })] },
+      { title: 'Effekte', fields: [bool('sfx.enabled', 'Effekt-Töne an', { hint: '#130: Kampf, Bewegung, Beute und Menüs (Werkstatt › Ton-Ereignisse). M schaltet allen Ton aus' }),
+        num('sfx.volume', 'Lautstärke', { unit: '%', min: 0, max: 200, hint: 'Gilt für alle Ton-Ereignisse; jedes hat dazu seine eigene' }), bool('sfx.ui', 'Menü-Töne', { hint: 'Fokus, Bestätigen, Zurück, Geht nicht in den Fenstern' }),
+        bool('sfx.footsteps', 'Schritte', { hint: 'Je nach Untergrund (Ton-Ereignisse › Untergrund)' }), num('sfx.stride', 'Schrittlänge beim Rennen', { unit: 'px', min: 40 }), num('sfx.strideWalk', 'Schrittlänge beim Gehen', { unit: 'px', min: 40 }),
+        num('sfx.burst', 'Höchstens gleichzeitig', { unit: 'Töne je 80 ms', min: 1, hint: 'Viele Treffer auf einmal: nur so viele klingen' })] },
       { title: 'Beute-Bilanz', fields: [bool('summary', 'Bilanz nach dem Run', { hint: '#017: zurück im Camp eine Karte mit Rang, Δ, Mitgebrachtem, Neuem (Rezepte, Techtree, Aufträge, Tank) und einem Knopf zur passenden Station. Aus = nur der Banner wie früher' })] },
       { title: 'Zielzeile', fields: [bool('quest.enabled', 'Zielzeile zeigen', { hint: '#016 roter Faden: im HUD, auf der Karte und nach dem Run steht der nächste Schritt zum Heilmittel bzw. der Tank, wenn er schwach ist' }),
         ref('quest.goal', 'Endziel', 'techtree', { hint: 'Knoten, auf den alles hinläuft. Leer = heilmittel' }), num('quest.tankWarn', 'Tank zuerst unter', { unit: '%', min: 0, max: 100, hint: 'Unter diesem Zustand zeigt die Zielzeile den Tank statt des Techtrees. Leer = 45' })] },
@@ -233,7 +241,8 @@ export const AREAS = {
         num('fog.mass', 'Masse ab', { unit: 'Kacheln', min: 1, max: 6, hint: 'So weit von der Luft weg, die Leyla erreichen kann, wird alles schwarze Masse (Wände, Fels, unerreichbare Luft)' }),
         num('fog.ragged', 'Ausfransen', { unit: '%', min: 0, max: 100, hint: 'Rand wie verkohltes Papier: 0 = weicher Verlauf' }), num('fog.grain', 'Körnung', { unit: 'px je Kachel', min: 2, max: 32, hint: 'Wie fein der Rand gezeichnet wird (16 = 4 Weltpixel)' }),
         num('fog.sight', 'Sicht', { unit: 'Kacheln', min: 1, hint: 'Sichtlinien von Leylas Augen, Wände halten sie auf' }), num('fog.fade', 'Aufdecken dauert', { unit: 'ms', min: 0 }),
-        num('fog.fakeFade', 'Scheinwand blendet aus', { unit: 'ms', min: 0 }), color('fog.color', 'Farbe')] },
+        num('fog.fakeFade', 'Scheinwand blendet aus', { unit: 'ms', min: 0 }), color('fog.color', 'Farbe'),
+        bool('fog.earth', 'Erde unter der Oberfläche', { hint: '#132: unter dem Boden des Eingangs zeigt die Dunkelheit Erdschichten statt Schwarz (aus = schwarz)' }), text('fog.earthColors', 'Erdschichten', { hint: 'Farben von oben nach unten, mit Komma' }), color('fog.earthStones', 'Steine'), num('fog.earthDepth', 'Erde bis', { unit: 'Kacheln', min: 1, hint: 'Ab hier nur noch die Farbe der Dunkelheit' })] },
       { title: 'Vordergrund', fields: [bool('foreground.enabled', 'Silhouetten im Vordergrund', { hint: '#043: schwarze Schutt-, Kisten-, Rohr- und Fass-Umrisse vor dem Boden der Innenräume, mit Parallaxe' }),
         range('foreground.every', 'Abstand', { unit: 'Kacheln', hint: 'Zwischen zwei Silhouetten (zufällig in diesem Bereich)' }), range('foreground.height', 'Höhe', { unit: 'Kacheln', hint: 'Über den Boden hinaus' }),
         num('foreground.parallax', 'Parallaxe', { unit: '%', min: 100, max: 160, hint: '100 = mit der Welt, mehr = näher an der Kamera' }), num('foreground.alpha', 'Deckkraft', { unit: '%', min: 0, max: 100 }), color('foreground.color', 'Farbe')] },
@@ -251,7 +260,7 @@ export const AREAS = {
         num('combat.blood.stay', 'Verblasst nach', { unit: 's', min: 1, hint: 'Leer = 20' }), num('combat.blood.max', 'Höchstens', { unit: 'Flecken', min: 10, hint: 'Ältere verschwinden zuerst. Leer = 160' }),
         color('combat.blood.color', 'Farbe', { hint: 'Leer = dunkles Rot' })] },
       { title: 'Kamera', fields: [num('camera.zoom', 'Zoom', { min: 0.3, max: 2, step: 0.05, hint: '1 = 1920×1080 Spielpixel sichtbar, 0,75 = weiter raus (mehr sichtbar), über 1 = näher ran' }),
-        num('camera.lookAhead', 'Vorlauf', { unit: 'px', min: 0, hint: 'So weit schaut die Kamera in Laufrichtung voraus' }), num('camera.follow', 'Nachziehen', { min: 0.01, max: 1, step: 0.01, hint: '1 = klebt an Leyla, kleiner = weicher' })] },
+        num('camera.lookAhead', 'Vorlauf', { unit: 'px', min: 0, hint: 'So weit schaut die Kamera in Laufrichtung voraus' }), num('camera.lookUp', 'Blick nach oben im Run', { unit: 'px', hint: '#132: so weit über Leyla liegt die Bildmitte in POIs (mehr Raum oben, weniger Dunkel unten)' }), num('camera.skyAbove', 'Himmel über dem Level', { unit: 'px', min: 0, hint: 'So weit darf die Kamera im Run über die Oberkante des Levels steigen' }), num('camera.follow', 'Nachziehen', { min: 0.01, max: 1, step: 0.01, hint: '1 = klebt an Leyla, kleiner = weicher' })] },
       { title: 'Kacheln', fields: [ref('tiles.platform', 'Plattform', 'assets', { hint: 'Asset der Art „Kacheln“ mit 4 Frames: einzeln, links, Mitte, rechts. Leer = aus Code gezeichnet' }),
         ref('tiles.terrain', 'Kachel-Set', 'terrain', { hint: 'Wände und Böden in allen Räumen ohne eigenes Kachel-Set. Leer = aus Code gezeichnet' }),
         bool('tiles.depth', 'Tiefe aus Code', { hint: 'Licht, Schatten und Masse für alle Kachel-Sets (Kachel-Sets › Tiefe); aus = flach wie früher' }), num('tiles.leylaCm', 'Leyla ist groß', { unit: 'cm', min: 50, hint: 'Maßstab für Clutter-Größen: Leylas Höhe im Spiel (Asset Stehen) entspricht so vielen Zentimetern. Leer = 170' })] },
@@ -1216,6 +1225,25 @@ export const AREAS = {
         num('speed', 'Tempo', { unit: 'Silben/s', min: 2, max: 25 }), num('formant', 'Kopfgröße', { unit: '%', min: 50, max: 200, hint: 'Verschiebt die Vokale: unter 100 groß und dumpf, über 100 klein und hell' }),
         num('breath', 'Hauchig', { unit: '%', min: 0, max: 100 }), num('rasp', 'Kratzig', { unit: '%', min: 0, max: 100 }), num('vibrato', 'Vibrato', { unit: '%', min: 0, max: 100 }), num('volume', 'Lautstärke', { unit: '%', min: 0, max: 200 })] }],
   },
+  sounds: {
+    name: 'Ton-Ereignisse', singular: 'Ton-Ereignis', icon: 'loudspeaker', file: 'data/sounds.json', kind: 'catalog', groupBy: { key: 'kind', options: SOUND_KINDS },
+    hint: '#130: jeder Effekt-Ton im Spiel (Hieb, Treffer, Schritte, Beute, Menüs, Jingles). Bis ein produzierter Ton da ist, spielt ein Platzhalter aus Code (Rezept). Sobald unter „Produziert“ ein Asset der Art Ton steht, spielt das, ohne Code-Änderung. Die ID ist der Name, unter dem das Spiel den Ton auslöst (Liste: docs/sounds.md).',
+    template: { name: 'Neues Ton-Ereignis', kind: 'world', recipe: 'ping', volume: 100, pitch: 100, vary: 50, cooldown: 0, priority: 'b' },
+    row: x => `${label(SOUND_KINDS, x.kind)} · ${x.samples?.length ? `produziert (${x.samples.length})` : `Code: ${label(SFX_RECIPES, x.recipe) || x.recipe || '–'}`}${x.mute ? ' · stumm' : ''}`,
+    sections: [{ title: 'Ereignis', fields: [NAME, select('kind', 'Art', SOUND_KINDS, { required: true }), DESCRIPTION, text('trigger', 'Auslöser', { hint: 'Wo im Code der Ton kommt (Datei:Zeile), für die Liste' }),
+        select('priority', 'Priorität', SOUND_PRIORITIES, { hint: 'Für die Produktion: A zuerst' }), area_('notes', 'Für die Produktion', { hint: 'Wie der echte Ton klingen soll (Länge, Material, Stimmung)' })] },
+      { title: 'Klang', fields: [select('recipe', 'Platzhalter aus Code', SFX_RECIPES, { hint: 'Spielt, solange kein produzierter Ton da ist' }),
+        refs('samples', 'Produziert', 'assets', { hint: 'Assets der Art Ton; mehrere = zufällig einer. Leer = Platzhalter aus Code' }),
+        num('volume', 'Lautstärke', { unit: '%', min: 0, max: 300 }), num('pitch', 'Tonhöhe', { unit: '%', min: 25, max: 400, hint: '100 = wie gebaut' }),
+        num('vary', 'Schwankt um', { unit: 'Cent ±', min: 0, max: 1200, hint: 'Jedes Mal ein wenig anders (100 Cent = ein Halbton)' }), num('cooldown', 'Höchstens alle', { unit: 'ms', min: 0, hint: 'Kommt der Ton öfter, bleibt er still' }),
+        bool('mute', 'Stumm'), select('replaces', 'Ersetzt Code-Ton', SFX_LEGACY.map(x => [x, label(SFX_RECIPES, x)]), { hint: 'Ältere Töne aus dem Bau-Modus und den Meldungen: dieses Ereignis spielt statt ihrer' })] },
+      { title: 'Untergrund (Schritte)', when: x => x.kind === 'move', fields: [refs('terrains', 'Auf Kachel-Sets', 'terrain', { hint: 'Schritte auf diesen Kachel-Sets klingen so' }),
+        bool('rig', 'Im Rig und am Van', { hint: 'Schritte im Camp über dem Boden (Container, Treppen, Deck)' }), bool('stepDefault', 'Sonst überall', { hint: 'Wenn kein anderer Schritt passt' })] }],
+    check: (x, report, p) => {
+      for (const a of x.samples || []) if (p.data.assets?.[a] && p.data.assets[a].kind !== 'sound') report('error', `„${a}“ ist kein Ton`);
+      if (!x.recipe && !(x.samples || []).length) report('warning', 'Weder Platzhalter noch produzierter Ton: bleibt still');
+    },
+  },
   decor: {
     name: 'Deko', singular: 'Deko-Stück', icon: 'star', file: 'data/decor.json', kind: 'catalog', groupBy: { key: 'place', options: DECOR_PLACES },
     hint: '#036 (Daniel: „das Dekosystem“): Kosmetik fürs Camp, beim Händler im Bau-Modus kaufen und in der Welt platzieren. Keine Werte, nur Gemütlichkeit (stärkere Buffs beim Schlafen und Ausruhen, Camp › Deko).',
@@ -1878,7 +1906,7 @@ export const AREAS = {
 
 // Navigation: groups of areas in the order of the design document
 export const GROUPS = [
-  ['ASSETS', ['assets', 'pixelOrders', 'voices']],
+  ['ASSETS', ['assets', 'pixelOrders', 'voices', 'sounds']],
   ['GRUNDLAGEN', ['game', 'splash', 'intro', 'tutorial', 'weather', 'economy', 'ranking', 'renames']],
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'kits', 'buffs']],

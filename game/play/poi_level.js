@@ -285,6 +285,7 @@ export class PoiLevel {
   openChest(c) {
     const s = this.scene;
     c.open = true; this.chestsOpened++;
+    s.sfx?.('crate_open', { x: c.x });   // #130
     s.turf?.chestOpened(c);   // #061 seen = theft
     if (c.sprite) { let f = 0; s.time.addEvent({ delay: 70, repeat: c.frames - 1, callback: () => c.sprite.setFrame(Math.min(c.frames - 1, ++f)) }); }
     else this.drawChest(c);
@@ -324,6 +325,7 @@ export class PoiLevel {
     const d = sw.door;
     if (!d || d.open) return;
     this.openSolid(d);
+    s.sfx?.('door_open', { x: sw.x });   // #130
     s.cam.shake(260, 0.004);
     s.tweens.add({ targets: d.art, y: -(d.y1 - d.y0) * s.T + 12, duration: 900, ease: 'Sine.easeInOut' });
     s.hud.toast('Abkürzung offen!', 'Ein Schalter hat eine Tür geöffnet', 'good', 3000);

@@ -9,6 +9,11 @@ const errors = [], ok = [], pageErrors = [];
 page.on('pageerror', e => pageErrors.push(e.message));
 const check = (name, cond, info) => { if (cond) ok.push(name); else errors.push(`${name}: ${JSON.stringify(info)}`); };
 await page.goto(base + 'index.html?stickers=all');
+// #135 the menu shows in one piece: a veil until scene, cockpit, stickers and fonts stand
+const veil0 = await page.evaluate(() => !!document.getElementById('boot'));
+await page.waitForFunction(() => window.bootReady, null, { timeout: 30000 });
+const veil1 = await page.evaluate(() => ({ ready: !!window.bootReady, splash: !!window.splash, menu: !!window.cockpitMenu }));
+check('Hauptmenü in einem Stück: Schleier bis alles steht, dann frei (#135)', veil0 && veil1.ready && veil1.splash && veil1.menu, { veil0, veil1 });
 await page.waitForFunction(() => window.cockpitMenu && window.splash, null, { timeout: 30000 });
 await page.waitForTimeout(1500);
 let r = await page.evaluate(() => { const l = document.getElementById('lcd'), b = l.getBoundingClientRect(); return { items: cockpitMenu.items(), vis: l.querySelectorAll('a:not([hidden])').length, box: [b.x, b.y, b.width, b.height], stickers: cockpitMenu.stickers() }; });

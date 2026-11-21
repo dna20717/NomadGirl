@@ -15,6 +15,7 @@ export class LeylaMoves {
     this.squash = { x: 1.25, y: 0.84 };
     this.nextGhost = 0;
     this.scene.fx.dust(this.x, this.feet, 5);
+    this.scene.sfx?.('dash', { x: this.x });   // #130
   }
   dash(time, input) {
     this.body.setVelocity(this.facing * (this.m.dashDistance ?? 280) / (DASH_TIME / 1000), 0);
@@ -33,6 +34,7 @@ export class LeylaMoves {
     this.setLow();
     this.body.setVelocityX(this.facing * (this.m.slideSpeed ?? 600));
     this.scene.fx.dust(this.x, this.feet, 8);
+    this.scene.sfx?.('slide', { x: this.x, ms: this.slideEnd - time });   // #130
   }
   slide(time, input, grounded) {
     const b = this.body, blocked = !this.canStand();
@@ -77,6 +79,9 @@ export class LeylaMoves {
     const v = slideDown ? Math.min(m.ladderSlide ?? 560, Math.max(m.climbSpeed ?? 150, b.velocity.y + (m.ladderSlide ?? 560) / 10)) : ((input.down.down ? 1 : 0) - (input.up.down ? 1 : 0)) * (m.climbSpeed ?? 150);
     b.setVelocity(0, v);
     this.climbSliding = slideDown;
+    // #130 a rung every 48 px climbed, a hiss while sliding down
+    if (slideDown) this.scene.sfx?.('ladder_slide', { x: this.x });
+    else if (v && Math.floor(((this.climbDist || 0) + Math.abs(v) / 60) / 48) !== Math.floor((this.climbDist || 0) / 48)) this.scene.sfx?.('ladder_step', { x: this.x });
     if (slideDown && Math.random() < 0.25) this.scene.fx.dust(this.x, this.y - this.size.h * 0.3, 1);
     if (!slideDown) {
       this.climbPhase = (this.climbPhase || 0) + Math.abs(v) / 1000;
@@ -144,6 +149,7 @@ export class LeylaMoves {
     b.reset(x, feet - this.size.h / 2); b.setVelocity(0, 0);
     this.airJumps = this.maxAirJumps; this.airDash = this.canAirDash; this.cut = false; this.flipUntil = 0;
     this.squash = { x: 0.94, y: 1.06 };
+    this.scene.sfx?.('ledge_grab', { x: this.x });   // #130
   }
   hang(time, input, dir) {
     const b = this.body, L = this.ledge, m = this.m;
@@ -228,6 +234,7 @@ export class LeylaMoves {
   // ---------- hard landing (after a long jump or deep fall) ----------
   startLand(time) {
     this.state = 'land'; this.landAt = time; this.flipUntil = 0;
+    this.scene.sfx?.('land_hard', { x: this.x });   // #130
     this.scene.fx.dust(this.x, this.feet, 16);
     this.scene.cam?.shake?.(120, 0.004);
   }

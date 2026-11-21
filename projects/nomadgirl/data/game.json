@@ -49,7 +49,7 @@
  "loading": {"leyla": "leyla_run_side", "drone": "drone_hull", "color": "#3ee8ff", "accent": "#ff4fd8", "height": 96, "width": 70, "text": ""},
  "testRoom": "testraum",
  "tiles": {"platform": "platform_metal", "terrain": "desert", "leylaCm": 170, "depth": true},
- "camera": {"zoom": 1, "lookAhead": 160, "follow": 0.12},
+ "camera": {"zoom": 1, "lookAhead": 160, "follow": 0.12, "lookUp": 150, "skyAbove": 320},
  "spawn": {
   "look": "van_side",
   "offset": [0, 0],
@@ -110,11 +110,13 @@
   "remembered": 60,
   "mass": 2,
   "ragged": 70,
-  "grain": 16
+  "grain": 16,
+  "earth": true
  },
  "tutorial": {"enabled": true, "gap": 40},
  "ladder": {"look": "ladder_steel", "top": [0, 38], "mid": [38, 118], "broken": [118, 198], "bottom": [198, 240], "width": 125, "brokenChance": 35, "tint": "#ffffff", "ropeTint": "#bb7547"},
  "foreground": {"enabled": true, "every": [5, 11], "height": [0.4, 1.2], "parallax": 118, "alpha": 96, "color": "#060508"},
  "roomTitle": {"enabled": true, "ms": 2600},
- "voice": {"enabled": true, "volume": 70, "bubbles": 60, "max": 4, "leyla": true, "barks": true, "barkGap": 4, "barkChance": 35}
+ "voice": {"enabled": true, "volume": 70, "bubbles": 60, "max": 4, "leyla": true, "barks": true, "barkGap": 4, "barkChance": 35},
+ "sfx": {"enabled": true, "volume": 60, "ui": true, "footsteps": true, "stride": 150, "strideWalk": 115, "burst": 10}
 }

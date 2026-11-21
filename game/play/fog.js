@@ -75,6 +75,14 @@ export class Fog {
     for (let i = 0; i < w * h; i++) this.alpha[i] = this.kind[i] === 0 ? 0 : 1;
     const col = parseInt(String(F.color || '#07060c').slice(1), 16);
     this.rgb = [col >> 16 & 255, col >> 8 & 255, col & 255];
+    // #132 (Daniel: „Ausbessern bitte, aber global“, the lower third of a run was plain black): below the surface (the floor under
+    // Leyla's start) the darkness is a cut through the earth: strata that get darker with depth, a few stones, black from „Erde bis“ on
+    if (F.earth !== false && R.start) {
+      let sy = R.start[1]; while (sy < h - 1 && !solid(R.start[0], sy)) sy++;
+      const hex = c => { const v = parseInt(String(c).slice(1), 16); return [v >> 16 & 255, v >> 8 & 255, v & 255]; };
+      const bands = String(F.earthColors || '#3b2a24,#2e211d,#241a18,#1a1314').split(',').map(t => hex(t.trim()));
+      this.earth = { y: sy, bands, deep: Math.max(1, F.earthDepth ?? 5), stones: hex(F.earthStones || '#4a3a30') };
+    }
     // chunks: one canvas each, Körnung pixels per tile (at most 4096 px on a side for the whole level)
     this.g = Math.max(1, Math.min(F.grain ?? 16, Math.floor(4096 / Math.max(w, h)), 32));
     this.cw = Math.ceil(w / CH); this.chh = Math.ceil(h / CH);
@@ -179,7 +187,13 @@ export class Fog {
           a = lo + spread * Math.max(0, Math.min(1, (m - 0.5) * (1 + rag * 3) + 0.5));
         }
         const o = (py * W + px) * 4;
-        d[o] = r0; d[o + 1] = g0; d[o + 2] = b0; d[o + 3] = Math.round(Math.max(0, Math.min(1, a)) * 255);
+        const E = this.earth;
+        if (E && fy + 0.5 >= E.y) {   // earth: wavy strata, stones, fading into the fog colour with depth
+          const gx = ox * g + px, gy = oy * g + py, dep = fy + 0.5 - E.y + (vnoise(gx / (g * 2.2), 7.3) - 0.5) * 0.8;
+          const b = E.bands[Math.max(0, Math.min(E.bands.length - 1, Math.floor(dep / (E.deep / E.bands.length))))], f = Math.max(0, Math.min(1, dep / E.deep));
+          const st = vnoise(gx / (g * 0.22), gy / (g * 0.22)) > 0.82 && dep < E.deep * 0.8 ? E.stones : b;
+          d[o] = st[0] + (r0 - st[0]) * f; d[o + 1] = st[1] + (g0 - st[1]) * f; d[o + 2] = st[2] + (b0 - st[2]) * f;
+        } else { d[o] = r0; d[o + 1] = g0; d[o + 2] = b0; } d[o + 3] = Math.round(Math.max(0, Math.min(1, a)) * 255);
       }
     }
     c.ctx.putImageData(c.img, 0, 0);

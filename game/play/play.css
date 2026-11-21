@@ -784,7 +784,7 @@ html, body { margin: 0; height: 100%; background: var(--ng-night); overflow: hid
 .wm-fc-chip small { color: var(--ng-muted2); font: 13px/1 var(--ui-font); margin-right: 2px; }
 .wm-fc-chip.wx { color: #f9a31b; }
 .wm-fc > p { margin: 5px 0 0; font-size: 12px; color: #f9a31b; }
-.wm-detail > .wm-go { position: sticky; bottom: 0; flex-shrink: 0; box-shadow: 0 -10px 14px var(--ng-panel3); }
+.wm-detail > .wm-go { position: sticky; bottom: 0; flex-shrink: 0; box-shadow: 0 -14px 16px var(--ng-panel3), 0 18px 0 18px var(--ng-panel3); }   /* #134 nothing shows through under the button, the fade above says „more“ */
 .wm-go { margin-top: auto; justify-content: center; font-size: 18px; padding: 12px; }
 .wm-why { color: var(--ng-lilac2); }
 .wm-unknown { color: #6d5f7c; font: 22px/1 VT323, monospace; letter-spacing: 3px; }

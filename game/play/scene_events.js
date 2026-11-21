@@ -14,11 +14,15 @@ import { colorOfItem, knowsColor, learnColor } from './signature.js';
 import { learnAll, learnNote } from '../crafting.js';
 import { bump, level as achieveLevel, check as achieveCheck } from '../achievements.js';
 import { mod } from '../mods.js';
+import { sfxOf } from './sfx.js';
 
 export class SceneEvents {
+  // #130 a sound event (Werkstatt › Ton-Ereignisse): code placeholder or produced sample, silent when muted → true when it sounded
+  sfx(id, o) { try { return sfxOf(this)?.play(id, o) || false; } catch { return false; } }
   // ---------- events ----------
-  onLeylaHit(dmg) { this.drone.react('hit'); this.cam.shake(120, 0.006); this.fx.bloodHit(this.leyla.x, this.leyla.chest, -this.leyla.facing || 1, Math.max(0.5, Math.min(1.6, dmg / 15))); this.hud.hurt(); }
+  onLeylaHit(dmg) { this.sfx('leyla_hurt', { x: this.leyla.x, heavy: dmg >= (this.leyla.d?.hit?.heavyFrom ?? 12) }); this.drone.react('hit'); this.cam.shake(120, 0.006); this.fx.bloodHit(this.leyla.x, this.leyla.chest, -this.leyla.facing || 1, Math.max(0.5, Math.min(1.6, dmg / 15))); this.hud.hurt(); }
   onLeylaDown() {
+    this.sfx('leyla_ko', { x: this.leyla?.x });   // #130
     if (this.mode === 'run' && this.box && this.data_.tank?.enabled !== false && this.data_.camp?.koReturn !== 'camp') return this.runKnockout();
     this.hud.banner('AvA schleppt dich raus …', 'Die Run-Beute bleibt liegen.', 3500, 'drama');
     this.cam.shake(300, 0.01);
@@ -82,7 +86,7 @@ export class SceneEvents {
     pile.grid.items = [];
     this.loot.sync(); this.lostPack = null;
     this.invChanged?.('backpack');
-    this.drone.react('rescue');
+    this.drone.react('rescue'); this.sfx('loot_pickup', { x: this.leyla.x });
     this.hud.toast('Rucksack zurück!', left ? 'Nicht alles passt, der Rest liegt am Boden' : '', 'good', 3200);
   }
   // ---------- Rezepte automatisch lernen + Achievements (#012) ----------
@@ -199,6 +203,7 @@ export class SceneEvents {
     if (G?.name) { const r = addRep(this.data_, this.box.save, G.name, -repConfig(this.data_).kill); if (r?.changed) this.hud.toast(`${G.name}: ${levelName(r.level)}`, 'Dein Ruf bei ihnen sinkt', 'warn', 3600); }
     const [a, b] = e.d.deltas || [0, 0], d = a + Math.floor(Math.random() * (b - a + 1));
     this.deltas += d;
+    if (d) this.time.delayedCall(260, () => this.sfx('delta_pickup', { x: e.x }));   // #130
     if (d) this.fx.text(e.x, e.feet - e.h - 20, `+${d} Δ`, { color: '#ffd27a', size: 48, rise: 90, life: 1100 });
     if (!this.level && this.enemies.every(x => !x.alive) && !this.cleared) {
       this.cleared = true;
@@ -254,6 +259,6 @@ export class SceneEvents {
     if (text !== this.vanPrompt || key !== this.vanKey) { this.vanPrompt = text; this.vanKey = key; this.hud.prompt(text, key); }
     if (input.grab.pressed && near && this.mode === 'run') this.confirmLeave();
     else if (input.grab.pressed && thing?.act) thing.act();
-    else if (input.grab.pressed && floorText && key === 'E') this.hud.floor.pick(this);
+    else if (input.grab.pressed && floorText && key === 'E') { this.hud.floor.pick(this); this.sfx('loot_pickup', { x: l.x }); }
   }
 }

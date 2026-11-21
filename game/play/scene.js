@@ -76,8 +76,9 @@ export class PlayScene extends Phaser.Scene {
   preload() {
     if (this.args?.loading) this.load.on('progress', p => this.args.loading.progress(p));   // Spiel › Ladebalken
     const A = this.data_.assets || {}, ids = new Set(Object.values(this.data_.leyla?.look || {}));
-    for (const e of Object.values(this.data_.enemies || {})) if (e.look) ids.add(e.look);
-    const kitted = kitAssets(this.data_, Object.values(this.data_.enemies || {}));   // Gegner-Bausätze (#004): poses, heads, weapons, hands strips
+    const foes = Object.values(this.data_.enemies || {});   // #135 tried: loading enemies only for runs; the extra wait at the start of a run cost stability, so all stay
+    for (const e of foes) if (e.look) ids.add(e.look);
+    const kitted = kitAssets(this.data_, foes);   // Gegner-Bausätze (#004): poses, heads, weapons, hands strips
     for (const id of kitted.ids) ids.add(id);
     for (const [key, file] of kitted.extra) if (!this.textures.exists(key)) this.load.image(key, new URL(file, this.base).href);
     for (const [k, id] of Object.entries(this.data_.game?.tiles || {})) if (k !== 'terrain') ids.add(id);
@@ -134,10 +135,15 @@ export class PlayScene extends Phaser.Scene {
       const S = this.data_.camp?.sound || {};
       for (const id of [S.wind, S.fire, ...(S.gusts || []), ...(this.data_.camp?.fire?.sit?.sounds || [])]) if (id) ids.add(id);
     }
+    this.queueAssets(ids);
+  }
+  // queue assets by id with their kind (sheet, symbol grid, image, sound); textures already there are skipped
+  queueAssets(ids) {
+    const A = this.data_.assets || {};
     for (const id of [...ids]) if (A[id]?.mirror) ids.add(A[id].mirror);   // drawn opposite direction
     for (const id of ids) {
       const a = A[id];
-      if (!a?.file) continue;
+      if (!a?.file || this.textures.exists(id)) continue;
       const url = new URL(a.file, this.base).href;
       if ((a.kind === 'animation' || a.kind === 'tiles') && a.frameSize) this.load.spritesheet(id, url, { frameWidth: a.frameSize[0], frameHeight: a.frameSize[1] });
       else if (a.kind === 'icons' && a.cell) { const [cw, ch] = Array.isArray(a.cell) ? a.cell : [a.cell, a.cell]; this.load.spritesheet(id, url, { frameWidth: cw, frameHeight: ch }); }
@@ -396,7 +402,9 @@ export class PlayScene extends Phaser.Scene {
     this.foreground = placeForeground(this);   // black silhouettes in front of the floors indoors (#043, Spiel › Vordergrund)
     // room lower than the view (zoomed out): floor stays at the bottom edge, sky above
     const viewH = this.scale.height / (C.zoom || 1);
-    cam.setBounds(0, Math.min(0, H - viewH), W, Math.max(H, viewH));
+    // #132 in a run the camera may rise into the sky above the level, so Leyla can stand lower in the picture (Spiel › Kamera › Himmel über dem Level)
+    const sky = this.mode === 'run' ? (C.skyAbove ?? 320) : 0;
+    cam.setBounds(0, Math.min(0, H - viewH) - sky, W, Math.max(H, viewH) + sky);
     // #134 (Glitch: the camera started at the container and swung over to Leyla): the first frames snap to her, then the soft follow
     cam.startFollow(this.leyla.box, false, 1, 1);
     { let n = 0; const soft = () => { if (++n < 3) return; cam.setLerp(C.follow ?? 0.12, C.follow ?? 0.12); this.events.off('postupdate', soft); }; this.events.on('postupdate', soft); }
@@ -835,6 +843,7 @@ export class PlayScene extends Phaser.Scene {
     }
     const cam = this.cam;
     cam.followOffset.x += (-this.leyla.facing * (this.data_.game?.camera?.lookAhead ?? 160) - cam.followOffset.x) * Math.min(1, dt / 400);
+    if (this.mode === 'run') cam.followOffset.y = this.data_.game?.camera?.lookUp ?? 90;   // #132 in a run Leyla stands lower: more room ahead and above, less darkness below
     this.bgCam.setScroll(cam.worldView.x, cam.worldView.y);   // parallax follows the world camera
     this.backdrop?.update(time, dt);
     this.atmo?.update(time, dt);

@@ -362,6 +362,7 @@ export class Enemy {
     this.until = time + (k === 'lunge' ? 180 : 120);
     if (this.waves) this.scene.time.delayedCall(k === 'lunge' ? 200 : 120, () => this.alive && this.wave());
     this.scene.fx.slash(this.x + this.facing * 20, this.feet - this.h * 0.55, this.facing, (this.weapon?.range ?? 80), 0xff9a7a);
+    this.scene.sfx?.('enemy_swing', { x: this.x });   // #130
   }
   // the ambusher hits the floor: splash around it, then it fights like a charger
   landed(time, l) {
@@ -483,6 +484,7 @@ export class Enemy {
         s.fx.text(this.x, this.body.top - 10, 'Block', { color: '#8fb3c9', size: 38, rise: 26 });
         this.body.setVelocityX(dir * 90);
         this.lastSeen = time; if (this.state === 'patrol') { this.state = 'engage'; }
+        s.sfx?.('hit_block', { x: this.x });   // #130
         return 'blocked';
       }
       this.guardOpen = true; this.state = 'stagger'; this.until = time + this.C.stagger; this.stunUntil = 0;
@@ -491,6 +493,8 @@ export class Enemy {
       damage = Math.round(damage * 0.5);
     }
     // armour plates: light hits only scratch, heavy hits crack a plate (Gegner › Konter › Panzerung)
+    if (this.plates > 0) s.sfx?.(heavy ? 'hit_armor' : 'hit_metal', { x: this.x, heavy });   // #130
+    else s.sfx?.(this.d.family === 'machine' ? 'hit_metal' : 'hit_flesh', { x: this.x, heavy, crit: !!crit });
     if (this.plates > 0) {
       if (heavy) {
         this.plates--;
@@ -574,6 +578,7 @@ export class Enemy {
   die(time, dir) {
     this.state = 'dead';
     this.scene.hud?.voice?.()?.bark(this, 'die');   // #112
+    this.scene.sfx?.(this.d.family === 'machine' ? 'enemy_death_machine' : 'enemy_death', { x: this.x });   // #130
     this.body.enable = false;
     this.warn.setVisible(false); this.aim.clear(); this.bar.clear(); this.gear.clear();
     const machine = this.d.family === 'machine';

@@ -10,6 +10,7 @@ import { farmKeys, workplaceOf } from '../workers.js';
 import { brandSets } from '../brand_perks.js';
 import { faceCanvas, SIZE } from '../glitch_face.js';
 import { brandOf as glitchBrand } from '../glitchlings.js';
+import { sfxNow } from './sfx.js';   // #130
 import { achievementOf, displayed, bonusText } from '../achievements.js';
 import { modsText, weaponStats, PART_SLOTS, CHIP_STATS } from '../stations.js';
 import { qualityBonus } from '../crafting.js';
@@ -726,7 +727,7 @@ export class InventoryUI {
   pick(key, g, e) {
     remove(g, e);
     this.held = { e, from: key };
-    this.pickedAt = performance.now();
+    this.pickedAt = performance.now(); sfxNow('item_pick');
     this.tip.hidden = true;
     this.changed(key);
   }
@@ -767,7 +768,7 @@ export class InventoryUI {
     if (!this.allows(key, h.e)) return;
     const res = drop(this.D, g, h.e, x, y);
     if (!res.ok) { this.host.notify?.('Passt da nicht hin'); return; }
-    this.held = res.held ? { e: res.held, from: key } : null;
+    this.held = res.held ? { e: res.held, from: key } : null; sfxNow('item_place');
     this.changed(key);
     this.moodAfter(key, h.e);
   }
@@ -824,7 +825,7 @@ export class InventoryUI {
       this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingelagert` : 'Nichts Passendes im Rucksack', n ? 'good' : 'warn'); return this.changed(this.other.key);
     }
     const n = moveAll(this.D, this.inv.grids.backpack, this.other.grid); this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingelagert` : 'Nichts passt mehr rein', n ? 'good' : 'warn'); this.changed(this.other.key); }
-  takeAll() { const n = moveAll(this.D, this.other.grid, this.inv.grids.backpack); this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingepackt` : 'Rucksack ist voll', n ? 'good' : 'warn'); this.changed(this.other.key); }
+  takeAll() { const n = moveAll(this.D, this.other.grid, this.inv.grids.backpack); if (n) sfxNow('loot_pickup'); this.host.notify?.(n ? `${n} ${n === 1 ? 'Sache' : 'Sachen'} eingepackt` : 'Rucksack ist voll', n ? 'good' : 'warn'); this.changed(this.other.key); }
 
   // ---------- slots ----------
   slotClick(slot) {
@@ -865,7 +866,7 @@ export class InventoryUI {
       const prev = inv.backpack;
       inv.backpack = e.id; inv.grids.backpack = test;
       this.held = prev ? { e: { a: 'backpacks', id: prev, n: 1, r: 0 }, from: 'backpack' } : null;
-      this.host.equipChanged?.('backpack');
+      this.host.equipChanged?.('backpack'); if (!quiet) sfxNow('item_equip');
       return true;
     }
     if (e.a !== 'weapons' || (D.weapons?.[e.id]?.kind || 'melee') !== slot) return say(`Hier gehört eine ${SLOT_NAMES[slot]}-Waffe hin`);
@@ -878,7 +879,7 @@ export class InventoryUI {
     if (slot === 'cyberdeck') { const lost = fitDeck(D, inv); for (const x of lost) addEntry(D, inv.grids[DECK], x, x.n); }
     inv.slotMods ??= {}; if (e.mods) inv.slotMods[slot] = { ...e.mods }; else delete inv.slotMods[slot];
     this.held = prev ? { e: { a: 'weapons', id: prev, n: 1, r: 0, ...(prevMods ? { mods: prevMods } : {}) }, from: slot } : null;
-    this.host.equipChanged?.(slot);
+    this.host.equipChanged?.(slot); if (!quiet) sfxNow('item_equip');
     return true;
   }
   // head, armor, implants (camp only, strain limit), AvA's parts
@@ -894,6 +895,7 @@ export class InventoryUI {
     if (prev && rest > 0) addEntry(D, this.inv.grids.backpack, e, rest);
     this.host.gearChanged?.();
     if (!quiet) {
+      sfxNow('item_equip');
       const before = prev ? gearScore(D.items?.[prev]?.stats) : 0, after = gearScore(t.stats);
       this.react(DRONE_WEAR.includes(w) ? 'dronePart' : after < before ? 'gearWorse' : 'gearBetter');
     }

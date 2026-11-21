@@ -34,9 +34,17 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
   #flash { position: fixed; inset: 0; z-index: 4; background: #fff; opacity: 0; pointer-events: none; transition: opacity .35s; }
   .hint { position: fixed; right: 1.5vw; bottom: 1.2vh; z-index: 3; font: 16px VT323, monospace; color: #e4d2aa; text-shadow: 0 2px 0 #060608; text-align: right; opacity: .8; }
   .hint a { color: #ffd541; }
+  /* #135 (Daniel: „Das Hauptmenü sollte vollständig laden, bis es gerendert wird und nicht in Stücken“): one veil until scene, cockpit,
+     stickers and fonts stand, then it fades; after 12 s it lifts anyway (stability before speed) */
+  #boot { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; background: #0d0a12; color: #7ff6ff; font: 28px VT323, monospace; letter-spacing: 3px; transition: opacity .5s ease; }
+  #boot i { opacity: .8; animation: bootPulse 1.2s ease-in-out infinite alternate; font-style: normal; }
+  #boot.off { opacity: 0; pointer-events: none; }
+  @keyframes bootPulse { from { opacity: .35; } to { opacity: .9; } }
 </style>
 </head>
 <body>
+<div id="boot" role="status" aria-live="polite"><i>Motor startet …</i></div>
+<script>setTimeout(() => { const b = document.getElementById('boot'); if (b) { b.classList.add('off'); setTimeout(() => b.remove(), 600); } }, 12000);   // #135 whatever happens: the menu shows after 12 s</script>
 <canvas id="scene" aria-label="Die Straße durch die Wastelands, gesehen aus dem Van"></canvas>
 <h1 class="logo"><img src="projects/nomadgirl/assets/ui/logo/logo.png" alt="NomadGirl"></h1>
 <canvas id="cockpit" aria-hidden="true"></canvas>
@@ -228,8 +236,9 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
 
   // ---------- start ----------
   let splash = null;
-  startSplash(document.getElementById('scene'), { drive: true, runner: false, nowPlaying: false, onGround: billboard, droneBrain, onDrone,
-    data: { horizon: 44, ground: ROAD, curve: { pan: 7 } } }).then(x => { splash = x; window.splash = x; });
+  const bootDone = (() => { let done = false; const el = document.getElementById('boot'); const lift = () => { if (done) return; done = true; el?.classList.add('off'); setTimeout(() => el?.remove(), 600); window.bootReady = true; }; return lift; })();
+  const splashReady = startSplash(document.getElementById('scene'), { drive: true, runner: false, nowPlaying: false, onGround: billboard, droneBrain, onDrone,
+    data: { horizon: 44, ground: ROAD, curve: { pan: 7 } } }).then(x => { splash = x; window.splash = x; }).catch(e => console.warn('Szene', e));
   // stickers: reached achievements from the savegame (online, else this browser); ?stickers=all shows every one
   const all = new URLSearchParams(location.search).get('stickers') === 'all';
   let done = {};
@@ -242,6 +251,8 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
     const sw = Math.max(200, Math.min(360, L.w * k * 1.1));   // #126 the slot's preview stands above the radio
     shotEl.style.cssText = `left:${ox + (L.x + L.w / 2) * k - sw / 2}px;bottom:${innerHeight - (oy + L.y * k) + 10}px;width:${sw}px;font-size:${Math.round(sw / 15)}px`; };
   cockpit = await startCockpit(document.getElementById('cockpit'), { cfg: CK, A, base: BASE, stickers, steerValue: () => splash?.curve?.() ?? 0, speed: () => 1, onFrame: placeLcd });
+  // everything stands: the first frames are drawn behind the veil, then it lifts in one piece
+  Promise.all([splashReady, document.fonts?.ready]).then(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))).then(bootDone, bootDone);
 
   const keys = new Set();
   addEventListener('keyup', e => keys.delete(e.key));

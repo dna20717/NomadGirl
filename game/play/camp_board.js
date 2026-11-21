@@ -111,7 +111,7 @@ export class CampBoard {
   }
   claimOne(id) {
     const D = this.D, save = this.box.save, s = this.scene, q = D.quests[id], r = claim(D, save, id), c = (this.companions || []).find(x => x.id === q.giver);
-    if (r.ok) { if (c) this.say(c, r.line || 'Danke, Leyla.'); s.hud.toast(`Erledigt: ${q.name}`, r.got.join(' · '), 'good'); }
+    if (r.ok) { s.sfx?.('jingle_quest'); if (c) this.say(c, r.line || 'Danke, Leyla.'); s.hud.toast(`Erledigt: ${q.name}`, r.got.join(' · '), 'good'); }
     this.jobsChanged();
     return r;
   }

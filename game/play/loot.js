@@ -141,7 +141,7 @@ export class Loot {
         e.n = left; moved = true;
         if (!left) p.grid.items.splice(p.grid.items.indexOf(e), 1);
       }
-      if (moved) { s.invChanged('floor'); this.sync(); }
+      if (moved) { s.sfx?.('loot_pickup', { x: l.x }); s.invChanged('floor'); this.sync(); }
     }
   }
   state() { return this.piles.map(p => ({ x: Math.round(p.x), items: p.grid.items.map(e => `${e.id}×${e.n}`) })); }

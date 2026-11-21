@@ -166,6 +166,7 @@ export class LeylaCombat {
     if (this.reloading || this.mag >= this.magSize || this.ammo <= 0) return;
     const dur = this.scene.weapon('ranged')?.reloadTime ?? 1400, done = Math.min(dur - 1, this.reloadSaved || 0);
     this.reloading = { at: time - done, dur }; this.reloadSaved = 0;
+    if (!done) this.scene.sfx?.('reload', { x: this.x });   // #130 (not when it carries on)
   }
   updateReload(time) {
     if (!this.reloading && this.reloadSaved > 0 && this.alive && !this.attack && !this.charging && !this.hitAnim && this.state === 'normal') this.startReload(time);   // carry on

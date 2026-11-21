@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Code → Ava: #130–#135 fertig (Ton-Platzhalter + Liste, POI-Gelände ohne PixelLab + Architektur-Pilot, Erde statt Schwarz, Glitches, Hauptmenü in einem Stück, Konzepte Info-Center + Gegner). #129 Info-Center wird gebaut, #136 Räume umbauen wartet auf Daniels Abnahme des Piloten.
 - 21.11. Code → Ava: Polish-Runde angelegt (#129–#135, Daniel 21.11., AFK: „du kannst also direkt diesen Plan nehmen und umsetzen. Weiteres Polish bitte auch direkt mitdenken und als Sub-Task in die Liste mit aufnehmen“), läuft der Reihe nach, Konzepte parallel.
 - 21.11. Code → Ava: #128 fertig: Brett als Deko, Camp breiter, leere Texte und Tooltips aufgeräumt; **Polish-Plan** mit Top 8 in `docs/backlog.md` › E (Ton im Kampf, POI-Gelände, Einblendungen, erster Abend, Run-Bildausschnitt, Ranking-Bonus + #109, Gegner/Bosse, Ladezeit).
 - 20.11. Code → Ava: #127 **Ebene + Schwarzes Brett** fertig (PixelLab 25, übrig 1.965,6).
@@ -261,6 +262,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 ## Tickets
 
+### #136 Räume wie echte Gebäude (alle POIs)
+- **Status:** offen · angelegt 21.11. von Code (aus #131, Pilot `lager`)
+- **Auftrag:** die übrigen Räume nach den Faustregeln in `docs/features/pois.md` › Architektur umbauen (Geschosse 5–6 Kacheln, Hallen mit Galerie), Prüfliste `node tools/rooms_audit.mjs`. Vorher mit Daniel: Pilot `lager` abnehmen, dann POI für POI.
+- **Rückfragen:**
+- **Ergebnis:**
+
 ### #129 Info-Center: Einblendungen ordnen + Spieler-Log
 - **Status:** offen · angelegt 21.11. von Code (Daniel: „Einblendungen ordnen: lass uns ein Information Center konzipieren, um das auch in Zukunft zu vermeiden. In diesem Rahmen können wir auch ein Log für den Spieler aufbereiten, in dem er alle Schritte nachvollziehen kann und ggf. historische Meldungen anschauen kann.“)
 - **Auftrag:** Konzept in `docs/concepts/info_center.md` (baut auf #070 Meldungs-Kanal + Logbuch auf), dann Kern bauen: feste Bühne mit Plätzen und Vorrang, nichts liegt übereinander; Log-Fenster mit Verlauf und Filtern.
@@ -268,40 +275,40 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #130 Ton: stimmungsvolle Platzhalter + Ton-Liste
-- **Status:** offen · angelegt 21.11. von Code (Daniel: „Ton bitte mit stimmungsvollen Platzhaltern besetzen und eine Liste erzeugen, in der Art des Tones und Status (Code vs. produziert) aufgelistet ist, die wir dann abarbeiten können.“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Ton bitte mit stimmungsvollen Platzhaltern besetzen und eine Liste erzeugen, in der Art des Tones und Status (Code vs. produziert) aufgelistet ist, die wir dann abarbeiten können.“)
 - **Auftrag:** Fehlende Töne (Treffer, Whoosh, Schritte, Sprung, Landung, Kiste, Beute, Schaden, k.o., UI) als Code-Platzhalter; Liste `docs/sounds.md`.
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code, per Helfer) 55 Ton-Ereignisse als stimmungsvolle Platzhalter aus Code (`game/play/sfx.js`, Web Audio), Werkstatt-Bereich **Ton-Ereignisse** (Art, Rezept, Produziert, Lautstärke, Tonhöhe, Schwankung, Abklingzeit, Untergrund), Spiel › Effekte; Liste zum Abarbeiten `docs/sounds.md` (Art, Auslöser, Status Code/produziert, Priorität). Produzierten Ton einsetzen: Asset Art Ton + Ton-Ereignis › Produziert, kein Code. Tests `test/sfx.test.js` (6), `tools/sfx_test.mjs` (10). **Bitte testen:** Run mit Ton: Hiebe, Treffer, Schritte je Untergrund, Sprung/Landung, Kisten, Menüs.
 
 ### #131 POI-Gelände fein + Architektur wie echte Gebäude
-- **Status:** offen · angelegt 21.11. von Code (Daniel: „POI-Gelände: optimiere und überarbeite es bitte so, dass es stilistisch zum Rest passt, ohne Tokens sinnlos zu verbrennen. Schau auch noch mal die Architektur der POIs an, damit sie wirklich wie echte verlassene Gebäude (für Gaming optimiert, was Höhen und Breiten angeht) aussehen.“ Grafiken: „strikt orthogonale Perspektive und Maßstab“.)
+- **Status:** fertig (21.11., Teil 1; Umbau aller Räume → #136) · angelegt 21.11. von Code (Daniel: „POI-Gelände: optimiere und überarbeite es bitte so, dass es stilistisch zum Rest passt, ohne Tokens sinnlos zu verbrennen. Schau auch noch mal die Architektur der POIs an, damit sie wirklich wie echte verlassene Gebäude (für Gaming optimiert, was Höhen und Breiten angeht) aussehen.“ Grafiken: „strikt orthogonale Perspektive und Maßstab“.)
 - **Auftrag:** Kachel-Sets der POIs sparsam per PixelLab verfeinern, Raum-Architektur (Geschosse, Breiten, Fassaden) prüfen.
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Wüste aus dem feinen Camp-Boden (`tools/terrain_polish.py`, **0 PixelLab**), Beton-Linoleum abgewetzt, Architektur-Faustregeln in `docs/features/pois.md`, Prüfliste `tools/rooms_audit.mjs` (lichte Höhe meist 9–15 statt 5–6 Kacheln), Pilot `lager` zweistöckig. ⚠️ vorläufig: Werkstatthalle bleibt hoch (Industriehalle). **Bitte testen:** Mile 7: Vorplatz (Sandstein), Verkaufsraum (Boden), Lager (zwei Geschosse).
 
 ### #132 Run-Bildausschnitt global
-- **Status:** offen · angelegt 21.11. von Code (Daniel: „Ausbessern bitte, aber global“ (unteres Drittel im Run schwarz).)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Ausbessern bitte, aber global“ (unteres Drittel im Run schwarz).)
 - **Auftrag:** In allen POIs unter dem Boden Erde/Tiefe statt Schwarz, Kamera so, dass der Run nicht kleiner wirkt.
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Erde unter der Oberfläche in der Dunkelheit (Schichten, Steine, nach unten schwarz), im Run Blick nach oben 150 px + Himmel über dem Level; alles unter Spiel › Nebel/Kamera einstellbar. ⚠️ vorläufig: das Dunkel bleibt (#043 „Masse schwarz“), es bekommt nur Erde.
 
 ### #133 Gegner-Baukasten: Konzept
-- **Status:** offen · angelegt 21.11. von Code (Daniel: „Bitte überlege, was wir noch an Gegnern und Verhalten brauchen könnten, das man über einen effizienten Baukasten und Upgrades für existierende Baukästen abbilden kann.“)
+- **Status:** fertig (21.11., Konzept) · angelegt 21.11. von Code (Daniel: „Bitte überlege, was wir noch an Gegnern und Verhalten brauchen könnten, das man über einen effizienten Baukasten und Upgrades für existierende Baukästen abbilden kann.“)
 - **Auftrag:** Konzept `docs/concepts/enemy_kit.md`.
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code, per Helfer) `docs/concepts/enemy_kit.md`: Vorlage + Bausteine (`traits`), Gruppenrollen, neue Bausteine (Scharfschütze, Werfer, Sanitäter, Alarmgeber, Hund, Drohnen, Geschütz …), Elite-Zusätze `enemyMods`, Gang-Ausrüstung für alle 12 Gangs, Bosse als Phasen-Skripte (Hausmeister, Major Null), erste Scheibe fast ohne neue Grafik. Fragen an Daniel im Dokument.
 
 ### #134 Glitches beheben
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Die Glitches kannst du alle beheben.“)
+- **Status:** fertig (21.11.) (21.11.) · angelegt 21.11. von Code (Daniel: „Die Glitches kannst du alle beheben.“)
 - **Auftrag:** Kaomoji-Kästchen, Ortsnamen auf der Karte, Werte-Umbruch im Inventar, „Hier plündern“ über Buffs, Fenster übereinander, Kamera-Schwenk beim Camp-Start, Revier-Meldung „(0)“.
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Kaomoji-Kästchen (Daten + Ersatz-Spalte), Ortsnamen auf der Karte (Stadt, Staubozean, Orte, Wracks, zweite Zeile werden umgangen), Werte im Inventar ohne Umbruch, Kamera ohne Schwenk beim Start, Revier-Toast einzeilig (Ruf in der zweiten Zeile), Bau-Modus schließt offene Fenster, „Hier plündern“ ohne Durchscheinen. Übrig für #129: Toasts und Kassette über Fenstern.
 
 ### #135 Ladezeit + Hauptmenü in einem Stück
-- **Status:** offen · angelegt 21.11. von Code (Daniel: „Ladezeit: ja! … Auch das Hauptmenü sollte vollständig laden, bis es gerendert wird und nicht in Stücken wie bisher. Optimiere hier ein wenig, aber Stabilität ist nach wie vor wichtiger als eine halbe Sekunde weniger Ladezeit.“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Ladezeit: ja! … Auch das Hauptmenü sollte vollständig laden, bis es gerendert wird und nicht in Stücken wie bisher. Optimiere hier ein wenig, aber Stabilität ist nach wie vor wichtiger als eine halbe Sekunde weniger Ladezeit.“)
 - **Auftrag:** Cockpit erst zeigen, wenn alles geladen ist; Spiel lädt nach Modus; Anfragen zählen vorher/nachher.
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Hauptmenü erscheint in einem Stück (Schleier bis Szene, Cockpit, Sticker und Schriften stehen; nach 12 s in jedem Fall), Prüfung im `cockpit_test`. Messung Camp-Start lokal: ~510 Netz-Anfragen, 2–4 s. ⚠️ Versuch „Gegner erst im Run laden“ zurückgenommen: die zusätzliche Ladepause am Run-Start war ein Stabilitätsrisiko (Daniel: Stabilität vor Tempo). Atlanten → Backlog E8.
 
 ### #128 Schwarzes Brett als Deko, Camp breiter, Null-Texte, Polish-Plan
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Mach aus dem schwarzen Brett etwas, dass man wie Deko im Camp platzieren kann und mach das Camp etwas größer, damit es nicht so gestreckt ist … Schau auch mal nach, ob es viele Tooltips und Text mit NULL oder leer gibt … Insgesamt: Polish-Durchgang. Was haben wir zu tun, um das Spiel auf die nächste Ebene zu bringen?“)
