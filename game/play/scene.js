@@ -367,7 +367,7 @@ export class PlayScene extends Phaser.Scene {
     this.lostPack = null;
     this.van?.reset();
     if (this.mode === 'camp') { const G = this.box.save.ground ??= {}; this.loot = new Loot(this, G[this.box.save.location] ??= []); }
-    else this.loot = this.mode === 'run' ? new Loot(this) : null;
+    else this.loot = this.mode === 'run' || (this.mode === 'test' && this.args?.poi) ? new Loot(this) : null;   // #152 a POI test run (?poi=) drops loot too
     this.setupInventory();
     if (this.mode === 'camp') this.camp = new Camp(this, this.box, this.campGeo);
     if (this.mode === 'camp' && this.box) this.time.delayedCall(this.script ? 0 : 1400, () => this.campNews());

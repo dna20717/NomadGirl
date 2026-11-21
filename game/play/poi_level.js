@@ -316,7 +316,15 @@ export class PoiLevel {
         host.door !== undefined ? (r.won ? 'Der Schalter gehört dir' : 'Der Schalter lässt sich trotzdem umlegen') : r.won ? (r.caught ? 'Sie wohnt jetzt in deinem Deck' : 'Kein Platz im Deck, Rucksack oder Lager') : 'Sie ist in die Leitungen geflohen',
         r.won ? 'good' : 'info', 3200);
       if (host.door !== undefined) { this.drawSwitch(host); this.pull(host); }
-      else s.fx?.sparks?.(host.x, host.feet - 80, r.won ? 0x3fe0d0 : 0xe43b9a, 10);
+      else {
+        s.fx?.sparks?.(host.x, host.feet - 80, r.won ? 0x3fe0d0 : 0xe43b9a, 10);
+        // #152 (Daniel 21.11.2026: „Automaten mit besiegten Entitäten droppen Nahrungsloot“): the machine spits out what it still holds
+        const table = this.P.machineLoot ?? 'automat_beute';
+        if (r.won && table && s.data_.lootTables?.[table] && s.loot) {
+          const things = s.lootRoll ? s.lootRoll(table) : [];
+          if (things.length) { s.loot.drop(host.x + 40, host.feet, things, 60); s.hud.toast('Der Automat spuckt aus', things.map(t => `${t.n}× ${s.data_[t.a]?.[t.id]?.name || t.id}`).join(' · '), 'loot', 3600); }
+        }
+      }
     } });
   }
 

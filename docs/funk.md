@@ -284,9 +284,9 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #152 Automaten mit besiegter Entity geben Nahrung
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Automaten mit besiegten Entitäten droppen Nahrungsloot“)
+- **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Automaten mit besiegten Entitäten droppen Nahrungsloot“)
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Gewinnt Leyla das Glitch-Duell an einem Automaten, fällt Beute aus der Tabelle „Automat (besiegte Entity)“ heraus (1–3: NomadCola, Neon-Ramen, Kaffee, Dumplings, MRE, selten Bento), mit Meldung „Der Automat spuckt aus“. POIs › Markenschild › Automat nach dem Duell (eigene Tabelle je POI). POI-Testläufe (`?poi=`) haben jetzt Bodenbeute. Test `glitch_duel_test` (11). **Bitte testen:** Tankstelle, Automat mit KI anzapfen und gewinnen.
 
 ### #153 Tresor: orthogonale, richtig geile Grafik
 - **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Der Tresor braucht endlich eine orthogonale tolle Grafik. Sie muss richtig geil sein, denn das ist ja das, worauf die Spieler hinarbeiten :-)“)

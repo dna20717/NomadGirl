@@ -235,5 +235,17 @@
    {"item": "spuernase_chip", "weight": 1, "min": 1, "max": 1},
    {"item": "faerbemittel_platin", "weight": 1, "min": 1, "max": 1}
   ]
+ },
+ "automat_beute": {
+  "name": "Automat (besiegte Entity)",
+  "rolls": [1, 3],
+  "entries": [
+   {"item": "nomadcola", "weight": 6, "min": 1, "max": 2},
+   {"item": "neon_ramen", "weight": 3, "min": 1, "max": 1},
+   {"item": "kaffee", "weight": 3, "min": 1, "max": 1},
+   {"item": "dumplings", "weight": 2, "min": 1, "max": 1},
+   {"item": "mre_ration", "weight": 2, "min": 1, "max": 1},
+   {"item": "bento_deluxe", "weight": 1, "min": 1, "max": 1}
+  ]
  }
 }

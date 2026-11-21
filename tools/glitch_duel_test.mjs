@@ -48,6 +48,14 @@ await page.keyboard.press('e'); await page.waitForTimeout(200);
 r = await ev(() => { const sc = game.scene.getScene('play'), sw = sc.level.switches[0]; nomad.step(60); return { open: sc.hud.duel.isOpen, on: sw.on, door: sw.door?.open, dueled: sw.dueled }; });
 check('Nach dem Duell (gewonnen oder verloren) ist der Schalter umgelegt, die Tür offen', !r.open && r.on && r.dueled && r.door !== false, r);
 
+// #152 a machine whose Entity was beaten spits out food
+r = await ev(() => { const sc = game.scene.getScene('play'), L = sc.level, h = { ...L.hosts()[0], done: false, dueled: false }, D = sc.hud.duel, open = D.open;
+  const n0 = sc.loot.piles.reduce((k, p) => k + p.grid.items.length, 0);
+  D.open = o => o.onDone({ won: true, caught: false }); L.duelAt(h, 'Automat', 'test152'); D.open = open;
+  const items = sc.loot.piles.flatMap(p => Math.abs(p.x - h.x) < 200 ? p.grid.items.map(e => sc.data_.items?.[e.id]?.category) : []);
+  return { n: sc.loot.piles.reduce((k, p) => k + p.grid.items.length, 0) - n0, cats: items }; });
+check('Automat nach gewonnenem Duell: Essen und NomadCola fallen heraus (#152)', r.n >= 1 && r.cats.every(c => c === 'food' || c === 'consumable'), r);
+
 await browser.close();
 for (const o of ok) console.log('✔', o);
 for (const e of errors) console.log('✖', e);   // ✖: tools/test_all.mjs shows these lines when the test is red
