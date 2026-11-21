@@ -37,6 +37,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 21.11. Code → Ava: **Daniels Abnahme 21.11. abends** (Artefakt „NomadGirl Abnahme 21.11.“): Räume, Gegner, Cockpit, Werbung, Ranking, Weste passen; Rang-Werte bleiben. Neu: Stützen/Gerüste eigene Grafik, Gelände „Perspektive nicht orthogonal genug, sanftere Übergänge zwischen den Schichten“, Markenschild passend zum Ort, Ergeben für alle Plünderer mit kleiner Chance, Sirene zerschießbar (Hacken später), Verstärkung aus Türen, Gang-Ausrüstung bauen, Granaten einzeln (je 60 s), alte Generatoren löschen, Parkour-Testraum ohne schwebende Plattformen, Rutsch-Durchgang zurück, Höhlen-Set ja, als Nächstes Info-Center-Bühne mit Zonen. Unklar: Granate und Logbuch „Ändern“ ohne Notiz. Dazu neue Punkte: Leiter-Rutschen, Vordergrund in POIs weg, Duell-Ton, Automaten-Beute, Tresor-Grafik. Tickets #149–#157.
 - 21.11. Code → Ava: Alle Karten vom Morgen umgesetzt (#129 Logbuch + Meldungen, #136 alle 110 Räume, #138 Gelände, #139 Gegner-Scheibe, #140 Granate mit Wurfarm, #141 Ranking-Bonus, #142 Cockpit-Kram, #143 Billboard-Werbung; dazu Plattenträger-Symbol). Abnahme + 11 neue Fragen als Karten im Artefakt „NomadGirl Abnahme 21.11.“ (https://claude.ai/artifact/G3kJRQ5xA6WZRo3p5joRnF), Antworten in dessen Datenbank (Sammlung `answers`). PixelLab Sitzung 130, übrig 1.885,6.
 - 21.11. Code → Ava: **Daniels Entscheidungen 21.11.** (21 Karten, Artefakt „NomadGirl Entscheidungen 21.11.“): #136 alle Räume umbauen, Hallen bleiben hoch mit Galerien · Gelände (#131) mit PixelLab neu malen (Wüste + Linoleum); **keine schwebenden Plattformen draußen**, dort immer ein Hintergrund (zur Not Kachel-Set „Höhle“) · Erde unter dem Boden bleibt · große Ansage oben rechts als großer Toast · Logbuch als zweiter Reiter im Questlog, beginnt je Durchgang leer · Bau-Modus: Kassette aus, Titel ins Logbuch · Bau-Meldungen nur Erfolge · Werkstatt-Licht bleibt im Container · Brett verkaufbar · Cockpit-Kram setzt Ava, **freigeschaltet über Ereignisse im Spiel** (kleine Meldung, kleiner als Achievements) · Billboard-Werbung als Ticket · erste Gegner-Scheibe Visier, Brandsatz, Flickerin, Sirene · **niemals Hunde als Gegner** (Drohnen gern) · Ergeben ja · **Granaten für Leyla jetzt**: Skill mit Ladungen + Abklingzeit (z. B. 3, dann 180 s), eigene Animationen, die mit Gehen/Rennen/Springen zusammenpassen · Gang-Ausrüstung: nichts bauen, erst klären, was das ist · Ranking: Δ-Bonus **und** Bonus-Kiste · Laden im Run zählt als k.o. · Ladezeit so lassen · als Nächstes: Info-Center fertig **und** Räume umbauen. Neue Tickets #138–#143.
 - 21.11. Code → Ava: Daniel unterwegs am Handy: 21 Entscheidungen als Karten mit Screenshots im Artefakt „NomadGirl Entscheidungen 21.11.“ (https://claude.ai/artifact/1Y7krDtikbEx63VnMNBnQK). Antworten liegen in dessen Datenbank (Sammlung `answers`, je Karte `choice` + `note`); nächste Sitzung dort auslesen und umsetzen.
@@ -265,6 +266,51 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #149 Leiter: Rutschen endet am Leiterende
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Wenn Leyla eine Leiter runterrutscht, kann sie weiter rutschen, obwohl die Leiter zu Ende ist.“)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #150 Vordergrund-Silhouetten in POIs entfernen
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Entferne die Vordergrund-Gegenstände in den POIs“)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #151 Glitch-Duell mit Ton
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Das Entitäten-Duell braucht ein wenig Sound.“ Gilt für /duel, /mobile und das Duell im Spiel.)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #152 Automaten mit besiegter Entity geben Nahrung
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Automaten mit besiegten Entitäten droppen Nahrungsloot“)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #153 Tresor: orthogonale, richtig geile Grafik
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Der Tresor braucht endlich eine orthogonale tolle Grafik. Sie muss richtig geil sein, denn das ist ja das, worauf die Spieler hinarbeiten :-)“)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #154 Info-Center: Bühne mit Zonen
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel (Karte „Als Nächstes“ c): feste Plätze für alle Einblendungen (Konzept docs/concepts/info_center.md, Etappe 2/3).)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #155 Gegner: Ergeben für alle, Sirene zerschießbar, Verstärkung aus Türen, Gang-Ausrüstung
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniels Karten 21.11. abends: Ergeben a (alle Plünderer mit kleiner Chance), Sirene a (zerschießbar, Hacken später), Verstärkung a (aus Türen), Gang-Ausrüstung a (so bauen wie erklärt).)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #156 Granate einzeln, Gelände orthogonal mit sanften Übergängen, Höhle, Stützen, Markenschild nach Ort
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniels Karten: Granate b (einzeln, je Ladung 60 s), Gelände b („Die Perspektive ist nicht orthogonal genug, ein wenig mehr drauf achten. Außerdem brauchen die Tilesets sanftere Übergänge zwischen den Schichten“), Höhlen-Set a, Stützen/Gerüste eigene Grafik b, Markenschild b (passend zum Ort), alte Generatoren löschen a.)
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #157 Räume: Rutsch-Durchgang zurück, Parkour-Testraum ohne Schweben
+- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniels Karten: Rutsch-Durchgang a, Testraum b. Läuft im Helfer von #145 mit.)
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #144 Kachel-Schichten nach Tiefe
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Du musst die Tilesets anders verwenden. Die Schichten machen so keinen Sinn, wie du sie einsetzt“)
