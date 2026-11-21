@@ -199,6 +199,12 @@ export class Benches {
       this.refill(bench);
     } else bench.picture = img(key);
     if (def.function === 'tank' && bench.picture) bench.tank = new TankView(this, bench, bench.picture);   // the cryo tank comes alive (tank_view.js)
+    // #137 (Daniel: „Manche Effekte von Werkstätten glitchen aus den Containern raus, z. B. Aquarium“): effects stay inside the place
+    // too: their area is cut to the clip (effect()), glows and puffs get a mask in the shape of the place
+    if (Number.isFinite(C0.x0) && Number.isFinite(C0.y0)) {
+      const mg = s.make.graphics({}, false).fillStyle(0xffffff).fillRect(C0.x0, C0.y0, C0.x1 - C0.x0, C0.y1 - C0.y0);
+      this.objs.push(mg); bench.mask = mg.createGeometryMask();
+    }
     // effects whose spot was cut away stay out
     (def.fx || []).forEach((r, i) => { const [ex, ey] = at((r.x || 0) + (r.w || 1) / 2, (r.y || 0) + (r.h || 1) / 2); if (ex >= C0.x0 && ex <= C0.x1 && ey >= C0.y0 && ey <= C0.y1) bench.fx.push(this.effect(bench, r, i)); });
     if (def.stands?.length) { bench.trophies = []; this.showTrophies(bench); }
@@ -301,7 +307,9 @@ export class Benches {
   }
   // one row of "Licht & Effekte" → a little live object
   effect(bench, r, i) {
-    const k = bench.k, [x, y] = bench.at(r.x || 0, r.y || 0), w = (r.w || 1) * k, h = (r.h || 1) * k, e = { r, x, y, w, h, cx: x + w / 2, cy: y + h / 2, ph: Math.random() * 10, s: r.when && r.when !== 'always' ? (r.idle ?? 0) / 100 : 1, i };
+    const k = bench.k, [x0, y0] = bench.at(r.x || 0, r.y || 0), C = bench.clip || {};
+    // #137 the area cut to the place (a fish tank at the edge of a cut picture swims only in the part that shows)
+    const x = Math.max(x0, C.x0 ?? -Infinity), y = Math.max(y0, C.y0 ?? -Infinity), w = Math.max(1, Math.min(x0 + (r.w || 1) * k, C.x1 ?? Infinity) - x), h = Math.max(1, Math.min(y0 + (r.h || 1) * k, C.y1 ?? Infinity) - y), e = { r, x, y, w, h, cx: x + w / 2, cy: y + h / 2, ph: Math.random() * 10, s: r.when && r.when !== 'always' ? (r.idle ?? 0) / 100 : 1, i };
     const kind = r.kind;
     if (kind === 'light' || kind === 'lava' || kind === 'flame') {
       const rad = (r.size || 40) * k;
@@ -326,6 +334,7 @@ export class Benches {
       e.halos = e.dots.slice(0, 40).map(d => this.glow(d.x, d.y, '#' + d.c.toString(16).padStart(6, '0')).setDisplaySize(11 * k + 4, 11 * k + 4));
     }
     if (kind === 'shine') e.next = this.scene.time.now + rnd(500, (r.rate || 6) * 1000);
+    if (bench.mask) for (const g of [e.glow, ...(e.halos || [])]) g?.setMask(bench.mask);   // #137 every glow stays in the cut-open container
     return e;
   }
 
@@ -377,6 +386,7 @@ export class Benches {
   puff(e, b, kind) {
     const r = e.r, k = b.k, smoke = kind === 'smoke', size = (r.size || 5) * k;
     const img = this.scene.add.image(0, 0, glowKey(this.scene)).setTint(col(r.color || (smoke ? '#9a94a6' : '#ece6f2'))).setDepth(-19.91);
+    if (b.mask) img.setMask(b.mask);   // #137 steam and smoke stay under the container's ceiling
     this.puffs.push({ img, x: e.x + Math.random() * e.w, y: e.y + Math.random() * e.h, vx: rnd(-4, 4) * k, vy: -rnd(16, 28) * k * (smoke ? 0.8 : 1), wob: rnd(4, 9) * k, ph: Math.random() * 6,
       r: size * 2, a: (smoke ? 0.4 : 0.32) * Math.min(1, 0.4 + e.s), age: 0, life: rnd(1.6, 2.6) * (smoke ? 1.4 : 1) });
     if (this.puffs.length > 140) { this.puffs[0].img.destroy(); this.puffs.shift(); }

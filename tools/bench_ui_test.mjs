@@ -166,6 +166,13 @@ check('Controller: A drückt den Knopf unter dem Cursor, der Cursor startet auf 
 await ev(() => game.scene.getScene('play').hud.craft.close());
 
 check('keine Fehler in der Konsole', !errors.filter(e => !/^.+: \{/.test(e)).length, errors);
+// #137 effects stay inside their place: the Chill Area (aquarium at the left edge of its picture) in the second place of a 20' container
+await ev(() => { const s = nomad.save(); s.rig.units[1].id = 'container_20'; s.rig.units[1].workshops = [{ id: 'cryotank', at: 0 }, { id: 'chill_area', at: 1 }]; game.scene.getScene('play').goCamp({ keepPlace: true }); });
+await page.waitForTimeout(2500);
+{ const v = await ev(() => { nomad.take(); nomad.step(10); const b = game.scene.getScene('play').camp?.benches?.list?.find(x => x.id === 'chill_area'); if (!b) return { none: game.scene.getScene('play').camp?.benches?.list?.map(x => x.id), units: nomad.save().rig.units.map(u => u.id + ':' + (u.workshops || []).map(w => w.id + '@' + w.at).join(',')) }; const c = b.clip;
+    const out = b.fx.filter(e => e.x < c.x0 - 0.5 || e.y < c.y0 - 0.5 || e.x + e.w > c.x1 + 0.5 || e.y + e.h > c.y1 + 0.5).map(e => e.r.kind);
+    return { n: b.fx.length, out, masked: !!b.mask, glows: b.fx.filter(e => e.glow).every(e => !!e.glow.mask) }; });
+  check('Werkstatt-Effekte bleiben im Container (#137): Aquarium am Rand, Leuchten maskiert', v.n > 0 && !v.out.length && v.masked && v.glows, v); }
 await browser.close();
 for (const o of ok) console.log('✔ ' + o);
 for (const e of errors) console.log('✘ ' + e);
