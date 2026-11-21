@@ -4,6 +4,7 @@ import { el } from '../ui.js';
 import { WEAR_SLOTS, TROPHY_GEAR } from '../../engine/schema.js';
 import { ROOM_TAGS } from '../../engine/project.js';
 import { buildPoi, poiReady } from '../../engine/poi.js';
+import { recipeName, keyKindName } from '../../engine/cycles.js';
 import { parseRoom } from '../../engine/room.js';
 import { generateMap, neighbours } from '../worldmap.js';
 import { makeRoad, landscapeOf, ROADSIDE, BW, BH } from '../road.js';
@@ -15,8 +16,8 @@ import { characterOf, characters } from '../banter.js';
 import { faceCanvas } from '../glitch_face.js';
 import { drawMap } from '../map_render.js';
 
-const ROOM_COLORS = { '#': '#8b919c', '=': '#d4a72c', H: '#5fb4d9', o: '#e45aa8', L: '#3fe0d0', C: '#c08a4a', S: '#7ee0a0', D: '#5b8a6a', B: '#6e5a7a', Z: '#ffd27a', 1: '#ff8a5c', A: '#b0b8c4', '^': '#3fe0d0', v: '#3fe0d0', '*': '#fff2a8', '%': '#9a7ab8', $: '#8a6e9a' };
-const ROOM_LEGEND = [['#', 'Wand'], ['=', 'Plattform'], ['H', 'Leiter'], ['o', 'Seil'], ['L', 'Start'], ['x', 'Gegner'], ['C', 'Kiste'], ['S', 'Schalter'], ['D', 'Tür'], ['B', 'Brüchig'], ['%', 'Scheinwand'], ['$', 'Getarnt brüchig'], ['Z', 'Ziel'], ['^', 'Abkürzung'], ['*', 'Lampe']];
+const ROOM_COLORS = { '#': '#8b919c', '=': '#d4a72c', H: '#5fb4d9', o: '#e45aa8', L: '#3fe0d0', C: '#c08a4a', S: '#7ee0a0', D: '#5b8a6a', B: '#6e5a7a', Z: '#ffd27a', 1: '#ff8a5c', A: '#b0b8c4', '^': '#3fe0d0', v: '#3fe0d0', '*': '#fff2a8', '%': '#9a7ab8', $: '#8a6e9a', '+': '#ff9f1c', '|': '#ff4060' };
+const ROOM_LEGEND = [['#', 'Wand'], ['=', 'Plattform'], ['H', 'Leiter'], ['o', 'Seil'], ['L', 'Start'], ['x', 'Gegner'], ['C', 'Kiste'], ['S', 'Schalter'], ['D', 'Tür'], ['B', 'Brüchig'], ['%', 'Scheinwand'], ['$', 'Getarnt brüchig'], ['Z', 'Ziel'], ['^', 'Abkürzung'], ['*', 'Lampe'], ['+', 'Schlüssel'], ['|', 'Schloss']];
 // a layout as a small map (rooms and POI levels)
 function roomMap(r, maxW = 300) {
   const px = Math.max(2, Math.min(8, Math.floor(maxW / Math.max(1, r.w))));
@@ -29,6 +30,52 @@ function roomMap(r, maxW = 300) {
     else if (t === 'H') g.fillRect(x2 * px + px / 4, y * px, px / 2, px);
     else g.fillRect(x2 * px, y * px, px, px);
   }
+  return c;
+}
+// #168 the cycle graph of a welded level as a small diagram: main slots in a row (start cyan, Wow magenta, Atempause green, goal gold),
+// under them one band per circle in its recipe's colour, keys and rewards above their host, the way back as an arc from the goal
+const RECIPE_COLORS = { lockKey: '#ffd27a', hiddenShortcut: '#9a7ab8', oneWayDown: '#5fb4d9', doublePath: '#7ee0a0', dangerReward: '#ff6b6b', changedReturn: '#e45aa8' };
+function graphMap(L, R, width = 320) {
+  const G = L.graph, n = G?.slots?.length || 0, step = n > 1 ? Math.min(44, (width - 40) / (n - 1)) : 0, W = Math.max(width, 40 + step * (n - 1)), H = 150;
+  const c = el('canvas', { class: 'ng-graphMap', width: W * 2, height: H * 2, style: `width:${W}px;height:${H}px;display:block;margin:8px 0;background:#0d0a12;border-radius:6px` }), g = c.getContext('2d');
+  if (!n) return c;
+  g.scale(2, 2);
+  const X = i => 20 + i * step, Y = 62, col = sl => ({ start: '#3fe0d0', goal: '#ffd27a', wow: '#e45aa8' }[sl.role] || (L.rooms.find(r => r.band === 'main' && r.id === sl.room)?.rest ? '#7ee0a0' : '#8b919c'));
+  // circles: bands under the slots
+  G.circles.forEach((ci, k) => {
+    const x0 = X(ci.from) - 9, x1 = X(ci.to) + 9, y = Y + 16 + k % 2 * 6;
+    g.strokeStyle = RECIPE_COLORS[ci.recipe] || '#ccc'; g.lineWidth = 3; g.beginPath(); g.moveTo(x0, y - 6); g.lineTo(x0, y); g.lineTo(x1, y); g.lineTo(x1, y - 6); g.stroke();
+    g.fillStyle = RECIPE_COLORS[ci.recipe] || '#ccc'; g.font = '11px Inter, sans-serif'; g.fillText(`${k + 1} ${ci.name}${ci.fallback ? ' ⚠' : ''}`, x0, y + 13);
+  });
+  // the path between slots: locked = a bar, one-way = an arrow down
+  for (const e of G.edges.filter(e => typeof e.from === 'number' && e.to === e.from + 1)) {
+    g.strokeStyle = '#4a5462'; g.lineWidth = 2; g.setLineDash([]); g.beginPath(); g.moveTo(X(e.from) + 7, Y); g.lineTo(X(e.to) - 7, Y); g.stroke();
+    const mx = (X(e.from) + X(e.to)) / 2;
+    if (e.kind === 'locked') { g.fillStyle = '#ffd27a'; g.fillRect(mx - 3, Y - 9, 6, 18); }
+    if (e.kind === 'oneway') { g.fillStyle = '#5fb4d9'; g.beginPath(); g.moveTo(mx - 6, Y - 6); g.lineTo(mx + 6, Y - 6); g.lineTo(mx, Y + 6); g.fill(); }
+  }
+  // the way back of the outer circle: an arc over everything
+  const back = G.edges.find(e => e.route);
+  if (back && n > 1) {
+    const kind = back.kind, x0 = X(0), x1 = X(n - 1);
+    g.strokeStyle = { gated: '#e45aa8', hidden: '#9a7ab8', oneway: '#5fb4d9', open: '#7ee0a0', danger: '#ff6b6b' }[kind] || '#ccc'; g.lineWidth = 2;
+    g.setLineDash(kind === 'hidden' ? [2, 4] : kind === 'gated' ? [6, 3] : []);
+    g.beginPath(); g.moveTo(x1, Y - 8); g.bezierCurveTo(x1, Y - 52, x0, Y - 52, x0, Y - 8); g.stroke(); g.setLineDash([]);
+    g.fillStyle = g.strokeStyle; g.beginPath(); g.moveTo(x0 - 5, Y - 16); g.lineTo(x0 + 5, Y - 16); g.lineTo(x0, Y - 8); g.fill();
+    g.font = '10px Inter, sans-serif'; g.fillText({ gated: 'Rückweg: Tür von der anderen Seite', hidden: 'Rückweg: versteckt', oneway: 'Rückweg: Einbahn hinunter', open: 'Rückweg: offen', danger: 'Rückweg: Gefahr + Kiste' }[kind] || '', (x0 + x1) / 2 - 60, Y - 42);
+  }
+  // keys and rewards over their host
+  for (const x of G.extras) {
+    const hx = X(x.host), y = Y - 26;
+    g.strokeStyle = '#6d758d'; g.setLineDash([2, 2]); g.beginPath(); g.moveTo(hx, Y - 8); g.lineTo(hx, y + 5); g.stroke(); g.setLineDash([]);
+    if (x.role === 'key') { g.strokeStyle = '#ffd27a'; g.lineWidth = 2; g.beginPath(); g.arc(hx - 4, y, 4, 0, 7); g.stroke(); g.fillStyle = '#ffd27a'; g.fillRect(hx, y - 1, 9, 3); }
+    else { g.fillStyle = '#ff6b6b'; g.beginPath(); for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5 - Math.PI / 2, r = i % 2 ? 3 : 7; g.lineTo(hx + Math.cos(a) * r, y + Math.sin(a) * r); } g.fill(); }
+  }
+  // slots
+  G.slots.forEach((sl, i) => {
+    g.fillStyle = col(sl); g.beginPath(); g.arc(X(i), Y, 7, 0, 7); g.fill();
+    g.fillStyle = '#0d0a12'; g.font = 'bold 9px Inter, sans-serif'; g.textAlign = 'center'; g.fillText(String(i + 1), X(i), Y + 3); g.textAlign = 'left';
+  });
   return c;
 }
 const roomLegend = () => el('div', { class: 'ng-legend' }, ...ROOM_LEGEND.map(([k, n]) => el('span', {}, el('i', { style: `background:${ROOM_COLORS[k] || '#e5484d'}` }), n)));
@@ -178,11 +225,14 @@ export const SUMMARY = {
     let seed = x.seed || 1;
     const draw = () => {
       const L = buildPoi(w.p.data, id, seed), r = parseRoom(L.def), main = L.rooms.filter(o => o.band === 'main').map(o => R[o.id]?.name || o.id);
-      box.replaceChildren(roomMap(r, 320), roomLegend(), facts([
+      const G = L.graph, C = L.cycles || {}, nm = sl => R[sl]?.name || sl;
+      box.replaceChildren(roomMap(r, 320), roomLegend(), el('b', { style: 'display:block;margin-top:10px' }, `Zyklus-Graph · Seed ${seed}`), graphMap(L, R, 320),
+        facts((G?.circles || []).map(ci => [`Kreis ${ci.i + 1}${ci.outer ? ' (außen)' : ''}`, `${ci.name}: Räume ${ci.from + 1}–${ci.to + 1}${ci.key ? ` · ${ci.key.name} (${keyKindName(ci.key.kind)}) in ${C.keys?.find(k => k.circle === ci.i) ? `${nm(L.rooms.find(o => { const k = C.keys.find(q => q.circle === ci.i); return k.x >= o.x && k.x < o.x + o.w && k.y >= o.y && k.y < o.y + o.h; })?.id)}` : '–'} → ${ci.key.lockName} vor ${nm(G.slots[ci.lockSlot]?.room)}` : ''}${ci.host != null && !ci.key ? ` · Seitenraum an ${nm(G.slots[ci.host]?.room)}` : ''}${ci.drop != null ? ` · Sprung in ${nm(G.slots[ci.drop]?.room)}` : ''}${ci.fallback ? ` · ⚠️ ${ci.fallback}` : ''}`])),
+        facts([
         ['Hauptweg', main.join(' → ')],
         ['Abzweige', L.rooms.filter(o => o.band === 'branch').map(o => R[o.id]?.name || o.id).join(', ') || 'keine'],
         ['Aufbau', L.stack === 'tower' ? 'Turm: vom Eingang nach oben' : L.stack === 'deep' ? 'Tiefe: vom Eingang nach unten' : 'Nebeneinander'],
-        ['Abkürzung', !L.shortcut ? 'keine' : L.shortcut.kind === 'shaft' ? 'Schacht mit Leiter neben dem Stapel, Tür unten' : 'Tunnel vom Ausgang zum Eingang'],
+        ['Abkürzung', !L.shortcut ? 'keine' : (L.shortcut.kind === 'shaft' ? (L.shortcut.oneWay ? 'Schacht ohne Leiter neben dem Stapel (Einbahn), Tür unten' : `Schacht mit Leiter neben dem Stapel${L.shortcut.door ? ', Tür unten' : ', offen'}`) : `Tunnel vom Ausgang zum Eingang${L.shortcut.oneWay ? ', hinein nur von oben (Bodenplatte)' : L.shortcut.door ? ', Tür am Eingang mit Schalter dahinter' : ''}`) + (L.shortcut.hidden ? ', Anfang versteckt' : '') + (L.shortcut.danger ? ', mit Gegnern und Kiste' : '')],
         ['Kisten · Secrets · Gegner', `${r.marks.C.length} · ${new Set([...r.marks.B, ...r.marks['%'], ...r.marks.$].map(([bx]) => bx)).size} · ${r.spawns.length}`],
         ['Größe', `${r.w} × ${r.h} Kacheln · Seed ${seed}`],
         ...L.problems.map(t => ['Hinweis', t])]),
