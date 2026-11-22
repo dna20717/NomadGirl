@@ -9083,5 +9083,301 @@
   "source": "KI (PixelLab, create_1_direction_object, AAP-64)",
   "date": "2026-11-22",
   "description": "#176: Feuerball, der Code bläht ihn beim Knall auf und blendet ihn aus (Granaten, auch der Werfer)"
+ },
+ "door_bulkhead_front_broken": {
+  "name": "Tür · Schott · frontal zerstört",
+  "kind": "image",
+  "file": "assets/pois/doors/bulkhead_front_broken.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, zerstört. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_bulkhead_front_closed": {
+  "name": "Tür · Schott · frontal zu",
+  "kind": "image",
+  "file": "assets/pois/doors/bulkhead_front_closed.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, zu. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_bulkhead_front_open": {
+  "name": "Tür · Schott · frontal offen",
+  "kind": "image",
+  "file": "assets/pois/doors/bulkhead_front_open.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, offen. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_bulkhead_side_broken": {
+  "name": "Tür · Schott · Profil zerstört",
+  "kind": "image",
+  "file": "assets/pois/doors/bulkhead_side_broken.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Durchgangstür im Profil (in der Wand, Leyla läuft hindurch), zerstört. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_bulkhead_side_closed": {
+  "name": "Tür · Schott · Profil zu",
+  "kind": "image",
+  "file": "assets/pois/doors/bulkhead_side_closed.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Durchgangstür im Profil (in der Wand, Leyla läuft hindurch), zu. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_glass_front_broken": {
+  "name": "Tür · Glas-Schiebetür · frontal zerstört",
+  "kind": "image",
+  "file": "assets/pois/doors/glass_front_broken.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, zerstört. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_glass_front_closed": {
+  "name": "Tür · Glas-Schiebetür · frontal zu",
+  "kind": "image",
+  "file": "assets/pois/doors/glass_front_closed.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, zu. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_glass_front_open": {
+  "name": "Tür · Glas-Schiebetür · frontal offen",
+  "kind": "image",
+  "file": "assets/pois/doors/glass_front_open.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, offen. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_glass_side_broken": {
+  "name": "Tür · Glas-Schiebetür · Profil zerstört",
+  "kind": "image",
+  "file": "assets/pois/doors/glass_side_broken.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Durchgangstür im Profil (in der Wand, Leyla läuft hindurch), zerstört. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_glass_side_closed": {
+  "name": "Tür · Glas-Schiebetür · Profil zu",
+  "kind": "image",
+  "file": "assets/pois/doors/glass_side_closed.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Durchgangstür im Profil (in der Wand, Leyla läuft hindurch), zu. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_grate_front_broken": {
+  "name": "Tür · Gitter · frontal zerstört",
+  "kind": "image",
+  "file": "assets/pois/doors/grate_front_broken.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, zerstört. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_grate_front_closed": {
+  "name": "Tür · Gitter · frontal zu",
+  "kind": "image",
+  "file": "assets/pois/doors/grate_front_closed.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, zu. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_grate_front_open": {
+  "name": "Tür · Gitter · frontal offen",
+  "kind": "image",
+  "file": "assets/pois/doors/grate_front_open.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, offen. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_grate_side_broken": {
+  "name": "Tür · Gitter · Profil zerstört",
+  "kind": "image",
+  "file": "assets/pois/doors/grate_side_broken.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Durchgangstür im Profil (in der Wand, Leyla läuft hindurch), zerstört. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_grate_side_closed": {
+  "name": "Tür · Gitter · Profil zu",
+  "kind": "image",
+  "file": "assets/pois/doors/grate_side_closed.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Durchgangstür im Profil (in der Wand, Leyla läuft hindurch), zu. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_shutter_front_broken": {
+  "name": "Tür · Rolltor · frontal zerstört",
+  "kind": "image",
+  "file": "assets/pois/doors/shutter_front_broken.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, zerstört. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_shutter_front_closed": {
+  "name": "Tür · Rolltor · frontal zu",
+  "kind": "image",
+  "file": "assets/pois/doors/shutter_front_closed.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, zu. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_shutter_front_open": {
+  "name": "Tür · Rolltor · frontal offen",
+  "kind": "image",
+  "file": "assets/pois/doors/shutter_front_open.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, offen. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_shutter_side_broken": {
+  "name": "Tür · Rolltor · Profil zerstört",
+  "kind": "image",
+  "file": "assets/pois/doors/shutter_side_broken.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Durchgangstür im Profil (in der Wand, Leyla läuft hindurch), zerstört. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_shutter_side_closed": {
+  "name": "Tür · Rolltor · Profil zu",
+  "kind": "image",
+  "file": "assets/pois/doors/shutter_side_closed.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Durchgangstür im Profil (in der Wand, Leyla läuft hindurch), zu. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_steel_front_broken": {
+  "name": "Tür · Stahl · frontal zerstört",
+  "kind": "image",
+  "file": "assets/pois/doors/steel_front_broken.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, zerstört. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_steel_front_chained": {
+  "name": "Tür · Stahl · frontal mit Kette",
+  "kind": "image",
+  "file": "assets/pois/doors/steel_front_chained.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, mit Kette. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_steel_front_closed": {
+  "name": "Tür · Stahl · frontal zu",
+  "kind": "image",
+  "file": "assets/pois/doors/steel_front_closed.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, zu. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_steel_front_open": {
+  "name": "Tür · Stahl · frontal offen",
+  "kind": "image",
+  "file": "assets/pois/doors/steel_front_open.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, offen. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_steel_side_broken": {
+  "name": "Tür · Stahl · Profil zerstört",
+  "kind": "image",
+  "file": "assets/pois/doors/steel_side_broken.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Durchgangstür im Profil (in der Wand, Leyla läuft hindurch), zerstört. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_steel_side_closed": {
+  "name": "Tür · Stahl · Profil zu",
+  "kind": "image",
+  "file": "assets/pois/doors/steel_side_closed.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Durchgangstür im Profil (in der Wand, Leyla läuft hindurch), zu. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_wood_front_boarded": {
+  "name": "Tür · Holz · frontal vernagelt",
+  "kind": "image",
+  "file": "assets/pois/doors/wood_front_boarded.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, vernagelt. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_wood_front_broken": {
+  "name": "Tür · Holz · frontal zerstört",
+  "kind": "image",
+  "file": "assets/pois/doors/wood_front_broken.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, zerstört. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_wood_front_closed": {
+  "name": "Tür · Holz · frontal zu",
+  "kind": "image",
+  "file": "assets/pois/doors/wood_front_closed.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, zu. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_wood_front_open": {
+  "name": "Tür · Holz · frontal offen",
+  "kind": "image",
+  "file": "assets/pois/doors/wood_front_open.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Rückwand-Tür frontal, offen. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_wood_side_broken": {
+  "name": "Tür · Holz · Profil zerstört",
+  "kind": "image",
+  "file": "assets/pois/doors/wood_side_broken.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Durchgangstür im Profil (in der Wand, Leyla läuft hindurch), zerstört. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "door_wood_side_closed": {
+  "name": "Tür · Holz · Profil zu",
+  "kind": "image",
+  "file": "assets/pois/doors/wood_side_closed.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px Seitenansicht, 4 verschiedene Teile je Auftrag, AAP-64), auf AAP-64 eingerastet und je Satz gemeinsam beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#174 Durchgangstür im Profil (in der Wand, Leyla läuft hindurch), zu. 32 px je Kachel, ohne Text.",
+  "derivedFrom": "doors_pixellab_174"
+ },
+ "doors_pixellab_174": {
+  "name": "Türen · PixelLab-Originale (#174)",
+  "kind": "source",
+  "file": "assets/pois/doors/orig/doors_pixellab_174.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px, 8 Aufträge à 4 Teile, AAP-64)",
+  "date": "2026-11-22",
+  "description": "#174: alle 32 Kandidaten, wie sie kamen (128 × 128 je Teil, alphabetisch: Material, Ansicht, Zustand)."
  }
 }
