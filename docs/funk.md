@@ -313,11 +313,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #175 Fehler aus Daniels Test: Keycard auf Leitern, Leichen zu groß, Hochhaus ohne Weg zurück
-- **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Auf Leitern kann man keine Keycard benutzen. Manche POI-Objekte wie Leichen sind etwas zu groß. Aus dem Hochhaus kommt man nicht wieder raus, wenn man vorzeitig raus will.“)
+- **Status:** fertig (22.11.) · angelegt 22.11. von Code (Daniel: „Auf Leitern kann man keine Keycard benutzen. Manche POI-Objekte wie Leichen sind etwas zu groß. Aus dem Hochhaus kommt man nicht wieder raus, wenn man vorzeitig raus will.“)
 - **Für:** Code
 - **Auftrag:** (1) Schlüssel/Keycard an Luken und Schlössern auch von der Leiter aus benutzen (E/↑ auf der Leiter). (2) Tropes/Leichen und andere POI-Objekte auf glaubwürdige Größen neben Leyla (192 px = 170 cm) bringen, Prüfer für Größen. (3) Delta Heights (und alle POIs prüfen): jederzeit ein Weg zurück zum Van, auch vor dem Tresor; Prüfer „Rückweg von jedem Raum“.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: Einbahn in der Tiefe bekommt eine Leiter zum Herunterlassen (Bündel + Zugschnur aus Code); ↑ als Benutzen auf der Leiter nur im Run; Leiche unter der Decke noch ≈ 58 cm hoch (Bildformat); Größengrenzen je Maßstab Entwurf; Türen an Leitern nicht geprüft (#174 war noch nicht auf main).
+- **Ergebnis:** (Code, per Helfer, `d613cb0`, `f9a6e69`, `f3488ec`) (1) ↑/Stick ↑ antippen auf der Leiter benutzt Luke/Schloss/Schalter, Halten klettert weiter. (2) Tropes › Maßstab + Größenprüfung, Tropes 10–25 % kleiner (z. B. Letzte Stellung 130 → 105 cm). (3) Neuer Prüfer „Kein Rückweg zum Van“ von jedem erreichbaren Ort: vorher Befunde in 6 POIs (Delta Heights 5/40 Seeds, Metro, Storm Drain, Pit 6, Raffinerie, Silo je 40/40), nachher 0; Tritte in hh_archiv, mt_halle, rf_tor, rf_tankfeld, rf_kesselhaus, durchgehende Leitern in mt_gittertor, kn_glanzberg, sm_kristalldom, rs_raketenblick, rs_lueftung; Einbahn-Leiter zum Herunterlassen. Tests npm 464 (way_home 4), cycles 24, poi 33, poi_levels 15, poi_stack 8, story 23, silo 12, Audits 0 bei 40 Seeds. PixelLab 0. **Bitte testen:** Delta Heights vorzeitig zurück, Pit 6 Seed 2 Luke von der Leiter, Einbahn in der Tiefe (Leiter herunterlassen), Tropes neben Leyla.
 
 ### #176 Wurfmesser als Alternative zur Granate + Grafik für Granate und Messer
 - **Status:** fertig (22.11.) · angelegt 22.11. von Code (Daniel: „Bau parallel zur Granate als Alternative Wurfmesser ein und mache für Granaten und Messer eine hübsche Grafik“)
