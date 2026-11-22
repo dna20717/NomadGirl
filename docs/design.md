@@ -78,6 +78,16 @@ Im POI spielt sich NomadGirl wie Dead Cells: schnelle Bewegung, harter Kampf, un
 - **Nächste Generation** (Recherche + Entscheidungen 21.11.2026): `docs/concepts/poi_next_gen.md`. Nach #160/#158/#163/#159: G1 Erzählschicht (Storylets, Tropes, Zeitschichten) → G2 Zyklen (7 Räume je Kreis) → G3 Leben (Ökosystem **auch zwischen Besuchen**, Regie) → G4 Hüllen → G5 Kuratieren → G6 Mitbauen. Leylas Spuren verblassen langsam. Tote ehrlich mit moderatem Gore. AvA kommentiert wichtige Funde. Alle 13 Wow-Momente abgenommen.
 - **Alle POIs in einem Durchgang** (Daniel, 21.11.2026: „lieber alles in einem Durchgang machen, damit es kohärent ist“): kein Pilot-POI, jedes Ticket gilt für alle POIs zugleich.
 
+### POI-Ton (Design-Session Daniel, 22.11.2026)
+
+- Führend: **`docs/concepts/poi_sound.md`**, Ticket #180.
+- **Musik hybrid:** die gerenderten POI-Schichten vom 14.11. (Erkundung, Spannung, Nervosität, Puls, taktgleich 64 s) sind die Basis, darüber eine live erzeugte **Färbung je Region** (5: Highway, Stadtrand, Salt Flats, Delta Ring, Versteckt).
+- **Regie = Mix:** Ereignisse schalten die Kampf-Schichten sofort hoch (bemerkt → Spannung, Treffer → Nervosität, Elite/Boss/Spitze → Puls), der Spannungswert der Regie entscheidet über das Abklingen, 3 s Nachlauf.
+- **Ambience aus der Story:** Klang-Bausteine je Raum aus den Steckbrief-Feldern (drinnen/draußen, Rolle, Verfall, Raum-Geschichte, Bewohner).
+- **Akustik:** Hall nach Raumgröße und Material, Töne hinter Wänden/Türen gedämpft, draußen trocken mit Wind.
+- **Klangquellen:** Technik, Leben, Radios + Durchsagen, Vorboten, positional mit Abstand und Richtung.
+- **Momente:** Atempause (leise Camp-Gitarre), Wow-Raum (Stille, dann Hauptthema), Tresor (eigener Jingle).
+
 ### Tod und AvA
 
 Stirbt Leyla, ist die Beute aus dem aktuellen Run verloren. AvA, ihre Drohne, rettet sie und bringt sie zurück zum Rig. Alles andere bleibt erhalten: Rig, Upgrades, Rezepte und Deltas auf dem Konto. Später kann AvA über Drohnen-Upgrades einen Teil der Beute mitretten. **Neu (12.11.2026):** jede Rettung kostet Zustand am Cryo-Tank, siehe „Die Suche“.

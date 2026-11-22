@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 22.11. Ava → Code: Neu **#180 POI-Ton** (Design-Session mit Daniel, `docs/concepts/poi_sound.md`): gerenderte Musik-Schichten + Färbung je Region, Regie als Mix, Ambience aus der Story, Hall + Dämpfung, Klangquellen, Momente. Skripte jetzt im Repo (`tools/music/leyla_poi.py`, `music_engine.py`). Hörproben der Färbungen mache ich parallel im Projekt-Chat, Rezepte folgen per Funkspruch.
+
 - 22.11. Code → Ava: **HNC (Übergabe)**. Stand `main` nach #160–#178, alles gepusht, Tests grün (npm 469, alle Browser-Tests der Runde grün, reach_audit + level_audit 0 bei 40 Seeds). Gebaut in dieser Sitzung (Details in den Tickets, `docs/changelog.md`):
   - **Leyla:** Wende-Wurf im Dash (#164), Wurfmesser als zweiter Wurf mit gemalter Granate/Messer/Feuerball/HUD (#176).
   - **POI-Overhaul:** Story zuerst (#160, Steckbriefe abgesegnet), Level-Design mit Wow-Raum je POI (#163, gemalt #165), Dressing Stufe 2 (#159); Nächste Generation **G1 Erzählschicht** (#167, 107 Storylets, Faden-Lore abgesegnet), **G2 Zyklus-Graph** (#168), **G3 Leben** (#169), **G4 Hüllen** (#171, gemalte Module #172); Rakete so hoch wie das Silo (#173); Türen offen/zu/zerstört (#174); Mile 7 als Mega-Store (#178).
@@ -327,6 +329,25 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #180 POI-Ton: Musik-Schichten + Färbung je Region, Ambience aus der Story, Akustik, Klangquellen
+- **Status:** offen · angelegt 22.11. von Ava (Design-Session mit Daniel, alle Fragen per Auswahl beantwortet)
+- **Für:** Code
+- **Lesen:** **`docs/concepts/poi_sound.md`** (führend, alle Entscheidungen), `docs/design.md` › POI-Ton, `docs/sounds.md` (Tonliste #130), #169 (Regie, `game/play/director.js`), #160 (`roomStory`), #158/#159 (Tags, Raum-Geschichten), #163 (Raumtypen Atempause/Wow), #167 (Durchsagen), #174 (Türen), `game/play/fog.js` (Sichtstrahlen).
+- **Auftrag (alle POIs zugleich):**
+  1. **Grundschichten einbauen:** `python3 tools/music/leyla_poi.py <out>` rendert `poi_explore`, `poi_tension`, `poi_jitter`, `poi_combat`, `poi_stinger_start`, `poi_stinger_end` (Seed 1313, braucht numba). Als .m4a + .ogg unter `projects/nomadgirl/assets/sound/music/` ablegen, Assets der Art Ton anlegen. Im POI alle vier taktgleich starten, nahtlos loopen (lückenlos, z. B. per `AudioBufferSourceNode` mit `loop`), nur Lautstärken ändern.
+  2. **Regie = Mix** (`director.js`): Ereignisse schalten sofort hoch (quantisiert auf Achtel, Einblenden ≈ 0,5 Takte), Spannungswert + Halte-Schwellen + 3 s Nachlauf steuern das Abklingen (Ausblenden ≈ 2 Takte), Stinger an Anfang/Ende, „jittery“-Zucken der Nervosität. Radio-Synth-Schichten im POI ersetzen.
+  3. **Färbungs-Schicht** live (Web Audio), taktgleich zu den Grundschichten, je Region aus Daten (`data/sound_regions.json` o. ä.); erst als Platzhalter nach der Tabelle in `poi_sound.md` › ②, die Rezepte aus Avas Hörproben folgen per Funkspruch.
+  4. **Ambience-Bausteine** je Raum aus Story/Level (Tabelle ③), Überblenden beim Raumwechsel.
+  5. **Akustik:** Hall-Klassen (Raumgröße × Kachel-Set) mit Code-Impulsantworten, Dämpfung ohne Sichtlinie (Strahlen aus `fog.js`), Türen offen/zu/zerstört.
+  6. **Klangquellen** (Technik, Leben, Radios + Durchsagen, Vorboten) positional, höchstens 8 zugleich, an Dressing-Tags und Objekte gekoppelt.
+  7. **Momente:** Atempause (Camp-Gitarre mit Antwort-Motiv), Wow (Stille → Stinger → Hauptthema), Tresor-Jingle.
+  8. **Mischung:** Busse je Art, Ducking nach `poi_sound.md` › Mischung, Lautstärken in den Einstellungen.
+  9. **Werkstatt › Ton › POI:** Schichten, Schwellen, Färbungen, Ambience-Regeln, Hall-Klassen, Klangquellen, Momente; alles einstellbar. `docs/sounds.md` nachziehen.
+- **Grenzen:** keine neuen Grafiken, kein PixelLab. Effekt-Platzhalter aus #130 nicht neu produzieren (nur durch Hall/Dämpfung schicken). Leistung: Faltung höchstens je Hall-Klasse einmal, nicht je Quelle.
+- **Fertig, wenn:** Im POI läuft die Erkundung mit Färbung der Region, Kampf schaltet sichtbar/hörbar hoch und klingt nach Regie ab (Fernsteuerung `nomad.state().music` mit Schicht-Lautstärken); Raumwechsel ändert Ambience und Hall; ein Gegner hinter einer Wand klingt dumpf; Atempause, Wow und Tresor haben ihren Moment; Tests (Regie-Logik und Ambience-Ableitung ohne DOM in `engine/`, Browser-Test für Schichten) grün; Spielstände gültig; Build grün.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #179 Mile 7 Runde 2: Dach-Block verkleiden, Supermarkt-Innen-Look, echtes Licht
 - **Status:** fertig (22.11.) · angelegt 22.11. von Code (Daniel: „Ja, mach die Tankstelle hübsch“)
