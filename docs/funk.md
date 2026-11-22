@@ -316,11 +316,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #172 G4: Fassaden-Module gemalt
-- **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Ja, mach, erzeuge die Grafiken für die Fassaden“)
+- **Status:** fertig (22.11.) · angelegt 22.11. von Code (Daniel: „Ja, mach, erzeuge die Grafiken für die Fassaden“)
 - **Für:** Code
 - **Auftrag:** Die Hüllen aus #171 wirken neben den PixelLab-Grafiken flach. Ein Satz Fassaden-Module mit PixelLab malen (Wandflächen je Material, Fenster heil/kaputt/vernagelt/beleuchtet, Gesimse, Dachkanten, Aufbauten, Markisen, Feuertreppe, Schildgerüst, Tankstellendach …), AAP-64, orthogonal, **ohne Text**, kachelbar; Grammatik aus #171 setzt sie zusammen, Code-Malerei bleibt Rückfall. Budget ≈ 150.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: 32 px je Kachel wie die Wow-Motive; Modul-Zuordnung je Gebäudetyp Entwurf; rote Tankstellen-Blende eingefärbt, wirkt etwas rosa; Tankstellendach verdeckt bei Mile 7 teils die Landmarke; Schäden bei hohem Verfall sehr dicht (Großmarkt, Ministerium); Erdhügel, Funkmast, Kuppel, Skyline weiter aus Code; mehr Grafikspeicher (Ministerium 9 statt 5 Stücke à 2048 px). Befund Code: Tankstelle wächst als 4-Geschosser, Tankstellendach fehlt über den Zapfinseln (Wow-Raum) – Umbau vorgeschlagen.
+- **Ergebnis:** (Code, per Helfer, `6fdf1db`, `62b575e`, `bd8ef86`, `8679d09`, `d384621`) 82 PixelLab-Module unter `assets/pois/facade/` (12 Wandflächen, Gesims, Dachkante, 13 Fenster, 16 Aufbauten, 15 Decals, Markise, Feuertreppe, Tankstellendach, Plakatwand, Giebel, Krone, Förderturm, Bunker-Sturz, 7 Anlagen, 9 Straßenbauten), ohne Text; `hull_paint.js` setzt die Hülle daraus zusammen (Wandraster nahtlos, Fenster 9-Slice, Varianten per Hash, Schäden als Decals), Code bleibt Rückfall; Werkstatt Welt › Gebäudetypen › Module. Tests npm 457, poi_levels 15, poi 33, light 18, workshop 64, Audits 0. **PixelLab ≈ 75** (laut Belegen; Kontostand fiel 1.125,6 → 990,6, weil #173 parallel malte). **Bitte testen:** Mile 7, Großmarkt Fassade + Feuertreppe, Ministerium Giebel, Delta Heights Glas, Raffinerie.
 
 ### #171 POI G4: Hüllen (Gebäude-Grammatik in Seitenansicht)
 - **Status:** fertig (22.11.) · angelegt 21.11. von Code (Daniel: „Mach G4 direkt weiter dann“)
