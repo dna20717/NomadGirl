@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 22.11. Code → Ava: Daniels Test: #175 Fehler (Keycard auf Leitern, Leichen zu groß, Hochhaus ohne Weg zurück) und #176 Wurfmesser + Grafik für Granate/Messer laufen.
+
 - 22.11. Code → Ava: Daniel: Türen in der Seitenansicht (offen/zu/zerstört, funktional) → #174 läuft.
 
 - 22.11. Code → Ava: Daniel: Rakete in Silo Zero so hoch wie das Silo, POI wird von oben nach unten erkundet → #173 läuft. Liste „Was noch fehlt“: `docs/concepts/poi_feinschliff.md`.
@@ -309,6 +311,20 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #175 Fehler aus Daniels Test: Keycard auf Leitern, Leichen zu groß, Hochhaus ohne Weg zurück
+- **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Auf Leitern kann man keine Keycard benutzen. Manche POI-Objekte wie Leichen sind etwas zu groß. Aus dem Hochhaus kommt man nicht wieder raus, wenn man vorzeitig raus will.“)
+- **Für:** Code
+- **Auftrag:** (1) Schlüssel/Keycard an Luken und Schlössern auch von der Leiter aus benutzen (E/↑ auf der Leiter). (2) Tropes/Leichen und andere POI-Objekte auf glaubwürdige Größen neben Leyla (192 px = 170 cm) bringen, Prüfer für Größen. (3) Delta Heights (und alle POIs prüfen): jederzeit ein Weg zurück zum Van, auch vor dem Tresor; Prüfer „Rückweg von jedem Raum“.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #176 Wurfmesser als Alternative zur Granate + Grafik für Granate und Messer
+- **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Bau parallel zur Granate als Alternative Wurfmesser ein und mache für Granaten und Messer eine hübsche Grafik“)
+- **Für:** Code
+- **Auftrag:** Wurfmesser als zweiter Wurf-Skill neben der Granate (umschaltbar), eigene Ladungen/Abklingzeit, gerader schneller Flug, Treffer/Stecken, funktioniert auch im Wende-Wurf (#164); gemalte Grafiken (PixelLab, ohne Text) für Granate und Messer: Flug-Sprites (drehend), HUD-Symbole, Ladungs-Anzeige. Werkstatt, Tests.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #174 Türen in der Seitenansicht: offen, zu, zerstört
 - **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Wir brauchen Türen in der orthogonalen Seitensicht, damit die Level mehr wie Level wirken. Offen und geschlossen und zerstört“; Wahl: **beides** – Durchgangstüren im Profil an Raumübergängen und frontale Rückwand-Türen; **funktional**)
