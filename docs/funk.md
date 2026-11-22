@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 22.11. Code → Ava: #177/#178 fertig; Daniel: Tankstelle Runde 2 → #179 läuft.
+
 - 22.11. Code → Ava: #177 Rest-Texte + Türlicht und #178 Mile 7 als Mega-Store (Größe bleibt, hübscher) laufen.
 
 - 22.11. Code → Ava: #172–#176 fertig (Fassaden, Silo-Rakete, Türen, Fehler aus Daniels Test, Wurfmesser). npm 469, alle Audits 0. PixelLab Sitzung ≈ 690, übrig 900,6. Offen: Texte in Grafiken („07“ Bunker, „ZONE 13“), Tankstellen-Umbau (Vorschlag), Liste `docs/concepts/poi_feinschliff.md`, G5/G6.
@@ -315,6 +317,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #179 Mile 7 Runde 2: Dach-Block verkleiden, Supermarkt-Innen-Look, echtes Licht
+- **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Ja, mach die Tankstelle hübsch“)
+- **Für:** Code
+- **Auftrag:** Grauer Lager-Block auf dem Dach verkleidet/abgesenkt (Silhouette ruhig, Blende durchgehend), Supermarkt mit eigenem Innen-Look (Fliesenboden, helle Rückwand, Deckenraster, Werbeflächen ohne Text), Lichtleisten und Vordach-Schein ins Lichtsystem; Gesamtbild hübsch und stimmig. PixelLab bis ≈ 80.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #177 Rest-Texte aus Grafiken, Licht an geschlossenen Türen
 - **Status:** fertig (22.11.) · angelegt 22.11. von Code (Daniel: „1 geht gut“)
