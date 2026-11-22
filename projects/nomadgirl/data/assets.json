@@ -9013,5 +9013,75 @@
   "date": "2026-11-22",
   "derivedFrom": "rocket_pl_tower_1",
   "description": "#173 Raketen-Tileset (POIs › Schacht-Motiv): Gitterturm mit Leiter und Wartungsbühne, senkrecht nahtlos."
+ },
+ "leyla_knife_source": {
+  "name": "Wurfmesser · Quelle",
+  "kind": "source",
+  "file": "assets/leyla/throw/knife_source.png",
+  "source": "KI (PixelLab, create_1_direction_object, AAP-64)",
+  "date": "2026-11-22",
+  "description": "#176: zwei Messer als Kandidat, oben genommen"
+ },
+ "leyla_knife": {
+  "name": "Wurfmesser · Flug",
+  "kind": "image",
+  "file": "assets/leyla/throw/knife.png",
+  "origin": [32, 8],
+  "source": "KI (PixelLab), zugeschnitten mit Code",
+  "derivedFrom": "leyla_knife_source",
+  "date": "2026-11-22",
+  "description": "#176: Klinge nach rechts, der Code dreht es im Flug. Länge im Spiel: Leyla › Wurfmesser › Länge"
+ },
+ "leyla_knife_stuck": {
+  "name": "Wurfmesser · steckt",
+  "kind": "image",
+  "file": "assets/leyla/throw/knife_stuck.png",
+  "origin": [39, 8],
+  "source": "KI (PixelLab), mit Code gekürzt (Spitze in der Wand), Schlitz aus Code",
+  "derivedFrom": "leyla_knife_source",
+  "date": "2026-11-22",
+  "description": "#176: Griff und 62 % der Klinge, Ankerpunkt = Wand"
+ },
+ "leyla_grenade_source": {
+  "name": "Granate · Quelle",
+  "kind": "source",
+  "file": "assets/leyla/throw/grenade_source.png",
+  "source": "KI (PixelLab, create_1_direction_object, AAP-64)",
+  "date": "2026-11-22"
+ },
+ "leyla_grenade": {
+  "name": "Granate · Flug",
+  "kind": "image",
+  "file": "assets/leyla/throw/grenade.png",
+  "origin": [18, 27],
+  "height": 34,
+  "source": "KI (PixelLab), zugeschnitten mit Code",
+  "derivedFrom": "leyla_grenade_source",
+  "date": "2026-11-22",
+  "description": "#176: Splittergranate mit Bügel und Ring, olivgrün mit türkisem Streifen; der Code dreht sie im Flug"
+ },
+ "hud_throw_grenade": {
+  "name": "HUD · Granate",
+  "kind": "image",
+  "file": "assets/leyla/throw/hud_grenade.png",
+  "source": "KI (PixelLab, create_1_direction_object, AAP-64)",
+  "date": "2026-11-22",
+  "description": "#176: Neon-Symbol (türkis) für die Wurf-Anzeige, ohne Text"
+ },
+ "hud_throw_knife": {
+  "name": "HUD · Wurfmesser",
+  "kind": "image",
+  "file": "assets/leyla/throw/hud_knife.png",
+  "source": "KI (PixelLab, create_1_direction_object, AAP-64)",
+  "date": "2026-11-22",
+  "description": "#176: Neon-Symbol (magenta) für die Wurf-Anzeige, ohne Text"
+ },
+ "fx_blast": {
+  "name": "Explosion · Feuerball",
+  "kind": "image",
+  "file": "assets/leyla/throw/blast.png",
+  "source": "KI (PixelLab, create_1_direction_object, AAP-64)",
+  "date": "2026-11-22",
+  "description": "#176: Feuerball, der Code bläht ihn beim Knall auf und blendet ihn aus (Granaten, auch der Werfer)"
  }
 }

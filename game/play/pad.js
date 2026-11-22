@@ -12,12 +12,12 @@ export const PAD_BUTTONS = [['0', 'Unten (A / ✕)'], ['1', 'Rechts (B / ○)'],
 
 // actions of the game (scene.js KEYS) that a controller can trigger
 export const PAD_ACTIONS = [['jump', 'Springen'], ['dash', 'Dash'], ['melee', 'Nahkampf'], ['ranged', 'Schießen · halten: wegstecken'], ['reload', 'Nachladen'],
-  ['grab', 'Benutzen (mit Hinweis)'], ['walk', 'Gehen'], ['inventory', 'Inventar'], ['help', 'Menü / Pause'], ['pose', 'Rig offen / zu (im Camp)'], ['holster', 'Waffe ziehen / wegstecken (Schalter)'], ['swap', 'Fernkampfwaffe wechseln'], ['down', 'Ducken / Slide (zusätzlich zum Stick)'], ['grenade', 'Granate werfen (#140)']];
+  ['grab', 'Benutzen (mit Hinweis)'], ['walk', 'Gehen'], ['inventory', 'Inventar'], ['help', 'Menü / Pause'], ['pose', 'Rig offen / zu (im Camp)'], ['holster', 'Waffe ziehen / wegstecken (Schalter)'], ['swap', 'Fernkampfwaffe wechseln'], ['down', 'Ducken / Slide (zusätzlich zum Stick)'], ['grenade', 'Wurf: Granate / Wurfmesser (#140, #176) · halten: wechseln'], ['throwSwap', 'Wurf wechseln (#176, zusätzlich)']];
 
 export const PAD_DEFAULTS = { enabled: true, deadzone: 30, walkTilt: 65,
   useTilt: 70,
   // Daniel, 12.11.2026: X melee, Y shoot (Quick Draw, hold = holster), use = left stick up (with a prompt on screen)
-  map: { jump: ['0'], dash: ['1', '6'], melee: ['2'], ranged: ['3', '7'], reload: ['5'], grab: ['up'], walk: ['4'], inventory: ['8'], help: ['9'], pose: ['11'], holster: [], swap: ['10'], down: [], grenade: ['11'] } };   // #140 grenade on R3: pose (rig open) only works in the camp, the grenade only outside
+  map: { jump: ['0'], dash: ['1', '6'], melee: ['2'], ranged: ['3', '7'], reload: ['5'], grab: ['up'], walk: ['4'], inventory: ['8'], help: ['9'], pose: ['11'], holster: [], swap: ['10'], down: [], grenade: ['11'], throwSwap: [] } };   // #140 grenade on R3: pose (rig open) only works in the camp, the grenade only outside
 
 const LABELS = {
   xbox: ['A', 'B', 'X', 'Y', 'LB', 'RB', 'LT', 'RT', 'View', 'Menu', 'L', 'R', '↑', '↓', '←', '→'],

@@ -70,7 +70,7 @@ const BORROW = { walk: ['run'], airJump: ['jump'], fall: ['jump'], hangOne: ['ha
 const KEYS = {
   left: ['A', 'LEFT'], right: ['D', 'RIGHT'], up: ['W', 'UP'], down: ['S', 'DOWN'],
   jump: ['SPACE'], walk: ['SHIFT'], dash: ['L', 'C'], melee: ['J', 'Y'], ranged: ['K', 'X'], grab: ['E'],
-  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], uiOk: ['ENTER'], uiSend: ['F'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['O', 'P'], build: ['B'], holster: ['Q'], swap: ['V'], radio: ['N'], stats: ['U'], grenade: ['T'],
+  restart: ['BACKSPACE'], reload: ['R'], help: ['ESC'], uiOk: ['ENTER'], uiSend: ['F'], controls: ['H'], debug: ['G'], mute: ['M'], inventory: ['I', 'TAB'], pose: ['O', 'P'], build: ['B'], holster: ['Q'], swap: ['V'], radio: ['N'], stats: ['U'], grenade: ['T'], throwSwap: ['Z'],
 };
 
 export class PlayScene extends Phaser.Scene {
@@ -112,7 +112,8 @@ export class PlayScene extends Phaser.Scene {
     const DR = this.data_.drone || {};
     for (const id of [DR.look, DR.face?.look, DR.face?.glass, ...(DR.parts || []).filter(r => r.on).map(r => r.look)]) if (id) ids.add(id);
     for (const r of this.data_.leyla?.idles || []) if (r.look) ids.add(r.look);
-    for (const k of ['look', 'arm']) if (this.data_.leyla?.grenade?.[k]) ids.add(this.data_.leyla.grenade[k]);   // #140 the throw
+    for (const k of ['look', 'arm', 'sprite', 'blastLook']) if (this.data_.leyla?.grenade?.[k]) ids.add(this.data_.leyla.grenade[k]);   // #140 the throw, #176 the painted grenade
+    for (const k of ['look', 'stuckLook']) if (this.data_.leyla?.knives?.[k]) ids.add(this.data_.leyla.knives[k]);   // #176 throwing knives
     { const C = this.data_.leyla?.combo || {}; for (const r of C.hits || []) for (const id of [r.look, r.walk]) if (id) ids.add(id); if (C.finisher) ids.add(C.finisher); }   // melee combo (Leyla › Kombo)
     for (const w of Object.values(this.data_.weapons || {})) for (const id of [w.sound, ...Object.values(w.poses || {}).filter(v => typeof v === 'string')]) if (id) ids.add(id);   // Waffen › Posen
     const SP = this.data_.game?.spawn;
@@ -761,7 +762,9 @@ export class PlayScene extends Phaser.Scene {
     const invPad = this.hud.inv?.isOpen && !this.hud.paused && !this.hud.modal;
     // Select in the camp (Daniel, 12.11.2026: „Rig-Bau-Modus = Select“): tap = inventory (on release), hold = build the rig
     const selHold = this.mode === 'camp' && pad?.kind && !this.hud.inv?.isOpen && !this.hud.build?.active && !this.hud.modal && !this.hud.craft?.isOpen && !(this.hud.tech?.isOpen || this.hud.map?.isOpen);
-    if (pad?.kind) for (const name of Object.keys(i)) { if (invPad && name !== 'inventory' && name !== 'help') continue; if (name === 'inventory' && (selHold || this.hud.build?.active)) continue; i[name].down ||= pad.down(name); i[name].pressed ||= pad.pressed(name) && !(pad.viaUp?.has(name) && !this.useByUp()); }
+    // #176 outside the camp the grenade button: tap = throw the active throw (on release), hold = swap grenade / knives
+    const thHold = pad?.kind && this.mode !== 'camp' && !invPad && (this.data_.game?.gamepad?.swapHold ?? 350) > 0;
+    if (pad?.kind) for (const name of Object.keys(i)) { if (invPad && name !== 'inventory' && name !== 'help') continue; if (name === 'inventory' && (selHold || this.hud.build?.active)) continue; if (name === 'grenade' && thHold) continue; i[name].down ||= pad.down(name); i[name].pressed ||= pad.pressed(name) && !(pad.viaUp?.has(name) && !this.useByUp()); }
     if (selHold) {
       const hold = this.data_.game?.gamepad?.buildHold ?? 500, now = this.now ?? 0;
       if (pad.down('inventory')) {
@@ -769,6 +772,13 @@ export class PlayScene extends Phaser.Scene {
         if (!this.selFired && now - this.selAt >= hold && hold > 0) { this.selFired = true; i.build = { down: true, pressed: true }; }
       } else { if (this.selAt != null && !this.selFired) i.inventory.pressed = true; this.selAt = null; this.selFired = false; }
     } else if (!pad?.down('inventory')) { this.selAt = null; this.selFired = false; }
+    if (thHold) {
+      const hold = this.data_.game?.gamepad?.swapHold ?? 350, now = this.now ?? 0;
+      if (pad.down('grenade')) {
+        this.thAt ??= now; i.grenade.down = true;
+        if (!this.thFired && now - this.thAt >= hold) { this.thFired = true; i.throwSwap = { down: true, pressed: true }; }
+      } else { if (this.thAt != null && !this.thFired) i.grenade.pressed = true; this.thAt = null; this.thFired = false; }
+    } else { this.thAt = null; this.thFired = false; }
     // use by „up“ (Daniel, 12.11.2026, 3a): W / ↑ / the stick flicked up counts as E while an E prompt is on screen and Leyla stands or walks;
     // then it does not start a ladder (the prompt wins)
     if (i.up?.pressed && !i.grab.pressed && this.useByUp()) { i.grab.pressed = true; i.up.pressed = false; }

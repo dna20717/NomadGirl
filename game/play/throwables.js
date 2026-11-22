@@ -1,7 +1,7 @@
 // Throwables (#139 Werfer, #140 Leyla's grenade): one code for everything that flies in an arc and goes off.
 // Ballistic flight with gravity, bounces off tiles (grenade) or shatters on the first contact (molotov, acid), a landing marker
 // on the ground from the moment it leaves the hand, an explosion whose damage stops at walls and chests (combat.blockedAt,
-// scene.covers), and a burning or corrosive area that hurts whoever stands in it. No graphics files: everything from code.
+// scene.covers), and a burning or corrosive area that hurts whoever stands in it. Code shapes, or (#176) the painted grenade and fireball from Leyla › Granate.
 //
 //   const T = Throwables.of(scene)
 //   T.throw({ x, y, vx, vy, item: 'granate' | 'molotow' | 'saeure', fuse, radius, damage, burn, friendly, from })
@@ -143,7 +143,7 @@ export class Throwables {
     s.fx.sparks(p.x, y, 0xffd27a, 26); s.fx.puff?.(p.x, p.y, 0x6b6670); s.fx.dust?.(p.x, p.y, 14);
     s.cam?.shake(260, 0.012);
     s.noise?.(p.x, y, 1600);
-    this.rings.push({ x: p.x, y, r: p.radius, at: time, life: 320 });
+    this.rings.push({ x: p.x, y, r: p.radius, at: time, life: 320, ball: true });
     boom(s, p.radius);
     this.blast(p.x, y, p, time);
     blastSirens(s, p.x, y, p.radius, p.damage ?? 20, time);   // #155
@@ -202,6 +202,7 @@ export class Throwables {
   draw(time) {
     const g = this.g, m = this.marks;
     g.clear(); m.clear();
+    this.used = 0;
     for (const p of this.list) {
       // landing marker: a flat ring of the blast radius on the ground, pulsing faster the closer the bang
       const left = p.item === 'granate' && p.landedAt != null ? Math.max(0, 1 - (time - p.landedAt) / p.fuse) : 1;
@@ -211,7 +212,8 @@ export class Throwables {
         m.fillStyle(col, 0.12 + 0.12 * pulse).fillEllipse(mk.x, mk.y - 4, p.radius * 2 * (1 - left * 0.6), p.radius * 0.42 * (1 - left * 0.6));
         m.fillStyle(col, 0.9).fillCircle(mk.x, mk.y - 4, 5);
       }
-      // the thing itself
+      // the thing itself: #176 the painted grenade (Leyla › Granate › Flug-Bild), turned by code; else the shape from code
+      if (this.picture(p, time)) continue;
       const c = Math.cos(p.rot), sn = Math.sin(p.rot), w = 11, h = 16;
       g.fillStyle(0x0d0a12, 1).fillCircle(p.x, p.y, 11);
       g.fillStyle(COLORS[p.item] || COLORS.granate, 1).fillPoints([[-w, -h], [w, -h], [w, h], [-w, h]].map(([x, y]) => ({ x: p.x + x * c * 0.7 - y * sn * 0.7, y: p.y + x * sn * 0.7 + y * c * 0.7 })), true);
@@ -230,11 +232,36 @@ export class Throwables {
     }
     for (const r of this.rings) {
       const k = (time - r.at) / r.life;
+      if (r.ball) this.fireball(r, k);
       g.lineStyle(8 * (1 - k) + 2, 0xffd27a, 0.8 * (1 - k)).strokeCircle(r.x, r.y, r.r * (0.3 + 0.7 * k));
     }
+    for (let i = this.used; i < (this.imgs?.length || 0); i++) this.imgs[i].setVisible(false);
   }
 
-  clear() { this.list = []; this.areas = []; this.rings = []; this.g.clear(); this.marks.clear(); }
+  // #176 the painted pictures: a pool of images, hidden each frame and shown again for what flies
+  img(key, i) {
+    this.imgs ??= [];
+    const im = this.imgs[i] ??= this.s.add.image(0, 0, key).setDepth(14);
+    return im.setTexture(key).setVisible(true).setAlpha(1);
+  }
+  picture(p, time) {
+    const s = this.s, key = p.item === 'granate' && s.data_?.leyla?.grenade?.sprite;
+    if (!key || !s.textures.exists(key)) return false;
+    const A = s.data_.assets?.[key] || {}, im = this.img(key, this.used++), w = im.frame.width, h = im.frame.height;
+    im.setOrigin((A.origin?.[0] ?? w / 2) / w, (A.origin?.[1] ?? h / 2) / h).setScale((A.height || 34) / h).setPosition(p.x, p.y - 4).setRotation(p.rot);
+    // a red blink at the lever before the bang
+    const left = p.landedAt != null ? Math.max(0, 1 - (time - p.landedAt) / p.fuse) : 1;
+    if (p.landedAt != null && Math.floor(time / (60 + 200 * left)) % 2) this.g.fillStyle(0xff4060, 1).fillCircle(p.x + Math.sin(p.rot) * 14, p.y - 4 - Math.cos(p.rot) * 14, 4);
+    return true;
+  }
+  fireball(r, k) {
+    const s = this.s, key = s.data_?.leyla?.grenade?.blastLook;
+    if (!key || !s.textures.exists(key) || k > 1) return;
+    const im = this.img(key, this.used++), sc = r.r * 1.5 / Math.max(1, im.frame.width) * (0.45 + 0.75 * Math.sqrt(k));
+    im.setOrigin(0.5).setPosition(r.x, r.y - r.r * 0.08 * k).setScale(sc).setRotation(r.x % 7).setAlpha(Math.max(0, 1 - k * k)).setDepth(14.1);
+  }
+
+  clear() { this.list = []; this.areas = []; this.rings = []; this.g.clear(); this.marks.clear(); for (const im of this.imgs || []) im.setVisible(false); }
   state() {
     const r = n => Math.round(n);
     return { flying: this.list.map(p => ({ item: p.item, x: r(p.x), y: r(p.y), landed: p.landedAt != null, friendly: !!p.friendly, mark: p.mark && { x: r(p.mark.x), y: r(p.mark.y) } })),

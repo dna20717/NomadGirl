@@ -10,6 +10,7 @@
 import { recoilTexture } from './recoil.js';
 import { makeSfx, sfxOf } from './sfx.js';
 import { LeylaGrenade } from './leyla_grenade.js';
+import { LeylaKnives } from './leyla_knives.js';
 
 const BASE = { height: 256, w: 72, h: 224, slideH: 104, crouchH: 196, climbW: 44, hand: 84, chest: 150, hangReach: 253, mantleLift: 120 };
 export const DASH_TIME = 170, TERMINAL_FALL = 1700;
@@ -46,6 +47,7 @@ export class Leyla {
     this.body.setMaxVelocityY(TERMINAL_FALL);
     this.sprite = scene.add.sprite(feet[0], feet[1], scene.lookKey('leyla', 'idle')).setDepth(10);
     this.start = feet;
+    this.knives = new LeylaKnives(this);   // #176 throwing knives (the second throw skill)
     this.grenade = new LeylaGrenade(this);   // #140 the grenade skill (charges, cooldown, throw layer)
     // two idles: after every loop pick one at random (Leyla › „Stehen 2 Anteil“)
     this.idleVariant = 'idle';

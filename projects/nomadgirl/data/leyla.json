@@ -219,7 +219,16 @@
  },
  "null": "voice",
  "voice": "leyla",
- "grenade": {"arm": "leyla_throw_arm", "refill": "each", "cooldown": 60, "look": "leyla_throw_pistol", "releaseFrame": 7},
+ "grenade": {
+  "arm": "leyla_throw_arm",
+  "refill": "each",
+  "cooldown": 60,
+  "look": "leyla_throw_pistol",
+  "releaseFrame": 7,
+  "sprite": "leyla_grenade",
+  "blastLook": "fx_blast",
+  "icon": "hud_throw_grenade"
+ },
  "turnThrow": {
   "enabled": true,
   "stamina": 30,
@@ -235,5 +244,6 @@
   "slowFactor": 35,
   "look": "leyla_brake_side",
   "frames": [2, 5]
- }
+ },
+ "knives": {"enabled": true, "charges": 4, "cooldown": 6, "look": "leyla_knife", "stuckLook": "leyla_knife_stuck", "icon": "hud_throw_knife"}
 }

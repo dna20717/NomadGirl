@@ -141,7 +141,7 @@ export function installControl(game) {
         light: s.atmo?.state() || null,
         mode: s.mode, prompt: s.hud.promptText, menu: s.hud.menuState(), banner: s.hud.bannerText(),
         camp: s.camp?.state(), health: Math.round(s.leyla.health), maxHealth: s.leyla.maxHealth,
-        grenade: l.grenade?.state() || null, throwables: s.throwables?.state() || null, siren: s.lastSiren || null, life: s.life?.state?.() || null, director: s.director?.state?.() || null,   // #139/#140, #169
+        grenade: l.grenade?.state() || null, knives: l.knives?.state() || null, throwKind: l.grenade?.kind || null, throwables: s.throwables?.state() || null, siren: s.lastSiren || null, life: s.life?.state?.() || null, director: s.director?.state?.() || null,   // #139/#140, #169
         turnThrow: { count: l.turnThrows || 0, active: l.state === 'turnThrow', denied: l.turnDenied || null, last: l.lastTurnThrow || null, stamina: Math.round(l.stamina ?? l.maxStamina),
           slow: { active: !!s.slowmo, factor: s.slowmo?.factor ?? 1, count: s.slowCount || 0, shift: Math.round(s.clockShift || 0) } },   // #164 Wende-Wurf + slow motion
       };

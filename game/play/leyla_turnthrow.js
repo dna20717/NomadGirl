@@ -24,11 +24,12 @@ export class LeylaTurnThrow {
   turnThrowTry(time, input, dir) {
     if (!input.grenade?.pressed) return false;
     const T = this.TT, D = this.dashDir, G = this.grenade;
-    if (!T.enabled || !D || dir !== -D || !this.alive || this.scene.mode === 'camp' || !G?.c.enabled || G.pose) return false;
+    if (!T.enabled || !D || dir !== -D || !this.alive || this.scene.mode === 'camp' || !(G?.c.enabled || G?.kind === 'knife') || G.pose) return false;
     const inDash = this.state === 'dash', late = this.state === 'normal' && time - (this.dashEndAt ?? -1e9) <= T.buffer;
     if (!inDash && !late) return false;
     G.skip = time;   // the press belongs to the move: no normal throw right after the dash
-    if ((G.charges ?? G.c.charges) <= 0) { this.scene.staminaDenied?.('grenade'); G.denied = time; this.turnDenied = 'charges'; return true; }   // the dash goes on
+    if (!G.activeReady()) {   // #176 the active throw: grenade or knives
+      this.scene.staminaDenied?.('grenade'); G.denied = time; this.turnDenied = 'charges'; return true; }   // the dash goes on
     if (!this.spend('turnThrow', time)) { this.turnDenied = 'stamina'; return true; }
     this.startTurnThrow(time, D);
     return true;
