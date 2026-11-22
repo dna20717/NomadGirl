@@ -19,7 +19,7 @@ import { DECALS } from './dressing_story.js';
 import { CHANNELS, CONDITIONS } from './storylets.js';
 import { OCCUPANT_KINDS } from './history.js';
 import { FACTIONS, ATTITUDES, CAMP_FACTIONS, LIFE_EVENTS, LIFE } from './ecosystem.js';
-import { TROPE_PLACES } from './tropes.js';
+import { TROPE_PLACES, TROPE_BODIES, tropeSizeIssues } from './tropes.js';
 import { HULL_KINDS, ROOF_KINDS, ROOFTOP, AWNINGS, MATERIALS, BASES, SURFACES, PLANT, SKY_KINDS, HULL } from './facade.js';
 import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
 import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
@@ -2034,7 +2034,8 @@ export const AREAS = {
     template: { name: 'Neuer Trope', place: 'floor', tiles: 3, chance: 50, weight: 10, gore: 0, roles: [], events: [], when: [] },
     row: x => `${label(TROPE_PLACES, x.place || 'floor')} · ${x.chance ?? 60} %${x.image ? ' · Bild' : x.art ? ' · Code' : ''}${x.gore ? ' · Gore ' + x.gore : ''}`,
     sections: [
-      { title: 'Trope', fields: [NAME, DESCRIPTION, ref('image', 'Bild', 'assets', { hint: 'Gemaltes Bild (PixelLab, AAP-64). Leer = Art aus Code und Spuren' }), num('cm', 'Höhe im Spiel', { unit: 'cm', min: 10, hint: 'Leyla ist 170 cm' }),
+      { title: 'Trope', fields: [NAME, DESCRIPTION, ref('image', 'Bild', 'assets', { hint: 'Gemaltes Bild (PixelLab, AAP-64). Leer = Art aus Code und Spuren' }), num('cm', 'Höhe im Spiel', { unit: 'cm', min: 10, hint: 'Leyla ist 170 cm. Die Höhe gilt für das ganze Bild (mit den Dingen am Boden)' }),
+        select('body', 'Maßstab', TROPE_BODIES, { hint: '#175: Was die Szene zeigt; die Prüfung warnt, wenn die Höhe nicht dazu passt (Leiche liegend 60–88 cm Bild, sitzend 85–115 cm …)' }),
         select('art', 'Art aus Code', [['', '–'], ['ad', 'Werbung gegen Wirklichkeit (Plakat mit Slogan einer Marke)'], ['machine', 'Das Haus läuft weiter (Maschine blinkt, dampft)'], ['order', 'Neue Ordnung (Kisten in Gang-Farbe)']]),
         multi('decals', 'Spuren dazu', DECALS), select('place', 'Wo', TROPE_PLACES), num('tiles', 'Breite', { unit: 'Kacheln', min: 1, max: 6 }),
         num('gore', 'Gore', { min: 0, max: 3, hint: '0 keiner, 1 Blutfleck, 2 moderat (Tote sichtbar), 3 etwas ehrlicher (frischere Wunden, Knochen; Daniel 21.11.2026: Grenze 3, moderat bleibt die Richtung). Zeitschichten › Gore höchstens schaltet ab' }), ref('note', 'Zettel daneben', 'storylets', { hint: 'Ein Zettel (Storylet) liegt dabei; er wandert beim Lesen ins Logbuch' })] },
@@ -2047,6 +2048,7 @@ export const AREAS = {
         num('chance', 'Chance je Level', { unit: '%', min: 0, max: 100 }), num('weight', 'Gewicht', { min: 0 }), bool('wow', 'Auch im Wow-Raum'), bool('off', 'Aus')] }],
     check: (x, report, p) => {
       if (!x.image && !x.art && !(x.decals || []).length) report('warning', 'Weder Bild noch Code-Art noch Spuren: nichts zu sehen');
+      for (const m of tropeSizeIssues(x)) report('warning', m);   // #175
       if (x.note && p?.data?.storylets?.[x.note] && p.data.storylets[x.note].channel !== 'note') report('warning', 'Zettel daneben sollte ein Storylet mit Wo = Zettel sein');
     },
   },

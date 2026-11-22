@@ -3,7 +3,7 @@
   "name": "Die letzte Stellung",
   "description": "Hinter Sandsäcken, das Gewehr noch auf dem Schoß. Hülsen am Boden, Einschusslöcher in der Wand dahinter.",
   "image": "trope_last_stand",
-  "cm": 130,
+  "cm": 105,
   "place": "floor",
   "tiles": 4,
   "decals": ["shells", "holes"],
@@ -13,13 +13,14 @@
   "events": ["fight", "gang"],
   "chance": 55,
   "weight": 14,
-  "when": []
+  "when": [],
+  "body": "sitting"
  },
  "letzte_pose": {
   "name": "Letzte Pose",
   "description": "An die Wand gelehnt, Rucksack noch auf, die Hand an einer leeren Flasche.",
   "image": "trope_last_pose",
-  "cm": 120,
+  "cm": 100,
   "place": "floor",
   "tiles": 3,
   "decals": [],
@@ -29,13 +30,14 @@
   "events": ["flight", "abandoned", "fire", "flood", "nest"],
   "chance": 45,
   "weight": 12,
-  "when": []
+  "when": [],
+  "body": "sitting"
  },
  "letztes_logbuch": {
   "name": "Das letzte Logbuch",
   "description": "Eine Kiste als Tisch, ein offenes Tagebuch, die Laterne glimmt noch.",
   "image": "trope_logbook",
-  "cm": 110,
+  "cm": 95,
   "place": "floor",
   "tiles": 3,
   "decals": ["sleep"],
@@ -45,13 +47,14 @@
   "events": [],
   "chance": 50,
   "weight": 12,
-  "when": []
+  "when": [],
+  "body": "object"
  },
  "eingefrorener_moment": {
   "name": "Der eingefrorene Moment",
   "description": "Über dem Schreibtisch zusammengesunken, das Formular noch in der Maschine.",
   "image": "trope_desk",
-  "cm": 135,
+  "cm": 105,
   "place": "floor",
   "tiles": 4,
   "decals": [],
@@ -61,13 +64,14 @@
   "events": ["orderly", "sealed", "flight", "abandoned"],
   "chance": 55,
   "weight": 14,
-  "when": []
+  "when": [],
+  "body": "desk"
  },
  "unter_der_decke": {
   "name": "Unter der Decke",
   "description": "Jemand wurde zugedeckt. Nur die Stiefel schauen heraus, daneben Brille und Becher.",
   "image": "trope_blanket",
-  "cm": 91,
+  "cm": 84,
   "place": "floor",
   "tiles": 4,
   "decals": [],
@@ -77,7 +81,8 @@
   "events": ["flight", "fight", "abandoned", "gang"],
   "chance": 40,
   "weight": 10,
-  "when": []
+  "when": [],
+  "body": "lying"
  },
  "warnung_an_der_wand": {
   "name": "Warnung an der Wand",
@@ -92,7 +97,8 @@
   "events": ["nest", "sealed", "fight", "gang", "flood"],
   "chance": 50,
   "weight": 10,
-  "when": []
+  "when": [],
+  "body": "wall"
  },
  "blutspur": {
   "name": "Handabdrücke",
@@ -107,13 +113,14 @@
   "events": ["fight", "flight", "nest"],
   "chance": 35,
   "weight": 8,
-  "when": []
+  "when": [],
+  "body": "wall"
  },
  "der_schrein": {
   "name": "Der Schrein",
   "description": "Kerzen, Fotos, Kronkorken, ein Helm auf einem Stock. Jemand kommt noch her.",
   "image": "trope_shrine",
-  "cm": 160,
+  "cm": 145,
   "place": "floor",
   "tiles": 3,
   "decals": [],
@@ -125,13 +132,14 @@
   "weight": 12,
   "when": [],
   "wow": true,
-  "lightBehavior": "flicker"
+  "lightBehavior": "flicker",
+  "body": "object"
  },
  "kinderspuren": {
   "name": "Kinderspuren",
   "description": "Ein Teddy mit einem Auge, ein Blechauto, eine Zeichnung vom Himmel, ein roter Stiefel. Sparsam.",
   "image": "trope_kids",
-  "cm": 65,
+  "cm": 55,
   "place": "floor",
   "tiles": 2,
   "decals": [],
@@ -140,7 +148,8 @@
   "events": ["flight", "abandoned"],
   "chance": 20,
   "weight": 5,
-  "when": []
+  "when": [],
+  "body": "small"
  },
  "die_wueste_holt_es_zurueck": {
   "name": "Die Wüste holt es zurück",
@@ -212,9 +221,10 @@
   "when": [],
   "description": "Hinter den Sandsäcken, die Hülsen liegen noch warm. Das Blut ist nicht getrocknet, die Spur führt zur Tür.",
   "image": "trope_last_stand",
-  "cm": 130,
+  "cm": 105,
   "decals": ["blood", "drip", "shells", "holes"],
   "light": "#ffb48a",
-  "lightStrength": 55
+  "lightStrength": 55,
+  "body": "sitting"
  }
 }

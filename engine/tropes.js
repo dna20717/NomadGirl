@@ -11,6 +11,20 @@ import { roomStory } from './story.js';
 import { holds, rng, hashStr } from './storylets.js';
 
 export const TROPE_PLACES = [['floor', 'auf dem Boden'], ['wall', 'an der Wand']];
+// #175 (Daniel 22.11.2026: „Manche POI-Objekte wie Leichen sind etwas zu groß“): plausible heights per kind of scene, in cm of the whole
+// picture („Höhe im Spiel“, Leyla 170 cm), and for a lying body its length (picture width); the check warns outside
+export const TROPE_BODIES = [['', '–'], ['lying', 'Liegt (Bild 60–88 cm hoch, Körper 155–195 cm lang)'], ['sitting', 'Sitzt am Boden (≈ 90–100 cm)'],
+  ['desk', 'Sitzt am Tisch (Tisch ≈ 75 cm)'], ['object', 'Ding, Möbel'], ['wall', 'An der Wand'], ['small', 'Klein (Spielzeug, Kram)']];
+export const TROPE_SIZES = { lying: { cm: [60, 88], long: [155, 195] }, sitting: { cm: [85, 115] }, desk: { cm: [90, 120] }, object: { cm: [40, 160] },
+  wall: { cm: [60, 200] }, small: { cm: [20, 70] } };
+// → problems as text; size = [w, h] of the picture in px (optional: then the length of a lying body is checked too)
+export function tropeSizeIssues(t, size = null) {
+  const R = TROPE_SIZES[t?.body]; if (!R || !t.image) return [];
+  const out = [], cm = t.cm ?? 100;
+  if (cm < R.cm[0] || cm > R.cm[1]) out.push(`Höhe ${cm} cm passt nicht zu „${TROPE_BODIES.find(b => b[0] === t.body)[1]}“ (${R.cm[0]}–${R.cm[1]} cm)`);
+  if (R.long && size?.[1]) { const long = Math.round(cm * size[0] / size[1]); if (long < R.long[0] || long > R.long[1]) out.push(`Länge ${long} cm (Bildbreite) passt nicht (${R.long[0]}–${R.long[1]} cm)`); }
+  return out;
+}
 export const GORE = [[0, 'keiner'], [1, 'Blutfleck'], [2, 'moderat (Tote sichtbar)']];
 const list = v => Array.isArray(v) ? v : String(v ?? '').split(',').map(s => s.trim()).filter(Boolean);
 const BUSY = 'HDSCZ@!%$BL*^v';   // ladders, doors, switches, chests, goal, terminal, siren … keep a tile off them
