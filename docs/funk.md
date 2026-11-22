@@ -324,11 +324,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #178 Mile 7 als Mega-Store hübscher
-- **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Die Tankstelle soll so ein Mega-Store sein, das heißt die Größe passt ganz gut. Dennoch hübscher machen bitte“)
+- **Status:** fertig (22.11.) · angelegt 22.11. von Code (Daniel: „Die Tankstelle soll so ein Mega-Store sein, das heißt die Größe passt ganz gut. Dennoch hübscher machen bitte“)
 - **Für:** Code
 - **Auftrag:** Mile 7 Gas & Go als riesiger Highway-Mega-Store (Truck-Stop mit Supermarkt, Imbiss, Werkstatt): Größe bleibt, Hülle/Fassade/Vorplatz/Innenräume hübscher und stimmiger (großes Tankstellendach über den Zapfinseln, Ladenfront mit Schaufenstern und Werbeflächen ohne Text, Vordach, Parkplatz mit Wracks, Innen Ladenreihen, Kassen, Imbiss-Theke), Licht und Neon. PixelLab bis ≈ 100.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: Lichtleisten und Vordach-Schein nur gemalt (nicht im Lichtsystem); Lager-Block auf dem Dach innen weiter grauer Raum, wirkt außen wie Kiste; Hof-Deko je Seed gewürfelt; Blende überall gleich hoch, fehlende Paneele wirken von weitem wie Fenster; Set-Dressing-Gruppen „Regalreihe“/„Imbiss-Ecke“ gelten für alle Läden; KI-Automaten-Abstand in allen POIs. **Befund Code:** Innen noch Beton statt Supermarkt (Boden, Wände, Deckenlicht fehlen als Supermarkt-Look); der graue Block auf dem Dach bricht die Silhouette.
+- **Ergebnis:** (Code, per Helfer, `88c1255`, `9ecc3e4`) Mile 7 als flache Halle mit roter Blende (Delta-Logo aus Code, keine Schrift), Werbe-Pylon, Lager als Wellblech-Block auf dem Dach, Tankstellendach mit Lichtleisten über jedem Hof (auch Wow-Raum, Steg wird Dach), Zapfsäulen, Eingangs-Vordächer, Parkplatz mit Markierungen, Lkw-Wrack, Werbetafeln, Laternen, Einkaufswagen; innen Regale, Kühlregale, Kasse, Imbiss-Theke, Neonröhren; Einfärben multipliziert (kein Rosa mehr); KI-Automaten 3 Kacheln weg von Leitern/Tresor/Türen. Gemalt `assets/pois/megastore/` (PixelLab 60). Tests npm 469, poi 33, poi_levels 15, doors 16, light 18, story 23, poi_stack 8, Audits 0. **Bitte testen:** `/game?poi=tankstelle_km7&seed=1` Vorplatz, Steg über die Zapfinseln, Pylon, Verkaufsraum; Seeds 2–4.
 
 ### #175 Fehler aus Daniels Test: Keycard auf Leitern, Leichen zu groß, Hochhaus ohne Weg zurück
 - **Status:** fertig (22.11.) · angelegt 22.11. von Code (Daniel: „Auf Leitern kann man keine Keycard benutzen. Manche POI-Objekte wie Leichen sind etwas zu groß. Aus dem Hochhaus kommt man nicht wieder raus, wenn man vorzeitig raus will.“)
