@@ -21,7 +21,7 @@ import { buildPoi } from '../engine/poi.js';
 import { parseRoom } from '../engine/room.js';
 import { atmoRegions, planLights } from '../engine/atmosphere.js';
 import { levelConfig, roomGates, landmarkViews, secretSigns, wowInLevel, wowOf, shooterFair, roomType } from '../engine/level_design.js';
-import { reachMap, rulesFrom } from './reach_audit.mjs';
+import { reachMap, rulesFrom, cycleOpts } from './reach_audit.mjs';
 import { initLife, simulate, planLife } from '../engine/ecosystem.js';
 import { planHull, hullAudit } from '../engine/facade.js';
 
@@ -29,7 +29,7 @@ export const SEEDS = [1, 2, 3, 5, 8, 13, 21, 34];
 
 // the easiest way from L to Z: hard moves (step ≥ 4 rows up, gap ≥ 4 columns without a place to stand) cost a lot
 export function mainPath(L, D) {
-  const lay = L.def.layout, m = reachMap(lay, { rules: rulesFrom(D), locks: L.cycles?.locks || [], links: L.cycles?.links || [] });
+  const lay = L.def.layout, m = reachMap(lay, { rules: rulesFrom(D), ...cycleOpts(L) });
   let z = null; for (let y = 0; y < lay.length && !z; y++) { const x = lay[y].indexOf('Z'); if (x >= 0) z = [x, y]; }
   if (!z) return { hard: [], ok: false };
   const goal = [-1, 0, 1].map(d => (z[0] + d) + ',' + z[1]).find(k => m.nodes.has(k));

@@ -98,6 +98,13 @@ export class PoiLevel {
     s.hud.setKeys?.([]);
     // #170 Rückweg verändert · eingestürzter Gang: open now, rubble once Leyla first stands in the goal room
     this.collapses = (C.collapses || []).map(c => ({ ...c, done: false }));
+    // #175 (Daniel: „Aus dem Hochhaus kommt man nicht wieder raus, wenn man vorzeitig raus will“): the ladder of a one-way hole hangs
+    // folded up at its top; at the landing E pulls the cord and lets it down, then the way back up is open (a circle closes from inside)
+    this.lifts = (C.oneWays || []).filter(o => o.ladder?.length).map(o => {
+      const f = { tiles: o.ladder, tx: o.land[0], x: (o.land[0] + 0.5) * T, feet: (o.land[1] + 1) * T, down: false, art: s.add.graphics().setDepth(-9.4) };
+      this.drawLift(f);
+      return f;
+    });
     // camouflaged tiles (art.js drawRoom bakes them like the wall around, on a layer above Leyla)
     for (const c of s.camo || []) {
       if (c.kind === '$') this.walls.push({ ...solidGroup(c.tiles, '$'), rts: c.rts });
@@ -391,6 +398,7 @@ export class PoiLevel {
     for (const o of this.locks) if (!o.open && this.nearLock(o))
       return this.held.includes(o.info.key) ? { text: `${o.info.name} öffnen · ${o.info.key}`, act: () => this.openLock(o) } : { text: `${o.info.name} · verschlossen, braucht: ${o.info.key}` };
     const talk = T?.near(); if (talk) return talk;   // #061
+    for (const f of this.lifts) if (!f.down && close(f)) return { text: 'Leiter herunterlassen · Weg nach oben', act: () => this.dropLift(f) };   // #175
     for (const f of this.fuses || []) if (close(f)) return { text: f.on ? 'Sicherungskasten · Strom aus' : 'Sicherungskasten · Strom an', act: () => this.toggleFuse(f) };   // #082
     for (const sw of this.switches) if (close(sw)) return sw.on ? { text: 'Schalter ist umgelegt' } : sw.dueled ? { text: 'Schalter umlegen', act: () => this.pull(sw) } : { text: 'Schalter hacken · Glitch-Duell', act: () => this.duelAt(sw, 'Schalter', `sw${this.switches.indexOf(sw)}`) };
     for (const t of this.terminals || []) if (close(t)) return t.done ? { text: 'Das Terminal ist still' } : t.tried ? { text: `${t.ai} schweigt · nächster Run` } : { text: `${t.ai} anzapfen · Glitch-Duell (sehr schwer)`, act: () => this.terminalDuel(t) };   // #057
@@ -530,22 +538,46 @@ export class PoiLevel {
     s.hud.toast(`${o.info.name} offen`, `${o.info.key} passt`, 'good', 3000);
   }
   // an opened hatch becomes a rung: the ladders above and below join into one, the top tile carries like a platform
-  hatchLadder(x, y) {
+  // (#175 also a let-down ladder: the tiles y … y1 of one column)
+  hatchLadder(x, y, y1 = y) {
     const s = this.scene, T = s.T, L = s.ladders || [];
-    const above = L.find(l => l.tx === x && l.bottom === y * T), below = L.find(l => l.tx === x && l.top === (y + 1) * T);
-    const top = above ? above.top : y * T, ty = above ? above.ty : y, bottom = below ? below.bottom : (y + 1) * T;
+    const above = L.find(l => l.tx === x && l.bottom === y * T), below = L.find(l => l.tx === x && l.top === (y1 + 1) * T);
+    const top = above ? above.top : y * T, ty = above ? above.ty : y, bottom = below ? below.bottom : (y1 + 1) * T;
     s.ladders = L.filter(l => l !== above && l !== below);
     s.ladders.push({ cx: (x + 0.5) * T, x0: x * T, x1: (x + 1) * T, top, bottom, tx: x, ty });
     if (below) {   // the old top of the ladder below no longer carries
-      s.platformTiles?.delete(x + ',' + (y + 1));
-      for (const z of s.platforms?.getChildren?.() || []) if (Math.abs(z.x - (x + 0.5) * T) < 1 && Math.abs(z.y - ((y + 1) * T + 8)) < 1) { s.platforms.remove(z, true, true); break; }
+      s.platformTiles?.delete(x + ',' + (y1 + 1));
+      for (const z of s.platforms?.getChildren?.() || []) if (Math.abs(z.x - (x + 0.5) * T) < 1 && Math.abs(z.y - ((y1 + 1) * T + 8)) < 1) { s.platforms.remove(z, true, true); break; }
     }
     if (!above) {
       s.platformTiles?.add(x + ',' + y);
       const z = s.add.zone((x + 0.5) * T, y * T + 8, T, 16); s.platforms?.add(z);
       Object.assign(z.body.checkCollision, { down: false, left: false, right: false });
     }
-    ladderArt(s, x * T, (x + 1) * T, y * T, (y + 1) * T, { depth: -9.5 });
+    ladderArt(s, x * T, (x + 1) * T, y * T, (y1 + 1) * T, { depth: -9.5 });
+  }
+  // #175 the folded ladder at the top of a one-way hole (rails, rungs, a red strap) and its pull cord down to a handle above the landing
+  drawLift(f) {
+    const s = this.scene, T = s.T, g = f.art.clear(), [x, y] = f.tiles[0], X = x * T, Y = y * T;
+    if (f.down) return;
+    g.fillStyle(0x2a2d33).fillRect(X + 10, Y + 4, T - 20, T * 0.85);
+    g.fillStyle(0x8a6a44); for (const dx of [12, T - 18]) g.fillRect(X + dx, Y + 2, 6, T * 0.85);
+    g.fillStyle(0xa07c4f); for (let k = 0; k < 4; k++) g.fillRect(X + 12, Y + 8 + k * 12, T - 24, 4);
+    g.fillStyle(0xd0303a).fillRect(X + 6, Y + T * 0.42, T - 12, 7);   // the strap that holds it up
+    const hy = f.feet - 150, cx = X + T - 10;
+    g.lineStyle(3, 0xc9b48a, 0.9).lineBetween(cx, Y + T * 0.45, cx, hy);
+    g.lineStyle(5, 0xffd27a).strokeCircle(cx, hy + 12, 10);   // the handle: pull here
+  }
+  // #175 let it down: the hole's tiles become ladder (joined with the ladders above and below), a rattle, the way up is open
+  dropLift(f) {
+    const s = this.scene, T = s.T, ys = f.tiles.map(([, y]) => y), x = f.tiles[0][0], y0 = Math.min(...ys), y1 = Math.max(...ys);
+    f.down = true; this.drawLift(f);
+    for (const [tx, ty] of f.tiles) if (s.room.tiles[ty]?.[tx] === '.') s.room.tiles[ty][tx] = 'H';
+    this.hatchLadder(x, y0, y1);
+    for (let y = y0; y <= y1; y++) s.time.delayedCall((y - y0) * 50, () => s.fx.puff((x + 0.5) * T, (y + 1) * T, 0xa08662));
+    s.sfx?.('ladder_step', { x: f.x }); s.sfx?.('door_open', { x: f.x });
+    s.cam.shake(160, 0.003);
+    s.hud.toast('Leiter unten', 'Der Weg nach oben ist offen · zurück zum Van jederzeit', 'good', 3000);
   }
   openSolid(o) {
     o.open = true;
@@ -698,6 +730,7 @@ export class PoiLevel {
       locks: this.locks.map(o => ({ x0: o.x0, x1: o.x1, y0: o.y0, y1: o.y1, open: o.open, name: o.info.name, key: o.info.key, hatch: o.hatch })),
       held: [...this.held],
       collapses: this.collapses.map(c => ({ tiles: c.tiles, done: c.done, trigger: c.trigger })),   // #170
+      lifts: this.lifts.map(f => ({ tiles: f.tiles, x: Math.round(f.x), feet: f.feet, down: f.down })),   // #175
     };
   }
 }

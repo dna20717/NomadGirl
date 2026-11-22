@@ -460,9 +460,12 @@ function weldStack({ graph, tiles, placed, branches, joints, stack, ends, enemyK
     } else if (c.recipe === 'oneWayDown' && stack === 'deep' && c.drop != null) {
       const j = joint(c.drop - 1);
       if (!j) continue;
-      let y = j.y; while (tiles[y][j.x] === 'H') tiles[y++][j.x] = '.';
+      const cut = [];
+      let y = j.y; while (tiles[y][j.x] === 'H') { cut.push([j.x, y]); tiles[y++][j.x] = '.'; }
       y--; while (tiles[y + 1]?.[j.x] === '.') y++;
-      out.oneWays.push({ circle: c.i, from: [j.x, j.y - 1], land: [j.x, y] });
+      // #175 (Daniel: „Aus dem Hochhaus kommt man nicht wieder raus …“): the cut ladder hangs folded up at the top of the hole; at the
+      // landing Leyla lets it down (E), then the way back up is open (Bibel: a way back opens from the inside and closes a circle)
+      out.oneWays.push({ circle: c.i, from: [j.x, j.y - 1], land: [j.x, y], ladder: cut });
     }
   }
   const outer = graph.circles.at(-1);

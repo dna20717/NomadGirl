@@ -7,6 +7,8 @@
 // Usage: node tools/reach_audit.mjs [--seeds 40] [--poi <id>] [--rooms] [--traps] [--verbose] [--root <project folder>]
 //   --rooms    also every room block standalone (entries: L, open seams left/right, hooks A, shortcut; doors open; between two
 //              entries at least one way, every mark from some entry)
+//   (#175) also from every place she can get to before the goal room (with the doors and locks open by then): a way home to the van,
+//   without cracking the vault first („Kein Rückweg zum Van“); ladders folded over a one-way hole come down from the landing
 //   --traps    also report dead ends: places she can get to but not back to the van from (model is conservative, so only a hint)
 //   Exit 1 when anything is unreachable.
 //
@@ -69,13 +71,19 @@ function arcWith(R, room, rise, hx, ledge) {
 const SOLID = new Set(['#', 'A', '^', 'v', 'D']);
 
 // → { nodes: Set('x,y'), open: Set(door index), edges (Map node → Set node), stand(x, y), near(x, y) }
-export function reachMap(layout, { start, starts, rules = RULES, doorsOpen = false, locks = [], links = [], keysHeld = null } = {}) {
+// doorsHeld = door indexes already open, frozen = nothing more opens on the way (#175: the state of the run at that moment);
+// stages = the nodes and what was open after each round of opening (#175: where she can be before which door / lock is open)
+// lifts (#175): ladders folded up over a one-way hole (cycles.oneWays[].ladder), let down at the landing (at): air until then, a
+// ladder after; liftsHeld = indexes already down
+export function reachMap(layout, { start, starts, rules = RULES, doorsOpen = false, locks = [], links = [], keysHeld = null, doorsHeld = null, frozen = false, forbid = null, lifts = [], liftsHeld = null } = {}) {
   const H = layout.length, W = Math.max(...layout.map(r => r.length));
   // #168 locks: shut (wall) until their key is reached, then air (a hatch: its ladder); keysHeld = indexes already open
   const lockOf = new Map(), lockOpen = new Set(keysHeld || []);
   locks.forEach((l, i) => { for (const [x, y] of l.tiles) lockOf.set(x + ',' + y, i); });
   const raw0 = (x, y) => (y < 0 || y >= H || x < 0 || x >= W ? '#' : layout[y][x] ?? '#');
-  const raw = (x, y) => { const c = raw0(x, y); if (c !== '|') return c; const i = lockOf.get(x + ',' + y); return i != null && lockOpen.has(i) ? (locks[i].hatch ? 'H' : '.') : '#'; };
+  const liftOf = new Map(), liftOpen = new Set(liftsHeld || []);
+  lifts.forEach((f, i) => { for (const [x, y] of f.tiles) liftOf.set(x + ',' + y, i); });
+  const raw = (x, y) => { const c = raw0(x, y); if (c === '.' && liftOpen.size && liftOpen.has(liftOf.get(x + ',' + y))) return 'H'; if (c !== '|') return c; const i = lockOf.get(x + ',' + y); return i != null && lockOpen.has(i) ? (locks[i].hatch ? 'H' : '.') : '#'; };
   // doors: 4-connected groups of D, every switch opens the nearest (centre distance, as in the game)
   const doorOf = new Map(), doors = [];
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (raw(x, y) === 'D' && !doorOf.has(x + ',' + y)) {
@@ -95,21 +103,25 @@ export function reachMap(layout, { start, starts, rules = RULES, doorsOpen = fal
   let s0 = starts || (start ? [start] : null);
   if (!s0) for (let y = 0; y < H && !s0; y++) for (let x = 0; x < W; x++) if (raw(x, y) === 'L') { s0 = [[x, y]]; break; }
   if (!s0) return { nodes: new Set(), edges: new Map(), near: () => false, open: new Set(), doors, switches };
-  const open = new Set(doorsOpen ? doors.map((_, i) => i) : []);
+  const open = new Set(doorsOpen ? doors.map((_, i) => i) : doorsHeld || []);
   let result;
+  const stages = [];
   for (;;) {
-    result = search(raw, W, H, s0, open, doorOf, rules);
+    result = search(raw, W, H, s0, open, doorOf, rules, forbid);
+    stages.push({ nodes: result.nodes, edges: result.edges, open: new Set(open), lockOpen: new Set(lockOpen), liftOpen: new Set(liftOpen) });
+    if (frozen) break;
     let more = false;
     for (const s of switches) if (s.door >= 0 && !open.has(s.door) && nearIn(result.nodes, s.x, s.y)) { open.add(s.door); more = true; }
     locks.forEach((l, i) => { if (!lockOpen.has(i) && l.keyAt && nearIn(result.nodes, ...l.keyAt)) { lockOpen.add(i); more = true; } });
+    lifts.forEach((f, i) => { if (!liftOpen.has(i) && f.at && nearIn(result.nodes, ...f.at)) { liftOpen.add(i); more = true; } });
     if (!more) break;
   }
-  return { ...result, open, doors, switches, lockOpen, near: (x, y) => nearIn(result.nodes, x, y) };
+  return { ...result, open, doors, switches, lockOpen, liftOpen, stages, near: (x, y) => nearIn(result.nodes, x, y) };
 }
 // E reaches it: standing in the same row (feet tile), at most one column away
 const nearIn = (nodes, x, y) => [-1, 0, 1].some(d => nodes.has((x + d) + ',' + y));
 
-function search(raw, W, H, starts, open, doorOf, R) {
+function search(raw, W, H, starts, open, doorOf, R, forbid = null) {
   const T = R.T, arc = (room, rise, hx, ledge) => arcWith(R, room, rise, hx, ledge);
   const solid = (x, y) => { const c = raw(x, y); return c === 'D' ? !open.has(doorOf.get(x + ',' + y)) : SOLID.has(c); };
   const plat = (x, y) => raw(x, y) === '=';
@@ -126,7 +138,7 @@ function search(raw, W, H, starts, open, doorOf, R) {
   const key = (x, y) => x + ',' + y;
   let from = null;
   const push = (x, y) => {
-    if (y < 0 || y >= H || x < 0 || x >= W) return;
+    if (y < 0 || y >= H || x < 0 || x >= W || forbid?.(x, y)) return;   // #175 forbid: places she may not use (the goal room)
     const k = key(x, y);
     if (from) { let e = edges.get(from); if (!e) edges.set(from, e = new Set()); e.add(k); }
     if (!nodes.has(k)) { nodes.add(k); q.push([x, y]); }
@@ -195,6 +207,68 @@ export function backTo(map, startKeys) {
   return seen;
 }
 
+// what the cycle graph puts into a level for the search: locks with their keys, switch → door links, ladders to let down (#175)
+export const cycleOpts = L => { const c = L.cycles || {}; return { locks: c.locks || [], links: c.links || [], lifts: (c.oneWays || []).filter(o => o.ladder?.length).map(o => ({ tiles: o.ladder, at: o.land })) }; };
+
+// #175 (Daniel 22.11.2026: „Aus dem Hochhaus kommt man nicht wieder raus, wenn man vorzeitig raus will“): from every place she can get
+// to, with the run as it is when she first gets there (the doors and locks open by then), a way home to the van exists without the
+// goal room: she may open switches, doors and locks on the way back, but she does not have to crack the vault or take the shortcut
+// first. The goal room itself and the shortcut are the business of „Rückweg vom Tresor“ and „Einsturz“. Places are grouped by what
+// they can reach (strongly connected parts of the move graph), one search per part → [{ kind, x, y, room }] (one per room and stage)
+export function homeAudit(L) {
+  const lay = L.def.layout, opts = cycleOpts(L);
+  const inR = (r, x, y) => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h;
+  const roomAt = (x, y) => L.rooms.find(r => inR(r, x, y));
+  const goals = L.rooms.filter(r => { for (let y = r.y; y < r.y + r.h; y++) if (lay[y]?.slice(r.x, r.x + r.w).includes('Z')) return true; return false; });
+  const forbid = goals.length ? (x, y) => goals.some(r => inR(r, x, y)) : null;
+  const isVan = k => { const [x, y] = k.split(',').map(Number); return lay[y][x] === 'L'; };
+  // the run before the goal room, round by round: what she reaches without it, and what is open by then (places she only gets to
+  // through the goal room, like a side room hanging off it or the far end of an open shortcut, belong to the goal room)
+  const M = reachMap(lay, { ...opts, forbid });
+  const out = [], seen = new Set(), told = new Set();
+  M.stages.forEach((st, k) => {
+    const fresh = [...st.nodes].filter(n => !seen.has(n));
+    for (const n of st.nodes) seen.add(n);
+    if (!fresh.length) return;
+    // the places new in this stage and everything they reach, nothing more opens (frozen) → which of them get home as they are
+    const vanKeys = [...st.nodes].filter(isVan).map(k => k.split(',').map(Number));
+    const G = reachMap(lay, { ...opts, starts: [...fresh.map(n => n.split(',').map(Number)), ...vanKeys], keysHeld: [...st.lockOpen], doorsHeld: [...st.open], liftsHeld: [...st.liftOpen], frozen: true, forbid });
+    const home = backTo(G, [...G.nodes].filter(isVan));
+    const bad = fresh.filter(n => !home.has(n) && G.nodes.has(n));
+    if (!bad.length) return;
+    // strongly connected parts among the bad places (iterative Tarjan): one search from one place of each part
+    const badSet = new Set(bad), idx = new Map(), low = new Map(), onStack = new Set(), stack = [], parts = [];
+    let counter = 0;
+    for (const v0 of bad) {
+      if (idx.has(v0)) continue;
+      const work = [[v0, [...(G.edges.get(v0) || [])].filter(w => badSet.has(w)), 0]];
+      idx.set(v0, counter); low.set(v0, counter++); stack.push(v0); onStack.add(v0);
+      while (work.length) {
+        const top = work[work.length - 1], [v, nb] = top;
+        if (top[2] < nb.length) {
+          const w = nb[top[2]++];
+          if (!idx.has(w)) { idx.set(w, counter); low.set(w, counter++); stack.push(w); onStack.add(w); work.push([w, [...(G.edges.get(w) || [])].filter(u => badSet.has(u)), 0]); }
+          else if (onStack.has(w)) low.set(v, Math.min(low.get(v), idx.get(w)));
+        } else {
+          work.pop();
+          if (work.length) { const u = work[work.length - 1][0]; low.set(u, Math.min(low.get(u), low.get(v))); }
+          if (low.get(v) === idx.get(v)) { const part = []; let w; do { w = stack.pop(); onStack.delete(w); part.push(w); } while (w !== v); parts.push(part); }
+        }
+      }
+    }
+    for (const part of parts) {
+      const [x, y] = part[0].split(',').map(Number);
+      const R = reachMap(lay, { ...opts, start: [x, y], keysHeld: [...st.lockOpen], doorsHeld: [...st.open], liftsHeld: [...st.liftOpen], forbid });
+      if (vanKeys.some(([a, b]) => R.nodes.has(a + ',' + b)) || [...R.nodes].some(isVan)) continue;
+      const r = roomAt(x, y), id = r?.id || (L.shortcut?.kind === 'shaft' ? 'Schacht' : 'Tunnel'), tag = id + ':' + k;
+      if (told.has(tag)) continue;
+      told.add(tag);
+      out.push({ kind: 'Kein Rückweg zum Van', x, y, room: id, stage: k, n: part.length, lx: r ? (r.flip ? r.w - 1 - (x - r.x) : x - r.x) : '–', ly: r ? y - r.y : '–' });
+    }
+  });
+  return out;
+}
+
 // one welded level → findings [{ kind, x, y, room, lx, ly }]
 export function auditLevel(L, { traps = false } = {}) {
   const lay = L.def.layout, out = [];
@@ -204,7 +278,7 @@ export function auditLevel(L, { traps = false } = {}) {
     const lx = r ? (r.flip ? r.w - 1 - (x - r.x) : x - r.x) : '–', ly = r ? y - r.y : '–';
     out.push({ kind, x, y, room: r ? r.id : (L.shortcut?.kind === 'shaft' ? 'Schacht' : 'Tunnel'), lx, ly });
   };
-  const cyc = L.cycles || {}, opts = { locks: cyc.locks || [], links: cyc.links || [] };
+  const cyc = L.cycles || {}, opts = cycleOpts(L);
   const M = reachMap(lay, opts);
   for (let y = 0; y < lay.length; y++) for (let x = 0; x < lay[y].length; x++) {
     const c = lay[y][x];
@@ -231,6 +305,8 @@ export function auditLevel(L, { traps = false } = {}) {
     const van = []; for (let y = 0; y < lay.length; y++) for (let x = 0; x < lay[y].length; x++) if (lay[y][x] === 'L') van.push([x, y]);
     if (!van.some(p => after.near(...p))) note('Einsturz: kein Weg zum Van', ...c.tiles[0]);
   }
+  // #175 from every place she gets to before the goal room, a way home to the van (vorzeitig raus)
+  for (const f of homeAudit(L)) out.push(f);
   const sc = L.shortcut;
   if (sc) for (const [name, p] of [['Abkürzung (Ausgang)', sc.oneWay ? (cyc.oneWays || []).at(-1)?.from || sc.down : sc.down], ['Abkürzung (Eingang)', sc.up]]) {
     const [x, y] = p, hit = [-1, 0, 1, 2, 3].some(dy => [-1, 0, 1].some(dx => M.nodes.has((x + dx) + ',' + (y - 1 + dy))));
