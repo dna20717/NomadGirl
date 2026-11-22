@@ -214,26 +214,28 @@ export class LevelFx {
   // or Leyla's first steps stop it (she stays in control the whole time)
   rideShaft(cam, base, z, ms) {
     const s = this.scene, T = this.T, B = this.wowBox, SH = B.shaft, C = this.cfg;
-    const up = SH.sh.cfg.rideMs, down = Math.round(up * 0.6), hold = C.wowHold;
-    const foot = B.by - 4 * T, tip = SH.top + 4 * T, x = SH.cx;
-    this.wowCam = { base, at: s.time.now, back: false, ride: true, from: s.leyla?.x ?? 0 };
+    const up = SH.sh.cfg.rideMs, lead = Math.round(ms * 0.6);
+    this.wowCam = { base, at: s.time.now, back: false, ride: { x: SH.cx, foot: B.by - 4 * T, tip: SH.top + 4 * T, lead, up, hold: C.wowHold, down: Math.round(up * 0.6) }, from: s.leyla?.x ?? 0 };
     cam.stopFollow();
-    cam.pan(x, foot, ms * 0.6, 'Sine.easeInOut', true);
-    cam.zoomTo(z * 0.85, ms * 0.6, 'Sine.easeInOut', true);
-    const leg = (from, to, dur, then) => { this.rideTween = s.tweens.addCounter({ from, to, duration: dur, ease: 'Sine.easeInOut', onUpdate: tw => { if (!this.wowCam?.back) cam.centerOn(x, tw.getValue()); }, onComplete: then }); };
+    cam.pan(SH.cx, B.by - 4 * T, lead, 'Sine.easeInOut', true);
+    cam.zoomTo(z * 0.85, lead, 'Sine.easeInOut', true);
     const stop = () => this.endWowCam();
     this.wowStop = stop;
-    this.rideTimer = s.time.delayedCall(ms * 0.6 + 200, () => {
-      if (this.wowCam?.back) return;
-      cam.panEffect?.reset?.();
-      leg(foot, tip, up, () => { this.rideTimer = s.time.delayedCall(hold, () => leg(tip, foot, down, () => s.time.delayedCall(hold * 0.5, stop))); });
-    });
     s.input.keyboard?.once('keydown', stop); s.input.once('pointerdown', stop);
+  }
+  // the ride runs on the scene clock (also under nomad.step): lead-in pan, up, hold at the tip, down, a breath, done
+  rideStep() {
+    const s = this.scene, c = this.wowCam, R = c.ride, t = s.time.now - c.at, e = k => 0.5 - 0.5 * Math.cos(Math.PI * Math.max(0, Math.min(1, k)));
+    if (t < R.lead) return;
+    if (!R.going) { R.going = true; s.cam.panEffect?.reset?.(); }
+    const t1 = t - R.lead, a = R.up, b = a + R.hold, d = b + R.down, f = d + R.hold * 0.5;
+    const y = t1 < a ? R.foot + (R.tip - R.foot) * e(t1 / a) : t1 < b ? R.tip : t1 < d ? R.tip + (R.foot - R.tip) * e((t1 - b) / R.down) : R.foot;
+    s.cam.centerOn(R.x, y);
+    if (t1 >= f) this.endWowCam();
   }
   endWowCam() {
     const s = this.scene, c = this.wowCam; if (!c || c.back) return;
     c.back = true;
-    this.rideTween?.stop?.(); this.rideTimer?.remove?.(false);
     const cam = s.cam, C = s.data_.game?.camera || {};
     cam.panEffect?.reset?.(); cam.zoomEffect?.reset?.();
     cam.zoomTo(c.base, 500, 'Sine.easeInOut', true);
@@ -270,7 +272,9 @@ export class LevelFx {
   update(time, dt) {
     if (!this.on) return;
     const T = this.T, s = this.scene;
-    if (this.wowCam?.ride && !this.wowCam.back && Math.abs((s.leyla?.x ?? 0) - this.wowCam.from) > 2 * T) this.endWowCam();   // #173 she walks: the ride ends
+    if (this.wowCam?.ride && !this.wowCam.back) {   // #173 the ride up the rocket; she walks: the ride ends
+      if (Math.abs((s.leyla?.x ?? 0) - this.wowCam.from) > 2 * T) this.endWowCam(); else this.rideStep();
+    }
     if (this.landmark && this.P.level?.landmarkMotif === 'mast') this.landmark.alpha = 0.75 + 0.25 * (Math.sin(time / 300) > 0 ? 1 : 0);
     if (this.wowFx) {
       const B = this.wowBox, kind = this.wow.W.particles, near = Math.abs(s.leyla.x - B.bx) < s.scale.width;

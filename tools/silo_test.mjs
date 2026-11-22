@@ -52,6 +52,16 @@ v = await ev(() => { const s = game.scene.getScene('play'), t = s.level.terminal
 check('KI-Terminal: Glitch-Duell gegen Titan Lullaby, sehr schwer (85 Integrität, #076)', /Titan Lullaby/.test(v.prompt || '') && v.duel?.open && v.duel.foe === 'Titan Lullaby' && v.duel.hp?.[1] === 85, v);
 v = await ev(() => { const s = game.scene.getScene('play'); s.hud.duel.act('back'); nomad.step(5); return { prompt: s.level.nearest()?.text, open: s.hud.duel.isOpen }; });
 check('Aufgegeben: nur ein Versuch je Run', !v.open && /schweigt/.test(v.prompt || ''), v);
+// #173 the rocket as tall as the silo: segments from the nose under the yard down to the pad in the Wow room, the ride up and back
+v = await ev(() => {
+  const s = game.scene.getScene('play'), F = s.levelFx, SH = F.shaft, T = s.T, r = F.wow.room;
+  const parts = SH.plan.map(p => p.part), imgs = SH.box.list.filter(o => o.type === 'Image').length;
+  nomad.tpTile(r.x + Math.floor(r.w / 2) - 6, r.y + r.h - 1);
+  nomad.step(15); let tip = Infinity; for (let i = 0; i < 50; i++) { nomad.step(15); tip = Math.min(tip, s.cam.midPoint.y); }
+  return { parts: [parts[0], parts.at(-1)], rings: parts.filter(p => p === 'ring').length, imgs, tiles: Math.round((SH.stand - SH.top) / T), mask: !!SH.box.mask, tip: Math.round(tip), top: SH.top, back: !!F.wowCam?.back, img: !!F.wowPic?.img };
+});
+check('Rakete so hoch wie das Silo (#173): Spitze bis Rampe über 150 Kacheln, Ringe, Maske; Wow ohne altes Bild', v.parts[0] === 'nose' && v.parts[1] === 'engine' && v.rings >= 2 && v.imgs > 15 && v.tiles > 150 && v.mask && !v.img, v);
+check('Kamerafahrt im Wow-Raum: den Rumpf hoch bis zur Spitze und zurück', v.tip < v.top + 8 * 64 && v.back, v);
 
 console.log(ok.map(x => '✔ ' + x).join('\n'));
 if (errors.length) { console.log(errors.map(x => '✖ ' + x).join('\n')); await browser.close(); process.exit(1); }
