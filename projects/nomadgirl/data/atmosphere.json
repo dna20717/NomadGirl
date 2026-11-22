@@ -162,5 +162,30 @@
   "drips": {"perMinute": 0},
   "fog": {"count": 0},
   "critters": {"moths": 2.5, "papers": 3, "draft": 8}
+ },
+ "vorplatz_abend": {
+  "name": "Vorplatz am Abend",
+  "light": {"ambient": 58, "color": "#ffe0cc", "vignette": 24},
+  "lamps": [],
+  "dust": {"count": 40, "color": "#e8c896", "size": 4, "drift": [-90, 14], "alpha": 30, "inLight": true},
+  "sparks": {"perMinute": 0},
+  "drips": {"perMinute": 0},
+  "fog": {"count": 0},
+  "description": "#179 Tankstellen-Hof in der Dämmerung: etwas dunkler und warm, damit die Lichtleisten unter dem Tankstellendach und die Vordächer leuchten. Sand treibt im Wind.",
+  "critters": {"moths": 2}
+ },
+ "supermarkt_hell": {
+  "name": "Supermarkt hell",
+  "description": "#179 Heller Supermarkt: kühles Weiß, Leuchtpaneele unter der abgehängten Decke (manche stottern, kaputte hängen herab), wenig Vignette, Staub im Licht.",
+  "light": {"ambient": 62, "color": "#dcecff", "vignette": 26},
+  "lamps": [
+   {"kind": "panel", "color": "#eef8ff", "every": 5, "offset": 2, "chance": 80, "radius": 480, "strength": 78, "behavior": "steady"},
+   {"kind": "panel", "color": "#eef8ff", "every": 5, "offset": 2, "chance": 100, "radius": 460, "strength": 70, "behavior": "buzz"}
+  ],
+  "dust": {"count": 50, "color": "#f6ecd0", "size": 3, "drift": [6, -4], "alpha": 45, "inLight": true},
+  "sparks": {"perMinute": 1, "color": "#ffd27a"},
+  "drips": {"perMinute": 2, "color": "#9ec8d8"},
+  "fog": {"count": 0},
+  "critters": {"flies": 2, "moths": 1.5, "roaches": 3, "papers": 5, "draft": 20}
  }
 }

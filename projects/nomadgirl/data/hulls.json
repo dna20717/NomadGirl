@@ -54,7 +54,10 @@
   "pumps": true,
   "yard": ["truck", "wreck", "lamp", "cart", "dumpster", "billboard", "stop"],
   "yardGap": 3,
-  "apron": true
+  "apron": true,
+  "upperFascia": true,
+  "upperPad": 2,
+  "lamps": true
  },
  "mall": {
   "name": "Mall",

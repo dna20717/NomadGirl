@@ -139,12 +139,13 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
     const p = new Path2D(), b = plan.buildings[bi];
     for (let y = Math.max(y0, b.top); y <= Math.min(y0 + h - 1, b.bottom); y++) {
       let run = -1;
-      for (let x = Math.max(x0, b.x0 - 1); x <= Math.min(x0 + w, b.x1 + 1); x++) {
+      const bx0 = b.vx0 ?? b.x0, bx1 = b.vx1 ?? b.x1;   // #179 the clad block on the roof may reach past the hall
+      for (let x = Math.max(x0, bx0 - 1); x <= Math.min(x0 + w, bx1 + 1); x++) {
         const on = cls(x, y) === 1 && bOf(x, y) === bi;
         if (on && run < 0) run = x;
         if (!on && run >= 0) { p.rect(run * g, y * g, (x - run) * g, g); run = -1; }
       }
-      if (run >= 0) p.rect(run * g, y * g, (Math.min(x0 + w, b.x1 + 1) + 1 - run) * g, g);
+      if (run >= 0) p.rect(run * g, y * g, (Math.min(x0 + w, bx1 + 1) + 1 - run) * g, g);
     }
     return p;
   };
@@ -161,9 +162,9 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
 
   // ---------- 2. per building, clipped to its facade: material, bands, plinth, pilasters, windows, damage ----------
   plan.buildings.forEach((b, bi) => {
-    if (b.x1 < x0 - 2 || b.x0 > x0 + w + 2) return;
+    if ((b.vx1 ?? b.x1) < x0 - 2 || (b.vx0 ?? b.x0) > x0 + w + 2) return;
     ctx.save(); ctx.clip(facadePath(bi));
-    const left = b.x0, right = b.x1 + 1, top = b.top, bottom = plan.ground;
+    const left = b.vx0 ?? b.x0, right = (b.vx1 ?? b.x1) + 1, top = b.top, bottom = plan.ground;
     // material: the painted wall texture (#172) on the world grid (chunks stitch), variants per texture cell; else from code
     const tex = M('wall');
     if (tex) {
@@ -327,7 +328,7 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
       const im = M('entry'); if (!im) continue;
       const r = fitIn(ctx, dimmed(im, dk * 0.7), p.x * g, p.y * g, p.w * g, p.h * g, { mode: 'height', stretch: 1, flip: p.side > 0 });
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
-      const gr = ctx.createLinearGradient(0, r.y + r.h * 0.2, 0, r.y + r.h); gr.addColorStop(0, 'rgba(255,236,190,0.16)'); gr.addColorStop(1, 'rgba(255,236,190,0)');
+      const gr = ctx.createLinearGradient(0, r.y + r.h * 0.2, 0, r.y + r.h); gr.addColorStop(0, `rgba(255,236,190,${C.lamps ? 0.06 : 0.16})`); gr.addColorStop(1, 'rgba(255,236,190,0)');
       ctx.fillStyle = gr; ctx.fillRect(r.x + r.w * 0.05, r.y + r.h * 0.2, r.w * 0.9, r.h * 0.8); ctx.restore();
       continue;
     }
@@ -339,7 +340,7 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
       if (p.walk || C.stationAll) {
         const ly = (p.y + H0 * 0.3) * g, lh = (plan.ground - p.y - H0 * 0.3) * g;
         ctx.save(); ctx.globalCompositeOperation = 'lighter';
-        const gr = ctx.createLinearGradient(0, ly, 0, ly + lh); gr.addColorStop(0, 'rgba(230,240,255,0.2)'); gr.addColorStop(0.6, 'rgba(255,230,190,0.07)'); gr.addColorStop(1, 'rgba(255,230,190,0)');
+        const gr = ctx.createLinearGradient(0, ly, 0, ly + lh); gr.addColorStop(0, `rgba(230,240,255,${C.lamps ? 0.08 : 0.2})`); gr.addColorStop(0.6, `rgba(255,230,190,${C.lamps ? 0.03 : 0.07})`); gr.addColorStop(1, 'rgba(255,230,190,0)');
         ctx.fillStyle = gr; ctx.fillRect(Math.round(p.x * g), Math.round(ly), Math.round(p.w * g), Math.round(lh)); ctx.restore();
       }
       continue;
@@ -376,29 +377,75 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
 }
 
 // #178 the fascia of the mega-store (Mile 7): coping, a red band with a white and an orange stripe, every ~24 tiles a white roundel with
-// the orange delta of Delta Petrol (shapes from code, no lettering), panels missing by decay with the steel showing
+// the orange delta of Delta Petrol (shapes from code, no lettering). #179 panels missing by decay open up the steel studs and the
+// insulation behind (no dark holes that read as windows from afar); p.frame: the raised fascia around the block on the roof, the band
+// runs down both sides of the block (a U upside down) to the hall's fascia (a pier in front of it) or to the block's bottom (a cap)
 function drawFascia(ctx, p, g, { trim, px1, R, decay }) {
-  const red = trim, hiRed = mix(trim, 0xffffff, 0.22), loRed = mix(trim, DARK, 0.35);
-  R(0xb3b9d1, p.x, p.y, p.w, 0.2); R(0xdae0ea, p.x, p.y, p.w, 1 / g); R(0x6d758d, p.x, p.y + 0.2 - 1 / g, p.w, 1 / g);
-  R(red, p.x, p.y + 0.2, p.w, p.h - 0.45); R(hiRed, p.x, p.y + 0.2, p.w, 2 / g);
-  R(0xdae0ea, p.x, p.y + p.h * 0.52, p.w, p.h * 0.1); R(0xfa6a0a, p.x, p.y + p.h * 0.62, p.w, p.h * 0.05);
-  R(loRed, p.x, p.y + p.h - 0.35, p.w, 0.1); R(0x333941, p.x, p.y + p.h - 0.25, p.w, 0.25); R(INK, p.x, p.y + p.h - 1 / g, p.w, 1 / g);
-  for (let x = p.x + 2; x < p.x + p.w - 1; x += 2) R(loRed, x, p.y + 0.22, 1 / g, p.h * 0.28);   // panel joints
+  const red = trim, hiRed = mix(trim, 0xffffff, 0.22), loRed = mix(trim, DARK, 0.35), h = p.h, f = p.frame || 0, bot = p.bottom ?? p.y + h;
+  const segs = [{ x: p.x, y: p.y, w: p.w, h, dir: 'h' }];   // the band: top, then the sides (vertical, from under the top band down)
+  if (f) segs.push({ x: p.x, y: p.y + h, w: f, h: bot - p.y - h, dir: 'v', side: -1 }, { x: p.x + p.w - f, y: p.y + h, w: f, h: bot - p.y - h, dir: 'v', side: 1 });
+  for (const sg of segs) R(red, sg.x, sg.y, sg.w, sg.h);
+  // stripes along the band at the same depth from its outer edge, mitred into Ls at the corners: coping (outside), white, orange,
+  // the dark lower edge (inside). Along the top band "outside" is up; along the sides outside is away from the block
+  const along = (d0, d1, c) => {
+    const a = d0 * (f || h), b = d1 * (f || h), y = p.y + d0 * h;
+    R(c, p.x + (f ? a : 0), y, p.w - (f ? 2 * a : 0), (d1 - d0) * h);
+    if (f) { R(c, p.x + a, y, b - a, bot - y); R(c, p.x + p.w - b, y, b - a, bot - y); }
+  };
+  along(0, 0.1, 0xb3b9d1); along(0.1, 0.1 + 2 / g / h, hiRed);
+  along(0.52, 0.62, 0xdae0ea); along(0.62, 0.67, 0xfa6a0a);
+  along(0.825, 0.875, loRed); along(0.875, 1, 0x333941);
+  R(0xdae0ea, p.x, p.y, p.w, 1 / g);
+  if (!f) R(INK, p.x, p.y + h - 1 / g, p.w, 1 / g);
+  else {   // the inner edge against the block, the outer contour, the foot of each side
+    R(INK, p.x + f, p.y + h - 1 / g, p.w - 2 * f, 1 / g);
+    for (const sg of segs.slice(1)) {
+      R(INK, sg.side < 0 ? sg.x + sg.w - 1 / g : sg.x, sg.y, 1 / g, sg.h); R(INK, sg.side < 0 ? sg.x : sg.x + sg.w - 1 / g, p.y, 1 / g, bot - p.y);
+      const join = sg.side < 0 ? p.joinL : p.joinR;
+      if (join != null) R(mix(trim, DARK, 0.55), sg.side < 0 ? sg.x + sg.w : sg.x - 0.18, bot - (p.roofH || h), 0.18, (p.roofH || h) - 0.25);   // a pier in front of the hall's fascia: its shadow on the band
+      else { R(0x333941, sg.x, bot - 0.22, sg.w, 0.22); R(0x6d758d, sg.x, bot - 0.22, sg.w, 1 / g); R(INK, sg.x, bot - 1 / g, sg.w, 1 / g); }   // a cap
+    }
+  }
+  // panel joints: across the band every 2 tiles
+  for (let x = p.x + 2; x < p.x + p.w - 1; x += 2) R(loRed, x, p.y + 0.22, 1 / g, h * 0.28);
+  if (f) for (const sg of segs.slice(1)) for (let y = sg.y + 2; y < sg.y + sg.h - 0.5; y += 2) R(loRed, sg.x + (sg.side < 0 ? 0.22 : sg.w * 0.5), y, sg.w * 0.28, 1 / g);
   // weathering: rust runs from the joints, by decay
   for (let k = 0; k < p.w * decay * 0.4; k++) { const x = p.x + hash(k, p.x | 0, 91) * p.w, hh = 0.2 + hash(k, 2, 92) * 0.5; R(0x71413b, x, p.y + 0.25, 2 / g, hh); }
-  // logos: a white roundel with the orange delta
-  const n = Math.max(1, Math.round(p.w / 24));
+  if (f) for (const sg of segs.slice(1)) for (let k = 0; k < sg.h * decay * 0.25; k++) { const y = sg.y + hash(k, sg.x | 0, 95) * sg.h, hh = 0.3 + hash(k, 5, 96) * 0.6; R(0x71413b, sg.x + 0.3 + hash(k, 6, 97) * (sg.w - 0.6), y, 2 / g, hh); }
+  // logos: a white roundel with the orange delta (on the raised band one, in the middle)
+  const n = f ? 1 : Math.max(1, Math.round(p.w / 24)), logos = [];
   for (let k = 0; k < n; k++) {
-    const cx = p.x + (k + 0.5) * p.w / n, cy = p.y + p.h * 0.45, r = p.h * 0.42;
+    const cx = p.x + (k + 0.5) * p.w / n, cy = p.y + h * 0.45, r = h * 0.42;
+    logos.push(cx);
     ctx.fillStyle = css(INK); ctx.beginPath(); ctx.arc(cx * g, cy * g, r * g + px1, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = css(0xfef3c0); ctx.beginPath(); ctx.arc(cx * g, cy * g, r * g, 0, Math.PI * 2); ctx.fill();
     deltaLogo(ctx, cx * g, cy * g, r * g * 0.72, px1);
   }
-  // missing panels: the steel frame behind
+  // missing panels: open, the steel studs and rails of the frame and the insulation behind them, torn edges of the panel left and right
   for (let k = 0; k < Math.floor(decay * p.w / 70); k++) {
     const x = p.x + 1 + hash(k, p.x | 0, 93) * (p.w - 4), ww = 0.8 + hash(k, 3, 94) * 0.9;
-    if (Array.from({ length: n }, (_, i) => p.x + (i + 0.5) * p.w / n).some(cx => Math.abs(cx - x - ww / 2) < p.h)) continue;   // keep the logos
-    R(0x5b3138, x, p.y + 0.2, ww, p.h * 0.5); R(0x3b1725, x, p.y + 0.2 + p.h * 0.5, ww, p.h * 0.5 - 0.45); for (let xx = x + 0.25; xx < x + ww; xx += 0.5) R(0x4a5462, xx, p.y + 0.2, 1 / g, p.h - 0.45);
+    if (logos.some(cx => Math.abs(cx - x - ww / 2) < h)) continue;   // keep the logos
+    if (f && (x < p.x + f + 0.3 || x + ww > p.x + p.w - f - 0.3)) continue;   // not in the corners
+    openPanel(R, x, p.y + 0.2, ww, h * 0.62, 'h', g, k);
+  }
+  if (f) for (const sg of segs.slice(1)) for (let k = 0; k < Math.floor(decay * sg.h / 14); k++) {
+    const y = sg.y + 1 + hash(k, sg.x | 0, 98) * Math.max(0.5, sg.h - 3), hh = 0.8 + hash(k, 7, 99) * 0.9;
+    openPanel(R, sg.x + (sg.side < 0 ? 0.2 : sg.w * 0.38), y, sg.w * 0.62, hh, 'v', g, k + 7);
+  }
+}
+// #179 a missing fascia panel: insulation (faded yellow board) behind galvanised studs every half tile, a rail across, and the red panel
+// torn off at both ends (a jagged lip); lighter than the red band, never a dark hole that reads as a window
+function openPanel(R, x, y, w, h, dir, g, seed) {
+  R(0xc7b08b, x, y, w, h); R(0xa08662, dir === 'h' ? x : x + w * 0.55, dir === 'h' ? y + h * 0.55 : y, dir === 'h' ? w : w * 0.45, dir === 'h' ? h * 0.45 : h);
+  for (let k = 0; k < 5; k++) R(0xe4d2aa, x + hash(seed, k, 101) * Math.max(0, w - 0.2), y + hash(seed, k, 102) * Math.max(0, h - 0.1), 0.2, 1 / g);
+  if (dir === 'h') {
+    for (let xx = x + 0.2; xx < x + w - 0.1; xx += 0.5) { R(0x8b93af, xx, y, 0.12, h); R(0xdae0ea, xx, y, 1 / g, h); R(0x4a5462, xx + 0.12, y, 1 / g, h); }
+    R(0x8b93af, x, y + h * 0.42, w, 0.12); R(0xdae0ea, x, y + h * 0.42, w, 1 / g); R(0x4a5462, x, y + h * 0.42 + 0.12, w, 1 / g);
+    for (const ex of [x, x + w - 2 / g]) for (let yy = y; yy < y + h; yy += 3 / g) R(0x73172d, ex + (hash(seed, yy * g | 0, 103) - 0.5) * 3 / g, yy, 2 / g, 2 / g);
+  } else {
+    for (let yy = y + 0.2; yy < y + h - 0.1; yy += 0.5) { R(0x8b93af, x, yy, w, 0.12); R(0xdae0ea, x, yy, w, 1 / g); R(0x4a5462, x, yy + 0.12, w, 1 / g); }
+    R(0x8b93af, x + w * 0.42, y, 0.12, h); R(0xdae0ea, x + w * 0.42, y, 1 / g, h);
+    for (const ey of [y, y + h - 2 / g]) for (let xx = x; xx < x + w; xx += 3 / g) R(0x73172d, xx, ey + (hash(seed, xx * g | 0, 104) - 0.5) * 3 / g, 2 / g, 2 / g);
   }
 }
 // the orange delta (Delta Petrol), a triangle with a lighter inner triangle, centred on (cx, cy), r = half its height, in pixels

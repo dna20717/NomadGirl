@@ -139,7 +139,57 @@
     "strict": true
    },
    {"look": "megastore_props", "name": "Zapfsäule", "cm": 180, "w": 2, "chance": 4, "place": "floor_out", "tags": "straße, kanister", "roles": "outdoor", "strict": true},
-   {"look": "megastore_props", "name": "Neonröhre", "cm": 55, "chance": 12, "place": "ceiling", "tags": "licht", "roles": "shop, hall, storage, corridor"}
+   {"look": "megastore_props", "name": "Neonröhre", "cm": 55, "chance": 12, "place": "ceiling", "tags": "licht", "roles": "hall, storage, corridor"},
+   {
+    "look": "megastore_signs",
+    "name": "Gangschild 1",
+    "cm": 95,
+    "chance": 9,
+    "place": "ceiling",
+    "tags": "schild, regal, laden",
+    "roles": "shop",
+    "strict": true,
+    "above": "regal"
+   },
+   {
+    "look": "megastore_signs",
+    "name": "Gangschild 2",
+    "cm": 95,
+    "chance": 9,
+    "place": "ceiling",
+    "tags": "schild, regal, laden",
+    "roles": "shop",
+    "strict": true,
+    "above": "regal"
+   },
+   {
+    "look": "megastore_signs",
+    "name": "Gangschild 3",
+    "cm": 95,
+    "chance": 9,
+    "place": "ceiling",
+    "tags": "schild, regal, laden",
+    "roles": "shop",
+    "strict": true,
+    "above": "regal"
+   },
+   {
+    "look": "megastore_signs",
+    "name": "Gangschild 4",
+    "cm": 95,
+    "chance": 9,
+    "place": "ceiling",
+    "tags": "schild, regal, laden",
+    "roles": "shop",
+    "strict": true,
+    "above": "regal"
+   },
+   {"look": "megastore_signs", "name": "Angebot", "cm": 80, "chance": 8, "place": "wall", "tags": "schild, deko, laden", "roles": "shop", "strict": true, "lift": 1.5},
+   {"look": "megastore_signs", "name": "Obst-Banner", "cm": 45, "chance": 6, "place": "wall", "tags": "schild, deko, laden", "roles": "shop", "strict": true, "lift": 1.5},
+   {"look": "megastore_signs", "name": "Preisschild", "cm": 110, "chance": 4, "place": "floor_in", "tags": "schild, laden", "roles": "shop", "strict": true},
+   {"look": "megastore_signs", "name": "Kamera", "cm": 30, "chance": 3, "place": "wall", "tags": "technik", "roles": "shop, storage", "strict": true},
+   {"look": "megastore_signs", "name": "Notausgang", "cm": 50, "chance": 4, "place": "ceiling", "tags": "schild, licht", "roles": "shop, hall, storage", "strict": true},
+   {"look": "megastore_signs", "name": "Wimpel", "cm": 40, "chance": 5, "place": "ceiling", "tags": "deko, laden", "roles": "shop", "strict": true}
   ],
   "story": {
    "before": "Letzte Delta-Petrol-Tankstelle vor der Salzebene, Familienbetrieb mit Waschstraße, Reifenlager und Werkstatthalle",

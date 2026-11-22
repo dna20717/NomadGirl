@@ -51,7 +51,11 @@ const BASE = { kind: 'building', floors: 1, floorH: 6, axis: 5, winW: 2, winH: 2
   // #178 mega-store: side rooms over the hall become their own block (upper, no windows if upperWindows off) instead of raising the hall;
   // entrance canopy; station roof over every outdoor room beside the building (also the Wow room and the entrance) with pumps under it;
   // yard things behind the play space; a parking apron
-  upperAnnex: false, upperWindows: true, entry: 'none', stationAll: false, pumps: true, yard: [], yardGap: 3, apron: false };
+  upperAnnex: false, upperWindows: true, entry: 'none', stationAll: false, pumps: true, yard: [], yardGap: 3, apron: false,
+  // #179 the fascia steps up around the block on the roof (a raised sign parapet: the band runs up its sides and across its top), the
+  // block reaches its whole side room and `upperPad` tiles more each side (the clad frame); hull lamps (canopy strips, entrance
+  // downlights, pylon) in the light system, flicker by decay
+  upperFascia: false, upperPad: 2, lamps: false };
 export function hullTypes(D) { return D?.hulls || {}; }
 const num = (v, d) => v == null || v === '' || Number.isNaN(+v) ? d : +v;
 
@@ -59,7 +63,7 @@ export function hullConfig(D, poiId) {
   const P = D?.pois?.[poiId] || {}, H = P.hull || {}, G = hullGame(D), type = H.type || null, T = type ? hullTypes(D)[type] || {} : {};
   const c = { ...BASE };
   for (const src of [T, H]) for (const [k, v] of Object.entries(src || {})) if (k !== 'name' && k !== 'description' && k !== 'type' && k !== 'on' && v != null && v !== '' && !(Array.isArray(v) && !v.length && src === H)) c[k] = v;
-  for (const k of ['floors', 'floorH', 'axis', 'winW', 'winH', 'sill', 'edge', 'baseH', 'roofH', 'rooftopCount', 'lisEvery', 'roomWindows', 'lit', 'damage', 'cover', 'yardGap']) c[k] = num(c[k], BASE[k]);
+  for (const k of ['floors', 'floorH', 'axis', 'winW', 'winH', 'sill', 'edge', 'baseH', 'roofH', 'rooftopCount', 'lisEvery', 'roomWindows', 'lit', 'damage', 'cover', 'yardGap', 'upperPad']) c[k] = num(c[k], BASE[k]);
   c.on = G.enabled !== false && H.on !== false && !!type && !!hullTypes(D)[type];
   c.type = type; c.name = T.name || type || '';
   c.decay = num(H.decay, num(P.story?.decay, 1));
@@ -170,12 +174,18 @@ function buildPlan(D, poiId, L, cfg, opt) {
       });
       if (cfg.uniform) { const top = Math.min(...volumes.map(v => v.top)); for (const v of volumes) v.top = top; }
       // #178 a side room over the hall is a block of its own on the roof (the high-bay store of the mega-store), the hall keeps its height
-      if (cfg.upperAnnex) for (const b of branches) if (b.x1 >= x0 && b.x0 <= x1 && b.top < Math.min(...volumes.map(v => v.top))) volumes.push(vol(Math.max(b.x0, x0), Math.min(b.x1, x1), Math.max(minTop, b.top), b.bottom, { annex: true, upper: true }));
+      const hallTop0 = Math.min(...volumes.map(v => v.top)), whole = new Set();
+      if (cfg.upperAnnex) for (const b of branches) if (b.x1 >= x0 && b.x0 <= x1 && b.top < hallTop0) {
+        // #179 upperFascia: the block is its whole side room plus a clad frame of upperPad tiles each side (the fascia runs up there)
+        if (cfg.upperFascia && cfg.roof === 'fascia') { const pad = Math.max(0, Math.round(cfg.upperPad)); volumes.push(vol(Math.max(0, b.x0 - pad), Math.min(W - 1, b.x1 + pad), Math.max(minTop, b.top), b.bottom, { annex: true, upper: true, frame: pad })); whole.add(b); }
+        else volumes.push(vol(Math.max(b.x0, x0), Math.min(b.x1, x1), Math.max(minTop, b.top), b.bottom, { annex: true, upper: true }));
+      }
       for (const b of branches) {
+        if (whole.has(b)) continue;
         if (b.x0 < x0) volumes.push(vol(b.x0, Math.min(b.x1, x0 - 1), b.top, b.bottom, { annex: true }));
         if (b.x1 > x1) volumes.push(vol(Math.max(b.x0, x1 + 1), b.x1, b.top, b.bottom, { annex: true }));
       }
-      B.push({ x0, x1, top: Math.min(...volumes.map(v => v.top)), bottom: ground, ground, floorH: fh, volumes, rooms: [...run, ...branches].map(r => r.i) });
+      B.push({ x0, x1, vx0: Math.min(x0, ...volumes.map(v => v.x0)), vx1: Math.max(x1, ...volumes.map(v => v.x1)), top: Math.min(...volumes.map(v => v.top)), bottom: ground, ground, floorH: fh, volumes, rooms: [...run, ...branches].map(r => r.i) });
       run = [];
     };
     for (const r of main) { if (r.indoor && (!run.length || r.x0 <= run.at(-1).x1 + 1)) run.push(r); else { flush(); if (r.indoor) run.push(r); } }
@@ -262,7 +272,7 @@ function partsOf(D, poiId, L, plan, rooms, main, rnd) {
     // roof per volume: kind, a parapet, rooftop units on the flat parts
     const units = list(cfg.rooftop);
     tops.concat(b.volumes.filter(v => v.annex)).forEach((v, vi) => {
-      const w = v.x1 - v.x0 + 1, kind = v.annex ? 'parapet' : cfg.roof === 'dome' ? (rooms[v.room]?.wow ? 'dome' : 'parapet') : cfg.roof;
+      const w = v.x1 - v.x0 + 1, kind = v.frame != null ? 'fascia' : v.annex ? 'parapet' : cfg.roof === 'dome' ? (rooms[v.room]?.wow ? 'dome' : 'parapet') : cfg.roof;
       if (kind === 'none') return;
       // the room at the top of the volume is open (Rohbau, terrace, broken floor): no roof, the columns stick out unfinished
       const crown = rooms.find(r => r.top <= v.top + 1 && r.x1 >= v.x0 && r.x0 <= v.x1 && r.top >= v.top - 1);
@@ -274,7 +284,12 @@ function partsOf(D, poiId, L, plan, rooms, main, rnd) {
         }
         return;
       }
-      push({ kind: 'roof', roof: kind, x: v.x0, y: v.top - cfg.roofH, w, h: cfg.roofH, b: bi, annex: !!v.annex });
+      // #179 the raised fascia around the block: its top band, and the bands down its sides to the hall's fascia (join) or its bottom (cap)
+      if (v.frame != null) {
+        const joinAt = x => tops.some(o => x >= o.x0 && x <= o.x1) ? hallTop : null, f = Math.max(1, v.frame);
+        push({ kind: 'roof', roof: kind, x: v.x0, y: v.top - cfg.roofH, w, h: cfg.roofH, b: bi, annex: true, upper: true, frame: f,
+          bottom: v.bottom + 1, joinL: joinAt(v.x0 + f / 2), joinR: joinAt(v.x1 - f / 2), roofH: cfg.roofH });
+      } else push({ kind: 'roof', roof: kind, x: v.x0, y: v.top - cfg.roofH, w, h: cfg.roofH, b: bi, annex: !!v.annex });
       // #172 a pediment in classical proportion (about 1 : 2.4, like the painted module): over a wide volume it crowns the middle
       if (kind === 'gable') { const gh = Math.min(7, Math.max(2, (w + 1) / 2.4)), gw = Math.min(w + 1, gh * 2.4); push({ kind: 'gable', x: v.x0 - 0.5 + (w + 1 - gw) / 2, y: v.top - cfg.roofH - gh, w: gw, h: gh, b: bi }); }
       // crown: 2 tiles of code; a painted crown rises higher (tall), the hull makes room for it above the level
@@ -408,6 +423,27 @@ function partsOf(D, poiId, L, plan, rooms, main, rnd) {
     push({ kind: 'surface', what: cfg.surface + '_in', x: r.x0 + 2, y: ground - 7, w: r.w - 4, h: 6 });   // in the entrance room, behind: canopy, fence, headframe legs
   }
   return P;
+}
+
+// ---------------- #179 lamps of the hull (Gebäudetyp › Licht der Hülle) ----------------
+// The painted lights of the hull as lamps for the light system (engine/atmosphere.js planLights): light strips under every station
+// roof (every ~3 tiles, cool white), a downlight under every entrance canopy (warm), the light boxes of the pylon (no clip: it stands
+// over the roof). Decay (POIs › Story › Verfall × Schäden) lets some buzz, flicker or die. All in tiles; y = the underside of the fixture.
+// → [{ x, y, kind, color, radius, strength, behavior, bare (no fixture from code: the picture has one), free (not clipped to a room), what }]
+export const HULL_LAMP = { strip: { color: '#e3f0ff', radius: 380, strength: 95, every: 3 }, entry: { color: '#ffe2a8', radius: 330, strength: 62 }, pylon: { color: '#ffd59a', radius: 300, strength: 55 } };
+export function hullLamps(plan) {
+  if (!plan?.on || !plan.cfg?.lamps) return [];
+  const out = [], dec = (plan.cfg.decay ?? 1) * (plan.cfg.damage ?? 100) / 100;
+  const mood = (x, y, k) => { const r = hash(x * 7 | 0, y * 3 | 0, 600 + k); return r < dec * 0.03 ? 'broken' : r < dec * 0.07 ? 'flicker' : r < dec * 0.15 ? 'buzz' : 'steady'; };
+  for (const p of plan.parts) {
+    if (p.kind === 'station') {
+      const n = Math.max(1, Math.round(p.w / HULL_LAMP.strip.every));
+      for (let k = 0; k < n; k++) { const x = p.x + (k + 0.5) * p.w / n - 0.5; out.push({ ...HULL_LAMP.strip, x, y: p.y + (plan.ground - p.y) * 0.25, kind: 'ceiling', behavior: mood(x, p.y, k), bare: true, what: 'station' }); }
+    }
+    if (p.kind === 'entry') { const x = p.x + p.w / 2 - 0.5; out.push({ ...HULL_LAMP.entry, x, y: p.y + p.h * 0.2, kind: 'ceiling', behavior: mood(x, p.y, 9), bare: true, what: 'entry' }); }
+    if (p.kind === 'pylon') out.push({ ...HULL_LAMP.pylon, x: p.x + p.w / 2 - 0.5, y: p.y + p.h * 0.09, kind: 'bulb', behavior: dec >= 2.5 ? 'flicker' : mood(p.x, p.y, 11) === 'broken' ? 'flicker' : 'steady', bare: true, free: true, what: 'pylon' });
+  }
+  return out;
 }
 
 // ---------------- audit (test/facade.test.js, tools/level_audit.mjs) ----------------

@@ -339,8 +339,12 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
     if ((t !== '#' || cg) && !style) {   // camouflaged tiles get the back wall behind them (seen once a fake wall fades)
       const bk = terrain?.back?.(x, y);
       if (bk) {
-        const list = y % 2 && bk.fill2.length ? bk.fill2 : bk.fill;
-        back.push({ key: bk.key, frame: list[x % list.length], x: px, y: py - bk.over, tx: x, ty: y, kit: bk });
+        let list = y % 2 && bk.fill2.length ? bk.fill2 : bk.fill;
+        // #179 the wall's foot (skirting) right over the floor, its top edge (ceiling) right under the ceiling, damage by decay
+        if (bk.base?.length && solid(x, y + 1)) list = bk.base;
+        else if (bk.ceil?.length && solid(x, y - 1)) list = bk.ceil;
+        else if (bk.broken?.length && hash(x, y, 179) * 100 < bk.brokenChance) list = bk.broken;
+        back.push({ key: bk.key, frame: list[(x + (list === bk.broken ? y : 0)) % list.length], x: px, y: py - bk.over, tx: x, ty: y, kit: bk });
         backShade.fillStyle(0x060608, (bk.shade ?? 55) / 100).fillRect(px, py, T, T);
       }
     }
@@ -437,7 +441,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
         clutter.push({ ...st, ai: it.ai, ens: it.ens, plan: it }); continue;
       }
       if (it.hang === 'wall' && terrain?.shaft?.has(Math.floor(it.x + it.w / 2) + ',' + it.y)) continue;   // #173 the back wall is open to the shaft there
-      const st = placed(kit, it.key, frame, cx, 0), hh = -st.y, dy = it.hang === 'ceiling' ? it.y * T - 2 + hh : it.y * T + T / 2 + hh / 2;
+      const st = placed(kit, it.key, frame, cx, 0), hh = -st.y, dy = it.hang === 'ceiling' ? it.y * T - 2 + hh : it.y * T + T / 2 + hh / 2 - (it.lift || 0) * T;   // #179 lift: higher on the wall (posters over the shelves)
       clutter.push({ ...st, y: st.y + dy, ay: st.ay != null ? st.ay + dy : st.ay, hang: it.hang, plan: it, ...(it.hang === 'wall' ? { tint: backTint } : {}) });
     }
   }

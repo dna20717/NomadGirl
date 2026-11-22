@@ -48,7 +48,7 @@ check('Vorplatz: Sand treibt im Wind', s.dust > 0, s.dust);
 await shot('vorplatz');
 
 s = await go(56, 33);
-check('Verkaufsraum: Neon-Stimmung', s.mood === 'beton_neon', s.mood);
+check('Verkaufsraum: Supermarkt hell (#179)', s.mood === 'supermarkt_hell', s.mood);
 check('Verkaufsraum: Staub im Licht', s.dust > 0, s.dust);
 await shot('verkaufsraum');
 

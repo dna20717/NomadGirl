@@ -152,7 +152,7 @@ export function pickWeighted(items, weightOf, r) {
 export function dressingOverrides(D, poiId, roomId) {
   const P = D?.pois?.[poiId]?.dressing || {}, R = D?.rooms?.[roomId]?.dressing || {};
   const S = roomId && D?.rooms?.[roomId] ? roomStory(D?.pois?.[poiId] || {}, D.rooms[roomId]) : null;
-  return { scale: (P.density ?? 100) / 100, density: R.density ?? null, prefer: [...list(P.prefer), ...list(R.prefer), ...(S?.must || [])], avoid: [...list(P.avoid), ...list(R.avoid)],
+  return { scale: (P.density ?? 100) / 100, density: R.density ?? null, wall: R.wall ?? null, prefer: [...list(P.prefer), ...list(R.prefer), ...(S?.must || [])], avoid: [...list(P.avoid), ...list(R.avoid)],
     sets: R.sets?.length ? R.sets : P.sets?.length ? P.sets : [], must: S?.must || [], forbid: S?.never || [], decay: S?.decay ?? D?.pois?.[poiId]?.story?.decay ?? null, story: S };
 }
 
@@ -254,7 +254,7 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
   const aiClear = (c, x, y) => { if (!c.ai) return true; for (let dy = -4; dy <= 0; dy++) for (let dx = -3; dx < c.w + 3; dx++) if ('HZCSD@!L/+o'.includes(ch(x + dx, y + dy) || '.')) return false; return true; };
   const gapFree = (x0, x1, y, g) => { for (let x = x0 - g; x < x0; x++) if (!free(x, y)) return false; for (let x = x1 + 1; x <= x1 + g; x++) if (!free(x, y)) return false; return true; };
   const put = (c, x, y, hang, type, ens, R) => {
-    const it = { x, y, w: c.w, h: c.h, hang, type, set: c.set, key: c.key, name: c.name, brand: !!c.brand, ai: !!c.ai, ens: ens || null, room: R.key };
+    const it = { x, y, w: c.w, h: c.h, hang, type, set: c.set, key: c.key, name: c.name, brand: !!c.brand, ai: !!c.ai, ens: ens || null, room: R.key, tags: c.rule?.tags || '', ...(+c.rule?.lift > 0 && hang === 'wall' ? { lift: +c.rule.lift } : {}) };
     items.push(it);
     if (hang === 'stand') for (let i = 0; i < c.w; i++) taken.set((x + i) + ',' + y, it);
     R.placed++;
@@ -353,14 +353,30 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
     }
     // 3. on the back wall and under the ceiling: a small share of the budget, far apart, away from ladders and doors
     // borrowed from another set only when its rule names this room's role (a ZONE 13 sign stays in the bunker)
-    const wallBudget = Math.round(R.budget * cfg.wall / 100), hangPool = cands(R, true).filter(c => list(c.rule.place).some(p => p === 'wall' || p === 'ceiling') && (!c.borrowed || list(c.rule.roles).includes(R.role)));
+    const wallBudget = Math.round(R.budget * (ov.wall ?? cfg.wall) / 100), hangPool = cands(R, true).filter(c => list(c.rule.place).some(p => p === 'wall' || p === 'ceiling') && (!c.borrowed || list(c.rule.roles).includes(R.role)));
     let hung = 0;
+    // #179 things that hang over others (Regel „Über“, e.g. aisle signs over the shelf rows): one over each thing with that tag, in order
+    // left to right through the candidates (Gangschild 1, 2, 3 …), under the ceiling straight above its middle, with room to hang
+    const overs = hangPool.filter(c => c.rule.above && list(c.rule.place).includes('ceiling') && weight(c, R.role) > 0).sort((a, b) => String(a.name).localeCompare(String(b.name), 'de', { numeric: true }));
+    if (overs.length) {
+      const tag = overs[0].rule.above, rows = items.filter(it => it.room === R.key && it.hang === 'stand' && !it.debris && list(it.tags).includes(tag)).sort((a, b) => a.y - b.y || a.x - b.x);
+      let k = 0;
+      for (const it of rows) {
+        const cx = it.x + Math.floor(it.w / 2), c = overs[k % overs.length];
+        const s = spots.list.filter(o => o.type === 'ceiling' && o.x === cx && o.y < it.y && o.y + o.drop >= it.y - 1 && o.drop >= it.h + c.h + 1).sort((a, b) => b.y - a.y)[0];
+        if (!s || wallKeep.has(s.x + ',' + s.y) || items.some(o => o.hang !== 'stand' && Math.abs(o.x - s.x) < 3 && Math.abs(o.y - s.y) < 3)) continue;
+        let ld = false; for (let d = 0; d < s.drop; d++) for (const dx of [-1, 0, 1]) if (ch(s.x + dx, s.y + d) === 'H') ld = true;
+        if (ld) continue;
+        put(c, s.x, s.y, 'ceiling', 'ceiling', null, R); hung++; k++;
+      }
+    }
     const hangOrder = [...R.hang].sort((a, b) => ((b.side ? 1 : 0) + hash(b.x, b.y, s0 + 61)) - ((a.side ? 1 : 0) + hash(a.x, a.y, s0 + 61)));
     for (const s of hangOrder) {
       if (hung >= wallBudget) break;
       if (wallKeep.has(s.x + ',' + s.y) || items.some(it => it.hang !== 'stand' && Math.abs(it.x - s.x) < 5 && Math.abs(it.y - s.y) < 3)) continue;
       if (s.type === 'ceiling') { let ld = false; for (let k = 0; k < s.drop; k++) for (const dx of [-1, 0, 1]) if (ch(s.x + dx, s.y + k) === 'H') ld = true; if (ld) continue; }
-      const fit = hangPool.filter(c => list(c.rule.place).includes(s.type) && c.w === 1 && same(c) < cfg.sameMax && (s.type !== 'ceiling' || s.drop >= c.h + 3));
+      const airUp = n => { for (let k = 1; k <= n; k++) if (ch(s.x, s.y - k) !== '.') return false; return true; };   // #179 lifted wall things need the wall above free
+      const fit = hangPool.filter(c => !c.rule.above && list(c.rule.place).includes(s.type) && c.w === 1 && same(c) < cfg.sameMax && (s.type !== 'ceiling' || s.drop >= c.h + 3) && (s.type !== 'wall' || !(+c.rule.lift > 0) || airUp(Math.ceil(+c.rule.lift + c.h / 2))));
       const c = pickWeighted(fit, c => weight(c, R.role), hash(s.x, s.y, s0 + 71));
       if (c) { put(c, s.x, s.y, s.type, s.type, null, R); hung++; }
     }

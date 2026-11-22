@@ -82,11 +82,13 @@ export class Atmosphere {
   // ---------- lights ----------
   addLamp(L) {
     const s = this.scene, T = this.T, x = (L.x + 0.5) * T, y = L.y * T, c = rgb(L.color), reg = L.region;
-    const clip = { x0: reg.x * T, y0: reg.y * T, x1: (reg.x + reg.w) * T, y1: (reg.y + reg.h) * T };
+    const clip = L.free ? null : { x0: reg.x * T, y0: reg.y * T, x1: (reg.x + reg.w) * T, y1: (reg.y + reg.h) * T };
     const g = this.fixtures, lit = Phaser.Display.Color.GetColor(...c);
-    // fixture from code: cable, shade, tube, box
+    // fixture from code: cable, shade, tube, box; #179 bare: the picture brings it (the hull's canopy strips, downlights, pylon)
     let ly = y + 14;
-    if (L.kind === 'tube') {
+    if (L.bare) ly = y + (L.kind === 'tube' ? 4 : 2);
+    else if (L.kind === 'panel') ly = this.panel(g, L, x, y, lit);
+    else if (L.kind === 'tube') {
       g.fillStyle(0x2a2d33).fillRect(x - 6, y, 3, 8).fillRect(x + 3, y, 3, 8).fillStyle(0x3a3e46).fillRect(x - 54, y + 8, 108, 7);
       g.fillStyle(lit).fillRect(x - 50, y + 15, 100, 6); ly = y + 18;
     } else if (L.kind === 'emergency') {
@@ -98,9 +100,26 @@ export class Atmosphere {
       g.fillStyle(lit).fillRect(x - 18, y + 36, 37, 4); ly = y + 36;
     }
     const halo = s.add.image(x, ly, s.fx.glowKey()).setBlendMode(Phaser.BlendModes.ADD).setDepth(this.depth + 0.5).setTint(lit);
-    const hw = L.kind === 'tube' ? 260 : L.kind === 'emergency' ? 120 : 110;
-    halo.setDisplaySize(hw, L.kind === 'tube' ? 70 : hw);
-    this.lights.push({ kind: L.kind, x, y: ly, c, radius: L.radius, strength: L.strength / 100, behavior: L.behavior, seed: L.seed, clip, halo, haloA: L.kind === 'emergency' ? 0.7 : 0.55, lamp: true, fixed: L.fixed, f: 1 });
+    const hw = L.bare ? (L.kind === 'tube' ? 150 : L.kind === 'bulb' ? 170 : 90) : L.kind === 'tube' ? 260 : L.kind === 'panel' ? 220 : L.kind === 'emergency' ? 120 : 110;
+    halo.setDisplaySize(hw, L.kind === 'tube' ? (L.bare ? 36 : 70) : L.kind === 'panel' ? 46 : L.bare && L.kind === 'bulb' ? 120 : hw);
+    this.lights.push({ kind: L.kind === 'panel' ? 'tube' : L.kind, x, y: ly, c, radius: L.radius, strength: L.strength / 100, behavior: L.behavior, seed: L.seed, clip, halo, haloA: L.kind === 'emergency' ? 0.7 : 0.55, lamp: true, fixed: L.fixed, f: 1 });
+  }
+  // #179 Leuchtpaneel (supermarket ceiling): a flat light panel in a frame flush under the ceiling; a broken one hangs down on one wire
+  panel(g, L, x, y, lit) {
+    const w = 96, h = 9, hang = L.behavior === 'broken' && L.seed < 0.6;
+    if (!hang) {
+      g.fillStyle(0x333941).fillRect(x - w / 2 - 4, y, w + 8, 5).fillStyle(0x8b93af).fillRect(x - w / 2 - 2, y + 5, w + 4, h + 2);
+      g.fillStyle(lit).fillRect(x - w / 2 + 2, y + 6, w - 4, h).fillStyle(0xffffff, 0.55).fillRect(x - w / 2 + 2, y + 6, w - 4, 2);
+      for (const k of [1, 2]) g.fillStyle(0x6d758d).fillRect(x - w / 2 + k * w / 3, y + 6, 2, h);
+      return y + 12;
+    }
+    // hanging: one end still on the ceiling, the other down on its wire, the tube's light points down and to the side
+    const side = L.seed < 0.3 ? -1 : 1, x0 = x - side * w / 2, y0 = y + 6, x1 = x + side * w * 0.35, y1 = y + 62;
+    g.fillStyle(0x333941).fillRect(x - w / 2 - 4, y, w + 8, 4);
+    g.lineStyle(2, 0x1c1d22).lineBetween(x + side * w / 2, y + 4, x1 + side * 6, y1);
+    g.fillStyle(0x8b93af).fillPoints([{ x: x0, y: y0 - 2 }, { x: x1 + side * 4, y: y1 - 4 }, { x: x1 + side * 2, y: y1 + 8 }, { x: x0, y: y0 + 10 }], true);
+    g.fillStyle(lit).fillPoints([{ x: x0 + side * 4, y: y0 + 2 }, { x: x1, y: y1 - 1 }, { x: x1 - side * 1, y: y1 + 5 }, { x: x0 + side * 4, y: y0 + 8 }], true);
+    return (y0 + y1) / 2 + 6;
   }
   addGlow(p) {
     const s = this.scene, rows = p.kit?.def?.glows || [], r = rows.find(r => r.name === p.name);

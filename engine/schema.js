@@ -1853,7 +1853,7 @@ export const AREAS = {
         select('hull.roof', 'Dachart', [['', '– wie der Typ –'], ...ROOF_KINDS]),
         num('hull.decay', 'Schäden', { min: 0, max: 3, hint: 'Risse, Löcher, kaputte und vernagelte Fenster, fehlende Dachteile. Leer = POIs › Story › Verfall' }),
         num('hull.roomWindows', 'Fenster in Räumen', { unit: '%', min: 0, max: 100, hint: 'Leer = wie der Typ' })] },
-      { title: 'Marken-Clutter', wide: true, fields: [table('brandProps', 'Marken-Clutter', [ref('look', 'Symbol-Raster', 'assets'), text('name', 'Symbol'), num('cm', 'Höhe', { unit: 'cm', min: 1 }), num('w', 'Breite', { unit: 'Kacheln', min: 1, max: 6, hint: '#178: so viele Bodenkacheln hält das Set-Dressing frei (Regalreihe, Kühlregal). Leer = 1' }), num('chance', 'Chance', { unit: '%', min: 0, max: 100 }), bool('ai', 'KI'), text('place', 'Ort'), text('tags', 'Tags'), text('roles', 'Rollen'), bool('strict', 'Nur diese Rollen')], { hint: 'Daniel, 17.11.2026: Dinge einer Marke, die in diesem POI auf freiem Boden stehen (z. B. NomadCola-Automaten an Tankstellen). Symbol = Name im Raster, Höhe in echten cm, Chance je freier Bodenkachel (mit Set-Dressing: Gewicht beim Auswählen). KI = darin wohnt eine Entity: E / ↑ davor startet ein Glitch-Duell (#052). Ort, Tags, Rollen wie Kachel-Sets › Clutter-Regeln (#158)' })] },
+      { title: 'Marken-Clutter', wide: true, fields: [table('brandProps', 'Marken-Clutter', [ref('look', 'Symbol-Raster', 'assets'), text('name', 'Symbol'), num('cm', 'Höhe', { unit: 'cm', min: 1 }), num('w', 'Breite', { unit: 'Kacheln', min: 1, max: 6, hint: '#178: so viele Bodenkacheln hält das Set-Dressing frei (Regalreihe, Kühlregal). Leer = 1' }), num('chance', 'Chance', { unit: '%', min: 0, max: 100 }), bool('ai', 'KI'), text('place', 'Ort'), text('tags', 'Tags'), text('roles', 'Rollen'), bool('strict', 'Nur diese Rollen'), text('above', 'Über (Tag)'), num('lift', 'Höher an der Wand', { unit: 'Kacheln', min: 0, max: 4, step: 0.5 })], { hint: '#179 Über: hängt unter der Decke genau über jedem Ding mit diesem Tag, der Reihe nach (Gangschild 1, 2, 3 über den Regalen). Höher an der Wand: Wand-Dinge so viel über Augenhöhe (Plakate über den Regalen).  Daniel, 17.11.2026: Dinge einer Marke, die in diesem POI auf freiem Boden stehen (z. B. NomadCola-Automaten an Tankstellen). Symbol = Name im Raster, Höhe in echten cm, Chance je freier Bodenkachel (mit Set-Dressing: Gewicht beim Auswählen). KI = darin wohnt eine Entity: E / ↑ davor startet ein Glitch-Duell (#052). Ort, Tags, Rollen wie Kachel-Sets › Clutter-Regeln (#158)' })] },
       { title: 'Ranking', fields: [num('parTime', 'Bestzeit', { unit: 's', min: 0 }), num('secrets', 'Secrets', { min: 0, hint: 'Im Level zählen die brüchigen Wände (B); diese Zahl gilt nur für POIs ohne Level' })] },
       { title: 'Leben G3', fields: [bool('life.off', 'Ohne Lager', { hint: '#169: Gegner stehen an ihren Spawn-Punkten wie früher, keine Simulation' }), num('life.camps', 'Lager', { min: 1, max: 8, hint: 'So viele Lager zum Start eines Durchgangs. Leer = nach Größe (S 1, M 2, L 2, XL 3, XXL 4)' }),
         bool('life.nest', 'Mit Nest', { hint: 'Leer = wenn der POI Mutanten hat. Ansicht: Ökosystem (unten) simuliert N Tage' })] },
@@ -1908,7 +1908,11 @@ export const AREAS = {
       { title: 'Kanten', fields: [color('edge.color', 'Umriss'), num('edge.width', 'Umriss', { unit: 'px', min: 0 }),
         num('edge.shade', 'Schatten', { unit: '%', min: 0, max: 100, hint: 'Abdunkeln innen neben dem Umriss' }), num('edge.shadeWidth', 'Schatten', { unit: 'px', min: 0 })] },
       { title: 'Rückwand', fields: [ref('back.terrain', 'Rückwand aus', 'terrain', { hint: 'In Innenräumen (Raum-Bausteine › Innenraum) und im Tunnel liegt die Füllung dieses Sets abgedunkelt hinter allem. Leer = dunkle Wand aus Code' }),
-        num('back.shade', 'Abdunkeln', { unit: '%', min: 0, max: 100 })] },
+        num('back.shade', 'Abdunkeln', { unit: '%', min: 0, max: 100 }),
+        lines('back.base', 'Wandfuß', { hint: '#179: Namen aus dem Raster der Rückwand, eine pro Zeile: die Rückwand direkt über dem Boden (z. B. Sockelband im Supermarkt). Leer = Füllung' }),
+        lines('back.ceiling', 'Deckenrand', { hint: '#179: die Rückwand direkt unter der Decke (abgehängte Decke, Lüftungsgitter). Leer = Füllung' }),
+        lines('back.broken', 'Kaputt (Verfall)', { hint: '#179: Varianten mit Schäden (abgefallene Fliesen, Risse); ersetzen die Füllung je Kachel mit der Chance unten × Verfall des POI / 3' }),
+        num('back.brokenChance', 'Kaputt: Chance', { unit: '%', min: 0, max: 100, hint: 'Bei Verfall 3 (POIs › Story); weniger Verfall, seltener. Leer = 0' })] },
       { title: 'Clutter & Decals', fields: [ref('props', 'Raster', 'assets', { hint: 'Asset der Art „Symbole“ mit Clutter (steht auf dem unteren Rand) und Decals' }),
         num('clutterChance', 'Clutter', { unit: '%', min: 0, max: 100, hint: 'Chance je Oberflächen-Kachel mit Wand links und rechts und freier Luft darüber' }),
         lines('clutter', 'Clutter', { hint: 'Namen aus dem Raster, eine pro Zeile; doppelt = häufiger' }),
@@ -1935,6 +1939,8 @@ export const AREAS = {
       if (x.props && !P) report('error', 'Clutter-Raster ist kein Asset der Art „Symbole“');
       if (!(x.top || []).length || !(x.fill || []).length) report('warning', 'Oberfläche oder Füllung fehlt');
       for (const k of ['top', 'fill', 'fill2']) for (const n of x[k] || []) if (T && !T.has(n)) report('error', `„${n}“ gibt es im Raster nicht`);
+      const BT = x.back?.terrain ? names(p.data.terrain?.[x.back.terrain]?.look) : null;   // #179 Wandfuß, Deckenrand, Kaputt: names in the back wall's raster
+      for (const k of ['base', 'ceiling', 'broken']) for (const n of x.back?.[k] || []) if (BT && !BT.has(n)) report('error', `Rückwand: „${n}“ gibt es im Raster der Rückwand nicht`);
       for (const k of ['clutter', 'decals', 'details']) for (const n of x[k] || []) if (P && !P.has(n)) report('error', `„${n}“ gibt es im Clutter-Raster nicht`);
       const B = names(x.propsBig);
       if (x.propsBig && !B) report('error', 'Großer-Clutter-Raster ist kein Asset der Art „Symbole“');
@@ -2032,7 +2038,10 @@ export const AREAS = {
         bool('stationAll', 'Tankstellendach über jedem Hof', { hint: 'Mit Vordach „Tankstellendach“: über jedem Außenraum am Gebäude, auch im Wow-Raum und am Eingang; folgt dem Steg des Raums, wenn es einen gibt (der Steg ist dann das Dach)' }),
         bool('pumps', 'Zapfsäulen unter dem Dach'), bool('apron', 'Parkplatz', { hint: 'Asphalt mit Parkstreifen hinter dem Boden der Außenräume' }),
         multi('yard', 'Auf dem Hof', YARD, { hint: 'Hinter der Spielfläche: Lkw, Werbetafel und Laternen stehen hinter dem Dach, der Rest daneben; nie vor dem Wow-Motiv' }),
-        num('yardGap', 'Abstand auf dem Hof', { unit: 'Kacheln', min: 0, max: 12, hint: 'Leer = 3' })] },
+        num('yardGap', 'Abstand auf dem Hof', { unit: 'Kacheln', min: 0, max: 12, hint: 'Leer = 3' }),
+        bool('upperFascia', 'Blende um den Block', { hint: '#179 (Daniel 22.11.2026: „mach die Tankstelle hübsch“): mit Dachart Blende läuft die Blende am Block auf dem Dach hoch, über ihn und wieder herunter (erhöhte Werbe-Attika), der Block reicht über seinen ganzen Seitenraum; aus = grauer Block mit Attika wie in #178' }),
+        num('upperPad', 'Rahmen um den Block', { unit: 'Kacheln', min: 0, max: 4, hint: 'So breit steht die Blende links und rechts neben dem Block. Leer = 2' }),
+        bool('lamps', 'Licht der Hülle', { hint: '#179: Lichtleisten unter dem Tankstellendach, Downlights der Eingangs-Vordächer und die Leuchtkästen des Pylons leuchten im Lichtsystem (Spiel › Atmosphäre); Verfall lässt einzelne flackern oder ausfallen. Aus = nur gemalt' })] },
       { title: 'Module (gemalt)', fields: [
         ref('art.wall', 'Wandfläche', 'assets', { hint: '#172: gemalte Textur (PixelLab, AAP-64, 32 px je Kachel, nahtlos), auf dem Raster der Welt gekachelt. Leer = Material aus Code. Gemeinsame Module (Aufbauten, Schäden, Markisen …): Spiel › Hülle › Module' }),
         ref('art.wallAlt', 'Wandfläche Variante', 'assets'), num('art.wallAltShare', 'Anteil Variante', { unit: '%', min: 0, max: 100, hint: 'Leer = 25' }),
@@ -2198,6 +2207,7 @@ export const AREAS = {
         select('type', 'Raumtyp', [['', '– aus Merkmalen –'], ...ROOM_TYPES], { hint: '#163 (Bibel › Raumtypen): was der Raum im Spiel tut. Schwelle = ankommen, Gang = Druck, Arena = Kampf, Vertikale = klettern, Atempause = Story ohne Gegner, Abzweig = Beute, Boss, Wow = der eine Moment des POI' }),
         bool('hurdle', 'Bewusste Hürde', { hint: '#163 Level-Prüfer: hier darf der Hauptweg eine Stufe 4 oder eine Lücke über 3 haben' }),
         num('dressing.density', 'Dichte hier', { unit: 'Dinge je 10 Bodenkacheln', min: 0, max: 10, step: 0.1, hint: '#158: überschreibt die Dichte der Rolle (Spiel › Set-Dressing). Leer = nach Rolle' }),
+        num('dressing.wall', 'An Wand und Decke hier', { unit: '% der Dinge', min: 0, max: 100, hint: '#179: Anteil für Schilder, Plakate und Hängendes in diesem Raum (z. B. Supermarkt mit Werbung). Leer = Spiel › Set-Dressing' }),
         text('dressing.prefer', 'Bevorzugt Tags', { hint: '#158: Clutter mit diesen Tags (Komma) kommt hier doppelt so oft' }), text('dressing.avoid', 'Meidet Tags', { hint: 'Viermal seltener' }),
         refs('dressing.sets', 'Nur diese Ensembles', 'poiSets', { hint: 'Leer = alle POI-Ensembles, die zur Rolle passen' }),
         bool('indoor', 'Innenraum', { hint: 'Im POI-Level: Rückwand statt Himmel. Leer = Innenraum, wenn der Raum keinen eigenen Hintergrund hat' }),

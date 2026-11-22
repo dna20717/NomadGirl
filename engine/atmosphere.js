@@ -10,8 +10,9 @@ import { levelConfig, lightTheWay, wowInLevel } from './level_design.js';
 import { shaftInLevel } from './shaft.js';
 import { roomTale, decayConfig } from './dressing_story.js';
 import { roomStory } from './story.js';
+import { planHull, hullLamps } from './facade.js';
 
-export const LAMP_KINDS = [['ceiling', 'Deckenlampe'], ['tube', 'Neonröhre'], ['emergency', 'Notlicht'], ['bulb', 'Glühbirne']];
+export const LAMP_KINDS = [['ceiling', 'Deckenlampe'], ['tube', 'Neonröhre'], ['panel', 'Leuchtpaneel (Supermarkt)'], ['emergency', 'Notlicht'], ['bulb', 'Glühbirne']];
 export const LIGHT_BEHAVIORS = [['steady', 'Ruhig'], ['flicker', 'Flackert'], ['pulse', 'Pulsiert'], ['broken', 'Kaputt (Aussetzer, Funken)'], ['stutter', 'Springt an (Neonröhre stottert)'], ['alarm', 'Alarm (Rundumlicht)'], ['buzz', 'Brummt (leises Zittern)']];
 
 // the same random number for the same tile, every time
@@ -99,6 +100,11 @@ export function planLights(D, room, regionAt, opts = {}) {
         const x = Math.max(W.room.x + 1, Math.min(W.room.x + W.room.w - 2, W.x + d * Math.round(W.room.w / 4))), y = top(x);
         lamps.push(lamp({ ...L, kind: 'ceiling', behavior: 'steady', radius: Math.round(L.radius * 0.9), strength: Math.round(L.strength * W.W.fill / 100) }, x, y, regionAt(x, y), true));
       }
+    }
+    // #179 the hull's lamps (Welt › Gebäudetypen › Licht der Hülle): canopy strips, entrance downlights, the pylon's light boxes
+    if (opts.level.def) for (const L of hullLamps(planHull(D, opts.poiId, opts.level))) {
+      const tx = Math.max(0, Math.min(room.w - 1, Math.floor(L.x))), ty = Math.max(0, Math.min(room.h - 1, Math.floor(L.y)));
+      lamps.push({ ...lamp(L, L.x, L.y, regionAt(tx, ty), true), bare: true, free: !!L.free, hull: L.what });
     }
     // #173 Schacht-Motiv: a floodlight over the motif in every room the shaft crosses (POIs › Schacht-Motiv › Schacht-Licht)
     const sh = shaftInLevel(D, opts.poiId, opts.level);

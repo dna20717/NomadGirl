@@ -185,7 +185,14 @@ export class PlayScene extends Phaser.Scene {
   terrainMap() {
     const D = this.data_, kits = terrainKits(this, D), LI = this.levelInfo;
     const reg = regionMap(D, LI?.def ? { rooms: LI.rooms, poiId: this.levelPoi } : { roomId: this.roomId });
-    const backOf = id => { const t = D.terrain?.[id], k = kits(t?.back?.terrain); return k ? { ...k, shade: t.back.shade } : null; };
+    // #179 Wandfuß, Deckenrand and damaged variants of the back wall (Kachel-Sets › Rückwand), by the POI's decay
+    const backCache = new Map(), decay = this.levelPoi ? (D.pois?.[this.levelPoi]?.story?.decay ?? 1) : 1;
+    const backOf = id => {
+      if (backCache.has(id)) return backCache.get(id);
+      const t = D.terrain?.[id], k = kits(t?.back?.terrain), names = D.assets?.[k?.key]?.names || [], idx = l => (l || []).map(n => names.indexOf(n)).filter(i => i >= 0);
+      const out = k ? { ...k, shade: t.back.shade, base: idx(t.back.base), ceil: idx(t.back.ceiling), broken: idx(t.back.broken), brokenChance: (t.back.brokenChance || 0) * Math.max(0, decay) / 3 } : null;
+      backCache.set(id, out); return out;
+    };
     // #163 windows to the landmark: holes in the back wall (engine/level_design.js landmarkViews)
     const holes = new Set();
     if (LI?.def && this.mode !== 'camp') for (const v of landmarkViews(D, this.levelPoi, LI)) if (v.win) for (let y = v.win.y; y < v.win.y + v.win.h; y++) for (let x = v.win.x; x < v.win.x + v.win.w; x++) holes.add(x + ',' + y);

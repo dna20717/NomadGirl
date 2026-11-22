@@ -79,7 +79,7 @@
    "......H.....1...###...1...1...",
    "##############################"
   ],
-  "terrain": "concrete",
+  "terrain": "supermarket",
   "story": {
    "function": "Verkaufsraum mit Kasse, Kühlregalen und Kaffeemaschine",
    "moment": "Der Pächter verkaufte die letzten Kanister unter der Theke, während draußen geprügelt wurde",
@@ -89,7 +89,7 @@
    "never": "wrack, grün"
   },
   "type": "rest",
-  "dressing": {"density": 4.5, "prefer": "regal, kasse, laden, küche, licht"}
+  "dressing": {"density": 4.5, "prefer": "regal, kasse, laden, küche, licht", "wall": 30}
  },
  "lager": {
   "name": "Lager",
@@ -1291,7 +1291,8 @@
    "must": "fass, kanister, straße",
    "never": "büro, bett"
   },
-  "type": "arena"
+  "type": "arena",
+  "atmosphere": "vorplatz_abend"
  },
  "reifenlager": {
   "name": "Reifenlager",
