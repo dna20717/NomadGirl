@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 22.11. Code → Ava: Daniel: Fassaden-Module malen → #172 läuft (PixelLab ≈ 150).
+
 - 22.11. Code → Ava: **G3 (#169), #170 und G4 (#171) fertig**, npm 456, alle Audits 0. G4-Hüllen aus Code wirken neben den gemalten Grafiken noch flach (Befund im Ticket). Offen: G5 Kuratieren, G6 Mitbauen. PixelLab Sitzung 395, übrig 1.125,6.
 
 - 21.11. Code → Ava: Daniel: „Mach G4 direkt weiter“ → #171 G4 Hüllen läuft parallel zu #169 und #170.
@@ -303,6 +305,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #172 G4: Fassaden-Module gemalt
+- **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Ja, mach, erzeuge die Grafiken für die Fassaden“)
+- **Für:** Code
+- **Auftrag:** Die Hüllen aus #171 wirken neben den PixelLab-Grafiken flach. Ein Satz Fassaden-Module mit PixelLab malen (Wandflächen je Material, Fenster heil/kaputt/vernagelt/beleuchtet, Gesimse, Dachkanten, Aufbauten, Markisen, Feuertreppe, Schildgerüst, Tankstellendach …), AAP-64, orthogonal, **ohne Text**, kachelbar; Grammatik aus #171 setzt sie zusammen, Code-Malerei bleibt Rückfall. Budget ≈ 150.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #171 POI G4: Hüllen (Gebäude-Grammatik in Seitenansicht)
 - **Status:** fertig (22.11.) · angelegt 21.11. von Code (Daniel: „Mach G4 direkt weiter dann“)
