@@ -105,7 +105,7 @@ test('#172 gemalte Module: Typ über Spiel › Hülle, POI über Typ, jedes Modu
   const fs = await import('node:fs');
   for (const id of Object.keys(D.pois)) {
     const art = hullConfig(D, id).art;
-    for (const [k, v] of Object.entries(art)) for (const a of Array.isArray(v) ? v : typeof v === 'string' ? [v] : []) {
+    for (const [k, v] of Object.entries(art)) if (!k.endsWith('Tint')) for (const a of Array.isArray(v) ? v : typeof v === 'string' ? [v] : []) {
       assert.equal(D.assets[a]?.kind, 'image', `${id}: Modul ${k} = ${a}`);
       assert.ok(fs.existsSync(new URL('../projects/nomadgirl/' + D.assets[a].file, import.meta.url)), `${a}: Datei`);
     }

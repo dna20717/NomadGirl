@@ -41,7 +41,9 @@
    "base": "facade_base_tiles",
    "band": "facade_strip_cornice",
    "roof": "facade_strip_coping",
-   "lisene": "facade_wall_concrete"
+   "lisene": "facade_wall_concrete",
+   "roofTint": "#b4202a",
+   "liseneTint": "#b4202a"
   }
  },
  "mall": {

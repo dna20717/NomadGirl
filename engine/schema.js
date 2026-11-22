@@ -1975,7 +1975,8 @@ export const AREAS = {
         refs('art.windowLit', 'Fenster erleuchtet', 'assets'), refs('art.windowBroken', 'Fenster kaputt', 'assets'), refs('art.windowBoarded', 'Fenster vernagelt', 'assets'),
         refs('art.shop', 'Schaufenster', 'assets', { hint: 'Im Sockel „Schaufenster“, je Achse' }),
         ref('art.base', 'Sockel', 'assets', { hint: 'Textur des Sockels' }), ref('art.band', 'Gesims', 'assets', { hint: 'Waagrechter Streifen, nahtlos nach links und rechts' }),
-        ref('art.roof', 'Dachkante / Attika', 'assets', { hint: 'Waagrechter Streifen, auf die Höhe der Dachkante gestaucht' }), ref('art.lisene', 'Lisenen', 'assets', { hint: 'Textur der Ecken und Lisenen' }),
+        ref('art.roof', 'Dachkante / Attika', 'assets', { hint: 'Waagrechter Streifen, auf die Höhe der Dachkante gestaucht' }), color('art.roofTint', 'Dachkante einfärben', { hint: 'Leer = wie gemalt; z. B. die rote Blende der Tankstelle' }),
+        ref('art.lisene', 'Lisenen', 'assets', { hint: 'Textur der Ecken und Lisenen' }), color('art.liseneTint', 'Lisenen einfärben'),
         ref('art.gable', 'Giebel', 'assets', { hint: 'Ganzes Bild, Verhältnis etwa 2,4 : 1; über breiten Bauten sitzt der Giebel in der Mitte' }), ref('art.crown', 'Krone', 'assets', { hint: 'Hochhaus-Krone, ragt höher als die Krone aus Code' })] },
     ],
     check: (x, report) => {

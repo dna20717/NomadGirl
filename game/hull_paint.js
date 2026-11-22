@@ -42,6 +42,18 @@ function dimmed(img, k) {
   }
   return m.get(key);
 }
+// the picture coloured over by `color` (k 0..1), cached: a painted coping in the type's trim colour (the red fascia of the gas station)
+function tinted(img, color, k = 0.6) {
+  if (!color) return img;
+  let m = dimCache.get(img); if (!m) dimCache.set(img, m = new Map());
+  const key = color + k;
+  if (!m.has(key)) {
+    const c = mkCanvas(img.width, img.height), x = c.getContext('2d');
+    x.drawImage(img, 0, 0); x.globalCompositeOperation = 'source-atop'; x.globalAlpha = k; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height);
+    m.set(key, c);
+  }
+  return m.get(key);
+}
 // 9-slice: corners keep their size (scaled by s), edges and middle stretch; for windows of any size in the grid
 function nine(ctx, img, dx, dy, dw, dh, s = 1) {
   const iw = img.width, ih = img.height, b = Math.max(2, Math.round(Math.min(iw, ih) * 0.2)), d = Math.max(2, Math.min(Math.round(b * s), Math.floor(dw / 2) - 1, Math.floor(dh / 2) - 1));
@@ -66,7 +78,7 @@ function fitIn(ctx, img, x, y, w, h, { stretch = 1.25, mode = 'contain', flip = 
 // all asset ids a hull config uses (for loading them before painting)
 export function hullArtIds(cfg) {
   const out = new Set();
-  for (const v of Object.values(cfg?.art || {})) for (const id of Array.isArray(v) ? v : [v]) if (typeof id === 'string' && id) out.add(id);
+  for (const v of Object.values(cfg?.art || {})) for (const id of Array.isArray(v) ? v : [v]) if (typeof id === 'string' && id && id[0] !== '#') out.add(id);
   return [...out];
 }
 
@@ -184,7 +196,7 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
         if (p.style === 'tiles') for (let y = p.y; y < p.y + p.h; y += 0.25) for (let x = p.x; x < p.x + p.w; x += 0.25) R(mix(baseC, 0xffffff, hash(x * 4 | 0, y * 4 | 0, 9) < 0.5 ? 0.12 : 0), x, y, 0.25 - 1 / g, 0.25 - 1 / g);
         if (p.style === 'shop') for (const ax of b.axes) { R(frame, ax - 0.5, p.y + 0.3, C.winW + 1, p.h - 0.3); R(mix(glass, DARK, 0.45), ax - 0.5 + 2 / g, p.y + 0.3 + 2 / g, C.winW + 1 - 4 / g, p.h - 0.3 - 4 / g); R(mix(glass, 0xffffff, 0.25), ax, p.y + 0.6, 0.2, p.h * 0.6); }
       }
-      if (p.kind === 'lisene' && M('lisene')) { tileRect(M('lisene'), p.x + 0.2, p.y, 0.6, p.h, { dimK: 0.1 }); R(mix(trim, 0xffffff, 0.28), p.x + 0.2, p.y, 1.5 / g, p.h); R(INK, p.x + 0.8 - 1.5 / g, p.y, 1.5 / g, p.h); }
+      if (p.kind === 'lisene' && M('lisene')) { tileRect(tinted(M('lisene'), C.art?.liseneTint), p.x + 0.2, p.y, 0.6, p.h, { dimK: 0.1 }); R(mix(trim, 0xffffff, 0.28), p.x + 0.2, p.y, 1.5 / g, p.h); R(INK, p.x + 0.8 - 1.5 / g, p.y, 1.5 / g, p.h); }
       else if (p.kind === 'lisene') { R(trim, p.x + 0.2, p.y, 0.6, p.h); R(mix(trim, 0xffffff, 0.28), p.x + 0.2, p.y, 1.5 / g, p.h); R(mix(trim, DARK, 0.35), p.x + 0.8 - 1.5 / g, p.y, 1.5 / g, p.h); }
     }
     // windows of the facade (the rooms behind them we cannot enter): frame, glass with a streak of sky, lit, broken, boarded
@@ -255,7 +267,7 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
   for (const p of plan.parts) {
     if (p.x > x0 + w + 4 || p.x + p.w < x0 - 4) continue;
     // #172 painted: parapet/coping strip, pediment, crown, rooftop units (variants), a fallen wreck, the bunker lintel
-    if (p.kind === 'roof' && M('roof')) { tileRect(M('roof'), p.x, p.y, p.w, p.h, { stripH: p.h }); R(INK, p.x, p.y, 1 / g, p.h); R(INK, p.x + p.w - 1 / g, p.y, 1 / g, p.h); R(INK, p.x, p.y + p.h - 1 / g, p.w, 1 / g); continue; }
+    if (p.kind === 'roof' && M('roof')) { tileRect(tinted(M('roof'), C.art?.roofTint), p.x, p.y, p.w, p.h, { stripH: p.h }); R(INK, p.x, p.y, 1 / g, p.h); R(INK, p.x + p.w - 1 / g, p.y, 1 / g, p.h); R(INK, p.x, p.y + p.h - 1 / g, p.w, 1 / g); continue; }
     if (p.kind === 'gable' && M('gable')) { R(roofC, p.x - 0.3, p.y + p.h - 0.2, p.w + 0.6, 0.3); ctx.drawImage(M('gable'), Math.round(p.x * g), Math.round(p.y * g), Math.round(p.w * g), Math.round(p.h * g)); continue; }
     if (p.kind === 'crown' && M('crown')) { const t = p.tall || p.h; fitIn(ctx, M('crown'), p.x * g, (p.y + p.h - t) * g, p.w * g, t * g, { stretch: 1.2 }); continue; }
     if (p.kind === 'unit' && p.fallen) { const im = M('fallen', p.x | 0); if (im) fitIn(ctx, im, (p.x - 0.2) * g, (p.y - 0.4) * g, (p.w + 0.4) * g, (p.h + 0.4) * g, { flip: hash(p.x | 0, 1, 87) < 0.5 }); continue; }

@@ -2,14 +2,15 @@
 // Pictures of the hulls (#171 G4): per POI the whole level (fog and light map off, so the building reads) and close-ups in game zoom
 // (light on): the roof edge of the first building, a facade with windows, the outside (sky, skyline, awning/canopy). With --before the
 // same pictures with Spiel › Hülle › Hüllen aus (the data is changed in the browser only), for vorher/nachher.
-//   node tools/facade_shots.mjs <tag> [--poi <id>] [--seed 1] [--before] [--no-close] [--sheet output/hullen_171.jpg]
+// With --code (#172) the hull painted from code only (Spiel › Hülle › Gemalte Module aus, the look of #171), for vorher/nachher of the modules.
+//   node tools/facade_shots.mjs <tag> [--poi <id>] [--seed 1] [--before | --code] [--no-close] [--sheet output/fassaden_172.jpg]
 //   (server must run, GAME_URL) → output/hullen_<poi>_<what>_<tag>.png
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { chromium } from 'playwright';
 const args = process.argv.slice(2), opt = k => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null; };
 const tag = args.find((a, i) => !a.startsWith('--') && !['--poi', '--seed', '--sheet'].includes(args[i - 1])) || 'now';
-const seed = +(opt('--seed') || 1), only = opt('--poi'), before = args.includes('--before'), close = !args.includes('--no-close'), sheet = opt('--sheet');
+const seed = +(opt('--seed') || 1), only = opt('--poi'), before = args.includes('--before'), code = args.includes('--code'), close = !args.includes('--no-close'), sheet = opt('--sheet');
 const base = process.env.GAME_URL || 'http://localhost:8766/game.html';
 const D = JSON.parse(fs.readFileSync(new URL('../projects/nomadgirl/data/pois.json', import.meta.url)));
 fs.mkdirSync('output', { recursive: true });
@@ -18,7 +19,7 @@ const out = [], whole = [], errors = [];
 for (const poi of Object.keys(D).filter(p => !only || p === only)) {
   const p = await b.newPage({ viewport: { width: 1600, height: 900 } });
   p.on('pageerror', e => errors.push(`${poi}: ${e.message}`));
-  if (before) await p.route(/data\/game\.json/, async r => { const res = await r.fetch(), j = await res.json(); j.hull = { ...(j.hull || {}), enabled: false }; r.fulfill({ response: res, json: j }); });
+  if (before || code) await p.route(/data\/game\.json/, async r => { const res = await r.fetch(), j = await res.json(); j.hull = { ...(j.hull || {}), ...(before ? { enabled: false } : { modules: false }) }; r.fulfill({ response: res, json: j }); });
   try {
     await p.goto(`${base}?poi=${poi}&seed=${seed}`);
     await p.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.leyla, null, { timeout: 120000 });
