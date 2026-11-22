@@ -25,6 +25,8 @@ export function levelConfig(D) {
   return { ...LEVEL, ...Object.fromEntries(Object.entries(g).filter(([k, v]) => k in LEVEL && v != null)) };
 }
 
+import { planHull, hullWindowSpot } from './facade.js';
+
 const WALLS = new Set(['#', 'A', '^', 'v', 'D', 'B', '$', '%']);
 const isWall = c => c == null || WALLS.has(c);
 
@@ -115,13 +117,14 @@ export function lightTheWay(lamps, L, room, cfg = LEVEL, mk = null) {
 export function landmarkViews(D, poiId, L, cfg = levelConfig(D)) {
   const P = D?.pois?.[poiId]; if (!P?.level?.landmark || !L?.rooms?.length) return [];
   const indoor = id => { const r = D.rooms?.[id] || {}; return r.indoor ?? !(r.backdrop?.image || r.backdrop?.weather); };
-  const wow = wowOf(D, poiId)?.room, tiles = L.def.layout;
+  const wow = wowOf(D, poiId)?.room, tiles = L.def.layout, hull = planHull(D, poiId, L);
   let k = 0;
   return L.rooms.map((r, i) => {
     if (r.band !== 'main') return { room: i, how: null };
     if (!indoor(r.id)) return { room: i, how: 'sky' };
     if (r.id === wow || k++ % Math.max(1, cfg.windowEvery)) return { room: i, how: null };
-    const win = windowSpot(tiles, r);
+    // #171 Hüllen G4: inside a building the window sits on its grid (Fenster = Fenster der Räume); elsewhere the old spot
+    const onGrid = hull.on ? hullWindowSpot(hull, { ...r, i }) : undefined, win = onGrid === undefined ? windowSpot(tiles, r) : onGrid;
     return { room: i, how: win ? 'window' : null, win };
   });
 }

@@ -160,7 +160,8 @@
      "story": "Der Pächter gab ihn nur gegen Tankquittung raus; er hängt noch am Haken hinterm Tresen"
     }
    ]
-  }
+  },
+  "hull": {"type": "gas_station"}
  },
  "grossmarkt": {
   "name": "Delta South Megamall",
@@ -288,7 +289,8 @@
      "story": "Die Aufsicht vom Info-Stand ließ sie beim Ausruf für den kleinen Kevin liegen"
     }
    ]
-  }
+  },
+  "hull": {"type": "mall"}
  },
  "bunker_13": {
   "name": "Deadlock Bunker 13",
@@ -399,7 +401,8 @@
      "story": "Die Rust Guard schrauben die Räder ab, damit keiner ohne Dienstplan durchgeht"
     }
    ]
-  }
+  },
+  "hull": {"type": "bunker"}
  },
  "ministerium": {
   "name": "Ministry of Order",
@@ -498,7 +501,8 @@
     {"name": "Genehmigungsstempel", "kind": "stamp", "lock": "gate", "lockName": "Schranke am Schalter", "story": "Ohne Stempel kein Durchgang: Order is safety"},
     {"name": "Wartenummer 000", "kind": "ticket", "lock": "door", "lockName": "Tür zum Amtsleiter", "story": "Die Anzeige ruft sie seit Jahren auf, niemand hatte sie"}
    ]
-  }
+  },
+  "hull": {"type": "ministry"}
  },
  "delta_heights": {
   "name": "Delta Heights",
@@ -590,7 +594,8 @@
      "story": "Der Bauherr flog mit dem Hubschrauber, die Karte fiel aus dem Jackett"
     }
    ]
-  }
+  },
+  "hull": {"type": "highrise"}
  },
  "parkhaus_sued": {
   "name": "P+R Delta Süd",
@@ -706,7 +711,8 @@
      "story": "Die Gebühr läuft seit Jahren; der Schein öffnet die Schranke trotzdem"
     }
    ]
-  }
+  },
+  "hull": {"type": "parking"}
  },
  "funkmast_km31": {
   "name": "Funkmast KM 31",
@@ -798,7 +804,8 @@
      "story": "Der Funker drehte sie raus, damit niemand den Mast abschaltet"
     }
    ]
-  }
+  },
+  "hull": {"type": "radio_mast"}
  },
  "metro_line4": {
   "name": "Metro Line 4",
@@ -908,7 +915,8 @@
     {"recipe": "dangerReward", "weight": 2}
    ],
    "keys": [{"name": "Vierkantschlüssel", "kind": "key", "lock": "hatch", "lockName": "Gitterluke", "story": "Jeder Schaffner hatte einen; einer liegt noch im Kiosk"}]
-  }
+  },
+  "hull": {"type": "metro"}
  },
  "storm_drain9": {
   "name": "Storm Drain 9",
@@ -985,7 +993,8 @@
     {"recipe": "dangerReward", "weight": 2}
    ],
    "keys": [{"name": "Ventilrad", "kind": "valve", "lock": "hatch", "lockName": "Schieber", "story": "Vom Pegelhäuschen, damit der Schieber bei Hochwasser zu bleibt"}]
-  }
+  },
+  "hull": {"type": "drain"}
  },
  "pit6": {
   "name": "Pit 6",
@@ -1077,7 +1086,8 @@
      "story": "Wer einfährt, hängt seine Marke ab; diese hängt seit dem letzten Tag nicht am Brett"
     }
    ]
-  }
+  },
+  "hull": {"type": "mine"}
  },
  "delta_crude": {
   "name": "Delta Crude Refinery",
@@ -1192,7 +1202,8 @@
      "story": "Beim Abschalten nahm der Schichtleiter die Räder mit; eins vergaß er auf der Brücke"
     }
    ]
-  }
+  },
+  "hull": {"type": "refinery"}
  },
  "sunny_acres": {
   "name": "Sunny Acres",
@@ -1307,7 +1318,8 @@
      "story": "Ruhezeit 13 bis 15 Uhr: das Tor bleibt zu, der Schlüssel hängt im Büro"
     }
    ]
-  }
+  },
+  "hull": {"type": "trailer_park"}
  },
  "raketensilo": {
   "name": "Silo Zero",
@@ -1439,6 +1451,7 @@
      "story": "Der Code für den Tag danach, mit Bleistift auf den Dienstplan gekritzelt"
     }
    ]
-  }
+  },
+  "hull": {"type": "silo"}
  }
 }

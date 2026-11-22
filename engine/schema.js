@@ -20,6 +20,7 @@ import { CHANNELS, CONDITIONS } from './storylets.js';
 import { OCCUPANT_KINDS } from './history.js';
 import { FACTIONS, ATTITUDES, CAMP_FACTIONS, LIFE_EVENTS, LIFE } from './ecosystem.js';
 import { TROPE_PLACES } from './tropes.js';
+import { HULL_KINDS, ROOF_KINDS, ROOFTOP, AWNINGS, MATERIALS, BASES, SURFACES, PLANT, SKY_KINDS, HULL } from './facade.js';
 import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
 import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
 import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from './megarig.js';
@@ -318,6 +319,16 @@ export const AREAS = {
         num('dressing.backDim', 'Rückwand-Clutter dunkler', { unit: '%', min: 35, max: 50, hint: 'Rohre, Kabelkanäle, Regale, Poster, Türen ohne Funktion auf der Rückwand: so viel dunkler als die Spielebene (Bibel: 35–50 %). Leer = 42' }),
         num('dressing.backEvery', 'Rückwand-Clutter: Abstand', { unit: 'Wandplätze', min: 1, max: 30, hint: 'Etwa eins je so viele freie Wandplätze. Leer = 7' }),
         bool('dressing.learn', 'Entwickler-Modus: Korrekturen (K)', { hint: '#159 (Daniel 21.11.2026: nur im Entwickler-Modus): K im POI schaltet Korrekturen an, ein Klick auf ein Ding fragt nach dem Grund, daraus wird eine Regel (Katalog Korrekturen) für alle Seeds. Auch mit ?dev in der Adresse' })] },
+      { title: 'Hülle', fields: [bool('hull.enabled', 'Hüllen an', { hint: '#171 G4 (Gebäude-Grammatik in Seitenansicht): um die Räume jedes POI steht ein Gebäude nach den Regeln seines Gebäudetyps (Welt › Gebäudetypen, POIs › Hülle). Aus = Fels um die Räume wie früher. Leer = an' }),
+        num('hull.grain', 'Körnung', { unit: 'Pixel je Kachel', min: 4, max: 32, hint: `So fein wird die Hülle gemalt (dann scharf auf 64 px hochskaliert). Leer = ${HULL.grain}` }),
+        num('hull.light', 'Licht auf der Hülle', { unit: '%', min: 20, max: 120, hint: `Fassade und Himmel um die Gebäude sind draußen: so hell bleiben sie unter der Lichtkarte (Innenräume behalten ihre Atmosphäre). Leer = ${HULL.light}` }),
+        num('hull.backDim', 'Vordächer und Treppen dunkler', { unit: '%', min: 0, max: 80, hint: `Markisen, Vordächer, Feuertreppen, Anlagen und Straßenmöbel stehen hinter der Spielfläche: so viel dunkler, damit niemand sie für Plattformen hält. Leer = ${HULL.backDim}` }),
+        num('hull.reach', 'Außen offen ab', { unit: 'Kacheln über dem Boden', min: 3, max: 20, hint: `Decke und Wände von Außenräumen, die so hoch über jedem Stand liegen (keine Leiter daneben), werden zu Himmel bzw. Fassade. Die Kollision bleibt (unerreichbar). Leer = ${HULL.reach}` }),
+        bool('hull.roomWindows', 'Fenster der Räume', { hint: 'Wo das Fensterraster eines Gebäudes frei durch einen Innenraum läuft, bekommt die Rückwand ein Fenster nach draußen (Gebäudetyp › Fenster in Räumen %). Leer = an' }),
+        bool('hull.skyline', 'Skyline im Hintergrund', { hint: 'Ferne Gebäude-Silhouetten aus derselben Grammatik: BigCityDelta am Horizont, Nachbarbauten je Region, auch um die Landmarke. Leer = an' }),
+        num('hull.cityShare', 'BigCityDelta: Türme', { unit: '%', min: 0, max: 100, hint: `Anteil hoher Türme in der fernen Stadt. Leer = ${HULL.cityShare}` }),
+        table('hull.regions', 'Skyline je Region', [text('region', 'Region'), select('kind', 'Nachbarn', SKY_KINDS), num('density', 'Dichte', { unit: '%', min: 0, max: 300 })],
+          { hint: 'Welche Nachbarbauten in einer Region der Reisekarte stehen (Zeile ohne Region = alle anderen). Ohne Zeile: Delta Ring Stadt, The Outskirts Vorstadt, Scrap Desert und East Bend Industrie, Salt Flats Salzebene, South Badlands und Crow Valley Canyon, sonst Wüste' })] },
       { title: 'Level-Design', fields: [num('levelDesign.peak', 'Spitze ab', { unit: '%', min: 0, max: 150, hint: `#163 Rhythmus (Bibel › Level-Design): nach einem Hauptraum ab dieser Intensität folgt einer unter „Ruhe unter“ (nicht vor dem Ausgang). Leer = ${LEVEL.peak}` }),
         num('levelDesign.calm', 'Ruhe unter', { unit: '%', min: 0, max: 100, hint: `Leer = ${LEVEL.calm}` }), num('levelDesign.rest', 'Ruhe-Raum', { unit: '%', min: 0, max: 100, hint: `So laut wird der Raum nach der Spitze; bevorzugt ein Raum vom Typ Atempause (ohne Gegner, mit Kiste). Leer = ${LEVEL.rest}` }),
         num('levelDesign.seam', 'Kein Spawn an Nähten', { unit: 'Kacheln', min: 0, max: 8, hint: `Faire Kämpfe: so weit von jeder Naht zwischen zwei Räumen spawnt nichts (Gegner rücken nach innen). Leer = ${LEVEL.seam}` }),
@@ -1761,6 +1772,14 @@ export const AREAS = {
         refs('dressing.sets', 'Nur diese Ensembles', 'poiSets', { hint: 'Leer = alle passenden POI-Ensembles. Raum-Bausteine können es je Raum überschreiben' }),
         num('dressing.desert', 'Wüste kriecht rein', { unit: '%', min: 0, max: 100, hint: '#159: Sand in Ecken und am Wandfuß, Grün in Ritzen, Licht durch Öffnungen, von jedem Eingang und Fenster nach innen abnehmend. Leer = 60 (Bunker fast nichts)' }),
         num('dressing.desertReach', 'Wüste: Reichweite', { unit: 'Kacheln', min: 1, max: 60, hint: 'So weit kriecht sie hinein. Leer = 14' })] },
+      { title: 'Hülle', fields: [bool('hull.on', 'Hülle an', { hint: '#171 G4: das Gebäude um die Räume. Leer = an, sobald ein Gebäudetyp gewählt ist' }),
+        ref('hull.type', 'Gebäudetyp', 'hulls', { hint: 'Welt › Gebäudetypen: die Regeln (Sockel, Etagen, Fensterachsen, Dach, Schäden). Die Felder hier überschreiben den Typ nur für diesen POI' }),
+        num('hull.floorH', 'Etagenhöhe', { unit: 'Kacheln', min: 3, max: 16, hint: 'Ungefähre Geschosshöhe; die echte kommt aus den Räumen (jeder Raum in ganze Geschosse geteilt). Leer = wie der Typ' }),
+        num('hull.floors', 'Geschosse mindestens', { min: 1, max: 12, hint: 'Nebeneinander-POIs: so hoch steht das Gebäude über dem Boden, auch wo die Räume niedriger sind. Leer = wie der Typ' }),
+        num('hull.axis', 'Fensterachse', { unit: 'Kacheln', min: 2, max: 16, hint: 'Abstand der Fenster (Takt). Leer = wie der Typ' }),
+        select('hull.roof', 'Dachart', [['', '– wie der Typ –'], ...ROOF_KINDS]),
+        num('hull.decay', 'Schäden', { min: 0, max: 3, hint: 'Risse, Löcher, kaputte und vernagelte Fenster, fehlende Dachteile. Leer = POIs › Story › Verfall' }),
+        num('hull.roomWindows', 'Fenster in Räumen', { unit: '%', min: 0, max: 100, hint: 'Leer = wie der Typ' })] },
       { title: 'Marken-Clutter', wide: true, fields: [table('brandProps', 'Marken-Clutter', [ref('look', 'Symbol-Raster', 'assets'), text('name', 'Symbol'), num('cm', 'Höhe', { unit: 'cm', min: 1 }), num('chance', 'Chance', { unit: '%', min: 0, max: 100 }), bool('ai', 'KI'), text('place', 'Ort'), text('tags', 'Tags'), text('roles', 'Rollen')], { hint: 'Daniel, 17.11.2026: Dinge einer Marke, die in diesem POI auf freiem Boden stehen (z. B. NomadCola-Automaten an Tankstellen). Symbol = Name im Raster, Höhe in echten cm, Chance je freier Bodenkachel (mit Set-Dressing: Gewicht beim Auswählen). KI = darin wohnt eine Entity: E / ↑ davor startet ein Glitch-Duell (#052). Ort, Tags, Rollen wie Kachel-Sets › Clutter-Regeln (#158)' })] },
       { title: 'Ranking', fields: [num('parTime', 'Bestzeit', { unit: 's', min: 0 }), num('secrets', 'Secrets', { min: 0, hint: 'Im Level zählen die brüchigen Wände (B); diese Zahl gilt nur für POIs ohne Level' })] },
       { title: 'Leben G3', fields: [bool('life.off', 'Ohne Lager', { hint: '#169: Gegner stehen an ihren Spawn-Punkten wie früher, keine Simulation' }), num('life.camps', 'Lager', { min: 1, max: 8, hint: 'So viele Lager zum Start eines Durchgangs. Leer = nach Größe (S 1, M 2, L 2, XL 3, XXL 4)' }),
@@ -1910,6 +1929,33 @@ export const AREAS = {
       }
       if (x.after) { let k = x.after, n = 0; const seen = new Set(); while (k && n++ < 99) { if (seen.has(k)) { report('error', 'Die Kette über „Nach“ ist ein Kreis'); break; } seen.add(k); k = S[k]?.after; } }
       if (x.channel === 'memory' && !x.ava) report('hint', 'Faden ohne AvA-Kommentar');
+    },
+  },
+  hulls: {
+    name: 'Gebäudetypen', singular: 'Gebäudetyp', icon: 'building', file: 'data/hulls.json', kind: 'catalog',
+    hint: '#171 G4 Hüllen (docs/concepts/poi_next_gen.md › G4): die Gebäude-Grammatik in Seitenansicht. Aus den verschweißten Räumen eines POI entsteht ein Gebäude: Sockel, Etagen (Höhe aus den Räumen), Fensterachsen im Takt, Dach mit Aufbauten, Lisenen, Vordächer, Feuertreppen, Schäden nach Verfall. Fenster der Fassade und Fenster in den Rückwänden der Räume liegen im selben Raster. Keine Texte in Grafiken',
+    template: { name: 'Neuer Gebäudetyp', kind: 'building', floors: 1, floorH: 6, axis: 5, winW: 2, winH: 2, sill: 1, roof: 'parapet', roofH: 1, base: 'plain', baseH: 1, material: 'concrete', wall: '#8b93af', trim: '#4a5462' },
+    row: x => `${label(HULL_KINDS, x.kind || 'building')} · ${label(ROOF_KINDS, x.roof || 'parapet')} · Achse ${x.axis ?? 5}`,
+    sections: [
+      { title: 'Gebäudetyp', fields: [NAME, DESCRIPTION, select('kind', 'Form', HULL_KINDS, { hint: 'Gebäude: Fassade um die Räume. Eingegraben: Erdhügel mit Portal. Gittermast: Stahlfachwerk. Offene Decks: Brüstungen statt Fenster. Anlage: Gebäude plus Tanks und Kolonnen über dem Gelände. Nur Oberfläche: Untergrund-POIs, über der Straße nur Aufbauten' }),
+        select('material', 'Material', MATERIALS), color('wall', 'Wand'), color('trim', 'Gesims, Lisenen'), color('glass', 'Glas'), color('frame', 'Rahmen'), color('litColor', 'Licht in Fenstern'), color('roofColor', 'Dach'), color('baseColor', 'Sockel')] },
+      { title: 'Grammatik', fields: [num('floors', 'Geschosse mindestens', { min: 1, max: 12, hint: 'Nebeneinander-POIs: so hoch steht das Gebäude, auch über niedrigen Räumen (Türme: aus den Räumen)' }),
+        num('floorH', 'Etagenhöhe', { unit: 'Kacheln', min: 3, max: 16, hint: 'Richtwert; die echte Höhe kommt aus den Räumen (#131: 5–6 Kacheln je Geschoss)' }), bool('uniform', 'Eine Traufhöhe', { hint: 'Alle Teile gleich hoch (Mall, Ministerium); aus = jeder Raum sein eigenes Volumen mit Stufen' }),
+        num('axis', 'Fensterachse', { unit: 'Kacheln', min: 2, max: 16, hint: 'Takt der Fenster' }), num('winW', 'Fenster breit', { unit: 'Kacheln', min: 1, max: 8 }), num('winH', 'Fenster hoch', { unit: 'Kacheln', min: 1, max: 6 }),
+        num('sill', 'Brüstung', { unit: 'Kacheln', min: 0, max: 4, hint: 'Vom Boden des Geschosses bis zur Fensterunterkante' }), num('edge', 'Rand ohne Fenster', { unit: 'Kacheln', min: 0, max: 6 }),
+        num('roomWindows', 'Fenster in Räumen', { unit: '%', min: 0, max: 100, hint: 'Wo das Raster frei durch einen Innenraum läuft (keine Leiter, Lampe, Plattform), so oft ein Fenster in der Rückwand' }),
+        num('lit', 'Erleuchtete Fenster', { unit: '%', min: 0, max: 100 })] },
+      { title: 'Sockel, Dach, Schmuck', fields: [select('base', 'Sockel', BASES), num('baseH', 'Sockel hoch', { unit: 'Kacheln', min: 0, max: 8 }),
+        select('roof', 'Dachart', ROOF_KINDS, { hint: 'Kuppel: nur über dem Wow-Raum, sonst Attika' }), num('roofH', 'Dachkante hoch', { unit: 'Kacheln', min: 0, max: 4 }),
+        multi('rooftop', 'Aufbauten', ROOFTOP), num('rooftopCount', 'Aufbauten je Dach', { min: 0, max: 8 }),
+        bool('lisene', 'Ecken und Lisenen'), num('lisEvery', 'Lisene alle', { unit: 'Achsen', min: 0, max: 8, hint: '0 = nur an den Ecken' }),
+        select('awning', 'Vordach / Markise', AWNINGS), bool('fireEscape', 'Feuertreppe'), num('damage', 'Schäden', { unit: '% des Verfalls', min: 0, max: 200, hint: 'Wie stark der Verfall (POIs › Story) an der Hülle zu sehen ist' }),
+        num('cover', 'Erde über dem Bunker', { unit: 'Kacheln', min: 1, max: 10, hint: 'Nur Eingegraben' }), select('surface', 'Über der Straße', SURFACES, { hint: 'Nur Oberfläche' }),
+        multi('plant', 'Auf dem Gelände', PLANT, { hint: 'Über den Außenräumen im Hintergrund (Anlage, Siedlung)' })] },
+    ],
+    check: (x, report) => {
+      if ((x.winW ?? 2) >= (x.axis ?? 5)) report('warning', 'Fenster breiter als die Achse: kein Pfeiler dazwischen');
+      if ((x.sill ?? 1) + (x.winH ?? 2) + 1 > (x.floorH ?? 6)) report('warning', 'Brüstung + Fenster höher als ein Geschoss');
     },
   },
   tropes: {
@@ -2311,7 +2357,7 @@ export const GROUPS = [
   ['ACHIEVEMENTS & AUFTRÄGE', ['achievements', 'quests']],
   ['PROGRESSION', ['techtree', 'resources']],
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'decorSets', 'megarigs', 'rigAddons', 'salvage', 'people', 'companions']],
-  ['WELT', ['worldmap', 'parallax', 'pois', 'rooms', 'terrain', 'poiSets', 'roomStories', 'storylets', 'tropes', 'history', 'life', 'dressingRules', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
+  ['WELT', ['worldmap', 'parallax', 'pois', 'rooms', 'terrain', 'poiSets', 'roomStories', 'storylets', 'tropes', 'history', 'hulls', 'life', 'dressingRules', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
   ['LORE', ['brands', 'chronicle']],
   ['ENTITIES', ['glitchlings']],
 ];

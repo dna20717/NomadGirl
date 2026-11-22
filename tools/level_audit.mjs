@@ -9,6 +9,7 @@
 //   · no spawn at a seam, every shooter with sight of the way in of his room
 //   · the Wow room in every seed: narrow before wide, the largest room of the POI, a key light on the motif, calm first, a reward
 //     within 4 tiles of the motif
+//   · #171 the hull: never on play space, rooms stay closed, windows on the grid of their building (facade, back walls, landmark)
 //   · #169 the camps (fresh state and after 10 days): never in an Atempause, the Wow room, the entrance, never at a seam; members on
 //     their floor, rounds on walkable floor
 // Usage: node tools/level_audit.mjs [--seeds 8] [--poi <id>] [--verbose]   Exit 1 on findings.
@@ -22,6 +23,7 @@ import { atmoRegions, planLights } from '../engine/atmosphere.js';
 import { levelConfig, roomGates, landmarkViews, secretSigns, wowInLevel, wowOf, shooterFair, roomType } from '../engine/level_design.js';
 import { reachMap, rulesFrom } from './reach_audit.mjs';
 import { initLife, simulate, planLife } from '../engine/ecosystem.js';
+import { planHull, hullAudit } from '../engine/facade.js';
 
 export const SEEDS = [1, 2, 3, 5, 8, 13, 21, 34];
 
@@ -121,6 +123,12 @@ export function auditPoi(D, poiId, seed) {
   }
   // 8. #169 camps
   for (const f of auditLife(D, poiId, L, seed)) add('Lager', f.text, f.room);
+  // 9. #171 Hüllen G4: the hull never on play space, every room still closed, windows on the grid of their building (facade, back walls,
+  // landmark windows) and whole
+  {
+    const plan = planHull(D, poiId, L), lw = landmarkViews(D, poiId, L, cfg).filter(v => v.win).map(v => ({ room: v.room, win: v.win }));
+    for (const f of hullAudit(D, poiId, L, plan, lw)) add(`Hülle: ${f.what}`, f.text);
+  }
   return out;
 }
 export function auditLife(D, poiId, L, seed) {
