@@ -29,10 +29,10 @@ function objectUrl(w, file) {
 // #170 the picture as the game shows it: with its text from data (Assets › Schrift aus Code), else the file itself
 function shownUrl(w, a) {
   if (!hasLabels(a)) return objectUrl(w, a.file);
-  w.labeled = w.labeled || new Map();
+  w.labeledUrls = w.labeledUrls || new Map();
   const key = a.file + JSON.stringify(a.labels);
-  if (!w.labeled.has(key)) w.labeled.set(key, Promise.all([image(w, a.file), loadFont()]).then(([img]) => labeledCanvas(img, a.labels).toDataURL()));
-  return w.labeled.get(key);
+  if (!w.labeledUrls.has(key)) w.labeledUrls.set(key, Promise.all([image(w, a.file), loadFont()]).then(([img]) => labeledCanvas(img, a.labels).toDataURL()));
+  return w.labeledUrls.get(key);
 }
 const failed = (file, e) => el('p', { class: 'ng-inline error' }, icon('error', 14), ` ${file} lässt sich nicht laden (${e.message})`);
 
