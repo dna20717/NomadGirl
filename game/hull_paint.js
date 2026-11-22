@@ -284,7 +284,7 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
     }
     if (p.kind === 'portal' && M('portal')) { const im = M('portal'), ww = (p.w + 1.6) * g, hh = ww * im.height / im.width; ctx.drawImage(dimmed(im, dim / 200), Math.round((p.x - 0.8) * g), Math.round((p.y + 1.3) * g - hh), Math.round(ww), Math.round(hh)); continue; }
     if (p.kind === 'roof') {
-      const c = p.roof === 'flat' ? roofC : trim;
+      const c = p.roof === 'flat' || (p.annex && C.roof === 'fascia') ? roofC : trim;   // #178 the block on the mega-store's roof: a grey coping
       R(c, p.x, p.y, p.w, p.h); R(mix(c, 0xffffff, 0.35), p.x, p.y, p.w, 2 / g); R(INK, p.x, p.y, p.w, 1 / g); R(INK, p.x, p.y, 1 / g, p.h); R(INK, p.x + p.w - 1 / g, p.y, 1 / g, p.h);
       if (p.roof === 'parapet' || p.roof === 'crown') { R(mix(c, DARK, 0.35), p.x, p.y + p.h - 2 / g, p.w, 2 / g); for (let x = p.x + 0.5; x < p.x + p.w - 0.5; x += 2) R(mix(c, DARK, 0.2), x, p.y + 3 / g, 1 / g, p.h - 5 / g); }
     }

@@ -249,6 +249,9 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
     }
     return true;
   };
+  // #178 a thing with a KI in it (E / ↑ starts a duel) keeps away from ladders, the goal, switches, chests, doors and the start, or its
+  // prompt would take the place of theirs
+  const aiClear = (c, x, y) => { if (!c.ai) return true; for (let dy = -4; dy <= 0; dy++) for (let dx = -3; dx < c.w + 3; dx++) if ('HZCSD@!L/+o'.includes(ch(x + dx, y + dy) || '.')) return false; return true; };
   const gapFree = (x0, x1, y, g) => { for (let x = x0 - g; x < x0; x++) if (!free(x, y)) return false; for (let x = x1 + 1; x <= x1 + g; x++) if (!free(x, y)) return false; return true; };
   const put = (c, x, y, hang, type, ens, R) => {
     const it = { x, y, w: c.w, h: c.h, hang, type, set: c.set, key: c.key, name: c.name, brand: !!c.brand, ai: !!c.ai, ens: ens || null, room: R.key };
@@ -312,7 +315,7 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
       if (!open.length) break;
       const [eid, E] = pickWeighted(open, ([id, e]) => (e.weight ?? 1) * (e.roles?.length ? 2 : 1) * (tale?.sets.includes(id) ? 6 : 1), hash(k, ri, s0 + 21));
       const places = E.place?.length ? E.place : ['floor_in'];
-      const at = (c, x, y) => fitsAt(c, x, y) && places.includes(spots.at(x, y).type);
+      const at = (c, x, y) => fitsAt(c, x, y) && aiClear(c, x, y) && places.includes(spots.at(x, y).type);
       for (const a of order.filter(s => places.includes(s.type) && (!E.corner || s.corner || k > 2)).slice(0, 40)) {
         if (!free(a.x, a.y) || keep.has(a.x + ',' + a.y)) continue;
         const ms = E.members, plan = [], used = new Set();
@@ -344,7 +347,7 @@ export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 
     for (const s of order) {
       if (R.placed >= R.budget) break;
       if (!free(s.x, s.y) || keep.has(s.x + ',' + s.y)) continue;
-      const fit = single.filter(c => (!c.ai || ais() < cfg.aiMax) && same(c) < cfg.sameMax && fitsAt(c, s.x, s.y) && gapFree(s.x, s.x + c.w - 1, s.y, cfg.minGap));
+      const fit = single.filter(c => (!c.ai || ais() < cfg.aiMax) && same(c) < cfg.sameMax && fitsAt(c, s.x, s.y) && aiClear(c, s.x, s.y) && gapFree(s.x, s.x + c.w - 1, s.y, cfg.minGap));
       const c = pickWeighted(fit, c => weight(c, R.role), hash(s.x, s.y, s0 + 51));
       if (c) put(c, s.x, s.y, 'stand', s.type, null, R);
     }
