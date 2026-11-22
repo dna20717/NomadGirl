@@ -320,11 +320,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #176 Wurfmesser als Alternative zur Granate + Grafik für Granate und Messer
-- **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Bau parallel zur Granate als Alternative Wurfmesser ein und mache für Granaten und Messer eine hübsche Grafik“)
+- **Status:** fertig (22.11.) · angelegt 22.11. von Code (Daniel: „Bau parallel zur Granate als Alternative Wurfmesser ein und mache für Granaten und Messer eine hübsche Grafik“)
 - **Für:** Code
 - **Auftrag:** Wurfmesser als zweiter Wurf-Skill neben der Granate (umschaltbar), eigene Ladungen/Abklingzeit, gerader schneller Flug, Treffer/Stecken, funktioniert auch im Wende-Wurf (#164); gemalte Grafiken (PixelLab, ohne Text) für Granate und Messer: Flug-Sprites (drehend), HUD-Symbole, Ladungs-Anzeige. Werkstatt, Tests.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: Wechseln mit Z bzw. rechten Stick halten (Granate am Controller fliegt dadurch beim Loslassen, ≈ 0,1 s später); 4 Messer, je 6 s einzeln zurück; Wende-Fächer aus 3 Messern kostet 1 Ladung; Aufsammeln gibt eine Ladung zurück; Sirenen nur bei Treffer auf den Kasten; Messer im Gegner verschwindet, in Wand/Kiste/Tür steckt es 8 s; Kopftreffer = obere 15 %; steckendes Messer recht klein (Länge im Spiel einstellbar); Drehung per Code, keine Animationsstreifen.
+- **Ergebnis:** (Code, per Helfer, `a3fe84a`) `game/play/leyla_knives.js`: Wurfmesser als zweiter Wurf (T wirft, Z wechselt, Controller rechter Stick tippen/halten, `throwSwap` frei belegbar), gerader Flug mit Drehung, Kopftreffer ×2, steckt und wird aufgesammelt, lautlos, Wurf im Laufen/Springen und Wende-Fächer; Werkstatt Leyla › Wurfmesser (23 Felder); HUD mit beiden Würfen (aktiv groß mit Neon, Ladungen füllen sich). Gemalt (PixelLab 10): Messer, steckendes Messer, Granate (rotes Blinklicht vor dem Knall, auch beim Werfer), Feuerball, HUD-Symbole. Tests knives 18, turn_throw 10, enemy_traits 32, game 53, parcours 50, npm 459. **Bitte testen:** `/game?room=gegner_arena` Z/T, Messer in der Wand aufsammeln, Wende-Fächer, Controller, HUD, Feuerball.
 
 ### #174 Türen in der Seitenansicht: offen, zu, zerstört
 - **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Wir brauchen Türen in der orthogonalen Seitensicht, damit die Level mehr wie Level wirken. Offen und geschlossen und zerstört“; Wahl: **beides** – Durchgangstüren im Profil an Raumübergängen und frontale Rückwand-Türen; **funktional**)
