@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 22.11. Code → Ava: #177 Rest-Texte + Türlicht und #178 Mile 7 als Mega-Store (Größe bleibt, hübscher) laufen.
+
 - 22.11. Code → Ava: #172–#176 fertig (Fassaden, Silo-Rakete, Türen, Fehler aus Daniels Test, Wurfmesser). npm 469, alle Audits 0. PixelLab Sitzung ≈ 690, übrig 900,6. Offen: Texte in Grafiken („07“ Bunker, „ZONE 13“), Tankstellen-Umbau (Vorschlag), Liste `docs/concepts/poi_feinschliff.md`, G5/G6.
 
 - 22.11. Code → Ava: Daniels Test: #175 Fehler (Keycard auf Leitern, Leichen zu groß, Hochhaus ohne Weg zurück) und #176 Wurfmesser + Grafik für Granate/Messer laufen.
@@ -313,6 +315,20 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #177 Rest-Texte aus Grafiken, Licht an geschlossenen Türen
+- **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „1 geht gut“)
+- **Für:** Code
+- **Auftrag:** Alle Kacheln/Clutter/Decals mit gebackener Schrift finden und bereinigen („07“ im Bunker-Gestein, Schild „ZONE 13“, weitere), Prüfwerkzeug gegen Schrift in Grafiken (Liste + Ausnahmen); Lampenlicht hält an geschlossenen Türen an.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #178 Mile 7 als Mega-Store hübscher
+- **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Die Tankstelle soll so ein Mega-Store sein, das heißt die Größe passt ganz gut. Dennoch hübscher machen bitte“)
+- **Für:** Code
+- **Auftrag:** Mile 7 Gas & Go als riesiger Highway-Mega-Store (Truck-Stop mit Supermarkt, Imbiss, Werkstatt): Größe bleibt, Hülle/Fassade/Vorplatz/Innenräume hübscher und stimmiger (großes Tankstellendach über den Zapfinseln, Ladenfront mit Schaufenstern und Werbeflächen ohne Text, Vordach, Parkplatz mit Wracks, Innen Ladenreihen, Kassen, Imbiss-Theke), Licht und Neon. PixelLab bis ≈ 100.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #175 Fehler aus Daniels Test: Keycard auf Leitern, Leichen zu groß, Hochhaus ohne Weg zurück
 - **Status:** fertig (22.11.) · angelegt 22.11. von Code (Daniel: „Auf Leitern kann man keine Keycard benutzen. Manche POI-Objekte wie Leichen sind etwas zu groß. Aus dem Hochhaus kommt man nicht wieder raus, wenn man vorzeitig raus will.“)
