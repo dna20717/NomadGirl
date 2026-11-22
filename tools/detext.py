@@ -67,6 +67,7 @@ JOBS = [
     ('assets/camp/kit/mod_tent_b.png', [('heal', 199, 22, 231, 41, {'thr': 34})]),  # 732 on the tent
     ('assets/tiles/tileset00/props_big.png', [('heal', 22, 9, 91, 20, {})]),         # SNACKS on the vending machine
     ('assets/drive/bus.png', [('heal', 168, 15, 207, 24, {})]),                      # destination display
+    ('assets/tiles/tileset00/props.png', [('heal', 200, 2252, 250, 2290, {})]),     # #173 stencil "07" (detail_metal_11) on the metal/bunker fill
 ]
 
 

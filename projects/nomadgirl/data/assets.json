@@ -8842,5 +8842,176 @@
   "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
   "date": "2026-11-22",
   "description": "Rostige Dachluke mit Leiter. #172, 54 × 30 px, 32 px je Kachel."
+ },
+ "tileset00_props_text": {
+  "name": "TileSet00 · Clutter & Decals (Original mit Text)",
+  "kind": "source",
+  "file": "assets/tiles/tileset00/source/props_text.png",
+  "derivedFrom": "tileset00_source",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Stilvorlage Leyla)",
+  "date": "11.11.2026",
+  "description": "#173: das Blatt, wie es gemalt wurde, mit der Schablonen-Zahl „07“ (detail_metal_11). Im Spiel steht die Fassung ohne Text; detail_metal_11 ist leer und aus den Kachel-Sets genommen."
+ },
+ "rocket_pl_body_0": {
+  "name": "Rakete · PixelLab-Original body_0",
+  "kind": "source",
+  "file": "assets/pois/rocket/source/pl_body_0.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png)",
+  "date": "2026-11-22",
+  "derivedFrom": "wow_rocket",
+  "description": "#173: gemalter Kandidat, aus dem tools/rocket_tiles_173.py ein Segment der Silo-Rakete schneidet."
+ },
+ "rocket_pl_body_1": {
+  "name": "Rakete · PixelLab-Original body_1",
+  "kind": "source",
+  "file": "assets/pois/rocket/source/pl_body_1.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png)",
+  "date": "2026-11-22",
+  "derivedFrom": "wow_rocket",
+  "description": "#173: gemalter Kandidat, aus dem tools/rocket_tiles_173.py ein Segment der Silo-Rakete schneidet."
+ },
+ "rocket_pl_body_2": {
+  "name": "Rakete · PixelLab-Original body_2",
+  "kind": "source",
+  "file": "assets/pois/rocket/source/pl_body_2.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png)",
+  "date": "2026-11-22",
+  "derivedFrom": "wow_rocket",
+  "description": "#173: gemalter Kandidat, aus dem tools/rocket_tiles_173.py ein Segment der Silo-Rakete schneidet."
+ },
+ "rocket_pl_body_3": {
+  "name": "Rakete · PixelLab-Original body_3",
+  "kind": "source",
+  "file": "assets/pois/rocket/source/pl_body_3.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png)",
+  "date": "2026-11-22",
+  "derivedFrom": "wow_rocket",
+  "description": "#173: gemalter Kandidat, aus dem tools/rocket_tiles_173.py ein Segment der Silo-Rakete schneidet."
+ },
+ "rocket_pl_nose_0": {
+  "name": "Rakete · PixelLab-Original nose_0",
+  "kind": "source",
+  "file": "assets/pois/rocket/source/pl_nose_0.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png)",
+  "date": "2026-11-22",
+  "derivedFrom": "wow_rocket",
+  "description": "#173: gemalter Kandidat, aus dem tools/rocket_tiles_173.py ein Segment der Silo-Rakete schneidet."
+ },
+ "rocket_pl_engine_2": {
+  "name": "Rakete · PixelLab-Original engine_2",
+  "kind": "source",
+  "file": "assets/pois/rocket/source/pl_engine_2.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png)",
+  "date": "2026-11-22",
+  "derivedFrom": "wow_rocket",
+  "description": "#173: gemalter Kandidat, aus dem tools/rocket_tiles_173.py ein Segment der Silo-Rakete schneidet."
+ },
+ "rocket_pl_ring_2": {
+  "name": "Rakete · PixelLab-Original ring_2",
+  "kind": "source",
+  "file": "assets/pois/rocket/source/pl_ring_2.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png)",
+  "date": "2026-11-22",
+  "derivedFrom": "wow_rocket",
+  "description": "#173: gemalter Kandidat, aus dem tools/rocket_tiles_173.py ein Segment der Silo-Rakete schneidet."
+ },
+ "rocket_pl_pad_1": {
+  "name": "Rakete · PixelLab-Original pad_1",
+  "kind": "source",
+  "file": "assets/pois/rocket/source/pl_pad_1.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png)",
+  "date": "2026-11-22",
+  "derivedFrom": "wow_rocket",
+  "description": "#173: gemalter Kandidat, aus dem tools/rocket_tiles_173.py ein Segment der Silo-Rakete schneidet."
+ },
+ "rocket_pl_tower_1": {
+  "name": "Rakete · PixelLab-Original tower_1",
+  "kind": "source",
+  "file": "assets/pois/rocket/source/pl_tower_1.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png)",
+  "date": "2026-11-22",
+  "derivedFrom": "wow_rocket",
+  "description": "#173: gemalter Kandidat, aus dem tools/rocket_tiles_173.py ein Segment der Silo-Rakete schneidet."
+ },
+ "rocket_nose": {
+  "name": "Rakete · Spitze",
+  "kind": "image",
+  "file": "assets/pois/rocket/rocket_nose.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png); zugeschnitten, Scale2x (Code, tools/rocket_tiles_173.py)",
+  "date": "2026-11-22",
+  "derivedFrom": "rocket_pl_nose_0",
+  "description": "#173 Raketen-Tileset (POIs › Schacht-Motiv): Nasenkegel mit roten Bändern, steht oben im Schacht."
+ },
+ "rocket_body_plain": {
+  "name": "Rakete · Rumpf glatt",
+  "kind": "image",
+  "file": "assets/pois/rocket/rocket_body_plain.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png); eine nahtlose Periode geschnitten (Code, tools/rocket_tiles_173.py)",
+  "date": "2026-11-22",
+  "derivedFrom": "rocket_pl_body_1",
+  "description": "#173 Raketen-Tileset (POIs › Schacht-Motiv): Rumpf-Kachel, senkrecht nahtlos (Kabelkanal rechts)."
+ },
+ "rocket_body_stripes": {
+  "name": "Rakete · Rumpf mit Streifen",
+  "kind": "image",
+  "file": "assets/pois/rocket/rocket_body_stripes.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png); eine nahtlose Periode geschnitten (Code, tools/rocket_tiles_173.py)",
+  "date": "2026-11-22",
+  "derivedFrom": "rocket_pl_body_0",
+  "description": "#173 Raketen-Tileset (POIs › Schacht-Motiv): Rumpf-Kachel mit roten Bändern, beginnt jede Stufe."
+ },
+ "rocket_body_hatch": {
+  "name": "Rakete · Rumpf mit Luke",
+  "kind": "image",
+  "file": "assets/pois/rocket/rocket_body_hatch.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png); eine nahtlose Periode geschnitten (Code, tools/rocket_tiles_173.py)",
+  "date": "2026-11-22",
+  "derivedFrom": "rocket_pl_body_2",
+  "description": "#173 Raketen-Tileset (POIs › Schacht-Motiv): Rumpf-Kachel mit Wartungsluke und Leiter-Schiene, ohne Text."
+ },
+ "rocket_body_patched": {
+  "name": "Rakete · Rumpf geflickt",
+  "kind": "image",
+  "file": "assets/pois/rocket/rocket_body_patched.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png); eine nahtlose Periode geschnitten (Code, tools/rocket_tiles_173.py)",
+  "date": "2026-11-22",
+  "derivedFrom": "rocket_pl_body_3",
+  "description": "#173 Raketen-Tileset (POIs › Schacht-Motiv): Rumpf-Kachel mit Flicken und Rost."
+ },
+ "rocket_ring": {
+  "name": "Rakete · Stufen-Ring",
+  "kind": "image",
+  "file": "assets/pois/rocket/rocket_ring.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png); zugeschnitten (Code, tools/rocket_tiles_173.py)",
+  "date": "2026-11-22",
+  "derivedFrom": "rocket_pl_ring_2",
+  "description": "#173 Raketen-Tileset (POIs › Schacht-Motiv): Zwischenstufe aus Rippenblech mit Warnband."
+ },
+ "rocket_engine": {
+  "name": "Rakete · Leitwerk und Triebwerk",
+  "kind": "image",
+  "file": "assets/pois/rocket/rocket_engine.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png); zugeschnitten, Scale2x (Code, tools/rocket_tiles_173.py)",
+  "date": "2026-11-22",
+  "derivedFrom": "rocket_pl_engine_2",
+  "description": "#173 Raketen-Tileset (POIs › Schacht-Motiv): Heck mit vier Flossen und drei Düsen, steht auf der Startrampe."
+ },
+ "rocket_pad": {
+  "name": "Rakete · Startrampe",
+  "kind": "image",
+  "file": "assets/pois/rocket/rocket_pad.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png); zugeschnitten (Code, tools/rocket_tiles_173.py)",
+  "date": "2026-11-22",
+  "derivedFrom": "rocket_pl_pad_1",
+  "description": "#173 Raketen-Tileset (POIs › Schacht-Motiv): Startplattform mit Halteklammern und Flammenablenker."
+ },
+ "rocket_tower": {
+  "name": "Rakete · Versorgungsturm",
+  "kind": "image",
+  "file": "assets/pois/rocket/rocket_tower.png",
+  "source": "KI (PixelLab, create_image_pro 128 × 128, AAP-64, Stilbild wow_rocket.png); eine nahtlose Periode geschnitten (Code, tools/rocket_tiles_173.py)",
+  "date": "2026-11-22",
+  "derivedFrom": "rocket_pl_tower_1",
+  "description": "#173 Raketen-Tileset (POIs › Schacht-Motiv): Gitterturm mit Leiter und Wartungsbühne, senkrecht nahtlos."
  }
 }

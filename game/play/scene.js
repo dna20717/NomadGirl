@@ -33,6 +33,7 @@ import { StoryFx } from './story_fx.js';
 import { Life, prepareLife } from './life.js';
 import { Director } from './director.js';
 import { landmarkViews } from '../../engine/level_design.js';
+import { shaftInLevel } from '../../engine/shaft.js';
 import { hasLabels, applyLabels, loadFont, RAW } from '../labels.js';
 import { planHull } from '../../engine/facade.js';
 import { Hull, hullSkyline } from './hull.js';
@@ -100,6 +101,7 @@ export class PlayScene extends Phaser.Scene {
     for (const t of Object.values(this.data_.terrain || {})) for (const id of [t.look, t.props, t.propsBig]) if (id) ids.add(id);   // Kachel-Sets (TileSet00)
     for (const P of Object.values(this.data_.pois || {})) for (const b of P.brandProps || []) if (b.look) ids.add(b.look);   // Marken-Clutter (NomadCola-Automaten …)
     for (const P of Object.values(this.data_.pois || {})) for (const id of [P.wow?.image, P.level?.landmarkImage]) if (id) ids.add(id);
+    for (const P of Object.values(this.data_.pois || {})) if (P.shaft?.on) for (const g of P.shaft.segments || []) if (g.image) ids.add(g.image);   // #173 the rocket's segments
     for (const id of Object.values(this.data_.life?.images || {})) if (id) ids.add(id);   // #169 painted camp props
     for (const t of Object.values(this.data_.tropes || {})) if (t.image) ids.add(t.image);   // #167 painted tropes   // #165 painted Wow motifs and landmarks
     if (this.data_.game?.hull?.modules !== false)   // #172 painted facade modules: shared ones, every building type, POI overrides (small pictures)
@@ -190,7 +192,10 @@ export class PlayScene extends Phaser.Scene {
     this.hullPlan = plan?.on ? plan : null;
     const HP = this.hullPlan, isHull = HP ? (x, y) => x >= 0 && y >= 0 && x < HP.W && y < HP.H && HP.cls[y * HP.W + x] > 0 : null;
     if (HP) for (const w of HP.windows) if (w.where === 'room') for (let y = w.y; y < w.y + w.h; y++) for (let x = w.x; x < w.x + w.w; x++) holes.add(x + ',' + y);
-    return { reg, kits, idAt: reg.idAt, inside: isHull ? (x, y) => !isHull(x, y) && reg.inside(x, y) : reg.inside, skip: isHull, at: (x, y) => kits(reg.idAt(x, y)), back: (x, y) => reg.inside(x, y) && !holes.has(x + ',' + y) ? backOf(reg.idAt(x, y)) : null };
+    // #173 Schacht-Motiv: the back wall opens where the shaft crosses a room (game/play/shaft_fx.js draws the shaft there)
+    const SH = LI?.def && this.mode !== 'camp' ? shaftInLevel(D, this.levelPoi, LI) : null;
+    if (SH) for (const c of SH.cells) holes.add(c);
+    return { shaft: SH?.cells || null, reg, kits, idAt: reg.idAt, inside: isHull ? (x, y) => !isHull(x, y) && reg.inside(x, y) : reg.inside, skip: isHull, at: (x, y) => kits(reg.idAt(x, y)), back: (x, y) => reg.inside(x, y) && !holes.has(x + ',' + y) ? backOf(reg.idAt(x, y)) : null };
   }
   // Ort-Typen of the room or level (#158, engine/dressing.js placeTypes), once per room
   placeMap() { return this.places_ ??= placeTypes(this.room, this.terrain?.reg || regionMap(this.data_, { roomId: this.roomId })); }

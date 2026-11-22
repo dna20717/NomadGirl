@@ -16,6 +16,7 @@
 import { parseRoom } from './room.js';
 import { levelConfig, wowOf, roomType, calmAfterPeaks, fairFights, restChestSpot } from './level_design.js';
 import { planCycles, keySpot, seamLock, standSpots } from './cycles.js';
+import { shaftConfig } from './shaft.js';
 
 export const TUNNEL_HEIGHT = 4;   // free rows in the shortcut tunnel (Leyla is 168 px = 2.6 tiles)
 
@@ -250,13 +251,23 @@ function buildStack({ D, P, poiId, R, rnd, parsed, ready, main, start, exit, sta
   const joints = [];
   order[0].flip = rnd() < 0.5; order[0].p = look(order[0].id, order[0].flip); order[0].x = 0; order[0].y = 0;
   const middle = order[0].w / 2;
+  // #173 POIs › Schacht-Motiv › Räume am Schacht ausrichten: every room hangs as close as its hooks allow centred under the first room,
+  // so a column through the middle (the rocket of Silo Zero) runs through all of them. The dice roll exactly as before.
+  const align = shaftConfig(P)?.align;
   for (let i = 1; i < order.length; i++) {
-    const up = order[i - 1], lo = order[i], fh = hooksOf(up.p, 'floor'), fx = fh[Math.floor(rnd() * fh.length)];
+    const up = order[i - 1], lo = order[i], fh = hooksOf(up.p, 'floor');
+    let fx = fh[Math.floor(rnd() * fh.length)];
     const options = [false, true].map(flip => {
       const p = look(lo.id, flip), ch = hooksOf(p, 'ceil'), cx = ch[Math.floor(rnd() * ch.length)], x = up.x + fx - cx;
       return { flip, p, x, off: Math.abs(x + p.w / 2 - middle) };
     }).sort((a, b) => a.off - b.off);
-    const o = options[1].off - options[0].off < 6 && rnd() < 0.5 ? options[1] : options[0];
+    let o = options[1].off - options[0].off < 6 && rnd() < 0.5 ? options[1] : options[0];
+    if (align) {
+      const all = [];
+      for (const f of fh) for (const flip of [false, true]) { const p = look(lo.id, flip); for (const c of hooksOf(p, 'ceil')) { const x = up.x + f - c; all.push({ flip, p, x, fx: f, off: Math.abs(x + p.w / 2 - middle) }); } }
+      const best = all.sort((a, b) => a.off - b.off)[0];
+      if (best) { o = best; fx = best.fx; }
+    }
     Object.assign(lo, { flip: o.flip, p: o.p, x: o.x, y: up.y + up.h });
     joints.push({ x: up.x + fx, y: up.y + up.h - 1 });
   }

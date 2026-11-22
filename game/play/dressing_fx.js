@@ -3,6 +3,7 @@
 // (K, click a thing, pick a reason → a rule in data/dressing_rules.json for every seed). Logic in engine/dressing_story.js.
 import { desertField, desertMarks, planBackWall, levelTales, taleMarks, ruleFrom, RULE_REASONS, hash } from '../../engine/dressing_story.js';
 import { landmarkViews } from '../../engine/level_design.js';
+import { shaftInLevel } from '../../engine/shaft.js';
 import { roomStory } from '../../engine/story.js';
 import { openDialogue, el } from '../ui.js';
 
@@ -18,6 +19,7 @@ export class DressingFx {
     if (!reg || !spots) { this.on = false; return; }
     const holes = new Set(), holeList = [];
     for (const v of landmarkViews(D, s.levelPoi, LI)) if (v.win) for (let y = v.win.y; y < v.win.y + v.win.h; y++) for (let x = v.win.x; x < v.win.x + v.win.w; x++) { holes.add(x + ',' + y); holeList.push([x, y]); }
+    for (const c of shaftInLevel(D, s.levelPoi, LI)?.cells || []) holes.add(c);   // #173 nothing hangs on the back wall where the shaft opens
     this.g = s.add.graphics().setDepth(-9.9);   // on the floors, in front of the tiles
     this.back = s.add.graphics().setDepth(-10.9);   // between the back wall and the world
     this.glow = s.add.graphics().setDepth(-9.85).setBlendMode(Phaser.BlendModes.ADD);

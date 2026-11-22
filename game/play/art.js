@@ -433,6 +433,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
         if (it.tilt || it.flip) { const f = scene.textures.getFrame(it.key, frame); Object.assign(st, { angle: it.tilt || 0, flipX: !!it.flip, scale: st.scale || 1, ox: st.ox ?? 0.5, oy: st.oy ?? 1, ax: st.ax ?? cx, ay: st.ay ?? it.y * T + 4 }); if (Math.abs(it.tilt) >= 80) st.ay += f.cutWidth * (st.scale || 1) * 0.15; }
         clutter.push({ ...st, ai: it.ai, ens: it.ens, plan: it }); continue;
       }
+      if (it.hang === 'wall' && terrain?.shaft?.has(Math.floor(it.x + it.w / 2) + ',' + it.y)) continue;   // #173 the back wall is open to the shaft there
       const st = placed(kit, it.key, frame, cx, 0), hh = -st.y, dy = it.hang === 'ceiling' ? it.y * T - 2 + hh : it.y * T + T / 2 + hh / 2;
       clutter.push({ ...st, y: st.y + dy, ay: st.ay != null ? st.ay + dy : st.ay, hang: it.hang, plan: it, ...(it.hang === 'wall' ? { tint: backTint } : {}) });
     }

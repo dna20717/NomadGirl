@@ -1452,6 +1452,27 @@
     }
    ]
   },
-  "hull": {"type": "silo"}
+  "hull": {"type": "silo"},
+  "shaft": {
+   "on": true,
+   "kind": "rocket",
+   "width": 10,
+   "tower": 6,
+   "towerSide": "left",
+   "ringEvery": 44,
+   "light": "#dae0ea",
+   "lightStrength": 70,
+   "segments": [
+    {"part": "nose", "image": "rocket_nose", "from": 0, "to": 134},
+    {"part": "body", "image": "rocket_body_stripes", "from": 0, "to": 114, "weight": 1, "after": "ring"},
+    {"part": "body", "image": "rocket_body_plain", "from": 0, "to": 114, "weight": 4},
+    {"part": "body", "image": "rocket_body_hatch", "from": 0, "to": 114, "weight": 1},
+    {"part": "body", "image": "rocket_body_patched", "from": 0, "to": 114, "weight": 2},
+    {"part": "ring", "image": "rocket_ring", "from": 3, "to": 123},
+    {"part": "engine", "image": "rocket_engine", "from": 72, "to": 184},
+    {"part": "pad", "image": "rocket_pad", "from": 0, "to": 128},
+    {"part": "tower", "image": "rocket_tower", "from": 0, "to": 117}
+   ]
+  }
  }
 }

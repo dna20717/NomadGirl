@@ -7,6 +7,7 @@
 // (POIs › Atmosphäre im Tunnel, else the tunnel's Kachel-Set).
 import { WALL } from './room.js';
 import { levelConfig, lightTheWay, wowInLevel } from './level_design.js';
+import { shaftInLevel } from './shaft.js';
 import { roomTale, decayConfig } from './dressing_story.js';
 import { roomStory } from './story.js';
 
@@ -97,6 +98,17 @@ export function planLights(D, room, regionAt, opts = {}) {
       if (W.W.fill > 0) for (const d of [-1, 1]) {
         const x = Math.max(W.room.x + 1, Math.min(W.room.x + W.room.w - 2, W.x + d * Math.round(W.room.w / 4))), y = top(x);
         lamps.push(lamp({ ...L, kind: 'ceiling', behavior: 'steady', radius: Math.round(L.radius * 0.9), strength: Math.round(L.strength * W.W.fill / 100) }, x, y, regionAt(x, y), true));
+      }
+    }
+    // #173 Schacht-Motiv: a floodlight over the motif in every room the shaft crosses (POIs › Schacht-Motiv › Schacht-Licht)
+    const sh = shaftInLevel(D, opts.poiId, opts.level);
+    if (sh && sh.cfg.lightStrength > 0) {
+      const x = sh.body[0] + Math.floor(sh.body[1] / 2);
+      for (const o of sh.rooms) {
+        let y = o.y; while (y < o.y + o.h && !sh.cells.has(x + ',' + y)) y++;
+        if (y >= o.y + o.h) continue;
+        while (y > o.y && !solid(x, y - 1)) y--;
+        lamps.push({ ...lamp({ kind: 'ceiling', color: sh.cfg.light, radius: 520, strength: sh.cfg.lightStrength, behavior: 'steady' }, x, y, regionAt(x, y), true), shaft: true });
       }
     }
   }

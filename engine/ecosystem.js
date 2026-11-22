@@ -276,7 +276,10 @@ export function planLife(D, poiId, L, S, seed = 1) {
       const x = s.x0 + Math.min(w - 1, Math.floor((k + 0.5) * w / n));
       members.push({ enemy: list[Math.floor(r() * list.length)], x, y: s.y, role: T.round && n >= 2 && k === 0 ? 'round' : k % 2 ? 'guard' : 'sit', faction, gang });
     }
-    for (const m of members) if (sym.has(tiles[m.y][m.x])) tiles[m.y][m.x] = '.';
+    // a specialist (boss, siren, medic …) keeps its place: a member standing on it moves to the next free spot of the camp (#173)
+    const kept = (x, y) => { const e = sym.get(tiles[y][x]); return !!e && special(e); };
+    for (const m of members) if (kept(m.x, m.y)) { for (let d = 1; d <= w; d++) { const x = [m.x + d, m.x - d].find(xx => xx >= s.x0 && xx <= s.x1 && !kept(xx, m.y)); if (x != null) { m.x = x; break; } } }
+    for (const m of members) if (sym.has(tiles[m.y][m.x]) && !kept(m.x, m.y)) tiles[m.y][m.x] = '.';
     const cx = Math.round((s.x0 + s.x1) / 2), room = L.rooms.find(o => o.id === s.id && s.x0 >= o.x && s.x0 < o.x + o.w && s.y >= o.y && s.y < o.y + o.h);
     camps.push({ id: c.id, type: c.type, name: T.name, faction, gang, strength: c.strength, room: room.id, roomIndex: s.i, ...(s.side ? { side: true } : {}), x0: s.x0, x1: s.x1, y: s.y, cx,
       props: split(T.props), story: T.story || null, members, route: roundRoute(tiles, cx, s.y, K.roundReach) });

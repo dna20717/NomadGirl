@@ -3,6 +3,7 @@
 // and the Wow room: its motif as a code silhouette (AAP-64, glow, VT323), movement, a camera move on the first entry (once per run,
 // any input stops it, Leyla stays in control), a stinger and a music layer. Logic in engine/level_design.js; nothing here blocks play.
 import { landmarkViews, guideLines, secretSigns, wowInLevel, levelConfig } from '../../engine/level_design.js';
+import { drawShaft } from './shaft_fx.js';
 
 // AAP-64 (projects/nomadgirl/assets/palette/aap-64.hex): every colour snaps to it
 const AAP = '060608 141013 3b1725 73172d b4202a df3e23 fa6a0a f9a31b ffd541 fffc40 d6f264 9cdb43 59c135 14a02e 1a7a3e 24523b 122020 143464 285cc4 249fde 20d6c7 a6fcdb ffffff fef3c0 fad6b8 f5a097 e86a73 bc4a9b 793a80 403353 242234 221c1a 322b28 71413b bb7547 dba463 f4d29c dae0ea b3b9d1 8b93af 6d758d 4a5462 333941 422433 5b3138 8e5252 ba756a e9b5a3 e3e6ff b9bffb 849be4 588dbe 477d85 23674e 328464 5daf8d 92dcba cdf7e2 e4d2aa c7b08b a08662 796755 5a4e44 423934'.split(' ').map(h => parseInt(h, 16));
@@ -25,6 +26,7 @@ export class LevelFx {
     this.drawLandmark();
     this.drawGuides(guideLines(D, s.levelPoi, LI));
     this.signs = secretSigns(LI, this.cfg); this.drawSigns();
+    this.shaft = drawShaft(s);   // #173 the rocket through the whole silo (POIs › Schacht-Motiv)
     this.wow = wowInLevel(D, s.levelPoi, LI);
     if (this.wow) this.drawWow();
     s.events.once('shutdown', () => this.stopMusic(true));
@@ -114,6 +116,9 @@ export class LevelFx {
     const s = this.scene, T = this.T, w = this.wow, W = w.W, r = w.room;
     const g = s.add.graphics().setDepth(-10.6), col = aap(W.light || '#ffd541');
     const bx = (w.x + 0.5) * T, by = (w.y + 1) * T, k = (W.scale ?? 150) / 100;
+    // #173 the shaft's motif stands in this room (the rocket on its pad): it is the Wow motif, no picture and no silhouette on top
+    const SH = this.shaft && this.shaft.sh.bottomRoom === w.index ? this.shaft : null;
+    if (SH) return this.drawWowShaft(g, SH, col);
     const pic = W.image && s.textures.exists(W.image) ? this.drawWowImage(g, bx, by, k, col) : null;   // #165 the painted motif
     if (!pic) drawMotif(g, w.motif, bx, by, k, col, { text: W.text || '', room: { x: r.x * T, y: r.y * T, w: r.w * T, h: r.h * T }, T });   // fallback: code silhouette
     this.wowG = g; this.wowPic = pic;
@@ -122,6 +127,21 @@ export class LevelFx {
     this.wowGlow.fillStyle(col, 0.12).fillCircle(gx, gy, R).fillStyle(col, 0.1).fillCircle(gx, gy, R / 2);
     this.wowFx = s.add.graphics().setDepth(-9.6).setBlendMode(Phaser.BlendModes.ADD);
     this.wowBox = { x: r.x * T, y: r.y * T, w: r.w * T, h: r.h * T, bx, by: pic && !W.imageHang ? pic.bottom : by, top: pic ? pic.top : by - 5 * T * k, bottom: pic?.bottom, core: pic?.core, half: pic ? pic.w / 2 : 3 * T };
+  }
+  // #173 the Wow room at the foot of the shaft: glow at the nozzles, the counter on a console beside the pad, steam from the trench
+  drawWowShaft(g, SH, col) {
+    const s = this.scene, T = this.T, w = this.wow, W = w.W, r = w.room;
+    const nozzles = { x: SH.cx, y: SH.stand - 1.5 * T };
+    this.wowG = g; this.wowPic = { core: nozzles, w: SH.half * 2, h: 12 * T, img: null };
+    this.wowGlow = s.add.graphics().setDepth(-10.55).setBlendMode(Phaser.BlendModes.ADD);
+    this.wowGlow.fillStyle(col, 0.12).fillCircle(nozzles.x, nozzles.y, 5 * T).fillStyle(col, 0.1).fillCircle(nozzles.x, nozzles.y, 2.5 * T);
+    this.wowFx = s.add.graphics().setDepth(-9.6).setBlendMode(Phaser.BlendModes.ADD);
+    this.wowPulse = s.add.graphics().setDepth(-10.55).setBlendMode(Phaser.BlendModes.ADD);
+    // the counter: a console on a post right of the pad (inside the room), VT323 from code
+    const floor = (r.y + r.h - 1) * T, x = Math.min((r.x + r.w - 5) * T, SH.cx + SH.half + 0.6 * T), y = floor - 3.2 * T;
+    g.fillStyle(0x333941, 1).fillRect(x, y, 3.4 * T, 1.2 * T).lineStyle(4, 0x4a5462, 1).strokeRect(x, y, 3.4 * T, 1.2 * T).fillRect(x + 1.5 * T, y + 1.2 * T, 0.3 * T, floor - y - 1.2 * T);
+    vtext(s, x + 1.7 * T, y + 0.6 * T, W.text || '00:00:01', 0.9 * T, 0xe83b3b, -10.58);
+    this.wowBox = { x: r.x * T, y: r.y * T, w: r.w * T, h: r.h * T, bx: SH.cx, by: floor, top: Math.max(r.y * T, SH.stand - 14 * T), core: nozzles, half: SH.half, shaft: SH };
   }
   // #165 the painted motif (POIs › Wow › Motiv: gemaltes Bild): foot on the motif point (or hung under the ceiling), with what moves on it
   // from code: the second hand of the clock, the counter beside the rocket, text, a pulsing core, light cones under a dome, the chandelier
@@ -179,6 +199,7 @@ export class LevelFx {
     if (this.wowDone || W.camera === false || !s.cam) return;
     this.wowDone = true;
     const cam = s.cam, base = cam.zoom, ms = C.wowMs, z = base * C.wowZoom / 100, B = this.wowBox;
+    if (B.shaft?.sh.cfg.ride) return this.rideShaft(cam, base, z, ms);
     const tx = B.bx, ty = W.imageHang && B.bottom ? (B.top + B.by) / 2 : Math.max(B.top + 2 * this.T, B.by - 3 * this.T);   // #170 a hanging motif: frame it and the floor
     this.wowCam = { base, at: s.time.now, until: s.time.now + ms + C.wowHold, back: false };
     cam.stopFollow();
@@ -189,9 +210,30 @@ export class LevelFx {
     s.input.keyboard?.once('keydown', stop); s.input.once('pointerdown', stop);
     s.time.delayedCall(ms + C.wowHold, stop);
   }
+  // #173 the ride up the rocket: zoom out at its foot, up the hull to the tip, a breath there, back down to the pad; any key, a click
+  // or Leyla's first steps stop it (she stays in control the whole time)
+  rideShaft(cam, base, z, ms) {
+    const s = this.scene, T = this.T, B = this.wowBox, SH = B.shaft, C = this.cfg;
+    const up = SH.sh.cfg.rideMs, down = Math.round(up * 0.6), hold = C.wowHold;
+    const foot = B.by - 4 * T, tip = SH.top + 4 * T, x = SH.cx;
+    this.wowCam = { base, at: s.time.now, back: false, ride: true, from: s.leyla?.x ?? 0 };
+    cam.stopFollow();
+    cam.pan(x, foot, ms * 0.6, 'Sine.easeInOut', true);
+    cam.zoomTo(z * 0.85, ms * 0.6, 'Sine.easeInOut', true);
+    const leg = (from, to, dur, then) => { this.rideTween = s.tweens.addCounter({ from, to, duration: dur, ease: 'Sine.easeInOut', onUpdate: tw => { if (!this.wowCam?.back) cam.centerOn(x, tw.getValue()); }, onComplete: then }); };
+    const stop = () => this.endWowCam();
+    this.wowStop = stop;
+    this.rideTimer = s.time.delayedCall(ms * 0.6 + 200, () => {
+      if (this.wowCam?.back) return;
+      cam.panEffect?.reset?.();
+      leg(foot, tip, up, () => { this.rideTimer = s.time.delayedCall(hold, () => leg(tip, foot, down, () => s.time.delayedCall(hold * 0.5, stop))); });
+    });
+    s.input.keyboard?.once('keydown', stop); s.input.once('pointerdown', stop);
+  }
   endWowCam() {
     const s = this.scene, c = this.wowCam; if (!c || c.back) return;
     c.back = true;
+    this.rideTween?.stop?.(); this.rideTimer?.remove?.(false);
     const cam = s.cam, C = s.data_.game?.camera || {};
     cam.panEffect?.reset?.(); cam.zoomEffect?.reset?.();
     cam.zoomTo(c.base, 500, 'Sine.easeInOut', true);
@@ -228,6 +270,7 @@ export class LevelFx {
   update(time, dt) {
     if (!this.on) return;
     const T = this.T, s = this.scene;
+    if (this.wowCam?.ride && !this.wowCam.back && Math.abs((s.leyla?.x ?? 0) - this.wowCam.from) > 2 * T) this.endWowCam();   // #173 she walks: the ride ends
     if (this.landmark && this.P.level?.landmarkMotif === 'mast') this.landmark.alpha = 0.75 + 0.25 * (Math.sin(time / 300) > 0 ? 1 : 0);
     if (this.wowFx) {
       const B = this.wowBox, kind = this.wow.W.particles, near = Math.abs(s.leyla.x - B.bx) < s.scale.width;

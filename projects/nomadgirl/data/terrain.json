@@ -269,7 +269,6 @@
    "detail_metal_5",
    "detail_metal_6",
    "detail_metal_8",
-   "detail_metal_11",
    "detail_metal_12",
    "detail_metal_13",
    "detail_metal_14",
@@ -598,8 +597,7 @@
    "detail_metal_7",
    "detail_metal_8",
    "detail_metal_9",
-   "detail_metal_10",
-   "detail_metal_11"
+   "detail_metal_10"
   ],
   "detailChance": 8,
   "glows": [

@@ -235,6 +235,7 @@ Pfade relativ zu `projects/nomadgirl/`. In Klammern die ID im Werkstatt-Bereich 
 | (keine Datei) | Rig-Radio (#090): vier Sender mit Musik, Rauschen und Knistern, live erzeugt (`game/radio.js` Noten, `game/radio_audio.js` Web Audio) | Code | 19.11.2026 |
 
 | `assets/techtree/nodes_2.png` … `nodes_8.png` (+ `source/`: Motive, Wirkungen, Bau-Skript) | Techtree-Knoten #110 (`tt_nodes_2` … `tt_nodes_8`, je 4 × 4 à 64 px): 101 neue Knoten-Bilder, dazu 11 Zweitversionen von Schlusssteinen (`*_alt`) | KI (PixelLab, Create Image Pro, Stilbild tt_nodes, Palette AAP-64), 7 Blätter à 10 Generierungen | 19.11.2026 |
+| `assets/pois/rocket/rocket_nose.png`, `rocket_body_plain.png`, `rocket_body_stripes.png`, `rocket_body_hatch.png`, `rocket_body_patched.png`, `rocket_ring.png`, `rocket_engine.png`, `rocket_pad.png`, `rocket_tower.png` (+ `source/pl_*.png`) | Raketen-Tileset Silo Zero (#173, POIs › Schacht-Motiv): Spitze, vier Rumpf-Kacheln (glatt, Streifen, Luke, geflickt; senkrecht nahtlos), Stufen-Ring, Heck mit Flossen und Düsen, Startrampe mit Flammenablenker, Versorgungsturm (nahtlos); ohne Text | KI (PixelLab, Create Image Pro 128 × 128, AAP-64, Stilbild `wow_rocket.png`, 6 Aufträge = 60 Generierungen), geschnitten mit Code (`tools/rocket_tiles_173.py`: nahtlose Periode, Spitze und Heck Scale2x) | 22.11.2026 |
 
 ## Ordner
 
@@ -284,7 +285,7 @@ Jeder POI hat einen Wow-Raum (POIs › Wow). **Seit #165 gemalt** (PixelLab, AAP
 | Pit 6 | `sm_kristalldom` | sieben Kristall-Dreiecke mit Glanzkante, Glitzern | Kristalle |
 | Ministry of Order | `min_uhrensaal` | große Uhr mit laufendem Sekundenzeiger, Kronleuchter | Uhr, Kronleuchter |
 | Delta Crude Refinery | `rf_fackelnacht` | Fackelturm mit Flamme, Funkenregen, Fässer der Destille | Fackelturm |
-| Silo Zero | `rs_raketenblick` | Rakete über die Schachthöhe, Anzeige „00:00:01“ rot | Rakete, Startrampe |
+| Silo Zero | `rs_raketenblick` | Rakete über die Schachthöhe, Anzeige „00:00:01“ rot | seit #173 Raketen-Tileset über die ganze Silo-Tiefe (Schacht-Motiv) |
 
 Landmarken (POIs › Level-Design › Landmarke: Bild) nutzen dieselben Silhouetten; dazu wünschenswert: Wasserturm mit Lächel-Gesicht, Förderturm, Funkmast-Spitze, Neon-Schild „Penthouse“, Anzeigetafel „Zug fällt aus“.
 
@@ -311,6 +312,7 @@ Daniel, 21.11.2026: „Texte sollen niemals in der Grafik sein.“ Alle Bilder i
 | `tileset00_props_big` | SNACKS (Automat) | SNACKS |
 | `kit_mod_tent_b` | 732 (aufs Zelt gesprüht) | – (Deko ohne Text) |
 | `drive_bus` | Zielanzeige | – (Anzeige aus) |
+| `tileset00_props` (#173) | Schablonen-Zahl „07“ (Einschluss `detail_metal_11` im Metall-/Bunker-Set) | – (Feld leer, aus den Kachel-Sets genommen; Original `source/props_text.png`) |
 
 Bewusst gelassen (⚠️, Daniel entscheidet):
 
