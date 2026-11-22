@@ -317,11 +317,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #177 Rest-Texte aus Grafiken, Licht an geschlossenen Türen
-- **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „1 geht gut“)
+- **Status:** fertig (22.11.) · angelegt 22.11. von Code (Daniel: „1 geht gut“)
 - **Für:** Code
 - **Auftrag:** Alle Kacheln/Clutter/Decals mit gebackener Schrift finden und bereinigen („07“ im Bunker-Gestein, Schild „ZONE 13“, weitere), Prüfwerkzeug gegen Schrift in Grafiken (Liste + Ausnahmen); Lampenlicht hält an geschlossenen Türen an.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: Ersatztexte Entwurf („NASSER BODEN“ sehr klein); `station2_11` mit leichten Schriftresten; `tools/camp_kit.py` holt beim Neuschneiden die Schrift zurück (danach `detext.py`); bewusst gelassen: Graffiti, Plakatfetzen, Eistruhen-Logo, Krakel, Handschrift auf Tropes/Zettelkabine, NomadCola, Controller-Symbole; Licht durch Wände ohne Tür wie bisher, Gotteslicht-Strahlen nicht an Türen geschnitten.
+- **Ergebnis:** (Code, per Helfer, `3b29f3f`, `3ae6b9f`) `tools/text_audit.py` (Kontaktbögen aller Welt-Grafiken), `detext.py` erweitert, Schrift aus Code mit Drehung; Texte entfernt und deutsch aus Code: ZONE 13, OFFEN (Neon, schräg), NASSER BODEN, −50 %, Camp-Poster/Kalender/Nummernschilder/WÜSTE/DAHEIM/FARBE; Graffiti-Buchstaben und Kisten-Stempel ohne Ersatz entfernt. Liste `docs/assets.md` › Nachlese (#177). „07“ war schon in #173 weg (alter Stand auf #174-Bildern). Licht: geschlossene Türen, Schalter-Türen und Schlösser schneiden Lampenlicht ab (Lichtkarte + `lightAt`), Zustandswechsel sofort. Tests npm 469, doors 22, light 18, poi 33, poi_levels 15, Audits 0. PixelLab 0. **Bitte testen:** Bunker 13 Seed 2 (ZONE 13, Stahltür + Licht), Schilder in Großmarkt/Tankstelle, Camp-Deko.
 
 ### #178 Mile 7 als Mega-Store hübscher
 - **Status:** fertig (22.11.) · angelegt 22.11. von Code (Daniel: „Die Tankstelle soll so ein Mega-Store sein, das heißt die Größe passt ganz gut. Dennoch hübscher machen bitte“)
