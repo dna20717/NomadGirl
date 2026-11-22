@@ -65,6 +65,7 @@ export class TechtreeUI {
     if (best) { this.sel = best; this.draw(); }
   }
   buy(id) {
+    if (this.host.canBuy && !this.host.canBuy()) { this.shake = id; this.draw(); this.host.notify?.('Freischalten geht nur im Camp', 'warn'); return { ok: false, reason: 'Freischalten geht nur im Camp' }; }
     const r = unlock(this.D, this.save, id);
     if (!r.ok) { this.shake = id; this.draw(); this.host.notify?.(r.reason, 'warn'); return r; }
     this.flash = id; this.host.changed?.(r); this.draw();

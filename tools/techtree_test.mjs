@@ -44,6 +44,14 @@ v = await ev(() => { nomad.goTo('Van'); nomad.step(1, [], ['grab']); nomad.choos
 check('Lebenszeichen: AvAs Zustand im Run', /AvA.*100 % · Stabil/.test(v || ''), v);
 await shot('run');
 
+// Esc › Skilltree: in the run the tree opens to look at, unlocking only in the camp
+const menuItems = await ev(() => { const h = game.scene.getScene('play').hud; h.pauseMenu(); const items = nomad.menu().items.map(i => i.label); nomad.choose('Skilltree'); return items; });
+await page.waitForTimeout(100);
+v = await ev(items => { const h = game.scene.getScene('play').hud;
+  const s = nomad.save(), id = Object.keys(game.scene.getScene('play').data_.techtree).find(k => !s.nodes.includes(k)), n0 = s.nodes.length, r = h.tech.buy(id);
+  const open = !h.tech.el.hidden; h.tech.close(); return { items, open, ok: r.ok, reason: r.reason, same: s.nodes.length === n0 }; }, menuItems);
+check('Esc-Menü › Skilltree im Run: öffnet zum Ansehen, Freischalten nur im Camp', v.items.includes('Skilltree') && v.open && !v.ok && /nur im Camp/.test(v.reason) && v.same, v);
+
 // AvA dead → k.o. in the run: nobody comes, the dream ends, a new Durchgang: Leyla at the fire, the nodes stay, everything else is new
 v = await ev(() => { const sc = game.scene.getScene('play'), s = nomad.save(); s.tank.dead = true; s.tank.cond = 0; s.deltas = 999; sc.drone.die();
   sc.leyla.hurt(sc.now + 5000, 9999, 0); nomad.step(240); return { mode: sc.mode }; });

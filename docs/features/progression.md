@@ -21,6 +21,8 @@ Daniel, 19.11.2026: „600, aber ein Cheat-Menü nur für mich“. Freigeschalte
 
 ## Skilltrees (#110)
 
+- **Im Esc-Menü** (Daniel, 22.11.2026: „Kannst du den Skilltree bitte im Esc-Menü ergänzen“): Pause-Menü › **Skilltree** öffnet den Techtree überall, wo ein Spielstand läuft. Im Camp wird wie am Warroom freigeschaltet; im Run und auf der Fahrt nur ansehen (Freischalten zahlt aus dem Rig: „Freischalten geht nur im Camp“, Host-Haken `canBuy`). Test `tools/techtree_test.mjs` (11).
+
 Daniel, 19.11.2026: „ich habe das Gefühl, dass die insgesamt zu kurz sind“ → 20+ Knoten je Ast, nach Ressource, Inhalte passive Boni, Rezepte & Werkstätten, Welt & Story, „damit es nicht überall gleich viele sind“. Entwurf im Artefakt „NomadGirl Skilltrees“, Daniel: „Ich mag alle Skills“.
 - **108 Knoten:** Technik 26 (Rig, Waffen, AvA), Wissen 24 (Karte, Duell, Handel, Welt), Bio 27 (Garten, Küche, Heilung, Heilmittel), Dunkelheit 31 (Tab verborgen, bis #080 die Warnung und den Preis baut). Stufen = Spalten, Kinder auf der Höhe ihrer Eltern (`build_tree.py`: Schwerpunkt der Eltern-Zeilen), damit → zum Nachfolger führt.
 - **Neue Freischaltungen** (Werkstatt › Techtree › Schaltet frei): **Boni** für jeden Wert (`TECH_BONUS`: Tank, AvA, alle Leyla-Werte, alle Camp-Werte; fließen über den Boni-Bus `gearParts`/`parts`), **Werkstätten** und **Rig-Teile** (erst kaufbar mit dem Knoten: `techLock`, Händler zeigt „🔒 Knoten“; was schon im Rig steht, bleibt), **Merker** (Welt-Merker für Zwischenfälle, Quests, Orte), **Ort aufdecken**, **Wirkung folgt** (die eigene Mechanik fehlt noch; der Merker ist gesetzt).

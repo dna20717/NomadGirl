@@ -159,6 +159,7 @@ export class Hud {
       { label: 'Steuerung', sub: 'Tasten und Controller', act: () => this.toggleHelp(true) },
       { label: 'Feldhandbuch', sub: 'Alle Lektionen mit Clips', act: () => setTimeout(() => this.tut?.openGuide(), 0) },
       ...(sc.box ? [{ label: 'Achievements', sub: 'Erreicht, offen, Trophäen', act: () => setTimeout(() => this.ach?.open(), 0) }, { label: 'Logbuch', sub: 'Alle Meldungen mit Uhrzeit', act: () => setTimeout(() => this.logbook(), 0) }] : []),
+      ...(sc.box && Object.keys(sc.data_?.techtree || {}).length ? [{ label: 'Skilltree', sub: sc.mode === 'camp' ? 'Techtree: freischalten mit Vorräten aus dem Rig' : 'Techtree ansehen · freischalten im Camp', act: () => setTimeout(() => { this.inv?.close?.(); this.tech?.open(); }, 0) }] : []),
       ...(sc.box ? [{ label: 'Werte', sub: 'Grundwerte, Boni und ihre Quellen · U', act: () => setTimeout(() => this.openValues(), 0) }] : []),   // #091 → #104 im Inventar
       ...(this.radio && sc.box && sc.mode !== 'run' && this.radio.C.stations.length ? [{ label: `Radio: ${this.radio.on ? this.radio.station?.name : 'aus'}`, sub: 'Sender wählen · N', act: () => setTimeout(() => this.radio.menu(this), 0) }] : []),   // #090
       { label: 'Optionen', sub: 'Ton, Schießstil', act: () => setTimeout(() => this.optionsMenu(), 0) },

@@ -555,6 +555,7 @@ export class PlayScene extends Phaser.Scene {
       save: () => hud.scene.box.save,
       changed: () => { clearTimeout(hud.scene.saveTimer); hud.scene.saveTimer = setTimeout(() => hud.scene.box?.persist(), 400); hud.scene.applyGear?.(); },
       notify: (text, kind = 'info') => hud.toast(text, '', kind, 3200),
+      canBuy: () => hud.scene.mode === 'camp',   // Esc › Skilltree in a POI or on the drive: look only, the stock is in the rig
       closed: () => {},
     });
     hud.tech.close(); hud.tech.el.hidden = true;
