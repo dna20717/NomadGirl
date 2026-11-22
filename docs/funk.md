@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 22.11. Code → Ava: **G3 (#169), #170 und G4 (#171) fertig**, npm 456, alle Audits 0. G4-Hüllen aus Code wirken neben den gemalten Grafiken noch flach (Befund im Ticket). Offen: G5 Kuratieren, G6 Mitbauen. PixelLab Sitzung 395, übrig 1.125,6.
+
 - 21.11. Code → Ava: Daniel: „Mach G4 direkt weiter“ → #171 G4 Hüllen läuft parallel zu #169 und #170.
 
 - 21.11. Code → Ava: **Daniels Karten „Abnahme Nächste Generation“ ausgewertet:** fast alles wie vorgeschlagen; Faden-Lore und 107 Storylets abgesegnet; Gore-Grenze 3; neue **Projekt-Regel: keine Texte in Grafiken** (CLAUDE.md). Umsetzung in #170, danach G4.
@@ -303,12 +305,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #171 POI G4: Hüllen (Gebäude-Grammatik in Seitenansicht)
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniel: „Mach G4 direkt weiter dann“)
+- **Status:** fertig (22.11.) · angelegt 21.11. von Code (Daniel: „Mach G4 direkt weiter dann“)
 - **Für:** Code
 - **Lesen:** `docs/concepts/poi_next_gen.md` (G4), `poi_bible.md`, `poi_steckbriefe.md`, #158 (Set je Gebäudehülle, Autotiling), #144/#156 (Kacheln, Tiefe), #163 (Landmarken, Fenster), #168 (Zyklus-Graph).
 - **Auftrag:** Gebäude-Grammatik in Seitenansicht (Sockel, Etagen, Fensterachsen, Dach), Hülle um die verschweißten Räume, Fenster = Fenster der Räume, Silhouetten für Landmarken und Parallax. Alle POIs zugleich, Werkstatt, Prüfer + Tests. Keine Texte in Grafiken.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: Kollision bleibt, wo sich Außenräume zum Himmel öffnen (mit Doppelsprung im Grenzfall unsichtbare Decke); Fassade im Dunkeln sichtbar; Bunker/Untergrund ohne Fensterraster; Tankstellendach nie im Eingang/Wow-Raum (entfällt bei Mile 7); Nachbar-Silhouetten nur Stadt/Vorstadt/Industrie; 13 Gebäudetypen Entwurf. **Befund Code (Ava):** Die Hülle ist komplett aus Code gemalt und wirkt neben den PixelLab-Grafiken flach und grob (große glatte Flächen, wenig Textur, Fassade dominiert das Bild) – Stil-Abgleich mit gemalten Fassaden-Modulen nötig.
+- **Ergebnis:** (Code, per Helfer, `8b5d776`, `9cbdb0e`, `78530fa`, `1e5969c`) `engine/facade.js` (Gebäude aus den Räumen, Geschosse, Fensterachsen, Sockel, Gesimse, Lisenen, Dacharten, Aufbauten, Markisen, Feuertreppen, Schäden nach Verfall + Ereignis), `game/hull_paint.js` (AAP-64, Dithering, ohne Text), Fenster der Fassade = Fenster der Räume, Skyline BigCityDelta + Nachbarn je Region aus derselben Grammatik; Werkstatt Welt › Gebäudetypen (13), POIs › Hülle, Vorschau je Seed, Spiel › Hülle. `silo_test` nimmt `GAME_URL`. Tests npm 456 (facade 9), poi 33, poi_levels 12, poi_stack 8, light 18, silo 10, cycles 17, story 23, workshop 64; Audits 0 (neuer Punkt Hülle). PixelLab 0. **Bitte testen:** Mile 7 Fassade, Großmarkt Kuppel + Schaufenster, Delta Heights Turm, Ministerium Giebel, Bunker Erdhügel, Raumfenster mit Stadtblick.
 
 ### #170 Abnahme Nächste Generation umsetzen: Texte raus aus Grafiken, Reste
 - **Status:** fertig (22.11.) · angelegt 21.11. von Code (Daniels Karten im Artefakt „NomadGirl Abnahme Nächste Generation“)
