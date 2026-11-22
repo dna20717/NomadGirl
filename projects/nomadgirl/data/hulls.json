@@ -159,7 +159,8 @@
    "band": "facade_strip_cornice",
    "roof": "facade_strip_cornice",
    "lisene": "facade_wall_rustika",
-   "gable": "facade_gable"
+   "gable": "facade_gable",
+   "roofTint": "#a08662"
   }
  },
  "highrise": {
