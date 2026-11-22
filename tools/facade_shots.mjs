@@ -25,7 +25,7 @@ for (const poi of Object.keys(D).filter(p => !only || p === only)) {
     // where to look: the plan of the hull (also when it is switched off, from the engine, so vorher/nachher show the same spots)
     const info = await p.evaluate(async () => {
       nomad.take(); const s = game.scene.getScene('play'); if (s.hud) s.hud.roomTitle = () => {}; for (const e of s.enemies) e.destroy?.(); s.enemies = [];
-      const { planHull } = await import('/engine/facade.js'), P = planHull(s.data_, s.levelPoi, s.levelInfo), L = s.levelInfo;
+      const { planHull } = await import('/engine/facade.js'), D0 = s.data_, P = planHull({ ...D0, game: { ...D0.game, hull: { ...(D0.game?.hull || {}), enabled: true } } }, s.levelPoi, s.levelInfo, { decay: D0.pois[s.levelPoi]?.hull?.decay ?? D0.pois[s.levelPoi]?.story?.decay ?? 1 }), L = s.levelInfo;
       const b0 = P.buildings?.[0], wins = (P.windows || []).filter(w => w.where === 'facade'), rw = (P.windows || []).find(w => w.where === 'room');
       const spots = [];
       if (b0) spots.push({ what: 'dach', x: b0.x0 + 2, y: b0.top + 1 });
@@ -44,7 +44,7 @@ for (const poi of Object.keys(D).filter(p => !only || p === only)) {
       const s = game.scene.getScene('play'), T = s.T, c = s.cam, W = s.room.w * T, H = (s.room.h + above + 2) * T;
       if (s.fog) { s.fog.reveal = () => {}; for (const o of s.children.list) if (o.depth === 15.5) o.setVisible(false); }
       s.atmo?.image?.setVisible(false);
-      c.stopFollow(); c.setBounds(-6000, -6000, W + 12000, H + 12000); c.setZoom(Math.min(1600 / W, 900 / H) * 0.96); c.centerOn(W / 2, (s.room.h * T) / 2 - (above + 2) * T / 2);
+      c.stopFollow(); c.setBounds(-6000, -6000, W + 12000, H + 12000); const z = Math.max(0.1, Math.min(1600 / W, 900 / H) * 0.96); c.setZoom(z); c.centerOn(W / 2, z * H > 900 ? 900 / z / 2 - (above + 2) * T : (s.room.h * T) / 2 - (above + 2) * T / 2);   // too big for one picture (software WebGL): the top part
     }, info.above));
     if (close) for (const sp of info.spots) await shot(`nah_${sp.what}`, sp => {
       const s = game.scene.getScene('play'), T = s.T, c = s.cam, C = s.data_.game?.camera || {};
