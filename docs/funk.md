@@ -318,11 +318,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #173 Silo Zero: Rakete so hoch wie das Silo
-- **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Die Rakete ist viel zu klein. Mach aus der Grafik ein Tileset und mach die Rakete so hoch wie das Silo selbst. Das ist übrigens ein POI, den man von oben nach unten erkundet.“)
+- **Status:** fertig (22.11.) · angelegt 22.11. von Code (Daniel: „Die Rakete ist viel zu klein. Mach aus der Grafik ein Tileset und mach die Rakete so hoch wie das Silo selbst. Das ist übrigens ein POI, den man von oben nach unten erkundet.“)
 - **Für:** Code
 - **Auftrag:** Rakete (`wow_rocket.png`, #165) in Segmente zerlegen (Spitze, Rumpf kachelbar, Stufen-Ringe, Leitwerk/Triebwerk, Startrampe/Gerüst), daraus eine Rakete über die ganze Tiefe des Silos bauen: sie steht im Schacht und ist beim Abstieg von oben nach unten immer wieder zu sehen (Spitze oben am Anfang, Triebwerk unten am Tresor). Wow-Moment und Kamerafahrt anpassen. Nebenbei: Zahl „07“ im Gestein-Kachel-Set (Regel „keine Texte in Grafiken“) entfernen.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: Rakete 10 Kacheln breit, Versorgungsturm 6 links; Spitze im ersten Innenraum unter dem Hof (kein Blick von oben in den Schacht beim Einstieg); Rakete steht auf dem Boden des Wow-Raums, Flammengraben im Raum darunter; Kabelkanal springt zwischen Rumpf-Varianten; Spitze, Heck und Rampe gröber als der Rumpf (hochskaliert); Graffiti-Decals mit Pseudo-Schrift gelassen.
+- **Ergebnis:** (Code, per Helfer, `9e3e1d5`, `44533db`) Raketen-Tileset mit PixelLab gemalt und geschnitten (`assets/pois/rocket/`: Spitze, 4 Rumpf-Varianten nahtlos, Stufen-Ring, Heck, Startrampe, Versorgungsturm); `engine/shaft.js` legt die Säule durchs ganze Silo (Seed 1: 219 Kacheln ≈ 124 m), Räume richten sich am Schacht aus, `game/play/shaft_fx.js` zeichnet hinter der Spielebene, Rückwände öffnen sich mit Stahlpfosten und Lampen; Kamerafahrt vom Fuß zur Spitze (abbrechbar); POIs › Schacht-Motiv (für andere POIs vorbereitet); „07“ aus dem Kachel-Blatt entfernt; Lager verdrängt keine Sirene mehr. Tests npm 460 (shaft 3), silo 12, poi 33, poi_levels 15, poi_stack 8, light 18, Audits 0. **PixelLab 60.** **Bitte testen:** `/game?poi=raketensilo&seed=1` von oben nach unten, Kamerafahrt im Wow-Raum.
 
 ### #172 G4: Fassaden-Module gemalt
 - **Status:** fertig (22.11.) · angelegt 22.11. von Code (Daniel: „Ja, mach, erzeuge die Grafiken für die Fassaden“)
