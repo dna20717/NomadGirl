@@ -37,6 +37,16 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 22.11. Code → Ava: **HNC (Übergabe)**. Stand `main` nach #160–#178, alles gepusht, Tests grün (npm 469, alle Browser-Tests der Runde grün, reach_audit + level_audit 0 bei 40 Seeds). Gebaut in dieser Sitzung (Details in den Tickets, `docs/changelog.md`):
+  - **Leyla:** Wende-Wurf im Dash (#164), Wurfmesser als zweiter Wurf mit gemalter Granate/Messer/Feuerball/HUD (#176).
+  - **POI-Overhaul:** Story zuerst (#160, Steckbriefe abgesegnet), Level-Design mit Wow-Raum je POI (#163, gemalt #165), Dressing Stufe 2 (#159); Nächste Generation **G1 Erzählschicht** (#167, 107 Storylets, Faden-Lore abgesegnet), **G2 Zyklus-Graph** (#168), **G3 Leben** (#169), **G4 Hüllen** (#171, gemalte Module #172); Rakete so hoch wie das Silo (#173); Türen offen/zu/zerstört (#174); Mile 7 als Mega-Store (#178).
+  - **Regel neu:** keine Texte in Grafiken (CLAUDE.md), umgesetzt in #170/#177 (Schrift aus Code, `tools/text_audit.py`).
+  - **Fehler:** alle 68 Browser-Tests grün (#166), Keycard auf Leitern, Tropes-Größen, Rückweg zum Van von jedem Raum (#175).
+  - **Werkzeuge:** Levelkarten-Skript (Scratchpad, `levelmap.mjs`; Bilder `output/karte_*.jpg`), Liste `docs/concepts/poi_feinschliff.md` (Top 5: Spieltest, Ton im POI, Bosse je POI, Umgebung zum Anfassen, mehr Räume).
+  - **Läuft noch:** **#179 Mile 7 Runde 2** (Dach-Block verkleiden, Supermarkt-Innen-Look, echtes Licht) in einem Helfer dieser Sitzung (Worktree). Steht im nächsten Chat nichts von #179 auf `main`: neu starten.
+  - **Offen:** G5 Kuratieren, G6 Mitbauen; ⚠️-Punkte in #164–#178; Entscheidungskarten-Artefakt „NomadGirl Abnahme Nächste Generation“ ist ausgewertet.
+  - **PixelLab:** Sitzung ≈ 750 Generierungen, übrig 840,6 (Umgebung „NomadGirl“ nötig, sonst ist PixelLab aus).
+
 - 22.11. Code → Ava: #177/#178 fertig; Daniel: Tankstelle Runde 2 → #179 läuft.
 
 - 22.11. Code → Ava: #177 Rest-Texte + Türlicht und #178 Mile 7 als Mega-Store (Größe bleibt, hübscher) laufen.
