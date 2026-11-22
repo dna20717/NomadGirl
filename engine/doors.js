@@ -190,9 +190,13 @@ export function planDoors(D, poiId, L, seed = 1) {
 
 // would the locked doors cut Leyla off from something the level needs? (keys, switches, the goal, both ends of the shortcut, the exit)
 export function cutsOff(L, side) {
-  // switch doors (D) stay shut here: the rough model would walk the shortcut backwards through them and miss a locked door on the main way
-  const noD = rows => rows.map(r => r.replace(/D/g, '#'));
-  const lay = noD(doorLayout(L, { side, locked: true })), R = reach(lay, {}), base = reach(noD(doorLayout(L, { side })), {});
+  // twice: with switch doors (D) open (keys and switches behind them) and shut (the rough model would otherwise walk the shortcut backwards
+  // through them and miss a locked door on the main way)
+  return [false, true].some(noD => cutWith(L, side, noD));
+}
+function cutWith(L, side, shutD) {
+  const fix = rows => shutD ? rows.map(r => r.replace(/D/g, '#')) : rows;
+  const lay = fix(doorLayout(L, { side, locked: true })), R = reach(lay, {}), base = reach(fix(doorLayout(L, { side })), {});
   const need = [];
   for (let y = 0; y < lay.length; y++) for (let x = 0; x < lay[y].length; x++) if ('+SZ'.includes(L.def.layout[y][x])) need.push([x, y]);
   for (const e of ['up', 'down']) if (L.shortcut?.[e]) need.push(L.shortcut[e]);
