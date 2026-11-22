@@ -11,7 +11,7 @@ page.on('pageerror', e => errors.push('Seite: ' + e.message));
 const check = (name, cond, info) => (cond ? ok : errors).push(cond ? name : `${name}: ${JSON.stringify(info).slice(0, 500)}`);
 const ev = (fn, a) => page.evaluate(fn, a);
 
-await page.goto('http://localhost:8766/game.html?camp&new');
+await page.goto((process.env.GAME_URL || 'http://localhost:8766/game.html') + '?camp&new');
 await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.camp, null, { timeout: 60000 });
 let v = await ev(() => { nomad.take(); nomad.step(10); return { here: nomad.save().map.nodes.some(n => n.id === 'silo_zero') }; });
 check('Neues Spiel: Silo Zero steht nicht auf der Karte', !v.here, v);
@@ -26,7 +26,7 @@ for (const [i, step] of [['silo_frequenz', 'silo_peilen'], ['', 'silo_folgen'], 
   if (i === 1) check('Konvoi der Zero Hour, dann geht es in die Berge', /Zero Hour|Raketen/.test(v.title) && v.chain === 'silo_entdeckt', v);
   if (i === 2) check('Silo Zero gesehen, aber nur Kartenstück 4 (Funkkoordinaten) bleibt: der Ort ist noch nicht auf der Karte', /Silo Zero|Karte/.test(v.title) && !v.revealed.includes('silo_zero') && v.k4 === 1, v);
 }
-await page.goto('http://localhost:8766/game.html?camp&new');
+await page.goto((process.env.GAME_URL || 'http://localhost:8766/game.html') + '?camp&new');
 await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.camp, null, { timeout: 60000 });
 await ev(() => { nomad.take(); nomad.step(10); });
 // the treasure hunt (a fresh camp: Onkel Sung rides as a guest and stays behind without a Gästekoje) „Now I am become Death“: with a piece, Onkel Sung offers it; all five pieces put together reveal the place
@@ -44,7 +44,7 @@ check('Reisekarte: Silo Zero hat seinen Namen und lässt sich anfahren', v.node 
 await ev(() => game.scene.getScene('play').hud.map.close());
 
 // the POI itself
-await page.goto('http://localhost:8766/game.html?poi=raketensilo&seed=5');
+await page.goto((process.env.GAME_URL || 'http://localhost:8766/game.html') + '?poi=raketensilo&seed=5');
 await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.level, null, { timeout: 120000 });
 v = await ev(() => { nomad.take(); nomad.calm(); nomad.step(10); const s = game.scene.getScene('play'); return { rooms: s.levelInfo?.rooms?.length, gang: s.gang()?.name, banner: nomad.state().banner || '', t: s.level.state().terminals }; });
 check('Silo Zero: mindestens 20 Räume, Revier der Zero Hour, ein KI-Terminal', v.rooms >= 20 && v.gang === 'Zero Hour' && v.t.length === 1 && v.t[0].ai === 'Titan Lullaby', v);

@@ -21,10 +21,12 @@ for (const [poi, seed, room, kit, mood] of CASES) {
     const tm = s.terrainMap(), kitAt = tm?.idAt?.(r.x + 3, r.y + r.h - 1);
     nomad.tp((r.x + 4) * T, (r.y + r.h - 1) * T - 2); nomad.step(150);
     const st = nomad.state();
-    return { chests: st0.level?.chests?.length ?? st0.level?.chests, secrets: st0.level?.secretsMax, shortcut: !!L.shortcut, rooms: L.rooms.length, kitAt, mood: st.light?.mood, critters: st.light?.critters, lamps: st.light?.lamps?.length };
+    const hull = s.hull?.state?.() || null;   // #171 the building around the rooms
+    return { hull, chests: st0.level?.chests?.length ?? st0.level?.chests, secrets: st0.level?.secretsMax, shortcut: !!L.shortcut, rooms: L.rooms.length, kitAt, mood: st.light?.mood, critters: st.light?.critters, lamps: st.light?.lamps?.length };
   }, [room]);
   check(`${poi}: lädt ohne Fehler, ${v.rooms} Räume, Kisten, Geheimnisse, Abkürzung`, !errs.length && v.chests > 0 && v.secrets > 0 && v.shortcut, { ...v, errs });
   check(`${poi}: ${room} trägt Kachel-Set ${kit} und Stimmung ${mood}, Lampen`, v.kitAt === kit && v.mood === mood && v.lamps > 10, v);
+  check(`${poi}: Hülle ${v.hull?.type} gemalt (${v.hull?.chunks} Stücke, ${v.hull?.windows} Fenster)`, v.hull && v.hull.chunks > 0 && (poi === 'bunker_13' ? v.hull.earth > 500 : v.hull.facade > 500 && v.hull.windows > 20), v.hull);
   const life = Object.values(v.critters || {}).reduce((n, x) => n + x, 0);
   check(`${poi}: Kleinvieh lebt (${JSON.stringify(v.critters)})`, life > 0, v);
   if (shots) { fs.mkdirSync('output', { recursive: true }); await page.evaluate(() => nomad.freeze()); await page.waitForTimeout(500); await page.screenshot({ path: `output/poi_levels_${poi}.png` }); }

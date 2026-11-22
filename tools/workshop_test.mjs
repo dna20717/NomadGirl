@@ -27,6 +27,13 @@ for (const [a, A] of Object.entries(AREAS)) {
 }
 await go({ area: 'validation' }); await shot('validation');
 
+// #171 Hüllen G4: POIs › Hülle with the preview of the building for the seed, Gebäudetypen shows its POIs
+await go({ area: 'pois', choice: 'grossmarkt' });
+{ const t = await page.evaluate(() => document.body.innerText); if (!/Hülle · Seed/.test(t) || !/Fenster\n?.*in der Fassade/.test(t) || !/Gebäudetyp/.test(t)) errors.push('POIs › Hülle: Vorschau fehlt'); }
+await shot('pois_hull');
+await go({ area: 'hulls', choice: 'mall' });
+{ const t = await page.evaluate(() => document.body.innerText); if (!/Genutzt von: Delta South Megamall/.test(t)) errors.push('Gebäudetypen: Mall ohne POI'); }
+
 // edit a number in Leyla, then undo
 await go({ area: 'leyla' });
 const field = page.getByRole('spinbutton', { name: 'Rennen (px/s)', exact: true });

@@ -66,7 +66,7 @@ export function hullSkyline(scene, worldW) {
   const out = [], seed = scene.levelSeed || 1, stamp = Date.now();
   for (const [far, sf, depth, hh, color, alpha] of [[true, 0.03, -97.97, H * 0.2, '#403353', 0.75], [false, 0.09, -97.46, H * 0.16, '#422433', 0.9]]) {
     const width = Math.min(8192, Math.ceil(W * 1.6 + worldW * sf)), sky = skylinePlan(D, { region, seed: seed + (far ? 0 : 17), width, height: hh, far });
-    if (!sky.list.length) continue;
+    if (!sky.list.length || !far && !['city', 'outskirts', 'industry'].includes(sky.kind)) continue;   // open country: only the far city
     const key = `hullsky_${far ? 'far' : 'near'}_${stamp}`, tex = scene.textures.createCanvas(key, width, Math.ceil(hh * 1.4) + 40), ctx = tex.getContext();
     paintSkyline(ctx, sky, { x: 0, base: tex.height, color, k: 1, alpha });
     tex.refresh();
