@@ -128,6 +128,46 @@ export class Atmosphere {
   }
   flash(x, y, color, radius = 200, life = 140) { this.flashes.push({ x, y, c: rgb(color), radius, strength: 0.9, t: 0, life }); }
 
+  // #177 shut doors stop lamp light like walls: side doors (closed, locked), the switch doors (D) and the locks (|, hatches too) while
+  // they are shut; open and broken ones let it through. Each blocker is the door plus the solid wall it sits in (contiguous solid tiles
+  // above and below a door, left and right of a hatch, up to 8 tiles), so the light cannot sneak over the lintel. Rebuilt every frame
+  // from the doors' states: opening, shutting, breaking change the light at once.
+  blockers() {
+    const s = this.scene, L = s.level, T = this.T, R = s.room, out = [];
+    if (!L) return out;
+    const push = (tx0, ty0, tx1, ty1) => {   // tiles, x1/y1 exclusive
+      if (ty1 - ty0 >= tx1 - tx0) { let a = ty0, b = ty1; for (let i = 0; i < 8 && R.solid(tx0, a - 1) && a - 1 >= 0; i++) a--; for (let i = 0; i < 8 && R.solid(tx0, b) && b < R.h; i++) b++; ty0 = a; ty1 = b; }
+      else { let a = tx0, b = tx1; for (let i = 0; i < 8 && R.solid(a - 1, ty0) && a - 1 >= 0; i++) a--; for (let i = 0; i < 8 && R.solid(b, ty0) && b < R.w; i++) b++; tx0 = a; tx1 = b; }
+      out.push({ x0: tx0 * T, y0: ty0 * T, x1: tx1 * T, y1: ty1 * T });
+    };
+    for (const d of L.doorways?.side || []) if (L.doorways.shut(d)) push(d.x, d.y0, d.x + 1, d.y1 + 1);
+    for (const g of [...(L.doors || []), ...(L.locks || [])]) if (!g.open) push(g.x0, g.y0, g.x1, g.y1);
+    return out;
+  }
+  // is the way from the light to the point cut by a blocker? (segment against rectangle, slab test)
+  shaded(l, x, y, bl = this.blocked) {
+    for (const b of bl || []) {
+      if (l.x >= b.x0 && l.x <= b.x1 && l.y >= b.y0 && l.y <= b.y1) continue;   // a light inside the wall lights its own side
+      const dx = x - l.x, dy = y - l.y;
+      let t0 = 0, t1 = 1, ok = true;
+      for (const [p, q] of [[-dx, l.x - b.x0], [dx, b.x1 - l.x], [-dy, l.y - b.y0], [dy, b.y1 - l.y]]) {
+        if (p === 0) { if (q < 0) { ok = false; break; } continue; }
+        const r = q / p;
+        if (p < 0) { if (r > t1) { ok = false; break; } if (r > t0) t0 = r; } else { if (r < t0) { ok = false; break; } if (r < t1) t1 = r; }
+      }
+      if (ok && t0 <= t1) return true;
+    }
+    return false;
+  }
+  // the shadow of a blocker seen from a light: from its two outermost corners away from the light, out past the light's reach (world points)
+  shadowOf(l, b, reach) {
+    const cs = [[b.x0, b.y0], [b.x1, b.y0], [b.x1, b.y1], [b.x0, b.y1]], ang = c => Math.atan2(c[1] - l.y, c[0] - l.x);
+    const base = Math.atan2((b.y0 + b.y1) / 2 - l.y, (b.x0 + b.x1) / 2 - l.x), rel = c => { let a = ang(c) - base; return Math.atan2(Math.sin(a), Math.cos(a)); };
+    const sorted = [...cs].sort((p, q) => rel(p) - rel(q)), lo = sorted[0], hi = sorted[3];
+    const far = c => { const dx = c[0] - l.x, dy = c[1] - l.y, d = Math.hypot(dx, dy) || 1; return [c[0] + dx / d * (reach * 2 + 64), c[1] + dy / d * (reach * 2 + 64)]; };
+    return [lo, hi, far(hi), far(lo)];   // the side of the blocker facing the light stays lit
+  }
+
   // brightness 0..1 at a world point (ambient + lights, without vignette): dust, tests
   lightAt(x, y) {
     if (!this.on) return 1;
@@ -138,6 +178,7 @@ export class Atmosphere {
       if (l.clip && (x < l.clip.x0 || x > l.clip.x1 || y < l.clip.y0 || y > l.clip.y1)) continue;
       const dx = x - l.x, dy = y - l.y, d = Math.hypot(dx, dy);
       if (d > l.radius) continue;
+      if (this.shaded(l, x, y, this.blocked)) continue;   // #177 behind a shut door
       const fall = 1 - d / l.radius;
       if (l.kind === 'ceiling' || l.kind === 'tube') { const a = Math.abs(Math.atan2(dy, dx) - Math.PI / 2), half = l.kind === 'tube' ? 1.0 : 0.62; if (a > half * 1.35 && d > 50) continue; add(l, l.f * fall * (a > half ? 0.35 : 1)); }
       else add(l, l.f * fall);
@@ -158,6 +199,7 @@ export class Atmosphere {
     if (!this.on) return;
     const s = this.scene, T = this.T, l = s.leyla;
     this.time += dt;
+    this.blocked = this.blockers();   // #177 shut doors this frame (lightAt, dust)
     const mood = this.moodAt(Math.floor(l.x / T), Math.floor((l.feet - 40) / T));
     this.vig = lerp(this.vig, mood.vignette, Math.min(1, dt / 600));
     for (const L of this.lights) {
@@ -194,17 +236,29 @@ export class Atmosphere {
     ctx.drawImage(this.amb, x0 / T, y0 / T, W / T, H / T, 0, 0, this.lw, this.lh);
     if (this.blackout) { ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgb(70,58,64)'; ctx.fillRect(0, 0, this.lw, this.lh); }   // #082 Stromausfall
     ctx.globalCompositeOperation = 'lighter';
-    // lamps and glowing things
+    // lamps and glowing things; #177 a lamp near a shut door is drawn on a scratch canvas, its shadows cut out, then added
+    const bl = this.blocked = this.blockers();
     for (const L of this.lights) {
       if (L.x + L.radius < x0 || L.x - L.radius > x0 + W || L.y + L.radius < y0 || L.y - L.radius > y0 + H) continue;
       const a = L.strength * L.f;
       if (a < 0.01) continue;
-      if (L.clip) { ctx.save(); ctx.beginPath(); ctx.rect(X(L.clip.x0), Y(L.clip.y0), (L.clip.x1 - L.clip.x0) / k, (L.clip.y1 - L.clip.y0) / k); ctx.clip(); }
+      const near = bl.filter(b => b.x1 > L.x - L.radius && b.x0 < L.x + L.radius && b.y1 > L.y - L.radius && b.y0 < L.y + L.radius && !(L.x >= b.x0 && L.x <= b.x1 && L.y >= b.y0 && L.y <= b.y1));
+      let c = ctx;
+      if (near.length) {
+        if (!this.scratch || this.scratch.width !== this.lw || this.scratch.height !== this.lh) { this.scratch = document.createElement('canvas'); this.scratch.width = this.lw; this.scratch.height = this.lh; }
+        c = this.scratch.getContext('2d'); c.globalCompositeOperation = 'source-over'; c.clearRect(0, 0, this.lw, this.lh); c.globalCompositeOperation = 'lighter';
+      }
+      if (L.clip) { c.save(); c.beginPath(); c.rect(X(L.clip.x0), Y(L.clip.y0), (L.clip.x1 - L.clip.x0) / k, (L.clip.y1 - L.clip.y0) / k); c.clip(); }
       const lx = X(L.x), ly = Y(L.y), r = L.radius / k;
-      if (L.kind === 'ceiling') { blob(ctx, lx, ly, r * 0.32, L.c, a * 0.8); cone(ctx, lx, ly, Math.PI / 2, 0.62, r, L.c, a); }
-      else if (L.kind === 'tube') { blob(ctx, lx, ly, r * 0.38, L.c, a * 0.7, 2.6); cone(ctx, lx, ly, Math.PI / 2, 1.0, r, L.c, a * 0.85); }
-      else blob(ctx, lx, ly, r, L.c, a);
-      if (L.clip) ctx.restore();
+      if (L.kind === 'ceiling') { blob(c, lx, ly, r * 0.32, L.c, a * 0.8); cone(c, lx, ly, Math.PI / 2, 0.62, r, L.c, a); }
+      else if (L.kind === 'tube') { blob(c, lx, ly, r * 0.38, L.c, a * 0.7, 2.6); cone(c, lx, ly, Math.PI / 2, 1.0, r, L.c, a * 0.85); }
+      else blob(c, lx, ly, r, L.c, a);
+      if (L.clip) c.restore();
+      if (near.length) {
+        c.globalCompositeOperation = 'destination-out'; c.fillStyle = '#000';
+        for (const b of near) { const pts = this.shadowOf(L, b, L.radius); c.beginPath(); pts.forEach(([px, py], i) => (i ? c.lineTo(X(px), Y(py)) : c.moveTo(X(px), Y(py)))); c.closePath(); c.fill(); }
+        ctx.drawImage(this.scratch, 0, 0);
+      }
     }
     // short flashes (sparks)
     for (const f of this.flashes) blob(ctx, X(f.x), Y(f.y), f.radius / k, f.c, f.strength * (1 - f.t / f.life));

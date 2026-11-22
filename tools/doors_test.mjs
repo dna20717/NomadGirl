@@ -140,6 +140,56 @@ const PRE = `
   await page.close();
 }
 
+// ---------- 4. #177 light: a shut door stops lamp light like a wall, open and broken ones let it through, the change shows at once ----------
+{
+  const { page, errs } = await open('bunker_13', 2);
+  const v = await run(page, `
+    const A = s.atmo; if (!A?.on) return { off: true };
+    const d = byMat('steel') || W.side[0];
+    nomad.tp(d.cx - T * 6, d.feet - 2); nomad.step(4);
+    const lamp = { kind: 'bulb', x: d.cx - T * 2, y: d.top + T * 0.8, c: [255, 240, 220], radius: 520, strength: 1.4, behavior: 'steady', seed: 0.3, clip: null, halo: { setAlpha() {} }, haloA: 0, f: 1 };
+    A.lights.push(lamp);
+    // the lightmap pixel at a world point (rendered right now with only the test lamp on; headless steps do not move the camera, so point it at the door)
+    const px = (wx, wy) => {   // what the test lamp adds to the lightmap there (with and without it, the other lamps off)
+      s.cam.centerOn(d.cx, d.top); s.cam.preRender();
+      const keep = A.lights.map(l => l.strength), read = () => { A.render(); const vw = s.cam.worldView, m = A.margin, k = A.k, q = A.ctx.getImageData(Math.floor((wx - (vw.x - m)) / k), Math.floor((wy - (vw.y - m)) / k), 1, 1).data; return q[0] + q[1] + q[2]; };
+      A.lights.forEach(l => { l.strength = 0; }); const base = read(); lamp.strength = 1.4; const lit = read();
+      A.lights.forEach((l, i) => { l.strength = keep[i]; });
+      return lit - base;
+    };
+    const here = st => {
+      W.setState(d, st, true); nomad.step(1);
+      const fx = d.cx + T * 1.5, fy = d.top + T, nx = d.cx - T * 1.2;
+      return { st, near: +A.lightAt(nx, fy).toFixed(3), far: +A.lightAt(fx, fy).toFixed(3), blockers: A.blocked.length, pxNear: px(nx, fy), pxFar: px(fx, fy) };
+    };
+    const rows = ['closed', 'locked', 'open', 'broken', 'closed'].map(here);
+    A.lights.pop(); W.setState(d, 'closed', true);
+    // switch doors and locks count as blockers while shut
+    const L = s.level, shutSwitch = (L.doors || []).filter(g => !g.open).length + (L.locks || []).filter(g => !g.open).length;
+    return { rows, shutSwitch, side: W.side.filter(x => W.shut(x)).length };
+  `);
+  const [c, lk, op, br, again] = v.rows || [];
+  check(`Licht: zu hält Lampenlicht an (hinter der Tür ${c?.far} statt ${op?.far}, Lichtkarte ${c?.pxFar} statt ${op?.pxFar})`, !v.off && c.far < op.far - 0.15 && c.pxFar < op.pxFar * 0.3 && op.pxFar > 60, v);
+  check('Licht: verschlossen ebenso, die Seite der Lampe bleibt hell', lk.far < op.far - 0.15 && Math.abs(lk.near - op.near) < 0.02 && c.pxNear > c.pxFar, v);
+  check('Licht: offen und zerstört lassen es durch', Math.abs(br.far - op.far) < 0.02 && op.far > c.far, v);
+  check('Licht: wieder zu, sofort wieder dunkel (Zustandswechsel)', Math.abs(again.far - c.far) < 0.02 && again.blockers === c.blockers && c.blockers === op.blockers + 1, v);
+  check(`Licht: Schalter-Türen und Schlösser zählen mit (${v.shutSwitch} zu, ${v.side} Türen zu)`, c.blockers === v.side + v.shutSwitch, v);
+  if (shots) {
+    // a picture: the door shut with a lamp before it, then open (fog off, so only the light makes the difference)
+    await page.evaluate(() => { const f = game.scene.getScene('play').fog; if (f?.F) Object.assign(f.F, { density: 0, remembered: 0, secretDensity: 0, walls: 0, fade: 1 }); });
+    for (const st of ['closed', 'open']) {
+      await page.evaluate(st => { const s = game.scene.getScene('play'), W = s.level.doorways, T = s.T, d = W.side.find(x => x.p.material === 'steel') || W.side[0];
+        W.setState(d, st, true); nomad.tp(d.cx - T * 3, d.feet - 2); nomad.step(4);
+        s.atmo.lights = s.atmo.lights.filter(l => !l.test); s.atmo.lights.push({ test: true, kind: 'bulb', x: d.cx - T * 1.5, y: d.top + T * 0.6, c: [255, 220, 170], radius: 560, strength: 1.6, behavior: 'steady', seed: 0.3, clip: null, halo: { setAlpha() {} }, haloA: 0, f: 1 }); nomad.step(2); }, st);
+      await page.evaluate(() => nomad.freeze()); await page.waitForTimeout(600);
+      await page.screenshot({ path: `output/doors_test_light_${st}.png` });
+      await page.evaluate(() => nomad.thaw());
+    }
+  }
+  check('Bunker 13 Licht: keine Seitenfehler', !errs.length, errs);
+  await page.close();
+}
+
 console.log(ok.map(o => '✔ ' + o).join('\n'));
 if (errors.length) { console.log(errors.map(e => '✘ ' + e).join('\n')); process.exitCode = 1; }
 console.log(`${ok.length} ok, ${errors.length} Fehler`);
