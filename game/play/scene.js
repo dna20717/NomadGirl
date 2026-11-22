@@ -790,6 +790,9 @@ export class PlayScene extends Phaser.Scene {
     const l = this.leyla, h = this.hud, G = this.data_.game?.gamepad || {};
     if (G.useUp === false || !l?.alive || h.modal || h.paused || h.duel?.isOpen || h.inv?.isOpen || h.craft?.isOpen || (h.tech?.isOpen || h.map?.isOpen) || h.build?.active) return false;
     if (!h.promptText || (h.promptKey || 'E') !== 'E' || h.promptEl?.hidden) return false;
+    // #175 (Daniel: „Auf Leitern kann man keine Keycard benutzen“): on a ladder a tap ↑ opens what is in reach (a hatch, a lock, a switch)
+    // as long as the prompt can act; holding ↑ keeps climbing, a prompt without an action (locked, needs …) never steals the climb
+    if (l.state === 'climb') return !!this.level?.nearest()?.act;
     return l.state === 'normal' && (l.body.blocked.down || l.body.touching.down) && Math.abs(l.body.velocity.x) <= (l.m.walkSpeed ?? 240) * 1.15;
   }
   // windows (ui_nav.js, Daniel 12.11.2026: one grammar): move, ok, back, context, send, tabs; keyboard and controller alike

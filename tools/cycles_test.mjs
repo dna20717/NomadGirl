@@ -1,6 +1,7 @@
 // #168 G2 the cycle graph in the browser: Schlüssel und Schloss in a POI. Mile 7 (side by side): the door into the workshop hall stays
 // shut without the key, the toilet key lies in the side room, E picks it up (HUD lists it), the door opens with it and Leyla walks
-// through. Pit 6 (deep): the hatch in the joint ladder, key, open, climb down through it.
+// through. Pit 6 (deep): the hatch in the joint ladder, key, open, climb down through it. #175: the hatch opens from the ladder below
+// (E and a tap ↑, the controller's use), and the ladder of a one-way hole comes down from the landing (way back up to the van).
 // Server must run (npm run serve).   node tools/cycles_test.mjs [--shots]   pictures to output/cycles_*.png
 import fs from 'node:fs';
 import { chromium } from 'playwright';
@@ -11,13 +12,13 @@ const errors = [], ok = [];
 const check = (name, cond, info) => (cond ? ok : errors).push(cond ? name : `${name}: ${JSON.stringify(info)}`);
 const base = process.env.GAME_URL || 'http://localhost:8766/game.html';
 
-async function open(poi, seed) {
+async function open(poi, seed, recipe = 'lockKey') {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } }), errs = [];
   page.on('pageerror', e => errs.push(e.message));
   page.on('console', m => { if (m.type() === 'error' && !/\/api\/|version\.json/.test(m.location()?.url || '')) errs.push(m.text()); });
   // the recipe is pinned to Schlüssel und Schloss (POIs › Struktur › Rezepte), so the check does not hang on one seed's roll
   const pois = JSON.parse(fs.readFileSync(new URL('../projects/nomadgirl/data/pois.json', import.meta.url), 'utf8'));
-  pois[poi].cycles = { ...pois[poi].cycles, recipes: [{ recipe: 'lockKey', weight: 1 }] };
+  pois[poi].cycles = { ...pois[poi].cycles, recipes: [{ recipe, weight: 1 }] };
   await page.addInitScript(p => localStorage.setItem('nomadgirl-drafts:data/pois.json', JSON.stringify(p)), pois);
   await page.goto(`${base}?poi=${poi}&seed=${seed}`);
   await page.waitForFunction(() => window.nomad && window.game?.scene.getScene('play')?.leyla, null, { timeout: 120000 });
@@ -91,6 +92,49 @@ const keyRow = page => page.evaluate(() => { const r = document.querySelector('.
   check('Luke: Leyla klettert hindurch nach unten', s.feet > s.below, s);
   await shot(page, 'hatch_open');
   check('Pit 6: ohne Fehler', !errs.length, errs);
+  await page.close();
+}
+
+// ---------- #175 Pit 6: the hatch from the ladder below (Daniel: „Auf Leitern kann man keine Keycard benutzen“) ----------
+{
+  const { page, errs, ev } = await open('pit6', 2);
+  const s = await ev(() => {
+    nomad.step(240); const k = nomad.state().level.keys[0]; nomad.tp(k.x - 40, k.feet); nomad.step(8); nomad.step(1, [], ['grab']); nomad.step(20);
+    const o = nomad.state().level.locks[0];
+    nomad.tp((o.x0 + 0.5) * T, (o.y1 + 4) * T); nomad.step(3);
+    nomad.until(st => st.leyla.state === 'climb', 30, ['up']);
+    nomad.step(90, ['up']); nomad.step(6);
+    const st = nomad.state(), p = st.prompt, state = st.leyla.state;
+    nomad.step(1, [], ['up']); nomad.step(20);   // a tap ↑ on the ladder = use (keyboard W / ↑, the controller's stick)
+    const lv = nomad.state().level;
+    return { p, state, open: lv.locks[0].open, held: lv.held, tile: game.scene.getScene('play').room.tiles[o.y0][o.x0] };
+  });
+  check('Luke von unten: auf der Leiter steht der Hinweis „öffnen“', s.state === 'climb' && /^Förderkorb-Luke öffnen/.test(s.p || ''), s);
+  check('Luke von unten: ↑ auf der Leiter öffnet mit der Grubenmarke', s.open && !s.held.length && s.tile === 'H', s);
+  await shot(page, 'hatch_from_ladder');
+  check('Luke von der Leiter: ohne Fehler', !errs.length, errs);
+  await page.close();
+}
+
+// ---------- #175 Pit 6: Einbahn hinunter, the ladder comes down from the landing ----------
+{
+  const { page, errs, ev } = await open('pit6', 1, 'oneWayDown');
+  const s = await ev(() => {
+    const sc = game.scene.getScene('play'), f = nomad.state().level.lifts[0];
+    if (!f) return { none: true };
+    const top = Math.min(...f.tiles.map(t => t[1]));
+    nomad.tp(f.x, f.feet); nomad.step(240);
+    const p = nomad.state().prompt; nomad.step(1, [], ['grab']); nomad.step(20);
+    const down = nomad.state().level.lifts[0].down, tile = sc.room.tiles[top][f.tiles[0][0]];
+    nomad.until(st => st.leyla.state === 'climb', 60, ['up'], ['up']);
+    nomad.until(st => st.leyla.feet <= top * T + 2, 900, ['up']); nomad.step(20);
+    return { p, down, tile, feet: nomad.state().leyla.feet, top: top * T };
+  });
+  check('Einbahn: an der Landestelle „Leiter herunterlassen“', /^Leiter herunterlassen/.test(s.p || ''), s);
+  check('Einbahn: die Leiter ist unten', s.down && s.tile === 'H', s);
+  check('Einbahn: Leyla klettert wieder hinauf', s.feet <= s.top + 4, s);
+  await shot(page, 'lift_up');
+  check('Einbahn-Leiter: ohne Fehler', !errs.length, errs);
   await page.close();
 }
 
