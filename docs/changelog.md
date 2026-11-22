@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 22.11.2026: **Türen** (#174): gemalte Türen in sechs Materialien im Profil und frontal, offen/zu/zerstört/verschlossen; mit E öffnen, Gegner öffnen auch, zerstörbar je Material, kaputte Türen bleiben als Spur, Rückwand-Türen führen in Seitenräume.
 - 22.11.2026: **Fehler aus Daniels Test** (#175): Luken und Schlösser auch von der Leiter aus, Tropes in glaubwürdigen Größen, von jedem Raum aller POIs ein Weg zurück zum Van (neuer Prüfer, 6 POIs repariert, Leiter zum Herunterlassen nach Einbahnen).
 - 22.11.2026: **Wurfmesser** (#176): zweiter Wurf neben der Granate (Z wechselt), lautlos, gerade, steckt in Wänden, Kopftreffer, Fächer im Wende-Wurf; gemalte Granate, Messer, Feuerball und neue HUD-Symbole.
 - 22.11.2026: **Rakete so hoch wie das Silo** (#173): In Silo Zero steht die Rakete als durchgehende Säule durch alle Etagen, gemalt als Tileset, Räume öffnen sich zum Schacht, Kamerafahrt vom Triebwerk zur Spitze.
