@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 22.11. Code → Ava: Daniel: Türen in der Seitenansicht (offen/zu/zerstört, funktional) → #174 läuft.
+
 - 22.11. Code → Ava: Daniel: Rakete in Silo Zero so hoch wie das Silo, POI wird von oben nach unten erkundet → #173 läuft. Liste „Was noch fehlt“: `docs/concepts/poi_feinschliff.md`.
 
 - 22.11. Code → Ava: Daniel: Fassaden-Module malen → #172 läuft (PixelLab ≈ 150).
@@ -307,6 +309,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #174 Türen in der Seitenansicht: offen, zu, zerstört
+- **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Wir brauchen Türen in der orthogonalen Seitensicht, damit die Level mehr wie Level wirken. Offen und geschlossen und zerstört“; Wahl: **beides** – Durchgangstüren im Profil an Raumübergängen und frontale Rückwand-Türen; **funktional**)
+- **Für:** Code
+- **Auftrag:** Türen je Material/Gebäudetyp gemalt (PixelLab, ohne Text), Zustände offen/zu/zerstört; Durchgangstüren blockieren zu, öffnen mit E (Gegner auch), zerstörbar durch Hiebe/Schüsse/Granaten, bleiben als Spur kaputt (#167); verschlossene nutzen das Schloss-System (#168); Rückwand-Türen frontal, manche führen in Seitenräume; Zustand gewürfelt nach Verfall/Story; Erreichbarkeit nie blockiert.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #173 Silo Zero: Rakete so hoch wie das Silo
 - **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Die Rakete ist viel zu klein. Mach aus der Grafik ein Tileset und mach die Rakete so hoch wie das Silo selbst. Das ist übrigens ein POI, den man von oben nach unten erkundet.“)
