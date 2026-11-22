@@ -311,12 +311,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #170 Abnahme Nächste Generation umsetzen: Texte raus aus Grafiken, Reste
-- **Status:** läuft (21.11.) · angelegt 21.11. von Code (Daniels Karten im Artefakt „NomadGirl Abnahme Nächste Generation“)
+- **Status:** fertig (22.11.) · angelegt 21.11. von Code (Daniels Karten im Artefakt „NomadGirl Abnahme Nächste Generation“)
 - **Für:** Code
 - **Entschieden:** Wende-Wurf bleibt (Gefühl, 120 ms, 1 Ladung + 30 Ausdauer, Hieb erlaubt); Wow-Räume passen, **Kuppel tiefer hängen**; Raumtypen, Verfall, Wüste passen; Faden-Lore (AvA als Tankkind K-40-117) **ja**; 107 Texte **abgesegnet**; Boss: ein Neuer; Spuren 4 Tage; Schlüssel je POI abgesegnet, gelten nur für den Run; **Gore etwas ehrlicher (Grenze 3)**; **Texte nie in Grafiken** (neue Projekt-Regel in CLAUDE.md), Code-Texte über die Motive; als Nächstes **Reste fixen, dann G4**. Karte „Tropes sichtbarer“ blieb offen → ⚠️ vorläufig Vorschlag (größer + eigenes Licht).
 - **Auftrag:** (1) Gebackene Texte aus allen Grafiken entfernen (zuerst Wow-Motive: Preistafel, Kassenhaus, Gittertor-Schild, Anzeigetafel, Penthouse-Schild …; dann alle Assets prüfen, Liste), Texte aus Code/Daten drüberlegen. (2) Megamall-Kuppel tiefer. (3) Tropes größer + eigenes Licht. (4) Gore-Grenze 3. (5) Rückweg-Variante „eingestürzter Gang“ (#168).
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig / Daniel entscheidet: bewusst gelassen Spiel-Logo (Wortmarke), NOMADCOLA-Logos, OPEN-Schild (Gegenstand), Techtree-Bilder `tt_nodes_2/3/4/7` (Text, lieber neu malen), Instrumente/Uhr/Controller-Symbole, unleserliche Pseudo-Schrift, Tutorial-Screenshots; Leyla-/Raider-Streifen nicht einzeln geprüft; alle neuen Schildtexte Entwurf; Preise als Text in den Asset-Daten (nicht an Treibstoffpreis gekoppelt); Sonne auf Preistafel zeigt leichte Buchstabenreste; neuer Gore-3-Trope „Nicht lange her“ aus vorhandenem Material.
+- **Ergebnis:** (Code, per Helfer, `7105df1`, `e06769b`, `6a51d8f`) `tools/detext.py` + `game/labels.js` (Assets › Schrift aus Code, VT323, überall gleich): Text entfernt aus Preistafel, Anzeigetafel, Penthouse, Kuppel, Kassenhaus, Tresor, Schwarzes Brett, Schatz-/Waffenkammer, Schrein, Snack-Automat, Zelt, Bus; Originale als `_text`-Assets. Liste in `docs/assets.md` › Text entfernt. Megamall-Kuppel hängt 5 Kacheln tiefer an Seilen. Tropes in echten Größen mit eigenem Licht. Gore-Grenze 3 + Trope „Nicht lange her“. Rückweg-Variante „eingestürzter Gang“ (POIs › Struktur › Einsturz 50 %, Prüfer: 42 Einstürze in 13 × 40 Seeds, 0 Befunde). Tests npm 447, poi 33, poi_levels 9, poi_stack 8, story 23, cycles 17, light 18, life, drive 20, workshop 63, splash. PixelLab 0. **Bitte testen:** Mile 7 Preistafel, Megamall Kuppel, P+R KASSE, Camp AUFTRÄGE/Schatzkammer, Bunker 13 Seed 2 Trope, Ministerium Seed 3 Einsturz.
 
 ### #169 POI G3: Leben (Lager, Beziehungen, Regie, Simulation zwischen Besuchen)
 - **Status:** fertig (21.11.) · angelegt 21.11. von Code (Daniel: „Mach weiter mit G3“)

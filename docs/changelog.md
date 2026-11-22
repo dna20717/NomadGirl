@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 22.11.2026: **Keine Texte in Grafiken** (#170, neue Regel): Schrift kommt aus Code (Assets › Schrift aus Code), 13 Grafiken bereinigt; Megamall-Kuppel tiefer, Tropes in echten Größen mit Licht, Gore-Grenze 3, Rückweg-Variante „eingestürzter Gang“.
 - 21.11.2026: **POI G3 Leben** (#169): Fraktionen reagieren aufeinander, Gegner wohnen in Lagern und drehen Runden, die POIs leben zwischen den Besuchen weiter (Nester wachsen, Lager ziehen um, Spähtrupps, neue Bewohner), Regie mit Aufbau, Spitze und Ruhe samt Musik-Schichten; Ökosystem-Ansicht in der Werkstatt.
 - 21.11.2026: **POI Nächste Generation G1 + G2** (#167, #168): Erzählschicht mit 107 Storylets (Zettel, Durchsagen, Funk, Gerüchte, Splitter-Faden zu AvA, AvA kommentiert), 13 Tropes (9 gemalt), Zeitschichten und Leylas Spuren, die verblassen; Zyklus-Graph vor den Räumen mit 6 Rezepten und Schlüsseln aus der Story, Werkstatt-Diagramm, Prüfer gegen Softlocks.
 - 21.11.2026: **Wow-Räume gemalt** (#165): alle 13 Wow-Motive und vier Landmarken mit PixelLab (Reaktor, Kristalle, Uhr, Rakete, Kuppel, Pool …), Räume heller mit Fülllicht und Dressing ums Motiv; rote Browser-Tests repariert (#166, Brett-Geschenk frei vom Motor-Sockel).
