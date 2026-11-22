@@ -21,7 +21,7 @@ import { OCCUPANT_KINDS } from './history.js';
 import { FACTIONS, ATTITUDES, CAMP_FACTIONS, LIFE_EVENTS, LIFE } from './ecosystem.js';
 import { TROPE_PLACES, TROPE_BODIES, tropeSizeIssues } from './tropes.js';
 import { DOOR_MATERIALS, DOOR_OPENING, DOOR_KINDS, DOOR_BREAK, DOORS } from './doors.js';
-import { HULL_KINDS, ROOF_KINDS, ROOFTOP, AWNINGS, MATERIALS, BASES, SURFACES, PLANT, SKY_KINDS, HULL } from './facade.js';
+import { HULL_KINDS, ROOF_KINDS, ROOFTOP, AWNINGS, MATERIALS, BASES, SURFACES, PLANT, SKY_KINDS, HULL, ENTRIES, YARD } from './facade.js';
 import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
 import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
 import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from './megarig.js';
@@ -1853,7 +1853,7 @@ export const AREAS = {
         select('hull.roof', 'Dachart', [['', '– wie der Typ –'], ...ROOF_KINDS]),
         num('hull.decay', 'Schäden', { min: 0, max: 3, hint: 'Risse, Löcher, kaputte und vernagelte Fenster, fehlende Dachteile. Leer = POIs › Story › Verfall' }),
         num('hull.roomWindows', 'Fenster in Räumen', { unit: '%', min: 0, max: 100, hint: 'Leer = wie der Typ' })] },
-      { title: 'Marken-Clutter', wide: true, fields: [table('brandProps', 'Marken-Clutter', [ref('look', 'Symbol-Raster', 'assets'), text('name', 'Symbol'), num('cm', 'Höhe', { unit: 'cm', min: 1 }), num('chance', 'Chance', { unit: '%', min: 0, max: 100 }), bool('ai', 'KI'), text('place', 'Ort'), text('tags', 'Tags'), text('roles', 'Rollen')], { hint: 'Daniel, 17.11.2026: Dinge einer Marke, die in diesem POI auf freiem Boden stehen (z. B. NomadCola-Automaten an Tankstellen). Symbol = Name im Raster, Höhe in echten cm, Chance je freier Bodenkachel (mit Set-Dressing: Gewicht beim Auswählen). KI = darin wohnt eine Entity: E / ↑ davor startet ein Glitch-Duell (#052). Ort, Tags, Rollen wie Kachel-Sets › Clutter-Regeln (#158)' })] },
+      { title: 'Marken-Clutter', wide: true, fields: [table('brandProps', 'Marken-Clutter', [ref('look', 'Symbol-Raster', 'assets'), text('name', 'Symbol'), num('cm', 'Höhe', { unit: 'cm', min: 1 }), num('w', 'Breite', { unit: 'Kacheln', min: 1, max: 6, hint: '#178: so viele Bodenkacheln hält das Set-Dressing frei (Regalreihe, Kühlregal). Leer = 1' }), num('chance', 'Chance', { unit: '%', min: 0, max: 100 }), bool('ai', 'KI'), text('place', 'Ort'), text('tags', 'Tags'), text('roles', 'Rollen'), bool('strict', 'Nur diese Rollen')], { hint: 'Daniel, 17.11.2026: Dinge einer Marke, die in diesem POI auf freiem Boden stehen (z. B. NomadCola-Automaten an Tankstellen). Symbol = Name im Raster, Höhe in echten cm, Chance je freier Bodenkachel (mit Set-Dressing: Gewicht beim Auswählen). KI = darin wohnt eine Entity: E / ↑ davor startet ein Glitch-Duell (#052). Ort, Tags, Rollen wie Kachel-Sets › Clutter-Regeln (#158)' })] },
       { title: 'Ranking', fields: [num('parTime', 'Bestzeit', { unit: 's', min: 0 }), num('secrets', 'Secrets', { min: 0, hint: 'Im Level zählen die brüchigen Wände (B); diese Zahl gilt nur für POIs ohne Level' })] },
       { title: 'Leben G3', fields: [bool('life.off', 'Ohne Lager', { hint: '#169: Gegner stehen an ihren Spawn-Punkten wie früher, keine Simulation' }), num('life.camps', 'Lager', { min: 1, max: 8, hint: 'So viele Lager zum Start eines Durchgangs. Leer = nach Größe (S 1, M 2, L 2, XL 3, XXL 4)' }),
         bool('life.nest', 'Mit Nest', { hint: 'Leer = wenn der POI Mutanten hat. Ansicht: Ökosystem (unten) simuliert N Tage' })] },
@@ -2025,6 +2025,14 @@ export const AREAS = {
         select('awning', 'Vordach / Markise', AWNINGS), bool('fireEscape', 'Feuertreppe'), num('damage', 'Schäden', { unit: '% des Verfalls', min: 0, max: 200, hint: 'Wie stark der Verfall (POIs › Story) an der Hülle zu sehen ist' }),
         num('cover', 'Erde über dem Bunker', { unit: 'Kacheln', min: 1, max: 10, hint: 'Nur Eingegraben' }), select('surface', 'Über der Straße', SURFACES, { hint: 'Nur Oberfläche' }),
         multi('plant', 'Auf dem Gelände', PLANT, { hint: 'Über den Außenräumen im Hintergrund (Anlage, Siedlung)' })] },
+      { title: 'Mega-Store (#178)', fields: [
+        bool('upperAnnex', 'Seitenräume als Block auf dem Dach', { hint: 'Ein Seitenraum über der Halle wird ein eigener Block (Hochregallager), die Halle behält ihre Höhe. Aus = die Halle wächst bis über den Seitenraum (Wohnblock)' }),
+        bool('upperWindows', 'Fenster im Block', { hint: 'Aus = der Block auf dem Dach bleibt geschlossen (Lager)' }),
+        select('entry', 'Eingang', ENTRIES, { hint: 'Vordach über den Türen zu den Außenräumen (Bild: Module › Eingangs-Vordach)' }),
+        bool('stationAll', 'Tankstellendach über jedem Hof', { hint: 'Mit Vordach „Tankstellendach“: über jedem Außenraum am Gebäude, auch im Wow-Raum und am Eingang; folgt dem Steg des Raums, wenn es einen gibt (der Steg ist dann das Dach)' }),
+        bool('pumps', 'Zapfsäulen unter dem Dach'), bool('apron', 'Parkplatz', { hint: 'Asphalt mit Parkstreifen hinter dem Boden der Außenräume' }),
+        multi('yard', 'Auf dem Hof', YARD, { hint: 'Hinter der Spielfläche: Lkw, Werbetafel und Laternen stehen hinter dem Dach, der Rest daneben; nie vor dem Wow-Motiv' }),
+        num('yardGap', 'Abstand auf dem Hof', { unit: 'Kacheln', min: 0, max: 12, hint: 'Leer = 3' })] },
       { title: 'Module (gemalt)', fields: [
         ref('art.wall', 'Wandfläche', 'assets', { hint: '#172: gemalte Textur (PixelLab, AAP-64, 32 px je Kachel, nahtlos), auf dem Raster der Welt gekachelt. Leer = Material aus Code. Gemeinsame Module (Aufbauten, Schäden, Markisen …): Spiel › Hülle › Module' }),
         ref('art.wallAlt', 'Wandfläche Variante', 'assets'), num('art.wallAltShare', 'Anteil Variante', { unit: '%', min: 0, max: 100, hint: 'Leer = 25' }),
@@ -2034,7 +2042,11 @@ export const AREAS = {
         ref('art.base', 'Sockel', 'assets', { hint: 'Textur des Sockels' }), ref('art.band', 'Gesims', 'assets', { hint: 'Waagrechter Streifen, nahtlos nach links und rechts' }),
         ref('art.roof', 'Dachkante / Attika', 'assets', { hint: 'Waagrechter Streifen, auf die Höhe der Dachkante gestaucht' }), color('art.roofTint', 'Dachkante einfärben', { hint: 'Leer = wie gemalt; z. B. die rote Blende der Tankstelle' }),
         ref('art.lisene', 'Lisenen', 'assets', { hint: 'Textur der Ecken und Lisenen' }), color('art.liseneTint', 'Lisenen einfärben'),
-        ref('art.gable', 'Giebel', 'assets', { hint: 'Ganzes Bild, Verhältnis etwa 2,4 : 1; über breiten Bauten sitzt der Giebel in der Mitte' }), ref('art.crown', 'Krone', 'assets', { hint: 'Hochhaus-Krone, ragt höher als die Krone aus Code' })] },
+        ref('art.gable', 'Giebel', 'assets', { hint: 'Ganzes Bild, Verhältnis etwa 2,4 : 1; über breiten Bauten sitzt der Giebel in der Mitte' }), ref('art.crown', 'Krone', 'assets', { hint: 'Hochhaus-Krone, ragt höher als die Krone aus Code' }),
+        ref('art.station', 'Tankstellendach', 'assets', { hint: '#178: überschreibt Spiel › Hülle › Module für diesen Typ' }), ref('art.pylon', 'Werbe-Pylon', 'assets', { hint: 'Leuchtkästen leer: das Logo malt der Code' }),
+        ref('art.entry', 'Eingangs-Vordach', 'assets', { hint: 'Wandseite rechts im Bild' }), refs('art.pump', 'Zapfsäule', 'assets'),
+        refs('art.yard_truck', 'Hof: Lkw-Wrack', 'assets'), refs('art.yard_wreck', 'Hof: Autowrack', 'assets'), refs('art.yard_lamp', 'Hof: Laterne', 'assets'), refs('art.yard_cart', 'Hof: Einkaufswagen', 'assets'),
+        refs('art.yard_dumpster', 'Hof: Müllcontainer', 'assets'), refs('art.yard_billboard', 'Hof: Werbetafel', 'assets'), refs('art.yard_stop', 'Hof: Radstopper und Poller', 'assets')] },
     ],
     check: (x, report) => {
       if ((x.winW ?? 2) >= (x.axis ?? 5)) report('warning', 'Fenster breiter als die Achse: kein Pfeiler dazwischen');

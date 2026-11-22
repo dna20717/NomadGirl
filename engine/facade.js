@@ -19,9 +19,15 @@
 export const HULL_KINDS = [['building', 'Gebäude'], ['buried', 'Eingegraben (Bunker)'], ['lattice', 'Gittermast'], ['decks', 'Offene Decks (Parkhaus)'],
   ['plant', 'Anlage (Raffinerie)'], ['surface', 'Nur Oberfläche (Untergrund)'], ['trailers', 'Wohnwagen-Siedlung']];
 export const ROOF_KINDS = [['flat', 'Flachdach'], ['parapet', 'Attika'], ['gable', 'Satteldach / Giebel'], ['shed', 'Pultdach (Sheds)'], ['crown', 'Krone (Hochhaus)'],
-  ['dome', 'Kuppel'], ['none', 'keins']];
+  ['dome', 'Kuppel'], ['fascia', 'Blende (Mega-Store)'], ['none', 'keins']];
 export const ROOFTOP = [['ac', 'Klimagerät'], ['tank', 'Wassertank'], ['antenna', 'Antenne'], ['dish', 'Schüssel'], ['solar', 'Solarpaneele'], ['chimney', 'Schornstein'],
-  ['vent', 'Lüfter'], ['frame', 'Schildgerüst (leer)'], ['stairs', 'Treppenhaus-Aufbau']];
+  ['vent', 'Lüfter'], ['frame', 'Schildgerüst (leer)'], ['stairs', 'Treppenhaus-Aufbau'], ['pylon', 'Werbe-Pylon (einer, am höchsten Teil)']];
+// #178 a mega-store (Mile 7): an entrance canopy at the doors towards the outdoor rooms, and what stands in the yard behind the play space
+export const ENTRIES = [['none', 'keins'], ['canopy', 'Eingangs-Vordach']];
+export const YARD = [['truck', 'Lkw-Wrack'], ['wreck', 'Autowrack'], ['lamp', 'Laterne'], ['cart', 'Einkaufswagen'], ['dumpster', 'Müllcontainer'], ['billboard', 'Werbetafel (leer)'], ['stop', 'Radstopper und Poller']];
+// size of each yard thing in tiles [w, h] (the painter keeps the picture's aspect inside)
+export const YARD_FAR = new Set(['truck', 'billboard', 'lamp']);
+export const YARD_SIZE = { truck: [12, 4.4], wreck: [4, 1.9], lamp: [2.2, 6.5], cart: [1.3, 1.25], dumpster: [2.8, 2.1], billboard: [5, 6.2], stop: [1.4, 0.55] };
 export const AWNINGS = [['none', 'keine'], ['awning', 'Markise'], ['canopy', 'Vordach'], ['station', 'Tankstellendach über dem Hof']];
 export const MATERIALS = [['concrete', 'Beton (Platten)'], ['brick', 'Ziegel'], ['plaster', 'Putz'], ['metal', 'Blech (Wellen)'], ['glass', 'Glas (Vorhangfassade)'], ['stone', 'Naturstein']];
 export const BASES = [['none', 'kein Sockel'], ['plain', 'glatt'], ['stone', 'Rustika'], ['shop', 'Schaufenster'], ['tiles', 'Fliesen']];
@@ -41,7 +47,11 @@ export function hullGame(D) { const g = D?.game?.hull || {}; return { ...HULL, .
 const BASE = { kind: 'building', floors: 1, floorH: 6, axis: 5, winW: 2, winH: 2, sill: 1, edge: 1, base: 'plain', baseH: 1, roof: 'parapet', roofH: 1,
   rooftop: [], rooftopCount: 2, lisene: true, lisEvery: 0, awning: 'none', fireEscape: false, roomWindows: 35, lit: 12, uniform: false, damage: 100,
   material: 'concrete', wall: '#8b93af', trim: '#4a5462', glass: '#285cc4', frame: '#333941', litColor: '#ffd541', roofColor: '#4a5462', baseColor: '#5a4e44',
-  cover: 4, surface: '', plant: [], neighbors: true };
+  cover: 4, surface: '', plant: [], neighbors: true,
+  // #178 mega-store: side rooms over the hall become their own block (upper, no windows if upperWindows off) instead of raising the hall;
+  // entrance canopy; station roof over every outdoor room beside the building (also the Wow room and the entrance) with pumps under it;
+  // yard things behind the play space; a parking apron
+  upperAnnex: false, upperWindows: true, entry: 'none', stationAll: false, pumps: true, yard: [], yardGap: 3, apron: false };
 export function hullTypes(D) { return D?.hulls || {}; }
 const num = (v, d) => v == null || v === '' || Number.isNaN(+v) ? d : +v;
 
@@ -49,7 +59,7 @@ export function hullConfig(D, poiId) {
   const P = D?.pois?.[poiId] || {}, H = P.hull || {}, G = hullGame(D), type = H.type || null, T = type ? hullTypes(D)[type] || {} : {};
   const c = { ...BASE };
   for (const src of [T, H]) for (const [k, v] of Object.entries(src || {})) if (k !== 'name' && k !== 'description' && k !== 'type' && k !== 'on' && v != null && v !== '' && !(Array.isArray(v) && !v.length && src === H)) c[k] = v;
-  for (const k of ['floors', 'floorH', 'axis', 'winW', 'winH', 'sill', 'edge', 'baseH', 'roofH', 'rooftopCount', 'lisEvery', 'roomWindows', 'lit', 'damage', 'cover']) c[k] = num(c[k], BASE[k]);
+  for (const k of ['floors', 'floorH', 'axis', 'winW', 'winH', 'sill', 'edge', 'baseH', 'roofH', 'rooftopCount', 'lisEvery', 'roomWindows', 'lit', 'damage', 'cover', 'yardGap']) c[k] = num(c[k], BASE[k]);
   c.on = G.enabled !== false && H.on !== false && !!type && !!hullTypes(D)[type];
   c.type = type; c.name = T.name || type || '';
   c.decay = num(H.decay, num(P.story?.decay, 1));
@@ -155,10 +165,12 @@ function buildPlan(D, poiId, L, cfg, opt) {
       const x0 = run[0].x0, x1 = run.at(-1).x1, fh = floorsOf(run), tall = ground - cfg.floors * fh;
       const branches = rooms.filter(r => r.band !== 'main' && r.x1 >= x0 - 2 && r.x0 <= x1 + 2);
       const volumes = run.map(r => {
-        const over = branches.filter(b => b.x1 >= r.x0 && b.x0 <= r.x1);
+        const over = cfg.upperAnnex ? [] : branches.filter(b => b.x1 >= r.x0 && b.x0 <= r.x1);
         return vol(r.x0, r.x1, Math.max(minTop, Math.min(r.top, tall, ...over.map(b => b.top))), ground, { room: r.i });
       });
       if (cfg.uniform) { const top = Math.min(...volumes.map(v => v.top)); for (const v of volumes) v.top = top; }
+      // #178 a side room over the hall is a block of its own on the roof (the high-bay store of the mega-store), the hall keeps its height
+      if (cfg.upperAnnex) for (const b of branches) if (b.x1 >= x0 && b.x0 <= x1 && b.top < Math.min(...volumes.map(v => v.top))) volumes.push(vol(Math.max(b.x0, x0), Math.min(b.x1, x1), Math.max(minTop, b.top), b.bottom, { annex: true, upper: true }));
       for (const b of branches) {
         if (b.x0 < x0) volumes.push(vol(b.x0, Math.min(b.x1, x0 - 1), b.top, b.bottom, { annex: true }));
         if (b.x1 > x1) volumes.push(vol(Math.max(b.x0, x1 + 1), b.x1, b.top, b.bottom, { annex: true }));
@@ -200,6 +212,7 @@ function buildPlan(D, poiId, L, cfg, opt) {
     for (const wy of b.grid.rows) for (const wx of b.axes) {
       const cells = []; for (let y = wy; y < wy + cfg.winH; y++) for (let x = wx; x < wx + cfg.winW; x++) cells.push([x, y]);
       if (!cells.every(([x, y]) => volAt(x, y)?.b === bi)) continue;
+      if (!cfg.upperWindows && cells.some(([x, y]) => volAt(x, y)?.v.upper)) continue;   // #178 the block on the roof has no windows
       const k = rnd(wx, wy, 7), dec = cfg.decay * cfg.damage / 100;
       const win = { x: wx, y: wy, w: cfg.winW, h: cfg.winH, b: bi, lit: k < cfg.lit / 100, broken: rnd(wx, wy, 8) < dec * 0.18, boarded: rnd(wx, wy, 9) < dec * 0.08 };
       if (cells.every(([x, y]) => plan.cls[y * W + x] === 1)) { plan.windows.push({ ...win, where: 'facade', room: null }); continue; }
@@ -239,7 +252,8 @@ function partsOf(D, poiId, L, plan, rooms, main, rnd) {
     const tops = b.volumes.filter(v => !v.annex);
     // plinth (Sockel) and floor bands (Gesims) over the whole building, the painter clips them to facade tiles
     if (cfg.base !== 'none' && cfg.baseH > 0) push({ kind: 'base', style: cfg.base, x: b.x0, y: ground - cfg.baseH, w: b.x1 - b.x0 + 1, h: cfg.baseH, b: bi });
-    for (const F of b.floors || []) if (F < ground && F > b.top) push({ kind: 'band', x: b.x0, y: F, w: b.x1 - b.x0 + 1, h: 1, b: bi });
+    const hallTop = Math.min(...tops.map(v => v.top)), uppers = b.volumes.filter(v => v.upper);   // #178 no storey bands on the block over the hall (it reads as one tall store)
+    for (const F of b.floors || []) if (F < ground && F > b.top && !(cfg.upperAnnex && F <= hallTop)) push({ kind: 'band', x: b.x0, y: F, w: b.x1 - b.x0 + 1, h: 1, b: bi });
     // pilasters (Lisenen): at the corners, and every n axes between the windows
     if (cfg.lisene) {
       for (const v of tops) { push({ kind: 'lisene', x: v.x0, y: v.top, w: 1, h: ground - v.top, b: bi, corner: true }); push({ kind: 'lisene', x: v.x1, y: v.top, w: 1, h: ground - v.top, b: bi, corner: true }); }
@@ -267,15 +281,31 @@ function partsOf(D, poiId, L, plan, rooms, main, rnd) {
       if (kind === 'crown') push({ kind: 'crown', x: v.x0 + w * 0.2, y: v.top - cfg.roofH - 2, w: w * 0.6, h: 2, tall: Math.min(12, w * 0.6 * 1.1), b: bi });
       if (kind === 'dome') push({ kind: 'dome', x: v.x0 + 1, y: v.top - cfg.roofH - Math.min(5, w / 4), w: w - 2, h: Math.min(5, w / 4), b: bi });
       if (kind === 'shed') for (let x = v.x0; x + 4 <= v.x1 + 1; x += 5) push({ kind: 'shed', x, y: v.top - cfg.roofH - 2, w: 5, h: 2, b: bi });
-      if (!units.length || kind === 'gable' || kind === 'dome' || v.annex) return;
+      if (!units.length || kind === 'gable' || kind === 'dome' || (v.annex && !v.upper)) return;
+      const pick = units.filter(u => u !== 'pylon');
+      if (!pick.length) return;
       const n = Math.min(cfg.rooftopCount, Math.floor(w / 5));
       for (let k = 0; k < n; k++) {
-        const u = units[Math.floor(rnd(v.x0, k, 21 + vi) * units.length)], x = v.x0 + 2 + (k + 0.5) * (w - 4) / n + (rnd(v.x0, k, 22) - 0.5) * 2;
+        const u = pick[Math.floor(rnd(v.x0, k, 21 + vi) * pick.length)], x = v.x0 + 2 + (k + 0.5) * (w - 4) / n + (rnd(v.x0, k, 22) - 0.5) * 2;
         const size = { ac: [2, 1.2], tank: [2.4, 3.2], antenna: [0.4, 5], dish: [1.6, 1.8], solar: [4, 1.2], chimney: [1, 3], vent: [1.2, 1.2], frame: [5, 3.5], stairs: [2.6, 2] }[u] || [1, 1];
+        if (!v.upper && uppers.some(o => x + 1.5 >= o.x0 && x - 1.5 <= o.x1)) continue;   // #178 not behind the block on the roof
         if (dec > 1.5 && rnd(x | 0, k, 23) < 0.35) { push({ kind: 'unit', unit: u, fallen: true, x: x - 1, y: v.top - cfg.roofH - 1, w: 2, h: 1, b: bi, tilt: 0 }); continue; }   // fallen off: a wreck lies there
         push({ kind: 'unit', unit: u, x: x - size[0] / 2, y: v.top - cfg.roofH - size[1], w: size[0], h: size[1], b: bi, tilt: dec > 0.5 ? (rnd(x | 0, k, 24) - 0.5) * dec * 6 : 0 });
       }
     });
+    // #178 one advertising pylon on the highest part of the first building (blank light boxes, the brand's logo from code)
+    // (on the hall's roof beside the block, where the sky is free: the camera sees 5 tiles over the level at most)
+    if (list(cfg.rooftop).includes('pylon') && !P.some(p => p.kind === 'pylon')) {
+      let best = null;
+      for (const v of tops) {
+        let a = v.x0 + 2;
+        for (let x = v.x0 + 2; x <= v.x1 - 1; x++) {
+          const cut = uppers.some(u => x >= u.x0 - 2 && x <= u.x1 + 2) || x === v.x1 - 1;
+          if (cut) { if (x - a >= 5 && (!best || x - a > best.w)) best = { x: a, w: x - a, top: v.top }; a = x + 1; }
+        }
+      }
+      if (best) { const pw = 3.4, ph = Math.min(10, best.top - cfg.roofH + 5), x = best.x + best.w * 0.5 - pw / 2; if (ph >= 6) push({ kind: 'pylon', x, y: best.top - cfg.roofH - ph, w: pw, h: ph, b: bi }); }
+    }
     // awnings, canopies and fire escapes: towards the outdoor rooms beside the building (in the background, dimmed: no platform)
     const sideAir = side => { const x = side < 0 ? b.x0 - 1 : b.x1 + 1, r = rooms.find(o => o.band === 'main' && !o.indoor && x >= o.x0 && x <= o.x1); return r || null; };
     for (const side of [-1, 1]) {
@@ -283,6 +313,7 @@ function partsOf(D, poiId, L, plan, rooms, main, rnd) {
       if (!o) continue;
       const ex = side < 0 ? b.x0 : b.x1 + 1;
       if (cfg.awning === 'awning' || cfg.awning === 'canopy') push({ kind: cfg.awning, x: side < 0 ? ex - 3 : ex, y: ground - 5, w: 3, h: cfg.awning === 'awning' ? 1.2 : 0.6, side, b: bi, torn: rnd(ex, 1, 31) < dec * 0.3 });
+      if (cfg.entry === 'canopy') push({ kind: 'entry', x: side < 0 ? ex - 4.2 : ex, y: ground - 5.3, w: 4.2, h: 5.3, side, b: bi });   // #178 over the sliding doors
       if (cfg.fireEscape && b.floors.length > 2 && rnd(ex, 2, 32) < 0.8) push({ kind: 'fire', x: side < 0 ? ex - 3 : ex, y: b.floors[b.floors.length - 2] - 1, w: 3, h: ground - b.floors[b.floors.length - 2] - 3, side, step: b.floorH, b: bi });
     }
     if (cfg.fireEscape && plan.stack === 'tower') {
@@ -317,7 +348,45 @@ function partsOf(D, poiId, L, plan, rooms, main, rnd) {
   // open ground structures over the outdoor rooms (background, dimmed): station roof, plant, trailers, street furniture
   const outs = main.filter(r => !r.indoor && r.bottom === ground);
   // the station roof stands over the forecourt: an outdoor room beside a building, not the entrance, not the Wow room (its motif rules there)
-  if (cfg.awning === 'station') outs.filter((r, i) => i > 0 && !r.wow && B.some(b => b.x0 === r.x1 + 1 || b.x1 === r.x0 - 1)).slice(0, 1).forEach(r => push({ kind: 'station', x: r.x0 + 3, y: ground - 8, w: r.w - 6, h: 1.4, posts: Math.max(2, Math.floor((r.w - 6) / 10)) }));
+  // #178 stationAll (mega-store): over every outdoor room beside a building, the Wow room too (its motif stands in front as a pylon); the
+  // canopy follows the walkway of the room when there is one (the platform reads as the roof), pumps stand in rows under it
+  const stations = [];
+  if (cfg.awning === 'station' && !cfg.stationAll) outs.filter((r, i) => i > 0 && !r.wow && B.some(b => b.x0 === r.x1 + 1 || b.x1 === r.x0 - 1)).slice(0, 1).forEach(r => { const p = { kind: 'station', x: r.x0 + 3, y: ground - 8, w: r.w - 6, h: 1.4, posts: Math.max(2, Math.floor((r.w - 6) / 10)) }; push(p); stations.push(p); });
+  if (cfg.awning === 'station' && cfg.stationAll) for (const r of outs) {
+    if (!B.some(b => b.x0 <= r.x1 + 3 && b.x1 >= r.x0 - 3) && !r.wow) continue;
+    let best = null;   // the longest walkway (platform '=', ladder through it) 5 to 11 rows over the ground
+    for (let y = ground - 11; y <= ground - 5; y++) for (let x = r.x0 + 1, a = -1; x <= r.x1; x++) {
+      const c = plan.tiles[y]?.[x], on = (c === '=' || c === 'H' && (plan.tiles[y][x - 1] === '=' || plan.tiles[y][x + 1] === '=')) && x < r.x1;
+      if (on && a < 0) a = x;
+      if (!on && a >= 0) { if (x - a >= 8 && (!best || x - a > best.w)) best = { x: a, y, w: x - a }; a = -1; }
+    }
+    const p = best ? { kind: 'station', x: best.x - 0.25, y: best.y, w: best.w + 0.5, h: 1.4, walk: true } : { kind: 'station', x: r.x0 + 3, y: ground - 8, w: r.w - 6, h: 1.4 };
+    if (p.w < 6) continue;
+    p.posts = Math.max(1, Math.round(p.w / 9)); push(p); stations.push(p);
+  }
+  if (cfg.pumps) for (const st of stations) for (let k = 0, n = Math.max(1, Math.floor(st.w / 6)); k < n; k++) push({ kind: 'pump', x: st.x + (k + 0.5) * st.w / n - 0.7 + (k % 2 ? 1.2 : -1.2), y: ground - 2.2, w: 1.4, h: 2.2, seed: k });
+  // #178 the yard behind the play space: a parking apron with bay lines, wrecks, lamps, carts, dumpsters, blank billboards (slot by slot,
+  // never under the station roof, never in front of the Wow motif)
+  const yard = list(cfg.yard);
+  if (cfg.apron || yard.length) outs.forEach((r, ri) => {
+    if (cfg.apron) push({ kind: 'apron', x: r.x0, y: ground - 0.55, w: r.w, h: 0.55 });
+    if (!yard.length) return;
+    // far things (truck, billboard, lamp) stand behind the station roof, near ones (carts, dumpsters, wheel stops, car wrecks) beside it
+    const busy = stations.filter(st => st.x < r.x1 && st.x + st.w > r.x0).map(st => [st.x - 0.5, st.x + st.w + 0.5]), wowBusy = [];
+    const P0 = D?.pois?.[poiId]?.wow, wp = r.wow && Array.isArray(P0?.point) ? r.x0 + P0.point[0] : null;
+    if (wp != null) wowBusy.push([wp - 4, wp + 4]);
+    const free = (a, z, far) => ![...wowBusy, ...(far ? [] : busy)].some(([p, q]) => a < q && z > p);
+    let x = r.x0 + 1, k = 0, truck = 0;
+    while (x < r.x1 - 1 && k < 40) {
+      const want = yard.filter(u => u !== 'truck' || !truck), u = want[Math.floor(rnd(x | 0, ri, 71) * want.length)], [sw, sh] = YARD_SIZE[u] || [2, 2];
+      k++;
+      const far = YARD_FAR.has(u);
+      if (x + sw > r.x1 - 1 || !free(x, x + sw, far)) { x += 1; continue; }
+      push({ kind: 'yard', what: u, x, y: ground - sh, w: sw, h: sh, seed: k + ri * 50, flip: rnd(x | 0, ri, 72) < 0.5, far });
+      if (u === 'truck') truck++;
+      x += sw + cfg.yardGap * (0.5 + rnd(x | 0, ri, 73));
+    }
+  });
   const plant = list(cfg.plant);
   if (plant.length) outs.forEach((r, i) => {
     for (let k = 0, x = r.x0 + 2 + rnd(i, 0, 61) * 4; x < r.x1 - 4 && k < 6; k++) {

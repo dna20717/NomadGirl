@@ -9379,5 +9379,124 @@
   "source": "KI (PixelLab, create_1_direction_object 128 px, 8 Aufträge à 4 Teile, AAP-64)",
   "date": "2026-11-22",
   "description": "#174: alle 32 Kandidaten, wie sie kamen (128 × 128 je Teil, alphabetisch: Material, Ansicht, Zustand)."
+ },
+ "megastore_source": {
+  "name": "Mega-Store · PixelLab-Bogen (Original)",
+  "kind": "source",
+  "file": "assets/pois/megastore/orig/megastore_pixellab_178.png",
+  "source": "KI (PixelLab): 3 Aufträge 128 px mit je 4 verschiedenen Teilen (Innen, Hof, Bauteile) + 3 Aufträge 256 px (Tankstellendach, Lkw-Wrack, Werbe-Pylon), AAP-64",
+  "date": "2026-11-22",
+  "description": "#178 Originale nebeneinander (je 256 × 256): Billboard, Tankstellendach, Einkaufswagen, Kasse, Kühlregal, Müllcontainer, Vordach, Laterne, Neonröhre, Zapfsäule, Pylon, Regal, Imbiss, Lkw, Radstopper."
+ },
+ "megastore_canopy": {
+  "name": "Mega-Store · Tankstellendach mit Lichtleisten",
+  "kind": "image",
+  "file": "assets/pois/megastore/canopy.png",
+  "source": "KI (PixelLab, create_1_direction_object, Seitenansicht, AAP-64), Ränder beschnitten (Code), Boden-Streifen entfernt",
+  "date": "2026-11-22",
+  "description": "#178 Mile 7 als Mega-Store. Abschnitt mit rot-weißer Blende, Lichtleisten unten und Stütze; wird über die Zapfinseln gereiht. 230 × 175 px. Ohne Text.",
+  "derivedFrom": "megastore_source"
+ },
+ "megastore_pylon": {
+  "name": "Mega-Store · Werbe-Pylon (leer)",
+  "kind": "image",
+  "file": "assets/pois/megastore/pylon.png",
+  "source": "KI (PixelLab, create_1_direction_object, Seitenansicht, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#178 Mile 7 als Mega-Store. Zwei leere Leuchtkästen am Mast, das Logo (orangenes Delta) malt der Code darauf. Ohne Text.",
+  "derivedFrom": "megastore_source"
+ },
+ "megastore_entry": {
+  "name": "Mega-Store · Eingangs-Vordach",
+  "kind": "image",
+  "file": "assets/pois/megastore/entry.png",
+  "source": "KI (PixelLab, create_1_direction_object, Seitenansicht, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#178 Mile 7 als Mega-Store. Flaches Vordach mit Downlights und Stütze über den Schiebetüren. Ohne Text.",
+  "derivedFrom": "megastore_source"
+ },
+ "megastore_pump": {
+  "name": "Mega-Store · Zapfsäule",
+  "kind": "image",
+  "file": "assets/pois/megastore/pump.png",
+  "source": "KI (PixelLab, create_1_direction_object, Seitenansicht, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#178 Mile 7 als Mega-Store. Rot-weiße Zapfsäule mit leerem Display und Schlauch. Ohne Text.",
+  "derivedFrom": "megastore_source"
+ },
+ "megastore_truck": {
+  "name": "Mega-Store · Lkw-Wrack",
+  "kind": "image",
+  "file": "assets/pois/megastore/truck.png",
+  "source": "KI (PixelLab, create_1_direction_object, Seitenansicht, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#178 Mile 7 als Mega-Store. Rostiger Sattelzug mit Kofferauflieger, platte Reifen. Ohne Text.",
+  "derivedFrom": "megastore_source"
+ },
+ "megastore_cart": {
+  "name": "Mega-Store · Einkaufswagen",
+  "kind": "image",
+  "file": "assets/pois/megastore/cart.png",
+  "source": "KI (PixelLab, create_1_direction_object, Seitenansicht, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#178 Mile 7 als Mega-Store. Verlassener Einkaufswagen. Ohne Text.",
+  "derivedFrom": "megastore_source"
+ },
+ "megastore_dumpster": {
+  "name": "Mega-Store · Müllcontainer",
+  "kind": "image",
+  "file": "assets/pois/megastore/dumpster.png",
+  "source": "KI (PixelLab, create_1_direction_object, Seitenansicht, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#178 Mile 7 als Mega-Store. Grüner Stahlcontainer, verbeult. Ohne Text.",
+  "derivedFrom": "megastore_source"
+ },
+ "megastore_lamp": {
+  "name": "Mega-Store · Laterne (doppelt)",
+  "kind": "image",
+  "file": "assets/pois/megastore/lamp.png",
+  "source": "KI (PixelLab, create_1_direction_object, Seitenansicht, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#178 Mile 7 als Mega-Store. Hohe Doppel-Laterne am Highway. Ohne Text.",
+  "derivedFrom": "megastore_source"
+ },
+ "megastore_billboard": {
+  "name": "Mega-Store · Werbetafel (leer)",
+  "kind": "image",
+  "file": "assets/pois/megastore/billboard.png",
+  "source": "KI (PixelLab, create_1_direction_object, Seitenansicht, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#178 Mile 7 als Mega-Store. Leere, verblichene Tafel auf zwei Stahlbeinen. Ohne Text.",
+  "derivedFrom": "megastore_source"
+ },
+ "megastore_wheelstop": {
+  "name": "Mega-Store · Radstopper",
+  "kind": "image",
+  "file": "assets/pois/megastore/wheelstop.png",
+  "source": "KI (PixelLab, create_1_direction_object, Seitenansicht, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#178 Mile 7 als Mega-Store. Beton-Radstopper mit gelben Streifen. Ohne Text.",
+  "derivedFrom": "megastore_source"
+ },
+ "megastore_bollard": {
+  "name": "Mega-Store · Poller",
+  "kind": "image",
+  "file": "assets/pois/megastore/bollard.png",
+  "source": "KI (PixelLab, create_1_direction_object, Seitenansicht, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "#178 Mile 7 als Mega-Store. Kurzer gelber Poller. Ohne Text.",
+  "derivedFrom": "megastore_source"
+ },
+ "megastore_props": {
+  "name": "Symbole: Mega-Store innen",
+  "kind": "icons",
+  "file": "assets/pois/megastore/props.png",
+  "cell": [128, 128],
+  "grid": [4, 2],
+  "names": ["Supermarktregal", "Kühlregal", "Kasse", "Imbiss-Theke", "Einkaufswagen", "Müllcontainer", "Zapfsäule", "Neonröhre"],
+  "description": "#178 Mile 7 als Mega-Store: Supermarkt-Einrichtung als Marken-Clutter (POIs › Marken-Clutter), unten bündig, die Neonröhre oben bündig (hängt). Ohne Text.",
+  "source": "KI (PixelLab, create_1_direction_object, Seitenansicht, AAP-64), Ränder beschnitten (Code), in Zellen zu 128 px gesetzt (Code)",
+  "date": "2026-11-22",
+  "derivedFrom": "megastore_source"
  }
 }

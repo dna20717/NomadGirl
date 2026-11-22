@@ -80,5 +80,26 @@
   "place": ["floor_in"],
   "weight": 2,
   "members": [{"tag": "bank", "side": "core"},{"tag": "bank|sitz", "side": "right", "gap": 0},{"tag": "grün|müll", "side": "right", "gap": 0, "optional": true}]
+ },
+ "regalreihe": {
+  "name": "Regalreihe",
+  "description": "#178 Supermarkt: Regale im Takt, am Ende ein Kühlregal oder Automat.",
+  "roles": ["shop"],
+  "place": ["floor_in"],
+  "weight": 6,
+  "members": [
+   {"tag": "regal", "side": "core"},
+   {"tag": "regal", "side": "right", "gap": 1, "optional": true},
+   {"tag": "regal", "side": "left", "gap": 1, "optional": true},
+   {"tag": "automat", "side": "right", "gap": 1, "optional": true}
+  ]
+ },
+ "imbiss": {
+  "name": "Imbiss-Ecke",
+  "description": "#178 Imbiss-Theke mit Automat und Kühlbox daneben.",
+  "roles": ["shop", "living"],
+  "place": ["floor_in"],
+  "weight": 3,
+  "members": [{"tag": "küche", "side": "core"},{"tag": "automat", "side": "left", "gap": 1, "optional": true},{"tag": "vorrat|müll", "side": "right", "gap": 0, "optional": true}]
  }
 }

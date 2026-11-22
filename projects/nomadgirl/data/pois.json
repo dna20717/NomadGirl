@@ -92,7 +92,54 @@
     "tags": "automat, laden, licht",
     "roles": "shop, corridor"
    },
-   {"look": "icons_nomadcola", "name": "Kistenstapel", "cm": 80, "chance": 3, "place": "floor_in, corner", "tags": "kiste", "roles": "storage, shop"}
+   {"look": "icons_nomadcola", "name": "Kistenstapel", "cm": 80, "chance": 3, "place": "floor_in, corner", "tags": "kiste", "roles": "storage, shop"},
+   {"look": "megastore_props", "name": "Supermarktregal", "cm": 165, "w": 4, "chance": 30, "place": "floor_in", "tags": "regal, laden", "roles": "shop", "strict": true},
+   {
+    "look": "megastore_props",
+    "name": "Kühlregal",
+    "cm": 200,
+    "w": 4,
+    "chance": 14,
+    "place": "floor_in, corner",
+    "tags": "automat, laden, licht",
+    "roles": "shop",
+    "strict": true
+   },
+   {"look": "megastore_props", "name": "Kasse", "cm": 110, "w": 3, "chance": 10, "place": "floor_in", "tags": "kasse, laden", "roles": "shop", "strict": true},
+   {
+    "look": "megastore_props",
+    "name": "Imbiss-Theke",
+    "cm": 115,
+    "w": 3,
+    "chance": 8,
+    "place": "floor_in",
+    "tags": "küche, kasse, laden",
+    "roles": "shop, living",
+    "strict": true
+   },
+   {
+    "look": "megastore_props",
+    "name": "Einkaufswagen",
+    "cm": 100,
+    "w": 2,
+    "chance": 5,
+    "place": "floor_in, floor_out",
+    "tags": "laden, müll",
+    "roles": "shop, outdoor, corridor, storage"
+   },
+   {
+    "look": "megastore_props",
+    "name": "Müllcontainer",
+    "cm": 140,
+    "w": 4,
+    "chance": 3,
+    "place": "floor_out, corner",
+    "tags": "müll, straße",
+    "roles": "outdoor, hall",
+    "strict": true
+   },
+   {"look": "megastore_props", "name": "Zapfsäule", "cm": 180, "w": 2, "chance": 4, "place": "floor_out", "tags": "straße, kanister", "roles": "outdoor", "strict": true},
+   {"look": "megastore_props", "name": "Neonröhre", "cm": 55, "chance": 12, "place": "ceiling", "tags": "licht", "roles": "shop, hall, storage, corridor"}
   ],
   "story": {
    "before": "Letzte Delta-Petrol-Tankstelle vor der Salzebene, Familienbetrieb mit Waschstraße, Reifenlager und Werkstatthalle",

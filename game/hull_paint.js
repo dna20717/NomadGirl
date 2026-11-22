@@ -49,7 +49,10 @@ function tinted(img, color, k = 0.6) {
   const key = color + k;
   if (!m.has(key)) {
     const c = mkCanvas(img.width, img.height), x = c.getContext('2d');
-    x.drawImage(img, 0, 0); x.globalCompositeOperation = 'source-atop'; x.globalAlpha = k; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height);
+    // #178 multiply keeps the painted light and shade (a plain overlay made the red fascia look pink), then a little of the colour on top
+    x.drawImage(img, 0, 0); x.globalCompositeOperation = 'multiply'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height);
+    x.globalCompositeOperation = 'source-atop'; x.globalAlpha = k * 0.35; x.fillRect(0, 0, c.width, c.height);
+    x.globalAlpha = 1; x.globalCompositeOperation = 'destination-in'; x.drawImage(img, 0, 0);
     m.set(key, c);
   }
   return m.get(key);
@@ -267,6 +270,8 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
   for (const p of plan.parts) {
     if (p.x > x0 + w + 4 || p.x + p.w < x0 - 4) continue;
     // #172 painted: parapet/coping strip, pediment, crown, rooftop units (variants), a fallen wreck, the bunker lintel
+    if (p.kind === 'roof' && p.roof === 'fascia') { drawFascia(ctx, p, g, { trim, px1, R, decay: (C.decay ?? 1) * (C.damage ?? 100) / 100 }); continue; }
+    if (p.kind === 'pylon') { const im = M('pylon'); if (im) { const r = fitIn(ctx, im, p.x * g, p.y * g, p.w * g, p.h * g, { mode: 'height', stretch: 1 }); pylonLogos(ctx, r, g, (C.decay ?? 1) * (C.damage ?? 100) / 100); } continue; }
     if (p.kind === 'roof' && M('roof')) { tileRect(tinted(M('roof'), C.art?.roofTint), p.x, p.y, p.w, p.h, { stripH: p.h }); R(INK, p.x, p.y, 1 / g, p.h); R(INK, p.x + p.w - 1 / g, p.y, 1 / g, p.h); R(INK, p.x, p.y + p.h - 1 / g, p.w, 1 / g); continue; }
     if (p.kind === 'gable' && M('gable')) { R(roofC, p.x - 0.3, p.y + p.h - 0.2, p.w + 0.6, 0.3); ctx.drawImage(M('gable'), Math.round(p.x * g), Math.round(p.y * g), Math.round(p.w * g), Math.round(p.h * g)); continue; }
     if (p.kind === 'crown' && M('crown')) { const t = p.tall || p.h; fitIn(ctx, M('crown'), p.x * g, (p.y + p.h - t) * g, p.w * g, t * g, { stretch: 1.2 }); continue; }
@@ -308,14 +313,35 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
     if (p.kind === 'lattice') drawLattice(ctx, p, g, { trim: snap(C.trim), white: snap(C.wall), px1, back });
   }
   // ---------- 5. behind the play space (dimmed): awnings, canopies, the station roof, fire escapes, plant, street structures ----------
+  // #178 first the parking apron and the far yard (trucks, billboards, lamps behind the station roof), at the end the near yard
+  const near = p => !(p.x > x0 + w + 12 || p.x + p.w < x0 - 12);
+  for (const p of plan.parts) if (p.kind === 'apron' && near(p)) drawApron(ctx, p, g, { back, R, px1 });
+  for (const p of plan.parts) if (p.kind === 'yard' && p.far && near(p)) drawYard(ctx, p, g, M, dim / 100 * 1.15);
   for (const p of plan.parts) {
     if (p.x > x0 + w + 12 || p.x + p.w < x0 - 12) continue;
+    if (p.kind === 'apron' || p.kind === 'yard') continue;
     // #172 painted and darkened like everything behind the play space
     const dk = dim / 100;
+    if (p.kind === 'pump') { const im = M('pump', p.seed); if (im) fitIn(ctx, dimmed(im, dk * 0.9), p.x * g, p.y * g, p.w * g, p.h * g, { mode: 'height', stretch: 1, flip: p.seed % 2 === 1 }); continue; }
+    if (p.kind === 'entry') {   // #178 the entrance canopy over the sliding doors: the wall end of the picture (right) at the building
+      const im = M('entry'); if (!im) continue;
+      const r = fitIn(ctx, dimmed(im, dk * 0.7), p.x * g, p.y * g, p.w * g, p.h * g, { mode: 'height', stretch: 1, flip: p.side > 0 });
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      const gr = ctx.createLinearGradient(0, r.y + r.h * 0.2, 0, r.y + r.h); gr.addColorStop(0, 'rgba(255,236,190,0.16)'); gr.addColorStop(1, 'rgba(255,236,190,0)');
+      ctx.fillStyle = gr; ctx.fillRect(r.x + r.w * 0.05, r.y + r.h * 0.2, r.w * 0.9, r.h * 0.8); ctx.restore();
+      continue;
+    }
     if (p.kind === 'awning' && M('awning')) { const im = dimmed(M('awning'), dk), hh = p.w * im.height / im.width; ctx.drawImage(im, Math.round(p.x * g), Math.round(p.y * g), Math.round(p.w * g), Math.round(hh * g)); continue; }
     if (p.kind === 'station' && M('station')) {   // the canopy in sections, each with its post down to the ground
       const im = dimmed(M('station'), dk), H0 = plan.ground - p.y, segW = H0 * im.width / im.height, n = Math.max(1, Math.round(p.w / segW)), sw = p.w / n;
       for (let k = 0; k < n; k++) ctx.drawImage(im, Math.round((p.x + k * sw) * g), Math.round(p.y * g), Math.round(sw * g) + 1, Math.round(H0 * g));
+      // #178 the light strips under the canopy fall on the forecourt (a soft warm cone, drawn additive)
+      if (p.walk || C.stationAll) {
+        const ly = (p.y + H0 * 0.3) * g, lh = (plan.ground - p.y - H0 * 0.3) * g;
+        ctx.save(); ctx.globalCompositeOperation = 'lighter';
+        const gr = ctx.createLinearGradient(0, ly, 0, ly + lh); gr.addColorStop(0, 'rgba(230,240,255,0.2)'); gr.addColorStop(0.6, 'rgba(255,230,190,0.07)'); gr.addColorStop(1, 'rgba(255,230,190,0)');
+        ctx.fillStyle = gr; ctx.fillRect(Math.round(p.x * g), Math.round(ly), Math.round(p.w * g), Math.round(lh)); ctx.restore();
+      }
       continue;
     }
     if (p.kind === 'fire' && M('fire')) {   // one flight per storey, alternating
@@ -345,7 +371,64 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
     if (p.kind === 'surface') drawSurface(ctx, p, g, { back, trim, wall, glass, px1, R, C });
     if (p.kind === 'street') { R(back(0x333941), p.x, p.y + 1 - 0.15, p.w, 0.15); }
   }
+  for (const p of plan.parts) if (p.kind === 'yard' && !p.far && near(p)) drawYard(ctx, p, g, M, dim / 100 * 0.8);
   ctx.restore();
+}
+
+// #178 the fascia of the mega-store (Mile 7): coping, a red band with a white and an orange stripe, every ~24 tiles a white roundel with
+// the orange delta of Delta Petrol (shapes from code, no lettering), panels missing by decay with the steel showing
+function drawFascia(ctx, p, g, { trim, px1, R, decay }) {
+  const red = trim, hiRed = mix(trim, 0xffffff, 0.22), loRed = mix(trim, DARK, 0.35);
+  R(0xb3b9d1, p.x, p.y, p.w, 0.2); R(0xdae0ea, p.x, p.y, p.w, 1 / g); R(0x6d758d, p.x, p.y + 0.2 - 1 / g, p.w, 1 / g);
+  R(red, p.x, p.y + 0.2, p.w, p.h - 0.45); R(hiRed, p.x, p.y + 0.2, p.w, 2 / g);
+  R(0xdae0ea, p.x, p.y + p.h * 0.52, p.w, p.h * 0.1); R(0xfa6a0a, p.x, p.y + p.h * 0.62, p.w, p.h * 0.05);
+  R(loRed, p.x, p.y + p.h - 0.35, p.w, 0.1); R(0x333941, p.x, p.y + p.h - 0.25, p.w, 0.25); R(INK, p.x, p.y + p.h - 1 / g, p.w, 1 / g);
+  for (let x = p.x + 2; x < p.x + p.w - 1; x += 2) R(loRed, x, p.y + 0.22, 1 / g, p.h * 0.28);   // panel joints
+  // weathering: rust runs from the joints, by decay
+  for (let k = 0; k < p.w * decay * 0.4; k++) { const x = p.x + hash(k, p.x | 0, 91) * p.w, hh = 0.2 + hash(k, 2, 92) * 0.5; R(0x71413b, x, p.y + 0.25, 2 / g, hh); }
+  // logos: a white roundel with the orange delta
+  const n = Math.max(1, Math.round(p.w / 24));
+  for (let k = 0; k < n; k++) {
+    const cx = p.x + (k + 0.5) * p.w / n, cy = p.y + p.h * 0.45, r = p.h * 0.42;
+    ctx.fillStyle = css(INK); ctx.beginPath(); ctx.arc(cx * g, cy * g, r * g + px1, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = css(0xfef3c0); ctx.beginPath(); ctx.arc(cx * g, cy * g, r * g, 0, Math.PI * 2); ctx.fill();
+    deltaLogo(ctx, cx * g, cy * g, r * g * 0.72, px1);
+  }
+  // missing panels: the steel frame behind
+  for (let k = 0; k < Math.floor(decay * p.w / 70); k++) {
+    const x = p.x + 1 + hash(k, p.x | 0, 93) * (p.w - 4), ww = 0.8 + hash(k, 3, 94) * 0.9;
+    if (Array.from({ length: n }, (_, i) => p.x + (i + 0.5) * p.w / n).some(cx => Math.abs(cx - x - ww / 2) < p.h)) continue;   // keep the logos
+    R(0x5b3138, x, p.y + 0.2, ww, p.h * 0.5); R(0x3b1725, x, p.y + 0.2 + p.h * 0.5, ww, p.h * 0.5 - 0.45); for (let xx = x + 0.25; xx < x + ww; xx += 0.5) R(0x4a5462, xx, p.y + 0.2, 1 / g, p.h - 0.45);
+  }
+}
+// the orange delta (Delta Petrol), a triangle with a lighter inner triangle, centred on (cx, cy), r = half its height, in pixels
+function deltaLogo(ctx, cx, cy, r, px1) {
+  const tri = (k, c) => { ctx.fillStyle = css(c); ctx.beginPath(); ctx.moveTo(cx, cy - r * k); ctx.lineTo(cx + r * 1.1 * k, cy + r * 0.85 * k); ctx.lineTo(cx - r * 1.1 * k, cy + r * 0.85 * k); ctx.closePath(); ctx.fill(); };
+  tri(1.12, INK); tri(1, 0xfa6a0a); tri(0.45, 0xfef3c0);
+  ctx.fillStyle = css(0xb4202a); ctx.fillRect(Math.round(cx - r * 1.1), Math.round(cy + r * 0.85 - px1 * 2), Math.round(r * 2.2), px1 * 2);
+}
+// the logos on the pylon's blank light boxes: the delta in the upper box, orange and yellow stripes below; a dead lower box by decay
+function pylonLogos(ctx, r, g, decay) {
+  const box = (fy, fh) => ({ x: r.x + r.w * 0.13, y: r.y + r.h * fy, w: r.w * 0.7, h: r.h * fh });
+  const a = box(0.03, 0.12), b = box(0.215, 0.115);
+  ctx.save();
+  ctx.fillStyle = 'rgba(254,243,192,0.55)'; ctx.fillRect(a.x, a.y, a.w, a.h);
+  deltaLogo(ctx, a.x + a.w / 2, a.y + a.h * 0.52, a.h * 0.36, Math.max(1, Math.round(g / 16)));
+  if (decay < 2.5) { ctx.fillStyle = css(0xfa6a0a); ctx.fillRect(b.x, b.y + b.h * 0.25, b.w, b.h * 0.2); ctx.fillStyle = css(0xf9a31b); ctx.fillRect(b.x, b.y + b.h * 0.55, b.w, b.h * 0.12); }
+  else { ctx.fillStyle = 'rgba(20,16,19,0.55)'; ctx.fillRect(b.x, b.y, b.w, b.h); ctx.fillStyle = css(0xfa6a0a); ctx.fillRect(b.x, b.y + b.h * 0.3, b.w * 0.45, b.h * 0.18); }
+  ctx.restore();
+}
+// the parking apron behind the play floor: asphalt, a kerb, slanted bay lines (the far edge of the lot), dust over it
+function drawApron(ctx, p, g, { back, R, px1 }) {
+  R(back(0x322b28), p.x, p.y, p.w, p.h); R(back(0x5a4e44), p.x, p.y, p.w, 2 / g); R(back(0x8b93af), p.x, p.y + 2 / g, p.w, 1 / g);
+  ctx.fillStyle = css(back(0xc7b08b));
+  for (let x = p.x + 1; x < p.x + p.w - 0.5; x += 3) { ctx.beginPath(); ctx.moveTo(x * g, (p.y + 0.15) * g); ctx.lineTo((x + 0.12) * g, (p.y + 0.15) * g); ctx.lineTo((x + 0.55) * g, (p.y + p.h) * g); ctx.lineTo((x + 0.4) * g, (p.y + p.h) * g); ctx.closePath(); ctx.fill(); }
+  for (let k = 0; k < p.w * 1.5; k++) { const x = p.x + hash(k, p.x | 0, 95) * p.w; R(back(0xa08662), x, p.y + p.h * (0.3 + hash(k, 1, 96) * 0.6), 0.3 + hash(k, 2, 97) * 0.8, px1 / g); }
+}
+// one thing of the yard (truck, car wreck, lamp, cart, dumpster, billboard, wheel stop), painted and darkened
+function drawYard(ctx, p, g, M, dk) {
+  const im = M('yard_' + p.what, p.seed); if (!im) return;
+  fitIn(ctx, dimmed(im, Math.min(0.85, dk)), p.x * g, p.y * g, p.w * g, p.h * g, { mode: 'height', stretch: 1, flip: !!p.flip && p.what !== 'billboard' });
 }
 
 function drawUnit(ctx, p, g, { trim, roofC, frame, wall, lit, px1, R, mix: m }) {

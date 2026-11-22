@@ -129,6 +129,7 @@ export function roleConfig(D) {
 export function roleWeight(rule, role, cfg) {
   let w = rule?.weight ?? 1;
   const roles = list(rule?.roles), tags = list(rule?.tags), c = cfg ? cfg(role) : { prefer: [], avoid: [] };
+  if (roles.length && rule?.strict && !roles.includes(role)) return 0;   // #178 Marken-Clutter „nur in diesen Rollen“ (Supermarktregal nie im Tunnel)
   if (roles.length) w *= roles.includes(role) ? 3 : 0.25;
   if (tags.some(t => c.prefer.includes(t))) w *= 2;
   if (tags.some(t => c.avoid.includes(t))) w *= 0.25;
@@ -182,7 +183,7 @@ export function setPool(D, id, T = 64) {
 // Marken-Clutter of a POI as candidates: their chance becomes their weight (Spiel › Set-Dressing › Marken-Gewicht)
 export function brandPool(D, poiId, T = 64) {
   const k = pxPerCm(D), w = dressingConfig(D).brandWeight / 100;
-  return (D.pois?.[poiId]?.brandProps || []).filter(b => b.look && b.name).map(b => ({ set: null, brand: true, key: b.look, name: b.name, w: 1, h: Math.max(1, Math.ceil((b.cm || 100) * k / T - 0.15)), ai: !!b.ai,
+  return (D.pois?.[poiId]?.brandProps || []).filter(b => b.look && b.name).map(b => ({ set: null, brand: true, key: b.look, name: b.name, w: Math.max(1, Math.min(6, Math.round(+b.w || 1))), h: Math.max(1, Math.ceil((b.cm || 100) * k / T - 0.15)), ai: !!b.ai,
     rule: { ...b, weight: (b.chance ?? 5) * w } }));
 }
 const tagsOf = c => list(c.rule?.tags);
