@@ -12,6 +12,12 @@ Stand 22.11.2026 · Ava (Code) nach der Runde #160–#172 (Story, Level-Design, 
 | 4 | **Umgebung zum Anfassen**: zerbrechliches Clutter (Glas, Kisten, Flaschen), Gefahren (Strom im Wasser, Gas + Funken, einstürzende Böden), Physik-Objekte (Fässer rollen, explodieren), Traversal-Momente (Seilrutsche, fahrender Aufzug, Förderband) | Die Räume sehen jetzt echt aus, reagieren aber kaum. Interaktion macht aus Kulisse einen Spielplatz und passt zu Leylas Granaten und Wende-Wurf. | M–L |
 | 5 | **Mehr Raum-Bausteine je POI** (heute ≈ 9 Räume je POI, 123 gesamt) | Zyklus-Graph, Rhythmus und Story würfeln gut, aber aus wenig Material: nach ein paar Runs kennt man die Räume. Ziel ≈ 15 je POI, mit G6 (WFC) halb automatisch. | M (mit G6) |
 
+## Was die Levelkarten zeigen (Megamall und Silo Zero, Seed 1)
+
+- **Megamall:** Die Hülle macht aus dem Level endlich ein Gebäude, aber die drei Obergeschosse sind reine Fassade mit gleichförmigen Fenstern; gespielt wird fast nur auf einem langen Erdgeschoss plus Tunnel. Mehr begehbare Etagen (Galerien, Rolltreppen) würden die Mall-Fantasie tragen.
+- **Silo Zero:** schöner Abstieg mit der Rakete als Höhepunkt kurz vor dem Tresor; das Gestein zwischen den Räumen ist aber eine große, gleichmäßige Fläche, und darin steht auf vielen Kacheln die Zahl **„07“** (gebackene Schrift im Kachel-Set, gegen die neue Regel).
+- **Ordnungsreihen wiederholen sich:** dieselbe Werkbank fünfmal nebeneinander (#159 „Ordnung“); Reihen brauchen Varianten oder Lücken mit Abwechslung.
+
 ## Aussehen
 
 - **Fassaden-Module gemalt** (#172, läuft): die Hüllen aus Code wirken flach.
