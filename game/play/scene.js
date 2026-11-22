@@ -34,6 +34,8 @@ import { Life, prepareLife } from './life.js';
 import { Director } from './director.js';
 import { landmarkViews } from '../../engine/level_design.js';
 import { hasLabels, applyLabels, loadFont, RAW } from '../labels.js';
+import { planHull } from '../../engine/facade.js';
+import { Hull, hullSkyline } from './hull.js';
 import { Drone } from './drone.js';
 import { Van } from './van.js';
 import { DriveUI } from './drive_ui.js';
@@ -180,7 +182,12 @@ export class PlayScene extends Phaser.Scene {
     // #163 windows to the landmark: holes in the back wall (engine/level_design.js landmarkViews)
     const holes = new Set();
     if (LI?.def && this.mode !== 'camp') for (const v of landmarkViews(D, this.levelPoi, LI)) if (v.win) for (let y = v.win.y; y < v.win.y + v.win.h; y++) for (let x = v.win.x; x < v.win.x + v.win.w; x++) holes.add(x + ',' + y);
-    return { reg, kits, idAt: reg.idAt, inside: reg.inside, at: (x, y) => kits(reg.idAt(x, y)), back: (x, y) => reg.inside(x, y) && !holes.has(x + ',' + y) ? backOf(reg.idAt(x, y)) : null };
+    // #171 Hüllen G4: the building around the rooms (engine/facade.js); its tiles are drawn by game/play/hull.js, its room windows are holes
+    const plan = LI?.def && this.mode !== 'camp' && !this.megarig ? planHull(D, this.levelPoi, LI) : null;
+    this.hullPlan = plan?.on ? plan : null;
+    const HP = this.hullPlan, isHull = HP ? (x, y) => x >= 0 && y >= 0 && x < HP.W && y < HP.H && HP.cls[y * HP.W + x] > 0 : null;
+    if (HP) for (const w of HP.windows) if (w.where === 'room') for (let y = w.y; y < w.y + w.h; y++) for (let x = w.x; x < w.x + w.w; x++) holes.add(x + ',' + y);
+    return { reg, kits, idAt: reg.idAt, inside: isHull ? (x, y) => !isHull(x, y) && reg.inside(x, y) : reg.inside, skip: isHull, at: (x, y) => kits(reg.idAt(x, y)), back: (x, y) => reg.inside(x, y) && !holes.has(x + ',' + y) ? backOf(reg.idAt(x, y)) : null };
   }
   // Ort-Typen of the room or level (#158, engine/dressing.js placeTypes), once per room
   placeMap() { return this.places_ ??= placeTypes(this.room, this.terrain?.reg || regionMap(this.data_, { roomId: this.roomId })); }
@@ -327,6 +334,7 @@ export class PlayScene extends Phaser.Scene {
     this.parallaxSet = null;
     if (bd?.image || bd?.weather || bd?.parallax) this.backdrop = new Backdrop(this, bd, H, W); else drawBackground(this, W, H);
     if (this.mode === 'camp' || this.megarig) drawCampBackground(this, this.data_.camp || {});
+    if (this.levelInfo?.def && this.mode !== 'camp' && !this.megarig) hullSkyline(this, W);   // #171 BigCityDelta and the neighbours from the building grammar
     const background = this.children.list.filter(o => !before.has(o));
     this.bgCam = this.cameras.main;
     this.cam = this.cameras.add(0, 0, this.scale.width, this.scale.height);
@@ -341,6 +349,7 @@ export class PlayScene extends Phaser.Scene {
     if (this.megarig) { if (!drawCampGround(this, this.data_, { floor: this.megarig.G, W: R.w, H: R.h }, T)) drawn = drawRoom(this, { ...R, tiles: R.tiles.map((r, y) => y >= this.megarig.G ? r : r.map(() => '.')) }, T, tiles, null, this.terrain); }
     else if (!(this.mode === 'camp' && drawCampGround(this, this.data_, this.campGeo, T)))
       drawn = drawRoom(this, R, T, tiles, this.mode === 'camp' ? { ground: CG?.color || '#4a3628', top: CG?.top || '#8a6440', hide: this.campGeo.hidden } : null, this.terrain);
+    this.hull = this.hullPlan ? new Hull(this, this.hullPlan) : null;   // #171 the building around the rooms
 
     this.solids = this.physics.add.staticGroup();
     for (const r of solidRects(R)) this.solids.add(this.add.zone((r.x + r.w / 2) * T, (r.y + r.h / 2) * T, r.w * T, r.h * T));

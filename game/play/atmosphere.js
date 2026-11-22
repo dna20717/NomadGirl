@@ -43,9 +43,9 @@ export class Atmosphere {
     const wowRoom = s.levelInfo?.rooms?.find(r => r.wow), WW = D.pois?.[s.levelPoi]?.wow || {};
     const dark = 1 - (WW.dark ?? D.game?.levelDesign?.wowDark ?? 30) / 100, floor = (WW.ambient ?? 0) / 100;
     for (let y = 0; y < R.h; y++) for (let x = 0; x < R.w; x++) {
-      const m = this.moodAt(x, y), c = rgb(m.color), i = (y * R.w + x) * 4;
+      const hl = s.hull?.lightAt(x, y), m = this.moodAt(x, y), c = hl != null ? [255, 240, 226] : rgb(m.color), i = (y * R.w + x) * 4;   // #171 the hull is outside: Spiel › Hülle › Licht
       const inWow = wowRoom && x >= wowRoom.x && x < wowRoom.x + wowRoom.w && y >= wowRoom.y && y < wowRoom.y + wowRoom.h;
-      const a = inWow ? Math.max(floor, m.ambient * dark) : m.ambient;
+      const a = hl != null ? hl : inWow ? Math.max(floor, m.ambient * dark) : m.ambient;
       img.data[i] = c[0] * a; img.data[i + 1] = c[1] * a; img.data[i + 2] = c[2] * a; img.data[i + 3] = 255;
       this.ambLum[y * R.w + x] = (c[0] + c[1] + c[2]) / 765 * a;
     }

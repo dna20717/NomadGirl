@@ -281,7 +281,10 @@ function fillOf(kit, x, y, solid) {
 }
 export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = null) {
   const brands = !style ? brandKit(scene) : null;
-  const g0 = scene.make.graphics({}, false), solid = (x, y) => x < 0 || y < 0 || x >= room.w || y >= room.h || WALLS.has(room.tiles[y][x]) || CAMO.has(room.tiles[y][x]), stamps0 = [];
+  // #171 Hüllen G4: wall tiles the hull takes over (facade, earth, open sky; game/play/hull.js) are not drawn here and count as air for
+  // edges and depth, so the shell of the rooms gets its rims and roofs against them. Collision stays (scene.js solidRects).
+  const skip = !style && terrain?.skip ? terrain.skip : null;
+  const g0 = scene.make.graphics({}, false), solid = (x, y) => x < 0 || y < 0 || x >= room.w || y >= room.h || (WALLS.has(room.tiles[y][x]) || CAMO.has(room.tiles[y][x])) && !(skip && skip(x, y)), stamps0 = [];
   // camouflaged tiles: one group per connected patch, each with its own graphics and stamps (poi_level fades or breaks them)
   const camo = [], camoAt = new Map();
   for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
@@ -327,6 +330,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
   };
   for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
     const t0 = room.tiles[y][x], t = WALLS.has(t0) || CAMO.has(t0) ? '#' : t0, px = x * T, py = y * T;
+    if (skip && skip(x, y)) continue;   // #171 drawn by the hull
     const cg = camoAt.get(x + ',' + y), g = cg ? cg.g : g0, edges = cg ? cg.edges : edges0, stamps = cg ? cg.stamps : stamps0, details = cg ? cg.stamps : details0, decals = cg ? cg.stamps : decals0;
     const kit = t === '#' && !style ? kitAt(x, y) : null;
     if ((t !== '#' || cg) && !style) {   // camouflaged tiles get the back wall behind them (seen once a fake wall fades)
@@ -507,7 +511,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
     if (anyKit) {
       const P = depthOf(anyKit), a = P.drop / 100, n = 3, sz = P.dropSize / n;
       for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
-        if (vsolid(x, y) || terrain?.back?.(x, y)) continue;
+        if (vsolid(x, y) || terrain?.back?.(x, y) || skip?.(x, y)) continue;
         if (room.tiles[y][x] === '=') for (let i = 0; i < 3; i++) g0.fillStyle(0x07050c, a * 0.8 * (1 - i / 3)).fillRect(x * T + 6, y * T + 18 + i * 6, T, 6);
         const L = solid(x - 1, y) && kitAt(x - 1, y), U = solid(x, y - 1) && kitAt(x, y - 1), px = x * T, py = y * T;
         for (let i = 0; i < n; i++) {
