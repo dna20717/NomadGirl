@@ -21,6 +21,8 @@ function image(w, file) {
   if (!w.bitmaps.has(file)) w.bitmaps.set(file, blob(w, file).then(b => createImageBitmap(b)));
   return w.bitmaps.get(file);
 }
+// a picture by file, loaded once per workshop (#172 hull preview with painted modules)
+export const assetBitmap = (w, file) => image(w, file);
 function objectUrl(w, file) {
   w.urls = w.urls || new Map();
   if (!w.urls.has(file)) w.urls.set(file, blob(w, file).then(b => URL.createObjectURL(b)));

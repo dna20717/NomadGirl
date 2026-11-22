@@ -8186,5 +8186,661 @@
   "source": "KI (PixelLab, create_image_pro 160 × 144, AAP-64), beste von 4 Kandidaten, Ränder beschnitten (Code)",
   "date": "2026-11-21",
   "description": "Mutanten-Nest (#169): Hügel aus Ranken, Kabeln und Schleim mit grün leuchtenden Eiersäcken."
+ },
+ "facade_wall_plaster": {
+  "name": "Fassade · Putz",
+  "kind": "image",
+  "file": "assets/pois/facade/wall_plaster.png",
+  "source": "KI (PixelLab, create_tiles_pro 64 px, 16 Kacheln, Draufsicht, ohne Umriss, Kanten nahtlos gemacht (Code), AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Verwitterter heller Putz mit Flecken. #172, 64 × 64 px, 32 px je Kachel."
+ },
+ "facade_wall_plaster_b": {
+  "name": "Fassade · Putz · Variante",
+  "kind": "image",
+  "file": "assets/pois/facade/wall_plaster_b.png",
+  "source": "KI (PixelLab, create_tiles_pro 64 px, 16 Kacheln, Draufsicht, ohne Umriss, Kanten nahtlos gemacht (Code), AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Putz mit Regenspuren und abgeplatzten Stellen. #172, 64 × 64 px, 32 px je Kachel."
+ },
+ "facade_wall_concrete": {
+  "name": "Fassade · Betonplatten",
+  "kind": "image",
+  "file": "assets/pois/facade/wall_concrete.png",
+  "source": "KI (PixelLab, create_tiles_pro 64 px, 16 Kacheln, Draufsicht, ohne Umriss, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Graue Fertigteil-Platten mit Fugenraster und Ankerlöchern. #172, 64 × 64 px, 32 px je Kachel."
+ },
+ "facade_wall_concrete_b": {
+  "name": "Fassade · Betonplatten · Rost",
+  "kind": "image",
+  "file": "assets/pois/facade/wall_concrete_b.png",
+  "source": "KI (PixelLab, create_tiles_pro 64 px, 16 Kacheln, Draufsicht, ohne Umriss, Kanten nahtlos gemacht (Code), AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Betonplatten mit Rostfahnen aus den Fugen. #172, 64 × 64 px, 32 px je Kachel."
+ },
+ "facade_wall_rustika": {
+  "name": "Fassade · Naturstein · Rustika",
+  "kind": "image",
+  "file": "assets/pois/facade/wall_rustika.png",
+  "source": "KI (PixelLab, create_tiles_pro 64 px, 16 Kacheln, Draufsicht, ohne Umriss, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Bossierte Sandsteinquader mit tiefen Fugen (Amtsbau). #172, 64 × 64 px, 32 px je Kachel."
+ },
+ "facade_wall_stone": {
+  "name": "Fassade · Naturstein · Quader",
+  "kind": "image",
+  "file": "assets/pois/facade/wall_stone.png",
+  "source": "KI (PixelLab, create_tiles_pro 64 px, 16 Kacheln, Draufsicht, ohne Umriss, x-Kante nahtlos gemacht (Code), AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Glatte, verwitterte Sandsteinlagen. #172, 64 × 64 px, 32 px je Kachel."
+ },
+ "facade_wall_glass": {
+  "name": "Fassade · Glasfassade",
+  "kind": "image",
+  "file": "assets/pois/facade/wall_glass.png",
+  "source": "KI (PixelLab, create_tiles_pro 64 px, 16 Kacheln, Draufsicht, ohne Umriss, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Vorhangfassade: dunkelblaue Scheiben im Stahlraster, Himmelsspiegelung. #172, 64 × 64 px, 32 px je Kachel."
+ },
+ "facade_wall_glass_b": {
+  "name": "Fassade · Glasfassade · kaputt",
+  "kind": "image",
+  "file": "assets/pois/facade/wall_glass_b.png",
+  "source": "KI (PixelLab, create_tiles_pro 64 px, 16 Kacheln, Draufsicht, ohne Umriss, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Vorhangfassade mit gesprungenen und fehlenden Scheiben. #172, 64 × 64 px, 32 px je Kachel."
+ },
+ "facade_wall_metal": {
+  "name": "Fassade · Wellblech",
+  "kind": "image",
+  "file": "assets/pois/facade/wall_metal.png",
+  "source": "KI (PixelLab, create_tiles_pro 64 px, 16 Kacheln, Draufsicht, ohne Umriss, y-Kante nahtlos gemacht (Code), AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Graublaues Wellblech mit Nieten. #172, 64 × 64 px, 32 px je Kachel."
+ },
+ "facade_wall_metal_b": {
+  "name": "Fassade · Wellblech · Rost",
+  "kind": "image",
+  "file": "assets/pois/facade/wall_metal_b.png",
+  "source": "KI (PixelLab, create_tiles_pro 64 px, 16 Kacheln, Draufsicht, ohne Umriss, y-Kante nahtlos gemacht (Code), AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Wellblech mit rostbraunen Flecken. #172, 64 × 64 px, 32 px je Kachel."
+ },
+ "facade_base_tiles": {
+  "name": "Fassade · Sockel · Fliesen",
+  "kind": "image",
+  "file": "assets/pois/facade/base_tiles.png",
+  "source": "KI (PixelLab, create_tiles_pro 64 px, 16 Kacheln, Draufsicht, ohne Umriss, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Kleine dunkelrote Fliesen, einige gebrochen. #172, 64 × 64 px, 32 px je Kachel."
+ },
+ "facade_base_stone": {
+  "name": "Fassade · Sockel · Rustika dunkel",
+  "kind": "image",
+  "file": "assets/pois/facade/base_stone.png",
+  "source": "KI (PixelLab, create_tiles_pro 64 px, 16 Kacheln, Draufsicht, ohne Umriss, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Grobe dunkle Sockelquader. #172, 64 × 64 px, 32 px je Kachel."
+ },
+ "facade_strip_cornice": {
+  "name": "Fassade · Gesims",
+  "kind": "image",
+  "file": "assets/pois/facade/strip_cornice.png",
+  "source": "KI (PixelLab, create_tiles_pro 64 px, 16 Kacheln, Draufsicht, ohne Umriss, Streifen 64 × 28 ausgeschnitten (Code), AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Waagrechtes Betongesims, nahtlos nach links und rechts. #172, 64 × 28 px, 32 px je Kachel."
+ },
+ "facade_strip_coping": {
+  "name": "Fassade · Dachkante · Blech",
+  "kind": "image",
+  "file": "assets/pois/facade/strip_coping.png",
+  "source": "KI (PixelLab, create_tiles_pro 64 px, 16 Kacheln, Draufsicht, ohne Umriss, Streifen 64 × 30 ausgeschnitten (Code), AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Attika-Abdeckung aus Blech mit Rostspuren. #172, 64 × 30 px, 32 px je Kachel."
+ },
+ "facade_window": {
+  "name": "Fassade · Fenster dunkel",
+  "kind": "image",
+  "file": "assets/pois/facade/window.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Dunkles Glas mit Spiegelung, Stahlrahmen, Sims. #172, 50 × 52 px, 32 px je Kachel."
+ },
+ "facade_window_lit": {
+  "name": "Fassade · Fenster erleuchtet",
+  "kind": "image",
+  "file": "assets/pois/facade/window_lit.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Warmes Licht von innen, Regale als Silhouette. #172, 46 × 47 px, 32 px je Kachel."
+ },
+ "facade_window_broken": {
+  "name": "Fassade · Fenster kaputt",
+  "kind": "image",
+  "file": "assets/pois/facade/window_broken.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Zersplittertes Glas, Scherben im Rahmen, dahinter schwarz. #172, 48 × 53 px, 32 px je Kachel."
+ },
+ "facade_window_boarded": {
+  "name": "Fassade · Fenster vernagelt",
+  "kind": "image",
+  "file": "assets/pois/facade/window_boarded.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Mit verwitterten Brettern vernagelt. #172, 56 × 58 px, 32 px je Kachel."
+ },
+ "facade_window_shop": {
+  "name": "Fassade · Schaufenster",
+  "kind": "image",
+  "file": "assets/pois/facade/window_shop.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Dunkles Schaufenster im Alurahmen, leer. #172, 52 × 48 px, 32 px je Kachel."
+ },
+ "facade_window_classic": {
+  "name": "Fassade · Fenster klassisch",
+  "kind": "image",
+  "file": "assets/pois/facade/window_classic.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Hohes Fenster mit Sandstein-Gewände und Schlussstein (Ministerium). #172, 54 × 62 px, 32 px je Kachel."
+ },
+ "facade_window_round": {
+  "name": "Fassade · Rundfenster",
+  "kind": "image",
+  "file": "assets/pois/facade/window_round.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Okulus mit Steinring (Reserve). #172, 58 × 58 px, 32 px je Kachel."
+ },
+ "facade_window_shutter": {
+  "name": "Fassade · Fenster mit Rollladen",
+  "kind": "image",
+  "file": "assets/pois/facade/window_shutter.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Rostiger Rollladen halb unten. #172, 50 × 52 px, 32 px je Kachel."
+ },
+ "facade_window_industrial": {
+  "name": "Fassade · Industriefenster",
+  "kind": "image",
+  "file": "assets/pois/facade/window_industrial.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Stahlsprossen, kleine Scheiben, einige kaputt. #172, 50 × 50 px, 32 px je Kachel."
+ },
+ "facade_window_trailer": {
+  "name": "Fassade · Wohnwagenfenster",
+  "kind": "image",
+  "file": "assets/pois/facade/window_trailer.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Kleines abgerundetes Fenster im Alurahmen. #172, 50 × 38 px, 32 px je Kachel."
+ },
+ "facade_window_bars": {
+  "name": "Fassade · Fenster vergittert",
+  "kind": "image",
+  "file": "assets/pois/facade/window_bars.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Eisengitter vor dunklem Glas. #172, 52 × 52 px, 32 px je Kachel."
+ },
+ "facade_window_sheet": {
+  "name": "Fassade · Fenster mit Blech",
+  "kind": "image",
+  "file": "assets/pois/facade/window_sheet.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Mit rostigem Wellblech zugenagelt. #172, 44 × 47 px, 32 px je Kachel."
+ },
+ "facade_window_burnt": {
+  "name": "Fassade · Fenster ausgebrannt",
+  "kind": "image",
+  "file": "assets/pois/facade/window_burnt.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Verrußter Rahmen, Glas zersprungen (Reserve). #172, 44 × 44 px, 32 px je Kachel."
+ },
+ "facade_unit_ac": {
+  "name": "Fassade · Aufbau · Klimagerät",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_ac.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Klimagerät mit Lüftergitter. #172, 60 × 39 px, 32 px je Kachel."
+ },
+ "facade_unit_ac_b": {
+  "name": "Fassade · Aufbau · Klimageräte gestapelt",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_ac_b.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Zwei rostige Klimageräte übereinander. #172, 58 × 55 px, 32 px je Kachel."
+ },
+ "facade_unit_tank": {
+  "name": "Fassade · Aufbau · Wassertank",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_tank.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Rostiger Tank mit Kegeldach auf Stahlbeinen. #172, 45 × 60 px, 32 px je Kachel."
+ },
+ "facade_unit_tank_b": {
+  "name": "Fassade · Aufbau · Holztank",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_tank_b.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Holzfass-Tank auf Stahlgestell. #172, 52 × 57 px, 32 px je Kachel."
+ },
+ "facade_unit_antenna": {
+  "name": "Fassade · Aufbau · Antenne",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_antenna.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Antennenmast mit Querstreben und rotem Licht. #172, 28 × 59 px, 32 px je Kachel."
+ },
+ "facade_unit_antenna_b": {
+  "name": "Fassade · Aufbau · Antennen",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_antenna_b.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Antennenbündel mit kleinen Schüsseln. #172, 44 × 60 px, 32 px je Kachel."
+ },
+ "facade_unit_dish": {
+  "name": "Fassade · Aufbau · Schüssel",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_dish.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Verwitterte Satellitenschüssel. #172, 39 × 58 px, 32 px je Kachel."
+ },
+ "facade_unit_vent": {
+  "name": "Fassade · Aufbau · Lüfter",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_vent.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Pilz-Lüftungshaube. #172, 42 × 45 px, 32 px je Kachel."
+ },
+ "facade_unit_vent_b": {
+  "name": "Fassade · Aufbau · Lüfterturbine",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_vent_b.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Dachlüfter-Turbine auf Kasten. #172, 42 × 58 px, 32 px je Kachel."
+ },
+ "facade_unit_fan": {
+  "name": "Fassade · Aufbau · Abluftkasten",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_fan.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Rostiger Abluftkasten mit Lamellen (Reserve). #172, 55 × 61 px, 32 px je Kachel."
+ },
+ "facade_unit_chimney": {
+  "name": "Fassade · Aufbau · Schornstein",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_chimney.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Ziegelschornstein mit Blechhut. #172, 41 × 57 px, 32 px je Kachel."
+ },
+ "facade_unit_solar": {
+  "name": "Fassade · Aufbau · Solar",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_solar.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Schräge Solarpaneele, eins gesprungen. #172, 61 × 36 px, 32 px je Kachel."
+ },
+ "facade_unit_stairs": {
+  "name": "Fassade · Aufbau · Treppenhaus",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_stairs.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Betonkasten mit Stahltür. #172, 56 × 52 px, 32 px je Kachel."
+ },
+ "facade_unit_stairs_b": {
+  "name": "Fassade · Aufbau · Maschinenraum",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_stairs_b.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Aufzugs-Maschinenraum mit Lüftungsgitter. #172, 58 × 55 px, 32 px je Kachel."
+ },
+ "facade_unit_frame": {
+  "name": "Fassade · Aufbau · Schildgerüst klein",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_frame.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Leere Tafel auf zwei Beinen, ohne Schrift. #172, 58 × 60 px, 32 px je Kachel."
+ },
+ "facade_unit_fallen": {
+  "name": "Fassade · Aufbau · abgestürzt",
+  "kind": "image",
+  "file": "assets/pois/facade/unit_fallen.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Umgekipptes Klimagerät (Verfall ab 2). #172, 60 × 45 px, 32 px je Kachel."
+ },
+ "facade_decal_crack_a": {
+  "name": "Fassade · Schaden · Riss",
+  "kind": "image",
+  "file": "assets/pois/facade/decal_crack_a.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Langer verzweigter Riss (Decal, transparent). #172, 41 × 62 px, 32 px je Kachel."
+ },
+ "facade_decal_crack_b": {
+  "name": "Fassade · Schaden · Sternriss",
+  "kind": "image",
+  "file": "assets/pois/facade/decal_crack_b.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Sternförmiger Riss. #172, 57 × 58 px, 32 px je Kachel."
+ },
+ "facade_decal_crack_c": {
+  "name": "Fassade · Schaden · Riss breit",
+  "kind": "image",
+  "file": "assets/pois/facade/decal_crack_c.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Breiter Riss mit abgeplatztem Putz, Ziegel darunter. #172, 55 × 60 px, 32 px je Kachel."
+ },
+ "facade_decal_hole_a": {
+  "name": "Fassade · Schaden · Loch",
+  "kind": "image",
+  "file": "assets/pois/facade/decal_hole_a.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Loch mit Bewehrung. #172, 58 × 60 px, 32 px je Kachel."
+ },
+ "facade_decal_hole_b": {
+  "name": "Fassade · Schaden · Loch klein",
+  "kind": "image",
+  "file": "assets/pois/facade/decal_hole_b.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Kleines Loch mit Bewehrung. #172, 44 × 41 px, 32 px je Kachel."
+ },
+ "facade_decal_hole_brick": {
+  "name": "Fassade · Schaden · Loch Ziegel",
+  "kind": "image",
+  "file": "assets/pois/facade/decal_hole_brick.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Großes Loch, Ziegel am Rand. #172, 58 × 60 px, 32 px je Kachel."
+ },
+ "facade_decal_soot": {
+  "name": "Fassade · Schaden · Ruß",
+  "kind": "image",
+  "file": "assets/pois/facade/decal_soot.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Rußfahne (Ereignis Feuer). #172, 46 × 61 px, 32 px je Kachel."
+ },
+ "facade_decal_shots_a": {
+  "name": "Fassade · Schaden · Einschüsse",
+  "kind": "image",
+  "file": "assets/pois/facade/decal_shots_a.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Gruppe Einschüsse (Ereignis Kampf). #172, 45 × 49 px, 32 px je Kachel."
+ },
+ "facade_decal_shots_b": {
+  "name": "Fassade · Schaden · Einschuss-Garbe",
+  "kind": "image",
+  "file": "assets/pois/facade/decal_shots_b.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Einschüsse in einer Linie. #172, 56 × 52 px, 32 px je Kachel."
+ },
+ "facade_decal_shots_c": {
+  "name": "Fassade · Schaden · Einschüsse einzeln",
+  "kind": "image",
+  "file": "assets/pois/facade/decal_shots_c.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Verstreute Einschüsse. #172, 51 × 51 px, 32 px je Kachel."
+ },
+ "facade_decal_rust": {
+  "name": "Fassade · Verwitterung · Rost",
+  "kind": "image",
+  "file": "assets/pois/facade/decal_rust.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Rostfahne unter einem Beschlag. #172, 26 × 56 px, 32 px je Kachel."
+ },
+ "facade_decal_stain": {
+  "name": "Fassade · Verwitterung · Wasserflecken",
+  "kind": "image",
+  "file": "assets/pois/facade/decal_stain.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Wasser- und Schmutzfahnen. #172, 51 × 58 px, 32 px je Kachel."
+ },
+ "facade_decal_moss": {
+  "name": "Fassade · Verwitterung · Moos",
+  "kind": "image",
+  "file": "assets/pois/facade/decal_moss.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Moos und Unkraut in einem Riss. #172, 59 × 59 px, 32 px je Kachel."
+ },
+ "facade_decal_peel": {
+  "name": "Fassade · Verwitterung · abgeplatzt",
+  "kind": "image",
+  "file": "assets/pois/facade/decal_peel.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Abgeplatzter Putz, Ziegel darunter. #172, 57 × 56 px, 32 px je Kachel."
+ },
+ "facade_decal_scorch": {
+  "name": "Fassade · Schaden · Brandfleck",
+  "kind": "image",
+  "file": "assets/pois/facade/decal_scorch.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Schwarzer Brandfleck (Reserve). #172, 56 × 55 px, 32 px je Kachel."
+ },
+ "facade_awning": {
+  "name": "Fassade · Markise",
+  "kind": "image",
+  "file": "assets/pois/facade/awning.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px, 4 Kandidaten, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Gestreifte Ladenmarkise rot-weiß, angerissen. #172, 122 × 55 px, 32 px je Kachel."
+ },
+ "facade_fire_escape": {
+  "name": "Fassade · Feuertreppe",
+  "kind": "image",
+  "file": "assets/pois/facade/fire_escape.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px, 4 Kandidaten, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Podest mit Geländer und Treppenlauf. #172, 114 × 114 px, 32 px je Kachel."
+ },
+ "facade_station": {
+  "name": "Fassade · Tankstellendach",
+  "kind": "image",
+  "file": "assets/pois/facade/station.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px, 4 Kandidaten, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Dachabschnitt mit leerer roter Blende (ohne Schrift), Stütze, Lampen. #172, 116 × 100 px, 32 px je Kachel."
+ },
+ "facade_billboard": {
+  "name": "Fassade · Schildgerüst",
+  "kind": "image",
+  "file": "assets/pois/facade/billboard.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px, 4 Kandidaten, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Große leere Plakatwand mit Laufsteg und Gitterbeinen, ohne Schrift. #172, 114 × 109 px, 32 px je Kachel."
+ },
+ "facade_gable": {
+  "name": "Fassade · Giebel",
+  "kind": "image",
+  "file": "assets/pois/facade/gable.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px, 4 Kandidaten, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Sandstein-Dreiecksgiebel mit Rundfenster, Ranken. #172, 127 × 51 px (Ranken unten abgeschnitten), 32 px je Kachel."
+ },
+ "facade_crown": {
+  "name": "Fassade · Hochhaus-Krone",
+  "kind": "image",
+  "file": "assets/pois/facade/crown.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px, 4 Kandidaten, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Gestufte Art-déco-Krone aus Stahl mit leerem Band und Lichtern. #172, 107 × 117 px, 32 px je Kachel."
+ },
+ "facade_headframe": {
+  "name": "Fassade · Förderturm",
+  "kind": "image",
+  "file": "assets/pois/facade/headframe.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px, 4 Kandidaten, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Stahlgerüst mit Seilscheibe (Zeche). #172, 106 × 113 px, 32 px je Kachel."
+ },
+ "facade_portal_lintel": {
+  "name": "Fassade · Bunker-Sturz",
+  "kind": "image",
+  "file": "assets/pois/facade/portal_lintel.png",
+  "source": "KI (PixelLab, create_1_direction_object 128 px, 4 Kandidaten, oberer Teil ausgeschnitten (Code), AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Betonsturz mit Warnstreifen und Moos. #172, 115 × 34 px, 32 px je Kachel."
+ },
+ "facade_plant_tank": {
+  "name": "Fassade · Gelände · Tank",
+  "kind": "image",
+  "file": "assets/pois/facade/plant_tank.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Gedrungener Lagertank mit Leiter. #172, 64 × 51 px, 32 px je Kachel."
+ },
+ "facade_plant_column": {
+  "name": "Fassade · Gelände · Kolonne",
+  "kind": "image",
+  "file": "assets/pois/facade/plant_column.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Destillationskolonne mit Bühnen. #172, 39 × 62 px, 32 px je Kachel."
+ },
+ "facade_plant_pipes": {
+  "name": "Fassade · Gelände · Rohrbrücke",
+  "kind": "image",
+  "file": "assets/pois/facade/plant_pipes.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Drei Rohre auf Stahlbock. #172, 64 × 49 px, 32 px je Kachel."
+ },
+ "facade_plant_stack": {
+  "name": "Fassade · Gelände · Schlot",
+  "kind": "image",
+  "file": "assets/pois/facade/plant_stack.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Schlot mit rot-weißen Ringen. #172, 24 × 61 px, 32 px je Kachel."
+ },
+ "facade_plant_trailer": {
+  "name": "Fassade · Gelände · Wohnwagen",
+  "kind": "image",
+  "file": "assets/pois/facade/plant_trailer.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Alter Wohnwagen. #172, 62 × 36 px, 32 px je Kachel."
+ },
+ "facade_plant_watertower": {
+  "name": "Fassade · Gelände · Wasserturm",
+  "kind": "image",
+  "file": "assets/pois/facade/plant_watertower.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Wasserturm auf Stahlbeinen. #172, 36 × 61 px, 32 px je Kachel."
+ },
+ "facade_plant_pylon": {
+  "name": "Fassade · Gelände · Strommast",
+  "kind": "image",
+  "file": "assets/pois/facade/plant_pylon.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Gittermast mit Isolatoren. #172, 44 × 63 px, 32 px je Kachel."
+ },
+ "facade_surface_drain": {
+  "name": "Fassade · Straße · Mauer mit Gully",
+  "kind": "image",
+  "file": "assets/pois/facade/surface_drain.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Stützmauer mit Gitterrost und Moos. #172, 64 × 51 px, 32 px je Kachel."
+ },
+ "facade_surface_washhouse": {
+  "name": "Fassade · Straße · Kaue",
+  "kind": "image",
+  "file": "assets/pois/facade/surface_washhouse.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Kleine Ziegel-Kaue. #172, 64 × 42 px, 32 px je Kachel."
+ },
+ "facade_surface_conveyor": {
+  "name": "Fassade · Straße · Förderband",
+  "kind": "image",
+  "file": "assets/pois/facade/surface_conveyor.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Förderbandbrücke auf Stelzen (Reserve). #172, 63 × 50 px, 32 px je Kachel."
+ },
+ "facade_surface_fence": {
+  "name": "Fassade · Straße · Zaun",
+  "kind": "image",
+  "file": "assets/pois/facade/surface_fence.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Maschendrahtzaun mit Stacheldraht. #172, 64 × 38 px, 32 px je Kachel."
+ },
+ "facade_surface_radar": {
+  "name": "Fassade · Straße · Radar",
+  "kind": "image",
+  "file": "assets/pois/facade/surface_radar.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Radarschüssel auf Gitterturm. #172, 35 × 61 px, 32 px je Kachel."
+ },
+ "facade_surface_guardhouse": {
+  "name": "Fassade · Straße · Wachhaus",
+  "kind": "image",
+  "file": "assets/pois/facade/surface_guardhouse.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Kleines Wachhaus aus Beton. #172, 50 × 45 px, 32 px je Kachel."
+ },
+ "facade_surface_lamp": {
+  "name": "Fassade · Straße · Laterne",
+  "kind": "image",
+  "file": "assets/pois/facade/surface_lamp.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Straßenlaterne. #172, 28 × 63 px, 32 px je Kachel."
+ },
+ "facade_surface_metro": {
+  "name": "Fassade · Straße · U-Bahn-Abgang",
+  "kind": "image",
+  "file": "assets/pois/facade/surface_metro.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Abgang mit Stahldach und leerem Schild. #172, 62 × 46 px, 32 px je Kachel."
+ },
+ "facade_surface_hatch": {
+  "name": "Fassade · Straße · Luke",
+  "kind": "image",
+  "file": "assets/pois/facade/surface_hatch.png",
+  "source": "KI (PixelLab, create_1_direction_object 64 px, 16 Kandidaten je Auftrag, AAP-64), Ränder beschnitten (Code)",
+  "date": "2026-11-22",
+  "description": "Rostige Dachluke mit Leiter. #172, 54 × 30 px, 32 px je Kachel."
  }
 }

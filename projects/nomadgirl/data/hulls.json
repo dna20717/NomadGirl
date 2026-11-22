@@ -26,7 +26,23 @@
   "glass": "#143464",
   "frame": "#333941",
   "roofColor": "#5a4e44",
-  "baseColor": "#8e5252"
+  "baseColor": "#8e5252",
+  "art": {
+   "wall": "facade_wall_plaster",
+   "wallAlt": "facade_wall_plaster_b",
+   "wallAltShare": 20,
+   "window": ["facade_window", "facade_window_bars"],
+   "windowLit": ["facade_window_lit"],
+   "windowBroken": ["facade_window_broken"],
+   "windowBoarded": [
+    "facade_window_boarded",
+    "facade_window_sheet"
+   ],
+   "base": "facade_base_tiles",
+   "band": "facade_strip_cornice",
+   "roof": "facade_strip_coping",
+   "lisene": "facade_wall_concrete"
+  }
  },
  "mall": {
   "name": "Mall",
@@ -57,7 +73,27 @@
   "glass": "#249fde",
   "frame": "#333941",
   "roofColor": "#4a5462",
-  "baseColor": "#4a5462"
+  "baseColor": "#4a5462",
+  "art": {
+   "wall": "facade_wall_concrete",
+   "wallAlt": "facade_wall_concrete_b",
+   "wallAltShare": 15,
+   "window": [
+    "facade_window",
+    "facade_window_shutter"
+   ],
+   "windowLit": ["facade_window_lit"],
+   "windowBroken": ["facade_window_broken"],
+   "windowBoarded": [
+    "facade_window_boarded",
+    "facade_window_sheet"
+   ],
+   "shop": ["facade_window_shop"],
+   "base": "facade_base_stone",
+   "band": "facade_strip_cornice",
+   "roof": "facade_strip_coping",
+   "lisene": "facade_wall_concrete"
+  }
  },
  "bunker": {
   "name": "Bunker-Eingang",
@@ -104,7 +140,25 @@
   "glass": "#24523b",
   "frame": "#221c1a",
   "roofColor": "#5b3138",
-  "baseColor": "#a08662"
+  "baseColor": "#a08662",
+  "art": {
+   "wall": "facade_wall_stone",
+   "wallAlt": "facade_wall_rustika",
+   "wallAltShare": 0,
+   "window": [
+    "facade_window_classic"
+   ],
+   "windowLit": ["facade_window_lit"],
+   "windowBroken": ["facade_window_broken"],
+   "windowBoarded": [
+    "facade_window_boarded"
+   ],
+   "base": "facade_wall_rustika",
+   "band": "facade_strip_cornice",
+   "roof": "facade_strip_cornice",
+   "lisene": "facade_wall_rustika",
+   "gable": "facade_gable"
+  }
  },
  "highrise": {
   "name": "Hochhaus",
@@ -134,7 +188,22 @@
   "glass": "#477d85",
   "frame": "#242234",
   "roofColor": "#333941",
-  "baseColor": "#242234"
+  "baseColor": "#242234",
+  "art": {
+   "wall": "facade_wall_glass",
+   "wallAlt": "facade_wall_glass_b",
+   "wallAltShare": 18,
+   "window": ["facade_window"],
+   "windowLit": ["facade_window_lit"],
+   "windowBroken": ["facade_window_broken"],
+   "windowBoarded": ["facade_window_sheet"],
+   "shop": ["facade_window_shop"],
+   "base": "facade_base_stone",
+   "band": "facade_strip_coping",
+   "roof": "facade_strip_coping",
+   "lisene": "facade_wall_concrete",
+   "crown": "facade_crown"
+  }
  },
  "parking": {
   "name": "Parkhaus",
@@ -163,7 +232,16 @@
   "glass": "#141013",
   "frame": "#333941",
   "roofColor": "#6d758d",
-  "baseColor": "#4a5462"
+  "baseColor": "#4a5462",
+  "art": {
+   "wall": "facade_wall_concrete",
+   "wallAlt": "facade_wall_concrete_b",
+   "wallAltShare": 30,
+   "base": "facade_base_stone",
+   "band": "facade_strip_cornice",
+   "roof": "facade_strip_coping",
+   "lisene": "facade_wall_concrete"
+  }
  },
  "radio_mast": {
   "name": "Funkmast",
@@ -233,7 +311,24 @@
   "frame": "#322b28",
   "roofColor": "#71413b",
   "baseColor": "#4a5462",
-  "plant": ["tank", "column", "pipes", "stack", "tank"]
+  "plant": ["tank", "column", "pipes", "stack", "tank"],
+  "art": {
+   "wall": "facade_wall_metal",
+   "wallAlt": "facade_wall_metal_b",
+   "wallAltShare": 30,
+   "window": [
+    "facade_window_industrial"
+   ],
+   "windowLit": ["facade_window_lit"],
+   "windowBroken": [
+    "facade_window_industrial"
+   ],
+   "windowBoarded": ["facade_window_sheet"],
+   "base": "facade_wall_concrete",
+   "band": "facade_strip_coping",
+   "roof": "facade_strip_coping",
+   "lisene": "facade_wall_concrete"
+  }
  },
  "trailer_park": {
   "name": "Wohnwagen-Siedlung",
@@ -263,7 +358,25 @@
   "frame": "#333941",
   "roofColor": "#a08662",
   "baseColor": "#a08662",
-  "plant": ["trailer", "trailer", "pylon"]
+  "plant": ["trailer", "trailer", "pylon"],
+  "art": {
+   "wall": "facade_wall_plaster",
+   "wallAlt": "facade_wall_plaster_b",
+   "wallAltShare": 25,
+   "window": [
+    "facade_window_trailer",
+    "facade_window"
+   ],
+   "windowLit": ["facade_window_lit"],
+   "windowBroken": ["facade_window_broken"],
+   "windowBoarded": [
+    "facade_window_boarded"
+   ],
+   "base": "facade_base_tiles",
+   "band": "facade_strip_cornice",
+   "roof": "facade_strip_coping",
+   "lisene": "facade_wall_plaster_b"
+  }
  },
  "silo": {
   "name": "Raketensilo",

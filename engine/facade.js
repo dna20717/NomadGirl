@@ -32,7 +32,9 @@ export const SKY_KINDS = [['city', 'Stadt (Hochhäuser)'], ['outskirts', 'Vorsta
 const SKY_OF_REGION = { 'Delta Ring': 'city', 'The Outskirts': 'outskirts', 'Scrap Desert': 'industry', 'East Bend': 'industry', 'Salt Flats': 'salt', 'South Badlands': 'canyon', 'Crow Valley': 'canyon', 'Glass Dunes': 'desert' };
 
 // Spiel › Hülle: switches and numbers for all POIs
-export const HULL = { enabled: true, grain: 16, light: 85, backDim: 45, reach: 6, skyline: true, cityShare: 100, roomWindows: true };
+// #172 painted modules: modules (an/aus), artGrain (pixels per tile when modules are painted), artPx (pixels per tile the modules are painted at),
+// artDim (the textured facade a little darker, behind the play space)
+export const HULL = { enabled: true, grain: 16, light: 85, backDim: 45, reach: 6, skyline: true, cityShare: 100, roomWindows: true, modules: true, artGrain: 32, artPx: 32, artDim: 20 };
 export function hullGame(D) { const g = D?.game?.hull || {}; return { ...HULL, ...Object.fromEntries(Object.entries(g).filter(([k, v]) => k in HULL && v != null && v !== '')) }; }
 
 // the code defaults of a type; data/hulls.json overrides field by field
@@ -54,6 +56,10 @@ export function hullConfig(D, poiId) {
   c.event = P.story?.eventKind || '';
   c.reach = G.reach;
   c.roomWindowsOn = G.roomWindows !== false;
+  // #172 painted modules: Spiel › Hülle › Module (shared: rooftop units, awnings, damage, plant …) under Gebäudetyp › Module under POIs › Hülle
+  const artOf = o => Object.fromEntries(Object.entries(o || {}).filter(([, v]) => v != null && v !== '' && !(Array.isArray(v) && !v.length)));
+  c.art = G.modules === false ? {} : { ...artOf(D?.game?.hull?.art), ...artOf(T.art), ...artOf(H.art) };
+  c.artPx = G.artPx; c.artDim = G.artDim;
   return c;
 }
 
@@ -206,7 +212,7 @@ function buildPlan(D, poiId, L, cfg, opt) {
     }
   });
   plan.parts = partsOf(D, poiId, L, plan, rooms, main, rnd);
-  plan.above = Math.max(0, -Math.min(0, ...plan.parts.map(p => Math.floor(p.y)), ...B.map(b => b.top - (cfg.roofH + 1))));
+  plan.above = Math.max(0, -Math.min(0, ...plan.parts.map(p => Math.floor(p.y - (p.tall ? p.tall - p.h : 0))), ...B.map(b => b.top - (cfg.roofH + 1))));
   return plan;
 }
 
@@ -255,8 +261,10 @@ function partsOf(D, poiId, L, plan, rooms, main, rnd) {
         return;
       }
       push({ kind: 'roof', roof: kind, x: v.x0, y: v.top - cfg.roofH, w, h: cfg.roofH, b: bi, annex: !!v.annex });
-      if (kind === 'gable') push({ kind: 'gable', x: v.x0 - 0.5, y: v.top - cfg.roofH - Math.min(6, Math.max(2, w / 6)), w: w + 1, h: Math.min(6, Math.max(2, w / 6)), b: bi });
-      if (kind === 'crown') push({ kind: 'crown', x: v.x0 + w * 0.2, y: v.top - cfg.roofH - 2, w: w * 0.6, h: 2, b: bi });
+      // #172 a pediment in classical proportion (about 1 : 2.4, like the painted module): over a wide volume it crowns the middle
+      if (kind === 'gable') { const gh = Math.min(7, Math.max(2, (w + 1) / 2.4)), gw = Math.min(w + 1, gh * 2.4); push({ kind: 'gable', x: v.x0 - 0.5 + (w + 1 - gw) / 2, y: v.top - cfg.roofH - gh, w: gw, h: gh, b: bi }); }
+      // crown: 2 tiles of code; a painted crown rises higher (tall), the hull makes room for it above the level
+      if (kind === 'crown') push({ kind: 'crown', x: v.x0 + w * 0.2, y: v.top - cfg.roofH - 2, w: w * 0.6, h: 2, tall: Math.min(12, w * 0.6 * 1.1), b: bi });
       if (kind === 'dome') push({ kind: 'dome', x: v.x0 + 1, y: v.top - cfg.roofH - Math.min(5, w / 4), w: w - 2, h: Math.min(5, w / 4), b: bi });
       if (kind === 'shed') for (let x = v.x0; x + 4 <= v.x1 + 1; x += 5) push({ kind: 'shed', x, y: v.top - cfg.roofH - 2, w: 5, h: 2, b: bi });
       if (!units.length || kind === 'gable' || kind === 'dome' || v.annex) return;
@@ -264,7 +272,7 @@ function partsOf(D, poiId, L, plan, rooms, main, rnd) {
       for (let k = 0; k < n; k++) {
         const u = units[Math.floor(rnd(v.x0, k, 21 + vi) * units.length)], x = v.x0 + 2 + (k + 0.5) * (w - 4) / n + (rnd(v.x0, k, 22) - 0.5) * 2;
         const size = { ac: [2, 1.2], tank: [2.4, 3.2], antenna: [0.4, 5], dish: [1.6, 1.8], solar: [4, 1.2], chimney: [1, 3], vent: [1.2, 1.2], frame: [5, 3.5], stairs: [2.6, 2] }[u] || [1, 1];
-        if (dec > 1.5 && rnd(x | 0, k, 23) < 0.35) continue;   // fallen off
+        if (dec > 1.5 && rnd(x | 0, k, 23) < 0.35) { push({ kind: 'unit', unit: u, fallen: true, x: x - 1, y: v.top - cfg.roofH - 1, w: 2, h: 1, b: bi, tilt: 0 }); continue; }   // fallen off: a wreck lies there
         push({ kind: 'unit', unit: u, x: x - size[0] / 2, y: v.top - cfg.roofH - size[1], w: size[0], h: size[1], b: bi, tilt: dec > 0.5 ? (rnd(x | 0, k, 24) - 0.5) * dec * 6 : 0 });
       }
     });

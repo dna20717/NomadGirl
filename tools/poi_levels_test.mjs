@@ -27,6 +27,8 @@ for (const [poi, seed, room, kit, mood] of CASES) {
   check(`${poi}: lädt ohne Fehler, ${v.rooms} Räume, Kisten, Geheimnisse, Abkürzung`, !errs.length && v.chests > 0 && v.secrets > 0 && v.shortcut, { ...v, errs });
   check(`${poi}: ${room} trägt Kachel-Set ${kit} und Stimmung ${mood}, Lampen`, v.kitAt === kit && v.mood === mood && v.lamps > 10, v);
   check(`${poi}: Hülle ${v.hull?.type} gemalt (${v.hull?.chunks} Stücke, ${v.hull?.windows} Fenster)`, v.hull && v.hull.chunks > 0 && (poi === 'bunker_13' ? v.hull.earth > 500 : v.hull.facade > 500 && v.hull.windows > 20), v.hull);
+  // #172 painted modules: building types with modules paint at the module grain; the bunker (earth) only uses the shared ones (portal, units)
+  check(`${poi}: Hülle aus gemalten Modulen (${v.hull?.modules} Module, Körnung ${v.hull?.grain})`, v.hull && v.hull.modules > (poi === 'bunker_13' ? 0 : 20) && v.hull.grain === 32, v.hull);
   const life = Object.values(v.critters || {}).reduce((n, x) => n + x, 0);
   check(`${poi}: Kleinvieh lebt (${JSON.stringify(v.critters)})`, life > 0, v);
   if (shots) { fs.mkdirSync('output', { recursive: true }); await page.evaluate(() => nomad.freeze()); await page.waitForTimeout(500); await page.screenshot({ path: `output/poi_levels_${poi}.png` }); }

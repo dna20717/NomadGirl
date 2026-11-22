@@ -102,6 +102,9 @@ export class PlayScene extends Phaser.Scene {
     for (const P of Object.values(this.data_.pois || {})) for (const id of [P.wow?.image, P.level?.landmarkImage]) if (id) ids.add(id);
     for (const id of Object.values(this.data_.life?.images || {})) if (id) ids.add(id);   // #169 painted camp props
     for (const t of Object.values(this.data_.tropes || {})) if (t.image) ids.add(t.image);   // #167 painted tropes   // #165 painted Wow motifs and landmarks
+    if (this.data_.game?.hull?.modules !== false)   // #172 painted facade modules: shared ones, every building type, POI overrides (small pictures)
+      for (const o of [this.data_.game?.hull?.art, ...Object.values(this.data_.hulls || {}).map(T => T.art), ...Object.values(this.data_.pois || {}).map(P => P.hull?.art)])
+        for (const v of Object.values(o || {})) for (const id of Array.isArray(v) ? v : [v]) if (typeof id === 'string' && id) ids.add(id);
     if (this.data_.worldmap?.logos) ids.add(this.data_.worldmap.logos);
     for (const k of ['look', 'open']) if (this.data_.game?.vault?.[k]) ids.add(this.data_.game.vault[k]);   // #153 the painted vault   // the brand sign at a POI's entrance
     const DR = this.data_.drone || {};

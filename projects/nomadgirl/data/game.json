@@ -148,5 +148,50 @@
    {"role": "combat", "density": 2, "prefer": "sperre, sandsack, kiste, fass", "avoid": "bett, grün"},
    {"role": "cave", "density": 1.5, "prefer": "stein, knochen, kabel", "avoid": "laden, büro"}
   ]
+ },
+ "hull": {
+  "art": {
+   "ac": ["facade_unit_ac", "facade_unit_ac_b"],
+   "tank": ["facade_unit_tank", "facade_unit_tank_b"],
+   "antenna": [
+    "facade_unit_antenna",
+    "facade_unit_antenna_b"
+   ],
+   "dish": ["facade_unit_dish"],
+   "solar": ["facade_unit_solar"],
+   "chimney": ["facade_unit_chimney"],
+   "vent": ["facade_unit_vent", "facade_unit_vent_b"],
+   "frame": ["facade_billboard"],
+   "stairs": ["facade_unit_stairs", "facade_unit_stairs_b"],
+   "fallen": "facade_unit_fallen",
+   "awning": "facade_awning",
+   "station": "facade_station",
+   "fire": "facade_fire_escape",
+   "portal": "facade_portal_lintel",
+   "crack": ["facade_decal_crack_a", "facade_decal_crack_b"],
+   "hole": ["facade_decal_hole_a", "facade_decal_hole_b"],
+   "soot": ["facade_decal_soot"],
+   "shots": ["facade_decal_shots_a", "facade_decal_shots_b", "facade_decal_shots_c"],
+   "weather": ["facade_decal_stain", "facade_decal_moss", "facade_decal_peel", "facade_decal_crack_c"],
+   "weatherShare": 100,
+   "plant_tank": ["facade_plant_tank"],
+   "plant_column": ["facade_plant_column"],
+   "plant_pipes": ["facade_plant_pipes"],
+   "plant_stack": ["facade_plant_stack"],
+   "plant_trailer": ["facade_plant_trailer"],
+   "plant_watertower": [
+    "facade_plant_watertower"
+   ],
+   "plant_pylon": ["facade_plant_pylon"],
+   "surface_metro": "facade_surface_metro",
+   "surface_lamp": "facade_surface_lamp",
+   "surface_drain": "facade_surface_drain",
+   "surface_headframe": "facade_headframe",
+   "surface_washhouse": "facade_surface_washhouse",
+   "surface_fence": "facade_surface_fence",
+   "surface_radar": "facade_surface_radar",
+   "surface_guardhouse": "facade_surface_guardhouse",
+   "surface_hatch": "facade_surface_hatch"
+  }
  }
 }

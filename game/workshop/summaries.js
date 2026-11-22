@@ -17,7 +17,8 @@ import { characterOf, characters } from '../banter.js';
 import { faceCanvas } from '../glitch_face.js';
 import { drawMap } from '../map_render.js';
 import { planHull, hullAudit } from '../../engine/facade.js';
-import { paintHull } from '../hull_paint.js';
+import { paintHull, hullArtIds } from '../hull_paint.js';
+import { assetBitmap } from './asset_preview.js';
 
 const ROOM_COLORS = { '#': '#8b919c', '=': '#d4a72c', H: '#5fb4d9', o: '#e45aa8', L: '#3fe0d0', C: '#c08a4a', S: '#7ee0a0', D: '#5b8a6a', B: '#6e5a7a', Z: '#ffd27a', 1: '#ff8a5c', A: '#b0b8c4', '^': '#3fe0d0', v: '#3fe0d0', '*': '#fff2a8', '%': '#9a7ab8', $: '#8a6e9a', '+': '#ff9f1c', '|': '#ff4060' };
 const ROOM_LEGEND = [['#', 'Wand'], ['=', 'Plattform'], ['H', 'Leiter'], ['o', 'Seil'], ['L', 'Start'], ['x', 'Gegner'], ['C', 'Kiste'], ['S', 'Schalter'], ['D', 'Tür'], ['B', 'Brüchig'], ['%', 'Scheinwand'], ['$', 'Getarnt brüchig'], ['Z', 'Ziel'], ['^', 'Abkürzung'], ['*', 'Lampe'], ['+', 'Schlüssel'], ['|', 'Schloss']];
@@ -130,11 +131,26 @@ async function hear(v, text) {
 const SAMPLES = ['Hallo! Schön, dich zu sehen.', 'Hast du das gehört? Da draußen ist was.', 'Nein, nein, nein. Das machen wir anders!', 'Hm … vielleicht morgen?'];
 
 // #171 the hull of a level as a picture (POIs › Level, under the map): sky, rooms and their walls simplified, the hull painted by game/hull_paint.js
-function hullPreview(D, id, L, maxW = 320) {
+function hullPreview(D, id, L, maxW = 320, w = null) {
   const plan = planHull(D, id, L);
   if (!plan.on) return el('p', { class: 'ed-small' }, 'Hülle aus (POIs › Hülle › Gebäudetyp, Spiel › Hülle).');
   const g = Math.max(2, Math.min(8, Math.floor(maxW / plan.W))), above = plan.above + 1, Hh = plan.H + above;
   const c = el('canvas', { class: 'ng-roomMap', width: plan.W * g, height: Hh * g, style: 'image-rendering:pixelated;max-width:100%' }), ctx = c.getContext('2d');
+  paintPreview(D, plan, L, c, ctx, g, above, Hh, null);
+  // #172 painted modules: load them, then paint again with them (code painting first, so the picture never waits)
+  const ids = w ? hullArtIds(plan.cfg).filter(k => D.assets?.[k]?.file) : [];
+  if (ids.length) Promise.all(ids.map(k => assetBitmap(w, D.assets[k].file).then(b => [k, b], () => [k, null]))).then(list => {
+    const m = new Map(list); paintPreview(D, plan, L, c, ctx, g, above, Hh, k => m.get(k) || null);
+  });
+  const f = hullAudit(D, id, L, plan), n = k => plan.windows.filter(o => o.where === k).length, cfg = plan.cfg;
+  return el('div', {}, c, facts([
+    ['Gebäudetyp', `${cfg.name} · ${cfg.kind} · Dach ${cfg.roof} · Achse ${cfg.axis} · Verfall ${cfg.decay}`],
+    ['Gebäude', plan.buildings.map(b => `${b.x1 - b.x0 + 1} breit, ${b.floors?.length - 1 || 0} Geschosse à ${b.floorH}`).join(' · ') || 'keins (nur Oberfläche)'],
+    ['Fenster', `${n('facade')} in der Fassade · ${n('room')} in Räumen (gleiches Raster)`],
+    ['Module', ids.length ? `${ids.length} gemalte Module (Welt › Gebäudetypen › Module, Spiel › Hülle › Module)` : 'keine: alles aus Code'],
+    ['Prüfung', f.length ? `⚠️ ${f.length}: ${f.slice(0, 2).map(q => q.text).join(' · ')}` : 'Hülle dicht, Fenster im Raster']]));
+}
+function paintPreview(D, plan, L, c, ctx, g, above, Hh, art) {
   const sky = ctx.createLinearGradient(0, 0, 0, Hh * g); sky.addColorStop(0, '#242234'); sky.addColorStop(0.7, '#793a80'); sky.addColorStop(1, '#f5a097');
   ctx.fillStyle = sky; ctx.fillRect(0, 0, c.width, c.height);
   for (let y = 0; y < plan.H; y++) for (let x = 0; x < plan.W; x++) {
@@ -145,14 +161,8 @@ function hullPreview(D, id, L, maxW = 320) {
     ctx.fillRect(x * g, (y + above) * g, g, g);
   }
   const off = document.createElement('canvas'); off.width = c.width; off.height = c.height;
-  paintHull(off.getContext('2d'), plan, { g, x0: 0, y0: -above, w: plan.W, h: Hh, dim: 45 });
+  paintHull(off.getContext('2d'), plan, { g, x0: 0, y0: -above, w: plan.W, h: Hh, dim: 45, art });
   ctx.drawImage(off, 0, 0);
-  const f = hullAudit(D, id, L, plan), n = k => plan.windows.filter(o => o.where === k).length, cfg = plan.cfg;
-  return el('div', {}, c, facts([
-    ['Gebäudetyp', `${cfg.name} · ${cfg.kind} · Dach ${cfg.roof} · Achse ${cfg.axis} · Verfall ${cfg.decay}`],
-    ['Gebäude', plan.buildings.map(b => `${b.x1 - b.x0 + 1} breit, ${b.floors?.length - 1 || 0} Geschosse à ${b.floorH}`).join(' · ') || 'keins (nur Oberfläche)'],
-    ['Fenster', `${n('facade')} in der Fassade · ${n('room')} in Räumen (gleiches Raster)`],
-    ['Prüfung', f.length ? `⚠️ ${f.length}: ${f.slice(0, 2).map(q => q.text).join(' · ')}` : 'Hülle dicht, Fenster im Raster']]));
 }
 
 export const SUMMARY = {
@@ -250,7 +260,7 @@ export const SUMMARY = {
     const D = w.p.data, users = Object.entries(D.pois || {}).filter(([, P]) => P.hull?.type === id);
     if (!users.length) return { title: 'Hülle', body: el('p', { class: 'ed-small' }, 'Noch kein POI nutzt diesen Gebäudetyp (POIs › Hülle › Gebäudetyp).') };
     const [pid, P] = users[0], L = poiReady(D, pid).ok ? buildPoi(D, pid, P.seed || 1) : null;
-    return { title: 'Hülle', body: el('div', {}, el('p', { class: 'ed-small' }, 'Genutzt von: ' + users.map(([k, q]) => q.name || k).join(', ')), L?.def ? hullPreview(D, pid, L) : null) };
+    return { title: 'Hülle', body: el('div', {}, el('p', { class: 'ed-small' }, 'Genutzt von: ' + users.map(([k, q]) => q.name || k).join(', ')), L?.def ? hullPreview(D, pid, L, 320, w) : null) };
   },
 
   pois(w, x, id) {
@@ -265,7 +275,7 @@ export const SUMMARY = {
       const L = buildPoi(w.p.data, id, seed), r = parseRoom(L.def), main = L.rooms.filter(o => o.band === 'main').map(o => R[o.id]?.name || o.id);
       const G = L.graph, C = L.cycles || {}, nm = sl => R[sl]?.name || sl;
       box.replaceChildren(roomMap(r, 320), roomLegend(), el('b', { style: 'display:block;margin-top:10px' }, `Zyklus-Graph · Seed ${seed}`), graphMap(L, R, 320),
-        el('b', { style: 'display:block;margin-top:10px' }, `Hülle · Seed ${seed}`), hullPreview(w.p.data, id, L),
+        el('b', { style: 'display:block;margin-top:10px' }, `Hülle · Seed ${seed}`), hullPreview(w.p.data, id, L, 320, w),
         facts((G?.circles || []).map(ci => [`Kreis ${ci.i + 1}${ci.outer ? ' (außen)' : ''}`, `${ci.name}: Räume ${ci.from + 1}–${ci.to + 1}${ci.key ? ` · ${ci.key.name} (${keyKindName(ci.key.kind)}) in ${C.keys?.find(k => k.circle === ci.i) ? `${nm(L.rooms.find(o => { const k = C.keys.find(q => q.circle === ci.i); return k.x >= o.x && k.x < o.x + o.w && k.y >= o.y && k.y < o.y + o.h; })?.id)}` : '–'} → ${ci.key.lockName} vor ${nm(G.slots[ci.lockSlot]?.room)}` : ''}${ci.host != null && !ci.key ? ` · Seitenraum an ${nm(G.slots[ci.host]?.room)}` : ''}${ci.drop != null ? ` · Sprung in ${nm(G.slots[ci.drop]?.room)}` : ''}${ci.fallback ? ` · ⚠️ ${ci.fallback}` : ''}`])),
         facts([
         ['Hauptweg', main.join(' → ')],

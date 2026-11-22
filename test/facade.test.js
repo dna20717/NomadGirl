@@ -101,6 +101,24 @@ test('Skyline aus derselben Grammatik: Stadt dicht und hoch, Canyon karg, determ
   assert.ok(skylinePlan(D, { seed: 1, width: 3000, far: true }).list.length > 15, 'BigCityDelta am Horizont');
 });
 
+test('#172 gemalte Module: Typ über Spiel › Hülle, POI über Typ, jedes Modul ein Bild-Asset mit Datei, Schalter aus = keine', async () => {
+  const fs = await import('node:fs');
+  for (const id of Object.keys(D.pois)) {
+    const art = hullConfig(D, id).art;
+    for (const [k, v] of Object.entries(art)) for (const a of Array.isArray(v) ? v : typeof v === 'string' ? [v] : []) {
+      assert.equal(D.assets[a]?.kind, 'image', `${id}: Modul ${k} = ${a}`);
+      assert.ok(fs.existsSync(new URL('../projects/nomadgirl/' + D.assets[a].file, import.meta.url)), `${a}: Datei`);
+    }
+  }
+  const mall = hullConfig(D, 'grossmarkt').art;
+  assert.ok(mall.wall && mall.window?.length && mall.ac?.length, 'Mall: Wand (Typ), Fenster (Typ), Klimagerät (gemeinsam)');
+  const over = hullConfig({ ...D, pois: { ...D.pois, grossmarkt: { ...D.pois.grossmarkt, hull: { ...D.pois.grossmarkt.hull, art: { wall: 'facade_wall_metal' } } } } }, 'grossmarkt').art;
+  assert.equal(over.wall, 'facade_wall_metal', 'POI überschreibt');
+  assert.deepEqual(hullConfig({ ...D, game: { ...D.game, hull: { ...D.game.hull, modules: false } } }, 'grossmarkt').art, {});
+  // the pediment in the proportion of the painted module (about 1 : 2.4), never wider than its volume
+  for (const seed of [1, 2, 3]) for (const g of planHull(D, 'ministerium', buildPoi(D, 'ministerium', seed)).parts.filter(q => q.kind === 'gable')) assert.ok(g.w / g.h <= 2.41 + 1e-9 || g.h === 2, `Giebel ${g.w.toFixed(1)} × ${g.h.toFixed(1)}`);
+});
+
 test('Hülle aus: Spiel › Hülle › Hüllen an = aus, oder POI › Hülle an = aus', () => {
   const L = buildPoi(D, 'grossmarkt', 1);
   assert.equal(planHull({ ...D, game: { ...D.game, hull: { enabled: false } } }, 'grossmarkt', L, { decay: 1 }).on, false);

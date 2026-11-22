@@ -3,7 +3,7 @@
 // rooms (depth −12: behind the back wall −11 and the tiles −10). Room windows show the dusk and the far city through the back wall, with
 // a frame like the landmark windows (#163). hullSkyline puts the far silhouettes of the same grammar on the background camera:
 // BigCityDelta on the horizon and the neighbours of the region. Nothing here collides or blocks play.
-import { paintHull, paintSkyline, paintWindowView } from '../hull_paint.js';
+import { paintHull, paintSkyline, paintWindowView, hullArtIds } from '../hull_paint.js';
 import { hullGame, skylinePlan } from '../../engine/facade.js';
 import { landmarkViews } from '../../engine/level_design.js';
 
@@ -13,7 +13,10 @@ export class Hull {
   constructor(scene, plan) {
     const s = this.scene = scene, D = s.data_, G = hullGame(D), T = s.T;
     this.plan = plan; this.G = G;
-    const g = this.g = Math.max(4, Math.min(32, Math.round(G.grain))), above = plan.above + 1, y0 = -above, Wt = plan.W, Ht = plan.H + above;
+    // #172 painted modules (loaded with the level, scene.js): the picture of an asset id, or null (the code paints instead)
+    const ids = hullArtIds(plan.cfg), art = id => s.textures.exists(id) ? s.textures.get(id).getSourceImage() : null, mods = ids.some(id => art(id));
+    const g = this.g = Math.max(4, Math.min(64, Math.round(mods ? G.artGrain : G.grain))), above = plan.above + 1, y0 = -above, Wt = plan.W, Ht = plan.H + above;
+    this.modules = ids.filter(id => art(id)).length;
     const step = Math.max(8, Math.floor(CHUNK / g)), stamp = Date.now();
     // room windows: the landmark windows (#163) draw their own view; the others get the city
     const lw = new Set(landmarkViews(D, s.levelPoi, s.levelInfo).filter(v => v.win).map(v => `${v.win.x},${v.win.y}`));
@@ -24,7 +27,7 @@ export class Hull {
       const w = Math.min(step, Wt - cx), h = Math.min(step, plan.H - cy);
       if (!this.busy(cx, cy, w, h)) continue;
       const key = `hull_${stamp}_${cx}_${cy}`, tex = s.textures.createCanvas(key, w * g, h * g), ctx = tex.getContext();
-      paintHull(ctx, plan, { g, x0: cx, y0: cy, w, h, dim: G.backDim });
+      paintHull(ctx, plan, { g, x0: cx, y0: cy, w, h, dim: G.backDim, art: mods ? art : null });
       for (const wn of this.roomWindows) {
         if (wn.x + wn.w < cx || wn.x > cx + w || wn.y + wn.h < cy || wn.y > cy + h) continue;
         paintWindowView(ctx, (wn.x - cx) * g, (wn.y - cy) * g, wn.w * g, wn.h * g, { sky, seed: wn.x * 7 + wn.y });
@@ -52,7 +55,7 @@ export class Hull {
     return P.parts.some(p => p.x < x0 + w && p.x + p.w > x0 && p.y < y0 + h && p.y + p.h > y0) || P.windows.some(q => q.x < x0 + w && q.x + q.w > x0 && q.y < y0 + h && q.y + q.h > y0);
   }
   // Fernsteuerung / tests: what the hull did
-  state() { const P = this.plan, c = [0, 0, 0, 0, 0]; for (const v of P.cls) c[v]++; return { type: P.cfg.type, kind: P.cfg.kind, facade: c[1], open: c[2], earth: c[4], buildings: P.buildings.length, windows: P.windows.filter(w => w.where === 'facade').length, roomWindows: P.windows.filter(w => w.where === 'room').length, parts: P.parts.length, chunks: this.images.length, grain: this.g }; }
+  state() { const P = this.plan, c = [0, 0, 0, 0, 0]; for (const v of P.cls) c[v]++; return { type: P.cfg.type, kind: P.cfg.kind, facade: c[1], open: c[2], earth: c[4], buildings: P.buildings.length, windows: P.windows.filter(w => w.where === 'facade').length, roomWindows: P.windows.filter(w => w.where === 'room').length, parts: P.parts.length, chunks: this.images.length, grain: this.g, modules: this.modules || 0 }; }
   lightAt(x, y) { const P = this.plan; return x >= 0 && y >= 0 && x < P.W && y < P.H && P.cls[y * P.W + x] ? this.G.light / 100 : null; }
 }
 

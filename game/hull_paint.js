@@ -25,12 +25,64 @@ const DARK = 0x141013, INK = 0x060608, LIGHT = 0xfef3c0;
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => (v + 0.5) / 16);
 const hash = (x, y, s = 0) => { let h = (x * 374761393 + y * 668265263 + s * 2246822519) >>> 0; h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
 
-export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = plan.H, dim = 45 } = {}) {
+// ---------------- #172 painted modules (PixelLab, AAP-64): helpers ----------------
+// A module is an asset id in plan.cfg.art (Welt › Gebäudetypen › Module, Spiel › Hülle › Module); `art(id)` gives the loaded picture or null.
+// A list of ids is a set of variants (picked per place by hash). Modules are painted at plan.cfg.artPx pixels per tile (Standard 32).
+const mkCanvas = (w, h) => { if (typeof OffscreenCanvas !== 'undefined') return new OffscreenCanvas(w, h); const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const dimCache = new WeakMap();
+// the picture darkened by k (0..1) towards DARK, cached: things behind the play space (Spiel › Hülle › Vordächer und Treppen dunkler)
+function dimmed(img, k) {
+  if (!k) return img;
+  let m = dimCache.get(img); if (!m) dimCache.set(img, m = new Map());
+  const key = Math.round(k * 100);
+  if (!m.has(key)) {
+    const c = mkCanvas(img.width, img.height), x = c.getContext('2d');
+    x.drawImage(img, 0, 0); x.globalCompositeOperation = 'source-atop'; x.globalAlpha = k; x.fillStyle = '#141013'; x.fillRect(0, 0, c.width, c.height);
+    m.set(key, c);
+  }
+  return m.get(key);
+}
+// 9-slice: corners keep their size (scaled by s), edges and middle stretch; for windows of any size in the grid
+function nine(ctx, img, dx, dy, dw, dh, s = 1) {
+  const iw = img.width, ih = img.height, b = Math.max(2, Math.round(Math.min(iw, ih) * 0.2)), d = Math.max(2, Math.min(Math.round(b * s), Math.floor(dw / 2) - 1, Math.floor(dh / 2) - 1));
+  const sx = [0, b, iw - b, iw], sy = [0, b, ih - b, ih], X = [dx, dx + d, dx + dw - d, dx + dw], Y = [dy, dy + d, dy + dh - d, dy + dh];
+  for (let j = 0; j < 3; j++) for (let i = 0; i < 3; i++) {
+    const w0 = sx[i + 1] - sx[i], h0 = sy[j + 1] - sy[j], w1 = X[i + 1] - X[i], h1 = Y[j + 1] - Y[j];
+    if (w0 > 0 && h0 > 0 && w1 > 0 && h1 > 0) ctx.drawImage(img, sx[i], sy[j], w0, h0, X[i], Y[j], w1, h1);
+  }
+}
+// a picture into a box (pixels): keep its aspect, stretch up to `stretch` to fill more of the box, stand on the bottom, centred
+function fitIn(ctx, img, x, y, w, h, { stretch = 1.25, mode = 'contain', flip = false } = {}) {
+  const a = img.width / img.height;
+  let dw, dh;
+  if (mode === 'height') { dh = h; dw = Math.min(h * a, w * 2.2); if (dw < h * a) dh = Math.min(h, dw / a * stretch); }
+  else if (a > w / h) { dw = w; dh = Math.min(h, w / a * stretch); }
+  else { dh = h; dw = Math.min(w, h * a * stretch); }
+  const X = Math.round(x + (w - dw) / 2), Y = Math.round(y + h - dh);
+  if (flip) { ctx.save(); ctx.translate(X + dw, Y); ctx.scale(-1, 1); ctx.drawImage(img, 0, 0, Math.round(dw), Math.round(dh)); ctx.restore(); }
+  else ctx.drawImage(img, X, Y, Math.round(dw), Math.round(dh));
+  return { x: X, y: Y, w: dw, h: dh };
+}
+// all asset ids a hull config uses (for loading them before painting)
+export function hullArtIds(cfg) {
+  const out = new Set();
+  for (const v of Object.values(cfg?.art || {})) for (const id of Array.isArray(v) ? v : [v]) if (typeof id === 'string' && id) out.add(id);
+  return [...out];
+}
+
+export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = plan.H, dim = 45, art = null } = {}) {
   if (!plan?.on) return;
   const C = plan.cfg, W = plan.W, H = plan.H, cls = (x, y) => x < 0 || y < 0 || x >= W || y >= H ? 0 : plan.cls[y * W + x];
   const pw = w * g, ph = h * g, X = x => Math.round((x - x0) * g), Y = y => Math.round((y - y0) * g);
   const wall = snap(C.wall), trim = snap(C.trim), glass = snap(C.glass), frame = snap(C.frame), lit = snap(C.litColor || '#ffd541'), roofC = snap(C.roofColor), baseC = snap(C.baseColor);
   const back = c => mix(c, 0x141013, dim / 100);   // things behind the play space: darker, never read as a platform
+  // #172 modules: M(key, seed) → picture or null (code painting stays the fallback), s = canvas pixels per module pixel
+  const M = (key, seed = 0) => {
+    if (!art) return null;
+    let v = C.art?.[key]; if (Array.isArray(v)) v = v.length ? v[Math.floor(hash(seed | 0, v.length, 77) * v.length) % v.length] : null;
+    const im = v ? art(v) : null; return im && im.width ? im : null;
+  };
+  const s = g / Math.max(4, C.artPx || 32), artDim = (C.artDim ?? 0) / 100;
   const bOf = (x, y) => { for (let b = 0; b < plan.buildings.length; b++) for (const v of plan.buildings[b].volumes) if (x >= v.x0 && x <= v.x1 && y >= v.top && y <= v.bottom) return b; return -1; };
 
   // ---------- 1. the mass: facade (wall with light from above, dithered), earth (strata) — per pixel ----------
@@ -82,14 +134,37 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
     return p;
   };
   const px1 = Math.max(1, Math.round(g / 16));   // one art pixel at this grain
+  // #172 a texture tiled over a rectangle (tile units), aligned to the world, at `sc` canvas pixels per module pixel; stripH: squeeze to that height
+  const tileRect = (img, x, y, ww, hh, { sc = s, stripH = 0, dimK = 0 } = {}) => {
+    const im = dimK ? dimmed(img, dimK) : img, th = stripH ? stripH * g : img.height * sc, tw = img.width * (stripH ? th / img.height : sc);
+    if (tw < 1 || th < 1) return;
+    ctx.save(); ctx.beginPath(); ctx.rect(Math.round(x * g), Math.round(y * g), Math.round(ww * g), Math.round(hh * g)); ctx.clip();
+    const sx = Math.floor(x * g / tw) * tw, sy = stripH ? y * g : Math.floor(y * g / th) * th;
+    for (let py = sy; py < (y + hh) * g; py += th) for (let px = sx; px < (x + ww) * g; px += tw) ctx.drawImage(im, Math.round(px), Math.round(py), Math.ceil(tw), Math.ceil(th));
+    ctx.restore();
+  };
 
   // ---------- 2. per building, clipped to its facade: material, bands, plinth, pilasters, windows, damage ----------
   plan.buildings.forEach((b, bi) => {
     if (b.x1 < x0 - 2 || b.x0 > x0 + w + 2) return;
     ctx.save(); ctx.clip(facadePath(bi));
     const left = b.x0, right = b.x1 + 1, top = b.top, bottom = plan.ground;
-    // material
-    if (C.material === 'brick') { for (let y = top * g; y < bottom * g; y += Math.max(2, g / 4)) { Rp(shade, left * g, y, (right - left) * g, px1); const off = (y / Math.max(2, g / 4)) % 2 ? g / 4 : 0; for (let x = left * g + off; x < right * g; x += g / 2) Rp(shade, x, y, px1, g / 4); } }
+    // material: the painted wall texture (#172) on the world grid (chunks stitch), variants per texture cell; else from code
+    const tex = M('wall');
+    if (tex) {
+      const tw = tex.width * s, th = tex.height * s, cw = tex.width / Math.max(4, C.artPx || 32), ch = tex.height / Math.max(4, C.artPx || 32);
+      for (let cy = Math.floor(top / ch) * ch; cy < bottom; cy += ch) for (let cx = Math.floor(left / cw) * cw; cx < right; cx += cw) {
+        if (cx + cw < x0 - 1 || cx > x0 + w + 1 || cy + ch < y0 - 1 || cy > y0 + h + 1) continue;
+        const alt = (C.art?.wallAltShare ?? 25) > hash(cx, cy, 71) * 100 ? M('wallAlt', Math.floor(hash(cx, cy, 72) * 97)) : null;
+        ctx.drawImage(alt || tex, Math.round(cx * g), Math.round(cy * g), Math.round(tw), Math.round(th));
+      }
+      // light from above, shade towards the ground (the building stands outside), and the facade a bit back behind the play space
+      const gr = ctx.createLinearGradient(0, top * g, 0, bottom * g);
+      gr.addColorStop(0, 'rgba(254,243,192,0.10)'); gr.addColorStop(0.35, 'rgba(20,16,19,0)'); gr.addColorStop(1, 'rgba(20,16,19,0.3)');
+      ctx.fillStyle = gr; ctx.fillRect(left * g, top * g, (right - left) * g, (bottom - top) * g);
+      if (artDim) { ctx.fillStyle = `rgba(20,16,19,${artDim})`; ctx.fillRect(left * g, top * g, (right - left) * g, (bottom - top) * g); }
+    }
+    else if (C.material === 'brick') { for (let y = top * g; y < bottom * g; y += Math.max(2, g / 4)) { Rp(shade, left * g, y, (right - left) * g, px1); const off = (y / Math.max(2, g / 4)) % 2 ? g / 4 : 0; for (let x = left * g + off; x < right * g; x += g / 2) Rp(shade, x, y, px1, g / 4); } }
     else if (C.material === 'concrete') { for (let x = left; x < right; x += Math.max(2, C.axis / 2)) R(shade, x, top, 1 / g, bottom - top); for (let y = bottom; y > top; y -= b.floorH / 2) R(shade, left, y - 0.5, right - left, 1 / g); for (let k = 0; k < (right - left) * (bottom - top) / 6; k++) { const x = left + hash(k, bi, 1) * (right - left), y = top + hash(k, bi, 2) * (bottom - top); R(hash(k, bi, 3) < 0.5 ? shade : light, x, y, 2 / g, 1 / g); } }
     else if (C.material === 'metal') { for (let x = left * g; x < right * g; x += Math.max(3, g / 4)) { Rp(shade, x, top * g, px1, (bottom - top) * g); Rp(light, x + px1 * 2, top * g, px1, (bottom - top) * g); } }
     else if (C.material === 'stone') { for (let y = top; y < bottom; y += 1) { R(shade, left, y, right - left, 1 / g); for (let x = left + (y % 2) * 0.75; x < right; x += 1.5) R(shade, x, y, 1 / g, 1); } }
@@ -97,20 +172,29 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
     else { for (let k = 0; k < (right - left) * (bottom - top) / 3; k++) { const x = left + hash(k, bi, 4) * (right - left), y = top + hash(k, bi, 5) * (bottom - top); R(hash(k, bi, 6) < 0.6 ? shade : light, x, y, (1 + hash(k, bi, 7) * 3) / g, 1 / g); } }   // plaster
     for (const p of plan.parts) {
       if (p.b !== bi) continue;
-      if (p.kind === 'band') { R(trim, p.x, p.y - 0.28, p.w, 0.28); R(mix(trim, 0xffffff, 0.3), p.x, p.y - 0.28, p.w, 1 / g); R(DARK, p.x, p.y, p.w, 1 / g); }
-      if (p.kind === 'base') {
+      if (p.kind === 'band' && M('band')) { tileRect(M('band'), p.x, p.y - 0.3, p.w, 0.3, { stripH: 0.3, dimK: 0.4 }); R(DARK, p.x, p.y, p.w, 1 / g); }
+      else if (p.kind === 'band') { R(trim, p.x, p.y - 0.28, p.w, 0.28); R(mix(trim, 0xffffff, 0.3), p.x, p.y - 0.28, p.w, 1 / g); R(DARK, p.x, p.y, p.w, 1 / g); }
+      if (p.kind === 'base' && M('base')) {
+        tileRect(M('base'), p.x, p.y, p.w, p.h); R(mix(baseC, 0xffffff, 0.25), p.x, p.y, p.w, 2 / g); R(DARK, p.x, p.y + 2 / g, p.w, 1 / g);
+        if (p.style === 'shop') for (const ax of b.axes) { const im = M('shop', ax); if (im) nine(ctx, im, Math.round((ax - 0.5) * g), Math.round((p.y + 0.3) * g), Math.round((C.winW + 1) * g), Math.round((p.h - 0.3) * g), s); }
+      }
+      else if (p.kind === 'base') {
         R(baseC, p.x, p.y, p.w, p.h); R(mix(baseC, 0xffffff, 0.25), p.x, p.y, p.w, 2 / g);
         if (p.style === 'stone') for (let y = p.y; y < p.y + p.h; y += 0.5) { R(mix(baseC, DARK, 0.4), p.x, y, p.w, 1 / g); for (let x = p.x + ((y * 2) % 2) * 0.6; x < p.x + p.w; x += 1.2) { R(mix(baseC, DARK, 0.4), x, y, 1 / g, 0.5); R(mix(baseC, 0xffffff, 0.2), x + 1 / g, y + 1 / g, 1 / g, 0.5 - 2 / g); } }
         if (p.style === 'tiles') for (let y = p.y; y < p.y + p.h; y += 0.25) for (let x = p.x; x < p.x + p.w; x += 0.25) R(mix(baseC, 0xffffff, hash(x * 4 | 0, y * 4 | 0, 9) < 0.5 ? 0.12 : 0), x, y, 0.25 - 1 / g, 0.25 - 1 / g);
         if (p.style === 'shop') for (const ax of b.axes) { R(frame, ax - 0.5, p.y + 0.3, C.winW + 1, p.h - 0.3); R(mix(glass, DARK, 0.45), ax - 0.5 + 2 / g, p.y + 0.3 + 2 / g, C.winW + 1 - 4 / g, p.h - 0.3 - 4 / g); R(mix(glass, 0xffffff, 0.25), ax, p.y + 0.6, 0.2, p.h * 0.6); }
       }
-      if (p.kind === 'lisene') { R(trim, p.x + 0.2, p.y, 0.6, p.h); R(mix(trim, 0xffffff, 0.28), p.x + 0.2, p.y, 1.5 / g, p.h); R(mix(trim, DARK, 0.35), p.x + 0.8 - 1.5 / g, p.y, 1.5 / g, p.h); }
+      if (p.kind === 'lisene' && M('lisene')) { tileRect(M('lisene'), p.x + 0.2, p.y, 0.6, p.h, { dimK: 0.1 }); R(mix(trim, 0xffffff, 0.28), p.x + 0.2, p.y, 1.5 / g, p.h); R(INK, p.x + 0.8 - 1.5 / g, p.y, 1.5 / g, p.h); }
+      else if (p.kind === 'lisene') { R(trim, p.x + 0.2, p.y, 0.6, p.h); R(mix(trim, 0xffffff, 0.28), p.x + 0.2, p.y, 1.5 / g, p.h); R(mix(trim, DARK, 0.35), p.x + 0.8 - 1.5 / g, p.y, 1.5 / g, p.h); }
     }
     // windows of the facade (the rooms behind them we cannot enter): frame, glass with a streak of sky, lit, broken, boarded
     for (const wn of plan.windows) {
       if (wn.b !== bi || wn.where !== 'facade') continue;
       const { x, y, w: ww, h: hh } = wn;
       if (plan.kind === 'decks') { R(DARK, x - 0.4, y, ww + 0.8, hh); R(mix(trim, DARK, 0.2), x - 0.4, y + hh * 0.55, ww + 0.8, 2 / g); continue; }   // open deck: a dark slot with the railing
+      // #172 painted window: boarded, broken, lit or dark (variants per place), 9-slice into the grid cell, a little shadow in the reveal
+      const wim = wn.boarded ? M('windowBoarded', wn.x * 7 + wn.y) : wn.broken ? M('windowBroken', wn.x * 7 + wn.y) : wn.lit ? M('windowLit', wn.x * 7 + wn.y) : M('window', wn.x * 7 + wn.y);
+      if (wim) { R(mix(wall, DARK, 0.55), x - 1 / g, y - 1 / g, ww + 2 / g, hh + 3 / g); nine(ctx, wim, Math.round(x * g), Math.round(y * g), Math.round(ww * g), Math.round(hh * g), s); continue; }
       R(mix(wall, DARK, 0.45), x - 2 / g, y - 2 / g, ww + 4 / g, hh + 4 / g);   // reveal
       R(frame, x, y, ww, hh);
       const ix = x + 2 / g, iy = y + 2 / g, iw = ww - 4 / g, ih = hh - 4 / g;
@@ -122,8 +206,24 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
       R(mix(trim, 0xffffff, 0.2), x - 3 / g, y + hh + 1 / g, ww + 6 / g, 2 / g);   // sill
     }
     // damage
+    // #172 weathering from the painted decals (rust, stains, moss, peeling paint) by decay, before the bigger damage
+    const decK = (C.decay ?? 1) * (C.damage ?? 100) / 100, nW = Math.round(decK * (right - left) * (bottom - top) / 90 * (C.art?.weatherShare ?? 100) / 100);
+    for (let k = 0; k < nW && C.art?.weather?.length; k++) {
+      const im = M('weather', k * 13 + bi); if (!im) break;
+      const wx = left + hash(k, bi, 81) * (right - left - 1), wy = top + hash(k, bi, 82) * (bottom - top - 1.5), sz = 1 + hash(k, bi, 83) * 0.8;
+      fitIn(ctx, im, wx * g, wy * g, sz * g, sz * g, { flip: hash(k, bi, 84) < 0.5 });
+    }
     for (const p of plan.parts) {
       if (p.b !== bi) continue;
+      const dk = { hole: 'hole', crack: 'crack', shots: 'shots', soot: 'soot' }[p.kind], dim0 = dk ? M(dk, (p.seed ?? 0) + bi * 31 + (p.x | 0)) : null;
+      if (dim0) {
+        // decals at most a little larger than painted (≈ 2 tiles), so damage stays a detail and the wall still reads
+        const nat = Math.max(dim0.width, dim0.height) * s / g * 1.15, ln = Math.min(p.len || 2, nat * 1.2);
+        if (p.kind === 'crack') fitIn(ctx, dim0, (p.x - 0.4) * g, p.y * g, ln * g, ln * g, { mode: 'height', flip: hash(p.seed, bi, 85) < 0.5 });
+        else if (p.kind === 'soot') fitIn(ctx, dim0, p.x * g, (p.y - 0.4) * g, p.w * g, (p.h + 0.6) * g, { stretch: 1.6 });
+        else fitIn(ctx, dim0, p.x * g, p.y * g, Math.min(nat, Math.max(1.2, p.w)) * g, Math.min(nat, Math.max(1.2, p.h)) * g, { stretch: 1.2, flip: hash(p.seed, bi, 86) < 0.5 });
+        continue;
+      }
       if (p.kind === 'hole') {   // a bite out of the facade: dark inside, rebar, a broken light edge
         const cx = p.x + p.w / 2, cy = p.y + p.h / 2, n = 9;
         ctx.fillStyle = css(DARK); ctx.beginPath();
@@ -154,6 +254,18 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
   // ---------- 4. roofs and what stands on them, the lattice, the portal ----------
   for (const p of plan.parts) {
     if (p.x > x0 + w + 4 || p.x + p.w < x0 - 4) continue;
+    // #172 painted: parapet/coping strip, pediment, crown, rooftop units (variants), a fallen wreck, the bunker lintel
+    if (p.kind === 'roof' && M('roof')) { tileRect(M('roof'), p.x, p.y, p.w, p.h, { stripH: p.h }); R(INK, p.x, p.y, 1 / g, p.h); R(INK, p.x + p.w - 1 / g, p.y, 1 / g, p.h); R(INK, p.x, p.y + p.h - 1 / g, p.w, 1 / g); continue; }
+    if (p.kind === 'gable' && M('gable')) { R(roofC, p.x - 0.3, p.y + p.h - 0.2, p.w + 0.6, 0.3); ctx.drawImage(M('gable'), Math.round(p.x * g), Math.round(p.y * g), Math.round(p.w * g), Math.round(p.h * g)); continue; }
+    if (p.kind === 'crown' && M('crown')) { const t = p.tall || p.h; fitIn(ctx, M('crown'), p.x * g, (p.y + p.h - t) * g, p.w * g, t * g, { stretch: 1.2 }); continue; }
+    if (p.kind === 'unit' && p.fallen) { const im = M('fallen', p.x | 0); if (im) fitIn(ctx, im, (p.x - 0.2) * g, (p.y - 0.4) * g, (p.w + 0.4) * g, (p.h + 0.4) * g, { flip: hash(p.x | 0, 1, 87) < 0.5 }); continue; }
+    if (p.kind === 'unit' && M(p.unit, p.x * 3 | 0)) {
+      const im = M(p.unit, p.x * 3 | 0), cx = (p.x + p.w / 2) * g, by = (p.y + p.h) * g;
+      ctx.save(); if (p.tilt) { ctx.translate(cx, by); ctx.rotate(p.tilt * Math.PI / 180); ctx.translate(-cx, -by); }
+      fitIn(ctx, im, p.x * g, p.y * g, p.w * g, p.h * g, { mode: 'height', flip: hash(p.x | 0, 2, 88) < 0.5 && p.unit !== 'frame' });
+      ctx.restore(); continue;
+    }
+    if (p.kind === 'portal' && M('portal')) { const im = M('portal'), ww = (p.w + 1.6) * g, hh = ww * im.height / im.width; ctx.drawImage(dimmed(im, dim / 200), Math.round((p.x - 0.8) * g), Math.round((p.y + 1.3) * g - hh), Math.round(ww), Math.round(hh)); continue; }
     if (p.kind === 'roof') {
       const c = p.roof === 'flat' ? roofC : trim;
       R(c, p.x, p.y, p.w, p.h); R(mix(c, 0xffffff, 0.35), p.x, p.y, p.w, 2 / g); R(INK, p.x, p.y, p.w, 1 / g); R(INK, p.x, p.y, 1 / g, p.h); R(INK, p.x + p.w - 1 / g, p.y, 1 / g, p.h);
@@ -186,6 +298,25 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
   // ---------- 5. behind the play space (dimmed): awnings, canopies, the station roof, fire escapes, plant, street structures ----------
   for (const p of plan.parts) {
     if (p.x > x0 + w + 12 || p.x + p.w < x0 - 12) continue;
+    // #172 painted and darkened like everything behind the play space
+    const dk = dim / 100;
+    if (p.kind === 'awning' && M('awning')) { const im = dimmed(M('awning'), dk), hh = p.w * im.height / im.width; ctx.drawImage(im, Math.round(p.x * g), Math.round(p.y * g), Math.round(p.w * g), Math.round(hh * g)); continue; }
+    if (p.kind === 'station' && M('station')) {   // the canopy in sections, each with its post down to the ground
+      const im = dimmed(M('station'), dk), H0 = plan.ground - p.y, segW = H0 * im.width / im.height, n = Math.max(1, Math.round(p.w / segW)), sw = p.w / n;
+      for (let k = 0; k < n; k++) ctx.drawImage(im, Math.round((p.x + k * sw) * g), Math.round(p.y * g), Math.round(sw * g) + 1, Math.round(H0 * g));
+      continue;
+    }
+    if (p.kind === 'fire' && M('fire')) {   // one flight per storey, alternating
+      const im = dimmed(M('fire'), dk), step = Math.max(3, p.step || 5), fw = Math.min(p.w * 1.5, step * im.width / im.height);
+      for (let y = p.y + p.h, k = 0; y - step >= p.y - 0.01; y -= step, k++) {
+        const fx = p.x + (p.w - fw) / 2;
+        if (k % 2) { ctx.save(); ctx.translate(Math.round((fx + fw) * g), 0); ctx.scale(-1, 1); ctx.drawImage(im, 0, Math.round((y - step) * g), Math.round(fw * g), Math.round(step * g)); ctx.restore(); }
+        else ctx.drawImage(im, Math.round(fx * g), Math.round((y - step) * g), Math.round(fw * g), Math.round(step * g));
+      }
+      continue;
+    }
+    if (p.kind === 'plant' && M('plant_' + p.what, p.seed)) { fitIn(ctx, dimmed(M('plant_' + p.what, p.seed), dk), p.x * g, p.y * g, p.w * g, p.h * g, { stretch: 1.6, flip: hash(p.seed, 3, 89) < 0.5 }); continue; }
+    if (p.kind === 'surface' && drawSurfaceArt(ctx, p, g, M, dk)) continue;
     if (p.kind === 'awning') {   // striped awning, torn by decay
       const n = Math.max(3, Math.round(p.w * 2));
       for (let k = 0; k < n; k++) { if (p.torn && k % 3 === 2) continue; R(back(k % 2 ? 0xdae0ea : trim), p.x + k * p.w / n, p.y, p.w / n, p.h - (p.torn && k % 4 === 1 ? 0.4 : 0)); }
@@ -206,6 +337,7 @@ export function paintHull(ctx, plan, { g = 16, x0 = 0, y0 = 0, w = plan.W, h = p
 }
 
 function drawUnit(ctx, p, g, { trim, roofC, frame, wall, lit, px1, R, mix: m }) {
+  if (p.fallen) return;   // a wreck only as a painted module (#172)
   ctx.save();
   const cx = (p.x + p.w / 2) * g, by = (p.y + p.h) * g;
   if (p.tilt) { ctx.translate(cx, by); ctx.rotate(p.tilt * Math.PI / 180); ctx.translate(-cx, -by); }
@@ -261,6 +393,20 @@ function drawPlant(ctx, p, g, { back, trim, wall, px1, R }) {
   if (p.what === 'trailer') { R(back(0xdae0ea), bx, p.y + 0.4, p.w, p.h - 1); R(back(trim), bx, p.y + 1.3, p.w, 0.25); for (let x = bx + 0.6; x < bx + p.w - 1; x += 1.8) R(back(0x285cc4), x, p.y + 0.8, 0.9, 0.4); ctx.fillStyle = css(d); ctx.beginPath(); ctx.arc((bx + p.w * 0.3) * g, (by - 0.4) * g, 0.4 * g, 0, Math.PI * 2); ctx.fill(); R(d, bx - 1, by - 0.8, 1, 1 / g); }
   if (p.what === 'watertower') { R(d, bx + 0.6, p.y + 4, 0.2, p.h - 4); R(d, bx + p.w - 0.8, p.y + 4, 0.2, p.h - 4); R(c, bx, p.y + 1, p.w, 3); ctx.fillStyle = css(c); ctx.beginPath(); ctx.moveTo(bx * g, (p.y + 1) * g); ctx.lineTo((bx + p.w / 2) * g, p.y * g); ctx.lineTo((bx + p.w) * g, (p.y + 1) * g); ctx.fill(); }
   if (p.what === 'pylon') { ctx.strokeStyle = css(d); ctx.lineWidth = px1; ctx.beginPath(); ctx.moveTo(bx * g, by * g); ctx.lineTo((bx + p.w / 2) * g, p.y * g); ctx.lineTo((bx + p.w) * g, by * g); for (let y = p.y + 2; y < by; y += 2) { const f = (y - p.y) / p.h; ctx.moveTo((bx + p.w / 2 - f * p.w / 2) * g, y * g); ctx.lineTo((bx + p.w / 2 + f * p.w / 2) * g, y * g); } ctx.moveTo((bx - 0.5) * g, (p.y + 2) * g); ctx.lineTo((bx + p.w + 0.5) * g, (p.y + 2) * g); ctx.stroke(); }
+}
+// #172 the street structures of the underground POIs from painted modules; false = nothing painted for it, the code draws it
+function drawSurfaceArt(ctx, p, g, M, dk) {
+  const im = k => { const i = M('surface_' + k, p.seed || 0); return i ? dimmed(i, dk) : null; }, bx = p.x, by = p.y + p.h;
+  const row = (i, hh, y = by - hh) => { const tw = hh * i.width / i.height; for (let x = bx; x < bx + p.w - 0.01; x += tw) { const ww = Math.min(tw, bx + p.w - x); ctx.drawImage(i, 0, 0, i.width * ww / tw, i.height, Math.round(x * g), Math.round(y * g), Math.round(ww * g), Math.round(hh * g)); } };
+  const fit = (i, x, w, h, o) => fitIn(ctx, i, x * g, (by - h) * g, w * g, h * g, o);
+  const w = p.what;
+  if (w.endsWith('_in')) { const f = im('fence'); if (!f) return false; row(f, 1.4); return true; }
+  if (w === 'metro') { const m = im('metro'), l = im('lamp'); if (!m) return false; fit(m, bx + 0.8, p.w - 0.8, Math.min(p.h, 4.5)); if (l) fit(l, bx - 0.4, 1.2, 4, { mode: 'height' }); return true; }
+  if (w === 'drain') { const d = im('drain'); if (!d) return false; row(d, 3); return true; }
+  if (w === 'mine') { const hf = im('headframe'), wh = im('washhouse'); if (!hf && !wh) return false; if (hf) fit(hf, bx + p.w * 0.45, p.w * 0.55, p.h, { mode: 'height' }); if (wh) fit(wh, bx, p.w * 0.6, 4.5); return true; }
+  if (w === 'silo') { const f = im('fence'), gh = im('guardhouse'), rd = im('radar'); if (!f && !gh && !rd) return false; if (rd) fit(rd, bx + p.w * 0.1, 2.5, 5.5, { mode: 'height' }); if (gh) fit(gh, bx + p.w * 0.5, 3, 2.8); if (f) row(f, 1.5); return true; }
+  if (w === 'hatch') { const h = im('hatch'); if (!h) return false; fit(h, bx, p.w, 1.2); return true; }
+  return false;
 }
 function drawSurface(ctx, p, g, { back, trim, wall, glass, px1, R, C }) {
   const w = back(snap(C.wall)), t = back(snap(C.trim)), d = back(0x333941), hi = back(0xdae0ea), bx = p.x, by = p.y + p.h;
