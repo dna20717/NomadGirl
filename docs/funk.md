@@ -43,7 +43,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   - **Regel neu:** keine Texte in Grafiken (CLAUDE.md), umgesetzt in #170/#177 (Schrift aus Code, `tools/text_audit.py`).
   - **Fehler:** alle 68 Browser-Tests grün (#166), Keycard auf Leitern, Tropes-Größen, Rückweg zum Van von jedem Raum (#175).
   - **Werkzeuge:** Levelkarten-Skript (Scratchpad, `levelmap.mjs`; Bilder `output/karte_*.jpg`), Liste `docs/concepts/poi_feinschliff.md` (Top 5: Spieltest, Ton im POI, Bosse je POI, Umgebung zum Anfassen, mehr Räume).
-  - **Läuft noch:** **#179 Mile 7 Runde 2** (Dach-Block verkleiden, Supermarkt-Innen-Look, echtes Licht) in einem Helfer dieser Sitzung (Worktree). Steht im nächsten Chat nichts von #179 auf `main`: neu starten.
+  - **Nachtrag:** #179 Mile 7 Runde 2 ist fertig (`839dfa5`), PixelLab übrig 810,6. Nächster Schritt dort: Dach-Block wirkt von außen wie ein schwarzes Loch.
   - **Offen:** G5 Kuratieren, G6 Mitbauen; ⚠️-Punkte in #164–#178; Entscheidungskarten-Artefakt „NomadGirl Abnahme Nächste Generation“ ist ausgewertet.
   - **PixelLab:** Sitzung ≈ 750 Generierungen, übrig 840,6 (Umgebung „NomadGirl“ nötig, sonst ist PixelLab aus).
 
@@ -329,11 +329,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #179 Mile 7 Runde 2: Dach-Block verkleiden, Supermarkt-Innen-Look, echtes Licht
-- **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Ja, mach die Tankstelle hübsch“)
+- **Status:** fertig (22.11.) · angelegt 22.11. von Code (Daniel: „Ja, mach die Tankstelle hübsch“)
 - **Für:** Code
 - **Auftrag:** Grauer Lager-Block auf dem Dach verkleidet/abgesenkt (Silhouette ruhig, Blende durchgehend), Supermarkt mit eigenem Innen-Look (Fliesenboden, helle Rückwand, Deckenraster, Werbeflächen ohne Text), Lichtleisten und Vordach-Schein ins Lichtsystem; Gesamtbild hübsch und stimmig. PixelLab bis ≈ 80.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: Lager-Block innen dunkel, liest sich im roten Rahmen als schwarzes Feld (Lager-Atmosphäre gilt auch anderswo) – **Befund Code: wirkt von außen wie ein Loch, nächster Schritt: Lager heller oder Block als geschlossene Fassade/Billboard von außen**; gekipptes Regal lässt Gangschild über leerem Boden; Supermarkt-Set nur im Verkaufsraum (Mile 7); Abendstimmung nur in den Zapfinseln.
+- **Ergebnis:** (Code, per Helfer, `839dfa5`) Rote Blende läuft als Werbe-Attika um den Dach-Block (Felder `upperFascia`, `upperPad`, `lamps`); offene Blenden-Paneele mit Unterkonstruktion; Supermarkt-Kachel-Sets (Karo-Boden, weiße Fliesen, rotes Sockelband, abgehängte Decke, abgefallene Fliesen nach Verfall), Atmosphäre „Supermarkt hell“ mit Leuchtpaneelen (kaputte hängen am Draht); Gangschilder über den Regalen, ANGEBOT/−30 % aus Code, OFFEN-Neon stottert; Lichtleisten, Vordach-Downlights und Pylon im Lichtsystem (`hullLamps`), Abendstimmung an den Zapfinseln. PixelLab 30. Tests npm 470, poi 33, poi_levels 15, doors 22, light 18, story 23, Audits 0. **Bitte testen:** `/game?poi=tankstelle_km7&seed=1` Dach-Block von außen, Verkaufsraum, Lichtinseln unter dem Dach, Seeds 2–4.
 
 ### #177 Rest-Texte aus Grafiken, Licht an geschlossenen Türen
 - **Status:** fertig (22.11.) · angelegt 22.11. von Code (Daniel: „1 geht gut“)

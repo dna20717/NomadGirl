@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 22.11.2026: **Mile 7 Runde 2** (#179): Werbe-Attika um den Dach-Block, heller Supermarkt mit Fliesen, Leuchtpaneelen und Gangschildern, echtes Licht unter dem Tankstellendach und am Pylon.
 - 22.11.2026: **Rest-Texte aus Grafiken, Licht an Türen** (#177): Prüfwerkzeug für Schrift in Grafiken, Schilder und Camp-Deko mit deutscher Schrift aus Code; geschlossene Türen halten Lampenlicht auf.
 - 22.11.2026: **Mile 7 als Mega-Store** (#178): flache Halle mit roter Delta-Blende, Werbe-Pylon, großes Tankstellendach mit Lichtleisten, Parkplatz mit Wracks, Supermarkt-Einrichtung innen.
 - 22.11.2026: **Türen** (#174): gemalte Türen in sechs Materialien im Profil und frontal, offen/zu/zerstört/verschlossen; mit E öffnen, Gegner öffnen auch, zerstörbar je Material, kaputte Türen bleiben als Spur, Rückwand-Türen führen in Seitenräume.
