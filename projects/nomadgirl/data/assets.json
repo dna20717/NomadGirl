@@ -2533,7 +2533,15 @@
   "description": "Clutter steht auf dem unteren Rand des Felds (Sätze *3 = streng orthogonal von der Seite, die älteren Sätze sind schräg und bleiben nur aufbewahrt), Decals liegen flach auf Wänden, Einschlüsse (detail_*) liegen auf der Füllung.",
   "derivedFrom": "tileset00_source",
   "source": "KI (PixelLab, Create Image Pro, AAP-64, Stilvorlage Leyla)",
-  "date": "11.11.2026"
+  "date": "11.11.2026",
+  "labels": [
+   {"text": "ZONE\n13", "at": [224, 1772], "size": 15, "color": "#2e2826", "width": 38},
+   {"text": "OFFEN", "at": [95, 1124], "size": 16, "color": "#ff4a3a", "glow": true, "width": 44, "angle": -9},
+   {"text": "OFFEN", "at": [226, 877], "size": 14, "color": "#c47a6c", "width": 38, "angle": -15},
+   {"text": "NASSER\nBODEN", "at": [357, 1127], "size": 9, "color": "#2a2220", "width": 25},
+   {"text": "NASSER\nBODEN", "at": [293, 1639], "size": 9, "color": "#2a2220", "width": 25},
+   {"text": "−50 %", "at": [416, 1619], "size": 13, "color": "#6a4436", "width": 30, "angle": -4}
+  ]
  },
  "tileset00_props_big_text": {
   "name": "TileSet00 · Großer Clutter (Original mit Text)",
@@ -6186,7 +6194,16 @@
   "names": ["X", "03", "Kreuz", "Blech", "Schild", "Wüste", "Schlitze", "Stern", "Latten", "Gitter"],
   "source": "KI (PixelLab, Create Image Pro in Spielgröße 1:1, AAP-64, Referenzen: Leyla für Blickwinkel und Maßstab, TileSet00 Großer Clutter für den Stil) + Code (tools/camp_kit.py: Varianten zuschneiden, unten mittig)",
   "date": "2026-11-19",
-  "description": "#111 Camp-Baukasten: Stapelbare Vorratskiste, oben und unten flach. Je Feld eine Variante (Kandidaten in assets/camp/kit/candidates/)."
+  "description": "#111 Camp-Baukasten: Stapelbare Vorratskiste, oben und unten flach. Je Feld eine Variante (Kandidaten in assets/camp/kit/candidates/).",
+  "derivedFrom": "kit_crate_text"
+ },
+ "kit_crate_text": {
+  "name": "Camp-Baukasten · Holzkiste (Original mit Text)",
+  "kind": "source",
+  "file": "assets/camp/kit/source/crate_text.png",
+  "source": "KI (PixelLab, Create Image Pro in Spielgröße 1:1, AAP-64, Referenzen: Leyla für Blickwinkel und Maßstab, TileSet00 Großer Clutter für den Stil) + Code (tools/camp_kit.py: Varianten zuschneiden, unten mittig)",
+  "date": "2026-11-19",
+  "description": "#177: das Blatt, wie es gemalt wurde, mit gebackenem Text (Schablonen-Zahl 03, Stempel auf der Plakette, CARGO-Etikett). Im Spiel steht die Fassung ohne Text (tools/detext.py), die Schrift kommt aus den Daten."
  },
  "kit_plant": {
   "name": "Camp-Baukasten · Topfpflanze im Eimer",
@@ -6197,7 +6214,17 @@
   "names": ["Türkis", "Farbe", "Blech", "Gestreift", "Creme", "Grün", "Blau", "Sand", "Fisch"],
   "source": "KI (PixelLab, Create Image Pro in Spielgröße 1:1, AAP-64, Referenzen: Leyla für Blickwinkel und Maßstab, TileSet00 Großer Clutter für den Stil) + Code (tools/camp_kit.py: Varianten zuschneiden, unten mittig)",
   "date": "2026-11-19",
-  "description": "#111 Camp-Baukasten: Grüne Pflanze mit gelben Blüten in alten Eimern, mit Schaufel. Je Feld eine Variante (Kandidaten in assets/camp/kit/candidates/)."
+  "description": "#111 Camp-Baukasten: Grüne Pflanze mit gelben Blüten in alten Eimern, mit Schaufel. Je Feld eine Variante (Kandidaten in assets/camp/kit/candidates/).",
+  "labels": [{"text": "FARBE", "at": [91, 50], "size": 8, "color": "#6a5040", "width": 13}],
+  "derivedFrom": "kit_plant_text"
+ },
+ "kit_plant_text": {
+  "name": "Camp-Baukasten · Topfpflanze im Eimer (Original mit Text)",
+  "kind": "source",
+  "file": "assets/camp/kit/source/plant_text.png",
+  "source": "KI (PixelLab, Create Image Pro in Spielgröße 1:1, AAP-64, Referenzen: Leyla für Blickwinkel und Maßstab, TileSet00 Großer Clutter für den Stil) + Code (tools/camp_kit.py: Varianten zuschneiden, unten mittig)",
+  "date": "2026-11-19",
+  "description": "#177: das Blatt, wie es gemalt wurde, mit gebackenem Text (PAINT auf dem Farbeimer). Im Spiel steht die Fassung ohne Text (tools/detext.py), die Schrift kommt aus den Daten."
  },
  "kit_planter": {
   "name": "Camp-Baukasten · Pflanzkasten",
@@ -6363,7 +6390,24 @@
   ],
   "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenzen: Leyla für Blickwinkel/Maßstab, Pilot-Stücke des Baukastens für den Stil) + Code (tools/camp_kit.py)",
   "date": "2026-11-19",
-  "description": "#111: Für die Außenwände der Container."
+  "description": "#111: Für die Außenwände der Container.",
+  "labels": [
+   {"text": "WÜSTE", "at": [92, 23], "size": 10, "color": "#4a3a36", "width": 26},
+   {"text": "D 13", "at": [392, 27], "size": 9, "color": "#f2c14a", "width": 26},
+   {"text": "NG 77", "at": [411, 40], "size": 10, "color": "#3a2a1a", "width": 25},
+   {"text": "B4", "at": [383, 50], "size": 9, "color": "#30303a", "width": 10},
+   {"text": "WÜSTE", "at": [406, 53], "size": 8, "color": "#f0e0c8", "width": 26},
+   {"text": "DAHEIM", "at": [526, 43], "size": 14, "color": "#2a2220", "width": 40}
+  ],
+  "derivedFrom": "kit_wall_items_text"
+ },
+ "kit_wall_items_text": {
+  "name": "Camp-Baukasten · Wandschmuck (Original mit Text)",
+  "kind": "source",
+  "file": "assets/camp/kit/source/wall_items_text.png",
+  "source": "KI (PixelLab, Create Image Pro, AAP-64, Referenzen: Leyla für Blickwinkel/Maßstab, Pilot-Stücke des Baukastens für den Stil) + Code (tools/camp_kit.py)",
+  "date": "2026-11-19",
+  "description": "#177: das Blatt, wie es gemalt wurde, mit gebackenem Text (DESERT auf dem Reiseposter, Nummernschilder, HOME). Im Spiel steht die Fassung ohne Text (tools/detext.py), die Schrift kommt aus den Daten."
  },
  "kit_ground_items": {
   "name": "Camp-Baukasten · Bodenkram",
@@ -6437,7 +6481,17 @@
   ],
   "source": "KI (PixelLab, Create Image Pro 256 × 256, 4 × 4, AAP-64, Referenz Container bzw. Pilot-Stücke) + Code (tools/camp_kit.py)",
   "date": "2026-11-19",
-  "description": "#114: Fenster in Containerwand-Stil (Pixeldichte der Container, im Spiel ×2)."
+  "description": "#114: Fenster in Containerwand-Stil (Pixeldichte der Container, im Spiel ×2).",
+  "labels": [{"text": "OFFEN", "at": [443, 20], "size": 8, "color": "#ff8a5a", "glow": true, "width": 17}],
+  "derivedFrom": "kit_wall_windows_text"
+ },
+ "kit_wall_windows_text": {
+  "name": "Camp-Baukasten · Fenster (Original mit Text)",
+  "kind": "source",
+  "file": "assets/camp/kit/source/wall_windows_text.png",
+  "source": "KI (PixelLab, Create Image Pro 256 × 256, 4 × 4, AAP-64, Referenz Container bzw. Pilot-Stücke) + Code (tools/camp_kit.py)",
+  "date": "2026-11-19",
+  "description": "#177: das Blatt, wie es gemalt wurde, mit gebackenem Text (Neon OPEN im Fenster). Im Spiel steht die Fassung ohne Text (tools/detext.py), die Schrift kommt aus den Daten."
  },
  "kit_wall_doors": {
   "name": "Camp-Baukasten · Türen & Tore",
@@ -6476,7 +6530,21 @@
   ],
   "source": "KI (PixelLab, Create Image Pro 256 × 256, 4 × 4, AAP-64, Referenz Container bzw. Pilot-Stücke) + Code (tools/camp_kit.py)",
   "date": "2026-11-19",
-  "description": "#114: Innen an die Rückwand oder an die Decke."
+  "description": "#114: Innen an die Rückwand oder an die Decke.",
+  "labels": [
+   {"text": "ROST", "at": [863, 23], "size": 10, "color": "#e8d4a8", "width": 24},
+   {"text": "TOUR", "at": [863, 47], "size": 8, "color": "#e8d4a8", "width": 24},
+   {"text": "7", "at": [478, 45], "size": 12, "color": "#3a3030"}
+  ],
+  "derivedFrom": "kit_inside_items_text"
+ },
+ "kit_inside_items_text": {
+  "name": "Camp-Baukasten · Innenkram (Original mit Text)",
+  "kind": "source",
+  "file": "assets/camp/kit/source/inside_items_text.png",
+  "source": "KI (PixelLab, Create Image Pro 256 × 256, 4 × 4, AAP-64, Referenz Container bzw. Pilot-Stücke) + Code (tools/camp_kit.py)",
+  "date": "2026-11-19",
+  "description": "#177: das Blatt, wie es gemalt wurde, mit gebackenem Text (Bandposter (Name, TRUCKS), Kalender-Zahl 7). Im Spiel steht die Fassung ohne Text (tools/detext.py), die Schrift kommt aus den Daten."
  },
  "plx_desert_far": {
   "name": "Parallax · Wüste fern: Tafelberge im Dunst",
@@ -8850,7 +8918,7 @@
   "derivedFrom": "tileset00_source",
   "source": "KI (PixelLab, Create Image Pro, AAP-64, Stilvorlage Leyla)",
   "date": "11.11.2026",
-  "description": "#173: das Blatt, wie es gemalt wurde, mit der Schablonen-Zahl „07“ (detail_metal_11). Im Spiel steht die Fassung ohne Text; detail_metal_11 ist leer und aus den Kachel-Sets genommen."
+  "description": "#173/#177: das Blatt, wie es gemalt wurde, mit Schrift: Schablonen-Zahl „07“ (detail_metal_11), ZONE 13, OPEN (2 ×), WET FLOOR (2 ×), SALE, Buchstaben-Graffiti (detail_ruins_9, detail_ruins_15). Im Spiel steht die Fassung ohne Text, Schilder bekommen ihre Schrift aus den Daten; detail_metal_11, detail_ruins_9 und _15 sind leer und aus den Kachel-Sets genommen."
  },
  "rocket_pl_body_0": {
   "name": "Rakete · PixelLab-Original body_0",

@@ -200,7 +200,7 @@ export const AREAS = {
       { title: 'Kassette (Now Playing)', when: x => !!x.reels, fields: [size('size', 'Bildgröße', { unit: 'px' }), text('label', 'Etikett x, y, b, h', { hint: 'Bildpixel' }), num('reelSize', 'Spulen-Größe', { unit: 'px', min: 2 })] },
       { title: 'Schrift aus Code', when: x => x.kind === 'image' || x.kind === 'icons' || !!x.labels, fields: [table('labels', 'Schrift', [text('text', 'Text', { hint: '\\n = neue Zeile' }), point('at', 'Mitte bei', { unit: 'px im Bild' }),
           num('size', 'Größe', { unit: 'px im Bild', min: 4, max: 200 }), color('color', 'Farbe'), select('align', 'Ausrichtung', [['', 'Mitte'], ['left', 'links (ab „Mitte bei“)'], ['right', 'rechts (bis „Mitte bei“)']]),
-          bool('glow', 'Leuchtet (Neon)'), num('width', 'Höchstens breit', { unit: 'px im Bild', min: 1, hint: 'Längere Texte werden schmaler gestaucht. Leer = frei' })],
+          bool('glow', 'Leuchtet (Neon)'), num('width', 'Höchstens breit', { unit: 'px im Bild', min: 1, hint: 'Längere Texte werden schmaler gestaucht. Leer = frei' }), num('angle', 'Drehung', { unit: '°', min: -90, max: 90, hint: '#177 für schräg hängende Schilder, im Uhrzeigersinn' })],
           { hint: '#170 (Daniel, 21.11.2026: „Texte sollen niemals in der Grafik sein“): Schilder, Preise, Anzeigen kommen in VT323 aus den Daten auf das Bild (game/labels.js), im Spiel, in der Fahrt und in der Vorschau. Gebackener Text wird aus dem Bild entfernt (tools/detext.py), das Original bleibt als Quelle' })] },
       { title: 'Herkunft', fields: [text('source', 'Erzeugt mit', { hint: 'KI-Werkzeug oder Code' }), ref('derivedFrom', 'Abgeleitet von', 'assets', { hint: 'z. B. Streifen aus einem Original-GIF' }), text('date', 'Datum')] },
     ],

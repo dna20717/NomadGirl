@@ -12,7 +12,9 @@ Box modes
          the banner keep their texture, only the strokes go
          options: thr (distance), grow, ref (x, y of the calm colour), colors (only these are letters),
          flat (screens, neon signs: letters take the calm colour itself)
+         pick (a test on the RGBA pixel: only those are letters, e.g. red neon on a plate with a blue frame)
   board  an empty sign board: fill + 1 px frame (for neon letters standing free over a scaffold)
+  clear  the box becomes see-through (#177: a decal that is nothing but lettering)
 
   python3 tools/detext.py            all jobs
   python3 tools/detext.py priceboard only jobs whose file contains the word
@@ -22,6 +24,8 @@ from collections import Counter
 from PIL import Image
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'projects', 'nomadgirl')
+
+BLUE = lambda p: p[2] > p[0] + 25 or sum(p[:3]) < 40   # #177 the frame of a neon sign and the black outline around it stay
 
 # (file, [(mode, x0, y0, x1, y1, options)]) – boxes in picture pixels, x1/y1 exclusive
 JOBS = [
@@ -67,7 +71,41 @@ JOBS = [
     ('assets/camp/kit/mod_tent_b.png', [('heal', 199, 22, 231, 41, {'thr': 34})]),  # 732 on the tent
     ('assets/tiles/tileset00/props_big.png', [('heal', 22, 9, 91, 20, {})]),         # SNACKS on the vending machine
     ('assets/drive/bus.png', [('heal', 168, 15, 207, 24, {})]),                      # destination display
-    ('assets/tiles/tileset00/props.png', [('heal', 200, 2252, 250, 2290, {})]),     # #173 stencil "07" (detail_metal_11) on the metal/bunker fill
+    ('assets/tiles/tileset00/props.png', [
+        ('heal', 200, 2252, 250, 2290, {}),     # #173 stencil "07" (detail_metal_11) on the metal/bunker fill
+        # #177 the rest of the sheet: signs get their text from code (labels), pure lettering goes
+        ('heal', 204, 1759, 245, 1787, {}),                                        # ZONE 13 (bunker3_11)
+        ('heal', 71, 1112, 121, 1136, {'flat': True, 'grow': 1, 'keep': BLUE, 'pick': lambda p: p[0] > p[1] + 25 and p[0] > p[2] + 15}),   # OPEN neon (station3_9)
+        ('heal', 204, 864, 249, 889, {'flat': True, 'grow': 1, 'keep': BLUE, 'pick': lambda p: p[0] > p[1] + 35 and p[0] > p[2] + 30}),    # OPEN unlit, askew (station2_11)
+        ('heal', 344, 1118, 371, 1136, {}),                                        # WET FLOOR (station3_13)
+        ('heal', 280, 1630, 307, 1648, {}),                                        # WET FLOOR (mall3_12)
+        ('heal', 400, 1611, 434, 1628, {'thr': 40}),                               # SALE (mall3_14)
+        ('clear', 64, 2368, 128, 2432, {}),                                        # block-letter graffiti (detail_ruins_9)
+        ('clear', 448, 2368, 512, 2432, {}),                                       # dripping stencil lettering (detail_ruins_15)
+    ]),
+    # #177 camp kit (back-wall decor, crates)
+    ('assets/camp/kit/crate.png', [   # planks run up and down: letters take the plank above/below (vertical), the gaps between planks stay
+        ('heal', 86, 22, 90, 37, {'grow': 0, 'vertical': True, 'pick': lambda p: sum(p[:3]) < 160}),    # stencil 03
+        ('heal', 91, 22, 101, 37, {'grow': 0, 'vertical': True, 'pick': lambda p: sum(p[:3]) < 160}),
+        ('heal', 102, 22, 105, 37, {'grow': 0, 'vertical': True, 'pick': lambda p: sum(p[:3]) < 160}),
+        ('heal', 286, 35, 309, 40, {'grow': 0, 'pick': lambda p: sum(p[:3]) < 230}),   # stamp on the plate crate (row 40 is a plank edge)
+        ('heal', 286, 41, 309, 47, {'grow': 0, 'pick': lambda p: sum(p[:3]) < 230}),
+        ('heal', 596, 29, 613, 38, {'grow': 0, 'pick': lambda p: sum(p[:3]) < 230}),   # CARGO label on the grate crate
+    ]),
+    ('assets/camp/kit/inside_items.png', [
+        ('heal', 850, 18, 878, 28, {}), ('heal', 850, 43, 878, 51, {}),   # band poster: name and TRUCKS
+        ('heal', 473, 39, 484, 51, {'thr': 50}),                            # calendar: the 7
+    ]),
+    ('assets/camp/kit/plant.png', [('heal', 85, 46, 98, 54, {'grow': 0, 'pick': lambda p: sum(p[:3]) < 420})]),    # PAINT on the bucket
+    ('assets/camp/kit/wall_items.png', [
+        ('heal', 79, 20, 106, 26, {'grow': 0, 'pick': lambda p: sum(p[:3]) < 400}),                       # DESERT on the travel poster
+        ('heal', 378, 21, 406, 32, {'grow': 0, 'pick': lambda p: p[0] > 150 and p[1] > 110 and p[2] < 130}),   # number plates: blue
+        ('heal', 398, 36, 425, 45, {'grow': 0, 'pick': lambda p: sum(p[:3]) < 300}),                      # yellow
+        ('heal', 378, 44, 389, 56, {'grow': 0, 'pick': lambda p: sum(p[:3]) < 350}),                      # white
+        ('heal', 392, 48, 421, 59, {'grow': 0, 'pick': lambda p: sum(p[:3]) > 450}),                      # red
+        ('heal', 506, 35, 547, 51, {'grow': 0, 'pick': lambda p: sum(p[:3]) < 200}),                      # HOME
+    ]),
+    ('assets/camp/kit/wall_windows.png', [('heal', 434, 17, 452, 23, {'flat': True, 'thr': 30, 'grow': 0})]),   # neon OPEN in the window
 ]
 
 
@@ -76,20 +114,26 @@ def source_of(path):
     return os.path.join(d, 'source', f.replace('.png', '_text.png'))
 
 
-def heal(px, w, h, x0, y0, x1, y1, thr=60, grow=1, ref=None, colors=None, flat=False):
+def heal(px, w, h, x0, y0, x1, y1, thr=60, grow=1, ref=None, colors=None, flat=False, pick=None, keep=None, vertical=False):
     box = [(x, y) for y in range(y0, y1) for x in range(x0, x1)]
     # the calm colour: the most frequent one in the box (or the pixel at `ref`); a see-through plate counts too
     med = px[ref] if ref else Counter(px[k] for k in box).most_common(1)[0][0]
     if med[3]:   # on an opaque plate nothing see-through around it turns opaque
         box = [k for k in box if px[k][3]]
     dist = lambda p, q: (sum((p[c] - q[c]) ** 2 for c in range(3)) + (p[3] - q[3]) ** 2) ** 0.5
-    if colors:   # only these colours are letters (the sun keeps its shading)
+    if pick:     # #177 a test decides (red neon inside a blue frame)
+        text = {k for k in box if px[k][3] and pick(px[k])}
+        if flat:   # the plate: the most frequent colour that is not a letter
+            med = Counter(px[k] for k in box if k not in text).most_common(1)[0][0]
+    elif colors:   # only these colours are letters (the sun keeps its shading)
         text = {k for k in box if any(dist(px[k], (*c, 255)) < 12 for c in colors)}
     else:
         text = {k for k in box if dist(px[k], med) > thr}
     inside = set(box)
     for _ in range(grow):
         text |= {(x + dx, y + dy) for x, y in text for dx in (-1, 0, 1) for dy in (-1, 0, 1) if (x + dx, y + dy) in inside}
+    if keep:     # never touched (the blue frame of a neon sign)
+        text = {k for k in text if not keep(px[k])}
     if flat:   # screens and neon signs: just the empty plate
         for k in text:
             px[k] = med
@@ -98,11 +142,9 @@ def heal(px, w, h, x0, y0, x1, y1, thr=60, grow=1, ref=None, colors=None, flat=F
     for (x, y) in text:
         got = None
         for r in range(1, max(x1 - x0, y1 - y0)):
-            for c in ((x - r, y), (x + r, y)) if r % 2 else ((x + r, y), (x - r, y)):
-                if c in src and c not in text:
-                    got = src[c]; break
-            if got: break
-            for c in ((x, y - r), (x, y + r)):
+            row = ((x - r, y), (x + r, y)) if r % 2 else ((x + r, y), (x - r, y))
+            col = ((x, y - r), (x, y + r))
+            for c in (col + row if vertical else row + col):   # #177 vertical: planks running up and down
                 if c in src and c not in text:
                     got = src[c]; break
             if got: break
@@ -130,7 +172,11 @@ def main(words):
         im = Image.open(src).convert('RGBA'); px = im.load(); n = 0
         for mode, x0, y0, x1, y1, o in boxes:
             if mode == 'heal':
-                n += heal(px, im.width, im.height, x0, y0, x1, y1, o.get('thr', 60), o.get('grow', 1), o.get('ref'), o.get('colors'), o.get('flat', False))
+                n += heal(px, im.width, im.height, x0, y0, x1, y1, o.get('thr', 60), o.get('grow', 1), o.get('ref'), o.get('colors'), o.get('flat', False), o.get('pick'), o.get('keep'), o.get('vertical', False))
+            elif mode == 'clear':
+                for y in range(y0, y1):
+                    for x in range(x0, x1): px[x, y] = (0, 0, 0, 0)
+                n += (x1 - x0) * (y1 - y0)
             else:
                 board(px, x0, y0, x1, y1, o['fill'], o['frame']); n += (x1 - x0) * (y1 - y0)
         im.save(path)

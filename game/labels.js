@@ -1,5 +1,5 @@
 // #170 (Daniel, 21.11.2026: „Texte sollen niemals in der Grafik sein“): text on pictures comes from data, never from the pixels.
-// Assets › Schrift aus Code (field `labels`): rows { text, at: [x, y] centre in picture pixels, size (px), color, align, glow, width }.
+// Assets › Schrift aus Code (field `labels`): rows { text, at: [x, y] centre in picture pixels, size (px), color, align, glow, width, angle (°) }.
 // The text is drawn into a copy of the picture at the picture's own size, in VT323, its edges snapped to full pixels so it sits in the
 // pixel art like painted letters; neon signs glow. Used by the game (scene.js: textures), the drive (drive_ui.js) and the workshop preview.
 // No Phaser, no DOM beyond a canvas.
@@ -42,6 +42,7 @@ export function drawLabels(ctx, labels, k = 1) {
     const s = stamp(L), [cx, cy] = L.at;
     const x0 = L.align === 'left' ? cx : L.align === 'right' ? cx - s.width : cx - s.width / 2, y0 = cy - s.height / 2;
     ctx.save(); ctx.imageSmoothingEnabled = false;
+    if (+L.angle) { ctx.translate(cx * k, cy * k); ctx.rotate(+L.angle * Math.PI / 180); ctx.translate(-cx * k, -cy * k); }   // #177 a sign hanging askew
     if (L.glow) {   // neon: a soft halo in the same colour behind the letters
       ctx.save(); ctx.globalAlpha = 0.55; ctx.shadowColor = L.color || '#ffffff'; ctx.shadowBlur = Math.max(2, (+L.size || 12) * 0.35) * k;
       ctx.drawImage(s, Math.round(x0) * k, Math.round(y0) * k, s.width * k, s.height * k); ctx.restore();

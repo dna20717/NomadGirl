@@ -336,3 +336,42 @@ Bewusst gelassen (⚠️, Daniel entscheidet):
 | `tut_*` (61) | Spiel-Oberfläche | Bildschirmfotos des Spiels (Aufnahme-Tool), die Schrift kommt dort aus Code |
 | `ws_treasury_cyber_candidate_2`, `intro_panel_5_source` | HALL OF LOOT, „5“ | Kandidat/Original, nicht im Spiel |
 | `life_stash` (#169) | oranges Sprüh-Zeichen | Gang-Symbol, keine Schrift |
+
+### Nachlese (#177)
+
+Systematisch alle Bilder durchgesehen, die eine Welt-Datei nennt (Kachel-Sets, `tileset00/*`, Fabrik-Blatt, Clutter, Decals, Einschlüsse, Camp-Baukasten als Rückwand-Deko, Türen, Fassaden-Module, Tropes, Lager, Wow, Rakete, Parallax): `python3 tools/text_audit.py` schneidet sie in Kontaktbögen (`output/text_audit/`). Entfernt mit `tools/detext.py` (PixelLab 0), Originale als Quelle (`tileset00/source/props_text.png`, neu `camp/kit/source/<blatt>_text.png`, Assets `kit_*_text`, `derivedFrom`). Die „07“ im Bunker-Gestein, die #174 noch sah, war dieselbe Schablonen-Zahl `detail_metal_11` aus #173: die Bilder von #174 stammten von einem Stand vor #173; im Spiel ist keine weitere Zahl auf Gestein oder Wand.
+
+| Asset · Feld | Gebackener Text | Jetzt (⚠️ Entwurf) |
+| --- | --- | --- |
+| `tileset00_props` · `bunker3_11` | ZONE 13 (Hängeschild, Bunker) | ZONE/13 aus Code |
+| `tileset00_props` · `station3_9` | OPEN (Neon, schräg) | OFFEN, rotes Neon, −9° |
+| `tileset00_props` · `station2_11` | OPEN (Neon aus, schräg) | OFFEN, matt, −15° |
+| `tileset00_props` · `station3_13`, `mall3_12` | WET FLOOR (Warnaufsteller) | NASSER/BODEN |
+| `tileset00_props` · `mall3_14` | SALE (Schild am Ständer) | −50 % |
+| `tileset00_props` · `detail_ruins_9` | Blockbuchstaben-Graffiti | – (Feld leer, aus dem Set Ruine genommen) |
+| `tileset00_props` · `detail_ruins_15` | Schablonen-Schrift mit Farbläufern | – (Feld leer, aus dem Set Ruine genommen) |
+| `kit_crate` · 03, Schild, Gitter | Schablonen-Zahl 03, Stempel, CARGO-Etikett | – (Kisten ohne Schrift) |
+| `kit_inside_items` · Bandposter | Bandname, TRUCKS | ROST / TOUR |
+| `kit_inside_items` · Kalender | 7 | 7 aus Code |
+| `kit_plant` · Farbe | PAINT auf dem Eimer | FARBE |
+| `kit_wall_items` · Reiseposter | DESERT | WÜSTE |
+| `kit_wall_items` · Nummernschilder | 2205…, F0541, dgf 3e23, 29 | D 13, NG 77, B4, WÜSTE |
+| `kit_wall_items` · HOME-Schild | HOME | DAHEIM |
+| `kit_wall_windows` · Neon OPEN | OPEN im Fenster | OFFEN (Neon) |
+
+Neu in Assets › Schrift aus Code: **Drehung** (°) für schief hängende Schilder.
+
+Bewusst gelassen (⚠️, Daniel entscheidet):
+
+| Asset | Text | Grund |
+| --- | --- | --- |
+| `tileset00_props` · `decal_4`, `decal_5` | gesprühte Tags | Graffiti, Pseudo-Schrift, unleserlich |
+| `tileset00_props` · `decal_12` | zerrissenes Plakat | Fetzen, keine Buchstaben |
+| `tileset00_props` · `station2_14`, `big_station_2` | Logo auf der Eistruhe | Pseudo-Wortmarke, unleserlich (Eis-Bild) |
+| `tileset00_props` · `station3_2`, `industry3_10`, `industry2_10`, `station_9`, `industry2_6`, `industry3_6` | Etiketten, Schablonen-Striche, Warnsymbole | Symbole bzw. Krakel, keine Buchstaben |
+| `factory_props` | Warnsymbole, Tropfen | Symbole |
+| `kit_graffiti` · Tag | „Bubble“-Graffiti | Graffiti-Tag ist das Motiv (wie #170/#173 Graffiti), Pseudo-Schrift |
+| `kit_inside_wall` · Steckbrief, Film-Poster; `kit_inside_pinboard`; `kit_wall_doors` · Tür mit Schild; `kit_planter` · Mit Schild; `kit_plant_grow` | Krakel auf Zetteln, Schildern, Etiketten | unleserlich, Bildsprache |
+| `trope_logbook`, `trope_desk`, `trope_shrine`, `wow_cabin` | Handschrift-Krakel | unleserlich |
+| `icons_nomadcola` (Marken-Clutter) | „Nomad“ | Lore-Marke (wie #170) |
+| `pad_icons` | Tasten A/B/X/Y, LB … | Controller-Symbole (wie #170) |

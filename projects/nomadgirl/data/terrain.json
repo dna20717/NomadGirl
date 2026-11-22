@@ -374,7 +374,7 @@
    "decal_15"
   ],
   "description": "Zerfallene Ziegel mit Schutt und Moos oben. Für Stadt-Ruinen.",
-  "details": ["detail_ruins_3", "detail_ruins_4", "detail_ruins_8", "detail_ruins_9", "detail_ruins_11", "detail_ruins_13", "detail_ruins_15"],
+  "details": ["detail_ruins_3", "detail_ruins_4", "detail_ruins_8", "detail_ruins_11", "detail_ruins_13"],
   "detailChance": 14,
   "sizes": [
    {"name": "ruins3_0", "cm": 35},
