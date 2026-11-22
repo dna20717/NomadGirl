@@ -104,4 +104,17 @@ Quellen hängen an Tags aus dem Dressing (#158: z. B. `leuchtet`, `technik`) und
 
 ## Hörproben (Ava, Projekt-Chat)
 
-Ava rendert die 5 Färbungen über der Erkundungs-Schicht, Atempause, Wow-Moment und Tresor-Jingle zum Anhören. Nach Daniels OK gehen die Rezepte (Instrumente, Tonhöhen, Rhythmen) als Daten in die Färbungs-Schicht; abgenommene Stems landen unter `projects/nomadgirl/assets/sound/music/`.
+Rezept: `tools/music/poi_colors.py` (`python3 tools/music/poi_colors.py <poi_explore.wav> <out>`, Seed 2211, braucht numba). Erzeugt je Region `farbe_<region>.wav` (Erkundung + Färbung, 64 s) und `farbe_<region>_layer.wav` (nur Färbung), dazu `moment_atempause`, `moment_wow_silo`, `moment_tresor`. Nach Daniels OK gehen die Rezepte als Daten in die Färbungs-Schicht; abgenommene Stems landen unter `projects/nomadgirl/assets/sound/music/`.
+
+| Hörprobe | Inhalt | Daniel |
+|---|---|---|
+| `farbe_highway` | Slide-Gitarre, Wind, quietschendes Schild, Funkrauschen | offen |
+| `farbe_stadtrand` | leiernde Kaufhaus-Muzak (E-Piano, Vibraphon), Gong A–F–D, Stadtbrummen, großer Hall | offen |
+| `farbe_saltflats` | gestrichenes Metall, Morse im 3-3-2-Rhythmus, Geigerzähler, Lüftung, harter kurzer Hall | offen |
+| `farbe_deltaring` | kalte Orgel, Chor, Uhrwerk auf den Vierteln, Schreibmaschine, Dampf | offen |
+| `farbe_versteckt` | tiefer Chor, Theremin mit dem Hauptthema eine Oktave tiefer, Countdown, Sub | offen |
+| `moment_atempause` | Erkundung sinkt auf 30 %, Camp-Gitarre mit Antwort-Motiv | offen |
+| `moment_wow_silo` | 6 s Erkundung, 1 s Stille, Schlag + Chor, Hauptthema mit Färbung „Versteckt“ | offen |
+| `moment_tresor` | Glocken + Gitarre, Hauptthema T5–8 gerafft, Schluss in D-Dur (Picardie-Terz) | offen |
+
+**Offen = wie Skript bauen (⚠️ vorläufig).** 👎 = Code baut nur einen schlichten Platzhalter, Ava liefert eine neue Fassung.
