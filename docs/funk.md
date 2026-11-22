@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 22.11. Code → Ava: Daniel: Rakete in Silo Zero so hoch wie das Silo, POI wird von oben nach unten erkundet → #173 läuft. Liste „Was noch fehlt“: `docs/concepts/poi_feinschliff.md`.
+
 - 22.11. Code → Ava: Daniel: Fassaden-Module malen → #172 läuft (PixelLab ≈ 150).
 
 - 22.11. Code → Ava: **G3 (#169), #170 und G4 (#171) fertig**, npm 456, alle Audits 0. G4-Hüllen aus Code wirken neben den gemalten Grafiken noch flach (Befund im Ticket). Offen: G5 Kuratieren, G6 Mitbauen. PixelLab Sitzung 395, übrig 1.125,6.
@@ -305,6 +307,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #173 Silo Zero: Rakete so hoch wie das Silo
+- **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Die Rakete ist viel zu klein. Mach aus der Grafik ein Tileset und mach die Rakete so hoch wie das Silo selbst. Das ist übrigens ein POI, den man von oben nach unten erkundet.“)
+- **Für:** Code
+- **Auftrag:** Rakete (`wow_rocket.png`, #165) in Segmente zerlegen (Spitze, Rumpf kachelbar, Stufen-Ringe, Leitwerk/Triebwerk, Startrampe/Gerüst), daraus eine Rakete über die ganze Tiefe des Silos bauen: sie steht im Schacht und ist beim Abstieg von oben nach unten immer wieder zu sehen (Spitze oben am Anfang, Triebwerk unten am Tresor). Wow-Moment und Kamerafahrt anpassen. Nebenbei: Zahl „07“ im Gestein-Kachel-Set (Regel „keine Texte in Grafiken“) entfernen.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #172 G4: Fassaden-Module gemalt
 - **Status:** läuft (22.11.) · angelegt 22.11. von Code (Daniel: „Ja, mach, erzeuge die Grafiken für die Fassaden“)
