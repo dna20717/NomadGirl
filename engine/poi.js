@@ -17,6 +17,7 @@ import { parseRoom } from './room.js';
 import { levelConfig, wowOf, roomType, calmAfterPeaks, fairFights, restChestSpot } from './level_design.js';
 import { planCycles, keySpot, seamLock, standSpots } from './cycles.js';
 import { shaftConfig } from './shaft.js';
+import { planDoors } from './doors.js';
 
 export const TUNNEL_HEIGHT = 4;   // free rows in the shortcut tunnel (Leyla is 168 px = 2.6 tiles)
 
@@ -57,7 +58,13 @@ export function curveAt(c, t) {
   return c[i] + (c[i + 1] - c[i]) * (f - i);
 }
 
+// #174 doors after the welding: side doors go into the layout („/“), front doors and every door's state into L.doors (engine/doors.js)
 export function buildPoi(D, poiId, seed = 1) {
+  const L = weld(D, poiId, seed);
+  if (L.def) { const d = planDoors(D, poiId, L, seed); L.doors = d; } else L.doors = { side: [], front: [], links: 0, problems: [] };
+  return L;
+}
+function weld(D, poiId, seed = 1) {
   const P = D.pois?.[poiId] || {}, R = D.rooms || {}, rnd = rng(seed), problems = [];
   const all = (P.rooms || []).filter(id => R[id]?.layout?.length);
   const parsed = Object.fromEntries(all.map(id => [id, parseRoom(R[id])]));

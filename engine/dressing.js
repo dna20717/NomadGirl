@@ -197,9 +197,9 @@ export function keepClear(room, spots, reg = {}) {
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
     const c = ch(x, y);
     if (c === '.' || c === '#' || c === '=' || c === '*') continue;
-    const r = c === 'L' || c === 'Z' || c === 'D' ? 2 : 1;
+    const r = c === 'L' || c === 'Z' || c === 'D' || c === '/' ? 2 : 1;
     if ('LSCZ@!1'.includes(c) || !FIXED.has(c)) mark(x, y + 1, r);
-    if ('DB%$'.includes(c)) { mark(x, y + 1, 2); mark(x, y, 1); }
+    if ('DB%$/'.includes(c)) { mark(x, y + 1, 2); mark(x, y, 1); }
     if (c === 'H') { if (ch(x, y + 1) !== 'H') mark(x, y + 1, 1); if (ch(x, y - 1) !== 'H') { mark(x, y, 1); mark(x, y + 1, 1); } }
     if ('^vA'.includes(c)) mark(x, y, 1);
     if ('HDSC@!Z%$B'.includes(c) || !FIXED.has(c)) for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) wallKeep.add((x + dx) + ',' + (y + dy));
@@ -218,12 +218,13 @@ export function keepClear(room, spots, reg = {}) {
 //   regions: [{ key, role, set, spots, budget, placed }]
 // Only rooms whose Kachel-Set has Clutter-Regeln are planned; planned(x, y) tells art.js which floor tiles are left for the old dice.
 // Deterministic: the same level and seed give the same plan.
-export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 64, singles = true }) {
+export function planDressing({ D, room, reg, spots, poiId = null, seed = 0, T = 64, singles = true, keepFree = [] }) {
   const cfg = dressingConfig(D), rc = roleConfig(D), ch = (x, y) => room.tiles[y]?.[x];
   const rules = rulesOf(D), ocfg = orderConfig(D), dcfg = decayConfig(D);   // #159 corrections, order rows, decay
   const pools = new Map(), poolOf = id => { if (!pools.has(id)) pools.set(id, setPool(D, id, T)); return pools.get(id); };
   const brands = brandPool(D, poiId, T), sets = Object.keys(D.terrain || {});
   const { keep, wallKeep } = keepClear(room, spots, reg);
+  for (const k of keepFree) { keep.add(k); wallKeep.add(k); }   // #174 in front of the front doors
   const idAt = reg.idAt || (() => null), roleAt = reg.roleAt || (() => 'general'), roomAt = reg.roomAt || (() => null);
   const keyOf = r => r ? `${r.id}@${r.x},${r.y}` : 'room';
   const taken = new Map(), items = [], s0 = (seed >>> 0) % 100003;

@@ -122,7 +122,7 @@ export const BACK_KINDS = { shop: ['poster', 'shelf', 'sign', 'poster'], office:
 export function planBackWall(D, room, reg, spots, seed, holes = new Set()) {
   const ch = (x, y) => room.tiles[y]?.[x], out = [], taken = new Set();
   const roleAt = reg.roleAt || (() => 'general'), roomAt = reg.roomAt || (() => null);
-  const busy = (x, y) => { for (let dy = -1; dy <= 2; dy++) for (let dx = -1; dx <= 1; dx++) { const c = ch(x + dx, y + dy); if (c && 'HDSC@!Z%$BL*'.includes(c)) return true; } return holes.has(x + ',' + y) || taken.has(x + ',' + y); };
+  const busy = (x, y) => { for (let dy = -1; dy <= 2; dy++) for (let dx = -1; dx <= 1; dx++) { const c = ch(x + dx, y + dy); if (c && 'HDSC@!Z%$BL*/'.includes(c)) return true; } return holes.has(x + ',' + y) || taken.has(x + ',' + y); };
   const inside = reg.inside || (() => true), free = (x, y) => ch(x, y) === '.' && inside(x, y) && !busy(x, y);
   const every = D?.game?.dressing?.backEvery ?? 7;
   for (const s of spots.list) {

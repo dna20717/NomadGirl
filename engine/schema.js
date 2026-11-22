@@ -20,6 +20,7 @@ import { CHANNELS, CONDITIONS } from './storylets.js';
 import { OCCUPANT_KINDS } from './history.js';
 import { FACTIONS, ATTITUDES, CAMP_FACTIONS, LIFE_EVENTS, LIFE } from './ecosystem.js';
 import { TROPE_PLACES, TROPE_BODIES, tropeSizeIssues } from './tropes.js';
+import { DOOR_MATERIALS, DOOR_OPENING, DOOR_KINDS, DOOR_BREAK, DOORS } from './doors.js';
 import { HULL_KINDS, ROOF_KINDS, ROOFTOP, AWNINGS, MATERIALS, BASES, SURFACES, PLANT, SKY_KINDS, HULL } from './facade.js';
 import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
 import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
@@ -320,6 +321,18 @@ export const AREAS = {
         num('dressing.backDim', 'Rückwand-Clutter dunkler', { unit: '%', min: 35, max: 50, hint: 'Rohre, Kabelkanäle, Regale, Poster, Türen ohne Funktion auf der Rückwand: so viel dunkler als die Spielebene (Bibel: 35–50 %). Leer = 42' }),
         num('dressing.backEvery', 'Rückwand-Clutter: Abstand', { unit: 'Wandplätze', min: 1, max: 30, hint: 'Etwa eins je so viele freie Wandplätze. Leer = 7' }),
         bool('dressing.learn', 'Entwickler-Modus: Korrekturen (K)', { hint: '#159 (Daniel 21.11.2026: nur im Entwickler-Modus): K im POI schaltet Korrekturen an, ein Klick auf ein Ding fragt nach dem Grund, daraus wird eine Regel (Katalog Korrekturen) für alle Seeds. Auch mit ?dev in der Adresse' })] },
+      { title: 'Türen', fields: [bool('doors.enabled', 'Türen an', { hint: '#174: Durchgangstüren im Profil an Nähten, Gebäude-Eingängen und Innenwänden, Rückwand-Türen frontal (Welt › Türen). Aus = offene Durchgänge wie früher. Leer = an' }),
+        num('doors.seam', 'Dichte an Nähten', { unit: '%', min: 0, max: 100, hint: `Chance je Durchgang zwischen zwei Räumen. Leer = ${DOORS.seam}` }), num('doors.entrance', 'Gebäude-Eingänge', { unit: '%', min: 0, max: 100, hint: `Chance je Weg von draußen nach drinnen (Hülle). Leer = ${DOORS.entrance}` }),
+        num('doors.inner', 'Innenwände', { unit: '%', min: 0, max: 100, hint: `Chance je Durchbruch in einer Wand innerhalb eines Raums. Leer = ${DOORS.inner}` }),
+        num('doors.minH', 'Durchgang mindestens', { unit: 'Kacheln', min: 3, max: 6 }), num('doors.maxH', 'Durchgang höchstens', { unit: 'Kacheln', min: 3, max: 6, hint: 'Nie in Schächten, an Leitern, im Wow-Raum und seinem Eingang, am Start, an Schlössern, Schaltern, Kisten' }),
+        num('doors.lockedMax', 'Verschlossen höchstens', { min: 0, max: 6, hint: 'Je Level; nur wo dahinter nichts liegt, was das Level braucht (Schlüssel, Schalter, Tresor, Abkürzung). Aufbrechen, sprengen oder hacken (Glitch-Duell)' }),
+        num('doors.sideLocked', 'Seitenräume verschlossen', { unit: '%', min: 0, max: 100, hint: 'Eine geschlossene Tür zu einem Seitenraum ist so oft verschlossen (die Beute dahinter). Leer = 40' }),
+        bool('doors.front', 'Rückwand-Türen', { hint: 'Frontale Türen an freien Wandplätzen der Innenräume (statt der alten Code-Türen der Rückwand)' }), num('doors.frontEvery', 'Rückwand-Türen: Abstand', { unit: 'Plätze', min: 1, max: 60, hint: `Etwa eine je so viele freie Plätze. Leer = ${DOORS.frontEvery}` }),
+        num('doors.frontLink', 'Echte Eingänge', { unit: '%', min: 0, max: 100, hint: `Chance je Seitenraum: eine Rückwand-Tür im Seitenraum und eine im nächsten Hauptraum, E geht hindurch. Leer = ${DOORS.frontLink}` }),
+        bool('doors.enemies', 'Gegner öffnen Türen', { hint: 'Beim Verfolgen, Suchen und Kämpfen (verschlossene nicht). Leer = an' }), bool('doors.patrol', 'Auch auf Runde', { hint: 'Gegner auf Patrouille/Runde öffnen Türen auch (#169)' }),
+        num('doors.splinters', 'Splitter', { min: 0, max: 60, hint: 'Teilchen beim Zerstören' }),
+        table('doors.states', 'Zustände je Verfall', [num('decay', 'Verfall', { min: 0, max: 3 }), num('open', 'offen', { unit: '%', min: 0 }), num('closed', 'zu', { unit: '%', min: 0 }), num('broken', 'zerstört', { unit: '%', min: 0 }), num('locked', 'verschlossen', { unit: '%', min: 0 })],
+          { hint: 'Gewichte je Verfall des Raums (POIs › Story › Verfall). Versiegelte Orte halten Türen öfter zu, Kampf und Feuer zerstören mehr, Flucht lässt mehr offen' })] },
       { title: 'Hülle', fields: [bool('hull.enabled', 'Hüllen an', { hint: '#171 G4 (Gebäude-Grammatik in Seitenansicht): um die Räume jedes POI steht ein Gebäude nach den Regeln seines Gebäudetyps (Welt › Gebäudetypen, POIs › Hülle). Aus = Fels um die Räume wie früher. Leer = an' }),
         num('hull.grain', 'Körnung', { unit: 'Pixel je Kachel', min: 4, max: 32, hint: `So fein wird die Hülle gemalt (dann scharf auf 64 px hochskaliert). Leer = ${HULL.grain}` }),
         num('hull.light', 'Licht auf der Hülle', { unit: '%', min: 20, max: 120, hint: `Fassade und Himmel um die Gebäude sind draußen: so hell bleiben sie unter der Lichtkarte (Innenräume behalten ihre Atmosphäre). Leer = ${HULL.light}` }),
@@ -2052,6 +2065,27 @@ export const AREAS = {
       if (x.note && p?.data?.storylets?.[x.note] && p.data.storylets[x.note].channel !== 'note') report('warning', 'Zettel daneben sollte ein Storylet mit Wo = Zettel sein');
     },
   },
+  doors: {
+    name: 'Türen', singular: 'Türsatz', icon: 'door-open', file: 'data/doors.json', kind: 'catalog',
+    hint: '#174 (Daniel 22.11.2026: „Wir brauchen Türen in der orthogonalen Seitensicht, damit die Level mehr wie Level wirken. Offen und geschlossen und zerstört“): je Material ein Türsatz mit Bildern je Ansicht und Zustand. Durchgangstüren im Profil stehen in den Durchgängen der Wände (Nähte, Gebäude-Eingänge, Innenwände; Layout-Zeichen „/“), Rückwand-Türen frontal an Wandplätzen der Innenräume. Zu = Wand und keine Sicht, E öffnet und schließt, Gegner öffnen auch, Treffer zerstören sie (bleibt als Spur). Welcher Satz wohin passt: Gebäudetyp (POIs › Hülle) und Rolle des Raums. Spiel › Türen stellt Dichte und Zustände ein. Keine Texte in Grafiken.',
+    template: { name: 'Neuer Türsatz', material: 'wood', opening: 'swing', health: 40, breaks: 'all', side: {}, front: {}, hulls: [], roles: [], weight: 10 },
+    row: x => `${label(DOOR_MATERIALS, x.material || 'wood')} · ${x.health ?? 40} Leben · ${label(DOOR_BREAK, x.breaks || 'all')}`,
+    groupBy: { key: 'material', options: DOOR_MATERIALS },
+    sections: [
+      { title: 'Türsatz', fields: [NAME, DESCRIPTION, select('material', 'Material', DOOR_MATERIALS), select('opening', 'Öffnet', DOOR_OPENING, { hint: 'Wie die Durchgangstür aufgeht: Flügel schwingt auf und steht neben dem Durchgang, Schiebetür gleitet in die Wand, Rolltor fährt in den Kasten' }),
+        num('health', 'Leben', { min: 1, hint: 'So viel Schaden hält die Tür, bis sie zerstört ist (Holz wenig, Stahl viel)' }), select('breaks', 'Zerstörbar durch', DOOR_BREAK, { hint: '⚠️ Schott: nur Granaten' }),
+        color('splinter', 'Splitter', { hint: 'Farbe der Splitter beim Treffer und beim Zerstören' }), num('weight', 'Gewicht', { min: 0 }), bool('off', 'Aus')] },
+      { title: 'Profil (Durchgangstür)', fields: [ref('side.closed', 'Zu (Profil)', 'assets', { hint: 'Schmaler Türflügel von der Kante, steht im Durchgang. Offen = das frontale Bild schmal daneben (schwingt) bzw. eingefahren (Schiebetür, Rolltor)' }),
+        ref('side.broken', 'Zerstört (Profil)', 'assets', { hint: 'Splitter, verbogen, aus den Angeln' })] },
+      { title: 'Frontal (Rückwand)', fields: [ref('front.closed', 'Zu', 'assets'), ref('front.open', 'Offen (dunkler Durchgang)', 'assets'), ref('front.broken', 'Zerstört', 'assets'),
+        ref('front.boarded', 'Vernagelt', 'assets', { hint: 'Für verschlossene Rückwand-Türen' }), ref('front.locked', 'Verschlossen (Kette)', 'assets', { hint: 'Für verschlossene Rückwand-Türen' })] },
+      { title: 'Wo', fields: [refs('hulls', 'Gebäudetypen', 'hulls', { hint: 'Passt besser in diese Gebäudetypen (POIs › Hülle); leer = überall' }), multi('roles', 'Rollen', ROOM_ROLES, { hint: 'Räume mit dieser Rolle. Leer = überall' }),
+        multi('kinds', 'Nur als', [...DOOR_KINDS, ['front', 'Rückwand-Tür']], { hint: 'Leer = alle Arten' })] },
+      { title: 'Ton', fields: [ref('sounds.open', 'Öffnen', 'sounds'), ref('sounds.shut', 'Schließen', 'sounds'), ref('sounds.hit', 'Treffer', 'sounds'), ref('sounds.break', 'Zerstört', 'sounds')] }],
+    check: (x, report, p) => {
+      if (!x.side?.closed && !x.front?.closed) report('warning', 'Weder Profil- noch Frontbild: nirgends zu sehen');
+    },
+  },
   history: {
     name: 'Zeitschichten', icon: 'hourglass', file: 'data/history.json', kind: 'single',
     hint: '#167 Zeitschichten je Ort (Daniel 21.11.2026: „1–3 Zwischenbesitzer, hinterher begründet per Ersetzungs-Grammatik wie Caves of Qud“): je Durchgang und Ort gewürfelt, dann erklärt: wie eine Schicht endet, sagt die nächste (Grammatik › ending.<Art>). Revierkrieg, Leylas Übernahmen und das Aufräumen nach Leylas Spuren schreiben neue Schichten in den Spielstand. Dazu: Leylas Spuren verblassen und werden aufgeräumt, Zettel je Besuch, Gore-Grenze.',
@@ -2429,7 +2463,7 @@ export const GROUPS = [
   ['ACHIEVEMENTS & AUFTRÄGE', ['achievements', 'quests']],
   ['PROGRESSION', ['techtree', 'resources']],
   ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'decorSets', 'megarigs', 'rigAddons', 'salvage', 'people', 'companions']],
-  ['WELT', ['worldmap', 'parallax', 'pois', 'rooms', 'terrain', 'poiSets', 'roomStories', 'storylets', 'tropes', 'history', 'hulls', 'life', 'dressingRules', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
+  ['WELT', ['worldmap', 'parallax', 'pois', 'rooms', 'terrain', 'poiSets', 'roomStories', 'storylets', 'tropes', 'history', 'hulls', 'doors', 'life', 'dressingRules', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
   ['LORE', ['brands', 'chronicle']],
   ['ENTITIES', ['glitchlings']],
 ];

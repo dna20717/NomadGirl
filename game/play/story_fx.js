@@ -199,6 +199,7 @@ export class StoryFx {
       if (t.kind === 'chest') { const c = lv?.chests?.find(c => !c.bonus && Math.abs(c.x - x) < T / 2 && Math.abs(c.feet - feet) < T / 2); if (c) { c.open = true; c.looted = true; c.trace = t.fade; if (c.sprite) c.sprite.setFrame(Math.max(0, (c.frames || 1) - 1)).setAlpha(0.75 + 0.25 * t.fade); else lv.drawChest(c); } }
       if (t.kind === 'siren') { const p = alarmPoints(s).find(p => Math.abs(p.x - x) < T / 2 && Math.abs(p.feet - feet) < T * 3); if (p) { p.broken = true; p.on = false; p.hp = 0; p.trace = t.fade; } }
       if (t.kind === 'boss') this.drawStain(x, feet, t.fade);
+      if (t.kind === 'door') lv?.doorways?.applyTrace(t);   // #174 the door she broke stays broken
     }
   }
   drawStain(x, feet, a = 1) {

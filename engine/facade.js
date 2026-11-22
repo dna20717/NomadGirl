@@ -76,7 +76,7 @@ const memo = new WeakMap();
 //   windows: [{ x, y, w, h, b (building index), where: 'facade'|'room', room, lit, broken, boarded }], parts: [{ kind, x, y, w, h, … }], above (rows above the level) }
 export function planHull(D, poiId, L, opt = {}) {
   if (!L?.def) return { on: false };
-  if (!opt.decay && memo.has(L)) return memo.get(L);
+  if (opt.decay == null && memo.has(L)) return memo.get(L);
   const cfg = hullConfig(D, poiId);
   if (opt.decay != null) cfg.decay = opt.decay;
   const out = buildPlan(D, poiId, L, cfg, opt);

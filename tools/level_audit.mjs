@@ -24,6 +24,7 @@ import { levelConfig, roomGates, landmarkViews, secretSigns, wowInLevel, wowOf, 
 import { reachMap, rulesFrom, cycleOpts } from './reach_audit.mjs';
 import { initLife, simulate, planLife } from '../engine/ecosystem.js';
 import { planHull, hullAudit } from '../engine/facade.js';
+import { doorAudit } from '../engine/doors.js';
 
 export const SEEDS = [1, 2, 3, 5, 8, 13, 21, 34];
 
@@ -129,6 +130,8 @@ export function auditPoi(D, poiId, seed) {
     const plan = planHull(D, poiId, L), lw = landmarkViews(D, poiId, L, cfg).filter(v => v.win).map(v => ({ room: v.room, win: v.win }));
     for (const f of hullAudit(D, poiId, L, plan, lw)) add(`Hülle: ${f.what}`, f.text);
   }
+  // 10. #174 doors: in doorways (lintel, floor), never at ladders or in the shaft, locked ones cut nothing off, front pairs whole and reachable
+  for (const f of doorAudit(D, poiId, L)) add(`Türen: ${f.what}`, f.text);
   return out;
 }
 export function auditLife(D, poiId, L, seed) {

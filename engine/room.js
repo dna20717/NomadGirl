@@ -7,6 +7,7 @@
 //   B  brittle wall (melee breaks it, counts as a secret)  Z  goal (E = POI done, ranking)  1  random enemy of the POI
 //   A  branch hook (main room: ceiling, branch room: floor)  ^  shortcut comes up here (start room floor)  v  shortcut goes down here (exit room floor)
 //   +  key (#168, a prop of the POI's story: picked up with E)   |  lock (#168: solid until Leyla brings its key; door, gate, hatch)
+//   /  door in a doorway (#174: the planner puts them into welded levels; E opens and shuts it, hits break it; shut = solid)
 //   any other letter or digit: spawn point, resolved via the room's spawn table (symbol → enemy)
 
 export const TILE_LEGEND = [
@@ -20,9 +21,10 @@ export const TILE_LEGEND = [
   ['@', 'KI-Terminal (#057: Glitch-Duell gegen die Entity aus POI › Terminal-KI, optional)'],
   ['!', 'Alarmpunkt (#139: Sirene an der Wand; Alarmgeber laufen hin und lösen sie aus)'],
   ['+', 'Schlüssel (#168: Requisit aus der Story, E hebt ihn auf; meist setzt ihn der Zyklus-Graph)'], ['|', 'Schloss (#168: zu, bis Leyla den Schlüssel bringt: Tür, Schranke, Luke)'],
+  ['/', 'Durchgangstür (#174: im Durchgang einer Wand, senkrecht, 3–4 hoch; meist setzt sie der Tür-Planer; E öffnet und schließt, Treffer zerstören sie)'],
 ];
 // tiles that block like a wall: doors and brittle walls until opened, unused branch/shortcut markers stay wall
-export const SOLID_TILES = new Set(['#', 'D', 'B', '$', 'A', '^', 'v', '|']);
+export const SOLID_TILES = new Set(['#', 'D', 'B', '$', 'A', '^', 'v', '|', '/']);
 // drawn like the wall around them (Daniel, 11.11.2026: „geheime Passagen müssen hinter Tiles versteckt sein“)
 export const CAMO = new Set(['%', '$']);
 // static walls (doors and brittle walls get their own bodies in the game, they open)
@@ -37,7 +39,7 @@ export function parseRoom(room = {}) {
   const [w0, h0] = room.size || [];
   const w = w0 || Math.max(0, ...rows.map(r => r.length)), h = h0 || rows.length;
   const problems = [], start = [], spawns = [], ladders = [], anchors = [], platforms = [], unknown = new Set();
-  const marks = { C: [], S: [], D: [], B: [], Z: [], 1: [], A: [], '^': [], v: [], '*': [], '%': [], $: [], '@': [], '!': [], '+': [], '|': [] };
+  const marks = { C: [], S: [], D: [], B: [], Z: [], 1: [], A: [], '^': [], v: [], '*': [], '%': [], $: [], '@': [], '!': [], '+': [], '|': [], '/': [] };
   const tiles = Array.from({ length: h }, (_, y) => Array.from({ length: w }, (_, x) => rows[y]?.[x] ?? '.'));
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
     const c = tiles[y][x];

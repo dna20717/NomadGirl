@@ -39,6 +39,7 @@ import { nodeLoader } from './loader.js';
 import { loadProject } from '../engine/project.js';
 import { buildPoi, poiReady } from '../engine/poi.js';
 import { parseRoom } from '../engine/room.js';
+import { doorLayout } from '../engine/doors.js';
 
 // numbers of the game at 192 px Leyla (rulesFrom reads them from the data); speed = 90 % of the run (she has to speed up first)
 export const RULES = { T: 64, gravity: 3600, jump: 1120, speed: 396, bodyPx: 168, widthPx: 54, handPx: 105, grabUp: 40, grabLow: 95,
@@ -283,6 +284,11 @@ export function auditLevel(L, { traps = false } = {}) {
   for (let y = 0; y < lay.length; y++) for (let x = 0; x < lay[y].length; x++) {
     const c = lay[y][x];
     if ('CSZ@+'.includes(c) && !M.near(x, y)) note({ C: 'Kiste', S: 'Schalter', Z: 'Tresor', '@': 'Terminal', '+': 'Schlüssel' }[c], x, y);
+  }
+  // #174 doors: shut ones open by E (they count as open); locked ones count as wall: keys, switches and the vault stay reachable without them
+  if ((L.doors?.side || []).some(d => d.state === 'locked')) {
+    const M2 = reachMap(doorLayout(L, { locked: true }), opts);
+    for (let y = 0; y < lay.length; y++) for (let x = 0; x < lay[y].length; x++) if ('SZ+'.includes(lay[y][x]) && M.near(x, y) && !M2.near(x, y)) note('hinter verschlossener Tür', x, y);
   }
   // #168 every lock opens (its key is reachable before it: no softlock) and every one-way drop leads on to the vault or home
   (cyc.locks || []).forEach((l, i) => { if (!M.lockOpen.has(i)) note('Schloss ohne erreichbaren Schlüssel', ...l.tiles[0]); });

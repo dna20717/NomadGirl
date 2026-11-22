@@ -193,5 +193,27 @@
    "surface_guardhouse": "facade_surface_guardhouse",
    "surface_hatch": "facade_surface_hatch"
   }
+ },
+ "doors": {
+  "enabled": true,
+  "seam": 50,
+  "entrance": 90,
+  "inner": 40,
+  "front": true,
+  "frontEvery": 14,
+  "frontLink": 60,
+  "lockedMax": 1,
+  "sideLocked": 40,
+  "enemies": true,
+  "patrol": false,
+  "minH": 3,
+  "maxH": 4,
+  "splinters": 14,
+  "states": [
+   {"decay": 0, "open": 25, "closed": 65, "broken": 5, "locked": 5},
+   {"decay": 1, "open": 30, "closed": 50, "broken": 15, "locked": 5},
+   {"decay": 2, "open": 30, "closed": 35, "broken": 30, "locked": 5},
+   {"decay": 3, "open": 25, "closed": 20, "broken": 50, "locked": 5}
+  ]
  }
 }

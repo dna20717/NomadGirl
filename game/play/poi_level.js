@@ -15,6 +15,7 @@ import { uniqueEntity } from '../glitchlings.js';
 import { stock } from '../crafting.js';
 import { ladderArt } from './ladder_art.js';
 import { keyKindName } from '../../engine/cycles.js';
+import { Doors } from './doors.js';
 
 const NEAREST = () => Phaser.Textures.FilterMode.NEAREST;
 
@@ -84,6 +85,9 @@ export class PoiLevel {
       o.glow = s.add.image((o.x0 + o.x1) / 2 * T, o.hatch ? o.y0 * T + 20 : o.y1 * T - 10, s.textures.exists('fx_glow') ? 'fx_glow' : '__WHITE').setBlendMode(Phaser.BlendModes.ADD).setDepth(-4).setScale(0.9).setAlpha(0.7).setTint(0xff4060);
       return o;
     });
+    // #174 doors in doorways (profile) and on the back wall (front); the cycle graph's door locks wear the painted door of their kind
+    this.doorways = new Doors(s, this);
+    for (const o of this.locks) o.img = this.doorways.lockArt(o);
     const keyAt = new Map((C.keys || []).map(k => [k.x + ',' + k.y, k]));
     this.keys = (R.marks['+'] || []).map(([x, y]) => {
       const info = keyAt.get(x + ',' + y) || { name: 'Schlüssel', kind: 'key', lock: 'Schloss' };
@@ -217,7 +221,16 @@ export class PoiLevel {
   }
   indoor(id) { const r = this.scene.data_.rooms?.[id] || {}; return r.indoor ?? !(r.backdrop?.image || r.backdrop?.weather); }
   drawDoor(d) {
-    const T = this.scene.T, g = d.art.clear(), x = d.x0 * T, y = d.y0 * T, w = (d.x1 - d.x0) * T, h = (d.y1 - d.y0) * T;
+    const s = this.scene, T = s.T, g = d.art.clear(), x = d.x0 * T, y = d.y0 * T, w = (d.x1 - d.x0) * T, h = (d.y1 - d.y0) * T;
+    // #174 the painted shutter (Welt › Türen, material Rolltor) in front of the code drawing; the red lamp stays
+    const rt = Object.values(s.data_.doors || {}).find(t => t.material === 'shutter' && t.side?.closed && s.textures.exists(t.side.closed));
+    if (rt && !d.img) {
+      const src = s.textures.get(rt.side.closed).getSourceImage();
+      s.textures.get(rt.side.closed).setFilter(NEAREST());
+      d.img = s.add.image(x + w / 2, y + h, rt.side.closed).setOrigin(0.5, 1).setScale(h / src.height).setDepth(-8.95);
+      g.fillStyle(0xff4060).fillRect(x + w / 2 - 5, y + h - 30, 10, 10);
+      return;
+    }
     g.fillStyle(0x3a3f48).fillRect(x, y, w, h);
     g.fillStyle(0x2a2e35); for (let yy = y + 10; yy < y + h; yy += 22) g.fillRect(x + 4, yy, w - 8, 8);   // shutter slats
     g.fillStyle(0xd4a72c); for (let yy = y + 6; yy < y + h; yy += 44) g.fillRect(x + 2, yy, w - 4, 4);   // warning stripes
@@ -404,6 +417,7 @@ export class PoiLevel {
     for (const t of this.terminals || []) if (close(t)) return t.done ? { text: 'Das Terminal ist still' } : t.tried ? { text: `${t.ai} schweigt · nächster Run` } : { text: `${t.ai} anzapfen · Glitch-Duell (sehr schwer)`, act: () => this.terminalDuel(t) };   // #057
     // KIs in machines (Marken-Clutter marked „KI“, e.g. NomadCola-Automaten): once per run
     for (const h of this.hosts()) if (!h.done && close(h)) return { text: `${h.name} anzapfen · Glitch-Duell`, act: () => this.duelAt(h, h.name, `host${this.hosts().indexOf(h)}`) };
+    const way = this.doorways?.nearest(l, range); if (way) return way;   // #174
     for (const d of this.doors) if (!d.open && Math.abs((d.x0 + d.x1) / 2 * this.scene.T - l.x) < range * 0.8 && l.feet > d.y0 * this.scene.T && l.feet <= d.y1 * this.scene.T + 4)
       return { text: 'Die Tür geht von dieser Seite nicht auf' };
     return this.scene.storyFx?.nearest(close) || null;   // #167 notes, the Splitter
@@ -416,13 +430,13 @@ export class PoiLevel {
     const s = this.scene, save = s.box?.save, foe = foeFor(s.data_, save, `${this.poi}:${s.levelInfo?.seed ?? s.args?.seed ?? 0}:${key}`);
     if (!s.hud.duel || !foe) { host.dueled = host.done = true; if (host.door !== undefined) this.pull(host); return; }
     s.hud.duel.open({ foe, title: 'Glitch-Duell', sub: `${where} · hier wohnt ${foe.name}`, onDone: r => {
-      host.dueled = true; host.done = true;
+      host.dueled = true; host.done = true; host.won = !!r.won;
       if (r.caught) s.box?.persist?.();
       s.hud.toast(r.won ? (r.caught ? `Gefangen: ${foe.name}` : `${foe.name} ist entwischt`) : r.gaveUp ? 'Duell abgebrochen' : `${foe.name} hat gewonnen`,
         host.door !== undefined ? (r.won ? 'Der Schalter gehört dir' : 'Der Schalter lässt sich trotzdem umlegen') : r.won ? (r.caught ? 'Sie wohnt jetzt in deinem Deck' : 'Kein Platz im Deck, Rucksack oder Lager') : 'Sie ist in die Leitungen geflohen',
         r.won ? 'good' : 'info', 3200);
       if (host.door !== undefined) { this.drawSwitch(host); this.pull(host); }
-      else {
+      else if (!host.quiet) {
         s.fx?.sparks?.(host.x, host.feet - 80, r.won ? 0x3fe0d0 : 0xe43b9a, 10);
         // #152 (Daniel 21.11.2026: „Automaten mit besiegten Entitäten droppen Nahrungsloot“): the machine spits out what it still holds
         const table = this.P.machineLoot ?? 'automat_beute';
@@ -503,6 +517,7 @@ export class PoiLevel {
     s.sfx?.('door_open', { x: sw.x });   // #130
     s.cam.shake(260, 0.004);
     s.tweens.add({ targets: d.art, y: -(d.y1 - d.y0) * s.T + 12, duration: 900, ease: 'Sine.easeInOut' });
+    if (d.img) s.tweens.add({ targets: d.img, y: d.img.y - (d.y1 - d.y0) * s.T + 18, duration: 900, ease: 'Sine.easeInOut' });
     s.hud.toast('Abkürzung offen!', 'Ein Schalter hat eine Tür geöffnet', 'good', 3000);
   }
   // #168 a lock is in reach: beside it (door, gate) or above / below it (a hatch in a ladder)
@@ -532,6 +547,7 @@ export class PoiLevel {
     if (o.glow) s.tweens.add({ targets: o.glow, alpha: 0, delay: 1200, duration: 800 });
     if (o.hatch) { for (const [x, y] of o.tiles) { s.room.tiles[y][x] = 'H'; this.hatchLadder(x, y); } s.tweens.add({ targets: o.art, alpha: 0, duration: 500 }); }
     else s.tweens.add({ targets: o.art, y: -(o.y1 - o.y0) * T + 12, duration: 900, ease: 'Sine.easeInOut' });
+    if (o.img) s.tweens.add({ targets: o.img, y: o.img.y - (o.y1 - o.y0) * T + 12, alpha: 0.85, duration: 900, ease: 'Sine.easeInOut' });
     s.sfx?.('door_open', { x: (o.x0 + o.x1) / 2 * T });
     s.cam.shake(220, 0.004);
     s.fx.sparks((o.x0 + o.x1) / 2 * T, (o.y0 + o.y1) / 2 * T, 0x3fe0d0, 10);
@@ -585,8 +601,9 @@ export class PoiLevel {
     this.scene.solids.remove(o.zone, true, true);
   }
   // Leyla's melee box (world px) → breaks brittle walls it touches
-  meleeHit(x0, x1, y0, y1) {
+  meleeHit(x0, x1, y0, y1, dmg = 0, time) {
     const s = this.scene, T = s.T;
+    if (dmg) this.doorways?.hitRect(x0, x1, y0, y1, dmg, 'melee', time);   // #174 doors take the blow
     for (const w of this.walls) {
       if (w.open || x1 < w.x0 * T || x0 > w.x1 * T || y1 < w.y0 * T || y0 > w.y1 * T) continue;
       this.openSolid(w);
@@ -731,6 +748,7 @@ export class PoiLevel {
       held: [...this.held],
       collapses: this.collapses.map(c => ({ tiles: c.tiles, done: c.done, trigger: c.trigger })),   // #170
       lifts: this.lifts.map(f => ({ tiles: f.tiles, x: Math.round(f.x), feet: f.feet, down: f.down })),   // #175
+      doorways: this.doorways?.state() || null,   // #174
     };
   }
 }

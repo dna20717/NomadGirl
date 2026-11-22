@@ -18,7 +18,8 @@ export const SFX_RECIPES = [
   ['jump', 'Absprung'], ['airJump', 'Doppelsprung (Implantat)'], ['landSoft', 'Landung weich'], ['landHard', 'Landung hart'], ['dash', 'Dash'], ['slide', 'Rutschen'],
   ['ladder', 'Leitersprosse'], ['ladderSlide', 'Leiter runterrutschen'], ['ledge', 'Kante greifen'],
   ['crate', 'Kiste öffnen'], ['loot', 'Beute aufheben'], ['delta', 'Δ klimpern'], ['equip', 'Ausrüsten'], ['itemPick', 'Ding nehmen'], ['itemPlace', 'Ding ablegen'],
-  ['door', 'Tür (Servo)'], ['switch', 'Schalter'], ['uiHover', 'UI: Fokus'], ['uiConfirm', 'UI: Bestätigen'], ['uiBack', 'UI: Zurück'], ['uiDeny', 'UI: Geht nicht'],
+  ['door', 'Tür (Servo)'], ['doorSwing', 'Tür schwingt auf (Knarren)'], ['doorShut', 'Tür fällt zu'], ['doorSlide', 'Schiebetür'], ['doorHitWood', 'Treffer: Holztür'], ['glassHit', 'Treffer: Glas'],
+  ['doorBreakWood', 'Holztür zersplittert'], ['doorBreakMetal', 'Metalltür reißt'], ['glassBreak', 'Glas zerspringt'], ['switch', 'Schalter'], ['uiHover', 'UI: Fokus'], ['uiConfirm', 'UI: Bestätigen'], ['uiBack', 'UI: Zurück'], ['uiDeny', 'UI: Geht nicht'],
   ['jingleQuest', 'Jingle: Auftrag erledigt'], ['jingleAchievement', 'Jingle: Achievement'],
   // the older ones (build mode, toasts)
   ['tick', 'Kombo-Takt'], ['klonk', 'Klonk (Schweres setzt auf)'], ['klack', 'Klack (Kupplung)'], ['ratchet', 'Ratsche'], ['coins', 'Münzen (Händler)'], ['lift', 'Hochheben'],
@@ -102,6 +103,18 @@ export const RECIPES = {
   itemPick: (c, d, t, k) => { noise(c, d, t, 0.04, 0.12, { type: 'bandpass', f0: 2200 * k, f1: 3000 * k, q: 1.5 }); },
   itemPlace: (c, d, t, k) => { noise(c, d, t, 0.03, 0.14, { type: 'bandpass', f0: 1400 * k, q: 1.5 }); tone(c, d, 'sine', 180 * k, 120 * k, t, 0.05, 0.1); },
   door: (c, d, t, k) => { const g = grit(c, d, 1.5); tone(c, g, 'sawtooth', 55 * k, 75 * k, t, 0.9, 0.06, 0.15); noise(c, d, t, 0.9, 0.08, { type: 'bandpass', f0: 600, f1: 1400, q: 1, a: 0.2 }); thump(c, g, t + 0.9, 70 * k, 0.3, 0.5); noise(c, d, t + 0.92, 0.25, 0.1, { type: 'highpass', f0: 3000, a: 0.01 }); },
+  // #174 doors: a creaking hinge, a slam, a hiss of a sliding door, splinters, torn metal, shattering glass
+  doorSwing: (c, d, t, k) => { const o = c.createOscillator(), f = c.createBiquadFilter(), g = c.createGain(), lfo = c.createOscillator(), lg = c.createGain();
+    o.type = 'sawtooth'; o.frequency.setValueAtTime(140 * k, t); o.frequency.linearRampToValueAtTime(95 * k, t + 0.5); f.type = 'bandpass'; f.frequency.value = 1100 * k; f.Q.value = 7;
+    lfo.frequency.value = 31; lg.gain.value = 26; lfo.connect(lg).connect(o.frequency); env(g, t, 0.05, 0.07, 0.55); o.connect(f).connect(g).connect(d); o.start(t); o.stop(t + 0.6); lfo.start(t); lfo.stop(t + 0.6);
+    noise(c, d, t, 0.03, 0.2, { type: 'bandpass', f0: 2200 * k, q: 3 }); },
+  doorShut: (c, d, t, k) => { const g = grit(c, d, 1); thump(c, g, t, 95 * k, 0.22, 0.6); noise(c, d, t, 0.05, 0.3, { type: 'bandpass', f0: 1800 * k, q: 1.5 }); ring(c, d, t + 0.01, 310 * k, 0.18, 0.04, [1, 2.1]); },
+  doorSlide: (c, d, t, k) => { noise(c, d, t, 0.45, 0.12, { type: 'bandpass', f0: 900 * k, f1: 1600 * k, q: 1.2, a: 0.08 }); tone(c, d, 'sine', 220 * k, 260 * k, t, 0.45, 0.03, 0.08); thump(c, d, t + 0.45, 150 * k, 0.08, 0.2); },
+  doorHitWood: (c, d, t, k) => { thump(c, d, t, 120 * k, 0.12, 0.45); noise(c, d, t, 0.06, 0.3, { type: 'bandpass', f0: 1100 * k, f1: 600 * k, q: 1.4 }); },
+  glassHit: (c, d, t, k) => { noise(c, d, t, 0.05, 0.25, { type: 'highpass', f0: 3500 * k }); ring(c, d, t, 1900 * k, 0.2, 0.05, [1, 2.7, 4.1]); },
+  doorBreakWood: (c, d, t, k) => { const g = grit(c, d, 1.4); thump(c, g, t, 90 * k, 0.3, 0.7); for (let i = 0; i < 6; i++) noise(c, d, t + i * 0.035 + Math.random() * 0.02, 0.05, 0.3, { type: 'bandpass', f0: (900 + Math.random() * 1400) * k, q: 2 }); noise(c, d, t + 0.05, 0.4, 0.12, { type: 'lowpass', f0: 1400, f1: 300 }); },
+  doorBreakMetal: (c, d, t, k) => { const g = grit(c, d, 1.8); thump(c, g, t, 70 * k, 0.35, 0.7); ring(c, d, t, 240 * k, 0.6, 0.12, [1, 1.37, 2.63, 3.9]); noise(c, d, t, 0.5, 0.18, { type: 'bandpass', f0: 2600 * k, f1: 700 * k, q: 0.8 }); },
+  glassBreak: (c, d, t, k) => { noise(c, d, t, 0.08, 0.4, { type: 'highpass', f0: 2500 * k }); for (let i = 0; i < 9; i++) ring(c, d, t + 0.02 + i * 0.03 + Math.random() * 0.03, (2400 + Math.random() * 2600) * k, 0.12, 0.035, [1, 2.4]); noise(c, d, t + 0.1, 0.5, 0.1, { type: 'highpass', f0: 5000 * k, a: 0.02 }); },
   switch: (c, d, t, k) => { noise(c, d, t, 0.02, 0.4, { type: 'bandpass', f0: 1600 * k, q: 2 }); thump(c, d, t, 140 * k, 0.08, 0.3); tone(c, grit(c, d, 3), 'sawtooth', 100 * k, 100 * k, t + 0.03, 0.2, 0.03, 0.01); },
   uiHover: (c, d, t, k) => { noise(c, d, t, 0.012, 0.12, { type: 'bandpass', f0: 4200 * k, q: 4 }); },
   uiConfirm: (c, d, t, k) => { noise(c, d, t, 0.012, 0.18, { type: 'bandpass', f0: 3000 * k, q: 3 }); tone(c, d, 'triangle', 660 * k, 660 * k, t + 0.01, 0.08, 0.06); tone(c, d, 'triangle', 990 * k, 990 * k, t + 0.05, 0.1, 0.05); },

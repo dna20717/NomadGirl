@@ -147,6 +147,7 @@ export class Throwables {
     boom(s, p.radius);
     this.blast(p.x, y, p, time);
     blastSirens(s, p.x, y, p.radius, p.damage ?? 20, time);   // #155
+    s.level?.doorways?.blast(p.x, y, p.radius, p.damage ?? 20, time);   // #174 a grenade blows doors in (also bulkheads)
     // ⚠️ explosions open brittle walls in reach (concept 3.2)
     const r = p.radius * 0.6;
     s.level?.meleeHit?.(p.x - r, p.x + r, y - r, y + r);

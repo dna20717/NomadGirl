@@ -201,7 +201,7 @@ export function repairLife(save) {
 // what changed since `since` (day) for AvA and the time layers → [{ day, kind, gang }]
 export const newsSince = (S, since) => (S?.log || []).filter(x => x.day > since);
 // ---------- camps in the welded level ----------
-const BLOCK = new Set(['H', 'D', 'C', 'S', '!', '@', '+', '|', 'Z', 'L', '%', '$', 'B', 'o', '^', 'v']);
+const BLOCK = new Set(['H', 'D', 'C', 'S', '!', '@', '+', '|', 'Z', 'L', '%', '$', 'B', 'o', '^', 'v', '/']);
 // the rooms a camp may live in, each with its longest free floor away from seams → [{ i, id, x0, x1, y }] (y = the row she stands in)
 export function campSpots(D, L, minW = 4, loose = false) {
   if (!L?.def) return [];
@@ -238,7 +238,7 @@ export function campSpots(D, L, minW = 4, loose = false) {
 }
 // how far a round goes along the same floor from x (tiles), both ways → [xl, xr]
 function roundRoute(tiles, x, y, reach) {
-  const at = (xx, yy) => tiles[yy]?.[xx] ?? '#', walk = xx => !'#=HDB$%|'.includes(at(xx, y)) && !'#=HD'.includes(at(xx, y - 1)) && '#='.includes(at(xx, y + 1));
+  const at = (xx, yy) => tiles[yy]?.[xx] ?? '#', walk = xx => !'#=HDB$%|/'.includes(at(xx, y)) && !'#=HD/'.includes(at(xx, y - 1)) && '#='.includes(at(xx, y + 1));
   let l = x, r = x;
   while (l - 1 > 0 && x - l < reach && walk(l - 1)) l--;
   while (r + 1 < tiles[0].length - 1 && r - x < reach && walk(r + 1)) r++;

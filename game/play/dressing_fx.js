@@ -27,7 +27,10 @@ export class DressingFx {
     this.field = desertField(D, s.levelPoi, LI, holeList);
     this.drawDesert(desertMarks(this.field, spots, reg.inside, this.seed));
     this.drawOpenings(LI, holeList);
-    this.backItems = planBackWall(D, s.room, reg, spots, this.seed, holes);
+    // #174 the front doors of the level (engine/doors.js) stand on the back wall: nothing else there, and no more code doors
+    const fronts = LI.doors?.front || [];
+    for (const f of fronts) for (let y = f.y - 1; y <= f.feet; y++) for (let x = f.x - 1; x <= f.x + f.w; x++) holes.add(x + ',' + y);
+    this.backItems = planBackWall(D, s.room, reg, spots, this.seed, holes).filter(b => b.kind !== 'door' || !Object.keys(D.doors || {}).length || D.game?.doors?.enabled === false);
     this.drawBack(this.backItems);
     this.tales = levelTales(D, s.levelPoi, LI, this.seed);
     for (const [i, id] of this.tales) { const T = D.roomStories?.[id]; if (T) this.drawTale(T, LI.rooms[i]); }

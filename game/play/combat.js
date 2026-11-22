@@ -69,7 +69,8 @@ export class Combat {
     damageSirens(s, z, Math.round((w.damage ?? 10) * (power?.damage || 1) * this.boost('melee')), time);   // #155 a siren on the wall breaks
     // brittle walls in POI levels: only where the strike really reaches the wall
     const walls = z.filter(r => r.wall != null);
-    for (const r of walls) s.level?.meleeHit(r.wall - 4, r.wall + 4, r.y - 4, r.y + 4);
+    const dmgDoor = Math.round((w.damage ?? 10) * (power?.damage || 1) * this.boost('melee'));
+    for (const r of walls) s.level?.meleeHit(r.wall - 4, r.wall + 4, r.y - 4, r.y + 4, dmgDoor, time);   // brittle walls, #174 doors
     if (walls.length && !hits && !blocked) s.sfx?.('melee_wall', { x: leyla.x });
     if (walls.length && !hits && !blocked) s.fx.sparks(walls[Math.floor(walls.length / 2)].wall - f * 6, walls[Math.floor(walls.length / 2)].y, 0xb8b0a0, 4);
     if (blocked && !hits) { leyla.body.setVelocityX(-f * 260); s.fx.text(leyla.x + f * 80, b.bottom - H - 10, 'Block', { color: '#8fb3c9', size: 38, rise: 26 }); }
@@ -201,7 +202,7 @@ export class Combat {
       const n = Math.max(1, Math.ceil(Math.hypot(p.vx, p.vy) * k / 12));
       for (let i = 0; i < n && !p.dead; i++) {
         p.x += p.vx * k / n; p.y += p.vy * k / n;
-        if (s.pointSolid(p.x, p.y)) { p.dead = true; s.fx.sparks(p.x - Math.sign(p.vx) * 6, p.y, 0xffd27a, 6); break; }
+        if (s.pointSolid(p.x, p.y)) { p.dead = true; s.fx.sparks(p.x - Math.sign(p.vx) * 6, p.y, 0xffd27a, 6); s.level?.doorways?.shot(p.x, p.y, p.damage, time); break; }   // #174 a door takes the nail
         if (covers.some(c => p.x > c.x - c.w / 2 && p.x < c.x + c.w / 2 && p.y > c.top && p.y < c.feet)) { p.dead = true; s.fx.sparks(p.x - Math.sign(p.vx) * 6, p.y, 0xc7b08b, 6); break; }   // a chest is cover (#014)
         if (p.friendly) {
           if (damageSirens(s, [{ x0: p.x - 4, x1: p.x + 4, y0: p.y - 4, y1: p.y + 4 }], p.damage, time)) { p.dead = true; break; }   // #155

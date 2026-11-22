@@ -665,5 +665,113 @@
   "priority": "c",
   "trigger": "makeSfx.coins: build_mode.js:970, build_decor.js",
   "replaces": "coins"
+ },
+ "door_swing": {
+  "name": "Tür schwingt auf",
+  "kind": "world",
+  "recipe": "doorSwing",
+  "volume": 70,
+  "pitch": 100,
+  "vary": 60,
+  "cooldown": 0,
+  "priority": "b",
+  "trigger": "game/play/doors.js (#174)",
+  "notes": "Knarrende Angel (#174)"
+ },
+ "door_shut": {
+  "name": "Tür fällt zu",
+  "kind": "world",
+  "recipe": "doorShut",
+  "volume": 70,
+  "pitch": 100,
+  "vary": 60,
+  "cooldown": 0,
+  "priority": "b",
+  "trigger": "game/play/doors.js (#174)",
+  "notes": "Schlag + kurzes Klirren (#174)"
+ },
+ "door_slide": {
+  "name": "Schiebetür",
+  "kind": "world",
+  "recipe": "doorSlide",
+  "volume": 70,
+  "pitch": 100,
+  "vary": 60,
+  "cooldown": 0,
+  "priority": "b",
+  "trigger": "game/play/doors.js (#174)",
+  "notes": "Zischen auf der Schiene (#174)"
+ },
+ "door_hit_wood": {
+  "name": "Treffer an Holztür",
+  "kind": "world",
+  "recipe": "doorHitWood",
+  "volume": 70,
+  "pitch": 100,
+  "vary": 60,
+  "cooldown": 60,
+  "priority": "b",
+  "trigger": "game/play/doors.js (#174)",
+  "notes": "Dumpfer Schlag (#174)"
+ },
+ "door_hit_metal": {
+  "name": "Treffer an Metalltür",
+  "kind": "world",
+  "recipe": "hitMetal",
+  "volume": 70,
+  "pitch": 100,
+  "vary": 60,
+  "cooldown": 60,
+  "priority": "b",
+  "trigger": "game/play/doors.js (#174)",
+  "notes": "Metall klingt (#174)"
+ },
+ "door_hit_glass": {
+  "name": "Treffer an Glas",
+  "kind": "world",
+  "recipe": "glassHit",
+  "volume": 70,
+  "pitch": 100,
+  "vary": 60,
+  "cooldown": 60,
+  "priority": "b",
+  "trigger": "game/play/doors.js (#174)",
+  "notes": "Klirren (#174)"
+ },
+ "door_break_wood": {
+  "name": "Holztür zersplittert",
+  "kind": "world",
+  "recipe": "doorBreakWood",
+  "volume": 70,
+  "pitch": 100,
+  "vary": 60,
+  "cooldown": 0,
+  "priority": "b",
+  "trigger": "game/play/doors.js (#174)",
+  "notes": "Krachen und Splitter (#174)"
+ },
+ "door_break_metal": {
+  "name": "Metalltür reißt",
+  "kind": "world",
+  "recipe": "doorBreakMetal",
+  "volume": 70,
+  "pitch": 100,
+  "vary": 60,
+  "cooldown": 0,
+  "priority": "b",
+  "trigger": "game/play/doors.js (#174)",
+  "notes": "Reißendes Blech, Nachhall (#174)"
+ },
+ "door_break_glass": {
+  "name": "Glas zerspringt",
+  "kind": "world",
+  "recipe": "glassBreak",
+  "volume": 70,
+  "pitch": 100,
+  "vary": 60,
+  "cooldown": 0,
+  "priority": "b",
+  "trigger": "game/play/doors.js (#174)",
+  "notes": "Scherben (#174)"
  }
 }

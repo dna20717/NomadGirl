@@ -278,6 +278,8 @@ export class Enemy {
     const b = this.body;
     if (!dir) return b.setVelocityX(0);
     this.facing = dir;
+    const door = this.scene.level?.doorways?.enemyAt(this, dir);   // #174 a shut door in the way: grab the handle (not a locked one)
+    if (door) { b.setVelocityX(0); this.stuck = door === 'locked'; return; }
     if (this.safeStep(dir, drop)) { b.setVelocityX(dir * speed); this.stuck = false; }
     else if (this.hop(dir)) this.stuck = false;
     else { b.setVelocityX(0); this.stuck = true; }

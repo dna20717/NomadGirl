@@ -29,7 +29,7 @@ export class Fog {
     this.on = F.enabled !== false && s.mode !== 'camp' && !!R?.start;
     if (!this.on) return;
     const w = R.w, h = R.h, inside = (x, y) => s.terrain?.inside?.(x, y) ?? false;
-    const shut = t => t === 'D' || t === '|';   // doors and locks (#168) open later: what lies behind is the level, no secret
+    const shut = t => t === 'D' || t === '|' || t === '/';   // doors, locks (#168) and doorway doors (#174) open later: what lies behind is the level, no secret
     const solid = (x, y) => { const t = R.tiles[y]?.[x]; return t == null || (SOLID_TILES.has(t) && !shut(t)) || t === '%'; };
     const pass = (x, y) => { const t = R.tiles[y]?.[x]; return t != null && (!SOLID_TILES.has(t) || shut(t)) && t !== '%'; };
     // reachable without secrets, then with them

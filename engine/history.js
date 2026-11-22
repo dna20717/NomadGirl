@@ -13,7 +13,7 @@
 //   timeLayers(D, node, save, opts)    → [{ occupant, name, kind, by: roll | home | war | leyla | cleanup, day, text }]
 //   expand(D, symbol, vars, r)         one symbol of the grammar, recursive (#symbol# inside, {var} placeholders)
 //   writeLayer(save, node, layer)      the Revierkrieg / Leyla / the cleanup add a layer (save.story.layers)
-//   addTrace(save, node, trace)        { kind: chest | siren | boss, room, rx, ry } with today's day
+//   addTrace(save, node, trace)        { kind: chest | siren | boss | door, room, rx, ry } with today's day
 //   traceFade(D, trace, day)           1 → fadeTo while it ages, 0 when the new residents have cleared it
 //   freshTraces(D, save, node)         the traces still there, with .fade
 //   tidyTraces(D, save)                clears the old traces everywhere, writes a cleanup layer → [{ node, n }]
@@ -27,7 +27,7 @@ const pick = (r, a) => a.length ? a[Math.floor(r() * a.length)] : '';
 // kinds of occupants (the grammar has an ending for each: ending.gang, ending.nest …)
 export const OCCUPANT_KINDS = [['gang', 'Gang'], ['sect', 'Sekte'], ['refugees', 'Flüchtlinge'], ['traders', 'Händler'], ['scavengers', 'Plünderer'],
   ['hermit', 'Einsiedler'], ['military', 'Versprengte Soldaten'], ['nest', 'Viecher (Nest)'], ['empty', 'niemand']];
-export const TRACE_KINDS = [['chest', 'geöffnete Kiste'], ['siren', 'zerstörte Sirene'], ['boss', 'gefallener Boss']];
+export const TRACE_KINDS = [['chest', 'geöffnete Kiste'], ['siren', 'zerstörte Sirene'], ['boss', 'gefallener Boss'], ['door', 'zerstörte Tür (#174)']];
 export const LAYER_BY = [['roll', 'gewürfelt'], ['home', 'heute (Heimat-Gang)'], ['war', 'Revierkrieg'], ['leyla', 'Leyla hat freigekämpft'], ['cleanup', 'aufgeräumt'], ['moved', 'Lager umgezogen (#169)'], ['gone', 'Lager aufgelöst (#169)'], ['nest', 'Nest gewachsen (#169)'], ['settle', 'neue Bewohner (#169)']];
 
 export const traceConfig = D => ({ cleanupDays: Math.max(1, D?.history?.traces?.cleanupDays ?? 4), fadeTo: Math.max(0, Math.min(100, D?.history?.traces?.fadeTo ?? 35)) / 100 });

@@ -27,7 +27,7 @@ export function tropeSizeIssues(t, size = null) {
 }
 export const GORE = [[0, 'keiner'], [1, 'Blutfleck'], [2, 'moderat (Tote sichtbar)']];
 const list = v => Array.isArray(v) ? v : String(v ?? '').split(',').map(s => s.trim()).filter(Boolean);
-const BUSY = 'HDSCZ@!%$BL*^v';   // ladders, doors, switches, chests, goal, terminal, siren … keep a tile off them
+const BUSY = 'HDSCZ@!%$BL*^v/';   // ladders, doors, switches, chests, goal, terminal, siren … keep a tile off them
 
 // free stretches of w tiles: floor below, two tiles of air above, nothing special within one tile → [[x, y]] (y = the air tile on the floor)
 export function tropeSpots(tiles, rect, w = 3, place = 'floor') {
