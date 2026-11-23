@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 23.11. Code → Ava: **#184 + #185 fertig** (Meta-Baum): neues Spiel beginnt in Mile 7 mit Stufe 0, acht Stufen öffnen sich über Ziele und Story-Momente, vier Systeme ganz raus bis zu ihrer Stufe. Konzept `docs/concepts/freischaltungen.md`, Feature `docs/features/unlocks.md`. Offen ⚠️: Zahlen, Hacking-Trennung, Story-Momente als Dialog.
+
 - 23.11. Code → Ava: Daniel: „B, ich bin eine Weile AFK, du kannst dich also austoben!“ → #184 und #185 laufen in einem Rutsch.
 
 - 23.11. Code → Ava: Neu **#184** (Meta-Baum, Stufen 0–3, Schraube wird Händler) und **#185** (Stufen 4–7, ganz raus). Konzept fertig, alle Fragen beantwortet.
@@ -353,16 +355,16 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #185 Freischaltungen Teil 2: Stufen 4–7, „ganz raus“
-- **Status:** läuft (23.11.) · angelegt 23.11. von Code (nach #184)
+- **Status:** fertig (23.11.) · angelegt 23.11. von Code (nach #184)
 - **Für:** Code
 - **Lesen:** `docs/concepts/freischaltungen.md` (führend), #184.
 - **Auftrag:** Türen der Stufen 4–7 (Suche + Tank-Verfall ab Stufe 4, Karawane, Machtspiele, Giganten). **Ganz raus** (Daniel) für Hacking + Entities, Cyberware, Mega-Rigs + Bergung, Machtspiele: keine Spur in Inventar, Camp, Bau-Modus, Karte, Straße, HUD, Radio, Storylets, Aufträgen, Achievements, Lektionen. Dinge verborgener Systeme als **Wertsache** (`hiddenAs`). Ruf der Gangs zählt still mit. Prüfwerkzeug: Stufen 0–3 abspielen und nach Wörtern verborgener Systeme suchen.
 - **Fertig, wenn:** mit Stufe 3 ist von den vier Systemen nichts zu sehen, Implantate liegen als Wertsache; Freischalten macht sie sichtbar und benutzbar; Tests grün.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: Hacking komplett in Stufe 2 (erstes Hacking und Entities voll noch nicht getrennt); Gang-Frieden im Run läuft weiter, nur ohne Anzeige; Radio/Storylets nennen Gangs weiter als Namen.
+- **Ergebnis:** (Code) ganz raus für Hacking (Schalter von Hand, keine Terminals/KIs, Türen ohne Hacken, kein Deck-Platz, kein Duell am Feuer, kein Worker-Chip), Cyberware (kein Implantate-Tab, kein Ripperdoc im Katalog, Implantate + Baupläne als Wertsache), Mega-Rigs (keine Wracks, keine Bergung, kein Umziehen), Machtspiele (Ruf still, keine Ruf-Anzeige/Toasts/Gespräche/Aufträge/Revierkrieg/Gefangenen/Dunkelheit, Schwarzmarkt und Ghostwire gesperrt). Stufe 4–7: Tank-Verfall, Techtree, Zerlegen, Hauptquest, Crew, Lucky. Lektionen nach System. Tests siehe #184.
 
 ### #184 Freischaltungen Teil 1: Meta-Baum, Stufen 0–3, „Schraube wird Händler“
-- **Status:** läuft (23.11.) · angelegt 23.11. von Code (Konzept mit Daniel, drei Fragerunden)
+- **Status:** fertig (23.11.) · angelegt 23.11. von Code (Konzept mit Daniel, drei Fragerunden)
 - **Für:** Code
 - **Lesen:** **`docs/concepts/freischaltungen.md`** (führend, alle Entscheidungen), `docs/features/trade.md`, `docs/features/tutorial.md`, `docs/features/achievements.md` (Zähler), `docs/features/progression.md` (Questlog, Durchgang).
 - **Auftrag:**
@@ -374,8 +376,8 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
   6. **Neuer Durchgang wählbar:** Freischaltungen behalten oder bei 0 beginnen. Alte Spielstände: alles frei.
   7. Datenset/Fixture „alles frei“ für die bestehenden Browser-Tests.
 - **Fertig, wenn:** ein neues Spiel beginnt im ersten POI mit nur Bewegung/Kampf/Benutzen, die Stufen 0–3 öffnen sich nacheinander über Ziele und Story-Momente, Schraube wird Händler, der Meta-Baum zeigt alles, alte Stände laden mit allem frei; Tests grün; Build grün.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: alle Ziele/Zahlen (Startwerte, siehe `docs/features/unlocks.md`); Story-Momente als Toast (Dialog mit Porträt später); „Ein Platz zum Bleiben“ ist nur ein Moment (das Camp gibt es immer, nach dem ersten Run); Schraube-Questkette: 8 Schrott → 3 alte Platinen → 1 Zwischenfall; Sungs neuer Auftrag „Fleisch mit Meinung“ (2 Mutantenfleisch) schenkt die Kochnische, „Sungs Suppe“ kommt danach; Inventar im Camp ab dem ersten Kill oder der ersten Beute (der Boden im Run geht immer); automatisierte Browser spielen mit allem frei.
+- **Ergebnis:** (Code) `game/unlocks.js` (Stufen, Ziele → Meta → frei, `unlocked`, `hiddenAs`, Geschenke), Bereiche **Meta-Baum: Stufen** + **Meta-Baum: Freischaltungen** (17 Systeme), `save.meta`, Start im ersten POI, Start-Rig ohne Geschenke, Durchgang wählbar, Cheats › Meta-Baum, Türen der Stufen 0–3, 4 neue Aufträge. Doku `docs/features/unlocks.md`. Tests: npm 486 (neu `unlocks.test` 5), `unlock_test` 19 (Spürhund), Gesamtlauf siehe #185. PixelLab 0. **Bitte testen:** Hauptmenü › neues Spiel in einem freien Slot: Start in Mile 7, dann Camp; Pause-Menü › Cheats › Meta-Baum zum Springen.
 
 ### #183 Weitere Händler: Sungs Küche, Karawane, Händler an Orten, Lucky Ferro
 - **Status:** fertig (23.11.) · angelegt 23.11. von Code (Daniel: „Das System gefällt mir richtig gut. Lass uns direkt die anderen Händler auch einbauen.“; Auswahl: alle vier, Bau-Katalog bleibt im Bau-Modus)

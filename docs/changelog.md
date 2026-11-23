@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 23.11.2026: **Freischaltungen / Meta-Baum** (#184, #185): Ein neues Spiel beginnt im ersten POI mit nur Bewegung, Kampf und Benutzen; acht Stufen bis zu den Giganten öffnen sich über Ziele und Story-Momente (Rucksack nach dem ersten Kill, Reisen nach zwei POIs, Rig bauen mit „Kabelsalat“, Kochen mit Sungs Auftrag, Handel mit der Questkette „Schraube wird Händler“ …). Hacking, Cyberware, Mega-Rigs und Machtspiele sind bis dahin ganz raus, ihre Dinge liegen als Wertsache herum. Der Tank verfällt erst ab „Die Suche“. Testen: Pause-Menü › Cheats › Meta-Baum.
 - 23.11.2026: **Weitere Händler** (#183): Sungs Küche, Lucky Ferro (taucht ab Tag 3 am Feuer auf), Händlerkarawane und Markenstand auf der Straße, Papier & Pläne, Schwarzmarkt und Ghostwire an Orten der Reisekarte, alle im selben Händlerfenster.
 - 23.11.2026: **Händler + Vorschuss** (#182, aus FB-2): Schraube kauft an und verkauft im neuen Händlerfenster (schlechter Kurs zum Start, Tageskasse, satt bei Gleichem, Ware jeden Tag neu); Onkel Sung gibt einen Vorschuss ohne Zinsen, die Hälfte jeder Run-Auszahlung geht zurück.
 - 23.11.2026: **Feedback-Knopf für die Testphase** (#181): F8, Home-Taste oder Select + Start pausiert, Fenster mit Chips und Text, Bild vom Moment und Spur der letzten 30 s gehen als Issue ins private Repo FeedbackBucket; JS-Fehler bieten Feedback an.

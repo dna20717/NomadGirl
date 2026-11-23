@@ -60,16 +60,16 @@ engine/project.js      Laden, Prüfen, Verwendungen, Umbenennen, Löschen (Brows
 engine/room.js         Raum-Layouts lesen (parseRoom, solidRects, Zeichen-Legende), Browser und Node
 engine/poi.js          POI-Level: Räume zu einem Level verschweißen (buildPoi, poiReady), Ranking (rankRun)
 engine/image.js, font.js   Bild und Pixelschrift (aus NomadTactics, für browser_loader)
-game/workshop/         Werkstatt: workshop.js (Gerüst + Seiten aus dem Schema), summaries.js (abgeleitete Werte, Vorschauen), asset_preview.js (Animation, Bild, Großansicht, Vorschaubilder), workshop.css
+game/workshop/         Werkstatt: workshop.js (Gerüst + Seiten aus dem Schema), summaries.js, asset_preview.js, workshop.css
 game/drone_cables.js   Kabel der Drohne (Verlet-Seile, Spiel + Startseite)
 game/weather.js        Wetter-Himmel, Sterne und Regen aus Code (Startseite + Spiel)
-game/worldmap.js       Reisekarte (ohne DOM): Routen-Netz je Durchgang würfeln, Orte, Straßen, Marken; map_render.js zeichnet sie (Spiel + Werkstatt)
+game/worldmap.js       Reisekarte (ohne DOM): Routen-Netz je Durchgang; map_render.js zeichnet sie
 game/quest.js, quests.js, summary.js   Zielzeile, Questlog, Beute-Bilanz (ohne DOM)
-game/crafting.js       Kochen & Craften (ohne DOM): Rezeptbuch, Vorräte aus Lager/Kiste/Rucksack, Herstellen, Experimentieren, Fehlschläge, Zettel, Tipps, Essen
-game/rig.js            Rig umbauen (ohne DOM): Budgets (Gewicht, Container, Energie, Verbrauch, Rig-Teile), Rig-Teile an Sockeln (anschrauben, tauschen, abschrauben, kaufen, verkaufen), Aktionen sofort (act), Umstellen, Kaufen/Verkaufen, Anhänger an Kupplungen/umsortieren/abhängen, Lager-Umzug, Schnappschuss für Rückgängig
+game/crafting.js       Kochen & Craften (ohne DOM): Rezeptbuch, Vorräte, Herstellen, Experimentieren, Essen
+game/rig.js            Rig umbauen (ohne DOM): Budgets, Rig-Teile, Werkstätten und Anhänger setzen, kaufen, verkaufen, Rückgängig (Details: docs/features/rig.md)
 game/inventory.js      Inventar-Kern (ohne DOM): Raster aus Rechtecken, Drehen, Stapeln, Tauschen, Alles einlagern, Beute würfeln
-game/save.js           Spielstand: neuer Stand, Start-Rig verteilen, Uhr (Ereignis-Zeit), Reparieren, online /api/save bzw. localStorage
-game/play/             Spiel: main.js (Laden + Start), scene.js (Raum, Physik, Ablauf) + scene_runs.js + scene_events.js, camp*.js (Camp), leyla*.js (Leyla), *_ui.js (Fenster), hud.js, control.js (Fernsteuerung), fog.js, foreground.js, signature.js, poi_level.js, enemies.js, combat.js, fx.js, art.js, play.css; Einzelheiten in den Feature-Dateien
+game/save.js           Spielstand: neuer Stand, Uhr, Reparieren, online /api/save bzw. localStorage
+game/play/             Spiel: main.js (Start), scene.js (+ scene_runs.js, scene_events.js), camp*.js, leyla*.js, *_ui.js (Fenster), hud.js, control.js (Fernsteuerung); Einzelheiten in den Feature-Dateien
 game/vendor/           Phaser 3.90 (MIT)
 game/ui.js, ui.css, basis.css, icons.js, store.js, browser_loader.js, font/   gemeinsamer Kern (Kopie aus NomadTactics)
 tools/ng.js            Kommandozeile für Daten
@@ -143,8 +143,9 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 - `docs/features/art.md`: Feld `look` an Entitäten, Asset-Vorschau, Symbol-Raster, Gegenrichtung beim Spiegeln.
 - `docs/features/editor.md`: Werkstatt-Editor: Spielen-Knopf, Scroll-Position.
 - `docs/features/online.md`: Online im Detail: Access-Login, Speichern = Commit, Spielstand online, Version, verspätete Builds, lokaler Worker.
-- `docs/features/trade.md`: Händlerfenster für alle Händler (Camp, Straße, Orte; Schraube, Sung, Lucky, Karawane, Schwarzmarkt, Ghostwire …) und Vorschuss bei Onkel Sung (#182, #183).
-- `docs/features/feedback.md`: Feedback-Knopf der Testphase (#181): F8 / Home / Select+Start, Spur, Issue in FeedbackBucket.
+- `docs/features/unlocks.md`: Meta-Baum (#184/#185): Stufen, ganz raus, Türen je System.
+- `docs/features/trade.md`: Händlerfenster (Camp, Straße, Orte) und Vorschuss (#182, #183).
+- `docs/features/feedback.md`: Feedback-Knopf der Testphase (#181), FeedbackBucket.
 - `docs/features/tests.md`: Alle Browser-Tests und Prüfwerkzeuge mit ihren Prüfungen.
 - `docs/changelog.md`: Verlauf aller Ausbaustufen (früher „Stand“), neueste oben.
 

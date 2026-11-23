@@ -1,6 +1,6 @@
 # Freischaltungen: der Meta-Baum
 
-Stand 23.11.2026 · Konzept von Ava (Code) aus dem Gespräch mit Daniel. Noch nichts gebaut.
+Stand 23.11.2026 · Konzept von Ava (Code) aus dem Gespräch mit Daniel. **Gebaut als #184/#185**, Feature-Wissen in `docs/features/unlocks.md`.
 
 ## Anlass
 
