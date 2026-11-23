@@ -47,7 +47,7 @@ Muster für jeden Auslöser: **Ziel** (was der Spieler tut) → **Story-Moment**
 |---|---|---|
 | Reisekarte + Fahrt | Karte, Etappen, Sprit, Vorräte | 2 POIs geschafft → Schraube macht den Van flott |
 | Zwischenfälle | Ereignis-Baukasten unterwegs | erste Fahrt |
-| Erstes Hacking | ein Entity, ein Duell | Datenkristall in einem POI → AvA findet etwas im Netz |
+| Erstes Hacking | ein Entity, ein Duell (bis dahin **ganz raus**) | Datenkristall in einem POI → AvA findet etwas im Netz |
 
 ### Stufe 3 · Zuhause
 
@@ -109,13 +109,29 @@ Daniel: „Schraube dabei zu helfen, Händler zu werden, wäre ein tolles Quest 
 
 ## Gesperrtes je System
 
-Daniels Regel: je System entscheiden. ⚠️ Vorschläge:
+Daniels Regel: je System entscheiden. Dazu (Daniel, 23.11.2026): „Ich würde sogar noch einen Schritt weitergehen und einige Systeme (Hacking und Cyberware, Mega-Rigs …) nicht einmal teasern und aus dem UI so lange raushalten.“
 
-| Art | Wann | Beispiele |
+| Art | Wann | Systeme |
 |---|---|---|
-| **Unsichtbar** | Das System würde nur verwirren | Moral, Dunkelheit, Gangs/Ruf, Mega-Rigs, Zerlegen |
-| **Teaser** | Neugier hilft | Werkbank im Rig mit Plane drüber („Schraube braucht Kabel“), verschlossene Warroom-Karte |
-| **Als Quest erzählt** | Das System hat eine Figur | Handel (Schraube), Kochen (Sung), Vorschuss (Sung), Hacking (AvA) |
+| **Ganz raus** (Daniel) | bis zur Freischaltung keine Spur in der Oberfläche | **Hacking + Entities**, **Cyberware**, **Mega-Rigs + Bergung**, **Machtspiele** (Gangs/Ruf, Revierkrieg, Kopfgeld, Dunkelheit, Gefangene/Zelle) |
+| **Unsichtbar** (⚠️ Ava) | würde nur verwirren | Moral, Zerlegen, Ressourcen Technik/Wissen/Bio bis Stufe 4 |
+| **Teaser** (⚠️ Ava) | Neugier hilft | Werkbank im Rig mit Plane drüber („Schraube braucht Kabel“), verschlossene Warroom-Karte |
+| **Als Quest erzählt** | das System hat eine Figur | Handel (Schraube), Kochen (Sung), Vorschuss (Sung) |
+
+### „Ganz raus“ heißt überall raus
+
+Damit ein System wirklich weg ist, schweigt es an jeder Stelle, bis es frei ist:
+
+- **Inventar:** keine Implantat-Slots (Cyberware), kein Cyberdeck-Tab, keine Entities, kein Gefangenen-Platz.
+- **Camp und Bau-Modus:** Ripperdoc-Liege, Serverschrank, Zelle fehlen im Händler-Katalog und im Rig; kein „Umziehen“ in Mega-Rigs, kein freundliches Duell am Feuer.
+- **Reisekarte und Straße:** keine Wracks, keine Bergung, keine Fronten, keine Gang-Ketten, keine Kopfgeldjäger, keine Ghostwire- und Schwarzmarkt-Händler.
+- **HUD und Fenster:** keine Ruf-Anzeige, keine Dunkelheit, keine Bergungs-Quests im Questlog, keine Duell-Knöpfe.
+- **Radio, Storylets, Aufträge, Achievements, Lektionen, Steuerungs-Hilfe:** keine Zeile, die auf das System zeigt (Achievements des Systems zählen erst ab der Freischaltung oder bleiben verdeckt).
+- **Startseite und Intro** bleiben, wie sie sind (Stimmung, keine Mechanik).
+
+**Dinge verborgener Systeme in Beute und Ware** (Daniel: „Als Wertsache“): Implantate, Programme, Entities, Baupläne dafür tauchen weiter auf, gelten aber als **Wertsache**: Tooltip nur mit Name, Marke und „Wertsache · lässt sich verkaufen“, kein Slot, keine Erklärung, keine Werte. Mit der Freischaltung werden sie benutzbar, wo sie liegen. ⚠️ Ava: Händler zahlen dafür den Wertsachen-Kurs; ein Zettel im Spiel darf sie „seltsame Technik“ nennen.
+
+⚠️ Offen: **Gangs im Hintergrund.** Gangs sind auch heute schon Gegner in POIs und Figuren auf der Straße. Vorschlag: Sie bleiben als Gegner und Namen da, der **Ruf zählt still mit**, aber Anzeige, Gang-Aufträge, Frieden, Ketten und Revierkrieg kommen erst mit „Machtspiele“.
 
 ## Technik (Vorschlag)
 
@@ -125,11 +141,13 @@ Daniels Regel: je System entscheiden. ⚠️ Vorschläge:
 - **Story-Moment:** nutzt, was es gibt: Lektionen im Feldhandbuch (Karte beim ersten Mal), Companion-Dialog (`hud.menu` mit `talk`), AvA-Stimmungen, Toasts. Jede Freischaltung bringt ihre Lektion.
 - **Alte Spielstände:** bekommen beim Laden alles frei (`repairSave`), damit niemand etwas verliert.
 - **Cheats › Meta-Baum:** Stufen als Spalten, Systeme als Karten (frei / offen / gesperrt), Klick schaltet um, „alles frei“ und „zurück auf Stufe 0“.
+- **„Ganz raus“ technisch:** jedes Fenster und jede Tabelle fragt `unlocked()`; Beute fragt `hiddenAs(D, save, item)` und zeigt verborgene Dinge als Wertsache. Ein Prüfwerkzeug (Browser-Test) läuft Stufe 0–3 ab und sucht in DOM und Texten nach Wörtern der verborgenen Systeme (Implantat, Cyberdeck, Ruf, Bergung …).
 - **Datenset „Alles frei“** für Tests und Werkstatt, damit die Browser-Tests nicht an Freischaltungen hängen (wie `furnishedStart`).
 
 ## Offene Fragen an Daniel
 
 - **Neuer Durchgang:** Bleibt alles frei (Traum-Wissen), oder fängt man bei einer Stufe > 0 neu an?
+- **Gangs im Hintergrund:** Ruf still mitzählen (Vorschlag oben) oder bis zur Freischaltung ganz ohne Ruf?
 - **Wie viel Meta** gibt ein Ziel, und wie viel kostet ein System? Oder reicht „jedes Ziel = eine Freischaltung“, und Meta ist nur der Zähler im Hintergrund?
 - **Was passiert mit dem Startgeld und dem Start-Rig** (heute Werkstätten ab Start)? Vorschlag: Start-Rig leer bis Stufe 3, Lager und Schlafkoje ab Stufe 1.
 - **Wo fährt Schraube als Händler mit:** nur als Knopf auf der Karte, oder sitzt er sichtbar an einem Stand im Camp bzw. an Orten?
