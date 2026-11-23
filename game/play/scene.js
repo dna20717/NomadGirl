@@ -860,6 +860,12 @@ export class PlayScene extends Phaser.Scene {
     ({ time, delta } = slowClock(this, time, delta));   // #164 slow motion: the game clock (real time minus what slow motion held back)
     this.now = time;   // the loop's clock (hits, shots and Leyla run on it; scene.time.now is another clock)
     let input = this.readInput();
+    this.lastInput = input;   // #181 the feedback trace records what was held
+    if (this.hud.feedbackOpen || this.hud.feedbackSwallow > 0) {   // #181 feedback window (game/feedback/): the game waits, none of its keys act
+      if (!this.hud.feedbackOpen) this.hud.feedbackSwallow--;
+      for (const v of Object.values(input)) if (v) v.pressed = false;
+      if (this.hud.feedbackOpen) { this.physics.world.pause(); this.hud.update(this, time); return; }
+    }
     this.padMenus(input, Math.min(delta, 50));
     this.hud.tut?.tick(performance.now()); this.hud.tut?.poll(this.now);   // field guide (#011)
     // Esc / Start: closes what is open (inventory, controls), otherwise the pause menu (Daniel, 11.11.2026: controls hidden in a menu)

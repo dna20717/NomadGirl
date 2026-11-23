@@ -18,6 +18,7 @@ import { openSave, arrive } from '../save.js';
 import { openStorage, activeSlot, chooseSlot } from '../slots.js';
 import { composeKits } from '../vehicle_kit.js';
 import { cheatsOn, watchCheatWord, runCheat } from '../cheats.js';
+import { installGameFeedback } from './feedback_adapter.js';   // #181 test phase: feedback button
 
 export async function start(parent, hudRoot, loading, opts = {}) {
   const base = new URL('projects/nomadgirl/', location.href);
@@ -107,5 +108,6 @@ export async function start(parent, hudRoot, loading, opts = {}) {
   }
   game.scene.add('play', PlayScene, true, args);
   window.nomad = installControl(game);   // remote control for Ava and tests
+  window.nomadFeedback = installGameFeedback(game, D);   // #181 test phase: F8 / home button / Select + Start
   return game;
 }

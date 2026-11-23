@@ -1,0 +1,32 @@
+/* Feedback for the test phase (#181): window and error hint. Only --ui-* tokens. */
+.fb-overlay { position: fixed; inset: 0; z-index: 9000; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, .55); font-family: var(--ui-font); color: var(--ui-text); padding: 16px; }
+.fb-box { width: min(880px, 100%); max-height: calc(100vh - 32px); overflow: auto; background: var(--ui-glass); backdrop-filter: blur(10px); border: 1px solid var(--ui-border-strong); border-top: 2px solid var(--ui-acc-line); border-radius: var(--ui-r-pane); box-shadow: var(--ui-shadow); }
+.fb-head { display: flex; align-items: center; gap: 8px; padding: 12px 16px; font-size: var(--ui-gr-xl); font-weight: 600; color: var(--ui-text-strong); border-bottom: 1px solid var(--ui-border); }
+.fb-head svg { color: var(--ui-acc); }
+.fb-where { margin-left: auto; font-size: var(--ui-gr-s); font-weight: 400; color: var(--ui-text2); }
+.fb-body { display: flex; gap: 16px; padding: 16px; flex-wrap: wrap; }
+.fb-shot { width: 320px; max-width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--ui-r-field); border: 1px solid var(--ui-border); background: var(--ui-canvas); }
+.fb-noshot { display: flex; align-items: center; justify-content: center; color: var(--ui-text3); font-size: var(--ui-gr-s); }
+.fb-main { flex: 1 1 320px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.fb-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.fb-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border-radius: var(--ui-r-button); border: 1px solid var(--ui-border-strong); background: var(--ui-field); color: var(--ui-text); font: inherit; font-size: var(--ui-gr-m); cursor: pointer; transition: background var(--ui-t1), border-color var(--ui-t1); }
+.fb-chip:hover { background: var(--ui-hover); }
+.fb-chip.on { background: var(--ui-acc-soft); border-color: var(--ui-acc-line); color: var(--ui-text-strong); }
+.fb-text { width: 100%; box-sizing: border-box; resize: vertical; min-height: 96px; padding: 10px; border-radius: var(--ui-r-field); border: 1px solid var(--ui-border-strong); background: var(--ui-field); color: var(--ui-text); font: inherit; font-size: var(--ui-gr-l); }
+.fb-hint { font-size: var(--ui-gr-xs); color: var(--ui-text3); }
+.fb-foot { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--ui-border); flex-wrap: wrap; }
+.fb-status { margin-right: auto; font-size: var(--ui-gr-m); color: var(--ui-text2); }
+.fb-status.good { color: var(--ui-green); } .fb-status.warn { color: var(--ui-acc); } .fb-status.bad { color: var(--ui-red); }
+.fb-keys { font-size: var(--ui-gr-xs); color: var(--ui-text3); }
+.fb-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: var(--ui-r-button); border: 1px solid var(--ui-border-strong); background: var(--ui-panel); color: var(--ui-text); font: inherit; font-size: var(--ui-gr-m); cursor: pointer; }
+.fb-btn:hover { background: var(--ui-hover); }
+.fb-send { background: var(--ui-acc); border-color: var(--ui-acc); color: var(--ui-acc-text); font-weight: 600; }
+.fb-send:hover { background: var(--ui-acc); filter: brightness(1.08); }
+.fb-send:disabled { opacity: .45; cursor: default; filter: none; }
+.fb-focus { outline: 2px solid var(--ui-acc-line); outline-offset: 2px; }
+.fb-text.fb-focus { outline-offset: 0; }
+.fb-hintbox { position: fixed; left: 16px; bottom: 16px; z-index: 8900; display: flex; align-items: center; gap: 10px; max-width: min(460px, calc(100vw - 32px)); padding: 10px 12px; font-family: var(--ui-font); font-size: var(--ui-gr-m); color: var(--ui-text); background: var(--ui-glass); backdrop-filter: blur(8px); border: 1px solid var(--ui-border-strong); border-top: 2px solid var(--ui-red); border-radius: var(--ui-r-pane); box-shadow: var(--ui-shadow); }
+.fb-hintbox > svg { color: var(--ui-red); flex: none; }
+.fb-hintmsg { font-size: var(--ui-gr-xs); color: var(--ui-text3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px; }
+.fb-x { border: 0; background: none; color: var(--ui-text2); cursor: pointer; padding: 4px; }
+@media (max-width: 600px) { .fb-keys { display: none; } }

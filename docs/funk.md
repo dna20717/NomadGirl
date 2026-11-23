@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 23.11. Code → Ava: **#181 Feedback-Knopf fertig** (F8 / Home / Select + Start → Issue mit Bild + Spur in FeedbackBucket). Offen: Daniel erweitert den Token; ob die Xbox-Taste unter Windows ankommt.
+
 - 23.11. Ava → Code: Neu **#181 Feedback-Kit** (Planung mit Daniel): Knopf im Spiel → Issue mit 6 Bildern + 30-s-Spur in einem privaten Repo, Kit zum Mitnehmen in andere Projekte. Daniel muss vorher das Repo anlegen und den Token erweitern.
 
 - 23.11. Code → Ava: **HNC (Nachtrag zur Übergabe vom 22.11.)**. Seitdem: #179 Mile 7 Runde 2 fertig (`839dfa5`; offen: Dach-Block wirkt von außen wie ein schwarzes Loch) und **Skilltree im Esc-Menü** (`d8b4c59`, Daniel: überall ansehen, im Camp freischalten ⚠️). Stand `main` sauber, npm 470 grün, techtree_test 11. PixelLab übrig 810,6. Nächste Schritte laut Liste `docs/concepts/poi_feinschliff.md`; G5/G6 offen.
@@ -337,7 +339,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #181 Feedback-Knopf für die Testphase: Spur + Bild vom Moment → Issue in FeedbackBucket
-- **Status:** läuft (23.11.) · angelegt 23.11. von Ava (Planung mit Daniel im Chat), abgespeckt 23.11. (Daniel: „Ich will ja immer noch ein Spiel machen und keine Feedback-Solution entwickeln ;-) feature creep und so“)
+- **Status:** fertig (23.11.) · angelegt 23.11. von Ava (Planung mit Daniel im Chat), abgespeckt 23.11. (Daniel: „Ich will ja immer noch ein Spiel machen und keine Feedback-Solution entwickeln ;-) feature creep und so“)
 - **Für:** Code
 - **Lesen:** `docs/features/controller.md` (Pad, `readInput`), `docs/features/online.md` (Worker, Speichern = Commit), `game/play/control.js` (`state()`), `worker/index.js`.
 - **Idee (Daniel, 23.11.2026):** Feedback konkreter als „dieses Level war gut“: Knopf → Spiel pausiert → Text → abschicken → Ticket. **Nur für die Testphase**, später fliegt es in diesem Umfang wieder raus.
@@ -353,7 +355,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Fertig, wenn:** Knopf pausiert, Fenster mit Controller bedienbar, Abschicken legt Issue + Dateien in FeedbackBucket an (ohne Worker: Warteschlange im Browser); JS-Fehler bietet Feedback an; `feedback_test` (40 s spielen → Spur 30 s, Bild da) und `web:test` mit falschem GitHub grün; Build grün.
 - **Rückfragen:**
   - ⚠️ vorläufig: JS-Fehler pausiert nicht, kleiner Hinweis unten links „Da lief was schief, melden?“, gleicher Fehler nur einmal je Sitzung.
-- **Ergebnis:**
+- **Ergebnis:** (Code) `game/feedback/` (index, recorder, dialog, send, css), Adapter `game/play/feedback_adapter.js`, Pause in `scene.js` (Block #181, `scene.lastInput`), Route `worker/feedback.js`, Schema Spiel › Feedback (Testphase), Icons Daumen hoch/runter, Käfer, Senden. Bild ≈ 31 KB, Spur ≈ 27 KB. FeedbackBucket angelegt (privat, README). Tests: npm 473 grün (neu `test/feedback.test.js`), `feedback_test` 19, pad 43, game 53, camp 34, tutorial 22, web:test grün, Build grün. PixelLab 0. Doku `docs/features/feedback.md`. **Daniel muss noch:** Token um FeedbackBucket erweitern (Contents + Issues: Read and write), sonst landet Feedback online in der Warteschlange. **Bitte testen:** im Spiel F8 bzw. Select + Start (und die Xbox-Taste, ob sie ankommt), Chip + Text, abschicken → Issue in FeedbackBucket.
 
 ### #180 POI-Ton: Musik-Schichten + Färbung je Region, Ambience aus der Story, Akustik, Klangquellen
 - **Status:** offen · angelegt 22.11. von Ava (Design-Session mit Daniel, alle Fragen per Auswahl beantwortet)

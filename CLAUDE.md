@@ -143,6 +143,7 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 - `docs/features/art.md`: Feld `look` an Entitäten, Asset-Vorschau, Symbol-Raster, Gegenrichtung beim Spiegeln.
 - `docs/features/editor.md`: Werkstatt-Editor: Spielen-Knopf, Scroll-Position.
 - `docs/features/online.md`: Online im Detail: Access-Login, Speichern = Commit, Spielstand online, Version, verspätete Builds, lokaler Worker.
+- `docs/features/feedback.md`: Feedback-Knopf der Testphase (#181): F8 / Home / Select+Start, Spur, Issue in FeedbackBucket.
 - `docs/features/tests.md`: Alle Browser-Tests und Prüfwerkzeuge mit ihren Prüfungen.
 - `docs/changelog.md`: Verlauf aller Ausbaustufen (früher „Stand“), neueste oben.
 

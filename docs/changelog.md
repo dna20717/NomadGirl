@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 23.11.2026: **Feedback-Knopf für die Testphase** (#181): F8, Home-Taste oder Select + Start pausiert, Fenster mit Chips und Text, Bild vom Moment und Spur der letzten 30 s gehen als Issue ins private Repo FeedbackBucket; JS-Fehler bieten Feedback an.
 - 22.11.2026: **Skilltree im Esc-Menü**: überall ansehen, im Camp freischalten.
 - 22.11.2026: **Mile 7 Runde 2** (#179): Werbe-Attika um den Dach-Block, heller Supermarkt mit Fliesen, Leuchtpaneelen und Gangschildern, echtes Licht unter dem Tankstellendach und am Pylon.
 - 22.11.2026: **Rest-Texte aus Grafiken, Licht an Türen** (#177): Prüfwerkzeug für Schrift in Grafiken, Schilder und Camp-Deko mit deutscher Schrift aus Code; geschlossene Türen halten Lampenlicht auf.

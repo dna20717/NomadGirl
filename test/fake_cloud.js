@@ -58,6 +58,9 @@ export function fakeGitHub(files, repo = 'dna20717/NomadGirl') {
       if (!commits.get(body.sha).parents.includes(g.refs[m[1]]) && !body.force) return ok({ message: 'Update is not a fast forward' }, 422);
       g.refs[m[1]] = body.sha; return ok({ object: { sha: body.sha } });
     }
+    // #181 issues (FeedbackBucket)
+    if (method === 'POST' && p === 'issues') { g.issues ||= []; const n = g.issues.length + 1; g.issues.push({ number: n, ...body }); return ok({ number: n, html_url: `https://github.com/${repo}/issues/${n}` }, 201); }
+    if (method === 'PATCH' && (m = p.match(/^issues\/(\d+)$/))) { const it = g.issues?.[Number(m[1]) - 1]; if (!it) return ok({ message: 'Not Found' }, 404); Object.assign(it, body); return ok({ number: it.number }); }
     return ok({ message: 'unexpected ' + method + ' ' + p }, 500);
   };
   return g;
