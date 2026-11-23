@@ -73,3 +73,11 @@ test('#181 Spur: Fenster der letzten Sekunden, Eingaben nur bei Wechsel, Fehler 
   assert.equal(rec.error('boom'), true); assert.equal(rec.error('boom'), false);
   assert.equal(rec.dump().errors[0].count, 2);
 });
+
+test('#181 Bild aus Safari (JPEG) bekommt die richtige Endung', async () => {
+  const { bucket, call } = await setup();
+  const r = await call({ ...BODY, shot: 'data:image/jpeg;base64,' + Buffer.from('jpegdata').toString('base64') });
+  assert.equal(r.status, 200);
+  assert.ok(bucket.fileAt('media/nomadgirl/FB-1/moment.jpg'));
+  assert.match(bucket.issues[0].body, /FB-1\/moment\.jpg\?raw=true/);
+});

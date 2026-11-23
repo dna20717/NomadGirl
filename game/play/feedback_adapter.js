@@ -41,14 +41,14 @@ export function installGameFeedback(game, D) {
         const t = setTimeout(() => res(null), 1500);   // under the remote control the loop sleeps: no picture then
         R.snapshot(img => {
           clearTimeout(t);
-          try { const c = document.createElement('canvas'); c.width = width; c.height = Math.round(width * img.height / img.width); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); res(c.toDataURL('image/webp', 0.6)); }
+          try { const c = document.createElement('canvas'); c.width = width; c.height = Math.round(width * img.height / img.width); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); let d = c.toDataURL('image/webp', 0.6); if (!d.startsWith('data:image/webp')) d = c.toDataURL('image/jpeg', 0.7); res(d); }   // Safari cannot write WebP (PNG ≈ 290 KB), JPEG instead
           catch { res(null); }
         });
       });
     },
     context() {
       const s = scene(), l = s?.leyla, box = s?.box;
-      return { mode: s?.mode, poi: s?.levelPoi || null, seed: s?.levelSeed || null, room: s?.roomId, place: s?.roomDef?.name || null,
+      return { mode: s?.mode, poi: s?.levelPoi || null, seed: s?.levelSeed || null, room: s?.mode === 'camp' ? null : s?.roomId, place: s?.roomDef?.name || null,
         tile: l ? [Math.floor(l.x / s.T), Math.round(l.feet / s.T)] : null, health: l ? `${r(l.health)}/${l.maxHealth}` : null,
         window: s?.hud ? windowOf(s.hud) : null, cycle: box?.save?.cycle ?? null, day: box?.save?.day ?? null, slot: window.__nomadData?.slot ?? null,
         version: version?.short || 'lokal', data: window.__nomadData?.commit?.slice(0, 7) || null, set: window.__nomadData?.set?.id || null,

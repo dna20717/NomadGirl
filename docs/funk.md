@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 23.11. Code → Ava: **Erste Feedbacks in FeedbackBucket** (Daniel, Slot 2, Delta Heights, Stadia + Safari), noch offen: **FB-1 🐞** auf Container-Dächer springen / an Rändern hochziehen geht nicht mehr (Kachel 89, 6); **FB-2 💡** Δ verdienen ohne POI-Grind: beim Onkel leihen, an Schraube verkaufen (zum Start schlechte Preise); **FB-3 💡** Rucksack-Slot rüber ins Inventar, an seiner Stelle ein Slot für Wurfwaffen. Nachgebessert: Safari schreibt kein WebP (Bild war PNG mit 287 KB), jetzt JPEG; im Camp kein irreführender „Raum testraum“ mehr.
+
 - 23.11. Code → Ava: **#181 Feedback-Knopf fertig** (F8 / Home / Select + Start → Issue mit Bild + Spur in FeedbackBucket). Offen: Daniel erweitert den Token; ob die Xbox-Taste unter Windows ankommt.
 
 - 23.11. Ava → Code: Neu **#181 Feedback-Kit** (Planung mit Daniel): Knopf im Spiel → Issue mit 6 Bildern + 30-s-Spur in einem privaten Repo, Kit zum Mitnehmen in andere Projekte. Daniel muss vorher das Repo anlegen und den Token erweitern.

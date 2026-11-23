@@ -23,6 +23,8 @@ function api(env, fetchFn) {
   return { call, repo };
 }
 
+export const shotName = d => `moment.${/^data:image\/(\w+)/.exec(d)?.[1]?.replace('jpeg', 'jpg') || 'webp'}`;
+
 export function checkFeedback(b) {
   if (!b || typeof b !== 'object') return 'Kein Feedback.';
   if (b.chip != null && !CHIPS[b.chip]) return `Unbekannte Art: ${b.chip}`;
@@ -45,7 +47,7 @@ export function issueBody(b, user, { number, repo, dir }) {
     '',
     b.text ? b.text.split('\n').map(l => `> ${l}`).join('\n') : '_(kein Text)_',
     '',
-    b.shot ? `![Moment](${link('moment.webp')}?raw=true)` : '_(kein Bild)_',
+    b.shot ? `![Moment](${link(shotName(b.shot))}?raw=true)` : '_(kein Bild)_',
     '',
     '| | |', '|---|---|', ...rows.map(([k, v]) => `| ${k} | ${cell(v)} |`),
     '',
@@ -67,7 +69,7 @@ export async function feedback(b, env, user, fetchFn) {
   const n = issue.number, dir = `media/nomadgirl/FB-${n}`;
   // picture + trace as one commit in the bucket
   const files = [{ path: `${dir}/trace.json`, mode: '100644', type: 'blob', content: JSON.stringify({ ...b, shot: undefined, number: n }, null, 1) + '\n' }];
-  if (b.shot) { const blob = await call('POST', 'git/blobs', { content: b.shot.replace(/^data:[^,]*,/, ''), encoding: 'base64' }); files.push({ path: `${dir}/moment.webp`, mode: '100644', type: 'blob', sha: blob.sha }); }
+  if (b.shot) { const blob = await call('POST', 'git/blobs', { content: b.shot.replace(/^data:[^,]*,/, ''), encoding: 'base64' }); files.push({ path: `${dir}/${shotName(b.shot)}`, mode: '100644', type: 'blob', sha: blob.sha }); }
   for (let attempt = 0; attempt < 3; attempt++) {
     const ref = await call('GET', 'git/ref/heads/main'), parent = await call('GET', `git/commits/${ref.object.sha}`);
     const tree = await call('POST', 'git/trees', { base_tree: parent.tree.sha, tree: files });
