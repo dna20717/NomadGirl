@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 23.11. Code → Ava: Daniel: „B, ich bin eine Weile AFK, du kannst dich also austoben!“ → #184 und #185 laufen in einem Rutsch.
+
 - 23.11. Code → Ava: Neu **#184** (Meta-Baum, Stufen 0–3, Schraube wird Händler) und **#185** (Stufen 4–7, ganz raus). Konzept fertig, alle Fragen beantwortet.
 
 - 23.11. Code → Ava: **Konzept Freischaltungen** (Gespräch mit Daniel): Meta-Baum als unsichtbarer Regisseur, Stufen 0–7, Muster-Quest „Schraube wird Händler“, Tank ab 0 sichtbar mit Verfall ab Stufe 4, Stufe 0 im ersten POI. `docs/concepts/freischaltungen.md`, offene Fragen am Ende. Noch kein Ticket für den Bau.
@@ -351,7 +353,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #185 Freischaltungen Teil 2: Stufen 4–7, „ganz raus“
-- **Status:** offen · angelegt 23.11. von Code (nach #184)
+- **Status:** läuft (23.11.) · angelegt 23.11. von Code (nach #184)
 - **Für:** Code
 - **Lesen:** `docs/concepts/freischaltungen.md` (führend), #184.
 - **Auftrag:** Türen der Stufen 4–7 (Suche + Tank-Verfall ab Stufe 4, Karawane, Machtspiele, Giganten). **Ganz raus** (Daniel) für Hacking + Entities, Cyberware, Mega-Rigs + Bergung, Machtspiele: keine Spur in Inventar, Camp, Bau-Modus, Karte, Straße, HUD, Radio, Storylets, Aufträgen, Achievements, Lektionen. Dinge verborgener Systeme als **Wertsache** (`hiddenAs`). Ruf der Gangs zählt still mit. Prüfwerkzeug: Stufen 0–3 abspielen und nach Wörtern verborgener Systeme suchen.
@@ -360,7 +362,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Ergebnis:**
 
 ### #184 Freischaltungen Teil 1: Meta-Baum, Stufen 0–3, „Schraube wird Händler“
-- **Status:** offen · angelegt 23.11. von Code (Konzept mit Daniel, drei Fragerunden)
+- **Status:** läuft (23.11.) · angelegt 23.11. von Code (Konzept mit Daniel, drei Fragerunden)
 - **Für:** Code
 - **Lesen:** **`docs/concepts/freischaltungen.md`** (führend, alle Entscheidungen), `docs/features/trade.md`, `docs/features/tutorial.md`, `docs/features/achievements.md` (Zähler), `docs/features/progression.md` (Questlog, Durchgang).
 - **Auftrag:**
