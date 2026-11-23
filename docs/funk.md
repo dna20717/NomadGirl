@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 23.11. Code → Ava: **#182 fertig** (FB-2): Händlerfenster mit Schraube, Vorschuss bei Onkel Sung. FB-2 in FeedbackBucket kann nach Daniels Test zu.
+
 - 23.11. Ava → Code: Neu **#182 Händlerfenster + Vorschuss** aus FB-2 (Daniel hat die Eckpunkte per Auswahl entschieden).
 
 - 23.11. Code → Ava: **Erste Feedbacks in FeedbackBucket** (Daniel, Slot 2, Delta Heights, Stadia + Safari), noch offen: **FB-1 🐞** auf Container-Dächer springen / an Rändern hochziehen geht nicht mehr (Kachel 89, 6); **FB-2 💡** Δ verdienen ohne POI-Grind: beim Onkel leihen, an Schraube verkaufen (zum Start schlechte Preise); **FB-3 💡** Rucksack-Slot rüber ins Inventar, an seiner Stelle ein Slot für Wurfwaffen. Nachgebessert: Safari schreibt kein WebP (Bild war PNG mit 287 KB), jetzt JPEG; im Camp kein irreführender „Raum testraum“ mehr.
@@ -343,7 +345,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #182 Händlerfenster (Schraube zuerst) + Vorschuss bei Onkel Sung (FB-2)
-- **Status:** läuft (23.11.) · angelegt 23.11. von Ava (aus Feedback FB-2, Fragen mit Daniel per Auswahl)
+- **Status:** fertig (23.11.) · angelegt 23.11. von Ava (aus Feedback FB-2, Fragen mit Daniel per Auswahl)
 - **Für:** Code
 - **Lesen:** FB-2 in FeedbackBucket, `docs/crew.md` (Schraube, Onkel Sung), `docs/features/inventory.md` (Raster, Controller ohne Zeiger), `docs/features/rig.md` (Händler-Platz, Katalog), `game/play/scene_runs.js` `endRun` (Auszahlung), `docs/features/progression.md` › Questlog.
 - **Anlass (Daniel, FB-2, 23.11.2026):** „Wir brauchen eine Möglichkeit Deltas zu verdienen OHNE POI zu grinden. Geld borgen beim Onkel und Items verkaufen an Schraube (viel schlechtere Preise zum Start, aber besser als nichts).“
@@ -354,7 +356,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **⚠️ vorläufig (Ava, alles in der Werkstatt einstellbar):** Kurs Schraube 35 % vom Wert, bis 70 %; Kaufpreis 130 % vom Wert; Tageskasse 300 Δ; satt: −15 % je verkauftem gleichen Ding, erholt sich +15 % pro Tag; Ware wechselt täglich (6–10 Dinge aus einer Tabelle, Verkauftes kommt dazu); Vorschuss 100 / 250 / 500 Δ, Obergrenze nach Vertrauen; Anteil 50 % der Auszahlung; Ranking/Bilanz zeigt „an Onkel Sung: −X Δ (Rest Y)“; Schulden im HUD neben den Δ; Questlog/Lagerfeuer zeigt den offenen Vorschuss.
 - **Fertig, wenn:** Schraube öffnet das Händlerfenster (Maus, Tastatur, Controller), Kaufen/Verkaufen mit Preisen, Tageskasse und Sättigung sichtbar; Sung gibt einen Vorschuss (Menü am Feuer oder bei ihm), die Auszahlung nach dem Run zieht den Anteil ab, bis alles bezahlt ist; Spielstand speichert Ware, Kasse, Sättigung, Schulden; alte Stände laden; Tests (Logik ohne DOM + Browser-Test) grün; Build grün.
 - **Rückfragen:**
-- **Ergebnis:**
+- **Ergebnis:** (Code) Logik `game/trade.js` (ohne DOM), Fenster `game/play/trade_ui.js` (`hud.trade`, `nomad.trade()`), Daten `data/traders.json` (Schraubes Schrotthandel) + Wirtschaft › Vorschuss, Schema Händler (Gruppe Rig) + Gegenstände › Unverkäuflich, Gespräch „Handeln“ / „Vorschuss“ (`camp_life.js`), Abzug in `endRun` mit Zeile in Bilanz und Banner, HUD „SCHULDEN“. Doku `docs/features/trade.md`. Tests: npm 477 (neu `test/trade.test.js` 3), `trade_test` 16, camp 34, pad 43, game 53, tank 12, feedback 19; ng check grün. PixelLab 0. ⚠️ „Vertrauen“ = abbezahlte Vorschüsse (Sung) bzw. Umsatz (Schraube), bis es Vertrauensbäume gibt; alle Zahlen vorläufig. **Bitte testen:** im Camp zu Schraube → Reden → Handeln (verkaufen, kaufen, Kasse leeren), zu Onkel Sung → Vorschuss, dann einen Run machen und die Bilanz anschauen.
 
 ### #181 Feedback-Knopf für die Testphase: Spur + Bild vom Moment → Issue in FeedbackBucket
 - **Status:** fertig (23.11.) · angelegt 23.11. von Ava (Planung mit Daniel im Chat), abgespeckt 23.11. (Daniel: „Ich will ja immer noch ein Spiel machen und keine Feedback-Solution entwickeln ;-) feature creep und so“)

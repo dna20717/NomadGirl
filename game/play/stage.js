@@ -58,7 +58,7 @@ export class Stage {
   context(h) {
     if (h.build?.active) return 'build';
     if (h.drive?.isOpen) return 'drive';
-    if (h.inv?.isOpen || h.craft?.isOpen || h.tech?.isOpen || h.map?.isOpen || h.quests?.isOpen || h.ach?.isOpen || h.tut?.isOpen || h.megaBuild?.isOpen || h.duel?.isOpen) return 'window';
+    if (h.inv?.isOpen || h.craft?.isOpen || h.tech?.isOpen || h.map?.isOpen || h.quests?.isOpen || h.trade?.isOpen || h.ach?.isOpen || h.tut?.isOpen || h.megaBuild?.isOpen || h.duel?.isOpen) return 'window';
     if (h.modal) return h.menuEl?.classList.contains('talk') ? 'talk' : 'window';
     return 'play';
   }

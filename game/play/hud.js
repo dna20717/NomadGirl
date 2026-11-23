@@ -467,7 +467,7 @@ export class Hud {
     const l = scene.leyla, max = l.maxHealth;
     // windows on top: the E prompt of the world waits (its key means „ok“ in the window)
     const hideP = !this.promptText || this.modal || !!this.inv?.isOpen || !!this.craft?.isOpen || !!this.tech?.isOpen || !!this.map?.isOpen;
-    const windowed = !!(this.inv?.isOpen || this.craft?.isOpen || this.tech?.isOpen || this.map?.isOpen || this.quests?.isOpen || this.ach?.isOpen || this.tut?.isOpen || this.build?.active);
+    const windowed = !!(this.inv?.isOpen || this.craft?.isOpen || this.tech?.isOpen || this.map?.isOpen || this.quests?.isOpen || this.trade?.isOpen || this.ach?.isOpen || this.tut?.isOpen || this.build?.active);
     this.root.classList.toggle('hud-windowed', windowed);
     this.root.classList.toggle('hud-building', !!this.build?.active);   // #129 notes below the build bar, not on it
     // #129 Info-Center, context „window“: hints wait, the cassette steps aside; on closing, what waited comes one by one
@@ -520,14 +520,14 @@ export class Hud {
       }
       const G = this.goal, run = this.modeName === 'run';
       const fx = activeEffects(D, sv, { run: this.modeName === 'run', sky: scene.weatherRun, turf: scene.turf?.state?.() });   // #067 Effekt-Leiste
-      const key = [sv.day, sv.hour, sv.location, sv.deltas, sv.fuel, sv.food, effectsKey(fx), this.modeName, vit ? `${Math.round(sv.tank.cond)}${sv.tank.dead}` : '', G ? G.text + G.sub : ''].join('|');
+      const key = [sv.day, sv.hour, sv.location, sv.deltas, sv.debt?.amount || 0, sv.fuel, sv.food, effectsKey(fx), this.modeName, vit ? `${Math.round(sv.tank.cond)}${sv.tank.dead}` : '', G ? G.text + G.sub : ''].join('|');
       if (key !== this.campKey) {
         this.campKey = key;
         // #016 Run-HUD aufräumen: in the run only what matters in the run (AvA's vital signs, buffs, the goal); clock, Δ, fuel and
         // supplies of the camp stay in the camp (the run shows its own Δ top right)
         this.campEl.replaceChildren(
           ...(run ? [] : [el('div', { class: 'hud-row' }, el('span', { class: 'hud-room' }, `${clockText(sv)} · ${loc}`)),
-            el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'Δ'), el('b', {}, String(sv.deltas)), el('span', { class: 'hud-label' }, 'SPRIT'), el('b', {}, `${Math.round(sv.fuel)} l`),
+            el('div', { class: 'hud-row' }, el('span', { class: 'hud-label' }, 'Δ'), el('b', {}, String(sv.deltas)), ...(sv.debt?.amount > 0 ? [el('span', { class: 'hud-label', title: 'Vorschuss: ein Anteil jeder Run-Auszahlung geht zurück, bis alles bezahlt ist' }, 'SCHULDEN'), el('b', { class: 'hud-debt' }, `${sv.debt.amount} Δ`)] : []), el('span', { class: 'hud-label' }, 'SPRIT'), el('b', {}, `${Math.round(sv.fuel)} l`),
               el('span', { class: 'hud-label' }, 'VORRÄTE'), el('b', {}, (Math.round(sv.food * 10) / 10).toLocaleString('de-DE')))]),
           ...(vit ? [el('div', { class: 'hud-row hud-vital' + (vit.index >= 4 || vit.dead ? ' bad' : '') }, el('span', { class: 'hud-label' }, '♥ AvA'), el('b', {}, vit.dead ? 'kein Signal' : `${Math.round(sv.tank.cond)} % · ${vit.name}`))] : []),
           ...(fx.length ? [el('div', { class: 'hud-row hud-buffs hud-fx' }, el('span', { class: 'hud-label' }, 'EFFEKTE'), ...fx.map(e => el('span', { class: `hud-fxchip ${e.kind}`, title: e.sub || null }, e.label, e.left != null ? el('small', {}, ` ${Math.ceil(e.left)} h`) : null)))] : []),

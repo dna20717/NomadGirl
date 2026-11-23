@@ -57,6 +57,7 @@ export class SummaryUI {
       S.grade ? el('div', { class: `sum-grade g${S.grade}` }, S.grade) : el('div', { class: 'sum-grade none' }, S.ko ? icon('heart', 34) : '–'),
       el('div', { class: 'sum-title' }, el('small', {}, S.poi || ''), el('h2', {}, S.title),
         el('p', {}, [S.paid != null && !S.ko ? `+${S.paid} Δ${S.grade ? ` (${S.base} + ${S.bonus} %)` : ''}` : null, S.killsMax != null ? `${S.kills}/${S.killsMax} Kills` : `${S.kills || 0} Kills`, S.secretsMax ? `${S.secrets}/${S.secretsMax} Secrets` : null, S.time || null].filter(Boolean).join(' · ')),
+        S.debt ? el('p', { class: 'sum-debt' }, icon('coins', 14), ` An ${S.debt.to}: −${S.debt.cut} Δ`, el('b', {}, S.debt.done ? ' · Vorschuss abbezahlt' : ` · noch ${S.debt.left} Δ offen`)) : null,   // #182
         S.grade && !S.ko && S.bonus ? el('p', { class: 'sum-bonus' }, icon('star', 14), ` Rang-Bonus ${S.grade} +${S.bonus} %`, S.bonusDeltas ? el('b', {}, ` · +${S.bonusDeltas} Δ`) : null) : null),   // #141
       S.parts ? el('div', { class: 'sum-parts' }, part('Zeit', S.parts.time, P.time), part('Kills', S.parts.kills, P.kills), part('Secrets', S.parts.secrets, P.secrets)) : null);
     const thing = x => el('li', { class: x.resource ? 'res' : '' }, markOf(D, 'items', x.id, 28) || icon('box', 16), el('span', {}, x.name), el('b', {}, `×${x.n}`));
@@ -80,5 +81,5 @@ export class SummaryUI {
     this.el.replaceChildren(el('div', { class: 'tut-card sum-card ui-frame' }, head, el('div', { class: 'sum-cols' }, home, newCol), btns,
       hints([...(B.length > 1 ? [['move', 'wählen']] : []), ['ok', 'weiter'], ['back', 'schließen']]), closeX(() => this.close())));
   }
-  state() { const S = this.S; return { open: this.isOpen, grade: S?.grade || null, ko: !!S?.ko, gained: (S?.gained || []).map(x => `${x.id}×${x.n}`), lost: (S?.lost || []).map(x => `${x.id}×${x.n}`), recipes: S?.recipes || [], ready: S?.ready || [], bonus: S?.grade && !S?.ko && S?.bonus ? { pct: S.bonus, deltas: S.bonusDeltas || 0 } : null, crate: S?.crate || null, quests: (S?.quests || []).map(q => q.id + (q.ready ? '!' : '')), next: S?.next || null, btn: this.btn, buttons: this.S ? this.buttons() : [], stowed: this.stowed || null }; }
+  state() { const S = this.S; return { open: this.isOpen, debt: S?.debt || null, grade: S?.grade || null, ko: !!S?.ko, gained: (S?.gained || []).map(x => `${x.id}×${x.n}`), lost: (S?.lost || []).map(x => `${x.id}×${x.n}`), recipes: S?.recipes || [], ready: S?.ready || [], bonus: S?.grade && !S?.ko && S?.bonus ? { pct: S.bonus, deltas: S.bonusDeltas || 0 } : null, crate: S?.crate || null, quests: (S?.quests || []).map(q => q.id + (q.ready ? '!' : '')), next: S?.next || null, btn: this.btn, buttons: this.S ? this.buttons() : [], stowed: this.stowed || null }; }
 }

@@ -1033,6 +1033,7 @@ b.hud-throw-icon { width: auto; height: auto; padding: 0 2px; }
 .sum-title small { color: var(--ng-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
 .sum-title h2 { margin: 2px 0 6px; font: 36px/1 VT323, monospace; color: var(--ng-gold); }
 .sum-title p { margin: 0; color: var(--ng-text2); font-size: 14px; }
+.sum-title p.sum-debt { margin-top: 4px; color: var(--ui-text2); display: flex; align-items: center; gap: 4px; }   /* #182 Vorschuss */
 .sum-title p.sum-bonus { margin-top: 4px; color: var(--ng-gold); display: flex; align-items: center; gap: 4px; }   /* #141 */
 .sum-parts { display: flex; flex-direction: column; gap: 6px; }
 .sum-part small { color: var(--ng-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .8px; }
@@ -1225,3 +1226,16 @@ b.hud-throw-icon { width: auto; height: auto; padding: 0 2px; }
 .inv-val-src.neg { color: var(--ng-red); }
 .inv-val-head { margin: 8px 0 2px; font: 18px/1 VT323, monospace; color: var(--ng-gold); letter-spacing: .04em; }
 .radio-chip .radio-dj { width: 28px; height: 28px; margin: -4px 0 -4px -4px; border-radius: 6px; flex: none; }   /* #103 */
+
+/* #182 Händlerfenster (trade_ui.js): looks like the Questlog, price on the right of each row */
+.tr-list li { display: flex; align-items: center; gap: 8px; }
+.tr-list li .ql-row { flex: 1; min-width: 0; }
+.tr-list .tr-price { margin-left: auto; color: var(--ui-acc); font-weight: 600; font-size: var(--ui-gr-l); white-space: nowrap; }
+.tr-list li.tr-no .tr-price { color: var(--ui-text3); text-decoration: line-through; }
+.tr-list .tr-glyph { width: 28px; text-align: center; font-style: normal; color: var(--ui-text2); }
+.tr-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.tr-line { color: var(--ui-text2); }
+.tr-note { margin: 0 16px; font-size: var(--ui-gr-m); }
+.tr-note.good { color: var(--ui-green); } .tr-note.bad { color: var(--ui-red); }
+.tr-greet { margin: 4px 0 8px; }
+.hud-row b { white-space: nowrap; }

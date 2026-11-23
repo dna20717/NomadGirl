@@ -12,5 +12,12 @@
   "keepPercent": 0,
   "description": "AvA sammelt Leyla ein, fliegt sie zum Rig und kommentiert das ausführlich."
  },
- "foodtruck": {"priceFactor": 1.5, "maxPerStop": 8}
+ "foodtruck": {"priceFactor": 1.5, "maxPerStop": 8},
+ "advance": {
+  "enabled": true,
+  "lender": "onkel_sung",
+  "share": 50,
+  "tiers": [{"amount": 100, "after": 0},{"amount": 250, "after": 1},{"amount": 500, "after": 2}],
+  "offer": "Brauchst du was? Ich leg dir was hin. Zinsen nehm ich keine, ich bin ja kein Hai. Aber von jedem Run will ich die Hälfte, bis wir quitt sind."
+ }
 }

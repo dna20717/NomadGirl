@@ -58,6 +58,7 @@ import { MegaBuild } from './mega_build.js';
 import { ladderArt } from './ladder_art.js';
 import { Tutorial } from './tutorial.js';
 import { AchievementsUI } from './achievements_ui.js';
+import { TradeUI } from './trade_ui.js';
 import { QuestLogUI } from './questlog_ui.js';
 import { SummaryUI } from './summary_ui.js';
 import { GlitchDuelUI } from './glitch_duel_ui.js';
@@ -563,6 +564,7 @@ export class PlayScene extends Phaser.Scene {
     hud.tut ??= new Tutorial(hud.root, { scene: () => hud.scene, hud });
     hud.ach ??= new AchievementsUI(hud.root, { scene: () => hud.scene });   // Menü › Achievements (#012)
     hud.sum ??= new SummaryUI(hud.root, { scene: () => hud.scene, go: next => hud.scene.goNext?.(next) });   // Beute-Bilanz (#017)
+    hud.trade ??= new TradeUI(hud.root, { scene: () => hud.scene, toast: (t, sub, kind) => hud.toast(t, sub, kind), changed: () => { hud.campKey = null; hud.refresh?.(); } });   // Händlerfenster (#182)
     hud.quests ??= new QuestLogUI(hud.root, { scene: () => hud.scene, toast: (t, sub, kind) => hud.toast(t, sub, kind), changed: () => { hud.campKey = null; hud.goalAt = 0; hud.scene.camp?.questMarks?.(); } });   // Questlog (#016)
     // the travel map (#007, game/play/map_ui.js): warroom and van door
     hud.map ??= new MapUI(hud.root, {
@@ -590,7 +592,7 @@ export class PlayScene extends Phaser.Scene {
   openBuild() {
     if (this.mode !== 'camp' || !this.box || this.hud.build.active) return;
     // #134 (Glitch: Karte und Bau-Modus übereinander): every other window closes first
-    for (const w of [this.hud.inv, this.hud.craft, this.hud.tech, this.hud.map, this.hud.quests, this.hud.ach, this.hud.tut]) if (w?.isOpen) w.close?.();
+    for (const w of [this.hud.inv, this.hud.craft, this.hud.tech, this.hud.map, this.hud.quests, this.hud.trade, this.hud.ach, this.hud.tut]) if (w?.isOpen) w.close?.();
     this.hud.closeMenu?.();
     if (this.campGeo?.mega) { if (!this.hud.megaBuild.isOpen) this.hud.megaBuild.open(); return; }
     this.hud.build.open();
@@ -816,6 +818,7 @@ export class PlayScene extends Phaser.Scene {
     if (hud.megaBuild?.isOpen) { hud.megaBuild.nav(u); eat(); input.help.pressed = false; return; }   // build plan aboard (#029)
     if (hud.drive?.isOpen && !hud.modal) { hud.drive.nav(u); eat(); input.help.pressed = false; return; }   // the drive (#053); its incident's window is a menu
     if (hud.quests?.isOpen) { hud.quests.nav(u); eat(); input.help.pressed = false; return; }   // Questlog (#016)
+    if (hud.trade?.isOpen) { hud.trade.nav(u); eat(); input.help.pressed = false; return; }   // Händlerfenster (#182)
     if (hud.ach?.isOpen) { hud.ach.nav(u); eat(); input.help.pressed = false; return; }   // Menü › Achievements (#012)   // the field guide card / archive (#011)
     if (hud.paused && !hud.modal) { if (u.pressed('ok') || u.pressed('back')) { hud.toggleHelp(false); eat(); input.help.pressed = false; } return; }
     if (hud.modal) {
@@ -892,7 +895,7 @@ export class PlayScene extends Phaser.Scene {
     // every window pauses the game (Daniel, 12.11.2026: „Fenster pausieren immer, auch im Run“): menus, controls, cooking and the inventory
     let invDone = false;
     if (this.hud.inv?.isOpen && !this.hud.paused && !this.hud.modal && !this.leaving) { this.inventoryUpdate(input); invDone = true; }
-    if (this.hud.tut?.isOpen || this.hud.ach?.isOpen || this.hud.quests?.isOpen || this.hud.megaBuild?.isOpen || this.hud.sum?.isOpen || this.hud.duel?.isOpen || this.hud.drive?.isOpen || this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
+    if (this.hud.tut?.isOpen || this.hud.ach?.isOpen || this.hud.quests?.isOpen || this.hud.trade?.isOpen || this.hud.megaBuild?.isOpen || this.hud.sum?.isOpen || this.hud.duel?.isOpen || this.hud.drive?.isOpen || this.hud.paused || this.hud.modal || this.hud.craft?.isOpen || (this.hud.tech?.isOpen || this.hud.map?.isOpen) || this.hud.inv?.isOpen || this.leaving) {
       // cooking, crafting, a menu: the workshops keep glowing, steaming and sparking behind the window
       if (this.camp && !this.hud.paused && !this.leaving) { this.camp.benches?.update(time, Math.min(delta, 50)); this.camp.lid?.(Math.min(delta, 50)); }
       this.physics.world.pause(); this.hud.update(this, time); return;

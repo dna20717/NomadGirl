@@ -8,7 +8,7 @@ export function installGameFeedback(game, D) {
   let version = null; loadVersion().then(v => { version = v; });
   const r = n => Math.round(n);
   const windowOf = h => h.modal ? `Menü: ${h.menuTitle || ''}` : h.paused ? 'Steuerung' : h.inv?.isOpen ? 'Inventar' : h.craft?.isOpen ? 'Kochen' : h.map?.isOpen ? 'Reisekarte'
-    : h.tech?.isOpen ? 'Techtree' : h.build?.active ? 'Rig bauen' : h.drive?.isOpen ? 'Fahrt' : h.duel?.isOpen ? 'Duell' : h.tut?.isOpen ? 'Feldhandbuch' : h.quests?.isOpen ? 'Questlog' : null;
+    : h.tech?.isOpen ? 'Techtree' : h.build?.active ? 'Rig bauen' : h.drive?.isOpen ? 'Fahrt' : h.duel?.isOpen ? 'Duell' : h.tut?.isOpen ? 'Feldhandbuch' : h.quests?.isOpen ? 'Questlog' : h.trade?.isOpen ? 'Händler' : null;
   // the small state 4× per second: enough to see what happened and to put Leyla there again
   const sample = s => {
     const l = s.leyla; if (!l?.body) return null;

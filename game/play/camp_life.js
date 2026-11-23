@@ -4,6 +4,7 @@ import { nowPlayingFor } from '../now_playing.js';
 import { offers, accept, claim, progressOf, qstate } from '../quests.js';
 import { figureTexture } from './camp.js';
 import { noteTexture } from './camp_board.js';
+import { traderOf, traderConfig, advanceConfig, advanceTiers, takeAdvance, debtOf, repay } from '../trade.js';   // #182
 
 export class CampLife {
   // ---------- sound: soft wind with gusts, the fire gets louder (and moves left/right) the closer Leyla comes ----------
@@ -155,7 +156,8 @@ export class CampLife {
   // #025: a conversation in the dialogue box (name plate, colour, room for a portrait later), not a plain menu
   talk(c) {
     const D = this.D, save = this.box.save, s = this.scene, J = this.jobsOf(c), who = this.talkOf(c.id);
-    if (!J.offer.length && !J.ready.length && !J.active.length) return this.bark(c, true);
+    const tid = traderOf(D, c.id), A = advanceConfig(D), lends = A.on && A.lender === c.id;   // #182 Händler, Vorschuss
+    if (!J.offer.length && !J.ready.length && !J.active.length && !tid && !lends) return this.bark(c, true);
     const rew = q => { const R = q.reward || {}; return [R.reveal ? 'Ein Ort auf der Karte' : null, R.deltas ? `${R.deltas} Δ` : null, ...(R.items || []).map(x => `${x.count || 1}× ${D.items?.[x.item]?.name || x.item}`)].filter(Boolean).join(' · '); };
     const items = [
       ...J.ready.map(id => ({ label: `Abgeben: ${D.quests[id].name}`, sub: rew(D.quests[id]), primary: true, icon: 'check', act: () => {
@@ -168,10 +170,27 @@ export class CampLife {
           { label: 'Später', icon: 'clock', act: () => this.say(c, 'Überleg es dir.') }] });
       } })),
       ...J.active.map(id => ({ label: `Wie läuft „${D.quests[id].name}“?`, sub: `${progressOf(D, save, id).n} / ${progressOf(D, save, id).target}`, icon: 'help', act: () => { const p = progressOf(D, save, id); this.say(c, p.missing?.length ? `${p.n} von ${p.target}. Es fehlt noch: ${p.missing.map(x => D.items?.[x]?.name || x).join(', ')}.` : p.n ? `${p.n} von ${p.target}. Weiter so.` : 'Noch nichts? Ich warte.'); } })),
+      ...(tid ? [{ label: 'Handeln', sub: traderConfig(D, tid).name, icon: 'coins', primary: !J.ready.length && !J.offer.length, act: () => setTimeout(() => s.hud.trade?.open(tid), 0) }] : []),
+      ...(lends ? [this.advanceItem(c, who, !J.ready.length && !J.offer.length && !tid)] : []),
       { label: 'Plaudern', icon: 'speechBubble', act: () => this.bark(c, true) },
       { label: 'Tschüss', icon: 'x', act: () => {} }];
-    const greet = (J.ready.length ? 'Na? Sieht aus, als hättest du was für mich.' : J.offer.length ? 'Gut, dass du kommst. Ich hab da was.' : 'Und, wie läuft es da draußen?');
+    const greet = (J.ready.length ? 'Na? Sieht aus, als hättest du was für mich.' : J.offer.length ? 'Gut, dass du kommst. Ich hab da was.' : tid ? 'Was brauchst du? Oder was willst du loswerden?' : 'Und, wie läuft es da draußen?');
     s.hud.menu({ title: who.name, sub: greet, items, talk: who });
+  }
+  // #182 Vorschuss (Daniel 23.11.2026, FB-2): without interest and deadline; a share of every run's payout goes back until it is paid
+  advanceItem(c, who, primary) {
+    const D = this.D, save = this.box.save, s = this.scene, A = advanceConfig(D), debt = debtOf(save);
+    const done = text => { this.box.persist?.(); s.hud.campKey = null; this.say(c, text); };
+    const open = () => {
+      const d = debtOf(save), back = d ? Math.min(d.amount, save.deltas || 0) : 0;
+      s.hud.menu({ title: 'Vorschuss', sub: d ? `Offen: ${d.amount} Δ von ${d.taken} Δ. ${A.share} % jeder Run-Auszahlung gehen an ${who.name}, bis alles bezahlt ist.` : (D.economy?.advance?.offer || `Ohne Zinsen. ${A.share} % jeder Run-Auszahlung gehen zurück, bis alles bezahlt ist.`), talk: who, items: [
+        ...(d ? [{ label: back ? `Jetzt zurückzahlen: ${back} Δ` : 'Jetzt zurückzahlen', sub: back ? (back < d.amount ? `Danach noch ${d.amount - back} Δ offen` : 'Damit ist alles bezahlt') : 'Du hast gerade keine Δ', disabled: !back, primary: !!back, icon: 'coins',
+          act: () => { const r = repay(D, save, back); if (r.ok) { s.hud.toast(r.done ? 'Vorschuss abbezahlt' : `${r.n} Δ zurückgezahlt`, r.done ? `${who.name} ist zufrieden` : `Noch ${r.left} Δ offen`, 'good'); done(r.done ? 'Quitt. Siehst du, so einfach geht das.' : 'Danke. Der Rest läuft über die Runs.'); } } }] : []),
+        ...advanceTiers(D, save).map(t => ({ label: `${t.amount} Δ leihen`, sub: t.ok ? `Zurück: ${A.share} % jeder Run-Auszahlung` : t.reason, disabled: !t.ok, icon: 'coins',
+          act: () => { const r = takeAdvance(D, save, t.amount); if (r.ok) { s.hud.toast(`Vorschuss: +${t.amount} Δ`, `${A.share} % jeder Run-Auszahlung gehen an ${who.name}`, 'info', 5000); done('Hier. Und jetzt geh und bring was Anständiges mit.'); } } })),
+        { label: 'Lieber nicht', icon: 'x', act: () => {} }] });
+    };
+    return { label: debt ? `Vorschuss: noch ${debt.amount} Δ offen` : 'Vorschuss', sub: debt ? 'Zurückzahlen' : 'Δ leihen, ohne Zinsen', icon: 'coins', primary, act: () => setTimeout(open, 0) };
   }
   bark(c, now = false) {
     const lines = c.def.lines || [];

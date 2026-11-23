@@ -1,5 +1,6 @@
 // Camp ↔ run (#017 split from scene.js): restart, go to the camp, start and end a run (Beute-Bilanz), enemies of the run.
 // Mixed into PlayScene (game/play/scene.js): the methods keep their `this`, nothing else changes.
+import { repayFromRun, advanceConfig } from '../trade.js';   // #182
 import { placeOf, threatOf } from '../worldmap.js';
 import { repLine, gangOfPlace, gangInfo } from '../reputation.js';
 import { takeover } from '../turf_war.js';
@@ -75,6 +76,10 @@ export class SceneRuns {
     let paid = this.level?.payout(this.deltas) ?? this.deltas;
     const rank = !ko && this.level?.done;
     paid = Math.round(paid * (1 + mod(this.data_, save, 'sell') / 100));   // #066 Boni-Bus (Rang-S-Abzeichen & Co., #012)   // Rang-S-Abzeichen & Co. (#012)
+    // #182 Vorschuss: a fixed share of the payout goes to the lender (Onkel Sung) until the advance is paid back
+    const owed = ko ? null : repayFromRun(this.data_, save, paid), lenderName = this.data_.companions?.[advanceConfig(this.data_).lender]?.name || 'Onkel Sung';
+    const debt = owed?.cut ? { cut: owed.cut, left: owed.left, done: owed.done, to: lenderName } : null;
+    if (debt) paid -= debt.cut;
     if (!ko) { save.health = Math.round(this.leyla.health); save.deltas += paid; }
     // achievements (#012): knocked out, or home safe (the tank never went critical in this run), Δ earned
     const later = list => ((save.achievements ??= {}).news ??= []).push(...list.map(a => a.id));   // announced when the camp is there
@@ -97,13 +102,13 @@ export class SceneRuns {
       const R = this.level?.done, P = this.data_.pois?.[save.run?.poi] || {}, sec = R?.seconds ?? Math.round((this.elapsed || 0) / 1000);
       summary = runCompare(this.data_, save, save.run?.before || {}, { ko, poi: P.name || save.run?.poi || '', title: ko ? 'AvA hat dich heimgebracht' : rank ? `Tresor geknackt · Rang ${rank.grade}` : 'Zurück im Camp',
         grade: rank?.grade || null, parts: rank?.parts || null, paid, base: this.deltas, bonus: rank?.bonus || 0, bonusDeltas: rank ? this.level.payout(this.deltas) - this.deltas : 0, crate: rank?.crate || null, kills: this.kills, killsMax: this.level?.killsMax ?? null,
-        secrets: this.level?.secrets ?? 0, secretsMax: this.level?.secretsMax ?? 0, turf: movedLine, time: `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}` });
+        secrets: this.level?.secrets ?? 0, secretsMax: this.level?.secretsMax ?? 0, turf: movedLine, time: `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`, debt });
     } catch (e) { console.warn('Bilanz', e); }
     save.run = null;
     this.hud.inv?.close();
     const banner = ko ? ['AvA hat dich heimgebracht', `${clockText(save)} · Der Rucksack ist weg.${trunk.moved ? ' Der Kofferraum ist sicher.' : ''}`, 'drama']
-      : rank ? [`Zurück im Camp · Rang ${rank.grade}`, `${clockText(save)} · +${paid} Δ (${this.deltas} + ${rank.bonus} %) · ${this.kills} Kills${movedLine ? ` · ${movedLine}` : ''}`, 'good']
-      : ['Zurück im Camp', `${clockText(save)} · +${paid} Δ · ${this.kills} Kills`, 'good'];
+      : rank ? [`Zurück im Camp · Rang ${rank.grade}`, `${clockText(save)} · +${paid} Δ (${this.deltas} + ${rank.bonus} %) · ${this.kills} Kills${debt ? ` · an ${debt.to} −${debt.cut} Δ` : ''}${movedLine ? ` · ${movedLine}` : ''}`, 'good']
+      : ['Zurück im Camp', `${clockText(save)} · +${paid} Δ · ${this.kills} Kills${debt ? ` · an ${debt.to} −${debt.cut} Δ` : ''}`, 'good'];
     this.goCamp({ banner: summary && this.data_.game?.summary !== false ? null : banner, fade: ko ? 900 : 600, arriving: true, summary: this.data_.game?.summary !== false ? summary : null });
   }
   // the gold button of the Beute-Bilanz: straight to where it pays off

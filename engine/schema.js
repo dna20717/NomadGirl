@@ -64,7 +64,7 @@ export const TECH_BONUS = [['tankDecay', 'Tank: Verfall %'], ['tankRescue', 'Tan
   ['defense', 'Leyla: Abwehr %'], ['melee', 'Leyla: Nahkampf %'], ['ranged', 'Leyla: Fernkampf %'], ['crit', 'Leyla: Krit-Chance %'], ['speed', 'Leyla: Tempo %'],
   ['jump', 'Leyla: Sprungkraft %'], ['regen', 'Leyla: heilt sich (LP/10 s)'], ['heal', 'Leyla: Heilung %'], ['stamina', 'Leyla: Ausdauer'], ['staminaRegen', 'Leyla: Erholung %'],
   ['hack', 'Duell-Integrität'], ['growth', 'Camp: Wachstum %'], ['fuel', 'Camp: Spritersparnis %'], ['sleepHeal', 'Camp: Schlaf heilt %'], ['rest', 'Camp: Ruhe %'],
-  ['perfect', 'Camp: perfekt kochen %'], ['refund', 'Camp: Zutat zurück %'], ['power', 'Camp: Strom ⚡'], ['sell', 'Camp: mehr Δ aus Runs %'], ['loot', 'Camp: Extra-Beute %']];
+  ['perfect', 'Camp: perfekt kochen %'], ['refund', 'Camp: Zutat zurück %'], ['power', 'Camp: Strom ⚡'], ['sell', 'Camp: mehr Δ aus Runs und beim Verkaufen %'], ['loot', 'Camp: Extra-Beute %']];
 const LOOK = ref('look', 'Aussehen', 'assets', { hint: 'Grafik aus dem Bereich Assets' });
 const ICON = num('icon', 'Symbol', { min: 0, hint: 'Nur bei Aussehen der Art „Symbole“: welches Feld im Raster (0 = oben links, zeilenweise). Am einfachsten rechts in der Vorschau anklicken' });
 // an entry whose look is an icon sheet must name a cell that exists
@@ -559,6 +559,11 @@ export const AREAS = {
       { title: 'Währung', fields: [text('currency.name', 'Name', { hint: 'Noch ohne Wirkung: das Spiel schreibt überall „Δ“' }), text('currency.symbol', 'Symbol', { hint: 'Noch ohne Wirkung: das Spiel schreibt überall „Δ“' }), num('startDeltas', 'Startgeld', { unit: 'Δ', min: 0 }), area_('currency.description', 'Hintergrund')] },
       { title: 'Tod (noch ohne Wirkung: der k.o. steht unter Camp › Heilen)', fields: [text('rescue.drone', 'Rettungsdrohne'), bool('rescue.losesRunLoot', 'Run-Beute geht verloren'), bool('rescue.losesEquipped', 'Ausgerüstetes geht verloren'),
         num('rescue.keepPercent', 'AvA rettet', { unit: '%', min: 0, max: 100, hint: 'Anteil der Run-Beute, den AvA mitbringt (später über Drohnen-Upgrades)' }), area_('rescue.description', 'Ablauf')] },
+      { title: 'Vorschuss', fields: [bool('advance.enabled', 'Vorschuss an', { hint: '#182, Daniel 23.11.2026 (FB-2): Geld borgen ohne Zinsen und ohne Frist; ein fester Anteil jeder Run-Auszahlung geht zurück, bis alles bezahlt ist. Leer = an' }),
+        ref('advance.lender', 'Bei wem', 'companions', { hint: 'Leer = Onkel Sung. „Reden“ mit ihm bietet den Vorschuss an' }),
+        num('advance.share', 'Anteil je Run', { unit: '%', min: 1, max: 100, hint: 'So viel der Δ-Auszahlung nach einem Run geht an ihn, bis die Schulden weg sind. Leer = 50' }),
+        table('advance.tiers', 'Beträge', [num('amount', 'Δ', { min: 1 }), num('after', 'Ab abbezahlten Vorschüssen', { min: 0 })], { hint: 'Die Obergrenze wächst mit dem Vertrauen: jeder abbezahlte Vorschuss schaltet die nächste Zeile frei. Leer = 100 / 250 / 500' }),
+        area_('advance.offer', 'Sein Angebot', { hint: 'Was er sagt, wenn Leyla fragt' })] },
       { title: 'Foodtruck (noch ohne Wirkung: kommt mit dem Verkauf)', fields: [num('foodtruck.priceFactor', 'Preisfaktor', { step: 0.05, min: 0, hint: 'Verkaufspreis = Wert × Faktor' }), num('foodtruck.maxPerStop', 'Max. Verkäufe pro Halt', { min: 0 })] },
     ],
   },
@@ -1090,7 +1095,7 @@ export const AREAS = {
     sections: [
       { title: 'Gegenstand', fields: [NAME, LOOK, ICON, select('category', 'Kategorie', ITEM_CATEGORIES), multi('tags', 'Tags', ITEM_TAGS, { hint: 'Trophäe = darf an einen Trophäen-Ständer in der Schatzkammer' }), DESCRIPTION] },
       { title: 'Rucksack & Handel', fields: [size('size', 'Größe', { unit: 'Felder', hint: 'Rechteck im Raster (Daniel, 14.11.2026: nur noch Rechtecke, keine Tetris-Formen). Im Spiel mit Rechtsklick drehbar' }),
-        num('stack', 'Stapel', { min: 1 }), text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar, solange es kein Aussehen gibt: 1–3 Zeichen oder ein Emoji' }), VALUE,
+        num('stack', 'Stapel', { min: 1 }), text('glyph', 'Kürzel', { hint: 'Platzhalter im Inventar, solange es kein Aussehen gibt: 1–3 Zeichen oder ein Emoji' }), VALUE, bool('noSell', 'Unverkäuflich', { hint: '#182: kein Händler kauft es an (Quest-Dinge, Erinnerungsstücke)' }),
         ref('brand', 'Hersteller', 'brands', { hint: '#045: Marke aus der Lore-Datenbank. Ihre Spielwerte wirken: Qualität auf die Boni (Implantate), Preis auf den Wert, „In der Beute“ auf die Häufigkeit' })] },
       { title: 'Wirkung', fields: [ref('buff', 'Buff beim Essen/Benutzen', 'buffs'), ref('teaches', 'Bringt Rezept bei', 'recipes', { hint: 'Für Baupläne und Kochbücher' })] },
       { title: 'Ausrüstung', fields: [select('wear', 'Trägt man als', [['', '—'], ...WEAR_SLOTS], { hint: 'Kopf und Rüstung an Leyla, Implantate in ihrem Körper (nur im Camp einbauen), Teile an AvA' }),
@@ -1565,6 +1570,29 @@ export const AREAS = {
         num('morale.high', 'Hochstimmung ab', { min: 0, max: 100, hint: 'Leer = 75' }), num('morale.tense', 'Stabil ab', { min: 0, max: 100, hint: 'Leer = 40, darunter angespannt' }), num('morale.crisis', 'Angespannt ab', { min: 0, max: 100, hint: 'Leer = 20, darunter Krise' }),
         num('morale.jobHigh', 'Jobs in Hochstimmung', { unit: '%', hint: 'Leer = +25' }), num('morale.jobTense', 'Jobs angespannt', { unit: '%', hint: 'Leer = −25 (in der Krise bringen Jobs nichts)' }), num('morale.leave', 'Krise: jemand geht', { unit: '% je Tag', min: 0, max: 100, hint: 'Leer = 30' })] },
     ],
+  },
+  traders: {
+    name: 'Händler', singular: 'Händler', icon: 'coins', file: 'data/traders.json', kind: 'catalog',
+    hint: '#182, Daniel 23.11.2026 (FB-2): ein Händlerfenster für alle Händler, kaufen und verkaufen. Leyla verkauft aus Lager, Kiste und Rucksack. Drei Bremsen: schlechter Kurs zum Start (wächst mit der Kundschaft), Tageskasse, satt bei Gleichem. Die Ware wechselt jeden Tag.',
+    template: { name: 'Neuer Händler', rate: [35, 70], rateEvery: 100, markup: 130, cash: 300, satiety: { step: 15, recover: 15, floor: 20 }, stockCount: [6, 10], stock: [] },
+    row: (x, p) => `${p?.data.companions?.[x.keeper]?.name || 'ohne Figur'} · zahlt ${x.rate?.[0] ?? 35}–${x.rate?.[1] ?? 70} % · Kasse ${x.cash ?? 300} Δ`,
+    sections: [
+      { title: 'Händler', fields: [NAME, ref('keeper', 'Figur', 'companions', { hint: 'Wer den Laden führt; „Reden“ mit ihr bietet „Handeln“ an' }), area_('greeting', 'Begrüßung')] },
+      { title: 'Preise', fields: [range('rate', 'Zahlt', { unit: '% vom Wert', min: 1, max: 100, hint: 'Ankauf: zum Start der erste Wert, je „Mehr Kurs je“ gehandelte Δ 1 % mehr bis zum zweiten. Der Boni-Bus „mehr Δ aus Runs und beim Verkaufen“ zählt obendrauf' }),
+        num('rateEvery', 'Mehr Kurs je', { unit: 'Δ gehandelt', min: 1, hint: 'Kundschaft: so viele Δ Umsatz (kaufen und verkaufen) = 1 % besserer Kurs. Leer = 100' }),
+        num('markup', 'Verlangt', { unit: '% vom Wert', min: 1, hint: 'Verkaufspreis seiner Ware. Leer = 130' }),
+        num('cash', 'Tageskasse', { unit: 'Δ', min: 0, hint: 'So viel kann er pro Tag auszahlen; füllt sich über Nacht, Leylas Einkäufe gehen hinein. Leer = 300' }),
+        num('satiety.step', 'Satt: je Stück', { unit: '%', min: 0, max: 100, hint: 'Jedes verkaufte Stück desselben Dings senkt seinen Preis dafür um so viel. Leer = 15' }),
+        num('satiety.recover', 'Satt: erholt sich', { unit: '% pro Tag', min: 0, hint: 'Leer = 15' }),
+        num('satiety.floor', 'Satt: höchstens bis', { unit: '%', min: 1, max: 100, hint: 'Tiefer fällt der Preis nicht. Leer = 20' }),
+        multi('buys', 'Kauft', ITEM_CATEGORIES, { hint: 'Leer = alles mit Wert. Gegenstände mit „Unverkäuflich“ nie' })] },
+      { title: 'Ware', fields: [range('stockCount', 'Dinge pro Tag', { min: 0, hint: 'So viele Zeilen der Tabelle würfelt er jeden Tag (mit Chance als Gewicht). Was Leyla ihm verkauft, legt er dazu' }),
+        table('stock', 'Ware', [ref('item', 'Gegenstand', 'items'), num('chance', 'Chance', { min: 0, hint: 'Gewicht' }), range('count', 'Anzahl', { min: 1 })])] },
+    ],
+    check: (x, report) => {
+      if (x.rate && x.rate[1] < x.rate[0]) report('warning', 'Zahlt: der höchste Kurs liegt unter dem Startkurs');
+      if ((x.markup ?? 130) < (x.rate?.[1] ?? 70)) report('warning', 'Verlangt weniger, als er höchstens zahlt: kaufen und zurückverkaufen bringt Δ');
+    },
   },
   companions: {
     name: 'Companions', singular: 'Companion', icon: 'humans', file: 'data/companions.json', kind: 'catalog',
@@ -2492,7 +2520,7 @@ export const GROUPS = [
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
   ['ACHIEVEMENTS & AUFTRÄGE', ['achievements', 'quests']],
   ['PROGRESSION', ['techtree', 'resources']],
-  ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'decorSets', 'megarigs', 'rigAddons', 'salvage', 'people', 'companions']],
+  ['RIG', ['tank', 'camp', 'build', 'tractors', 'containers', 'workshops', 'rigParts', 'decor', 'decorSets', 'megarigs', 'rigAddons', 'salvage', 'people', 'companions', 'traders']],
   ['WELT', ['worldmap', 'parallax', 'pois', 'rooms', 'terrain', 'poiSets', 'roomStories', 'storylets', 'tropes', 'history', 'hulls', 'doors', 'life', 'dressingRules', 'atmosphere', 'locations', 'encounters', 'roadEvents', 'travel', 'radio']],
   ['LORE', ['brands', 'chronicle']],
   ['ENTITIES', ['glitchlings']],
