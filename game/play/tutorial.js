@@ -9,6 +9,7 @@
 //   keys     {k:jump} game action, {u:ok} window action, {stick} {rstick}: keycaps on the keyboard, the buttons of the controller in use
 // What was seen is kept in this browser (localStorage nomadgirl-tutorial-seen), the switch in Menü › Optionen (nomadgirl-tutorial-off).
 import { unlocked } from '../unlocks.js';   // #184
+import { SOLID_TILES } from '../../engine/room.js';
 const CHAPTER_SYSTEM = { inventory: 'inventory', build: 'build', travel: 'travel', progress: 'search' };
 const LESSON_SYSTEM = { kochen: 'cooking', experimentieren: 'build', werkbank: 'build', ripperdoc: 'cyberware', implantate: 'cyberware', haendler: 'build', warroom: 'travel', ko: 'camp', tank: 'search' };
 import { el } from '../ui.js';
@@ -63,6 +64,37 @@ export class Tutorial {
   event(name) { this.events.set(name, this.scene?.now ?? 0); }   // the loop's clock, like poll()
   // #186 a system was freed (Meta-Baum, scene.unlockTick): its lesson comes at the next calm moment
   unlocked(id) { this.freed.add(id); }
+  // #187 (Daniel 23.11.2026: „wenn sie es zum ersten Mal macht, bedeutet eigentlich oft: kurz bevor sie es das erste Mal machen muss“):
+  // what lies just ahead of Leyla in the level, in her direction (Auslöser „Voraus im Level“). In the first POI (fixed seed) that is always
+  // the same spot: the first ladder, the first ledge, the first gap of Mile 7.
+  //   jump: a step of 1–2 tiles or a gap ahead · ledge: a wall of 3–4 tiles with room on top (grab it) · ladder: one in reach
+  //   ceiling: a passage only one tile high (duck / slide) · enemy: someone in sight ahead · enemyClose: someone a few steps away
+  ahead(on, s) {
+    const l = s.leyla, T = s.T, b = l.body;
+    if (!b || !s.tileAt || !(b.blocked.down || b.touching.down) || l.state !== 'normal') return false;
+    const dir = l.facing < 0 ? -1 : 1, ry = Math.floor((l.feet - 1) / T), solid = (x, y) => SOLID_TILES.has(s.tileAt(x, (y + 0.5) * T));
+    const col = d => l.x + dir * d * T;
+    switch (on) {
+      case 'jump': for (let d = 1; d <= 3; d++) {
+        const x = col(d), h = [0, 1, 2, 3].findIndex(k => !solid(x, ry - k));
+        if (h >= 1 && h <= 2) return true;   // a step to jump onto
+        if (!solid(x, ry + 1) && !solid(x, ry + 2) && !(s.ladders || []).some(q => Math.abs(q.cx - x) < T / 2)) return d <= 2;   // a gap
+        if (h !== 0) return false;
+      } return false;
+      case 'ledge': for (let d = 1; d <= 3; d++) {
+        const x = col(d), h = [0, 1, 2, 3, 4, 5].findIndex(k => !solid(x, ry - k));
+        if (h >= 3 && h <= 4) return true;
+        if (h !== 0) return false;
+      } return false;
+      case 'ceiling': for (let d = 1; d <= 3; d++) { const x = col(d); if (solid(x, ry)) return false; if (solid(x, ry - 1)) return true; } return false;
+      case 'ladder': return (s.ladders || []).some(q => Math.abs(q.cx - l.x) < 3 * T && Math.sign(q.cx - l.x || dir) === dir && l.feet > q.top - T && l.feet <= q.bottom + T);
+      case 'enemy': case 'enemyClose': {
+        const far = on === 'enemy' ? 12 : 5;
+        return (s.enemies || []).some(e => e.alive && e.state !== 'dead' && Math.sign((e.x ?? e.body?.center.x) - l.x) === dir && Math.abs((e.x ?? e.body?.center.x) - l.x) < far * T && Math.abs((e.feet ?? e.body?.bottom) - l.feet) < 3 * T);
+      }
+      default: return false;
+    }
+  }
   // #186 what Leyla is doing right now (Lektionen › Auslöser „Leyla“): her state, plus a few things she does that are no state
   doing(on, s, now) {
     const l = s.leyla, b = l.body, grounded = b?.blocked.down || b?.touching.down;
@@ -83,7 +115,9 @@ export class Tutorial {
     for (const [k, at] of this.events) if (now - at > 8000) this.events.delete(k);   // an event counts for a few seconds
     if (this.tip && now < this.tip.at) { this.tip.until = now + (this.tip.until - this.tip.at); this.tip.at = now; }   // the scene clock started again
     if (this.tip && (now >= this.tip.until || !this.enabled || s?.mode !== 'run')) this.hideTip(now);   // gone with time, outside the run, or off
-    if (!s || this.isOpen || this.tip || !this.enabled) return;
+    // #187 a tip that stands for a few seconds may make way for a lesson Leyla needs right now (something just ahead)
+    const urgentOnly = !!this.tip && now - this.tip.at > 3000;   // (urgent() below waits Spiel › Tutorial › Vorher-Abstand)
+    if (!s || this.isOpen || (this.tip && !urgentOnly) || !this.enabled) return;
     if (this.mode !== s.mode || this.sceneId !== s.sys.settings.key + (s.roomId || '') + (s.level ? 'L' : '')) { this.count = 0; this.mode = s.mode; this.sceneId = s.sys.settings.key + (s.roomId || '') + (s.level ? 'L' : ''); this.modeAt = now; if (this.lastClose > now) this.lastClose = now - 2500; }   // a new scene starts its clock again
     if (this.nextPoll - now > 1000) this.nextPoll = 0;   // #186 the scene clock started again (camp ↔ run): poll right away
     if (this.lastClose > now) this.lastClose = now - 1;
@@ -111,13 +145,17 @@ export class Tutorial {
         case 'leyla': return !win && this.doing(x.on, s, now);
         case 'event': return this.events.has(x.on);
         case 'unlock': return !win && this.freed.has(x.on);
+        case 'ahead': return !win && mode !== 'camp' && this.ahead(x.on, s);   // #187 kurz bevor
         default: return false;
       }
     };
     const order = path ? [...this.lessons].sort((a, b) => (path.indexOf(a.id) + 1 || 99) - (path.indexOf(b.id) + 1 || 99)) : this.lessons;
     // the pause and the cap hold for everything except a window the player opened himself (he is right there)
     const calm = now - this.lastClose > quiet && this.count < cap;
-    const next = order.find(x => fits(x) && (calm || (x.trigger === 'window' && now - this.lastClose > 2500)));
+    // what she needs right now (Voraus im Level) waits only 4 s, not the whole pause; it may replace a tip that has stood long enough
+    const urgentGap = (T.urgentGap ?? 6) * 1000, urgent = x => x.trigger === 'ahead' && this.count < cap && now - this.lastClose > urgentGap && (!this.tip || now - this.tip.at > urgentGap);
+    const next = order.find(x => fits(x) && (urgentOnly ? urgent(x) : calm || urgent(x) || (x.trigger === 'window' && now - this.lastClose > 2500)));
+    if (next && urgentOnly) this.hideTip(now - 2501);   // the old tip goes, the new one comes right away
     if (next?.trigger === 'unlock') this.freed.delete(next.on);
     if (next?.trigger === 'event') this.events.delete(next.on);
     if (next && now - this.lastClose > 2500) {

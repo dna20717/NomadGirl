@@ -16,8 +16,8 @@
   "text": "{k:jump} springt. Lang gehalten geht es höher, kurz angetippt wird ein Hüpfer daraus.",
   "media": "clip",
   "clip": "tut_springen",
-  "trigger": "leyla",
-  "on": "air"
+  "trigger": "ahead",
+  "on": "jump"
  },
  "salto": {
   "name": "Salto",
@@ -36,8 +36,8 @@
   "text": "Spring an eine Kante, Leyla greift von selbst zu. {k:up} zieht sie hoch, {k:down} lässt sie einarmig baumeln, noch einmal {k:down} lässt los.",
   "media": "clip",
   "clip": "tut_kanten",
-  "trigger": "leyla",
-  "on": "hang"
+  "trigger": "ahead",
+  "on": "ledge"
  },
  "leitern": {
   "name": "Leitern und Treppen",
@@ -46,8 +46,8 @@
   "text": "An einer Leiter klettert Leyla mit {k:up} hinauf. {k:down} rutscht schnell nach unten. Oben zieht sie sich von selbst über die Kante.",
   "media": "clip",
   "clip": "tut_leitern",
-  "trigger": "leyla",
-  "on": "climb"
+  "trigger": "ahead",
+  "on": "ladder"
  },
  "dash": {
   "name": "Dash",
@@ -76,8 +76,8 @@
   "text": "Im Stand {k:down}: Leyla geht in die Hocke. {k:down} mit {k:jump} auf einer dünnen Plattform: sie lässt sich fallen.",
   "media": "clip",
   "clip": "tut_ducken",
-  "trigger": "leyla",
-  "on": "crouch"
+  "trigger": "ahead",
+  "on": "ceiling"
  },
  "seil": {
   "name": "Seile",
@@ -96,8 +96,9 @@
   "text": "{k:melee} schlägt zu. Im Takt getippt wird eine Kombo daraus, eine Sekunde gehalten ein schwerer Hieb.",
   "media": "clip",
   "clip": "tut_nahkampf",
-  "trigger": "leyla",
-  "on": "melee"
+  "trigger": "ahead",
+  "on": "enemyClose",
+  "mode": "run"
  },
  "schiessen": {
   "name": "Schießen",
@@ -106,8 +107,9 @@
   "text": "{k:ranged} zieht die Waffe und schießt im selben Zug. Gehalten steckt Leyla sie wieder weg.",
   "media": "clip",
   "clip": "tut_schiessen",
-  "trigger": "leyla",
-  "on": "shot"
+  "trigger": "ahead",
+  "on": "enemy",
+  "mode": "run"
  },
  "nachladen": {
   "name": "Nachladen",
@@ -132,9 +134,9 @@
    {"look": "tut_gegner_1", "caption": "Gegner schauen nach vorn. Ein Ausrufezeichen heißt: entdeckt."},
    {"look": "tut_gegner_2", "caption": "In der Nähe hören sie Leyla auch hinter sich. Von hinten bist du im Vorteil."}
   ],
-  "trigger": "event",
+  "trigger": "ahead",
   "mode": "run",
-  "on": "alert"
+  "on": "enemy"
  },
  "treffer": {
   "name": "Treffer einstecken",
@@ -318,8 +320,9 @@
    {"look": "tut_kochen_1", "caption": "Zutaten in den Topf, {u:ok} kocht."},
    {"look": "tut_kochen_2", "caption": "Bekannte Rezepte stehen im Buch. {u:send} legt alle Zutaten auf einmal hinein."}
   ],
-  "trigger": "window",
-  "on": "kitchen"
+  "trigger": "near",
+  "on": "Kochen",
+  "mode": "camp"
  },
  "experimentieren": {
   "name": "Experimentieren",
@@ -344,8 +347,9 @@
    {"look": "tut_werkbank_1", "caption": "An der Werkbank entstehen Teile, Munition und Ausrüstung aus Schrott."},
    {"look": "tut_werkbank_2", "caption": "Zettel aus den POIs bringen neue Baupläne."}
   ],
-  "trigger": "window",
-  "on": "craft"
+  "trigger": "near",
+  "on": "Herstellen",
+  "mode": "camp"
  },
  "hydrokultur": {
   "name": "Hydrokultur",
@@ -385,8 +389,9 @@
    {"look": "tut_ripperdoc_1", "caption": "Auf der Liege setzt der Ripperdoc Implantate ein."},
    {"look": "tut_ripperdoc_2", "caption": "Jedes hat seinen Preis: einen Vorteil und einen Haken."}
   ],
-  "trigger": "window",
-  "on": "cyber"
+  "trigger": "near",
+  "on": "Ripperdoc",
+  "mode": "camp"
  },
  "bauen": {
   "name": "Der Bau-Modus",

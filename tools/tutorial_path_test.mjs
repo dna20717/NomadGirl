@@ -20,12 +20,14 @@ await ev(async () => { window.__U = await import('./game/unlocks.js'); nomad.tak
 // 1. the first run: „Laufen“ comes first, as a tip, the game runs on
 let v = await ev(() => { nomad.step(260); return { ...st(), mode: game.scene.getScene('play').mode, first: !!game.scene.getScene('play').box.save.run?.first }; });
 check('Erster Run in Mile 7: „Laufen“ als Tipp (Lehrpfad)', v.mode === 'run' && v.first && v.tip === 'laufen' && !v.open, v);
-// 2. a pause: the first jump right after it does not bring „Springen“ yet
-v = await ev(() => { TU().hideTip(game.scene.getScene('play').now); nomad.step(1, [], ['jump']); nomad.step(20, ['jump']); nomad.step(40); return st(); });
+// 2. a pause: walking on right after it brings no second tip yet
+v = await ev(() => { TU().hideTip(game.scene.getScene('play').now); nomad.step(60, ['right']); return st(); });
 check('Gleich danach kein zweiter Tipp (Pause im Lehrpfad)', !v.tip, v);
-// 3. after the pause: the first jump → „Springen“ (the first time she does it)
-v = await ev(() => { TU().lastClose = -1e9; nomad.step(80); nomad.step(1, [], ['jump']); nomad.step(30, ['jump']); return st(); });
-check('Erster Sprung nach der Pause → „Springen“', v.tip === 'springen', v);
+// 3. #187 kurz bevor: walking on, the next lesson comes before she needs it (a step, a ledge, a ladder, a low ceiling, an enemy ahead)
+v = await ev(() => { TU().lastClose = -1e9; const s = game.scene.getScene('play'); let r = null;
+  for (let i = 0; i < 300 && !r; i++) { nomad.step(4, ['right']); const id = TU().tip?.id; if (id) r = { id, grounded: !!s.leyla.body.blocked.down, state: s.leyla.state, x: Math.round(s.leyla.x) }; }
+  return r || st(); });
+check('Weiterlaufen: eine Lektion kommt, bevor Leyla es tun muss (Leyla noch am Boden)', ['springen', 'kanten', 'leitern', 'ducken', 'gegner', 'nahkampf', 'schiessen'].includes(v.id) && v.grounded, v);
 // 4. off the path: a dash brings no lesson in the first run
 v = await ev(() => { TU().hideTip(game.scene.getScene('play').now); TU().lastClose = -1e9; nomad.step(80); nomad.step(1, [], ['dash']); nomad.step(10, ['dash']); return st(); });
 check('Dash ist nicht im Lehrpfad: keine Lektion im ersten Run', v.tip !== 'dash' && !v.seen.includes('dash'), v);

@@ -64,9 +64,9 @@ v = await ev(() => { nomad.step(60); return { tut: TU().state(), inv: SC().hud.i
 check('B schließt nur die Karte, das Inventar bleibt offen, keine zweite Karte in derselben Öffnung', !v.tut.open && v.inv, v);
 await ev(() => { SC().hud.inv.close(); nomad.step(10); });
 
-// #186 the first time Leyla does it: the first blow → „Nahkampf“
-v = await ev(() => { nomad.step(200); READY(); nomad.step(1, [], ['melee']); nomad.step(60); return TU().state(); });
-check('Erster Schlag → Lektion „Nahkampf“ (beim ersten Mal tun)', v.open && v.lesson === 'nahkampf', v);
+// an event: Leyla is hit → „Treffer“ (#187: Nahkampf comes before the first enemy, tutorial_path_test)
+v = await ev(() => { nomad.step(200); READY(); SC().drone.react('hit'); nomad.step(60); return TU().state(); });
+check('Ereignis (Treffer) → Lektion „Treffer“', v.open && v.lesson === 'treffer', v);
 // „für diese Sitzung nicht mehr“ (Daniel, 14.11.2026): X toggles the checkbox on the card, then no card comes until it is off again
 await tap(2);
 v = await ev(() => ({ tut: TU().state(), box: !!document.querySelector('.tut-mute input')?.checked, txt: document.querySelector('.tut-mute')?.textContent || '' }));

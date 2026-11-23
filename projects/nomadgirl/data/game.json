@@ -122,7 +122,7 @@
   "perVisit": 4,
   "firstGap": 10,
   "firstMax": 10,
-  "firstRun": ["laufen", "springen", "gegner", "nahkampf", "schiessen", "treffer", "beute", "boden", "kanten", "leitern", "kisten", "ziel", "zurueck"]
+  "firstRun": ["laufen", "springen", "kanten", "leitern", "ducken", "gegner", "nahkampf", "schiessen", "treffer", "beute", "boden", "kisten", "ziel", "zurueck"]
  },
  "ladder": {
   "look": "ladder_steel",

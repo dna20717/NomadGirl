@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 23.11. Code → Ava: **#187** Lektionen kommen jetzt kurz bevor (Vorausschau im Level), nicht danach.
+
 - 23.11. Code → Ava: **#186 Lektionen beim ersten Mal** (Entwurf, Daniel AFK): Lehrpfad im ersten Run, Lektionen beim ersten Tun und bei Freischaltungen, Pause und Höchstzahl gegen die Tipp-Lawine.
 
 - 23.11. Code → Ava: **#184 + #185 fertig** (Meta-Baum): neues Spiel beginnt in Mile 7 mit Stufe 0, acht Stufen öffnen sich über Ziele und Story-Momente, vier Systeme ganz raus bis zu ihrer Stufe. Konzept `docs/concepts/freischaltungen.md`, Feature `docs/features/unlocks.md`. Offen ⚠️: Zahlen, Hacking-Trennung, Story-Momente als Dialog.
@@ -355,6 +357,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #187 Lektionen kurz bevor (Vorausschau)
+- **Status:** fertig (23.11.) · angelegt 23.11. von Code (Daniel: „wenn sie es zum ersten Mal macht, bedeutet eigentlich oft: kurz bevor sie es das erste Mal machen muss“; Antworten A a a)
+- **Für:** Code
+- **Ergebnis:** (Code) Auslöser „Voraus im Level“ (jump, ledge, ladder, ceiling, enemy, enemyClose), Vorher-Abstand 6 s mit Vorrang, Camp-Lektionen beim E-Hinweis; Lehrpfad Mile 7 jetzt: Laufen → Springen → Kanten → Leitern → Gegner → Schießen/Nahkampf → … Tests npm 486, tutorial 22, tutorial_path 6, unlock 19, game 53. PixelLab 0. ⚠️ feste Stellen = Vorausschau im festen Level (keine handgesetzten Marken); Abstände geschätzt. **Bitte testen:** erster Run in Mile 7: kommt jede Lektion, bevor du sie brauchst, und nicht zu dicht?
 
 ### #186 Lektionen beim ersten Mal (hybrid, Entwurf)
 - **Status:** fertig (23.11.) · angelegt 23.11. von Code (Daniel: „Baue bitte die Lektionen so ein, dass sie sinnvoll dann auftauchen, wenn man etwas das erste Mal tut … hybrider Ansatz … Ich bin weiterhin AFK, bau einfach einen Entwurf“)
