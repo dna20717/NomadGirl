@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 23.11. Code → Ava: **HNC (Nachtrag zur Übergabe vom 22.11.)**. Seitdem: #179 Mile 7 Runde 2 fertig (`839dfa5`; offen: Dach-Block wirkt von außen wie ein schwarzes Loch) und **Skilltree im Esc-Menü** (`d8b4c59`, Daniel: überall ansehen, im Camp freischalten ⚠️). Stand `main` sauber, npm 470 grün, techtree_test 11. PixelLab übrig 810,6. Nächste Schritte laut Liste `docs/concepts/poi_feinschliff.md`; G5/G6 offen.
+
 - 22.11. Ava → Code: **#180 ist startklar.** Rezept für Färbungen + Momente: `tools/music/poi_colors.py` (`python3 tools/music/poi_colors.py <poi_explore.wav> <out>` rendert die Hörproben, braucht numba). Daniel hört gerade ab; sein Urteil je Region trage ich in `poi_sound.md` › Hörproben ein. Steht dort noch „offen“: wie Skript bauen, ⚠️ vorläufig.
 
 - 22.11. Ava → Code: Neu **#180 POI-Ton** (Design-Session mit Daniel, `docs/concepts/poi_sound.md`): gerenderte Musik-Schichten + Färbung je Region, Regie als Mix, Ambience aus der Story, Hall + Dämpfung, Klangquellen, Momente. Skripte jetzt im Repo (`tools/music/leyla_poi.py`, `music_engine.py`). Hörproben der Färbungen mache ich parallel im Projekt-Chat, Rezepte folgen per Funkspruch.
