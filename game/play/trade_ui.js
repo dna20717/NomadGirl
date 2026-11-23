@@ -28,8 +28,8 @@ export class TradeUI {
   get scene() { return this.host.scene(); }
   get D() { return this.scene?.data_ || {}; }
   get save() { return this.scene?.box?.save || null; }
-  open(id, tab = 'sell') { this.id = id; this.tab = tab; this.pick = 0; this.note = null; this.draw(); this.el.hidden = false; }
-  close() { this.el.hidden = true; this.el.replaceChildren(); this.id = null; }
+  open(id, tab = 'sell', { onClose = null } = {}) { this.id = id; this.tab = tab; this.pick = 0; this.note = null; this.onClose = onClose; this.draw(); this.el.hidden = false; }
+  close() { this.el.hidden = true; this.el.replaceChildren(); this.id = null; const f = this.onClose; this.onClose = null; f?.(); }   // #183 the road goes on when the stand closes
   nav(u) { for (const a of ['back', 'ok', 'send', 'up', 'down', 'next', 'prev', 'left', 'right']) if (u.pressed(a)) return this.act(a === 'left' ? 'prev' : a === 'right' ? 'next' : a); }
   rows() { const O = offers(this.D, this.save, this.id); return this.tab === 'sell' ? O.sell : O.buy; }
   act(a) {

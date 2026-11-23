@@ -87,6 +87,28 @@ await ev(() => { nomad.step(3); nomad.choose('100 Δ leihen'); nomad.step(3); })
 const run = await ev(() => { const sc = game.scene.getScene('play'), S = sc.box.save, d0 = S.deltas; sc.deltas = 120; S.run = { poi: null, before: {} }; sc.endRun(false); return { got: S.deltas - d0, debt: S.debt }; });
 await page.waitForTimeout(500); run.sum = await ev(() => { nomad.step(120); return game.scene.getScene('play').hud.sum?.state?.()?.debt || null; });
 check('Run-Auszahlung: 50 % an Onkel Sung, Bilanz zeigt es', run.got === 60 && run.debt?.amount === 40 && run.sum?.cut === 60 && run.sum?.left === 40, run);
+// 5. #183 Sungs Küche, Lucky Ferro at the fire, a trader at this place, a stand on the road
+await ev(() => { const H = game.scene.getScene('play').hud; H.sum?.close?.(); nomad.step(5); nomad.goTo('Onkel Sung'); nomad.step(1, [], ['grab']); nomad.step(3); nomad.choose('Handeln'); }); await page.waitForTimeout(150);
+t = await ev(() => { nomad.step(3); return nomad.trade(); });
+check('Onkel Sung: Händlerfenster „Sungs Küche“, kauft Ramen, keine Goldzähne', t?.id === 'onkel_sung' && t.sell.some(x => x.startsWith('neon_ramen')) && !t.sell.some(x => x.startsWith('kupferkabel')) && t.buy.length >= 5, t);
+await key('Escape');
+const lucky = await ev(() => { const sc = game.scene.getScene('play'); sc.box.save.day = 3; sc.crewNews(); nomad.step(3); return { comp: sc.box.save.companions, spots: sc.camp.hotspots.filter(h => h.name === 'Lucky Ferro').length }; });
+check('Lucky Ferro taucht ab Tag 3 am Feuer auf', lucky.comp.includes('lucky_ferro') && lucky.spots === 1, lucky);
+await ev(() => { nomad.goTo('Lucky Ferro'); nomad.step(1, [], ['grab']); nomad.step(3); nomad.choose('Handeln'); }); await page.waitForTimeout(150);
+t = await ev(() => { nomad.step(3); return nomad.trade(); });
+check('Lucky: „Luckys Sonderangebote“, zahlt 45 %', t?.id === 'lucky_ferro' && t.rate === 45, t);
+await key('Escape');
+const place = await ev(async () => { const { placeTraders } = await import('./game/trade.js'); const sc = game.scene.getScene('play'), S = sc.box.save; const n = S.map.nodes.find(n => placeTraders(sc.data_, S, n.id).some(t => t.id === 'papierhaendler')); S.location = n.id; S.hour = 12; sc.camp.vanMenu([]); nomad.step(2); return nomad.map()?.extras || []; });
+check('Ort mit Papierhändler: Knopf auf der Reisekarte', place.some(x => x === 'Handeln: Papier & Pläne'), place);
+await ev(() => { nomad.choose('Handeln: Papier'); }); await page.waitForTimeout(150);
+t = await ev(() => { nomad.step(3); return nomad.trade(); });
+check('Papierhändler öffnet sich mit eigener Kasse je Ort', /^papierhaendler@/.test(t?.id || '') && t.cash === 250, t);
+await key('Escape');
+const road = await ev(async () => { const { generateEncounter } = await import('./game/road_events.js'); const { openRoad } = await import('./game/trade.js'); const sc = game.scene.getScene('play'), S = sc.box.save, E = generateEncounter(sc.data_, Math.random, { situation: 'karawane', save: S, danger: 2 }); const o = E.options.find(x => x.trade); sc.hud.trade.open(openRoad(sc.data_, S, o.trade.trader, o.trade), 'buy', { onClose: () => { window.__closed = true; } }); nomad.step(2); return { t: nomad.trade(), brand: o.trade.brand }; });
+check('Karawane: Fenster mit Markenware, Tab Kaufen', road.t?.tab === 'buy' && road.t.buy.length >= 4, road);
+await key('Escape');
+check('Schließen führt die Fahrt weiter (onClose)', await ev(() => !!window.__closed));
+await shot('lucky');
 await browser.close();
 for (const o of ok) console.log('  ✓ ' + o);
 for (const e of errors) console.log('  ✗ ' + e);

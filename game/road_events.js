@@ -101,6 +101,15 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
         result: 'Eingepackt, mit Aufkleber und einem Lächeln, das nichts kostet.|Der Verkäufer scannt deinen Daumen. „Danke für Ihren Einkauf.“' })), ...A];
     }
   }
+  // #183 a stand on the road with the trader window: its brand comes from the situation (the Markenstand's, else one that makes things)
+  let tradeBrand = null;
+  if (A.some(a => a.trade && D.traders?.[a.trade])) {
+    const sell = b => Object.values(D.items || {}).some(t => t.brand === b && (t.value || 0) > 0);
+    const shown = S.shop === 'brand' ? Object.keys(D.brands || {}).find(b => (D.brands[b].short || D.brands[b].name) === fill.brand) : null;
+    const pool = Object.keys(D.brands || {}).filter(sell);
+    tradeBrand = shown || (pool.length ? pick(rnd, pool) : null);
+    if (tradeBrand && !shown) fill.brand = D.brands[tradeBrand].short || D.brands[tradeBrand].name;
+  }
   const free = a => !(a.deltas < 0) && !a.use && !hasNeeds(a);   // always possible (time and fuel she has; Δ and things maybe not)
   // #059 answers that need someone or something: open ones come first, missing ones only where there is room (greyed, with the reason)
   if (save) { const open = a => !hasNeeds(a) || !needBlocked(D, save, a); A = [...A.filter(a => hasNeeds(a) && open(a)), ...A.filter(a => !hasNeeds(a)), ...A.filter(a => !open(a))]; }
@@ -126,6 +135,7 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
     if (a.failHours) o.failHours = a.failHours;
     if (a.rep && gang) { o.rep = a.rep; o.gang = gang; }
     if (a.repRival && rival) { o.repRival = a.repRival; o.rival = rival; }
+    if (a.trade && D.traders?.[a.trade]) o.trade = { trader: a.trade, brand: tradeBrand, gang, mood: M?.price ?? 100, danger, scale: C.scale, seed: Math.floor(rnd() * 2 ** 31) };   // #183
     if (a.flag) o.flag = a.flag;
     if (a.buff) o.buff = a.buff;
     if (a.reveal) o.reveal = a.reveal;

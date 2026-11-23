@@ -62,5 +62,25 @@
   "look": "companion_onkel_sung_idle",
   "height": 240,
   "voice": "onkel_sung"
+ },
+ "lucky_ferro": {
+  "name": "Lucky Ferro",
+  "role": "Händler",
+  "stage": "1",
+  "joinDay": 3,
+  "workshops": [],
+  "buffs": [],
+  "tips": [],
+  "description": "Charmeur mit Schulden und Freunden überall. Verkauft „frische Stadtluft“ in Dosen.",
+  "lines": [
+   "Doppelt oder nichts? Komm schon, das Glück mag dich, ich hab's gefragt.",
+   "Die Dose? Frische Stadtluft. Echte. Fast echt.",
+   "Ich hab nichts aus dem Lager genommen. Ich hab es umverteilt.",
+   "Jeder schuldet jemandem was. Ich schulde nur mehr Leuten.",
+   "Heute ist mein Glückstag. Gestern war auch einer, der ging nur schief."
+  ],
+  "color": "#e8b84a",
+  "voice": "quirlig",
+  "arriveLine": "Hab gehört, hier gibt's ein Feuer und Leute mit Δ. Lucky Ferro, Händler. Das Veilchen? Lange Geschichte."
  }
 }

@@ -812,13 +812,13 @@ export class PlayScene extends Phaser.Scene {
     if (!u) return;
     const eat = () => { for (const k of ['jump', 'grab', 'dash', 'up', 'down', 'left', 'right', 'melee', 'ranged', 'reload', 'holster']) if (input[k]) input[k].pressed = false; };
     if (hud.tut?.isOpen) { hud.tut.nav(u); eat(); input.help.pressed = false; return; }   
+    if (hud.trade?.isOpen) { hud.trade.nav(u); eat(); input.help.pressed = false; return; }   // Händlerfenster (#182; before the drive: a stand on the road opens it there, #183)
     if (hud.sum?.isOpen) { hud.sum.nav(u); eat(); input.help.pressed = false; return; }   // Beute-Bilanz (#017)
     if (hud.duel?.isOpen) { hud.duel.nav(u); eat(); input.help.pressed = false; return; }   // Glitch-Duell (#052)
     if (hud.duel?.swallow > 0) { hud.duel.swallow--; eat(); input.help.pressed = false; return; }   // the Esc / E that closed it must not open the pause menu or act again (3 frames)
     if (hud.megaBuild?.isOpen) { hud.megaBuild.nav(u); eat(); input.help.pressed = false; return; }   // build plan aboard (#029)
     if (hud.drive?.isOpen && !hud.modal) { hud.drive.nav(u); eat(); input.help.pressed = false; return; }   // the drive (#053); its incident's window is a menu
     if (hud.quests?.isOpen) { hud.quests.nav(u); eat(); input.help.pressed = false; return; }   // Questlog (#016)
-    if (hud.trade?.isOpen) { hud.trade.nav(u); eat(); input.help.pressed = false; return; }   // Händlerfenster (#182)
     if (hud.ach?.isOpen) { hud.ach.nav(u); eat(); input.help.pressed = false; return; }   // Menü › Achievements (#012)   // the field guide card / archive (#011)
     if (hud.paused && !hud.modal) { if (u.pressed('ok') || u.pressed('back')) { hud.toggleHelp(false); eat(); input.help.pressed = false; } return; }
     if (hud.modal) {

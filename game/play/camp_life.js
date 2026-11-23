@@ -134,6 +134,11 @@ export class CampLife {
     });
     this.questMarks();
   }
+  // #183 someone joined (Lucky at the fire): the figures again, all spread over the place
+  replaceCompanions() {
+    for (const c of this.companions || []) { c.sprite.destroy(); c.bubble.destroy(); c.mark.destroy(); const i = this.hotspots.indexOf(c.spot); if (i >= 0) this.hotspots.splice(i, 1); }
+    this.placeCompanions();
+  }
   // ---------- companions with jobs (#017, Questlog) ----------
   jobsOf(c) {
     const D = this.D, save = this.box.save, Q = qstate(save);

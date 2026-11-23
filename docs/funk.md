@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 23.11. Code → Ava: **#183 fertig**: Sungs Küche, Lucky Ferro, Karawane + Markenstand, Papier & Pläne, Schwarzmarkt, Ghostwire im selben Händlerfenster.
+
 - 23.11. Code → Ava: **#182 fertig** (FB-2): Händlerfenster mit Schraube, Vorschuss bei Onkel Sung. FB-2 in FeedbackBucket kann nach Daniels Test zu.
 
 - 23.11. Ava → Code: Neu **#182 Händlerfenster + Vorschuss** aus FB-2 (Daniel hat die Eckpunkte per Auswahl entschieden).
@@ -345,12 +347,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #183 Weitere Händler: Sungs Küche, Karawane, Händler an Orten, Lucky Ferro
-- **Status:** läuft (23.11.) · angelegt 23.11. von Code (Daniel: „Das System gefällt mir richtig gut. Lass uns direkt die anderen Händler auch einbauen.“; Auswahl: alle vier, Bau-Katalog bleibt im Bau-Modus)
+- **Status:** fertig (23.11.) · angelegt 23.11. von Code (Daniel: „Das System gefällt mir richtig gut. Lass uns direkt die anderen Händler auch einbauen.“; Auswahl: alle vier, Bau-Katalog bleibt im Bau-Modus)
 - **Für:** Code
 - **Lesen:** `docs/features/trade.md` (#182), `docs/features/worldmap.md` (Zwischenfälle, Reisekarte), `docs/crew.md` (Lucky, Mei), `docs/features/lore.md` (Ghostwire), `game/pricing.js`.
 - **Auftrag:** dasselbe Händlerfenster für (1) **Onkel Sungs Küche** im Camp, (2) die **Händlerkarawane** auf der Straße (Antwort „Handeln“), (3) **Händler an Orten** der Reisekarte (Kartenhändler, Schwarzmarkt nachts, Ghostwire für Cyberware), (4) **Lucky Ferro** als Crew-Händler (taucht am Feuer auf, Figur aus Code, kein PixelLab).
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ vorläufig: Lucky kommt ab Tag 3 von selbst (crew.md: „taucht am Feuer auf“), Figur aus Code, Stimme quirlig; Ortshändler ohne Figur, nur als Knopf auf der Reisekarte; Chancen/Zeiten/Kurse geschätzt; Ghostwire nur in Delta Ring und The Outskirts; altes „Handeln“ beim liegengebliebenen LKW bleibt ein Tausch ohne Fenster.
+- **Ergebnis:** (Code) Händler › Art (Camp/Straße/Orte), Wo, Marke, Ware der Marke; `trade.js` `openRoad`, `placeTraders`, Preise über `pricing.js`; Antworten `laden`/`laden_marke` mit Feld Händler; Knöpfe auf der Reisekarte (`traderExtras`); Companions › Kommt ab Tag, Erster Satz; Lucky Ferro + 6 neue Händler in `traders.json`. Tests npm 481 (trade.test 7), trade_test 23, camp 34, crew 5, drive 20, map 18, pad 43, game 53. PixelLab 0. **Bitte testen:** Sung → Handeln; Tag 3 im Camp (Lucky); an der Van-Tür auf der Karte nach „Handeln: …“ schauen (nachts Schwarzmarkt); unterwegs eine Karawane.
 
 ### #182 Händlerfenster (Schraube zuerst) + Vorschuss bei Onkel Sung (FB-2)
 - **Status:** fertig (23.11.) · angelegt 23.11. von Ava (aus Feedback FB-2, Fragen mit Daniel per Auswahl)

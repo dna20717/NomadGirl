@@ -57,7 +57,13 @@ export function reject(save) { save.applicant = null; }
 
 // arriving in the camp: maybe someone waits at the fire (Ruf zieht an); hidden traits show after a few days → { applicant, revealed: [{ name, trait }] }
 export function campArrival(D, save, rnd = Math.random) {
-  const C = peopleConfig(D), out = { applicant: null, revealed: [] };
+  const C = peopleConfig(D), out = { applicant: null, revealed: [], joined: [] };
+  // #183 companions who are not there from the start turn up at the fire from their day (Companions › Kommt ab Tag), once per Durchgang
+  save.met ??= [];
+  for (const [id, c] of Object.entries(D.companions || {})) {
+    if (!(c.joinDay > 0) || (save.day ?? 1) < c.joinDay || save.met.includes(id) || (save.companions || []).includes(id)) continue;
+    save.met.push(id); (save.companions ??= []).push(id); out.joined.push({ id, name: c.name || id, line: c.arriveLine || '' });
+  }
   for (const p of crew(save)) if (!p.seen && (p.traits || []).length > 1 && (save.day ?? 1) - (p.day ?? 1) >= C.revealDays) { p.seen = true; out.revealed.push({ name: p.name, trait: trait(D, p.traits[1])?.name || p.traits[1] }); }
   if (!save.applicant && C.skills.length && (save.day ?? 1) >= C.fireFromDay && rnd() * 100 < C.fireChance) { save.applicant = rollPerson(D, Math.floor(rnd() * 2 ** 31)); out.applicant = save.applicant; }
   return out;

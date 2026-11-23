@@ -146,7 +146,7 @@
    "weight": 2,
    "danger": 1,
    "text": "Planwagen, Laternen, ein Schild: „{brand}, fast legal“.|Ein Laden auf Rädern. Es gibt {cargo}, Sprit und schlechte Witze.",
-   "answers": "onkel_redet, fuer_alle_kochen, handeln, tanken, essen_kaufen, weiterfahren",
+   "answers": "onkel_redet, fuer_alle_kochen, laden, tanken, essen_kaufen, weiterfahren",
    "moods": "freundlich, gierig, gelangweilt",
    "loot": "kiste_tankstelle"
   },
@@ -552,7 +552,7 @@
    "roadside": "trader",
    "shop": "brand",
    "text": "Ein Truck mit aufgeklappter Seite, Neonschrift, Musik aus Boxen: {brand} verkauft direkt vom Laster.|Ein Verkaufsstand im Logo-Look. Wer ein Billboard gesehen hat, kennt die Preise schon.",
-   "answers": "weiterfahren"
+   "answers": "laden_marke, weiterfahren"
   },
   {
    "figures": "pistolero",
@@ -1288,7 +1288,15 @@
    "food": 1,
    "recruit": true,
    "result": "Sie schaut lange auf das Rig. Dann wirft sie ihren Rucksack auf die Ladefläche."
-  }
+  },
+  {
+   "id": "laden",
+   "label": "Den Laden ansehen|Stöbern gehen",
+   "when": "any",
+   "trade": "karawane",
+   "result": "Handschlag, Staub, weiter.|Man winkt dir nach. Ehrlich gemeint, vermutlich."
+  },
+  {"id": "laden_marke", "label": "Das ganze Sortiment ansehen", "when": "any", "trade": "markenstand", "result": "Eine Tüte mit Logo, ein Aufkleber gratis."}
  ],
  "words": {
   "group": "Rostkrähen|Asphaltwölfe|Neon-Saints|Schrottkönige|Staubtöchter|Kilometerfresser",

@@ -5,6 +5,7 @@ import { synergyAt } from '../synergy.js';
 import { cozyBonus } from '../decor.js';
 import { ensureMap, placeOf } from '../worldmap.js';
 import { pickEncounter, encounterById, choose, blocked } from '../travel.js';
+import { openRoad, placeTraders } from '../trade.js';   // #183
 import { potsOf, stage, ripe, harvest, STAGES, canWater, waterOf, water } from '../garden.js';
 import { level as cisternLevel, tap as cisternTap } from '../cistern.js';
 import { clockText, advance, hoursUntil } from '../save.js';
@@ -206,7 +207,13 @@ export class CampActions {
     const extras = ids.map(w => { const d = this.D.workshops?.[w.id] || {}; return { label: VERB[d.function] || d.name || w.id, icon: d.function === 'sleep' ? 'moon' : d.function === 'kitchen' ? 'light' : 'workbench', act: () => this.use(w.id) }; });
     // #029: salvaged mega rigs you do not live in yet: move aboard from here
     for (const id of owned(this.box.save).filter(m => m !== activeMega(this.D, this.box.save) && this.D.megarigs?.[m]?.tractor)) extras.push({ label: `Umziehen: ${this.D.megarigs[id].name}`, icon: 'vehicle', act: () => { this.scene.hud.map?.close?.(); this.moveAboard(id); } });
+    extras.push(...this.traderExtras());   // #183 traders at this place
     this.openMap({ extras, sel: this.box.save.location });
+  }
+  // #183 Händler an Orten: a button per trader where the rig stands (closed ones say when they open)
+  traderExtras() {
+    const s = this.scene;
+    return placeTraders(this.D, this.box.save).map(t => ({ label: t.open ? `Handeln: ${t.name}` : `${t.name} · ${t.reason}`, icon: 'coins', disabled: !t.open, act: () => { if (!t.open) return s.hud.toast(t.name, `Hat ${t.reason} geöffnet`, 'info'); s.hud.inv?.close(); setTimeout(() => s.hud.trade?.open(t.key), 0); } }));
   }
   // Loadout-Check next to „Hier plündern“ (#016): what Leyla takes along, each line ok or a warning
   loadout() {
@@ -311,6 +318,7 @@ export class CampActions {
     const wr = this.rigWorkshop('warroom') || Object.keys(D.workshops || {}).find(k => D.workshops[k].function === 'warroom');
     if (wr) extras.push({ label: 'Auswerten', icon: 'research', act: () => { s.hud.inv?.close(); s.hud.craft?.open(wr, 'salvage'); } });
     extras.push({ label: 'Questlog', icon: 'list', act: () => { s.hud.inv?.close(); s.hud.quests?.open(); } });   // #016
+    extras.push(...this.traderExtras());   // #183
     this.openMap({ extras });
   }
   // the first built-in workshop of a kind (function) anywhere in the rig, or null
@@ -361,7 +369,10 @@ export class CampActions {
     const meet = () => {
       s.achieveLater?.('encounters');
       const opts = E.options || [];
-      const pick = o => { const before = new Set(offers(D, save)), r = choose(D, save, o); R.log.push(`${E.name}: ${[r.text, r.lines.join(', ')].filter(Boolean).join(' ')}`);
+      const pick = o => {
+        // #183 a stand on the road: the trader window first, the road goes on when it closes
+        if (o.trade && !o.traded && s.hud.trade) { const key = openRoad(D, save, o.trade.trader, o.trade); if (key) { setTimeout(() => s.hud.trade.open(key, 'buy', { onClose: () => pick({ ...o, traded: true }) }), 0); return; } }
+        const before = new Set(offers(D, save)), r = choose(D, save, o); R.log.push(`${E.name}: ${[r.text, r.lines.join(', ')].filter(Boolean).join(' ')}`);
         s.hud.toast(E.name, [r.text, r.lines.join(' · ')].filter(Boolean).join(' · '), r.failed || o.health || o.deltas < 0 || o.fuel > 0 ? 'warn' : 'travel', 4200);
         for (const x of [r.rep, r.rep2, ...(r.rep?.rivals || []), ...(r.rep2?.rivals || [])]) if (x?.changed) s.hud.toast(`${x.gang}: ${levelName(x.level)}`, x.n > 0 ? 'Dein Ruf bei ihnen steigt' : 'Dein Ruf bei ihnen sinkt', x.n > 0 ? 'good' : 'warn', 4200);   // #055
         if (r.story) s.hud.toast('Die Geschichte geht weiter', 'Auf der nächsten Etappe', 'travel', 3600);

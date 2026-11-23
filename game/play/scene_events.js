@@ -169,7 +169,9 @@ export class SceneEvents {
     const r = campArrival(this.data_, this.box.save);
     for (const x of r.revealed) this.hud.toast(`Du lernst ${x.name} besser kennen`, `${x.trait}`, 'info', 5200);
     if (r.applicant) this.hud.toast(`${r.applicant.name} wartet am Feuer`, 'Will mitfahren · am Lagerfeuer entscheiden', 'info', 6000);
-    if (r.applicant || r.revealed.length) this.box.persist?.();
+    for (const x of r.joined) this.hud.toast(`${x.name} taucht am Feuer auf`, x.line || 'Fährt jetzt mit', 'good', 7000);   // #183
+    if (r.joined.length) this.camp?.replaceCompanions?.();
+    if (r.applicant || r.revealed.length || r.joined.length) this.box.persist?.();
   }
   // #079 the days that passed: prisoners in the Zelle make Dunkelheit, those outside of it suffer (one toast)
   prisonerNews() {

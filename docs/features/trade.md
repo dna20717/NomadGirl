@@ -24,10 +24,20 @@
 - **HUD:** im Camp „SCHULDEN X Δ“ neben den Δ.
 - Spielstand: `save.debt = { lender, amount, taken, day } | null`, `save.debtsPaid`.
 
+## Weitere Händler (#183)
+
+Daniel, 23.11.2026: „Das System gefällt mir richtig gut. Lass uns direkt die anderen Händler auch einbauen.“ Auswahl: alle vier, Bau-Katalog bleibt im Bau-Modus. Händler › **Art**: Camp (Figur), Straße (aus einem Zwischenfall), Orte (Reisekarte). Schlüssel in `save.trade`: Camp = ID, Straße = `id@road` (jedes Mal frisch, kein Tageswechsel), Orte = `id@<Knoten>` (eigene Ware und Kasse je Ort).
+
+- **Sungs Küche** (Camp, Onkel Sung): kauft Zutaten und Gerichte (40–75 %, Kasse 200 Δ), verkauft Zutaten, Gewürze, MRE. Im Gespräch „Handeln“ und „Vorschuss“.
+- **Lucky Ferro** (neuer Companion, Händler, Figur aus Code in Gold, Stimme `quirlig`): Companions › **Kommt ab Tag** (3) + **Erster Satz**; beim Ankommen im Camp ab Tag 3 taucht er am Feuer auf (`crew.campArrival` → `joined`, Toast, `camp.replaceCompanions`), einmal je Durchgang (`save.met`). **Luckys Sonderangebote**: zahlt 45–80 % (Glückspilz), Kasse 450 Δ, Ware bunt (Cola, Spritzen, Waffenteile, Implantat, Wertsachen).
+- **Händlerkarawane** und **Markenstand** (Straße): Ereignis-Baukasten › Antworten › **Händler**; Antwort „Den Laden ansehen“ (`laden`, Lage Karawane statt des alten „Handeln“) bzw. „Das ganze Sortiment ansehen“ (`laden_marke`, Markenstand). Die Marke kommt aus der Lage (`{brand}` im Text passt), Händler › **Ware der Marke** legt Dinge der Marke aus. Preise mit `pricing.js` (Ruf der Gang, Stimmung, Gefahr, Influencer). Beim Schließen geht die Fahrt weiter (`TradeUI.open(key, tab, { onClose })`).
+- **An Orten** (Reisekarte, Knopf im Kopf an der Van-Tür und im Warroom, wo das Rig steht): Händler › **Wo**: nur an POIs, nur in Regionen, Chance je Ort (je Ort und Durchgang fest), offen tagsüber / nachts (20–5 Uhr); geschlossene sagen, wann. **Papier & Pläne** (tagsüber, 40 %: Baupläne, Zettel, Rezepte), **Schwarzmarkt** (nachts, 35 %: Waffenteile, Implantate, Spritzen; zahlt 50–70 %), **Ghostwire** (nachts, 30 %, nur Delta Ring und The Outskirts: Cyberware, Chips, Ghostwire-Ware). Preise mit Ruf der Gang des Orts und Gefahr.
+- Quest-Dinge (Tag `quest`) kauft niemand.
+
 ## Fernsteuerung und Tests
 
-`nomad.trade()` (Tab, Kasse, Kurs, Listen, letzte Meldung). Tests: `test/trade.test.js` (Kurs, satt, Kasse, Ware je Tag, kaufen, Kundschaft, Vorschuss-Stufen, Anteil, Zurückzahlen), `tools/trade_test.mjs` (16: Schraube → Handeln, nur Angekauftes, E/F verkaufen, satt, pausiert, Kaufen, Esc, Sung → Vorschuss, Stufen gesperrt, HUD, zurückzahlen, Run-Auszahlung 50 % mit Bilanz).
+`nomad.trade()` (Tab, Kasse, Kurs, Listen, letzte Meldung). Tests: `test/trade.test.js` (7; Kurs, satt, Kasse, Ware je Tag, kaufen, Kundschaft, Vorschuss-Stufen, Anteil, Zurückzahlen), `tools/trade_test.mjs` (23; #183: Sungs Küche, Lucky ab Tag 3, Papierhändler am Ort, Karawane mit Weiterfahrt; vorher: Schraube → Handeln, nur Angekauftes, E/F verkaufen, satt, pausiert, Kaufen, Esc, Sung → Vorschuss, Stufen gesperrt, HUD, zurückzahlen, Run-Auszahlung 50 % mit Bilanz).
 
 ## Offen / ⚠️ vorläufig
 
-Zahlen (Kurs, Kasse, Sättigung, Ware, Beträge, Anteil) von Ava geschätzt; „Vertrauen“ = abbezahlte Vorschüsse bzw. Umsatz, bis es Vertrauensbäume im Spiel gibt. Weitere Händler (POIs, Mei, Ghostwire) nutzen dasselbe Fenster, sobald sie eine Figur oder einen Ort haben.
+Zahlen (Kurs, Kasse, Sättigung, Ware, Beträge, Anteil) von Ava geschätzt; „Vertrauen“ = abbezahlte Vorschüsse bzw. Umsatz, bis es Vertrauensbäume im Spiel gibt. Mei (Sungs Ast 4 A) fehlt noch, sie braucht den Vertrauensbaum. Luckys verborgene Eigenheit „Lange Finger“ und das Glücksspiel sind noch nicht gebaut. Lucky und die Ortshändler haben Figuren aus Code bzw. keine Figur (PixelLab nur mit Freigabe).

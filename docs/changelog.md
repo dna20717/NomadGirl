@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 23.11.2026: **Weitere Händler** (#183): Sungs Küche, Lucky Ferro (taucht ab Tag 3 am Feuer auf), Händlerkarawane und Markenstand auf der Straße, Papier & Pläne, Schwarzmarkt und Ghostwire an Orten der Reisekarte, alle im selben Händlerfenster.
 - 23.11.2026: **Händler + Vorschuss** (#182, aus FB-2): Schraube kauft an und verkauft im neuen Händlerfenster (schlechter Kurs zum Start, Tageskasse, satt bei Gleichem, Ware jeden Tag neu); Onkel Sung gibt einen Vorschuss ohne Zinsen, die Hälfte jeder Run-Auszahlung geht zurück.
 - 23.11.2026: **Feedback-Knopf für die Testphase** (#181): F8, Home-Taste oder Select + Start pausiert, Fenster mit Chips und Text, Bild vom Moment und Spur der letzten 30 s gehen als Issue ins private Repo FeedbackBucket; JS-Fehler bieten Feedback an.
 - 22.11.2026: **Skilltree im Esc-Menü**: überall ansehen, im Camp freischalten.
