@@ -6,6 +6,9 @@
 //   megarig.html?id=<id>&stage=<n>   mega rig prototype (#022): Leyla walks a vehicle from the area „Mega-Rigs“, no savegame
 //   game.html?camp        the game: camp ↔ runs with a savegame (online per login, otherwise in this browser); ?camp&new starts over
 //                         #126 &slot=<n> plays slot 1–3 (else this device's slot); a slot is played with the Datenset it began with
+import { unlockConfig } from '../unlocks.js';   // #184
+import { poiReady } from '../../engine/poi.js';
+import { snapshot as runSnapshot } from '../summary.js';
 import { openStore, withDrafts } from '../store.js';
 import { cloudFiles } from '../cloud_store.js';
 import { browserLoader } from '../browser_loader.js';
@@ -86,7 +89,16 @@ export async function start(parent, hudRoot, loading, opts = {}) {
       return r;
     };
     if (q.has('new')) await box.reset();   // Neues Spiel › Alles zurücksetzen
-    else if (q.has('cycle')) await box.cycle();   // Neues Spiel › Neuer Durchgang: the tech tree stays
+    else if (q.has('cycle')) await box.cycle(q.get('cycle') !== 'fresh');   // Neues Spiel › Neuer Durchgang: the tech tree stays; #184 ?cycle=fresh: the Meta-Baum starts at 0 too
+    if (q.has('new') || q.has('cycle')) { try { const u = new URL(location.href); u.searchParams.delete('new'); u.searchParams.delete('cycle'); history.replaceState(null, '', u); } catch { /* old browser */ } }   // a reload must not start over again
+    // #184 Stufe 0 (Daniel 23.11.2026: „Erster POI“): a brand-new game (Meta-Baum at 0) begins right in the first POI, the camp comes after it
+    let firstRun = false;
+    const UC = unlockConfig(D), m0 = box.save.meta;
+    if ((q.has('new') || q.has('cycle')) && m0 && !m0.all && !(m0.unlocked || []).includes('camp') && UC.firstPoi && poiReady(D, UC.firstPoi).ok) {
+      const node = box.save.map?.nodes?.find(n => n.id === box.save.location);
+      box.save.run = { poi: UC.firstPoi, room: null, seed: UC.firstSeed || 1, location: box.save.location, danger: node?.danger || 1, before: runSnapshot(D, box.save), first: true };
+      firstRun = true;
+    }
     console.info(`Spielstand ${box.where === 'cloud' ? 'online (pro Login)' : 'in diesem Browser'}${box.fresh ? ', neu' : ''}`);
     hud.saveBox = box;
     // another tab or device saved something newer (Lichterketten, 13.11.2026): this tab takes it over and opens the camp fresh
@@ -100,11 +112,12 @@ export async function start(parent, hudRoot, loading, opts = {}) {
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') box.adoptNewer(); });
     window.addEventListener('focus', () => box.adoptNewer());
     // a run that was interrupted (page closed) counts as knocked out: the camp starts, the run loot is gone
-    const run = box.save.run;
+    const run = firstRun ? null : box.save.run;
     if (run) { box.save.run = null; box.save.buffs = []; box.save.buffQ = {}; box.save.inv.grids.backpack.items = []; }   // like knocked out
-    arrive(box.save, D);   // every arrival in the camp is at dusk (Camp › Zeit › Ankunft um)
+    if (!firstRun) arrive(box.save, D);   // every arrival in the camp is at dusk (Camp › Zeit › Ankunft um)
     await box.persist();
     args = { ...args, mode: 'camp', box, banner: run ? ['AvA hat dich heimgebracht', 'Der letzte Run wurde abgebrochen.'] : box.fresh ? ['Willkommen im Camp', 'E benutzt Dinge · H zeigt die Steuerung'] : null };
+    if (firstRun) args = { ...args, mode: 'run', roomId: null, banner: [D.pois[UC.firstPoi]?.name || UC.firstPoi, 'Wo bin ich? AvA? … AvA!'] };   // #184
   }
   game.scene.add('play', PlayScene, true, args);
   window.nomad = installControl(game);   // remote control for Ava and tests

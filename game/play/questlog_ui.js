@@ -2,6 +2,7 @@
 // task, side jobs from the companions (take, follow, hand in). Opened at the warroom (map header) and at the campfire. Looks like the
 // field guide; one grammar: stick/arrows choose, LB/RB or Q switch the tab, A/E does the main thing (take, hand in, follow), back closes.
 // Logic in game/quests.js.
+import { unlocked } from '../unlocks.js';   // #184
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { hints, closeX, keyGlyph } from './ui_nav.js';
@@ -40,7 +41,8 @@ export class QuestLogUI {
   log() { return this.save ? questLog(this.D, this.save) : null; }
   rows(L = this.log()) {
     if (!L) return [];
-    if (this.tab === 'active') return [{ kind: 'main' }, ...(L.tank ? [{ kind: 'tank' }] : []), ...(L.salvage || []).map(q => ({ kind: 'salvage', q })), ...L.active.map(q => ({ kind: 'side', q }))];
+    const U = id => unlocked(this.D, this.save, id);   // #184 Meta-Baum: the search (main quest, tank) from stage 4, salvage with the Mega-Rigs
+    if (this.tab === 'active') return [...(U('search') ? [{ kind: 'main' }, ...(L.tank ? [{ kind: 'tank' }] : [])] : []), ...(U('megarigs') ? (L.salvage || []).map(q => ({ kind: 'salvage', q })) : []), ...L.active.map(q => ({ kind: 'side', q }))];
     if (this.tab === 'log') return this.logView().list.slice(0, LOG_SHOW).map(e => ({ kind: 'log', e }));
     if (this.tab === 'offers') return L.offers.map(q => ({ kind: 'offer', q }));
     return L.done.map(q => ({ kind: 'done', q }));
@@ -80,9 +82,9 @@ export class QuestLogUI {
     const list = el('ol', { class: 'tut-list ql-list' }, ...(R.length ? R.map((r, i) => el('li', { class: (i === this.pick ? 'on' : '') + (r.kind === 'side' && r.q.ready ? ' ready' : '') + (r.kind === 'tank' && L.tank.cond < 45 ? ' warn' : ''), onclick: () => { if (this.pick === i) this.primary(r); else { this.pick = i; this.draw(); } } },
       icon(r.kind === 'main' ? 'flag' : r.kind === 'tank' ? 'heart' : r.kind === 'salvage' ? 'vehicle' : r.kind === 'offer' ? 'speechBubble' : r.kind === 'done' ? 'check' : 'target', 14),
       el('span', { class: 'ql-row' }, el('b', {}, title(r)), el('small', {}, sub(r))), tracked(r) ? el('i', { class: 'ql-star', title: 'Wird verfolgt' }, '◆') : null))
-      : [el('li', { class: 'ql-empty' }, this.tab === 'offers' ? 'Gerade hat niemand etwas für dich.' : 'Noch nichts erledigt.')]));
+      : [el('li', { class: 'ql-empty' }, this.tab === 'offers' ? 'Gerade hat niemand etwas für dich.' : this.tab === 'active' ? 'Gerade nichts zu tun. Frag im Camp herum.' : 'Noch nichts erledigt.')]));
     this.el.replaceChildren(el('div', { class: 'tut-guide ql-box ui-frame' },
-      el('header', {}, icon('list', 20), el('h2', {}, 'Questlog'), el('small', {}, `Die Suche: ${Math.round(L.main.progress * 100)} %`), tabs),
+      el('header', {}, icon('list', 20), el('h2', {}, 'Questlog'), el('small', {}, unlocked(D, this.save, 'search') ? `Die Suche: ${Math.round(L.main.progress * 100)} %` : 'Aufträge aus dem Camp'), tabs),
       el('div', { class: 'tut-main' }, list, R[this.pick] ? this.detail(R[this.pick], L) : el('div')),
       hints([['move', 'wählen'], ['tabs', 'Liste'], ['ok', this.okLabel(R[this.pick])], ['back', 'schließen']], 'Die verfolgte Quest steht als Zielzeile im Bild; ein schwacher Tank geht immer vor'),
       closeX(() => this.close())));

@@ -1,5 +1,6 @@
 // What Leyla does in the camp (#017 split from camp.js): use a workshop, sleep, sit by the fire, the warroom, the van door, driving.
 // Mixed into Camp (game/play/camp.js): the methods keep their `this`, nothing else changes.
+import { unlocked, systemOf } from '../unlocks.js';   // #184
 import { owned, activeMega } from '../mega.js';
 import { synergyAt } from '../synergy.js';
 import { cozyBonus } from '../decor.js';
@@ -33,7 +34,11 @@ export class CampActions {
     const def = this.D.workshops?.[id] || {}, s = this.scene;
     if (this.noPower && def.power < 0 && def.function !== 'warroom' && def.function !== 'tank')
       return s.hud.menu({ title: def.name || id, sub: `Kein Strom: das Rig erzeugt ${this.budget.power.made} ⚡ und braucht ${this.budget.power.used} ⚡. Generator einbauen oder Verbraucher ausbauen (B: Rig umbauen).`,
-        items: [{ label: 'Rig umbauen', primary: true, act: () => s.openBuild() }, { label: 'Zurück', act: () => {} }] });
+        items: [...(unlocked(this.D, this.box.save, 'build') ? [{ label: 'Rig umbauen', primary: true, act: () => s.openBuild() }] : []), { label: 'Zurück', act: () => {} }] });
+    // #184 Meta-Baum: a workshop whose system is not free yet
+    const sys = { kitchen: 'cooking', foodtruck: 'cooking', craft: 'build', vehicle: 'build', cyber: 'cyberware', warroom: 'travel' }[def.function];
+    if (sys && !unlocked(this.D, this.box.save, sys)) { const X = systemOf(this.D, sys); return s.hud.menu({ title: def.name || id, sub: X?.teaser || 'Damit kann Leyla noch nichts anfangen. Vielleicht weiß jemand im Camp mehr.', items: [{ label: 'Zurück', act: () => {} }] }); }
+    if (def.function === 'tank' && !unlocked(this.D, this.box.save, 'search')) return s.hud.menu({ title: def.name || id, sub: 'AvA schläft. Der Tank summt gleichmäßig, alle Lämpchen grün.', items: [{ label: 'Zurück', act: () => {} }] });
     if (def.function === 'sleep') return this.sleep(def, place);
     if (def.function === 'warroom') return this.warroom();
     if (def.function === 'jobs') return this.boardMenu();   // #033 the Auftragsbüro: the notice board as a room in the rig
@@ -126,7 +131,7 @@ export class CampActions {
         const dock = R.drone && place && this.benches?.dockOf(place);
         if (dock && s.drone) { s.drone.dock = { ...dock, until: s.time.now + 3200 }; s.drone.react('cleared'); s.time.delayedCall(3000, done); }
         else s.time.delayedCall(1400, done);
-      } }, ...(def.function === 'chill' && farmEntities(this.D, save).length ? [{ label: 'Freundliches Duell', sub: 'mit einer Entity aus der Bit-Farm · Bindung', icon: 'heart', act: () => this.friendlyDuel() }] : []),
+      } }, ...(def.function === 'chill' && unlocked(this.D, save, 'hacking') && farmEntities(this.D, save).length ? [{ label: 'Freundliches Duell', sub: 'mit einer Entity aus der Bit-Farm · Bindung', icon: 'heart', act: () => this.friendlyDuel() }] : []),
       ...[this.benchWorkerItem(id, place, () => this.restMenu(id, def, place, who)), this.upgradeItem(id, place, () => this.restMenu(id, def, place, who))].filter(Boolean),   // #076 Worker, #078 Ausbau
       { label: 'Zurück', act: () => {} }] });
   }
@@ -206,14 +211,14 @@ export class CampActions {
   vanMenu(ids) {
     const extras = ids.map(w => { const d = this.D.workshops?.[w.id] || {}; return { label: VERB[d.function] || d.name || w.id, icon: d.function === 'sleep' ? 'moon' : d.function === 'kitchen' ? 'light' : 'workbench', act: () => this.use(w.id) }; });
     // #029: salvaged mega rigs you do not live in yet: move aboard from here
-    for (const id of owned(this.box.save).filter(m => m !== activeMega(this.D, this.box.save) && this.D.megarigs?.[m]?.tractor)) extras.push({ label: `Umziehen: ${this.D.megarigs[id].name}`, icon: 'vehicle', act: () => { this.scene.hud.map?.close?.(); this.moveAboard(id); } });
+    if (unlocked(this.D, this.box.save, 'megarigs')) for (const id of owned(this.box.save).filter(m => m !== activeMega(this.D, this.box.save) && this.D.megarigs?.[m]?.tractor)) extras.push({ label: `Umziehen: ${this.D.megarigs[id].name}`, icon: 'vehicle', act: () => { this.scene.hud.map?.close?.(); this.moveAboard(id); } });
     extras.push(...this.traderExtras());   // #183 traders at this place
     this.openMap({ extras, sel: this.box.save.location });
   }
   // #183 Händler an Orten: a button per trader where the rig stands (closed ones say when they open)
   traderExtras() {
     const s = this.scene;
-    return placeTraders(this.D, this.box.save).map(t => ({ label: t.open ? `Handeln: ${t.name}` : `${t.name} · ${t.reason}`, icon: 'coins', disabled: !t.open, act: () => { if (!t.open) return s.hud.toast(t.name, `Hat ${t.reason} geöffnet`, 'info'); s.hud.inv?.close(); setTimeout(() => s.hud.trade?.open(t.key), 0); } }));
+    return placeTraders(this.D, this.box.save).filter(t => unlocked(this.D, this.box.save, this.D.traders?.[t.id]?.unlock || 'trade')).map(t => ({ label: t.open ? `Handeln: ${t.name}` : `${t.name} · ${t.reason}`, icon: 'coins', disabled: !t.open, act: () => { if (!t.open) return s.hud.toast(t.name, `Hat ${t.reason} geöffnet`, 'info'); s.hud.inv?.close(); setTimeout(() => s.hud.trade?.open(t.key), 0); } }));
   }
   // Loadout-Check next to „Hier plündern“ (#016): what Leyla takes along, each line ok or a warning
   loadout() {
@@ -264,8 +269,8 @@ export class CampActions {
     s.hud.menu({ title: 'Lagerfeuer', sub: 'Knistern, Funken, Zeit zum Nachdenken.', items: [
       { label: 'Hinsetzen', sub: 'Die Zeit vergeht, das Feuer heilt', primary: true, act: () => this.sitDown() },
       { label: 'Questlog', sub: [ready ? `${ready} zum Abgeben` : null, n ? `${n} neue Angebote` : null].filter(Boolean).join(' · ') || 'Die Suche, AvAs Tank, Aufträge', act: () => s.hud.quests?.open(ready ? 'active' : n ? 'offers' : 'active') },
-      ...(this.box.save.applicant ? [{ label: `Bewerber: ${this.box.save.applicant.name}`, sub: 'wartet am Feuer und will mitfahren', icon: 'person', act: () => this.applicantMenu() }] : []),   // #085
-      ...((this.box.save.crew || []).length ? [{ label: `Crew (${this.box.save.crew.length})`, sub: 'Leute, Fähigkeiten, Jobs', icon: 'humans', act: () => this.crewMenu() }] : []),
+      ...(this.box.save.applicant && unlocked(this.D, this.box.save, 'crew') ? [{ label: `Bewerber: ${this.box.save.applicant.name}`, sub: 'wartet am Feuer und will mitfahren', icon: 'person', act: () => this.applicantMenu() }] : []),   // #085
+      ...((this.box.save.crew || []).length && unlocked(this.D, this.box.save, 'crew') ? [{ label: `Crew (${this.box.save.crew.length})`, sub: 'Leute, Fähigkeiten, Jobs', icon: 'humans', act: () => this.crewMenu() }] : []),
       { label: 'Zurück', act: () => {} }] });
   }
   // ---------- #085 Crew-Kern: the applicant at the fire, the crew window, jobs at workshops ----------
@@ -314,9 +319,10 @@ export class CampActions {
   // Warroom: the travel map (#007) with the POI here, the places to drive to, and the techtree / Auswerten in its header
   warroom() {
     const s = this.scene, D = this.D, save = this.box.save, extras = [];
-    if (Object.keys(D.techtree || {}).length) extras.push({ label: 'Techtree', icon: 'tree', act: () => { s.hud.inv?.close(); s.hud.tech?.open(); } });
+    const search = unlocked(D, save, 'search');   // #184 Techtree and Auswerten come with stage 4
+    if (search && Object.keys(D.techtree || {}).length) extras.push({ label: 'Techtree', icon: 'tree', act: () => { s.hud.inv?.close(); s.hud.tech?.open(); } });
     const wr = this.rigWorkshop('warroom') || Object.keys(D.workshops || {}).find(k => D.workshops[k].function === 'warroom');
-    if (wr) extras.push({ label: 'Auswerten', icon: 'research', act: () => { s.hud.inv?.close(); s.hud.craft?.open(wr, 'salvage'); } });
+    if (search && wr) extras.push({ label: 'Auswerten', icon: 'research', act: () => { s.hud.inv?.close(); s.hud.craft?.open(wr, 'salvage'); } });
     extras.push({ label: 'Questlog', icon: 'list', act: () => { s.hud.inv?.close(); s.hud.quests?.open(); } });   // #016
     extras.push(...this.traderExtras());   // #183
     this.openMap({ extras });

@@ -6,6 +6,7 @@
 // Per hour: rate × (1 + accel × (100 − cond) / 100) × (1 + days in this run of the game × aging) × bonus (Techtree, < 1 = slower).
 // A rescue on a knock-out costs `rescue` %; is the tank already below that, it is the last rescue: Leyla is saved, AvA dies.
 
+import { unlocked } from './unlocks.js';   // #184
 import { tankMods } from './techtree.js';
 
 export const clockHours = save => (save.day ?? 1) * 24 + (save.hour ?? 0);
@@ -28,7 +29,7 @@ export function rate(D, save, mods = tankMods(D, save)) {
 // catch up with the clock: hour by hour (the rate changes as the condition falls). → the condition lost
 export function update(D, save, mods = tankMods(D, save)) {
   const t = ensureTank(D, save);
-  if (t.dead || D.tank?.enabled === false) { t.at = clockHours(save); return 0; }
+  if (t.dead || D.tank?.enabled === false || !unlocked(D, save, 'search')) { t.at = clockHours(save); return 0; }   // #184: the tank decays from stage 4 (Die Suche)
   const now = clockHours(save), before = t.cond;
   let h = now - t.at;
   while (h > 0 && t.cond > 0) { const step = Math.min(1, h); t.cond = clamp(t.cond - rate(D, save, mods) * step); h -= step; }

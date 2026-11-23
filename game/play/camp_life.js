@@ -1,5 +1,6 @@
 // The camp's life (#017 split from camp.js): wind and fire sound, the companions, their jobs (Questlog).
 // Mixed into Camp (game/play/camp.js): the methods keep their `this`, nothing else changes.
+import { unlocked } from '../unlocks.js';   // #184
 import { nowPlayingFor } from '../now_playing.js';
 import { offers, accept, claim, progressOf, qstate } from '../quests.js';
 import { figureTexture } from './camp.js';
@@ -161,7 +162,7 @@ export class CampLife {
   // #025: a conversation in the dialogue box (name plate, colour, room for a portrait later), not a plain menu
   talk(c) {
     const D = this.D, save = this.box.save, s = this.scene, J = this.jobsOf(c), who = this.talkOf(c.id);
-    const tid = traderOf(D, c.id), A = advanceConfig(D), lends = A.on && A.lender === c.id;   // #182 Händler, Vorschuss
+    const tid = unlocked(D, save, D.traders?.[traderOf(D, c.id)]?.unlock || 'trade') ? traderOf(D, c.id) : null, A = advanceConfig(D), lends = A.on && A.lender === c.id && unlocked(D, save, 'advance');   // #182 Händler, Vorschuss; #184 erst frei
     if (!J.offer.length && !J.ready.length && !J.active.length && !tid && !lends) return this.bark(c, true);
     const rew = q => { const R = q.reward || {}; return [R.reveal ? 'Ein Ort auf der Karte' : null, R.deltas ? `${R.deltas} Δ` : null, ...(R.items || []).map(x => `${x.count || 1}× ${D.items?.[x.item]?.name || x.item}`)].filter(Boolean).join(' · '); };
     const items = [

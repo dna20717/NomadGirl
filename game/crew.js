@@ -7,6 +7,7 @@
 // save.applicant = a person waiting at the fire (Bewerber), or null
 //   job = '<unit>:<at>' a workshop in the rig; the person works there: her skill for that workshop's function adds to the Boni-Bus.
 
+import { unlocked } from './unlocks.js';   // #184
 import { jobFactor } from './morale.js';
 const rng = seed => () => { seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 const lines = v => (Array.isArray(v) ? v : String(v || '').split('\n')).map(x => String(x).trim()).filter(Boolean);
@@ -61,11 +62,11 @@ export function campArrival(D, save, rnd = Math.random) {
   // #183 companions who are not there from the start turn up at the fire from their day (Companions › Kommt ab Tag), once per Durchgang
   save.met ??= [];
   for (const [id, c] of Object.entries(D.companions || {})) {
-    if (!(c.joinDay > 0) || (save.day ?? 1) < c.joinDay || save.met.includes(id) || (save.companions || []).includes(id)) continue;
+    if (!(c.joinDay > 0) || (save.day ?? 1) < c.joinDay || save.met.includes(id) || (save.companions || []).includes(id) || (c.unlock && !unlocked(D, save, c.unlock))) continue;
     save.met.push(id); (save.companions ??= []).push(id); out.joined.push({ id, name: c.name || id, line: c.arriveLine || '' });
   }
   for (const p of crew(save)) if (!p.seen && (p.traits || []).length > 1 && (save.day ?? 1) - (p.day ?? 1) >= C.revealDays) { p.seen = true; out.revealed.push({ name: p.name, trait: trait(D, p.traits[1])?.name || p.traits[1] }); }
-  if (!save.applicant && C.skills.length && (save.day ?? 1) >= C.fireFromDay && rnd() * 100 < C.fireChance) { save.applicant = rollPerson(D, Math.floor(rnd() * 2 ** 31)); out.applicant = save.applicant; }
+  if (!save.applicant && unlocked(D, save, 'crew') && C.skills.length && (save.day ?? 1) >= C.fireFromDay && rnd() * 100 < C.fireChance) { save.applicant = rollPerson(D, Math.floor(rnd() * 2 ** 31)); out.applicant = save.applicant; }
   return out;
 }
 

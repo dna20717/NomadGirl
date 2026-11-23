@@ -3,6 +3,7 @@
 //   Rezeptbuch: known recipes of this kind of workshop with what is on hand (green) or missing (red), "Kochen"/"Herstellen" makes one;
 //               notes in the camp inventories can be read (recipe learnt), companions in the camp give hints for unknown ones.
 //   Experimentieren: click supplies to put one into the pot (right click or click in the pot takes one out), "Ausprobieren" tries it.
+import { unlocked } from '../unlocks.js';   // #184
 import { madeOnce } from '../achievements.js';
 import { el } from '../ui.js';
 import { hints, NavCursor } from './ui_nav.js';
@@ -100,7 +101,7 @@ export class CraftUI {
     if (this.stationOnly) { this.stationOnly = false; this.mode = 'done'; }
     this.draw();
   }
-  canSalvage() { return SALVAGE.includes(functionOf(this.D, this.ws)); }
+  canSalvage() { return SALVAGE.includes(functionOf(this.D, this.ws)) && unlocked(this.D, this.save, 'search'); }   // #184 Zerlegen from stage 4
   setMode(m) { if (this.mode === m) return; this.mode = m; this.cursor.i = -1; this.draw(); }
   close() { cancelAnimationFrame(this.raf); this.station = null; this.el.hidden = true; this.tip.hidden = true; this.pot = {}; this.cursor.hide(); this.cursor.start = null; this.host.closed?.(); }
   nav(ui) {

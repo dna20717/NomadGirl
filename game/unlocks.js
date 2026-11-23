@@ -15,6 +15,7 @@
 // No save (test room, POI test mode) or Freischaltungen off = everything free.
 
 import { stock } from './crafting.js';
+import { fits } from './rig.js';
 const list = v => (Array.isArray(v) ? v : String(v ?? '').split(',')).map(x => String(x).trim()).filter(Boolean);
 
 export function unlockConfig(D) {
@@ -110,7 +111,7 @@ export function checkUnlocks(D, save, ctx = gameCtx(D, save)) {
         m.goals[k] = true; m.pots[s.id] = (m.pots[s.id] || 0) + (g.meta ?? 1); m.points += g.meta ?? 1; changed = true;
       });
       const any = s.goals.some((g, i) => m.goals[`${s.id}:${i}`]);
-      if (s.stage <= st && any && (m.pots[s.id] || 0) >= s.cost) { m.unlocked.push(s.id); fresh.push({ id: s.id, name: s.name, moment: s.moment, grant: s.grant, stage: s.stage }); changed = true; }
+      if (s.stage <= st && any && (m.pots[s.id] || 0) >= s.cost) { m.unlocked.push(s.id); fresh.push({ id: s.id, name: s.name, moment: s.moment, grant: s.grant, stage: s.stage, description: s.description }); changed = true; }
     }
     const now = stageOf(D, save);
     if (now !== m.stage) { m.stage = now; changed = true; }
@@ -162,4 +163,17 @@ export function hiddenAs(D, save, itemId) {
   const taught = t.teaches ? D.items?.[D.recipes?.[t.teaches]?.result]?.category : null;   // a blueprint for a hidden thing hides with it
   for (const s of unlockConfig(D).systems) if ((s.items.includes(t.category) || (taught && s.items.includes(taught))) && !unlocked(D, save, s.id)) return s.id;
   return null;
+}
+
+// the workshops a freed system brings (Freischaltung › Geschenk): into a free place of the rig, else onto the scrapyard → [{ id, where }]
+export function grantWorkshops(D, save, ids = []) {
+  const out = [], rig = save.rig;
+  for (const id of ids) {
+    if (!D.workshops?.[id]) continue;
+    let done = false;
+    for (let ui = 0; ui < rig.units.length && !done; ui++) for (let at = 0; at < 12 && !done; at++) if (fits(D, rig, ui, at, id)) { rig.units[ui].workshops.push({ id, at }); done = true; }
+    if (!done) (rig.spare.workshops ??= []).push(id);
+    out.push({ id, where: done ? 'rig' : 'spare' });
+  }
+  return out;
 }

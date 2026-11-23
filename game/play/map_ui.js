@@ -2,6 +2,7 @@
 // Zielen, die zur Wahl stehen“). Opens at the warroom and at the van door. Left the map (game/map_render.js), right the chosen place:
 // kind, danger, loot hints, cost of the drive, and the action (Hinfahren, Hier plündern). One UI grammar (ui_nav.js):
 // stick / arrows pick a place in that direction, ok = the action, back = close; mouse: hover / click a place, click the button.
+import { unlocked, systemOf } from '../unlocks.js';   // #184
 import { activeMega } from '../mega.js';
 import { repOf, levelOf, levelName, gangOfPlace, gangInfo, rivalsOf } from '../reputation.js';
 import { fronts } from '../turf_war.js';
@@ -91,6 +92,7 @@ export class MapUI {
     if (n.dock) return { label: 'Andockpunkt', disabled: activeMega(this.D, save) ? 'Mega-Rig: die Überfahrt kommt bald' : 'Zu gefährlich für unsere kleinen Fahrzeuge · nur mit einem Mega-Rig' };
     if (id === save.location) return n.poi && this.D.pois?.[n.poi] ? { label: 'Hier plündern', icon: 'target', act: () => { this.close(); this.host.plunder(); } } : null;
     // #014: also further away, over several legs along known roads (Zwischenfälle unterwegs)
+    if (!unlocked(this.D, save, 'travel')) return { label: 'Hinfahren', disabled: systemOf(this.D, 'travel')?.teaser || 'Der Van springt noch nicht an' };   // #184 Meta-Baum
     const cost = this.host.cost(id);
     if (!cost || cost.route?.[cost.route.length - 1] !== id || (cost.route.length > 2 && !cost.legs?.length)) return { label: 'Kein Weg bekannt', disabled: 'Keine bekannte Straße dorthin' };
     const legs = cost.legs?.length || 1, why = this.host.blocked(cost);

@@ -13,7 +13,7 @@
   "stage": 1,
   "hide": "hidden",
   "description": "Das Inventar-Fenster (I / Select): Raster, Drehen, Ausrüsten.",
-  "goals": [{"kind": "counter", "counter": "kills", "n": 1}],
+  "goals": [{"kind": "counter", "counter": "kills", "n": 1},{"kind": "flag", "flag": "beute"}],
   "moment": {"title": "Der hatte was dabei", "text": "Leyla, der Typ hatte Sachen in den Taschen. Schau in deinen Rucksack: I oder Select."}
  },
  "camp": {

@@ -1,4 +1,6 @@
 // HUD as HTML over the canvas: health, ammo, dash, time, kills, Δ, banners and the controls overlay.
+import { tree as metaTree, setUnlocked, unlockAll, resetMeta, stageOf, unlocked } from '../unlocks.js';   // #184 Cheats › Meta-Baum
+const HIDE_LABEL = { out: 'ganz raus', hidden: 'unsichtbar', teaser: 'Teaser', quest: 'als Quest' };
 import { activeEffects, effectsKey } from '../effects.js';
 import { hapticsOn, setHaptics } from '../haptics.js';
 import { placeOf } from '../worldmap.js';
@@ -129,6 +131,7 @@ export class Hud {
     this.menu({ title: 'Neues Spiel?', sub: `${this.slotLabel()}: Ein neuer Durchgang beginnt klein: Rig, Inventar, Δ, Tank und Uhr. Der Techtree bleibt, es sei denn, du setzt ausdrücklich alles zurück.`,
       items: [{ label: 'Abbrechen', sub: 'Weiterspielen', act: () => {} },
         { label: 'Neuer Durchgang', sub: 'Techtree bleibt, alles andere fängt neu an', act: () => { location.href = `game.html?camp&slot=${n}&cycle`; } },
+        ...(this.saveBox?.save?.meta && !this.saveBox.save.meta.all ? [{ label: 'Neuer Durchgang, Erinnerungen vergessen', sub: 'Wie oben, aber Leyla lernt alles wieder von vorn (Bewegung, Plündern, Reisen …)', act: () => { location.href = `game.html?camp&slot=${n}&cycle=fresh`; } }] : []),   // #184 Daniel: „beim Neustart wählbar“
         { label: 'Alles zurücksetzen', sub: 'Auch der Techtree ist weg. Der alte Stand lässt sich im Hauptmenü noch einmal zurückholen', act: () => { location.href = `game.html?camp&slot=${n}&new`; } }] });
   }
   // #104 the Werte live in the inventory (Leyla › Werte)
@@ -159,7 +162,7 @@ export class Hud {
       { label: 'Steuerung', sub: 'Tasten und Controller', act: () => this.toggleHelp(true) },
       { label: 'Feldhandbuch', sub: 'Alle Lektionen mit Clips', act: () => setTimeout(() => this.tut?.openGuide(), 0) },
       ...(sc.box ? [{ label: 'Achievements', sub: 'Erreicht, offen, Trophäen', act: () => setTimeout(() => this.ach?.open(), 0) }, { label: 'Logbuch', sub: 'Alle Meldungen mit Uhrzeit', act: () => setTimeout(() => this.logbook(), 0) }] : []),
-      ...(sc.box && Object.keys(sc.data_?.techtree || {}).length ? [{ label: 'Skilltree', sub: sc.mode === 'camp' ? 'Techtree: freischalten mit Vorräten aus dem Rig' : 'Techtree ansehen · freischalten im Camp', act: () => setTimeout(() => { this.inv?.close?.(); this.tech?.open(); }, 0) }] : []),
+      ...(sc.box && unlocked(sc.data_, sc.box.save, 'search') && Object.keys(sc.data_?.techtree || {}).length ? [{ label: 'Skilltree', sub: sc.mode === 'camp' ? 'Techtree: freischalten mit Vorräten aus dem Rig' : 'Techtree ansehen · freischalten im Camp', act: () => setTimeout(() => { this.inv?.close?.(); this.tech?.open(); }, 0) }] : []),
       ...(sc.box ? [{ label: 'Werte', sub: 'Grundwerte, Boni und ihre Quellen · U', act: () => setTimeout(() => this.openValues(), 0) }] : []),   // #091 → #104 im Inventar
       ...(this.radio && sc.box && sc.mode !== 'run' && this.radio.C.stations.length ? [{ label: `Radio: ${this.radio.on ? this.radio.station?.name : 'aus'}`, sub: 'Sender wählen · N', act: () => setTimeout(() => this.radio.menu(this), 0) }] : []),   // #090
       { label: 'Optionen', sub: 'Ton, Schießstil', act: () => setTimeout(() => this.optionsMenu(), 0) },
@@ -177,7 +180,21 @@ export class Hud {
     const sc = this.scene; if (!sc?.box) return;
     this.menu({ title: 'Cheats', sub: 'Nur für dich · gilt sofort für den Spielstand', items: [
       ...CHEATS.map(c => ({ label: c.label, sub: c.sub, act: () => { const line = runCheat(sc.data_, sc.box.save, c.id); if (c.id === 'heal' && sc.leyla) { sc.leyla.health = sc.leyla.maxHealth; sc.box.save.health = sc.leyla.maxHealth; } sc.box.persist?.(); this.toast('Cheat', line || c.label, 'info', 2200); setTimeout(() => this.cheatMenu(), 0); } })),
+      { label: 'Meta-Baum', sub: 'Freischaltungen (#184): sehen, umschalten, alles frei, zurück auf 0', icon: 'lock', act: () => setTimeout(() => this.metaMenu(), 0) },
       { label: 'Fertig', icon: 'x', act: () => { this.campKey = null; } }] });
+  }
+  // Cheats › Meta-Baum (#184, Daniel 23.11.2026: „für den normalen Spieler komplett unsichtbar, zur besseren Testbarkeit aber im Moment sichtbar“)
+  metaMenu() {
+    const sc = this.scene, D = sc?.data_, save = sc?.box?.save; if (!save) return;
+    const T = metaTree(D, save), m = save.meta || {}, again = () => { sc.box.persist?.(); this.campKey = null; setTimeout(() => this.metaMenu(), 0); };
+    const items = [];
+    for (const st of T) for (const x of st.systems) items.push({ label: `${x.free ? '✓' : st.open ? '○' : '·'} ${st.i} ${st.name} · ${x.name}`, sub: [x.free ? 'frei' : st.open ? 'offen' : 'Stufe zu', HIDE_LABEL[x.hide] || '', x.cost ? `Meta ${x.pot}/${x.cost}` : '', x.goals.map(g => (g.done ? '✓ ' : '') + g.text).join(', ')].filter(Boolean).join(' · '),
+      act: () => { setUnlocked(D, save, x.id, !x.free); sc.unlockTick?.(); again(); } });
+    this.menu({ title: 'Meta-Baum', sub: m.all ? 'Alles frei (alter Spielstand oder Cheat)' : `Stufe ${stageOf(D, save)} · ${(m.unlocked || []).length} frei · ${m.points || 0} Meta gesammelt · Klick schaltet um`, items: [
+      { label: 'Alles frei', icon: 'check', act: () => { unlockAll(D, save); again(); } },
+      { label: 'Zurück auf Stufe 0', icon: 'clock', act: () => { resetMeta(D, save); again(); } },
+      ...items,
+      { label: 'Zurück', icon: 'x', act: () => setTimeout(() => this.cheatMenu(), 0) }] });
   }
   // Menü › Optionen: sound and the shooting style (design.md: Klassisch | Cells-like); the style is kept in this browser
   optionsMenu() {
@@ -213,7 +230,7 @@ export class Hud {
     this.modeName = mode; this.save = save; this.D = D;
     this.root.dataset.mode = mode;
     this.campEl.hidden = !save;
-    this.buildBtn.hidden = mode !== 'camp';
+    this.buildBtn.hidden = mode !== 'camp' || !unlocked(D, save, 'build');   // #184 Meta-Baum
     this.openBtn.hidden = true;   // Daniel, 12.11.2026: „Rig offen oder zu kann dann im Bau-Menü sein“ (build_mode.js bar)
     this.prompt(null);
     this.closeMenu();
@@ -513,6 +530,7 @@ export class Hud {
         this.goalAt = now;
         const before = this.goal;
         try { this.goal = questGoal(D, sv); } catch { this.goal = null; }
+        if (this.goal && !this.goal.quest && !unlocked(D, sv, 'search')) this.goal = null;   // #184: the search for the cure shows from stage 4
         try { scene.camp?.questMarks?.(); scene.camp?.boardNotes?.(); } catch { /* camp not ready */ }   // #017: „!“ / „✓“ over the companions stay true (a job done while cooking)
         // progress on the way (#016): a node on the way was unlocked → a gold toast with how far the search is
         if (before && this.goal && before.quest && before.quest === this.goal.quest && this.goal.kind === 'ready' && before.kind !== 'ready') this.scene?.sfx?.('jingle_quest'), this.toast(`Auftrag erledigt: ${this.goal.text.replace(/ · erledigt$/, '')}`, 'Abgeben im Questlog (Lagerfeuer, Warroom)', 'good');
@@ -523,6 +541,7 @@ export class Hud {
       const key = [sv.day, sv.hour, sv.location, sv.deltas, sv.debt?.amount || 0, sv.fuel, sv.food, effectsKey(fx), this.modeName, vit ? `${Math.round(sv.tank.cond)}${sv.tank.dead}` : '', G ? G.text + G.sub : ''].join('|');
       if (key !== this.campKey) {
         this.campKey = key;
+        this.buildBtn.hidden = this.modeName !== 'camp' || !unlocked(D, sv, 'build');   // #184: frees during the camp
         // #016 Run-HUD aufräumen: in the run only what matters in the run (AvA's vital signs, buffs, the goal); clock, Δ, fuel and
         // supplies of the camp stay in the camp (the run shows its own Δ top right)
         this.campEl.replaceChildren(

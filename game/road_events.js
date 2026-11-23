@@ -14,6 +14,7 @@
 // four legs. Situations with „Nur als Folge“ only come that way, „needs“/„not“ ask for Merker (who was helped turns up again).
 // Placeholders also {gang} {rival} {motto}.
 // No DOM.
+import { unlocked } from './unlocks.js';   // #184
 import { mapBrands, valueOf } from './brands.js';
 import { brandDiscount, influencer } from './brand_perks.js';
 import { gangs, repOf, levelOf, gangOfPlace, repPrice, rivalsOf } from './reputation.js';
@@ -87,7 +88,8 @@ export function generateEncounter(D, rnd = Math.random, ctx = {}) {
   // answers: those of the situation that fit the mood, in the situation's order, at most „Antworten höchstens“; always one that costs nothing to try
   const friendly = M ? !!M.friendly : true, hostile = M ? !!M.hostile : true;
   const fits = a => !a.when || a.when === 'any' || (a.when === 'friendly' && friendly) || (a.when === 'hostile' && hostile);
-  let A = answerRefs(S).map(r => { const a = C.answers.find(x => x.id === r.id); return a && { ...a, next: r.next }; }).filter(Boolean).filter(fits);
+  let A = answerRefs(S).map(r => { const a = C.answers.find(x => x.id === r.id); return a && { ...a, next: r.next }; }).filter(Boolean).filter(fits)
+    .filter(a => !save || ((!a.trade || unlocked(D, save, D.traders?.[a.trade]?.unlock || 'trade')) && (!(a.prisoner || a.dark || a.hurtPrisoners) || unlocked(D, save, 'power'))));   // #184 Meta-Baum: no stand before Handel, no prisoners before Machtspiele
   // #064 a Markenstand sells up to three things of one brand (the Influencer's, if it makes things), cheaper with the Influencer buff
   if (S.shop === 'brand') {
     const makes = b => Object.keys(D.items || {}).filter(id => { const t = D.items[id]; return t.brand === b && (t.value || 0) > 0 && !(t.tags || []).some(x => x === 'quest' || x === 'trophy'); });

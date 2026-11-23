@@ -1,4 +1,6 @@
 // The play scene: builds a room from its layout, places Leyla and the enemies, runs input, physics, combat and HUD.
+import { unlocked } from '../unlocks.js';   // #184
+import { worldFlags } from '../conditions.js';
 import { MapUI } from './map_ui.js';
 import { makeSfx } from './sfx.js';
 import { placeOf, threatOf } from '../worldmap.js';
@@ -591,6 +593,7 @@ export class PlayScene extends Phaser.Scene {
   }
   openBuild() {
     if (this.mode !== 'camp' || !this.box || this.hud.build.active) return;
+    if (!this.U('build')) return;   // #184 Meta-Baum: Rig bauen comes with Schraube's „Kabelsalat“
     // #134 (Glitch: Karte und Bau-Modus übereinander): every other window closes first
     for (const w of [this.hud.inv, this.hud.craft, this.hud.tech, this.hud.map, this.hud.quests, this.hud.trade, this.hud.ach, this.hud.tut]) if (w?.isOpen) w.close?.();
     this.hud.closeMenu?.();
@@ -640,7 +643,9 @@ export class PlayScene extends Phaser.Scene {
   }
   // the ground: one bundle at a time; with several in reach L1/R1 (cursor on the ground) or the arrows in the header page through them
   // (Daniel, 13.11.2026: „Boden-Inventar scrollbar mit Schulterbuttons, das macht es einfacher, wenn da viel Zeug liegt“)
+  U(id) { return unlocked(this.data_, this.box?.save, id); }   // #184 Meta-Baum: is the system free (no savegame = everything)
   openFloor(page = 0) {
+    if (this.box?.save && !worldFlags(this.box.save).includes('beute')) worldFlags(this.box.save).push('beute');   // #184 the first loot frees Rucksack & Inventar
     const all = this.loot.inReach(), n = all.length, i = n ? ((page % n) + n) % n : 0, pile = n ? all[i] : this.loot.floor();
     const inv = this.hud.inv, keep = inv.isOpen && inv.other?.kind === 'floor';
     inv.open({ key: 'floor', title: this.loot.piles.includes(pile) ? 'Boden · Beute' : 'Boden', grid: pile.grid, kind: 'floor', pile, page: i, pages: Math.max(1, n),
@@ -661,7 +666,7 @@ export class PlayScene extends Phaser.Scene {
     const inv = this.hud.inv;
     if (!inv) return;
     if (input.inventory.pressed) {
-      if (inv.isOpen) inv.close(); else if (this.mode === 'run' || this.loot?.nearest()) this.openFloor(); else inv.open();
+      if (inv.isOpen) inv.close(); else if (this.mode === 'run' || this.loot?.nearest()) this.openFloor(); else if (this.U('inventory')) inv.open();   // #184 Meta-Baum
     }
     if (!inv.isOpen) return;
     const o = inv.other;
@@ -870,6 +875,7 @@ export class PlayScene extends Phaser.Scene {
       if (this.hud.feedbackOpen) { this.physics.world.pause(); this.hud.update(this, time); return; }
     }
     this.padMenus(input, Math.min(delta, 50));
+    if (this.box && (this.unlockN = (this.unlockN || 0) + 1) % 60 === 0) this.unlockTick?.();   // #184 Meta-Baum, once a second
     this.hud.tut?.tick(performance.now()); this.hud.tut?.poll(this.now);   // field guide (#011)
     // Esc / Start: closes what is open (inventory, controls), otherwise the pause menu (Daniel, 11.11.2026: controls hidden in a menu)
     if (input.help.pressed) {

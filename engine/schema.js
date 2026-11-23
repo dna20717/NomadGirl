@@ -1580,7 +1580,7 @@ export const AREAS = {
     row: (x, p) => `${p?.data.companions?.[x.keeper]?.name || 'ohne Figur'} · zahlt ${x.rate?.[0] ?? 35}–${x.rate?.[1] ?? 70} % · Kasse ${x.cash ?? 300} Δ`,
     sections: [
       { title: 'Händler', fields: [NAME, select('kind', 'Art', [['', 'Im Camp (Standard)'], ['camp', 'Im Camp (mit Figur)'], ['road', 'Auf der Straße (aus einem Zwischenfall)'], ['place', 'An Orten der Reisekarte']], { hint: '#183: Camp = „Reden“ mit der Figur → Handeln. Straße = eine Antwort im Ereignis-Baukasten mit „Händler“ öffnet ihn, jedes Mal frische Ware. Orte = Knopf „Handeln“ auf der Reisekarte am Van und im Warroom, wo das Rig steht' }),
-        ref('keeper', 'Figur', 'companions', { hint: 'Im Camp: wer den Laden führt; „Reden“ mit ihr bietet „Handeln“ an' }), area_('greeting', 'Begrüßung'),
+        ref('keeper', 'Figur', 'companions', { hint: 'Im Camp: wer den Laden führt; „Reden“ mit ihr bietet „Handeln“ an' }), ref('unlock', 'Erst mit Freischaltung', 'unlocks', { hint: '#184: leer = Handel' }), area_('greeting', 'Begrüßung'),
         ref('brand', 'Marke', 'brands', { hint: 'Für „Ware der Marke“: an Orten seine Marke (Ghostwire). Auf der Straße kommt die Marke aus dem Zwischenfall' }), num('brandStock', 'Ware der Marke', { min: 0, hint: 'So viele Dinge, die die Marke herstellt, legt er zusätzlich aus' })] },
       { title: 'Wo (an Orten)', when: x => x.kind === 'place', fields: [refs('at.pois', 'Nur an POIs', 'pois', { hint: 'Leer = überall' }), text('at.regions', 'Nur in Regionen', { hint: 'Namen der Regionen der Reisekarte, Komma; leer = überall' }),
         num('at.chance', 'Chance je Ort', { unit: '%', min: 0, max: 100, hint: 'Je Ort und Durchgang einmal gewürfelt' }), select('at.time', 'Offen', [['any', 'immer'], ['day', 'tagsüber'], ['night', 'nachts (20–5 Uhr)']])] },
@@ -1612,6 +1612,7 @@ export const AREAS = {
         lines('craftLines.hit', 'Beim Kochen/Craften: Treffer', { hint: 'Sagt der Companion, wenn an seiner Werkstatt etwas gelingt (eine Zeile pro Spruch)' }),
         lines('craftLines.miss', 'Beim Kochen/Craften: Fehlschlag'),
         color('color', 'Platzhalter-Farbe', { hint: 'Solange es kein Aussehen gibt, steht hier eine Figur aus Code' }), num('height', 'Größe', { unit: 'px', min: 40 }),
+        ref('unlock', 'Erst mit Freischaltung', 'unlocks', { hint: '#184: kommt erst, wenn dieses System im Meta-Baum frei ist (Lucky: „lucky“)' }),
         num('joinDay', 'Kommt ab Tag', { min: 1, hint: '#183: nicht von Anfang an im Camp; taucht ab diesem Tag beim Ankommen im Camp am Feuer auf (z. B. Lucky Ferro). Leer = nur über den Start bzw. Ereignisse' }),
         area_('arriveLine', 'Erster Satz', { hint: 'Was er beim Auftauchen sagt' })] },
     ],

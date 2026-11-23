@@ -105,7 +105,8 @@
    {"item": "kabelbaum", "chance": 30, "count": [1, 2]},
    {"item": "zahnraeder", "chance": 30, "count": [1, 2]},
    {"item": "zettel_rohrpistole", "chance": 10, "count": [1, 1]}
-  ]
+  ],
+  "unlock": "trade"
  },
  "markenstand": {
   "name": "Markenstand",
@@ -118,7 +119,8 @@
   "brandStock": 5,
   "stockCount": [0, 0],
   "buys": ["junk", "valuable"],
-  "stock": []
+  "stock": [],
+  "unlock": "trade"
  },
  "papierhaendler": {
   "name": "Papier & Pläne",
@@ -143,7 +145,8 @@
    {"item": "bauplan_herzpumpe", "chance": 10, "count": [1, 1]},
    {"item": "bauplan_federbeine_mk2", "chance": 10, "count": [1, 1]},
    {"item": "bauplan_heilgel_haut", "chance": 10, "count": [1, 1]}
-  ]
+  ],
+  "unlock": "trade"
  },
  "schwarzmarkt": {
   "name": "Schwarzmarkt",
@@ -168,7 +171,8 @@
    {"item": "greifarm", "chance": 10, "count": [1, 1]},
    {"item": "plattentraeger", "chance": 10, "count": [1, 1]},
    {"item": "notfall_relais", "chance": 20, "count": [1, 1]}
-  ]
+  ],
+  "unlock": "power"
  },
  "ghostwire": {
   "name": "Ghostwire",
@@ -195,6 +199,7 @@
    {"item": "chip", "chance": 50, "count": [1, 3]},
    {"item": "bauplan_overclock_chip", "chance": 10, "count": [1, 1]}
   ],
-  "brand": "ghostwire"
+  "brand": "ghostwire",
+  "unlock": "power"
  }
 }

@@ -1,5 +1,6 @@
 // Events of the play scene (#017 split from scene.js): knock-out, waking up, the dropped backpack, notes and achievements, kills.
 // Mixed into PlayScene (game/play/scene.js): the methods keep their `this`, nothing else changes.
+import { checkUnlocks, grantWorkshops } from '../unlocks.js';   // #184
 import { gangWar } from '../turf_war.js';
 import { tickMorale } from '../morale.js';
 import { catchUp, cellKeys } from '../prisoners.js';
@@ -156,6 +157,28 @@ export class SceneEvents {
     this.announce([...news.filter(id => D.achievements[id]).map(info), ...now]);
   }
   // #085 arriving: a hidden trait shows, someone may wait at the fire
+  // #184 Meta-Baum: once a second the goals are checked; a freed system comes with its story moment (who says what) and its gifts
+  unlockTick() {
+    const D = this.data_, save = this.box?.save;
+    if (!save?.meta || save.meta.all) return;
+    const fresh = checkUnlocks(D, save);
+    if (!fresh.length) return;
+    let built = false;
+    fresh.forEach((f, i) => {
+      const g = f.grant?.workshops?.length ? grantWorkshops(D, save, f.grant.workshops) : [];
+      if (g.some(x => x.where === 'rig')) built = true;
+      const M = f.moment || {}, who = M.who ? D.companions?.[M.who]?.name || M.who : 'AvA';
+      const gifts = g.map(x => `${D.workshops[x.id]?.name || x.id} ${x.where === 'rig' ? 'steht jetzt im Rig' : 'liegt auf dem Schrottplatz'}`);
+      this.time.delayedCall(i * 1400, () => {
+        this.hud.toast(M.title || `Neu: ${f.name}`, [M.text ? `${who}: „${M.text}“` : f.description, ...gifts].filter(Boolean).join(' · '), 'good', 9000);
+        this.sfx?.('jingle_quest');
+        if (!M.who) this.drone?.react?.('curious');
+      });
+    });
+    if (built && this.mode === 'camp') this.camp?.drawRig?.();
+    this.hud.campKey = null;
+    this.box.persist?.();
+  }
   crewNews() {
     // #102 Gangs kämpfen selbst: what changed hands at the fronts while Leyla was away
     const war = gangWar(this.data_, this.box.save);
