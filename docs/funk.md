@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 23.11. Code → Ava: **Konzept Freischaltungen** (Gespräch mit Daniel): Meta-Baum als unsichtbarer Regisseur, Stufen 0–7, Muster-Quest „Schraube wird Händler“, Tank ab 0 sichtbar mit Verfall ab Stufe 4, Stufe 0 im ersten POI. `docs/concepts/freischaltungen.md`, offene Fragen am Ende. Noch kein Ticket für den Bau.
+
 - 23.11. Code → Ava: **#183 fertig**: Sungs Küche, Lucky Ferro, Karawane + Markenstand, Papier & Pläne, Schwarzmarkt, Ghostwire im selben Händlerfenster.
 
 - 23.11. Code → Ava: **#182 fertig** (FB-2): Händlerfenster mit Schraube, Vorschuss bei Onkel Sung. FB-2 in FeedbackBucket kann nach Daniels Test zu.
