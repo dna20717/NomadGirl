@@ -21,6 +21,7 @@ const shot = async n => { if (!shots) return; fs.mkdirSync('output', { recursive
 // helpers inside the page
 await ev(() => {
   nomad.take(); nomad.step(30);
+  { const S = nomad.save(); S.quests ??= { active: {}, done: {}, tracked: null }; S.quests.done ??= {}; S.quests.done.sung_zutaten = { day: 1 }; }   // #184 „Sungs Suppe“ comes after „Fleisch mit Meinung“
   window.c = {
     to(name) { nomad.goTo(name); return nomad.state().prompt; },
     use() { nomad.step(1, [], ['grab']); return nomad.menu(); },
@@ -86,7 +87,7 @@ check('Questlog: Kupferkabel da → abgeben, Belohnung, Kabel weg, wieder Hauptq
 s = await ev(() => { const cp = game.scene.getScene('play').camp, sch = cp.companions.find(x => x.id === 'schraube'); cp.questMarks(); const mark = sch.markKind, hint = sch.spot.hint;
   nomad.goTo('Schraube'); const m = c.use(); nomad.choose('Auftrag: Geier'); const sub = [...document.querySelectorAll('.hud-talk .hud-item small')].map(e => e.textContent).join(' '); nomad.choose('Annehmen'); nomad.step(3);
   return { mark, hint, menu: m?.items.map(i => i.label), sub, active: Object.keys(nomad.save().quests.active), mark2: sch.markKind }; });
-check('Companions: „!“ über Schraube, im Gespräch den Folgeauftrag annehmen (#017)', s.mark === 'offer' && s.hint === 'Reden · neuer Auftrag' && s.menu?.[0] === 'Auftrag: Geier rupfen' && /Belohnung/.test(s.sub || '') && s.active.includes('geier_rupfen') && !s.mark2, s);
+check('Companions: „!“ über Schraube, im Gespräch den Folgeauftrag annehmen (#017)', s.mark === 'offer' && s.hint === 'Reden · neuer Auftrag' && s.menu?.[0] === 'Auftrag: Geier rupfen' && /Belohnung/.test(s.sub || '') && s.active.includes('geier_rupfen') && (!s.mark2 || s.menu.includes('Auftrag: Ein Stand braucht Ware')), s);   // #184: „Ein Stand braucht Ware“ also follows „Kabelsalat“
 p = await ev(() => c.to('Lagerfeuer'));
 s = await ev(() => { game.scene.getScene('play').leyla.health = 40; c.use(); nomad.choose('Hinsetzen'); nomad.step(240); const st = nomad.state(), sp = game.scene.getScene('play').leyla.sprite; return { st, flip: sp.flipX, frame: sp.frame.name, prompt: st.prompt }; });
 check('E am Feuer: Leyla setzt sich und zockt, schaut zum Feuer', s.st.leyla.state === 'sit' && s.prompt === 'Aufstehen · Lagerfeuer' && Number(s.frame) >= 6, s);
