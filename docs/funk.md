@@ -343,7 +343,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #182 Händlerfenster (Schraube zuerst) + Vorschuss bei Onkel Sung (FB-2)
-- **Status:** offen · angelegt 23.11. von Ava (aus Feedback FB-2, Fragen mit Daniel per Auswahl)
+- **Status:** läuft (23.11.) · angelegt 23.11. von Ava (aus Feedback FB-2, Fragen mit Daniel per Auswahl)
 - **Für:** Code
 - **Lesen:** FB-2 in FeedbackBucket, `docs/crew.md` (Schraube, Onkel Sung), `docs/features/inventory.md` (Raster, Controller ohne Zeiger), `docs/features/rig.md` (Händler-Platz, Katalog), `game/play/scene_runs.js` `endRun` (Auszahlung), `docs/features/progression.md` › Questlog.
 - **Anlass (Daniel, FB-2, 23.11.2026):** „Wir brauchen eine Möglichkeit Deltas zu verdienen OHNE POI zu grinden. Geld borgen beim Onkel und Items verkaufen an Schraube (viel schlechtere Preise zum Start, aber besser als nichts).“
