@@ -151,13 +151,15 @@ Damit ein System wirklich weg ist, schweigt es an jeder Stelle, bis es frei ist:
 - **Schraube:** „ist von Anfang an dabei, aber er wird erst später zum Händler“: Schraube steht ab dem Grund-Camp am Feuer (Reden, Sprüche, Aufträge); „Handeln“ gibt es erst nach der Questkette „Schraube wird Händler“.
 - **Gangs:** „still mitzählen“: Gangs bleiben als Gegner und Namen, der Ruf zählt unsichtbar mit; Anzeige, Gang-Aufträge, Frieden, Ketten und Revierkrieg kommen mit „Machtspiele“.
 
-## Offene Fragen an Daniel
+## Entschieden in Runde 3 (Daniel, 23.11.2026)
 
-- **Start-Rig:** Was steht zu Beginn im Rig (Rückfrage Daniel: „leer?“)? Siehe Runde 3 im Chat.
-- **Zahlen** (Rückfrage Daniel: „welche Zahlen?“): Schwellen der Ziele, Meta-Preise, Freischaltungen je Stufe. Siehe Runde 3 im Chat.
+- **Start-Rig: nur das Nötigste.** Van + Wohnanhänger mit Schlafkoje und Lagerregal. Kochnische (Geschenk von Sung mit seiner Quest), Werkbank (von Schraube mit „Kabelsalat“) und Warroom (mit dem Reisen) kommen mit ihrer Freischaltung ins Rig bzw. auf den Schrottplatz.
+- **Zahlen: Startwerte von Ava** in der Werkstatt (Bereich Freischaltungen), Feinschliff nach Daniels erstem Durchspielen.
+
+Damit sind alle Fragen beantwortet.
 
 ## Nächste Schritte
 
-1. Daniel liest das Doc, beantwortet die offenen Fragen.
-2. Ticket für den Bau: Bereich Freischaltungen + `unlocks.js` + Cheats-Ansicht + die Türen der Stufen 0–3 + Questkette „Schraube wird Händler“.
-3. Stufen 4–7 in einem zweiten Ticket, danach Spieltest der ersten Stunde mit dem Feedback-Knopf.
+1. ~~Daniel beantwortet die offenen Fragen~~ (erledigt, Runden 2 und 3).
+2. Ticket #184: Bereich Freischaltungen + `unlocks.js` + Cheats-Ansicht + die Türen der Stufen 0–3 + Questkette „Schraube wird Händler“.
+3. Ticket #185: Stufen 4–7 inklusive „ganz raus“, danach Spieltest der ersten Stunde mit dem Feedback-Knopf.

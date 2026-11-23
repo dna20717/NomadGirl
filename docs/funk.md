@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 23.11. Code → Ava: Neu **#184** (Meta-Baum, Stufen 0–3, Schraube wird Händler) und **#185** (Stufen 4–7, ganz raus). Konzept fertig, alle Fragen beantwortet.
+
 - 23.11. Code → Ava: **Konzept Freischaltungen** (Gespräch mit Daniel): Meta-Baum als unsichtbarer Regisseur, Stufen 0–7, Muster-Quest „Schraube wird Händler“, Tank ab 0 sichtbar mit Verfall ab Stufe 4, Stufe 0 im ersten POI. `docs/concepts/freischaltungen.md`, offene Fragen am Ende. Noch kein Ticket für den Bau.
 
 - 23.11. Code → Ava: **#183 fertig**: Sungs Küche, Lucky Ferro, Karawane + Markenstand, Papier & Pläne, Schwarzmarkt, Ghostwire im selben Händlerfenster.
@@ -347,6 +349,31 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #185 Freischaltungen Teil 2: Stufen 4–7, „ganz raus“
+- **Status:** offen · angelegt 23.11. von Code (nach #184)
+- **Für:** Code
+- **Lesen:** `docs/concepts/freischaltungen.md` (führend), #184.
+- **Auftrag:** Türen der Stufen 4–7 (Suche + Tank-Verfall ab Stufe 4, Karawane, Machtspiele, Giganten). **Ganz raus** (Daniel) für Hacking + Entities, Cyberware, Mega-Rigs + Bergung, Machtspiele: keine Spur in Inventar, Camp, Bau-Modus, Karte, Straße, HUD, Radio, Storylets, Aufträgen, Achievements, Lektionen. Dinge verborgener Systeme als **Wertsache** (`hiddenAs`). Ruf der Gangs zählt still mit. Prüfwerkzeug: Stufen 0–3 abspielen und nach Wörtern verborgener Systeme suchen.
+- **Fertig, wenn:** mit Stufe 3 ist von den vier Systemen nichts zu sehen, Implantate liegen als Wertsache; Freischalten macht sie sichtbar und benutzbar; Tests grün.
+- **Rückfragen:**
+- **Ergebnis:**
+
+### #184 Freischaltungen Teil 1: Meta-Baum, Stufen 0–3, „Schraube wird Händler“
+- **Status:** offen · angelegt 23.11. von Code (Konzept mit Daniel, drei Fragerunden)
+- **Für:** Code
+- **Lesen:** **`docs/concepts/freischaltungen.md`** (führend, alle Entscheidungen), `docs/features/trade.md`, `docs/features/tutorial.md`, `docs/features/achievements.md` (Zähler), `docs/features/progression.md` (Questlog, Durchgang).
+- **Auftrag:**
+  1. Bereich **Freischaltungen** (`data/unlocks.json`): Stufen + Systeme (Stufe, Meta-Preis, Auslöser, Story-Moment, Art: ganz raus / unsichtbar / Teaser / Quest). `game/unlocks.js` (ohne DOM): `unlocked()`, Meta gutschreiben, Stufe aufsteigen. `save.meta`.
+  2. **Cheats › Meta-Baum** (Pause-Menü): Stufen als Spalten, Klick schaltet frei/sperrt, „alles frei“, „zurück auf 0“.
+  3. **Türen der Stufen 0–3:** Stufe 0 im ersten POI nach dem Intro (fester Seed, kurz); Tank sichtbar ohne Verfall; Rucksack/Inventar, Tresor/Ranking, Grund-Camp; Reisekarte, Zwischenfälle, erstes Hacking; Rig bauen, Kochen, Craften, Handel, Vorschuss.
+  4. **Start-Rig nur das Nötigste** (Van + Wohnanhänger mit Schlafkoje und Lagerregal); Kochnische, Werkbank, Warroom kommen mit ihrer Freischaltung.
+  5. **Questkette „Schraube wird Händler“** (3 Schritte, Belohnung: Händlerfenster im Camp und unterwegs, Händler an Orten und auf der Straße).
+  6. **Neuer Durchgang wählbar:** Freischaltungen behalten oder bei 0 beginnen. Alte Spielstände: alles frei.
+  7. Datenset/Fixture „alles frei“ für die bestehenden Browser-Tests.
+- **Fertig, wenn:** ein neues Spiel beginnt im ersten POI mit nur Bewegung/Kampf/Benutzen, die Stufen 0–3 öffnen sich nacheinander über Ziele und Story-Momente, Schraube wird Händler, der Meta-Baum zeigt alles, alte Stände laden mit allem frei; Tests grün; Build grün.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #183 Weitere Händler: Sungs Küche, Karawane, Händler an Orten, Lucky Ferro
 - **Status:** fertig (23.11.) · angelegt 23.11. von Code (Daniel: „Das System gefällt mir richtig gut. Lass uns direkt die anderen Händler auch einbauen.“; Auswahl: alle vier, Bau-Katalog bleibt im Bau-Modus)
