@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 23.11. Ava → Code: Neu **#181 Feedback-Kit** (Planung mit Daniel): Knopf im Spiel → Issue mit 6 Bildern + 30-s-Spur in einem privaten Repo, Kit zum Mitnehmen in andere Projekte. Daniel muss vorher das Repo anlegen und den Token erweitern.
+
 - 23.11. Code → Ava: **HNC (Nachtrag zur Übergabe vom 22.11.)**. Seitdem: #179 Mile 7 Runde 2 fertig (`839dfa5`; offen: Dach-Block wirkt von außen wie ein schwarzes Loch) und **Skilltree im Esc-Menü** (`d8b4c59`, Daniel: überall ansehen, im Camp freischalten ⚠️). Stand `main` sauber, npm 470 grün, techtree_test 11. PixelLab übrig 810,6. Nächste Schritte laut Liste `docs/concepts/poi_feinschliff.md`; G5/G6 offen.
 
 - 22.11. Ava → Code: **#180 ist startklar.** Rezept für Färbungen + Momente: `tools/music/poi_colors.py` (`python3 tools/music/poi_colors.py <poi_explore.wav> <out>` rendert die Hörproben, braucht numba). Daniel hört gerade ab; sein Urteil je Region trage ich in `poi_sound.md` › Hörproben ein. Steht dort noch „offen“: wie Skript bauen, ⚠️ vorläufig.
@@ -333,6 +335,30 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #181 Feedback-Kit: Knopf im Spiel → Ticket mit Bildern + Spur in privatem Repo
+- **Status:** offen · angelegt 23.11. von Ava (Planung mit Daniel im Chat, alle Fragen beantwortet)
+- **Für:** Code
+- **Lesen:** `docs/features/controller.md` (Pad, `readInput`, Halten-Muster), `docs/features/online.md` (Worker, Speichern = Commit, Access), `docs/features/tutorial.md` › Aufnahme (Ringpuffer-Vorbild), `game/play/control.js` (`state()`), `worker/index.js`.
+- **Idee (Daniel, 23.11.2026):** „Feedback während des Spiels sammeln, aber konkreter als ‚dieses Level hat mir gut gefallen‘.“ Knopf drücken → Spiel pausiert → Text schreiben → abschicken → die letzten Sekunden kommen als Ticket mit.
+- **Entscheidungen (Daniel, 23.11.2026):**
+  - **Bilder statt Video**, wenige und stark gepackt: 6 Bilder gestaffelt (Moment, −1, −2, −4, −7, −10 s), 960 × 540 WebP Q60, ≈ 200 KB; Ringpuffer nur 2 Bilder/s über 10 s. Kein Ton. Dazu eine **Spur** (JSON, gepackt) über 30 s: `state()` 4×/s, Eingaben je Frame, Ereignisse, Konsolen-Fehler, fps, offene Fenster + HUD-Werte (HUD nicht ins Bild, die Spur reicht).
+  - **Ziel: ein privates Repo für alle Projekte** (`dna20717/feedback` o. ä.), Projekte per Label `projekt:nomadgirl`. Issues dort, Bilder + Spur als Commit unter `media/<projekt>/FB-<n>/`. `NomadGirl/main` bekommt davon nichts.
+  - **Kit zum Mitnehmen, Code lebt im privaten Repo** (Antwort 1C): Quelle im Feedback-Repo unter `kit/`; Projekte haben eine Kopie (`game/vendor/feedback/` + `VERSION`), weil der Cloudflare-Build nur NomadGirl klont. Abgleich per `node tools/feedback_sync.mjs`. Kit ohne Import aus `game/`/`engine/` (Test prüft). Teile: `core.js` (Ringpuffer, Auslöser, Verpacken, Warteschlange offline), `dialog.js` (Fenster mit gemeinsamem UI-Kern), `worker.js` (`handleFeedback()`, nutzt das vorhandene Committen + ein Aufruf „Issue anlegen“, **keine neue Cloudflare-Infrastruktur**), `schema.js` (Bereich „Feedback“ für die Werkstatt), `cli.mjs` (list/show/close), `README.md`. Pro Spiel ein Adapter (~50 Zeilen: canvas, state, context, pause/resume, pad).
+  - **Einstellbar** (`feedback.json`, Werkstatt-Bereich „Feedback“): Auslöser (Pad-Knöpfe, Tasten, an/aus), Modi mit Aufnahme, Bilder-Zeitplan/Breite/Qualität/Obergrenze, Spur (Dauer, Takt, Felder, Eingaben, Fehler), Chips, Pflichttext, Ziel (Repo, Labels, Titel-Vorlage `FB-{n} · {chip} · {ort}`), Voreinstellungen Sparsam/Normal/Gründlich.
+  - **Auslöser:** Xbox-/Stadia-Taste (Pad-Index 16, kommt unter Windows oft nicht an), Ersatz **Select + Start zusammen**, Tastatur **F8**; im Spiel-Menü ein Taster „kommt mein Knopf an?“.
+  - **Fenster:** Chips 👍 Gut · 👎 Schlecht · 🐞 Bug · 💡 Idee · 😵 Verwirrend (in der Oberfläche Lucide-Icons), per Controller wählbar; Text optional über Tastatur. Vorschau der Bilder, Abschicken gold.
+  - **Auto-Angebot bei JS-Fehler gleich mitbauen** (3B); k.o. und POI-Bewertung nur als Felder einplanen.
+  - **Jeder Spieler darf Feedback geben.**
+  - **Nummern:** Feedback heißt `FB-<n>`, damit es nicht mit Funk-Tickets `(#NNN)` kollidiert; Schließen nur mit ausdrücklichem Verweis aufs Feedback-Repo.
+- **Daniel richtet ein (Anleitung Schritt für Schritt von Code):** privates Repo anlegen; `GITHUB_TOKEN` des Workers um dieses Repo erweitern (Contents + Issues: Read and write); Repo für Claude Code freigeben (`add_repo`).
+- **Abschnitte:** 1 Auslöser + Pause + Fenster + Kontext · 2 Spur-Ringpuffer · 3 Bilder-Ringpuffer + Packen · 4 Worker `/api/feedback` (Issue + Commit, Warteschlange offline) · 5 JS-Fehler-Angebot · 6 Werkstatt-Bereich + Voreinstellungen · 7 `cli.mjs`, Sync, `docs/features/feedback.md`, Landkarte in `CLAUDE.md`.
+- **Grenzen:** kein PixelLab, keine neuen Grafiken, keine Bibliothek. Keine E-Mail-Adresse ins Issue (Access liefert sie, ins Ticket kommt ein Kürzel). Leistung: Aufnahme kostet höchstens 1 ms je Frame, sonst Takt senken (messen und ins Ergebnis).
+- **Fertig, wenn:** Knopf (16 / Select+Start / F8) pausiert, Fenster mit Controller bedienbar, Abschicken legt ein Issue mit 6 Bildern + Spur im Feedback-Repo an (lokal ohne Worker: Warteschlange); `cli.mjs show` holt alles; JS-Fehler bietet Feedback an (einmal je Fehler und Sitzung); Kit-Test (keine Importe nach außen), `feedback_test` (40 s spielen → Spur 30 s, Bilder-Zeitplan stimmt), `web:test` mit falschem GitHub grün; Build grün.
+- **Rückfragen:**
+  - ⚠️ vorläufig: „Jeder Spieler“ heißt im Moment jeder, der durch den Access-Login kommt (die ganze Adresse liegt dahinter). Wird das Spiel später offen, braucht es Spam-Schutz (Größe, Anzahl je Spieler und Stunde). Größenlimit und ein einfaches Limit je Login baut Code gleich mit.
+  - ⚠️ vorläufig: JS-Fehler-Angebot pausiert nicht, sondern zeigt einen kleinen Hinweis unten links („Da lief was schief, melden?“), gleiche Fehler nur einmal je Sitzung.
+- **Ergebnis:**
 
 ### #180 POI-Ton: Musik-Schichten + Färbung je Region, Ambience aus der Story, Akustik, Klangquellen
 - **Status:** offen · angelegt 22.11. von Ava (Design-Session mit Daniel, alle Fragen per Auswahl beantwortet)
