@@ -344,6 +344,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 ## Tickets
 
+### #183 Weitere Händler: Sungs Küche, Karawane, Händler an Orten, Lucky Ferro
+- **Status:** läuft (23.11.) · angelegt 23.11. von Code (Daniel: „Das System gefällt mir richtig gut. Lass uns direkt die anderen Händler auch einbauen.“; Auswahl: alle vier, Bau-Katalog bleibt im Bau-Modus)
+- **Für:** Code
+- **Lesen:** `docs/features/trade.md` (#182), `docs/features/worldmap.md` (Zwischenfälle, Reisekarte), `docs/crew.md` (Lucky, Mei), `docs/features/lore.md` (Ghostwire), `game/pricing.js`.
+- **Auftrag:** dasselbe Händlerfenster für (1) **Onkel Sungs Küche** im Camp, (2) die **Händlerkarawane** auf der Straße (Antwort „Handeln“), (3) **Händler an Orten** der Reisekarte (Kartenhändler, Schwarzmarkt nachts, Ghostwire für Cyberware), (4) **Lucky Ferro** als Crew-Händler (taucht am Feuer auf, Figur aus Code, kein PixelLab).
+- **Rückfragen:**
+- **Ergebnis:**
+
 ### #182 Händlerfenster (Schraube zuerst) + Vorschuss bei Onkel Sung (FB-2)
 - **Status:** fertig (23.11.) · angelegt 23.11. von Ava (aus Feedback FB-2, Fragen mit Daniel per Auswahl)
 - **Für:** Code
