@@ -3,6 +3,7 @@
 // Mouse: click picks a thing up (it follows the pointer), click on a cell puts it down (stacks or swaps), right click turns it,
 // double click moves it to the other side, a click outside the panels puts it back. Placeholders until things have a look:
 // coloured cells by category with a short glyph, the name and the count.
+import { unlocked, hiddenAs } from '../unlocks.js';   // #184
 import { morale } from '../morale.js';
 import { statSheet, leylaValues, valueText, SOURCE_NAMES } from '../stat_sheet.js';
 import { DECK, deckSize, fitDeck } from '../save.js';
@@ -155,9 +156,11 @@ export class InventoryUI {
     this.ghost.style.transform = this.zoom < 1 ? `scale(${this.zoom})` : '';
   }
   tabsEl() {
-    const D = this.D, camp = this.host.inCamp?.() && this.vanStore(), t = this.vanTab ? 'van' : this.view === 'implants' ? 'implants' : this.view === 'stats' ? 'stats' : 'gear';
+    const D = this.D, camp = this.host.inCamp?.() && this.vanStore(), cyber = this.U('cyberware');
+    if (!cyber && this.view === 'implants') this.view = 'gear';   // #184 Cyberware: ganz raus
+    const t = this.vanTab ? 'van' : this.view === 'implants' ? 'implants' : this.view === 'stats' ? 'stats' : 'gear';
     const tab = (id, ic, name, go) => el('button', { class: 'inv-tab' + (t === id ? ' on' : ''), 'data-tab': id, onmousedown: ev => { ev.stopPropagation(); go(); } }, icon(ic, 14), name);
-    return el('div', { class: 'inv-tabs' }, tab('gear', 'person', 'Ausrüstung', () => { this.view = 'gear'; this.setTab('leyla'); }), tab('implants', 'brain', 'Implantate', () => { this.view = 'implants'; this.setTab('leyla'); }), tab('stats', 'scale', 'Werte', () => { this.view = 'stats'; this.setTab('leyla'); }),   // #104
+    return el('div', { class: 'inv-tabs' }, tab('gear', 'person', 'Ausrüstung', () => { this.view = 'gear'; this.setTab('leyla'); }), cyber ? tab('implants', 'brain', 'Implantate', () => { this.view = 'implants'; this.setTab('leyla'); }) : null, tab('stats', 'scale', 'Werte', () => { this.view = 'stats'; this.setTab('leyla'); }),   // #104
       camp ? tab('van', 'vehicle', D.tractors?.[this.host.save().rig.tractor]?.name || 'Van', () => this.setTab('van')) : null);
   }
   bagEl() {
@@ -169,7 +172,7 @@ export class InventoryUI {
   // the cyberdeck's places for Entities (#049), under the backpack while Leyla holds a deck
   deckEl() {
     const D = this.D, g = this.inv.grids[DECK], deck = D.weapons?.[this.inv.slots?.cyberdeck];
-    if (!g || !deck) return null;
+    if (!g || !deck || !this.U('hacking')) return null;   // #184 Hacking: ganz raus
     return el('div', { class: 'inv-deck' }, el('div', { class: 'inv-sub cyan' }, icon('brain', 14), deck.name, el('small', {}, `${g.items.length}/${g.w / 2} Entities`)), this.gridEl(DECK, g));
   }
   // the shoulder button that pages (controller only, keyGlyph shows L1 / R1 or LB / RB)
@@ -218,7 +221,7 @@ export class InventoryUI {
     // only the six places left and right change, and she fades into the scan; the wires are drawn once the layout stands
     const col = keys => el('div', { class: 'inv-wearcol' }, ...keys.map(([x, n]) => this.slotEl(x, n)));
     let left, right;
-    if (!implants) { left = [['wear:head'], ['wear:armor'], ['melee']]; right = [['cyberdeck'], ['ranged'], ['backpack']]; }
+    if (!implants) { left = [['wear:head'], ['wear:armor'], ['melee']]; right = [...(this.U('hacking') ? [['cyberdeck']] : []), ['ranged'], ['backpack']]; }   // #184 no deck slot before Hacking
     else {
       const rows = I.implants?.length ? I.implants : IMPLANTS.map((slot, i) => ({ slot, name: WEAR_NAMES[slot], at: [48, 40 + i * 30], side: i < 3 ? 'left' : 'right' }));
       left = rows.filter(r => r.side !== 'right').map(r => ['wear:' + r.slot, r.name]);
@@ -458,8 +461,18 @@ export class InventoryUI {
   // the slots only show what is built in: rig parts are dragged onto the van in the build mode (B)
   partClick(p) { this.host.notify?.(p.id ? 'Ein- und ausbauen: Rig bauen (B)' : `${PART_SLOT_NAMES[p.slot]}: ein Rig-Teil im Bau-Modus (B) an den Van ziehen`, 'info'); }
 
+  U(id) { return unlocked(this.D, this.host.save?.(), id); }   // #184 Meta-Baum
   showTip(e, key = null) {
     if (this.menuOn) return;   // the right-click menu stays until it is used or closed
+    // #184 a thing of a hidden system (Daniel: „Als Wertsache“): name, maker, value; no slot, no values, no explanation
+    if (e.a === 'items' && hiddenAs(this.D, this.host.save?.(), e.id)) {
+      const D = this.D, t = thing(D, e.a, e.id) || {}, acts = key != null && !this.held ? this.actionsFor(key, e) : [];
+      const row = x => el('li', {}, ...(this.padOn ? [...keyGlyph(x.k), x.hold ? el('small', {}, 'halten') : null, ' '] : []), x.label);
+      this.tip.replaceChildren(...[brandPlate(D, t), el('b', {}, t.name || e.id), el('small', {}, ['Wertsache', stackMax(D, e.a, e.id) > 1 ? `Stapel ${e.n}/${stackMax(D, e.a, e.id)}` : null, `${valueOf(D, t) * e.n} Δ`, 'lässt sich verkaufen'].filter(Boolean).join(' · ')),
+        el('p', {}, 'Seltsame Technik. Was immer das ist, irgendwer zahlt dafür.'), acts.length ? el('ul', { class: 'inv-acts' }, ...(this.padOn ? acts.filter(x => x.k) : acts).map(row)) : null].filter(Boolean));
+      this.tip.hidden = false;
+      return;
+    }
     const D = this.D, t = thing(D, e.a, e.id) || {}, k = kindOf(D, e.a, e.id);
     const facts = e.g ? ['Entity', `${e.g.bits} Bits`, D.brands?.[glitchBrand(D, e.g)]?.short ? `von ${D.brands[glitchBrand(D, e.g)].short}` : null].filter(Boolean) : [CATEGORY_NAMES[k], e.a === 'rigParts' ? `Slot: ${PART_SLOT_NAMES[t.slot] || t.slot}` : null, e.a === 'rigParts' && t.pull ? `+${t.pull} kg Zugkraft` : null,
       e.a === 'rigParts' && t.armor ? `+${t.armor} Panzerung` : null, e.a === 'rigParts' && t.storageRows ? `+${t.storageRows} Reihen Stauraum` : null,
@@ -519,7 +532,7 @@ export class InventoryUI {
     // the first action without a key goes on X / R held (Ausrüsten next to Essen, Drohne geben next to a chest …)
     const extra = out.find(x => !x.k);
     if (extra) Object.assign(extra, { k: 'context', hold: true });
-    return out;
+    return e.a === 'items' && hiddenAs(D, this.host.save?.(), e.id) ? out.filter(x => !['equip', 'learn', 'use', 'deck', 'worker', 'drone', 'learnDye'].includes(x.id)) : out;   // #184 a hidden system's thing is just a Wertsache
   }
   // where a thing would be worn or held: weapon slot, backpack, a worn place
   slotFor(e) {

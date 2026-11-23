@@ -4,6 +4,7 @@
 //   save.salvage = { sites: { <project>: { node, cycle } }, built: { <project>: { <row>: n } }, done: { <project>: { day, cycle } }, seen: { <project>: true } }
 //   D.salvage[id] = { name, after, hops: [min, max], minCycle, tractor | megarig, steps: [{ step, item, count, where: [poi], hours }], chestChance, anywhere }
 // Daniel, 14.11.2026: „Man muss mehrmals zurückgehen, bis er fertig ist“; „Keine Gefahr fürs Wrack“: what is built stays (also over a Durchgang).
+import { unlocked } from './unlocks.js';   // #185
 import { stock, take } from './crafting.js';
 import { hops } from './worldmap.js';
 
@@ -25,7 +26,7 @@ export function sections(D, id) {
 // available: the one before is done, the Durchgang has come; done ones stay done
 export function open(D, save, id) {
   const x = D.salvage?.[id], S = sstate(save);
-  if (!x || S.done[id]) return false;
+  if (!x || S.done[id] || !unlocked(D, save, 'megarigs')) return false;   // #185 Mega-Rigs & Bergung: ganz raus
   if (x.after && !S.done[x.after]) return false;
   return (save.cycle || 1) >= (x.minCycle || 1);
 }
@@ -49,7 +50,7 @@ export function ensureSites(D, save) {
     if (pick) { S.sites[id] = { node: pick.id, cycle, seed: map.seed }; taken.add(pick.id); }
   }
   // the map shows the wrecks (map_render.js): { node: project name }, only for projects that are open or done
-  map.wrecks = Object.fromEntries(Object.entries(S.sites).filter(([id]) => open(D, save, id) || S.done[id]).map(([id, s]) => [s.node, { id, name: D.salvage[id]?.name || id, done: !!S.done[id] }]));
+  map.wrecks = Object.fromEntries(Object.entries(S.sites).filter(([id]) => open(D, save, id) || (S.done[id] && unlocked(D, save, 'megarigs'))).map(([id, s]) => [s.node, { id, name: D.salvage[id]?.name || id, done: !!S.done[id] }]));
   return S.sites;
 }
 const hashId = s => [...String(s)].reduce((h, c) => (Math.imul(h, 31) + c.charCodeAt(0)) >>> 0, 7);
@@ -57,7 +58,7 @@ export const siteOf = (save, id) => sstate(save).sites[id]?.node || null;
 // the project whose wreck stands where the camp is (open or done: a done wreck site is the base)
 export function here(D, save) {
   ensureSites(D, save);
-  return Object.keys(D.salvage || {}).find(id => siteOf(save, id) === save.location && (open(D, save, id) || isDone(save, id))) || null;
+  return Object.keys(D.salvage || {}).find(id => siteOf(save, id) === save.location && (open(D, save, id) || (isDone(save, id) && unlocked(D, save, 'megarigs')))) || null;
 }
 
 // how far: per row built / needed, the current section, what is missing there and where it may lie

@@ -1,6 +1,7 @@
 // Loot on the ground in a run: beaten enemies drop bundles (their loot table), each bundle is a small grid.
 // The ground inventory (like XCOM) shows the nearest bundle within reach (Leyla › Inventar › Boden-Reichweite);
 // stackable things Leyla already carries are picked up by walking past, as far as the stacks have room.
+import { unlocked } from '../unlocks.js';   // #185
 import { capture, capturable } from '../prisoners.js';
 import { newGrid, add, rollLoot, thing, stackMax, addEntry } from '../inventory.js';
 import { earn } from '../earn.js';
@@ -118,7 +119,7 @@ export class Loot {
     paid.add(key);
     if (first) for (const r of earn(this.scene.data_, 'kill', { family: e.d.family, boss: e.d.behavior === 'boss' })) { const same = t.find(x => x.a === 'items' && x.id === r.id); if (same) same.n += r.n; else t.push(r); }
     // #079 a raider beaten in melee may stay down tied up: a prisoner, picked up like loot
-    if (this.scene.box && capturable(this.scene.data_, e, e.lastHit)) t.push(capture(this.scene.data_, e, this.scene.gang?.()?.name || null));
+    if (this.scene.box && unlocked(this.scene.data_, this.scene.box.save, 'power') && capturable(this.scene.data_, e, e.lastHit)) t.push(capture(this.scene.data_, e, this.scene.gang?.()?.name || null));
     if (t.length) this.drop(e.x, e.feet, t);
   }
 

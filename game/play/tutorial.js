@@ -8,6 +8,9 @@
 //   archive  Menü › Feldhandbuch: chapters (LB/RB), lessons (up/down), the lesson on the right
 //   keys     {k:jump} game action, {u:ok} window action, {stick} {rstick}: keycaps on the keyboard, the buttons of the controller in use
 // What was seen is kept in this browser (localStorage nomadgirl-tutorial-seen), the switch in Menü › Optionen (nomadgirl-tutorial-off).
+import { unlocked } from '../unlocks.js';   // #184
+const CHAPTER_SYSTEM = { inventory: 'inventory', build: 'build', travel: 'travel', progress: 'search' };
+const LESSON_SYSTEM = { kochen: 'cooking', experimentieren: 'build', werkbank: 'build', ripperdoc: 'cyberware', implantate: 'cyberware', haendler: 'build', warroom: 'travel', ko: 'camp', tank: 'search' };
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { hints, closeX, keyGlyph, padInUse } from './ui_nav.js';
@@ -45,7 +48,8 @@ export class Tutorial {
   get D() { return this.scene?.data_ || {}; }
   get lessons() {
     const order = Object.fromEntries(TUT_CHAPTERS.map(([k], i) => [k, i]));
-    return Object.entries(this.D.tutorial || {}).map(([id, l]) => ({ id, ...l })).sort((a, b) => (order[a.chapter] ?? 99) - (order[b.chapter] ?? 99) || (a.order ?? 0) - (b.order ?? 0));
+    const save = this.scene?.box?.save, D = this.D, free = l => unlocked(D, save, l.unlock || LESSON_SYSTEM[l.id] || CHAPTER_SYSTEM[l.chapter]);   // #184 Meta-Baum: lessons come with their system
+    return Object.entries(this.D.tutorial || {}).map(([id, l]) => ({ id, ...l })).filter(free).sort((a, b) => (order[a.chapter] ?? 99) - (order[b.chapter] ?? 99) || (a.order ?? 0) - (b.order ?? 0));
   }
   get isOpen() { return !this.el.hidden; }
   // automated browsers (the tests) see no cards unless they ask for them (nomadgirl-tutorial-test), so no card pauses another test

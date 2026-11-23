@@ -9,6 +9,7 @@
 //   rig part → a socket on the van (taken = swap, the old one goes onto the scrapyard), the scrapyard (take off), the dealer's pad (sell)
 //   dealer catalogue (button or click on the pad): bought things are delivered onto the pad.
 // Logic in game/rig.js (act, snapshot/restore), drawing in game/play/camp.js (drawRig, drawYard), values in "Rig-Bau".
+import { workshopOpen } from '../unlocks.js';   // #185
 import { hang, unhang, canHang, lightsConfig } from '../string_lights.js';
 import { el } from '../ui.js';
 import { WORKSHOP_FUNCTIONS } from '../../engine/schema.js';
@@ -535,6 +536,7 @@ export class BuildMode {
 
   shopEl() {
     const D = this.D, S = shop(D), save = this.save;
+    S.workshops = S.workshops.filter(id => workshopOpen(D, save, id));   // #184/#185 Meta-Baum: no Ripperdoc, Zelle, Bit-Farm … before their system
     this.shopTab ??= 'workshops';
     const row = (area, id) => {
       const x = D[area][id], price = priceOf(D, area, id), lock = techLock(D, save, area, id), poor = price > save.deltas || !!lock;   // #110 Techtree

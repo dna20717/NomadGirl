@@ -4,6 +4,7 @@
 //   $ camouflaged brittle walls (look like the wall, break the same)   % fake walls (look like the wall, Leyla walks through, they fade; secrets too)
 //   + keys (#168: a prop of the POI's story, E picks it up, the HUD lists it)   | locks (#168: door, gate, valve, hatch: E with its key opens them)
 // After the goal the run is finished; E at the van pays the base money plus the rank bonus (k.o. on the way back = everything gone).
+import { unlocked } from '../unlocks.js';   // #185
 import { roomTale } from '../../engine/dressing_story.js';
 import { rollLoot } from '../inventory.js';
 import { chestPart } from '../salvage.js';
@@ -413,10 +414,11 @@ export class PoiLevel {
     const talk = T?.near(); if (talk) return talk;   // #061
     for (const f of this.lifts) if (!f.down && close(f)) return { text: 'Leiter herunterlassen · Weg nach oben', act: () => this.dropLift(f) };   // #175
     for (const f of this.fuses || []) if (close(f)) return { text: f.on ? 'Sicherungskasten · Strom aus' : 'Sicherungskasten · Strom an', act: () => this.toggleFuse(f) };   // #082
-    for (const sw of this.switches) if (close(sw)) return sw.on ? { text: 'Schalter ist umgelegt' } : sw.dueled ? { text: 'Schalter umlegen', act: () => this.pull(sw) } : { text: 'Schalter hacken · Glitch-Duell', act: () => this.duelAt(sw, 'Schalter', `sw${this.switches.indexOf(sw)}`) };
-    for (const t of this.terminals || []) if (close(t)) return t.done ? { text: 'Das Terminal ist still' } : t.tried ? { text: `${t.ai} schweigt · nächster Run` } : { text: `${t.ai} anzapfen · Glitch-Duell (sehr schwer)`, act: () => this.terminalDuel(t) };   // #057
+    const hack = unlocked(this.scene.data_, this.scene.box?.save, 'hacking');   // #185 Hacking: ganz raus (switches go by hand, no terminals, no KIs)
+    for (const sw of this.switches) if (close(sw)) return sw.on ? { text: 'Schalter ist umgelegt' } : sw.dueled || !hack ? { text: 'Schalter umlegen', act: () => this.pull(sw) } : { text: 'Schalter hacken · Glitch-Duell', act: () => this.duelAt(sw, 'Schalter', `sw${this.switches.indexOf(sw)}`) };
+    if (hack) for (const t of this.terminals || []) if (close(t)) return t.done ? { text: 'Das Terminal ist still' } : t.tried ? { text: `${t.ai} schweigt · nächster Run` } : { text: `${t.ai} anzapfen · Glitch-Duell (sehr schwer)`, act: () => this.terminalDuel(t) };   // #057
     // KIs in machines (Marken-Clutter marked „KI“, e.g. NomadCola-Automaten): once per run
-    for (const h of this.hosts()) if (!h.done && close(h)) return { text: `${h.name} anzapfen · Glitch-Duell`, act: () => this.duelAt(h, h.name, `host${this.hosts().indexOf(h)}`) };
+    if (hack) for (const h of this.hosts()) if (!h.done && close(h)) return { text: `${h.name} anzapfen · Glitch-Duell`, act: () => this.duelAt(h, h.name, `host${this.hosts().indexOf(h)}`) };
     const way = this.doorways?.nearest(l, range); if (way) return way;   // #174
     for (const d of this.doors) if (!d.open && Math.abs((d.x0 + d.x1) / 2 * this.scene.T - l.x) < range * 0.8 && l.feet > d.y0 * this.scene.T && l.feet <= d.y1 * this.scene.T + 4)
       return { text: 'Die Tür geht von dieser Seite nicht auf' };

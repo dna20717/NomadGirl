@@ -1,5 +1,6 @@
 // Events of the play scene (#017 split from scene.js): knock-out, waking up, the dropped backpack, notes and achievements, kills.
 // Mixed into PlayScene (game/play/scene.js): the methods keep their `this`, nothing else changes.
+import { unlocked } from '../unlocks.js';
 import { checkUnlocks, grantWorkshops } from '../unlocks.js';   // #184
 import { gangWar } from '../turf_war.js';
 import { tickMorale } from '../morale.js';
@@ -181,7 +182,7 @@ export class SceneEvents {
   }
   crewNews() {
     // #102 Gangs kämpfen selbst: what changed hands at the fronts while Leyla was away
-    const war = gangWar(this.data_, this.box.save);
+    const war = unlocked(this.data_, this.box.save, 'power') ? gangWar(this.data_, this.box.save) : [];   // #185 Machtspiele: ganz raus (no wars before)
     for (const x of war) this.hud.toast(`${x.to} übernehmen ${x.place}`, `${x.from} sind raus · Funk vom Tag ${x.day}`, 'info', 6000);
     if (war.length) this.box.persist?.();
     // #100 Rig-Moral: the time that passed moves it; a new level and anyone who left get a message
@@ -198,6 +199,7 @@ export class SceneEvents {
   }
   // #079 the days that passed: prisoners in the Zelle make Dunkelheit, those outside of it suffer (one toast)
   prisonerNews() {
+    if (!unlocked(this.data_, this.box.save, 'power')) return;   // #185
     const D = this.data_, save = this.box.save, r = catchUp(D, save, cellKeys(D, save, storeKeyOf));
     const dead = r.hurt.filter(h => h.died).map(h => h.name), sore = r.hurt.filter(h => !h.died).map(h => h.name);
     if (dead.length) this.hud.toast(`${dead.join(', ')} hat es nicht überlebt`, 'Ohne Zelle halten Gefangene nicht lange durch', 'warn', 6000);

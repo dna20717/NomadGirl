@@ -380,7 +380,8 @@ export class CampActions {
         if (o.trade && !o.traded && s.hud.trade) { const key = openRoad(D, save, o.trade.trader, o.trade); if (key) { setTimeout(() => s.hud.trade.open(key, 'buy', { onClose: () => pick({ ...o, traded: true }) }), 0); return; } }
         const before = new Set(offers(D, save)), r = choose(D, save, o); R.log.push(`${E.name}: ${[r.text, r.lines.join(', ')].filter(Boolean).join(' ')}`);
         s.hud.toast(E.name, [r.text, r.lines.join(' · ')].filter(Boolean).join(' · '), r.failed || o.health || o.deltas < 0 || o.fuel > 0 ? 'warn' : 'travel', 4200);
-        for (const x of [r.rep, r.rep2, ...(r.rep?.rivals || []), ...(r.rep2?.rivals || [])]) if (x?.changed) s.hud.toast(`${x.gang}: ${levelName(x.level)}`, x.n > 0 ? 'Dein Ruf bei ihnen steigt' : 'Dein Ruf bei ihnen sinkt', x.n > 0 ? 'good' : 'warn', 4200);   // #055
+        if (unlocked(D, save, 'power')) for (const x of [r.rep, r.rep2, ...(r.rep?.rivals || []), ...(r.rep2?.rivals || [])]) if (x?.changed) s.hud.toast(   // #185 the Ruf counts quietly before Machtspiele
+          `${x.gang}: ${levelName(x.level)}`, x.n > 0 ? 'Dein Ruf bei ihnen steigt' : 'Dein Ruf bei ihnen sinkt', x.n > 0 ? 'good' : 'warn', 4200);   // #055
         if (r.story) s.hud.toast('Die Geschichte geht weiter', 'Auf der nächsten Etappe', 'travel', 3600);
         if (r.revealed) s.hud.toast(`Neuer Ort: ${r.revealed.name}`, 'Steht jetzt auf der Reisekarte', 'good', 6000);   // #057
         for (const q of offers(D, save).filter(id => !before.has(id))) s.hud.toast(`Neuer Auftrag: ${D.quests[q].name}`, `${D.companions?.[D.quests[q].giver]?.name || 'Jemand'} im Camp will darüber reden`, 'info', 6000);   // #062

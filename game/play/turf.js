@@ -4,6 +4,7 @@
 // (plunderers, their drones, the boss) do not attack, do not come to noise or calls. Their chests are theirs: opening one while one of
 // them sees it costs Ruf. The vault only by breaking the peace. A friend can talk to them: trade (a few things from the POI's loot at
 // Ruf prices) and a job (clear the turf of mutants and vermin). Any hit on one of them breaks the peace: all of them fight, Ruf drops.
+import { unlocked } from '../unlocks.js';   // #185
 import { addRep, repOf, levelOf, levelName, repConfig, repPrice, REP_LEVELS, rivalLines } from '../reputation.js';
 import { rollLoot } from '../inventory.js';
 import { give } from '../crafting.js';
@@ -88,7 +89,7 @@ export class Turf {
       { label: 'Lassen', icon: 'x', primary: true, act: () => {} }] });
   }
   near() {
-    if (!this.active) return null;
+    if (!this.active || !unlocked(this.D, this.scene.box?.save, 'power')) return null;   // #185 no talks with gangs before Machtspiele
     const s = this.scene, l = s.leyla, range = (this.D.camp?.interactRange ?? 130) * 1.2;
     const e = s.enemies.find(x => this.calm(x) && Math.abs(x.x - l.x) < range && Math.abs(x.body.bottom - l.feet) < 80);
     const J = gangJobs(this.D, this.save, this.gang), news = J.offers.length + J.ready.length;   // #088

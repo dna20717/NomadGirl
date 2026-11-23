@@ -121,7 +121,7 @@ export class MapUI {
     const W = Math.max(200, Math.floor(r.width)), H = Math.max(120, Math.floor(r.height));
     if (c.width !== W * dpr || c.height !== H * dpr) { c.width = W * dpr; c.height = H * dpr; c.style.width = W + 'px'; c.style.height = H + 'px'; }
     const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const M = mapConfig(this.D), res = drawMap(ctx, W, H, this.D, this.map, { paper: this.image(M.paper), logos: this.image(M.logos), here: this.save.location, sel: this.sel, route: this.routeTo(this.sel), t: (performance.now() - this.t0) / 1000, hideDanger: !this.intel, fronts: fronts(this.D, this.save) });
+    const M = mapConfig(this.D), res = drawMap(ctx, W, H, this.D, this.map, { paper: this.image(M.paper), logos: this.image(M.logos), here: this.save.location, sel: this.sel, route: this.routeTo(this.sel), t: (performance.now() - this.t0) / 1000, hideDanger: !this.intel, fronts: unlocked(this.D, this.save, 'power') ? fronts(this.D, this.save) : [] });   // #185 Machtspiele: ganz raus
     this.places = res.places;
   }
   hover(e) {
@@ -145,7 +145,7 @@ export class MapUI {
     const P = D.pois?.[n.poi] || {}, b = C.brands.find(x => x.id === n.brand), here = n.id === save.location, a = this.action();
     const logo = b && this.D.assets?.[C.logos]?.file ? el('span', { class: 'wm-logo', style: `background-image:url("${new URL(D.assets[C.logos].file, this.host.base).href}");background-position:${(b.icon % 4) * -64}px ${Math.floor(b.icon / 4) * -64}px` }) : null;
     const cost = a?.cost;
-    const G = (() => { try { return questGoal(D, save); } catch { return null; } })();   // #016 the red thread on the map
+    const G = (() => { try { const g = questGoal(D, save); return g && !g.quest && !unlocked(D, save, 'search') ? null : g; } catch { return null; } })();   // #016 the red thread on the map; #184 the search from stage 4
     this.aside.replaceChildren(...[
       G ? goalEl(G) : null,
       el('div', { class: 'wm-head' }, logo, el('div', {}, el('h3', {}, n.name), el('small', {}, [KIND_NAMES[P.kind] || P.name, n.region, P.size ? `Größe ${P.size}` : null].filter(Boolean).join(' · ')))),
@@ -153,9 +153,9 @@ export class MapUI {
       el('div', { class: 'wm-row' }, el('small', {}, 'Gefahr'), this.intel ? el('b', { class: 'wm-danger' }, '●'.repeat(n.danger || 1) + '○'.repeat(Math.max(0, 5 - (n.danger || 1)))) : el('b', { class: 'wm-unknown' }, '? ? ?')),
       this.intel && (n.danger || 1) > 1 ? (() => { const T = threatOf(this.host.D, n.danger); return el('p', { class: 'wm-threat' }, `Gegner +${Math.round(T.more * 100)} % · zäher +${Math.round((T.health - 1) * 100)} % · Beute +${Math.round(T.loot)} %`); })() : null,
       el('div', { class: 'wm-row' }, el('small', {}, 'Beute'), this.intel ? el('div', { class: 'wm-hints' }, ...(n.hints || []).map(h => el('span', { style: `--c:${HINT_COLORS[h] || '#c7b08b'}` }, optLabel(ITEM_CATEGORIES, h) || h))) : el('b', { class: 'wm-unknown' }, '? ? ?')),
-      this.intel ? null : el('p', { class: 'wm-intel' }, icon('research', 14), ' Was dort wartet, zeigt erst ein Warroom. Bau einen ins Rig (B), dann siehst du Gefahr, Beute und das Wetter.'),
+      this.intel ? null : el('p', { class: 'wm-intel' }, icon('research', 14), unlocked(D, save, 'build') ? ' Was dort wartet, zeigt erst ein Warroom. Bau einen ins Rig (B), dann siehst du Gefahr, Beute und das Wetter.' : ' Was dort wartet, zeigt erst ein Warroom.'),
       b ? el('p', { class: 'wm-brand' }, `${b.name}: „${b.slogan}“`) : null,
-      gangOfPlace(D, save, n.id) ? this.repRow(gangInfo(D, gangOfPlace(D, save, n.id)), save.turfs?.[n.id] ? P.gang?.name : null) : null,   // #055 whose turf, and Leyla's Ruf with them; #089 who moved in
+      gangOfPlace(D, save, n.id) && unlocked(D, save, 'power') ? this.repRow(gangInfo(D, gangOfPlace(D, save, n.id)), save.turfs?.[n.id] ? P.gang?.name : null) : null,   // #055 whose turf, and Leyla's Ruf with them; #089 who moved in
       // the POI's own text only at the landmark itself; rolled places say what kind of place it is
       // #160: rolled places say one sentence of their archetype's story (joke or past), tinted by the region; the landmark keeps its own text
       el('p', { class: 'wm-desc' }, n.landmark && P.description ? P.description : (() => { const S = placeStory(D, n, save, gangOfPlace(D, save, n.id) || null); return S.line ? [S.line, S.tint ? `${S.tint}.` : ''].filter(Boolean).join(' ') : `Wie ${P.name || 'ein POI'}, nur ${n.danger > (P.danger || 1) ? 'weiter draußen und gefährlicher' : 'ein anderer Ort'}. Was genau dort liegt, weiß man erst drinnen.`; })()),

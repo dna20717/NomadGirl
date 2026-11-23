@@ -2379,7 +2379,7 @@ export const AREAS = {
         area_('text', 'Text', { hint: 'Tasten als Platzhalter, je Gerät als Taste oder Controller-Symbol: {k:jump} Spiel-Aktion (jump, dash, melee, ranged, reload, holster, grab, up, down, left, right, walk, inventory, build, help), {u:ok} Fenster-Aktion (ok, back, context, send, tabs, move), {stick}, {rstick}' })] },
       { title: 'Bilder', fields: [select('media', 'Art', [['clip', 'Clip (Schleife)'], ['slides', 'Slideshow']]), ref('clip', 'Clip', 'assets', { hint: 'Asset der Art „Clip (Video)“' }),
         table('slides', 'Bilder', [ref('look', 'Bild', 'assets'), text('caption', 'Untertitel')], { hint: 'Eine Seite je Zeile, Untertitel mit Platzhaltern wie im Text' })] },
-      { title: 'Beim ersten Mal', fields: [select('trigger', 'Auslöser', TUT_TRIGGERS), select('mode', 'Wo', TUT_MODES),
+      { title: 'Beim ersten Mal', fields: [select('trigger', 'Auslöser', TUT_TRIGGERS), select('mode', 'Wo', TUT_MODES), ref('unlock', 'Erst mit Freischaltung', 'unlocks', { hint: '#184: Lektion erst, wenn dieses System frei ist (leer: nach Kapitel, z. B. Reisen → Reisen)' }),
         text('on', 'Bei', { hint: 'Hinweis sichtbar: Text im E-Hinweis (Teilwort, z. B. Kiste). Fenster: inventory, other, floor, build, shop, map, kitchen, craft, cyber, tech. Leyla: climb, hang, slide, crouch, swing, dash, flip. Ereignis: AvAs Stimmung (alert, kill, hit, cleared, down) oder cycle' }),
         num('after', 'Frühestens nach', { unit: 's', min: 0, hint: 'Sekunden im Camp bzw. im POI' })] },
     ],

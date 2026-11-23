@@ -1,5 +1,6 @@
 // Camp ↔ run (#017 split from scene.js): restart, go to the camp, start and end a run (Beute-Bilanz), enemies of the run.
 // Mixed into PlayScene (game/play/scene.js): the methods keep their `this`, nothing else changes.
+import { unlocked } from '../unlocks.js';   // #184/#185
 import { repayFromRun, advanceConfig } from '../trade.js';   // #182
 import { placeOf, threatOf } from '../worldmap.js';
 import { repLine, gangOfPlace, gangInfo } from '../reputation.js';
@@ -44,7 +45,7 @@ export class SceneRuns {
       this.box.save.health = this.leyla.health;
       this.box.save.run = { poi, room: null, seed: P.seed || 1 + Math.floor(Math.random() * 2 ** 31), location: this.box.save.location, danger: this.placeDanger(poi), before: runSnapshot(D, this.box.save) };   // before: for the Beute-Bilanz (#017)
       this.box.persist();
-      return this.restartAs({ mode: 'run', roomId: null, banner: [P.name || poi, `${(gangOfPlace(D, this.box.save, this.box.save.location) || P.gang?.name) ? `Revier: ${repLine(this.data_, this.box.save, gangOfPlace(D, this.box.save, this.box.save.location) || P.gang.name)} · ` : ''}Finde den Tresor · E am Van: zurück ins Camp`] }, 700);   // #016 whose place this is
+      return this.restartAs({ mode: 'run', roomId: null, banner: [P.name || poi, `${(gangOfPlace(D, this.box.save, this.box.save.location) || P.gang?.name) && unlocked(D, this.box.save, 'power') ? `Revier: ${repLine(this.data_, this.box.save, gangOfPlace(D, this.box.save, this.box.save.location) || P.gang.name)} · ` : ''}Finde den Tresor · E am Van: zurück ins Camp`] }, 700);   // #016 whose place this is
     }
     const ready = (P.rooms || []).filter(has);
     const room = ready.find(id => R[id].tags?.includes('start')) || ready[0] || [D.camp?.fallbackRoom, D.game?.testRoom].find(has);
@@ -93,7 +94,8 @@ export class SceneRuns {
       if (rank && this.level.secretsMax > 0 && this.level.secrets >= this.level.secretsMax) later(bump(this.data_, save, 'secretsAll', 1, [this.level.poi]));
     }
     // #089 Revierkrieg: fought through their place (no peace) and cracked the vault: the rival she stands best with moves in
-    const moved = rank && this.turf && !this.turf.active && this.kills > 0 ? takeover(this.data_, save, save.run?.location ?? save.location, this.turf.gang) : null;
+    const moved = rank && this.turf && !this.turf.active && this.kills > 0 && unlocked(this.data_, save, 'power') ?   // #185 Revierkrieg with Machtspiele
+      takeover(this.data_, save, save.run?.location ?? save.location, this.turf.gang) : null;
     const movedLine = moved ? `${moved.to} übernehmen ${placeOf(this.data_, save, moved.node)?.name || 'den Ort'} (vorher ${moved.from})` : '';
     save.buffs = []; save.buffQ = {};
     // Beute-Bilanz (#017): what changed since she drove off

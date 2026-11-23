@@ -137,12 +137,14 @@ export function tree(D, save) {
   return C.stages.map(S => ({ ...S, open: S.i <= st, systems: C.systems.filter(s => s.stage === S.i).map(s => ({ id: s.id, name: s.name, hide: s.hide, cost: s.cost,
     free: unlocked(D, save, s.id), pot: m?.pots?.[s.id] || 0, goals: s.goals.map((g, i) => ({ ...g, done: !!m?.goals?.[`${s.id}:${i}`], text: goalText(D, g) })) })) }));
 }
+const COUNTER_NAMES = { kills: 'Gegner besiegt', pois: 'POI geschafft', trips: 'Fahrt', encounters: 'Zwischenfall', knockouts: 'k.o.', sleeps: 'Nacht geschlafen', cooked: 'Gericht gekocht', crafted: 'hergestellt', secrets: 'Secret' };
+const FLAG_NAMES = { beute: 'erste Beute aufgehoben' };
 export function goalText(D, g) {
   switch (g.kind) {
     case 'start': return 'von Anfang an';
-    case 'counter': return `${g.n ?? 1}× ${g.counter}`;
+    case 'counter': return `${g.n ?? 1}× ${COUNTER_NAMES[g.counter] || g.counter}`;
     case 'quest': return `Auftrag „${D.quests?.[g.quest]?.name || g.quest}“`;
-    case 'flag': return `Merker ${g.flag}`;
+    case 'flag': return FLAG_NAMES[g.flag] || `Merker ${g.flag}`;
     case 'day': return `ab Tag ${g.n}`;
     case 'item': return `${g.n ?? 1}× ${D.items?.[g.item]?.name || g.item} im Lager`;
     case 'unlock': return `nach ${systemOf(D, g.system)?.name || g.system}`;
@@ -154,6 +156,10 @@ export function goalText(D, g) {
 export const GOAL_KINDS = [['start', 'von Anfang an'], ['counter', 'Zähler erreicht'], ['quest', 'Auftrag erledigt'], ['flag', 'Merker gesetzt'], ['day', 'ab Tag'], ['item', 'Ding im Lager'], ['unlock', 'anderes System frei'], ['poor', 'weniger Δ als'], ['stage', 'Stufe offen']];
 export const HIDE_KINDS = [['out', 'Ganz raus (keine Spur)'], ['hidden', 'Unsichtbar'], ['teaser', 'Teaser'], ['quest', 'Als Quest erzählt']];
 export { list as unlockList };
+
+// #185 workshops of a hidden system (ganz raus): not in the dealer's catalog, not as a gift (function → system)
+export const FUNCTION_SYSTEM = { cyber: 'cyberware', cell: 'power', bitfarm: 'hacking', warroom: 'travel', kitchen: 'cooking', foodtruck: 'cooking', craft: 'build', vehicle: 'build' };
+export const workshopOpen = (D, save, id) => { const sys = FUNCTION_SYSTEM[D.workshops?.[id]?.function]; return !sys || unlocked(D, save, sys); };
 
 // ---------- ganz raus: things of a hidden system ----------
 // the system that hides this thing until it is free (Freischaltung › Dinge des Systems: item categories), or null

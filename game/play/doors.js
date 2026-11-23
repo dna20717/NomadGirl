@@ -6,6 +6,7 @@
 //   front Rückwand-Türen frontal: scenery on the back wall; a paired one (link) is a real way: E steps through into its partner.
 // Pictures: the door sets of Welt › Türen (PixelLab, AAP-64, 32 px per tile, scaled sharp); an open swing door shows its leaf narrow
 // beside the doorway (like Terraria), a sliding door and a shutter pull into the wall / the box above.
+import { unlocked } from '../unlocks.js';   // #185
 import { addTrace } from '../../engine/history.js';
 import { doorConfig, pickType, hash } from '../../engine/doors.js';
 import { hullConfig } from '../../engine/facade.js';
@@ -256,7 +257,8 @@ export class Doors {
       if (d.state === 'broken' || Math.abs(d.cx - l.x) > range * 0.85 || l.feet < d.top + T || l.feet > d.feet + 6) continue;
       if (d.state === 'open') return this.blocked(d) ? null : { text: `${d.t.name || 'Tür'} schließen`, act: () => this.close(d) };
       if (d.state === 'closed') return { text: `${d.t.name || 'Tür'} öffnen`, act: () => this.open(d, l) };
-      return d.tried ? { text: `${d.t.name || 'Tür'} · verschlossen · aufbrechen oder sprengen` } : { text: `${d.t.name || 'Tür'} · verschlossen · hacken (Glitch-Duell)`, act: () => this.hack(d) };
+      return d.tried || !unlocked(this.scene.data_, this.scene.box?.save, 'hacking') ? { text: `${d.t.name || 'Tür'} · verschlossen · aufbrechen oder sprengen` } :   // #185 no hacking before it is free
+         { text: `${d.t.name || 'Tür'} · verschlossen · hacken (Glitch-Duell)`, act: () => this.hack(d) };
     }
     for (const f of this.front) if (f.link != null && Math.abs(f.x - l.x) < T * 1.2 && Math.abs(f.feet - l.feet) < 40) return { text: 'Durch die Tür', act: () => this.goThrough(f) };
     return null;
