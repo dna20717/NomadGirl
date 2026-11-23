@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 23.11. Code → Ava: **#186 Lektionen beim ersten Mal** (Entwurf, Daniel AFK): Lehrpfad im ersten Run, Lektionen beim ersten Tun und bei Freischaltungen, Pause und Höchstzahl gegen die Tipp-Lawine.
+
 - 23.11. Code → Ava: **#184 + #185 fertig** (Meta-Baum): neues Spiel beginnt in Mile 7 mit Stufe 0, acht Stufen öffnen sich über Ziele und Story-Momente, vier Systeme ganz raus bis zu ihrer Stufe. Konzept `docs/concepts/freischaltungen.md`, Feature `docs/features/unlocks.md`. Offen ⚠️: Zahlen, Hacking-Trennung, Story-Momente als Dialog.
 
 - 23.11. Code → Ava: Daniel: „B, ich bin eine Weile AFK, du kannst dich also austoben!“ → #184 und #185 laufen in einem Rutsch.
@@ -353,6 +355,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #186 Lektionen beim ersten Mal (hybrid, Entwurf)
+- **Status:** fertig (23.11.) · angelegt 23.11. von Code (Daniel: „Baue bitte die Lektionen so ein, dass sie sinnvoll dann auftauchen, wenn man etwas das erste Mal tut … hybrider Ansatz … Ich bin weiterhin AFK, bau einfach einen Entwurf“)
+- **Für:** Code
+- **Lesen:** `docs/features/tutorial.md` (Abschnitt „Beim ersten Mal, hybrid“), `docs/features/unlocks.md`.
+- **Rückfragen:** ⚠️ vorläufig: Lehrpfad = Reihenfolge im ersten Run (keine festen Kacheln); Pause 25 s, höchstens 4 je Besuch, im Lehrpfad 10 s / 10; Clips und Texte unverändert; Feldhandbuch weiter nach Kapiteln.
+- **Ergebnis:** (Code) `tutorial.js` (Lehrpfad, Pause, Höchstzahl, nur Kampf-Lektionen im Kampf, Auslöser „Leyla tut“ erweitert, neuer Auslöser „System frei“, Uhr-Fehler nach Run → Camp behoben), Spiel › Tutorial (Pause, Höchstens, Lehrpfad), 12 Lektionen mit neuen Auslösern. Tests: npm 486, tutorial 22, tutorial_path 6 (neu), unlock 19, camp 34, game 53. PixelLab 0. **Bitte testen:** neues Spiel in einem freien Slot, den ersten Run in Mile 7 spielen und schauen, ob die Tipps zur richtigen Zeit kommen; danach im Camp „Kabelsalat“ abgeben (Lektion „Bauen“).
 
 ### #185 Freischaltungen Teil 2: Stufen 4–7, „ganz raus“
 - **Status:** fertig (23.11.) · angelegt 23.11. von Code (nach #184)

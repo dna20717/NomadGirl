@@ -22,7 +22,8 @@ await page.addInitScript(() => {
 });
 await page.goto('http://localhost:8766/game.html?camp&new');
 await page.waitForFunction(() => window.nomad && window.game?.scene?.getScene('play')?.camp, null, { timeout: 40000 });
-await ev(() => { nomad.take(); window.SC = () => game.scene.getScene('play'); window.TU = () => SC().hud.tut; });
+await ev(() => { nomad.take(); window.SC = () => game.scene.getScene('play'); window.TU = () => SC().hud.tut; Object.assign(SC().data_.game.tutorial, { perVisit: 99 }); window.READY = () => { TU().lastClose = -1e9; };   // #186: READY() skips the pause between lessons (Spiel › Tutorial › Pause, 25 s)
+});
 const tap = async b => ev(x => { setPad([x]); nomad.step(2); setPad(); nomad.step(2); }, b);
 
 // time trigger: the first lesson of the camp after 2 s
@@ -38,11 +39,11 @@ await page.keyboard.press('Escape');
 v = await ev(() => { nomad.step(4); return { tut: TU().state(), pause: !!SC().hud.modal }; });
 check('Esc schließt die Karte (kein Pause-Menü dahinter), Lektion ist gesehen', !v.tut.open && v.tut.seen.includes('laufen') && !v.pause, v);
 v = await ev(() => { nomad.step(300); return TU().state(); });
-check('Gleich danach keine zweite Karte (Abstand)', !v.open, v);
+check('Gleich danach keine zweite Karte (Pause zwischen Lektionen)', !v.open, v);
 
 // a prompt: near the Kofferraum → „Das Camp-Lager“ (#041: the camp chest is gone, the van's rear door opens the Camp-Lager)
-v = await ev(() => { const go = () => { nomad.goTo('Kofferraum'); nomad.step(20); };
-  go(); const first = TU().state().lesson; if (first && first !== 'kiste') { TU().close(); nomad.step(200); go(); } return { ...TU().state(), first, slides: document.querySelectorAll('.tut-slide').length }; });   // on the way she may pass the fire: its card first
+v = await ev(() => { const go = () => { READY(); nomad.goTo('Kofferraum'); nomad.step(20); };
+  go(); const first = TU().state().lesson; for (let i = 0; i < 4 && TU().state().lesson !== 'kiste'; i++) { if (TU().isOpen) TU().close(); nomad.step(20); go(); } return { ...TU().state(), first, slides: document.querySelectorAll('.tut-slide').length }; });   // on the way she may pass the fire: its card first
 check('Hinweis „Kofferraum“ sichtbar → Lektion „Das Camp-Lager“ (Slideshow)', v.open && v.lesson === 'kiste' && v.slides === 2, v);
 v = await ev(() => { const a = TU().state().slide; TU().act('right'); const b = TU().state().slide; return { a, b, src: document.querySelector('.tut-slide.on img')?.getAttribute('src') }; });
 check('Slideshow blättert, Bilder aus dem Spiel', v.a === 0 && v.b === 1 && /tut_kiste_2\.webp$/.test(v.src || ''), v);
@@ -55,23 +56,23 @@ check('A schließt die Karte', !v.open, v);
 
 // a window: the inventory → a lesson over it, one per opening
 await tap(5);   // the controller in hand: buttons as pictures
-v = await ev(() => { nomad.step(200); nomad.step(1, [], ['inventory']); nomad.step(200); return { tut: TU().state(), inv: SC().hud.inv.isOpen, imgs: document.querySelectorAll('.tut-card .pad-ico').length }; });
-check('Inventar auf → Lektion „Formen und Drehen“ darüber, mit Controller-Symbolen', v.inv && v.tut.open && v.tut.lesson === 'raster' && v.imgs > 0, v);
+v = await ev(() => { nomad.step(200); READY(); nomad.step(1, [], ['inventory']); nomad.step(200); return { tut: TU().state(), inv: SC().hud.inv.isOpen, imgs: document.querySelectorAll('.tut-card .pad-ico').length }; });
+check('Inventar auf → Lektion zum Inventar darüber, mit Controller-Symbolen', v.inv && v.tut.open && ['inventar', 'raster'].includes(v.tut.lesson) && v.imgs > 0, v);   // #186 „Das Inventar“ comes first at the first opening
 await shot('window');
 await tap(1);
 v = await ev(() => { nomad.step(60); return { tut: TU().state(), inv: SC().hud.inv.isOpen }; });
 check('B schließt nur die Karte, das Inventar bleibt offen, keine zweite Karte in derselben Öffnung', !v.tut.open && v.inv, v);
 await ev(() => { SC().hud.inv.close(); nomad.step(10); });
 
-// an event: AvA alarmed → „Nahkampf“
-v = await ev(() => { nomad.step(200); SC().drone.react('alert'); nomad.step(200); return TU().state(); });
-check('Ereignis (AvA alarmiert) → Lektion „Nahkampf“', v.open && v.lesson === 'nahkampf', v);
+// #186 the first time Leyla does it: the first blow → „Nahkampf“
+v = await ev(() => { nomad.step(200); READY(); nomad.step(1, [], ['melee']); nomad.step(60); return TU().state(); });
+check('Erster Schlag → Lektion „Nahkampf“ (beim ersten Mal tun)', v.open && v.lesson === 'nahkampf', v);
 // „für diese Sitzung nicht mehr“ (Daniel, 14.11.2026): X toggles the checkbox on the card, then no card comes until it is off again
 await tap(2);
 v = await ev(() => ({ tut: TU().state(), box: !!document.querySelector('.tut-mute input')?.checked, txt: document.querySelector('.tut-mute')?.textContent || '' }));
 check('Häkchen „Für diese Sitzung keine Lektionen mehr“ auf der Karte, X setzt es', v.tut.open && v.tut.sessionOff && v.box && /Sitzung/.test(v.txt), v);
 await tap(1);
-v = await ev(() => { nomad.step(200); SC().drone.react('kill'); nomad.step(200); const r = { ...TU().state(), keep: sessionStorage.getItem('nomadgirl-tutorial-session-off') }; TU().setSessionOff(false); TU().events.clear(); return r; });
+v = await ev(() => { nomad.step(200); READY(); SC().drone.react('kill'); nomad.step(200); const r = { ...TU().state(), keep: sessionStorage.getItem('nomadgirl-tutorial-session-off') }; TU().setSessionOff(false); TU().events.clear(); return r; });
 check('Mit Häkchen kommt in dieser Sitzung keine Karte mehr (sessionStorage)', !v.open && v.sessionOff && v.keep === '1', v);
 
 // Menü › Feldhandbuch: chapters, lessons, slides

@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 23.11.2026: **Lektionen beim ersten Mal** (#186, Entwurf): Lehrpfad im ersten Run in Mile 7, sonst kommt eine Lektion, wenn Leyla etwas zum ersten Mal tut (erster Sprung, Schlag, Schuss …) oder ein System frei wird; Pause zwischen Lektionen und höchstens ein paar je Besuch.
 - 23.11.2026: **Freischaltungen / Meta-Baum** (#184, #185): Ein neues Spiel beginnt im ersten POI mit nur Bewegung, Kampf und Benutzen; acht Stufen bis zu den Giganten öffnen sich über Ziele und Story-Momente (Rucksack nach dem ersten Kill, Reisen nach zwei POIs, Rig bauen mit „Kabelsalat“, Kochen mit Sungs Auftrag, Handel mit der Questkette „Schraube wird Händler“ …). Hacking, Cyberware, Mega-Rigs und Machtspiele sind bis dahin ganz raus, ihre Dinge liegen als Wertsache herum. Der Tank verfällt erst ab „Die Suche“. Testen: Pause-Menü › Cheats › Meta-Baum.
 - 23.11.2026: **Weitere Händler** (#183): Sungs Küche, Lucky Ferro (taucht ab Tag 3 am Feuer auf), Händlerkarawane und Markenstand auf der Straße, Papier & Pläne, Schwarzmarkt und Ghostwire an Orten der Reisekarte, alle im selben Händlerfenster.
 - 23.11.2026: **Händler + Vorschuss** (#182, aus FB-2): Schraube kauft an und verkauft im neuen Händlerfenster (schlechter Kurs zum Start, Tageskasse, satt bei Gleichem, Ware jeden Tag neu); Onkel Sung gibt einen Vorschuss ohne Zinsen, die Hälfte jeder Run-Auszahlung geht zurück.

@@ -127,7 +127,7 @@ export const SOUND_PRIORITIES = [['a', 'A · zuerst'], ['b', 'B · bald'], ['c',
 export const ASSET_KINDS = [['animation', 'Animation'], ['tiles', 'Kacheln'], ['image', 'Bild'], ['video', 'Clip (Video)'], ['sound', 'Ton'], ['icons', 'Symbole'], ['reference', 'Referenz'], ['source', 'Original']];
 // tutorial (#011): chapters of the field guide and what makes a lesson show up the first time
 export const TUT_CHAPTERS = [['move', 'Bewegung'], ['fight', 'Kampf'], ['ava', 'AvA'], ['inventory', 'Inventar'], ['camp', 'Camp'], ['build', 'Rig bauen'], ['travel', 'Reisen'], ['poi', 'Im POI'], ['progress', 'Fortschritt']];
-export const TUT_TRIGGERS = [['', 'nie (nur Feldhandbuch)'], ['time', 'nach Zeit'], ['near', 'Hinweis sichtbar'], ['window', 'Fenster offen'], ['leyla', 'Leyla-Zustand'], ['event', 'Ereignis']];
+export const TUT_TRIGGERS = [['', 'nie (nur Feldhandbuch)'], ['time', 'nach Zeit'], ['near', 'Hinweis sichtbar'], ['window', 'Fenster offen'], ['leyla', 'Leyla tut (Zustand oder run, air, melee, shot, reload, flip)'], ['event', 'Ereignis'], ['unlock', 'System frei (Meta-Baum, #186)']];
 export const TUT_MODES = [['', 'überall'], ['camp', 'im Camp'], ['run', 'im POI']];
 export const DAYTIME = [['any', 'Immer'], ['day', 'Tag'], ['night', 'Nacht']];
 export const DRONE_MOODS = [['idle', 'Normal'], ['kill', 'Gegner erledigt'], ['cleared', 'Raum geräumt'], ['bored', 'Langeweile'], ['alert', 'Gegner in der Nähe'],
@@ -252,7 +252,11 @@ export const AREAS = {
         ref('quest.goal', 'Endziel', 'techtree', { hint: 'Knoten, auf den alles hinläuft. Leer = heilmittel' }), num('quest.tankWarn', 'Tank zuerst unter', { unit: '%', min: 0, max: 100, hint: 'Unter diesem Zustand zeigt die Zielzeile den Tank statt des Techtrees. Leer = 45' })] },
       { title: 'Tutorial', fields: [bool('tutorial.enabled', 'Lektionen beim ersten Mal', { hint: '#011: Karte mit Clip, wenn man etwas zum ersten Mal sieht oder kann. Spieler können sie unter Menü › Optionen abschalten' }), num('tutorial.gap', 'Abstand zwischen zwei Karten', { unit: 's', min: 0 }),
         bool('tutorial.runTips', 'Im Run als Tipp', { hint: '#016: im Run kommen Lektionen als kleiner Tipp in der Ecke, das Spiel läuft weiter (Klick auf „Mehr“ öffnet die Karte). Fenster-Lektionen bleiben Karten. Aus = überall Karten' }),
-        num('tutorial.tipSeconds', 'Tipp bleibt', { unit: 's', min: 2, hint: 'Leer = 9' })] },
+        num('tutorial.tipSeconds', 'Tipp bleibt', { unit: 's', min: 2, hint: 'Leer = 9' }),
+        num('tutorial.minGap', 'Pause zwischen Lektionen', { unit: 's', min: 0, hint: '#186 (Daniel: „ohne den Spieler mit zu vielen Tutorial-Tipps hintereinander zu erschlagen“): so lange nach einer Lektion kommt keine neue (Fenster, die der Spieler selbst öffnet, ausgenommen). Leer = 25' }),
+        num('tutorial.perVisit', 'Höchstens je Run / Camp-Besuch', { min: 1, hint: 'Leer = 4' }),
+        lines('tutorial.firstRun', 'Lehrpfad im ersten POI', { hint: '#186: Lektions-IDs in dieser Reihenfolge; im allerersten Run (Meta-Baum, Erster POI) kommen nur diese, jede beim ersten Mal, die frühere zuerst' }),
+        num('tutorial.firstGap', 'Lehrpfad: Pause', { unit: 's', min: 0, hint: 'Leer = 10' }), num('tutorial.firstMax', 'Lehrpfad: höchstens', { min: 1, hint: 'Leer = 10' })] },
       { title: 'Controller', fields: [bool('gamepad.enabled', 'Controller an', { hint: 'Gamepad-API des Browsers: Xbox, PlayStation, Stadia (Bluetooth-Modus), Switch Pro … mit Standard-Belegung. Die Knöpfe heißen hier nach ihrer Lage, die Hilfe im Spiel zeigt die Symbole des angeschlossenen Controllers' }),
         ref('gamepad.icons', 'Symbole', 'assets', { hint: 'Asset der Art „Symbole“ (tools/pad_icons.py): <typ>_0 … <typ>_9 je Controller (xbox, stadia, ps, switch), dazu für alle gleich stick_l, stick_r, stick_l_up … stick_l_press, stick_r_press, dpad, dpad_up …' }), num('gamepad.iconSize', 'Symbol-Größe', { unit: 'px', min: 16, max: 64, hint: 'So hoch erscheinen die Knöpfe in Hinweisen und Hilfe (Standard 32)' }),
         select('gamepad.symbols', 'Symbole von', PAD_KINDS, { hint: 'Automatisch nach dem Namen, den der Controller meldet; zum Testen fest einstellbar (Stadia meldet sich manchmal ohne Namen)' }),

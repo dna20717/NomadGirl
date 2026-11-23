@@ -115,7 +115,15 @@
   "grain": 16,
   "earth": true
  },
- "tutorial": {"enabled": true, "gap": 40},
+ "tutorial": {
+  "enabled": true,
+  "gap": 40,
+  "minGap": 25,
+  "perVisit": 4,
+  "firstGap": 10,
+  "firstMax": 10,
+  "firstRun": ["laufen", "springen", "gegner", "nahkampf", "schiessen", "treffer", "beute", "boden", "kanten", "leitern", "kisten", "ziel", "zurueck"]
+ },
  "ladder": {
   "look": "ladder_steel",
   "top": [0, 38],

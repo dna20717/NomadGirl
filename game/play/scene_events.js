@@ -170,6 +170,7 @@ export class SceneEvents {
       if (g.some(x => x.where === 'rig')) built = true;
       const M = f.moment || {}, who = M.who ? D.companions?.[M.who]?.name || M.who : 'AvA';
       const gifts = g.map(x => `${D.workshops[x.id]?.name || x.id} ${x.where === 'rig' ? 'steht jetzt im Rig' : 'liegt auf dem Schrottplatz'}`);
+      this.hud.tut?.unlocked?.(f.id);   // #186 its lesson comes at the next calm moment
       this.time.delayedCall(i * 1400, () => {
         this.hud.toast(M.title || `Neu: ${f.name}`, [M.text ? `${who}: „${M.text}“` : f.description, ...gifts].filter(Boolean).join(' · '), 'good', 9000);
         this.sfx?.('jingle_quest');

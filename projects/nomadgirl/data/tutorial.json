@@ -7,8 +7,7 @@
   "media": "clip",
   "clip": "tut_laufen",
   "trigger": "time",
-  "mode": "camp",
-  "after": 2
+  "after": 1
  },
  "springen": {
   "name": "Springen",
@@ -17,8 +16,8 @@
   "text": "{k:jump} springt. Lang gehalten geht es höher, kurz angetippt wird ein Hüpfer daraus.",
   "media": "clip",
   "clip": "tut_springen",
-  "trigger": "time",
-  "after": 40
+  "trigger": "leyla",
+  "on": "air"
  },
  "salto": {
   "name": "Salto",
@@ -57,9 +56,8 @@
   "text": "{k:dash} schießt Leyla ein Stück nach vorn. Danach lädt er sich kurz auf, oben steht dann DASH.",
   "media": "clip",
   "clip": "tut_dash",
-  "trigger": "time",
-  "mode": "run",
-  "after": 15
+  "trigger": "leyla",
+  "on": "dash"
  },
  "slide": {
   "name": "Slide",
@@ -98,8 +96,8 @@
   "text": "{k:melee} schlägt zu. Im Takt getippt wird eine Kombo daraus, eine Sekunde gehalten ein schwerer Hieb.",
   "media": "clip",
   "clip": "tut_nahkampf",
-  "trigger": "event",
-  "on": "alert"
+  "trigger": "leyla",
+  "on": "melee"
  },
  "schiessen": {
   "name": "Schießen",
@@ -108,8 +106,8 @@
   "text": "{k:ranged} zieht die Waffe und schießt im selben Zug. Gehalten steckt Leyla sie wieder weg.",
   "media": "clip",
   "clip": "tut_schiessen",
-  "trigger": "event",
-  "on": "alert"
+  "trigger": "leyla",
+  "on": "shot"
  },
  "nachladen": {
   "name": "Nachladen",
@@ -121,9 +119,8 @@
    {"look": "tut_nachladen_1", "caption": "Oben links steht, wie viel Munition noch im Magazin ist."},
    {"look": "tut_nachladen_2", "caption": "{k:reload} lädt nach. Wer leer abdrückt, lädt auch."}
   ],
-  "trigger": "time",
-  "mode": "run",
-  "after": 120
+  "trigger": "leyla",
+  "on": "reload"
  },
  "gegner": {
   "name": "Gegner sehen und hören",
@@ -135,9 +132,9 @@
    {"look": "tut_gegner_1", "caption": "Gegner schauen nach vorn. Ein Ausrufezeichen heißt: entdeckt."},
    {"look": "tut_gegner_2", "caption": "In der Nähe hören sie Leyla auch hinter sich. Von hinten bist du im Vorteil."}
   ],
-  "trigger": "time",
+  "trigger": "event",
   "mode": "run",
-  "after": 8
+  "on": "alert"
  },
  "treffer": {
   "name": "Treffer einstecken",
@@ -205,9 +202,8 @@
    {"look": "tut_inventar_1", "caption": "{k:inventory} öffnet das Inventar. Links Leyla mit Waffen, Kleidung und Implantaten."},
    {"look": "tut_inventar_2", "caption": "Rechts Rucksack und AvA, oben die Tabs."}
   ],
-  "trigger": "time",
-  "mode": "camp",
-  "after": 60
+  "trigger": "window",
+  "on": "inventory"
  },
  "raster": {
   "name": "Formen und Drehen",
@@ -268,9 +264,10 @@
   "text": "Unten erscheint ein Hinweis, was hier geht. {k:grab} oder der Stick nach oben benutzt es.",
   "media": "clip",
   "clip": "tut_benutzen",
-  "trigger": "time",
+  "trigger": "near",
   "mode": "camp",
-  "after": 10
+  "on": "*",
+  "after": 8
  },
  "feuer": {
   "name": "Am Lagerfeuer",
@@ -401,9 +398,8 @@
    {"look": "tut_bauen_1", "caption": "{k:build} öffnet den Bau-Modus, am Controller hältst du dafür Select."},
    {"look": "tut_bauen_2", "caption": "Leyla setzt sich ans Feuer, du steuerst AvA: Sie ist dein Zeiger."}
   ],
-  "trigger": "time",
-  "mode": "camp",
-  "after": 100
+  "trigger": "unlock",
+  "on": "build"
  },
  "einbauen": {
   "name": "Werkstätten einbauen",
@@ -490,8 +486,8 @@
    {"look": "tut_karte_1", "caption": "Die Karte zeigt die Orte dieses Durchgangs."},
    {"look": "tut_karte_2", "caption": "Rot eingekreist: Nachbarorte, eine Straße weit."}
   ],
-  "trigger": "window",
-  "on": "map"
+  "trigger": "unlock",
+  "on": "travel"
  },
  "fahren": {
   "name": "Fahren",
@@ -599,7 +595,8 @@
   "clip": "tut_zurueck",
   "trigger": "near",
   "on": "Van",
-  "mode": "run"
+  "mode": "run",
+  "after": 90
  },
  "tank": {
   "name": "AvAs Tank",
@@ -608,9 +605,8 @@
   "text": "",
   "media": "slides",
   "slides": [{"look": "tut_tank_1", "caption": "Im Cryo-Tank liegt AvAs Körper."},{"look": "tut_tank_2", "caption": "Wartung hält ihn stabil, jeder k.o. kostet Zustand."}],
-  "trigger": "near",
-  "on": "AvA",
-  "mode": "camp"
+  "trigger": "unlock",
+  "on": "search"
  },
  "techtree": {
   "name": "Der Techtree",

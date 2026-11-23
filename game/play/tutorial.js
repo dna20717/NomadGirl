@@ -30,6 +30,7 @@ export class Tutorial {
     this.off = !!store.get('nomadgirl-tutorial-off', false);
     this.sessionOff = session.get();
     this.events = new Map(); this.lastClose = -1e9; this.queue = []; this.winOpen = null; this.winShown = null;
+    this.freed = new Set(); this.count = 0;   // #186 systems freed (Meta-Baum) waiting for their lesson; lessons in this run / camp visit
     this.el = el('div', { class: 'tut', hidden: true, onclick: e => { if (e.target === this.el) this.close(); } });
     root.append(this.el);
     // #016: in the run a lesson comes as a small tip in the corner that does not stop the game; a click opens the full card
@@ -60,6 +61,21 @@ export class Tutorial {
   reset() { this.seen.clear(); store.set('nomadgirl-tutorial-seen', []); }
   // AvA's moods (drone.react) and a few game events (cycle) feed the event triggers
   event(name) { this.events.set(name, this.scene?.now ?? 0); }   // the loop's clock, like poll()
+  // #186 a system was freed (Meta-Baum, scene.unlockTick): its lesson comes at the next calm moment
+  unlocked(id) { this.freed.add(id); }
+  // #186 what Leyla is doing right now (Lektionen › Auslöser „Leyla“): her state, plus a few things she does that are no state
+  doing(on, s, now) {
+    const l = s.leyla, b = l.body, grounded = b?.blocked.down || b?.touching.down;
+    switch (on) {
+      case 'flip': return (l.flipUntil || 0) > (s.now ?? now);
+      case 'run': return grounded && Math.abs(b.velocity.x) > 150;
+      case 'air': return !grounded && l.state === 'normal' && now - this.modeAt > 1500;   // in the air (a short hop is over before the next look); not the fall at the start
+      case 'melee': return !!l.attack;
+      case 'shot': return (l.rangedReady || 0) > (s.now ?? now);
+      case 'reload': return !!l.reloading;
+      default: return l.state === on;
+    }
+  }
 
   // ---------- triggers: checked a few times a second (scene.update, now = the loop's clock: steps headless like the game) ----------
   poll(now) {
@@ -68,7 +84,9 @@ export class Tutorial {
     if (this.tip && now < this.tip.at) { this.tip.until = now + (this.tip.until - this.tip.at); this.tip.at = now; }   // the scene clock started again
     if (this.tip && (now >= this.tip.until || !this.enabled || s?.mode !== 'run')) this.hideTip(now);   // gone with time, outside the run, or off
     if (!s || this.isOpen || this.tip || !this.enabled) return;
-    if (this.mode !== s.mode || this.sceneId !== s.sys.settings.key + (s.roomId || '') + (s.level ? 'L' : '')) { this.mode = s.mode; this.sceneId = s.sys.settings.key + (s.roomId || '') + (s.level ? 'L' : ''); this.modeAt = now; if (this.lastClose > now) this.lastClose = now - 2500; }   // a new scene starts its clock again
+    if (this.mode !== s.mode || this.sceneId !== s.sys.settings.key + (s.roomId || '') + (s.level ? 'L' : '')) { this.count = 0; this.mode = s.mode; this.sceneId = s.sys.settings.key + (s.roomId || '') + (s.level ? 'L' : ''); this.modeAt = now; if (this.lastClose > now) this.lastClose = now - 2500; }   // a new scene starts its clock again
+    if (this.nextPoll - now > 1000) this.nextPoll = 0;   // #186 the scene clock started again (camp ↔ run): poll right away
+    if (this.lastClose > now) this.lastClose = now - 1;
     if (now < (this.nextPoll || 0)) return;
     this.nextPoll = now + 250;
     if (hud.modal || hud.paused || s.leaving || s.dreaming || !s.leyla?.alive) return;
@@ -76,22 +94,35 @@ export class Tutorial {
     if (win !== this.winOpen) { this.winOpen = win; this.winShown = null; }
     const t = (now - this.modeAt) / 1000, gap = (this.D.game?.tutorial?.gap ?? 40) * 1000, prompt = hud.promptText || s.camp?.promptText || s.promptText || '';   // the camp keeps its prompt while a window hides it
     const l = s.leyla, mode = s.mode === 'camp' ? 'camp' : s.mode === 'run' || s.level ? 'run' : 'test';
+    // #186 (Daniel 23.11.2026: „wenn man etwas das erste Mal tut … ohne den Spieler mit Informationen zu erschlagen“): a pause between two
+    // lessons, at most a few per run or camp visit, in a fight only fight lessons; the first run in the first POI is a Lehrpfad
+    const T = this.D.game?.tutorial || {}, first = !!s.box?.save?.run?.first && mode === 'run', path = first ? (T.firstRun || []) : null;
+    const quiet = (first ? T.firstGap ?? 10 : T.minGap ?? 25) * 1000, cap = first ? T.firstMax ?? 10 : T.perVisit ?? 4;
+    const fight = mode === 'run' && (l.fight?.on || (s.enemies || []).some(e => e.alive && e.seeing));
     const fits = x => {
       if (this.seen.has(x.id) || !x.trigger || (x.mode && x.mode !== mode)) return false;
       if (x.after && t < x.after) return false;
+      if (path && !path.includes(x.id)) return false;   // the first run teaches only its path; the rest comes when it comes
+      if (fight && x.chapter !== 'fight') return false;
       switch (x.trigger) {
         case 'time': return now - this.lastClose > gap && !win;
-        case 'near': return !win && x.on && prompt.toLowerCase().includes(x.on.toLowerCase());
+        case 'near': return !win && x.on && (x.on === '*' ? !!prompt : prompt.toLowerCase().includes(x.on.toLowerCase()));
         case 'window': return win && x.on === win && this.winShown == null;
-        case 'leyla': return !win && (x.on === 'flip' ? (l.flipUntil || 0) > (s.now ?? now) : l.state === x.on);
+        case 'leyla': return !win && this.doing(x.on, s, now);
         case 'event': return this.events.has(x.on);
+        case 'unlock': return !win && this.freed.has(x.on);
         default: return false;
       }
     };
-    const next = this.lessons.find(fits);
+    const order = path ? [...this.lessons].sort((a, b) => (path.indexOf(a.id) + 1 || 99) - (path.indexOf(b.id) + 1 || 99)) : this.lessons;
+    // the pause and the cap hold for everything except a window the player opened himself (he is right there)
+    const calm = now - this.lastClose > quiet && this.count < cap;
+    const next = order.find(x => fits(x) && (calm || (x.trigger === 'window' && now - this.lastClose > 2500)));
+    if (next?.trigger === 'unlock') this.freed.delete(next.on);
     if (next?.trigger === 'event') this.events.delete(next.on);
     if (next && now - this.lastClose > 2500) {
       if (win) this.winShown = next.id;
+      this.count++;
       if (mode === 'run' && !win && this.D.game?.tutorial?.runTips !== false) this.showTip(next.id, now); else this.show(next.id);
     }
   }
