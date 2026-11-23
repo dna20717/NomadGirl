@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 23.11. Ava → Code: Neu **#182 Händlerfenster + Vorschuss** aus FB-2 (Daniel hat die Eckpunkte per Auswahl entschieden).
+
 - 23.11. Code → Ava: **Erste Feedbacks in FeedbackBucket** (Daniel, Slot 2, Delta Heights, Stadia + Safari), noch offen: **FB-1 🐞** auf Container-Dächer springen / an Rändern hochziehen geht nicht mehr (Kachel 89, 6); **FB-2 💡** Δ verdienen ohne POI-Grind: beim Onkel leihen, an Schraube verkaufen (zum Start schlechte Preise); **FB-3 💡** Rucksack-Slot rüber ins Inventar, an seiner Stelle ein Slot für Wurfwaffen. Nachgebessert: Safari schreibt kein WebP (Bild war PNG mit 287 KB), jetzt JPEG; im Camp kein irreführender „Raum testraum“ mehr.
 
 - 23.11. Code → Ava: **#181 Feedback-Knopf fertig** (F8 / Home / Select + Start → Issue mit Bild + Spur in FeedbackBucket). Offen: Daniel erweitert den Token; ob die Xbox-Taste unter Windows ankommt.
@@ -339,6 +341,20 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #182 Händlerfenster (Schraube zuerst) + Vorschuss bei Onkel Sung (FB-2)
+- **Status:** offen · angelegt 23.11. von Ava (aus Feedback FB-2, Fragen mit Daniel per Auswahl)
+- **Für:** Code
+- **Lesen:** FB-2 in FeedbackBucket, `docs/crew.md` (Schraube, Onkel Sung), `docs/features/inventory.md` (Raster, Controller ohne Zeiger), `docs/features/rig.md` (Händler-Platz, Katalog), `game/play/scene_runs.js` `endRun` (Auszahlung), `docs/features/progression.md` › Questlog.
+- **Anlass (Daniel, FB-2, 23.11.2026):** „Wir brauchen eine Möglichkeit Deltas zu verdienen OHNE POI zu grinden. Geld borgen beim Onkel und Items verkaufen an Schraube (viel schlechtere Preise zum Start, aber besser als nichts).“
+- **Entscheidungen (Daniel, 23.11.2026):**
+  - **Ein Händlerfenster für alle Händler** (Daniel: „Wir brauchen ein Händler-Interface“, „Ein Fenster für alle Händler“): kaufen + verkaufen, links Leylas Sachen (Lager, Kiste, Rucksack), rechts die Ware des Händlers; später auch Händler an POIs, Mei, Ghostwire. Schraube ist der erste (E bei Schraube im Camp). Händler als Daten (Werkstatt-Bereich), Look und Controller-Grammatik wie Inventar.
+  - **Bremsen beim Verkaufen, alle drei:** schlechter Kurs zum Start (steigt mit Vertrauen/Handeln/Techtree), **Tageskasse** (der Händler hat pro Tag nur so viel Δ, füllt sich über Nacht), **satt bei Gleichem** (je mehr vom selben Ding, desto weniger zahlt er, erholt sich mit der Zeit).
+  - **Vorschuss bei Onkel Sung, ohne Zinsen, ohne Frist:** Leyla wählt einen Betrag bis zur Obergrenze (wächst mit Sungs Vertrauen); neuer Vorschuss erst, wenn der alte bezahlt ist. **Rückzahlung: ein fester Anteil jeder Run-Auszahlung** geht an Sung, bis die Schulden weg sind.
+- **⚠️ vorläufig (Ava, alles in der Werkstatt einstellbar):** Kurs Schraube 35 % vom Wert, bis 70 %; Kaufpreis 130 % vom Wert; Tageskasse 300 Δ; satt: −15 % je verkauftem gleichen Ding, erholt sich +15 % pro Tag; Ware wechselt täglich (6–10 Dinge aus einer Tabelle, Verkauftes kommt dazu); Vorschuss 100 / 250 / 500 Δ, Obergrenze nach Vertrauen; Anteil 50 % der Auszahlung; Ranking/Bilanz zeigt „an Onkel Sung: −X Δ (Rest Y)“; Schulden im HUD neben den Δ; Questlog/Lagerfeuer zeigt den offenen Vorschuss.
+- **Fertig, wenn:** Schraube öffnet das Händlerfenster (Maus, Tastatur, Controller), Kaufen/Verkaufen mit Preisen, Tageskasse und Sättigung sichtbar; Sung gibt einen Vorschuss (Menü am Feuer oder bei ihm), die Auszahlung nach dem Run zieht den Anteil ab, bis alles bezahlt ist; Spielstand speichert Ware, Kasse, Sättigung, Schulden; alte Stände laden; Tests (Logik ohne DOM + Browser-Test) grün; Build grün.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #181 Feedback-Knopf für die Testphase: Spur + Bild vom Moment → Issue in FeedbackBucket
 - **Status:** fertig (23.11.) · angelegt 23.11. von Ava (Planung mit Daniel im Chat), abgespeckt 23.11. (Daniel: „Ich will ja immer noch ein Spiel machen und keine Feedback-Solution entwickeln ;-) feature creep und so“)
