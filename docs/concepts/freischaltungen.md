@@ -136,7 +136,7 @@ Damit ein System wirklich weg ist, schweigt es an jeder Stelle, bis es frei ist:
 ## Technik (Vorschlag)
 
 - **Werkstatt-Bereich „Freischaltungen“** (`data/unlocks.json`, Gruppe Grundlagen): je System eine ID, Name, Stufe, Meta-Preis, Auslöser (Zähler wie bei Achievements, Quest erledigt, Merker, Tag), Story-Moment (Lektion, Dialog, Toast), Art des Sperrens (unsichtbar / Teaser / Quest), Teaser-Text. Dazu die Stufen: Name, „nächste Stufe ab n Freischaltungen“.
-- **Spielstand:** `save.meta = { points, unlocked: [ids], stage }`. **Neuer Durchgang:** ⚠️ Freigeschaltetes bleibt (Traum-Wissen); offen, siehe unten.
+- **Spielstand:** `save.meta = { points, unlocked: [ids], stage }`. **Neuer Durchgang:** wählbar (bleibt oder zurück auf 0), siehe Runde 2.
 - **Eine Abfrage überall:** `unlocked(D, save, 'trade')` in `game/unlocks.js` (ohne DOM). Jedes System fragt an seiner Tür: Gespräch „Handeln“, Knöpfe auf der Karte, Tab im Inventar, Bau-Modus-Taste, Tank-Verfall, Zwischenfälle …
 - **Story-Moment:** nutzt, was es gibt: Lektionen im Feldhandbuch (Karte beim ersten Mal), Companion-Dialog (`hud.menu` mit `talk`), AvA-Stimmungen, Toasts. Jede Freischaltung bringt ihre Lektion.
 - **Alte Spielstände:** bekommen beim Laden alles frei (`repairSave`), damit niemand etwas verliert.
@@ -144,14 +144,17 @@ Damit ein System wirklich weg ist, schweigt es an jeder Stelle, bis es frei ist:
 - **„Ganz raus“ technisch:** jedes Fenster und jede Tabelle fragt `unlocked()`; Beute fragt `hiddenAs(D, save, item)` und zeigt verborgene Dinge als Wertsache. Ein Prüfwerkzeug (Browser-Test) läuft Stufe 0–3 ab und sucht in DOM und Texten nach Wörtern der verborgenen Systeme (Implantat, Cyberdeck, Ruf, Bergung …).
 - **Datenset „Alles frei“** für Tests und Werkstatt, damit die Browser-Tests nicht an Freischaltungen hängen (wie `furnishedStart`).
 
+## Entschieden in Runde 2 (Daniel, 23.11.2026)
+
+- **Neuer Durchgang:** „beim Neustart wählbar“: Beim neuen Durchgang fragt das Spiel, ob die Freischaltungen bleiben (Traum-Wissen) oder ob es bei Stufe 0 losgeht. Neues Spiel (alles zurücksetzen) beginnt immer bei 0.
+- **Meta als Preis:** „vom System abhängig“: Freischaltungen haben einen eigenen Meta-Preis (0 = das Ziel schaltet direkt frei). Kleine Systeme gehen direkt, große (Hacking, Cyberware, Mega-Rigs) sammeln Meta aus mehreren Zielen.
+- **Schraube:** „ist von Anfang an dabei, aber er wird erst später zum Händler“: Schraube steht ab dem Grund-Camp am Feuer (Reden, Sprüche, Aufträge); „Handeln“ gibt es erst nach der Questkette „Schraube wird Händler“.
+- **Gangs:** „still mitzählen“: Gangs bleiben als Gegner und Namen, der Ruf zählt unsichtbar mit; Anzeige, Gang-Aufträge, Frieden, Ketten und Revierkrieg kommen mit „Machtspiele“.
+
 ## Offene Fragen an Daniel
 
-- **Neuer Durchgang:** Bleibt alles frei (Traum-Wissen), oder fängt man bei einer Stufe > 0 neu an?
-- **Gangs im Hintergrund:** Ruf still mitzählen (Vorschlag oben) oder bis zur Freischaltung ganz ohne Ruf?
-- **Wie viel Meta** gibt ein Ziel, und wie viel kostet ein System? Oder reicht „jedes Ziel = eine Freischaltung“, und Meta ist nur der Zähler im Hintergrund?
-- **Was passiert mit dem Startgeld und dem Start-Rig** (heute Werkstätten ab Start)? Vorschlag: Start-Rig leer bis Stufe 3, Lager und Schlafkoje ab Stufe 1.
-- **Wo fährt Schraube als Händler mit:** nur als Knopf auf der Karte, oder sitzt er sichtbar an einem Stand im Camp bzw. an Orten?
-- **Die Zahlen** (Ziele wie „2 POIs“, Schwellen) stellen wir nach dem ersten Durchspielen ein.
+- **Start-Rig:** Was steht zu Beginn im Rig (Rückfrage Daniel: „leer?“)? Siehe Runde 3 im Chat.
+- **Zahlen** (Rückfrage Daniel: „welche Zahlen?“): Schwellen der Ziele, Meta-Preise, Freischaltungen je Stufe. Siehe Runde 3 im Chat.
 
 ## Nächste Schritte
 
