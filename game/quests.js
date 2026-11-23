@@ -5,6 +5,7 @@
 //   save.quests = { active: { <id>: { base, day } }, done: { <id>: { day } }, tracked: 'main' | <id> }
 //   D.quests[id] = { name, giver (companion), text, after (quest), minDay, counter + filter + target (like achievements) | item + count
 //                    (deliver), reward: { deltas, items: [{ item, count }] }, done (line of the giver when it is handed in) }
+import { unlocked } from './unlocks.js';   // #184
 import { PRISONER, addDark, prisonerConfig } from './prisoners.js';
 import { ok as condOk, setFlag } from './conditions.js';
 import { state as achState } from './achievements.js';
@@ -33,7 +34,8 @@ export function offers(D, save, gang = null) {
   // #057 a treasure hunt only comes up once Leyla has one of its pieces (she brings it up with the giver)
   const has = x => !x.whenHas || (x.pieces || []).some(id => (stock(D, save)[id] || 0) > 0);
   const flagged = x => condOk(D, save, x);   // #062 Merker, #068 one condition language (Merker, Tag, Crew & Rig)
-  return Object.entries(D.quests || {}).filter(([id, x]) => (x.gang || null) === gang && (!gang || repEnough(D, save, x)) && !Q.active[id] && !Q.done[id] && (!x.after || Q.done[x.after]) && has(x) && flagged(x)).map(([id]) => id);
+  const free = x => (!x.unlock || unlocked(D, save, x.unlock)) && (!x.gang || unlocked(D, save, 'power'));   // #184 Meta-Baum: jobs of locked systems wait
+  return Object.entries(D.quests || {}).filter(([id, x]) => (x.gang || null) === gang && (!gang || repEnough(D, save, x)) && !Q.active[id] && !Q.done[id] && (!x.after || Q.done[x.after]) && has(x) && flagged(x) && free(x)).map(([id]) => id);
 }
 export function accept(D, save, id) {
   const x = D.quests?.[id], Q = qstate(save);

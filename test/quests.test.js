@@ -15,7 +15,8 @@ const fresh = () => ({ day: 1, hour: 8, deltas: 0, nodes: [], tank: { cond: 90, 
 
 test('Questlog: Angebote, Folge-Auftrag erst nach dem ersten, Ab Tag', () => {
   const s = fresh(), o = offers(D, s);
-  assert.ok(o.includes('kabelsalat') && o.includes('sungs_suppe'));
+  assert.ok(o.includes('kabelsalat') && o.includes('sung_zutaten'));
+  assert.ok(!o.includes('sungs_suppe'), '#184: erst nach „Fleisch mit Meinung“');
   assert.ok(!o.includes('geier_rupfen'), 'Folgeauftrag noch nicht');
   assert.ok(!o.includes('lichter_fuers_camp'), 'erst ab Tag 2');
 });

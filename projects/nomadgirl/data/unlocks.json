@@ -1,0 +1,145 @@
+{
+ "movement": {"name": "Bewegung", "stage": 0, "hide": "hidden", "description": "Laufen, Springen, Ducken, Kanten, Leiter, Dash.", "goals": [{"kind": "start"}]},
+ "fight": {"name": "Kampf", "stage": 0, "hide": "hidden", "description": "Nahkampf, Schießen, Nachladen.", "goals": [{"kind": "start"}]},
+ "use": {
+  "name": "Benutzen",
+  "stage": 0,
+  "hide": "hidden",
+  "description": "E an Türen, Schaltern, Kisten. AvA folgt. Der Tank ist sichtbar, verfällt aber noch nicht.",
+  "goals": [{"kind": "start"}]
+ },
+ "inventory": {
+  "name": "Rucksack & Inventar",
+  "stage": 1,
+  "hide": "hidden",
+  "description": "Das Inventar-Fenster (I / Select): Raster, Drehen, Ausrüsten.",
+  "goals": [{"kind": "counter", "counter": "kills", "n": 1}],
+  "moment": {"title": "Der hatte was dabei", "text": "Leyla, der Typ hatte Sachen in den Taschen. Schau in deinen Rucksack: I oder Select."}
+ },
+ "camp": {
+  "name": "Ein Platz zum Bleiben",
+  "stage": 1,
+  "hide": "hidden",
+  "description": "Grund-Camp: Lagerfeuer, Schlafen, Lager, Companions.",
+  "goals": [{"kind": "counter", "counter": "pois", "n": 1},{"kind": "counter", "counter": "knockouts", "n": 1}],
+  "moment": {"title": "Ein Platz zum Bleiben", "text": "Wir brauchen einen Platz zum Bleiben. Hier ist ein Feuer. Und Leute, die nicht schießen."}
+ },
+ "travel": {
+  "name": "Reisen",
+  "stage": 2,
+  "hide": "teaser",
+  "teaser": "Der Van springt noch nicht an. Schraube kümmert sich.",
+  "description": "Reisekarte, Hinfahren, Sprit, Vorräte, Zwischenfälle unterwegs. Bringt den Warroom.",
+  "goals": [{"kind": "counter", "counter": "pois", "n": 2}],
+  "moment": {"who": "schraube", "title": "Der Van läuft", "text": "Hörst du das? Er schnurrt. Wir können los, wohin du willst. Die Karte hängt im Warroom."},
+  "grant": {"workshops": ["warroom"]}
+ },
+ "hacking": {
+  "name": "Hacking & Entities",
+  "stage": 2,
+  "cost": 2,
+  "hide": "out",
+  "items": "glitchling",
+  "description": "Cyberdeck, Programme, Entities, Duelle, Bit-Stapel.",
+  "goals": [{"kind": "counter", "counter": "pois", "n": 3},{"kind": "counter", "counter": "trips", "n": 1}],
+  "moment": {"title": "Da ist etwas im Netz", "text": "Leyla … ich hab da draußen etwas gehört. Im Netz. Es hat zurückgeschaut."}
+ },
+ "build": {
+  "name": "Rig bauen & Werkbank",
+  "stage": 3,
+  "hide": "quest",
+  "description": "Bau-Modus (B / Select halten), Werkstätten umstellen und kaufen, Werkbank: Herstellen und Experimentieren.",
+  "goals": [{"kind": "quest", "quest": "kabelsalat"}],
+  "moment": {
+   "who": "schraube",
+   "title": "Eine Werkbank",
+   "text": "Für die Kabel kriegst du was Richtiges: meine alte Werkbank. Und ab jetzt bauen wir das Rig, wie du willst."
+  },
+  "grant": {"workshops": ["werkbank"]}
+ },
+ "cooking": {
+  "name": "Kochen",
+  "stage": 3,
+  "hide": "quest",
+  "description": "Kochnische, Rezeptbuch, Gerichte mit Buffs.",
+  "goals": [{"kind": "quest", "quest": "sung_zutaten"}],
+  "moment": {
+   "who": "onkel_sung",
+   "title": "Sungs Kochnische",
+   "text": "Mit Fleisch und Meinung kann ich arbeiten. Hier, meine Kochnische. Bring mir was, ich zeig dir den Rest."
+  },
+  "grant": {"workshops": ["kochnische"]}
+ },
+ "trade": {
+  "name": "Handel",
+  "stage": 3,
+  "hide": "quest",
+  "description": "Schraube wird Händler: Händlerfenster im Camp und unterwegs, Händler an Orten und auf der Straße.",
+  "goals": [{"kind": "quest", "quest": "schraube_kunde"}],
+  "moment": {
+   "who": "schraube",
+   "title": "Schraubes Schrotthandel",
+   "text": "Mein erster Kunde! Ab jetzt hab ich einen Laden. Und ich fahr mit, also hast du ihn überall dabei."
+  }
+ },
+ "advance": {
+  "name": "Vorschuss",
+  "stage": 3,
+  "hide": "hidden",
+  "description": "Onkel Sung leiht Δ ohne Zinsen.",
+  "goals": [{"kind": "poor", "n": 50}],
+  "moment": {"who": "onkel_sung", "title": "Knapp bei Kasse?", "text": "Ich seh doch, dass es knapp ist. Komm zu mir, ich leg dir was hin. Ohne Zinsen."}
+ },
+ "search": {
+  "name": "Die Suche",
+  "stage": 4,
+  "hide": "hidden",
+  "description": "Techtree zum Heilmittel im Warroom, AvAs Tank verfällt und will gepflegt werden, Technik/Wissen/Bio, Zerlegen und Auswerten, Hauptquest.",
+  "goals": [{"kind": "stage", "n": 4}],
+  "moment": {"title": "Leyla … der Tank", "text": "Leyla, der Tank piept. Ich glaube, ich … ich werde weniger. Bitte. Im Warroom liegt der Weg zum Heilmittel."},
+  "items": "progress"
+ },
+ "crew": {
+  "name": "Karawane",
+  "stage": 5,
+  "hide": "hidden",
+  "description": "Bewerber am Feuer, Crew, Jobs, Rig-Moral.",
+  "goals": [{"kind": "stage", "n": 5}],
+  "moment": {"title": "Besuch am Feuer", "text": "Da sitzt jemand an unserem Feuer. Sieht aus, als wollte er mit."}
+ },
+ "lucky": {
+  "name": "Lucky Ferro",
+  "stage": 5,
+  "hide": "hidden",
+  "description": "Lucky taucht am Feuer auf, Händler mit Sonderangeboten.",
+  "goals": [{"kind": "unlock", "system": "crew"},{"kind": "day", "n": 3, "meta": 0}],
+  "cost": 1
+ },
+ "power": {
+  "name": "Machtspiele",
+  "stage": 6,
+  "cost": 2,
+  "hide": "out",
+  "items": "prisoner",
+  "description": "Gangs und Ruf (zählt vorher still mit), Gang-Aufträge, Frieden, Revierkrieg, Kopfgeld, Dunkelheit, Gefangene und Zelle, Schwarzmarkt und Ghostwire.",
+  "goals": [{"kind": "counter", "counter": "encounters", "n": 3},{"kind": "counter", "counter": "pois", "n": 6}],
+  "moment": {"title": "Die Gangs reden über dich", "text": "Leyla, die Gangs haben angefangen, über dich zu reden. Das kann gut oder schlecht sein. Meistens beides."}
+ },
+ "megarigs": {
+  "name": "Mega-Rigs & Bergung",
+  "stage": 7,
+  "hide": "out",
+  "description": "Wracks auf der Karte, Bergung, Umziehen in ein Mega-Rig.",
+  "goals": [{"kind": "counter", "counter": "pois", "n": 10}],
+  "moment": {"who": "schraube", "title": "Ein Gigant", "text": "Hast du das auf der Karte gesehen? Da liegt ein Riese im Sand. Wenn wir den flottkriegen …"}
+ },
+ "cyberware": {
+  "name": "Cyberware",
+  "stage": 7,
+  "hide": "out",
+  "items": "implant",
+  "description": "Implantat-Slots, Ripperdoc, Implantate und ihre Baupläne.",
+  "goals": [{"kind": "counter", "counter": "pois", "n": 8},{"kind": "unlock", "system": "search", "meta": 0}],
+  "moment": {"title": "Seltsame Technik", "text": "Die seltsamen Chips, die du sammelst? Das sind Implantate. Man kann sie einsetzen. In Menschen. In dich."}
+ }
+}

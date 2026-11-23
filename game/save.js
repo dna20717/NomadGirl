@@ -8,6 +8,7 @@
 //   camp = the Kofferraum (plus rows from a Dachbox) and every Lagerregal as ONE grid; older 'chest' and 'rig:<unit>' grids move into it on load
 // Times are hours (18.5 = 18:30). "Ereignis-Zeit": the clock only moves on actions (sleeping, runs, sitting at the fire).
 
+import { unlockConfig, freshMeta } from './unlocks.js';   // #184 Meta-Baum
 import { storyState } from '../engine/storylets.js';
 import { repairLife } from '../engine/ecosystem.js';
 import { keepThrough, recipeOf } from './achievements.js';
@@ -180,15 +181,26 @@ function newInventory(D, save) {
 }
 
 // handed: what Spiel › Start › Nachreichen already gave (a new Durchgang keeps it, Daniel 16.11.2026: „A“, only once per savegame)
-export function newSave(D, handed = []) {
-  return giftBoard(D, withMap(D, newSaveCore(D, handed)));
+// opts.meta (#184): a brand-new game starts the Meta-Baum at stage 0 (game/unlocks.js); the workshops its systems bring later
+// (Freischaltung › Geschenk: Kochnische, Werkbank, Warroom) stay out of the start rig. Without it (tests, repairSave) everything is free.
+export function newSave(D, handed = [], opts = {}) {
+  const meta = opts.meta && unlockConfig(D).on ? (opts.keep || freshMeta(D)) : null;
+  const s = giftBoard(D, withMap(D, newSaveCore(D, handed, meta ? withheld(D, meta) : null)));
+  if (meta) s.meta = meta;
+  return s;
+}
+// the workshops that come with a system that is not free yet
+export function withheld(D, meta) {
+  const out = new Set();
+  for (const x of unlockConfig(D).systems) if (!meta.all && !meta.unlocked.includes(x.id)) for (const w of x.grant?.workshops || []) out.add(w);
+  return out;
 }
 // the travel map (#007): rolled for every new game and every Durchgang (game/worldmap.js)
 function withMap(D, s) { ensureMap(D, s); return s; }
-function newSaveCore(D, handed = []) {
-  const S = D.game?.start || {}, C = D.camp?.clock || {};
-  const { units, left } = placeWorkshops(D, S.tractor, S.containers || [], S.workshops || []);
-  const spare = [...(S.spare || []), ...left].filter(id => D.workshops?.[id]);   // packed on the scrapyard: Spiel › Start › Verpackt auf dem Schrottplatz, plus what did not fit
+function newSaveCore(D, handed = [], skip = null) {
+  const S = D.game?.start || {}, C = D.camp?.clock || {}, keep = id => !skip?.has(id);
+  const { units, left } = placeWorkshops(D, S.tractor, S.containers || [], (S.workshops || []).filter(keep));
+  const spare = [...(S.spare || []).filter(keep), ...left].filter(id => D.workshops?.[id]);   // packed on the scrapyard: Spiel › Start › Verpackt auf dem Schrottplatz, plus what did not fit
   return noGift(withInventory(D, ensureTankInRig(D, {
     version: SAVE_VERSION,
     day: C.startDay ?? 1, hour: C.startHour ?? 18,
@@ -206,8 +218,12 @@ function newSaveCore(D, handed = []) {
 }
 // a new Durchgang (design.md › Progression: „War alles nur ein Traum?“): AvA is dead, Leyla wakes up at the fire.
 // What stays: the tech tree nodes (and the recipes they unlock), the count of Durchgänge. Everything else starts small.
-export function newCycle(D, old) {
-  const s = newSave(D, old.handedOut || []);
+// keepUnlocks (#184, Daniel 23.11.2026: „beim Neustart wählbar“): the Meta-Baum stays (Traum-Wissen) or starts at stage 0
+export function newCycle(D, old, keepUnlocks = true) {
+  const om = old.meta;
+  const meta = !om || om.all ? null : keepUnlocks ? freshMeta(D, om) : freshMeta(D, null, old);
+  const s = newSave(D, old.handedOut || [], meta ? { meta: true, keep: meta } : {});
+  if (!meta && om?.all) s.meta = om;
   s.nodes = [...(old.nodes || [])].filter(id => D.techtree?.[id]);
   s.cycle = (old.cycle || 1) + 1;
   s.map = null; ensureMap(D, s);   // a new Durchgang, a new map
@@ -465,14 +481,17 @@ export async function openSave(D, base = '', opts = {}) {
   try { G = await be.blob('achievements'); } catch { G = null; }
   const learnt = s => {   // the global achievements into this slot, with the recipes they teach
     withGlobal(s, G);
+    if (s.meta && !s.meta.based) { s.meta.base = { ...(s.achievements?.counts || {}) }; s.meta.based = true; }   // #184 the Meta-Baum counts from here (the counters are global)
     for (const id of Object.keys(s.achievements?.done || {})) { const rid = recipeOf(D, id); if (rid && Array.isArray(s.recipes) && !s.recipes.includes(rid)) s.recipes.push(rid); }
     return s;
   };
   const fresh = s => { s.set = opts.set ?? ''; s.name ??= `Leyla ${n}`; return s; };
+  // #184 a brand-new game starts the Meta-Baum at stage 0; automated browsers (all tests) play with everything free unless a test asks
+  const metaNew = () => { try { return !(typeof navigator !== 'undefined' && navigator.webdriver && !localStorage.getItem('nomadgirl-unlocks-test')); } catch { return true; } };
   let clock = Date.now();
   const box = {
     where: be.where, time, slot: n, be,
-    save: learnt(stored ? repairSave(stored, D) : fresh(repairSave(null, D))),
+    save: learnt(stored ? repairSave(stored, D) : fresh(newSave(D, [], { meta: metaNew() }))),
     fresh: !stored,
     error: null,
     seen: stored?.savedAt || 0,   // the newest stamp this tab knows (loaded or written itself)
@@ -509,10 +528,10 @@ export async function openSave(D, base = '', opts = {}) {
     async reset() {
       const { save: old } = await be.get(n).catch(() => ({ save: null }));
       if (old) await be.setBlob('trash', { slot: n, save: old, meta: slotMeta(D, old, n), why: 'überschrieben', at: Date.now() }).catch(() => {});
-      box.save = learnt(fresh(newSave(D))); if (old?.name) box.save.name = old.name;   // a new game begins with this device's Datenset
+      box.save = learnt(fresh(newSave(D, [], { meta: metaNew() }))); if (old?.name) box.save.name = old.name;   // a new game begins with this device's Datenset
       box.fresh = true; return box.persist(true);
     },
-    async cycle() { const keep = { name: box.save.name, set: box.save.set, playMs: box.save.playMs }; box.save = learnt(Object.assign(newCycle(D, box.save), keep)); box.fresh = true; return box.persist(true); },
+    async cycle(keepUnlocks = true) { const keep = { name: box.save.name, set: box.save.set, playMs: box.save.playMs }; box.save = learnt(Object.assign(newCycle(D, box.save, keepUnlocks), keep)); box.fresh = true; return box.persist(true); },
   };
   return box;
 }

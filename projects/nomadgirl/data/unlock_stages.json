@@ -1,0 +1,15 @@
+{
+ "enabled": true,
+ "firstPoi": "tankstelle_km7",
+ "firstSeed": 7,
+ "stages": [
+  {"name": "Erwachen", "text": "Bewegung, Kampf, Benutzen. AvA ist da, der Tank auch."},
+  {"name": "Plündern", "need": 3, "text": "Rucksack, Kisten, Tresor, ein Platz zum Bleiben."},
+  {"name": "Unterwegs", "need": 2, "text": "Reisekarte, Fahrt, Zwischenfälle, erstes Hacking."},
+  {"name": "Zuhause", "need": 1, "text": "Rig bauen, Werkbank, Kochen, Handel, Vorschuss."},
+  {"name": "Die Suche", "need": 3, "text": "Techtree zum Heilmittel, AvAs Tank verfällt, Technik, Wissen, Bio."},
+  {"name": "Karawane", "need": 1, "text": "Crew, Siedler, Moral, Lucky Ferro."},
+  {"name": "Machtspiele", "need": 1, "text": "Gangs und Ruf, Revierkrieg, Kopfgeld, Dunkelheit, Gefangene."},
+  {"name": "Giganten", "need": 1, "text": "Mega-Rigs, Bergung, Cyberware."}
+ ]
+}

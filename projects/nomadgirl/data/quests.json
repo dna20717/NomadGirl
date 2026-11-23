@@ -26,7 +26,9 @@
   "done": "Gut. Jetzt hör zu: Mutanten tragen das, was AvA braucht, im Blut.",
   "counter": "cooked",
   "target": 3,
-  "reward": {"deltas": 40, "items": [{"item": "bio", "count": 2}]}
+  "reward": {"deltas": 40, "items": [{"item": "bio", "count": 2}]},
+  "after": "sung_zutaten",
+  "unlock": "cooking"
  },
  "tresor_tankstelle": {
   "name": "Der Tresor im Mile 7",
@@ -47,7 +49,8 @@
   "done": "Siehst du? Jetzt ist es ein Zuhause.",
   "counter": "lights",
   "target": 2,
-  "reward": {"deltas": 30, "items": [{"item": "wissen", "count": 1}]}
+  "reward": {"deltas": 30, "items": [{"item": "wissen", "count": 1}]},
+  "unlock": "build"
  },
  "silo_schatz": {
   "name": "Now I am become Death",
@@ -110,7 +113,8 @@
   "reward": {"deltas": 200, "items": [{"item": "technik", "count": 2}]},
   "text": "Die Siedlung an der Kreuzung zahlt für Plünderer, die ihre Brunnen vergiftet haben. Lebend. Jetzt, wo du eine Zelle im Rig hast: Bring mir einen, gefesselt.",
   "done": "Sie haben ihn abgeholt. Keiner hat gefragt, wie. Hier, dein Anteil.",
-  "needWorkshop": "cell"
+  "needWorkshop": "cell",
+  "unlock": "power"
  },
  "kopfgeld_sung": {
   "name": "Zwei Namen auf der Liste",
@@ -121,7 +125,8 @@
   "reward": {"deltas": 380, "items": [{"item": "wissen", "count": 2}]},
   "text": "Ich habe eine Liste. Nicht meine, ich trage sie nur. Zwei von denen da draußen sollen reden, nicht sterben. Bring sie mir.",
   "done": "Sie reden. Ich höre zu. Leyla … pass auf, dass dich das nicht verändert.",
-  "needWorkshop": "cell"
+  "needWorkshop": "cell",
+  "unlock": "power"
  },
  "vultures_ratten": {
   "name": "Ratten im Markt",
@@ -300,5 +305,45 @@
   "count": 1,
   "text": "Der Countdown im Silo darf nicht stehen bleiben. Bring Notstrom, und schalte zehn von denen aus, die am Schaltpult rumfummeln.",
   "done": "Die Uhr läuft wieder. Keiner weiß, was bei null passiert. Genau so mögen wir es."
+ },
+ "sung_zutaten": {
+  "name": "Fleisch mit Meinung",
+  "giver": "onkel_sung",
+  "text": "Ich hab drei Sterne, aber keine Zutaten. Bring mir Mutantenfleisch, dann zeig ich dir, was ein Herd kann.",
+  "item": "mutantenfleisch",
+  "count": 2,
+  "reward": {"deltas": 30},
+  "done": "Gut. Jetzt hab ich was zum Arbeiten."
+ },
+ "schraube_ware": {
+  "name": "Ein Stand braucht Ware",
+  "giver": "schraube",
+  "after": "kabelsalat",
+  "text": "Wir schleppen so viel Schrott durch die Gegend, ich könnte das verkaufen. Bring mir acht Stück Schrott, dann bau ich einen Stand.",
+  "item": "schrott",
+  "count": 8,
+  "reward": {"deltas": 20},
+  "done": "Das ist ein Anfang. Ein schöner, rostiger Anfang."
+ },
+ "schraube_kasse": {
+  "name": "Eine Kasse",
+  "giver": "schraube",
+  "after": "schraube_ware",
+  "text": "Ein Händler ohne Kasse ist ein Typ mit Schrott. Drei alte Platinen, dann löte ich mir eine.",
+  "item": "alte_platine",
+  "count": 3,
+  "reward": {"deltas": 30},
+  "done": "Klingelt! Hör nur, sie klingelt!"
+ },
+ "schraube_kunde": {
+  "name": "Der erste Kunde",
+  "giver": "schraube",
+  "after": "schraube_kasse",
+  "text": "Jetzt fehlt nur noch Kundschaft. Nimm mich mit auf die Straße. Der nächste Zwischenfall unterwegs, und ich mach das erste Geschäft.",
+  "counter": "encounters",
+  "target": 1,
+  "reward": {"deltas": 50},
+  "done": "Mein erster Kunde! Ab jetzt bin ich Händler.",
+  "unlock": "travel"
  }
 }

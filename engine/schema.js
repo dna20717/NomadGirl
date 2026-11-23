@@ -26,6 +26,7 @@ import { PAD_BUTTONS, PAD_ACTIONS, PAD_KINDS } from '../game/play/pad.js';
 import { LAMP_KINDS, LIGHT_BEHAVIORS } from './atmosphere.js';
 import { MEGARIG_KINDS, ADDON_AT, ADDON_CODE, ADDON_WALK, megarigProblems } from './megarig.js';
 import { ACHIEVEMENT_COUNTERS, ACHIEVEMENT_SPECIALS, ACHIEVEMENT_CATEGORIES } from '../game/achievements.js';
+import { GOAL_KINDS, HIDE_KINDS } from '../game/unlocks.js';
 import { REP_LEVELS } from '../game/reputation.js';
 import { RADIO_STYLES, RADIO_TALK, RADIO_SCALES, RADIO_KEYS } from '../game/radio_kinds.js';
 import { VOICE_STYLES, VOICE_SOUNDS } from '../game/voice.js';
@@ -1166,7 +1167,8 @@ export const AREAS = {
     sections: [
       { title: 'Auftrag', fields: [NAME, ref('giver', 'Auftraggeber', 'companions'), text('gang', 'Gang', { hint: '#088 Gangs als Auftraggeber: statt einer Begleiterin vergibt eine Gang den Auftrag (Name wie POI › Gang). Annehmen und Abgeben nur in ihrem Revier, beim Reden mit einem von ihnen' }),
         select('minRep', 'Ab Ruf', [['', 'Geduldet (Standard)'], ...REP_LEVELS.filter(([k]) => k === 'freund')], { hint: '#088: erst ab diesem Ruf bei der Gang im Angebot. Unter Geduldet gibt es keinen Frieden, also kein Gespräch' }), area_('text', 'Text', { hint: 'Was der Auftraggeber sagt' }), area_('done', 'Beim Abgeben', { hint: 'Sein Satz, wenn Leyla den Auftrag abgibt' }),
-        ref('after', 'Nach Auftrag', 'quests', { hint: 'Erst im Angebot, wenn dieser Auftrag erledigt ist' }), num('minDay', 'Ab Tag', { min: 1 })] },
+        ref('after', 'Nach Auftrag', 'quests', { hint: 'Erst im Angebot, wenn dieser Auftrag erledigt ist' }), num('minDay', 'Ab Tag', { min: 1 }),
+        ref('unlock', 'Erst mit Freischaltung', 'unlocks', { hint: '#184: erst im Angebot, wenn dieses System frei ist (Meta-Baum). Gang-Aufträge brauchen immer „Machtspiele“' })] },
       { title: 'Ziel', fields: [select('counter', 'Zähler', [['', '– Dinge abgeben –'], ...ACHIEVEMENT_COUNTERS], { hint: 'Was das Spiel zählt (ab dem Annehmen). Leer = Dinge abgeben' }), text('filter', 'Filter', { hint: 'Wie bei Achievements: Gegner, Familie, POI, Rang, Rezept …' }), num('target', 'Ziel', { min: 1 }),
         ref('item', 'Abgeben: Ding', 'items'), num('count', 'Abgeben: Anzahl', { min: 1 }),
         refs('pieces', 'Abgeben: alle diese', 'items', { hint: '#057 Schatzsuche: je eins von jedem (z. B. fünf Kartenstücke); statt „Abgeben: Ding“' }),
@@ -2345,6 +2347,27 @@ export const AREAS = {
     ],
     check: (x, report, P) => { for (const m of eventProblems(P.data || {})) report(/keine Antwort/.test(m) ? 'warning' : 'error', m); },
   },
+  unlockStages: {
+    name: 'Meta-Baum: Stufen', icon: 'lock', file: 'data/unlock_stages.json', kind: 'single',
+    hint: '#184/#185, Daniel 23.11.2026: der Meta-Baum. Die Systeme kommen dosiert, Stufe für Stufe; der Spieler sieht den Baum nie, er erlebt Ziele und Story-Momente (Konzept docs/concepts/freischaltungen.md). Die Systeme stehen im Bereich „Meta-Baum: Freischaltungen“. Testen: Pause-Menü › Cheats › Meta-Baum.',
+    sections: [
+      { title: 'Allgemein', fields: [bool('enabled', 'Freischaltungen an', { hint: 'Aus = alles von Anfang an frei (wie vor #184). Alte Spielstände haben immer alles frei' }), ref('firstPoi', 'Erster POI', 'pois', { hint: 'Ein neues Spiel beginnt nach dem Intro hier (Stufe 0: Bewegung, Kampf, Benutzen). Leer = im Camp wie früher' }), num('firstSeed', 'Seed des ersten POIs', { min: 1 })] },
+      { title: 'Stufen', fields: [table('stages', 'Stufen', [text('name', 'Name'), num('need', 'Öffnet ab', { min: 0, hint: 'So viele Systeme der vorigen Stufe müssen frei sein; leer = alle' }), text('text', 'Satz', { hint: 'Für den Meta-Baum' })], { hint: 'Reihenfolge = Stufe 0, 1, 2 …' })] },
+    ],
+  },
+  unlocks: {
+    name: 'Meta-Baum: Freischaltungen', singular: 'Freischaltung', icon: 'lock', file: 'data/unlocks.json', kind: 'catalog', groupBy: { key: 'stage' },
+    hint: 'Je System eine Freischaltung: Stufe, Meta-Preis, Ziele (Ziel → Story-Moment → Meta), wie es gesperrt aussieht. Jedes erfüllte Ziel gibt seine Meta; frei ist das System, sobald seine Stufe offen ist und die Meta den Preis erreicht (Preis 0 = das erste Ziel reicht).',
+    template: { name: 'Neues System', stage: 0, cost: 0, hide: 'hidden', goals: [{ kind: 'start', meta: 1 }] },
+    row: x => `Stufe ${x.stage ?? 0} · ${HIDE_KINDS.find(h => h[0] === x.hide)?.[1] || 'Unsichtbar'}${x.cost ? ` · ${x.cost} Meta` : ''}`,
+    sections: [
+      { title: 'System', fields: [NAME, num('stage', 'Stufe', { min: 0 }), num('cost', 'Meta-Preis', { min: 0, hint: 'Daniel: „vom System abhängig“. 0 = das erste erfüllte Ziel schaltet frei' }), select('hide', 'Gesperrt', HIDE_KINDS, { hint: 'Ganz raus (Daniel): keine Spur in der Oberfläche, Dinge davon gelten als Wertsache' }), area_('description', 'Was frei wird'), text('teaser', 'Teaser', { hint: 'Nur bei „Teaser“: was man vorher sieht' }),
+        text('items', 'Dinge des Systems', { hint: 'Kategorien von Gegenständen (Komma), die bis zur Freischaltung als Wertsache gelten, z. B. implant' })] },
+      { title: 'Ziele', fields: [table('goals', 'Ziele', [select('kind', 'Art', GOAL_KINDS), select('counter', 'Zähler', [['', '–'], ...ACHIEVEMENT_COUNTERS]), num('n', 'Anzahl / Tag / Stufe', { min: 0 }), ref('quest', 'Auftrag', 'quests'), text('flag', 'Merker'), ref('item', 'Ding', 'items'), ref('system', 'System', 'unlocks'), num('meta', 'Meta', { min: 0, hint: 'Leer = 1' })])] },
+      { title: 'Story-Moment', fields: [ref('moment.who', 'Wer', 'companions', { hint: 'Leer = AvA' }), text('moment.title', 'Titel'), area_('moment.text', 'Satz'), ref('moment.lesson', 'Lektion', 'tutorial', { hint: 'Feldhandbuch-Lektion zum System' })] },
+      { title: 'Geschenk', fields: [refs('grant.workshops', 'Werkstätten', 'workshops', { hint: 'Kommen mit der Freischaltung ins Rig (freier Platz) bzw. auf den Schrottplatz' })] },
+    ],
+  },
   tutorial: {
     name: 'Lektionen', singular: 'Lektion', icon: 'help', file: 'data/tutorial.json', kind: 'catalog', groupBy: { key: 'chapter', options: TUT_CHAPTERS },
     hint: 'Das Feldhandbuch (#011, Daniel, 13.11.2026: „ein Tutorial ähnlich wie bei Far Cry … Clips und Screenshots … feingranulare Lektionen“). Beim ersten Mal erscheint die Karte (pausiert), danach steht sie im Pause-Menü › Feldhandbuch. Clips und Bilder nimmt tools/tutorial_capture.mjs aus dem Spiel auf.',
@@ -2520,7 +2543,7 @@ export const AREAS = {
 // Navigation: groups of areas in the order of the design document
 export const GROUPS = [
   ['ASSETS', ['assets', 'pixelOrders', 'voices', 'sounds']],
-  ['GRUNDLAGEN', ['game', 'splash', 'intro', 'tutorial', 'notices', 'weather', 'economy', 'ranking', 'renames']],
+  ['GRUNDLAGEN', ['game', 'unlockStages', 'unlocks', 'splash', 'intro', 'tutorial', 'notices', 'weather', 'economy', 'ranking', 'renames']],
   ['LEYLA', ['leyla', 'drone', 'backpacks']],
   ['KAMPF', ['weapons', 'enemies', 'kits', 'buffs']],
   ['BEUTE & CRAFTING', ['items', 'lootTables', 'recipes', 'crafting']],
