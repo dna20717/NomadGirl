@@ -376,3 +376,7 @@ Bewusst gelassen (⚠️, Daniel entscheidet):
 | `trope_logbook`, `trope_desk`, `trope_shrine`, `wow_cabin` | Handschrift-Krakel | unleserlich |
 | `icons_nomadcola` (Marken-Clutter) | „Nomad“ | Lore-Marke (wie #170) |
 | `pad_icons` | Tasten A/B/X/Y, LB … | Controller-Symbole (wie #170) |
+
+## Favicon
+
+`game/brand/icon.svg`, `icon-180.png`, `icon-192.png`: runder NOMAD-Aufnäher mit Leylas Rig, Kante Pink `#E0408F`. Aus Code (NomadPixel-Skripte `rund.py`/`rundlogo.py`, Text-Pixel-Art, Palette AAP-64 als Grundlage), 24.11.2026. Keine Schrift in der Grafik.

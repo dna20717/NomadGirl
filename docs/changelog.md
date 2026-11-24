@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 24.11.2026: **Favicon**: runder NOMAD-Aufnäher (Rig auf Stoff, pinke Stickkante) als Tab- und Homescreen-Symbol auf allen Seiten.
 - 23.11.2026: **Lektionen kurz bevor** (#187): Springen, Kanten, Leitern, Ducken, Gegner, Schießen und Nahkampf kommen, wenn das Hindernis, die Kante, die Leiter oder der Gegner gerade vor Leyla liegt; im Camp schon beim E-Hinweis an der Werkstatt.
 - 23.11.2026: **Lektionen beim ersten Mal** (#186, Entwurf): Lehrpfad im ersten Run in Mile 7, sonst kommt eine Lektion, wenn Leyla etwas zum ersten Mal tut (erster Sprung, Schlag, Schuss …) oder ein System frei wird; Pause zwischen Lektionen und höchstens ein paar je Besuch.
 - 23.11.2026: **Freischaltungen / Meta-Baum** (#184, #185): Ein neues Spiel beginnt im ersten POI mit nur Bewegung, Kampf und Benutzen; acht Stufen bis zu den Giganten öffnen sich über Ziele und Story-Momente (Rucksack nach dem ersten Kill, Reisen nach zwei POIs, Rig bauen mit „Kabelsalat“, Kochen mit Sungs Auftrag, Handel mit der Questkette „Schraube wird Händler“ …). Hacking, Cyberware, Mega-Rigs und Machtspiele sind bis dahin ganz raus, ihre Dinge liegen als Wertsache herum. Der Tank verfällt erst ab „Die Suche“. Testen: Pause-Menü › Cheats › Meta-Baum.
