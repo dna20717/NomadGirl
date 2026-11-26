@@ -185,13 +185,14 @@
     beginRun() {
       const s = S();
       this.lastPoi = s.levelPoi; this.runStart = this.frame; this.plan = null; this.visited = new Set(); this.retreat = false;
+      this.target = null; this.lastSafe = null;   // a new level: nothing from the last one (an old target sent the assist teleport out of the world, #193)
       this.log.push({ f: this.frame, run: s.levelPoi, seed: s.levelSeed });
     },
     runTick() {
       const s = S(), l = s.leyla, st = this.st;
       if (this.runStart == null) this.beginRun();
       const R = s.room, rh = (R.h ?? R.tiles.length) * s.T;
-      if (l.feet > rh + 400 || !Number.isFinite(l.x) || !Number.isFinite(l.feet)) { this.note('void', `Leyla ist aus der Welt gefallen (Füße bei y ${Math.round(l.feet)}, Level ${rh} hoch)`, { from: this.lastSafe }); if (this.lastSafe) nomad.tp(...this.lastSafe); else if (s.van) nomad.tp(s.van.x, s.van.y); this.wait(30); return; }
+      if (l.feet > rh + 400 || !Number.isFinite(l.x) || !Number.isFinite(l.feet)) { this.note('void', `Leyla ist aus der Welt gefallen (Füße bei y ${Math.round(l.feet)}, Level ${rh} hoch)`, { from: this.lastSafe }); if (this.lastSafe && this.lastSafe[1] <= rh) nomad.tp(...this.lastSafe); else if (s.van) nomad.tp(s.van.x, s.van.y); this.wait(30); return; }
       if ((l.body.blocked.down || l.body.touching.down) && this.frame % 60 < 6 && l.feet <= rh) this.lastSafe = [l.x, l.feet];
       if (!l.alive || l.health <= 0) { this.log.push({ f: this.frame, ko: true }); this.wait(240); return; }
       // fight first
@@ -279,6 +280,8 @@
       if (stuckFor > 60 * 40) {   // 40 s without getting closer: assisted teleport, and a finding
         this.assists++; t.assists = (t.assists || 0) + 1;
         if (t.assists > 2 && t.what !== 'van') { this.note('giveup', `Ziel (${t.what}) auch mit Hilfe nicht erreichbar`); this.visited.add(t.what + Math.round(t.x) + ',' + Math.round(t.feet)); this.target = null; return; }
+        const R = S().room, W0 = (R.w ?? R.tiles[0].length) * T, H0 = (R.h ?? R.tiles.length) * T;
+        if (t.feet > H0 || t.x < 0 || t.x > W0) { this.note('giveup', `Ziel (${t.what}) liegt außerhalb des Levels (Kachel ${Math.round(t.x / T)},${Math.round(t.feet / T)})`); this.target = null; return; }   // never teleport out of the world
         this.note('stuck', `Kommt nicht zum Ziel (${t.what}), Bot hilft nach`, { to: [Math.round(t.x / T), Math.round(t.feet / T)] });
         nomad.tp(t.x, t.feet); this.wait(20); t.since = this.frame; t.best = 0;
         return;
