@@ -47,3 +47,7 @@ Issues in FeedbackBucket lesen (GitHub-Werkzeuge, Repo per `add_repo`), `trace.j
 ## Tests
 
 `test/feedback.test.js` (Worker gegen falsches GitHub: Issue + Commit in FeedbackBucket, NomadGirl unberührt, Prüfung, Login; Spur-Fenster), `tools/feedback_test.mjs` (19: Spur 30 s, F8 pausiert, Bild, Tasten erreichen Leyla nicht, Esc, Select + Start ohne Pause-Menü, Steuerkreuz/A/Start, Warteschlange ohne Worker, FB-7 mit Worker + Warteschlange geleert, JS-Fehler-Hinweis, einmal je Fehler).
+
+## Pausen in der Spur (#188)
+
+Steht das Spiel still (Feedback-Fenster, Menü, versteckter Tab), entsteht zwischen zwei Frames eine lange Lücke. Bis 26.11. zählte sie als Frame (FB-4 bis FB-12: „schlimmster Frame 276351 ms“, „fps 2“). Jetzt: Lücken über 1 s landen in `fps.pauses` / `pausedMs`, Schnitt und schlimmster Frame zählen nur echte Frames. Das Issue zeigt „…, 2× Pause, zusammen 95 s“.

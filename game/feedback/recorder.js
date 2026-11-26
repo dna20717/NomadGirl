@@ -9,12 +9,14 @@ export class Recorder {
   constructor({ seconds = 30, every = 15, maxEvents = 400 } = {}) {
     this.ms = seconds * 1000; this.every = Math.max(1, every); this.maxEvents = maxEvents;
     this.samples = []; this.inputs = []; this.events = []; this.errors = [];
-    this.frames = 0; this.lastHeld = null; this.lastT = 0; this.fps = [];
+    this.frames = 0; this.lastHeld = null; this.lastT = 0; this.fps = []; this.pauses = [];
   }
   // once per frame: t = clock in ms, held = names of the held inputs, sample = () => small state (only called when due)
   frame(t, held, sample) {
     this.frames++;
-    if (this.lastT && t > this.lastT) { this.fps.push([t, t - this.lastT]); }
+    // FB-4…FB-12 (25.11.2026): the gap while the game stood still (the feedback window, a menu, a hidden tab) is no frame: worst frames of
+    // 60–270 s and averages of 2 fps came from typing the report. A gap over a second counts as a pause, not into the fps
+    if (this.lastT && t > this.lastT) { if (t - this.lastT > 1000) this.pauses.push([t, t - this.lastT]); else this.fps.push([t, t - this.lastT]); }
     this.lastT = t;
     const h = held.join('+');
     if (h !== this.lastHeld) { this.inputs.push({ t, held: h }); this.lastHeld = h; }
@@ -36,12 +38,13 @@ export class Recorder {
     // keep the input that was held when the window starts
     let i = 0; while (i + 1 < this.inputs.length && this.inputs[i + 1].t < from) i++; if (i) this.inputs.splice(0, i);
     let k = 0; while (k < this.fps.length && this.fps[k][0] < from) k++; if (k) this.fps.splice(0, k);
+    let q = 0; while (q < this.pauses.length && this.pauses[q][0] < from) q++; if (q) this.pauses.splice(0, q);
   }
   // fps over the window: average and the worst frame
   fpsInfo() {
     if (!this.fps.length) return null;
     const d = this.fps.map(f => f[1]), avg = d.reduce((a, b) => a + b, 0) / d.length;
-    return { avg: Math.round(1000 / avg), worstMs: Math.round(Math.max(...d)) };
+    return { avg: Math.round(1000 / avg), worstMs: Math.round(Math.max(...d)), ...(this.pauses.length ? { pauses: this.pauses.length, pausedMs: Math.round(this.pauses.reduce((a, p) => a + p[1], 0)) } : {}) };
   }
   dump(t = this.lastT) {
     this.trim(t);

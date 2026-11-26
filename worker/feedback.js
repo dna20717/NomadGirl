@@ -40,7 +40,7 @@ export function issueBody(b, user, { number, repo, dir }) {
   const c = b.context || {}, t = b.trace || {}, link = f => `https://github.com/${repo}/blob/main/${dir}/${f}`;
   const rows = [['Modus', c.mode], ['POI', c.poi && `${c.poi} · Seed ${c.seed}`], ['Raum', c.room], ['Ort', c.place], ['Kachel', c.tile?.join(', ')], ['Leben', c.health], ['Fenster', c.window],
     ['Durchgang / Tag', c.cycle != null ? `${c.cycle} / ${c.day ?? '–'}` : null], ['Slot', c.slot], ['Version', c.version], ['Daten', c.data], ['Datenset', c.set], ['Controller', c.pad], ['Bildschirm', c.screen], ['Browser', c.browser], ['Adresse', c.url],
-    ['fps', t.fps ? `${t.fps.avg} (schlimmster Frame ${t.fps.worstMs} ms)` : null]].filter(([, v]) => v != null && v !== '');
+    ['fps', t.fps ? `${t.fps.avg} (schlimmster Frame ${t.fps.worstMs} ms${t.fps.pauses ? `, ${t.fps.pauses}× Pause, zusammen ${Math.round(t.fps.pausedMs / 1000)} s` : ''})` : null]].filter(([, v]) => v != null && v !== '');
   const errors = (t.errors || []).slice(-5);
   return [
     `**${CHIPS[b.chip] || 'Feedback'}** · ${cell(b.where)}`,
