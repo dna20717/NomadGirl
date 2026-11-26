@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 26.11. Code → Ava: **#188 Feedback-Paket läuft** (FB-1, FB-3–FB-12, neun neue Meldungen von Steven am 25.11.).
+
 - 23.11. Code → Ava: **#187** Lektionen kommen jetzt kurz bevor (Vorausschau im Level), nicht danach.
 
 - 23.11. Code → Ava: **#186 Lektionen beim ersten Mal** (Entwurf, Daniel AFK): Lehrpfad im ersten Run, Lektionen beim ersten Tun und bei Freischaltungen, Pause und Höchstzahl gegen die Tipp-Lawine.
@@ -357,6 +359,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #188 Feedback-Paket 25.11. (FB-1, FB-3–FB-12)
+- **Status:** läuft (26.11.) · angelegt 26.11. von Code (Daniel: „Lass uns kurz die Ideen besprechen und dann nach meinem go alles als Paket abarbeiten“, dann „Lets go!“)
+- **Für:** Code
+- **Lesen:** FeedbackBucket FB-1, FB-3 bis FB-12 (Bild + `trace.json`), `docs/features/feedback.md`, `inventory.md`, `drone.md`, `rig.md`, `pois.md`.
+- **Entscheidungen (Daniel, 26.11., Auswahl):** FB-3 Rucksack-Slot rüber zum Rucksack-Raster, an seiner Stelle ein **Wurf-Slot** für eine Wurf-Ausrüstung mit Ladungen + Abklingzeit (Granaten bleiben ein Skill); FB-5 **Blättern in der Boden-Leiste** (←/→ bzw. Q/Mausrad, E hebt das Markierte auf); FB-7 Abrutschen an AvA beheben **+ mehr Akku**; FB-8 „Sooo viel Loot“ = Lob, bleibt.
+- **Paket:** FB-1 Container-Kanten · FB-4 Baumenü kaputt · FB-6 falsche Van-Grafik im Level · FB-9 Textfenster links länger · FB-10 Bilanz zuckt beim Blättern · FB-11 Secrets 0/4 · FB-12 Bodenplatte zum Tunnel · FB-3 · FB-5 · FB-7 · Spur zählt Tipp-Pause nicht als Ruckler.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #187 Lektionen kurz bevor (Vorausschau)
 - **Status:** fertig (23.11.) · angelegt 23.11. von Code (Daniel: „wenn sie es zum ersten Mal macht, bedeutet eigentlich oft: kurz bevor sie es das erste Mal machen muss“; Antworten A a a)
