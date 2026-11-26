@@ -12,6 +12,8 @@
     ole: { runMin: 35, chests: 'all', enemies: 'defend', secrets: true, loot: 'choose', camp: ['Schwarzes Brett', 'Lagerfeuer:Questlog', 'Onkel Sung', 'Schlafkoje:Schlafen'], campMin: 8, travel: 0.6 },
     deniz: { runMin: 25, chests: 'all', enemies: 'all', secrets: true, loot: 'choose', camp: ['Schraube', 'Lagerfeuer:Questlog', 'Kochnische', 'trade', 'Schlafkoje:Schlafen'], campMin: 10, travel: 0.25 },
     kai: { runMin: 12, chests: 'none', enemies: 'all', secrets: false, loot: 'none', camp: ['Schlafkoje:Schlafen'], campMin: 2, travel: 0.4 },
+    // #191 Testpilot: goes through every system it has a skill for, in every camp visit (tools/persona_bot/skills.js)
+    pilot: { runMin: 12, chests: 'all', enemies: 'all', secrets: true, loot: 'choose', camp: ['skill:tank', 'skill:salvage', 'skill:tech', 'skill:cook', 'skill:build', 'Schraube:Handeln', 'Schlafkoje:Schlafen'], campMin: 4, travel: 0.5, allJobs: true },
   };
   const bot = window.personaBot = {
     persona: null, st: null, frame: 0, log: [], findings: [], runs: [], seen: new Set(), assists: 0, toastsSeen: 0, errors: [],
@@ -22,13 +24,15 @@
       nomad.take(); nomad.fast(true);   // pictures only for shots and reports (the runner switches it off then)
     },
     // run n frames of play, return what happened since the last chunk
-    chunk(n) {
+    async chunk(n) {
       const end = this.frame + n;
       while (this.frame < end) {
         try { this.tick(); } catch (e) { this.note('script', `Bot-Fehler: ${e.message}`, { stack: String(e.stack).slice(0, 300) }); this.wait(30); }
       }
       this.watch();
-      const out = { frame: this.frame, log: this.log, findings: this.findings, runs: this.runs, errors: this.errors, assists: this.assists, state: this.brief() };
+      for (const f of (await window.checks?.tick(this.frame)) || []) this.findings.push({ ...f, frame: this.frame, key: f.kind + ':' + f.text.slice(0, 60), dup: false });   // #191 the checks
+      const out = { frame: this.frame, log: this.log, findings: this.findings, runs: this.runs, errors: this.errors, assists: this.assists, state: this.brief(), coverage: window.coverage?.data || null };
+      if (window.coverage) window.coverage.data = {};   // #191 the runner keeps it (the page reloads every 20 game minutes)
       this.log = []; this.findings = []; this.runs = []; this.errors = [];
       return out;
     },
@@ -52,7 +56,7 @@
     // ---------------- main loop ----------------
     tick() {
       const s = S();
-      if (!s?.leyla) return this.wait(10);
+      if (!s?.leyla || s.leaving || (s.mode === 'camp' && !s.camp)) return this.wait(10);   // #191 a scene change is under way (loading bar): nothing to do yet
       if (this.closeStray()) return;
       if (s.mode === 'camp') return this.campTick();
       if (s.mode === 'run' || s.level) return this.runTick();
@@ -83,7 +87,7 @@
     // ---------------- camp ----------------
     campTick() {
       const st = this.st, s = S();
-      if (this.campLeft == null) { this.campLeft = st.campMin * 3600; this.campTodo = [...st.camp].sort(() => this.rnd() - 0.5).slice(0, Math.max(2, Math.ceil(st.camp.length * 0.7))); }
+      if (this.campLeft == null) { this.campLeft = st.campMin * 3600; this.campTodo = st.allJobs ? [...st.camp] : [...st.camp].sort(() => this.rnd() - 0.5).slice(0, Math.max(2, Math.ceil(st.camp.length * 0.7))); }
       if (this.campTodo.length && this.campLeft > 0) {
         const job = this.campTodo.shift(), t0 = this.frame;
         this.campJob(job);
@@ -117,6 +121,13 @@
       this.wait(Math.min(k, 120));
     },
     campJob(job) {
+      if (job.startsWith('skill:') && window.testpilot) {   // #191 a skill of the Testpilot
+        const name = job.slice(6), r = window.testpilot[name]?.() || { ok: false, what: name, note: 'unbekannte Fähigkeit' };
+        this.log.push({ f: this.frame, skill: r });
+        if (!r.ok) this.note('skill', `${r.what}: ${r.note}`);
+        this.closeStray(); this.wait(30);
+        return;
+      }
       const [where, what] = job.split(':'), h = H();
       if (where === 'build') {   // Malu: open the build mode, look around, close it again
         const s = S(); s.openBuild(); this.wait(60);
@@ -153,15 +164,13 @@
     startRun() {
       const st = this.st;
       this.expectMenu = true;
+      // #191 TravelMode through the skill (the map's neighbours are in `near`; #189 looked for `neighbours` and never travelled)
+      if (window.testpilot && this.rnd() < st.travel) { const r = window.testpilot.travel(); this.log.push({ f: this.frame, skill: r, travel: r.note }); if (!r.ok) this.note('skill', `travel: ${r.note}`); this.closeStray(); this.expectMenu = true; }
       this.goTo('Van'); this.wait(1, [], ['grab']); this.wait(10);
       if (H().menuState()) nomad.choose('Planen');
       const m = nomad.map();
       let ok = false;
-      if (m?.open) {
-        const go = this.rnd() < st.travel && m.neighbours?.length ? m.neighbours[Math.floor(this.rnd() * m.neighbours.length)] : null;
-        if (go) { ok = nomad.choose(typeof go === 'string' ? go : go.name || go.id); this.log.push({ f: this.frame, travel: go?.name || go }); }
-        if (!ok) ok = nomad.choose('Plündern');
-      }
+      if (m?.open) ok = nomad.choose('Plündern');
       this.expectMenu = false;
       if (!ok) { this.note('travel', 'Vom Van aus kommt Leyla nicht los (Karte/Plündern)', { map: m && { here: m.here, action: m.action } }); H().map?.close(); this.wait(600); return; }
       this.wait(120);

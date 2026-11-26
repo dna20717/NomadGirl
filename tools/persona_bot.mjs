@@ -23,6 +23,7 @@ const VOICE = {
   malu: { stuck: 'Hier hänge ich fest, das nervt beim gemütlichen Spielen. {what}', use: 'Hier sollte doch was gehen, tut es aber nicht. {what}', window: 'Das Fenster bleibt offen. {what}', build: 'Beim Bauen hakt es. {what}', travel: 'Losfahren klappt nicht. {what}', error: 'Fehler aufgetaucht. {what}', script: 'Etwas stimmt hier nicht. {what}' },
   ole: { stuck: 'Weg gefunden, der gemeint aussieht, aber nicht geht. {what}', use: 'Interaktion ohne Wirkung. {what}', window: 'Fenster hängt. {what}', build: 'Bau-Modus hakt. {what}', travel: 'Reisen geht nicht. {what}', error: 'JS-Fehler beim Erkunden. {what}', script: 'Seltsames Verhalten. {what}' },
   deniz: { stuck: 'Hier verliere ich Zeit, weil Leyla nicht durchkommt. Kostet Rang. {what}', use: 'Aktion ohne Ergebnis. {what}', window: 'Fenster lässt sich nicht schließen. {what}', build: 'Bau-Modus: {what}', travel: 'Kein Run möglich. {what}', error: 'Fehlermeldung: {what}', script: 'Unklarer Zustand: {what}' },
+  pilot: { stuck: 'Kommt nicht weiter. {what}', use: 'Interaktion ohne Wirkung. {what}', window: 'Fenster hängt. {what}', build: 'Bauen: {what}', travel: 'Reisen: {what}', error: 'JS-Fehler: {what}', script: 'Bot-Fehler: {what}', skill: 'System-Test: {what}', hud: 'HUD: {what}', memory: 'Speicher: {what}', numbers: 'Werte: {what}', softlock: 'Softlock: {what}', save: 'Spielstand: {what}' },
   kai: { stuck: 'Lauf unterbrochen, Leyla bleibt hängen. Killt den Flow. {what}', use: 'Input frisst nichts. {what}', window: 'Fenster blockiert. {what}', build: 'Bauen kaputt. {what}', travel: 'Komme nicht in den Run. {what}', error: 'Error: {what}', script: 'Bug? {what}' },
 };
 const CHIP = { stuck: 'bug', use: 'bug', window: 'bug', build: 'bug', travel: 'bug', error: 'bug', script: 'verwirrend' };
@@ -47,12 +48,14 @@ async function open(fresh, fromFrame) {
   await page.goto((process.env.GAME_URL || 'http://localhost:8766/game.html') + (fresh ? '?camp&new' : '?camp'));
   await page.waitForFunction(() => { try { return window.nomad?.state?.() && window.nomadFeedback; } catch { return false; } }, null, { timeout: 120000 });
   await page.addScriptTag({ path: 'tools/persona_bot/brain.js' });
+  await page.addScriptTag({ path: 'tools/persona_bot/checks.js' });   // #191
+  await page.addScriptTag({ path: 'tools/persona_bot/skills.js' });
   await page.evaluate(([p, s, f]) => personaBot.init(p, s, f), [id, seed + crashes * 1000, fromFrame]);
 }
 await open(true, 0);
 
 let reports = 0, nextShot = 0, frame = 0, assists = 0;
-const t0 = Date.now(), counts = {};
+const t0 = Date.now(), counts = {}, covered = {};
 const SESSION = 20 * 3600;   // a real player closes the game now and then: every 20 game minutes the browser opens again (the game keeps textures of every run, #189) on the same save
 let sessionStart = 0;
 async function metrics() { try { const m = Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map(x => [x.name, x.value])); return { heap: Math.round(m.JSHeapUsedSize / 1048576), nodes: m.Nodes, listeners: m.JSEventListeners, docs: m.Documents }; } catch { return null; } }
@@ -88,6 +91,7 @@ while (frame < total) {
   }
   frame = r.frame; assists = r.assists;
   for (const x of r.log) log(x);
+  for (const [k, m] of Object.entries(r.coverage || {})) for (const [v, n] of Object.entries(m)) { const c = (covered[k] ??= {}); c[v] = (c[v] || 0) + n; }   // #191
   for (const x of r.runs) log({ runDone: x });
   for (const e of [...r.errors, ...pageErrors.splice(0)]) r.findings.push({ kind: 'error', text: String(e).slice(0, 300), frame, mode: r.state.mode, poi: r.state.poi });
   for (const f of r.findings) {
@@ -109,6 +113,15 @@ while (frame < total) {
   }
   if (Math.round(frame / 3600) % 30 === 0) console.log(`${P.name}: ${(frame / 216000).toFixed(1)} h Spielzeit · ${Math.round((Date.now() - t0) / 60000)} min · ${reports} Meldungen · ${assists} Hilfen`);
 }
+// #191 coverage: what was touched, what exists and was never touched (from the game as it stands at the end)
+let cov = null;
+try { cov = await page.evaluate(d => { window.coverage.data = d; return window.coverage.report(); }, covered); } catch (e) { cov = { touched: covered, never: {}, error: e.message }; }
+fs.writeFileSync(path.join(out, 'coverage.json'), JSON.stringify(cov, null, 1));
+const kinds = Object.keys({ ...cov.touched, ...cov.never }).sort();
+fs.writeFileSync(path.join(out, 'report.md'), [`# Testpilot ${id} · ${(frame / 216000).toFixed(1)} h Spielzeit`, '',
+  '| Bereich | berührt | nie berührt |', '|---|---|---|',
+  ...kinds.map(k => `| ${k} | ${Object.entries(cov.touched[k] || {}).map(([v, n]) => `${v} (${n})`).join(', ') || '–'} | ${(cov.never[k] || []).join(', ') || '–'} |`), '',
+  '## Befund-Kandidaten', '', ...Object.entries(counts).filter(([k]) => !k.startsWith('_')).map(([k, n]) => `- ${k}: ${n}`), ''].join('\n'));
 const summary = { persona: id, hours: frame / 216000, minutes: Math.round((Date.now() - t0) / 60000), reports, assists, crashes, counts };
 fs.writeFileSync(path.join(out, 'summary.json'), JSON.stringify(summary, null, 1));
 console.log(JSON.stringify(summary));

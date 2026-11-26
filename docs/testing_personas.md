@@ -64,3 +64,17 @@ node tools/persona_feedback.mjs --persona ole --chip bug --text "…" [--url 'ht
 - **In der Cloud-Sitzung** (kein Login): das Werkzeug fängt genau die Anfrage des Formulars ab und legt sie unter `output/persona/<zeit>_<persona>/payload.json` ab. Mit `--post <payload> --number <n> --bucket <Klon von FeedbackBucket>` schreibt es Bild und Spur nach `media/nomadgirl/FB-<n>/` und den Issue-Text mit derselben Funktion wie der Worker (`issueBody` aus `worker/feedback.js`) nach `issue.md`. Ava legt das Issue an (Labels `nomadgirl`, Chip, `persona`), pusht den Klon und setzt den Text ein.
 - **Gemeldet von** „Persona Ole (Ava)“, damit jede Meldung als Persona erkennbar bleibt.
 - Personas melden, was ihnen als dieser Spielertyp auffällt, nicht alles, was Ava im Code sieht. Code-Befunde gehören ins Funkbuch.
+
+## Testpilot (#191)
+
+Eine sechste „Persona“ ohne Spielertyp: **`pilot`** geht bei jedem Camp-Besuch alle Systeme durch, für die es eine Fähigkeit gibt, und reist bei jeder zweiten Abfahrt. Läuft **nur auf Zuruf** (Daniel, 26.11.2026):
+
+```
+npm run testpilot                                     # 2 h Spielzeit, ~10–15 Rechenminuten
+node tools/persona_bot.mjs --persona pilot --hours 5  # länger
+```
+
+- **Fähigkeiten** (`tools/persona_bot/skills.js`), alle über die echten Fenster und ihre Funktionen: **Reisen** (Karte am Van, ein Nachbarort mit POI zuerst, Fahrt vorspulen, Zwischenfälle beantworten), **Bauen** (eine Werkstatt aus dem Schrottplatz in einen Platz des Rigs ziehen, mit dem Zeiger des Bau-Modus; Leyla schraubt), **Kochen** (ein fertiges Rezept an der Kochnische), **Zerlegen** (an der Werkbank, gibt Technik), **Techtree** (der erste bezahlbare Knoten), **Tank warten** (ein Wartungsrezept am Cryo-Tank). Dazu wie alle Personas Runs, Kampf, Beute, Händler-Fenster, Schlafen.
+- **Prüfer** (`tools/persona_bot/checks.js`) laufen nach jedem Häppchen bei allen Personas mit: ein HUD-Teil je Art (Wurf-Anzeige, Boden-Leiste, Notizen), Level-Texturen wachsen nicht von Camp zu Camp, Raider-Cache in seiner Grenze, Werte im Rahmen (Δ, Leben, Tank), nichts bewegt sich (Softlock), **Spielstand speichern + laden** ohne Verlust (alle 10 Spielminuten), JS-Fehler.
+- **Abdeckung:** `output/persona_play/<persona>/report.md` und `coverage.json`: was berührt wurde (Fenster, Menüpunkte, Rezepte, Knoten, Orte, POIs, Zwischenfälle, Umbauten) und was es gibt, aber nie berührt wurde.
+- Befunde prüft Ava wie bei den Personas und meldet sie dann übers Formular.

@@ -19,6 +19,7 @@ export const PERSONAS = {
   ole: { name: 'Ole', viewport: [1720, 720], pad: true },   // ultrawide 21:9
   deniz: { name: 'Deniz', viewport: [1600, 900], pad: false },
   kai: { name: 'Kai', viewport: [1920, 1080], pad: true },
+  pilot: { name: 'Testpilot', viewport: [1920, 1080], pad: false },   // #191 goes through every system
 };
 const CHIP_LABEL = { gut: 'Gut', schlecht: 'Schlecht', bug: 'Bug', idee: 'Idee', verwirrend: 'Verwirrend' };
 
