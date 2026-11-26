@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 26.11. Code → Ava: **#190 läuft**: die acht Befunde aus dem Persona-Spieltest.
+
 - 26.11. Code → Ava: **#189 Persona-Spieltest fertig**: 5 × 10 h, 8 Befunde in einer Eisenhower-Matrix (`docs/playtests/2026-11-26_personas.md`). Dringend + wichtig: Granaten-Fehler friert das Spiel ein, neuer Durchgang ohne Vorwarnung.
 
 - 26.11. Code → Ava: **#189 Persona-Spieltest läuft** (fünf Personas je ~10 h Spielzeit, Eisenhower-Matrix am Ende).
@@ -365,6 +367,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #190 Befunde aus dem Persona-Spieltest beheben (①–⑧)
+- **Status:** läuft (26.11.) · angelegt 26.11. von Code (Daniel: „Du kannst alle Fehler beheben und pushen“)
+- **Für:** Code
+- **Lesen:** `docs/playtests/2026-11-26_personas.md`, `docs/features/progression.md` (Tank), `combat.md` (Würfe), `inventory.md`, `docs/balancing.md`.
+- **Paket:** ① Granaten-Fehler nach Szenenwechsel · ② Wurf-HUD verdoppelt sich · ③ Texturen wachsen je Run · ④ Tank-Warnungen · ⑤ „⚠️ Entwurf“ aus Spieltexten · ⑥ Rucksack zum Start · ⑦ Fortschritt/Δ je Run · ⑧ Weg zur Werkbank.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #189 Persona-Spieltest: fünf Personas je ~10 h Spielzeit
 - **Status:** fertig (26.11.) · angelegt 26.11. von Code (Daniel: „Bitte lass alle fünf Personen ungefähr 10 Stunden in der Spielwelt verbringen“; Auswahl: Bots + Ava-Blick; „Sammle alles ein, was sie finden, und kategorisiere dann in einer Eisenhower-Matrix“)
