@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 26.11. Code → Ava: **#189 Persona-Spieltest fertig**: 5 × 10 h, 8 Befunde in einer Eisenhower-Matrix (`docs/playtests/2026-11-26_personas.md`). Dringend + wichtig: Granaten-Fehler friert das Spiel ein, neuer Durchgang ohne Vorwarnung.
+
 - 26.11. Code → Ava: **#189 Persona-Spieltest läuft** (fünf Personas je ~10 h Spielzeit, Eisenhower-Matrix am Ende).
 
 - 26.11. Code → Ava: **#188 Feedback-Paket fertig**: FB-1, 3, 5, 6, 7, 9, 10, 11, 12 gebaut, FB-8 = Lob, FB-4 nicht nachstellbar (Rückfrage an Steven im Issue). Alle 77 Browser-Tests grün.
@@ -365,12 +367,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #189 Persona-Spieltest: fünf Personas je ~10 h Spielzeit
-- **Status:** läuft (26.11.) · angelegt 26.11. von Code (Daniel: „Bitte lass alle fünf Personen ungefähr 10 Stunden in der Spielwelt verbringen“; Auswahl: Bots + Ava-Blick; „Sammle alles ein, was sie finden, und kategorisiere dann in einer Eisenhower-Matrix“)
+- **Status:** fertig (26.11.) · angelegt 26.11. von Code (Daniel: „Bitte lass alle fünf Personen ungefähr 10 Stunden in der Spielwelt verbringen“; Auswahl: Bots + Ava-Blick; „Sammle alles ein, was sie finden, und kategorisiere dann in einer Eisenhower-Matrix“)
 - **Für:** Code
 - **Lesen:** `docs/testing_personas.md`, `docs/features/feedback.md`, `docs/features/tests.md`.
 - **Plan:** `tools/persona_bot.mjs` spielt je Persona in ihrem Stil (Jana kurze Runs, Malu Camp, Ole Erkunden, Deniz Rang-Farmen, Kai Kampf/Tempo) ~10 h Spielzeit kopflos, mit Protokoll, Bildern und Auffälligkeiten; Ava wertet als Persona aus, jeder Befund geht durchs Formular (`tools/persona_feedback.mjs`), am Ende Eisenhower-Matrix.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ Die 8 Meldungen liegen als Formular-Anfragen in `output/persona/`; nach FeedbackBucket erst nach Daniels Go (braucht Schreibrecht auf FeedbackBucket). ⚠️ Der Granaten-Fehler ist für die Läufe nur im Testbrowser überbrückt (`brain.js` › `patchKnown`), im Spiel unverändert.
+- **Ergebnis:** (Code) Bericht mit Matrix `docs/playtests/2026-11-26_personas.md`. 5 × 10 h Spielzeit (134 Runs), 8 geprüfte Befunde: Sofort ① Granaten-Fehler friert das Spiel ein (2. Run nach einem Wurf), ④ neuer Durchgang ohne Vorwarnung; Planen ③ Speicher wächst je Run, ⑧ Weg zur Tank-Wartung unklar, ⑦ Fortschritt zäh; Schnell ② Wurf-HUD verdoppelt sich, ⑤ „⚠️ Entwurf“ in 7 Spieltexten; Später ⑥ Rucksack voll. Werkzeuge: `tools/persona_bot.mjs` + `tools/persona_bot/brain.js`, Fernsteuerung `nomad.stepQuiet` und `nomad.fast` (Schnellgang ohne Bild-Arbeit: Himmel, Regen, Lichtkarte, Nebel-Zeichnung, Notiz-Layout). Tests: npm 486 grün. PixelLab 0.
 
 ### #188 Feedback-Paket 25.11. (FB-1, FB-3–FB-12)
 - **Status:** fertig (26.11.) · angelegt 26.11. von Code (Daniel: „Lass uns kurz die Ideen besprechen und dann nach meinem go alles als Paket abarbeiten“, dann „Lets go!“)

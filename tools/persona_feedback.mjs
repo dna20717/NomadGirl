@@ -48,7 +48,8 @@ async function report() {
   await page.goto(url);
   await page.waitForFunction(() => { try { return window.nomad?.state?.() && window.nomadFeedback; } catch { return false; } }, null, { timeout: 60000 });
   const steps = opt('do');
-  await page.evaluate(async js => { nomad.take(); nomad.step(30); if (js) await eval(js); nomad.step(60); nomad.release(); }, steps || '');
+  // a broken game (the very thing being reported) may throw while stepping: then the real loop takes over, like for a player
+  await page.evaluate(async js => { try { nomad.take(); nomad.step(30); if (js) await eval(js); nomad.step(60); } catch (e) { console.warn('Nachstellen:', e.message); } finally { try { nomad.release(); } catch {} } }, steps || '');
   await page.waitForTimeout(1500);   // a moment of real frames, so the picture and the trace are live
   await page.keyboard.press('F8');
   await page.waitForSelector('.fb-text', { timeout: 15000 });
