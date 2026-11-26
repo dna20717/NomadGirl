@@ -78,8 +78,12 @@ export class SummaryUI {
         St ? ` Eingelagert: ${St.moved}${St.left ? ` · ${St.left} passen nicht` : ''}` : ' Alles einlagern') : null,
       el('button', { class: 'inv-btn' + on('ok'), onclick: press('ok') }, 'Weiter'),
       S.next ? el('button', { class: 'inv-btn wm-go' + on('next'), onclick: press('next') }, icon('arrow_right', 16), ` ${S.next.label}`, el('small', {}, S.next.sub)) : null);
-    this.el.replaceChildren(el('div', { class: 'tut-card sum-card ui-frame' }, head, el('div', { class: 'sum-cols' }, home, newCol), btns,
-      hints([...(B.length > 1 ? [['move', 'wählen']] : []), ['ok', 'weiter'], ['back', 'schließen']]), closeX(() => this.close())));
+    const parts = [head, el('div', { class: 'sum-cols' }, home, newCol), btns, hints([...(B.length > 1 ? [['move', 'wählen']] : []), ['ok', 'weiter'], ['back', 'schließen']]), closeX(() => this.close())];
+    // FB-10 (Steven, 25.11.2026: „zuckt so komisch, wenn man darin blättert … als würde sie jedes Mal neu eingeblendet“): the card stays,
+    // only its content changes, so the pop-in (.tut-card, .sum-grade) plays once when it opens and not on every ← / →
+    const card = this.el.firstElementChild;
+    if (card?.classList.contains('sum-card')) { card.replaceChildren(...parts); card.classList.add('sum-settled'); }
+    else this.el.replaceChildren(el('div', { class: 'tut-card sum-card ui-frame' }, ...parts));
   }
   state() { const S = this.S; return { open: this.isOpen, debt: S?.debt || null, grade: S?.grade || null, ko: !!S?.ko, gained: (S?.gained || []).map(x => `${x.id}×${x.n}`), lost: (S?.lost || []).map(x => `${x.id}×${x.n}`), recipes: S?.recipes || [], ready: S?.ready || [], bonus: S?.grade && !S?.ko && S?.bonus ? { pct: S.bonus, deltas: S.bonusDeltas || 0 } : null, crate: S?.crate || null, quests: (S?.quests || []).map(q => q.id + (q.ready ? '!' : '')), next: S?.next || null, btn: this.btn, buttons: this.S ? this.buttons() : [], stowed: this.stowed || null }; }
 }

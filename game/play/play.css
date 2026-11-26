@@ -1023,6 +1023,7 @@ b.hud-throw-icon { width: auto; height: auto; padding: 0 2px; }
 
 /* Beute-Bilanz (#017) */
 .sum-card { width: min(940px, 94vw); gap: 16px; }
+.sum-settled .sum-grade, .sum-settled .ach-bar i { animation: none; transition: none; }   /* FB-10 no second pop-in while choosing a button */
 .sum-head { display: grid; grid-template-columns: auto 1fr minmax(220px, 280px); gap: 18px; align-items: center; }
 .sum-grade { width: 92px; height: 92px; border-radius: 16px; display: grid; place-items: center; font: 84px/1 VT323, monospace; color: var(--ng-night); background: var(--ng-gold); box-shadow: 0 0 30px rgba(255, 210, 122, .35); animation: sum-grade .6s cubic-bezier(.2, .9, .3, 1.4); }
 @keyframes sum-grade { from { transform: scale(.3) rotate(-12deg); opacity: 0; } to { transform: none; opacity: 1; } }
