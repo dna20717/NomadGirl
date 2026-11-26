@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 26.11. Code → Ava: **#191 Testpilot läuft**. Dazu: die acht Persona-Meldungen stehen als FB-13 … FB-20 in FeedbackBucket, 13–19 sind mit #190 geschlossen, FB-20 (Δ) bleibt offen.
+
 - 26.11. Code → Ava: **#190 fertig**: sieben der acht Befunde behoben, ⑦ (Δ-Balancing) bewusst offen. 78/78 Browser-Tests grün.
 
 - 26.11. Code → Ava: **#190 läuft**: die acht Befunde aus dem Persona-Spieltest.
@@ -369,6 +371,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #191 Testpilot: Prüfer, Abdeckung und vier Systeme (Reisen, Bauen, Kochen, Techtree/Tank)
+- **Status:** läuft (26.11.) · angelegt 26.11. von Code (Daniel: „ob wir nicht vielleicht einen Bot weiterentwickeln sollten, um effizientes Testing über alle Systeme hinweg zu ermöglichen“; Auswahl: Prüfer + 4 Systeme, nur auf Zuruf)
+- **Für:** Code
+- **Lesen:** `docs/playtests/2026-11-26_personas.md`, `docs/features/tests.md` › Testing-Personas, `worldmap.md`, `rig.md`, `crafting.md`, `progression.md`.
+- **Plan:** Der Persona-Bot (#189) bekommt Prüfer, die bei jedem Schritt mitlaufen (JS-Fehler, Fenster ohne Ausweg, Leyla in der Welt, doppelte HUD-Teile, Level-Texturen, Spielstand speichern + laden ohne Verlust, Δ/Tag/Tank im Rahmen), einen Abdeckungsbericht (Fenster, Menüpunkte, Rezepte, Orte, Systeme) und Fähigkeiten für Reisen (Karte, Fahrt, Zwischenfälle), Bauen (Werkstatt einbauen), Kochen (Rezept herstellen), Techtree freischalten und Tank warten. Läuft nur auf Zuruf.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #190 Befunde aus dem Persona-Spieltest beheben (①–⑧)
 - **Status:** fertig (26.11.) · angelegt 26.11. von Code (Daniel: „Du kannst alle Fehler beheben und pushen“)
