@@ -121,7 +121,7 @@ check('Switch: Benutzen = Stick hoch', s.icon === 'stick_l_up', s.icon);
 
 // inventory with the controller, no pointer (Daniel, 11.11.2026): a cursor on cells, slots and tabs
 await ev(() => setPad({ id: 'Xbox Wireless Controller (STANDARD GAMEPAD Vendor: 045e)' }));
-await ev(() => { const s = game.scene.getScene('play'), inv = s.box.save.inv, g = inv.grids.backpack; g.items = g.items.filter(e => !(e.x < 3 && e.y < 2)); g.items.push({ a: 'items', id: 'schrottplatte', n: 1, x: 0, y: 0, r: 0 }); });
+await ev(() => { const s = game.scene.getScene('play'), inv = s.box.save.inv, g = inv.grids.backpack; g.items = [];   /* #190 ⑥ the start inventory lies differently in the 5×4 Schulranzen */ g.items.push({ a: 'items', id: 'schrottplatte', n: 1, x: 0, y: 0, r: 0 }); });
 await tap(8);
 const iv = () => ev(() => { const u = game.scene.getScene('play').hud.inv, c = document.querySelector('.inv-cursor'), g = game.scene.getScene('play').box.save.inv.grids.backpack;
   const e = g.items.find(x => x.id === 'schrottplatte'); return { open: u.isOpen, cursor: !c.hidden, focus: u.focusId, held: u.held?.e.id || null, at: e ? [e.x, e.y] : null, x: game.scene.getScene('play').leyla.x }; });

@@ -100,7 +100,7 @@ await shot('moved');
 
 // storage shelf in the trailer: it opens the same Camp-Lager (#041); swap the backpack for the hiking backpack
 s = await ev(() => { nomad.step(1, [], ['grab']); nomad.goTo('Lagerregal'); nomad.step(1, [], ['grab']); nomad.step(5); return nomad.inv(); });
-check('E am Lagerregal öffnet das Camp-Lager', s.open && s.other?.key === 'camp' && s.other?.title === 'Camp-Lager' && has(s.other.grid, 'wanderrucksack') && has(s.other.grid, 'kronkorken'), s);
+check('E am Lagerregal öffnet das Camp-Lager', s.open && s.other?.key === 'camp' && s.other?.title === 'Camp-Lager' && has(s.other.grid, 'wanderrucksack') && (has(s.other.grid, 'kronkorken') || has(s.backpack, 'kronkorken')), s);   // #190 ⑥ the 5×4 Schulranzen may hold them
 const ruck = await ev(() => nomad.save().inv.grids.camp.items.find(e => e.id === 'wanderrucksack'));
 await click(1, ruck.x, ruck.y); await slot('Rucksack');
 s = await inv();
@@ -145,7 +145,9 @@ check('Boden-Inventar zeigt das Bündel', s.open && s.other?.key === 'floor' && 
 await shot('floor');
 const rb = await ev(() => game.scene.getScene('play').hud.inv.other.grid.items.find(e => e.id === 'rohrbogen'));
 await click(1, rb.x, rb.y);
-// put the L where it fits in the 6×4 backpack: try cells until it lands
+// put the L where it fits in the 6×4 backpack (#190: the start inventory changes, so ask for a free spot instead of guessing cells)
+const spot = await ev(async () => { const { findSpot } = await import('./game/inventory.js'); const sc = game.scene.getScene('play'), u = sc.hud.inv; return findSpot(sc.data_, nomad.save().inv.grids.backpack, u.held.e.a, u.held.e.id, [u.held.e.r || 0]); });
+if (spot) await click(0, spot.x, spot.y);
 for (const [x, y] of [[4, 1], [3, 1], [4, 0], [2, 1], [5, 0]]) { if (!(await inv()).held) break; await click(0, x, y); }
 s = await inv();
 check('Rohrbogen vom Boden in den Rucksack', !s.held && has(s.backpack, 'rohrbogen'), s);

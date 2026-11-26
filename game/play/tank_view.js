@@ -41,7 +41,7 @@ export class TankView {
     const save = this.save; if (!save) return;
     tankUpdate(this.D, save);
     const w = tankWarning(this.D, save);   // #190 ④ a worse phase: say so (once), not only in the picture
-    if (w) this.scene.time.delayedCall(force ? 2200 : 0, () => { this.scene.hud?.banner(w.title, w.sub, 6500, w.kind); this.scene.drone?.react?.('gearWorse'); });
+    if (w) this.scene.time.delayedCall(force ? 2200 : 0, () => this.scene.hud?.banner(w.title, w.sub, 6500, w.kind));
     const p = phase(this.D, save);
     if (!force && p.index === this.phaseIndex) return;
     this.phaseIndex = p.index; this.p = p;
