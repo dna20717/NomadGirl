@@ -237,7 +237,7 @@ export class Atmosphere {
 
   // ---------- lightmap ----------
   render() {
-    if (!this.on || this.hidden || !this.scene.leyla) return;
+    if (!this.on || this.hidden || !this.scene.leyla || this.scene.fast) return;   // #189 fast = bots step headless: nothing to see
     const s = this.scene, cam = s.cam, k = this.k, m = this.margin, T = this.T;
     // #165 the camera zoomed out (Wow camera move to 70 %, pictures of whole rooms): grow the lightmap so it still covers the view
     const needW = Math.ceil((cam.worldView.width + m * 2) / k), needH = Math.ceil((cam.worldView.height + m * 2) / k);

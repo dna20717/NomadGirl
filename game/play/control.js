@@ -54,6 +54,8 @@ export function installControl(game) {
       steps(frames); held.clear();
       return api.state();
     },
+    // #189 fast: the scene skips what is only a picture (sky, rain, light map, fog drawing, note layout) while bots step headless
+    fast(on = true) { const s = scene(); s.fast = !!on; return s.fast; },
     // #189 like step, without building the whole state afterwards (bots step thousands of times)
     stepQuiet(frames = 1, hold = [], tap = []) { if (!active) api.take(); held = new Set(hold); for (const k of tap) tapped.add(k); steps(frames); held.clear(); },
     until(test, max = 600, hold = [], tap = []) {

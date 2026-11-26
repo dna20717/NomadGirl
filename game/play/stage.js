@@ -80,7 +80,7 @@ export class Stage {
     this.put('F', h.tut?.tipEl, true); this.put('F', h.footEl);
     this.put('G', h.radio?.el);
     this.limit('B'); this.limit('E'); this.limit('F'); this.limit('G');
-    this.fitNotes(h);
+    if (!h.scene?.fast) this.fitNotes(h);   // #189 no layout measuring while bots step headless
   }
   // build mode: the stage starts below the build bar and ends above its hint line (layout boxes, not the slide-in animation)
   buildEdges(h) {

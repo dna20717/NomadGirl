@@ -71,6 +71,7 @@ export class Backdrop {
   }
 
   update(time, dt) {
+    if (this.scene.fast) return;   // #189 headless bots: sky and rain are only pictures
     this.place();
     const t = time / 1000;
     if (this.sky) {

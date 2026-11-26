@@ -135,6 +135,7 @@ export class Fog {
   update(dt) {
     if (!this.on) return;
     this.reveal();
+    if (this.scene.fast) return;   // #189 headless bots: what Leyla has seen still counts, the drawing waits
     this.draw(Math.min(1, dt / (this.F.fade ?? 450)));
   }
   // what a tile wants: in sight clear, seen „Besucht“, never seen „Ungesehen“ (behind secrets „Hinter Secrets“), mass black

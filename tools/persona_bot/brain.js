@@ -19,7 +19,7 @@
       this.persona = persona; this.st = STYLE[persona]; this.rnd = mulberry(seed);
       this.phase = 'camp'; this.plan = null; this.campLeft = null; this.campTodo = [];
       window.addEventListener('error', e => this.errors.push(String(e.message)));
-      nomad.take();
+      nomad.take(); nomad.fast(true);   // pictures only for shots and reports (the runner switches it off then)
     },
     // run n frames of play, return what happened since the last chunk
     chunk(n) {

@@ -50,7 +50,7 @@ async function report(f) {
   const what = [f.text, f.poi ? `(${f.poi}, Kachel ${f.tile?.join(', ')})` : f.tile ? `(Kachel ${f.tile.join(', ')})` : ''].filter(Boolean).join(' ');
   const text = (VOICE[id][f.kind] || '{what}').replace('{what}', what);
   caught = null;
-  await page.evaluate(() => nomad.release());
+  await page.evaluate(() => { nomad.fast(false); nomad.release(); });
   await page.waitForTimeout(800);
   await page.keyboard.press('F8');
   try {
@@ -60,7 +60,7 @@ async function report(f) {
     await page.click('.fb-send');
     await page.waitForFunction(() => !document.querySelector('.fb-text'), null, { timeout: 30000 });
   } catch (e) { log({ reportFailed: e.message, f }); }
-  await page.evaluate(() => nomad.take());
+  await page.evaluate(() => { nomad.take(); nomad.fast(true); });
   if (caught) { reports++; fs.writeFileSync(path.join(fbDir, `${String(reports).padStart(3, '0')}_${f.kind}.json`), JSON.stringify({ ...caught, persona: id, finding: f }, null, 1)); }
 }
 
@@ -83,9 +83,11 @@ while (frame < total) {
   log({ f: frame, state: r.state, assists, ms: Date.now() - tc });
   if (frame >= nextShot) {
     nextShot += shotEvery;
-    await page.evaluate(() => nomad.freeze()); await page.waitForTimeout(500);
-    await page.screenshot({ path: path.join(out, `shot_${String(Math.round(frame / 3600)).padStart(4, '0')}min.png`) });
-    await page.evaluate(() => nomad.thaw());
+    try {   // a picture now and then; under load the software renderer may be slow, a missing picture is no reason to stop
+      await page.evaluate(() => { nomad.fast(false); nomad.stepQuiet(2); nomad.freeze(); }); await page.waitForTimeout(800);
+      await page.screenshot({ path: path.join(out, `shot_${String(Math.round(frame / 3600)).padStart(4, '0')}min.png`), timeout: 90000 });
+    } catch (e) { log({ shotFailed: e.message.slice(0, 120), frame }); }
+    await page.evaluate(() => { nomad.thaw(); nomad.fast(true); });
   }
   if (Math.round(frame / 3600) % 30 === 0) console.log(`${P.name}: ${(frame / 216000).toFixed(1)} h Spielzeit · ${Math.round((Date.now() - t0) / 60000)} min · ${reports} Meldungen · ${assists} Hilfen`);
 }
