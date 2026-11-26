@@ -49,10 +49,21 @@
       for (; this.toastsSeen < log.length; this.toastsSeen++) this.log.push({ f: this.frame, toast: log[this.toastsSeen].title, sub: log[this.toastsSeen].sub });
     },
 
+    // Known game bugs, already found and reported (#189), patched only in this test browser so the long run goes on; the repo keeps them
+    // until Daniel decides. 1) Throwables.img reuses pictures of a scene that is gone → setTexture on a destroyed image ('sys').
+    patchKnown(s) {
+      const T = s.throwables, P = T && Object.getPrototypeOf(T);
+      if (!P || P.__botPatched) return;
+      const img = P.img;
+      P.img = function (key, i) { if (this.imgs?.[i] && !this.imgs[i].scene) this.imgs[i] = null; return img.call(this, key, i); };
+      P.__botPatched = true;
+      this.log.push({ f: this.frame, patched: 'Throwables.img (Bilder einer alten Szene)' });
+    },
     // ---------------- main loop ----------------
     tick() {
       const s = S();
       if (!s?.leyla) return this.wait(10);
+      this.patchKnown(s);
       if (this.closeStray()) return;
       if (s.mode === 'camp') return this.campTick();
       if (s.mode === 'run' || s.level) return this.runTick();
