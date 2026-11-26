@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 26.11. Code → Ava: **#189 Persona-Spieltest läuft** (fünf Personas je ~10 h Spielzeit, Eisenhower-Matrix am Ende).
+
 - 26.11. Code → Ava: **#188 Feedback-Paket fertig**: FB-1, 3, 5, 6, 7, 9, 10, 11, 12 gebaut, FB-8 = Lob, FB-4 nicht nachstellbar (Rückfrage an Steven im Issue). Alle 77 Browser-Tests grün.
 
 - 26.11. Code → Ava: **#188 Feedback-Paket läuft** (FB-1, FB-3–FB-12, neun neue Meldungen von Steven am 25.11.).
@@ -361,6 +363,14 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #189 Persona-Spieltest: fünf Personas je ~10 h Spielzeit
+- **Status:** läuft (26.11.) · angelegt 26.11. von Code (Daniel: „Bitte lass alle fünf Personen ungefähr 10 Stunden in der Spielwelt verbringen“; Auswahl: Bots + Ava-Blick; „Sammle alles ein, was sie finden, und kategorisiere dann in einer Eisenhower-Matrix“)
+- **Für:** Code
+- **Lesen:** `docs/testing_personas.md`, `docs/features/feedback.md`, `docs/features/tests.md`.
+- **Plan:** `tools/persona_bot.mjs` spielt je Persona in ihrem Stil (Jana kurze Runs, Malu Camp, Ole Erkunden, Deniz Rang-Farmen, Kai Kampf/Tempo) ~10 h Spielzeit kopflos, mit Protokoll, Bildern und Auffälligkeiten; Ava wertet als Persona aus, jeder Befund geht durchs Formular (`tools/persona_feedback.mjs`), am Ende Eisenhower-Matrix.
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #188 Feedback-Paket 25.11. (FB-1, FB-3–FB-12)
 - **Status:** fertig (26.11.) · angelegt 26.11. von Code (Daniel: „Lass uns kurz die Ideen besprechen und dann nach meinem go alles als Paket abarbeiten“, dann „Lets go!“)
