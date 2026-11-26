@@ -23,7 +23,7 @@ import { makeTextures, drawBackground, drawRoom, terrainKits, PLACEHOLDER_COLORS
 import { regionMap, placeTypes, PLACE_COLORS } from '../../engine/dressing.js';
 import { Leyla } from './leyla.js';
 import { Enemy } from './enemies.js';
-import { kitAssets } from './enemy_kit.js';
+import { kitAssets, pruneKits } from './enemy_kit.js';
 import { uiInput } from './ui_nav.js';
 import { Combat } from './combat.js';
 import { Fx } from './fx.js';
@@ -307,6 +307,13 @@ export class PlayScene extends Phaser.Scene {
   create() {
     if (this.args?.loading) this.events.once('postupdate', () => this.args.loading.done());
     this.camp = null; this.vanPrompt = null;   // the scene object is reused on restart (camp ↔ run)
+    // #190 ③ (persona test #189: textures 532 → 1000 after four runs, tabs up to 2 GB): what a level makes for itself (fog chunks,
+    // baked render textures with generated names) goes with the scene; caches (autotiles, raider kits) stay, they only grow with new combinations
+    const texBefore = new Set(this.textures.getTextureKeys());
+    this.events.once('shutdown', () => {
+      for (const k of this.textures.getTextureKeys()) if (!texBefore.has(k) && (/^fog_/.test(k) || /^[0-9a-f]{8}-[0-9a-f]{4}-/.test(k)) && this.textures.exists(k)) this.textures.remove(k);
+      pruneKits(this, this.data_.game?.kitCacheKeep ?? 8);   // the raider strips of older scenes
+    });
     this.sound.stopAll(); this.sound.removeAll();   // camp sounds belong to one visit
     try { this.muted = localStorage.getItem('nomadgirl-mute') === '1'; this.sound.mute = this.muted; } catch { /* private mode */ }   // #090 own flag: Phaser's mute reads back late
     applyLabels(this, this.data_.assets);   // #170 Assets › Schrift aus Code: text onto the pictures before anything uses them

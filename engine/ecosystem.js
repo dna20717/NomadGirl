@@ -45,13 +45,13 @@ export const LIFE = {
   director: { peak: 70, calm: 25, decay: 6, perEngaged: 5, perHurt: 0.8, perKill: 6, siren: 45, peakMin: 6, peakMax: 25, relax: 18, wowGrace: 8,
     lull: 45, maxWaves: 2, waveSize: 2, notice: 50, feudDamage: 60, music: 30 },
   lines: [
-    { kind: 'moved', text: '⚠️ Entwurf: Das Lager der {gang} steht jetzt woanders. Sie haben dich nicht vergessen.' },
-    { kind: 'gone', text: '⚠️ Entwurf: Vom Lager ist nur kalte Asche übrig. Die {gang} sind weitergezogen.' },
-    { kind: 'nest', text: '⚠️ Entwurf: Es raschelt mehr als letztes Mal. Das Nest hat sich geteilt.' },
-    { kind: 'owner', text: '⚠️ Entwurf: Neue Farben an den Wänden. Hier sitzen jetzt die {gang}.' },
-    { kind: 'visit', text: '⚠️ Entwurf: Funkverkehr auf einer fremden Frequenz. Ein Spähtrupp der {gang} ist im Haus.' },
-    { kind: 'settle', text: '⚠️ Entwurf: Jemand hat sich hier neu eingerichtet. Frische Feuerstelle.' },
-    { kind: 'raided', text: '⚠️ Entwurf: Sie lecken noch ihre Wunden vom letzten Mal.' },
+    { kind: 'moved', text: 'Das Lager der {gang} steht jetzt woanders. Sie haben dich nicht vergessen.' },
+    { kind: 'gone', text: 'Vom Lager ist nur kalte Asche übrig. Die {gang} sind weitergezogen.' },
+    { kind: 'nest', text: 'Es raschelt mehr als letztes Mal. Das Nest hat sich geteilt.' },
+    { kind: 'owner', text: 'Neue Farben an den Wänden. Hier sitzen jetzt die {gang}.' },
+    { kind: 'visit', text: 'Funkverkehr auf einer fremden Frequenz. Ein Spähtrupp der {gang} ist im Haus.' },
+    { kind: 'settle', text: 'Jemand hat sich hier neu eingerichtet. Frische Feuerstelle.' },
+    { kind: 'raided', text: 'Sie lecken noch ihre Wunden vom letzten Mal.' },
   ],
 };
 

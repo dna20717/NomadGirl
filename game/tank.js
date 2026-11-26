@@ -47,6 +47,24 @@ export function phase(D, save) {
   return { ...rows[k], index: k + 1 };
 }
 
+// #190 ④ (persona test #189: all five woke up in „Neuer Anfang“ around day 11 without one message about the tank): when the tank slips into a
+// worse phase (or has less than a day left) a warning is due, once per phase. → { title, sub, kind } or null; maintenance resets it
+export function tankWarning(D, save) {
+  const t = save?.tank;
+  if (!t || t.dead || D.tank?.enabled === false) return null;
+  const p = phase(D, save), seen = t.warned ?? 1;
+  if (p.index < seen) { t.warned = p.index; t.lastDay = false; return null; }   // better again (maintenance)
+  const h = hoursLeft(D, save), days = Math.max(1, Math.round(h / 24));
+  if (p.index > seen) {
+    t.warned = p.index;
+    if (p.warn === '-') return null;
+    const sub = (p.warn || 'Noch etwa {days} Tage, dann ist AvAs Tank leer. Wartung: Zielzeile „Das Heilmittel“ oben rechts.').replace('{days}', days);
+    return { title: `AvAs Tank: ${p.name}`, sub, kind: p.index >= 4 ? 'warn' : 'info' };
+  }
+  if (h <= 24 && !t.lastDay) { t.lastDay = true; return { title: 'AvAs Tank: letzter Tag', sub: 'Ohne Wartung ist ihr Tank morgen leer, dann beginnt alles von vorn.', kind: 'warn' }; }
+  return null;
+}
+
 // a knock-out in a run: AvA brings Leyla back and pays with the tank. → { cost, last }
 export function rescue(D, save, mods = tankMods(D, save)) {
   const t = ensureTank(D, save), cost = (D.tank?.rescue ?? 12) * (mods.rescue ?? 1);

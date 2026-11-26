@@ -18,7 +18,11 @@ const COLORS = { granate: 0x4e5a3a, molotow: 0xb06a2a, saeure: 0x7fbf3a };
 const AREA_COLORS = { molotow: [0xff7a1a, 0xffd27a], saeure: [0x8fe04a, 0xd8ff8a] };
 
 export class Throwables {
-  static of(scene) { return (scene.throwables ??= new Throwables(scene)); }
+  // #190 ① (persona test #189: „zweiter Run, Granate, das Spiel friert ein“): Phaser keeps the scene object over a restart (camp ↔ run),
+  // so scene.throwables survived while its graphics and pictures belonged to the old scene → setTexture on a destroyed image ('sys').
+  // A destroyed graphics means a new scene: start over.
+  static live(scene) { const t = scene.throwables; if (t && !t.g?.scene) scene.throwables = null; return scene.throwables || null; }   // #190 ① only one of this scene
+  static of(scene) { const t = scene.throwables; return (scene.throwables = t && t.g?.scene ? t : new Throwables(scene)); }
   constructor(scene) {
     this.s = scene; this.list = []; this.areas = []; this.rings = []; this.log = [];
     this.g = scene.add.graphics().setDepth(14);
@@ -242,6 +246,7 @@ export class Throwables {
   // #176 the painted pictures: a pool of images, hidden each frame and shown again for what flies
   img(key, i) {
     this.imgs ??= [];
+    if (this.imgs[i] && !this.imgs[i].scene) this.imgs[i] = null;   // #190 ① never reuse a destroyed picture
     const im = this.imgs[i] ??= this.s.add.image(0, 0, key).setDepth(14);
     return im.setTexture(key).setVisible(true).setAlpha(1);
   }

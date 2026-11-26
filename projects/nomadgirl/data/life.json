@@ -63,13 +63,13 @@
   "music": 30
  },
  "lines": [
-  {"kind": "moved", "text": "⚠️ Entwurf: Das Lager der {gang} steht jetzt woanders. Sie haben dich nicht vergessen."},
-  {"kind": "gone", "text": "⚠️ Entwurf: Vom Lager ist nur kalte Asche übrig. Die {gang} sind weitergezogen."},
-  {"kind": "nest", "text": "⚠️ Entwurf: Es raschelt mehr als letztes Mal. Das Nest hat sich geteilt."},
-  {"kind": "owner", "text": "⚠️ Entwurf: Neue Farben an den Wänden. Hier sitzen jetzt die {gang}."},
-  {"kind": "visit", "text": "⚠️ Entwurf: Funkverkehr auf einer fremden Frequenz. Ein Spähtrupp der {gang} ist im Haus."},
-  {"kind": "settle", "text": "⚠️ Entwurf: Jemand hat sich hier neu eingerichtet. Frische Feuerstelle."},
-  {"kind": "raided", "text": "⚠️ Entwurf: Sie lecken noch ihre Wunden vom letzten Mal."}
+  {"kind": "moved", "text": "Das Lager der {gang} steht jetzt woanders. Sie haben dich nicht vergessen."},
+  {"kind": "gone", "text": "Vom Lager ist nur kalte Asche übrig. Die {gang} sind weitergezogen."},
+  {"kind": "nest", "text": "Es raschelt mehr als letztes Mal. Das Nest hat sich geteilt."},
+  {"kind": "owner", "text": "Neue Farben an den Wänden. Hier sitzen jetzt die {gang}."},
+  {"kind": "visit", "text": "Funkverkehr auf einer fremden Frequenz. Ein Spähtrupp der {gang} ist im Haus."},
+  {"kind": "settle", "text": "Jemand hat sich hier neu eingerichtet. Frische Feuerstelle."},
+  {"kind": "raided", "text": "Sie lecken noch ihre Wunden vom letzten Mal."}
  ],
  "images": {"fire": "life_campfire", "stash": "life_stash", "nest": "life_nest"}
 }

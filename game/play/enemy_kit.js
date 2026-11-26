@@ -101,6 +101,20 @@ export function kitAssets(D, enemies) {
   return { ids, extra };
 }
 
+// #190 ③ (persona test #189: ~14 MB per raider combination, 130 MB after five runs): the cache keeps the newest KEEP combinations;
+// older ones lose their strips and animations when a scene ends (they are built again when such a raider shows up)
+export function pruneKits(scene, keep = 8) {
+  const C = scene.kitCache;
+  if (!C || C.size <= keep) return 0;
+  let n = 0;
+  for (const [tag, look] of [...C]) {
+    if (C.size <= keep) break;
+    for (const a of Object.values(look.anims || {})) { if (scene.anims.exists(a.key)) scene.anims.remove(a.key); if (scene.textures.exists(a.key)) scene.textures.remove(a.key); }
+    C.delete(tag); n++;
+  }
+  return n;
+}
+
 // ---------- build ----------
 // → { anims: { state: { key, frames, fps, loop } }, ox, oy, scale, flip: false, cls } or null (then the old look)
 export function kitLook(scene, def) {
@@ -111,7 +125,7 @@ export function kitLook(scene, def) {
   if (!poses.length) return null;
   const tag = [def.kit, cls, def.weapon || '-', def.kitHead || '-', def.kitSkin || '-', def.kitGang || '-'].join('|');
   scene.kitCache ??= new Map();
-  if (scene.kitCache.has(tag)) return scene.kitCache.get(tag);
+  if (scene.kitCache.has(tag)) { const hit = scene.kitCache.get(tag); scene.kitCache.delete(tag); scene.kitCache.set(tag, hit); return hit; }   // #190 ③ newest last (for pruneKits)
   const A = D.assets || {}, swap = swapper(rulesFor(kit, def));
   const head = (kit.heads || []).find(h => h.id === def.kitHead && h.look && scene.textures.exists(h.look));
   const weapon = heldSprite(scene, w, kit);

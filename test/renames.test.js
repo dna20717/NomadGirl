@@ -32,13 +32,14 @@ test('Spielstand zieht mit: Gegenstand im Rucksack, Rezept, Buff', async () => {
   const s = newSave(D);
   s.buffs = ['satt'];
   s.recipes = [...new Set([...(s.recipes || []), 'bohneneintopf'])];
+  const had = s.inv.grids.backpack.items.filter(e => e.id === 'kupferkabel').reduce((n, e) => n + e.n, 0);   // #190 ⑥ the start inventory may bring some
   assert.equal(add(D, s.inv.grids.backpack, 'items', 'kupferkabel', 3), 0);
   const raw = JSON.parse(JSON.stringify(s));
   renameEntry(p, 'items', 'kupferkabel', 'kabel_kupfer');
   renameEntry(p, 'buffs', 'satt', 'gesaettigt');
   renameEntry(p, 'recipes', 'bohneneintopf', 'bohnen_eintopf');
   const r = repairSave(raw, D);
-  assert.ok(r.inv.grids.backpack.items.some(e => e.a === 'items' && e.id === 'kabel_kupfer' && e.n === 3), 'Kabel bleibt im Rucksack');
+  assert.equal(r.inv.grids.backpack.items.filter(e => e.a === 'items' && e.id === 'kabel_kupfer').reduce((n, e) => n + e.n, 0), had + 3, 'Kabel bleibt im Rucksack');
   assert.ok(!r.inv.grids.backpack.items.some(e => e.id === 'kupferkabel'));
   assert.deepEqual(r.buffs, ['gesaettigt']);
   assert.ok(r.recipes.includes('bohnen_eintopf') && !r.recipes.includes('bohneneintopf'));

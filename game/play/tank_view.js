@@ -7,7 +7,7 @@
 //   she blinks, and when the drone itself flies by she shows her loving face
 // - now and then her hand rests against the glass (Phasen › Hand, faded in and out) and, once the glass is fogged (phase 2+),
 //   a fingertip draws a heart from the inside that slowly fades again
-import { phase, update as tankUpdate, hoursLeft } from '../tank.js';
+import { phase, update as tankUpdate, hoursLeft, tankWarning } from '../tank.js';
 
 const HEART = (() => {   // a heart as a list of points (unit size, starts at the dip), drawn one after another like a fingertip
   const pts = [];
@@ -40,6 +40,8 @@ export class TankView {
   refresh(force = false) {
     const save = this.save; if (!save) return;
     tankUpdate(this.D, save);
+    const w = tankWarning(this.D, save);   // #190 ④ a worse phase: say so (once), not only in the picture
+    if (w) this.scene.time.delayedCall(force ? 2200 : 0, () => { this.scene.hud?.banner(w.title, w.sub, 6500, w.kind); this.scene.drone?.react?.('gearWorse'); });
     const p = phase(this.D, save);
     if (!force && p.index === this.phaseIndex) return;
     this.phaseIndex = p.index; this.p = p;

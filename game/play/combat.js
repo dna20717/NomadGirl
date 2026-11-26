@@ -1,5 +1,6 @@
 // Combat: Leyla's melee and ranged attacks, enemy shots, projectiles, hitstop.
 // Weapon values from the game data (area "Waffen"): damage, cooldown, range, knockback, critChance, ammo, projectileSpeed.
+import { Throwables } from './throwables.js';
 import { damageSirens } from './traits/alarm.js';
 
 export class Combat {
@@ -230,8 +231,8 @@ export class Combat {
     for (const p of this.shots) if (p.dead && p.img) { p.img.destroy(); p.img = null; }
     this.shots = this.shots.filter(p => !p.dead);
     this.scene.leyla?.knives?.update(time, dt);   // #176 throwing knives
-    this.scene.throwables?.update(time, dt);   // grenades, molotovs (#139/#140, game/play/throwables.js)
+    Throwables.live(this.scene)?.update(time, dt);   // #190 ① not the one of the scene before a restart   // grenades, molotovs (#139/#140, game/play/throwables.js)
   }
 
-  clear() { for (const p of this.shots) p.img?.destroy(); this.shots = []; this.mark?.clear(); this.target = null; this.scene.throwables?.clear(); this.scene.leyla?.knives?.clear(); for (const p of this.scene.alarmPts || []) p.on = false; }
+  clear() { for (const p of this.shots) p.img?.destroy(); this.shots = []; this.mark?.clear(); this.target = null; Throwables.live(this.scene)?.clear(); this.scene.leyla?.knives?.clear(); for (const p of this.scene.alarmPts || []) p.on = false; }
 }

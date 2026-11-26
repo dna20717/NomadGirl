@@ -160,6 +160,7 @@ export class LeylaGrenade {
     const H = scene.hud, K = this.l.knives, kinds = [this.c.enabled && 'grenade', K?.c.enabled && 'knife'].filter(Boolean);
     if (!H?.dash?.parentNode || !kinds.length) { if (this.el) this.el.hidden = true; return; }
     if (!this.el) {
+      H.dash.parentNode.querySelectorAll('.hud-throw').forEach(n => n.remove());   // #190 ② the Leyla of the scene before left hers behind (one more per run)
       this.el = document.createElement('span');
       this.el.className = 'hud-throw';
       this.el.title = 'Wurf: T wirft, Z wechselt Granate / Wurfmesser (Controller: rechten Stick drücken, halten = wechseln)';

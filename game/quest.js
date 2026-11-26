@@ -41,7 +41,20 @@ export function goal(D, save) {
   if (next.st.state === 'ready') return { kind: 'ready', text: `${name}: ${n.name || next.id} bereit`, sub: 'Freischalten im Warroom › Techtree', progress: p };
   const miss = next.st.miss || [];
   const r0 = miss[0] && D.resources?.[miss[0].resource];
-  const sub = miss.map(c => `${c.count - c.have} ${D.resources?.[c.resource]?.name || c.resource}`).join(' · ') + (r0?.source ? ` (${r0.source})` : '');
+  const sub = miss.map(c => `${c.count - c.have} ${D.resources?.[c.resource]?.name || c.resource}`).join(' · ') + (r0?.source ? ` (${r0.source})` : '') + missingBench(D, save, r0?.source);
   return { kind: 'step', text: `${name}: ${n.name || next.id}`, sub: 'Fehlt ' + sub, progress: p, node: next.id };
 }
 export { have };
+
+// #190 ⑧ (persona test #189: „Zerlegen an der Werkbank – ich habe aber gar keine Werkbank“; at Malu's the Werkbank lay in the scrapyard
+// for ten hours): the workshop the source names is not in the rig → say where it is and how it gets in
+export function missingBench(D, save, source) {
+  if (!source || !save?.rig) return '';
+  const ws = Object.entries(D.workshops || {}).find(([, w]) => w?.name && source.includes(w.name));
+  if (!ws) return '';
+  const [id, w] = ws, built = (save.rig.units || []).some(u => (u.workshops || []).some(x => x.id === id));
+  if (built) return '';
+  const spare = (save.rig.spare?.workshops || []).includes(id);
+  return spare ? ` · die ${w.name} liegt im Schrottplatz: B · Rig bauen, einbauen` : ` · erst eine ${w.name} ins Rig bauen (B · Rig bauen)`;
+}
+
