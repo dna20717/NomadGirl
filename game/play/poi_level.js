@@ -455,7 +455,7 @@ export class PoiLevel {
     const st = this.scene.levelInfo?.stack, sc = this.scene.levelInfo?.shortcut || {};   // #168 the outer circle's recipe shapes it
     if (st === 'tower') return sc.oneWay ? 'in den Schacht neben dem Turm springen, unten der Schalter' : sc.hidden ? 'hinter der getarnten Wand in den Schacht, ganz nach unten' : 'der Schacht neben dem Turm, ganz nach unten';
     if (st === 'deep') return sc.hidden ? 'durch die Tür am Schacht, die Leiter hoch, oben durch die getarnte Wand' : sc.open ? 'die Leiter im Schacht hoch' : 'durch die Tür am Schacht, die Leiter hoch';
-    return sc.oneWay ? 'durch die Bodenplatte runter in den Tunnel' : sc.hidden ? 'durch die Falltür im Boden, unten durch den Tunnel' : sc.door ? 'unten durch den Tunnel, der Schalter öffnet die Tür am Eingang' : 'unten durch den Tunnel';
+    return sc.oneWay ? 'durch die Bodenplatte runter in den Tunnel (Ducken + Springen)' : sc.hidden ? 'durch die Falltür im Boden, unten durch den Tunnel' : sc.door ? 'unten durch den Tunnel, der Schalter öffnet die Tür am Eingang' : 'unten durch den Tunnel';
   }
 
   openChest(c) {
@@ -677,6 +677,26 @@ export class PoiLevel {
       s.hud.toast('Geheimnis gefunden!', `${this.secrets} von ${this.secretsMax}`, 'secret', 3200);
       this.secretReward((f.x0 + f.x1) / 2 * T, f.y1 * T);
       s.fog?.reveal(true);
+    }
+    this.secretDust(dt);
+  }
+  // FB-11 (Steven, 25.11.2026: „Missionsabschluss sagt 0/4 Secrets, hier ist aber nichts zu finden“): a hidden wall gives itself away a
+  // little: now and then a pinch of dust trickles from its top while Leyla is near (Spiel › Nebel › Secrets rieseln ab, Kacheln)
+  secretDust(dt) {
+    const s = this.scene, l = s.leyla, T = s.T, R = (s.data_.game?.fog?.secretDust ?? 6) * T;
+    if (!R || !l || l.alive === false || !s.textures.exists('px')) return;
+    for (const w of [...this.walls.filter(w => w.kind === '$'), ...this.fakes]) {
+      if (w.open || w.found) continue;
+      const cx = (w.x0 + w.x1) / 2 * T, cy = (w.y0 + w.y1) / 2 * T;
+      if (Math.abs(l.x - cx) > R || Math.abs(l.feet - T / 2 - cy) > R) continue;
+      w.dustIn = (w.dustIn ?? 600 + Math.random() * 1200) - dt;
+      if (w.dustIn > 0) continue;
+      w.dustIn = 1800 + Math.random() * 2600;
+      const [tx] = w.tiles[Math.floor(Math.random() * w.tiles.length)], x0 = tx * T, y0 = Math.min(...w.tiles.map(t => t[1])) * T;
+      for (let i = 0; i < 9; i++) {
+        const p = s.add.image(x0 + 6 + Math.random() * (T - 12), y0 + 2 + Math.random() * 6, 'px').setTint(0xd8c49c).setAlpha(0.9).setDepth(11).setScale(1 + Math.random() * 0.9);
+        s.tweens.add({ targets: p, y: p.y + T * (0.8 + Math.random() * 1.2), x: p.x + (Math.random() - 0.5) * 10, alpha: 0, duration: 900 + Math.random() * 700, delay: i * 70, ease: 'Quad.easeIn', onComplete: () => p.destroy() });
+      }
     }
   }
   // #170 the passage behind her caves in: rubble from code (concrete, rebar, dust), solid like a wall, a rumble, the camera shakes,

@@ -229,7 +229,7 @@ export class Leyla {
     const ladder = this.scene.ladderAt(this.x, this.feet);
     // drop through a platform: ↓ + jump
     if (grounded && input.down.down && input.jump.pressed && this.scene.onPlatform(this.x, this.feet)) {
-      this.dropUntil = time + 250; this.jumpAt = -1e9; return;
+      this.dropUntil = time + 250; this.jumpAt = -1e9; this.dropCenter(); return;
     }
     // jump (buffer + coyote time), air jumps, short hop when released early
     if (time - this.jumpAt <= (m.jumpBuffer ?? 120) && (grounded || time - this.lastGround <= (m.coyoteTime ?? 100))) {
@@ -277,6 +277,8 @@ export class Leyla {
     if (grounded && input.down.down && !dir && !input.jump.down && Math.abs(b.velocity.x) <= (m.walkSpeed ?? 240) * 0.8) return this.startCrouch();   // not while a direction is held (after a slide with ↓ + → she simply runs on)
   }
 
+  // FB-11/12: dropping through a narrow plate slides her over it (scene.dropX), so the floor beside it does not catch her
+  dropCenter() { const b = this.body, nx = this.scene.dropX?.(this.x, this.feet, b.width); if (nx != null && Math.abs(nx - this.x) > 0.5) { b.x += nx - this.x; b.prev.x = b.x; } }
   jump(f) {
     this.scene.sfx?.(f < 1 ? 'jump_double' : 'jump', { x: this.x });   // #130
     this.body.setVelocityY(-(this.m.jumpVelocity ?? 1100) * f * (1 + (this.scene.mods?.jump || 0) / 100));   // Sprungkraft from implants

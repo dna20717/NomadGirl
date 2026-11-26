@@ -714,6 +714,17 @@ export class PlayScene extends Phaser.Scene {
     return true;
   }
   groundAt(px, py) { const tx = Math.floor(px / this.T), ty = Math.floor(py / this.T); return this.room.solid(tx, ty) || this.platformTiles.has(tx + ',' + ty); }
+  // FB-11/FB-12 (Steven, 25.11.2026: „Hier ist zwar eine Platte, aber undurchdringlich“): dropping through a plate in solid ground (the
+  // one-way shortcut down to the tunnel is one tile wide) only worked within a few pixels of its middle, Leyla's body caught on the
+  // floor beside it. ↓ + jump now slides her over the plate's run so she fits through. → the x she drops at
+  dropX(x, feet, w) {
+    const T = this.T, ty = Math.floor((feet + 4) / T), has = c => this.platformTiles.has(c + ',' + ty);
+    const c0 = [0, -30, 30].map(dx => Math.floor((x + dx) / T)).find(has);
+    if (c0 == null) return x;
+    let a = c0, b = c0; while (has(a - 1)) a--; while (has(b + 1)) b++;
+    const lo = a * T + w / 2 + 1, hi = (b + 1) * T - w / 2 - 1;
+    return lo > hi ? (a + b + 1) * T / 2 : Math.max(lo, Math.min(hi, x));
+  }
   onPlatform(x, feet) {
     const ty = Math.floor((feet + 4) / this.T);
     for (const dx of [-30, 0, 30]) if (this.platformTiles.has(Math.floor((x + dx) / this.T) + ',' + ty)) return true;

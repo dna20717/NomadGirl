@@ -217,7 +217,7 @@ export class LeylaMoves {
     // drop through a platform (↓ + jump) or jump out of the crouch
     if (input.jump.pressed && this.canStand()) {
       this.endCrouch();
-      if (input.down.down && this.scene.onPlatform(this.x, this.feet)) { this.dropUntil = time + 250; this.jumpAt = -1e9; } else this.jump(1);
+      if (input.down.down && this.scene.onPlatform(this.x, this.feet)) { this.dropUntil = time + 250; this.jumpAt = -1e9; this.dropCenter(); } else this.jump(1);
       return;
     }
     // at an edge: ↓ + direction towards it = climb down and hang on the edge
