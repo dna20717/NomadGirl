@@ -376,6 +376,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 ## Tickets
 
+### #193 Testpilot Stufe 3: Questlog, Händler-Platz, Implantate, Bit-Farm
+- **Status:** läuft (26.11.) · angelegt 26.11. von Code (Daniel: „Go mit 3“)
+- **Für:** Code
+- **Plan:** `skills.js` bekommt **Aufträge** (Questlog: Angebot annehmen, Fertiges abgeben; bei Schraube und Sung „Abgeben: …“), **Händler-Platz** (eine fehlende Werkstatt im Bau-Modus kaufen, Bauen setzt sie ein), **Implantate** (ein Implantat aus Rucksack oder Lager über die Hand des Inventars einbauen) und **Bit-Farm** (Entity einziehen, Worker einteilen, Freundschaftsduell an der Chill-Ecke). Abdeckung kennt die neuen Fenster.
+
 ### #192 Testpilot Stufe 2: Duell, Händler, Crew, Hacking, Rückwand-Türen
 - **Status:** fertig (26.11.) · angelegt 26.11. von Code (Daniel: „Ja, bau den Bot weiter aus“)
 - **Für:** Code
