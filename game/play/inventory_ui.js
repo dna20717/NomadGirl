@@ -167,6 +167,7 @@ export class InventoryUI {
     const D = this.D, inv = this.inv, bp = D.backpacks?.[inv.backpack];
     return el('section', { class: 'inv-panel bag' },
       el('header', {}, icon('bags', 16), el('b', {}, bp?.name || 'Rucksack'), el('small', {}, `${worth(D, inv.grids.backpack)} Δ`)),
+      this.host.throwInfo?.() ? el('div', { class: 'inv-bagslot' }, this.slotEl('backpack'), el('small', {}, 'Anderen Rucksack hierher ziehen')) : null,   // FB-3 the backpack slot sits by its grid
       this.gridEl('backpack', inv.grids.backpack), this.deckEl());
   }
   // the cyberdeck's places for Entities (#049), under the backpack while Leyla holds a deck
@@ -221,7 +222,10 @@ export class InventoryUI {
     // only the six places left and right change, and she fades into the scan; the wires are drawn once the layout stands
     const col = keys => el('div', { class: 'inv-wearcol' }, ...keys.map(([x, n]) => this.slotEl(x, n)));
     let left, right;
-    if (!implants) { left = [['wear:head'], ['wear:armor'], ['melee']]; right = [...(this.U('hacking') ? [['cyberdeck']] : []), ['ranged'], ['backpack']]; }   // #184 no deck slot before Hacking
+    // FB-3 (Steven, 25.11.2026: „Rucksack-Slot rüber ins Inventar, an seiner Stelle ein Slot für Wurfwaffen“; Daniel: Wurf-Skill): the backpack
+    // moved up to its grid (bagEl), here the active throw with its charges; A / click switches Granate ↔ Wurfmesser
+    const throwSlot = !!this.host.throwInfo?.();
+    if (!implants) { left = [['wear:head'], ['wear:armor'], ['melee']]; right = [...(this.U('hacking') ? [['cyberdeck']] : []), ['ranged'], [throwSlot ? 'throw' : 'backpack']]; }   // #184 no deck slot before Hacking
     else {
       const rows = I.implants?.length ? I.implants : IMPLANTS.map((slot, i) => ({ slot, name: WEAR_NAMES[slot], at: [48, 40 + i * 30], side: i < 3 ? 'left' : 'right' }));
       left = rows.filter(r => r.side !== 'right').map(r => ['wear:' + r.slot, r.name]);
@@ -407,7 +411,17 @@ export class InventoryUI {
   }
 
   // a slot: weapons (melee, ranged, cyberdeck), the backpack, or a worn place 'wear:<key>' (head, armor, implants, AvA's parts)
+  // FB-3 the throw slot: the active throw skill (Granate / Wurfmesser), its charges and the cooldown; a click switches
+  throwEl() {
+    const T = this.host.throwInfo?.() || {}, more = (T.kinds || []).length > 1;
+    const pic = T.url ? el('img', { class: 'inv-throwpic', src: T.url, alt: '' }) : icon('target', 22);
+    const s = el('div', { class: 'inv-slot wear throw full', 'data-slot': 'throw', title: more ? 'Wurf: Klick / A wechselt Granate und Wurfmesser' : 'Wurf', style: `--col:${T.kind === 'knife' ? '#ff4fa0' : '#3fe0d0'}` },
+      el('small', {}, 'Wurf'), pic, el('span', {}, `${T.name || 'Wurf'} · ${T.charges ?? 0}/${T.max ?? 0}${T.refillIn > 0 ? ` · ${Math.ceil(T.refillIn / 1000)} s` : ''}`));
+    s.addEventListener('mousedown', ev => { ev.stopPropagation(); if (ev.button === 0) this.slotClick('throw'); });
+    return s;
+  }
   slotEl(slot, label) {
+    if (slot === 'throw') return this.throwEl();
     const D = this.D, inv = this.inv, w = slot.startsWith('wear:') && slot.slice(5);
     const [a, id] = w ? ['items', inv.wear?.[w]] : slot === 'backpack' ? ['backpacks', inv.backpack] : ['weapons', inv.slots[slot]];
     const t = id && thing(D, a, id), name = label || (w ? WEAR_NAMES[w] : SLOT_NAMES[slot]);
@@ -846,6 +860,7 @@ export class InventoryUI {
 
   // ---------- slots ----------
   slotClick(slot) {
+    if (slot === 'throw') { if (this.held) return this.host.notify?.('Würfe sind Fertigkeiten: Granate und Wurfmesser füllen sich von selbst wieder auf', 'info'); if (this.host.throwSwap?.()) { sfxNow('item_equip'); this.draw(); } return; }   // FB-3
     const inv = this.inv, h = this.held;
     if (h) {
       if (!this.equip(slot, h.e)) return;

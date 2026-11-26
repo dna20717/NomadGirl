@@ -63,6 +63,7 @@ import { AchievementsUI } from './achievements_ui.js';
 import { TradeUI } from './trade_ui.js';
 import { QuestLogUI } from './questlog_ui.js';
 import { SummaryUI } from './summary_ui.js';
+import { THROW_KINDS } from './leyla_grenade.js';   // FB-3 the throw slot in the inventory
 import { GlitchDuelUI } from './glitch_duel_ui.js';
 import { snapshot as runSnapshot, compare as runCompare } from '../summary.js';
 import { use as useThing, learnAll, learnNote } from '../crafting.js';
@@ -532,6 +533,10 @@ export class PlayScene extends Phaser.Scene {
       learn: (g, e) => hud.scene.learnFrom(g, e),
       dyeOf: id => hud.scene.dyeOf(id), learnDye: (g, e) => hud.scene.learnDyeFrom(g, e),   // #092
       canThrow: () => !!hud.scene.loot,
+      // FB-3 the throw slot: active throw skill, charges, cooldown; throwSwap switches Granate ↔ Wurfmesser (also in the camp)
+      throwInfo: () => { const g = hud.scene.leyla?.grenade, K = hud.scene.leyla?.knives; if (!g) return null; const kinds = [g.c.enabled && 'grenade', K?.c.enabled && 'knife'].filter(Boolean); if (!kinds.length) return null;
+        const k = g.kind, src = k === 'knife' ? K : g, c = src.c, A = hud.scene.data_.assets?.[c.icon]; return { kind: k, kinds, name: THROW_KINDS[k], charges: src.charges ?? c.charges, max: c.charges, refillIn: src.refillAt != null ? Math.max(0, src.refillAt - (src.now?.() ?? hud.scene.now ?? 0)) : 0, url: A?.file && hud.scene.base ? new URL(A.file, hud.scene.base).href : '' }; },
+      throwSwap: () => { const g = hud.scene.leyla?.grenade; if (!g || !g.c.enabled || !hud.scene.leyla?.knives?.c.enabled) return false; g.swap(hud.scene.now ?? 0); return true; },
       inCamp: () => hud.scene.mode === 'camp',
       gearChanged: () => hud.scene.applyGear(),
       react: mood => hud.scene.drone?.react(mood),

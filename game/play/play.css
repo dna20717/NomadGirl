@@ -353,6 +353,13 @@ b.hud-throw-icon { width: auto; height: auto; padding: 0 2px; }
 .inv-center .inv-slot.use { width: 150px; min-height: 0; padding: 6px; grid-auto-flow: column; gap: 6px; }
 .inv-slot.wear { width: 96px; height: 96px; box-sizing: border-box; min-height: 0; }
 .inv-slot.wear:not(.full) span { color: #6f6380; }
+/* FB-3 the throw slot (active throw skill) and the backpack slot beside its grid */
+.inv-slot.throw .inv-throwpic { width: 44px; height: 44px; object-fit: contain; image-rendering: pixelated; }
+.inv-slot.throw span { font-size: 11px; line-height: 1.1; }
+.inv-bagslot { display: flex; align-items: center; gap: 10px; margin: 2px 0 6px; }
+.inv-bagslot .inv-slot.wear { width: 72px; height: 72px; }
+.inv-bagslot .inv-slot.wear b img, .inv-bagslot .inv-slot.wear b canvas { max-width: 34px; max-height: 34px; }
+.inv-bagslot > small { color: var(--ng-muted); font-size: 12px; }
 .inv-slot.wear.full { background: linear-gradient(180deg, color-mix(in srgb, var(--col) 55%, var(--ng-panel)), var(--ng-panel)); }
 .inv-slot.implant:not(.full) { border-color: #2c5a62; }
 .inv-partpic { width: 52px; height: 52px; object-fit: contain; }
