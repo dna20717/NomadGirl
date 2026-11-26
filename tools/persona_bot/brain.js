@@ -13,7 +13,7 @@
     deniz: { runMin: 25, chests: 'all', enemies: 'all', secrets: true, loot: 'choose', camp: ['Schraube', 'Lagerfeuer:Questlog', 'Kochnische', 'skill:trade', 'Schlafkoje:Schlafen'], campMin: 10, travel: 0.25 },
     kai: { runMin: 12, chests: 'none', enemies: 'all', secrets: false, loot: 'none', camp: ['Schlafkoje:Schlafen'], campMin: 2, travel: 0.4, duels: true },
     // #191 Testpilot: goes through every system it has a skill for, in every camp visit (tools/persona_bot/skills.js)
-    pilot: { runMin: 12, chests: 'all', enemies: 'all', secrets: true, loot: 'choose', camp: ['skill:quests', 'skill:tank', 'skill:salvage', 'skill:tech', 'skill:cook', 'skill:trade', 'skill:shop', 'skill:build', 'skill:implants', 'skill:crew', 'skill:bitfarm', 'Schlafkoje:Schlafen'], campMin: 4, travel: 0.5, allJobs: true, duels: true },
+    pilot: { runMin: 12, chests: 'all', enemies: 'all', secrets: true, loot: 'choose', camp: ['skill:quests', 'skill:implants', 'skill:tank', 'skill:salvage', 'skill:tech', 'skill:cook', 'skill:trade', 'skill:shop', 'skill:build', 'skill:crew', 'skill:bitfarm', 'Schlafkoje:Schlafen'], campMin: 4, travel: 0.5, allJobs: true, duels: true },
   };
   const bot = window.personaBot = {
     persona: null, st: null, frame: 0, log: [], findings: [], runs: [], seen: new Set(), assists: 0, toastsSeen: 0, errors: [],

@@ -50,7 +50,7 @@
       if (!to) { H().map.close(); bot().expectMenu = false; return res(false, 'travel', 'Kein Nachbarort auf der Karte'); }
       const ok = nomad.choose(to);
       bot().expectMenu = false;
-      if (!ok) { H().map?.close(); return res(false, 'travel', `Hinfahren nach ${to} geht nicht (${nomad.map()?.action || '–'})`); }
+      if (!ok) { const a = H().map?.action?.(), why = a ? a.label + (a.disabled ? ': ' + a.disabled : '') : '–'; H().map?.close(); return res(false, 'travel', `Hinfahren nach ${to} geht nicht (${why})`); }
       // the drive: spool it, answer what comes up on the road
       for (let k = 0; k < 400; k++) {
         const h = H(), d = h.drive;
@@ -69,7 +69,7 @@
     build(want = null) {
       const s = S(), D = s.data_, R = s.box.save.rig, spare = R.spare?.workshops || [];
       want ??= skills.lastBought; skills.lastBought = null;
-      const id = want && spare.includes(want) ? want : spare.find(w => !D.workshops?.[w]?.fixed);
+      const id = want && spare.includes(want) ? want : spare.find(w => ['bitfarm', 'chill_area', 'ripperdoc', 'warroom'].includes(w)) || spare.find(w => !D.workshops?.[w]?.fixed);   // what the shop bought first
       if (!id) return res(true, 'build', 'nichts im Schrottplatz');
       s.openBuild(); wait(40);
       const b = H().build;
@@ -78,8 +78,8 @@
       const item = (s.camp.yardItems || []).find(it => it.id === id && it.kind === 'ws');
       // a place: empty first, else one whose workshop is neither fixed nor the one we need for cooking
       const slots = b.slots(), wsAt = sl => (R.units[sl.ui]?.workshops || []).find(w => w.at === sl.p);
-      const free = slots.find(sl => !wsAt(sl)) || slots.find(sl => { const w = wsAt(sl); return w && !D.workshops?.[w.id]?.fixed && !['kitchen', 'tank'].includes(fn(D, w.id)) && !['bitfarm', 'chill_area'].includes(w.id); });   // what the Bit-Farm skill needs stays
-      if (!item || !free) { b.close(); wait(30); return res(false, 'build', !item ? `${id} liegt nicht sichtbar im Schrottplatz` : 'kein Platz im Rig'); }
+      const free = slots.find(sl => !wsAt(sl)) || slots.find(sl => { const w = wsAt(sl); return w && !D.workshops?.[w.id]?.fixed && !['kitchen', 'tank'].includes(fn(D, w.id)) && (fn(D, w.id) !== 'craft' || (coverage.set('salvage').size && ['bitfarm', 'chill_area'].includes(id))) && (!['bitfarm', 'chill_area'].includes(w.id) || coverage.set('bitfarm').has(w.id === 'bitfarm' ? 'Worker' : 'Freundschaftsduell')); });   // rotate: the Werkbank goes once it has salvaged, the farm once it was tested   // what the Bit-Farm skill needs stays
+      if (!item || !free) { b.close(); wait(30); return res(!free, 'build', !item ? `${id} liegt nicht sichtbar im Schrottplatz` : 'kein Platz im Rig'); }
       const v = b.viewBox(), cam = s.cam, scr = w => ({ x: (w.x - v.x) * v.z + cam.x, y: (w.y - v.y) * v.z + cam.y });
       const a = scr({ x: (item.x0 + item.x1) / 2, y: (item.y0 + item.y1) / 2 }), z = scr({ x: (free.x0 + free.x1) / 2, y: (free.y0 + free.y1) / 2 });
       b.pointerDown({ button: 0, ...a }); wait(2);
@@ -174,8 +174,10 @@
       cov('window', 'Händler');
       const d0 = nomad.save().deltas, s0 = T.state(), notes = [];
       if (s0.sell.length) {
-        const best = s0.sell.map((x, j) => ({ j, v: Number(x.split('@')[1]) * Number(x.split('×')[1].split('@')[0]) })).sort((a, b) => b.v - a.v)[0];
-        T.pick = best.j; T.act('send'); wait(3); notes.push(T.state().note); cov('trade', 'verkauft');
+        const Di = S().data_.items || {}, keep = id => ['eyes', 'nerves', 'arm', 'heart', 'legs', 'skin'].includes(Di[id]?.wear);   // implants stay for the implant skill
+        const best = s0.sell.map((x, j) => ({ j, id: x.split('×')[0], v: Number(x.split('@')[1]) * Number(x.split('×')[1].split('@')[0]) })).filter(x => !keep(x.id)).sort((a, b) => b.v - a.v)[0];
+        if (best) T.pick = best.j;
+        if (best) { T.act('send'); wait(3); notes.push(T.state().note); cov('trade', 'verkauft'); }
       }
       T.act('next'); wait(2);
       const s1 = T.state();
