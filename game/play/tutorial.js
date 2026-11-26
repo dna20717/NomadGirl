@@ -23,6 +23,13 @@ const PAD_SPECIAL = { left: 'stick', right: 'stick', up: 'stick', down: 'stick' 
 const session = { get() { try { return sessionStorage.getItem('nomadgirl-tutorial-session-off') === '1'; } catch { return false; } }, set(v) { try { v ? sessionStorage.setItem('nomadgirl-tutorial-session-off', '1') : sessionStorage.removeItem('nomadgirl-tutorial-session-off'); } catch { /* private mode */ } } };
 const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode */ } } };
 
+// FB-9 (Steven, 25.11.2026: „Die Textfenster links … müssen länger stehen bleiben. So schnell kann doch keiner lesen“): a tip stands at
+// least Spiel › Tutorial › Tipp bleibt mindestens (12 s), a long one as long as it takes to read it (Lesetempo, + 4 s to look over)
+export function tipSeconds(D, l) {
+  const T = D?.game?.tutorial || {}, chars = String(l?.name || '').length + String(l?.text || '').replace(/\{[^}]*\}/g, 'X').length;
+  return Math.round(Math.max(T.tipSeconds ?? 12, 4 + chars / (T.readChars || 12)));
+}
+
 export class Tutorial {
   // host: { scene: () => PlayScene, hud }
   constructor(root, host) {
@@ -116,7 +123,7 @@ export class Tutorial {
     if (this.tip && now < this.tip.at) { this.tip.until = now + (this.tip.until - this.tip.at); this.tip.at = now; }   // the scene clock started again
     if (this.tip && (now >= this.tip.until || !this.enabled || s?.mode !== 'run')) this.hideTip(now);   // gone with time, outside the run, or off
     // #187 a tip that stands for a few seconds may make way for a lesson Leyla needs right now (something just ahead)
-    const urgentOnly = !!this.tip && now - this.tip.at > 3000;   // (urgent() below waits Spiel › Tutorial › Vorher-Abstand)
+    const urgentOnly = !!this.tip && now - this.tip.at > (this.D.game?.tutorial?.yieldAfter ?? 8) * 1000;   // FB-9: long enough to read first   // (urgent() below waits Spiel › Tutorial › Vorher-Abstand)
     if (!s || this.isOpen || (this.tip && !urgentOnly) || !this.enabled) return;
     if (this.mode !== s.mode || this.sceneId !== s.sys.settings.key + (s.roomId || '') + (s.level ? 'L' : '')) { this.count = 0; this.mode = s.mode; this.sceneId = s.sys.settings.key + (s.roomId || '') + (s.level ? 'L' : ''); this.modeAt = now; if (this.lastClose > now) this.lastClose = now - 2500; }   // a new scene starts its clock again
     if (this.nextPoll - now > 1000) this.nextPoll = 0;   // #186 the scene clock started again (camp ↔ run): poll right away
@@ -252,14 +259,15 @@ export class Tutorial {
     const pic = l.media === 'clip' ? (url(l.clip) ? el('video', { src: url(l.clip), autoplay: true, loop: true, muted: true, playsinline: true, oncanplay: e => { e.target.muted = true; e.target.play?.().catch(() => {}); } }) : null)
       : (() => { const f = (l.slides || []).find(x => x.look && url(x.look)); return f ? el('img', { src: url(f.look), alt: '' }) : null; })();
     const ch = TUT_CHAPTERS.find(([k]) => k === l.chapter)?.[1] || '';
+    const secs = tipSeconds(this.D, l);
     this.tipEl.replaceChildren(
       pic ? el('div', { class: 'tut-tip-pic' }, pic) : null,
       el('div', { class: 'tut-tip-text' }, el('small', {}, icon('help', 12), ' Feldhandbuch · ', ch), el('b', {}, l.name || l.id), l.text ? el('p', {}, ...this.glyphs(l.text)) : null,
         el('div', { class: 'tut-tip-foot' }, el('button', { class: 'tut-tip-more', onclick: e => { e.stopPropagation(); this.hideTip(this.scene?.now ?? 0); this.show(id); } }, 'Mehr'),
           el('button', { class: 'tut-tip-off', onclick: e => { e.stopPropagation(); this.setSessionOff(true); this.hideTip(this.scene?.now ?? 0); } }, 'Für diese Sitzung aus'))),
-      el('span', { class: 'tut-tip-bar', style: `animation-duration:${(this.D.game?.tutorial?.tipSeconds ?? 9)}s` }));
+      el('span', { class: 'tut-tip-bar', style: `animation-duration:${secs}s` }));
     this.tipEl.hidden = false;
-    this.tip = { id, at: now, until: now + (this.D.game?.tutorial?.tipSeconds ?? 9) * 1000 };
+    this.tip = { id, at: now, until: now + secs * 1000 };
   }
   hideTip(now) {
     if (!this.tip) return;
