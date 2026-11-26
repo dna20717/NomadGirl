@@ -791,6 +791,7 @@ export class Camp {
     if (this.C.rig?.roofWalk !== false && u.kind !== 'tractor' && u.def?.kind !== 'crate' && roofFree(this.box.save.rig, u.ui) && u.deckY != null) {
       const r = s.add.zone(u.in0 + u.cell * u.places / 2, u.deckY + 8, u.cell * u.places + 16, 16);
       s.platforms.add(r); Object.assign(r.body.checkCollision, { down: false, left: false, right: false });
+      r.ledge = true;   // FB-1: its ends are edges to grab and pull up
       this.rigObjs.push(r);
     }
     // a stacked container has end walls: up there Leyla can walk from end to end without stepping off into the air (down = ladder)

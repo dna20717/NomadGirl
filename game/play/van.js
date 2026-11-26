@@ -32,7 +32,7 @@ export class Van {
       const a = this.toWorld(R.x[0], R.y), b = this.toWorld(R.x[1], R.y);
       this.roof = { x0: Math.min(a.x, b.x), x1: Math.max(a.x, b.x), y: a.y };
       const z = scene.add.zone((this.roof.x0 + this.roof.x1) / 2, this.roof.y + 8, this.roof.x1 - this.roof.x0, 16);
-      scene.platforms.add(z);
+      scene.platforms.add(z); z.ledge = true;   // FB-1: grab the roof's edge and pull up
       Object.assign(z.body.checkCollision, { down: false, left: false, right: false });
       // foreground (e.g. the front rail): same frames as the van, drawn in front of Leyla while she is up there
       const fg = R.front && scene.assetInfo(R.front);

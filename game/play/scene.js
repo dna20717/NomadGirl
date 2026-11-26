@@ -746,6 +746,16 @@ export class PlayScene extends Phaser.Scene {
       }
       if (ground(cx, Math.floor(handY / T))) break;   // a wall in between: no grabbing through it
     }
+    // FB-1 (Daniel, 23.11.2026: „Man kann nicht mehr auf die Dächer von Containern springen oder sich an den Rändern hochziehen“): a
+    // platform zone marked as a ledge (camp: container roofs, the van's roof) has grabbable ends like a tile edge
+    for (const z of this.platforms?.getChildren?.() || []) {
+      const b = z.body;
+      if (!z.ledge || !b) continue;
+      const ex = dir > 0 ? b.left : b.right, d = (ex - x) * dir;
+      if (d < halfW - 8 || d > halfW + Math.max(6, side) + 8 || b.top < handY - up || b.top > handY + reach) continue;
+      if (this.room.solid(Math.floor((ex + dir * 8) / this.T), Math.floor((b.top - 8) / this.T))) continue;
+      return { x: ex, y: b.top, dir };
+    }
     return this.drone?.ledgeFor?.(x, handY, dir, reach, halfW, up, side) || null;   // AvA's edge
   }
   // edge of the ground Leyla stands on, in direction dir (for climbing down): hanging there she faces back to it
