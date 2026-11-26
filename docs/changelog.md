@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 26.11.2026: **Feedback-Paket** (#188, FB-1 und FB-3 bis FB-12 aus FeedbackBucket): Van im Level frei von Wracks und Plakatwänden; Lektions-Tipps bleiben länger; Beute-Bilanz zuckt nicht mehr; Bodenplatte zum Tunnel lässt Leyla durch; versteckte Wände rieseln Staub; Container-Dächer haben greifbare Kanten; AvA hält Leyla fest (Akku 6 s); Boden-Leiste blättern (Steuerkreuz, F, Mausrad, Klick); Wurf-Slot im Inventar, Rucksack-Slot am Raster; Feedback-Spur zählt Pausen nicht als Ruckler. FB-4 (Baumenü) nicht nachstellbar, Rückfrage an Steven.
 - 24.11.2026: **Favicon**: runder NOMAD-Aufnäher (Rig auf Stoff, pinke Stickkante) als Tab- und Homescreen-Symbol auf allen Seiten.
 - 23.11.2026: **Lektionen kurz bevor** (#187): Springen, Kanten, Leitern, Ducken, Gegner, Schießen und Nahkampf kommen, wenn das Hindernis, die Kante, die Leiter oder der Gegner gerade vor Leyla liegt; im Camp schon beim E-Hinweis an der Werkstatt.
 - 23.11.2026: **Lektionen beim ersten Mal** (#186, Entwurf): Lehrpfad im ersten Run in Mile 7, sonst kommt eine Lektion, wenn Leyla etwas zum ersten Mal tut (erster Sprung, Schlag, Schuss …) oder ein System frei wird; Pause zwischen Lektionen und höchstens ein paar je Besuch.
