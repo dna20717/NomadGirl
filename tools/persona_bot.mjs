@@ -66,6 +66,7 @@ async function report(f) {
 
 while (frame < total) {
   let r;
+  const tc = Date.now();
   try { r = await page.evaluate(n => personaBot.chunk(n), CHUNK); }
   catch (e) { log({ crash: e.message, frame }); pageErrors.push('crash: ' + e.message); break; }
   frame = r.frame; assists = r.assists;
@@ -79,7 +80,7 @@ while (frame < total) {
     // only JS errors go through the form right away (objective); the rest Ava checks first and reports as the persona afterwards
     if (f.kind === 'error' && !f.dup && !counts['_' + k]) { counts['_' + k] = 1; await report(f); }
   }
-  log({ f: frame, state: r.state, assists });
+  log({ f: frame, state: r.state, assists, ms: Date.now() - tc });
   if (frame >= nextShot) {
     nextShot += shotEvery;
     await page.evaluate(() => nomad.freeze()); await page.waitForTimeout(500);
