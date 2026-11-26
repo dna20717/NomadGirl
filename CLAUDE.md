@@ -79,13 +79,13 @@ docs/design.md         Game Design Document
 docs/crew.md           Kernfiguren der Crew (Geschichten, Vertrauensbäume)
 docs/glossary.md       Deutsch → Englisch
 docs/assets.md         alle Assets mit Herkunft (KI/Code)
-docs/backlog.md        offene Punkte, technische Schulden, Relikte (Durchsicht 12.11.2026)
-docs/balancing.md      Balancing-Bericht, Simulation (tools/balance_sim.mjs)
+docs/backlog.md        offene Punkte, technische Schulden, Relikte
+docs/balancing.md      Balancing-Bericht (tools/balance_sim.mjs)
 docs/funk.md           Funkbuch: Tickets und Rückmeldungen zwischen Projekt-Chat und Claude Code
 docs/features/         Feature-Wissen je Bereich (siehe Landkarte)
 docs/changelog.md      Verlauf: was wann gebaut wurde (früher „Stand“)
 projects/nomadgirl/assets/   alle Grafiken: Animationen, Bilder, Referenzen, Originale (nach Figur/Thema in Unterordnern, z. B. leyla/)
-output/                Bilder vom Werkstatt-Test (nicht im Git)
+output/                Testbilder (nicht im Git)
 ```
 
 ## Werkstatt und Schema
@@ -147,7 +147,7 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 - `docs/features/trade.md`: Händlerfenster (Camp, Straße, Orte) und Vorschuss (#182, #183).
 - `docs/features/feedback.md`: Feedback-Knopf der Testphase (#181), FeedbackBucket.
 - `docs/features/tests.md`: Alle Browser-Tests und Prüfwerkzeuge mit ihren Prüfungen.
-- `docs/testing_personas.md`: Fünf Testing-Personas nach Bartle (Jana, Malu, Ole, Deniz, Kai); ihre Befunde gehen **übers Feedback-Formular** (`tools/persona_feedback.mjs`), nie als Issue von Hand (Daniel, 26.11.2026).
+- `docs/testing_personas.md`: Personas, Befunde nur übers Formular.
 - `docs/changelog.md`: Verlauf aller Ausbaustufen (früher „Stand“), neueste oben.
 
 ## Kommandozeile `ng`
