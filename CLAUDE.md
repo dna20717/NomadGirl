@@ -147,6 +147,7 @@ Je Feature eine Datei in `docs/features/`, vor der Arbeit am Feature lesen:
 - `docs/features/trade.md`: Händlerfenster (Camp, Straße, Orte) und Vorschuss (#182, #183).
 - `docs/features/feedback.md`: Feedback-Knopf der Testphase (#181), FeedbackBucket.
 - `docs/features/tests.md`: Alle Browser-Tests und Prüfwerkzeuge mit ihren Prüfungen.
+- `docs/testing_personas.md`: Fünf Testing-Personas nach Bartle (Jana, Malu, Ole, Deniz, Kai); ihre Befunde gehen **übers Feedback-Formular** (`tools/persona_feedback.mjs`), nie als Issue von Hand (Daniel, 26.11.2026).
 - `docs/changelog.md`: Verlauf aller Ausbaustufen (früher „Stand“), neueste oben.
 
 ## Kommandozeile `ng`

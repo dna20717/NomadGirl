@@ -97,3 +97,7 @@ node tools/mirror_test.mjs [--shots]      # #044 Spiegel: beim Händler kaufen, 
 
 Korrektur (#017): Frühere „alle grün“-Meldungen nach #016 waren falsch, weil mein Filter Zeilen wie „39 ok, 2 Fehler“ wegen des „ok“ aussortiert hat; `pad_test` (Van-Tür öffnet jetzt direkt die Karte) und `poi_test` (Beute-Bilanz statt Banner) waren rot und sind jetzt angepasst. `test_all.mjs` wertet die letzte Zeile und den Exit-Code richtig aus. Dazu: `light_test` und `poi_test` legen die vier klassischen Tankstellen-Räume als Entwurf fest (ihre Prüfungen kennen deren Layout), `tutorial_test` wartet bis zu 5 s auf die Clip-Vorschau.
 - `tools/brand_sign_test.mjs` (3): Markenschild am POI-Eingang steht auf festem Boden, ohne Marke kein Schild, keine Seitenfehler.
+
+## Testing-Personas
+
+`node tools/persona_feedback.mjs --persona <jana|malu|ole|deniz|kai> --chip <gut|schlecht|bug|idee|verwirrend> --text "…"`: spielt mit Bildschirm und Gerät der Persona, füllt das echte Feedback-Formular aus (F8, Chip, Text, Abschicken). Ohne Worker landet die Anfrage in `output/persona/…/payload.json`, `--post … --number <n> --bucket <Klon>` legt Bild, Spur und Issue-Text für FeedbackBucket an. Ablauf: `docs/testing_personas.md`.
