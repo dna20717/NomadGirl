@@ -171,6 +171,7 @@
       const m = nomad.map();
       let ok = false;
       if (m?.open) ok = nomad.choose('Plündern');
+      if (!ok) { H().map?.close(); this.wait(60); this.goTo('Van'); this.wait(1, [], ['grab']); this.wait(10); if (H().menuState()) nomad.choose('Planen'); if (nomad.map()?.open) ok = nomad.choose('Plündern'); }   // #191 right after arriving the first E may come too early
       this.expectMenu = false;
       if (!ok) { this.note('travel', 'Vom Van aus kommt Leyla nicht los (Karte/Plündern)', { map: m && { here: m.here, action: m.action } }); H().map?.close(); this.wait(600); return; }
       this.wait(120);
@@ -191,7 +192,7 @@
       if (this.runStart == null) this.beginRun();
       const R = s.room, rh = (R.h ?? R.tiles.length) * s.T;
       if (l.feet > rh + 400 || !Number.isFinite(l.x) || !Number.isFinite(l.feet)) { this.note('void', `Leyla ist aus der Welt gefallen (Füße bei y ${Math.round(l.feet)}, Level ${rh} hoch)`, { from: this.lastSafe }); if (this.lastSafe) nomad.tp(...this.lastSafe); else if (s.van) nomad.tp(s.van.x, s.van.y); this.wait(30); return; }
-      if ((l.body.blocked.down || l.body.touching.down) && this.frame % 60 < 6) this.lastSafe = [l.x, l.feet];
+      if ((l.body.blocked.down || l.body.touching.down) && this.frame % 60 < 6 && l.feet <= rh) this.lastSafe = [l.x, l.feet];
       if (!l.alive || l.health <= 0) { this.log.push({ f: this.frame, ko: true }); this.wait(240); return; }
       // fight first
       if (this.fight()) return;
@@ -242,7 +243,8 @@
         for (const f of lv.fakes || []) if (!f.found) list.push(mk((f.x0 + f.x1 + 1) / 2 * T, (f.y1 + 1) * T, 'secret', () => (S().level?.state()?.fakes || []).find(q => q.x0 === f.x0 && q.y0 === f.y0)?.found, 'walk'));
         for (const w of lv.walls || []) if (!w.open) list.push(mk((w.x0 + w.x1 + 1) / 2 * T, (w.y1 + 1) * T, 'wall', () => (S().level?.state()?.walls || []).find(q => q.x0 === w.x0 && q.y0 === w.y0)?.open, 'melee'));
       }
-      if (st.enemies === 'all') for (const e of s.enemies || []) if (e.alive && e.state !== 'dead') list.push(mk(e.x, e.feet, 'enemy', () => !e.alive || e.state === 'dead', 'fight'));
+      const inWorld = e => e.feet <= (s.room.h ?? s.room.tiles.length) * T + 64 && e.x >= 0 && e.x <= (s.room.w ?? s.room.tiles[0].length) * T;   // #191 an enemy that fell out of the level is a finding (checks.js), no target
+      if (st.enemies === 'all') for (const e of s.enemies || []) if (e.alive && e.state !== 'dead' && inWorld(e)) list.push(mk(e.x, e.feet, 'enemy', () => !e.alive || e.state === 'dead', 'fight'));
       for (const g of lv.goals || []) list.push(mk(g.x, g.feet, 'goal', () => !!S().level?.state()?.done, 'grab'));
       const fresh = list.filter(t => !this.visited.has(t.what + Math.round(t.x) + ',' + Math.round(t.feet)));
       const pool = fresh.filter(t => t.what !== 'goal');

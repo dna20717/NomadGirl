@@ -142,7 +142,7 @@
       if (t.cond >= 99) return res(true, 'tank', 'Tank voll');
       const spot = benchSpot('tank');
       if (!spot) return res(false, 'tank', 'Cryo-Tank nicht im Rig');
-      const before = t.cond, c = openBench(spot);
+      const before = t.cond, c = openBench(spot) || (wait(60), openBench(spot));   // a second try (right after a scene change)
       if (!c) return res(false, 'tank', 'Cryo-Tank: Fenster geht nicht auf');
       cov('window', 'Cryo-Tank');
       const ready = (c.state().book || []).filter(r => r.ready);

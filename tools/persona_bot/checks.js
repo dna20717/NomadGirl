@@ -43,6 +43,11 @@
       // measured in the camp (no level of its own): the count must not climb from visit to visit
       if (s.mode === 'camp' && !s.leaving) { campBase ??= lvl; if (lvl > campBase + 15) push(finding('memory', `Level-Texturen im Camp ${campBase} → ${lvl}: eine Szene räumt nicht auf`)); }
       if (s.mode === 'camp' && !s.leaving && (s.kitCache?.size || 0) > (s.data_.game?.kitCacheKeep ?? 8)) push(finding('memory', `Raider-Cache im Camp bei ${s.kitCache.size} Kombinationen (Grenze ${s.data_.game?.kitCacheKeep ?? 8})`));   // pruned when a level ends
+      // 2b) nobody outside the level: an enemy below the bottom is never found, its kill never counts
+      if (s.room && s.mode !== 'camp') {
+        const H0 = (s.room.h ?? s.room.tiles.length) * s.T, W0 = (s.room.w ?? s.room.tiles[0].length) * s.T;
+        for (const e of s.enemies || []) if (e.alive && e.state !== 'dead' && (e.feet > H0 + 200 || e.x < -200 || e.x > W0 + 200)) push(finding('void', `Gegner ${e.id} ist aus dem Level gefallen (Kachel ${Math.round(e.x / s.T)},${Math.round(e.feet / s.T)}, Level ${Math.round(W0 / s.T)}×${Math.round(H0 / s.T)})`, { enemy: e.id, spawn: e.spawnAt || null }));
+      }
       // 3) numbers in range
       if (!Number.isFinite(sv.deltas) || sv.deltas < 0) push(finding('numbers', `Δ ist ${sv.deltas}`));
       if (sv.tank && !sv.tank.dead && !(sv.tank.cond >= 0 && sv.tank.cond <= 100)) push(finding('numbers', `Tank-Zustand ${sv.tank.cond}`));

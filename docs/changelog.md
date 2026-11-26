@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 26.11.2026: **Testpilot** (#191): der Persona-Bot reist, baut, kocht, zerlegt, schaltet im Techtree frei und wartet den Tank; Prüfer bei jedem Schritt (HUD, Speicher, Werte, Softlock, Speichern + Laden, Gegner außerhalb des Levels) und ein Abdeckungsbericht; `npm run testpilot`, nur auf Zuruf.
 - 26.11.2026: **Befunde aus dem Persona-Spieltest** (#190): Granaten nach einem Szenenwechsel stürzen nicht mehr ab, eine Wurf-Anzeige, Speicher wächst nicht mehr mit jedem Run, AvAs Tank warnt bei jeder schlechteren Phase, keine Entwurfs-Marker mehr in Spieltexten, Schulranzen 5 × 4, die Zielzeile sagt, wo die Werkbank liegt.
 - 26.11.2026: **Persona-Spieltest** (#189): fünf Testing-Personas spielen je 10 h als Bots (`tools/persona_bot.mjs`, Schnellgang `nomad.fast`), 8 geprüfte Befunde übers Feedback-Formular, Eisenhower-Matrix in `docs/playtests/2026-11-26_personas.md`.
 - 26.11.2026: **Testing-Personas** nach Bartle (`docs/testing_personas.md`), Befunde nur übers Feedback-Formular (`tools/persona_feedback.mjs`).
