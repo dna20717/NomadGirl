@@ -31,11 +31,12 @@ const CHIP = { stuck: 'bug', use: 'bug', window: 'bug', build: 'bug', travel: 'b
 const profile = path.join('output', 'persona_play', '_profile_' + id);
 fs.rmSync(profile, { recursive: true, force: true });
 const pageErrors = [];
-let ctx = null, page = null, caught = null, crashes = 0;
+let ctx = null, page = null, cdp = null, caught = null, crashes = 0, sessions = 0;
 async function open(fresh, fromFrame) {
   if (ctx) await ctx.close().catch(() => {});
   ctx = await chromium.launchPersistentContext(profile, { headless: true, viewport: { width: P.viewport[0], height: P.viewport[1] }, args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
   page = ctx.pages()[0] || await ctx.newPage();
+  cdp = await ctx.newCDPSession(page); await cdp.send('Performance.enable'); sessions++;
   page.on('pageerror', e => pageErrors.push(e.message));
   page.on('console', m => { if (m.type() === 'error' && !/404|Failed to load resource|\/api\//.test(m.text())) pageErrors.push(m.text()); });
   if (P.pad) await page.addInitScript(() => {
@@ -52,6 +53,9 @@ await open(true, 0);
 
 let reports = 0, nextShot = 0, frame = 0, assists = 0;
 const t0 = Date.now(), counts = {};
+const SESSION = 90 * 3600;   // a real player closes the game now and then: every 90 game minutes the browser opens again on the same save
+let sessionStart = 0;
+async function metrics() { try { const m = Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map(x => [x.name, x.value])); return { heap: Math.round(m.JSHeapUsedSize / 1048576), nodes: m.Nodes, listeners: m.JSEventListeners, docs: m.Documents }; } catch { return null; } }
 async function report(f) {
   if (reports >= maxReports) return;
   const what = [f.text, f.poi ? `(${f.poi}, Kachel ${f.tile?.join(', ')})` : f.tile ? `(Kachel ${f.tile.join(', ')})` : ''].filter(Boolean).join(' ');
@@ -78,6 +82,7 @@ while (frame < total) {
   catch (e) {   // the tab crashed (or hung): a finding of its own; the browser comes back with the same save and plays on
     crashes++; log({ crash: e.message.slice(0, 200), frame, crashes });
     if (crashes > 8) break;
+    sessionStart = frame;
     try { await open(false, frame); } catch (e2) { log({ reopenFailed: e2.message.slice(0, 200) }); break; }
     continue;
   }
@@ -92,7 +97,8 @@ while (frame < total) {
     // only JS errors go through the form right away (objective); the rest Ava checks first and reports as the persona afterwards
     if (f.kind === 'error' && !f.dup && !counts['_' + k]) { counts['_' + k] = 1; await report(f); }
   }
-  log({ f: frame, state: r.state, assists, ms: Date.now() - tc });
+  log({ f: frame, state: r.state, assists, ms: Date.now() - tc, mem: await metrics(), session: sessions });
+  if (frame - sessionStart >= SESSION) { sessionStart = frame; log({ reload: 'Spielpause', frame, mem: await metrics() }); try { await open(false, frame); } catch (e) { log({ reopenFailed: e.message.slice(0, 200) }); break; } continue; }
   if (frame >= nextShot) {
     nextShot += shotEvery;
     try {   // a picture now and then; under load the software renderer may be slow, a missing picture is no reason to stop
