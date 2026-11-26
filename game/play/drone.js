@@ -303,7 +303,13 @@ export class Drone {
       if (Math.hypot(h.x - g.x, h.y - g.y) < (P.grab ?? 70) && l.hangFits(L)) l.startHang(L);   // only where her legs hang free
     }
     // standing on her, hanging at her edge or pulling up onto her
-    const onTop = this.platOn && (l.body.blocked.down || l.body.touching.down) && Math.abs(l.feet - top) < 10 && Math.abs(l.x - this.x) < w / 2 + halfW;
+    // FB-7 (Steven, 25.11.2026: „Leyla sollte mit der Drohne, solange der Akku Saft hat, richtig verankern. Sie glitcht immer wieder
+    // runter“): sinking under her weight AvA left a standing Leyla behind for a frame, „touching down“ flickered, the carrying stopped
+    // and once parking was over the platform went away under her feet. Now she rides along (below) and a short grace keeps the hold.
+    const near = Math.abs(l.feet - top) < 14 && Math.abs(l.x - this.x) < w / 2 + halfW && l.body.velocity.y >= -40 && l.state !== 'climb' && l.state !== 'swing';
+    const touch = (l.body.blocked.down || l.body.touching.down) && Math.abs(l.feet - top) < 10 && Math.abs(l.x - this.x) < w / 2 + halfW;
+    if (this.platOn && touch) this.rideUntil = time + 180;
+    const onTop = this.platOn && (touch || (near && time < (this.rideUntil || 0)));
     this.carrying = !!(onTop || l.ledge?.drone); this.riding = !!onTop;
     const ready = time >= (this.emptyUntil || 0);
     this.platOn = P.enabled !== false && l.alive && ready && this.battery > 0 && !this.build && !this.dock && (this.leashed || this.parkAt || this.carrying);
@@ -311,7 +317,7 @@ export class Drone {
     if (this.carrying) {
       this.battery = Math.max(0, this.battery - dt / cap * (this.flying ? P.flyDrain ?? 3 : 1));
       const sag = (P.sag ?? 12) * (1 - this.battery) * dt / 1000;   // the motors labour: she sinks a little (Leyla with her)
-      if (l.state === 'hang' && l.ledge?.drone) { if (this.carryLeyla(0, sag)) this.y += sag; } else this.y += sag;
+      if ((l.state === 'hang' && l.ledge?.drone) || this.riding) { if (this.carryLeyla(0, sag)) this.y += sag; } else this.y += sag;   // FB-7 standing too
       if (this.battery <= 0) this.empty(time);
     } else this.battery = Math.min(1, this.battery + dt / ((P.recharge ?? 6) * 1000));
     this.plat.setPosition(this.x, top + 8); this.plat.body.updateFromGameObject();

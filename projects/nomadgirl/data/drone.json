@@ -61,7 +61,7 @@
  "platform": {
   "enabled": true,
   "park": 1800,
-  "battery": 4,
+  "battery": 6,
   "recharge": 6,
   "cooldown": 1500,
   "width": 110,

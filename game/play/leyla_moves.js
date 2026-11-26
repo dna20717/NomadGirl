@@ -168,6 +168,13 @@ export class LeylaMoves {
       const z = this.size, dr = this.scene.drone, top = L.point && dr ? { x: dr.x, feet: dr.platformTop() } : { x: L.x + L.dir * (z.w / 2 + 4), feet: L.y };
       if (this.scene.rectFree(top.x - z.w / 2 + 2, top.feet - z.crouchH, z.w - 4, z.crouchH - 2)) return this.startMantle(time, top);
     }
+    // FB-7 (Steven, 25.11.2026: „Leyla sollte mit der Drohne … richtig verankern. Sie glitcht immer wieder runter“): at AvA she already
+    // dangles from one arm, so a single twitch of the stick down let go. There ↓ has to be held a moment (Leyla › Kanten › Loslassen an AvA)
+    if (L.drone) {
+      if (!input.down.down) this.downSince = null;
+      else if ((this.downSince ??= time) && time - this.downSince >= (m.droneLetGo ?? 350)) { this.downSince = null; this.leaveHang(time); }
+      return;
+    }
     // ↓ once = dangle from one arm, ↓ again = let go (Daniel, 12.11.2026)
     if (input.down.pressed) {
       if (!this.oneArm && this.m.oneArmTap !== false && this.d.look?.hangOne) this.oneArm = true;
