@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 26.11.2026: **Testpilot Stufe 3** (#193): der Bot nimmt Aufträge im Questlog an und gibt Fertiges ab, kauft fehlende Werkstätten am Händler-Platz, baut Implantate über die Hand des Inventars ein und zieht Entities in die Bit-Farm (Worker, Freundschaftsduell an der Chill-Ecke); Werkstätten rotieren im vollen Rig; nach einer Reise keine alten Ziele mehr.
 - 26.11.2026: **Testpilot Stufe 2** (#192): der Bot spielt Glitch-Duelle an KI-Automaten und -Terminals, handelt bei Schraube, nimmt Bewerber in die Crew auf und geht durch Rückwand-Türen.
 - 26.11.2026: **Testpilot** (#191): der Persona-Bot reist, baut, kocht, zerlegt, schaltet im Techtree frei und wartet den Tank; Prüfer bei jedem Schritt (HUD, Speicher, Werte, Softlock, Speichern + Laden, Gegner außerhalb des Levels) und ein Abdeckungsbericht; `npm run testpilot`, nur auf Zuruf.
 - 26.11.2026: **Befunde aus dem Persona-Spieltest** (#190): Granaten nach einem Szenenwechsel stürzen nicht mehr ab, eine Wurf-Anzeige, Speicher wächst nicht mehr mit jedem Run, AvAs Tank warnt bei jeder schlechteren Phase, keine Entwurfs-Marker mehr in Spieltexten, Schulranzen 5 × 4, die Zielzeile sagt, wo die Werkbank liegt.

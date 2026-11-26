@@ -377,9 +377,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #193 Testpilot Stufe 3: Questlog, Händler-Platz, Implantate, Bit-Farm
-- **Status:** läuft (26.11.) · angelegt 26.11. von Code (Daniel: „Go mit 3“)
+- **Status:** fertig (26.11.) · angelegt 26.11. von Code (Daniel: „Go mit 3“)
 - **Für:** Code
 - **Plan:** `skills.js` bekommt **Aufträge** (Questlog: Angebot annehmen, Fertiges abgeben; bei Schraube und Sung „Abgeben: …“), **Händler-Platz** (eine fehlende Werkstatt im Bau-Modus kaufen, Bauen setzt sie ein), **Implantate** (ein Implantat aus Rucksack oder Lager über die Hand des Inventars einbauen) und **Bit-Farm** (Entity einziehen, Worker einteilen, Freundschaftsduell an der Chill-Ecke). Abdeckung kennt die neuen Fenster.
+- **Rückfragen:** ⚠️ Das Start-Rig hat drei Plätze (Kochnische, Werkbank, Cryo-Tank). Der Bot rotiert deshalb: die Werkbank geht raus, sobald sie einmal zerlegt hat, Bit-Farm und Chill-Ecke, sobald sie getestet sind. Einen Container für mehr Platz kauft er noch nicht (Stufe 4?).
+- **Ergebnis:** (Code) `ecdc438`, `1865255`, `d7e8750` + dieser Commit. `skills.js`: `quests`, `shop`, `implants`, `bitfarm`; Bauen schützt Kochnische, Tank, Werkbank (bis sie zerlegt hat) und Bit-Farm/Chill-Ecke (bis getestet); Handel verkauft keine Implantate; gesperrte Fahrt nennt ihren Grund. `brain.js`: ein neues Level startet ohne alte Ziele, die Hilfe teleportiert nie außerhalb des Levels (das waren die 64 „aus der Welt gefallen“ in Lauf 2, ein Bot-Fehler). Rauchtest (`output/smoke3.mjs`, Δ und Techtree geschenkt): alle vier Skills greifen, Entity zieht in die Bit-Farm und wird Worker. Lauf 3 (1,5 h Spielzeit, 6 min): Questlog 12×, Implantat eingebaut 6× (nach jedem k.o. neuer Durchgang mit frischem Lager), Händler-Platz 3× (Chill-Ecke gekauft und eingebaut), Reisen bis n9, 0 Spielfehler, 0 JS-Fehler. Die Bit-Farm erreicht der Pilot in 1,5 h nicht: ihr Techtree-Knoten kostet Technik, und die kommt nur aus der Werkbank, die im vollen Rig rotiert. PixelLab: 0.
+- **Für Daniel:** nichts zu testen im Spiel, `npm run testpilot` wie gehabt.
 
 ### #192 Testpilot Stufe 2: Duell, Händler, Crew, Hacking, Rückwand-Türen
 - **Status:** fertig (26.11.) · angelegt 26.11. von Code (Daniel: „Ja, bau den Bot weiter aus“)
