@@ -53,7 +53,7 @@ await open(true, 0);
 
 let reports = 0, nextShot = 0, frame = 0, assists = 0;
 const t0 = Date.now(), counts = {};
-const SESSION = 90 * 3600;   // a real player closes the game now and then: every 90 game minutes the browser opens again on the same save
+const SESSION = 20 * 3600;   // a real player closes the game now and then: every 20 game minutes the browser opens again (the game keeps textures of every run, #189) on the same save
 let sessionStart = 0;
 async function metrics() { try { const m = Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map(x => [x.name, x.value])); return { heap: Math.round(m.JSHeapUsedSize / 1048576), nodes: m.Nodes, listeners: m.JSEventListeners, docs: m.Documents }; } catch { return null; } }
 async function report(f) {
@@ -81,7 +81,7 @@ while (frame < total) {
   try { r = await page.evaluate(n => personaBot.chunk(n), CHUNK); }
   catch (e) {   // the tab crashed (or hung): a finding of its own; the browser comes back with the same save and plays on
     crashes++; log({ crash: e.message.slice(0, 200), frame, crashes });
-    if (crashes > 8) break;
+    if (crashes > 30) break;
     sessionStart = frame;
     try { await open(false, frame); } catch (e2) { log({ reopenFailed: e2.message.slice(0, 200) }); break; }
     continue;
