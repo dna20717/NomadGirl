@@ -1,6 +1,7 @@
 import { placeTypes, fits, roleConfig, roleWeight, pickWeighted, planDressing, hullMap, tileCase } from '../../engine/dressing.js';
 import { rulesOf } from '../../engine/dressing_story.js';
 import { autoTile, autotileOf, innerCorner } from './autotile.js';
+import { vanSpan } from '../../engine/room.js';
 const WALLS = new Set(['#', 'A', '^', 'v']);   // drawn as wall (doors and brittle walls: game/play/poi_level.js)
 const CAMO = new Set(['%', '$']);   // fake walls and camouflaged brittle walls: drawn like the wall, on their own layer above Leyla
 // Code-drawn art for the MVP: sky and skyline of BigCityDelta, tiles, placeholder raiders, projectiles, particles.
@@ -74,6 +75,8 @@ function propStamp(scene, kit, key, frame, cx, ground) {
 const rng = seed => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
 
 // #174 the floor and wall in front of a front door (engine/doors.js) stay free of set dressing
+// FB-6: the van's outline (plus a tile each side) stays free of clutter (engine/room.js vanSpan)
+const vanFree = (D, room, T) => { const v = vanSpan(D, room?.start, T), out = []; if (v) for (let y = v.y0; y <= v.y1; y++) for (let x = v.x0 - 1; x <= v.x1 + 1; x++) out.push(x + ',' + y); return out; };
 const frontFree = L => (L?.doors?.front || []).flatMap(f => { const out = []; for (let y = f.y; y <= f.feet + 1; y++) for (let x = f.x - 1; x <= f.x + f.w; x++) out.push(x + ',' + y); return out; });
 
 export function makeTextures(scene) {
@@ -315,8 +318,9 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
   const ruleOf = (kit, key, f) => kit.rules?.size ? kit.rules.get(kit.nameOf(key, f)) || {} : null;
   // #158 the plan (engine/dressing.js planDressing): POI-Ensembles first, then single things up to the room's density (Spiel ›
   // Set-Dressing), ways and fighting spots free, deterministic per seed. Rooms whose set has no Clutter-Regeln keep the old dice.
-  const plan = spots && scene.data_?.game?.dressing?.enabled !== false ? planDressing({ D: scene.data_, room, reg: terrain.reg, spots, poiId: scene.levelPoi, seed: scene.levelSeed || 0, T, keepFree: frontFree(scene.levelInfo) }) : null;
-  const planOcc = new Set();
+  const vanKeep = !style && scene.mode !== 'camp' && !scene.megarig ? vanFree(scene.data_, room, T) : [];
+  const plan = spots && scene.data_?.game?.dressing?.enabled !== false ? planDressing({ D: scene.data_, room, reg: terrain.reg, spots, poiId: scene.levelPoi, seed: scene.levelSeed || 0, T, keepFree: [...frontFree(scene.levelInfo), ...vanKeep] }) : null;
+  const planOcc = new Set(vanKeep);
   if (plan) for (const s of spots.list) if (plan.planned(s.x, s.y)) planOcc.add(s.x + ',' + s.y);
   // #158 Raum-Rollen weight the choice (Raum-Bausteine › Rolle, Spiel › Set-Dressing › Rollen)
   const roleCfg = roleConfig(scene.data_), roleAt = (x, y) => terrain?.reg?.roleAt?.(x, y) || 'general';

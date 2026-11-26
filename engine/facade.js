@@ -35,6 +35,8 @@ export const SURFACES = [['', '–'], ['metro', 'U-Bahn-Abgang'], ['drain', 'Gul
 export const PLANT = [['tank', 'Tank'], ['column', 'Kolonne'], ['pipes', 'Rohrbrücke'], ['stack', 'Schlot'], ['trailer', 'Wohnwagen'], ['watertower', 'Wasserturm'], ['pylon', 'Mast']];
 // regions of the travel map → what stands on the horizon (Spiel › Hülle › Skyline je Region overrides)
 export const SKY_KINDS = [['city', 'Stadt (Hochhäuser)'], ['outskirts', 'Vorstadt'], ['industry', 'Industrie'], ['desert', 'Wüste (vereinzelt)'], ['salt', 'Salzebene'], ['canyon', 'Canyon (kaum etwas)']];
+import { vanSpan } from './room.js';
+
 const SKY_OF_REGION = { 'Delta Ring': 'city', 'The Outskirts': 'outskirts', 'Scrap Desert': 'industry', 'East Bend': 'industry', 'Salt Flats': 'salt', 'South Badlands': 'canyon', 'Crow Valley': 'canyon', 'Glass Dunes': 'desert' };
 
 // Spiel › Hülle: switches and numbers for all POIs
@@ -383,6 +385,7 @@ function partsOf(D, poiId, L, plan, rooms, main, rnd) {
   // #178 the yard behind the play space: a parking apron with bay lines, wrecks, lamps, carts, dumpsters, blank billboards (slot by slot,
   // never under the station roof, never in front of the Wow motif)
   const yard = list(cfg.yard);
+  const lay = plan.tiles || [], vanRow = lay.findIndex(row => row.includes('L')), van = vanRow >= 0 ? vanSpan(D, [lay[vanRow].indexOf('L'), vanRow]) : null;   // FB-6
   if (cfg.apron || yard.length) outs.forEach((r, ri) => {
     if (cfg.apron) push({ kind: 'apron', x: r.x0, y: ground - 0.55, w: r.w, h: 0.55 });
     if (!yard.length) return;
@@ -390,6 +393,7 @@ function partsOf(D, poiId, L, plan, rooms, main, rnd) {
     const busy = stations.filter(st => st.x < r.x1 && st.x + st.w > r.x0).map(st => [st.x - 0.5, st.x + st.w + 0.5]), wowBusy = [];
     const P0 = D?.pois?.[poiId]?.wow, wp = r.wow && Array.isArray(P0?.point) ? r.x0 + P0.point[0] : null;
     if (wp != null) wowBusy.push([wp - 4, wp + 4]);
+    if (van && van.x1 >= r.x0 && van.x0 <= r.x1) wowBusy.push([van.x0 - 1, van.x1 + 2]);   // FB-6: nothing of the yard over Leyla's van
     const free = (a, z, far) => ![...wowBusy, ...(far ? [] : busy)].some(([p, q]) => a < q && z > p);
     let x = r.x0 + 1, k = 0, truck = 0;
     while (x < r.x1 - 1 && k < 40) {

@@ -83,3 +83,16 @@ export function solidRects(r) {
   }
   return out;
 }
+
+// FB-6 (Steven, 25.11.2026: „In den Leveln wird die falsche Grafik vom Van angezeigt“): where Leyla's van stands at the start L
+// (Spiel › Spawn-Punkt), in tiles: { x0, x1, y0, y1 } (x1/y1 inclusive, y1 = the floor row it stands on). Clutter and the yard
+// behind the play space keep this free, or a wrecked truck in front of the van looks like a different vehicle. null = no van.
+export function vanSpan(D, start, T = 64) {
+  const S = D?.game?.spawn, A = S?.look && D.assets?.[S.look];
+  if (!A || S.enabled === false || !start) return null;
+  const [fw, fh] = A.frameSize || [0, 0];
+  if (!fw || !fh) return null;
+  const k = (A.height || fh) / fh, ox = (A.origin || [fw / 2])[0], [dx, dy] = S.offset || [0, 0];
+  const fx = (start[0] + 0.5) * T + dx, fy = (start[1] + 1) * T + dy, left = S.flip ? fx - (fw - ox) * k : fx - ox * k;
+  return { x0: Math.floor(left / T), x1: Math.floor((left + fw * k) / T), y0: Math.floor((fy - fh * k) / T), y1: start[1] + 1 };
+}
