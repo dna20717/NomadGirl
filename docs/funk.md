@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 26.11. Code → Ava: **#188 Feedback-Paket fertig**: FB-1, 3, 5, 6, 7, 9, 10, 11, 12 gebaut, FB-8 = Lob, FB-4 nicht nachstellbar (Rückfrage an Steven im Issue). Alle 77 Browser-Tests grün.
+
 - 26.11. Code → Ava: **#188 Feedback-Paket läuft** (FB-1, FB-3–FB-12, neun neue Meldungen von Steven am 25.11.).
 
 - 23.11. Code → Ava: **#187** Lektionen kommen jetzt kurz bevor (Vorausschau im Level), nicht danach.
@@ -361,13 +363,13 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #188 Feedback-Paket 25.11. (FB-1, FB-3–FB-12)
-- **Status:** läuft (26.11.) · angelegt 26.11. von Code (Daniel: „Lass uns kurz die Ideen besprechen und dann nach meinem go alles als Paket abarbeiten“, dann „Lets go!“)
+- **Status:** fertig (26.11.) · angelegt 26.11. von Code (Daniel: „Lass uns kurz die Ideen besprechen und dann nach meinem go alles als Paket abarbeiten“, dann „Lets go!“)
 - **Für:** Code
 - **Lesen:** FeedbackBucket FB-1, FB-3 bis FB-12 (Bild + `trace.json`), `docs/features/feedback.md`, `inventory.md`, `drone.md`, `rig.md`, `pois.md`.
 - **Entscheidungen (Daniel, 26.11., Auswahl):** FB-3 Rucksack-Slot rüber zum Rucksack-Raster, an seiner Stelle ein **Wurf-Slot** für eine Wurf-Ausrüstung mit Ladungen + Abklingzeit (Granaten bleiben ein Skill); FB-5 **Blättern in der Boden-Leiste** (←/→ bzw. Q/Mausrad, E hebt das Markierte auf); FB-7 Abrutschen an AvA beheben **+ mehr Akku**; FB-8 „Sooo viel Loot“ = Lob, bleibt.
 - **Paket:** FB-1 Container-Kanten · FB-4 Baumenü kaputt · FB-6 falsche Van-Grafik im Level · FB-9 Textfenster links länger · FB-10 Bilanz zuckt beim Blättern · FB-11 Secrets 0/4 · FB-12 Bodenplatte zum Tunnel · FB-3 · FB-5 · FB-7 · Spur zählt Tipp-Pause nicht als Ruckler.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ FB-4 „Das Baumenü ist kaputt“ nicht nachstellbar (Ultrawide 3440×1277, Xbox-Controller, Maus, gedrosselte CPU: alles grün; einmal unter Last zwei JS-Fehler „reading 'sys'“ beim Verkaufen, nicht wiederholbar) → Rückfrage an Steven im Issue. ⚠️ FB-11 Staub an versteckten Wänden ist ein neues Erkennungszeichen (Spiel › Nebel › Secrets rieseln ab, 6 Kacheln, 0 = aus). ⚠️ Wurf-Slot ohne neue Gegenstände: zeigt und wechselt die beiden Wurf-Skills; Molotov/Blendgranate wären neue Skills.
+- **Ergebnis:** (Code) Commits `d7ee296` FB-6 Van frei von Hof-Wracks/Clutter (`vanSpan`), `6a77fa7` FB-9 Tipps ≥ 12 s nach Lesetempo, `0c9dcd5` FB-10 Bilanz ohne Zucken, `3d47b5d` FB-12 Bodenplatte (`dropX`) + FB-11 Staub, `1cb8b60` FB-1 Dachkanten greifen, `78cb67c` FB-7 AvA hält fest (↓ halten 350 ms, Stehen sinkt mit, Akku 6 s), `8f96e86` FB-5 Boden-Leiste blättern (Steuerkreuz / F / Mausrad / Klick), `26d5a78` FB-3 Wurf-Slot + Rucksack-Slot am Raster, `3fe75eb` Spur zählt Pausen nicht als Ruckler. Tests: npm 486, alle 77 Browser-Tests grün (pad_test-Schwelle an Akku 6 s angepasst), ng check grün, Build grün. PixelLab 0. **Bitte testen:** Container-Dach anspringen und hochziehen; an AvA hängen und den Stick bewegen; Beute am Boden mit Steuerkreuz wählen; Inventar › Wurf-Slot anklicken; in Mile 7 nach dem Tresor durch die Bodenplatte (Ducken + Springen); Staub an getarnten Wänden; Van am Start ohne Wrack davor.
 
 ### #187 Lektionen kurz bevor (Vorausschau)
 - **Status:** fertig (23.11.) · angelegt 23.11. von Code (Daniel: „wenn sie es zum ersten Mal macht, bedeutet eigentlich oft: kurz bevor sie es das erste Mal machen muss“; Antworten A a a)
