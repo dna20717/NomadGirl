@@ -7,6 +7,10 @@
   const cov = (k, v) => window.coverage?.touch(k, v);
   const wait = (k, hold = [], tap = []) => bot().wait(k, hold, tap);
   const res = (ok, what, note = '') => ({ ok, what, note });
+  let INV = null; import(new URL('game/inventory.js', location.href).href).then(m => { INV = m; });   // the inventory core (same module the game uses)
+  let TECH = null; import(new URL('game/techtree.js', location.href).href).then(m => { TECH = m; });
+  let WORK = null; import(new URL('game/workers.js', location.href).href).then(m => { WORK = m; });
+  const addBack = (D, grid, e) => INV ? INV.addEntry(D, grid, e, e.n || 1) === 0 : false;
   // after a scene change: wait until the new scene stands (no loading bar, the camp built)
   const settle = (max = 900) => { for (let k = 0; k < max; k += 15) { const s = S(); if (s?.leyla && !s.leaving && (s.mode !== 'camp' || s.camp) && !H().drive?.isOpen) return true; wait(15); } return false; };
   const fn = (D, id) => D.workshops?.[id]?.function || null;
@@ -64,6 +68,7 @@
     // ---- building: a workshop from the scrapyard into a place of the rig (the real drag of the build mode) ----
     build(want = null) {
       const s = S(), D = s.data_, R = s.box.save.rig, spare = R.spare?.workshops || [];
+      want ??= skills.lastBought; skills.lastBought = null;
       const id = want && spare.includes(want) ? want : spare.find(w => !D.workshops?.[w]?.fixed);
       if (!id) return res(true, 'build', 'nichts im Schrottplatz');
       s.openBuild(); wait(40);
@@ -73,18 +78,18 @@
       const item = (s.camp.yardItems || []).find(it => it.id === id && it.kind === 'ws');
       // a place: empty first, else one whose workshop is neither fixed nor the one we need for cooking
       const slots = b.slots(), wsAt = sl => (R.units[sl.ui]?.workshops || []).find(w => w.at === sl.p);
-      const free = slots.find(sl => !wsAt(sl)) || slots.find(sl => { const w = wsAt(sl); return w && !D.workshops?.[w.id]?.fixed && !['kitchen', 'tank'].includes(fn(D, w.id)); });
+      const free = slots.find(sl => !wsAt(sl)) || slots.find(sl => { const w = wsAt(sl); return w && !D.workshops?.[w.id]?.fixed && !['kitchen', 'tank'].includes(fn(D, w.id)) && !['bitfarm', 'chill_area'].includes(w.id); });   // what the Bit-Farm skill needs stays
       if (!item || !free) { b.close(); wait(30); return res(false, 'build', !item ? `${id} liegt nicht sichtbar im Schrottplatz` : 'kein Platz im Rig'); }
       const v = b.viewBox(), cam = s.cam, scr = w => ({ x: (w.x - v.x) * v.z + cam.x, y: (w.y - v.y) * v.z + cam.y });
       const a = scr({ x: (item.x0 + item.x1) / 2, y: (item.y0 + item.y1) / 2 }), z = scr({ x: (free.x0 + free.x1) / 2, y: (free.y0 + free.y1) / 2 });
       b.pointerDown({ button: 0, ...a }); wait(2);
       for (let i = 1; i <= 8; i++) { b.pointerMove({ x: a.x + (z.x - a.x) * i / 8, y: a.y + (z.y - a.y) * i / 8, event: { buttons: 1 } }); wait(2); }
       b.pointerUp({ button: 0, ...z }); wait(10);
-      const st = nomad.build(), placed = (s.box.save.rig.units || []).some(u => (u.workshops || []).some(w => w.id === id));
+      const st = nomad.build(), swapped = wsAt(free)?.id, placed = (s.box.save.rig.units || []).some(u => (u.workshops || []).some(w => w.id === id));
       cov('build', id);
       b.close(); wait(30);
       for (let k = 0; k < 80 && nomad.build()?.working; k++) wait(60);   // Leyla screws it in
-      return res(placed, 'build', placed ? `${id} eingebaut` : `${id} nicht eingebaut: ${st?.msg?.text || st?.msg || 'ohne Meldung'}`);
+      return res(placed, 'build', placed ? `${id} eingebaut${swapped && swapped !== id ? ` (statt ${swapped})` : ''}` : `${id} nicht eingebaut: ${st?.msg?.text || st?.msg || 'ohne Meldung'}`);
     },
     // ---- cooking / crafting: the first recipe that is ready at a workshop of that function ----
     craftAt(fun = 'kitchen') {
@@ -195,6 +200,110 @@
       bot().expectMenu = false;
       cov('crew', ok ? 'aufgenommen' : 'nicht aufgenommen');
       return res(ok && (sv.crew?.length || 0) > 0, 'crew', ok ? `aufgenommen: ${sv.crew?.at(-1)?.name || '?'}${jobs[0] ? ' · ' + jobs[0].label : ''}` : 'Bewerber da, aber „Aufnehmen“ fehlt');
+    },
+    // ---- jobs (#193): the questlog takes the first offer and hands in what is done; NPC menus offer the same („Abgeben: …“) ----
+    quests() {
+      const h = H(), Q = h.quests;
+      if (!Q) return res(false, 'quests', 'kein Questlog');
+      Q.open('offers'); wait(3);
+      if (!Q.isOpen) return res(false, 'quests', 'Questlog geht nicht auf');
+      cov('window', 'Questlog');
+      const notes = [], st0 = Q.state();
+      if (st0.rows?.length) { Q.pick = 0; Q.act('ok'); wait(2); notes.push('angenommen'); cov('quest', 'angenommen'); }
+      Q.open('active'); wait(2);
+      const rows = Q.state().rows || [];
+      rows.forEach((r, i) => { if (/!$/.test(r)) { Q.pick = i; Q.act('ok'); wait(2); notes.push('abgegeben: ' + r.replace(/^side:|!$/g, '')); cov('quest', 'abgegeben'); } });
+      Q.close(); wait(3);
+      // at the NPCs: what they want back
+      for (const who of ['Schraube', 'Onkel Sung']) {
+        bot().expectMenu = true;
+        if (!bot().goTo(who)) { bot().expectMenu = false; continue; }
+        wait(1, [], ['grab']); wait(6);
+        const m = h.menuState(), j = m ? m.items.findIndex(x => /^Abgeben:/.test(x.label) && !x.disabled) : -1;
+        if (j >= 0) { notes.push(m.items[j].label); h.choose(j); wait(5); cov('quest', 'beim NPC abgegeben'); }
+        while (h.modal) { const mm = h.menuState(); const k = mm.items.findIndex(x => /tschüss|zurück|schließen/i.test(x.label)); h.choose(k >= 0 ? k : mm.items.length - 1); wait(2); if (h.modal && h.menuState()?.title === mm.title) { h.modal = false; break; } }
+        bot().expectMenu = false;
+      }
+      return res(true, 'quests', notes.join(' · ') || `nichts zu tun (${(st0.rows || []).length} Angebote)`);
+    },
+    // ---- the dealer in the build mode: buy a workshop the rig does not have yet (Bit-Farm, Chill-Ecke, Ripperdoc …), build() puts it in ----
+    shop() {
+      const s = S(), D = s.data_, R = s.box.save.rig, have = new Set((R.units || []).flatMap(u => (u.workshops || []).map(w => w.id)));
+      const all = ['bitfarm', 'chill_area', 'ripperdoc', 'werkbank', 'warroom'].filter(id => D.workshops?.[id] && !have.has(id));
+      const locked = all.filter(id => TECH?.techLock(D, s.box.save, 'workshops', id));
+      const want = all.filter(id => !locked.includes(id) && (D.workshops[id].value ?? 0) <= s.box.save.deltas);
+      const waiting = all.filter(id => (R.spare?.workshops || []).includes(id));
+      if (waiting.length) return res(true, 'shop', `${waiting.join('/')} wartet noch im Schrottplatz auf Platz`);
+      if (!want.length) return res(true, 'shop', `nichts Neues bezahlbar (${s.box.save.deltas} Δ${locked.length ? ', Techtree fehlt für ' + locked.join('/') : ''})`);
+      s.openBuild(); wait(40);
+      const b = H().build;
+      if (!b?.active) return res(false, 'shop', 'Bau-Modus geht nicht auf');
+      cov('window', 'Händler-Platz');
+      const d0 = s.box.save.deltas; b.buy('workshops', want[0]); wait(10);
+      const got = (s.box.save.rig.spare?.workshops || []).includes(want[0]);
+      const msg = b.msg?.text || b.msg || '';
+      b.close(); wait(30);
+      for (let k = 0; k < 40 && nomad.build()?.working; k++) wait(60);
+      if (got) { skills.lastBought = want[0]; cov('bought', want[0]); }
+      return res(got || /Techtree/.test(msg), 'shop', got ? `${want[0]} gekauft (${d0} → ${s.box.save.deltas} Δ)` : `${want[0]}: ${msg || 'nicht gekauft'}`);
+    },
+    // ---- cyberware (#006): an implant from the backpack or the Camp-Lager onto its place, through the inventory's own hand ----
+    implants() {
+      const s = S(), D = s.data_, inv = s.box.save.inv, U = H().inv;
+      const IMPL = ['eyes', 'nerves', 'arm', 'heart', 'legs', 'skin'];
+      let found = null;
+      for (const key of ['backpack', 'camp']) for (const e of inv.grids[key]?.items || []) { const w = e.a === 'items' && D.items?.[e.id]?.wear; if (w && IMPL.includes(w) && inv.wear?.[w] !== e.id) { found = { key, e, w }; break; } }
+      if (!found) return res(true, 'implants', 'kein Implantat im Rucksack oder Lager');
+      U.open(); wait(3);
+      if (!U.isOpen) return res(false, 'implants', 'Inventar geht nicht auf');
+      cov('window', 'Inventar');
+      U.view = 'implants'; U.draw?.(); wait(2); cov('window', 'Implantate');
+      const g = inv.grids[found.key], i = g.items.indexOf(found.e);
+      g.items.splice(i, 1); U.held = { e: { ...found.e, n: 1 }, from: found.key };
+      if ((found.e.n || 1) > 1) g.items.splice(i, 0, { ...found.e, n: found.e.n - 1 });
+      U.slotClick('wear:' + found.w); wait(3);
+      const now = inv.wear[found.w] === found.e.id;
+      if (U.held) { addBack(D, inv.grids[found.key], U.held.e); U.held = null; }   // still in the hand (refused, or the old one came off): back into the grid
+      U.close(); wait(3);
+      cov('implant', found.e.id);
+      return res(true, 'implants', now ? `${found.e.id} eingebaut (${found.w})` : `${found.e.id}: nicht eingebaut (${U.lastNote || 'Belastung oder Regel'})`);
+    },
+    // ---- Bit-Farm (#060): a caught Entity moves into the farm and works at a workshop; the Chill-Ecke offers a friendly duel ----
+    bitfarm() {
+      const s = S(), D = s.data_, sv = s.box.save, keys = WORK ? WORK.farmKeys(D, sv) : [];
+      const hasFarm = (sv.rig.units || []).some(u => (u.workshops || []).some(w => w.id === 'bitfarm'));
+      if (!hasFarm) return res(true, 'bitfarm', 'keine Bit-Farm im Rig');
+      cov('window', 'Bit-Farm');
+      const notes = [];
+      // an Entity from the deck, the backpack or the Camp-Lager into the farm
+      const farm = keys.map(k => sv.inv.grids[k]).find(Boolean);
+      if (farm) for (const key of ['deck', 'backpack', 'camp']) {
+        const g = sv.inv.grids[key], e = g?.items?.find(x => x.g);
+        if (!e) continue;
+        g.items.splice(g.items.indexOf(e), 1);
+        if (addBack(D, farm, e)) { notes.push(`${e.g.name} in die Bit-Farm`); cov('bitfarm', 'Entity eingezogen'); } else { g.items.push(e); notes.push('Bit-Farm voll'); }
+        break;
+      }
+      // a worker: the camp's own menu
+      const ent = farm?.items?.find(x => x.g);
+      if (ent && s.camp.workerMenu) {
+        bot().expectMenu = true; s.camp.workerMenu(ent.g); wait(2);
+        const m = H().menuState(), j = m ? m.items.findIndex(x => !x.disabled && !/zurück|abziehen/i.test(x.label)) : -1;
+        if (j >= 0) { notes.push(`Worker: ${m.items[j].label.split(' · ')[0]}`); H().choose(j); wait(3); cov('bitfarm', 'Worker'); }
+        while (H().modal) { const mm = H().menuState(); H().choose(Math.max(0, mm.items.findIndex(x => /zurück/i.test(x.label)))); wait(2); if (H().modal) { H().modal = false; break; } }
+        bot().expectMenu = false;
+      }
+      // the Chill-Ecke: a friendly duel
+      const chill = s.camp.benches?.list?.find(b => b.id === 'chill_area');
+      if (chill) {
+        bot().expectMenu = true; s.camp.use('chill_area', chill.place); wait(3);
+        const m = H().menuState(), j = m ? m.items.findIndex(x => /duell/i.test(x.label) && !x.disabled) : -1;
+        if (j >= 0) { H().choose(j); wait(5); if (H().duel?.isOpen) { const r = skills.duel(); notes.push('Chill-Ecke: ' + r.note); cov('bitfarm', 'Freundschaftsduell'); } }
+        else if (m) notes.push(`Chill-Ecke: ${m.items.map(x => x.label).join('/')}`);
+        while (H().modal) { const mm = H().menuState(); H().choose(Math.max(0, mm.items.findIndex(x => /zurück/i.test(x.label)))); wait(2); if (H().modal) { H().modal = false; break; } }
+        bot().expectMenu = false;
+      }
+      return res(true, 'bitfarm', notes.join(' · ') || 'keine Entity zum Einziehen');
     },
     // ---- AvA's tank: a maintenance recipe at the cryo tank ----
     tank() {

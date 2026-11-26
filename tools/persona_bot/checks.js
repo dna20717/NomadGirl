@@ -17,7 +17,7 @@
       never('recipe', sv.recipes || []);
       never('node', Object.keys(D.techtree || {}));
       never('poi', Object.keys(D.pois || {}).filter(id => D.pois[id]?.rooms?.length));
-      never('window', ['Reisekarte', 'Fahrt', 'Bau-Modus', 'Techtree', 'Cryo-Tank', 'Inventar', 'Händler', 'Questlog', 'Glitch-Duell']);
+      never('window', ['Reisekarte', 'Fahrt', 'Bau-Modus', 'Händler-Platz', 'Techtree', 'Cryo-Tank', 'Inventar', 'Implantate', 'Händler', 'Questlog', 'Glitch-Duell', 'Bit-Farm']);
       return out;
     },
   };
