@@ -27,21 +27,28 @@ const VOICE = {
 };
 const CHIP = { stuck: 'bug', use: 'bug', window: 'bug', build: 'bug', travel: 'bug', error: 'bug', script: 'verwirrend' };
 
-const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
-const page = await browser.newPage({ viewport: { width: P.viewport[0], height: P.viewport[1] } });
+// one browser profile per persona: after a crash the browser comes back with the same save (localStorage) and plays on
+const profile = path.join('output', 'persona_play', '_profile_' + id);
+fs.rmSync(profile, { recursive: true, force: true });
 const pageErrors = [];
-page.on('pageerror', e => pageErrors.push(e.message));
-page.on('console', m => { if (m.type() === 'error' && !/404|Failed to load resource|\/api\//.test(m.text())) pageErrors.push(m.text()); });
-if (P.pad) await page.addInitScript(() => {
-  const pad = { id: 'Xbox Wireless Controller (STANDARD GAMEPAD Vendor: 045e)', index: 0, connected: true, mapping: 'standard', axes: [0, 0, 0, 0], buttons: Array.from({ length: 17 }, () => ({ pressed: false, value: 0 })) };
-  navigator.getGamepads = () => [pad, null, null, null];
-});
-let caught = null;
-await page.route('**/api/feedback', async r => { caught = r.request().postDataJSON(); await r.fulfill({ status: 200, contentType: 'application/json', body: '{"number":0}' }); });
-await page.goto((process.env.GAME_URL || 'http://localhost:8766/game.html') + '?camp&new');
-await page.waitForFunction(() => { try { return window.nomad?.state?.() && window.nomadFeedback; } catch { return false; } }, null, { timeout: 90000 });
-await page.addScriptTag({ path: 'tools/persona_bot/brain.js' });
-await page.evaluate(([p, s]) => personaBot.init(p, s), [id, seed]);
+let ctx = null, page = null, caught = null, crashes = 0;
+async function open(fresh, fromFrame) {
+  if (ctx) await ctx.close().catch(() => {});
+  ctx = await chromium.launchPersistentContext(profile, { headless: true, viewport: { width: P.viewport[0], height: P.viewport[1] }, args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
+  page = ctx.pages()[0] || await ctx.newPage();
+  page.on('pageerror', e => pageErrors.push(e.message));
+  page.on('console', m => { if (m.type() === 'error' && !/404|Failed to load resource|\/api\//.test(m.text())) pageErrors.push(m.text()); });
+  if (P.pad) await page.addInitScript(() => {
+    const pad = { id: 'Xbox Wireless Controller (STANDARD GAMEPAD Vendor: 045e)', index: 0, connected: true, mapping: 'standard', axes: [0, 0, 0, 0], buttons: Array.from({ length: 17 }, () => ({ pressed: false, value: 0 })) };
+    navigator.getGamepads = () => [pad, null, null, null];
+  });
+  await page.route('**/api/feedback', async r => { caught = r.request().postDataJSON(); await r.fulfill({ status: 200, contentType: 'application/json', body: '{"number":0}' }); });
+  await page.goto((process.env.GAME_URL || 'http://localhost:8766/game.html') + (fresh ? '?camp&new' : '?camp'));
+  await page.waitForFunction(() => { try { return window.nomad?.state?.() && window.nomadFeedback; } catch { return false; } }, null, { timeout: 120000 });
+  await page.addScriptTag({ path: 'tools/persona_bot/brain.js' });
+  await page.evaluate(([p, s, f]) => personaBot.init(p, s, f), [id, seed + crashes * 1000, fromFrame]);
+}
+await open(true, 0);
 
 let reports = 0, nextShot = 0, frame = 0, assists = 0;
 const t0 = Date.now(), counts = {};
@@ -68,7 +75,12 @@ while (frame < total) {
   let r;
   const tc = Date.now();
   try { r = await page.evaluate(n => personaBot.chunk(n), CHUNK); }
-  catch (e) { log({ crash: e.message, frame }); pageErrors.push('crash: ' + e.message); break; }
+  catch (e) {   // the tab crashed (or hung): a finding of its own; the browser comes back with the same save and plays on
+    crashes++; log({ crash: e.message.slice(0, 200), frame, crashes });
+    if (crashes > 8) break;
+    try { await open(false, frame); } catch (e2) { log({ reopenFailed: e2.message.slice(0, 200) }); break; }
+    continue;
+  }
   frame = r.frame; assists = r.assists;
   for (const x of r.log) log(x);
   for (const x of r.runs) log({ runDone: x });
@@ -91,7 +103,7 @@ while (frame < total) {
   }
   if (Math.round(frame / 3600) % 30 === 0) console.log(`${P.name}: ${(frame / 216000).toFixed(1)} h Spielzeit · ${Math.round((Date.now() - t0) / 60000)} min · ${reports} Meldungen · ${assists} Hilfen`);
 }
-const summary = { persona: id, hours: frame / 216000, minutes: Math.round((Date.now() - t0) / 60000), reports, assists, counts };
+const summary = { persona: id, hours: frame / 216000, minutes: Math.round((Date.now() - t0) / 60000), reports, assists, crashes, counts };
 fs.writeFileSync(path.join(out, 'summary.json'), JSON.stringify(summary, null, 1));
 console.log(JSON.stringify(summary));
-await browser.close();
+await ctx.close();

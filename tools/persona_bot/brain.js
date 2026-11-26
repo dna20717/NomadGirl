@@ -15,8 +15,8 @@
   };
   const bot = window.personaBot = {
     persona: null, st: null, frame: 0, log: [], findings: [], runs: [], seen: new Set(), assists: 0, toastsSeen: 0, errors: [],
-    init(persona, seed = 1) {
-      this.persona = persona; this.st = STYLE[persona]; this.rnd = mulberry(seed);
+    init(persona, seed = 1, frame = 0) {
+      this.persona = persona; this.frame = frame; this.st = STYLE[persona]; this.rnd = mulberry(seed);
       this.phase = 'camp'; this.plan = null; this.campLeft = null; this.campTodo = [];
       window.addEventListener('error', e => this.errors.push(String(e.message)));
       nomad.take(); nomad.fast(true);   // pictures only for shots and reports (the runner switches it off then)
@@ -41,7 +41,7 @@
     },
     brief() {
       const s = S(), sv = s?.box?.save;
-      return { mode: s?.mode, poi: s?.levelPoi || null, day: sv?.day, deltas: sv?.deltas, hp: s?.leyla && Math.round(s.leyla.health), place: sv?.location, bag: sv?.inv?.grids?.backpack?.items?.length, tank: sv?.tank?.level != null ? Math.round(sv.tank.level) : null };
+      return { heapMB: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : null, dom: document.getElementsByTagName('*').length, objs: s?.children?.list?.length ?? null, mode: s?.mode, poi: s?.levelPoi || null, day: sv?.day, deltas: sv?.deltas, hp: s?.leyla && Math.round(s.leyla.health), place: sv?.location, bag: sv?.inv?.grids?.backpack?.items?.length, tank: sv?.tank?.level != null ? Math.round(sv.tank.level) : null };
     },
     // toasts and windows that hang (things a player sees)
     watch() {
