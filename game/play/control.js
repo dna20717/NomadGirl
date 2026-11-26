@@ -54,6 +54,8 @@ export function installControl(game) {
       steps(frames); held.clear();
       return api.state();
     },
+    // #189 like step, without building the whole state afterwards (bots step thousands of times)
+    stepQuiet(frames = 1, hold = [], tap = []) { if (!active) api.take(); held = new Set(hold); for (const k of tap) tapped.add(k); steps(frames); held.clear(); },
     until(test, max = 600, hold = [], tap = []) {
       const t = fn(test); let v = api.state();
       for (let i = 0; i < max && !t(v); i++) v = api.step(1, hold, i === 0 ? tap : []);

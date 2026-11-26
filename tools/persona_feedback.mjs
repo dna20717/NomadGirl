@@ -24,7 +24,8 @@ const CHIP_LABEL = { gut: 'Gut', schlecht: 'Schlecht', bug: 'Bug', idee: 'Idee',
 
 const args = process.argv.slice(2), opt = k => { const i = args.indexOf('--' + k); return i >= 0 ? args[i + 1] : null; }, flag = k => args.includes('--' + k);
 
-if (opt('post')) post(); else await report();
+const main = import.meta.url === new URL(`file://${path.resolve(process.argv[1] || '')}`).href;   // imported by persona_bot.mjs: only the PERSONAS
+if (main) { if (opt('post')) post(); else await report(); }
 
 async function report() {
   const id = opt('persona'), P = PERSONAS[id], chip = opt('chip'), text = opt('text') || '';
