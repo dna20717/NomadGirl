@@ -10,10 +10,10 @@
     jana: { runMin: 10, chests: 'near', enemies: 'defend', secrets: false, loot: 'all', camp: ['Lagerfeuer:Hinsetzen', 'Kochnische', 'Schlafkoje:Schlafen'], campMin: 12, travel: 0.1 },
     malu: { runMin: 8, chests: 'near', enemies: 'defend', secrets: false, loot: 'all', camp: ['Kochnische', 'Lagerfeuer:Hinsetzen', 'Onkel Sung', 'Schraube', 'build', 'Schwarzes Brett', 'Kochnische', 'Schlafkoje:Schlafen'], campMin: 40, travel: 0.05 },
     ole: { runMin: 35, chests: 'all', enemies: 'defend', secrets: true, loot: 'choose', camp: ['Schwarzes Brett', 'Lagerfeuer:Questlog', 'Onkel Sung', 'Schlafkoje:Schlafen'], campMin: 8, travel: 0.6 },
-    deniz: { runMin: 25, chests: 'all', enemies: 'all', secrets: true, loot: 'choose', camp: ['Schraube', 'Lagerfeuer:Questlog', 'Kochnische', 'trade', 'Schlafkoje:Schlafen'], campMin: 10, travel: 0.25 },
-    kai: { runMin: 12, chests: 'none', enemies: 'all', secrets: false, loot: 'none', camp: ['Schlafkoje:Schlafen'], campMin: 2, travel: 0.4 },
+    deniz: { runMin: 25, chests: 'all', enemies: 'all', secrets: true, loot: 'choose', camp: ['Schraube', 'Lagerfeuer:Questlog', 'Kochnische', 'skill:trade', 'Schlafkoje:Schlafen'], campMin: 10, travel: 0.25 },
+    kai: { runMin: 12, chests: 'none', enemies: 'all', secrets: false, loot: 'none', camp: ['Schlafkoje:Schlafen'], campMin: 2, travel: 0.4, duels: true },
     // #191 Testpilot: goes through every system it has a skill for, in every camp visit (tools/persona_bot/skills.js)
-    pilot: { runMin: 12, chests: 'all', enemies: 'all', secrets: true, loot: 'choose', camp: ['skill:tank', 'skill:salvage', 'skill:tech', 'skill:cook', 'skill:build', 'Schraube:Handeln', 'Schlafkoje:Schlafen'], campMin: 4, travel: 0.5, allJobs: true },
+    pilot: { runMin: 12, chests: 'all', enemies: 'all', secrets: true, loot: 'choose', camp: ['skill:tank', 'skill:salvage', 'skill:tech', 'skill:cook', 'skill:build', 'skill:trade', 'skill:crew', 'Schlafkoje:Schlafen'], campMin: 4, travel: 0.5, allJobs: true, duels: true },
   };
   const bot = window.personaBot = {
     persona: null, st: null, frame: 0, log: [], findings: [], runs: [], seen: new Set(), assists: 0, toastsSeen: 0, errors: [],
@@ -245,6 +245,11 @@
       }
       const inWorld = e => e.feet <= (s.room.h ?? s.room.tiles.length) * T + 64 && e.x >= 0 && e.x <= (s.room.w ?? s.room.tiles[0].length) * T;   // #191 an enemy that fell out of the level is a finding (checks.js), no target
       if (st.enemies === 'all') for (const e of s.enemies || []) if (e.alive && e.state !== 'dead' && inWorld(e)) list.push(mk(e.x, e.feet, 'enemy', () => !e.alive || e.state === 'dead', 'fight'));
+      // #192 DuellMode / hacking: KI machines and the KI terminal (E opens the duel window, skills.duel plays it)
+      if (st.duels) {
+        for (const h of s.level?.hosts?.() || []) if (!h.done && !h.dueled && h.x != null) list.push(mk(h.x, h.feet, 'duel', () => !!(s.level.hosts().find(q => q.x === h.x && q.feet === h.feet) || {}).dueled || !!(s.level.hosts().find(q => q.x === h.x) || {}).done, 'duel'));
+        for (const t of s.level?.terminals || []) if (!t.done && !t.tried) list.push(mk(t.x, t.feet, 'terminal', () => t.done || t.tried, 'duel'));
+      }
       for (const g of lv.goals || []) list.push(mk(g.x, g.feet, 'goal', () => !!S().level?.state()?.done, 'grab'));
       const fresh = list.filter(t => !this.visited.has(t.what + Math.round(t.x) + ',' + Math.round(t.feet)));
       const pool = fresh.filter(t => t.what !== 'goal');
@@ -259,6 +264,7 @@
       const s = S(), l = s.leyla, T = s.T;
       const dist = Math.hypot(t.x - l.x, (t.feet - l.feet) * 1.5);
       if (dist < 70) {
+        if (t.act === 'duel') { this.expectMenu = true; this.wait(1, [], ['grab']); this.wait(6); this.expectMenu = false; const r = H().duel?.isOpen ? window.testpilot?.duel() : { ok: false, what: 'duel', note: `E öffnet kein Duell (Hinweis: ${H().promptText || '–'})` }; this.log.push({ f: this.frame, skill: r }); if (!r.ok) this.note('skill', `${r.what}: ${r.note}`); this.visited.add(t.what + Math.round(t.x) + ',' + Math.round(t.feet)); this.target = null; return; }
         if (t.act === 'grab' || t.act === 'leave') { this.expectMenu = t.act !== 'leave'; this.wait(1, [], ['grab']); this.wait(10); this.expectMenu = false; }
         else if (t.act === 'melee') this.wait(20, [], ['melee']);
         else this.wait(10, [t.x > l.x ? 'right' : 'left']);
@@ -280,7 +286,12 @@
       if (!this.plan || this.plan.t !== t || this.frame - this.plan.at > 600) { this.plan = { t, at: this.frame, path: path(s, l, t) }; t.bestLen = Math.min(t.bestLen ?? 1e9, this.plan.path?.length ?? 1e9); }
       const p = this.plan.path;
       if (!p || !p.length) { this.drive(t.x, t.feet, stuckFor); return; }
-      const n = p[0], nx = (n.c + 0.5) * T, nfeet = n.g * T;
+      const n = p[0];
+      if (n.door) {   // #192 walk to the door, E: on the other side
+        if (Math.abs(n.door.x - l.x) < 40 && Math.abs(n.door.feet - l.feet) < 40) { this.wait(1, [], ['grab']); this.wait(30); window.coverage?.touch('door', 'Rückwand-Tür'); if (Math.abs((n.c + 0.5) * T - l.x) < 96) { p.shift(); t.since = this.frame; } return; }
+        this.drive(n.door.x, n.door.feet, stuckFor); return;
+      }
+      const nx = (n.c + 0.5) * T, nfeet = n.g * T;
       if (Math.abs(nx - l.x) < 18 && Math.abs(nfeet - l.feet) < 40) { p.shift(); if (p.length < (t.bestLen ?? 1e9)) { t.bestLen = p.length; t.since = this.frame; } return; }   // a way point closer to the end is progress (a ladder may lead away first)
       this.drive(nx, nfeet, stuckFor, n);
     },
@@ -338,6 +349,13 @@
           for (let k = 0; k <= dx && clear; k++) for (let r = Math.min(n.g, g2) - 3 - (up > 0 ? 1 : 0); r < Math.max(n.g, g2) - 1 && clear; r++) if (solid(n.c + dir * k, r) && !(k === dx && r >= g2)) clear = false;
           if (clear) push(n, { c: c2, g: g2, jump: true });
         }
+      }
+      // #192 Rückwand-Türen: E at a door with a partner takes Leyla to it (doors.js goThrough)
+      for (const f of s.level?.doorways?.front || []) {
+        if (f.link == null) continue;
+        const to = s.level.doorways.front[f.link];
+        if (!to || Math.abs(Math.floor(f.x / T) - n.c) > 1 || Math.round(f.feet / T) !== n.g) continue;
+        push(n, { c: Math.floor(to.x / T), g: Math.round(to.feet / T), door: { x: f.x, feet: f.feet } });
       }
       // ladders in this column (tiles H and the van's ladder)
       for (const L of s.ladders || []) {

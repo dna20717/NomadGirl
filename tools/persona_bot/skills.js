@@ -135,6 +135,67 @@
       h.tech.close(); wait(3);
       return res(!!r?.ok, 'tech', `${ready[0].id}: ${r?.ok ? 'freigeschaltet' : r?.reason}`);
     },
+    // ---- DuellMode / hacking: the duel window that E at a KI machine or terminal opened; a few real moves, then the rest at once ----
+    duel() {
+      const D = H().duel;
+      if (!D?.isOpen) return res(false, 'duel', 'Duell-Fenster ist nicht offen');
+      cov('window', 'Glitch-Duell');
+      const st0 = D.state(); cov('duel', st0.foe);
+      if (D.phase === 'pick') { D.act('ok'); wait(2); }
+      for (let k = 0; k < 6 && D.view?.duel && !D.view.duel.winner; k++) {
+        if (D.view.canAct?.()) { for (let r = Math.floor(Math.random() * 3); r > 0; r--) D.act(Math.random() < 0.5 ? 'left' : 'right'); D.act('ok'); cov('duel', 'Zug'); }
+        wait(20);
+      }
+      if (D.view?.duel && !D.view.duel.winner) D.quick();
+      const st = D.state();
+      if (D.isOpen) { D.act('ok'); wait(5); }
+      if (D.isOpen) D.close();
+      wait(10);
+      return res(!!st.winner, 'duel', `${st0.foe || '?'}: ${st.winner === 'player' ? 'gewonnen' : st.winner ? 'verloren' : 'ohne Ende'}`);
+    },
+    // ---- trading at Schraube: sell the stack he pays most for, buy the cheapest thing that fits the purse ----
+    trade(who = 'Schraube') {
+      bot().expectMenu = true;
+      if (!bot().goTo(who)) { bot().expectMenu = false; return res(true, 'trade', `${who} ist nicht im Camp`); }
+      wait(1, [], ['grab']); wait(8);
+      const m = H().menuState(), i = m ? m.items.findIndex(x => /handeln/i.test(x.label) && !x.disabled) : -1;
+      if (i < 0) { if (m) H().choose(m.items.findIndex(x => /zurück/i.test(x.label))); bot().expectMenu = false; wait(5); return res(true, 'trade', `${who}: noch kein Handel`); }
+      const sub = m.items[i].sub;
+      H().choose(i); wait(8); bot().expectMenu = false;
+      const T = H().trade;
+      // „Handeln“ opens the window with setTimeout(…, 0): after this synchronous chunk. Open it the same way at once (the same trader).
+      if (T && !T.isOpen) { const tid = Object.keys(S().data_.traders || {}).find(k => S().data_.traders[k].name === sub); if (tid) { T.open(tid); wait(2); } }
+      if (!T?.isOpen) return res(false, 'trade', `${who}: Händlerfenster geht nicht auf`);
+      cov('window', 'Händler');
+      const d0 = nomad.save().deltas, s0 = T.state(), notes = [];
+      if (s0.sell.length) {
+        const best = s0.sell.map((x, j) => ({ j, v: Number(x.split('@')[1]) * Number(x.split('×')[1].split('@')[0]) })).sort((a, b) => b.v - a.v)[0];
+        T.pick = best.j; T.act('send'); wait(3); notes.push(T.state().note); cov('trade', 'verkauft');
+      }
+      T.act('next'); wait(2);
+      const s1 = T.state();
+      if (s1.tab !== 'sell' && s1.buy.length) {
+        const cheap = s1.buy.map((x, j) => ({ j, p: Number(x.split('@')[1]) })).filter(x => x.p <= nomad.save().deltas).sort((a, b) => a.p - b.p)[0];
+        if (cheap) { T.pick = cheap.j; T.act('ok'); wait(3); notes.push(T.state().note); cov('trade', 'gekauft'); }
+      }
+      T.close(); wait(5);
+      return res(true, 'trade', `${who}: ${notes.filter(Boolean).join(' · ') || 'nichts zu handeln'} (Δ ${d0} → ${nomad.save().deltas})`);
+    },
+    // ---- crew: a settler waiting at the fire is taken in and gets the first job offered ----
+    crew() {
+      const s = S(), sv = s.box.save;
+      if (!sv.applicant) { cov('crew', `Crew ${sv.crew?.length || 0}`); return res(true, 'crew', `kein Bewerber (Crew ${sv.crew?.length || 0})`); }
+      bot().expectMenu = true;
+      bot().goTo('Lagerfeuer'); s.camp.fireMenu?.(); wait(3);
+      let ok = nomad.choose('Bewerber');
+      if (ok) ok = nomad.choose('Aufnehmen');
+      const jobs = (H().menuItems || []).filter(x => !x.disabled && !/zurück/i.test(x.label));
+      if (ok && jobs.length) { H().choose(H().menuItems.indexOf(jobs[0])); wait(3); cov('crew', 'Job vergeben'); }
+      while (H().modal) { const m = H().menuState(); H().choose(Math.max(0, m.items.findIndex(x => /zurück|schließen/i.test(x.label)))); wait(2); if (!H().modal) break; H().modal = false; }
+      bot().expectMenu = false;
+      cov('crew', ok ? 'aufgenommen' : 'nicht aufgenommen');
+      return res(ok && (sv.crew?.length || 0) > 0, 'crew', ok ? `aufgenommen: ${sv.crew?.at(-1)?.name || '?'}${jobs[0] ? ' · ' + jobs[0].label : ''}` : 'Bewerber da, aber „Aufnehmen“ fehlt');
+    },
     // ---- AvA's tank: a maintenance recipe at the cryo tank ----
     tank() {
       const t = nomad.save().tank;

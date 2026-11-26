@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 26.11. Code → Ava: **#192 Testpilot Stufe 2 fertig**: Duell, Handel, Crew, KI-Terminals, Rückwand-Türen.
+
 - 26.11. Code → Ava: **#191 Testpilot fertig**: `npm run testpilot`, Bericht in `output/persona_play/pilot/report.md`.
 
 - 26.11. Code → Ava: **#191 Testpilot läuft**. Dazu: die acht Persona-Meldungen stehen als FB-13 … FB-20 in FeedbackBucket, 13–19 sind mit #190 geschlossen, FB-20 (Δ) bleibt offen.
@@ -373,6 +375,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #192 Testpilot Stufe 2: Duell, Händler, Crew, Hacking, Rückwand-Türen
+- **Status:** fertig (26.11.) · angelegt 26.11. von Code (Daniel: „Ja, bau den Bot weiter aus“)
+- **Für:** Code
+- **Ergebnis:** (Code) `skills.js`: **Duell** (E am KI-Automaten oder KI-Terminal, Kern wählen, ein paar echte Züge, Rest mit `quick`), **Handel** (bei Schraube den wertvollsten Stapel verkaufen, das Günstigste kaufen; „Handeln“ öffnet sein Fenster per `setTimeout`, der Bot öffnet es dann direkt), **Crew** (Bewerber am Feuer aufnehmen, ersten Job geben). `brain.js`: KI-Automaten und KI-Terminals als Ziele im Run (Pilot, Kai), **Rückwand-Türen** als Kanten in der Wegfindung (zur Tür, E, drüben weiter), Deniz handelt wirklich. Lauf 1,5 h: je 9× Bauen, Kochen, Crew, Zerlegen, Tank, Techtree, Handel, 6× Reisen, 2–6 Duelle, 4 Türen. PixelLab 0. ⚠️ Noch offen beim Bot: selten direkt nach einer Reise nicht vom Van los (im Spiel nicht nachstellbar). Noch ohne Fähigkeit: Bit-Farm (Chill-Ecke), Questlog abgeben, Implantate einbauen.
 
 ### #191 Testpilot: Prüfer, Abdeckung und vier Systeme (Reisen, Bauen, Kochen, Techtree/Tank)
 - **Status:** fertig (26.11.) · angelegt 26.11. von Code (Daniel: „ob wir nicht vielleicht einen Bot weiterentwickeln sollten, um effizientes Testing über alle Systeme hinweg zu ermöglichen“; Auswahl: Prüfer + 4 Systeme, nur auf Zuruf)
