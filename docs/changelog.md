@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 26.11.2026: **Befunde aus dem Persona-Spieltest** (#190): Granaten nach einem Szenenwechsel stürzen nicht mehr ab, eine Wurf-Anzeige, Speicher wächst nicht mehr mit jedem Run, AvAs Tank warnt bei jeder schlechteren Phase, keine Entwurfs-Marker mehr in Spieltexten, Schulranzen 5 × 4, die Zielzeile sagt, wo die Werkbank liegt.
 - 26.11.2026: **Persona-Spieltest** (#189): fünf Testing-Personas spielen je 10 h als Bots (`tools/persona_bot.mjs`, Schnellgang `nomad.fast`), 8 geprüfte Befunde übers Feedback-Formular, Eisenhower-Matrix in `docs/playtests/2026-11-26_personas.md`.
 - 26.11.2026: **Testing-Personas** nach Bartle (`docs/testing_personas.md`), Befunde nur übers Feedback-Formular (`tools/persona_feedback.mjs`).
 - 26.11.2026: **Feedback-Paket** (#188, FB-1 und FB-3 bis FB-12 aus FeedbackBucket): Van im Level frei von Wracks und Plakatwänden; Lektions-Tipps bleiben länger; Beute-Bilanz zuckt nicht mehr; Bodenplatte zum Tunnel lässt Leyla durch; versteckte Wände rieseln Staub; Container-Dächer haben greifbare Kanten; AvA hält Leyla fest (Akku 6 s); Boden-Leiste blättern (Steuerkreuz, F, Mausrad, Klick); Wurf-Slot im Inventar, Rucksack-Slot am Raster; Feedback-Spur zählt Pausen nicht als Ruckler. FB-4 (Baumenü) nicht nachstellbar, Rückfrage an Steven.

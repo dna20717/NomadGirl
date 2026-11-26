@@ -37,6 +37,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 26.11. Code → Ava: **#190 fertig**: sieben der acht Befunde behoben, ⑦ (Δ-Balancing) bewusst offen. 78/78 Browser-Tests grün.
+
 - 26.11. Code → Ava: **#190 läuft**: die acht Befunde aus dem Persona-Spieltest.
 
 - 26.11. Code → Ava: **#189 Persona-Spieltest fertig**: 5 × 10 h, 8 Befunde in einer Eisenhower-Matrix (`docs/playtests/2026-11-26_personas.md`). Dringend + wichtig: Granaten-Fehler friert das Spiel ein, neuer Durchgang ohne Vorwarnung.
@@ -369,12 +371,12 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #190 Befunde aus dem Persona-Spieltest beheben (①–⑧)
-- **Status:** läuft (26.11.) · angelegt 26.11. von Code (Daniel: „Du kannst alle Fehler beheben und pushen“)
+- **Status:** fertig (26.11.) · angelegt 26.11. von Code (Daniel: „Du kannst alle Fehler beheben und pushen“)
 - **Für:** Code
 - **Lesen:** `docs/playtests/2026-11-26_personas.md`, `docs/features/progression.md` (Tank), `combat.md` (Würfe), `inventory.md`, `docs/balancing.md`.
 - **Paket:** ① Granaten-Fehler nach Szenenwechsel · ② Wurf-HUD verdoppelt sich · ③ Texturen wachsen je Run · ④ Tank-Warnungen · ⑤ „⚠️ Entwurf“ aus Spieltexten · ⑥ Rucksack zum Start · ⑦ Fortschritt/Δ je Run · ⑧ Weg zur Werkbank.
-- **Rückfragen:**
-- **Ergebnis:**
+- **Rückfragen:** ⚠️ ⑥ Schulranzen 5 × 4 (vorher 4 × 3) vorläufig. ⚠️ ⑦ nicht verändert: Fortschritt läuft über Ressourcen/Techtree (Simulation: Wartungsklappe Tag 1–2), die Bots haben weder verkauft noch den Techtree benutzt. ⚠️ ⑤ Die sieben Texte im Leben am Ort gelten damit als abgenommen (Marker raus).
+- **Ergebnis:** (Code) `5d28cb6`, `40b34af`: ① `Throwables.of`/`live` (keine Instanz der alten Szene), ② alte Wurf-Anzeige weg, ③ Nebel-/Render-Texturen gehen mit der Szene, Raider-Cache begrenzt (Spiel › Technik › Gegner-Bausätze im Speicher, 8), ④ `tankWarning` (Banner je schlechterer Phase + letzter Tag, Spalte „Warnung“ in Cryo-Tank › Phasen), ⑤ Marker raus + Wächter-Test, ⑥ Schulranzen 5 × 4, ⑧ `missingBench` in der Zielzeile. Tests: npm 488, neu `tools/rerun_test.mjs` (4) und `test/tank_warning.test.js` (2), alle 78 Browser-Tests grün (pad/inventory/renames auf den größeren Ranzen angepasst). PixelLab 0. **Bitte testen:** zwei Runs mit Granaten hintereinander; Tank absichtlich verfallen lassen (Banner); Zielzeile ohne Werkbank.
 
 ### #189 Persona-Spieltest: fünf Personas je ~10 h Spielzeit
 - **Status:** fertig (26.11.) · angelegt 26.11. von Code (Daniel: „Bitte lass alle fünf Personen ungefähr 10 Stunden in der Spielwelt verbringen“; Auswahl: Bots + Ava-Blick; „Sammle alles ein, was sie finden, und kategorisiere dann in einer Eisenhower-Matrix“)
