@@ -195,6 +195,11 @@
       // the target
       const tooLong = (this.frame - this.runStart) > st.runMin * 3600;
       const lv = s.level?.state?.() || {};
+      if (tooLong && this.target && this.target.what !== 'van') this.target = null;   // the persona's time in the run is up: home
+      if (this.target && this.target.what !== 'van' && this.frame - this.target.born > 60 * 180) {   // 3 min on one target: give it up
+        this.note('giveup', `Ziel (${this.target.what}) nach 3 Minuten aufgegeben`, { to: [Math.round(this.target.x / s.T), Math.round(this.target.feet / s.T)] });
+        this.visited.add(this.target.what + Math.round(this.target.x) + ',' + Math.round(this.target.feet)); this.target = null;
+      }
       if (!this.target || this.target.done?.()) this.target = this.pickTarget(lv, tooLong);
       if (!this.target) return this.wait(30);
       this.go(this.target);
@@ -217,7 +222,9 @@
       const mk = (x, feet, what, done, act) => ({ x, feet, what, done, act });
       if (lv.done || tooLong) {   // home: the van (start)
         const v = s.van;
-        return v ? mk(v.x, v.y, 'van', () => S().mode !== 'run', 'leave') : null;
+        const t = v ? mk(v.x, v.y, 'van', () => S().mode !== 'run', 'leave') : null;
+        if (t) { t.since = this.frame; t.born = this.frame; t.best = 1e9; t.assists = 0; this.plan = null; }
+        return t;
       }
       const list = [];
       if (st.chests !== 'none') for (const c of lv.chests || []) if (!c.open && (st.chests === 'all' || near(c.x, c.feet) < 1400)) list.push(mk(c.x, c.feet, 'chest', () => (S().level?.state()?.chests || []).find(q => q.x === c.x && q.feet === c.feet)?.open, 'grab'));
@@ -233,7 +240,7 @@
       const pickFrom = pool.length && !(this.persona === 'jana' && this.rnd() < 0.7) ? pool : fresh;
       pickFrom.sort((a, b) => near(a.x, a.feet) - near(b.x, b.feet));
       const t = pickFrom[0] || null;
-      if (t) { t.since = this.frame; t.best = 1e9; this.plan = null; }
+      if (t) { t.since = this.frame; t.born = this.frame; t.best = 1e9; t.assists = 0; this.plan = null; }
       return t;
     },
     // walk the path to the target, act there; stuck → jump, back off, assist
@@ -253,16 +260,17 @@
       if (dist < t.best - 32) { t.best = dist; t.since = this.frame; }
       const stuckFor = this.frame - t.since;
       if (stuckFor > 60 * 40) {   // 40 s without getting closer: assisted teleport, and a finding
-        this.assists++;
+        this.assists++; t.assists = (t.assists || 0) + 1;
+        if (t.assists > 2 && t.what !== 'van') { this.note('giveup', `Ziel (${t.what}) auch mit Hilfe nicht erreichbar`); this.visited.add(t.what + Math.round(t.x) + ',' + Math.round(t.feet)); this.target = null; return; }
         this.note('stuck', `Kommt nicht zum Ziel (${t.what}), Bot hilft nach`, { to: [Math.round(t.x / T), Math.round(t.feet / T)] });
         nomad.tp(t.x, t.feet); this.wait(20); t.since = this.frame; t.best = 0;
         return;
       }
-      if (!this.plan || this.plan.t !== t || this.frame - this.plan.at > 600) this.plan = { t, at: this.frame, path: path(s, l, t) };
+      if (!this.plan || this.plan.t !== t || this.frame - this.plan.at > 600) { this.plan = { t, at: this.frame, path: path(s, l, t) }; t.bestLen = Math.min(t.bestLen ?? 1e9, this.plan.path?.length ?? 1e9); }
       const p = this.plan.path;
       if (!p || !p.length) { this.drive(t.x, t.feet, stuckFor); return; }
       const n = p[0], nx = (n.c + 0.5) * T, nfeet = n.g * T;
-      if (Math.abs(nx - l.x) < 18 && Math.abs(nfeet - l.feet) < 40) { p.shift(); t.since = this.frame; return; }   // every way point is progress (a ladder may lead away first)
+      if (Math.abs(nx - l.x) < 18 && Math.abs(nfeet - l.feet) < 40) { p.shift(); if (p.length < (t.bestLen ?? 1e9)) { t.bestLen = p.length; t.since = this.frame; } return; }   // a way point closer to the end is progress (a ladder may lead away first)
       this.drive(nx, nfeet, stuckFor, n);
     },
     // steer towards a point: hold the direction, jump when it is higher or across a gap, ladders, drop through plates
