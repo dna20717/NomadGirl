@@ -632,6 +632,7 @@ b.hud-throw-icon { width: auto; height: auto; padding: 0 2px; }
   -webkit-mask-composite: source-in; mask-composite: intersect;   /* after the shorthand, it resets this */
   animation: inv-scan 3s linear infinite; }
 .fs-cell { position: relative; width: var(--c); height: var(--c); display: grid; place-items: center; font-style: normal; }
+.fs-cell:not(.empty) { pointer-events: auto; cursor: pointer; }   /* FB-5 click = pick it up, wheel = choose */
 .fs-cell:not(.empty)::before { content: ''; position: absolute; inset: 5px; border-radius: 4px;
   background: radial-gradient(closest-side, color-mix(in srgb, var(--col) 45%, transparent), transparent); box-shadow: inset 0 0 0 1px rgba(127, 246, 255, .25); }
 .fs-cell .inv-art { position: relative; filter: drop-shadow(0 0 4px rgba(127, 246, 255, .45)); }

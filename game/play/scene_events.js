@@ -302,5 +302,6 @@ export class SceneEvents {
     if (input.grab.pressed && near && this.mode === 'run') this.confirmLeave();
     else if (input.grab.pressed && thing?.act) thing.act();
     else if (input.grab.pressed && floorText && key === 'E') { this.hud.floor.pick(this); this.sfx('loot_pickup', { x: l.x }); }
+    else if (floorText && !near && !thing) this.hud.floor?.leaf(this, input);   // FB-5 choose what to pick up
   }
 }

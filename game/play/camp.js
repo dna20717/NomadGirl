@@ -1273,6 +1273,7 @@ export class Camp {
     if (best !== this.prompt || text !== this.promptText) { this.prompt = best; this.promptText = text; s.hud.prompt(text); }
     if (best && input.grab.pressed) best.act();
     else if (floor && input.grab.pressed) s.hud.floor.pick(s);
+    else if (floor) s.hud.floor.leaf(s, input);   // FB-5 choose what to pick up
   }
 
   state() {

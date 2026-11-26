@@ -204,7 +204,7 @@ s = await ev(() => { const s = game.scene.getScene('play'), d = s.drone, l = s.l
   nomad.step(1, ['jump'], ['jump']); nomad.step(40, ['jump']); nomad.step(20); const on = d.riding, x0 = l.x, b0 = d.battery;
   setPad({ axes: [0, 0, 1, 0] }); nomad.step(30); setPad(); const moved = Math.round(l.x - x0), used = +(b0 - d.battery).toFixed(2), still = d.riding;
   d.parkAt = null; d.parkUntil = 0; nomad.step(30, ['left']); nomad.step(200); return { on, moved, used, still }; });
-check('Auf AvA: rechter Stick lässt beide schweben, kostet viel Akku', s.on && s.moved > 40 && s.still && s.used > 0.3, s);
+check('Auf AvA: rechter Stick lässt beide schweben, kostet viel Akku', s.on && s.moved > 40 && s.still && s.used > 0.2, s);   // FB-7: battery 6 s (was 4), so 0.5 s of hovering costs ~0.25
 // hanging at her grip, the right stick carries Leyla along; parts on AvA give more battery
 s = await ev(() => { const s = game.scene.getScene('play'), d = s.drone, l = s.leyla; nomad.step(400); d.battery = 1; d.emptyUntil = 0;
   const top = l.feet - 330, y = top + d.half - (d.d.platform?.inset ?? 14); d.x = l.x + 40; d.y = y; d.parkAt = [d.x, y]; d.parkUntil = s.time.now + 1e7; nomad.step(3);
@@ -223,6 +223,8 @@ const icons = await ev(() => [...document.querySelectorAll('.inv-pages .pad-ico'
 const v0 = await ev(() => { const inv = game.scene.getScene('play').hud.inv; inv.focusId = 'cell:backpack:0:0'; return inv.view + inv.tab; });
 await tap(5); const v1 = await ev(() => { const inv = game.scene.getScene('play').hud.inv; const r = { view: inv.view + inv.tab, page: inv.other?.page }; inv.close(); for (const q of [...game.scene.getScene('play').loot.piles]) q.grid.items = []; nomad.step(3); return r; });
 check('Boden mit mehreren Bündeln: L1/R1 blättern (Cursor am Boden), sonst Tabs', s.pages === 3 && p1 === 1 && p2 === 2 && icons.length === 2 && v1.view !== v0 && v1.page === 2, { s, p1, p2, icons, v0, v1 });
+// FB-7: AvA (6 s battery) still holds Leyla from the hover check above; she lets go first (↓ held at AvA)
+await ev(() => { const l = game.scene.getScene('play').leyla; if (l.state === 'hang') nomad.step(40, ['down']); nomad.step(60); });
 await ev(() => nomad.release());
 await page.keyboard.down('d'); await page.waitForTimeout(1500); s = await sc(); await page.keyboard.up('d');
 check('Tastatur geht weiter, Hinweis zeigt wieder E', Math.abs(s.vx) > 50 && !s.menu && s.key === 'E' && !s.icon, s);

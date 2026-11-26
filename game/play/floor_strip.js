@@ -2,15 +2,28 @@
 // in der Nähe ist, um nichts zu übersehen“; „das Grid soll zu den Rändern hin ausfaden und ein wenig zur Cyberware-Ansicht von Leylas
 // Inventar passen“). A thin scan grid at the bottom of the screen: what lies on the ground in reach, nearest first. The first thing
 // carries the golden frame; E / stick ↑ picks it up (scene.floorPick), I opens the whole ground inventory.
+// FB-5 (Steven, 25.11.2026: „Den Loot … kann man nur der Reihe nach aufsammeln, ich möchte vorher schon auswählen können … ohne vorher das
+// Menü zu öffnen“): the golden frame can be moved: d-pad ← / → (controller), F or the mouse wheel (keyboard), a click on a cell picks it.
 import { el } from '../ui.js';
 import { thing, add, stackMax, addEntry } from '../inventory.js';
 import { artOf, glyphOf, kindOf, CATEGORY_COLORS } from './inventory_ui.js';
 
 export class FloorStrip {
   constructor(root, D) {
-    this.D = D; this.sig = null;
+    this.D = D; this.sig = null; this.sel = null;   // sel: the chosen entry (stays chosen while the list changes around it)
     this.el = el('div', { class: 'floor-strip', hidden: true });
+    this.el.addEventListener('wheel', e => { if (this.list?.length > 1) { e.preventDefault(); this.cycle(e.deltaY > 0 ? 1 : -1); } }, { passive: false });
     root.append(this.el);
+  }
+  get index() { const i = this.list?.findIndex(t => t.e === this.sel) ?? -1; return i < 0 ? 0 : i; }
+  get chosen() { return this.list?.[this.index] || null; }
+  // move the golden frame (wraps around); → true if there was something to choose from
+  cycle(d) {
+    const n = this.list?.length || 0;
+    if (n < 2) return false;
+    this.sel = this.list[(this.index + d + n) % n].e; this.sig = null;
+    this.scene_?.sfx?.('ui_hover');
+    return true;
   }
   get S() { return this.D.leyla?.inventory?.floorStrip || {}; }
 
@@ -31,8 +44,9 @@ export class FloorStrip {
     const h = scene.hud, S = this.S;
     const off = S.enabled === false || !scene.leyla?.alive || h.inv?.isOpen || h.craft?.isOpen || h.tech?.isOpen || h.map?.isOpen || h.build?.active || h.modal || h.paused;
     const list = off ? [] : this.things(scene).slice(0, S.max ?? 8);
-    this.list = list;
-    const sig = list.map(t => `${t.e.id}×${t.e.n}`).join(',');
+    this.list = list; this.scene_ = scene;
+    if (scene.pad) scene.pad.floorCycle = list.length > 1;   // the d-pad leafs through the strip (pad.js)
+    const sig = list.map(t => `${t.e.id}×${t.e.n}`).join(',') + '|' + this.index;
     if (sig === this.sig) return;
     this.sig = sig;
     this.el.hidden = !list.length;
@@ -43,18 +57,24 @@ export class FloorStrip {
       const i = j - lead, t = i >= 0 ? list[i] : null;
       if (!t) { cells.push(el('i', { class: 'fs-cell empty' })); continue; }
       const k = kindOf(D, t.e.a, t.e.id), art = artOf(D, t.e.a, t.e.id, Math.round(cell * 0.78));
-      cells.push(el('i', { class: 'fs-cell' + (i === 0 ? ' first' : ''), style: `--col:${CATEGORY_COLORS[k] || '#555'}` },
+      cells.push(el('i', { class: 'fs-cell' + (i === this.index ? ' first' : ''), style: `--col:${CATEGORY_COLORS[k] || '#555'}`, onclick: () => { this.sel = t.e; this.sig = null; this.pick(scene); } },
         art || el('b', {}, glyphOf(D, t.e.a, t.e.id)), t.e.n > 1 ? el('span', {}, String(t.e.n)) : null));
     }
-    const first = thing(D, list[0].e.a, list[0].e.id);
+    const first = thing(D, this.chosen.e.a, this.chosen.e.id);
     this.el.style.setProperty('--fs-cell', `${cell}px`);
     this.el.style.setProperty('--fs-fade', `${S.fade ?? 22}%`);
-    this.el.replaceChildren(el('div', { class: 'fs-grid' }, ...cells), el('small', { class: 'fs-label' }, `Boden · ${first?.name || list[0].e.id}`));
+    this.el.replaceChildren(el('div', { class: 'fs-grid' }, ...cells), el('small', { class: 'fs-label' }, `Boden · ${first?.name || this.chosen.e.id}${list.length > 1 ? ` · ${this.index + 1}/${list.length}` : ''}`));
   }
 
+  // FB-5: d-pad ← / → (pad.js floorPrev / floorNext) or F (keyboard) moves the golden frame
+  leaf(scene, input) {
+    const p = scene.pad;
+    if (p?.pressed?.('floorPrev')) this.cycle(-1);
+    else if (p?.pressed?.('floorNext') || input?.uiSend?.pressed) this.cycle(1);
+  }
   // E / stick ↑: the first thing into the backpack (all of it if it fits), what does not fit stays
   pick(scene) {
-    const t = this.list?.[0];
+    const t = this.chosen;
     if (!t || !scene.box) return false;
     const D = this.D, bag = scene.box.save.inv.grids.backpack, l = scene.leyla, name = thing(D, t.e.a, t.e.id)?.name || t.e.id;
     const left = addEntry(D, bag, t.e, t.e.n);
@@ -70,9 +90,9 @@ export class FloorStrip {
   }
   // text for the prompt line, or null
   prompt() {
-    const t = this.list?.[0];
+    const t = this.chosen;
     if (!t) return null;
-    const n = this.list.length, name = thing(this.D, t.e.a, t.e.id)?.name || t.e.id;
-    return `Aufheben: ${name}${n > 1 ? ` · I: alles am Boden (${n})` : ''}`;
+    const n = this.list.length, name = thing(this.D, t.e.a, t.e.id)?.name || t.e.id, pad = this.scene_?.pad?.kind;
+    return `Aufheben: ${name}${n > 1 ? ` · ${pad ? '◀ ▶' : 'F'}: wählen · I: alles am Boden (${n})` : ''}`;
   }
 }

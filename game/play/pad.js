@@ -66,8 +66,12 @@ export class Pad {
     const stickUp = ay < -(this.c.useTilt ?? 70) / 100 || (g.buttons[12]?.pressed ?? false);
     const btn = i => { if (i === 'up') return stickUp; const b = g.buttons[i]; return !!b && (b.pressed || b.value > 0.5); };
     this.viaUp = new Set();
-    if (ax < -dz || btn(14)) this.now.add('left');
-    if (ax > dz || btn(15)) this.now.add('right');
+    // FB-5: while the Boden-Leiste shows things, the d-pad ← / → leafs through them (floorPrev / floorNext) instead of walking
+    const cyc = !!this.floorCycle;
+    if (cyc && btn(14)) this.now.add('floorPrev');
+    if (cyc && btn(15)) this.now.add('floorNext');
+    if (ax < -dz || (btn(14) && !cyc)) this.now.add('left');
+    if (ax > dz || (btn(15) && !cyc)) this.now.add('right');
     if (ay < -dz - 0.2 || btn(12)) this.now.add('up');
     if (ay > dz + 0.2 || btn(13)) this.now.add('down');
     // stick only half tilted = walking (Spiel › Controller › Gehen bis)
