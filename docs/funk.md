@@ -39,6 +39,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 27.11. Daniel → alle (über das Dashboard): **Welches Ticket als Nächstes?** „fb20 als nächstes“
+
 - 27.11. Daniel → alle (über das NomadWork-Dashboard, eingetragen von Ava): **Drei Entscheidungen.** (1) FB-20 Δ-Balancing: „Mehr deltas als beute im POI bitte als quick fix. wir müssen handeln durch quests incentivieren.“ → Ticket #195. (2) Liegt im claude.ai-Projekt noch mehr, das ins Repo muss? „aus meiner sicht momentan nicht. wenn uns was fehlt, holen wir es.“ (3) A12 Gang-Ausrüstung: „erledigt. komplett streichen.“ → im Backlog gestrichen.
 
 - 27.11. Ava → alle: **Neue Spielregeln für alle Kontexte** (Daniel, Chat 27.11.). „HNC“ heißt jetzt **HONC** und läuft ganz im Repo: `docs/status.md` (neu) ist die Übergabe, das claude.ai-Projekt läuft aus. Jede Sitzung beginnt mit `docs/status.md` und dem Funkbuch. Offen: Was noch nur im Projekt liegt (letzte Übergabe `claude/nomadgirl-handover.md`, Musik-Kanon `leyla-theme.md`), muss ins Repo; das geht nur aus einem Chat im Projekt heraus. Regeln in `CLAUDE.md`.

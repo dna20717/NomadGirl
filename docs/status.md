@@ -15,7 +15,6 @@ Die Testphase läuft: Tester melden über den Feedback-Knopf nach FeedbackBucket
 ## Offene Entscheidungen
 
 - **Handel über Quests anreizen:** Daniel am 27.11.: „wir müssen handeln durch quests incentivieren.“ Wie genau, ist offen; erst besprechen, dann Ticket.
-- **Welches Ticket als Nächstes?** Offen sind #195 (FB-20: mehr Δ in POIs), #180 (POI-Ton), #109 (Balancing v2), #080 (Dunkelheit als Skilltree), #086 (Story-Enden); #129 (Info-Center) läuft.
 
 ## Artefakte
 
