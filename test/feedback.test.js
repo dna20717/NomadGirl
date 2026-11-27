@@ -81,3 +81,50 @@ test('#181 Bild aus Safari (JPEG) bekommt die richtige Endung', async () => {
   assert.ok(bucket.fileAt('media/nomadgirl/FB-1/moment.jpg'));
   assert.match(bucket.issues[0].body, /FB-1\/moment\.jpg\?raw=true/);
 });
+
+// #194 the board: list, one report with picture and trace, status, the tick, text, comments
+test('#194 Feedback-Board: Liste, Meldung mit Bild und Spur, Status, Abnahme-Häkchen, Text, Kommentar', async () => {
+  const { bucket, call } = await setup();
+  await call(BODY); await call({ chip: 'idee', text: 'Mehr Hunde', where: 'Camp' });
+  const access = await fakeAccess();
+  const env = testEnv(), main = fakeGitHub({ 'README.md': '# NG\n' });
+  const fetchFn = async (url, opt) => String(url).startsWith(TEAM) ? new Response(JSON.stringify(access.certs)) : String(url).includes('/FeedbackBucket/') ? bucket.fetch(url, opt) : main.fetch(url, opt);
+  const ask = async (way, body, email = 'steven@example.com') => {
+    const headers = email ? { 'cf-access-jwt-assertion': await access.token(email) } : {};
+    const r = await handle(new Request('https://ng.example.workers.dev/api/feedback/' + way, body ? { method: 'POST', headers, body: JSON.stringify(body) } : { headers }), env, fetchFn);
+    return { status: r.status, type: r.headers.get('content-type'), data: /json/.test(r.headers.get('content-type') || '') ? await r.json() : Buffer.from(await r.arrayBuffer()) };
+  };
+  assert.equal((await ask('list', null, null)).status, 401);   // only with a login
+  let r = await ask('list');
+  assert.equal(r.status, 200, JSON.stringify(r.data));
+  assert.deepEqual(r.data.items.map(i => [i.number, i.status, i.chip]), [[2, 'offen', 'idee'], [1, 'offen', 'bug']]);
+  assert.equal(r.data.items[1].text, 'Gegner trifft mich\ndurch die Wand');
+  assert.equal(r.data.items[1].where, 'Tankstelle Km 7 · Seed 3 · Raum hall_2');
+  r = await ask('item?n=1');
+  assert.deepEqual(r.data.files.sort(), ['moment.webp', 'trace.json']);
+  r = await ask('file?n=1&f=trace.json');
+  assert.equal(r.data.context.poi, 'tankstelle_km7');
+  r = await ask('file?n=1&f=moment.webp'); assert.match(r.type, /image\/webp/);
+  assert.equal((await ask('file?n=1&f=../../README.md')).status, 400);
+  // tick before „Bereit zur Abnahme“: refused
+  assert.equal((await ask('update', { n: 1, accepted: true })).status, 400);
+  r = await ask('update', { n: 1, status: 'arbeit' });
+  assert.equal(r.data.status, 'arbeit'); assert.deepEqual(bucket.issues[0].labels, ['nomadgirl', 'bug', 'in-bearbeitung']);
+  r = await ask('update', { n: 1, status: 'abnahme', comment: 'Ist gefixt in abc123' });
+  assert.equal(r.data.status, 'abnahme'); assert.deepEqual(bucket.issues[0].labels, ['nomadgirl', 'bug', 'abnahme']);
+  r = await ask('update', { n: 1, accepted: true });
+  assert.deepEqual([r.data.status, r.data.accepted], ['zu', true]);
+  assert.equal(bucket.issues[0].state, 'closed'); assert.deepEqual(bucket.issues[0].labels, ['nomadgirl', 'bug', 'abgenommen']);
+  r = await ask('update', { n: 1, accepted: false });   // untick: back to „Bereit zur Abnahme“, open again
+  assert.deepEqual([r.data.status, r.data.accepted, bucket.issues[0].state], ['abnahme', false, 'open']);
+  r = await ask('update', { n: 2, text: 'Mehr Hunde\nund Katzen' });
+  assert.match(bucket.issues[1].body, /> Mehr Hunde\n> und Katzen/);
+  assert.match(bucket.issues[1].body, /gemeldet von/);   // the rest of the body stays
+  const notes = bucket.issues[0].commentList.map(c => c.body);
+  assert.equal(notes.length, 4);
+  assert.match(notes[1], /^Ist gefixt in abc123\n\n<sub>Status: \*\*Bereit zur Abnahme\*\* · /);
+  assert.match(notes[2], /Abgenommen und geschlossen/);
+  assert.doesNotMatch(notes.join('\n'), /example\.com/);   // no login e-mail
+  r = await ask('item?n=1'); assert.equal(r.data.comments.length, 4);
+  r = await ask('list'); assert.deepEqual(r.data.items.map(i => i.status), ['offen', 'abnahme']);
+});

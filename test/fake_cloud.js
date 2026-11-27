@@ -61,6 +61,17 @@ export function fakeGitHub(files, repo = 'dna20717/NomadGirl') {
     // #181 issues (FeedbackBucket)
     if (method === 'POST' && p === 'issues') { g.issues ||= []; const n = g.issues.length + 1; g.issues.push({ number: n, ...body }); return ok({ number: n, html_url: `https://github.com/${repo}/issues/${n}` }, 201); }
     if (method === 'PATCH' && (m = p.match(/^issues\/(\d+)$/))) { const it = g.issues?.[Number(m[1]) - 1]; if (!it) return ok({ message: 'Not Found' }, 404); Object.assign(it, body); return ok({ number: it.number }); }
+    // #194 the board: list, one issue, comments, files in the bucket
+    if (method === 'GET' && p === 'issues') { const lab = u.searchParams.get('labels'), st = u.searchParams.get('state') || 'open'; return ok((g.issues || []).filter(i => (st === 'all' || (i.state || 'open') === st) && (!lab || (i.labels || []).includes(lab))).map(i => ({ state: 'open', comments: (i.commentList || []).length, ...i, labels: (i.labels || []).map(name => ({ name })) })).reverse()); }
+    if (method === 'GET' && (m = p.match(/^issues\/(\d+)$/))) { const i = g.issues?.[Number(m[1]) - 1]; return i ? ok({ state: 'open', ...i, comments: (i.commentList || []).length, labels: (i.labels || []).map(name => ({ name })) }) : ok({ message: 'Not Found' }, 404); }
+    if (method === 'GET' && (m = p.match(/^issues\/(\d+)\/comments$/))) return ok((g.issues?.[Number(m[1]) - 1]?.commentList || []));
+    if (method === 'POST' && (m = p.match(/^issues\/(\d+)\/comments$/))) { const i = g.issues?.[Number(m[1]) - 1]; if (!i) return ok({ message: 'Not Found' }, 404); (i.commentList ||= []).push({ user: { login: 'nomadgirl-bot' }, created_at: new Date().toISOString(), body: body.body }); return ok({ id: i.commentList.length }, 201); }
+    if (method === 'GET' && (m = p.match(/^contents\/(.+)$/))) {
+      const path = decodeURIComponent(m[1]), tree = trees.get(commits.get(g.refs.main).tree);
+      if (tree.has(path)) return opt.headers?.accept === 'application/vnd.github.raw' ? new Response(Buffer.from(blobs.get(tree.get(path)), 'latin1'), { status: 200 }) : ok({ name: path.split('/').pop(), path });
+      const kids = [...tree.keys()].filter(k => k.startsWith(path + '/')).map(k => ({ name: k.slice(path.length + 1), path: k }));
+      return kids.length ? ok(kids) : ok({ message: 'Not Found' }, 404);
+    }
     return ok({ message: 'unexpected ' + method + ' ' + p }, 500);
   };
   return g;

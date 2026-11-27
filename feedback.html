@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="game/brand/icon.svg">
+<link rel="apple-touch-icon" href="game/brand/icon-180.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NomadGirl · Feedback-Board</title>
+<link rel="stylesheet" href="game/basis.css">
+<link rel="stylesheet" href="game/ui.css">
+<link rel="stylesheet" href="game/feedback/feedback.css" data-feedback>
+<style>html, body { height: 100%; margin: 0; background: var(--ui-canvas); }</style>
+</head>
+<body>
+<script type="module">
+  // #194 the feedback board as a page (online /feedback, from the main menu); the same board as in the pause menu
+  import { openBoard } from './game/feedback/board.js';
+  window.feedbackBoard = openBoard({ page: true });
+</script>
+</body>
+</html>

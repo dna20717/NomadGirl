@@ -11,6 +11,7 @@
 //   FEEDBACK_REPO "owner/name" for #181 (default dna20717/FeedbackBucket; the token needs Contents + Issues read/write there)
 import { pretty } from '../tools/json.js';
 import { feedback } from './feedback.js';   // #181 test phase
+import { feedbackBoard } from './feedback_board.js';   // #194 the board
 
 const GITHUB = 'https://api.github.com';
 const json = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
@@ -36,6 +37,7 @@ export async function handle(request, env, fetchFn) {
     if (url.pathname === '/api/blob') return await saveBlob(request, env, user, url);   // #126 achievements, Vor-Lösch-Zustand, previews
     if (!env.GITHUB_TOKEN) return failure(503, 'GitHub-Schlüssel fehlt (GITHUB_TOKEN).');
     const gh = github(env, fetchFn);
+    if (url.pathname.startsWith('/api/feedback/')) return await feedbackBoard(request, env, user, url, fetchFn);   // #194 list, item, file, update
     if (url.pathname === '/api/feedback' && request.method === 'POST') return await feedback(await request.json().catch(() => null), env, user, fetchFn);   // #181 → FeedbackBucket
     if (url.pathname === '/api/files' && request.method === 'GET') return json(await readFiles(gh, env));
     if (url.pathname === '/api/upload' && request.method === 'POST') {   // #083 a picture for an asset, as its own commit

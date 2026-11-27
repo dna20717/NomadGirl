@@ -9,6 +9,7 @@
 import { Recorder } from './recorder.js';
 import { FeedbackDialog } from './dialog.js';
 import { sendFeedback, flushQueue, queued } from './send.js';
+import { FeedbackBoard } from './board.js';   // #194
 import { el } from '../ui.js';
 import { icon } from '../icons.js';
 
@@ -42,7 +43,7 @@ export function installFeedback(adapter, config = {}) {
 
   // ---------- triggers ----------
   window.addEventListener('keydown', e => {
-    if (e.key === c.key && !e.repeat && !dialog?.isOpen) { e.preventDefault(); e.stopPropagation(); open(); }
+    if (e.key === c.key && !e.repeat && !dialog?.isOpen && !board?.isOpen) { e.preventDefault(); e.stopPropagation(); open(); }
   }, true);
   let prev = new Set();
   const buttons = (c.buttons || []).map(String);
@@ -52,7 +53,7 @@ export function installFeedback(adapter, config = {}) {
     if (g) g.buttons.forEach((b, i) => { if (b && (b.pressed || b.value > 0.5)) now.add(String(i)); });
     const hit = k => now.has(k) && !prev.has(k);
     const combo = c.combo && now.has('8') && now.has('9') && (hit('8') || hit('9'));
-    if (!dialog?.isOpen && (buttons.some(hit) || combo)) open();
+    if (!dialog?.isOpen && !board?.isOpen && (buttons.some(hit) || combo)) open();
     prev = now;
     requestAnimationFrame(poll);
   };
@@ -79,9 +80,17 @@ export function installFeedback(adapter, config = {}) {
   }
   function hideHint() { if (hint) { clearTimeout(hint.timer); hint.remove(); hint = null; } }
 
+  // #194 the board over the paused game (pause menu)
+  let board = null;
+  function openBoard() {
+    if (board?.isOpen || dialog?.isOpen) return;
+    adapter.pause();
+    board = new FeedbackBoard({ onClose: () => { board = null; adapter.resume(); } }).mount();
+  }
+
   flushQueue(c.url);   // what waited from last time
   return {
-    rec, open,
+    rec, open, openBoard, board: () => board,
     // for tests and Ava: is it open, what was sent last, what waits
     state: () => ({ enabled: true, open: !!dialog?.isOpen, hint: !!hint, last, queued: queued().length, trace: rec.dump() }),
     dialog: () => dialog,

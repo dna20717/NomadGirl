@@ -66,7 +66,7 @@ try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme
   const [bbImg, posterImg, logosImg] = await Promise.all([load(CK.billboard), load(CK.poster), load(CK.adLogos || 'map_logos')]);
 
   // ---------- menu in the radio ----------
-  const ITEMS = [['game.html?camp', 'Spiel', 'Camp & Runs'], ['intro.html', 'Intro', 'Wie alles anfing'], ['game.html', 'Testraum', 'Parkour'], ['workshop.html', 'Werkstatt', 'Alles einstellen'], ['https://github.com/dna20717/NomadGirl/blob/main/docs/design.md', 'Design-Dok', 'Fahrplan']];
+  const ITEMS = [['game.html?camp', 'Spiel', 'Camp & Runs'], ['intro.html', 'Intro', 'Wie alles anfing'], ['game.html', 'Testraum', 'Parkour'], ['workshop.html', 'Werkstatt', 'Alles einstellen'], ['feedback.html', 'Feedback', 'Testphase: Meldungen & Abnahme'], ['https://github.com/dna20717/NomadGirl/blob/main/docs/design.md', 'Design-Dok', 'Fahrplan']];
   const lcd = document.getElementById('lcd'), shotEl = document.getElementById('slotshot');
   const row = (t, s2, act, cls = '') => { const a = document.createElement('a'); a.href = '#'; a.innerHTML = `<span></span><small></small>`; a.querySelector('span').textContent = t; a.querySelector('small').textContent = s2 || ''; if (cls) a.className = cls; a.addEventListener('click', e => { e.preventDefault(); act?.(); }); return a; };
   // the LCD has levels (#126): the main menu, the slots, a slot's actions, dialogs; ← Esc / B goes back

@@ -165,6 +165,7 @@ export class Hud {
       ...(sc.box && unlocked(sc.data_, sc.box.save, 'search') && Object.keys(sc.data_?.techtree || {}).length ? [{ label: 'Skilltree', sub: sc.mode === 'camp' ? 'Techtree: freischalten mit Vorräten aus dem Rig' : 'Techtree ansehen · freischalten im Camp', act: () => setTimeout(() => { this.inv?.close?.(); this.tech?.open(); }, 0) }] : []),
       ...(sc.box ? [{ label: 'Werte', sub: 'Grundwerte, Boni und ihre Quellen · U', act: () => setTimeout(() => this.openValues(), 0) }] : []),   // #091 → #104 im Inventar
       ...(this.radio && sc.box && sc.mode !== 'run' && this.radio.C.stations.length ? [{ label: `Radio: ${this.radio.on ? this.radio.station?.name : 'aus'}`, sub: 'Sender wählen · N', act: () => setTimeout(() => this.radio.menu(this), 0) }] : []),   // #090
+      ...(window.nomadFeedback?.openBoard ? [{ label: 'Feedback-Board', sub: 'Testphase: Meldungen, Status, Abnahme', icon: 'speechBubble', act: () => setTimeout(() => window.nomadFeedback.openBoard(), 0) }] : []),   // #194
       { label: 'Optionen', sub: 'Ton, Schießstil', act: () => setTimeout(() => this.optionsMenu(), 0) },
       ...(sc.box && cheatsOn() ? [{ label: 'Cheats', sub: 'Nur auf diesem Gerät freigeschaltet', act: () => setTimeout(() => this.cheatMenu(), 0) }] : []),   // #097
       ...(this.modeName === 'test' ? [{ label: 'Raum neu starten', sub: 'Rücktaste', act: () => sc.level ? sc.restartAs({}) : sc.restartRoom() }] : []),

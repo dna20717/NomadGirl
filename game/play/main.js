@@ -122,5 +122,8 @@ export async function start(parent, hudRoot, loading, opts = {}) {
   game.scene.add('play', PlayScene, true, args);
   window.nomad = installControl(game);   // remote control for Ava and tests
   window.nomadFeedback = installGameFeedback(game, D);   // #181 test phase: F8 / home button / Select + Start
+  // #194 „Hier spielen“ from the feedback board: ?tp=col,row puts Leyla where the report was sent
+  const tp = (q.get('tp') || '').split(',').map(Number);
+  if (tp.length === 2 && tp.every(Number.isFinite)) { const t0 = Date.now(), at = () => { const s = game.scene.getScene('play'); if (s?.leyla?.body && s.room) window.nomad.tpTile(tp[0], tp[1]); else if (Date.now() - t0 < 20000) setTimeout(at, 200); }; setTimeout(at, 300); }
   return game;
 }

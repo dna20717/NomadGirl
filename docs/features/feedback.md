@@ -51,3 +51,16 @@ Issues in FeedbackBucket lesen (GitHub-Werkzeuge, Repo per `add_repo`), `trace.j
 ## Pausen in der Spur (#188)
 
 Steht das Spiel still (Feedback-Fenster, Menü, versteckter Tab), entsteht zwischen zwei Frames eine lange Lücke. Bis 26.11. zählte sie als Frame (FB-4 bis FB-12: „schlimmster Frame 276351 ms“, „fps 2“). Jetzt: Lücken über 1 s landen in `fps.pauses` / `pausedMs`, Schnitt und schlimmster Frame zählen nur echte Frames. Das Issue zeigt „…, 2× Pause, zusammen 95 s“.
+
+## Feedback-Board (#194)
+
+Daniel, 27.11.2026: „kann das bitte direkt mit ins Hauptmenü und ins Pause-Menü … sehen und editieren sollen es alle können (sind ja eh nur Steven und ich) … achte drauf, dass alle Tickets den richtigen Status haben (offen, in Bearbeitung, bereit zur Abnahme, geschlossen) und dann noch das Abnahme-Häkchen daneben“.
+
+- **Wo:** Pause-Menü › **Feedback-Board** (über dem pausierten Spiel, Esc / B schließt, das Spiel läuft weiter), Hauptmenü › **Feedback**, Seite `/feedback` (`feedback.html`). Alle mit Login dürfen sehen und bearbeiten.
+- **Status** (`game/feedback/status.js`, gilt für Worker und Board): offenes Issue ohne Label = **Offen**, Label `in-bearbeitung` = **In Bearbeitung**, Label `abnahme` = **Bereit zur Abnahme**, geschlossenes Issue = **Geschlossen**. Das **Abnahme-Häkchen** = Label `abgenommen`, geht erst ab „Bereit zur Abnahme“ und schließt die Meldung; Häkchen weg → wieder „Bereit zur Abnahme“, offen. Geschlossen ohne Häkchen = erledigt ohne Abnahme (z. B. Persona-Befunde).
+- **Liste:** Reiter mit Zahlen (Nicht geschlossen, Offen, In Bearbeitung, Bereit zur Abnahme, Geschlossen, Alle), Filter nach Art, Personas an/aus; je Zeile FB-Nummer, Art, Ort, erste Textzeile, wer, Status-Auswahl und Häkchen. ↑ ↓ (Steuerkreuz) wählt.
+- **Meldung:** Bild vom Moment, Text (bearbeitbar, „Text speichern“ ersetzt nur das Zitat im Issue), **Spur als Zeitleiste** (Leben als Linie, gehaltene Eingaben als Balken, Ereignisse und Fehler als Punkte, Maus drauf zeigt Details), Moment (Modus, POI, Kachel, Version, Gerät, fps, Nachspielen), Kommentare und neuer Kommentar, Link zu GitHub.
+- **Hier spielen:** öffnet `game.html?poi=…&seed=…&tp=Spalte,Zeile`; `?tp=` setzt Leyla nach dem Laden an die Kachel (`game/play/main.js`).
+- **Worker** (`worker/feedback_board.js`): `GET /api/feedback/list`, `GET /api/feedback/item?n=`, `GET /api/feedback/file?n=&f=` (nur `moment.*` und `trace.json` aus `media/nomadgirl/FB-n/`), `POST /api/feedback/update { n, status, accepted, text, comment }`. Jede Änderung schreibt einen Kommentar ins Issue („Status: … · Name über das Feedback-Board“), ohne Login-Adresse.
+- **Ohne Worker** (lokal): das Board sagt „Kein Server hier“.
+- **Tests:** `test/feedback.test.js` (#194: Liste, Datei, Status, Häkchen nur ab Abnahme, zurücknehmen, Text, Kommentare, Login), `tools/fbboard_test.mjs` (16 Prüfungen: Seite, Reiter, Detail mit Bild + Spur, Status, Häkchen, Personas, Text, Kommentar, Tastatur, Handy-Breite, `?tp=`, Pause-Menü, Esc, Hauptmenü).
