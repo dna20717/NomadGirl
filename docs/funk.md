@@ -39,6 +39,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 27.11. Daniel → alle (über das alte Artefakt-Dashboard, eingetragen von Ava): **Handel über Quests anreizen**, Nachtrag als Beispielsatz: „"Hey Leyla, wenn du xy findest, kannst du es mir mitbringen? Ich zahl dann doppelt"“
+
 - 27.11. Daniel → alle (über das Dashboard): **Handel über Quests anreizen:** „es muss quests geben, die darauf hinaus läuft, dass man mit einem händler interagiert. beispielsweise klassiche fetchquest aufgaben von schraube.“
 
 - 27.11. Daniel → alle (über das Dashboard): **Welches Ticket als Nächstes?** „fb20 als nächstes“
