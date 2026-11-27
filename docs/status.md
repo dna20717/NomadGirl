@@ -14,7 +14,7 @@ Die Testphase läuft: Tester melden über den Feedback-Knopf nach FeedbackBucket
 
 ## Offene Entscheidungen
 
-- **Handel über Quests anreizen:** Daniel am 27.11.: „wir müssen handeln durch quests incentivieren.“ Wie genau, ist offen; erst besprechen, dann Ticket.
+Keine.
 
 ## Artefakte
 

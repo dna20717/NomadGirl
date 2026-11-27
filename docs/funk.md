@@ -39,6 +39,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 27.11. Daniel → alle (über das Dashboard): **Handel über Quests anreizen:** „es muss quests geben, die darauf hinaus läuft, dass man mit einem händler interagiert. beispielsweise klassiche fetchquest aufgaben von schraube.“
+
 - 27.11. Daniel → alle (über das Dashboard): **Welches Ticket als Nächstes?** „fb20 als nächstes“
 
 - 27.11. Daniel → alle (über das NomadWork-Dashboard, eingetragen von Ava): **Drei Entscheidungen.** (1) FB-20 Δ-Balancing: „Mehr deltas als beute im POI bitte als quick fix. wir müssen handeln durch quests incentivieren.“ → Ticket #195. (2) Liegt im claude.ai-Projekt noch mehr, das ins Repo muss? „aus meiner sicht momentan nicht. wenn uns was fehlt, holen wir es.“ (3) A12 Gang-Ausrüstung: „erledigt. komplett streichen.“ → im Backlog gestrichen.
