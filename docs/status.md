@@ -1,6 +1,6 @@
 # Status: NomadGirl
 
-Aktualisiert: 27.11.2026 (Ava, Chat). Erste Fassung, aus Funkbuch, Backlog und Changelog zusammengetragen.
+Aktualisiert: 27.11.2026 (Ava, Chat). Drei Entscheidungen aus dem NomadWork-Dashboard eingetragen.
 
 Diese Datei ist der Stand auf einen Blick und die Übergabe bei HONC. Die vier Überschriften unten bleiben wörtlich so, ein Dashboard liest sie aus. Einzelheiten stehen im Funkbuch (`funk.md`), der Verlauf in `changelog.md`.
 
@@ -14,10 +14,8 @@ Die Testphase läuft: Tester melden über den Feedback-Knopf nach FeedbackBucket
 
 ## Offene Entscheidungen
 
-- **Welches Ticket als Nächstes?** Offen sind #180 (POI-Ton), #109 (Balancing v2), #080 (Dunkelheit als Skilltree), #086 (Story-Enden); #129 (Info-Center) läuft.
-- **FB-20 (Δ-Balancing):** in #190 bewusst offen gelassen.
-- **A12 Gang-Ausrüstung** (`backlog.md`): Daniel wollte erst klären, was das ist.
-- **Liegt im claude.ai-Projekt noch mehr**, das ins Repo muss, außer Übergabe und `leyla-theme.md`?
+- **Handel über Quests anreizen:** Daniel am 27.11.: „wir müssen handeln durch quests incentivieren.“ Wie genau, ist offen; erst besprechen, dann Ticket.
+- **Welches Ticket als Nächstes?** Offen sind #195 (FB-20: mehr Δ in POIs), #180 (POI-Ton), #109 (Balancing v2), #080 (Dunkelheit als Skilltree), #086 (Story-Enden); #129 (Info-Center) läuft.
 
 ## Artefakte
 

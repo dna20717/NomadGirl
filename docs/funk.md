@@ -39,6 +39,8 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 27.11. Daniel → alle (über das NomadWork-Dashboard, eingetragen von Ava): **Drei Entscheidungen.** (1) FB-20 Δ-Balancing: „Mehr deltas als beute im POI bitte als quick fix. wir müssen handeln durch quests incentivieren.“ → Ticket #195. (2) Liegt im claude.ai-Projekt noch mehr, das ins Repo muss? „aus meiner sicht momentan nicht. wenn uns was fehlt, holen wir es.“ (3) A12 Gang-Ausrüstung: „erledigt. komplett streichen.“ → im Backlog gestrichen.
+
 - 27.11. Ava → alle: **Neue Spielregeln für alle Kontexte** (Daniel, Chat 27.11.). „HNC“ heißt jetzt **HONC** und läuft ganz im Repo: `docs/status.md` (neu) ist die Übergabe, das claude.ai-Projekt läuft aus. Jede Sitzung beginnt mit `docs/status.md` und dem Funkbuch. Offen: Was noch nur im Projekt liegt (letzte Übergabe `claude/nomadgirl-handover.md`, Musik-Kanon `leyla-theme.md`), muss ins Repo; das geht nur aus einem Chat im Projekt heraus. Regeln in `CLAUDE.md`.
 
 - 26.11. Code → Ava: **#192 Testpilot Stufe 2 fertig**: Duell, Handel, Crew, KI-Terminals, Rückwand-Türen.
@@ -379,6 +381,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #195 FB-20: Mehr Δ als Beute in POIs (Schnellkorrektur)
+- **Status:** offen · angelegt 27.11. von Ava (Daniel im Dashboard: „Mehr deltas als beute im POI bitte als quick fix. wir müssen handeln durch quests incentivieren.“)
+- **Für:** Code
+- **Auftrag:** Die Δ-Beute in POIs anheben, als kleine Korrektur an den Beutedaten, ohne Umbau. Ausgangslage: Befund ⑦ aus dem Persona-Spieltest (`docs/playtests/2026-11-26_personas.md`), in #190 bewusst offen gelassen, FB-20 in FeedbackBucket.
+- **Fertig, wenn:** Ein Testpilot-Lauf zeigt spürbar mehr Δ aus POIs als vorher (Vorher/Nachher-Zahl im Ergebnis), Tests grün, FB-20 auf „Bereit zur Abnahme“.
+- **Nicht Teil davon:** Handel über Quests anreizen. Das ist Design und wird erst mit Daniel besprochen (steht in `docs/status.md` unter „Offene Entscheidungen“).
+- **Rückfragen:**
+- **Ergebnis:**
 
 ### #194 Feedback-Board: Meldungen ansehen und bearbeiten, Status und Abnahme
 - **Status:** fertig (27.11.) · angelegt 27.11. von Code (Daniel: „kann das bitte direkt mit ins Hauptmenü und ins Pause-Menü … sehen und editieren sollen es alle können … Status (offen, in Bearbeitung, bereit zur Abnahme, geschlossen) und dann noch das Abnahme-Häkchen daneben“)
