@@ -376,6 +376,11 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 
 ## Tickets
 
+### #194 Feedback-Board: Meldungen ansehen und bearbeiten, Status und Abnahme
+- **Status:** läuft (27.11.) · angelegt 27.11. von Code (Daniel: „kann das bitte direkt mit ins Hauptmenü und ins Pause-Menü … sehen und editieren sollen es alle können … Status (offen, in Bearbeitung, bereit zur Abnahme, geschlossen) und dann noch das Abnahme-Häkchen daneben“)
+- **Für:** Code
+- **Plan:** Worker-Wege `/api/feedback/list`, `item`, `file`, `update` (Status über Labels `in-bearbeitung`/`abnahme`, Häkchen = `abgenommen` + geschlossen, Kommentar, Text). Board `game/feedback/board.js`: Liste mit Filtern, Bild, Text, Spur als Zeitleiste, „Hier spielen“, Kommentare. Im Pause-Menü, im Hauptmenü und unter `/feedback`. Alle Issues bekommen den passenden Status.
+
 ### #193 Testpilot Stufe 3: Questlog, Händler-Platz, Implantate, Bit-Farm
 - **Status:** fertig (26.11.) · angelegt 26.11. von Code (Daniel: „Go mit 3“)
 - **Für:** Code
