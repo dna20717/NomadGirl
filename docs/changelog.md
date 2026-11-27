@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 27.11.2026: **Spielregeln für alle Kontexte**: `docs/status.md` als Status auf einen Blick, „HNC“ heißt jetzt HONC und läuft ganz im Repo, das Funkbuch gilt für jede Sitzung, das claude.ai-Projekt läuft aus.
 - 27.11.2026: **Feedback-Board** (#194): alle Meldungen der Testphase im Pause-Menü, im Hauptmenü und unter /feedback; Status Offen, In Bearbeitung, Bereit zur Abnahme, Geschlossen mit Abnahme-Häkchen; Bild, Text bearbeiten, Spur als Zeitleiste, „Hier spielen“ an der gemeldeten Stelle, Kommentare.
 - 26.11.2026: **Testpilot Stufe 3** (#193): der Bot nimmt Aufträge im Questlog an und gibt Fertiges ab, kauft fehlende Werkstätten am Händler-Platz, baut Implantate über die Hand des Inventars ein und zieht Entities in die Bit-Farm (Worker, Freundschaftsduell an der Chill-Ecke); Werkstätten rotieren im vollen Rig; nach einer Reise keine alten Ziele mehr.
 - 26.11.2026: **Testpilot Stufe 2** (#192): der Bot spielt Glitch-Duelle an KI-Automaten und -Terminals, handelt bei Schraube, nimmt Bewerber in die Crew auf und geht durch Rückwand-Türen.

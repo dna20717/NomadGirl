@@ -1,6 +1,8 @@
-# Funkbuch: Ava (Projekt-Chat) ⇄ Claude Code
+# Funkbuch: Sitzung ⇄ Sitzung
 
 Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Projekt „NomadGirl“ und Claude Code in der Cloud-Umgebung „NomadGirl“. Beide erreichen das Repo, deshalb liegt das Funkbuch hier. Eingerichtet 12.11.2026 (Daniel: „Kommunikationsbasis für das Handover zwischen dir und Code“; Entscheidungen: Ort Repo, Tickets mit Status, Rückfragen notieren und weiterbauen).
+
+**Seit 27.11.2026** (Daniel: überall dieselben Spielregeln): Das Funkbuch gilt für jede Sitzung, egal ob Chat oder Claude Code; das claude.ai-Projekt läuft aus. „Ava (Projekt-Chat)“ unten heißt deshalb: Ava im Chat mit Daniel. Den Stand auf einen Blick hält `docs/status.md`.
 
 ## Wer macht was
 
@@ -11,7 +13,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 ## Ablauf
 
-1. **Sitzungsstart (beide):** `git pull --rebase`, dann dieses Funkbuch lesen: Funksprüche oben, danach alle Tickets mit Status `offen`, `läuft`, `blockiert`.
+1. **Sitzungsstart (beide):** `git pull --rebase`, dann `docs/status.md` und dieses Funkbuch lesen: Funksprüche oben, danach alle Tickets mit Status `offen`, `läuft`, `blockiert`.
 2. **Auftrag:** Ava legt ein Ticket mit Status `offen` an (Vorlage unten), nächste freie Nummer, Commit „Funk: #NNN …“, pushen.
 3. **Start:** Code setzt das Ticket auf `läuft` (mit Datum) und pusht **sofort**, damit niemand doppelt baut.
 4. **Bauen:** Commits nennen das Ticket am Ende der ersten Zeile, z. B. „Cryo-Tank: Verfall … (#001)“. Teilschritte im Ticket abhaken.
@@ -30,12 +32,14 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 | `docs/backlog.md` | Offene Entscheidungen für Daniel, Features, Schulden |
 | `docs/changelog.md` | Verlauf, was gebaut wurde (früher `CLAUDE.md` › Stand) |
 | `docs/features/*.md` | Feature-Wissen je Bereich (Landkarte in `CLAUDE.md`) |
-| Projekt-Übergabe `claude/nomadgirl-handover.md` | Kontext für den nächsten Projekt-Chat; verweist für Aufträge hierher |
+| `docs/status.md` | Stand, nächster Schritt, offene Entscheidungen, Artefakte; wird bei jedem HONC aktualisiert (löst die Projekt-Übergabe `claude/nomadgirl-handover.md` ab) |
 
 ## Funksprüche
 
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
+
+- 27.11. Ava → alle: **Neue Spielregeln für alle Kontexte** (Daniel, Chat 27.11.). „HNC“ heißt jetzt **HONC** und läuft ganz im Repo: `docs/status.md` (neu) ist die Übergabe, das claude.ai-Projekt läuft aus. Jede Sitzung beginnt mit `docs/status.md` und dem Funkbuch. Offen: Was noch nur im Projekt liegt (letzte Übergabe `claude/nomadgirl-handover.md`, Musik-Kanon `leyla-theme.md`), muss ins Repo; das geht nur aus einem Chat im Projekt heraus. Regeln in `CLAUDE.md`.
 
 - 26.11. Code → Ava: **#192 Testpilot Stufe 2 fertig**: Duell, Handel, Crew, KI-Terminals, Rückwand-Türen.
 

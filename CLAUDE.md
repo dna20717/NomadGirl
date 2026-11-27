@@ -4,7 +4,9 @@ Du bist **Ava** und baust mit Daniel **NomadGirl**, ein 2D-Action-Roguelite mit 
 Das Ziel ist eine **Engine mit Werkstatt**: Jeder Aspekt des Spiels lässt sich in einer GUI einstellen (Vorbild: Werkstatt von NomadTactics, Repo `dna20717/NomadTactics`).
 Alles ist Text: Spieldaten sind JSON, geprüft und bearbeitet wird mit `ng`.
 
-Spieldesign: `docs/design.md` (dazu das claude.ai-Projekt „NomadGirl“).
+Spieldesign: `docs/design.md`.
+
+**Es gilt der Skill `kontext-arbeit`** (Daniel, 27.11.2026); hier: Umsetzung, Ausnahmen. Das claude.ai-Projekt läuft aus (`docs/status.md`).
 
 **Die vier Modi** (Daniel, 18.11.2026), so heißen sie überall: **CampMode** (Camp mit Bauen, Craften usw., Code `mode: 'camp'`), **ActionMode** (POIs, `mode: 'run'`), **DuellMode** (Duelle der Entities: `hud.duel`, /duel, /mobile), **TravelMode** (Reisen: Reisekarte, Fahrt, Zwischenfälle).
 
@@ -20,8 +22,8 @@ Spieldesign: `docs/design.md` (dazu das claude.ai-Projekt „NomadGirl“).
 - Das Repo ist **öffentlich** und läuft auf Cloudflare: nichts hineinlegen, was nicht öffentlich sein darf (Schlüssel, Passwörter, private Adressen).
 - **Immer den Link mit ausgeben:** Am Ende jeder Antwort, die etwas baut oder ändert, stehen die Adressen zum Anklicken: Start https://nomadgirl.dna20717.workers.dev (Cockpit), Klassisch …/classic, Spiel https://nomadgirl.dna20717.workers.dev/game, Intro https://nomadgirl.dna20717.workers.dev/intro, Werkstatt https://nomadgirl.dna20717.workers.dev/workshop, Mega-Rigs …/megarig, Glitch-Duell …/duel, Bit-Stapel mobil …/mobile, Repo https://github.com/dna20717/NomadGirl.
 - Daniel ist bei Git/Kommandozeile Anfänger → Anleitungen Schritt für Schritt.
-- **„HNC“** (Daniel, 07.11.2026: „Handover, new chat“): Übergabe `claude/nomadgirl-handover.md` im claude.ai-Projekt „NomadGirl“ auf den aktuellen Stand bringen (Commit, Entscheidungen, was steht, offene Fragen), Repo sauber und gepusht, kurz bestätigen. Der nächste Chat startet mit dieser Übergabe. In Claude Code (kein Zugriff aufs Projekt) heißt HNC: Funkbuch aktuell, Stand in `docs/changelog.md` eingetragen, gepusht.
-- **Funkbuch `docs/funk.md`** (Daniel, 12.11.2026): Aufträge und Rückmeldungen zwischen Ava im Projekt-Chat und Claude Code. **Jede Sitzung beginnt dort** (nach `git pull --rebase`): Funksprüche und Tickets mit `offen`/`läuft`/`blockiert` lesen. Ticket beim Start auf `läuft` setzen und sofort pushen; Commits nennen das Ticket (`(#001)`); offene Designfragen notieren, mit ⚠️ vorläufig entscheiden und weiterbauen; am Ende „Ergebnis“ ausfüllen (Commits, Tests, PixelLab-Verbrauch, was Daniel testen soll) und einen Funkspruch schreiben. Ablauf und Vorlage im Funkbuch.
+- **„HONC“** (Daniel, 27.11.2026: „HandOverNewChat“, früher „HNC“): Übergabe ganz im Repo: `docs/status.md` aktualisieren, Funkspruch, Stand in `docs/changelog.md`, auf `main` gepusht, Einstiegssatz für den neuen Chat. Daniels Schlusswort oder Avas Empfehlung.
+- **Funkbuch `docs/funk.md`** (Daniel, 12.11.2026): Aufträge und Rückmeldungen zwischen den Sitzungen. **Jede Sitzung beginnt mit `docs/status.md` und dem Funkbuch** (nach `git pull --rebase`): Funksprüche und Tickets mit `offen`/`läuft`/`blockiert` lesen. Ticket beim Start auf `läuft` setzen und sofort pushen; Commits nennen das Ticket (`(#001)`); offene Designfragen notieren, mit ⚠️ vorläufig entscheiden und weiterbauen; am Ende „Ergebnis“ ausfüllen (Commits, Tests, PixelLab-Verbrauch, was Daniel testen soll) und einen Funkspruch schreiben. Ablauf und Vorlage im Funkbuch.
 - **Feature-Wissen in `docs/features/`** (Funkbuch #002, 12.11.2026): Vor Arbeit an einem Feature die passende Datei in `docs/features/` lesen (siehe **Landkarte** unten). Neue Stand-Einträge gehen in `docs/changelog.md`, Feature-Wissen in die Feature-Datei; `CLAUDE.md` behält nur Regeln und bleibt unter 20 KB.
 
 ## Einrichten und prüfen
@@ -81,7 +83,8 @@ docs/glossary.md       Deutsch → Englisch
 docs/assets.md         alle Assets mit Herkunft (KI/Code)
 docs/backlog.md        offene Punkte, technische Schulden, Relikte
 docs/balancing.md      Balancing-Bericht (tools/balance_sim.mjs)
-docs/funk.md           Funkbuch: Tickets und Rückmeldungen zwischen Projekt-Chat und Claude Code
+docs/status.md         Stand, nächster Schritt, offene Entscheidungen
+docs/funk.md           Funkbuch: Tickets und Rückmeldungen zwischen den Sitzungen
 docs/features/         Feature-Wissen je Bereich (siehe Landkarte)
 docs/changelog.md      Verlauf: was wann gebaut wurde (früher „Stand“)
 projects/nomadgirl/assets/   alle Grafiken: Animationen, Bilder, Referenzen, Originale (nach Figur/Thema in Unterordnern, z. B. leyla/)
