@@ -22,7 +22,7 @@ export function noise(x, seed = 0) {
 
 export function newDiorama(cfg0, { base = 'desert', seed = 1, hour = 18.2, name = 'Mein Camp' } = {}) {
   const cfg = cfgOf(cfg0), half = Math.floor(cfg.width / 2);
-  const m = { v: 1, name, seed, base, hour, parcel: [-half, cfg.width - half - 1], cells: new Map(), cfg, history: [], future: [], step: null, made: Date.now(), seconds: 0 };
+  const m = { v: 1, name, seed, base, hour, parcel: [-half, cfg.width - half - 1], cells: new Map(), back: new Map(), cfg, history: [], future: [], step: null, made: Date.now(), seconds: 0 };
   for (let x = m.parcel[0]; x <= m.parcel[1]; x++) fillColumn(m, x);
   return m;
 }
@@ -38,6 +38,8 @@ export function setAt(m, x, y) {
   return m.cells.get(key(x, y)) ?? null;
 }
 export const solid = (m, x, y) => setAt(m, x, y) != null;
+// the back wall (ruins: the inside of a building, darker); only where the front is air
+export const backAt = (m, x, y) => m.back.get(key(x, y)) ?? null;
 // the highest solid row of a column (y), or bottom + 1 when it is dug out completely
 export function surface(m, x) {
   for (let y = top(m); y <= bottom(m); y++) if (solid(m, x, y)) return y;
@@ -52,29 +54,29 @@ export function begin(m, kind = 'paint') {
 }
 // one tile: set it (or empty it with null); out of the parcel it grows first, out of the rows nothing happens.
 // → true when something changed
-export function put(m, x, y, set) {
+export function put(m, x, y, set, layer = 'c') {
   if (y < top(m) || y > bottom(m)) return false;
   if (!inParcel(m, x)) return false;
-  const k = key(x, y), before = m.cells.get(k) ?? null, after = set ?? null;
+  const map = layer === 'b' ? m.back : m.cells, k = key(x, y), before = map.get(k) ?? null, after = set ?? null;
   if (before === after) return false;
-  if (y === bottom(m) && after == null && m.cfg.keep > 0) return false;   // the last row stays: the diorama never opens to the void
-  if (after == null) m.cells.delete(k); else m.cells.set(k, after);
-  const st = m.step || begin(m);
-  const c = st.changes.get(k);
-  if (c) { c[1] = after; if (c[0] === c[1]) st.changes.delete(k); } else st.changes.set(k, [before, after]);
+  if (layer === 'c' && y === bottom(m) && after == null && m.cfg.keep > 0) return false;   // the last row stays: the diorama never opens to the void
+  if (after == null) map.delete(k); else map.set(k, after);
+  const st = m.step || begin(m), sk = layer === 'b' ? 'b|' + k : k;
+  const c = st.changes.get(sk);
+  if (c) { c[1] = after; if (c[0] === c[1]) st.changes.delete(sk); } else st.changes.set(sk, [before, after]);
   return true;
 }
 // close the gesture: an empty step is dropped; a real one goes on the history and clears the redo list
 export function end(m) {
   const st = m.step; m.step = null;
   if (!st || !st.changes.size) return null;
-  const step = { kind: st.kind, changes: [...st.changes].map(([k, [b, a]]) => [...unkey(k), b, a]) };
+  const step = { kind: st.kind, changes: [...st.changes].map(([k, [b, a]]) => k.startsWith('b|') ? [...unkey(k.slice(2)), b, a, 1] : [...unkey(k), b, a]) };
   m.history.push(step); m.future = [];
   if (m.history.length > 400) m.history.shift();
   return step;
 }
 function apply(m, step, back) {
-  for (const [x, y, b, a] of step.changes) { const v = back ? b : a, k = key(x, y); if (v == null) m.cells.delete(k); else m.cells.set(k, v); }
+  for (const [x, y, b, a, l] of step.changes) { const v = back ? b : a, k = key(x, y), map = l ? m.back : m.cells; if (v == null) map.delete(k); else map.set(k, v); }
   return step;
 }
 export function undo(m) { if (m.step) end(m); const s = m.history.pop(); if (!s) return null; m.future.push(s); return apply(m, s, true); }
@@ -122,37 +124,77 @@ export function hillTargets(m, plan, snap, rough = m.cfg.rough) {
   }
   return out;
 }
-// the hill of the moment: tiles the last frame of the gesture set but this one does not go back to the snapshot (base), the new
-// targets are put. base = Map key → set|null of every tile the gesture touched so far (its value before the gesture)
-// → { added: [[x, y, set]], removed: [[x, y, set]] }
-export function shapeHill(m, plan, snap, base) {
-  const want = hillTargets(m, plan, snap), added = [], removed = [];
-  for (const [k, before] of base) if (!want.has(k)) { const [x, y] = unkey(k), now = m.cells.get(k) ?? null; if (now !== before && put(m, x, y, before)) (before == null ? removed : added).push([x, y, before ?? now]); }
+// a shape of this moment (a hill, a ruin): tiles the last frame of the gesture set but this one does not go back to their value
+// before the gesture (base), the new targets are put. want: Map of „x,y“ (front) or „b|x,y“ (back wall) → set|null;
+// base: Map of every key the gesture touched → its value before. → { added: [[x, y, set, back]], removed: [[x, y, set, back]] }
+export function reshape(m, want, base) {
+  const added = [], removed = [], parse = k => { const b = k.startsWith('b|'), [x, y] = unkey(b ? k.slice(2) : k); return { b, x, y, map: b ? m.back : m.cells, kk: b ? k.slice(2) : k }; };
+  for (const [k, before] of base) {
+    if (want.has(k)) continue;
+    const p = parse(k), now = p.map.get(p.kk) ?? null;
+    if (now !== before && put(m, p.x, p.y, before, p.b ? 'b' : 'c')) (before == null ? removed : added).push([p.x, p.y, before ?? now, p.b]);
+  }
   for (const [k, v] of want) {
-    if (!base.has(k)) base.set(k, m.cells.get(k) ?? null);
-    const [x, y] = unkey(k), now = m.cells.get(k) ?? null;
-    if (now === v) continue;
-    if (put(m, x, y, v)) (v == null ? removed : added).push([x, y, v ?? now]);
+    const p = parse(k);
+    if (!base.has(k)) base.set(k, p.map.get(p.kk) ?? null);
+    if ((p.map.get(p.kk) ?? null) === v) continue;
+    const was = p.map.get(p.kk) ?? null;
+    if (put(m, p.x, p.y, v, p.b ? 'b' : 'c')) (v == null ? removed : added).push([p.x, p.y, v ?? was, p.b]);
   }
   return { added, removed };
 }
+export const shapeHill = (m, plan, snap, base) => reshape(m, hillTargets(m, plan, snap), base);
+
+// ---------- ruins ----------
+// A broken building out of one set, standing on the ground at the anchor column: pillars at both ends, floors every four rows with
+// gaps, a jagged top (one side falls off more), the inside as a darker back wall with window holes to the sky; columns where the
+// ground lies lower get a foundation. plan = { x0, x1, base (the ground row: the ruin's lowest row is base − 1), height, set, seed }
+export function ruinTargets(m, plan, snap) {
+  const out = new Map(), a = Math.min(plan.x0, plan.x1), b = Math.max(plan.x0, plan.x1), w = b - a + 1, H = Math.max(2, plan.height), yb = plan.base, sd = plan.seed || 1;
+  if (w < 2) return out;
+  const fall = noise(a * 7 + b, sd) < 0.5 ? -1 : 1, rough = Math.min(3, Math.floor(H / 3));
+  const topOf = x => {
+    const k = (x - a) / Math.max(1, w - 1), side = fall > 0 ? k : 1 - k, pillar = x === a || x === b;
+    const drop = Math.round(side * side * H * 0.38 + noise(x, sd + 3) * rough * (pillar ? 0.4 : 1));
+    return yb - H + Math.min(H - 2, drop);
+  };
+  for (let x = a; x <= b; x++) {
+    const t = topOf(x), s = snap.get(x) ?? surface(m, x), edge = x === a || x === b;
+    for (let y = yb; y < s; y++) out.set(key(x, y), plan.set);   // foundation down to lower ground
+    for (let y = t; y < yb; y++) {
+      if (y < top(m)) continue;
+      const fromBase = yb - y, floor = fromBase % 4 === 0 && fromBase > 0;
+      const crumb = y === t && !edge && noise(x * 13 + y, sd + 5) < 0.45;   // the broken top: a brick here and there
+      const gap = floor && !edge && noise(Math.floor((x - a) / 2) * 31 + y, sd + 7) > 0.72;
+      if (edge || (floor && !gap) || crumb) out.set(key(x, y), plan.set);
+      else {
+        const band = (fromBase - 1) % 4, col = (x - a) % 3, win = band >= 1 && band <= 2 && col !== 0 && w >= 4 && noise(Math.floor((x - a) / 3) * 17 + Math.floor(fromBase / 4), sd + 9) < 0.7;
+        out.set(key(x, y), null);
+        if (!win) out.set('b|' + key(x, y), plan.set);
+      }
+    }
+  }
+  return out;
+}
+export const shapeRuin = (m, plan, snap, base) => reshape(m, ruinTargets(m, plan, snap), base);
 
 // ---------- save ----------
 // compact: the sets used, then one string per row of the parcel (a letter per tile, „.“ = air)
 const LET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 export function toJSON(m) {
-  const sets = [...new Set(m.cells.values())].sort(), idx = new Map(sets.map((s, i) => [s, LET[i]]));
-  const rows = [];
-  for (let y = top(m); y <= bottom(m); y++) { let r = ''; for (let x = m.parcel[0]; x <= m.parcel[1]; x++) { const v = m.cells.get(key(x, y)); r += v == null ? '.' : idx.get(v); } rows.push(r); }
-  while (rows.length && /^\.*$/.test(rows[0])) rows.shift();
-  return { v: 1, name: m.name, seed: m.seed, base: m.base, hour: m.hour, parcel: m.parcel, sets, rows, made: m.made, seconds: Math.round(m.seconds), metrics: metrics(m) };
+  const sets = [...new Set([...m.cells.values(), ...m.back.values()])].sort(), idx = new Map(sets.map((s, i) => [s, LET[i]]));
+  const rowsOf = map => { const rows = []; for (let y = top(m); y <= bottom(m); y++) { let r = ''; for (let x = m.parcel[0]; x <= m.parcel[1]; x++) { const v = map.get(key(x, y)); r += v == null ? '.' : idx.get(v); } rows.push(r); } return rows; };
+  const rows = rowsOf(m.cells), back = rowsOf(m.back);
+  while (rows.length && /^\.*$/.test(rows[0]) && /^\.*$/.test(back[0])) { rows.shift(); back.shift(); }
+  return { v: 1, name: m.name, seed: m.seed, base: m.base, hour: m.hour, parcel: m.parcel, sets, rows, back: m.back.size ? back : undefined, made: m.made, seconds: Math.round(m.seconds), metrics: metrics(m) };
 }
 export function fromJSON(j, cfg0) {
   if (!j || j.v !== 1 || !Array.isArray(j.parcel) || !Array.isArray(j.rows)) return null;
   const cfg = cfgOf(cfg0), m = newDiorama(cfg, { base: j.base || 'desert', seed: j.seed || 1, hour: j.hour ?? 18.2, name: j.name || 'Mein Camp' });
-  m.parcel = [j.parcel[0] | 0, j.parcel[1] | 0]; m.cells = new Map(); m.made = j.made || Date.now(); m.seconds = j.seconds || 0;
+  m.parcel = [j.parcel[0] | 0, j.parcel[1] | 0]; m.cells = new Map(); m.back = new Map(); m.made = j.made || Date.now(); m.seconds = j.seconds || 0;
   const y0 = bottom(m) - j.rows.length + 1;
-  j.rows.forEach((r, i) => { for (let c = 0; c < r.length; c++) { const ch = r[c]; if (ch === '.') continue; const s = j.sets[LET.indexOf(ch)]; if (s) m.cells.set(key(m.parcel[0] + c, y0 + i), s); } });
+  const fill = (rows, map) => (rows || []).forEach((r, i) => { for (let c = 0; c < r.length; c++) { const ch = r[c]; if (ch === '.') continue; const s = j.sets[LET.indexOf(ch)]; if (s) map.set(key(m.parcel[0] + c, y0 + i), s); } });
+  fill(j.rows, m.cells); fill(j.back, m.back);
   return m;
 }
 

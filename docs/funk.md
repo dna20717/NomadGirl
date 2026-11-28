@@ -39,6 +39,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 28.11. Ava → Daniel: **#196 Ruinen im CampBuilder**: RB halten → Werkzeug „Ruine“, Ecke setzen, zur Seite und hoch ziehen. 21/21 Prüfungen. PixelLab 0.
 - 28.11. Ava → Daniel: **#196 CampBuilder v2, Scheibe 1 steht** unter `/campbuilder`: Boden malen, Hügel hochziehen, Senken graben, Musik mit Bau-Tönen, Sonnen-Uhr, Material-Rad, Zurückspulen, Speichern online. 17/17 Browser-Prüfungen. PixelLab 0.
 - 28.11. Ava → Daniel: **#196 CampBuilder v2 geplant** (`docs/features/campbuilder.md`): Recherche zu Townscaper, Tiny Glade, Cloud Gardens, Summerhouse, Unpacking; acht Zen-Regeln; elf Technik-Tricks, die fast nur vorhandene Grafik brauchen; Controller- und Touch-Belegung; Stufen 0–5. Wartet auf fünf Antworten, dann Stufe 0 (Gefühlstest). PixelLab 0.
 - 28.11. Ava → Daniel: **NomadPixel × SDXL im Skill** (Abschnitt 17, `veredeln.py`). **Nachtschicht** geplant (`.claude/skills/nomadpixel/nachtschicht.md`, Bewerter `nachtschicht.py`): 10 Bilder je Motiv, Vorsortieren, Ava sichtet, Datensatz immer mit Originalen gemischt (Recherche: sonst Modellkollaps). Entscheidungen Daniel: eigener Stil-Bewerter, Ava steuert per Termin, ControlNet erst ohne. Offen: Bildmodell-Datei für den Bewerter (Download durch Daniel), welcher Stil zuerst.
@@ -395,7 +396,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #196 CampBuilder v2: Bau-Spielzeug mit Zen-Gefühl (Planung)
-- **Status:** läuft (28.11.: Scheibe 1 fertig; als Nächstes Scheibe 2: Ruinen, erste Deko-Stücke, verschieben und vergrößern) · angelegt 28.11. von Ava (Daniel im Code-Chat: „Na gut, a soll es sein“)
+- **Status:** läuft (28.11.: Scheibe 1 und Ruinen fertig; als Nächstes: Deko-Stücke setzen, verschieben, vergrößern) · angelegt 28.11. von Ava (Daniel im Code-Chat: „Na gut, a soll es sein“)
 - **Für:** Code, erst nach Daniels Antworten auf die offenen Fragen
 - **Lesen:** `docs/features/campbuilder.md` (Plan, Recherche, Technik-Tricks, Bedienung), `docs/features/camp.md` › Deko, Camp-Baukasten, Farbe; `docs/features/controller.md` › Bau-Modus mit Controller; `docs/features/tiles.md`
 - **Auftrag (Daniel, 28.11.2026):** „genau diese Art von Gefühl haben, wenn man ein Camp aufbaut. Zunächst ohne Ressourcen-Limits. Alles kann sauber platziert werden, snappt aneinander, wächst bei Bedarf durch Dragging, kann eingefärbt werden … auch mit den vielen Dingen aus den Tilesets“; „Bedienung nur mit Controller und ggf. Touch, aber nicht Maus“; „Zen-Zustand“; „noch nicht bauen, erst noch planen“. Eigene Seite `/campbuilder`, Ausbaustufen 0–5 im Plan, Stufe 0 = Gefühlstest.

@@ -3,7 +3,8 @@
 // middle of a tile when the stick rests; under her a light shows the tile she works on.
 //   A held  + drag: add ground (paint); at the surface, drag up = a hill that grows step by step
 //   B held  + drag: take ground away; at the surface, drag down = a hollow
-//   LB/RB tap: material · LB held: the material wheel (right stick) · Y held: the sun (sticks turn the hour)
+//   LB/RB tap: material · LB held: the material wheel · RB held: the tool wheel (ground, ruin) · Y held: the sun (sticks turn the hour)
+//   Ruin tool: A at the ground, pull sideways (width) and up (height): a broken building of the material grows
 //   LT/RT zoom · right stick moves the view · Select: back (held: rewinds) · X: forward · Start: menu
 // Every step is a note of the music (tones.js), the higher the tile, the higher the note. Plan: docs/features/campbuilder.md.
 import { makeTextures } from '../play/art.js';
@@ -47,6 +48,7 @@ export class BuilderScene extends Phaser.Scene {
     this.m = this.args.model;
     this.sets = Object.keys(this.data_.terrain || {});
     this.set = this.sets.includes(this.args.set) ? this.args.set : this.m.base;
+    this.tool = 'ground';
     this.mats = new Map((C.materials || []).map(r => [r.set, r.material]));
     this.sky = new Sky(this, null, this.data_, C);
     this.view = new TerrainView(this, this.m, { details: C.view?.details !== false, margin: Math.ceil(W / ((C.view?.zoom?.[0] ?? 38) / 100) / T / 2) + 4 });
@@ -140,9 +142,10 @@ export class BuilderScene extends Phaser.Scene {
     }
     // the material: LB / RB tap, LB held opens the wheel
     const wheelAfter = 200;
-    if (I.down('lb') && I.heldFor('lb', time) > wheelAfter && !this.g) { if (!hud?.wheelOpen) { hud?.openWheel(this.set); this.tones?.play('open'); } hud?.wheelAim(I.right[0] || I.left[0], I.right[1] || I.left[1]); this.frame(dt, time); return; }
-    if (I.released('lb')) { if (hud?.wheelOpen) { const s = hud.closeWheel(); if (s && s !== this.set) this.chooseSet(s); } else this.cycleSet(-1); }
-    if (I.pressed('rb')) this.cycleSet(1);
+    for (const [btn, kind] of [['lb', 'set'], ['rb', 'tool']]) {
+      if (I.down(btn) && I.heldFor(btn, time) > wheelAfter && !this.g) { if (!hud?.wheelOpen) { hud?.openWheel(kind); this.tones?.play('open'); } hud?.wheelAim(I.right[0] || I.left[0], I.right[1] || I.left[1]); this.frame(dt, time); return; }
+      if (I.released(btn)) { if (hud?.wheelOpen) { const s = hud.closeWheel(); if (kind === 'set' && s && s !== this.set) this.chooseSet(s); if (kind === 'tool' && s && s !== this.tool) this.chooseTool(s); } else this.cycleSet(btn === 'lb' ? -1 : 1); }
+    }
     // back and forth in time
     if (I.pressed('select')) { this.endGesture(); this.back(); this.rewindAt = time + 420; }
     if (I.down('select') && time > (this.rewindAt || Infinity)) { this.back(); this.rewindAt = time + Math.max(55, 200 - I.heldFor('select', time) / 12); }
@@ -200,7 +203,8 @@ export class BuilderScene extends Phaser.Scene {
       const c = this.cell(), s = M.solid(this.m, c.x, c.y), above = M.solid(this.m, c.x, c.y - 1), below = M.solid(this.m, c.x, c.y + 1);
       const surf = s && !above ? c.y : !s && below ? c.y + 1 : null;
       this.g = { btn: a ? 'a' : 'b', mode: 'pending', start: { ...this.cur }, cell: c, surf, t: time, last: null };
-      if (surf == null) this.startPaint();
+      if (a && this.tool === 'ruin') this.startRuin();
+      else if (surf == null) this.startPaint();
       return;
     }
     if (!g) return;
@@ -217,6 +221,7 @@ export class BuilderScene extends Phaser.Scene {
       return;
     }
     if (g.mode === 'paint') this.paint();
+    else if (g.mode === 'ruin') this.shapeRuin();
     else this.shape();
   }
   startPaint() {
@@ -236,7 +241,11 @@ export class BuilderScene extends Phaser.Scene {
   paintCell({ x, y }) {
     const m = this.m, add = this.g.btn === 'a';
     if (add && M.solid(m, x, y)) return;
-    if (!add && !M.solid(m, x, y)) return;
+    if (!add && !M.solid(m, x, y)) {   // B over air: a back wall there goes
+      const b = M.backAt(m, x, y);
+      if (b && M.put(m, x, y, null, 'b')) { this.view.crumble(x, y, b, 0, true); this.crumble(x * T + T / 2, y * T + T / 2, b, 4); this.note('remove', -y, b, 0.5); }
+      return;
+    }
     this.edge(x);
     const set = add ? this.set : M.setAt(m, x, y);
     if (!M.put(m, x, y, add ? this.set : null)) return;
@@ -282,6 +291,7 @@ export class BuilderScene extends Phaser.Scene {
     const g = this.g;
     if (!g) return;
     this.g = null;
+    if (g.mode === 'ruin' && !g.moved && release) { this.g = g; this.shapeRuin({ W: 5, H: 6 }); this.g = null; }
     if (g.mode === 'pending') {   // a tap: one tile
       if (!release) return;
       g.mode = 'paint'; this.g = g; M.begin(this.m, g.btn === 'a' ? 'paint' : 'erase');
@@ -310,7 +320,7 @@ export class BuilderScene extends Phaser.Scene {
   forth() { const s = M.redo(this.m); if (s) this.replay(s, false); }
   replay(step, back) {
     const ch = step.changes, xs = ch.map(c => c[0]), mid = xs.length ? (Math.min(...xs) + Math.max(...xs)) / 2 : 0;
-    for (const [x, y, b, a] of ch) { const now = back ? b : a, was = back ? a : b, d = Math.abs(x - mid) * 10; if (now == null) this.view.crumble(x, y, was, d); else this.view.pop(x, y, now, d); }
+    for (const [x, y, b, a, l] of ch) { const now = back ? b : a, was = back ? a : b, d = Math.abs(x - mid) * 10; if (now == null) this.view.crumble(x, y, was, d, !!l); else this.view.pop(x, y, now, d, !!l); }
     const top = ch.reduce((h, c) => Math.max(h, -c[1]), -99);
     this.tones?.play(back ? 'undo' : 'redo', { degree: top });
     this.input_.rumble(0.16, 26, this.cfg.haptics);
@@ -321,6 +331,39 @@ export class BuilderScene extends Phaser.Scene {
     this.tones?.play('select', { degree: this.sets.indexOf(s) % 5 });
     this.input_.rumble(0.12, 18, this.cfg.haptics);
     if (Math.random() < 0.35) this.drone.react('curious');
+  }
+  chooseTool(t) {
+    this.tool = t; this.hud?.setMaterial(this.set, this.view.kitOf(this.set));
+    this.tones?.play('select', { degree: t === 'ruin' ? 4 : 0 });
+    this.input_.rumble(0.12, 18, this.cfg.haptics);
+  }
+  // ---------- a ruin: anchored at the ground under the start, pulled sideways and up ----------
+  startRuin() {
+    const g = this.g, m = this.m;
+    g.mode = 'ruin'; g.ax = g.cell.x; g.yb = M.surface(m, g.ax); g.set = this.set; g.seed = 1 + Math.floor(Math.random() * 99999);
+    M.begin(m, 'ruin');
+    g.snap = M.snapshot(m, m.parcel[0] - 60, m.parcel[1] + 60); g.base = new Map(); g.W = 0; g.H = 0;
+  }
+  shapeRuin(fixed = null) {
+    const g = this.g, m = this.m, c = this.cell(), max = (this.cfg.hill?.max ?? 14) + 4;
+    const dx = c.x - g.ax, up = g.yb - c.y;
+    if (Math.abs(dx) >= 1 || up >= 2) g.moved = true;
+    if (!g.moved && !fixed) return;
+    const dir = fixed ? 1 : dx < 0 ? -1 : 1, W = fixed ? fixed.W : Math.max(3, Math.abs(dx) + 1), H = fixed ? fixed.H : Math.max(3, Math.min(max, up));
+    if (W === g.W && H === g.H) return;
+    const grewH = H > g.H, grewW = W > g.W;
+    g.W = W; g.H = H;
+    const x0 = g.ax, x1 = g.ax + dir * (W - 1);
+    for (let i = 0; i < 6; i++) { if (!(this.edge(Math.min(x0, x1)) || this.edge(Math.max(x0, x1)))) break; }
+    const { added, removed } = M.shapeRuin(m, { x0, x1, base: g.yb, height: H, set: g.set, seed: g.seed }, g.snap, g.base);
+    g.box = [Math.min(x0, x1), g.yb - H, Math.max(x0, x1), g.yb];
+    for (const [x, y, set, back] of added) this.view.pop(x, y, set, (g.yb - y) * 22 + Math.abs(x - g.ax) * 8, back);
+    for (const [x, y, set, back] of removed) this.view.crumble(x, y, set, 0, back);
+    if (added.length || removed.length) {
+      this.note(grewH || grewW ? 'hill' : 'dig', grewH ? H : W, g.set, grewH || grewW ? 1 : 0.5, true);
+      this.puff((x0 + x1 + 1) / 2 * T, (g.yb - H + 1) * T, g.set, grewH ? 12 : 6);
+      this.input_.rumble(grewH || grewW ? 0.24 + H * 0.02 : 0.12, grewH ? 38 : 22, this.cfg.haptics);
+    }
   }
   cycleSet(d) { const i = this.sets.indexOf(this.set); this.chooseSet(this.sets[(i + d + this.sets.length) % this.sets.length]); }
   // one note per moment at most (a stroke over many tiles is a melody, not a heap)
@@ -388,13 +431,24 @@ export class BuilderScene extends Phaser.Scene {
     for (const [cx, cy, sx, sy] of [[px, py, 1, 1], [px + T, py, -1, 1], [px, py + T, 1, -1], [px + T, py + T, -1, -1]]) g.beginPath().moveTo(cx + sx * 4, cy + sy * 16).lineTo(cx + sx * 4, cy + sy * 4).lineTo(cx + sx * 16, cy + sy * 4).strokePath();
     // the tile that A would add, as a ghost
     const f = !remove && !M.solid(m, c.x, c.y) ? this.view.frameOf(c.x, c.y, this.set) : null;
-    if (f && !G) { this.ghostImg.setVisible(true).setTexture(f.key, f.frame).setPosition(px + T / 2, py + T).setAlpha(0.32 + 0.14 * breathe); }
+    if (f && !G && this.tool === 'ground') { this.ghostImg.setVisible(true).setTexture(f.key, f.frame).setPosition(px + T / 2, py + T).setAlpha(0.32 + 0.14 * breathe); }
     else this.ghostImg.setVisible(false);
     // at the surface, while resting: little chevrons say „pull me up“
     const s = M.solid(m, c.x, c.y), surf = s && !M.solid(m, c.x, c.y - 1) ? c.y : !s && M.solid(m, c.x, c.y + 1) ? c.y + 1 : null;
     if (!G && surf != null && this.idle > 500) {
       const y0 = (surf - 1) * T + 8 - (time / 40 % 14);
       for (let i = 0; i < 2; i++) g.lineStyle(3, 0xffd541, 0.35 * (1 - i * 0.4) * Math.min(1, (this.idle - 500) / 600)).beginPath().moveTo(px + T / 2 - 9, y0 - i * 12 + 6).lineTo(px + T / 2, y0 - i * 12 - 3).lineTo(px + T / 2 + 9, y0 - i * 12 + 6).strokePath();
+    }
+    // a ruin being pulled: its frame, corners bright
+    if (G?.mode === 'ruin' && G.box) {
+      const [a, t, b2, yb] = G.box, x0 = a * T, x1 = (b2 + 1) * T, y0 = t * T, y1 = yb * T;
+      gd.lineStyle(2, 0xffd541, 0.35).strokeRect(x0, y0, x1 - x0, y1 - y0);
+      for (const [cx, cy] of [[x0, y0], [x1, y0], [x0, y1], [x1, y1]]) gd.fillStyle(0xffd541, 0.9).fillCircle(cx, cy, 5);
+    }
+    // the ruin tool at rest: a little frame of a house above the tile
+    if (!G && this.tool === 'ruin') {
+      const s0 = M.surface(m, c.x) * T, k = 0.5 + 0.2 * breathe;
+      gd.lineStyle(2, 0xffd541, 0.3 * k).strokeRect(px, s0 - 6 * T, 5 * T, 6 * T);
     }
     // a hill being pulled: a line from the ground up to AvA with a tick per step
     if (G && (G.mode === 'hill' || G.mode === 'dig')) {

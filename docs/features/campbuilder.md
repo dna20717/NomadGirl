@@ -186,8 +186,9 @@ Bühne, Boden formen, AvA, Klang, Uhr. Seite `campbuilder.html` (online `/campbu
 - **Bedienung umgesetzt:** wie in der Tabelle oben, mit diesen Abweichungen (⚠️ vorläufig): Y halten = Uhr (statt Farbrad), X = Wiederholen, LB/RB antippen = Material zurück/vor, Rechter Stick drücken = Kamera zurück zu AvA. Steuerkreuz = eine Kachel je Druck.
 - **Speichern:** `/api/blob?name=diorama1..6` im Worker (KV der Spielstände, pro Login), Kopie immer auch in `localStorage` `nomadgirl-diorama:<n>`; von selbst 2,5 s nach dem letzten Schritt, kleines Wolken-Symbol unten rechts.
 - **Werkstatt:** Bereich **CampBuilder** (Gruppe Rig, `data/campbuilder.json`): Parzelle, Hügel, Zeiger, Ansicht, Uhr, Klang, Material je Kachel-Set, Gefühl.
-- **Tests:** `node --test test/campbuilder.test.js` (7), `node tools/campbuilder_test.mjs [--shots]` (17 Prüfungen: Hügel, Senke, Malen, Abtragen, Zurück/Vor, Zurückspulen, Material-Rad, Uhr, Menü, Parzelle wächst, Steuerkreuz, leise Oberfläche, Speichern + Laden, Touch).
-- **Noch nicht** (nächste Scheiben): Ruinen-Bauteil, Deko-Stücke, Farbrad, Leyla, Wege-Anzeige, Fotomodus.
+- **Tests:** `node --test test/campbuilder.test.js` (7), `node tools/campbuilder_test.mjs [--shots]` (21 Prüfungen: Ruinen, Werkzeug-Rad, Hügel, Senke, Malen, Abtragen, Zurück/Vor, Zurückspulen, Material-Rad, Uhr, Menü, Parzelle wächst, Steuerkreuz, leise Oberfläche, Speichern + Laden, Touch).
+- **Ruinen** (Scheibe 2a, 28.11.2026): Werkzeug-Rad mit RB halten (Boden formen · Ruine), Touch: „Ruine“ in der Leiste. Mit der Ruine: A am Boden setzt die Ecke, zur Seite ziehen = Breite, hoch ziehen = Höhe (mindestens 3 × 3), antippen = Standard-Ruine 5 × 6. Gebaut aus dem aktuellen Material: Pfeiler an beiden Enden, Decken alle vier Reihen mit Lücken, gezackte Oberkante (eine Seite bricht stärker weg), innen dunklere Rückwand (neue Ebene `back` im Modell, eigene Zeichenketten im Speicherformat) mit Fensterlöchern; wo der Boden tiefer liegt, ein Fundament. Wächst Reihe für Reihe von unten nach oben, jede Stufe ein Ton. B über einer Rückwand nimmt sie weg. Alles ist echter Boden: Leyla kann später darin klettern (`model.js` › `ruinTargets`, `reshape`).
+- **Noch nicht** (nächste Scheiben): Deko-Stücke zum Setzen, Verschieben und Vergrößern, Farbrad, Leyla, Wege-Anzeige, Fotomodus.
 
 ## Quellen
 

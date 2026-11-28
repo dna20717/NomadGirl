@@ -8,6 +8,7 @@ const PAD = { grid: [10, 6], file: 'projects/nomadgirl/assets/ui/pad_icons.png' 
 const PAD_NAMES = ['xbox_0', 'xbox_1', 'xbox_2', 'xbox_3', 'xbox_4', 'xbox_5', 'xbox_6', 'xbox_7', 'xbox_8', 'xbox_9', 'stadia_0', 'stadia_1', 'stadia_2', 'stadia_3', 'stadia_4', 'stadia_5', 'stadia_6', 'stadia_7', 'stadia_8', 'stadia_9',
   'ps_0', 'ps_1', 'ps_2', 'ps_3', 'ps_4', 'ps_5', 'ps_6', 'ps_7', 'ps_8', 'ps_9', 'switch_0', 'switch_1', 'switch_2', 'switch_3', 'switch_4', 'switch_5', 'switch_6', 'switch_7', 'switch_8', 'switch_9',
   'stick_l', 'stick_l_up', 'stick_l_down', 'stick_l_left', 'stick_l_right', 'stick_l_press', 'stick_r', 'stick_r_up', 'stick_r_down', 'stick_r_left', 'stick_r_right', 'stick_r_press', 'dpad', 'dpad_up', 'dpad_down', 'dpad_left', 'dpad_right'];
+export const TOOLS = [{ id: 'ground', name: 'Boden formen', icon: 'mountain', hint: 'Malen, Hügel, Senken' }, { id: 'ruin', name: 'Ruine', icon: 'building', hint: 'Ecke setzen, zur Seite und hoch ziehen' }];
 const BTN = { a: 0, b: 1, x: 2, y: 3, lb: 4, rb: 5, lt: 6, rt: 7, select: 8, start: 9 };
 const hh = h => { const m = Math.round((((h % 24) + 24) % 24) * 60); return `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -16,10 +17,10 @@ export class Hud {
   constructor(root, base) {
     this.root = root; this.base = base; this.menuOpen = false; this.wheelOpen = false; this.awake = 0; this.thumbs = new Map();
     root.innerHTML = `
-      <div class="cb-chip" data-chip><canvas width="96" height="72"></canvas><div><b data-name></b><span class="cb-keys" data-keys></span></div></div>
+      <div class="cb-chip" data-chip><canvas width="96" height="72"></canvas><div><b data-name></b><span class="cb-tool" data-tool></span><span class="cb-keys" data-keys></span></div></div>
       <div class="cb-hints" data-hints></div>
       <div class="cb-clock" data-clock><svg viewBox="0 0 300 140" aria-hidden="true"><path d="M30 130 A120 120 0 0 1 270 130" class="cb-arc"/><path d="M30 130 A120 120 0 0 1 270 130" class="cb-arc-lit" data-lit/><circle r="11" data-sun class="cb-sun"/></svg><div class="cb-time" data-time></div><div class="cb-clock-hint" data-chint></div></div>
-      <div class="cb-wheel" data-wheel><div class="cb-wheel-ring" data-ring></div><div class="cb-wheel-mid"><b data-wname></b><span data-whint></span></div></div>
+      <div class="cb-wheel" data-wheel><div class="cb-wheel-ring" data-ring></div><div class="cb-wheel-mid"><b data-wname></b><small data-wsub></small><span data-whint></span></div></div>
       <div class="cb-menu" data-menu></div>
       <div class="cb-sound" data-sound>${icon('muted', 16).outerHTML}<span>Für Ton einmal tippen oder eine Taste drücken</span></div>
       <div class="cb-saved" data-saved>${icon('cloud', 16).outerHTML}</div>
@@ -69,6 +70,8 @@ export class Hud {
     const cv = this.$('chip').querySelector('canvas'), g = cv.getContext('2d');
     g.clearRect(0, 0, 96, 72); if (kit) g.drawImage(this.thumb(set, kit), 0, 0);
     this.$('name').textContent = name;
+    const T0 = TOOLS.find(t => t.id === s.tool) || TOOLS[0];
+    this.$('tool').innerHTML = `${icon(T0.icon, 14).outerHTML}${T0.name}`;
     this.$('keys').innerHTML = `${this.btn('lb', 22)}${this.btn('rb', 22)}`;
     this.$('chip').classList.add('flash'); setTimeout(() => this.$('chip').classList.remove('flash'), 260);
     const tc = this.root.querySelector('[data-tset] canvas'); if (tc && kit) { const t = tc.getContext('2d'); t.clearRect(0, 0, 96, 72); t.drawImage(this.thumb(set, kit), 0, 0); }
@@ -77,38 +80,42 @@ export class Hud {
   hints() {
     this.$('hints').innerHTML = [
       [this.pad('stick_l'), 'Fliegen'], [this.btn('a'), 'Auftragen · hochziehen'], [this.btn('b'), 'Abtragen · runterziehen'],
-      [this.btn('lb'), 'Material'], [this.btn('y'), 'Uhr'], [this.btn('select'), 'Zurück'], [this.btn('x'), 'Vor'], [this.btn('lt') + this.btn('rt'), 'Zoom'],
+      [this.btn('lb'), 'Material'], [this.btn('rb'), 'halten: Werkzeug'], [this.btn('y'), 'Uhr'], [this.btn('select'), 'Zurück'], [this.btn('x'), 'Vor'], [this.btn('lt') + this.btn('rt'), 'Zoom'],
     ].map(([k, t]) => `<span>${k}<i>${t}</i></span>`).join('');
   }
 
   // ---------- the material wheel ----------
-  openWheel(current) {
-    const s = this.scene, sets = s.sets, ring = this.$('ring'), n = sets.length;
-    this.wheelOpen = true; this.aim = sets.indexOf(current);
-    ring.innerHTML = sets.map((id, i) => {
+  // kind 'set': the Kachel-Sets (LB held) · 'tool': the tools (RB held)
+  openWheel(kind = 'set') {
+    const s = this.scene, ring = this.$('ring');
+    this.wheelKind = kind;
+    this.wheelItems = kind === 'tool' ? TOOLS.map(t => ({ id: t.id, name: t.name, sub: t.hint, icon: t.icon })) : s.sets.map(id => ({ id, name: s.data_.terrain?.[id]?.name || id }));
+    const list = this.wheelItems, n = list.length, R = n <= 4 ? 150 : 230;
+    this.wheelOpen = true; this.aim = Math.max(0, list.findIndex(it => it.id === (kind === 'tool' ? s.tool : s.set)));
+    ring.innerHTML = list.map((it, i) => {
       const a = -Math.PI / 2 + i / n * Math.PI * 2;
-      return `<button class="cb-slice" data-i="${i}" style="--x:${Math.cos(a) * 230}px;--y:${Math.sin(a) * 230}px"></button>`;
+      return `<button class="cb-slice${it.icon ? ' cb-slice-tool' : ''}" data-i="${i}" style="--x:${Math.cos(a) * R}px;--y:${Math.sin(a) * R}px">${it.icon ? icon(it.icon, 34).outerHTML : ''}</button>`;
     }).join('');
     ring.querySelectorAll('.cb-slice').forEach((b, i) => {
-      b.append(this.thumb(sets[i], s.view.kitOf(sets[i])).cloneNode());
-      b.querySelector('canvas').getContext('2d').drawImage(this.thumb(sets[i], s.view.kitOf(sets[i])), 0, 0);
-      b.addEventListener('pointerdown', e => { e.preventDefault(); this.aim = i; this.paintAim(); s.chooseSet(sets[i]); this.closeWheel(); });
+      if (!list[i].icon) { const th = this.thumb(list[i].id, s.view.kitOf(list[i].id)), c = th.cloneNode(); c.getContext('2d').drawImage(th, 0, 0); b.append(c); }
+      b.addEventListener('pointerdown', e => { e.preventDefault(); this.aim = i; this.paintAim(); const id = this.closeWheel(); if (kind === 'tool') s.chooseTool(id); else s.chooseSet(id); });
     });
     this.$('wheel').classList.add('open');
-    this.$('whint').innerHTML = `${this.pad('stick_r', 22)} wählen · ${this.btn('lb', 22)} loslassen`;
+    this.$('whint').innerHTML = `${this.pad('stick_r', 22)} wählen · ${this.btn(kind === 'tool' ? 'rb' : 'lb', 22)} loslassen`;
     this.paintAim();
   }
   wheelAim(x, y) {
     if (Math.hypot(x, y) < 0.4) return;
-    const n = this.scene.sets.length, a = Math.atan2(y, x) + Math.PI / 2, i = ((Math.round(a / (Math.PI * 2) * n) % n) + n) % n;
+    const n = this.wheelItems.length, a = Math.atan2(y, x) + Math.PI / 2, i = ((Math.round(a / (Math.PI * 2) * n) % n) + n) % n;
     if (i !== this.aim) { this.aim = i; this.paintAim(); this.scene.tones?.play('move'); this.scene.input_.rumble(0.08, 12, this.scene.cfg.haptics); }
   }
   paintAim() {
-    const s = this.scene;
+    const it = this.wheelItems[this.aim];
     this.$('ring').querySelectorAll('.cb-slice').forEach((b, i) => b.classList.toggle('on', i === this.aim));
-    this.$('wname').textContent = s.data_.terrain?.[s.sets[this.aim]]?.name || '';
+    this.$('wname').textContent = it?.name || '';
+    this.$('wsub').textContent = it?.sub || '';
   }
-  closeWheel() { this.wheelOpen = false; this.$('wheel').classList.remove('open'); return this.scene.sets[this.aim]; }
+  closeWheel() { this.wheelOpen = false; this.$('wheel').classList.remove('open'); return this.wheelItems?.[this.aim]?.id; }
 
   // ---------- the sun ----------
   showClock(on, time) {
@@ -172,12 +179,12 @@ export class Hud {
   touchBar() {
     const el = this.$('touch'), s = this.scene;
     el.innerHTML = `<button data-tset><canvas width="96" height="72"></canvas></button>
-      <div class="cb-seg"><button data-tool="a" class="on">${icon('plus', 18).outerHTML}<span>Auftragen</span></button><button data-tool="b">${icon('eraser', 18).outerHTML}<span>Abtragen</span></button></div>
+      <div class="cb-seg"><button data-tool="a" class="on">${icon('plus', 18).outerHTML}<span>Auftragen</span></button><button data-tool="r">${icon('building', 18).outerHTML}<span>Ruine</span></button><button data-tool="b">${icon('eraser', 18).outerHTML}<span>Abtragen</span></button></div>
       <button data-tundo>${icon('undo', 18).outerHTML}</button><button data-tredo>${icon('redo', 18).outerHTML}</button><button data-tsun>${icon('sun', 18).outerHTML}</button><button data-tmenu>${icon('menu', 18).outerHTML}</button>`;
     this.tool = 'a';
     const tap = (sel, f) => el.querySelector(sel).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); s.tones?.unlock(); f(); });
-    tap('[data-tset]', () => this.wheelOpen ? this.closeWheel() : this.openWheel(s.set));
-    el.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); this.tool = b.dataset.tool; el.querySelectorAll('[data-tool]').forEach(x => x.classList.toggle('on', x === b)); s.tones?.play('select'); }));
+    tap('[data-tset]', () => this.wheelOpen ? this.closeWheel() : this.openWheel('set'));
+    el.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); const t = b.dataset.tool; this.tool = t === 'b' ? 'b' : 'a'; if (t !== 'b') s.chooseTool(t === 'r' ? 'ruin' : 'ground'); el.querySelectorAll('[data-tool]').forEach(x => x.classList.toggle('on', x === b)); s.tones?.play('select'); }));
     tap('[data-tundo]', () => s.back()); tap('[data-tredo]', () => s.forth());
     tap('[data-tsun]', () => { s.setHour(s.hour + 1.5); this.showClock(true, s.time.now); });
     tap('[data-tmenu]', () => this.menuOpen ? this.closeMenu() : this.openMenu());

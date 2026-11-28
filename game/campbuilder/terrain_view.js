@@ -4,7 +4,7 @@
 // columns. A change redraws only the chunks around it. room.ox keeps every variant and dice roll tied to the world column.
 // New tiles pop in (squash & stretch) on their own sprite until the chunk is drawn again; removed tiles crumble.
 import { drawRoom, terrainKits } from '../play/art.js';
-import { setAt, solid, top, bottom } from './model.js';
+import { setAt, solid, top, bottom, backAt } from './model.js';
 
 export const CH = 12, PAD = 3, AIR = 3;
 const mod = (i, n) => ((i % n) + n) % n;
@@ -20,11 +20,12 @@ export class TerrainView {
   setDetails(on, redraw = true) {
     this.details = on;
     const D = this.s.data_, D2 = on ? D : { ...D, terrain: Object.fromEntries(Object.entries(D.terrain || {}).map(([k, t]) => [k, { ...t, clutterChance: 0, decalChance: 0, bigChance: 0 }])) };
-    this.kits = terrainKits(this.s, D2);
+    this.kits = terrainKits(this.s, D2); this.backs = new Map();
     if (redraw) this.all();
   }
   kitOf(set) { return this.kits(set) || this.kits(this.m.base); }
-  backOf(x) { const k = this.kitOf(setAt(this.m, x, bottom(this.m))); return k ? { ...k, shade: 58 } : null; }
+  backOf(x) { return this.backKit(setAt(this.m, x, bottom(this.m)), 58); }
+  backKit(set, shade = 46) { const id = set + ':' + shade; this.backs ||= new Map(); if (!this.backs.has(id)) { const k = this.kitOf(set); this.backs.set(id, k ? { ...k, shade } : null); } return this.backs.get(id); }
   range() { const [x0, x1] = this.m.parcel; return [Math.floor((x0 - this.margin) / CH), Math.floor((x1 + this.margin) / CH)]; }
   all() { const [a, b] = this.range(); for (let c = a; c <= b; c++) this.dirty.add(c); }
   // a tile changed: its chunk and the neighbours that see it in their padding
@@ -48,7 +49,9 @@ export class TerrainView {
     for (let y = 0; y < h; y++) { let r = ''; for (let x = 0; x < w; x++) r += solid(m, wx0 + x, wy0 + y) ? '#' : '.'; tiles.push(r); }
     const room = { w, h, tiles, ox: wx0, start: null };
     // below the old ground line air shows the earth behind it (dug holes, caves): the back wall of the set the column ends in
-    const terrain = { at: (x, y) => { const v = setAt(m, wx0 + x, wy0 + y); return v ? this.kitOf(v) : null; }, back: (x, y) => wy0 + y >= 0 && !solid(m, wx0 + x, wy0 + y) ? this.backOf(wx0 + x) : null };
+    // a ruin's back wall where it was built; below the old ground line the earth of the column
+    const terrain = { at: (x, y) => { const v = setAt(m, wx0 + x, wy0 + y); return v ? this.kitOf(v) : null; },
+      back: (x, y) => { const X = wx0 + x, Y = wy0 + y; if (solid(m, X, Y)) return null; const b = backAt(m, X, Y); return b ? this.backKit(b) : Y >= 0 ? this.backOf(X) : null; } };
     const res = drawRoom(s, room, T, {}, null, terrain);
     for (const L of res.layers || []) { const lx = L.x, ly = L.y; L.setCrop(PAD * T - lx, 0, CH * T, h * T + 64); L.setPosition(wx0 * T + lx, wy0 * T + ly); L.setDepth(-10); }
     const old = this.chunks.get(c);
@@ -57,10 +60,10 @@ export class TerrainView {
     this.bakes++;
   }
   // the frame a tile shows (as drawRoom picks it without autotiling): the surface where air is above, else the fill
-  frameOf(x, y, set) {
+  frameOf(x, y, set, back = false) {
     const k = this.kitOf(set);
     if (!k) return null;
-    const list = !solid(this.m, x, y - 1) ? k.top : k.fill;
+    const list = !back && !solid(this.m, x, y - 1) ? k.top : k.fill;
     return { key: k.key, frame: list[mod(x, list.length)], over: k.over };
   }
   // the colour of a set's dust: the middle of its surface tile, measured once
@@ -78,19 +81,21 @@ export class TerrainView {
     return col;
   }
   // a new tile pops in from the ground: squashed, then it springs to its size
-  pop(x, y, set, delay = 0) {
-    const s = this.s, T = this.T, f = this.frameOf(x, y, set);
+  pop(x, y, set, delay = 0, back = false) {
+    const s = this.s, T = this.T, f = this.frameOf(x, y, set, back);
     if (!f || !s.textures.exists(f.key)) return;
-    const img = s.add.image(x * T + T / 2, y * T + T, f.key, f.frame).setOrigin(0.5, 1).setDepth(-9.6).setScale(1.22, 0.12).setAlpha(0.85);
+    const img = s.add.image(x * T + T / 2, y * T + T, f.key, f.frame).setOrigin(0.5, 1).setDepth(back ? -10.6 : -9.6).setScale(1.22, 0.12).setAlpha(0.85);
+    if (back) img.setTint(0x6a6470);
     const p = { img, x, v: Infinity, born: s.time.now };
     s.tweens.add({ targets: img, scaleX: 1, scaleY: 1, alpha: 1, duration: 260, delay, ease: 'Back.Out', easeParams: [2.2], onComplete: () => { p.v = this.version + 1; } });
     this.pops.push(p); this.touch(x);
   }
   // a tile goes: it crumbles down and fades, a few crumbs fly
-  crumble(x, y, set, delay = 0) {
-    const s = this.s, T = this.T, f = this.frameOf(x, y - 0, set);
+  crumble(x, y, set, delay = 0, back = false) {
+    const s = this.s, T = this.T, f = this.frameOf(x, y, set, back);
     if (!f || !s.textures.exists(f.key)) { this.touch(x); return; }
-    const img = s.add.image(x * T + T / 2, y * T + T, f.key, f.frame).setOrigin(0.5, 1).setDepth(-9.6);
+    const img = s.add.image(x * T + T / 2, y * T + T, f.key, f.frame).setOrigin(0.5, 1).setDepth(back ? -10.6 : -9.6);
+    if (back) img.setTint(0x6a6470);
     s.tweens.add({ targets: img, scaleX: 0.55, scaleY: 0.1, alpha: 0, y: img.y + 10, duration: 240, delay, ease: 'Quad.In', onComplete: () => img.destroy() });
     this.touch(x);
   }

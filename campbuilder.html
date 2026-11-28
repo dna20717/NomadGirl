@@ -24,6 +24,7 @@
   .cb-chip canvas { width: 64px; height: 48px; border-radius: 8px; image-rendering: pixelated; background: rgba(0,0,0,.25); }
   .cb-chip b { display: block; font-weight: 600; color: var(--ui-text-strong); }
   .cb-chip.flash { transform: scale(1.04); }
+  .cb-tool { display: flex; gap: 5px; align-items: center; margin-top: 2px; font-size: var(--ui-gr-s); color: var(--ui-text2); }
   .cb-keys { display: flex; gap: 4px; margin-top: 4px; opacity: .8; }
   .cb-pad { display: inline-block; vertical-align: middle; flex: none; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5)); }
   .cb-key { display: inline-block; min-width: 20px; padding: 1px 6px; border-radius: 6px; border: 1px solid var(--ui-border-strong); font-size: var(--ui-gr-s); text-align: center; }
@@ -55,6 +56,8 @@
   .cb-slice.on { transform: translate(var(--x), var(--y)) scale(1.18); border-color: var(--ui-acc-line); box-shadow: 0 0 0 2px var(--ui-acc), var(--ui-shadow); z-index: 2; }
   .cb-wheel-mid { position: absolute; text-align: center; }
   .cb-wheel-mid b { display: block; font: 34px/1.1 var(--ui-pixel); color: var(--ui-text-strong); text-shadow: 0 2px 10px rgba(0,0,0,.7); max-width: 300px; }
+  .cb-wheel-mid small { display: block; margin-top: 6px; color: var(--ui-text2); font-size: var(--ui-gr-s); }
+  .cb-slice-tool { display: grid; place-items: center; color: var(--ui-text-strong); }
   .cb-wheel-mid span { display: inline-flex; gap: 6px; align-items: center; margin-top: 8px; font-size: var(--ui-gr-s); color: var(--ui-text2); }
   /* the menu */
   .cb-menu { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; pointer-events: none; background: rgba(13,10,18,.35); }

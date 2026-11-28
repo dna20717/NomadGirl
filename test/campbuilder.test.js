@@ -1,7 +1,7 @@
 // CampBuilder v2 (#196): the diorama model (game/campbuilder/model.js)
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { newDiorama, solid, surface, begin, put, end, undo, redo, grow, snapshot, shapeHill, hillTargets, toJSON, fromJSON, metrics, setAt, bottom } from '../game/campbuilder/model.js';
+import { shapeRuin, backAt, newDiorama, solid, surface, begin, put, end, undo, redo, grow, snapshot, shapeHill, hillTargets, toJSON, fromJSON, metrics, setAt, bottom } from '../game/campbuilder/model.js';
 
 test('a new diorama: flat ground of the base set, the parcel in the middle, ground beyond it', () => {
   const m = newDiorama({ width: 20, depth: 5 }, { base: 'desert' });
@@ -86,4 +86,27 @@ test('save and load give the same ground; the metric counts', () => {
   assert.ok(M.relief >= 4);
   assert.ok(M.stand > 10);
   assert.equal(fromJSON({ v: 2 }), null);
+});
+
+test('a ruin: pillars, floors, a jagged top, back wall with windows; one step, saved with its back wall', () => {
+  const m = newDiorama({ width: 40 }, { seed: 4 });
+  const snap = snapshot(m, m.parcel[0], m.parcel[1]), base = new Map();
+  begin(m, 'ruin');
+  shapeRuin(m, { x0: 0, x1: 7, base: 0, height: 9, set: 'ruins', seed: 4 }, snap, base);
+  assert.equal(setAt(m, 0, -1), 'ruins', 'left pillar');
+  assert.equal(setAt(m, 7, -1), 'ruins', 'right pillar');
+  assert.equal(setAt(m, 3, -1), null, 'inside: air');
+  assert.equal(backAt(m, 3, -1), 'ruins', 'inside: back wall');
+  let walls = 0, windows = 0;
+  for (let x = 1; x < 7; x++) for (let y = -8; y < 0; y++) { if (setAt(m, x, y) == null && backAt(m, x, y) == null && y > -6) windows++; if (setAt(m, x, y)) walls++; }
+  assert.ok(windows > 0 && walls > 0, `windows ${windows}, walls ${walls}`);
+  shapeRuin(m, { x0: 0, x1: 3, base: 0, height: 4, set: 'ruins', seed: 4 }, snap, base);
+  assert.equal(setAt(m, 7, -1), null, 'smaller again: the far pillar is gone');
+  const st = end(m);
+  assert.ok(st.changes.some(c => c[4] === 1), 'back wall in the step');
+  const n = fromJSON(JSON.parse(JSON.stringify(toJSON(m))), m.cfg);
+  assert.deepEqual([...n.back].sort(), [...m.back].sort());
+  undo(m);
+  assert.equal(m.back.size, 0);
+  assert.equal(setAt(m, 0, -1), null);
 });
