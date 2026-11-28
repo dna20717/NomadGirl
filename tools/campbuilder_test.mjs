@@ -7,7 +7,7 @@ import { chromium } from 'playwright';
 
 const url = (process.env.CB_URL || 'http://localhost:8766/campbuilder.html');
 const shots = process.argv.includes('--shots');
-const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
+const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required'] });
 const page = await browser.newPage({ viewport: { width: 1600, height: 900 } });
 const errors = [], ok = [];
 page.on('pageerror', e => errors.push(e.message));
@@ -100,7 +100,7 @@ await shot('wheel_after');
 // the sun: Y held, the stick turns the hour; night comes
 r = await ev(async () => {
   const cb = campbuilder, h0 = cb.state().hour; cb.press('y'); cb.stick(1, 0);
-  const t0 = performance.now(); while (performance.now() - t0 < 900) { cb.step(1); await new Promise(res => setTimeout(res, 16)); }
+  const t0 = performance.now(); while (performance.now() - t0 < 1400) { cb.step(1); await new Promise(res => setTimeout(res, 16)); }
   const open = document.querySelector('[data-clock]').classList.contains('open');
   cb.stick(0, 0); cb.release('y'); cb.step(1);
   return { h0, h1: cb.state().hour, open, time: document.querySelector('[data-time]').textContent, veil: cb.scene().sky.veil };
@@ -141,6 +141,35 @@ await shot('ruin');
 r = await ev(() => { const cb = campbuilder, n = cb.model().back.size; cb.press('select'); cb.step(1); cb.release('select'); cb.step(1); const after = cb.model().back.size; cb.press('x'); cb.step(1); cb.release('x'); cb.step(1); return { n, after, again: cb.model().back.size }; });
 check('Ruine: zurück und vor samt Rückwand', r.after < r.n && r.again === r.n, r);
 await ev(() => { const s = campbuilder.scene(); s.chooseTool('ground'); });
+
+// three layers: the left stick pressed switches stage → foreground → background; painting goes into that layer; Y tapped opens
+// and closes the facades; a box of ground gets a back wall by itself
+r = await ev(() => {
+  const cb = campbuilder, s = cb.scene(), m = cb.model(), M = cb.M, out = {};
+  cb.press('ls'); cb.step(1); cb.release('ls'); cb.step(1); out.l1 = s.layer;
+  cb.at(20, -3); cb.press('a'); cb.step(2); for (let x = 21; x <= 23; x++) { cb.at(x, -3); cb.step(1); } cb.release('a'); cb.step(2);
+  out.front = M.frontAt(m, 22, -3); out.stage = M.solid(m, 22, -3);
+  cb.press('ls'); cb.step(1); cb.release('ls'); cb.step(1); out.l2 = s.layer;
+  cb.at(20, -6); cb.press('a'); cb.step(2); cb.release('a'); cb.step(2); out.back = M.backAt(m, 20, -6);
+  cb.press('ls'); cb.step(1); cb.release('ls'); cb.step(1); out.l3 = s.layer;
+  const f0 = s.facade; cb.press('y'); cb.step(1); cb.release('y'); cb.step(1); out.f = [f0, s.facade];
+  cb.press('y'); cb.step(1); cb.release('y'); cb.step(1); cb.press('y'); cb.step(1); cb.release('y'); cb.step(1); out.f.push(s.facade);
+  // a box: walls left, right, a roof; inside gets a back wall of its own
+  while (m.parcel[1] < 56) M.grow(m, m.parcel[1]);
+  M.begin(m); for (let y = -5; y < 0; y++) { M.put(m, 40, y, 'concrete'); M.put(m, 46, y, 'concrete'); } for (let x = 40; x <= 46; x++) M.put(m, x, -5, 'concrete'); M.end(m);
+  out.inside = M.enclosedSet(m, 43, -2, cb.scene().cfg.enclose); out.outside = M.enclosedSet(m, 52, -2, cb.scene().cfg.enclose);
+  s.view.all(); s.view.update(s.time.now, true);
+  out.fronts = [...s.view.front.values()].filter(l => l.length).length;
+  out.audio = s.tones.state();
+  return out;
+});
+check('Ebenen: L-Stick drücken wechselt Bühne → Vordergrund → Hintergrund', r.l1 === 'f' && r.l2 === 'b' && r.l3 === 'c', r);
+check('Ebenen: malen geht in die gewählte Ebene', r.front && !r.stage && r.back && r.fronts >= 1, r);
+check('Fassaden: Y tippen schaltet um, Halten bleibt die Uhr', r.f[0] === 'auto' && r.f[1] === 'open' && r.f[2] === 'auto', r);
+check('Automatischer Hintergrund in eingeschlossenen Flächen', r.inside === 'concrete' && r.outside === null, r);
+check('Klang läuft (Handwerk statt Instrument)', r.audio.running && r.audio.played > 5, r.audio);
+await ev(() => { campbuilder.at(43, -3); campbuilder.step(3); });
+await shot('layers');
 
 // the menu: Start opens, details off redraws the ground, B closes
 r = await ev(() => {

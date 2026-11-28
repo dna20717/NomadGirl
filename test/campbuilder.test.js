@@ -1,7 +1,7 @@
 // CampBuilder v2 (#196): the diorama model (game/campbuilder/model.js)
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { shapeRuin, backAt, newDiorama, solid, surface, begin, put, end, undo, redo, grow, snapshot, shapeHill, hillTargets, toJSON, fromJSON, metrics, setAt, bottom } from '../game/campbuilder/model.js';
+import { enclosedSet, frontAt, OPEN, shapeRuin, backAt, newDiorama, solid, surface, begin, put, end, undo, redo, grow, snapshot, shapeHill, hillTargets, toJSON, fromJSON, metrics, setAt, bottom } from '../game/campbuilder/model.js';
 
 test('a new diorama: flat ground of the base set, the parcel in the middle, ground beyond it', () => {
   const m = newDiorama({ width: 20, depth: 5 }, { base: 'desert' });
@@ -109,4 +109,27 @@ test('a ruin: pillars, floors, a jagged top, back wall with windows; one step, s
   undo(m);
   assert.equal(m.back.size, 0);
   assert.equal(setAt(m, 0, -1), null);
+});
+
+test('three layers: foreground and background are their own maps, undone and saved like the stage', () => {
+  const m = newDiorama({ width: 20 });
+  begin(m); put(m, 2, -2, 'metal', 'f'); put(m, 3, -2, 'ruins', 'b'); put(m, 4, -2, 'desert'); const st = end(m);
+  assert.deepEqual(st.changes.map(c => c[4] ?? 0).sort(), [0, 1, 2]);
+  assert.equal(frontAt(m, 2, -2), 'metal'); assert.equal(backAt(m, 3, -2), 'ruins'); assert.equal(solid(m, 2, -2), false, 'the foreground does not carry');
+  const n = fromJSON(JSON.parse(JSON.stringify(toJSON(m))), m.cfg);
+  assert.equal(frontAt(n, 2, -2), 'metal'); assert.equal(backAt(n, 3, -2), 'ruins');
+  undo(m); assert.equal(m.front.size + m.back.size, 0);
+});
+
+test('automatic background: air shut in on most sides gets a wall of the set around it, open air and windows do not', () => {
+  const m = newDiorama({ width: 30 });
+  begin(m);
+  for (let y = -5; y < 0; y++) { put(m, 0, y, 'ruins'); put(m, 6, y, 'ruins'); }
+  for (let x = 0; x <= 6; x++) put(m, x, -5, 'ruins');
+  end(m);
+  assert.equal(enclosedSet(m, 3, -2), 'ruins');
+  assert.equal(enclosedSet(m, 12, -2), null, 'open desert air');
+  put(m, 3, -3, OPEN, 'b');
+  assert.equal(enclosedSet(m, 3, -3), null, 'a window stays open');
+  assert.equal(backAt(m, 3, -3), null);
 });

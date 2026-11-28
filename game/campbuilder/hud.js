@@ -9,6 +9,8 @@ const PAD_NAMES = ['xbox_0', 'xbox_1', 'xbox_2', 'xbox_3', 'xbox_4', 'xbox_5', '
   'ps_0', 'ps_1', 'ps_2', 'ps_3', 'ps_4', 'ps_5', 'ps_6', 'ps_7', 'ps_8', 'ps_9', 'switch_0', 'switch_1', 'switch_2', 'switch_3', 'switch_4', 'switch_5', 'switch_6', 'switch_7', 'switch_8', 'switch_9',
   'stick_l', 'stick_l_up', 'stick_l_down', 'stick_l_left', 'stick_l_right', 'stick_l_press', 'stick_r', 'stick_r_up', 'stick_r_down', 'stick_r_left', 'stick_r_right', 'stick_r_press', 'dpad', 'dpad_up', 'dpad_down', 'dpad_left', 'dpad_right'];
 export const TOOLS = [{ id: 'ground', name: 'Boden formen', icon: 'mountain', hint: 'Malen, Hügel, Senken' }, { id: 'ruin', name: 'Ruine', icon: 'building', hint: 'Ecke setzen, zur Seite und hoch ziehen' }];
+export const LAYER_NAMES = { c: 'Bühne', f: 'Vordergrund', b: 'Hintergrund' };
+const FACADE = { auto: 'Fassaden: um AvA offen', open: 'Fassaden: durchsichtig', closed: 'Fassaden: zu' };
 const BTN = { a: 0, b: 1, x: 2, y: 3, lb: 4, rb: 5, lt: 6, rt: 7, select: 8, start: 9 };
 const hh = h => { const m = Math.round((((h % 24) + 24) % 24) * 60); return `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -23,6 +25,7 @@ export class Hud {
       <div class="cb-wheel" data-wheel><div class="cb-wheel-ring" data-ring></div><div class="cb-wheel-mid"><b data-wname></b><small data-wsub></small><span data-whint></span></div></div>
       <div class="cb-menu" data-menu></div>
       <div class="cb-sound" data-sound>${icon('muted', 16).outerHTML}<span>Für Ton einmal tippen oder eine Taste drücken</span></div>
+      <div class="cb-flash" data-flash></div>
       <div class="cb-saved" data-saved>${icon('cloud', 16).outerHTML}</div>
       <div class="cb-touch" data-touch></div>
       <div class="cb-hello" data-hello><div class="cb-hello-card"><div class="cb-title">CampBuilder</div><p>Bau dein Camp. Ohne Eile, ohne Grenzen.</p><p class="cb-hello-how" data-how></p><p class="cb-go" data-go></p></div></div>`;
@@ -71,7 +74,8 @@ export class Hud {
     g.clearRect(0, 0, 96, 72); if (kit) g.drawImage(this.thumb(set, kit), 0, 0);
     this.$('name').textContent = name;
     const T0 = TOOLS.find(t => t.id === s.tool) || TOOLS[0];
-    this.$('tool').innerHTML = `${icon(T0.icon, 14).outerHTML}${T0.name}`;
+    this.$('tool').innerHTML = `${icon(T0.icon, 14).outerHTML}${s.layer === 'c' ? T0.name : 'Malen'}<i class="cb-layer l-${s.layer}">${icon('layers', 14).outerHTML}${LAYER_NAMES[s.layer]}</i>`;
+    const tl = this.root.querySelector('[data-tlayer] span'); if (tl) tl.textContent = LAYER_NAMES[s.layer];
     this.$('keys').innerHTML = `${this.btn('lb', 22)}${this.btn('rb', 22)}`;
     this.$('chip').classList.add('flash'); setTimeout(() => this.$('chip').classList.remove('flash'), 260);
     const tc = this.root.querySelector('[data-tset] canvas'); if (tc && kit) { const t = tc.getContext('2d'); t.clearRect(0, 0, 96, 72); t.drawImage(this.thumb(set, kit), 0, 0); }
@@ -80,7 +84,7 @@ export class Hud {
   hints() {
     this.$('hints').innerHTML = [
       [this.pad('stick_l'), 'Fliegen'], [this.btn('a'), 'Auftragen · hochziehen'], [this.btn('b'), 'Abtragen · runterziehen'],
-      [this.btn('lb'), 'Material'], [this.btn('rb'), 'halten: Werkzeug'], [this.btn('y'), 'Uhr'], [this.btn('select'), 'Zurück'], [this.btn('x'), 'Vor'], [this.btn('lt') + this.btn('rt'), 'Zoom'],
+      [this.btn('lb'), 'Material'], [this.btn('rb'), 'halten: Werkzeug'], [this.pad('stick_l_press'), 'Ebene'], [this.btn('y'), 'tippen: Fassaden · halten: Uhr'], [this.btn('select'), 'Zurück'], [this.btn('x'), 'Vor'], [this.btn('lt') + this.btn('rt'), 'Zoom'],
     ].map(([k, t]) => `<span>${k}<i>${t}</i></span>`).join('');
   }
 
@@ -180,11 +184,13 @@ export class Hud {
     const el = this.$('touch'), s = this.scene;
     el.innerHTML = `<button data-tset><canvas width="96" height="72"></canvas></button>
       <div class="cb-seg"><button data-tool="a" class="on">${icon('plus', 18).outerHTML}<span>Auftragen</span></button><button data-tool="r">${icon('building', 18).outerHTML}<span>Ruine</span></button><button data-tool="b">${icon('eraser', 18).outerHTML}<span>Abtragen</span></button></div>
-      <button data-tundo>${icon('undo', 18).outerHTML}</button><button data-tredo>${icon('redo', 18).outerHTML}</button><button data-tsun>${icon('sun', 18).outerHTML}</button><button data-tmenu>${icon('menu', 18).outerHTML}</button>`;
+      <button data-tlayer>${icon('layers', 18).outerHTML}<span>Bühne</span></button><button data-tfacade>${icon('auge', 18).outerHTML}</button><button data-tundo>${icon('undo', 18).outerHTML}</button><button data-tredo>${icon('redo', 18).outerHTML}</button><button data-tsun>${icon('sun', 18).outerHTML}</button><button data-tmenu>${icon('menu', 18).outerHTML}</button>`;
     this.tool = 'a';
     const tap = (sel, f) => el.querySelector(sel).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); s.tones?.unlock(); f(); });
     tap('[data-tset]', () => this.wheelOpen ? this.closeWheel() : this.openWheel('set'));
     el.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); const t = b.dataset.tool; this.tool = t === 'b' ? 'b' : 'a'; if (t !== 'b') s.chooseTool(t === 'r' ? 'ruin' : 'ground'); el.querySelectorAll('[data-tool]').forEach(x => x.classList.toggle('on', x === b)); s.tones?.play('select'); }));
+    tap('[data-tlayer]', () => s.cycleLayer());
+    tap('[data-tfacade]', () => s.setFacade({ auto: 'open', open: 'closed', closed: 'auto' }[s.facade]));
     tap('[data-tundo]', () => s.back()); tap('[data-tredo]', () => s.forth());
     tap('[data-tsun]', () => { s.setHour(s.hour + 1.5); this.showClock(true, s.time.now); });
     tap('[data-tmenu]', () => this.menuOpen ? this.closeMenu() : this.openMenu());
@@ -223,5 +229,7 @@ export class Hud {
     this.$('sound').classList.toggle('show', !!s.tones && !s.tones.running && time > 2500);
     this.root.classList.toggle('nopad', !s.input_.padSeen);
   }
+  // a short quiet line in the middle (the facades switched)
+  flash(mode) { const el = this.$('flash'); el.innerHTML = `${icon(mode === 'closed' ? 'door' : 'auge', 16).outerHTML}${FACADE[mode] || mode}`; el.classList.add('show'); clearTimeout(this.flashT); this.flashT = setTimeout(() => el.classList.remove('show'), 1300); }
   saved(ok) { const el = this.$('saved'); el.classList.toggle('bad', !ok); el.classList.add('show'); clearTimeout(this.savedT); this.savedT = setTimeout(() => el.classList.remove('show'), 1400); }
 }

@@ -7,9 +7,10 @@
   "view": { "zoom": [38, 115], "start": 72, "zoomSpeed": 120, "pan": 1400, "parallax": "wueste", "details": true },
   "clock": { "start": 18.2, "speed": 5 },
   "music": { "enabled": true, "bpm": 72, "volume": 34, "root": 62, "chords": "I vi IV V" },
-  "tones": { "volume": 70, "grid": 16, "wait": 70 },
+  "tones": { "volume": 80, "musical": 0, "grid": 16, "wait": 70 },
   "haptics": { "enabled": true, "strength": 60 },
   "hud": { "fade": 3.5 },
+  "enclose": { "enabled": true, "percent": 75, "reach": 10 },
   "save": { "after": 2.5, "slot": 1 },
   "materials": [
     { "set": "desert", "material": "sand" },

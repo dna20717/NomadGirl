@@ -1,7 +1,7 @@
 // CampBuilder v2 (#196): the sound, all from code (Web Audio). A slow pad plays the chords of CampBuilder › Klang › Akkorde, a
 // little wind lies under it; every building step plays a note of the same major pentatonic (in it any sequence sounds right), drawn
-// a little onto the beat (at most to the next 1/16, CampBuilder › Klang › Auf den Takt), so the building plays along with the music.
-// Under the note the material speaks (sand trickles, stone clicks, metal rings: CampBuilder › Material je Kachel-Set).
+// The building itself sounds like craft (foley from code: weight, material, crumbs; CampBuilder › Material je Kachel-Set); a note
+// of the music's pentatonic can lie under it (CampBuilder › Klang › Musikalisch, 0 = none), drawn onto the beat.
 //   const t = new Tones(cfg); t.unlock() on a user gesture · t.play('add', { degree, material }) · t.music(on) · t.state()
 // Silent and harmless without an AudioContext (tests, before the first gesture): nothing throws, play() returns null.
 
@@ -123,33 +123,8 @@ export class Tones {
     const s = c.createGain(); s.gain.value = send; g.connect(s); s.connect(this.verb);
     a.start(when); b.start(when); a.stop(when + dur + 0.05); b.stop(when + dur + 0.05);
   }
-  noise(when, { type = 'lowpass', freq = 800, q = 0.8, vel = 0.3, dur = 0.08, to = null }) {
-    const c = this.ctx, src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
-    src.buffer = this.noiseBuf; src.playbackRate.value = 0.8 + Math.random() * 0.4;
-    f.type = type; f.frequency.setValueAtTime(freq, when); if (to) f.frequency.exponentialRampToValueAtTime(to, when + dur); f.Q.value = q;
-    g.gain.setValueAtTime(0.0001, when); g.gain.exponentialRampToValueAtTime(vel, when + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
-    src.connect(f); f.connect(g); g.connect(this.sfxBus); src.start(when, Math.random()); src.stop(when + dur + 0.05);
-  }
-  thump(when, freq = 90, vel = 0.4, dur = 0.14) {
-    const c = this.ctx, o = c.createOscillator(), g = c.createGain();
-    o.type = 'sine'; o.frequency.setValueAtTime(freq * 1.6, when); o.frequency.exponentialRampToValueAtTime(freq, when + 0.05);
-    g.gain.setValueAtTime(0.0001, when); g.gain.exponentialRampToValueAtTime(vel, when + 0.005); g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
-    o.connect(g); g.connect(this.sfxBus); o.start(when); o.stop(when + dur + 0.05);
-  }
-  ring(when, freq, vel = 0.12) {   // metal: inharmonic partials that ring on
-    for (const [k, a] of [[1, 1], [2.76, 0.5], [5.4, 0.25]]) this.pluck(freq * k, when, { vel: vel * a, dur: 0.9, bright: 0.6, send: 0.6 });
-  }
-  material(m, when, vel = 1, down = false) {
-    const v = Math.min(1, vel);
-    if (m === 'sand') { this.noise(when, { type: 'highpass', freq: 2600, vel: 0.11 * v, dur: 0.16 }); this.thump(when, 80, 0.16 * v); }
-    else if (m === 'earth') { this.noise(when, { freq: 700, vel: 0.2 * v, dur: 0.1, to: 200 }); this.thump(when, 70, 0.3 * v); }
-    else if (m === 'stone') { this.noise(when, { type: 'bandpass', freq: 2200, q: 2, vel: 0.22 * v, dur: 0.04 }); this.thump(when, 110, 0.2 * v, 0.08); }
-    else if (m === 'concrete') { this.noise(when, { type: 'bandpass', freq: 1300, q: 1.4, vel: 0.2 * v, dur: 0.06 }); this.thump(when, 85, 0.3 * v, 0.12); }
-    else if (m === 'metal') { this.ring(when, down ? 330 : 520, 0.06 * v); this.thump(when, 95, 0.18 * v, 0.1); }
-    else if (m === 'wood') { this.noise(when, { type: 'bandpass', freq: 900, q: 3, vel: 0.2 * v, dur: 0.07 }); this.pluck(180, when, { vel: 0.08 * v, dur: 0.12 }); }
-    else if (m === 'glass') this.pluck(1760, when, { vel: 0.06 * v, dur: 0.5, send: 0.8 });
-  }
-  // on the beat: the next 1/16 (CampBuilder › Klang › Auf den Takt), unless that is further than „Höchstens warten“
+  // on the beat: the next 1/16 (CampBuilder › Klang › Auf den Takt), unless that is further than „Höchstens warten“ (only for the
+  // optional note under the craft, Klang › Musikalisch; the craft itself sounds at once)
   when() {
     const c = this.ctx, now = c.currentTime + 0.005, g = this.beat * 4 / (this.cfg.tones?.grid || 16), wait = (this.cfg.tones?.wait ?? 70) / 1000;
     const next = this.t0 + Math.ceil((now - this.t0) / g) * g;
@@ -160,20 +135,76 @@ export class Tones {
     const ch = this.chords[this.chordIndex()], L = ladder(this.root + 12, ch), list = warm ? L.warm : L.all, mid = Math.floor(list.length / 3);
     return list[Math.max(0, Math.min(list.length - 1, mid + Math.round(degree)))];
   }
-  // kind: add · remove · hill · dig · grow · undo · redo · select · move · menu · open
-  play(kind, { degree = 0, material = 'sand', vel = 1 } = {}) {
+
+  // ---------- the craft (Daniel, 28.11.2026: „mehr handwerklich satt klingen und wenig wie ein Instrument“) ----------
+  // Every sound is built from layers like a foley take: the weight (a low thump that drops in pitch), the material's own voice
+  // (sand pours, stone clacks, metal clanks, wood knocks), then a tail of crumbs that settle. Each take varies a little (pitch, time,
+  // how many crumbs), so a stroke over many tiles never sounds like a machine. Panned to where AvA works.
+  bus(pan = 0) {
+    const c = this.ctx;
+    if (!c.createStereoPanner) return this.sfxBus;
+    const p = c.createStereoPanner(); p.pan.value = Math.max(-0.8, Math.min(0.8, pan)); p.connect(this.sfxBus);
+    setTimeout(() => { try { p.disconnect(); } catch { /* gone */ } }, 3000);
+    return p;
+  }
+  burst(at, out, { type = 'bandpass', freq = 1000, q = 1, vel = 0.2, dur = 0.05, to = null, attack = 0.002 }) {
+    const c = this.ctx, src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    src.buffer = this.noiseBuf; src.playbackRate.value = 0.75 + Math.random() * 0.5;
+    f.type = type; f.frequency.setValueAtTime(freq, at); if (to) f.frequency.exponentialRampToValueAtTime(to, at + dur); f.Q.value = q;
+    g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(vel, at + attack); g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+    src.connect(f); f.connect(g); g.connect(out); src.start(at, Math.random() * 1.5); src.stop(at + dur + 0.05);
+  }
+  weight(at, out, freq = 70, vel = 0.4, dur = 0.16) {
+    const c = this.ctx, o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(freq * 2.2, at); o.frequency.exponentialRampToValueAtTime(freq, at + 0.04);
+    g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(vel, at + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+    o.connect(g); g.connect(out); o.start(at); o.stop(at + dur + 0.05);
+  }
+  knock(at, out, freq, vel = 0.2, dur = 0.07) {   // a short tuned body: wood, brick, a hollow pillar
+    const c = this.ctx, o = c.createOscillator(), g = c.createGain();
+    o.type = 'triangle'; o.frequency.setValueAtTime(freq * 1.15, at); o.frequency.exponentialRampToValueAtTime(freq, at + 0.02);
+    g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(vel, at + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+    o.connect(g); g.connect(out); o.start(at); o.stop(at + dur + 0.05);
+  }
+  clank(at, out, base, vel = 0.1, dur = 0.35) {   // sheet metal: a few inharmonic partials, a little different every time
+    for (const r of [1, 2.13 + Math.random() * 0.2, 3.7 + Math.random() * 0.4, 5.9]) {
+      const c = this.ctx, o = c.createOscillator(), g = c.createGain();
+      o.type = 'sine'; o.frequency.value = base * r;
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(vel / r, at + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, at + dur / Math.sqrt(r));
+      o.connect(g); g.connect(out); o.start(at); o.stop(at + dur + 0.05);
+    }
+  }
+  crumbs(at, out, n = 5, spread = 0.22, freq = 3000, vel = 0.05) {   // little pieces that settle after the hit
+    for (let i = 0; i < n; i++) { const t = at + 0.03 + Math.pow(Math.random(), 1.6) * spread; this.burst(t, out, { freq: freq * (0.6 + Math.random() * 0.8), q: 3, vel: vel * (1 - (t - at) / (spread + 0.1)), dur: 0.012 + Math.random() * 0.02 }); }
+  }
+  // one take of a material: kind 'set' (a tile goes in), 'take' (a tile comes out), 'heave' (the ground rises a step), 'sink'
+  craft(m, kind, at, out, k = 1) {
+    const v = Math.min(1.3, k), j = 0.92 + Math.random() * 0.16, take = kind === 'take' || kind === 'sink', heavy = kind === 'heave' || kind === 'sink';
+    const W = { sand: 60, earth: 58, stone: 85, concrete: 52, metal: 75, wood: 95, glass: 110 }[m] || 70;
+    if (!take) this.weight(at, out, W * j, (heavy ? 0.5 : 0.34) * v, heavy ? 0.24 : 0.15);
+    if (m === 'sand') { this.burst(at, out, { type: 'lowpass', freq: 2200 * j, to: 500, vel: 0.16 * v, dur: take ? 0.32 : 0.22, attack: 0.012 }); this.crumbs(at, out, take ? 9 : 4, 0.3, 4200, 0.035 * v); }
+    else if (m === 'earth') { this.burst(at, out, { type: 'lowpass', freq: 900 * j, to: 250, vel: 0.22 * v, dur: 0.14 }); this.crumbs(at, out, take ? 10 : 6, 0.28, 2600, 0.05 * v); }
+    else if (m === 'stone') { this.burst(at, out, { freq: 2300 * j, q: 2.2, vel: 0.26 * v, dur: 0.03 }); this.knock(at, out, 240 * j, 0.14 * v, 0.06); this.crumbs(at, out, take ? 8 : 3, 0.22, 3400, 0.045 * v); }
+    else if (m === 'concrete') { this.burst(at, out, { freq: 1100 * j, q: 1.2, vel: 0.24 * v, dur: 0.07, to: 600 }); this.knock(at, out, 150 * j, 0.12 * v, 0.08); this.crumbs(at, out, take ? 10 : 5, 0.3, 2800, 0.05 * v); }
+    else if (m === 'metal') { this.clank(at, out, (take ? 210 : 260) * j, 0.11 * v, heavy ? 0.5 : 0.32); this.burst(at, out, { freq: 3500, q: 1, vel: 0.06 * v, dur: 0.04 }); if (take) this.burst(at + 0.05, out, { freq: 1800, q: 6, vel: 0.05, dur: 0.18, to: 900 }); }
+    else if (m === 'wood') { this.knock(at, out, 190 * j, 0.24 * v, 0.09); this.burst(at, out, { freq: 1300 * j, q: 3, vel: 0.16 * v, dur: 0.05 }); if (take) this.burst(at + 0.04, out, { freq: 700, q: 8, vel: 0.06, dur: 0.22, to: 1100 }); }
+    else if (m === 'glass') { this.clank(at, out, 1200 * j, 0.04 * v, 0.4); this.crumbs(at, out, take ? 9 : 2, 0.25, 6000, 0.04 * v); }
+    if (heavy) this.burst(at + 0.02, out, { type: 'lowpass', freq: 500, to: 160, vel: 0.12 * v, dur: 0.35, attack: 0.03 });   // the ground grinds as it moves
+  }
+  // kind: add · remove · hill · dig · grow · undo · redo · select · move · menu · open; pan −1 … 1
+  play(kind, { degree = 0, material = 'sand', vel = 1, pan = 0 } = {}) {
     this.log.push(kind);
     if (this.log.length > 200) this.log.shift();
     const c = this.ctx;
     if (!c || c.state !== 'running' || !this.tonesOn) return null;
-    const at = this.when();
-    if (kind === 'add' || kind === 'hill') { this.pluck(hz(this.note(degree)), at, { vel: 0.32 * vel }); this.material(material, at, vel); }
-    else if (kind === 'remove' || kind === 'dig') { this.pluck(hz(this.note(degree, false) - 12), at, { vel: 0.22 * vel, dur: 0.7, bright: 0.6 }); this.material(material, at, vel * 0.9, true); this.noise(at + 0.03, { freq: 1200, vel: 0.06, dur: 0.25, to: 300 }); }
-    else if (kind === 'grow') { const n = this.note(4); for (let i = 0; i < 3; i++) this.pluck(hz(n + [0, 5, 12][i]), at + i * this.beat / 4, { vel: 0.16, dur: 1.4, send: 0.8 }); }
-    else if (kind === 'undo' || kind === 'redo') { const up = kind === 'redo'; this.noise(at, { type: 'bandpass', freq: up ? 600 : 1800, q: 1, vel: 0.08, dur: 0.18, to: up ? 1800 : 500 }); this.pluck(hz(this.note(degree)), at, { vel: 0.12, dur: 0.4, bright: 0.5 }); }
-    else if (kind === 'select') this.pluck(hz(this.note(degree)), now(c), { vel: 0.14, dur: 0.35 });
-    else if (kind === 'move') this.noise(now(c), { type: 'bandpass', freq: 2400, q: 4, vel: 0.025, dur: 0.03 });
-    else if (kind === 'menu' || kind === 'open') { this.pluck(hz(this.note(kind === 'open' ? 2 : 0)), now(c), { vel: 0.12, dur: 0.5 }); }
+    const at = now(c), out = this.bus(pan), mus = (this.cfg.tones?.musical ?? 0) / 100;
+    if (kind === 'add' || kind === 'hill') { this.craft(material, kind === 'hill' ? 'heave' : 'set', at, out, vel); if (mus) this.pluck(hz(this.note(degree)), this.when(), { vel: 0.3 * mus * vel }); }
+    else if (kind === 'remove' || kind === 'dig') { this.craft(material, kind === 'dig' ? 'sink' : 'take', at, out, vel); if (mus) this.pluck(hz(this.note(degree, false) - 12), this.when(), { vel: 0.2 * mus * vel, dur: 0.7, bright: 0.6 }); }
+    else if (kind === 'grow') { for (let i = 0; i < 2; i++) { this.knock(at + i * 0.16, out, 170, 0.26, 0.1); this.burst(at + i * 0.16, out, { freq: 1500, q: 2, vel: 0.12, dur: 0.04 }); } this.weight(at + 0.32, out, 55, 0.25, 0.2); }
+    else if (kind === 'undo' || kind === 'redo') { const up = kind === 'redo'; this.burst(at, out, { freq: up ? 500 : 1600, q: 1.4, vel: 0.07, dur: 0.16, to: up ? 1600 : 450 }); this.craft(material, up ? 'set' : 'take', at + 0.06, out, 0.45); }
+    else if (kind === 'select') { this.knock(at, out, 900, 0.08, 0.03); this.burst(at, out, { freq: 3800, q: 5, vel: 0.05, dur: 0.02 }); this.knock(at + 0.05, out, 1300, 0.05, 0.03); }
+    else if (kind === 'move') this.burst(at, out, { freq: 3200, q: 5, vel: 0.03, dur: 0.015 });
+    else if (kind === 'menu' || kind === 'open') { this.burst(at, out, { type: 'lowpass', freq: kind === 'open' ? 900 : 400, to: kind === 'open' ? 2200 : 200, vel: 0.06, dur: 0.18, attack: 0.03 }); this.knock(at + 0.03, out, kind === 'open' ? 700 : 480, 0.05, 0.04); }
     return at;
   }
 }

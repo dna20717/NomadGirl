@@ -48,10 +48,11 @@ export class BuilderScene extends Phaser.Scene {
     this.m = this.args.model;
     this.sets = Object.keys(this.data_.terrain || {});
     this.set = this.sets.includes(this.args.set) ? this.args.set : this.m.base;
-    this.tool = 'ground';
+    this.tool = 'ground'; this.layer = 'c'; this.facade = 'auto';
     this.mats = new Map((C.materials || []).map(r => [r.set, r.material]));
     this.sky = new Sky(this, null, this.data_, C);
-    this.view = new TerrainView(this, this.m, { details: C.view?.details !== false, margin: Math.ceil(W / ((C.view?.zoom?.[0] ?? 38) / 100) / T / 2) + 4 });
+    this.view = new TerrainView(this, this.m, { enclose: C.enclose, details: C.view?.details !== false, margin: Math.ceil(W / ((C.view?.zoom?.[0] ?? 38) / 100) / T / 2) + 4 });
+    this.makeHole();
     this.view.update(0, true);
     this.under = this.add.graphics().setDepth(-9);
     this.drawUnder();
@@ -82,6 +83,33 @@ export class BuilderScene extends Phaser.Scene {
     this.g = null; this.repeat = {}; this.idle = 0; this.saveAt = 0; this.notes = 0; this.lastNote = 0; this.stats = { gestures: 0 };
     this.hud?.attach(this);
     this.events.emit('ready');
+  }
+  // the foreground opens like the rig (Daniel, 28.11.2026: „die Mechanik wieder auf, dass man Gebäude öffnen und schließen kann“):
+  // auto = a soft hole around AvA, open = see-through, closed = whole. Y tapped switches.
+  makeHole() {
+    if (!this.textures.exists('cb_hole')) {
+      const t = this.textures.createCanvas('cb_hole', 256, 256), g = t.getContext(), r = g.createRadialGradient(128, 128, 20, 128, 128, 128);
+      r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(0.55, 'rgba(255,255,255,0.9)'); r.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = r; g.fillRect(0, 0, 256, 256); t.refresh();
+    }
+    this.hole = this.make.image({ x: 0, y: 0, key: 'cb_hole', add: false }).setScale(3.2);
+    try { this.holeMask = new Phaser.Display.Masks.BitmapMask(this, this.hole); this.holeMask.invertAlpha = true; } catch { this.holeMask = null; }
+    this.setFacade('auto', false);
+  }
+  setFacade(mode, sound = true) {
+    this.facade = mode;
+    const box = this.view.frontBox, editing = this.layer === 'f';
+    if (mode === 'auto' && this.holeMask && !editing) box.setMask(this.holeMask); else box.clearMask();
+    this.tweens.add({ targets: box, alpha: mode === 'open' && !editing ? 0.16 : 1, duration: 420, ease: 'Sine.InOut' });
+    if (sound) { this.tones?.play(mode === 'closed' ? 'menu' : 'open'); this.input_.rumble(0.12, 20, this.cfg.haptics); this.hud?.flash?.(mode); }
+  }
+  cycleLayer() {
+    const order = ['c', 'f', 'b'];
+    this.layer = order[(order.indexOf(this.layer) + 1) % order.length];
+    this.setFacade(this.facade, false);
+    this.hud?.setMaterial(this.set, this.view.kitOf(this.set));
+    this.tones?.play('select', { degree: order.indexOf(this.layer) });
+    this.input_.rumble(0.14, 22, this.cfg.haptics);
   }
   zoomRange() { const z = this.cfg.view?.zoom || [38, 115]; return [z[0] / 100, z[1] / 100]; }
   material(set) { return this.mats.get(set) || 'stone'; }
@@ -132,7 +160,10 @@ export class BuilderScene extends Phaser.Scene {
     if (hud?.menuOpen) { hud.menuNav(I, time); this.frame(dt, time); return; }
     if (I.pressed('start')) { this.endGesture(); hud?.openMenu(); this.tones?.play('open'); this.frame(dt, time); return; }
     // the sun: Y held, the sticks turn the hour
-    const clock = I.down('y') && !this.g;
+    if (I.released('y') && !this.clockUsed && !this.g) this.setFacade({ auto: 'open', open: 'closed', closed: 'auto' }[this.facade]);
+    if (!I.down('y')) this.clockUsed = false;
+    const clock = I.down('y') && I.heldFor('y', time) > 220 && !this.g;
+    if (clock) this.clockUsed = true;
     hud?.showClock(clock, time);
     if (clock) {
       const v = (Math.abs(I.left[0]) > Math.abs(I.right[0]) ? I.left[0] : I.right[0]) + (I.down('right') ? 1 : 0) - (I.down('left') ? 1 : 0);
@@ -152,6 +183,7 @@ export class BuilderScene extends Phaser.Scene {
     if (!I.down('select')) this.rewindAt = null;
     if (I.pressed('x')) { this.endGesture(); this.forth(); }
     if (I.pressed('rs')) this.recenter = true;
+    if (I.pressed('ls')) this.cycleLayer();
     // zoom and view
     const zv = (I.rt - I.lt) * (C.view?.zoomSpeed ?? 120) / 100;
     if (zv) this.zoom = clamp(this.zoom * Math.exp(zv * dt / 1000), ...this.zoomRange());
@@ -203,7 +235,8 @@ export class BuilderScene extends Phaser.Scene {
       const c = this.cell(), s = M.solid(this.m, c.x, c.y), above = M.solid(this.m, c.x, c.y - 1), below = M.solid(this.m, c.x, c.y + 1);
       const surf = s && !above ? c.y : !s && below ? c.y + 1 : null;
       this.g = { btn: a ? 'a' : 'b', mode: 'pending', start: { ...this.cur }, cell: c, surf, t: time, last: null };
-      if (a && this.tool === 'ruin') this.startRuin();
+      if (this.layer !== 'c') { this.g.surf = null; this.startPaint(); }
+      else if (a && this.tool === 'ruin') this.startRuin();
       else if (surf == null) this.startPaint();
       return;
     }
@@ -240,6 +273,17 @@ export class BuilderScene extends Phaser.Scene {
   }
   paintCell({ x, y }) {
     const m = this.m, add = this.g.btn === 'a';
+    if (this.layer !== 'c') {   // foreground and background: a layer of its own, nothing to carry
+      const l = this.layer, get = l === 'f' ? M.frontAt : M.backAt, was = get(m, x, y);
+      if (add ? was === this.set : was == null) return;
+      this.edge(x);
+      if (!M.put(m, x, y, add ? this.set : null, l)) return;
+      if (add) this.view.pop(x, y, this.set, 0, l); else this.view.crumble(x, y, was, 0, l);
+      this.puff(x * T + T / 2, y * T + T, add ? this.set : was, add ? 4 : 6);
+      this.note(add ? 'add' : 'remove', -y, add ? this.set : was, 0.7);
+      this.input_.rumble(add ? 0.18 : 0.15, 20, this.cfg.haptics);
+      return;
+    }
     if (add && M.solid(m, x, y)) return;
     if (!add && !M.solid(m, x, y)) {   // B over air: a back wall there goes
       const b = M.backAt(m, x, y);
@@ -320,7 +364,7 @@ export class BuilderScene extends Phaser.Scene {
   forth() { const s = M.redo(this.m); if (s) this.replay(s, false); }
   replay(step, back) {
     const ch = step.changes, xs = ch.map(c => c[0]), mid = xs.length ? (Math.min(...xs) + Math.max(...xs)) / 2 : 0;
-    for (const [x, y, b, a, l] of ch) { const now = back ? b : a, was = back ? a : b, d = Math.abs(x - mid) * 10; if (now == null) this.view.crumble(x, y, was, d, !!l); else this.view.pop(x, y, now, d, !!l); }
+    for (const [x, y, b, a, l] of ch) { const now = back ? b : a, was = back ? a : b, d = Math.abs(x - mid) * 10; if (now == null) this.view.crumble(x, y, was, d, l || 'c'); else this.view.pop(x, y, now, d, l || 'c'); }
     const top = ch.reduce((h, c) => Math.max(h, -c[1]), -99);
     this.tones?.play(back ? 'undo' : 'redo', { degree: top });
     this.input_.rumble(0.16, 26, this.cfg.haptics);
@@ -371,7 +415,8 @@ export class BuilderScene extends Phaser.Scene {
     const now = this.time.now;
     if (!force && now - this.lastNote < 70) return;
     this.lastNote = now; this.notes++;
-    this.tones?.play(kind, { degree, material: this.material(set), vel });
+    const cam = this.cam, pan = ((this.cur.x - cam.worldView.x) / cam.worldView.width - 0.5) * 1.4;   // where AvA works, left or right
+    this.tones?.play(kind, { degree, material: this.material(set), vel, pan });
   }
   puff(x, y, set, n = 8) { this.dust.setParticleTint(this.view.dustOf(set)); this.dust.emitParticleAt(x, y, n); }
   crumble(x, y, set, n = 6, side = 0) {
@@ -400,6 +445,7 @@ export class BuilderScene extends Phaser.Scene {
     this.drone.build = { x: c.x, y: c.y - (C.above ?? 92), smooth: 0.22 };
     this.drone.update(time, dt);
     this.drawCursor(time);
+    if (this.hole) this.hole.setPosition(c.x, c.y);
     // sky and light in screen space, counter-scaled against the zoom
     const z = cam.zoom, cx = W / 2, cy = H / 2, scr = (sx, sy) => [cx + (sx - cx) / z, cy + (sy - cy) / z];
     const gy = (0 - cam.worldView.y) * z;
@@ -418,8 +464,8 @@ export class BuilderScene extends Phaser.Scene {
   drawCursor(time) {
     const g = this.ghost.clear(), b = this.beam.clear(), gd = this.guide.clear(), c = this.cell(), m = this.m, G = this.g;
     const px = c.x * T, py = c.y * T, breathe = 0.5 + 0.5 * Math.sin(time / 420);
-    const remove = G ? G.btn === 'b' : M.solid(m, c.x, c.y);
-    const col = remove ? 0x7ff6ff : 0xffd541;
+    const remove = G ? G.btn === 'b' : this.layer === 'f' ? !!M.frontAt(m, c.x, c.y) : this.layer === 'b' ? !!M.backAt(m, c.x, c.y) : M.solid(m, c.x, c.y);
+    const col = this.layer === 'f' ? (remove ? 0xff9ad0 : 0xff7ac0) : this.layer === 'b' ? (remove ? 0xb8b0ff : 0x9a8cff) : remove ? 0x7ff6ff : 0xffd541;
     // the light from AvA down onto the tile
     const dx = this.drone.x, dy = this.drone.y + 18;
     b.fillStyle(col, 0.07 + 0.04 * breathe).fillTriangle(dx - 10, dy, dx + 10, dy, px + T, py + T).fillTriangle(dx - 10, dy, px, py + T, px + T, py + T);
@@ -430,12 +476,12 @@ export class BuilderScene extends Phaser.Scene {
     g.lineStyle(3, 0xffffff, a * 0.8);
     for (const [cx, cy, sx, sy] of [[px, py, 1, 1], [px + T, py, -1, 1], [px, py + T, 1, -1], [px + T, py + T, -1, -1]]) g.beginPath().moveTo(cx + sx * 4, cy + sy * 16).lineTo(cx + sx * 4, cy + sy * 4).lineTo(cx + sx * 16, cy + sy * 4).strokePath();
     // the tile that A would add, as a ghost
-    const f = !remove && !M.solid(m, c.x, c.y) ? this.view.frameOf(c.x, c.y, this.set) : null;
-    if (f && !G && this.tool === 'ground') { this.ghostImg.setVisible(true).setTexture(f.key, f.frame).setPosition(px + T / 2, py + T).setAlpha(0.32 + 0.14 * breathe); }
+    const f = !remove && (this.layer !== 'c' || !M.solid(m, c.x, c.y)) ? this.view.frameOf(c.x, c.y, this.set, this.layer === 'b') : null;
+    if (f && !G && (this.tool === 'ground' || this.layer !== 'c')) { this.ghostImg.setVisible(true).setTexture(f.key, f.frame).setPosition(px + T / 2, py + T).setAlpha(0.32 + 0.14 * breathe); }
     else this.ghostImg.setVisible(false);
     // at the surface, while resting: little chevrons say „pull me up“
     const s = M.solid(m, c.x, c.y), surf = s && !M.solid(m, c.x, c.y - 1) ? c.y : !s && M.solid(m, c.x, c.y + 1) ? c.y + 1 : null;
-    if (!G && surf != null && this.idle > 500) {
+    if (!G && surf != null && this.idle > 500 && this.layer === 'c') {
       const y0 = (surf - 1) * T + 8 - (time / 40 % 14);
       for (let i = 0; i < 2; i++) g.lineStyle(3, 0xffd541, 0.35 * (1 - i * 0.4) * Math.min(1, (this.idle - 500) / 600)).beginPath().moveTo(px + T / 2 - 9, y0 - i * 12 + 6).lineTo(px + T / 2, y0 - i * 12 - 3).lineTo(px + T / 2 + 9, y0 - i * 12 + 6).strokePath();
     }
@@ -446,7 +492,7 @@ export class BuilderScene extends Phaser.Scene {
       for (const [cx, cy] of [[x0, y0], [x1, y0], [x0, y1], [x1, y1]]) gd.fillStyle(0xffd541, 0.9).fillCircle(cx, cy, 5);
     }
     // the ruin tool at rest: a little frame of a house above the tile
-    if (!G && this.tool === 'ruin') {
+    if (!G && this.tool === 'ruin' && this.layer === 'c') {
       const s0 = M.surface(m, c.x) * T, k = 0.5 + 0.2 * breathe;
       gd.lineStyle(2, 0xffd541, 0.3 * k).strokeRect(px, s0 - 6 * T, 5 * T, 6 * T);
     }
