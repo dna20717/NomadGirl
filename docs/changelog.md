@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 28.11.2026: **CampBuilder glatt** (#196): keine durchblitzenden Kacheln mehr, Bröckeln in vier Stücken, Zeichnen mit Zeitbudget und viermal schneller, AvA nickt beim Bauen, Pipette.
 - 28.11.2026: **Organische Übergänge** (#196): Kachel-Sets greifen mit Zungen und Klumpen ineinander, auch übereinander; im CampBuilder an, im Spiel je Kachel-Set einschaltbar.
 - 28.11.2026: **CampBuilder v2, Gebäude** (#196): vom Schuppen zum Hochhaus hochziehen, Bausätze aus Material-Kombinationen, Etagen, Tür, Treppen, Rückwand, Fassade mit Fenstern, Verfall.
 - 28.11.2026: **CampBuilder v2, Ebenen** (#196): Bauen klingt nach Handwerk (Foley aus Code), drei Ebenen Vordergrund / Bühne / Hintergrund, Fassaden öffnen und schließen (Y tippen), automatischer Hintergrund in eingeschlossenen Flächen.

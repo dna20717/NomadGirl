@@ -182,7 +182,7 @@ export class BuilderScene extends Phaser.Scene {
     if (I.down('select') && time > (this.rewindAt || Infinity)) { this.back(); this.rewindAt = time + Math.max(55, 200 - I.heldFor('select', time) / 12); }
     if (!I.down('select')) this.rewindAt = null;
     if (I.pressed('x')) { this.endGesture(); this.forth(); }
-    if (I.pressed('rs')) this.recenter = true;
+    if (I.pressed('rs')) this.pipette();
     if (I.pressed('ls')) this.cycleLayer();
     // zoom and view
     const zv = (I.rt - I.lt) * (C.view?.zoomSpeed ?? 120) / 100;
@@ -413,12 +413,22 @@ export class BuilderScene extends Phaser.Scene {
       this.input_.rumble(grewH || grewW ? 0.24 + H * 0.02 : 0.12, grewH ? 38 : 22, this.cfg.haptics);
     }
   }
+  // the pipette (rechter Stick drücken): the material and the layer under AvA, so one can go on with what is already there
+  pipette() {
+    const c = this.cell(), m = this.m, f = M.frontAt(m, c.x, c.y), st = M.setAt(m, c.x, c.y), b = M.backAt(m, c.x, c.y);
+    const [l, set] = f ? ['f', f] : st ? ['c', st] : b ? ['b', b] : [this.layer, null];
+    this.recenter = true;
+    if (!set) return;
+    if (l !== this.layer) { this.layer = l; this.setFacade(this.facade, false); }
+    if (set !== this.set) this.chooseSet(set); else this.hud?.setMaterial(this.set, this.view.kitOf(this.set));
+    this.hud?.flash(this.data_.terrain?.[set]?.name || set, 'picker');
+  }
   cycleSet(d) { const i = this.sets.indexOf(this.set); this.chooseSet(this.sets[(i + d + this.sets.length) % this.sets.length]); }
   // one note per moment at most (a stroke over many tiles is a melody, not a heap)
   note(kind, degree, set, vel = 1, force = false) {
     const now = this.time.now;
     if (!force && now - this.lastNote < 70) return;
-    this.lastNote = now; this.notes++;
+    this.lastNote = now; this.notes++; this.tap = Math.min(1, (this.tap || 0) + 0.7 * vel);
     const cam = this.cam, pan = ((this.cur.x - cam.worldView.x) / cam.worldView.width - 0.5) * 1.4;   // where AvA works, left or right
     this.tones?.play(kind, { degree, material: this.material(set), vel, pan });
   }
@@ -446,7 +456,9 @@ export class BuilderScene extends Phaser.Scene {
     const C = this.cfg.cursor || {};
     this.leyla.x = c.x + (c.vx > 0 ? 120 : -120); this.leyla.feet = c.y + 200; this.leyla.facing = c.vx >= 0 ? 1 : -1;
     this.leyla.state = this.idle > 9000 ? 'pose' : 'normal';
-    this.drone.build = { x: c.x, y: c.y - (C.above ?? 92), smooth: 0.22 };
+    // every building step AvA dips like a hammer stroke and springs back (this.tap decays smoothly, frame-rate independent)
+    this.tap = (this.tap || 0) * Math.pow(0.86, dt / 16.67);
+    this.drone.build = { x: c.x, y: c.y - (C.above ?? 92) + this.tap * 26, smooth: 0.22 + this.tap * 0.4 };
     this.drone.update(time, dt);
     this.drawCursor(time);
     if (this.hole) this.hole.setPosition(c.x, c.y);

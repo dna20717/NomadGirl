@@ -15,7 +15,7 @@ export class TerrainView {
   constructor(scene, model, { details = true, margin = 40, enclose = null, seams = null } = {}) {
     this.seams = seams; this.s = scene; this.m = model; this.T = 64; this.margin = margin; this.enclose = enclose; this.front = new Map();
     this.frontBox = scene.add.container(0, 0).setDepth(40);   // the foreground: over Leyla and the stage, under AvA
-    this.chunks = new Map(); this.dirty = new Set(); this.pops = []; this.lastBake = -1e9; this.version = 0; this.bakes = 0;
+    this.chunks = new Map(); this.dirty = new Set(); this.pops = []; this.hidden = new Map(); this.bakeMs = 0; this.budget = 6; this.lastBake = -1e9; this.version = 0; this.bakes = 0;
     this.dust = new Map();
     this.setDetails(details, false);
   }
@@ -38,30 +38,39 @@ export class TerrainView {
   // a tile changed: its chunk and the neighbours that see it in their padding
   // a tile changed: its chunk and the neighbours that see it in their padding (or whose automatic background it may close)
   touch(x) { const r = Math.max(PAD + 1, this.enclose?.enabled !== false && this.enclose ? this.enclose.reach ?? 10 : 0); for (let c = Math.floor((x - r) / CH); c <= Math.floor((x + r) / CH); c++) this.dirty.add(c); }
-  // once per frame: redraw what changed (at most every 90 ms while the hands are busy, so the frame rate stays smooth)
+  // once per frame: redraw what changed, nearest to the view first, within a time budget (a few ms per frame, at least one chunk),
+  // so the frame rate stays even while the hands are busy
   update(time, force = false) {
     const [a, b] = this.range();
     for (let c = a; c <= b; c++) if (!this.chunks.has(c)) this.dirty.add(c);
-    if (!this.dirty.size || (!force && time - this.lastBake < 90)) { this.settle(); return false; }
-    const list = [...this.dirty].sort((p, q) => Math.abs(p - this.focus(a, b)) - Math.abs(q - this.focus(a, b)));
-    const n = force ? list.length : Math.min(list.length, 4);
-    for (const c of list.slice(0, n)) { this.dirty.delete(c); if (c >= a && c <= b) this.bake(c); }
+    if (!this.dirty.size || (!force && !this.urgent && time - this.lastBake < 40)) { this.settle(); return false; }
+    this.urgent = false;
+    const f = this.focus(a, b), list = [...this.dirty].sort((p, q) => Math.abs(p - f) - Math.abs(q - f)), t0 = performance.now();
+    for (const c of list) {
+      if (!force && performance.now() - t0 > this.budget && c !== list[0]) break;
+      this.dirty.delete(c);
+      if (c < a || c > b) continue;
+      const t1 = performance.now(); this.bake(c); this.bakeMs = this.bakeMs * 0.8 + (performance.now() - t1) * 0.2;
+    }
     this.lastBake = time; this.version++;
     this.settle();
     return true;
   }
   focus(a, b) { const cam = this.s.cameras?.main; return cam ? Math.floor(cam.midPoint.x / this.T / CH) : (a + b) / 2; }
   bake(c) {
-    const s = this.s, m = this.m, T = this.T, wx0 = c * CH - PAD, wy0 = top(m) - AIR, w = CH + 2 * PAD, h = bottom(m) - wy0 + 1;
+    const s = this.s, m = this.m, T = this.T, wx0 = c * CH - PAD, w = CH + 2 * PAD, wy0 = this.topRow(wx0, w), h = bottom(m) - wy0 + 1;
     const E = this.enclose && this.enclose.enabled !== false ? this.enclose : null;
     const tiles = [];
-    for (let y = 0; y < h; y++) { let r = ''; for (let x = 0; x < w; x++) r += solid(m, wx0 + x, wy0 + y) ? '#' : '.'; tiles.push(r); }
+    // a tile still popping in counts as air here: the bake must not show it finished behind its own growing sprite
+    const H = this.hidden, sol = (X, Y) => solid(m, X, Y) && !(H.size && H.has('c|' + X + ',' + Y));
+    for (let y = 0; y < h; y++) { let r = ''; for (let x = 0; x < w; x++) r += sol(wx0 + x, wy0 + y) ? '#' : '.'; tiles.push(r); }
     // the background behind air: a wall built there (a ruin's inside); an open window stays open; air shut in on most sides gets a
     // wall of the set around it; below the old ground line the earth of the column
-    const terrain = { at: (x, y) => { const v = setAt(m, wx0 + x, wy0 + y); return v ? this.kitOf(v) : null; },
+    const terrain = { at: (x, y) => { const v = sol(wx0 + x, wy0 + y) ? setAt(m, wx0 + x, wy0 + y) : null; return v ? this.kitOf(v) : null; },
       back: (x, y) => {
         const X = wx0 + x, Y = wy0 + y;
-        if (solid(m, X, Y)) return null;
+        if (sol(X, Y)) return null;
+        if (H.size && H.has('b|' + X + ',' + Y)) return Y >= 0 ? this.backOf(X) : null;
         const raw = backRaw(m, X, Y);
         if (raw === OPEN) return null;
         if (raw) return this.backKit(raw);
@@ -79,16 +88,23 @@ export class TerrainView {
   }
   // a facade is a wall: only its fill, no crust on every window sill (the stripes looked like slabs)
   wallKit(set) { this.walls ||= new Map(); if (!this.walls.has(set)) { const k = this.plain(set) || this.kitOf(set); this.walls.set(set, k ? { ...k, top: k.fill, def: { ...k.def, autotile: { ...(k.def.autotile || {}), caps: false } } } : null); } return this.walls.get(set); }
+  // the highest row anything stands in (stage, background, foreground) over these columns, minus a margin of air: the sky above is
+  // not drawn (a flat chunk is 10 rows instead of 40; drawing time follows the size)
+  topRow(wx0, w) {
+    const m = this.m, t = top(m), b = bottom(m);
+    for (let y = t; y <= b; y++) for (let x = wx0 - 1; x <= wx0 + w; x++) if (solid(m, x, y) || backRaw(m, x, y) || frontAt(m, x, y)) return Math.max(t - AIR, y - AIR);
+    return b - AIR;
+  }
   place(layers, wx0, wy0, h, depth) { for (const L of layers || []) { const lx = L.x, ly = L.y; L.setCrop(PAD * this.T - lx, 0, CH * this.T, h * this.T + 64); L.setPosition(wx0 * this.T + lx, wy0 * this.T + ly); L.setDepth(depth); } }
   // the foreground of a chunk, drawn like ground of its own (edges, crust, depth), without clutter, into the foreground box
   bakeFront(c, wx0, wy0, w, h) {
     const m = this.m, old = this.front.get(c);
     let any = false;
     const tiles = [];
-    for (let y = 0; y < h; y++) { let r = ''; for (let x = 0; x < w; x++) { const f = frontAt(m, wx0 + x, wy0 + y); if (f && x >= PAD && x < w - PAD) any = true; r += f ? '#' : '.'; } tiles.push(r); }
+    for (let y = 0; y < h; y++) { let r = ''; for (let x = 0; x < w; x++) { const f = this.hidden.has('f|' + (wx0 + x) + ',' + (wy0 + y)) ? null : frontAt(m, wx0 + x, wy0 + y); if (f && x >= PAD && x < w - PAD) any = true; r += f ? '#' : '.'; } tiles.push(r); }
     let layers = [];
     if (any) {
-      const terrain = { at: (x, y) => { const v = frontAt(m, wx0 + x, wy0 + y); return v ? this.wallKit(v) : null; }, back: () => null };
+      const terrain = { at: (x, y) => { const v = tiles[y]?.[x] === '#' ? frontAt(m, wx0 + x, wy0 + y) : null; return v ? this.wallKit(v) : null; }, back: () => null };
       // out of the room counts as air for the foreground (it floats): rows of air around it
       const res = drawRoom(this.s, { w, h: h + 2, tiles: ['.'.repeat(w), ...tiles, '.'.repeat(w)], ox: wx0, start: null }, this.T, {}, null, { at: (x, y) => terrain.at(x, y - 1), back: () => null });
       layers = res.layers || [];
@@ -126,26 +142,52 @@ export class TerrainView {
     if (!f || !s.textures.exists(f.key)) return;
     const img = s.add.image(x * T + T / 2, y * T + T, f.key, f.frame).setOrigin(0.5, 1).setDepth(back ? -10.6 : L === 'f' ? 40.5 : -9.6).setScale(1.22, 0.12).setAlpha(0.85);
     if (back) img.setTint(0x6a6470); else if (L === 'f') img.setTint(0xd8d0d8);
-    const p = { img, x, v: Infinity, born: s.time.now };
-    s.tweens.add({ targets: img, scaleX: 1, scaleY: 1, alpha: 1, duration: 260, delay, ease: 'Back.Out', easeParams: [2.2], onComplete: () => { p.v = this.version + 1; } });
+    const k = L + '|' + x + ',' + y, prev = this.popAt?.get(k);
+    if (prev) this.dropPop(prev);
+    const p = { img, x, k, v: Infinity, born: s.time.now };
+    this.popAt ||= new Map(); this.popAt.set(k, p); this.hidden.set(k, p);
+    this.refit(x, y + 1, L);   // the tile under it, if it is still popping, loses its surface crust now
+    // grows out of the ground, overshoots a little, settles; then the chunk is drawn with the tile and the sprite fades into it
+    p.tw = s.tweens.add({ targets: img, scaleX: 1, scaleY: 1, alpha: 1, duration: 280, delay, ease: 'Back.Out', easeParams: [2.4],
+      onComplete: () => { if (this.hidden.get(k) === p) this.hidden.delete(k); this.popAt.delete(k); this.touch(x); p.v = this.version + 1; } });
     this.pops.push(p); this.touch(x);
   }
   // a tile goes: it crumbles down and fades, a few crumbs fly
+  // a popping tile shows what it will be: crust only while air is above it
+  refit(x, y, L) {
+    const p = this.popAt?.get(L + '|' + x + ',' + y);
+    if (!p || L === 'b') return;
+    const set = L === 'f' ? frontAt(this.m, x, y) : setAt(this.m, x, y), f = set && this.frameOf(x, y, set, L === 'f' ? 'f' : false);
+    if (f) p.img.setTexture(f.key, f.frame);
+  }
+  dropPop(p) { p.tw?.stop(); p.img.destroy(); this.hidden.delete(p.k); this.popAt?.delete(p.k); this.pops = this.pops.filter(q => q !== p); }
   crumble(x, y, set, delay = 0, layer = 'c') {
+    const pk = lay(layer) + '|' + x + ',' + y, popping = this.popAt?.get(pk);
+    if (popping) { this.dropPop(popping); this.touch(x); }   // it goes again before it had even settled: just let it go
+    this.refit(x, y + 1, lay(layer));
+    this.urgent = true;   // a tile that goes must leave the drawing right away, or it shows behind its own crumbling sprite
     const L = lay(layer), back = L === 'b', s = this.s, T = this.T, f = this.frameOf(x, y, set, L === 'f' ? 'f' : back);
     if (!f || !s.textures.exists(f.key)) { this.touch(x); return; }
-    const img = s.add.image(x * T + T / 2, y * T + T, f.key, f.frame).setOrigin(0.5, 1).setDepth(back ? -10.6 : L === 'f' ? 40.5 : -9.6);
-    if (back) img.setTint(0x6a6470); else if (L === 'f') img.setTint(0xd8d0d8);
-    s.tweens.add({ targets: img, scaleX: 0.55, scaleY: 0.1, alpha: 0, y: img.y + 10, duration: 240, delay, ease: 'Quad.In', onComplete: () => img.destroy() });
+    // it breaks into four pieces: each tips over, falls with a little gravity and fades (crop of the same frame, no new art)
+    const fr = s.textures.getFrame(f.key, f.frame), fw = fr.cutWidth, fh = fr.cutHeight, hw = fw / 2, hh = fh / 2, depth = back ? -10.6 : L === 'f' ? 40.5 : -9.6;
+    for (const [qx, qy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) {
+      const img = s.add.image(x * T + qx * hw + hw / 2, y * T - f.over + qy * hh + hh / 2, f.key, f.frame).setDepth(depth).setCrop(qx * hw, qy * hh, hw, hh)
+        .setOrigin((qx * hw + hw / 2) / fw, (qy * hh + hh / 2) / fh);
+      if (back) img.setTint(0x6a6470); else if (L === 'f') img.setTint(0xd8d0d8);
+      const side = qx ? 1 : -1, r = Math.random(), d = delay + qy * 25 + r * 30;
+      s.tweens.add({ targets: img, x: img.x + side * (10 + r * 22), angle: side * (18 + r * 40), duration: 360, delay: d, ease: 'Sine.Out' });
+      s.tweens.add({ targets: img, y: img.y + 46 + qy * 10 + r * 20, duration: 360, delay: d, ease: 'Quad.In' });
+      s.tweens.add({ targets: img, alpha: 0, scale: 0.7, duration: 200, delay: d + 170, ease: 'Sine.In', onComplete: () => img.destroy() });
+    }
     this.touch(x);
   }
   // pop sprites leave once their chunk has been drawn with the tile in it
   settle() {
     this.pops = this.pops.filter(p => {
       if (this.version < p.v || this.dirty.has(Math.floor(p.x / CH))) return true;
-      this.s.tweens.add({ targets: p.img, alpha: 0, duration: 120, onComplete: () => p.img.destroy() });
+      this.s.tweens.add({ targets: p.img, alpha: 0, duration: 90, onComplete: () => p.img.destroy() });
       return false;
     });
   }
-  destroy() { for (const ch of this.chunks.values()) for (const L of ch.layers) L.destroy(); this.chunks.clear(); for (const ls of this.front.values()) for (const L of ls) L.destroy(); this.front.clear(); for (const p of this.pops) p.img.destroy(); this.pops = []; }
+  destroy() { for (const ch of this.chunks.values()) for (const L of ch.layers) L.destroy(); this.chunks.clear(); for (const ls of this.front.values()) for (const L of ls) L.destroy(); this.front.clear(); for (const p of this.pops) { p.tw?.stop(); p.img.destroy(); } this.pops = []; this.hidden.clear(); this.popAt?.clear(); }
 }

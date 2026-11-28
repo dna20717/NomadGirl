@@ -84,7 +84,7 @@ export class Hud {
   hints() {
     this.$('hints').innerHTML = [
       [this.pad('stick_l'), 'Fliegen'], [this.btn('a'), 'Auftragen · hochziehen'], [this.btn('b'), 'Abtragen · runterziehen'],
-      [this.btn('lb'), 'Material'], [this.btn('rb'), 'halten: Werkzeug'], [this.pad('stick_l_press'), 'Ebene'], [this.btn('y'), 'tippen: Fassaden · halten: Uhr'], [this.btn('select'), 'Zurück'], [this.btn('x'), 'Vor'], [this.btn('lt') + this.btn('rt'), 'Zoom'],
+      [this.btn('lb'), 'Material'], [this.btn('rb'), 'halten: Werkzeug'], [this.pad('stick_l_press'), 'Ebene'], [this.btn('y'), 'tippen: Fassaden · halten: Uhr'], [this.pad('stick_r_press'), 'Pipette'], [this.btn('select'), 'Zurück'], [this.btn('x'), 'Vor'], [this.btn('lt') + this.btn('rt'), 'Zoom'],
     ].map(([k, t]) => `<span>${k}<i>${t}</i></span>`).join('');
   }
 

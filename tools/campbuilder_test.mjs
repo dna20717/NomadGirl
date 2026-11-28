@@ -148,7 +148,7 @@ await ev(() => { const s = campbuilder.scene(); s.chooseTool('ground'); });
 
 // three layers: the left stick pressed switches stage → foreground → background; painting goes into that layer; Y tapped opens
 // and closes the facades; a box of ground gets a back wall by itself
-r = await ev(() => {
+r = await ev(async () => {
   const cb = campbuilder, s = cb.scene(), m = cb.model(), M = cb.M, out = {};
   cb.press('ls'); cb.step(1); cb.release('ls'); cb.step(1); out.l1 = s.layer;
   cb.at(20, -3); cb.press('a'); cb.step(2); for (let x = 21; x <= 23; x++) { cb.at(x, -3); cb.step(1); } cb.release('a'); cb.step(2);
@@ -162,6 +162,7 @@ r = await ev(() => {
   while (m.parcel[1] < 56) M.grow(m, m.parcel[1]);
   M.begin(m); for (let y = -5; y < 0; y++) { M.put(m, 40, y, 'concrete'); M.put(m, 46, y, 'concrete'); } for (let x = 40; x <= 46; x++) M.put(m, x, -5, 'concrete'); M.end(m);
   out.inside = M.enclosedSet(m, 43, -2, cb.scene().cfg.enclose); out.outside = M.enclosedSet(m, 52, -2, cb.scene().cfg.enclose);
+  await new Promise(res => setTimeout(res, 900));   // the tiles pop in first, then the chunks are drawn with them
   s.view.all(); s.view.update(s.time.now, true);
   out.fronts = [...s.view.front.values()].filter(l => l.length).length;
   out.audio = s.tones.state();
@@ -209,6 +210,18 @@ check('Steuerkreuz: eine Kachel weiter, mittig', r.c1.x === r.c0.x + 1 && r.c1.y
 // HUD falls quiet when nothing happens
 await page.waitForTimeout(4200);
 check('Oberfläche wird leise', await ev(() => { campbuilder.step(1); return campbuilder.state().hud.quiet; }), null);
+
+// smooth: tiles still popping in stay out of the drawing (no finished tile behind its own growing sprite); afterwards nothing is
+// left over; drawing a chunk keeps to a small budget (headless software rendering: generous)
+r = await ev(async () => {
+  const cb = campbuilder, v = cb.scene().view; cb.at(-30, -1); cb.press('a'); cb.step(2); cb.at(-30, -4); cb.step(2);
+  const during = v.hidden.size; cb.release('a'); cb.step(1);
+  await new Promise(res => setTimeout(res, 1500)); cb.step(3); v.update(cb.scene().time.now, true); cb.step(3);
+  await new Promise(res => setTimeout(res, 300)); cb.step(2);
+  return { during, after: v.hidden.size, pops: v.pops.length, ms: v.bakeMs };
+});
+check('Glatt: ploppende Kacheln bleiben aus der Zeichnung, danach bleibt nichts hängen', r.during > 0 && r.after === 0 && r.pops === 0, r);
+check('Glatt: ein Abschnitt zeichnet sich schnell', r.ms < 40, r);
 
 // save and load again
 r = await ev(async () => { const ok = await campbuilder.save(); return { ok, m: campbuilder.state().metrics }; });
