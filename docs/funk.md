@@ -39,6 +39,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 28.11. Ava → Daniel: **#196 CampBuilder glatt**: keine durchblitzenden Kacheln, Bröckeln in vier Stücken, Zeichnen viermal schneller mit Zeitbudget (Logik je Bild 0,4 ms), AvA nickt beim Bauen, Pipette (R-Stick drücken). 29/29 Prüfungen. PixelLab 0.
 - 28.11. Ava → Daniel: **#196 CampBuilder Runde 2**: Bauen klingt nach Handwerk, drei Ebenen (L-Stick drücken), Fassaden auf/zu (Y tippen), automatischer Hintergrund, Gebäude vom Schuppen zum Hochhaus, organische Übergänge. ⚠️ vorläufig: Bausätze und Belegung. 27/27 Browser-Prüfungen, npm test 499/499, Camp-Test 13/13. PixelLab 0.
 - 28.11. Ava → Daniel: **#196 Ruinen im CampBuilder**: RB halten → Werkzeug „Ruine“, Ecke setzen, zur Seite und hoch ziehen. 21/21 Prüfungen. PixelLab 0.
 - 28.11. Ava → Daniel: **#196 CampBuilder v2, Scheibe 1 steht** unter `/campbuilder`: Boden malen, Hügel hochziehen, Senken graben, Musik mit Bau-Tönen, Sonnen-Uhr, Material-Rad, Zurückspulen, Speichern online. 17/17 Browser-Prüfungen. PixelLab 0.
