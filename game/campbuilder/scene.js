@@ -12,6 +12,7 @@ import { Drone } from '../play/drone.js';
 import * as M from './model.js';
 import { TerrainView, AIR } from './terrain_view.js';
 import { Sky } from './sky.js';
+import { Pieces, catalog } from './pieces.js';
 
 const T = 64;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -31,6 +32,7 @@ export class BuilderScene extends Phaser.Scene {
     for (const id of [DR.look, DR.face?.look, DR.face?.glass, ...(DR.parts || []).filter(r => r.on).map(r => r.look)]) if (id) ids.add(id);
     const P = D.parallax?.[this.cfg.view?.parallax || 'wueste'];
     for (const L of P?.layers || []) if (L.look) ids.add(L.look);
+    for (const c of catalog(D)) ids.add(c.d.look);   // the camp kit's pieces
     for (const id of ids) {
       const a = A[id];
       if (!a?.file || this.textures.exists(id)) continue;
@@ -65,7 +67,9 @@ export class BuilderScene extends Phaser.Scene {
     this.guide = this.add.graphics().setDepth(56);
     this.dust = this.add.particles(0, 0, 'px', { lifespan: { min: 500, max: 1100 }, speed: { min: 30, max: 140 }, angle: { min: 200, max: 340 }, gravityY: 260, scale: { start: 1.6, end: 0.2 }, alpha: { start: 0.85, end: 0 }, emitting: false }).setDepth(-9.4);
     this.crumbs = this.add.particles(0, 0, 'px', { lifespan: { min: 700, max: 1300 }, speed: { min: 60, max: 220 }, angle: { min: 210, max: 330 }, gravityY: 900, scale: { start: 1.3, end: 0.8 }, alpha: { start: 1, end: 0.2 }, emitting: false, bounce: 0.3 }).setDepth(-9.3);
-    this.veil = this.add.rectangle(0, 0, W, H, 0xffffff).setOrigin(0).setScrollFactor(0).setDepth(50).setBlendMode(Phaser.BlendModes.MULTIPLY);
+    // night and golden hour over the world (normal blend: works on every renderer); lights shine above it (depth 51)
+    this.veil = this.add.rectangle(0, 0, W, H, 0x0b0d26, 0).setOrigin(0).setScrollFactor(0).setDepth(50);
+    this.warmth = this.add.rectangle(0, 0, W, H, 0xff9a50, 0).setOrigin(0).setScrollFactor(0).setDepth(50.1).setBlendMode(Phaser.BlendModes.ADD);
     // AvA, the hand (the game's own drone, without Leyla: a stand-in tells her where to look and how calm it is)
     this.leyla = { x: 0, feet: 0, facing: 1, alive: true, health: 100, state: 'normal', body: { velocity: { x: 0, y: 0 } }, size: { w: 60 } };
     const DD = { ...this.data_, drone: { ...(this.data_.drone || {}), bubble: { ...(this.data_.drone?.bubble || {}), show: false }, roam: { enabled: false }, layer: 'front' } };
@@ -81,6 +85,10 @@ export class BuilderScene extends Phaser.Scene {
     this.hour = this.m.hour ?? C.clock?.start ?? 18.2;
     this.sky.setHour(this.hour);
     this.g = null; this.repeat = {}; this.idle = 0; this.saveAt = 0; this.notes = 0; this.lastNote = 0; this.stats = { gestures: 0 };
+    // pieces from the camp kit, and the brush's colour (Farbrad)
+    if (!this.textures.exists('cb_glow')) { const t = this.textures.createCanvas('cb_glow', 128, 128), g = t.getContext(), r = g.createRadialGradient(64, 64, 2, 64, 64, 64); r.addColorStop(0, 'rgba(255,214,140,0.9)'); r.addColorStop(0.4, 'rgba(255,170,80,0.35)'); r.addColorStop(1, 'rgba(255,140,60,0)'); g.fillStyle = r; g.fillRect(0, 0, 128, 128); t.refresh(); }
+    this.cat = catalog(this.data_); this.pieceId = (this.cat.find(c => c.id === 'feuertonne') || this.cat[0])?.id; this.pv = 0; this.color = null;
+    this.pieces = new Pieces(this); this.pieces.rebuild(this.m.pieces);
     this.hud?.attach(this);
     this.events.emit('ready');
   }
@@ -112,7 +120,7 @@ export class BuilderScene extends Phaser.Scene {
     this.input_.rumble(0.14, 22, this.cfg.haptics);
   }
   zoomRange() { const z = this.cfg.view?.zoom || [38, 115]; return [z[0] / 100, z[1] / 100]; }
-  material(set) { return this.mats.get(set) || 'stone'; }
+  material(set) { return this.mats.get(M.setOf(set)) || 'stone'; }
 
   // ---------- the ground below the diorama: it fades into the dark ----------
   drawUnder() {
@@ -173,15 +181,17 @@ export class BuilderScene extends Phaser.Scene {
     }
     // the material: LB / RB tap, LB held opens the wheel
     const wheelAfter = 200;
-    for (const [btn, kind] of [['lb', 'set'], ['rb', 'tool']]) {
-      if (I.down(btn) && I.heldFor(btn, time) > wheelAfter && !this.g) { if (!hud?.wheelOpen) { hud?.openWheel(kind); this.tones?.play('open'); } hud?.wheelAim(I.right[0] || I.left[0], I.right[1] || I.left[1]); this.frame(dt, time); return; }
-      if (I.released(btn)) { if (hud?.wheelOpen) { const s = hud.closeWheel(); if (kind === 'set' && s && s !== this.set) this.chooseSet(s); if (kind === 'tool' && s && s !== this.tool) this.chooseTool(s); } else this.cycleSet(btn === 'lb' ? -1 : 1); }
+    for (const [btn, kind] of [['lb', this.tool === 'deko' ? 'piece' : 'set'], ['rb', 'tool'], ['x', 'color']]) {
+      if (I.down(btn) && I.heldFor(btn, time) > wheelAfter && !this.g) { if (!hud?.wheelOpen) { hud?.openWheel(kind); this.tones?.play('open'); } hud?.wheelAim(I.right[0] || I.left[0], I.right[1] || I.left[1], time); this.frame(dt, time); return; }
+      if (!I.released(btn)) continue;
+      if (hud?.wheelOpen) { const s = hud.closeWheel(); if (kind === 'set' && s && s !== this.set) this.chooseSet(s); if (kind === 'tool' && s && s !== this.tool) this.chooseTool(s); if (kind === 'piece' && s) this.choosePiece(s); if (kind === 'color') this.chooseColor(s); continue; }
+      if (btn === 'x') { this.endGesture(); if (this.tool === 'deko') this.variant(); else this.forth(); continue; }   // X tapped: forward in time (deko: the next variant)
+      if (kind === 'piece') this.cyclePiece(btn === 'lb' ? -1 : 1); else this.cycleSet(btn === 'lb' ? -1 : 1);
     }
     // back and forth in time
     if (I.pressed('select')) { this.endGesture(); this.back(); this.rewindAt = time + 420; }
     if (I.down('select') && time > (this.rewindAt || Infinity)) { this.back(); this.rewindAt = time + Math.max(55, 200 - I.heldFor('select', time) / 12); }
     if (!I.down('select')) this.rewindAt = null;
-    if (I.pressed('x')) { this.endGesture(); this.forth(); }
     if (I.pressed('rs')) this.pipette();
     if (I.pressed('ls')) this.cycleLayer();
     // zoom and view
@@ -235,6 +245,7 @@ export class BuilderScene extends Phaser.Scene {
       const c = this.cell(), s = M.solid(this.m, c.x, c.y), above = M.solid(this.m, c.x, c.y - 1), below = M.solid(this.m, c.x, c.y + 1);
       const surf = s && !above ? c.y : !s && below ? c.y + 1 : null;
       this.g = { btn: a ? 'a' : 'b', mode: 'pending', start: { ...this.cur }, cell: c, surf, t: time, last: null };
+      if (this.tool === 'deko') { this.startPiece(); return; }
       if (this.layer !== 'c') { this.g.surf = null; this.startPaint(); }
       else if (a && this.tool === 'ruin') this.startRuin();
       else if (surf == null) this.startPaint();
@@ -253,7 +264,9 @@ export class BuilderScene extends Phaser.Scene {
       }
       return;
     }
-    if (g.mode === 'paint') this.paint();
+    if (g.mode === 'done') return;
+    if (g.mode === 'piece') this.movePiece(time);
+    else if (g.mode === 'paint') this.paint();
     else if (g.mode === 'ruin') this.shapeRuin();
     else this.shape();
   }
@@ -274,25 +287,26 @@ export class BuilderScene extends Phaser.Scene {
   paintCell({ x, y }) {
     const m = this.m, add = this.g.btn === 'a';
     if (this.layer !== 'c') {   // foreground and background: a layer of its own, nothing to carry
-      const l = this.layer, get = l === 'f' ? M.frontAt : M.backAt, was = get(m, x, y);
-      if (add ? was === this.set : was == null) return;
+      const l = this.layer, get = l === 'f' ? M.frontAt : M.backAt, was = get(m, x, y), br = this.brush();
+      if (add ? was === br : was == null) return;
       this.edge(x);
-      if (!M.put(m, x, y, add ? this.set : null, l)) return;
-      if (add) this.view.pop(x, y, this.set, 0, l); else this.view.crumble(x, y, was, 0, l);
-      this.puff(x * T + T / 2, y * T + T, add ? this.set : was, add ? 4 : 6);
-      this.note(add ? 'add' : 'remove', -y, add ? this.set : was, 0.7);
+      if (!M.put(m, x, y, add ? br : null, l)) return;
+      if (add) this.view.pop(x, y, br, 0, l); else this.view.crumble(x, y, was, 0, l);
+      this.puff(x * T + T / 2, y * T + T, add ? br : was, add ? 4 : 6);
+      this.note(add ? 'add' : 'remove', -y, add ? br : was, 0.7);
       this.input_.rumble(add ? 0.18 : 0.15, 20, this.cfg.haptics);
       return;
     }
-    if (add && M.solid(m, x, y)) return;
+    // A over ground of another material or colour paints it over (the brush recolours, the Farbrad's way to work)
+    if (add && M.solid(m, x, y) && (M.setAt(m, x, y) === this.brush() || !M.inParcel(m, x))) return;
     if (!add && !M.solid(m, x, y)) {   // B over air: a back wall there goes
       const b = M.backAt(m, x, y);
       if (b && M.put(m, x, y, null, 'b')) { this.view.crumble(x, y, b, 0, true); this.crumble(x * T + T / 2, y * T + T / 2, b, 4); this.note('remove', -y, b, 0.5); }
       return;
     }
     this.edge(x);
-    const set = add ? this.set : M.setAt(m, x, y);
-    if (!M.put(m, x, y, add ? this.set : null)) return;
+    const set = add ? this.brush() : M.setAt(m, x, y);
+    if (!M.put(m, x, y, add ? set : null)) return;
     const T2 = T / 2;
     if (add) { this.view.pop(x, y, set); this.puff(x * T + T2, y * T + T, set, 6); }
     else { this.view.crumble(x, y, set); this.crumble(x * T + T2, y * T + T2, set, 8); }
@@ -305,7 +319,7 @@ export class BuilderScene extends Phaser.Scene {
     g.mode = dir > 0 ? 'hill' : 'dig'; g.dir = dir; g.H = 0; g.R = 0;
     M.begin(m, g.mode);
     g.snap = M.snapshot(m, m.parcel[0] - 60, m.parcel[1] + 60); g.base = new Map(); g.cx = g.cell.x;
-    g.set = dir > 0 ? this.set : M.setAt(m, g.cx, g.surf) || this.set;
+    g.set = dir > 0 ? this.brush() : M.setAt(m, g.cx, g.surf) || this.brush();
     this.shape();
   }
   // the hill of this moment: height from how far AvA is above (below) the start, width from the height and the sideways pull
@@ -363,6 +377,7 @@ export class BuilderScene extends Phaser.Scene {
   back() { const s = M.undo(this.m); if (s) this.replay(s, true); }
   forth() { const s = M.redo(this.m); if (s) this.replay(s, false); }
   replay(step, back) {
+    if (step.pieces) this.pieces.rebuild(this.m.pieces);
     const ch = step.changes, xs = ch.map(c => c[0]), mid = xs.length ? (Math.min(...xs) + Math.max(...xs)) / 2 : 0;
     for (const [x, y, b, a, l] of ch) { const now = back ? b : a, was = back ? a : b, d = Math.abs(x - mid) * 10; if (now == null) this.view.crumble(x, y, was, d, l || 'c'); else this.view.pop(x, y, now, d, l || 'c'); }
     const top = ch.reduce((h, c) => Math.max(h, -c[1]), -99);
@@ -375,6 +390,85 @@ export class BuilderScene extends Phaser.Scene {
     this.tones?.play('select', { degree: this.sets.indexOf(s) % 5 });
     this.input_.rumble(0.12, 18, this.cfg.haptics);
     if (Math.random() < 0.35) this.drone.react('curious');
+  }
+  brush() { return M.withPaint(this.set, this.color); }
+  chooseColor(hex) {
+    this.color = hex || null; this.hud?.setMaterial(this.set, this.view.kitOf(this.brush()));
+    this.tones?.play('select', { degree: 2 }); this.input_.rumble(0.12, 18, this.cfg.haptics);
+    // a piece under AvA takes the colour at once (one step)
+    if (this.tool === 'deko') { const i = this.pieces.hit(this.cur.x, this.cur.y); if (i >= 0) { M.begin(this.m, 'paint'); M.setPiece(this.m, i, { c: this.color || undefined }); M.end(this.m); this.pieces.rebuild(this.m.pieces, i); this.dirtySave(); } }
+  }
+  // ---------- pieces (the Deko tool) ----------
+  choosePiece(id) { this.pieceId = id; this.pv = 0; this.ghostKey = null; this.hud?.setMaterial(this.set, this.view.kitOf(this.brush())); this.tones?.play('select', { degree: this.cat.findIndex(c => c.id === id) % 5 }); this.input_.rumble(0.1, 16, this.cfg.haptics); }
+  cyclePiece(d) { const i = this.cat.findIndex(c => c.id === this.pieceId); this.choosePiece(this.cat[(i + d + this.cat.length) % this.cat.length].id); }
+  // where a piece stands: on the first ground at or under the point (half tiles); hanging ones go where the point is
+  spot(id, x, y) {
+    const d = this.data_.decor?.[id], sx = Math.round(x / 32) * 32;
+    if (!d) return null;
+    if (['wall', 'inside', 'climb'].includes(d.place)) return { x: sx, y: Math.round(y / 16) * 16 };
+    const col = Math.floor(sx / T - (sx % T === 0 ? 0.5 : 0)), m = this.m;
+    let r = Math.floor(y / T);
+    if (M.solid(m, col, r)) { while (r > M.top(m) && M.solid(m, col, r - 1)) r--; }
+    else { while (r <= M.bottom(m) && !M.solid(m, col, r)) r++; }
+    return { x: sx, y: r * T };
+  }
+  // the next variant: of the piece under AvA, or of the one in hand
+  variant() {
+    const i = this.pieces.hit(this.cur.x, this.cur.y);
+    if (i >= 0) { M.begin(this.m, 'piece'); M.setPiece(this.m, i, { v: (this.m.pieces[i].v || 0) + 1 }); M.end(this.m); this.pieces.rebuild(this.m.pieces, i); this.dirtySave(); }
+    else { this.pv++; this.ghostKey = null; }
+    this.tones?.play('select', { degree: 3 }); this.input_.rumble(0.1, 16, this.cfg.haptics);
+  }
+  materialOfPiece(d) { return d?.art === 'icon' ? 'metal' : /metal|blech|tonne|automat/i.test((d?.name || '') + (d?.tags || '')) ? 'metal' : 'wood'; }
+  // A on a piece grabs it (left stick moves it, right stick grows it); A on the free ground places the piece in hand and keeps
+  // holding it; B on a piece takes it away
+  startPiece() {
+    const g = this.g, m = this.m, i = this.pieces.hit(this.cur.x, this.cur.y);
+    if (g.btn === 'b') {
+      g.mode = 'done';
+      if (i < 0) return;
+      const o = this.pieces.objs[i], p = M.removePiece(m, i);
+      M.end(m); this.poof(o); this.pieces.rebuild(m.pieces);
+      this.tones?.play('remove', { material: this.materialOfPiece(o?.d) });
+      this.input_.rumble(0.3, 40, this.cfg.haptics); this.dirtySave(); return p;
+    }
+    M.begin(m, 'piece'); g.mode = 'piece'; g.growAt = 0;
+    if (i >= 0) { const p = m.pieces[i]; g.i = i; g.ox = p.x - this.cur.x; g.oy = p.y - this.cur.y; this.tones?.play('select', { degree: 1 }); }
+    else {
+      const q = this.spot(this.pieceId, this.cur.x, this.cur.y); if (!q) { g.mode = 'done'; return; }
+      this.edge(Math.floor(q.x / T));
+      g.i = M.addPiece(m, { id: this.pieceId, x: q.x, y: q.y, v: this.pv, ...(this.color ? { c: this.color } : {}) }); g.ox = q.x - this.cur.x; g.oy = q.y - this.cur.y; g.placed = true;
+      this.pieces.rebuild(m.pieces, g.i);
+      const o = this.pieces.objs[g.i]; if (o) this.dust.setParticleTint(0xcbb89a).emitParticleAt((o.x0 + o.x1) / 2, o.y1, 10);
+      this.tones?.play('add', { material: this.materialOfPiece(this.data_.decor?.[this.pieceId]) });
+    }
+    this.input_.rumble(0.28, 40, this.cfg.haptics); this.tap = 1;
+  }
+  movePiece(time) {
+    const g = this.g, m = this.m, p = m.pieces[g.i]; if (!p) return;
+    const q = this.spot(p.id, this.cur.x + g.ox, this.cur.y + g.oy);
+    if (q && (q.x !== p.x || q.y !== p.y)) { this.edge(Math.floor(q.x / T)); M.setPiece(m, g.i, q); this.pieces.rebuild(m.pieces); g.moved = true; this.tones?.play('move'); }
+    // the right stick grows it, step by step (posts get taller, crates stack, tents get wider)
+    const d = this.data_.decor?.[p.id], [rx, ry] = this.input_.right;
+    if (d?.grow && time > g.growAt && (Math.abs(ry) > 0.5 || Math.abs(rx) > 0.5)) {
+      const side = d.grow === 'side', v = side ? Math.sign(rx) : -Math.sign(ry), [lo, hi] = this.pieces.range(d), cur = p.n ?? d.growStart ?? (d.grow === 'steps' ? 0 : 1), n = Math.max(lo, Math.min(hi, cur + v));
+      g.growAt = time + 170;
+      if (v && n !== cur) { M.setPiece(m, g.i, { n }); this.pieces.rebuild(m.pieces, g.i); this.tones?.play('hill', { material: this.materialOfPiece(d), vel: 0.6 }); this.input_.rumble(0.22 + n * 0.03, 30, this.cfg.haptics); this.tap = 0.8; }
+    }
+  }
+  poof(o) {
+    if (!o) return;
+    this.dust.setParticleTint(0xb8a890).emitParticleAt((o.x0 + o.x1) / 2, (o.y0 + o.y1) / 2, 18);
+    this.crumbs.setParticleTint(0x8a7a6a).emitParticleAt((o.x0 + o.x1) / 2, (o.y0 + o.y1) / 2, 8);
+  }
+  // the piece in hand as a breathing ghost where it would go; a frame around the piece under AvA
+  drawGhost(time) {
+    const show = this.tool === 'deko' && !this.g && !this.hud?.wheelOpen;
+    const hit = show ? this.pieces.hit(this.cur.x, this.cur.y) : -1, q = show && hit < 0 ? this.spot(this.pieceId, this.cur.x, this.cur.y) : null;
+    const key = q ? [this.pieceId, q.x, q.y, this.pv, this.color].join('|') : '';
+    if (key !== this.ghostKey) { this.ghostKey = key; this.ghost_?.box.destroy(); this.ghost_ = q ? this.pieces.draw({ id: this.pieceId, x: q.x, y: q.y, v: this.pv, c: this.color }, { alpha: 0.5, depth: 55 }) : null; }
+    if (this.ghost_) this.ghost_.box.setAlpha(0.38 + 0.16 * Math.sin(time / 380));
+    const gd = this.guide; if (hit >= 0) { const o = this.pieces.objs[hit]; gd.lineStyle(2, 0xffd541, 0.55 + 0.2 * Math.sin(time / 300)).strokeRoundedRect(o.x0 - 6, o.y0 - 6, o.x1 - o.x0 + 12, o.y1 - o.y0 + 12, 8); }
   }
   chooseTool(t) {
     this.tool = t; this.hud?.setMaterial(this.set, this.view.kitOf(this.set));
@@ -403,7 +497,8 @@ export class BuilderScene extends Phaser.Scene {
     const kind = M.buildingKind(this.cfg.buildings, H), newKind = g.kind && kind.name !== g.kind.name;
     g.kind = kind;
     if (newKind) { this.tones?.play('grow'); this.hud?.flash(kind.name, 'building'); this.input_.rumble(0.45, 70, this.cfg.haptics); if (H > 12) this.drone.react('curious'); }
-    const { added, removed } = M.shapeBuilding(m, { x0, x1, base: g.yb, height: H, kind, seed: g.seed, set: g.set }, g.snap, g.base);
+    const paint = this.color, K = paint ? { ...kind, frame: M.withPaint(kind.frame, paint), facade: kind.facade && M.withPaint(kind.facade, paint) } : kind;   // the brush colours frame and facade
+    const { added, removed } = M.shapeBuilding(m, { x0, x1, base: g.yb, height: H, kind: K, seed: g.seed, set: g.set }, g.snap, g.base);
     g.box = [Math.min(x0, x1), g.yb - H, Math.max(x0, x1), g.yb];
     for (const [x, y, set, back] of added) this.view.pop(x, y, set, (g.yb - y) * 22 + Math.abs(x - g.ax) * 8, back);
     for (const [x, y, set, back] of removed) this.view.crumble(x, y, set, 0, back);
@@ -469,9 +564,11 @@ export class BuilderScene extends Phaser.Scene {
     for (const o of [this.sky.img]) { const [px, py] = scr(0, 0); o.setPosition(px, py).setScale(this.sky.k / z); }
     for (const { ts } of this.sky.layers) { const [px, py] = scr(-2, ts.y); ts.setPosition(px, py).setScale(1 / z); }
     { const [px, py] = scr(0, this.sky.ground.y); this.sky.ground.setPosition(px, py).setScale(1 / z); }
-    { const [px, py] = scr(0, 0); this.veil.setPosition(px, py).setScale(1 / z).setFillStyle(this.sky.veil ?? 0xffffff); }
+    { const [px, py] = scr(0, 0); this.veil.setPosition(px, py).setScale(1 / z).setFillStyle(this.sky.veil ?? 0x0b0d26, this.sky.veilAlpha ?? 0); this.warmth.setPosition(px, py).setScale(1 / z).setFillStyle(0xff9a50, this.sky.warm ?? 0); }
     this.drawFlags(time);
     this.view.update(time);
+    this.pieces.update(time, this.sky.S?.dark ?? 0);
+    this.drawGhost(time);
     this.hud?.update(time, this);
     if (this.saveAt && time > this.saveAt) { this.saveAt = 0; this.store?.save(this.m); }
     if (this.idle < 4000) this.m.seconds += dt / 1000;
@@ -492,8 +589,8 @@ export class BuilderScene extends Phaser.Scene {
     g.lineStyle(3, 0xffffff, a * 0.8);
     for (const [cx, cy, sx, sy] of [[px, py, 1, 1], [px + T, py, -1, 1], [px, py + T, 1, -1], [px + T, py + T, -1, -1]]) g.beginPath().moveTo(cx + sx * 4, cy + sy * 16).lineTo(cx + sx * 4, cy + sy * 4).lineTo(cx + sx * 16, cy + sy * 4).strokePath();
     // the tile that A would add, as a ghost
-    const f = !remove && (this.layer !== 'c' || !M.solid(m, c.x, c.y)) ? this.view.frameOf(c.x, c.y, this.set, this.layer === 'b') : null;
-    if (f && !G && (this.tool === 'ground' || this.layer !== 'c')) { this.ghostImg.setVisible(true).setTexture(f.key, f.frame).setPosition(px + T / 2, py + T).setAlpha(0.32 + 0.14 * breathe); }
+    const f = !remove && (this.layer !== 'c' || !M.solid(m, c.x, c.y)) ? this.view.frameOf(c.x, c.y, this.brush(), this.layer === 'b') : null;
+    if (f && !G && this.tool !== 'deko' && (this.tool === 'ground' || this.layer !== 'c')) { this.ghostImg.setVisible(true).setTexture(f.key, f.frame).setPosition(px + T / 2, py + T).setAlpha(0.32 + 0.14 * breathe); }
     else this.ghostImg.setVisible(false);
     // at the surface, while resting: little chevrons say „pull me up“
     const s = M.solid(m, c.x, c.y), surf = s && !M.solid(m, c.x, c.y - 1) ? c.y : !s && M.solid(m, c.x, c.y + 1) ? c.y + 1 : null;

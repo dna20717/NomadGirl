@@ -4,7 +4,8 @@
 // columns. A change redraws only the chunks around it. room.ox keeps every variant and dice roll tied to the world column.
 // New tiles pop in (squash & stretch) on their own sprite until the chunk is drawn again; removed tiles crumble.
 import { drawRoom, terrainKits } from '../play/art.js';
-import { setAt, solid, top, bottom, backAt, backRaw, frontAt, enclosedSet, OPEN } from './model.js';
+import { setAt, solid, top, bottom, backAt, backRaw, frontAt, enclosedSet, OPEN, setOf, paintOf } from './model.js';
+import { paintPixels } from '../play/camp.js';
 
 export const CH = 12, PAD = 3, AIR = 3;
 const mod = (i, n) => ((i % n) + n) % n;
@@ -26,11 +27,26 @@ export class TerrainView {
     const O = this.seams || {}, org = t => O.style === 'dither' ? t : { ...t, autotile: { ...(t.autotile || {}), style: O.style || 'organic', seam: O.width ?? 28, vertical: O.vertical !== false } };
     const D0 = this.s.data_, D = { ...D0, terrain: Object.fromEntries(Object.entries(D0.terrain || {}).map(([k, t]) => [k, org(t)])) };
     const D2 = on ? D : { ...D, terrain: Object.fromEntries(Object.entries(D.terrain || {}).map(([k, t]) => [k, { ...t, clutterChance: 0, decalChance: 0, bigChance: 0 }])) };
-    this.kits = terrainKits(this.s, D2); this.backs = new Map(); this.walls = new Map();
+    this.kits = terrainKits(this.s, D2); this.backs = new Map(); this.walls = new Map(); this.paints = new Map();
     this.plain = terrainKits(this.s, on ? { ...D, terrain: Object.fromEntries(Object.entries(D.terrain || {}).map(([k, t]) => [k, { ...t, clutterChance: 0, decalChance: 0, bigChance: 0 }])) } : D2);   // the foreground: no clutter
     if (redraw) this.all();
   }
-  kitOf(set) { return this.kits(set) || this.kits(this.m.base); }
+  kitOf(v) { const k = this.kits(setOf(v)) || this.kits(this.m.base); return this.painted(k, paintOf(v)); }
+  // a Kachel-Set in a colour (Farbrad): its sheet repainted once per colour, light and shade kept (camp.js paintPixels), same frames
+  painted(k, hex) {
+    if (!k || !hex) return k;
+    const id = k.key + '@' + hex; this.paints ||= new Map();
+    if (this.paints.has(id)) return this.paints.get(id);
+    const s = this.s, key = `${k.key}__cb${hex.slice(1)}`;
+    if (!s.textures.exists(key)) {
+      const src = s.textures.get(k.key), img = src.getSourceImage(), tex = s.textures.createCanvas(key, img.width, img.height), ctx = tex.getContext();
+      ctx.drawImage(img, 0, 0); const P = this.s.cfg?.paint || {}; paintPixels(ctx, img.width, img.height, hex, { keepSat: P.ground ?? 100, strength: P.strength ?? 82 }); tex.refresh();
+      for (const n of src.getFrameNames()) { const f = src.get(n); tex.add(n, 0, f.cutX, f.cutY, f.cutWidth, f.cutHeight); }
+    }
+    const out = { ...k, key, painted: hex };
+    this.paints.set(id, out);
+    return out;
+  }
   backOf(x) { return this.backKit(setAt(this.m, x, bottom(this.m)), 58); }
   backKit(set, shade = 46) { const id = set + ':' + shade; this.backs ||= new Map(); if (!this.backs.has(id)) { const k = this.kitOf(set); this.backs.set(id, k ? { ...k, shade } : null); } return this.backs.get(id); }
   range() { const [x0, x1] = this.m.parcel; return [Math.floor((x0 - this.margin) / CH), Math.floor((x1 + this.margin) / CH)]; }
@@ -87,7 +103,7 @@ export class TerrainView {
     this.bakes++;
   }
   // a facade is a wall: only its fill, no crust on every window sill (the stripes looked like slabs)
-  wallKit(set) { this.walls ||= new Map(); if (!this.walls.has(set)) { const k = this.plain(set) || this.kitOf(set); this.walls.set(set, k ? { ...k, top: k.fill, def: { ...k.def, autotile: { ...(k.def.autotile || {}), caps: false } } } : null); } return this.walls.get(set); }
+  wallKit(set) { this.walls ||= new Map(); if (!this.walls.has(set)) { const k = this.painted(this.plain(setOf(set)), paintOf(set)) || this.kitOf(set); this.walls.set(set, k ? { ...k, top: k.fill, def: { ...k.def, autotile: { ...(k.def.autotile || {}), caps: false } } } : null); } return this.walls.get(set); }
   // the highest row anything stands in (stage, background, foreground) over these columns, minus a margin of air: the sky above is
   // not drawn (a flat chunk is 10 rows instead of 40; drawing time follows the size)
   topRow(wx0, w) {

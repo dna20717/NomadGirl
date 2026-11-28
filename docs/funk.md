@@ -39,6 +39,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 28.11. Ava → Daniel: **#196 Deko und Farbrad im CampBuilder**: Werkzeug Deko (43 Stücke, Regal mit LB, setzen/verschieben/wachsen mit beiden Sticks, Variante X), Farbrad (X halten), Nacht jetzt wirklich dunkel. ⚠️ Code-Deko (Zelte, Neon) und Wachsen auf Touch fehlen noch. 33/33 Prüfungen. PixelLab 0.
 - 28.11. Ava → Daniel: **#196 CampBuilder glatt**: keine durchblitzenden Kacheln, Bröckeln in vier Stücken, Zeichnen viermal schneller mit Zeitbudget (Logik je Bild 0,4 ms), AvA nickt beim Bauen, Pipette (R-Stick drücken). 29/29 Prüfungen. PixelLab 0.
 - 28.11. Ava → Daniel: **#196 CampBuilder Runde 2**: Bauen klingt nach Handwerk, drei Ebenen (L-Stick drücken), Fassaden auf/zu (Y tippen), automatischer Hintergrund, Gebäude vom Schuppen zum Hochhaus, organische Übergänge. ⚠️ vorläufig: Bausätze und Belegung. 27/27 Browser-Prüfungen, npm test 499/499, Camp-Test 13/13. PixelLab 0.
 - 28.11. Ava → Daniel: **#196 Ruinen im CampBuilder**: RB halten → Werkzeug „Ruine“, Ecke setzen, zur Seite und hoch ziehen. 21/21 Prüfungen. PixelLab 0.
@@ -398,7 +399,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #196 CampBuilder v2: Bau-Spielzeug mit Zen-Gefühl (Planung)
-- **Status:** läuft (28.11.: Scheibe 1, Ruinen, Handwerks-Klang, Ebenen, Fassaden, Gebäude, organische Übergänge fertig; als Nächstes: Deko-Stücke setzen, verschieben, vergrößern) · angelegt 28.11. von Ava (Daniel im Code-Chat: „Na gut, a soll es sein“)
+- **Status:** läuft (28.11.: Scheibe 1, Ruinen, Handwerks-Klang, Ebenen, Fassaden, Gebäude, organische Übergänge, Glätte, Deko, Farbrad fertig; als Nächstes: Code-Deko, Leyla) · angelegt 28.11. von Ava (Daniel im Code-Chat: „Na gut, a soll es sein“)
 - **Für:** Code, erst nach Daniels Antworten auf die offenen Fragen
 - **Lesen:** `docs/features/campbuilder.md` (Plan, Recherche, Technik-Tricks, Bedienung), `docs/features/camp.md` › Deko, Camp-Baukasten, Farbe; `docs/features/controller.md` › Bau-Modus mit Controller; `docs/features/tiles.md`
 - **Auftrag (Daniel, 28.11.2026):** „genau diese Art von Gefühl haben, wenn man ein Camp aufbaut. Zunächst ohne Ressourcen-Limits. Alles kann sauber platziert werden, snappt aneinander, wächst bei Bedarf durch Dragging, kann eingefärbt werden … auch mit den vielen Dingen aus den Tilesets“; „Bedienung nur mit Controller und ggf. Touch, aber nicht Maus“; „Zen-Zustand“; „noch nicht bauen, erst noch planen“. Eigene Seite `/campbuilder`, Ausbaustufen 0–5 im Plan, Stufe 0 = Gefühlstest.

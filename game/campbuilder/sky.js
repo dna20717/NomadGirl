@@ -56,10 +56,9 @@ export class Sky {
       ts.setTint(t);
     }
     this.ground.setFillStyle(mixTint(mixTint(0x6b4f45, this.night, n * 0.85), 0xd08050, S.warm * 0.25));
-    // the light over the world: multiply veil (white = untouched)
-    let veil = mixTint(0xffffff, 0x4a4f8a, Math.min(1, S.dark * 1.05));
-    if (S.warm > 0) veil = mixTint(veil, 0xffd2a8, S.warm * 0.42);
-    this.veil = veil;
+    // the light over the world: a deep blue veil by night (its alpha), a warm glow at golden hour (added)
+    this.veil = 0x0b0d26; this.veilAlpha = Math.min(0.68, Math.max(0, S.dark - 0.04) * 0.8);
+    this.warm = S.warm * 0.11;
     this.dirty = true;
   }
   // every frame: clouds drift, stars twinkle; the parallax follows the camera and sits on the ground line

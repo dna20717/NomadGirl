@@ -118,7 +118,7 @@ r = await ev(async () => {
   const cb = campbuilder; cb.press('rb'); cb.step(1);
   await new Promise(res => setTimeout(res, 260)); cb.step(1);
   const open = cb.state().hud.wheel, items = document.querySelectorAll('.cb-slice').length;
-  cb.rstick(0, 1); cb.step(2); cb.release('rb'); cb.rstick(0, 0); cb.step(2);
+  cb.rstick(0.87, 0.5); cb.step(2); cb.release('rb'); cb.rstick(0, 0); cb.step(2);   // three tools: Gebäude sits at the lower right
   const tool = cb.scene().tool;
   cb.press('rb'); cb.step(1); cb.release('rb'); cb.step(1);   // a tap: next material
   const m = cb.model(), M = cb.M, h0 = cb.state().history, x0 = -14;
@@ -137,7 +137,7 @@ r = await ev(async () => {
   let tapPillar = 0; for (let x = tx - 3; x <= tx + 8; x++) if (M.solid(m, x, tb - 5)) tapPillar++;
   return { open, items, tool, mode, kinds, left, right, inside, air, facade, tapPillar, steps: cb.state().history - h0, back: m.back.size };
 });
-check('Werkzeug-Rad: RB halten, Gebäude wählen', r.open && r.items === 2 && r.tool === 'ruin', r);
+check('Werkzeug-Rad: RB halten, Gebäude wählen', r.open && r.items === 3 && r.tool === 'ruin', r);
 check('Gebäude: hochziehen wechselt den Bausatz (Schuppen → Haus → Mietshaus)', r.mode === 'ruin' && r.kinds.includes('Haus') && r.kinds.includes('Mietshaus'), r);
 check('Gebäude: Pfeiler, Luft mit Rückwand innen, Fassade davor', r.left && r.right && r.inside && r.air === null && r.facade > 10, r);
 check('Gebäude: antippen baut ein Standard-Haus, je ein Schritt', r.tapPillar >= 1 && r.steps === 2 && r.back > 10, r);
@@ -210,6 +210,48 @@ check('Steuerkreuz: eine Kachel weiter, mittig', r.c1.x === r.c0.x + 1 && r.c1.y
 // HUD falls quiet when nothing happens
 await page.waitForTimeout(4200);
 check('Oberfläche wird leise', await ev(() => { campbuilder.step(1); return campbuilder.state().hud.quiet; }), null);
+
+// Deko: the tool wheel's third tool; A places the piece in hand on the ground and keeps holding it (left stick moves, right stick
+// grows), LB held opens the shelf, X tapped takes the next variant, B takes a piece away; X held opens the Farbrad, the colour goes
+// onto new tiles, painting over recolours, a piece under AvA takes it
+r = await ev(async () => {
+  const cb = campbuilder, s = cb.scene(), m = cb.model(), M = cb.M, out = {}, wait = ms => new Promise(res => setTimeout(res, ms));
+  s.chooseTool('deko'); out.cat = s.cat.length;
+  cb.press('lb'); cb.step(1); await wait(260); cb.step(1); out.shelf = document.querySelectorAll('.cb-slice').length; out.grid = document.querySelector('[data-wheel]').classList.contains('grid');
+  cb.release('lb'); cb.step(2);
+  s.choosePiece((s.cat.find(c => c.d.grow === 'up' && !c.hang) || s.cat[0]).id); out.piece = s.pieceId;
+  const x = 8, base = M.surface(m, x); cb.at(x, base - 2);
+  const n0 = m.pieces.length; cb.press('a'); cb.step(2); out.placed = m.pieces.length - n0;
+  const i = m.pieces.length - 1, p0 = { ...m.pieces[i] };
+  cb.at(x + 2, base - 2); cb.step(3); out.moved = m.pieces[i].x - p0.x;
+  cb.rstick(0, -1); for (let k = 0; k < 4; k++) { cb.step(1); await wait(200); } cb.rstick(0, 0); cb.step(1);
+  out.grown = (m.pieces[i].n ?? 1) > (p0.n ?? 1);
+  cb.release('a'); cb.step(2);
+  out.feet = m.pieces[i].y === M.surface(m, Math.floor(m.pieces[i].x / 64 - 0.5)) * 64 || m.pieces[i].y === M.surface(m, Math.floor(m.pieces[i].x / 64)) * 64;
+  const v0 = m.pieces[i].v || 0; cb.press('x'); cb.step(1); cb.release('x'); cb.step(1); out.variant = (m.pieces[i].v || 0) - v0;
+  // the Farbrad
+  cb.press('x'); cb.step(1); await wait(260); cb.step(1); out.colors = document.querySelectorAll('.cb-swatch').length;
+  cb.rstick(1, 0); cb.step(2); cb.release('x'); cb.rstick(0, 0); cb.step(2);
+  out.color = s.color; out.pieceColor = m.pieces[i].c;
+  // ground: a red tile, and painting over recolours
+  s.chooseTool('ground'); cb.at(x - 6, M.surface(m, x - 6) - 1); cb.press('a'); cb.step(2); cb.release('a'); cb.step(2);
+  out.tile = M.setAt(m, x - 6, M.surface(m, x - 6));
+  s.chooseColor('#249fde'); cb.at(x - 6, M.surface(m, x - 6)); cb.press('a'); cb.step(2); cb.at(x - 5, M.surface(m, x - 6)); cb.step(2); cb.release('a'); cb.step(2);
+  out.repainted = M.setAt(m, x - 6, M.surface(m, x - 6));
+  s.chooseColor(null);
+  // B takes the piece away, back brings it again
+  s.chooseTool('deko'); const o = s.pieces.objs[i]; s.cur.x = (o.x0 + o.x1) / 2; s.cur.y = (o.y0 + o.y1) / 2;
+  const n1 = m.pieces.length; cb.press('b'); cb.step(2); cb.release('b'); cb.step(2); out.removed = n1 - m.pieces.length;
+  cb.press('select'); cb.step(1); cb.release('select'); cb.step(1); out.back = m.pieces.length === n1;
+  s.chooseTool('ground'); return out;
+});
+check('Deko: Regal mit allen Stücken (LB halten), Raster-Ansicht', r.cat >= 30 && r.shelf === r.cat && r.grid, r);
+check('Deko: A setzt, hält fest, linker Stick verschiebt, rechter Stick lässt wachsen', r.placed === 1 && r.moved > 0 && r.grown && r.feet, r);
+check('Deko: X tippen wechselt die Variante, B nimmt weg, Zurück holt es wieder', r.variant === 1 && r.removed === 1 && r.back, r);
+check('Farbrad: X halten, Farbe für Boden und Stück, Übermalen färbt um', r.colors === 17 && r.color && r.pieceColor === r.color && r.tile?.endsWith(r.color) && r.repainted?.endsWith('#249fde'), r);
+await ev(() => { const s = campbuilder.scene(); s.setHour(20.4); campbuilder.at(9, -3); campbuilder.step(5); });
+await shot('deko');
+await ev(() => campbuilder.scene().setHour(18.2));
 
 // smooth: tiles still popping in stay out of the drawing (no finished tile behind its own growing sprite); afterwards nothing is
 // left over; drawing a chunk keeps to a small budget (headless software rendering: generous)

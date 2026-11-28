@@ -1,7 +1,7 @@
 // CampBuilder v2 (#196): the diorama model (game/campbuilder/model.js)
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildingKind, shapeBuilding, enclosedSet, frontAt, OPEN, shapeRuin, backAt, newDiorama, solid, surface, begin, put, end, undo, redo, grow, snapshot, shapeHill, hillTargets, toJSON, fromJSON, metrics, setAt, bottom } from '../game/campbuilder/model.js';
+import { addPiece, setPiece, removePiece, withPaint, setOf, paintOf, buildingKind, shapeBuilding, enclosedSet, frontAt, OPEN, shapeRuin, backAt, newDiorama, solid, surface, begin, put, end, undo, redo, grow, snapshot, shapeHill, hillTargets, toJSON, fromJSON, metrics, setAt, bottom } from '../game/campbuilder/model.js';
 
 test('a new diorama: flat ground of the base set, the parcel in the middle, ground beyond it', () => {
   const m = newDiorama({ width: 20, depth: 5 }, { base: 'desert' });
@@ -138,4 +138,21 @@ test('automatic background: air shut in on most sides gets a wall of the set aro
   put(m, 3, -3, OPEN, 'b');
   assert.equal(enclosedSet(m, 3, -3), null, 'a window stays open');
   assert.equal(backAt(m, 3, -3), null);
+});
+
+test('pieces: placed, moved, grown, taken away; every change one step, saved; colour is part of the material', () => {
+  const m = newDiorama({ width: 20 });
+  begin(m); addPiece(m, { id: 'feuertonne', x: 96, y: 0, v: 0 }); end(m);
+  begin(m); setPiece(m, 0, { x: 160, n: 3 }); end(m);
+  assert.equal(m.history.length, 2);
+  undo(m); assert.equal(m.pieces[0].x, 96);
+  redo(m); assert.equal(m.pieces[0].n, 3);
+  const n = fromJSON(JSON.parse(JSON.stringify(toJSON(m))), m.cfg);
+  assert.deepEqual(n.pieces, m.pieces);
+  begin(m); removePiece(m, 0); end(m); assert.equal(m.pieces.length, 0); undo(m); assert.equal(m.pieces.length, 1);
+  const red = withPaint('ruins', '#df3e23');
+  assert.equal(red, 'ruins@#df3e23'); assert.equal(setOf(red), 'ruins'); assert.equal(paintOf(red), '#df3e23'); assert.equal(withPaint(red, null), 'ruins');
+  begin(m); put(m, 0, -1, red); end(m);
+  assert.equal(metrics(m).colours, 1);
+  assert.equal(setAt(fromJSON(JSON.parse(JSON.stringify(toJSON(m))), m.cfg), 0, -1), red);
 });

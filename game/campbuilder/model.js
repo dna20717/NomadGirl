@@ -22,7 +22,7 @@ export function noise(x, seed = 0) {
 
 export function newDiorama(cfg0, { base = 'desert', seed = 1, hour = 18.2, name = 'Mein Camp' } = {}) {
   const cfg = cfgOf(cfg0), half = Math.floor(cfg.width / 2);
-  const m = { v: 1, name, seed, base, hour, parcel: [-half, cfg.width - half - 1], cells: new Map(), back: new Map(), front: new Map(), cfg, history: [], future: [], step: null, made: Date.now(), seconds: 0 };
+  const m = { v: 1, name, seed, base, hour, parcel: [-half, cfg.width - half - 1], cells: new Map(), back: new Map(), front: new Map(), pieces: [], cfg, history: [], future: [], step: null, made: Date.now(), seconds: 0 };
   for (let x = m.parcel[0]; x <= m.parcel[1]; x++) fillColumn(m, x);
   return m;
 }
@@ -42,6 +42,10 @@ export const solid = (m, x, y) => setAt(m, x, y) != null;
 // davor)“): cells = the stage, back = the background (a ruin's inside, darker), front = the foreground (facades, drawn over Leyla).
 // OPEN in the back layer marks a hole that stays open (a window to the sky: no automatic background there).
 export const OPEN = '~';
+// a colour is part of the material (Daniel, 28.11.2026: Farbrad): „ruins@#df3e23“ = the brick set painted red (light and shade stay)
+export const paintOf = v => { const i = String(v ?? '').indexOf('@'); return i < 0 ? null : v.slice(i + 1); };
+export const setOf = v => { const t = String(v ?? ''), i = t.indexOf('@'); return i < 0 ? t : t.slice(0, i); };
+export const withPaint = (set, hex) => hex ? `${setOf(set)}@${hex}` : setOf(set);
 export const LAYERS = { c: 'cells', b: 'back', f: 'front' };
 const mapOf = (m, l) => m[LAYERS[l] || 'cells'];
 export const backAt = (m, x, y) => { const v = m.back.get(key(x, y)) ?? null; return v === OPEN ? null : v; };
@@ -77,7 +81,7 @@ export function surface(m, x) {
 // ---------- history ----------
 export function begin(m, kind = 'paint') {
   if (m.step) end(m);
-  m.step = { kind, changes: new Map(), at: Date.now() };
+  m.step = { kind, changes: new Map(), at: Date.now(), pb: JSON.stringify(m.pieces) };
   return m.step;
 }
 // one tile: set it (or empty it with null); out of the parcel it grows first, out of the rows nothing happens.
@@ -97,18 +101,27 @@ export function put(m, x, y, set, layer = 'c') {
 // close the gesture: an empty step is dropped; a real one goes on the history and clears the redo list
 export function end(m) {
   const st = m.step; m.step = null;
-  if (!st || !st.changes.size) return null;
-  const step = { kind: st.kind, changes: [...st.changes].map(([k, [b, a]]) => k[1] === '|' ? [...unkey(k.slice(2)), b, a, k[0] === 'b' ? 1 : 2] : [...unkey(k), b, a]) };
+  const pa = st ? JSON.stringify(m.pieces) : null, moved = st && pa !== st.pb;
+  if (!st || (!st.changes.size && !moved)) return null;
+  const step = { kind: st.kind, pieces: moved ? [st.pb, pa] : null, changes: [...st.changes].map(([k, [b, a]]) => k[1] === '|' ? [...unkey(k.slice(2)), b, a, k[0] === 'b' ? 1 : 2] : [...unkey(k), b, a]) };
   m.history.push(step); m.future = [];
   if (m.history.length > 400) m.history.shift();
   return step;
 }
 function apply(m, step, back) {
+  if (step.pieces) m.pieces = JSON.parse(step.pieces[back ? 0 : 1]);
   for (const [x, y, b, a, l] of step.changes) { const v = back ? b : a, k = key(x, y), map = l === 1 ? m.back : l === 2 ? m.front : m.cells; if (v == null) map.delete(k); else map.set(k, v); }
   return step;
 }
 export function undo(m) { if (m.step) end(m); const s = m.history.pop(); if (!s) return null; m.future.push(s); return apply(m, s, true); }
 export function redo(m) { const s = m.future.pop(); if (!s) return null; m.history.push(s); return apply(m, s, false); }
+
+// ---------- pieces (Deko from the camp kit, Daniel 28.11.2026: „Dinge bauen, verschieben oder vergrößern“) ----------
+// a piece = { id (Deko), x (world px of its middle), y (world px of its feet, or of its middle when it hangs), v (variant), f (mirrored),
+// n / m (grown: sections, bands), c (colour) }; the list is part of every step (undo / redo take it back)
+export function addPiece(m, p) { if (!m.step) begin(m, 'piece'); m.pieces.push({ ...p }); return m.pieces.length - 1; }
+export function setPiece(m, i, patch) { if (!m.pieces[i]) return false; if (!m.step) begin(m, 'piece'); Object.assign(m.pieces[i], patch); return true; }
+export function removePiece(m, i) { if (!m.pieces[i]) return null; if (!m.step) begin(m, 'piece'); return m.pieces.splice(i, 1)[0]; }
 
 // ---------- the parcel grows when one builds close to its edge ----------
 // → { side: -1|1, from, to } of the new columns, or null
@@ -259,7 +272,7 @@ export function toJSON(m) {
   const rowsOf = map => { const rows = []; for (let y = top(m); y <= bottom(m); y++) { let r = ''; for (let x = m.parcel[0]; x <= m.parcel[1]; x++) { const v = map.get(key(x, y)); r += v == null ? '.' : idx.get(v); } rows.push(r); } return rows; };
   const rows = rowsOf(m.cells), back = rowsOf(m.back), front = rowsOf(m.front);
   while (rows.length && /^\.*$/.test(rows[0]) && /^\.*$/.test(back[0]) && /^\.*$/.test(front[0])) { rows.shift(); back.shift(); front.shift(); }
-  return { v: 1, name: m.name, seed: m.seed, base: m.base, hour: m.hour, parcel: m.parcel, sets, rows, back: m.back.size ? back : undefined, front: m.front.size ? front : undefined, made: m.made, seconds: Math.round(m.seconds), metrics: metrics(m) };
+  return { v: 1, name: m.name, seed: m.seed, base: m.base, hour: m.hour, parcel: m.parcel, sets, rows, back: m.back.size ? back : undefined, front: m.front.size ? front : undefined, pieces: m.pieces.length ? m.pieces : undefined, made: m.made, seconds: Math.round(m.seconds), metrics: metrics(m) };
 }
 export function fromJSON(j, cfg0) {
   if (!j || j.v !== 1 || !Array.isArray(j.parcel) || !Array.isArray(j.rows)) return null;
@@ -268,6 +281,7 @@ export function fromJSON(j, cfg0) {
   const y0 = bottom(m) - j.rows.length + 1;
   const fill = (rows, map) => (rows || []).forEach((r, i) => { for (let c = 0; c < r.length; c++) { const ch = r[c]; if (ch === '.') continue; const s = j.sets[LET.indexOf(ch)]; if (s) map.set(key(m.parcel[0] + c, y0 + i), s); } });
   fill(j.rows, m.cells); fill(j.back, m.back); fill(j.front, m.front);
+  m.pieces = Array.isArray(j.pieces) ? j.pieces.filter(p => p && p.id && Number.isFinite(p.x) && Number.isFinite(p.y)).map(p => ({ ...p })) : [];
   return m;
 }
 
@@ -289,5 +303,5 @@ export function metrics(m) {
       if (y < bottom(m) && !solid(m, x, y + 1)) over++;
     }
   }
-  return { width: x1 - x0 + 1, tiles: m.cells.size, sets: Object.keys(sets).length, use: sets, relief, high, overhangs: over, stand, steps: m.history.length, seconds: Math.round(m.seconds) };
+  return { width: x1 - x0 + 1, pieces: m.pieces.length, colours: new Set([...m.cells.values(), ...m.pieces.map(p => p.c ? '@' + p.c : '')].map(paintOf).filter(Boolean)).size, tiles: m.cells.size, sets: Object.keys(sets).length, use: sets, relief, high, overhangs: over, stand, steps: m.history.length, seconds: Math.round(m.seconds) };
 }

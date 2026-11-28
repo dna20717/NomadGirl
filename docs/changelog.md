@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 28.11.2026: **CampBuilder: Deko und Farbrad** (#196): 43 Stücke aus dem Camp-Baukasten setzen, verschieben, wachsen lassen, Variante wechseln; Farbrad für Boden, Gebäude und Stücke; echte Nacht mit leuchtenden Laternen.
 - 28.11.2026: **CampBuilder glatt** (#196): keine durchblitzenden Kacheln mehr, Bröckeln in vier Stücken, Zeichnen mit Zeitbudget und viermal schneller, AvA nickt beim Bauen, Pipette.
 - 28.11.2026: **Organische Übergänge** (#196): Kachel-Sets greifen mit Zungen und Klumpen ineinander, auch übereinander; im CampBuilder an, im Spiel je Kachel-Set einschaltbar.
 - 28.11.2026: **CampBuilder v2, Gebäude** (#196): vom Schuppen zum Hochhaus hochziehen, Bausätze aus Material-Kombinationen, Etagen, Tür, Treppen, Rückwand, Fassade mit Fenstern, Verfall.

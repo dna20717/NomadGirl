@@ -8,7 +8,9 @@ const PAD = { grid: [10, 6], file: 'projects/nomadgirl/assets/ui/pad_icons.png' 
 const PAD_NAMES = ['xbox_0', 'xbox_1', 'xbox_2', 'xbox_3', 'xbox_4', 'xbox_5', 'xbox_6', 'xbox_7', 'xbox_8', 'xbox_9', 'stadia_0', 'stadia_1', 'stadia_2', 'stadia_3', 'stadia_4', 'stadia_5', 'stadia_6', 'stadia_7', 'stadia_8', 'stadia_9',
   'ps_0', 'ps_1', 'ps_2', 'ps_3', 'ps_4', 'ps_5', 'ps_6', 'ps_7', 'ps_8', 'ps_9', 'switch_0', 'switch_1', 'switch_2', 'switch_3', 'switch_4', 'switch_5', 'switch_6', 'switch_7', 'switch_8', 'switch_9',
   'stick_l', 'stick_l_up', 'stick_l_down', 'stick_l_left', 'stick_l_right', 'stick_l_press', 'stick_r', 'stick_r_up', 'stick_r_down', 'stick_r_left', 'stick_r_right', 'stick_r_press', 'dpad', 'dpad_up', 'dpad_down', 'dpad_left', 'dpad_right'];
-export const TOOLS = [{ id: 'ground', name: 'Boden formen', icon: 'mountain', hint: 'Malen, Hügel, Senken' }, { id: 'ruin', name: 'Gebäude', icon: 'building', hint: 'Ecke setzen, zur Seite und hoch ziehen: vom Schuppen bis zum Hochhaus' }];
+export const TOOLS = [{ id: 'ground', name: 'Boden formen', icon: 'mountain', hint: 'Malen, Hügel, Senken' }, { id: 'ruin', name: 'Gebäude', icon: 'building', hint: 'Ecke setzen, zur Seite und hoch ziehen: vom Schuppen bis zum Hochhaus' }, { id: 'deko', name: 'Deko', icon: 'gift', hint: 'Stücke aus dem Camp-Baukasten setzen, verschieben, wachsen lassen' }];
+// the Farbrad: AAP-64 like the camp's brush (CampBuilder › Farben)
+export const COLOR_NAMES = ['Weinrot', 'Zinnober', 'Orange', 'Bernstein', 'Gold', 'Lindgrün', 'Grün', 'Salbei', 'Himmelblau', 'Blau', 'Magenta', 'Rosa', 'Lachs', 'Weiß', 'Sand', 'Rost'];
 export const LAYER_NAMES = { c: 'Bühne', f: 'Vordergrund', b: 'Hintergrund' };
 const FACADE = { auto: 'Fassaden: um AvA offen', open: 'Fassaden: durchsichtig', closed: 'Fassaden: zu' };
 const BTN = { a: 0, b: 1, x: 2, y: 3, lb: 4, rb: 5, lt: 6, rt: 7, select: 8, start: 9 };
@@ -74,7 +76,9 @@ export class Hud {
     g.clearRect(0, 0, 96, 72); if (kit) g.drawImage(this.thumb(set, kit), 0, 0);
     this.$('name').textContent = name;
     const T0 = TOOLS.find(t => t.id === s.tool) || TOOLS[0];
-    this.$('tool').innerHTML = `${icon(T0.icon, 14).outerHTML}${s.layer === 'c' ? T0.name : 'Malen'}<i class="cb-layer l-${s.layer}">${icon('layers', 14).outerHTML}${LAYER_NAMES[s.layer]}</i>`;
+    const P0 = s.tool === 'deko' ? s.cat?.find(c => c.id === s.pieceId) : null, dot = s.color ? `<i class="cb-dot" style="background:${s.color}"></i>` : '';
+    if (P0) this.$('name').textContent = P0.name;
+    this.$('tool').innerHTML = `${dot}${icon(T0.icon, 14).outerHTML}${s.layer === 'c' || P0 ? T0.name : 'Malen'}<i class="cb-layer l-${s.layer}">${icon('layers', 14).outerHTML}${LAYER_NAMES[s.layer]}</i>`;
     const tl = this.root.querySelector('[data-tlayer] span'); if (tl) tl.textContent = LAYER_NAMES[s.layer];
     this.$('keys').innerHTML = `${this.btn('lb', 22)}${this.btn('rb', 22)}`;
     this.$('chip').classList.add('flash'); setTimeout(() => this.$('chip').classList.remove('flash'), 260);
@@ -84,7 +88,7 @@ export class Hud {
   hints() {
     this.$('hints').innerHTML = [
       [this.pad('stick_l'), 'Fliegen'], [this.btn('a'), 'Auftragen · hochziehen'], [this.btn('b'), 'Abtragen · runterziehen'],
-      [this.btn('lb'), 'Material'], [this.btn('rb'), 'halten: Werkzeug'], [this.pad('stick_l_press'), 'Ebene'], [this.btn('y'), 'tippen: Fassaden · halten: Uhr'], [this.pad('stick_r_press'), 'Pipette'], [this.btn('select'), 'Zurück'], [this.btn('x'), 'Vor'], [this.btn('lt') + this.btn('rt'), 'Zoom'],
+      [this.btn('lb'), 'Material'], [this.btn('rb'), 'halten: Werkzeug'], [this.btn('x'), 'halten: Farbe'], [this.pad('stick_l_press'), 'Ebene'], [this.btn('y'), 'tippen: Fassaden · halten: Uhr'], [this.pad('stick_r_press'), 'Pipette'], [this.btn('select'), 'Zurück'], [this.btn('x'), 'Vor'], [this.btn('lt') + this.btn('rt'), 'Zoom'],
     ].map(([k, t]) => `<span>${k}<i>${t}</i></span>`).join('');
   }
 
@@ -93,22 +97,47 @@ export class Hud {
   openWheel(kind = 'set') {
     const s = this.scene, ring = this.$('ring');
     this.wheelKind = kind;
-    this.wheelItems = kind === 'tool' ? TOOLS.map(t => ({ id: t.id, name: t.name, sub: t.hint, icon: t.icon })) : s.sets.map(id => ({ id, name: s.data_.terrain?.[id]?.name || id }));
-    const list = this.wheelItems, n = list.length, R = n <= 4 ? 150 : 230;
-    this.wheelOpen = true; this.aim = Math.max(0, list.findIndex(it => it.id === (kind === 'tool' ? s.tool : s.set)));
+    const colors = s.cfg.paint?.colors || s.data_.camp?.paint?.colors || [];
+    this.wheelItems = kind === 'tool' ? TOOLS.map(t => ({ id: t.id, name: t.name, sub: t.hint, icon: t.icon }))
+      : kind === 'color' ? [{ id: null, name: 'Original', sub: 'ohne Farbe', swatch: 'none' }, ...colors.map((c, i) => ({ id: c, name: COLOR_NAMES[i] || c, swatch: c }))]
+      : kind === 'piece' ? (s.cat || []).map(c => ({ id: c.id, name: c.name, sub: c.d.grow ? 'wächst mit dem rechten Stick' : '', piece: c }))
+      : s.sets.map(id => ({ id, name: s.data_.terrain?.[id]?.name || id }));
+    const list = this.wheelItems, n = list.length, R = n <= 4 ? 150 : n <= 17 ? 230 : 0, grid = !R, cols = Math.min(9, Math.ceil(Math.sqrt(n * 1.8)));
+    this.cols = cols; this.$('wheel').classList.toggle('grid', grid);
+    const cur = kind === 'tool' ? s.tool : kind === 'color' ? s.color : kind === 'piece' ? s.pieceId : s.set;
+    this.wheelOpen = true; this.aim = Math.max(0, list.findIndex(it => it.id === cur));
     ring.innerHTML = list.map((it, i) => {
-      const a = -Math.PI / 2 + i / n * Math.PI * 2;
-      return `<button class="cb-slice${it.icon ? ' cb-slice-tool' : ''}" data-i="${i}" style="--x:${Math.cos(a) * R}px;--y:${Math.sin(a) * R}px">${it.icon ? icon(it.icon, 34).outerHTML : ''}</button>`;
+      const a = -Math.PI / 2 + i / n * Math.PI * 2, rows = Math.ceil(n / cols);
+      const X = grid ? ((i % cols) - (cols - 1) / 2) * 104 : Math.cos(a) * R, Y = grid ? (Math.floor(i / cols) - (rows - 1) / 2) * 84 - 40 : Math.sin(a) * R;
+      const sw = it.swatch ? `<i class="cb-swatch${it.swatch === 'none' ? ' none' : ''}" style="background:${it.swatch === 'none' ? 'transparent' : it.swatch}"></i>` : '';
+      return `<button class="cb-slice${it.icon ? ' cb-slice-tool' : ''}" data-i="${i}" style="--x:${X}px;--y:${Y}px">${it.icon ? icon(it.icon, 34).outerHTML : sw}</button>`;
     }).join('');
     ring.querySelectorAll('.cb-slice').forEach((b, i) => {
-      if (!list[i].icon) { const th = this.thumb(list[i].id, s.view.kitOf(list[i].id)), c = th.cloneNode(); c.getContext('2d').drawImage(th, 0, 0); b.append(c); }
-      b.addEventListener('pointerdown', e => { e.preventDefault(); this.aim = i; this.paintAim(); const id = this.closeWheel(); if (kind === 'tool') s.chooseTool(id); else s.chooseSet(id); });
+      const it = list[i];
+      if (it.piece) b.append(this.pieceThumb(it.piece));
+      else if (!it.icon && !it.swatch) { const th = this.thumb(it.id, s.view.kitOf(it.id)), c = th.cloneNode(); c.getContext('2d').drawImage(th, 0, 0); b.append(c); }
+      b.addEventListener('pointerdown', e => { e.preventDefault(); this.aim = i; this.paintAim(); const id = this.closeWheel(); if (kind === 'tool') s.chooseTool(id); else if (kind === 'color') s.chooseColor(id); else if (kind === 'piece') s.choosePiece(id); else s.chooseSet(id); });
     });
     this.$('wheel').classList.add('open');
-    this.$('whint').innerHTML = `${this.pad('stick_r', 22)} wählen · ${this.btn(kind === 'tool' ? 'rb' : 'lb', 22)} loslassen`;
+    this.$('whint').innerHTML = `${this.pad('stick_r', 22)} wählen · ${this.btn({ tool: 'rb', color: 'x' }[kind] || 'lb', 22)} loslassen`;
     this.paintAim();
   }
-  wheelAim(x, y) {
+  // a picture of a piece for the shelf (its first variant, fitted into the slot)
+  pieceThumb(c) {
+    const s = this.scene, cv = document.createElement('canvas'); cv.width = 92; cv.height = 69;
+    try { const f = s.textures.getFrame(c.d.look, c.d.variant || 0), g = cv.getContext('2d'), k = Math.min(84 / f.cutWidth, 62 / f.cutHeight); g.imageSmoothingEnabled = false; g.drawImage(f.source.image, f.cutX, f.cutY, f.cutWidth, f.cutHeight, (92 - f.cutWidth * k) / 2, 66 - f.cutHeight * k, f.cutWidth * k, f.cutHeight * k); } catch { /* empty slot */ }
+    return cv;
+  }
+  wheelAim(x, y, time = performance.now()) {
+    if (this.$('wheel').classList.contains('grid')) {   // a shelf: the stick steps through it (held: repeats)
+      if (Math.hypot(x, y) < 0.5) { this.navAt = 0; return; }
+      if (time < (this.navAt || 0)) return;
+      const n = this.wheelItems.length, dx = Math.abs(x) > Math.abs(y) ? Math.sign(x) : 0, dy = dx ? 0 : Math.sign(y);
+      const i = Math.max(0, Math.min(n - 1, this.aim + dx + dy * this.cols));
+      this.navAt = time + (this.navAt ? 110 : 260);
+      if (i !== this.aim) { this.aim = i; this.paintAim(); this.scene.tones?.play('move'); this.scene.input_.rumble(0.06, 10, this.scene.cfg.haptics); }
+      return;
+    }
     if (Math.hypot(x, y) < 0.4) return;
     const n = this.wheelItems.length, a = Math.atan2(y, x) + Math.PI / 2, i = ((Math.round(a / (Math.PI * 2) * n) % n) + n) % n;
     if (i !== this.aim) { this.aim = i; this.paintAim(); this.scene.tones?.play('move'); this.scene.input_.rumble(0.08, 12, this.scene.cfg.haptics); }
@@ -183,14 +212,15 @@ export class Hud {
   touchBar() {
     const el = this.$('touch'), s = this.scene;
     el.innerHTML = `<button data-tset><canvas width="96" height="72"></canvas></button>
-      <div class="cb-seg"><button data-tool="a" class="on">${icon('plus', 18).outerHTML}<span>Auftragen</span></button><button data-tool="r">${icon('building', 18).outerHTML}<span>Gebäude</span></button><button data-tool="b">${icon('eraser', 18).outerHTML}<span>Abtragen</span></button></div>
-      <button data-tlayer>${icon('layers', 18).outerHTML}<span>Bühne</span></button><button data-tfacade>${icon('auge', 18).outerHTML}</button><button data-tundo>${icon('undo', 18).outerHTML}</button><button data-tredo>${icon('redo', 18).outerHTML}</button><button data-tsun>${icon('sun', 18).outerHTML}</button><button data-tmenu>${icon('menu', 18).outerHTML}</button>`;
+      <div class="cb-seg"><button data-tool="a" class="on">${icon('plus', 18).outerHTML}<span>Auftragen</span></button><button data-tool="r">${icon('building', 18).outerHTML}<span>Gebäude</span></button><button data-tool="d">${icon('gift', 18).outerHTML}<span>Deko</span></button><button data-tool="b">${icon('eraser', 18).outerHTML}<span>Abtragen</span></button></div>
+      <button data-tlayer>${icon('layers', 18).outerHTML}<span>Bühne</span></button><button data-tfacade>${icon('auge', 18).outerHTML}</button><button data-tcolor>${icon('brush', 18).outerHTML}</button><button data-tundo>${icon('undo', 18).outerHTML}</button><button data-tredo>${icon('redo', 18).outerHTML}</button><button data-tsun>${icon('sun', 18).outerHTML}</button><button data-tmenu>${icon('menu', 18).outerHTML}</button>`;
     this.tool = 'a';
     const tap = (sel, f) => el.querySelector(sel).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); s.tones?.unlock(); f(); });
-    tap('[data-tset]', () => this.wheelOpen ? this.closeWheel() : this.openWheel('set'));
-    el.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); const t = b.dataset.tool; this.tool = t === 'b' ? 'b' : 'a'; if (t !== 'b') s.chooseTool(t === 'r' ? 'ruin' : 'ground'); el.querySelectorAll('[data-tool]').forEach(x => x.classList.toggle('on', x === b)); s.tones?.play('select'); }));
+    tap('[data-tset]', () => this.wheelOpen ? this.closeWheel() : this.openWheel(s.tool === 'deko' ? 'piece' : 'set'));
+    el.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); const t = b.dataset.tool; this.tool = t === 'b' ? 'b' : 'a'; if (t !== 'b') s.chooseTool(t === 'r' ? 'ruin' : t === 'd' ? 'deko' : 'ground'); el.querySelectorAll('[data-tool]').forEach(x => x.classList.toggle('on', x === b)); s.tones?.play('select'); }));
     tap('[data-tlayer]', () => s.cycleLayer());
     tap('[data-tfacade]', () => s.setFacade({ auto: 'open', open: 'closed', closed: 'auto' }[s.facade]));
+    tap('[data-tcolor]', () => this.wheelOpen ? this.closeWheel() : this.openWheel('color'));
     tap('[data-tundo]', () => s.back()); tap('[data-tredo]', () => s.forth());
     tap('[data-tsun]', () => { s.setHour(s.hour + 1.5); this.showClock(true, s.time.now); });
     tap('[data-tmenu]', () => this.menuOpen ? this.closeMenu() : this.openMenu());
