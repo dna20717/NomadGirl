@@ -399,7 +399,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - **Lesen:** `docs/features/campbuilder.md` (Plan, Recherche, Technik-Tricks, Bedienung), `docs/features/camp.md` › Deko, Camp-Baukasten, Farbe; `docs/features/controller.md` › Bau-Modus mit Controller; `docs/features/tiles.md`
 - **Auftrag (Daniel, 28.11.2026):** „genau diese Art von Gefühl haben, wenn man ein Camp aufbaut. Zunächst ohne Ressourcen-Limits. Alles kann sauber platziert werden, snappt aneinander, wächst bei Bedarf durch Dragging, kann eingefärbt werden … auch mit den vielen Dingen aus den Tilesets“; „Bedienung nur mit Controller und ggf. Touch, aber nicht Maus“; „Zen-Zustand“; „noch nicht bauen, erst noch planen“. Eigene Seite `/campbuilder`, Ausbaustufen 0–5 im Plan, Stufe 0 = Gefühlstest.
 - **Fertig, wenn (Stufe 0):** `/campbuilder` öffnet, Boden malen und ein Stück setzen gehen nur mit Controller, Ton und Vibration beim Einrasten, Fernsteuerung `window.campbuilder` mit Browser-Test, Build grün.
-- **Rückfragen:** fünf offene Fragen im Plan (Bühne, Zeiger, Klang, Speichern, Gemütlichkeit), alle ⚠️ vorläufig beantwortet.
+- **Rückfragen:** fünf Grundfragen am 28.11. entschieden (wachsende Parzelle, freier Flug + Leyla mitdenken, Klang gemischt, online speichern, Metrik unsichtbar für v3), siehe Plan › Entscheidungen.
 - **Ergebnis:**
 
 ### #195 FB-20: Mehr Δ als Beute in POIs (Schnellkorrektur)

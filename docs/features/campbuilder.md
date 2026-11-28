@@ -1,6 +1,6 @@
 # CampBuilder v2 (Plan, #196)
 
-Ein eigenes Bau-Spielzeug für Camps, getrennt vom Spiel, aber auf seiner Technik. Stand: **Planung**, noch nichts gebaut.
+Ein eigenes Bau-Spielzeug für Camps, getrennt vom Spiel, aber auf seiner Technik. Stand: **Planung**, noch nichts gebaut. Direktive (Daniel, 28.11.2026): „Es muss gut aussehen und sich ausgezeichnet anfühlen.“ Wir gehen direkt hoch poliert ran: genug Assets, dazu der eigene Pixel-Skill für Lücken.
 
 Daniel, 28.11.2026: „genau diese Art von Gefühl haben, wenn man ein Camp aufbaut. Zunächst ohne Ressourcen-Limits. Alles kann sauber platziert werden, snappt aneinander, wächst bei Bedarf durch Dragging, kann eingefärbt werden. Und das nicht nur mit unseren Objekten, sondern auch mit den vielen Dingen aus den Tilesets.“ Dazu: „Bedienung nur mit Controller und ggf. Touch, aber nicht Maus. Idealerweise soll das Bauen einen Zen-Zustand erzeugen.“ Name: **CampBuilder v2**.
 
@@ -119,13 +119,34 @@ Das Rad ordnet automatisch aus den Daten, neue Stücke in der Werkstatt erschein
 4. **Rig und Leute:** Container und Werkstatt-Bilder, Leyla als Probe-Bewohnerin, Fotomodus, Touch voll.
 5. **Rückweg ins Spiel:** was sich bewährt, wandert in den Bau-Modus im CampMode (mit Grenzen).
 
-## Offene Fragen an Daniel
+## Entscheidungen (Daniel, 28.11.2026)
 
-1. **Bühne:** ⚠️ vorläufig feste Parzelle (etwa 40 Kacheln breit), die beim Bauen am Rand wächst. Alternative: endlos breit.
-2. **Zeiger:** ⚠️ vorläufig freier Flug mit Magnet, Steuerkreuz springt. Alternative: nur Springen wie im Bau-Modus.
-3. **Klang:** ⚠️ vorläufig musikalische Töne + Material-Geräusch gemischt. Alternativen: nur Foley, nur Musik.
-4. **Speichern:** ⚠️ vorläufig lokal + Export. Alternative: online als Commit wie die Werkstatt, damit Dioramen teilbar sind.
-5. **Gemütlichkeit:** ⚠️ vorläufig unsichtbar (nur Ensembles funkeln). Alternative: dezente Anzeige.
+1. **Bühne:** wachsende Parzelle. In v3 kann sie sich vielleicht durch Gameplay erweitern.
+2. **Zeiger:** freier Flug für v2, aber **Leyla mitdenken** (Kanten zum Klettern usw., siehe unten).
+3. **Klang:** gemischt, musikalische Töne + Material-Geräusch.
+4. **Speichern:** **online**, angelehnt an das bestehende Speichersystem (siehe unten).
+5. **Gemütlichkeit:** zunächst unsichtbar, aber eine **Metrik** wird mitgebaut, für v3.
+
+## Leyla mitdenken
+
+Jedes Diorama soll von Anfang an begehbar sein, auch wenn Leyla erst in Stufe 4 hineinkommt:
+
+- Das Modell hält zu jedem Stück seine **Lauf-Daten**: Tragflächen als Einweg-Plattformen, feste Körper, **Kanten** zum Hochziehen (wie `scene.ledgeAt`), Leitern und Treppen (`ladders`), Balkone und Stege. Das Meiste gibt es schon an den Deko-Stücken (Tragfläche, Haken, Begehbar, Klettern).
+- Boden aus dem dualen Raster ergibt dieselben festen Rechtecke wie ein Raum (`solidRects`), Kanten entstehen an jeder Oberkante mit Luft darüber.
+- Im Bau zeigt ein Schalter „Wege“ dezent, wo Leyla stehen, klettern und springen kann (Reichweiten aus `leyla.json`: Sprunghöhe, Kante greifen). Unerreichbare Flächen bleiben erlaubt (nie Nein), nur ohne Markierung.
+- Die Probe-Bewohnerin in Stufe 4 nutzt die echte Leyla aus dem Spiel (`leyla.js`), keine Nachbildung.
+
+## Online speichern
+
+Angelehnt an Spielstand online (`docs/features/online.md`): KV `nomadgirl-saves`, Schlüssel aus dem Login.
+
+- Neu im Worker: `GET/PUT/DELETE /api/diorama?slot=1..N` (Schlüssel `diorama:<hash>:<n>`, Kurzinfo als KV-Metadaten: Name, Stückzahl, Datum), `GET /api/dioramas` (alle Kurzinfos), Vorschaubild über `/api/blob?name=dshot<n>`. ⚠️ vorläufig 6 Plätze, 256 KB je Diorama.
+- Ohne Worker (lokal, Tests) localStorage `nomadgirl-diorama:<n>` wie `game/slots.js`.
+- Gespeichert wird von selbst (ein paar Sekunden nach dem letzten Schritt, leise), kein Speichern-Knopf nötig. Dazu Export/Import als Datei.
+
+## Metrik für v3
+
+Unsichtbar mitgerechnet und im Diorama gespeichert (`metrics`), lesbar über die Fernsteuerung: Gemütlichkeit wie im Camp (`cozyParts`: Stücke, Nachbarn, Ensembles, Wohnzellen), dazu Vielfalt (Arten, Farben), Dichte je Kachel, Licht bei Nacht, begehbare Fläche, Bauzeit und Schritte. Daraus kann v3 Ziele, Erweiterungen der Parzelle oder einen Rückweg ins Spiel ableiten.
 
 ## Quellen
 

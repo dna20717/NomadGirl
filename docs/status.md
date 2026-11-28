@@ -14,7 +14,7 @@ Die Testphase läuft: Tester melden über den Feedback-Knopf nach FeedbackBucket
 
 ## Offene Entscheidungen
 
-- **CampBuilder v2 (#196):** fünf Fragen in `docs/features/campbuilder.md` › Offene Fragen (Bühne, Zeiger, Klang, Speichern, Gemütlichkeit), alle ⚠️ vorläufig beantwortet.
+- **CampBuilder v2 (#196):** fünf Grundfragen entschieden (28.11.), letzte Runde zu Atmosphäre, Klangteppich, Leyla-Probe, Boden-Sets und Umfang der ersten Lieferung steht aus.
 
 ## Artefakte
 
