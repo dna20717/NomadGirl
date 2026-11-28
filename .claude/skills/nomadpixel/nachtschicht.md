@@ -1,5 +1,7 @@
 # Nachtschicht: Auto-Schleife für ein eigenes Trainingsset
 
+> **Kurswechsel 28.11.2026 (Daniel: „generell auf saubere Pixel-Art trainieren ohne diesen Fokus“):** Erstes Ziel ist ein **Clean-Pixel-LoRA (px8)**: festes 8-px-Raster (1024 px = 128 Pixel), Projektpalette, keine Matschkanten, Codewort `px8`. „Sauber“ ist messbar, daher entscheidet die Prüfstraße `scripts/cleanpx.py` (Raster, Rauschen, Farben, Doppelte, mehrere Motive auf einem Bild) statt eines Geschmacks-Bewerters. Motive: `scripts/cleanpx_motive.py` (Dinge, Wesen, Figuren, Orte; markenfrei). Chargen à 100 laufen tagsüber in Abständen. Stil-LoRAs (Amber v2, später Hausstil) kommen obendrauf. Charge 1: 86/100 bestanden; Ausfälle fast nur Figuren-Sammelbögen („mehrfach“).
+
 Stand 28.11.2026 (Daniel: „10 Bilder erzeugen, nach Qualität gewichten, 100 mal wiederholen, daraus ein eigenes Trainingsset … und das automatisieren“). Entscheidungen vom selben Tag: **eigener Stil-Bewerter**, **Ava steuert per Termin** (Claude-App auf geistopz muss offen sein), **ControlNet erst ohne**.
 
 ## Ablauf je Nacht
