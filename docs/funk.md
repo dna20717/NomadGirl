@@ -39,6 +39,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 28.11. Ava → Daniel: **NomadPixel × SDXL im Skill** (Abschnitt 17, `veredeln.py`). **Nachtschicht** geplant (`.claude/skills/nomadpixel/nachtschicht.md`, Bewerter `nachtschicht.py`): 10 Bilder je Motiv, Vorsortieren, Ava sichtet, Datensatz immer mit Originalen gemischt (Recherche: sonst Modellkollaps). Entscheidungen Daniel: eigener Stil-Bewerter, Ava steuert per Termin, ControlNet erst ohne. Offen: Bildmodell-Datei für den Bewerter (Download durch Daniel), welcher Stil zuerst.
 - 28.11. Ava → Daniel: **Probe NomadPixel × SDXL fertig** (`docs/proben/2026-11-28_nomadpixel_sdxl/`, Vergleichsbogen). Ergebnis: A (Entwurf, SDXL wenig Denoise) bringt fast nichts; **A+ (Entwurf vorbelichten, dann SDXL 0,6)** gewinnt beim Porträt und hält die Komposition; B (SDXL-Rohling → Skill) ist stark bei Szenen. Lehren im Lernbuch. Vorschlag nächster Schritt: Skill-Abschnitt „SDXL-Veredelung“ mit Vorbelichten + Skript `veredeln.py`.
 - 27.11. Daniel → Ava: NomadPixel-Skill mit SDXL aufwerten. Probe am 28.11.: Stresstest mit 3 Bildern (Ava-Selbstporträt, Stromleitungen + UFO, Peters Wohnzimmer), je A) Ava zeichnet .pix → SDXL drüber (Denoise 0,3–0,45) → zurück auf Raster/Palette und B) SDXL-Rohling → Foto→Pixel → .pix → Feinschliff. Anlass: Lernbuch 19.11. (Code-Clutter zu sauber/flach neben PixelLab). Danach entscheiden: Skill-Abschnitt, Skript render→.pix, ggf. Hausstil-LoRA.
 
