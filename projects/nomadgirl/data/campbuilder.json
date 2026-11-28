@@ -16,6 +16,7 @@
     { "name": "Mietshaus", "from": 10, "frame": "concrete", "floor": "concrete", "roof": "concrete", "back": "concrete_wall", "facade": "concrete_wall", "decay": 35, "windows": 3 },
     { "name": "Hochhaus", "from": 16, "frame": "bunker", "floor": "concrete", "roof": "metal", "back": "concrete_wall", "facade": "factory", "decay": 40, "windows": 2, "setback": true }
   ],
+  "seams": { "style": "organic", "width": 28, "vertical": true },
   "enclose": { "enabled": true, "percent": 75, "reach": 10 },
   "save": { "after": 2.5, "slot": 1 },
   "materials": [

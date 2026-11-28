@@ -6,8 +6,8 @@
 //   seams      where two sets meet side by side, the neighbour's tile runs into this one with a Bayer dither (like #156 between layers)
 // Kachel-Sets › Autotiling (per set), Spiel › Kacheln › Set je Gebäude-Hülle (engine/dressing.js hullMap).
 const BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
-export const AUTOTILE = { roof: 'gravel', under: 'shade', seam: 20, caps: true };
-export const autotileOf = kit => { const a = kit?.def?.autotile || {}; return { on: a.enabled !== false, roof: a.roof || AUTOTILE.roof, under: a.under || AUTOTILE.under, seam: a.seam ?? AUTOTILE.seam, caps: a.caps !== false }; };
+export const AUTOTILE = { roof: 'gravel', under: 'shade', seam: 20, caps: true, style: 'dither', vertical: false };
+export const autotileOf = kit => { const a = kit?.def?.autotile || {}; return { on: a.enabled !== false, roof: a.roof || AUTOTILE.roof, under: a.under || AUTOTILE.under, seam: a.seam ?? AUTOTILE.seam, caps: a.caps !== false, style: a.style || AUTOTILE.style, vertical: !!a.vertical }; };
 
 const rngOf = s => () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
 function pixels(scene, key, frame) {
@@ -68,11 +68,27 @@ function seam(ctx, w, h, other, left, S) {
   }
   ctx.putImageData(me, 0, 0);
 }
+// #196 organic seams (Daniel, 28.11.2026: „die Übergänge zwischen einzelnen Teilen müssen hübscher sein als gerastert“): the neighbour
+// runs in as tongues and clumps of 4-px blocks with a smooth, seeded edge (two sines and a little noise), a fine dark line where the
+// two meet; side = 'l' | 'r' (columns from that edge) or 'u' (rows from the top: a set lying on this one). Made once per pair.
+function organic(ctx, w, h, other, side, S, seed, top = 0) {
+  const me = ctx.getImageData(0, 0, w, h), a = me.data, ow = Math.min(w, other.w), oh = Math.min(h, other.h), b = other.ctx.getImageData(0, 0, ow, oh).data;
+  const B = 4, r = rngOf(seed * 7919 + side.charCodeAt(0)), p1 = r() * 6.28, p2 = r() * 6.28, f1 = 0.9 + r() * 0.8, f2 = 2.1 + r() * 1.4;
+  const depth = t => Math.max(B, Math.round((S * (0.55 + 0.28 * Math.sin(t * f1 + p1) + 0.17 * Math.sin(t * f2 + p2)) + (r() - 0.5) * 6) / B) * B);
+  const n = side === 'u' ? Math.ceil(w / B) : Math.ceil((h - top) / B), d = Array.from({ length: n }, (_, i) => depth(i / n * 6.28));
+  const put = (x, y, dark) => { const p = (y * w + x) * 4, q = (y * ow + x) * 4; if (x >= ow || y >= oh || b[q + 3] < 10) return; const k = dark ? 0.72 : 1; a[p] = b[q] * k; a[p + 1] = b[q + 1] * k; a[p + 2] = b[q + 2] * k; a[p + 3] = 255; };
+  for (let i = 0; i < n; i++) for (let j = 0; j < d[i]; j++) for (let s2 = 0; s2 < B; s2++) {
+    const edge = j >= d[i] - 1;
+    if (side === 'u') { const x = i * B + s2, y = top + j; if (x < w && y < h) put(x, y, edge); }
+    else { const y = top + i * B + s2, x = side === 'l' ? j : w - 1 - j; if (y < h && x >= 0 && x < w) put(x, y, edge); }
+  }
+  ctx.putImageData(me, 0, 0);
+}
 // → { key, frame } of the derived tile (made once per variant and kept in the texture manager)
 // v = { capL, capR, under, roof, crust: frame of a surface tile (for under = crust), seamL / seamR: { key, frame } of the neighbour }
 export function autoTile(scene, kit, frame, v) {
   const A = autotileOf(kit), sig = [v.roof ? 'roof:' + A.roof : '', v.capL && A.caps ? 'l' : '', v.capR && A.caps ? 'r' : '', v.under ? 'u:' + A.under : '',
-    v.seamL ? `sl:${v.seamL.key}:${v.seamL.frame}` : '', v.seamR ? `sr:${v.seamR.key}:${v.seamR.frame}` : ''].filter(Boolean).join('|');
+    v.seamL ? `sl:${v.seamL.key}:${v.seamL.frame}` : '', v.seamR ? `sr:${v.seamR.key}:${v.seamR.frame}` : '', v.seamU && A.vertical ? `su:${v.seamU.key}:${v.seamU.frame}` : '', A.style !== 'dither' ? A.style : ''].filter(Boolean).join('|');
   if (!sig) return { key: kit.key, frame };
   const id = `auto|${kit.key}|${frame}|${sig}`;
   if (scene.textures.exists(id)) return { key: id, frame: '__BASE' };
@@ -80,8 +96,15 @@ export function autoTile(scene, kit, frame, v) {
   const tex = scene.textures.createCanvas(id, w, h), ctx = tex.getContext();
   ctx.drawImage(P.c, 0, 0);
   if (v.roof && A.roof !== 'none') roofCover(ctx, w, o, A.roof, typeof frame === 'number' ? frame : 1);
-  if (v.seamL && A.seam > 0) seam(ctx, w, h, pixels(scene, v.seamL.key, v.seamL.frame), true, A.seam);
-  if (v.seamR && A.seam > 0) seam(ctx, w, h, pixels(scene, v.seamR.key, v.seamR.frame), false, A.seam);
+  const sd = typeof frame === 'number' ? frame + 1 : 7;
+  if (A.style === 'organic') {
+    if (v.seamU && A.vertical && A.seam > 0) organic(ctx, w, h, pixels(scene, v.seamU.key, v.seamU.frame), 'u', A.seam, sd, o);
+    if (v.seamL && A.seam > 0) organic(ctx, w, h, pixels(scene, v.seamL.key, v.seamL.frame), 'l', A.seam, sd, o);
+    if (v.seamR && A.seam > 0) organic(ctx, w, h, pixels(scene, v.seamR.key, v.seamR.frame), 'r', A.seam, sd + 3, o);
+  } else {
+    if (v.seamL && A.seam > 0) seam(ctx, w, h, pixels(scene, v.seamL.key, v.seamL.frame), true, A.seam);
+    if (v.seamR && A.seam > 0) seam(ctx, w, h, pixels(scene, v.seamR.key, v.seamR.frame), false, A.seam);
+  }
   if (v.under && A.under !== 'none') under(ctx, w, h, A.under, v.crust != null ? { ...pixels(scene, kit.key, v.crust), o } : null);
   if (v.capL && A.caps) cap(ctx, w, o, true);
   if (v.capR && A.caps) cap(ctx, w, o, false);

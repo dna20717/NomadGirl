@@ -12,8 +12,8 @@ const mod = (i, n) => ((i % n) + n) % n;
 const lay = l => l === true || l === 1 || l === 'b' ? 'b' : l === 2 || l === 'f' ? 'f' : 'c';
 
 export class TerrainView {
-  constructor(scene, model, { details = true, margin = 40, enclose = null } = {}) {
-    this.s = scene; this.m = model; this.T = 64; this.margin = margin; this.enclose = enclose; this.front = new Map();
+  constructor(scene, model, { details = true, margin = 40, enclose = null, seams = null } = {}) {
+    this.seams = seams; this.s = scene; this.m = model; this.T = 64; this.margin = margin; this.enclose = enclose; this.front = new Map();
     this.frontBox = scene.add.container(0, 0).setDepth(40);   // the foreground: over Leyla and the stage, under AvA
     this.chunks = new Map(); this.dirty = new Set(); this.pops = []; this.lastBake = -1e9; this.version = 0; this.bakes = 0;
     this.dust = new Map();
@@ -22,7 +22,10 @@ export class TerrainView {
   // CampBuilder › Ansicht › Lebendige Details: without them the sets bring no clutter, decals or big clutter
   setDetails(on, redraw = true) {
     this.details = on;
-    const D = this.s.data_, D2 = on ? D : { ...D, terrain: Object.fromEntries(Object.entries(D.terrain || {}).map(([k, t]) => [k, { ...t, clutterChance: 0, decalChance: 0, bigChance: 0 }])) };
+    // organic seams, also where one set lies on another (CampBuilder › Übergänge; the game keeps its own setting per Kachel-Set)
+    const O = this.seams || {}, org = t => O.style === 'dither' ? t : { ...t, autotile: { ...(t.autotile || {}), style: O.style || 'organic', seam: O.width ?? 28, vertical: O.vertical !== false } };
+    const D0 = this.s.data_, D = { ...D0, terrain: Object.fromEntries(Object.entries(D0.terrain || {}).map(([k, t]) => [k, org(t)])) };
+    const D2 = on ? D : { ...D, terrain: Object.fromEntries(Object.entries(D.terrain || {}).map(([k, t]) => [k, { ...t, clutterChance: 0, decalChance: 0, bigChance: 0 }])) };
     this.kits = terrainKits(this.s, D2); this.backs = new Map(); this.walls = new Map();
     this.plain = terrainKits(this.s, on ? { ...D, terrain: Object.fromEntries(Object.entries(D.terrain || {}).map(([k, t]) => [k, { ...t, clutterChance: 0, decalChance: 0, bigChance: 0 }])) } : D2);   // the foreground: no clutter
     if (redraw) this.all();

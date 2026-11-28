@@ -363,8 +363,10 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
       if (autotileOf(kit).on && !cg && scene.textures.createCanvas) {
         const C = tileCase(solid, x, y), roof = top && spots?.at(x, y)?.type === 'roof';
         const seamOf = dx => { const n = solid(x + dx, y) && !camoAt.has((x + dx) + ',' + y) ? kitAt(x + dx, y) : null; if (!n || n === kit || n.key === kit.key && n.def === kit.def || n.over !== kit.over) return null; const l = !solid(x + dx, y - 1) ? n.top : fillOf(n, x + dx, y, solid); return { key: n.key, frame: l[M(x + dx, l.length)] }; };
-        const v = { capL: C.capL, capR: C.capR, under: C.under, roof, crust: kit.top[M(x, kit.top.length)], seamL: seamOf(-1), seamR: seamOf(1) };
-        if (v.capL || v.capR || v.under || v.roof || v.seamL || v.seamR) ({ key, frame } = autoTile(scene, kit, roof ? kit.fill[M(x, kit.fill.length)] : frame, v));
+        // #196 a different set lying on this tile (vertical seam, only where the set asks for it: Autotiling › vertical)
+        const seamUp = () => { if (!autotileOf(kit).vertical || !solid(x, y - 1) || camoAt.has(x + ',' + (y - 1))) return null; const n = kitAt(x, y - 1); if (!n || n === kit || n.key === kit.key && n.def === kit.def) return null; return { key: n.key, frame: n.fill[M(x, n.fill.length)] }; };
+        const v = { capL: C.capL, capR: C.capR, under: C.under, roof, crust: kit.top[M(x, kit.top.length)], seamL: seamOf(-1), seamR: seamOf(1), seamU: seamUp() };
+        if (v.capL || v.capR || v.under || v.roof || v.seamL || v.seamR || v.seamU) ({ key, frame } = autoTile(scene, kit, roof ? kit.fill[M(x, kit.fill.length)] : frame, v));
         if (C.innerL) innerCorner(edges, px, py, T, true);
         if (C.innerR) innerCorner(edges, px, py, T, false);
       }

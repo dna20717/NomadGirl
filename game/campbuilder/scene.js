@@ -51,7 +51,7 @@ export class BuilderScene extends Phaser.Scene {
     this.tool = 'ground'; this.layer = 'c'; this.facade = 'auto';
     this.mats = new Map((C.materials || []).map(r => [r.set, r.material]));
     this.sky = new Sky(this, null, this.data_, C);
-    this.view = new TerrainView(this, this.m, { enclose: C.enclose, details: C.view?.details !== false, margin: Math.ceil(W / ((C.view?.zoom?.[0] ?? 38) / 100) / T / 2) + 4 });
+    this.view = new TerrainView(this, this.m, { seams: C.seams, enclose: C.enclose, details: C.view?.details !== false, margin: Math.ceil(W / ((C.view?.zoom?.[0] ?? 38) / 100) / T / 2) + 4 });
     this.makeHole();
     this.view.update(0, true);
     this.under = this.add.graphics().setDepth(-9);
