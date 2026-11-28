@@ -394,7 +394,7 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 ## Tickets
 
 ### #196 CampBuilder v2: Bau-Spielzeug mit Zen-Gefühl (Planung)
-- **Status:** offen (Planung, nicht bauen) · angelegt 28.11. von Ava (Daniel im Code-Chat)
+- **Status:** läuft (28.11., Scheibe 1: Bühne, Boden + Erhebungen, AvA, Klang, Uhr) · angelegt 28.11. von Ava (Daniel im Code-Chat: „Na gut, a soll es sein“)
 - **Für:** Code, erst nach Daniels Antworten auf die offenen Fragen
 - **Lesen:** `docs/features/campbuilder.md` (Plan, Recherche, Technik-Tricks, Bedienung), `docs/features/camp.md` › Deko, Camp-Baukasten, Farbe; `docs/features/controller.md` › Bau-Modus mit Controller; `docs/features/tiles.md`
 - **Auftrag (Daniel, 28.11.2026):** „genau diese Art von Gefühl haben, wenn man ein Camp aufbaut. Zunächst ohne Ressourcen-Limits. Alles kann sauber platziert werden, snappt aneinander, wächst bei Bedarf durch Dragging, kann eingefärbt werden … auch mit den vielen Dingen aus den Tilesets“; „Bedienung nur mit Controller und ggf. Touch, aber nicht Maus“; „Zen-Zustand“; „noch nicht bauen, erst noch planen“. Eigene Seite `/campbuilder`, Ausbaustufen 0–5 im Plan, Stufe 0 = Gefühlstest.
