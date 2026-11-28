@@ -112,7 +112,7 @@ Das Rad ordnet automatisch aus den Daten, neue Stücke in der Werkstatt erschein
 
 ## Ausbaustufen
 
-0. **Gefühlstest** (eine Sitzung): leere Bühne mit Himmel und Abendlicht, Wüsten-Boden mit dem Controller malen (duales Raster), AvA als Zeiger mit Magnet, Plopp-Ton in der Pentatonik, Vibration. Daniel testet nur das Gefühl.
+0. **Gefühlstest, 110 %** (Daniel: „perfekt = 110 Prozent! Keine Platzhalter, keine Kompromisse“): genaue Liste unten unter „Stufe 0 im Detail“.
 1. **Deko frei:** Bau-Rad, alle Deko-Stücke, Ziehen zum Wachsen, Varianten, Stapeln, „nie Nein“.
 2. **Tileset-Fundus:** Clutter, Props und Decals als Stücke, alle Kachel-Sets als Pinsel, Farbrad für alles.
 3. **Zen-Schicht:** Material-Klänge, Akkorde bei Ensembles, HUD blendet aus, Zurückspulen, die Welt antwortet (Krähen, Katze, Moos, Wind), lebendige Details.
@@ -126,6 +126,33 @@ Das Rad ordnet automatisch aus den Daten, neue Stücke in der Werkstatt erschein
 3. **Klang:** gemischt, musikalische Töne + Material-Geräusch.
 4. **Speichern:** **online**, angelehnt an das bestehende Speichersystem (siehe unten).
 5. **Gemütlichkeit:** zunächst unsichtbar, aber eine **Metrik** wird mitgebaut, für v3.
+6. **Licht:** goldene Stunde zum Start, Uhr frei drehbar, Lichter gehen in der Dämmerung an, mit einer schönen, sauberen Oberfläche dafür.
+7. **Klangteppich:** leise Musik, deren Tonart die Bau-Töne übernehmen (das Bauen spielt mit).
+8. **Leyla:** erst autonom im Diorama, übernehmen = selbst steuern (Stufe 4).
+9. **Boden-Pinsel:** alle 12 Kachel-Sets. Dazu **natürliche Erhebungen** formen und **Ruinen** nutzen bzw. platzieren, und das soll sich „GEIL anfühlen mit Drag, Grow und Sound“.
+10. **Erste Lieferung:** Stufe 0, aber 110 %; schon mit ersten Dingen, die man bauen, verschieben und vergrößern kann.
+11. **Neue Grafik:** PixelLab bis etwa 100 Generierungen, „nur wirklich im Notfall und dann nicht für einen Gegenstand, sondern für etwas, das man sinnvoll re-usen kann“ (ein Kachel-Set, Bruchkanten, ein Teile-Blatt). Zuerst Code und Pixel-Skill.
+
+## Stufe 0 im Detail
+
+Kein Platzhalter: Was drin ist, ist fertig poliert. Was nicht fertig wird, bleibt draußen.
+
+- **Bühne:** wachsende Parzelle, Himmel und Wetter aus `weather.js`, Parallax-Horizont, Boden läuft ins Dunkel aus (wie Camp › Rand), sanfte Kamera mit Zoom.
+- **Boden formen:** alle 12 Kachel-Sets als Pinsel auf dem dualen Raster.
+  - **Malen:** A halten + Stick zieht eine Spur, die Zellen füllen sich mit kurzem Nachfedern.
+  - **Erheben:** über dem Boden A halten und nach oben ziehen hebt einen **Hügel** mit weichem Abfall zu den Seiten, nach unten gräbt eine Senke. Die Form rastet in Kachel-Stufen, jede Stufe ein Ton, der höher (bzw. tiefer) wird, dazu Staub und Steinchen, die von der Kante rieseln.
+  - **Übergänge:** wo zwei Sets sich treffen, die Naht aus `autotile.js`; Oberflächen bekommen Kruste, Unterseiten Schatten, Tiefe aus Code.
+- **Ruinen:** ein Ruinen-Bauteil, das man setzt und **groß zieht** (Breite und Höhe in Kachel-Schritten). Es baut sich aus dem passenden Kachel-Set mit einer **Bruchkante aus Code** auf (gezackt, mit Samen aus der Position, nie zweimal gleich), Fensterlöcher und Bewehrungseisen als Details. Beim Wachsen bröckelt es sichtbar zurecht (kleine Brocken fallen). Ruinen sind begehbar (Kanten oben).
+- **Erste Stücke:** eine kleine, kuratierte Auswahl aus der Deko (⚠️ vorläufig etwa 10: Lagerfeuer, Laternenpfosten, Zeltstange + Plane, Kisten-Stapel, Zelt, Pflanzkasten, Sonnensegel, Wäscheleine, Windrad, Feuertonne), jede mit Setzen, Aufnehmen und Verschieben, Variante wechseln, Wachsen am Griff und Umfärben.
+- **AvA als Zeiger:** freier Flug mit Trägheit, Magnet zu Andockpunkten, Geist mit Atmen, Griffe zum Wachsen; das Stück hängt pendelnd unter ihr.
+- **Uhr:** eine Sonnen-Scheibe am oberen Rand (Controller: Taste halten + rechter Stick dreht die Sonne über den Himmel; Touch: Sonne ziehen), Himmel, Schatten und Lichter gleiten mit. Lichter gehen in der Dämmerung nacheinander an.
+- **Klang:** Klangteppich in einer Tonart mit langsamen Akkordwechseln; Bau-Töne aus derselben Tonleiter, **leicht auf den Takt gezogen** (höchstens ein Sechzehntel, damit es sofort reagiert und trotzdem musikalisch klingt), Material- und Untergrund-Geräusch darunter, Wind-Ambiente.
+- **Haptik:** feine Impulse je Stufe, ein satterer beim Einrasten.
+- **Zurückspulen** und Wiederholen.
+- **Leise Oberfläche:** Bau-Rad und Hilfe blenden aus, wenn nichts passiert; Tasten-Symbole je Controller-Typ (`pad_icons`).
+- **Speichern** online und lokal, von selbst; Metrik läuft mit.
+- **Touch** in Stufe 0 schon für Boden, Erheben, Stücke und Uhr.
+- **Fernsteuerung** `window.campbuilder` und Browser-Test mit Bildern; Daniel bekommt Vorher/Nachher-Bilder und eine kurze Spielanleitung.
 
 ## Leyla mitdenken
 

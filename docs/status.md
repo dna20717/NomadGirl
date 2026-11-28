@@ -14,7 +14,7 @@ Die Testphase läuft: Tester melden über den Feedback-Knopf nach FeedbackBucket
 
 ## Offene Entscheidungen
 
-- **CampBuilder v2 (#196):** fünf Grundfragen entschieden (28.11.), letzte Runde zu Atmosphäre, Klangteppich, Leyla-Probe, Boden-Sets und Umfang der ersten Lieferung steht aus.
+- **CampBuilder v2 (#196):** alle Fragen entschieden (28.11.), Stufe 0 im Detail im Plan; wartet auf Daniels Startsignal.
 
 ## Artefakte
 
