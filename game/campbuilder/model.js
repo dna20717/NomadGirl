@@ -173,37 +173,82 @@ export function reshape(m, want, base) {
 }
 export const shapeHill = (m, plan, snap, base) => reshape(m, hillTargets(m, plan, snap), base);
 
-// ---------- ruins ----------
-// A broken building out of one set, standing on the ground at the anchor column: pillars at both ends, floors every four rows with
-// gaps, a jagged top (one side falls off more), the inside as a darker back wall with window holes to the sky; columns where the
-// ground lies lower get a foundation. plan = { x0, x1, base (the ground row: the ruin's lowest row is base − 1), height, set, seed }
-export function ruinTargets(m, plan, snap) {
-  const out = new Map(), a = Math.min(plan.x0, plan.x1), b = Math.max(plan.x0, plan.x1), w = b - a + 1, H = Math.max(2, plan.height), yb = plan.base, sd = plan.seed || 1;
-  if (w < 2) return out;
-  const fall = noise(a * 7 + b, sd) < 0.5 ? -1 : 1, rough = Math.min(3, Math.floor(H / 3));
+// ---------- buildings (Daniel, 28.11.2026: „Ich ziehe einen Schuppen hoch bis zum Hochhaus und es sieht gut aus“, „Ruinen müssen
+// mehr wie passende Level-Komponenten funktionieren“, „aus vorgefertigten Material-Kombinationen“) ----------
+// The kind follows the height (CampBuilder › Gebäude: shed, house, block of flats, high-rise …), each a combination of sets for
+// frame (pillars), floors, roof, the back wall inside and the facade in front. Built like a level piece for Leyla: a storey is four
+// rows (three of air: she is three tiles tall), a door on the ground floor, a stair of single steps up to every storey with a hole
+// over it, alternating sides; windows in the facade; decay eats into one side (the top falls off, gaps in floors, holes in the
+// facade). A high-rise steps back above 60 %. Lower ground under the building gets a foundation.
+export const BUILDINGS = [
+  { name: 'Schuppen', from: 3, frame: 'metal', floor: 'metal', roof: 'metal', back: 'metal', facade: 'metal', decay: 20, windows: 0 },
+  { name: 'Haus', from: 6, frame: 'ruins', floor: 'concrete', roof: 'concrete', back: 'ruins', facade: 'ruins', decay: 30, windows: 3 },
+  { name: 'Mietshaus', from: 10, frame: 'concrete', floor: 'concrete', roof: 'concrete', back: 'concrete_wall', facade: 'concrete_wall', decay: 35, windows: 3 },
+  { name: 'Hochhaus', from: 16, frame: 'bunker', floor: 'concrete', roof: 'metal', back: 'concrete_wall', facade: 'factory', decay: 40, windows: 2, setback: true },
+];
+export function buildingKind(list, height) {
+  const L = (list?.length ? list : BUILDINGS).slice().sort((a, b) => (a.from || 0) - (b.from || 0));
+  let k = L[0]; for (const b of L) if (height >= (b.from || 0)) k = b;
+  return k;
+}
+// plan = { x0, x1, base (the ground row: the building's lowest storey stands on it), height, kind, seed, set (overrides the sets
+// when the kind has none) } → Map of targets like reshape wants
+export function buildingTargets(m, plan, snap) {
+  const out = new Map(), a = Math.min(plan.x0, plan.x1), b = Math.max(plan.x0, plan.x1), w = b - a + 1, H = Math.max(3, plan.height), yb = plan.base, sd = plan.seed || 1;
+  if (w < 3) return out;
+  const K = plan.kind || buildingKind(null, H), S = r => K[r] || plan.set || 'ruins', decay = (K.decay ?? 30) / 100;
+  const yt = yb - H, fall = noise(a * 7 + b, sd) < 0.5 ? -1 : 1, door = noise(a + b * 3, sd + 1) < 0.5 ? a : b;
+  const setRow = K.setback && w >= 7 && H >= 12 ? yb - Math.ceil(H * 0.6) : null;
+  const span = y => setRow != null && y < setRow ? [a + 1, b - 1] : [a, b];
+  // the top of each column: whole on the steady side, falling off towards the other (decay)
   const topOf = x => {
-    const k = (x - a) / Math.max(1, w - 1), side = fall > 0 ? k : 1 - k, pillar = x === a || x === b;
-    const drop = Math.round(side * side * H * 0.38 + noise(x, sd + 3) * rough * (pillar ? 0.4 : 1));
-    return yb - H + Math.min(H - 2, drop);
+    const k = (x - a) / Math.max(1, w - 1), side = fall > 0 ? k : 1 - k;
+    const drop = Math.round(Math.pow(side, 2.2) * H * decay * 0.8 + (side > 0.4 ? noise(x, sd + 3) * 2 * decay : 0));
+    return yt + Math.min(H - 3, drop);
   };
+  const floorAt = y => y < yb && (yb - y) % 4 === 0 && y > yt;
+  const stairOf = y => { const k = (yb - y) / 4; return k % 2 ? a + 1 : b - 4; };   // the stair below floor y starts here (4 columns)
+  const T = (x, y, v, l = 'c') => { if (y >= top(m) && y <= bottom(m)) out.set(l === 'c' ? key(x, y) : l + '|' + key(x, y), v); };
   for (let x = a; x <= b; x++) {
-    const t = topOf(x), s = snap.get(x) ?? surface(m, x), edge = x === a || x === b;
-    for (let y = yb; y < s; y++) out.set(key(x, y), plan.set);   // foundation down to lower ground
-    for (let y = t; y < yb; y++) {
-      if (y < top(m)) continue;
-      const fromBase = yb - y, floor = fromBase % 4 === 0 && fromBase > 0;
-      const crumb = y === t && !edge && noise(x * 13 + y, sd + 5) < 0.45;   // the broken top: a brick here and there
-      const gap = floor && !edge && noise(Math.floor((x - a) / 2) * 31 + y, sd + 7) > 0.72;
-      if (edge || (floor && !gap) || crumb) out.set(key(x, y), plan.set);
-      else {
-        const band = (fromBase - 1) % 4, col = (x - a) % 3, win = band >= 1 && band <= 2 && col !== 0 && w >= 4 && noise(Math.floor((x - a) / 3) * 17 + Math.floor(fromBase / 4), sd + 9) < 0.7;
-        out.set(key(x, y), null);
-        out.set('b|' + key(x, y), win ? OPEN : plan.set);   // a window stays open to the sky
+    const s = snap.get(x) ?? surface(m, x);
+    for (let y = yb; y < s; y++) T(x, y, S('frame'));   // foundation
+    const ct = topOf(x);
+    for (let y = ct; y < yb; y++) {
+      const [sa, sb] = span(y);
+      if (x < sa || x > sb) { if (setRow != null && y === setRow - 1 + 1) T(x, y, S('roof')); continue; }
+      const edge = x === sa || x === sb, ground = yb - y <= 3, isDoor = edge && x === door && ground && w >= 4;
+      const broken = ct > yt;   // this column lost its top
+      if (y === ct && !broken) { T(x, y, S('roof')); continue; }
+      if (y === ct && broken && noise(x * 13 + y, sd + 5) < 0.5) { T(x, y, S(edge ? 'frame' : 'floor')); continue; }   // a stump
+      if (edge && !isDoor) { T(x, y, S('frame')); continue; }
+      if (setRow != null && y === setRow && !edge) { T(x, y, S('roof')); continue; }   // the ledge where the tower steps back
+      if (floorAt(y) && !edge) {
+        const st = stairOf(y), hole = w >= 8 && x >= st && x <= st + 3;   // the way up from the storey below
+        const gap = !hole && noise(Math.floor((x - a) / 2) * 31 + y, sd + 7) < decay * 0.35 * (fall > 0 ? (x - a) / w : (b - x) / w) * 2;
+        if (!hole && !gap) { T(x, y, S('floor')); continue; }
       }
+      // inside: air, the back wall (holes where decay broke through), the facade in front with windows and the door
+      T(x, y, null);
+      const fromFloor = (yb - y - 1) % 4, storey = Math.floor((yb - y - 1) / 4);
+      const sideK = fall > 0 ? (x - a) / w : (b - x) / w;
+      const backHole = noise(x * 5 + y * 11, sd + 13) < decay * 0.5 * sideK * sideK;
+      T(x, y, backHole ? OPEN : S('back'), 'b');
+      // the stair: steps of single tiles from this storey's floor up to the next
+      if (w >= 8 && fromFloor <= 2) {
+        const st = stairOf(yb - (storey + 1) * 4), i = x - st;
+        if (i >= 0 && i <= 2 && fromFloor === i && yb - (storey + 1) * 4 > ct) { T(x, y, S('floor')); out.delete('b|' + key(x, y)); continue; }
+      }
+      const win = K.windows > 0 && (fromFloor === 1 || fromFloor === 2) && (x - a) % K.windows !== 0 && w >= 5;
+      const doorway = isDoor || (ground && Math.abs(x - door) <= 1 && fromFloor <= 2);
+      const facadeHole = noise(x * 7 + y * 3, sd + 17) < decay * 0.7 * sideK * sideK;
+      if (!win && !doorway && !facadeHole) T(x, y, S('facade'), 'f');
     }
   }
   return out;
 }
+export const shapeBuilding = (m, plan, snap, base) => reshape(m, buildingTargets(m, plan, snap), base);
+// the old simple ruin is a building of one set
+export const ruinTargets = (m, plan, snap) => buildingTargets(m, { ...plan, kind: { name: 'Ruine', frame: plan.set, floor: plan.set, roof: plan.set, back: plan.set, facade: null, decay: 40, windows: 3 } }, snap);
 export const shapeRuin = (m, plan, snap, base) => reshape(m, ruinTargets(m, plan, snap), base);
 
 // ---------- save ----------

@@ -335,7 +335,7 @@ export class BuilderScene extends Phaser.Scene {
     const g = this.g;
     if (!g) return;
     this.g = null;
-    if (g.mode === 'ruin' && !g.moved && release) { this.g = g; this.shapeRuin({ W: 5, H: 6 }); this.g = null; }
+    if (g.mode === 'ruin' && !g.moved && release) { this.g = g; this.shapeRuin({ W: 7, H: 7 }); this.g = null; }
     if (g.mode === 'pending') {   // a tap: one tile
       if (!release) return;
       g.mode = 'paint'; this.g = g; M.begin(this.m, g.btn === 'a' ? 'paint' : 'erase');
@@ -389,7 +389,7 @@ export class BuilderScene extends Phaser.Scene {
     g.snap = M.snapshot(m, m.parcel[0] - 60, m.parcel[1] + 60); g.base = new Map(); g.W = 0; g.H = 0;
   }
   shapeRuin(fixed = null) {
-    const g = this.g, m = this.m, c = this.cell(), max = (this.cfg.hill?.max ?? 14) + 4;
+    const g = this.g, m = this.m, c = this.cell(), max = Math.min(-M.top(m) - 2, 40);
     const dx = c.x - g.ax, up = g.yb - c.y;
     if (Math.abs(dx) >= 1 || up >= 2) g.moved = true;
     if (!g.moved && !fixed) return;
@@ -399,7 +399,11 @@ export class BuilderScene extends Phaser.Scene {
     g.W = W; g.H = H;
     const x0 = g.ax, x1 = g.ax + dir * (W - 1);
     for (let i = 0; i < 6; i++) { if (!(this.edge(Math.min(x0, x1)) || this.edge(Math.max(x0, x1)))) break; }
-    const { added, removed } = M.shapeRuin(m, { x0, x1, base: g.yb, height: H, set: g.set, seed: g.seed }, g.snap, g.base);
+    // the kind follows the height: shed → house → block of flats → high-rise (CampBuilder › Gebäude)
+    const kind = M.buildingKind(this.cfg.buildings, H), newKind = g.kind && kind.name !== g.kind.name;
+    g.kind = kind;
+    if (newKind) { this.tones?.play('grow'); this.hud?.flash(kind.name, 'building'); this.input_.rumble(0.45, 70, this.cfg.haptics); if (H > 12) this.drone.react('curious'); }
+    const { added, removed } = M.shapeBuilding(m, { x0, x1, base: g.yb, height: H, kind, seed: g.seed, set: g.set }, g.snap, g.base);
     g.box = [Math.min(x0, x1), g.yb - H, Math.max(x0, x1), g.yb];
     for (const [x, y, set, back] of added) this.view.pop(x, y, set, (g.yb - y) * 22 + Math.abs(x - g.ax) * 8, back);
     for (const [x, y, set, back] of removed) this.view.crumble(x, y, set, 0, back);

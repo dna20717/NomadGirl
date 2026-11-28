@@ -1,7 +1,7 @@
 {
   "name": "CampBuilder v2",
   "description": "Bau-Spielzeug für Camps (#196): ohne Grenzen, mit Controller und Touch, Bauen klingt wie Musik.",
-  "parcel": { "width": 40, "grow": 8, "growAt": 4, "depth": 7, "sky": 22, "maxWidth": 400, "base": "desert" },
+  "parcel": { "width": 40, "grow": 8, "growAt": 4, "depth": 7, "sky": 30, "maxWidth": 400, "base": "desert" },
   "hill": { "max": 14, "radius": 140, "minRadius": 2, "rough": 18, "wide": 100 },
   "cursor": { "speed": 1500, "accel": 9, "magnet": 30, "above": 92, "repeat": 140 },
   "view": { "zoom": [38, 115], "start": 72, "zoomSpeed": 120, "pan": 1400, "parallax": "wueste", "details": true },
@@ -10,6 +10,12 @@
   "tones": { "volume": 80, "musical": 0, "grid": 16, "wait": 70 },
   "haptics": { "enabled": true, "strength": 60 },
   "hud": { "fade": 3.5 },
+  "buildings": [
+    { "name": "Schuppen", "from": 3, "frame": "metal", "floor": "metal", "roof": "metal", "back": "metal", "facade": "metal", "decay": 20, "windows": 0 },
+    { "name": "Haus", "from": 6, "frame": "ruins", "floor": "concrete", "roof": "concrete", "back": "ruins", "facade": "ruins", "decay": 30, "windows": 3 },
+    { "name": "Mietshaus", "from": 10, "frame": "concrete", "floor": "concrete", "roof": "concrete", "back": "concrete_wall", "facade": "concrete_wall", "decay": 35, "windows": 3 },
+    { "name": "Hochhaus", "from": 16, "frame": "bunker", "floor": "concrete", "roof": "metal", "back": "concrete_wall", "facade": "factory", "decay": 40, "windows": 2, "setback": true }
+  ],
   "enclose": { "enabled": true, "percent": 75, "reach": 10 },
   "save": { "after": 2.5, "slot": 1 },
   "materials": [

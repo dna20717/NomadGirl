@@ -23,7 +23,7 @@ export class TerrainView {
   setDetails(on, redraw = true) {
     this.details = on;
     const D = this.s.data_, D2 = on ? D : { ...D, terrain: Object.fromEntries(Object.entries(D.terrain || {}).map(([k, t]) => [k, { ...t, clutterChance: 0, decalChance: 0, bigChance: 0 }])) };
-    this.kits = terrainKits(this.s, D2); this.backs = new Map();
+    this.kits = terrainKits(this.s, D2); this.backs = new Map(); this.walls = new Map();
     this.plain = terrainKits(this.s, on ? { ...D, terrain: Object.fromEntries(Object.entries(D.terrain || {}).map(([k, t]) => [k, { ...t, clutterChance: 0, decalChance: 0, bigChance: 0 }])) } : D2);   // the foreground: no clutter
     if (redraw) this.all();
   }
@@ -74,6 +74,8 @@ export class TerrainView {
     this.bakeFront(c, wx0, wy0, w, h);
     this.bakes++;
   }
+  // a facade is a wall: only its fill, no crust on every window sill (the stripes looked like slabs)
+  wallKit(set) { this.walls ||= new Map(); if (!this.walls.has(set)) { const k = this.plain(set) || this.kitOf(set); this.walls.set(set, k ? { ...k, top: k.fill, def: { ...k.def, autotile: { ...(k.def.autotile || {}), caps: false } } } : null); } return this.walls.get(set); }
   place(layers, wx0, wy0, h, depth) { for (const L of layers || []) { const lx = L.x, ly = L.y; L.setCrop(PAD * this.T - lx, 0, CH * this.T, h * this.T + 64); L.setPosition(wx0 * this.T + lx, wy0 * this.T + ly); L.setDepth(depth); } }
   // the foreground of a chunk, drawn like ground of its own (edges, crust, depth), without clutter, into the foreground box
   bakeFront(c, wx0, wy0, w, h) {
@@ -83,7 +85,7 @@ export class TerrainView {
     for (let y = 0; y < h; y++) { let r = ''; for (let x = 0; x < w; x++) { const f = frontAt(m, wx0 + x, wy0 + y); if (f && x >= PAD && x < w - PAD) any = true; r += f ? '#' : '.'; } tiles.push(r); }
     let layers = [];
     if (any) {
-      const terrain = { at: (x, y) => { const v = frontAt(m, wx0 + x, wy0 + y); return v ? this.plain(v) || this.kitOf(v) : null; }, back: () => null };
+      const terrain = { at: (x, y) => { const v = frontAt(m, wx0 + x, wy0 + y); return v ? this.wallKit(v) : null; }, back: () => null };
       // out of the room counts as air for the foreground (it floats): rows of air around it
       const res = drawRoom(this.s, { w, h: h + 2, tiles: ['.'.repeat(w), ...tiles, '.'.repeat(w)], ox: wx0, start: null }, this.T, {}, null, { at: (x, y) => terrain.at(x, y - 1), back: () => null });
       layers = res.layers || [];

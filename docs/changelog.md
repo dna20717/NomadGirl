@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 28.11.2026: **CampBuilder v2, Gebäude** (#196): vom Schuppen zum Hochhaus hochziehen, Bausätze aus Material-Kombinationen, Etagen, Tür, Treppen, Rückwand, Fassade mit Fenstern, Verfall.
 - 28.11.2026: **CampBuilder v2, Ebenen** (#196): Bauen klingt nach Handwerk (Foley aus Code), drei Ebenen Vordergrund / Bühne / Hintergrund, Fassaden öffnen und schließen (Y tippen), automatischer Hintergrund in eingeschlossenen Flächen.
 - 28.11.2026: **CampBuilder v2, Ruinen** (#196): Werkzeug-Rad (RB halten), Ruinen aus jedem Material in Breite und Höhe ziehen: Pfeiler, gebrochene Decken, gezackte Oberkante, Rückwand mit Fensterlöchern.
 - 28.11.2026: **CampBuilder v2, Scheibe 1** (#196, `/campbuilder`): Bau-Spielzeug nur mit Controller und Touch. Boden aus allen 12 Kachel-Sets malen und abtragen, Hügel hochziehen und Senken graben (wachsen Stufe für Stufe als Welle), AvA als Zeiger mit Trägheit und Magnet, Musik mit Bau-Tönen auf dem Takt, Material-Geräusche, Vibration, Sonnen-Uhr (Y), Material-Rad (LB), Zurückspulen (Select), wachsende Parzelle mit Pflöcken, leise Oberfläche, Speichern von selbst (online pro Login), Metrik für v3.

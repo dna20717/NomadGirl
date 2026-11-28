@@ -8,7 +8,7 @@ const PAD = { grid: [10, 6], file: 'projects/nomadgirl/assets/ui/pad_icons.png' 
 const PAD_NAMES = ['xbox_0', 'xbox_1', 'xbox_2', 'xbox_3', 'xbox_4', 'xbox_5', 'xbox_6', 'xbox_7', 'xbox_8', 'xbox_9', 'stadia_0', 'stadia_1', 'stadia_2', 'stadia_3', 'stadia_4', 'stadia_5', 'stadia_6', 'stadia_7', 'stadia_8', 'stadia_9',
   'ps_0', 'ps_1', 'ps_2', 'ps_3', 'ps_4', 'ps_5', 'ps_6', 'ps_7', 'ps_8', 'ps_9', 'switch_0', 'switch_1', 'switch_2', 'switch_3', 'switch_4', 'switch_5', 'switch_6', 'switch_7', 'switch_8', 'switch_9',
   'stick_l', 'stick_l_up', 'stick_l_down', 'stick_l_left', 'stick_l_right', 'stick_l_press', 'stick_r', 'stick_r_up', 'stick_r_down', 'stick_r_left', 'stick_r_right', 'stick_r_press', 'dpad', 'dpad_up', 'dpad_down', 'dpad_left', 'dpad_right'];
-export const TOOLS = [{ id: 'ground', name: 'Boden formen', icon: 'mountain', hint: 'Malen, Hügel, Senken' }, { id: 'ruin', name: 'Ruine', icon: 'building', hint: 'Ecke setzen, zur Seite und hoch ziehen' }];
+export const TOOLS = [{ id: 'ground', name: 'Boden formen', icon: 'mountain', hint: 'Malen, Hügel, Senken' }, { id: 'ruin', name: 'Gebäude', icon: 'building', hint: 'Ecke setzen, zur Seite und hoch ziehen: vom Schuppen bis zum Hochhaus' }];
 export const LAYER_NAMES = { c: 'Bühne', f: 'Vordergrund', b: 'Hintergrund' };
 const FACADE = { auto: 'Fassaden: um AvA offen', open: 'Fassaden: durchsichtig', closed: 'Fassaden: zu' };
 const BTN = { a: 0, b: 1, x: 2, y: 3, lb: 4, rb: 5, lt: 6, rt: 7, select: 8, start: 9 };
@@ -183,7 +183,7 @@ export class Hud {
   touchBar() {
     const el = this.$('touch'), s = this.scene;
     el.innerHTML = `<button data-tset><canvas width="96" height="72"></canvas></button>
-      <div class="cb-seg"><button data-tool="a" class="on">${icon('plus', 18).outerHTML}<span>Auftragen</span></button><button data-tool="r">${icon('building', 18).outerHTML}<span>Ruine</span></button><button data-tool="b">${icon('eraser', 18).outerHTML}<span>Abtragen</span></button></div>
+      <div class="cb-seg"><button data-tool="a" class="on">${icon('plus', 18).outerHTML}<span>Auftragen</span></button><button data-tool="r">${icon('building', 18).outerHTML}<span>Gebäude</span></button><button data-tool="b">${icon('eraser', 18).outerHTML}<span>Abtragen</span></button></div>
       <button data-tlayer>${icon('layers', 18).outerHTML}<span>Bühne</span></button><button data-tfacade>${icon('auge', 18).outerHTML}</button><button data-tundo>${icon('undo', 18).outerHTML}</button><button data-tredo>${icon('redo', 18).outerHTML}</button><button data-tsun>${icon('sun', 18).outerHTML}</button><button data-tmenu>${icon('menu', 18).outerHTML}</button>`;
     this.tool = 'a';
     const tap = (sel, f) => el.querySelector(sel).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); s.tones?.unlock(); f(); });
@@ -230,6 +230,6 @@ export class Hud {
     this.root.classList.toggle('nopad', !s.input_.padSeen);
   }
   // a short quiet line in the middle (the facades switched)
-  flash(mode) { const el = this.$('flash'); el.innerHTML = `${icon(mode === 'closed' ? 'door' : 'auge', 16).outerHTML}${FACADE[mode] || mode}`; el.classList.add('show'); clearTimeout(this.flashT); this.flashT = setTimeout(() => el.classList.remove('show'), 1300); }
+  flash(mode, ic = null) { const el = this.$('flash'); el.innerHTML = `${icon(ic || (mode === 'closed' ? 'door' : 'auge'), 16).outerHTML}${FACADE[mode] || mode}`; el.classList.add('show'); clearTimeout(this.flashT); this.flashT = setTimeout(() => el.classList.remove('show'), 1300); }
   saved(ok) { const el = this.$('saved'); el.classList.toggle('bad', !ok); el.classList.add('show'); clearTimeout(this.savedT); this.savedT = setTimeout(() => el.classList.remove('show'), 1400); }
 }

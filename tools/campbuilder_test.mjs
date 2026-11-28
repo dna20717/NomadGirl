@@ -76,7 +76,7 @@ r = await ev(() => {
 check('Zurück und vor', r.back === 'concrete' && r.forth === null && r.h === 4 && r.f === 0, r);
 r = await ev(async () => {
   const cb = campbuilder; cb.press('select');
-  const t0 = performance.now(); while (performance.now() - t0 < 1800) { cb.step(1); await new Promise(res => setTimeout(res, 16)); }
+  const t0 = performance.now(); while (performance.now() - t0 < 4000 && cb.state().history > 0) { cb.step(1); await new Promise(res => setTimeout(res, 16)); }
   cb.release('select'); cb.step(1);
   return { h: cb.state().history, f: cb.state().future, peak: cb.surface(0) };
 });
@@ -124,22 +124,26 @@ r = await ev(async () => {
   const m = cb.model(), M = cb.M, h0 = cb.state().history, x0 = -14;
   const base = M.surface(m, x0);
   cb.at(x0, base - 1); cb.press('a'); cb.step(2);
-  for (let i = 1; i <= 6; i++) { cb.at(x0 + i, base - 1 - i); cb.step(2); }
+  const kinds = [];
+  for (let i = 1; i <= 12; i++) { cb.at(x0 + Math.min(i, 9), base - 1 - i); cb.step(2); const f = document.querySelector('[data-flash]').textContent.trim(); if (f && !kinds.includes(f)) kinds.push(f); }
   const mode = cb.state().gesture;
   cb.release('a'); cb.step(2);
-  const left = M.setAt(m, x0, base - 2), right = M.setAt(m, x0 + 6, base - 2), inside = M.backAt(m, x0 + 3, base - 2), air = M.setAt(m, x0 + 3, base - 2);
-  // a tap builds the standard ruin (5 wide, 6 high)
-  const tx = x0 - 6, tb = M.surface(m, tx);
+  // above the ground floor (the door is down there): pillars at both ends, air inside with a back wall, a facade in front
+  const y = base - 5, left = M.setAt(m, x0, y), right = M.setAt(m, x0 + 9, y), inside = M.backAt(m, x0 + 5, base - 6) || M.backAt(m, x0 + 5, base - 7), air = M.setAt(m, x0 + 5, base - 6);
+  let facade = 0; for (let x = x0; x <= x0 + 9; x++) for (let yy = base - 12; yy < base; yy++) if (M.frontAt(m, x, yy)) facade++;
+  // a tap builds the standard house (7 × 7)
+  const tx = x0 - 10, tb = M.surface(m, tx);
   cb.at(tx, tb - 1); cb.press('a'); cb.step(2); cb.release('a'); cb.step(2);
-  const tapPillar = M.setAt(m, tx + 4, tb - 2);
-  return { open, items, tool, mode, left, right, inside, air, tapPillar, steps: cb.state().history - h0, back: m.back.size };
+  let tapPillar = 0; for (let x = tx - 3; x <= tx + 8; x++) if (M.solid(m, x, tb - 5)) tapPillar++;
+  return { open, items, tool, mode, kinds, left, right, inside, air, facade, tapPillar, steps: cb.state().history - h0, back: m.back.size };
 });
-check('Werkzeug-Rad: RB halten, Ruine wählen', r.open && r.items === 2 && r.tool === 'ruin', r);
-check('Ruine: ziehen baut Pfeiler, Rückwand, Luft dazwischen', r.mode === 'ruin' && r.left && r.right && r.inside && r.air === null, r);
-check('Ruine: antippen baut eine Standard-Ruine, je ein Schritt', r.tapPillar && r.steps === 2 && r.back > 10, r);
+check('Werkzeug-Rad: RB halten, Gebäude wählen', r.open && r.items === 2 && r.tool === 'ruin', r);
+check('Gebäude: hochziehen wechselt den Bausatz (Schuppen → Haus → Mietshaus)', r.mode === 'ruin' && r.kinds.includes('Haus') && r.kinds.includes('Mietshaus'), r);
+check('Gebäude: Pfeiler, Luft mit Rückwand innen, Fassade davor', r.left && r.right && r.inside && r.air === null && r.facade > 10, r);
+check('Gebäude: antippen baut ein Standard-Haus, je ein Schritt', r.tapPillar >= 1 && r.steps === 2 && r.back > 10, r);
 await shot('ruin');
 r = await ev(() => { const cb = campbuilder, n = cb.model().back.size; cb.press('select'); cb.step(1); cb.release('select'); cb.step(1); const after = cb.model().back.size; cb.press('x'); cb.step(1); cb.release('x'); cb.step(1); return { n, after, again: cb.model().back.size }; });
-check('Ruine: zurück und vor samt Rückwand', r.after < r.n && r.again === r.n, r);
+check('Gebäude: zurück und vor samt Rückwand', r.after < r.n && r.again === r.n, r);
 await ev(() => { const s = campbuilder.scene(); s.chooseTool('ground'); });
 
 // three layers: the left stick pressed switches stage → foreground → background; painting goes into that layer; Y tapped opens
