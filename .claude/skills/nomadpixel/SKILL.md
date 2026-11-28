@@ -248,3 +248,21 @@ Flach wirkt Pixel-Art, wenn Flächen einzeln „angemalt“ werden. Mit `relief.
 4. **Rendern** mit `r.render(alter=0.6–0.9)` für die Endzeit: Rost/Dreck sitzen dann automatisch in Fugen, Ecken und am Fuß, helle Schrammen an den Lichtkanten. `dither` bleibt aus (ruhige Flächen); `r.nach_c(c)` überträgt in eine `zeichnen.C`-Leinwand, danach `clean`.
 5. Danach wie immer: Profil prüfen (`AN pruefe … --profil clutter`), Vergleichsbild mit dem Bestand, Kritiker-Runde.
 
+
+## 17. SDXL-Veredelung (geistopz, ab 28.11.2026)
+
+Wenn Daniels PC **geistopz** mit ComfyUI erreichbar ist (Skill `geistopz-comfyui`), kann SDXL Volumen, Licht und Textur liefern, die Code-Pixel-Art schwer erreicht (Lernbuch 19.11.: „zu sauber, zu flach“). Ohne geistopz wird wie bisher von Hand gezeichnet. Probe und Vergleich: `docs/proben/2026-11-28_nomadpixel_sdxl/`. `VE` = `python3 .claude/skills/nomadpixel/scripts/veredeln.py`.
+
+**Weg A+ (Standard für Figuren, Porträts, Objekte):** Ava zeichnet den Entwurf wie gewohnt (Komposition, Silhouette, Farben), dann
+1. `VE vorbelichten entwurf.png vb.png`: hochskalieren, weichzeichnen, Licht oben links, Korn. **Nie den flachen Entwurf direkt** an SDXL geben: Bei Denoise 0,4–0,65 bleibt er flach, Details gehen verloren.
+2. `vb.png` nach `input\` auf geistopz legen, `VE workflow aplus --bild vb.png --prompt "pixel art, …"` an `POST /prompt` schicken (Pixel Art XL 0,8, Denoise **0,62**; Stil-LoRA zusätzlich möglich, z. B. Amber v2).
+3. `VE snap roh.png fertig.png --breite <Zielbreite> --farben <N>`: Raster + Projektpalette, Rauschen beruhigen, `clean`, Farben begrenzen; `.pix` daneben.
+4. Danach Pflicht wie immer: ansehen, Detail-Runde (Abschnitt 10), Feinschliff (14), Prüfungen.
+
+**Weg B (Szenen, Landschaften, Hintergründe):** SDXL-Rohling per txt2img (oder img2img aus einer Originalgrafik, Denoise ~0,55), dann `VE snap`. Inhalte gegen die Vorgabe prüfen: SDXL lässt gern Dinge weg (Probe: Strommasten).
+
+**Regeln aus der Probe:**
+- Formen im Entwurf eindeutig anlegen; ein Lichtkegel als hartes Dreieck wird zur Hütte. Leuchten als weichen Verlauf zeichnen.
+- Porträts und Gesichter **ab 96 px** snappen; bei 64 px zerfallen Mund und Augen. Darunter Gesicht von Hand nachzeichnen.
+- Farben: Figuren und Symbole `--farben 12–20`, Szenen bis 32.
+- Herkunft vermerken: `NomadPixel + SDXL (geistopz, Pixel Art XL[, LoRA …]), Feinschliff Ava`, mit Datum.
