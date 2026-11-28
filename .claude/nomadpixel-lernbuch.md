@@ -4,6 +4,11 @@ Was bei Grafiken für NomadGirl funktioniert und was nicht. **Vor jedem Auftrag 
 
 ## Regeln
 
+- 28.11.2026 (Probe NomadPixel × SDXL, Stresstest Ava/UFO/Wohnzimmer, `docs/proben/2026-11-28_nomadpixel_sdxl/`): **Flache Code-Entwürfe nie flach an SDXL geben.** Mit Pixel Art XL bei Denoise 0,4–0,65 bleibt das Bild so flach wie der Entwurf (0,4 ändert fast nichts, 0,65 verliert Augen und Leitungen). Erst **vorbelichten** (Weichzeichnen ~3 px, Licht von oben links, leichtes Korn), dann Denoise ~0,6: Komposition und Figur bleiben Avas, SDXL liefert Volumen, Licht und Textur (Weg „A+“, klarer Sieger beim Porträt).
+- 28.11.2026 (Probe): Formen im Entwurf müssen eindeutig sein. Der als Dreieck gezeichnete UFO-Lichtkegel wurde bei A+ zu einer Kuppelhütte; Lichtkegel lieber als weichen, hellen Verlauf anlegen.
+- 28.11.2026 (Probe): Weg B (SDXL-Rohling → `fromimg` auf AAP-64 → Feinschliff) ist stark bei Szenen (Wohnzimmer, Landschaft), driftet aber inhaltlich (Strommasten verschwanden) und Gesichter werden bei 64 px fleckig. Porträts unter ~96 px brauchen echte Handarbeit an Augen, Nase, Mund; die Automatik (Mehrheitsfilter + `clean`) reicht dort nicht.
+- 28.11.2026 (Probe): Nach `fromimg` hat ein SDXL-Bild schnell 30–48 Farben. Für Szenen ok, für Figuren und Symbole auf 12–20 reduzieren (`--colors`), sonst passt es nicht zum Bestand.
+
 - 19.11.2026 (Relief-Licht, Fabrik-Objekte): Objekte ab 32 px mit `relief.py` bauen (Höhenkarte → Licht, Glanz, Schatten, Abnutzung); Kritiker: flach 2,3 → Relief 3,3–3,4. Schatten warm, Lichter zwei Stufen unter Weiß, Struktur sparsam (≤ 0,3), Abnutzung `alter` 0,6–0,9.
 - 19.11.2026 (Kachel-Set Fabrik, 3 Kritiker-Runden 2,6 → 2,7 → 2,7): Code-Pixel-Art-Clutter wirkt neben dem gemalten PixelLab-Clutter (TileSet00) fremd: zu sauber, zu flach. Für Clutter, der neben dem Bestand steht, dichte gemalte Textur, kräftige Rost-Verläufe und echtes Volumen nötig; sonst lieber den vorhandenen Clutter nehmen oder PixelLab.
 - 19.11.2026 (Kachel-Set Fabrik): Kacheln immer im echten Spiel vor dem Himmel prüfen (Bildschirmfoto). Die Ziegelwand verschwand zuerst im Sonnenuntergang; Wand muss sich in der Helligkeit klar vom Hintergrund absetzen.
