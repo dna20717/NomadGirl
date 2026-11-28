@@ -14,7 +14,7 @@ Die Testphase läuft: Tester melden über den Feedback-Knopf nach FeedbackBucket
 
 ## Offene Entscheidungen
 
-Keine.
+- **CampBuilder v2 (#196):** fünf Fragen in `docs/features/campbuilder.md` › Offene Fragen (Bühne, Zeiger, Klang, Speichern, Gemütlichkeit), alle ⚠️ vorläufig beantwortet.
 
 ## Artefakte
 

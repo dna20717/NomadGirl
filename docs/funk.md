@@ -39,6 +39,7 @@ Gemeinsame Ablage für Aufträge und Rückmeldungen zwischen Ava im claude.ai-Pr
 
 Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender → Empfänger: Text`.
 
+- 28.11. Ava → Daniel: **#196 CampBuilder v2 geplant** (`docs/features/campbuilder.md`): Recherche zu Townscaper, Tiny Glade, Cloud Gardens, Summerhouse, Unpacking; acht Zen-Regeln; elf Technik-Tricks, die fast nur vorhandene Grafik brauchen; Controller- und Touch-Belegung; Stufen 0–5. Wartet auf fünf Antworten, dann Stufe 0 (Gefühlstest). PixelLab 0.
 - 28.11. Ava → Daniel: **NomadPixel × SDXL im Skill** (Abschnitt 17, `veredeln.py`). **Nachtschicht** geplant (`.claude/skills/nomadpixel/nachtschicht.md`, Bewerter `nachtschicht.py`): 10 Bilder je Motiv, Vorsortieren, Ava sichtet, Datensatz immer mit Originalen gemischt (Recherche: sonst Modellkollaps). Entscheidungen Daniel: eigener Stil-Bewerter, Ava steuert per Termin, ControlNet erst ohne. Offen: Bildmodell-Datei für den Bewerter (Download durch Daniel), welcher Stil zuerst.
 - 28.11. Ava → Daniel: **Probe NomadPixel × SDXL fertig** (`docs/proben/2026-11-28_nomadpixel_sdxl/`, Vergleichsbogen). Ergebnis: A (Entwurf, SDXL wenig Denoise) bringt fast nichts; **A+ (Entwurf vorbelichten, dann SDXL 0,6)** gewinnt beim Porträt und hält die Komposition; B (SDXL-Rohling → Skill) ist stark bei Szenen. Lehren im Lernbuch. Vorschlag nächster Schritt: Skill-Abschnitt „SDXL-Veredelung“ mit Vorbelichten + Skript `veredeln.py`.
 - 27.11. Daniel → Ava: NomadPixel-Skill mit SDXL aufwerten. Probe am 28.11.: Stresstest mit 3 Bildern (Ava-Selbstporträt, Stromleitungen + UFO, Peters Wohnzimmer), je A) Ava zeichnet .pix → SDXL drüber (Denoise 0,3–0,45) → zurück auf Raster/Palette und B) SDXL-Rohling → Foto→Pixel → .pix → Feinschliff. Anlass: Lernbuch 19.11. (Code-Clutter zu sauber/flach neben PixelLab). Danach entscheiden: Skill-Abschnitt, Skript render→.pix, ggf. Hausstil-LoRA.
@@ -391,6 +392,15 @@ Kurze Nachrichten ohne eigenes Ticket, neueste oben. Format: `TT.MM. Absender �
 - 12.11. Ava → Code: Funkbuch steht. Ab jetzt bitte jede Sitzung hier starten und hier zurückmelden. Den Bauauftrag „Progression“ habe ich nachträglich als #001 eingetragen; bitte PixelLab-Verbrauch der Abend-Sitzung nachreichen, falls bekannt.
 
 ## Tickets
+
+### #196 CampBuilder v2: Bau-Spielzeug mit Zen-Gefühl (Planung)
+- **Status:** offen (Planung, nicht bauen) · angelegt 28.11. von Ava (Daniel im Code-Chat)
+- **Für:** Code, erst nach Daniels Antworten auf die offenen Fragen
+- **Lesen:** `docs/features/campbuilder.md` (Plan, Recherche, Technik-Tricks, Bedienung), `docs/features/camp.md` › Deko, Camp-Baukasten, Farbe; `docs/features/controller.md` › Bau-Modus mit Controller; `docs/features/tiles.md`
+- **Auftrag (Daniel, 28.11.2026):** „genau diese Art von Gefühl haben, wenn man ein Camp aufbaut. Zunächst ohne Ressourcen-Limits. Alles kann sauber platziert werden, snappt aneinander, wächst bei Bedarf durch Dragging, kann eingefärbt werden … auch mit den vielen Dingen aus den Tilesets“; „Bedienung nur mit Controller und ggf. Touch, aber nicht Maus“; „Zen-Zustand“; „noch nicht bauen, erst noch planen“. Eigene Seite `/campbuilder`, Ausbaustufen 0–5 im Plan, Stufe 0 = Gefühlstest.
+- **Fertig, wenn (Stufe 0):** `/campbuilder` öffnet, Boden malen und ein Stück setzen gehen nur mit Controller, Ton und Vibration beim Einrasten, Fernsteuerung `window.campbuilder` mit Browser-Test, Build grün.
+- **Rückfragen:** fünf offene Fragen im Plan (Bühne, Zeiger, Klang, Speichern, Gemütlichkeit), alle ⚠️ vorläufig beantwortet.
+- **Ergebnis:**
 
 ### #195 FB-20: Mehr Δ als Beute in POIs (Schnellkorrektur)
 - **Status:** offen · angelegt 27.11. von Ava (Daniel im Dashboard: „Mehr deltas als beute im POI bitte als quick fix. wir müssen handeln durch quests incentivieren.“)
