@@ -1,6 +1,6 @@
 # CampBuilder v2 (Plan, #196)
 
-Ein eigenes Bau-Spielzeug für Camps, getrennt vom Spiel, aber auf seiner Technik. Stand: **Planung**, noch nichts gebaut. Direktive (Daniel, 28.11.2026): „Es muss gut aussehen und sich ausgezeichnet anfühlen.“ Wir gehen direkt hoch poliert ran: genug Assets, dazu der eigene Pixel-Skill für Lücken.
+Ein eigenes Bau-Spielzeug für Camps, getrennt vom Spiel, aber auf seiner Technik. Stand: **Scheibe 1 gebaut** (28.11.2026), Details unten unter „Gebaut“. Direktive (Daniel, 28.11.2026): „Es muss gut aussehen und sich ausgezeichnet anfühlen.“ Wir gehen direkt hoch poliert ran: genug Assets, dazu der eigene Pixel-Skill für Lücken.
 
 Daniel, 28.11.2026: „genau diese Art von Gefühl haben, wenn man ein Camp aufbaut. Zunächst ohne Ressourcen-Limits. Alles kann sauber platziert werden, snappt aneinander, wächst bei Bedarf durch Dragging, kann eingefärbt werden. Und das nicht nur mit unseren Objekten, sondern auch mit den vielen Dingen aus den Tilesets.“ Dazu: „Bedienung nur mit Controller und ggf. Touch, aber nicht Maus. Idealerweise soll das Bauen einen Zen-Zustand erzeugen.“ Name: **CampBuilder v2**.
 
@@ -174,6 +174,20 @@ Angelehnt an Spielstand online (`docs/features/online.md`): KV `nomadgirl-saves`
 ## Metrik für v3
 
 Unsichtbar mitgerechnet und im Diorama gespeichert (`metrics`), lesbar über die Fernsteuerung: Gemütlichkeit wie im Camp (`cozyParts`: Stücke, Nachbarn, Ensembles, Wohnzellen), dazu Vielfalt (Arten, Farben), Dichte je Kachel, Licht bei Nacht, begehbare Fläche, Bauzeit und Schritte. Daraus kann v3 Ziele, Erweiterungen der Parzelle oder einen Rückweg ins Spiel ableiten.
+
+## Gebaut: Scheibe 1 (28.11.2026)
+
+Bühne, Boden formen, AvA, Klang, Uhr. Seite `campbuilder.html` (online `/campbuilder`, `?new` = frische Parzelle, `?slot=1..6`).
+
+- **Code** `game/campbuilder/`: `model.js` (Diorama ohne DOM: Kacheln in Welt-Koordinaten, Parzelle wächst, Hügel/Senken mit Kosinus-Kuppel ohne Kerben, Schritte zum Zurückspulen, Speicherformat mit einer Zeichenkette je Reihe, Metrik), `terrain_view.js` (zeichnet mit `drawRoom` aus `game/play/art.js` in Abschnitten von 12 Spalten, je 3 Spalten Nachbarn als Rand, zugeschnitten; neue Kacheln ploppen mit Squash & Stretch, weggenommene zerbröseln; Erde hinter Löchern unter der alten Bodenlinie), `sky.js` (Himmel nach Uhrzeit aus `skyAt` + `makeWeather`, Parallax „Wüste“, Licht über der Welt als Multiply-Schleier), `tones.js` (Musik und Bau-Töne), `input.js` (Controller, Touch, Vibration, virtueller Controller), `hud.js` (leise Oberfläche), `store.js` (Speichern), `scene.js` (Gesten, Kamera, AvA), `main.js` (Start, Fernsteuerung `window.campbuilder`).
+- **drawRoom** (`art.js`) kann jetzt Ausschnitte: `room.ox` verschiebt Varianten und Würfel auf die Welt-Spalte, die gebackenen Ebenen kommen als `layers` zurück.
+- **Gesten:** A halten am Boden und hochziehen = Hügel (Höhe = wie weit hoch, Breite = Höhe × „Breite je Höhe“ + Seitwärts-Zug), B am Boden runterziehen = Senke; sonst malt A Kacheln (auch in die Luft) und B nimmt sie weg; antippen = eine Kachel. Die Kacheln eines Hügels kommen als Welle vom Gipfel nach außen. Bauen nah am Rand lässt die Parzelle wachsen (Pflöcke mit Fähnchen wandern mit).
+- **Klang:** Pad-Akkorde (Werkstatt › CampBuilder › Akkorde), Sub-Bass, ab und zu eine Glocke, Wind. Bau-Töne aus der Dur-Pentatonik, bevorzugt Akkordtöne, Tonhöhe = Höhe der Kachel (beim Hügel: Stufe), höchstens ein Sechzehntel auf den Takt gezogen. Material je Kachel-Set färbt den Ton. ⚠️ Browser starten Ton erst nach Taste, Tippen oder Klick; ein Controller-Knopf zählt nicht überall: dann erscheint oben rechts der Hinweis.
+- **Bedienung umgesetzt:** wie in der Tabelle oben, mit diesen Abweichungen (⚠️ vorläufig): Y halten = Uhr (statt Farbrad), X = Wiederholen, LB/RB antippen = Material zurück/vor, Rechter Stick drücken = Kamera zurück zu AvA. Steuerkreuz = eine Kachel je Druck.
+- **Speichern:** `/api/blob?name=diorama1..6` im Worker (KV der Spielstände, pro Login), Kopie immer auch in `localStorage` `nomadgirl-diorama:<n>`; von selbst 2,5 s nach dem letzten Schritt, kleines Wolken-Symbol unten rechts.
+- **Werkstatt:** Bereich **CampBuilder** (Gruppe Rig, `data/campbuilder.json`): Parzelle, Hügel, Zeiger, Ansicht, Uhr, Klang, Material je Kachel-Set, Gefühl.
+- **Tests:** `node --test test/campbuilder.test.js` (7), `node tools/campbuilder_test.mjs [--shots]` (17 Prüfungen: Hügel, Senke, Malen, Abtragen, Zurück/Vor, Zurückspulen, Material-Rad, Uhr, Menü, Parzelle wächst, Steuerkreuz, leise Oberfläche, Speichern + Laden, Touch).
+- **Noch nicht** (nächste Scheiben): Ruinen-Bauteil, Deko-Stücke, Farbrad, Leyla, Wege-Anzeige, Fotomodus.
 
 ## Quellen
 

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="game/brand/icon.svg">
+<link rel="apple-touch-icon" href="game/brand/icon-180.png">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>NomadGirl – CampBuilder</title>
+<script>try { document.documentElement.dataset.theme = localStorage.getItem('nomad.theme') || 'gray'; } catch (e) { document.documentElement.dataset.theme = 'gray'; }</script>
+<link rel="stylesheet" href="game/ui.css">
+<link rel="stylesheet" href="game/play/loading.css">
+<script src="game/vendor/phaser.min.js"></script>
+<style>
+  /* CampBuilder v2 (#196): a quiet interface over the world. Only --ui-* tokens, Inter + VT323. */
+  html, body { margin: 0; height: 100%; background: #0d0a12; overflow: hidden; overscroll-behavior: none; }
+  #game { position: fixed; inset: 0; }
+  #game canvas { touch-action: none; -webkit-user-select: none; user-select: none; }
+  .cb-hud { position: fixed; inset: 0; pointer-events: none; font: 500 var(--ui-gr-m) var(--ui-font); color: var(--ui-text); z-index: 20; }
+  .cb-hud > * { transition: opacity 900ms var(--ui-curve), transform 600ms var(--ui-curve); }
+  .cb-hud.quiet .cb-chip, .cb-hud.quiet .cb-hints { opacity: 0; transform: translateY(8px); }
+  .cb-glass { background: var(--ui-glass); border: 1px solid var(--ui-border); box-shadow: var(--ui-shadow); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .cb-chip { position: absolute; left: max(16px, env(safe-area-inset-left)); bottom: 18px; display: flex; gap: 12px; align-items: center; padding: 8px 14px 8px 8px;
+    background: var(--ui-glass); border: 1px solid var(--ui-border); border-radius: var(--ui-r-pane); box-shadow: var(--ui-shadow); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .cb-chip canvas { width: 64px; height: 48px; border-radius: 8px; image-rendering: pixelated; background: rgba(0,0,0,.25); }
+  .cb-chip b { display: block; font-weight: 600; color: var(--ui-text-strong); }
+  .cb-chip.flash { transform: scale(1.04); }
+  .cb-keys { display: flex; gap: 4px; margin-top: 4px; opacity: .8; }
+  .cb-pad { display: inline-block; vertical-align: middle; flex: none; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5)); }
+  .cb-key { display: inline-block; min-width: 20px; padding: 1px 6px; border-radius: 6px; border: 1px solid var(--ui-border-strong); font-size: var(--ui-gr-s); text-align: center; }
+  .cb-hints { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; max-width: calc(100vw - 340px);
+    padding: 8px 16px; border-radius: 999px; background: color-mix(in srgb, var(--ui-glass) 80%, transparent); border: 1px solid var(--ui-border); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .cb-hints span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .cb-hints i { font-style: normal; color: var(--ui-text2); font-size: var(--ui-gr-s); }
+  .cb-hud.quiet .cb-hints { transform: translate(-50%, 8px); }
+  .cb-hud.touch .cb-hints, .cb-hud.nopad .cb-hints, .cb-hud.nopad .cb-keys { display: none; }
+  /* the sun */
+  .cb-clock { position: absolute; left: 50%; top: 16px; width: 300px; transform: translate(-50%, -12px); opacity: 0; text-align: center; }
+  .cb-clock.open { opacity: 1; transform: translate(-50%, 0); }
+  .cb-clock svg { width: 300px; height: 140px; overflow: visible; }
+  .cb-arc { fill: none; stroke: rgba(255,255,255,.16); stroke-width: 3; stroke-dasharray: 2 9; stroke-linecap: round; }
+  .cb-arc-lit { fill: none; stroke: #ffd541; stroke-width: 3; stroke-linecap: round; filter: drop-shadow(0 0 6px rgba(255,213,65,.7)); transition: stroke 600ms; }
+  .cb-arc-lit.moon { stroke: #b3b9d1; filter: drop-shadow(0 0 6px rgba(179,185,209,.6)); }
+  .cb-sun { fill: #ffd541; filter: drop-shadow(0 0 10px #f9a31b); transition: fill 600ms; }
+  .cb-sun.moon { fill: #dae0ea; filter: drop-shadow(0 0 8px #8b93af); }
+  .cb-time { font: 40px/1 var(--ui-pixel); color: var(--ui-text-strong); margin-top: -58px; text-shadow: 0 2px 8px rgba(0,0,0,.6); }
+  .cb-clock-hint { margin-top: 10px; display: inline-flex; gap: 6px; align-items: center; font-size: var(--ui-gr-s); color: var(--ui-text2); }
+  /* the material wheel */
+  .cb-wheel { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; pointer-events: none; background: radial-gradient(circle, rgba(13,10,18,.55) 0, rgba(13,10,18,.2) 340px, transparent 520px); }
+  .cb-wheel.open { opacity: 1; pointer-events: auto; }
+  .cb-wheel-ring { position: relative; width: 0; height: 0; }
+  .cb-slice { position: absolute; left: 0; top: 0; width: 92px; height: 72px; margin: -36px 0 0 -46px; padding: 0; border-radius: 14px; border: 1px solid var(--ui-border);
+    background: var(--ui-glass); box-shadow: var(--ui-shadow); transform: translate(var(--x), var(--y)) scale(.86); transition: transform 220ms var(--ui-curve), border-color 220ms, box-shadow 220ms; cursor: pointer; overflow: hidden; }
+  .cb-wheel:not(.open) .cb-slice { transform: translate(calc(var(--x) * .6), calc(var(--y) * .6)) scale(.5); }
+  .cb-slice canvas { width: 92px; height: 69px; image-rendering: pixelated; }
+  .cb-slice.on { transform: translate(var(--x), var(--y)) scale(1.18); border-color: var(--ui-acc-line); box-shadow: 0 0 0 2px var(--ui-acc), var(--ui-shadow); z-index: 2; }
+  .cb-wheel-mid { position: absolute; text-align: center; }
+  .cb-wheel-mid b { display: block; font: 34px/1.1 var(--ui-pixel); color: var(--ui-text-strong); text-shadow: 0 2px 10px rgba(0,0,0,.7); max-width: 300px; }
+  .cb-wheel-mid span { display: inline-flex; gap: 6px; align-items: center; margin-top: 8px; font-size: var(--ui-gr-s); color: var(--ui-text2); }
+  /* the menu */
+  .cb-menu { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; pointer-events: none; background: rgba(13,10,18,.35); }
+  .cb-menu.open { opacity: 1; pointer-events: auto; }
+  .cb-menu-card { width: min(380px, calc(100vw - 32px)); padding: 18px; border-radius: var(--ui-r-pane); background: var(--ui-glass); border: 1px solid var(--ui-border); box-shadow: var(--ui-shadow); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .cb-title { font: 56px/1 var(--ui-pixel); color: var(--ui-text-strong); letter-spacing: 1px; }
+  .cb-title.small { font-size: 34px; margin: 0 0 12px 4px; }
+  .cb-item { position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 46px; padding: 0 14px; margin: 4px 0; border-radius: var(--ui-r-button); border: 1px solid transparent;
+    background: transparent; color: var(--ui-text); font: inherit; text-align: left; cursor: pointer; overflow: hidden; }
+  .cb-item span { flex: 1; }
+  .cb-item.on { background: var(--ui-hover); border-color: var(--ui-acc-line); }
+  .cb-item em { font-style: normal; font-size: var(--ui-gr-s); color: var(--ui-text3); display: inline-flex; gap: 4px; align-items: center; }
+  .cb-item em.yes { color: var(--ui-acc); }
+  .cb-hold { position: absolute; left: 0; bottom: 0; height: 3px; width: calc(var(--k) * 100%); background: var(--ui-acc); }
+  .cb-item.holding .cb-hold { width: 100%; transition: width 1000ms linear; }
+  .cb-menu-foot { margin-top: 12px; display: flex; gap: 8px; align-items: center; justify-content: center; color: var(--ui-text3); font-size: var(--ui-gr-s); }
+  /* sound, saved */
+  .cb-sound { position: absolute; right: 16px; top: 16px; display: flex; gap: 8px; align-items: center; padding: 8px 12px; border-radius: 999px; font-size: var(--ui-gr-s); color: var(--ui-text2);
+    background: var(--ui-glass); border: 1px solid var(--ui-border); opacity: 0; transform: translateY(-6px); }
+  .cb-sound.show { opacity: 1; transform: none; }
+  .cb-saved { position: absolute; right: 18px; bottom: 22px; color: var(--ui-text3); opacity: 0; }
+  .cb-saved.show { opacity: .8; }
+  .cb-saved.bad { color: var(--ui-red); }
+  /* touch */
+  .cb-touch { position: absolute; left: 50%; bottom: max(14px, env(safe-area-inset-bottom)); transform: translateX(-50%); display: none; gap: 8px; align-items: center; padding: 8px; pointer-events: auto;
+    border-radius: var(--ui-r-pane); background: var(--ui-glass); border: 1px solid var(--ui-border); box-shadow: var(--ui-shadow); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .cb-hud.touch .cb-touch { display: flex; }
+  .cb-hud.touch .cb-chip { display: none; }
+  .cb-touch button { min-width: 46px; min-height: 46px; display: inline-flex; gap: 6px; align-items: center; justify-content: center; padding: 0 10px; border-radius: var(--ui-r-button);
+    border: 1px solid var(--ui-border-strong); background: var(--ui-panel); color: var(--ui-text); font: inherit; }
+  .cb-touch [data-tset] { padding: 3px; } .cb-touch [data-tset] canvas { width: 52px; height: 39px; border-radius: 6px; image-rendering: pixelated; }
+  .cb-seg { display: flex; gap: 0; } .cb-seg button { border-radius: 0; } .cb-seg button:first-child { border-radius: var(--ui-r-button) 0 0 var(--ui-r-button); } .cb-seg button:last-child { border-radius: 0 var(--ui-r-button) var(--ui-r-button) 0; }
+  .cb-seg button.on { background: var(--ui-acc); color: var(--ui-acc-text); border-color: var(--ui-acc-line); }
+  @media (max-width: 560px) { .cb-seg span { display: none; } }
+  /* hello */
+  .cb-hello { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: auto; background: radial-gradient(circle, rgba(13,10,18,.25), rgba(13,10,18,.65)); transition: opacity 900ms var(--ui-curve); }
+  .cb-hello.gone { opacity: 0; pointer-events: none; }
+  .cb-hello-card { text-align: center; padding: 28px 34px; max-width: calc(100vw - 32px); }
+  .cb-hello-card .cb-title { font-size: clamp(56px, 12vw, 112px); text-shadow: 0 4px 30px rgba(249,163,27,.35), 0 2px 0 rgba(0,0,0,.4); }
+  .cb-hello-card p { margin: 10px 0 0; color: var(--ui-text2); display: flex; gap: 6px; justify-content: center; align-items: center; flex-wrap: wrap; }
+  .cb-hello-card .cb-go { margin-top: 26px; color: var(--ui-text3); animation: cb-breathe 2.6s ease-in-out infinite; }
+  @keyframes cb-breathe { 50% { opacity: .45; } }
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div class="cb-hud" id="hud"></div>
+<div id="load"></div>
+<script type="module">
+  // CampBuilder v2 (#196): own address (/campbuilder), not in the game. ?new = a fresh parcel, ?slot=1..6
+  import { start } from './game/campbuilder/main.js';
+  import { createLoading } from './game/play/loading.js';
+  const loading = createLoading(document.getElementById('load'), new URL('projects/nomadgirl/', location.href));
+  start(document.getElementById('game'), document.getElementById('hud'), loading).catch(e => { loading.fail?.('Fehler beim Laden: ' + e.message); console.error(e); });
+</script>
+</body>
+</html>

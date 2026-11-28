@@ -1,0 +1,28 @@
+{
+  "name": "CampBuilder v2",
+  "description": "Bau-Spielzeug für Camps (#196): ohne Grenzen, mit Controller und Touch, Bauen klingt wie Musik.",
+  "parcel": { "width": 40, "grow": 8, "growAt": 4, "depth": 7, "sky": 22, "maxWidth": 400, "base": "desert" },
+  "hill": { "max": 14, "radius": 140, "minRadius": 2, "rough": 18, "wide": 100 },
+  "cursor": { "speed": 1500, "accel": 9, "magnet": 30, "above": 92, "repeat": 140 },
+  "view": { "zoom": [38, 115], "start": 72, "zoomSpeed": 120, "pan": 1400, "parallax": "wueste", "details": true },
+  "clock": { "start": 18.2, "speed": 5 },
+  "music": { "enabled": true, "bpm": 72, "volume": 34, "root": 62, "chords": "I vi IV V" },
+  "tones": { "volume": 70, "grid": 16, "wait": 70 },
+  "haptics": { "enabled": true, "strength": 60 },
+  "hud": { "fade": 3.5 },
+  "save": { "after": 2.5, "slot": 1 },
+  "materials": [
+    { "set": "desert", "material": "sand" },
+    { "set": "concrete", "material": "concrete" },
+    { "set": "concrete_wall", "material": "concrete" },
+    { "set": "metal", "material": "metal" },
+    { "set": "ruins", "material": "stone" },
+    { "set": "mall", "material": "stone" },
+    { "set": "bunker", "material": "concrete" },
+    { "set": "marble", "material": "stone" },
+    { "set": "factory", "material": "metal" },
+    { "set": "cave", "material": "earth" },
+    { "set": "supermarket_wall", "material": "concrete" },
+    { "set": "supermarket", "material": "stone" }
+  ]
+}

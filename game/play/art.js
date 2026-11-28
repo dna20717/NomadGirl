@@ -222,7 +222,7 @@ export function terrainKits(scene, D) {
   };
 }
 // the same random number for the same tile, every time
-const hash = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + s * 2246822519) >>> 0; h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+const hashAt = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + s * 2246822519) >>> 0; h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
 const hexInt = (c, d) => c ? parseInt(String(c).slice(1), 16) : d;
 
 // ---------- depth for the tile sets (Daniel, 12.11.2026: „die Kachel-Sets wirken flach, wie an die Wand geklebt“) ----------
@@ -286,6 +286,9 @@ function fillOf(kit, x, y, solid) {
   return d >= from ? kit.fill2 : kit.fill;
 }
 export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = null) {
+  // #196 a room cut out of a bigger world (CampBuilder chunks): room.ox shifts the column for every variant and dice roll, so a tile
+  // looks the same whichever cut draws it; the baked layers come back in .layers (the caller may move, crop or destroy them)
+  const OX = room.ox | 0, hash = (x, y, s) => hashAt(x + OX, y, s), M = (i, n) => (((i + OX) % n) + n) % n, layers = [];
   const brands = !style ? brandKit(scene) : null;
   // #171 Hüllen G4: wall tiles the hull takes over (facade, earth, open sky; game/play/hull.js) are not drawn here and count as air for
   // edges and depth, so the shell of the rooms gets its rims and roofs against them. Collision stays (scene.js solidRects).
@@ -348,7 +351,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
         if (bk.base?.length && solid(x, y + 1)) list = bk.base;
         else if (bk.ceil?.length && solid(x, y - 1)) list = bk.ceil;
         else if (bk.broken?.length && hash(x, y, 179) * 100 < bk.brokenChance) list = bk.broken;
-        back.push({ key: bk.key, frame: list[(x + (list === bk.broken ? y : 0)) % list.length], x: px, y: py - bk.over, tx: x, ty: y, kit: bk });
+        back.push({ key: bk.key, frame: list[M(x + (list === bk.broken ? y : 0), list.length)], x: px, y: py - bk.over, tx: x, ty: y, kit: bk });
         backShade.fillStyle(0x060608, (bk.shade ?? 55) / 100).fillRect(px, py, T, T);
       }
     }
@@ -356,12 +359,12 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
     if (kit) {
       const top = !solid(x, y - 1), D = kit.def, seed = D.seed || 0, list = top ? kit.top : fillOf(kit, x, y, solid);
       // #158 autotiling: caps, undersides, roof covers and seams between sets derived from the set's own tiles (game/play/autotile.js)
-      let key = kit.key, frame = list[x % list.length];
+      let key = kit.key, frame = list[M(x, list.length)];
       if (autotileOf(kit).on && !cg && scene.textures.createCanvas) {
         const C = tileCase(solid, x, y), roof = top && spots?.at(x, y)?.type === 'roof';
-        const seamOf = dx => { const n = solid(x + dx, y) && !camoAt.has((x + dx) + ',' + y) ? kitAt(x + dx, y) : null; if (!n || n === kit || n.key === kit.key && n.def === kit.def || n.over !== kit.over) return null; const l = !solid(x + dx, y - 1) ? n.top : fillOf(n, x + dx, y, solid); return { key: n.key, frame: l[(x + dx) % l.length] }; };
-        const v = { capL: C.capL, capR: C.capR, under: C.under, roof, crust: kit.top[x % kit.top.length], seamL: seamOf(-1), seamR: seamOf(1) };
-        if (v.capL || v.capR || v.under || v.roof || v.seamL || v.seamR) ({ key, frame } = autoTile(scene, kit, roof ? kit.fill[x % kit.fill.length] : frame, v));
+        const seamOf = dx => { const n = solid(x + dx, y) && !camoAt.has((x + dx) + ',' + y) ? kitAt(x + dx, y) : null; if (!n || n === kit || n.key === kit.key && n.def === kit.def || n.over !== kit.over) return null; const l = !solid(x + dx, y - 1) ? n.top : fillOf(n, x + dx, y, solid); return { key: n.key, frame: l[M(x + dx, l.length)] }; };
+        const v = { capL: C.capL, capR: C.capR, under: C.under, roof, crust: kit.top[M(x, kit.top.length)], seamL: seamOf(-1), seamR: seamOf(1) };
+        if (v.capL || v.capR || v.under || v.roof || v.seamL || v.seamR) ({ key, frame } = autoTile(scene, kit, roof ? kit.fill[M(x, kit.fill.length)] : frame, v));
         if (C.innerL) innerCorner(edges, px, py, T, true);
         if (C.innerR) innerCorner(edges, px, py, T, false);
       }
@@ -474,7 +477,7 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
         const px = x * T, py = y * T, kit = kitAt(x, y);
         if (kit) {
           const top = !cs(x, y - 1), list = top ? kit.top : fillOf(kit, x, y, cs);
-          c.stamps.push({ key: kit.key, frame: list[x % list.length], x: px, y: py - kit.over });
+          c.stamps.push({ key: kit.key, frame: list[M(x, list.length)], x: px, y: py - kit.over });
           coverTiles.push({ x, y, kit, g: c.edges, cs });
         } else {
           c.g.fillStyle(0x24272e).fillRect(px, py, T, T);
@@ -544,14 +547,14 @@ export function drawRoom(scene, room, T, tiles = {}, style = null, terrain = nul
     for (const e of edgeTiles) rimEdges(e.g, { l: !solid(e.x - 1, e.y), r: !solid(e.x + 1, e.y), b: !solid(e.x, e.y + 1) }, e.x * T, e.y * T, T, { ...e.kit.def, depth: { rim: 0, shade: 0 } });
     for (const e of coverTiles) rimEdges(e.g, { l: !e.cs(e.x - 1, e.y), r: !e.cs(e.x + 1, e.y), b: !e.cs(e.x, e.y + 1) }, e.x * T, e.y * T, T, { ...e.kit.def, depth: { rim: 0, shade: 0 } });
   }
-  if (back.length) bake(scene, scene.make.graphics({}, false), 0, 0, room.w * T, room.h * T, { depth: -11, stamps: back, over: backShade });
+  if (back.length) layers.push(...bake(scene, scene.make.graphics({}, false), 0, 0, room.w * T, room.h * T, { depth: -11, stamps: back, over: backShade }));
   else backShade.destroy();
-  bake(scene, g0, 0, 0, room.w * T, room.h * T, { depth: -10, stamps: [...stamps0, ...details0, ...decals0, ...clutter], over: edges0 });
+  layers.push(...bake(scene, g0, 0, 0, room.w * T, room.h * T, { depth: -10, stamps: [...stamps0, ...details0, ...decals0, ...clutter], over: edges0 }));
   for (const c of camo) {
     const all = c.cover || c.tiles, xs = all.map(t => t[0]), ys = all.map(t => t[1]), x0 = (Math.min(...xs) - 1) * T, y0 = (Math.min(...ys) - 1) * T;
     c.rts = bake(scene, c.g, x0, y0, (Math.max(...xs) - Math.min(...xs) + 3) * T, (Math.max(...ys) - Math.min(...ys) + 3) * T, { depth: 10.6, stamps: c.stamps, over: c.edges });
     c.secret = all.filter(([x, y]) => !solid(x, y)).map(([x, y]) => [x, y]);   // the hidden air (the fog keeps it dense)
     delete c.g; delete c.edges; delete c.stamps;
   }
-  return { props: clutter, camo };
+  return { props: clutter, camo, layers };
 }

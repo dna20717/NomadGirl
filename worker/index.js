@@ -70,9 +70,10 @@ export function authorName(n) {
 // ---------- savegame (Cloudflare KV per login) ----------
 // #126 three slots: GET /api/save?slot=n → { save | null, time }   PUT /api/save?slot=n { save, meta } → { time }   DELETE → empty slot
 // (no slot = 1). GET /api/saves → { slots: { 1: meta | null, 2: …, 3: … } } from the KV metadata, without loading the savegames.
-// GET|PUT|DELETE /api/blob?name=achievements|trash|shot1..3 → { value }: the global achievements, the Vor-Lösch-Zustand, previews.
+// GET|PUT|DELETE /api/blob?name=achievements|trash|shot1..3 → { value }: the global achievements, the Vor-Lösch-Zustand, previews;
+// diorama1..6 = the CampBuilder's dioramas (#196).
 // The key is a hash of the login e-mail, so the e-mail is not stored in clear. The old single save (save:<hash>) moves to slot 1 once.
-const SAVE_MAX = 256 * 1024, META_MAX = 1000, SLOTS = 3, BLOBS = /^(achievements|trash|shot[1-3])$/;
+const SAVE_MAX = 256 * 1024, META_MAX = 1000, SLOTS = 3, BLOBS = /^(achievements|trash|shot[1-3]|diorama[1-6])$/;
 export async function saveKey(email) {
   const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(email).trim().toLowerCase()));
   return 'save:' + [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('');

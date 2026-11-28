@@ -2,6 +2,7 @@
 
 Verlauf: was wann gebaut wurde (früher `CLAUDE.md` › Stand). Neue Einträge oben.
 
+- 28.11.2026: **CampBuilder v2, Scheibe 1** (#196, `/campbuilder`): Bau-Spielzeug nur mit Controller und Touch. Boden aus allen 12 Kachel-Sets malen und abtragen, Hügel hochziehen und Senken graben (wachsen Stufe für Stufe als Welle), AvA als Zeiger mit Trägheit und Magnet, Musik mit Bau-Tönen auf dem Takt, Material-Geräusche, Vibration, Sonnen-Uhr (Y), Material-Rad (LB), Zurückspulen (Select), wachsende Parzelle mit Pflöcken, leise Oberfläche, Speichern von selbst (online pro Login), Metrik für v3.
 - 27.11.2026: **Spielregeln für alle Kontexte**: `docs/status.md` als Status auf einen Blick, „HNC“ heißt jetzt HONC und läuft ganz im Repo, das Funkbuch gilt für jede Sitzung, das claude.ai-Projekt läuft aus.
 - 27.11.2026: **Feedback-Board** (#194): alle Meldungen der Testphase im Pause-Menü, im Hauptmenü und unter /feedback; Status Offen, In Bearbeitung, Bereit zur Abnahme, Geschlossen mit Abnahme-Häkchen; Bild, Text bearbeiten, Spur als Zeitleiste, „Hier spielen“ an der gemeldeten Stelle, Kommentare.
 - 26.11.2026: **Testpilot Stufe 3** (#193): der Bot nimmt Aufträge im Questlog an und gibt Fertiges ab, kauft fehlende Werkstätten am Händler-Platz, baut Implantate über die Hand des Inventars ein und zieht Entities in die Bit-Farm (Worker, Freundschaftsduell an der Chill-Ecke); Werkstätten rotieren im vollen Rig; nach einer Reise keine alten Ziele mehr.
